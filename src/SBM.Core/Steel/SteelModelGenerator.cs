@@ -96,6 +96,7 @@ public sealed partial class SteelModelGenerator
         foreach (var c in _f.CrossFrames) { var cc = c; conn.Add(() => BuildCrossFrame(cc)); }
         foreach (var sp in _f.Splices) { var s = sp; conn.Add(() => BuildFieldSplice(s)); }
         conn.Add(BuildLateralBracing);
+        conn.Add(BuildInspectionAccess);
         foreach (var x in _f.CrossGirders) { var xx = x; conn.Add(() => BuildCrossGirder(xx)); }   // registers bolt holes in girder webs
         Parallel.ForEach(conn, a => a());
 

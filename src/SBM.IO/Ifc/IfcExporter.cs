@@ -124,6 +124,10 @@ public static class IfcExporter
                 PartCategory.Angle or PartCategory.Channel => (0.35, 0.85, 0.45),
                 PartCategory.SolePlate => (0.6, 0.6, 0.6),
                 PartCategory.BearingPad => (0.15, 0.15, 0.15),
+                PartCategory.InspectionBracket => (0.55, 0.75, 0.9),
+                PartCategory.InspectionCable => (0.8, 0.8, 0.85),
+                PartCategory.Grating => (0.6, 0.62, 0.66),
+                PartCategory.WalkwayStringer or PartCategory.WalkwayPost or PartCategory.WalkwayRail or PartCategory.WalkwayPlate => (0.45, 0.7, 0.5),
                 _ => (0.95, 0.3, 0.2),
             };
             int rgb = w.Add("IFCCOLOURRGB", $"$,{R(r)},{R(g)},{R(b)}");
@@ -557,6 +561,7 @@ public static class IfcExporter
                     AssemblyKind.CrossFrame => (".SITE.", ".CROSS_BRACING.", "$"),
                     AssemblyKind.LateralBracing => (".SITE.", ".CROSS_BRACING.", "$"),
                     AssemblyKind.FieldSplice => (".SITE.", ".USERDEFINED.", "'FIELD_SPLICE'"),
+                    AssemblyKind.InspectionCable or AssemblyKind.InspectionWalkway => (".SITE.", ".ACCESSORY_ASSEMBLY.", "$"),
                     _ => (".SITE.", ".USERDEFINED.", "'BEARING'"),
                 };
                 asmIds[asm.Mark] = w.Add("IFCELEMENTASSEMBLY",
@@ -590,6 +595,15 @@ public static class IfcExporter
                     PartCategory.GuideBar => w.Add("IFCPLATE", $"{common},'GUIDE_BAR',{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.USERDEFINED."),
                     PartCategory.Ptfe => w.Add("IFCPLATE", $"{common},'PTFE_SLIDING_SURFACE',{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.USERDEFINED."),
                     PartCategory.ShearPin => w.Add("IFCMECHANICALFASTENER", $"{common},$,{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},$,$,.DOWEL."),
+                    // Inspection access: WT cable brackets are IfcMembers (user-defined), the wire rope an IfcMember STRUCTURALCABLE,
+                    // walkway stringers STRINGER, rail posts POST, rails IfcRailing HANDRAIL, grating / diaphragm / toe board plates IfcPlate.
+                    PartCategory.InspectionBracket => w.Add("IFCMEMBER", $"{common},'CABLE_BRACKET',{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.USERDEFINED."),
+                    PartCategory.InspectionCable => w.Add("IFCMEMBER", $"{common},$,{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.STRUCTURALCABLE."),
+                    PartCategory.Grating => w.Add("IFCPLATE", $"{common},'GRATING',{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.USERDEFINED."),
+                    PartCategory.WalkwayStringer => w.Add("IFCMEMBER", $"{common},$,{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.STRINGER."),
+                    PartCategory.WalkwayPost => w.Add("IFCMEMBER", $"{common},$,{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.POST."),
+                    PartCategory.WalkwayRail => w.Add("IFCRAILING", $"{common},$,{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.HANDRAIL."),
+                    PartCategory.WalkwayPlate => w.Add("IFCPLATE", $"{common},'WALKWAY_PLATE',{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.USERDEFINED."),
                     _ => w.Add("IFCFASTENER", $"{common},$,{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.WELD."),
                 };
                 if (children.TryGetValue(part.Assembly, out var list)) list.Add(id);
@@ -613,17 +627,17 @@ public static class IfcExporter
                 {
                     1 => ("Anchor bolt", boltRef!.Diameter, ".ANCHORBOLT.", "ASTM F1554"),
                     2 => ("Shear stud", steel.StudDiameter, ".STUDSHEARCONNECTOR.", "ASTM A108 (AWS D1.5 Type B)"),
-                    _ => ("Bolt", steel.Bolt.Diameter, ".BOLT.", $"ASTM F3125 Gr. {steel.BoltGrade}"),
+                    _ => ("Bolt", boltRef is { Diameter: > 0 } ? boltRef.Diameter : steel.Bolt.Diameter, ".BOLT.", $"ASTM F3125 Gr. {steel.BoltGrade}"),
                 };
                 var k2 = (kind, (long)Math.Round(bolt.Grip * 1e5), (long)Math.Round(bolt.Length * 1e5),
-                    kind == 1 ? (long)Math.Round(boltRef!.Diameter * 1e5 + boltRef.Embedment * 1e9) : 0L);
+                    kind == 1 ? (long)Math.Round(boltRef!.Diameter * 1e5 + boltRef.Embedment * 1e9) : kind == 0 ? (long)Math.Round(dia * 1e5) : 0L);
                 if (!types.TryGetValue(k2, out var ty))
                 {
                     var mesh = kind switch
                     {
                         1 => SteelModel.AnchorBoltMesh(boltRef!.Diameter, boltRef.Grip, boltRef.Embedment, 10),
                         2 => steel.StudMesh(bolt.Length, 10),
-                        _ => SteelModel.BoltMesh(steel.Bolt, bolt.Grip, bolt.Length, 10),
+                        _ => SteelModel.BoltMesh(new BoltGeometry(dia), bolt.Grip, bolt.Length, 10),
                     };
                     var sb = new StringBuilder("(");
                     for (int i = 0; i < mesh.Positions.Count; i++)

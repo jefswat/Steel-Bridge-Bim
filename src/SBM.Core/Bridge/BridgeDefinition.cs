@@ -957,6 +957,8 @@ public sealed class BridgeDefinition
     public LateralBracingDefinition LateralBracing { get; set; } = new();
     /// <summary>Deck drains (scuppers) with downspouts.</summary>
     public List<DeckDrainDefinition> Drains { get; set; } = new();
+    /// <summary>Inspection cables and walkways (null = none).</summary>
+    public InspectionAccessDefinition? InspectionAccess { get; set; }
 
     /// <summary>A typical two-span continuous layout starting at the given station.</summary>
     public static BridgeDefinition CreateDefault(double beginStation, string alignmentName)
@@ -1027,5 +1029,6 @@ public sealed class BridgeDefinition
         Studs = Studs.Clone(),
         LateralBracing = LateralBracing.Clone(),
         Drains = Drains.Select(d => d.Clone()).ToList(),
+        InspectionAccess = InspectionAccess?.Clone(),
     };
 }

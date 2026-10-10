@@ -43,4 +43,21 @@ internal static class RolledBuilder
         var b = polygon.Select(p => origin + dirP * p.X + dirQ * p.Y + axis * u1).ToArray();
         MeshBuilder.AddLoft(mesh, polygon as Vec2[] ?? polygon.ToArray(), new[] { a, b });
     }
+
+    /// <summary>Round bar / rope of the given radius along a polyline (rings perpendicular to the local direction).</summary>
+    public static void AddTube(Mesh mesh, IReadOnlyList<Vec3> pts, double radius, int segments = 8)
+    {
+        if (pts.Count < 2) return;
+        var section = Enumerable.Range(0, segments).Select(i => Vec2.FromAngle(2 * Math.PI * i / segments) * radius).ToArray();
+        var rings = new List<Vec3[]>();
+        for (int i = 0; i < pts.Count; i++)
+        {
+            var d = (i == 0 ? pts[1] - pts[0] : i == pts.Count - 1 ? pts[i] - pts[i - 1] : (pts[i + 1] - pts[i]).Normalized() + (pts[i] - pts[i - 1]).Normalized()).Normalized();
+            var u = Vec3.Cross(d, new Vec3(0, 0, 1));
+            u = u.Length < 1e-6 ? new Vec3(1, 0, 0) : u.Normalized();
+            var v = Vec3.Cross(d, u).Normalized();
+            rings.Add(section.Select(q => pts[i] + u * q.X + v * q.Y).ToArray());
+        }
+        MeshBuilder.AddLoft(mesh, section, rings);
+    }
 }

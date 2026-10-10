@@ -127,6 +127,11 @@ public static partial class PropertyPath
         if (n is "depressedtopatend" or "bearingtoend" or "padlength" or "genericbodylength") return ValueKindHint.Short;
         if (n is "maxbarlength") return ValueKindHint.Long;
         if (n.Contains("cover") || n.Contains("lapoverride") || n.Contains("tolerance")) return ValueKindHint.Short;
+        // Cross girder / inspection access inputs: small dimensions in inches, run lengths and spacings in feet.
+        if (n is "anglelength" or "endanglelength" or "bracketlength" or "anchorbracketlength" or "supportbracketlength" or "topbelowdiscontinuouswebtop"
+            or "beginoffset" or "endoffset" or "ropeoffsetfromweb" or "ropeheightabovewebbottom" or "gratingabovewebbottom" or "walkwayendclearance"
+            || n.Contains("fromopening") || n.Contains("toopening") || n.Contains("fromtop") || n.Contains("endclear")) return ValueKindHint.Short;
+        if (n is "maxanchorspacing" or "maxpostspacing" or "stringerspanlimit" or "bracketclearofanchor") return ValueKindHint.Long;
         if (n.Contains("offset") && !n.Contains("workpoint")) return ValueKindHint.Long;
         string[] shortWords = { "thickness", "width", "diameter", "gap", "clip", "haunch", "edge", "pitch", "gage", "size", "lap",
             "clearance", "depth", "height", "extension", "projection", "embedment", "oversize", "increment", "penetration", "cover",

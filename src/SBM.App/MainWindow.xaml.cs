@@ -270,7 +270,9 @@ public partial class MainWindow : Window
             cam0.Width = 3.5;
             return;
         }
-        if (_vm.SteelModels.Values.SelectMany(m => m.Parts).Where(p => p.Assembly == mark).ToList() is { Count: > 0 } aparts
+        // MARK@Bridge name limits the search to that bridge (inspection walkway marks repeat in every bridge).
+        var steelSets = subBridge == "" ? _vm.SteelModels.Values : _vm.SteelModels.Where(kv => kv.Key.Name == subBridge).Select(kv => kv.Value);
+        if (steelSets.SelectMany(m => m.Parts).Where(p => p.Assembly == subMark).ToList() is { Count: > 0 } aparts
             && !mark.StartsWith("CF") && !mark.StartsWith("FS"))
         {
             // Any steel assembly (bearings B-…, cross girders XG-…): look at its bounding box.

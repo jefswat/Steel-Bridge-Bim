@@ -9,6 +9,18 @@ public sealed partial class SteelModelGenerator
 {
     // ================================================================== cross girders (discontinuous girders)
 
+    /// <summary>Vertical shift of the top-of-web chord (left to right continuing girder) that places the top of the cross girder
+    /// top flange below the discontinuous girder's top of web (0 when the definition leaves it flush), and the fraction of the
+    /// chord where the discontinuous girder crosses.</summary>
+    private (double dz, double frac) CrossGirderShift(CrossGirderResult x)
+    {
+        var xg = _def.Girders.CrossGirder;
+        double frac = Vec2.Dot(x.Center.XY - x.Left.XY, (x.Right.XY - x.Left.XY)) / Math.Max(1e-12, (x.Right.XY - x.Left.XY).LengthSquared);
+        if (xg.TopBelowDiscontinuousWebTop is not double off) return (0, frac);
+        double chordZ = x.Left.Z + (x.Right.Z - x.Left.Z) * frac;
+        return (x.Center.Z - off - chordZ, frac);
+    }
+
     /// <summary>
     /// Built-up cross girder between the two continuing girders, connected to their webs with pairs of angles (L5x5x1/2);
     /// the discontinuous girder frames into its web with angles. Runs in the CONNECTIONS phase: the angle bolts register
@@ -32,11 +44,9 @@ public sealed partial class SteelModelGenerator
         var dirPlan = (b.XY - a.XY).Normalized();
         double tcFrac = Vec2.Dot(x.Center.XY - a.XY, dirPlan) / Math.Max(1e-9, (b.XY - a.XY).Length);
         double xd = tcFrac * Ltot;                                            // discontinuous girder CL along the cross girder
-        if (xg.TopBelowDiscontinuousWebTop is double off)
         {
             // Top of the top flange = top of web of the discontinuous girder at its end − off; the girder keeps the chord slope.
-            double chordZ = a.Z + (b.Z - a.Z) * tcFrac;
-            double dz = x.Center.Z - off - chordZ;
+            var (dz, _) = CrossGirderShift(x);
             a = new Vec3(a.X, a.Y, a.Z + dz); b = new Vec3(b.X, b.Y, b.Z + dz);
         }
         var f = Frame3.FromXZ(a, b - a, Up);

@@ -121,6 +121,8 @@ public static class SceneBuilder
         ("3D-BEARINGS", 150, 150, 155, new[] { PartCategory.SolePlate, PartCategory.BearingPlate, PartCategory.MasonryPlate, PartCategory.GuideBar, PartCategory.ShearPin }),
         ("3D-BEARING-ELASTOMER", 40, 40, 45, new[] { PartCategory.BearingPad, PartCategory.BearingDisc, PartCategory.Ptfe }),
         ("3D-WELDS", 240, 80, 60, new[] { PartCategory.Weld }),
+        ("3D-INSPECTION", 120, 195, 150, new[] { PartCategory.InspectionBracket, PartCategory.InspectionCable, PartCategory.Grating,
+            PartCategory.WalkwayStringer, PartCategory.WalkwayPost, PartCategory.WalkwayRail, PartCategory.WalkwayPlate }),
     };
 
     /// <summary>Detail layers are split into square tiles (m) so the viewport can draw only tiles near the view.</summary>
@@ -164,8 +166,8 @@ public static class SceneBuilder
             {
                     IEnumerable<(Mesh mesh, List<Matrix4x4> inst, List<object> tags)> groups = kind switch
                 {
-                    0 => m.Bolts.Where(b => b.Kind == BoltKind.Structural).GroupBy(b => (Math.Round(b.Grip, 5), Math.Round(b.Length, 5), Tile(b.Frame.Origin)))
-                        .Select(gr => (SteelModel.BoltMesh(m.Bolt, gr.First().Grip, gr.First().Length), gr.Select(b => ToMatrix(b.Frame, o)).ToList(), gr.Cast<object>().ToList())),
+                    0 => m.Bolts.Where(b => b.Kind == BoltKind.Structural).GroupBy(b => (Math.Round(b.Diameter > 0 ? b.Diameter : m.Bolt.Diameter, 5), Math.Round(b.Grip, 5), Math.Round(b.Length, 5), Tile(b.Frame.Origin)))
+                        .Select(gr => (SteelModel.BoltMesh(gr.First().Diameter > 0 ? new BoltGeometry(gr.First().Diameter) : m.Bolt, gr.First().Grip, gr.First().Length), gr.Select(b => ToMatrix(b.Frame, o)).ToList(), gr.Cast<object>().ToList())),
                     1 => m.Studs.GroupBy(s => (Math.Round(s.Length, 5), Tile(s.Frame.Origin)))
                         .Select(gr => (m.StudMesh(gr.First().Length, 10), gr.Select(s => ToMatrix(s.Frame, o)).ToList(), gr.Cast<object>().ToList())),
                     _ => m.Bolts.Where(b => b.Kind == BoltKind.Anchor).GroupBy(b => (Math.Round(b.Diameter, 5), Math.Round(b.Grip, 5), Math.Round(b.Embedment, 5), Tile(b.Frame.Origin)))
