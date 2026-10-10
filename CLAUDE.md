@@ -75,6 +75,12 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
     face; ties follow the section (`PolygonTie`, hooks at the sharpest corner), optionally as two overlapping end hoops
     (`ColumnHoopOverlap`, legs mapped like the S-face corner) + crossties (`Crosstie`); flared base gets its own cage.
     Bar sizes include #14/#18. Plan data: `samples/plans/column-rebar.csx`.
+  - Cap section step / aesthetic relief (OPTIONAL, `SubstructureDefinition.Aesthetics` = `CapAestheticsDefinition`, as-designed caps only): the
+    cap is W above the relief curve and W - 1'-0 below (StepSetback 6" per face, BOTH faces). The cap solid itself is the narrower core; `BuildCapStep`
+    adds full-width strips above each layer line (`Layers` = BandChains, lowest line first; plans: fan arcs R5, R4, R3, 2" each, drafted 7 deg) as a
+    separate Cap-kind SubSolid ("... cap section step"); lines go to `SubstructureUnit.ReliefLines` (bent elevation view). `CapBandBuilder` builds the
+    tangent-arc S-curve from the plan tables (`FromTable`) or the explicit figures (`FromLongArc`). Cap bars are NOT adapted (warning). Data:
+    `samples/plans/pier-aesthetics.csx`, reading in `docs/plan-data/pier-cap-aesthetics.md` (Confirmed section). Texture itself / Detail A are not modeled.
   - `Drawing/Views/` — 2D views as `PlanDrawing`s (Z = 0) via `Drafter` (paper-inch sizes × scale; dims with ticks,
     leaders, hatch, elevation tags, AWS weld symbols; ALL text is vertically middle-aligned — DxfWriter writes 72/73
     accordingly; "\n" in text = multi-line). Keep annotation text short/multi-line: paper-sized text does not shrink
