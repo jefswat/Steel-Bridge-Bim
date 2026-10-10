@@ -200,6 +200,12 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   `CrossSlopeTable.SidesAt` interpolates break by break (a missing break = neighbour's distance, unchanged slope) /
   `DeltaElevation`; the elevation check lists the segments. Plan checks: `samples/plans/check-top-of-slab.csx`,
   `check-top-of-bearing.csx`.
+- Expansion joints (OPTIONAL, default off): `SupportDefinition.ExpansionJoint` (`ExpansionJointDefinition`) on the FIRST/LAST support of a
+  bridge. `ConcreteGenerator` cuts the deck back by the blockout width D (separate `Ends(o, insetB, insetE)`; shelf if the blockout is shallower than the
+  slab), builds the blockout concrete and a generic device envelope (`ConcreteModel.Joints`, viewport layer `3D-JOINTS`, material rows). IFC: blockout =
+  IfcBuildingElementPart (aggregated into the deck IfcSlab), device = IfcDiscreteAccessory EXPANSION_JOINT_DEVICE + pset `SBM_Placeholder`. The support's
+  `DeckEndOffset` stays the authority (the joint's own value is only a check). Plan data/confirmations: `docs/plan-data/expansion-joints.md`,
+  `samples/plans/joints-i80.csx`, `joints-ramp-g.csx` (run after the build scripts).
 - Variable deck width: `DeckDefinition.LeftAt/RightAt(station)`; constant decks keep the old code path.
 - Drainage: `BridgeDefinition.Drains` → `SubstructureModel.Drainage` (built in SubstructureGenerator, needs terrain for basins).
 - Raster terrain: `ElevationGrid` (full-res bilinear) + decimated display mesh; `TerrainModel(grid, mesh)`.

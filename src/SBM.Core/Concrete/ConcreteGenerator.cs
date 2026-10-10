@@ -10,8 +10,29 @@ using static SBM.Core.Units.UnitSystem;
 
 namespace SBM.Core.Concrete;
 
+/// <summary>One expansion joint: the blockout concrete (cast after the device is set) and a generic device envelope.</summary>
+public sealed class ExpansionJointResult
+{
+    public required string Support { get; init; }
+    public required bool AtBegin { get; init; }
+    public required ExpansionJointDefinition Definition { get; init; }
+    /// <summary>Blockout concrete on this unit's side of the joint.</summary>
+    public required Mesh Blockout { get; init; }
+    /// <summary>Generic device envelope (null when <see cref="ExpansionJointDefinition.Body"/> is off).</summary>
+    public Mesh? Body { get; init; }
+    /// <summary>Length of the joint across the deck between barriers (along the joint line).</summary>
+    public double Length { get; init; }
+    public double BlockoutVolume => Math.Abs(Blockout.Volume());
+    public double BodyVolume => Body == null ? 0 : Math.Abs(Body.Volume());
+    public string DeviceName => Definition.Type == ExpansionJointType.StripSeal
+        ? "Generic strip seal expansion joint (manufacturer-designed placeholder)"
+        : "Generic modular expansion joint (manufacturer-designed placeholder)";
+    public string BlockoutName => $"Joint blockout concrete, {Support}";
+}
+
 public sealed class ConcreteModel
 {
+    public List<ExpansionJointResult> Joints { get; } = new();
     public Mesh? Deck { get; set; }
     public Mesh? Haunches { get; set; }
     public List<(string Name, Mesh Mesh)> Barriers { get; } = new();
@@ -40,7 +61,7 @@ public sealed class ConcreteGenerator
     private readonly UnitSystem _u;
     private readonly ConcreteModel _m = new();
     private readonly ConcurrentQueue<Diagnostic> _diag = new();
-    private readonly ConcurrentDictionary<long, (double b, double e)> _ends = new();
+    private readonly ConcurrentDictionary<(long, long, long), (double b, double e)> _ends = new();
 
     private ConcreteGenerator(BridgeFraming f, UnitSystem u)
     {
@@ -67,7 +88,7 @@ public sealed class ConcreteGenerator
 
     private void Run()
     {
-        var tasks = new List<Action> { BuildDeckSolid, BuildHaunches, BuildBarriers };
+        var tasks = new List<Action> { BuildDeckSolid, BuildHaunches, BuildBarriers, BuildJoints };
         Parallel.ForEach(tasks, t => t());
         var bars = new ConcurrentBag<(string series, RebarSize size, BarShape shape, string loc, bool epoxy, BarPlacement placement)>();
         var rebarTasks = new List<Action>();
@@ -81,16 +102,18 @@ public sealed class ConcreteGenerator
 
     private double Top(double d, double o) => _a.ElevationAt(_a.DistanceToStation(d), o);
 
-    /// <summary>Alignment distances where the offset curve crosses the begin/end deck lines (optionally inset).</summary>
-    private (double b, double e) Ends(double o, double inset = 0)
+    /// <summary>Alignment distances where the offset curve crosses the begin/end deck lines (optionally inset, toward the deck).</summary>
+    private (double b, double e) Ends(double o, double inset = 0) => Ends(o, inset, inset);
+
+    private (double b, double e) Ends(double o, double insetB, double insetE)
     {
-        long key = (long)Math.Round(o * 1e4) * 1000 + (long)Math.Round(inset * 1e4);
+        var key = ((long)Math.Round(o * 1e4), (long)Math.Round(insetB * 1e4), (long)Math.Round(insetE * 1e4));
         return _ends.GetOrAdd(key, _ =>
         {
             var nb = DR.BeginLineDirection.Left;           // toward the deck (up-station)
             var ne = -DR.EndLineDirection.Left;
-            double db = Cross(DR.BeginLinePoint + nb * inset, DR.BeginLineDirection, o);
-            double de = Cross(DR.EndLinePoint + ne * inset, DR.EndLineDirection, o);
+            double db = Cross(DR.BeginLinePoint + nb * insetB, DR.BeginLineDirection, o);
+            double de = Cross(DR.EndLinePoint + ne * insetE, DR.EndLineDirection, o);
             return (db, de);
         });
     }
@@ -100,7 +123,9 @@ public sealed class ConcreteGenerator
     private double RightAtD(double d) => Deck.RightAt(_a.DistanceToStation(d));
 
     /// <summary>Alignment distances where a variable offset curve crosses the begin/end deck lines (optionally inset).</summary>
-    private (double b, double e) EndsVar(Func<double, double> offAtD, double inset = 0)
+    private (double b, double e) EndsVar(Func<double, double> offAtD, double inset = 0) => EndsVar(offAtD, inset, inset);
+
+    private (double b, double e) EndsVar(Func<double, double> offAtD, double insetB, double insetE)
     {
         var nb = DR.BeginLineDirection.Left;
         var ne = -DR.EndLineDirection.Left;
@@ -113,7 +138,7 @@ public sealed class ConcreteGenerator
             double w = Math.Abs(o - inv.Offset) + 15;
             return _a.IntersectOffsetCurveWithLine(offAtD, p, dir, guess - w, guess + w, guess, out double d) ? d : guess;
         }
-        return (One(DR.BeginLinePoint + nb * inset, DR.BeginLineDirection), One(DR.EndLinePoint + ne * inset, DR.EndLineDirection));
+        return (One(DR.BeginLinePoint + nb * insetB, DR.BeginLineDirection), One(DR.EndLinePoint + ne * insetE, DR.EndLineDirection));
     }
 
     private double Cross(Vec2 p, Vec2 dir, double o)
@@ -174,13 +199,13 @@ public sealed class ConcreteGenerator
     {
         if (Deck.VariableWidth) { BuildVariableDeckSolid(); return; }
         var offs = DeckOffsets(1.0);
-        var (b0, e0) = Ends(0);
+        var (b0, e0) = Ends(0, InsetB, InsetE);
         int ni = AlongSamples(e0 - b0) + 1;
         var top = new Vec3[ni, offs.Count];
         var bot = new Vec3[ni, offs.Count];
         for (int k = 0; k < offs.Count; k++)
         {
-            var (db, de) = Ends(offs[k]);
+            var (db, de) = Ends(offs[k], InsetB, InsetE);
             for (int i = 0; i < ni; i++)
             {
                 double d = db + (de - db) * i / (ni - 1);
@@ -191,6 +216,7 @@ public sealed class ConcreteGenerator
             }
         }
         _m.Deck = GridSolid(top, bot);
+        AddJointShelves();
     }
 
     /// <summary>Variable width: columns at fixed fractions of the width between the edges at each station.</summary>
@@ -199,7 +225,7 @@ public sealed class ConcreteGenerator
         double wMax = Deck.MaxRight - Deck.MinLeft;
         int nk = Math.Max(2, (int)Math.Ceiling(wMax / 1.0)) + 1;
         var fr = Enumerable.Range(0, nk).Select(k => (double)k / (nk - 1)).ToArray();
-        var (b0, e0) = Ends(0);
+        var (b0, e0) = Ends(0, InsetB, InsetE);
         int ni = AlongSamples(e0 - b0) + 1;
         var top = new Vec3[ni, nk];
         var bot = new Vec3[ni, nk];
@@ -207,7 +233,7 @@ public sealed class ConcreteGenerator
         {
             double t = fr[k];
             double Off(double d) => LeftAtD(d) + (RightAtD(d) - LeftAtD(d)) * t;
-            var (db, de) = EndsVar(Off);
+            var (db, de) = EndsVar(Off, InsetB, InsetE);
             for (int i = 0; i < ni; i++)
             {
                 double d = db + (de - db) * i / (ni - 1);
@@ -219,6 +245,7 @@ public sealed class ConcreteGenerator
             }
         }
         _m.Deck = GridSolid(top, bot);
+        AddJointShelves();
     }
 
     private void BuildHaunches()
@@ -291,6 +318,120 @@ public sealed class ConcreteGenerator
             _m.Barriers.Add((side < 0 ? "Left barrier" : "Right barrier", mesh));
         }
     }
+
+    // ================================================================== expansion joints
+
+    private ExpansionJointDefinition? JointAt(int support) =>
+        _def.Supports[support].ExpansionJoint is { Active: true } j ? j : null;
+    private ExpansionJointDefinition? JointB => JointAt(0);
+    private ExpansionJointDefinition? JointE => JointAt(_def.Supports.Count - 1);
+    private double InsetB => JointB?.BlockoutWidth ?? 0;
+    private double InsetE => JointE?.BlockoutWidth ?? 0;
+
+    /// <summary>Alignment distance where an offset curve crosses a deck end line moved by <paramref name="inset"/> (+ toward the deck).</summary>
+    private double EndD(Func<double, double> offAtD, bool begin, double inset)
+    {
+        var p = begin ? DR.BeginLinePoint + DR.BeginLineDirection.Left * inset : DR.EndLinePoint - DR.EndLineDirection.Left * inset;
+        var dir = begin ? DR.BeginLineDirection : DR.EndLineDirection;
+        var inv = _a.Inverse(p);
+        double o = offAtD(inv.Distance);
+        var q = p + dir * (o - inv.Offset);
+        double guess = _a.Inverse(q).Distance;
+        double w = Math.Abs(o - inv.Offset) + 15;
+        return _a.IntersectOffsetCurveWithLine(offAtD, p, dir, guess - w, guess + w, guess, out double d) ? d : guess;
+    }
+
+    /// <summary>Across-the-deck columns as offset functions; the full width uses exactly the deck solid's columns (matching seams).</summary>
+    private List<Func<double, double>> JointColumns(double li, double ri)
+    {
+        var list = new List<Func<double, double>>();
+        if (Deck.VariableWidth)
+        {
+            double wMax = Deck.MaxRight - Deck.MinLeft;
+            int nk = Math.Max(2, (int)Math.Ceiling(wMax / 1.0)) + 1;
+            for (int k = 0; k < nk; k++)
+            {
+                double t = (double)k / (nk - 1);
+                list.Add(d => { double l = LeftAtD(d) + li, r = RightAtD(d) - ri; return l + (r - l) * t; });
+            }
+            return list;
+        }
+        var offs = DeckOffsets(1.0);
+        if (li == 0 && ri == 0) return offs.Select(o => (Func<double, double>)(_ => o)).ToList();
+        double l0 = Deck.LeftEdgeOffset + li, r0 = Deck.RightEdgeOffset - ri;
+        int n = Math.Max(1, (int)Math.Ceiling((r0 - l0) / 1.0));
+        var os = Enumerable.Range(0, n + 1).Select(i => l0 + (r0 - l0) * i / n).ToList();
+        double piv = _a.CrossSlope.PivotOffset;
+        if (piv > l0 && piv < r0) os.Add(piv);
+        return os.Distinct().OrderBy(x => x).Select(o => (Func<double, double>)(_ => o)).ToList();
+    }
+
+    /// <summary>Slab of the deck-end zone between two insets from the deck end face (+ toward the deck); top/bottom are drops below finished grade.</summary>
+    private Mesh EndSlab(bool begin, double inset0, double inset1, double topDrop, double botDrop, double li = 0, double ri = 0)
+    {
+        var cols = JointColumns(li, ri);
+        int nk = cols.Count;
+        var top = new Vec3[2, nk];
+        var bot = new Vec3[2, nk];
+        for (int k = 0; k < nk; k++)
+            for (int i = 0; i < 2; i++)
+            {
+                double d = EndD(cols[k], begin, i == 0 ? inset0 : inset1);
+                double o = cols[k](d);
+                var p = _a.PointAtDistance(d, o);
+                double z = Top(d, o);
+                top[i, k] = p.WithZ(z - topDrop);
+                bot[i, k] = p.WithZ(z - botDrop);
+            }
+        return GridSolid(top, bot);
+    }
+
+    /// <summary>Where the blockout is shallower than the slab the deck keeps a shelf under it (the primary deck is cut back by the full blockout width).</summary>
+    private void AddJointShelves()
+    {
+        foreach (bool begin in new[] { true, false })
+        {
+            var j = begin ? JointB : JointE;
+            if (j == null || j.BlockoutDepth >= Deck.Thickness - 1e-6) continue;
+            _m.Deck!.Append(EndSlab(begin, 0, j.BlockoutWidth, j.BlockoutDepth, Deck.Thickness));
+        }
+    }
+
+    private void BuildJoints()
+    {
+        var res = new List<ExpansionJointResult>();
+        double barrierBase = BarrierProfiles.For(Deck.Barrier) is { Length: > 0 } pr ? pr.Max(q => q.X) : 0;
+        foreach (bool begin in new[] { true, false })
+        {
+            int idx = begin ? 0 : _def.Supports.Count - 1;
+            var sup = _def.Supports[idx];
+            var j = sup.ExpansionJoint;
+            if (j is not { Active: true }) continue;
+            if (j.DeckEndOffset is double plan && Math.Abs(plan - sup.DeckEndOffset) > 0.001)
+                Warn($"Expansion joint at {sup.Name}: plans give CL bearing to deck end {_u.FormatLength(plan, LengthKind.Short)}, the support has {_u.FormatLength(sup.DeckEndOffset, LengthKind.Short)} (not changed).");
+            if (j.BlockoutDepth > Deck.Thickness + 1e-6)
+                Warn($"Expansion joint at {sup.Name}: blockout depth {_u.FormatLength(j.BlockoutDepth, LengthKind.Short)} exceeds the modeled slab ({_u.FormatLength(Deck.Thickness, LengthKind.Short)}); the plans' deeper end block is not modeled, so the blockout concrete is limited to the slab thickness.");
+            if (j.SetDown >= Math.Min(j.BlockoutDepth, Deck.Thickness))
+                Warn($"Expansion joint at {sup.Name}: set-down is not smaller than the blockout depth.");
+            double depth = Math.Min(j.BlockoutDepth, Deck.Thickness);
+            var blockout = EndSlab(begin, 0, j.BlockoutWidth, 0, depth);
+            Mesh? body = null;
+            double length = 0;
+            double li = Deck.Barrier.Left ? (j.EdgeInset ?? barrierBase) : 0, ri = Deck.Barrier.Right ? (j.EdgeInset ?? barrierBase) : 0;
+            if (j.Body && j.GapAt50F > 1e-6)
+            {
+                // Device envelope: fills the opening between the deck-end faces from just below top of slab (set-down) to the blockout depth.
+                body = EndSlab(begin, 0, -j.GapAt50F, Math.Min(j.SetDown, depth * 0.5), depth, li, ri);
+                var pts = JointColumns(li, ri).Select(c => { double d = EndD(c, begin, 0); var p = _a.PointAtDistance(d, c(d)); return new Vec2(p.X, p.Y); }).ToList();
+                for (int k = 1; k < pts.Count; k++) length += (pts[k] - pts[k - 1]).Length;
+            }
+            res.Add(new ExpansionJointResult { Support = sup.Name, AtBegin = begin, Definition = j, Blockout = blockout, Body = body, Length = length });
+        }
+        if (res.Count == 0) return;
+        lock (_m.Joints) _m.Joints.AddRange(res);
+        lock (_m.Notes) _m.Notes.Add("Expansion joints: blockout concrete is cut out of the deck and cast separately; the device is a generic envelope (the manufacturer designs and supplies it). Deck reinforcement is not cut back at the blockout.");
+    }
+
 
     // ================================================================== deck reinforcement
 
