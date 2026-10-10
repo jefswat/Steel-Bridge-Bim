@@ -43,22 +43,25 @@ Use this to start the next session. Architecture notes are in `CLAUDE.md`. The u
 
 ## 0a. Open at the end of the 2026-10-10 session (check these first)
 
-- **Git not yet initialized.** `.gitignore` is written (bin/obj/dist/temp, *.ifc/*.ifczip/*.dxf/*.png, plan logs). Plan:
-  after the measure/snap agent finished: `git init`, first commit of the buildable state (local only; GitHub later,
-  private, user approval before any push).
-- **Measure / station-offset / object snaps** (Sonnet agent, edits `src\SBM.App`: new files + hooks in
-  MainWindow.Viewport3D.cs, MainWindow.xaml(.cs)). Review its changes, build, run tests, check with `--snapshot`.
-  If it did not finish: see its CLAUDE.md section / new files; the build must be green before the first commit.
-- **Reports possibly still being written:** `docs\plan-data\i80-elevation-investigation.md` (proposed I-80 input
-  fixes — review, verify, apply) and `docs\plan-data\piles-capstep-dowels.md` (BATTER COMPLETE for both sets: 1:4 outward normal to the footing edge, Ramp G corners diagonal 45°, 11G 1:6, I-80/19G outer N rows only; cap step and dowels only 16G-18G — rest still to read; battered piles, 16G/17G lower cap step,
-  footing dowels/couplers → new inputs FootingDefinition per-pile batter, cap section step, column dowels/couplers).
-- **Queued (user-approved):** near-view lofted rebar — smooth continuous tubes (fine bends, smooth normals) for rebar
-  tiles within ~20 ft of the view target when zoomed in (orthographic camera: use the target/zoom, not camera
-  distance); far tiles keep the hexagonal segments. In `Viewport/SceneBuilder.cs` (`AddTube`, rebar tiles `byTile`).
-  Do it after the measure agent's viewport changes are in git.
-- **User decision pending:** model modular expansion joints as blockout + generic body?
-- **Verify before changing:** cut-off cross girder vertical position (~11"/8" below the top flange, UNCERTAIN reading,
-  PDF 125) before editing BuildCrossGirder.
+- **Git initialized** (local, branch `main`, first commit e5a7218). Commit each verified step. GitHub later: private,
+  user approval before any push.
+- **Measure / station-offset / object snaps** (Sonnet agent; Ctrl+M, Ctrl+I, F3; files in CLAUDE.md). Build clean,
+  142 tests. TODO: zoomed-out snap queries slow on big models (mean 14 ms, p95 64 ms, worst ~1 s; radius-pruning
+  fix NOT applied — CLAUDE.md TODO); not tested on the I-80 model or in plan mode; SbmApp wrappers + docs/API.md entry
+  missing; index built twice at startup; leftover `--snapdump` debug block in MainWindow.Measure.cs.
+- **I-80 elevations** (`docs\plan-data\i80-elevation-investigation.md`): ✅ 2WB bottom flange PL 2 1/2 x 34 (applied,
+  2WB now ±0.1"); ✅ check-top-of-slab 6A girder A typo 1021.52 (fixed). OPEN: (3) gore 6A→7591+50 slope must vary
+  LINEARLY 3.4%→3.0% (sheet 190 note), cross-slope-i80.csx steps it → up to −2" on A-E; linear fix leaves +0.5" at A/6A
+  (Ramp A2 grade / transition reference / north edge?). (4) North girders (U2 A-C, U3 A-B) follow their own plan RADII
+  (e.g. U2 A 1749'-6, C 8000'-0; U3 A 2268'-5 / 1318'-5) — model uses offset curves → 1-2" mid-span; needs an explicit
+  girder-geometry input + plan pier offsets. (5) ~−0.05" bias U2 east / U3, −0.13" girder H 7WB-8WB unexplained.
+- **piles-capstep-dowels.md:** batter complete (1:4 outward normal to the footing edge; Ramp G corners 45°; 11G 1:6;
+  I-80/19G outer N rows only); confirm 1:4 = 1H:4V, diagonal convention, pile length along the axis. Cap step and
+  dowels: only 16G-18G — rest unread.
+- **Queued (user-approved):** near-view lofted rebar (smooth continuous tubes within ~20 ft of the view target when
+  zoomed in; far tiles keep hex segments) in `Viewport/SceneBuilder.cs` (`AddTube`, rebar tiles).
+- **User decision pending:** modular expansion joints as blockout + generic body?
+- **Verify before changing:** cut-off cross girder vertical position (~11"/8" below the top flange, PDF 125).
 ## 0. Session 2026-10-10 (afternoon) results
 
 - **Ramp G girder line was 1'-6 off (input error, fixed in `build-ramp-g.csx`):** typical section (PDF 85) = girder A
@@ -197,6 +200,7 @@ Elevation mismatches left after the 2.4 cross-slope fix (`check-top-of-bearing.c
   my girder A position or deck edge there disagrees with the plan. Not adjusted.
 - ✅ Ramp G top of bearing −1" through 3G–14G, +0.4 to +1.5" at 1G and 16G–19G — FIXED 2026-10-10 (girder line was
   1'-6 off, see section 0); now ±0.1".
+
 
 
 
