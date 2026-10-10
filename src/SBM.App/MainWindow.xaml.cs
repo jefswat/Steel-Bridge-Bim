@@ -194,6 +194,9 @@ public partial class MainWindow : Window
         // SUBn = unit n of the first bridge's substructure; SUBn@Bridge name = of that bridge.
         string subBridge = mark.Contains('@') ? mark[(mark.IndexOf('@') + 1)..] : "";
         string subMark = mark.Contains('@') ? mark[..mark.IndexOf('@')] : mark;
+        // FTGn[@Bridge] = foundation (footings + piles) of unit n, seen from the side and slightly above; width 110 ft.
+        bool ftg = subMark.StartsWith("FTG");
+        if (ftg) subMark = "SUB" + subMark[3..];
         if (subMark.StartsWith("SUB") && int.TryParse(subMark[3..], out int subNo)
             && (subBridge == "" ? _vm.SubstructureModels.Values.FirstOrDefault() : _vm.SubstructureModels.FirstOrDefault(kv => kv.Key.Name == subBridge).Value)?.Units.ElementAtOrDefault(subNo) is { } su)
         {
@@ -215,6 +218,17 @@ public partial class MainWindow : Window
             cam0.Position = new Point3D(c.X, c.Y, c.Z) - lk * 50;
             cam0.UpDirection = new Vector3D(0, 0, 1);
             cam0.Width = (s1 - s0) * 1.6;
+            if (ftg && su.Foundations.Count > 0)
+            {
+                var f0 = su.Foundations[0];
+                var tip = su.Foundations.SelectMany(q => q.Piles).Select(q => q.TipZ).DefaultIfEmpty(f0.BottomZ).Min();
+                var cfm = su.World(f0.S, f0.N, (f0.BottomZ + tip) / 2) - _scene.Origin;
+                var lkf = new Vector3D(-su.N.X + su.D.X * 0.25, -su.N.Y + su.D.Y * 0.25, 0.12);
+                lkf.Normalize();
+                cam0.LookDirection = lkf * 50;
+                cam0.Position = new Point3D(cfm.X, cfm.Y, cfm.Z) - lkf * 50;
+                cam0.Width = Math.Max(f0.SizeS * 2.5, (f0.BottomZ - tip) * 1.9);
+            }
             KeepCameraInRange();
             return;
         }

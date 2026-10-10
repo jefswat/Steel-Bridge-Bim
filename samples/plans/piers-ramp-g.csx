@@ -53,7 +53,7 @@ List<FootingPoint> Grid((double n, double[] s)[] rows) => rows.SelectMany(r => r
 // 1009.61 / 1011.56, ahead half 1.20 ft higher (1010.81 / 1012.77); tips at x = -22.203 / +20.703 (42'-11 5/16 overall)
 // 5'-6 below the top; soffit 9'-0 below the top at kinks 6" outside the column faces (x = +-5.5; elev. 1001.36 /
 // 1001.89 check). Column 10'-0 x 6'-6 octagonal (chamfers 3'-4 x 1'-9), 24'-0 high. Footing 28'-0 x 22'-0 x 5'-0,
-// bottom 972.62; 20 HP14x73, 70 ft (outer piles battered 1:4 on the plans -- modeled plumb). Ramp G CL is 11'-10 1/4
+// bottom 972.62; 20 HP14x73, 70 ft (outer N-row piles battered 1:4). Ramp G CL is 11'-10 1/4
 // left of the CL pier (pile layout).
 {
     var b = Doc.Project.Bridges.First(x => x.Name == "Ramp G Unit 4");
@@ -80,6 +80,7 @@ List<FootingPoint> Grid((double n, double[] s)[] rows) => rows.SelectMany(r => r
             }),
         },
     };
+    sd.Footings[0].BatterPerimeter(4, false, false);   // plans: the 10 piles of both outer N rows (N = +-9) batter 1:4 outward in N, no diagonals
     b.Supports[j].Substructure = sd;
     Doc.Regenerate();
     Report(b.Name, j, new[]
@@ -87,7 +88,7 @@ List<FootingPoint> Grid((double n, double[] s)[] rows) => rows.SelectMany(r => r
         ("back (Ramp G A-D), left to right", 1010.20), ("", 1010.76), ("", 1011.32), ("", 1011.88),
         ("ahead (I-80 Unit 3 A-C), left to right", 1011.50), ("", 1012.24), ("", 1012.94),
     });
-    Print($"  piles: {sd.Footings[0].Piles.Count} (plans: 20)");
+    Print($"  piles: {sd.Footings[0].Piles.Count} (plans: 20), battered {sd.Footings[0].Piles.Count(q => q.IsBattered)} (plans: 10)");
 }
 
 // ---------------------------------------------------------------- Hammerhead piers 1G-15G (design sheets 18-60)
@@ -95,7 +96,7 @@ List<FootingPoint> Grid((double n, double[] s)[] rows) => rows.SelectMany(r => r
 // the top corner at the outer ends of the overall dimension (left 1'-9 9/16 / right 1'-1 3/4 beyond the corners unless
 // noted); soffit kinks 6" outside the 10'-0 column faces (x = +-5.5) at the soffit elevations shown; column 10'-0 x
 // 6'-6 octagonal (3'-4 x 1'-9 chamfers) flaring below the flare elevation to 11'-0 x 7'-6 (3'-8 1/2 x 1'-11 3/8);
-// the Ramp G baseline is 10'-0 left of the CL pier. Outer piles battered 1:4 on the plans are modeled plumb.
+// the Ramp G baseline is 10'-0 left of the CL pier. Battered piles: see BatterPerimeter below.
 // NOTE: on most sheets the dimension string along the soffit closes 1'-0 longer than the one along the top; the top
 // string is used (affects the tip x by up to 6").
 // Pile patterns: rows across the cap (N, up-station +) with the positions along it.
@@ -146,6 +147,7 @@ var piers = new (string name, double eL, double eR, double kL, double kR, double
         Rows((9, a6), (4.5, a6), (0, L(-13.75, -2.75, 2.75, 13.75)), (-4.5, a6), (-9, a6)), 65, "HP14x73", 1.797, 1.146, 0, 28),
     ("Pier 15G", 1023.95, 1022.41, 1014.41, 1013.93, 990.17, 970.17, 6, 28, 18, g3, 65, "HP14x73", FI(1, 8.5625) / Ft(1), FI(1, 2.75) / Ft(1), 0, 30),
 };
+var BatteredRampG = new HashSet<string> { "Pier 1G", "Pier 2G", "Pier 3G", "Pier 8G", "Pier 9G", "Pier 10G", "Pier 11G", "Pier 12G", "Pier 13G", "Pier 14G", "Pier 15G" };
 foreach (var p in piers)
 {
     // The bridge whose support builds this pier (shared unit-end piers are built by the unit that owns them).
@@ -175,10 +177,14 @@ foreach (var p in piers)
     sd.Foundation = FoundationType.PileCap; sd.FootingThickness = F(p.ftgT); sd.FoundationTopElevation = F(p.ftgBot + p.ftgT);
     sd.FootingLength = F(p.ftgS); sd.FootingWidth = F(p.ftgN);
     sd.PileSection = p.section; sd.PileLength = F(p.pileFt);
-    sd.Footings = new() { new FootingDefinition { Column = 1, Piles = Grid(p.piles) } };
+    var ftg = new FootingDefinition { Column = 1, Piles = Grid(p.piles) };
+    // Battered piles (pile layout sheets, "BATTER PILES 1:4 IN DIRECTION SHOWN"; 11G 1:6): the perimeter piles batter outward normal to
+    // the footing edge, corner piles diagonally at 45 deg in plan; 4G-7G are plumb. Ratio read as 1 horizontal : 4 vertical (to be confirmed).
+    if (BatteredRampG.Contains(p.name)) ftg.BatterPerimeter(p.name == "Pier 11G" ? 6 : 4, true, true);
+    sd.Footings = new() { ftg };
     hit.b.Supports[hit.j].Substructure = sd;
     int n = sd.Footings[0].Piles.Count;
-    Print($"  {p.name} ({hit.b.Name}): {n} piles{(n == p.expect ? "" : $" -- PLANS SAY {p.expect}")}, {p.section} x {p.pileFt} ft");
+    Print($"  {p.name} ({hit.b.Name}): {n} piles{(n == p.expect ? "" : $" -- PLANS SAY {p.expect}")}, {ftg.Piles.Count(q => q.IsBattered)} battered, {p.section} x {p.pileFt} ft");
 }
 // ---------------------------------------------------------------- Piers 16G and 17G (design sheets 62-69, PDF 64-71)
 // Two-column bents (Ramp G passes between the columns; data docs/plan-data/ramp-g-piers-16g-18g.md). Cap 6'-0 wide,
@@ -222,7 +228,7 @@ foreach (var p in new (string name, double xRoad, double half, double eL, double
 // Hammerhead, radial: top corners x = +-17.5 at 1009.93 / 1012.00, tips -18.646 / +19.297 5'-6 below the top, soffit kinks
 // x = +-5.5 at 1001.62 / 1002.27; cap 8'-0 wide. Column 10'-0 x 6'-6 octagonal (3'-4 x 1'-9), no flare. Footing 32'-0
 // along the pier x 42'-6 x 7'-0, bottom 972.95; 34 HP14x73 x 70 ft. Ramp G CL 10'-0 left of the CL pier.
-// 22 piles are battered 1:4 on the plans (S = +-14 columns, outer rows, corners diagonal) -- modeled plumb (no batter input yet).
+// 22 piles are battered 1:4 on the plans (S = +-14 columns, outer rows, corners diagonal) (BatterPerimeter).
 {
     var b = Doc.Project.Bridges.First(x => x.Name == "Ramp G Unit 4");
     int j = b.Supports.FindIndex(s => s.Name == "Pier 18G");
@@ -250,10 +256,11 @@ foreach (var p in new (string name, double xRoad, double half, double eL, double
                               (-2.75, L(-14, -7, 7, 14)), (-8.25, L(-14, 0, 14)), (-13.75, s5), (-19.25, s5))),
         },
     };
+    sd.Footings[0].BatterPerimeter(4, true, true);   // 22 battered 1:4 (outer rows N, outer columns S, corners diagonal)
     b.Supports[j].Substructure = sd;
     Doc.Regenerate();
     Report(b.Name, j, new[] { ("A-D", 1010.59), ("", 1011.16), ("", 1011.73), ("", 1012.30) });
-    Print($"  piles: {sd.Footings[0].Piles.Count} (plans: 34)");
+    Print($"  piles: {sd.Footings[0].Piles.Count} (plans: 34), battered {sd.Footings[0].Piles.Count(q => q.IsBattered)} (plans: 22)");
 }
 
 Doc.Regenerate();

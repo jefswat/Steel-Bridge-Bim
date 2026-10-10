@@ -62,6 +62,7 @@ public sealed partial class SubstructureGenerator
                 catch (Exception ex) { g.Warn($"{defs[j].Name}: substructure could not be generated ({ex.Message})."); }
             });
         m.Units.AddRange(units2.OfType<SubstructureUnit>());
+        g.CheckPileClearances();
         g.BuildRebar(m);
         g.BuildDrainage(m);
         m.Diagnostics.AddRange(g._diag);
@@ -595,7 +596,7 @@ public sealed partial class SubstructureGenerator
                     unit.Foundations.Add(f);
                     if (sd.Foundation == FoundationType.PileCap)
                     {
-                        if (fd is { Piles.Count: > 0 }) AddPilesAt(unit, sd, f, s, n, fBot, fd.Piles, double.IsNaN(fd.PileLength) ? sd.PileLength : fd.PileLength, where);
+                        if (fd is { Piles.Count: > 0 }) AddPilesAt(unit, sd, f, s, n, fBot, fd.Piles, double.IsNaN(fd.PileLength) ? sd.PileLength : fd.PileLength, fd.BatterRatio, where);
                         else AddPiles(unit, sd, f, s, n, fBot, sd.PileColumns, where);
                     }
                 }
@@ -620,22 +621,6 @@ public sealed partial class SubstructureGenerator
         var y = new Vec3(unit.N.X, unit.N.Y, 0);
         // Frame with z up; x along the cap, y = up-station normal (may be left-handed; AddLoft fixes orientation).
         return new Frame3(o, x, y, Up);
-    }
-
-    /// <summary>Piles at explicit as-designed positions (relative to the footing center).</summary>
-    private void AddPilesAt(SubstructureUnit unit, SubstructureDefinition sd, FoundationInfo f, double s, double n, double capBottom, List<FootingPoint> at, double length, string where)
-    {
-        double top = capBottom + sd.PileEmbedment, tip = top - length;
-        bool steel = sd.PileType == PileType.SteelHP;
-        string size = steel ? sd.PileSection : $"{Sh(sd.PileSize)} square precast";
-        foreach (var q in at)
-        {
-            double ps = s + q.S, pn = n + q.N;
-            f.Piles.Add(new PileInfo(ps, pn, top, tip));
-            var m = new Mesh();
-            MeshBuilder.AddExtrusion(m, PileSection(sd), Frame(unit, ps, pn), tip, top);
-            unit.Solids.Add(new SubSolid(SubElementKind.Pile, $"{where} pile {f.Piles.Count}", $"Pile {size}, {L(length)}, tip {El(tip)}", m, IsConcrete: !steel));
-        }
     }
 
     private void AddPiles(SubstructureUnit unit, SubstructureDefinition sd, FoundationInfo f, double s, double n, double capBottom, int alongCount, string where)

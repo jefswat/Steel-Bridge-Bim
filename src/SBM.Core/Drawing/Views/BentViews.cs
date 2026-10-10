@@ -133,8 +133,16 @@ public static class BentViews
             foreach (var pile in fd.Piles.Where(pp => Math.Abs(pp.N - fd.Piles.Min(q => q.N)) < 1e-6))
             {
                 double zb = BreakZ(pile.TopZ, pile.TipZ);
-                Vertical(d, pile.S - In(7), pile.S + In(7), zb, pile.TopZ, double.PositiveInfinity, SheetLayers.SteelHidden);
-                if (zb > pile.TipZ) BreakLine(pile.S - In(7), pile.S + In(7), zb);
+                // A pile battered along the cap (S) slopes in this view; one battered across it (N) appears plumb.
+                double xb = pile.IsBattered ? pile.S + (pile.TipS - pile.S) * (pile.TopZ - zb) / (pile.TopZ - pile.TipZ) : pile.S;
+                if (xb == pile.S) Vertical(d, pile.S - In(7), pile.S + In(7), zb, pile.TopZ, double.PositiveInfinity, SheetLayers.SteelHidden);
+                else
+                {
+                    d.Line(SheetLayers.SteelHidden, new Vec2(pile.S - In(7), pile.TopZ), new Vec2(xb - In(7), zb));
+                    d.Line(SheetLayers.SteelHidden, new Vec2(pile.S + In(7), pile.TopZ), new Vec2(xb + In(7), zb));
+                    d.Line(SheetLayers.SteelHidden, new Vec2(xb - In(7), zb), new Vec2(xb + In(7), zb));
+                }
+                if (zb > pile.TipZ) BreakLine(xb - In(7), xb + In(7), zb);
                 zLow = Math.Min(zLow, zb);
             }
             if (fd.Piles.Count > 0) cutZ[fd.S] = BreakZ(fd.Piles[0].TopZ, fd.Piles[0].TipZ);
@@ -221,8 +229,10 @@ public static class BentViews
             d.ElevationTag(new Vec2(c.S - c.SizeS / 2, c.BottomZ), $"TOP OF {(sd.Foundation == FoundationType.DrilledShaft ? "SHAFT" : "FOOTING")} EL {d.Elev(c.BottomZ)}", right: false);
         foreach (var fd in unit.Foundations.Take(1))
         {
+            int nBat = fd.Piles.Count(q => q.IsBattered);
+            string batterNote = nBat > 0 ? "\n" + nBat + " BATTERED (SEE PLAN)" : "";
             string tip = fd.Type == FoundationType.DrilledShaft ? $"{d.Short(fd.SizeS)} DIA SHAFT, {d.Len(fd.TopZ - fd.BottomZ)} LONG, TIP EL {d.Elev(fd.BottomZ)}"
-                : fd.Piles.Count > 0 ? $"{fd.Piles.Count} PILES {(sd.PileType == PileType.SteelHP ? sd.PileSection : d.Short(sd.PileSize) + " SQ")}, TIP EL {d.Elev(fd.Piles[0].TipZ)}"
+                : fd.Piles.Count > 0 ? $"{fd.Piles.Count} PILES {(sd.PileType == PileType.SteelHP ? sd.PileSection : d.Short(sd.PileSize) + " SQ")}, TIP EL {d.Elev(fd.Piles[0].TipZ)}{batterNote}"
                 : $"FOOTING {d.Len(fd.SizeS)} x {d.Len(fd.SizeN)} x {d.Short(sd.FootingThickness)}";
             double tz = cutZ.TryGetValue(fd.S, out double zc0) ? zc0 : fd.Piles.Count > 0 ? fd.Piles[0].TipZ : fd.BottomZ;
             d.Leader(new Vec2(fd.S, tz + d.Paper(0.1)), new Vec2(fd.S + d.Paper(0.5), tz - d.Paper(0.3)), tip);

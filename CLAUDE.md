@@ -75,6 +75,12 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
     face; ties follow the section (`PolygonTie`, hooks at the sharpest corner), optionally as two overlapping end hoops
     (`ColumnHoopOverlap`, legs mapped like the S-face corner) + crossties (`Crosstie`); flared base gets its own cage.
     Bar sizes include #14/#18. Plan data: `samples/plans/column-rebar.csx`.
+    Battered piles (`SubstructurePiles.cs`): `FootingPoint.BatterDirS/N` (unit plan direction of the tip movement, 0 = plumb) +
+    `FootingDefinition.BatterRatio` (4 = 1H:4V; diagonal batter measured along the diagonal); `FootingDefinition.BatterPerimeter`
+    sets the plan pattern (perimeter out, optional S edges, 45 deg corners). Plan positions are at the FOOTING BOTTOM plane; length
+    along the axis from the head; head/tip cut horizontal; section = plumb orientation rotated minimally onto the axis (oblique
+    extrusion = exact IFC solid). `PileInfo` has head (S,N,TopZ) + tip (TipS,TipN,TipZ). Axis-distance clearance warnings
+    (`CheckPileClearances`). Snapshot `--closeup FTGn@Bridge` frames the foundation. Conventions are flagged for user confirmation.
   - `Drawing/Views/` — 2D views as `PlanDrawing`s (Z = 0) via `Drafter` (paper-inch sizes × scale; dims with ticks,
     leaders, hatch, elevation tags, AWS weld symbols; ALL text is vertically middle-aligned — DxfWriter writes 72/73
     accordingly; "\n" in text = multi-line). Keep annotation text short/multi-line: paper-sized text does not shrink
