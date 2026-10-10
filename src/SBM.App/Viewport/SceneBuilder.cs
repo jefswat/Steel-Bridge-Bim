@@ -222,6 +222,7 @@ public static class SceneBuilder
                 {
                     (j.Blockout, j.BlockoutName, $"{j.BlockoutVolume / 0.764554857984:N2} CY"),
                     (j.Body, j.DeviceName, $"{j.Definition.TypeName}, length {j.Length / 0.3048:N1} ft"),
+                    (j.EndBlock?.Mesh, j.EndBlock?.Name ?? "", j.EndBlock == null ? "" : $"{j.EndBlock.Volume / 0.764554857984:N2} CY; girder ends embedded"),
                 }).Where(x => x.Item1 is { IsEmpty: false }).ToList();
                 if (items.Count == 0) return null;
                 var g = FlatShaded(items.Select(x => x.Item1!), o,

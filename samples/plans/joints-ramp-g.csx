@@ -4,9 +4,14 @@
 //    ("4 +/-" flared each side of the gland, part plan on sheet 148): 4" and depth 8 1/16" (end block) are APPROXIMATE.
 //  * Strip seal opening at 50 F: end-of-concrete dimension D + 1/2 = 2" + 1/2" = 2 1/2" (sheet 148 section C-C, sheet 135 section A-A).
 //  * CL bearing to deck end: 1'-2 1/2 South Abut, 1'-1 1/2 Piers 5G and 9G, 1'-1 Pier 14G, 1'-3 1/2 Pier 19G (sheet 138 Unit 4 slab).
+//  * DECK END BLOCKS ("end dam diaphragm"): piers 2'-2 deep, soffit flat for 3'-3 (1'-2 + 2'-1, sheet 135 section B-B; the neighbouring
+//    dimension string gives 3'-3 1/2) then 45 degrees to the slab soffit. South Abutment (sheet 135 section A-A): 8 1/16" BELOW the slab soffit
+//    (16 1/16" total) for ~1'-9 1/2 from the deck end (scaled, not dimensioned), stepping up to the slab soffit; its W24x68 diaphragm top flange
+//    is cast into the block, flush with the soffit. Set DECK_END_BLOCKS = false below to switch them off. Reinforcing is NOT modeled.
 //  * One body per joint: Unit 1 owns 5G, Unit 2 owns 9G, Unit 3 owns 14G; Unit 4 owns 19G (the other side, I-80 Unit 3, has no 19G line in the model).
 using SBM.Core.Bridge;
 
+const bool DECK_END_BLOCKS = true;
 double FI(int ft, double inch) => Ft(ft) + In(inch);
 var units = Doc.Project.Bridges.Where(b => b.Name.StartsWith("Ramp G Unit")).OrderBy(b => b.Name).ToList();
 if (units.Count != 4) throw new Exception("Expected Ramp G Units 1-4 (run build-ramp-g.csx first).");
@@ -19,9 +24,14 @@ void Joint(SupportDefinition s, double deckEnd, double cIn, double dIn, bool bod
         Type = type, GapAt50F = In(cIn), BlockoutWidth = In(dIn), BlockoutDepth = depth > 0 ? depth : FI(1, 2), SetDown = In(setDownIn),
         DeckEndOffset = deckEnd, SealCount = null, Body = body,
     };
+    if (!DECK_END_BLOCKS) return;
+    var slab = units[0].Deck.Thickness;
+    s.ExpansionJoint.EndBlock = type == ExpansionJointType.StripSeal
+        ? new DeckEndBlockDefinition { Soffit = new() { new(0, slab + In(8.0625)), new(FI(1, 9.5), slab + In(8.0625)), new(FI(1, 9.5), slab + In(1.0625)), new(FI(1, 10.5), slab) } }
+        : new DeckEndBlockDefinition { Depth = FI(2, 2), FlatLength = FI(3, 3) };
 }
 
-Joint(units[0].Supports[0], FI(1, 2.5), 2.5, 4, true, ExpansionJointType.StripSeal, In(8.0625), 0);   // South Abutment (strip seal)
+Joint(units[0].Supports[0], FI(1, 2.5), 2.5, 4, true, ExpansionJointType.StripSeal, In(8), 0);   // South Abutment (strip seal; pocket depth not dimensioned: slab depth)
 Joint(units[0].Supports[^1], FI(1, 1.5), 9, 25, true);      // Pier 5G
 Joint(units[1].Supports[0], FI(1, 1.5), 9, 25, false);
 Joint(units[1].Supports[^1], FI(1, 1.5), 9, 25, true);      // Pier 9G
@@ -47,6 +57,8 @@ foreach (var u in units)
     foreach (var j in cm.Joints)
         Print($"  {u.Name} / {j.Support} ({j.Definition.TypeName}): blockout {j.BlockoutVolume / 0.764554857984:F2} CY, joint length {j.Length / Ft(1):F1} ft{(j.Body == null ? "" : ", device body " + (j.BodyVolume / 0.764554857984).ToString("F3") + " CY")}");
     foreach (var d in cm.Diagnostics.Where(d => d.Message.Contains("xpansion joint"))) Print("  WARNING " + d.Message);
+    foreach (var j in cm.Joints.Where(j => j.EndBlock != null)) Print($"  {u.Name} / {j.Support}: deck end block {j.EndBlock!.Volume / 0.764554857984:F2} CY");
+    foreach (var d in cm.Diagnostics.Where(d => d.Message.Contains("Deck end block"))) Print($"  {d.Severity}: {d.Message}");
 }
 Doc.Save();
 Print("Expansion joints set (8 joint ends).");
