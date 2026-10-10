@@ -4799,6 +4799,7 @@
       ],
       "AuxiliarySupports": [],
       "Girders": {
+        "PlanGeometry": [],
         "Terminations": [],
         "Beginnings": [],
         "CrossGirder": {
@@ -12497,6 +12498,93 @@
         }
       ],
       "Girders": {
+        "PlanGeometry": [
+          {
+            "Girder": 0,
+            "StartStation": 231377.0283667848,
+            "StartOffset": -23.3407537536398,
+            "StartDirectionDegrees": 2.871776932764164,
+            "Elements": [
+              {
+                "Kind": "Line",
+                "Radius": 0,
+                "Length": 202.02355100392907
+              },
+              {
+                "Kind": "ArcLeft",
+                "Radius": 533.2476,
+                "Length": 108.0235038625769
+              },
+              {
+                "Kind": "ArcLeft",
+                "Radius": 708.4822,
+                "Length": 243.84
+              }
+            ]
+          },
+          {
+            "Girder": 1,
+            "StartStation": 231376.80431114906,
+            "StartOffset": -19.828405346705154,
+            "StartDirectionDegrees": 2.41218382539086,
+            "Elements": [
+              {
+                "Kind": "Line",
+                "Radius": 0,
+                "Length": 212.31895298911462
+              },
+              {
+                "Kind": "ArcLeft",
+                "Radius": 451.25640000000004,
+                "Length": 182.88
+              }
+            ]
+          },
+          {
+            "Girder": 2,
+            "StartStation": 231376.5863192653,
+            "StartOffset": -16.411113729338588,
+            "StartDirectionDegrees": 2.0888303052897963,
+            "Elements": [
+              {
+                "Kind": "Line",
+                "Radius": 0,
+                "Length": 162.75089771084194
+              },
+              {
+                "Kind": "ArcLeft",
+                "Radius": 2438.4,
+                "Length": 182.88
+              }
+            ]
+          },
+          {
+            "Girder": 3,
+            "StartStation": 231376.36165725437,
+            "StartOffset": -12.8892596428875,
+            "StartDirectionDegrees": 1.460654817435095,
+            "Elements": [
+              {
+                "Kind": "Line",
+                "Radius": 0,
+                "Length": 234.0083401803269
+              }
+            ]
+          },
+          {
+            "Girder": 4,
+            "StartStation": 231376.17489369333,
+            "StartOffset": -9.961510497303431,
+            "StartDirectionDegrees": 0.7437834681531275,
+            "Elements": [
+              {
+                "Kind": "Line",
+                "Radius": 0,
+                "Length": 154.90612584213068
+              }
+            ]
+          }
+        ],
         "Terminations": [
           {
             "Girder": 4,
@@ -18938,6 +19026,57 @@
       ],
       "AuxiliarySupports": [],
       "Girders": {
+        "PlanGeometry": [
+          {
+            "Girder": 0,
+            "StartStation": 231734.91532567452,
+            "StartOffset": -22.282150000456866,
+            "StartDirectionDegrees": 4.157644088537669,
+            "Elements": [
+              {
+                "Kind": "ArcLeft",
+                "Radius": 691.4134,
+                "Length": 106.89898612933436
+              },
+              {
+                "Kind": "ArcLeft",
+                "Radius": 401.85975,
+                "Length": 65.56668809050159
+              },
+              {
+                "Kind": "ArcLeft",
+                "Radius": 706.65975,
+                "Length": 274.32
+              }
+            ]
+          },
+          {
+            "Girder": 1,
+            "StartStation": 231737.14725521856,
+            "StartOffset": -18.259425000738812,
+            "StartDirectionDegrees": 1.9179454911705045,
+            "Elements": [
+              {
+                "Kind": "ArcLeft",
+                "Radius": 852.4748000000001,
+                "Length": 141.15374122688422
+              }
+            ]
+          },
+          {
+            "Girder": 2,
+            "StartStation": 231739.26539615382,
+            "StartOffset": -14.392275000378012,
+            "StartDirectionDegrees": 0.2585626825381473,
+            "Elements": [
+              {
+                "Kind": "ArcLeft",
+                "Radius": 851.916,
+                "Length": 201.3067250492525
+              }
+            ]
+          }
+        ],
         "Terminations": [
           {
             "Girder": 1,
@@ -27090,6 +27229,7 @@
       ],
       "AuxiliarySupports": [],
       "Girders": {
+        "PlanGeometry": [],
         "Terminations": [],
         "Beginnings": [],
         "CrossGirder": {
@@ -31631,6 +31771,7 @@
       ],
       "AuxiliarySupports": [],
       "Girders": {
+        "PlanGeometry": [],
         "Terminations": [],
         "Beginnings": [],
         "CrossGirder": {
@@ -36608,6 +36749,7 @@
       ],
       "AuxiliarySupports": [],
       "Girders": {
+        "PlanGeometry": [],
         "Terminations": [],
         "Beginnings": [],
         "CrossGirder": {
@@ -41852,6 +41994,7 @@
       ],
       "AuxiliarySupports": [],
       "Girders": {
+        "PlanGeometry": [],
         "Terminations": [],
         "Beginnings": [],
         "CrossGirder": {

@@ -192,6 +192,12 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   `BridgeDefinition.SupportAt(i)` for any index from a bearing, frame or substructure unit â€” never index `Supports` directly.
   Support cross frames and bearing stiffeners are built on aux lines; substructure units, elevation check, bent/bearing/
   girder views include them. Data example: `samples/plans/pier-6a.csx` (I-80 Pier 6A).
+- As-designed girder plan geometry (OPTIONAL): `GirderLayoutDefinition.PlanGeometry` = per girder a start point (alignment station/offset),
+  start direction (degrees from the alignment tangent, + toward the right) and a chain of tangent / left / right arc elements (radius, length;
+  first extended backwards, last forwards) = the plan's "P.C. STA ..., R = ..." data. `FramingGenerator` builds a `GirderPlanCurve` and uses
+  its normal offset `OffsetAt(d)` for that girder INSTEAD of the offset-at-supports curve (those table values are then ignored for it, except
+  validation); bearings, spans, cross frames, splices, elevations follow. Data: `samples/plans/girder-geometry-i80.csx` (run after
+  girders-i80.csx / pier-6a.csx, which it supersedes for I-80 U2 A-E and U3 A-C), `docs/plan-data/girder-geometry-i80.md`.
 - As-designed cross frames (OPTIONAL; without them the automatic layout + definition angles are used):
   `CrossFrameDefinition.Styles` (`CrossFrameStyle`: InvertedK/KFrame/XFrame/Strut/PlateDiaphragm; top chord angle or W
   bolted through its web; bottom chord angle, channel, "2-" back-to-back channels straddling the gussets, or WT (stem on
