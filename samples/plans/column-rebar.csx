@@ -13,8 +13,17 @@
 //      4 spaces, N faces 3, chamfers 3; Ramp G 11'-0 x 7'-6: 4 spaces on every face, except 11G / 12G: 7 @ 6 and 6 @ 6
 //      on the S / N faces with 4 spaces on the chamfers. Flare hoops 6e3 come in lapped pairs at the column tie
 //      spacing; modeled as single closed hoops at HALF that spacing (same count).
-// Not modeled: footing dowels (11d2 / 18d3-d4) lapped or coupled to the column bars - the column bars run continuous from
-// the footing; 11G / 12G inner 6e4 ties.
+//  * FOOTING DOWELS / COLUMN SPLICES (docs/plan-data/piles-capstep-dowels.md, section 3): every column bar has an L-shaped
+//    footing dowel (hook on the bottom mat: 2'-0 #11 / 2'-7 #14 / 3'-5 #18 hook, hook underside 1'-4 [Ramp G] / 1'-3 [I-80]
+//    above the footing bottom, DERIVED from the printed laps) and the column bar either laps it (printed "8'-4 / 12'-6 MIN. LAP":
+//    column bars start at the footing top, dowels project by the lap) or meets it at a mechanical coupler (two splice levels
+//    5'-0 apart; short bar d1 + long dowel d3 at the HIGH level, long bar d2 + short dowel d4 at the LOW level; coupler
+//    elevations DERIVED from the bar lists, the coupler itself is generic). Which bar is d1 / d2 / terminating comes from the
+//    plan sections C-C (filled bar symbol = d1, open = d2, circled middle chamfer bar = the bar that stops at the column
+//    top, d7/d5/d9), read from the PDF vector symbols and written as SplicePattern strings: one letter per bar, counter-clockwise
+//    from +S (plan view, S right, N up-station; the mirror is not shown on the plans - UNCERTAIN, only swaps which bar is d1/d2).
+//    Bar tops = soffit at the column CL + the embedment derived from the bar lists. 9G: second lap at mid-height (27'-1).
+// Not modeled: plinth dowels (7d6 / 7d13) and flare bars starting at the footing top; 11G / 12G inner 6e4 ties.
 // Re-runnable; run after piers-i80.csx, pier-6a.csx and piers-ramp-g.csx.
 using SBM.Core.Bridge;
 
@@ -39,6 +48,43 @@ void Flare(SubstructureDefinition sd, int nS, double sS, int nN, double sN, int 
     r.FlareBarSize = "#7"; r.FlareCover = I(3.5);
     r.FlareFaceBarsS = nS; r.FlareFaceSpacingS = I(sS); r.FlareFaceBarsN = nN; r.FlareFaceSpacingN = I(sN); r.FlareChamferBars = nC;
     r.FlareTieSize = "#6"; r.FlareTieSpacing = I(hoopSpacing);
+}
+
+// One letter per column bar, counter-clockwise from +S: H = splices at the upper coupler, L = lower, T = lower and stops
+// short of the cap steel. 10'-0 x 6'-6 columns (46 bars), 8'-0 x 4'-6 columns (32 / 34 bars) and the Ramp G two-column bents (28).
+const string P46 = "HLHLHLHLHLHLHLHLHLHLHLHLLHLHLHLHLHLHLHLHLHLHLH", P46T = "HLHLHTHLHLHLHLHLHTHLHLHLLHLHTHLHLHLHLHLHTHLHLH";
+const string P32 = "HLHLHLHLLHLHLHLHHLHLHLHLLHLHLHLH", P34T = "HLHTHHLHLHLHHTHLHHLHTHHLHLHLHHTHLH", P28 = "LHLHLHLHLHLHLHLHLHLHLHLHLHLH";
+// pier name -> (lap or low coupler, high coupler [0 = lap pier], bar top above soffit, length of the T bars, pattern, mid-height lap start)
+var splices = new Dictionary<string, (double lapOrLow, double high, double embed, double term, string pat, double mid)>
+{
+    ["Pier 1G"] = (Ft(8) + In(4), 0, Ft(7) + In(10), 0, "", 0), ["Pier 2G"] = (Ft(10), Ft(15), Ft(7) + In(11), Ft(21) + In(9), P46T, 0),
+    ["Pier 3G"] = (Ft(8) + In(4), 0, Ft(7) + In(8), 0, "", 0), ["Pier 4G"] = (Ft(8) + In(4), 0, Ft(7) + In(8), 0, "", 0),
+    ["Pier 5G"] = (Ft(12) + In(6), 0, Ft(7) + In(8), 0, "", 0), ["Pier 6G"] = (Ft(8) + In(4), 0, Ft(7) + In(8), 0, "", 0),
+    ["Pier 7G"] = (Ft(10), Ft(15), Ft(7) + In(8), Ft(34) + In(6), P46T, 0), ["Pier 8G"] = (Ft(10), Ft(15), Ft(7) + In(8), 0, P46, 0),
+    ["Pier 9G"] = (Ft(12) + In(6), 0, Ft(7) + In(8), 0, "", Ft(27) + In(1)), ["Pier 10G"] = (Ft(10), Ft(15), Ft(7) + In(8), 0, P46, 0),
+    ["Pier 11G"] = (Ft(10), Ft(15), Ft(7) + In(8), Ft(44) + In(6), P46T, 0), ["Pier 12G"] = (Ft(10), Ft(15), Ft(7) + In(8), Ft(47) + In(6), P46T, 0),
+    ["Pier 13G"] = (Ft(8) + In(4), 0, Ft(7) + In(8), 0, "", 0), ["Pier 14G"] = (Ft(12) + In(6), 0, Ft(7) + In(8), 0, "", 0),
+    ["Pier 15G"] = (Ft(8) + In(4), 0, Ft(7) + In(9), 0, "", 0), ["Pier 16G"] = (Ft(5) + In(1), Ft(10) + In(1), Ft(6) + In(1), 0, P28, 0),
+    ["Pier 17G"] = (Ft(5) + In(1), Ft(10) + In(1), Ft(5) + In(11), 0, P28, 0),
+    ["Pier 18G"] = (Ft(9) + In(11), Ft(14) + In(11), Ft(7) + In(7), Ft(11) + In(6), P46T, 0), ["Pier 19G"] = (Ft(12) + In(6), 0, Ft(7) + In(9), 0, "", 0),
+    ["Pier 1WB"] = (Ft(12) + In(6), 0, Ft(6), 0, "", 0), ["Pier 2WB"] = (Ft(8) + In(4), 0, Ft(6), 0, "", 0),
+    ["Pier 3WB"] = (Ft(4) + In(11), Ft(9) + In(11), Ft(5) + In(11), 0, P32, 0), ["Pier 4WB"] = (Ft(8) + In(4), 0, Ft(6), 0, "", 0),
+    ["Pier 5WB"] = (Ft(12) + In(6), 0, Ft(6), 0, "", 0), ["Pier 6A"] = (Ft(12) + In(6), 0, Ft(6) + In(11), 0, "", 0),
+    ["Pier 6WB"] = (Ft(8) + In(4), 0, Ft(6), 0, "", 0), ["Pier 7WB"] = (Ft(5), Ft(10), Ft(5) + In(11), Ft(25) + In(8), P34T, 0),
+    ["Pier 8WB"] = (Ft(8) + In(4), 0, Ft(5) + In(11), 0, "", 0), ["Pier 9WB"] = (Ft(8) + In(4), 0, Ft(5) + In(11), 0, "", 0),
+    ["Pier 10WB"] = (Ft(8) + In(4), 0, Ft(5) + In(11), 0, "", 0), ["Pier 11WB"] = (Ft(12) + In(6), 0, Ft(5) + In(10), 0, "", 0),
+    ["Pier 12WB"] = (Ft(8) + In(4), 0, Ft(5) + In(10), 0, "", 0), ["Pier 13WB"] = (Ft(4) + In(11), Ft(9) + In(11), Ft(5) + In(9), 0, P32, 0),
+    ["Pier 14WB"] = (Ft(8) + In(4), 0, Ft(5) + In(10), 0, "", 0), ["Pier 15WB"] = (Ft(8) + In(4), 0, Ft(5) + In(10), 0, "", 0),
+};
+void Splice(SubstructureDefinition sd, string name, bool rampG)
+{
+    var r = sd.Reinforcement;
+    if (!splices.TryGetValue(name, out var s)) { r.ColumnSplice = ColumnSpliceType.Continuous; return; }
+    r.DowelBottomAboveFooting = rampG ? Ft(1) + In(4) : Ft(1) + In(3);
+    r.DowelHookLength = 0; r.DowelPin = 0;                      // by bar size: #11 2'-0, #14 2'-7, #18 3'-5
+    r.ColumnBarEmbedInCap = s.embed; r.ColumnSplicePattern = s.pat; r.ColumnTerminatingBarLength = s.term; r.ColumnMidLapStart = s.mid;
+    if (s.high > 0) { r.ColumnSplice = ColumnSpliceType.Coupler; r.CouplerLow = s.lapOrLow; r.CouplerHigh = s.high; r.ColumnLapLength = 0; }
+    else { r.ColumnSplice = ColumnSpliceType.Lap; r.ColumnLapLength = s.lapOrLow; r.CouplerLow = 0; r.CouplerHigh = 0; }
 }
 
 int done = 0;
@@ -71,8 +117,9 @@ foreach (var b in Doc.Project.Bridges.Where(x => x.Name.StartsWith("I-80") || x.
             else Apply(sd, "#11", 6, 7.5, 4, 6.5, 0, 0, Pos(8, 15.25, 22.5), 12, 40, 2);
             Flare(sd, 5, 0, 4, 0, 4, 6);
         }
+        Splice(sd, n, b.Name.StartsWith("Ramp G"));
         done++;
-        Print($"  {b.Name} {n}: {sd.Reinforcement.ColumnBarSize} column bars{(sd.Reinforcement.FlareBarSize != "" ? ", flare cage" : "")}");
+        Print($"  {b.Name} {n}: {sd.Reinforcement.ColumnBarSize} column bars{(sd.Reinforcement.FlareBarSize != "" ? ", flare cage" : "")}, {sd.Reinforcement.ColumnSplice}");
     }
 var res = Doc.Regenerate();
 Print($"{done} piers; regenerated {res.Bridges} bridges in {res.Elapsed.TotalSeconds:F1} s, {res.Errors.Count} errors.");

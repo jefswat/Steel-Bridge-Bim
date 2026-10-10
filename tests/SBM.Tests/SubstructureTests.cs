@@ -219,6 +219,114 @@ public class SubstructureTests
         Assert.Contains(m.Diagnostics, d => d.Message.Contains("battered") && d.Message.Contains("closer than a pile width"));
     }
 
+    private static (double s, double n) MeshExtent(SubstructureUnit u, SBM.Core.Solids.Mesh m, double top)
+    {
+        // Plan extent (S, N) of the mesh slice near the top (head) of a pile.
+        var v = m.Positions.Where(q => q.Z > top - 1e-6).Select(q => new Vec2(Vec2.Dot(q.XY - u.Origin, u.D), Vec2.Dot(q.XY - u.Origin, u.N))).ToList();
+        return (v.Max(q => q.X) - v.Min(q => q.X), v.Max(q => q.Y) - v.Min(q => q.Y));
+    }
+
+    [Fact]
+    public void PileWebOrientation_Default_Explicit_AndAlongBatter()
+    {
+        // HP14x73: depth 13.6 in, flange width 14.6 in. Default: flanges parallel to the cap (S extent = flange width).
+        var m = Build(p =>
+        {
+            p.Foundation = FoundationType.PileCap; p.FoundationTopElevation = Ft(500); p.PileLength = Ft(60); p.PileEmbedment = Ft(1);
+            var fd = new FootingDefinition { Column = 1, PileWeb = PileWebMode.AlongBatter, Piles =
+            {
+                new FootingPoint(0, 0),                                  // plumb, default web along N
+                new FootingPoint(Ft(5), 0) { WebDirS = 1, WebDirN = 0 }, // plumb, explicit web along S
+                new FootingPoint(0, Ft(5), 0, 1),                        // battered in N: web along N
+                new FootingPoint(-Ft(5), 0, -1, 0),                      // battered in S: web along S
+                new FootingPoint(Ft(5), Ft(5), Math.Sqrt(0.5), Math.Sqrt(0.5)),   // diagonal
+            } };
+            p.Footings = new() { fd };
+        });
+        var u = m.Units.Single(x => x.Type == SupportType.Pier);
+        var f = u.Foundations[0];
+        Assert.Equal((0, 1), (f.Piles[0].WebS, f.Piles[0].WebN));
+        Assert.Equal((1, 0), (f.Piles[1].WebS, f.Piles[1].WebN));
+        Assert.Equal((0, 1), (f.Piles[2].WebS, f.Piles[2].WebN));
+        Assert.Equal(-1, f.Piles[3].WebS, 9);
+        Assert.Equal(Math.Sqrt(0.5), f.Piles[4].WebS, 9);
+        var piles = u.Solids.Where(x => x.Kind == SubElementKind.Pile).ToList();
+        var e0 = MeshExtent(u, piles[0].Mesh, f.Piles[0].TopZ);
+        Assert.Equal(In(14.6), e0.s, 3); Assert.Equal(In(13.6), e0.n, 3);          // flanges along S, web across
+        var e1 = MeshExtent(u, piles[1].Mesh, f.Piles[1].TopZ);
+        Assert.Equal(In(13.6), e1.s, 3); Assert.Equal(In(14.6), e1.n, 3);          // turned 90 degrees
+        // Battered along S, web along the batter: the section is turned like pile 1 (head slice is oblique, so only check the volume).
+        Assert.Equal(piles[0].Mesh.Volume(), piles[3].Mesh.Volume(), 3);
+        Assert.Equal(piles[0].Mesh.Volume(), piles[4].Mesh.Volume(), 3);
+    }
+
+    [Fact]
+    public void ColumnSplices_DowelsAndCouplers_MatchPlanConventions()
+    {
+        // 8'-0 x 4'-6 chamfered column, #18, two coupler levels: 16 bars per level, d3 dowels long / d4 short.
+        double top = Ft(500);
+        var m = Build(p =>
+        {
+            p.ColumnShape = ColumnShape.Rectangular; p.ColumnWidth = Ft(8); p.ColumnDepth = Ft(4.5);
+            p.ColumnChamferS = Ft(2 + 4 / 12.0); p.ColumnChamferN = Ft(1.25);
+            p.FoundationTopElevation = top; p.Foundation = FoundationType.PileCap; p.FootingThickness = Ft(6);
+            var r = p.Reinforcement;
+            r.ColumnBarSize = "#18"; r.ColumnCover = In(2); r.ColumnSpiralSize = "#6"; r.ColumnSpiralPitch = In(12);
+            r.ColumnFaceBarsS = 6; r.ColumnFaceSpacingS = In(7.5); r.ColumnFaceBarsN = 4; r.ColumnFaceSpacingN = In(6);
+            r.ColumnChamferBarPositions = new() { In(6.5), In(15.5), In(21.25) };
+            r.ColumnSplice = ColumnSpliceType.Coupler; r.CouplerLow = Ft(4) + In(11); r.CouplerHigh = Ft(9) + In(11);
+            r.DowelBottomAboveFooting = Ft(1) + In(3); r.ColumnBarEmbedInCap = Ft(5) + In(11);
+            r.ColumnSplicePattern = "HLHLHLHLLHLHLHLHHLHLHLHLLHLHLHLH";
+        });
+        var u = m.Units.Single(x => x.Type == SupportType.Pier);
+        var marks = m.Marks.Where(k => k.Unit == u.Name).ToList();
+        var dow = marks.Where(k => k.Shape.Code == "L").ToList();
+        Assert.Equal(3 * 32, dow.Sum(k => k.Count));
+        Assert.All(dow, k => Assert.Equal(Ft(3) + In(5), k.Shape.Dimensions[1].Value, 6));          // #18 hook 3'-5
+        Assert.Equal(2, dow.Count);                                                                 // long and short dowels
+        double dLong = dow.Max(k => k.Length), dShort = dow.Min(k => k.Length);
+        Assert.Equal(Ft(5), dLong - dShort, 6);                                                     // levels 5'-0 apart
+        // Dowel A = coupler level + footing thickness - hook height; length = A + B.
+        Assert.Equal(Ft(9) + In(11) + Ft(6) - (Ft(1) + In(3)) + Ft(3) + In(5), dLong, 6);
+        // Couplers: one per column bar; column bars start at the coupler.
+        var cp = u.Solids.Where(x => x.Kind == SubElementKind.Coupler).ToList();
+        Assert.Equal(3 * 32, cp.Count);
+        Assert.All(cp, c => Assert.True(c.Mesh.HasExactSolids && !c.IsConcrete));
+        var vMarks = marks.Where(k => k.Shape.Code == "STR" && k.Location.Contains("verticals")).Select(k => k.Mark).ToHashSet();
+        var bottoms = m.Bars.Where(b => b.Unit == u.Name && vMarks.Contains(b.Mark)).Select(b => Math.Round(b.Points.Min(q => q.Z), 4)).Distinct().OrderBy(z => z).ToList();
+        Assert.Equal(2, bottoms.Count);                                                             // two splice levels
+        Assert.Equal(Ft(5), bottoms[1] - bottoms[0], 3);
+        Assert.Equal(top + Ft(4) + In(11), bottoms[0], 3);
+        // Dowel centerline starts at the hook (on the bottom mat) and ends at the coupler level.
+        var dwPl = m.Bars.Where(b => b.Unit == u.Name && dow.Any(k => k.Mark == b.Mark)).ToList();
+        Assert.All(dwPl, b => Assert.True(b.Points.Min(q => q.Z) >= top - Ft(6) + Ft(1) + In(3) - 1e-9));
+    }
+
+    [Fact]
+    public void ColumnSplices_LapPier_DowelProjectsLapLength_ColumnBarsStartAtFootingTop()
+    {
+        double top = Ft(500);
+        var m = Build(p =>
+        {
+            p.ColumnShape = ColumnShape.Rectangular; p.ColumnWidth = Ft(8); p.ColumnDepth = Ft(4.5);
+            p.ColumnChamferS = Ft(2 + 4 / 12.0); p.ColumnChamferN = Ft(1.25);
+            p.FoundationTopElevation = top; p.Foundation = FoundationType.PileCap; p.FootingThickness = Ft(5.5);
+            var r = p.Reinforcement;
+            r.ColumnBarSize = "#11"; r.ColumnCover = In(2); r.ColumnSpiralSize = "#6"; r.ColumnSpiralPitch = In(12);
+            r.ColumnFaceBarsS = 6; r.ColumnFaceSpacingS = In(7.5); r.ColumnFaceBarsN = 4; r.ColumnFaceSpacingN = In(6.5);
+            r.ColumnChamferBarPositions = new() { In(8), In(15.25), In(22.5) };
+            r.ColumnSplice = ColumnSpliceType.Lap; r.ColumnLapLength = Ft(8) + In(4); r.DowelBottomAboveFooting = Ft(1) + In(4);
+        });
+        var u = m.Units.Single(x => x.Type == SupportType.Pier);
+        var marks = m.Marks.Where(k => k.Unit == u.Name).ToList();
+        var dow = marks.Single(k => k.Shape.Code == "L");
+        Assert.Equal(3 * 32, dow.Count);
+        Assert.Equal(Ft(8) + In(4) + Ft(5.5) - (Ft(1) + In(4)) + Ft(2), dow.Length, 6);             // 14'-6 style: A + 2'-0 hook
+        Assert.Equal(top, m.Bars.Where(b => marks.Any(k => k.Mark == b.Mark && k.Shape.Code == "STR" && k.Location.Contains("verticals")))
+            .Min(b => b.Points.Min(q => q.Z)), 6);                                                  // bars start at the footing top
+        Assert.DoesNotContain(u.Solids, s => s.Kind == SubElementKind.Coupler);
+    }
+
     [Fact]
     public void SegmentDistance_Works()
     {

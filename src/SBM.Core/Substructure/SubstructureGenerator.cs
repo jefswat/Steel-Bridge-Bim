@@ -596,7 +596,7 @@ public sealed partial class SubstructureGenerator
                     unit.Foundations.Add(f);
                     if (sd.Foundation == FoundationType.PileCap)
                     {
-                        if (fd is { Piles.Count: > 0 }) AddPilesAt(unit, sd, f, s, n, fBot, fd.Piles, double.IsNaN(fd.PileLength) ? sd.PileLength : fd.PileLength, fd.BatterRatio, where);
+                        if (fd is { Piles.Count: > 0 }) AddPilesAt(unit, sd, f, s, n, fBot, fd.Piles, double.IsNaN(fd.PileLength) ? sd.PileLength : fd.PileLength, fd.BatterRatio, where, fd.PileWeb);
                         else AddPiles(unit, sd, f, s, n, fBot, sd.PileColumns, where);
                     }
                 }

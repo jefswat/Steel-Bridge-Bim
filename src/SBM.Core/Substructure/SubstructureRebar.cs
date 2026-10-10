@@ -1,6 +1,7 @@
 using SBM.Core.Bridge;
 using SBM.Core.Concrete;
 using SBM.Core.Geometry;
+using SBM.Core.Solids;
 using static SBM.Core.Units.UnitSystem;
 
 namespace SBM.Core.Substructure;
@@ -306,9 +307,13 @@ public sealed partial class SubstructureGenerator
         double inset = cov + sp.Diameter + v.Diameter / 2;
         var vb = FaceBars(sec, inset, r.ColumnFaceBarsS, r.ColumnFaceSpacingS, r.ColumnFaceBarsN, r.ColumnFaceSpacingN,
             r.ColumnChamferBars, r.ColumnChamferSpacing, r.ColumnChamferBarPositions, r.ColumnBarCount, $"{loc} verticals");
-        foreach (var p in vb)
-            AddRun(bars, "V", v, $"{loc} verticals", new[] { unit.World(c.S + p.X, c.N + p.Y, zBot), unit.World(c.S + p.X, c.N + p.Y, zTop) },
-                r.MaxBarLength, Lap(v, r, cov, In(6)));
+        if (r.ColumnBarEmbedInCap > 0) zTop = c.TopZ + r.ColumnBarEmbedInCap;
+        if (r.ColumnSplice != ColumnSpliceType.Continuous && f is { Type: FoundationType.SpreadFooting or FoundationType.PileCap })
+            SplicedVerticals(unit, c, f, vb, v, InsetConvex(sec, inset), zTop, loc, bars);
+        else
+            foreach (var p in vb)
+                AddRun(bars, "V", v, $"{loc} verticals", new[] { unit.World(c.S + p.X, c.N + p.Y, zBot), unit.World(c.S + p.X, c.N + p.Y, zTop) },
+                    r.MaxBarLength, Lap(v, r, cov, In(6)));
         double z0 = c.BottomZ + In(3), z1 = c.TopZ - In(3);
         var tieLine = InsetConvex(sec, cov + sp.Diameter / 2);
         double dz = 0;
@@ -369,6 +374,112 @@ public sealed partial class SubstructureGenerator
             SectionTies(unit, bars, c.S, c.N, InsetConvex(fsec, r.FlareCover + ft.Diameter / 2), ft, r.FlareTieSpacing,
                 c.BottomZ + In(3), sd.ColumnFlareElevation - r.FlareCover, 0, "P", $"{loc} flare ties");
         }
+    }
+
+    // ------------------------------------------------------------------ footing dowels and column splices
+
+    /// <summary>Default dowel hook leg (out-to-out) and pin diameter by bar size, from the plan bent-bar details.</summary>
+    private static (double hook, double pin) DowelDefaults(RebarSize size) => size.Name switch
+    {
+        "#11" => (Ft(2), Ft(1)), "#14" => (Ft(2) + In(7), Ft(1) + In(6.25)), "#18" => (Ft(3) + In(5), Ft(2)),
+        _ => (12 * size.Diameter, 6 * size.Diameter),
+    };
+
+    /// <summary>L-shaped dowel: vertical leg A (out-to-out, from the underside of the hook leg to the top) and hook leg B
+    /// (out-to-out from the outside of the vertical leg), bent around the pin. Local frame: x along the hook, y up from the
+    /// underside of the hook leg, origin under the vertical leg's centreline. The scheduled length is A + B (plan bar lists).</summary>
+    private static (BarShape shape, Vec2[] local) DowelL(double a, double b, RebarSize size, double pin)
+    {
+        double db = size.Diameter, rc = pin / 2 + db / 2;
+        var bends = new List<(Vec2, double)>();
+        var local = BarShape.Rounded(new[] { new Vec2(0, a), new Vec2(0, db / 2), new Vec2(b - db / 2, db / 2) }, rc, bends);
+        var shape = new BarShape
+        {
+            Code = "L", Description = "L-shaped dowel, 90° hook", Centerline = local, PinDiameter = pin, FixedLength = a + b,
+            Dimensions =
+            {
+                new BarDimension("A", a, new Vec2(0, 0), new Vec2(0, a), new Vec2(-1, 0)),
+                new BarDimension("B", b, new Vec2(0, 0), new Vec2(b, 0), new Vec2(0, -1)),
+            },
+        };
+        shape.Bends.AddRange(bends);
+        return (shape, local);
+    }
+
+    /// <summary>
+    /// Column verticals spliced to the footing: an L-shaped dowel per column bar (hook on the bottom mat, hook leg pointing
+    /// outward along S at the end faces and chamfers, along N at the long faces), then either a contact lap (column bars start at
+    /// the footing top, dowels stand beside them on the inside) or a coupler at the bar's splice level. Bars are taken in
+    /// counter-clockwise order from +S to read <see cref="SubstructureReinforcementDefinition.ColumnSplicePattern"/>.
+    /// </summary>
+    private void SplicedVerticals(SubstructureUnit unit, ColumnInfo c, FoundationInfo f, List<Vec2> vb, RebarSize v, Vec2[] barLine,
+        double zTop, string loc, List<RawBar> bars)
+    {
+        var r = unit.Definition.Reinforcement;
+        double db = v.Diameter;
+        var (hookDef, pinDef) = DowelDefaults(v);
+        double hook = r.DowelHookLength > 0 ? r.DowelHookLength : hookDef, pin = r.DowelPin > 0 ? r.DowelPin : pinDef;
+        double zHook = f.BottomZ + r.DowelBottomAboveFooting;
+        bool coupler = r.ColumnSplice == ColumnSpliceType.Coupler;
+        double lap = r.ColumnLapLength > 0 ? r.ColumnLapLength : Lap(v, r, r.ColumnCover, In(6));
+        string pat = r.ColumnSplicePattern ?? "";
+        if (pat != "" && pat.Length != vb.Count)
+        {
+            Warn($"{loc}: splice pattern has {pat.Length} letters but the column has {vb.Count} vertical bars — alternating H/L used.");
+            pat = "";
+        }
+        static double Ang(Vec2 p) { double a = Math.Atan2(p.Y, p.X); return a < -1e-9 ? a + 2 * Math.PI : a; }
+        var order = vb.OrderBy(Ang).ToList();
+        int k = 0;
+        foreach (var p in order)
+        {
+            char ch = pat != "" ? char.ToUpperInvariant(pat[k]) : (coupler ? (k % 2 == 0 ? 'H' : 'L') : 'H');
+            k++;
+            // Face normal at the bar (nearest edge of the bar line).
+            Vec2 outN = Vec2.Zero; double best = double.MaxValue;
+            for (int i = 0; i < barLine.Length; i++)
+            {
+                var a = barLine[i]; var b = barLine[(i + 1) % barLine.Length];
+                var e = b - a; double t = Math.Clamp(Vec2.Dot(p - a, e) / Math.Max(e.LengthSquared, 1e-12), 0, 1);
+                double d = Vec2.Distance(p, a + e * t);
+                if (d < best) { best = d; outN = e.Normalized().Right; }
+            }
+            var hookDir = Math.Abs(outN.Y) >= 0.9 ? new Vec2(0, Math.Sign(outN.Y)) : new Vec2(outN.X >= 0 ? 1 : -1, 0);
+            double level = coupler ? (ch == 'H' ? r.CouplerHigh : r.CouplerLow) : lap;
+            double zJoint = f.TopZ + level;
+            var pDowel = coupler ? p : p - outN * db;                      // contact lap: dowel on the inside of the bar
+            double zBar0 = coupler ? zJoint : f.TopZ;
+            // Column bar(s).
+            if (!coupler && r.ColumnMidLapStart > 0)
+            {
+                double zMid = f.TopZ + r.ColumnMidLapStart;
+                bars.Add(StraightBar(unit, c, p, v, loc, zBar0, zMid + lap));
+                bars.Add(StraightBar(unit, c, p, v, loc, zMid, zTop));
+            }
+            else
+            {
+                double top = ch == 'T' && r.ColumnTerminatingBarLength > 0 ? zBar0 + r.ColumnTerminatingBarLength : zTop;
+                bars.Add(StraightBar(unit, c, p, v, loc, zBar0, top));
+            }
+            // Dowel.
+            var (shape, loc2d) = DowelL(zJoint - zHook, hook, v, pin);
+            var pts = loc2d.Select(q => unit.World(c.S + pDowel.X + hookDir.X * q.X, c.N + pDowel.Y + hookDir.Y * q.X, zHook + q.Y)).ToArray();
+            bars.Add(new RawBar("L", v, shape, $"{loc} footing dowels", pts));
+            if (coupler)
+            {
+                double cl = r.CouplerLength > 0 ? r.CouplerLength : 6 * db, cd = r.CouplerDiameter > 0 ? r.CouplerDiameter : 1.75 * db;
+                var m = new Mesh();
+                MeshBuilder.AddExtrusion(m, Circle(cd / 2, 24), Frame(unit, c.S + p.X, c.N + p.Y), zJoint - cl / 2, zJoint + cl / 2);
+                unit.Solids.Add(new SubSolid(SubElementKind.Coupler, $"{loc} coupler {k}",
+                    $"Mechanical splice coupler (generic) for {v.Name} bars, {Sh(cl)} long x {Sh(cd)} dia, at {El(zJoint)}", m, IsConcrete: false));
+            }
+        }
+    }
+
+    private static RawBar StraightBar(SubstructureUnit unit, ColumnInfo c, Vec2 p, RebarSize v, string loc, double z0, double z1)
+    {
+        var pts = new[] { unit.World(c.S + p.X, c.N + p.Y, z0), unit.World(c.S + p.X, c.N + p.Y, z1) };
+        return new RawBar("V", v, BarShape.Straight(z1 - z0), $"{loc} verticals", pts);
     }
 
     /// <summary>Convex counter-clockwise polygon offset inward by d (edge lines moved in, adjacent ones intersected).</summary>
@@ -739,7 +850,7 @@ public sealed partial class SubstructureGenerator
 
     private static int SeriesOrder(string s) => s switch
     {
-        "A" => 0, "B" => 1, "C" => 2, "S" => 3, "W" => 4, "H" => 5, "V" => 6, "P" => 7, "D" => 8, "E" => 9, _ => 10,
+        "A" => 0, "B" => 1, "C" => 2, "S" => 3, "W" => 4, "H" => 5, "V" => 6, "L" => 6, "P" => 7, "D" => 8, "E" => 9, _ => 10,
     };
 
     private static void AssignMarks(SubstructureModel m, SubstructureUnit unit, List<RawBar> bars)
