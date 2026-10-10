@@ -74,3 +74,14 @@ profile in the superelevation transition zone (7595+58 to 7599+53) or the I-80 r
   suggests the FS22 location on A may also differ.
 - Unit 3 span residuals for B/C at 12WB-13WB were not individually reviewed.
 - Haunch is 3.5" everywhere in the model; plan "field haunch data" sheets (PDF 136-157) were not compared. The TOS-TOB chain closes without them.
+
+## D3 resolved (gore, 2026-10-10 follow-up)
+Plan evidence: sheet 190 detail "*" (PDF 197) + Ramp A2 geometry on PDF 9 / PDF 186 (R = 2986'-5; CL Ramp A2 = 61591+08.76 at I-80 7591+08.83,
+107.43' LT and 61591+50.00 at I-80 7591+50.00, 105.08' LT; north edge 13'-7 from it = 118.65' LT). The gore is the plane z = zPGL(s) - k(s) n
+tied to the Ramp A2 PGL, k 3.4% (6A line, 61591+09.14) -> 3.0% (61591+50.00) linear in Ramp A2 station, n = distance LT of the PGL. The sheet's
+elevations 1021.45 / 1022.06 are 12'-0 LT of the PGL (confirmed by the plan curb 1023.17 at 6A = surface 1023.175). Model slopes are along the
+WB normal, which is rotated about 3 deg from the Ramp A2 normal: effective slope 3.48% at 6A (not 3.4%). `cross-slope-i80.csx` now builds the
+surface from this geometry (rows every 5 ft, curb N edge on the surface, effective gore slope per row). Result vs plan table points 1-7 of A-E:
+max 0.18" (A pt 4), all others <= 0.11"; Pier 6A top of slab +0.0..+0.1" (was +0.2). No input other than these rows changed. The PGL grade (1.398%)
+and z are derived from the sheet's two elevations, not fitted to the A-E tables. Residual: the plan curb anchor at 7591+50 (1023.51) is 0.033 ft
+below the Ramp A2 surface there (the plan's own inconsistency, 0.4"); the model keeps 3.0% at 7591+50 as drawn.

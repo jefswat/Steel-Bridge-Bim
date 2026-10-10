@@ -22,6 +22,7 @@ public sealed class FramingGenerator
     private Vec2[] _supDir = Array.Empty<Vec2>();
     private GirderSpanCurve[][] _curves = Array.Empty<GirderSpanCurve[]>(); // [girder][span]
     private double[] _startExt = Array.Empty<double>(); // per girder: extension before first bearing
+    private GirderPlanCurve?[] _plan = Array.Empty<GirderPlanCurve?>(); // per girder: as-designed plan geometry (null = offset curve)
 
     private FramingGenerator(BridgeDefinition def, Alignment align)
     {
@@ -104,11 +105,23 @@ public sealed class FramingGenerator
             var (_, ang) = _align.EvaluateAtDistance(_dSup[j]);
             _supDir[j] = Vec2.FromAngle(ang).Right.Rotate(Numerics.DegToRad(_def.Supports[j].SkewDegrees));
         }
+
+        // As-designed plan geometry replaces the offset curve of those girders; the offsets at the supports then
+        // follow from it (they are only the starting guesses for the bearing intersections and the stiffener side).
+        _plan = new GirderPlanCurve?[NG];
+        foreach (var pg in _def.Girders.PlanGeometry)
+        {
+            if (pg.Girder < 0 || pg.Girder >= NG || pg.Elements.Count == 0) continue;
+            var curve = new GirderPlanCurve(_align, pg);
+            _plan[pg.Girder] = curve;
+            for (int j = 0; j < NS; j++) _offsets[j][pg.Girder] = curve.OffsetAt(_dSup[j]);
+        }
     }
 
     /// <summary>Girder offset at an alignment distance (linear between supports, constant beyond).</summary>
     private double OffsetAt(int girder, double d)
     {
+        if (_plan[girder] is { } pc) return pc.OffsetAt(d);
         if (d <= _dSup[0]) return _offsets[0][girder];
         if (d >= _dSup[^1]) return _offsets[^1][girder];
         int j = 0;

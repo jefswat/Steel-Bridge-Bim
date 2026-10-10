@@ -30,8 +30,15 @@ public sealed class FootingPoint
 {
     public double S { get; set; }
     public double N { get; set; }
+    /// <summary>Piles only: unit plan direction (S, N components, footing frame) in which a BATTERED pile's tip moves away
+    /// from its plan position; (0, 0) = plumb. The batter ratio is <see cref="FootingDefinition.BatterRatio"/>.</summary>
+    public double BatterDirS { get; set; }
+    public double BatterDirN { get; set; }
+    [System.Text.Json.Serialization.JsonIgnore] public bool IsBattered => BatterDirS * BatterDirS + BatterDirN * BatterDirN > 1e-12;
     public FootingPoint() { }
     public FootingPoint(double s, double n) { S = s; N = n; }
+    public FootingPoint(double s, double n, double batterDirS, double batterDirN) { S = s; N = n; BatterDirS = batterDirS; BatterDirN = batterDirN; }
+    public FootingPoint Clone() => new(S, N, BatterDirS, BatterDirN);
 }
 
 /// <summary>
@@ -48,11 +55,37 @@ public sealed class FootingDefinition
     public List<FootingPoint> Piles { get; set; } = new();
     /// <summary>Pile length (NaN = the pier's PileLength).</summary>
     public double PileLength { get; set; } = double.NaN;
+    /// <summary>Batter of the piles that have a direction: 4 = "1:4" = 1 horizontal per 4 vertical (the plans do not define
+    /// the ratio in words; this is the standard H:V reading, to be confirmed). Measured along the batter direction in plan.</summary>
+    public double BatterRatio { get; set; } = 4;
     public FootingDefinition Clone() => new()
     {
-        Column = Column, PileLength = PileLength,
-        Outline = Outline.Select(p => new FootingPoint(p.S, p.N)).ToList(), Piles = Piles.Select(p => new FootingPoint(p.S, p.N)).ToList(),
+        Column = Column, PileLength = PileLength, BatterRatio = BatterRatio,
+        Outline = Outline.Select(p => p.Clone()).ToList(), Piles = Piles.Select(p => p.Clone()).ToList(),
     };
+
+    /// <summary>
+    /// Sets the batter directions of the plan's usual pattern from the pile positions: piles on the perimeter of the pile
+    /// pattern (extreme |N| or, with <paramref name="sideRows"/>, extreme |S|) batter OUTWARD normal to that edge; where two
+    /// edges meet (a corner pile) it batters diagonally at 45 degrees in plan when <paramref name="diagonalCorners"/>, else it
+    /// follows the N edge. Interior piles stay plumb. Existing directions are replaced.
+    /// </summary>
+    public void BatterPerimeter(double ratio, bool sideRows, bool diagonalCorners)
+    {
+        BatterRatio = ratio;
+        if (Piles.Count == 0) return;
+        double eps = 1e-6, maxS = Piles.Max(p => Math.Abs(p.S)), maxN = Piles.Max(p => Math.Abs(p.N));
+        double r2 = Math.Sqrt(0.5);
+        foreach (var p in Piles)
+        {
+            bool onN = Math.Abs(Math.Abs(p.N) - maxN) < eps, onS = sideRows && Math.Abs(Math.Abs(p.S) - maxS) < eps;
+            double ds = Math.Sign(p.S), dn = Math.Sign(p.N);
+            if (onN && onS && diagonalCorners) { p.BatterDirS = ds * r2; p.BatterDirN = dn * r2; }
+            else if (onN) { p.BatterDirS = 0; p.BatterDirN = dn; }
+            else if (onS) { p.BatterDirS = ds; p.BatterDirN = 0; }
+            else { p.BatterDirS = 0; p.BatterDirN = 0; }
+        }
+    }
 }
 
 /// <summary>A vertex of an as-designed cap elevation profile: S along the support line from the alignment point (right
@@ -198,6 +231,8 @@ public sealed class SubstructureDefinition
     /// <summary>Optional as-designed profile of the up-station half of the cap width (e.g. a stepped top where the ahead
     /// unit's girders are shallower). Empty = the whole width uses <see cref="CapProfile"/>.</summary>
     public List<CapProfilePoint> CapProfileAhead { get; set; } = new();
+    /// <summary>Optional architectural texture band on one face of an as-designed cap (see <see cref="CapAestheticsDefinition"/>).</summary>
+    public CapAestheticsDefinition? Aesthetics { get; set; }
     public CapTopShape TopShape { get; set; } = CapTopShape.Sloped;
     /// <summary>Slope of a sloped cap top (rise/run along the cap, left to right); NaN = fit to the bearing seats.</summary>
     public double CapSlope { get; set; } = double.NaN;
@@ -325,6 +360,7 @@ public sealed class SubstructureDefinition
         c.CapProfile = CapProfile.Select(p => new CapProfilePoint(p.S, p.Elevation)).ToList();
         c.CapProfileAhead = CapProfileAhead.Select(p => new CapProfilePoint(p.S, p.Elevation)).ToList();
         c.Footings = Footings.Select(f => f.Clone()).ToList();
+        c.Aesthetics = Aesthetics?.Clone();
         return c;
     }
 }

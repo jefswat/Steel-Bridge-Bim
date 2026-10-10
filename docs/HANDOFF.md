@@ -50,9 +50,8 @@ Use this to start the next session. Architecture notes are in `CLAUDE.md`. The u
   fix NOT applied — CLAUDE.md TODO); not tested on the I-80 model or in plan mode; SbmApp wrappers + docs/API.md entry
   missing; index built twice at startup; leftover `--snapdump` debug block in MainWindow.Measure.cs.
 - **I-80 elevations** (`docs\plan-data\i80-elevation-investigation.md`): ✅ 2WB bottom flange PL 2 1/2 x 34 (applied,
-  2WB now ±0.1"); ✅ check-top-of-slab 6A girder A typo 1021.52 (fixed). OPEN: (3) gore 6A→7591+50 slope must vary
-  LINEARLY 3.4%→3.0% (sheet 190 note), cross-slope-i80.csx steps it → up to −2" on A-E; linear fix leaves +0.5" at A/6A
-  (Ramp A2 grade / transition reference / north edge?). (4) North girders (U2 A-C, U3 A-B) follow their own plan RADII
+  2WB now ±0.1"); ✅ check-top-of-slab 6A girder A typo 1021.52 (fixed). ✅ (3) gore 6A→7591+50 modeled from the Ramp A2 PGL geometry
+  (investigation doc, "D3 resolved"): A-E top of slab within 0.18". OPEN: (4) North girders (U2 A-C, U3 A-B) follow their own plan RADII
   (e.g. U2 A 1749'-6, C 8000'-0; U3 A 2268'-5 / 1318'-5) — model uses offset curves → 1-2" mid-span; needs an explicit
   girder-geometry input + plan pier offsets. (5) ~−0.05" bias U2 east / U3, −0.13" girder H 7WB-8WB unexplained.
 - **piles-capstep-dowels.md:** batter complete (1:4 outward normal to the footing edge; Ramp G corners 45°; 11G 1:6;
@@ -60,7 +59,7 @@ Use this to start the next session. Architecture notes are in `CLAUDE.md`. The u
   dowels: only 16G-18G — rest unread.
 - **Queued (user-approved):** near-view lofted rebar (smooth continuous tubes within ~20 ft of the view target when
   zoomed in; far tiles keep hex segments) in `Viewport/SceneBuilder.cs` (`AddTube`, rebar tiles).
-- **User decision pending:** modular expansion joints as blockout + generic body?
+- ✅ **Expansion joints merged** (feature/joints; `joints-i80.csx`, `joints-ramp-g.csx` after the build scripts): blockouts + generic placeholder bodies (IFC IfcDiscreteAccessory EXPANSION_JOINT_DEVICE + Pset SBM_Placeholder; blockout IfcBuildingElementPart). OPEN: Pier 11WB opening 7" vs plan C = 9" (support lines 3'-2 apart vs plan 3'-4 → I-80 Unit 2 11WB CL BRG offset 1'-6 vs 1'-8? verify); Pier 6A joint not modeled (one deck end per unit); 2'-2 deck end block not modeled (blockout limited to the 8" slab); abutment backwall front 17" vs plan 22" from CL BRG; strip seal pocket approximate.
 - **Verify before changing:** cut-off cross girder vertical position (~11"/8" below the top flange, PDF 125).
 ## 0. Session 2026-10-10 (afternoon) results
 
@@ -200,6 +199,7 @@ Elevation mismatches left after the 2.4 cross-slope fix (`check-top-of-bearing.c
   my girder A position or deck edge there disagrees with the plan. Not adjusted.
 - ✅ Ramp G top of bearing −1" through 3G–14G, +0.4 to +1.5" at 1G and 16G–19G — FIXED 2026-10-10 (girder line was
   1'-6 off, see section 0); now ±0.1".
+
 
 
 

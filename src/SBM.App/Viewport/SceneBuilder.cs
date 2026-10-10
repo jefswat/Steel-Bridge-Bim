@@ -217,6 +217,20 @@ public static class SceneBuilder
                     items.Select(b => (object)new NamedPick("Barrier", b.Name, new[] { ("Volume", $"{Math.Abs(b.Mesh.Volume()) / 0.764554857984:N1} CY") })).ToList());
                 return new SolidLayer { Name = "3D-BARRIER", R = 190, G = 190, B = 182, Parts = new() { (g, null) }, Triangles = g.Indices!.Count / 3, Opacity = 0.5f };
             },
+            () =>
+            {
+                // Expansion joints: blockout concrete + generic device envelope (manufacturer-designed placeholder).
+                var items = models.SelectMany(m => m.Joints).SelectMany(j => new (Mesh?, string, string)[]
+                {
+                    (j.Blockout, j.BlockoutName, $"{j.BlockoutVolume / 0.764554857984:N2} CY"),
+                    (j.Body, j.DeviceName, $"{j.Definition.TypeName}, length {j.Length / 0.3048:N1} ft"),
+                    (j.EndBlock?.Mesh, j.EndBlock?.Name ?? "", j.EndBlock == null ? "" : $"{j.EndBlock.Volume / 0.764554857984:N2} CY; girder ends embedded"),
+                }).Where(x => x.Item1 is { IsEmpty: false }).ToList();
+                if (items.Count == 0) return null;
+                var g = FlatShaded(items.Select(x => x.Item1!), o,
+                    items.Select(x => (object)new NamedPick("Expansion joint", x.Item2, new[] { ("Info", x.Item3) })).ToList());
+                return new SolidLayer { Name = "3D-JOINTS", R = 230, G = 140, B = 40, Parts = new() { (g, null) }, Triangles = g.Indices!.Count / 3, Opacity = 0.85f };
+            },
             () => RebarLayer(models, o, "Deck", "3D-REBAR-DECK"),
             () => RebarLayer(models, o, "Rail", "3D-REBAR-RAIL"),
         };

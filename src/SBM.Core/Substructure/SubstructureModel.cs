@@ -20,7 +20,15 @@ public sealed record PedestalInfo(int Girder, double S, double N, double LengthS
 /// <summary>Column (pier) in cap coordinates; top is where it meets the cap bottom at its center.</summary>
 public sealed record ColumnInfo(int Index, double S, double N, double TopZ, double BottomZ, ColumnShape Shape, double SizeS, double SizeN);
 
-public sealed record PileInfo(double S, double N, double TopZ, double TipZ);
+/// <summary>A pile in cap coordinates: (S, N, TopZ) is the head centre (cut horizontal), (TipS, TipN, TipZ) the tip centre; they
+/// differ in plan for a battered pile. Plumb piles: TipS = S, TipN = N.</summary>
+public sealed record PileInfo(double S, double N, double TopZ, double TipZ, double TipS, double TipN)
+{
+    public PileInfo(double s, double n, double topZ, double tipZ) : this(s, n, topZ, tipZ, s, n) { }
+    public bool IsBattered => Math.Abs(TipS - S) > 1e-9 || Math.Abs(TipN - N) > 1e-9;
+    /// <summary>Length along the pile axis, head to tip.</summary>
+    public double Length => Math.Sqrt((TipS - S) * (TipS - S) + (TipN - N) * (TipN - N) + (TopZ - TipZ) * (TopZ - TipZ));
+}
 
 /// <summary>Foundation element (shaft, footing or pile cap with piles) in cap coordinates.</summary>
 public sealed class FoundationInfo
@@ -70,6 +78,8 @@ public sealed class SubstructureUnit
     public List<Vec2> CapOutline { get; } = new();
     public List<Vec2> CapOutlineAhead { get; } = new();
     public string CapTopDescription { get; set; } = "";
+    /// <summary>Texture band lines on the cap face (S, Z), clipped to the cap: the texture edge and each layer line.</summary>
+    public List<List<Vec2>> ReliefLines { get; } = new();
     public List<PedestalInfo> Pedestals { get; } = new();
     public List<ColumnInfo> Columns { get; } = new();
     public List<FoundationInfo> Foundations { get; } = new();

@@ -484,9 +484,11 @@ public partial class MainWindow
             _selectedTag = tag;
             _selectedModel = model;
             if (hl != null) ShowHighlight(hl);
+            DbOnPicked(tag, hit.PointHit);
             return;
         }
         _vm.SelectedProperties.Clear();
+        DbOnCleared();
     }
 
     private void StatusText(string s) => _vm.StatusText = s;
