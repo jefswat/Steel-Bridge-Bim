@@ -78,6 +78,8 @@ public sealed class SubstructureUnit
     public List<Vec2> CapOutline { get; } = new();
     public List<Vec2> CapOutlineAhead { get; } = new();
     public string CapTopDescription { get; set; } = "";
+    /// <summary>Texture band lines on the cap face (S, Z), clipped to the cap: the texture edge and each layer line.</summary>
+    public List<List<Vec2>> ReliefLines { get; } = new();
     public List<PedestalInfo> Pedestals { get; } = new();
     public List<ColumnInfo> Columns { get; } = new();
     public List<FoundationInfo> Foundations { get; } = new();

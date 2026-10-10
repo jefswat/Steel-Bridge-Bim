@@ -231,6 +231,8 @@ public sealed class SubstructureDefinition
     /// <summary>Optional as-designed profile of the up-station half of the cap width (e.g. a stepped top where the ahead
     /// unit's girders are shallower). Empty = the whole width uses <see cref="CapProfile"/>.</summary>
     public List<CapProfilePoint> CapProfileAhead { get; set; } = new();
+    /// <summary>Optional architectural texture band on one face of an as-designed cap (see <see cref="CapAestheticsDefinition"/>).</summary>
+    public CapAestheticsDefinition? Aesthetics { get; set; }
     public CapTopShape TopShape { get; set; } = CapTopShape.Sloped;
     /// <summary>Slope of a sloped cap top (rise/run along the cap, left to right); NaN = fit to the bearing seats.</summary>
     public double CapSlope { get; set; } = double.NaN;
@@ -358,6 +360,7 @@ public sealed class SubstructureDefinition
         c.CapProfile = CapProfile.Select(p => new CapProfilePoint(p.S, p.Elevation)).ToList();
         c.CapProfileAhead = CapProfileAhead.Select(p => new CapProfilePoint(p.S, p.Elevation)).ToList();
         c.Footings = Footings.Select(f => f.Clone()).ToList();
+        c.Aesthetics = Aesthetics?.Clone();
         return c;
     }
 }

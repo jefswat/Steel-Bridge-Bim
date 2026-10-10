@@ -332,17 +332,25 @@ public sealed partial class SubstructureGenerator
         if (profile != null)
         {
             // Stepped cap: back half with the main profile, ahead half with its own (each extruded across its half).
-            double nSplit = profileAhead != null ? unit.CapMidN : unit.CapN1;
-            MeshBuilder.AddLoft(capMesh, profile, new[] { profile.Select(p => unit.World(p.X, unit.CapN0, p.Y)).ToArray(), profile.Select(p => unit.World(p.X, nSplit, p.Y)).ToArray() });
+            // With a cap section step the lower (core) section is narrower; the full-width strips are added by BuildCapStep.
+            double sb = sd.Aesthetics is { Layers.Count: > 0 } aes ? aes.StepSetback : 0;
+            double nLo = unit.CapN0 + sb, nHi = unit.CapN1 - sb;
+            double nSplit = profileAhead != null ? unit.CapMidN : nHi;
+            MeshBuilder.AddLoft(capMesh, profile, new[] { profile.Select(p => unit.World(p.X, nLo, p.Y)).ToArray(), profile.Select(p => unit.World(p.X, nSplit, p.Y)).ToArray() });
             if (profileAhead != null)
-                MeshBuilder.AddLoft(capMesh, profileAhead, new[] { profileAhead.Select(p => unit.World(p.X, nSplit, p.Y)).ToArray(), profileAhead.Select(p => unit.World(p.X, unit.CapN1, p.Y)).ToArray() });
+                MeshBuilder.AddLoft(capMesh, profileAhead, new[] { profileAhead.Select(p => unit.World(p.X, nSplit, p.Y)).ToArray(), profileAhead.Select(p => unit.World(p.X, nHi, p.Y)).ToArray() });
             double dMax = unit.CapTop.Zip(unit.CapBottom, (tp, bt) => tp.Y - bt.Y).Max(), dMin = unit.CapTop.Zip(unit.CapBottom, (tp, bt) => tp.Y - bt.Y).Min();
-            unit.Solids.Add(new SubSolid(SubElementKind.Cap, $"{sl.Name} cap", $"{(abut ? "Abutment" : "Bent")} cap {L(capLen)} long, {Sh(unit.CapN1 - unit.CapN0)} wide, {Sh(dMin)} to {Sh(dMax)} deep (as designed)", capMesh));
+            unit.Solids.Add(new SubSolid(SubElementKind.Cap, $"{sl.Name} cap", $"{(abut ? "Abutment" : "Bent")} cap {L(capLen)} long, {Sh(unit.CapN1 - unit.CapN0 - 2 * sb)} wide, {Sh(dMin)} to {Sh(dMax)} deep (as designed{(sb > 0 ? ", lower section" : "")})", capMesh));
         }
         else
         {
             ExtrudeProfile(capMesh, unit, unit.CapTop, unit.CapBottom, unit.CapN0, unit.CapN1);
             unit.Solids.Add(new SubSolid(SubElementKind.Cap, $"{sl.Name} cap", $"{(abut ? "Abutment" : "Bent")} cap {L(capLen)} long, {Sh(unit.CapN1 - unit.CapN0)} wide, {Sh(sd.CapDepth)} deep", capMesh));
+        }
+        if (sd.Aesthetics is { Layers.Count: > 0 } ae)
+        {
+            if (profile == null) Warn($"{sl.Name}: cap section step ignored - it needs an as-designed cap profile.");
+            else BuildCapStep(unit, sl.Name, ae, unit.CapOutline, unit.CapOutlineAhead.Count >= 3 ? unit.CapOutlineAhead : unit.CapOutline);
         }
         if (unit.Backwall is { } bw)
         {
@@ -401,6 +409,128 @@ public sealed partial class SubstructureGenerator
             }
         }
         return unit;
+    }
+
+    // ================================================================== cap section step (aesthetic relief curve)
+
+    /// <summary>
+    /// The aesthetic cap section: the core (lower section, narrower by the setback on each face) is the cap solid itself; this adds
+    /// the full-width strips above the relief curve on BOTH faces as layers stacked on the core face. Layer k (lowest line first)
+    /// is the part of the cap outline above its boundary line, setback / count thick, flush with the cap top and the end faces
+    /// (lofts of the clipped region), the tread under it drafted by <see cref="CapAestheticsDefinition.DraftDegrees"/>.
+    /// Where the lines of the layers coincide they make one step of the summed thickness (single 6" step).
+    /// </summary>
+    private void BuildCapStep(SubstructureUnit unit, string name, CapAestheticsDefinition ae, List<Vec2> outlineBack, List<Vec2> outlineAhead)
+    {
+        int m = ae.Layers.Count;
+        double h = ae.StepSetback / m, dd = h * Math.Tan(ae.DraftDegrees * Math.PI / 180);
+        if (ae.StepSetback <= 0 || unit.CapN1 - unit.CapN0 <= 2 * ae.StepSetback + In(6))
+        { Warn($"{name}: cap section step needs a setback and a cap wider than twice the setback."); return; }
+        double cover = unit.Definition.Reinforcement.CapCover;
+        Warn($"{name}: cap bars are laid out for the full {Sh(unit.CapN1 - unit.CapN0)} width; below the relief curve the cap is {Sh(ae.StepSetback)} narrower on each face, "
+            + $"so the face bars and stirrups there lie {Sh(ae.StepSetback - cover)} OUTSIDE the lower section (the plans bend them with the relief) - cap bar layout not adapted.");
+        var mesh = new Mesh();
+        int built = 0;
+        unit.ReliefLines.Clear();
+
+        void Face(List<Vec2> outline, double nCore, double dirN)
+        {
+            // Top line = top corners of the outline (upper envelope without the steep raked end faces).
+            var xs = outline.Select(p => p.X).Distinct().OrderBy(x => x).ToList();
+            var top = xs.Select(x => new Vec2(x, Envelope(outline, x).hi)).ToList();
+            static bool Steep(Vec2 a, Vec2 b) => Math.Abs(b.Y - a.Y) > Math.Abs(b.X - a.X);
+            while (top.Count > 2 && Steep(top[0], top[1])) top.RemoveAt(0);
+            while (top.Count > 2 && Steep(top[^2], top[^1])) top.RemoveAt(top.Count - 1);
+            var o = top[0];
+            var t = (top[^1] - o).Normalized();
+            var down = new Vec2(t.Y, -t.X);
+            Vec2 Fr(Vec2 p) => new(Vec2.Dot(p - o, t), Vec2.Dot(p - o, down));
+            Vec2 Un(Vec2 p) => o + t * p.X + down * p.Y;
+            var cap = outline.Select(Fr).ToList();
+            double area = 0;
+            for (int i = 0; i < cap.Count; i++) area += Vec2.Cross(cap[i], cap[(i + 1) % cap.Count]);
+            if (area < 0) cap.Reverse();
+            for (int i = 0; i < cap.Count; i++)
+                if (Vec2.Cross(cap[(i + 1) % cap.Count] - cap[i], cap[(i + 2) % cap.Count] - cap[(i + 1) % cap.Count]) < -1e-9)
+                { Warn($"{name}: cap outline is not convex - cap section step skipped on one face."); return; }
+            double minX = cap.Min(p => p.X) - 0.05, maxX = cap.Max(p => p.X) + 0.05;
+            var edges = cap.Zip(cap.Skip(1).Append(cap[0]), (a, b) => (a, b)).ToList();
+
+            List<Vec2> Pts(BandChain ch, double dy)
+            {
+                var pts = ch.Sample().Select(p => new Vec2(p.X, p.Y + dy)).ToList();
+                if (pts.Count >= 2 && pts[0].X > minX) { var dv = pts[1] - pts[0]; if (dv.X > 1e-9) pts.Insert(0, pts[0] - dv * ((pts[0].X - minX + 0.5) / dv.X)); }
+                if (pts.Count >= 2 && pts[^1].X < maxX) { var dv = pts[^1] - pts[^2]; if (dv.X > 1e-9) pts.Add(pts[^1] + dv * ((maxX - pts[^1].X + 0.5) / dv.X)); }
+                return pts;
+            }
+            List<Vec2> Region(List<Vec2> line)
+            {
+                var sub = new List<Vec2>(line) { new(line[^1].X, -2.0), new(line[0].X, -2.0) };
+                foreach (var (a, b) in edges)
+                {
+                    var inp = sub; sub = new List<Vec2>();
+                    if (inp.Count == 0) break;
+                    var prev = inp[^1];
+                    foreach (var cur in inp)
+                    {
+                        double sc = Vec2.Cross(b - a, cur - a), sp = Vec2.Cross(b - a, prev - a);
+                        if (sc >= 0)
+                        {
+                            if (sp < 0) sub.Add(prev + (cur - prev) * (sp / (sp - sc)));
+                            sub.Add(cur);
+                        }
+                        else if (sp >= 0) sub.Add(prev + (cur - prev) * (sp / (sp - sc)));
+                        prev = cur;
+                    }
+                }
+                return sub;
+            }
+            for (int k = 0; k < m; k++)
+            {
+                var outer = Region(Pts(ae.Layers[k], 0));
+                var baseR = Region(Pts(ae.Layers[k], dd));
+                if (outer.Count < 3) continue;
+                if (baseR.Count != outer.Count) baseR = outer;
+                var keep = Enumerable.Range(0, outer.Count).Where(i => i == 0 || (outer[i] - outer[i - 1]).Length > 1e-7 || (baseR[i] - baseR[i - 1]).Length > 1e-7).ToList();
+                var op = keep.Select(i => Un(outer[i])).ToList();
+                var bp = keep.Select(i => Un(baseR[i])).ToList();
+                double nb = nCore + dirN * k * h, no = nCore + dirN * (k + 1) * h;
+                MeshBuilder.AddLoft(mesh, bp, new[] { bp.Select(p => unit.World(p.X, nb, p.Y)).ToArray(), op.Select(p => unit.World(p.X, no, p.Y)).ToArray() });
+                built++;
+            }
+            // Lines for the 2D views: each layer line clipped to the cap, in (S, Z) (drawn once per face; identical for both when the profiles match).
+            foreach (var ch in ae.Layers.Where(c => c.Nodes.Count >= 2))
+            {
+                var pts = Pts(ch, 0);
+                var run = new List<Vec2>();
+                for (int i = 1; i < pts.Count; i++)
+                {
+                    double t0 = 0, t1 = 1;
+                    var dv = pts[i] - pts[i - 1];
+                    bool ok = true;
+                    foreach (var (a, b) in edges)
+                    {
+                        double num = Vec2.Cross(b - a, pts[i - 1] - a), den = Vec2.Cross(b - a, dv);
+                        if (Math.Abs(den) < 1e-12) { if (num < 0) { ok = false; break; } continue; }
+                        double tt = -num / den;
+                        if (den > 0) t0 = Math.Max(t0, tt); else t1 = Math.Min(t1, tt);
+                        if (t0 > t1) { ok = false; break; }
+                    }
+                    if (!ok) { if (run.Count > 1) unit.ReliefLines.Add(run); run = new List<Vec2>(); continue; }
+                    var s0 = Un(pts[i - 1] + dv * t0); var s1 = Un(pts[i - 1] + dv * t1);
+                    if (run.Count == 0 || (run[^1] - s0).Length > 1e-6) { if (run.Count > 1) unit.ReliefLines.Add(run); run = new List<Vec2> { s0 }; }
+                    run.Add(s1);
+                }
+                if (run.Count > 1) unit.ReliefLines.Add(run);
+            }
+        }
+        // Back face (N0, projects toward -N) and ahead face (N1, toward +N), each on its own half's outline.
+        Face(outlineBack, unit.CapN0 + ae.StepSetback, -1);
+        Face(outlineAhead, unit.CapN1 - ae.StepSetback, 1);
+        if (built == 0) { Warn($"{name}: cap section step lies outside the cap - check the relief curve against the cap profile."); return; }
+        unit.Solids.Add(new SubSolid(SubElementKind.Cap, $"{name} cap section step",
+            $"Full-width strips above the relief curve, both faces: {m} layer(s) of {Sh(h)} = {Sh(ae.StepSetback)} setback, {ae.DraftDegrees:0.#} deg tread draft", mesh));
+        Note($"{name}: cap section {Sh(unit.CapN1 - unit.CapN0)} wide above the relief curve, {Sh(unit.CapN1 - unit.CapN0 - 2 * ae.StepSetback)} below (texture band on the {(ae.Face == CapFaceSide.Ahead ? "ahead" : "back")} face); {ae.Source}.");
     }
 
     private double GroundAt(Vec2 p) => _ground?.Invoke(p) ?? double.NaN;
