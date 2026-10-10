@@ -212,7 +212,10 @@ public static class SubstructurePlanBuilder
                 if (f.SizeS > 0)
                     dwg.Layer(Layers.SubFoundation).Poly(Outline(u, f.S, f.N, f.SizeS, f.SizeN, f.Type == Bridge.FoundationType.DrilledShaft, f.TopZ), true);
                 foreach (var p in f.Piles)
+                {
                     dwg.Layer(Layers.SubFoundation).Poly(Outline(u, p.S, p.N, UnitSystem.In(14), UnitSystem.In(14), false, p.TopZ), true);
+                    if (p.IsBattered) dwg.Layer(Layers.SubFoundation).Poly(new[] { u.Plan(p.S, p.N).WithZ(p.TopZ), u.Plan(p.TipS, p.TipN).WithZ(p.TipZ) }, false);
+                }
             }
         }
     }

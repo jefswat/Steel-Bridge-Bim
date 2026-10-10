@@ -1352,6 +1352,15 @@ public sealed partial class MainViewModel : ObservableObject
                 MaterialRows.Add(new MaterialRow(b.Name, "Concrete", "Haunches", _project.Bridges.Count, "", $"{cmod.HaunchVolume / cy:N1} {vu}"));
                 if (cmod.Barriers.Count > 0)
                     MaterialRows.Add(new MaterialRow(b.Name, "Concrete", $"Barrier ({b.Deck.Barrier.Type})", cmod.Barriers.Count, "", $"{cmod.BarrierVolume / cy:N1} {vu}"));
+                foreach (var jr in cmod.Joints)
+                {
+                    MaterialRows.Add(new MaterialRow(b.Name, "Concrete", $"Joint blockout, {jr.Support}", 1, "", $"{jr.BlockoutVolume / cy:N2} {vu}"));
+                    if (jr.EndBlock != null)
+                        MaterialRows.Add(new MaterialRow(b.Name, "Concrete", $"Deck end block (end dam diaphragm), {jr.Support}", 1, "", $"{jr.EndBlock.Volume / cy:N2} {vu}"));
+                    if (jr.Body != null)
+                        MaterialRows.Add(new MaterialRow(b.Name, "Expansion joint", $"{jr.Definition.TypeName} at {jr.Support} (generic, manufacturer-designed)", 1,
+                            u.FormatLength(jr.Length), "by manufacturer"));
+                }
                 foreach (var g in cmod.Marks.GroupBy(m => m.Size.Name))
                     MaterialRows.Add(new MaterialRow(b.Name, "Reinforcing", $"{g.Key} ({string.Join(", ", g.Select(m => m.Mark))})", g.Sum(m => m.Count),
                         u.FormatLength(g.Sum(m => m.TotalLength)), $"{g.Sum(m => m.TotalMass) / massUnit:N0} {mu}"));
@@ -1369,7 +1378,7 @@ public sealed partial class MainViewModel : ObservableObject
                     MaterialRows.Add(new MaterialRow(b.Name, "Concrete", "Substructure " + ChoiceField.Humanize(g.Key.ToString()).ToLowerInvariant() + "s", g.Count(), "",
                         $"{g.Sum(x => Math.Abs(x.Mesh.Volume())) / cy:N1} {vu}"));
                 foreach (var g in smod.Units.SelectMany(x => x.Foundations).SelectMany(x => x.Piles).GroupBy(_ => 1))
-                    MaterialRows.Add(new MaterialRow(b.Name, "Piling", "Piles", g.Count(), u.FormatLength(g.Sum(p => p.TopZ - p.TipZ)), ""));
+                    MaterialRows.Add(new MaterialRow(b.Name, "Piling", "Piles", g.Count(), u.FormatLength(g.Sum(p => p.Length)), ""));
                 foreach (var g in smod.Marks.GroupBy(m => m.Size.Name))
                     MaterialRows.Add(new MaterialRow(b.Name, "Reinforcing (substructure)", g.Key, g.Sum(m => m.Count),
                         u.FormatLength(g.Sum(m => m.TotalLength)), $"{g.Sum(m => m.TotalMass) / massUnit:N0} {mu}"));

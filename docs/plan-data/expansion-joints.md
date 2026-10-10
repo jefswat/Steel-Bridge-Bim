@@ -167,3 +167,30 @@ Minimum inputs for (b):
 - Whether Pier 6A is a separate support line from 5WB; which sheets cover the Pier 19G slab end (I-80 pdf 195 or Ramp G pdf 138).
 - Strip seal part-plan edge dims (1'-4 / 1'-0, 5" / 6") not fully resolved.
 - Drainage trough geometry (I-80 pdf 211-218, Ramp G pdf 154-159) was not extracted.
+
+## 6. Confirmed (raster checks, 2026-10-10)
+PDF page numbers (1-based) of `B00168` (I-80, design 116) and `B00169` (Ramp G, design 316).
+- **C and D (I-80 pdf 209, section at pier; pdf 185 section C-C):** C = opening between the two deck-end faces at 50 F (the "DIM. C *" arrows span
+  the slab ends; 9" = 2 x 4 1/2" from CL pier, abutments 6" to the backwall face). D = blockout width from the deck-end face to the blockout edge,
+  perpendicular to the joint: pdf 185 dimension string "2'-1" runs from the blockout edge to the deck end (1'-1 1/2 CL bearing to deck end,
+  4 1/2" @ 50 F to CL pier). 25" at piers, 18" at abutments (table). Section depth 1'-2, "CL expansion joint" at the middle.
+- **Ramp G Pier 14G:** C = 10" (5" each side), CL bearing to deck end 1'-1 (pdf 137-138 and table pdf 152).
+- **Pier 19G (Ramp G side), Ramp G pdf 140 (design 138, Unit 4 slab):** CL bearing to deck end 1'-3 1/2, CL bearing to CL pier 1'-8, 4 1/2" @ 50 F,
+  blockout edge to deck end 2'-1. The 19G joint is the Ramp G Unit 4 end; its other side (I-80 Unit 3 north part, "Pier 11WB & 19G") has no
+  separate support line in the model.
+- **Joint line:** not given by the joint sheets; the deck-end face is dimensioned normal to the support line ("DESIGN FOR VARIABLE SKEW ON HORIZ. CURVES"
+  on the joint sheets), so the joint line is parallel to the support line at the deck-end offset; skews come from the model's supports.
+- **Pier 6A:** a separate line and a separate joint (own row in the movement table and in the quantities, pdf 4 and 209) beside Pier 5WB, serving
+  girders A-E; the model has one straight deck end per unit, so the 6A joint is NOT modeled separately (the 5WB joint line crosses the whole deck).
+- **Strip seal (Ramp G pdf 150, section C-C and expansion opening detail):** "D" is the JOINT SETTING (2" at 50 F, 15/16" at 90 F, 3 1/16" at 10 F);
+  concrete ends are D + 1/2" apart = 2 1/2" at 50 F. The pocket is "4 +/-" each side of the gland (flared); its depth is not dimensioned (model: 4" wide,
+  8 1/16" = slab end block depth, approximate).
+- **Model conflicts found by joints-i80.csx:** Pier 11WB support lines are 3'-2 apart in the model, the plans give 2 x 1'-8 = 3'-4 (opening 7" instead of 9");
+  abutment backwall front face is 17" from CL bearing in the model, 22" per plan (deck end 1'-4 + C 6"). Not changed.
+
+## 7. What the model builds
+`SupportDefinition.ExpansionJoint` (`ExpansionJointDefinition`, optional, default off) on an END support: blockout (width D from the deck-end face,
+full deck width, depth min(1'-2, slab)) is cut out of the deck and made as its own solid ("Joint blockout concrete"); a generic device envelope
+(opening C wide, set 1/8" down, to blockout depth, between the barrier faces) is the placeholder "Generic modular expansion joint (manufacturer-designed
+placeholder)". The plans' 2'-2 end block (deeper than the modeled 8" slab) is OPTIONAL (`ExpansionJointDefinition.EndBlock`, see `deck-end-blocks.md`); without it a warning says the blockout is limited to the slab. Sample data: `samples/plans/joints-i80.csx`, `joints-ramp-g.csx`.
+Not modeled: barrier slider/cover plates, beams, support boxes, anchors, seals, drainage troughs.

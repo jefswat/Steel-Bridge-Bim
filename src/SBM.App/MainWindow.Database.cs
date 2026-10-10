@@ -1,0 +1,238 @@
+using System.IO;
+using System.Windows;
+using HelixToolkit;
+using HelixToolkit.SharpDX;
+using HelixToolkit.Wpf.SharpDX;
+using Microsoft.Win32;
+using SBM.App.Viewport;
+using SBM.Core.Geometry;
+using SBM.IO.Database;
+using SBM.IO.Ifc;
+
+using MeshGeometry3D = HelixToolkit.SharpDX.MeshGeometry3D;
+
+namespace SBM.App;
+
+/// <summary>
+/// Companion database in the app: the Properties side shows the database record of the selected element (GlobalId, hierarchy,
+/// quantities, linked plan sheets with PDF / preview, QC status). The database file is <c>&lt;model&gt;.sqlite</c> beside the model;
+/// it is built on demand (Create / Rebuild), shows as out of date after the model regenerates, and keeps the QC records on rebuild
+/// (GlobalIds are the IFC ones, so they are stable). Elements are matched by object reference through a <see cref="TagIndex"/>
+/// rebuilt (cheaply, no database writes) whenever the scene is rebuilt.
+/// </summary>
+public partial class MainWindow
+{
+    private ModelDb? _db;
+    private TagIndex? _dbTags;
+    private Task<TagIndex>? _dbTagTask;
+    private int _dbScenes;
+    private bool _dbBusy;
+    private bool _dbStale;
+    private string? _dbShown;
+
+    private string? DbPath => _vm.FilePath is { Length: > 0 } f ? CompanionDatabase.DefaultPath(f) : null;
+
+    private void InitDatabase()
+    {
+        _vm.SceneReady += (_, _) => OnDbSceneReady();
+        DbPanel.CreateRequested += () => _ = BuildDatabaseAsync(false);
+        DbPanel.ImportPagesRequested += () => _ = BuildDatabaseAsync(true);
+        DbPanel.NavigateRequested += gid => { ShowDbElement(gid); HighlightDbGroup(gid); };
+        RefreshDbStatus();
+    }
+
+    private List<IfcBridgeData> DbSnapshotData() =>
+        _vm.Framings.Keys.Select(b => new IfcBridgeData(_vm.Framings[b], _vm.SteelModels.GetValueOrDefault(b), _vm.ConcreteModels.GetValueOrDefault(b),
+            _vm.SubstructureModels.GetValueOrDefault(b), _vm.PrestressedModels.GetValueOrDefault(b))).ToList();
+
+    private void OnDbSceneReady()
+    {
+        _dbScenes++;
+        _dbTags = null;
+        _dbTagTask = null;
+        if (_dbBusy) return;
+        OpenDb();
+        if (_db != null)
+        {
+            // Index the model objects → GlobalIds in the background (hashing only, no database writes).
+            var data = DbSnapshotData();
+            var project = _vm.Project;
+            _dbTagTask = Task.Run(() => ModelDatabase.BuildTagIndex(project, data));
+            if (_dbScenes > 1) _dbStale = true;
+        }
+        RefreshDbStatus();
+    }
+
+    private void OpenDb()
+    {
+        _db?.Dispose();
+        _db = null;
+        if (DbPath is { } p && File.Exists(p))
+        {
+            try
+            {
+                _db = new ModelDb(p);
+                if (DateTime.TryParse(_db.Meta("built_at"), null, System.Globalization.DateTimeStyles.RoundtripKind, out var built)
+                    && _vm.FilePath is { } mf && File.Exists(mf) && File.GetLastWriteTimeUtc(mf) > built.ToUniversalTime() && _dbScenes <= 1)
+                    _dbStale = true;
+            }
+            catch (Exception ex) { ViewModels.MainViewModel.Log("DB open failed: " + ex.Message); }
+        }
+    }
+
+    private void RefreshDbStatus()
+    {
+        if (DbPath == null) { DbPanel.SetStatus("Save the model first: the database file is <model>.sqlite beside it.", false, true, false); return; }
+        if (_dbBusy) { DbPanel.SetStatus("Building the database…", false, false, false); return; }
+        if (_db == null) { DbPanel.SetStatus($"No database yet ({Path.GetFileName(DbPath)}). Create it to see the sheets each element is based on.", true, true, false); return; }
+        string built = _db.Meta("built_at");
+        double mb = new FileInfo(_db.Path).Length / 1048576.0;
+        DbPanel.SetStatus($"{Path.GetFileName(_db.Path)}: {_db.ElementCount:N0} elements, {_db.SheetCount} plan sheets, built {built}, {mb:F0} MB." + (mb > ModelDatabase.SizeNoteMb ? $" (Note: larger than {ModelDatabase.SizeNoteMb:F0} MB; informational only.)" : "")
+            + (_dbStale ? " The model changed since: rebuild to update (QC is kept)." : ""), true, false, true);
+    }
+
+    private async Task BuildDatabaseAsync(bool pages)
+    {
+        if (_dbBusy || DbPath is not { } path) return;
+        string? folder = null;
+        string? links = CompanionDatabase.FindLinksFile(_vm.FilePath);
+        if (pages)
+        {
+            if (links == null) { MessageBox.Show(this, "No sheet-links*.json (plan sets and link rules) beside the model.", "Plan pages", MessageBoxButton.OK, MessageBoxImage.Information); return; }
+            var dlg = new OpenFolderDialog { Title = "Folder with the plan set PDFs" };
+            if (dlg.ShowDialog(this) != true) return;
+            folder = dlg.FolderName;
+        }
+        _dbBusy = true;
+        _db?.Dispose();
+        _db = null;
+        RefreshDbStatus();
+        var data = DbSnapshotData();
+        var project = _vm.Project;
+        string? model = _vm.FilePath;
+        try
+        {
+            var res = await Task.Run(() =>
+            {
+                var o = new DatabaseOptions { ModelFile = model, LinksFile = links, Pages = pages, Log = m => ViewModels.MainViewModel.Log("DB: " + m) };
+                if (folder != null) o.PlanFolders.Add(folder);
+                return CompanionDatabase.Build(path, project, data, o);
+            });
+            _dbTags = res.Build.Tags;
+            _dbTagTask = Task.FromResult(res.Build.Tags);
+            _dbStale = false;
+            ViewModels.MainViewModel.Log($"DB: built {res.Build.Elements:N0} elements in {res.Elapsed.TotalSeconds:F1} s, {res.Sheets} sheets, {res.Links?.Links ?? 0} links");
+            StatusText($"Database built: {res.Build.Elements:N0} elements, {res.Sheets} sheets in {res.Elapsed.TotalSeconds:F1} s");
+            ViewModels.MainViewModel.Log("DB: " + ModelDatabase.SizeText(path));
+        }
+        catch (Exception ex)
+        {
+            ViewModels.MainViewModel.Log("DB build failed: " + ex);
+            MessageBox.Show(this, ex.Message, "Database", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+        _dbBusy = false;
+        OpenDb();
+        RefreshDbStatus();
+        if (_dbShown != null) ShowDbElement(_dbShown);
+    }
+
+    // ------------------------------------------------------------------ selection hooks (called from Pick)
+
+    private static object? RawModelObject(object tag) => tag switch
+    {
+        RebarPick rp => rp.Bar,
+        SubPick sp => sp.Solid,
+        PsBeamPick pb => pb.Beam,
+        PsStrandPick ps => ps.Strand,
+        PsPadPick pp => pp.Pad,
+        NamedPick => null,
+        _ => tag,
+    };
+
+    private void DbOnPicked(object tag, System.Numerics.Vector3 hitLocal)
+    {
+        if (_db == null) { _dbShown = null; DbPanel.ShowMessage(DbPath == null ? "Save the model to use the database." : "No database for this model yet: Create database."); return; }
+        var task = _dbTagTask;
+        if (task == null) { DbPanel.ShowMessage("Indexing the model…"); return; }
+        void Resolve()
+        {
+            try
+            {
+                _dbTags = task.Result;
+                string? gid = _dbTags.Lookup(RawModelObject(tag));
+                if (gid == null && tag is NamedPick np && _scene != null)
+                {
+                    var w = new Vec3(hitLocal.X, hitLocal.Y, hitLocal.Z) + _scene.Origin;
+                    string[] cats = np.Kind switch
+                    {
+                        "Deck" => new[] { "deck slab" },
+                        "Barrier" => new[] { "barrier" },
+                        _ => new[] { "joint blockout", "expansion joint device" },
+                    };
+                    string name = np.Kind == "Deck" ? "Deck slab" : np.Name;
+                    foreach (var c in cats) { gid = _db!.FindByNameNear(c, name, w.X, w.Y, w.Z); if (gid != null) break; }
+                }
+                if (gid == null) { _dbShown = null; DbPanel.ShowMessage("This object is not in the database (rebuild it after model changes)."); return; }
+                ShowDbElement(gid);
+            }
+            catch (Exception ex) { DbPanel.ShowMessage("Database error: " + ex.Message); }
+        }
+        if (task.IsCompleted) Resolve();
+        else if (Environment.GetCommandLineArgs().Contains("--snapshot")) Resolve();
+        else
+        {
+            DbPanel.ShowMessage("Indexing the model…");
+            task.ContinueWith(_ => Dispatcher.BeginInvoke(Resolve), TaskScheduler.Default);
+        }
+    }
+
+    private void DbOnCleared()
+    {
+        _dbShown = null;
+        DbPanel.Clear();
+    }
+
+    private void ShowDbElement(string gid)
+    {
+        if (_db == null) return;
+        _dbShown = gid;
+        DbPanel.ShowElement(_db, gid);
+        ViewModels.MainViewModel.Log("DB: " + DbPanel.LastSummary);
+    }
+
+    /// <summary>Highlights, in the viewport, the mesh objects (plates, caps, columns, ...) below a hierarchy item. Bolts, studs and bars are instanced and not drawn in the highlight.</summary>
+    private void HighlightDbGroup(string gid)
+    {
+        if (_db == null || _dbTags == null) return;
+        var ids = new HashSet<string>(_db.Descendants(gid, 60000));
+        var pos = new Vector3Collection();
+        var nrm = new Vector3Collection();
+        var idx = new IntCollection();
+        int tris = 0;
+        foreach (var kv in SceneBuilder.Picks)
+        {
+            var full = kv.Key;
+            var table = kv.Value;
+            for (int i = 0; i < table.Tags.Count && tris < 400000; i++)
+            {
+                var raw = RawModelObject(table.Tags[i]);
+                if (raw == null || _dbTags.Lookup(raw) is not { } g || !ids.Contains(g)) continue;
+                int t0 = table.TriStart[i], t1 = i + 1 < table.TriStart.Count ? table.TriStart[i + 1] : full.Indices!.Count / 3;
+                for (int t = t0; t < t1; t++)
+                    for (int k = 0; k < 3; k++)
+                    {
+                        int v = full.Indices![3 * t + k];
+                        idx.Add(pos.Count);
+                        pos.Add(full.Positions![v]);
+                        nrm.Add(full.Normals![v]);
+                    }
+                tris += t1 - t0;
+            }
+        }
+        ClearHighlight();
+        if (tris == 0) return;
+        var geo = new MeshGeometry3D { Positions = pos, Normals = nrm, Indices = idx };
+        geo.UpdateBounds();
+        ShowHighlight(geo);
+    }
+}
