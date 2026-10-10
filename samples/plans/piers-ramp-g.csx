@@ -80,6 +80,7 @@ List<FootingPoint> Grid((double n, double[] s)[] rows) => rows.SelectMany(r => r
             }),
         },
     };
+    sd.Footings[0].PileWeb = PileWebMode.AlongBatter;
     sd.Footings[0].BatterPerimeter(4, false, false);   // plans: the 10 piles of both outer N rows (N = +-9) batter 1:4 outward in N, no diagonals
     b.Supports[j].Substructure = sd;
     Doc.Regenerate();
@@ -180,7 +181,7 @@ foreach (var p in piers)
     var ftg = new FootingDefinition { Column = 1, Piles = Grid(p.piles) };
     // Battered piles (pile layout sheets, "BATTER PILES 1:4 IN DIRECTION SHOWN"; 11G 1:6): the perimeter piles batter outward normal to
     // the footing edge, corner piles diagonally at 45 deg in plan; 4G-7G are plumb. Ratio read as 1 horizontal : 4 vertical (to be confirmed).
-    if (BatteredRampG.Contains(p.name)) ftg.BatterPerimeter(p.name == "Pier 11G" ? 6 : 4, true, true);
+    if (BatteredRampG.Contains(p.name)) { ftg.BatterPerimeter(p.name == "Pier 11G" ? 6 : 4, true, true); ftg.PileWeb = PileWebMode.AlongBatter; }   // S-edge piles web along S, corner piles web along the 45 deg diagonal (plan pile symbols)
     sd.Footings = new() { ftg };
     hit.b.Supports[hit.j].Substructure = sd;
     int n = sd.Footings[0].Piles.Count;
@@ -256,6 +257,7 @@ foreach (var p in new (string name, double xRoad, double half, double eL, double
                               (-2.75, L(-14, -7, 7, 14)), (-8.25, L(-14, 0, 14)), (-13.75, s5), (-19.25, s5))),
         },
     };
+    sd.Footings[0].PileWeb = PileWebMode.AlongBatter;
     sd.Footings[0].BatterPerimeter(4, true, true);   // 22 battered 1:4 (outer rows N, outer columns S, corners diagonal)
     b.Supports[j].Substructure = sd;
     Doc.Regenerate();
