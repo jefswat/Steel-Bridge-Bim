@@ -21,3 +21,6 @@ temp/
 
 # Script run logs
 samples/plans/*.log
+
+# Agent worktrees
+.worktrees/
