@@ -7,8 +7,9 @@
   // rules[].role    = "detail" (the element is drawn/dimensioned on the sheet) or "general" (context: notes, situation, staking).
   // A link is stored on the HIGHEST matching element only (e.g. a field-splice assembly); every child (plates, bolts) inherits it
   // through the hierarchy (view v_element_sheets). Sheets matching no rule are the "unused" sheets (what the model lacks).
-  // Hierarchy of categories: unit(IfcBridge) > part(superstructure|deck|substructure) > group(girder|cross frame group) >
-  //   assembly(girder field section|field splice|bearing|cross frame|cross girder|lateral bracing); substructure: part(pier|abutment) > element/bar.
+  // Hierarchy of categories: unit(IfcBridge) > part(superstructure|deck|substructure) > group(girder|cross frame group|deck reinforcing|barrier group|joint) >
+  //   assembly(girder field section|field splice|bearing|cross frame|cross girder|lateral bracing) > group(bolt group|stud group|weld group) > bolt/stud/part;
+  //   substructure: part(pier|abutment) > group(cap group|column group|footing group|backwall group) > concrete elements and their bars.
 
   "planSets": [
     { "id": "design-116", "pdf": "B00168*Design 116.pdf", "bridgeGroup": "I-80 WB" },
@@ -30,11 +31,11 @@
     { "id": "pier-details", "sheets": "^PIER NO\\. (?<p>\\w+) DETAILS", "basis": "Pier {p} cap, columns, footings, piles and reinforcing",
       "target": [ { "level": "part", "category": "pier", "support": "Pier {p}" } ] },
     { "id": "pier-aesthetics", "sheets": "^PIER AESTHETIC DETAILS", "basis": "Pier cap / column treatment (form liner, plinth)",
-      "target": [ { "level": "element", "category": [ "pier cap", "column" ] } ] },
+      "target": [ { "level": "group", "category": [ "cap group", "column group" ], "support": "Pier%" } ] },
     { "id": "abutment-details", "sheets": "^(?<n>WEST|EAST|SOUTH|NORTH) ABUTMENT DETAILS", "basis": "{n} abutment cap, backwall, piles and reinforcing",
       "target": [ { "level": "part", "category": "abutment", "support": "{n} Abut" } ] },
     { "id": "abutment-aesthetics", "sheets": "^ABUTMENT AESTHETIC DETAILS", "basis": "Abutment treatment",
-      "target": [ { "level": "element", "category": [ "abutment cap", "backwall" ] } ] },
+      "target": [ { "level": "group", "category": [ "cap group", "backwall group" ], "support": "%Abut%" } ] },
 
     { "id": "typical-section", "sheets": "^TYPICAL CROSS SECTIONS? - UNIT (?<u>\\d+)", "basis": "Typical section: deck, haunch, barrier, girder spacing",
       "target": [ { "level": "part", "category": "deck", "unit": "Unit {u}" }, { "level": "group", "category": "girder", "unit": "Unit {u}" } ] },
@@ -45,7 +46,7 @@
     { "id": "girder-data", "sheets": "^(GIRDER DATA|GIRDER ELEVATION) - UNIT (?<u>\\d+)", "basis": "Girder data / elevation: plate sizes, splice and stiffener locations",
       "target": [ { "level": "group", "category": "girder", "unit": "Unit {u}" } ] },
     { "id": "welding", "sheets": "^WELDING DETAILS", "basis": "Welding details",
-      "target": [ { "level": "part", "category": "weld" } ] },
+      "target": [ { "level": "group", "category": "weld group" } ] },
     { "id": "cross-frames", "sheets": "^CROSS FRAME DETAILS", "basis": "Cross frame details",
       "target": [ { "level": "assembly", "category": [ "cross frame", "lateral bracing" ] } ] },
     { "id": "cross-girder", "sheets": "^CROSS GIRDER DETAILS", "basis": "Cross girder details (discontinuous girders)",
@@ -59,24 +60,24 @@
     { "id": "bearings-all", "sheets": "^DISC BEARING DETAILS$", "basis": "Disc bearing details",
       "target": [ { "level": "assembly", "category": "bearing" } ] },
 
-    { "id": "slab-plan", "sheets": "^SLAB PLAN & REINFORCING\\W*UNIT\\W*(?<u>\\d+)", "basis": "Slab plan and reinforcing",
-      "target": [ { "level": "part", "category": "deck", "unit": "Unit {u}" } ] },
+    { "id": "slab-plan", "sheets": "^SLAB PLAN & REINFORCING\\W*UNIT\\W*(?<u>\\d+)", "basis": "Slab plan and reinforcing: slab, haunch and the unit's deck reinforcing",
+      "target": [ { "level": "element", "category": "deck slab", "unit": "Unit {u}" }, { "level": "group", "category": "deck reinforcing", "unit": "Unit {u}" } ] },
     { "id": "bar-list", "sheets": "^SLAB REINF\\. BAR LIST", "basis": "Slab bar list and quantities",
-      "target": [ { "level": "part", "category": "deck" } ] },
+      "target": [ { "level": "group", "category": "deck reinforcing" } ] },
     { "id": "cross-slope", "sheets": "^CROSS SLOPE GEOMETRICS", "basis": "Cross slope and gore geometrics",
       "target": [ { "level": "alignment" }, { "level": "part", "category": "deck" } ] },
     { "id": "top-of-slab", "sheets": "^TOP OF SLAB ELEVATIONS - UNIT (?<u>\\d+)", "basis": "Top of slab elevations",
       "target": [ { "level": "part", "category": "deck", "unit": "Unit {u}" } ] },
     { "id": "joint-modular", "sheets": "^MODULAR EXPANSION JOINT DETAILS", "basis": "Modular expansion joint",
-      "target": [ { "level": "element", "category": [ "joint blockout", "expansion joint device" ], "subtype": "Modular" } ] },
+      "target": [ { "level": "group", "category": "joint", "subtype": "Modular" } ] },
     { "id": "joint-strip", "sheets": "^STRIP SEAL JOINT DETAILS", "basis": "Strip seal expansion joint",
-      "target": [ { "level": "element", "category": [ "joint blockout", "expansion joint device" ], "subtype": "%strip%" } ] },
+      "target": [ { "level": "group", "category": "joint", "subtype": "%strip%" } ] },
     { "id": "drainage", "sheets": "^DRAINAGE DETAILS", "basis": "Deck drainage",
       "target": [ { "level": "element", "category": [ "deck drain", "drain pipe", "splash basin" ] } ] },
-    { "id": "barrier-unit", "sheets": "^BARRIER RAIL DETAILS - UNIT (?<u>\\d+)", "basis": "Barrier rail of the unit",
-      "target": [ { "level": "element", "category": "barrier", "unit": "Unit {u}" } ] },
+    { "id": "barrier-unit", "sheets": "^BARRIER RAIL DETAILS - UNIT (?<u>\\d+)", "basis": "Barrier rail of the unit (concrete and its reinforcing)",
+      "target": [ { "level": "group", "category": "barrier group", "unit": "Unit {u}" } ] },
     { "id": "barrier-all", "sheets": "^BARRIER RAIL DETAILS$", "basis": "Barrier rail details",
-      "target": [ { "level": "element", "category": "barrier" } ] }
+      "target": [ { "level": "group", "category": "barrier group" } ] }
   ],
 
   "hints": [

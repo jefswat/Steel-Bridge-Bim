@@ -20,7 +20,10 @@ public sealed class ElementInfo
     public string Unit { get; init; } = "";
     public string Support { get; init; } = "";
     public string Girder { get; init; } = "";
-    public string StationRange { get; init; } = "";
+    public double? StationBegin { get; init; }
+    public double? StationEnd { get; init; }
+    /// <summary>Formatted by <see cref="ModelDb.FormatStations"/> (station numbers are stored in meters).</summary>
+    public string StationRange { get; set; } = "";
     public string Material { get; init; } = "";
     public double? MassKg { get; init; }
     public double? VolumeM3 { get; init; }
@@ -70,7 +73,7 @@ public sealed class ModelDb : IDisposable
     public int ElementCount => ModelDatabase.Scalar<int>(_cn, "SELECT COUNT(*) FROM elements");
     public int SheetCount => ModelDatabase.Scalar<int>(_cn, "SELECT COUNT(*) FROM sheets");
 
-    private const string Cols = "global_id,parent_global_id,level,category,subtype,ifc_class,in_ifc,name,mark,bridge_group,bridge,unit,support,girder,station_range,material,mass_kg,volume_m3,length_m,properties";
+    private const string Cols = "global_id,parent_global_id,level,category,subtype,ifc_class,in_ifc,name,mark,bridge_group,bridge,unit,support,girder,station_begin,station_end,material,mass_kg,volume_m3,length_m,properties";
 
     private static string S(SqliteDataReader r, int i) => r.IsDBNull(i) ? "" : r.GetString(i);
     private static double? D(SqliteDataReader r, int i) => r.IsDBNull(i) ? null : r.GetDouble(i);
@@ -79,7 +82,7 @@ public sealed class ModelDb : IDisposable
     {
         GlobalId = S(r, 0), Parent = S(r, 1), Level = S(r, 2), Category = S(r, 3), Subtype = S(r, 4), IfcClass = S(r, 5), InIfc = r.GetInt32(6) != 0,
         Name = S(r, 7), Mark = S(r, 8), BridgeGroup = S(r, 9), Bridge = S(r, 10), Unit = S(r, 11), Support = S(r, 12), Girder = S(r, 13),
-        StationRange = S(r, 14), Material = S(r, 15), MassKg = D(r, 16), VolumeM3 = D(r, 17), LengthM = D(r, 18), Properties = S(r, 19),
+        StationBegin = D(r, 14), StationEnd = D(r, 15), Material = S(r, 16), MassKg = D(r, 17), VolumeM3 = D(r, 18), LengthM = D(r, 19), Properties = S(r, 20),
     };
 
     public ElementInfo? Get(string globalId)
@@ -88,7 +91,29 @@ public sealed class ModelDb : IDisposable
         c.CommandText = $"SELECT {Cols} FROM elements WHERE global_id=$g";
         c.Parameters.AddWithValue("$g", globalId);
         using var r = c.ExecuteReader();
-        return r.Read() ? Read(r) : null;
+        if (!r.Read()) return null;
+        var e = Read(r);
+        e.StationRange = FormatStations(e.StationBegin, e.StationEnd);
+        return e;
+    }
+
+    private string? _style, _foot;
+
+    /// <summary>"7596+55.86" style (US: 100-ft stations in the project's foot; SI: 1000 m) or "a to b".</summary>
+    public string FormatStations(double? a, double? b)
+    {
+        if (a == null) return "";
+        _style ??= Meta("station_style");
+        _foot ??= Meta("foot_m");
+        double foot = double.TryParse(_foot, NumberStyles.Float, CultureInfo.InvariantCulture, out var f) && f > 0 ? f : 0.3048;
+        string F(double sta)
+        {
+            double unit = _style == "US" ? 100 * foot : 1000;
+            double whole = Math.Floor(sta / unit + 1e-9);
+            double rem = (sta - whole * unit) / (_style == "US" ? foot : 1);
+            return $"{whole:0}+{rem:00.00}";
+        }
+        return b == null || Math.Abs(b.Value - a.Value) < 0.01 ? F(a.Value) : F(a.Value) + " to " + F(b.Value);
     }
 
     /// <summary>Ancestors from the project down to the element itself (the last item).</summary>
@@ -110,21 +135,21 @@ public sealed class ModelDb : IDisposable
     {
         var list = new List<ElementInfo>();
         using var c = _cn.CreateCommand();
-        c.CommandText = $"SELECT {Cols} FROM elements WHERE parent_global_id=$g ORDER BY seq LIMIT {limit}";
+        c.CommandText = $"SELECT {Cols} FROM elements WHERE seq IN (SELECT id FROM el WHERE parent_id = (SELECT id FROM el WHERE global_id = $g) LIMIT {limit}) ORDER BY seq";
         c.Parameters.AddWithValue("$g", globalId);
         using var r = c.ExecuteReader();
         while (r.Read()) list.Add(Read(r));
         return list;
     }
 
-    public int ChildCount(string globalId) => ModelDatabase.Scalar<int>(_cn, "SELECT COUNT(*) FROM elements WHERE parent_global_id=$g", ("$g", globalId));
+    public int ChildCount(string globalId) => ModelDatabase.Scalar<int>(_cn, "SELECT COUNT(*) FROM el WHERE parent_id = (SELECT id FROM el WHERE global_id = $g)", ("$g", globalId));
 
     /// <summary>Global ids of an element and all its descendants (limited).</summary>
     public List<string> Descendants(string globalId, int limit = 20000)
     {
         var list = new List<string>();
         using var c = _cn.CreateCommand();
-        c.CommandText = $"WITH RECURSIVE d(g) AS (SELECT $g UNION ALL SELECT e.global_id FROM elements e JOIN d ON e.parent_global_id = d.g) SELECT g FROM d LIMIT {limit}";
+        c.CommandText = $"WITH RECURSIVE d(i) AS (SELECT id FROM el WHERE global_id = $g UNION ALL SELECT e.id FROM el e JOIN d ON e.parent_id = d.i) SELECT e.global_id FROM d JOIN el e ON e.id = d.i LIMIT {limit}";
         c.Parameters.AddWithValue("$g", globalId);
         using var r = c.ExecuteReader();
         while (r.Read()) list.Add(r.GetString(0));
@@ -136,7 +161,7 @@ public sealed class ModelDb : IDisposable
     {
         using var c = _cn.CreateCommand();
         c.CommandText = """
-            SELECT global_id FROM elements WHERE category=$c AND name=$n AND bbox_min_x IS NOT NULL
+            SELECT global_id FROM el WHERE category_s = (SELECT id FROM strings WHERE value = $c) AND name = $n AND bbox_min_x IS NOT NULL
             ORDER BY (MAX(bbox_min_x - $x, 0) + MAX($x - bbox_max_x, 0)) + (MAX(bbox_min_y - $y, 0) + MAX($y - bbox_max_y, 0)) + (MAX(bbox_min_z - $z, 0) + MAX($z - bbox_max_z, 0)) LIMIT 1
             """;
         c.Parameters.AddWithValue("$c", category);

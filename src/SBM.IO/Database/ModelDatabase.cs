@@ -47,70 +47,81 @@ public sealed class DatabaseBuildResult
 /// </summary>
 public static class ModelDatabase
 {
-    public const int SchemaVersion = 1;
+    public const int SchemaVersion = 2;
 
     private static readonly Regex UnitName = new(@"^(?<g>.*?)\s+Unit\s+(?<n>\d+)\s*$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
     private static readonly Regex CfName = new(@"^(?<type>.*?)\s+G(?<a>\d+)[–-]G(?<b>\d+)(?:, span (?<span>\d+))?", RegexOptions.Compiled);
     private static readonly Regex XgName = new(@"^Cross girder G(?<a>\d+)[–-]G(?<b>\d+) carrying discontinuous G(?<g>\d+)", RegexOptions.Compiled);
 
+    // Physical layout (compact): el = one row per element with integer keys; repeated text (level, category, material, unit names...) lives
+    // once in strings, identical property JSON once in props. The readable table is the VIEW elements (same columns as before).
     public const string SchemaSql = """
         CREATE TABLE IF NOT EXISTS meta(key TEXT PRIMARY KEY, value TEXT);
-        CREATE TABLE IF NOT EXISTS elements(
-          global_id TEXT PRIMARY KEY, parent_global_id TEXT, seq INTEGER,
-          level TEXT NOT NULL, category TEXT, subtype TEXT, ifc_class TEXT, in_ifc INTEGER NOT NULL DEFAULT 1,
+        CREATE TABLE IF NOT EXISTS strings(id INTEGER PRIMARY KEY, value TEXT NOT NULL UNIQUE);
+        CREATE TABLE IF NOT EXISTS props(id INTEGER PRIMARY KEY, json TEXT NOT NULL UNIQUE);
+        CREATE TABLE IF NOT EXISTS el(
+          id INTEGER PRIMARY KEY, global_id TEXT NOT NULL UNIQUE, parent_id INTEGER,
+          level_s INTEGER, category_s INTEGER, subtype_s INTEGER, ifc_class_s INTEGER, in_ifc INTEGER NOT NULL DEFAULT 1,
           name TEXT, mark TEXT,
-          bridge_group TEXT, bridge TEXT, unit TEXT, support TEXT, girder TEXT,
-          station_begin REAL, station_end REAL, station_range TEXT,
-          material TEXT, mass_kg REAL, volume_m3 REAL, length_m REAL,
+          bridge_group_s INTEGER, bridge_s INTEGER, unit_s INTEGER, support_s INTEGER, girder_s INTEGER,
+          station_begin REAL, station_end REAL, material_s INTEGER, mass_kg REAL, volume_m3 REAL, length_m REAL,
           bbox_min_x REAL, bbox_min_y REAL, bbox_min_z REAL, bbox_max_x REAL, bbox_max_y REAL, bbox_max_z REAL,
-          properties TEXT);
+          props_id INTEGER);
         CREATE TABLE IF NOT EXISTS sheets(
           sheet_id TEXT PRIMARY KEY, plan_set TEXT NOT NULL, pdf_file TEXT, pdf_page INTEGER, design_sheet TEXT, title TEXT,
           page_file TEXT, preview_file TEXT, kind TEXT, note TEXT);
         CREATE TABLE IF NOT EXISTS element_sheet(
           global_id TEXT NOT NULL, sheet_id TEXT NOT NULL, role TEXT NOT NULL DEFAULT 'detail', basis TEXT, source TEXT,
-          PRIMARY KEY(global_id, sheet_id));
+          PRIMARY KEY(global_id, sheet_id)) WITHOUT ROWID;
         CREATE TABLE IF NOT EXISTS qc(
           global_id TEXT NOT NULL, sheet_id TEXT NOT NULL, status TEXT NOT NULL DEFAULT 'unchecked' CHECK(status IN ('unchecked','ok','issue')),
           checked_by TEXT, checked_at TEXT, note TEXT,
-          PRIMARY KEY(global_id, sheet_id));
+          PRIMARY KEY(global_id, sheet_id)) WITHOUT ROWID;
         """;
 
     public const string IndexSql = """
-        CREATE INDEX IF NOT EXISTS ix_el_parent ON elements(parent_global_id);
-        CREATE INDEX IF NOT EXISTS ix_el_cat ON elements(category);
-        CREATE INDEX IF NOT EXISTS ix_el_bridge ON elements(bridge, category);
-        CREATE INDEX IF NOT EXISTS ix_el_support ON elements(support);
-        CREATE INDEX IF NOT EXISTS ix_el_mark ON elements(mark);
-        CREATE INDEX IF NOT EXISTS ix_el_level ON elements(level);
+        CREATE INDEX IF NOT EXISTS ix_el_parent ON el(parent_id);
+        CREATE INDEX IF NOT EXISTS ix_el_cat ON el(category_s, level_s);
         CREATE INDEX IF NOT EXISTS ix_es_sheet ON element_sheet(sheet_id);
         """;
 
-    /// <summary>Views: hierarchy path, links resolved down the hierarchy (a link on an assembly applies to its children),
-    /// and the QC join.</summary>
+    /// <summary>Views: <c>elements</c> (readable columns), links resolved down the hierarchy (a link on a group applies to every
+    /// child), the hierarchy path, unused sheets and the QC join.</summary>
     public const string ViewSql = """
+        DROP VIEW IF EXISTS elements;
+        CREATE VIEW elements AS
+          SELECT e.id AS seq, e.global_id, p.global_id AS parent_global_id, sl.value AS level, sc.value AS category, st.value AS subtype,
+                 si.value AS ifc_class, e.in_ifc, COALESCE(e.name, sc.value || ' ' || e.mark) AS name, e.mark,
+                 sbg.value AS bridge_group, sb.value AS bridge, su.value AS unit, ss.value AS support, sg.value AS girder,
+                 e.station_begin, e.station_end, sm.value AS material, e.mass_kg, e.volume_m3, e.length_m,
+                 e.bbox_min_x, e.bbox_min_y, e.bbox_min_z, e.bbox_max_x, e.bbox_max_y, e.bbox_max_z, pr.json AS properties
+          FROM el e LEFT JOIN el p ON p.id = e.parent_id
+            LEFT JOIN strings sl ON sl.id = e.level_s LEFT JOIN strings sc ON sc.id = e.category_s LEFT JOIN strings st ON st.id = e.subtype_s
+            LEFT JOIN strings si ON si.id = e.ifc_class_s LEFT JOIN strings sbg ON sbg.id = e.bridge_group_s LEFT JOIN strings sb ON sb.id = e.bridge_s
+            LEFT JOIN strings su ON su.id = e.unit_s LEFT JOIN strings ss ON ss.id = e.support_s LEFT JOIN strings sg ON sg.id = e.girder_s
+            LEFT JOIN strings sm ON sm.id = e.material_s LEFT JOIN props pr ON pr.id = e.props_id;
         DROP VIEW IF EXISTS v_element_sheets;
         CREATE VIEW v_element_sheets AS
-          WITH RECURSIVE d(global_id, sheet_id, role, basis, link_root) AS (
-            SELECT global_id, sheet_id, role, basis, global_id FROM element_sheet
+          WITH RECURSIVE d(id, sheet_id, role, basis, link_root) AS (
+            SELECT e.id, l.sheet_id, l.role, l.basis, l.global_id FROM element_sheet l JOIN el e ON e.global_id = l.global_id
             UNION ALL
-            SELECT e.global_id, d.sheet_id, d.role, d.basis, d.link_root FROM d JOIN elements e ON e.parent_global_id = d.global_id)
-          SELECT global_id, sheet_id, role, basis, link_root FROM d;
+            SELECT c.id, d.sheet_id, d.role, d.basis, d.link_root FROM d JOIN el c ON c.parent_id = d.id)
+          SELECT e.global_id, d.sheet_id, d.role, d.basis, d.link_root FROM d JOIN el e ON e.id = d.id;
         DROP VIEW IF EXISTS v_element_path;
         CREATE VIEW v_element_path AS
-          WITH RECURSIVE p(global_id, depth, anc, anc_name, anc_level) AS (
-            SELECT global_id, 0, global_id, name, level FROM elements
+          WITH RECURSIVE p(eid, depth, anc) AS (
+            SELECT id, 0, id FROM el
             UNION ALL
-            SELECT p.global_id, p.depth + 1, e.parent_global_id, pe.name, pe.level
-              FROM p JOIN elements e ON e.global_id = p.anc JOIN elements pe ON pe.global_id = e.parent_global_id)
-          SELECT global_id, depth, anc AS ancestor_global_id, anc_name AS ancestor_name, anc_level AS ancestor_level FROM p;
+            SELECT p.eid, p.depth + 1, e.parent_id FROM p JOIN el e ON e.id = p.anc WHERE e.parent_id IS NOT NULL)
+          SELECT a.global_id AS global_id, p.depth AS depth, b.global_id AS ancestor_global_id, b.name AS ancestor_name
+          FROM p JOIN el a ON a.id = p.eid JOIN el b ON b.id = p.anc;
         DROP VIEW IF EXISTS v_unused_sheets;
         CREATE VIEW v_unused_sheets AS
           SELECT s.* FROM sheets s WHERE NOT EXISTS (SELECT 1 FROM element_sheet l WHERE l.sheet_id = s.sheet_id) AND COALESCE(s.kind,'') <> 'administrative';
         DROP VIEW IF EXISTS v_element_qc;
         CREATE VIEW v_element_qc AS
           SELECT e.global_id, e.level, e.category, e.name, e.mark, e.bridge, e.unit, e.support, e.girder,
-                 s.sheet_id, s.plan_set, s.design_sheet, s.pdf_page, s.title, v.role, v.basis,
+                 s.sheet_id, s.plan_set, s.design_sheet, s.pdf_page, s.title, v.role, v.basis, v.link_root,
                  COALESCE(q.status,'unchecked') AS qc_status, q.checked_by, q.checked_at, q.note
           FROM v_element_sheets v JOIN elements e ON e.global_id = v.global_id JOIN sheets s ON s.sheet_id = v.sheet_id
           LEFT JOIN qc q ON q.global_id = v.global_id AND q.sheet_id = v.sheet_id;
@@ -122,6 +133,8 @@ public static class ModelDatabase
         var cn = new SqliteConnection(new SqliteConnectionStringBuilder { DataSource = path, Mode = SqliteOpenMode.ReadWriteCreate, Pooling = false }.ToString());
         cn.Open();
         Exec(cn, "PRAGMA temp_store=MEMORY;");
+        // Version 1 files had a plain `elements` table: replace it (a rebuild refills; sheets, links and QC are kept).
+        if (Scalar<int>(cn, "SELECT COUNT(*) FROM sqlite_master WHERE name='elements' AND type='table'") > 0) Exec(cn, "DROP TABLE elements");
         Exec(cn, SchemaSql);
         if (Scalar<int>(cn, "SELECT COUNT(*) FROM pragma_table_info('sheets') WHERE name='note'") == 0) Exec(cn, "ALTER TABLE sheets ADD COLUMN note TEXT");
         return cn;
@@ -144,44 +157,80 @@ public static class ModelDatabase
         return r is null or DBNull ? default : (T)Convert.ChangeType(r, Nullable.GetUnderlyingType(typeof(T)) ?? typeof(T), CultureInfo.InvariantCulture);
     }
 
-    // ================================================================== build
-
-    /// <summary>Writes the element registry of the model to <paramref name="path"/> (replacing the elements and links, keeping sheets and QC).</summary>
-    public static DatabaseBuildResult Write(string path, BridgeProject project, IReadOnlyList<IfcBridgeData> bridges, string? modelFile = null)
+    /// <summary>File size in MB and the row count of each table (SQLite's dbstat byte sizes are used when available).</summary>
+    public static (double totalMb, List<(string name, double mb, long rows)> objects) SizeReport(SqliteConnection cn, string path)
     {
-        var sw = Stopwatch.StartNew();
-        using var cn = Open(path);
-        Exec(cn, "PRAGMA journal_mode=OFF; PRAGMA synchronous=OFF; PRAGMA temp_store=MEMORY;");
-        Exec(cn, "DROP VIEW IF EXISTS v_element_sheets; DROP VIEW IF EXISTS v_element_path; DROP VIEW IF EXISTS v_unused_sheets; DROP VIEW IF EXISTS v_element_qc;");
-        Exec(cn, "DROP INDEX IF EXISTS ix_el_parent; DROP INDEX IF EXISTS ix_el_cat; DROP INDEX IF EXISTS ix_el_bridge; DROP INDEX IF EXISTS ix_el_support; DROP INDEX IF EXISTS ix_el_mark; DROP INDEX IF EXISTS ix_el_level;");
-        Exec(cn, "DELETE FROM elements;");
-        var result = new DatabaseBuildResult { Path = path };
-        using (var tx = cn.BeginTransaction())
+        double total = new FileInfo(path).Length / 1048576.0;
+        var list = new List<(string, double, long)>();
+        var bytes = new Dictionary<string, double>();
+        try
         {
-            var w = new Writer(cn, tx, result);
-            new Builder(w, project, false).Run(bridges);
-            w.Dispose();
-            tx.Commit();
+            using var c = cn.CreateCommand();
+            c.CommandText = "SELECT name, SUM(pgsize) / 1048576.0 FROM dbstat GROUP BY name";
+            using var r = c.ExecuteReader();
+            while (r.Read()) bytes[r.GetString(0)] = r.GetDouble(1);
         }
-        Exec(cn, IndexSql);
-        // Links survive a rebuild (GlobalIds are stable) until the rules are applied again; drop those of elements that no longer exist.
-        Exec(cn, "DELETE FROM element_sheet WHERE global_id NOT IN (SELECT global_id FROM elements)");
-        Exec(cn, ViewSql);
-        Exec(cn, "INSERT OR REPLACE INTO meta VALUES('schema_version', @v)", ("@v", SchemaVersion.ToString()));
-        Exec(cn, "INSERT OR REPLACE INTO meta VALUES('project', @v)", ("@v", project.Name));
-        Exec(cn, "INSERT OR REPLACE INTO meta VALUES('model_file', @v)", ("@v", modelFile ?? ""));
-        Exec(cn, "INSERT OR REPLACE INTO meta VALUES('built_at', @v)", ("@v", DateTime.UtcNow.ToString("o")));
-        Exec(cn, "INSERT OR REPLACE INTO meta VALUES('coordinates', @v)", ("@v", "bbox in meters, project grid (state plane) coordinates; length_m/mass_kg/volume_m3 SI"));
-        result.Elapsed = sw.Elapsed;
-        return result;
+        catch (SqliteException) { }
+        foreach (var t in new[] { "el", "strings", "props", "element_sheet", "sheets", "qc" })
+            list.Add((t, bytes.GetValueOrDefault(t, double.NaN), Scalar<long>(cn, $"SELECT COUNT(*) FROM {t}")));
+        return (total, list);
     }
+
+    /// <summary>One-line summary: file size, largest tables; says so when above <paramref name="noteMb"/> (informational only, never an error).</summary>
+    public static string SizeText(string path, double noteMb = SizeNoteMb)
+    {
+        using var cn = Open(path);
+        var (total, objs) = SizeReport(cn, path);
+        string tables = string.Join(", ", objs.OrderByDescending(o => double.IsNaN(o.mb) ? o.rows : o.mb * 1e6).Take(4)
+            .Select(o => double.IsNaN(o.mb) ? $"{o.name} {o.rows:N0} rows" : $"{o.name} {o.mb:F1} MB ({o.rows:N0} rows)"));
+        return total > noteMb ? $"Note: the database is {total:F1} MB (> {noteMb:F0} MB). Largest tables: {tables}" : $"Database size {total:F1} MB. Largest tables: {tables}";
+    }
+
+    /// <summary>Informational size threshold (MB) above which the CLI / app mention the database size prominently. Not a limit.</summary>
+    public const double SizeNoteMb = 100;
+
+    // ================================================================== build
 
     /// <summary>Computes only the model object → GlobalId map (no database): for the app to resolve picked objects.</summary>
     public static TagIndex BuildTagIndex(BridgeProject project, IReadOnlyList<IfcBridgeData> bridges)
     {
         var res = new DatabaseBuildResult();
-        new Builder(new Writer(null, null, res), project, keysOnly: true).Run(bridges);
+        new Builder(new Writer(null, res), project, keysOnly: true).Run(bridges);
         return res.Tags;
+    }
+
+    /// <summary>Writes the element registry of the model to <paramref name="path"/> (replacing the elements; sheets, links and QC are kept).</summary>
+    public static DatabaseBuildResult Write(string path, BridgeProject project, IReadOnlyList<IfcBridgeData> bridges, string? modelFile = null, bool vacuum = false)
+    {
+        var sw = Stopwatch.StartNew();
+        var result = new DatabaseBuildResult { Path = path };
+        using (var cn = Open(path))
+        {
+            Exec(cn, "PRAGMA journal_mode=OFF; PRAGMA synchronous=OFF;");
+            Exec(cn, "DROP VIEW IF EXISTS v_element_sheets; DROP VIEW IF EXISTS v_element_path; DROP VIEW IF EXISTS v_unused_sheets; DROP VIEW IF EXISTS v_element_qc; DROP VIEW IF EXISTS elements;");
+            Exec(cn, "DROP INDEX IF EXISTS ix_el_parent; DROP INDEX IF EXISTS ix_el_cat;");
+            Exec(cn, "DELETE FROM el; DELETE FROM strings; DELETE FROM props;");
+            using (var tx = cn.BeginTransaction())
+            {
+                using var w = new Writer(cn, result, tx);
+                new Builder(w, project, false).Run(bridges);
+                tx.Commit();
+            }
+            Exec(cn, IndexSql);
+            // Links survive a rebuild (GlobalIds are stable) until the rules are applied again; drop those of elements that no longer exist.
+            Exec(cn, "DELETE FROM element_sheet WHERE global_id NOT IN (SELECT global_id FROM el)");
+            Exec(cn, ViewSql);
+            Exec(cn, "INSERT OR REPLACE INTO meta VALUES('schema_version', @v)", ("@v", SchemaVersion.ToString()));
+            Exec(cn, "INSERT OR REPLACE INTO meta VALUES('project', @v)", ("@v", project.Name));
+            Exec(cn, "INSERT OR REPLACE INTO meta VALUES('model_file', @v)", ("@v", modelFile ?? ""));
+            Exec(cn, "INSERT OR REPLACE INTO meta VALUES('built_at', @v)", ("@v", DateTime.UtcNow.ToString("o")));
+            Exec(cn, "INSERT OR REPLACE INTO meta VALUES('station_style', @v)", ("@v", project.Units.IsUS ? "US" : "SI"));
+            Exec(cn, "INSERT OR REPLACE INTO meta VALUES('foot_m', @v)", ("@v", project.Units.FootInMeters.ToString("R", CultureInfo.InvariantCulture)));
+            Exec(cn, "INSERT OR REPLACE INTO meta VALUES('coordinates', @v)", ("@v", "bbox in meters, project grid (state plane) coordinates; length_m/mass_kg/volume_m3 SI; stations in meters (display stations)"));
+            if (vacuum) Exec(cn, "VACUUM");
+        }
+        result.Elapsed = sw.Elapsed;
+        return result;
     }
 
     // ================================================================== writer
@@ -189,7 +238,7 @@ public static class ModelDatabase
     private sealed class Row
     {
         public string GlobalId = "", Parent = "", Level = "", Category = "", Subtype = "", IfcClass = "", Name = "", Mark = "";
-        public string BridgeGroup = "", Bridge = "", Unit = "", Support = "", Girder = "", Material = "", Props = "", StationText = "";
+        public string BridgeGroup = "", Bridge = "", Unit = "", Support = "", Girder = "", Material = "", Props = "";
         public bool InIfc = true;
         public double StaBegin = double.NaN, StaEnd = double.NaN, Mass = double.NaN, Volume = double.NaN, Length = double.NaN;
         public Box3 Box = Box3.Empty;
@@ -198,53 +247,86 @@ public static class ModelDatabase
 
     private sealed class Writer : IDisposable
     {
-        private readonly SqliteCommand? _cmd;
+        private readonly SqliteCommand? _cmd, _strCmd, _propCmd;
         private readonly SqliteParameter[] _p = new SqliteParameter[28];
+        private readonly SqliteParameter _sv = new("$v", null), _si = new("$i", null), _pv = new("$j", null), _pi = new("$k", null);
         private readonly DatabaseBuildResult _res;
-        private readonly SqliteParameter _props = new("$p", null);
-        private int _seq;
-        public Writer(SqliteConnection? cn, SqliteTransaction? tx, DatabaseBuildResult res)
+        private readonly Dictionary<string, int> _strings = new();
+        private readonly Dictionary<string, int> _props = new();
+        private readonly Dictionary<string, int> _ids = new();
+        private int _nextId;
+
+        public Writer(SqliteConnection? cn, DatabaseBuildResult res, SqliteTransaction? tx = null)
         {
             _res = res;
-            _cmd = null;
             if (cn == null) return;
+            string[] cols = { "global_id", "parent_id", "level_s", "category_s", "subtype_s", "ifc_class_s", "in_ifc", "name", "mark", "bridge_group_s", "bridge_s", "unit_s", "support_s", "girder_s",
+                "station_begin", "station_end", "material_s", "mass_kg", "volume_m3", "length_m",
+                "bbox_min_x", "bbox_min_y", "bbox_min_z", "bbox_max_x", "bbox_max_y", "bbox_max_z", "props_id", "id" };
             _cmd = cn.CreateCommand();
             _cmd.Transaction = tx;
-            string[] cols = { "global_id", "parent_global_id", "seq", "level", "category", "subtype", "ifc_class", "in_ifc", "name", "mark", "bridge_group", "bridge", "unit", "support", "girder",
-                "station_begin", "station_end", "station_range", "material", "mass_kg", "volume_m3", "length_m",
-                "bbox_min_x", "bbox_min_y", "bbox_min_z", "bbox_max_x", "bbox_max_y", "bbox_max_z" };
-            _cmd.CommandText = $"INSERT OR REPLACE INTO elements({string.Join(",", cols)},properties) VALUES({string.Join(",", cols.Select((_, i) => "$" + i))},$p)";
+            _cmd.CommandText = $"INSERT INTO el({string.Join(",", cols)}) VALUES({string.Join(",", cols.Select((_, i) => "$" + i))})";
             for (int i = 0; i < cols.Length; i++) _cmd.Parameters.Add(_p[i] = new SqliteParameter("$" + i, null));
-            _cmd.Parameters.Add(_props);
             _cmd.Prepare();
+            _strCmd = cn.CreateCommand(); _strCmd.Transaction = tx;
+            _strCmd.CommandText = "INSERT INTO strings(id, value) VALUES($i, $v)";
+            _strCmd.Parameters.Add(_si); _strCmd.Parameters.Add(_sv);
+            _propCmd = cn.CreateCommand(); _propCmd.Transaction = tx;
+            _propCmd.CommandText = "INSERT INTO props(id, json) VALUES($k, $j)";
+            _propCmd.Parameters.Add(_pi); _propCmd.Parameters.Add(_pv);
         }
 
-        private static object? N(string s) => s.Length == 0 ? null : s;
-        private static object? D(double d) => double.IsNaN(d) || double.IsInfinity(d) ? null : Math.Round(d, 6);
+        private object S(string s)
+        {
+            if (s.Length == 0) return DBNull.Value;
+            if (!_strings.TryGetValue(s, out int id))
+            {
+                _strings[s] = id = _strings.Count + 1;
+                _si.Value = id; _sv.Value = s; _strCmd!.ExecuteNonQuery();
+            }
+            return id;
+        }
+
+        private object P(string json)
+        {
+            if (json.Length == 0) return DBNull.Value;
+            if (!_props.TryGetValue(json, out int id))
+            {
+                _props[json] = id = _props.Count + 1;
+                _pi.Value = id; _pv.Value = json; _propCmd!.ExecuteNonQuery();
+            }
+            return id;
+        }
+
+        private static object N(string s) => s.Length == 0 ? DBNull.Value : s;
+        private static object D(double d) => double.IsNaN(d) || double.IsInfinity(d) ? DBNull.Value : Math.Round(d, 6);
 
         public void Add(Row r)
         {
             if (r.Tag != null) _res.Tags.Add(r.Tag, r.GlobalId);
-            if (_cmd == null) { _res.Elements++; return; }
-            _p[0].Value = r.GlobalId; _p[1].Value = N(r.Parent); _p[2].Value = _seq++; _p[3].Value = r.Level; _p[4].Value = N(r.Category);
-            _p[5].Value = N(r.Subtype); _p[6].Value = N(r.IfcClass); _p[7].Value = r.InIfc ? 1 : 0; _p[8].Value = N(r.Name); _p[9].Value = N(r.Mark);
-            _p[10].Value = N(r.BridgeGroup); _p[11].Value = N(r.Bridge); _p[12].Value = N(r.Unit); _p[13].Value = N(r.Support); _p[14].Value = N(r.Girder);
-            _p[15].Value = D(r.StaBegin); _p[16].Value = D(r.StaEnd); _p[17].Value = N(r.StationText); _p[18].Value = N(r.Material);
-            _p[19].Value = D(r.Mass); _p[20].Value = D(r.Volume); _p[21].Value = D(r.Length);
-            bool has = !r.Box.IsEmpty;
-            _p[22].Value = has ? Math.Round(r.Box.Min.X, 4) : null; _p[23].Value = has ? Math.Round(r.Box.Min.Y, 4) : null; _p[24].Value = has ? Math.Round(r.Box.Min.Z, 4) : null;
-            _p[25].Value = has ? Math.Round(r.Box.Max.X, 4) : null; _p[26].Value = has ? Math.Round(r.Box.Max.Y, 4) : null; _p[27].Value = has ? Math.Round(r.Box.Max.Z, 4) : null;
-            _props.Value = N(r.Props);
-            foreach (var q in _p) q.Value ??= DBNull.Value;
-            _props.Value ??= DBNull.Value;
-            _cmd.ExecuteNonQuery();
             _res.Elements++;
             _res.ByLevel[r.Level] = _res.ByLevel.GetValueOrDefault(r.Level) + 1;
             string c = r.Level + ": " + r.Category;
             _res.ByCategory[c] = _res.ByCategory.GetValueOrDefault(c) + 1;
+            if (_cmd == null) return;
+            int id = ++_nextId;
+            _ids[r.GlobalId] = id;
+            _p[0].Value = r.GlobalId;
+            _p[1].Value = r.Parent.Length > 0 && _ids.TryGetValue(r.Parent, out int pid) ? pid : DBNull.Value;
+            _p[2].Value = S(r.Level); _p[3].Value = S(r.Category); _p[4].Value = S(r.Subtype); _p[5].Value = S(r.IfcClass);
+            _p[6].Value = r.InIfc ? 1 : 0; _p[7].Value = N(r.Level == "part" && r.Name == r.Mark && r.IfcClass != "IFCBRIDGEPART" ? "" : r.Name); _p[8].Value = N(r.Mark);
+            _p[9].Value = S(r.BridgeGroup); _p[10].Value = S(r.Bridge); _p[11].Value = S(r.Unit); _p[12].Value = S(r.Support); _p[13].Value = S(r.Girder);
+            _p[14].Value = D(r.StaBegin); _p[15].Value = D(r.StaEnd); _p[16].Value = S(r.Material);
+            _p[17].Value = D(r.Mass); _p[18].Value = D(r.Volume); _p[19].Value = D(r.Length);
+            bool has = !r.Box.IsEmpty;
+            _p[20].Value = has ? Math.Round(r.Box.Min.X, 4) : DBNull.Value; _p[21].Value = has ? Math.Round(r.Box.Min.Y, 4) : DBNull.Value; _p[22].Value = has ? Math.Round(r.Box.Min.Z, 4) : DBNull.Value;
+            _p[23].Value = has ? Math.Round(r.Box.Max.X, 4) : DBNull.Value; _p[24].Value = has ? Math.Round(r.Box.Max.Y, 4) : DBNull.Value; _p[25].Value = has ? Math.Round(r.Box.Max.Z, 4) : DBNull.Value;
+            _p[26].Value = P(r.Props);
+            _p[27].Value = id;
+            _cmd.ExecuteNonQuery();
         }
 
-        public void Dispose() => _cmd?.Dispose();
+        public void Dispose() { _cmd?.Dispose(); _strCmd?.Dispose(); _propCmd?.Dispose(); }
     }
 
     // ================================================================== JSON helper
@@ -314,7 +396,6 @@ public static class ModelDatabase
         private void SetStation(Row r, double lo, double hi)
         {
             r.StaBegin = lo; r.StaEnd = hi;
-            r.StationText = Math.Abs(hi - lo) < 0.01 ? _project.Units.FormatStation(lo) : _project.Units.FormatStation(lo) + " to " + _project.Units.FormatStation(hi);
         }
 
         public void Run(IReadOnlyList<IfcBridgeData> bridges)
@@ -390,7 +471,7 @@ public static class ModelDatabase
             _ = deckSlabId;
         }
 
-        private static Row Part(Row r, Row from) { r.StaBegin = from.StaBegin; r.StaEnd = from.StaEnd; r.StationText = from.StationText; return r; }
+        private static Row Part(Row r, Row from) { r.StaBegin = from.StaBegin; r.StaEnd = from.StaEnd; return r; }
 
         // ------------------------------------------------------------ steel
 
@@ -472,12 +553,26 @@ public static class ModelDatabase
                 asmInfo[asm.Mark] = new AsmInfo(gid, support, girder, sub);
             }
 
+            // Groups per assembly for the many-instance items: "FS4 bolts", "G1-1 studs", "B-Pier1WB-G1 welds" ... (links / QC live on them or higher).
+            var asmGroups = new Dictionary<(string, string), string>();
+            string AsmGroup(string asmMark, string kind, string label, string cat)
+            {
+                if (asmGroups.TryGetValue((asmMark, kind), out var g)) return g;
+                asmInfo.TryGetValue(asmMark, out var ai0);
+                string id = Id($"{bk}/grp/{asmMark}/{kind}");
+                var gr = New(id, ai0?.GlobalId ?? superId, "group", cat, "", $"{asmMark} {label}");
+                gr.InIfc = false; gr.Support = ai0?.Support ?? ""; gr.Girder = ai0?.Girder ?? "";
+                _w.Add(gr);
+                return asmGroups[(asmMark, kind)] = id;
+            }
+
             // parts, with quantities and station extent computed per assembly from the parts' bounding boxes afterwards (kept simple: per part)
             foreach (var part in steel.Parts)
             {
                 string gid = Id(IfcKeys.Part(bk, part.Mark));
                 asmInfo.TryGetValue(part.Assembly, out var ai);
-                var r = New(gid, ai?.GlobalId ?? superId, "part", PartCategoryName(part.Category), IfcClassOf(part), part.Mark);
+                string partParent = part.Category == PartCategory.Weld && ai != null ? AsmGroup(part.Assembly, "welds", "welds", "weld group") : ai?.GlobalId ?? superId;
+                var r = New(gid, partParent, "part", PartCategoryName(part.Category), IfcClassOf(part), part.Mark);
                 r.InIfc = !part.Mesh.IsEmpty;
                 r.Mark = part.Mark; r.Material = part.Material; r.Support = ai?.Support ?? ""; r.Girder = ai?.Girder ?? "";
                 r.Tag = part;
@@ -505,7 +600,13 @@ public static class ModelDatabase
                 int idx = perAsm[asmMark] = perAsm.GetValueOrDefault(asmMark) + 1;
                 string cat = kind switch { 1 => "anchor bolt", 2 => "shear stud", _ => "bolt" };
                 string tag = kind switch { 1 => "AB", 2 => "SS", _ => "B" };
-                var r = New(gid, ai?.GlobalId ?? superId, "fastener", cat, "IFCMECHANICALFASTENER", $"{cat} {asmMark}.{tag}{idx}");
+                string fparent = ai == null ? superId : kind switch
+                {
+                    1 => AsmGroup(asmMark, "anchors", "anchor bolts", "anchor bolt group"),
+                    2 => AsmGroup(asmMark, "studs", "shear studs", "stud group"),
+                    _ => AsmGroup(asmMark, "bolts", "bolts", "bolt group"),
+                };
+                var r = New(gid, fparent, "fastener", cat, "IFCMECHANICALFASTENER", "");
                 r.Mark = $"{asmMark}-{tag}{idx}";
                 r.Support = ai?.Support ?? ""; r.Girder = ai?.Girder ?? "";
                 r.Material = kind switch { 1 => "ASTM F1554", 2 => "ASTM A108 (AWS D1.5 Type B)", _ => boltMat };
@@ -524,11 +625,11 @@ public static class ModelDatabase
                 Fastener(st, 2, st.Frame, st.Assembly, 0, st.Length, steel.StudDiameter, 0);
         }
 
-        private string Group(string key, string parent, string name, string category)
+        private string Group(string key, string parent, string name, string category, string support = "", string subtype = "")
         {
             string id = Id(key);
             var r = New(id, parent, "group", category, "", name);
-            r.InIfc = false;
+            r.InIfc = false; r.Support = support; r.Subtype = subtype;
             _w.Add(r);
             return id;
         }
@@ -560,6 +661,7 @@ public static class ModelDatabase
         {
             string slabId = "";
             string concMat = $"Concrete, f'c = {def.Deck.Reinforcement.ConcreteStrengthKsi:0.#} ksi";
+            string who = _unit.Length > 0 ? $"{_bridgeGroup} {_unit}" : def.Name;
             if (c.Deck != null)
             {
                 slabId = Id(IfcKeys.DeckSlab(bk));
@@ -570,9 +672,14 @@ public static class ModelDatabase
                 r.Props = new Json().Add("thickness_m", def.Deck.Thickness).Add("deck_volume_m3", c.DeckVolume).Add("haunch_volume_m3", c.HaunchVolume).ToString();
                 _w.Add(r);
             }
+            // Groups at the granularity the plans use: one deck-reinforcing group per unit, one barrier group (concrete + its bars) per unit.
+            string deckRebar = "", barrierGroup = "", barrierRebar = "";
+            string DeckRebar() => deckRebar.Length > 0 ? deckRebar : deckRebar = Group($"{bk}/grp/deck-rebar", deckPartId, $"{who} deck reinforcing", "deck reinforcing");
+            string BarrierGroup() => barrierGroup.Length > 0 ? barrierGroup : barrierGroup = Group($"{bk}/grp/barriers", deckPartId, $"{who} barriers", "barrier group");
+            string BarrierRebar() => barrierRebar.Length > 0 ? barrierRebar : barrierRebar = Group($"{bk}/grp/barrier-rebar", BarrierGroup(), $"{who} barrier reinforcing", "barrier reinforcing");
             foreach (var (name, mesh) in c.Barriers)
             {
-                var r = New(Id(IfcKeys.Barrier(bk, name)), deckPartId, "element", "barrier", "IFCRAILING", name);
+                var r = New(Id(IfcKeys.Barrier(bk, name)), BarrierGroup(), "element", "barrier", "IFCRAILING", name);
                 r.Material = concMat; r.Volume = Math.Abs(mesh.Volume()); r.Mass = r.Volume * 2400; r.Box = mesh.Bounds();
                 StationOf(r, r.Box);
                 r.Subtype = def.Deck.Barrier.Type.ToString();
@@ -583,32 +690,34 @@ public static class ModelDatabase
             {
                 string jk = IfcKeys.Joint(bk, jn++);
                 string type = jr.Definition.TypeName;
-                var r = New(Id(IfcKeys.JointBlockout(jk)), slabId.Length > 0 ? slabId : deckPartId, "element", "joint blockout", "IFCBUILDINGELEMENTPART", jr.BlockoutName);
+                string jg = Group(jk + "/grp", deckPartId, $"Expansion joint at {jr.Support} ({(jr.AtBegin ? "begin" : "end")} of {who})", "joint", jr.Support, type);
+                var r = New(Id(IfcKeys.JointBlockout(jk)), jg, "element", "joint blockout", "IFCBUILDINGELEMENTPART", jr.BlockoutName);
                 r.Support = jr.Support; r.Subtype = type; r.Material = concMat; r.Volume = jr.BlockoutVolume; r.Mass = r.Volume * 2400;
                 r.Box = jr.Blockout.Bounds(); StationOf(r, r.Box);
                 r.Props = new Json().Add("end", jr.AtBegin ? "begin" : "end").Add("joint_index", jn - 1).ToString();
                 _w.Add(r);
                 if (jr.Body != null)
                 {
-                    var d = New(Id(IfcKeys.JointDevice(jk)), deckPartId, "element", "expansion joint device", "IFCDISCRETEACCESSORY", jr.DeviceName);
+                    var d = New(Id(IfcKeys.JointDevice(jk)), jg, "element", "expansion joint device", "IFCDISCRETEACCESSORY", jr.DeviceName);
                     d.Support = jr.Support; d.Subtype = type; d.Material = "Steel (placeholder)"; d.Box = jr.Body.Bounds(); d.Length = jr.Length;
                     StationOf(d, d.Box);
                     d.Props = new Json().Add("end", jr.AtBegin ? "begin" : "end").Add("placeholder", true).ToString();
                     _w.Add(d);
                 }
             }
-            Bars(c.Bars, c.Marks, deckPartId, i => IfcKeys.DeckBar(bk, i), "Deck", def.Deck.Reinforcement.SteelYieldKsi, "");
+            Bars(c.Bars, c.Marks, (bar, m) => bar.Group == "Rail" ? BarrierRebar() : DeckRebar(), i => IfcKeys.DeckBar(bk, i), def.Deck.Reinforcement.SteelYieldKsi, "");
             return slabId;
         }
 
-        private void Bars(IEnumerable<BarPlacement> bars, IEnumerable<BarMark> marks, string parent, Func<int, string> key, string location, double fy, string support)
+        /// <summary>One row per bar placement (GlobalId = the IFC bar's); <paramref name="parentOf"/> picks the group a bar belongs to.</summary>
+        private void Bars(IEnumerable<BarPlacement> bars, IEnumerable<BarMark> marks, Func<BarPlacement, BarMark, string> parentOf, Func<int, string> key, double fy, string support)
         {
             var mk = marks.GroupBy(m => m.Mark).ToDictionary(g => g.Key, g => g.First());
             int n = 0;
             foreach (var bar in bars)
             {
                 var m = mk[bar.Mark];
-                var r = New(Id(key(n++)), parent, "bar", "rebar", "IFCREINFORCINGBAR", "Bar " + m.Mark);
+                var r = New(Id(key(n++)), parentOf(bar, m), "bar", "rebar", "IFCREINFORCINGBAR", "");
                 r.Mark = string.IsNullOrEmpty(m.Unit) ? m.Mark : $"{m.Unit} {m.Mark}";
                 r.Support = support; r.Tag = bar;
                 if (_keysOnly) { _w.Add(r); continue; }
@@ -626,6 +735,9 @@ public static class ModelDatabase
 
         // ------------------------------------------------------------ substructure
 
+        private static readonly Regex ColNo = new(@"column (\d+)", RegexOptions.Compiled);
+        private static readonly Regex PileGroupNo = new(@"pile group (\d+)", RegexOptions.Compiled);
+
         private void Substructure(SubstructureModel sub, string bk, string subId, string superId)
         {
             foreach (var unit in sub.Units)
@@ -640,6 +752,37 @@ public static class ModelDatabase
                     .Add("cap_top", unit.CapTopDescription).ToString();
                 _w.Add(ur);
                 string concMat = $"Concrete, f'c = {unit.Definition.Reinforcement.ConcreteStrengthKsi:0.#} ksi";
+
+                // Groups at the plans' granularity: cap (concrete + pedestals + cap bars), each column (concrete + its bars, ties), each footing
+                // (footing + piles/shaft + footing bars), backwall. Created on first use.
+                var groups = new Dictionary<string, string>();
+                string G(string id, string label, string cat)
+                {
+                    if (groups.TryGetValue(id, out var g)) return g;
+                    return groups[id] = Group($"{uk}/grp/{id}", uid, $"{unit.Name} – {label}", cat, unit.Name);
+                }
+                string CapG() => G("cap", "Cap", "cap group");
+                string ColG(int n) => G("col" + n, $"Column {n}", "column group");
+                string FtgG(int n) => G("ftg" + n, $"Footing {n}", "footing group");
+                string PileGroupG(int n) => G("pg" + n, $"Pile group {n}", "footing group");
+                Vec2 ColPos(int idx) => unit.Plan(unit.Columns[idx].S, unit.Columns[idx].N);
+                Vec2 FtgPos(int idx) => unit.Plan(unit.Foundations[idx].S, unit.Foundations[idx].N);
+
+                string ParentOfSolid(SubSolid so)
+                {
+                    switch (so.Kind)
+                    {
+                        case SubElementKind.Cap: case SubElementKind.Pedestal: return CapG();
+                        case SubElementKind.Backwall: return G("backwall", "Backwall", "backwall group");
+                        case SubElementKind.Column:
+                            return ColNo.Match(so.Name) is { Success: true } c1 ? ColG(int.Parse(c1.Groups[1].Value)) : uid;
+                        default:
+                            if (PileGroupNo.Match(so.Name) is { Success: true } pg) return PileGroupG(int.Parse(pg.Groups[1].Value));
+                            if (ColNo.Match(so.Name) is { Success: true } c2) return FtgG(int.Parse(c2.Groups[1].Value));
+                            return uid;
+                    }
+                }
+
                 int k = 0;
                 foreach (var so in unit.Solids)
                 {
@@ -654,7 +797,7 @@ public static class ModelDatabase
                         SubElementKind.Pile => ("pile", "IFCPILE"),
                         _ => ("footing", "IFCFOOTING"),
                     };
-                    var r = New(Id(IfcKeys.SubSolid(uk, k++)), uid, "element", cat, cls, so.Name);
+                    var r = New(Id(IfcKeys.SubSolid(uk, k++)), ParentOfSolid(so), "element", cat, cls, so.Name);
                     r.Support = unit.Name; r.Tag = so;
                     if (_keysOnly) { _w.Add(r); continue; }
                     r.Material = so.IsConcrete ? concMat : "ASTM A572 Gr. 50 (HP piling)";
@@ -663,7 +806,34 @@ public static class ModelDatabase
                     r.Props = new Json().Add("description", so.Description).ToString();
                     _w.Add(r);
                 }
-                Bars(sub.Bars.Where(b => b.Unit == unit.Name), sub.Marks.Where(m => m.Unit == unit.Name), uid, i => IfcKeys.SubBar(uk, i), "", unit.Definition.Reinforcement.SteelYieldKsi, unit.Name);
+
+                // Bars by what they reinforce, from the mark's location text; marks that span several columns / footings are split by
+                // the nearest column / footing (plan distance from the bar's centroid).
+                string ParentOfBar(BarPlacement bar, BarMark m)
+                {
+                    string loc = m.Location;
+                    double cx = 0, cy = 0;
+                    foreach (var p in bar.Points) { cx += p.X; cy += p.Y; }
+                    var c = new Vec2(cx / bar.Points.Length, cy / bar.Points.Length);
+                    int Nearest(IEnumerable<int> cand, Func<int, Vec2> pos)
+                    {
+                        int best = -1; double bd = double.MaxValue;
+                        foreach (int i in cand) { double d = Vec2.Distance(c, pos(i)); if (d < bd) { bd = d; best = i; } }
+                        return best;
+                    }
+                    if (loc.Contains(" cap ")) return CapG();
+                    if (loc.Contains("backwall")) return G("backwall", "Backwall", "backwall group");
+                    if (loc.Contains("footing") && unit.Foundations.Count > 0)
+                    {
+                        int i = Nearest(Enumerable.Range(0, unit.Foundations.Count), FtgPos);
+                        return FtgG(i + 1);
+                    }
+                    var cols = ColNo.Matches(loc).Select(x => int.Parse(x.Groups[1].Value)).Where(n => n >= 1 && n <= unit.Columns.Count).Distinct().ToList();
+                    if (cols.Count == 1) return ColG(cols[0]);
+                    if (cols.Count > 1) return ColG(Nearest(cols.Select(n => n - 1), ColPos) + 1);
+                    return uid;
+                }
+                Bars(sub.Bars.Where(b => b.Unit == unit.Name), sub.Marks.Where(m => m.Unit == unit.Name), ParentOfBar, i => IfcKeys.SubBar(uk, i), unit.Definition.Reinforcement.SteelYieldKsi, unit.Name);
             }
             int n = 0;
             foreach (var so in sub.Drainage)

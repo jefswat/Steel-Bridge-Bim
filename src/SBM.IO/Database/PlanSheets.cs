@@ -144,6 +144,7 @@ public static class PlanSheets
         res.Sheets = sheets.Count;
         var sets = rules.PlanSets.ToDictionary(p => p.Id);
         var adminRx = rules.Administrative.Select(a => new Regex(a, RegexOptions.IgnoreCase)).ToList();
+        FlatElements(cn);
         ModelDatabase.Exec(cn, "BEGIN");
         ModelDatabase.Exec(cn, "DELETE FROM element_sheet");
         ModelDatabase.Exec(cn, "UPDATE sheets SET kind=NULL, note=NULL");
@@ -168,8 +169,8 @@ public static class PlanSheets
                     string where = BuildWhere(target, m, set, "e", ps, out string whereP);
                     string sql = $"""
                         INSERT INTO element_sheet(global_id, sheet_id, role, basis, source)
-                        SELECT e.global_id, $sheet, $role, $basis, $src FROM elements e
-                        WHERE {where} AND NOT EXISTS (SELECT 1 FROM elements p WHERE p.global_id = e.parent_global_id AND {whereP})
+                        SELECT e.global_id, $sheet, $role, $basis, $src FROM t_el e
+                        WHERE {where} AND NOT EXISTS (SELECT 1 FROM t_el p WHERE p.global_id = e.parent_global_id AND {whereP})
                         ON CONFLICT(global_id, sheet_id) DO UPDATE SET role = excluded.role, basis = excluded.basis, source = excluded.source WHERE excluded.role = 'detail' AND element_sheet.role <> 'detail'
                         """;
                     ps.Add(("$sheet", s.id)); ps.Add(("$role", rule.Role)); ps.Add(("$basis", Expand(rule.Basis, m))); ps.Add(("$src", $"{sourceName}#{rule.Id}"));
@@ -192,6 +193,16 @@ public static class PlanSheets
         res.SheetsLinked = ModelDatabase.Scalar<int>(cn, "SELECT COUNT(DISTINCT sheet_id) FROM element_sheet");
         res.SheetsUnused = ModelDatabase.Scalar<int>(cn, "SELECT COUNT(*) FROM v_unused_sheets");
         return res;
+    }
+
+    /// <summary>Materializes the readable <c>elements</c> view as a temp table with indexes (rule matching and coverage run on it; the physical tables are compact).</summary>
+    public static void FlatElements(SqliteConnection cn)
+    {
+        ModelDatabase.Exec(cn, "DROP TABLE IF EXISTS temp.t_el");
+        ModelDatabase.Exec(cn, "CREATE TEMP TABLE t_el AS SELECT * FROM elements");
+        ModelDatabase.Exec(cn, "CREATE UNIQUE INDEX temp.ix_t_gid ON t_el(global_id)");
+        ModelDatabase.Exec(cn, "CREATE INDEX temp.ix_t_parent ON t_el(parent_global_id)");
+        ModelDatabase.Exec(cn, "CREATE INDEX temp.ix_t_cat ON t_el(level, category)");
     }
 
     private static string BuildWhere(Dictionary<string, JsonElement> sel, Match m, PlanSetSpec? set, string alias, List<(string, object?)> ps, out string wherePrimed)
@@ -286,27 +297,28 @@ public static class PlanSheets
         }
         sb.AppendLine("COVERAGE");
         // Propagate only a flag down the hierarchy (any link / detail link), not every (element, sheet) pair.
+        FlatElements(cn);
         ModelDatabase.Exec(cn, "DROP TABLE IF EXISTS temp.cov");
         ModelDatabase.Exec(cn, """
             CREATE TEMP TABLE cov AS
             WITH RECURSIVE c(gid, det) AS (
               SELECT global_id, MAX(role = 'detail') FROM element_sheet GROUP BY global_id
               UNION
-              SELECT e.global_id, c.det FROM c JOIN elements e ON e.parent_global_id = c.gid)
+              SELECT e.global_id, c.det FROM c JOIN t_el e ON e.parent_global_id = c.gid)
             SELECT gid, MAX(det) AS det FROM c GROUP BY gid
             """);
         ModelDatabase.Exec(cn, "CREATE UNIQUE INDEX temp.ix_cov ON cov(gid)");
         Q("elements by level (count | with any sheet | with a detail sheet):", """
-            SELECT e.level, COUNT(*), SUM(c.gid IS NOT NULL), SUM(COALESCE(c.det, 0)) FROM elements e LEFT JOIN cov c ON c.gid = e.global_id
+            SELECT e.level, COUNT(*), SUM(c.gid IS NOT NULL), SUM(COALESCE(c.det, 0)) FROM t_el e LEFT JOIN cov c ON c.gid = e.global_id
             GROUP BY e.level ORDER BY 2 DESC
             """);
         Q("total (elements | with any sheet | % | with a detail sheet | %):", """
             SELECT COUNT(*), SUM(c.gid IS NOT NULL), ROUND(100.0 * SUM(c.gid IS NOT NULL) / COUNT(*), 1),
                    SUM(COALESCE(c.det, 0)), ROUND(100.0 * SUM(COALESCE(c.det, 0)) / COUNT(*), 1)
-            FROM elements e LEFT JOIN cov c ON c.gid = e.global_id
+            FROM t_el e LEFT JOIN cov c ON c.gid = e.global_id
             """);
         Q("elements with NO detail sheet by category (count):", """
-            SELECT e.level || ': ' || COALESCE(e.category, ''), COUNT(*) FROM elements e LEFT JOIN cov c ON c.gid = e.global_id
+            SELECT e.level || ': ' || COALESCE(e.category, ''), COUNT(*) FROM t_el e LEFT JOIN cov c ON c.gid = e.global_id
             WHERE COALESCE(c.det, 0) = 0 GROUP BY 1 ORDER BY 2 DESC
             """);
         return sb.ToString();

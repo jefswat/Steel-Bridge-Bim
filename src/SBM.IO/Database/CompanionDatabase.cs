@@ -11,6 +11,8 @@ public sealed class DatabaseOptions
     /// <summary>Split the plan PDFs into single pages and (re)fill the sheets table. Without it, sheets already in the database are kept.</summary>
     public bool Pages { get; set; }
     public bool Previews { get; set; } = true;
+    /// <summary>VACUUM after writing (smaller file; takes a few seconds and needs temporary disk space about the size of the database).</summary>
+    public bool Vacuum { get; set; }
     /// <summary>Folders searched for the plan PDFs (the model folder and its <c>plans</c> subfolder are always searched).</summary>
     public List<string> PlanFolders { get; } = new();
     /// <summary>Write the unused-sheet report (markdown) here.</summary>
@@ -57,7 +59,7 @@ public static class CompanionDatabase
         var res = new CompanionResult();
         string dbDir = Path.GetDirectoryName(Path.GetFullPath(dbPath))!;
         Directory.CreateDirectory(dbDir);
-        res.Build = ModelDatabase.Write(dbPath, project, bridges, options.ModelFile);
+        res.Build = ModelDatabase.Write(dbPath, project, bridges, options.ModelFile, options.Vacuum);
         string? linksFile = options.LinksFile ?? FindLinksFile(options.ModelFile);
         LinkRules? rules = linksFile != null && File.Exists(linksFile) ? LinkRules.Load(linksFile) : null;
         using var cn = ModelDatabase.Open(dbPath);

@@ -6,7 +6,7 @@ import sys, os, re, json, pymupdf
 args = [a for a in sys.argv[1:] if not a.startswith("--")]
 pdf, out = args[0], args[1]
 preview = "--no-preview" not in sys.argv
-zoom = 1.3
+zoom = 1.15
 if "--zoom" in sys.argv:
     zoom = float(sys.argv[sys.argv.index("--zoom") + 1])
 os.makedirs(out, exist_ok=True)
@@ -41,7 +41,7 @@ for i, page in enumerate(doc, start=1):
     if preview:
         jf = base + ".jpg"
         if not os.path.exists(os.path.join(out, jf)):
-            page.get_pixmap(matrix=pymupdf.Matrix(zoom, zoom), colorspace=pymupdf.csGRAY).save(os.path.join(out, jf), jpg_quality=70)
+            page.get_pixmap(matrix=pymupdf.Matrix(zoom, zoom), colorspace=pymupdf.csGRAY).save(os.path.join(out, jf), jpg_quality=55)
     rows.append({"pdf_page": i, "design_sheet": sheet, "title": title, "page_file": base + ".pdf", "preview_file": jf})
 with open(os.path.join(out, "sheets.json"), "w", encoding="utf-8") as f:
     json.dump({"pdf_file": os.path.basename(pdf), "sheets": rows}, f, indent=1)

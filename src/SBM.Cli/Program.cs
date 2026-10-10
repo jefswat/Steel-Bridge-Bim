@@ -28,7 +28,7 @@ public static class Program
                                                             shows running copies. (All other commands work on .sbm files.)
           sbm regen <file.sbm>                              Regenerate; print counts, warnings, timing
           sbm export <file.sbm> [--ifc a.ifc|a.ifczip] [--dxf b.dxf] [--landxml c.xml]
-          sbm db <file.sbm> [out.sqlite] [--pages] [--plans <folder>[,<folder>]] [--links rules.json] [--no-previews]
+          sbm db <file.sbm> [out.sqlite] [--pages] [--plans <folder>[,<folder>]] [--links rules.json] [--no-previews] [--no-vacuum]
                                                             [--unused report.md]
                                                             Companion SQLite database: every element (IFC GlobalIds + hierarchy),
                                                             plan sheets (--pages splits the plan PDFs), element -> sheet links, QC
@@ -183,7 +183,7 @@ public static class Program
                     var doc = SbmDocument.Open(args[1]);
                     var o = new SBM.IO.Database.DatabaseOptions
                     {
-                        Pages = args.Contains("--pages"), Previews = !args.Contains("--no-previews"), LinksFile = Opt("--links"),
+                        Pages = args.Contains("--pages"), Vacuum = !args.Contains("--no-vacuum"), Previews = !args.Contains("--no-previews"), LinksFile = Opt("--links"),
                         UnusedReport = Opt("--unused"), Log = m => Console.WriteLine("  " + m),
                     };
                     if (Opt("--plans") is { } pl) o.PlanFolders.AddRange(pl.Split(','));
@@ -193,6 +193,7 @@ public static class Program
                     foreach (var (lv, n) in r.Build.ByLevel.OrderByDescending(x => x.Value)) Console.WriteLine($"  {lv,-10} {n,9:N0}");
                     if (r.Links is { } l)
                         Console.WriteLine($"  sheets {l.Sheets}, links {l.Links:N0}, sheets linked {l.SheetsLinked}, unlinked {l.SheetsUnused}");
+                    Console.WriteLine("  " + SBM.IO.Database.ModelDatabase.SizeText(r.Build.Path));
                     if (r.Coverage.Length > 0) Console.WriteLine(r.Coverage);
                     if (r.Links != null) foreach (var w in r.Links.Warnings) Console.WriteLine("  warning: " + w);
                     return 0;
