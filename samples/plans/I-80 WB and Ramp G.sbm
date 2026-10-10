@@ -1509,7 +1509,7 @@
           "Type": "Abutment",
           "Station": 231001.714272,
           "SkewDegrees": 44,
-          "DeckEndOffset": 0.45720000000000005,
+          "DeckEndOffset": 0.4064,
           "GirderEndExtension": 0.30479999999999996,
           "SharedPier": "",
           "PierCenterOffset": 0,
@@ -1660,6 +1660,19 @@
               "BackwallBarSpacing": 0.30479999999999996,
               "MaxBarLength": 18.288
             }
+          },
+          "ExpansionJoint": {
+            "Type": "Modular",
+            "GapAt50F": 0.15239999999999998,
+            "BlockoutWidth": 0.4572,
+            "BlockoutDepth": 0.3556,
+            "SetDown": 0.003175,
+            "DeckEndOffset": 0.4064,
+            "SealCount": null,
+            "Body": true,
+            "EdgeInset": null,
+            "Active": true,
+            "TypeName": "Modular"
           }
         },
         {
@@ -2088,7 +2101,8 @@
               "BackwallBarSpacing": 0.30479999999999996,
               "MaxBarLength": 18.288
             }
-          }
+          },
+          "ExpansionJoint": null
         },
         {
           "Name": "Pier 2WB",
@@ -2516,7 +2530,8 @@
               "BackwallBarSpacing": 0.30479999999999996,
               "MaxBarLength": 18.288
             }
-          }
+          },
+          "ExpansionJoint": null
         },
         {
           "Name": "Pier 3WB",
@@ -2980,7 +2995,8 @@
               "BackwallBarSpacing": 0.30479999999999996,
               "MaxBarLength": 18.288
             }
-          }
+          },
+          "ExpansionJoint": null
         },
         {
           "Name": "Pier 4WB",
@@ -3376,14 +3392,15 @@
               "BackwallBarSpacing": 0.30479999999999996,
               "MaxBarLength": 18.288
             }
-          }
+          },
+          "ExpansionJoint": null
         },
         {
           "Name": "Pier 5WB",
           "Type": "Pier",
           "Station": 231375.170472,
           "SkewDegrees": 0,
-          "DeckEndOffset": 0.45720000000000005,
+          "DeckEndOffset": 0.3429,
           "GirderEndExtension": 0.30479999999999996,
           "SharedPier": "Pier 5WB",
           "PierCenterOffset": 0.45720000000000005,
@@ -3708,6 +3725,19 @@
               "BackwallBarSpacing": 0.30479999999999996,
               "MaxBarLength": 18.288
             }
+          },
+          "ExpansionJoint": {
+            "Type": "Modular",
+            "GapAt50F": 0.2286,
+            "BlockoutWidth": 0.635,
+            "BlockoutDepth": 0.3556,
+            "SetDown": 0.003175,
+            "DeckEndOffset": 0.3429,
+            "SealCount": null,
+            "Body": true,
+            "EdgeInset": null,
+            "Active": true,
+            "TypeName": "Modular"
           }
         }
       ],
@@ -6368,7 +6398,7 @@
           "Type": "Pier",
           "Station": 231376.084872,
           "SkewDegrees": 0,
-          "DeckEndOffset": 0.45720000000000005,
+          "DeckEndOffset": 0.3429,
           "GirderEndExtension": 0.30479999999999996,
           "SharedPier": "Pier 5WB",
           "PierCenterOffset": -0.45720000000000005,
@@ -6527,6 +6557,19 @@
               "BackwallBarSpacing": 0.30479999999999996,
               "MaxBarLength": 18.288
             }
+          },
+          "ExpansionJoint": {
+            "Type": "Modular",
+            "GapAt50F": 0.2286,
+            "BlockoutWidth": 0.635,
+            "BlockoutDepth": 0.3556,
+            "SetDown": 0.003175,
+            "DeckEndOffset": 0.3429,
+            "SealCount": null,
+            "Body": false,
+            "EdgeInset": null,
+            "Active": true,
+            "TypeName": "Modular"
           }
         },
         {
@@ -7088,7 +7131,8 @@
               "BackwallBarSpacing": 0.30479999999999996,
               "MaxBarLength": 18.288
             }
-          }
+          },
+          "ExpansionJoint": null
         },
         {
           "Name": "Pier 7WB",
@@ -7613,7 +7657,8 @@
               "BackwallBarSpacing": 0.30479999999999996,
               "MaxBarLength": 18.288
             }
-          }
+          },
+          "ExpansionJoint": null
         },
         {
           "Name": "Pier 8WB",
@@ -8126,7 +8171,8 @@
               "BackwallBarSpacing": 0.30479999999999996,
               "MaxBarLength": 18.288
             }
-          }
+          },
+          "ExpansionJoint": null
         },
         {
           "Name": "Pier 9WB",
@@ -8559,7 +8605,8 @@
               "BackwallBarSpacing": 0.30479999999999996,
               "MaxBarLength": 18.288
             }
-          }
+          },
+          "ExpansionJoint": null
         },
         {
           "Name": "Pier 10WB",
@@ -8992,14 +9039,15 @@
               "BackwallBarSpacing": 0.30479999999999996,
               "MaxBarLength": 18.288
             }
-          }
+          },
+          "ExpansionJoint": null
         },
         {
           "Name": "Pier 11WB",
           "Type": "Pier",
           "Station": 231745.9553937256,
           "SkewDegrees": 27.46527777777778,
-          "DeckEndOffset": 0.45720000000000005,
+          "DeckEndOffset": 0.3937,
           "GirderEndExtension": 0.30479999999999996,
           "SharedPier": "Pier 11WB \u0026 19G",
           "PierCenterOffset": 0.45720000000000005,
@@ -9600,6 +9648,19 @@
               "BackwallBarSpacing": 0.30479999999999996,
               "MaxBarLength": 18.288
             }
+          },
+          "ExpansionJoint": {
+            "Type": "Modular",
+            "GapAt50F": 0.2286,
+            "BlockoutWidth": 0.635,
+            "BlockoutDepth": 0.3556,
+            "SetDown": 0.003175,
+            "DeckEndOffset": 0.3937,
+            "SealCount": null,
+            "Body": true,
+            "EdgeInset": null,
+            "Active": true,
+            "TypeName": "Modular"
           }
         }
       ],
@@ -9925,7 +9986,8 @@
               "BackwallBarSpacing": 0.30479999999999996,
               "MaxBarLength": 18.288
             }
-          }
+          },
+          "ExpansionJoint": null
         }
       ],
       "Girders": {
@@ -13488,7 +13550,7 @@
           "Type": "Pier",
           "Station": 231746.9205937256,
           "SkewDegrees": 27.46527777777778,
-          "DeckEndOffset": 0.45720000000000005,
+          "DeckEndOffset": 0.3937,
           "GirderEndExtension": 0.30479999999999996,
           "SharedPier": "Pier 11WB \u0026 19G",
           "PierCenterOffset": -0.508,
@@ -13646,6 +13708,19 @@
               "BackwallBarSpacing": 0.30479999999999996,
               "MaxBarLength": 18.288
             }
+          },
+          "ExpansionJoint": {
+            "Type": "Modular",
+            "GapAt50F": 0.2286,
+            "BlockoutWidth": 0.635,
+            "BlockoutDepth": 0.3556,
+            "SetDown": 0.003175,
+            "DeckEndOffset": 0.3937,
+            "SealCount": null,
+            "Body": false,
+            "EdgeInset": null,
+            "Active": true,
+            "TypeName": "Modular"
           }
         },
         {
@@ -14126,7 +14201,8 @@
               "BackwallBarSpacing": 0.30479999999999996,
               "MaxBarLength": 18.288
             }
-          }
+          },
+          "ExpansionJoint": null
         },
         {
           "Name": "Pier 13WB",
@@ -14582,7 +14658,8 @@
               "BackwallBarSpacing": 0.30479999999999996,
               "MaxBarLength": 18.288
             }
-          }
+          },
+          "ExpansionJoint": null
         },
         {
           "Name": "Pier 14WB",
@@ -14990,7 +15067,8 @@
               "BackwallBarSpacing": 0.30479999999999996,
               "MaxBarLength": 18.288
             }
-          }
+          },
+          "ExpansionJoint": null
         },
         {
           "Name": "Pier 15WB",
@@ -15398,14 +15476,15 @@
               "BackwallBarSpacing": 0.30479999999999996,
               "MaxBarLength": 18.288
             }
-          }
+          },
+          "ExpansionJoint": null
         },
         {
           "Name": "East Abut",
           "Type": "Abutment",
           "Station": 232022.74480951318,
           "SkewDegrees": 5.445277777777778,
-          "DeckEndOffset": 0.45720000000000005,
+          "DeckEndOffset": 0.4064,
           "GirderEndExtension": 0.30479999999999996,
           "SharedPier": "",
           "PierCenterOffset": 0,
@@ -15560,6 +15639,19 @@
               "BackwallBarSpacing": 0.30479999999999996,
               "MaxBarLength": 18.288
             }
+          },
+          "ExpansionJoint": {
+            "Type": "Modular",
+            "GapAt50F": 0.15239999999999998,
+            "BlockoutWidth": 0.4572,
+            "BlockoutDepth": 0.3556,
+            "SetDown": 0.003175,
+            "DeckEndOffset": 0.4064,
+            "SealCount": null,
+            "Body": true,
+            "EdgeInset": null,
+            "Active": true,
+            "TypeName": "Modular"
           }
         }
       ],
@@ -21264,7 +21356,7 @@
           "Type": "Abutment",
           "Station": 2056370.59896,
           "SkewDegrees": 0,
-          "DeckEndOffset": 0.45720000000000005,
+          "DeckEndOffset": 0.3683,
           "GirderEndExtension": 0.30479999999999996,
           "SharedPier": "",
           "PierCenterOffset": 0,
@@ -21413,6 +21505,19 @@
               "BackwallBarSpacing": 0.30479999999999996,
               "MaxBarLength": 18.288
             }
+          },
+          "ExpansionJoint": {
+            "Type": "StripSeal",
+            "GapAt50F": 0.0635,
+            "BlockoutWidth": 0.1016,
+            "BlockoutDepth": 0.20478749999999998,
+            "SetDown": 0,
+            "DeckEndOffset": 0.3683,
+            "SealCount": null,
+            "Body": true,
+            "EdgeInset": null,
+            "Active": true,
+            "TypeName": "Strip seal"
           }
         },
         {
@@ -21704,7 +21809,8 @@
               "BackwallBarSpacing": 0.30479999999999996,
               "MaxBarLength": 18.288
             }
-          }
+          },
+          "ExpansionJoint": null
         },
         {
           "Name": "Pier 2G",
@@ -22027,7 +22133,8 @@
               "BackwallBarSpacing": 0.30479999999999996,
               "MaxBarLength": 18.288
             }
-          }
+          },
+          "ExpansionJoint": null
         },
         {
           "Name": "Pier 3G",
@@ -22342,7 +22449,8 @@
               "BackwallBarSpacing": 0.30479999999999996,
               "MaxBarLength": 18.288
             }
-          }
+          },
+          "ExpansionJoint": null
         },
         {
           "Name": "Pier 4G",
@@ -22665,14 +22773,15 @@
               "BackwallBarSpacing": 0.30479999999999996,
               "MaxBarLength": 18.288
             }
-          }
+          },
+          "ExpansionJoint": null
         },
         {
           "Name": "Pier 5G",
           "Type": "Pier",
           "Station": 2056633.793759811,
           "SkewDegrees": -0.09046705770555137,
-          "DeckEndOffset": 0.45720000000000005,
+          "DeckEndOffset": 0.3429,
           "GirderEndExtension": 0.30479999999999996,
           "SharedPier": "Pier 5G",
           "PierCenterOffset": 0.45720000000000005,
@@ -22980,6 +23089,19 @@
               "BackwallBarSpacing": 0.30479999999999996,
               "MaxBarLength": 18.288
             }
+          },
+          "ExpansionJoint": {
+            "Type": "Modular",
+            "GapAt50F": 0.2286,
+            "BlockoutWidth": 0.635,
+            "BlockoutDepth": 0.3556,
+            "SetDown": 0.003175,
+            "DeckEndOffset": 0.3429,
+            "SealCount": null,
+            "Body": true,
+            "EdgeInset": null,
+            "Active": true,
+            "TypeName": "Modular"
           }
         }
       ],
@@ -25311,7 +25433,7 @@
           "Type": "Pier",
           "Station": 2056634.70816019,
           "SkewDegrees": 0.09046705784376573,
-          "DeckEndOffset": 0.45720000000000005,
+          "DeckEndOffset": 0.3429,
           "GirderEndExtension": 0.30479999999999996,
           "SharedPier": "Pier 5G",
           "PierCenterOffset": -0.45720000000000005,
@@ -25463,6 +25585,19 @@
               "BackwallBarSpacing": 0.30479999999999996,
               "MaxBarLength": 18.288
             }
+          },
+          "ExpansionJoint": {
+            "Type": "Modular",
+            "GapAt50F": 0.2286,
+            "BlockoutWidth": 0.635,
+            "BlockoutDepth": 0.3556,
+            "SetDown": 0.003175,
+            "DeckEndOffset": 0.3429,
+            "SealCount": null,
+            "Body": false,
+            "EdgeInset": null,
+            "Active": true,
+            "TypeName": "Modular"
           }
         },
         {
@@ -25786,7 +25921,8 @@
               "BackwallBarSpacing": 0.30479999999999996,
               "MaxBarLength": 18.288
             }
-          }
+          },
+          "ExpansionJoint": null
         },
         {
           "Name": "Pier 7G",
@@ -26177,7 +26313,8 @@
               "BackwallBarSpacing": 0.30479999999999996,
               "MaxBarLength": 18.288
             }
-          }
+          },
+          "ExpansionJoint": null
         },
         {
           "Name": "Pier 8G",
@@ -26552,14 +26689,15 @@
               "BackwallBarSpacing": 0.30479999999999996,
               "MaxBarLength": 18.288
             }
-          }
+          },
+          "ExpansionJoint": null
         },
         {
           "Name": "Pier 9G",
           "Type": "Pier",
           "Station": 2056862.3937598104,
           "SkewDegrees": -0.09046705784376573,
-          "DeckEndOffset": 0.45720000000000005,
+          "DeckEndOffset": 0.3429,
           "GirderEndExtension": 0.30479999999999996,
           "SharedPier": "Pier 9G",
           "PierCenterOffset": 0.45720000000000005,
@@ -26859,6 +26997,19 @@
               "BackwallBarSpacing": 0.30479999999999996,
               "MaxBarLength": 18.288
             }
+          },
+          "ExpansionJoint": {
+            "Type": "Modular",
+            "GapAt50F": 0.2286,
+            "BlockoutWidth": 0.635,
+            "BlockoutDepth": 0.3556,
+            "SetDown": 0.003175,
+            "DeckEndOffset": 0.3429,
+            "SealCount": null,
+            "Body": true,
+            "EdgeInset": null,
+            "Active": true,
+            "TypeName": "Modular"
           }
         }
       ],
@@ -28959,7 +29110,7 @@
           "Type": "Pier",
           "Station": 2056863.3081601902,
           "SkewDegrees": 0.09046705788982976,
-          "DeckEndOffset": 0.45720000000000005,
+          "DeckEndOffset": 0.3429,
           "GirderEndExtension": 0.30479999999999996,
           "SharedPier": "Pier 9G",
           "PierCenterOffset": -0.45720000000000005,
@@ -29111,6 +29262,19 @@
               "BackwallBarSpacing": 0.30479999999999996,
               "MaxBarLength": 18.288
             }
+          },
+          "ExpansionJoint": {
+            "Type": "Modular",
+            "GapAt50F": 0.2286,
+            "BlockoutWidth": 0.635,
+            "BlockoutDepth": 0.3556,
+            "SetDown": 0.003175,
+            "DeckEndOffset": 0.3429,
+            "SealCount": null,
+            "Body": false,
+            "EdgeInset": null,
+            "Active": true,
+            "TypeName": "Modular"
           }
         },
         {
@@ -29486,7 +29650,8 @@
               "BackwallBarSpacing": 0.30479999999999996,
               "MaxBarLength": 18.288
             }
-          }
+          },
+          "ExpansionJoint": null
         },
         {
           "Name": "Pier 11G",
@@ -29909,7 +30074,8 @@
               "BackwallBarSpacing": 0.30479999999999996,
               "MaxBarLength": 18.288
             }
-          }
+          },
+          "ExpansionJoint": null
         },
         {
           "Name": "Pier 12G",
@@ -30332,7 +30498,8 @@
               "BackwallBarSpacing": 0.30479999999999996,
               "MaxBarLength": 18.288
             }
-          }
+          },
+          "ExpansionJoint": null
         },
         {
           "Name": "Pier 13G",
@@ -30655,14 +30822,15 @@
               "BackwallBarSpacing": 0.30479999999999996,
               "MaxBarLength": 18.288
             }
-          }
+          },
+          "ExpansionJoint": null
         },
         {
           "Name": "Pier 14G",
           "Type": "Pier",
           "Station": 2057191.57775981,
           "SkewDegrees": -0.09046705788981861,
-          "DeckEndOffset": 0.45720000000000005,
+          "DeckEndOffset": 0.3302,
           "GirderEndExtension": 0.30479999999999996,
           "SharedPier": "Pier 14G",
           "PierCenterOffset": 0.45720000000000005,
@@ -30962,6 +31130,19 @@
               "BackwallBarSpacing": 0.30479999999999996,
               "MaxBarLength": 18.288
             }
+          },
+          "ExpansionJoint": {
+            "Type": "Modular",
+            "GapAt50F": 0.254,
+            "BlockoutWidth": 0.635,
+            "BlockoutDepth": 0.3556,
+            "SetDown": 0.003175,
+            "DeckEndOffset": 0.3302,
+            "SealCount": null,
+            "Body": true,
+            "EdgeInset": null,
+            "Active": true,
+            "TypeName": "Modular"
           }
         }
       ],
@@ -33620,7 +33801,7 @@
           "Type": "Pier",
           "Station": 2057192.49216019,
           "SkewDegrees": 0.09046705784376415,
-          "DeckEndOffset": 0.45720000000000005,
+          "DeckEndOffset": 0.3302,
           "GirderEndExtension": 0.30479999999999996,
           "SharedPier": "Pier 14G",
           "PierCenterOffset": -0.45720000000000005,
@@ -33772,6 +33953,19 @@
               "BackwallBarSpacing": 0.30479999999999996,
               "MaxBarLength": 18.288
             }
+          },
+          "ExpansionJoint": {
+            "Type": "Modular",
+            "GapAt50F": 0.254,
+            "BlockoutWidth": 0.635,
+            "BlockoutDepth": 0.3556,
+            "SetDown": 0.003175,
+            "DeckEndOffset": 0.3302,
+            "SealCount": null,
+            "Body": false,
+            "EdgeInset": null,
+            "Active": true,
+            "TypeName": "Modular"
           }
         },
         {
@@ -34087,7 +34281,8 @@
               "BackwallBarSpacing": 0.30479999999999996,
               "MaxBarLength": 18.288
             }
-          }
+          },
+          "ExpansionJoint": null
         },
         {
           "Name": "Pier 16G",
@@ -34448,7 +34643,8 @@
               "BackwallBarSpacing": 0.30479999999999996,
               "MaxBarLength": 18.288
             }
-          }
+          },
+          "ExpansionJoint": null
         },
         {
           "Name": "Pier 17G",
@@ -34809,7 +35005,8 @@
               "BackwallBarSpacing": 0.30479999999999996,
               "MaxBarLength": 18.288
             }
-          }
+          },
+          "ExpansionJoint": null
         },
         {
           "Name": "Pier 18G",
@@ -35140,14 +35337,15 @@
               "BackwallBarSpacing": 0.30479999999999996,
               "MaxBarLength": 18.288
             }
-          }
+          },
+          "ExpansionJoint": null
         },
         {
           "Name": "Pier 19G",
           "Type": "Pier",
           "Station": 2057490.1335039116,
           "SkewDegrees": 32.99814970203185,
-          "DeckEndOffset": 0.45720000000000005,
+          "DeckEndOffset": 0.3937,
           "GirderEndExtension": 0.30479999999999996,
           "SharedPier": "Pier 11WB \u0026 19G",
           "PierCenterOffset": 0.508,
@@ -35440,6 +35638,19 @@
               "BackwallBarSpacing": 0.30479999999999996,
               "MaxBarLength": 18.288
             }
+          },
+          "ExpansionJoint": {
+            "Type": "Modular",
+            "GapAt50F": 0.2286,
+            "BlockoutWidth": 0.635,
+            "BlockoutDepth": 0.3556,
+            "SetDown": 0.003175,
+            "DeckEndOffset": 0.3937,
+            "SealCount": null,
+            "Body": true,
+            "EdgeInset": null,
+            "Active": true,
+            "TypeName": "Modular"
           }
         }
       ],

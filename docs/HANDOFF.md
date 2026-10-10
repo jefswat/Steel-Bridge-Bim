@@ -60,7 +60,7 @@ Use this to start the next session. Architecture notes are in `CLAUDE.md`. The u
   dowels: only 16G-18G — rest unread.
 - **Queued (user-approved):** near-view lofted rebar (smooth continuous tubes within ~20 ft of the view target when
   zoomed in; far tiles keep hex segments) in `Viewport/SceneBuilder.cs` (`AddTube`, rebar tiles).
-- **User decision pending:** modular expansion joints as blockout + generic body?
+- ✅ **Expansion joints merged** (feature/joints; `joints-i80.csx`, `joints-ramp-g.csx` after the build scripts): blockouts + generic placeholder bodies (IFC IfcDiscreteAccessory EXPANSION_JOINT_DEVICE + Pset SBM_Placeholder; blockout IfcBuildingElementPart). OPEN: Pier 11WB opening 7" vs plan C = 9" (support lines 3'-2 apart vs plan 3'-4 → I-80 Unit 2 11WB CL BRG offset 1'-6 vs 1'-8? verify); Pier 6A joint not modeled (one deck end per unit); 2'-2 deck end block not modeled (blockout limited to the 8" slab); abutment backwall front 17" vs plan 22" from CL BRG; strip seal pocket approximate.
 - **Verify before changing:** cut-off cross girder vertical position (~11"/8" below the top flange, PDF 125).
 ## 0. Session 2026-10-10 (afternoon) results
 
@@ -200,6 +200,7 @@ Elevation mismatches left after the 2.4 cross-slope fix (`check-top-of-bearing.c
   my girder A position or deck edge there disagrees with the plan. Not adjusted.
 - ✅ Ramp G top of bearing −1" through 3G–14G, +0.4 to +1.5" at 1G and 16G–19G — FIXED 2026-10-10 (girder line was
   1'-6 off, see section 0); now ±0.1".
+
 
 
 
