@@ -130,6 +130,9 @@ public partial class MainWindow : Window
                     kc.Width = kv[6];
                     KeepCameraInRange();
                 }
+                // --width W: orthographic view width in meters (after --closeup / --camera), e.g. to look at bars.
+                int wi = Array.IndexOf(args, "--width");
+                if (wi >= 0 && wi + 1 < args.Length && View.Camera is OrthographicCamera wc) wc.Width = double.Parse(args[wi + 1], System.Globalization.CultureInfo.InvariantCulture);
                 if (args.Contains("--sheets")) ModeSheets.IsChecked = true;
                 int hi = Array.IndexOf(args, "--hide");
                 if (hi >= 0 && hi + 1 < args.Length)
@@ -152,11 +155,34 @@ public partial class MainWindow : Window
                         ViewModels.MainViewModel.Log("PICK: " + string.Join(" | ", _vm.SelectedProperties.Select(r => $"{r.Name}={r.Value}")));
                     }, System.Windows.Threading.DispatcherPriority.ApplicationIdle);
                 }
+                UpdateRebarLod();
                 RunMeasureSnapshot(args);
+                int lodWaits = 0;
+                bool frameBenchDone = false;
                 var t2 = new System.Windows.Threading.DispatcherTimer { Interval = TimeSpan.FromSeconds(threeD ? 1.5 : args.Any(x => x is "--measure" or "--query" or "--snapbench") ? 1.5 : 0.1) };
                 t2.Tick += (_, _) =>
                 {
+                    int fbi = Array.IndexOf(args, "--framebench");
+                    if (!_lodBusy && fbi >= 0 && !frameBenchDone)
+                    {
+                        frameBenchDone = true;
+                        double secs = fbi + 1 < args.Length ? double.Parse(args[fbi + 1], System.Globalization.CultureInfo.InvariantCulture) : 3;
+                        FrameBench(secs);
+                        t2.Interval = TimeSpan.FromSeconds(secs + 0.5);
+                        return;
+                    }
+                    if (_lodBusy && ++lodWaits < 120) { t2.Interval = TimeSpan.FromMilliseconds(500); return; } // let the near-view rebar finish
                     t2.Stop();
+                    // --pickafter fx,fy / --hideafter fx,fy: like --pick / --hide but once the near-view rebar is in place.
+                    foreach (var opt in new[] { "--hideafter", "--pickafter" })
+                    {
+                        int oi2 = Array.IndexOf(args, opt);
+                        if (oi2 < 0 || oi2 + 1 >= args.Length) continue;
+                        var pp2 = args[oi2 + 1].Split(',').Select(x => double.Parse(x, System.Globalization.CultureInfo.InvariantCulture)).ToArray();
+                        Pick(new Point(pp2[0] * View.ActualWidth, pp2[1] * View.ActualHeight));
+                        ViewModels.MainViewModel.Log("PICKAFTER: " + string.Join(" | ", _vm.SelectedProperties.Select(r => $"{r.Name}={r.Value}")) + $" (smooth bars {_lodSkip.Count})");
+                        if (opt == "--hideafter" && _selectedTag != null) { HideElement(_selectedTag, _selectedTitle); ViewModels.MainViewModel.Log($"HIDEAFTER: {_hiddenList.Count} hidden: {string.Join(", ", _hiddenList.Select(h => h.label))}"); }
+                    }
                     SaveSnapshot(path);
                     SnapshotEditors(path);
                     _vm.IsDirty = false;
@@ -166,6 +192,30 @@ public partial class MainWindow : Window
             };
             timer.Start();
         };
+    }
+
+    /// <summary>Snapshot option <c>--framebench SECONDS</c>: renders continuously and logs the frame interval statistics (FRAMEBENCH:).</summary>
+    private void FrameBench(double seconds)
+    {
+        var stamps = new List<double>();
+        var sw = System.Diagnostics.Stopwatch.StartNew();
+        EventHandler? h = null;
+        h = (_, _) =>
+        {
+            stamps.Add(sw.Elapsed.TotalMilliseconds);
+            if (sw.Elapsed.TotalSeconds >= seconds)
+            {
+                System.Windows.Media.CompositionTarget.Rendering -= h;
+                var d = new List<double>();
+                for (int i = 1; i < stamps.Count; i++) d.Add(stamps[i] - stamps[i - 1]);
+                d.Sort();
+                if (d.Count > 0)
+                    ViewModels.MainViewModel.Log($"FRAMEBENCH: {d.Count} frames in {seconds:F1} s, mean {d.Average():F1} ms, median {d[d.Count / 2]:F1} ms, p95 {d[(int)(d.Count * 0.95)]:F1} ms, max {d[^1]:F1} ms; first frame at {stamps[0]:F0} ms, then +{(stamps.Count > 2 ? stamps[1] - stamps[0] : 0):F0}, +{(stamps.Count > 3 ? stamps[2] - stamps[1] : 0):F0}, +{(stamps.Count > 4 ? stamps[3] - stamps[2] : 0):F0} ms");
+                return;
+            }
+            View.InvalidateRender();
+        };
+        System.Windows.Media.CompositionTarget.Rendering += h;
     }
 
     /// <summary>Points the 3D camera at a cross frame (by mark) for close inspection.</summary>
@@ -447,6 +497,7 @@ public partial class MainWindow : Window
         _fullText.Clear();
         _fullMeshes.Clear();
         _visibleInstances.Clear();
+        ResetRebarLod();
         // Hidden elements are objects of the previous model: keep only those that still exist (by mark) after regeneration.
         RemapHidden(scene);
 
@@ -508,6 +559,7 @@ public partial class MainWindow : Window
         if (zoom) Dispatcher.BeginInvoke(ZoomExtents, System.Windows.Threading.DispatcherPriority.Background);
         MarkSheetsStale();
         InvalidateSnapIndex();
+        Dispatcher.BeginInvoke(UpdateRebarLod, System.Windows.Threading.DispatcherPriority.ApplicationIdle);
     }
 
     private void ZoomExtents()

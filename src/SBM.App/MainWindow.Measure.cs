@@ -325,6 +325,7 @@ public partial class MainWindow
         {
             foreach (var m in models)
             {
+                if (m is MeshGeometryModel3D ovm && _lodOverlays.Contains(ovm)) continue; // near-view rebar overlay duplicates the tile meshes
                 switch (m)
                 {
                     case MeshGeometryModel3D mm when mm.Tag is List<Matrix4x4> inst && mm.Geometry is MeshGeometry3D ig:
