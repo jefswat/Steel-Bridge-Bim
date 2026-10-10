@@ -175,7 +175,11 @@ public static class LayoutViews
                     if (fd.SizeS > 0)
                         d.Poly(SheetLayers.ConcreteHidden, M(SubstructurePlanBuilder.Outline(unit2, fd.S, fd.N, fd.SizeS, fd.SizeN, fd.Type == FoundationType.DrilledShaft, 0).Select(p => p.XY)), true);
                     foreach (var pile in fd.Piles)
+                    {
                         d.Poly(SheetLayers.ConcreteHidden, M(SubstructurePlanBuilder.Outline(unit2, pile.S, pile.N, In(14), In(14), false, 0).Select(p => p.XY)), true);
+                        if (pile.IsBattered)   // the tip runs out in the batter direction
+                            d.Poly(SheetLayers.ConcreteHidden, M(new[] { unit2.Plan(pile.S, pile.N), unit2.Plan(pile.TipS, pile.TipN) }));
+                    }
                 }
             }
 
@@ -401,7 +405,14 @@ public static class LayoutViews
             foreach (var pile in fnd.Piles.Where(p => Math.Abs(p.S - fnd.Piles.Min(q => q.S)) < 1e-6))
             {
                 double xp = St(pile.S, pile.N);
-                DrawVertical(d, xp - In(7), xp + In(7), pile.TipZ, pile.TopZ, ground, SheetLayers.SteelHidden, SheetLayers.SteelHidden);
+                if (!pile.IsBattered) DrawVertical(d, xp - In(7), xp + In(7), pile.TipZ, pile.TopZ, ground, SheetLayers.SteelHidden, SheetLayers.SteelHidden);
+                else
+                {
+                    double xt = St(pile.TipS, pile.TipN);   // sloped in the developed elevation
+                    d.Line(SheetLayers.SteelHidden, new Vec2(xp - In(7), pile.TopZ), new Vec2(xt - In(7), pile.TipZ));
+                    d.Line(SheetLayers.SteelHidden, new Vec2(xp + In(7), pile.TopZ), new Vec2(xt + In(7), pile.TipZ));
+                    d.Line(SheetLayers.SteelHidden, new Vec2(xt - In(7), pile.TipZ), new Vec2(xt + In(7), pile.TipZ));
+                }
                 zMin = Math.Min(zMin, pile.TipZ);
             }
             string what = fnd.Type switch

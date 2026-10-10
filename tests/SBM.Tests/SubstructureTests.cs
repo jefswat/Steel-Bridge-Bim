@@ -141,4 +141,87 @@ public class SubstructureTests
         Assert.Equal(2, sd.ColumnCount);
         Assert.Null(back.Bridges[0].Supports[0].Substructure);
     }
+
+    private static SubstructureModel BuildBattered(double ratio, Func<List<FootingPoint>> piles, bool sides = false, bool diag = false)
+    {
+        return Build(p =>
+        {
+            p.Foundation = FoundationType.PileCap; p.FoundationTopElevation = Ft(500); p.PileLength = Ft(60); p.PileEmbedment = Ft(1);
+            var fd = new FootingDefinition { Piles = piles() };
+            fd.BatterPerimeter(ratio, sides, diag);
+            p.Footings = Enumerable.Range(1, 3).Select(k => { var c = fd.Clone(); c.Column = k; return c; }).ToList();
+        });
+    }
+
+    [Fact]
+    public void BatteredPile_TipMovesOutward_LengthAlongAxis_HeadHorizontal()
+    {
+        // 3 x 3 grid at 5 ft, 1:4 on the outer N rows, outward in N.
+        var m = BuildBattered(4, () => (from s in new[] { -5.0, 0, 5 } from n in new[] { -5.0, 0, 5 } select new FootingPoint(Ft(s), Ft(n))).ToList());
+        var pier = m.Units.Single(u => u.Type == SupportType.Pier);
+        var f = pier.Foundations[0];
+        Assert.Equal(9, f.Piles.Count);
+        Assert.Equal(6, f.Piles.Count(p => p.IsBattered));
+        var pile = f.Piles.First(p => p.N - f.N > Ft(4));                 // outer +N row
+        double len = Ft(60), drop = len / Math.Sqrt(1 + 1 / 16.0);
+        Assert.Equal(len, pile.Length, 6);
+        Assert.Equal(drop, pile.TopZ - pile.TipZ, 6);
+        Assert.Equal(drop / 4, pile.TipN - pile.N, 6);              // tip moves +N by drop/4
+        Assert.Equal(pile.S, pile.TipS, 9);                         // S unchanged for an N-edge pile
+        // Plan point at the footing bottom plane is the dimensioned position: head is inside by embedment/4.
+        Assert.Equal(Ft(5) - Ft(1) / 4, pile.N - f.N, 6);
+        // Plumb piles stay plumb.
+        Assert.All(f.Piles.Where(p => !p.IsBattered), p => Assert.Equal(p.Length, p.TopZ - p.TipZ, 9));
+        // Solid: top and bottom are horizontal, the mesh spans the head..tip in plan along N.
+        var solid = pier.Solids.First(x => x.Kind == SubElementKind.Pile && x.Description.Contains("battered"));
+        var b = solid.Mesh.Bounds();
+        Assert.Equal(pile.TopZ - pile.TipZ, b.Max.Z - b.Min.Z, 6);
+        Assert.True(solid.Mesh.Volume() > 0);
+        double plumbVol = pier.Solids.First(x => x.Kind == SubElementKind.Pile && !x.Description.Contains("battered")).Mesh.Volume();
+        // Same cross-section, axis length 60 ft vs vertical 60 ft: equal volume.
+        Assert.Equal(plumbVol, solid.Mesh.Volume(), 4);
+    }
+
+    [Fact]
+    public void BatteredCornerPiles_Diagonal45_And_FileRoundTrip()
+    {
+        var m = BuildBattered(4, () => (from s in new[] { -6.0, 0, 6 } from n in new[] { -6.0, 0, 6 } select new FootingPoint(Ft(s), Ft(n))).ToList(), sides: true, diag: true);
+        var f = m.Units.Single(u => u.Type == SupportType.Pier).Foundations[0];
+        Assert.Equal(8, f.Piles.Count(p => p.IsBattered));          // perimeter ring
+        var corner = f.Piles.First(p => p.S - f.S > Ft(5) && p.N - f.N > Ft(5));
+        Assert.Equal(corner.TipS - corner.S, corner.TipN - corner.N, 9);   // 45 deg
+        double drop = corner.TopZ - corner.TipZ;
+        Assert.Equal(drop / 4, Math.Sqrt(Math.Pow(corner.TipS - corner.S, 2) + Math.Pow(corner.TipN - corner.N, 2)), 6);   // 1:4 along the diagonal
+
+        var doc = SbmDocument.Sample();
+        var sd = SubstructureDefinition.Default(SupportType.Pier);
+        var fd = new FootingDefinition { Column = 1, Piles = { new FootingPoint(0, Ft(5)), new FootingPoint(0, 0) } };
+        fd.BatterPerimeter(6, false, false);
+        sd.Footings = new() { fd };
+        doc.Bridge().Supports[1].Substructure = sd;
+        var back = SBM.Core.Project.BridgeProject.FromJson(doc.Project.ToJson()).Bridges[0].Supports[1].Substructure!.Footings[0];
+        Assert.Equal(6, back.BatterRatio);
+        Assert.Equal(1, back.Piles[0].BatterDirN, 9);
+        Assert.False(back.Piles[1].IsBattered);
+    }
+
+    [Fact]
+    public void BatteredPiles_RunningIntoNeighbours_AreReported()
+    {
+        // Two piles 1 ft apart, one battered toward the other.
+        var m = Build(p =>
+        {
+            p.Foundation = FoundationType.PileCap; p.FoundationTopElevation = Ft(500); p.PileLength = Ft(60);
+            var fd = new FootingDefinition { Column = 1, BatterRatio = 2, Piles = { new FootingPoint(0, 0, 0, 1), new FootingPoint(0, Ft(1.5)) } };
+            p.Footings = new() { fd };
+        });
+        Assert.Contains(m.Diagnostics, d => d.Message.Contains("battered") && d.Message.Contains("closer than a pile width"));
+    }
+
+    [Fact]
+    public void SegmentDistance_Works()
+    {
+        Assert.Equal(1, SubstructureGenerator.SegmentDistance(new Vec3(0, 0, 0), new Vec3(0, 0, 10), new Vec3(1, 0, 0), new Vec3(1, 0, 10)), 9);
+        Assert.Equal(0, SubstructureGenerator.SegmentDistance(new Vec3(-1, 0, 0), new Vec3(1, 0, 0), new Vec3(0, -1, 0), new Vec3(0, 1, 0)), 9);
+    }
 }
