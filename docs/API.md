@@ -204,3 +204,15 @@ doc.ExportIfc("Br12.ifc");
   bridge regenerates.
 - **Terrain queries:** terrain uses a uniform-grid spatial index. A 335,000-triangle TIN indexes in about 30 ms and
   answers an elevation query in about 0.3 µs.
+
+## Companion database (`sbm db`)
+
+`sbm db <model.sbm> [out.sqlite] [--pages] [--plans <folder>] [--links rules.json] [--unused report.md] [--no-previews] [--no-vacuum]`
+writes `<model>.sqlite` (SQLite): one row per model element with the IFC GlobalId, hierarchy (project > site > bridge > unit > superstructure /
+deck / substructure > groups such as girder, deck reinforcing, pier column n, footing n, FS4 bolts > elements), quantities and bounding box.
+Tables: `elements` (view over the compact `el`/`strings`/`props`), `sheets`, `element_sheet` (links, stored on the group / assembly that the plan
+organizes the information by), `qc` (status unchecked/ok/issue, checked_by, checked_at, note). Views: `v_element_sheets` (links resolved to every
+child), `v_element_path`, `v_unused_sheets`, `v_element_qc`. `--pages` splits the plan PDFs (PyMuPDF, `tools/plan_split.py`) into
+`<model dir>/plans/<set>/p###.pdf` + JPEG previews (git-ignored) and fills `sheets`. Link rules: `samples/plans/sheet-links-i80-rampg.json`
+(JSON, documented in its header). A rebuild keeps sheets and QC. The size is always printed (a note appears above 100 MB; informational only).
+In the app the Properties side shows the record of the selected element (hierarchy links, sheets with Open PDF / Preview, QC).

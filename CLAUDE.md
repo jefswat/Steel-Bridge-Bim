@@ -28,6 +28,12 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   `SBM.Api/SbmApp.cs` client, `sbm app â€¦`, script global `App`. Not started in `--snapshot` runs. Add new remote commands
   in `HandleRemote` + `SbmApp` wrappers + docs/API.md.
 - `src/SBM.Cli` â€” `sbm.exe` command line over SBM.Api (new/info/get/set/add/remove/import-landxml/regen/export/run/bench/
+- Companion database: `SBM.IO/Database` (`ModelDatabase` writer + schema, `PlanSheets` sheets/link rules/reports, `ModelDb` reader, `CompanionDatabase`
+  orchestration; `IfcKeys` = the key patterns behind the IFC GlobalIds, shared with `IfcExporter` — never change a pattern). Compact layout `el` +
+  `strings` + `props`, readable VIEW `elements`; groups (no IFC entity) at the plans' granularity; links on groups/assemblies, children inherit
+  (`v_element_sheets`). `tools/plan_split.py` splits plan PDFs. App: `MainWindow.Database.cs` + `SBM.App/Database/` (panel, preview window).
+  Keep `ModelDatabase.Builder` numbering in step with `IfcExporter` (test `GlobalIds_AreTheIfcGlobalIds`). CLI `sbm db`, docs in docs/API.md.
+- `src/SBM.Cli` — `sbm.exe` command line over SBM.Api (new/info/get/set/add/remove/import-landxml/regen/export/run/bench/
   elevations/drawings/sheets).
 - `src/SBM.Core` â€” no UI. All geometry and the parametric model.
   - `Geometry/` Vec2/Vec3 (double), Box2, Numerics (Gauss-Legendre, Brent, FindRoots, line intersection).

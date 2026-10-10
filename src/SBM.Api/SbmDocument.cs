@@ -284,6 +284,17 @@ public sealed class SbmDocument
         IfcExporter.Export(path, Project, data);
     }
 
+    /// <summary>Writes the companion SQLite database (element registry with IFC GlobalIds and hierarchy, plan sheets, sheet links, QC).</summary>
+    public SBM.IO.Database.CompanionResult ExportDatabase(string? path = null, SBM.IO.Database.DatabaseOptions? options = null)
+    {
+        Regenerate();
+        options ??= new SBM.IO.Database.DatabaseOptions();
+        options.ModelFile ??= FilePath;
+        path ??= FilePath != null ? SBM.IO.Database.CompanionDatabase.DefaultPath(FilePath) : throw new InvalidOperationException("Pass a database path.");
+        var data = _models.OfType<BridgeModel>().Select(m => new IfcBridgeData(m.Framing, m.Steel, m.Concrete, m.Substructure, m.Prestressed)).ToList();
+        return SBM.IO.Database.CompanionDatabase.Build(path, Project, data, options);
+    }
+
     public void ExportDxf(string path)
     {
         Regenerate(includeSteel: false);
