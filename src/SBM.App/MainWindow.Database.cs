@@ -86,7 +86,8 @@ public partial class MainWindow
         if (_dbBusy) { DbPanel.SetStatus("Building the database…", false, false, false); return; }
         if (_db == null) { DbPanel.SetStatus($"No database yet ({Path.GetFileName(DbPath)}). Create it to see the sheets each element is based on.", true, true, false); return; }
         string built = _db.Meta("built_at");
-        DbPanel.SetStatus($"{Path.GetFileName(_db.Path)}: {_db.ElementCount:N0} elements, {_db.SheetCount} plan sheets, built {built}."
+        double mb = new FileInfo(_db.Path).Length / 1048576.0;
+        DbPanel.SetStatus($"{Path.GetFileName(_db.Path)}: {_db.ElementCount:N0} elements, {_db.SheetCount} plan sheets, built {built}, {mb:F0} MB." + (mb > ModelDatabase.SizeNoteMb ? $" (Note: larger than {ModelDatabase.SizeNoteMb:F0} MB; informational only.)" : "")
             + (_dbStale ? " The model changed since: rebuild to update (QC is kept)." : ""), true, false, true);
     }
 
@@ -122,6 +123,7 @@ public partial class MainWindow
             _dbStale = false;
             ViewModels.MainViewModel.Log($"DB: built {res.Build.Elements:N0} elements in {res.Elapsed.TotalSeconds:F1} s, {res.Sheets} sheets, {res.Links?.Links ?? 0} links");
             StatusText($"Database built: {res.Build.Elements:N0} elements, {res.Sheets} sheets in {res.Elapsed.TotalSeconds:F1} s");
+            ViewModels.MainViewModel.Log("DB: " + ModelDatabase.SizeText(path));
         }
         catch (Exception ex)
         {
