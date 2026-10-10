@@ -177,6 +177,7 @@ public class SubstructureTests
         var b = solid.Mesh.Bounds();
         Assert.Equal(pile.TopZ - pile.TipZ, b.Max.Z - b.Min.Z, 6);
         Assert.True(solid.Mesh.Volume() > 0);
+        Assert.True(solid.Mesh.HasExactSolids);                       // oblique extrusion recipe: IFC writes an IfcExtrudedAreaSolid
         double plumbVol = pier.Solids.First(x => x.Kind == SubElementKind.Pile && !x.Description.Contains("battered")).Mesh.Volume();
         // Same cross-section, axis length 60 ft vs vertical 60 ft: equal volume.
         Assert.Equal(plumbVol, solid.Mesh.Volume(), 4);

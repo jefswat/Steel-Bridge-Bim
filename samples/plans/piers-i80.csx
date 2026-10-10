@@ -205,7 +205,12 @@ foreach (var p in ip)
     sd.PileSection = "HP14x73"; sd.PileLength = F(p.pileFt);
     var pl = Grid(p.piles);
     sd.Footings = Enumerable.Range(1, p.cols.Length).Select(k => new FootingDefinition { Column = k, Piles = pl.Select(q => new FootingPoint(q.S, q.N)).ToList() }).ToList();
+    // Battered piles (pile layout sheets, 1:4 in the direction shown): on I-80 only the two OUTER N rows batter, outward in N, no
+    // diagonals and no S-edge piles; the other piers (1WB-3WB, 8WB, 9WB, 15WB) are plumb. Ratio read as 1 H : 4 V (to be confirmed).
+    if (new[] { "Pier 4WB", "Pier 5WB", "Pier 6WB", "Pier 7WB", "Pier 10WB", "Pier 12WB", "Pier 13WB", "Pier 14WB" }.Contains(p.name))
+        foreach (var fd in sd.Footings) fd.BatterPerimeter(4, false, false);
     b.Supports[p.j].Substructure = sd;
+    Print($"    {p.name}: {sd.Footings.Sum(f => f.Piles.Count(q => q.IsBattered))} battered piles in {sd.Footings.Count} footing(s)");
     if (pl.Count != p.expect) Print($"    PILE COUNT {pl.Count} -- PLANS SAY {p.expect}");
 }
 Doc.Regenerate();
