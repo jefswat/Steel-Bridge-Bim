@@ -96,6 +96,7 @@ public sealed partial class SteelModelGenerator
         foreach (var c in _f.CrossFrames) { var cc = c; conn.Add(() => BuildCrossFrame(cc)); }
         foreach (var sp in _f.Splices) { var s = sp; conn.Add(() => BuildFieldSplice(s)); }
         conn.Add(BuildLateralBracing);
+        foreach (var x in _f.CrossGirders) { var xx = x; conn.Add(() => BuildCrossGirder(xx)); }   // registers bolt holes in girder webs
         Parallel.ForEach(conn, a => a());
 
         // Phase 3: members.
@@ -103,63 +104,7 @@ public sealed partial class SteelModelGenerator
         foreach (var g in _f.Girders) { var gg = g; members.Add(() => BuildGirder(gg)); members.Add(() => BuildStuds(gg)); }
         foreach (var s in _f.Stiffeners) { var ss = s; members.Add(() => BuildStiffener(ss)); }
         foreach (var b in _f.Bearings) { var bb = b; members.Add(() => BuildBearing(bb)); }
-        foreach (var x in _f.CrossGirders) { var xx = x; members.Add(() => BuildCrossGirder(xx)); }
         Parallel.ForEach(members, a => a());
-    }
-
-    // ================================================================== cross girders (discontinuous girders)
-
-    /// <summary>Built-up cross girder between the two continuing girders, connected to their webs with pairs of
-    /// L5x5x1/2 angles; the discontinuous girder frames into its web with angles. Top of the cross girder top flange is
-    /// level with the bottom of the main girder top flanges.</summary>
-    private void BuildCrossGirder(Framing.CrossGirderResult x)
-    {
-        var xg = _def.Girders.CrossGirder;
-        string mark = x.Mark;
-        _assemblies.Add(new SteelAssembly { Mark = mark, Kind = AssemblyKind.CrossFrame, Girder = x.Girder,
-            Description = $"Cross girder G{x.LeftGirder + 1}–G{x.RightGirder + 1} carrying discontinuous G{x.Girder + 1}" });
-        double twL = _web[x.LeftGirder].Thickness(x.LeftGirderDistance), twR = _web[x.RightGirder].Thickness(x.RightGirderDistance);
-        double gap = Inch(0.75);
-        var a = x.Left; var b = x.Right;
-        var f = Frame3.FromXZ(a, b - a, new Vec3(0, 0, 1));
-        double L = (b - a).Length;
-        double x0 = twL / 2 + gap, x1 = L - twR / 2 - gap;
-        double D = xg.WebDepth, tw = xg.WebThickness, bf = xg.FlangeWidth, tf = xg.FlangeThickness;
-        // z = 0 at the main girders' top of web; cross girder top flange top there.
-        var web = new Mesh(); MeshBuilder.AddBox(web, f, x0, x1, -tw / 2, tw / 2, -tf - D, -tf);
-        var top = new Mesh(); MeshBuilder.AddBox(top, f, x0, x1, -bf / 2, bf / 2, -tf, 0);
-        var bot = new Mesh(); MeshBuilder.AddBox(bot, f, x0, x1, -bf / 2, bf / 2, -2 * tf - D, -tf - D);
-        double len = x1 - x0;
-        _parts.Add(new SteelPart { Mark = $"{mark}-W", Category = PartCategory.WebPlate, Assembly = mark, Mesh = web, Length = len, Description = $"Cross girder web {Pl(D, tw)}" });
-        _parts.Add(new SteelPart { Mark = $"{mark}-TF", Category = PartCategory.FlangePlate, Assembly = mark, Mesh = top, Length = len, Description = $"Cross girder flange {Pl(bf, tf)}" });
-        _parts.Add(new SteelPart { Mark = $"{mark}-BF", Category = PartCategory.FlangePlate, Assembly = mark, Mesh = bot, Length = len, Description = $"Cross girder flange {Pl(bf, tf)}" });
-        // Connection angles L5x5x1/2: both sides of the cross girder web at each main girder, outstanding leg on the girder web.
-        double leg = Inch(5), t = Inch(0.5), h = D - Inch(4);
-        int n = 0;
-        foreach (var (xw, sgn) in new[] { (twL / 2, 1.0), (L - twR / 2, -1.0) })
-            foreach (double side in new[] { -1.0, 1.0 })
-            {
-                var m = new Mesh();
-                double zb = -tf - D + Inch(2);
-                // leg on the main girder web
-                MeshBuilder.AddBox(m, f, Math.Min(xw, xw + sgn * t), Math.Max(xw, xw + sgn * t), side > 0 ? tw / 2 : -tw / 2 - leg, side > 0 ? tw / 2 + leg : -tw / 2, zb, zb + h);
-                // leg on the cross girder web
-                MeshBuilder.AddBox(m, f, Math.Min(xw + sgn * t, xw + sgn * leg), Math.Max(xw + sgn * t, xw + sgn * leg), side > 0 ? tw / 2 : -tw / 2 - t, side > 0 ? tw / 2 + t : -tw / 2, zb, zb + h);
-                _parts.Add(new SteelPart { Mark = $"{mark}-A{++n}", Category = PartCategory.Angle, Assembly = mark, Mesh = m, Length = h, Description = "L5x5x1/2 connection angle", Role = MemberRole.Diaphragm });
-            }
-        // Discontinuous girder end: angles on both sides of its web against the cross girder web.
-        var g = _f.Girders[x.Girder];
-        var (pe, te, _) = g.Path.At(g.Length);
-        var fe = Frame3.FromXZ(pe, new Vec3(te.X, te.Y, 0), new Vec3(0, 0, 1));
-        double twg = _web[x.Girder].Thickness(g.Length);
-        foreach (double side in new[] { -1.0, 1.0 })
-        {
-            var m = new Mesh();
-            double zb = -_def.Girders.Section.WebDepth + Inch(4), zt = -Inch(4);
-            MeshBuilder.AddBox(m, fe, -leg, gap, side > 0 ? twg / 2 : -twg / 2 - t, side > 0 ? twg / 2 + t : -twg / 2, zb, zt);
-            MeshBuilder.AddBox(m, fe, gap - t, gap, side > 0 ? twg / 2 : -twg / 2 - leg, side > 0 ? twg / 2 + leg : -twg / 2, zb, zt);
-            _parts.Add(new SteelPart { Mark = $"{mark}-E{(side > 0 ? 2 : 1)}", Category = PartCategory.Angle, Assembly = mark, Mesh = m, Length = zt - zb, Description = "L5x5x1/2 end connection angle", Role = MemberRole.Diaphragm });
-        }
     }
 
     // ================================================================== formatting helpers

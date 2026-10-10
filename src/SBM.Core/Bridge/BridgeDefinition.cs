@@ -201,6 +201,11 @@ public sealed class GirderTermination
     public int Support { get; set; }
     /// <summary>CL bearing to CL cross girder, along the girder.</summary>
     public double Distance { get; set; }
+    /// <summary>
+    /// Optional plan angle (degrees) of the cross girder to this girder, as dimensioned on the plans: from the girder's
+    /// ahead tangent, clockwise, to the cross girder direction (left → right). 90 = square (default when null).
+    /// </summary>
+    public double? CrossGirderAngleDegrees { get; set; }
     public GirderTermination Clone() => (GirderTermination)MemberwiseClone();
 }
 
@@ -213,6 +218,53 @@ public sealed class CrossGirderSection
     public double FlangeThickness { get; set; } = In(0.625);
     /// <summary>Gap between the end of the discontinuous girder and the cross girder web.</summary>
     public double EndGap { get; set; } = In(0.75);
+
+    // ---- As-designed details (all OPTIONAL: the defaults reproduce the simple legacy cross girder).
+
+    /// <summary>
+    /// null = the top of the cross girder top flange is level with the top-of-web chord of the supporting girders (legacy).
+    /// Otherwise the top of the top flange is this far BELOW the top of web (bottom of top flange) of the discontinuous
+    /// girder at its end (I-80: 11" in Unit 2, 8" in Unit 3, design sheet 121).
+    /// </summary>
+    public double? TopBelowDiscontinuousWebTop { get; set; }
+    /// <summary>Connection angle leg and thickness (L5x5x1/2).</summary>
+    public double AngleLeg { get; set; } = In(5);
+    public double AngleThickness { get; set; } = In(0.5);
+    /// <summary>Length of the angles at the continuing girders and at the discontinuous girder; 0 = legacy (web depth - 4"),
+    /// angles are centred in the cross girder web.</summary>
+    public double AngleLength { get; set; }
+    public double EndAngleLength { get; set; }
+    /// <summary>Bolt pitch in each angle leg (single line); 0 = no bolts or holes.</summary>
+    public double AngleBoltPitch { get; set; }
+    /// <summary>Angle end to the first bolt.</summary>
+    public double AngleBoltEndDistance { get; set; } = In(2);
+    /// <summary>Heel (corner against the other member) to the bolt line, in both legs.</summary>
+    public double AngleBoltGage { get; set; } = In(3);
+    /// <summary>Bolt diameter of the angle connections; 0 = the bridge's bolt diameter.</summary>
+    public double BoltDiameter { get; set; }
+
+    /// <summary>Vertical (near side) stiffeners flanking each web opening: plate width (outstand from the web face) and thickness; width 0 = none.</summary>
+    public double StiffenerWidth { get; set; }
+    public double StiffenerThickness { get; set; }
+    /// <summary>Opening edge to the stiffener centerline.</summary>
+    public double StiffenerFromOpening { get; set; } = In(6);
+    /// <summary>Web opening beside the discontinuous girder (one between each continuing girder and the discontinuous
+    /// girder, centred between their centerlines); width 0 = none.</summary>
+    public double OpeningWidth { get; set; }
+    public double OpeningHeight { get; set; }
+    public double OpeningRadius { get; set; } = In(6);
+    /// <summary>Top of the cross girder top flange to the centerline of the upper opening edge plate.</summary>
+    public double OpeningPlateFromTop { get; set; }
+    /// <summary>Horizontal opening edge plates (far side) above and below each opening: outstand width and thickness; width 0 = none.</summary>
+    public double OpeningPlateWidth { get; set; }
+    public double OpeningPlateThickness { get; set; }
+    /// <summary>Edge plate centerline to the opening edge.</summary>
+    public double OpeningPlateToOpening { get; set; } = In(0.5);
+    /// <summary>Edge plates stop this far short of the angle toes (assumed from the plan elevation, not dimensioned).</summary>
+    public double OpeningPlateEndClear { get; set; } = In(3);
+    /// <summary>Fillet weld sizes: web to flanges, stiffeners to web (0 = not modeled).</summary>
+    public double WebFlangeWeld { get; set; }
+    public double StiffenerWeld { get; set; }
     public CrossGirderSection Clone() => (CrossGirderSection)MemberwiseClone();
 }
 
