@@ -191,6 +191,46 @@ public partial class MainWindow : Window
             cam0.Width = 3.2;
             return;
         }
+        // EBLKn[@Bridge] = n-th deck end block (0-based, in joint order) of that bridge: longitudinal cut through the block at mid-deck, seen
+        // from the left side, showing the soffit, the girder ends embedded in the block and the end cross frame beneath it.
+        if (mark.StartsWith("EBLK") && int.TryParse((mark.Contains('@') ? mark[4..mark.IndexOf('@')] : mark[4..]), out int ebNo))
+        {
+            string ebBridge = mark.Contains('@') ? mark[(mark.IndexOf('@') + 1)..] : "";
+            var ebm = (ebBridge == "" ? _vm.ConcreteModels.FirstOrDefault() : _vm.ConcreteModels.FirstOrDefault(kv => kv.Key.Name == ebBridge));
+            var eblk = ebm.Value?.Joints.Where(j => j.EndBlock != null).ElementAtOrDefault(ebNo)?.EndBlock;
+            if (eblk != null && _vm.Project.FindAlignment(ebm.Key.AlignmentName) is { } eal)
+            {
+                _planMode = false; View.IsRotationEnabled = true; SyncViewSwitch(false); ApplyLayerVisibility();
+                var bb = eblk.Mesh.Bounds();
+                var ebMid = (bb.Min + bb.Max) * 0.5;
+                var so = eal.Inverse(ebMid.XY);
+                double offC = (ebm.Key.Deck.LeftEdgeOffset + ebm.Key.Deck.RightEdgeOffset) / 2;
+                // Cross-section cut (keeps the up-station side) through the flat soffit zone, halfway along it, seen from down-station.
+                double xt = Math.Min(eblk.Soffit[1].X, eblk.Soffit[^1].X) / 2;
+                double F(double st) => eblk.PlanX(eal.PointAt(st, offC)) - xt;
+                double s0 = so.Station, s1 = so.Station + 0.5;
+                for (int it = 0; it < 12; it++)
+                {
+                    double f0 = F(s0), f1 = F(s1);
+                    if (Math.Abs(f1 - f0) < 1e-12) break;
+                    double s2 = s1 - f1 * (s1 - s0) / (f1 - f0);
+                    s0 = s1; s1 = s2;
+                    if (Math.Abs(F(s1)) < 1e-4) break;
+                }
+                SectionAtStation(s1, 0);
+                var pc = eal.PointAt(s1, offC);
+                var c = new Vec3(pc.X, pc.Y, ebMid.Z - 0.3) - _scene.Origin;
+                var tg = eal.RightNormalAt(s1).Left;
+                var lk = new Vector3D(tg.X, tg.Y, 0.12);
+                lk.Normalize();
+                cam0.LookDirection = lk * 50;
+                cam0.Position = new Point3D(c.X, c.Y, c.Z) - lk * 50;
+                cam0.UpDirection = new Vector3D(0, 0, 1);
+                cam0.Width = 4.5;
+                KeepCameraInRange();
+                return;
+            }
+        }
         // SUBn = unit n of the first bridge's substructure; SUBn@Bridge name = of that bridge.
         string subBridge = mark.Contains('@') ? mark[(mark.IndexOf('@') + 1)..] : "";
         string subMark = mark.Contains('@') ? mark[..mark.IndexOf('@')] : mark;

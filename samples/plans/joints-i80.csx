@@ -6,8 +6,13 @@
 //  * One device body per joint (spans the whole opening): Unit 1 owns 5WB, Unit 2 owns 11WB. The joint line is the deck-end line (parallel to the support line).
 //  * NOT modeled: the Pier 6A joint (a separate line beside 5WB for girders A-E; the model has one straight deck end per unit),
 //    the Pier 19G joint on this side (Ramp G Unit 4 owns it), barrier slider plates, the manufacturer's beams/support boxes/anchors.
+//  * DECK END BLOCKS ("end dam diaphragm", slab sheets 178/183/188 sections B-B, C-C): 2'-2 deep (1'-2 blockout + 1'-0 below), soffit flat for
+//    3'-4 1/2 from the deck end at the piers (1'-3 1/2 + 2'-1, pdf 185 C-C, 190 C-C) and 2'-10 at the abutments (1'-6 + 1'-4, pdf 185 B-B,
+//    195 C-C), then rising at 45 degrees to the 8" slab soffit. Set DECK_END_BLOCKS = false below to switch them off.
+//    Reinforcing (marks 5d/5e) is NOT modeled; see docs/plan-data/deck-end-blocks.md.
 using SBM.Core.Bridge;
 
+const bool DECK_END_BLOCKS = true;
 double FI(int ft, double inch) => Ft(ft) + In(inch);
 var units = Doc.Project.Bridges.Where(b => b.Name.StartsWith("I-80 WB Unit")).OrderBy(b => b.Name).ToList();
 if (units.Count != 3) throw new Exception("Expected I-80 WB Units 1-3 (run build-i80-wb.csx first).");
@@ -19,6 +24,7 @@ void Joint(SupportDefinition s, double deckEnd, double cIn, double dIn, bool bod
     {
         Type = type, GapAt50F = In(cIn), BlockoutWidth = In(dIn), BlockoutDepth = FI(1, 2), SetDown = In(0.125),
         DeckEndOffset = deckEnd, SealCount = null, Body = body,
+        EndBlock = DECK_END_BLOCKS ? new DeckEndBlockDefinition { Depth = FI(2, 2), FlatLength = dIn < 20 ? FI(2, 10) : FI(3, 4.5) } : null,
     };
 }
 
@@ -51,6 +57,8 @@ foreach (var u in units)
     foreach (var j in cm.Joints)
         Print($"  {u.Name} / {j.Support} ({j.Definition.TypeName}): blockout {j.BlockoutVolume / 0.764554857984:F2} CY, joint length {j.Length / Ft(1):F1} ft{(j.Body == null ? "" : ", device body " + (j.BodyVolume / 0.764554857984).ToString("F3") + " CY")}");
     foreach (var d in cm.Diagnostics.Where(d => d.Message.Contains("xpansion joint"))) Print("  WARNING " + d.Message);
+    foreach (var j in cm.Joints.Where(j => j.EndBlock != null)) Print($"  {u.Name} / {j.Support}: deck end block {j.EndBlock!.Volume / 0.764554857984:F2} CY");
+    foreach (var d in cm.Diagnostics.Where(d => d.Message.Contains("Deck end block"))) Print($"  {d.Severity}: {d.Message}");
 }
 Doc.Save();
 Print("Expansion joints set (6 joint ends).");

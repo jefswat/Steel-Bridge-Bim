@@ -431,6 +431,16 @@ public static class IfcExporter
                 AddMaterial(concreteMat, bp);
                 psetTargets.Add((bp, "BLOCKOUT", jr.BlockoutName, 0, jr.BlockoutVolume * 2400));
                 result.ElementCount++;
+                if (jr.EndBlock is { } eb && !eb.Mesh.IsEmpty)
+                {
+                    int epds = Body(eb.Mesh, concreteStyle);
+                    string edesc = $"End dam diaphragm: {u.FormatLength(eb.Definition.Depth, LengthKind.Short)} deep at the deck end; girder ends are embedded in it";
+                    int ep = w.Add("IFCBUILDINGELEMENTPART", $"{Guid(jk + "/endblock")},$,{S(eb.Name)},{S(edesc)},'DECK_END_BLOCK',{Ref(pl)},{Ref(epds)},$,.USERDEFINED.");
+                    blockParts.Add(ep);
+                    AddMaterial(concreteMat, ep);
+                    psetTargets.Add((ep, "ENDBLOCK", eb.Name, 0, eb.Volume * 2400));
+                    result.ElementCount++;
+                }
                 if (jr.Body != null)
                 {
                     int dpds = Body(jr.Body, jointStyle);
