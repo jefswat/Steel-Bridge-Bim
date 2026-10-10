@@ -22,6 +22,8 @@ public sealed class ExpansionJointResult
     public Mesh? Body { get; init; }
     /// <summary>Length of the joint across the deck between barriers (along the joint line).</summary>
     public double Length { get; init; }
+    /// <summary>Thickened deck end under the blockout (null = not modeled).</summary>
+    public DeckEndBlockResult? EndBlock { get; init; }
     public double BlockoutVolume => Math.Abs(Blockout.Volume());
     public double BodyVolume => Body == null ? 0 : Math.Abs(Body.Volume());
     public string DeviceName => Definition.Type == ExpansionJointType.StripSeal
@@ -30,11 +32,65 @@ public sealed class ExpansionJointResult
     public string BlockoutName => $"Joint blockout concrete, {Support}";
 }
 
+/// <summary>Where a point lies relative to a deck end block: X = distance from the deck-end face (+ toward the deck, perpendicular to the joint), Drop = below finished top of slab.</summary>
+public readonly record struct EndBlockHit(double X, double Drop, bool OnDeck, bool Inside, double AboveSoffit);
+
+/// <summary>Steel found inside a deck end block: embedded as the plans show, or an unintended clash. Heights are above the block soffit (m).</summary>
+public sealed record DeckEndClash(string Support, string Member, bool Intended, int Count, double MaxAboveSoffit, string Note);
+
+/// <summary>The thickened deck end ("end dam diaphragm") at an expansion joint: solid + the analytic outline used for clash checks.</summary>
+public sealed class DeckEndBlockResult
+{
+    public required string Support { get; init; }
+    public required bool AtBegin { get; init; }
+    public required DeckEndBlockDefinition Definition { get; init; }
+    public required Mesh Mesh { get; init; }
+    /// <summary>Soffit polyline (X from the deck-end face, Drop below top of slab) from the face to the slab soffit.</summary>
+    public required List<EndBlockPoint> Soffit { get; init; }
+    public required double SlabThickness { get; init; }
+    public required double BlockoutWidth { get; init; }
+    /// <summary>Drop of the bottom of the concrete above the block at X &lt; BlockoutWidth (the blockout's bottom).</summary>
+    public required double BlockoutBottom { get; init; }
+    /// <summary>Distance of a plan point from the deck-end face (+ toward the deck, perpendicular to the joint).</summary>
+    public required Func<Vec2, double> PlanX { get; init; }
+    /// <summary>Drop of a point below the finished top of slab, and whether it lies between the deck edges.</summary>
+    public required Func<Vec3, (double drop, bool onDeck)> DeckAt { get; init; }
+    public double Volume => Math.Abs(Mesh.Volume());
+    public string Name => $"Deck end block (end dam diaphragm), {Support}";
+
+    public double SoffitDropAt(double x)
+    {
+        var s = Soffit;
+        if (x < s[0].X || x > s[^1].X) return double.NaN;
+        for (int i = 1; i < s.Count; i++)
+            if (x <= s[i].X + 1e-12)
+            {
+                double w = s[i].X - s[i - 1].X;
+                return w < 1e-12 ? s[i].Drop : s[i - 1].Drop + (s[i].Drop - s[i - 1].Drop) * (x - s[i - 1].X) / w;
+            }
+        return s[^1].Drop;
+    }
+
+    /// <summary>Classifies a world point: inside the block solid (between the slab/blockout concrete above and the soffit), and how far it is above the soffit.</summary>
+    public EndBlockHit Probe(Vec3 p)
+    {
+        double x = PlanX(p.XY);
+        if (x < -1e-6 || x > Soffit[^1].X + 1e-6) return new EndBlockHit(x, 0, false, false, 0);
+        var (drop, onDeck) = DeckAt(p);
+        double soff = SoffitDropAt(x);
+        if (!onDeck || double.IsNaN(soff)) return new EndBlockHit(x, drop, onDeck, false, 0);
+        double top = x < BlockoutWidth ? BlockoutBottom : SlabThickness;
+        return new EndBlockHit(x, drop, onDeck, drop >= top - 1e-6 && drop <= soff + 1e-6, soff - drop);
+    }
+}
+
 public sealed class ConcreteModel
 {
     public List<ExpansionJointResult> Joints { get; } = new();
     public Mesh? Deck { get; set; }
     public Mesh? Haunches { get; set; }
+    /// <summary>Steel embedded in or clashing with the deck end blocks (filled by <c>DeckEndBlockCheck</c> once the steel exists).</summary>
+    public List<DeckEndClash> EndBlockClashes { get; } = new();
     public List<(string Name, Mesh Mesh)> Barriers { get; } = new();
     public List<BarMark> Marks { get; } = new();
     public List<BarPlacement> Bars { get; } = new();
@@ -392,9 +448,60 @@ public sealed class ConcreteGenerator
         foreach (bool begin in new[] { true, false })
         {
             var j = begin ? JointB : JointE;
-            if (j == null || j.BlockoutDepth >= Deck.Thickness - 1e-6) continue;
-            _m.Deck!.Append(EndSlab(begin, 0, j.BlockoutWidth, j.BlockoutDepth, Deck.Thickness));
+            if (j == null || EffectiveBlockoutDepth(j) >= Deck.Thickness - 1e-6) continue;
+            _m.Deck!.Append(EndSlab(begin, 0, j.BlockoutWidth, EffectiveBlockoutDepth(j), Deck.Thickness));
         }
+    }
+
+    /// <summary>Blockout depth actually built: the plan depth when the end block provides the concrete below the slab, else limited to the slab.</summary>
+    private double EffectiveBlockoutDepth(ExpansionJointDefinition j) =>
+        j.EndBlock != null && j.EndBlock.SoffitFor(Deck.Thickness).Count >= 2 ? j.BlockoutDepth : Math.Min(j.BlockoutDepth, Deck.Thickness);
+
+    private DeckEndBlockResult? BuildEndBlock(bool begin, SupportDefinition sup, ExpansionJointDefinition j)
+    {
+        var eb = j.EndBlock!;
+        double slab = Deck.Thickness, bo = j.BlockoutDepth, d = j.BlockoutWidth;
+        var soffit = eb.SoffitFor(slab);
+        string where = $"Deck end block at {sup.Name}";
+        if (soffit.Count < 2) { Warn($"{where}: depth {_u.FormatLength(eb.Depth, LengthKind.Short)} is not greater than the slab ({_u.FormatLength(slab, LengthKind.Short)}); no end block built."); return null; }
+        if (Math.Abs(soffit[0].X) > 1e-6) { Warn($"{where}: the soffit profile must start at the deck-end face (X = 0); no end block built."); return null; }
+        double bt = Math.Max(bo, slab);
+        if (soffit[0].Drop <= bt + 1e-6) { Warn($"{where}: the soffit at the deck end ({_u.FormatLength(soffit[0].Drop, LengthKind.Short)} below top of slab) is not below the blockout ({_u.FormatLength(bt, LengthKind.Short)}); no end block built."); return null; }
+        if (soffit[^1].X <= d + 1e-6 || soffit[^1].Drop > slab + 1e-6)
+        { Warn($"{where}: the soffit must reach the slab soffit beyond the blockout edge ({_u.FormatLength(d, LengthKind.Short)}); no end block built."); return null; }
+        // closed outline in (x, drop): face top, soffit, back along the slab soffit to the blockout edge, up to the blockout bottom
+        var outline = soffit.Select(q => new Vec2(q.X, q.Drop)).ToList();
+        outline.Insert(0, new Vec2(0, bt));
+        if (bt > slab + 1e-6) { outline.Add(new Vec2(d, slab)); outline.Add(new Vec2(d, bt)); }
+        var section = outline.Select(q => new Vec2(q.X, -q.Y)).ToList();
+        var cols = JointColumns(0, 0);
+        var rings = new List<Vec3[]>(cols.Count);
+        foreach (var c in cols)
+        {
+            var ring = new Vec3[outline.Count];
+            for (int i = 0; i < outline.Count; i++)
+            {
+                double dd = EndD(c, begin, outline[i].X);
+                double o = c(dd);
+                ring[i] = _a.PointAtDistance(dd, o).WithZ(Top(dd, o) - outline[i].Y);
+            }
+            rings.Add(ring);
+        }
+        var mesh = new Mesh();
+        MeshBuilder.AddLoft(mesh, section, rings);
+        var origin = begin ? DR.BeginLinePoint : DR.EndLinePoint;
+        var normal = begin ? DR.BeginLineDirection.Left : -DR.EndLineDirection.Left;
+        (double, bool) DeckAt(Vec3 p)
+        {
+            var so = _a.Inverse(p.XY);
+            bool on = so.Offset >= Deck.LeftAt(so.Station) - 1e-6 && so.Offset <= Deck.RightAt(so.Station) + 1e-6;
+            return (_a.ElevationAt(so.Station, so.Offset) - p.Z, on);
+        }
+        return new DeckEndBlockResult
+        {
+            Support = sup.Name, AtBegin = begin, Definition = eb, Mesh = mesh, Soffit = soffit, SlabThickness = slab, BlockoutWidth = d,
+            BlockoutBottom = bt, PlanX = xy => Vec2.Dot(xy - origin, normal), DeckAt = DeckAt,
+        };
     }
 
     private void BuildJoints()
@@ -409,11 +516,12 @@ public sealed class ConcreteGenerator
             if (j is not { Active: true }) continue;
             if (j.DeckEndOffset is double plan && Math.Abs(plan - sup.DeckEndOffset) > 0.001)
                 Warn($"Expansion joint at {sup.Name}: plans give CL bearing to deck end {_u.FormatLength(plan, LengthKind.Short)}, the support has {_u.FormatLength(sup.DeckEndOffset, LengthKind.Short)} (not changed).");
-            if (j.BlockoutDepth > Deck.Thickness + 1e-6)
+            DeckEndBlockResult? block = j.EndBlock != null ? BuildEndBlock(begin, sup, j) : null;
+            if (j.BlockoutDepth > Deck.Thickness + 1e-6 && block == null)
                 Warn($"Expansion joint at {sup.Name}: blockout depth {_u.FormatLength(j.BlockoutDepth, LengthKind.Short)} exceeds the modeled slab ({_u.FormatLength(Deck.Thickness, LengthKind.Short)}); the plans' deeper end block is not modeled, so the blockout concrete is limited to the slab thickness.");
             if (j.SetDown >= Math.Min(j.BlockoutDepth, Deck.Thickness))
                 Warn($"Expansion joint at {sup.Name}: set-down is not smaller than the blockout depth.");
-            double depth = Math.Min(j.BlockoutDepth, Deck.Thickness);
+            double depth = block != null ? j.BlockoutDepth : Math.Min(j.BlockoutDepth, Deck.Thickness);
             var blockout = EndSlab(begin, 0, j.BlockoutWidth, 0, depth);
             Mesh? body = null;
             double length = 0;
@@ -425,11 +533,12 @@ public sealed class ConcreteGenerator
                 var pts = JointColumns(li, ri).Select(c => { double d = EndD(c, begin, 0); var p = _a.PointAtDistance(d, c(d)); return new Vec2(p.X, p.Y); }).ToList();
                 for (int k = 1; k < pts.Count; k++) length += (pts[k] - pts[k - 1]).Length;
             }
-            res.Add(new ExpansionJointResult { Support = sup.Name, AtBegin = begin, Definition = j, Blockout = blockout, Body = body, Length = length });
+            res.Add(new ExpansionJointResult { Support = sup.Name, AtBegin = begin, Definition = j, Blockout = blockout, Body = body, Length = length, EndBlock = block });
         }
         if (res.Count == 0) return;
         lock (_m.Joints) _m.Joints.AddRange(res);
-        lock (_m.Notes) _m.Notes.Add("Expansion joints: blockout concrete is cut out of the deck and cast separately; the device is a generic envelope (the manufacturer designs and supplies it). Deck reinforcement is not cut back at the blockout.");
+        lock (_m.Notes) _m.Notes.Add("Expansion joints: blockout concrete is cut out of the deck and cast separately; the device is a generic envelope (the manufacturer designs and supplies it). Deck reinforcement is not cut back at the blockout."
+            + (res.Any(r => r.EndBlock != null) ? " Deck end blocks (end dam diaphragms) are separate solids below the blockout; their reinforcing is not modeled. Haunch solids are not cut back where they run through an end block (the overlap is counted twice in haunch quantities)." : ""));
     }
 
 

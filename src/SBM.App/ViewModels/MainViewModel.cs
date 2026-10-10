@@ -1355,6 +1355,8 @@ public sealed partial class MainViewModel : ObservableObject
                 foreach (var jr in cmod.Joints)
                 {
                     MaterialRows.Add(new MaterialRow(b.Name, "Concrete", $"Joint blockout, {jr.Support}", 1, "", $"{jr.BlockoutVolume / cy:N2} {vu}"));
+                    if (jr.EndBlock != null)
+                        MaterialRows.Add(new MaterialRow(b.Name, "Concrete", $"Deck end block (end dam diaphragm), {jr.Support}", 1, "", $"{jr.EndBlock.Volume / cy:N2} {vu}"));
                     if (jr.Body != null)
                         MaterialRows.Add(new MaterialRow(b.Name, "Expansion joint", $"{jr.Definition.TypeName} at {jr.Support} (generic, manufacturer-designed)", 1,
                             u.FormatLength(jr.Length), "by manufacturer"));

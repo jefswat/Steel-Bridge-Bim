@@ -116,3 +116,33 @@ textured face along the lower arc plus the end-fan steps; texture itself need no
 2. Direction of the setbacks in Details A and B (which side projects) and whether the end fan arcs are steps only or contain grooves.
 3. How "VARIES" end lengths on Ramp G 1G-15G/18G are derived, and exact L1 reference (top-corner to top-corner vs sloped length).
 4. Ramp G texture depth values under the revision cloud (PDF 78).
+
+## CONFIRMED (re-read on 220-400 dpi raster clips, PDF 78, 79, 83, 84; cap step from `docs/plan-data/piles-capstep-dowels.md` item 2)
+
+1. TEXTURED FACE. Only the figure notes say: PDF 83 pier 6A "NO TEXTURE (FAR FACE) / TEXTURE B (NEAR FACE)"; PDF 84 pier 11WB and PDF 78 pier 19G
+   "NO TEXTURE (NEAR FACE) / TEXTURE B (FAR FACE)". All views are "looking ahead station": near = back (down-station, N0), far = ahead (up-station, N1).
+   The generic figures (1WB-15WB, 1G-15G/18G, 16G/17G) carry no near/far note: modeled as the far (ahead) face like 11WB / 19G (UNRESOLVABLE from the
+   sheets; flagged). Texture is not geometry (it is only the face tag `CapAestheticsDefinition.Face`); the cap SECTION STEP is on both faces.
+2. WHAT THE STEPS ARE. Sections A-A/B-B (item 2 of the piles/capstep doc): cap full width W above the relief curve, W - 1'-0 below it (6" setback per face,
+   both faces), as one 6" step or three 2" steps through the fan end. The three nested fan arcs R3 > R4 > R5 ARE the three step lines (they start together
+   at the point of reverse curvature and fan out; "2 @ 3/4 = 1 1/2" is the spacing mark at the tip, not a step height). So: layers = [R5, R4, R3] (lowest
+   line first), 2" thick each, stacked outward from the lower section; tread drafted 7 deg (Detail B), no chamfers. Detail B orientation: the upper
+   (textured) part projects, its underside slopes up toward the outside; the sketch cannot say more. Detail A (1/2" setback at the beak tip, 3" / 3" from the
+   W.P.): NOT modeled (plan-detail sketch only; flagged). The textured end faces are not modeled either.
+3. L1 and "VARIES". L1 = top corner to top corner of the cap (matches the structural cap: 2 x half length for every I-80 pier, 63'/53' on 16G/17G).
+   The dimension strings of the explicit figures run from the left top corner. 1G-15G/18G: cap 35'-0, the point of reverse curvature (CL pier) is 17'-6 from
+   each corner, so both "VARIES" end lengths are 17'-6 - 9'-6 = 8'-0 (the 1'-9 / 1'-9 / 6'-0 break marks are the fan control points 9'-6 / 7'-9 / 6'-0 from the CL).
+   CONFLICT 19G: the aesthetic sheet puts the CL-pier mark 18'-0 1/2 from the left corner (8'-3 1/2 + 9'-9) and 22'-0 from the right (7'-2 + 1'-11 + 1'-11 +
+   11'-0 1/16); `piers-ramp-g.csx` has the corners at -21.0 / +19.0 from the column. The aesthetic chain is used as printed (it adds up to the 40'-0 cap).
+   CONFLICT beak depth: the sheets give the band depth at the long-side tip as 6'-9 (6A) and 6'-6 1/4 (19G, 1G-15G, 18G), the structural pier sheets give the beak
+   tip 5'-0 (6A) / 5'-6 below the top; the modeled caps keep the structural tips, so the long arc enters the cap through the soffit bevel a little inside the tip.
+4. TEXTURE DEPTHS under the revision cloud (PDF 78, 12-01-15): Texture A max 1 1/2"; Texture B max 1 1/2", min 1 3/8" (the I-80 sheet prints the same).
+   No effect on the geometry (the setback is 6").
+
+How the curve is built (code: `CapBandBuilder`): arcs are tangent; depths are measured perpendicular to the top line, stations along it from the left corner.
+- Table piers (I-80 1WB-15WB, 16G, 17G): hill arc R1 -> reverse point P at L-hill, 3'-6 deep -> sag arc R2 -> reverse point Q at L-fan from the other end, 3'-6 deep ->
+  three hill arcs R3/R4/R5 tangent at Q. 16G/17G are the mirror image with L2 on the fan side. The arcs end where they meet the cap outline (end face / soffit bevel).
+  Check against the sheets: L4 (spacing of the arc ends) comes out 1.5-1.7 ft smaller than printed (e.g. 4WB 1.7 vs 2.25) -- L4 is not used.
+- Explicit figures (6A, 19G, 1G-15G, 18G): the long arc (R84 / R60 / R40, sag) from the tip depth to the labeled point of reverse curvature, then the three fan arcs
+  tangent from it. The control-point depths printed on the sheets are reproduced to: 6A -8/-5/-1 in, 19G +5/+8/+12 in, 1G +0/+1/+5 in (model - sheet): the printed
+  figures are schematic and over-determined (UNRESOLVED; the residuals are printed by `pier-aesthetics.csx`).

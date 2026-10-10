@@ -220,8 +220,47 @@ public sealed class CrossGirderSection
     public CrossGirderSection Clone() => (CrossGirderSection)MemberwiseClone();
 }
 
+public enum GirderPlanElementKind { Line, ArcLeft, ArcRight }
+
+/// <summary>One tangent or circular arc of an as-designed girder plan geometry (see <see cref="GirderPlanGeometry"/>).</summary>
+public sealed class GirderPlanElement
+{
+    public GirderPlanElementKind Kind { get; set; } = GirderPlanElementKind.Line;
+    /// <summary>Arc radius (ignored for lines).</summary>
+    public double Radius { get; set; }
+    /// <summary>Length along the element. The LAST element is extended past this when the girder runs longer.</summary>
+    public double Length { get; set; }
+    public GirderPlanElement Clone() => (GirderPlanElement)MemberwiseClone();
+}
+
+/// <summary>
+/// Optional as-designed plan geometry of one girder (default: none = offset curve from the alignment, flared linearly
+/// between the supports' <see cref="GirderLayoutDefinition.OffsetsAtSupports"/>): a start point in alignment
+/// station/offset, a start direction and a chain of tangents and arcs (each tangent to the previous one), e.g. the plan's
+/// "P.C. STA ..., R = ..." girder radius data. The first element is extended backwards and the last forwards as needed.
+/// Bearings are where the girder crosses the support lines; everything else follows from those curves.
+/// </summary>
+public sealed class GirderPlanGeometry
+{
+    /// <summary>Girder index (0 = G1).</summary>
+    public int Girder { get; set; }
+    public double StartStation { get; set; }
+    /// <summary>Offset of the start point from the alignment (right positive).</summary>
+    public double StartOffset { get; set; }
+    /// <summary>Direction of travel at the start, in degrees from the alignment tangent at StartStation (positive = toward the right).</summary>
+    public double StartDirectionDegrees { get; set; }
+    public List<GirderPlanElement> Elements { get; set; } = new();
+    public GirderPlanGeometry Clone() => new()
+    {
+        Girder = Girder, StartStation = StartStation, StartOffset = StartOffset, StartDirectionDegrees = StartDirectionDegrees,
+        Elements = Elements.Select(e => e.Clone()).ToList(),
+    };
+}
+
 public sealed class GirderLayoutDefinition
 {
+    /// <summary>As-designed plan geometry per girder (optional, see <see cref="GirderPlanGeometry"/>).</summary>
+    public List<GirderPlanGeometry> PlanGeometry { get; set; } = new();
     /// <summary>Girders that end on cross girders inside the bridge (e.g. a widening that tapers out).</summary>
     public List<GirderTermination> Terminations { get; set; } = new();
     /// <summary>Girders that begin on an auxiliary support line (see <see cref="GirderBeginning"/>).</summary>
@@ -270,6 +309,7 @@ public sealed class GirderLayoutDefinition
         Kind = Kind,
         Prestressed = Prestressed.Clone(),
         Terminations = Terminations.Select(t => t.Clone()).ToList(),
+        PlanGeometry = PlanGeometry.Select(t => t.Clone()).ToList(),
         Beginnings = Beginnings.Select(t => t.Clone()).ToList(),
         CrossGirder = CrossGirder.Clone(),
     };
@@ -951,6 +991,18 @@ public sealed class BridgeDefinition
                 errors.Add("Flared girder offset table must have one row per support and one value per girder.");
             else if (tbl.Any(r => r.Zip(r.Skip(1)).Any(p => p.Second <= p.First)))
                 errors.Add("Flared girder offsets must increase from left to right at every support.");
+        }
+        foreach (var pg in Girders.PlanGeometry)
+        {
+            string gn = $"Girder {pg.Girder + 1} plan geometry";
+            if (pg.Girder < 0 || pg.Girder >= Girders.Count) errors.Add($"{gn}: girder index out of range.");
+            else if (Girders.PlanGeometry.Count(o => o.Girder == pg.Girder) > 1) errors.Add($"{gn} is given more than once.");
+            if (pg.Elements.Count == 0) errors.Add($"{gn} has no elements.");
+            foreach (var e in pg.Elements)
+            {
+                if (e.Length < 0) errors.Add($"{gn}: element lengths cannot be negative.");
+                if (e.Kind != GirderPlanElementKind.Line && e.Radius <= 0) errors.Add($"{gn}: arc radius must be positive.");
+            }
         }
         if (Deck.RightEdgeOffset <= Deck.LeftEdgeOffset) errors.Add("Deck right edge must be right of the left edge.");
         if (Girders.IsPrestressed) errors.AddRange(Girders.Prestressed.Validate());

@@ -97,6 +97,7 @@ public static class BentViews
         var capPoly = unit.CapOutline.Count >= 3 ? unit.CapOutline : unit.CapTop.Concat(Enumerable.Reverse(unit.CapBottom)).ToList();
         d.Poly(SheetLayers.Concrete, capPoly, true);
         if (unit.CapOutlineAhead.Count >= 3) d.Poly(SheetLayers.ConcreteHidden, unit.CapOutlineAhead, true);   // stepped ahead half
+        foreach (var rl in unit.ReliefLines) d.Poly(SheetLayers.Concrete, rl);                                   // texture band lines
         if (unit.Backwall is { } bw2)
         {
             var wall = bw2.Top.Concat(Enumerable.Reverse(unit.CapTop.Where(p => p.X >= bw2.Top[0].X - 1e-9 && p.X <= bw2.Top[^1].X + 1e-9))).ToList();

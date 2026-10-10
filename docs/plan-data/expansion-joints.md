@@ -192,5 +192,5 @@ PDF page numbers (1-based) of `B00168` (I-80, design 116) and `B00169` (Ramp G, 
 `SupportDefinition.ExpansionJoint` (`ExpansionJointDefinition`, optional, default off) on an END support: blockout (width D from the deck-end face,
 full deck width, depth min(1'-2, slab)) is cut out of the deck and made as its own solid ("Joint blockout concrete"); a generic device envelope
 (opening C wide, set 1/8" down, to blockout depth, between the barrier faces) is the placeholder "Generic modular expansion joint (manufacturer-designed
-placeholder)". The plans' 2'-2 end block (deeper than the modeled 8" slab) is not modeled; a warning says so. Sample data: `samples/plans/joints-i80.csx`, `joints-ramp-g.csx`.
+placeholder)". The plans' 2'-2 end block (deeper than the modeled 8" slab) is OPTIONAL (`ExpansionJointDefinition.EndBlock`, see `deck-end-blocks.md`); without it a warning says the blockout is limited to the slab. Sample data: `samples/plans/joints-i80.csx`, `joints-ramp-g.csx`.
 Not modeled: barrier slider/cover plates, beams, support boxes, anchors, seals, drainage troughs.
