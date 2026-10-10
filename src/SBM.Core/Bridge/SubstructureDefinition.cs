@@ -76,8 +76,16 @@ public sealed class FootingDefinition
     public double BatterRatio { get; set; } = 4;
     /// <summary>Plan orientation of the H-pile webs (see <see cref="PileWebMode"/>); a pile's own WebDirS/N overrides it.</summary>
     public PileWebMode PileWeb { get; set; } = PileWebMode.Default;
+    /// <summary>As-designed reinforcing of this footing (the plan bar list: mats, side bars, uplift anchors). Empty = the generic
+    /// mats of <see cref="SubstructureReinforcementDefinition.FootingBarSize"/> / spacing.</summary>
+    public List<PlanBarGroup> Bars { get; set; } = new();
+    /// <summary>Indices (into <see cref="Piles"/>) of the circled piles that carry the pile uplift anchors (the plans' 8f6 detail).</summary>
+    public List<int> UpliftPiles { get; set; } = new();
+    /// <summary>Uplift anchor V-bars per circled pile (the plans: 3, at 4 in. along the web).</summary>
+    public int UpliftBarsPerPile { get; set; } = 3;
     public FootingDefinition Clone() => new()
     {
+        Bars = Bars.Select(b => b.Clone()).ToList(), UpliftPiles = UpliftPiles.ToList(), UpliftBarsPerPile = UpliftBarsPerPile,
         Column = Column, PileLength = PileLength, BatterRatio = BatterRatio, PileWeb = PileWeb,
         Outline = Outline.Select(p => p.Clone()).ToList(), Piles = Piles.Select(p => p.Clone()).ToList(),
     };
@@ -248,10 +256,14 @@ public sealed class SubstructureReinforcementDefinition
 
     public double MaxBarLength { get; set; } = Ft(60);
 
+    /// <summary>As-designed cap and pedestal reinforcing (the plan bar list); when present it replaces the generic cap bars and stirrups.</summary>
+    public List<PlanBarGroup> CapBars { get; set; } = new();
+
     public SubstructureReinforcementDefinition Clone()
     {
         var c = (SubstructureReinforcementDefinition)MemberwiseClone();
         c.ColumnChamferBarPositions = ColumnChamferBarPositions?.ToList();
+        c.CapBars = CapBars.Select(b => b.Clone()).ToList();
         return c;
     }
 }

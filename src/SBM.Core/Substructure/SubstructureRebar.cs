@@ -24,13 +24,18 @@ public sealed partial class SubstructureGenerator
             var r = unit.Definition.Reinforcement;
             if (!r.Enabled) continue;
             var bars = new List<RawBar>();
-            CapBars(unit, bars);
+            if (r.CapBars.Count > 0) CapPlanBars(unit, bars); else CapBars(unit, bars);
             if (unit.Backwall != null) BackwallBars(unit, bars);
             foreach (var c in unit.Columns) ColumnBars(unit, c, bars);
-            foreach (var f in unit.Foundations)
+            for (int fi = 0; fi < unit.Foundations.Count; fi++)
             {
+                var f = unit.Foundations[fi];
                 if (f.Type == FoundationType.DrilledShaft) ShaftBars(unit, f, bars);
-                else if (f.Type is FoundationType.SpreadFooting or FoundationType.PileCap && f.SizeS > 0) FootingBars(unit, f, bars);
+                else if (f.Type is FoundationType.SpreadFooting or FoundationType.PileCap && f.SizeS > 0)
+                {
+                    var fd = unit.Definition.Footings.FirstOrDefault(x => x.Column == fi + 1);
+                    if (fd is { Bars.Count: > 0 }) FootingPlanBars(unit, f, fd, bars); else FootingBars(unit, f, bars);
+                }
             }
             perUnit.Add((unit, bars));
         }
@@ -850,7 +855,7 @@ public sealed partial class SubstructureGenerator
 
     private static int SeriesOrder(string s) => s switch
     {
-        "A" => 0, "B" => 1, "C" => 2, "S" => 3, "W" => 4, "H" => 5, "V" => 6, "L" => 6, "P" => 7, "D" => 8, "E" => 9, _ => 10,
+        "A" => 0, "B" => 1, "C" => 2, "S" => 3, "W" => 4, "H" => 5, "V" => 6, "L" => 6, "P" => 7, "F" => 8, "G" => 8, "D" => 8, "E" => 9, _ => 10,
     };
 
     private static void AssignMarks(SubstructureModel m, SubstructureUnit unit, List<RawBar> bars)

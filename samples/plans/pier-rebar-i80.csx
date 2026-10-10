@@ -1,0 +1,141 @@
+// I-80 WB (Design 116) piers 1WB-15WB incl. 6A and 11WB
+// Footing, cap and pedestal reinforcing of the as-designed piers, from the plans' bar lists ("REINFORCING BAR LIST - PIER NO. nn", the
+// sheet's printed totals reconcile exactly to these lists: docs/plan-data/footing-rebar-comparison.md, bar lists read from the PDF text
+// layer). Every line is one plan mark: "mark;kind;size;total count;listed length (in);...". Footings: the totals of a multi-footing pier
+// are split evenly over its footings. Re-runnable; run after piers-i80.csx / pier-6a.csx / piers-ramp-g.csx / pier-aesthetics.csx /
+// column-rebar.csx (it only sets FootingDefinition.Bars / UpliftPiles and SubstructureReinforcementDefinition.CapBars).
+//  * Footing mats: lowest bottom layer 1" clear above the pile heads, bottom bars bent up 90 degrees at both ends (hook leg derived from
+//    the listed length: length - (footing dimension - 4") = both hooks), top mat 3" clear below the top, first bar 6" from the face.
+//    The run direction follows the listed length against the footing dimensions (bars end 2" short of the face).
+//  * 8f6 pile uplift anchors (design sheet 19 / 20 detail): 3 V-bars per CIRCLED pile through a 1 1/2" hole in the web, 6" above the
+//    footing bottom. Circled piles = the ring symbols read from the pile layout sheet (vector circles) mapped to the nearest pile; where the
+//    ring count does not match the bar list the outermost piles of the pile pattern are used (marked below as "perimeter rule").
+//  * Caps: groups as listed (see SubstructurePlanBars.cs for the placement rules; the cap is laid out inside the 6"-narrower lower section).
+using SBM.Core.Bridge;
+
+var P = new Dictionary<string, (string[] foot, string[] cap, (double s, double n)[] rings)>
+{
+    ["Pier 1WB"] = (
+        new string[] { "7f1;FootingMat;#7;54;188.00;1;1;1;0.00", "7f2;FootingMat;#7;48;212.00;1;2;0;0.00", "7f3;FootingSideVertical;#7;192;61.00;0;1;0;0.00", "7f4;FootingSideHorizontal;#7;24;202.00;0;1;1;0.00", "7f5;FootingSideHorizontal;#7;24;226.00;0;1;0;0.00", "8f6;UpliftAnchor;#8;108;60.00;0;1;0;0.00", "11g1;FootingMat;#11;54;234.00;0;1;1;23.00", "11g2;FootingMat;#11;48;258.00;0;2;0;23.00" },
+        new string[] { "11a1;CapTop;#11;20;477.00;0", "11a2;CapTop;#11;40;451.00;0", "6a3;CapSide;#6;20;563.00;0", "6a4;CapSide;#6;4;546.00;0", "6a5;CapSide;#6;4;514.00;0", "5a6;CapSide;#5;4;560.00;0", "5a7;CapSide;#5;2;509.00;0", "5a8;CapSide;#5;2;343.00;0", "5a9;CapSide;#5;2;572.00;0", "5a10;CapSide;#5;2;571.00;0", "5a11;CapSide;#5;2;63.00;0", "5a12;CapSide;#5;2;86.00;0", "5a13;CapEnd;#5;8;111.00;0", "5a14;CapEnd;#5;12;82.00;1", "11b1;CapBottom;#11;36;497.00;0", "6b2;CapCantilever;#6;12;133.00;0", "6c1;CapHoop;#6;194;270.00;0", "6c2;CapCantileverHoop;#6;68;244.03;0", "6c3;CapTie;#6;97;100.00;0", "6c4;CapTie;#6;34;86.94;0", "5c5;CapHairpin;#5;72;135.00;0", "5c6;CapHairpin;#5;64;113.00;0", "4c7;CapTransverse;#4;82;65.00;0", "5m1;PedestalLongitudinal;#5;36;125.00;0", "5n1;PedestalTransverse;#5;36;127.00;0", "5n2;PedestalHoop;#5;2;264.00;0" },
+        new (double s, double n)[] { (3.50, -5.99), (-3.50, -5.99), (-7.00, -5.99), (7.00, -2.00), (-7.00, -2.00), (7.00, 2.00), (-7.00, 2.00), (7.00, 6.01), (-7.00, 6.01), (-3.50, 6.01), (3.50, 6.01) }),
+    ["Pier 2WB"] = (
+        new string[] { "7f1;FootingMat;#7;54;188.00;1;1;1;0.00", "7f2;FootingMat;#7;48;212.00;1;2;0;0.00", "7f3;FootingSideVertical;#7;192;61.00;0;1;0;0.00", "7f4;FootingSideHorizontal;#7;24;202.00;0;1;1;0.00", "7f5;FootingSideHorizontal;#7;24;226.00;0;1;0;0.00", "8f6;UpliftAnchor;#8;108;60.00;0;1;0;0.00", "11g1;FootingMat;#11;54;234.00;0;1;1;23.00", "11g2;FootingMat;#11;48;258.00;0;2;0;23.00" },
+        new string[] { "11a1;CapTop;#11;20;465.00;0", "11a2;CapTop;#11;40;439.00;0", "6a3;CapSide;#6;20;545.00;0", "6a4;CapSide;#6;4;528.00;0", "6a5;CapSide;#6;4;496.00;0", "5a6;CapSide;#5;4;543.00;0", "5a7;CapSide;#5;2;493.00;0", "5a8;CapSide;#5;2;332.00;0", "5a9;CapSide;#5;2;554.00;0", "5a10;CapSide;#5;2;553.00;0", "5a11;CapSide;#5;2;61.00;0", "5a12;CapSide;#5;2;83.00;0", "5a13;CapEnd;#5;8;111.00;0", "5a14;CapEnd;#5;12;82.00;1", "11b1;CapBottom;#11;36;478.00;0", "6b2;CapCantilever;#6;12;133.00;0", "6c1;CapHoop;#6;186;270.00;0", "6c2;CapCantileverHoop;#6;68;244.03;0", "6c3;CapTie;#6;93;100.00;0", "6c4;CapTie;#6;34;86.94;0", "5c5;CapHairpin;#5;72;135.00;0", "5c6;CapHairpin;#5;60;113.00;0", "4c7;CapTransverse;#4;78;65.00;0", "5m1;PedestalLongitudinal;#5;36;125.00;0", "5n1;PedestalTransverse;#5;36;127.00;0", "5n2;PedestalHoop;#5;2;264.00;0" },
+        new (double s, double n)[] { (7.00, -5.99), (3.50, -5.99), (-3.50, -5.99), (-7.00, -5.99), (7.00, -2.00), (7.00, 2.00), (-7.00, 2.00), (7.00, 6.01), (-7.00, 6.01), (-3.50, 6.01), (3.50, 6.01) }),
+    ["Pier 3WB"] = (
+        new string[] { "8f1;FootingMat;#8;132;260.00;1;1;0;0.00", "8f6;UpliftAnchor;#8;126;60.00;0;1;0;0.00", "11g1;FootingMat;#11;174;308.00;0;1;0;24.00" },
+        new string[] { "11a1;CapTop;#11;20;465.00;0", "11a2;CapTop;#11;40;439.00;0", "6a3;CapSide;#6;20;545.00;0", "6a4;CapSide;#6;4;528.00;0", "6a5;CapSide;#6;4;496.00;0", "5a6;CapSide;#5;4;542.00;0", "5a7;CapSide;#5;2;493.00;0", "5a8;CapSide;#5;2;332.00;0", "5a9;CapSide;#5;2;554.00;0", "5a10;CapSide;#5;2;553.00;0", "5a11;CapSide;#5;2;61.00;0", "5a12;CapSide;#5;2;83.00;0", "5a13;CapEnd;#5;8;111.00;0", "5a14;CapEnd;#5;12;82.00;1", "11b1;CapBottom;#11;36;478.00;0", "6b2;CapCantilever;#6;12;133.00;0", "6c1;CapHoop;#6;186;270.00;0", "6c2;CapCantileverHoop;#6;68;244.03;0", "6c3;CapTie;#6;93;100.00;0", "6c4;CapTie;#6;34;86.94;0", "5c5;CapHairpin;#5;72;135.00;0", "5c6;CapHairpin;#5;60;113.00;0", "4c7;CapTransverse;#4;78;65.00;0", "5m1;PedestalLongitudinal;#5;36;137.00;0", "5n1;PedestalTransverse;#5;42;127.00;0", "5n2;PedestalHoop;#5;2;288.00;0" },
+        new (double s, double n)[] { (-9.01, 9.00), (-9.01, -9.01), (-9.01, -4.50), (-9.01, 4.50), (0.00, -9.01), (-4.50, -9.01), (4.49, -9.01), (9.00, -9.01), (0.00, 9.00), (-4.50, 9.00), (4.49, 9.00), (9.00, 9.00), (9.00, -4.50), (9.00, 4.50) }),
+    ["Pier 4WB"] = (
+        new string[] { "7f1;FootingMat;#7;30;254.00;1;1;1;0.00", "7f2;FootingMat;#7;44;170.00;1;2;0;0.00", "7f3;FootingSideVertical;#7;140;67.00;0;1;0;0.00", "7f4;FootingSideHorizontal;#7;20;268.00;0;1;1;0.00", "7f5;FootingSideHorizontal;#7;20;184.00;0;1;0;0.00", "8f6;UpliftAnchor;#8;24;60.00;0;1;0;0.00", "11g1;FootingMat;#11;48;300.00;0;1;1;23.00", "7g2;FootingMat;#7;44;196.00;0;2;0;13.00" },
+        new string[] { "11a1;CapTop;#11;22;471.00;0", "11a2;CapTop;#11;22;445.00;0", "6a3;CapSide;#6;20;401.00;0", "6a4;CapSide;#6;4;384.00;0", "6a5;CapSide;#6;2;661.00;0", "5a6;CapSide;#5;4;398.00;0", "5a7;CapSide;#5;2;358.00;0", "5a8;CapSide;#5;2;240.00;0", "5a9;CapSide;#5;2;411.00;0", "5a10;CapSide;#5;2;410.00;0", "5a11;CapSide;#5;2;44.00;0", "5a12;CapSide;#5;2;59.00;0", "5a13;CapEnd;#5;8;111.00;0", "5a14;CapEnd;#5;12;82.00;1", "11b1;CapBottom;#11;22;564.00;0", "6b2;CapCantilever;#6;12;133.00;0", "6c1;CapHoop;#6;142;270.00;0", "6c2;CapCantileverHoop;#6;68;244.03;0", "6c3;CapTie;#6;71;100.00;0", "6c4;CapTie;#6;34;86.94;0", "5c5;CapHairpin;#5;50;135.00;0", "5c6;CapHairpin;#5;46;113.00;0", "4c7;CapTransverse;#4;54;65.00;0", "5m1;PedestalLongitudinal;#5;36;127.00;0", "5n1;PedestalTransverse;#5;36;129.00;0", "5n2;PedestalHoop;#5;3;264.00;0" },
+        new (double s, double n)[] {  }),
+    ["Pier 5WB"] = (
+        new string[] { "7f1;FootingMat;#7;32;236.00;1;1;1;0.00", "7f2;FootingMat;#7;40;188.00;1;2;0;0.00", "7f3;FootingSideVertical;#7;136;61.00;0;1;0;0.00", "7f4;FootingSideHorizontal;#7;16;250.00;0;1;1;0.00", "7f5;FootingSideHorizontal;#7;16;202.00;0;1;0;0.00", "8f6;UpliftAnchor;#8;24;60.00;0;1;0;0.00", "10g1;FootingMat;#10;62;278.00;0;1;1;21.00", "10g2;FootingMat;#10;40;230.00;0;2;0;21.00" },
+        new string[] { "9a1;CapTop;#9;24;449.00;0", "9a2;CapTop;#9;24;429.00;0", "6a3;CapSide;#6;20;404.00;0", "6a4;CapSide;#6;4;390.00;0", "6a5;CapSide;#6;2;661.00;0", "5a6;CapSide;#5;4;399.00;0", "5a7;CapSide;#5;2;358.00;0", "5a8;CapSide;#5;2;240.00;0", "5a9;CapSide;#5;2;401.00;0", "5a10;CapSide;#5;2;414.00;0", "5a11;CapSide;#5;2;35.00;0", "5a12;CapSide;#5;2;58.00;0", "5a13;CapEnd;#5;8;135.00;0", "5a14;CapEnd;#5;9;82.00;1", "5a15;CapEnd;#5;9;87.00;1", "9b1;CapBottom;#9;28;564.00;0", "6b2;CapCantilever;#6;8;133.00;0", "6b3;CapCantilever;#6;8;120.00;0", "6c1;CapHoop;#6;110;300.00;0", "6c2;CapCantileverHoop;#6;48;273.97;0", "6c3;CapTie;#6;55;100.00;0", "6c4;CapTie;#6;24;86.88;0", "5c5;CapHairpin;#5;50;159.00;0", "5c6;CapHairpin;#5;46;137.00;0", "4c7;CapTransverse;#4;54;89.00;0", "5m1;PedestalLongitudinal;#5;48;121.00;0", "5n1;PedestalTransverse;#5;36;153.00;0", "5n2;PedestalHoop;#5;3;300.00;0" },
+        new (double s, double n)[] {  }),
+    ["Pier 6A"] = (
+        new string[] { "7f1;FootingMat;#7;29;236.00;1;1;1;0.00", "7f2;FootingMat;#7;27;344.00;1;2;0;0.00", "7f3;FootingSideVertical;#7;94;61.00;0;1;0;0.00", "7f4;FootingSideHorizontal;#7;8;250.00;0;1;1;0.00", "7f5;FootingSideHorizontal;#7;8;358.00;0;1;0;0.00", "8f6;UpliftAnchor;#8;24;60.00;0;1;0;0.00", "11g1;FootingMat;#11;39;282.00;0;1;1;23.00", "11g2;FootingMat;#11;39;390.00;0;2;0;23.00" },
+        new string[] { "10a1;CapTop;#10;14;660.00;0", "10a2;CapTop;#10;28;613.00;0", "8a3;CapSide;#8;12;621.00;0", "8a4;CapSide;#8;2;526.00;0", "8a5;CapSide;#8;2;424.00;0", "8a6;CapSide;#8;2;326.00;0", "8a7;CapSide;#8;2;229.00;0", "5a8;CapSide;#5;4;623.00;0", "5a9;CapSide;#5;2;348.00;0", "5a10;CapSide;#5;2;233.00;0", "5a11;CapSide;#5;2;634.00;0", "5a14;CapEnd;#5;10;135.00;0", "6a15;CapEnd;#6;7;90.00;1", "6a16;CapEnd;#6;7;93.00;1", "8b1;CapBottom;#8;8;635.00;0", "6c1;CapHoop;#6;32;332.00;0", "6c2;CapCantileverHoop;#6;124;292.00;0", "5c3;CapHairpin;#5;40;157.00;0", "5c4;CapHairpin;#5;40;171.00;0", "4c5;CapTransverse;#4;48;98.00;0", "5m1;PedestalLongitudinal;#5;40;112.00;0", "8m2;CapTop;#8;4;617.00;0", "5n1;PedestalTransverse;#5;50;104.00;0", "6n2;CapHairpin;#6;52;110.00;0" },
+        new (double s, double n)[] {  }),
+    ["Pier 6WB"] = (
+        new string[] { "7f1;FootingMat;#7;72;236.00;1;1;1;0.00", "7f2;FootingMat;#7;80;212.00;1;2;0;0.00", "7f3;FootingSideVertical;#7;288;67.00;0;1;0;0.00", "7f4;FootingSideHorizontal;#7;40;250.00;0;1;1;0.00", "7f5;FootingSideHorizontal;#7;40;226.00;0;1;0;0.00", "8f6;UpliftAnchor;#8;48;60.00;0;1;0;0.00", "10g1;FootingMat;#10;140;278.00;0;1;1;21.00", "10g2;FootingMat;#10;80;254.00;0;2;0;21.00" },
+        new string[] { "11a1;CapTop;#11;20;546.00;0", "11a2;CapTop;#11;40;519.00;0", "6a3;CapSide;#6;20;665.00;0", "6a4;CapSide;#6;4;650.00;0", "6a5;CapSide;#6;4;618.00;0", "5a6;CapSide;#5;4;662.00;0", "5a7;CapSide;#5;2;606.00;0", "5a8;CapSide;#5;2;408.00;0", "5a9;CapSide;#5;2;672.00;0", "5a10;CapSide;#5;2;674.00;0", "5a11;CapSide;#5;2;76.00;0", "5a12;CapSide;#5;2;104.00;0", "5a13;CapEnd;#5;8;111.00;0", "5a14;CapEnd;#5;12;82.00;1", "11b1;CapBottom;#11;48;433.00;0", "6b2;CapCantilever;#6;12;132.00;0", "6c1;CapHoop;#6;186;270.00;0", "6c2;CapCantileverHoop;#6;68;244.03;0", "6c3;CapTie;#6;93;100.00;0", "6c4;CapTie;#6;34;86.94;0", "5c5;CapHairpin;#5;86;135.00;0", "5c6;CapHairpin;#5;76;113.00;0", "4c7;CapTransverse;#4;98;65.00;0", "5m1;PedestalLongitudinal;#5;66;127.00;0", "5n1;PedestalTransverse;#5;66;129.00;0", "5n2;PedestalHoop;#5;4;264.00;0" },
+        new (double s, double n)[] {  }),
+    ["Pier 7WB"] = (
+        new string[] { "7f1;FootingMat;#7;117;344.00;1;1;1;0.00", "7f2;FootingMat;#7;87;236.00;1;2;0;0.00", "7f3;FootingSideVertical;#7;282;79.00;0;1;0;0.00", "7f4;FootingSideHorizontal;#7;36;358.00;0;1;1;0.00", "7f5;FootingSideHorizontal;#7;36;250.00;0;1;0;0.00", "8f6;UpliftAnchor;#8;90;60.00;0;1;0;0.00", "11g1;FootingMat;#11;117;390.00;0;1;1;23.00", "11g2;FootingMat;#11;87;282.00;0;2;0;23.00" },
+        new string[] { "11a1;CapTop;#11;22;493.00;0", "11a2;CapTop;#11;44;468.00;0", "6a3;CapSide;#6;20;587.00;0", "6a4;CapSide;#6;4;572.00;0", "6a5;CapSide;#6;4;540.00;0", "5a6;CapSide;#5;4;585.00;0", "5a7;CapSide;#5;2;533.00;0", "5a8;CapSide;#5;2;359.00;0", "5a9;CapSide;#5;2;593.00;0", "5a10;CapSide;#5;2;596.00;0", "5a11;CapSide;#5;2;69.00;0", "5a12;CapSide;#5;2;91.00;0", "5a13;CapEnd;#5;8;111.00;0", "5a14;CapEnd;#5;12;82.00;1", "11b1;CapBottom;#11;44;521.00;0", "6b2;CapCantilever;#6;12;131.00;0", "6c1;CapHoop;#6;222;270.00;0", "6c2;CapCantileverHoop;#6;68;244.03;0", "6c3;CapTie;#6;111;100.00;0", "6c4;CapTie;#6;34;86.94;0", "5c5;CapHairpin;#5;78;135.00;0", "5c6;CapHairpin;#5;64;113.00;0", "4c7;CapTransverse;#4;86;65.00;0", "5m1;PedestalLongitudinal;#5;60;125.00;0", "5n1;PedestalTransverse;#5;70;118.00;0" },
+        new (double s, double n)[] {  }),
+    ["Pier 8WB"] = (
+        new string[] { "7f1;FootingMat;#7;88;170.00;1;1;1;0.00", "7f2;FootingMat;#7;60;254.00;1;2;0;0.00", "7f3;FootingSideVertical;#7;280;67.00;0;1;0;0.00", "7f4;FootingSideHorizontal;#7;40;184.00;0;1;1;0.00", "7f5;FootingSideHorizontal;#7;40;268.00;0;1;0;0.00", "8f6;UpliftAnchor;#8;144;60.00;0;1;0;0.00", "10g1;FootingMat;#10;88;212.00;0;1;1;21.00", "10g2;FootingMat;#10;88;296.00;0;2;0;21.00" },
+        new string[] { "11a1;CapTop;#11;18;577.00;0", "11a2;CapTop;#11;36;552.00;0", "6a3;CapSide;#6;20;713.00;0", "6a4;CapSide;#6;4;698.00;0", "6a5;CapSide;#6;4;666.00;0", "5a6;CapSide;#5;4;711.00;0", "5a7;CapSide;#5;2;650.00;0", "5a8;CapSide;#5;2;439.00;0", "5a9;CapSide;#5;2;720.00;0", "5a10;CapSide;#5;2;720.00;0", "5a11;CapSide;#5;2;82.00;0", "5a12;CapSide;#5;2;110.00;0", "5a13;CapEnd;#5;8;111.00;0", "5a14;CapEnd;#5;12;82.00;1", "11b1;CapBottom;#11;60;465.00;0", "6b2;CapCantilever;#6;12;131.00;0", "6c1;CapHoop;#6;282;276.00;0", "6c2;CapCantileverHoop;#6;68;250.02;0", "6c3;CapTie;#6;141;100.00;0", "6c4;CapTie;#6;34;86.94;0", "5c5;CapHairpin;#5;94;135.00;0", "5c6;CapHairpin;#5;80;113.00;0", "4c7;CapTransverse;#4;106;65.00;0", "5m1;PedestalLongitudinal;#5;54;116.00;0", "5n1;PedestalTransverse;#5;54;118.00;0" },
+        new (double s, double n)[] { (-8.75, -5.25), (-8.75, 5.25), (8.75, -5.25), (8.75, 5.25), (-5.25, -5.25), (-5.25, 5.25), (-1.75, -5.25), (-1.75, 5.25), (1.75, -5.25), (1.75, 5.25), (5.25, -5.25), (5.25, 5.25) }),
+    ["Pier 9WB"] = (
+        new string[] { "7f1;FootingMat;#7;78;206.00;1;1;1;0.00", "7f2;FootingMat;#7;69;308.00;1;2;0;0.00", "8f6;UpliftAnchor;#8;72;60.00;0;1;0;0.00", "11g1;FootingMat;#11;78;254.00;0;1;1;24.00", "11g2;FootingMat;#11;69;356.00;0;2;0;24.00" },
+        new string[] { "11a1;CapTop;#11;18;510.00;0", "11a2;CapTop;#11;36;484.00;0", "6a3;CapSide;#6;20;611.00;0", "6a4;CapSide;#6;4;596.00;0", "6a5;CapSide;#6;4;564.00;0", "5a6;CapSide;#5;4;609.00;0", "5a7;CapSide;#5;2;556.00;0", "5a8;CapSide;#5;2;374.00;0", "5a9;CapSide;#5;2;617.00;0", "5a10;CapSide;#5;2;621.00;0", "5a11;CapSide;#5;2;69.00;0", "5a12;CapSide;#5;2;95.00;0", "5a13;CapEnd;#5;8;111.00;0", "5a14;CapEnd;#5;12;82.00;1", "11b1;CapBottom;#11;32;545.00;0", "6b2;CapCantilever;#6;12;130.00;0", "6c1;CapHoop;#6;178;276.00;0", "6c2;CapCantileverHoop;#6;52;249.97;0", "6c3;CapTie;#6;89;100.00;0", "6c4;CapTie;#6;26;86.96;0", "5c5;CapHairpin;#5;78;135.00;0", "5c6;CapHairpin;#5;70;113.00;0", "4c7;CapTransverse;#4;90;65.00;0", "5m1;PedestalLongitudinal;#5;48;114.00;0", "5n1;PedestalTransverse;#5;48;116.00;0" },
+        new (double s, double n)[] {  }),
+    ["Pier 10WB"] = (
+        new string[] { "7f1;FootingMat;#7;78;206.00;1;1;1;0.00", "7f2;FootingMat;#7;69;308.00;1;2;0;0.00", "8f6;UpliftAnchor;#8;72;60.00;0;1;0;0.00", "11g1;FootingMat;#11;78;254.00;0;1;1;24.00", "11g2;FootingMat;#11;69;356.00;0;2;0;24.00" },
+        new string[] { "11a1;CapTop;#11;18;478.00;0", "11a2;CapTop;#11;36;452.00;0", "6a3;CapSide;#6;20;563.00;0", "6a4;CapSide;#6;4;547.00;0", "6a5;CapSide;#6;4;515.00;0", "5a6;CapSide;#5;4;561.00;0", "5a7;CapSide;#5;2;510.00;0", "5a8;CapSide;#5;2;344.00;0", "5a9;CapSide;#5;2;569.00;0", "5a10;CapSide;#5;2;574.00;0", "5a11;CapSide;#5;2;63.00;0", "5a12;CapSide;#5;2;86.00;0", "5a13;CapEnd;#5;8;111.00;0", "5a14;CapEnd;#5;12;82.00;1", "11b1;CapBottom;#11;32;497.00;0", "6b2;CapCantilever;#6;12;130.00;0", "6c1;CapHoop;#6;158;276.00;0", "6c2;CapCantileverHoop;#6;52;249.05;0", "6c3;CapTie;#6;79;100.00;0", "6c4;CapTie;#6;26;86.35;0", "5c5;CapHairpin;#5;72;135.00;0", "5c6;CapHairpin;#5;64;113.00;0", "4c7;CapTransverse;#4;82;65.00;0", "5m1;PedestalLongitudinal;#5;42;114.00;0", "5n1;PedestalTransverse;#5;42;116.00;0" },
+        new (double s, double n)[] {  }),
+    ["Pier 11WB"] = (
+        new string[] { "7f1;FootingMat;#7;80;212.00;1;1;0;0.00", "7f2;FootingMat;#7;28;171.93;1;2;0;0.00", "7f3;FootingSideVertical;#7;196;73.00;0;1;0;0.00", "7f4;FootingSideVertical;#7;40;226.00;0;1;0;0.00", "7f5;FootingSideVertical;#7;10;146.00;0;1;0;0.00", "8f6;UpliftAnchor;#8;30;60.00;0;1;0;0.00", "7f7;FootingSideVertical;#7;10;127.00;0;1;0;0.00", "7f8;FootingSideVertical;#7;10;146.00;0;1;0;0.00", "10g1;FootingMat;#10;94;254.00;0;1;0;21.00", "10g2;FootingMat;#10;32;214.04;0;2;0;1.02" },
+        new string[] { "9a1;CapTop;#9;22;583.00;0", "9a2;CapTop;#9;22;562.00;0", "6a3;CapSide;#6;20;538.00;0", "6a4;CapSide;#6;4;526.00;0", "6a5;CapSide;#6;4;498.00;0", "5a6;CapSide;#5;4;531.00;0", "5a7;CapSide;#5;2;483.00;0", "5a8;CapSide;#5;2;325.00;0", "5a9;CapSide;#5;2;540.00;0", "5a10;CapSide;#5;2;544.00;0", "5a11;CapSide;#5;2;59.00;0", "5a12;CapSide;#5;2;81.00;0", "5a13;CapEnd;#5;8;135.00;0", "5a14;CapEnd;#5;18;82.00;1", "9b1;CapBottom;#9;56;477.00;0", "6b2;CapCantilever;#6;16;118.00;0", "6c1;CapHoop;#6;138;310.00;0", "6c2;CapCantileverHoop;#6;32;285.12;0", "6c3;CapTie;#6;69;100.00;0", "6c4;CapTie;#6;16;87.38;0", "5c5;CapHairpin;#5;72;159.00;0", "5c6;CapHairpin;#5;58;137.00;0", "4c7;CapTransverse;#4;78;89.00;0", "5m1;PedestalLongitudinal;#5;56;108.00;0", "8m2;CapTop;#8;8;551.00;0", "6m3;CapTop;#6;4;534.00;0", "5n1;PedestalTransverse;#5;42;95.00;0", "5n2;PedestalTransverse;#5;42;93.00;0", "6n3;CapTie;#6;85;127.00;0" },
+        new (double s, double n)[] { (-69.50, -7.50), (-54.50, -7.50), (-69.50, 7.50), (-29.00, 7.50), (-14.00, 7.50), (-14.00, -7.50), (-7.50, -7.50), (7.50, -7.50), (7.50, 7.50), (-7.50, 7.50) }),
+    ["Pier 12WB"] = (
+        new string[] { "7f1;FootingMat;#7;64;242.00;1;1;1;0.00", "7f2;FootingMat;#7;84;188.00;1;2;0;0.00", "7f3;FootingSideVertical;#7;280;61.00;0;1;0;0.00", "7f4;FootingSideHorizontal;#7;32;256.00;0;1;1;0.00", "7f5;FootingSideHorizontal;#7;32;202.00;0;1;0;0.00", "8f6;UpliftAnchor;#8;48;60.00;0;1;0;0.00", "11g1;FootingMat;#11;84;288.00;0;1;1;23.00", "7g2;FootingMat;#7;84;214.00;0;2;0;13.00" },
+        new string[] { "10a1;CapTop;#10;18;546.00;0", "10a2;CapTop;#10;36;523.00;0", "6a3;CapSide;#6;20;696.00;0", "6a4;CapSide;#6;4;680.00;0", "6a5;CapSide;#6;4;648.00;0", "5a6;CapSide;#5;4;693.00;0", "5a7;CapSide;#5;2;635.00;0", "5a8;CapSide;#5;2;428.00;0", "5a9;CapSide;#5;2;701.00;0", "5a10;CapSide;#5;2;706.00;0", "5a11;CapSide;#5;2;80.00;0", "5a12;CapSide;#5;2;109.00;0", "5a13;CapEnd;#5;8;111.00;0", "5a14;CapEnd;#5;12;82.00;1", "10b1;CapBottom;#10;48;441.00;0", "6b2;CapCantilever;#6;12;129.00;0", "6c1;CapHoop;#6;218;276.00;0", "6c2;CapCantileverHoop;#6;68;250.02;0", "6c3;CapTie;#6;109;100.00;0", "6c4;CapTie;#6;34;86.94;0", "5c5;CapHairpin;#5;92;135.00;0", "5c6;CapHairpin;#5;78;113.00;0", "4c7;CapTransverse;#4;102;65.00;0", "5m1;PedestalLongitudinal;#5;60;114.00;0", "5n1;PedestalTransverse;#5;60;116.00;0" },
+        new (double s, double n)[] { (-6.00, -8.25), (-6.00, 8.25), (6.00, -8.25), (6.00, 8.25) }),
+    ["Pier 13WB"] = (
+        new string[] { "7f1;FootingMat;#7;123;356.00;1;1;1;0.00", "7f2;FootingMat;#7;90;284.00;1;2;0;0.00", "7f3;FootingSideVertical;#7;312;67.00;0;1;0;0.00", "7f4;FootingSideHorizontal;#7;30;370.00;0;1;1;0.00", "7f5;FootingSideHorizontal;#7;30;298.00;0;1;0;0.00", "8f6;UpliftAnchor;#8;36;60.00;0;1;0;0.00", "11g1;FootingMat;#11;123;402.00;0;1;1;23.00", "11g2;FootingMat;#11;90;330.00;0;2;0;23.00" },
+        new string[] { "11a1;CapTop;#11;18;490.00;0", "11a2;CapTop;#11;36;464.00;0", "6a3;CapSide;#6;20;582.00;0", "6a4;CapSide;#6;4;566.00;0", "6a5;CapSide;#6;4;534.00;0", "5a6;CapSide;#5;4;579.00;0", "5a7;CapSide;#5;2;528.00;0", "5a8;CapSide;#5;2;356.00;0", "5a9;CapSide;#5;2;587.00;0", "5a10;CapSide;#5;2;592.00;0", "5a11;CapSide;#5;2;65.00;0", "5a12;CapSide;#5;2;90.00;0", "5a13;CapEnd;#5;8;111.00;0", "5a14;CapEnd;#5;12;82.00;1", "11b1;CapBottom;#11;36;515.00;0", "6b2;CapCantilever;#6;12;129.00;0", "6c1;CapHoop;#6;170;276.00;0", "6c2;CapCantileverHoop;#6;36;247.89;0", "6c3;CapTie;#6;85;100.00;0", "6c4;CapTie;#6;18;86.11;0", "5c5;CapHairpin;#5;78;135.00;0", "5c6;CapHairpin;#5;64;113.00;0", "4c7;CapTransverse;#4;84;65.00;0", "5m1;PedestalLongitudinal;#5;54;114.00;0", "5n1;PedestalTransverse;#5;54;116.00;0" },
+        new (double s, double n)[] {  }),
+    ["Pier 14WB"] = (
+        new string[] { "7f1;FootingMat;#7;57;242.00;1;1;1;0.00", "7f2;FootingMat;#7;63;224.00;1;2;0;0.00", "8f6;UpliftAnchor;#8;36;60.00;0;1;0;0.00", "10g1;FootingMat;#10;75;286.00;0;1;1;22.00", "10g2;FootingMat;#10;63;268.00;0;2;0;22.00" },
+        new string[] { "10a1;CapTop;#10;18;434.00;0", "10a2;CapTop;#10;36;411.00;0", "6a3;CapSide;#6;20;528.00;0", "6a4;CapSide;#6;4;511.00;0", "6a5;CapSide;#6;4;479.00;0", "5a6;CapSide;#5;4;525.00;0", "5a7;CapSide;#5;2;477.00;0", "5a8;CapSide;#5;2;321.00;0", "5a9;CapSide;#5;2;534.00;0", "5a10;CapSide;#5;2;539.00;0", "5a11;CapSide;#5;2;58.00;0", "5a12;CapSide;#5;2;80.00;0", "5a13;CapEnd;#5;8;111.00;0", "5a14;CapEnd;#5;12;82.00;1", "10b1;CapBottom;#10;36;452.00;0", "6b2;CapCantilever;#6;12;129.00;0", "6c1;CapHoop;#6;138;276.00;0", "6c2;CapCantileverHoop;#6;40;248.07;0", "6c3;CapTie;#6;69;100.00;0", "6c4;CapTie;#6;20;85.89;0", "5c5;CapHairpin;#5;70;135.00;0", "5c6;CapHairpin;#5;58;113.00;0", "4c7;CapTransverse;#4;74;65.00;0", "5m1;PedestalLongitudinal;#5;48;114.00;0", "5n1;PedestalTransverse;#5;48;116.00;0" },
+        new (double s, double n)[] { (7.51, -8.26), (-7.49, 8.23) }),
+    ["Pier 15WB"] = (
+        new string[] { "7f1;FootingMat;#7;57;242.00;1;1;1;0.00", "7f2;FootingMat;#7;63;224.00;1;2;0;0.00", "8f6;UpliftAnchor;#8;36;60.00;0;1;0;0.00", "10g1;FootingMat;#10;75;286.00;0;1;1;22.00", "10g2;FootingMat;#10;63;268.00;0;2;0;22.00" },
+        new string[] { "10a1;CapTop;#10;18;426.00;0", "10a2;CapTop;#10;36;403.00;0", "6a3;CapSide;#6;20;516.00;0", "6a4;CapSide;#6;4;499.00;0", "6a5;CapSide;#6;4;467.00;0", "5a6;CapSide;#5;4;513.00;0", "5a7;CapSide;#5;2;466.00;0", "5a8;CapSide;#5;2;314.00;0", "5a9;CapSide;#5;2;521.00;0", "5a10;CapSide;#5;2;527.00;0", "5a11;CapSide;#5;2;56.00;0", "5a12;CapSide;#5;2;78.00;0", "5a13;CapEnd;#5;8;111.00;0", "5a14;CapEnd;#5;12;82.00;1", "10b1;CapBottom;#10;36;440.00;0", "6b2;CapCantilever;#6;12;129.00;0", "6c1;CapHoop;#6;134;276.00;0", "6c2;CapCantileverHoop;#6;40;248.07;0", "6c3;CapTie;#6;67;100.00;0", "6c4;CapTie;#6;20;85.89;0", "5c5;CapHairpin;#5;68;135.00;0", "5c6;CapHairpin;#5;56;113.00;0", "4c7;CapTransverse;#4;74;65.00;0", "5m1;PedestalLongitudinal;#5;48;114.00;0", "5n1;PedestalTransverse;#5;48;116.00;0" },
+        new (double s, double n)[] { (7.50, -8.25), (-7.48, 8.23) }),
+};
+
+double In_(double v) => In(v);
+int done = 0, perimeterRule = 0;
+foreach (var b in Doc.Project.Bridges)
+    foreach (var sup in b.Supports.Concat(b.AuxiliarySupports))
+    {
+        var sd = sup.Substructure;
+        if (sd == null || sd.CapProfile == null || sd.CapProfile.Count < 3 || !P.TryGetValue(sup.Name, out var d)) continue;
+        int nf = Math.Max(1, sd.Footings.Count);
+        // ---- cap
+        sd.Reinforcement.CapBars = d.cap.Select(line =>
+        {
+            var t = line.Split(';');
+            return new PlanBarGroup
+            {
+                Mark = t[0], Kind = Enum.Parse<PlanBarKind>(t[1]), Size = t[2], Count = int.Parse(t[3]), Length = In_(double.Parse(t[4])), Vertical = t[5] == "1",
+            };
+        }).ToList();
+        // ---- footings
+        for (int k = 0; k < sd.Footings.Count; k++)
+        {
+            var fd = sd.Footings[k];
+            fd.Bars = new();
+            foreach (var line in d.foot)
+            {
+                var t = line.Split(';');
+                int total = int.Parse(t[3]);
+                int cnt = (int)Math.Round(total * (k + 1.0) / nf) - (int)Math.Round(total * (double)k / nf);
+                if (cnt <= 0) continue;
+                fd.Bars.Add(new PlanBarGroup
+                {
+                    Mark = t[0], Kind = Enum.Parse<PlanBarKind>(t[1]), Size = t[2], Count = cnt, Length = In_(double.Parse(t[4])),
+                    Top = t[5] == "1", Order = int.Parse(t[6]), AlongN = t[7] == "1", HookExtra = In_(double.Parse(t[8])),
+                });
+            }
+            // circled piles
+            var up = fd.Bars.FirstOrDefault(g => g.Kind == PlanBarKind.UpliftAnchor);
+            fd.UpliftPiles = new();
+            if (up != null && fd.Piles.Count > 0)
+            {
+                int want = (up.Count + fd.UpliftBarsPerPile - 1) / fd.UpliftBarsPerPile;
+                var mapped = d.rings.Select(r => Enumerable.Range(0, fd.Piles.Count).OrderBy(i => Math.Pow(fd.Piles[i].S - Ft(r.s), 2) + Math.Pow(fd.Piles[i].N - Ft(r.n), 2)).First()).Distinct().ToList();
+                if (mapped.Count == want) fd.UpliftPiles = mapped;
+                else
+                {
+                    double hs = fd.Piles.Max(p => Math.Abs(p.S)), hn = fd.Piles.Max(p => Math.Abs(p.N));
+                    fd.UpliftPiles = Enumerable.Range(0, fd.Piles.Count).OrderByDescending(i => Math.Max(Math.Abs(fd.Piles[i].S) / hs, Math.Abs(fd.Piles[i].N) / hn)).ThenBy(i => i).Take(want).ToList();
+                    perimeterRule++;
+                    Print($"  {sup.Name} footing {fd.Column}: {mapped.Count} circled piles read from the sheet, {want} needed -> perimeter rule");
+                }
+            }
+        }
+        done++;
+    }
+Print($"{done} piers given plan footing / cap reinforcing ({perimeterRule} footings use the perimeter rule for the circled piles).");
+var res = Doc.Regenerate();
+Print($"regenerated {res.Bridges} bridges in {res.Elapsed.TotalSeconds:F1} s, {res.Errors.Count} errors.");
+foreach (var e in res.Errors) Print("  ERROR " + e);
+Doc.Save();
