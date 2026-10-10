@@ -532,7 +532,7 @@
           },
           {
             "Station": 231388.91999999963,
-            "Elevation": 312.1830687999952,
+            "Elevation": 312.18306879999574,
             "LengthIn": 0,
             "LengthOut": 0
           },
@@ -1245,31 +1245,171 @@
             "LeftMoreBreaks": [
               {
                 "Distance": 7.315200000000001,
-                "Slope": -0.0109
+                "Slope": -0.010492221634172476
               },
               {
                 "Distance": 8.436864,
-                "Slope": -0.034
+                "Slope": -0.034827395215586796
               }
             ],
             "RightMoreBreaks": null
           },
           {
-            "Station": 231388.34392800002,
+            "Station": 231376.728,
             "LeftSlope": -0.02,
             "RightSlope": -0.02,
             "LeftBreak": 3.6576000000000004,
-            "LeftOuterSlope": -0.029815609756098767,
-            "RightBreak": 0,
-            "RightOuterSlope": "NaN",
+            "LeftOuterSlope": -0.026097560975606348,
+            "RightBreak": 3.6576000000000004,
+            "RightOuterSlope": -0.02371829724673302,
             "LeftMoreBreaks": [
               {
                 "Distance": 7.315200000000001,
-                "Slope": -0.029165533980588867
+                "Slope": -0.010853407267381212
               },
               {
                 "Distance": 8.436864,
-                "Slope": -0.034
+                "Slope": -0.03448582063327453
+              }
+            ],
+            "RightMoreBreaks": null
+          },
+          {
+            "Station": 231378.252,
+            "LeftSlope": -0.02,
+            "RightSlope": -0.02,
+            "LeftBreak": 3.6576000000000004,
+            "LeftOuterSlope": -0.02658536585365672,
+            "RightBreak": 3.6576000000000004,
+            "RightOuterSlope": -0.02323045977012051,
+            "LeftMoreBreaks": [
+              {
+                "Distance": 7.315200000000001,
+                "Slope": -0.012824296508562798
+              },
+              {
+                "Distance": 8.436864,
+                "Slope": -0.03398703846802058
+              }
+            ],
+            "RightMoreBreaks": null
+          },
+          {
+            "Station": 231379.776,
+            "LeftSlope": -0.02,
+            "RightSlope": -0.02,
+            "LeftBreak": 3.6576000000000004,
+            "LeftOuterSlope": -0.02707317073170709,
+            "RightBreak": 3.6576000000000004,
+            "RightOuterSlope": -0.022742622293508007,
+            "LeftMoreBreaks": [
+              {
+                "Distance": 7.315200000000001,
+                "Slope": -0.014638100739593147
+              },
+              {
+                "Distance": 8.436864,
+                "Slope": -0.03348780888107591
+              }
+            ],
+            "RightMoreBreaks": null
+          },
+          {
+            "Station": 231381.30000000002,
+            "LeftSlope": -0.02,
+            "RightSlope": -0.02,
+            "LeftBreak": 3.6576000000000004,
+            "LeftOuterSlope": -0.02756097560975746,
+            "RightBreak": 3.6576000000000004,
+            "RightOuterSlope": -0.0222547848168955,
+            "LeftMoreBreaks": [
+              {
+                "Distance": 7.315200000000001,
+                "Slope": -0.016298115085356318
+              },
+              {
+                "Distance": 8.436864,
+                "Slope": -0.0329881397516535
+              }
+            ],
+            "RightMoreBreaks": null
+          },
+          {
+            "Station": 231382.82400000002,
+            "LeftSlope": -0.02,
+            "RightSlope": -0.02,
+            "LeftBreak": 3.6576000000000004,
+            "LeftOuterSlope": -0.02804878048780783,
+            "RightBreak": 3.6576000000000004,
+            "RightOuterSlope": -0.02176694734028299,
+            "LeftMoreBreaks": [
+              {
+                "Distance": 7.315200000000001,
+                "Slope": -0.018028080912125193
+              },
+              {
+                "Distance": 8.436864,
+                "Slope": -0.03248804289744646
+              }
+            ],
+            "RightMoreBreaks": null
+          },
+          {
+            "Station": 231384.348,
+            "LeftSlope": -0.02,
+            "RightSlope": -0.02,
+            "LeftBreak": 3.6576000000000004,
+            "LeftOuterSlope": -0.02853658536584889,
+            "RightBreak": 3.6576000000000004,
+            "RightOuterSlope": -0.0212791098636798,
+            "LeftMoreBreaks": [
+              {
+                "Distance": 7.315200000000001,
+                "Slope": -0.019610795803785046
+              },
+              {
+                "Distance": 8.436864,
+                "Slope": -0.03198752887377524
+              }
+            ],
+            "RightMoreBreaks": null
+          },
+          {
+            "Station": 231385.872,
+            "LeftSlope": -0.02,
+            "RightSlope": -0.02,
+            "LeftBreak": 3.6576000000000004,
+            "LeftOuterSlope": -0.02902439024389926,
+            "RightBreak": 3.6576000000000004,
+            "RightOuterSlope": -0.020791272387067294,
+            "LeftMoreBreaks": [
+              {
+                "Distance": 7.315200000000001,
+                "Slope": -0.021049537234226225
+              },
+              {
+                "Distance": 8.436864,
+                "Slope": -0.03148660859750951
+              }
+            ],
+            "RightMoreBreaks": null
+          },
+          {
+            "Station": 231387.396,
+            "LeftSlope": -0.02,
+            "RightSlope": -0.02,
+            "LeftBreak": 3.6576000000000004,
+            "LeftOuterSlope": -0.02951219512194963,
+            "RightBreak": 3.6576000000000004,
+            "RightOuterSlope": -0.020303434910454787,
+            "LeftMoreBreaks": [
+              {
+                "Distance": 7.315200000000001,
+                "Slope": -0.022347578944888986
+              },
+              {
+                "Distance": 8.436864,
+                "Slope": -0.030985293874614128
               }
             ],
             "RightMoreBreaks": null

@@ -50,9 +50,8 @@ Use this to start the next session. Architecture notes are in `CLAUDE.md`. The u
   fix NOT applied — CLAUDE.md TODO); not tested on the I-80 model or in plan mode; SbmApp wrappers + docs/API.md entry
   missing; index built twice at startup; leftover `--snapdump` debug block in MainWindow.Measure.cs.
 - **I-80 elevations** (`docs\plan-data\i80-elevation-investigation.md`): ✅ 2WB bottom flange PL 2 1/2 x 34 (applied,
-  2WB now ±0.1"); ✅ check-top-of-slab 6A girder A typo 1021.52 (fixed). OPEN: (3) gore 6A→7591+50 slope must vary
-  LINEARLY 3.4%→3.0% (sheet 190 note), cross-slope-i80.csx steps it → up to −2" on A-E; linear fix leaves +0.5" at A/6A
-  (Ramp A2 grade / transition reference / north edge?). (4) North girders (U2 A-C, U3 A-B) follow their own plan RADII
+  2WB now ±0.1"); ✅ check-top-of-slab 6A girder A typo 1021.52 (fixed). ✅ (3) gore 6A→7591+50 modeled from the Ramp A2 PGL geometry
+  (investigation doc, "D3 resolved"): A-E top of slab within 0.18". OPEN: (4) North girders (U2 A-C, U3 A-B) follow their own plan RADII
   (e.g. U2 A 1749'-6, C 8000'-0; U3 A 2268'-5 / 1318'-5) — model uses offset curves → 1-2" mid-span; needs an explicit
   girder-geometry input + plan pier offsets. (5) ~−0.05" bias U2 east / U3, −0.13" girder H 7WB-8WB unexplained.
 - **piles-capstep-dowels.md:** batter complete (1:4 outward normal to the footing edge; Ramp G corners 45°; 11G 1:6;
