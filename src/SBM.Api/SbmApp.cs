@@ -97,6 +97,17 @@ public sealed class SbmApp : IDisposable
     public string RunScript(string file, params string[] args) => Send("run", new[] { Path.GetFullPath(file) }.Concat(args).ToArray());
     public string Snapshot(string png) => Send("snapshot", Path.GetFullPath(png));
     public string View(string mode) => Send("view", mode);
+    /// <summary>
+    /// Distance (two points) or angle (three points, vertex in the middle) between points given as "E,N[,Z]" in the project's coordinate
+    /// units (ft for US projects, m for SI; unit suffixes accepted). Returns the formatted record (3D / horizontal / slope distance, station and
+    /// offset of each point). <paramref name="alignment"/> names the alignment for stations (default: nearest).
+    /// </summary>
+    public string Measure(string pointA, string pointB, string? pointC = null, string? alignment = null) =>
+        Send("measure", new[] { pointA, pointB }.Concat(pointC != null ? new[] { pointC } : Array.Empty<string>())
+            .Concat(alignment != null ? new[] { "alignment=" + alignment } : Array.Empty<string>()).ToArray());
+    /// <summary>Station, offset and elevations (profile, ground, cross-slope grade) at a point "E,N[,Z]".</summary>
+    public string StationOffset(string point, string? alignment = null) =>
+        Send("station-offset", alignment != null ? new[] { point, "alignment=" + alignment } : new[] { point });
     public string Messages(int count = 20) => Send("messages", count.ToString());
     /// <summary>Closes the app. Unsaved changes: error unless <paramref name="save"/> or <paramref name="discard"/>.</summary>
     public string Close(bool save = false, bool discard = false) => Send("close", save ? "--save" : discard ? "--discard" : "");

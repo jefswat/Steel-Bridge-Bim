@@ -153,7 +153,7 @@ public partial class MainWindow : Window
                     }, System.Windows.Threading.DispatcherPriority.ApplicationIdle);
                 }
                 RunMeasureSnapshot(args);
-                var t2 = new System.Windows.Threading.DispatcherTimer { Interval = TimeSpan.FromSeconds(threeD ? 1.5 : 0.1) };
+                var t2 = new System.Windows.Threading.DispatcherTimer { Interval = TimeSpan.FromSeconds(threeD ? 1.5 : args.Any(x => x is "--measure" or "--query" or "--snapbench") ? 1.5 : 0.1) };
                 t2.Tick += (_, _) =>
                 {
                     t2.Stop();

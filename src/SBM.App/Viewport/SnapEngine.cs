@@ -100,7 +100,9 @@ public sealed class SnapHit
 public sealed class SnapStats
 {
     public int Leaves, Triangles, Candidates, OcclusionTests;
-    public double Ms;
+    public double Ms, TravMs, OccMs, ExtraMs;
+    /// <summary>The traversal hit its time budget and returned the best candidate found so far.</summary>
+    public bool Truncated;
 }
 
 /// <summary>
@@ -313,6 +315,10 @@ public sealed class SnapIndex
         public float Depth;
         public bool CheckOcclusion;
         public SnapSource? Src;
+        /// <summary>Edge candidates are verified as feature edges only when they reach the ranking (the check scans neighbours).</summary>
+        public Leaf? EdgeLeaf;
+        public int EdgeTri;
+        public Vector3 E0, E1;
     }
 
     private sealed class Ctx
@@ -321,7 +327,14 @@ public sealed class SnapIndex
         public required SnapEnvironment Env;
         public SnapStats Stats = new();
         public Vector3 InvDir;
-        public float Radius, R2;
+        public float Radius, R2, R0, R02;
+        /// <summary>Scores of the best <see cref="KBest"/> candidates so far (ascending); Threshold = the K-th.</summary>
+        public readonly float[] Best = new float[KBest];
+        public int BestCount;
+        public float Threshold = float.MaxValue;
+        public long Deadline;
+        public bool Stop;
+        public int LeafTicks;
         public List<Cand> Cands = new();
         public HashSet<(int, int, int)> Seen = new();
         public byte[] SrcVis = Array.Empty<byte>(), LineVis = Array.Empty<byte>();
@@ -332,6 +345,37 @@ public sealed class SnapIndex
         public readonly List<(Vector3 a, Vector3 b, float depthA, object? tag, string layer)> InterSegs = new();
         public readonly HashSet<object> Touched = new();
     }
+
+    /// <summary>Candidates kept for ranking; the occlusion pass looks at no more than 24 of them.</summary>
+    private const int KBest = 10;
+    private const float MaxBonus = 9f;
+    /// <summary>Time budget of one query's traversal (ms); the best candidate found by then is used.</summary>
+    private const double BudgetMs = 4;
+
+    /// <summary>
+    /// Records a candidate score and shrinks the search radius: once <see cref="KBest"/> candidates are known, anything farther
+    /// than (K-th best score + the largest mode bonus) pixels from the ray cannot reach the top K, so boxes and triangles
+    /// beyond that radius are skipped. The result is identical to an exhaustive search.
+    /// </summary>
+    private static void Note(Ctx cx, float score)
+    {
+        int n = cx.BestCount;
+        if (n == KBest && score >= cx.Best[KBest - 1]) return;
+        int i = n < KBest ? n : KBest - 1;
+        while (i > 0 && cx.Best[i - 1] > score) { cx.Best[i] = cx.Best[i - 1]; i--; }
+        cx.Best[i] = score;
+        if (n < KBest) cx.BestCount++;
+        if (cx.BestCount == KBest)
+        {
+            cx.Threshold = cx.Best[KBest - 1];
+            float r = (cx.Threshold + MaxBonus) * cx.Req.PixelSize;
+            if (r < cx.Radius) { cx.Radius = Math.Max(r, 0); cx.R2 = cx.Radius * cx.Radius; }
+        }
+    }
+
+    /// <summary>Could a candidate of this kind at squared distance <paramref name="d2"/> still enter the top K?</summary>
+    private static bool Worth(Ctx cx, SnapKind kind, float d2) =>
+        d2 <= cx.R2 && MathF.Sqrt(d2) / cx.Req.PixelSize - Bonus(kind) < cx.Threshold;
 
     private static float Bonus(SnapKind k) => k switch
     {
@@ -348,18 +392,10 @@ public sealed class SnapIndex
         cx.InvDir = SnapMath.Reciprocal(req.Dir);
         cx.Radius = req.TolerancePx * req.PixelSize;
         cx.R2 = cx.Radius * cx.Radius;
+        cx.R0 = cx.Radius; cx.R02 = cx.R2;
+        cx.Deadline = System.Diagnostics.Stopwatch.GetTimestamp() + (long)(BudgetMs * System.Diagnostics.Stopwatch.Frequency / 1000);
         cx.SrcVis = new byte[_sources.Count];
         cx.LineVis = new byte[_lines.Count];
-
-        if (_root >= 0) Visit(_root, cx);
-
-        // Surface point under the pixel (the "Nearest" snap on solids).
-        if (cx.SurfaceT < float.MaxValue)
-            cx.Cands.Add(new Cand
-            {
-                P = cx.SurfaceP, Kind = SnapKind.Surface, Tag = cx.SurfaceTag, Layer = cx.SurfaceSrc?.Layer ?? "", Label = cx.SurfaceSrc?.Label ?? "",
-                PxDist = 0, Score = req.TolerancePx + 1, Depth = cx.SurfaceT, Src = cx.SurfaceSrc,
-            });
 
         // Domain points (bearings, work points, splices ...).
         if ((req.Modes & SnapModes.Domain) != 0)
@@ -370,7 +406,20 @@ public sealed class SnapIndex
                 if (d2 > cx.R2 || !env.Kept(dp.P)) continue;
                 float px = MathF.Sqrt(d2) / req.PixelSize;
                 cx.Cands.Add(new Cand { P = dp.P, Kind = SnapKind.Domain, Label = dp.Label, PxDist = px, Score = px - Bonus(SnapKind.Domain), Depth = t });
+                Note(cx, px - Bonus(SnapKind.Domain));
             }
+
+        if (_root >= 0) Visit(_root, cx);
+        cx.Radius = cx.R0; cx.R2 = cx.R02; // intersections use the full capture radius
+        cx.Stats.TravMs = sw.Elapsed.TotalMilliseconds;
+
+        // Surface point under the pixel (the "Nearest" snap on solids).
+        if (cx.SurfaceT < float.MaxValue)
+            cx.Cands.Add(new Cand
+            {
+                P = cx.SurfaceP, Kind = SnapKind.Surface, Tag = cx.SurfaceTag, Layer = cx.SurfaceSrc?.Layer ?? "", Label = cx.SurfaceSrc?.Label ?? "",
+                PxDist = 0, Score = req.TolerancePx + 1, Depth = cx.SurfaceT, Src = cx.SurfaceSrc,
+            });
 
         if ((req.Modes & SnapModes.Intersection) != 0) Intersections(cx);
 
@@ -380,11 +429,15 @@ public sealed class SnapIndex
         int tested = 0;
         foreach (var c in cx.Cands)
         {
+            if (c.EdgeLeaf != null && !IsFeatureEdge(c.Src!, c.EdgeLeaf, c.EdgeTri, c.E0, c.E1)) continue;
             if (c.CheckOcclusion && !env.XRay)
             {
                 if (tested++ >= 24) break;
                 cx.Stats.OcclusionTests++;
-                if (IsOccluded(cx, c.P, c.Depth)) continue;
+                long o0 = System.Diagnostics.Stopwatch.GetTimestamp();
+                bool occ = IsOccluded(cx, c.P, c.Depth);
+                cx.Stats.OccMs += System.Diagnostics.Stopwatch.GetElapsedTime(o0).TotalMilliseconds;
+                if (occ) continue;
             }
             result = new SnapHit
             {
@@ -399,11 +452,28 @@ public sealed class SnapIndex
 
     private void Visit(int ni, Ctx cx)
     {
+        if (cx.Stop) return;
         ref readonly var n = ref _nodes[ni];
         if (!SnapMath.LineHitsBox(cx.Req.Origin, cx.InvDir, n.Min, n.Max, cx.Radius)) return;
-        if (n.Left < 0) { ProcessLeaf(_leaves[n.Right], cx); return; }
-        Visit(n.Left, cx);
-        Visit(n.Right, cx);
+        if (n.Left < 0)
+        {
+            if ((++cx.LeafTicks & 7) == 0 && System.Diagnostics.Stopwatch.GetTimestamp() > cx.Deadline) { cx.Stop = true; cx.Stats.Truncated = true; return; }
+            ProcessLeaf(_leaves[n.Right], cx);
+            return;
+        }
+        // Best-first: the child nearer the ray goes first so good candidates shrink the radius before the far side is searched.
+        int a = n.Left, b = n.Right;
+        if (RayDist(_nodes[b], cx) < RayDist(_nodes[a], cx)) (a, b) = (b, a);
+        Visit(a, cx);
+        Visit(b, cx);
+    }
+
+    private static float RayDist(in Node n, Ctx cx)
+    {
+        var c = (n.Min + n.Max) * 0.5f;
+        float half = (n.Max - n.Min).Length() * 0.5f;
+        float d = MathF.Sqrt(SnapMath.DistanceToRaySq(c, cx.Req.Origin, cx.Req.Dir, out _));
+        return Math.Max(0, d - half);
     }
 
     private bool SrcVisible(SnapSource s, Ctx cx)
@@ -440,13 +510,15 @@ public sealed class SnapIndex
     private static object? TagOf(SnapSource s, int tri) =>
         s.Table != null ? s.Table.Find(tri, out _, out _) : s.FixedTag;
 
-    private void AddCand(Ctx cx, Vector3 p, SnapKind kind, float d2, float depth, object? tag, SnapSource? src, string layer, string label, bool occlusion = true)
+    private void AddCand(Ctx cx, Vector3 p, SnapKind kind, float d2, float depth, object? tag, SnapSource? src, string layer, string label, bool occlusion = true, Leaf? edgeLeaf = null, int edgeTri = 0, Vector3 e0 = default, Vector3 e1 = default)
     {
         if (cx.Cands.Count > 3000) return;
+        float px0 = MathF.Sqrt(d2) / cx.Req.PixelSize;
+        if (px0 - Bonus(kind) >= cx.Threshold) return;
         var key = ((int)kind, (int)MathF.Round(p.X * 2000), (int)MathF.Round(p.Y * 2000) * 31 + (int)MathF.Round(p.Z * 2000));
         if (!cx.Seen.Add(key)) return;
-        float px = MathF.Sqrt(d2) / cx.Req.PixelSize;
-        cx.Cands.Add(new Cand { P = p, Kind = kind, Tag = tag, Layer = layer, Label = label, PxDist = px, Score = px - Bonus(kind), Depth = depth, CheckOcclusion = occlusion, Src = src });
+        cx.Cands.Add(new Cand { P = p, Kind = kind, Tag = tag, Layer = layer, Label = label, PxDist = px0, Score = px0 - Bonus(kind), Depth = depth, CheckOcclusion = occlusion, Src = src, EdgeLeaf = edgeLeaf, EdgeTri = edgeTri, E0 = e0, E1 = e1 });
+        if (edgeLeaf == null) Note(cx, px0 - Bonus(kind)); // unverified edge candidates must not shrink the search
     }
 
     // ----- triangles
@@ -462,9 +534,9 @@ public sealed class SnapIndex
         bool wantVerts = (modes & SnapModes.Endpoint) != 0;
         bool wantMids = (modes & SnapModes.Midpoint) != 0;
         bool wantPerp = (modes & SnapModes.Perpendicular) != 0 && req.Previous != null;
-        float pad = cx.Radius;
         for (int t = lf.I0; t < lf.I1; t++)
         {
+            float pad = cx.Radius;
             var a = pos[ind[3 * t]];
             var b = pos[ind[3 * t + 1]];
             var c = pos[ind[3 * t + 2]];
@@ -503,14 +575,14 @@ public sealed class SnapIndex
                     {
                         var m = (p0 + p1) * 0.5f;
                         float d2 = SnapMath.DistanceToRaySq(m, req.Origin, req.Dir, out float tm);
-                        if (d2 <= cx.R2 && env.Kept(m) && IsFeatureEdge(s, lf, t, p0, p1))
-                            AddCand(cx, m, SnapKind.Midpoint, d2, tm, tag, s, s.Layer, s.Label);
+                        if (Worth(cx, SnapKind.Midpoint, d2) && env.Kept(m))
+                            AddCand(cx, m, SnapKind.Midpoint, d2, tm, tag, s, s.Layer, s.Label, true, lf, t, p0, p1);
                     }
                     if (wantPerp && SnapMath.PerpendicularFoot(req.Previous!.Value, p0, p1, out var foot))
                     {
                         float d2 = SnapMath.DistanceToRaySq(foot, req.Origin, req.Dir, out float tf);
-                        if (d2 <= cx.R2 && env.Kept(foot) && IsFeatureEdge(s, lf, t, p0, p1))
-                            AddCand(cx, foot, SnapKind.Perpendicular, d2, tf, tag, s, s.Layer, s.Label);
+                        if (Worth(cx, SnapKind.Perpendicular, d2) && env.Kept(foot))
+                            AddCand(cx, foot, SnapKind.Perpendicular, d2, tf, tag, s, s.Layer, s.Label, true, lf, t, p0, p1);
                     }
                 }
         }
@@ -526,6 +598,8 @@ public sealed class SnapIndex
     private void AddExtras(Ctx cx)
     {
         if (cx.Touched.Count == 0 || ExtraPoints == null) return;
+        long e0 = System.Diagnostics.Stopwatch.GetTimestamp();
+        try {
         var req = cx.Req;
         foreach (var tag in cx.Touched)
         {
@@ -546,6 +620,7 @@ public sealed class SnapIndex
                     SegmentCandidates(cx, pts[i].p, pts[i + 1].p, tag, null, "", pts[0].label[..^7] + " centerline", true);
         }
         cx.Touched.Clear();
+        } finally { cx.Stats.ExtraMs += System.Diagnostics.Stopwatch.GetElapsedTime(e0).TotalMilliseconds; }
     }
 
     private static SnapModes KindMode(SnapKind k) => k switch
@@ -662,8 +737,9 @@ public sealed class SnapIndex
         if (tag != null && env.IsHidden(tag)) return;
         if ((modes & endMode) != 0)
         {
-            foreach (var v in new[] { a, b })
+            for (int vi = 0; vi < 2; vi++)
             {
+                var v = vi == 0 ? a : b;
                 float d2 = SnapMath.DistanceToRaySq(v, req.Origin, req.Dir, out float t);
                 if (d2 <= cx.R2 && env.Kept(v)) AddCand(cx, v, ends, d2, t, tag, src, layer, label, occlusion);
             }

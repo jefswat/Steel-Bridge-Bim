@@ -166,7 +166,8 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
     `MeasureOverlay`, panel `MeasurePanel`, snap bar; remote `measure` / `station-offset`; snapshot `--measure fx,fy,fx,fy`,
     `--query fx,fy`, `--snapbench N`), `Viewport/SnapEngine.cs` (`SnapIndex` = BVH over triangle/segment/instance chunks, built lazily
     after each scene rebuild; ranked candidates + occlusion test), pure helpers `SBM.Core/Geometry/SnapMath.cs`, `PointQuery.cs`.
-    TODO: prune the search radius by the K-th best candidate (zoomed-out queries on big models are slow).
+    Query cost control: best-first BVH traversal, search radius shrinks to (K-th best score + max bonus) px once K=10 candidates are known
+    (exact), 4 ms traversal budget, feature-edge checks deferred to ranking. Index is debounced (one build per scene burst; prebuilt once at startup).
 - Units/shared piers: `SupportDefinition.SharedPier` + `PierCenterOffset`; `RegenerationCache` is two-phase (superstructure
   per bridge, then substructure per bridge with `ForeignSeats` of other bridges on the owner's shared piers).
 - Discontinuous girders: `GirderLayoutDefinition.Terminations`; `FramingGenerator.ApplyTerminations` truncates the girder,
