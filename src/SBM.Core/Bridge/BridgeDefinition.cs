@@ -53,6 +53,9 @@ public sealed class SupportDefinition
     /// <summary>Cap, pedestals, columns and foundation; null = defaults for the support type.</summary>
     public SubstructureDefinition? Substructure { get; set; }
 
+    /// <summary>Deck expansion joint at this END support (blockout + generic device); null = none.</summary>
+    public ExpansionJointDefinition? ExpansionJoint { get; set; }
+
     [System.Text.Json.Serialization.JsonIgnore]
     public SubstructureDefinition ResolvedSubstructure => Substructure ?? SubstructureDefinition.Default(Type);
 
@@ -61,6 +64,7 @@ public sealed class SupportDefinition
         var c = (SupportDefinition)MemberwiseClone();
         c.Substructure = Substructure?.Clone();
         c.Bearings = Bearings?.Clone();
+        c.ExpansionJoint = ExpansionJoint?.Clone();
         c.GirderFixities = GirderFixities?.ToList();
         return c;
     }

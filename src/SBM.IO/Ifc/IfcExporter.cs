@@ -246,6 +246,8 @@ public static class IfcExporter
 
         var materials = new Dictionary<string, List<int>>();
         var psetTargets = new List<(int id, string mark, string desc, double length, double massKg)>();
+        // Generic expansion joint devices: (accessory, location text) -> SBM_Placeholder property set.
+        var placeholders = new List<(int id, string location, string type)>();
 
         int RgbStyle(string name, double r, double g, double b, double transparency = 0)
         {
@@ -390,6 +392,7 @@ public static class IfcExporter
             int deckSlab = 0;
             var contained = new List<int>();
             int concreteStyle = RgbStyle("Concrete", 0.72, 0.72, 0.69);
+            int jointStyle = RgbStyle("Expansion joint (generic)", 0.9, 0.55, 0.15);
             string concreteMat = $"Concrete, f'c = {def.Deck.Reinforcement.ConcreteStrengthKsi:0.#} ksi";
             if (c.Deck != null)
             {
@@ -410,6 +413,38 @@ public static class IfcExporter
                 AddMaterial(concreteMat, rail);
                 psetTargets.Add((rail, name, "Concrete barrier", 0, Math.Abs(mesh.Volume()) * 2400));
             }
+            // Expansion joints. The blockout concrete is poured separately (after the device is set), so it is its own element:
+            // an IfcBuildingElementPart (USERDEFINED "JOINT_BLOCKOUT_CONCRETE") aggregated into the deck slab, whose own geometry is
+            // the deck cut back to the blockout edge (an IfcOpeningElement would void a slab that is already cut, and would hide the
+            // separate pour). The device is a generic IfcDiscreteAccessory EXPANSION_JOINT_DEVICE flagged as a placeholder.
+            int jn = 0;
+            var blockParts = new List<int>();
+            foreach (var jr in c.Joints)
+            {
+                string jk = $"{bk}/joint/{jn++}";
+                string loc = $"{jr.Support}, {(jr.AtBegin ? "begin" : "end")} of {def.Name}";
+                string tname = jr.Definition.TypeName;
+                int bpds = Body(jr.Blockout, concreteStyle);
+                string bdesc = $"Blockout {u.FormatLength(jr.Definition.BlockoutWidth, LengthKind.Short)} wide x {u.FormatLength(jr.Definition.BlockoutDepth, LengthKind.Short)} deep, placed after the {tname.ToLowerInvariant()} joint is installed";
+                int bp = w.Add("IFCBUILDINGELEMENTPART", $"{Guid(jk + "/blockout")},$,{S(jr.BlockoutName)},{S(bdesc)},'JOINT_BLOCKOUT_CONCRETE',{Ref(pl)},{Ref(bpds)},$,.USERDEFINED.");
+                blockParts.Add(bp);
+                AddMaterial(concreteMat, bp);
+                psetTargets.Add((bp, "BLOCKOUT", jr.BlockoutName, 0, jr.BlockoutVolume * 2400));
+                result.ElementCount++;
+                if (jr.Body != null)
+                {
+                    int dpds = Body(jr.Body, jointStyle);
+                    string ddesc = "Envelope of the joint opening only. Generic placeholder: the device is designed and supplied by the manufacturer.";
+                    int acc = w.Add("IFCDISCRETEACCESSORY", $"{Guid(jk + "/device")},$,{S(jr.DeviceName)},{S(ddesc)},{S(tname.ToUpperInvariant() + "_EXPANSION_JOINT")},{Ref(pl)},{Ref(dpds)},$,.EXPANSION_JOINT_DEVICE.");
+                    contained.Add(acc);
+                    AddMaterial("Steel (placeholder, A36 minimum per plans)", acc);
+                    placeholders.Add((acc, loc, tname));
+                    result.ElementCount++;
+                }
+            }
+            if (blockParts.Count > 0 && deckSlab > 0)
+                w.Add("IFCRELAGGREGATES", $"{Guid(bk + "/rel/blockouts")},$,$,$,{Ref(deckSlab)},{Refs(blockParts)}");
+            else contained.AddRange(blockParts);
             var marks = c.Marks.ToDictionary(m => m.Mark);
             ExportBars(c.Bars.Select(b => (b, marks[b.Mark])), $"{bk}/bar", contained, pl, def.Deck.Reinforcement.SteelYieldKsi);
             for (int i = 0; i < contained.Count; i += 5000)
@@ -704,6 +739,18 @@ public static class IfcExporter
             int first = grp.First().id;
             int ps = w.Add("IFCPROPERTYSET", $"{Guid(key + "/pset/" + first)},$,'SBM_Fabrication',$,({Ref(p1)},{Ref(p2)},{Ref(p3)},{Ref(p4)})");
             w.Add("IFCRELDEFINESBYPROPERTIES", $"{Guid(key + "/relpset/" + first)},$,$,$,{Refs(grp.Select(t => t.id))},{Ref(ps)}");
+        }
+
+        // Generic expansion joint devices: custom placeholder pset. Pset_ManufacturerTypeInformation is deliberately absent
+        // (an IfcPropertySet cannot be empty): nothing about the real product is known from the plans.
+        foreach (var (id, location, type) in placeholders)
+        {
+            int q1 = w.Add("IFCPROPERTYSINGLEVALUE", "'IsPlaceholder',$,IFCBOOLEAN(.T.),$");
+            int q2 = w.Add("IFCPROPERTYSINGLEVALUE", $"'Basis',$,IFCTEXT({S("Plans: blockout and opening only; device designed/supplied by manufacturer")}),$");
+            int q3 = w.Add("IFCPROPERTYSINGLEVALUE", $"'Location',$,IFCLABEL({S(location)}),$");
+            int q4 = w.Add("IFCPROPERTYSINGLEVALUE", $"'DeviceType',$,IFCLABEL({S(type)}),$");
+            int ps = w.Add("IFCPROPERTYSET", $"{Guid(key + "/placeholder/" + id)},$,'SBM_Placeholder',$,({Ref(q1)},{Ref(q2)},{Ref(q3)},{Ref(q4)})");
+            w.Add("IFCRELDEFINESBYPROPERTIES", $"{Guid(key + "/relplaceholder/" + id)},$,$,$,({Ref(id)}),{Ref(ps)}");
         }
 
         w.Footer();
