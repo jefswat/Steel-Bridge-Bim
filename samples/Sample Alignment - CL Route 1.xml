@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<LandXML version="1.2" date="2026-10-08" time="07:43:30" xmlns="http://www.landxml.org/schema/LandXML-1.2">
+  <Units>
+    <Imperial areaUnit="squareFoot" linearUnit="foot" volumeUnit="cubicFeet" temperatureUnit="fahrenheit" pressureUnit="inHG" angularUnit="decimal degrees" directionUnit="decimal degrees" />
+  </Units>
+  <Application name="Steel Bridge Modeler" manufacturer="SBM" version="0.1" />
+  <Alignments>
+    <Alignment name="CL Route 1" length="5480.98486393" staStart="0" desc="Sample alignment">
+      <CoordGeom>
+        <Line staStart="0" length="1997.79335027">
+          <Start>5000 10000</Start>
+          <End>5000 11997.79335027</End>
+        </Line>
+        <Spiral rot="ccw" spiType="clothoid" staStart="1997.79335027" length="200" radiusStart="INF" radiusEnd="1500">
+          <Start>5000 11997.79335027</Start>
+          <PI>5000 12131.15773738</PI>
+          <End>5004.44303371 12197.70447967</End>
+        </Spiral>
+        <Curve rot="ccw" staStart="2197.79335027" length="585.3981634" radius="1500">
+          <Start>5004.44303371 12197.70447967</Start>
+          <Center>6501.11093476 12097.77853728</Center>
+          <End>5154.99554023 12759.5740832</End>
+        </Curve>
+        <Spiral rot="ccw" spiType="clothoid" staStart="2783.19151366" length="200" radiusStart="1500" radiusEnd="INF">
+          <Start>5154.99554023 12759.5740832</Start>
+          <PI>5184.42113131 12819.42676942</PI>
+          <End>5251.10332487 12934.92371662</End>
+        </Spiral>
+        <Line staStart="2983.19151366" length="2497.79335027">
+          <Start>5251.10332487 12934.92371662</Start>
+          <End>6500 15098.07621135</End>
+        </Line>
+      </CoordGeom>
+      <Profile name="CL Route 1 Profile">
+        <ProfAlign name="CL Route 1 Profile">
+          <PVI>0 500</PVI>
+          <ParaCurve length="800">2200 544</ParaCurve>
+          <PVI>4000 526</PVI>
+        </ProfAlign>
+      </Profile>
+    </Alignment>
+  </Alignments>
+</LandXML>

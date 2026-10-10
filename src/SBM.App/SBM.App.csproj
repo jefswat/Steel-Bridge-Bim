@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\SBM.Core\SBM.Core.csproj" />
+    <ProjectReference Include="..\SBM.IO\SBM.IO.csproj" />
+    <ProjectReference Include="..\SBM.Api\SBM.Api.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+    <PackageReference Include="HelixToolkit.Wpf.SharpDX" Version="3.1.2" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <AssemblyName>SteelBridgeModeler</AssemblyName>
+    <RootNamespace>SBM.App</RootNamespace>
+    <Product>Steel Bridge Modeler</Product>
+    <Version>0.1.0</Version>
+    <!-- Fluent theme (ThemeMode) is flagged experimental in some SDKs. -->
+    <NoWarn>$(NoWarn);WPF0001</NoWarn>
+    <TieredPGO>true</TieredPGO>
+    <ServerGarbageCollection>false</ServerGarbageCollection>
+    <ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>
+  </PropertyGroup>
+
+</Project>

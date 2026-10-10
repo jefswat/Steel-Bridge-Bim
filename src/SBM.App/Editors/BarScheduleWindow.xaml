@@ -1,0 +1,54 @@
+<Window x:Class="SBM.App.Editors.BarScheduleWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:ed="clr-namespace:SBM.App.Editors"
+        Title="Bar Schedule" Width="1280" Height="760" MinWidth="900" MinHeight="500"
+        WindowStartupLocation="CenterOwner" Background="#FF1F1F1F">
+    <DockPanel Background="#FF1F1F1F">
+        <Border DockPanel.Dock="Bottom" Background="{StaticResource PanelHeaderBrush}" Padding="12,8">
+            <DockPanel>
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                    <Button Content="Export CSV…" Width="110" Margin="0,0,8,0" Click="OnExport"/>
+                    <Button Content="Close" Width="90" IsCancel="True" Click="OnClose"/>
+                </StackPanel>
+                <TextBlock x:Name="Totals" Foreground="#FFDDDDDD" VerticalAlignment="Center" TextWrapping="Wrap"/>
+            </DockPanel>
+        </Border>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="3*"/>
+                <ColumnDefinition Width="4"/>
+                <ColumnDefinition Width="2*"/>
+            </Grid.ColumnDefinitions>
+            <DockPanel>
+                <DockPanel DockPanel.Dock="Top" Background="{StaticResource PanelHeaderBrush}">
+                    <ComboBox x:Name="UnitFilter" DockPanel.Dock="Right" Width="200" Margin="4,2" SelectionChanged="OnUnitChanged"
+                              ToolTip="Show the marks of one unit (marks repeat per substructure unit)"/>
+                    <TextBlock Style="{StaticResource PanelHeader}" Text="Bar mark list" VerticalAlignment="Center"/>
+                </DockPanel>
+                <DataGrid x:Name="Grid" IsReadOnly="True" AutoGenerateColumns="False" HeadersVisibility="Column" SelectionMode="Single"
+                          SelectionChanged="OnSelected">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Unit" Binding="{Binding Unit}"/>
+                        <DataGridTextColumn Header="Mark" Binding="{Binding Mark}" FontWeight="SemiBold"/>
+                        <DataGridTextColumn Header="Size" Binding="{Binding Size}"/>
+                        <DataGridTextColumn Header="No." Binding="{Binding Count}"/>
+                        <DataGridTextColumn Header="Length" Binding="{Binding Length}"/>
+                        <DataGridTextColumn Header="Shape" Binding="{Binding Shape}"/>
+                        <DataGridTextColumn Header="A" Binding="{Binding A}"/>
+                        <DataGridTextColumn Header="B" Binding="{Binding B}"/>
+                        <DataGridTextColumn Header="C / D" Binding="{Binding C}"/>
+                        <DataGridTextColumn Header="Weight" Binding="{Binding Weight}"/>
+                        <DataGridTextColumn Header="Coating" Binding="{Binding Coating}"/>
+                        <DataGridTextColumn Header="Location" Binding="{Binding Location}"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </DockPanel>
+            <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" Background="{StaticResource BorderBrushDark}"/>
+            <DockPanel Grid.Column="2">
+                <TextBlock DockPanel.Dock="Top" Style="{StaticResource PanelHeader}" Text="Bending diagram"/>
+                <ed:BendDiagramView x:Name="Diagram"/>
+            </DockPanel>
+        </Grid>
+    </DockPanel>
+</Window>

@@ -1,0 +1,116 @@
+<Window x:Class="SBM.App.Editors.BridgeEditorWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Bridge" Width="1050" Height="720" MinWidth="820" MinHeight="520"
+        WindowStartupLocation="CenterOwner" ShowInTaskbar="False" Background="#FF1F1F1F">
+    <DockPanel Background="#FF1F1F1F">
+        <Border DockPanel.Dock="Bottom" Background="{StaticResource PanelHeaderBrush}" Padding="12,8">
+            <DockPanel>
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                    <Button Content="Apply" Width="90" Margin="0,0,8,0" Click="OnApply" ToolTip="Regenerate the model without closing"/>
+                    <Button Content="OK" Width="90" Margin="0,0,8,0" IsDefault="True" Click="OnOk" Style="{StaticResource AccentButtonStyle}"/>
+                    <Button Content="Cancel" Width="90" IsCancel="True"/>
+                </StackPanel>
+                <ScrollViewer MaxHeight="80" VerticalScrollBarVisibility="Auto">
+                    <TextBlock Text="{Binding ErrorText}" Foreground="{StaticResource ErrorBrush}" TextWrapping="Wrap" VerticalAlignment="Center"/>
+                </ScrollViewer>
+            </DockPanel>
+        </Border>
+
+        <TabControl x:Name="Tabs" Margin="8">
+            <TabItem Header="Supports &amp; Spans">
+                <DockPanel Margin="8">
+                    <ItemsControl DockPanel.Dock="Top" ItemsSource="{Binding GeneralFields}" Style="{StaticResource FieldList}" Margin="8,0,8,8"/>
+                    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,6">
+                        <Button Style="{StaticResource ToolIconButton}" Content="&#xE710;" ToolTip="Add support after selection" Click="OnSupportAdd"/>
+                        <Button Style="{StaticResource ToolIconButton}" Content="&#xE74D;" ToolTip="Delete selected support" Click="OnSupportDelete"/>
+                        <TextBlock Text="Span lengths:" VerticalAlignment="Center" Margin="16,0,6,0"/>
+                        <TextBox Width="300" Text="{Binding SpanListText, UpdateSourceTrigger=PropertyChanged}" ToolTip="Comma-separated span lengths measured along the alignment from the first support"/>
+                        <Button Content="Set spans" Margin="6,0,0,0" Click="OnSetSpans"/>
+                    </StackPanel>
+                    <TextBlock DockPanel.Dock="Bottom" Foreground="{StaticResource MutedText}" TextWrapping="Wrap" Margin="0,6,0,0"
+                               Text="Stations are at the CL bearing on the alignment. Skew is measured from the radial line; positive = right end of the support line is up-station. Deck end offset and girder extension apply at abutments."/>
+                    <DataGrid x:Name="SupportGrid" ItemsSource="{Binding Supports}"/>
+                </DockPanel>
+            </TabItem>
+
+            <TabItem Header="Girders">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+                        <ItemsControl ItemsSource="{Binding GirderFields}" Style="{StaticResource FieldList}"/>
+                        <StackPanel Orientation="Horizontal" Margin="16,4">
+                            <Button Content="Center on alignment" Click="OnCenterGirders" ToolTip="Set the G1 offset so the girder group is centered on the alignment"/>
+                        </StackPanel>
+                        <TextBlock Margin="16,8" Foreground="{StaticResource MutedText}" TextWrapping="Wrap"
+                                   Text="Curved girders follow the alignment at their offsets (concentric on curves, true offsets through spirals). Chorded girders are straight between bearings and kink at interior supports."/>
+                        <TextBlock Text="Plate changes (optional)" FontWeight="SemiBold" FontSize="13" Margin="16,14,0,4" Foreground="{StaticResource AccentBrushSbm}"/>
+                        <TextBlock Margin="16,0,16,6" Foreground="{StaticResource MutedText}" TextWrapping="Wrap"
+                                   Text="Each row is a plate that runs from the previous change (or girder start) to its end station, measured on a radial line across all girders. Leave the end station blank on the last row of each plate. Plates with no rows use the typical size above. Flange width changes get 1:2.5 tapers on the wider plate. The haunch is measured to the thickest top flange; the top of web stays smooth."/>
+                        <StackPanel Orientation="Horizontal" Margin="16,0,0,6">
+                            <Button Style="{StaticResource ToolIconButton}" Content="&#xE710;" ToolTip="Add plate row" Click="OnPlateAdd"/>
+                            <Button Style="{StaticResource ToolIconButton}" Content="&#xE74D;" ToolTip="Delete selected row" Click="OnPlateDelete"/>
+                        </StackPanel>
+                        <DataGrid x:Name="PlateGrid" ItemsSource="{Binding PlateRows}" Margin="16,0,16,16" MinHeight="120" HorizontalAlignment="Left"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <TabItem Header="Deck &amp; Barrier">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <ItemsControl ItemsSource="{Binding DeckFields}" Style="{StaticResource FieldList}"/>
+                </ScrollViewer>
+            </TabItem>
+
+            <TabItem Header="Cross Frames">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <ItemsControl ItemsSource="{Binding CrossFrameFields}" Style="{StaticResource FieldList}"/>
+                </ScrollViewer>
+            </TabItem>
+
+            <TabItem Header="Stiffeners">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <ItemsControl ItemsSource="{Binding StiffenerFields}" Style="{StaticResource FieldList}"/>
+                </ScrollViewer>
+            </TabItem>
+
+            <TabItem Header="Field Splices">
+                <DockPanel Margin="8">
+                    <TextBlock DockPanel.Dock="Top" Foreground="{StaticResource MutedText}" TextWrapping="Wrap" Margin="0,0,0,6"
+                               Text="Field splice lines run radially (normal to the alignment) across all girders at the given stations."/>
+                    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,6">
+                        <Button Style="{StaticResource ToolIconButton}" Content="&#xE710;" ToolTip="Add splice" Click="OnSpliceAdd"/>
+                        <Button Style="{StaticResource ToolIconButton}" Content="&#xE74D;" ToolTip="Delete selected splice" Click="OnSpliceDelete"/>
+                    </StackPanel>
+                    <DataGrid x:Name="SpliceGrid" ItemsSource="{Binding Splices}" HorizontalAlignment="Left" Width="320"/>
+                </DockPanel>
+            </TabItem>
+
+            <TabItem Header="Connections &amp; Bearings">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <ItemsControl ItemsSource="{Binding ConnectionFields}" Style="{StaticResource FieldList}"/>
+                </ScrollViewer>
+            </TabItem>
+
+            <TabItem Header="Studs &amp; Bracing">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <ItemsControl ItemsSource="{Binding StudBracingFields}" Style="{StaticResource FieldList}"/>
+                </ScrollViewer>
+            </TabItem>
+            <TabItem Header="Substructure">
+                <DockPanel Margin="8">
+                    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="8,0,0,6">
+                        <TextBlock Text="Support:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                        <ComboBox Width="200" ItemsSource="{Binding Supports}" SelectedItem="{Binding SubstructureSupport}" DisplayMemberPath="Name"/>
+                        <Button Content="{Binding CopySubstructureLabel}" Margin="12,0,0,0" Click="OnCopySubstructure"
+                                ToolTip="Copy this cap, column, foundation and reinforcing layout to every other support of the same type"/>
+                    </StackPanel>
+                    <TextBlock DockPanel.Dock="Top" Foreground="{StaticResource MutedText}" TextWrapping="Wrap" Margin="8,0,8,4"
+                               Text="Positions along the cap are measured on the (skewed) support line from the alignment, right positive. Bearing seats come from the girders and bearings; the cap top is shaped as chosen and set so the shortest pedestal is the minimum height, and each pedestal takes up the rest of its seat."/>
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <ItemsControl ItemsSource="{Binding SubstructureFields}" Style="{StaticResource FieldList}"/>
+                    </ScrollViewer>
+                </DockPanel>
+            </TabItem>
+        </TabControl>
+    </DockPanel>
+</Window>

@@ -1,0 +1,421 @@
+{
+  "Version": 1,
+  "Name": "Sample Project",
+  "UnitSystem": "US",
+  "Foot": "International",
+  "Alignments": [
+    {
+      "Name": "CL Route 1",
+      "Description": "Sample alignment",
+      "StartStation": 0,
+      "StationEquations": [],
+      "Elements": [
+        {
+          "X": 3048,
+          "Y": 1524,
+          "Angle": 0,
+          "Length": 608.9274131614579,
+          "K0": 0,
+          "K1": 0
+        },
+        {
+          "X": 3656.927413161458,
+          "Y": 1524,
+          "Angle": 0,
+          "Length": 60.96,
+          "K0": 0,
+          "K1": 0.0021872265966754153
+        },
+        {
+          "X": 3717.860325402313,
+          "Y": 1525.3542366745673,
+          "Angle": 0.06666666666666665,
+          "Length": 178.4293602035423,
+          "K0": 0.0021872265966754153,
+          "K1": 0.0021872265966754153
+        },
+        {
+          "X": 3889.1181805607453,
+          "Y": 1571.2426406617556,
+          "Angle": 0.4569321089316323,
+          "Length": 60.96,
+          "K0": 0.0021872265966754153,
+          "K1": 0
+        },
+        {
+          "X": 3942.564748825177,
+          "Y": 1600.536293419271,
+          "Angle": 0.5235987755982989,
+          "Length": 761.3274131614579,
+          "K0": 0,
+          "K1": 0
+        }
+      ],
+      "PiDefinition": {
+        "Pis": [
+          {
+            "Northing": 1524,
+            "Easting": 3048,
+            "Radius": 0,
+            "SpiralIn": 0,
+            "SpiralOut": 0
+          },
+          {
+            "Northing": 1524,
+            "Easting": 3810,
+            "Radius": 457.20000000000005,
+            "SpiralIn": 60.96,
+            "SpiralOut": 60.96
+          },
+          {
+            "Northing": 1981.2,
+            "Easting": 4601.893629220491,
+            "Radius": 0,
+            "SpiralIn": 0,
+            "SpiralOut": 0
+          }
+        ]
+      },
+      "Profile": {
+        "Vpis": [
+          {
+            "Station": 0,
+            "Elevation": 152.4,
+            "LengthIn": 0,
+            "LengthOut": 0
+          },
+          {
+            "Station": 670.5600000000001,
+            "Elevation": 165.8112,
+            "LengthIn": 121.92,
+            "LengthOut": 121.92
+          },
+          {
+            "Station": 1219.2,
+            "Elevation": 160.3248,
+            "LengthIn": 0,
+            "LengthOut": 0
+          }
+        ],
+        "IsEmpty": false
+      },
+      "CrossSlope": {
+        "Rows": [
+          {
+            "Station": 588.6074131614579,
+            "LeftSlope": -0.02,
+            "RightSlope": -0.02
+          },
+          {
+            "Station": 608.9274131614579,
+            "LeftSlope": -0.02,
+            "RightSlope": 0
+          },
+          {
+            "Station": 629.247413161458,
+            "LeftSlope": -0.02,
+            "RightSlope": 0.02
+          },
+          {
+            "Station": 669.887413161458,
+            "LeftSlope": -0.06,
+            "RightSlope": 0.06
+          },
+          {
+            "Station": 848.3167733650002,
+            "LeftSlope": -0.06,
+            "RightSlope": 0.06
+          },
+          {
+            "Station": 888.9567733650002,
+            "LeftSlope": -0.02,
+            "RightSlope": 0.02
+          },
+          {
+            "Station": 909.2767733650003,
+            "LeftSlope": -0.02,
+            "RightSlope": 0
+          },
+          {
+            "Station": 929.5967733650003,
+            "LeftSlope": -0.02,
+            "RightSlope": -0.02
+          }
+        ],
+        "PivotOffset": 0
+      }
+    }
+  ],
+  "Bridges": [
+    {
+      "Name": "Sample Bridge",
+      "AlignmentName": "CL Route 1",
+      "Supports": [
+        {
+          "Name": "Abut 1",
+          "Type": "Abutment",
+          "Station": 640.08,
+          "SkewDegrees": 15,
+          "DeckEndOffset": 0.45720000000000005,
+          "GirderEndExtension": 0.2286,
+          "Fixity": "GuidedExpansion",
+          "ResolvedFixity": "GuidedExpansion",
+          "Substructure": null
+        },
+        {
+          "Name": "Pier 1",
+          "Type": "Pier",
+          "Station": 682.7520000000001,
+          "SkewDegrees": 15,
+          "DeckEndOffset": 0.45720000000000005,
+          "GirderEndExtension": 0.2286,
+          "Fixity": "Auto",
+          "ResolvedFixity": "Fixed",
+          "Substructure": null
+        },
+        {
+          "Name": "Abut 2",
+          "Type": "Abutment",
+          "Station": 725.4240000000001,
+          "SkewDegrees": 15,
+          "DeckEndOffset": 0.45720000000000005,
+          "GirderEndExtension": 0.2286,
+          "Fixity": "GuidedExpansion",
+          "ResolvedFixity": "GuidedExpansion",
+          "Substructure": null
+        }
+      ],
+      "Girders": {
+        "Count": 5,
+        "Spacings": [
+          2.7432000000000003,
+          2.7432000000000003,
+          2.7432000000000003,
+          2.7432000000000003
+        ],
+        "FirstGirderOffset": -5.486400000000001,
+        "OffsetsAtSupports": null,
+        "PlanLayout": "CurvedParallel",
+        "Section": {
+          "TopFlange": {
+            "Width": 0.4064,
+            "Thickness": 0.0254
+          },
+          "WebDepth": 1.3716,
+          "WebThickness": 0.0127,
+          "BottomFlange": {
+            "Width": 0.4572,
+            "Thickness": 0.03175
+          },
+          "PlateChanges": [
+            {
+              "Plate": "BottomFlange",
+              "EndStation": 675.1320000000001,
+              "Width": 0.4572,
+              "Thickness": 0.03175
+            },
+            {
+              "Plate": "BottomFlange",
+              "EndStation": 690.3720000000001,
+              "Width": 0.508,
+              "Thickness": 0.0508
+            },
+            {
+              "Plate": "BottomFlange",
+              "EndStation": "NaN",
+              "Width": 0.4572,
+              "Thickness": 0.03175
+            }
+          ]
+        }
+      },
+      "Deck": {
+        "LeftEdgeOffset": -6.5532,
+        "RightEdgeOffset": 6.5532,
+        "Thickness": 0.21589999999999998,
+        "Haunch": 0.07619999999999999,
+        "OverhangThickness": 0.2286,
+        "StayInPlaceForms": true,
+        "SipFormDepth": 0.0508,
+        "Barrier": {
+          "Type": "TxDotSstr",
+          "Reinforcement": true,
+          "EpoxyCoated": true,
+          "StirrupSpacing": 0.15239999999999998,
+          "Height": 0.8128,
+          "BaseWidth": 0.4064,
+          "TopWidth": 0.15239999999999998,
+          "Left": true,
+          "Right": true
+        },
+        "Reinforcement": {
+          "Enabled": true,
+          "ConcreteStrengthKsi": 4,
+          "SteelYieldKsi": 60,
+          "EpoxyCoated": true,
+          "TopCover": 0.0635,
+          "BottomCover": 0.03175,
+          "SideCover": 0.0508,
+          "TransverseOrientation": "Auto",
+          "SkewLimitDegrees": 15,
+          "TopTransverseSize": "#5",
+          "TopTransverseSpacing": 0.15239999999999998,
+          "BottomTransverseSize": "#5",
+          "BottomTransverseSpacing": 0.15239999999999998,
+          "TopLongitudinalSize": "#4",
+          "TopLongitudinalSpacing": 0.2286,
+          "BottomLongitudinalSize": "#5",
+          "BottomLongitudinalSpacing": 0.2286,
+          "MaxBarLength": 18.288,
+          "LapOverride": 0,
+          "NegativeMomentSteel": true,
+          "NegativeMomentSize": "#5",
+          "NegativeRegionFraction": 0.25,
+          "RequiredSteelRatio": 0.01,
+          "MarkLengthTolerance": 0.0508
+        }
+      },
+      "CrossFrames": {
+        "IntermediateType": "Auto",
+        "SupportType": "Auto",
+        "Orientation": "Auto",
+        "Arrangement": "Auto",
+        "MaxSpacing": 7.62,
+        "MinDistanceFromBearing": 0.9144000000000001,
+        "SkewLimitDegrees": 20,
+        "KFrameAspectRatio": 1.5,
+        "ChordAngle": "L4x4x3/8",
+        "DiagonalAngle": "L4x4x3/8",
+        "SupportChordAngle": "L5x5x3/8",
+        "SupportDiagonalAngle": "L4x4x3/8",
+        "DiaphragmChannel": "C15x33.9",
+        "TopWorkPointOffset": 0.15239999999999998,
+        "BottomWorkPointOffset": 0.15239999999999998,
+        "GussetThickness": 0.0127,
+        "MemberClearance": 0.0254,
+        "WeldLap": 0.15239999999999998,
+        "MemberWeldSize": 0.00635
+      },
+      "Stiffeners": {
+        "BearingStiffener": {
+          "Width": 0.17779999999999999,
+          "Thickness": 0.022224999999999998
+        },
+        "ConnectionPlate": {
+          "Width": 0.17779999999999999,
+          "Thickness": 0.0127
+        },
+        "IntermediateMaxSpacing": 3.6576000000000004,
+        "IntermediateStiffener": {
+          "Width": 0.15239999999999998,
+          "Thickness": 0.0127
+        },
+        "IntermediateSide": "Interior",
+        "CornerClip": 0.038099999999999995,
+        "IntermediateBottomGap": 0.0508,
+        "WeldSize": 0.00635,
+        "FlangeToWebWeld": 0.0079375
+      },
+      "FieldSplices": [
+        {
+          "Station": 672.0840000000001
+        },
+        {
+          "Station": 693.4200000000001
+        }
+      ],
+      "Bolts": {
+        "Grade": "A325",
+        "Diameter": 0.022224999999999998,
+        "BoltsPerConnection": 3,
+        "Pitch": 0.07619999999999999,
+        "EdgeDistance": 0.038099999999999995
+      },
+      "Bearings": {
+        "Type": "Disc",
+        "DiscDiameter": 0.30479999999999996,
+        "DiscHeight": 0.044449999999999996,
+        "UpperPlateLength": 0.4572,
+        "UpperPlateWidth": 0.4572,
+        "UpperPlateThickness": 0.038099999999999995,
+        "ExpansionPlateExtension": 0.15239999999999998,
+        "PtfeThickness": 0.003175,
+        "MasonryPlateLength": 0.5588,
+        "MasonryPlateWidth": 0.762,
+        "MasonryPlateThickness": 0.044449999999999996,
+        "ShearPinDiameter": 0.07619999999999999,
+        "GuideBarWidth": 0.038099999999999995,
+        "GuideBarHeight": 0.0635,
+        "AnchorBoltCount": 4,
+        "AnchorBoltDiameter": 0.03175,
+        "AnchorBoltGrade": "F1554 Gr. 36",
+        "AnchorBoltEmbedment": 0.4572,
+        "AnchorHoleOversize": 0.0127,
+        "AnchorEdgeDistance": 0.0635,
+        "PadLength": 0.35559999999999997,
+        "PadWidth": 0.508,
+        "PadHeight": 0.08889999999999999,
+        "SolePlateMinThickness": 0.038099999999999995,
+        "SolePlateProjection": 0.0254
+      },
+      "FieldSpliceGap": 0.009524999999999999,
+      "SpliceDetail": {
+        "FlangeOuterPlateThickness": 0.015875,
+        "FlangeInnerPlateThickness": 0.015875,
+        "WebPlateThickness": 0.011112499999999999,
+        "FlangeBoltLinesPerSide": 2,
+        "TopFlangeBoltRows": 3,
+        "BottomFlangeBoltRows": 4,
+        "WebBoltColumns": 2,
+        "FlangeGage": 0.07619999999999999,
+        "FirstLineFromWeb": 0.044449999999999996,
+        "WebPlateFlangeClearance": 0.03175,
+        "InnerPlateWebClearance": 0.0127
+      },
+      "Studs": {
+        "Enabled": true,
+        "Diameter": 0.022224999999999998,
+        "RowsAcross": 3,
+        "TransverseSpacing": 0.1143,
+        "Pitch": 0.30479999999999996,
+        "Penetration": 0.0508,
+        "MinCover": 0.0508,
+        "HeadDiameter": 0.034925,
+        "HeadHeight": 0.009524999999999999,
+        "LengthIncrement": 0.0127,
+        "Clearance": 0.038099999999999995
+      },
+      "LateralBracing": {
+        "Enabled": true,
+        "Flange": "Bottom",
+        "Bays": [
+          1,
+          4
+        ],
+        "Spans": [],
+        "Pattern": "Warren",
+        "Angle": "L5x5x3/8",
+        "GussetThickness": 0.0127,
+        "BoltsPerConnection": 4
+      }
+    }
+  ],
+  "References": [
+    {
+      "Name": "Existing Ground",
+      "Path": "Sample Existing Ground.xml",
+      "Kind": "Terrain",
+      "Format": "Auto",
+      "Visible": true,
+      "R": 128,
+      "G": 108,
+      "B": 76,
+      "Opacity": 0.85,
+      "UnitScale": 0,
+      "OffsetX": 0,
+      "OffsetY": 0,
+      "OffsetZ": 0,
+      "ContourInterval": 0
+    }
+  ]
+}

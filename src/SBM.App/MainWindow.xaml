@@ -1,0 +1,595 @@
+<Window x:Class="SBM.App.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:hx="http://helix-toolkit.org/wpf/SharpDX"
+        xmlns:vm="clr-namespace:SBM.App.ViewModels"
+        xmlns:vp="clr-namespace:SBM.App.Viewport"
+        Title="{Binding WindowTitle}" Height="900" Width="1500" MinWidth="900" MinHeight="600"
+        WindowStartupLocation="CenterScreen" Background="#FF1F1F1F">
+    <Window.CommandBindings>
+        <CommandBinding Command="{x:Static ApplicationCommands.Find}" Executed="OnFindCommand"/>
+    </Window.CommandBindings>
+    <Window.InputBindings>
+        <KeyBinding Key="N" Modifiers="Control" Command="{Binding NewCommand}"/>
+        <KeyBinding Key="O" Modifiers="Control" Command="{Binding OpenCommand}"/>
+        <KeyBinding Key="S" Modifiers="Control" Command="{Binding SaveCommand}"/>
+        <KeyBinding Key="Z" Modifiers="Control" Command="{Binding UndoCommand}"/>
+        <KeyBinding Key="Y" Modifiers="Control" Command="{Binding RedoCommand}"/>
+        <KeyBinding Key="F5" Command="{Binding RegenerateCommand}"/>
+        <KeyBinding Key="Home" Command="{Binding ZoomExtentsCommand}"/>
+        <KeyBinding Key="E" Modifiers="Control" Command="{Binding ShowElevationCheckCommand}"/>
+        <KeyBinding Key="D" Modifiers="Control" Command="{Binding ShowDrawingsCommand}"/>
+        <KeyBinding Key="K" Modifiers="Control" Command="{x:Static ApplicationCommands.Find}"/>
+        <KeyBinding Key="F" Modifiers="Control" Command="{x:Static ApplicationCommands.Find}"/>
+    </Window.InputBindings>
+
+    <Grid Background="#FF1F1F1F">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- ===================== Ribbon ===================== -->
+        <TabControl x:Name="Ribbon" Grid.Row="0" Style="{StaticResource RibbonTabs}" Background="{StaticResource RibbonBrush}" BorderThickness="0,0,0,1" BorderBrush="{StaticResource BorderBrushDark}" Padding="2">
+            <TabItem Header="Home">
+                <StackPanel Orientation="Horizontal" Height="100">
+                    <HeaderedContentControl Header="Project" Style="{StaticResource RibbonGroup}">
+                        <StackPanel Orientation="Horizontal">
+                            <Button Style="{StaticResource RibbonButton}" Command="{Binding NewCommand}" ToolTip="New project (Ctrl+N)">
+                                <StackPanel><TextBlock Style="{StaticResource RibbonIcon}" Text="&#xE8A5;"/><TextBlock Style="{StaticResource RibbonLabel}" Text="New"/></StackPanel>
+                            </Button>
+                            <Button Style="{StaticResource RibbonButton}" Command="{Binding OpenCommand}" ToolTip="Open project (Ctrl+O)">
+                                <StackPanel><TextBlock Style="{StaticResource RibbonIcon}" Text="&#xE8E5;"/><TextBlock Style="{StaticResource RibbonLabel}" Text="Open"/></StackPanel>
+                            </Button>
+                            <Button Style="{StaticResource RibbonButton}" Command="{Binding SaveCommand}" ToolTip="Save project (Ctrl+S)">
+                                <StackPanel><TextBlock Style="{StaticResource RibbonIcon}" Text="&#xE74E;"/><TextBlock Style="{StaticResource RibbonLabel}" Text="Save"/></StackPanel>
+                            </Button>
+                            <Button Style="{StaticResource RibbonButton}" Command="{Binding SaveAsCommand}">
+                                <StackPanel><TextBlock Style="{StaticResource RibbonIcon}" Text="&#xE792;"/><TextBlock Style="{StaticResource RibbonLabel}" Text="Save As"/></StackPanel>
+                            </Button>
+                            <Button Style="{StaticResource RibbonButton}" Command="{Binding LoadSampleCommand}" ToolTip="Load a demonstration project">
+                                <StackPanel><TextBlock Style="{StaticResource RibbonIcon}" Text="&#xE7BE;"/><TextBlock Style="{StaticResource RibbonLabel}" Text="Sample"/></StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </HeaderedContentControl>
+                    <HeaderedContentControl Header="Edit" Style="{StaticResource RibbonGroup}">
+                        <StackPanel Orientation="Horizontal">
+                            <Button Style="{StaticResource RibbonButton}" Command="{Binding UndoCommand}" ToolTip="Undo (Ctrl+Z)">
+                                <StackPanel><TextBlock Style="{StaticResource RibbonIcon}" Text="&#xE7A7;"/><TextBlock Style="{StaticResource RibbonLabel}" Text="Undo"/></StackPanel>
+                            </Button>
+                            <Button Style="{StaticResource RibbonButton}" Command="{Binding RedoCommand}" ToolTip="Redo (Ctrl+Y)">
+                                <StackPanel><TextBlock Style="{StaticResource RibbonIcon}" Text="&#xE7A6;"/><TextBlock Style="{StaticResource RibbonLabel}" Text="Redo"/></StackPanel>
+                            </Button>
+                            <Button Style="{StaticResource RibbonButton}" Command="{Binding RegenerateCommand}" ToolTip="Regenerate model (F5)">
+                                <StackPanel><TextBlock Style="{StaticResource RibbonIcon}" Text="&#xE72C;"/><TextBlock Style="{StaticResource RibbonLabel}" Text="Regenerate"/></StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </HeaderedContentControl>
+                    <HeaderedContentControl Header="Automation" Style="{StaticResource RibbonGroup}">
+                        <Button Style="{StaticResource RibbonButton}" Command="{Binding RunScriptCommand}" ToolTip="Run a C# script (.csx) against this project (Doc, Print, Ft, In, Sta, Len). Undo reverts it.">
+                            <StackPanel><TextBlock Style="{StaticResource RibbonIcon}" Text="&#xE943;"/><TextBlock Style="{StaticResource RibbonLabel}" Text="Run Script"/></StackPanel>
+                        </Button>
+                    </HeaderedContentControl>
+                    <HeaderedContentControl Header="Units" Style="{StaticResource RibbonGroup}">
+                        <Button Style="{StaticResource RibbonButton}" Command="{Binding ToggleUnitsCommand}" ToolTip="Switch display units between US and SI">
+                            <StackPanel><TextBlock Style="{StaticResource RibbonIcon}" Text="&#xE9E9;"/><TextBlock Style="{StaticResource RibbonLabel}" Text="{Binding UnitsText}"/></StackPanel>
+                        </Button>
+                    </HeaderedContentControl>
+                </StackPanel>
+            </TabItem>
+
+            <TabItem Header="Alignment">
+                <StackPanel Orientation="Horizontal" Height="100">
+                    <HeaderedContentControl Header="Create" Style="{StaticResource RibbonGroup}">
+                        <StackPanel Orientation="Horizontal">
+                            <Button Style="{StaticResource RibbonButton}" Command="{Binding ImportLandXmlCommand}" ToolTip="Import alignments, profiles and superelevation from LandXML">
+                                <StackPanel><TextBlock Style="{StaticResource RibbonIcon}" Text="&#xE8B5;"/><TextBlock Style="{StaticResource RibbonLabel}" Text="Import LandXML"/></StackPanel>
+                            </Button>
+                            <Button Style="{StaticResource RibbonButton}" Command="{Binding NewAlignmentCommand}" ToolTip="Create an alignment from a PI table">
+                                <StackPanel><TextBlock Style="{StaticResource RibbonIcon}" Text="&#xE710;"/><TextBlock Style="{StaticResource RibbonLabel}" Text="New by PIs"/></StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </HeaderedContentControl>
+                    <HeaderedContentControl Header="Modify" Style="{StaticResource RibbonGroup}">
+                        <Button Style="{StaticResource RibbonButton}" Command="{Binding EditAlignmentCommand}" ToolTip="Edit horizontal, vertical and cross slope">
+                            <StackPanel><TextBlock Style="{StaticResource RibbonIcon}" Text="&#xE70F;"/><TextBlock Style="{StaticResource RibbonLabel}" Text="Edit Alignment"/></StackPanel>
+                        </Button>
+                    </HeaderedContentControl>
+                    <HeaderedContentControl Header="Output" Style="{StaticResource RibbonGroup}">
+                        <Button Style="{StaticResource RibbonButton}" Command="{Binding ExportLandXmlCommand}">
+                            <StackPanel><TextBlock Style="{StaticResource RibbonIcon}" Text="&#xEDE1;"/><TextBlock Style="{StaticResource RibbonLabel}" Text="Export LandXML"/></StackPanel>
+                        </Button>
+                    </HeaderedContentControl>
+                </StackPanel>
+            </TabItem>
+
+            <TabItem Header="Superstructure">
+                <StackPanel Orientation="Horizontal" Height="100">
+                    <HeaderedContentControl Header="Bridge" Style="{StaticResource RibbonGroup}">
+                        <StackPanel Orientation="Horizontal">
+                            <Button Style="{StaticResource RibbonButton}" Command="{Binding NewBridgeCommand}" ToolTip="Lay out a new steel girder bridge on the selected alignment">
+                                <StackPanel><TextBlock Style="{StaticResource RibbonIcon}" Text="&#xE710;"/><TextBlock Style="{StaticResource RibbonLabel}" Text="New Bridge"/></StackPanel>
+                            </Button>
+                            <Button Style="{StaticResource RibbonButton}" Command="{Binding ImportPgSuperCommand}" ToolTip="Import a PGSuper / BridgeLink bridge (*.pgs or ReportExportAgent *_export.xml) onto an alignment as prestressed I-girders">
+                                <StackPanel><TextBlock Style="{StaticResource RibbonIcon}" Text="&#xE8B5;"/><TextBlock Style="{StaticResource RibbonLabel}" Text="Import PGSuper"/></StackPanel>
+                            </Button>
+                            <Button Style="{StaticResource RibbonButton}" Command="{Binding EditBridgeCommand}" CommandParameter="0">
+                                <StackPanel><TextBlock Style="{StaticResource RibbonIcon}" Text="&#xE7C1;"/><TextBlock Style="{StaticResource RibbonLabel}" Text="Supports &amp; Spans"/></StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </HeaderedContentControl>
+                    <HeaderedContentControl Header="Framing" Style="{StaticResource RibbonGroup}">
+                        <StackPanel Orientation="Horizontal">
+                            <Button Style="{StaticResource RibbonButton}" Command="{Binding EditBridgeCommand}" CommandParameter="1">
+                                <StackPanel><TextBlock Style="{StaticResource RibbonIcon}" Text="&#xE8A9;"/><TextBlock Style="{StaticResource RibbonLabel}" Text="Girders"/></StackPanel>
+                            </Button>
+                            <Button Style="{StaticResource RibbonButton}" Command="{Binding EditBridgeCommand}" CommandParameter="3">
+                                <StackPanel><TextBlock Style="{StaticResource RibbonIcon}" Text="&#xE8C1;"/><TextBlock Style="{StaticResource RibbonLabel}" Text="Cross Frames"/></StackPanel>
+                            </Button>
+                            <Button Style="{StaticResource RibbonButton}" Command="{Binding EditBridgeCommand}" CommandParameter="4">
+                                <StackPanel><TextBlock Style="{StaticResource RibbonIcon}" Text="&#xE7C5;"/><TextBlock Style="{StaticResource RibbonLabel}" Text="Stiffeners"/></StackPanel>
+                            </Button>
+                            <Button Style="{StaticResource RibbonButton}" Command="{Binding EditBridgeCommand}" CommandParameter="5">
+                                <StackPanel><TextBlock Style="{StaticResource RibbonIcon}" Text="&#xE8C6;"/><TextBlock Style="{StaticResource RibbonLabel}" Text="Field Splices"/></StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </HeaderedContentControl>
+                    <HeaderedContentControl Header="Details" Style="{StaticResource RibbonGroup}">
+                        <Button Style="{StaticResource RibbonButton}" Command="{Binding EditBridgeCommand}" CommandParameter="6" ToolTip="Bolts, bearings and splice gap">
+                            <StackPanel><TextBlock Style="{StaticResource RibbonIcon}" Text="&#xE8C6;"/><TextBlock Style="{StaticResource RibbonLabel}" Text="Connections &amp; Bearings"/></StackPanel>
+                        </Button>
+                    </HeaderedContentControl>
+                    <HeaderedContentControl Header="Studs &amp; Bracing" Style="{StaticResource RibbonGroup}">
+                        <Button Style="{StaticResource RibbonButton}" Command="{Binding EditBridgeCommand}" CommandParameter="7" ToolTip="Shear studs and top/bottom flange lateral bracing">
+                            <StackPanel><TextBlock Style="{StaticResource RibbonIcon}" Text="&#xE8FD;"/><TextBlock Style="{StaticResource RibbonLabel}" Text="Studs &amp; Laterals"/></StackPanel>
+                        </Button>
+                    </HeaderedContentControl>
+                    <HeaderedContentControl Header="Reinforcing" Style="{StaticResource RibbonGroup}">
+                        <Button Style="{StaticResource RibbonButton}" Command="{Binding ShowBarScheduleCommand}" ToolTip="Bar mark list with bending diagrams; export to CSV">
+                            <StackPanel><TextBlock Style="{StaticResource RibbonIcon}" Text="&#xE9D5;"/><TextBlock Style="{StaticResource RibbonLabel}" Text="Bar Schedule"/></StackPanel>
+                        </Button>
+                    </HeaderedContentControl>
+                    <HeaderedContentControl Header="Checks" Style="{StaticResource RibbonGroup}">
+                        <Button Style="{StaticResource RibbonButton}" Command="{Binding ShowElevationCheckCommand}" ToolTip="Elevation Check (Ctrl+E): step-by-step elevations from profile grade to bearing seat at every bearing, or at any station and offset">
+                            <StackPanel><TextBlock Style="{StaticResource RibbonIcon}" Text="&#xE9F9;"/><TextBlock Style="{StaticResource RibbonLabel}" Text="Elevation Check"/></StackPanel>
+                        </Button>
+                    </HeaderedContentControl>
+                    <HeaderedContentControl Header="Deck" Style="{StaticResource RibbonGroup}">
+                        <Button Style="{StaticResource RibbonButton}" Command="{Binding EditBridgeCommand}" CommandParameter="2">
+                            <StackPanel><TextBlock Style="{StaticResource RibbonIcon}" Text="&#xE81E;"/><TextBlock Style="{StaticResource RibbonLabel}" Text="Deck, Barrier &amp; Rebar"/></StackPanel>
+                        </Button>
+                    </HeaderedContentControl>
+                </StackPanel>
+            </TabItem>
+
+            <TabItem Header="References">
+                <StackPanel Orientation="Horizontal" Height="100">
+                    <HeaderedContentControl Header="Terrain" Style="{StaticResource RibbonGroup}">
+                        <Button Style="{StaticResource RibbonButton}" Command="{Binding ImportTerrainCommand}" ToolTip="Existing ground TIN: LandXML surface (Civil 3D / OpenRoads), DXF 3DFACE, OBJ or STL">
+                            <StackPanel><TextBlock Style="{StaticResource RibbonIcon}" Text="&#xE909;"/><TextBlock Style="{StaticResource RibbonLabel}" Text="Import Terrain"/></StackPanel>
+                        </Button>
+                    </HeaderedContentControl>
+                    <HeaderedContentControl Header="Reference Models" Style="{StaticResource RibbonGroup}">
+                        <StackPanel Orientation="Horizontal">
+                            <Button Style="{StaticResource RibbonButton}" Command="{Binding AttachReferenceCommand}" ToolTip="Attach DXF (lines, polylines, 3D faces), OBJ or STL models — roadway, utilities, existing structures">
+                                <StackPanel><TextBlock Style="{StaticResource RibbonIcon}" Text="&#xE71B;"/><TextBlock Style="{StaticResource RibbonLabel}" Text="Attach Reference"/></StackPanel>
+                            </Button>
+                            <Button Style="{StaticResource RibbonButton}" Command="{Binding RemoveReferenceCommand}" ToolTip="Detach the reference selected in the Project Explorer">
+                                <StackPanel><TextBlock Style="{StaticResource RibbonIcon}" Text="&#xE74D;"/><TextBlock Style="{StaticResource RibbonLabel}" Text="Detach"/></StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </HeaderedContentControl>
+                </StackPanel>
+            </TabItem>
+
+            <TabItem Header="View">
+                <StackPanel Orientation="Horizontal" Height="100">
+                    <HeaderedContentControl Header="Views" Style="{StaticResource RibbonGroup}">
+                        <StackPanel Orientation="Horizontal">
+                            <Button Style="{StaticResource RibbonButton}" Command="{Binding ViewPlanCommand}" ToolTip="Top (plan) view, rotation locked">
+                                <StackPanel><TextBlock Style="{StaticResource RibbonIcon}" Text="&#xE80A;"/><TextBlock Style="{StaticResource RibbonLabel}" Text="Plan"/></StackPanel>
+                            </Button>
+                            <Button Style="{StaticResource RibbonButton}" Command="{Binding View3DCommand}" ToolTip="Isometric 3D view (right-drag to orbit)">
+                                <StackPanel><TextBlock Style="{StaticResource RibbonIcon}" Text="&#xF158;"/><TextBlock Style="{StaticResource RibbonLabel}" Text="3D"/></StackPanel>
+                            </Button>
+                            <Button Style="{StaticResource RibbonButton}" Command="{Binding ZoomExtentsCommand}" ToolTip="Zoom extents (Home)">
+                                <StackPanel><TextBlock Style="{StaticResource RibbonIcon}" Text="&#xE740;"/><TextBlock Style="{StaticResource RibbonLabel}" Text="Zoom Extents"/></StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </HeaderedContentControl>
+                    <HeaderedContentControl Header="Section" Style="{StaticResource RibbonGroup}">
+                        <Button Style="{StaticResource RibbonButton}" Click="OnToggleSection" ToolTip="Section Cut (Ctrl+Shift+S): cut the 3D model with a vertical plane at a station (along any skew) or an offset; the cut face and everything behind it stay visible. Drag the slider to move it live.">
+                            <StackPanel><TextBlock Style="{StaticResource RibbonIcon}" Text="&#xE8B3;"/><TextBlock Style="{StaticResource RibbonLabel}" Text="Section Cut"/></StackPanel>
+                        </Button>
+                    </HeaderedContentControl>
+                    <HeaderedContentControl Header="Inquiry" Style="{StaticResource RibbonGroup}">
+                        <StackPanel Orientation="Horizontal">
+                            <Button Style="{StaticResource RibbonButton}" Click="OnMeasureDistance" ToolTip="Measure (Ctrl+M): click two points (snapped) for the 3D and plan distance, dE / dN / dZ, slope, bearing and the station / offset of both points. Chain keeps measuring from the last point.">
+                                <StackPanel><TextBlock Style="{StaticResource RibbonIcon}" Text="&#xE7B8;"/><TextBlock Style="{StaticResource RibbonLabel}" Text="Measure"/></StackPanel>
+                            </Button>
+                            <Button Style="{StaticResource RibbonButton}" Click="OnMeasureAngle" ToolTip="Measure the angle between three points (first point, vertex, third point)">
+                                <StackPanel><TextBlock Style="{StaticResource RibbonIcon}" Text="&#xE7B7;"/><TextBlock Style="{StaticResource RibbonLabel}" Text="Measure Angle"/></StackPanel>
+                            </Button>
+                            <Button Style="{StaticResource RibbonButton}" Click="OnQueryPoint" ToolTip="Station / Offset / Elevation (Ctrl+I): hover or click any point (snapped) for E, N, Z, station, offset, profile grade, finished grade and the difference">
+                                <StackPanel><TextBlock Style="{StaticResource RibbonIcon}" Text="&#xE81D;"/><TextBlock Style="{StaticResource RibbonLabel}" Text="Station / Offset"/></StackPanel>
+                            </Button>
+                            <Button Style="{StaticResource RibbonButton}" Click="OnSnapSettings" ToolTip="Object snaps (F3 toggles all): endpoint, midpoint, center, intersection, perpendicular, nearest, bridge points (bearings, work points, splices, web lines), X-ray">
+                                <StackPanel><TextBlock Style="{StaticResource RibbonIcon}" Text="&#xE7C9;"/><TextBlock Style="{StaticResource RibbonLabel}" Text="Object Snaps"/></StackPanel>
+                            </Button>
+                            <Button Style="{StaticResource RibbonButton}" Click="OnMeasureClear" ToolTip="Remove all measurements and pinned points from the view">
+                                <StackPanel><TextBlock Style="{StaticResource RibbonIcon}" Text="&#xE74D;"/><TextBlock Style="{StaticResource RibbonLabel}" Text="Clear Measurements"/></StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </HeaderedContentControl>
+                </StackPanel>
+            </TabItem>
+
+            <TabItem Header="Review">
+                <StackPanel Orientation="Horizontal" Height="100">
+                    <HeaderedContentControl Header="Checks" Style="{StaticResource RibbonGroup}">
+                        <Button Style="{StaticResource RibbonButton}" Command="{Binding ShowElevationCheckCommand}" ToolTip="Elevation Check (Ctrl+E): step-by-step elevations from profile grade to bearing seat at every bearing, or at any station and offset">
+                            <StackPanel><TextBlock Style="{StaticResource RibbonIcon}" Text="&#xE9F9;"/><TextBlock Style="{StaticResource RibbonLabel}" Text="Elevation Check"/></StackPanel>
+                        </Button>
+                    </HeaderedContentControl>
+                    <HeaderedContentControl Header="Reports" Style="{StaticResource RibbonGroup}">
+                        <StackPanel Orientation="Horizontal">
+                            <Button Style="{StaticResource RibbonButton}" Click="OnShowReport" Tag="1" ToolTip="Bearing table: station, offset, coordinates, top/bottom of steel, deck, seat, ground">
+                                <StackPanel><TextBlock Style="{StaticResource RibbonIcon}" Text="&#xE8A1;"/><TextBlock Style="{StaticResource RibbonLabel}" Text="Bearings"/></StackPanel>
+                            </Button>
+                            <Button Style="{StaticResource RibbonButton}" Click="OnShowReport" Tag="2" ToolTip="Cross-frame schedule">
+                                <StackPanel><TextBlock Style="{StaticResource RibbonIcon}" Text="&#xE8C1;"/><TextBlock Style="{StaticResource RibbonLabel}" Text="Cross Frames"/></StackPanel>
+                            </Button>
+                            <Button Style="{StaticResource RibbonButton}" Click="OnShowReport" Tag="3" ToolTip="Steel, bolts, concrete and rebar quantities">
+                                <StackPanel><TextBlock Style="{StaticResource RibbonIcon}" Text="&#xE9D2;"/><TextBlock Style="{StaticResource RibbonLabel}" Text="Material List"/></StackPanel>
+                            </Button>
+                            <Button Style="{StaticResource RibbonButton}" Command="{Binding ShowBarScheduleCommand}" ToolTip="Bar mark list with bending diagrams; export to CSV">
+                                <StackPanel><TextBlock Style="{StaticResource RibbonIcon}" Text="&#xE9D5;"/><TextBlock Style="{StaticResource RibbonLabel}" Text="Bar Schedule"/></StackPanel>
+                            </Button>
+                            <Button Style="{StaticResource RibbonButton}" Click="OnShowReport" Tag="0" ToolTip="Messages and warnings from the last regeneration">
+                                <StackPanel><TextBlock Style="{StaticResource RibbonIcon}" Text="&#xE7BA;"/><TextBlock Style="{StaticResource RibbonLabel}" Text="Messages"/></StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </HeaderedContentControl>
+                </StackPanel>
+            </TabItem>
+
+            <TabItem Header="Output">
+                <StackPanel Orientation="Horizontal" Height="100">
+                    <HeaderedContentControl Header="Drawings" Style="{StaticResource RibbonGroup}">
+                        <Button Style="{StaticResource RibbonButton}" Command="{Binding ShowDrawingsCommand}" ToolTip="Plan sheets (Ctrl+D): 11x17 sheets built from the model — layout, typical section, girder elevations, steel details, bearing details, bents, bar lists. Export PDF and DXF.">
+                            <StackPanel><TextBlock Style="{StaticResource RibbonIcon}" Text="&#xE8A1;"/><TextBlock Style="{StaticResource RibbonLabel}" Text="Sheets"/></StackPanel>
+                        </Button>
+                    </HeaderedContentControl>
+                    <HeaderedContentControl Header="CAD" Style="{StaticResource RibbonGroup}">
+                        <StackPanel Orientation="Horizontal">
+                            <Button Style="{StaticResource RibbonButton}" Command="{Binding ExportIfcCommand}" ToolTip="Full 3D steel model as IFC 4.3 (IfcBridge, plates, members, bolts, welds, bearings)">
+                                <StackPanel><TextBlock Style="{StaticResource RibbonIcon}" Text="&#xF158;"/><TextBlock Style="{StaticResource RibbonLabel}" Text="IFC 4.3 Model"/></StackPanel>
+                            </Button>
+                            <Button Style="{StaticResource RibbonButton}" Command="{Binding ExportDxfCommand}" ToolTip="Framing plan as layered 3D DXF (opens in MicroStation / Civil 3D)">
+                                <StackPanel><TextBlock Style="{StaticResource RibbonIcon}" Text="&#xEDE1;"/><TextBlock Style="{StaticResource RibbonLabel}" Text="Framing Plan DXF"/></StackPanel>
+                            </Button>
+                            <Button Style="{StaticResource RibbonButton}" Command="{Binding ExportLandXmlCommand}">
+                                <StackPanel><TextBlock Style="{StaticResource RibbonIcon}" Text="&#xE8B5;"/><TextBlock Style="{StaticResource RibbonLabel}" Text="LandXML"/></StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </HeaderedContentControl>
+                </StackPanel>
+            </TabItem>
+        </TabControl>
+        <Grid Grid.Row="0" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,4,10,0" Width="300">
+            <TextBox x:Name="CommandSearch" Padding="28,4,8,4" ToolTip="Find any command by name (Ctrl+K), then press Enter"
+                     TextChanged="OnCommandSearchChanged" PreviewKeyDown="OnCommandSearchKey" GotKeyboardFocus="OnCommandSearchFocus" LostKeyboardFocus="OnCommandSearchLostFocus"/>
+            <TextBlock FontFamily="{StaticResource IconFont}" Text="&#xE721;" Margin="9,0,0,0" VerticalAlignment="Center" IsHitTestVisible="False" Foreground="#FFBBBBBB"/>
+            <TextBlock x:Name="CommandSearchHint" Text="Find a command   (Ctrl+K)" Margin="30,0,0,0" VerticalAlignment="Center" IsHitTestVisible="False" Foreground="#FF9A9A9A"/>
+            <Popup x:Name="CommandPopup" PlacementTarget="{Binding ElementName=CommandSearch}" Placement="Bottom" StaysOpen="True" AllowsTransparency="True" Width="460">
+                <Border Background="#FF2B2B2B" BorderBrush="#FF3794FF" BorderThickness="1" CornerRadius="4" Padding="2">
+                    <ListBox x:Name="CommandList" MaxHeight="420" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Background="Transparent" BorderThickness="0"
+                             PreviewMouseLeftButtonUp="OnCommandListClick">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Margin="2,3">
+                                    <TextBlock>
+                                        <Run Text="{Binding Name, Mode=OneWay}" FontWeight="SemiBold" Foreground="White"/>
+                                        <Run Text="{Binding Where, Mode=OneWay}" Foreground="#FF8CC4FF"/>
+                                    </TextBlock>
+                                    <TextBlock Text="{Binding Description}" Foreground="#FFBBBBBB" FontSize="11.5" TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Border>
+            </Popup>
+        </Grid>
+
+        <!-- ===================== Main area ===================== -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="270" MinWidth="160"/>
+                <ColumnDefinition Width="4"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="4"/>
+                <ColumnDefinition Width="320" MinWidth="200"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Project explorer -->
+            <DockPanel Background="{StaticResource PanelBrush}">
+                <TextBlock DockPanel.Dock="Top" Style="{StaticResource PanelHeader}" Text="Project Explorer"/>
+                <TreeView x:Name="ExplorerTree" ItemsSource="{Binding Explorer}" BorderThickness="0" Background="Transparent"
+                          SelectedItemChanged="OnExplorerSelected" MouseDoubleClick="OnExplorerDoubleClick">
+                    <TreeView.ItemContainerStyle>
+                        <Style TargetType="TreeViewItem" BasedOn="{StaticResource {x:Type TreeViewItem}}">
+                            <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"/>
+                        </Style>
+                    </TreeView.ItemContainerStyle>
+                    <TreeView.ItemTemplate>
+                        <HierarchicalDataTemplate DataType="{x:Type vm:ExplorerNode}" ItemsSource="{Binding Children}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock FontFamily="{StaticResource IconFont}" Text="{Binding Icon}" Margin="0,0,6,0" VerticalAlignment="Center" Foreground="#FF8CC4FF"/>
+                                <TextBlock Text="{Binding Header}" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </HierarchicalDataTemplate>
+                    </TreeView.ItemTemplate>
+                </TreeView>
+            </DockPanel>
+            <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" Background="{StaticResource BorderBrushDark}"/>
+
+            <!-- Viewport + bottom panel -->
+            <Grid Grid.Column="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="4"/>
+                    <RowDefinition Height="200" MinHeight="60"/>
+                </Grid.RowDefinitions>
+                <hx:Viewport3DX x:Name="View" ShowViewCube="True" ShowCoordinateSystem="True" ModelUpDirection="0,0,1"
+                                ZoomExtentsWhenLoaded="False" ShowFrameRate="False" IsInertiaEnabled="False"
+                                ZoomAroundMouseDownPoint="True" RotateAroundMouseDownPoint="True"
+                                MouseMove="OnViewportMouseMove" TextBrush="White"/>
+                <!-- Plan / 3D switch (model mode) -->
+                <StackPanel x:Name="ViewSwitch" Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10" Panel.ZIndex="4">
+                    <RadioButton x:Name="ViewPlanButton" Content="Plan" GroupName="ViewMode" IsChecked="True" Style="{StaticResource ModeToggle}"
+                                 Checked="OnViewSwitch" ToolTip="Plan view (top, rotation locked)"/>
+                    <RadioButton x:Name="View3DButton" Content="3D" GroupName="ViewMode" Style="{StaticResource ModeToggle}"
+                                 Checked="OnViewSwitch" ToolTip="3D view (right-drag to orbit)"/>
+                    <Border Width="10"/>
+                    <ToggleButton x:Name="TerrainToggle" Content="Terrain" IsChecked="True" Style="{StaticResource ModeToggle}" Click="OnTerrainToggle"
+                                  ToolTip="Show / hide terrain surfaces and contours (hidden terrain is not drawn; elevations still use it)"/>
+                    <Border Width="10"/>
+                    <ToggleButton x:Name="CompassViewButton" Content="Views ▾" Style="{StaticResource ModeToggle}" Click="OnCompassViews"
+                                  ToolTip="3D views from N, NE, E, SE, S, SW, W, NW at a set look-down angle; detail drawing distance"/>
+                    <Border Width="10"/>
+                    <RadioButton Content="Extents" GroupName="ZoomCmds" Style="{StaticResource ModeToggle}" Click="OnZoomExtentsButton" ToolTip="Zoom extents"/>
+                    <RadioButton Content="Window" GroupName="ZoomCmds" Style="{StaticResource ModeToggle}" Click="OnZoomWindowButton" ToolTip="Zoom window: drag a rectangle"/>
+                </StackPanel>
+                <Canvas Grid.Row="0" IsHitTestVisible="False" Panel.ZIndex="5">
+                    <Rectangle x:Name="ZoomRect" Visibility="Collapsed" Stroke="#FF3794FF" StrokeThickness="1.5" StrokeDashArray="4 2" Fill="#223794FF"/>
+                </Canvas>
+                <!-- Live section cut (alignment coordinates, Z vertical) -->
+                <Border x:Name="SectionPanel" Grid.Row="0" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="10" Padding="12,8"
+                        CornerRadius="4" Background="#EE252526" BorderBrush="#FF3F3F46" BorderThickness="1" Visibility="Collapsed" Width="360">
+                    <StackPanel>
+                        <DockPanel Margin="0,0,0,6">
+                            <Button DockPanel.Dock="Right" Style="{StaticResource ToolIconButton}" Content="&#xE711;" Click="OnSectionClose" ToolTip="Turn the section cut off"/>
+                            <TextBlock Text="SECTION CUT" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                        </DockPanel>
+                        <ComboBox x:Name="SectionMode" SelectionChanged="OnSectionChanged" Margin="0,0,0,6">
+                            <ComboBoxItem Content="Cross section at a station (along the skew)"/>
+                            <ComboBoxItem Content="Longitudinal at an offset (tangent at the station)"/>
+                        </ComboBox>
+                        <Grid>
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="70"/><ColumnDefinition Width="110"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions><RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/></Grid.RowDefinitions>
+                            <TextBlock Text="Station" VerticalAlignment="Center"/>
+                            <TextBox x:Name="SectionStation" Grid.Column="1" Margin="0,2" LostFocus="OnSectionText" KeyDown="OnSectionTextKey"/>
+                            <Slider x:Name="SectionStationSlider" Grid.Column="2" Margin="8,0,0,0" VerticalAlignment="Center" ValueChanged="OnSectionSlider"/>
+                            <TextBlock Grid.Row="1" Text="Offset" VerticalAlignment="Center"/>
+                            <TextBox x:Name="SectionOffset" Grid.Row="1" Grid.Column="1" Margin="0,2" LostFocus="OnSectionText" KeyDown="OnSectionTextKey"/>
+                            <Slider x:Name="SectionOffsetSlider" Grid.Row="1" Grid.Column="2" Margin="8,0,0,0" VerticalAlignment="Center" ValueChanged="OnSectionSlider"/>
+                            <TextBlock Grid.Row="2" Text="Skew" VerticalAlignment="Center"/>
+                            <TextBox x:Name="SectionSkew" Grid.Row="2" Grid.Column="1" Margin="0,2" LostFocus="OnSectionText" KeyDown="OnSectionTextKey" ToolTip="Cross sections: angle from the radial line, positive = right end up-station (like support skews)"/>
+                            <CheckBox x:Name="SectionFlip" Grid.Row="2" Grid.Column="2" Margin="8,0,0,0" Content="Other side" Checked="OnSectionChanged" Unchecked="OnSectionChanged"/>
+                            <TextBlock Grid.Row="3" Text="Snap to" VerticalAlignment="Center"/>
+                            <ComboBox x:Name="SectionSupport" Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" Margin="0,2" SelectionChanged="OnSectionSupport"
+                                      ToolTip="Cut just beside a support, along its skew, to see the bent / abutment in elevation"/>
+                        </Grid>
+                        <TextBlock x:Name="SectionInfo" Foreground="{StaticResource MutedText}" FontSize="11" TextWrapping="Wrap" Margin="0,6,0,0"/>
+                    </StackPanel>
+                </Border>
+                <!-- Measure / query / snap overlay (screen-space graphics reprojected with the camera) -->
+                <Canvas x:Name="MeasureOverlay" Grid.Row="0" IsHitTestVisible="False" ClipToBounds="True" Panel.ZIndex="3"/>
+                <Border x:Name="MeasurePanel" Grid.Row="0" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,44,0,0" Padding="10,8"
+                        CornerRadius="4" Background="#EE252526" BorderBrush="#FF3F3F46" BorderThickness="1" Visibility="Collapsed" Width="400" Panel.ZIndex="4">
+                    <StackPanel>
+                        <DockPanel Margin="0,0,0,4">
+                            <Button DockPanel.Dock="Right" Style="{StaticResource ToolIconButton}" Content="&#xE711;" Click="OnMeasureClose" ToolTip="Finish (Esc)"/>
+                            <TextBlock x:Name="MeasureTitle" Text="MEASURE" FontWeight="SemiBold" VerticalAlignment="Center" Foreground="#FFE6E6E6"/>
+                        </DockPanel>
+                        <DockPanel Margin="0,0,0,4">
+                            <TextBlock Text="Alignment" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#FFE6E6E6"/>
+                            <ComboBox x:Name="MeasureAlignment" SelectionChanged="OnMeasureAlignmentChanged" ToolTip="Alignment used for station / offset / grades"/>
+                        </DockPanel>
+                        <ScrollViewer MaxHeight="360" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+                            <TextBlock x:Name="MeasureReadout" FontFamily="Consolas" FontSize="12" Foreground="#FFE6E6E6" TextWrapping="NoWrap"/>
+                        </ScrollViewer>
+                        <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                            <Button Content="Copy" Click="OnMeasureCopy" Padding="12,2" Margin="0,0,6,0" ToolTip="Copy the results to the clipboard"/>
+                            <Button Content="Clear" Click="OnMeasureClear" Padding="12,2" Margin="0,0,12,0" ToolTip="Remove all measurements and pinned points"/>
+                            <CheckBox x:Name="MeasureChain" Content="Chain" VerticalAlignment="Center" Foreground="#FFE6E6E6" ToolTip="Keep measuring from the last point"/>
+                        </StackPanel>
+                        <TextBlock x:Name="MeasureHint" Foreground="{StaticResource MutedText}" FontSize="11" TextWrapping="Wrap" Margin="0,6,0,0"/>
+                    </StackPanel>
+                </Border>
+                <StackPanel x:Name="SnapBar" Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,10,10" Panel.ZIndex="4">
+                    <StackPanel.Resources>
+                        <Style TargetType="ToggleButton">
+                            <Setter Property="Foreground" Value="#FFE6E6E6"/>
+                            <Setter Property="FontSize" Value="11"/>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ToggleButton">
+                                        <Border x:Name="bd" Background="#E62B2B2B" BorderBrush="#FF55575C" BorderThickness="1" Padding="7,3" Margin="0,0,-1,0">
+                                            <ContentPresenter HorizontalAlignment="Center" TextElement.Foreground="{TemplateBinding Foreground}"/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="bd" Property="Background" Value="#FF3A3D41"/></Trigger>
+                                            <Trigger Property="IsChecked" Value="True">
+                                                <Setter TargetName="bd" Property="Background" Value="#FF2A6BBD"/>
+                                                <Setter TargetName="bd" Property="BorderBrush" Value="#FF3794FF"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </StackPanel.Resources>
+                    <ToggleButton x:Name="SnapMaster" Content="SNAP" IsChecked="True" Click="OnSnapMaster" ToolTip="Object snaps on / off (F3)"/>
+                    <ToggleButton Content="END" Tag="Endpoint" IsChecked="True" Click="OnSnapMode" ToolTip="Endpoint: vertices, line ends, bar bends"/>
+                    <ToggleButton Content="MID" Tag="Midpoint" IsChecked="True" Click="OnSnapMode" ToolTip="Midpoint of segments and mesh edges"/>
+                    <ToggleButton Content="CEN" Tag="Center" IsChecked="True" Click="OnSnapMode" ToolTip="Center of bolts, studs and columns"/>
+                    <ToggleButton Content="INT" Tag="Intersection" IsChecked="True" Click="OnSnapMode" ToolTip="Apparent intersection of lines (as seen in the view)"/>
+                    <ToggleButton Content="PER" Tag="Perpendicular" IsChecked="True" Click="OnSnapMode" ToolTip="Perpendicular foot from the previous point"/>
+                    <ToggleButton Content="NEA" Tag="Nearest" IsChecked="True" Click="OnSnapMode" ToolTip="Nearest point on a line or bar"/>
+                    <ToggleButton Content="BRG" Tag="Domain" IsChecked="True" Click="OnSnapMode" ToolTip="Bridge points: bearings, cross-frame work points, splices, girder web lines, deck edge"/>
+                    <ToggleButton Content="X-RAY" Tag="XRay" IsChecked="False" Click="OnSnapMode" ToolTip="Also snap to geometry hidden behind opaque solids"/>
+                </StackPanel>
+                <!-- Sheets mode: 11x17 plan sheets composed from the live model -->
+                <DockPanel x:Name="SheetsPanel" Grid.Row="0" Visibility="Collapsed" Background="#FF1F1F1F">
+                    <Border DockPanel.Dock="Top" Background="{StaticResource PanelHeaderBrush}" Padding="8,44,8,6">
+                        <DockPanel>
+                            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                                <Button Content="Zoom Extents" Margin="0,0,6,0" Click="OnSheetZoom"/>
+                                <Button Content="Export PDF…" Margin="0,0,6,0" Click="OnExportPdf" ToolTip="All sheets as one 11x17 vector PDF"/>
+                                <Button Content="Export Sheets DXF…" Margin="0,0,6,0" Click="OnExportSheetsDxf" ToolTip="Each sheet as a DXF in paper inches (1:1), border and title block included"/>
+                                <Button Content="Export 2D Models DXF…" Click="OnExport2DModels" ToolTip="Each view full size in feet (meters) as a 2D DXF model, for referencing into MicroStation sheets"/>
+                            </StackPanel>
+                            <TextBlock x:Name="SheetStatus" VerticalAlignment="Center" Foreground="#FFDDDDDD" TextTrimming="CharacterEllipsis"/>
+                        </DockPanel>
+                    </Border>
+                    <ListBox x:Name="SheetList" DockPanel.Dock="Left" Width="250" Background="{StaticResource PanelBrush}" BorderThickness="0"
+                             SelectionChanged="OnSheetSelected">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Margin="2,3">
+                                    <TextBlock Text="{Binding Number}" Foreground="#FF8CC4FF" FontWeight="SemiBold"/>
+                                    <TextBlock Text="{Binding Title}" Foreground="White" TextWrapping="Wrap" MaxWidth="225"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                    <vp:DrawingCanvas x:Name="SheetCanvas" Paper="True"/>
+                </DockPanel>
+                <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,8,0,0" Panel.ZIndex="5">
+                    <RadioButton x:Name="ModeModel" Content="Model" IsChecked="True" Style="{StaticResource ModeToggle}" Checked="OnModeModel" ToolTip="3D model and plan"/>
+                    <RadioButton x:Name="ModeSheets" Content="Sheets 11x17" Style="{StaticResource ModeToggle}" Checked="OnModeSheets" ToolTip="Plan sheets built from the model (Ctrl+D)"/>
+                </StackPanel>
+                <GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" Background="{StaticResource BorderBrushDark}"/>
+                <TabControl x:Name="ReportTabs" Grid.Row="2" Background="{StaticResource PanelBrush}" BorderThickness="0">
+                    <TabItem Header="Messages">
+                        <ListBox ItemsSource="{Binding Messages}" Background="Transparent" BorderThickness="0">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock FontFamily="{StaticResource IconFont}" Text="{Binding Icon}" Foreground="{Binding Color}" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                        <TextBlock Text="{Binding Text}" TextWrapping="Wrap"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </TabItem>
+                    <TabItem Header="Bearings">
+                        <DataGrid ItemsSource="{Binding BearingRows}" IsReadOnly="True" AutoGenerateColumns="False" HeadersVisibility="Column">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Support" Binding="{Binding Support}"/>
+                                <DataGridTextColumn Header="Girder" Binding="{Binding Girder}"/>
+                                <DataGridTextColumn Header="Station" Binding="{Binding Station}"/>
+                                <DataGridTextColumn Header="Offset" Binding="{Binding Offset}"/>
+                                <DataGridTextColumn Header="Northing" Binding="{Binding Northing}"/>
+                                <DataGridTextColumn Header="Easting" Binding="{Binding Easting}"/>
+                                <DataGridTextColumn Header="Top of Steel" Binding="{Binding TopOfSteel}"/>
+                                <DataGridTextColumn Header="Bottom of Steel" Binding="{Binding BottomOfSteel}"/>
+                                <DataGridTextColumn Header="Top of Deck" Binding="{Binding Deck}"/>
+                                <DataGridTextColumn Header="Bearing Seat" Binding="{Binding Seat}"/>
+                                <DataGridTextColumn Header="Bearing" Binding="{Binding SolePlate}"/>
+                                <DataGridTextColumn Header="Ground" Binding="{Binding Ground}"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </TabItem>
+                    <TabItem Header="Cross Frames">
+                        <DataGrid ItemsSource="{Binding CrossFrameRows}" IsReadOnly="True" AutoGenerateColumns="False" HeadersVisibility="Column">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Mark" Binding="{Binding Mark}"/>
+                                <DataGridTextColumn Header="Span" Binding="{Binding Span}"/>
+                                <DataGridTextColumn Header="Bay" Binding="{Binding Bay}"/>
+                                <DataGridTextColumn Header="Type" Binding="{Binding Type}"/>
+                                <DataGridTextColumn Header="Station" Binding="{Binding Station}"/>
+                                <DataGridTextColumn Header="Plan Length" Binding="{Binding PlanLength}"/>
+                                <DataGridTextColumn Header="Dist. on Left Girder" Binding="{Binding LeftDist}"/>
+                                <DataGridTextColumn Header="Dist. on Right Girder" Binding="{Binding RightDist}"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </TabItem>
+                    <TabItem Header="Material List">
+                        <DataGrid ItemsSource="{Binding MaterialRows}" IsReadOnly="True" AutoGenerateColumns="False" HeadersVisibility="Column">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Bridge" Binding="{Binding Bridge}"/>
+                                <DataGridTextColumn Header="Item" Binding="{Binding Item}"/>
+                                <DataGridTextColumn Header="Size" Binding="{Binding Size}"/>
+                                <DataGridTextColumn Header="Qty" Binding="{Binding Quantity}"/>
+                                <DataGridTextColumn Header="Total Length" Binding="{Binding TotalLength}"/>
+                                <DataGridTextColumn Header="Weight" Binding="{Binding Weight}"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </TabItem>
+                </TabControl>
+            </Grid>
+            <GridSplitter Grid.Column="3" HorizontalAlignment="Stretch" Background="{StaticResource BorderBrushDark}"/>
+
+            <!-- Properties + layers -->
+            <Grid Grid.Column="4" Background="{StaticResource PanelBrush}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <TextBlock Style="{StaticResource PanelHeader}" Text="Properties"/>
+                <ListView Grid.Row="1" ItemsSource="{Binding SelectedProperties}" Background="Transparent" BorderThickness="0">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="130"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="{Binding Name}" Foreground="{StaticResource MutedText}" TextWrapping="Wrap"/>
+                                <TextBlock Grid.Column="1" Text="{Binding Value}" TextWrapping="Wrap" Margin="6,0,0,0"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+                <TextBlock Grid.Row="2" Style="{StaticResource PanelHeader}" Text="Layers"/>
+                <ScrollViewer Grid.Row="3" VerticalScrollBarVisibility="Auto">
+                    <ItemsControl ItemsSource="{Binding LayerItems}" Margin="8,4">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" Margin="0,1">
+                                    <CheckBox IsChecked="{Binding IsVisible}" MinWidth="0" VerticalAlignment="Center"/>
+                                    <Border Width="14" Height="14" Background="{Binding Swatch}" CornerRadius="2" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="{Binding Name}" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </Grid>
+        </Grid>
+
+        <!-- ===================== Status bar ===================== -->
+        <Border Grid.Row="2" Background="#FF007ACC" Padding="8,3">
+            <DockPanel>
+                <TextBlock DockPanel.Dock="Right" Text="{Binding StatusText}" Foreground="White" Margin="16,0,0,0"/>
+                <TextBlock Text="{Binding CursorText}" Foreground="White" FontFamily="Consolas" TextTrimming="CharacterEllipsis"/>
+            </DockPanel>
+        </Border>
+    </Grid>
+</Window>

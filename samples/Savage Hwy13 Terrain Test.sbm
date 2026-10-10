@@ -1,0 +1,226 @@
+{
+  "Version": 1,
+  "Name": "Savage Hwy 13 Terrain Test",
+  "UnitSystem": "US",
+  "Foot": "International",
+  "Alignments": [
+    {
+      "Name": "TH 13",
+      "Description": "",
+      "StartStation": 3048,
+      "StationEquations": [],
+      "Elements": [
+        {
+          "X": 468900,
+          "Y": 4958840,
+          "Angle": -0.30876427147597535,
+          "Length": 1100.462477920667,
+          "K0": 0,
+          "K1": 0
+        },
+        {
+          "X": 469948.42140081583,
+          "Y": 4958505.589725602,
+          "Angle": -0.30876427147646973,
+          "Length": 232.92528817907427,
+          "K0": 0.0011111111111111111,
+          "K1": 0.0011111111111111111
+        },
+        {
+          "X": 470176.97096582997,
+          "Y": 4958464.151451709,
+          "Angle": -0.049958395721707925,
+          "Length": 1299.6859397165783,
+          "K0": 0,
+          "K1": 0
+        },
+        {
+          "X": 471475.03533792857,
+          "Y": 4958399.248233104,
+          "Angle": -0.04995839572194276,
+          "Length": 169.95953639876734,
+          "K0": 0.0006666666666666666,
+          "K1": 0.0006666666666666666
+        },
+        {
+          "X": 471644.90016563394,
+          "Y": 4958400.385458268,
+          "Angle": 0.06334796187691748,
+          "Length": 1257.6223874760162,
+          "K0": 0,
+          "K1": 0
+        }
+      ],
+      "PiDefinition": {
+        "Pis": [
+          {
+            "Northing": 4958840,
+            "Easting": 468900,
+            "Radius": 0,
+            "SpiralIn": 0,
+            "SpiralOut": 0
+          },
+          {
+            "Northing": 4958470,
+            "Easting": 470060,
+            "Radius": 900,
+            "SpiralIn": 0,
+            "SpiralOut": 0
+          },
+          {
+            "Northing": 4958395,
+            "Easting": 471560,
+            "Radius": 1500,
+            "SpiralIn": 0,
+            "SpiralOut": 0
+          },
+          {
+            "Northing": 4958480,
+            "Easting": 472900,
+            "Radius": 0,
+            "SpiralIn": 0,
+            "SpiralOut": 0
+          }
+        ]
+      },
+      "Profile": {
+        "Vpis": [
+          {
+            "Station": 3098,
+            "Elevation": 221.79066180616525,
+            "LengthIn": 50,
+            "LengthOut": 50
+          },
+          {
+            "Station": 3248,
+            "Elevation": 221.85841919017855,
+            "LengthIn": 50,
+            "LengthOut": 50
+          },
+          {
+            "Station": 3398,
+            "Elevation": 220.60792872525417,
+            "LengthIn": 50,
+            "LengthOut": 50
+          },
+          {
+            "Station": 3548,
+            "Elevation": 220.07502005324272,
+            "LengthIn": 50,
+            "LengthOut": 50
+          },
+          {
+            "Station": 3698,
+            "Elevation": 219.68702722647527,
+            "LengthIn": 50,
+            "LengthOut": 50
+          },
+          {
+            "Station": 3848,
+            "Elevation": 219.63335034980443,
+            "LengthIn": 50,
+            "LengthOut": 50
+          },
+          {
+            "Station": 3998,
+            "Elevation": 219.72870817258763,
+            "LengthIn": 50,
+            "LengthOut": 50
+          },
+          {
+            "Station": 4148,
+            "Elevation": 219.83653466136772,
+            "LengthIn": 50,
+            "LengthOut": 50
+          },
+          {
+            "Station": 4448,
+            "Elevation": 219.92524480895267,
+            "LengthIn": 50,
+            "LengthOut": 50
+          },
+          {
+            "Station": 4598,
+            "Elevation": 219.70136538043886,
+            "LengthIn": 50,
+            "LengthOut": 50
+          },
+          {
+            "Station": 4748,
+            "Elevation": 216.98178766269243,
+            "LengthIn": 50,
+            "LengthOut": 50
+          },
+          {
+            "Station": 4898,
+            "Elevation": 216.19766381380217,
+            "LengthIn": 50,
+            "LengthOut": 50
+          },
+          {
+            "Station": 5048,
+            "Elevation": 214.8051758456414,
+            "LengthIn": 50,
+            "LengthOut": 50
+          },
+          {
+            "Station": 5198,
+            "Elevation": 217.69109197806858,
+            "LengthIn": 50,
+            "LengthOut": 50
+          },
+          {
+            "Station": 5348,
+            "Elevation": 215.31662564523137,
+            "LengthIn": 50,
+            "LengthOut": 50
+          },
+          {
+            "Station": 5498,
+            "Elevation": 215.85065106586853,
+            "LengthIn": 50,
+            "LengthOut": 50
+          },
+          {
+            "Station": 5648,
+            "Elevation": 218.245448747414,
+            "LengthIn": 50,
+            "LengthOut": 50
+          }
+        ],
+        "IsEmpty": false
+      },
+      "CrossSlope": {
+        "Rows": [
+          {
+            "Station": 0,
+            "LeftSlope": -0.02,
+            "RightSlope": -0.02
+          }
+        ],
+        "PivotOffset": 0
+      }
+    }
+  ],
+  "Bridges": [],
+  "References": [
+    {
+      "Name": "Lidar DEM 2025",
+      "Path": "C:\\SBMData\\Savage_Hwy13\\dem.flt",
+      "Kind": "Terrain",
+      "Format": "Grid",
+      "Visible": true,
+      "R": 150,
+      "G": 140,
+      "B": 120,
+      "Opacity": 1,
+      "UnitScale": 1,
+      "OffsetX": 0,
+      "OffsetY": 0,
+      "OffsetZ": 0,
+      "ContourInterval": 0.6096,
+      "ImagePath": "C:\\SBMData\\Savage_Hwy13\\ortho.jpg",
+      "DisplayMaxVertices": 0
+    }
+  ]
+}

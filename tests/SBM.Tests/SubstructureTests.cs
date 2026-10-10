@@ -1,0 +1,144 @@
+using SBM.Api;
+using SBM.Core.Bridge;
+using SBM.Core.Geometry;
+using SBM.Core.Substructure;
+using Xunit;
+using static SBM.Core.Units.UnitSystem;
+
+namespace SBM.Tests;
+
+public class SubstructureTests
+{
+    private static SubstructureModel Build(Action<SubstructureDefinition>? pier = null, Action<SubstructureDefinition>? abut = null)
+    {
+        var doc = SbmDocument.Sample();
+        foreach (var s in doc.Bridge().Supports)
+        {
+            var sd = SubstructureDefinition.Default(s.Type);
+            if (s.Type == SupportType.Pier) pier?.Invoke(sd); else abut?.Invoke(sd);
+            s.Substructure = sd;
+        }
+        return doc.Substructure();
+    }
+
+    [Fact]
+    public void EverySupport_HasCapPedestalsAndFoundations()
+    {
+        var m = Build();
+        Assert.Equal(3, m.Units.Count);
+        var pier = m.Units.Single(u => u.Type == SupportType.Pier);
+        Assert.Equal(3, pier.Columns.Count);
+        Assert.Equal(3, pier.Foundations.Count);
+        Assert.Equal(5, pier.Pedestals.Count);
+        Assert.All(m.Units, u => Assert.Contains(u.Solids, s => s.Kind == SubElementKind.Cap));
+        Assert.All(m.Units.Where(u => u.Type == SupportType.Abutment), u => Assert.NotNull(u.Backwall));
+        Assert.All(m.Units.SelectMany(u => u.Solids), s => Assert.True(Math.Abs(s.Mesh.Volume()) > 0, s.Name));
+    }
+
+    [Fact]
+    public void ShortestPedestal_IsTheMinimum_AndSeatsAreMet()
+    {
+        var m = Build(p => p.MinPedestalHeight = In(2), a => a.MinPedestalHeight = In(2));
+        foreach (var u in m.Units)
+        {
+            Assert.Equal(In(2), u.Pedestals.Min(p => p.Height), 6);
+            Assert.All(u.Pedestals, p => Assert.Equal(p.SeatZ, u.CapTopAt(p.S) + p.Height, 9));
+        }
+    }
+
+    [Fact]
+    public void FollowSeats_GivesUniformPedestals_LevelGivesVariable()
+    {
+        var follow = Build(p => { p.TopShape = CapTopShape.FollowSeats; p.MinPedestalHeight = In(3); }).Units.Single(u => u.Type == SupportType.Pier);
+        Assert.All(follow.Pedestals, p => Assert.Equal(In(3), p.Height, 3));
+        var level = Build(p => p.TopShape = CapTopShape.Level).Units.Single(u => u.Type == SupportType.Pier);
+        // Superelevated deck: seats differ by feet across the bent, so level-cap pedestals vary.
+        Assert.True(level.Pedestals.Max(p => p.Height) - level.Pedestals.Min(p => p.Height) > In(6));
+        Assert.Equal(level.CapTop[0].Y, level.CapTop[^1].Y, 9);
+    }
+
+    [Fact]
+    public void SlopedCap_FitsSeats_AndBottomIsParallel()
+    {
+        var u = Build(p => p.TopShape = CapTopShape.Sloped).Units.Single(x => x.Type == SupportType.Pier);
+        double slope = (u.CapTop[^1].Y - u.CapTop[0].Y) / (u.CapTop[^1].X - u.CapTop[0].X);
+        Assert.True(Math.Abs(slope) > 0.01, $"slope {slope}");
+        Assert.True(u.Pedestals.Max(p => p.Height) - u.Pedestals.Min(p => p.Height) < In(3));
+        Assert.All(u.CapBottom.Zip(u.CapTop), p => Assert.Equal(Ft(4), p.Second.Y - p.First.Y, 9));
+    }
+
+    [Fact]
+    public void OctagonalColumn_BarsFollowTheChamfers_WithPlanCover()
+    {
+        // I-80 type column: 8'-0 x 4'-6 with 2'-4 x 1'-3 chamfers, 6 / 4 / 3 bars per S / N / chamfer face, paired hoops
+        // overlapping 3'-4, crossties; flared base 9'-0 x 5'-6 with its own cage.
+        var m = Build(p =>
+        {
+            p.ColumnShape = ColumnShape.Rectangular; p.ColumnWidth = Ft(8); p.ColumnDepth = Ft(4.5);
+            p.ColumnChamferS = Ft(2 + 4 / 12.0); p.ColumnChamferN = Ft(1.25);
+            p.ColumnFlareElevation = Ft(512); p.ColumnFlareWidth = Ft(9); p.ColumnFlareDepth = Ft(5.5);
+            p.ColumnFlareChamferS = Ft(2 + 8.5 / 12); p.ColumnFlareChamferN = Ft(1 + 5.625 / 12);
+            p.FoundationTopElevation = Ft(500); p.Foundation = FoundationType.PileCap;
+            var r = p.Reinforcement;
+            r.ColumnBarSize = "#11"; r.ColumnCover = In(2); r.ColumnSpiralSize = "#6"; r.ColumnSpiralPitch = In(12);
+            r.ColumnFaceBarsS = 6; r.ColumnFaceSpacingS = In(7.5); r.ColumnFaceBarsN = 4; r.ColumnFaceSpacingN = In(6.5);
+            r.ColumnChamferBarPositions = new() { In(8), In(15.25), In(22.5) };
+            r.ColumnHoopOverlap = In(40); r.ColumnCrosstieSize = "#5"; r.ColumnCrosstieBar = 2;
+            r.FlareBarSize = "#7"; r.FlareFaceBarsS = 5; r.FlareFaceBarsN = 4; r.FlareChamferBars = 4; r.FlareTieSpacing = In(6);
+        });
+        var u = m.Units.Single(x => x.Type == SupportType.Pier);
+        var c = u.Columns[0];
+        var marks = m.Marks.Where(mk => mk.Unit == u.Name).ToDictionary(mk => mk.Mark);
+        // Column 1's bars: column bar marks are shared between columns, so pick them by position.
+        var mine = m.Bars.Where(b => b.Unit == u.Name && marks[b.Mark].Location.Contains(" column ")
+            && Math.Abs(b.Points.Average(p => Vec2.Dot(p.XY - u.Origin, u.D)) - c.S) < Ft(6)).ToList();
+        int Count(string what) => mine.Count(b => marks[b.Mark].Location.EndsWith(what));
+        Assert.Equal(2 * 6 + 2 * 4 + 4 * 3, Count("verticals"));
+        Assert.Equal(2 * 5 + 2 * 4 + 4 * 4 - 8, Count("flare bars"));
+        Assert.Equal(Count("crossties"), Count("hoops"));                         // two hoops and two crossties per level
+        // Clear cover to the octagon (column bars) / flare section, in the section plane.
+        double a = c.SizeS / 2, bb = c.SizeN / 2;
+        double Clear(Vec2[] sec, Vec2 q) => Enumerable.Range(0, sec.Length).Min(k => Vec2.Cross((sec[(k + 1) % sec.Length] - sec[k]).Normalized(), q - sec[k]));
+        Vec2[] Oct(double w, double d, double cs, double cn) => new[] { new Vec2(-w / 2 + cs, -d / 2), new Vec2(w / 2 - cs, -d / 2), new Vec2(w / 2, -d / 2 + cn),
+            new Vec2(w / 2, d / 2 - cn), new Vec2(w / 2 - cs, d / 2), new Vec2(-w / 2 + cs, d / 2), new Vec2(-w / 2, d / 2 - cn), new Vec2(-w / 2, -d / 2 + cn) };
+        var col = Oct(c.SizeS, c.SizeN, Ft(2 + 4 / 12.0), Ft(1.25));
+        var fl = Oct(Ft(9), Ft(5.5), Ft(2 + 8.5 / 12), Ft(1 + 5.625 / 12));
+        foreach (var bar in mine)
+        {
+            var mk = marks[bar.Mark];
+            bool flare = mk.Location.Contains("flare");
+            foreach (var p in bar.Points.Where(p => p.Z >= c.BottomZ - 1e-9))
+            {
+                var q = new Vec2(Vec2.Dot(p.XY - u.Origin, u.D) - c.S, Vec2.Dot(p.XY - u.Origin, u.N) - c.N);
+                double clear = Clear(flare ? fl : col, q) - mk.Size.Diameter / 2;
+                Assert.True(clear >= (flare ? In(3.5) : In(2)) - In(0.01), $"{mk.Location}: {clear / In(1):F2} in clear");
+            }
+        }
+    }
+
+    [Fact]
+    public void PileCap_HasPileGroups_AndRebarMarks()
+    {
+        var m = Build(p => { p.Foundation = FoundationType.PileCap; p.FoundationTopElevation = Ft(500); });
+        var pier = m.Units.Single(u => u.Type == SupportType.Pier);
+        Assert.All(pier.Foundations, f => Assert.Equal(9, f.Piles.Count));
+        Assert.All(pier.Columns, c => Assert.Equal(Ft(500), c.BottomZ, 9));
+        Assert.Contains(m.Marks, mk => mk.Unit == "Pier 1" && mk.Mark.StartsWith("F"));
+        Assert.Contains(m.Marks, mk => mk.Unit == "Pier 1" && mk.Shape.Code == "SPIRAL");
+        Assert.Contains(m.Marks, mk => mk.Unit == "Pier 1" && mk.Shape.Code == "TIE");
+        Assert.All(m.Marks, mk => Assert.True(mk.Length <= Ft(60) + In(1) || mk.Shape.Code == "SPIRAL", $"{mk.Unit} {mk.Mark}"));
+    }
+
+    [Fact]
+    public void Substructure_RoundTripsThroughProjectFile()
+    {
+        var doc = SbmDocument.Sample();
+        doc.Bridge().Supports[1].Substructure = new SubstructureDefinition { ColumnCount = 2, ColumnSpacings = { Ft(20) }, TopShape = CapTopShape.Crowned };
+        var json = doc.Project.ToJson();
+        var back = SBM.Core.Project.BridgeProject.FromJson(json);
+        var sd = back.Bridges[0].Supports[1].Substructure!;
+        Assert.Equal(CapTopShape.Crowned, sd.TopShape);
+        Assert.Equal(2, sd.ColumnCount);
+        Assert.Null(back.Bridges[0].Supports[0].Substructure);
+    }
+}

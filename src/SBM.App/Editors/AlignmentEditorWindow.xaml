@@ -1,0 +1,92 @@
+<Window x:Class="SBM.App.Editors.AlignmentEditorWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Alignment" Width="1050" Height="700" MinWidth="800" MinHeight="500"
+        WindowStartupLocation="CenterOwner" ShowInTaskbar="False" Background="#FF1F1F1F">
+    <DockPanel Background="#FF1F1F1F">
+        <Border DockPanel.Dock="Bottom" Background="{StaticResource PanelHeaderBrush}" Padding="12,8">
+            <DockPanel>
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                    <Button Content="Apply" Width="90" Margin="0,0,8,0" Click="OnApply" ToolTip="Update the model without closing"/>
+                    <Button Content="OK" Width="90" Margin="0,0,8,0" IsDefault="True" Click="OnOk" Style="{StaticResource AccentButtonStyle}"/>
+                    <Button Content="Cancel" Width="90" IsCancel="True"/>
+                </StackPanel>
+                <TextBlock Text="{Binding ErrorText}" Foreground="{StaticResource ErrorBrush}" TextWrapping="Wrap" VerticalAlignment="Center"/>
+            </DockPanel>
+        </Border>
+
+        <TabControl Margin="8">
+            <TabItem Header="General">
+                <ItemsControl ItemsSource="{Binding GeneralFields}" Style="{StaticResource FieldList}"/>
+            </TabItem>
+
+            <TabItem Header="Horizontal">
+                <Grid Margin="8">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="2*"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="{Binding HorizontalNote}" Foreground="{StaticResource MutedText}" TextWrapping="Wrap" Margin="0,0,0,6"/>
+                    <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,6" x:Name="PiToolbar">
+                        <Button Style="{StaticResource ToolIconButton}" Content="&#xE710;" ToolTip="Add PI after selection" Click="OnPiAdd"/>
+                        <Button Style="{StaticResource ToolIconButton}" Content="&#xE74D;" ToolTip="Delete selected PI" Click="OnPiDelete"/>
+                        <Button Content="Compute" Margin="8,0,0,0" Click="OnCompute" ToolTip="Recompute curve data"/>
+                    </StackPanel>
+                    <DataGrid Grid.Row="2" x:Name="PiGrid" ItemsSource="{Binding Pis}"/>
+                    <TextBlock Grid.Row="3" Text="Curve data" FontWeight="SemiBold" Margin="0,10,0,4"/>
+                    <Grid Grid.Row="4">
+                        <DataGrid x:Name="CurveGrid" ItemsSource="{Binding CurveReport}" IsReadOnly="True" AutoGenerateColumns="False" HeadersVisibility="Column">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="PI" Binding="{Binding Pi}"/>
+                                <DataGridTextColumn Header="Deflection" Binding="{Binding Deflection}"/>
+                                <DataGridTextColumn Header="Radius" Binding="{Binding Radius}"/>
+                                <DataGridTextColumn Header="Spiral In" Binding="{Binding SpiralIn}"/>
+                                <DataGridTextColumn Header="Spiral Out" Binding="{Binding SpiralOut}"/>
+                                <DataGridTextColumn Header="Tangent" Binding="{Binding Tangent}"/>
+                                <DataGridTextColumn Header="Arc Length" Binding="{Binding ArcLength}"/>
+                                <DataGridTextColumn Header="TS / PC" Binding="{Binding Begin}"/>
+                                <DataGridTextColumn Header="ST / PT" Binding="{Binding End}"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                        <DataGrid x:Name="ElementGrid" ItemsSource="{Binding Elements}" IsReadOnly="True" AutoGenerateColumns="False" HeadersVisibility="Column" Visibility="Collapsed">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Element" Binding="{Binding Type}"/>
+                                <DataGridTextColumn Header="Start Station" Binding="{Binding Start}"/>
+                                <DataGridTextColumn Header="Length" Binding="{Binding Length}"/>
+                                <DataGridTextColumn Header="Radius" Binding="{Binding Radius}"/>
+                                <DataGridTextColumn Header="Start Direction" Binding="{Binding Direction}"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="Vertical">
+                <DockPanel Margin="8">
+                    <TextBlock DockPanel.Dock="Top" Foreground="{StaticResource MutedText}" TextWrapping="Wrap" Margin="0,0,0,6"
+                               Text="Parabolic vertical curves. Leave VC length blank for a grade break. For unsymmetrical curves enter the back (incoming) length in L1."/>
+                    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,6">
+                        <Button Style="{StaticResource ToolIconButton}" Content="&#xE710;" ToolTip="Add VPI after selection" Click="OnVpiAdd"/>
+                        <Button Style="{StaticResource ToolIconButton}" Content="&#xE74D;" ToolTip="Delete selected VPI" Click="OnVpiDelete"/>
+                    </StackPanel>
+                    <DataGrid x:Name="VpiGrid" ItemsSource="{Binding Vpis}"/>
+                </DockPanel>
+            </TabItem>
+
+            <TabItem Header="Cross Slope">
+                <DockPanel Margin="8">
+                    <TextBlock DockPanel.Dock="Top" Foreground="{StaticResource MutedText}" TextWrapping="Wrap" Margin="0,0,0,6"
+                               Text="Slopes are measured away from the pivot (negative = falls away). Values are interpolated linearly between stations and held beyond the ends. Normal crown is -2% / -2%."/>
+                    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,6">
+                        <Button Style="{StaticResource ToolIconButton}" Content="&#xE710;" ToolTip="Add row after selection" Click="OnSlopeAdd"/>
+                        <Button Style="{StaticResource ToolIconButton}" Content="&#xE74D;" ToolTip="Delete selected row" Click="OnSlopeDelete"/>
+                    </StackPanel>
+                    <DataGrid x:Name="SlopeGrid" ItemsSource="{Binding Slopes}"/>
+                </DockPanel>
+            </TabItem>
+        </TabControl>
+    </DockPanel>
+</Window>

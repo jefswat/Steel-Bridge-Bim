@@ -1,0 +1,285 @@
+<Application x:Class="SBM.App.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ed="clr-namespace:SBM.App.Editors"
+             ThemeMode="Dark"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+        <ResourceDictionary>
+            <FontFamily x:Key="IconFont">Segoe Fluent Icons, Segoe MDL2 Assets</FontFamily>
+            <SolidColorBrush x:Key="PanelBrush" Color="#FF252526"/>
+            <SolidColorBrush x:Key="PanelHeaderBrush" Color="#FF2D2D30"/>
+            <SolidColorBrush x:Key="RibbonBrush" Color="#FF2B2B2B"/>
+            <SolidColorBrush x:Key="BorderBrushDark" Color="#FF3F3F46"/>
+            <SolidColorBrush x:Key="AccentBrushSbm" Color="#FF3794FF"/>
+            <SolidColorBrush x:Key="MutedText" Color="#FFA0A0A0"/>
+            <SolidColorBrush x:Key="ErrorBrush" Color="#FFFF6B6B"/>
+
+            <!-- Large ribbon button: icon over label -->
+            <Style x:Key="RibbonButton" TargetType="Button">
+                <Setter Property="Background" Value="Transparent"/>
+                <!-- Explicit: this style replaces the theme's Button style, so without it labels fall back to black. -->
+                <Setter Property="Foreground" Value="#FFE6E6E6"/>
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="Padding" Value="6,4"/>
+                <Setter Property="Margin" Value="1,0"/>
+                <Setter Property="MinWidth" Value="58"/>
+                <Setter Property="VerticalAlignment" Value="Stretch"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="bd" Background="{TemplateBinding Background}" CornerRadius="4" Padding="{TemplateBinding Padding}">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Top"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="bd" Property="Background" Value="#22FFFFFF"/>
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter TargetName="bd" Property="Background" Value="#33FFFFFF"/>
+                                </Trigger>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter Property="Opacity" Value="0.5"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <Style x:Key="RibbonIcon" TargetType="TextBlock">
+                <Setter Property="FontFamily" Value="{StaticResource IconFont}"/>
+                <Setter Property="FontSize" Value="24"/>
+                <Setter Property="HorizontalAlignment" Value="Center"/>
+                <Setter Property="Margin" Value="0,2,0,4"/>
+                <Setter Property="Foreground" Value="#FF8CC4FF"/>
+            </Style>
+
+            <Style x:Key="RibbonLabel" TargetType="TextBlock">
+                <Setter Property="FontSize" Value="11.5"/>
+                <Setter Property="Foreground" Value="#FFE6E6E6"/>
+                <Setter Property="TextAlignment" Value="Center"/>
+                <Setter Property="TextWrapping" Value="Wrap"/>
+                <Setter Property="MaxWidth" Value="76"/>
+                <Setter Property="HorizontalAlignment" Value="Center"/>
+            </Style>
+
+            <Style x:Key="RibbonGroup" TargetType="HeaderedContentControl">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="HeaderedContentControl">
+                            <Border BorderBrush="{StaticResource BorderBrushDark}" BorderThickness="0,0,1,0" Padding="4,2,6,0">
+                                <DockPanel>
+                                    <TextBlock DockPanel.Dock="Bottom" Text="{TemplateBinding Header}" HorizontalAlignment="Center"
+                                               FontSize="11" Foreground="#FFC8C8C8" Margin="0,2,0,2"/>
+                                    <ContentPresenter/>
+                                </DockPanel>
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <!-- Readable headers everywhere: explicit templates so tab and grid headers never fall back to dark text. -->
+            <Style x:Key="SbmTabItem" TargetType="TabItem">
+                <Setter Property="Padding" Value="11,6"/>
+                <!-- Tab content inherits Foreground from the TabItem: keep it light. -->
+                <Setter Property="Foreground" Value="#FFE6E6E6"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="TabItem">
+                            <Border x:Name="bd" Background="Transparent" BorderBrush="Transparent" BorderThickness="0,0,0,2"
+                                    CornerRadius="3,3,0,0" Padding="{TemplateBinding Padding}" Margin="0,0,2,0">
+                                <ContentPresenter x:Name="cp" ContentSource="Header" RecognizesAccessKey="True" VerticalAlignment="Center"
+                                                  TextElement.Foreground="#FFD4D4D4" TextElement.FontSize="13.5"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="bd" Property="Background" Value="#FF37373D"/>
+                                    <Setter TargetName="cp" Property="TextElement.Foreground" Value="White"/>
+                                </Trigger>
+                                <Trigger Property="IsSelected" Value="True">
+                                    <Setter TargetName="bd" Property="Background" Value="#FF3A3D41"/>
+                                    <Setter TargetName="bd" Property="BorderBrush" Value="#FF3794FF"/>
+                                    <Setter TargetName="cp" Property="TextElement.Foreground" Value="White"/>
+                                    <Setter TargetName="cp" Property="TextElement.FontWeight" Value="SemiBold"/>
+                                </Trigger>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter TargetName="cp" Property="Opacity" Value="0.5"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            <Style TargetType="TabItem" BasedOn="{StaticResource SbmTabItem}"/>
+            <Style x:Key="RibbonTabs" TargetType="TabControl">
+                <Setter Property="ItemContainerStyle">
+                    <Setter.Value>
+                        <Style TargetType="TabItem" BasedOn="{StaticResource SbmTabItem}">
+                            <Setter Property="Padding" Value="14,6"/>
+                        </Style>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            <Style x:Key="HeaderGripper" TargetType="Thumb">
+                <Setter Property="Width" Value="6"/>
+                <Setter Property="Cursor" Value="SizeWE"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Thumb"><Border Background="Transparent"/></ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            <Style TargetType="DataGridColumnHeader">
+                <Setter Property="Foreground" Value="#FFF0F0F0"/>
+                <Setter Property="FontWeight" Value="SemiBold"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="DataGridColumnHeader">
+                            <Grid>
+                                <Border Background="#FF2D2D30" BorderBrush="#FF3F3F46" BorderThickness="0,0,1,1" Padding="8,6">
+                                    <DockPanel>
+                                        <TextBlock x:Name="sort" DockPanel.Dock="Right" Margin="4,0,0,0" Foreground="#FF8CC4FF" FontSize="9" VerticalAlignment="Center"/>
+                                        <ContentPresenter VerticalAlignment="Center" TextElement.Foreground="#FFF0F0F0"/>
+                                    </DockPanel>
+                                </Border>
+                                <Thumb x:Name="PART_LeftHeaderGripper" HorizontalAlignment="Left" Style="{StaticResource HeaderGripper}"/>
+                                <Thumb x:Name="PART_RightHeaderGripper" HorizontalAlignment="Right" Style="{StaticResource HeaderGripper}"/>
+                            </Grid>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="SortDirection" Value="Ascending"><Setter TargetName="sort" Property="Text" Value="▲"/></Trigger>
+                                <Trigger Property="SortDirection" Value="Descending"><Setter TargetName="sort" Property="Text" Value="▼"/></Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <!-- Model / Sheets segmented switch -->
+            <Style x:Key="ModeToggle" TargetType="ToggleButton">
+                <Setter Property="Foreground" Value="#FFE6E6E6"/>
+                <Setter Property="FontSize" Value="12.5"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="ToggleButton">
+                            <Border x:Name="bd" Background="#E62B2B2B" BorderBrush="#FF55575C" BorderThickness="1" Padding="14,4" Margin="0,0,-1,0">
+                                <ContentPresenter HorizontalAlignment="Center" TextElement.Foreground="{TemplateBinding Foreground}"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="bd" Property="Background" Value="#FF3A3D41"/></Trigger>
+                                <Trigger Property="IsChecked" Value="True">
+                                    <Setter TargetName="bd" Property="Background" Value="#FF2A6BBD"/>
+                                    <Setter TargetName="bd" Property="BorderBrush" Value="#FF3794FF"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <Style x:Key="PanelHeader" TargetType="TextBlock">
+                <Setter Property="FontWeight" Value="SemiBold"/>
+                <Setter Property="FontSize" Value="12"/>
+                <Setter Property="Padding" Value="8,5"/>
+                <Setter Property="Background" Value="{StaticResource PanelHeaderBrush}"/>
+                <Setter Property="Foreground" Value="#FFDDDDDD"/>
+            </Style>
+
+            <Style x:Key="ToolIconButton" TargetType="Button">
+                <Setter Property="FontFamily" Value="{StaticResource IconFont}"/>
+                <Setter Property="FontSize" Value="13"/>
+                <Setter Property="Padding" Value="7,4"/>
+                <Setter Property="Margin" Value="0,0,4,0"/>
+                <Setter Property="Foreground" Value="#FFE6E6E6"/>
+                <Setter Property="Background" Value="#FF3A3D41"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="bd" Background="{TemplateBinding Background}" BorderBrush="#FF55575C" BorderThickness="1"
+                                    CornerRadius="4" Padding="{TemplateBinding Padding}">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="bd" Property="Background" Value="#FF4A4D52"/></Trigger>
+                                <Trigger Property="IsPressed" Value="True"><Setter TargetName="bd" Property="Background" Value="#FF2A5A8C"/></Trigger>
+                                <Trigger Property="IsEnabled" Value="False"><Setter Property="Opacity" Value="0.5"/></Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <!-- Form field templates used by every input window -->
+            <DataTemplate x:Key="FieldText" DataType="{x:Type ed:TextField}">
+                <Grid Margin="0,3" ToolTip="{Binding ToolTip}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="210"/>
+                        <ColumnDefinition Width="180"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="{Binding Label}" VerticalAlignment="Center"/>
+                    <TextBox Grid.Column="1" Text="{Binding Text, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding IsEnabled}"/>
+                    <StackPanel Grid.Column="2" Margin="10,0,0,0" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding Hint}" Foreground="{StaticResource MutedText}" FontSize="11"/>
+                        <TextBlock Text="{Binding Error}" Foreground="{StaticResource ErrorBrush}" FontSize="11" TextWrapping="Wrap"/>
+                    </StackPanel>
+                </Grid>
+            </DataTemplate>
+            <DataTemplate x:Key="FieldString" DataType="{x:Type ed:StringField}">
+                <Grid Margin="0,3">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="210"/>
+                        <ColumnDefinition Width="260"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="{Binding Label}" VerticalAlignment="Center"/>
+                    <TextBox Grid.Column="1" Text="{Binding Text, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBlock Grid.Column="2" Margin="10,0,0,0" Text="{Binding Error}" Foreground="{StaticResource ErrorBrush}" VerticalAlignment="Center"/>
+                </Grid>
+            </DataTemplate>
+            <DataTemplate x:Key="FieldBool" DataType="{x:Type ed:BoolField}">
+                <Grid Margin="0,3" ToolTip="{Binding ToolTip}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="210"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="{Binding Label}" VerticalAlignment="Center"/>
+                    <CheckBox Grid.Column="1" IsChecked="{Binding Value}" IsEnabled="{Binding IsEnabled}"/>
+                </Grid>
+            </DataTemplate>
+            <DataTemplate x:Key="FieldChoice" DataType="{x:Type ed:ChoiceField}">
+                <Grid Margin="0,3" ToolTip="{Binding ToolTip}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="210"/>
+                        <ColumnDefinition Width="380"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="{Binding Label}" VerticalAlignment="Center"/>
+                    <ComboBox Grid.Column="1" ItemsSource="{Binding Options}" SelectedItem="{Binding Selected}" IsEnabled="{Binding IsEnabled}"/>
+                </Grid>
+            </DataTemplate>
+            <DataTemplate x:Key="FieldHeader" DataType="{x:Type ed:HeaderField}">
+                <TextBlock Text="{Binding Label}" FontWeight="SemiBold" FontSize="13" Margin="0,14,0,4" Foreground="{StaticResource AccentBrushSbm}"/>
+            </DataTemplate>
+            <ed:FieldTemplateSelector x:Key="FieldSelector"
+                                      Text="{StaticResource FieldText}" String="{StaticResource FieldString}"
+                                      Bool="{StaticResource FieldBool}" Choice="{StaticResource FieldChoice}"
+                                      Header="{StaticResource FieldHeader}"/>
+
+            <Style x:Key="FieldList" TargetType="ItemsControl">
+                <Setter Property="ItemTemplateSelector" Value="{StaticResource FieldSelector}"/>
+                <Setter Property="Focusable" Value="False"/>
+                <Setter Property="Margin" Value="16,8"/>
+            </Style>
+
+            <Style x:Key="ErrorCell" TargetType="TextBlock">
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=Tag}" Value="True">
+                        <Setter Property="Foreground" Value="{StaticResource ErrorBrush}"/>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

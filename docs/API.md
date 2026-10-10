@@ -1,0 +1,206 @@
+# Steel Bridge Modeler — automation API
+
+There are three ways to drive the modeler from code. All three use the same engine as the desktop app and read and
+write the same `.sbm` project files.
+
+| Use | Tool | Best for |
+|---|---|---|
+| **Command line** | `sbm.exe` (next to the app in `dist\SteelBridgeModeler`) | Python, Excel/VBA, batch files, CI |
+| **C# scripts** (`.csx`) | `sbm run script.csx file.sbm`, or **Home ▸ Run Script** in the app | Parametric studies and bulk edits |
+| **.NET library** | `SBM.Api.dll` → `SbmDocument` | Custom tools and add-ins |
+
+## Property paths and units
+
+Every input in the model has a path:
+
+```
+Bridges[0].Supports[1].SkewDegrees
+Bridges["Sample Bridge"].Girders.Section.WebDepth
+Bridges[0].Girders.Section.PlateChanges
+Bridges[0].CrossFrames.ChordAngle
+Bridges[0].Bearings.Type
+Bridges[0].LateralBracing.Bays
+Alignments[0].StartStation
+References[0].Opacity
+```
+
+You can index lists by number or by name: `Bridges[0]` and `Bridges["Sample Bridge"]` are equivalent.
+`sbm get file.sbm <path>` lists what is available at any level.
+
+Values are text with engineering units:
+
+| Kind | Examples |
+|---|---|
+| Lengths | `12'-6 1/2"`, `12.5'`, `54"`, `1.2 m`, `300 mm` |
+| Stations | `12+34.56` (SI: `1+234.567`) |
+| Angles | `20`, `20.5`, `15°30'00"` |
+| Slopes | `-2%`, `-0.02` |
+| Enums | `Disc`, `Elastomeric`, `GuidedExpansion`, `Top` (not case-sensitive) |
+
+A plain number takes the unit the input windows use for that field:
+- inches for plate sizes, depths, gaps and clearances;
+- feet for spans, offsets and spacings (meters and millimeters in SI projects).
+
+Add the unit whenever there could be doubt.
+
+JSON values (starting with `{` or `[`) replace a whole object or list, and are written in internal SI units
+(meters, degrees).
+
+## Command line
+
+```bat
+sbm new  "C:\Jobs\Br12\Br12.sbm" --sample
+sbm info "C:\Jobs\Br12\Br12.sbm"
+sbm get  "C:\Jobs\Br12\Br12.sbm" "Bridges[0].Supports[1]"
+sbm set  "C:\Jobs\Br12\Br12.sbm" "Bridges[0].Supports[1].SkewDegrees=20" "Bridges[0].Girders.Section.WebDepth=60\""
+sbm add  "C:\Jobs\Br12\Br12.sbm" "Bridges[0].FieldSplices" "Station=22+90"
+sbm remove "C:\Jobs\Br12\Br12.sbm" "Bridges[0].FieldSplices[2]"
+sbm import-landxml "C:\Jobs\Br12\Br12.sbm" "C:\Jobs\Br12\alignments.xml"
+sbm regen  "C:\Jobs\Br12\Br12.sbm"
+sbm export "C:\Jobs\Br12\Br12.sbm" --ifc Br12.ifc --dxf Br12.dxf --landxml Br12.xml
+sbm export "C:\Jobs\Br12\Br12.sbm" --ifc Br12.ifczip   # compressed IFC-ZIP (about 5x smaller; same model inside)
+sbm run    "samples\scripts\web-depth-study.csx" "C:\Jobs\Br12\Br12.sbm"
+sbm bench  "C:\Jobs\Br12\Br12.sbm"
+sbm sheets     "C:\Jobs\Br12\Br12.sbm" "C:\Jobs\Br12\Br12 Sheets.pdf"   # 11x17 plan set (vector PDF)
+sbm drawings   "C:\Jobs\Br12\Br12.sbm" "C:\Jobs\Br12\dxf"   # 2D DXF models: layout, plan, typical section, bents, bar bending
+sbm elevations "C:\Jobs\Br12\Br12.sbm"          # grade → deck → haunch → web → flange → sole plate → seat, every bearing
+```
+
+**Exit codes:** `0` means OK, `1` means a usage or input error, and `2` means the model has errors.
+`set`, `add`, `remove` and `import-landxml` save the file.
+
+**Python:** see `samples/scripts/skew_study.py`. It calls `sbm` through `subprocess`. Project files are plain JSON
+(SI units), so you can also read them directly.
+
+## Two ways in: project files vs. the running app
+
+| | Works on | Use for |
+|---|---|---|
+| `SbmDocument`, `sbm <command> file.sbm`, `sbm run script.csx file.sbm` | a project **file**, in its own headless engine | batch runs, studies, CI — the app doesn't see the changes until the file is reopened |
+| `SbmApp`, `sbm app <command>`, `App` in scripts | the **running app** (live model on screen) | driving what you're looking at: edits are undoable (Ctrl+Z) and regenerate immediately |
+
+The running app listens on `\\.\pipe\SteelBridgeModeler.<process id>` (local, current Windows user only — the same idea
+as COM's GetActiveObject, without registration). One JSON line per request, one back:
+
+```
+→ {"cmd":"set","args":["Bridges[0].Girders.Count","6"]}
+← {"ok":true,"result":"Bridges[0].Girders.Count = 6"}
+```
+
+Commands: `status`, `get <path>`, `set <path> <value>`, `describe [path]`, `regen`, `open <file> [--force]`,
+`save [file]`, `import-pgsuper <file> [alignment] [station] [name]`, `run <script.csx> [args]`, `snapshot <png>`,
+`view plan|3d|zoom`, `section <station> [skew]` / `section off`, `messages [n]`, `undo`, `close [--save|--discard]`
+(close refuses when there are unsaved changes unless told what to do).
+
+```
+sbm app list
+sbm app status
+sbm app set "Bridges[0].Girders.Prestressed.Type" Tx62
+sbm app import-pgsuper "C:\models\Option1.pgs" "CL Route 1" 30+50
+sbm app snapshot C:\temp\view.png
+sbm app close --save
+```
+```csharp
+using var app = SbmApp.Connect();          // or Connect(processId) when several copies run
+app.Set("Bridges[0].Deck.Haunch", "3.5");  // live, undoable
+Console.WriteLine(app.Get("Bridges[0].Girders.Spacings"));
+```
+In a script run by `sbm run`, `App` is the running app and `Doc` is the file.
+
+Python (e.g. from the PGSuper MCP tools): `samples/scripts/sbm_app_client.py` (standard library only) —
+`send("set", "Bridges[0].Deck.Haunch", 3.5)`, or from a shell `python sbm_app_client.py status`.
+
+### PGSuper import
+
+```
+sbm import-pgsuper Bridge.sbm "Option1.pgs" "CL Route 1" 25+00
+```
+```csharp
+var res = Doc.ImportPgSuper(@"C:\models\Option1.pgs", "CL Route 1", Sta("25+00"));
+foreach (var n in res.Notes) Print(n);
+var ps = Doc.Prestressed(res.Bridge.Name);   // beams, strands, pads, bearing seats
+```
+Prestressed inputs live at `Bridges[i].Girders.Kind` (`SteelPlate` / `TxDotPrestressed`) and
+`Bridges[i].Girders.Prestressed.*` (`Type` Tx28…Tx70 / Custom, `StrandCount`, `StrandDiameter`, `DepressedStrands`,
+`ConcreteStrength` (ksi), `EndGapAtBent`, `BearingToEnd`, `InteriorEnds`, `PadLength` (0 = IGEB table), …).
+
+## C# scripts
+
+These globals are available:
+
+| Global | What it is |
+|---|---|
+| `Doc` | The open `SbmDocument` |
+| `Print(x)` | Writes output |
+| `Ft(x)`, `In(x)`, `M(x)` | Convert to meters |
+| `Sta("12+34.56")`, `Len("12'-6\"")` | Parse text with units |
+| `Args` | Script arguments |
+
+Common namespaces are imported for you.
+
+```csharp
+var b = Doc.Bridge();                       // first bridge (or Doc.Bridge("name"))
+b.Supports[0].SkewDegrees = 25;
+b.Bearings.Type = BearingType.Disc;
+b.LateralBracing.Enabled = true;
+b.LateralBracing.Bays = new() { 1, 4 };
+var r = Doc.Regenerate();                   // incremental: unchanged bridges are reused
+Print($"{r.CrossFrames} frames, {r.Bolts} bolts, {r.SteelMassKg / 907.18:F1} tons");
+foreach (var s in Doc.Steel().BearingSeats) Print($"{s.Support} G{s.Girder + 1}: seat {s.SeatElevation / 0.3048:F3} ft");
+Doc.ExportIfc(@"C:\Jobs\Br12\Br12.ifc");
+```
+
+Vendor-designed bearings (plans give the assumed bearing height and the anchor bolts):
+
+```csharp
+b.Bearings.Type = BearingType.Generic;
+b.Bearings.GenericHeight = In(9);                 // bottom of flange to bottom of the masonry pad, at CL bearing
+b.Bearings.MasonryPadThickness = In(0.125);
+b.Bearings.AnchorEdgeDistance = In(3); b.Bearings.AnchorEdgeDistanceFixed = In(5);
+var pier = b.Supports[2];
+pier.Bearings = b.Bearings.Clone();               // per-support override (anchors differ by pier)
+pier.Bearings.AnchorSpacingAcross = In(44);       // 2 x "X"
+pier.Bearings.AnchorSpacingAlong = In(18);        // 2 x "Y"
+pier.Bearings.AnchorBoltDiameter = In(2.5); pier.Bearings.AnchorBoltEmbedment = Ft(2.5);
+pier.Fixity = BearingFixity.Fixed;                // FX ...
+pier.GirderFixities = new() { BearingFixity.Expansion, BearingFixity.Auto, BearingFixity.Auto, BearingFixity.Expansion }; // ... MD exterior girders
+```
+See `samples/plans/bearings.csx` for a full plan bearing data table.
+
+In the app, a script runs against the open project and the model regenerates afterward. A single **Undo** reverts
+everything the script did.
+
+## .NET library
+
+Reference `SBM.Api.dll`, `SBM.Core.dll` and `SBM.IO.dll`.
+
+```csharp
+using SBM.Api;
+var doc = SbmDocument.Open("Br12.sbm");             // or SbmDocument.New(), SbmDocument.Sample()
+doc.Set("Bridges[0].Girders.Count", "6");
+doc.Bridge().Girders.Spacings = Enumerable.Repeat(SBM.Core.Units.UnitSystem.Ft(8), 5).ToList();
+var report = doc.Regenerate();
+var framing = doc.Framing();                         // bearings, girder lines, cross frames, stiffeners …
+var steel   = doc.Steel();                           // 3D parts (meshes), bolts, studs, bearing seats
+var sub     = doc.Substructure();                    // bents/abutments: caps, pedestals, columns, foundations, rebar marks
+var sheets  = doc.Sheets();                          // composed 11x17 sheets; doc.ExportPdf("set.pdf")
+var views   = doc.Drawings();                        // 2D views (PlanDrawing per view); doc.ExportDrawings(folder) writes DXF
+doc.Set("Bridges[0].Supports[1].Substructure", "{\"TopShape\":\"Crowned\",\"ColumnCount\":2,\"ColumnSpacings\":[6.1]}");  // JSON = SI units
+var chains  = doc.BearingElevations();              // step-by-step elevation chains, each checked against the model
+doc.Project.Units.TryParseStation("22+00", out var sta);
+var g3      = doc.GirderElevations(2, sta);          // girder G3 web CL at a station
+doc.Save();                                          // or Save("other.sbm")
+doc.ExportIfc("Br12.ifc");
+```
+
+## Performance notes
+
+- **Incremental regeneration:** each bridge is keyed by a hash of its definition, alignment and units. Unchanged
+  bridges are reused, so a no-change regeneration of the sample takes about 18 ms.
+- **Parallel work:** bridges, girders, cross frames, splices, stiffeners and bearings all generate in parallel.
+- **Fast plate meshing:** plates with holes are cut into cells, so triangulation stays linear in the number of holes.
+- **Instanced fasteners:** bolts, studs and anchor bolts are drawn with GPU instancing, one mesh per size.
+- **Reference models:** these load in the background, are cached by file timestamp, and are never rebuilt when the
+  bridge regenerates.
+- **Terrain queries:** terrain uses a uniform-grid spatial index. A 335,000-triangle TIN indexes in about 30 ms and
+  answers an elevation query in about 0.3 µs.

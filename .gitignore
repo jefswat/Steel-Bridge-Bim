@@ -1,0 +1,23 @@
+# Build output
+bin/
+obj/
+.vs/
+*.user
+TestResults/
+
+# Published program and plan PDFs (regenerable / large)
+dist/
+
+# Scratch work (scripts, rasters, snapshots, test models, PDF text cache)
+temp/
+
+# Generated exports
+*.ifc
+*.ifczip
+*.dxf
+*.dwg
+*.png
+!docs/**/*.png
+
+# Script run logs
+samples/plans/*.log
