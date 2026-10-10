@@ -206,7 +206,7 @@ public static class RebarLod
     /// <summary>The smooth version is used only while the view (orthographic width) is narrower than this (ft).</summary>
     public static double SwitchWidthFt = 60;
     /// <summary>Upper bound of smooth triangles (the nearest bars win).</summary>
-    public static int MaxTriangles = 1_500_000;
+    public static int MaxTriangles = 1_000_000;
 
     /// <summary>Snapshot/diagnostic options: <c>--nolod</c>, <c>--lodradius ft</c>, <c>--lodwidth ft</c>.</summary>
     public static void ParseArgs(string[] args)
