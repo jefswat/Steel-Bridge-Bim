@@ -1812,6 +1812,12 @@
             "SealCount": null,
             "Body": true,
             "EdgeInset": null,
+            "EndBlock": {
+              "Depth": 0.6604,
+              "FlatLength": 0.8636,
+              "ChamferRun": null,
+              "Soffit": []
+            },
             "Active": true,
             "TypeName": "Modular"
           }
@@ -4792,6 +4798,12 @@
             "SealCount": null,
             "Body": true,
             "EdgeInset": null,
+            "EndBlock": {
+              "Depth": 0.6604,
+              "FlatLength": 1.0287000000000002,
+              "ChamferRun": null,
+              "Soffit": []
+            },
             "Active": true,
             "TypeName": "Modular"
           }
@@ -7626,6 +7638,12 @@
             "SealCount": null,
             "Body": false,
             "EdgeInset": null,
+            "EndBlock": {
+              "Depth": 0.6604,
+              "FlatLength": 1.0287000000000002,
+              "ChamferRun": null,
+              "Soffit": []
+            },
             "Active": true,
             "TypeName": "Modular"
           }
@@ -12083,6 +12101,12 @@
             "SealCount": null,
             "Body": true,
             "EdgeInset": null,
+            "EndBlock": {
+              "Depth": 0.6604,
+              "FlatLength": 1.0287000000000002,
+              "ChamferRun": null,
+              "Soffit": []
+            },
             "Active": true,
             "TypeName": "Modular"
           }
@@ -16314,6 +16338,12 @@
             "SealCount": null,
             "Body": false,
             "EdgeInset": null,
+            "EndBlock": {
+              "Depth": 0.6604,
+              "FlatLength": 1.0287000000000002,
+              "ChamferRun": null,
+              "Soffit": []
+            },
             "Active": true,
             "TypeName": "Modular"
           }
@@ -19019,6 +19049,12 @@
             "SealCount": null,
             "Body": true,
             "EdgeInset": null,
+            "EndBlock": {
+              "Depth": 0.6604,
+              "FlatLength": 0.8636,
+              "ChamferRun": null,
+              "Soffit": []
+            },
             "Active": true,
             "TypeName": "Modular"
           }
@@ -24931,12 +24967,35 @@
             "Type": "StripSeal",
             "GapAt50F": 0.0635,
             "BlockoutWidth": 0.1016,
-            "BlockoutDepth": 0.20478749999999998,
+            "BlockoutDepth": 0.2032,
             "SetDown": 0,
             "DeckEndOffset": 0.3683,
             "SealCount": null,
             "Body": true,
             "EdgeInset": null,
+            "EndBlock": {
+              "Depth": 0.6604,
+              "FlatLength": 1.0287000000000002,
+              "ChamferRun": null,
+              "Soffit": [
+                {
+                  "X": 0,
+                  "Drop": 0.40798749999999995
+                },
+                {
+                  "X": 0.5461,
+                  "Drop": 0.40798749999999995
+                },
+                {
+                  "X": 0.5461,
+                  "Drop": 0.2301875
+                },
+                {
+                  "X": 0.5715,
+                  "Drop": 0.2032
+                }
+              ]
+            },
             "Active": true,
             "TypeName": "Strip seal"
           }
@@ -27222,6 +27281,12 @@
             "SealCount": null,
             "Body": true,
             "EdgeInset": null,
+            "EndBlock": {
+              "Depth": 0.6604,
+              "FlatLength": 0.9906000000000001,
+              "ChamferRun": null,
+              "Soffit": []
+            },
             "Active": true,
             "TypeName": "Modular"
           }
@@ -29720,6 +29785,12 @@
             "SealCount": null,
             "Body": false,
             "EdgeInset": null,
+            "EndBlock": {
+              "Depth": 0.6604,
+              "FlatLength": 0.9906000000000001,
+              "ChamferRun": null,
+              "Soffit": []
+            },
             "Active": true,
             "TypeName": "Modular"
           }
@@ -31764,6 +31835,12 @@
             "SealCount": null,
             "Body": true,
             "EdgeInset": null,
+            "EndBlock": {
+              "Depth": 0.6604,
+              "FlatLength": 0.9906000000000001,
+              "ChamferRun": null,
+              "Soffit": []
+            },
             "Active": true,
             "TypeName": "Modular"
           }
@@ -34031,6 +34108,12 @@
             "SealCount": null,
             "Body": false,
             "EdgeInset": null,
+            "EndBlock": {
+              "Depth": 0.6604,
+              "FlatLength": 0.9906000000000001,
+              "ChamferRun": null,
+              "Soffit": []
+            },
             "Active": true,
             "TypeName": "Modular"
           }
@@ -36742,6 +36825,12 @@
             "SealCount": null,
             "Body": true,
             "EdgeInset": null,
+            "EndBlock": {
+              "Depth": 0.6604,
+              "FlatLength": 0.9906000000000001,
+              "ChamferRun": null,
+              "Soffit": []
+            },
             "Active": true,
             "TypeName": "Modular"
           }
@@ -39567,6 +39656,12 @@
             "SealCount": null,
             "Body": false,
             "EdgeInset": null,
+            "EndBlock": {
+              "Depth": 0.6604,
+              "FlatLength": 0.9906000000000001,
+              "ChamferRun": null,
+              "Soffit": []
+            },
             "Active": true,
             "TypeName": "Modular"
           }
@@ -41987,6 +42082,12 @@
             "SealCount": null,
             "Body": true,
             "EdgeInset": null,
+            "EndBlock": {
+              "Depth": 0.6604,
+              "FlatLength": 0.9906000000000001,
+              "ChamferRun": null,
+              "Soffit": []
+            },
             "Active": true,
             "TypeName": "Modular"
           }
