@@ -28,6 +28,10 @@ public static class Program
                                                             shows running copies. (All other commands work on .sbm files.)
           sbm regen <file.sbm>                              Regenerate; print counts, warnings, timing
           sbm export <file.sbm> [--ifc a.ifc|a.ifczip] [--dxf b.dxf] [--landxml c.xml]
+          sbm db <file.sbm> [out.sqlite] [--pages] [--plans <folder>[,<folder>]] [--links rules.json] [--no-previews]
+                                                            [--unused report.md]
+                                                            Companion SQLite database: every element (IFC GlobalIds + hierarchy),
+                                                            plan sheets (--pages splits the plan PDFs), element -> sheet links, QC
           sbm run <script.csx> [file.sbm] [-- args...]      Run a C# script (globals: Doc, Print, Ft, In, Sta, Len)
           sbm bench <file.sbm> [n]                          Time cold/warm regeneration
           sbm elevations <file.sbm> [bridge]                Step-by-step elevations, grade to bearing seat, at every bearing
@@ -170,6 +174,27 @@ public static class Program
                     if (Opt("--ifc") is { } ifc) { doc.ExportIfc(ifc); Console.WriteLine($"  IFC 4.3 → {ifc}"); }
                     if (Opt("--dxf") is { } dxf) { doc.ExportDxf(dxf); Console.WriteLine($"  DXF → {dxf}"); }
                     if (Opt("--landxml") is { } lx) { doc.ExportLandXml(lx); Console.WriteLine($"  LandXML → {lx}"); }
+                    return 0;
+                }
+                case "db":
+                {
+                    Need(args, 2);
+                    string? Opt(string name) { int i = Array.IndexOf(args, name); return i > 0 && i + 1 < args.Length ? args[i + 1] : null; }
+                    var doc = SbmDocument.Open(args[1]);
+                    var o = new SBM.IO.Database.DatabaseOptions
+                    {
+                        Pages = args.Contains("--pages"), Previews = !args.Contains("--no-previews"), LinksFile = Opt("--links"),
+                        UnusedReport = Opt("--unused"), Log = m => Console.WriteLine("  " + m),
+                    };
+                    if (Opt("--plans") is { } pl) o.PlanFolders.AddRange(pl.Split(','));
+                    string? outPath = args.Length > 2 && !args[2].StartsWith("--") ? args[2] : null;
+                    var r = doc.ExportDatabase(outPath, o);
+                    Console.WriteLine($"Database {r.Build.Path}: {r.Build.Elements:N0} elements in {r.Elapsed.TotalSeconds:F1} s (registry {r.Build.Elapsed.TotalSeconds:F1} s)");
+                    foreach (var (lv, n) in r.Build.ByLevel.OrderByDescending(x => x.Value)) Console.WriteLine($"  {lv,-10} {n,9:N0}");
+                    if (r.Links is { } l)
+                        Console.WriteLine($"  sheets {l.Sheets}, links {l.Links:N0}, sheets linked {l.SheetsLinked}, unlinked {l.SheetsUnused}");
+                    if (r.Coverage.Length > 0) Console.WriteLine(r.Coverage);
+                    if (r.Links != null) foreach (var w in r.Links.Warnings) Console.WriteLine("  warning: " + w);
                     return 0;
                 }
                 case "run":

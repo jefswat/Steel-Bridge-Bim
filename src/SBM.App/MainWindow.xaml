@@ -4,6 +4,7 @@
         xmlns:hx="http://helix-toolkit.org/wpf/SharpDX"
         xmlns:vm="clr-namespace:SBM.App.ViewModels"
         xmlns:vp="clr-namespace:SBM.App.Viewport"
+        xmlns:dbp="clr-namespace:SBM.App.Database"
         Title="{Binding WindowTitle}" Height="900" Width="1500" MinWidth="900" MinHeight="600"
         WindowStartupLocation="CenterScreen" Background="#FF1F1F1F">
     <Window.CommandBindings>
@@ -548,12 +549,14 @@
             <Grid Grid.Column="4" Background="{StaticResource PanelBrush}">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="3*"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
                 <TextBlock Style="{StaticResource PanelHeader}" Text="Properties"/>
-                <ListView Grid.Row="1" ItemsSource="{Binding SelectedProperties}" Background="Transparent" BorderThickness="0">
+                <Grid Grid.Row="1">
+                <Grid.RowDefinitions><RowDefinition Height="2*" MinHeight="80"/><RowDefinition Height="3*"/></Grid.RowDefinitions>
+                <ListView Grid.Row="0" ItemsSource="{Binding SelectedProperties}" Background="Transparent" BorderThickness="0">
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <Grid>
@@ -567,6 +570,8 @@
                         </DataTemplate>
                     </ListView.ItemTemplate>
                 </ListView>
+                <dbp:ElementDbPanel x:Name="DbPanel" Grid.Row="1"/>
+                </Grid>
                 <TextBlock Grid.Row="2" Style="{StaticResource PanelHeader}" Text="Layers"/>
                 <ScrollViewer Grid.Row="3" VerticalScrollBarVisibility="Auto">
                     <ItemsControl ItemsSource="{Binding LayerItems}" Margin="8,4">

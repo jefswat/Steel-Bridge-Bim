@@ -1,0 +1,96 @@
+{
+  // Rules linking model elements to the plan sheets they are based on (companion database, tables sheets / element_sheet).
+  // rules[].sheets  = regex on the normalized sheet title (case-insensitive; named groups become {name} below)
+  // rules[].target  = OR of selectors; a selector is AND of elements columns: level, category, subtype, bridge, bridge_group,
+  //                   unit, support, girder, mark, name.  Value = text ({captures}, % wildcard) or a list of texts.
+  //                   bridge_group defaults to the plan set's bridge_group.
+  // rules[].role    = "detail" (the element is drawn/dimensioned on the sheet) or "general" (context: notes, situation, staking).
+  // A link is stored on the HIGHEST matching element only (e.g. a field-splice assembly); every child (plates, bolts) inherits it
+  // through the hierarchy (view v_element_sheets). Sheets matching no rule are the "unused" sheets (what the model lacks).
+  // Hierarchy of categories: unit(IfcBridge) > part(superstructure|deck|substructure) > group(girder|cross frame group) >
+  //   assembly(girder field section|field splice|bearing|cross frame|cross girder|lateral bracing); substructure: part(pier|abutment) > element/bar.
+
+  "planSets": [
+    { "id": "design-116", "pdf": "B00168*Design 116.pdf", "bridgeGroup": "I-80 WB" },
+    { "id": "design-316", "pdf": "B00169*Design 316.pdf", "bridgeGroup": "Ramp G" }
+  ],
+
+  "administrative": [ "^$", "^REVISED:?$", "^REVISION SHEET", "RICHARD T\\. HORTON" ],
+
+  "rules": [
+    { "id": "general-notes", "sheets": "^(ESTIMATED QUANTITIES|SUMMARY OF ITEMIZED QUANTITIES|GENERAL NOTES)\\b", "role": "general",
+      "basis": "General notes, estimated and itemized quantities", "target": [ { "level": "unit" } ] },
+    { "id": "situation", "sheets": "^SITUATION PLAN", "role": "general", "basis": "Situation plan: location, alignment and ties",
+      "target": [ { "level": "alignment" }, { "level": "unit" } ] },
+    { "id": "superstructure-notes", "sheets": "^SUPERSTRUCTURE DETAILS", "role": "general", "basis": "Superstructure notes (bolt sizes, details common to all units)",
+      "target": [ { "level": "part", "category": "superstructure" } ] },
+    { "id": "staking", "sheets": "^STAKING DIAGRAM - UNIT (?<u>\\d+)", "role": "general", "basis": "Staking diagram: support lines and layout of the unit",
+      "target": [ { "level": "unit", "unit": "Unit {u}" } ] },
+
+    { "id": "pier-details", "sheets": "^PIER NO\\. (?<p>\\w+) DETAILS", "basis": "Pier {p} cap, columns, footings, piles and reinforcing",
+      "target": [ { "level": "part", "category": "pier", "support": "Pier {p}" } ] },
+    { "id": "pier-aesthetics", "sheets": "^PIER AESTHETIC DETAILS", "basis": "Pier cap / column treatment (form liner, plinth)",
+      "target": [ { "level": "element", "category": [ "pier cap", "column" ] } ] },
+    { "id": "abutment-details", "sheets": "^(?<n>WEST|EAST|SOUTH|NORTH) ABUTMENT DETAILS", "basis": "{n} abutment cap, backwall, piles and reinforcing",
+      "target": [ { "level": "part", "category": "abutment", "support": "{n} Abut" } ] },
+    { "id": "abutment-aesthetics", "sheets": "^ABUTMENT AESTHETIC DETAILS", "basis": "Abutment treatment",
+      "target": [ { "level": "element", "category": [ "abutment cap", "backwall" ] } ] },
+
+    { "id": "typical-section", "sheets": "^TYPICAL CROSS SECTIONS? - UNIT (?<u>\\d+)", "basis": "Typical section: deck, haunch, barrier, girder spacing",
+      "target": [ { "level": "part", "category": "deck", "unit": "Unit {u}" }, { "level": "group", "category": "girder", "unit": "Unit {u}" } ] },
+    { "id": "longitudinal-section", "sheets": "^LONGITUDINAL SECTION - UNIT (?<u>\\d+)", "basis": "Longitudinal section: spans, deck, girders",
+      "target": [ { "level": "part", "category": "deck", "unit": "Unit {u}" }, { "level": "group", "category": "girder", "unit": "Unit {u}" } ] },
+    { "id": "steel-layout", "sheets": "^(STRUCTURAL STEEL LAYOUT|STRUCTUAL STEEL LAYOUT|FRAMING PLAN) - UNIT (?<u>\\d+)", "basis": "Steel layout / framing plan: girders, cross frames, splices, bearings",
+      "target": [ { "level": "part", "category": "superstructure", "unit": "Unit {u}" } ] },
+    { "id": "girder-data", "sheets": "^(GIRDER DATA|GIRDER ELEVATION) - UNIT (?<u>\\d+)", "basis": "Girder data / elevation: plate sizes, splice and stiffener locations",
+      "target": [ { "level": "group", "category": "girder", "unit": "Unit {u}" } ] },
+    { "id": "welding", "sheets": "^WELDING DETAILS", "basis": "Welding details",
+      "target": [ { "level": "part", "category": "weld" } ] },
+    { "id": "cross-frames", "sheets": "^CROSS FRAME DETAILS", "basis": "Cross frame details",
+      "target": [ { "level": "assembly", "category": [ "cross frame", "lateral bracing" ] } ] },
+    { "id": "cross-girder", "sheets": "^CROSS GIRDER DETAILS", "basis": "Cross girder details (discontinuous girders)",
+      "target": [ { "level": "assembly", "category": "cross girder" } ] },
+    { "id": "field-splice", "sheets": "^FIELD SPLICE DETAILS", "basis": "Field splice schedule and details",
+      "target": [ { "level": "assembly", "category": "field splice" } ] },
+    { "id": "haunch", "sheets": "^FIELD HAUNCH DATA - UNIT (?<u>\\d+)", "basis": "Field haunch data: haunch heights to compare with the model",
+      "target": [ { "level": "element", "category": "deck slab", "unit": "Unit {u}" } ] },
+    { "id": "bearings-unit", "sheets": "^DISC BEARING DETAILS - UNIT (?<u>\\d+)", "basis": "Disc bearing table of the unit",
+      "target": [ { "level": "assembly", "category": "bearing", "unit": "Unit {u}" } ] },
+    { "id": "bearings-all", "sheets": "^DISC BEARING DETAILS$", "basis": "Disc bearing details",
+      "target": [ { "level": "assembly", "category": "bearing" } ] },
+
+    { "id": "slab-plan", "sheets": "^SLAB PLAN & REINFORCING\\W*UNIT\\W*(?<u>\\d+)", "basis": "Slab plan and reinforcing",
+      "target": [ { "level": "part", "category": "deck", "unit": "Unit {u}" } ] },
+    { "id": "bar-list", "sheets": "^SLAB REINF\\. BAR LIST", "basis": "Slab bar list and quantities",
+      "target": [ { "level": "part", "category": "deck" } ] },
+    { "id": "cross-slope", "sheets": "^CROSS SLOPE GEOMETRICS", "basis": "Cross slope and gore geometrics",
+      "target": [ { "level": "alignment" }, { "level": "part", "category": "deck" } ] },
+    { "id": "top-of-slab", "sheets": "^TOP OF SLAB ELEVATIONS - UNIT (?<u>\\d+)", "basis": "Top of slab elevations",
+      "target": [ { "level": "part", "category": "deck", "unit": "Unit {u}" } ] },
+    { "id": "joint-modular", "sheets": "^MODULAR EXPANSION JOINT DETAILS", "basis": "Modular expansion joint",
+      "target": [ { "level": "element", "category": [ "joint blockout", "expansion joint device" ], "subtype": "Modular" } ] },
+    { "id": "joint-strip", "sheets": "^STRIP SEAL JOINT DETAILS", "basis": "Strip seal expansion joint",
+      "target": [ { "level": "element", "category": [ "joint blockout", "expansion joint device" ], "subtype": "%strip%" } ] },
+    { "id": "drainage", "sheets": "^DRAINAGE DETAILS", "basis": "Deck drainage",
+      "target": [ { "level": "element", "category": [ "deck drain", "drain pipe", "splash basin" ] } ] },
+    { "id": "barrier-unit", "sheets": "^BARRIER RAIL DETAILS - UNIT (?<u>\\d+)", "basis": "Barrier rail of the unit",
+      "target": [ { "level": "element", "category": "barrier", "unit": "Unit {u}" } ] },
+    { "id": "barrier-all", "sheets": "^BARRIER RAIL DETAILS$", "basis": "Barrier rail details",
+      "target": [ { "level": "element", "category": "barrier" } ] }
+  ],
+
+  "hints": [
+    { "sheets": "BNSF SHORING", "suggests": "Temporary works: shoring next to the railroad. No temporary / construction-stage elements in the model." },
+    { "sheets": "INSPECTION (ACCESS|CABLE|WALKWAY)", "suggests": "Inspection access: walkways, cables, access openings, hatches (and the cut-off diaphragm openings). Not modeled." },
+    { "sheets": "SIGN SUPPORT|EXIT SIGN", "suggests": "Sign structures: sign supports, brackets, bases and foundations on the bridge (I-80). Not modeled." },
+    { "sheets": "CAMBER", "suggests": "Camber and blocking: girder camber/blocking diagrams. Camber is not modeled (deferred)." },
+    { "sheets": "MOMENT & REACTION", "suggests": "Design reactions and moments: load data for bearings and girders. No load/reaction properties on bearings or girders yet." },
+    { "sheets": "CRASH CUSHION", "suggests": "Crash cushion / end post at barrier ends (Ramp A, Ramp G). Not modeled." },
+    { "sheets": "BARRIER RAIL AESTHETIC", "suggests": "Barrier rail surface treatment (form liner, recess). Barrier is the plain SSTR profile." },
+    { "sheets": "LIGHTING", "suggests": "Bridge lighting: poles, bases, conduit and junction boxes. Not modeled." },
+    { "sheets": "MACADAM|SLOPE PROTECTION", "suggests": "Slope protection under the bridge at the abutments (macadam stone). No slope-protection / earthwork elements." },
+    { "sheets": "WING ARMORING", "suggests": "Abutment wing armoring (wingwalls). Wingwalls are not modeled." },
+    { "sheets": "ABUTMENT BACKFILL", "suggests": "Abutment backfill zone / drainage fill and approach. No backfill, approach slab or roadway elements." },
+    { "sheets": "SUBDRAIN", "suggests": "Subdrain behind the abutments. Not modeled." }
+  ]
+}

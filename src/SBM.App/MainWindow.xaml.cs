@@ -46,6 +46,7 @@ public partial class MainWindow : Window
         View.CameraChanged += (_, _) => KeepCameraInRange();
         InitNavigation();
         InitMeasure();
+        InitDatabase();
         View.PreviewMouseLeftButtonDown += OnViewportMouseDown;
         View.PreviewMouseLeftButtonUp += OnViewportMouseUp;
         View.PreviewMouseRightButtonDown += OnViewportRightDown;

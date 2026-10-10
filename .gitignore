@@ -24,3 +24,9 @@ samples/plans/*.log
 
 # Agent worktrees
 .worktrees/
+
+# Companion database + split plan pages (regenerable)
+*.sqlite
+*.sqlite-journal
+**/plans/*/p[0-9][0-9][0-9].*
+**/plans/*/sheets.json
