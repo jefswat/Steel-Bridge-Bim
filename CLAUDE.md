@@ -218,8 +218,22 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   (DirectX 11, System.Numerics types; namespaces `HelixToolkit`, `HelixToolkit.SharpDX`, `HelixToolkit.Wpf.SharpDX`).
   - `Viewport/SceneBuilder` batches each layer into one LineGeometry3D + one BillboardText3D; vertices are rebased to a
     local origin (state-plane coords exceed float precision). Model-sized text (FixedSize=false).
-  - `Editors/` input windows built from `FieldBase` rows (TextField/ChoiceField/BoolField/SpacingField) and DataGrids of
+  - `Editors/` input windows built from `FieldBase` rows (TextField/ChoiceField/BoolField/SpacingField/StringField with
+    optional validator + AllowEmpty/LengthListField = comma list of lengths, blank = null) and DataGrids of
     `CellValue` (unit-aware text cells). Apply = regenerate without closing.
+    Bridge editor tabs beyond the basics: Substructure (support combo = supports THEN auxiliary supports; pedestal plan
+    sizes S/N + shared block, chamfer / flare column geometry, per-face column bars, chamfer positions, hoop overlap,
+    crossties, flare cage, ColumnSplice Lap/Coupler + pattern), Aux. Supports (AuxiliarySupports grid + Girders.Beginnings
+    grid; renaming an aux support carries its beginnings), Deck Ends & Joints (first/last support: ExpansionJoint +
+    EndBlock; explicit Soffit polyline is kept, script only), Deck & Barrier (Deck.EdgeStrip; Width 0 = null).
+    `SupportRowVm.Source` keeps the loaded SupportDefinition so inputs WITHOUT an editor (SharedPier, GirderFixities,
+    DeckEndPoints, EndSupport/EndSplice/EndOffset, PierCenterOffset, Bearing...) survive Apply; build new support inputs
+    from it, never `new SupportDefinition`. Snapshot: `--editors [--editbridge NAME] [--editsupport NAME]` picks the bridge
+    and the support shown on Substructure / Deck Ends; long tabs also render scrolled pages `_bridgeN_p1..`.
+    Still script/API only (no editor): abutment / wingwall / counterfort detail + abutment rebar, cap profiles + aesthetics,
+    CapBars, cross-frame styles / bolting, field splice plate details, GirderBeginning cross-girder details,
+    Girders.CrossGirder / PlanGeometry / Terminations, inspection access, drains, lighting, sign supports, misc items,
+    DeckPlanReinforcement families / end dam, deck edge tables, prestressed strand layout, pile web / batter / uplift.
   - Header readability: App.xaml defines explicit TabItem (`SbmTabItem`) and DataGridColumnHeader templates â€” do NOT
     use `BasedOn="{StaticResource {x:Type TabItem}}"` (resolves to the classic light template). TabItem Foreground is
     inherited by tab content, so it must stay light. All windows get dark title bars (DWM) and a light default

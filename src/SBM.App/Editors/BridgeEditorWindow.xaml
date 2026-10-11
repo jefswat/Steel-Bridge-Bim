@@ -100,7 +100,8 @@
                 <DockPanel Margin="8">
                     <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="8,0,0,6">
                         <TextBlock Text="Support:" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                        <ComboBox Width="200" ItemsSource="{Binding Supports}" SelectedItem="{Binding SubstructureSupport}" DisplayMemberPath="Name"/>
+                        <ComboBox Width="200" ItemsSource="{Binding SubstructureChoices}" SelectedItem="{Binding SubstructureSupport}" DisplayMemberPath="Name"
+                                  ToolTip="Supports, then auxiliary support lines"/>
                         <Button Content="{Binding CopySubstructureLabel}" Margin="12,0,0,0" Click="OnCopySubstructure"
                                 ToolTip="Copy this cap, column, foundation and reinforcing layout to every other support of the same type"/>
                     </StackPanel>
@@ -108,6 +109,53 @@
                                Text="Positions along the cap are measured on the (skewed) support line from the alignment, right positive. Bearing seats come from the girders and bearings; the cap top is shaped as chosen and set so the shortest pedestal is the minimum height, and each pedestal takes up the rest of its seat."/>
                     <ScrollViewer VerticalScrollBarVisibility="Auto">
                         <ItemsControl ItemsSource="{Binding SubstructureFields}" Style="{StaticResource FieldList}"/>
+                    </ScrollViewer>
+                </DockPanel>
+            </TabItem>
+
+            <TabItem Header="Aux. Supports">
+                <DockPanel Margin="8">
+                    <TextBlock DockPanel.Dock="Top" Foreground="{StaticResource MutedText}" TextWrapping="Wrap" Margin="0,0,0,8"
+                               Text="Auxiliary support lines carry the start bearings of girders that begin on their own line (e.g. a hammerhead beside the first pier). The line passes through the alignment at the station with the skew, like a support (it is the CL bearing line), but it does not divide the spans. Its cap, columns and foundation are set on the Substructure tab."/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="16"/>
+                            <ColumnDefinition Width="300"/>
+                        </Grid.ColumnDefinitions>
+                        <DockPanel>
+                            <TextBlock DockPanel.Dock="Top" Text="Auxiliary support lines" FontWeight="SemiBold" FontSize="13" Margin="0,0,0,4" Foreground="{StaticResource AccentBrushSbm}"/>
+                            <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,6">
+                                <Button Style="{StaticResource ToolIconButton}" Content="&#xE710;" ToolTip="Add auxiliary support line" Click="OnAuxAdd"/>
+                                <Button Style="{StaticResource ToolIconButton}" Content="&#xE74D;" ToolTip="Delete selected auxiliary support line" Click="OnAuxDelete"/>
+                            </StackPanel>
+                            <DataGrid x:Name="AuxGrid" ItemsSource="{Binding AuxSupports}" MinHeight="120"/>
+                        </DockPanel>
+                        <DockPanel Grid.Column="2">
+                            <TextBlock DockPanel.Dock="Top" Text="Girder beginnings" FontWeight="SemiBold" FontSize="13" Margin="0,0,0,4" Foreground="{StaticResource AccentBrushSbm}"/>
+                            <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,6">
+                                <Button Style="{StaticResource ToolIconButton}" Content="&#xE710;" ToolTip="Add girder beginning" Click="OnBeginningAdd"/>
+                                <Button Style="{StaticResource ToolIconButton}" Content="&#xE74D;" ToolTip="Delete selected girder beginning" Click="OnBeginningDelete"/>
+                            </StackPanel>
+                            <TextBlock DockPanel.Dock="Bottom" Foreground="{StaticResource MutedText}" TextWrapping="Wrap" Margin="0,6,0,0"
+                                       Text="Girder 1 = G1 (leftmost). The girder starts at its bearing on the line minus the girder extension and has no bearing on the first support."/>
+                            <DataGrid x:Name="BeginningGrid" ItemsSource="{Binding Beginnings}" MinHeight="120"/>
+                        </DockPanel>
+                    </Grid>
+                </DockPanel>
+            </TabItem>
+
+            <TabItem Header="Deck Ends &amp; Joints">
+                <DockPanel Margin="8">
+                    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="8,0,0,6">
+                        <TextBlock Text="Deck end at:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                        <ComboBox Width="200" ItemsSource="{Binding JointSupports}" SelectedItem="{Binding JointSupport}" DisplayMemberPath="Name"
+                                  ToolTip="The first and last support of this bridge (unit)"/>
+                    </StackPanel>
+                    <TextBlock DockPanel.Dock="Top" Foreground="{StaticResource MutedText}" TextWrapping="Wrap" Margin="8,0,8,4"
+                               Text="Expansion joints are built at the deck ends (first and last support). The model cuts the blockout out of the deck and casts it as its own solid, and adds a generic envelope of the device. The CL bearing to deck end distance is the Deck End Offset on the Supports tab."/>
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <ItemsControl ItemsSource="{Binding JointFields}" Style="{StaticResource FieldList}"/>
                     </ScrollViewer>
                 </DockPanel>
             </TabItem>

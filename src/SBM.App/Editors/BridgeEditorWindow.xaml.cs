@@ -39,6 +39,41 @@ public partial class BridgeEditorWindow : Window
         GridColumns.AddCell(PlateGrid, "Ends at Station", nameof(PlateRowVm.EndStation), 140);
         GridColumns.AddCell(PlateGrid, "Width", nameof(PlateRowVm.Width), 110);
         GridColumns.AddCell(PlateGrid, "Thickness", nameof(PlateRowVm.Thickness), 110);
+
+        GridColumns.Configure(AuxGrid);
+        GridColumns.AddText(AuxGrid, "Name", nameof(SupportRowVm.Name), 110);
+        GridColumns.AddCombo(AuxGrid, "Type", nameof(SupportRowVm.Type), _vm.SupportTypes, 100);
+        GridColumns.AddCell(AuxGrid, "CL Brg Station", nameof(SupportRowVm.Station), 130);
+        GridColumns.AddCell(AuxGrid, "Skew", nameof(SupportRowVm.Skew), 110);
+        GridColumns.AddCell(AuxGrid, "Girder Ext.", nameof(SupportRowVm.GirderExtension), 100);
+        GridColumns.AddCombo(AuxGrid, "Bearing Fixity", nameof(SupportRowVm.Fixity), _vm.Fixities, 140);
+        AuxGrid.CellEditEnding += (_, _) => Dispatcher.BeginInvoke(_vm.RefreshAuxNames);
+
+        GridColumns.Configure(BeginningGrid);
+        GridColumns.AddCell(BeginningGrid, "Girder", nameof(BeginningRowVm.Girder), 80);
+        GridColumns.AddCombo(BeginningGrid, "Begins on", nameof(BeginningRowVm.Support), _vm.AuxNames, 170);
+    }
+
+    private void OnAuxAdd(object sender, RoutedEventArgs e)
+    {
+        GridColumns.CommitEdits(AuxGrid);
+        _vm.AuxSupports.Add(_vm.NewAuxSupport());
+    }
+
+    private void OnAuxDelete(object sender, RoutedEventArgs e)
+    {
+        if (AuxGrid.SelectedItem is SupportRowVm r) _vm.AuxSupports.Remove(r);
+    }
+
+    private void OnBeginningAdd(object sender, RoutedEventArgs e)
+    {
+        GridColumns.CommitEdits(BeginningGrid);
+        _vm.Beginnings.Add(_vm.NewBeginning());
+    }
+
+    private void OnBeginningDelete(object sender, RoutedEventArgs e)
+    {
+        if (BeginningGrid.SelectedItem is BeginningRowVm r) _vm.Beginnings.Remove(r);
     }
 
     private void OnPlateAdd(object sender, RoutedEventArgs e)
@@ -56,8 +91,17 @@ public partial class BridgeEditorWindow : Window
     /// <summary>Non-modal instance with a no-op apply, for rendering previews/snapshots.</summary>
     private void OnCopySubstructure(object sender, RoutedEventArgs e) => _vm.CopySubstructureToSameType();
 
-    public static BridgeEditorWindow CreateForPreview(BridgeDefinition def, BridgeProject project, UnitSystem units) =>
-        new(def, project, units, 0, false, _ => { });
+    public static BridgeEditorWindow CreateForPreview(BridgeDefinition def, BridgeProject project, UnitSystem units, string? support = null)
+    {
+        var w = new BridgeEditorWindow(def, project, units, 0, false, _ => { });
+        // Preview of one support's substructure / deck end (snapshot --editsupport NAME).
+        if (support != null && w._vm.SubstructureChoices.FirstOrDefault(r => r.Name == support) is { } r)
+        {
+            w._vm.SubstructureSupport = r;
+            if (w._vm.JointSupports.Contains(r)) w._vm.JointSupport = r;
+        }
+        return w;
+    }
 
     public static void Edit(BridgeDefinition def, BridgeProject project, UnitSystem units, int tab, bool isNew, Action<BridgeDefinition> apply)
     {
@@ -70,6 +114,9 @@ public partial class BridgeEditorWindow : Window
         GridColumns.CommitEdits(SupportGrid);
         GridColumns.CommitEdits(SpliceGrid);
         GridColumns.CommitEdits(PlateGrid);
+        GridColumns.CommitEdits(AuxGrid);
+        GridColumns.CommitEdits(BeginningGrid);
+        _vm.RefreshAuxNames();
         if (!_vm.TryBuild(out var def) || def == null) return false;
         _apply(def);
         return true;
