@@ -54,14 +54,14 @@ public sealed partial class SubstructureGenerator
         var poly = unit.CapOutline.Count >= 3 ? unit.CapOutline.ToList()
             : unit.CapTop.Concat(Enumerable.Reverse(unit.CapBottom)).ToList();
         double tol = ContainmentTolerance, capCov = r.CapCover, ftgCov = In(2);
-        var bad = new Dictionary<string, (int n, double worst)>();
+        var bad = new Dictionary<string, (int n, double worst, string at)>();
         int total = 0;
         foreach (var b in bars)
         {
             bool cap = b.Location.Contains(" cap "), ftg = b.Location.Contains(" footing ") && !b.Location.Contains("dowel");
             if (!cap && !ftg) continue;
             bool ped = b.Location.Contains("pedestal");
-            double rad = b.Size.Diameter / 2, worst = double.MaxValue;
+            double rad = b.Size.Diameter / 2, worst = double.MaxValue; string at = "";
             // sample the polyline every ~6"
             var pts = new List<Vec3>();
             for (int i = 0; i < b.Points.Length; i++)
@@ -96,19 +96,19 @@ public sealed partial class SubstructureGenerator
                     }
                     c = best;
                 }
-                worst = Math.Min(worst, c);
+                if (c < worst) { worst = c; at = $"S {Sh(s)} N {Sh(n)} El {El(p.Z)}"; }
             }
             if (worst < -tol)
             {
                 total++;
                 string kind = System.Text.RegularExpressions.Regex.Replace(b.Location, @"^.*?(cap|footing \d+) ", "");
                 bad.TryGetValue(kind, out var v);
-                bad[kind] = (v.n + 1, Math.Min(v.worst, worst));
+                bad[kind] = v.n == 0 || worst < v.worst ? (v.n + 1, worst, at) : (v.n + 1, v.worst, v.at);
             }
         }
         if (total > 0)
             Warn($"{unit.Name}: {total} plan-listed bar(s) lie outside the concrete / short of the cover (centerline - radius - cover, tolerance 1/8\"): "
-                + string.Join("; ", bad.OrderBy(k => k.Value.worst).Select(k => $"{k.Key} x{k.Value.n} worst {Sh(-k.Value.worst)}")) + " - kept as listed on the plans.");
+                + string.Join("; ", bad.OrderBy(k => k.Value.worst).Select(k => $"{k.Key} x{k.Value.n} worst {Sh(-k.Value.worst)} at {k.Value.at}")) + " - kept as listed on the plans.");
         return total;
     }
 }

@@ -192,16 +192,21 @@ public sealed partial class SubstructureGenerator
 
         // Centred polyline following z(s) for a bar of the given listed length. The ends keep the cover to the (raked) end faces where the
         // cap allows; a bar that is longer than the room is kept as listed (extended past the cover) and reported by the containment check.
-        Vec3[] Follow(double n, double length, Func<double, double> z, double centre, double endCover = -1, int hook = 0)
+        Vec3[] Follow(double n, double length, Func<double, double> z, double centre, double endCover = -1, int hook = 0, double rad = 0)
         {
             if (endCover < 0) endCover = cov;
-            double lo = s0, hi = s1;
-            for (double x = s0; x < sMid; x += In(1)) { if (Clr(x, z(x)) >= endCover - 1e-6) { lo = x; break; } }
-            for (double x = s1; x > sMid; x -= In(1)) { if (Clr(x, z(x)) >= endCover - 1e-6) { hi = x; break; } }
-            double legH = 0;
-            if (hook != 0 && length > hi - lo + 1e-6)
+            double lo = s0, hi = s1, legH = 0, fullLength = length;
+            for (int iter = 0; iter < 3; iter++)
+            {
+                double lg = legH;
+                lo = s0; hi = s1;
+                for (double x = s0; x < sMid; x += In(1)) { if (Clr(x, z(x)) >= endCover - 1e-6 && (lg <= 0 || (Clr(x, z(x) + hook * lg) >= endCover + rad - 1e-6 && Clr(x, z(x)) >= endCover + rad - 1e-6))) { lo = x; break; } }
+                for (double x = s1; x > sMid; x -= In(1)) { if (Clr(x, z(x)) >= endCover - 1e-6 && (lg <= 0 || (Clr(x, z(x) + hook * lg) >= endCover + rad - 1e-6 && Clr(x, z(x)) >= endCover + rad - 1e-6))) { hi = x; break; } }
+                if (hook != 0 && fullLength > hi - lo + 1e-6) legH = (fullLength - (hi - lo)) / 2; else legH = 0;
+            }
+            if (legH > 0)
             {   // listed length beyond the room between the end faces: the excess is turned down (top bars) / up (bottom bars) in a hook at each end, as the plans' bent bars
-                legH = (length - (hi - lo)) / 2; length = hi - lo; centre = (lo + hi) / 2;
+                length = hi - lo; centre = (lo + hi) / 2;
             }
             double a = Math.Max(lo, centre - length / 2), b = Math.Min(hi, centre + length / 2);
             if (b - a < length - 1e-6 && Math.Abs(centre - sMid) < 1e-6 + capLen) { double mid = (a + b) / 2; a = mid - length / 2; b = mid + length / 2; if (a < lo - 1e-6 || b > hi + 1e-6) { a = Math.Min(a, Math.Max(lo, a)); } }
@@ -245,7 +250,7 @@ public sealed partial class SubstructureGenerator
                     double n = mine.Count == 1 ? (nA + nB) / 2 : nA + size.Diameter / 2 + (avail - size.Diameter) * j / (mine.Count - 1);
                     double off = dir * row * (dbMax + In(1.5));
                     Func<double, double> z = s => z0(s) + off;
-                    var pts = Follow(n, g.Length, z, sMid, -1, dir < 0 ? -1 : 1);
+                    var pts = Follow(n, g.Length, z, sMid, -1, dir < 0 ? -1 : 1, size.Diameter / 2);
                     bars.Add(PlanBarFixed(series, size, $"{loc} {g.Mark} {what}", pts, g.Length));
                 }
             }
@@ -264,7 +269,7 @@ public sealed partial class SubstructureGenerator
                 {
                     double n = cnt == 1 ? (nA + nB) / 2 : nA + (nB - nA) * j / (cnt - 1);
                     double centre = end == 0 ? s0 + cov + g.Length / 2 : s1 - cov - g.Length / 2;
-                    var pts = Follow(n, g.Length, s => BotAt(s) + cov + st.Diameter + size.Diameter / 2 + 3 * size.Diameter * (1 + rowsB), centre, -1, 1);
+                    var pts = Follow(n, g.Length, s => BotAt(s) + cov + st.Diameter + size.Diameter / 2 + 3 * size.Diameter * (1 + rowsB), centre, -1, 1, size.Diameter / 2);
                     bars.Add(PlanBarFixed("B", size, $"{loc} {g.Mark} cantilever bottom", pts, g.Length));
                 }
             }
