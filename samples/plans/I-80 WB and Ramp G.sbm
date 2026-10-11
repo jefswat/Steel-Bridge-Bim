@@ -1775,6 +1775,7 @@
             "PileType": "SteelHP",
             "PileSection": "HP14x73",
             "PileSize": 0.4572,
+            "PileShellThickness": "NaN",
             "PileRows": 3,
             "PileColumns": 3,
             "PileSpacing": 0.9144000000000001,
@@ -1857,6 +1858,7 @@
                   "TopElevation": 304.02276
                 }
               ],
+              "StandalonePedestals": [],
               "Masks": [
                 {
                   "End": "Left",
@@ -2796,6 +2798,7 @@
             "PileType": "SteelHP",
             "PileSection": "HP14x73",
             "PileSize": 0.4572,
+            "PileShellThickness": "NaN",
             "PileRows": 3,
             "PileColumns": 3,
             "PileSpacing": 0.9144000000000001,
@@ -4794,6 +4797,7 @@
             "PileType": "SteelHP",
             "PileSection": "HP14x73",
             "PileSize": 0.4572,
+            "PileShellThickness": "NaN",
             "PileRows": 3,
             "PileColumns": 3,
             "PileSpacing": 0.9144000000000001,
@@ -6792,6 +6796,7 @@
             "PileType": "SteelHP",
             "PileSection": "HP14x73",
             "PileSize": 0.4572,
+            "PileShellThickness": "NaN",
             "PileRows": 3,
             "PileColumns": 3,
             "PileSpacing": 0.9144000000000001,
@@ -8525,6 +8530,7 @@
             "PileType": "SteelHP",
             "PileSection": "HP14x73",
             "PileSize": 0.4572,
+            "PileShellThickness": "NaN",
             "PileRows": 3,
             "PileColumns": 3,
             "PileSpacing": 0.9144000000000001,
@@ -10240,6 +10246,7 @@
             "PileType": "SteelHP",
             "PileSection": "HP14x73",
             "PileSize": 0.4572,
+            "PileShellThickness": "NaN",
             "PileRows": 3,
             "PileColumns": 3,
             "PileSpacing": 0.9144000000000001,
@@ -18039,6 +18046,7 @@
           "PadLength": 0,
           "PadWidth": 0.5334,
           "PadThickness": 0.06985,
+          "PierPadOrientation": "SquareToBeam",
           "Standard": null,
           "Designation": "",
           "StandardBearingLength": 0,
@@ -21103,7 +21111,8 @@
             }
           ]
         }
-      }
+      },
+      "PsSteelDiaphragms": null
     },
     {
       "Name": "I-80 WB Unit 2",
@@ -21218,6 +21227,7 @@
             "PileType": "SteelHP",
             "PileSection": "HP14x73",
             "PileSize": 0.4572,
+            "PileShellThickness": "NaN",
             "PileRows": 3,
             "PileColumns": 3,
             "PileSpacing": 0.9144000000000001,
@@ -21554,6 +21564,7 @@
             "PileType": "SteelHP",
             "PileSection": "HP14x73",
             "PileSize": 0.4572,
+            "PileShellThickness": "NaN",
             "PileRows": 3,
             "PileColumns": 3,
             "PileSpacing": 0.9144000000000001,
@@ -23977,6 +23988,7 @@
             "PileType": "SteelHP",
             "PileSection": "HP14x73",
             "PileSize": 0.4572,
+            "PileShellThickness": "NaN",
             "PileRows": 3,
             "PileColumns": 3,
             "PileSpacing": 0.9144000000000001,
@@ -26112,6 +26124,7 @@
             "PileType": "SteelHP",
             "PileSection": "HP14x73",
             "PileSize": 0.4572,
+            "PileShellThickness": "NaN",
             "PileRows": 3,
             "PileColumns": 3,
             "PileSpacing": 0.9144000000000001,
@@ -28444,6 +28457,7 @@
             "PileType": "SteelHP",
             "PileSection": "HP14x73",
             "PileSize": 0.4572,
+            "PileShellThickness": "NaN",
             "PileRows": 3,
             "PileColumns": 3,
             "PileSpacing": 0.9144000000000001,
@@ -30210,6 +30224,7 @@
             "PileType": "SteelHP",
             "PileSection": "HP14x73",
             "PileSize": 0.4572,
+            "PileShellThickness": "NaN",
             "PileRows": 3,
             "PileColumns": 3,
             "PileSpacing": 0.9144000000000001,
@@ -32001,6 +32016,7 @@
             "PileType": "SteelHP",
             "PileSection": "HP14x73",
             "PileSize": 0.4572,
+            "PileShellThickness": "NaN",
             "PileRows": 5,
             "PileColumns": 5,
             "PileSpacing": 1.2192,
@@ -34430,6 +34446,7 @@
             "PileType": "SteelHP",
             "PileSection": "HP14x73",
             "PileSize": 0.4572,
+            "PileShellThickness": "NaN",
             "PileRows": 3,
             "PileColumns": 3,
             "PileSpacing": 0.9144000000000001,
@@ -45625,6 +45642,7 @@
           "PadLength": 0,
           "PadWidth": 0.5334,
           "PadThickness": 0.06985,
+          "PierPadOrientation": "SquareToBeam",
           "Standard": null,
           "Designation": "",
           "StandardBearingLength": 0,
@@ -51863,7 +51881,8 @@
             }
           ]
         }
-      }
+      },
+      "PsSteelDiaphragms": null
     },
     {
       "Name": "I-80 WB Unit 3",
@@ -51977,6 +51996,7 @@
             "PileType": "SteelHP",
             "PileSection": "HP14x73",
             "PileSize": 0.4572,
+            "PileShellThickness": "NaN",
             "PileRows": 3,
             "PileColumns": 3,
             "PileSpacing": 0.9144000000000001,
@@ -52295,6 +52315,7 @@
             "PileType": "SteelHP",
             "PileSection": "HP14x73",
             "PileSize": 0.4572,
+            "PileShellThickness": "NaN",
             "PileRows": 3,
             "PileColumns": 3,
             "PileSpacing": 0.9144000000000001,
@@ -54530,6 +54551,7 @@
             "PileType": "SteelHP",
             "PileSection": "HP14x73",
             "PileSize": 0.4572,
+            "PileShellThickness": "NaN",
             "PileRows": 3,
             "PileColumns": 3,
             "PileSpacing": 0.9144000000000001,
@@ -56529,6 +56551,7 @@
             "PileType": "SteelHP",
             "PileSection": "HP14x73",
             "PileSize": 0.4572,
+            "PileShellThickness": "NaN",
             "PileRows": 3,
             "PileColumns": 3,
             "PileSpacing": 0.9144000000000001,
@@ -58234,6 +58257,7 @@
             "PileType": "SteelHP",
             "PileSection": "HP14x73",
             "PileSize": 0.4572,
+            "PileShellThickness": "NaN",
             "PileRows": 3,
             "PileColumns": 3,
             "PileSpacing": 0.9144000000000001,
@@ -59831,6 +59855,7 @@
             "PileType": "SteelHP",
             "PileSection": "HP14x73",
             "PileSize": 0.4572,
+            "PileShellThickness": "NaN",
             "PileRows": 3,
             "PileColumns": 3,
             "PileSpacing": 0.9144000000000001,
@@ -59925,6 +59950,7 @@
                   "TopElevation": 308.634384
                 }
               ],
+              "StandalonePedestals": [],
               "Masks": [
                 {
                   "End": "Left",
@@ -70211,6 +70237,7 @@
           "PadLength": 0,
           "PadWidth": 0.5334,
           "PadThickness": 0.06985,
+          "PierPadOrientation": "SquareToBeam",
           "Standard": null,
           "Designation": "",
           "StandardBearingLength": 0,
@@ -75523,7 +75550,8 @@
             }
           ]
         }
-      }
+      },
+      "PsSteelDiaphragms": null
     },
     {
       "Name": "Ramp G Unit 1",
@@ -75628,6 +75656,7 @@
             "PileType": "SteelHP",
             "PileSection": "HP14x73",
             "PileSize": 0.4572,
+            "PileShellThickness": "NaN",
             "PileRows": 3,
             "PileColumns": 3,
             "PileSpacing": 0.9144000000000001,
@@ -75706,6 +75735,7 @@
                   "TopElevation": 303.60823200000004
                 }
               ],
+              "StandalonePedestals": [],
               "Masks": [
                 {
                   "End": "Left",
@@ -76559,6 +76589,7 @@
             "PileType": "SteelHP",
             "PileSection": "HP14x73",
             "PileSize": 0.4572,
+            "PileShellThickness": "NaN",
             "PileRows": 3,
             "PileColumns": 3,
             "PileSpacing": 0.9144000000000001,
@@ -77804,6 +77835,7 @@
             "PileType": "SteelHP",
             "PileSection": "HP14x73",
             "PileSize": 0.4572,
+            "PileShellThickness": "NaN",
             "PileRows": 3,
             "PileColumns": 3,
             "PileSpacing": 0.9144000000000001,
@@ -79113,6 +79145,7 @@
             "PileType": "SteelHP",
             "PileSection": "HP14x73",
             "PileSize": 0.4572,
+            "PileShellThickness": "NaN",
             "PileRows": 3,
             "PileColumns": 3,
             "PileSpacing": 0.9144000000000001,
@@ -80414,6 +80447,7 @@
             "PileType": "SteelHP",
             "PileSection": "HP14x73",
             "PileSize": 0.4572,
+            "PileShellThickness": "NaN",
             "PileRows": 3,
             "PileColumns": 3,
             "PileSpacing": 0.9144000000000001,
@@ -81727,6 +81761,7 @@
             "PileType": "SteelHP",
             "PileSection": "HP14x117",
             "PileSize": 0.4572,
+            "PileShellThickness": "NaN",
             "PileRows": 3,
             "PileColumns": 3,
             "PileSpacing": 0.9144000000000001,
@@ -86213,6 +86248,7 @@
           "PadLength": 0,
           "PadWidth": 0.5334,
           "PadThickness": 0.06985,
+          "PierPadOrientation": "SquareToBeam",
           "Standard": null,
           "Designation": "",
           "StandardBearingLength": 0,
@@ -88691,14 +88727,19 @@
             "BoxFromGutter": 1.0668000000000002,
             "BoxLength": 0.6604,
             "BoxWidth": 0.3048,
-            "BoxHighEndHeight": 0.48260000000000003,
+            "BoxHighEndHeight": 0.4064,
             "BoxBottomSlope": 0.07619999999999999,
             "PrintedTroughDrop": 0.508,
             "PipeNominalDiameter": 0.2032,
             "Pipe1Slope": 0.08333333333333333,
             "CapBoxFromColumn": 3.81,
-            "CapBoxLengthN": 0.4064,
-            "CapBoxWidthS": 0.4572,
+            "CapBoxFace": "Back",
+            "CapBoxAlongFace": 0.4064,
+            "CapBoxOutTop": 0.4572,
+            "CapBoxOutBottom": 0.4064,
+            "CapBoxInletFromFace": 0.2286,
+            "CapBoxOutletClear": 0.038099999999999995,
+            "CapBoxInletEmbed": 0.1016,
             "CapBoxDepth": 0.6096,
             "CapBoxBelowTop": null,
             "CapPipeSlope": 0.08,
@@ -88741,7 +88782,8 @@
             }
           ]
         }
-      }
+      },
+      "PsSteelDiaphragms": null
     },
     {
       "Name": "Ramp G Unit 2",
@@ -88849,6 +88891,7 @@
             "PileType": "SteelHP",
             "PileSection": "HP14x73",
             "PileSize": 0.4572,
+            "PileShellThickness": "NaN",
             "PileRows": 3,
             "PileColumns": 3,
             "PileSpacing": 0.9144000000000001,
@@ -89157,6 +89200,7 @@
             "PileType": "SteelHP",
             "PileSection": "HP14x73",
             "PileSize": 0.4572,
+            "PileShellThickness": "NaN",
             "PileRows": 3,
             "PileColumns": 3,
             "PileSpacing": 0.9144000000000001,
@@ -90470,6 +90514,7 @@
             "PileType": "SteelHP",
             "PileSection": "HP14x73",
             "PileSize": 0.4572,
+            "PileShellThickness": "NaN",
             "PileRows": 3,
             "PileColumns": 3,
             "PileSpacing": 0.9144000000000001,
@@ -91939,6 +91984,7 @@
             "PileType": "SteelHP",
             "PileSection": "HP14x73",
             "PileSize": 0.4572,
+            "PileShellThickness": "NaN",
             "PileRows": 3,
             "PileColumns": 3,
             "PileSpacing": 0.9144000000000001,
@@ -93360,6 +93406,7 @@
             "PileType": "SteelHP",
             "PileSection": "HP14x73",
             "PileSize": 0.4572,
+            "PileShellThickness": "NaN",
             "PileRows": 3,
             "PileColumns": 3,
             "PileSpacing": 0.9144000000000001,
@@ -97353,6 +97400,7 @@
           "PadLength": 0,
           "PadWidth": 0.5334,
           "PadThickness": 0.06985,
+          "PierPadOrientation": "SquareToBeam",
           "Standard": null,
           "Designation": "",
           "StandardBearingLength": 0,
@@ -99682,14 +99730,19 @@
             "BoxFromGutter": 1.0668000000000002,
             "BoxLength": 0.6604,
             "BoxWidth": 0.3048,
-            "BoxHighEndHeight": 0.48260000000000003,
+            "BoxHighEndHeight": 0.4064,
             "BoxBottomSlope": 0.07619999999999999,
             "PrintedTroughDrop": 0.508,
             "PipeNominalDiameter": 0.2032,
             "Pipe1Slope": 0.08333333333333333,
             "CapBoxFromColumn": 3.81,
-            "CapBoxLengthN": 0.4064,
-            "CapBoxWidthS": 0.4572,
+            "CapBoxFace": "Back",
+            "CapBoxAlongFace": 0.4064,
+            "CapBoxOutTop": 0.4572,
+            "CapBoxOutBottom": 0.4064,
+            "CapBoxInletFromFace": 0.2286,
+            "CapBoxOutletClear": 0.038099999999999995,
+            "CapBoxInletEmbed": 0.1016,
             "CapBoxDepth": 0.6096,
             "CapBoxBelowTop": null,
             "CapPipeSlope": 0.08,
@@ -99849,7 +99902,8 @@
             }
           ]
         }
-      }
+      },
+      "PsSteelDiaphragms": null
     },
     {
       "Name": "Ramp G Unit 3",
@@ -99957,6 +100011,7 @@
             "PileType": "SteelHP",
             "PileSection": "HP14x73",
             "PileSize": 0.4572,
+            "PileShellThickness": "NaN",
             "PileRows": 3,
             "PileColumns": 3,
             "PileSpacing": 0.9144000000000001,
@@ -100265,6 +100320,7 @@
             "PileType": "SteelHP",
             "PileSection": "HP14x73",
             "PileSize": 0.4572,
+            "PileShellThickness": "NaN",
             "PileRows": 3,
             "PileColumns": 3,
             "PileSpacing": 0.9144000000000001,
@@ -101686,6 +101742,7 @@
             "PileType": "SteelHP",
             "PileSection": "HP14x73",
             "PileSize": 0.4572,
+            "PileShellThickness": "NaN",
             "PileRows": 3,
             "PileColumns": 3,
             "PileSpacing": 0.9144000000000001,
@@ -103129,6 +103186,7 @@
             "PileType": "SteelHP",
             "PileSection": "HP14x73",
             "PileSize": 0.4572,
+            "PileShellThickness": "NaN",
             "PileRows": 3,
             "PileColumns": 3,
             "PileSpacing": 0.9144000000000001,
@@ -104572,6 +104630,7 @@
             "PileType": "SteelHP",
             "PileSection": "HP14x73",
             "PileSize": 0.4572,
+            "PileShellThickness": "NaN",
             "PileRows": 3,
             "PileColumns": 3,
             "PileSpacing": 0.9144000000000001,
@@ -105885,6 +105944,7 @@
             "PileType": "SteelHP",
             "PileSection": "HP14x73",
             "PileSize": 0.4572,
+            "PileShellThickness": "NaN",
             "PileRows": 3,
             "PileColumns": 3,
             "PileSpacing": 0.9144000000000001,
@@ -110907,6 +110967,7 @@
           "PadLength": 0,
           "PadWidth": 0.5334,
           "PadThickness": 0.06985,
+          "PierPadOrientation": "SquareToBeam",
           "Standard": null,
           "Designation": "",
           "StandardBearingLength": 0,
@@ -113661,14 +113722,19 @@
             "BoxFromGutter": 1.0668000000000002,
             "BoxLength": 0.6604,
             "BoxWidth": 0.3048,
-            "BoxHighEndHeight": 0.48260000000000003,
+            "BoxHighEndHeight": 0.4064,
             "BoxBottomSlope": 0.07619999999999999,
             "PrintedTroughDrop": 0.508,
             "PipeNominalDiameter": 0.2032,
             "Pipe1Slope": 0.08333333333333333,
             "CapBoxFromColumn": 3.81,
-            "CapBoxLengthN": 0.4064,
-            "CapBoxWidthS": 0.4572,
+            "CapBoxFace": "Back",
+            "CapBoxAlongFace": 0.4064,
+            "CapBoxOutTop": 0.4572,
+            "CapBoxOutBottom": 0.4064,
+            "CapBoxInletFromFace": 0.2286,
+            "CapBoxOutletClear": 0.038099999999999995,
+            "CapBoxInletEmbed": 0.1016,
             "CapBoxDepth": 0.6096,
             "CapBoxBelowTop": null,
             "CapPipeSlope": 0.08,
@@ -113711,7 +113777,8 @@
             }
           ]
         }
-      }
+      },
+      "PsSteelDiaphragms": null
     },
     {
       "Name": "Ramp G Unit 4",
@@ -113819,6 +113886,7 @@
             "PileType": "SteelHP",
             "PileSection": "HP14x73",
             "PileSize": 0.4572,
+            "PileShellThickness": "NaN",
             "PileRows": 3,
             "PileColumns": 3,
             "PileSpacing": 0.9144000000000001,
@@ -114127,6 +114195,7 @@
             "PileType": "SteelHP",
             "PileSection": "HP14x73",
             "PileSize": 0.4572,
+            "PileShellThickness": "NaN",
             "PileRows": 3,
             "PileColumns": 3,
             "PileSpacing": 0.9144000000000001,
@@ -115430,6 +115499,7 @@
             "PileType": "SteelHP",
             "PileSection": "HP14x73",
             "PileSize": 0.4572,
+            "PileShellThickness": "NaN",
             "PileRows": 3,
             "PileColumns": 3,
             "PileSpacing": 0.9144000000000001,
@@ -117059,6 +117129,7 @@
             "PileType": "SteelHP",
             "PileSection": "HP14x73",
             "PileSize": 0.4572,
+            "PileShellThickness": "NaN",
             "PileRows": 3,
             "PileColumns": 3,
             "PileSpacing": 0.9144000000000001,
@@ -118680,6 +118751,7 @@
             "PileType": "SteelHP",
             "PileSection": "HP14x73",
             "PileSize": 0.4572,
+            "PileShellThickness": "NaN",
             "PileRows": 3,
             "PileColumns": 3,
             "PileSpacing": 0.9144000000000001,
@@ -120038,6 +120110,7 @@
             "PileType": "SteelHP",
             "PileSection": "HP14x73",
             "PileSize": 0.4572,
+            "PileShellThickness": "NaN",
             "PileRows": 3,
             "PileColumns": 3,
             "PileSpacing": 0.9144000000000001,
@@ -124657,6 +124730,7 @@
           "PadLength": 0,
           "PadWidth": 0.5334,
           "PadThickness": 0.06985,
+          "PierPadOrientation": "SquareToBeam",
           "Standard": null,
           "Designation": "",
           "StandardBearingLength": 0,
@@ -127324,14 +127398,19 @@
             "BoxFromGutter": 1.2192,
             "BoxLength": 0.6604,
             "BoxWidth": 0.3048,
-            "BoxHighEndHeight": 0.48260000000000003,
+            "BoxHighEndHeight": 0.4064,
             "BoxBottomSlope": 0.07619999999999999,
             "PrintedTroughDrop": 0.508,
             "PipeNominalDiameter": 0.2032,
             "Pipe1Slope": 0.08333333333333333,
             "CapBoxFromColumn": -5.584825,
-            "CapBoxLengthN": 0.4064,
-            "CapBoxWidthS": 0.4572,
+            "CapBoxFace": "Back",
+            "CapBoxAlongFace": 0.4064,
+            "CapBoxOutTop": 0.4572,
+            "CapBoxOutBottom": 0.4064,
+            "CapBoxInletFromFace": 0.2286,
+            "CapBoxOutletClear": 0.038099999999999995,
+            "CapBoxInletEmbed": 0.1016,
             "CapBoxDepth": 0.6096,
             "CapBoxBelowTop": null,
             "CapPipeSlope": 0.08,
@@ -127374,7 +127453,8 @@
             }
           ]
         }
-      }
+      },
+      "PsSteelDiaphragms": null
     }
   ],
   "References": [
