@@ -19,20 +19,20 @@ public sealed class NurbsSlab
     public required double MaxDeviation { get; init; }
     public required double Tolerance { get; init; }
     public int Panels => Top.Length;
-    public int Bands => Top[0].Length;
 
     /// <summary>Fits the slab; null with the reason when the tolerance is not reached.</summary>
+    /// <param name="bandsOf">number of bands of a panel (panels may split differently across).</param>
     /// <param name="row">(panel, band, v) -> evaluator of the exact top along u in [0, 1]; called once per row.</param>
-    public static NurbsSlab? Create(int panels, int bands, Func<int, int, double, Func<double, Vec3>> row, double depth, double tol, out string reason, int maxRows = 32)
+    public static NurbsSlab? Create(int panels, Func<int, int> bandsOf, Func<int, int, double, Func<double, Vec3>> row, double depth, double tol, out string reason, int maxRows = 32)
     {
         reason = "";
-        var nv = Enumerable.Repeat(3, bands).ToArray();
-        for (int iter = 0; iter < 6; iter++)
+        var top = new NurbsSurface[panels][];
+        double dev = 0;
+        for (int pn = 0; pn < panels; pn++)
         {
-            var top = new NurbsSurface[panels][];
-            double dev = 0;
-            bool again = false;
-            for (int pn = 0; pn < panels && !again; pn++)
+            int bands = bandsOf(pn);
+            var nv = Enumerable.Repeat(3, bands).ToArray();
+            for (int iter = 0; ; iter++)
             {
                 // rows: band b, j = 0..nv[b]; row (b, 0) is row (b-1, nv[b-1])
                 var fns = new List<Func<double, Vec3>>();
@@ -50,8 +50,9 @@ public sealed class NurbsSlab
                 var fit = NurbsFit.FitCommon(fns.Count, u => fns.Select(f => f(u)).ToArray(), 0, 1, Array.Empty<double>(), tol * 0.5, 3, 0.1);
                 if (!fit.Converged) { reason = $"panel {pn + 1}/{panels}: rows {fit.MaxDeviation * 1000:0.###} mm > {tol * 500:0.###} mm"; return null; }
                 int nu = fit.Control[0].Length;
-                top[pn] = new NurbsSurface[bands];
-                dev = Math.Max(dev, fit.MaxDeviation);
+                var surf = new NurbsSurface[bands];
+                double pdev = fit.MaxDeviation;
+                bool again = false;
                 var uChecks = Enumerable.Range(0, 65).Select(k => k / 64.0)
                     .Concat(fit.Knots.Distinct().Zip(fit.Knots.Distinct().Skip(1), (a, c) => (a + c) / 2)).ToList();
                 for (int b = 0; b < bands; b++)
@@ -65,7 +66,7 @@ public sealed class NurbsSlab
                         kv = k;
                         for (int j = 0; j < c.Length; j++) ctrl[i, j] = c[j];
                     }
-                    var s = top[pn][b] = new NurbsSurface(3, Math.Min(3, nv[b]), fit.Knots, kv, ctrl);
+                    var s = surf[b] = new NurbsSurface(3, Math.Min(3, nv[b]), fit.Knots, kv, ctrl);
                     double bd = 0, bu = 0, bvv = 0;
                     for (int j = 0; j < nv[b]; j++)
                     {
@@ -80,7 +81,7 @@ public sealed class NurbsSlab
                             if (e > bd) { bd = e; bu = u; bvv = v; }
                         }
                     }
-                    dev = Math.Max(dev, bd);
+                    pdev = Math.Max(pdev, bd);
                     if (bd > tol)
                     {
                         if (nv[b] * 2 > maxRows) { reason = $"panel {pn + 1}/{panels}, band {b + 1}/{bands}: across {bd * 1000:0.###} mm > {tol * 1000:0.###} mm at u = {bu:0.####}, v = {bvv:0.####}"; return null; }
@@ -88,11 +89,10 @@ public sealed class NurbsSlab
                         again = true;
                     }
                 }
+                if (!again) { top[pn] = surf; dev = Math.Max(dev, pdev); break; }
             }
-            if (!again) return new NurbsSlab { Top = top, Depth = depth, MaxDeviation = dev, Tolerance = tol };
         }
-        reason = "no convergence";
-        return null;
+        return new NurbsSlab { Top = top, Depth = depth, MaxDeviation = dev, Tolerance = tol };
     }
 
     public Vec3 TopAt(int panel, int band, double v, double u) => Top[panel][band].PointAt(u, v);
@@ -117,7 +117,7 @@ public sealed class NurbsSlab
             solid.Faces.Add(new NurbsFace { Surface = s, Role = role });
         }
         for (int pn = 0; pn < Panels; pn++)
-            for (int b = 0; b < Bands; b++)
+            for (int b = 0; b < Top[pn].Length; b++)
             {
                 var t = Top[pn][b];
                 Add(t, new Vec3(0, 0, 1), "top");
@@ -133,7 +133,7 @@ public sealed class NurbsSlab
         for (int pn = 0; pn < Panels; pn++)
             foreach (bool right in new[] { false, true })
             {
-                var t = Top[pn][right ? Bands - 1 : 0];
+                var t = Top[pn][right ? Top[pn].Length - 1 : 0];
                 var c = t.Boundary(true, right);
                 var (_, _, sv) = t.Eval(0.5, right ? t.V1 : t.V0);
                 Add(NurbsSurface.Ruled(c, c.Translated(down)), right ? sv : -sv, right ? "side 1" : "side 0");
