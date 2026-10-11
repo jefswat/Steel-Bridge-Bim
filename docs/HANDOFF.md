@@ -43,6 +43,12 @@ Use this to start the next session. Architecture notes are in `CLAUDE.md`. The u
 
 ## 0a. State at the end of 2026-10-10 (evening) — START HERE
 
+- **2026-10-11 (re-run, branch i80-rerun): the committed model now includes today's merges.** Re-run on
+  `samples\plans\I-80 WB and Ramp G.sbm`: `column-rebar.csx` (6e3 hairpin pairs, 11G/12G 6e4 hoop pairs), the 11WB / 9G
+  fields of the pedestal blocks of `piers-i80.csx` / `piers-ramp-g.csx` only (11WB 60 x 47 / ahead 45, joint 1"; 9G 60 x 36, not
+  shared; pier scripts NOT re-run, positions untouched), `pier-aesthetics.csx`, `pier-rebar-i80.csx`, `pier-rebar-ramp-g.csx`.
+  `check-sub-cover.csx` 178 -> 40; `check-substructure-chains.csx` unchanged (0 mismatches, 6 reported, 13 of 779 plan rows > 0.01 ft).
+
 - **2026-10-11 (Windows Sandbox session): both branches below are MERGED into main** (232 tests pass). Model updated with
   `temp\apply-pedestals.csx` (only the new pedestal blocks of the pier scripts, so later pier scripts are not undone) +
   `abutments-i80.csx` / `abutments-ramp-g.csx`; substructure elevation check: 49 flags (was 70), only the known Pier 5G
@@ -88,8 +94,8 @@ Use this to start the next session. Architecture notes are in `CLAUDE.md`. The u
 - **OPEN:** (1) Pier 6A: girder A inside the level strip (plan follows the plane) — agent checking whether the gore edge
   has a barrier (`docs\plan-data\gore-6a-edge.md`); (2) ~0.008 ft low I-80 U2 7WB-9WB unexplained by sheet 190;
   (3) cap bars outside cover: 2,103 -> 565 (bend diagrams + pedestal sizes) -> 178 (cap-cover branch 2026-10-11: pedestal U bars in the pedestal top,
-  5n2 hoops at the noted girders, 6b2 / 5a13 / 5a15 / 5a11 / 5a12 / hairpin-zone fixes, per-face relief lines); remaining 178 = 11WB / 9G pedestals not set,
-  6A (stepped top vs relief, undecoded end bars), Ramp G 5a12 relief bars, 19G 5c4 - `docs/plan-data/cap-cover-containment.md`;
+  5n2 hoops at the noted girders, 6b2 / 5a13 / 5a15 / 5a11 / 5a12 / hairpin-zone fixes, per-face relief lines) -> 40 (second pass, in the model since 2026-10-11):
+  6A 5a11 (2), Ramp G 5a12 relief bars (34), 19G 5c4 (4) - `docs/plan-data/cap-cover-containment.md`;
   (4) plan's own camber vs deflection inconsistent at ~177 I-80 U2 points (plan issue); (5) 3 1/2" clear at the textured
   cap face — ANSWERED: the plans print 3 1/2" CL. only to the 5c hairpin legs, at both faces (checked); a production cover for other bars at the textured
   face is not stated (mockup note only: 2" clear to the bottom of the texture) - UNRESOLVED warning, 2" kept; (6) abutment wing/counterfort/step/corbel/maskwall rebar schedule-only, abutment
