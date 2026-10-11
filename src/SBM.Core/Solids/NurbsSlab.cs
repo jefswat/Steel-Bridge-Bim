@@ -27,8 +27,10 @@ public sealed class NurbsSlab
     {
         reason = "";
         var top = new NurbsSurface[panels][];
-        double dev = 0;
-        for (int pn = 0; pn < panels; pn++)
+        var pdevs = new double[panels];
+        var fails = new string?[panels];
+        // panels are independent: fit them in parallel (each result depends only on its own inputs, so the outcome is deterministic)
+        Parallel.For(0, panels, pn =>
         {
             int bands = bandsOf(pn);
             var nv = Enumerable.Repeat(3, bands).ToArray();
@@ -48,7 +50,7 @@ public sealed class NurbsSlab
                     }
                 }
                 var fit = NurbsFit.FitCommon(fns.Count, u => fns.Select(f => f(u)).ToArray(), 0, 1, Array.Empty<double>(), tol * 0.5, 3, 0.1);
-                if (!fit.Converged) { reason = $"panel {pn + 1}/{panels}: rows {fit.MaxDeviation * 1000:0.###} mm > {tol * 500:0.###} mm"; return null; }
+                if (!fit.Converged) { fails[pn] = $"panel {pn + 1}/{panels}: rows {fit.MaxDeviation * 1000:0.###} mm > {tol * 500:0.###} mm"; return; }
                 int nu = fit.Control[0].Length;
                 var surf = new NurbsSurface[bands];
                 double pdev = fit.MaxDeviation;
@@ -84,15 +86,16 @@ public sealed class NurbsSlab
                     pdev = Math.Max(pdev, bd);
                     if (bd > tol)
                     {
-                        if (nv[b] * 2 > maxRows) { reason = $"panel {pn + 1}/{panels}, band {b + 1}/{bands}: across {bd * 1000:0.###} mm > {tol * 1000:0.###} mm at u = {bu:0.####}, v = {bvv:0.####}"; return null; }
+                        if (nv[b] * 2 > maxRows) { fails[pn] = $"panel {pn + 1}/{panels}, band {b + 1}/{bands}: across {bd * 1000:0.###} mm > {tol * 1000:0.###} mm at u = {bu:0.####}, v = {bvv:0.####}"; return; }
                         nv[b] *= 2;
                         again = true;
                     }
                 }
-                if (!again) { top[pn] = surf; dev = Math.Max(dev, pdev); break; }
+                if (!again) { top[pn] = surf; pdevs[pn] = pdev; break; }
             }
-        }
-        return new NurbsSlab { Top = top, Depth = depth, MaxDeviation = dev, Tolerance = tol };
+        });
+        if (fails.FirstOrDefault(f => f != null) is { } why) { reason = why; return null; }
+        return new NurbsSlab { Top = top, Depth = depth, MaxDeviation = pdevs.Max(), Tolerance = tol };
     }
 
     public Vec3 TopAt(int panel, int band, double v, double u) => Top[panel][band].PointAt(u, v);
@@ -105,6 +108,27 @@ public sealed class NurbsSlab
         return NurbsSweep.SampleCurves(rows, chord);
     }
 
+    /// <summary>Integral of Su x Sv over the face (its area vector).</summary>
+    public static Vec3 AreaVector(NurbsSurface s)
+    {
+        var a = Vec3.Zero;
+        for (int i = s.DegreeU; i < s.CountU; i++)
+        {
+            if (s.KnotsU[i + 1] <= s.KnotsU[i]) continue;
+            for (int j = s.DegreeV; j < s.CountV; j++)
+            {
+                if (s.KnotsV[j + 1] <= s.KnotsV[j]) continue;
+                foreach (var (u, wu) in Gauss.Points(3, s.KnotsU[i], s.KnotsU[i + 1]))
+                    foreach (var (v, wv) in Gauss.Points(3, s.KnotsV[j], s.KnotsV[j + 1]))
+                    {
+                        var (_, su, sv) = s.Eval(u, v);
+                        a += Vec3.Cross(su, sv) * (wu * wv);
+                    }
+            }
+        }
+        return a;
+    }
+
     /// <summary>Closed B-rep: panel x band tops and bottoms, a ruled end face per band at the slab ends, ruled side faces per panel.</summary>
     public NurbsSolid ToSolid(string kind)
     {
@@ -112,8 +136,10 @@ public sealed class NurbsSlab
         var down = new Vec3(0, 0, -Depth);
         void Add(NurbsSurface s, Vec3 outward, string role)
         {
-            var (_, su, sv) = s.Eval((s.U0 + s.U1) / 2, (s.V0 + s.V1) / 2);
-            if (Vec3.Dot(Vec3.Cross(su, sv), outward) < 0) s = s.ReversedV();
+            // orientation from the whole face's area vector (robust where parts of a face are degenerate, e.g. at clamped panels)
+            var av = AreaVector(s);
+            if (av.Length < 1e-12) return;   // zero-area face (a panel row of no length): nothing to bound
+            if (Vec3.Dot(av, outward) < 0) s = s.ReversedV();
             solid.Faces.Add(new NurbsFace { Surface = s, Role = role });
         }
         for (int pn = 0; pn < Panels; pn++)
@@ -126,8 +152,10 @@ public sealed class NurbsSlab
                 {
                     if (end ? pn != Panels - 1 : pn != 0) continue;
                     var c = t.Boundary(false, end);
-                    var along = t.PointAt(end ? 1 - 1e-4 : 1e-4, 0.5) - t.PointAt(end ? 1 : 0, 0.5);   // into the slab
-                    Add(NurbsSurface.Ruled(c, c.Translated(down)), -along, end ? "end 1" : "end 0");
+                    // outward: away from the farthest panel centre (end panels may be slivers along the end line: no local direction)
+                    var fc = c.PointAt((c.Start + c.End) / 2);
+                    var inner = Enumerable.Range(0, Panels).Select(q => Top[q][Top[q].Length / 2].PointAt(0.5, 0.5)).MaxBy(x => (x - fc).Length);
+                    Add(NurbsSurface.Ruled(c, c.Translated(down)), fc - inner, end ? "end 1" : "end 0");
                 }
             }
         for (int pn = 0; pn < Panels; pn++)
@@ -135,7 +163,8 @@ public sealed class NurbsSlab
             {
                 var t = Top[pn][right ? Top[pn].Length - 1 : 0];
                 var c = t.Boundary(true, right);
-                var (_, _, sv) = t.Eval(0.5, right ? t.V1 : t.V0);
+                var sv = Vec3.Zero;
+                for (int k = 0; k <= 8; k++) sv += t.Eval(k / 8.0, right ? t.V1 : t.V0).sv;
                 Add(NurbsSurface.Ruled(c, c.Translated(down)), right ? sv : -sv, right ? "side 1" : "side 0");
             }
         return solid;
