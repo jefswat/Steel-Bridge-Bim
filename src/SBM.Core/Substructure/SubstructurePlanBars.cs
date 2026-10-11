@@ -127,6 +127,8 @@ public sealed partial class SubstructureGenerator
         double pin = In(6), rc = pin / 2 + db / 2;
         var bends = new List<(Vec2, double)>();
         var local = BarShape.Rounded(new[] { new Vec2(-half, rise), new Vec2(0, 0), new Vec2(half, rise) }, rc, bends);
+        double yMin = local.Min(q => q.Y);                          // the bar's lowest point (inside of the pin) sits in the hole: shift the V down onto it
+        local = local.Select(q => new Vec2(q.X, q.Y - yMin)).ToArray();
         BarShape Shape()
         {
             var sh = new BarShape

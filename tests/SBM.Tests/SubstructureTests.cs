@@ -328,6 +328,80 @@ public class SubstructureTests
     }
 
     [Fact]
+    public void PlanBars_Footing_MatsSideBarsAndUpliftAnchors_FollowTheBarList()
+    {
+        double top = Ft(500);
+        var m = Build(p =>
+        {
+            p.Foundation = FoundationType.PileCap; p.FoundationTopElevation = top; p.FootingThickness = Ft(5.5); p.PileEmbedment = Ft(1);
+            p.FootingLength = Ft(18); p.FootingWidth = Ft(16);
+            var fd = new FootingDefinition { Column = 1, UpliftBarsPerPile = 3 };
+            for (int i = 0; i < 4; i++) fd.Piles.Add(new FootingPoint(Ft(-6 + 4 * i), 0));
+            fd.UpliftPiles = new() { 0, 3 };
+            fd.Bars = new()
+            {
+                new PlanBarGroup { Mark = "11g1", Kind = PlanBarKind.FootingMat, Size = "#11", Count = 18, Length = Ft(19) + In(6), AlongN = true, HookExtra = Ft(1) + In(11), Order = 1 },
+                new PlanBarGroup { Mark = "7f1", Kind = PlanBarKind.FootingMat, Size = "#7", Count = 18, Length = Ft(15) + In(8), Top = true },
+                new PlanBarGroup { Mark = "7f3", Kind = PlanBarKind.FootingSideVertical, Size = "#7", Count = 64, Length = Ft(5) + In(1) },
+                new PlanBarGroup { Mark = "8f6", Kind = PlanBarKind.UpliftAnchor, Size = "#8", Count = 6, Length = Ft(5) },
+            };
+            p.Footings = Enumerable.Range(1, 3).Select(k => { var c = fd.Clone(); c.Column = k; return c; }).ToList();
+        });
+        var u = m.Units.Single(x => x.Type == SupportType.Pier);
+        var marks = m.Marks.Where(k => k.Unit == u.Name).ToList();
+        var g1 = marks.Single(k => k.Location.Contains("11g1"));
+        Assert.Equal(3 * 18, g1.Count);                                                    // three footings
+        Assert.Equal(Ft(19) + In(6), g1.Length, 6);                                        // listed length, hooks included
+        Assert.Equal("BENT", g1.Shape.Code);
+        Assert.Equal(3 * 64, marks.Single(k => k.Location.Contains("7f3")).Count);
+        Assert.Equal(3 * 6, marks.Single(k => k.Location.Contains("8f6")).Count);
+        Assert.Equal(Ft(5), marks.Single(k => k.Location.Contains("8f6")).Length, 6);
+        // Bottom bars sit 1" clear above the pile heads (12" embedment): lowest point of the bar centreline.
+        var f = u.Foundations[0];
+        var bar = m.Bars.First(b => b.Mark == g1.Mark);
+        Assert.Equal(f.BottomZ + Ft(1) + In(1) + g1.Size.Diameter / 2, bar.Points.Min(q => q.Z), 6);
+        // Anchors pass through the pile web hole 6" above the footing bottom.
+        var anc = m.Bars.First(b => b.Mark == marks.Single(k => k.Location.Contains("8f6")).Mark);
+        Assert.Equal(f.BottomZ + In(6), anc.Points.Min(q => q.Z), 3);
+    }
+
+    [Fact]
+    public void PlanBars_Cap_GroupsAreCountedAndStayInsideTheCap()
+    {
+        var m = Build(p =>
+        {
+            p.CapWidth = Ft(6); p.CapDepth = Ft(5);
+            p.Reinforcement.CapBars = new()
+            {
+                new PlanBarGroup { Mark = "11a1", Kind = PlanBarKind.CapTop, Size = "#11", Count = 20, Length = Ft(30) },
+                new PlanBarGroup { Mark = "11a2", Kind = PlanBarKind.CapTop, Size = "#11", Count = 20, Length = Ft(28) },
+                new PlanBarGroup { Mark = "11b1", Kind = PlanBarKind.CapBottom, Size = "#11", Count = 30, Length = Ft(30) },
+                new PlanBarGroup { Mark = "6c1", Kind = PlanBarKind.CapHoop, Size = "#6", Count = 40, Length = Ft(15) },
+                new PlanBarGroup { Mark = "5c5", Kind = PlanBarKind.CapHairpin, Size = "#5", Count = 10, Length = Ft(8) },
+                new PlanBarGroup { Mark = "4c7", Kind = PlanBarKind.CapTransverse, Size = "#4", Count = 12, Length = Ft(5) },
+            };
+        });
+        var u = m.Units.Single(x => x.Type == SupportType.Pier);
+        var marks = m.Marks.Where(k => k.Unit == u.Name && k.Location.Contains(" cap")).ToList();
+        int N(string mk) => marks.Where(k => k.Location.Contains(mk)).Sum(k => k.Count);
+        Assert.Equal(40, N("a1") + N("a2"));
+        Assert.Equal(30, N("11b1"));
+        Assert.Equal(40, N("6c1"));
+        Assert.Equal(10, N("5c5"));
+        Assert.Equal(12, N("4c7"));
+        Assert.Equal(Ft(30), marks.First(k => k.Location.Contains("11a1")).Length, 3);
+        var hoop = marks.First(k => k.Location.Contains("6c1"));
+        Assert.Equal(Ft(15), hoop.Shape.DevelopedLength, 2);                                // height solved from the listed length
+        // Every bar point lies inside the cap's plan width.
+        foreach (var b in m.Bars.Where(b => b.Unit == u.Name && marks.Any(k => k.Mark == b.Mark)))
+            foreach (var q in b.Points)
+            {
+                double n = Vec2.Dot(q.XY - u.Origin, u.N);
+                Assert.InRange(n, u.CapN0 - 1e-6, u.CapN1 + 1e-6);
+            }
+    }
+
+    [Fact]
     public void SegmentDistance_Works()
     {
         Assert.Equal(1, SubstructureGenerator.SegmentDistance(new Vec3(0, 0, 0), new Vec3(0, 0, 10), new Vec3(1, 0, 0), new Vec3(1, 0, 10)), 9);
