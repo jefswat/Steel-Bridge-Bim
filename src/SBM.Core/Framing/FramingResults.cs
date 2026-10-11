@@ -14,8 +14,16 @@ public sealed class SupportLineResult
     public required Vec2 AlignmentPoint { get; init; }
     /// <summary>Unit direction of the support line, pointing left → right.</summary>
     public required Vec2 Direction { get; init; }
-    /// <summary>Bearing points (top of steel at web CL) per girder; null if the girder misses this support.</summary>
+    /// <summary>Bearing points (top of steel at web CL) per girder; null if the girder misses this support. With per-span girder
+    /// layouts these are the points of the span BEHIND an interior support (of the first span at the first support); the
+    /// span ahead may differ, see <see cref="AheadBearings"/>.</summary>
     public required BearingResult?[] Bearings { get; init; }
+    /// <summary>Per-span girder layouts only (<see cref="Bridge.GirderLayoutDefinition.SpanLayouts"/>): the support-line points of
+    /// the span AHEAD of an interior support, per girder (null array = same as <see cref="Bearings"/>).</summary>
+    public BearingResult?[]? AheadBearings { get; set; }
+
+    /// <summary>Bearing of a girder for the span behind (ahead = false) or ahead of (ahead = true) this support.</summary>
+    public BearingResult? BearingFor(int girder, bool ahead) => ahead && AheadBearings is { } a ? a[girder] : Bearings[girder];
 }
 
 public sealed class BearingResult
@@ -280,4 +288,13 @@ public sealed class BridgeFraming
     public bool HasErrors => Diagnostics.Any(d => d.Severity == DiagnosticSeverity.Error);
 
     public IEnumerable<BearingResult> Bearings => Supports.Concat(AuxSupports).SelectMany(s => s.Bearings).OfType<BearingResult>();
+
+    /// <summary>
+    /// Support-line point of girder <paramref name="girder"/> at the begin (<paramref name="atEnd"/> = false) or end of span
+    /// <paramref name="span"/>. Equal to <c>Supports[span].Bearings[girder]</c> / <c>Supports[span + 1].Bearings[girder]</c> unless a
+    /// per-span girder layout gives the girder different points on the two sides of an interior support. Use this (not the
+    /// support's <c>Bearings</c>) for anything that belongs to one span (prestressed beam ends, span elevations).
+    /// </summary>
+    public BearingResult? SpanBearing(int girder, int span, bool atEnd) =>
+        atEnd ? Supports[span + 1].BearingFor(girder, false) : Supports[span].BearingFor(girder, true);
 }

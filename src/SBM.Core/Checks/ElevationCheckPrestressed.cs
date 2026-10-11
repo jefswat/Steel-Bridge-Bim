@@ -1,3 +1,4 @@
+using SBM.Core.Bridge;
 using SBM.Core.Framing;
 using SBM.Core.Geometry;
 using SBM.Core.Prestressed;
@@ -39,6 +40,22 @@ public static partial class ElevationCheck
             var so = a.Inverse(q);
             return def.Deck.FinishedElevation(a, so.Station, so.Offset) - def.Deck.Thickness - def.Deck.Haunch;
         }
+        if (cs.LayoutBegin is { } lb && cs.LayoutEnd is { } le && def.Girders.SpanLayoutOf(span) is { } lay)
+        {
+            // Per-span girder layout: the beam is straight through its points on the layout's begin / end lines, where top of
+            // beam = finished grade − slab − haunch (the layout's haunch at that end, else the deck haunch).
+            double hb = lay.Begin.Haunches?[girder] ?? def.Deck.Haunch, he = lay.End.Haunches?[girder] ?? def.Deck.Haunch;
+            double zb = TopAtPoint(lb.XY, hb), ze = TopAtPoint(le.XY, he);
+            double ll = (le.XY - lb.XY).Length;
+            var tl = (le.XY - lb.XY) / ll;
+            double dl = Vec2.Dot(p - lb.XY, tl);
+            double gl = (ze - zb) / ll;
+            string Where(GirderSpanEnd e, int sup) => Math.Abs(e.LineShift) > 1e-9
+                ? $"{f.Supports[sup].Name} line moved {L(e.LineShift)} along the reference offset {L(e.ReferenceOffset)}" : $"{f.Supports[sup].Name} line";
+            string bl = $"span {span + 1} layout: top of beam on the {Where(lay.Begin, span)} {E(zb)} (finished grade − slab {Sh(def.Deck.Thickness)} − haunch {Sh(hb)}), " +
+                        $"beam straight to the {Where(lay.End, span + 1)} {E(ze)} (haunch {Sh(he)}): grade {Pct(gl)} × {L(dl)} along the girder";
+            return (zb + gl * dl, bl, span);
+        }
         double zA = TopAtSupport(cs.Start), zB = TopAtSupport(cs.End);
         double lc = (cs.End - cs.Start).Length;
         var t = (cs.End - cs.Start) / lc;
@@ -48,6 +65,12 @@ public static partial class ElevationCheck
         string basis = $"top of beam on the {f.Supports[span].Name} line {E(zA)} (finished grade − slab {Sh(def.Deck.Thickness)} − haunch {Sh(def.Deck.Haunch)}), " +
                        $"beam straight to the {f.Supports[span + 1].Name} line {E(zB)}: grade {Pct(grade)} × {L(dist)} along the girder";
         return (z, basis, span);
+
+        double TopAtPoint(Vec2 q, double haunch)
+        {
+            var so = a.Inverse(q);
+            return def.Deck.FinishedElevation(a, so.Station, so.Offset) - def.Deck.Thickness - haunch;
+        }
     }
 
     /// <summary>Chain at a prestressed girder CL at any point: finished grade down to the bottom of the beam.</summary>
@@ -70,7 +93,8 @@ public static partial class ElevationCheck
     }
 
     /// <summary>Chains at every prestressed beam end (pad center): two per girder at interior bents.</summary>
-    public static List<ElevationChain> PrestressedBearings(BridgeFraming f, PrestressedModel ps, UnitSystem u, Substructure.SubstructureModel? sub = null)
+    public static List<ElevationChain> PrestressedBearings(BridgeFraming f, PrestressedModel ps, UnitSystem u, Substructure.SubstructureModel? sub = null,
+        IReadOnlyList<Substructure.SubstructureModel>? others = null)
     {
         var list = new List<ElevationChain>();
         string E(double z) => u.FormatLength(z, LengthKind.Coordinate);
@@ -98,19 +122,8 @@ public static partial class ElevationCheck
                 else ch.Checks.Add($"Bearing seat matches the 3D model ({E(seat.SeatElevation)}).");
             }
             ch.Checks.Add($"Total depth top of deck to bearing seat: {u.FormatLength(ch.Steps[1].Elevation - z)}.");
-            if (sub?.Units.FirstOrDefault(x => x.SupportIndex == sup) is { } unit)
-            {
-                double sB = Vec2.Dot(pad.Center.XY - unit.Origin, unit.D), nB = Vec2.Dot(pad.Center.XY - unit.Origin, unit.N);
-                var ped = unit.Pedestals.Where(p => p.Girder == pad.Girder).OrderBy(p => Math.Abs(p.N - nB)).FirstOrDefault();
-                double capTop = unit.CapTopAt(sB);
-                double h = z - capTop;
-                ch.Steps.Add(new CalcStep("− Pedestal", $"seat − cap top; cap top {unit.CapTopDescription}, shortest pedestal {Sh(unit.Definition.MinPedestalHeight)}" +
-                    (h < UnitSystem.In(0.125) ? " (no pedestal built)" : ""), -h, capTop, "Top of cap at the bearing"));
-                double capBot = unit.CapBottomAt(sB);
-                ch.Steps.Add(new CalcStep("− Cap depth", $"{Sh(capTop - capBot)} at this bearing", -(capTop - capBot), capBot, "Bottom of cap at the bearing"));
-                if (ped != null && Math.Abs(ped.SeatZ - z) > 0.0005) { ch.Mismatch = true; ch.Checks.Add($"Pedestal seat in the substructure model differs by {Sh(ped.SeatZ - z)}"); }
-                else if (ped != null) ch.Checks.Add($"Pedestal and cap match the substructure model ({Sh(h)} pedestal, cap top {E(capTop)}).");
-            }
+            if (FindPedestal(sub, others, sup, pad.Girder, pad.Center.XY) is { } hit)
+                AddSubstructure(ch, hit.unit, hit.ped, pad.Center.XY, u);
             list.Add(ch);
         }
         return list;

@@ -1,6 +1,6 @@
 # Br. 02069 - T.H. 65 S.B. over 117th Ave (MnDOT) - plan data summary
 
-Set `br02069-th65`, `Br02069_Certified Plans_20250926.pdf` (39 pages, PDF page = sheet). Standard: `../EXTRACTION.md`. Index: `INDEX.md`. CSVs: `working-points.csv`, `strands-30MH-B1.csv`, `seat-elevations.csv`, `bar-lists.csv`. Scripts/caches: `temp/br02069/` (not committed; `checks.py` alignment/profile/WP recompute, `bars.py` bar CSV + weight check). Tags: TEXT / RASTER / DERIVED / UNVERIFIED / UNRESOLVED.
+Set `br02069-th65`, `Br02069_Certified Plans_20250926.pdf` (39 pages, PDF page = sheet). Standard: `../EXTRACTION.md`. Index: `INDEX.md`. CSVs: `working-points.csv`, `strands-30MH-B1.csv`, `seat-elevations.csv`, `bar-lists.csv`, `bend-diagrams.csv`. Scripts/caches: `temp/br02069/` (not committed; `checks.py` alignment/profile/WP recompute, `bars.py` bar CSV + weight check). Tags: TEXT / RASTER / DERIVED / UNVERIFIED / UNRESOLVED.
 
 Tools: `python` on PATH has PyMuPDF but not pypdfium2; the pypdfium2 scripts (`words.py`, `clips.py`, `clip.py`) run with `C:\SBM\temp\pytools\python.exe -I`.
 
@@ -27,7 +27,7 @@ Bridge: single simple span 99'-3" CL-CL brg, 0 deg skew, seven MnDOT 30MH preten
 | WP distances | A-B, C-D, E-F 99.25; A-C 21.00; C-E 15.00; A-D/B-C 101.45; C-F/D-E 100.38; A-F 105.58 | ft | p3 | TEXT | recomputed ok |
 | Roads under | EB117, WB117A/B, ramps (p35, p37) | - | p35, p37 | TEXT | not extracted |
 | Vertical clearance | points A and B: 16'-11 1/8" | - | p1 notes 3,4 | RASTER | |
-| Horizontal clearance | 10'-3" min; 17'-9 7/8" min | - | p1 | UNVERIFIED | 7/8 not rasterized |
+| Horizontal clearance | 10'-3" min; 17'-9 7/8" min | - | p1 (plan + section) | RASTER | 7/8 confirmed at 500 dpi, both occurrences |
 
 ## 2. Layout
 | item | value | unit | PDF p. / sheet | tag | note |
@@ -63,16 +63,35 @@ Bridge: single simple span 99'-3" CL-CL brg, 0 deg skew, seven MnDOT 30MH preten
 | Losses | ES 24.93; LT 26.26; total 51.19 ksi | ksi | p16 | TEXT | sum ok |
 | Concrete | beam f'ci 8.0, f'c 9.5; RC 4 ksi | ksi | p16, p1 | TEXT | |
 | Camber | erection 7 3/8"; DL defl 5 1/4" int / 5 1/8" ext; residual 2 1/8" int / 2 1/4" ext | in | p16 | RASTER | differences ok |
-| Beam bars | G301E, G402E, G303E, G505E, G508E, 4-G806E; stirrups 9@4", 19@9", 27@14" | - | p16 | RASTER | no bill |
+| Beam bars | G301E, G402E, G303E, G505E, G508E, 4-G806E (shapes in bend-diagrams.csv) | - | p16 | RASTER | no bill (beam bars paid with the beam) |
+| Stirrup spacing (each half, from beam end) | 2" + 4 sps @ 2 1/2" (= 3'-10" with the next group) + 9 sps @ 4" + 19 sps @ 9" + 27 sps @ 14" + 6" to CL span; symm. about CL span -> 60 positions per half, 120 per beam | - | p16 elevation | RASTER | 2 + 10 + 36 + 171 + 378 + 6 = 603" = 50'-3" = 100'-6"/2 ok; 2" + 3'-10" = 48" ok |
+| End-zone bars | 2-G505E (C bar: 2'-1" vertical, 3'-6" top flange leg, 1'-0" bottom leg; 1 1/4" clr to web faces, 2" clr top) then 2-G508E (L: 2'-10" + 1'-0" leg, projects 7" above beam; note 11: each pair may be one No. 5 bulbed bar); G402E (hairpin 2'-10" x 4" o-o, projects 7" above beam) at all other positions ("G402E SPG. except as noted") | - | p16 elevation, end view, section | RASTER | which of the 5 end positions take G505E vs G508E is only shown by leaders (drawing not to scale there) |
+| G301E | straight 2'-6", top flange transverse, 1 1/2" clr top, one at each stirrup position ("space with G505E, G508E or G402E") | - | p16 | RASTER | |
+| G303E | bottom flange pairs (2'-11" + 3 1/2" offset + 1'-10" @ 4:12, crossed): 2-G303E sp. w/ G505E, 2-G303E sp. w/ G508E, 2-G303E sp. w/ G402E over the end region; 1 1/8" clr entire bottom flange (note 10) | - | p16 | RASTER | extent of the G402E-paired G303E zone not dimensioned (UNRESOLVED) |
+| G806E | 4 longit. No. 8 in top flange at 3 1/2" + 3 sps @ 9" = 2'-3" + 3 1/2" (= 2'-10" ok); permissible splice 5'-1" min. lap; note 7: two inside bars may be placed against the stirrup | - | p16 end view / elevation | RASTER | length not given (no bill) |
+| Beam top / ends | top: 6" bond-breaker strips at flange tips (note 8), 1'-10" rough-floated center (note 9); ends: 1/2" chamfer, no chamfer at top | - | p16 | TEXT | |
 | Intermediate diaphragms | none | - | p2, p16 | TEXT | temp. bracing |
-| End diaphragms | concrete, both abutments | - | p15, p17, p20, p21 | TEXT | dims U2 |
+| End diaphragms | concrete, both abutments, semi-integral (p17 "integral & semi-integral abutment") | - | p15, p17, p20, p21 | TEXT | detail rows below |
+| End diaph. thickness | 3'-0" (plan: 1'-6" back face -> CL end diaph + 1'-6" -> front face) | - | p20 plan, p21 A-A/B-B | TEXT | |
+| End diaph. stations across | back face = back face of abutment; CL brg 2'-6" from back face (1'-3" + 3" + 1'-0"); front face of diaph 6" ahead of CL brg; front face of abut 1'-6" ahead of CL brg | - | p21 A-A/B-B, p20 plan (10"+1'-0"+6"+1'-0" stack) | TEXT | 1'-3"+3"+1'-0"+1'-6" = 4'-0" stem ok; 2'-6"+6" = 3'-0" ok |
+| End diaph. bottom | rear 1'-3" sits on the abutment back ledge on 1" Type A polystyrene; 3" Type B polystyrene against the seat riser (the 3" in the dim chain); 1" backer rod at back face | - | p21 A-A, p11 Detail A | TEXT | bottom elevation = back ledge + 1" (S 922.35 / N 922.15 DERIVED, sec. 4) |
+| End diaph. depth | "VARIES" (top of deck to bottom); back face: 1'-4" paving-bracket notch, then S609E B.F. 2 eq. sps + 2 eq. sps + 4" | - | p21 A-A/B-B | TEXT | total not dimensioned; follows deck profile |
+| Paving bracket | 8" wide x 1'-4" deep notch at back face top; 1/2" x 7" bit. felt; 4" (note 1: to approach panel dowel bar); 5 1/2" deck end to first S615M; 4 1/2" clr S617S; sawcut joint (note 4) | - | p21, p20 plan (8" paving bracket) | RASTER | 5 1/2, 4 1/2 confirmed on clip |
+| Front fillet | between beams, front face of diaph meets slab underside with a 1'-0" (vert, A-A) x 1'-0" (horiz, B-B) 45 deg fillet; S405E 2 bars | - | p21 A-A, B-B | TEXT | slab 9" above fillet |
+| Beam embedment | beam ends 7 1/2" behind CL brg inside diaph (std table E); 2 x 1 1/2" dia. holes per beam for 2-S506E thru beams: 30MH C = 3 1/2", D = 1'-1 1/4" above bottom of beam, E = 7 1/2" along CL beam; A/B (parapet abut.), X/Y NA | - | p17 table (30MH row), p20/21 | RASTER | |
+| End diaph. length | 41'-0" (WL -23'-6" .. +17'-6") = between mask wall inner face (-23'-7") and infill wall W end (+17'-7") less 1" polystyrene each end (p3 corners, p11 Detail C); S609E / S405E 40'-8" = 41'-0" - 2 x 2" clr ok | - | p5, p3, p11, p20 | DERIVED | no direct dimension on p20 |
+| PVC sleeve | 3" dia. PVC through diaph, 1'-0"+/- from WL, 2'-0" below top, S abut only (note 1) | - | p20 | TEXT | lighting conduit |
+| Diaph. rebar sets | between beams 2 sps @ 1'-0" (3 sets S510E/S511E/S513E/S615M/S616M/S617S); at beams 4 sps @ 1'-0" (3 sets S510E/S512E/S514E/S615M); 1 set at each end; 5-S609E B.F., 4/3-S609E, S607E/S608E F.F. between beams | - | p20 | TEXT | |
 | Slab | 9" min; top clr 2", bottom 1" | - | p2, p3, p19 | TEXT | |
 | Stool at CL brg | 4 1/4" both | in | p3 | RASTER | |
 | Roadway-to-seat | S 9+4 1/4+30+3 1/4=46 1/2" (3.88'); N 9+4 1/4+30+6 1/2=49 3/4" (4.15') | - | p3 | RASTER | ok |
 | Bearings | 7 F1 fixed B310 (S), 7 E1 exp B311 (N) = 14 | - | p15, p31, p2 | TEXT | |
 | F1 | pad 12x30x1/2; SF 8.6; brg plate 14x47x1 1/2; curved 4 1/2x32x1 1/4 R16; L 3 1/4"; A-3; anchor rods 1 1/2" @ +/-1'-9 1/2" | - | p31, p5 | RASTER | L sum ok |
 | E1 | pad 12x30x3 3/4 (6 plates 1/8, 5 lam 1/2, 1/4 covers); SF 8.6; brg plate 14x33x1 1/2; curved 4 1/2x32x1 1/4 R16; L 6 1/2"; A-3 | - | p31 | RASTER | sums ok |
-| Sole plate | B303, cast with beam | - | p16, p30 | TEXT | dims U6 |
+| Sole plate | B303 (std, MH row): 3'-2 3/4" (across beam) x 1'-3" (along beam) x 3/4"; sides chamfered (sides only); galvanized; cast with beam | - | p30 B303 | RASTER | |
+| Sole plate CL brg | CL brg = CL shear studs at 7 1/2" from plate end (M/MN/MH/RB); plate end flush with beam end (beam end 7 1/2" to CL brg) | - | p30, p16 | RASTER | 1'-3" = 2 x 7 1/2" ok |
+| Sole plate studs | 6 x 7/8" dia. x 4" to 5" unheaded shear studs: 3 across @ 6" (13 3/8" + 6" + 6" + 13 3/8" = 3'-2 3/4" ok) x 2 rows @ +/-3" from CL brg; AWS D1.1 | - | p30 | RASTER | note 2: may be modified to clear strands |
+| Pintle holes | 2 x 1 3/4" dia. (for 1 1/2" pintles) at +/-8" from CL beam (11 3/8" from plate edge, 11 3/8 + 8 = 19 3/8 = half width ok), on CL brg; 1/4" bevel; 2 1/2" x 1 3/4" Type B polystyrene plug | - | p30 | RASTER | |
 | Seats | S 923.76 W / 923.88 E fascia; N 923.55 / 923.67 | ft | p3 | TEXT | seat-elevations.csv |
 
 ## 4. Substructure (2 abutments, no piers)
@@ -85,12 +104,21 @@ Common: footing 59'-7" (offset -23.58 to +36.00), 6'-0" x 3'-0", bottom EL 917.7
 | Stem heights | footing->ledge 1'-7 1/4" S / 1'-4 3/4" N; ledge->seat 1'-0"; seat slopes 1" to front | - | p11 | RASTER | |
 | Seat front | S 923.27, N 923.06 level | ft | p5, p10 | TEXT | derived chain ok |
 | Back ledge | S 922.35, N 922.15 | ft | - | DERIVED | infill 5'-4 1/2" / 5'-7 7/8" ok |
-| Pedestals S | 10 x 4'-8" x 2'-6", gaps 1'-4", ends 8" E / 3" W; 7 beam + 3 future | - | p5 | TEXT | sum ok |
-| Pedestals N | 10 x 3'-6" x 2'-6", gaps 2'-6", ends 1'-3" E / 10" W | - | p10 | TEXT | end assignment DERIVED |
-| Pedestal types | Type A; Type B at future | - | p5 | TEXT | sheet 6 |
+| Pedestals S | 10 x 4'-8" (along abut.) x 2'-4" (across), gaps 1'-4", ends 8" E / 3" W; 7 beam + 3 future | - | p5, p6 | TEXT | sum ok; across = 1'-0" behind + 1'-4" ahead of CL brg (p6), flush with seat back edge, 2" short of seat front face (seat 2'-6"); earlier '2'-6"' was the seat width |
+| Pedestals N | 10 x 3'-6" (1'-9" + 1'-9") x 2'-4" (1'-0" + 1'-4"), gaps 2'-6", ends 1'-3" E / 10" W; 2" short of seat front | - | p10, p12 | TEXT | end assignment DERIVED |
+| Pedestal types | S: Type A U.N.O., Type B per note 6 (future) (p5 notes 5/6, details p6); N: Type C U.N.O., Type D per note 6 (p10 notes 5/6, details p12) | - | p5, p6, p10, p12 | TEXT | |
+| Type A (S) | 8-A525E trans. (3 3/8" + 7" + 5 sps abt. @ 7" = 2'-11 1/4" + 7" + 3 3/8" = 4'-8" ok); 5-A526E longit. (3 5/8" + 5" + 7 1/4" + 2 sps @ 4 1/4" + 3 5/8" = 2'-4" ok); 2" clr; 1 set 2-A529E ties (note 1: only where pedestal >= 9" tall, 2 pedestals), 4" / 4" in E-E; 2 anchor rods on CL brg | - | p6 plan + E-E | RASTER | 5 x 7 = 2'-11" vs '2'-11 1/4" abt.' as printed |
+| Type B (S, future) | 8-A527M trans. (same 3 3/8"/7" layout); 5-A528M longit. (4" + 4 1/2" + 7" + 2 sps @ 4 1/4" + 4" = 2'-4" ok); 3" clr; no A529E | - | p6 plan + F-F | RASTER | |
+| Type C (N) | 6-B525E trans. (4 3/8" + 5 sps @ abt. 6 5/8" = 2'-9 1/4" + 4 3/8" = 3'-6" ok); 4-B526E longit. (4 3/8" + 3 sps @ abt. 6 3/8" = 1'-7 1/4" + 4 3/8" = 2'-4" ok); 2" clr; B529E (note 1, 2 pedestals) | - | p12 | RASTER | |
+| Type D (N, future) | 6-B527M trans., 4-B528M longit., same layout as C; 3" clr; no B529E | - | p12 | RASTER | |
+| Pedestal heights | not dimensioned; top = seat-elevations.csv, bottom = seat | - | p5, p10 | DERIVED | |
 | Pedestal tops | PG - 2%|off| - 3.88/4.15 | ft | p5, p10 | TEXT | seat-elevations.csv |
-| Infill wall | 1'-6", top 927.73 S / 927.80 N | - | p5, p11 | TEXT | |
-| Mask walls | top 930.61 S / 930.67 N; h 12'-10 3/8" S / 12'-11" N; 1'-5 1/2" x 6'-4"; coping 1'-1"x2" | - | p11 | RASTER | ok |
+| Infill wall | 1'-6", top 927.73 S / 927.80 N (level) | - | p5, p11 | TEXT | |
+| Infill wall extent | only in the east 18'-5" (future widening): from abutment E end (WL +36'-0") to WL +17'-7" (18'-5" + 17'-7" = 36'-0" ok); its W end = deck/end diaph E end +17'-6" + 1" Type B polystyrene (p11 Detail C, p3 SE corner: 1" at slab, 1 1/2" at approach panel); under the superstructure the end diaphragm sits on the back ledge instead | - | p5/p10 plan + elev., p3, p11 | TEXT | both abutments (N mirrored); pipe railing posts 1'-8 1/4" + 3 @ 5'-0" + 1'-8 3/4" = 18'-5" ok |
+| Abutment E end | footing, stem and infill wall end flush at WL +36'-0" with 2" x 12" keyways (note 4) for the future widening; no mask wall at the E end | - | p5, p10 | TEXT | |
+| Mask walls | W end only; top 930.61 S / 930.67 N; h 12'-10 3/8" S / 12'-11" N; 1'-5 1/2" x 6'-4"; coping 1'-1"x2" | - | p11 | RASTER | ok |
+| Mask wall position across | front (outer, W) face 25'-0 1/2" W of WL; inner face at WL -23'-7" = footing W end (25'-0 1/2" - 1'-5 1/2") = deck edge -23'-6" - 1" polystyrene (1 1/2" at approach panel, p3); coping projects 2" beyond front face | - | p5, p10, p3 | RASTER | 1/2 fractions confirmed on p5 clip |
+| Mask wall position along | 6'-4" long; plan p5: from footing front edge (2'-9" ahead of CL brg) to footing back edge (3'-3" behind CL brg) = 6'-0", outer 7" (incl. 2" coping) extends 4" further back (D-D: 1'-0 1/2" + 7", 4" step) -> 6'-4" ok; stands beside the footing W end down to 917.75, 5" x 1'-0 1/2" toe notch with 2" Type B polystyrene (C-C) | - | p5 plan, p11 D-D / C-C, p3 SW corner | DERIVED | ends not dimensioned directly; from footing lines 9" + 4'-0" + 1'-3" = 6'-0" + 4" = 6'-4"; p3 scales the same |
 | Joints | contraction B801 at 29'-4" (S) / 30'-10" (N) from east end; 2"x12" keyways | - | p5, p10, p32 | TEXT | |
 | Piles | 12" CIP, 1/4" shell, B201 splice; 2 rows x 7 @ 9'-5", ends 1'-6" W / 1'-7" E | - | p4, p9, p29 | RASTER | sum ok |
 | Pile rows | back 1'-9" behind CL brg, front 1'-3" ahead; 1'-0" embed; plumb | - | p4, p9, p11 | RASTER | no batter noted |
@@ -109,18 +137,32 @@ bar-lists.csv: 93 marks (A 29 p8, B 29 p14, S 17 p21, R 18 p24; 10 R rows RASTER
 | Superstructure | 5050 / 19100 / 250 (p18) | DERIVED | 5046/19097/250 |
 | Bridge | 19200 / 19970 / 250 (p2) | DERIVED | ok |
 | Deck transverse | 137 S403M top, 137 S404M bot, 136 @ 9" (p18) | TEXT | |
-| Deck longit. | S401M 60'-0" + S402M 45'-2", 2'-7" lap; 55 bot + 29 top lines (p18/19) | TEXT | length ok; U4 |
-| Bend diagrams | p8, p14, p21, p24 | UNRESOLVED | |
-| Beam bars | p16 | TEXT | |
+| Deck longit. | S401M 60'-0" + S402M 45'-2", 2'-7" lap; 55 bot + 29 top lines (p18/19) | TEXT | length ok |
+| Deck longit. layout | top: 3 1/2" + 8 1/2" + 26 sps @ 1'-6" = 39'-0" + 8 1/2" + 3 1/2" = 41'-0" -> 27 + 1 extra line 3 1/2" from each deck edge = 29; bottom: 7" + 5" + 52 sps @ 9" = 39'-0" + 5" + 7" = 41'-0" -> 53 + 1 extra line 7" from each edge = 55 (U4 closed) | RASTER | p19 transverse section | 84 lines x (1 S401M + 1 S402M) = 168 = 84 + 84 bill ok |
+| Bend diagrams | bend-diagrams.csv: 52 bent marks of the bills (A 17 p8, B 17 p14, S 8 p21, R 10 p24) + 5 beam G bars (p16, no bill). 25 OK (sum of out-to-out dims = listed length exactly); 22 have one leg / hook not dimensioned on the sheet (listed - dims given as DERIVED, not checkable); 5 barrier loops R505M/R517E/R506E/R507E/R518E NOT RECONCILED (-2 9/16 .. +3/16 in vs true-length sum; std barrier sheet length convention not stated) | RASTER | convention p8/p14 note: "ALL BENT BAR DIMENSIONS ARE GIVEN OUT-TO-OUT"; p21/p24 no note; pin diameters not shown on any sheet |
+| Beam bars | p16, see sec. 3 rows + bend-diagrams.csv (G bars) | RASTER | no bill |
 
 ## 6. Misc
-Barrier Type S (TL-4 deck / TL-3 approach panel), control joints 11 sps @ about 9'-4 1/4" (UNVERIFIED) p22/24/25; pipe railing 18 LF per abutment, posts 3 @ 5'-0" (p5, p10, p23); approach panel cover plates p27; no expansion devices, 1" polystyrene diaphragm/mask wall (p19, p21); no drains; underpass lights about 248+40 / 249+28, 1" PVC-coated RMC, 3" sleeves (p18, p20, p26); slope paving 15 SY (p28); nameplate B101, 2 emblems (p29, p11); sign by others (p1).
+Barrier Type S (TL-4 deck / TL-3 approach panel), control joints 11 sps @ abt. 9'-4 1/4" = 102'-11" (RASTER p22, 1/4 confirmed at 500 dpi; 11 x 9'-4 1/4" = 102'-10 3/4", 'ABT.') p22/24/25; pipe railing 18 LF per abutment, posts 3 @ 5'-0" (p5, p10, p23); approach panel cover plates p27; no expansion devices, 1" polystyrene diaphragm/mask wall (p19, p21); no drains; underpass lights about 248+40 / 249+28, 1" PVC-coated RMC, 3" sleeves (p18, p20, p26); slope paving 15 SY (p28); nameplate B101, 2 emblems (p29, p11); sign by others (p1).
 
 ## 7. Checks data
 SOQ p2: barrier 273 LF; struct. conc. 140 CY (71+69 ok); bars 19200/19970/250; slab 4220 SF; planing 4954 SF; 14 bearings; 704 LF 30MH; test piles 100 + 105 ft; piling 2405 LF; pipe railing 36 LF; slope paving 15 SY; conduit LS. working-points.csv, seat-elevations.csv, camber (p16), pile loads (p4/p9).
 
 ## UNRESOLVED
-U1 horizontal datum (p34/36/37). U2 end diaphragm geometry (p20/21/17). U3 bend dimensions (p8/14/21/24). U4 deck line counts vs spacing, 55 vs 53 bot, 29 vs 27 top (p19). U5 17'-9 7/8", 9'-4 1/4" not rasterized (p1, p22). U6 sole plate B303 dims (p30). U7 pedestal Type A/B details (p6). U8 pile tip elevations (p4/p9). U9 mask/infill wall east-end and corner extents (p3/5/10/11). U10 camber shape (p16).
+| id | open item | pages | status |
+|---|---|---|---|
+| U1 | horizontal datum not stated | p34, p36, p37 | UNRESOLVED |
+| U2 | end diaphragm geometry | p17, p20, p21, p11, p3, p5 | closed (sec. 3); length 41'-0" DERIVED from mask wall / infill wall faces - no direct dimension |
+| U3 | bend dimensions | p8, p14, p21, p24 | closed for 25 marks (bend-diagrams.csv); still UNRESOLVED: 22 marks with one leg / hook not dimensioned on the sheet (A/B 504E, 505E, 514E, 420E, 423E, 502E hooks, 503E hooks; S615M, S616M, S617S; R501M-R504E foot; R408E 2:12 leg); barrier loops R505M/R517E/R506E/R507E/R518E do not reconcile with the true-length sum (std barrier sheet length convention not stated, p24); pin diameters not shown on any sheet |
+| U4 | deck line counts 55/29 vs spacing | p19 | closed: 1 extra line 7" (bot) / 3 1/2" (top) from each deck edge |
+| U5 | 17'-9 7/8", 9'-4 1/4" raster | p1, p22 | closed (RASTER) |
+| U6 | sole plate B303 | p30 | closed |
+| U7 | pedestal Type A/B (and N Type C/D) | p6, p12 | closed; pedestal is 2'-4" across (not 2'-6" = seat width) |
+| U8 | pile tip elevations | p4, p9 | UNRESOLVED |
+| U9 | mask / infill wall E end and corners | p3, p5, p10, p11 | closed: infill wall only in the E 18'-5"; mask wall W only; mask wall along-bridge ends DERIVED from footing lines (not dimensioned directly) |
+| U10 | camber shape | p16 | UNRESOLVED |
+| U11 | beam bars: extent of the G402E-paired G303E zone; G806E bar length; which end positions take G505E vs G508E | p16 | UNRESOLVED (not dimensioned, no bill) |
+| U12 | pedestal heights (only tops given) | p5, p10, p6 | DERIVED from seat-elevations.csv minus seat; no direct dimension |
 
 ## Model mapping
 | section | model inputs | notes |

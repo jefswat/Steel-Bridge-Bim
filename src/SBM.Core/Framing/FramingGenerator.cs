@@ -63,6 +63,8 @@ public sealed class FramingGenerator
         if (!_diag.IsEmpty && _diag.Any(d => d.Severity == DiagnosticSeverity.Error)) return;
 
         SetupSupports();
+        SetupSpanLayouts();
+        if (_diag.Any(d => d.Severity == DiagnosticSeverity.Error)) return;
         ComputeBearings();
         if (_diag.Any(d => d.Severity == DiagnosticSeverity.Error)) return;
         BuildGirders();
@@ -123,9 +125,181 @@ public sealed class FramingGenerator
         }
     }
 
+    // ------------------------------------------------------------------ per-span girder layouts (optional)
+
+    /// <summary>Per span: its layout (null = the default offset curves).</summary>
+    private GirderSpanLayout?[] _layout = Array.Empty<GirderSpanLayout?>();
+    /// <summary>[girder][span] of layout spans: support-line points S0/S1, the girder points on the layout's begin / end lines
+    /// L0/L1 (Z = top of beam for prestressed beams, NaN for steel) and the top of beam at S0/S1 (NaN for steel).</summary>
+    private (Vec2 S0, Vec2 S1, Vec3 L0, Vec3 L1, double Z0, double Z1)[][] _chord = Array.Empty<(Vec2, Vec2, Vec3, Vec3, double, double)[]>();
+    private bool HasLayout(int span) => span >= 0 && span < _layout.Length && _layout[span] != null;
+
+    /// <summary>Point at an alignment distance on the constant offset curve <paramref name="o"/>, after moving <paramref name="arc"/>
+    /// along that curve from distance <paramref name="d"/> (arc length of the offset curve, + up-station).</summary>
+    private double MoveAlongOffsetCurve(double d, double o, double arc)
+    {
+        if (Math.Abs(arc) < 1e-12) return d;
+        double Arc(double d1)
+        {
+            const int n = 32;
+            double s = 0;
+            var prev = _align.PointAtDistance(d, o);
+            for (int k = 1; k <= n; k++)
+            {
+                var p = _align.PointAtDistance(d + (d1 - d) * k / n, o);
+                s += Vec2.Distance(prev, p);
+                prev = p;
+            }
+            return d1 >= d ? s : -s;
+        }
+        double x = d + arc;
+        for (int it = 0; it < 30; it++)
+        {
+            double f = Arc(x) - arc;
+            if (Math.Abs(f) < 1e-10) break;
+            double h = 1e-4;
+            double df = (Arc(x + h) - Arc(x - h)) / (2 * h);
+            if (Math.Abs(df) < 1e-9) break;
+            x -= f / df;
+        }
+        return x;
+    }
+
+    /// <summary>Where a line (point, direction) crosses the constant offset curve <paramref name="o"/>, searching near <paramref name="dNear"/>.</summary>
+    private bool LineCrossesOffset(Vec2 p, Vec2 dir, double o, double dNear, double skewDeg, out Vec2 point)
+    {
+        double w = Math.Abs(o) * (Math.Abs(Math.Tan(Numerics.DegToRad(skewDeg))) + 0.5) + 10;
+        double guess = dNear;
+        point = default;
+        if (!_align.IntersectOffsetCurveWithLine(_ => o, p, dir, guess - w, guess + w, guess, out double d)) return false;
+        point = _align.PointAtDistance(d, o);
+        return true;
+    }
+
+    /// <summary>The layout line of one span end and the girder points on it (only the first when perpendicular spacings give the rest).</summary>
+    private (Vec2 linePoint, List<Vec2> points)? LayoutLine(int support, GirderSpanEnd e, int count, string where)
+    {
+        var sup = _def.Supports[support];
+        var a = _align.PointAtDistance(_dSup[support]);
+        var dir = _supDir[support];
+        // Reference point: the support line crossing the reference offset curve; then moved along that curve by LineShift.
+        double skew = sup.SkewDegrees;
+        if (!IntersectSupportWithOffsetCurve(support, _ => e.ReferenceOffset, e.ReferenceOffset, a, out double dRef))
+        {
+            Error($"{where}: the {sup.Name} support line does not cross the reference offset {e.ReferenceOffset:0.###} m.");
+            return null;
+        }
+        double dLine = MoveAlongOffsetCurve(dRef, e.ReferenceOffset, e.LineShift);
+        var r = _align.PointAtDistance(dLine, e.ReferenceOffset);
+        var offs = e.Resolved();
+        var pts = new List<Vec2>();
+        for (int i = 0; i < count; i++)
+        {
+            double o = offs[i];
+            if (e.Measure == SpanOffsetMeasure.AlongLine) pts.Add(r + dir * o);
+            else
+            {
+                double near = dLine + (o - e.ReferenceOffset) * Math.Tan(Numerics.DegToRad(skew));
+                if (!LineCrossesOffset(r, dir, o, near, skew, out var q))
+                {
+                    Error($"{where}: girder {i + 1} offset {o:0.###} m does not cross the line at {sup.Name}.");
+                    return null;
+                }
+                pts.Add(q);
+            }
+        }
+        return (r, pts);
+    }
+
+    /// <summary>Resolves the per-span layouts into chords (support-line points, layout-line points, top of beam).</summary>
+    private void SetupSpanLayouts()
+    {
+        _layout = new GirderSpanLayout?[Math.Max(0, NSpan)];
+        if (_def.Girders.SpanLayouts is not { Count: > 0 } list) return;
+        foreach (var l in list) if (l.Span >= 0 && l.Span < NSpan) _layout[l.Span] = l;
+        _chord = Enumerable.Range(0, NG).Select(_ => new (Vec2, Vec2, Vec3, Vec3, double, double)[NSpan]).ToArray();
+        for (int j = 0; j < NSpan; j++)
+        {
+            if (_layout[j] is not { } lay) continue;
+            string where = $"Span {j + 1} girder layout";
+            if (_def.Girders.PlanGeometry.Count > 0)
+                Warn($"{where}: the girders' as-designed plan geometry is ignored in this span (the span layout governs).");
+            int count = lay.PerpendicularSpacings != null ? 1 : NG;
+            var lb = LayoutLine(j, lay.Begin, count, where + " (begin)");
+            var le = LayoutLine(j + 1, lay.End, count, where + " (end)");
+            if (lb == null || le == null) return;
+            var (pb, qb) = lb.Value;
+            var (pe, qe) = le.Value;
+            var ends = new (Vec2 a, Vec2 b)[NG];
+            if (lay.PerpendicularSpacings is { } ps)
+            {
+                var a0 = qb[0];
+                var t = (qe[0] - a0).Normalized();
+                double acc = 0;
+                for (int i = 0; i < NG; i++)
+                {
+                    if (i > 0) acc += ps[i - 1];
+                    var o = a0 + t.Right * acc;
+                    if (!Numerics.IntersectLines(o, t, pb, _supDir[j], out double tb, out _) ||
+                        !Numerics.IntersectLines(o, t, pe, _supDir[j + 1], out double te, out _))
+                    {
+                        Error($"{where}: girder {i + 1} is parallel to a support line.");
+                        return;
+                    }
+                    ends[i] = (o + t * tb, o + t * te);
+                }
+            }
+            else
+                for (int i = 0; i < NG; i++) ends[i] = (qb[i], qe[i]);
+
+            var a = _align.PointAtDistance(_dSup[j]);
+            var z = _align.PointAtDistance(_dSup[j + 1]);
+            for (int i = 0; i < NG; i++)
+            {
+                var (lp0, lp1) = ends[i];
+                var c = lp1 - lp0;
+                if (c.Length < 0.01) { Error($"{where}: girder {i + 1} has no length."); return; }
+                if (!Numerics.IntersectLines(lp0, c, a, _supDir[j], out double t0, out _) ||
+                    !Numerics.IntersectLines(lp0, c, z, _supDir[j + 1], out double t1, out _))
+                {
+                    Error($"{where}: girder {i + 1} is parallel to a support line.");
+                    return;
+                }
+                var s0 = lp0 + c * t0;
+                var s1 = lp0 + c * t1;
+                double zl0 = double.NaN, zl1 = double.NaN, z0 = double.NaN, z1 = double.NaN;
+                if (PS)
+                {
+                    // Prestressed: top of beam = finished grade - slab - haunch at the layout's line points; straight between them.
+                    double h0 = lay.Begin.Haunches?[i] ?? _def.Deck.Haunch, h1 = lay.End.Haunches?[i] ?? _def.Deck.Haunch;
+                    zl0 = DeckElevationAtPoint(lp0) - _def.Deck.Thickness - h0;
+                    zl1 = DeckElevationAtPoint(lp1) - _def.Deck.Thickness - h1;
+                    z0 = zl0 + (zl1 - zl0) * t0;
+                    z1 = zl0 + (zl1 - zl0) * t1;
+                }
+                _chord[i][j] = (s0, s1, lp0.WithZ(zl0), lp1.WithZ(zl1), z0, z1);
+            }
+        }
+    }
+
+    /// <summary>Normal offset of a layout span's chord at an alignment distance (the chord line extended).</summary>
+    private double ChordOffsetAt(int girder, int span, double d)
+    {
+        var (s0, s1, _, _, _, _) = _chord[girder][span];
+        var (p, ang) = _align.EvaluateAtDistance(d);
+        var n = Vec2.FromAngle(ang).Right;
+        return Numerics.IntersectLines(p, n, s0, s1 - s0, out double t, out _) ? t : _align.Inverse(s0).Offset;
+    }
+
     /// <summary>Girder offset at an alignment distance (linear between supports, constant beyond).</summary>
     private double OffsetAt(int girder, double d)
     {
+        if (_layout.Length > 0 && _chord.Length > 0)
+        {
+            int js = 0;
+            while (js < NSpan - 1 && d > _dSup[js + 1]) js++;
+            if (HasLayout(js)) return ChordOffsetAt(girder, js, d);
+        }
         if (_plan[girder] is { } pc) return pc.OffsetAt(d);
         if (d <= _dSup[0]) return _offsets[0][girder];
         if (d >= _dSup[^1]) return _offsets[^1][girder];
@@ -199,6 +373,50 @@ public sealed class FramingGenerator
                 AlignmentPoint = a, Direction = _supDir[j], Bearings = bearings,
             });
         }
+        if (_chord.Length > 0) ApplySpanLayoutBearings(dWeb);
+    }
+
+    /// <summary>Per-span layouts: support-line points of the layout spans replace the offset-curve bearings; at an interior
+    /// support the span ahead gets its own points (<see cref="SupportLineResult.AheadBearings"/>) when they differ.</summary>
+    private void ApplySpanLayoutBearings(double dWeb)
+    {
+        BearingResult Make(int i, int k, Vec2 p, double z)
+        {
+            var so = _align.Inverse(p);
+            double deck = DeckElevationAtPoint(p);
+            double webTop = PS ? z : deck - WebTopDrop;
+            return new BearingResult
+            {
+                Girder = i, Support = k, Station = so.Station, Offset = so.Offset,
+                TopOfSteel = p.WithZ(webTop + TopFlangeT(so.Station)),
+                BottomOfSteelElevation = webTop - dWeb - BottomFlangeT(so.Station), DeckElevation = deck,
+            };
+        }
+        for (int k = 0; k < NS; k++)
+        {
+            var line = _result.Supports[k];
+            var ahead = new BearingResult?[NG];
+            bool differs = false;
+            for (int i = 0; i < NG; i++)
+            {
+                var dflt = line.Bearings[i];
+                BearingResult? back = k > 0 ? (HasLayout(k - 1) ? Make(i, k, _chord[i][k - 1].S1, _chord[i][k - 1].Z1) : dflt) : null;
+                BearingResult? ah = k < NSpan ? (HasLayout(k) ? Make(i, k, _chord[i][k].S0, _chord[i][k].Z0) : dflt) : null;
+                line.Bearings[i] = k == 0 ? ah : back;
+                ahead[i] = ah;
+                if (back != null && ah != null && !ReferenceEquals(back, ah))
+                {
+                    double gap = Vec2.Distance(back.TopOfSteel.XY, ah.TopOfSteel.XY);
+                    double dz = Math.Abs(back.TopOfSteel.Z - ah.TopOfSteel.Z);
+                    if (gap > 1e-6 || dz > 1e-6) differs = true;
+                    if (!PS && gap > Units.UnitSystem.In(1.0 / 16))
+                        Error($"G{i + 1} at {line.Name}: the span layouts put the girder {gap:0.####} m apart behind and ahead of the support; " +
+                              "steel girders are continuous, so both spans must give the same point on the support line.");
+                }
+                if (line.Bearings[i] is { } b) _offsets[k][i] = b.Offset;
+            }
+            if (differs && k > 0 && k < NS - 1) line.AheadBearings = ahead;
+        }
     }
 
     // ------------------------------------------------------------------ girders
@@ -209,8 +427,8 @@ public sealed class FramingGenerator
         if (PS)
         {
             // Straight beam between the support-line points (haunch is set at the supports; no camber).
-            double z0 = _result.Supports[c.Span].Bearings[c.Girder]!.TopOfSteel.Z;
-            double z1 = _result.Supports[c.Span + 1].Bearings[c.Girder]!.TopOfSteel.Z;
+            double z0 = _result.SpanBearing(c.Girder, c.Span, false)!.TopOfSteel.Z;
+            double z1 = _result.SpanBearing(c.Girder, c.Span, true)!.TopOfSteel.Z;
             double t = c.Length > 0 ? c.SAt(u) / c.Length : u;
             return (z0 + (z1 - z0) * t, _align.Inverse(c.PointAt(u)).Station);
         }
@@ -248,14 +466,19 @@ public sealed class FramingGenerator
             var spans = new GirderSpanCurve[NSpan];
             for (int j = 0; j < NSpan; j++)
             {
-                double d0 = _alignDistanceOfBearing(i, j), d1 = _alignDistanceOfBearing(i, j + 1);
+                double d0 = _align.StationToDistance(_result.SpanBearing(i, j, false)!.Station), d1 = _align.StationToDistance(_result.SpanBearing(i, j, true)!.Station);
                 if (d1 <= d0 + 0.01)
                 {
                     Error($"G{i + 1}: bearings at {_def.Supports[j].Name} and {_def.Supports[j + 1].Name} cross or coincide (check skews and span lengths).");
                     return;
                 }
                 int ii = i;
-                spans[j] = new GirderSpanCurve(_align, d => OffsetAt(ii, d), i, j, d0, d1, chorded);
+                if (HasLayout(j))
+                {
+                    var ch = _chord[i][j];
+                    spans[j] = new GirderSpanCurve(_align, ch.S0, ch.S1, i, j) { LayoutBegin = ch.L0, LayoutEnd = ch.L1 };
+                }
+                else spans[j] = new GirderSpanCurve(_align, d => OffsetAt(ii, d), i, j, d0, d1, chorded);
             }
             _curves[i] = spans;
 
@@ -297,11 +520,14 @@ public sealed class FramingGenerator
                 var c = spans[j];
                 var pts = c.Sample(8, 0.01, 1.5);
                 int n = pts.Count - 1;
+                // Per-span layouts may put a (prestressed) girder on different points behind and ahead of a support: the path
+                // jumps there within 0.01 mm of path distance (the back point stays at the span boundary).
+                bool jog = j > 0 && Vec2.Distance(spans[j - 1].End, c.Start) > 1e-6;
                 for (int k = 0; k <= n; k++)
                 {
                     double u = (double)k / n;
                     var (wt, sta) = WebTopAt(c, u);
-                    AddSample(sAcc + c.SAt(u), pts[k], c.TangentAt(u), wt, sta);
+                    AddSample(sAcc + c.SAt(u) + (jog && k == 0 ? 1e-5 : 0), pts[k], c.TangentAt(u), wt, sta);
                 }
                 sAcc += c.Length;
             }

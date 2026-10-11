@@ -31,6 +31,16 @@ public sealed class CrossSlopeRow
     }
 }
 
+/// <summary>Profile grade line / cross-slope pivot offset at a station (<see cref="CrossSlopeTable.PivotOffsets"/>).</summary>
+public sealed class PivotOffsetRow
+{
+    public double Station { get; set; }
+    /// <summary>Offset from the alignment, right positive.</summary>
+    public double Offset { get; set; }
+    public PivotOffsetRow() { }
+    public PivotOffsetRow(double station, double offset) { Station = station; Offset = offset; }
+}
+
 /// <summary>A slope break: beyond <see cref="Distance"/> from the pivot, <see cref="Slope"/> applies.</summary>
 public sealed class CrossSlopeBreak
 {
@@ -48,8 +58,45 @@ public sealed class CrossSlopeTable
 {
     public List<CrossSlopeRow> Rows { get; set; } = new();
 
-    /// <summary>Offset of the profile grade / crown point from the alignment (right positive).</summary>
+    /// <summary>Offset of the profile grade / crown point from the alignment (right positive): the profile grade line (PGL)
+    /// the vertical profile is given on and the cross slopes pivot about, when it is not the stationing line (e.g. a PGL
+    /// 5.00 ft right of CL I-29). Stations stay the alignment's (radial projection).</summary>
     public double PivotOffset { get; set; }
+
+    /// <summary>OPTIONAL varying PGL / pivot offset by station (linear between rows, held beyond the ends); null or empty =
+    /// the constant <see cref="PivotOffset"/>.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public List<PivotOffsetRow>? PivotOffsets { get; set; }
+
+    /// <summary>True when the pivot offset varies by station (<see cref="PivotOffsets"/>).</summary>
+    [System.Text.Json.Serialization.JsonIgnore]
+    public bool VariablePivot => PivotOffsets is { Count: > 0 };
+
+    /// <summary>Profile grade / pivot offset at a station (the table when given, else <see cref="PivotOffset"/>).</summary>
+    public double PivotOffsetAt(double station)
+    {
+        if (PivotOffsets is not { Count: > 0 } t) return PivotOffset;
+        if (station <= t[0].Station) return t[0].Offset;
+        if (station >= t[^1].Station) return t[^1].Offset;
+        int i = 1;
+        while (t[i].Station < station) i++;
+        var a = t[i - 1];
+        var b = t[i];
+        double span = b.Station - a.Station;
+        return span > 0 ? a.Offset + (b.Offset - a.Offset) * (station - a.Station) / span : b.Offset;
+    }
+
+    /// <summary>How the pivot offset at a station was obtained (for calculation reports); empty for a zero constant offset.</summary>
+    public string PivotSource(double station, Func<double, string> sta, Func<double, string> len)
+    {
+        if (PivotOffsets is not { Count: > 0 } t)
+            return Math.Abs(PivotOffset) > 1e-9 ? $"constant pivot / PGL offset {len(PivotOffset)}" : "";
+        if (station <= t[0].Station) return $"pivot / PGL offset {len(t[0].Offset)} held from STA {sta(t[0].Station)}";
+        if (station >= t[^1].Station) return $"pivot / PGL offset {len(t[^1].Offset)} held from STA {sta(t[^1].Station)}";
+        int i = 1;
+        while (t[i].Station < station) i++;
+        return $"pivot / PGL offset {len(PivotOffsetAt(station))} interpolated STA {sta(t[i - 1].Station)} ({len(t[i - 1].Offset)}) to STA {sta(t[i].Station)} ({len(t[i].Offset)})";
+    }
 
     public static CrossSlopeTable NormalCrown(double slope = -0.02) => new() { Rows = { new CrossSlopeRow(0, slope, slope) } };
 
@@ -59,6 +106,10 @@ public sealed class CrossSlopeTable
         for (int i = 1; i < Rows.Count; i++)
             if (Rows[i].Station < Rows[i - 1].Station)
                 errors.Add($"Cross slope row {i + 1}: stations must be increasing.");
+        if (PivotOffsets is { } p)
+            for (int i = 1; i < p.Count; i++)
+                if (p[i].Station <= p[i - 1].Station)
+                    errors.Add($"Pivot offset row {i + 1}: stations must be increasing.");
         return errors;
     }
 
@@ -168,13 +219,14 @@ public sealed class CrossSlopeTable
     public double DeltaElevation(double station, double offset)
     {
         var (l, r) = SidesAt(station);
-        double d = offset - PivotOffset;
+        double d = offset - PivotOffsetAt(station);
         return d >= 0 ? r.DeltaAt(d) : l.DeltaAt(-d);
     }
 
     public CrossSlopeTable Clone() => new()
     {
         PivotOffset = PivotOffset,
+        PivotOffsets = PivotOffsets?.Select(p => new PivotOffsetRow(p.Station, p.Offset)).ToList(),
         Rows = Rows.Select(r => new CrossSlopeRow(r.Station, r.LeftSlope, r.RightSlope)
         {
             LeftBreak = r.LeftBreak, LeftOuterSlope = r.LeftOuterSlope, RightBreak = r.RightBreak, RightOuterSlope = r.RightOuterSlope,

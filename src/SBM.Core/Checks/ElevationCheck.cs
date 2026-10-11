@@ -25,6 +25,11 @@ public sealed class ElevationChain
     /// <summary>Comparison with the generated model (e.g. "matches 3D model to 0.001 ft").</summary>
     public List<string> Checks { get; } = new();
     public bool Mismatch { get; set; }
+    /// <summary>Differences between inputs found along the chain (e.g. seats that differ on a shared pedestal block, a seat beyond the
+    /// as-designed cap). Reported only: the model is never adjusted. Also listed in <see cref="Checks"/> ("Reported: ...").</summary>
+    public List<string> Reported { get; } = new();
+    /// <summary>The substructure part of the chain as values (null = no substructure unit under this bearing).</summary>
+    public SubstructureChainValues? Substructure { get; set; }
     public double Final => Steps.Count > 0 ? Steps[^1].Elevation : double.NaN;
 }
 
@@ -55,16 +60,21 @@ public static partial class ElevationCheck
     {
         string E(double z) => u.FormatLength(z, LengthKind.Coordinate);
         var (pgl, how) = a.Profile.Explain(station, s => u.FormatStation(s), E, x => u.FormatLength(x));
-        ch.Steps.Add(new CalcStep($"Profile grade at STA {u.FormatStation(station)}", how, double.NaN, pgl, "Profile grade (PGL)"));
-
         var cs = a.CrossSlope;
+        double pivOff = cs.PivotOffsetAt(station);
+        string pivHow = cs.PivotSource(station, s => u.FormatStation(s), x => u.FormatLength(x));
+        string pglAt = pivHow.Length > 0
+            ? $" — on the PGL {u.FormatLength(Math.Abs(pivOff))} {(pivOff < 0 ? "LT" : "RT")} of the alignment ({pivHow}); profile stations = alignment stations"
+            : "";
+        ch.Steps.Add(new CalcStep($"Profile grade at STA {u.FormatStation(station)}", how + pglAt, double.NaN, pgl, "Profile grade (PGL)"));
+
         var (l, r) = cs.SlopesAt(station);
-        double d = offset - cs.PivotOffset;
+        double d = offset - pivOff;
         double slope = d >= 0 ? r : l;
         double dz = cs.DeltaElevation(station, offset);
         string side = d >= 0 ? "right" : "left";
         string rows = CrossSlopeSource(cs, station, u);
-        string pivot = Math.Abs(cs.PivotOffset) > 1e-9 ? $" from pivot at {u.FormatLength(cs.PivotOffset)}" : "";
+        string pivot = pivHow.Length > 0 ? $" from pivot at {u.FormatLength(pivOff)}" : "";
         var sd = d >= 0 ? cs.SidesAt(station).right : cs.SidesAt(station).left;
         string slopeText = sd.Break > 0 && Math.Abs(d) > sd.Break
             ? $"{side} slope {string.Join(" + ", sd.Segments(Math.Abs(d)).Select(g => $"{Pct(g.Slope)} × {u.FormatLength(g.To - g.From)}"))} (breaks at {string.Join(", ", sd.Segments(Math.Abs(d)).Skip(1).Select(g => u.FormatLength(g.From)))}; {rows}){pivot}, offset {u.FormatLength(offset)} {(offset < 0 ? "LT" : "RT")}"
@@ -174,7 +184,8 @@ public static partial class ElevationCheck
     }
 
     /// <summary>Full chain for one bearing (support index, girder index).</summary>
-    public static ElevationChain Bearing(BridgeFraming f, SteelModel? steel, int support, int girder, UnitSystem u, Substructure.SubstructureModel? sub = null)
+    public static ElevationChain Bearing(BridgeFraming f, SteelModel? steel, int support, int girder, UnitSystem u, Substructure.SubstructureModel? sub = null,
+        IEnumerable<Substructure.SubstructureModel>? others = null)
     {
         var def = f.Definition;
         var a = f.Alignment;
@@ -265,35 +276,24 @@ public static partial class ElevationCheck
         }
         ch.Checks.Add($"Total depth top of deck to bearing seat: {u.FormatLength(ch.Steps[1].Elevation - z)}.");
 
-        // Below the seat: pedestal, then the cap.
-        if (sub?.Units.FirstOrDefault(x => x.SupportIndex == support) is { } unit && unit.Pedestals.FirstOrDefault(p => p.Girder == girder) is { } ped)
-        {
-            var sd = unit.Definition;
-            double sB = Vec2.Dot(br.TopOfSteel.XY - unit.Origin, unit.D);
-            // The pedestal stands on the cap top under its own centre (the ahead half of a stepped cap has its own top).
-            double capTop = unit.CapTopAt(sB, ped.N);
-            double h = z - capTop;
-            z = capTop;
-            ch.Steps.Add(new CalcStep("− Pedestal", $"seat − cap top; cap top {unit.CapTopDescription}, set so the shortest pedestal is {In(sd.MinPedestalHeight)}" +
-                (h < UnitSystem.In(0.125) ? " (no pedestal built)" : ""), -h, z, "Top of cap at CL bearing"));
-            double capBot = unit.CapBottomAt(sB);
-            ch.Steps.Add(new CalcStep("− Cap depth", $"{In(capTop - capBot)} at this bearing ({(sd.BottomShape == CapBottomShape.Level ? "level bottom" : "bottom parallel to top")})",
-                -(capTop - capBot), capBot, "Bottom of cap at CL bearing"));
-            if (Math.Abs(ped.Height - h) > 0.0005) { ch.Mismatch = true; ch.Checks.Add($"Pedestal in the substructure model differs by {In(ped.Height - h)}"); }
-            else ch.Checks.Add($"Pedestal height and cap top match the substructure model ({In(h)}, {E(capTop)}).");
-        }
+        // Below the seat: pedestal, cap, column, footing, piles (ElevationCheckSubstructure.cs). The seat is where the generator puts it
+        // (the framing bearing point); a shared pier may be built by another bridge (others).
+        if (FindPedestal(sub, others, support, girder, br.TopOfSteel.XY) is { } hit)
+            AddSubstructure(ch, hit.unit, hit.ped, br.TopOfSteel.XY, u);
         return ch;
     }
 
-    /// <summary>All bearings of a bridge.</summary>
+    /// <summary>All bearings of a bridge. <paramref name="others"/> = the substructure models of the other bridges (shared piers are built
+    /// by one owner bridge; its unit carries the seats of every bridge on it).</summary>
     public static List<ElevationChain> AllBearings(BridgeFraming f, SteelModel? steel, UnitSystem u, Substructure.SubstructureModel? sub = null,
-        Prestressed.PrestressedModel? prestressed = null)
+        Prestressed.PrestressedModel? prestressed = null, IEnumerable<Substructure.SubstructureModel>? others = null)
     {
-        if (prestressed != null) return PrestressedBearings(f, prestressed, u, sub);
+        var o = others?.ToList();
+        if (prestressed != null) return PrestressedBearings(f, prestressed, u, sub, o);
         var list = new List<ElevationChain>();
         foreach (var sl in f.Supports.Concat(f.AuxSupports))
             for (int i = 0; i < sl.Bearings.Length; i++)
-                if (sl.Bearings[i] != null) list.Add(Bearing(f, steel, sl.Index, i, u, sub));
+                if (sl.Bearings[i] != null) list.Add(Bearing(f, steel, sl.Index, i, u, sub, o));
         return list;
     }
 
@@ -311,7 +311,7 @@ public static partial class ElevationCheck
                 sb.AppendLine($"  {st.Item,-30} {change,14}  = {u.FormatLength(st.Elevation, LengthKind.Coordinate),11}  {st.Result}");
                 sb.AppendLine($"      {st.Basis}");
             }
-            foreach (var c in ch.Checks) sb.AppendLine("  ✓ " + c);
+            foreach (var c in ch.Checks) sb.AppendLine((c.Contains("differs") ? "  ! " : "  ✓ ") + c);
             sb.AppendLine();
         }
         return sb.ToString();

@@ -137,7 +137,7 @@ public static partial class PropertyPath
         string[] shortWords = { "thickness", "width", "diameter", "gap", "clip", "haunch", "edge", "pitch", "gage", "size", "lap",
             "clearance", "depth", "height", "extension", "projection", "embedment", "oversize", "increment", "penetration", "cover",
             "workpoint", "fromweb", "spacing", "setdown", "flatlength", "chamferrun", "margin", "beginclear" };
-        if (n == "maxspacing" || n == "intermediatemaxspacing" || n == "mindistancefrombearing" || n == "mindistancefromsplice" || n == "maxbaywidth") return ValueKindHint.Long;
+        if (n == "maxspacing" || n == "perpendicularspacings" || n == "lineshift" || n == "intermediatemaxspacing" || n == "mindistancefrombearing" || n == "mindistancefromsplice" || n == "maxbaywidth") return ValueKindHint.Long;
         return shortWords.Any(n.Contains) ? ValueKindHint.Short : ValueKindHint.Long;
     }
 
