@@ -19,6 +19,8 @@ namespace SBM.App;
 /// camera moves and come back ~¼ s after it stops, and only tiles within <see cref="_detailRadius"/> of the view
 /// center are drawn (0 = all).</item>
 /// <item>Zoom window: drag a rectangle to zoom to it.</item>
+/// <item>Hold the middle button to pan. Right-drag orbits around the selection's centroid when something is selected,
+/// else around the point under the cursor.</item>
 /// </list>
 /// </summary>
 public partial class MainWindow
@@ -49,7 +51,10 @@ public partial class MainWindow
         View.CameraChanged += (_, _) => OnCameraMoved();
         View.PreviewMouseWheel += OnViewportWheel;
         View.PreviewMouseRightButtonDown += (_, e) => SetRotationPoint(e.GetPosition(View));
-        View.PreviewMouseDown += (_, e) => { if (e.ChangedButton == MouseButton.Middle) SetRotationPoint(e.GetPosition(View)); };
+        View.PreviewMouseDown += OnMiddlePanDown;
+        View.PreviewMouseMove += OnMiddlePanMove;
+        View.PreviewMouseUp += OnMiddlePanUp;
+        View.LostMouseCapture += (_, _) => _panFrom = null;
         View.PreviewMouseLeftButtonDown += OnZoomWindowDown;
         View.PreviewMouseMove += OnZoomWindowMove;
         View.PreviewMouseLeftButtonUp += OnZoomWindowUp;
@@ -121,13 +126,72 @@ public partial class MainWindow
         return View.UnProjectOnPlane(screen, new Point3D(0, 0, target.Z), new Vector3D(0, 0, 1));
     }
 
+    /// <summary>Orbit pivot: the centroid of the selection (vertex average of the highlight mesh) when something is
+    /// selected, else the point under the cursor on the plane through the view target.</summary>
     private void SetRotationPoint(Point screen)
     {
-        if (PlanePoint(screen) is { } p)
+        if (SelectionCentroid() is { } c)
+        {
+            View.FixedRotationPoint = c;
+            View.FixedRotationPointEnabled = true;
+        }
+        else if (PlanePoint(screen) is { } p)
         {
             View.FixedRotationPoint = p;
             View.FixedRotationPointEnabled = true;
         }
+    }
+
+    private Point3D? SelectionCentroid()
+    {
+        if (_highlight?.Geometry is not { Positions: { Count: > 0 } pos }) return null;
+        var s = Vector3.Zero;
+        foreach (var p in pos) s += p;
+        s /= pos.Count;
+        return new Point3D(s.X, s.Y, s.Z);
+    }
+
+    // ------------------------------------------------------------------ middle-button pan
+
+    private Point? _panFrom;
+
+    /// <summary>Point under <paramref name="screen"/> on the plane through the view target, normal to the view direction
+    /// (the cursor stays on the same model point while panning, for orthographic and perspective cameras).</summary>
+    private Point3D? ViewPlanePoint(Point screen)
+    {
+        if (View.Camera is not ProjectionCamera cam) return null;
+        var target = cam.Position + cam.LookDirection;
+        return View.UnProjectOnPlane(screen, target, cam.LookDirection);
+    }
+
+    private void OnMiddlePanDown(object sender, MouseButtonEventArgs e)
+    {
+        if (e.ChangedButton != MouseButton.Middle || View.Camera is not ProjectionCamera) return;
+        e.Handled = true; // our pan, not Helix's middle-button gesture
+        _panFrom = e.GetPosition(View);
+        View.CaptureMouse();
+        View.Cursor = Cursors.SizeAll;
+    }
+
+    private void OnMiddlePanMove(object sender, MouseEventArgs e)
+    {
+        if (_panFrom is not { } from || e.MiddleButton != MouseButtonState.Pressed || View.Camera is not ProjectionCamera cam) return;
+        var to = e.GetPosition(View);
+        if (ViewPlanePoint(from) is { } a && ViewPlanePoint(to) is { } b)
+        {
+            cam.Position += a - b;
+            _panFrom = to;
+        }
+        e.Handled = true;
+    }
+
+    private void OnMiddlePanUp(object sender, MouseButtonEventArgs e)
+    {
+        if (e.ChangedButton != MouseButton.Middle || _panFrom == null) return;
+        e.Handled = true;
+        _panFrom = null;
+        View.ReleaseMouseCapture();
+        View.Cursor = null;
     }
 
     /// <summary>Zoom toward the cursor (orthographic camera: scale the width, keep the point under the cursor fixed).</summary>

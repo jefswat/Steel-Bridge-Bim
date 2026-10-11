@@ -95,6 +95,31 @@ public sealed class GirderPath
         return ds > 0 ? (WebTop[i + 1].Z - WebTop[i].Z) / ds : 0;
     }
 
+    /// <summary>
+    /// Exact top-of-web point and plan tangent at s from the girder's span curves and the deck surface (null where the path itself is the
+    /// definition: chorded spans, end extensions). The samples above lie on it; <see cref="At"/> interpolates linearly between them.
+    /// Only the exact-geometry option (NURBS) uses it.
+    /// </summary>
+    public Func<double, (Vec3 point, Vec2 tangent)?>? Exact { get; set; }
+
+    /// <summary>Path distances where the exact geometry may kink (span boundaries, end extensions).</summary>
+    public List<double> ExactBreaks { get; } = new();
+
+    /// <summary>Exact point and tangent where known, else the linear path.</summary>
+    public (Vec3 point, Vec2 tangent) ExactAt(double s)
+    {
+        if (Exact?.Invoke(s) is { } e) return e;
+        var (p, t, _) = At(s);
+        return (p, t);
+    }
+
+    /// <summary>Exact girder-coordinate map: (s, lateral r, vertical z relative to top of web) -> world.</summary>
+    public Vec3 ExactPoint(double s, double r, double z)
+    {
+        var (p, t) = ExactAt(s);
+        return p + new Vec3(t.Right.X, t.Right.Y, 0) * r + new Vec3(0, 0, z);
+    }
+
     /// <summary>Sample distances strictly inside (s0, s1).</summary>
     public IEnumerable<double> SamplesBetween(double s0, double s1) => S.Where(s => s > s0 + 1e-6 && s < s1 - 1e-6);
 }

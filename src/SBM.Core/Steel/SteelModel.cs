@@ -42,6 +42,9 @@ public sealed class SteelPart
     /// <summary>Overall length (plates: along the girder or longest dimension; angles: cut length).</summary>
     public double Length { get; init; }
     public double Volume => Math.Abs(Mesh.Volume());
+    /// <summary>Volume of the exact NURBS solids (exact-geometry option), null when the part has none. Opt-in quantity; <see cref="Mass"/>
+    /// stays on the mesh.</summary>
+    public double? ExactVolume => Mesh.ExactVolume();
     /// <summary>Rolled shapes: AISC nominal weight (lb/ft, all pieces of the member) — mass = weight x length, as on a steel list.</summary>
     public double NominalWeightLbPerFt { get; init; }
     public double Mass => NominalWeightLbPerFt > 0 ? NominalWeightLbPerFt * 1.48816394 * Length : Category switch
@@ -127,6 +130,8 @@ public sealed class SteelModel
     public List<CrossFrameDetail2D> CrossFrameDetails { get; } = new();
     public List<Diagnostic> Diagnostics { get; } = new();
     public TimeSpan GenerationTime { get; set; }
+    /// <summary>Exact-geometry option: what was built as NURBS (null when the option is off).</summary>
+    public NurbsReport? Nurbs { get; set; }
 
     public double SteelMass => Parts.Where(p => p.Category is not (PartCategory.BearingPad or PartCategory.Weld or PartCategory.BearingDisc or PartCategory.Ptfe)).Sum(p => p.Mass);
 

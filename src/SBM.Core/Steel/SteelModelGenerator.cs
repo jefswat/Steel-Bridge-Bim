@@ -60,9 +60,15 @@ public sealed partial class SteelModelGenerator
         };
     }
 
-    public static SteelModel Generate(BridgeFraming framing, UnitSystem units)
+    public static SteelModel Generate(BridgeFraming framing, UnitSystem units, Project.GeometrySettings? geometry = null)
     {
         var g = new SteelModelGenerator(framing, units);
+        if (geometry is { ExactCurvedGeometry: true })
+        {
+            g._geo = geometry;
+            g._fitTol = geometry.FitToleranceFor(units);
+            g._model.Nurbs = new NurbsReport { Tolerance = g._fitTol };
+        }
         var sw = Stopwatch.StartNew();
         if (!framing.HasErrors && framing.Girders.Count > 0) g.Run();
         g._model.Assemblies.AddRange(g._assemblies.OrderBy(a => a.Kind).ThenBy(a => a.Mark, MarkComparer.Instance));
@@ -328,7 +334,7 @@ public sealed partial class SteelModelGenerator
             {
                 var mesh = new Mesh();
                 var hs = topHoles.Where(h => h.Center.X > a && h.Center.X < b).ToList();
-                PlateBuilder.AddLongPlate(mesh, a, b, breaks, s => -top.Width(s) / 2, s => top.Width(s) / 2, _ => 0, top.Thickness, hs, map);
+                LongPlate(mesh, path, a, b, breaks, top.Breaks, s => -top.Width(s) / 2, s => top.Width(s) / 2, _ => 0, top.Thickness, hs, map, false, "girder flange");
                 _parts.Add(new SteelPart { Mark = $"{mark}-TF{n++}", Category = PartCategory.FlangePlate, Assembly = mark, Mesh = mesh,
                     Length = b - a, Description = Pl(seg.Width, seg.Thickness) });
             }
@@ -338,7 +344,7 @@ public sealed partial class SteelModelGenerator
                 var mesh = new Mesh();
                 var hs = webHoles.Where(h => h.Center.X > a && h.Center.X < b).ToList();
                 double tw = seg.Thickness;
-                PlateBuilder.AddLongPlate(mesh, a, b, path.S, _ => -d, _ => 0, _ => -tw / 2, _ => tw / 2, hs, webMap);
+                LongPlate(mesh, path, a, b, path.S, Array.Empty<double>(), _ => -d, _ => 0, _ => -tw / 2, _ => tw / 2, hs, webMap, true, "girder web");
                 _parts.Add(new SteelPart { Mark = $"{mark}-W{n++}", Category = PartCategory.WebPlate, Assembly = mark, Mesh = mesh,
                     Length = b - a, Description = Pl(d, tw) });
             }
@@ -347,7 +353,7 @@ public sealed partial class SteelModelGenerator
             {
                 var mesh = new Mesh();
                 var hs = botHoles.Where(h => h.Center.X > a && h.Center.X < b).ToList();
-                PlateBuilder.AddLongPlate(mesh, a, b, breaks, s => -bot.Width(s) / 2, s => bot.Width(s) / 2, s => -d - bot.Thickness(s), _ => -d, hs, map);
+                LongPlate(mesh, path, a, b, breaks, bot.Breaks, s => -bot.Width(s) / 2, s => bot.Width(s) / 2, s => -d - bot.Thickness(s), _ => -d, hs, map, false, "girder flange");
                 _parts.Add(new SteelPart { Mark = $"{mark}-BF{n++}", Category = PartCategory.FlangePlate, Assembly = mark, Mesh = mesh,
                     Length = b - a, Description = Pl(seg.Width, seg.Thickness) });
             }

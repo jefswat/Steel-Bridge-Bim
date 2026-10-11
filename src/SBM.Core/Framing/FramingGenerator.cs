@@ -539,6 +539,34 @@ public sealed class FramingGenerator
             if (PS) wt1 = WebTopAt(cn, 1).webTop + (WebTopAt(cn, 1).webTop - WebTopAt(cn, 0).webTop) / cn.Length * ext1;
             AddSample(sAcc + ext1, endPt, tn, wt1, st1);
 
+            // Exact evaluator (curved spans only; chorded spans and the end extensions are straight in the path itself).
+            var starts = new double[NSpan + 1];
+            starts[0] = ext0;
+            for (int j = 0; j < NSpan; j++) starts[j + 1] = starts[j] + spans[j].Length;
+            path.ExactBreaks.Add(0);
+            path.ExactBreaks.AddRange(starts);
+            path.ExactBreaks.Add(sAcc + ext1);
+            // where the deck grade kinks or changes curvature (cross-slope rows, VPIs, vertical curve ends): along curved spans
+            foreach (double kd in Concrete.ConcreteGenerator.KinkStations(_align).Select(_align.StationToDistance))
+                for (int j = 0; j < NSpan; j++)
+                {
+                    var c = spans[j];
+                    if (c.Chorded || kd <= c.D0 || kd >= c.D1) continue;
+                    path.ExactBreaks.Add(starts[j] + c.SAt((kd - c.D0) / (c.D1 - c.D0)));
+                }
+            if (!PS)
+                path.Exact = s =>
+                {
+                    if (s < starts[0] || s > starts[NSpan]) return null;
+                    int j = 0;
+                    while (j + 1 < NSpan && s > starts[j + 1]) j++;
+                    var c = spans[j];
+                    if (c.Chorded || c.Length <= 0) return null;
+                    double u = c.UAt(s - starts[j]);
+                    var (wt, _) = WebTopAt(c, u);
+                    return (c.PointAt(u).WithZ(wt), c.TangentAt(u));
+                };
+
             girders[i] = new GirderResult
             {
                 Index = i, Spans = spans.ToList(), WebLine = web, TopFlangeLeft = left, TopFlangeRight = right,
@@ -635,6 +663,8 @@ public sealed class FramingGenerator
             }
             foreach (double s in g.Path.S) if (s < e - 1e-6) Add(s);
             Add(e);
+            path.Exact = g.Path.Exact;
+            path.ExactBreaks.AddRange(g.Path.ExactBreaks.Where(x => x < e - 1e-6).Append(e));
             _result.Girders[i] = new GirderResult
             {
                 Index = i, Spans = g.Spans, WebLine = web, TopFlangeLeft = left, TopFlangeRight = right,
@@ -730,6 +760,8 @@ public sealed class FramingGenerator
             }
             Add(cut);
             foreach (double s in g.Path.S) if (s > cut + 1e-6) Add(s);
+            if (g.Path.Exact is { } ex) path.Exact = s => ex(s + cut);
+            path.ExactBreaks.AddRange(g.Path.ExactBreaks.Where(x => x > cut + 1e-6).Select(x => x - cut).Prepend(0));
             _result.Girders[i] = new GirderResult
             {
                 Index = i, Spans = g.Spans, WebLine = web, TopFlangeLeft = left, TopFlangeRight = right,

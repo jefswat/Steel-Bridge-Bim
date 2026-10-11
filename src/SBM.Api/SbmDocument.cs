@@ -215,6 +215,11 @@ public sealed class SbmDocument
             ok.Sum(m => m.Steel?.Studs.Count ?? 0), ok.Sum(m => m.Steel?.SteelMass ?? 0), warn, err, sw.Elapsed);
     }
 
+    /// <summary>Exact quantities of the elements that carry NURBS (project setting Geometry.ExactCurvedGeometry): exact volume / area from
+    /// the NURBS vs the tessellated mesh, fit deviation. Empty when the setting is off.</summary>
+    public List<NurbsQuantityRow> ExactQuantities(string? bridgeName = null) =>
+        (bridgeName == null ? Project.Bridges.Select(b => b.Name) : new[] { bridgeName }).SelectMany(n => NurbsQuantities.Rows(Model(n))).ToList();
+
     /// <summary>Results for a bridge (regenerates if needed).</summary>
     public BridgeModel Model(string? bridgeName = null)
     {

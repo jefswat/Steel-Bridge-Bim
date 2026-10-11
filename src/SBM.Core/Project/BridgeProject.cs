@@ -18,6 +18,8 @@ public sealed class BridgeProject
     public List<Alignment> Alignments { get; set; } = new();
     public List<BridgeDefinition> Bridges { get; set; } = new();
     public List<References.ReferenceModelDefinition> References { get; set; } = new();
+    /// <summary>Geometry options (exact NURBS for curved parts; default off).</summary>
+    public GeometrySettings Geometry { get; set; } = new();
 
     /// <summary>Resolves a reference path (relative paths are relative to the project file's folder).</summary>
     public static string ResolvePath(string path, string? projectFile) =>
@@ -62,6 +64,8 @@ public sealed class BridgeProject
         public List<AlignmentDto> Alignments { get; set; } = new();
         public List<BridgeDefinition> Bridges { get; set; } = new();
         public List<References.ReferenceModelDefinition>? References { get; set; } = new();
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+        public GeometrySettings? Geometry { get; set; }
 
         public static ProjectDto From(BridgeProject p) => new()
         {
@@ -71,6 +75,7 @@ public sealed class BridgeProject
             Alignments = p.Alignments.Select(AlignmentDto.From).ToList(),
             Bridges = p.Bridges,
             References = p.References,
+            Geometry = p.Geometry.IsDefault ? null : p.Geometry,
         };
 
         public BridgeProject ToProject() => new()
@@ -80,6 +85,7 @@ public sealed class BridgeProject
             Alignments = Alignments.Select(a => a.ToAlignment()).ToList(),
             Bridges = Bridges,
             References = References ?? new(),
+            Geometry = Geometry ?? new(),
         };
     }
 
