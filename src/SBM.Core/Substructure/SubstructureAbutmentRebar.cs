@@ -156,10 +156,10 @@ public sealed partial class SubstructureGenerator
         else if (scheduleOnly.Count > 0)
         {
             Warn($"{name}: reinforcing - placed in 3D: footing longitudinals, footing hoops at the pile pitch, backwall verticals (printed strings), maskwall 5e2 / 5e3, counterfort verticals and 5h4 hoops, pile uplift anchors 8j3; the other plan bar-list rows are in the schedule at the printed count/length with the plan bend diagram where read: {string.Join(", ", scheduleOnly)}.");
-            ReportUnresolvedAbutmentMarks(name, scheduleOnly.Select(x => x.Split(' ')[0]));
+            ReportUnresolvedAbutmentMarks(name, ad.Source, scheduleOnly.Select(x => x.Split(' ')[0]));
         }
         if (ad.Wings.Any(w => w.UpliftPiles.Count == 0) && rb.PlanBarList.Any(l => l.Mark == "8j3"))
-            Warn($"{name}: UNRESOLVED - no circled (uplift anchor) wing-footing piles are given for every wing; the 8j3 bars of those wings stay in the schedule.");
+            Warn($"{name}: " + UnresolvedFlag.Text(ad.Source != "" ? ad.Source + ", wing footing pile plan" : "wing footing pile plan", "uplift anchor (circled) wing-footing piles", "not every wing has its circled piles entered, so the 8j3 anchors cannot be placed there", "The 8j3 bars of those wings stay in the schedule."));
         lock (m) { m.Marks.AddRange(marks); m.Bars.AddRange(places); }
     }
 

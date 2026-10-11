@@ -112,7 +112,7 @@ public sealed partial class MiscItemsGenerator
         double capTop = unit.CapTopAt(sCb, nCb);
         if (double.IsNaN(capTop)) { Warn($"{asm}: no cap top at S = {L(sCb)}."); return; }
         if (sCb < unit.CapS0 || sCb > unit.CapS1) Warn($"{asm}: the cap collection box (S = {L(sCb)}) is off the cap (S {L(unit.CapS0)} to {L(unit.CapS1)}).");
-        if (pd.CapBoxBelowTop == null) Warn($"{asm}: box top below the cap top is printed as 1\" min / 1/4\" max (UNRESOLVED): 1/4\" modeled.");
+        if (pd.CapBoxBelowTop == null) Warn($"{asm}: " + UnresolvedFlag.Text("Ramp G PDF 157", "pier collection box top below the cap top", "it is printed as a range '1\" min / 1/4\" max', not one value", "1/4\" modeled."));
         double boxTop = capTop - (pd.CapBoxBelowTop ?? In(0.25));
         var pCap = unit.Plan(sCb, nCb);
         var capBox = new Mesh();
@@ -127,7 +127,7 @@ public sealed partial class MiscItemsGenerator
         double runP = (pCap - p0).Length;
         var dSN = pCap - p0;
         Info($"{asm}: pipe 1 plan run {L(runP)} (along the pier line {L(Vec2.Dot(dSN, dir))}, along the bridge {L(Vec2.Dot(dSN, ahead))}) from the trough box to the pier collection box.");
-        if (runP < In(6)) Warn($"{asm}: the pier collection box is almost directly under the trough box (run {Sh(runP)}): the plan's 1:12 pipe needs a longitudinal run (section A-A) whose length is not dimensioned (UNRESOLVED N position of the cap box); modeled as computed.");
+        if (runP < In(6)) Warn($"{asm}: the pier collection box is almost directly under the trough box (run {Sh(runP)}): the plan's 1:12 pipe needs a longitudinal run (section A-A) whose length is not dimensioned (UNRESOLVED (Ramp G PDF 154 section A-A / PDF 157): N position of the cap box - not dimensioned, the section shows the run by scale only); modeled as computed.");
         else Warn($"{asm}: N position of the pier collection box on the cap is not dimensioned (section A-A shows the pipe running back-station about 6-7 ft by scale): placed on the CL column.");
         double z1 = z0 - runP * pd.Pipe1Slope;
         double zFl = boxTop + In(4);

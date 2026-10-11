@@ -4,7 +4,7 @@
 //   working points A-F, CP1, CP2 (p3 / p1 / p34, working-points.csv): plan X/Y vs model (bearing points / working line);
 //   top of roadway at the working points and at begin / end bridge (p1, p3);
 //   bridge seats / pedestal tops (p3, p5, p10, seat-elevations.csv): model bearing seat (bottom of the bearing) and the as-designed
-//   pedestal (beam step) top; future pedestals are not modeled (GAP);
+//   pedestal (beam step) top; the pedestals for the future beam lines (+21/+27/+33) are built now (standalone pedestals, p5 / p10; bars p8 / p14);
 //   pedestal sizes (p5/p6, p10/p12); beam shape MN 30MH and debonding A/B/C (p16);
 //   span 99.25 (p1, p15), beam length 100.50 (p16), begin / end bridge stations (p1), deck area 4220 SF (SOQ p2, nearest SF).
 // Prints a pass / fail table and a summary line. Horizontal datum not stated (U1): X/Y are the plan's local grid.
@@ -93,7 +93,12 @@ foreach (var r in Csv("seat-elevations.csv"))
     bool future = r[2].Contains("future");
     if (future)
     {
-        Row("Pedestal tops", $"{side} ped {r[1]} off {off:+0.00;-0.00} (future)", plan, null, "GAP: future pedestals not modeled (p5/p10)");
+        // Built now for a future beam (p5 note 6 Type B / p10 note 6 Type D; bars in the bar lists p8 / p14 and quantities p4 / p9).
+        var fp = sub.Units.First(u => u.Name == sname).Pedestals.FirstOrDefault(p => p.Girder < 0 && Math.Abs(p.S - Ft(off)) < Ft(0.01));
+        Row("Pedestal tops", $"{side} ped {r[1]} off {off:+0.00;-0.00} (future beam, built now)", plan, fp?.SeatZ / ft, "standalone pedestal (plan input)" + (fp == null ? " - NOT FOUND in the model" : ""));
+        Row("Pedestal size", $"{side} ped {r[1]} future beam along beam (ft)", 28.0 / 12, fp?.WidthN / ft, side == "S" ? "p6 Type B 2'-4\"" : "p12 Type D 2'-4\"");
+        Row("Pedestal size", $"{side} ped {r[1]} future beam along abutment (ft)", side == "S" ? 56.0 / 12 : 42.0 / 12, fp?.LengthS / ft, side == "S" ? "p5 4'-8\"" : "p10 3'-6\"");
+        Row("Pedestal size", $"{side} ped {r[1]} future beam centre offset (ft)", off, fp?.S / ft, side == "S" ? "p5 chain 3\" + 10 x 4'-8\" + 9 x 1'-4\" + 8\"" : "p10 chain 10\" + 10 x 3'-6\" + 9 x 2'-6\" + 1'-3\"");
         continue;
     }
     int g = GirderAt(off);

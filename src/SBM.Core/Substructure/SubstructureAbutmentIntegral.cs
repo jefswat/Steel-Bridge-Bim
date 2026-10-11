@@ -58,6 +58,7 @@ public sealed partial class SubstructureGenerator
         if (ad.Extension != null) ignored.Add("Extension");
         if (ad.FootingNotches.Count > 0) ignored.Add("FootingNotches");
         if (ad.BackwallTop.Count > 0) ignored.Add("BackwallTop");
+        if (ad.StandalonePedestals.Count > 0) ignored.Add("StandalonePedestals");
         if (ignored.Count > 0) Warn($"{name}: integral abutment - stub-abutment inputs not used: {string.Join(", ", ignored)}.");
 
         // ---- steps: one level step per girder at the plan top; checked against the bearing seat
@@ -69,7 +70,7 @@ public sealed partial class SubstructureGenerator
             var sdef = ad.Steps.FirstOrDefault(x => x.Girder == seat.Girder + 1);
             if (sdef == null)
             {
-                Warn($"{name}: UNRESOLVED - no step top elevation for girder G{seat.Girder + 1} ({StepDiagramPage}); the stepped cap is not built.");
+                Warn($"{name}: " + UnresolvedFlag.Text(StepDiagramPage, $"step top elevation for girder G{seat.Girder + 1}", "none was entered for this girder (the step diagram gives one per beam)", "The stepped cap is not built."));
                 stepsOk = false; tops.Add(double.NaN); continue;
             }
             tops.Add(sdef.TopElevation);
@@ -84,7 +85,7 @@ public sealed partial class SubstructureGenerator
         else if (ad.StepBoundaryS.Count > 0)
         {
             if (ad.StepBoundaryS.Count != gs.Count - 1)
-                Warn($"{name}: UNRESOLVED - {ad.StepBoundaryS.Count} step riser positions given for {gs.Count} girders (need {gs.Count - 1}, {StepDiagramPage}); the stepped cap is not built.");
+                Warn($"{name}: " + UnresolvedFlag.Text(StepDiagramPage, "step riser positions", $"{ad.StepBoundaryS.Count} were entered for {gs.Count} girders but {gs.Count - 1} are needed (one between each pair of beams)", "The stepped cap is not built."));
             else
             {
                 risers = ad.StepBoundaryS.OrderBy(x => x).ToList();
@@ -95,10 +96,10 @@ public sealed partial class SubstructureGenerator
         }
         else if (ad.StepRisersAtMidBay) risers = Enumerable.Range(0, gs.Count - 1).Select(k => (gs[k].S + gs[k + 1].S) / 2).ToList();
         else
-            Warn($"{name}: UNRESOLVED - step riser positions between the girders are not given ({StepDiagramPage}: mid-bay or a standard dimension from the beam CL, open question Q3); set StepBoundaryS or StepRisersAtMidBay. The stepped cap is not built.");
+            Warn($"{name}: " + UnresolvedFlag.Text(StepDiagramPage, "step riser positions between the girders", "the diagram does not dimension them (mid-bay or a standard distance from the beam CL? open question Q3)", "Set StepBoundaryS or StepRisersAtMidBay. The stepped cap is not built."));
         if (risers != null && risers.FirstOrDefault(r => new[] { nBack, nFront }.Any(n => r <= leftEnd(n) + 1e-4 || r >= rightEnd(n) - 1e-4), double.NaN) is var bad && !double.IsNaN(bad))
         {
-            Warn($"{name}: UNRESOLVED - step riser at S {L(bad)} is outside the cap ends; the stepped cap is not built.");
+            Warn($"{name}: " + UnresolvedFlag.Text(StepDiagramPage, $"step riser at S {L(bad)}", "the entered position lies outside the cap ends, so it cannot be the plan riser", "The stepped cap is not built."));
             risers = null;
         }
         Func<double, double>? stepTop = null;
@@ -182,7 +183,7 @@ public sealed partial class SubstructureGenerator
         unit.Foundations.Add(main);
         geo.PileStationsS = ad.PileStations.ToArray();
         if (ad.PileRowOffsets.Count == 0 && ad.PileStations.Count > 0)
-            Warn($"{name}: UNRESOLVED - integral abutment without PileRowOffsets (the plan pile line, e.g. [0] = on the CL bearing); no cap piles built.");
+            Warn($"{name}: " + UnresolvedFlag.Text("p.15 pile layout", "integral abutment pile line (PileRowOffsets)", "it was not entered, so the model does not know where the pile line is across the cap (e.g. [0] = on the CL bearing)", "No cap piles built."));
         else
             foreach (double ps in ad.PileStations.OrderBy(x => x))
                 foreach (double xr in ad.PileRowOffsets)
@@ -231,7 +232,7 @@ public sealed partial class SubstructureGenerator
         var missing = new List<string>();
         if (double.IsNaN(we.Length) || we.Length <= 0) missing.Add("Length");
         if (double.IsNaN(we.WallThickness) || we.WallThickness <= 0) missing.Add("WallThickness");
-        if (missing.Count > 0) { Warn($"{name}: UNRESOLVED - {wn}: {string.Join(", ", missing)} not given (p.15 A-A / p.17); not built."); return; }
+        if (missing.Count > 0) { Warn($"{name}: " + UnresolvedFlag.Text("p.15 A-A / p.17", $"{wn}: {string.Join(", ", missing)}", "not dimensioned on these sheets (or not entered)", "Not built.")); return; }
         double side = we.GutterOffset < 0 ? -1 : 1;                    // outboard direction in offset
         double eIn = we.GutterOffset, eOut = eIn + side * we.WallThickness;
         double dirSta = -sg;                                            // rearward = away from the span
@@ -261,8 +262,8 @@ public sealed partial class SubstructureGenerator
         }
 
         bool topOk = !double.IsNaN(we.FootingTopElevation), botOk = !double.IsNaN(we.FootingBottomElevation), insideOk = !double.IsNaN(we.FootingInside);
-        if (!topOk) Warn($"{name}: UNRESOLVED - {wn}: footing top (= wall bottom) elevation not given (p.15 A-A / p.20 A-A); footing and wall not built.");
-        else if (!botOk || !insideOk) Warn($"{name}: UNRESOLVED - {wn}: footing {(!botOk ? "bottom elevation" : "width inside the gutter line")} not given (p.15 A-A / p.17); footing not built.");
+        if (!topOk) Warn($"{name}: " + UnresolvedFlag.Text("p.15 A-A / p.20 A-A", $"{wn}: footing top (= wall bottom) elevation", "no elevation is printed for it (or none was entered)", "Footing and wall not built."));
+        else if (!botOk || !insideOk) Warn($"{name}: " + UnresolvedFlag.Text("p.15 A-A / p.17", $"{wn}: footing {(!botOk ? "bottom elevation" : "width inside the gutter line")}", "not dimensioned on these sheets (or not entered)", "Footing not built."));
         if (topOk && botOk && insideOk)
         {
             if (we.FootingTopElevation <= we.FootingBottomElevation) Warn($"{name}: {wn}: footing top {El(we.FootingTopElevation)} is not above the bottom {El(we.FootingBottomElevation)}; footing not built.");
@@ -276,7 +277,7 @@ public sealed partial class SubstructureGenerator
         }
         if (topOk)
         {
-            if (we.WallTop.Count == 0) Warn($"{name}: UNRESOLVED - {wn}: wall top elevations / positions (A / B / C, p.20) not given; wall not built.");
+            if (we.WallTop.Count == 0) Warn($"{name}: " + UnresolvedFlag.Text("p.20", $"{wn}: wall top elevations / positions A / B / C", "none were entered (the points are tagged on p.20 but their values are not all printed)", "Wall not built."));
             else
             {
                 var wt = we.WallTop.OrderBy(p => p.U).Select(p => new Vec2(p.U, p.Elevation)).ToList();
@@ -294,7 +295,7 @@ public sealed partial class SubstructureGenerator
         int placedPiles = 0;
         if (we.Piles.Count > 0 && botOk)
         {
-            if (double.IsNaN(we.PileTopAboveFootingBottom)) Warn($"{name}: UNRESOLVED - {wn}: pile head embedment not given; wing extension piles not built.");
+            if (double.IsNaN(we.PileTopAboveFootingBottom)) Warn($"{name}: " + UnresolvedFlag.Text("p.15 A-A / p.17", $"{wn}: pile head embedment in the extension footing", "not dimensioned for the extension footing (or not entered)", "Wing extension piles not built."));
             else
             {
                 double sm = path.Sta(ub + we.Length / 2);
@@ -317,10 +318,10 @@ public sealed partial class SubstructureGenerator
                 }
             }
         }
-        else if (we.Piles.Count > 0) Warn($"{name}: UNRESOLVED - {wn}: piles need the footing bottom elevation; not built.");
+        else if (we.Piles.Count > 0) Warn($"{name}: " + UnresolvedFlag.Text("p.15 A-A / p.17", $"{wn}: extension piles", "their head level depends on the footing bottom elevation, which is not given", "Not built."));
         int positioned = we.Piles.Count(p => !double.IsNaN(p.Along) && !double.IsNaN(p.Across));
         if (we.PlanPileCount > positioned)
-            Warn($"{name}: UNRESOLVED - {wn}: {we.PlanPileCount - positioned} of {we.PlanPileCount} plan pile(s) have no position along / across the extension (p.17, WA-1); not built.");
+            Warn($"{name}: " + UnresolvedFlag.Text("p.17, WA-1", $"{wn}: position of {we.PlanPileCount - positioned} of {we.PlanPileCount} plan pile(s)", "the sheet counts them but does not locate them along / across the extension", "Not built."));
         _ = placedPiles;
     }
 
@@ -333,7 +334,7 @@ public sealed partial class SubstructureGenerator
             ?? (sp.BarSize.Trim() == "#2" ? new SBM.Core.Concrete.RebarSize("#2", In(0.25), 0.05 * 0.00064516, 0.167 * 1.48816394) : null);
         if (size == null || double.IsNaN(sp.Diameter) || double.IsNaN(sp.Pitch) || sp.Turns <= 0)
         {
-            Warn($"{name}: UNRESOLVED - pile spiral needs bar size, diameter, pitch and turns (p.15 note); not scheduled.");
+            Warn($"{name}: " + UnresolvedFlag.Text("p.15 note", "pile spiral bar size / diameter / pitch / turns", "not all of them were entered from the note", "Not scheduled."));
             return;
         }
         int piles = unit.Foundations.Sum(f => f.Piles.Count);
@@ -354,13 +355,13 @@ public sealed partial class SubstructureGenerator
     /// <summary>CMP casings around the abutment piles from the bottom of the concrete down to the casing bottom (UNRESOLVED when NaN: schedule records only).</summary>
     private void BuildPileCasings(SubstructureUnit unit, AbutmentGeometry geo, PileCasingDefinition pc, string name, List<(double s, double n, double top)> at)
     {
-        if (double.IsNaN(pc.Diameter) || pc.Diameter <= 0) { Warn($"{name}: UNRESOLVED - pile casing diameter not given (p.17); casings not modeled."); return; }
+        if (double.IsNaN(pc.Diameter) || pc.Diameter <= 0) { Warn($"{name}: " + UnresolvedFlag.Text("p.17", "pile casing diameter", "not given on the sheet (or not entered)", "Casings not modeled.")); return; }
         string fill = string.IsNullOrWhiteSpace(pc.Fill) ? "" : $", filled with {pc.Fill}";
         foreach (var (s, n, top) in at) geo.Casings.Add(new PileCasingInfo(s, n, top, pc.BottomElevation, pc.Diameter));
         double planNote = pc.PlanTotalLength;
         if (double.IsNaN(pc.BottomElevation))
         {
-            Warn($"{name}: UNRESOLVED - CMP pile casing bottom (bottom of the EPS fill, road plans) is not in this set (p.17); {at.Count} casing(s) of {Sh(pc.Diameter)} scheduled with unknown length, no solid.");
+            Warn($"{name}: " + UnresolvedFlag.Text("p.17", "CMP pile casing bottom", "it is the bottom of the EPS fill, which is in the road plans, not this set", $"{at.Count} casing(s) of {Sh(pc.Diameter)} scheduled with unknown length, no solid."));
             if (planNote > 0)
                 Note($"{name}: pile casings - plan quantity {L(planNote)} for the bridge (schedule value; not used for the geometry).");
             return;

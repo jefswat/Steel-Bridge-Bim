@@ -143,7 +143,7 @@ public class IntegralAbutmentTests
         var (m2, u2) = Run(c2);
         if (c2.Peds.Count > 2)
         {
-            Assert.Contains(m2.Diagnostics, d => d.Message.Contains("UNRESOLVED") && d.Message.Contains("step riser positions given"));
+            Assert.Contains(m2.Diagnostics, d => d.Message.Contains("UNRESOLVED") && d.Message.Contains("step riser positions") && d.Message.Contains("were entered"));
             Assert.DoesNotContain(u2.Solids, s => s.Kind == SubElementKind.Footing);
         }
     }

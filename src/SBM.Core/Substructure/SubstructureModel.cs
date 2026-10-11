@@ -10,7 +10,12 @@ namespace SBM.Core.Substructure;
 public enum SubElementKind { Cap, Pedestal, Backwall, Column, DrilledShaft, Footing, Pile, DeckDrain, DrainPipe, SplashBasin, Coupler, Wingwall, Counterfort, Maskwall, WingFooting, PileCasing }
 
 /// <summary>A solid of the substructure with its quantity data.</summary>
-public sealed record SubSolid(SubElementKind Kind, string Name, string Description, Mesh Mesh, bool IsConcrete = true);
+public sealed record SubSolid(SubElementKind Kind, string Name, string Description, Mesh Mesh, bool IsConcrete = true)
+{
+    /// <summary>CIP pipe pile: steel shell wall thickness of the concrete-filled pipe (0 = not a pipe pile; NaN = pipe pile, shell not given).
+    /// The mesh is the outside diameter; IFC writes one IfcPile COMPOSITE with the shell as a property.</summary>
+    public double ShellThickness { get; init; }
+}
 
 /// <summary>One plan-listed bar outside the clear-cover envelope: Excess = how far (m) the bar surface reaches into the cover zone at its worst point,
 /// Face = the governing concrete face (cap top / cap soffit / cap end / cap side N0 / cap side N1 / footing ... / column ...).</summary>
@@ -25,6 +30,9 @@ public sealed record PedestalInfo(int Girder, double S, double N, double LengthS
     public double SeatN { get; init; } = double.NaN;
     public double RowS => double.IsNaN(SeatS) ? S : SeatS;
     public double RowN => double.IsNaN(SeatN) ? N : SeatN;
+    /// <summary>Drawing label when the pedestal carries no bearing of this bridge (standalone pedestal, e.g. "FUTURE BEAM"; Girder = -1). "" = G{Girder + 1}.</summary>
+    public string Label { get; init; } = "";
+    public string Tag => Label != "" ? Label : $"G{Girder + 1}";
 }
 
 /// <summary>Column (pier) in cap coordinates; top is where it meets the cap bottom at its center.</summary>
@@ -157,7 +165,12 @@ public sealed class SubstructureModel
 }
 
 /// <summary>A beam step (seat block) of an as-designed abutment.</summary>
-public sealed record AbutmentStepInfo(int Girder, double S, double S0, double S1, double TopZ, double BaseZ, double N0, double N1);
+public sealed record AbutmentStepInfo(int Girder, double S, double S0, double S1, double TopZ, double BaseZ, double N0, double N1)
+{
+    /// <summary>Standalone pedestal label (Girder = -1, e.g. "FUTURE BEAM"); "" = G{Girder + 1}.</summary>
+    public string Label { get; init; } = "";
+    public string Tag => Label != "" ? Label : $"G{Girder + 1}";
+}
 
 /// <summary>A counterfort with its wing footing (plan frame: X along the wall rearward, Y = alignment offset).</summary>
 public sealed record CounterfortInfo(int Index, double Start, double Width, double Projection, double TopZ, double FootingTop, double FootingBottom,

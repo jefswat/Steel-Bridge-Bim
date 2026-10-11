@@ -92,7 +92,7 @@ public static class BentViews
             }
             if (unit.Pedestals.Count <= 2)
                 d.Leader(new Vec2(p.S, p.SeatZ), new Vec2(p.S + d.Paper(0.25), p.SeatZ - d.Paper(0.55) - (p.Girder % 2) * d.Paper(0.25)),
-                    $"G{p.Girder + 1} SEAT {d.Elev(p.SeatZ)}, PED {d.Short(p.Height)}");
+                    $"{p.Tag} SEAT {d.Elev(p.SeatZ)}, PED {d.Short(p.Height)}");
         }
 
         // ---- cap (and backwall)
@@ -235,7 +235,7 @@ public static class BentViews
             int nBat = fd.Piles.Count(q => q.IsBattered);
             string batterNote = nBat > 0 ? "\n" + nBat + " BATTERED (SEE PLAN)" : "";
             string tip = fd.Type == FoundationType.DrilledShaft ? $"{d.Short(fd.SizeS)} DIA SHAFT, {d.Len(fd.TopZ - fd.BottomZ)} LONG, TIP EL {d.Elev(fd.BottomZ)}"
-                : fd.Piles.Count > 0 ? $"{fd.Piles.Count} PILES {(sd.PileType == PileType.SteelHP ? sd.PileSection : d.Short(sd.PileSize) + " SQ")}, TIP EL {d.Elev(fd.Piles[0].TipZ)}{batterNote}"
+                : fd.Piles.Count > 0 ? $"{fd.Piles.Count} PILES {sd.PileLabel(d.Short)}, TIP EL {d.Elev(fd.Piles[0].TipZ)}{batterNote}"
                 : $"FOOTING {d.Len(fd.SizeS)} x {d.Len(fd.SizeN)} x {d.Short(sd.FootingThickness)}";
             double tz = cutZ.TryGetValue(fd.S, out double zc0) ? zc0 : fd.Piles.Count > 0 ? fd.Piles[0].TipZ : fd.BottomZ;
             d.Leader(new Vec2(fd.S, tz + d.Paper(0.1)), new Vec2(fd.S + d.Paper(0.5), tz - d.Paper(0.3)), tip);
@@ -268,7 +268,7 @@ public static class BentViews
             d.Text("BEARING SEAT ELEVATIONS", new Vec2(tx, ty), d.TextH * 1.1, 0, TextAlign.Left, SheetLayers.Title);
             int row = 1;
             foreach (var p in unit.Pedestals.OrderBy(p => p.Girder).ThenBy(p => p.S))
-                d.Text($"G{p.Girder + 1}: SEAT EL {d.Elev(p.SeatZ)}, PEDESTAL {d.Short(p.Height)}", new Vec2(tx, ty - row++ * d.TextH * 1.6), d.SmallTextH, 0, TextAlign.Left);
+                d.Text($"{p.Tag}: SEAT EL {d.Elev(p.SeatZ)}, PEDESTAL {d.Short(p.Height)}", new Vec2(tx, ty - row++ * d.TextH * 1.6), d.SmallTextH, 0, TextAlign.Left);
         }
         return new SheetView($"{unit.Name} elevation and cap section", unit.Name.Replace(" ", ""), dwg, d.Scale,
             $"{kind.ToLowerInvariant()} elevation along the support line with pedestals, columns, foundations and reinforcing; Section A–A through the cap.");

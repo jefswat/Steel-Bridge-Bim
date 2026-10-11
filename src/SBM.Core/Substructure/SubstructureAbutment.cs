@@ -374,6 +374,28 @@ public sealed partial class SubstructureGenerator
             { var pi = new PedestalInfo(seat.Girder, seat.S, Nx((xBwF + xStepF) / 2), ad.StepLength, xStepF - xBwF, FB(seat.S) + D + W, top); unit.Pedestals.Add(pi); unit.PedestalBlocks.Add(pi); }
         }
 
+        // ---- standalone pedestals (no bearing of this bridge, e.g. for a future beam line): same section as the beam steps
+        foreach (var (pd, k) in ad.StandalonePedestals.Select((p, i) => (p, i)).OrderBy(x => x.p.S))
+        {
+            double len = double.IsNaN(pd.Length) ? ad.StepLength : pd.Length;
+            double s0 = pd.S - len / 2, s1 = pd.S + len / 2, top = pd.TopElevation;
+            string tag = pd.Label != "" ? pd.Label : $"P{k + 1}";
+            if (top <= Math.Min(FB(s0), FB(s1)) + D + W + 1e-4) { Warn($"{name}: pedestal {tag} at S {L(pd.S)} top {El(top)} is not above the seat base; not built."); continue; }
+            if (geo.Steps.FirstOrDefault(st => st.S0 < s1 - 1e-6 && s0 < st.S1 - 1e-6) is { } hit)
+                Warn($"{name}: pedestal {tag} at S {L(pd.S)} overlaps the beam step {hit.Tag}; both are built - check the plan positions.");
+            var sm = new Mesh();
+            AddSlab(sm, unit, new[]
+            {
+                new SV(Nx(xBwF), s => FB(s) + D + W), new SV(Nx(xStepF), s => FB(s) + D + W), new SV(Nx(xStepF), _ => top), new SV(Nx(xBwF), _ => top),
+            }, ConstPlane(s0), ConstPlane(s1), fbPts.Select(p => p.X));
+            double hMid = top - (FB(pd.S) + D + W);
+            unit.Solids.Add(new SubSolid(SubElementKind.Pedestal, $"{name} pedestal {tag} S {L(pd.S)}",
+                $"Pedestal without a bearing ({(pd.Label != "" ? pd.Label.ToLowerInvariant() : "standalone")}) {Sh(len)} x {Sh(xStepF - xBwF)}, top {El(top)}, {Sh(hMid)} above the wash", sm));
+            geo.Steps.Add(new AbutmentStepInfo(-1, pd.S, s0, s1, top, FB(pd.S) + D + W, Math.Min(Nx(xBwF), Nx(xStepF)), Math.Max(Nx(xBwF), Nx(xStepF))) { Label = tag });
+            var pi = new PedestalInfo(-1, pd.S, Nx((xBwF + xStepF) / 2), len, xStepF - xBwF, FB(pd.S) + D + W, top) { Label = tag };
+            unit.Pedestals.Add(pi); unit.PedestalBlocks.Add(pi);
+        }
+
         // ---- main footing foundation and piles at the plan stations (rows normal to the line: PileRowOffsets, default the two legacy rows)
         var main = new FoundationInfo { Type = FoundationType.PileCap, S = (s0Mid + s1Mid) / 2, N = nMid, TopZ = FB((s0Mid + s1Mid) / 2) + D, BottomZ = FB((s0Mid + s1Mid) / 2), SizeS = s1Mid - s0Mid, SizeN = ad.FootingWidth };
         unit.Foundations.Add(main);

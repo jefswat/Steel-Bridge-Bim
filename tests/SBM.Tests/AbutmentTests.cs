@@ -229,4 +229,39 @@ public class AbutmentTests
         Assert.Null(u.Abutment);
         Assert.Contains(u.Solids, s => s.Kind == SubElementKind.Backwall);
     }
+
+    [Fact]
+    public void StandalonePedestal_AndCipPipePiles_AreBuiltAndExported()
+    {
+        var (doc, ad) = Setup();
+        var u0 = doc.Substructure().Units.First(u => u.SupportIndex == 0);
+        double sFree = u0.Pedestals.Max(p => p.S) + Ft(2);           // beyond the last bearing, still on the footing (ends at max + 3 ft)
+        double top = u0.Pedestals.Min(p => p.SeatZ) - In(2);
+        ad.StandalonePedestals.Add(new AbutmentPedestalDefinition(sFree, top, "FUTURE BEAM") { Length = Ft(1.5) });
+        var sd = doc.Bridge().Supports[0].ResolvedSubstructure.Clone();
+        sd.Abutment = ad; sd.PileType = PileType.CipPipe; sd.PileSize = In(12); sd.PileShellThickness = In(0.25);
+        doc.Bridge().Supports[0].Substructure = sd;
+        doc.Regenerate();
+        var u = doc.Substructure().Units.First(x => x.SupportIndex == 0);
+        var fp = Assert.Single(u.Pedestals, p => p.Girder < 0);
+        Assert.Equal("FUTURE BEAM", fp.Label);
+        Assert.Equal(top, fp.SeatZ, 6);
+        Assert.Equal(Ft(1.5), fp.LengthS, 6);
+        Assert.Contains(u.Abutment!.Steps, st => st.Girder < 0 && st.Tag == "FUTURE BEAM");
+        var pile = u.Solids.First(s => s.Kind == SubElementKind.Pile);
+        Assert.Equal(In(0.25), pile.ShellThickness, 9);
+        double len = ad.PileLength;
+        Assert.InRange(Math.Abs(pile.Mesh.Volume()) / (Math.PI * In(6) * In(6) * len), 0.99, 1.0);   // round (inscribed 32-gon)
+        string path = Path.Combine(Path.GetTempPath(), "abut-cip-" + Guid.NewGuid().ToString("N") + ".ifc");
+        try
+        {
+            doc.ExportIfc(path);
+            string text = File.ReadAllText(path);
+            Assert.Contains(".DRIVEN.,.COMPOSITE.)", text);
+            Assert.Contains("'SBM_PipePile'", text);
+            Assert.Contains("'ShellThickness'", text);
+            Assert.Contains("FUTURE BEAM", text);
+        }
+        finally { File.Delete(path); }
+    }
 }

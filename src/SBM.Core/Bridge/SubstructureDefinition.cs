@@ -135,7 +135,9 @@ public enum FoundationType
     None,
 }
 
-public enum PileType { SteelHP, PrecastConcrete }
+/// <summary>Pile type. CipPipe = cast-in-place concrete pipe pile (MnDOT "12\" C-I-P"): round steel shell (<see cref="SubstructureDefinition.PileShellThickness"/>)
+/// filled with concrete; one round solid of the outside diameter <see cref="SubstructureDefinition.PileSize"/> (IFC: one IfcPile COMPOSITE, shell as a property).</summary>
+public enum PileType { SteelHP, PrecastConcrete, CipPipe }
 
 /// <summary>How chamfered-column vertical bars connect to the footing: run continuous from the footing mat (default), or
 /// lap with L-shaped footing dowels, or mechanical couplers at two splice levels (alternate bars at different levels).</summary>
@@ -382,8 +384,17 @@ public sealed class SubstructureDefinition
     public PileType PileType { get; set; } = PileType.SteelHP;
     /// <summary>"HP14x73" style for steel; side dimension for precast (see <see cref="PileSize"/>).</summary>
     public string PileSection { get; set; } = "HP14x73";
-    /// <summary>Precast concrete pile side dimension.</summary>
+    /// <summary>Precast concrete pile side dimension; CIP pipe pile outside diameter.</summary>
     public double PileSize { get; set; } = In(18);
+    /// <summary>CIP pipe pile steel shell wall thickness (NaN = not given: UNRESOLVED warning; the round solid is still built).</summary>
+    public double PileShellThickness { get; set; } = double.NaN;
+    /// <summary>Short pile label for views: "HP14x73", "12\" SQ", "12\" CIP PIPE".</summary>
+    public string PileLabel(Func<double, string> shortLength) => PileType switch
+    {
+        PileType.SteelHP => PileSection,
+        PileType.CipPipe => shortLength(PileSize) + " CIP PIPE",
+        _ => shortLength(PileSize) + " SQ",
+    };
     /// <summary>Piles across the cap (normal to the support line) per group.</summary>
     public int PileRows { get; set; } = 3;
     /// <summary>Piles along the cap per group (pile caps); total piles under an abutment cap.</summary>

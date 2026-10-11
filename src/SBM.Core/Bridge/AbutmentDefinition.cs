@@ -19,6 +19,22 @@ public sealed class AbutmentStepDefinition
     public AbutmentStepDefinition(int girder, double top) { Girder = girder; TopElevation = top; }
 }
 
+/// <summary>Pedestal (beam step) built WITHOUT a bearing of this bridge, e.g. MnDOT "Type B" pedestals for a future beam line (Br. 02069 p5 / p6, built now:
+/// their bars are in the abutment bar list p8 and quantities p4). Same section as the beam steps (backwall front face to <see cref="AbutmentDefinition.BearingToStepFront"/>).</summary>
+public sealed class AbutmentPedestalDefinition
+{
+    /// <summary>Centre along the support line, S from the alignment point (as <see cref="AbutmentDefinition.PileStations"/>).</summary>
+    public double S { get; set; }
+    /// <summary>Top elevation as printed (absolute).</summary>
+    public double TopElevation { get; set; }
+    /// <summary>Length along the support line (NaN = <see cref="AbutmentDefinition.StepLength"/>).</summary>
+    public double Length { get; set; } = double.NaN;
+    /// <summary>Drawing / solid label, e.g. "FUTURE BEAM".</summary>
+    public string Label { get; set; } = "";
+    public AbutmentPedestalDefinition() { }
+    public AbutmentPedestalDefinition(double s, double top, string label) { S = s; TopElevation = top; Label = label; }
+}
+
 /// <summary>End panel (maskwall) standing on the footing end: a thin wall parallel to the alignment, spanning the footing width.</summary>
 public sealed class MaskwallDefinition
 {
@@ -296,6 +312,8 @@ public sealed class AbutmentDefinition
     // ---- steps
     public double StepLength { get; set; } = Ft(4.5);
     public List<AbutmentStepDefinition> Steps { get; set; } = new();
+    /// <summary>Pedestals without a bearing (future beam lines); Stub abutments only.</summary>
+    public List<AbutmentPedestalDefinition> StandalonePedestals { get; set; } = new();
     public List<MaskwallDefinition> Masks { get; set; } = new();
     /// <summary>True footing plan outline: end notches (empty = ends are plain alignment-offset lines).</summary>
     public List<FootingNotchDefinition> FootingNotches { get; set; } = new();
