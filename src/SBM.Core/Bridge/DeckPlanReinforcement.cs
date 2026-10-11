@@ -95,6 +95,8 @@ public sealed class DeckLongZone
     public List<double>? Positions { get; set; }
     /// <summary>Positions are measured from the right reference (toward the left) instead of from the left one.</summary>
     public bool PositionsFromRight { get; set; }
+    /// <summary>Layer of each line of <see cref="Positions"/> (read from the plan's section); null = alternate from <see cref="FirstLayer"/>.</summary>
+    public List<DeckBarLayer>? PositionLayers { get; set; }
     public string Size { get; set; } = "#6";
     /// <summary>Mark of stock-length bars.</summary>
     public string Mark { get; set; } = "";
@@ -109,6 +111,7 @@ public sealed class DeckLongZone
         var z = (DeckLongZone)MemberwiseClone();
         z.Left = Left.Clone(); z.Right = Right.Clone();
         z.Positions = Positions?.ToList();
+        z.PositionLayers = PositionLayers?.ToList();
         return z;
     }
 }
@@ -137,6 +140,11 @@ public sealed class DeckPlanReinforcement
     public List<DeckTransverseZone> Transverse { get; set; } = new();
     public List<DeckLongZone> Longitudinal { get; set; } = new();
     public List<DeckPlanBarLine> PlanBarList { get; set; } = new();
+    /// <summary>
+    /// Mark families ("6b") compared as a whole: the plan's rows of the family are not matched mark by mark (the plan's start/closure pieces are not distinguished
+    /// by the generator) and are not put in the schedule; the placed marks starting with the family prefix are compared with their sum.
+    /// </summary>
+    public List<string> Families { get; set; } = new();
     /// <summary>Clear distance of the longitudinal bar ends from the deck-end lines (0 = use the deck side cover).</summary>
     public double LongitudinalEndCover { get; set; }
     public double LongitudinalBeginCover { get; set; }
@@ -152,7 +160,7 @@ public sealed class DeckPlanReinforcement
     {
         Transverse = Transverse.Select(z => z.Clone()).ToList(),
         Longitudinal = Longitudinal.Select(z => z.Clone()).ToList(),
-        PlanBarList = PlanBarList.Select(l => l.Clone()).ToList(),
+        PlanBarList = PlanBarList.Select(l => l.Clone()).ToList(), Families = Families.ToList(),
         LongitudinalEndCover = LongitudinalEndCover, LongitudinalBeginCover = LongitudinalBeginCover, TransverseBeginClear = TransverseBeginClear, TransverseEndClear = TransverseEndClear, WeightTolerance = WeightTolerance,
     };
 }

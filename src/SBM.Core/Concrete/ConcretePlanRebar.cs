@@ -30,7 +30,7 @@ public sealed partial class ConcreteGenerator
         int zi = 0;
         foreach (var z in plan.Transverse) { BuildTransverseZone(z, zi, lineD[zi], bag, c, ZT); zi++; }
         zi = 0;
-        foreach (var z in plan.Longitudinal) BuildLongZone(z, zi++, bag, plan, ZL);
+        BuildLongRuns(plan, bag, ZL);
 
         // ---- marks
         var marks = new List<BarMark>();
@@ -287,72 +287,154 @@ public sealed partial class ConcreteGenerator
         }
     }
 
-    private void BuildLongZone(DeckLongZone z, int index, ConcurrentBag<PlanBar> bag, DeckPlanReinforcement plan, Func<DeckBarLayer, double, double> zL)
+    private static bool SameRef(DeckLongRef a, DeckLongRef b) => a.Kind == b.Kind && a.Girder == b.Girder && Math.Abs(a.Offset - b.Offset) < 1e-9;
+
+    private static bool Linkable(DeckLongZone a, DeckLongZone b) =>
+        a.Positions == null && b.Positions == null && SameRef(a.Left, b.Left) && SameRef(a.Right, b.Right) && a.Mark == b.Mark && a.Size == b.Size && a.Alternate == b.Alternate
+        && a.FirstLayer == b.FirstLayer && !double.IsNaN(a.EndStation) && !double.IsNaN(b.StartStation) && Math.Abs(a.EndStation - b.StartStation) < 1e-6;
+
+    /// <summary>
+    /// Longitudinal zones in runs: consecutive zones between the same two reference lines whose station ranges abut ("24 EQ. SPA." changing to "22 EQ. SPA.") share their
+    /// bars - a line of one zone continues as the nearest line of the same layer in the next zone (a small lateral shift at the boundary) when there is one, else the bar
+    /// ends / a new one starts. Bars are lap-spliced in stock lengths along the whole track, so the bar count follows the length of the lines, not the number of zones.
+    /// </summary>
+    private void BuildLongRuns(DeckPlanReinforcement plan, ConcurrentBag<PlanBar> bag, Func<DeckBarLayer, double, double> zL)
     {
-        string zn = $"longitudinal zone {index + 1}{(z.Name.Length > 0 ? " (" + z.Name + ")" : "")}";
-        var size = RebarCatalog.Size(z.Size);
-        var oL = RefOffset(z.Left, zn);
-        var oR = RefOffset(z.Right, zn);
-        if (oL == null || oR == null) return;
-        if (z.StockLength <= z.Lap + Ft(1) || z.Mark.Length == 0) { Warn($"Deck reinforcing, {zn}: stock length / lap / mark missing - skipped."); return; }
+        var zones = plan.Longitudinal;
+        var used = new bool[zones.Count];
+        int runNo = 0;
+        for (int i = 0; i < zones.Count; i++)
+        {
+            if (used[i]) continue;
+            var chain = new List<DeckLongZone> { zones[i] };
+            used[i] = true;
+            // follow the zones that continue this one (same reference lines, mark and size, the next starting where this ends) - not necessarily adjacent in the list
+            while (true)
+            {
+                int nx = Enumerable.Range(0, zones.Count).FirstOrDefault(k => !used[k] && Linkable(chain[^1], zones[k]), -1);
+                if (nx < 0) break;
+                used[nx] = true; chain.Add(zones[nx]);
+            }
+            BuildLongRun(chain, ++runNo, bag, plan, zL);
+        }
+    }
+
+    private sealed class LongTrack { public List<(int zone, int k)> Segs = new(); public DeckBarLayer Layer; }
+
+    private void BuildLongRun(List<DeckLongZone> run, int runNo, ConcurrentBag<PlanBar> bag, DeckPlanReinforcement plan, Func<DeckBarLayer, double, double> zL)
+    {
+        var z0 = run[0];
+        string rn = $"longitudinal run {runNo} ({z0.Name}{(run.Count > 1 ? $" .. {run[^1].Name}" : "")})";
+        var size = RebarCatalog.Size(z0.Size);
+        if (z0.StockLength <= z0.Lap + Ft(1) || z0.Mark.Length == 0) { Warn($"Deck reinforcing, {rn}: stock length / lap / mark missing - skipped."); return; }
+        var oL = new Func<double, double>[run.Count]; var oR = new Func<double, double>[run.Count];
+        for (int q = 0; q < run.Count; q++)
+        {
+            oL[q] = RefOffset(run[q].Left, rn); oR[q] = RefOffset(run[q].Right, rn);
+            if (oL[q] == null || oR[q] == null) return;
+        }
         double coverE = plan.LongitudinalEndCover > 0 ? plan.LongitudinalEndCover : Deck.Reinforcement.SideCover;
         double coverB = plan.LongitudinalBeginCover > 0 ? plan.LongitudinalBeginCover : coverE;
-        bool begin = double.IsNaN(z.StartStation), end = double.IsNaN(z.EndStation);
-        double dS = begin ? 0 : _a.StationToDistance(z.StartStation);
-        double dE = end ? 0 : _a.StationToDistance(z.EndStation);
-        int lines = z.Positions is { Count: > 0 } ? z.Positions.Count : z.Spaces + 1;
-        if (lines <= 0) return;
         double zTop = zL(DeckBarLayer.Top, size.Diameter), zBot = zL(DeckBarLayer.Bottom, size.Diameter);
-        string closure = z.ClosureMark.Length > 0 ? z.ClosureMark : z.Mark;
-        int bad = 0;
-        var sink = new ConcurrentBag<PlanBar>();
-        Parallel.For(0, lines, k =>
+        string closure = z0.ClosureMark.Length > 0 ? z0.ClosureMark : z0.Mark;
+        int Lines(DeckLongZone z) => z.Positions is { Count: > 0 } ? z.Positions.Count : z.Spaces + 1;
+        DeckBarLayer LayerOf(DeckLongZone z, int k) =>
+            z.PositionLayers is { Count: > 0 } pl && k < pl.Count ? pl[k] : z.Alternate && k % 2 == 1 ? (z.FirstLayer == DeckBarLayer.Top ? DeckBarLayer.Bottom : DeckBarLayer.Top) : z.FirstLayer;
+        Func<double, double> OffOf(int q, int k)
         {
-            Func<double, double> off;
-            if (z.Positions is { Count: > 0 } pos) { double q = pos[k]; off = z.PositionsFromRight ? d => oR(d) - q : d => oL(d) + q; }
-            else
+            var z = run[q];
+            if (z.Positions is { Count: > 0 } pos) { double v = pos[k]; return z.PositionsFromRight ? d => oR[q](d) - v : d => oL[q](d) + v; }
+            double f = z.Spaces == 0 ? 0 : (double)k / z.Spaces;
+            return d => { double l = oL[q](d) + z.LeftMargin, r = oR[q](d) - z.RightMargin; return l + (r - l) * f; };
+        }
+
+        // tracks: link lines of consecutive zones by layer and nearest fraction across the bay
+        var tracks = new List<LongTrack>();
+        var open = new Dictionary<int, LongTrack>();      // line index of the previous zone -> its track
+        for (int q = 0; q < run.Count; q++)
+        {
+            int nq = Lines(run[q]);
+            var next = new Dictionary<int, LongTrack>();
+            if (q > 0 && run[q].Positions == null)
             {
-                double f = z.Spaces == 0 ? 0 : (double)k / z.Spaces;
-                off = d => { double l = oL(d) + z.LeftMargin, rr = oR(d) - z.RightMargin; return l + (rr - l) * f; };
+                double Fr(DeckLongZone z, int k) => z.Spaces == 0 ? 0 : (double)k / z.Spaces;
+                foreach (var layer in new[] { DeckBarLayer.Top, DeckBarLayer.Bottom })
+                {
+                    var prevK = open.Keys.Where(k => open[k].Layer == layer).ToList();
+                    var curK = Enumerable.Range(0, nq).Where(k => LayerOf(run[q], k) == layer).ToList();
+                    double thr = 0.6 * 2.0 / Math.Max(1, Math.Min(Math.Max(run[q - 1].Spaces, 1), Math.Max(run[q].Spaces, 1)));
+                    var pairs = (from a in prevK from b in curK select (a, b, d: Math.Abs(Fr(run[q - 1], a) - Fr(run[q], b)))).Where(t => t.d <= thr).OrderBy(t => t.d).ToList();
+                    var usedA = new HashSet<int>(); var usedB = new HashSet<int>();
+                    foreach (var (a, b, _) in pairs)
+                    {
+                        if (usedA.Contains(a) || usedB.Contains(b)) continue;
+                        usedA.Add(a); usedB.Add(b);
+                        open[a].Segs.Add((q, b));
+                        next[b] = open[a];
+                    }
+                }
             }
-            var layer = z.Alternate && k % 2 == 1 ? (z.FirstLayer == DeckBarLayer.Top ? DeckBarLayer.Bottom : DeckBarLayer.Top) : z.FirstLayer;
-            double zOff = layer == DeckBarLayer.Top ? zTop : zBot;
-            var (eb, ee) = EndsVar(off, coverB, coverE);
-            double d0 = begin ? eb : dS, d1 = end ? ee : dE + z.Lap;
-            if (d1 > ee) d1 = ee;
-            if (d0 < eb) d0 = eb;
-            if (d1 - d0 < Ft(2)) { Interlocked.Increment(ref bad); return; }
-            int n = Math.Max(2, (int)Math.Ceiling((d1 - d0) / 1.0));
-            var pts = new Vec3[n + 1]; var cum = new double[n + 1];
-            for (int i = 0; i <= n; i++)
+            for (int k = 0; k < nq; k++)
+                if (!next.ContainsKey(k))
+                {
+                    var t = new LongTrack { Layer = LayerOf(run[q], k) };
+                    t.Segs.Add((q, k));
+                    tracks.Add(t); next[k] = t;
+                }
+            open = next;
+        }
+
+        var sink = new ConcurrentBag<PlanBar>();
+        int bad = 0;
+        string loc = "Deck longitudinal, top & bottom";
+        Parallel.ForEach(tracks, t =>
+        {
+            double zOff = t.Layer == DeckBarLayer.Top ? zTop : zBot;
+            var pts = new List<Vec3>(); var cum = new List<double>();
+            int lastZone = t.Segs[^1].zone;
+            foreach (var (q, k) in t.Segs)
             {
-                double d = d0 + (d1 - d0) * i / n;
-                double o = off(d);
-                var p = _a.PointAtDistance(d, o);
-                pts[i] = p.WithZ(Deck.FinishedElevation(_a, _a.DistanceToStation(d), o) + zOff);
-                if (i > 0) cum[i] = cum[i - 1] + Vec2.Distance(pts[i - 1].XY, p);
+                var z = run[q];
+                var off = OffOf(q, k);
+                var (eb, ee) = EndsVar(off, coverB, coverE);
+                double d0 = double.IsNaN(z.StartStation) ? eb : Math.Max(eb, _a.StationToDistance(z.StartStation));
+                // a track that stops at the end of this zone laps Lap into the next one; a continuing track just runs on
+                double d1 = double.IsNaN(z.EndStation) ? ee : Math.Min(ee, _a.StationToDistance(z.EndStation) + (q == lastZone && q < run.Count - 1 ? z.Lap : 0));
+                if (d1 - d0 < Ft(0.5)) continue;
+                int n = Math.Max(2, (int)Math.Ceiling((d1 - d0) / 1.0));
+                for (int s = 0; s <= n; s++)
+                {
+                    double d = d0 + (d1 - d0) * s / n;
+                    double o = off(d);
+                    var p = _a.PointAtDistance(d, o);
+                    pts.Add(p.WithZ(Deck.FinishedElevation(_a, _a.DistanceToStation(d), o) + zOff));
+                    cum.Add(cum.Count == 0 ? 0 : cum[^1] + Vec2.Distance(pts[^2].XY, p));
+                }
             }
-            double Lt = cum[n];
-            string loc = "Deck longitudinal, top & bottom";
-            void Emit(double a, double b, string mark, double nominal) =>
-                sink.Add(new PlanBar(mark, size, loc, nominal, b - a, SubPolyline2D(pts, cum, a, b)));
-            if (Lt <= z.StockLength + 1e-6)
+            if (pts.Count < 2 || cum[^1] < Ft(2)) { Interlocked.Increment(ref bad); return; }
+            var P = pts.ToArray(); var C = cum.ToArray();
+            double Lt = C[^1];
+            void Emit(double a, double b, string mark, double nominal) => sink.Add(new PlanBar(mark, size, loc, nominal, b - a, SubPolyline2D(P, C, a, b)));
+            if (Lt <= z0.StockLength + 1e-6)
             {
-                Emit(0, Lt, Math.Abs(Lt - z.StockLength) <= In(1) ? z.Mark : closure, Math.Abs(Lt - z.StockLength) <= In(1) ? z.StockLength : 0);
+                bool stock = Math.Abs(Lt - z0.StockLength) <= In(1);
+                Emit(0, Lt, stock ? z0.Mark : closure, stock ? z0.StockLength : 0);
                 return;
             }
-            int np = (int)Math.Ceiling((Lt - z.Lap) / (z.StockLength - z.Lap) - 1e-9);
-            for (int q = 0; q < np; q++)
+            int npc = (int)Math.Ceiling((Lt - z0.Lap) / (z0.StockLength - z0.Lap) - 1e-9);
+            for (int q = 0; q < npc; q++)
             {
-                bool lastP = q == np - 1;
-                double a = q * (z.StockLength - z.Lap);
-                if (!lastP) { Emit(a, a + z.StockLength, z.Mark, z.StockLength); continue; }
-                if (z.LastIsStock) Emit(Lt - z.StockLength, Lt, z.Mark, z.StockLength);
+                double a = q * (z0.StockLength - z0.Lap);
+                if (q < npc - 1) { Emit(a, a + z0.StockLength, z0.Mark, z0.StockLength); continue; }
+                if (z0.LastIsStock) Emit(Lt - z0.StockLength, Lt, z0.Mark, z0.StockLength);
                 else Emit(a, Lt, closure, 0);
             }
         });
         foreach (var b in sink) bag.Add(b);
-        if (bad > 0) Warn($"Deck reinforcing, {zn}: {bad} of {lines} lines are shorter than 2 ft or outside the deck (check the station range) - not placed.");
+        if (sink.Count > 0)
+            lock (_m.Notes)
+                _m.Notes.Add($"  {rn}: {tracks.Count} bar lines, {sink.Count} bars, {sink.Sum(b => b.Length) / 0.3048:N0} ft ({sink.Sum(b => b.Length * b.Size.MassPerLength) * 2.2046226218:N0} lb), zones {string.Join("/", run.Select(z => z.Positions != null ? z.Positions.Count : z.Spaces))}");
+        if (bad > 0) Warn($"Deck reinforcing, {rn}: {bad} of {tracks.Count} bar lines are shorter than 2 ft or outside the deck (check the station range) - not placed.");
     }
 
     private static Vec3[] SubPolyline2D(Vec3[] pts, double[] cum, double a, double b)
@@ -379,8 +461,22 @@ public sealed partial class ConcreteGenerator
         var notes = new List<string>();
         double planTotal = 0, modelPlaced = 0, modelSched = 0;
         var sched = new List<BarMark>();
+        foreach (var fam in plan.Families)
+        {
+            var rows = plan.PlanBarList.Where(l => l.Mark.StartsWith(fam)).ToList();
+            var placed = marks.Where(m => m.Mark.StartsWith(fam)).ToList();
+            if (rows.Count == 0 || placed.Count == 0) continue;
+            double pw = rows.Sum(l => l.WeightLb), mw = placed.Sum(m => m.TotalMass) * Lb;
+            int pc = rows.Sum(l => l.Count), mc = placed.Sum(m => m.Count);
+            planTotal += pw; modelPlaced += mw;
+            notes.Add($"family {fam}: model {mc} bars ({string.Join(", ", placed.OrderBy(m => m.Mark).Select(m => $"{m.Mark} x{m.Count}"))}) = {mw:N0} lb; plan {pc} bars ({string.Join(", ", rows.Select(l => $"{l.Mark} x{l.Count}"))}) = {pw:N0} lb ({(pw > 0 ? (mw / pw - 1) * 100 : 0):+0.0;-0.0}%)");
+            if (pw > 0 && Math.Abs(mw / pw - 1) > plan.WeightTolerance)
+                Warn($"Deck reinforcing vs plan bar list, mark family {fam}: model {mc} bars / {mw:N0} lb, plan {pc} bars / {pw:N0} lb ({(mw / pw - 1) * 100:+0.0;-0.0}%) - not adjusted.");
+        }
+        bool InFamily(string mark) => plan.Families.Any(f => mark.StartsWith(f));
         foreach (var line in plan.PlanBarList)
         {
+            if (InFamily(line.Mark)) continue;
             planTotal += line.WeightLb;
             if (byMark.TryGetValue(line.Mark, out var m))
             {
@@ -411,7 +507,7 @@ public sealed partial class ConcreteGenerator
             });
             notes.Add($"{line.Mark}: not placed in 3D - schedule only, {line.Count} x {(line.Varies ? "VARIES" : _u.FormatLength(line.Length, LengthKind.Short))} = {ww:N0} lb");
         }
-        foreach (var m in marks.Where(m => plan.PlanBarList.All(l => l.Mark != m.Mark)))
+        foreach (var m in marks.Where(m => !InFamily(m.Mark) && plan.PlanBarList.All(l => l.Mark != m.Mark)))
             Warn($"Deck reinforcing: mark {m.Mark} ({m.Count} bars, {m.TotalMass * Lb:N0} lb) is placed but is not in the plan bar list.");
         marks.AddRange(sched);
         lock (_m.Notes)
