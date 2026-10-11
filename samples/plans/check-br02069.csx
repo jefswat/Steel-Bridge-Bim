@@ -5,6 +5,7 @@
 //   top of roadway at the working points and at begin / end bridge (p1, p3);
 //   bridge seats / pedestal tops (p3, p5, p10, seat-elevations.csv): model bearing seat (bottom of the bearing) and the as-designed
 //   pedestal (beam step) top; future pedestals are not modeled (GAP);
+//   pedestal sizes (p5/p6, p10/p12); beam shape MN 30MH and debonding A/B/C (p16);
 //   span 99.25 (p1, p15), beam length 100.50 (p16), begin / end bridge stations (p1), deck area 4220 SF (SOQ p2, nearest SF).
 // Prints a pass / fail table and a summary line. Horizontal datum not stated (U1): X/Y are the plan's local grid.
 using System.IO;
@@ -78,7 +79,7 @@ foreach (var r in Csv("working-points.csv"))
     {
         int g = GirderAt(off), j = SupportOf(sta);
         var bs = ps.BearingSeats.First(s => s.Support == b.Supports[j].Name && s.Girder == g);
-        Row("Bridge seat (W.P.)", $"{pt} G{g + 1} {b.Supports[j].Name}", seat, bs.SeatElevation / ft, "model seat = bottom of bearing" + (j == 1 ? "; GAP one bearing height (3 1/4\") per bridge, N plan L = 6 1/2\"" : ""));
+        Row("Bridge seat (W.P.)", $"{pt} G{g + 1} {b.Supports[j].Name}", seat, bs.SeatElevation / ft, "model seat = bottom of bearing" + (j == 1 ? "; GAP one pad thickness (3 1/4\") for both beam ends, N plan L = 6 1/2\"" : ""));
     }
 }
 
@@ -99,9 +100,12 @@ foreach (var r in Csv("seat-elevations.csv"))
     var unit = sub.Units.First(u => u.Name == sname);
     var ped = unit.Pedestals.FirstOrDefault(p => p.Girder == g);
     Row("Pedestal tops", $"{side} ped {r[1]} G{g + 1} as-designed step top", plan, ped?.SeatZ / ft, "pedestal solid (plan input)");
+    // Pedestal size (S Type A p5/p6: 4'-8" along the abutment; N Type C p10/p12: 3'-6"; both 2'-4" along the beam = 1'-0" behind + 1'-4" ahead of CL brg)
+    Row("Pedestal size", $"{side} G{g + 1} along beam (ft)", 28.0 / 12, ped?.WidthN / ft, side == "S" ? "p6 Type A 2'-4\"" : "p12 Type C 2'-4\"");
+    Row("Pedestal size", $"{side} G{g + 1} along abutment (ft)", side == "S" ? 56.0 / 12 : 42.0 / 12, ped?.LengthS / ft, side == "S" ? "p5 4'-8\"" : "p10 3'-6\"");
     var bs = ps.BearingSeats.First(s => s.Support == sname && s.Girder == g);
     Row("Bearing seats", $"{side} G{g + 1} off {off:+0.00;-0.00} model seat", plan, bs.SeatElevation / ft,
-        j == 1 ? "GAP: bearing height 3 1/4\" for both ends (N plan 6 1/2\")" : "PG - 2%|off| - 9 - 4 1/4 - 30 - 3 1/4\"");
+        j == 1 ? "GAP: one pad thickness 3 1/4\" for both beam ends (N plan L 6 1/2\")" : "PG - 2%|off| - 9 - 4 1/4 - 30 - 3 1/4\"");
 }
 
 // ---------------------------------------------------------------- span, beam, deck
@@ -118,6 +122,22 @@ foreach (var beam in ps.Beams)
     Row("Layout", "Deck right edge offset", 17.50, st.Max(s => s.Offset) / ft);
     double area = fr.Deck.Area / (ft * ft);
     Row("Layout", "Deck area (SF, SOQ nearest SF)", 4220, Math.Round(area), $"model {area:F1} SF = 41'-0\" x 102'-11\"", 0.5, "F1");
+}
+// one value of a group in ft (null if empty; a mixed group gives a value off by the spread -> FAIL)
+double? Same(IEnumerable<double> v) { var l = v.ToList(); if (l.Count == 0) return null; double lo = l.Min(), hi = l.Max(); return (hi - lo < 1e-9 ? lo : lo - (hi - lo)) / ft; }
+// Beam shape and debonding (p16): MnDOT 30MH from the standard catalog; A 4 @ 9'-0", B 6 @ 13'-0", C 4 @ 17'-0" each end.
+foreach (var beam in ps.Beams)
+{
+    Row("Beam", $"{beam.Mark} shape {beam.Shape.Key} (1 = MN 30MH)", 1, beam.Shape.Key == "MN 30MH" ? 1 : 0, "StandardBeamCatalog", 0, "F0");
+    Row("Beam", $"{beam.Mark} strands", 44, beam.Strands.Count, "p16", 0, "F0");
+    foreach (var (sym, n, len) in new[] { ("A", 4, 9.0), ("B", 6, 13.0), ("C", 4, 17.0) })
+    {
+        var grp = beam.Strands.Where(x => x.DebondSymbol == sym).ToList();
+        Row("Debonding", $"{beam.Mark} {sym} count", n, grp.Count, "p16", 0, "F0");
+        Row("Debonding", $"{beam.Mark} {sym} length start (ft)", len, Same(grp.Select(x => x.DebondStart)), $"p16 {len}'-0\"");
+        Row("Debonding", $"{beam.Mark} {sym} length end (ft)", len, Same(grp.Select(x => x.DebondEnd)), $"p16 {len}'-0\"");
+    }
+    Row("Debonding", $"{beam.Mark} debonded total", 14, beam.Strands.Count(x => x.Debonded), "p16", 0, "F0");
 }
 // Stool at CL brg (p3: 4 1/4") from the model: deck bottom - beam top at the bearing.
 foreach (var beam in ps.Beams.Where(x => x.Girder == 0 || x.Girder == 6))
