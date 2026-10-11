@@ -18674,7 +18674,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -18682,7 +18683,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -18695,7 +18697,8 @@
               "3": "2",
               "4": "2"
             },
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -18706,7 +18709,8 @@
               "1": "7",
               "2": "7"
             },
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -18717,7 +18721,8 @@
               "3": "7",
               "4": "7"
             },
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -18725,7 +18730,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -18733,7 +18739,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -18745,7 +18752,8 @@
               "1": "2",
               "2": "2"
             },
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -18758,7 +18766,8 @@
               2,
               3,
               4
-            ]
+            ],
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -18768,7 +18777,8 @@
             "BayStyles": {},
             "Bays": [
               1
-            ]
+            ],
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -18780,7 +18790,8 @@
               0,
               2,
               4
-            ]
+            ],
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -18792,7 +18803,8 @@
               0,
               1,
               3
-            ]
+            ],
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -18802,7 +18814,8 @@
             "BayStyles": {},
             "Bays": [
               4
-            ]
+            ],
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -18812,7 +18825,8 @@
             "BayStyles": {
               "3": "9"
             },
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -18824,7 +18838,8 @@
               "3": "2",
               "4": "2"
             },
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -18832,7 +18847,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -18840,7 +18856,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -18848,7 +18865,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -18856,7 +18874,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -18864,7 +18883,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -18872,7 +18892,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -18880,7 +18901,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -18892,7 +18914,8 @@
               "1": "2",
               "2": "2"
             },
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -18905,7 +18928,8 @@
               2,
               3,
               4
-            ]
+            ],
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -18915,7 +18939,8 @@
             "BayStyles": {},
             "Bays": [
               1
-            ]
+            ],
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -18927,7 +18952,8 @@
               0,
               2,
               4
-            ]
+            ],
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -18939,7 +18965,8 @@
               0,
               1,
               3
-            ]
+            ],
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -18949,7 +18976,8 @@
             "BayStyles": {},
             "Bays": [
               4
-            ]
+            ],
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -18959,7 +18987,8 @@
             "BayStyles": {
               "3": "9"
             },
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -18971,7 +19000,8 @@
               "3": "2",
               "4": "2"
             },
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -18979,7 +19009,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -18987,7 +19018,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -18995,7 +19027,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -19003,7 +19036,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -19011,7 +19045,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -19019,7 +19054,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -19032,7 +19068,8 @@
               "2": "2",
               "3": "2"
             },
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -19045,7 +19082,8 @@
               2,
               3,
               4
-            ]
+            ],
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -19057,7 +19095,8 @@
             },
             "Bays": [
               1
-            ]
+            ],
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -19069,7 +19108,8 @@
               0,
               2,
               4
-            ]
+            ],
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -19081,7 +19121,8 @@
               0,
               1,
               3
-            ]
+            ],
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -19091,7 +19132,8 @@
             "BayStyles": {},
             "Bays": [
               4
-            ]
+            ],
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -19101,7 +19143,8 @@
             "BayStyles": {
               "3": "9"
             },
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -19114,7 +19157,8 @@
               "3": "2",
               "4": "2"
             },
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -19122,7 +19166,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -19130,7 +19175,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -19138,7 +19184,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -19146,7 +19193,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -19154,7 +19202,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -19162,7 +19211,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -19170,7 +19220,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -19178,7 +19229,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -19186,7 +19238,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -19194,7 +19247,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -19202,7 +19256,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -19210,7 +19265,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -19218,7 +19274,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -19226,7 +19283,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -19234,7 +19292,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -19242,7 +19301,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           }
         ],
         "Links": []
@@ -47646,7 +47706,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 10,
@@ -47654,7 +47715,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 10,
@@ -47662,7 +47724,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 10,
@@ -47670,7 +47733,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 10,
@@ -47678,7 +47742,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 10,
@@ -47686,7 +47751,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 10,
@@ -47694,7 +47760,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 10,
@@ -47702,7 +47769,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 10,
@@ -47710,7 +47778,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 10,
@@ -47718,7 +47787,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 10,
@@ -47726,7 +47796,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 10,
@@ -47734,7 +47805,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 10,
@@ -47742,7 +47814,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 10,
@@ -47750,7 +47823,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 10,
@@ -47758,7 +47832,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 10,
@@ -47766,7 +47841,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 10,
@@ -47774,7 +47850,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 10,
@@ -47782,7 +47859,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 10,
@@ -47790,7 +47868,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 10,
@@ -47798,7 +47877,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 10,
@@ -47806,7 +47886,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 10,
@@ -47814,7 +47895,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 10,
@@ -47822,7 +47904,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 10,
@@ -47830,7 +47913,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 10,
@@ -47838,7 +47922,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 10,
@@ -47852,7 +47937,8 @@
               "5": "4",
               "6": "4"
             },
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 10,
@@ -47872,7 +47958,8 @@
               7,
               8,
               9
-            ]
+            ],
+            "Unresolved": []
           },
           {
             "Girder": 10,
@@ -47887,13 +47974,13 @@
             },
             "Bays": [
               0,
-              1,
               5,
               6,
               7,
               8,
               9
-            ]
+            ],
+            "Unresolved": []
           },
           {
             "Girder": 10,
@@ -47906,7 +47993,8 @@
               "8": "4",
               "9": "4"
             },
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 10,
@@ -47914,7 +48002,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 10,
@@ -47922,7 +48011,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 10,
@@ -47930,7 +48020,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 10,
@@ -47938,7 +48029,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 10,
@@ -47954,7 +48046,8 @@
               7,
               8,
               9
-            ]
+            ],
+            "Unresolved": []
           },
           {
             "Girder": 10,
@@ -47962,7 +48055,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 10,
@@ -47970,7 +48064,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 10,
@@ -47978,7 +48073,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 10,
@@ -47986,7 +48082,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 10,
@@ -48003,7 +48100,8 @@
               7,
               8,
               9
-            ]
+            ],
+            "Unresolved": []
           },
           {
             "Girder": 10,
@@ -48011,7 +48109,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 10,
@@ -48019,7 +48118,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 10,
@@ -48027,7 +48127,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 10,
@@ -48035,7 +48136,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 10,
@@ -48043,7 +48145,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 10,
@@ -48051,7 +48154,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -48069,7 +48173,8 @@
               7,
               8,
               9
-            ]
+            ],
+            "Unresolved": []
           },
           {
             "Girder": 2,
@@ -48080,7 +48185,8 @@
             "Bays": [
               0,
               2
-            ]
+            ],
+            "Unresolved": []
           },
           {
             "Girder": 5,
@@ -48093,7 +48199,8 @@
               7,
               8,
               9
-            ]
+            ],
+            "Unresolved": []
           },
           {
             "Girder": 6,
@@ -48106,7 +48213,8 @@
               1,
               2,
               6
-            ]
+            ],
+            "Unresolved": []
           },
           {
             "Girder": 7,
@@ -48117,7 +48225,8 @@
             "Bays": [
               7,
               9
-            ]
+            ],
+            "Unresolved": []
           },
           {
             "Girder": 8,
@@ -48135,7 +48244,8 @@
               5,
               6,
               8
-            ]
+            ],
+            "Unresolved": []
           },
           {
             "Girder": 9,
@@ -48145,7 +48255,8 @@
             "BayStyles": {},
             "Bays": [
               9
-            ]
+            ],
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -48160,7 +48271,8 @@
               7,
               8,
               9
-            ]
+            ],
+            "Unresolved": []
           },
           {
             "Girder": 5,
@@ -48171,7 +48283,8 @@
             "Bays": [
               1,
               5
-            ]
+            ],
+            "Unresolved": []
           },
           {
             "Girder": 6,
@@ -48185,7 +48298,8 @@
               6,
               8,
               9
-            ]
+            ],
+            "Unresolved": []
           },
           {
             "Girder": 7,
@@ -48196,7 +48310,8 @@
             "Bays": [
               7,
               9
-            ]
+            ],
+            "Unresolved": []
           },
           {
             "Girder": 8,
@@ -48210,7 +48325,8 @@
               5,
               6,
               8
-            ]
+            ],
+            "Unresolved": []
           },
           {
             "Girder": 9,
@@ -48220,7 +48336,8 @@
             "BayStyles": {},
             "Bays": [
               9
-            ]
+            ],
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -48234,7 +48351,8 @@
               7,
               8,
               9
-            ]
+            ],
+            "Unresolved": []
           },
           {
             "Girder": 5,
@@ -48244,7 +48362,8 @@
             "BayStyles": {},
             "Bays": [
               5
-            ]
+            ],
+            "Unresolved": []
           },
           {
             "Girder": 6,
@@ -48257,7 +48376,8 @@
               6,
               8,
               9
-            ]
+            ],
+            "Unresolved": []
           },
           {
             "Girder": 7,
@@ -48267,7 +48387,8 @@
             "BayStyles": {},
             "Bays": [
               7
-            ]
+            ],
+            "Unresolved": []
           },
           {
             "Girder": 8,
@@ -48280,7 +48401,8 @@
               5,
               6,
               8
-            ]
+            ],
+            "Unresolved": []
           },
           {
             "Girder": 9,
@@ -48290,7 +48412,8 @@
             "BayStyles": {},
             "Bays": [
               9
-            ]
+            ],
+            "Unresolved": []
           }
         ],
         "Links": [
@@ -71544,7 +71667,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 9,
@@ -71552,7 +71676,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 9,
@@ -71560,7 +71685,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 9,
@@ -71568,7 +71694,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 9,
@@ -71576,15 +71703,17 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
-          },
-          {
-            "Girder": 9,
-            "Distance": 41.36548750000001,
-            "NormalToGirder": false,
-            "Style": "",
-            "BayStyles": {},
-            "Bays": null
+            "Bays": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8
+            ],
+            "Unresolved": []
           },
           {
             "Girder": 9,
@@ -71592,7 +71721,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 9,
@@ -71600,7 +71730,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 9,
@@ -71608,7 +71739,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 9,
@@ -71616,7 +71748,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 9,
@@ -71624,7 +71757,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 9,
@@ -71632,7 +71766,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 9,
@@ -71640,7 +71775,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 9,
@@ -71648,7 +71784,11 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": [
+              7,
+              8
+            ],
+            "Unresolved": []
           },
           {
             "Girder": 9,
@@ -71656,7 +71796,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 9,
@@ -71664,7 +71805,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 9,
@@ -71672,7 +71814,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 9,
@@ -71680,7 +71823,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 9,
@@ -71688,7 +71832,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 9,
@@ -71696,7 +71841,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 9,
@@ -71706,7 +71852,8 @@
             "BayStyles": {
               "0": "6"
             },
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 9,
@@ -71716,7 +71863,8 @@
             "BayStyles": {
               "0": "6"
             },
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 9,
@@ -71726,7 +71874,8 @@
             "BayStyles": {
               "0": "6"
             },
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 9,
@@ -71736,7 +71885,8 @@
             "BayStyles": {
               "0": "6"
             },
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 9,
@@ -71746,7 +71896,8 @@
             "BayStyles": {
               "0": "6"
             },
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 9,
@@ -71756,7 +71907,8 @@
             "BayStyles": {
               "0": "6"
             },
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 9,
@@ -71766,7 +71918,8 @@
             "BayStyles": {
               "0": "6"
             },
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 9,
@@ -71776,7 +71929,8 @@
             "BayStyles": {
               "0": "6"
             },
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 9,
@@ -71786,7 +71940,8 @@
             "BayStyles": {
               "0": "6"
             },
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 9,
@@ -71796,7 +71951,8 @@
             "BayStyles": {
               "0": "6"
             },
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 9,
@@ -71806,7 +71962,8 @@
             "BayStyles": {
               "0": "6"
             },
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 9,
@@ -71816,7 +71973,8 @@
             "BayStyles": {
               "0": "6"
             },
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 9,
@@ -71826,7 +71984,8 @@
             "BayStyles": {
               "0": "6"
             },
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 9,
@@ -71845,7 +72004,8 @@
               "8": "8",
               "9": "8"
             },
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 9,
@@ -71853,7 +72013,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 9,
@@ -71861,7 +72022,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -71869,7 +72031,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -71877,7 +72040,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -71885,7 +72049,73 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
+          },
+          {
+            "Girder": 0,
+            "Distance": 57.296856458183576,
+            "NormalToGirder": false,
+            "Style": "",
+            "BayStyles": {},
+            "Bays": [
+              0,
+              1,
+              2,
+              3,
+              6,
+              7,
+              8
+            ],
+            "Unresolved": [
+              "Pier 12WB, PDF 115: the J string \u00272 SPA @ 22\u0027-7 1/8 = 45\u0027-2 1/4\u0027 to J\u0027s bearing puts a line at J - 22\u0027-7 1/8, but the line drawn there is this straight radial (21\u0027-11 3/16 along A, 5\u0027-0 along E), which crosses J at J - 20.32 ft; its G-H..I-J frames are modeled on the drawn line (the I-J frame is partly under the 6\u0027-11 3/8 dimension). The line is drawn through F\u0027s bearing; in the model it passes 0.067 ft from it (F\u0027s bearing radial crosses A at \u002B21.999)"
+            ]
+          },
+          {
+            "Girder": 8,
+            "Distance": 50.413816458873185,
+            "NormalToGirder": false,
+            "Style": "",
+            "BayStyles": {},
+            "Bays": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7
+            ],
+            "Unresolved": [
+              "Pier 12WB, PDF 115: placed by the dimension 6\u0027-11 3/8 along I from I\u0027s CL bearing; the frame linework is drawn about 2 ft further ahead (scaled: crosses A about 45.5 ft past A\u0027s bearing vs 43.44 ft from the dimension)"
+            ]
+          },
+          {
+            "Girder": 0,
+            "Distance": 117.27907521607393,
+            "NormalToGirder": false,
+            "Style": "",
+            "BayStyles": {},
+            "Bays": [
+              0,
+              2,
+              3
+            ],
+            "Unresolved": [
+              "Pier 13WB, PDF 117: line drawn through G\u0027s CL bearing, but in the model the radial at 16\u0027-1 15/16 along A (= 8\u0027-0 along E, both plan dims) passes 0.15 ft from G\u0027s bearing (G\u0027s bearing radial crosses A at \u002B16.01): check G\u0027s 13WB bearing / girder geometry (no frame in bays E-G on this line). Also the 13WB pier-line spacings A-C 6\u0027-3 7/16, C-D 6\u0027-9 1/16 vs model 6.345 / 6.707 ft (A-D 13.04 = model 13.05): girder C\u0027s 13WB bearing is about 0.05 ft off along the pier"
+            ]
+          },
+          {
+            "Girder": 0,
+            "Distance": 121.21290021607395,
+            "NormalToGirder": false,
+            "Style": "",
+            "BayStyles": {},
+            "Bays": [
+              0
+            ],
+            "Unresolved": []
           }
         ],
         "Links": []
@@ -84564,7 +84794,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -84572,7 +84803,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -84584,7 +84816,8 @@
               "1": "5",
               "2": "5"
             },
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -84592,7 +84825,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -84600,7 +84834,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -84608,7 +84843,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -84616,7 +84852,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -84624,7 +84861,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -84632,7 +84870,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -84640,7 +84879,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -84648,7 +84888,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -84656,7 +84897,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -84664,7 +84906,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -84672,7 +84915,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -84680,7 +84924,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -84688,7 +84933,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -84696,7 +84942,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -84704,7 +84951,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -84712,7 +84960,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -84720,7 +84969,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -84728,7 +84978,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -84736,7 +84987,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -84744,7 +84996,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -84752,7 +85005,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -84760,7 +85014,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -84768,7 +85023,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -84776,7 +85032,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -84784,7 +85041,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -84792,7 +85050,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -84800,7 +85059,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -84808,7 +85068,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -84816,7 +85077,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -84824,7 +85086,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -84832,7 +85095,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -84840,7 +85104,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -84848,7 +85113,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -84856,7 +85122,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           }
         ],
         "Links": []
@@ -95187,7 +95454,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -95195,7 +95463,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -95203,7 +95472,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -95211,7 +95481,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -95219,7 +95490,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -95227,7 +95499,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -95235,7 +95508,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -95243,7 +95517,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -95251,7 +95526,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -95259,7 +95535,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -95267,7 +95544,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -95275,7 +95553,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -95283,7 +95562,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -95291,7 +95571,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -95299,7 +95580,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -95307,7 +95589,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -95315,7 +95598,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -95323,7 +95607,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -95331,7 +95616,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -95339,7 +95625,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -95347,7 +95634,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -95355,7 +95643,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -95363,7 +95652,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -95371,7 +95661,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -95379,7 +95670,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -95387,7 +95679,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -95395,7 +95688,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -95403,7 +95697,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -95411,7 +95706,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -95419,7 +95715,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -95427,7 +95724,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -95435,7 +95733,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -95443,7 +95742,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -95451,7 +95751,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -95459,7 +95760,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           }
         ],
         "Links": []
@@ -108185,7 +108487,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -108193,7 +108496,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -108201,7 +108505,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -108209,7 +108514,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -108217,7 +108523,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -108225,7 +108532,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -108233,7 +108541,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -108241,7 +108550,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -108249,7 +108559,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -108257,7 +108568,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -108265,7 +108577,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -108273,7 +108586,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -108281,7 +108595,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -108289,7 +108604,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -108297,7 +108613,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -108305,7 +108622,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -108313,7 +108631,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -108321,7 +108640,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -108329,7 +108649,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -108337,7 +108658,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -108345,7 +108667,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -108353,7 +108676,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -108361,7 +108685,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -108369,7 +108694,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -108377,7 +108703,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -108385,7 +108712,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -108393,7 +108721,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -108401,7 +108730,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -108409,7 +108739,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -108417,7 +108748,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -108425,7 +108757,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -108433,7 +108766,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -108441,7 +108775,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -108449,7 +108784,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -108457,7 +108793,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -108465,7 +108802,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -108473,7 +108811,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -108481,7 +108820,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -108489,7 +108829,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -108497,7 +108838,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -108505,7 +108847,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -108513,7 +108856,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -108521,7 +108865,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -108529,7 +108874,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -108537,7 +108883,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -108545,7 +108892,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -108553,7 +108901,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -108561,7 +108910,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -108569,7 +108919,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           }
         ],
         "Links": []
@@ -121515,7 +121866,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -121523,7 +121875,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -121531,7 +121884,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -121539,7 +121893,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -121547,7 +121902,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -121555,7 +121911,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -121563,7 +121920,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -121571,7 +121929,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -121579,7 +121938,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -121587,7 +121947,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -121595,7 +121956,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -121603,7 +121965,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -121611,7 +121974,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -121619,7 +121983,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -121627,7 +121992,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -121639,23 +122005,25 @@
               "1": "2",
               "2": "2"
             },
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
-            "Girder": 0,
-            "Distance": 113.42611289253018,
+            "Girder": 1,
+            "Distance": 112.89297551271108,
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {
               "0": "3",
               "1": "3",
-              "2": "3"
+              "2": "2"
             },
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
-            "Girder": 0,
-            "Distance": 117.88487122586352,
+            "Girder": 2,
+            "Distance": 116.81859646307988,
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {
@@ -121663,11 +122031,12 @@
               "1": "3",
               "2": "3"
             },
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
-            "Girder": 0,
-            "Distance": 122.34362955919686,
+            "Girder": 3,
+            "Distance": 120.74421741738257,
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {
@@ -121675,7 +122044,8 @@
               "1": "2",
               "2": "2"
             },
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -121683,7 +122053,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -121691,7 +122062,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -121699,7 +122071,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -121707,7 +122080,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -121715,7 +122089,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -121723,7 +122098,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -121731,7 +122107,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -121739,7 +122116,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -121747,7 +122125,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -121759,7 +122138,8 @@
               "1": "3",
               "2": "2"
             },
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 1,
@@ -121771,7 +122151,8 @@
             },
             "Bays": [
               1
-            ]
+            ],
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -121785,7 +122166,8 @@
             "Bays": [
               0,
               2
-            ]
+            ],
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -121797,7 +122179,8 @@
               "1": "3",
               "2": "3"
             },
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -121807,7 +122190,8 @@
             "BayStyles": {
               "2": "2"
             },
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -121815,7 +122199,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -121823,7 +122208,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -121831,7 +122217,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -121839,7 +122226,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -121847,7 +122235,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -121855,7 +122244,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -121863,7 +122253,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -121871,7 +122262,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -121879,7 +122271,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -121887,7 +122280,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -121895,7 +122289,8 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {},
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           },
           {
             "Girder": 0,
@@ -121907,7 +122302,8 @@
               "1": "2",
               "2": "2"
             },
-            "Bays": null
+            "Bays": null,
+            "Unresolved": []
           }
         ],
         "Links": []
