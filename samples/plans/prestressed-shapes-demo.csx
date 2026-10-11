@@ -48,7 +48,7 @@ foreach (var s in StandardBeamCatalog.StateShapes)
 const string AlName = "PS demo";
 Doc.Project.Alignments.RemoveAll(a => a.Name == AlName);
 var al = Doc.AddAlignment(AlName, Ft(1000), new[] { new PiRow(0, 0), new PiRow(Ft(2000), 0) });
-al.Profile = new VerticalProfile { Vpis = { new Vpi(al.StartStation, Ft(100)), new Vpi(al.EndStation, Ft(100) + 0.01 * (al.EndStation - al.StartStation)) } };
+al.Profile = new VerticalProfile { Vpis = { new Vpi(al.StartStation, Ft(100)), new Vpi(al.EndStation, Ft(100)) } }; // level: layout lengths = plan lengths
 
 BridgeDefinition NewBridge(string name, params (string name, SupportType type, double station)[] sups)
 {

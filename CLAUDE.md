@@ -165,8 +165,20 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
     FramingGenerator treats the beam top as "top of web" (flange t = 0, web = D), forces chorded, skips cross frames,
     stiffeners and splices; `RegenerationCache` runs PrestressedGenerator instead of steel (`BridgeModel.Prestressed`).
     Views: `PrestressedViews` + branch in `SectionViews` / `SheetSet`. IFC: IfcBeam + IfcTendon (validated 0 issues).
+    State standards (all inputs OPTIONAL, Tx path unchanged): `StandardBeamCatalog` (key "IA BTD", "MN 30MH"; Tx listed too)
+    with `SectionProfile` = exact outline from the sharp corners + true radius fillets / chamfers (`TxGirderShape.Profile`,
+    properties integrated from it, printed values in `PrintedArea/Yb/Ix`, `PropertyCheck`); `Beam("BTD55"|"BTD60"|"BTD105")`
+    = standard beam definitions (Woodbury p.27-30). `PrestressedBeamDefinition`: `Standard`, `Designation`,
+    `StandardBearingLength`/`StandardOverallLength` (beam built at the STANDARD length along the sloped beam, CHECK warning vs
+    layout, never stretched), `Placement` (NO default: null = UNRESOLVED, drawn centred), `SpanBeams` (per span / beam line,
+    last match wins; `For(span, girder)`), `HarpedColumns` + `HarpedTopBelowTopAtEnd` (`StrandPatterns.Resolve`),
+    `HoldDownFromMidspan`, `Unresolved` list, `StrandPoint.DebondStart/End/Symbol` (`StrandPatterns.Debond`). Beams with a
+    profile carry `PrestressedBeam.Body` -> IFC IfcArbitraryClosedProfileDef over IfcIndexedPolyCurve (IfcArcIndex) extruded
+    and clipped by the end planes; debond sheathing = IfcTendonConduit (key `IfcKeys.PsSheath`) + Pset SBM_Debonding.
+    Demo: `samples/plans/prestressed-shapes-demo.csx`; tests `PrestressedStandardTests`.
   - `SBM.IO/PgSuper/` â€” `PgSuperReader` (.pgs BridgeDescription schema v6+ or ReportExportAgent export XML; strand key
-    bits per WBFL PsStrand; end distances normalized to CL-bearing-to-end) and `PgSuperImport.Apply` (onto an alignment).
+    bits per WBFL PsStrand; end distances normalized to CL-bearing-to-end; straight-strand `DebondInfo` Strand/Length1/Length2
+    -> StrandPoint debond lengths) and `PgSuperImport.Apply` (onto an alignment).
     The user's PGSuper/BridgeLink tooling lives in `Documents\PGSuper-master\copilot` (agent, MCP) â€” reuse its export.
   - `Checks/ElevationCheck.cs` â€” transparent elevation chains (`CalcStep` rows: profile via `VerticalProfile.Explain`,
     cross slope, slab, haunch, web, flange, sole plate, bearing stack) reconciled against framing + `BearingSeats`.
