@@ -1,0 +1,21 @@
+abutment,pedestal,beam,offset_ft,pedestal_size_along_abut_x_along_beam,top_elev_plan,top_elev_derived,derived_formula,source,tag
+S,1,(future),+33.00,4'-8" x 2'-6",923.52,923.52,"PG(248+34.75)=928.056 - 0.02*|off| - 46.5in/12",p5 / sh5 ELEVATION,TEXT
+S,2,(future),+27.00,4'-8" x 2'-6",923.64,923.64,same,p5 / sh5,TEXT
+S,3,(future),+21.00,4'-8" x 2'-6",923.76,923.76,same,p5 / sh5,TEXT
+S,4,B1 E fascia (W.P. E),+15.00,4'-8" x 2'-6",923.88,923.88,same; = p3 W.P. E bridge seat 923.88,p5 / sh5,TEXT
+S,5,B1,+9.00,4'-8" x 2'-6",924.00,924.00,same,p5 / sh5,TEXT
+S,6,B1,+3.00,4'-8" x 2'-6",924.12,924.12,same,p5 / sh5,TEXT
+S,7,B1,-3.00,4'-8" x 2'-6",924.12,924.12,same,p5 / sh5,TEXT
+S,8,B1,-9.00,4'-8" x 2'-6",924.00,924.00,same,p5 / sh5,TEXT
+S,9,B1,-15.00,4'-8" x 2'-6",923.88,923.88,same,p5 / sh5,TEXT
+S,10,B1 W fascia (W.P. A),-21.00,4'-8" x 2'-6",923.76,923.76,same; = p3 W.P. A bridge seat 923.76,p5 / sh5,TEXT
+N,1,(future),+33.00,3'-6" x 2'-6",923.31,923.31,"PG(249+34.00)=928.118 - 0.02*|off| - 49.75in/12",p10 / sh10 ELEVATION,TEXT
+N,2,(future),+27.00,3'-6" x 2'-6",923.43,923.43,same,p10 / sh10,TEXT
+N,3,(future),+21.00,3'-6" x 2'-6",923.55,923.55,same,p10 / sh10,TEXT
+N,4,B1 E fascia (W.P. F),+15.00,3'-6" x 2'-6",923.67,923.67,same; = p3 W.P. F bridge seat 923.67,p10 / sh10,TEXT
+N,5,B1,+9.00,3'-6" x 2'-6",923.79,923.79,same,p10 / sh10,TEXT
+N,6,B1,+3.00,3'-6" x 2'-6",923.91,923.91,same,p10 / sh10,TEXT
+N,7,B1,-3.00,3'-6" x 2'-6",923.91,923.91,same,p10 / sh10,TEXT
+N,8,B1,-9.00,3'-6" x 2'-6",923.79,923.79,same,p10 / sh10,TEXT
+N,9,B1,-15.00,3'-6" x 2'-6",923.67,923.67,same,p10 / sh10,TEXT
+N,10,B1 W fascia (W.P. B),-21.00,3'-6" x 2'-6",923.55,923.55,same; = p3 W.P. B bridge seat 923.55,p10 / sh10,TEXT

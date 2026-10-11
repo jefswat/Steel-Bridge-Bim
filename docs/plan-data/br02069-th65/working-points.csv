@@ -1,0 +1,13 @@
+point,description,station_SB65,offset_ft,x_easting,y_northing,top_of_roadway,top_rdwy_to_seat_ft,bridge_seat,check_xy_from_alignment,check_elev_from_profile,source,tag
+A,CL brg S abut x CL W fascia beam,248+34.75,-21.00,508170.642,153820.439,927.64,3.88,923.76,"dX 0.000 dY -0.001","927.636",p3 / sh3 WORKING POINT LAYOUT table,TEXT
+B,CL brg N abut x CL W fascia beam,249+34.00,-21.00,508171.928,153919.681,927.70,4.15,923.55,"0.000 0.000","927.698",p3 / sh3,TEXT
+C,CL brg S abut x working line (CL SB65),248+34.75,0.00,508191.640,153820.167,928.06,,,"0.000 -0.001","928.056",p3 / sh3,TEXT
+D,CL brg N abut x working line,249+34.00,0.00,508192.926,153919.409,928.12,,,"0.000 0.000","928.118",p3 / sh3,TEXT
+E,CL brg S abut x CL E fascia beam,248+34.75,15.00,508206.639,153819.973,927.76,3.88,923.88,"0.000 0.000","927.756",p3 / sh3,TEXT
+F,CL brg N abut x CL E fascia beam,249+34.00,15.00,508207.925,153919.215,927.82,4.15,923.67,"0.000 0.000","927.818",p3 / sh3,TEXT
+BEGIN,Begin bridge (end of slab S),248+32.92,0.00,,,928.05,,,,"928.052",p1 / sh1 GENERAL PLAN,TEXT
+END,End bridge (end of slab N),249+35.83,0.00,,,928.12,,,,"928.116",p1 / sh1,TEXT
+CP1,Control point SB65 248+97.047 = WB117B 46+66.313 (angle 89d28'33.0"),248+97.047,0.00,508192.447,153882.459,,,,"0.000 +0.001",,p1/p3/p34,TEXT
+CP2,SB65 248+67.045 = EB117 46+66.039 (angle 89d28'33.0"),248+67.045,0.00,508192.059,153852.460,,,,"0.000 0.000",,p1/p34,TEXT
+TIE20,Ret. Wall 20 tie-in to mask wall,248+31.50,,508167.141,153817.151,,,,,,p1 / sh1,TEXT
+TIE23,Ret. Wall 23 tie-in to mask wall,249+37.25,,508168.513,153923.059,,,,,,p1 / sh1,TEXT
