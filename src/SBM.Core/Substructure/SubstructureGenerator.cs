@@ -304,6 +304,11 @@ public sealed partial class SubstructureGenerator
         double tallest = 0;
         bool planPed = sd.PedestalSizeAlong > 0 && sd.PedestalSizeAcross > 0;
         if (sd.PedestalShared && !planPed) Warn($"{sl.Name}: PedestalShared needs the plan pedestal size (PedestalSizeAlong / PedestalSizeAcross); ignored.");
+        // Two rows (plan "BACK BRG." / "AHEAD BRG."): the ahead (+N of the CL pier) blocks may have their own across size, and the rows may abut on a printed line
+        bool rows = planPed && !sd.PedestalShared && (sd.PedestalSizeAcrossAhead > 0 || !double.IsNaN(sd.PedestalRowJoint));
+        if (!planPed && (sd.PedestalSizeAcrossAhead > 0 || !double.IsNaN(sd.PedestalRowJoint)))
+            Warn($"{sl.Name}: PedestalSizeAcrossAhead / PedestalRowJoint need the plan pedestal size (PedestalSizeAlong / PedestalSizeAcross); ignored.");
+        double AcrossOf(Seat x) => rows && sd.PedestalSizeAcrossAhead > 0 && x.N > unit.CapMidN ? sd.PedestalSizeAcrossAhead : sd.PedestalSizeAcross;
         var groups = new List<List<Seat>>();
         if (planPed && sd.PedestalShared)
         {
@@ -323,11 +328,19 @@ public sealed partial class SubstructureGenerator
                 sMid = grp.Average(q => (q.Footprint.Min(f => f.X) + q.Footprint.Max(f => f.X)) / 2);
                 nMid = grp.Average(q => (q.Footprint.Min(f => f.Y) + q.Footprint.Max(f => f.Y)) / 2);
                 ps0 = sMid - sd.PedestalSizeAlong / 2; ps1 = sMid + sd.PedestalSizeAlong / 2;
-                pn0 = nMid - sd.PedestalSizeAcross / 2; pn1 = nMid + sd.PedestalSizeAcross / 2;
+                double across = AcrossOf(grp[0]);
+                pn0 = nMid - across / 2; pn1 = nMid + across / 2;
+                if (rows && !double.IsNaN(sd.PedestalRowJoint))
+                {
+                    double nj = unit.CapMidN + sd.PedestalRowJoint;
+                    if (grp[0].N > unit.CapMidN) { pn0 = nj; pn1 = nj + across; } else { pn0 = nj - across; pn1 = nj; }
+                    nMid = (pn0 + pn1) / 2;
+                    if (pn0 < unit.CapN0 - 1e-6 || pn1 > unit.CapN1 + 1e-6) Warn($"{sl.Name}: plan pedestal {whoP} ({Sh(pn0 - unit.CapMidN)} .. {Sh(pn1 - unit.CapMidN)} from the CL pier) extends beyond the cap width.");
+                }
                 foreach (var q in grp)
                 {
                     double out0 = Math.Max(ps0 - q.Footprint.Min(f => f.X), Math.Max(q.Footprint.Max(f => f.X) - ps1, Math.Max(pn0 - q.Footprint.Min(f => f.Y), q.Footprint.Max(f => f.Y) - pn1)));
-                    if (out0 > In(0.125)) Warn($"{sl.Name}: bearing footprint at {whoP} extends {Sh(out0)} beyond the plan pedestal ({Sh(sd.PedestalSizeAlong)} x {Sh(sd.PedestalSizeAcross)}).");
+                    if (out0 > In(0.125)) Warn($"{sl.Name}: bearing footprint at {whoP} extends {Sh(out0)} beyond the plan pedestal ({Sh(sd.PedestalSizeAlong)} x {Sh(across)}).");
                 }
                 double zMax = grp.Max(q => q.Z), zMin = grp.Min(q => q.Z);
                 if (zMax - zMin > In(0.125))

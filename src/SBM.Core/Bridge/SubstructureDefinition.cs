@@ -326,6 +326,12 @@ public sealed class SubstructureDefinition
     /// <summary>One pedestal block carries every seat of a girder line (back and ahead bearing of an expansion / continuity pier: 4 anchor bolts in one 5'-0 x 6'-0 block, the
     /// pedestal bar list counts 6 bars per BLOCK). The block top follows the highest seat; seats that differ are reported. Needs <see cref="PedestalSizeAlong"/> / Across.</summary>
     public bool PedestalShared { get; set; }
+    /// <summary>Two pedestal rows of different widths (a shared pier's "BACK BRG." / "AHEAD BRG." rows, e.g. Pier 11WB 3'-11 / 3'-9): across size of the blocks of the
+    /// seats on the ahead (+N) side of the CL pier; <see cref="PedestalSizeAcross"/> is then the back (-N) row's. 0 = every block uses PedestalSizeAcross.</summary>
+    public double PedestalSizeAcrossAhead { get; set; }
+    /// <summary>The two rows abut on the line N = CL pier + this value (+ toward ahead; Pier 11WB: 1"): back blocks span [joint - across, joint], ahead blocks
+    /// [joint, joint + across ahead], instead of being centred on their seats. NaN = centred on the seats. Needs the plan size, not with <see cref="PedestalShared"/>.</summary>
+    public double PedestalRowJoint { get; set; } = double.NaN;
 
     // ---------------- Columns (piers)
     public int ColumnCount { get; set; } = 3;

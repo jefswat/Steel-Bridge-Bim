@@ -637,7 +637,7 @@ public sealed partial class SubstructureGenerator
                     var (hs, hl) = PlanHoop(size, g.Dims[0], g.Dims[1], g.Dims[2], g.Dims[3], g.Pin, g.Length);
                     // With the plan note's girders (PlanBarGroup.Girders): the hoops go round those pedestal blocks (plan: hoop 2" inside the block faces; the pier
                     // elevations show it as a dot inside the pedestal), g.Count / blocks per block, at mid-height of the block (elevation not dimensioned).
-                    var sel = PedestalBlocksOf(unit, g.Girders);
+                    var sel = g.Girders == "" && g.PedestalRow is "BACK" or "AHEAD" ? PedestalBlocksOfRow(unit, g.PedestalRow) : PedestalBlocksOf(unit, g.Girders);
                     if (sel.Count > 0 && g.Count % sel.Count == 0)
                     {
                         int perB = g.Count / sel.Count;
@@ -671,7 +671,11 @@ public sealed partial class SubstructureGenerator
                 continue;
             }
             if (peds.Count == 0) continue;
-            if (g.Shape == "U" && g.Dims.Length == 3 && g.Count % peds.Count == 0)
+            // the blocks this group goes in: every block, one bearing row (11WB 5n1 back / 5n2 ahead), or one set per girder line across both rows (9G 5n1)
+            var blocks = g.PedestalRow switch { "BACK" or "AHEAD" => PedestalBlocksOfRow(unit, g.PedestalRow), "LINE" => PedestalLines(unit), _ => peds.ToList() };
+            if (g.PedestalRow != "" && (blocks.Count == 0 || g.Count % blocks.Count != 0))
+                Warn($"{unit.Name}: UNRESOLVED {g.Mark} pedestal bars - the plan row \"{g.PedestalRow}\" selects {blocks.Count} pedestal block(s), the bar list has {g.Count} bars; placed by the generic rule.");
+            if (g.Shape == "U" && g.Dims.Length == 3 && blocks.Count > 0 && g.Count % blocks.Count == 0)
             {
                 // 5m1 / 5n1 (plan bend diagram, pedestal plan): U bars, base out to out 5'-1 / 5'-3, legs 2'-8 hanging into the cap from the base. Per pedestal
                 // g.Count / pedestals bars at equal spaces, the end bars 4" from the pedestal edges (plan: "4, 5 EQ SPA, 4"). 5m1 (longitudinal) runs along S
@@ -682,19 +686,20 @@ public sealed partial class SubstructureGenerator
                 // size (PedestalSizeAlong / Across): the bearing-footprint pedestals (9G, 19G, 11WB, 6A: plan size not settled) are smaller than these bars, whose
                 // base then stays under the cap top as before (reported by the check).
                 bool planPed = unit.Definition.PedestalSizeAlong > 0 && unit.Definition.PedestalSizeAcross > 0;
-                int per = g.Count / peds.Count;
+                int per = g.Count / blocks.Count;
+                double edge = g.EdgeDistance > 0 ? g.EdgeDistance : In(4);
                 bool alongS2 = g.Kind == PlanBarKind.PedestalLongitudinal;
                 var trans = groups.FirstOrDefault(x => x.Kind == PlanBarKind.PedestalTransverse);
                 double under = alongS2 && trans != null ? RebarCatalog.Size(trans.Size).Diameter : 0;
                 var (ps, pl) = PlanU(size, g.Dims[0], g.Dims[1], g.Dims[2], g.Pin, g.Length);
-                foreach (var p in peds)
+                foreach (var p in blocks)
                 {
                     double across = alongS2 ? p.WidthN : p.LengthS;
                     double zOut = (planPed && p.Height > In(0.125) ? p.SeatZ
                         : TopSpan(p.S - (alongS2 ? g.Dims[1] / 2 : across / 2), p.S + (alongS2 ? g.Dims[1] / 2 : across / 2), p.N - (alongS2 ? across / 2 : g.Dims[1] / 2), p.N + (alongS2 ? across / 2 : g.Dims[1] / 2))) - cov - under;
                     for (int k = 0; k < per; k++)
                     {
-                        double t = per == 1 ? 0 : -across / 2 + In(4) + (across - In(8)) * k / (per - 1);
+                        double t = per == 1 ? 0 : -across / 2 + edge + (across - 2 * edge) * k / (per - 1);
                         Vec3 Pp(double u, double v) => alongS2 ? unit.World(p.S + u - g.Dims[1] / 2, p.N + t, zOut - v) : unit.World(p.S + t, p.N + u - g.Dims[1] / 2, zOut - v);
                         bars.Add(new RawBar("M", size, ps, $"{where} pedestal bars", pl.Select(q => Pp(q.X, q.Y)).ToArray()));
                     }
@@ -734,6 +739,28 @@ public sealed partial class SubstructureGenerator
         return unit.PedestalBlocks.Where(p => unit.Pedestals.Any(q => idx.Contains(q.Girder % 1000)
                 && Math.Abs(q.RowS - p.S) <= p.LengthS / 2 + 1e-6 && Math.Abs(q.RowN - p.N) <= p.WidthN / 2 + 1e-6))
             .OrderBy(p => p.S).ToList();
+    }
+
+    /// <summary>Pedestal blocks (in cap order) of one bearing row: "BACK" = centre on the -N side of the CL pier, "AHEAD" = +N side.</summary>
+    internal static List<PedestalInfo> PedestalBlocksOfRow(SubstructureUnit unit, string row)
+        => unit.PedestalBlocks.Where(p => row == "AHEAD" ? p.N > unit.CapMidN : p.N < unit.CapMidN).OrderBy(p => p.S).ToList();
+
+    /// <summary>One block per girder line spanning a back block and the ahead block at the same place along the cap (their S centres within half a block
+    /// length): S = the mean, N = the union of the two, length = the shorter, cap top / seat = the LOWER of the two (the bar base lies under the lower top).
+    /// Lines with a single block are left out.</summary>
+    internal static List<PedestalInfo> PedestalLines(SubstructureUnit unit)
+    {
+        var back = PedestalBlocksOfRow(unit, "BACK");
+        var ahead = PedestalBlocksOfRow(unit, "AHEAD");
+        var res = new List<PedestalInfo>();
+        foreach (var b in back)
+        {
+            var a = ahead.Where(x => Math.Abs(x.S - b.S) < Math.Min(x.LengthS, b.LengthS) / 2).OrderBy(x => Math.Abs(x.S - b.S)).FirstOrDefault();
+            if (a == null) continue;
+            double n0 = Math.Min(b.N - b.WidthN / 2, a.N - a.WidthN / 2), n1 = Math.Max(b.N + b.WidthN / 2, a.N + a.WidthN / 2);
+            res.Add(new PedestalInfo(b.Girder, (a.S + b.S) / 2, (n0 + n1) / 2, Math.Min(a.LengthS, b.LengthS), n1 - n0, Math.Min(a.CapTopZ, b.CapTopZ), Math.Min(a.SeatZ, b.SeatZ)));
+        }
+        return res;
     }
 
     /// <summary>Hoop height h (out-to-out) so that the closed stirrup w x h has the listed developed length.</summary>

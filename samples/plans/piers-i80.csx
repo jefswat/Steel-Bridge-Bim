@@ -218,7 +218,10 @@ foreach (var p in ip)
 }
 // ---- Plan pedestal sizes (inches: along the cap x across it). Printed on the cap plan / pedestal bar layout of every pier sheet ("4, 5 EQ. SPA., 4"; 3WB and 7WB "4, 6 EQ., 4"; with the
 // total below, e.g. 5'-6 x 5'-8) and confirmed by the 5m1 / 5n1 U-bar bases (base + 4" or 5" = pedestal); docs/plan-data/pier-pedestals.md. NOT set (sizes not
-// settled by the sheets, the bearing-footprint pedestals stay): Pier 6A (Ramp A2 pedestals share the cap), Pier 11WB (two staggered rows, along size not printed).
+// settled by the sheets, the bearing-footprint pedestals stay): Pier 6A (Ramp A2 pedestals share the cap).
+// Pier 11WB (Design 116 PDF 63, cap plan, raster-read 2026-10-11): two staggered rows, 2'-6 | 2'-6 = 5'-0 along (TYP., centred on the girder) for both; across BACK BRG. row
+// 3'-11 and AHEAD BRG. row 3'-9, each 2" from its cap face, the rows abutting 1" ahead of the CL pier (2 + 3'-9 + 3'-11 + 2 = 8'-0). U-bar bases (PDF 66 "5m1, 5n1, 5n2"):
+// 4'-8 + 4 = 5'-0, 3'-7 + 4 = 3'-11, 3'-5 + 4 = 3'-9.
 // Pier 5WB: ONE 5'-0 x 7'-8 block per girder line carries the back and ahead bearing (36 5n1 bars = 6 blocks x 6).
 {
     var peds = new Dictionary<string, (double along, double across, bool shared)>
@@ -231,6 +234,12 @@ foreach (var p in ip)
         foreach (var sup in bridge.Supports)
             if (sup.Substructure != null && peds.TryGetValue(sup.Name, out var v))
             { sup.Substructure.PedestalSizeAlong = In(v.along); sup.Substructure.PedestalSizeAcross = In(v.across); sup.Substructure.PedestalShared = v.shared; }
+    foreach (var bridge in Doc.Project.Bridges.Where(x => x.Name.StartsWith("I-80")))
+        foreach (var sup in bridge.Supports.Where(x => x.Name == "Pier 11WB" && x.Substructure != null))
+        {
+            var sd = sup.Substructure;
+            sd.PedestalSizeAlong = In(60); sd.PedestalSizeAcross = In(47); sd.PedestalSizeAcrossAhead = In(45); sd.PedestalRowJoint = In(1); sd.PedestalShared = false;
+        }
 }
 Doc.Regenerate();
 foreach (var b in Doc.Project.Bridges.Where(x => x.Name.StartsWith("I-80")))
