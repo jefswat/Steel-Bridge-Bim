@@ -15,6 +15,7 @@
 using System.IO;
 using SBM.Core.Checks;
 using SBM.Core.Geometry;
+using SBM.Core.Bridge;
 
 string DataDir()
 {
@@ -293,6 +294,126 @@ foreach (var r in bi)
     var c = fr.Girders[g].Spans[j];
     Row("Beam seats (p.25)", $"{r[1]} span {j + 1} start", Num(r[8]), (c.LayoutBegin!.Value.Z - depth - In(Num(r[6]))) / ft, $"top - 4'-6 - {r[6]}\" brg");
     Row("Beam seats (p.25)", $"{r[1]} span {j + 1} end", Num(r[9]), (c.LayoutEnd!.Value.Z - depth - In(Num(r[7]))) / ft, $"top - 4'-6 - {r[7]}\" brg");
+}
+
+// ---------------------------------------------------------------- substructure (p.9-12 piers, p.15-17 abutments, p.3 quantities)
+// Plan values as printed (0.01 ft elevations, 1/16" dimensions); counts exact. The abutment pile caps are not built while the step risers are
+// UNRESOLVED (decision 11), so their volumes are reported for the drawn riser candidates as INFO only.
+var subm = Doc.Model(BrName).Substructure;
+if (subm == null) Row("Substructure", "substructure generated", 1, 0, "not generated");
+else
+{
+    var U = subm.Units.ToDictionary(u => u.SupportIndex);
+    double[][] pierSteps = { new[] { 1117.94, 1118.23, 1118.52, 1118.80, 1119.06 }, new[] { 1118.21, 1118.62, 1119.03, 1119.43, 1119.82 } };
+    double[] pJ = { 1117.25, 1117.42 }, pK = { 1118.76, 1119.54 };
+    double[][] pLMN = { new[] { 1112.36, 1113.01, 1113.65 }, new[] { 1112.57, 1113.48, 1114.39 } };
+    string[][] dimA = { new[] { "17'-4 5/16\"", "18'-0 1/8\"", "18'-7 13/16\"" }, new[] { "17'-6 13/16\"", "18'-5 3/4\"", "19'-4 11/16\"" } };
+    for (int pi = 0; pi < 2; pi++)
+    {
+        if (!U.TryGetValue(pi + 1, out var u)) { Row("Pier (p.9)", $"Pier {pi + 1} built", 1, 0); continue; }
+        string P = $"Pier {pi + 1}";
+        var blocks = u.PedestalBlocks.OrderBy(b => b.S).ToList();
+        Row("Pier (p.9)", $"{P} step blocks (count)", 5, blocks.Count, "", 0, "F0");
+        for (int i = 0; i < Math.Min(5, blocks.Count); i++)
+            Row("Pier (p.9)", $"{P} step {beamNames[i]} top (table of pier elevations)", pierSteps[pi][i], blocks[i].SeatZ / ft, $"block {blocks[i].Height / In(1):F2}\" above the sloped cap top");
+        double s0 = u.CapOutline.Min(p => p.X);
+        Row("Pier (p.9)", $"{P} J cap top at the west end", pJ[pi], u.CapTopAt(s0) / ft);
+        Row("Pier (p.9)", $"{P} K cap top at the east end (outer face of the 4\" reveal)", pK[pi], u.CapTopAt(s0 + Len("42'-1 5/8\"")) / ft, "cap top line extended over the reveal");
+        var cols = u.Columns.OrderBy(c => c.S).ToList();
+        Row("Pier (p.9)", $"{P} columns", 3, cols.Count, "", 0, "F0");
+        for (int c = 0; c < Math.Min(3, cols.Count); c++)
+        {
+            Row("Pier (p.9)", $"{P} {"LMN"[c]} cap bottom at column {c + 2}", pLMN[pi][c], u.CapBottomAt(cols[c].S) / ft);
+            Row("Pier (p.9)", $"{P} column {c + 2} height DIM A (in)", Len(dimA[pi][c]) / In(1), (cols[c].TopZ - cols[c].BottomZ) / In(1), "", 1.0 / 16, "F4");
+        }
+        Row("Pier (p.9)", $"{P} maskwall solids", 1, u.Solids.Count(x => x.Kind == SBM.Core.Substructure.SubElementKind.Maskwall), "p.9 / p.11 C-C", 0, "F0");
+        var foots = u.Foundations.Where(f => f.Type == FoundationType.PileCap).ToList();
+        Row("Pier (p.9)", $"{P} footings", 3, foots.Count, "", 0, "F0");
+        for (int fi = 0; fi < foots.Count; fi++)
+        {
+            var f = foots[fi];
+            string F = $"{P} footing {fi + 2}";
+            Row("Pier footings (p.9/11)", $"{F} bottom", 1090.00, f.BottomZ / ft);
+            Row("Pier footings (p.9/11)", $"{F} top", 1095.00, f.TopZ / ft, "bottom + 5'-0");
+            Row("Pier footings (p.9/11)", $"{F} size along the pier (in)", 120, f.SizeS / In(1), "10'-0", 1.0 / 16, "F4");
+            Row("Pier footings (p.9/11)", $"{F} size across the pier (in)", 162, f.SizeN / In(1), "13'-6", 1.0 / 16, "F4");
+            Row("Pier piles (p.11)", $"{F} piles", 12, f.Piles.Count, "HP12x84", 0, "F0");
+            Row("Pier piles (p.11)", $"{F} battered piles (outer rows, away from CL pier)", 6, f.Piles.Count(p => p.IsBattered && Math.Sign(p.TipN - p.N) == Math.Sign(p.N - u.CapMidN)), "U6", 0, "F0");
+            foreach (var p in f.Piles.Where(p => p.IsBattered).Take(1))
+                Row("Pier piles (p.11)", $"{F} batter H:V x 4", 1, 4 * Math.Sqrt(Math.Pow(p.TipS - p.S, 2) + Math.Pow(p.TipN - p.N, 2)) / (p.TopZ - p.TipZ), "1:4", 0.001, "F4");
+            Row("Pier piles (p.11)", $"{F} pile head above the footing bottom (in)", 12, (f.Piles.Max(p => p.TopZ) - f.BottomZ) / In(1), "1'-0 top of pile", 1.0 / 16, "F4");
+        }
+    }
+    // Abutments: piles, bottom elevations, step diagram depths (computed from the step tops and the bottom, cap or no cap)
+    var abs = new[] { (k: 0, n: "S. Abut.", bw: 1113.71, be: 1114.60, dl: "3'-9 1/2\"", dr: "3'-8 1/2\"", vol: 18.1, steps: new[] { 1117.50, 1117.71, 1117.92, 1118.11, 1118.31 }),
+                      (k: 3, n: "N. Abut.", bw: 1113.91, be: 1115.64, dl: "3'-11 3/4\"", dr: "3'-10 1/2\"", vol: 19.5, steps: new[] { 1117.89, 1118.29, 1118.70, 1119.10, 1119.51 }) };
+    foreach (var ab in abs)
+    {
+        if (!U.TryGetValue(ab.k, out var u) || u.Abutment is not { } geo) { Row("Abutment (p.15-17)", $"{ab.n} built", 1, 0); continue; }
+        Row("Abutment (p.15-17)", $"{ab.n} piles (7 on CL brg + 1 wing)", 8, u.Foundations.Sum(f => f.Piles.Count), "HP12x84", 0, "F0");
+        double nm = u.CapMidN, sL = geo.LeftEndS(nm), sR = geo.RightEndS(nm);
+        Row("Abutment (p.15-17)", $"{ab.n} bottom of footing at the west end", ab.bw, geo.FootingBottom(sL) / ft);
+        Row("Abutment (p.15-17)", $"{ab.n} bottom of footing at the east end (level 3'-0)", ab.be, geo.FootingBottom(sR) / ft);
+        Row("Abutment (p.15-17)", $"{ab.n} step diagram depth at the west end (in)", Len(ab.dl) / In(1), geo.DepthAtLeftEnd / In(1), "step D - bottom", 1.0 / 16, "F4");
+        Row("Abutment (p.15-17)", $"{ab.n} step diagram depth at the east end (in)", Len(ab.dr) / In(1), geo.DepthAtRightEnd / In(1), "step H - bottom", 1.0 / 16, "F4");
+        Row("Abutment (p.15-17)", $"{ab.n} stepped pile cap solid built", 1, u.Solids.Any(s => s.Name.EndsWith("pile cap")) ? 1 : 0, "risers UNRESOLVED (decision 11)", 0, "F0", info: true);
+        Row("Abutment (p.15-17)", $"{ab.n} wing extension wall + footing solids", 2, u.Solids.Count(s => s.Kind is SBM.Core.Substructure.SubElementKind.Wingwall or SBM.Core.Substructure.SubElementKind.WingFooting), "", 0, "F0");
+        Row("Abutment (p.15-17)", $"{ab.n} CMP casings scheduled", 8, geo.Casings.Count, "bottom UNRESOLVED (EPS, road plans)", 0, "F0");
+        // girder S on CL brg = the abutment's pile-cap top line breaks (placeholder line through the step tops)
+        var bS = u.CapTop.Skip(1).Take(u.CapTop.Count - 2).Select(p => p.X).ToList();
+        if (bS.Count == 5)
+        {
+            double Vol(Func<int, double> riser)
+            {
+                double v = 0; int n = 800;
+                for (int i = 0; i < n; i++)
+                {
+                    double s = sL + (sR - sL) * (i + 0.5) / n;
+                    int k = 0; while (k < 4 && s > riser(k)) k++;
+                    v += (Ft(ab.steps[k]) - geo.FootingBottom(s)) * Ft(3) * (sR - sL) / n;
+                }
+                return v / 0.764554857984;
+            }
+            Row("Abutment volume (p.17)", $"{ab.n} cap cy, risers 1'-9 past the lower beam (rear elev. p.15/16, scaled)", ab.vol, Vol(k => bS[k] + Ft(1.75)), "pile cap only, no wing footing", 0.05, "F2", info: true);
+            Row("Abutment volume (p.17)", $"{ab.n} cap cy, risers 3'-4 past the lower beam (step diagram p.17, scaled)", ab.vol, Vol(k => bS[k] + Ft(3) + In(4)), "", 0.05, "F2", info: true);
+            Row("Abutment volume (p.17)", $"{ab.n} cap cy, risers at mid-bay", ab.vol, Vol(k => (bS[k] + bS[k + 1]) / 2), "", 0.05, "F2", info: true);
+            double wing = u.Solids.Where(s => s.Name.Contains("wing extension") && s.Name.EndsWith("footing")).Sum(s => Math.Abs(s.Mesh.Volume())) / 0.764554857984;
+            Row("Abutment volume (p.17)", $"{ab.n} wing extension footing cy (model)", 0, wing, "add to the cap candidates if the plan quantity includes it", 0.05, "F2", info: true);
+            // Riser offset x past the lower beam's CL (same for every riser) that reproduces the plan 'abutment footing' quantity (cap + wing footing):
+            // the quantity is rounded to 0.1 cy, so x is only determined to about +- (0.05 cy / sum of the step rises x 3'-0) - EVIDENCE, not a dimension.
+            double lo = 0, hi = Ft(8);
+            for (int it = 0; it < 60; it++) { double mid = (lo + hi) / 2; if (Vol(k => bS[k] + mid) + wing > ab.vol) lo = mid; else hi = mid; }
+            double rises = Enumerable.Range(0, 4).Sum(k => Ft(ab.steps[k + 1] - ab.steps[k]));
+            double tolX = 0.05 * 0.764554857984 / (rises * Ft(3));
+            Row("Abutment volume (p.17)", $"{ab.n} riser offset past the lower beam CL that matches {ab.vol} cy (in)", 21, (lo + hi) / 2 / In(1), $"+-{tolX / In(1):F1}\" from the 0.1 cy rounding; plan value 21 = the 1'-9 drawn on the rear elevation", 0, "F1", info: true);
+        }
+    }
+    // Piles: plan quantity 11,440 LF = 8 x 155 + 8 x 150 + 72 x 125 (contract lengths, p.3 / p.12 / p.17)
+    var allPiles = subm.Units.SelectMany(x => x.Foundations).SelectMany(f => f.Piles).ToList();
+    Row("Quantities (p.3)", "Piles HP12x84 (count)", 88, allPiles.Count, "72 pier + 16 abutment", 0, "F0");
+    Row("Quantities (p.3)", "Piles HP12x84 (LF)", 11440, allPiles.Sum(p => p.Length) / ft, "contract lengths along the pile axis", 0.5, "F1");
+    // Rebar: placed plan marks vs the bar-list weights (p.12) per pier; marks without a 3D rule = INFO (schedule only)
+    foreach (var r in File.ReadAllLines(Path.Combine(dir, "bar-lists.csv")).Skip(1).Where(l => l.StartsWith("Pier ")))
+    {
+        var c = System.Text.RegularExpressions.Regex.Matches(r, "\"[^\"]*\"|[^,]+").Select(m => m.Value.Trim('"')).ToArray();
+        string unitName = c[0], mark = c[2];
+        double plan = double.Parse(c[7].Replace(",", ""), System.Globalization.CultureInfo.InvariantCulture);
+        var mk = subm.Marks.Where(m => m.Unit == unitName && System.Text.RegularExpressions.Regex.IsMatch(m.Location, $@"(^|\s){mark}(\s|$)")).ToList();
+        if (mk.Count == 0) { Row("Pier rebar (p.12)", $"{unitName} {mark} weight (lb)", plan, 0, "not placed in 3D (schedule only)", 0, "F0", info: true); continue; }
+        Row("Pier rebar (p.12)", $"{unitName} {mark} weight (lb)", plan, mk.Sum(m => m.TotalMass) / 0.45359237, $"{mk.Sum(m => m.Count)} bars", Math.Max(1, plan * 0.01), "F0");
+    }
+    var gen = subm.Marks.Where(m => (m.Unit == "Pier 1" || m.Unit == "Pier 2") && m.Location.Contains("column")).ToList();
+    Row("Pier rebar (p.12)", "column bars of the generic column pipeline (lb, both piers; plan 10d1-10d5 + 10d2 + 5e1-5e3 + 6d13-6d16)",
+        2 * (2580 + 5753 + 2661 + 2741 + 1596 + 1666 + 430 + 257 + 265 + 137 + 173), gen.Sum(m => m.TotalMass) / 0.45359237, "verticals + dowels + generic #5 ties; INFO", 1, "F0", info: true);
+}
+// ---------------------------------------------------------------- steel diaphragm W21x50 + W14x38 (p.32 note: only between beam lines G and H over the traveled roadway, span 2)
+{
+    var parts = Doc.Model(BrName).Steel?.Parts ?? new();
+    foreach (var shape in new[] { "W21x50", "W14x38" })
+    {
+        var ps = parts.Where(p => p.Description.Contains(shape)).ToList();
+        Row("Steel diaphragms (p.31/32)", $"{shape} members", 1, ps.Count, string.Join("; ", ps.Select(p => p.Assembly)), 0, "F0");
+    }
 }
 
 // ---------------------------------------------------------------- one elevation chain (shows the PGL offset)

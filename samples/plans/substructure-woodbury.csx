@@ -97,8 +97,10 @@ foreach (var pd in pierData)
     double J = Ft(pd.J), K = Ft(pd.K);
     double Top(double s) => J + (K - J) * (s - sW) / (sE - sW);
     double sL = sW + colEnd, sN = sL + 2 * colSp;
-    double Bot(double s) => Ft(pd.L) + (Ft(pd.N) - Ft(pd.L)) * (s - sL) / (sN - sL);   // straight soffit through L and N; M checked
-    Diff($"Pier {k} cap bottom at column 3 (M {pd.M:F2}) on the line L-N", Ft(pd.M), Bot(sL + colSp), Ft(0.01));
+    // soffit through the printed L / M / N (a 0.005 ft kink at column 3), extended to the cap ends along the end segments
+    double sM = sL + colSp;
+    double Bot(double s) => s <= sM ? Ft(pd.L) + (Ft(pd.M) - Ft(pd.L)) * (s - sL) / (sM - sL) : Ft(pd.M) + (Ft(pd.N) - Ft(pd.M)) * (s - sM) / (sN - sM);
+    Diff($"Pier {k} M ({pd.M:F2}) vs the straight line L-N (kink in the soffit)", Ft(pd.M), (Ft(pd.L) + Ft(pd.N)) / 2, Ft(0.01));
     Diff($"Pier {k} cap depth at the west end (5'-0)", Ft(5), J - Bot(sW), In(1.0 / 16));
     Diff($"Pier {k} cap depth at the east end (5'-0, p.9 elevation at K)", Ft(5), K - Bot(sE), In(1.0 / 16));
     Diff($"Pier {k} col 4 CL to the east end (2'-11 13/16)", colEnd, sE - sN, In(1.0 / 16));
@@ -108,7 +110,7 @@ foreach (var pd in pierData)
     var sd = SubstructureDefinition.Default(SupportType.Pier);
     sd.CapProfile = new()
     {
-        new(sW, Top(sW)), new(sB, Top(sB)), new(sB, Bot(sB)), new(sW, Bot(sW)),
+        new(sW, Top(sW)), new(sB, Top(sB)), new(sB, Bot(sB)), new(sN, Bot(sN)), new(sM, Bot(sM)), new(sL, Bot(sL)), new(sW, Bot(sW)),
     };
     sd.CapWidth = capW; sd.CapOffset = 0;
     // Steps (p.9 cap plans): one level block per beam line carrying the back + ahead pads, 1'-10 + 1'-10 = 3'-8 along the CL pier, 4'-1 5/8 across
