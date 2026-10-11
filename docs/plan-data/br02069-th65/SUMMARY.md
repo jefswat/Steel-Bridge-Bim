@@ -82,7 +82,10 @@ Bridge: single simple span 99'-3" CL-CL brg, 0 deg skew, seven MnDOT 30MH preten
 | Bearings | 7 F1 fixed B310 (S), 7 E1 exp B311 (N) = 14 | - | p15, p31, p2 | TEXT | |
 | F1 | pad 12x30x1/2; SF 8.6; brg plate 14x47x1 1/2; curved 4 1/2x32x1 1/4 R16; L 3 1/4"; A-3; anchor rods 1 1/2" @ +/-1'-9 1/2" | - | p31, p5 | RASTER | L sum ok |
 | E1 | pad 12x30x3 3/4 (6 plates 1/8, 5 lam 1/2, 1/4 covers); SF 8.6; brg plate 14x33x1 1/2; curved 4 1/2x32x1 1/4 R16; L 6 1/2"; A-3 | - | p31 | RASTER | sums ok |
-| Sole plate | B303, cast with beam | - | p16, p30 | TEXT | dims U6 |
+| Sole plate | B303 (std, MH row): 3'-2 3/4" (across beam) x 1'-3" (along beam) x 3/4"; sides chamfered (sides only); galvanized; cast with beam | - | p30 B303 | RASTER | |
+| Sole plate CL brg | CL brg = CL shear studs at 7 1/2" from plate end (M/MN/MH/RB); plate end flush with beam end (beam end 7 1/2" to CL brg) | - | p30, p16 | RASTER | 1'-3" = 2 x 7 1/2" ok |
+| Sole plate studs | 6 x 7/8" dia. x 4" to 5" unheaded shear studs: 3 across @ 6" (13 3/8" + 6" + 6" + 13 3/8" = 3'-2 3/4" ok) x 2 rows @ +/-3" from CL brg; AWS D1.1 | - | p30 | RASTER | note 2: may be modified to clear strands |
+| Pintle holes | 2 x 1 3/4" dia. (for 1 1/2" pintles) at +/-8" from CL beam (11 3/8" from plate edge, 11 3/8 + 8 = 19 3/8 = half width ok), on CL brg; 1/4" bevel; 2 1/2" x 1 3/4" Type B polystyrene plug | - | p30 | RASTER | |
 | Seats | S 923.76 W / 923.88 E fascia; N 923.55 / 923.67 | ft | p3 | TEXT | seat-elevations.csv |
 
 ## 4. Substructure (2 abutments, no piers)
@@ -95,9 +98,14 @@ Common: footing 59'-7" (offset -23.58 to +36.00), 6'-0" x 3'-0", bottom EL 917.7
 | Stem heights | footing->ledge 1'-7 1/4" S / 1'-4 3/4" N; ledge->seat 1'-0"; seat slopes 1" to front | - | p11 | RASTER | |
 | Seat front | S 923.27, N 923.06 level | ft | p5, p10 | TEXT | derived chain ok |
 | Back ledge | S 922.35, N 922.15 | ft | - | DERIVED | infill 5'-4 1/2" / 5'-7 7/8" ok |
-| Pedestals S | 10 x 4'-8" x 2'-6", gaps 1'-4", ends 8" E / 3" W; 7 beam + 3 future | - | p5 | TEXT | sum ok |
-| Pedestals N | 10 x 3'-6" x 2'-6", gaps 2'-6", ends 1'-3" E / 10" W | - | p10 | TEXT | end assignment DERIVED |
-| Pedestal types | Type A; Type B at future | - | p5 | TEXT | sheet 6 |
+| Pedestals S | 10 x 4'-8" (along abut.) x 2'-4" (across), gaps 1'-4", ends 8" E / 3" W; 7 beam + 3 future | - | p5, p6 | TEXT | sum ok; across = 1'-0" behind + 1'-4" ahead of CL brg (p6), flush with seat back edge, 2" short of seat front face (seat 2'-6"); earlier '2'-6"' was the seat width |
+| Pedestals N | 10 x 3'-6" (1'-9" + 1'-9") x 2'-4" (1'-0" + 1'-4"), gaps 2'-6", ends 1'-3" E / 10" W; 2" short of seat front | - | p10, p12 | TEXT | end assignment DERIVED |
+| Pedestal types | S: Type A U.N.O., Type B per note 6 (future) (p5 notes 5/6, details p6); N: Type C U.N.O., Type D per note 6 (p10 notes 5/6, details p12) | - | p5, p6, p10, p12 | TEXT | |
+| Type A (S) | 8-A525E trans. (3 3/8" + 7" + 5 sps abt. @ 7" = 2'-11 1/4" + 7" + 3 3/8" = 4'-8" ok); 5-A526E longit. (3 5/8" + 5" + 7 1/4" + 2 sps @ 4 1/4" + 3 5/8" = 2'-4" ok); 2" clr; 1 set 2-A529E ties (note 1: only where pedestal >= 9" tall, 2 pedestals), 4" / 4" in E-E; 2 anchor rods on CL brg | - | p6 plan + E-E | RASTER | 5 x 7 = 2'-11" vs '2'-11 1/4" abt.' as printed |
+| Type B (S, future) | 8-A527M trans. (same 3 3/8"/7" layout); 5-A528M longit. (4" + 4 1/2" + 7" + 2 sps @ 4 1/4" + 4" = 2'-4" ok); 3" clr; no A529E | - | p6 plan + F-F | RASTER | |
+| Type C (N) | 6-B525E trans. (4 3/8" + 5 sps @ abt. 6 5/8" = 2'-9 1/4" + 4 3/8" = 3'-6" ok); 4-B526E longit. (4 3/8" + 3 sps @ abt. 6 3/8" = 1'-7 1/4" + 4 3/8" = 2'-4" ok); 2" clr; B529E (note 1, 2 pedestals) | - | p12 | RASTER | |
+| Type D (N, future) | 6-B527M trans., 4-B528M longit., same layout as C; 3" clr; no B529E | - | p12 | RASTER | |
+| Pedestal heights | not dimensioned; top = seat-elevations.csv, bottom = seat | - | p5, p10 | DERIVED | |
 | Pedestal tops | PG - 2%|off| - 3.88/4.15 | ft | p5, p10 | TEXT | seat-elevations.csv |
 | Infill wall | 1'-6", top 927.73 S / 927.80 N | - | p5, p11 | TEXT | |
 | Mask walls | top 930.61 S / 930.67 N; h 12'-10 3/8" S / 12'-11" N; 1'-5 1/2" x 6'-4"; coping 1'-1"x2" | - | p11 | RASTER | ok |
