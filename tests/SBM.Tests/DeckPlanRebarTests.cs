@@ -1,3 +1,4 @@
+using SBM.Api;
 using SBM.Core.Bridge;
 using SBM.Core.Concrete;
 using SBM.Core.Framing;
@@ -146,5 +147,25 @@ public class DeckPlanRebarTests
         Assert.Null(p.Bridges[0].Deck.Reinforcement.Plan);
         Assert.Contains(c.Marks, m => m.Mark.StartsWith("T"));
         Assert.Contains(c.Marks, m => m.Mark.StartsWith("L"));
+    }
+
+    [Fact]
+    public void ContainmentCheck_ReportsCoverEdgesAndEnds_PlanBarsStayInside()
+    {
+        var doc = SbmDocument.Sample();
+        var b = doc.Project.Bridges[0];
+        var r = b.Deck.Reinforcement;
+        r.TopCover = In(2.5); r.BottomCover = In(1); r.SideCover = In(2);
+        r.Plan = new DeckPlanReinforcement { TransverseBeginClear = In(12), TransverseEndClear = In(12) };
+        r.Plan.Transverse.Add(new DeckTransverseZone { Layer = DeckBarLayer.Top, Size = "#7", StartDistance = Ft(40), Spacing = In(7), Count = 20, Pieces = { new DeckLinePiece { Mark = "7a1" } } });
+        r.Plan.Transverse.Add(new DeckTransverseZone { Layer = DeckBarLayer.Bottom, Size = "#7", StartDistance = Ft(40) + In(3.5), Spacing = In(7), Count = 20, Pieces = { new DeckLinePiece { Mark = "7a2" } } });
+        doc.Regenerate();
+        var cm = doc.Concrete();
+        string note = cm.Notes.Single(n => n.StartsWith("Deck rebar containment check"));
+        Assert.Contains("40 bars", note);
+        Assert.DoesNotContain(cm.Diagnostics, d => d.Message.StartsWith("Deck reinforcing check") && d.Severity == SBM.Core.Framing.DiagnosticSeverity.Warning);
+        Assert.Contains("min top cover 2 1/2\"", note);
+        Assert.Contains("min bottom cover 1\"", note);
+        Assert.Contains("steel clashes 0 bars", note);
     }
 }

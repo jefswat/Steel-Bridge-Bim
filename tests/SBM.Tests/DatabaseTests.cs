@@ -64,6 +64,36 @@ public class DatabaseTests : IDisposable
     }
 
     [Fact]
+    public void DeckReinforcingGroup_CarriesPlanScheduleIncludingScheduleOnlyMarks()
+    {
+        var doc = SbmDocument.Sample();
+        var r = doc.Project.Bridges[0].Deck.Reinforcement;
+        r.Plan = new SBM.Core.Bridge.DeckPlanReinforcement();
+        r.Plan.Transverse.Add(new SBM.Core.Bridge.DeckTransverseZone
+        {
+            Layer = SBM.Core.Bridge.DeckBarLayer.Top, Size = "#7", StartDistance = 0.3048 * 60, Spacing = 0.0254 * 7, Count = 12,
+            Pieces = { new SBM.Core.Bridge.DeckLinePiece { Mark = "7a1" } },
+        });
+        r.Plan.PlanBarList.Add(new SBM.Core.Bridge.DeckPlanBarLine { Mark = "5e1", Size = "#5", Count = 30, Length = 0.3048 * 9.33, WeightLb = 292, Location = "END DAM" });
+        doc.Regenerate();
+        string db = Path.Combine(_dir, "plan.sqlite");
+        doc.ExportDatabase(db);
+        using var cn = ModelDatabase.Open(db);
+        using var c = cn.CreateCommand();
+        c.CommandText = "SELECT properties, global_id FROM elements WHERE level = 'group' AND category = 'deck reinforcing'";
+        using var rd = c.ExecuteReader();
+        Assert.True(rd.Read());
+        string props = rd.GetString(0), gid = rd.GetString(1);
+        rd.Close();
+        Assert.Contains("\"plan_driven\":true", props);
+        Assert.Contains("schedule_only_marks\":\"5e1\"", props);
+        Assert.Contains("7a1,#7,12,", props);
+        c.CommandText = "SELECT COUNT(*) FROM elements WHERE parent_global_id = $g AND level = 'bar'";
+        c.Parameters.AddWithValue("$g", gid);
+        Assert.Equal(12, Convert.ToInt32(c.ExecuteScalar()));      // the schedule-only mark has no bar element
+    }
+
+    [Fact]
     public void GlobalIds_AreTheIfcGlobalIds()
     {
         var (doc, db, res) = Build();
