@@ -1,6 +1,10 @@
 {
   // Rules linking model elements to the plan sheets they are based on (companion database, tables sheets / element_sheet).
+  // models          = the .sbm files these rules belong to (the app and `sbm db` pick the sheet-links*.json beside the model that names it).
+  // planFolders     = extra folders for the plan PDFs (relative to this file); the PDF is only needed for Open PDF / --pages.
+  // planSets[].sheets = the sheet index { p: PDF page, s: design sheet, t: title }: fills the sheets table on every build (no PDF split).
   // rules[].sheets  = regex on the normalized sheet title (case-insensitive; named groups become {name} below)
+  // rules[].pages   = optional list of PDF pages the rule is limited to (sheets sharing a title)
   // rules[].target  = OR of selectors; a selector is AND of elements columns: level, category, subtype, bridge, bridge_group,
   //                   unit, support, girder, mark, name.  Value = text ({captures}, % wildcard) or a list of texts.
   //                   bridge_group defaults to the plan set's bridge_group.
