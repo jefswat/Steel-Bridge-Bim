@@ -72,7 +72,7 @@ tolerance of each other), then every path classified and grouped into cells by r
 checked against the drawn glyph on raster clips for every code / shape combination (40 clips, all agree). Cross-checks: slab deflections
 4,703 of 4,703 cells read; vs the decimal tables 4,690 within 1/32" + rounding, the rest are H5 below; haunch elevations identical to the
 earlier extraction. Columns of the discontinuous-girder tables are numbered 1..n from the CL pier (mapped to point numbers as check-blocking does).
-The extractor (`haunch_extract.py`, `vecfont.py`) is a temp tool (not committed per the task scope).
+Reproduce: `python -I tools/haunch_extract.py "dist/SteelBridgeModeler/B00168 - CBIS-ESI-Westbound I-80 - Design 116.pdf" "dist/SteelBridgeModeler/B00169 - CBIS-ESI-Ramp G - Design 316.pdf" docs/plan-data/haunch` (needs PyMuPDF; `tools/vecfont.py` + `tools/plantext.py`; regenerates the 14 CSVs byte-identical).
 
 ### Results (`check-haunch.csx`)
 - H1 model HAUNCH: 4702 / 4703 within 1/16" (mean 0.000"). Worst: Ramp G U4 D pt 50 (STA 67497+89.38) +0.102" - an isolated point where the plan's
