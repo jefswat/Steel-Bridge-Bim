@@ -122,7 +122,7 @@ foreach (var key in bnds.Keys.OrderBy(k => k.Item1).ThenBy(k => k.Item2))
             }
         }
         if (why != null) { unres.Add((bn, pr.Line, pr.Pt, pr.Pdf, why)); continue; }
-        double z = al.ElevationAt(at.Sta, at.Off) / Ft(1);
+        double z = b.Deck.FinishedElevation(al, at.Sta, at.Off) / Ft(1);   // deck-aware: includes the optional level edge strip
         int span = SpanOf(pr.Pt);
         res.Add((bn, span, $"{b.Supports[span].Name}-{b.Supports[span + 1].Name}", pr.Pt, pr.Line, at.Sta / Ft(1), at.Off / Ft(1), pr.Elev, z, pr.Pdf));
     }

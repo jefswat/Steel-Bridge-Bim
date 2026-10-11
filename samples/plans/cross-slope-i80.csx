@@ -113,6 +113,30 @@ foreach (var r in goreRows)
     mb[1] = new CrossSlopeBreak(mb[1].Distance, -k);
     Print($"  gore STA {Doc.Units.FormatStation(r.Station)}: curb {(z24 - z27) / 3.68:P2}, effective slope {k:P3} (Ramp A2 k {Kramp(Foot(xs, yWb0 + 54.8).s):P2})");
 }
+// ---- Right-side superelevation transition, plan stations (sheet 190, PDF 197; docs/plan-data/superelevation-8wb.md) ----
+// (1) The transition starts at 7591+48.11 (-2.0%), not 7591+50.00: add that row and keep the 7591+50.00 row ON the same straight line
+//     (the plan is linear between 7591+48.11 and 7595+58.11).
+// (2) The plan is linear in I-80 STATIONING ("measured along I-80"); rows interpolate in WB station. Up to the P.C. (7597+73.11) the two stationings
+//     are identical; beyond it WB = P.C. + (I-80 - P.C.) x (R_wb / R_80), also linear, so a row exactly at the P.C. makes the WB interpolation
+//     reproduce the plan's I-80-linear slope everywhere (no per-row stationing option is needed; the two alignments stay separate).
+CrossSlopeRow FromSides(double st, CrossSlopeTable.Side L, double rightSlope)
+{
+    var rw = new CrossSlopeRow(st, L.Slope, rightSlope);
+    if (L.Breaks is { Length: > 0 } b) { rw.LeftBreak = b[0].At; rw.LeftOuterSlope = b[0].Slope; rw.LeftMoreBreaks = b.Skip(1).Select(x => new CrossSlopeBreak(x.At, x.Slope)).ToList(); }
+    return rw;
+}
+{
+    double st = Wb("7591+48.11"), st2 = Wb("7595+58.11");
+    var (L, _) = al.CrossSlope.SidesAt(st);
+    var row50 = al.CrossSlope.Rows.First(r => Math.Abs(r.Station - Wb("7591+50.00")) < 1e-6);
+    row50.RightSlope = -0.02 + 0.04 * (Wb("7591+50.00") - st) / (st2 - st);
+    al.CrossSlope.Rows.Add(FromSides(st, L, -0.02));
+    double s1 = Sta("7596+55.86"), s2 = Sta("7599+53.11");
+    double rs = 0.03 + 0.029 * (pc80 - s1) / (s2 - s1);       // 3.0% at 7596+55.86 -> 5.9% at 7599+53.11, linear in I-80 station
+    al.CrossSlope.Rows.Add(new CrossSlopeRow(Wb("7597+73.11"), -rs, rs));
+    al.CrossSlope.Rows = al.CrossSlope.Rows.OrderBy(r => r.Station).ToList();
+    Print($"  right transition: row at 7591+48.11 (-2.000%), 7591+50.00 at {row50.RightSlope:P4}; P.C. 7597+73.11 slope {rs:P4}");
+}
 foreach (var (v, p) in al.Profile.Vpis.Zip(pgl)) v.Elevation = p.Pgl - al.CrossSlope.DeltaElevation(v.Station, pglOff);
 foreach (var r in al.CrossSlope.Rows)
     Print($"  STA {Doc.Units.FormatStation(r.Station)}: left {r.LeftSlope:P1}{(r.LeftBreak > 0 ? $" to {r.LeftBreak / Ft(1):F0}' then {r.LeftOuterSlope:P2}" : "")}{string.Concat((r.LeftMoreBreaks ?? new()).Select(m => $" to {m.Distance / Ft(1):F2}' then {m.Slope:P2}"))}, right {r.RightSlope:P1}{(r.RightBreak > 0 ? $" to {r.RightBreak / Ft(1):F0}' then {r.RightOuterSlope:P2}" : "")}");

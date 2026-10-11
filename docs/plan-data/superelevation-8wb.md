@@ -54,3 +54,14 @@ Result: 7WB-8WB worst -0.021 -> -0.017, 8WB-9WB -0.020 -> -0.012; the rest of th
   and CrossSlopeRow breaks are constant-distance per row, so rows cannot express it. Proposed small Core option, OFF by default, per bridge deck:
   `DeckDefinition.LevelStripLowSide` (bool) + `LevelStripWidth` (1'-7): the finished-grade query beyond (edge - width) on a side whose slope at the gutter point is
   negative (falls toward the edge) returns the gutter elevation; where the slope is >= 0 the plane continues. Set in this project's scripts only. Not implemented.
+
+## 6. Implemented (feature/deckedge, 2026-10-10)
+- Section 4 corrections are in `cross-slope-i80.csx` (row at 7591+48.11, 7591+50.00 on the same line, row at the P.C. 7597+73.11). A row at the P.C. makes the WB
+  interpolation exactly I-80-linear: stationing is identical up to the P.C. and a constant scale beyond it, so no per-row stationing feature was needed.
+  Top of slab (model - plan, U2 girders): 7WB-8WB mean -0.0100 -> -0.0084, worst -0.0215 -> -0.0165, >0.01: 126 -> 84; 8WB-9WB mean -0.0073 -> -0.0056, worst -0.0200 -> -0.0123,
+  >0.01: 50 -> 12; 6WB-7WB +0.0013 -> -0.0001 (worst -0.0095 -> -0.0096); top of bearing 8WB -0.2 -> -0.1 in. Remaining ~ -0.008 ft at 7WB-9WB is UNRESOLVED (not forced).
+- Section 5 option: `DeckDefinition.EdgeStrip` + `samples/plans/deck-edge-strip.csx` (all 7 bridges, 1'-7). Edge residuals: I-80 U1 EDGE -0.030/-0.043 -> 0.000/0.000; U2 north -0.076 -> -0.001, U3 north -0.091 ->
+  +0.003 (one point +0.023 at 11WB), south unchanged (-0.004); Ramp G left/right edges -0.05..-0.095 -> within 0.007 except Pier 19G (-0.042, deck-end width).
+- OPEN QUESTION: I-80 U2 girder A at Pier 6A / pt 1-2 lies 0.99 ft from the model's north edge (-76.58 vs -77.57), i.e. INSIDE the 1'-7 strip. The plan's girder A elevation there follows the plane
+  (without strip +0.007 / +0.009, with strip +0.027 / +0.017; top of bearing A at 6A +0.1 -> +0.3 in). Either the gore edge there is not subject to the typical-section note, or the model's overhang
+  (edge offset or girder A offset at 6A) is wrong. Not decided; no exception was coded.
