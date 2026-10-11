@@ -36,7 +36,7 @@ text layout: the along value is the horizontal "4, n EQ., 4" string on the cap p
 | 3WB | 27 (25) / 30 (28) | 4, **6** EQ., 4 = 6'-6 | 5'-8 | 6'-1 + 5 = 78 | 5'-3 + 5 = 68 | 36 / 42 = 6 x 6 / 6 x 7 | 78 x 68 | yes |
 | 4WB | 31 (29) / 34 (32) | 5'-6 | 5'-8 | 5'-1 + 5 = 66 | 5'-3 + 5 = 68 | 36 / 36 | 66 x 68 | yes |
 | 5WB | 35 (33) / 38 (36) | 4, 5 EQ. SPA., 4 = 5'-0 | 7'-8 (EQ.) | 4'-7 + 5 = 60 | 7'-3 + 5 = 92 | 48 / 36 = 6 x 8 / 6 x 6 | 60 x 92, **shared** | yes |
-| 6WB | 43 (41) / 46 (44) | 5'-6 | 5'-8 | list 10'-7 - 2 x 2'-9 = 5'-1 + 5 = 66 (UNVERIFIED) | 5'-3 + 5 = 68 | 66 / 66 = 11 x 6 | 66 x 68 | yes |
+| 6WB | 43 (41) / 46 (44) | 5'-6 | 5'-8 | 5'-1 + 5 = 66 (diagram "5m1, 5n1" PDF 46, raster-confirmed 2026-10-11) | 5'-3 + 5 = 68 | 66 / 66 = 11 x 6 | 66 x 68 | yes |
 | 7WB | 47 (45) / 50 (48) | 4, **6** EQ., 4 = 6'-3 | 5'-8 | 5'-11 + 4 = 75 | 5'-4 + 4 = 68 | 60 / 70 = 10 x 6 / 10 x 7 | 75 x 68 | yes |
 | 8WB | 51 (49) / 54 (52) | 5'-6 | 5'-8 | 5'-2 + 4 = 66 | 5'-4 + 4 = 68 | 54 / 54 = 9 x 6 | 66 x 68 | yes |
 | 9WB | 55 (53) / 58 (56) | 5'-6 | 5'-8 | 5'-2 + 4 = 66 | 5'-4 + 4 = 68 | 48 / 48 | 66 x 68 | yes |
@@ -62,7 +62,7 @@ Pedestal bar layout printed on the cap plan:
 | 2G | 22 (20) / 24 (22) | 2'-10 + 2'-10 = 5'-8 | 6'-0 | 5'-4 + 4 = 68 | 5'-8 + 4 = 72 | 24 / 24 | 68 x 72 | yes |
 | 3G | 25 (23) / 27 (25) | 5'-0 | 6'-0 | 4'-8 + 4 = 60 | 5'-8 + 4 = 72 | 24 / 24 | 60 x 72 | yes |
 | 4G | 28 (26) / 30 (28) | 5'-0 | 6'-0 | 4'-8 + 4 = 60 | 5'-8 + 4 = 72 | 24 / 24 | 60 x 72 | yes |
-| 5G | 31 (29) / 33 (31) | 5'-0 | 6'-0 | list 9'-2 - 2 x 2'-3 = 4'-8 + 4 = 60 (UNVERIFIED) | 5'-8 + 4 = 72 | 24 / 24 = 4 x 6 | 60 x 72, **shared** | yes |
+| 5G | 31 (29) / 33 (31) | 5'-0 | 6'-0 | 4'-8 + 4 = 60 (diagram "5m1, 5n1", raster-confirmed 2026-10-11) | 5'-8 + 4 = 72 | 24 / 24 = 4 x 6 | 60 x 72, **shared** | yes |
 | 6G | 34 (32) / 36 (34) | 5'-0 | 6'-0 | 4'-8 + 4 = 60 | 5'-8 + 4 = 72 | 24 / 24 | 60 x 72 | yes |
 | 7G | 37 (35) / 39 (37) | 5'-8 | 6'-0 | 5'-4 + 4 = 68 | 5'-8 + 4 = 72 | 24 / 24 | 68 x 72 | yes |
 | 8G | 40 (38) / 42 (40) | 5'-0 | 6'-0 | 4'-8 + 4 = 60 | 5'-8 + 4 = 72 | 24 / 24 | 60 x 72 | yes |
@@ -70,7 +70,7 @@ Pedestal bar layout printed on the cap plan:
 | 11G | 49 (47) / 51 (49) | 5'-8 | 6'-0 | 5'-4 + 4 = 68 | 5'-8 + 4 = 72 | 24 / 24 | 68 x 72 | yes |
 | 12G | 52 (50) / 54 (52) | 5'-8 | 6'-0 | 5'-4 + 4 = 68 | 5'-8 + 4 = 72 | 24 / 24 | 68 x 72 | yes |
 | 13G | 55 (53) / 57 (55) | 5'-0 | 6'-0 | 4'-8 + 4 = 60 | 5'-8 + 4 = 72 | 24 / 24 | 60 x 72 | yes |
-| 14G | 58 (56) / 60 (58) | 5'-0 | 6'-0 | list 9'-2 - 2 x 2'-3 = 4'-8 + 4 = 60 (UNVERIFIED) | 5'-8 + 4 = 72 | 24 / 24 = 4 x 6 | 60 x 72, **shared** | yes |
+| 14G | 58 (56) / 60 (58) | 5'-0 | 6'-0 | 4'-8 + 4 = 60 (diagram "5m1, 5n1", raster-confirmed 2026-10-11) | 5'-8 + 4 = 72 | 24 / 24 = 4 x 6 | 60 x 72, **shared** | yes |
 | 15G | 61 (59) / 63 (61) | 5'-0 | 6'-0 | 4'-8 + 4 = 60 | 5'-8 + 4 = 72 | 24 / 24 | 60 x 72 | yes |
 | 16G | 64 (62) / 67 (65) | 7'-2 | 5'-8 (5 SPA.) | 6'-10 + 4 = 86 | 5'-4 + 4 = 68 | 24 / 32 = 4 x 6 / 4 x 8 | 86 x 68 | yes |
 | 17G | 68 (66) / 71 (69) | 6'-0 | 5'-8 (5 SPA.) | 5'-8 + 4 = 72 | 5'-4 + 4 = 68 | 24 / 28 = 4 x 6 / 4 x 7 | 72 x 68 | yes |
@@ -105,10 +105,8 @@ has only 24 5n1 and 24 5m1 = 4 blocks x 6. That means one 5'-0 x 6'-0 block per 
 
 ## UNVERIFIED
 
-- 6WB 5m1 base: the diagram is not decoded. 5'-1 is derived from the list length 10'-7 minus the 2'-9 legs of 5n1.
-  The pedestal size itself is printed (5'-6).
-- 5G and 14G 5m1 base: not in the bend-diagram comparison. 4'-8 is derived from the list length 9'-2 minus 2 x 2'-3.
-  The along size itself is printed (2'-6 | 2'-6).
+- (closed 2026-10-11, cap-cover work) 6WB 5m1 base 5'-1 and 5G / 14G 5m1 base 4'-8: read on raster clips of the shared "5m1, 5n1" U diagrams
+  (Design 116 PDF 46: 5'-1 / 5'-3, legs 2'-9, D = 2 1/2; Design 316 PDF 33 / 60: 4'-8 / 5'-8, legs 2'-3, D = 2 1/2). The csx lines now carry the shapes.
 - Ramp G across "5 SPA. @ 1'-0 = 5'-0;": the trailing glyph is not decoded. The 6'-0 total is confirmed by
   5n1 5'-8 + 4.
 - 6A 4'-6 x 3'-10 (orientation and whether it applies to the I-80 row), the 11WB "5'-0" along candidate, and the 19G

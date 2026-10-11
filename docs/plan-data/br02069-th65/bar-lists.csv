@@ -1,0 +1,94 @@
+unit,mark,size,coating,count,length,length_ft,location,weight_lb,source,tag
+South abutment,A701E,7,epoxy,20,"59'-1""",59.0833,FTG LONGIT TOP & BOT,2415.3,p8 / sh8,TEXT
+South abutment,A502E,5,epoxy,60,"15'-6""",15.5,FTG TRANS STIRRUP,970.0,p8 / sh8,TEXT
+South abutment,A503E,5,epoxy,60,"11'-4""",11.3333,FTG TRANS STIRRUP,709.2,p8 / sh8,TEXT
+South abutment,A504E,5,epoxy,10,"8'-1""",8.0833,FTG HORIZ MASK WALL TIE,84.3,p8 / sh8,TEXT
+South abutment,A505E,5,epoxy,19,"7'-5""",7.4167,INFILL WALL BF DOWEL,147.0,p8 / sh8,TEXT
+South abutment,A506E,5,epoxy,60,"5'-4""",5.3333,ABUT VERT TIE,333.8,p8 / sh8,TEXT
+South abutment,A507E,5,epoxy,41,"6'-4""",6.3333,ABUT VERT TIE,270.8,p8 / sh8,TEXT
+South abutment,A508M,5,chromium-epoxy (4% Cr),19,"6'-4""",6.3333,ABUT VERT TIE,125.5,p8 / sh8,TEXT
+South abutment,A609E,6,epoxy,3,"59'-3""",59.25,ABUT HORIZ EF,267.0,p8 / sh8,TEXT
+South abutment,A610E,6,epoxy,2,"30'-0""",30.0,ABUT HORIZ BF,90.1,p8 / sh8,TEXT
+South abutment,A611E,6,epoxy,2,"29'-1""",29.0833,ABUT HORIZ BF,87.4,p8 / sh8,TEXT
+South abutment,A612E,6,epoxy,2,"40'-0""",40.0,ABUT HORIZ EF,120.2,p8 / sh8,TEXT
+South abutment,A613M,6,chromium-epoxy (4% Cr),2,"22'-4""",22.3333,ABUT HORIZ EF,67.1,p8 / sh8,TEXT
+South abutment,A514E,5,epoxy,2,"6'-8""",6.6667,ABUT HORIZ MASK WALL TIE,13.9,p8 / sh8,TEXT
+South abutment,A515E,5,epoxy,19,"6'-7""",6.5833,INFILL WALL FF DOWEL,130.5,p8 / sh8,TEXT
+South abutment,A516E,5,epoxy,19,"2'-10""",2.8333,INFILL WALL VERT TIE,56.1,p8 / sh8,TEXT
+South abutment,A517E,5,epoxy,12,"18'-1""",18.0833,INFILL WALL HORIZ EF,226.3,p8 / sh8,TEXT
+South abutment,A518E,5,epoxy,16,"12'-1""",12.0833,MASK WALL VERT EF,201.6,p8 / sh8,TEXT
+South abutment,A419E,4,epoxy,1,"12'-5""",12.4167,MASK WALL VERT LUG,8.3,p8 / sh8,TEXT
+South abutment,A420E,4,epoxy,8,"2'-2""",2.1667,MASK WALL VERT LUG TIE,11.6,p8 / sh8,TEXT
+South abutment,A521E,5,epoxy,26,"5'-8""",5.6667,MASK WALL HORIZ EF,153.7,p8 / sh8,TEXT
+South abutment,A422E,4,epoxy,1,"6'-0""",6.0,MASK WALL HORIZ LUG,4.0,p8 / sh8,TEXT
+South abutment,A423E,4,epoxy,13,"2'-0""",2.0,MASK WALL HORIZ LUG TIE,17.4,p8 / sh8,TEXT
+South abutment,A524E,5,epoxy,21,"2'-8""",2.6667,MASK WALL TIE,58.4,p8 / sh8,TEXT
+South abutment,A525E,5,epoxy,56,"7'-0""",7.0,PEDESTAL TRANS,408.9,p8 / sh8,TEXT
+South abutment,A526E,5,epoxy,35,"9'-4""",9.3333,PEDESTAL LONGIT,340.7,p8 / sh8,TEXT
+South abutment,A527M,5,chromium-epoxy (4% Cr),24,"6'-2""",6.1667,PEDESTAL TRANS,154.4,p8 / sh8,TEXT
+South abutment,A528M,5,chromium-epoxy (4% Cr),15,"8'-6""",8.5,PEDESTAL LONGIT,133.0,p8 / sh8,TEXT
+South abutment,A529E,5,epoxy,8,"8'-10""",8.8333,PEDESTAL TIE,73.7,p8 / sh8,TEXT
+North abutment,B701E,7,epoxy,20,"59'-1""",59.0833,FTG LONGIT TOP & BOT,2415.3,p14 / sh14,TEXT
+North abutment,B502E,5,epoxy,60,"15'-6""",15.5,FTG TRANS STIRRUP,970.0,p14 / sh14,TEXT
+North abutment,B503E,5,epoxy,60,"10'-10""",10.8333,FTG TRANS STIRRUP,677.9,p14 / sh14,TEXT
+North abutment,B504E,5,epoxy,10,"8'-1""",8.0833,FTG HORIZ MASK WALL TIE,84.3,p14 / sh14,TEXT
+North abutment,B505E,5,epoxy,19,"7'-6""",7.5,INFILL WALL BF DOWEL,148.6,p14 / sh14,TEXT
+North abutment,B506E,5,epoxy,60,"5'-4""",5.3333,ABUT VERT TIE,333.8,p14 / sh14,TEXT
+North abutment,B507E,5,epoxy,41,"6'-0""",6.0,ABUT VERT TIE,256.6,p14 / sh14,TEXT
+North abutment,B508M,5,chromium-epoxy (4% Cr),19,"6'-0""",6.0,ABUT VERT TIE,118.9,p14 / sh14,TEXT
+North abutment,B609E,6,epoxy,3,"59'-3""",59.25,ABUT HORIZ EF,267.0,p14 / sh14,TEXT
+North abutment,B610E,6,epoxy,2,"30'-7""",30.5833,ABUT HORIZ BF,91.9,p14 / sh14,TEXT
+North abutment,B611E,6,epoxy,2,"28'-6""",28.5,ABUT HORIZ BF,85.6,p14 / sh14,TEXT
+North abutment,B612E,6,epoxy,2,"40'-0""",40.0,ABUT HORIZ EF,120.2,p14 / sh14,TEXT
+North abutment,B613M,6,chromium-epoxy (4% Cr),2,"22'-4""",22.3333,ABUT HORIZ EF,67.1,p14 / sh14,TEXT
+North abutment,B514E,5,epoxy,2,"6'-8""",6.6667,ABUT HORIZ MASK WALL TIE,13.9,p14 / sh14,TEXT
+North abutment,B515E,5,epoxy,19,"6'-8""",6.6667,INFILL WALL FF DOWEL,132.1,p14 / sh14,TEXT
+North abutment,B516E,5,epoxy,19,"2'-10""",2.8333,INFILL WALL VERT TIE,56.1,p14 / sh14,TEXT
+North abutment,B517E,5,epoxy,12,"18'-1""",18.0833,INFILL WALL HORIZ EF,226.3,p14 / sh14,TEXT
+North abutment,B518E,5,epoxy,16,"12'-2""",12.1667,MASK WALL VERT EF,203.0,p14 / sh14,TEXT
+North abutment,B419E,4,epoxy,1,"12'-7""",12.5833,MASK WALL VERT LUG,8.4,p14 / sh14,TEXT
+North abutment,B420E,4,epoxy,8,"2'-2""",2.1667,MASK WALL VERT LUG TIE,11.6,p14 / sh14,TEXT
+North abutment,B521E,5,epoxy,26,"5'-8""",5.6667,MASK WALL HORIZ EF,153.7,p14 / sh14,TEXT
+North abutment,B422E,4,epoxy,1,"6'-0""",6.0,MASK WALL HORIZ LUG,4.0,p14 / sh14,TEXT
+North abutment,B423E,4,epoxy,13,"2'-0""",2.0,MASK WALL HORIZ LUG TIE,17.4,p14 / sh14,TEXT
+North abutment,B524E,5,epoxy,21,"2'-8""",2.6667,MASK WALL TIE,58.4,p14 / sh14,TEXT
+North abutment,B525E,5,epoxy,42,"7'-0""",7.0,PEDESTAL TRANS,306.6,p14 / sh14,TEXT
+North abutment,B526E,5,epoxy,28,"8'-2""",8.1667,PEDESTAL LONGIT,238.5,p14 / sh14,TEXT
+North abutment,B527M,5,chromium-epoxy (4% Cr),18,"6'-2""",6.1667,PEDESTAL TRANS,115.8,p14 / sh14,TEXT
+North abutment,B528M,5,chromium-epoxy (4% Cr),12,"7'-4""",7.3333,PEDESTAL LONGIT,91.8,p14 / sh14,TEXT
+North abutment,B529E,5,epoxy,8,"7'-8""",7.6667,PEDESTAL TIE,64.0,p14 / sh14,TEXT
+"Superstructure (deck, end diaphragm)",S401M,4,chromium-epoxy (4% Cr),84,"60'-0""",60.0,DECK - TOP & BOT. LONGIT.,3366.7,p21 / sh21,TEXT
+"Superstructure (deck, end diaphragm)",S402M,4,chromium-epoxy (4% Cr),84,"45'-2""",45.1667,DECK - TOP & BOT. LONGIT.,2534.4,p21 / sh21,TEXT
+"Superstructure (deck, end diaphragm)",S403M,4,chromium-epoxy (4% Cr),137,"40'-8""",40.6667,DECK - TOP TRANSV,3721.7,p21 / sh21,TEXT
+"Superstructure (deck, end diaphragm)",S404M,4,chromium-epoxy (4% Cr),137,"40'-3""",40.25,DECK - BOT. TRANSV,3683.5,p21 / sh21,TEXT
+"Superstructure (deck, end diaphragm)",S405E,4,epoxy,2,"40'-8""",40.6667,END DIAPH - FILLET,54.3,p21 / sh21,TEXT
+"Superstructure (deck, end diaphragm)",S506E,5,epoxy,28,"4'-0""",4.0,END DIAPH THRU BEAMS,116.8,p21 / sh21,TEXT
+"Superstructure (deck, end diaphragm)",S607E,6,epoxy,24,"4'-11""",4.9167,END DIAPH BTWN BEAMS,177.2,p21 / sh21,TEXT
+"Superstructure (deck, end diaphragm)",S608E,6,epoxy,12,"2'-5""",2.4167,END DIAPH BTWN BEAMS,43.6,p21 / sh21,TEXT
+"Superstructure (deck, end diaphragm)",S609E,6,epoxy,24,"40'-8""",40.6667,END DIAPH - HORIZ,1466.0,p21 / sh21,TEXT
+"Superstructure (deck, end diaphragm)",S510E,5,epoxy,82,"6'-5""",6.4167,END DIAPH - STIRR.,548.8,p21 / sh21,TEXT
+"Superstructure (deck, end diaphragm)",S511E,5,epoxy,40,"7'-4""",7.3333,END DIAPH - STIRR. BTWN BEAMS,305.9,p21 / sh21,TEXT
+"Superstructure (deck, end diaphragm)",S512E,5,epoxy,42,"4'-10""",4.8333,END DIAPH - STIRR. @ BEAMS,211.7,p21 / sh21,TEXT
+"Superstructure (deck, end diaphragm)",S513E,5,epoxy,40,"4'-8""",4.6667,END DIAPH - TIE BTWN BEAMS,194.7,p21 / sh21,TEXT
+"Superstructure (deck, end diaphragm)",S514E,5,epoxy,42,"3'-6""",3.5,END DIAPH - TIE @ BEAMS,153.3,p21 / sh21,TEXT
+"Superstructure (deck, end diaphragm)",S615M,6,chromium-epoxy (4% Cr),82,"6'-0""",6.0,END DIAPH - VERT,739.0,p21 / sh21,TEXT
+"Superstructure (deck, end diaphragm)",S616M,6,chromium-epoxy (4% Cr),40,"5'-10""",5.8333,END DIAPH - DECK TIE,350.5,p21 / sh21,TEXT
+"Superstructure (deck, end diaphragm)",S617S,6,stainless 75 ksi,40,"4'-2""",4.1667,END DIAPH - APP PANEL TIE,250.3,p21 / sh21,TEXT
+Barrier,R503E,5,epoxy,4,"5'-8""",5.6667,BARRIER DOWEL,23.6,p24 / sh24,TEXT
+Barrier,R504E,5,epoxy,4,"5'-7""",5.5833,BARRIER DOWEL,23.3,p24 / sh24,TEXT
+Barrier,R506E,5,epoxy,4,"6'-9""",6.75,BARRIER VERTICAL,28.2,p24 / sh24,TEXT
+Barrier,R614M,6,chromium-epoxy (4% Cr),8,"29'-9""",29.75,BARRIER LONGIT.,357.5,p24 / sh24,TEXT
+Barrier,R415E,4,epoxy,8,"19'-8""",19.6667,BARRIER LONGIT.,105.1,p24 / sh24,TEXT
+Barrier,R616E,6,epoxy,8,"19'-5""",19.4167,BARRIER LONGIT.,233.3,p24 / sh24,TEXT
+Barrier,R517E,5,epoxy,82,"7'-1""",7.0833,BARRIER VERTICAL,605.8,p24 / sh24,TEXT
+Barrier,R518E,5,epoxy,2,"5'-1""",5.0833,BARRIER VERTICAL,10.6,p24 / sh24,TEXT
+Barrier,R501M,5,chromium-epoxy (4% Cr),212,"5'-7""",5.5833,BARRIER DOWEL,1234.6,p24 / sh24 (raster),RASTER
+Barrier,R502E,5,epoxy,82,"5'-9""",5.75,BARRIER DOWEL,491.8,p24 / sh24 (raster),RASTER
+Barrier,R505M,5,chromium-epoxy (4% Cr),212,"7'-1""",7.0833,BARRIER VERTICAL,1566.2,p24 / sh24 (raster),RASTER
+Barrier,R507E,5,epoxy,4,"6'-5""",6.4167,BARRIER VERTICAL,26.8,p24 / sh24 (raster),RASTER
+Barrier,R408E,4,epoxy,4,"13'-0""",13.0,BARRIER LONGIT.,34.7,p24 / sh24 (raster),RASTER
+Barrier,R409E,4,epoxy,4,"13'-0""",13.0,BARRIER LONGIT.,34.7,p24 / sh24 (raster),RASTER
+Barrier,R610E,6,epoxy,8,"13'-0""",13.0,BARRIER LONGIT.,156.2,p24 / sh24 (raster),RASTER
+Barrier,R411M,4,chromium-epoxy (4% Cr),16,"40'-0""",40.0,BARRIER LONGIT.,427.5,p24 / sh24 (raster),RASTER
+Barrier,R612M,6,chromium-epoxy (4% Cr),16,"40'-0""",40.0,BARRIER LONGIT.,961.3,p24 / sh24 (raster),RASTER
+Barrier,R413M,4,chromium-epoxy (4% Cr),8,"28'-11""",28.9167,BARRIER LONGIT.,154.5,p24 / sh24 (raster),RASTER

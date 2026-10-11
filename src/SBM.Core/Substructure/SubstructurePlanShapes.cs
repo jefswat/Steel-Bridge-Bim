@@ -71,6 +71,18 @@ public sealed partial class SubstructureGenerator
     }
 
     /// <summary>
+    /// End bar 5a15 (Pier 5WB bend diagram): top leg (10"), run down the end face (4'-5) and a slanted leg (2'-0) whose projection on the run direction is
+    /// <paramref name="slantDrop"/> (6"), the leg and the slant on the same side. Local: u inward from the end face's outside line (u = 0), v up from the top's
+    /// outside face (v = 0); the top leg runs inward at v = 0, the run hangs at u = 0, the slant leaves its foot inward and down (along the soffit bevel).
+    /// </summary>
+    internal static (BarShape shape, Vec2[] sharp) PlanA15(RebarSize size, double topLeg, double run, double slant, double slantDrop, double pin, double listed)
+    {
+        double across = Math.Sqrt(Math.Max(slant * slant - slantDrop * slantDrop, 0));
+        return PlanBent(size, new[] { new Vec2(topLeg, 0), new Vec2(0, 0), new Vec2(0, -run), new Vec2(across, -run - slantDrop) }, new[] { topLeg, run, slant }, +1,
+            "A15", $"Bar {Dim(topLeg)} + {Dim(run)} + {Dim(slant)} slanted ({Dim(slantDrop)} drop), out to out", pin, listed);
+    }
+
+    /// <summary>
     /// Hoop of the plan's bend diagram (6c1 / 6c2 / 5n2): rectangle <paramref name="w"/> x <paramref name="h"/> out to out with two straight tails that lap
     /// <paramref name="lapV"/> down the right side and <paramref name="lapH"/> along the top (list length = 2 (w + h) + the two laps). The tails run
     /// one bar diameter inside the closing pass. Local: u across, v up; the bar starts on the right side, runs up, left along the top, down, along the bottom, up the right

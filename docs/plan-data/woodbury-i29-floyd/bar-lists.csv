@@ -1,0 +1,153 @@
+unit,coating,mark,location,shape,no,length,weight_lb,source,tag
+Pier 1,epoxy coated,10a1,"CAP, TOP, LONGITUDINAL",bent (hooked ends),8,"50'-3","1,730",PDF p.12 / DS 10,RASTER
+Pier 1,epoxy coated,10a2,"CAP, TOP, LONGITUDINAL",straight,6,"41'-0","1,059",PDF p.12 / DS 10,RASTER
+Pier 1,epoxy coated,5a5,"CAP, SIDES, LONGITUDINAL",straight,8,"41'-0","342",PDF p.12 / DS 10,RASTER
+Pier 1,epoxy coated,8a7,"CAP, DOWELS",straight,25,"6'-0","401",PDF p.12 / DS 10,RASTER
+Pier 1,epoxy coated,10b1,"CAP, BOTTOM, LONGITUDINAL",straight,14,"41'-0","2,470",PDF p.12 / DS 10,RASTER
+Pier 1,epoxy coated,5c1,"CAP, HOOPS",closed hoop,140,"16'-4","2,385",PDF p.12 / DS 10,RASTER
+Pier 1,epoxy coated,4c2,"CAP, TRANSVERSE",U,42,"4'-7","129",PDF p.12 / DS 10,RASTER
+Pier 1,epoxy coated,5c3,"CAP, TRANSVERSE, ENDS",U,12,"6'-9","84",PDF p.12 / DS 10,RASTER
+Pier 1,epoxy coated,5c4,"CAP AND MASKWALL, TRANSVERSE, ENDS",U,11,"3'-10","44",PDF p.12 / DS 10,RASTER
+Pier 1,epoxy coated,5c5,"MASKWALL, HOOPS",tapered hoop,5,"9'-11","52",PDF p.12 / DS 10,RASTER
+Pier 1,epoxy coated,10d1,"COLUMN NO. 2, VERTICAL",straight,28,"21'-5","2,580",PDF p.12 / DS 10,RASTER
+Pier 1,epoxy coated,10d2,"FOOTING TO COLUMN DOWEL",L,84,"15'-11","5,753",PDF p.12 / DS 10,RASTER
+Pier 1,epoxy coated,10d3,"COLUMN NO. 3, VERTICAL",straight,28,"22'-1","2,661",PDF p.12 / DS 10,RASTER
+Pier 1,epoxy coated,10d5,"COLUMN NO. 4, VERTICAL",straight,28,"22'-9","2,741",PDF p.12 / DS 10,RASTER
+Pier 1,epoxy coated,6d13,"COLUMN NO. 2, VERTICAL",straight,8,"21'-5","257",PDF p.12 / DS 10,RASTER
+Pier 1,epoxy coated,6d14,"COLUMN NO. 3, VERTICAL",straight,8,"22'-1","265",PDF p.12 / DS 10,RASTER
+Pier 1,epoxy coated,6d15,"COLUMN NO. 4, VERTICAL",straight,4,"22'-9","137",PDF p.12 / DS 10,RASTER
+Pier 1,epoxy coated,6d16,"COLUMN NO. 4, VERTICAL",straight,4,"28'-9","173",PDF p.12 / DS 10,RASTER
+Pier 1,epoxy coated,5d20,"MASKWALL, VERTICAL",straight,5,"7'-1","37",PDF p.12 / DS 10,RASTER
+Pier 1,epoxy coated,5e1,"COLUMN, HOOPS",closed hoop,90,"17'-0","1,596",PDF p.12 / DS 10,RASTER
+Pier 1,epoxy coated,5e2,"COLUMN, HOOPS",closed hoop,90,"17'-9","1,666",PDF p.12 / DS 10,RASTER
+Pier 1,epoxy coated,5e3,"COLUMN, TIES",hooked tie,90,"4'-7","430",PDF p.12 / DS 10,RASTER
+Pier 1,epoxy coated,5m1,"CAP, PEDESTAL, LONGITUDINAL",straight,25,"3'-4","87",PDF p.12 / DS 10,RASTER
+Pier 1,epoxy coated,5n1,"CAP, PEDESTAL, TRANSVERSE",U,30,"7'-10","245",PDF p.12 / DS 10,RASTER
+Pier 1,stainless steel,10a3,"CAP, TOP, LONGITUDINAL (threaded end, mech. coupler)",straight,14,"13'-9","828",PDF p.12 / DS 10,RASTER
+Pier 1,stainless steel,5a6,"CAP, SIDES, LONGITUDINAL",straight,8,"7'-6","63",PDF p.12 / DS 10,RASTER
+Pier 1,stainless steel,10b2,"CAP, BOTTOM, LONGITUDINAL (threaded end, mech. coupler)",straight,14,"12'-5","748",PDF p.12 / DS 10,RASTER
+Pier 1,non-coated,7f1,"FOOTING, TOP",straight,33,"13'-2","888",PDF p.12 / DS 10,RASTER
+Pier 1,non-coated,7f2,"FOOTING, TOP",straight,45,"9'-8","889",PDF p.12 / DS 10,RASTER
+Pier 1,non-coated,8f6,"PILE UPLIFT ANCHORS",V,48,"5'-0","641",PDF p.12 / DS 10,RASTER
+Pier 1,non-coated,9g1,"FOOTING, BOTTOM",U,42,"16'-4","2,332",PDF p.12 / DS 10,RASTER
+Pier 1,non-coated,7g2,"FOOTING, BOTTOM",U,45,"12'-0","1,104",PDF p.12 / DS 10,RASTER
+Pier 2,epoxy coated,10a1,"CAP, TOP, LONGITUDINAL",bent (hooked ends),8,"50'-3","1,730",PDF p.12 / DS 10,RASTER
+Pier 2,epoxy coated,10a2,"CAP, TOP, LONGITUDINAL",straight,6,"41'-0","1,059",PDF p.12 / DS 10,RASTER
+Pier 2,epoxy coated,5a5,"CAP, SIDES, LONGITUDINAL",straight,8,"41'-0","342",PDF p.12 / DS 10,RASTER
+Pier 2,epoxy coated,8a7,"CAP, DOWELS",straight,25,"6'-0","401",PDF p.12 / DS 10,RASTER
+Pier 2,epoxy coated,10b1,"CAP, BOTTOM, LONGITUDINAL",straight,14,"41'-0","2,470",PDF p.12 / DS 10,RASTER
+Pier 2,epoxy coated,5c1,"CAP, HOOPS",closed hoop,140,"16'-4","2,385",PDF p.12 / DS 10,RASTER
+Pier 2,epoxy coated,4c2,"CAP, TRANSVERSE",U,42,"4'-7","129",PDF p.12 / DS 10,RASTER
+Pier 2,epoxy coated,5c3,"CAP, TRANSVERSE, ENDS",U,12,"6'-9","84",PDF p.12 / DS 10,RASTER
+Pier 2,epoxy coated,5c4,"CAP AND MASKWALL, TRANSVERSE, ENDS",U,11,"3'-10","44",PDF p.12 / DS 10,RASTER
+Pier 2,epoxy coated,5c5,"MASKWALL, HOOPS",tapered hoop,5,"9'-11","52",PDF p.12 / DS 10,RASTER
+Pier 2,epoxy coated,10d1,"COLUMN NO. 2, VERTICAL",straight,28,"21'-8","2,610",PDF p.12 / DS 10,RASTER
+Pier 2,epoxy coated,10d2,"FOOTING TO COLUMN DOWEL",L,84,"15'-11","5,753",PDF p.12 / DS 10,RASTER
+Pier 2,epoxy coated,10d3,"COLUMN NO. 3, VERTICAL",straight,28,"22'-7","2,721",PDF p.12 / DS 10,RASTER
+Pier 2,epoxy coated,10d5,"COLUMN NO. 4, VERTICAL",straight,28,"23'-6","2,831",PDF p.12 / DS 10,RASTER
+Pier 2,epoxy coated,6d13,"COLUMN NO. 2, VERTICAL",straight,8,"21'-8","260",PDF p.12 / DS 10,RASTER
+Pier 2,epoxy coated,6d14,"COLUMN NO. 3, VERTICAL",straight,8,"22'-7","271",PDF p.12 / DS 10,RASTER
+Pier 2,epoxy coated,6d15,"COLUMN NO. 4, VERTICAL",straight,4,"23'-6","141",PDF p.12 / DS 10,RASTER
+Pier 2,epoxy coated,6d16,"COLUMN NO. 4, VERTICAL",straight,4,"29'-6","177",PDF p.12 / DS 10,RASTER
+Pier 2,epoxy coated,5d20,"MASKWALL, VERTICAL",straight,5,"7'-2","37",PDF p.12 / DS 10,RASTER
+Pier 2,epoxy coated,5e1,"COLUMN, HOOPS",closed hoop,90,"17'-0","1,596",PDF p.12 / DS 10,RASTER
+Pier 2,epoxy coated,5e2,"COLUMN, HOOPS",closed hoop,90,"17'-9","1,666",PDF p.12 / DS 10,RASTER
+Pier 2,epoxy coated,5e3,"COLUMN, TIES",hooked tie,90,"4'-7","430",PDF p.12 / DS 10,RASTER
+Pier 2,epoxy coated,5m1,"CAP, PEDESTAL, LONGITUDINAL",straight,25,"3'-4","87",PDF p.12 / DS 10,RASTER
+Pier 2,epoxy coated,5n1,"CAP, PEDESTAL, TRANSVERSE",U,30,"7'-10","245",PDF p.12 / DS 10,RASTER
+Pier 2,stainless steel,10a3,"CAP, TOP, LONGITUDINAL (threaded end, mech. coupler)",straight,14,"13'-9","828",PDF p.12 / DS 10,RASTER
+Pier 2,stainless steel,5a6,"CAP, TOP, LONGITUDINAL",straight,8,"7'-6","63",PDF p.12 / DS 10,RASTER
+Pier 2,stainless steel,10b2,"CAP, BOTTOM, LONGITUDINAL (threaded end, mech. coupler)",straight,14,"12'-5","748",PDF p.12 / DS 10,RASTER
+Pier 2,non-coated,7f1,"FOOTING, TOP",straight,33,"13'-2","888",PDF p.12 / DS 10,RASTER
+Pier 2,non-coated,7f2,"FOOTING, TOP",straight,45,"9'-8","889",PDF p.12 / DS 10,RASTER
+Pier 2,non-coated,8f6,"PILE UPLIFT ANCHORS",V,48,"5'-0","641",PDF p.12 / DS 10,RASTER
+Pier 2,non-coated,9g1,"FOOTING, BOTTOM",U,42,"16'-4","2,332",PDF p.12 / DS 10,RASTER
+Pier 2,non-coated,7g2,"FOOTING, BOTTOM",U,45,"12'-0","1,104",PDF p.12 / DS 10,RASTER
+Deck/abutments/diaphragms,epoxy coated,6a1,"DECK TRANSVERSE, TOP AND BOTTOM",straight,481,"37'-3","26,912",PDF p.26 / DS 24,RASTER
+Deck/abutments/diaphragms,epoxy coated,6a2,"DECK TRANSVERSE, TOP",straight,7,"VARIES","234",PDF p.26 / DS 24,RASTER
+Deck/abutments/diaphragms,epoxy coated,6a3,"DECK TRANSVERSE, TOP",straight,22,"38'-6","1,272",PDF p.26 / DS 24,RASTER
+Deck/abutments/diaphragms,epoxy coated,6a4,"DECK TRANSVERSE, TOP",straight,10,"VARIES","295",PDF p.26 / DS 24,RASTER
+Deck/abutments/diaphragms,epoxy coated,6a5,"DECK TRANSVERSE, BOTTOM",straight,6,"VARIES","201",PDF p.26 / DS 24,RASTER
+Deck/abutments/diaphragms,epoxy coated,6a6,"DECK TRANSVERSE, BOTTOM",straight,9,"VARIES","265",PDF p.26 / DS 24,RASTER
+Deck/abutments/diaphragms,epoxy coated,6a7,"DECK TRANSVERSE, TOP AND BOTTOM",U,4,"11'-0","66",PDF p.26 / DS 24,RASTER
+Deck/abutments/diaphragms,epoxy coated,5b1,"DECK LONGIT. TOP AND BOTTOM",straight,504,"40'-0","21,027",PDF p.26 / DS 24,RASTER
+Deck/abutments/diaphragms,epoxy coated,7b2,"DECK LONGIT. OVER PIERS",straight,188,"28'-0","10,760",PDF p.26 / DS 24,RASTER
+Deck/abutments/diaphragms,epoxy coated,5d2,"ABUT. DIAPH. LONGIT. F.F.",straight,24,"7'-3","181",PDF p.26 / DS 24,RASTER
+Deck/abutments/diaphragms,epoxy coated,5d3,"ABUT. DIAPH. LONGIT. F.F.",straight,8,"5'-3","44",PDF p.26 / DS 24,RASTER
+Deck/abutments/diaphragms,epoxy coated,5d5,"S. ABUT. DIAPH. END",L,3,"4'-5","14",PDF p.26 / DS 24,RASTER
+Deck/abutments/diaphragms,epoxy coated,5d6,"S. ABUT. DIAPH. LONGIT. B.F.",bent,4,"38'-3","160",PDF p.26 / DS 24,RASTER
+Deck/abutments/diaphragms,epoxy coated,5d7,"PAVING NOTCH LONGIT.",straight,4,"38'-6","161",PDF p.26 / DS 24,RASTER
+Deck/abutments/diaphragms,epoxy coated,5d8,"ABUT. DIAPH. WING EXT. LONGIT.",straight,24,"7'-8","192",PDF p.26 / DS 24,RASTER
+Deck/abutments/diaphragms,epoxy coated,5d10,"PIER DIAPH. LONGIT.",straight,16,"4'-2","70",PDF p.26 / DS 24,RASTER
+Deck/abutments/diaphragms,epoxy coated,5d13,"PIER DIAPH. LONGIT.",straight,48,"7'-5","371",PDF p.26 / DS 24,RASTER
+Deck/abutments/diaphragms,epoxy coated,5d14,"PIER DIAPH. LONGIT.",straight,16,"5'-5","90",PDF p.26 / DS 24,RASTER
+Deck/abutments/diaphragms,epoxy coated,5d17,"PIER DIAPH. LONGIT.",bent,8,"10'-9","90",PDF p.26 / DS 24,RASTER
+Deck/abutments/diaphragms,epoxy coated,5d19,"N. ABUT. DIAPH. END",bent,3,"5'-5","17",PDF p.26 / DS 24,RASTER
+Deck/abutments/diaphragms,epoxy coated,5d20,"N. ABUT. DIAPH. LONGIT. B.F.",bent,4,"38'-9","162",PDF p.26 / DS 24,RASTER
+Deck/abutments/diaphragms,epoxy coated,5e1,"PIER DIAPH. HOOPS",closed hoop,32,"14'-2","473",PDF p.26 / DS 24,RASTER
+Deck/abutments/diaphragms,epoxy coated,5e2,"PIER DIAPH. HOOPS",closed hoop,16,"13'-4","223",PDF p.26 / DS 24,RASTER
+Deck/abutments/diaphragms,epoxy coated,5e3,"PIER DIAPH. TIES",U,48,"3'-7","179",PDF p.26 / DS 24,RASTER
+Deck/abutments/diaphragms,epoxy coated,5e5,"PIER DIAPH. TIES",U,4,"3'-8","15",PDF p.26 / DS 24,RASTER
+Deck/abutments/diaphragms,epoxy coated,5e6,"PIER DIAPH. HOOPS",closed hoop,2,"13'-5","28",PDF p.26 / DS 24,RASTER
+Deck/abutments/diaphragms,epoxy coated,5e7,"PIER DIAPH. HOOPS",closed hoop,2,"14'-3","30",PDF p.26 / DS 24,RASTER
+Deck/abutments/diaphragms,epoxy coated,8f1,"S. ABUT. FOOTING LONGIT.",bent,9,"37'-10","909",PDF p.26 / DS 24,RASTER
+Deck/abutments/diaphragms,epoxy coated,8f3,"ABUT. EXTENSION LONGIT.",L,8,"10'-2","217",PDF p.26 / DS 24,RASTER
+Deck/abutments/diaphragms,epoxy coated,8f4,"S. ABUT. EXTENSION LONGIT.",L,4,"8'-8","93",PDF p.26 / DS 24,RASTER
+Deck/abutments/diaphragms,epoxy coated,8f5,"N. ABUT. FOOTING LONGIT.",bent,9,"38'-9","931",PDF p.26 / DS 24,RASTER
+Deck/abutments/diaphragms,epoxy coated,8f6,"N. ABUT. EXTENSION LONGIT.",L,4,"8'-5","90",PDF p.26 / DS 24,RASTER
+Deck/abutments/diaphragms,epoxy coated,8g1,"ABUT. VERT. BOTH FACES",straight,135,"8'-9","3,154",PDF p.26 / DS 24,RASTER
+Deck/abutments/diaphragms,epoxy coated,8g3,"ABUT. DIAPH. VERT. B.F.",L,74,"15'-9","3,112",PDF p.26 / DS 24,RASTER
+Deck/abutments/diaphragms,epoxy coated,6g4,"ABUT. DIAPH. WING EXT. VERT.",straight,20,"7'-3","218",PDF p.26 / DS 24,RASTER
+Deck/abutments/diaphragms,epoxy coated,6j1,"TOP OF DECK TRANSVERSE (AT RAIL)",straight,254,"6'-3","2,384",PDF p.26 / DS 24,RASTER
+Deck/abutments/diaphragms,epoxy coated,5k1,"PAVING NOTCH",L,74,"4'-9","367",PDF p.26 / DS 24,RASTER
+Deck/abutments/diaphragms,epoxy coated,5k2,"PAVING NOTCH",bent,74,"3'-5","264",PDF p.26 / DS 24,RASTER
+Deck/abutments/diaphragms,epoxy coated,5p1,"ABUT. HOOPS",closed hoop,136,"10'-6","1,489",PDF p.26 / DS 24,RASTER
+Deck/abutments/diaphragms,epoxy coated,5p2,"ABUT. HOOPS",closed hoop,12,"10'-7","132",PDF p.26 / DS 24,RASTER
+Deck/abutments/diaphragms,epoxy coated,6p3,"ABUT. BOTT. AT PILES",V (bent),28,"6'-8","280",PDF p.26 / DS 24,RASTER
+Deck/abutments/diaphragms,epoxy coated,5p4,"ABUT. HOOPS AT ENDS",closed hoop,4,"10'-8","45",PDF p.26 / DS 24,RASTER
+Deck/abutments/diaphragms,epoxy coated,4t1,"UNDER BEAMS AT ABUTMENTS",V (bent),10,"5'-4","36",PDF p.26 / DS 24,RASTER
+Deck/abutments/diaphragms,stainless steel,6a17,"DECK TRANSVERSE, TOP & BOTTOM",straight,522,"6'-6","5,096",PDF p.26 / DS 24,RASTER
+Deck/abutments/diaphragms,stainless steel,5d9,"ABUT. DIAPH. LONGIT.",straight,12,"5'-2","65",PDF p.26 / DS 24,RASTER
+Deck/abutments/diaphragms,stainless steel,5d11,"ABUT. DIAPH. LONGIT. F.F.",straight,6,"5'-7","35",PDF p.26 / DS 24,RASTER
+Deck/abutments/diaphragms,stainless steel,5d12,"ABUT. DIAPH. LONGIT. F.F.",straight,2,"4'-7","10",PDF p.26 / DS 24,RASTER
+Deck/abutments/diaphragms,stainless steel,5d15,"PIER DIAPH. LONGIT.",straight,12,"4'-11","62",PDF p.26 / DS 24,RASTER
+Deck/abutments/diaphragms,stainless steel,5d16,"PIER DIAPH. LONGIT.",straight,4,"3'-11","16",PDF p.26 / DS 24,RASTER
+Deck/abutments/diaphragms,stainless steel,5d18,"PIER DIAPH. LONGIT.",bent,2,"6'-8","14",PDF p.26 / DS 24,RASTER
+Deck/abutments/diaphragms,stainless steel,8f2,"ABUT. FOOTING LONGIT. DOWELS",straight,18,"10'-4","497",PDF p.26 / DS 24,RASTER
+Deck/abutments/diaphragms,stainless steel,8g5,"ABUT. VERT. F.F.",straight,1,"8'-9","23",PDF p.26 / DS 24,RASTER
+Deck/abutments/diaphragms,non-coated,#2,"PILE SPIRAL",spiral,16,"38'-6","103",PDF p.26 / DS 24,RASTER
+Deck/abutments/diaphragms,non-coated,-,"SPIRAL SPACERS, L7/8 x 7/8 x 1/8 x 0.70",straight,48,"1'-10","62",PDF p.26 / DS 24,RASTER
+BTD55 beam (per beam),per standard 4730 (uncoated unless noted),5a1,"",straight,12,"29'-2","",PDF p.27 / DS 25,RASTER
+BTD60 beam (per beam),per standard 4730 (uncoated unless noted),5a1,"",straight,12,"31'-8","",PDF p.27 / DS 25,RASTER
+BTD105 beam (per beam),per standard 4730 (uncoated unless noted),5a1,"",straight,12,"35'-3","",PDF p.27 / DS 25,RASTER
+BTD105 beam (per beam),per standard 4730 (uncoated unless noted),5a2,"",straight,6,"40'-0","",PDF p.27 / DS 25,RASTER
+BTD55 beam (per beam),epoxy coated,5b1,"",hairpin (epoxy),39,"10'-8","",PDF p.27 / DS 25,RASTER
+BTD60 beam (per beam),epoxy coated,5b1,"",hairpin (epoxy),43,"10'-8","",PDF p.27 / DS 25,RASTER
+BTD105 beam (per beam),epoxy coated,5b1,"",hairpin (epoxy),81,"10'-8","",PDF p.27 / DS 25,RASTER
+BTD55 beam (per beam),epoxy coated,6b3,"",bent - used in pairs with 6b4,32,"5'-9","",PDF p.27 / DS 25,RASTER
+BTD60 beam (per beam),epoxy coated,6b3,"",bent - used in pairs with 6b4,32,"5'-9","",PDF p.27 / DS 25,RASTER
+BTD105 beam (per beam),epoxy coated,6b3,"",bent - used in pairs with 6b4,32,"5'-9","",PDF p.27 / DS 25,RASTER
+BTD55 beam (per beam),per standard 4730 (uncoated unless noted),6b4,"",U,8,"5'-1","",PDF p.27 / DS 25,RASTER
+BTD60 beam (per beam),per standard 4730 (uncoated unless noted),6b4,"",U,8,"5'-1","",PDF p.27 / DS 25,RASTER
+BTD105 beam (per beam),per standard 4730 (uncoated unless noted),6b4,"",U,16,"5'-1","",PDF p.27 / DS 25,RASTER
+BTD55 beam (per beam),per standard 4730 (uncoated unless noted),4c1,"",straight,73,"2'-7","",PDF p.27 / DS 25,RASTER
+BTD60 beam (per beam),per standard 4730 (uncoated unless noted),4c1,"",straight,81,"2'-7","",PDF p.27 / DS 25,RASTER
+BTD105 beam (per beam),per standard 4730 (uncoated unless noted),4c1,"",straight,133,"2'-7","",PDF p.27 / DS 25,RASTER
+BTD55 beam (per beam),per standard 4730 (uncoated unless noted),4d1,"",bent stirrup,59,"6'-5","",PDF p.27 / DS 25,RASTER
+BTD60 beam (per beam),per standard 4730 (uncoated unless noted),4d1,"",bent stirrup,63,"6'-5","",PDF p.27 / DS 25,RASTER
+BTD105 beam (per beam),per standard 4730 (uncoated unless noted),4d1,"",bent stirrup,101,"6'-5","",PDF p.27 / DS 25,RASTER
+BTD55 beam (per beam),per standard 4730 (uncoated unless noted),4e1,"",U,26,"3'-2","",PDF p.27 / DS 25,RASTER
+BTD60 beam (per beam),per standard 4730 (uncoated unless noted),4e1,"",U,26,"3'-2","",PDF p.27 / DS 25,RASTER
+BTD105 beam (per beam),per standard 4730 (uncoated unless noted),4e1,"",U,26,"3'-2","",PDF p.27 / DS 25,RASTER
+BTD55 beam (per beam),per standard 4730 (uncoated unless noted),4h1,"",hairpin,6,"8'-0","",PDF p.27 / DS 25,RASTER
+BTD60 beam (per beam),per standard 4730 (uncoated unless noted),4h1,"",hairpin,6,"8'-0","",PDF p.27 / DS 25,RASTER
+BTD105 beam (per beam),per standard 4730 (uncoated unless noted),4h1,"",hairpin,6,"8'-0","",PDF p.27 / DS 25,RASTER
+Barrier rail (one rail),epoxy coated,5c1,"RAIL, VERTICAL",bent,237,"7'-5","1,833",PDF p.39 / DS 37,RASTER
+Barrier rail (one rail),epoxy coated,5c8,"RAIL, VERTICAL",J,79,"1'-9","144",PDF p.39 / DS 37,RASTER
+Barrier rail (one rail),epoxy coated,6d1,"RAIL, LONGITUDINAL",straight,91,"36'-0","4,921",PDF p.39 / DS 37,RASTER
+Barrier rail (one rail),epoxy coated,4d2,"RAIL, LONGITUDINAL AT BUMP-OUT",closed loop,12,"7'-9","62",PDF p.39 / DS 37,RASTER
+Barrier rail (one rail),epoxy coated,4d3,"RAIL, LONGITUDINAL AT BUMP-OUT",closed loop,8,"6'-9","36",PDF p.39 / DS 37,RASTER
+Barrier rail (one rail),stainless steel,5c2,"RAIL, VERTICAL",closed bent,227,"6'-0","1,421",PDF p.39 / DS 37,RASTER
+Barrier rail (one rail),stainless steel,5c3,"RAIL, VERTICAL",bent,10,"3'-3","34",PDF p.39 / DS 37,RASTER
+Barrier rail (one rail),stainless steel,5c14,"RAIL, VERTICAL",hooked,10,"3'-10","40",PDF p.39 / DS 37,RASTER
+Barrier rail (one rail),stainless steel,4c15,"RAIL, VERTICAL AT BUMP-OUT",straight,10,"4'-0","27",PDF p.39 / DS 37,RASTER

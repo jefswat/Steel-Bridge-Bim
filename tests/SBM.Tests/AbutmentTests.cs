@@ -1,6 +1,7 @@
 using SBM.Api;
 using SBM.Core.Bridge;
 using SBM.Core.Geometry;
+using SBM.Core.Solids;
 using SBM.Core.Substructure;
 using Xunit;
 
@@ -166,6 +167,58 @@ public class AbutmentTests
         Assert.NotEqual(v0, v1, 3);
         Assert.True(Math.Abs(v1 - v0) > 0.1 && Math.Abs(v1 - v0) < 5, $"notch changes the footing volume by {v1 - v0:F3} m3");
         _ = u0; _ = sl; _ = baseline;
+        // the plan outline (generator) and the piling-layout view follow the notched footing: same area as the footing solid's bottom face
+        var un = doc.Substructure().Units.First(x => x.SupportIndex == 0);
+        var outline = un.Abutment!.FootingOutline;
+        Assert.True(outline.Count > 4, "notched outline has more than the 4 parallelogram corners");
+        double aOut = Math.Abs(MeshBuilder.SignedArea(outline));
+        Assert.InRange(aOut / BottomArea(un.Solids.Single(s => s.Kind == SubElementKind.Footing).Mesh), 0.999, 1.001);
+        var view = doc.Drawings().Single(v => v.Name == un.Name + " piling and wing layout");
+        var concrete = view.Drawing.Layers.Where(l => l.Style == SBM.Core.Drawing.Views.SheetLayers.Concrete).SelectMany(l => l.Polylines).Where(p => p.Closed).ToList();
+        var drawn = concrete.Single(p => p.Points.Length == outline.Count);
+        Assert.Equal(aOut, Math.Abs(MeshBuilder.SignedArea(drawn.Points.Select(q => new Vec2(q.X, q.Y)).ToList())), 4);
+    }
+
+    [Fact]
+    public void CorbelOffsets_LeaveAPlainWallBehindTheWing_AndTheRearElevationStopsTheCorbelLines()
+    {
+        var (doc, ad) = Setup();
+        var sd = doc.Bridge().Supports[0].ResolvedSubstructure.Clone();
+        sd.Abutment = ad;
+        doc.Bridge().Supports[0].Substructure = sd;
+        doc.Regenerate();
+        double Upper() => Math.Abs(doc.Substructure().Units.First(x => x.SupportIndex == 0).Solids.Single(s => s.Name.EndsWith("backwall (upper, corbel)")).Mesh.Volume());
+        double v0 = Upper();
+        ad.CorbelLeftOffset = ad.LeftEndOffset + Ft(3);
+        sd.Abutment = ad;
+        doc.Regenerate();
+        double v1 = Upper();
+        var g = doc.Substructure().Units.First(x => x.SupportIndex == 0).Abutment!;
+        double nB = g.N(g.XBwBack);
+        double plainS = g.CorbelLeftS!(nB) - g.BwLeftS(nB);
+        Assert.True(plainS > Ft(2.9), $"plain reach {plainS:F3} m");
+        // removed = corbel section (projection x vertical face + 45 deg taper triangle) over the plain reach
+        double area = ad.CorbelProjection * ad.CorbelVertical + ad.CorbelProjection * ad.CorbelTaperRise / 2;
+        Assert.InRange((v0 - v1) / (area * plainS), 0.9, 1.1);
+        // backwall extent unchanged (the plain wall continues to the end), corbel offsets outside the backwall are rejected
+        Assert.Equal(g.BwLeftS(nB), g.LeftEndS(nB), 6);
+        ad.CorbelLeftOffset = ad.LeftEndOffset - Ft(1);
+        sd.Abutment = ad;
+        var res = doc.Regenerate();
+        Assert.True(res.Errors.Count > 0 || doc.Substructure().Diagnostics.Any(d => d.Message.Contains("corbel offsets")), "corbel outside the backwall must be reported");
+    }
+
+    /// <summary>Plan area of the downward-facing triangles of a solid.</summary>
+    private static double BottomArea(Mesh m)
+    {
+        double a = 0, zMin = m.Positions.Min(p => p.Z);
+        for (int t = 0; t < m.TriangleCount; t++)
+        {
+            var p0 = m.Positions[m.Indices[3 * t]]; var p1 = m.Positions[m.Indices[3 * t + 1]]; var p2 = m.Positions[m.Indices[3 * t + 2]];
+            if (Math.Max(p0.Z, Math.Max(p1.Z, p2.Z)) > zMin + 1e-6) continue;          // level footing bottom only
+            a += Math.Abs(Vec3.Cross(p1 - p0, p2 - p0).Z) / 2;
+        }
+        return a;
     }
 
     [Fact]

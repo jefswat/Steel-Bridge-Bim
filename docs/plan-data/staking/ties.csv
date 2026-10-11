@@ -1,0 +1,4 @@
+set,pdf_page,from_alignment,from_station,from_offset_lt_ft,to_alignment,to_station,to_offset_lt_ft,what,tag
+116,15,CL I-80,7591+08.83,107.43,CL Ramp A2,61591+08.76,0,CL Pier 6A x CL Ramp A2 (Ramp A2 is not in the model),TEXT
+116,16,CL I-80,7602+94.96,109.63,CL Ramp G,67502+97.70,0,CL Pier 11WB & 19G x CL Ramp G,TEXT
+116,16,CL I-80,7603+32.45,41.08,CL I-80,7602+94.96,109.63,CL Pier 11WB & 19G: 77'-6 7/8 along the pier line from the WB CL point to the Ramp G CL point,RASTER

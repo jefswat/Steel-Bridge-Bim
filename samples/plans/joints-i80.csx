@@ -4,12 +4,13 @@
 //  * "D" = blockout width from the deck-end face, perpendicular to the joint (25" piers, 18" abutments); depth 1'-2; device 1/8" below top of slab.
 //  * CL bearing to deck end: 1'-1 1/2 Pier 5WB (both units), 1'-3 1/2 Pier 11WB (both units), 1'-4 abutments.
 //  * One device body per joint (spans the whole opening): Unit 1 owns 5WB, Unit 2 owns 11WB. The joint line is the deck-end line (parallel to the support line).
-//  * NOT modeled: the Pier 6A joint (a separate line beside 5WB for girders A-E; the model has one straight deck end per unit),
+//  * The Pier 6A part of the Unit 2 begin (kinked end of slab, PDF 186 Detail A) is set by deck-end-kinks.csx (SupportDefinition.DeckEndPoints; run it after this script).
+//    NOT modeled:
 //    the Pier 19G joint on this side (Ramp G Unit 4 owns it), barrier slider plates, the manufacturer's beams/support boxes/anchors.
 //  * DECK END BLOCKS ("end dam diaphragm", slab sheets 178/183/188 sections B-B, C-C): 2'-2 deep (1'-2 blockout + 1'-0 below), soffit flat for
 //    3'-4 1/2 from the deck end at the piers (1'-3 1/2 + 2'-1, pdf 185 C-C, 190 C-C) and 2'-10 at the abutments (1'-6 + 1'-4, pdf 185 B-B,
 //    195 C-C), then rising at 45 degrees to the 8" slab soffit. Set DECK_END_BLOCKS = false below to switch them off.
-//    Reinforcing (marks 5d/5e) is NOT modeled; see docs/plan-data/deck-end-blocks.md.
+//    Reinforcing (marks 5d/5e/4d): schedule only, UNRESOLVED (deck-rebar-i80.csx; docs/plan-data/deck-rebar.md section 5).
 using SBM.Core.Bridge;
 using SBM.Core.Geometry;
 

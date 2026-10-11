@@ -107,11 +107,17 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
     in the plan's zone order, 4c7/4c5 U, 11g/10g bottom mats U, 6c1/6c2/5n2 hoops with lap tails (`PlanHoop`), 6b2 cantilever flat + slant (`CS`), 5a11/5a12 short end bars. Data is appended to the
     csx lines as `;S=shape:dims:pin` (+ `;Z=..;M=..` hairpins, `;E=-1/1`) by `tools/patch_*.py` from `tools/extract_all.py`/`shapes.py` (plan text + fraction glyph decoder `plantext.py`);
     plan vs model for every mark: `docs/plan-data/bend-diagram-comparison.md` (`tools/compare.py`, `make_doc.py`; abutment diagrams hand-read in `tools/abut_hand.py`). Bars are never moved to
-    satisfy cover - containment violations are raised. `LateralSetback` continues each relief line level beyond its ends (the plans' arcs start at the cap tips).
+    satisfy cover - containment violations are raised. `LateralSetback` continues each relief line level beyond its ends (the plans' arcs start at the cap tips) and counts each
+    face's own layer lines once (`SubstructureUnit.ReliefLineTags` = face + layer per line). Pedestal U bars 5m1 / 5n1: base in the TOP of the plan pedestal block (2" under it; 5m1 one
+    5n1 bar lower), legs through the block into the cap; 5n2 hoops round the blocks of the note's girders (`PlanBarGroup.Girders`, csx `;G=C,D`), else UNRESOLVED at mid-cap;
+    `PlanBarGroup.End` also picks the end of CapEnd groups (5WB 5a15 shape `A15` left, 5a14 right). Check: pedestal blocks are host concrete for pedestal bars, hairpins need 3 1/2" CL.
+    to both full-width faces (`HairpinFaceClear`, sections A-A/B-B), per-bar records `SubstructureUnit.CoverViolations` (`samples/plans/check-sub-cover.csx`); textured-face cover for
+    other bars UNRESOLVED (2" kept). State and remaining warnings: `docs/plan-data/cap-cover-containment.md`.
   - As-designed abutment (OPTIONAL `SubstructureDefinition.Abutment`, `AbutmentDefinition.cs`; null = parametric abutment): `SubstructureAbutment.cs`
     (`AddSlab` = prism between two vertical planes with per-vertex elevation functions; end lines are alignment offsets, so S depends on N),
     `SubstructureAbutmentRebar.cs` (only proven placements in 3D, rest of the plan bar list = schedule-only marks, mismatches = warnings),
-    `AbutmentViews` (3 sheet panels), `SubElementKind.Wingwall/Counterfort/Maskwall/WingFooting`, `unit.Abutment` (`AbutmentGeometry`). Standing rule:
+    `AbutmentViews` (3 sheet panels; the plan draws `AbutmentGeometry.FootingOutline` = generator outline with notches), `SubElementKind.Wingwall/Counterfort/Maskwall/WingFooting`,
+    `unit.Abutment` (`AbutmentGeometry`). Backwall runs behind the wings to the maskwalls; `CorbelLeft/RightOffset` limit the corbel to the wing inner faces. Standing rule:
     no invented defaults - unresolved plan items are generator warnings ("UNRESOLVED"). Docs `docs/plan-data/abutments-model.md`; scripts `samples/plans/abutments-*.csx`.
   - Cap section step / aesthetic relief (OPTIONAL, `SubstructureDefinition.Aesthetics` = `CapAestheticsDefinition`, as-designed caps only): the
     cap is W above the relief curve and W - 1'-0 below (StepSetback 6" per face, BOTH faces). The cap solid itself is the narrower core; `BuildCapStep`
@@ -258,7 +264,8 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   Tee`); unknown sections are reported. Gap inputs (docs/plan-data/cross-frame-gaps.md "Implementation"): `CrossFrameDefinition.Links` (`CrossFrameLink`: frame
   between girder g1 at support / aux support line s1 and g2 at s2 - plane through the two CL bearings, E-F at Pier 6A / 5WB), `SupportBayStyles[support][bay]`
   (Type 6 in bay A-D at 14WB/15WB), `CrossFrameStyle.BottomBoltPitch`, `CrossFrameStyle.Unresolved` (plan items not dimensioned: raised once per bridge as UNRESOLVED
-  warnings, nothing invented), per-girder lines at skewed piers (Girder = X, Distance = X's bearing distance, explicit Bays) and a warning for every listed bay a
+  warnings, nothing invented), `CrossFrameLine.Unresolved` (per-line plan conflicts / undimensioned items, raised with the line location; frames still
+  generated as listed), per-girder lines at skewed piers (Girder = X, Distance = X's bearing distance, explicit Bays) and a warning for every listed bay a
   line cannot generate (`BuildFrameLines`). Plan data: `samples/plans/cross-frames-i80.csx`, `cross-frames-ramp-g.csx`.
   Rolled sections come from the embedded AISC Shapes Database v16.0 extract `Steel/AiscShapes.csv` (all W, WT, C, MC, L:
   dims, A, W lb/ft, kdes/kdet/k1, x/y, workable gages WGi/WGo; angle gages g/g1/g2 = AISC Manual Table 1-7A in code).
@@ -280,7 +287,13 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   = the plans' "end dam diaphragm" (2'-2 deep, flat soffit then 45 degrees to the slab soffit, full deck width, girder ends cast into it). `ConcreteGenerator.BuildEndBlock`
   -> `ExpansionJointResult.EndBlock` (`DeckEndBlockResult.Probe`); the blockout is then built to its full plan depth. `Checks/DeckEndBlockCheck` (run in
   `RegenerationCache`) reports steel inside a block: girder ends/studs/W strut flange flush = INTENDED (Info), anything else = CLASH warning; nothing is moved.
-  Block rebar is not modeled. Data/evidence: `docs/plan-data/deck-end-blocks.md`; scripts `joints-i80.csx`, `joints-ramp-g.csx` (DECK_END_BLOCKS flag). Snapshot `--closeup EBLKn[@Bridge]`.
+  Block rebar: see `DeckPlanReinforcement.EndDam` below. Data/evidence: `docs/plan-data/deck-end-blocks.md`; scripts `joints-i80.csx`, `joints-ramp-g.csx` (DECK_END_BLOCKS flag). Snapshot `--closeup EBLKn[@Bridge]`.
+- Kinked deck ends (OPTIONAL `SupportDefinition.DeckEndPoints` on the first / last support = the plan's break points of the end of slab as station / offset, left to right, monotone; first and last
+  segments extend; null / < 2 points = the straight `DeckEndOffset` line): `Framing/DeckEndPolyline.cs` (`SignedDistance` = shortest distance, + into the deck; `Inset` = parallel offset with miter vertices,
+  vanished middle segments dropped, end segments kept; `Clip` of a plan segment; `CrossOffsetCurve`). `DeckResult.BeginPolyline/EndPolyline` + `FromBegin/FromEnd` (use these, not `BeginLinePoint`, for
+  distances from a deck end). Followed by the deck outline (break points are vertices), slab solid (extra columns through the break points, `VarColumns`/`DeckOffsets`), blockouts / end blocks / joint
+  bodies (`EndD`, `PlanX`), transverse bar clipping (`ClipToEnds`) and longitudinal bar ends (`EndsVar`), `DeckRebarCheck`. `BeginLinePoint/Direction` stay the straight lines (gap checks, drains, views).
+  Plan data: `samples/plans/deck-end-kinks.csx` (I-80 U2 at Pier 5WB / 6A, Ramp G U4 at Pier 19G incl. its straight right-edge flare as a `RightEdgeTable`); run before the deck-rebar scripts.
 - Camber / blocking (OPTIONAL `GirderLayoutDefinition.Camber` = `GirderCamberDefinition` per girder: DatumPoint, Keys (plan point number -> support index / FS number /
   `GirderEnd`), Points (camber, steel and slab+barrier deflection)): `Framing/CamberBlocking.cs` -> `BridgeFraming.Camber` (per point: final top of web, girder-line haunch
   elevation H = grade - slab + slab deflection, no-load top of web N = web + deflections, BLOCKING = N - N(datum), camber from the no-load shape = N - chord(N) between splices).
@@ -293,9 +306,15 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   `TransverseBeginClear/EndClear`. `DeckLongZone` = equal spaces between two reference lines (girder web line / edge / offset, margins, alternating layers) or explicit `Positions` (+ `PositionLayers`,
   `PositionsFromRight`), stock chains with laps; zones that abut between the same references form a RUN and their lines continue across zones (nearest line of the same layer) so bar counts follow the length
   of the lines. `PlanBarList` (+ `Families`, e.g. "6b") = the plan's bar list per unit: every placed mark is compared (counts exactly, weight 3%) with warnings for differences, rows without a placed bar become
-  schedule-only marks (no 3D bar; end dam 5d/5e are NOT placed). Marks are the plan's (7a1, 6b1, 5j1...), the generic AssignMarks is bypassed. `Checks/DeckRebarCheck` (run in RegenerationCache for every deck
-  with bars): cover top/bottom, edges, deck-end/blockout distance, bars vs the highest steel surface (top flanges, splice plates, fillers) -> `ConcreteModel.Notes` / Diagnostics. Plan data and results:
-  `docs/plan-data/deck-rebar.md`, `deck-bar-lists.csv`; scripts `samples/plans/deck-rebar-i80.csx`, `deck-rebar-ramp-g.csx` (run LAST, after the joint/deck-edge/girder scripts), `report-deck-rebar.csx`,
+  schedule-only marks (no 3D bar). Marks are the plan's (7a1, 6b1, 5j1...), the generic AssignMarks is bypassed. End dam diaphragm bars (`DeckPlanReinforcement.EndDam` = `DeckEndDamBar`,
+  `Concrete/ConcreteEndDam.cs`): bend-diagram shape (open bar by its OUTSIDE outline in section coordinates X from the deck-end face / Drop below grade, or a hoop w x h with lap tails, built with
+  `SubstructureGenerator.PlanBent/PlanHoop`) in the plane normal to the deck-end line, repeated per girder bay (`FromGirder`, `Spacing`, `PerBay`, `Overhang` from the exterior girder lines, girders found where
+  their web lines cross the deck end); `Unplaced` bars count toward the mark (location "... not modeled - UNRESOLVED") with `Unresolved` raised; `DeckPlanReinforcement.Unresolved` = plan items not dimensioned,
+  each an "UNRESOLVED (deck reinforcing): ..." warning. Placed: Ramp G 5d2-5d5 at Piers 5G/9G/14G; I-80 and the rest of the end dams are schedule only (reasons + pages in `docs/plan-data/deck-rebar.md` 5-6).
+  `Checks/DeckRebarCheck` (run in RegenerationCache for every deck
+  with bars): cover top/bottom, edges, deck-end/blockout distance, bars vs the highest steel surface (top flanges, splice plates, fillers) -> `ConcreteModel.Notes` / Diagnostics; end dam marks are checked
+  separately (`CheckEndDams`: clear inside the deck-end concrete incl. the end block soffit, exact test against the top flange / splice plate triangles near the ends). Plan data and results:
+  `docs/plan-data/deck-rebar.md`, `deck-bar-lists.csv`; scripts `samples/plans/deck-rebar-i80.csx`, `deck-rebar-ramp-g.csx` (run LAST, after the joint/deck-edge/girder scripts and `deck-end-kinks.csx`), `report-deck-rebar.csx`,
   `check-deck-rebar.csx`. The typical-section sheet text and the database group "deck reinforcing" (unit bar schedule in its properties, incl. schedule-only marks) follow the plan.
 - Variable deck width: `DeckDefinition.LeftAt/RightAt(station)`; constant decks keep the old code path.
 - Deck edge strip (OPTIONAL, default off, PROJECT-SPECIFIC to the Iowa plans): `DeckDefinition.EdgeStrip` (`DeckEdgeStrip` Width inboard from the edge, follows

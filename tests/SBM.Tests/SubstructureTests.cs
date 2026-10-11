@@ -487,4 +487,34 @@ public class SubstructureTests
         Assert.Equal(1, SubstructureGenerator.SegmentDistance(new Vec3(0, 0, 0), new Vec3(0, 0, 10), new Vec3(1, 0, 0), new Vec3(1, 0, 10)), 9);
         Assert.Equal(0, SubstructureGenerator.SegmentDistance(new Vec3(-1, 0, 0), new Vec3(1, 0, 0), new Vec3(0, -1, 0), new Vec3(0, 1, 0)), 9);
     }
+    [Fact]
+    public void PlanPedestalUBars_SitInThePedestalTop_AndHoopsGoRoundTheNamedGirders()
+    {
+        // plan pedestal 5'-6 x 5'-8 (8" min high), 5n1 U bars 2'-8 + 5'-3 + 2'-8 (6 per pedestal), 5n2 hoops "AT GIRDERS B & C ONLY"
+        var sm = Build(p =>
+        {
+            p.PedestalSizeAlong = In(66); p.PedestalSizeAcross = In(68); p.MinPedestalHeight = In(8);
+            p.Reinforcement.CapBars = new()
+            {
+                new PlanBarGroup { Mark = "5n1", Kind = PlanBarKind.PedestalTransverse, Size = "#5", Count = 30, Length = In(127), Shape = "U", Dims = new[] { In(32), In(63), In(32) }, Pin = In(2.5) },
+                new PlanBarGroup { Mark = "5n2", Kind = PlanBarKind.PedestalHoop, Size = "#5", Count = 2, Length = In(264), Shape = "HOOP", Dims = new[] { In(62), In(64), In(6), In(6) }, Pin = In(2.5), Girders = "B-C" },
+            };
+        });
+        var u = sm.Units.Single(x => x.Type == SupportType.Pier);
+        var blocks = u.PedestalBlocks.OrderBy(b => b.S).ToList();
+        double S(Vec3 q) => Vec2.Dot(q.XY - u.Origin, u.D);
+        var n1 = sm.Bars.Where(b => b.Unit == u.Name && sm.Marks.Any(m => m.Unit == u.Name && m.Mark == b.Mark && m.Location.EndsWith("5n1 pedestal bars"))).ToList();
+        Assert.Equal(30, n1.Count);
+        foreach (var b in n1)
+        {
+            var blk = blocks.OrderBy(k => Math.Abs(k.S - S(b.Points[0]))).First();
+            // base: 2" clear below the pedestal top (centre a half bar lower), i.e. in the pedestal, not under the cap top
+            Assert.Equal(blk.SeatZ - In(2) - In(0.625) / 2, b.Points.Max(q => q.Z), 3);
+        }
+        var n2 = sm.Bars.Where(b => b.Unit == u.Name && sm.Marks.Any(m => m.Unit == u.Name && m.Mark == b.Mark && m.Location.EndsWith("5n2 pedestal hoops"))).ToList();
+        Assert.Equal(2, n2.Count);
+        var hoopBlocks = n2.Select(b => blocks.OrderBy(k => Math.Abs(k.S - b.Points.Average(q => S(q)))).First()).ToList();
+        Assert.Equal(new[] { 1, 2 }, hoopBlocks.Select(k => k.Girder).OrderBy(x => x).ToArray());
+        Assert.All(n2.Zip(hoopBlocks), t => Assert.InRange(t.First.Points[0].Z, t.Second.CapTopZ, t.Second.SeatZ));
+    }
 }

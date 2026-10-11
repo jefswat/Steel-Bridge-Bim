@@ -1,0 +1,8 @@
+set,bridge,pdf_page,spans_printed,measured_along,tag
+116,I-80 WB Unit 1,15,207'-0; 278'-0; 265'-0; 240'-0; 236'-9,CL westbound approach roadway,CODE
+116,I-80 WB Unit 2,16,210'-0; 260'-0; 234'-1 1/16; 200'-10 1/8; 167'-11 15/16; 143'-6 11/16,CL westbound approach roadway,CODE
+116,I-80 WB Unit 3,17,160'-7 1/2; 195'-5 15/16; 195'-3 1/8; 195'-2 3/16; 160'-0 1/2,CL westbound approach roadway,CODE
+316,Ramp G Unit 1,14,145'-0; 190'-0; 190'-0; 190'-0; 150'-0,CL Ramp G,CODE
+316,Ramp G Unit 2,15,175'-0; 213'-0; 202'-0; 160'-0,CL Ramp G,CODE
+316,Ramp G Unit 3,16,200'-0; 255'-0; 220'-0; 225'-0; 180'-0,CL Ramp G,CODE
+316,Ramp G Unit 4,17,167'-0; 198'-0; 258'-0; 205'-0; 152'-0,CL Ramp G,CODE

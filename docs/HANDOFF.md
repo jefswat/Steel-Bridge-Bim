@@ -50,6 +50,10 @@ Use this to start the next session. Architecture notes are in `CLAUDE.md`. The u
   NOT pushed from the sandbox (no GitHub credentials there): push `main` from the host. Still open from abutfix:
   `docs\plan-data\pier-pedestals.md` (referenced by the scripts, missing), notched footing outline in AbutmentViews,
   South backwall 19.4 vs 21.5 CY.
+  -> branch `worktree-agent-aefd082a948c047f5`: notched outline drawn (`AbutmentGeometry.FootingOutline`); South backwall now 21.6 CY
+  (backwall maskwall to maskwall behind the wings per rear elevation p80, corbel only between the wings: `CorbelLeft/RightOffset`;
+  same for I-80). Pour split 11.1/10.5 vs plan 11.5/10.0 = minor CONFLICT (plan split computed without the 3" c.j. offset).
+  Main model must re-run `abutments-i80.csx` + `abutments-ramp-g.csx` after merge. See docs/plan-data/abutments-model.md.
 - (was) **PAUSED FOR RESTART (2026-10-11):** two branches committed but NOT merged — verify (full build + tests), merge
   (keep main's .sbm, re-run scripts with temp\cli-main), push:
   - `feature/abutfix` (c8e2515, last commit WIP): counterfort 1'-10, maskwall flush, extensions, West footing notches,
@@ -83,9 +87,12 @@ Use this to start the next session. Architecture notes are in `CLAUDE.md`. The u
   check-blocking, substructure-elevation check (running).
 - **OPEN:** (1) Pier 6A: girder A inside the level strip (plan follows the plane) — agent checking whether the gore edge
   has a barrier (`docs\plan-data\gore-6a-edge.md`); (2) ~0.008 ft low I-80 U2 7WB-9WB unexplained by sheet 190;
-  (3) 2,103 cap bars outside cover (pedestal U-bars, end verticals, 4c5/4c7, skin) — bend-diagram agent fixing;
+  (3) cap bars outside cover: 2,103 -> 565 (bend diagrams + pedestal sizes) -> 178 (cap-cover branch 2026-10-11: pedestal U bars in the pedestal top,
+  5n2 hoops at the noted girders, 6b2 / 5a13 / 5a15 / 5a11 / 5a12 / hairpin-zone fixes, per-face relief lines); remaining 178 = 11WB / 9G pedestals not set,
+  6A (stepped top vs relief, undecoded end bars), Ramp G 5a12 relief bars, 19G 5c4 - `docs/plan-data/cap-cover-containment.md`;
   (4) plan's own camber vs deflection inconsistent at ~177 I-80 U2 points (plan issue); (5) 3 1/2" clear at the textured
-  cap face — which bars (bend agent); (6) abutment wing/counterfort/step/corbel/maskwall rebar schedule-only, abutment
+  cap face — ANSWERED: the plans print 3 1/2" CL. only to the 5c hairpin legs, at both faces (checked); a production cover for other bars at the textured
+  face is not stated (mockup note only: 2" clear to the bottom of the texture) - UNRESOLVED warning, 2" kept; (6) abutment wing/counterfort/step/corbel/maskwall rebar schedule-only, abutment
   uplift piles unidentified.
 - **Running branches:** feature/bends (bend diagrams, every printed dimension), feature/deckrebar (deck reinforcing to
   the plans — biggest model error), feature/sheets (overprinting, model-driven notes, missing sheets).
@@ -148,9 +155,10 @@ as "…before bearing iteration.sbm". The run confirmed item 2.3: girder C has n
    - I-80 Unit 2 skewed Piers 8WB–10WB: frames on K's string and K's bearing lines only; the plans' extra partial frames
      placed from other girders' bearings ("measured along girder" dims) are not transcribed; Type 4 bays partly read.
    - I-80 Unit 2 bay E–F frame at Pier 5WB/6A (special orientation, sheet 117 detail) not modeled.
-   - I-80 Unit 3 partial lines along girder A at Piers 12WB/13WB (21'-11 3/16; 16'-1 15/16, 12'-10 7/8, 7'-4 1/8) not added;
-     Type 6 pier frames in bay A–D at 14WB/15WB modeled as Type 5 (support styles are per support, not per bay).
-   - Ramp G Pier 17G zone Types 2/3 partly approximate. **Ramp G Span 16G along girder A is 193.48 ft in the model vs
+   - ✅ (2026-10-11) I-80 Unit 3 partial lines at Piers 12WB/13WB placed from the plan dims, Ramp G Pier 16G zone transcribed
+     (per-bearing lines, B line C-D = Type 2), PDF 110 visual checks settled; 3 plan conflicts raised as line UNRESOLVED notes;
+     5 plan-consistent frames inside splice plates remain (Unit 3 FS22/FS24). See `docs/plan-data/cross-frame-gaps.md` section 8.
+   - Ramp G Pier 17G zone: verified against the plan (no change). **Ramp G Span 16G along girder A is 193.48 ft in the model vs
      191'-2 9/16 in the plan girder data (2.26 ft)** — Pier 16G location/skew in my inputs likely off (straddle bent, 3.4).
    - Assumed: tie plate length 10"; top gusset bolt rows; abutment frame bottom bolt rows; Ramp G abutment W24x68 4"
      below the top of web; inspection walkways not modeled; studs on W top struts not modeled.
@@ -182,7 +190,8 @@ as "…before bearing iteration.sbm". The run confirmed item 2.3: girder C has n
      1 1/4x24 / 2x24 | 1 1/8x22 end. B-D: top as A but 1 1/8x20/2x20 at 2G and 1x20/2x20 at 3G, 4G; bottom
      7/8x18 | 1 1/8x20 / 1 7/8x20 | 7/8x18 | 1 1/8x20 / 2x20 | 7/8x20 | 1 1/4x20 / 2x20 | 7/8x18 | 1 1/8x20 / 2x20 | 7/8x18.
 4. **Ramp G Piers 16G and 17G** (data extracted: `docs\plan-data\ramp-g-piers-16g-18g.md`; two-column bents, pages 64–71) and **18G** (pages 72–74; data partly read: 31'-6"×42'-6"×7'-0" footing, 34 HP14x73).
-5. **Deck reinforcing** per the plan layout: DONE on `feature/deckrebar` (`docs/plan-data/deck-rebar.md`): plan-driven transverse (7a), longitudinal (6b), 5j1 and the plan bar lists for all units of both bridges; slab bars within 0.5% of the lists (I-80) / 0.3% (Ramp G). Open: end dam bars 5d/5e/4d are schedule-only (not placed in 3D), the kinked slab ends at Pier 6A / 19G, I-80 U3 north bays 6b2 +10%, overhang positions of Ramp G (count proven, positions inferred). Bar M1 near FS4-G1-P9: not reproducible (generic layout passes the new containment check; see section 6 of deck-rebar.md).
+5. **Deck reinforcing** per the plan layout: DONE on `feature/deckrebar` (`docs/plan-data/deck-rebar.md`): plan-driven transverse (7a), longitudinal (6b), 5j1 and the plan bar lists for all units of both bridges; slab bars within 0.5% of the lists (I-80) / 0.3% (Ramp G). 2026-10-11: kinked slab ends at Pier 5WB/6A and 19G modeled (`SupportDefinition.DeckEndPoints`, `deck-end-kinks.csx`, run before the deck-rebar scripts), Ramp G end dam 5d2-5d5 at 5G/9G/14G placed in 3D
+   (rest of the end dams schedule only, UNRESOLVED: deck-rebar.md sections 5-7; Ramp G U3 end dam bars meet its 20" top flanges). Open: I-80 U3 north bays 6b2 +10%, overhang positions of Ramp G (count proven, positions inferred). Bar M1 near FS4-G1-P9: not reproducible (generic layout passes the new containment check; see section 6 of deck-rebar.md).
 6. **Drain routing** per sheets 205–220: downspouts, collectors, pipe hangers. The current piped drains run generically to the nearest pier.
 7. **Modular expansion joints** (sheets 203–204). Plans give blockouts/deck ends only; hardware is manufacturer-designed (`docs\plan-data\expansion-joints.md`). **User decision pending** on whether to model them (blockout + generic body).
 8. **Battered piles** (1:4 corner and edge piles): modeled plumb. Needs a batter direction per pile in `FootingDefinition`.
@@ -214,10 +223,46 @@ as "…before bearing iteration.sbm". The run confirmed item 2.3: girder C has n
 - Editor UI for the new column-rebar inputs (faces, chamfer positions, hoop overlap, crossties, flare cage).
 - Generic bearings: bearing body 16"×16" and masonry plate 1¾" are assumptions (vendor items).
 
-## 5. Other plan sets not started
+## 4a-bis. Open decisions page (2026-10-11)
 
-- Prestressed sets in `dist\SteelBridgeModeler\`: Woodbury I-29 NB over Floyd Blvd, and Br02069 (TH 65).
-- Include borings in the IFC geotech representation where they're shown.
+All pending user decisions (staking 1-4, Ramp G 19G 27" bar end calibration, Ramp G U3 end dam bars vs 20" flanges,
+standard beam sheets download, Woodbury standard-beam placement) are on https://claude.ai/artifact/HGTVUujx3prgBrmWAjn5ra
+(source temp/decisions/). The user saves choices there: read them with ArtifactData list, collection "decisions".
+
+## 4b. Staking check findings: AWAITING USER REVIEW (2026-10-11; user is checking on the computer, do not change yet)
+
+From `check-staking.csx` / `docs/plan-data/haunch-staking-check.md`:
+1. Pier 11WB & 19G is 10 11/16" left along the pier line vs the staking footing centres (PDF 16: -31'-1 15/16, +9'-5 1/16,
+   +30'-11 1/16; model -31'-11 5/8, +8'-6 3/8, +30'-0 3/8). PDF 63 gives CL WB 11 5/16" from CL pier at one bearing row;
+   `piers-i80.csx` uses 11 5/8" at the pier CL. Staking vs pier sheet also differ 1" on footing 1-2 (40'-7 vs 40'-6).
+2. Pier 6A: 13'-2 15/16 from CL Ramp A2 on PDF 15, 39, 41; `pier-6a.csx` uses 13'-2 5/16.
+3. Pier 6WB footings: 2'-2 3/8 on PDF 16, 43, 45; `piers-i80.csx` uses 2'-2 3/16.
+4. `docs/plan-data/camber/RG-unit2-defl_slab_in.csv` point 7 holds the unnumbered "midpoint of field section" column
+   (3.13/2.95/2.78/2.61); PDF 116 point 7 = 3.05/2.87/2.71/2.55. Check the steel deflection / camber CSVs for the same shift.
+Plan-only (no input change): Ramp G 5G footing staking 31'-6 x 22'-0 vs details 29'-0 x 24'-0 (model follows details);
+allowable field haunch MAX in tension zones below the plans' nominal geometry (365 points).
+
+## 5. Prestressed plan sets: extracted, program improvements QUEUED (user, 2026-10-11)
+
+Plan data: `docs/plan-data/woodbury-i29-floyd/` (Iowa Design 817, 3-span BTD, integral abutments) and
+`docs/plan-data/br02069-th65/` (MnDOT, 1 span 7 x 30MH). Each SUMMARY.md "Model mapping" lists the gaps in detail.
+**User rule:** standard beams (Iowa BTx, MnDOT MH, ...) are taken from the state standard, not designed per bridge —
+model them at the STANDARD length/strands/details; differences vs the layout are check warnings, never stretched beams.
+
+Queue (shared by both sets first):
+1. Beam shape catalog beyond Tx: Iowa BTA-BTE bulb tees (BTD first) and MnDOT MH (30MH), with true radius fillets
+   (R 8 / R 2 BTD, 6" R 30MH) — the WBFL PrecastIBeam dims can't do them; per-shape standard data (lengths, strands).
+2. Per-span (per beam line) prestressed beam definitions: type, standard length, strand pattern (BTD55/105/60).
+3. Strand debonding (`StrandPoint` debond lengths; PGSuper import too) — Br02069 14 of 44 strands.
+4. Harped strands at given grid columns + hold-down distance from midspan (vs `HarpPointFraction`).
+5. Integral / semi-integral abutments with concrete end diaphragms (beams embedded), pier continuity diaphragms on pads.
+6. Steel intermediate diaphragms between prestressed beams (C15 / W21 / W14; the prestressed path skips cross frames).
+7. Straight chord girders with different spacing per span / different offsets each side of a pier (Woodbury).
+8. Profile grade line offset from the stationing line (Woodbury pivot 5.00 ft RT).
+9. Smaller: round CIP pipe piles, curved-plate bearings, future-beam pedestals, MnDOT Type S / Iowa aesthetic
+   barriers, columns with brick-reveal projections, stage-joint deck edge, prestressed camber in the haunch check,
+   beam bar generator (stirrups, end bars).
+- Also: include borings in the IFC geotech representation where they're shown.
 
 ## 6. Last: cap aesthetic features (requested by the user)
 

@@ -10,7 +10,10 @@
 //    bays that narrow (north of the continuous girders) have the equal-space counts printed on the longitudinal layouts.
 //  * Transverse bar ends stop short of the joint blockouts: clear distance from the deck-end line (normal to it) calibrated on the bar lengths printed at the skewed
 //    ends (7a4/7a7 Unit 1 begin, 7a2/7a13 Unit 2 end, 7a4/7a15 Unit 3 begin, 7a3/7a10/7a13 Unit 3 end): ~17" at the abutments (blockout D = 18"), ~27" at the piers
-//    (D = 25").  Unit 2's begin is the KINKED slab end at Pier 6A (sheet 177 Detail A), which the deck outline does not have: the first lines there are longer than the plan's.
+//    (D = 25").  Unit 2's begin is the KINKED slab end at Pier 5WB / 6A (sheet 179 = PDF 186, Detail A): set by deck-end-kinks.csx (run it first).
+//  * END DAM DIAPHRAGM bars 5d / 4d / 5e (sections B-B / C-C, PDF 185 / 190 / 195): schedule only, UNRESOLVED (see EndDamUnresolved below): the sections give the bend
+//    diagrams and the clears in the section, but the positions ALONG the joint are only "PLACE n BARS BETWEEN GIRDERS ... AND 2 BARS AT EQUAL SPACING OUTSIDE EXTERIOR
+//    GIRDERS" with "@ 1'-0" - no end distances from the girders and no reference for the outside bars (Ramp G prints its equivalent as 10" + 8 @ 1'-0 + 10" on its PDF 138).
 //  * Bar lists (PDF 196) are in docs\plan-data\deck-bar-lists.csv; the generator compares every placed mark with them and reports the differences.
 using SBM.Core.Bridge;
 using System.Globalization;
@@ -110,6 +113,23 @@ IEnumerable<DeckLongZone> VarBays((string sta, (int l, int r, int n)[] rows)[] c
 }
 (int, int, int) Rw(int l, int r, int n) => (l, r, n);
 
+// ---------------------------------------------------------------- end dam diaphragm (schedule only)
+List<string> EndDamUnresolved(int unit)
+{
+    var where = unit switch
+    {
+        1 => "West Abutment (section B-B) and Pier 5WB (section C-C), PDF 185",
+        2 => "Piers 5WB / 6A (kinked end) and 11WB, PDF 190 (note: 10 bars between girders A-D and F-K, 8 between D-F, 2 outside at 5WB / 6A; 10 between girders and 2 outside at 11WB)",
+        _ => "Pier 11WB (12 bars A-B, 11 B-D, 10 D-J, 2 outside) and the East Abutment (5 bars A-D, 10 D-J, 2 outside), PDF 195",
+    };
+    return new()
+    {
+        $"I-80 WB Unit {unit} end dam diaphragm bars 5d / 4d at {where}: positions along the joint not dimensioned (bar counts per bay and '@ 1'-0' only; no distance from the girder lines, " +
+        "'2 bars at equal spacing outside exterior girders' without the outer reference) - schedule only.",
+        $"I-80 WB Unit {unit} end dam longitudinal bars 5e at {where}: section positions drawn as dots, only partly dimensioned (hoop corners, 'EQ. SPA.' groups) - schedule only.",
+    };
+}
+
 // ---------------------------------------------------------------- Unit 1
 {
     var b = Doc.Project.Bridges.First(x => x.Name == "I-80 WB Unit 1");
@@ -129,7 +149,7 @@ IEnumerable<DeckLongZone> VarBays((string sta, (int l, int r, int n)[] rows)[] c
     var lz1 = new List<DeckLongZone> { Overhang(true, 1, "6b1", F(39, 0), "6b1c", false) };
     lz1.AddRange(ConstBays(1, 6, "6b1", F(39, 0), "6b1c", false));
     lz1.Add(Overhang(false, 6, "6b1", F(39, 0), "6b1c", false));
-    r.Plan = new DeckPlanReinforcement { WeightTolerance = 0.03, PlanBarList = BarList("I-80 WB", 1), Transverse = t, Longitudinal = lz1, Families = new() { "6b" }, TransverseBeginClear = In(17), TransverseEndClear = In(27), LongitudinalBeginCover = In(18), LongitudinalEndCover = In(25) };
+    r.Plan = new DeckPlanReinforcement { WeightTolerance = 0.03, PlanBarList = BarList("I-80 WB", 1), Transverse = t, Longitudinal = lz1, Families = new() { "6b" }, TransverseBeginClear = In(17), TransverseEndClear = In(27), LongitudinalBeginCover = In(18), LongitudinalEndCover = In(25), Unresolved = EndDamUnresolved(1) };
 }
 
 // ---------------------------------------------------------------- Unit 2
@@ -196,7 +216,7 @@ IEnumerable<DeckLongZone> VarBays((string sta, (int l, int r, int n)[] rows)[] c
     }, "6b1", F(39, 10), "6b1c", false));
     lz2.AddRange(ConstBays(6, 11, "6b1", F(39, 10), "6b1c", false));
     lz2.Add(Overhang(false, 11, "6b1", F(39, 10), "6b1c", false));
-    r.Plan = new DeckPlanReinforcement { WeightTolerance = 0.03, PlanBarList = BarList("I-80 WB", 2), Transverse = t, Longitudinal = lz2, Families = new() { "6b" }, TransverseBeginClear = In(27), TransverseEndClear = In(27), LongitudinalBeginCover = In(25), LongitudinalEndCover = In(25) };
+    r.Plan = new DeckPlanReinforcement { WeightTolerance = 0.03, PlanBarList = BarList("I-80 WB", 2), Transverse = t, Longitudinal = lz2, Families = new() { "6b" }, TransverseBeginClear = In(27), TransverseEndClear = In(27), LongitudinalBeginCover = In(25), LongitudinalEndCover = In(25), Unresolved = EndDamUnresolved(2) };
 }
 
 // ---------------------------------------------------------------- Unit 3
@@ -255,7 +275,7 @@ IEnumerable<DeckLongZone> VarBays((string sta, (int l, int r, int n)[] rows)[] c
     }, "6b2", F(39, 9), "", true));
     lz3.AddRange(ConstBays(4, 10, "6b1", F(39, 1), "", true));
     lz3.Add(Overhang(false, 10, "6b1", F(39, 1), "", true));
-    r.Plan = new DeckPlanReinforcement { WeightTolerance = 0.03, PlanBarList = BarList("I-80 WB", 3), Transverse = t, Longitudinal = lz3, TransverseBeginClear = In(27), TransverseEndClear = In(17.5), LongitudinalBeginCover = In(25), LongitudinalEndCover = In(18) };
+    r.Plan = new DeckPlanReinforcement { WeightTolerance = 0.03, PlanBarList = BarList("I-80 WB", 3), Transverse = t, Longitudinal = lz3, TransverseBeginClear = In(27), TransverseEndClear = In(17.5), LongitudinalBeginCover = In(25), LongitudinalEndCover = In(18), Unresolved = EndDamUnresolved(3) };
 }
 
 var res = Doc.Regenerate();
@@ -267,6 +287,6 @@ foreach (var n in new[] { 1, 2, 3 })
     var cm = Doc.Concrete(name);
     Print($"== {name}");
     foreach (var s in cm.Notes.Where(s => s.StartsWith("Plan-driven") || s.StartsWith("  ") || s.StartsWith("Edge") || s.StartsWith("Transverse zone") || s.StartsWith("Top:") || s.StartsWith("Bottom:"))) Print("   " + s);
-    foreach (var d in cm.Diagnostics.Where(d => d.Message.StartsWith("Deck reinforc"))) Print($"   {d.Severity}: {d.Message}");
+    foreach (var d in cm.Diagnostics.Where(d => d.Message.StartsWith("Deck reinforc") || d.Message.StartsWith("UNRESOLVED") || d.Message.StartsWith("Deck end dam"))) Print($"   {d.Severity}: {d.Message}");
 }
 if (Environment.GetEnvironmentVariable("DR_NOSAVE") != "1") Doc.Save();
