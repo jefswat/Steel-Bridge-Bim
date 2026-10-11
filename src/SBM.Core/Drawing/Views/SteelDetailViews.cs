@@ -315,21 +315,18 @@ public static class SteelDetailViews
             _ => System.Text.RegularExpressions.Regex.Replace(c.ToString(), "([a-z])([A-Z])", "$1 $2").ToUpperInvariant(),
         }).Distinct());
         var mats = ctx.Steel == null ? new List<(string, string)>() : ctx.Steel.Parts
-            .Where(p => p.Category is not (PartCategory.Weld or PartCategory.BearingPad or PartCategory.Ptfe or PartCategory.InspectionCable) && p.Material.StartsWith("ASTM", StringComparison.OrdinalIgnoreCase))
+            .Where(p => p.Category is not (PartCategory.Weld or PartCategory.BearingPad or PartCategory.Ptfe or PartCategory.InspectionCable or PartCategory.InspectionBracket or PartCategory.Grating or PartCategory.WalkwayStringer or PartCategory.WalkwayPost or PartCategory.WalkwayRail or PartCategory.WalkwayPlate) && p.Material.StartsWith("ASTM", StringComparison.OrdinalIgnoreCase))
             .GroupBy(p => p.Material).OrderBy(g => g.Key)
             .Select(g => (g.Key.ToUpperInvariant(), Cats(g.Select(p => p.Category).Distinct()))).ToList();
         var lines = new List<string> { "STRUCTURAL STEEL NOTES", "" };
         int n = 1;
         foreach (var (m, c) in mats)
         {
-            lines.Add($"{n++}. {c}:");
-            lines.Add($"   {m}.");
+            lines.Add($"{n++}. {c}: {m}.");
         }
         double hole = def.Bolts.Diameter + In(1.0 / 16);
-        lines.Add($"{n++}. HIGH-STRENGTH BOLTS: ASTM F3125 GR. {def.Bolts.Grade}, {S(def.Bolts.Diameter)} DIA (BRIDGE DEFAULT; FRAME BOLT NOTES GOVERN),");
-        lines.Add($"   {S(hole)} DIA HOLES, {S(def.Bolts.EdgeDistance)} EDGE DISTANCE.");
-        lines.Add($"{n++}. CROSS FRAMES: INTERMEDIATE FRAMES AND CONNECTION PLATES ARE NORMAL TO THE FLANGES;");
-        lines.Add("   SUPPORT FRAMES AND BEARING STIFFENERS ARE PLUMB.");
+        lines.Add($"{n++}. HIGH-STRENGTH BOLTS: ASTM F3125 GR. {def.Bolts.Grade}, {S(def.Bolts.Diameter)} DIA AS A BRIDGE DEFAULT (FRAME BOLT NOTES GOVERN), {S(hole)} DIA HOLES, {S(def.Bolts.EdgeDistance)} EDGE DISTANCE.");
+        lines.Add($"{n++}. CROSS FRAMES: INTERMEDIATE FRAMES AND CONNECTION PLATES ARE NORMAL TO THE FLANGES; SUPPORT FRAMES AND BEARING STIFFENERS ARE PLUMB.");
         if (def.CrossFrames.Orientation == CrossFrameOrientation.Auto)
             lines.Add($"{n++}. CROSS FRAMES PARALLEL TO SKEW IF SKEW <= {def.CrossFrames.SkewLimitDegrees:0} DEG, OTHERWISE NORMAL TO THE GIRDERS.");
         else lines.Add($"{n++}. CROSS FRAME ORIENTATION: {def.CrossFrames.Orientation.ToString().ToUpperInvariant()}.");
@@ -338,7 +335,7 @@ public static class SteelDetailViews
         var wrapped = new List<string>();
         foreach (var ln0 in lines)
         {
-            string ln = ln0.TrimStart();
+            string ln = ln0;
             var cur = "";
             foreach (var w in ln.Split(' ', StringSplitOptions.RemoveEmptyEntries))
             {
@@ -349,7 +346,7 @@ public static class SteelDetailViews
         }
         lines = wrapped;
         for (int i = 0; i < lines.Count; i++)
-            d.Text(lines[i], new Vec2(0, -i * d.Paper(0.2)), d.Paper(i == 0 ? 0.13 : 0.09), 0, TextAlign.Left, i == 0 ? SheetLayers.Title : SheetLayers.Text);
+            d.Text(lines[i], new Vec2(0, -i * d.Paper(0.17)), d.Paper(i == 0 ? 0.13 : 0.08), 0, TextAlign.Left, i == 0 ? SheetLayers.Title : SheetLayers.Text);
         return new SheetView("Steel notes", "Notes", dwg, 1, "", PaperSpace: true);
     }
 }
