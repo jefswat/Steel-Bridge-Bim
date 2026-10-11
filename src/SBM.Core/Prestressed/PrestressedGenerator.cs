@@ -72,8 +72,9 @@ public static class PrestressedGenerator
                     model.Diagnostics.Add(new Diagnostic(DiagnosticSeverity.Warning, $"UNRESOLVED (prestressed {(d.Designation != "" ? d.Designation : TxGirderCatalog.Get(d).Name)}): {r}"));
         if (model.Beams.Any(b => b.Strands.Any(s => s.Debonded)))
             model.Diagnostics.Add(new Diagnostic(DiagnosticSeverity.Warning,
-                "UNRESOLVED (prestressed): debond sheathing product / size is not dimensioned on the plans; the sheathing is drawn " +
-                $"{u.FormatLength(used.FirstOrDefault()?.SheathThickness ?? In(1.0 / 16), LengthKind.Short)} thick around the strand (display only, IfcTendonConduit)."));
+                UnresolvedFlag.Text(used.FirstOrDefault(d => d.Source != "")?.Source is { } src ? src : "beam sheet (debonding table)", "prestressed debond sheathing product / size",
+                    "the plans give the debonded lengths only, the sheathing is not specified or dimensioned",
+                    $"The sheathing is drawn {u.FormatLength(used.FirstOrDefault()?.SheathThickness ?? In(1.0 / 16), LengthKind.Short)} thick around the strand (display only, IfcTendonConduit).")));
         model.GenerationTime = sw.Elapsed;
         return model;
     }
@@ -172,7 +173,7 @@ public static class PrestressedGenerator
                     assumption = Assumption.Unresolved(
                         (pd.Placement == StandardBeamPlacement.AtPierBearing
                             ? $"placement 'at the pier bearing' of the standard {typeName} beam is ambiguous (both or neither end at a pier)"
-                            : $"placement of the standard {typeName} beam between layout bearings that differ from its standard CL-CL bearing length is not set (not stated on the plans)") +
+                            : $"placement of the standard {typeName} beam between layout bearings that differ from its standard CL-CL bearing length is not set - the plans do not say which end the standard length is measured from") +
                         (pd.Source != "" ? $" ({pd.Source})" : ""),
                         "centred between the layout bearings (display only)");
             }
@@ -308,7 +309,7 @@ public static class PrestressedGenerator
         var seatList = new List<BearingSeat>();
         var padType = shape.IsTx ? shape.Type : shape.DepthIn > 58 ? TxGirderType.Tx62 : TxGirderType.Tx54;
         if (shape.IsStateStandard && pd.PadLength <= 0)
-            warn.Enqueue($"UNRESOLVED (prestressed {typeName}): no bearing pad size given (PadLength = 0); the TxDOT IGEB pad table is used as a placeholder.");
+            warn.Enqueue(UnresolvedFlag.Text(pd.Source != "" ? pd.Source : "bearing sheet", $"prestressed {typeName} bearing pad size", "no pad size was entered for this beam (PadLength = 0), so the plan pad is unknown to the model", "The TxDOT IGEB pad table is used as a placeholder."));
         foreach (var (sNom, sup, end, abut, k, fk, eCl) in new[] { (brgA, supA, 0, abutA, kA, fkA, endA), (brgB, supB, 1, abutB, kB, fkB, endB) })
         {
             double skew = def.Supports[sup.Index].SkewDegrees;

@@ -366,7 +366,7 @@ public sealed partial class SubstructureGenerator
         {
             const int perStation = 2;
             int totalBars = hair.Sum(g => g.Count);
-            if (totalBars % perStation != 0 || hair.Any(g => g.Count % perStation != 0)) Warn($"{loc}: UNRESOLVED - hairpin counts {string.Join("/", hair.Select(g => g.Count))} are not multiples of {perStation} per station; hairpins not placed.");
+            if (totalBars % perStation != 0 || hair.Any(g => g.Count % perStation != 0)) Warn($"{loc}: " + UnresolvedFlag.Text("cap bar list / Sections A-A, B-B", "hairpin stations", $"the listed counts {string.Join("/", hair.Select(g => g.Count))} are not multiples of {perStation} bars per station, so the stations cannot be derived", "Hairpins not placed."));
             else
             {
                 int ns = totalBars / perStation;
@@ -413,7 +413,7 @@ public sealed partial class SubstructureGenerator
                 }
                 Warn($"{loc}: hairpins {string.Join(", ", hair.Select(g => g.Mark))}: " + (zoned
                     ? $"{ns} stations at equal spaces {Dim(margin)} inside the top ends, marks by the plan's zone order and counts (the plan's gap dimensions between zones are not read); {perStation} bars per station side by side (their offset is not dimensioned)."
-                    : $"UNRESOLVED - the plan's zones are not read; {ns} stations at equal spaces, marks given by the depth of the full-width zone."));
+                    : $"UNRESOLVED (cap elevation hairpin zones): zone limits - the plan's zone dimensions are not read into the model; {ns} stations at equal spaces, marks given by the depth of the full-width zone."));
             }
         }
         foreach (var g in groups.Where(g => (g.Kind is PlanBarKind.CapHoop or PlanBarKind.CapCantileverHoop or PlanBarKind.CapTie or PlanBarKind.CapHairpin) && !(g.Kind == PlanBarKind.CapHairpin && g.Shape == "U" && g.Dims.Length == 3)))
@@ -659,7 +659,7 @@ public sealed partial class SubstructureGenerator
                         }
                         continue;
                     }
-                    Warn($"{unit.Name}: UNRESOLVED {g.Mark} pedestal hoops - " + (g.Girders == "" ? "the girders that carry them are not given"
+                    Warn($"{unit.Name}: UNRESOLVED (cap bar list / pedestal note): {g.Mark} pedestal hoops - " + (g.Girders == "" ? "the note naming the girders that carry them was not entered"
                         : $"the plan note's girders \"{g.Girders}\" select {sel.Count} pedestal block(s), the bar list has {g.Count} hoops")
                         + "; placed at mid-cap under the cap top (position not modeled).");
                     for (int i = 0; i < g.Count; i++)
@@ -679,7 +679,7 @@ public sealed partial class SubstructureGenerator
             // the blocks this group goes in: every block, one bearing row (11WB 5n1 back / 5n2 ahead), or one set per girder line across both rows (9G 5n1)
             var blocks = g.PedestalRow switch { "BACK" or "AHEAD" => PedestalBlocksOfRow(unit, g.PedestalRow), "LINE" => PedestalLines(unit), _ => peds.ToList() };
             if (g.PedestalRow != "" && (blocks.Count == 0 || g.Count % blocks.Count != 0))
-                Warn($"{unit.Name}: UNRESOLVED {g.Mark} pedestal bars - the plan row \"{g.PedestalRow}\" selects {blocks.Count} pedestal block(s), the bar list has {g.Count} bars; placed by the generic rule.");
+                Warn($"{unit.Name}: UNRESOLVED (cap bar list / pedestal details): {g.Mark} pedestal bars - the plan row \"{g.PedestalRow}\" selects {blocks.Count} pedestal block(s) but the bar list has {g.Count} bars, which does not divide evenly; placed by the generic rule.");
             if (g.Shape == "U" && g.Dims.Length == 3 && blocks.Count > 0 && g.Count % blocks.Count == 0)
             {
                 // 5m1 / 5n1 (plan bend diagram, pedestal plan): U bars, base out to out 5'-1 / 5'-3, legs 2'-8 hanging into the cap from the base. Per pedestal
@@ -790,7 +790,7 @@ public sealed partial class SubstructureGenerator
         }
         if (lines.Count == 0)
         {
-            Warn($"{unit.Name}: UNRESOLVED {g.Mark} reverse-curve bar - no relief line on this face to place it by; placed with its chord level at mid-cap under the top.");
+            Warn($"{unit.Name}: UNRESOLVED (cap bend diagram / aesthetic relief): {g.Mark} reverse-curve bar - the bar is placed by the relief line of its face and this face has none in the model; placed with its chord level at mid-cap under the top.");
             double z0 = unit.CapTopAt(sMid) - Ft(4);
             return new RawBar("C", size, rs, $"{loc} {g.Mark} side faces", rp.Select(p => unit.World(sC + p.X, n, z0 + p.Y)).ToArray());
         }

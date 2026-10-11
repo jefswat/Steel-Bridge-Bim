@@ -254,7 +254,7 @@ public static class PsSteelDiaphragmDetailer
             double lowerLen = bay.LowerPlanLength;
             bool doLower = lower != null && !double.IsNaN(lowerLen);
             if (lower != null && !doLower)
-                Warn($"UNRESOLVED steel diaphragm {where}: lower member {bay.Lower} has no plan length (p.31 table) - not detailed.");
+                Warn(UnresolvedFlag.Text("p.31 diaphragm table", $"steel diaphragm {where}: length of the lower member {bay.Lower}", "the table lists no length for this bay's lower member", "Not detailed."));
 
             var res = new PsDiaphragmBayResult
             {

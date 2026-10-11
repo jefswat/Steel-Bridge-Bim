@@ -1133,7 +1133,7 @@ public sealed class FramingGenerator
             double aL = Numerics.RadToDeg(Math.Acos(Math.Clamp(Math.Abs(Vec2.Dot(chord.Normalized(), DirOf(sl))), 0, 1)));
             double aR = Numerics.RadToDeg(Math.Acos(Math.Clamp(Math.Abs(Vec2.Dot(chord.Normalized(), DirOf(sr))), 0, 1)));
             Warn($"{what} (style {st}): frame plane through the two CL bearings; it differs from the bearing stiffener planes by {aL:F2} deg at G{link.LeftGirder + 1} and {aR:F2} deg at G{link.RightGirder + 1} " +
-                 "(plans: note location for fit up). UNRESOLVED: whether the frame bolts to the ahead or the back stiffener of each pair (not dimensioned) - the model uses the pair at the CL bearing.");
+                 "(plans: note location for fit up). UNRESOLVED (framing plan / support frame section of this link): which stiffener of each pair the frame bolts to - the plans draw the frame between the two CL bearings but do not say ahead or back stiffener; the model uses the pair at the CL bearing.");
             frames.Add(new CrossFrameResult
             {
                 Span = spl, Bay = link.LeftGirder, RightGirder = link.RightGirder, AtSupport = true,
@@ -1164,7 +1164,7 @@ public sealed class FramingGenerator
             string where = $"Frame line {line.Distance / 0.3048:F2} ft along G{g + 1}";
             if (line.Distance < 0 || line.Distance > total + 1e-6) { Warn($"{where}: beyond the girder ({total / 0.3048:F2} ft)."); continue; }
             foreach (var note in line.Unresolved)
-                Warn($"{where}: UNRESOLVED (plan, nothing invented) - {note}");
+                Warn($"{where}: UNRESOLVED (framing plan, page and reason in the note; nothing invented) - {note}");
             var (rj, ru) = LocateOnGirder(g, s0 + line.Distance);
             var rc = _curves[g][rj];
             var p = rc.PointAt(ru);

@@ -102,7 +102,7 @@ sd.PileSection = "HP14x73"; sd.PileType = PileType.SteelHP;
 sd.BackwallGap = F(0, 2.5);                                                // plans: 2 1/2" between the deck end (1'-2 1/2) and the backwall face (1'-5)
 sd.Reinforcement.EpoxyCoated = true;
 sup.Substructure = sd;
-Print("UNRESOLVED: Ramp G step transverse bars 5m1 (20 = 4 steps x 5 vs 4 per step on I-80).");
+Print("UNRESOLVED (Ramp G sheets 80-83, bar list / beam step detail): step transverse bars 5m1 - the list gives 20 (= 4 steps x 5) while the I-80 steps take 4 each, and no dimension on the step detail confirms 5 per step.");
 Print("CONFLICT (minor, not adjusted): Ramp G backwall pour split - p83 prints below c.j. 11.5 / above c.j. 10.0 CY; the model (c.j. 3\" below the taper per section p80, " +
       "5'-6 1/8 at the CL) gives 11.1 / 10.5 CY. The total agrees (21.6 vs 21.5); the plan split matches a c.j. at the bottom of the taper (no 3\"). docs/plan-data/abutments-model.md.");
 

@@ -40,7 +40,7 @@ var rg = new List<MiscBarRow>
 };
 u2.Misc.EndPosts.Add(new CrashCushionEndPostDefinition { Name = "Crash cushion end post Ramp A (Pier 5WB)", Support = "Pier 5WB", Bars = ra });
 u2.Misc.EndPosts.Add(new CrashCushionEndPostDefinition { Name = "Crash cushion end post Ramp G (Pier 11WB)", Support = "Pier 11WB", Bars = rg });
-u2.Misc.Unresolved.Add("[cushion] End posts: start of the end block from the CL pier (scaled about 2'-1 on Ramp A), wedge direction, plan width at the pier end (two 1'-5 rails + gap) and the skewed Ramp G plan are not dimensioned; the I.M. 455 crash cushion has no geometry in the plans.");
+u2.Misc.Unresolved.Add("[cushion] (I-80 PDF 229 / 230) End posts: start of the end block from the CL pier (scaled about 2'-1 on Ramp A), wedge direction, plan width at the pier end (two 1'-5 rails + gap) and the skewed Ramp G plan are not dimensioned; the I.M. 455 crash cushion has no geometry in the plans.");
 
 var res = Doc.Regenerate();
 Print($"Regenerated {res.Bridges} bridges in {res.Elapsed.TotalSeconds:F1} s, {res.Errors.Count} errors.");

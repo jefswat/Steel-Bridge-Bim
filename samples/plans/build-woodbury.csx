@@ -139,7 +139,7 @@ br.Deck.StayInPlaceForms = false;
 br.Deck.Reinforcement.Enabled = false;   // deck bars: later step (bar lists in bar-lists.csv, bend dims U9)
 br.Deck.Barrier.Type = BarrierType.None; // Iowa aesthetic barrier east side only: profile not transcribed (U10)
 br.Deck.Barrier.Left = false;
-unresolved.Add("U10: Iowa aesthetic barrier (east side, 3'-8 x 1'-7) profile not fully transcribed (PDF p.38) - no barrier modeled.");
+unresolved.Add("U10 (PDF p.38): Iowa aesthetic barrier (east side, 3'-8 x 1'-7) profile - the sheet's profile dimensions have not all been transcribed into the plan data yet; no barrier modeled.");
 
 // ---------------------------------------------------------------- beams (beam layout p.21 / DS 19)
 // 5 beam lines D, E, F, G, H (west to east; A-C are stage 2). Iowa BTD beams: depth 4'-6. PLACEHOLDER shape = Tx54
@@ -200,9 +200,9 @@ br.Girders.SpanLayouts = new()
 br.CrossFrames.MaxSpacing = Ft(25);
 Doc.Project.Bridges.Add(br);
 
-unresolved.Add("U3 (closed by the user): beams are standard BTD55 / BTD105 / BTD60 at the STANDARD lengths - the beam generator change belongs to the prestressed work; this model's beams follow the layout chords (placeholder Tx54 shape).");
+unresolved.Add("U3 is CLOSED by the user (PDF p.27-30: standard BTD55 / BTD105 / BTD60 at the STANDARD lengths) - listed here only because this model still follows the layout chords with a placeholder Tx54 shape (program work, not a plan question).");
 unresolved.Add("U4: plan skews to the local tangent at Pier 2 (13 deg 00'40\") and N. Abut. (14 deg 29'57\") do not reproduce from the parallel 10 deg 09'36\" (PDF p.21 vs p.7); the parallel lines through the staking points govern.");
-unresolved.Add("Beam ends at the piers (square or parallel to the pier) and abutment end details (integral, beams embedded) - prestressed/abutment work (PDF p.20, p.28-30).");
+unresolved.Add("Beam ends (PDF p.20, p.28-30): square or parallel to the pier at the piers, integral abutment embedment - given on these sheets but not modeled yet (prestressed / abutment program work, not a plan question).");
 
 var rep = Doc.Regenerate(includeSteel: false);
 foreach (var e in rep.Errors) Print("ERROR " + e);

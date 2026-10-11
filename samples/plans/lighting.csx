@@ -57,8 +57,8 @@ foreach (var b in i80.Concat(rampG))
     if (b.Name.StartsWith("Ramp G"))
         b.Misc.Lighting.Conduits.Add(new ConduitRunDefinition { Name = $"Power conduit {b.Name}", Side = LightingSide.Left, Kind = JunctionBoxKind.Power, FromStation = s0, ToStation = s1, HeightAboveBase = In(7) });
 }
-u3.Misc.Unresolved.Add("[light] I-80 lighting: East Abutment pole base (10'-0 max from the end of the superstructure), the power conduit side, underdeck junction boxes / stub-outs (7583+40.50, 7588+69.64, 7582+45.00 12'-3 LT, 7582+70.00 57'-11 LT), pier-top Type 2 boxes and expansion fittings are schematic or not dimensioned: not modeled; pole base rebar for the abutment base is scheduled only.");
-gu2.Misc.Unresolved.Add("[light] Ramp G lighting: which of the two junction boxes at Pier 8G is power / ITS is not printed; underdeck boxes and stub-outs (67474+90.40, 67475+53.29, 67477+44.79, 67486+92.70, 67487+45.83) and expansion fittings are schematic: not modeled.");
+u3.Misc.Unresolved.Add("[light] (I-80 PDF 233-236) I-80 lighting: East Abutment pole base (10'-0 max from the end of the superstructure), the power conduit side, underdeck junction boxes / stub-outs (7583+40.50, 7588+69.64, 7582+45.00 12'-3 LT, 7582+70.00 57'-11 LT), pier-top Type 2 boxes and expansion fittings are schematic or not dimensioned: not modeled; pole base rebar for the abutment base is scheduled only.");
+gu2.Misc.Unresolved.Add("[light] (Ramp G PDF 168-170) Ramp G lighting: which of the two junction boxes at Pier 8G is power / ITS is not printed; underdeck boxes and stub-outs (67474+90.40, 67475+53.29, 67477+44.79, 67486+92.70, 67487+45.83) and expansion fittings are schematic: not modeled.");
 
 var res = Doc.Regenerate();
 Print($"Regenerated {res.Bridges} bridges in {res.Elapsed.TotalSeconds:F1} s, {res.Errors.Count} errors.");

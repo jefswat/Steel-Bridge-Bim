@@ -35,7 +35,7 @@ public sealed partial class SubstructureGenerator
         double width = sd.PileType != PileType.SteelHP ? sd.PileSize : section.Max(p => Math.Max(Math.Abs(p.X), Math.Abs(p.Y))) * 2;
         double h = batterRatio > 0 ? 1.0 / batterRatio : 0;
         if (sd.PileType == PileType.CipPipe && double.IsNaN(sd.PileShellThickness) && f.Piles.Count == 0)
-            Warn($"UNRESOLVED: {where}: CIP pipe pile shell thickness not entered (PileShellThickness) - the round {Sh(sd.PileSize)} pile is built, the shell is left blank because no thickness was given.");
+            Warn($"{where}: " + UnresolvedFlag.Text("pile notes", "CIP pipe pile shell thickness", "no thickness was entered (PileShellThickness)", $"The round {Sh(sd.PileSize)} pile is built; the shell thickness property is left blank."));
         var section0 = section;
         foreach (var q in at)
         {

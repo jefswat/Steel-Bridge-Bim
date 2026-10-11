@@ -13,3 +13,19 @@ public sealed record Assumption(string Status, string Reason, string Basis)
     public const string UnresolvedStatus = "UNRESOLVED";
     public static Assumption Unresolved(string reason, string basis) => new(UnresolvedStatus, reason, basis);
 }
+
+/// <summary>
+/// Standard text of an UNRESOLVED warning (user rule: every flag names the plan page AND says in plain words WHY the item is open, e.g.
+/// "UNRESOLVED (p.17): CMP casing bottom - it is the bottom of the EPS fill, which is in the road plans, not this set."). Diagnostics have no
+/// structured reason field, so the reason lives in the message text; build new flags with <see cref="Text"/>.
+/// </summary>
+public static class UnresolvedFlag
+{
+    /// <summary>"UNRESOLVED (pages): item - why. then" (<paramref name="then"/> = what the model does instead; optional).</summary>
+    public static string Text(string pages, string item, string why, string then = "")
+    {
+        string p = string.IsNullOrWhiteSpace(pages) ? "page not given" : pages.Trim();
+        string s = $"UNRESOLVED ({p}): {item.Trim()} - {why.Trim().TrimEnd('.')}.";
+        return then.Trim().Length > 0 ? $"{s} {then.Trim()}" : s;
+    }
+}

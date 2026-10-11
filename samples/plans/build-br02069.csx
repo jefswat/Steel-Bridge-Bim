@@ -14,6 +14,7 @@
 // Feet: the project's default (international) foot is used for every value, plan coordinates included, so all plan
 // distances and elevations are reproduced exactly; no geodetic meaning is attached to the coordinates.
 using System.IO;
+using SBM.Core;
 using SBM.Core.Alignments;
 using SBM.Core.Bridge;
 using SBM.Core.Geometry;
@@ -22,7 +23,8 @@ using SBM.Core.Prestressed;
 double F(double ft, double inch = 0) => Ft(ft) + In(inch);
 var unresolved = new List<string>();
 var gaps = new List<string>();
-void U(string s) => unresolved.Add(s);
+// UNRESOLVED = plan item not stated / not readable: always the PDF page(s) AND a short plain reason why (SBM.Core.UnresolvedFlag).
+void U(string pages, string item, string why, string then = "") => unresolved.Add(UnresolvedFlag.Text(pages, item, why, then));
 void G(string s) => gaps.Add(s);
 
 string DataDir()
@@ -52,6 +54,7 @@ var al = Doc.AddAlignment(AlName, Sta("208+26.273"), new[]
     new PiRow(Ft(155142.296), Ft(508208.766)),
 });
 al.Description = "SB65 working line, region R7 tangent (Br. 02069 p36); local grid X/Y - horizontal datum not stated (U1)";
+U("p34, p36, p37", "horizontal datum (U1)", "the survey / alignment sheets give X / Y without naming the coordinate system", "Plan X / Y used as a local grid in feet.");
 {
     double len = (al.PointAt(Sta("261+56.990")) - al.PointAt(Sta("208+26.273"))).Length;
     var pc = al.PointAt(Sta("261+56.990"));
@@ -108,6 +111,7 @@ b.Deck.OverhangThickness = In(9);
 b.Deck.Haunch = In(4.25);
 // GAP: no camber in the prestressed model (SUMMARY gap 10): the stool is constant 4 1/4" along the beam (plan value at CL brg only;
 //      erection camber 7 3/8", residual 2 1/8" int / 2 1/4" ext, p16 - camber shape U10).
+U("p16", "camber shape along the beam (U10)", "the sheet prints single camber / deflection values (erection 7 3/8\", residual 2 1/8\" / 2 1/4\"), no camber curve");
 G("Prestressed camber / variable stool: the beams are straight, stool 4 1/4\" constant (plan value at CL brg only); camber 7 3/8\" erection, residual 2 1/8\"/2 1/4\" (p16, U10) not modeled. Needs: prestressed camber in the haunch (GirderLayoutDefinition.Camber for prestressed).");
 // Deck reinforcing: the plan bar list (S401M-S404M..., p18/p19/p21) is not entered; the generic generator would invent bars -> off.
 b.Deck.Reinforcement.Enabled = false;
@@ -122,7 +126,7 @@ b.Deck.Barrier.Height = In(36);
 b.Deck.Barrier.BaseWidth = In(18);
 b.Deck.Barrier.Reinforcement = false;            // R-bars (p24 bill) not modeled; SSTR bars would be invented
 G($"Barrier: MnDOT Type S 36\" profile not in BarrierProfiles - modeled as SingleSlope 36\" x 1'-6\" base, top width = program default {b.Deck.Barrier.TopWidth / In(1):0.##}\" (not read, p24); barrier bars R501M..R612M (p24) not modeled. Needs: MnDOT Type S barrier profile + plan barrier bars.");
-U("Barrier Type S top width / traffic-face breaks not read from Fig. 5-397.138(A) (p24).");
+U("p24, Fig. 5-397.138(A)", "barrier Type S top width / traffic-face breaks", "the standard figure's dimensions have not been transcribed into the plan data yet", "Program default top width kept.");
 
 // ================================================================ 3. prestressed beams (p16 30MH-101, Beam B1)
 // MnDOT 30MH from the standard catalog (StandardBeamCatalog "MN 30MH", Fig. 5-397.501 mod. / p16): H 30", top flange 2'-10",
@@ -189,9 +193,12 @@ G("Abutment stem: AbutmentDefinition has no stem face set back from the footing 
 G("Abutment infill wall: AbutmentDefinition always builds a corbel and three backwall pours (Iowa); set to zero size here. Needs: optional corbel / plain wall.");
 G("Test piles: one test pile per abutment longer (S 105 vs 95 ft, N 100 vs 90 ft, back row, p4/p9) - one PileLength per abutment; contract lengths used. Needs: per-pile length.");
 G("Abutment reinforcing (bar-lists.csv A/B series, p6-p8, p12-p14; bend diagrams U3) not entered; the Iowa abutment rebar generator would invent placements -> substructure reinforcement off. Needs: plan bar data for a MnDOT abutment.");
-U("Mask walls: east-end and corner extents not dimensioned (U9, p3/p5/p10/p11) - only the west mask wall (MSE Ret. Wall 20 / 23 tie-ins, p1) is built.");
-U("Pile tip elevations not given (U8, p4/p9) - piles hang the contract length from the head.");
-U("End diaphragm geometry (U2, p17/p20/p21) - not modeled; bend dimensions (U3, p8/p14/p21/p24) - bars not modeled.");
+// U9 closed (SUMMARY sec. 4): mask wall at the W end only (p5 / p10, no mask wall at the E end, which ends flush at +36'-0" with keyways for the widening);
+//    the infill wall is only in the E 18'-5" (+17'-7" .. +36'-0"); under the superstructure the end diaphragm sits on the back ledge.
+G("Abutment infill wall extent: the plans have it only in the E 18'-5\" (WL +17'-7\" .. +36'-0\", p5 / p10 / p11 Detail C); the AbutmentDefinition backwall runs from the W mask wall to +36'-0\". Needs: backwall end offsets / end diaphragm on the ledge (p20, p21).");
+U("p4, p9", "pile tip elevations (U8)", "the pile notes give only estimated lengths (95 / 90 ft, test piles 105 / 100 ft), no tip elevations", "Piles hang the contract length from the head.");
+// U2 closed (SUMMARY sec. 3: end diaphragm geometry read from p17 / p20 / p21) - the end diaphragm itself is a GAP (listed above).
+U("p8, p14, p21, p24", "bend dimensions of 22 bent marks and the barrier loop lengths (U3)", "one leg or hook of those marks is not dimensioned on the sheet, the barrier loops R505M / R517E / R506E / R507E / R518E do not add up to the listed length, and no sheet shows pin diameters", "No bars of these marks are modeled (reinforcement GAPs).");
 
 var seatRows = Csv("seat-elevations.csv");
 void SetAbutment(SupportDefinition sup, string side, double ledge, double seatFront, double infillTop, double maskTop, double pedAlong, double pileLen, string pages)
@@ -245,7 +252,7 @@ void SetAbutment(SupportDefinition sup, string side, double ledge, double seatFr
 SetAbutment(b.Supports[0], "S", 922.35, 923.27, 927.73, 930.61, F(4, 8), 95, "p4, p5, p11");
 // N: ledge 922.15, seat front 923.06, infill 927.80, mask top 930.67, pedestals 3'-6", piles 90 ft (13 + test 100)
 SetAbutment(b.Supports[1], "N", 922.15, 923.06, 927.80, 930.67, F(3, 6), 90, "p9, p10, p11");
-U("Deck end 1'-10\" from CL brg is 10\" BEYOND the infill wall face (1'-0\" behind CL brg): the slab end sits over the end diaphragm / infill wall (semi-integral, p18/p20); the model reports the overlap only.");
+G("Deck end 1'-10\" from CL brg is 10\" BEYOND the infill wall face (1'-0\" behind CL brg): the slab end sits over the end diaphragm (semi-integral, p18 / p20 / p21); without the end diaphragm the model reports the overlap only.");
 
 Doc.Project.Bridges.Add(b);
 
@@ -268,7 +275,7 @@ foreach (var u in sub.Units)
 foreach (var d in sub.Diagnostics) Print($"  SUB {d.Severity}: {d.Message}");
 Print("");
 Print("UNRESOLVED (plan items not stated / not read):");
-foreach (var s in unresolved) Print("  UNRESOLVED " + s);
+foreach (var s in unresolved) Print("  " + s);
 Print("GAPS (program features missing; closest input used):");
 foreach (var s in gaps) Print("  GAP " + s);
 Doc.Save();

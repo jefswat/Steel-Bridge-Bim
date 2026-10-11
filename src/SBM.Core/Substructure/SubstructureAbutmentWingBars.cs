@@ -67,7 +67,7 @@ public sealed partial class SubstructureGenerator
                     double zTop2 = mk.TopZ - In(2), len2 = l2.Length;
                     double need = mk.TopZ - In(2) - (mk.BaseZ - Ft(1.5));
                     if (Math.Abs(need - len2) > In(1))
-                        Warn($"{name}: UNRESOLVED - maskwall {side}: 5e2 listed length {Sh(len2)} vs {Sh(need)} for the wall height + the 1'-6 embedment - 2\" cover; the bar hangs from the top cover at the listed length (the list prints one length for all walls).");
+                        Warn($"{name}: " + UnresolvedFlag.Text(ad.Source != "" ? ad.Source + ", bar list" : "abutment bar list", $"maskwall {side}: 5e2 length", $"the list prints one length for all maskwalls ({Sh(len2)}) but this wall needs {Sh(need)} (height + 1'-6 embedment - 2\" cover)", "The bar hangs from the top cover at the listed length."));
                     for (int i = 0; i < n2; i++)
                     {
                         double e = i % 2 == 0 ? eA : eB;
@@ -168,7 +168,7 @@ public sealed partial class SubstructureGenerator
     }
 
     /// <summary>One warning that lists every schedule-only mark with the reason it is not placed.</summary>
-    private void ReportUnresolvedAbutmentMarks(string name, IEnumerable<string> scheduleOnlyMarks)
+    private void ReportUnresolvedAbutmentMarks(string name, string source, IEnumerable<string> scheduleOnlyMarks)
     {
         var rest = new HashSet<string>(scheduleOnlyMarks);
         var parts = new List<string>();
@@ -178,6 +178,6 @@ public sealed partial class SubstructureGenerator
             if (hit.Count > 0) parts.Add($"{string.Join("/", hit)}: {why}");
         }
         if (rest.Count > 0) parts.Add($"{string.Join(", ", rest)}: no placement dimensions in the plans");
-        if (parts.Count > 0) Warn($"{name}: UNRESOLVED (schedule only, no 3D bar) - {string.Join("; ", parts)}.");
+        if (parts.Count > 0) Warn($"{name}: UNRESOLVED ({(source != "" ? source + ", " : "")}abutment bar list and details; schedule only, no 3D bar) - {string.Join("; ", parts)}.");
     }
 }
