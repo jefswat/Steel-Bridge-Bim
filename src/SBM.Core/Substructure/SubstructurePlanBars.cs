@@ -71,6 +71,14 @@ public sealed partial class SubstructureGenerator
                     {
                         double t = g.Count == 1 ? 0 : -across / 2 + off + (across - 2 * off) * i / (g.Count - 1);
                         Vec3 P(double a, double zz) => g.AlongN ? unit.World(cx + t, cy + a, zz) : unit.World(cx + a, cy + t, zz);
+                        if (g.Shape == "U" && g.Dims.Length == 3 && !g.Top)
+                        {
+                            // plan bend diagram (11g1 / 11g2 ...): base and legs out to out (legs up from the base's bottom face), centred on the footing
+                            var (us, ul) = PlanU(size, g.Dims[0], g.Dims[1], g.Dims[2], g.Pin, g.Length);
+                            double zb0 = z - db / 2;
+                            bars.Add(new RawBar("F", size, us, $"{where} {what}", ul.Select(q => P(q.X - g.Dims[1] / 2, zb0 + q.Y)).ToArray()));
+                            continue;
+                        }
                         var pts = g.HookExtra > 0
                             ? new[] { P(-run, z + g.HookExtra), P(-run, z), P(run, z), P(run, z + g.HookExtra) }
                             : new[] { P(-run, z), P(run, z) };
@@ -288,13 +296,75 @@ public sealed partial class SubstructureGenerator
                 double f = (k + 1.0) / (perFace + 1.0);
                 double n = face == 0 ? nLo + cov + st.Diameter + size.Diameter / 2 : nHi - cov - st.Diameter - size.Diameter / 2;
                 Func<double, double> z = s => BotAt(s) + (TopAt(s) - BotAt(s)) * f;
-                bars.Add(PlanBarFixed("C", size, $"{loc} {g.Mark} side faces", Follow(n, g.Length, z, sMid), g.Length));
+                // 5a11 / 5a12: short bars at the cap ends (plan elevation: "5a11 (E.F.)" at the left end, "5a12 (E.F.)" at the right); their height along the end is not dimensioned
+                double endC = g.End == 0 ? sMid : g.End < 0 ? s0 + cov + g.Length / 2 : s1 - cov - g.Length / 2;
+                bars.Add(PlanBarFixed("C", size, $"{loc} {g.Mark} side faces", Follow(n, g.Length, z, endC), g.Length));
             }
         }
         // ---- hoops, ties, cantilever hoops, hairpins
         double w = nHi - nLo - 2 * cov;
         double Even(int k, int cnt, double a, double b) => cnt == 1 ? (a + b) / 2 : a + (b - a) * k / (cnt - 1);
-        foreach (var g in groups.Where(g => g.Kind is PlanBarKind.CapHoop or PlanBarKind.CapCantileverHoop or PlanBarKind.CapTie or PlanBarKind.CapHairpin))
+        // 5c5 / 5c6 (plan bend diagram): U bars in the transverse plane, base across the width (5'-5 = 6'-0 less 3 1/2" clear at both faces) with legs
+        // hanging down (2'-11 / 2'-0 out to out from the top face of the base), two bars per station along the top ("N SPA. @ 1'-4; k-5c5 BARS").
+        // NOT READ: the plans' zone dimensions (which stations are c5 / c6). Stations: equal spaces from 4" inside the top ends; the groups are given the
+        // stations by the depth of the full-width zone (the longer-legged group where the zone is deepest), as the plan's zones follow the relief arc.
+        var hair = groups.Where(g => g.Kind == PlanBarKind.CapHairpin && g.Shape == "U" && g.Dims.Length == 3 && g.Count > 0).OrderBy(g => g.Dims[0]).ToList();
+        if (hair.Count > 0)
+        {
+            const int perStation = 2;
+            int totalBars = hair.Sum(g => g.Count);
+            if (totalBars % perStation != 0 || hair.Any(g => g.Count % perStation != 0)) Warn($"{loc}: UNRESOLVED - hairpin counts {string.Join("/", hair.Select(g => g.Count))} are not multiples of {perStation} per station; hairpins not placed.");
+            else
+            {
+                int ns = totalBars / perStation;
+                double zMaxTop = poly.Max(q => q.Y);
+                var topV = poly.Where(q => q.Y >= zMaxTop - 1e-6).ToList();
+                double sTopL = topV.Min(q => q.X), sTopR = topV.Max(q => q.X);
+                double LowZ(double sx)
+                {
+                    double zl = double.MaxValue;
+                    foreach (var line in unit.ReliefLines) if (line.Count > 1 && sx >= line[0].X && sx <= line[^1].X) zl = Math.Min(zl, SubstructureUnit.Interp(line, sx));
+                    return zl == double.MaxValue ? BotAt(sx) : Math.Max(zl, BotAt(sx));
+                }
+                double margin = hair.Max(g => g.ZoneMargin) > 0 ? hair.Max(g => g.ZoneMargin) : In(4);
+                var stations = Enumerable.Range(0, ns).Select(j => Even(j, ns, sTopL + margin, sTopR - margin)).ToList();
+                // zones read from the plan (k-5cX BARS labels left to right): station j belongs to the mark whose zone it falls in
+                bool zoned = hair.All(g => g.ZoneStations.Length > 0 && g.ZoneStations.Length == hair[0].ZoneStations.Length) && hair.Sum(g => g.ZoneStations.Sum()) == ns;
+                var byDepth = zoned ? stations : stations.OrderBy(sx => TopAt(sx) - LowZ(sx)).ToList();           // shallowest first
+                var zoneOf = new Dictionary<PlanBarGroup, List<double>>();
+                if (zoned)
+                {
+                    int pos = 0;
+                    for (int zq = 0; zq < hair[0].ZoneStations.Length; zq++)
+                        foreach (var g in hair)
+                        {
+                            int zi = zq;
+                            int c = g.ZoneStations[zi];
+                            if (c == 0) continue;
+                            if (!zoneOf.TryGetValue(g, out var l)) zoneOf[g] = l = new List<double>();
+                            l.AddRange(stations.Skip(pos).Take(c)); pos += c;
+                        }
+                }
+                int at = 0;
+                foreach (var g in hair)
+                {
+                    var size = RebarCatalog.Size(g.Size);
+                    var (hs, hl) = PlanU(size, g.Dims[0], g.Dims[1], g.Dims[2], g.Pin, g.Length);
+                    double ncH = (unit.CapN0 + unit.CapN1) / 2;
+                    foreach (var sx in zoned ? zoneOf[g] : byDepth.Skip(at).Take(g.Count / perStation))
+                        for (int b = 0; b < perStation; b++)
+                        {
+                            double sp = sx + (b - (perStation - 1) / 2.0) * size.Diameter, zOut = TopAt(sp) - cov;
+                            bars.Add(new RawBar("R", size, hs, $"{loc} {g.Mark} hairpins", hl.Select(q => unit.World(sp, ncH + q.X - g.Dims[1] / 2, zOut - q.Y)).ToArray()));
+                        }
+                    at += g.Count / perStation;
+                }
+                Warn($"{loc}: hairpins {string.Join(", ", hair.Select(g => g.Mark))}: " + (zoned
+                    ? $"{ns} stations at equal spaces {Dim(margin)} inside the top ends, marks by the plan's zone order and counts (the plan's gap dimensions between zones are not read); {perStation} bars per station side by side (their offset is not dimensioned)."
+                    : $"UNRESOLVED - the plan's zones are not read; {ns} stations at equal spaces, marks given by the depth of the full-width zone."));
+            }
+        }
+        foreach (var g in groups.Where(g => (g.Kind is PlanBarKind.CapHoop or PlanBarKind.CapCantileverHoop or PlanBarKind.CapTie or PlanBarKind.CapHairpin) && !(g.Kind == PlanBarKind.CapHairpin && g.Shape == "U" && g.Dims.Length == 3)))
         {
             var size = RebarCatalog.Size(g.Size);
             bool cant = g.Kind == PlanBarKind.CapCantileverHoop;
@@ -312,10 +382,19 @@ public sealed partial class SubstructureGenerator
                 else s = Even(i, g.Count, midLo, midHi);
                 s = Math.Clamp(s, s0 + cov, s1 - cov);
                 int dirIn = s < sMid ? 1 : -1;
+                string where = $"{loc} {g.Mark}";
+                if (g.Kind == PlanBarKind.CapHairpin && g.Shape == "U" && g.Dims.Length == 3)
+                {
+                    // 5c5 / 5c6 (plan bend diagram): U bar in the transverse plane, base across the width (5'-5 = 6'-0 less 3 1/2" clear at both faces),
+                    // legs hanging down (2'-11 / 2'-0, out to out from the top of the base). Stations stay as laid out (zones are not read).
+                    var (hs, hl) = PlanU(size, g.Dims[0], g.Dims[1], g.Dims[2], g.Pin, g.Length);
+                    double zOut = TopAt(s) - cov, ncH = (unit.CapN0 + unit.CapN1) / 2;
+                    bars.Add(new RawBar("R", size, hs, $"{where} hairpins", hl.Select(q => unit.World(s, ncH + q.X - g.Dims[1] / 2, zOut - q.Y)).ToArray()));
+                    continue;
+                }
                 s = FitS(s, dirIn, x => Clr(x, TopAt(x) - cov) >= cov - 1e-4 && Clr(x, BotAt(x) + cov) >= cov - 1e-4);
                 double zt = TopAt(s) - cov, zb = BotAt(s) + cov;
                 if (zt - zb < In(12)) continue;
-                string where = $"{loc} {g.Mark}";
                 if (g.Kind is PlanBarKind.CapHoop or PlanBarKind.CapCantileverHoop)
                 {
                     double h = zt - zb;
@@ -351,19 +430,51 @@ public sealed partial class SubstructureGenerator
                 string where = $"{loc} {g.Mark}";
                 if (g.Kind == PlanBarKind.CapTransverse)
                 {
-                    // 4c5 / 4c7: straight base with 4 1/2" legs turned up at both ends (7'-5 + 2 x 4 1/2 = 8'-2 on the 1G list).
+                    // 4c5 / 4c7 (plan bend diagram): base 4'-8 (7'-5 on the wide caps) with 4 1/2" legs turned up at both ends, out to out.
                     double s = Math.Clamp(Even(i, g.Count, s0 + cov + In(3), s1 - cov - In(3)), s0 + cov, s1 - cov);
                     s = FitS(s, s < sMid ? 1 : -1, x => TopAt(x) - BotAt(x) > In(24) && Clr(x, (TopAt(x) + BotAt(x)) / 2) >= cov + size.Diameter / 2 + In(5));
-                    double leg = In(4.5), bas = Math.Max(In(12), g.Length - 2 * leg), z = (TopAt(s) + BotAt(s)) / 2, nc = (unit.CapN0 + unit.CapN1) / 2;
+                    bool planU = g.Shape == "U" && g.Dims.Length == 3;
+                    double leg1 = planU ? g.Dims[0] : In(4.5), leg2 = planU ? g.Dims[2] : leg1, leg = Math.Max(leg1, leg2);
+                    double bas = planU ? g.Dims[1] : Math.Max(In(12), g.Length - 2 * leg), z = (TopAt(s) + BotAt(s)) / 2, nc = (unit.CapN0 + unit.CapN1) / 2;
                     // highest elevation (full width above the relief curve) where the base fits between the cap sides with the cover
                     for (double zz = TopAt(s) - cov - In(6); zz > BotAt(s) + cov + In(12); zz -= In(2))
-                        if (unit.CapN1 - unit.CapN0 - 2 * Setb(s, zz) - 2 * (cov + size.Diameter / 2) >= bas + 1e-6 && Clr(s, zz + leg) >= cov) { z = zz - leg; break; }
-                    var pts = new[] { unit.World(s, nc - bas / 2, z + leg), unit.World(s, nc - bas / 2, z), unit.World(s, nc + bas / 2, z), unit.World(s, nc + bas / 2, z + leg) };
-                    bars.Add(PlanBarFixed("T", size, $"{where} transverse", pts, g.Length));
+                        if (unit.CapN1 - unit.CapN0 - 2 * Setb(s, zz) - 2 * (cov + (planU ? 0 : size.Diameter / 2)) >= bas + 1e-6 && Clr(s, zz + leg) >= cov) { z = zz - leg; break; }
+                    if (planU)
+                    {
+                        var (ts, tl) = PlanU(size, leg1, bas, leg2, g.Pin, g.Length);
+                        double zb0 = z - size.Diameter / 2;                                   // base: outside face at zb0, legs up
+                        bars.Add(new RawBar("T", size, ts, $"{where} transverse", tl.Select(q => unit.World(s, nc + q.X - bas / 2, zb0 + q.Y)).ToArray()));
+                    }
+                    else
+                    {
+                        var pts = new[] { unit.World(s, nc - bas / 2, z + leg), unit.World(s, nc - bas / 2, z), unit.World(s, nc + bas / 2, z), unit.World(s, nc + bas / 2, z + leg) };
+                        bars.Add(PlanBarFixed("T", size, $"{where} transverse", pts, g.Length));
+                    }
                 }
                 else
                 {
                     int end = i % 2, k = i / 2, per = (g.Count + 1) / 2;
+                    if (vertical && g.Shape == "A14" && g.Dims.Length == 4)
+                    {
+                        // 5a14 (plan bend diagram): bar in the vertical longitudinal plane at the cap end - vertical leg 24", top run 4'-0, slanted leg 10" (2 1/2"
+                        // run) parallel to the raked end face; 6 across the width at 9" from the faces (5 equal spaces), at each end. The bar is pushed in from the end
+                        // face only as far as the clear cover needs; its top follows the cap top minus the cover.
+                        var (es, el) = PlanA14(size, g.Dims[0], g.Dims[1], g.Dims[2], g.Dims[3], g.Pin, g.Length);
+                        double nEnd = per == 1 ? (unit.CapN0 + unit.CapN1) / 2 : unit.CapN0 + In(9) + (unit.CapN1 - unit.CapN0 - In(18)) * k / (per - 1);
+                        double dirOut = end == 0 ? -1 : 1, sv0 = end == 0 ? s0 : s1;
+                        double zTopOut = Math.Min(TopAt(sv0 - dirOut * g.Dims[1]), TopAt(sv0 - dirOut * (g.Dims[1] + g.Dims[3]))) - cov;
+                        double sv = sv0 - dirOut * (g.Dims[1] + g.Dims[3] + cov);                // start clear of the end, move inward until the cover holds
+                        for (int it = 0; it < 800; it++)
+                        {
+                            bool ok = true;
+                            foreach (var q in el)
+                                if (Clr(sv + dirOut * q.X, zTopOut - size.Diameter / 2 + q.Y + size.Diameter / 2) < cov - 1e-4) { ok = false; break; }
+                            if (ok) break;
+                            sv -= dirOut * In(0.25);
+                        }
+                        bars.Add(new RawBar("E", size, es, $"{where} end bars", el.Select(q => unit.World(sv + dirOut * q.X, nEnd, zTopOut + q.Y)).ToArray()));
+                        continue;
+                    }
                     double need = vertical ? g.Length : Math.Max(In(12), (g.Length - w) / 2) + In(6);
                     double s = end == 0 ? s0 + cov + In(2) : s1 - cov - In(2);
                     // move in from the tip until the cap is deep enough for the bar
@@ -375,6 +486,15 @@ public sealed partial class SubstructureGenerator
                         double n = per == 1 ? (nLo + nHi) / 2 : nLo + cov + (nHi - nLo - 2 * cov) * k / (per - 1);
                         double len = Math.Min(g.Length, zt - zb);
                         bars.Add(PlanBarFixed("E", size, $"{where} end vertical", new[] { unit.World(s, n, zt), unit.World(s, n, zt - g.Length) }, g.Length));
+                    }
+                    else if (g.Shape == "U" && g.Dims.Length == 3)
+                    {
+                        // 5a13 (plan bend diagram): U with a 5'-3 base and 2'-0 legs, out to out; 4 at each end stacked at equal spaces. Plane / leg direction of the
+                        // sketch are not dimensioned - the legs stand up from the base in the transverse plane (as before).
+                        var (us, ul) = PlanU(size, g.Dims[0], g.Dims[1], g.Dims[2], g.Pin, g.Length);
+                        double zb0 = per == 1 ? (zt + zb) / 2 : zb + (zt - zb - Math.Max(g.Dims[0], g.Dims[2])) * k / Math.Max(1, per - 1);
+                        double nc = (unit.CapN0 + unit.CapN1) / 2;
+                        bars.Add(new RawBar("E", size, us, $"{where} end transverse", ul.Select(q => unit.World(s, nc + q.X - g.Dims[1] / 2, zb0 + q.Y)).ToArray()));
                     }
                     else
                     {
@@ -411,6 +531,27 @@ public sealed partial class SubstructureGenerator
                 continue;
             }
             if (peds.Count == 0) continue;
+            if (g.Shape == "U" && g.Dims.Length == 3 && g.Count % peds.Count == 0)
+            {
+                // 5m1 / 5n1 (plan bend diagram, pedestal plan): U bars, base out to out 5'-1 / 5'-3, legs 2'-8 hanging into the cap from the base. Per pedestal
+                // g.Count / pedestals bars at equal spaces, the end bars 4" from the pedestal edges (plan: "4, 5 EQ SPA, 4"). 5m1 (longitudinal) runs along S
+                // and is spaced across N; 5n1 (transverse) runs along N and is spaced across S. Base top = cap top less the cover (vertical position is not dimensioned).
+                int per = g.Count / peds.Count;
+                bool alongS2 = g.Kind == PlanBarKind.PedestalLongitudinal;
+                var (ps, pl) = PlanU(size, g.Dims[0], g.Dims[1], g.Dims[2], g.Pin, g.Length);
+                foreach (var p in peds)
+                {
+                    double across = alongS2 ? p.WidthN : p.LengthS;
+                    double zOut = TopAt(p.S) - cov;
+                    for (int k = 0; k < per; k++)
+                    {
+                        double t = per == 1 ? 0 : -across / 2 + In(4) + (across - In(8)) * k / (per - 1);
+                        Vec3 Pp(double u, double v) => alongS2 ? unit.World(p.S + u - g.Dims[1] / 2, p.N + t, zOut - v) : unit.World(p.S + t, p.N + u - g.Dims[1] / 2, zOut - v);
+                        bars.Add(new RawBar("M", size, ps, $"{where} pedestal bars", pl.Select(q => Pp(q.X, q.Y)).ToArray()));
+                    }
+                }
+                continue;
+            }
             for (int i = 0; i < g.Count; i++)
             {
                 var p = peds[i % peds.Count];
