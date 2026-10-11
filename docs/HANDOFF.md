@@ -1,4 +1,4 @@
-﻿# Handoff: remaining items (as of 2026-10-10)
+# Handoff: remaining items (as of 2026-10-10)
 
 Use this to start the next session. Architecture notes are in `CLAUDE.md`. The user's working rules are in memory:
 
@@ -7,7 +7,7 @@ Use this to start the next session. Architecture notes are in `CLAUDE.md`. The u
 
 ## Current state
 
-- **Program:** `dist\SteelBridgeModeler\` (app plus `sbm.exe`), republished 20:02 with generic bearings. Matches the source; tests 128/128 pass.
+- **Program:** `dist\SteelBridgeModeler\` (app plus `sbm.exe`), republished 2026-10-10 evening from main (205 tests).
 - **Test model:** `samples\plans\I-80 WB and Ramp G.sbm`, saved 13:48. Iowa DOT Designs 116 (WB I-80) and 316 (Ramp G), georeferenced to UTM 15N.
   - Rebuild order:
     1. `build-i80-wb.csx`, then `support-lines-i80.csx` (11WB bearing lines parallel to the CL pier, 1'-8 normal each side; re-runnable)
@@ -41,26 +41,41 @@ Use this to start the next session. Architecture notes are in `CLAUDE.md`. The u
     PDF 85 Superstructure Notes = 15/16" holes, 7/8" bolts. Helpers: `tools\words_near.py` (locate words), `tools\notes_probe.py` (note blocks).
   - Temp files (scripts, rasters, snapshots, test models) go in `temp\` (user preference).
 
-## 0a. Open at the end of the 2026-10-10 session (check these first)
+## 0a. State at the end of 2026-10-10 (evening) — START HERE
 
-- **Git initialized** (local, branch `main`, first commit e5a7218). Commit each verified step. GitHub later: private,
-  user approval before any push.
-- **Measure / station-offset / object snaps** (Sonnet agent; Ctrl+M, Ctrl+I, F3; files in CLAUDE.md). Build clean,
-  142 tests. TODO: zoomed-out snap queries slow on big models (mean 14 ms, p95 64 ms, worst ~1 s; radius-pruning
-  fix NOT applied — CLAUDE.md TODO); not tested on the I-80 model or in plan mode; SbmApp wrappers + docs/API.md entry
-  missing; index built twice at startup; leftover `--snapdump` debug block in MainWindow.Measure.cs.
-- **I-80 elevations** (`docs\plan-data\i80-elevation-investigation.md`): ✅ 2WB bottom flange PL 2 1/2 x 34 (applied,
-  2WB now ±0.1"); ✅ check-top-of-slab 6A girder A typo 1021.52 (fixed). ✅ (3) gore 6A→7591+50 modeled from the Ramp A2 PGL geometry
-  (investigation doc, "D3 resolved"): A-E top of slab within 0.18". OPEN: (4) North girders (U2 A-C, U3 A-B) follow their own plan RADII
-  (e.g. U2 A 1749'-6, C 8000'-0; U3 A 2268'-5 / 1318'-5) — model uses offset curves → 1-2" mid-span; needs an explicit
-  girder-geometry input + plan pier offsets. (5) ~−0.05" bias U2 east / U3, −0.13" girder H 7WB-8WB unexplained.
-- **piles-capstep-dowels.md:** batter complete (1:4 outward normal to the footing edge; Ramp G corners 45°; 11G 1:6;
-  I-80/19G outer N rows only); confirm 1:4 = 1H:4V, diagonal convention, pile length along the axis. Cap step and
-  dowels: only 16G-18G — rest unread.
-- **Queued (user-approved):** near-view lofted rebar (smooth continuous tubes within ~20 ft of the view target when
-  zoomed in; far tiles keep hex segments) in `Viewport/SceneBuilder.cs` (`AddTube`, rebar tiles).
-- ✅ **Expansion joints merged** (feature/joints; `joints-i80.csx`, `joints-ramp-g.csx` after the build scripts): blockouts + generic placeholder bodies (IFC IfcDiscreteAccessory EXPANSION_JOINT_DEVICE + Pset SBM_Placeholder; blockout IfcBuildingElementPart). OPEN: Pier 11WB opening 7" vs plan C = 9" (support lines 3'-2 apart vs plan 3'-4 → I-80 Unit 2 11WB CL BRG offset 1'-6 vs 1'-8? verify); Pier 6A joint not modeled (one deck end per unit); 2'-2 deck end block not modeled (blockout limited to the 8" slab); abutment backwall front 17" vs plan 22" from CL BRG; strip seal pocket approximate.
-- **Verify before changing:** cut-off cross girder vertical position (~11"/8" below the top flange, PDF 125).
+- **Git + GitHub:** local repo, `main` pushed to https://github.com/jefswat/Steel-Bridge-Bim (private) after every verified
+  merge (user-approved routine). Feature work in `.worktrees\<name>` (branch `feature/<name>`), merged one at a time:
+  keep main's `.sbm`, re-run the branch's scripts with a CLI built to `temp\cli-main` (`dotnet build src/SBM.Cli -o
+  temp\cli-main` — read-only agents lock `src\SBM.Cli\bin\Debug\sbm.exe`), build, test, commit, push.
+- **Agent limits** (a crash from memory / open files happened with 6 builders): ≤3 builders at once, `-nodeReuse:false`,
+  no concurrent GPU snapshots, one model copy per agent. Every brief carries the user's rule: **no fallback guesses —
+  raise unreadable / non-reconciling plan data as warnings**.
+- **Merged today (all applied to the model):** expansion joints (placeholder IfcDiscreteAccessory EXPANSION_JOINT_DEVICE
+  + Pset SBM_Placeholder), battered piles, I-80 gore from Ramp A2, cap aesthetics + 6" section step, plan girder geometry
+  (north girders), deck end blocks + clash check, companion SQLite DB (`sbm db`, plan-page links per group, QC, GUI
+  panel, 80 MB), inspection access + cross girders as designed, viewport (snap pruning, near-view smooth rebar), pier
+  dowels/couplers + pile web orientation + plan footing/cap reinforcing (within ~1-2.5% of bar lists) + uplift rings read
+  from the sheets + clear-cover containment, Pier 11WB support lines (1'-8 parallel) + I-80 span check (109 spans, worst
+  0.21") + joint openings = plan, as-designed abutments + wingwalls, camber input + calculated blocking (595 values, none
+  > 0.02 ft except U2 girder A), level strip under the barrier on the low side (project option `DeckDefinition.EdgeStrip`)
+  + sheet-190 cross-slope rows.
+- **Checks (all in samples\plans):** check-top-of-bearing (worst 0.31" = U2 girder A at 6A, see below), check-spans-i80 /
+  -ramp-g, check-top-of-slab-all (4842 points; I-80 139 / Ramp G 8 beyond 0.01 ft; 3496 unresolved edge/gutter points),
+  check-blocking, substructure-elevation check (running).
+- **OPEN:** (1) Pier 6A: girder A inside the level strip (plan follows the plane) — agent checking whether the gore edge
+  has a barrier (`docs\plan-data\gore-6a-edge.md`); (2) ~0.008 ft low I-80 U2 7WB-9WB unexplained by sheet 190;
+  (3) 2,103 cap bars outside cover (pedestal U-bars, end verticals, 4c5/4c7, skin) — bend-diagram agent fixing;
+  (4) plan's own camber vs deflection inconsistent at ~177 I-80 U2 points (plan issue); (5) 3 1/2" clear at the textured
+  cap face — which bars (bend agent); (6) abutment wing/counterfort/step/corbel/maskwall rebar schedule-only, abutment
+  uplift piles unidentified.
+- **Running branches:** feature/bends (bend diagrams, every printed dimension), feature/deckrebar (deck reinforcing to
+  the plans — biggest model error), feature/sheets (overprinting, model-driven notes, missing sheets).
+- **Backlog:** Ramp G drains (25 inlets modelable), sign supports / crash cushion end posts / lighting (placeholders),
+  DB refresh + "missing detail" report, rule-placed rebar positions, full-model IFC validation (IfcOpenShell not
+  installed — needs user OK), cross-frame approximations (partial lines at skewed piers, bay E-F 5WB/6A, 6A joint),
+  pier close-up rebar display bug, prestressed plan sets.
+- **Unknown-origin local files:** `sandbox/` and docker lines in `CLAUDE.md` (stashed around merges, never committed).
+
 ## 0. Session 2026-10-10 (afternoon) results
 
 - **Ramp G girder line was 1'-6 off (input error, fixed in `build-ramp-g.csx`):** typical section (PDF 85) = girder A
