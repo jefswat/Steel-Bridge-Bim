@@ -159,12 +159,18 @@ br.Girders.FirstGirderOffset = Ft(30);
 br.Girders.Spacings = Enumerable.Repeat(Ft(8), 4).ToList();
 br.Girders.PlanLayout = GirderPlanLayout.Chorded;
 
-// Per-span layout. Beam D "measured along CL bearing" from CL NB roadway (W.P. = CL pier x CL NB roadway); the pier
-// bearing lines are 1'-0 each side of CL pier measured along CL NB roadway; the other beams parallel to beam D at the span's
-// spacing "measured perpendicular to CL beam". Haunch at each bearing = deck thickness at beams T (p.24) - 8" slab.
+// Per-span layout (p.21). Beam D "measured along CL bearing" from the W.P. (= CL pier x CL NB roadway; at the abutments CL brg x
+// CL NB): an aligned dimension, i.e. from the W.P.'s foot on the bearing line (OffsetOrigin = WorkPoint). The pier bearing
+// lines are 1'-0 from CL pier ALONG THE BEAM (ShiftMeasure = AlongGirder): p.21 prints the perpendicular distances 11 13/16 /
+// 11 3/4 (pier 1 back / ahead) and 11 3/4 / 11 5/8 (pier 2) = 1'-0 x cos(beam angle) - different each side, which a 1'-0 along
+// CL NB cannot give; the "1'-0" on the CL NB string is then 11 15/16 to 1'-0 1/16 (within 1/16"). With this reading every beam's
+// CL-CL bearing chord is the STANDARD length within 1/16" (55'-0 -0.02", 105'-0 -0.05", 60'-0 +0.00") and the p.33 beam-line
+// top of deck / p.25 seats reproduce (check-woodbury.csx). The other beams are parallel to beam D at the span's spacing
+// "measured perpendicular to CL beam". Haunch at each bearing = deck thickness at beams T (p.24) - 8" slab.
 GirderSpanEnd End(double shift, string beamD, double[] tIn) => new()
 {
-    LineShift = shift, Measure = SpanOffsetMeasure.AlongLine, ReferenceOffset = Ft(27.00),
+    LineShift = shift, ShiftMeasure = SpanLineShiftMeasure.AlongGirder, OffsetOrigin = SpanOffsetOrigin.WorkPoint,
+    Measure = SpanOffsetMeasure.AlongLine, ReferenceOffset = Ft(27.00),
     Offsets = { Len(beamD) }, Haunches = tIn.Select(t => In(t - 8)).ToList(),
 };
 double F(int whole, int num = 0, int den = 1) => whole + (double)num / den;
