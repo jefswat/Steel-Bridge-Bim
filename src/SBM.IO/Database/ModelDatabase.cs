@@ -648,11 +648,12 @@ public static class ModelDatabase
                 Fastener(st, 2, st.Frame, st.Assembly, 0, st.Length, steel.StudDiameter, 0);
         }
 
-        private string Group(string key, string parent, string name, string category, string support = "", string subtype = "")
+        private string Group(string key, string parent, string name, string category, string support = "", string subtype = "", string props = "")
         {
             string id = Id(key);
             var r = New(id, parent, "group", category, "", name);
             r.InIfc = false; r.Support = support; r.Subtype = subtype;
+            if (props.Length > 0) r.Props = props;
             _w.Add(r);
             return id;
         }
@@ -702,7 +703,24 @@ public static class ModelDatabase
             }
             // Groups at the granularity the plans use: one deck-reinforcing group per unit, one barrier group (concrete + its bars) per unit.
             string deckRebar = "", barrierGroup = "", barrierRebar = "";
-            string DeckRebar() => deckRebar.Length > 0 ? deckRebar : deckRebar = Group($"{bk}/grp/deck-rebar", deckPartId, $"{who} deck reinforcing", "deck reinforcing");
+            // the group carries the unit's deck bar schedule (every mark, also the schedule-only rows of a plan bar list that have no 3D bar)
+            string DeckRebarProps()
+            {
+                var railMarks = c.Bars.Where(b => b.Group == "Rail").Select(b => b.Mark).ToHashSet();
+                var dm = c.Marks.Where(m => m.Unit == "" && !railMarks.Contains(m.Mark)).OrderBy(m => m.Mark, StringComparer.Ordinal).ToList();
+                if (dm.Count == 0) return "";
+                const double Lb = 2.2046226218;
+                var placed = dm.Where(m => !m.Location.Contains("schedule only")).ToList();
+                var sched = dm.Except(placed).ToList();
+                return new Json().Add("plan_driven", def.Deck.Reinforcement.Plan != null)
+                    .Add("marks", dm.Count).Add("bars_placed", placed.Sum(m => m.Count)).Add("placed_lb", placed.Sum(m => m.TotalMass) * Lb)
+                    .Add("schedule_only_marks", string.Join(",", sched.Select(m => m.Mark))).Add("schedule_only_lb", sched.Sum(m => m.TotalMass) * Lb)
+                    .Add("schedule_columns", "mark,size,count,length_ft(max),min_length_ft,weight_lb,placement")
+                    .Add("schedule", string.Join(";", dm.Select(m => string.Join(",", m.Mark, m.Size.Name, m.Count.ToString(CultureInfo.InvariantCulture), (m.Length / 0.3048).ToString("0.00", CultureInfo.InvariantCulture),
+                        (m.MinLength / 0.3048).ToString("0.00", CultureInfo.InvariantCulture), (m.TotalMass * Lb).ToString("0", CultureInfo.InvariantCulture), m.Location.Contains("schedule only") ? "schedule only" : "3D"))))
+                    .ToString();
+            }
+            string DeckRebar() => deckRebar.Length > 0 ? deckRebar : deckRebar = Group($"{bk}/grp/deck-rebar", deckPartId, $"{who} deck reinforcing", "deck reinforcing", props: DeckRebarProps());
             string BarrierGroup() => barrierGroup.Length > 0 ? barrierGroup : barrierGroup = Group($"{bk}/grp/barriers", deckPartId, $"{who} barriers", "barrier group");
             string BarrierRebar() => barrierRebar.Length > 0 ? barrierRebar : barrierRebar = Group($"{bk}/grp/barrier-rebar", BarrierGroup(), $"{who} barrier reinforcing", "barrier reinforcing");
             foreach (var (name, mesh) in c.Barriers)

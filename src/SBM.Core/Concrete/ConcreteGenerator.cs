@@ -108,7 +108,7 @@ public sealed class ConcreteModel
 /// Deck top follows finished grade (profile + cross slope); haunches fill from the top flange to the deck bottom;
 /// barriers (TxDOT SSTR by default) sit on the deck at each edge between the deck end lines.
 /// </summary>
-public sealed class ConcreteGenerator
+public sealed partial class ConcreteGenerator
 {
     private static readonly Vec3 Up = new(0, 0, 1);
     private readonly BridgeFraming _f;
@@ -148,7 +148,7 @@ public sealed class ConcreteGenerator
         Parallel.ForEach(tasks, t => t());
         var bars = new ConcurrentBag<(string series, RebarSize size, BarShape shape, string loc, bool epoxy, BarPlacement placement)>();
         var rebarTasks = new List<Action>();
-        if (Deck.Reinforcement.Enabled) rebarTasks.Add(() => BuildDeckRebar(bars));
+        if (Deck.Reinforcement.Enabled) rebarTasks.Add(Deck.Reinforcement.Plan != null ? BuildPlanDeckRebar : () => BuildDeckRebar(bars));
         if (Deck.Barrier.Type == BarrierType.TxDotSstr && Deck.Barrier.Reinforcement) rebarTasks.Add(() => BuildSstrRebar(bars));
         Parallel.ForEach(rebarTasks, t => t());
         AssignMarks(bars);
@@ -744,12 +744,14 @@ public sealed class ConcreteGenerator
     }
 
     /// <summary>Clips a plan segment to the deck between the end lines inset by the cover.</summary>
-    private bool ClipToEnds(ref Vec2 p0, ref Vec2 p1, double cover)
+    private bool ClipToEnds(ref Vec2 p0, ref Vec2 p1, double cover) => ClipToEnds(ref p0, ref p1, cover, cover);
+
+    private bool ClipToEnds(ref Vec2 p0, ref Vec2 p1, double coverBegin, double coverEnd)
     {
         var nb = DR.BeginLineDirection.Left;
         var ne = -DR.EndLineDirection.Left;
-        var qb = DR.BeginLinePoint + nb * cover;
-        var qe = DR.EndLinePoint + ne * cover;
+        var qb = DR.BeginLinePoint + nb * coverBegin;
+        var qe = DR.EndLinePoint + ne * coverEnd;
         foreach (var (q, n) in new[] { (qb, nb), (qe, ne) })
         {
             double s0 = Vec2.Dot(p0 - q, n), s1 = Vec2.Dot(p1 - q, n);

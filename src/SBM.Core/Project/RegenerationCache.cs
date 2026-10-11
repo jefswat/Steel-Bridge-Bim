@@ -89,7 +89,7 @@ public sealed class RegenerationCache
                 var ts = Task.Run(() => SteelModelGenerator.Generate(f, project.Units));
                 cm = Concrete.ConcreteGenerator.Generate(f, project.Units);
                 st = ts.Result;
-                if (cm != null && st != null) Checks.DeckEndBlockCheck.Run(f, st, cm, project.Units);
+                if (cm != null && st != null) { Checks.DeckEndBlockCheck.Run(f, st, cm, project.Units); Checks.DeckRebarCheck.Run(f, st, cm, project.Units); }
             }
             lock (_lock) _super[key] = (f, st, cm, ps);
             parts[i] = (f, st, cm, ps, false);

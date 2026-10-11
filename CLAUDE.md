@@ -277,6 +277,16 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   The model geometry stays the final shape. Points between key points are equally spaced along each girder. Girder properties, material report, DB girder-group properties
   (camber_table), `sbm blocking`. Plan data/results: `docs/plan-data/camber-blocking.md` (section 9), `docs/plan-data/camber/*.csv`; scripts `samples/plans/camber-i80.csx`,
   `camber-ramp-g.csx` (run after the girder/splice/termination scripts) and `check-blocking.csx`.
+- Plan-driven deck reinforcing (OPTIONAL `DeckReinforcementDefinition.Plan` = `DeckPlanReinforcement`, Bridge/DeckPlanReinforcement.cs; null = the generic generator below stays the default):
+  `Concrete/ConcretePlanRebar.cs` (partial `ConcreteGenerator`). `DeckTransverseZone` = equally spaced RADIAL lines along a deck edge from the begin deck-end line (`StartAfterPrevious`, `AnchorToEnd`,
+  `BetweenZone` for bars between another zone's lines; edge paths extend beyond the deck ends), each line = lapped `DeckLinePiece`s (fixed stock pieces + a remainder), clipped by the end lines with
+  `TransverseBeginClear/EndClear`. `DeckLongZone` = equal spaces between two reference lines (girder web line / edge / offset, margins, alternating layers) or explicit `Positions` (+ `PositionLayers`,
+  `PositionsFromRight`), stock chains with laps; zones that abut between the same references form a RUN and their lines continue across zones (nearest line of the same layer) so bar counts follow the length
+  of the lines. `PlanBarList` (+ `Families`, e.g. "6b") = the plan's bar list per unit: every placed mark is compared (counts exactly, weight 3%) with warnings for differences, rows without a placed bar become
+  schedule-only marks (no 3D bar; end dam 5d/5e are NOT placed). Marks are the plan's (7a1, 6b1, 5j1...), the generic AssignMarks is bypassed. `Checks/DeckRebarCheck` (run in RegenerationCache for every deck
+  with bars): cover top/bottom, edges, deck-end/blockout distance, bars vs the highest steel surface (top flanges, splice plates, fillers) -> `ConcreteModel.Notes` / Diagnostics. Plan data and results:
+  `docs/plan-data/deck-rebar.md`, `deck-bar-lists.csv`; scripts `samples/plans/deck-rebar-i80.csx`, `deck-rebar-ramp-g.csx` (run LAST, after the joint/deck-edge/girder scripts), `report-deck-rebar.csx`,
+  `check-deck-rebar.csx`. The typical-section sheet text and the database group "deck reinforcing" (unit bar schedule in its properties, incl. schedule-only marks) follow the plan.
 - Variable deck width: `DeckDefinition.LeftAt/RightAt(station)`; constant decks keep the old code path.
 - Deck edge strip (OPTIONAL, default off, PROJECT-SPECIFIC to the Iowa plans): `DeckDefinition.EdgeStrip` (`DeckEdgeStrip` Width inboard from the edge, follows
   `LeftAt/RightAt`). `DeckDefinition.FinishedElevation(alignment, sta, off)` = `Alignment.ElevationAt` except beyond the gutter line (edge -/+ Width) on a side whose
