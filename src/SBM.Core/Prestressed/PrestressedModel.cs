@@ -128,6 +128,9 @@ public sealed class PrestressedModel
     public List<BearingSeat> BearingSeats { get; } = new();
     public List<Diagnostic> Diagnostics { get; } = new();
     public TimeSpan GenerationTime { get; set; }
+    /// <summary>Concrete end / pier diaphragms (<see cref="Bridge.SupportDefinition.Diaphragm"/>), set by RegenerationCache phase 2
+    /// (after the substructure); null = none.</summary>
+    public Diaphragms.ConcreteDiaphragmModel? ConcreteDiaphragms { get; set; }
 
     public double ConcreteVolume => Beams.Sum(b => b.Volume);
     public double TotalMass => Beams.Sum(b => b.Mass);

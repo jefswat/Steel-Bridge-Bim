@@ -66,6 +66,10 @@ public sealed class SupportDefinition
     /// </summary>
     public List<DeckEndPoint>? DeckEndPoints { get; set; }
 
+    /// <summary>OPTIONAL concrete end / pier diaphragm (prestressed bridges, <see cref="ConcreteDiaphragmDefinition"/>); null = none.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public ConcreteDiaphragmDefinition? Diaphragm { get; set; }
+
     [System.Text.Json.Serialization.JsonIgnore]
     public SubstructureDefinition ResolvedSubstructure => Substructure ?? SubstructureDefinition.Default(Type);
 
@@ -77,6 +81,7 @@ public sealed class SupportDefinition
         c.ExpansionJoint = ExpansionJoint?.Clone();
         c.GirderFixities = GirderFixities?.ToList();
         c.DeckEndPoints = DeckEndPoints?.Select(p => p.Clone()).ToList();
+        c.Diaphragm = Diaphragm?.Clone();
         return c;
     }
 }

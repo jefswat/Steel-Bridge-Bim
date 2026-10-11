@@ -726,6 +726,43 @@ public static class IfcExporter
                 contained.Add(id);
                 result.ElementCount++;
             }
+            // Concrete end / pier diaphragms (superstructure): IfcBeam .DIAPHRAGM., keyways = IfcBuildingElementPart aggregated into it,
+            // polystyrene / preformed fillers = IfcBuildingElementPart 'JOINT_FILLER' (thin solids). Flagged items get Pset SBM_Status.
+            if (ps.ConcreteDiaphragms is { IsEmpty: false } cd)
+            {
+                int diaStyle = RgbStyle("Concrete", 0.72, 0.72, 0.69), fillStyle = RgbStyle("Joint filler", 0.92, 0.92, 0.80);
+                var byName = new Dictionary<string, int>();
+                foreach (var d in cd.Diaphragms)
+                {
+                    int dpds = Body(d.Mesh, diaStyle);
+                    int id = w.Add("IFCBEAM", $"{Guid(IfcKeys.Diaphragm(bk, d.Support))},$,{S(d.Name)},{S(d.Description)},{S(d.ObjectType)},{Ref(pl)},{Ref(dpds)},{S(d.Support)},.DIAPHRAGM.");
+                    AddMaterial(d.Material, id);
+                    psetTargets.Add((id, d.Support, d.Name, d.Length, d.Volume * 2400));
+                    if (d.Assumption != null) miscStatus.Add((id, d.Assumption));
+                    contained.Add(id);
+                    byName[d.Support] = id;
+                    result.ElementCount++;
+                }
+                var kidsOf = new Dictionary<string, List<int>>();
+                int an = 0;
+                foreach (var a in cd.Accessories)
+                {
+                    int apds = Body(a.Mesh, a.Kind == SBM.Core.Diaphragms.DiaphragmAccessoryKind.Keyway ? diaStyle : fillStyle);
+                    string type = a.Kind == SBM.Core.Diaphragms.DiaphragmAccessoryKind.Keyway ? "SHEAR_KEY" : "JOINT_FILLER";
+                    int id = w.Add("IFCBUILDINGELEMENTPART", $"{Guid(IfcKeys.DiaphragmAccessory(bk, a.Support, an++))},$,{S(a.Name)},{S(a.Description)},{S(type)},{Ref(pl)},{Ref(apds)},$,.USERDEFINED.");
+                    AddMaterial(a.Material, id);
+                    if (a.Assumption != null) miscStatus.Add((id, a.Assumption));
+                    result.ElementCount++;
+                    if (a.Kind == SBM.Core.Diaphragms.DiaphragmAccessoryKind.Keyway && byName.ContainsKey(a.Support))
+                    {
+                        if (!kidsOf.TryGetValue(a.Support, out var l)) kidsOf[a.Support] = l = new List<int>();
+                        l.Add(id);
+                    }
+                    else contained.Add(id);
+                }
+                foreach (var (sup, kids) in kidsOf)
+                    w.Add("IFCRELAGGREGATES", $"{Guid(IfcKeys.Diaphragm(bk, sup) + "/rel")},$,$,$,{Ref(byName[sup])},{Refs(kids)}");
+            }
             for (int i = 0; i < contained.Count; i += 5000)
                 w.Add("IFCRELCONTAINEDINSPATIALSTRUCTURE", $"{Guid(bk + "/rel/ps/" + i)},$,$,$,{Refs(contained.Skip(i).Take(5000))},{Ref(superPart)}");
         }

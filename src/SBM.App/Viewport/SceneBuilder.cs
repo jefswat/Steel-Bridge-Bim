@@ -276,10 +276,42 @@ public static class SceneBuilder
                 var g = FlatShaded(pads.Select(p => p.Mesh), o, pads.Select(p => (object)new PsPadPick(p)).ToList());
                 return new SolidLayer { Name = "3D-BEARING-ELASTOMER", R = 40, G = 40, B = 45, Parts = new() { (g, null) }, Triangles = g.Indices!.Count / 3 };
             },
+            () => DiaphragmLayer(models, o, "3D-DIAPHRAGMS", 188, 186, 176, flagged: false, accessories: false, 0.6f),
+            () => DiaphragmLayer(models, o, "3D-DIAPHRAGM-FILLERS", 235, 232, 200, flagged: false, accessories: true, 1f),
+            () => DiaphragmLayer(models, o, "3D-UNRESOLVED-DIAPHRAGMS", 255, 110, 40, flagged: true, accessories: null, 0.6f),
         };
         var results = new SolidLayer?[jobs.Length];
         Parallel.For(0, jobs.Length, i => results[i] = jobs[i]());
         scene.Solids.AddRange(results.OfType<SolidLayer>());
+    }
+
+    /// <summary>Concrete end / pier diaphragms and their fillers / keyways; elements modeled on an UNRESOLVED item go to their own orange layer.</summary>
+    private static SolidLayer? DiaphragmLayer(IReadOnlyList<SBM.Core.Prestressed.PrestressedModel> models, Vec3 o, string name, byte r, byte g, byte b,
+        bool flagged, bool? accessories, float opacity)
+    {
+        const double cy = 0.764554857984;
+        var items = new List<(Mesh mesh, object tag)>();
+        foreach (var cd in models.Select(m => m.ConcreteDiaphragms).OfType<SBM.Core.Diaphragms.ConcreteDiaphragmModel>())
+        {
+            if (accessories != true)
+                foreach (var d in cd.Diaphragms.Where(d => (d.Assumption != null) == flagged && !d.Mesh.IsEmpty))
+                {
+                    var props = new List<(string, string)> { ("Type", d.ObjectType), ("Volume", $"{d.Volume / cy:N2} CY"), ("Info", d.Description) };
+                    if (d.UnbuiltParts.Count > 0) props.Add(("Not built (UNRESOLVED)", string.Join(", ", d.UnbuiltParts)));
+                    if (d.Assumption != null) { props.Add(("Status", d.Assumption.Status)); props.Add(("Reason", d.Assumption.Reason)); props.Add(("Assumed", d.Assumption.Basis)); }
+                    items.Add((d.Mesh, new NamedPick("Diaphragm", d.Name, props)));
+                }
+            if (accessories != false)
+                foreach (var a in cd.Accessories.Where(a => (a.Assumption != null) == flagged && !a.Mesh.IsEmpty))
+                {
+                    var props = new List<(string, string)> { ("Material", a.Material), ("Volume", $"{a.Volume / cy:N3} CY"), ("Info", a.Description) };
+                    if (a.Assumption != null) { props.Add(("Status", a.Assumption.Status)); props.Add(("Reason", a.Assumption.Reason)); props.Add(("Assumed", a.Assumption.Basis)); }
+                    items.Add((a.Mesh, new NamedPick(a.Kind.ToString(), a.Name, props)));
+                }
+        }
+        if (items.Count == 0) return null;
+        var geo = FlatShaded(items.Select(x => x.mesh), o, items.Select(x => x.tag).ToList());
+        return new SolidLayer { Name = name, R = r, G = g, B = b, Parts = new() { (geo, null) }, Triangles = geo.Indices!.Count / 3, Opacity = opacity };
     }
 
     /// <summary>Caps, pedestals, backwalls, columns, foundations (concrete), steel piles, and substructure rebar.</summary>

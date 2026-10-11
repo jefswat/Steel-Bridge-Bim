@@ -1374,6 +1374,17 @@ public sealed partial class MainViewModel : ObservableObject
                     MaterialRows.Add(new MaterialRow(b.Name, "Bearing pad",
                         $"Elastomeric {u.FormatLength(grp.Key.Length, LengthKind.Short)} x {u.FormatLength(grp.Key.Width, LengthKind.Short)} x {u.FormatLength(grp.Key.Thickness, LengthKind.Short)}",
                         grp.Count(), "", "—"));
+                if (psm.ConcreteDiaphragms is { } cdm)
+                {
+                    double cy = u.IsUS ? 0.764554857984 : 1;
+                    string vu = u.IsUS ? "CY" : "m³";
+                    foreach (var d in cdm.Diaphragms)
+                        MaterialRows.Add(new MaterialRow(b.Name, "Concrete", $"{d.Name} ({d.ObjectType.Replace('_', ' ').ToLowerInvariant()}{(d.UnbuiltParts.Count > 0 ? ", parts UNRESOLVED: " + string.Join(", ", d.UnbuiltParts) : "")}{(d.Assumption != null ? ", UNRESOLVED geometry" : "")})",
+                            d.Parts.Count, u.FormatLength(d.Length), $"{d.Volume / cy:N2} {vu}"));
+                    foreach (var grp in cdm.Accessories.GroupBy(a => (a.Kind, a.Material)))
+                        MaterialRows.Add(new MaterialRow(b.Name, grp.Key.Kind == SBM.Core.Diaphragms.DiaphragmAccessoryKind.Keyway ? "Keyway" : "Joint filler", grp.Key.Material,
+                            grp.Count(), "", $"{grp.Sum(a => a.Volume) / cy:N3} {vu}"));
+                }
             }
             if (ConcreteModels.TryGetValue(b, out var cmod))
             {
