@@ -281,6 +281,9 @@ public sealed partial class SubstructureGenerator
             {
                 var wt = we.WallTop.OrderBy(p => p.U).Select(p => new Vec2(p.U, p.Elevation)).ToList();
                 double Top(double u) => SubstructureUnit.Interp(wt, u);
+                double uFirst = Math.Min(0, path.U(CrossStation(a, unit, sta0, dirSta, eOut, nBack)) - ub);
+                if (wt[0].X > uFirst + In(0.5) || wt[^1].X < we.Length - In(0.5))
+                    Warn($"{name}: {wn}: wall top points cover U {L(wt[0].X)} .. {L(wt[^1].X)} but the wall runs {L(uFirst)} .. {L(we.Length)} from the cap back face (skewed back face included); the top is extended linearly beyond the given points.");
                 var wm = Body(eIn, eOut, _ => we.FootingTopElevation, Top);
                 unit.Solids.Add(new SubSolid(SubElementKind.Wingwall, $"{name} {wn} wall",
                     $"Wing extension wall {Sh(we.WallThickness)} thick outboard of the gutter line, {Sh(we.Length)} from the cap back face, top {El(wt.Min(p => p.Y))} .. {El(wt.Max(p => p.Y))}, bottom {El(we.FootingTopElevation)}", wm));

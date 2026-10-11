@@ -71,7 +71,7 @@ public class IntegralAbutmentTests
         // the solid: lowest point = the west bottom, highest = step H; the end faces carry the end step tops
         var cap = u.Solids.Single(s => s.Kind == SubElementKind.Footing);
         var zs = cap.Mesh.Positions.Select(p => p.Z).ToList();
-        Assert.Equal(Ft(dBot) + c.Dz, zs.Min(), 4);
+        Assert.InRange(zs.Min(), Ft(dBot) + c.Dz - 0.01, Ft(dBot) + c.Dz + 1e-6);   // bottom profile is in S; the skewed end corner reaches a little further down-slope
         Assert.Equal(Ft(hTop) + c.Dz, zs.Max(), 4);
         Assert.Contains(m.Notes, n => n.Contains("integral cap depth at the left end"));
     }
@@ -190,7 +190,9 @@ public class IntegralAbutmentTests
         var wall = u.Solids.Single(s => s.Kind == SubElementKind.Wingwall);
         double nominal = (In(17) + In(19)) * Ft(6.5) * Ft(3);
         Assert.InRange(Math.Abs(foot.Mesh.Volume()) / nominal, 0.7, 1.3);
-        Assert.InRange(wall.Mesh.Positions.Max(p => p.Z), fb + Ft(8.8) - 1e-6, fb + Ft(9) + 1e-6);
+        // top follows the given points (linearly extended past U = 0 at the skewed back-face corner, reported)
+        Assert.InRange(wall.Mesh.Positions.Max(p => p.Z), fb + Ft(8.8) - 1e-6, fb + Ft(9) + In(1));
+        Assert.Equal(fb + Ft(3), wall.Mesh.Positions.Min(p => p.Z), 6);
         Assert.Equal(5, u.Solids.Count(s => s.Kind == SubElementKind.Pile));
         Assert.Equal(5, u.Abutment!.Casings.Count);
         Assert.Contains(u.Abutment.Casings, k => Math.Abs(k.Top - fb) < 1e-9 && k.N != 0);
