@@ -14,6 +14,9 @@ public sealed class CamberKeyPoint
     public int Support { get; set; } = -1;
     /// <summary>Plan field splice number when the key point is a field splice; 0 = none.</summary>
     public int Splice { get; set; }
+    /// <summary>The key point is the end of a discontinuous girder: its termination (<see cref="GirderTermination"/>, CL bearing of the
+    /// termination support + the termination distance along the girder).</summary>
+    public bool GirderEnd { get; set; }
     public CamberKeyPoint Clone() => (CamberKeyPoint)MemberwiseClone();
 }
 

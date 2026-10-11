@@ -9,7 +9,12 @@
 //  * Per point and girder: camber (in, up +), deflection due to steel and due to slab+barrier (in, down +).
 //  * Blocking DATUM = the end of the girder's blocking row that the plans print as 0.00.  Both ends 0.00, or neither, or the datum in a
 //    discontinuous girder's un-numbered tail => no datum is set (reported); nothing is substituted.
-//  * Un-numbered tails of the discontinuous girders (PDF 140-146, 152-155) are NOT loaded (UNRESOLVED, see docs\plan-data\camber-blocking.md).
+//  * Discontinuous girders (I-80 U2 B-E, U3 B-C; Terminations): the main tables stop before the termination pier. Their un-numbered "DISCONTINUOUS
+//    GIRDERS" tail tables (PDF 140-146, 152-155; printed order) are loaded as the points from the termination pier to the girder end: n values =
+//    n-1 equal spaces from the CL bearing of the termination pier to the girder end (key `GirderEnd` = pier + the Termination distance), numbered from
+//    the pier's point number. This is the mapping of PDF 205's "MEASURED ALONG GIRDER x" layout (value counts = printed spaces + 1); it is
+//    CONFIRMED only by check-blocking.csx (haunch elevation / camber relation / blocking of the tail points), not stated on the plans in words.
+//    Tail deflection tables: first of the two per girder (page order) = slab+barrier, second = steel (check-blocking.csx tests this).
 using System.Globalization;
 using SBM.Core.Bridge;
 
@@ -17,6 +22,7 @@ const string Br = "I80", PlanBr = "I-80";
 int[] units = { 1, 2, 3 };
 string BridgeName(int u) => $"I-80 WB Unit {u}";
 
+const bool TailTable0IsSlab = true;
 string dataDir = new[] { @"docs\plan-data\camber", @"C:\Users\jefsw\OneDrive\Desktop\Steel Bridge Modeler\docs\plan-data\camber" }.First(System.IO.Directory.Exists);
 string tosCsv = new[] { @"samples\plans\top-of-slab-i80-rampg.csv", @"C:\Users\jefsw\OneDrive\Desktop\Steel Bridge Modeler\samples\plans\top-of-slab-i80-rampg.csv" }.First(System.IO.File.Exists);
 double Num(string s) => double.Parse(s.Trim().TrimEnd('*'), CultureInfo.InvariantCulture);
@@ -33,6 +39,17 @@ foreach (var ln in System.IO.File.ReadAllLines(tosCsv))
     if (!bpts.ContainsKey(k)) bpts[k] = new();
     bpts[k].Add((int.Parse(c[3]), c[4], c[5]));
 }
+
+// tail values of one girder in printed order (TailTables: the two deflection tables per girder in page order)
+List<List<double>> TailTables(string file, int g)
+{
+    var res = new List<List<double>>();
+    var rows = Table(file).Skip(1).Where(r => r[0] == ((char)('A' + g)).ToString()).ToList();
+    foreach (var grp in rows.GroupBy(r => r[1]).OrderBy(x => int.Parse(x.Key))) res.Add(grp.OrderBy(r => int.Parse(r[2])).Select(r => Num(r[3])).ToList());
+    return res;
+}
+List<double> TailValues(string file, int g) =>
+    Table(file).Skip(1).Where(r => r[0] == ((char)('A' + g)).ToString()).OrderBy(r => int.Parse(r[1])).Select(r => Num(r[2])).ToList();
 
 int totalPts = 0, totalGirders = 0;
 foreach (int u in units)
@@ -80,8 +97,30 @@ foreach (int u in units)
             if (int.Parse(steel[r][0]) != pt || int.Parse(slab[r][0]) != pt) throw new Exception("tables misaligned");
             gc.Points.Add(new CamberPoint { Number = pt, Camber = In(Num(camber[r][col])), SteelDeflection = In(Num(steel[r][col])), SlabDeflection = In(Num(slab[r][col])) });
         }
+        // discontinuous girder: tail from the termination pier to the girder end
+        var term = b.Girders.Terminations.FirstOrDefault(x => x.Girder == g);
+        int endPoint = -1;
+        if (term != null)
+        {
+            var cT = TailValues($"{Br}-unit{u}-camber_in-discontinuous-unnumbered.csv", g);
+            var oT = TailTables($"{Br}-unit{u}-other_DEFLECTION_ORDINATES_OF_DISCON-unnumbered.csv", g);
+            int pier = supportPts[term.Support];
+            if (cT.Count == 0 || oT.Count != 2 || oT[0].Count != cT.Count || oT[1].Count != cT.Count)
+                Print($"!! {b.Name} girder {hdr[col].Last()}: tail tables missing or of unequal length - tail not loaded");
+            else
+            {
+                gc.Points.RemoveAll(p => p.Number >= pier);          // the main tables end before the termination pier
+                gc.Keys.RemoveAll(k => k.Number > pier);
+                endPoint = pier + cT.Count - 1;
+                gc.Keys.Add(new CamberKeyPoint { Number = endPoint, GirderEnd = true });
+                var slabT = TailTable0IsSlab ? oT[0] : oT[1]; var steelT = TailTable0IsSlab ? oT[1] : oT[0];
+                for (int i = 0; i < cT.Count; i++)
+                    gc.Points.Add(new CamberPoint { Number = pier + i, Camber = In(cT[i]), SlabDeflection = In(slabT[i]), SteelDeflection = In(steelT[i]) });
+            }
+        }
         // datum: the end of the blocking row printed 0.00
-        var vals = block.Skip(1).Where(r => Has(r[col + 1])).Select(r => (Pt: int.Parse(r[1]), V: Num(r[col + 1]))).OrderBy(x => x.Pt).ToList();
+        // a starred value (0.00*) is "location at end of discontinuous girder" = the girder end point (its own numbering)
+        var vals = block.Skip(1).Where(r => Has(r[col + 1])).Select(r => (Pt: r[col + 1].Contains('*') && endPoint > 0 ? endPoint : int.Parse(r[1]), V: Num(r[col + 1]))).OrderBy(x => x.Pt).ToList();
         string why = null;
         if (vals.Count == 0) why = "no blocking values printed";
         else
@@ -91,7 +130,7 @@ foreach (int u in units)
             else
             {
                 int dp = first0 ? vals[0].Pt : vals[^1].Pt;
-                if (gc.Points.All(p => p.Number != dp)) why = $"the datum (point {dp}, 0.00) is in the un-numbered tail (not loaded)";
+                if (gc.Points.All(p => p.Number != dp)) why = $"the datum (point {dp}, 0.00) is not among the loaded points";
                 else gc.DatumPoint = dp;
             }
         }

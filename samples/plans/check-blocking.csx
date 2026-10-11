@@ -43,12 +43,20 @@ for (int u = 1; u <= label; u++)
         int col = Array.IndexOf(hdr, "girder_" + gl);
         if (col < 0) { notes.Add($"{bn} {gl}: no haunch column"); continue; }
         var gpath = f.Girders[gres.Girder].Path;
-        var keyNums = Doc.Project.Bridges.First(x => x.Name == bn).Girders.Camber.First(c => c.Girder == gres.Girder).Keys.Select(k => k.Number).OrderBy(x => x).ToList();
+        var gcd = Doc.Project.Bridges.First(x => x.Name == bn).Girders.Camber.First(c => c.Girder == gres.Girder);
+        var keyNums = gcd.Keys.Select(k => k.Number).OrderBy(x => x).ToList();
+        // discontinuous girder: plan values of the tail (un-numbered, printed order) start at the key point before the girder end
+        var endKey = gcd.Keys.FirstOrDefault(k => k.GirderEnd);
+        int tailStart = endKey != null ? gcd.Keys.Where(k => k.Number < endKey.Number).Max(k => k.Number) : int.MaxValue;
+        var tailH = new List<double>();
+        if (endKey != null && System.IO.File.Exists(System.IO.Path.Combine(dataDir, $"{br}-unit{u}-haunch_elev_ft-discontinuous-unnumbered.csv")))
+            tailH = Table($"{br}-unit{u}-haunch_elev_ft-discontinuous-unnumbered.csv").Skip(1).Where(r => r[0] == gl).OrderBy(r => int.Parse(r[1])).Select(r => Num(r[2])).ToList();
         int SegOf(int pt) { int s = 0; for (int i = 0; i < keyNums.Count; i++) if (pt >= keyNums[i]) s = i; return s; }
         foreach (var p in gres.Points)
         {
             var hrow = H.Skip(1).FirstOrDefault(r => int.Parse(r[0]) == p.Number);
             double planH = hrow != null && Has(hrow[col]) ? Num(hrow[col]) : double.NaN;
+            if (p.Number >= tailStart && p.Number - tailStart < tailH.Count) planH = tailH[p.Number - tailStart];
             double dH = double.NaN;
             if (!double.IsNaN(planH))
             {
@@ -58,7 +66,8 @@ for (int u = 1; u <= label; u++)
             }
             string letter = "";
             double planB = double.NaN, mB = double.NaN, mBc = double.NaN;
-            var brow = B.Skip(1).FirstOrDefault(r => int.Parse(r[1]) == p.Number);
+            // starred value = location at the end of the discontinuous girder (the girder's own end point)
+            var brow = B.Skip(1).FirstOrDefault(r => Has(r[col + 1]) && (r[col + 1].Contains('*') ? p.Kind == "end" : int.Parse(r[1]) == p.Number));
             if (brow != null && Has(brow[col + 1]) && !double.IsNaN(p.Blocking))
             {
                 letter = brow[0]; planB = Num(brow[col + 1]); mB = Ft_(p.Blocking); mBc = double.IsNaN(p.BlockingFromCamber) ? double.NaN : Ft_(p.BlockingFromCamber);
@@ -72,7 +81,7 @@ for (int u = 1; u <= label; u++)
         int missing = camCsvPts.Count(n => gres.Points.All(p => p.Number != n));
         if (missing > 0) notes.Add($"{bn} {gl}: {missing} plan haunch points not compared (not located on the girder: {SBM.Core.Framing.CamberBlocking.Ranges(camCsvPts.Where(n => gres.Points.All(p => p.Number != n)))})");
         foreach (var row in B.Skip(1))
-            if (Has(row[col + 1]) && gres.Points.All(p => p.Number != int.Parse(row[1])) )
+            if (Has(row[col + 1]) && (row[col + 1].Contains('*') ? gres.Points.All(p => p.Kind != "end") : gres.Points.All(p => p.Number != int.Parse(row[1]))))
                 notes.Add($"{bn} {gl}: plan blocking {row[0]} (pt {row[1]}) = {row[col + 1]} not compared (point not located on the girder)");
         if (gres.DatumPoint == 0) notes.Add($"{bn} {gl}: no blocking datum - blocking not computed for this girder");
     }

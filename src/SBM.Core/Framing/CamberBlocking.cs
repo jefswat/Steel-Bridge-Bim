@@ -8,7 +8,7 @@ public sealed class CamberPointResult
 {
     public required int Girder { get; init; }
     public required int Number { get; init; }
-    /// <summary>"bearing", "splice" or "" (interpolated point between two key points).</summary>
+    /// <summary>"bearing", "splice", "end" (end of a discontinuous girder) or "" (interpolated point between two key points).</summary>
     public string Kind { get; init; } = "";
     /// <summary>Key point label: support name or "FS n" (empty between key points).</summary>
     public string Label { get; init; } = "";
@@ -99,6 +99,17 @@ public static class CamberBlocking
     private static double KeyDistance(BridgeDefinition def, BridgeFraming f, GirderResult gr, CamberKeyPoint k, out string label, out string why)
     {
         label = ""; why = "";
+        if (k.GirderEnd)
+        {
+            label = "girder end";
+            var t = def.Girders.Terminations.FirstOrDefault(x => x.Girder == gr.Index);
+            if (t == null) { why = "girder is not discontinuous (no termination)"; return double.NaN; }
+            var br = f.SupportLine(t.Support).Bearings[gr.Index];
+            if (br == null) { why = "girder has no bearing at its termination support"; return double.NaN; }
+            int n = gr.Spans.Count;
+            double sb = !double.IsNaN(br.PathDistance) ? br.PathDistance : gr.DistanceAt(Math.Min(br.Support, n - 1), br.Support >= n ? 1 : 0);
+            return sb + t.Distance;
+        }
         if (k.Support >= 0)
         {
             int total = def.Supports.Count + def.AuxiliarySupports.Count;
@@ -163,8 +174,8 @@ public static class CamberBlocking
             {
                 if (keys[i].Number == p.Number && !double.IsNaN(kd[i]))
                 {
-                    s = kd[i]; label = kl[i]; kind = keys[i].Splice > 0 ? "splice" : "bearing";
-                    chord = keys[i].Splice > 0 || i == 0 || i == keys.Count - 1;
+                    s = kd[i]; label = kl[i]; kind = keys[i].Splice > 0 ? "splice" : keys[i].GirderEnd ? "end" : "bearing";
+                    chord = keys[i].Splice > 0 || keys[i].GirderEnd || i == 0 || i == keys.Count - 1;
                 }
                 else if (i + 1 < keys.Count && keys[i].Number < p.Number && p.Number < keys[i + 1].Number
                          && !double.IsNaN(kd[i]) && !double.IsNaN(kd[i + 1]))
