@@ -85,6 +85,7 @@ Vec2 Cross(SBM.Core.Alignments.Alignment al, Vec2 p0, Vec2 d, double off)
 }
 
 var flagged = new List<string>();
+var conflicts = new List<string>();   // plan-internal conflicts (footings.csv column "conflict"): the model follows the detail sheets; reported, not counted as model errors
 int nPts = 0, okPts = 0, nSk = 0, okSk = 0, nSp = 0, okSp = 0, nF = 0, okF = 0;
 var pierCross = new Dictionary<string, (Vec2 Q, double ModelSta, SBM.Core.Alignments.Alignment Al, Vec2 Dir, Vec2 Nrm)>();
 
@@ -190,12 +191,14 @@ foreach (var grp in Csv("footings.csv").GroupBy(r => (r["bridge"], r["support"])
         var dLS = (m.LS - D(r["size_s_ft"])) * 12; var dLN = (m.LN - D(r["size_n_ft"])) * 12;
         var ds = new[] { dS, dN, dLS, dLN }.Where(x => !double.IsNaN(x)).ToList();
         nF++; bool ok = ds.All(x => Math.Abs(x) <= 1.0 / 16 + 1e-6); if (ok) okF++;
+        string conflict = r.TryGetValue("conflict", out var cf) ? cf : "";
         string Tx(double x) => double.IsNaN(x) ? "   -  " : $"{Z(x, 2),6:+0.00;-0.00}";
         Print($"   {bn,-15} {sn,-10} #{k + 1}: plan S {FtIn(ps),-13} {D(r["size_s_ft"]),5:0.##} x {D(r["size_n_ft"]),5:0.##} | model S {FtIn(m.S),-13} N {Z(m.N, 3),6:+0.000;-0.000} {m.LS,6:0.###} x {m.LN,6:0.###} | d(in) S {Tx(dS)} N {Tx(dN)} size {Tx(dLS)} {Tx(dLN)}{(ok ? "" : " <-")}");
-        if (!ok) flagged.Add($"footing {bn} {sn} #{k + 1}: d S {Z(dS, 2):+0.00;-0.00}\" N {(double.IsNaN(dN) ? "-" : Z(dN, 2).ToString("+0.00;-0.00"))}\" size {Z(dLS, 2):+0.00;-0.00}\" x {Z(dLN, 2):+0.00;-0.00}\" (plan {r["printed_dims"]}), PDF {r["pdf_page"]}");
+        if (!ok && conflict != "") conflicts.Add($"footing {bn} {sn} #{k + 1}: d S {Z(dS, 2):+0.00;-0.00}\" size {Z(dLS, 2):+0.00;-0.00}\" x {Z(dLN, 2):+0.00;-0.00}\" - {conflict}");
+        else if (!ok) flagged.Add($"footing {bn} {sn} #{k + 1}: d S {Z(dS, 2):+0.00;-0.00}\" N {(double.IsNaN(dN) ? "-" : Z(dN, 2).ToString("+0.00;-0.00"))}\" size {Z(dLS, 2):+0.00;-0.00}\" x {Z(dLN, 2):+0.00;-0.00}\" (plan {r["printed_dims"]}), PDF {r["pdf_page"]}");
     }
 }
-Print($"   footings: {okF}/{nF} within 1/16\" (centre S, N and both sizes)");
+Print($"   footings: {okF}/{nF} within 1/16\" (centre S, N and both sizes); {conflicts.Count} beyond are PLAN CONFLICTS (staking vs detail sheets), {nF - okF - conflicts.Count} model differences");
 
 Print("-- (5) ties between alignments");
 {
@@ -215,3 +218,5 @@ Print("-- (5) ties between alignments");
 }
 Print($"== flagged: {flagged.Count}");
 foreach (var f in flagged) Print("   " + f);
+Print($"== PLAN CONFLICTS (plan-internal, model follows the detail sheets): {conflicts.Count}");
+foreach (var f in conflicts) Print("   CONFLICT " + f);

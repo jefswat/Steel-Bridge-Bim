@@ -180,6 +180,11 @@ public sealed class DeckEndDamBar
     public double SideOffset { get; set; }
     public int Unplaced { get; set; }
     public string Unresolved { get; set; } = "";
+    /// <summary>OPTIONAL plan note that lets this mark be field cut / adjusted where it meets other work (e.g. Ramp G "5d4 bars shall be field cut ...",
+    /// Section B-B, PDF 137). Non-empty = clashes of this mark with the steel are reported as Info quoting the note, not as a conflict.</summary>
+    public string FieldCutNote { get; set; } = "";
+    /// <summary>OPTIONAL one-line plain explanation used when this mark (placed as the plan dimensions it) clashes with the steel: reported as a PLAN CONFLICT.</summary>
+    public string ConflictNote { get; set; } = "";
     public DeckEndDamBar Clone()
     {
         var b = (DeckEndDamBar)MemberwiseClone();

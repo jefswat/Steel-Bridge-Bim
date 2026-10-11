@@ -2,7 +2,11 @@
 // bearings of Unit 2 girders A-E (Ramp A2 bridge, not part of this design, on its back side). Girders A-E begin on its
 // CL bearing line; F-K start on Pier 5WB. Run after girders-i80.csx (re-runnable).
 //  * CL Pier 6A crosses CL Ramp A2 at I-80 STA 7591+08.83, 107.43' LT; skewed 3 39'00" from CL Pier 5WB (north end
-//    further ahead); CL bearing 1'-6 ahead of the CL pier. Ramp A2 CL is 13'-2 5/16 left (north) of the column CL.
+//    further ahead); CL bearing 1'-6 ahead of the CL pier. Ramp A2 CL is 13'-2 15/16 left (north) of the column CL (staking PDF 15,
+//    Pier 6A details PDF 39 and 41, raster-confirmed on PDF 39; user decision 2026-10-11 - was 13'-2 5/16, 5/8" off).
+//  * PIER_POSITION_ONLY=1: on an existing model update only the position fields of the 6A substructure (CapProfile,
+//    CapProfileAhead, FirstColumnOffset); the support, girder beginnings and later scripts' data are kept. The A-E girder
+//    lines then follow from girder-geometry-i80.csx (same column point), which must be re-run.
 //  * Ahead bearings A-E along the pier from the left top corner (x = -26'): 2'-5 9/16, then 11'-6 9/16, 11'-2 13/16,
 //    11'-6 15/16, 9'-7 1/2.
 //  * Cap 8'-0 wide, 52'-0 between top corners, left beak tip 1'-2 beyond the corner, right tip 1'-6 1/8; tips 5'-0 below
@@ -24,7 +28,7 @@ var (_, ang5) = al.EvaluateAtDistance(al.StationToDistance(sta5));
 var dir = Vec2.FromAngle(ang5).Right.Rotate(skew * Math.PI / 180);  // left -> right along the pier
 var ahead = new Vec2(-dir.Y, dir.X); if (Vec2.Dot(ahead, Vec2.FromAngle(ang5)) < 0) ahead = -ahead;
 var rampPt = al.PointAt(Sta("7591+08.83"), -(Ft(107.43) - Ft(41.08)));
-var colPt = rampPt + dir * FI(13, 2.3125);                          // column CL on the CL pier
+var colPt = rampPt + dir * FI(13, 2.9375);                          // column CL on the CL pier (13'-2 15/16)
 var brgPt = colPt + ahead * Ft(1.5);
 // Where the CL bearing line crosses the WB CL (offset 0): secant on the line parameter.
 double OffAt(double t) => al.Inverse(brgPt + dir * t).Offset;
@@ -36,10 +40,13 @@ Print($"  CL brg Pier 6A crosses the WB CL at STA {Doc.Units.FormatStation(staLi
 double Sof(Vec2 p) => Vec2.Dot(p - crossPt, dir);                  // cap coordinate S on this support
 double Splan(double x) => Sof(colPt) + F(x);                       // plan x (from the column CL, right +)
 
+bool posOnly = Environment.GetEnvironmentVariable("PIER_POSITION_ONLY") == "1" && u2.AuxiliarySupports.Any(s => s.Name == "Pier 6A" && s.Substructure != null);
+var pier6a = posOnly ? u2.AuxiliarySupports.First(s => s.Name == "Pier 6A") : null;
+if (!posOnly) {
 // ---- girders A-E begin on Pier 6A
 u2.AuxiliarySupports.RemoveAll(s => s.Name == "Pier 6A");
 u2.Girders.Beginnings.RemoveAll(b => b.Support == "Pier 6A");
-var pier6a = new SupportDefinition
+pier6a = new SupportDefinition
 {
     Name = "Pier 6A", Type = SupportType.Pier, Station = staLine, SkewDegrees = skew, GirderEndExtension = In(12),
     PierCenterOffset = -Ft(1.5), Fixity = BearingFixity.Expansion,
@@ -69,6 +76,7 @@ for (int it = 0; it < 6; it++)
     Print($"  pass {it + 1}: largest bearing offset error {worst / In(1):F2} in");
     if (worst < In(0.05)) break;
 }
+}   // !posOnly
 
 // ---- the as-designed pier
 var sd = SubstructureDefinition.Default(SupportType.Pier);
@@ -100,7 +108,8 @@ var piles = all6.Select(s => Q(s, 8)).Concat(new[] { -12.5, -7.5, 7.5, 12.5 }.Se
 sd.Footings = new() { new FootingDefinition { Column = 1, Piles = piles } };
 sd.Footings[0].PileWeb = PileWebMode.AlongBatter;   // plan pile symbols: web along the batter direction (flanges across it); plumb piles web along N
 sd.Footings[0].BatterPerimeter(4, false, false);   // plans: the 12 piles of both outer N rows (N = +-8) batter 1:4 outward in N
-pier6a.Substructure = sd;
+if (posOnly) { var o = pier6a!.Substructure!; o.CapProfile = sd.CapProfile; o.CapProfileAhead = sd.CapProfileAhead; o.FirstColumnOffset = sd.FirstColumnOffset; }
+else pier6a!.Substructure = sd;
 
 var res = Doc.Regenerate();
 Print($"Regenerated {res.Bridges} bridges in {res.Elapsed.TotalSeconds:F1} s, {res.Errors.Count} errors.");

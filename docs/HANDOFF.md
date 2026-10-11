@@ -236,24 +236,35 @@ as "…before bearing iteration.sbm". The run confirmed item 2.3: girder C has n
 - Open: column 6e1 hoop counts are a few short of the bar lists (e.g. 2G 78 vs 80): the plans count the plinth and column zones separately ("14 SPA. ... & 24 SPA."), the model spaces one zone over the full height.
 - Generic bearings: bearing body 16"×16" and masonry plate 1¾" are assumptions (vendor items).
 
-## 4a-bis. Open decisions page (2026-10-11)
+## 4a-bis. Decisions page (2026-10-11): staking 1-4, 19G calibration, Ramp G U3 end dam - DECIDED and applied
 
-All pending user decisions (staking 1-4, Ramp G 19G 27" bar end calibration, Ramp G U3 end dam bars vs 20" flanges,
-standard beam sheets download, Woodbury standard-beam placement) are on https://claude.ai/artifact/HGTVUujx3prgBrmWAjn5ra
-(source temp/decisions/). The user saves choices there: read them with ArtifactData list, collection "decisions".
+The page https://claude.ai/artifact/HGTVUujx3prgBrmWAjn5ra (source temp/decisions/) still carries the open items
+"standard beam sheets download" and "Woodbury standard-beam placement". The six below were answered by the user and applied
+on branch `dec-i80` (sample model updated; no pier script re-run in full - `PIER_POSITION_ONLY=1`, see CLAUDE.md):
 
-## 4b. Staking check findings: AWAITING USER REVIEW (2026-10-11; user is checking on the computer, do not change yet)
+1. **Pier 11WB & 19G position along the pier line - DECIDED (A).** PDF 63 cap plan, chained from the RIGHT top corner (42'-6
+   right of the CL pier): ahead row 2'-9 3/16 + 12'-10 15/16 + 12'-11 3/16 + 12'-11 3/8 = 41'-6 11/16 to "CL girder G & CL WB"
+   (= 11 5/16" right of the CL pier); back row 4'-5 5/8 + 12'-11 1/16 + 12'-11 5/16 + 12'-11 1/2 = 43'-3 1/2 to "CL girder H & CL WB"
+   (= 9 1/2" left). `piers-i80.csx` applies 11 5/16 at the ahead row; the model WB CL then crosses the CL pier 0.937" right
+   (back row check -9.479" vs -9 1/2; pile layout PDF 65 "CL WB 9'-5 1/16 from CL column 2" = 0.938"). Was 11 5/8" at the CL pier.
+   Staking footings 2/3 now +0.01"; footing 1 +1.01" = PLAN CONFLICT (staking 40'-7 vs pier details 40'-6), reported by check-staking.
+2. **Pier 6A column 13'-2 15/16 from CL Ramp A2 - DECIDED (A)** (`pier-6a.csx`, `girder-geometry-i80.csx`: the A-E bearings are
+   chained from the cap corner, so Unit 2 A-E start 5/8" further along the 6A line). check-spans-i80: spans from 6A now -0.02..-0.06"
+   (were -0.05..-0.09"), 109 spans 8 beyond 1/16" (was 15).
+3. **Pier 6WB 2'-2 3/8 - DECIDED (A)** (`piers-i80.csx`): all four footings +0.00".
+4. **Ramp G camber CSV column shift - DECIDED (A), wider than point 7:** the point before every unnumbered "MIDPOINT OF FIELD
+   SECTION" column held the midpoint value in the camber, steel and slab deflection CSVs of all four Ramp G units (U1 pt 25; U2 7, 51, 72;
+   U3 35, 83, 106; U4 55; 78 cells, PDF 111-125). Fixed from the text layer (PDF 116 pt 7 raster-confirmed: 3.05 / 2.87 / 2.71 / 2.55);
+   I-80 tables have no such shift (14,723 cells compared, 0 differences). `camber-ramp-g.csx` re-run. check-haunch H5 13 -> 0.
+5. **Pier 19G slab bar end clear 27" - DECIDED (A): CALIBRATED** (labelled in `deck-rebar-ramp-g.csx`, deck-rebar.md section 3).
+6. **Ramp G Unit 3 end dam bars vs 20" flanges - DECIDED (A):** 5d4 = Info "field cut per the plan note, Section B-B, PDF 137"
+   (`DeckEndDamBar.FieldCutNote`); 5d2 / 5d3 / 5d5 (10 each) = PLAN CONFLICT warnings with the reason (`ConflictNote`): PDF 138 puts the
+   first bar 10" from the girder CL and Unit 3's top flanges at 9G / 14G are 20" wide. Nothing moved.
 
-From `check-staking.csx` / `docs/plan-data/haunch-staking-check.md`:
-1. Pier 11WB & 19G is 10 11/16" left along the pier line vs the staking footing centres (PDF 16: -31'-1 15/16, +9'-5 1/16,
-   +30'-11 1/16; model -31'-11 5/8, +8'-6 3/8, +30'-0 3/8). PDF 63 gives CL WB 11 5/16" from CL pier at one bearing row;
-   `piers-i80.csx` uses 11 5/8" at the pier CL. Staking vs pier sheet also differ 1" on footing 1-2 (40'-7 vs 40'-6).
-2. Pier 6A: 13'-2 15/16 from CL Ramp A2 on PDF 15, 39, 41; `pier-6a.csx` uses 13'-2 5/16.
-3. Pier 6WB footings: 2'-2 3/8 on PDF 16, 43, 45; `piers-i80.csx` uses 2'-2 3/16.
-4. `docs/plan-data/camber/RG-unit2-defl_slab_in.csv` point 7 holds the unnumbered "midpoint of field section" column
-   (3.13/2.95/2.78/2.61); PDF 116 point 7 = 3.05/2.87/2.71/2.55. Check the steel deflection / camber CSVs for the same shift.
-Plan-only (no input change): Ramp G 5G footing staking 31'-6 x 22'-0 vs details 29'-0 x 24'-0 (model follows details);
-allowable field haunch MAX in tension zones below the plans' nominal geometry (365 points).
+Check results before -> after (model copy, see the final report of branch dec-i80): check-staking flagged 9 -> 0 (+2 plan conflicts:
+11WB footing 1, Ramp G 5G size); check-sub-cover 40 -> 40 (the 11WB shift adds none); check-deck-rebar end dam steel 40 bars (one warning)
+-> 30 PLAN CONFLICT + 10 field-cut Info; check-blocking haunch elevation beyond 0.01 ft 37 -> 30, blocking 19 -> 28 (I-80 U2 A-E move
+at 6A: marginal 0.010-0.018 ft, none beyond 0.02; Ramp G U2/U3 flags 3 -> 0); check-haunch H2 26 -> 19, H5 13 -> 0.
 
 ## 5. Prestressed plan sets: extracted, program improvements QUEUED (user, 2026-10-11)
 

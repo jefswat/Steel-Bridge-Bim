@@ -102,6 +102,8 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
     side-by-side as-designed piers ("Pier 11WB & 19G"): every support with a CapProfile owns its cap and takes only the
     seats on it (RegenerationCache owners). Conflicts (seats off the cap, seat below cap top, column not under cap) are
     WARNINGS, never auto-fixed. Plan-set data: `samples/plans/piers-i80.csx`, `piers-ramp-g.csx`, `deck-edges-i80.csx`.
+    `piers-i80.csx` / `pier-6a.csx` with env `PIER_POSITION_ONLY=1` update only the position fields (CapProfile, CapProfileAhead,
+    FirstColumnOffset) of existing piers, so later scripts' data (rebar, aesthetics, pedestals, footing bars) survive a position fix.
     Chamfered (octagonal) column rebar (`SubstructureRebar.ColumnBars`): verticals per face from the OUTSIDE-face
     dimensions (centred groups, explicit chamfer positions, or equal spaces with shared corners) set in normal to the
     face; ties follow the section (`PolygonTie`, hooks at the sharpest corner), optionally as two overlapping end hoops
@@ -449,7 +451,8 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   `Concrete/ConcreteEndDam.cs`): bend-diagram shape (open bar by its OUTSIDE outline in section coordinates X from the deck-end face / Drop below grade, or a hoop w x h with lap tails, built with
   `SubstructureGenerator.PlanBent/PlanHoop`) in the plane normal to the deck-end line, repeated per girder bay (`FromGirder`, `Spacing`, `PerBay`, `Overhang` from the exterior girder lines, girders found where
   their web lines cross the deck end); `Unplaced` bars count toward the mark (location "... not modeled - UNRESOLVED") with `Unresolved` raised; `DeckPlanReinforcement.Unresolved` = plan items not dimensioned,
-  each an "UNRESOLVED (deck reinforcing): ..." warning. Placed: Ramp G 5d2-5d5 at Piers 5G/9G/14G; I-80 and the rest of the end dams are schedule only (reasons + pages in `docs/plan-data/deck-rebar.md` 5-6).
+  each an "UNRESOLVED (deck reinforcing): ..." warning. Steel clashes of end dam bars are reported per mark: `DeckEndDamBar.FieldCutNote` (plan note
+  allowing field cutting, Ramp G 5d4) -> Info quoting it; any other mark -> "PLAN CONFLICT" warning with `ConflictNote` (plain reason); never moved. Placed: Ramp G 5d2-5d5 at Piers 5G/9G/14G; I-80 and the rest of the end dams are schedule only (reasons + pages in `docs/plan-data/deck-rebar.md` 5-6).
   `Checks/DeckRebarCheck` (run in RegenerationCache for every deck
   with bars): cover top/bottom, edges, deck-end/blockout distance, bars vs the highest steel surface (top flanges, splice plates, fillers) -> `ConcreteModel.Notes` / Diagnostics; end dam marks are checked
   separately (`CheckEndDams`: clear inside the deck-end concrete incl. the end block soffit, exact test against the top flange / splice plate triangles near the ends). Plan data and results:

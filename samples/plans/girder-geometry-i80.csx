@@ -60,7 +60,7 @@ double skew6a = -(3 + 39 / 60.0);
 var (_, ang5) = al.EvaluateAtDistance(al.StationToDistance(u2.Supports[0].Station));
 var dir6 = Vec2.FromAngle(ang5).Right.Rotate(skew6a * Math.PI / 180);
 var ahead6 = new Vec2(-dir6.Y, dir6.X); if (Vec2.Dot(ahead6, Vec2.FromAngle(ang5)) < 0) ahead6 = -ahead6;
-var col6 = al.PointAt(Sta("7591+08.83"), -(Ft(107.43) - off80)) + dir6 * Ft(FI(13, 2.3125));
+var col6 = al.PointAt(Sta("7591+08.83"), -(Ft(107.43) - off80)) + dir6 * Ft(FI(13, 2.9375));   // column CL 13'-2 15/16 from CL Ramp A2 (PDF 15, 39, 41; was 2 5/16)
 var xs = new double[5]; xs[0] = -26 + FI(2, 5.5625); xs[1] = xs[0] + FI(11, 6.5625); xs[2] = xs[1] + FI(11, 2.8125); xs[3] = xs[2] + FI(11, 6.9375); xs[4] = xs[3] + FI(9, 7.5);
 var s6a = xs.Select(x => col6 + dir6 * Ft(x) + ahead6 * Ft(1.5)).ToArray();
 
