@@ -149,7 +149,20 @@ Barrier Type S (TL-4 deck / TL-3 approach panel), control joints 11 sps @ abt. 9
 SOQ p2: barrier 273 LF; struct. conc. 140 CY (71+69 ok); bars 19200/19970/250; slab 4220 SF; planing 4954 SF; 14 bearings; 704 LF 30MH; test piles 100 + 105 ft; piling 2405 LF; pipe railing 36 LF; slope paving 15 SY; conduit LS. working-points.csv, seat-elevations.csv, camber (p16), pile loads (p4/p9).
 
 ## UNRESOLVED
-U1 horizontal datum (p34/36/37). U2 end diaphragm geometry (p20/21/17). U3 bend dimensions (p8/14/21/24). U4 deck line counts vs spacing, 55 vs 53 bot, 29 vs 27 top (p19). U5 17'-9 7/8", 9'-4 1/4" not rasterized (p1, p22). U6 sole plate B303 dims (p30). U7 pedestal Type A/B details (p6). U8 pile tip elevations (p4/p9). U9 mask/infill wall east-end and corner extents (p3/5/10/11). U10 camber shape (p16).
+| id | open item | pages | status |
+|---|---|---|---|
+| U1 | horizontal datum not stated | p34, p36, p37 | UNRESOLVED |
+| U2 | end diaphragm geometry | p17, p20, p21, p11, p3, p5 | closed (sec. 3); length 41'-0" DERIVED from mask wall / infill wall faces - no direct dimension |
+| U3 | bend dimensions | p8, p14, p21, p24 | closed for 25 marks (bend-diagrams.csv); still UNRESOLVED: 22 marks with one leg / hook not dimensioned on the sheet (A/B 504E, 505E, 514E, 420E, 423E, 502E hooks, 503E hooks; S615M, S616M, S617S; R501M-R504E foot; R408E 2:12 leg); barrier loops R505M/R517E/R506E/R507E/R518E do not reconcile with the true-length sum (std barrier sheet length convention not stated, p24); pin diameters not shown on any sheet |
+| U4 | deck line counts 55/29 vs spacing | p19 | closed: 1 extra line 7" (bot) / 3 1/2" (top) from each deck edge |
+| U5 | 17'-9 7/8", 9'-4 1/4" raster | p1, p22 | closed (RASTER) |
+| U6 | sole plate B303 | p30 | closed |
+| U7 | pedestal Type A/B (and N Type C/D) | p6, p12 | closed; pedestal is 2'-4" across (not 2'-6" = seat width) |
+| U8 | pile tip elevations | p4, p9 | UNRESOLVED |
+| U9 | mask / infill wall E end and corners | p3, p5, p10, p11 | closed: infill wall only in the E 18'-5"; mask wall W only; mask wall along-bridge ends DERIVED from footing lines (not dimensioned directly) |
+| U10 | camber shape | p16 | UNRESOLVED |
+| U11 | beam bars: extent of the G402E-paired G303E zone; G806E bar length; which end positions take G505E vs G508E | p16 | UNRESOLVED (not dimensioned, no bill) |
+| U12 | pedestal heights (only tops given) | p5, p10, p6 | DERIVED from seat-elevations.csv minus seat; no direct dimension |
 
 ## Model mapping
 | section | model inputs | notes |
