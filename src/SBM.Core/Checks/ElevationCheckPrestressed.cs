@@ -70,7 +70,8 @@ public static partial class ElevationCheck
     }
 
     /// <summary>Chains at every prestressed beam end (pad center): two per girder at interior bents.</summary>
-    public static List<ElevationChain> PrestressedBearings(BridgeFraming f, PrestressedModel ps, UnitSystem u, Substructure.SubstructureModel? sub = null)
+    public static List<ElevationChain> PrestressedBearings(BridgeFraming f, PrestressedModel ps, UnitSystem u, Substructure.SubstructureModel? sub = null,
+        IReadOnlyList<Substructure.SubstructureModel>? others = null)
     {
         var list = new List<ElevationChain>();
         string E(double z) => u.FormatLength(z, LengthKind.Coordinate);
@@ -98,19 +99,8 @@ public static partial class ElevationCheck
                 else ch.Checks.Add($"Bearing seat matches the 3D model ({E(seat.SeatElevation)}).");
             }
             ch.Checks.Add($"Total depth top of deck to bearing seat: {u.FormatLength(ch.Steps[1].Elevation - z)}.");
-            if (sub?.Units.FirstOrDefault(x => x.SupportIndex == sup) is { } unit)
-            {
-                double sB = Vec2.Dot(pad.Center.XY - unit.Origin, unit.D), nB = Vec2.Dot(pad.Center.XY - unit.Origin, unit.N);
-                var ped = unit.Pedestals.Where(p => p.Girder == pad.Girder).OrderBy(p => Math.Abs(p.N - nB)).FirstOrDefault();
-                double capTop = unit.CapTopAt(sB);
-                double h = z - capTop;
-                ch.Steps.Add(new CalcStep("− Pedestal", $"seat − cap top; cap top {unit.CapTopDescription}, shortest pedestal {Sh(unit.Definition.MinPedestalHeight)}" +
-                    (h < UnitSystem.In(0.125) ? " (no pedestal built)" : ""), -h, capTop, "Top of cap at the bearing"));
-                double capBot = unit.CapBottomAt(sB);
-                ch.Steps.Add(new CalcStep("− Cap depth", $"{Sh(capTop - capBot)} at this bearing", -(capTop - capBot), capBot, "Bottom of cap at the bearing"));
-                if (ped != null && Math.Abs(ped.SeatZ - z) > 0.0005) { ch.Mismatch = true; ch.Checks.Add($"Pedestal seat in the substructure model differs by {Sh(ped.SeatZ - z)}"); }
-                else if (ped != null) ch.Checks.Add($"Pedestal and cap match the substructure model ({Sh(h)} pedestal, cap top {E(capTop)}).");
-            }
+            if (FindPedestal(sub, others, sup, pad.Girder, pad.Center.XY) is { } hit)
+                AddSubstructure(ch, hit.unit, hit.ped, pad.Center.XY, u);
             list.Add(ch);
         }
         return list;
