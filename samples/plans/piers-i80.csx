@@ -216,7 +216,7 @@ foreach (var p in ip)
     Print($"    {p.name}: {sd.Footings.Sum(f => f.Piles.Count(q => q.IsBattered))} battered piles in {sd.Footings.Count} footing(s)");
     if (pl.Count != p.expect) Print($"    PILE COUNT {pl.Count} -- PLANS SAY {p.expect}");
 }
-// ---- Plan pedestal sizes (inches: along the cap x across it). Printed on the cap plan / pedestal bar layout of every pier sheet ("4, 5 EQ. SPA., 4" with the
+// ---- Plan pedestal sizes (inches: along the cap x across it). Printed on the cap plan / pedestal bar layout of every pier sheet ("4, 5 EQ. SPA., 4"; 3WB and 7WB "4, 6 EQ., 4"; with the
 // total below, e.g. 5'-6 x 5'-8) and confirmed by the 5m1 / 5n1 U-bar bases (base + 4" or 5" = pedestal); docs/plan-data/pier-pedestals.md. NOT set (sizes not
 // settled by the sheets, the bearing-footprint pedestals stay): Pier 6A (Ramp A2 pedestals share the cap), Pier 11WB (two staggered rows, along size not printed).
 // Pier 5WB: ONE 5'-0 x 7'-8 block per girder line carries the back and ahead bearing (36 5n1 bars = 6 blocks x 6).
