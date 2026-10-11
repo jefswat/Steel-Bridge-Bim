@@ -120,7 +120,28 @@ public static class ConcreteDiaphragmGenerator
         public double D => Beam.Shape.Depth;
         public double Hw => Beam.Shape.TopWidth / 2;
         public double Hb => Beam.Shape.BottomWidth / 2;
-        public bool PresentAt(double c) => (c - Xd) * Sx > 1e-9;
+        /// <summary>End face square to the beam in plan (interior bents, InteriorGirderEnds.Square): in a slice x = c the beam is the outline
+        /// clipped at the section x where the face meets the slice.</summary>
+        public bool Square;
+        public bool PresentAt(double c) => Square ? true : (c - Xd) * Sx > 1e-9;
+        private double XbAt(Frame k, double c) => (c - k.Xs * Vec2.Dot(Top.XY - k.O, k.N)) / (k.Xs * Vec2.Dot(Right, k.N));
+        private int KeepSign(Frame k)
+        {
+            double dsdx = -Vec2.Dot(Right, k.N) / Vec2.Dot(T, k.N);
+            return Math.Sign(AtStart ? dsdx : -dsdx);
+        }
+        /// <summary>The beam void in section coordinates at slice c (null = no beam in this slice).</summary>
+        public Vec2[]? VoidAt(Frame k, double c)
+        {
+            if (!Square) return PresentAt(c) ? Void : null;
+            double xbc = XbAt(k, c);
+            int sg = KeepSign(k);
+            var cl = ClipHalf(Void.ToList(), p => sg * (p.X - xbc));
+            return cl.Count < 3 || Math.Abs(MeshBuilder.SignedArea(cl)) < 1e-8 ? null : cl.ToArray();
+        }
+        /// <summary>Slice positions where the clip line of a square end passes an outline vertex (topology events).</summary>
+        public IEnumerable<double> SquareEvents(Frame k) => Void.Select(p => p.X).Distinct()
+            .Select(xb => k.Xs * Vec2.Dot(Top.XY - k.O, k.N) + xb * k.Xs * Vec2.Dot(Right, k.N));
         public double SAlong(Frame k, double c, double xb)
         {
             double tn = k.Xs * Vec2.Dot(T, k.N);
@@ -224,8 +245,7 @@ public static class ConcreteDiaphragmGenerator
                 Beam = b, AtStart = atStart, Top = top, T = t, Right = t.Right, Xd = k.X(top.XY),
                 Sx = Math.Sign(xs * Vec2.Dot(into, nrm)), Void = VoidOutline(b.Shape),
             };
-            if (b.Definition?.InteriorEnds == InteriorGirderEnds.Square && sup.Type != SupportType.Abutment)
-                Warn($"{b.Mark}: beam end is square to the beam in plan - the diaphragm treats it as parallel to the support at its CL (not exact).");
+            be.Square = b.Definition?.InteriorEnds == InteriorGirderEnds.Square && sup.Type != SupportType.Abutment;
             ends.Add(be);
         }
         double maxLean = ends.Count == 0 ? 0 : ends.Max(e => sup.Type == SupportType.Abutment ? 0 : Math.Abs(e.Beam.Slope) * e.D * Math.Abs(Vec2.Dot(e.T, nrm)));
@@ -271,18 +291,22 @@ public static class ConcreteDiaphragmGenerator
 
         // ---- checks: embedment, bearing gap, deck end vs back face
         var built = dia.Parts;
-        foreach (var e in ends)
+        var outsideEnds = ends.Where(e => built.Count > 0 && !built.Any(p => e.Xd > p.XMin - 1e-6 && e.Xd < p.XMax + 1e-6)).ToList();
+        if (outsideEnds.Count > 0)
+            Warn($"{outsideEnds.Count} beam end(s) ({string.Join(", ", outsideEnds.Select(e => e.Beam.Mark))}, x {string.Join(" / ", outsideEnds.Select(e => L(e.Xd)).Distinct())}) are not inside a built part" +
+                 (dia.UnbuiltParts.Count > 0 ? $" (unbuilt: {string.Join(", ", dia.UnbuiltParts)})." : "."));
+        if (!double.IsNaN(dd.PlanBearingGap) && k.Steps.Count > 0)
         {
-            bool inside = built.Any(p => e.Xd > p.XMin - 1e-6 && e.Xd < p.XMax + 1e-6);
-            if (!inside && built.Count > 0)
-                Warn($"{e.Beam.Mark}: beam end (x {L(e.Xd)}) is not inside a built part of the diaphragm" + (dia.UnbuiltParts.Count > 0 ? $" (unbuilt: {string.Join(", ", dia.UnbuiltParts)})." : "."));
-            if (!double.IsNaN(dd.PlanBearingGap) && k.Steps.Count > 0)
+            var off = new List<string>();
+            foreach (var e in ends)
             {
                 var brg = e.AtStart ? e.Beam.BearingStart : e.Beam.BearingEnd;
                 double gap = brg.Z - e.D - k.BottomAt(k.S(brg.XY));
-                if (Math.Abs(gap - dd.PlanBearingGap) > In(1.0 / 16))
-                    Warn($"{e.Beam.Mark}: beam bottom at the CL bearing is {L(gap)} above the diaphragm bottom step (plan bearing {L(dd.PlanBearingGap)}) - model seat / beam elevation differs from the plan step.");
+                if (Math.Abs(gap - dd.PlanBearingGap) > In(1.0 / 16)) off.Add($"{e.Beam.Mark} {L(gap)}");
             }
+            if (off.Count > 0)
+                Warn($"CHECK: beam bottom above the plan bottom step at the CL bearing differs from the plan bearing {L(dd.PlanBearingGap)} by more than 1/16 in.: {string.Join(", ", off)} (model beam / seat elevations vs the plan step elevations; nothing adjusted).");
+            else Info($"beam bottoms at the CL bearings are {L(dd.PlanBearingGap)} above the plan steps (all {ends.Count} beam ends, 1/16 in.).");
         }
         if (sup.Type == SupportType.Abutment && built.Count > 0)
         {
@@ -403,8 +427,12 @@ public static class ConcreteDiaphragmGenerator
         }
         double xmin = pts.Min(p => p.X), xmax = pts.Max(p => p.X);
         var cuts = pts.Select(p => p.X).ToList();
-        var beams = cutBeams ? allEnds.Where(e => e.Sx > 0 ? xmax > e.Xd + 1e-6 : xmin < e.Xd - 1e-6).ToList() : new List<BeamEnd>();
-        foreach (var b in beams) if (b.Xd > xmin + 1e-6 && b.Xd < xmax - 1e-6) cuts.Add(b.Xd);
+        var beams = cutBeams ? allEnds.Where(e => e.Square
+            ? Enumerable.Range(0, 9).Any(q => e.VoidAt(k, xmin + (xmax - xmin) * (q + 0.5) / 9) != null) || e.SquareEvents(k).Any(c => c > xmin && c < xmax)
+            : e.Sx > 0 ? xmax > e.Xd + 1e-6 : xmin < e.Xd - 1e-6).ToList() : new List<BeamEnd>();
+        foreach (var b in beams)
+            foreach (var c in b.Square ? b.SquareEvents(k) : new[] { b.Xd })
+                if (c > xmin + 1e-6 && c < xmax - 1e-6) cuts.Add(c);
         cuts = cuts.Distinct().OrderBy(x => x).ToList();
         var merged = new List<double>();
         foreach (var c in cuts) if (merged.Count == 0 || c - merged[^1] > 1e-6) merged.Add(c);
@@ -415,11 +443,14 @@ public static class ConcreteDiaphragmGenerator
             double xa = merged[i], xb = merged[i + 1], xm = (xa + xb) / 2;
             var lo = lower.FirstOrDefault(e => e.X0 <= xm && e.X1 >= xm) ?? throw new InvalidOperationException($"no lower edge at x {xm:0.###} m (section not vertically convex?)");
             var up = upper.FirstOrDefault(e => e.X0 <= xm && e.X1 >= xm) ?? throw new InvalidOperationException($"no upper edge at x {xm:0.###} m");
-            var present = beams.Where(b => b.PresentAt(xm)).ToList();
+            var present = beams.Where(b => b.VoidAt(k, xm) != null).ToList();
             foreach (var b in present) usedBeams.Add(b);
+            // square beam ends: evaluate the end slices a hair inside the slab so the clip line never sits on an outline vertex
+            double eps = present.Any(b => b.Square) ? 1e-5 : 0;
             var plan = SlicePlan(k, xm, lo, up, left, right, present, fasciaBeams);
-            var r0 = Slice(k, xa, lo, up, left, right, present, fasciaBeams, plan);
-            var r1 = Slice(k, xb, lo, up, left, right, present, fasciaBeams, plan);
+            var r0 = Slice(k, xa + eps, lo, up, left, right, present, fasciaBeams, plan);
+            var r1 = Slice(k, xb - eps, lo, up, left, right, present, fasciaBeams, plan);
+            xa += eps; xb -= eps;
             if (r0.Count != r1.Count) throw new InvalidOperationException($"slice topology changed in x {xa:0.###}..{xb:0.###} m");
             var sec = r0.Select(p => new Vec2(p.S, p.Z)).ToList();
             var ring0 = r0.Select(p => k.W(p.S, xa).WithZ(p.Z)).ToArray();
@@ -462,7 +493,8 @@ public static class ConcreteDiaphragmGenerator
         foreach (int i in order)
         {
             var b = present[i];
-            double a = b.Map(k, x, b.Hw, b.D).S, c = b.Map(k, x, -b.Hw, b.D).S;
+            var ext = ((b.Square ? b.VoidAt(k, x) : null) ?? b.Void).Where(p => p.Y > b.D + Big / 2).Select(p => b.Map(k, x, p.X, b.D).S).ToList();
+            double a = ext.Max(), c = ext.Min();
             ev.Add((Math.Max(a, c), 1, i));
             ev.Add((Math.Min(a, c), 2, i));
         }
@@ -546,7 +578,8 @@ public static class ConcreteDiaphragmGenerator
 
     private static List<(double S, double Z)> Notch(Frame k, double x, BeamEnd b, Func<double, double> top, Func<double, double> low)
     {
-        var v = b.Void.Select(p => b.Map(k, x, p.X, p.Y)).ToList();
+        var vs = (b.Square ? b.VoidAt(k, x) : b.Void) ?? throw new InvalidOperationException($"{b.Beam.Mark}: beam void vanished inside a slab");
+        var v = vs.Select(p => b.Map(k, x, p.X, p.Y)).ToList();
         double area = 0;
         for (int i = 0; i < v.Count; i++) { var p = v[i]; var q = v[(i + 1) % v.Count]; area += p.S * q.Z - q.S * p.Z; }
         if (area < 0) v.Reverse();
@@ -643,7 +676,8 @@ public static class ConcreteDiaphragmGenerator
         double hb = e.Hb;
         var pad = ps.Pads.FirstOrDefault(p => p.Girder == e.Beam.Girder && p.Span == e.Beam.Span && p.Support == sup.Name);
         var pieces = new List<List<Vec2>>();
-        var foot = new List<Vec2> { new(UAtX(e.Xd, -hb), -hb), new(UAtX(xFace, -hb), -hb), new(UAtX(xFace, hb), hb), new(UAtX(e.Xd, hb), hb) };
+        double U0(double vv) => e.Square ? 0 : UAtX(e.Xd, vv);   // square end: the face is u = 0
+        var foot = new List<Vec2> { new(U0(-hb), -hb), new(UAtX(xFace, -hb), -hb), new(UAtX(xFace, hb), hb), new(U0(hb), hb) };
         if (pad == null) pieces.Add(foot);
         else
         {

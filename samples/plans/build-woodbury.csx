@@ -204,6 +204,13 @@ unresolved.Add("U3 (closed by the user): beams are standard BTD55 / BTD105 / BTD
 unresolved.Add("U4: plan skews to the local tangent at Pier 2 (13 deg 00'40\") and N. Abut. (14 deg 29'57\") do not reproduce from the parallel 10 deg 09'36\" (PDF p.21 vs p.7); the parallel lines through the staking points govern.");
 unresolved.Add("Beam ends at the piers (square or parallel to the pier) and abutment end details (integral, beams embedded) - prestressed/abutment work (PDF p.20, p.28-30).");
 
+// ---------------------------------------------------------------- concrete end / pier diaphragms + fillers / keyways (diaphragms-woodbury.csx, run from the repo root)
+{
+    var dr = await SBM.Api.ScriptHost.RunFileAsync(@"samples\plans\diaphragms-woodbury.csx", Doc, Args);
+    Print(dr.Output.TrimEnd());
+    if (!dr.Success) Print("ERROR in diaphragms-woodbury.csx: " + dr.Error);
+}
+
 var rep = Doc.Regenerate(includeSteel: false);
 foreach (var e in rep.Errors) Print("ERROR " + e);
 foreach (var w in rep.Warnings.Take(30)) Print("warning " + w);

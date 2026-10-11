@@ -167,7 +167,7 @@ b.Girders.Prestressed = new PrestressedBeamDefinition
 Print($"Strands: {strands.Count} (plan 44), debonded {strands.Count(s => s.DebondStart > 0)} (plan 14)");
 G("Bearings: MnDOT curved-plate bearings F1 (B310, fixed, L 3 1/4\") / E1 (B311, expansion, L 6 1/2\") (p31) - only a plain pad (12\" x 30\") whose thickness PrestressedBeamDefinition.PadThickness applies to BOTH ends of the beam; 3 1/4\" used, so the North seats are 3 1/4\" too high. Needs: a per-support (per beam end) prestressed bearing height, e.g. PadThickness per support / PrestressedGenerator reading a per-support value, or a curved-plate bearing assembly.");
 G("Sole plate B303 (p16, p30; dims U6) not modeled. Needs: sole plate for prestressed beams.");
-G("Concrete end diaphragms at both abutments (p15, p17, p20, p21; dims U2) not modeled. Needs: concrete end diaphragm / semi-integral abutment element.");
+// Concrete end diaphragms (p15, p17, p20, p21; U2 closed): SupportDefinition.Diaphragm, set by diaphragms-br02069.csx (below); front-part bottom UNRESOLVED (p.21).
 G("Optional top strands 2 x 1/2\" (p16) and beam bars G301E..G806E, stirrups (p16) not modeled. Needs: prestressed beam mild reinforcing.");
 
 // ================================================================ 4. abutments (p4, p5, p9, p10, p11)
@@ -193,7 +193,7 @@ G("Test piles: one test pile per abutment longer (S 105 vs 95 ft, N 100 vs 90 ft
 G("Abutment reinforcing (bar-lists.csv A/B series, p6-p8, p12-p14; bend diagrams U3) not entered; the Iowa abutment rebar generator would invent placements -> substructure reinforcement off. Needs: plan bar data for a MnDOT abutment.");
 U("Mask walls: east-end and corner extents not dimensioned (U9, p3/p5/p10/p11) - only the west mask wall (MSE Ret. Wall 20 / 23 tie-ins, p1) is built.");
 U("Pile tip elevations not given (U8, p4/p9) - piles hang the contract length from the head.");
-U("End diaphragm geometry (U2, p17/p20/p21) - not modeled; bend dimensions (U3, p8/p14/p21/p24) - bars not modeled.");
+U("End diaphragm: back part + paving bracket + polystyrene modeled (diaphragms-br02069.csx); front-part bottom between the beams not dimensioned (p.21) - not built; bend dimensions (U3, p8/p14/p21/p24) - bars not modeled.");
 
 var seatRows = Csv("seat-elevations.csv");
 void SetAbutment(SupportDefinition sup, string side, double ledge, double seatFront, double infillTop, double maskTop, double pedAlong, double pileLen, string pages)
@@ -242,6 +242,13 @@ SetAbutment(b.Supports[1], "N", 922.15, 923.06, 927.80, 930.67, F(3, 6), 90, "p9
 U("Deck end 1'-10\" from CL brg is 10\" BEYOND the infill wall face (1'-0\" behind CL brg): the slab end sits over the end diaphragm / infill wall (semi-integral, p18/p20); the model reports the overlap only.");
 
 Doc.Project.Bridges.Add(b);
+
+// ---------------------------------------------------------------- concrete end / pier diaphragms + fillers / keyways (diaphragms-br02069.csx, run from the repo root)
+{
+    var dr = await SBM.Api.ScriptHost.RunFileAsync(@"samples\plans\diaphragms-br02069.csx", Doc, Args);
+    Print(dr.Output.TrimEnd());
+    if (!dr.Success) Print("ERROR in diaphragms-br02069.csx: " + dr.Error);
+}
 
 // ================================================================ regenerate, report, save
 var res = Doc.Regenerate();
