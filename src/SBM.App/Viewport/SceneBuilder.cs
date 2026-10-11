@@ -309,13 +309,14 @@ public static class SceneBuilder
             () => Layer("3D-DRAINAGE", 90, 170, 200, x => x.Kind is SBM.Core.Substructure.SubElementKind.DeckDrain or SBM.Core.Substructure.SubElementKind.DrainPipe),
             () => Layer("3D-SPLASH-BASIN", 140, 120, 90, x => x.Kind == SBM.Core.Substructure.SubElementKind.SplashBasin),
             // Optional misc items: Ramp G drainage, sign supports, end posts, lighting (items by others as translucent placeholders).
-            () => MiscLayer(models, o, "3D-DRAIN-PIPES", 90, 170, 200, e => e.Group == SBM.Core.Misc.MiscGroup.Drainage && e.Kind is SBM.Core.Misc.MiscKind.DrainTube or SBM.Core.Misc.MiscKind.DrainPipe or SBM.Core.Misc.MiscKind.PipeFitting or SBM.Core.Misc.MiscKind.PipeHanger or SBM.Core.Misc.MiscKind.PipeSupport),
-            () => MiscLayer(models, o, "3D-DRAIN-INLETS", 60, 140, 190, e => e.Kind is SBM.Core.Misc.MiscKind.DrainTrench or SBM.Core.Misc.MiscKind.DrainGrate or SBM.Core.Misc.MiscKind.DrainBox or SBM.Core.Misc.MiscKind.DrainTrough),
-            () => MiscLayer(models, o, "3D-DRAIN-STONE", 140, 120, 90, e => e.Kind is SBM.Core.Misc.MiscKind.SplashBasin or SBM.Core.Misc.MiscKind.ErosionMattress),
-            () => MiscLayer(models, o, "3D-SIGN-SUPPORT", 150, 160, 190, e => e.Group == SBM.Core.Misc.MiscGroup.SignSupport && !e.Placeholder),
-            () => MiscLayer(models, o, "3D-CRASH-CUSHION", 210, 190, 60, e => e.Group == SBM.Core.Misc.MiscGroup.CrashCushion && !e.Placeholder),
-            () => MiscLayer(models, o, "3D-LIGHTING", 230, 215, 90, e => e.Group == SBM.Core.Misc.MiscGroup.Lighting && !e.Placeholder),
-            () => MiscLayer(models, o, "3D-PLACEHOLDER", 200, 80, 200, e => e.Placeholder, 0.55f),
+            () => MiscLayer(models, o, "3D-DRAIN-PIPES", 90, 170, 200, e => e.Assumption == null && e.Group == SBM.Core.Misc.MiscGroup.Drainage && e.Kind is SBM.Core.Misc.MiscKind.DrainTube or SBM.Core.Misc.MiscKind.DrainPipe or SBM.Core.Misc.MiscKind.PipeFitting or SBM.Core.Misc.MiscKind.PipeHanger or SBM.Core.Misc.MiscKind.PipeSupport),
+            () => MiscLayer(models, o, "3D-DRAIN-INLETS", 60, 140, 190, e => e.Assumption == null && e.Kind is SBM.Core.Misc.MiscKind.DrainTrench or SBM.Core.Misc.MiscKind.DrainGrate or SBM.Core.Misc.MiscKind.DrainBox or SBM.Core.Misc.MiscKind.DrainTrough),
+            () => MiscLayer(models, o, "3D-DRAIN-STONE", 140, 120, 90, e => e.Assumption == null && e.Kind is SBM.Core.Misc.MiscKind.SplashBasin or SBM.Core.Misc.MiscKind.ErosionMattress),
+            () => MiscLayer(models, o, "3D-SIGN-SUPPORT", 150, 160, 190, e => e.Assumption == null && e.Group == SBM.Core.Misc.MiscGroup.SignSupport && !e.Placeholder),
+            () => MiscLayer(models, o, "3D-CRASH-CUSHION", 210, 190, 60, e => e.Assumption == null && e.Group == SBM.Core.Misc.MiscGroup.CrashCushion && !e.Placeholder),
+            () => MiscLayer(models, o, "3D-LIGHTING", 230, 215, 90, e => e.Assumption == null && e.Group == SBM.Core.Misc.MiscGroup.Lighting && !e.Placeholder),
+            () => MiscLayer(models, o, "3D-UNRESOLVED", 255, 110, 40, e => e.Assumption != null),
+            () => MiscLayer(models, o, "3D-PLACEHOLDER", 200, 80, 200, e => e.Placeholder && e.Assumption == null, 0.55f),
             () =>
             {
                 var byTile = new Dictionary<(long, long), (List<Mesh> tubes, List<object> tags)>();
@@ -350,7 +351,7 @@ public static class SceneBuilder
         var sel = models.Where(m => m.Misc != null).SelectMany(m => m.Misc!.Elements).Where(e => !e.Mesh.IsEmpty && pick(e)).ToList();
         if (sel.Count == 0) return null;
         var geo = FlatShaded(sel.Select(e => e.Mesh), o, sel.Select(e => (object)new NamedPick(e.Group.ToString(), e.Name,
-            new[] { ("Info", e.Description), ("Placeholder", e.Placeholder ? "by others: " + e.PlaceholderBasis : "") }.Where(x => x.Item2 != "").ToList())).ToList());
+            new[] { ("Info", e.Description), ("Placeholder", e.Placeholder ? "by others: " + e.PlaceholderBasis : ""), ("UNRESOLVED", e.Assumption?.Reason ?? ""), ("Assumed", e.Assumption?.Basis ?? "") }.Where(x => x.Item2 != "").ToList())).ToList());
         return new SolidLayer { Name = name, R = r, G = g, B = b, Parts = new() { (geo, null) }, Triangles = geo.Indices!.Count / 3, Opacity = opacity };
     }
 

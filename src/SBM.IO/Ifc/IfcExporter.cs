@@ -254,6 +254,8 @@ public static class IfcExporter
         var placeholders = new List<(int id, string location, string type)>();
         // Misc items by others (sign base plates, crash cushion, junction boxes, trough): SBM_Placeholder with the plan basis.
         var miscPlaceholders = new List<(int id, string location, string basis)>();
+        // Elements modeled on an assumption the plans do not fix: Pset SBM_Status (Status, Reason, Basis).
+        var miscStatus = new List<(int id, SBM.Core.Assumption a)>();
 
         int RgbStyle(string name, double r, double g, double b, double transparency = 0)
         {
@@ -394,6 +396,7 @@ public static class IfcExporter
                 };
                 AddMaterial(el.Material, id);
                 if (children.TryGetValue(el.Assembly, out var list)) list.Add(id);
+                if (el.Assumption != null) miscStatus.Add((id, el.Assumption));
                 if (el.Placeholder) miscPlaceholders.Add((id, string.IsNullOrEmpty(el.Location) ? el.Assembly : el.Location, el.PlaceholderBasis));
                 // The element passes through the deck slab: a real opening (IfcOpeningElement voiding it).
                 if (el.Opening is { IsEmpty: false } && deckSlabId > 0)
@@ -860,6 +863,15 @@ public static class IfcExporter
             int q3 = w.Add("IFCPROPERTYSINGLEVALUE", $"'Location',$,IFCLABEL({S(location)}),$");
             int ps = w.Add("IFCPROPERTYSET", $"{Guid(key + "/placeholder/" + id)},$,'SBM_Placeholder',$,({Ref(q1)},{Ref(q2)},{Ref(q3)})");
             w.Add("IFCRELDEFINESBYPROPERTIES", $"{Guid(key + "/relplaceholder/" + id)},$,$,$,({Ref(id)}),{Ref(ps)}");
+        }
+
+        foreach (var (id, a) in miscStatus)
+        {
+            int q1 = w.Add("IFCPROPERTYSINGLEVALUE", $"'Status',$,IFCLABEL({S(a.Status)}),$");
+            int q2 = w.Add("IFCPROPERTYSINGLEVALUE", $"'Reason',$,IFCTEXT({S(a.Reason)}),$");
+            int q3 = w.Add("IFCPROPERTYSINGLEVALUE", $"'Basis',$,IFCTEXT({S(a.Basis)}),$");
+            int ps = w.Add("IFCPROPERTYSET", $"{Guid(key + "/status/" + id)},$,'SBM_Status',$,({Ref(q1)},{Ref(q2)},{Ref(q3)})");
+            w.Add("IFCRELDEFINESBYPROPERTIES", $"{Guid(key + "/relstatus/" + id)},$,$,$,({Ref(id)}),{Ref(ps)}");
         }
 
         w.Footer();

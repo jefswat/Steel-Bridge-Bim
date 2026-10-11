@@ -1,4 +1,4 @@
-﻿# Steel Bridge Modeler â€” notes for Claude
+# Steel Bridge Modeler â€” notes for Claude
 
 Desktop BIM modeler for steel plate girder bridges and substructures (Windows, .NET 10, WPF). The user is a bridge
 engineer who directs and tests; Claude writes and maintains all code. Keep this file current when architecture changes.
@@ -66,6 +66,8 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
     `ResolvedSubstructure`). `SubstructureGenerator` runs AFTER steel (needs `SteelModel.BearingSeats`), per support in
     parallel: cap coordinates S (along the skewed support line from the alignment point, right +), N (normal, up-station +).
     Cap top = shape g(S) + c with c set so min pedestal = MinPedestalHeight; pedestals take the rest (variable).
+    Plan pedestal sizes (OPTIONAL): `PedestalSizeAlong/Across` (S x N, centred on the bearing footprint; 0 = footprint + `PedestalProjection`) and `PedestalShared` (ONE block per girder
+    line carries the back + ahead seats, top = highest seat, differences reported). Set by `piers-i80.csx` / `piers-ramp-g.csx` (not 6A, 11WB, 9G, 19G: sizes not settled).
     `SubstructureRebar.cs` = bars + marks (per unit; `BarMark.Unit`/`BarPlacement.Unit`; straight bars within 2" share a
     mark cut to the shortest). Ground for automatic foundation tops: `RegenerationCache.Ground` (+ `GroundVersion` in key);
     app sets it from loaded terrains, `SbmDocument` loads terrain references itself.
@@ -334,6 +336,10 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   assemblies > elements (`MiscItems` in ModelDatabase; keys `IfcKeys.MiscAssembly/MiscElement`), sheet rules in `sheet-links-i80-rampg.json`. Viewport layers `3D-DRAIN-*`,
   `3D-SIGN-SUPPORT`, `3D-CRASH-CUSHION`, `3D-LIGHTING`, `3D-PLACEHOLDER`. Plan data scripts (re-runnable): `samples/plans/drains-ramp-g.csx`, `signs-i80.csx`, `end-posts.csx`,
   `lighting.csx`; data/results/unresolved list: `docs/plan-data/misc-items-data.md` (section "Model").
+  UNRESOLVED FLAG (general, reusable): `SBM.Core/Assumption.cs` `Assumption{Status="UNRESOLVED", Reason (what the plans lack + PDF page), Basis (what was assumed)}` on the element
+  (`MiscElement.Assumption`; set with `Flag(name, reason, basis)`). Consumers: viewport layer `3D-UNRESOLVED` (all flagged elements, orange, removed from their normal layers; reason in the pick
+  properties; isolate with the layer toggles), IFC Pset `SBM_Status` {Status, Reason, Basis}, database props `status/reason/assumed` + view `v_unresolved` (with QC status), one warning per reason.
+  Plan dimension that governs over a derived one (piped drains 22-25: tube 1'-8 from CL girder A) is modeled and the disagreement raised as `CONFLICT (plan vs model)`.
 - Plan-set test models: `samples/plans/*.csx` (Iowa DOT Designs 116/316); data in C:\SBMData (not in OneDrive).
 
 ## Conventions (bridge engineering)

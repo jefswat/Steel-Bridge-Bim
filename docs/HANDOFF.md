@@ -43,7 +43,14 @@ Use this to start the next session. Architecture notes are in `CLAUDE.md`. The u
 
 ## 0a. State at the end of 2026-10-10 (evening) — START HERE
 
-- **PAUSED FOR RESTART (2026-10-11):** two branches committed but NOT merged — verify (full build + tests), merge
+- **2026-10-11 (Windows Sandbox session): both branches below are MERGED into main** (232 tests pass). Model updated with
+  `temp\apply-pedestals.csx` (only the new pedestal blocks of the pier scripts, so later pier scripts are not undone) +
+  `abutments-i80.csx` / `abutments-ramp-g.csx`; substructure elevation check: 49 flags (was 70), only the known Pier 5G
+  plan misprint fails closure. Backup: `temp\backups\...before abutfix merge.sbm` (C:\SBMData is read-only in the sandbox).
+  NOT pushed from the sandbox (no GitHub credentials there): push `main` from the host. Still open from abutfix:
+  `docs\plan-data\pier-pedestals.md` (referenced by the scripts, missing), notched footing outline in AbutmentViews,
+  South backwall 19.4 vs 21.5 CY.
+- (was) **PAUSED FOR RESTART (2026-10-11):** two branches committed but NOT merged — verify (full build + tests), merge
   (keep main's .sbm, re-run scripts with temp\cli-main), push:
   - `feature/abutfix` (c8e2515, last commit WIP): counterfort 1'-10, maskwall flush, extensions, West footing notches,
     wing uplift anchors 8j3, placed maskwall/counterfort bars, pile-head check fix, plan PEDESTAL sizes
