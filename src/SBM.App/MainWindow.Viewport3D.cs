@@ -259,31 +259,36 @@ public partial class MainWindow
     {
         _plane = ComputePlane(out string info);
         SectionInfo.Text = info;
-        foreach (var model in AllModels())
+        foreach (var model in AllModels()) ApplyToModel(model);
+    }
+
+    /// <summary>Re-derives one model's displayed geometry from its full geometry: section cut, hidden elements, near-view rebar LOD.</summary>
+    private void ApplyToModel(Element3D model)
+    {
+        switch (model)
         {
-            switch (model)
+            case MeshGeometryModel3D im when im.Tag is List<Matrix4x4> all:
             {
-                case MeshGeometryModel3D im when im.Tag is List<Matrix4x4> all:
-                {
-                    var tags = im.Geometry is MeshGeometry3D ig && SceneBuilder.InstanceTags.TryGetValue(ig, out var t) ? t : null;
-                    var vis = Enumerable.Range(0, all.Count).Where(i => Kept(all[i].Translation) && (tags == null || i >= tags.Count || !_hidden.Contains(tags[i]))).ToList();
-                    _visibleInstances[im] = vis;
-                    im.Instances = vis.Count == all.Count ? all : vis.Select(i => all[i]).ToList();
-                    break;
-                }
-                case MeshGeometryModel3D mm when _fullMeshes.TryGetValue(mm, out var fullMesh):
-                {
-                    var hiddenRanges = HiddenRanges(fullMesh);
-                    mm.Geometry = _plane == null && hiddenRanges.Count == 0 ? fullMesh : ClipMesh(fullMesh, hiddenRanges);
-                    break;
-                }
-                case LineGeometryModel3D lm when _fullLines.TryGetValue(lm, out var full):
-                    lm.Geometry = _plane == null ? full : ClipLines(full);
-                    break;
-                case BillboardTextModel3D tm when _fullText.TryGetValue(tm, out var fullText):
-                    tm.Geometry = _plane == null ? fullText : ClipText(fullText);
-                    break;
+                var tags = im.Geometry is MeshGeometry3D ig && SceneBuilder.InstanceTags.TryGetValue(ig, out var t) ? t : null;
+                bool lod = _lodSkip.Count > 0;
+                var vis = Enumerable.Range(0, all.Count).Where(i => Kept(all[i].Translation)
+                    && (tags == null || i >= tags.Count || (!_hidden.Contains(tags[i]) && !(lod && _lodSkip.Contains(tags[i]))))).ToList();
+                _visibleInstances[im] = vis;
+                im.Instances = vis.Count == all.Count ? all : vis.Select(i => all[i]).ToList();
+                break;
             }
+            case MeshGeometryModel3D mm when _fullMeshes.TryGetValue(mm, out var fullMesh):
+            {
+                var hiddenRanges = HiddenRanges(fullMesh, !_lodOverlays.Contains(mm));
+                mm.Geometry = _plane == null && hiddenRanges.Count == 0 ? fullMesh : ClipMesh(fullMesh, hiddenRanges);
+                break;
+            }
+            case LineGeometryModel3D lm when _fullLines.TryGetValue(lm, out var full):
+                lm.Geometry = _plane == null ? full : ClipLines(full);
+                break;
+            case BillboardTextModel3D tm when _fullText.TryGetValue(tm, out var fullText):
+                tm.Geometry = _plane == null ? fullText : ClipText(fullText);
+                break;
         }
     }
 
@@ -315,13 +320,14 @@ public partial class MainWindow
     }
 
     /// <summary>Triangle ranges [start, end) of hidden elements in a merged mesh.</summary>
-    private List<(int start, int end)> HiddenRanges(MeshGeometry3D full)
+    private List<(int start, int end)> HiddenRanges(MeshGeometry3D full, bool withLod = true)
     {
         var res = new List<(int, int)>();
-        if (_hidden.Count == 0 || !SceneBuilder.Picks.TryGetValue(full, out var table)) return res;
+        bool lod = withLod && _lodSkip.Count > 0;
+        if ((_hidden.Count == 0 && !lod) || !SceneBuilder.Picks.TryGetValue(full, out var table)) return res;
         int n = full.Indices!.Count / 3;
         for (int i = 0; i < table.Tags.Count; i++)
-            if (_hidden.Contains(table.Tags[i]))
+            if (_hidden.Contains(table.Tags[i]) || (lod && _lodSkip.Contains(table.Tags[i])))
                 res.Add((table.TriStart[i], i + 1 < table.TriStart.Count ? table.TriStart[i + 1] : n));
         return res;
     }
@@ -343,6 +349,7 @@ public partial class MainWindow
         var idx = new IntCollection(ind.Count);
         var map = new List<int>(ind.Count / 3);
         Span<Vector3> poly = stackalloc Vector3[4];
+        Span<Vector3> polyN = stackalloc Vector3[4];
         for (int i = 0; i + 2 < ind.Count; i += 3)
         {
             if (skip is { Count: > 0 })
@@ -355,12 +362,14 @@ public partial class MainWindow
             var b = src[ind[i + 1]];
             var c = src[ind[i + 2]];
             float da = cut ? Vector3.Dot(nn, a - pp) : 1, db = cut ? Vector3.Dot(nn, b - pp) : 1, dc = cut ? Vector3.Dot(nn, c - pp) : 1;
-            var n = nrm[ind[i]];
+            var na = nrm[ind[i]];
+            var nb = nrm[ind[i + 1]];
+            var nc = nrm[ind[i + 2]];
             if (da >= 0 && db >= 0 && dc >= 0)
             {
-                idx.Add(pos.Count); pos.Add(a); nor.Add(n);
-                idx.Add(pos.Count); pos.Add(b); nor.Add(n);
-                idx.Add(pos.Count); pos.Add(c); nor.Add(n);
+                idx.Add(pos.Count); pos.Add(a); nor.Add(na);
+                idx.Add(pos.Count); pos.Add(b); nor.Add(nb);
+                idx.Add(pos.Count); pos.Add(c); nor.Add(nc);
                 map.Add(i / 3);
                 continue;
             }
@@ -369,17 +378,23 @@ public partial class MainWindow
             int k = 0;
             var v = new[] { a, b, c };
             var d = new[] { da, db, dc };
+            var vn = new[] { na, nb, nc };
             for (int j = 0; j < 3; j++)
             {
                 int j2 = (j + 1) % 3;
-                if (d[j] >= 0) poly[k++] = v[j];
-                if ((d[j] >= 0) != (d[j2] >= 0)) poly[k++] = v[j] + (v[j2] - v[j]) * (d[j] / (d[j] - d[j2]));
+                if (d[j] >= 0) { polyN[k] = vn[j]; poly[k++] = v[j]; }
+                if ((d[j] >= 0) != (d[j2] >= 0))
+                {
+                    float f = d[j] / (d[j] - d[j2]);
+                    polyN[k] = Vector3.Normalize(vn[j] + (vn[j2] - vn[j]) * f);
+                    poly[k++] = v[j] + (v[j2] - v[j]) * f;
+                }
             }
             for (int j = 1; j + 1 < k; j++)
             {
-                idx.Add(pos.Count); pos.Add(poly[0]); nor.Add(n);
-                idx.Add(pos.Count); pos.Add(poly[j]); nor.Add(n);
-                idx.Add(pos.Count); pos.Add(poly[j + 1]); nor.Add(n);
+                idx.Add(pos.Count); pos.Add(poly[0]); nor.Add(polyN[0]);
+                idx.Add(pos.Count); pos.Add(poly[j]); nor.Add(polyN[j]);
+                idx.Add(pos.Count); pos.Add(poly[j + 1]); nor.Add(polyN[j + 1]);
                 map.Add(i / 3);
             }
         }

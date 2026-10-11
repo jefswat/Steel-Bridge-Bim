@@ -89,7 +89,8 @@ as COM's GetActiveObject, without registration). One JSON line per request, one 
 
 Commands: `status`, `get <path>`, `set <path> <value>`, `describe [path]`, `regen`, `open <file> [--force]`,
 `save [file]`, `import-pgsuper <file> [alignment] [station] [name]`, `run <script.csx> [args]`, `snapshot <png>`,
-`view plan|3d|zoom`, `section <station> [skew]` / `section off`, `messages [n]`, `undo`, `close [--save|--discard]`
+`view plan|3d|zoom`, `section <station> [skew]` / `section off`, `measure <E,N[,Z]> <E,N[,Z]> [<E,N[,Z]>] [alignment=NAME]`,
+`station-offset <E,N[,Z]> [alignment=NAME]`, `messages [n]`, `undo`, `close [--save|--discard]`
 (close refuses when there are unsaved changes unless told what to do).
 
 ```
@@ -104,6 +105,8 @@ sbm app close --save
 using var app = SbmApp.Connect();          // or Connect(processId) when several copies run
 app.Set("Bridges[0].Deck.Haunch", "3.5");  // live, undoable
 Console.WriteLine(app.Get("Bridges[0].Girders.Spacings"));
+Console.WriteLine(app.Measure("100,200,50", "160,240,52"));      // points in project units (ft for US, m for SI)
+Console.WriteLine(app.StationOffset("100,200", alignment: "CL Route 1"));
 ```
 In a script run by `sbm run`, `App` is the running app and `Doc` is the file.
 

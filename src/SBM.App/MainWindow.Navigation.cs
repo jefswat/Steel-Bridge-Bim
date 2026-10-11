@@ -32,6 +32,7 @@ public partial class MainWindow
 
     private void InitNavigation()
     {
+        RebarLod.ParseArgs(Environment.GetCommandLineArgs());
         View.EnableMouseButtonHitTest = false;
         View.EnableCursorPosition = false;
         View.RotateAroundMouseDownPoint = false;
@@ -43,6 +44,7 @@ public partial class MainWindow
             _navTimer!.Stop();
             _navigating = false;
             ApplyDetailVisibility();
+            UpdateRebarLod();
         };
         View.CameraChanged += (_, _) => OnCameraMoved();
         View.PreviewMouseWheel += OnViewportWheel;

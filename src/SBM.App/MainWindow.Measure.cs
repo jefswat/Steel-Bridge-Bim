@@ -292,7 +292,24 @@ public partial class MainWindow
         _snapDirty = true;
         _snapIndex = null; // never query an index of geometry that is no longer in the scene
         _snapVersion++;
-        if (MeasureActive) EnsureSnapIndex();
+        // Debounced: the scene and the reference models are rebuilt in quick succession at startup / after a regeneration, and
+        // one index build (seconds on a big model) must serve them all. The first scene is also indexed before any tool is used.
+        if (!MeasureActive && _snapPrebuilt) return;
+        _snapDebounce ??= new System.Windows.Threading.DispatcherTimer(System.Windows.Threading.DispatcherPriority.Background) { Interval = TimeSpan.FromMilliseconds(600) };
+        _snapDebounce.Tick -= OnSnapDebounce;
+        _snapDebounce.Tick += OnSnapDebounce;
+        _snapDebounce.Stop();
+        _snapDebounce.Start();
+    }
+
+    private System.Windows.Threading.DispatcherTimer? _snapDebounce;
+    private bool _snapPrebuilt;
+
+    private void OnSnapDebounce(object? sender, EventArgs e)
+    {
+        _snapDebounce?.Stop();
+        _snapPrebuilt = true;
+        EnsureSnapIndex();
     }
 
     private void EnsureSnapIndex()
@@ -308,6 +325,7 @@ public partial class MainWindow
         {
             foreach (var m in models)
             {
+                if (m is MeshGeometryModel3D ovm && _lodOverlays.Contains(ovm)) continue; // near-view rebar overlay duplicates the tile meshes
                 switch (m)
                 {
                     case MeshGeometryModel3D mm when mm.Tag is List<Matrix4x4> inst && mm.Geometry is MeshGeometry3D ig:
@@ -395,11 +413,17 @@ public partial class MainWindow
     /// <summary>Waits for the index (snapshot runs; blocks the UI thread).</summary>
     private SnapIndex? WaitForSnapIndex()
     {
-        EnsureSnapIndex();
-        try { _snapBuild?.Wait(60_000); } catch { }
-        // The completion posts to the dispatcher: pump it.
-        for (int i = 0; i < 50 && _snapIndex == null; i++)
-            Dispatcher.Invoke(() => { }, System.Windows.Threading.DispatcherPriority.Background);
+        var until = DateTime.UtcNow.AddSeconds(90);
+        while (_snapIndex == null && DateTime.UtcNow < until)
+        {
+            _snapDebounce?.Stop();
+            EnsureSnapIndex();
+            try { _snapBuild?.Wait(60_000); } catch { }
+            // The completion posts to the dispatcher: pump it (also lets a newer scene invalidate this index).
+            for (int i = 0; i < 20 && _snapIndex == null; i++)
+                Dispatcher.Invoke(() => { }, System.Windows.Threading.DispatcherPriority.Background);
+            if (_snapIndex == null) System.Threading.Thread.Sleep(20);
+        }
         return _snapIndex;
     }
 
@@ -819,8 +843,6 @@ public partial class MainWindow
                 var index = WaitForSnapIndex();
                 var log = ViewModels.MainViewModel.Log;
                 if (index == null) { log("SNAP: index not available"); return; }
-                log($"SNAP INDEX: {index.LeafCount:N0} leaves, {index.TriangleCount:N0} triangles, built in {index.BuildMs:F0} ms");
-                if (args.Contains("--snapdump")) foreach (var line in index.Describe()) log("SNAPSRC: " + line);
                 Point P(double fx, double fy) => new(fx * View.ActualWidth, fy * View.ActualHeight);
                 if (mi >= 0 && mi + 1 < args.Length)
                 {
@@ -830,15 +852,6 @@ public partial class MainWindow
                     {
                         var pt = P(v[k], v[k + 1]);
                         RayCheck(pt);
-                        if (args.Contains("--snapdump") && RayAt(pt) is { } rr)
-                            foreach (var (nm, lst) in _refModels)
-                                foreach (var mdl in lst.OfType<MeshGeometryModel3D>())
-                                {
-                                    var g = (MeshGeometry3D)mdl.Geometry!; int nh = 0; float tmin = float.MaxValue;
-                                    for (int ti = 0; ti + 2 < g.Indices!.Count; ti += 3)
-                                        if (SBM.Core.Geometry.SnapMath.RayTriangle(rr.Origin, rr.Dir, g.Positions![g.Indices[ti]], g.Positions[g.Indices[ti + 1]], g.Positions[g.Indices[ti + 2]], out float tt)) { nh++; tmin = Math.Min(tmin, tt); }
-                                    log($"REFHIT {nm}: vis={mdl.Visibility} tris={g.Indices.Count / 3} hits={nh} tmin={tmin} bounds {g.Bound.Minimum}..{g.Bound.Maximum} ray {rr.Origin} {rr.Dir}");
-                                }
                         var h = SnapAt(pt, out var st);
                         log($"SNAP: ({v[k]:F2},{v[k + 1]:F2}) -> {(h == null ? "none" : $"{h.Kind} '{HitText(h)}' px={h.ScreenDistance:F1} E={ToWorld(h.P).X:F3} N={ToWorld(h.P).Y:F3} Z={ToWorld(h.P).Z:F3}")} in {st?.Ms:F2} ms ({st?.Leaves} chunks, {st?.Triangles} tris, {st?.Candidates} cands)");
                         MeasureClick(pt);
@@ -886,6 +899,7 @@ public partial class MainWindow
         int hits = 0;
         long cands = 0, leaves = 0, tris = 0;
         var kinds = new Dictionary<SnapKind, int>();
+        int trunc = 0; double travSum = 0, occSum = 0, extraSum = 0; var slow = new List<string>();
         int terrainHits = 0;
         bool prevSnap = _msSnapOn;
         _msSnapOn = true;
@@ -894,7 +908,8 @@ public partial class MainWindow
             var pt = new Point((0.15 + 0.7 * rnd.NextDouble()) * View.ActualWidth, (0.15 + 0.7 * rnd.NextDouble()) * View.ActualHeight);
             var h = SnapAt(pt, out var st);
             if (i < 5 || st == null) continue; // warm-up
-            times.Add(st.Ms);
+            times.Add(st.Ms); if (st.Truncated) trunc++; travSum += st.TravMs; occSum += st.OccMs; extraSum += st.ExtraMs;
+            if (st.Ms > 8) slow.Add($"{st.Ms:F0}ms(trav {st.TravMs:F0}, occ {st.OccMs:F0}/{st.OcclusionTests}, extra {st.ExtraMs:F0}, {st.Leaves} chunks, {st.Triangles} tris)");
             leaves += st.Leaves; tris += st.Triangles; cands += st.Candidates;
             if (h != null && h.Kind != SnapKind.Free) { hits++; kinds[h.Kind] = kinds.GetValueOrDefault(h.Kind) + 1; }
             if (h != null && h.Layer.StartsWith("REF-")) terrainHits++;
@@ -902,6 +917,7 @@ public partial class MainWindow
         _msSnapOn = prevSnap;
         if (times.Count == 0) { log("SNAPBENCH: no queries"); return; }
         times.Sort();
+        log($"SNAPBENCH split (mean ms): traverse {travSum / times.Count:F2}, occlusion {occSum / times.Count:F2}, extras {extraSum / times.Count:F2}; {trunc} truncated; GCs {GC.CollectionCount(0)}/{GC.CollectionCount(1)}/{GC.CollectionCount(2)}; slow: {string.Join("; ", slow.Take(12))}");
         log($"SNAPBENCH: {times.Count} queries, mean {times.Average():F2} ms, median {times[times.Count / 2]:F2} ms, p95 {times[(int)(times.Count * 0.95)]:F2} ms, max {times[^1]:F2} ms; " +
             $"avg {leaves / times.Count} chunks, {tris / times.Count} triangles, {cands / times.Count} candidates; {hits} on-object ({string.Join(", ", kinds.Select(k => $"{k.Key} {k.Value}"))}), {terrainHits} on terrain; index {index.LeafCount:N0} chunks / {index.TriangleCount:N0} triangles built in {index.BuildMs:F0} ms");
     }
