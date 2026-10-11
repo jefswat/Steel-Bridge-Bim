@@ -25,6 +25,22 @@ public sealed partial class SubstructureGenerator
         return inside ? d : -d;
     }
 
+    /// <summary>Which face of the cap outline (S-Z) is nearest to a point: top (edge flatter than 45 deg above the point), soffit (below) or end.</summary>
+    private static string OutlineFace(IReadOnlyList<Vec2> poly, double s, double z)
+    {
+        var p = new Vec2(s, z); double best = double.MaxValue; string face = "cap outline";
+        for (int i = 0, j = poly.Count - 1; i < poly.Count; j = i++)
+        {
+            var a = poly[j]; var b = poly[i]; var e = b - a;
+            double t = Math.Clamp(Vec2.Dot(p - a, e) / Math.Max(e.LengthSquared, 1e-12), 0, 1);
+            var q = a + e * t; double d = Vec2.Distance(p, q);
+            if (d >= best) continue;
+            best = d;
+            face = Math.Abs(e.Y) < Math.Abs(e.X) ? (q.Y > z ? "cap top" : "cap soffit") : "cap end";
+        }
+        return face;
+    }
+
     /// <summary>Lateral setback (per face) of the cap section at (s, z): the lower section is StepSetback narrower than the full width;
     /// each relief layer strip above its line gives back its share. No relief at the station = the full setback (conservative).</summary>
     private static double LateralSetback(SubstructureUnit unit, double s, double z)
@@ -66,21 +82,35 @@ public sealed partial class SubstructureGenerator
         Vec2[]? flareSec = !double.IsNaN(sd.ColumnFlareElevation) && sd.ColumnFlareWidth > 0
             ? Octagon(sd.ColumnFlareWidth, sd.ColumnFlareDepth, sd.ColumnFlareChamferS, sd.ColumnFlareChamferN) : null;
 
-        // slack (>= 0 fine) of one point against the cap, a footing or a column section
+        // slack (>= 0 fine) of one point against the cap, a footing or a column section; face = the governing face of the last evaluation
+        string face = "";
         double CapSlack(double s, double n, double z, double radHere)
         {
             double sbk = LateralSetback(unit, s, z);
-            return Math.Min(PolyClear(poly, new Vec2(s, z)), Math.Min(n - (unit.CapN0 + sbk), unit.CapN1 - sbk - n)) - radHere - capCov;
+            double o = PolyClear(poly, new Vec2(s, z)), a = n - (unit.CapN0 + sbk), b = unit.CapN1 - sbk - n;
+            if (o <= a && o <= b) face = OutlineFace(poly, s, z);
+            else face = (a <= b ? "cap side N0" : "cap side N1") + (sbk > 1e-9 ? " (lower section)" : "");
+            return Math.Min(o, Math.Min(a, b)) - radHere - capCov;
+        }
+        double CapOverColumn(double s, double n, double z, double radHere)
+        {
+            double sbk = LateralSetback(unit, s, z), t = unit.CapTopAt(s) - z, a = n - (unit.CapN0 + sbk), b = unit.CapN1 - sbk - n;
+            face = t <= a && t <= b ? "cap top (column bar)" : (a <= b ? "cap side N0" : "cap side N1") + " (column bar)";
+            return Math.Min(t, Math.Min(a, b)) - radHere - capCov;
         }
         double FootingSlack(FoundationInfo f, double s, double n, double z, double radHere, bool bottomMat, bool leavesTop = false)
         {
             double side = Math.Min(f.SizeS / 2 - Math.Abs(s - f.S), f.SizeN / 2 - Math.Abs(n - f.N)) - radHere - r.FootingSideClear;
             double top = leavesTop ? double.MaxValue : f.TopZ - z - radHere - r.FootingTopClear;   // dowels / column bars leave through the top
             double bot = z - radHere - (f.BottomZ + (bottomMat ? sd.PileEmbedment + r.PileTopClear : r.FootingSideClear));
+            face = side <= top && side <= bot ? "footing side" : top <= bot ? "footing top" : bottomMat ? "footing bottom (pile heads)" : "footing bottom";
             return Math.Min(side, Math.Min(top, bot));
         }
-        double ColumnSlack(ColumnInfo c, Vec2[] sec, double s, double n, double radHere, double cover) =>
-            PolyClear(sec, new Vec2(s - c.S, n - c.N)) - radHere - cover;
+        double ColumnSlack(ColumnInfo c, Vec2[] sec, double s, double n, double radHere, double cover)
+        {
+            face = "column face";
+            return PolyClear(sec, new Vec2(s - c.S, n - c.N)) - radHere - cover;
+        }
 
         foreach (var b in bars)
         {
@@ -94,7 +124,7 @@ public sealed partial class SubstructureGenerator
             if (fm.Success) ftgIdx = int.Parse(fm.Groups[1].Value) - 1;
             bool uplift = loc.Contains("uplift"), bottomMat = loc.Contains("bottom mat"), flare = loc.Contains("flare");
             bool verticals = loc.EndsWith("verticals") || loc.EndsWith("flare bars");
-            double rad = b.Size.Diameter / 2, worst = double.MaxValue; string at = "";
+            double rad = b.Size.Diameter / 2, worst = double.MaxValue; string at = "", worstFace = ""; Vec3 worstP = default;
             var pts = new List<Vec3>();
             for (int i = 0; i < b.Points.Length; i++)
             {
@@ -140,7 +170,7 @@ public sealed partial class SubstructureGenerator
                         if (p.Z < zf - 1e-9 && f != null && f.Type != FoundationType.DrilledShaft) c = FootingSlack(f, s, n, p.Z, radHere, false, true);
                         else if (p.Z > Math.Max(column.TopZ, unit.CapBottomAt(s)) + 1e-9) c = !verticals ? double.MaxValue
                             : PolyClear(ColSection(column), new Vec2(s - column.S, n - column.N)) >= 0
-                                ? Math.Min(unit.CapTopAt(s) - p.Z, Math.Min(n - (unit.CapN0 + LateralSetback(unit, s, p.Z)), unit.CapN1 - LateralSetback(unit, s, p.Z) - n)) - radHere - capCov   // inside the column footprint the soffit is not a free face
+                                ? CapOverColumn(s, n, p.Z, radHere)   // inside the column footprint the soffit is not a free face
                                 : CapSlack(s, n, p.Z, radHere);   // the column runs up to the soffit
                         else
                         {
@@ -152,13 +182,14 @@ public sealed partial class SubstructureGenerator
                     }
                 }
                 else continue;
-                if (c < worst) { worst = c; at = $"S {Sh(s)} N {Sh(n)} El {El(p.Z)}" + (column != null && (colBar || dowel) ? $" [col rel S {Sh(s - column.S)} N {Sh(n - column.N)}, col top {El(column.TopZ)}, soffit {El(unit.CapBottomAt(s))}]" : ""); }
+                if (c < worst) { worst = c; worstFace = face; worstP = new Vec3(s, n, p.Z); at =$"S {Sh(s)} N {Sh(n)} El {El(p.Z)}" + (column != null && (colBar || dowel) ? $" [col rel S {Sh(s - column.S)} N {Sh(n - column.N)}, col top {El(column.TopZ)}, soffit {El(unit.CapBottomAt(s))}]" : ""); }
             }
             if (worst < -tol)
             {
                 total++;
                 string kind = System.Text.RegularExpressions.Regex.Replace(loc, @"^.*?(cap|footing \d+|column \d+) ", "");
                 if (dowel) kind = "footing dowels"; else if (colBar) kind = "column " + kind;
+                unit.CoverViolations.Add(new CoverViolation(loc, kind, -worst, worstFace, worstP.X, worstP.Y, worstP.Z));
                 bad.TryGetValue(kind, out var v);
                 bad[kind] = v.n == 0 || worst < v.worst ? (v.n + 1, worst, at) : (v.n + 1, v.worst, v.at);
             }

@@ -13,6 +13,10 @@ public enum SubElementKind { Cap, Pedestal, Backwall, Column, DrilledShaft, Foot
 public sealed record SubSolid(SubElementKind Kind, string Name, string Description, Mesh Mesh, bool IsConcrete = true);
 
 /// <summary>Pedestal (bearing seat build-up) under one bearing. S/N = center in cap coordinates.</summary>
+/// <summary>One plan-listed bar outside the clear-cover envelope: Excess = how far (m) the bar surface reaches into the cover zone at its worst point,
+/// Face = the governing concrete face (cap top / cap soffit / cap end / cap side N0 / cap side N1 / footing ... / column ...).</summary>
+public sealed record CoverViolation(string Location, string Kind, double Excess, string Face, double S, double N, double Z);
+
 public sealed record PedestalInfo(int Girder, double S, double N, double LengthS, double WidthN, double CapTopZ, double SeatZ)
 {
     public double Height => SeatZ - CapTopZ;
@@ -87,6 +91,8 @@ public sealed class SubstructureUnit
     /// <summary>Abutment backwall: front/back faces (N) and top profile (S, Z); bottom is the cap top.</summary>
     public (double N0, double N1, List<Vec2> Top)? Backwall { get; set; }
     public List<SubSolid> Solids { get; } = new();
+    /// <summary>Plan-listed bars outside the clear-cover envelope (one row per bar at its worst point; filled by the containment check).</summary>
+    public List<CoverViolation> CoverViolations { get; } = new();
     /// <summary>As-designed abutment data (footing, backwall, steps, wings...) when the support has an <see cref="AbutmentDefinition"/>; else null.</summary>
     public AbutmentGeometry? Abutment { get; set; }
 
