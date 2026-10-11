@@ -96,8 +96,11 @@ foreach (var p in rampTable)
 double d6 = FI("6'-6") + 0.25 / 12;
 // Pier 6A (PDF 83): textured NEAR face; tip 6'-9 deep; point of reverse curvature at the CL pier (5'-0), 12'-10 1/8 + 13'-0 from the
 // left top corner; R = 84'-0; fan R 63'-6 / 60'-0 / 59'-6 with control points 7'-0, 10'-0, 13'-0 beyond it at 4'-6, 4'-0, 3'-6 deep.
-Apply("Pier 6A", CapFaceSide.Back, g => CapBandBuilder.FromLongArc(g.l1, F(FI("12'-10") + 0.125 / 12 + 13.0), F(5.0), g.tipL, F(6.75), F(84.0),
-    F(63.5), F(60.0), F(59.5), false), 52.0);
+// The band depths are measured from the LOWER half's top (1010.75 / 1012.51, the face-of-cap elevations the structural sheets dimension the beak 5'-0 / 8'-6
+// from, Design 116 PDF 39 / 41) on BOTH faces: section A-A (PDF 40) ends the 5c3 hairpins hung from that top at the first step, and 5a11 (E.F.) is one bar
+// for both faces (docs/plan-data/cap-cover-containment.md). Before, the back face was measured from its own (upper, +0.75 ft) top.
+Apply("Pier 6A", CapFaceSide.Back, g => { var a6 = CapBandBuilder.FromLongArc(g.l1, F(FI("12'-10") + 0.125 / 12 + 13.0), F(5.0), g.tipL, F(6.75), F(84.0),
+    F(63.5), F(60.0), F(59.5), false); a6.BandFromLowerTop = true; return a6; }, 52.0);
 // Pier 19G (PDF 78): far face; tip 6'-6 1/4 deep, Q 5'-6 deep at 8'-3 1/2 + 9'-9 from the left top corner (the sheet's CL pier mark);
 // R 60'-0; fan R 34'-0 / 28'-6 / 23'-0, control points 7'-2, 9'-1, 11'-0 beyond Q at 4'-7 1/2, 4'-3 1/2, 3'-10 1/2.
 Apply("Pier 19G", CapFaceSide.Ahead, g => CapBandBuilder.FromLongArc(g.l1, F(FI("8'-3") + 0.5 / 12 + 9.75), F(5.5), g.tipL, F(d6), F(60.0),

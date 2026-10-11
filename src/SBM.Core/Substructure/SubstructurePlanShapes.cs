@@ -56,6 +56,39 @@ public sealed partial class SubstructureGenerator
         => PlanBent(size, new[] { new Vec2(0, leg), new Vec2(0, 0), new Vec2(run, 0) }, new[] { leg, run }, +1,
             "L", $"L bar {Dim(leg)} + {Dim(run)} out to out", pin, listed);
 
+    /// <summary>
+    /// Reverse-curve bar (Pier 6A 5a11, Design 116 PDF 42 bend diagram): a sag arc of radius <paramref name="r1"/> over the horizontal <paramref name="a1"/> and a crest
+    /// arc of radius <paramref name="r2"/> over <paramref name="a2"/>, tangent at the point of reverse curvature; the left end lies <paramref name="riseL"/> below and the
+    /// right end <paramref name="riseR"/> above the diagram's horizontal reference line. The tangent angle at the reverse point follows from the total rise
+    /// (riseL + riseR). Local: x along the reference line (0 = point of reverse curvature), y up. Returns the shape, the centerline sampled every ~2"
+    /// (left end first) and the developed length of the curve.
+    /// </summary>
+    internal static (BarShape shape, Vec2[] pts, double length) PlanReverseCurve(double a1, double r1, double a2, double r2, double riseL, double riseR, double listed)
+    {
+        (double yl, double yr) Ends(double th)
+        {
+            double c1x = -r1 * Math.Sin(th), c1y = r1 * Math.Cos(th), c2x = r2 * Math.Sin(th), c2y = -r2 * Math.Cos(th);
+            return (c1y - Math.Sqrt(Math.Max(r1 * r1 - Math.Pow(-a1 - c1x, 2), 0)), c2y + Math.Sqrt(Math.Max(r2 * r2 - Math.Pow(a2 - c2x, 2), 0)));
+        }
+        double lo = 0, hi = 0.6, rise = riseL + riseR;
+        for (int k = 0; k < 80; k++) { double m = (lo + hi) / 2; var (yl, yr) = Ends(m); if (yr - yl < rise) lo = m; else hi = m; }
+        double t = (lo + hi) / 2;
+        double cx1 = -r1 * Math.Sin(t), cy1 = r1 * Math.Cos(t), cx2 = r2 * Math.Sin(t), cy2 = -r2 * Math.Cos(t);
+        double Y(double x) => x <= 0 ? cy1 - Math.Sqrt(Math.Max(r1 * r1 - (x - cx1) * (x - cx1), 0)) : cy2 + Math.Sqrt(Math.Max(r2 * r2 - (x - cx2) * (x - cx2), 0));
+        int n = Math.Max(8, (int)Math.Ceiling((a1 + a2) / In(2)));
+        var pts = Enumerable.Range(0, n + 1).Select(i => { double x = -a1 + (a1 + a2) * i / n; return new Vec2(x, Y(x)); }).ToArray();
+        double len = 0;
+        for (int i = 1; i < pts.Length; i++) len += Vec2.Distance(pts[i - 1], pts[i]);
+        var shape = new BarShape
+        {
+            Code = "RC", Description = $"Reverse curve R {Dim(r1)} over {Dim(a1)} + R {Dim(r2)} over {Dim(a2)}, rise {Dim(riseL)} + {Dim(riseR)}, out to out",
+            Centerline = pts.Select(p => p - pts[0]).ToArray(), PinDiameter = 0, FixedLength = listed,
+        };
+        shape.Dimensions.Add(new BarDimension("A", a1, new Vec2(0, 0), new Vec2(a1, 0), new Vec2(0, -1)));
+        shape.Dimensions.Add(new BarDimension("B", a2, new Vec2(a1, 0), new Vec2(a1 + a2, 0), new Vec2(0, -1)));
+        return (shape, pts, len);
+    }
+
     private static string Dim(double m) => new SBM.Core.Units.UnitSystem().FormatLength(m, SBM.Core.Units.LengthKind.Short);
 
     /// <summary>

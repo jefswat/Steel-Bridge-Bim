@@ -134,7 +134,15 @@ public sealed partial class SubstructureGenerator
         {
             var q = BlockAt(s, n);
             if (q == null) return CapSlack(s, n, z, radHere);
-            double top = q.SeatZ - z, side = Math.Min(q.LengthS / 2 - Math.Abs(s - q.S), q.WidthN / 2 - Math.Abs(n - q.N));
+            // abutting back / ahead blocks (Pier 9G, 11WB): the joint is not a free face up to the neighbour's top (a 9G 5n1 base runs across both blocks)
+            double nLo = q.N - q.WidthN / 2, nHi = q.N + q.WidthN / 2;
+            foreach (var r0 in unit.PedestalBlocks)
+            {
+                if (ReferenceEquals(r0, q) || r0.Height <= In(0.125) || Math.Abs(s - r0.S) > r0.LengthS / 2 || r0.SeatZ < z) continue;
+                if (Math.Abs(r0.N + r0.WidthN / 2 - nLo) < In(0.125)) nLo = r0.N - r0.WidthN / 2;
+                else if (Math.Abs(r0.N - r0.WidthN / 2 - nHi) < In(0.125)) nHi = r0.N + r0.WidthN / 2;
+            }
+            double top = q.SeatZ - z, side = Math.Min(q.LengthS / 2 - Math.Abs(s - q.S), Math.Min(n - nLo, nHi - n));
             if (z > unit.CapTopAt(s, n))
             {
                 face = top <= side ? "pedestal top" : "pedestal side";

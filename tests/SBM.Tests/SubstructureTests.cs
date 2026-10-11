@@ -64,6 +64,21 @@ public class SubstructureTests
     }
 
     [Fact]
+    public void PlanPedestalRows_AbutOnTheJointLine_WithTheirOwnAcrossSize()
+    {
+        // Pier 11WB style: back row 3'-11, ahead row 3'-9, abutting 1" ahead of the CL pier; seats at or behind the CL pier are the back row
+        var u = Build(p => { p.PedestalSizeAlong = In(60); p.PedestalSizeAcross = In(47); p.PedestalSizeAcrossAhead = In(45); p.PedestalRowJoint = In(1); })
+            .Units.Single(x => x.Type == SupportType.Pier);
+        Assert.All(u.PedestalBlocks, p =>
+        {
+            Assert.Equal(In(60), p.LengthS, 6);
+            bool ahead = p.N > u.CapMidN;
+            Assert.Equal(ahead ? In(45) : In(47), p.WidthN, 6);
+            Assert.Equal(u.CapMidN + In(1), ahead ? p.N - p.WidthN / 2 : p.N + p.WidthN / 2, 6);
+        });
+    }
+
+    [Fact]
     public void FollowSeats_GivesUniformPedestals_LevelGivesVariable()
     {
         var follow = Build(p => { p.TopShape = CapTopShape.FollowSeats; p.MinPedestalHeight = In(3); }).Units.Single(u => u.Type == SupportType.Pier);

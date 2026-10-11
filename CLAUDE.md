@@ -70,7 +70,7 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
     parallel: cap coordinates S (along the skewed support line from the alignment point, right +), N (normal, up-station +).
     Cap top = shape g(S) + c with c set so min pedestal = MinPedestalHeight; pedestals take the rest (variable).
     Plan pedestal sizes (OPTIONAL): `PedestalSizeAlong/Across` (S x N, centred on the bearing footprint; 0 = footprint + `PedestalProjection`) and `PedestalShared` (ONE block per girder
-    line carries the back + ahead seats, top = highest seat, differences reported). Set by `piers-i80.csx` / `piers-ramp-g.csx` (not 6A, 11WB, 9G, 19G: sizes not settled).
+    line carries the back + ahead seats, top = highest seat, differences reported). Set by `piers-i80.csx` / `piers-ramp-g.csx` (not 6A, 19G: sizes not settled). Two rows (11WB): `PedestalSizeAcrossAhead` (+N row; Across = back row) and `PedestalRowJoint` (rows abut at CL pier + joint instead of centring on the seats); pedestal bar groups pick blocks by `PlanBarGroup.PedestalRow` (csx `;R=BACK|AHEAD|LINE`, LINE = one set across the back + ahead block of a girder line, 9G 5n1) and `EdgeDistance` (`;X=`, end bars from the block edge, default 4").
     `SubstructureRebar.cs` = bars + marks (per unit; `BarMark.Unit`/`BarPlacement.Unit`; straight bars within 2" share a
     mark cut to the shortest). Ground for automatic foundation tops: `RegenerationCache.Ground` (+ `GroundVersion` in key);
     app sets it from loaded terrains, `SbmDocument` loads terrain references itself.
@@ -110,7 +110,8 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   - Plan BEND DIAGRAMS (`SubstructurePlanShapes.cs`; `PlanBarGroup.Shape/Dims/Pin`, hairpin `ZoneStations/ZoneMargin`, skin-bar `End`; abutment `PlanBarLine.Shaped`): plan convention is
     "ALL DIMENSIONS ARE OUT TO OUT. D = PIN DIAMETER" and the bar-list length = the plain SUM of the out-to-out segments (no bend deductions). `PlanBent/PlanU/PlanL/PlanA14/PlanHoop` build
     the `BarShape` (Dimensions = printed values, centerline = outline inset db/2, printed pin, FixedLength = listed) and the sharp 3D centerline; marks: 5m1/5n1 pedestal U, 5a13/6a14 end U,
-    5a14/6a15 end bars in the longitudinal plane (leg + top run + slanted leg along the raked face), 5c5/5c6 (5c3/5c4) hairpins = U across the width (3 1/2" clear at both faces) hanging from the top
+    5a14/6a15 end bars in the longitudinal plane (leg + top run + slanted leg along the raked face; 6A 6a16 = A14 with 0 run), 6A 5a11 reverse curve `PlanReverseCurve` (csx `S=RC:a1,R1,a2,R2,riseL,riseR`,
+    fitted rigidly to the face's relief line + 3 1/2"), 5c5/5c6 (5c3/5c4) hairpins = U across the width (3 1/2" clear at both faces) hanging from the top
     in the plan's zone order, 4c7/4c5 U, 11g/10g bottom mats U, 6c1/6c2/5n2 hoops with lap tails (`PlanHoop`), 6b2 cantilever flat + slant (`CS`), 5a11/5a12 short end bars. Data is appended to the
     csx lines as `;S=shape:dims:pin` (+ `;Z=..;M=..` hairpins, `;E=-1/1`) by `tools/patch_*.py` from `tools/extract_all.py`/`shapes.py` (plan text + fraction glyph decoder `plantext.py`);
     plan vs model for every mark: `docs/plan-data/bend-diagram-comparison.md` (`tools/compare.py`, `make_doc.py`; abutment diagrams hand-read in `tools/abut_hand.py`). Bars are never moved to
@@ -139,7 +140,7 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
     adds full-width strips above each layer line (`Layers` = BandChains, lowest line first; plans: fan arcs R5, R4, R3, 2" each, drafted 7 deg) as a
     separate Cap-kind SubSolid ("... cap section step"); lines go to `SubstructureUnit.ReliefLines` (bent elevation view). `CapBandBuilder` builds the
     tangent-arc S-curve from the plan tables (`FromTable`) or the explicit figures (`FromLongArc`). Cap bars are NOT adapted (warning). Data:
-    `samples/plans/pier-aesthetics.csx`, reading in `docs/plan-data/pier-cap-aesthetics.md` (Confirmed section). Texture itself / Detail A are not modeled.
+    `samples/plans/pier-aesthetics.csx`, reading in `docs/plan-data/pier-cap-aesthetics.md` (Confirmed section). Stepped top (6A): `BandFromLowerTop` measures both faces' lines from the lower half's top. Texture itself / Detail A are not modeled.
   - `Drawing/Views/` â€” 2D views as `PlanDrawing`s (Z = 0) via `Drafter` (paper-inch sizes Ã— scale; dims with ticks,
     leaders, hatch, elevation tags, AWS weld symbols; ALL text is vertically middle-aligned â€” DxfWriter writes 72/73
     accordingly; "\n" in text = multi-line). Keep annotation text short/multi-line: paper-sized text does not shrink

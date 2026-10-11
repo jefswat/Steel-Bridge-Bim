@@ -56,5 +56,12 @@ public sealed class PlanBarGroup
     /// <summary>Pedestal hoops (5n2): the girders whose pedestals carry them, as the plan note prints them ("AT GIRDERS C &amp; D ONLY" = "C,D";
     /// "B-D" = a range; letter A = girder index 0, a seat of the ahead span counts too). "" = not given: the hoops are placed at mid-cap and flagged UNRESOLVED.</summary>
     public string Girders { get; set; } = "";
+    /// <summary>Pedestal bars (U bars and hoops) on a pier with separate back and ahead pedestal blocks: "" = every block; "BACK" / "AHEAD" = only the blocks of
+    /// the seats on that side of the CL pier (Pier 11WB: 5n1 back row, 5n2 ahead row; Pier 9G: 5n3 and the 5n2 hoops in the back pedestals); "LINE" = one set per
+    /// girder line, the base running across the back AND the ahead block (Pier 9G 5n1, base 5'-7 across both 3'-0 blocks).</summary>
+    public string PedestalRow { get; set; } = "";
+    /// <summary>Pedestal U bars: distance of the end bars of a block from the block edges as the plan prints it ("4, 5 EQ. SPA., 4"; Pier 9G "6, 2 SPA. @ 1'-0, 6"),
+    /// centre of bar, meters. 0 = 4".</summary>
+    public double EdgeDistance { get; set; }
     public PlanBarGroup Clone() => (PlanBarGroup)MemberwiseClone();
 }

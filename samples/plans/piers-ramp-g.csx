@@ -268,15 +268,17 @@ foreach (var p in new (string name, double xRoad, double half, double eL, double
 
 // ---- Plan pedestal sizes (inches: along the cap x across it): cap plan / pedestal bar layout of each pier sheet (e.g. 1G "2'-6 | 2'-6 = 5'-0" along, "6 | 5 SPA. @ 1'-0 | 6"
 // = 6'-0" across; 16G 7'-2 x 5'-8) and confirmed by the 5m1 / 5n1 U-bar bases (base + 4" = pedestal); docs/plan-data/pier-pedestals.md. 5G and 14G: ONE block per girder
-// line carries the back and ahead bearing (24 5n1 bars = 4 blocks x 6). NOT set: 9G (separate back / ahead pedestals about 11" (0.91-0.92 ft) apart in elevation, bar groups 5n1 + 5n3), 19G (two rows
-// of different bridges on the shared line).
+// line carries the back and ahead bearing (24 5n1 bars = 4 blocks x 6). 9G (Design 316 PDF 43 cap plan, raster-read 2026-10-11): separate back / ahead pedestals, each 5'-0 along
+// ("2'-6 | 2'-6", "5, 5 SPA. @ 10, 5") x 3'-0 across ("1'-0 | 6, 2 SPA. @ 1'-0 | 1'-0 | 2 SPA. @ 1'-0, 6 | 1'-0" on the 8'-0 cap = two 3'-0 blocks abutting on the CL pier,
+// centred on the bearings 1'-6 each side); the back ones are ~11" higher. 5m1 4'-6 + 6 = 5'-0 (3 per block across, 6" from the edges); 5n3 2'-6 U (back block only); 5n1 base
+// 5'-7 spans BOTH blocks of a girder line (6'-0 - 5"). NOT set: 19G (two rows of different bridges on the shared line).
 {
     var peds = new Dictionary<string, (double along, double across, bool shared)>
     {
         ["Pier 1G"] = (60, 72, false), ["Pier 2G"] = (68, 72, false), ["Pier 3G"] = (60, 72, false), ["Pier 4G"] = (60, 72, false), ["Pier 5G"] = (60, 72, true),
         ["Pier 6G"] = (60, 72, false), ["Pier 7G"] = (68, 72, false), ["Pier 8G"] = (60, 72, false), ["Pier 10G"] = (60, 72, false), ["Pier 11G"] = (68, 72, false),
         ["Pier 12G"] = (68, 72, false), ["Pier 13G"] = (60, 72, false), ["Pier 14G"] = (60, 72, true), ["Pier 15G"] = (60, 72, false),
-        ["Pier 16G"] = (86, 68, false), ["Pier 17G"] = (72, 68, false), ["Pier 18G"] = (68, 72, false),
+        ["Pier 16G"] = (86, 68, false), ["Pier 17G"] = (72, 68, false), ["Pier 18G"] = (68, 72, false), ["Pier 9G"] = (60, 36, false),
     };
     foreach (var bridge in Doc.Project.Bridges.Where(x => x.Name.StartsWith("Ramp G")))
         foreach (var sup in bridge.Supports)

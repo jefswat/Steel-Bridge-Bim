@@ -339,6 +339,11 @@ public sealed partial class SubstructureGenerator
                 // 5a11 / 5a12: short bars at the cap ends (plan elevation: "5a11 (E.F.)" at the left end, "5a12 (E.F.)" at the right); their height along the end is not dimensioned
                 // The bar end keeps the cover to the (raked) end face at the bar's own height: s0 / s1 are the top corners, at mid-height the end face is inches
                 // further in (centring on s0 + cover put the end through the raked face; Follow then re-centres a bar it has to shorten, so it must fit as given).
+                if (g.Shape == "RC" && g.Dims.Length == 6)
+                {
+                    bars.Add(ReverseCurveSideBar(unit, g, size, face == 0 ? -1 : 1, face == 0 ? nLo + In(3.5) + size.Diameter / 2 : nHi - In(3.5) - size.Diameter / 2, sMid, loc));
+                    continue;
+                }
                 double endC = sMid;
                 if (g.End != 0)
                 {
@@ -637,7 +642,7 @@ public sealed partial class SubstructureGenerator
                     var (hs, hl) = PlanHoop(size, g.Dims[0], g.Dims[1], g.Dims[2], g.Dims[3], g.Pin, g.Length);
                     // With the plan note's girders (PlanBarGroup.Girders): the hoops go round those pedestal blocks (plan: hoop 2" inside the block faces; the pier
                     // elevations show it as a dot inside the pedestal), g.Count / blocks per block, at mid-height of the block (elevation not dimensioned).
-                    var sel = PedestalBlocksOf(unit, g.Girders);
+                    var sel = g.Girders == "" && g.PedestalRow is "BACK" or "AHEAD" ? PedestalBlocksOfRow(unit, g.PedestalRow) : PedestalBlocksOf(unit, g.Girders);
                     if (sel.Count > 0 && g.Count % sel.Count == 0)
                     {
                         int perB = g.Count / sel.Count;
@@ -671,7 +676,11 @@ public sealed partial class SubstructureGenerator
                 continue;
             }
             if (peds.Count == 0) continue;
-            if (g.Shape == "U" && g.Dims.Length == 3 && g.Count % peds.Count == 0)
+            // the blocks this group goes in: every block, one bearing row (11WB 5n1 back / 5n2 ahead), or one set per girder line across both rows (9G 5n1)
+            var blocks = g.PedestalRow switch { "BACK" or "AHEAD" => PedestalBlocksOfRow(unit, g.PedestalRow), "LINE" => PedestalLines(unit), _ => peds.ToList() };
+            if (g.PedestalRow != "" && (blocks.Count == 0 || g.Count % blocks.Count != 0))
+                Warn($"{unit.Name}: UNRESOLVED {g.Mark} pedestal bars - the plan row \"{g.PedestalRow}\" selects {blocks.Count} pedestal block(s), the bar list has {g.Count} bars; placed by the generic rule.");
+            if (g.Shape == "U" && g.Dims.Length == 3 && blocks.Count > 0 && g.Count % blocks.Count == 0)
             {
                 // 5m1 / 5n1 (plan bend diagram, pedestal plan): U bars, base out to out 5'-1 / 5'-3, legs 2'-8 hanging into the cap from the base. Per pedestal
                 // g.Count / pedestals bars at equal spaces, the end bars 4" from the pedestal edges (plan: "4, 5 EQ SPA, 4"). 5m1 (longitudinal) runs along S
@@ -679,22 +688,23 @@ public sealed partial class SubstructureGenerator
                 // "6-5m1" detail): the base lies in the TOP of the pedestal block (pedestals are 8 .. 12" high), the 5n1 bases (dots in the elevation) on top with the
                 // plan cover below the pedestal top, the 5m1 base one 5n1 bar below them; the legs hang through the pedestal into the cap. (Earlier the base was put
                 // under the cap top: the legs reached a pedestal height deeper, below the relief line into the 6" narrower lower section.) Only with the plan pedestal
-                // size (PedestalSizeAlong / Across): the bearing-footprint pedestals (9G, 19G, 11WB, 6A: plan size not settled) are smaller than these bars, whose
+                // size (PedestalSizeAlong / Across): the bearing-footprint pedestals (19G, 6A: plan size not settled) are smaller than these bars, whose
                 // base then stays under the cap top as before (reported by the check).
                 bool planPed = unit.Definition.PedestalSizeAlong > 0 && unit.Definition.PedestalSizeAcross > 0;
-                int per = g.Count / peds.Count;
+                int per = g.Count / blocks.Count;
+                double edge = g.EdgeDistance > 0 ? g.EdgeDistance : In(4);
                 bool alongS2 = g.Kind == PlanBarKind.PedestalLongitudinal;
                 var trans = groups.FirstOrDefault(x => x.Kind == PlanBarKind.PedestalTransverse);
                 double under = alongS2 && trans != null ? RebarCatalog.Size(trans.Size).Diameter : 0;
                 var (ps, pl) = PlanU(size, g.Dims[0], g.Dims[1], g.Dims[2], g.Pin, g.Length);
-                foreach (var p in peds)
+                foreach (var p in blocks)
                 {
                     double across = alongS2 ? p.WidthN : p.LengthS;
                     double zOut = (planPed && p.Height > In(0.125) ? p.SeatZ
                         : TopSpan(p.S - (alongS2 ? g.Dims[1] / 2 : across / 2), p.S + (alongS2 ? g.Dims[1] / 2 : across / 2), p.N - (alongS2 ? across / 2 : g.Dims[1] / 2), p.N + (alongS2 ? across / 2 : g.Dims[1] / 2))) - cov - under;
                     for (int k = 0; k < per; k++)
                     {
-                        double t = per == 1 ? 0 : -across / 2 + In(4) + (across - In(8)) * k / (per - 1);
+                        double t = per == 1 ? 0 : -across / 2 + edge + (across - 2 * edge) * k / (per - 1);
                         Vec3 Pp(double u, double v) => alongS2 ? unit.World(p.S + u - g.Dims[1] / 2, p.N + t, zOut - v) : unit.World(p.S + t, p.N + u - g.Dims[1] / 2, zOut - v);
                         bars.Add(new RawBar("M", size, ps, $"{where} pedestal bars", pl.Select(q => Pp(q.X, q.Y)).ToArray()));
                     }
@@ -734,6 +744,97 @@ public sealed partial class SubstructureGenerator
         return unit.PedestalBlocks.Where(p => unit.Pedestals.Any(q => idx.Contains(q.Girder % 1000)
                 && Math.Abs(q.RowS - p.S) <= p.LengthS / 2 + 1e-6 && Math.Abs(q.RowN - p.N) <= p.WidthN / 2 + 1e-6))
             .OrderBy(p => p.S).ToList();
+    }
+
+    /// <summary>
+    /// Reverse-curve skin bar (Pier 6A 5a11 (E.F.), bend diagram Design 116 PDF 42: R 83'-8 1/2 sag over 26'-9 1/2, R 63'-9 1/2 crest over 25'-9, ends 11 1/2 below /
+    /// 1'-3 above the reference line). The radii are the relief arcs of the aesthetic figure (PDF 83: long arc R 84'-0, fan R 63'-6) 3 1/2" toward the full-width
+    /// section, and the plan elevation PDF 41 ("5a11 (E.F.)") draws the bar along the relief step, section A-A (PDF 40) at the step corner 3 1/2" CL. from the
+    /// face. Its position along the cap is not dimensioned: the rigid bar (shape as printed) is fitted (rotation, S, Z; least squares) to this face's highest
+    /// relief line + 3 1/2" (normal), and the fit residual is reported. Not moved for cover.
+    /// </summary>
+    private RawBar ReverseCurveSideBar(SubstructureUnit unit, PlanBarGroup g, RebarSize size, int side, double n, double sMid, string loc)
+    {
+        var (rs, rp, rlen) = PlanReverseCurve(g.Dims[0], g.Dims[1], g.Dims[2], g.Dims[3], g.Dims[4], g.Dims[5], g.Length);
+        if (Math.Abs(rlen - g.Length) > In(1))
+            Warn($"{unit.Name}: {g.Mark} reverse curve from the bend diagram is {Dim(rlen)} long, the bar list {Dim(g.Length)}.");
+        bool tagged = unit.ReliefLineTags.Count == unit.ReliefLines.Count;
+        var lines = Enumerable.Range(0, unit.ReliefLines.Count).Where(j => unit.ReliefLines[j].Count > 1 && (!tagged || unit.ReliefLineTags[j].Side == side))
+            .Select(j => unit.ReliefLines[j]).ToList();
+        double off = In(3.5);
+        double Target(double sx)
+        {
+            double zr = double.NaN, slope = 0;
+            foreach (var l in lines)
+                if (sx >= l[0].X && sx <= l[^1].X)
+                {
+                    double v = SubstructureUnit.Interp(l, sx);
+                    if (double.IsNaN(zr) || v > zr) { zr = v; slope = (SubstructureUnit.Interp(l, Math.Min(sx + 0.05, l[^1].X)) - SubstructureUnit.Interp(l, Math.Max(sx - 0.05, l[0].X))) / 0.1; }
+                }
+            return double.IsNaN(zr) ? double.NaN : zr + off * Math.Sqrt(1 + slope * slope);
+        }
+        double sC = sMid - (g.Dims[2] - g.Dims[0]) / 2;     // chord centred on mid-cap as the start
+        (double cost, double dz) Eval(double phi, double ds, int stride)
+        {
+            double c = Math.Cos(phi), sn = Math.Sin(phi), sum = 0, sum2 = 0; int cnt = 0, tot = 0;
+            for (int i = 0; i < rp.Length; i += stride)
+            {
+                tot++;
+                double sx = sC + ds + rp[i].X * c - rp[i].Y * sn, zx = rp[i].X * sn + rp[i].Y * c, tz = Target(sx);
+                if (double.IsNaN(tz)) continue;
+                double r = tz - zx; sum += r; sum2 += r * r; cnt++;
+            }
+            if (cnt < tot * 0.6) return (double.MaxValue, 0);
+            double mean = sum / cnt;
+            return (sum2 / cnt - mean * mean, mean);
+        }
+        if (lines.Count == 0)
+        {
+            Warn($"{unit.Name}: UNRESOLVED {g.Mark} reverse-curve bar - no relief line on this face to place it by; placed with its chord level at mid-cap under the top.");
+            double z0 = unit.CapTopAt(sMid) - Ft(4);
+            return new RawBar("C", size, rs, $"{loc} {g.Mark} side faces", rp.Select(p => unit.World(sC + p.X, n, z0 + p.Y)).ToArray());
+        }
+        double bp = 0, bs = 0, bc = double.MaxValue;
+        for (double phi = -0.07; phi <= 0.07 + 1e-9; phi += 0.0035)
+            for (double ds = -Ft(4); ds <= Ft(4) + 1e-9; ds += In(2))
+            { var e = Eval(phi, ds, 4); if (e.cost < bc) { bc = e.cost; bp = phi; bs = ds; } }
+        double p0 = bp, s0f = bs;
+        for (double phi = p0 - 0.0035; phi <= p0 + 0.0035 + 1e-9; phi += 0.0001)
+            for (double ds = s0f - In(2); ds <= s0f + In(2) + 1e-9; ds += In(0.0625))
+            { var e = Eval(phi, ds, 1); if (e.cost < bc) { bc = e.cost; bp = phi; bs = ds; } }
+        var (fc, dzf) = Eval(bp, bs, 1);
+        double cs = Math.Cos(bp), ss = Math.Sin(bp), maxDev = 0;
+        var pts = rp.Select(p =>
+        {
+            double sx = sC + bs + p.X * cs - p.Y * ss, zx = dzf + p.X * ss + p.Y * cs, tz = Target(sx);
+            if (!double.IsNaN(tz)) maxDev = Math.Max(maxDev, Math.Abs(zx - tz));
+            return unit.World(sx, n, zx);
+        }).ToArray();
+        Warn($"{unit.Name}: {g.Mark} ({(side < 0 ? "back" : "ahead")} face) reverse-curve bar fitted to the relief line + 3 1/2\": rotation {bp * 180 / Math.PI:0.00} deg, "
+            + $"rms {Dim(Math.Sqrt(Math.Max(fc, 0)))}, max {Dim(maxDev)} off the offset relief line (its position along the cap is not dimensioned).");
+        return new RawBar("C", size, rs, $"{loc} {g.Mark} side faces", pts);
+    }
+
+    /// <summary>Pedestal blocks (in cap order) of one bearing row: "BACK" = centre on the -N side of the CL pier, "AHEAD" = +N side.</summary>
+    internal static List<PedestalInfo> PedestalBlocksOfRow(SubstructureUnit unit, string row)
+        => unit.PedestalBlocks.Where(p => row == "AHEAD" ? p.N > unit.CapMidN : p.N < unit.CapMidN).OrderBy(p => p.S).ToList();
+
+    /// <summary>One block per girder line spanning a back block and the ahead block at the same place along the cap (their S centres within half a block
+    /// length): S = the mean, N = the union of the two, length = the shorter, cap top / seat = the LOWER of the two (the bar base lies under the lower top).
+    /// Lines with a single block are left out.</summary>
+    internal static List<PedestalInfo> PedestalLines(SubstructureUnit unit)
+    {
+        var back = PedestalBlocksOfRow(unit, "BACK");
+        var ahead = PedestalBlocksOfRow(unit, "AHEAD");
+        var res = new List<PedestalInfo>();
+        foreach (var b in back)
+        {
+            var a = ahead.Where(x => Math.Abs(x.S - b.S) < Math.Min(x.LengthS, b.LengthS) / 2).OrderBy(x => Math.Abs(x.S - b.S)).FirstOrDefault();
+            if (a == null) continue;
+            double n0 = Math.Min(b.N - b.WidthN / 2, a.N - a.WidthN / 2), n1 = Math.Max(b.N + b.WidthN / 2, a.N + a.WidthN / 2);
+            res.Add(new PedestalInfo(b.Girder, (a.S + b.S) / 2, (n0 + n1) / 2, Math.Min(a.LengthS, b.LengthS), n1 - n0, Math.Min(a.CapTopZ, b.CapTopZ), Math.Min(a.SeatZ, b.SeatZ)));
+        }
+        return res;
     }
 
     /// <summary>Hoop height h (out-to-out) so that the closed stirrup w x h has the listed developed length.</summary>
