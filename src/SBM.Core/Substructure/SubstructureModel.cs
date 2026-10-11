@@ -12,11 +12,11 @@ public enum SubElementKind { Cap, Pedestal, Backwall, Column, DrilledShaft, Foot
 /// <summary>A solid of the substructure with its quantity data.</summary>
 public sealed record SubSolid(SubElementKind Kind, string Name, string Description, Mesh Mesh, bool IsConcrete = true);
 
-/// <summary>Pedestal (bearing seat build-up) under one bearing. S/N = center in cap coordinates.</summary>
 /// <summary>One plan-listed bar outside the clear-cover envelope: Excess = how far (m) the bar surface reaches into the cover zone at its worst point,
 /// Face = the governing concrete face (cap top / cap soffit / cap end / cap side N0 / cap side N1 / footing ... / column ...).</summary>
 public sealed record CoverViolation(string Location, string Kind, double Excess, string Face, double S, double N, double Z);
 
+/// <summary>Pedestal (bearing seat build-up) under one bearing. S/N = center in cap coordinates.</summary>
 public sealed record PedestalInfo(int Girder, double S, double N, double LengthS, double WidthN, double CapTopZ, double SeatZ)
 {
     public double Height => SeatZ - CapTopZ;
@@ -90,6 +90,9 @@ public sealed class SubstructureUnit
     public string CapTopDescription { get; set; } = "";
     /// <summary>Texture band lines on the cap face (S, Z), clipped to the cap: the texture edge and each layer line.</summary>
     public List<List<Vec2>> ReliefLines { get; } = new();
+    /// <summary>Per entry of <see cref="ReliefLines"/>: the face it belongs to (-1 = back face N0, +1 = ahead face N1) and its layer index (lowest line first).
+    /// A layer line clipped to the cap can come in several runs; the two faces have their own lines (6A: own back / ahead profiles).</summary>
+    public List<(int Side, int Layer)> ReliefLineTags { get; } = new();
     /// <summary>One entry per bearing seat (SeatZ / Height as the elevation checks need them; with a shared plan pedestal the geometry is the block's).</summary>
     public List<PedestalInfo> Pedestals { get; } = new();
     /// <summary>The pedestal solids: one per block (= <see cref="Pedestals"/> unless a plan pedestal carries several seats). The pedestal bars are placed per block.</summary>

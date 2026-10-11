@@ -83,9 +83,12 @@ Use this to start the next session. Architecture notes are in `CLAUDE.md`. The u
   check-blocking, substructure-elevation check (running).
 - **OPEN:** (1) Pier 6A: girder A inside the level strip (plan follows the plane) — agent checking whether the gore edge
   has a barrier (`docs\plan-data\gore-6a-edge.md`); (2) ~0.008 ft low I-80 U2 7WB-9WB unexplained by sheet 190;
-  (3) 2,103 cap bars outside cover (pedestal U-bars, end verticals, 4c5/4c7, skin) — bend-diagram agent fixing;
+  (3) cap bars outside cover: 2,103 -> 565 (bend diagrams + pedestal sizes) -> 178 (cap-cover branch 2026-10-11: pedestal U bars in the pedestal top,
+  5n2 hoops at the noted girders, 6b2 / 5a13 / 5a15 / 5a11 / 5a12 / hairpin-zone fixes, per-face relief lines); remaining 178 = 11WB / 9G pedestals not set,
+  6A (stepped top vs relief, undecoded end bars), Ramp G 5a12 relief bars, 19G 5c4 - `docs/plan-data/cap-cover-containment.md`;
   (4) plan's own camber vs deflection inconsistent at ~177 I-80 U2 points (plan issue); (5) 3 1/2" clear at the textured
-  cap face — which bars (bend agent); (6) abutment wing/counterfort/step/corbel/maskwall rebar schedule-only, abutment
+  cap face — ANSWERED: the plans print 3 1/2" CL. only to the 5c hairpin legs, at both faces (checked); a production cover for other bars at the textured
+  face is not stated (mockup note only: 2" clear to the bottom of the texture) - UNRESOLVED warning, 2" kept; (6) abutment wing/counterfort/step/corbel/maskwall rebar schedule-only, abutment
   uplift piles unidentified.
 - **Running branches:** feature/bends (bend diagrams, every printed dimension), feature/deckrebar (deck reinforcing to
   the plans — biggest model error), feature/sheets (overprinting, model-driven notes, missing sheets).

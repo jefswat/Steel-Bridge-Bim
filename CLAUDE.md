@@ -107,7 +107,12 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
     in the plan's zone order, 4c7/4c5 U, 11g/10g bottom mats U, 6c1/6c2/5n2 hoops with lap tails (`PlanHoop`), 6b2 cantilever flat + slant (`CS`), 5a11/5a12 short end bars. Data is appended to the
     csx lines as `;S=shape:dims:pin` (+ `;Z=..;M=..` hairpins, `;E=-1/1`) by `tools/patch_*.py` from `tools/extract_all.py`/`shapes.py` (plan text + fraction glyph decoder `plantext.py`);
     plan vs model for every mark: `docs/plan-data/bend-diagram-comparison.md` (`tools/compare.py`, `make_doc.py`; abutment diagrams hand-read in `tools/abut_hand.py`). Bars are never moved to
-    satisfy cover - containment violations are raised. `LateralSetback` continues each relief line level beyond its ends (the plans' arcs start at the cap tips).
+    satisfy cover - containment violations are raised. `LateralSetback` continues each relief line level beyond its ends (the plans' arcs start at the cap tips) and counts each
+    face's own layer lines once (`SubstructureUnit.ReliefLineTags` = face + layer per line). Pedestal U bars 5m1 / 5n1: base in the TOP of the plan pedestal block (2" under it; 5m1 one
+    5n1 bar lower), legs through the block into the cap; 5n2 hoops round the blocks of the note's girders (`PlanBarGroup.Girders`, csx `;G=C,D`), else UNRESOLVED at mid-cap;
+    `PlanBarGroup.End` also picks the end of CapEnd groups (5WB 5a15 shape `A15` left, 5a14 right). Check: pedestal blocks are host concrete for pedestal bars, hairpins need 3 1/2" CL.
+    to both full-width faces (`HairpinFaceClear`, sections A-A/B-B), per-bar records `SubstructureUnit.CoverViolations` (`samples/plans/check-sub-cover.csx`); textured-face cover for
+    other bars UNRESOLVED (2" kept). State and remaining warnings: `docs/plan-data/cap-cover-containment.md`.
   - As-designed abutment (OPTIONAL `SubstructureDefinition.Abutment`, `AbutmentDefinition.cs`; null = parametric abutment): `SubstructureAbutment.cs`
     (`AddSlab` = prism between two vertical planes with per-vertex elevation functions; end lines are alignment offsets, so S depends on N),
     `SubstructureAbutmentRebar.cs` (only proven placements in 3D, rest of the plan bar list = schedule-only marks, mismatches = warnings),

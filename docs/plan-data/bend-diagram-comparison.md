@@ -91,6 +91,8 @@ Three columns separate the two things that changed: **A** = the baseline model (
 * **Plan-true shapes (B -> C, 2002 -> 633)**: pedestal U bars 5m1 / 5n1 1,639 -> 339, end bars 5a14 207 -> 0, 6a15 71 -> 3, 4c7 15 -> 0, 4c5 0, 5n3 8 -> 0.
   The bars were also made to follow the sloped cap tops (a level base goes under the lowest point of the top; stations at the ends of the top face) - an earlier build of this
   work had them stacked at one end of sloped caps (that error is fixed and not part of the numbers above).
+* **Superseded 2026-10-11:** the cap-cover work brought the 633 to 178 (pedestal U bars in the pedestal top, 5n2 hoops round the named girders' pedestals, 5a13 in the
+  full-width zone, 5a11 / 5a12 at their ends, 5a15 shape, per-face relief lines, pedestal blocks in the check); see `docs/plan-data/cap-cover-containment.md`. The list below is the 633 state.
 * **Remaining (633 bars)**, all with the plan dimensions kept:
   * 5m1 / 5n1 pedestal bars (339): 5n1 on 1WB .. 4WB / 6WB (6 .. 12 bars, 3 3/16": the base 5'-3 of the end pedestal under the 5'-0 lower section); 5WB (36 bars, 21": 96" cap whose
     model section is narrower than the plan's at that pedestal); 11WB (24 + 56 bars, 1/2" .. 5 9/16"); 6WB (66 bars 1 1/2"); Ramp G 5G / 9G / 14G (24 bars, 5 1/2" .. 6": legs 2'-3 deeper than the
@@ -111,6 +113,12 @@ the **5c hairpin legs and base** only (it is the reason their base is 5'-5, not 
 diameter: top / bottom bar rows are dimensioned "3 1/2" to the bar centre" = 2" + 6 bar + half an 11 bar). Applied: the hairpin base width only (it is the printed dimension); the
 model's cap cover (2") is unchanged.
 
+**Answer to open question (5), 2026-10-11 (cap-cover work, `docs/plan-data/cap-cover-containment.md`):** the plans print the 3 1/2" CL. only from the two (full-width) cap faces to the
+5c hairpin legs, at BOTH faces (Design 116 PDF 20 sections A-A / B-B, pier 6A PDF 40 sections A-A / B-B, Ramp G equivalents) - it is not a textured-face-only value. The containment
+check now verifies it for the hairpins (`SubstructureGenerator.HairpinFaceClear`; all hairpins pass). For the other bars at the textured face the only statement is the MOCKUP note
+"A SINGLE MAT OF NO. 5 REINFORCING BARS ... SHALL BE SET 2 INCHES CLEAR TO THE BOTTOM OF THE TEXTURED FACE" (PDF 83; texture B up to 1 1/2" deep, i.e. 3 1/2" from the form face);
+no production cover is stated, so every pier with a relief step carries an UNRESOLVED warning and the check keeps the general 2" ("UNLESS OTHERWISE NOTED").
+
 ## 5. Unresolved items (raised, not decoded or not modeled)
 
 1. **Hairpin / hoop station layouts**: the plan's gap dimensions between zones ("1'-4", "1'-0") are not read - stations are equal spaces from the margin (the plan's "4" / "6")
@@ -125,7 +133,9 @@ model's cap cover (2") is unchanged.
    layout sheet - not changed.
 5. **Abutments**: only 5b1 hoops, 5d2 / 6d1 verticals and 9a1 are placed in 3D; all other marks have schedule shapes only. 5g2 (West), 5d4, 5b3, 5b4 and the East 5b2 diagrams (hook with slant) are
    read and reconciled (see the tables) but not given a model shape (slanted segments need their angles). 5b1 in the model keeps 135 degree hooks (plan: 6" lap tails).
-6. **Pedestal 5n2 hoops** (printed "AT GIRDERS C & D ONLY", Pier 1WB): which pedestals carry them is not decoded for the other piers; placed at mid-cap as before (shape now as printed).
+6. **Pedestal 5n2 hoops** (printed "AT GIRDERS C & D ONLY", Pier 1WB): (2026-10-11) the notes are read for 1WB-3WB (C & D), 4WB (B-D), 6WB (F-I) and 5WB
+   ("AT AHEAD BRG. GIRDERS G-I & AT BACK BRG. GIRDERS B-D ONLY"); the hoops go round those pedestal blocks (`PlanBarGroup.Girders`, csx `;G=`). 5WB: the note selects 4
+   shared blocks for 3 hoops - UNRESOLVED, mid-cap as before. 9G (4 hoops at one back pedestal): pedestals not set - UNRESOLVED, mid-cap.
 7. **Pedestal size**: the plan pedestals (5'-6 x 5'-8 on 1WB) differ from the model's bearing-seat pedestals (58 x 58"), which changes where the 4" end bars fall.
 8. **Deck slab bars**: not compared (see scope).
 
@@ -304,7 +314,7 @@ bar that is straight / bent where the plan is bent / straight), **not decoded**,
 | 7g2 | FOOTING, BOTTOM, LONGITUDINAL | bent: (not reconciled) ; D 5 1/4" | 16'-4" | BENT 1'-1 7/16" + 14'-2" + 1'-1 7/16" |  | not decoded |
 | 5m1 | CAP, PEDESTAL, LONGITUDINAL | U: 5'-1" + 2'-9" + 2'-9" (sum = list length) ; D 2 1/2" | 10'-7" | U 2'-9" + 5'-1" + 2'-9" ; D 2 1/2" | 5'-1" vs 5'-1"; 2'-9" vs 2'-9"; 2'-9" vs 2'-9" | match |
 | 5n1 | CAP, PEDESTAL, TRANSVERSE | U: 5'-3" + 2'-9" + 2'-9" (sum = list length) ; D 2 1/2" | 10'-9" | U 2'-9" + 5'-3" + 2'-9" ; D 2 1/2" | 5'-3" vs 5'-3"; 2'-9" vs 2'-9"; 2'-9" vs 2'-9" | match |
-| 5n2 | CAP, PEDESTAL, HOOP | bent: (not reconciled) ; 6'-8" MAX. ; D 2 1/2" | 22'-0" | TIE 5'-5 1/4" + 5'-8" ; D 2 1/2" |  | not decoded |
+| 5n2 | CAP, PEDESTAL, HOOP | hoop: 5'-4" + 5'-2" + 6" + 6" (read on raster clip 2026-10-11; sum = list length) ; D 2 1/2" | 22'-0" | HOOP 5'-2" + 5'-4" + 6" ; D 2 1/2" | 5'-4" vs 5'-4"; 5'-2" vs 5'-2"; 6" vs 6" | match (hand-updated, cap-cover work) |
 
 ### Pier 5WB (Design 116, sheet PDF p.38)
 
@@ -324,7 +334,7 @@ bar that is straight / bent where the plan is bent / straight), **not decoded**,
 | 5a12 | CAP, SIDES, LONGITUDINAL | straight | 4'-10" | STR 4'-10" | +0.00" | match |
 | 5a13 | CAP, ENDS, TRANSVERSE | U: 7'-3" + 2'-0" + 2'-0" (sum = list length) ; D 2 1/2" | 11'-3" | U 2'-0" + 7'-3" + 2'-0" ; D 2 1/2" | 7'-3" vs 7'-3"; 2'-0" vs 2'-0"; 2'-0" vs 2'-0" | match |
 | 5a14 | CAP, END, VERTICAL | U: 4'-0" + 2'-0" + 10" (sum = list length) ; D 2 1/2" | 6'-10" | A14 2'-0" + 4'-0" + 10" ; D 2 1/2" | 4'-0" vs 4'-0"; 2'-0" vs 2'-0"; 10" vs 10" | match |
-| 5a15 | CAP, END, VERTICAL | U: 4'-5" + 2'-0" + 10" (sum = list length) ; D 2 1/2" | 7'-3" | STR 7'-3" | 4'-5" vs 7'-3" (+34.00"); 2'-0" vs missing; 10" vs missing pin: plan 2 1/2" / model none (straight) | MISMATCH (model straight) |
+| 5a15 | CAP, END, VERTICAL | bent (read on raster clip 2026-10-11): 10" top leg + 4'-5" down the end face + 2'-0" slanted along the soffit bevel (6" drop) (sum = list length) ; D 2 1/2" | 7'-3" | A15 10" + 4'-5" + 2'-0" (6" drop) ; D 2 1/2", left end only (E=-1) | - | match (hand-updated, cap-cover work) |
 | 9b1 | CAP, BOTTOM, LONGITUDINAL | straight | 47'-0" | BENT 47'-0" | +0.00" | MISMATCH (model bent) |
 | 6b2 | CAP, BOTTOM, CANTILEVER | L: 9'-1" + 2'-0" (sum = list length) | 11'-1" | CS 2'-0" + 9'-1" ; D 4 1/2" (as scheduled (A,B...)) | 9'-1" vs 9'-1"; 2'-0" vs 2'-0" | match |
 | 6b3 | CAP, BOTTOM, CANTILEVER | L: 8'-0" + 2'-0" (sum = list length) ; D 4 1/2" | 10'-0" | CS 2'-0" + 8'-0" ; D 4 1/2" (as scheduled (A,B...)) | 8'-0" vs 8'-0"; 2'-0" vs 2'-0" | match |
@@ -442,7 +452,7 @@ bar that is straight / bent where the plan is bent / straight), **not decoded**,
 | 10g2 | FOOTING, BOTTOM, LONGITUDINAL | U: 17'-6" + 1'-10" + 1'-10" (sum = list length) ; D 10 3/4" | 21'-2" | U 1'-10" + 17'-6" + 1'-10" ; D 10 3/4" | 17'-6" vs 17'-6"; 1'-10" vs 1'-10"; 1'-10" vs 1'-10" | match |
 | 5m1 | CAP, PEDESTAL, LONGITUDINAL | bent: (not reconciled) ; D 2 1/2" | 10'-7" | BENT 2'-3 5/16" + 6'-1 5/8" + 2'-3 5/16" |  | not decoded |
 | 5n1 | CAP, PEDESTAL, TRANSVERSE | U: 5'-3" + 2'-9" + 2'-9" (sum = list length) ; D 2 1/2" | 10'-9" | U 2'-9" + 5'-3" + 2'-9" ; D 2 1/2" | 5'-3" vs 5'-3"; 2'-9" vs 2'-9"; 2'-9" vs 2'-9" | match |
-| 5n2 | CAP, PEDESTAL, HOOP | bent: (not reconciled) ; D 2 1/2" | 22'-0" | TIE 5'-5 1/4" + 5'-8" ; D 2 1/2" |  | not decoded |
+| 5n2 | CAP, PEDESTAL, HOOP | hoop: 5'-4" + 5'-2" + 6" + 6" (read on raster clip 2026-10-11; sum = list length) ; D 2 1/2" | 22'-0" | HOOP 5'-2" + 5'-4" + 6" ; D 2 1/2" | 5'-4" vs 5'-4"; 5'-2" vs 5'-2"; 6" vs 6" | match (hand-updated, cap-cover work) |
 
 ### Pier 7WB (Design 116, sheet PDF p.50)
 

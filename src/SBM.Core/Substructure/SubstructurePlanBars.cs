@@ -337,7 +337,15 @@ public sealed partial class SubstructureGenerator
                 double n = face == 0 ? nLo + cov + st.Diameter + size.Diameter / 2 : nHi - cov - st.Diameter - size.Diameter / 2;
                 Func<double, double> z = s => BotAt(s) + (TopAt(s) - BotAt(s)) * f;
                 // 5a11 / 5a12: short bars at the cap ends (plan elevation: "5a11 (E.F.)" at the left end, "5a12 (E.F.)" at the right); their height along the end is not dimensioned
-                double endC = g.End == 0 ? sMid : g.End < 0 ? s0 + cov + g.Length / 2 : s1 - cov - g.Length / 2;
+                // The bar end keeps the cover to the (raked) end face at the bar's own height: s0 / s1 are the top corners, at mid-height the end face is inches
+                // further in (centring on s0 + cover put the end through the raked face; Follow then re-centres a bar it has to shorten, so it must fit as given).
+                double endC = sMid;
+                if (g.End != 0)
+                {
+                    double x = g.End < 0 ? s0 : s1;
+                    for (int it = 0; it < 2000 && Clr(x, z(x)) < cov - 1e-6; it++) x -= g.End * In(0.25);
+                    endC = x - g.End * g.Length / 2;
+                }
                 bars.Add(PlanBarFixed("C", size, $"{loc} {g.Mark} side faces", Follow(n, g.Length, z, endC), g.Length));
             }
         }
@@ -503,6 +511,33 @@ public sealed partial class SubstructureGenerator
                 else
                 {
                     int end = i % 2, k = i / 2, per = (g.Count + 1) / 2;
+                    if (g.End != 0) { end = g.End < 0 ? 0 : 1; k = i; per = g.Count; }      // the plan shows the group at one end only (5WB: 9-5a15 left, 9-5a14 right)
+                    if (vertical && g.Shape == "A15" && g.Dims.Length == 4)
+                    {
+                        // 5a15 (Pier 5WB, Design 116 PDF 38 bend diagram, elevation PDF 35/37 "9-5a15"): bar in the vertical longitudinal plane at the end - 10" leg
+                        // inward under the top, 4'-5 down the (vertical) end face, 2'-0 slanted inward along the soffit bevel (6" drop), out to out; 9 across the width
+                        // at 9" from the faces (plan PDF 36 "9, 8 EQ. SPA., 9"). Pushed in from the end / down from the top only as far as the clear cover needs.
+                        var (fs, fl) = PlanA15(size, g.Dims[0], g.Dims[1], g.Dims[2], g.Dims[3], g.Pin, g.Length);
+                        double nE = per == 1 ? (unit.CapN0 + unit.CapN1) / 2 : unit.CapN0 + In(9) + (unit.CapN1 - unit.CapN0 - In(18)) * k / (per - 1);
+                        double inw = end == 0 ? 1 : -1, sTip = end == 0 ? s0 : s1;
+                        var smp = new List<Vec2>();
+                        for (int q = 0; q + 1 < fl.Length; q++)
+                        {
+                            int ns3 = Math.Max(1, (int)Math.Ceiling(Vec2.Distance(fl[q], fl[q + 1]) / In(1)));
+                            for (int m3 = 0; m3 < ns3; m3++) smp.Add(Vec2.Lerp(fl[q], fl[q + 1], m3 / (double)ns3));
+                        }
+                        smp.Add(fl[^1]);
+                        double needE = cov + size.Diameter / 2 - 1e-4, sv = sTip, zt0 = 0; bool okE = false;
+                        for (int it = 0; it < 400 && !okE; it++, sv += inw * In(0.25))
+                        {
+                            double zTopE = Math.Min(TopAt(sv), TopAt(sv + inw * g.Dims[0])) - cov;
+                            for (int jz = 0; jz < 48 && !okE; jz++) { zt0 = zTopE - jz * In(0.25); okE = smp.All(q => Clr(sv + inw * q.X, zt0 + q.Y) >= needE); }
+                        }
+                        if (okE) sv -= inw * In(0.25);
+                        else { sv = sTip + inw * cov; zt0 = TopAt(sv) - cov; }                                                       // no position keeps the cover: reported by the check
+                        bars.Add(new RawBar("E", size, fs, $"{where} end bars", fl.Select(q => unit.World(sv + inw * q.X, nE, zt0 + q.Y)).ToArray()));
+                        continue;
+                    }
                     if (vertical && g.Shape == "A14" && g.Dims.Length == 4)
                     {
                         // 5a14 (plan bend diagram): bar in the vertical longitudinal plane at the cap end - vertical leg 24", top run 4'-0, slanted leg 10" (2 1/2"
@@ -540,7 +575,10 @@ public sealed partial class SubstructureGenerator
                         {
                             double sx = sTipU + inwardU * it * In(0.25);
                             double zlo = double.NaN, zhi = double.NaN;
-                            for (double zz = BotAt(sx); zz <= TopAt(sx) + 1e-9; zz += In(0.25)) if (Clr(sx, zz) >= cov + rU - 1e-4) { zlo = zz; break; }
+                            // the base spans the width (5'-3 of a 6'-0 cap): it also needs the full-width (upper) section there - the plan's stack lies above the relief
+                            // line at the end (Design 116 PDF 36, pier 5WB elevation "3 EQ. SPA.; 4-5a13 BARS"); earlier only the S-Z outline was tested
+                            bool Wide(double zz) => g.Dims[1] / 2 <= (unit.CapN1 - unit.CapN0) / 2 - Setb(sx, zz) - cov + 1e-4;
+                            for (double zz = BotAt(sx); zz <= TopAt(sx) + 1e-9; zz += In(0.25)) if (Clr(sx, zz) >= cov + rU - 1e-4 && Wide(zz)) { zlo = zz; break; }
                             for (double zz = TopAt(sx); zz >= BotAt(sx) - 1e-9; zz -= In(0.25)) if (Clr(sx, zz) >= cov + rU - 1e-4) { zhi = zz; break; }
                             if (double.IsNaN(zlo) || double.IsNaN(zhi) || zhi - zlo < legU + 2 * rU) continue;
                             double zb0 = per == 1 ? zlo : zlo + (zhi - zlo - legU) * k / (per - 1);       // outside face of the base (bar centre at + r)
@@ -597,6 +635,28 @@ public sealed partial class SubstructureGenerator
                     // 5n2 (plan bend diagram): hoop 5'-2 (along S) x 5'-4 (along N), 6" lap tails, out to out; the plan puts them at the pedestals of girders C and D
                     // ("AT GIRDERS C & D ONLY", Pier 1WB) - which pedestals is not decoded for the other piers: placed at mid-cap, one above the other (as before).
                     var (hs, hl) = PlanHoop(size, g.Dims[0], g.Dims[1], g.Dims[2], g.Dims[3], g.Pin, g.Length);
+                    // With the plan note's girders (PlanBarGroup.Girders): the hoops go round those pedestal blocks (plan: hoop 2" inside the block faces; the pier
+                    // elevations show it as a dot inside the pedestal), g.Count / blocks per block, at mid-height of the block (elevation not dimensioned).
+                    var sel = PedestalBlocksOf(unit, g.Girders);
+                    if (sel.Count > 0 && g.Count % sel.Count == 0)
+                    {
+                        int perB = g.Count / sel.Count;
+                        foreach (var p in sel)
+                        {
+                            // the diagram's longer side goes along the block's longer side (3WB: 5'-4 x 6'-2 in a 6'-6 x 5'-8 block)
+                            bool swap = (g.Dims[0] > g.Dims[1]) != (p.LengthS > p.WidthN) && Math.Abs(g.Dims[0] - g.Dims[1]) > 1e-6 && Math.Abs(p.LengthS - p.WidthN) > 1e-6;
+                            double hS = swap ? g.Dims[1] : g.Dims[0], hN = swap ? g.Dims[0] : g.Dims[1];
+                            for (int i = 0; i < perB; i++)
+                            {
+                                double zc = (p.CapTopZ + p.SeatZ) / 2 - (i - (perB - 1) / 2.0) * In(3);
+                                bars.Add(new RawBar("M", size, hs, $"{where} pedestal hoops", hl.Select(q => unit.World(p.S + (swap ? q.Y : q.X) - hS / 2, p.N + (swap ? q.X : q.Y) - hN / 2, zc)).ToArray()));
+                            }
+                        }
+                        continue;
+                    }
+                    Warn($"{unit.Name}: UNRESOLVED {g.Mark} pedestal hoops - " + (g.Girders == "" ? "the girders that carry them are not given"
+                        : $"the plan note's girders \"{g.Girders}\" select {sel.Count} pedestal block(s), the bar list has {g.Count} hoops")
+                        + "; placed at mid-cap under the cap top (position not modeled).");
                     for (int i = 0; i < g.Count; i++)
                         bars.Add(new RawBar("M", size, hs, $"{where} pedestal hoops", hl.Select(q => unit.World(sMid + q.X - g.Dims[0] / 2, (unit.CapN0 + unit.CapN1) / 2 + q.Y - g.Dims[1] / 2, zh - i * In(3))).ToArray()));
                     continue;
@@ -615,14 +675,23 @@ public sealed partial class SubstructureGenerator
             {
                 // 5m1 / 5n1 (plan bend diagram, pedestal plan): U bars, base out to out 5'-1 / 5'-3, legs 2'-8 hanging into the cap from the base. Per pedestal
                 // g.Count / pedestals bars at equal spaces, the end bars 4" from the pedestal edges (plan: "4, 5 EQ SPA, 4"). 5m1 (longitudinal) runs along S
-                // and is spaced across N; 5n1 (transverse) runs along N and is spaced across S. Base top = cap top less the cover (vertical position is not dimensioned).
+                // and is spaced across N; 5n1 (transverse) runs along N and is spaced across S. Vertical position (pier elevations, e.g. Design 116 PDF 19, pier 1WB
+                // "6-5m1" detail): the base lies in the TOP of the pedestal block (pedestals are 8 .. 12" high), the 5n1 bases (dots in the elevation) on top with the
+                // plan cover below the pedestal top, the 5m1 base one 5n1 bar below them; the legs hang through the pedestal into the cap. (Earlier the base was put
+                // under the cap top: the legs reached a pedestal height deeper, below the relief line into the 6" narrower lower section.) Only with the plan pedestal
+                // size (PedestalSizeAlong / Across): the bearing-footprint pedestals (9G, 19G, 11WB, 6A: plan size not settled) are smaller than these bars, whose
+                // base then stays under the cap top as before (reported by the check).
+                bool planPed = unit.Definition.PedestalSizeAlong > 0 && unit.Definition.PedestalSizeAcross > 0;
                 int per = g.Count / peds.Count;
                 bool alongS2 = g.Kind == PlanBarKind.PedestalLongitudinal;
+                var trans = groups.FirstOrDefault(x => x.Kind == PlanBarKind.PedestalTransverse);
+                double under = alongS2 && trans != null ? RebarCatalog.Size(trans.Size).Diameter : 0;
                 var (ps, pl) = PlanU(size, g.Dims[0], g.Dims[1], g.Dims[2], g.Pin, g.Length);
                 foreach (var p in peds)
                 {
                     double across = alongS2 ? p.WidthN : p.LengthS;
-                    double zOut = TopSpan(p.S - (alongS2 ? g.Dims[1] / 2 : across / 2), p.S + (alongS2 ? g.Dims[1] / 2 : across / 2), p.N - (alongS2 ? across / 2 : g.Dims[1] / 2), p.N + (alongS2 ? across / 2 : g.Dims[1] / 2)) - cov;
+                    double zOut = (planPed && p.Height > In(0.125) ? p.SeatZ
+                        : TopSpan(p.S - (alongS2 ? g.Dims[1] / 2 : across / 2), p.S + (alongS2 ? g.Dims[1] / 2 : across / 2), p.N - (alongS2 ? across / 2 : g.Dims[1] / 2), p.N + (alongS2 ? across / 2 : g.Dims[1] / 2))) - cov - under;
                     for (int k = 0; k < per; k++)
                     {
                         double t = per == 1 ? 0 : -across / 2 + In(4) + (across - In(8)) * k / (per - 1);
@@ -647,6 +716,24 @@ public sealed partial class SubstructureGenerator
                 bars.Add(PlanBarFixed("M", size, $"{where} pedestal bars", pts, g.Length));
             }
         }
+    }
+
+    /// <summary>Pedestal blocks (in cap order) carrying a seat of one of the girders of a plan note ("C,D", "B-D", "G-I,B-D"; A = girder index 0; a seat of
+    /// the ahead span, index + 1000, counts by its letter too). Empty when the text is empty or unreadable.</summary>
+    internal static List<PedestalInfo> PedestalBlocksOf(SubstructureUnit unit, string girders)
+    {
+        var idx = new HashSet<int>();
+        foreach (var part in (girders ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+        {
+            var m = System.Text.RegularExpressions.Regex.Match(part, @"^([A-Z])(?:-([A-Z]))?$");
+            if (!m.Success) return new();
+            char a = m.Groups[1].Value[0], b = m.Groups[2].Success ? m.Groups[2].Value[0] : a;
+            for (char c = a; c <= b; c++) idx.Add(c - 'A');
+        }
+        if (idx.Count == 0) return new();
+        return unit.PedestalBlocks.Where(p => unit.Pedestals.Any(q => idx.Contains(q.Girder % 1000)
+                && Math.Abs(q.RowS - p.S) <= p.LengthS / 2 + 1e-6 && Math.Abs(q.RowN - p.N) <= p.WidthN / 2 + 1e-6))
+            .OrderBy(p => p.S).ToList();
     }
 
     /// <summary>Hoop height h (out-to-out) so that the closed stirrup w x h has the listed developed length.</summary>
