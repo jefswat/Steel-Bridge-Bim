@@ -13,8 +13,8 @@ namespace SBM.IO.Ifc;
 /// <list type="bullet">
 /// <item>recorded extrusions (<see cref="ExtrudedSolid"/>: plates with bolt holes, angles, boxes, straight girder plates)
 ///   -> IfcPolygonalFaceSet: one IfcIndexedPolygonalFaceWithVoids per end cap (holes stay holes, as regular polygons) and one
-///   quad per side / hole wall. Exact for the outline; each hole circle becomes an inscribed polygon whose sagitta is at most
-///   the chord tolerance.</item>
+///   quad per side / hole wall. Exact for the outline; each hole circle becomes an equal-area polygon (same volume as the
+///   Parametric solid) with as many sides as an inscribed polygon of sagitta &lt;= the chord tolerance needs.</item>
 /// <item>prestressed beams with a true-arc profile (IfcExtrudedAreaSolid clipped by two IfcHalfSpaceSolid in Parametric)
 ///   -> one IfcPolygonalFaceSet: arcs tessellated to the chord tolerance, swept along the beam axis and cut EXACTLY by the
 ///   two skewed end planes (each side face is a planar quad, each end cap a planar polygon in its end plane).</item>
@@ -77,23 +77,51 @@ internal sealed class IfcReferenceViewGeometry
         return r;
     }
 
-    /// <summary>Clockwise polygon (a void loop) inscribed in a hole circle.</summary>
-    public Vec2[] HolePolygon(Hole h)
+    /// <summary>
+    /// Clockwise polygon (a void loop) with the AREA of the hole circle: vertices on radius r*sqrt(2 pi / (n sin(2 pi / n))),
+    /// so plate volumes match the Parametric extrusion (an inscribed polygon leaves e.g. a 2" conduit bore 10 % too full);
+    /// vertices lie just outside the circle, edge midpoints just inside, both within the sagitta of the inscribed polygon.
+    /// Falls back to the inscribed polygon when an enlarged vertex would leave the outline (<paramref name="outline"/>).
+    /// </summary>
+    public Vec2[] HolePolygon(Hole h, IReadOnlyList<Vec2>? outline = null)
     {
         double r = h.Diameter / 2;
         int n = CircleSegments(r, _tol);
+        double re = r * Math.Sqrt(2 * Math.PI / (n * Math.Sin(2 * Math.PI / n)));
+        var p = Ring(h.Center, re, n);
+        if (outline != null && !p.All(q => StrictlyInside(q, outline))) p = Ring(h.Center, r, n);
+        return p;
+    }
+
+    private static Vec2[] Ring(Vec2 c, double r, int n)
+    {
         var p = new Vec2[n];
         for (int k = 0; k < n; k++)
         {
             double a = -2 * Math.PI * k / n;
-            p[k] = h.Center + new Vec2(Math.Cos(a), Math.Sin(a)) * r;
+            p[k] = c + new Vec2(Math.Cos(a), Math.Sin(a)) * r;
         }
         return p;
     }
 
+    private static bool StrictlyInside(Vec2 c, IReadOnlyList<Vec2> o)
+    {
+        bool inside = false;
+        for (int i = 0, j = o.Count - 1; i < o.Count; j = i++)
+        {
+            var a = o[i]; var b = o[j];
+            if ((a.Y > c.Y) != (b.Y > c.Y) && c.X < a.X + (c.Y - a.Y) * (b.X - a.X) / (b.Y - a.Y)) inside = !inside;
+            var ab = b - a;
+            double len2 = Vec2.Dot(ab, ab);
+            double t = len2 > 0 ? Math.Clamp(Vec2.Dot(c - a, ab) / len2, 0, 1) : 0;
+            if (Vec2.Distance(a + ab * t, c) <= 1e-5) return false;
+        }
+        return inside;
+    }
+
     /// <summary>A recorded extrusion as an IfcPolygonalFaceSet (returns its id).</summary>
     public int Prism(ExtrudedSolid e) =>
-        Prism(e.Frame, e.Outline, e.Holes.Select(HolePolygon).ToList(), e.Extrusion, null, null);
+        Prism(e.Frame, e.Outline, e.Holes.Select(h => HolePolygon(h, e.Outline)).ToList(), e.Extrusion, null, null);
 
     /// <summary>
     /// Prestressed beam with an exact profile: the polygonized profile in <see cref="BeamBody.Frame"/> (mirrored when the

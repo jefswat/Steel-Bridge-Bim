@@ -182,7 +182,7 @@ public class IfcReferenceViewTests
         Assert.NotEmpty(ext);
         Assert.Equal(ext.Count, fs.Count); // the same solids, in the same order
         double tol = tolM / 0.3048;        // the sample project is in feet
-        int holes = 0, voids = 0;
+        int holes = 0, voids = 0, exact = 0;
         for (int i = 0; i < ext.Count; i++)
         {
             var (vp, h, radii) = ExtrusionVolume(par, ext[i]);
@@ -192,13 +192,15 @@ public class IfcReferenceViewTests
             voids += nv;
             Assert.Equal(2 * radii.Count, nv); // one void loop per hole in each end cap
             if (nv > 0) Assert.True(minV >= 8);
-            // Inscribed hole polygons remove a little less than the circles: at most perimeter x sagitta per hole
-            // (plus the 7-decimal coordinate rounding of both files).
+            // Hole polygons have the circle's area: same volume up to the 7-decimal coordinate rounding of both files
+            // (and, for a hole whose enlarged polygon would leave the outline, the inscribed fallback: perimeter x sagitta).
             double slack = radii.Sum(r => 2 * Math.PI * r * tol) * Math.Abs(h), noise = 1e-5 * vp + 1e-9;
             Assert.InRange(vr - vp, -noise, slack + noise);
+            if (radii.Count > 0) exact += Math.Abs(vr - vp) <= noise ? 1 : 0;
         }
         Assert.True(holes > 100, $"the sample should have bolt holes ({holes})");
         Assert.Equal(2 * holes, voids);
+        Assert.True(exact > 0.9 * ext.Count(x => ExtrusionVolume(par, x).Radii.Count > 0), "solids with holes should keep their volume");
     }
 
     [Fact]
