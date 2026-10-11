@@ -50,34 +50,80 @@ public sealed partial class ConcreteGenerator
         return list;
     }
 
+    /// <summary>Stations where finished grade may kink or change curvature along the alignment: cross-slope and pivot table rows,
+    /// grade breaks (VPIs without a curve) and vertical curve ends.</summary>
+    public static List<double> KinkStations(Alignments.Alignment a)
+    {
+        var sta = a.CrossSlope.Rows.Select(r => r.Station).ToList();
+        if (a.CrossSlope.PivotOffsets is { } po) sta.AddRange(po.Select(r => r.Station));
+        foreach (var v in a.Profile.Vpis)
+        {
+            if (v.CurveLength <= 0) sta.Add(v.Station);
+            else { sta.Add(v.Station - v.LengthIn); sta.Add(v.Station + v.LengthOut); }
+        }
+        return sta;
+    }
+
+    /// <summary>Alignment distances where the deck top kinks across its whole width (cross-slope / pivot / edge table stations) and
+    /// whose radial line crosses every column between the deck ends: the panel boundaries of the NURBS slab.</summary>
+    private List<double> KinkDistances(List<Func<double, double>> hard)
+    {
+        var sta = KinkStations(_a);
+        if (Deck.LeftEdgeTable is { } lt) sta.AddRange(lt.Select(r => r.Station));
+        if (Deck.RightEdgeTable is { } rt) sta.AddRange(rt.Select(r => r.Station));
+        var ends = hard.Select(h => EndsVar(h, InsetB, InsetE)).ToList();
+        double lo = ends.Max(e => e.b) + 0.05, hi = ends.Min(e => e.e) - 0.05;
+        var list = new List<double>();
+        foreach (double d in sta.Select(s => _a.StationToDistance(s)).Where(d => d > lo && d < hi).OrderBy(d => d))
+            if (list.Count == 0 || d - list[^1] > 0.05) list.Add(d);
+        return list;
+    }
+
     /// <summary>
-    /// Deck slab from NURBS: fits the bands between the hard columns to the exact top (alignment offset point + finished grade, ends where
-    /// each row crosses the deck-end lines) and fills <paramref name="top"/> / <paramref name="bot"/> for the generator's columns at the
-    /// u samples. Returns the slab (null = keep today's grid; the reason is reported).
+    /// Deck slab from NURBS: fits the panels x bands (between the hard columns and the kink stations) to the exact top (alignment offset
+    /// point + finished grade, rows ending where they cross the deck-end lines) and fills <paramref name="top"/> / <paramref name="bot"/>
+    /// for the generator's columns. Returns the slab (null = keep today's grid; the reason is reported).
     /// </summary>
     private NurbsSlab? NurbsDeck(List<Func<double, double>> cols, ref int ni, out Vec3[,] top, out Vec3[,] bot)
     {
         top = bot = new Vec3[0, 0];
         var hard = HardColumns();
         int bands = hard.Count - 1;
-        Func<double, Vec3> Row(int b, double v)
+        var kinks = KinkDistances(hard);
+        int panels = kinks.Count + 1;
+        Func<double, Vec3> Row(int pn, int b, double v)
         {
             var ha = hard[b]; var hb = hard[b + 1];
             Func<double, double> off = d => ha(d) + (hb(d) - ha(d)) * v;
             var (db, de) = EndsVar(off, InsetB, InsetE);
+            double d0 = pn == 0 ? db : kinks[pn - 1], d1 = pn == panels - 1 ? de : kinks[pn];
             return u =>
             {
-                double d = db + (de - db) * u, o = off(d);
+                double d = d0 + (d1 - d0) * u, o = off(d);
                 return _a.PointAtDistance(d, o).WithZ(Top(d, o));
             };
         }
-        var slab = NurbsSlab.Create(bands, Row, Deck.Thickness, _fitTol, out string reason);
+        var slab = NurbsSlab.Create(panels, bands, Row, Deck.Thickness, _fitTol, out string reason);
         if (slab == null) { _nurbs!.Fallback("deck slab", reason); return null; }
-        int n0 = ni;
-        var us = _geo!.ChordTolerance > 0 ? slab.Samples(_geo.ChordTolerance) : Enumerable.Range(0, n0).Select(i => (double)i / (n0 - 1)).ToList();
+        var (e0, e1) = EndsVar(hard[0], InsetB, InsetE);
+        var bnd = new List<double> { e0 };
+        bnd.AddRange(kinks);
+        bnd.Add(e1);
+        // u samples per panel: the chord tolerance, or today's spacing spread over the panels
+        var us = new List<(int pn, double u)>();
+        for (int pn = 0; pn < panels; pn++)
+        {
+            List<double> s;
+            if (_geo!.ChordTolerance > 0) s = slab.Samples(pn, _geo.ChordTolerance);
+            else
+            {
+                int n = Math.Max(1, (int)Math.Round((ni - 1) * (bnd[pn + 1] - bnd[pn]) / (e1 - e0)));
+                s = Enumerable.Range(0, n + 1).Select(i => (double)i / n).ToList();
+            }
+            foreach (double u in s) if (pn == 0 || u > 0) us.Add((pn, u));
+        }
         ni = us.Count;
-        var (d0, d1) = EndsVar(hard[0], InsetB, InsetE);
-        double dm = (d0 + d1) / 2;
+        double dm = (e0 + e1) / 2;
         var where = cols.Select(c =>
         {
             double o = c(dm);
@@ -93,7 +139,7 @@ public sealed partial class ConcreteGenerator
         for (int k = 0; k < cols.Count; k++)
             for (int i = 0; i < ni; i++)
             {
-                var p = slab.TopAt(where[k].Item1, where[k].Item2, us[i]);
+                var p = slab.TopAt(us[i].pn, where[k].Item1, where[k].Item2, us[i].u);
                 top[i, k] = p;
                 bot[i, k] = new Vec3(p.X, p.Y, p.Z - Deck.Thickness);
             }
@@ -136,14 +182,29 @@ public sealed partial class ConcreteGenerator
             var r = Exact(s);
             if (r[3].Z < r[0].Z + 1e-3 || r[2].Z < r[1].Z + 1e-3) { _nurbs!.Fallback("haunch", $"{g.Name}: haunch thinner than 1 mm"); return false; }
         }
-        var sw = NurbsSweep.Create(4, Exact, ss[0], ss[^1], breaks, _fitTol, out string reason);
-        if (sw == null) { _nurbs!.Fallback("haunch", $"{g.Name}: {reason}"); return false; }
-        var us = _geo!.ChordTolerance > 0 ? sw.Samples(_geo.ChordTolerance) : ss.ToList();
+        // Per-span layouts may jog the path (points 0.01 mm apart): separate solids on each side, as one loft cannot be C0 there.
+        var runs = new List<(int a, int b)>();
+        int r0 = 0;
+        for (int i = 0; i + 1 < ss.Count; i++)
+            if (ss[i + 1] - ss[i] < 1e-4) { runs.Add((r0, i)); r0 = i + 1; }
+        runs.Add((r0, ss.Count - 1));
+        var sweeps = new List<NurbsSweep>();
+        foreach (var (ia, ib) in runs)
+        {
+            if (ib <= ia) continue;
+            var sw = NurbsSweep.Create(4, Exact, ss[ia], ss[ib], breaks, _fitTol, out string reason);
+            if (sw == null) { _nurbs!.Fallback("haunch", $"{g.Name}: {reason}"); return false; }
+            sweeps.Add(sw);
+        }
         var sec = new[] { new Vec2(-1, 0), new Vec2(1, 0), new Vec2(1, 1), new Vec2(-1, 1) };
-        int tri0 = mesh.TriangleCount;
-        MeshBuilder.AddLoft(mesh, sec, us.Select(sw.Ring).ToList());
-        mesh.AddNurbs(sw.ToSolid("haunch"), tri0);
-        _nurbs!.Built("haunch", sw.MaxDeviation);
+        foreach (var sw in sweeps)
+        {
+            var us = _geo!.ChordTolerance > 0 ? sw.Samples(_geo.ChordTolerance) : ss.Where(s => s >= sw.U0 - 1e-9 && s <= sw.U1 + 1e-9).ToList();
+            int tri0 = mesh.TriangleCount;
+            MeshBuilder.AddLoft(mesh, sec, us.Select(sw.Ring).ToList());
+            mesh.AddNurbs(sw.ToSolid("haunch"), tri0);
+            _nurbs!.Built("haunch", sw.MaxDeviation);
+        }
         return true;
     }
 

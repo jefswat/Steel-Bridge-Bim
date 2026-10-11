@@ -546,6 +546,14 @@ public sealed class FramingGenerator
             path.ExactBreaks.Add(0);
             path.ExactBreaks.AddRange(starts);
             path.ExactBreaks.Add(sAcc + ext1);
+            // where the deck grade kinks or changes curvature (cross-slope rows, VPIs, vertical curve ends): along curved spans
+            foreach (double kd in Concrete.ConcreteGenerator.KinkStations(_align).Select(_align.StationToDistance))
+                for (int j = 0; j < NSpan; j++)
+                {
+                    var c = spans[j];
+                    if (c.Chorded || kd <= c.D0 || kd >= c.D1) continue;
+                    path.ExactBreaks.Add(starts[j] + c.SAt((kd - c.D0) / (c.D1 - c.D0)));
+                }
             if (!PS)
                 path.Exact = s =>
                 {

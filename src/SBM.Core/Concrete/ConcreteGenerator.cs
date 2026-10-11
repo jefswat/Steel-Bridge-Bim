@@ -141,7 +141,6 @@ public sealed partial class ConcreteGenerator
         var sw = Stopwatch.StartNew();
         if (!framing.HasErrors && framing.Deck != null) g.Run();
         g._m.Diagnostics.AddRange(g._diag);
-        if (g._nurbs is { } nr && g._m.Deck != null) g._m.Diagnostics.Add(new Diagnostic(DiagnosticSeverity.Info, "Concrete: " + nr.Summary()));
         g._m.GenerationTime = sw.Elapsed;
         return g._m;
     }

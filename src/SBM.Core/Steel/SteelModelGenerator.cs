@@ -78,7 +78,6 @@ public sealed partial class SteelModelGenerator
         g._model.Studs.AddRange(g._studs.OrderBy(b => b.Assembly, MarkComparer.Instance));
         g._model.BearingSeats.AddRange(g._seats.OrderBy(s => s.Station).ThenBy(s => s.Girder));
         g._model.Diagnostics.AddRange(g._diag.Distinct());
-        if (g._model.Nurbs is { } nr) g._model.Diagnostics.Add(new Diagnostic(DiagnosticSeverity.Info, "Steel: " + nr.Summary()));
         g._model.GenerationTime = sw.Elapsed;
         return g._model;
     }
