@@ -235,7 +235,9 @@ public sealed class SbmDocument
     public List<SBM.Core.Checks.ElevationChain> BearingElevations(string? bridgeName = null)
     {
         var m = Model(bridgeName);
-        return SBM.Core.Checks.ElevationCheck.AllBearings(m.Framing, m.Steel, Project.Units, m.Substructure, m.Prestressed);
+        // Other bridges' substructures: a shared pier is built by its owner bridge.
+        var others = _models.Where(x => x != null && !ReferenceEquals(x, m)).Select(x => x!.Substructure).OfType<SBM.Core.Substructure.SubstructureModel>().ToList();
+        return SBM.Core.Checks.ElevationCheck.AllBearings(m.Framing, m.Steel, Project.Units, m.Substructure, m.Prestressed, others);
     }
 
     /// <summary>Elevation chain at a girder web centerline at a station (finished grade down to bottom of steel).</summary>

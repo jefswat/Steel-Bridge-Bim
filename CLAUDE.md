@@ -170,7 +170,15 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
     The user's PGSuper/BridgeLink tooling lives in `Documents\PGSuper-master\copilot` (agent, MCP) â€” reuse its export.
   - `Checks/ElevationCheck.cs` â€” transparent elevation chains (`CalcStep` rows: profile via `VerticalProfile.Explain`,
     cross slope, slab, haunch, web, flange, sole plate, bearing stack) reconciled against framing + `BearingSeats`.
-    MUST mirror `BearingDetailer` math; tests fail if they drift.
+    MUST mirror `BearingDetailer` math; tests fail if they drift. Below the seat, `Checks/ElevationCheckSubstructure.cs`
+    (`AddSubstructure`) continues the chain: pedestal (plan size / shared block top = highest seat) or as-designed abutment
+    beam step → cap top from the `CapProfile` polygon upper envelope (stepped `CapProfileAhead` on the ahead half, cap
+    section step as an info row) → cap bottom → soffit at the nearest column (= column top) → flare → footing / shaft →
+    pile head. Each row states its input; values are compared with the `SubstructureGenerator` unit (MUST mirror it;
+    `ElevationCheckSubstructureTests`) and exposed as `ElevationChain.Substructure`. Input differences (seats that differ
+    on a shared block, seats beyond the cap, step top vs seat) go to `ElevationChain.Reported` — never adjusted. Shared
+    piers built by another bridge are found via `others` (`SbmDocument.BearingElevations` passes the other bridges' units).
+    Plan reconciliation: `samples\plans\check-substructure-chains.csx`.
   - `Project/RegenerationCache.cs` â€” per-bridge hash cache used by app and API.
   - Steel generator phases: layouts â†’ connections (cross frames, field splices, lateral bracing register bolt holes
     in `_holes` / `_stiffHoles` / `_studExclusions`) â†’ members (girder plates, stiffeners, bearings, studs). Files:
@@ -210,8 +218,22 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   (DirectX 11, System.Numerics types; namespaces `HelixToolkit`, `HelixToolkit.SharpDX`, `HelixToolkit.Wpf.SharpDX`).
   - `Viewport/SceneBuilder` batches each layer into one LineGeometry3D + one BillboardText3D; vertices are rebased to a
     local origin (state-plane coords exceed float precision). Model-sized text (FixedSize=false).
-  - `Editors/` input windows built from `FieldBase` rows (TextField/ChoiceField/BoolField/SpacingField) and DataGrids of
+  - `Editors/` input windows built from `FieldBase` rows (TextField/ChoiceField/BoolField/SpacingField/StringField with
+    optional validator + AllowEmpty/LengthListField = comma list of lengths, blank = null) and DataGrids of
     `CellValue` (unit-aware text cells). Apply = regenerate without closing.
+    Bridge editor tabs beyond the basics: Substructure (support combo = supports THEN auxiliary supports; pedestal plan
+    sizes S/N + shared block, chamfer / flare column geometry, per-face column bars, chamfer positions, hoop overlap,
+    crossties, flare cage, ColumnSplice Lap/Coupler + pattern), Aux. Supports (AuxiliarySupports grid + Girders.Beginnings
+    grid; renaming an aux support carries its beginnings), Deck Ends & Joints (first/last support: ExpansionJoint +
+    EndBlock; explicit Soffit polyline is kept, script only), Deck & Barrier (Deck.EdgeStrip; Width 0 = null).
+    `SupportRowVm.Source` keeps the loaded SupportDefinition so inputs WITHOUT an editor (SharedPier, GirderFixities,
+    DeckEndPoints, EndSupport/EndSplice/EndOffset, PierCenterOffset, Bearing...) survive Apply; build new support inputs
+    from it, never `new SupportDefinition`. Snapshot: `--editors [--editbridge NAME] [--editsupport NAME]` picks the bridge
+    and the support shown on Substructure / Deck Ends; long tabs also render scrolled pages `_bridgeN_p1..`.
+    Still script/API only (no editor): abutment / wingwall / counterfort detail + abutment rebar, cap profiles + aesthetics,
+    CapBars, cross-frame styles / bolting, field splice plate details, GirderBeginning cross-girder details,
+    Girders.CrossGirder / PlanGeometry / Terminations, inspection access, drains, lighting, sign supports, misc items,
+    DeckPlanReinforcement families / end dam, deck edge tables, prestressed strand layout, pile web / batter / uplift.
   - Header readability: App.xaml defines explicit TabItem (`SbmTabItem`) and DataGridColumnHeader templates â€” do NOT
     use `BasedOn="{StaticResource {x:Type TabItem}}"` (resolves to the classic light template). TabItem Foreground is
     inherited by tab content, so it must stay light. All windows get dark title bars (DWM) and a light default

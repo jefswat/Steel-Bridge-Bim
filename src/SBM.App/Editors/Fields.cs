@@ -100,7 +100,8 @@ public sealed partial class TextField : FieldBase
         init { _blankMeans = value; Refresh(); }
     }
     private readonly string? _blankMeans;
-    public string Hint => BlankMeans != null ? $"blank = {BlankMeans}; {ValueFormat.Hint(_units, Kind)}" : ValueFormat.Hint(_units, Kind);
+    public string Hint => BlankMeans == null ? ValueFormat.Hint(_units, Kind)
+        : ValueFormat.Hint(_units, Kind) is { Length: > 0 } h ? $"blank = {BlankMeans}; {h}" : $"blank = {BlankMeans}";
 
     public TextField(UnitSystem units, string label, ValueKind kind, Func<double> get, Action<double> set, Func<double, string?>? validate = null, string? tip = null)
     {
@@ -148,23 +149,74 @@ public sealed partial class StringField : FieldBase
 {
     private readonly Func<string> _get;
     private readonly Action<string> _set;
+    private readonly Func<string, string?>? _validate;
     [ObservableProperty] private string _text = "";
+    /// <summary>A blank entry is allowed (stored as "").</summary>
+    public bool AllowEmpty { get; init; }
 
-    public StringField(string label, Func<string> get, Action<string> set)
+    public StringField(string label, Func<string> get, Action<string> set, Func<string, string?>? validate = null, string? tip = null)
     {
         Label = label;
         _get = get;
         _set = set;
+        _validate = validate;
+        ToolTip = tip;
         Refresh();
     }
 
     public override void Refresh() => Text = _get();
     public override bool Commit()
     {
-        if (string.IsNullOrWhiteSpace(Text)) { Error = "Required."; return false; }
-        _set(Text.Trim());
+        string t = (Text ?? "").Trim();
+        if (t.Length == 0 && !AllowEmpty) { Error = "Required."; return false; }
+        if (t.Length > 0 && _validate?.Invoke(t) is { } msg) { Error = msg; return false; }
+        Error = null;
+        _set(t);
         return true;
     }
+
+    partial void OnTextChanged(string value) => Error = null;
+}
+
+/// <summary>Comma-separated list of lengths (e.g. bar positions "8, 15 1/4, 22 1/2"); blank = none (null).</summary>
+public sealed partial class LengthListField : FieldBase
+{
+    private readonly UnitSystem _u;
+    private readonly LengthKind _kind;
+    private readonly Func<List<double>?> _get;
+    private readonly Action<List<double>?> _set;
+    [ObservableProperty] private string _text = "";
+    public string Hint { get; }
+
+    public LengthListField(UnitSystem u, string label, LengthKind kind, Func<List<double>?> get, Action<List<double>?> set, string blankMeans, string? tip = null)
+    {
+        _u = u;
+        _kind = kind;
+        Label = label;
+        _get = get;
+        _set = set;
+        ToolTip = tip;
+        Hint = $"blank = {blankMeans}; comma list, {ValueFormat.Hint(u, kind == LengthKind.Short ? ValueKind.LengthShort : ValueKind.LengthLong)}";
+        Refresh();
+    }
+
+    public override void Refresh() => Text = _get() is { Count: > 0 } l ? string.Join(", ", l.Select(x => _u.FormatLength(x, _kind))) : "";
+
+    public override bool Commit()
+    {
+        var list = new List<double>();
+        foreach (var tok in (Text ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+        {
+            if (!_u.TryParseLength(tok, _kind, out double v) || v < 0) { Error = $"Can't read \"{tok}\"."; return false; }
+            list.Add(v);
+        }
+        Error = null;
+        _set(list.Count == 0 ? null : list);
+        Refresh();
+        return true;
+    }
+
+    partial void OnTextChanged(string value) => Error = null;
 }
 
 public sealed partial class BoolField : FieldBase
@@ -239,7 +291,7 @@ public sealed class FieldTemplateSelector : DataTemplateSelector
 
     public override DataTemplate? SelectTemplate(object item, DependencyObject container) => item switch
     {
-        TextField or SpacingField or IntListField => Text,
+        TextField or SpacingField or IntListField or LengthListField => Text,
         StringField => String,
         BoolField => Bool,
         ChoiceField => Choice,

@@ -135,7 +135,7 @@ as "…before bearing iteration.sbm". The run confirmed item 2.3: girder C has n
 
 | # | Issue | Evidence | Fix needed |
 |---|---|---|---|
-| 2.1 | ✅ **Pier 6A built.** New feature: auxiliary support lines plus girder beginnings. Unit 2 girders A–E start on Pier 6A (`pier-6a.csx`); bearings on plan positions (0.01"); as-designed hammerhead with a stepped cap (Unit 2 on the lower half), 10'×6'-6" column, 24 piles. Gore slope 3.4% from 6A to 7591+50 added. | 6A pedestals 6.0–6.3"; 5WB carries Unit 2 F–K only; no seats out of range anywhere. | Bent view labels the beak tips as "top of cap" on as-designed caps (cosmetic). No editor UI for auxiliary supports yet (script/API only). |
+| 2.1 | ✅ **Pier 6A built.** New feature: auxiliary support lines plus girder beginnings. Unit 2 girders A–E start on Pier 6A (`pier-6a.csx`); bearings on plan positions (0.01"); as-designed hammerhead with a stepped cap (Unit 2 on the lower half), 10'×6'-6" column, 24 piles. Gore slope 3.4% from 6A to 7591+50 added. | 6A pedestals 6.0–6.3"; 5WB carries Unit 2 F–K only; no seats out of range anywhere. | Bent view labels the beak tips as "top of cap" on as-designed caps (cosmetic). Editor UI: bridge editor tab Aux. Supports (lines + girder beginnings). |
 | 2.2 | ✅ **Cross slopes fixed** (`cross-slope-i80.csx`, sheet 190). Gore slope break: 3% beyond 12' LT from 7591+50 (corrected in 2.4). South side transitions -2% → +2% over 410 ft (7591+48 to 7595+58) before going to +3% and +5.9%. The CL profile is re-derived from the PGL. New `CrossSlopeRow.LeftBreak/LeftOuterSlope` (and Right*). | 6WB/7WB pedestals now 6.8–15.6" and 7.3–9.8"; no seats out of range anywhere. | Unit 1 south 2.73% now modeled (2.4). The deck mesh has no vertex at the slope break (surface interpolates across it). |
 | 2.3 | ✅ **Girder terminations fixed.** Unit 3 B ends 60'-3 11/16" past 12WB and C 53'-2 11/16" past 13WB (design sheet 115); I had read B's span length as its end. Unit 2 E/D checked on sheet 114: correct. | B now bears on 12WB, C on 13WB. | — |
 | 2.4 | ✅ **Seat bias = bearing height.** The model stack was 6.6"; the plans assume 9" (bottom of flange to bottom of the ⅛" pad; 9⅝" at 5WB ahead F–K, 10 3/16" at 5G ahead, 9⅜" at 14G back). Bearings are vendor-designed, so they are now **generic** (`BearingType.Generic`): sole plate + one body + masonry plate sized from the anchors + pad. The anchors are per the tables (X/Y, 1½"/2½", 1'-6/2'-6) as per-support `SupportDefinition.Bearings`; MD/GE/FX per girder via `GirderFixities` (`bearings.csx`). | 13WB G seat 1013.556 vs plan pedestal top 1013.56. `check-top-of-bearing.csx`: Unit 3 and Unit 2 8WB–11WB are within ±0.1" of the table's top of bearing. | ✅ **I-80 cross slopes corrected from sheet 190** (`cross-slope-i80.csx`): Unit 1 south 2.73% beyond 12' RT; north lane 2 (12'–24' LT) 2%→3% over 102.50'; from 7591+50 3% beyond 12' LT (was 24'); crash-cushion curb 24'–27.68' and 3.4% gore near 6A (new `LeftMoreBreaks`). I-80 top of slab ±0.2" vs the plan table at 5WB/6A/6WB/7WB; top of bearing ±0.4" except below. Remaining mismatches moved to section 7 (deferred). |
@@ -202,12 +202,20 @@ as "…before bearing iteration.sbm". The run confirmed item 2.3: girder C has n
   groups per face (#11 / #14 / #18), paired 6e1 hoops + 5e2 crossties, flare cages (#7, 6e3). Clear cover checked: 2"
   hoops, 2.75" verticals, 3½"/4.25" flare. Approximations: flare 6e3 lapped pairs modeled as single closed hoops at half
   the spacing; column bars run continuous from the footing (plans: 11d2 dowels lapped, #18 mechanical couplers);
-  11G/12G inner 6e4 ties not modeled. No editor UI for the new column-rebar inputs yet (script/API).
+  11G/12G inner 6e4 ties not modeled. Editor UI: bridge editor Substructure tab (per-face bars, chamfer positions, hoops, crossties, flare cage, splices).
 
 - **Close-ups:** `--closeup SUBn@Bridge` uses a station section cut, which is wrong for Ramp G (other alignment). The free `--camera E,N,Z,dx,dy,dz,width[,dist]` often frames poorly; it needs testing.
 - **IfcOpenShell meshing of round-column ties** (Piers 4WB–7WB): those ties come out 2–4× their volume, cause unknown. Spirals and stirrups are fine.
 - **Possible further IFC size cuts:** rebar typed by mark, about −35 MB; coordinates trimmed to 5 decimals, about −12 MB.
-- **Elevation check** (`Checks/ElevationCheck`) doesn't know about as-designed caps yet.
+- ✅ **Elevation check knows the as-designed substructure** (2026-10-11, `Checks/ElevationCheckSubstructure.cs`): every
+  bearing chain continues seat → pedestal (plan size / shared block = highest seat) or abutment beam step → cap top from
+  the `CapProfile` / stepped `CapProfileAhead` polygon → cap bottom → column top (soffit at the nearest column) → flare →
+  footing / shaft → pile head, each row with its source, compared with the generated unit. Shared piers built by the other
+  bridge are found too. Model run: 244/244 chains reach the foundation (was 216 reaching the cap), 0 mismatches (was 18:
+  as-designed abutment steps), 6 REPORTED shared-block seat differences (5WB G6, 5G ×4, 14G; 1/8"-5/16", not adjusted).
+  `samples\plans\check-substructure-chains.csx` reconciles the chain with the plan data: 779 values, 13 flags = the 13
+  known seat / pedestal-height rows of `docs\plan-data\substructure-elevation-check.md` §2.3; substructure elevation check
+  unchanged at 49 flags (Pier 5G overall-dimension misprint still the only closure failure).
 
 ## 4a. To do: column rebar approximations (from `column-rebar.csx`)
 
@@ -216,7 +224,6 @@ as "…before bearing iteration.sbm". The run confirmed item 2.3: girder C has n
 - Pier 11G/12G inner 6e4 ties are not modeled.
 - Bar 18d9 (terminates at the column top to clear the cap bars) is modeled running full height.
 - Chamfer bar groups on the plans are slightly off-centre (e.g. 8 / 9¼ ends); exact positions are used where given, centred groups elsewhere.
-- Editor UI for the new column-rebar inputs (faces, chamfer positions, hoop overlap, crossties, flare cage).
 - Generic bearings: bearing body 16"×16" and masonry plate 1¾" are assumptions (vendor items).
 
 ## 4a-bis. Open decisions page (2026-10-11)

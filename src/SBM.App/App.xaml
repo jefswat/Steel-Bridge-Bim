@@ -227,7 +227,7 @@
                 </Grid>
             </DataTemplate>
             <DataTemplate x:Key="FieldString" DataType="{x:Type ed:StringField}">
-                <Grid Margin="0,3">
+                <Grid Margin="0,3" ToolTip="{Binding ToolTip}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="210"/>
                         <ColumnDefinition Width="260"/>

@@ -107,6 +107,15 @@ The seat elevations come from the superstructure chain (grade - slab - haunch - 
 | Pier 16G | Pedestal height (printed) 2 | 4.3750 in | 64 | 4.2308 | -0.1442 in |
 | Pier 19G | Pedestal top (*ELEV.) 2 (row A) | 1012.2400 ft | 75 | 1012.2293 | -0.0107 ft |
 
+Cross-check with the bearing elevation chains (2026-10-11, `samples\plans\check-substructure-chains.csx`): all 244 bearing
+chains (both bridges) now run seat → pedestal → as-designed cap → column → footing → pile head and match the generated
+units (0 mismatches; before: only 216 chains reached the cap, 18 as-designed abutment bearings mismatched because the old
+chain ignored the beam steps). Chain values vs this plan data: 779 compared on 35 piers, 13 flagged = exactly the 13 seat /
+pedestal-height rows of the table above; cap top under the seat (226), column top (35), flare (48), footing top / bottom
+(68 each) and pile head (68) all within 0.01 ft. The chains also REPORT 6 seats that sit lower than their shared pedestal
+block (block top = highest carried seat): Pier 5WB G6 (3/16"), Pier 5G Ramp G Unit 1 G2/G3/G4 and Unit 2 G1 (1/8"-3/16"),
+Pier 14G Unit 3 G1 (5/16"; the printed 1028.25 is within 0.004 ft of the lower seat 1028.246; the block top / higher seat is 1028.270). Reported only.
+
 ### 2.4 Plan misprint (the plan does not close)
 
 | Pier | Item | Plan | PDF | Reconciled value | Note |
