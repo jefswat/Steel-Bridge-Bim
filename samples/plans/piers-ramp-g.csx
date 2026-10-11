@@ -38,11 +38,12 @@ List<FootingPoint> Grid((double n, double[] s)[] rows) => rows.SelectMany(r => r
 {
     double m = (eR - eL) / (xR - xL);
     double Top(double x) => eL + m * (x - xL);
+    double k = Math.Sqrt(1 + m * m);   // plan depths are perpendicular to the sloped top (substructure-elevation-check.md)
     List<CapProfilePoint> P(double lift) => new()
     {
         new(S(xL), F(Top(xL) + lift)), new(S(xR), F(Top(xR) + lift)),
-        new(S(xTR), F(Top(xR) - tipDepth)), new(S(xKR), F(Top(xKR) - kinkDepth)),
-        new(S(xKL), F(Top(xKL) - kinkDepth)), new(S(xTL), F(Top(xL) - tipDepth)),
+        new(S(xTR), F(Top(xR) - tipDepth * k)), new(S(xKR), F(Top(xKR) - kinkDepth * k)),
+        new(S(xKL), F(Top(xKL) - kinkDepth * k)), new(S(xTL), F(Top(xL) - tipDepth * k)),
     };
     return (P(0), step > 0 ? P(step) : new());
 }

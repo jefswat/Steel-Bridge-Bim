@@ -4,6 +4,9 @@
 // elevations in feet (NAVD88 as on the plans). Pedestal tops are compared with the model's bearing seats.
 using SBM.Core.Bridge;
 using SBM.Core.Geometry;
+// Plan cap depths (7'-0, 4'-6 to the tip, 9'-0 TYP.) are dimensioned PERPENDICULAR to the sloped top: vertical = depth * sqrt(1 + m^2)
+// (substructure-elevation-check.md: up to 0.018 ft on steep caps when applied vertically).
+double PerpK(Func<double, double> top) { double m = top(1) - top(0); return Math.Sqrt(1 + m * m); }
 
 var units = Doc.Units;
 double F(double ft) => Ft(ft);
@@ -56,10 +59,10 @@ void Report(string bridge, int j, (string label, double planElevFt)[] seats)
     List<CapProfilePoint> Profile(double lift) => new()
     {
         P(-42.5, Top(-42.5) + lift), P(42.5, Top(42.5) + lift),            // top corners
-        P(43.927, Top(42.5) - 4.5),                                         // right tip
-        P(35.5, Top(35.5) - 7.0),                                           // right soffit kink
-        P(-35.5, Top(-35.5) - 7.0),                                         // left soffit kink
-        P(-43.479, Top(-42.5) - 4.5),                                       // left tip
+        P(43.927, Top(42.5) - 4.5 * PerpK(Top)),                            // right tip (depths are perpendicular to the sloped top)
+        P(35.5, Top(35.5) - 7.0 * PerpK(Top)),                              // right soffit kink
+        P(-35.5, Top(-35.5) - 7.0 * PerpK(Top)),                            // left soffit kink
+        P(-43.479, Top(-42.5) - 4.5 * PerpK(Top)),                          // left tip
     };
     sd.CapProfile = Profile(0);
     sd.CapProfileAhead = Profile(step);
@@ -187,8 +190,8 @@ foreach (var p in ip)
     sd.CapProfile = new()
     {
         new(Sx(-p.half), F(Top(-p.half))), new(Sx(p.half), F(Top(p.half))),
-        new(Sx(p.half + p.extR), F(Top(p.half) - 4.5)), new(Sx(kR), F(Top(kR) - 7)),
-        new(Sx(kL), F(Top(kL) - 7)), new(Sx(-p.half - p.extL), F(Top(-p.half) - 4.5)),
+        new(Sx(p.half + p.extR), F(Top(p.half) - 4.5 * PerpK(Top))), new(Sx(kR), F(Top(kR) - 7 * PerpK(Top))),
+        new(Sx(kL), F(Top(kL) - 7 * PerpK(Top))), new(Sx(-p.half - p.extL), F(Top(-p.half) - 4.5 * PerpK(Top))),
     };
     sd.CapWidth = F(6);
     sd.ColumnCount = p.cols.Length; sd.FirstColumnOffset = Sx(p.cols[0]);

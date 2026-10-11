@@ -86,6 +86,10 @@ double p11 = u2.Supports[^1].Station, sE = u3.Supports[^1].Station;
 // R = 1746'-5 to P.C.C. 7601+39.20, 78.67' LT; R = 2321'-4 to Pier 11WB (75'-2 out to out = 37'-7 LT of CL WB).
 u2.Deck.LeftEdgeTable = Edge("Unit 2", new[]
 {
+    // From the 6A end of slab to 7591+50.68 the north edge is 13'-7 left of CL Ramp A2 (sheet 179 / PDF 186; Ramp A2 CL
+    // 7591+08.83, 107.43' LT per sheet 190 / PDF 197) -> 121.00' LT at the 6A line, not 118.65 held back to 6A (that put
+    // girder A inside the level barrier strip; docs/plan-data/gore-6a-edge.md).
+    (Wb("7591+09.60"), 121.00, 0.0),
     (Wb("7591+50.68"), 118.65, 0.0),
     (Wb("7597+73.11"), 87.53, 0.0),
     (Wb("7601+39.20"), 78.67, 1746 + 5 / 12.0),

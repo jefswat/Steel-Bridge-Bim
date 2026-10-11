@@ -72,19 +72,19 @@ for (int it = 0; it < 6; it++)
 
 // ---- the as-designed pier
 var sd = SubstructureDefinition.Default(SupportType.Pier);
-double tL = 1010.75, tR = 1012.51, step = 1011.50 - 1010.75;
-double m = (tR - tL) / 52.0;
-double Top(double x) => tL + m * (x + 26);
-List<CapProfilePoint> Prof(double lift) => new()
+// Top corners of the two halves as printed (sheet 37-40): lower half 1010.75 / 1012.51 (Unit 2), upper half 1011.50 / 1013.28 —
+// the step is 0.75 at the left end and 0.77 at the right (substructure-elevation-check.md), so each half gets its own corners.
+double tL = 1010.75, tR = 1012.51, aL = 1011.50, aR = 1013.28;
+List<CapProfilePoint> Prof(double cL, double cR) => new()
 {
-    new(Splan(-26), F(Top(-26) + lift)), new(Splan(26), F(Top(26) + lift)),
-    new(Splan(26 + FI(1, 6.125) / Ft(1)), F(Top(26) - 5)), new(Splan(5.5), F(1003.31)),
-    new(Splan(-5.5), F(1002.94)), new(Splan(-26 - FI(1, 2) / Ft(1)), F(Top(-26) - 5)),
+    new(Splan(-26), F(cL)), new(Splan(26), F(cR)),
+    new(Splan(26 + FI(1, 6.125) / Ft(1)), F(tR - 5)), new(Splan(5.5), F(1003.31)),
+    new(Splan(-5.5), F(1002.94)), new(Splan(-26 - FI(1, 2) / Ft(1)), F(tL - 5)),
 };
 // Unit 2 (ahead) bears on the LOWER half (1010.75 / 1012.51): with the gore's 3.4% slope its seats run parallel to that
 // half at about 6"; the back half (Ramp A2 bridge) is 0.75 ft higher.
-sd.CapProfile = Prof(step);
-sd.CapProfileAhead = Prof(0);
+sd.CapProfile = Prof(aL, aR);          // back half = upper half (as before: the previous code raised CapProfile by the step)
+sd.CapProfileAhead = Prof(tL, tR);     // ahead half = lower half, carries Unit 2
 sd.CapWidth = F(8);
 sd.ColumnCount = 1; sd.FirstColumnOffset = Splan(0); sd.ColumnSpacings = new();
 sd.ColumnShape = ColumnShape.Rectangular; sd.ColumnWidth = F(10); sd.ColumnDepth = FI(6, 6);
