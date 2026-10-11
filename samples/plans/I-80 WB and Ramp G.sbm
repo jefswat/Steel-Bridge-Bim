@@ -1791,6 +1791,8 @@
               "RightEndOffset": 11.506200000000002,
               "BackwallLeftOffset": "NaN",
               "BackwallRightOffset": "NaN",
+              "CorbelLeftOffset": -7.315200000000001,
+              "CorbelRightOffset": 10.972800000000001,
               "FootingBackToBackwallBack": 0.038099999999999995,
               "BackwallThickness": 0.45720000000000005,
               "BackwallFrontToBearing": 0.5588,
@@ -2027,6 +2029,7 @@
                 "FrontFaceBarLength": 3.8862000000000005,
                 "BackFaceSpacing": 0.15239999999999998,
                 "FrontFaceSpacing": 0.3048,
+                "BackwallStringStartOffset": "NaN",
                 "BackFaceEdge": 0.15239999999999998,
                 "FrontFaceEdge": 0.3048,
                 "BackwallBarCover": 0.0508,
@@ -57255,6 +57258,8 @@
               "RightEndOffset": 11.506200000000002,
               "BackwallLeftOffset": "NaN",
               "BackwallRightOffset": "NaN",
+              "CorbelLeftOffset": -12.8016,
+              "CorbelRightOffset": 10.972800000000001,
               "FootingBackToBackwallBack": 0.038099999999999995,
               "BackwallThickness": 0.45720000000000005,
               "BackwallFrontToBearing": 0.5588,
@@ -57493,6 +57498,7 @@
                 "FrontFaceBarLength": 3.0988,
                 "BackFaceSpacing": 0.15239999999999998,
                 "FrontFaceSpacing": 0.3048,
+                "BackwallStringStartOffset": "NaN",
                 "BackFaceEdge": 0.15239999999999998,
                 "FrontFaceEdge": 0.3048,
                 "BackwallBarCover": 0.0508,
@@ -72901,8 +72907,10 @@
               "Source": "Iowa DOT Design 316 Ramp G South abutment, sheets 80-83",
               "LeftEndOffset": -2.7178000000000004,
               "RightEndOffset": 8.8138,
-              "BackwallLeftOffset": -1.8288000000000002,
-              "BackwallRightOffset": 7.9248,
+              "BackwallLeftOffset": "NaN",
+              "BackwallRightOffset": "NaN",
+              "CorbelLeftOffset": -1.8288000000000002,
+              "CorbelRightOffset": 7.9248,
               "FootingBackToBackwallBack": 0.038099999999999995,
               "BackwallThickness": 0.45720000000000005,
               "BackwallFrontToBearing": 0.43179999999999996,
@@ -72919,6 +72927,10 @@
                 }
               ],
               "BackwallTop": [
+                {
+                  "S": -2.463800000205075,
+                  "Elevation": 306.013104
+                },
                 {
                   "S": -1.8288000001167122,
                   "Elevation": 306.013104
@@ -73115,6 +73127,7 @@
                 "FrontFaceBarLength": 3.3528000000000002,
                 "BackFaceSpacing": 0.15239999999999998,
                 "FrontFaceSpacing": 0.3048,
+                "BackwallStringStartOffset": -1.8288000000000002,
                 "BackFaceEdge": 0.15239999999999998,
                 "FrontFaceEdge": 0.3048,
                 "BackwallBarCover": 0.0508,
