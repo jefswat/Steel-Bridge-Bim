@@ -416,6 +416,24 @@ else
     }
 }
 
+// ---------------------------------------------------------------- terrain (3DEP lidar 2020, 1 m, NAVD88) vs plan ground - INFO (placement is APPROXIMATE, U1)
+{
+    var pts = new (string what, string sta, double off, double elev)[]
+    {
+        ("CL I-29 x CL Floyd (Floyd grade at 103+29.91, p.6 VC)", "464+51.66", 0, 1096.78 + 0.5 - 0.01 * 79.91 + 0.02 / 200 * 79.91 * 79.91),
+        ("S berm A1", "464+07.48", -67.58, 1098.01), ("S berm A2", "463+89.85", 27.00, 1097.85), ("S berm A3", "463+82.61", 67.58, 1098.36),
+        ("S berm B1", "463+61.58", -67.58, 1113.17), ("S berm B2", "463+44.56", 27.00, 1115.38), ("S berm B3", "463+37.29", 67.58, 1116.43),
+        ("N berm A1", "465+29.97", -67.58, 1097.94), ("N berm A2", "465+07.18", 27.00, 1097.96), ("N berm A3", "464+97.97", 67.58, 1098.63),
+        ("N berm B1", "465+82.29", -67.58, 1111.69), ("N berm B2", "465+57.26", 27.00, 1115.70), ("N berm B3", "465+47.15", 67.58, 1117.75),
+    };
+    foreach (var p in pts)
+    {
+        var q = al.PointAt(Sta(p.sta), Ft(p.off));
+        double? z = Doc.GroundAt(q);
+        Row("Terrain 3DEP (p.6)", $"{p.what} STA {p.sta} {Math.Abs(p.off):F2}' {(p.off < 0 ? "LT" : "RT")}", p.elev, z.HasValue ? z.Value / ft : double.NaN, "lidar 2020 vs plan; INFO", 0.5, "F2", info: true);
+    }
+}
+
 // ---------------------------------------------------------------- one elevation chain (shows the PGL offset)
 var chain = ElevationCheck.Grade(al, CrossOffset(fr.Supports[1].AlignmentPoint, fr.Supports[1].Direction, clNb), clNb, Doc.Units, "CL NB at Pier 1", b.Deck);
 Print(ElevationCheck.ToText(new[] { chain }, Doc.Units));
