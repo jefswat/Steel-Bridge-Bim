@@ -84,6 +84,14 @@
       "target": [ { "level": "group", "category": "joint", "subtype": "%strip%" } ] },
     { "id": "drainage", "sheets": "^DRAINAGE DETAILS", "basis": "Deck drainage",
       "target": [ { "level": "element", "category": [ "deck drain", "drain pipe", "splash basin" ] } ] },
+    { "id": "drainage-assemblies", "sheets": "^DRAINAGE DETAILS", "basis": "Deck drainage: trench inlets, tubes, collection pipe, pier joint collection systems (trough, boxes, pier pipes)",
+      "target": [ { "level": "assembly", "category": [ "deck drain", "drain collector", "pier drain" ] } ] },
+    { "id": "sign-supports", "sheets": "^(SIGN SUPPORT DETAILS|EXIT SIGN SUPPORT BASES)", "basis": "Sign supports: truss support brackets (plates, stiffeners, anchor bolts; post / base plate by others) and exit sign bases",
+      "target": [ { "level": "assembly", "category": "sign support" } ] },
+    { "id": "crash-cushion", "sheets": "^CRASH CUSHION END POST", "basis": "Crash cushion end post (concrete wedge and its reinforcing; cushion unit by others)",
+      "target": [ { "level": "assembly", "category": "crash cushion" } ] },
+    { "id": "lighting", "sheets": "^LIGHTING DETAILS", "basis": "Lighting: pole bases (anchor bolts, block, reinforcing), junction boxes, conduit in the barrier (poles and luminaires not in the contract)",
+      "target": [ { "level": "assembly", "category": [ "pole base", "junction box", "conduit" ] } ] },
     { "id": "barrier-unit", "sheets": "^BARRIER RAIL DETAILS - UNIT (?<u>\\d+)", "basis": "Barrier rail of the unit (concrete and its reinforcing)",
       "target": [ { "level": "group", "category": "barrier group", "unit": "Unit {u}" } ] },
     { "id": "barrier-all", "sheets": "^BARRIER RAIL DETAILS$", "basis": "Barrier rail details",
@@ -92,7 +100,7 @@
 
   "hints": [
     { "sheets": "BNSF SHORING", "suggests": "Temporary works: shoring next to the railroad. No temporary / construction-stage elements in the model." },
-    { "sheets": "SIGN SUPPORT|EXIT SIGN", "suggests": "Sign structures: sign supports, brackets, bases and foundations on the bridge (I-80). Not modeled." },
+    { "sheets": "SIGN SUPPORT|EXIT SIGN", "suggests": "Sign structures: sign supports, brackets, bases and foundations on the bridge (I-80). No sign support element is linked to this sheet." },
     { "sheets": "MOMENT & REACTION", "suggests": "Design reactions and moments: load data for bearings and girders. No load/reaction properties on bearings or girders yet." },
     { "sheets": "CRASH CUSHION", "suggests": "Crash cushion / end post at barrier ends (Ramp A, Ramp G). Not modeled." },
     { "sheets": "BARRIER RAIL AESTHETIC", "suggests": "Barrier rail surface treatment (form liner, recess). Barrier is the plain SSTR profile." },
