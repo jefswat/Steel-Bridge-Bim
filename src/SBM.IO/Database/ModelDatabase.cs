@@ -481,7 +481,7 @@ public static class ModelDatabase
         {
             var asmInfo = new Dictionary<string, AsmInfo>();
             var girderGroup = new Dictionary<int, string>();
-            string cfGroup = "", lbGroup = "";
+            string cfGroup = "", lbGroup = "", inspGroup = "";
             string GirderGroup(int g)
             {
                 if (girderGroup.TryGetValue(g, out var id)) return id;
@@ -519,6 +519,12 @@ public static class ModelDatabase
                             if (parts.Length >= 3) support = parts[^2];
                             sub = parts[0].Contains('(') ? parts[0][(parts[0].IndexOf('(') + 1)..].TrimEnd(')') : "";
                         }
+                        break;
+                    case AssemblyKind.InspectionCable:
+                    case AssemblyKind.InspectionWalkway:
+                        parent = inspGroup.Length > 0 ? inspGroup : (inspGroup = Group($"{bk}/group/inspection", superId, "Inspection access", "inspection access group"));
+                        cat = asm.Kind == AssemblyKind.InspectionCable ? "inspection cable" : "inspection walkway";
+                        sub = asm.Kind == AssemblyKind.InspectionCable ? "wire rope cable" : asm.Description.Contains("Type B") ? "Type B walkway" : "Type A walkway";
                         break;
                     case AssemblyKind.LateralBracing:
                         parent = lbGroup.Length > 0 ? lbGroup : (lbGroup = Group($"{bk}/group/lateral", superId, "Lateral bracing", "lateral bracing group"));
@@ -643,12 +649,17 @@ public static class ModelDatabase
             PartCategory.SolePlate => "sole plate", PartCategory.BearingPad => "bearing pad", PartCategory.Weld => "weld",
             PartCategory.SplicePlate => "splice plate", PartCategory.BearingPlate => "bearing plate", PartCategory.MasonryPlate => "masonry plate",
             PartCategory.BearingDisc => "bearing disc", PartCategory.ShearPin => "shear pin", PartCategory.GuideBar => "guide bar",
-            PartCategory.Ptfe => "PTFE surface", _ => c.ToString(),
+            PartCategory.Ptfe => "PTFE surface",
+            PartCategory.InspectionBracket => "cable bracket", PartCategory.InspectionCable => "wire rope", PartCategory.Grating => "grating",
+            PartCategory.WalkwayStringer => "walkway stringer", PartCategory.WalkwayPost => "walkway post", PartCategory.WalkwayRail => "walkway rail",
+            PartCategory.WalkwayPlate => "walkway plate", _ => c.ToString(),
         };
 
         private static string IfcClassOf(SteelPart p) => p.Category switch
         {
-            PartCategory.Angle or PartCategory.Channel => "IFCMEMBER",
+            PartCategory.Angle or PartCategory.Channel or PartCategory.InspectionBracket or PartCategory.InspectionCable
+                or PartCategory.WalkwayStringer or PartCategory.WalkwayPost => "IFCMEMBER",
+            PartCategory.WalkwayRail => "IFCRAILING",
             PartCategory.BearingPad or PartCategory.BearingDisc => "IFCBEARING",
             PartCategory.ShearPin => "IFCMECHANICALFASTENER",
             PartCategory.Weld => "IFCFASTENER",
