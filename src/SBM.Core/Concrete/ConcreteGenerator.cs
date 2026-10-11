@@ -168,8 +168,8 @@ public sealed partial class ConcreteGenerator
         {
             var nb = DR.BeginLineDirection.Left;           // toward the deck (up-station)
             var ne = -DR.EndLineDirection.Left;
-            double db = Cross(DR.BeginLinePoint + nb * insetB, DR.BeginLineDirection, o);
-            double de = Cross(DR.EndLinePoint + ne * insetE, DR.EndLineDirection, o);
+            double db = PolyCross(true, insetB, _ => o) ?? Cross(DR.BeginLinePoint + nb * insetB, DR.BeginLineDirection, o);
+            double de = PolyCross(false, insetE, _ => o) ?? Cross(DR.EndLinePoint + ne * insetE, DR.EndLineDirection, o);
             return (db, de);
         });
     }
@@ -194,7 +194,33 @@ public sealed partial class ConcreteGenerator
             double w = Math.Abs(o - inv.Offset) + 15;
             return _a.IntersectOffsetCurveWithLine(offAtD, p, dir, guess - w, guess + w, guess, out double d) ? d : guess;
         }
-        return (One(DR.BeginLinePoint + nb * insetB, DR.BeginLineDirection), One(DR.EndLinePoint + ne * insetE, DR.EndLineDirection));
+        return (PolyCross(true, insetB, offAtD) ?? One(DR.BeginLinePoint + nb * insetB, DR.BeginLineDirection),
+                PolyCross(false, insetE, offAtD) ?? One(DR.EndLinePoint + ne * insetE, DR.EndLineDirection));
+    }
+
+    private readonly ConcurrentDictionary<(bool, long), DeckEndPolyline> _insetPolys = new();
+
+    /// <summary>Kinked deck-end line (begin / end) moved by <paramref name="inset"/> toward the deck; null = the end is straight.</summary>
+    private DeckEndPolyline? EndPoly(bool begin, double inset)
+    {
+        var p = begin ? DR.BeginPolyline : DR.EndPolyline;
+        if (p == null) return null;
+        return _insetPolys.GetOrAdd((begin, (long)Math.Round(inset * 1e6)), _ => p.Inset(inset));
+    }
+
+    /// <summary>Crossing of an offset curve with a kinked deck end (null when that end is straight).</summary>
+    private double? PolyCross(bool begin, double inset, Func<double, double> offAtD)
+    {
+        if (EndPoly(begin, inset) is not { } p) return null;
+        if (!p.CrossOffsetCurve(_a, offAtD, out double d)) Warn($"Kinked deck end ({(begin ? "begin" : "end")}): an offset line does not cross it near the deck; nearest estimate used.");
+        return d;
+    }
+
+    /// <summary>Interior break points of the kinked deck ends between the deck edges (solid columns run through them).</summary>
+    private IEnumerable<Vec2> KinkVertices()
+    {
+        foreach (var p in new[] { DR.BeginPolyline, DR.EndPolyline })
+            if (p != null) foreach (var v in p.VerticesBetween(_a, LeftAtD, RightAtD)) yield return v;
     }
 
     private double Cross(Vec2 p, Vec2 dir, double o)
@@ -215,6 +241,7 @@ public sealed partial class ConcreteGenerator
         double piv = _a.CrossSlope.PivotOffset;
         if (piv > l && piv < r) list.Add(piv);
         foreach (var g in StripLines(l, r)) list.Add(g);
+        foreach (var v in KinkVertices()) list.Add(_a.Inverse(v).Offset);
         return list.Distinct().OrderBy(x => x).ToList();
     }
 
@@ -232,6 +259,27 @@ public sealed partial class ConcreteGenerator
     /// has its own cells.
     /// </summary>
     private List<Func<double, double>> VarColumns(double li, double ri)
+    {
+        var cols = VarColumnsBase(li, ri);
+        // kinked deck ends: one more column through each break point, at its fraction between the neighbouring columns
+        foreach (var v in KinkVertices())
+        {
+            var so = _a.Inverse(v);
+            double dv = so.Distance, ov = so.Offset;
+            for (int j = 0; j + 1 < cols.Count; j++)
+            {
+                double a = cols[j](dv), b = cols[j + 1](dv);
+                if (ov <= a + 1e-6 || ov >= b - 1e-6) continue;
+                var ca = cols[j]; var cb = cols[j + 1];
+                double f = (ov - a) / (b - a);
+                cols.Insert(j + 1, d => ca(d) + (cb(d) - ca(d)) * f);
+                break;
+            }
+        }
+        return cols;
+    }
+
+    private List<Func<double, double>> VarColumnsBase(double li, double ri)
     {
         var list = new List<Func<double, double>>();
         double wMax = Deck.MaxRight - Deck.MinLeft;
@@ -426,6 +474,7 @@ public sealed partial class ConcreteGenerator
     /// <summary>Alignment distance where an offset curve crosses a deck end line moved by <paramref name="inset"/> (+ toward the deck).</summary>
     private double EndD(Func<double, double> offAtD, bool begin, double inset)
     {
+        if (PolyCross(begin, inset, offAtD) is double pd) return pd;
         var p = begin ? DR.BeginLinePoint + DR.BeginLineDirection.Left * inset : DR.EndLinePoint - DR.EndLineDirection.Left * inset;
         var dir = begin ? DR.BeginLineDirection : DR.EndLineDirection;
         var inv = _a.Inverse(p);
@@ -530,7 +579,7 @@ public sealed partial class ConcreteGenerator
         return new DeckEndBlockResult
         {
             Support = sup.Name, AtBegin = begin, Definition = eb, Mesh = mesh, Soffit = soffit, SlabThickness = slab, BlockoutWidth = d,
-            BlockoutBottom = bt, PlanX = xy => Vec2.Dot(xy - origin, normal), DeckAt = DeckAt,
+            BlockoutBottom = bt, PlanX = (begin ? DR.BeginPolyline : DR.EndPolyline) is { } kp ? kp.SignedDistance : xy => Vec2.Dot(xy - origin, normal), DeckAt = DeckAt,
         };
     }
 
@@ -752,8 +801,9 @@ public sealed partial class ConcreteGenerator
         var ne = -DR.EndLineDirection.Left;
         var qb = DR.BeginLinePoint + nb * coverBegin;
         var qe = DR.EndLinePoint + ne * coverEnd;
-        foreach (var (q, n) in new[] { (qb, nb), (qe, ne) })
+        foreach (var (q, n, begin) in new[] { (qb, nb, true), (qe, ne, false) })
         {
+            if (EndPoly(begin, begin ? coverBegin : coverEnd) is { } poly) { if (!poly.Clip(ref p0, ref p1)) return false; continue; }
             double s0 = Vec2.Dot(p0 - q, n), s1 = Vec2.Dot(p1 - q, n);
             if (s0 < 0 && s1 < 0) return false;
             if (s0 < 0) p0 = p0 + (p1 - p0) * (s0 / (s0 - s1));

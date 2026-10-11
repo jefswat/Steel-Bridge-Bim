@@ -35,7 +35,7 @@ D 48 pt and the flat soffit 90 pt (1.875 D: 2'-10 for D = 1'-6). The identical o
 - **Abutment backwall interface:** deck end to backwall face = C 6" at 50 F (I-80); Ramp G strip seal 2 1/2"; 3/4" drip groove with a 2" step in the soffit at
   the end face (Ramp G A-A); the block does not touch the backwall (the joint gap is between them). Paving notch is on the abutment sheets (abutments.md).
 
-### Reinforcing of the end block (not modeled)
+### Reinforcing of the end block (2026-10-11: Ramp G 5d2-5d5 at Piers 5G/9G/14G placed, the rest schedule only - deck-rebar.md section 6)
 Bars are placed by the same bar lists as the slab (pdf 196 = design 189; Ramp G pdf 141 = design 139): hoops 5d1/5d2/5d5/5d6/5d10/5d12 (hoop around the
 stirrup stack, D = 2" pin on the bend diagram), straight 5d3/5d4/5d9/5d11, 4d7/4d8 (small bars), longitudinal 5e1-5e11, all epoxy coated.
 Placement: transverse 5d bars at 1'-0 along the joint ("@ 1'-0"), 10 bars between girders and 2 outside the exterior girders at equal spacing, positioned parallel
@@ -46,6 +46,10 @@ I-80 Unit 1 quantities (pdf 196, interleaved text, assignments of the columns UN
 5e8 20 x 2'-8. Ramp G Unit 1 (pdf 141): 5d1 abut hoops 36 x 4'-2, 5d2 62 x 6'-2, 5d3 62 x 8'-0, 5d4 62 x 7'-3, 5d5 62 x 5'-5, 4d6 16 x 4'-1, 5e1 60 x 9'-4,
 5e2 14 x 34'-10, 5e3 40 x 2'-9, 5e4 6 x 33'-4. The bend diagrams (hoop leg dimensions) are small images on the bar list; they were not read, so no end-block bars are
 built. Per the user rule, nothing is guessed.
+2026-10-11: the Ramp G bend diagrams (PDF 141) were read: 5d1 open hoop 10 1/2 x 1'-5 with 6" legs (4'-2), 5d2 hoop 11 x 1'-8 (6'-2), 5d3 hoop 2'-10 x 8 (8'-0), both with 6" tails at one
+corner, 5d4 U 4'-0 / 1'-9 / 1'-6 (7'-3), 5d5 1'-6 + 2'-5 at 45 deg + 1'-6 (5'-5), 4d6 1'-10 + 3 + 1'-3 slanted + 9 (4'-1); D = 2 1/2" (4d6: 2"). The Ramp G partial section (PDF 138) dimensions the
+5d layout along the joint at Piers 5G, 9G, 14G (10" + 8 @ 1'-0 + 10" per bay, 10" and 1'-0 outside): those bars are placed. I-80 has no such dimensions (counts per bay only): its end dam bars stay
+schedule only (UNRESOLVED).
 
 ## 2. What the model builds
 `ExpansionJointDefinition.EndBlock` (`DeckEndBlockDefinition`, optional, default off): `Depth`, `FlatLength`, `ChamferRun` (null = 45 degrees to the slab
@@ -54,7 +58,7 @@ soffit) or an explicit `Soffit` polyline (X from the deck-end face, Drop below t
 the finished grade and the skewed deck end. The blockout is then built to its full plan depth (1'-2) and the "blockout depth exceeds modeled slab" warning is
 not given. Result: `ExpansionJointResult.EndBlock` (`DeckEndBlockResult`: mesh, soffit, `Probe(point)` = inside / height above soffit). Viewport layer `3D-JOINTS`, material
 row "Deck end block", IFC `IfcBuildingElementPart` "DECK_END_BLOCK" aggregated into the deck `IfcSlab`.
-Not done: block reinforcing; haunch solids are not trimmed where they run through the block (a small overlap, counted twice in haunch volume).
+Not done: block reinforcing except Ramp G 5d2-5d5 at Piers 5G/9G/14G (`DeckPlanReinforcement.EndDam`); haunch solids are not trimmed where they run through the block (a small overlap, counted twice in haunch volume).
 
 `DeckEndBlockCheck` (run by `RegenerationCache` after steel and concrete exist): every steel part (vertices + triangle centroids), stud and bolt inside a block is
 classified. INTENDED (Info, one line per block): girder top flange, upper web, stiffeners, welds, shear studs, and a rolled top strut whose flange is within
@@ -76,3 +80,8 @@ Warnings (model vs plans, inputs not changed):
 - Ramp G South Abutment block plan length (~1'-9 1/2) scaled from the drawing, not dimensioned.
 - I-80 abutment end frame top elevation relative to the soffit; bar bend diagrams for 5d/5e marks; whether the block is full width under the barriers
   (modeled full width between the deck edges; Ramp G pdf 138 section C-C shows a reduced 1'-3 wide block at the barrier).
+
+## 5. Kinked deck ends (2026-10-11)
+The end blocks, blockouts and joint bodies follow a kinked end of slab (`SupportDefinition.DeckEndPoints`): I-80 Unit 2 at Pier 5WB / 6A (block 22.39 -> 22.40 CY, blockout 10.58 CY) and Ramp G Unit 4 at
+Pier 19G (Details A/B of PDF 141; block 7.68 -> 7.78 CY, blockout 3.76 -> 3.82 CY). The Detail B step at the Ramp G left corner is not coordinated and is modeled perpendicular to the edge as drawn (READING).
+The reduced end block under the Ramp G barriers (section C-C, PDF 138: "1'-3" at the bottom) is still not modeled (the block runs full width).

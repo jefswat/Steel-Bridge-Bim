@@ -13,7 +13,7 @@ namespace SBM.Core.Concrete;
 /// </summary>
 public sealed partial class ConcreteGenerator
 {
-    private sealed record PlanBar(string Mark, RebarSize Size, string Loc, double Nominal, double Length, Vec3[] Points);
+    private sealed record PlanBar(string Mark, RebarSize Size, string Loc, double Nominal, double Length, Vec3[] Points, BarShape? Shape = null);
 
     private void BuildPlanDeckRebar()
     {
@@ -31,6 +31,7 @@ public sealed partial class ConcreteGenerator
         foreach (var z in plan.Transverse) { BuildTransverseZone(z, zi, lineD[zi], bag, c, ZT); zi++; }
         zi = 0;
         BuildLongRuns(plan, bag, ZL);
+        BuildEndDamBars(plan, bag);
 
         // ---- marks
         var marks = new List<BarMark>();
@@ -43,10 +44,13 @@ public sealed partial class ConcreteGenerator
             bool fixedLen = max - min <= In(1) + 1e-9;
             double nominal = fixedLen ? (g.Any(b => b.Nominal > 0) ? g.First(b => b.Nominal > 0).Nominal : Math.Round(lens.Average() / In(1)) * In(1)) : max;
             string loc = plan.PlanBarList.FirstOrDefault(l => l.Mark == g.Key)?.Location is { Length: > 0 } s ? s : first.Loc;
+            // end dam groups: bars of the mark that are counted but not modeled (their end's layout is not dimensioned)
+            int unplaced = plan.EndDam.Where(e => e.Mark == g.Key).Sum(e => e.Unplaced);
+            if (unplaced > 0) loc += $" ({lens.Count} in 3D, {unplaced} not modeled - UNRESOLVED)";
             marks.Add(new BarMark
             {
-                Mark = g.Key, Size = first.Size, Shape = BarShape.Straight(nominal), Location = loc, Epoxy = r.EpoxyCoated, Count = lens.Count,
-                VaryingLengths = fixedLen ? null : lens.Select(l => Math.Round(l / In(1)) * In(1)).ToList(),
+                Mark = g.Key, Size = first.Size, Shape = first.Shape ?? BarShape.Straight(nominal), Location = loc, Epoxy = r.EpoxyCoated, Count = lens.Count + unplaced,
+                VaryingLengths = fixedLen || unplaced > 0 ? null : lens.Select(l => Math.Round(l / In(1)) * In(1)).ToList(),
             });
             places.AddRange(g.Select(b => new BarPlacement { Mark = g.Key, Points = b.Points }));
         }

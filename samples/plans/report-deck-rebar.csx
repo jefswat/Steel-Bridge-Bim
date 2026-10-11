@@ -22,12 +22,14 @@ foreach (var b in Doc.Project.Bridges)
     var marks = cm.Marks.Where(m => m.Unit == "").ToList();
     var placed = marks.Where(m => !m.Location.Contains("schedule only")).ToList();
     var sched = marks.Where(m => m.Location.Contains("schedule only")).ToList();
+    var nIn3d = cm.Bars.Where(bp => bp.Unit == "").GroupBy(bp => bp.Mark).ToDictionary(g => g.Key, g => g.Count());
+    double In3d(SBM.Core.Concrete.BarMark m) => m.Count == 0 ? 0 : Math.Min(1.0, (nIn3d.TryGetValue(m.Mark, out var k) ? k : 0) / (double)m.Count);
     var rows = plan.Where(p => p.Br == br && p.U == unit).ToList();
     double planSlab = rows.Where(r => Slab(r.Mark)).Sum(r => r.Lb), planAll = rows.Sum(r => r.Lb);
     double mSlab = marks.Where(m => Slab(m.Mark)).Sum(m => m.TotalMass) * LbPerKg;
     double mAll = marks.Sum(m => m.TotalMass) * LbPerKg;
     Print($"== {b.Name} ({(b.Deck.Reinforcement.Plan != null ? "plan-driven" : "generic layout")}): slab bars {mSlab:N0} lb vs plan {planSlab:N0} lb ({(planSlab > 0 ? (mSlab / planSlab - 1) * 100 : 0):+0.0;-0.0}%); " +
-          $"all marks incl. end dam {mAll:N0} lb vs plan {planAll:N0} lb; placed in 3D {placed.Sum(m => m.TotalMass) * LbPerKg:N0} lb ({placed.Sum(m => m.Count):N0} bars), schedule only {sched.Sum(m => m.TotalMass) * LbPerKg:N0} lb");
+          $"all marks incl. end dam {mAll:N0} lb vs plan {planAll:N0} lb; placed in 3D {placed.Sum(m => m.TotalMass * In3d(m)) * LbPerKg:N0} lb ({placed.Sum(m => (int)Math.Round(m.Count * In3d(m))):N0} bars), schedule only / not modeled {(sched.Sum(m => m.TotalMass) + placed.Sum(m => m.TotalMass * (1 - In3d(m)))) * LbPerKg:N0} lb");
     if (b.Deck.Reinforcement.Plan == null) continue;
     var fam = b.Deck.Reinforcement.Plan.Families;
     foreach (var r in rows.Where(r => Slab(r.Mark) && !fam.Any(f => r.Mark.StartsWith(f))))
@@ -43,5 +45,14 @@ foreach (var b in Doc.Project.Bridges)
         Print($"   {f}*   plan {pr.Sum(r => r.Count),5} bars {pr.Sum(r => r.Lb),9:N0} lb   model {mm.Sum(m => m.Count),5} bars {mm.Sum(m => m.TotalMass) * LbPerKg,9:N0} lb  {(pr.Sum(r => r.Lb) > 0 ? (mm.Sum(m => m.TotalMass) * LbPerKg / pr.Sum(r => r.Lb) - 1) * 100 : 0),+6:0.0}%   ({string.Join(", ", mm.OrderBy(m => m.Mark).Select(m => $"{m.Mark} x{m.Count}"))})");
     }
     var endDam = rows.Where(r => !Slab(r.Mark)).ToList();
-    Print($"   end dam / insert marks (schedule only): {string.Join(", ", endDam.Select(r => r.Mark))} = {endDam.Sum(r => r.Lb):N0} lb");
+    var damPlaced = endDam.Where(r => marks.Any(m => m.Mark == r.Mark && !m.Location.Contains("schedule only"))).ToList();
+    var damSched = endDam.Except(damPlaced).ToList();
+    foreach (var r in damPlaced)
+    {
+        var m = marks.First(x => x.Mark == r.Mark);
+        int in3d = cm.Bars.Count(bp => bp.Mark == r.Mark && bp.Unit == "");
+        double mw = m.TotalMass * LbPerKg;
+        Print($"   {r.Mark,-5} plan {r.Count,5} x {r.Len,-8} {r.Lb,9:N0} lb   model {m.Count,5} x {m.Length / 0.3048:F2} ft {mw,9:N0} lb  {(r.Lb > 0 ? (mw / r.Lb - 1) * 100 : 0),+6:0.0}%   end dam, {in3d} in 3D{(in3d < m.Count ? $", {m.Count - in3d} not modeled (UNRESOLVED)" : "")}");
+    }
+    Print($"   end dam / insert marks (schedule only): {string.Join(", ", damSched.Select(r => r.Mark))} = {damSched.Sum(r => r.Lb):N0} lb");
 }

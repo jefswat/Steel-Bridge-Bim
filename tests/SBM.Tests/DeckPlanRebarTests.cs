@@ -189,4 +189,51 @@ public class DeckPlanRebarTests
         }
         finally { try { File.Delete(path); } catch (IOException) { } }
     }
+
+    [Fact]
+    public void EndDamBars_PlacedPerBay_ShapedMark_UnplacedCounted()
+    {
+        var p = SampleProject.Create();
+        var b = p.Bridges[0];
+        foreach (var s in new[] { b.Supports[0], b.Supports[^1] })
+            s.ExpansionJoint = new ExpansionJointDefinition { Type = ExpansionJointType.Modular, BlockoutWidth = In(25), GapAt50F = In(9), BlockoutDepth = In(14),
+                EndBlock = new DeckEndBlockDefinition { Depth = In(26), FlatLength = In(39) } };
+        var plan = b.Deck.Reinforcement.Plan = new DeckPlanReinforcement();
+        plan.PlanBarList.Add(new DeckPlanBarLine { Mark = "5d4", Size = "#5", Count = 100, Length = In(87), WeightLb = 100 * 87 / 12.0 * 1.043 });
+        plan.Unresolved.Add("test item, PDF 1");
+        var u = new DeckEndDamBar
+        {
+            Mark = "5d4", Ends = DeckEndSide.Begin, ListedLength = In(87), Pin = In(2.5), FromGirder = In(10), Spacing = In(12), PerBay = 3, Overhang = { In(10) },
+            Outside = new() { new(In(51), In(3.5)), new(In(3), In(3.5)), new(In(3), In(24.5)), new(In(21), In(24.5)) }, Dims = new() { In(48), In(21), In(18) },
+            Unplaced = 7, Unresolved = "other end not dimensioned",
+        };
+        plan.EndDam.Add(u);
+        var f = FramingGenerator.Generate(b, p.Alignments[0]);
+        var c = ConcreteGenerator.Generate(f, p.Units);
+        int ng = f.Girders.Count;
+        int placed = (ng - 1) * 3 + 2;
+        Assert.Equal(placed, c.Bars.Count(x => x.Mark == "5d4"));
+        var m = c.Marks.Single(x => x.Mark == "5d4");
+        Assert.Equal(placed + 7, m.Count);
+        Assert.Equal(In(87), m.Length, 6);
+        Assert.Equal(3, m.Shape.Dimensions.Count);
+        Assert.Contains("not modeled - UNRESOLVED", m.Location);
+        Assert.Contains(c.Diagnostics, d => d.Message.StartsWith("UNRESOLVED (deck reinforcing): test item"));
+        Assert.Contains(c.Diagnostics, d => d.Message.StartsWith("UNRESOLVED (deck end dam 5d4)"));
+        // every bar lies in the end dam zone of the begin end: 3" .. 51" from the deck-end face, 3.5" .. 24.5" below the top of slab
+        var dr = f.Deck!;
+        foreach (var bar in c.Bars.Where(x => x.Mark == "5d4"))
+            foreach (var q in bar.Points)
+            {
+                double x = dr.FromBegin(q.XY);
+                Assert.InRange(x, In(3) - 1e-6, In(51) + 1e-6);
+                var so = p.Alignments[0].Inverse(q.XY);
+                double drop = b.Deck.FinishedElevation(p.Alignments[0], so.Station, so.Offset) - q.Z;
+                Assert.InRange(drop, In(3.5) - 1e-6, In(24.5) + 1e-6);
+            }
+        // the check reports the end dam bars separately (inside the concrete: no clear warning)
+        var rep = SBM.Core.Checks.DeckRebarCheck.Run(f, null, c, p.Units);
+        Assert.Contains(c.Notes, n => n.StartsWith("Deck end dam bar check (" + placed + " bars)"));
+        Assert.DoesNotContain(c.Diagnostics, d => d.Message.Contains("end dam bars have less than"));
+    }
 }
