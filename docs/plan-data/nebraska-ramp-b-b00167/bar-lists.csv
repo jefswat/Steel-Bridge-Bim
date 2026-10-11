@@ -1,0 +1,133 @@
+unit,mark,size,location,no,length,weight_lb,coating,weight_check_lb,check,source,tag
+Pier 2,11d1,#11,"COLUMN NO.1, VERTICAL",44,20'-3,4734,epoxy,4734,ok,p.14 DS 13,TEXT
+Pier 2,11d2,#11,"COLUMN NO. 2, VERTICAL",44,21'-10,5104,epoxy,5104,ok,p.14 DS 13,TEXT
+Pier 2,11d3,#11,"FOOTING TO COLUMN DOWEL",88,17'-5,8143,epoxy,8143,ok,p.14 DS 13,TEXT
+Pier 2,6d4,#6,"COLUMN NO. 1, VERTICAL",14,18'-10,396,epoxy,396,ok,p.14 DS 13,TEXT
+Pier 2,6d5,#6,"COLUMN NO. 2, VERTICAL",14,20'-5,429,epoxy,429,ok,p.14 DS 13,TEXT
+Pier 2,6d6,#6,"COLUMN NO. 1, VERTICAL",2,17'-6,53,epoxy,53,ok,p.14 DS 13,TEXT
+Pier 2,6d7,#6,"COLUMN NO. 2, VERTICAL",2,19'-1,57,epoxy,57,ok,p.14 DS 13,TEXT
+Pier 2,6d8,#6,"COLUMN NO. 1, VERTICAL",3,16'-3,73,epoxy,73,ok,p.14 DS 13,TEXT
+Pier 2,6d9,#6,"COLUMN NO. 2, VERTICAL",3,17'-10,80,epoxy,80,ok,p.14 DS 13,TEXT
+Pier 2,5e1,#5,"COLUMN HOOPS",54,24'-4,1371,epoxy,1371,ok,p.14 DS 13,TEXT
+Pier 2,5e2,#5,"COLUMN HOOPS",60,25'-1,1570,epoxy,1570,ok,p.14 DS 13,TEXT
+Pier 2,5e3,#5,"COLUMN TIES",60,6'-5,402,epoxy,402,ok,p.14 DS 13,TEXT
+Pier 2,5e4,#5,"COLUMN TIES",60,7'-7,475,epoxy,475,ok,p.14 DS 13,TEXT
+Pier 2,5e5,#5,"COLUMN HOOPS",50,5'-6,287,epoxy,287,ok,p.14 DS 13,TEXT
+Pier 2,6m1,#6,"PEDESTAL",28,7'-8,322,epoxy,322,ok,p.14 DS 13,TEXT
+Pier 2,6m2,#6,"PEDESTAL, HOOP",2,23'-10,72,epoxy,72,ok,p.14 DS 13,TEXT
+Pier 2,6n1,#6,"PEDESTAL",16,9'-6,228,epoxy,228,ok,p.14 DS 13,TEXT
+Pier 2,6f1,#6,"FOOTING, TOP",56,13'-2,1107,non-coated,1107,ok,p.14 DS 13,TEXT
+Pier 2,8f6,#8,"PILE UPLIFT ANCHORS",32,5'-0,427,non-coated,427,ok,p.14 DS 13,TEXT
+Pier 2,10g1,#10,"FOOTING, BOTTOM",56,16'-10,4056,non-coated,4056,ok,p.14 DS 13,TEXT
+Pier 1,11a1,#11,"CAP, TOP, LONGITUDINAL",8,37'-2,1580,epoxy,1580,ok,p.14 DS 13,TEXT
+Pier 1,11a2,#11,"CAP, TOP, LONGITUDINAL",4,27'-9,590,epoxy,590,ok,p.14 DS 13,TEXT
+Pier 1,6a3,#6,"CAP, SIDES, LONGITUDINAL",8,27'-9,333,epoxy,333,ok,p.14 DS 13,TEXT
+Pier 1,11b1,#11,"CAP, BOTTOM LONGITUDINAL",18,27'-9,2654,epoxy,2654,ok,p.14 DS 13,TEXT
+Pier 1,6c1,#6,"CAP, HOOPS",90,18'-2,2456,epoxy,2456,ok,p.14 DS 13,TEXT
+Pier 1,4c2,#4,"CAP, TRANSVERSE",15,5'-3,53,epoxy,53,ok,p.14 DS 13,TEXT
+Pier 1,5c3,#5,"CAP, TRANSVERSE, ENDS",12,6'-4,79,epoxy,79,ok,p.14 DS 13,TEXT
+Pier 1,5c4,#5,"CAP, TRANSVERSE, ENDS",30,4'-4,136,epoxy,136,ok,p.14 DS 13,TEXT
+Pier 1,5c5,#5,"MASKWALL HORIZONTAL",18,4'-6,84,epoxy,84,ok,p.14 DS 13,TEXT
+Pier 1,11d1,#11,"COLUMN VERTICAL",60,22'-0,7013,epoxy,7013,ok,p.14 DS 13,TEXT
+Pier 1,11d2,#11,"FOOTING TO COLUMN DOWEL",60,18'-5,5871,epoxy,5871,ok,p.14 DS 13,TEXT
+Pier 1,6d3,#6,"COLUMN VERTICAL",12,17'-11,323,epoxy,323,ok,p.14 DS 13,TEXT
+Pier 1,6d4,#6,"COLUMN VERTICAL",4,30'-5,183,epoxy,183,ok,p.14 DS 13,TEXT
+Pier 1,6d5,#6,"COLUMN VERTICAL",12,10'-7,191,epoxy,191,ok,p.14 DS 13,TEXT
+Pier 1,6d6,#6,"COLUMN VERTICAL",12,6'-0,108,epoxy,108,ok,p.14 DS 13,TEXT
+Pier 1,5d7,#5,"MASKWALL VERTICAL",12,10'-7,132,epoxy,132,ok,p.14 DS 13,TEXT
+Pier 1,6d8,#6,"COLUMN VERTICAL",4,31'-3,188,epoxy,188,ok,p.14 DS 13,TEXT
+Pier 1,6d9,#6,"COLUMN VERTICAL",8,22'-0,264,epoxy,264,ok,p.14 DS 13,TEXT
+Pier 1,5e1,#5,"COLUMN HOOPS",50,18'-4,956,epoxy,956,ok,p.14 DS 13,TEXT
+Pier 1,5e2,#5,"COLUMN HOOPS",50,17'-10,930,epoxy,930,ok,p.14 DS 13,TEXT
+Pier 1,5e3,#5,"COLUMN TIES",50,4'-8,243,epoxy,243,ok,p.14 DS 13,TEXT
+Pier 1,5e4,#5,"COLUMN HOOPS",98,7'-3,741,epoxy,741,ok,p.14 DS 13,TEXT
+Pier 1,4e5,#4,"COLUMN HOOPS",4,4'-2,11,epoxy,11,ok,p.14 DS 13,TEXT
+Pier 1,5m1,#5,"CAP, PEDESTAL, LONGITUDINAL",28,9'-0,263,epoxy,263,ok,p.14 DS 13,TEXT
+Pier 1,6n1,#6,"CAP, PEDESTAL, TRANSVERSE",40,8'-5,506,epoxy,506,ok,p.14 DS 13,TEXT
+Pier 1,7f1,#7,"FOOTING, TOP, LONGITUDINAL",24,16'-8,818,non-coated,818,ok,p.14 DS 13,TEXT
+Pier 1,7f2,#7,"FOOTING, TOP, TRANSVERSE",36,10'-8,785,non-coated,785,ok,p.14 DS 13,TEXT
+Pier 1,8f6,#8,"PILE UPLIFT ANCHORS",40,5'-0,534,non-coated,534,ok,p.14 DS 13,TEXT
+Pier 1,10g1,#10,"FOOTING, BOTTOM, LONGITUDINAL",34,20'-4,2975,non-coated,2975,ok,p.14 DS 13,TEXT
+Pier 1,7g2,#7,"FOOTING, BOTTOM, TRANSVERSE",36,13'-0,957,non-coated,957,ok,p.14 DS 13,TEXT
+North abutment,8a1,#8,"FOOTING LONGITUDINAL",18,28'-9,1382,epoxy,1382,ok,p.23 DS 22,TEXT
+North abutment,8a2,#8,"WING FOOTING",10,VARIES,376,epoxy,,VARIES - not checkable,p.23 DS 22,TEXT
+North abutment,8a3,#8,"WING FOOTING",10,10'-7,283,epoxy,283,ok,p.23 DS 22,TEXT
+North abutment,5b1,#5,"FOOTING HOOPS",34,18'-9,665,epoxy,665,ok,p.23 DS 22,TEXT
+North abutment,5b2,#5,"WING FOOTING HOOPS",6,13'-11,87,epoxy,87,ok,p.23 DS 22,TEXT
+North abutment,6d1,#6,"BACKWALL VERTICAL B.F.",51,11'-6,881,epoxy,881,ok,p.23 DS 22,TEXT
+North abutment,5d2,#5,"BACKWALL VERTICAL F.F.",25,11'-2,291,epoxy,291,ok,p.23 DS 22,TEXT
+North abutment,5d3,#5,"PAVING NOTCH",25,4'-5,115,epoxy,115,ok,p.23 DS 22,TEXT
+North abutment,5d4,#5,"PAVING NOTCH",25,3'-5,89,epoxy,89,ok,p.23 DS 22,TEXT
+North abutment,4d6,#4,"BACKWALL VERTICAL HOOP",25,8'-0,134,epoxy,134,ok,p.23 DS 22,TEXT
+North abutment,5d9,#5,"WING EXTENSION HORIZONTAL",38,5'-8,225,epoxy,225,ok,p.23 DS 22,TEXT
+North abutment,5e1,#5,"MASKWALL VERTICAL",20,9'-11,207,epoxy,207,ok,p.23 DS 22,TEXT
+North abutment,5e2,#5,"WING EXTENSION VERTICAL",28,11'-3,329,epoxy,329,ok,p.23 DS 22,TEXT
+North abutment,5f3,#5,"MASKWALL HORIZONTAL",34,5'-10,207,epoxy,207,ok,p.23 DS 22,TEXT
+North abutment,6g1,#6,"BACKWALL LONGITUDINAL",22,25'-8,848,epoxy,848,ok,p.23 DS 22,TEXT
+North abutment,5g2,#5,"BACKWALL DOWELS",44,4'-5,203,epoxy,203,ok,p.23 DS 22,TEXT
+North abutment,5g3,#5,"PAVING NOTCH LONGITUDINAL",2,25'-8,54,epoxy,54,ok,p.23 DS 22,TEXT
+North abutment,5m1,#5,"BEAM STEPS TRANSVERSE",20,8'-2,170,epoxy,170,ok,p.23 DS 22,TEXT
+North abutment,5n1,#5,"BEAM STEPS LONGITUDINAL",16,8'-6,142,epoxy,142,ok,p.23 DS 22,TEXT
+North abutment,5n2,#5,"BEAM STEP HOOPS",2,14'-11,31,epoxy,31,ok,p.23 DS 22,TEXT
+North abutment,5d5,#5,"PAVING NOTCH DOWELS",13,3'-6,47,stainless,47,ok,p.23 DS 22,TEXT
+South abutment,8a1,#8,"FOOTING LONGITUDINAL",18,28'-9,1382,epoxy,1382,ok,p.23 DS 22,TEXT
+South abutment,8a2,#8,"WING FOOTING",5,VARIES,188,epoxy,,VARIES - not checkable,p.23 DS 22,TEXT
+South abutment,8a3,#8,"WING FOOTING",5,10'-7,141,epoxy,141,ok,p.23 DS 22,TEXT
+South abutment,6a4,#6,"FOOTING END",5,VARIES,54,epoxy,,VARIES - not checkable,p.23 DS 22,TEXT
+South abutment,5b1,#5,"FOOTING HOOPS",34,18'-9,665,epoxy,665,ok,p.23 DS 22,TEXT
+South abutment,5b2,#5,"WING FOOTING HOOPS",3,13'-11,44,epoxy,44,ok,p.23 DS 22,TEXT
+South abutment,6d1,#6,"BACKWALL VERTICAL B.F.",54,11'-3,912,epoxy,912,ok,p.23 DS 22,TEXT
+South abutment,5d2,#5,"BACKWALL VERTICAL F.F.",28,10'-11,319,epoxy,319,ok,p.23 DS 22,TEXT
+South abutment,5d3,#5,"PAVING NOTCH",27,4'-5,124,epoxy,124,ok,p.23 DS 22,TEXT
+South abutment,5d4,#5,"PAVING NOTCH",27,3'-5,96,epoxy,96,ok,p.23 DS 22,TEXT
+South abutment,4d6,#4,"BACKWALL VERTICAL HOOP",32,8'-0,171,epoxy,171,ok,p.23 DS 22,TEXT
+South abutment,5d7,#5,"BACKWALL EXTENSION VERTICAL",10,VARIES,117,epoxy,,VARIES - not checkable,p.23 DS 22,TEXT
+South abutment,5d9,#5,"WING EXTENSION HORIZONTAL",20,5'-8,118,epoxy,118,ok,p.23 DS 22,TEXT
+South abutment,5e1,#5,"MASKWALL VERTICAL",20,9'-7,200,epoxy,200,ok,p.23 DS 22,TEXT
+South abutment,5e2,#5,"WING EXTENSION VERTICAL",14,10'-11,159,epoxy,159,ok,p.23 DS 22,TEXT
+South abutment,5f3,#5,"MASKWALL HORIZONTAL",18,5'-10,110,epoxy,110,ok,p.23 DS 22,TEXT
+South abutment,5f4,#5,"MASKWALL HORIZONTAL",16,4'-9,79,epoxy,79,ok,p.23 DS 22,TEXT
+South abutment,6g1,#6,"BACKWALL LONGITUDINAL",22,27'-3,900,epoxy,900,ok,p.23 DS 22,TEXT
+South abutment,5g2,#5,"BACKWALL DOWELS",22,4'-5,101,epoxy,101,ok,p.23 DS 22,TEXT
+South abutment,5g3,#5,"PAVING NOTCH LONGITUDINAL",2,27'-3,57,epoxy,57,ok,p.23 DS 22,TEXT
+South abutment,6g4,#6,"BACKWALL EXTENSION HORIZONTAL",32,7'-8,368,epoxy,368,ok,p.23 DS 22,TEXT
+South abutment,5m1,#5,"BEAM STEPS TRANSVERSE",20,8'-2,170,epoxy,170,ok,p.23 DS 22,TEXT
+South abutment,5n1,#5,"BEAM STEPS LONGITUDINAL",16,8'-6,142,epoxy,142,ok,p.23 DS 22,TEXT
+South abutment,5n2,#5,"BEAM STEP HOOPS",2,14'-11,31,epoxy,31,ok,p.23 DS 22,TEXT
+South abutment,5d5,#5,"PAVING NOTCH DOWELS",14,3'-6,51,stainless,51,ok,p.23 DS 22,TEXT
+Superstructure (deck),6a1,#6,"DECK TRANSV. TOP & BOTT.",1495,28'-10,64745,epoxy,64745,ok,p.45 DS 44,TEXT
+Superstructure (deck),6a2,#6,"DECK TRANSV. TOP & BOTT.",16,29'-6,709,epoxy,709,ok,p.45 DS 44,TEXT
+Superstructure (deck),6a3,#6,"DECK TRANSV. TOP & BOTT.",18,30'-2,816,epoxy,816,ok,p.45 DS 44,TEXT
+Superstructure (deck),6a4,#6,"DECK, RAIL BUMP-OUT",8,9'-6,114,epoxy,114,ok,p.45 DS 44,TEXT
+Superstructure (deck),5a5,#5,"DRAIN HANGER SUPPORT INSERT ANCHOR",22,1'-0,23,epoxy,23,ok,p.45 DS 44,TEXT
+Superstructure (deck),5a6,#5,"DECK AT DRAINS",16,3'-0,50,epoxy,50,ok,p.45 DS 44,TEXT
+Superstructure (deck),6b1,#6,"DECK LONGIT. TOP & BOTT.",1072,38'-3,61588,epoxy,61588,ok,p.45 DS 44,TEXT
+Superstructure (deck),5d1,#5,"ABUT. DIAPH. HOOPS",48,4'-4,217,epoxy,217,ok,p.45 DS 44,TEXT
+Superstructure (deck),5d2,#5,"INTEGRAL STEEL PIER CAP HAUNCH",38,5'-4,211,epoxy,211,ok,p.45 DS 44,TEXT
+Superstructure (deck),5e1,#5,"ABUT. DIAPH. LONGIT.",6,22'-8,142,epoxy,142,ok,p.45 DS 44,TEXT
+Superstructure (deck),5e2,#5,"ABUT. DIAPH. LONGIT.",6,7'-5,46,epoxy,46,ok,p.45 DS 44,TEXT
+Superstructure (deck),5e5,#5,"INTEGRAL STEEL PIER CAP HAUNCH LONGIT.",9,5'-4,50,epoxy,50,ok,p.45 DS 44,TEXT
+Superstructure (deck),5e6,#5,"INTEGRAL STEEL PIER CAP HAUNCH LONGIT.",6,2'-5,15,epoxy,15,ok,p.45 DS 44,TEXT
+Superstructure (deck),5j1,#5,"DECK TRANSV. TOP (AT RAIL)",1528,6'-3,9961,epoxy,9961,ok,p.45 DS 44,TEXT
+West rail,5c1,#5,"RAIL, VERTICAL",579,7'-5,4479,epoxy,4479,ok,p.56 DS 55,RASTER
+West rail,6d1,#6,"RAIL, LONGITUDINAL",208,38'-4,11976,epoxy,11976,ok,p.56 DS 55,RASTER
+West rail,4d4,#4,"RAIL, LONGITUDINAL AT BUMP-OUT",12,6'-7,53,epoxy,53,ok,p.56 DS 55,RASTER
+West rail,4d5,#4,"RAIL, LONGITUDINAL AT BUMP-OUT",8,6'-1,33,epoxy,33,ok,p.56 DS 55,RASTER
+West rail,5c1,#5,"RAIL, VERTICAL (2nd section group)",13,7'-5,101,epoxy,101,ok,p.56 DS 55,RASTER
+West rail,6d2,#6,"RAIL, LONGITUDINAL",13,1'-2,23,epoxy,23,ok,p.56 DS 55,RASTER
+West rail,6d3,#6,"RAIL, LONGITUDINAL",13,5'-8,111,epoxy,111,ok,p.56 DS 55,RASTER
+West rail,5c2,#5,"RAIL, VERTICAL",579,6'-0,3623,stainless,3623,ok,p.56 DS 55,RASTER
+West rail,4c15,#4,"RAIL, VERTICAL AT BUMP-OUT",10,4'-0,27,stainless,27,ok,p.56 DS 55,RASTER
+West rail,5c3,#5,"RAIL, VERTICAL",13,3'-3,44,stainless,44,ok,p.56 DS 55,RASTER
+West rail,5c14,#5,"RAIL, VERTICAL",13,3'-10,52,stainless,52,ok,p.56 DS 55,RASTER
+East rail,5c1,#5,"RAIL, VERTICAL",582,7'-5,4502,epoxy,4502,ok,p.56 DS 55,RASTER
+East rail,5c8,#5,"RAIL, VERTICAL",197,1'-9,360,epoxy,360,ok,p.56 DS 55,RASTER
+East rail,6d1,#6,"RAIL, LONGITUDINAL",208,38'-4,11976,epoxy,11976,ok,p.56 DS 55,RASTER
+East rail,4d4,#4,"RAIL, LONGITUDINAL AT BUMP-OUT",12,6'-7,53,epoxy,53,ok,p.56 DS 55,RASTER
+East rail,4d5,#4,"RAIL, LONGITUDINAL AT BUMP-OUT",8,6'-1,33,epoxy,33,ok,p.56 DS 55,RASTER
+East rail,5c1,#5,"RAIL, VERTICAL (2nd section group)",22,7'-5,170,epoxy,170,ok,p.56 DS 55,RASTER
+East rail,6d3,#6,"RAIL, LONGITUDINAL",26,5'-8,222,epoxy,221,ok,p.56 DS 55,RASTER
+East rail,5c2,#5,"RAIL, VERTICAL",582,6'-0,3642,stainless,3642,ok,p.56 DS 55,RASTER
+East rail,4c15,#4,"RAIL, VERTICAL AT BUMP-OUT",10,4'-0,27,stainless,27,ok,p.56 DS 55,RASTER
+East rail,5c3,#5,"RAIL, VERTICAL",22,3'-3,75,stainless,75,ok,p.56 DS 55,RASTER
+East rail,5c14,#5,"RAIL, VERTICAL",22,3'-10,88,stainless,88,ok,p.56 DS 55,RASTER
