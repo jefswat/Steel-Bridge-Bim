@@ -18044,6 +18044,10 @@
             "BoltGage": 0.08889999999999999,
             "TopBoltRows": 2,
             "BottomBoltOffset": 0,
+            "BottomBoltPitch": 0,
+            "Unresolved": [
+              "tie plate length is not dimensioned (I-80 Types 1-4, sheet 118): the model keeps 10 in; a length scaled from the elevation (about 4.7 in) is NOT used"
+            ],
             "TopWorkPointOffset": 0.15239999999999998,
             "BottomWorkPointOffset": 0.254,
             "TiePlateThickness": 0.0127,
@@ -18074,6 +18078,10 @@
             "BoltGage": 0.08889999999999999,
             "TopBoltRows": 2,
             "BottomBoltOffset": 0.044449999999999996,
+            "BottomBoltPitch": 0,
+            "Unresolved": [
+              "tie plate length is not dimensioned (I-80 Types 1-4, sheet 118): the model keeps 10 in; a length scaled from the elevation (about 4.7 in) is NOT used"
+            ],
             "TopWorkPointOffset": 0.15239999999999998,
             "BottomWorkPointOffset": 0.254,
             "TiePlateThickness": 0.0127,
@@ -18104,6 +18112,8 @@
             "BoltGage": 0.08889999999999999,
             "TopBoltRows": 2,
             "BottomBoltOffset": 0.044449999999999996,
+            "BottomBoltPitch": 0,
+            "Unresolved": [],
             "TopWorkPointOffset": 0.15239999999999998,
             "BottomWorkPointOffset": 0.254,
             "TiePlateThickness": 0.0127,
@@ -18131,6 +18141,10 @@
             "BoltGage": 0.08889999999999999,
             "TopBoltRows": 2,
             "BottomBoltOffset": 0,
+            "BottomBoltPitch": 0,
+            "Unresolved": [
+              "tie plate length is not dimensioned (I-80 Types 1-4, sheet 118): the model keeps 10 in; a length scaled from the elevation (about 4.7 in) is NOT used"
+            ],
             "TopWorkPointOffset": 0.15239999999999998,
             "BottomWorkPointOffset": 0.254,
             "TiePlateThickness": 0.0127,
@@ -18161,6 +18175,8 @@
             "BoltGage": 0.08889999999999999,
             "TopBoltRows": 2,
             "BottomBoltOffset": 0.044449999999999996,
+            "BottomBoltPitch": 0,
+            "Unresolved": [],
             "TopWorkPointOffset": 0.15239999999999998,
             "BottomWorkPointOffset": 0.254,
             "TiePlateThickness": 0.0127,
@@ -18188,6 +18204,8 @@
             "BoltGage": 0.08889999999999999,
             "TopBoltRows": 2,
             "BottomBoltOffset": 0,
+            "BottomBoltPitch": 0,
+            "Unresolved": [],
             "TopWorkPointOffset": 0.15239999999999998,
             "BottomWorkPointOffset": 0.254,
             "TiePlateThickness": 0.0127,
@@ -18215,6 +18233,10 @@
             "BoltGage": 0.08889999999999999,
             "TopBoltRows": 3,
             "BottomBoltOffset": 0,
+            "BottomBoltPitch": 0,
+            "Unresolved": [
+              "shear studs on the W top strut (7/8 in dia, 2 across) are not modeled: their lengthwise pitch / number per strut is not dimensioned (Section C-C: 7/8 x 5 studs, 1 1/2 in from the edge)"
+            ],
             "TopWorkPointOffset": 0.4572,
             "BottomWorkPointOffset": 0.15239999999999998,
             "TiePlateThickness": 0.0127,
@@ -18242,6 +18264,10 @@
             "BoltGage": 0.08889999999999999,
             "TopBoltRows": 6,
             "BottomBoltOffset": 0,
+            "BottomBoltPitch": 0.15239999999999998,
+            "Unresolved": [
+              "shear studs on the W top strut (7/8 in dia, 2 across) are not modeled: their lengthwise pitch / number per strut is not dimensioned (Section B-B: 7/8 x 0\u0027-5 studs, 2 in from the edge)"
+            ],
             "TopWorkPointOffset": 0.59055,
             "BottomWorkPointOffset": 0.2032,
             "TiePlateThickness": 0.0127,
@@ -18269,6 +18295,8 @@
             "BoltGage": 0.08889999999999999,
             "TopBoltRows": 0,
             "BottomBoltOffset": 0,
+            "BottomBoltPitch": 0,
+            "Unresolved": [],
             "TopWorkPointOffset": 0.15239999999999998,
             "BottomWorkPointOffset": 0.15239999999999998,
             "TiePlateThickness": 0.0127,
@@ -18296,6 +18324,8 @@
             "BoltGage": 0.08889999999999999,
             "TopBoltRows": 0,
             "BottomBoltOffset": 0,
+            "BottomBoltPitch": 0,
+            "Unresolved": [],
             "TopWorkPointOffset": 0.15239999999999998,
             "BottomWorkPointOffset": 0.15239999999999998,
             "TiePlateThickness": 0.0127,
@@ -18323,6 +18353,8 @@
             "BoltGage": 0.08889999999999999,
             "TopBoltRows": 0,
             "BottomBoltOffset": 0,
+            "BottomBoltPitch": 0,
+            "Unresolved": [],
             "TopWorkPointOffset": "NaN",
             "BottomWorkPointOffset": 0.254,
             "TiePlateThickness": 0.0127,
@@ -18345,6 +18377,7 @@
           "Pier 4WB": "1",
           "Pier 5WB": "10"
         },
+        "SupportBayStyles": {},
         "SupportStyle": "",
         "Lines": [
           {
@@ -18923,7 +18956,8 @@
             "BayStyles": {},
             "Bays": null
           }
-        ]
+        ],
+        "Links": []
       },
       "Stiffeners": {
         "BearingStiffener": {
@@ -46576,6 +46610,10 @@
             "BoltGage": 0.08889999999999999,
             "TopBoltRows": 2,
             "BottomBoltOffset": 0,
+            "BottomBoltPitch": 0,
+            "Unresolved": [
+              "tie plate length is not dimensioned (I-80 Types 1-4, sheet 118): the model keeps 10 in; a length scaled from the elevation (about 4.7 in) is NOT used"
+            ],
             "TopWorkPointOffset": 0.15239999999999998,
             "BottomWorkPointOffset": 0.254,
             "TiePlateThickness": 0.0127,
@@ -46606,6 +46644,10 @@
             "BoltGage": 0.08889999999999999,
             "TopBoltRows": 2,
             "BottomBoltOffset": 0.044449999999999996,
+            "BottomBoltPitch": 0,
+            "Unresolved": [
+              "tie plate length is not dimensioned (I-80 Types 1-4, sheet 118): the model keeps 10 in; a length scaled from the elevation (about 4.7 in) is NOT used"
+            ],
             "TopWorkPointOffset": 0.15239999999999998,
             "BottomWorkPointOffset": 0.254,
             "TiePlateThickness": 0.0127,
@@ -46636,6 +46678,8 @@
             "BoltGage": 0.08889999999999999,
             "TopBoltRows": 2,
             "BottomBoltOffset": 0.044449999999999996,
+            "BottomBoltPitch": 0,
+            "Unresolved": [],
             "TopWorkPointOffset": 0.15239999999999998,
             "BottomWorkPointOffset": 0.254,
             "TiePlateThickness": 0.0127,
@@ -46663,6 +46707,10 @@
             "BoltGage": 0.08889999999999999,
             "TopBoltRows": 2,
             "BottomBoltOffset": 0,
+            "BottomBoltPitch": 0,
+            "Unresolved": [
+              "tie plate length is not dimensioned (I-80 Types 1-4, sheet 118): the model keeps 10 in; a length scaled from the elevation (about 4.7 in) is NOT used"
+            ],
             "TopWorkPointOffset": 0.15239999999999998,
             "BottomWorkPointOffset": 0.254,
             "TiePlateThickness": 0.0127,
@@ -46693,6 +46741,8 @@
             "BoltGage": 0.08889999999999999,
             "TopBoltRows": 2,
             "BottomBoltOffset": 0.044449999999999996,
+            "BottomBoltPitch": 0,
+            "Unresolved": [],
             "TopWorkPointOffset": 0.15239999999999998,
             "BottomWorkPointOffset": 0.254,
             "TiePlateThickness": 0.0127,
@@ -46720,6 +46770,8 @@
             "BoltGage": 0.08889999999999999,
             "TopBoltRows": 2,
             "BottomBoltOffset": 0,
+            "BottomBoltPitch": 0,
+            "Unresolved": [],
             "TopWorkPointOffset": 0.15239999999999998,
             "BottomWorkPointOffset": 0.254,
             "TiePlateThickness": 0.0127,
@@ -46747,6 +46799,10 @@
             "BoltGage": 0.08889999999999999,
             "TopBoltRows": 3,
             "BottomBoltOffset": 0,
+            "BottomBoltPitch": 0,
+            "Unresolved": [
+              "shear studs on the W top strut (7/8 in dia, 2 across) are not modeled: their lengthwise pitch / number per strut is not dimensioned (Section C-C: 7/8 x 5 studs, 1 1/2 in from the edge)"
+            ],
             "TopWorkPointOffset": 0.4572,
             "BottomWorkPointOffset": 0.15239999999999998,
             "TiePlateThickness": 0.0127,
@@ -46774,6 +46830,10 @@
             "BoltGage": 0.08889999999999999,
             "TopBoltRows": 6,
             "BottomBoltOffset": 0,
+            "BottomBoltPitch": 0.15239999999999998,
+            "Unresolved": [
+              "shear studs on the W top strut (7/8 in dia, 2 across) are not modeled: their lengthwise pitch / number per strut is not dimensioned (Section B-B: 7/8 x 0\u0027-5 studs, 2 in from the edge)"
+            ],
             "TopWorkPointOffset": 0.59055,
             "BottomWorkPointOffset": 0.2032,
             "TiePlateThickness": 0.0127,
@@ -46801,6 +46861,8 @@
             "BoltGage": 0.08889999999999999,
             "TopBoltRows": 0,
             "BottomBoltOffset": 0,
+            "BottomBoltPitch": 0,
+            "Unresolved": [],
             "TopWorkPointOffset": 0.15239999999999998,
             "BottomWorkPointOffset": 0.15239999999999998,
             "TiePlateThickness": 0.0127,
@@ -46828,6 +46890,8 @@
             "BoltGage": 0.08889999999999999,
             "TopBoltRows": 0,
             "BottomBoltOffset": 0,
+            "BottomBoltPitch": 0,
+            "Unresolved": [],
             "TopWorkPointOffset": 0.15239999999999998,
             "BottomWorkPointOffset": 0.15239999999999998,
             "TiePlateThickness": 0.0127,
@@ -46855,6 +46919,8 @@
             "BoltGage": 0.08889999999999999,
             "TopBoltRows": 0,
             "BottomBoltOffset": 0,
+            "BottomBoltPitch": 0,
+            "Unresolved": [],
             "TopWorkPointOffset": "NaN",
             "BottomWorkPointOffset": 0.254,
             "TiePlateThickness": 0.0127,
@@ -46879,6 +46945,7 @@
           "Pier 10WB": "none",
           "Pier 11WB": "10"
         },
+        "SupportBayStyles": {},
         "SupportStyle": "",
         "Lines": [
           {
@@ -47105,54 +47172,14 @@
               "6": "4",
               "7": "4"
             },
-            "Bays": null
-          },
-          {
-            "Girder": 10,
-            "Distance": 201.5950375,
-            "NormalToGirder": false,
-            "Style": "",
-            "BayStyles": {
-              "6": "9"
-            },
-            "Bays": null
-          },
-          {
-            "Girder": 10,
-            "Distance": 207.66087499999998,
-            "NormalToGirder": false,
-            "Style": "",
-            "BayStyles": {},
-            "Bays": null
-          },
-          {
-            "Girder": 10,
-            "Distance": 214.315675,
-            "NormalToGirder": false,
-            "Style": "",
-            "BayStyles": {},
-            "Bays": null
-          },
-          {
-            "Girder": 10,
-            "Distance": 220.7879125,
-            "NormalToGirder": false,
-            "Style": "",
-            "BayStyles": {},
-            "Bays": null
-          },
-          {
-            "Girder": 10,
-            "Distance": 217.77960000000002,
-            "NormalToGirder": false,
-            "Style": "",
-            "BayStyles": {
-              "2": "4",
-              "5": "4"
-            },
             "Bays": [
-              2,
-              5
+              0,
+              1,
+              5,
+              6,
+              7,
+              8,
+              9
             ]
           },
           {
@@ -47161,13 +47188,20 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {
-              "2": "4",
               "5": "4",
               "6": "4",
               "7": "4",
               "8": "9"
             },
-            "Bays": null
+            "Bays": [
+              0,
+              1,
+              5,
+              6,
+              7,
+              8,
+              9
+            ]
           },
           {
             "Girder": 10,
@@ -47177,7 +47211,8 @@
             "BayStyles": {
               "6": "4",
               "7": "4",
-              "8": "4"
+              "8": "4",
+              "9": "4"
             },
             "Bays": null
           },
@@ -47215,45 +47250,19 @@
           },
           {
             "Girder": 10,
-            "Distance": 267.3302374999999,
-            "NormalToGirder": false,
-            "Style": "",
-            "BayStyles": {},
-            "Bays": null
-          },
-          {
-            "Girder": 10,
-            "Distance": 273.56752499999993,
-            "NormalToGirder": false,
-            "Style": "",
-            "BayStyles": {},
-            "Bays": null
-          },
-          {
-            "Girder": 10,
-            "Distance": 276.4281999999999,
-            "NormalToGirder": false,
-            "Style": "",
-            "BayStyles": {},
-            "Bays": null
-          },
-          {
-            "Girder": 10,
-            "Distance": 281.9923874999999,
-            "NormalToGirder": false,
-            "Style": "",
-            "BayStyles": {},
-            "Bays": null
-          },
-          {
-            "Girder": 10,
             "Distance": 284.7943249999999,
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {
-              "9": "9"
+              "8": "9"
             },
-            "Bays": null
+            "Bays": [
+              5,
+              6,
+              7,
+              8,
+              9
+            ]
           },
           {
             "Girder": 10,
@@ -47289,37 +47298,20 @@
           },
           {
             "Girder": 10,
-            "Distance": 321.1274375,
-            "NormalToGirder": false,
-            "Style": "",
-            "BayStyles": {},
-            "Bays": null
-          },
-          {
-            "Girder": 10,
-            "Distance": 325.993125,
-            "NormalToGirder": false,
-            "Style": "",
-            "BayStyles": {},
-            "Bays": null
-          },
-          {
-            "Girder": 10,
-            "Distance": 328.298175,
-            "NormalToGirder": false,
-            "Style": "",
-            "BayStyles": {},
-            "Bays": null
-          },
-          {
-            "Girder": 10,
             "Distance": 335.3800125,
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {
-              "9": "9"
+              "8": "9"
             },
-            "Bays": null
+            "Bays": [
+              0,
+              5,
+              6,
+              7,
+              8,
+              9
+            ]
           },
           {
             "Girder": 10,
@@ -47368,6 +47360,254 @@
             "Style": "",
             "BayStyles": {},
             "Bays": null
+          },
+          {
+            "Girder": 0,
+            "Distance": 200.90190959999998,
+            "NormalToGirder": false,
+            "Style": "",
+            "BayStyles": {
+              "6": "9"
+            },
+            "Bays": [
+              0,
+              2,
+              5,
+              6,
+              7,
+              8,
+              9
+            ]
+          },
+          {
+            "Girder": 2,
+            "Distance": 204.99659280000003,
+            "NormalToGirder": false,
+            "Style": "",
+            "BayStyles": {},
+            "Bays": [
+              0,
+              2
+            ]
+          },
+          {
+            "Girder": 5,
+            "Distance": 207.54380640000002,
+            "NormalToGirder": false,
+            "Style": "",
+            "BayStyles": {},
+            "Bays": [
+              5,
+              7,
+              8,
+              9
+            ]
+          },
+          {
+            "Girder": 6,
+            "Distance": 210.8533248,
+            "NormalToGirder": false,
+            "Style": "",
+            "BayStyles": {},
+            "Bays": [
+              0,
+              1,
+              2,
+              6
+            ]
+          },
+          {
+            "Girder": 7,
+            "Distance": 214.14912720000004,
+            "NormalToGirder": false,
+            "Style": "",
+            "BayStyles": {},
+            "Bays": [
+              7,
+              9
+            ]
+          },
+          {
+            "Girder": 8,
+            "Distance": 217.4315184,
+            "NormalToGirder": false,
+            "Style": "",
+            "BayStyles": {
+              "2": "4",
+              "5": "4"
+            },
+            "Bays": [
+              0,
+              1,
+              2,
+              5,
+              6,
+              8
+            ]
+          },
+          {
+            "Girder": 9,
+            "Distance": 220.7008032,
+            "NormalToGirder": false,
+            "Style": "",
+            "BayStyles": {},
+            "Bays": [
+              9
+            ]
+          },
+          {
+            "Girder": 0,
+            "Distance": 264.69594,
+            "NormalToGirder": false,
+            "Style": "",
+            "BayStyles": {},
+            "Bays": [
+              0,
+              5,
+              6,
+              7,
+              8,
+              9
+            ]
+          },
+          {
+            "Girder": 5,
+            "Distance": 269.0372064,
+            "NormalToGirder": false,
+            "Style": "",
+            "BayStyles": {},
+            "Bays": [
+              1,
+              5
+            ]
+          },
+          {
+            "Girder": 6,
+            "Distance": 272.20621200000005,
+            "NormalToGirder": false,
+            "Style": "",
+            "BayStyles": {},
+            "Bays": [
+              0,
+              1,
+              6,
+              8,
+              9
+            ]
+          },
+          {
+            "Girder": 7,
+            "Distance": 275.3660736,
+            "NormalToGirder": false,
+            "Style": "",
+            "BayStyles": {},
+            "Bays": [
+              7,
+              9
+            ]
+          },
+          {
+            "Girder": 8,
+            "Distance": 278.517096,
+            "NormalToGirder": false,
+            "Style": "",
+            "BayStyles": {},
+            "Bays": [
+              0,
+              1,
+              5,
+              6,
+              8
+            ]
+          },
+          {
+            "Girder": 9,
+            "Distance": 281.65988880000003,
+            "NormalToGirder": false,
+            "Style": "",
+            "BayStyles": {},
+            "Bays": [
+              9
+            ]
+          },
+          {
+            "Girder": 0,
+            "Distance": 316.9389648,
+            "NormalToGirder": false,
+            "Style": "",
+            "BayStyles": {},
+            "Bays": [
+              0,
+              6,
+              7,
+              8,
+              9
+            ]
+          },
+          {
+            "Girder": 5,
+            "Distance": 320.6721552,
+            "NormalToGirder": false,
+            "Style": "",
+            "BayStyles": {},
+            "Bays": [
+              5
+            ]
+          },
+          {
+            "Girder": 6,
+            "Distance": 323.62414320000005,
+            "NormalToGirder": false,
+            "Style": "",
+            "BayStyles": {},
+            "Bays": [
+              0,
+              6,
+              8,
+              9
+            ]
+          },
+          {
+            "Girder": 7,
+            "Distance": 326.57064479999997,
+            "NormalToGirder": false,
+            "Style": "",
+            "BayStyles": {},
+            "Bays": [
+              7
+            ]
+          },
+          {
+            "Girder": 8,
+            "Distance": 329.5122696,
+            "NormalToGirder": false,
+            "Style": "",
+            "BayStyles": {},
+            "Bays": [
+              0,
+              5,
+              6,
+              8
+            ]
+          },
+          {
+            "Girder": 9,
+            "Distance": 332.4487128,
+            "NormalToGirder": false,
+            "Style": "",
+            "BayStyles": {},
+            "Bays": [
+              9
+            ]
+          }
+        ],
+        "Links": [
+          {
+            "LeftGirder": 4,
+            "LeftSupport": "Pier 6A",
+            "RightGirder": 5,
+            "RightSupport": "Pier 5WB",
+            "Style": "10"
           }
         ]
       },
@@ -69374,6 +69614,10 @@
             "BoltGage": 0.08889999999999999,
             "TopBoltRows": 2,
             "BottomBoltOffset": 0,
+            "BottomBoltPitch": 0,
+            "Unresolved": [
+              "tie plate length is not dimensioned (I-80 Types 1-4, sheet 118): the model keeps 10 in; a length scaled from the elevation (about 4.7 in) is NOT used"
+            ],
             "TopWorkPointOffset": 0.15239999999999998,
             "BottomWorkPointOffset": 0.254,
             "TiePlateThickness": 0.0127,
@@ -69404,6 +69648,10 @@
             "BoltGage": 0.08889999999999999,
             "TopBoltRows": 2,
             "BottomBoltOffset": 0.044449999999999996,
+            "BottomBoltPitch": 0,
+            "Unresolved": [
+              "tie plate length is not dimensioned (I-80 Types 1-4, sheet 118): the model keeps 10 in; a length scaled from the elevation (about 4.7 in) is NOT used"
+            ],
             "TopWorkPointOffset": 0.15239999999999998,
             "BottomWorkPointOffset": 0.254,
             "TiePlateThickness": 0.0127,
@@ -69434,6 +69682,8 @@
             "BoltGage": 0.08889999999999999,
             "TopBoltRows": 2,
             "BottomBoltOffset": 0.044449999999999996,
+            "BottomBoltPitch": 0,
+            "Unresolved": [],
             "TopWorkPointOffset": 0.15239999999999998,
             "BottomWorkPointOffset": 0.254,
             "TiePlateThickness": 0.0127,
@@ -69461,6 +69711,10 @@
             "BoltGage": 0.08889999999999999,
             "TopBoltRows": 2,
             "BottomBoltOffset": 0,
+            "BottomBoltPitch": 0,
+            "Unresolved": [
+              "tie plate length is not dimensioned (I-80 Types 1-4, sheet 118): the model keeps 10 in; a length scaled from the elevation (about 4.7 in) is NOT used"
+            ],
             "TopWorkPointOffset": 0.15239999999999998,
             "BottomWorkPointOffset": 0.254,
             "TiePlateThickness": 0.0127,
@@ -69491,6 +69745,8 @@
             "BoltGage": 0.08889999999999999,
             "TopBoltRows": 2,
             "BottomBoltOffset": 0.044449999999999996,
+            "BottomBoltPitch": 0,
+            "Unresolved": [],
             "TopWorkPointOffset": 0.15239999999999998,
             "BottomWorkPointOffset": 0.254,
             "TiePlateThickness": 0.0127,
@@ -69518,6 +69774,8 @@
             "BoltGage": 0.08889999999999999,
             "TopBoltRows": 2,
             "BottomBoltOffset": 0,
+            "BottomBoltPitch": 0,
+            "Unresolved": [],
             "TopWorkPointOffset": 0.15239999999999998,
             "BottomWorkPointOffset": 0.254,
             "TiePlateThickness": 0.0127,
@@ -69545,6 +69803,10 @@
             "BoltGage": 0.08889999999999999,
             "TopBoltRows": 3,
             "BottomBoltOffset": 0,
+            "BottomBoltPitch": 0,
+            "Unresolved": [
+              "shear studs on the W top strut (7/8 in dia, 2 across) are not modeled: their lengthwise pitch / number per strut is not dimensioned (Section C-C: 7/8 x 5 studs, 1 1/2 in from the edge)"
+            ],
             "TopWorkPointOffset": 0.4572,
             "BottomWorkPointOffset": 0.15239999999999998,
             "TiePlateThickness": 0.0127,
@@ -69572,6 +69834,10 @@
             "BoltGage": 0.08889999999999999,
             "TopBoltRows": 6,
             "BottomBoltOffset": 0,
+            "BottomBoltPitch": 0.15239999999999998,
+            "Unresolved": [
+              "shear studs on the W top strut (7/8 in dia, 2 across) are not modeled: their lengthwise pitch / number per strut is not dimensioned (Section B-B: 7/8 x 0\u0027-5 studs, 2 in from the edge)"
+            ],
             "TopWorkPointOffset": 0.59055,
             "BottomWorkPointOffset": 0.2032,
             "TiePlateThickness": 0.0127,
@@ -69599,6 +69865,8 @@
             "BoltGage": 0.08889999999999999,
             "TopBoltRows": 0,
             "BottomBoltOffset": 0,
+            "BottomBoltPitch": 0,
+            "Unresolved": [],
             "TopWorkPointOffset": 0.15239999999999998,
             "BottomWorkPointOffset": 0.15239999999999998,
             "TiePlateThickness": 0.0127,
@@ -69626,6 +69894,8 @@
             "BoltGage": 0.08889999999999999,
             "TopBoltRows": 0,
             "BottomBoltOffset": 0,
+            "BottomBoltPitch": 0,
+            "Unresolved": [],
             "TopWorkPointOffset": 0.15239999999999998,
             "BottomWorkPointOffset": 0.15239999999999998,
             "TiePlateThickness": 0.0127,
@@ -69653,6 +69923,8 @@
             "BoltGage": 0.08889999999999999,
             "TopBoltRows": 0,
             "BottomBoltOffset": 0,
+            "BottomBoltPitch": 0,
+            "Unresolved": [],
             "TopWorkPointOffset": "NaN",
             "BottomWorkPointOffset": 0.254,
             "TiePlateThickness": 0.0127,
@@ -69674,6 +69946,14 @@
           "Pier 14WB": "5",
           "Pier 15WB": "5",
           "East Abut": "ABUT"
+        },
+        "SupportBayStyles": {
+          "Pier 14WB": {
+            "0": "6"
+          },
+          "Pier 15WB": {
+            "0": "6"
+          }
         },
         "SupportStyle": "",
         "Lines": [
@@ -70026,7 +70306,8 @@
             "BayStyles": {},
             "Bays": null
           }
-        ]
+        ],
+        "Links": []
       },
       "Stiffeners": {
         "BearingStiffener": {
@@ -81773,6 +82054,8 @@
             "BoltGage": 0.07619999999999999,
             "TopBoltRows": 2,
             "BottomBoltOffset": 0.038099999999999995,
+            "BottomBoltPitch": 0,
+            "Unresolved": [],
             "TopWorkPointOffset": 0.15239999999999998,
             "BottomWorkPointOffset": 0.15239999999999998,
             "TiePlateThickness": 0.0127,
@@ -81800,6 +82083,10 @@
             "BoltGage": 0.07619999999999999,
             "TopBoltRows": 2,
             "BottomBoltOffset": 0.0254,
+            "BottomBoltPitch": 0,
+            "Unresolved": [
+              "tie plate length is not dimensioned (Ramp G Types 2, 3): the model keeps 10 in; a length scaled from the elevation is NOT used"
+            ],
             "TopWorkPointOffset": 0.15239999999999998,
             "BottomWorkPointOffset": 0.2032,
             "TiePlateThickness": 0.0127,
@@ -81830,6 +82117,10 @@
             "BoltGage": 0.07619999999999999,
             "TopBoltRows": 2,
             "BottomBoltOffset": 0.0508,
+            "BottomBoltPitch": 0,
+            "Unresolved": [
+              "tie plate length is not dimensioned (Ramp G Types 2, 3): the model keeps 10 in; a length scaled from the elevation is NOT used"
+            ],
             "TopWorkPointOffset": 0.15239999999999998,
             "BottomWorkPointOffset": 0.254,
             "TiePlateThickness": 0.0127,
@@ -81860,6 +82151,10 @@
             "BoltGage": 0.07619999999999999,
             "TopBoltRows": 3,
             "BottomBoltOffset": 0.038099999999999995,
+            "BottomBoltPitch": 0,
+            "Unresolved": [
+              "shear studs on the W top strut (2 across) are not modeled: their lengthwise pitch / number per strut is not dimensioned (Section B-B: 1 1/2 in from the edge)"
+            ],
             "TopWorkPointOffset": 0.4445,
             "BottomWorkPointOffset": 0.15239999999999998,
             "TiePlateThickness": 0.0127,
@@ -81887,7 +82182,12 @@
             "BoltGage": 0.07619999999999999,
             "TopBoltRows": 7,
             "BottomBoltOffset": 0,
-            "TopWorkPointOffset": 0.40258999999999995,
+            "BottomBoltPitch": 0,
+            "Unresolved": [
+              "shear studs on the W top strut (2 across) are not modeled: their lengthwise pitch / number per strut is not dimensioned (Section A-A: 2 in from the edge)",
+              "pitch of the 2 bottom bolt rows on the WT5x15 chord is not dimensioned (the common 3 in pitch is kept)"
+            ],
+            "TopWorkPointOffset": 0.38036499999999995,
             "BottomWorkPointOffset": 0.15239999999999998,
             "TiePlateThickness": 0.0127,
             "TiePlateLength": 0.254,
@@ -81914,6 +82214,8 @@
             "BoltGage": 0.08889999999999999,
             "TopBoltRows": 0,
             "BottomBoltOffset": 0,
+            "BottomBoltPitch": 0,
+            "Unresolved": [],
             "TopWorkPointOffset": 0.15239999999999998,
             "BottomWorkPointOffset": 0.15239999999999998,
             "TiePlateThickness": 0.0127,
@@ -81936,6 +82238,7 @@
           "Pier 4G": "1",
           "Pier 5G": "4"
         },
+        "SupportBayStyles": {},
         "SupportStyle": "",
         "Lines": [
           {
@@ -82238,7 +82541,8 @@
             "BayStyles": {},
             "Bays": null
           }
-        ]
+        ],
+        "Links": []
       },
       "Stiffeners": {
         "BearingStiffener": {
@@ -91953,6 +92257,8 @@
             "BoltGage": 0.07619999999999999,
             "TopBoltRows": 2,
             "BottomBoltOffset": 0.038099999999999995,
+            "BottomBoltPitch": 0,
+            "Unresolved": [],
             "TopWorkPointOffset": 0.15239999999999998,
             "BottomWorkPointOffset": 0.15239999999999998,
             "TiePlateThickness": 0.0127,
@@ -91980,6 +92286,10 @@
             "BoltGage": 0.07619999999999999,
             "TopBoltRows": 2,
             "BottomBoltOffset": 0.0254,
+            "BottomBoltPitch": 0,
+            "Unresolved": [
+              "tie plate length is not dimensioned (Ramp G Types 2, 3): the model keeps 10 in; a length scaled from the elevation is NOT used"
+            ],
             "TopWorkPointOffset": 0.15239999999999998,
             "BottomWorkPointOffset": 0.2032,
             "TiePlateThickness": 0.0127,
@@ -92010,6 +92320,10 @@
             "BoltGage": 0.07619999999999999,
             "TopBoltRows": 2,
             "BottomBoltOffset": 0.0508,
+            "BottomBoltPitch": 0,
+            "Unresolved": [
+              "tie plate length is not dimensioned (Ramp G Types 2, 3): the model keeps 10 in; a length scaled from the elevation is NOT used"
+            ],
             "TopWorkPointOffset": 0.15239999999999998,
             "BottomWorkPointOffset": 0.254,
             "TiePlateThickness": 0.0127,
@@ -92040,6 +92354,10 @@
             "BoltGage": 0.07619999999999999,
             "TopBoltRows": 3,
             "BottomBoltOffset": 0.038099999999999995,
+            "BottomBoltPitch": 0,
+            "Unresolved": [
+              "shear studs on the W top strut (2 across) are not modeled: their lengthwise pitch / number per strut is not dimensioned (Section B-B: 1 1/2 in from the edge)"
+            ],
             "TopWorkPointOffset": 0.4445,
             "BottomWorkPointOffset": 0.15239999999999998,
             "TiePlateThickness": 0.0127,
@@ -92067,7 +92385,12 @@
             "BoltGage": 0.07619999999999999,
             "TopBoltRows": 7,
             "BottomBoltOffset": 0,
-            "TopWorkPointOffset": 0.40258999999999995,
+            "BottomBoltPitch": 0,
+            "Unresolved": [
+              "shear studs on the W top strut (2 across) are not modeled: their lengthwise pitch / number per strut is not dimensioned (Section A-A: 2 in from the edge)",
+              "pitch of the 2 bottom bolt rows on the WT5x15 chord is not dimensioned (the common 3 in pitch is kept)"
+            ],
+            "TopWorkPointOffset": 0.374015,
             "BottomWorkPointOffset": 0.15239999999999998,
             "TiePlateThickness": 0.0127,
             "TiePlateLength": 0.254,
@@ -92094,6 +92417,8 @@
             "BoltGage": 0.08889999999999999,
             "TopBoltRows": 0,
             "BottomBoltOffset": 0,
+            "BottomBoltPitch": 0,
+            "Unresolved": [],
             "TopWorkPointOffset": 0.15239999999999998,
             "BottomWorkPointOffset": 0.15239999999999998,
             "TiePlateThickness": 0.0127,
@@ -92115,6 +92440,7 @@
           "Pier 8G": "1",
           "Pier 9G": "4"
         },
+        "SupportBayStyles": {},
         "SupportStyle": "",
         "Lines": [
           {
@@ -92397,7 +92723,8 @@
             "BayStyles": {},
             "Bays": null
           }
-        ]
+        ],
+        "Links": []
       },
       "Stiffeners": {
         "BearingStiffener": {
@@ -104419,6 +104746,8 @@
             "BoltGage": 0.07619999999999999,
             "TopBoltRows": 2,
             "BottomBoltOffset": 0.038099999999999995,
+            "BottomBoltPitch": 0,
+            "Unresolved": [],
             "TopWorkPointOffset": 0.15239999999999998,
             "BottomWorkPointOffset": 0.15239999999999998,
             "TiePlateThickness": 0.0127,
@@ -104446,6 +104775,10 @@
             "BoltGage": 0.07619999999999999,
             "TopBoltRows": 2,
             "BottomBoltOffset": 0.0254,
+            "BottomBoltPitch": 0,
+            "Unresolved": [
+              "tie plate length is not dimensioned (Ramp G Types 2, 3): the model keeps 10 in; a length scaled from the elevation is NOT used"
+            ],
             "TopWorkPointOffset": 0.15239999999999998,
             "BottomWorkPointOffset": 0.2032,
             "TiePlateThickness": 0.0127,
@@ -104476,6 +104809,10 @@
             "BoltGage": 0.07619999999999999,
             "TopBoltRows": 2,
             "BottomBoltOffset": 0.0508,
+            "BottomBoltPitch": 0,
+            "Unresolved": [
+              "tie plate length is not dimensioned (Ramp G Types 2, 3): the model keeps 10 in; a length scaled from the elevation is NOT used"
+            ],
             "TopWorkPointOffset": 0.15239999999999998,
             "BottomWorkPointOffset": 0.254,
             "TiePlateThickness": 0.0127,
@@ -104506,6 +104843,10 @@
             "BoltGage": 0.07619999999999999,
             "TopBoltRows": 3,
             "BottomBoltOffset": 0.038099999999999995,
+            "BottomBoltPitch": 0,
+            "Unresolved": [
+              "shear studs on the W top strut (2 across) are not modeled: their lengthwise pitch / number per strut is not dimensioned (Section B-B: 1 1/2 in from the edge)"
+            ],
             "TopWorkPointOffset": 0.43179999999999996,
             "BottomWorkPointOffset": 0.15239999999999998,
             "TiePlateThickness": 0.0127,
@@ -104533,7 +104874,12 @@
             "BoltGage": 0.07619999999999999,
             "TopBoltRows": 7,
             "BottomBoltOffset": 0,
-            "TopWorkPointOffset": 0.40258999999999995,
+            "BottomBoltPitch": 0,
+            "Unresolved": [
+              "shear studs on the W top strut (2 across) are not modeled: their lengthwise pitch / number per strut is not dimensioned (Section A-A: 2 in from the edge)",
+              "pitch of the 2 bottom bolt rows on the WT5x15 chord is not dimensioned (the common 3 in pitch is kept)"
+            ],
+            "TopWorkPointOffset": 0.37718999999999997,
             "BottomWorkPointOffset": 0.15239999999999998,
             "TiePlateThickness": 0.0127,
             "TiePlateLength": 0.254,
@@ -104560,6 +104906,8 @@
             "BoltGage": 0.08889999999999999,
             "TopBoltRows": 0,
             "BottomBoltOffset": 0,
+            "BottomBoltPitch": 0,
+            "Unresolved": [],
             "TopWorkPointOffset": 0.15239999999999998,
             "BottomWorkPointOffset": 0.15239999999999998,
             "TiePlateThickness": 0.0127,
@@ -104582,6 +104930,7 @@
           "Pier 13G": "1",
           "Pier 14G": "4"
         },
+        "SupportBayStyles": {},
         "SupportStyle": "",
         "Lines": [
           {
@@ -104976,7 +105325,8 @@
             "BayStyles": {},
             "Bays": null
           }
-        ]
+        ],
+        "Links": []
       },
       "Stiffeners": {
         "BearingStiffener": {
@@ -117282,6 +117632,8 @@
             "BoltGage": 0.07619999999999999,
             "TopBoltRows": 2,
             "BottomBoltOffset": 0.038099999999999995,
+            "BottomBoltPitch": 0,
+            "Unresolved": [],
             "TopWorkPointOffset": 0.15239999999999998,
             "BottomWorkPointOffset": 0.15239999999999998,
             "TiePlateThickness": 0.0127,
@@ -117309,6 +117661,10 @@
             "BoltGage": 0.07619999999999999,
             "TopBoltRows": 2,
             "BottomBoltOffset": 0.0254,
+            "BottomBoltPitch": 0,
+            "Unresolved": [
+              "tie plate length is not dimensioned (Ramp G Types 2, 3): the model keeps 10 in; a length scaled from the elevation is NOT used"
+            ],
             "TopWorkPointOffset": 0.15239999999999998,
             "BottomWorkPointOffset": 0.2032,
             "TiePlateThickness": 0.0127,
@@ -117339,6 +117695,10 @@
             "BoltGage": 0.07619999999999999,
             "TopBoltRows": 2,
             "BottomBoltOffset": 0.0508,
+            "BottomBoltPitch": 0,
+            "Unresolved": [
+              "tie plate length is not dimensioned (Ramp G Types 2, 3): the model keeps 10 in; a length scaled from the elevation is NOT used"
+            ],
             "TopWorkPointOffset": 0.15239999999999998,
             "BottomWorkPointOffset": 0.254,
             "TiePlateThickness": 0.0127,
@@ -117369,6 +117729,10 @@
             "BoltGage": 0.07619999999999999,
             "TopBoltRows": 3,
             "BottomBoltOffset": 0.038099999999999995,
+            "BottomBoltPitch": 0,
+            "Unresolved": [
+              "shear studs on the W top strut (2 across) are not modeled: their lengthwise pitch / number per strut is not dimensioned (Section B-B: 1 1/2 in from the edge)"
+            ],
             "TopWorkPointOffset": 0.4445,
             "BottomWorkPointOffset": 0.15239999999999998,
             "TiePlateThickness": 0.0127,
@@ -117396,7 +117760,12 @@
             "BoltGage": 0.07619999999999999,
             "TopBoltRows": 7,
             "BottomBoltOffset": 0,
-            "TopWorkPointOffset": 0.40258999999999995,
+            "BottomBoltPitch": 0,
+            "Unresolved": [
+              "shear studs on the W top strut (2 across) are not modeled: their lengthwise pitch / number per strut is not dimensioned (Section A-A: 2 in from the edge)",
+              "pitch of the 2 bottom bolt rows on the WT5x15 chord is not dimensioned (the common 3 in pitch is kept)"
+            ],
+            "TopWorkPointOffset": 0.38036499999999995,
             "BottomWorkPointOffset": 0.15239999999999998,
             "TiePlateThickness": 0.0127,
             "TiePlateLength": 0.254,
@@ -117423,6 +117792,8 @@
             "BoltGage": 0.08889999999999999,
             "TopBoltRows": 0,
             "BottomBoltOffset": 0,
+            "BottomBoltPitch": 0,
+            "Unresolved": [],
             "TopWorkPointOffset": 0.15239999999999998,
             "BottomWorkPointOffset": 0.15239999999999998,
             "TiePlateThickness": 0.0127,
@@ -117445,6 +117816,7 @@
           "Pier 18G": "1",
           "Pier 19G": "4"
         },
+        "SupportBayStyles": {},
         "SupportStyle": "",
         "Lines": [
           {
@@ -117692,14 +118064,6 @@
             "Distance": 187.91849205919686,
             "NormalToGirder": false,
             "Style": "",
-            "BayStyles": {},
-            "Bays": null
-          },
-          {
-            "Girder": 0,
-            "Distance": 194.60504205919685,
-            "NormalToGirder": false,
-            "Style": "",
             "BayStyles": {
               "0": "3",
               "1": "3",
@@ -117708,14 +118072,40 @@
             "Bays": null
           },
           {
+            "Girder": 1,
+            "Distance": 191.16530849538518,
+            "NormalToGirder": false,
+            "Style": "",
+            "BayStyles": {
+              "1": "2"
+            },
+            "Bays": [
+              1
+            ]
+          },
+          {
+            "Girder": 0,
+            "Distance": 194.60504205919685,
+            "NormalToGirder": false,
+            "Style": "",
+            "BayStyles": {
+              "0": "2",
+              "2": "2"
+            },
+            "Bays": [
+              0,
+              2
+            ]
+          },
+          {
             "Girder": 0,
             "Distance": 197.84830455919686,
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {
               "0": "2",
-              "1": "2",
-              "2": "2"
+              "1": "3",
+              "2": "3"
             },
             "Bays": null
           },
@@ -117725,9 +118115,7 @@
             "NormalToGirder": false,
             "Style": "",
             "BayStyles": {
-              "0": "2",
-              "1": "3",
-              "2": "3"
+              "2": "2"
             },
             "Bays": null
           },
@@ -117831,7 +118219,8 @@
             },
             "Bays": null
           }
-        ]
+        ],
+        "Links": []
       },
       "Stiffeners": {
         "BearingStiffener": {

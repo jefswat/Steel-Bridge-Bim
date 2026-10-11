@@ -5,12 +5,15 @@
 //    frames only in some bays (listed per line).
 //  * Type marks: Unit 1 default Type 1; (2) heavier frames next to the piers (drawn bold), (7) plate diaphragms, (9) strut.
 //  * All bolts 1" in 1 1/16" holes, two columns 3 1/2" apart on the 7" connection plates, 1 3/4" edges (sheet 118 notes).
-// Assumed (not dimensioned on the plans): tie plate length 10"; top gusset bolt rows (2); abutment frame bottom bolt rows (2).
+// Confirmed on the plans (docs/plan-data/cross-frame-gaps.md section 5): top gusset bolts 2 rows x 2 columns (pitch 3 1/2, gage 3 1/2,
+// edge 1 3/4); abutment frame bottom gusset 2 x 2 bolts with the rows 6" apart (3" above/below the work point, WP 8" above the bottom flange).
+// NOT dimensioned (UNRESOLVED, nothing invented, raised as warnings by the generator through CrossFrameStyle.Unresolved): tie plate
+// length (the model's 10" stays), the lengthwise stud pitch of the shear studs on the W top struts (studs are not modeled).
 using SBM.Core.Bridge;
 
 double I(double inch) => In(inch);
 CrossFrameStyle Frame(string name, string top, string diag, string bot, double gusset, int rows, double topWp, double botWp,
-    int topRows = 2, bool tiePlates = false) => new()
+    int topRows = 2, bool tiePlates = false, double bottomPitch = 0, string[]? unresolved = null) => new()
 {
     Name = name, Kind = CrossFrameStyleKind.InvertedK, TopChord = top, Diagonal = diag, BottomChord = bot, GussetThickness = I(gusset),
     BoltDiameter = I(1), BoltColumns = 2, BoltGage = I(3.5), BoltEdgeDistance = I(1.75), BoltPitch = I(3.5),
@@ -18,7 +21,11 @@ CrossFrameStyle Frame(string name, string top, string diag, string bot, double g
     TiePlateThickness = I(0.5), TiePlateLength = I(10), TiePlateOffsets = tiePlates ? new() { -I(16), I(16) } : new(),
     // Taller bottom groups keep the lowest bolt 7" below the work point (as the 5-row Type 1 detail) and grow upward.
     BottomBoltOffset = I(Math.Max(0, (rows - 1) * 3.5 / 2 - 7)),
+    BottomBoltPitch = I(bottomPitch),
+    Unresolved = (tiePlates ? new[] { "tie plate length is not dimensioned (I-80 Types 1-4, sheet 118): the model keeps 10 in; a length scaled from the elevation (about 4.7 in) is NOT used" } : Array.Empty<string>())
+        .Concat(unresolved ?? Array.Empty<string>()).ToList(),
 };
+const string StudNote = "shear studs on the W top strut (7/8 in dia, 2 across) are not modeled: their lengthwise pitch / number per strut is not dimensioned";
 // Type 10 / abutment frames: rolled-beam top strut bolted through its web; its bolt group starts 2'-2 below the top of
 // slab (= 8" slab + 3 1/2" haunch above the top of web), so the strut's work point is 26" + half the group - 11 1/2" down.
 double StrutWp(int rows) => 26 + (rows - 1) * 3.5 / 2 - 11.5;
@@ -30,8 +37,8 @@ var styles = new List<CrossFrameStyle>
     Frame("4", "L6x6x3/8", "L6x6x1/2", "MC10x25", 0.625, 5, 6, 10, tiePlates: true),
     Frame("5", "L6x6x5/8", "L6x6x3/4", "2-MC10x28.5", 0.75, 6, 6, 10),
     Frame("6", "L6x6x3/8", "L6x6x5/8", "2-MC6x15.3", 0.5, 4, 6, 10),
-    Frame("10", "W12x40", "L5x5x5/8", "2-MC6x15.3", 0.5, 3, StrutWp(3), 6, topRows: 3),
-    Frame("ABUT", "W24x68", "L5x5x5/8", "L8x8x1/2", 0.5, 2, StrutWp(6), 8, topRows: 6),
+    Frame("10", "W12x40", "L5x5x5/8", "2-MC6x15.3", 0.5, 3, StrutWp(3), 6, topRows: 3, unresolved: new[] { StudNote + " (Section C-C: 7/8 x 5 studs, 1 1/2 in from the edge)" }),
+    Frame("ABUT", "W24x68", "L5x5x5/8", "L8x8x1/2", 0.5, 2, StrutWp(6), 8, topRows: 6, bottomPitch: 6, unresolved: new[] { StudNote + " (Section B-B: 7/8 x 0'-5 studs, 2 in from the edge)" }),
     new() { Name = "7", Kind = CrossFrameStyleKind.PlateDiaphragm, WebPlateThickness = I(0.625), FlangePlateWidth = I(16), FlangePlateThickness = I(0.75),
             DiaphragmBolts = 15, DiaphragmBoltPitch = I(6), BoltDiameter = I(1), TopWorkPointOffset = I(6), BottomWorkPointOffset = I(6) },
     new() { Name = "8", Kind = CrossFrameStyleKind.PlateDiaphragm, WebPlateThickness = I(0.5), FlangePlateWidth = I(12), FlangePlateThickness = I(0.75),
@@ -117,12 +124,17 @@ foreach (var s in unit1.Supports) Print($"  {s.Name}: support frames {cf1.Suppor
 // 106, 108 (107 is VOID, replaced by revised 108) and 109: default Type 3, frames perpendicular to the CL WB; spacing
 // along girder K (cumulative from K's CL bearing at Pier 5WB). K's bearings: the girder data tables give K's span
 // lengths 208'-6, 260'-0, 266'-7 1/4, 199'-7 1/2 (sum of the string), 165'-11 9/16, 138'-8 11/16.
-// Skewed Piers 8WB-10WB: the frames on K's string and on K's bearing lines are modeled with the bays the lines cross;
-// the plans' additional partial frames placed from other girders' bearings (dims marked "measured along girder") are
-// NOT yet transcribed (open item).
+// Skewed Piers 8WB-10WB (docs/plan-data/cross-frame-gaps.md section 1): the plans put a frame LINE (radial to the CL WB approach
+// roadway) through EACH girder's CL bearing, with frames only in the bays drawn. The ring dimensions "n'-n" are measured along the
+// PREVIOUS girder from its bearing to the radial through the next girder's bearing (verified to 0.003 ft). So these lines are
+// entered per girder (Girder = X, Distance = X's cumulative bearing distance, explicit Bays + BayStyles); the K-string dims that
+// land on those radials are only advanced (Skip), K's own bearing lines stay on the K string.
+// UNRESOLVED (not placed): 8WB A radial bay B-C (obscured by the "9'-0 13/16" dimension). The 8WB G radial bay G-H is a 4.6 pt stub
+// (rest hidden by a note) and the 8WB I radial types follow the report's input lines; both are flagged in the report.
 var u2 = new List<CrossFrameLine>();
 lines = u2;
 x = 0;
+void Skip(double ft) => x += ft;                                  // a K-string space that ends on a per-girder pier-zone line
 L(x += 23.5);
 Run(5, 24);
 Run(3, 21 + 8 / 12.0); lines.RemoveAt(lines.Count - 1);          // Pier 6WB: support frames
@@ -130,32 +142,64 @@ Run(12, 21 + 8 / 12.0); lines.RemoveAt(lines.Count - 1);         // Pier 7WB: su
 Run(8, 21 + 5 / 12.0, k => k switch
 {
     7 => (null, new[] { (0, "4"), (1, "4"), (2, "4"), (5, "4"), (6, "4") }),
-    8 => (null, new[] { (5, "4"), (6, "4"), (7, "4") }),
+    8 => (new[] { 0, 1, 5, 6, 7, 8, 9 }, new[] { (5, "4"), (6, "4"), (7, "4") }),   // C-F (2) absent on the plans
     _ => (null, Array.Empty<(int, string)>()),
 });
-Run(1, 21 + 6.8125 / 12, _ => (null, new[] { (6, "9") }));
-Run(1, 19 + 10.8125 / 12);
-Run(1, 21 + 10 / 12.0);
-Run(1, 21 + 2.8125 / 12);
-L(714.5, new[] { 2, 5 }, (2, "4"), (5, "4"));                    // partial line between K's string dims (approx.)
-Run(1, 10 + 4.8125 / 12, _ => (null, new[] { (2, "4"), (5, "4"), (6, "4"), (7, "4"), (8, "9") }));   // K's Pier 8WB bearing
-Run(5, 23 + 8 / 12.0, k => k == 1 ? (null, new[] { (6, "4"), (7, "4"), (8, "4") }) : (null, Array.Empty<(int, string)>()));
-Run(1, 23 + 11.5625 / 12);
-Run(1, 20 + 5.5625 / 12);
-Run(1, 9 + 4.625 / 12);
-Run(1, 18 + 3.0625 / 12);
-Run(1, 9 + 2.3125 / 12, _ => (null, new[] { (9, "9") }));        // K's Pier 9WB bearing
+Skip(21 + 6.8125 / 12);                                           // A's 8WB radial  (per-girder line below)
+Skip(19 + 10.8125 / 12);                                          // F
+Skip(21 + 10 / 12.0);                                             // H
+Skip(21 + 2.8125 / 12);                                           // J
+double kBrg8 = x + 10 + 4.8125 / 12;
+Run(1, 10 + 4.8125 / 12, _ => (new[] { 0, 1, 5, 6, 7, 8, 9 }, new[] { (5, "4"), (6, "4"), (7, "4"), (8, "9") }));   // K's Pier 8WB bearing
+Run(5, 23 + 8 / 12.0, k => k == 1 ? (null, new[] { (6, "4"), (7, "4"), (8, "4"), (9, "4") }) : (null, Array.Empty<(int, string)>()));   // K + 23'-8: G-H..J-K Type 4
+Skip(23 + 11.5625 / 12);                                          // A's 9WB radial
+Skip(20 + 5.5625 / 12);                                           // G
+Skip(9 + 4.625 / 12);                                             // H
+Skip(18 + 3.0625 / 12);                                           // J
+double kBrg9 = x + 9 + 2.3125 / 12;
+Run(1, 9 + 2.3125 / 12, _ => (new[] { 5, 6, 7, 8, 9 }, new[] { (8, "9") }));        // K's Pier 9WB bearing: strut in I-J
 Run(4, 23 + 10 / 12.0);
-Run(1, 23 + 10.4375 / 12);
-Run(1, 15 + 11.5625 / 12);
-Run(1, 7 + 6.75 / 12);
-Run(1, 23 + 2.8125 / 12, _ => (null, new[] { (9, "9") }));       // K's Pier 10WB bearing
+Skip(23 + 10.4375 / 12);                                          // A's 10WB radial
+Skip(15 + 11.5625 / 12);                                          // G
+Skip(7 + 6.75 / 12);                                              // H
+double kBrg10 = x + 23 + 2.8125 / 12;
+Run(1, 23 + 2.8125 / 12, _ => (new[] { 0, 5, 6, 7, 8, 9 }, new[] { (8, "9") }));    // K's Pier 10WB bearing: strut in I-J
 Run(4, 20.5);
 Run(1, 20 + 5.375 / 12);
 Run(1, 18 + 6.4375 / 12);
 Run(1, 17 + 8.875 / 12); lines.RemoveAt(lines.Count - 1);        // K's Pier 11WB bearing: end frames (Type 10)
 foreach (var l2 in u2) l2.Girder = 10;
-Print($"Unit 2: {u2.Count} frame lines along girder K, K to Pier 11WB bearing {x:F3} ft");
+Print($"K string at its bearing lines: 8WB {kBrg8:F3} (table 734.769), 9WB {kBrg9:F3} (934.364), 10WB {kBrg10:F3} (1100.329) ft");
+// Per-girder lines through the bearings (distances = cumulative bearing distances along the girder, report section 1).
+void P(int g, double d, int[] bays, params (int bay, string type)[] types)
+{
+    var l = new CrossFrameLine { Girder = g, Distance = Ft(d), Bays = bays.ToList() };
+    foreach (var (b, t) in types) l.BayStyles[b] = t;
+    u2.Add(l);
+}
+// Pier 8WB (sheet 107A)
+P(0, 659.127, new[] { 0, 2, 5, 6, 7, 8, 9 }, (6, "9"));           // A  (bay B-C unresolved)
+P(2, 672.561, new[] { 0, 2 });                                    // C
+P(5, 680.918, new[] { 5, 7, 8, 9 });                              // F
+P(6, 691.776, new[] { 0, 1, 2, 6 });                              // G
+P(7, 702.589, new[] { 7, 9 });                                    // H
+P(8, 713.358, new[] { 0, 1, 2, 5, 6, 8 }, (2, "4"), (5, "4"));    // I
+P(9, 724.084, new[] { 9 });                                       // J
+// Pier 9WB (sheet 108)
+P(0, 868.425, new[] { 0, 5, 6, 7, 8, 9 });                        // A
+P(5, 882.668, new[] { 1, 5 });                                    // F
+P(6, 893.065, new[] { 0, 1, 6, 8, 9 });                           // G
+P(7, 903.432, new[] { 7, 9 });                                    // H
+P(8, 913.770, new[] { 0, 1, 5, 6, 8 });                           // I
+P(9, 924.081, new[] { 9 });                                       // J
+// Pier 10WB (sheet 108)
+P(0, 1039.826, new[] { 0, 6, 7, 8, 9 });                          // A
+P(5, 1052.074, new[] { 5 });                                      // F
+P(6, 1061.759, new[] { 0, 6, 8, 9 });                             // G
+P(7, 1071.426, new[] { 7 });                                      // H
+P(8, 1081.077, new[] { 0, 5, 6, 8 });                             // I
+P(9, 1090.711, new[] { 9 });                                      // J
+Print($"Unit 2: {u2.Count} frame lines (K string + per-girder pier-zone lines), K to Pier 11WB bearing {x:F3} ft");
 
 var unit2 = Doc.Project.Bridges.First(b => b.Name == "I-80 WB Unit 2");
 var cf2 = unit2.CrossFrames;
@@ -167,6 +211,8 @@ cf2.SupportStyles = new()
     ["Pier 5WB"] = "10", ["Pier 6A"] = "10", ["Pier 6WB"] = "3", ["Pier 7WB"] = "3",
     ["Pier 8WB"] = "none", ["Pier 9WB"] = "none", ["Pier 10WB"] = "none", ["Pier 11WB"] = "10",
 };
+// Bay E-F between E at Pier 6A and F at Pier 5WB: Type 10 end frame on the straight line between the two CL bearings (sheet 117, Section A-A).
+cf2.Links = new() { new CrossFrameLink { LeftGirder = 4, LeftSupport = "Pier 6A", RightGirder = 5, RightSupport = "Pier 5WB", Style = "10" } };
 
 // ---------------- Unit 3 (girders A-J = 0-9; B and C end at cross girders), sheets 112, 113A (113 is VOID) and 114:
 // default Type 5, frames radial to the CL WB except along the piers (support frames on the skewed pier lines) and the
@@ -174,7 +220,8 @@ cf2.SupportStyles = new()
 // data: 158'-3 11/16, 194'-11 15/16, 195'-0 3/16, 195'-0 11/16, 160'-0 1/16 (each bearing falls on a string dimension).
 // Type 6 in the north bay (A-D) from mid Span 14WB to Span 16WB; one line of Type 8 plate diaphragms in Span 16WB.
 // Near the skewed piers the plans add partial lines measured along girder A (upper bays); the three at Pier 11WB are
-// included, the others (12WB: 21'-11 3/16; 13WB: 16'-1 15/16, 12'-10 7/8, 7'-4 1/8) are NOT yet (open item).
+// included, the others (12WB: 21'-11 3/16; 13WB: 16'-1 15/16, 12'-10 7/8, 7'-4 1/8) are NOT placed: UNRESOLVED (the plan dims do not
+// reconcile with the model's bearings, docs/plan-data/cross-frame-gaps.md section 3).
 var u3 = new List<CrossFrameLine>();
 lines = u3;
 x = 0;
@@ -218,6 +265,8 @@ cf3.SupportStyles = new()
 {
     ["Pier 11WB"] = "10", ["Pier 12WB"] = "5", ["Pier 13WB"] = "5", ["Pier 14WB"] = "5", ["Pier 15WB"] = "5", ["East Abut"] = "ABUT",
 };
+// Type 6 in the north bay (A-D, left girder A = 0) of the support frames at Piers 14WB and 15WB (sheets 117-118: Type 6 circle pairs).
+cf3.SupportBayStyles = new() { ["Pier 14WB"] = new() { [0] = "6" }, ["Pier 15WB"] = new() { [0] = "6" } };
 
 var res = Doc.Regenerate();
 Print($"Regenerated {res.Bridges} bridges in {res.Elapsed.TotalSeconds:F1} s, {res.Errors.Count} errors.");
