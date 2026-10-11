@@ -35,7 +35,9 @@ public sealed partial class ConcreteGenerator
         // ---- marks
         var marks = new List<BarMark>();
         var places = new List<BarPlacement>();
-        foreach (var g in bag.GroupBy(b => b.Mark).OrderBy(g => g.Key, StringComparer.Ordinal))
+        // The bag fills from parallel tasks: put each mark's bars in a fixed (geometric) order so bar i of a mark, and the
+        // IFC GlobalId / database row numbered from it, is the same bar on every run.
+        foreach (var g in InStableOrder(bag, b => b.Points).GroupBy(b => b.Mark).OrderBy(g => g.Key, StringComparer.Ordinal))
         {
             var first = g.First();
             var lens = g.Select(b => b.Length).ToList();

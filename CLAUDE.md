@@ -199,7 +199,11 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   shape may)/IfcFastener WELD/IfcBearing, IfcMapConversion base point,
   deterministic GlobalIds; a *.ifczip path writes a buildingSMART IFC-ZIP = one DEFLATE entry <name>.ifc, streamed). NOTE: in ADD2 IfcFacilityPart is abstract â€” use IfcBridgePart(..., UsageType, PredefinedType).
   Validate with IfcOpenShell (`pip install ifcopenshell pytest`; `ifcopenshell.validate.validate(f, log, express_rules=True)`);
-  last result: 0 issues.
+  reusable: `python -I tools/validate_ifc.py model.ifc [--express-sample N] [--geom N] [--geom-all REGEX] [--json out]`.
+  Last full-model result (2026-10-11, 344 MB, 3.75 M entities): 0 schema + 0 EXPRESS issues; see docs/plan-data/ifc-validation.md.
+  Exports must be reproducible (test `Ifc_RegeneratedModel_ExportsIdentically`): anything numbered from a parallel
+  generator's ConcurrentBag (stiffener marks, bar order, hole order) must be put in a fixed order first. Bar role:
+  TIE/HOOP/CROSSTIE/SPIRAL/SSTR-S = LIGATURE.
 - `src/SBM.App` â€” WPF (Fluent dark theme), MVVM via CommunityToolkit.Mvvm, GPU viewport = HelixToolkit.Wpf.SharpDX 3.x
   (DirectX 11, System.Numerics types; namespaces `HelixToolkit`, `HelixToolkit.SharpDX`, `HelixToolkit.Wpf.SharpDX`).
   - `Viewport/SceneBuilder` batches each layer into one LineGeometry3D + one BillboardText3D; vertices are rebased to a
