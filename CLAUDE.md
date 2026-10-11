@@ -191,6 +191,15 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
     profile carry `PrestressedBeam.Body` -> IFC IfcArbitraryClosedProfileDef over IfcIndexedPolyCurve (IfcArcIndex) extruded
     and clipped by the end planes; debond sheathing = IfcTendonConduit (key `IfcKeys.PsSheath`) + Pset SBM_Debonding.
     Demo: `samples/plans/prestressed-shapes-demo.csx`; tests `PrestressedStandardTests`.
+  - `Diaphragms/PsSteelDiaphragmDetailer` (T4, NOT hooked up yet - T6 does generator/RegenerationCache/IFC): Iowa 1036-BTD
+    steel intermediate diaphragms between prestressed beams. Pure function `Detail(PsSteelDiaphragmDefinition,
+    IReadOnlyList<PsDiaphragmBeamLine>)` -> `PsSteelDiaphragmModel` (SteelParts, BoltInstances with Diameter, cast holes,
+    per-bay fit/length/weight results, diagnostics). Input `Bridge/PsSteelDiaphragmDefinition.cs`: hole CHAINS per beam
+    line as dimensioned on the plan (from the beam end at the lower station; 1-based span/girder), bays (hole index each
+    side, member/lower member exact AISC names, plan lengths), `PsDiaphragmConnection.IowaBtd()` (standard values),
+    `Elevation` (Q4: `Level` default as p.32 labels it, or `AlongHoleLine`; warns when the 1" x 1 1/2" member slots
+    (+-1/4) or 1" x 2" leg slots (+-1/2) cannot take the offset), `MemberSide` (WD-3: `Unresolved` default = holes only,
+    no steel). `PsDiaphragmBeamLine.FromPrestressed(beam, depth, web)` adapts generated beams. Tests: PsSteelDiaphragmTests.
   - `SBM.IO/PgSuper/` â€” `PgSuperReader` (.pgs BridgeDescription schema v6+ or ReportExportAgent export XML; strand key
     bits per WBFL PsStrand; end distances normalized to CL-bearing-to-end; straight-strand `DebondInfo` Strand/Length1/Length2
     -> StrandPoint debond lengths) and `PgSuperImport.Apply` (onto an alignment).

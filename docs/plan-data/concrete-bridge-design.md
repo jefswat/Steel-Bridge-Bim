@@ -485,7 +485,24 @@ straight part; still compute); member length vs table; total weight vs 4,258 lb;
 | id | item | p. |
 |---|---|---|
 | WD-1 | member elevation / slope: the hole heights are fixed above each beam bottom but adjacent beam bottoms differ by spacing x cross slope (8'-0 x 5 % = 4.8"); p.32 labels the W21x50 / W14x38 "(LEVEL)" and requires equal "a" dimensions, while the slots take only 1/2" (1" x 1 1/2"). Is the member level (and how does the connection absorb 4.8"), or parallel to the line through the two hole pairs? | p.32 |
-| WD-2 | which beam of each bay gets Detail D vs F (table counts only: 2 D, 22 F) | p.31 |
+| WD-2 | RESOLVED (T4): Detail D = both ends of the W21x50 diaphragm (G-H span 2), Detail F = both ends of every C15x33.9 (2 D + 22 F = 12 diaphragms x 2); the plates are the same | p.31 table, p.32 sections |
+| WD-3 | side of the web hole on which the bent-plate 9" leg and the member lie (toward increasing or decreasing station): PART SECTION A-A has no station arrow and is drawn with the opposite stagger hand to the p.21 beam layout, so both mirror readings fit. `MemberSide` input, default `Unresolved` = cast holes only, no steel | p.32 A-A, p.21 |
+| WD-4 | C15x33.9 vertical position on the plates: the "a equal" note sits on the W21x50 slotted-hole detail; applied to the C15 as Detail F draws it (bolt group centred on the depth) - Info diagnostic | p.32 |
+| WD-5 | 4 - 7/8" x 2" bolts "for shim PL connection as required" (W14x38 end plates / 1/8" shims against the bottom bulbs) are not dimensioned: not placed (warning); W14 flange bolt gage not dimensioned: AISC workable gage 3 1/2 used (Info) | p.31, p.32 B-B |
+
+### 5.8 Status (T4 done, 2026-10-11)
+
+Implemented as designed with these changes: holes are input as the plan's CHAINS (`PsDiaphragmHoleChain`, checked
+against the beam end-to-end length) and bays reference a hole index on each beam; standard reading confirmed on raster
+clips of p.31/p.32: lower hole 1'-8 1/2 above the beam bottom, upper 9 3/8 above it; web hole 3 1/2 from the outer face
+of the 9" leg (6" leg tip 2 1/2 beyond the hole, Section C-C); leg slots 3 1/2 from the FREE edge of the 9" leg (= 5 1/2
+from the web face - this reproduces every p.31 member length from the beam spacing within 1/16"); member slots 1 5/8
+from the member end. W14x38 hung flange to flange under the W21x50 (webs in one plane, Section B-B), centred, 9 rows
+x 2 bolts in 8 equal spaces with 6" ends, PL 6 1/2 x 3/8 x 1'-2 end plates and 2 shims 1/8 per end. The result class is
+`PsSteelDiaphragmModel` (in the detailer file, NOT `DiaphragmModel.cs`, to stay clear of T5). Q4 / WD-1 is an explicit
+option (`Elevation`, default `Level`); on a 5 % cross slope the level member is 2.4" off each end vs +-1/4" slot take-up
+and is reported per bay; `AlongHoleLine` fits (leg slots take the 0.23" tilt offset). Not done (T6): hook-up, IFC,
+views, hole-vs-strand clearance.
 
 ---------------------------------------------------------------------------------------------------------------------
 
@@ -520,7 +537,7 @@ Serialization: definitions serialize directly (new properties need no DTO work; 
 | T1 Abutment kinds - Integral | `AbutmentKind`, `PileRowOffsets`, stepped cap top, wing extension, CMP casing (UNRESOLVED path), spiral schedule; tests; Woodbury S/N abutment script `samples/plans/abutments-woodbury.csx` (after reading WA-1/WA-3/WA-4) | `Bridge/AbutmentDefinition.cs`, `Substructure/SubstructureAbutment*.cs`, `Substructure/SubstructurePiles.cs` (casing), new tests | none | NOW |
 | T2 Abutment kinds - Stem | `StemSection`, explicit `Pedestals` (future), infill walls, mask wall top/length, `PileType.CipPipe`; Br02069 script | same files as T1 + `Bridge/SubstructureDefinition.cs` (PileType) | T1 merged (same files: run T1 then T2, or one agent doing both as two commits) | after T1 |
 | T3 IFC + views for T1/T2 | new IfcWall/IfcColumn/IfcPile mappings, casing part; `AbutmentViews` panels for stepped cap / stem | `SBM.IO/Ifc/IfcExporter.cs` (substructure block only), `Drawing/Views/AbutmentViews.cs` | T1, T2 | after T2 |
-| T4 Steel intermediate diaphragms (prestressed) | `Bridge/PsSteelDiaphragmDefinition.cs`, `Diaphragms/PsSteelDiaphragmDetailer.cs`, `Diaphragms/DiaphragmModel.cs`, preset `IowaBtd()`, unit tests against `diaphragm-bolt-holes.csv` and the member table; NOT hooked into regeneration yet (tests call it with a generated PrestressedModel) | new files only | read-only use of `PrestressedModel` (API may change under the Prestressed agent: rebase) | NOW |
+| T4 Steel intermediate diaphragms (prestressed) | `Bridge/PsSteelDiaphragmDefinition.cs`, `Diaphragms/PsSteelDiaphragmDetailer.cs`, `Diaphragms/DiaphragmModel.cs`, preset `IowaBtd()`, unit tests against `diaphragm-bolt-holes.csv` and the member table; NOT hooked into regeneration yet (tests call it with a generated PrestressedModel) | new files only | read-only use of `PrestressedModel` (API may change under the Prestressed agent: rebase) | DONE 2026-10-11 (see 5.8; result class `PsSteelDiaphragmModel`, not `DiaphragmModel.cs`) |
 | T5 Concrete diaphragms | `Bridge/DiaphragmDefinition.cs`, `Diaphragms/ConcreteDiaphragmGenerator.cs` (panel method), checks; tests on a synthetic 2-span bridge | new files only | T1 (cap top steps), T2 (stem seat refs); read-only PrestressedModel / ConcreteModel | after T1 (T2 for Br02069) |
 | T6 Hook-up | `SupportDefinition.Diaphragm` / bridge-level `PsSteelDiaphragms` property, `BridgeModel.Diaphragms`, phase-2 call in `RegenerationCache`, IFC export of diaphragms, 3D scene layer | `Bridge/BridgeDefinition.cs` (support class only), `Project/RegenerationCache.cs`, `SBM.IO/Ifc/IfcExporter.cs`, app scene builder | Prestressed + Framing agents MERGED; T4, T5 | after those merges |
 | T7 Bearings | `PrestressedBearingDefinition`, `Bearings/PrestressedBearingBuilder.cs`, one call in `PrestressedGenerator`; 3x3 bar + curved plate F1/E1; seat stack in the elevation check | new files + one call site in Prestressed/ | Prestressed agent merged | after that merge |
