@@ -63,7 +63,13 @@ Bridge: single simple span 99'-3" CL-CL brg, 0 deg skew, seven MnDOT 30MH preten
 | Losses | ES 24.93; LT 26.26; total 51.19 ksi | ksi | p16 | TEXT | sum ok |
 | Concrete | beam f'ci 8.0, f'c 9.5; RC 4 ksi | ksi | p16, p1 | TEXT | |
 | Camber | erection 7 3/8"; DL defl 5 1/4" int / 5 1/8" ext; residual 2 1/8" int / 2 1/4" ext | in | p16 | RASTER | differences ok |
-| Beam bars | G301E, G402E, G303E, G505E, G508E, 4-G806E; stirrups 9@4", 19@9", 27@14" | - | p16 | RASTER | no bill |
+| Beam bars | G301E, G402E, G303E, G505E, G508E, 4-G806E (shapes in bend-diagrams.csv) | - | p16 | RASTER | no bill (beam bars paid with the beam) |
+| Stirrup spacing (each half, from beam end) | 2" + 4 sps @ 2 1/2" (= 3'-10" with the next group) + 9 sps @ 4" + 19 sps @ 9" + 27 sps @ 14" + 6" to CL span; symm. about CL span -> 60 positions per half, 120 per beam | - | p16 elevation | RASTER | 2 + 10 + 36 + 171 + 378 + 6 = 603" = 50'-3" = 100'-6"/2 ok; 2" + 3'-10" = 48" ok |
+| End-zone bars | 2-G505E (C bar: 2'-1" vertical, 3'-6" top flange leg, 1'-0" bottom leg; 1 1/4" clr to web faces, 2" clr top) then 2-G508E (L: 2'-10" + 1'-0" leg, projects 7" above beam; note 11: each pair may be one No. 5 bulbed bar); G402E (hairpin 2'-10" x 4" o-o, projects 7" above beam) at all other positions ("G402E SPG. except as noted") | - | p16 elevation, end view, section | RASTER | which of the 5 end positions take G505E vs G508E is only shown by leaders (drawing not to scale there) |
+| G301E | straight 2'-6", top flange transverse, 1 1/2" clr top, one at each stirrup position ("space with G505E, G508E or G402E") | - | p16 | RASTER | |
+| G303E | bottom flange pairs (2'-11" + 3 1/2" offset + 1'-10" @ 4:12, crossed): 2-G303E sp. w/ G505E, 2-G303E sp. w/ G508E, 2-G303E sp. w/ G402E over the end region; 1 1/8" clr entire bottom flange (note 10) | - | p16 | RASTER | extent of the G402E-paired G303E zone not dimensioned (UNRESOLVED) |
+| G806E | 4 longit. No. 8 in top flange at 3 1/2" + 3 sps @ 9" = 2'-3" + 3 1/2" (= 2'-10" ok); permissible splice 5'-1" min. lap; note 7: two inside bars may be placed against the stirrup | - | p16 end view / elevation | RASTER | length not given (no bill) |
+| Beam top / ends | top: 6" bond-breaker strips at flange tips (note 8), 1'-10" rough-floated center (note 9); ends: 1/2" chamfer, no chamfer at top | - | p16 | TEXT | |
 | Intermediate diaphragms | none | - | p2, p16 | TEXT | temp. bracing |
 | End diaphragms | concrete, both abutments, semi-integral (p17 "integral & semi-integral abutment") | - | p15, p17, p20, p21 | TEXT | detail rows below |
 | End diaph. thickness | 3'-0" (plan: 1'-6" back face -> CL end diaph + 1'-6" -> front face) | - | p20 plan, p21 A-A/B-B | TEXT | |
@@ -134,7 +140,7 @@ bar-lists.csv: 93 marks (A 29 p8, B 29 p14, S 17 p21, R 18 p24; 10 R rows RASTER
 | Deck longit. | S401M 60'-0" + S402M 45'-2", 2'-7" lap; 55 bot + 29 top lines (p18/19) | TEXT | length ok |
 | Deck longit. layout | top: 3 1/2" + 8 1/2" + 26 sps @ 1'-6" = 39'-0" + 8 1/2" + 3 1/2" = 41'-0" -> 27 + 1 extra line 3 1/2" from each deck edge = 29; bottom: 7" + 5" + 52 sps @ 9" = 39'-0" + 5" + 7" = 41'-0" -> 53 + 1 extra line 7" from each edge = 55 (U4 closed) | RASTER | p19 transverse section | 84 lines x (1 S401M + 1 S402M) = 168 = 84 + 84 bill ok |
 | Bend diagrams | bend-diagrams.csv: 52 bent marks of the bills (A 17 p8, B 17 p14, S 8 p21, R 10 p24) + 5 beam G bars (p16, no bill). 25 OK (sum of out-to-out dims = listed length exactly); 22 have one leg / hook not dimensioned on the sheet (listed - dims given as DERIVED, not checkable); 5 barrier loops R505M/R517E/R506E/R507E/R518E NOT RECONCILED (-2 9/16 .. +3/16 in vs true-length sum; std barrier sheet length convention not stated) | RASTER | convention p8/p14 note: "ALL BENT BAR DIMENSIONS ARE GIVEN OUT-TO-OUT"; p21/p24 no note; pin diameters not shown on any sheet |
-| Beam bars | p16 | TEXT | |
+| Beam bars | p16, see sec. 3 rows + bend-diagrams.csv (G bars) | RASTER | no bill |
 
 ## 6. Misc
 Barrier Type S (TL-4 deck / TL-3 approach panel), control joints 11 sps @ abt. 9'-4 1/4" = 102'-11" (RASTER p22, 1/4 confirmed at 500 dpi; 11 x 9'-4 1/4" = 102'-10 3/4", 'ABT.') p22/24/25; pipe railing 18 LF per abutment, posts 3 @ 5'-0" (p5, p10, p23); approach panel cover plates p27; no expansion devices, 1" polystyrene diaphragm/mask wall (p19, p21); no drains; underpass lights about 248+40 / 249+28, 1" PVC-coated RMC, 3" sleeves (p18, p20, p26); slope paving 15 SY (p28); nameplate B101, 2 emblems (p29, p11); sign by others (p1).
