@@ -1,4 +1,4 @@
-﻿using SBM.Api;
+using SBM.Api;
 using SBM.Core.Alignments;
 using SBM.Core.Bridge;
 using SBM.Core.Diaphragms;
@@ -177,6 +177,12 @@ public class ConcreteDiaphragmTests
         var fill = Assert.Single(cd.Accessories, a => a.Kind == DiaphragmAccessoryKind.Filler);
         // pad 9" x 2'-0 centred 1'-0 from the CL pier: wholly inside the 1'-2 embedment (4" .. 1'-6)
         Assert.Equal(6 * (shape.BottomWidth * embed - In(24) * In(9)) * In(1), fill.Volume, 7);
+        // bearing zone open below the beams (pads + filler, not concrete): minus the bottom-flange footprint x 1" per beam end
+        def.OpenBelowBeams = true;
+        doc.Regenerate();
+        Assert.True(doc.Prestressed().ConcreteDiaphragms!.Diaphragms.Count == 1, string.Join(" | ", doc.Prestressed().ConcreteDiaphragms!.Diagnostics.Select(x => x.Message)));
+        var open = doc.Prestressed().ConcreteDiaphragms!.Diaphragms[0];
+        Assert.Equal(expected - 6 * shape.BottomWidth * embed * In(1), open.Volume, 5);
     }
 
     [Theory]

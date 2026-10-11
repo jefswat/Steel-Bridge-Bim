@@ -115,6 +115,10 @@ public enum DiaphragmFillerKind
     /// <summary>The gap under each beam end inside the diaphragm, between the beam bottom flange and the diaphragm bottom, around the
     /// bearing pad ("1 in. preformed filler around bearings").</summary>
     AroundBearings,
+    /// <summary>A layer of <see cref="DiaphragmFillerDefinition.Thickness"/> on the diaphragm bottom steps between
+    /// <see cref="DiaphragmFillerDefinition.X0"/> and <see cref="DiaphragmFillerDefinition.X1"/>, along the whole diaphragm except under the beam
+    /// bottom flanges (and except the keyways' width) - the bond-breaker at the diaphragm / cap interface.</summary>
+    Interface,
 }
 
 /// <summary>Polystyrene / preformed joint filler between the diaphragm and adjacent concrete, modeled as a thin solid.</summary>
@@ -127,6 +131,9 @@ public sealed class DiaphragmFillerDefinition
     public int Side { get; set; }
     public double Thickness { get; set; }
     public List<DiaphragmSectionPoint> Section { get; set; } = new();
+    /// <summary><see cref="DiaphragmFillerKind.Interface"/>: extent across (section X).</summary>
+    public double X0 { get; set; }
+    public double X1 { get; set; }
     public string Source { get; set; } = "";
     public DiaphragmFillerDefinition Clone()
     {
@@ -145,6 +152,8 @@ public sealed class DiaphragmKeywayDefinition
     public double X { get; set; }
     public double Width { get; set; }
     public double Depth { get; set; }
+    /// <summary>The keyway concrete continues this far ABOVE the bottom step (through an interface filler layer) to meet the diaphragm.</summary>
+    public double TopAbove { get; set; }
     /// <summary>Only in the bays between beams (bottom flange edge to bottom flange edge); false = full diaphragm length.</summary>
     public bool BetweenBeams { get; set; } = true;
     /// <summary>Non-empty: an item of the keyway the plans do not fix (with page); the keyway is flagged UNRESOLVED (Assumption) with this reason.</summary>
@@ -190,6 +199,9 @@ public sealed class ConcreteDiaphragmDefinition
     public List<DiaphragmFillerDefinition> Fillers { get; set; } = new();
     public List<DiaphragmKeywayDefinition> Keyways { get; set; } = new();
     public List<DiaphragmBeamHole> BeamHoles { get; set; } = new();
+    /// <summary>The beams sit on bearings in a zone that is NOT diaphragm concrete (pads + preformed filler, Woodbury pier p.20): the beam
+    /// voids continue down to the part bottom over the bottom-flange width. False = concrete under the beams (integral abutment).</summary>
+    public bool OpenBelowBeams { get; set; }
     /// <summary>Expected clear gap between the beam bottom and the diaphragm bottom step (bearing height), for the seat check; NaN = no check.</summary>
     public double PlanBearingGap { get; set; } = double.NaN;
     /// <summary>Plan items not dimensioned (raised as UNRESOLVED warnings).</summary>

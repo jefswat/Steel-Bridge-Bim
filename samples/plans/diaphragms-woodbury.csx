@@ -73,7 +73,8 @@ sup[3].Diaphragm = Abut("N. Abut. diaphragm", nAbut,
 // 2'-10 wide centred on the CL pier (user decision 10; hoops 5e1/5e2 2'-6 o-o + 2 x 2" cover), from the cap top steps to the soffit;
 // ends: west at the stage-2 edge of deck (CL NB roadway), east flush with the outside face of beam H (Detail B). Two parts (back /
 // ahead span beams) so each ends at its own fascia beam; beam ends 4" each side of CL pier (8" apart, Detail A).
-List<DiaphragmSectionPoint> Half(double x0, double x1) => new() { P(x0, Bot), P(x1, Bot), P(x1, Sof), P(x0, Sof) };
+// Bottom on the 1/4" preformed filler (p.20 Section B-B: 1/4" preformed expansion joint filler at the cap interface) -> bottom = step + 1/4".
+List<DiaphragmSectionPoint> Half(double x0, double x1) => new() { P(x0, Bot, In(0.25)), P(x1, Bot, In(0.25)), P(x1, Sof), P(x0, Sof) };
 ConcreteDiaphragmDefinition Pier(string name, double[] seats) => new()
 {
     Kind = ConcreteDiaphragmKind.PierContinuity, Name = name, Source = "p.20 part section at pier, Details A / B; p.26",
@@ -87,6 +88,7 @@ ConcreteDiaphragmDefinition Pier(string name, double[] seats) => new()
     Right = DiaphragmEnd.Fascia("east: flush with the outside face of beam H (p.20 Detail B)"),
     BottomSteps = Steps(seats), Risers = DiaphragmRiserRule.Unresolved, RiserSource = RiserWhy,
     PlanBearingGap = In(1),                               // plain neoprene 9 x 1 x 2'-4 1/2 (p.20, p.25 BEAM BEARING 1)
+    OpenBelowBeams = true,                                // under the beams: pads + 1" filler strips, not diaphragm concrete (p.20 part plan)
     Fillers =
     {
         new DiaphragmFillerDefinition
@@ -94,19 +96,26 @@ ConcreteDiaphragmDefinition Pier(string name, double[] seats) => new()
             Name = "filler around bearings", Material = "1\" preformed expansion joint filler", Kind = DiaphragmFillerKind.AroundBearings,
             Thickness = In(1), Source = "p.20 top of pier details: around bearings",
         },
+        new DiaphragmFillerDefinition
+        {
+            Name = "interface filler", Material = "1/4\" preformed expansion joint filler", Kind = DiaphragmFillerKind.Interface,
+            Thickness = In(0.25), X0 = -Len("1'-5\""), X1 = Len("1'-5\""), Source = "p.20 Section B-B (full diaphragm width, interrupted at the keyway)",
+        },
     },
     Keyways =
     {
         new DiaphragmKeywayDefinition
         {
-            Name = "keyway", X = 0, Width = In(8), Depth = In(2), BetweenBeams = true, Source = "p.20 top of pier details",
-            Unresolved = KeyBevel + "; its position across the cap is not dimensioned (p.20)",
-            Basis = "rectangular 8\" x 2\" (the printed 2x8 size), between the beams, centred on the CL pier",
+            Name = "keyway", X = 0, Width = In(8), Depth = In(2), TopAbove = In(0.25), BetweenBeams = true,
+            Source = "p.20 top of pier details, Section B-B (centred on the CL pier)",
+            Unresolved = KeyBevel + "; its 1/4\" filler lining (Section B-B) is not modeled",
+            Basis = "rectangular 8\" x 2\" (the printed 2x8 size), between the beams, centred on the CL pier, joined to the diaphragm through the 1/4\" layer",
         },
     },
     Unresolved =
     {
-        "1\" preformed filler on the faces of the steps and the sides / ends of the keyways (p.20): extents follow the unresolved risers / keyway - not modeled",
+        "1\" preformed filler on the faces of the steps and the sides / ends of the keyways (p.20 part plan): step faces follow the unresolved risers, keyway bevel undimensioned - not modeled",
+        "bearing pads: p.20 part plan draws the 9 x 2'-4 1/2 pads with the long side PARALLEL to the CL pier; the model pads are square to the beam (prestressed generator) - the filler is cut around the model pads",
         "pier diaphragm reinforcing (5d13-5d18, 5e1/5e2/5e6/5e7, p.26) not placed (schedule only)",
         "junction boxes in the pier diaphragm (lighting, p.35-37) not modeled",
     },
