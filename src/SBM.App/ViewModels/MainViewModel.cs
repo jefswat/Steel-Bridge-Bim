@@ -1263,6 +1263,17 @@ public sealed partial class MainViewModel : ObservableObject
         yield return new("Stiffeners", f.Stiffeners.Count(s => s.Girder == g.Index).ToString());
         foreach (var sp in f.Splices.Where(s => s.Girder == g.Index))
             yield return new($"Field splice {sp.Number}", $"{u.FormatLength(sp.GirderDistance)} from girder end");
+        if (f.Camber?.Girder(g.Index) is { Points.Count: > 0 } cg)
+        {
+            // Camber / blocking (plan data input; blocking = no-load top of web above the horizontal line through the datum point)
+            string In(double m) => u.FormatLength(m, LengthKind.Short);
+            yield return new("Camber (max / min)", $"{In(cg.Points.Max(p => p.Camber))} / {In(cg.Points.Min(p => p.Camber))}");
+            var bl = cg.Points.Where(p => !double.IsNaN(p.Blocking)).ToList();
+            yield return new("Blocking datum", cg.DatumPoint > 0 && bl.Count > 0 ? $"point {cg.DatumPoint}, blocking {u.FormatLength(bl.Min(p => p.Blocking), LengthKind.Coordinate)} to {u.FormatLength(bl.Max(p => p.Blocking), LengthKind.Coordinate)}" : "none (blocking not computed)");
+            foreach (var p in cg.Points.Where(p => p.Kind != ""))
+                yield return new($"{(p.Kind == "splice" ? "FS" : p.Kind == "end" ? "End" : "Brg")} pt {p.Number} ({p.Label})",
+                    $"camber {In(p.Camber)}, deflection {In(p.SteelDeflection)} steel + {In(p.SlabDeflection)} slab, blocking {(double.IsNaN(p.Blocking) ? "-" : u.FormatLength(p.Blocking, LengthKind.Coordinate))}, haunch elev {u.FormatLength(p.HaunchElevation, LengthKind.Coordinate)}");
+        }
     }
 
     private IEnumerable<PropertyRow> DeckProperties(BridgeDefinition b, BridgeFraming f)
@@ -1325,6 +1336,15 @@ public sealed partial class MainViewModel : ObservableObject
                     MaterialRows.Add(new MaterialRow(b.Name, "Shear stud",
                         $"{u.FormatLength(sm.StudDiameter, LengthKind.Short)} dia x {u.FormatLength(grp.Key, LengthKind.Short)} headed stud",
                         grp.Count(), "", ""));
+                if (f.Camber != null)
+                    foreach (var cg in f.Camber.Girders.Where(c => c.Points.Count > 0))
+                    {
+                        var bl = cg.Points.Where(p => !double.IsNaN(p.Blocking)).ToList();
+                        MaterialRows.Add(new MaterialRow(b.Name, "Camber / blocking",
+                            $"G{cg.Girder + 1}: camber {u.FormatLength(cg.Points.Min(p => p.Camber), LengthKind.Short)} to {u.FormatLength(cg.Points.Max(p => p.Camber), LengthKind.Short)}"
+                            + (bl.Count > 0 ? $", blocking {u.FormatLength(bl.Min(p => p.Blocking), LengthKind.Coordinate)} to {u.FormatLength(bl.Max(p => p.Blocking), LengthKind.Coordinate)} (datum pt {cg.DatumPoint})" : ", no blocking datum"),
+                            cg.Points.Count, "", ""));
+                    }
                 MaterialRows.Add(new MaterialRow(b.Name, "TOTAL STRUCTURAL STEEL", "", sm.Parts.Count(p => p.Category is not (PartCategory.Weld or PartCategory.BearingPad)),
                     "", $"{sm.SteelMass / massUnit:N0} {mu}"));
             }

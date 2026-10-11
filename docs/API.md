@@ -64,6 +64,7 @@ sbm bench  "C:\Jobs\Br12\Br12.sbm"
 sbm sheets     "C:\Jobs\Br12\Br12.sbm" "C:\Jobs\Br12\Br12 Sheets.pdf"   # 11x17 plan set (vector PDF)
 sbm drawings   "C:\Jobs\Br12\Br12.sbm" "C:\Jobs\Br12\dxf"   # 2D DXF models: layout, plan, typical section, bents, bar bending
 sbm elevations "C:\Jobs\Br12\Br12.sbm"          # grade → deck → haunch → web → flange → sole plate → seat, every bearing
+sbm blocking   "C:\Jobs\Br12\Br12.sbm"          # camber, deflections, girder-line haunch elevation and blocking at each key point (--all: every plan point)
 ```
 
 **Exit codes:** `0` means OK, `1` means a usage or input error, and `2` means the model has errors.

@@ -251,6 +251,24 @@ public static class CamberBlocking
         return r;
     }
 
+    /// <summary>Text report: per girder the camber, deflections, haunch elevation and blocking (key points, or every point with <paramref name="all"/>).</summary>
+    public static string ToText(string bridge, CamberResult res, Units.UnitSystem u, bool all = false)
+    {
+        var sb = new System.Text.StringBuilder();
+        string In(double m) => (m / 0.0254).ToString("0.00", System.Globalization.CultureInfo.InvariantCulture);
+        string F(double m) => double.IsNaN(m) ? "-" : (m / 0.3048).ToString("0.00", System.Globalization.CultureInfo.InvariantCulture);
+        sb.AppendLine($"== {bridge}: camber and blocking (inches / feet; camber up +, deflection down +; blocking = no-load top of web above the datum point's)");
+        foreach (var g in res.Girders)
+        {
+            sb.AppendLine($"{g.Name}: datum point {(g.DatumPoint > 0 ? g.DatumPoint.ToString() : "none")}, {g.Points.Count} points located, {g.UnlocatedPoints.Count} not located");
+            sb.AppendLine("   pt   at                dist(ft)  camber  steel  slab  haunch-elev  blocking");
+            foreach (var p in g.Points.Where(p => all || p.Kind != ""))
+                sb.AppendLine($"  {p.Number,4}  {(p.Label == "" ? "" : p.Label),-16} {F(p.PathDistance),9}  {In(p.Camber),6}  {In(p.SteelDeflection),5}  {In(p.SlabDeflection),5}  {F(p.HaunchElevation),11}  {F(p.Blocking),8}");
+            foreach (var w in g.Warnings) sb.AppendLine("   ! " + w);
+        }
+        return sb.ToString();
+    }
+
     /// <summary>"1-5, 9, 12-14" style list of point numbers.</summary>
     public static string Ranges(IEnumerable<int> nums)
     {
