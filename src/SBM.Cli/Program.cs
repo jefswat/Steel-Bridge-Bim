@@ -28,7 +28,7 @@ public static class Program
                                                             messages, undo, close. "sbm app help" lists them; "sbm app list"
                                                             shows running copies. (All other commands work on .sbm files.)
           sbm regen <file.sbm>                              Regenerate; print counts, warnings, timing
-          sbm export <file.sbm> [--ifc a.ifc|a.ifczip] [--geometry parametric|abv] [--dxf b.dxf] [--landxml c.xml]
+          sbm export <file.sbm> [--ifc a.ifc|a.ifczip] [--geometry parametric|abv] [--chord-tol mm] [--dxf b.dxf] [--landxml c.xml]
           sbm db <file.sbm> [out.sqlite] [--pages] [--plans <folder>[,<folder>]] [--links rules.json] [--no-previews] [--no-vacuum]
                                                             [--unused report.md]
                                                             Companion SQLite database: every element (IFC GlobalIds + hierarchy),
@@ -188,7 +188,16 @@ public static class Program
                         "abv" or "referenceview" => SBM.IO.Ifc.IfcGeometryMode.ReferenceView,
                         var g => throw new ArgumentException($"--geometry {g}: use parametric or abv"),
                     };
-                    if (Opt("--ifc") is { } ifc) { doc.ExportIfc(ifc, geometry); Console.WriteLine($"  IFC 4.3 ({geometry}) → {ifc}"); }
+                    // --chord-tol <mm>: ReferenceView polygon tolerance for hole circles / profile arcs (default 1/32 in = 0.79 mm).
+                    double chord = Opt("--chord-tol") is { } ct ? double.Parse(ct, System.Globalization.CultureInfo.InvariantCulture) / 1000 : 0;
+                    if (Opt("--ifc") is { } ifc)
+                    {
+                        doc.Regenerate();
+                        var sw = System.Diagnostics.Stopwatch.StartNew();
+                        var res = doc.ExportIfc(ifc, geometry, chord);
+                        Console.WriteLine($"  IFC 4.3 ({geometry}) → {ifc}  ({sw.Elapsed.TotalSeconds:0.0} s, {new FileInfo(ifc).Length / 1048576.0:0.0} MB, {res.EntityCount:N0} entities" +
+                                          (geometry == SBM.IO.Ifc.IfcGeometryMode.ReferenceView ? $", {res.PolygonalSolids:N0} polygonal face sets, chord tol {res.ChordTolerance * 1000:0.###} mm)" : ")"));
+                    }
                     if (Opt("--dxf") is { } dxf) { doc.ExportDxf(dxf); Console.WriteLine($"  DXF → {dxf}"); }
                     if (Opt("--landxml") is { } lx) { doc.ExportLandXml(lx); Console.WriteLine($"  LandXML → {lx}"); }
                     return 0;

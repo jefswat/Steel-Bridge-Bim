@@ -295,6 +295,35 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   distance m from the alignment START (not a station: `al.StationToDistance`), offsetLateral (IFC: + = LEFT), offsetVertical)`.
   Check: `sbm run tools/ifc-alignment-points.csx model.sbm -- a.ifc pts.json [abv] [--alignments-only|--spiral]` then
   `python -I tools/check_ifc_alignment.py a.ifc pts.json` (ifcopenshell.geom vs SBM, 1 mm); IDS: `python -I tools/run_ids.py a.ifc x.ids`.
+  Geometry modes (`IfcExportOptions(Geometry, ChordTolerance)`, `SbmDocument.ExportIfc(path, mode, chordTol)`, CLI
+  `sbm export --geometry parametric|abv [--chord-tol mm]`): **Parametric** (default, byte-identical to the pre-mode output)
+  = exact IfcExtrudedAreaSolid / IfcBooleanClippingResult. **ReferenceView** (`abv`, header `ViewDefinition
+  [AlignmentBasedView]`) writes only geometry the bSI AbV allows (checked against usBrSpec_AbV Exclusions.ids, 261
+  entities; `python -I tools/run_ids.py model.ifc <ids>`): `Ifc/IfcReferenceViewGeometry.cs` turns every recorded
+  `ExtrudedSolid` into an IfcPolygonalFaceSet (end caps = IfcIndexedPolygonalFaceWithVoids, holes = void loops of an
+  EQUAL-AREA polygon (volume = Parametric), as many sides (>= 8) as an inscribed polygon with sagitta <= chord tolerance, default 1/32 in = 0.79 mm -> 9 sides for a 15/16 in hole;
+  sides / hole walls = planar quads) and the arc-profile prestressed beams (Parametric: extrusion clipped by two half
+  spaces + IfcPlane) into ONE face set cut exactly by the skewed end planes (arcs polygonized to the tolerance).
+  Triangle meshes, swept-disk bars/strands, mapped bolt types (IfcTriangulatedFaceSet sources) are already allowed and
+  unchanged; element GlobalIds, materials and psets are the same (the SBM_Fabrication pset GlobalIds are keyed by STEP id,
+  so they differ between modes). Prestressed girders are IfcBeam `.GIRDER_SEGMENT.` in all modes (`.GIRDER.` is not in
+  IFC4X3_ADD2's IfcBeamTypeEnum; it is valid only for IfcElementAssembly / IfcBridge).
+  Volumes vs Parametric: `python -I tools/compare_ifc_volumes.py par.ifc abv.ifc --changed-only --exact-ref [--max N]`
+  (exact-ref = analytic extrusion volumes; OpenCascade meshes hole circles coarsely; AbV meshing is ~2x slower, ~0.15 s/plate). Cost: I-80 WB and
+  Ramp G: Parametric 346 MB / 3.76 M entities / 3.7 s, ReferenceView 765 MB / 6.03 M / 6.6 s (ifczip 72 vs 177 MB);
+  the growth is the ~324 k bolt holes (9 wall quads + 18 points each). Full-model AbV result: 0 schema + 0 EXPRESS issues,
+  AbV Exclusions IDS 261/261 pass (docs/plan-data/ifc-validation.md). NOT done: IfcSectionedSolidHorizontal along the
+  alignment. How it would plug in (alignment entities come from `alignmentWriter.For(name)`, written before the bridges):
+  deck slab, barriers and girder flange/web plates would each become IfcSectionedSolidHorizontal(Directrix =
+  `AxisCurve` (the IfcGradientCurve), CrossSections = IfcArbitraryClosedProfileDef over IfcIndexedPolyCurve polylines in the
+  section plane (x = lateral, + = LEFT as IFC; y = up from the directrix), CrossSectionPositions = IfcAxis2PlacementLinear(
+  IfcPointByDistanceExpression(distance from alignment start (`al.StationToDistance`), lateral, vertical, AxisCurve))) at
+  the stations where the section changes (deck: the loft rings of `ConcreteGenerator` = deck + haunch outline per station;
+  barriers: `BarrierProfiles.For` offset by the deck edge; girders: plate sections at field-section ends / thickness
+  transitions, offset = girder line). Hook = a ReferenceView branch next to `Body` / the deck `FaceSet` items in
+  `ExportConcrete` (same style, GlobalId, psets). Caveat: the solid ends are sections NORMAL to the directrix, so skewed
+  deck/barrier/girder ends cannot be represented exactly without a clip (AbV forbids booleans) - either keep the skewed
+  end zones as face sets (two items) or accept a squared end; holes / clips / bolts stay face sets.
 - `src/SBM.App` â€” WPF (Fluent dark theme), MVVM via CommunityToolkit.Mvvm, GPU viewport = HelixToolkit.Wpf.SharpDX 3.x
   (DirectX 11, System.Numerics types; namespaces `HelixToolkit`, `HelixToolkit.SharpDX`, `HelixToolkit.Wpf.SharpDX`).
   - `Viewport/SceneBuilder` batches each layer into one LineGeometry3D + one BillboardText3D; vertices are rebased to a

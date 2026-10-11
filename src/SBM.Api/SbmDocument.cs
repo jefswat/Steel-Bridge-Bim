@@ -295,11 +295,12 @@ public sealed class SbmDocument
 
     // ------------------------------------------------------------------ export
 
-    public void ExportIfc(string path, IfcGeometryMode geometry = IfcGeometryMode.Parametric)
+    /// <param name="chordTolerance">ReferenceView only: max sagitta (m) of hole / profile-arc polygons; 0 = 1/32 in.</param>
+    public IfcExportResult ExportIfc(string path, IfcGeometryMode geometry = IfcGeometryMode.Parametric, double chordTolerance = 0)
     {
         Regenerate();
         var data = _models.OfType<BridgeModel>().Where(m => m.Steel != null || m.Prestressed != null).Select(m => new IfcBridgeData(m.Framing, m.Steel, m.Concrete, m.Substructure, m.Prestressed)).ToList();
-        IfcExporter.Export(path, Project, data, new IfcExportOptions(geometry));
+        return IfcExporter.Export(path, Project, data, new IfcExportOptions(geometry, chordTolerance));
     }
 
     /// <summary>Writes the companion SQLite database (element registry with IFC GlobalIds and hierarchy, plan sheets, sheet links, QC).</summary>

@@ -22,6 +22,10 @@ public sealed class IfcExportResult
     /// <summary>Solids written as exact extrusions vs. triangle meshes.</summary>
     public int ExtrudedSolids { get; set; }
     public int TessellatedSolids { get; set; }
+    /// <summary>ReferenceView: solids written as IfcPolygonalFaceSet (recorded extrusions, clipped beam profiles) and the
+    /// chord tolerance (m) used for their hole circles / profile arcs.</summary>
+    public int PolygonalSolids { get; set; }
+    public double ChordTolerance { get; set; }
 }
 
 /// <summary>How solids are written.</summary>
@@ -35,7 +39,9 @@ public enum IfcGeometryMode
     ReferenceView,
 }
 
-public sealed record IfcExportOptions(IfcGeometryMode Geometry = IfcGeometryMode.Parametric);
+/// <param name="ChordTolerance">ReferenceView: max sagitta (m) of the polygons replacing hole circles and profile arcs;
+/// 0 = default 1/32 in (0.79 mm).</param>
+public sealed record IfcExportOptions(IfcGeometryMode Geometry = IfcGeometryMode.Parametric, double ChordTolerance = 0);
 
 /// <summary>
 /// Exports the model to IFC 4.3 (IFC4X3_ADD2) with semantic entities:
@@ -74,7 +80,8 @@ public static class IfcExporter
         var u = project.Units;
         double scale = 1 / u.LongUnit; // meters → project length units
         var w = new StepWriter(tw);
-        w.Header(fileName, "IFC4X3_ADD2", "ReferenceView");
+        bool abv = options.Geometry == IfcGeometryMode.ReferenceView;
+        w.Header(fileName, "IFC4X3_ADD2", abv ? "AlignmentBasedView" : "ReferenceView");
 
         // Base point: rounded center of the first bridge (or first alignment start).
         var basePt = Vec3.Zero;
@@ -91,6 +98,8 @@ public static class IfcExporter
         }
         string P(Vec3 p) => $"({C((p.X - basePt.X) * scale)},{C((p.Y - basePt.Y) * scale)},{C((p.Z - basePt.Z) * scale)})";
         string key = project.Name;
+        // AbV: no extrusions / booleans / half spaces; polygonal face sets instead (IfcReferenceViewGeometry).
+        var rv = abv ? new IfcReferenceViewGeometry(w, P, options.ChordTolerance) : null;
 
         // ---- units
         int lenUnit;
@@ -281,6 +290,7 @@ public static class IfcExporter
         {
             if (m.HasExactSolids && ExtrusionsPay(m) && m.Solids!.All(HolesInside))
             {
+                if (rv != null) return RvShape(m.Solids!.Select(rv.Prism).ToList(), style);
                 extrudedParts++;
                 var items = m.Solids!.Select(e => Extruded(e, style)).ToList();
                 int rep = w.Add("IFCSHAPEREPRESENTATION", $"{Ref(body)},'Body','SweptSolid',{Refs(items)}");
@@ -288,6 +298,13 @@ public static class IfcExporter
             }
             meshParts++;
             return Shape(FaceSet(m, style));
+        }
+
+        int RvShape(List<int> items, int? style)
+        {
+            if (style is { } st) foreach (int it in items) w.Add("IFCSTYLEDITEM", $"{Ref(it)},({Ref(st)}),$");
+            int rep = w.Add("IFCSHAPEREPRESENTATION", $"{Ref(body)},'Body','Tessellation',{Refs(items)}");
+            return w.Add("IFCPRODUCTDEFINITIONSHAPE", $"$,$,({Ref(rep)})");
         }
 
         var materials = new Dictionary<string, List<int>>();
@@ -675,10 +692,12 @@ public static class IfcExporter
                 string k = IfcKeys.PsAssembly(bk, b.Mark);
                 int asm = w.Add("IFCELEMENTASSEMBLY", $"{Guid(k)},$,{S(b.Mark)},{S($"{b.TypeName} prestressed girder")},$,{Ref(pl)},$,{S(b.Mark)},.FACTORY.,.GIRDER.");
                 contained.Add(asm);
-                int pds = b.Body != null && b.Shape.Profile != null ? ProfileBody(b, beamStyle) : Body(b.Mesh, beamStyle);
+                int pds = b.Body != null && b.Shape.Profile != null
+                    ? rv != null ? RvShape(new List<int> { rv.ClippedBeam(b.Body, b.Shape.Profile) }, beamStyle) : ProfileBody(b, beamStyle)
+                    : Body(b.Mesh, beamStyle);
                 string desc = $"{b.TypeName}, {b.Strands.Count} - {bStrandSize} strands ({b.Strands.Count(x => x.Depressed)} depressed" +
                               (b.Strands.Any(x => x.Debonded) ? $", {b.Strands.Count(x => x.Debonded)} debonded" : "") + $"), L = {u.FormatLength(b.Length)}";
-                int beam = w.Add("IFCBEAM", $"{Guid(IfcKeys.PsBeam(bk, b.Mark))},$,{S(b.Mark)},{S(desc)},$,{Ref(pl)},{Ref(pds)},{S(b.Mark)},.GIRDER.");
+                int beam = w.Add("IFCBEAM", $"{Guid(IfcKeys.PsBeam(bk, b.Mark))},$,{S(b.Mark)},{S(desc)},$,{Ref(pl)},{Ref(pds)},{S(b.Mark)},.GIRDER_SEGMENT.");
                 AddMaterial(b.Definition == null ? concreteMat : bConcrete, beam);
                 psetTargets.Add((beam, b.Mark, b.TypeName, b.Length, b.Mass));
                 if (b.Assumption != null) miscStatus.Add((beam, b.Assumption));
@@ -1031,6 +1050,7 @@ public static class IfcExporter
         result.EntityCount = w.Count;
         result.ExtrudedSolids = extrudedParts;
         result.TessellatedSolids = meshParts;
+        if (rv != null) { result.PolygonalSolids = rv.FaceSets; result.ChordTolerance = rv.ChordTolerance; }
         return result;
     }
 }
