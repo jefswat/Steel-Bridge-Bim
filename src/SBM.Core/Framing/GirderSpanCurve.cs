@@ -52,6 +52,33 @@ public sealed class GirderSpanCurve
         Length = _s[TableSize];
     }
 
+    /// <summary>
+    /// Explicit chord between two support-line points (per-span girder layout). D0 / D1 are the alignment distances of the
+    /// end points; the offset function is the chord's own (linear between the end offsets, only used for reporting).
+    /// </summary>
+    public GirderSpanCurve(Alignment align, Vec2 start, Vec2 end, int girder, int span)
+    {
+        _align = align;
+        Girder = girder;
+        Span = span;
+        Chorded = true;
+        Start = start;
+        End = end;
+        var s0 = align.Inverse(start);
+        var s1 = align.Inverse(end);
+        D0 = s0.Distance;
+        D1 = s1.Distance;
+        double o0 = s0.Offset, o1 = s1.Offset, d0 = D0, d1 = D1;
+        _offsetAt = d => d1 - d0 > 1e-9 ? o0 + (o1 - o0) * (d - d0) / (d1 - d0) : o0;
+        Length = Vec2.Distance(start, end);
+        for (int i = 0; i <= TableSize; i++) _s[i] = Length * i / TableSize;
+    }
+
+    /// <summary>Per-span girder layout: the girder's point on the layout's begin / end line (top of beam for prestressed
+    /// beams, NaN Z when the elevation follows the grade) - where the plan's offsets and haunches are given. Null = no layout.</summary>
+    public Vec3? LayoutBegin { get; init; }
+    public Vec3? LayoutEnd { get; init; }
+
     /// <summary>Alignment distance associated with u (exact for curved girders, approximate for chorded).</summary>
     public double DistanceAt(double u) => D0 + (D1 - D0) * u;
 

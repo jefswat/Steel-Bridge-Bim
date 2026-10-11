@@ -1,4 +1,4 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using SBM.Core.Bridge;
 using SBM.Core.Framing;
@@ -663,7 +663,7 @@ public sealed partial class SubstructureGenerator
     /// <summary>Where the cross-slope pivot (crown) crosses the support line, as a distance along it.</summary>
     private static double CrownOnSupportLine(SupportLineResult sl, Alignments.Alignment a)
     {
-        double pivot = a.CrossSlope.PivotOffset;
+        double pivot = a.CrossSlope.PivotOffsetAt(sl.Station);
         var r = a.RightNormalAt(sl.Station);
         double dot = Vec2.Dot(sl.Direction, r);
         return Math.Abs(dot) > 1e-6 ? pivot / dot : 0;

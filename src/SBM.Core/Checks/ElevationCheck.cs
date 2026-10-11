@@ -55,16 +55,21 @@ public static partial class ElevationCheck
     {
         string E(double z) => u.FormatLength(z, LengthKind.Coordinate);
         var (pgl, how) = a.Profile.Explain(station, s => u.FormatStation(s), E, x => u.FormatLength(x));
-        ch.Steps.Add(new CalcStep($"Profile grade at STA {u.FormatStation(station)}", how, double.NaN, pgl, "Profile grade (PGL)"));
-
         var cs = a.CrossSlope;
+        double pivOff = cs.PivotOffsetAt(station);
+        string pivHow = cs.PivotSource(station, s => u.FormatStation(s), x => u.FormatLength(x));
+        string pglAt = pivHow.Length > 0
+            ? $" — on the PGL {u.FormatLength(Math.Abs(pivOff))} {(pivOff < 0 ? "LT" : "RT")} of the alignment ({pivHow}); profile stations = alignment stations"
+            : "";
+        ch.Steps.Add(new CalcStep($"Profile grade at STA {u.FormatStation(station)}", how + pglAt, double.NaN, pgl, "Profile grade (PGL)"));
+
         var (l, r) = cs.SlopesAt(station);
-        double d = offset - cs.PivotOffset;
+        double d = offset - pivOff;
         double slope = d >= 0 ? r : l;
         double dz = cs.DeltaElevation(station, offset);
         string side = d >= 0 ? "right" : "left";
         string rows = CrossSlopeSource(cs, station, u);
-        string pivot = Math.Abs(cs.PivotOffset) > 1e-9 ? $" from pivot at {u.FormatLength(cs.PivotOffset)}" : "";
+        string pivot = pivHow.Length > 0 ? $" from pivot at {u.FormatLength(pivOff)}" : "";
         var sd = d >= 0 ? cs.SidesAt(station).right : cs.SidesAt(station).left;
         string slopeText = sd.Break > 0 && Math.Abs(d) > sd.Break
             ? $"{side} slope {string.Join(" + ", sd.Segments(Math.Abs(d)).Select(g => $"{Pct(g.Slope)} × {u.FormatLength(g.To - g.From)}"))} (breaks at {string.Join(", ", sd.Segments(Math.Abs(d)).Skip(1).Select(g => u.FormatLength(g.From)))}; {rows}){pivot}, offset {u.FormatLength(offset)} {(offset < 0 ? "LT" : "RT")}"

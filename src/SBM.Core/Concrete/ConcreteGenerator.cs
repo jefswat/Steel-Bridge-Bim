@@ -238,11 +238,24 @@ public sealed partial class ConcreteGenerator
         var list = new List<double> { l, r };
         int n = Math.Max(1, (int)Math.Ceiling((r - l) / step));
         for (int i = 1; i < n; i++) list.Add(l + (r - l) * i / n);
-        double piv = _a.CrossSlope.PivotOffset;
-        if (piv > l && piv < r) list.Add(piv);
+        foreach (double piv in PivotColumns()) if (piv > l && piv < r) list.Add(piv);
         foreach (var g in StripLines(l, r)) list.Add(g);
         foreach (var v in KinkVertices()) list.Add(_a.Inverse(v).Offset);
         return list.Distinct().OrderBy(x => x).ToList();
+    }
+
+    /// <summary>Deck grid columns at the crown (cross-slope pivot): the constant pivot offset, or with a varying pivot
+    /// (<see cref="CrossSlopeTable.PivotOffsets"/>) every table offset; a crown that moves between columns inside the deck is
+    /// reported (the slab top is chorded across it there).</summary>
+    private IEnumerable<double> PivotColumns()
+    {
+        var cs = _a.CrossSlope;
+        if (!cs.VariablePivot) return new[] { cs.PivotOffset };
+        var offs = cs.PivotOffsets!.Select(p => p.Offset).Distinct().ToList();
+        if (offs.Count > 1 && offs.Any(o => o > Deck.MinLeft && o < Deck.MaxRight))
+            lock (_m.Notes) if (!_m.Notes.Any(n => n.StartsWith("Varying cross-slope pivot")))
+                _m.Notes.Add("Varying cross-slope pivot inside the deck: the slab top has grid columns at the table's pivot offsets only; between them the crown line is chorded across the cells.");
+        return offs;
     }
 
     /// <summary>Gutter lines (edge strip start) strictly inside [l, r] of a constant-width deck, when the edge strip option is on.</summary>
@@ -495,8 +508,7 @@ public sealed partial class ConcreteGenerator
         double l0 = Deck.LeftEdgeOffset + li, r0 = Deck.RightEdgeOffset - ri;
         int n = Math.Max(1, (int)Math.Ceiling((r0 - l0) / 1.0));
         var os = Enumerable.Range(0, n + 1).Select(i => l0 + (r0 - l0) * i / n).ToList();
-        double piv = _a.CrossSlope.PivotOffset;
-        if (piv > l0 && piv < r0) os.Add(piv);
+        foreach (double piv in PivotColumns()) if (piv > l0 && piv < r0) os.Add(piv);
         os.AddRange(StripLines(l0, r0));
         return os.Distinct().OrderBy(x => x).Select(o => (Func<double, double>)(_ => o)).ToList();
     }
@@ -818,7 +830,7 @@ public sealed partial class ConcreteGenerator
         var s0 = _a.Inverse(p0);
         var s1 = _a.Inverse(p1);
         var ts = new List<double> { 0, 1 };
-        double piv = _a.CrossSlope.PivotOffset;
+        double piv = _a.CrossSlope.PivotOffsetAt((s0.Station + s1.Station) / 2);
         if ((s0.Offset - piv) * (s1.Offset - piv) < 0) ts.Add((piv - s0.Offset) / (s1.Offset - s0.Offset));
         int n = (int)Math.Ceiling(Vec2.Distance(p0, p1) / 3.0);
         for (int i = 1; i < n; i++) ts.Add((double)i / n);

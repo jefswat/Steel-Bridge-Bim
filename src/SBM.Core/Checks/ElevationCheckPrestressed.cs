@@ -1,3 +1,4 @@
+using SBM.Core.Bridge;
 using SBM.Core.Framing;
 using SBM.Core.Geometry;
 using SBM.Core.Prestressed;
@@ -39,6 +40,22 @@ public static partial class ElevationCheck
             var so = a.Inverse(q);
             return def.Deck.FinishedElevation(a, so.Station, so.Offset) - def.Deck.Thickness - def.Deck.Haunch;
         }
+        if (cs.LayoutBegin is { } lb && cs.LayoutEnd is { } le && def.Girders.SpanLayoutOf(span) is { } lay)
+        {
+            // Per-span girder layout: the beam is straight through its points on the layout's begin / end lines, where top of
+            // beam = finished grade − slab − haunch (the layout's haunch at that end, else the deck haunch).
+            double hb = lay.Begin.Haunches?[girder] ?? def.Deck.Haunch, he = lay.End.Haunches?[girder] ?? def.Deck.Haunch;
+            double zb = TopAtPoint(lb.XY, hb), ze = TopAtPoint(le.XY, he);
+            double ll = (le.XY - lb.XY).Length;
+            var tl = (le.XY - lb.XY) / ll;
+            double dl = Vec2.Dot(p - lb.XY, tl);
+            double gl = (ze - zb) / ll;
+            string Where(GirderSpanEnd e, int sup) => Math.Abs(e.LineShift) > 1e-9
+                ? $"{f.Supports[sup].Name} line moved {L(e.LineShift)} along the reference offset {L(e.ReferenceOffset)}" : $"{f.Supports[sup].Name} line";
+            string bl = $"span {span + 1} layout: top of beam on the {Where(lay.Begin, span)} {E(zb)} (finished grade − slab {Sh(def.Deck.Thickness)} − haunch {Sh(hb)}), " +
+                        $"beam straight to the {Where(lay.End, span + 1)} {E(ze)} (haunch {Sh(he)}): grade {Pct(gl)} × {L(dl)} along the girder";
+            return (zb + gl * dl, bl, span);
+        }
         double zA = TopAtSupport(cs.Start), zB = TopAtSupport(cs.End);
         double lc = (cs.End - cs.Start).Length;
         var t = (cs.End - cs.Start) / lc;
@@ -48,6 +65,12 @@ public static partial class ElevationCheck
         string basis = $"top of beam on the {f.Supports[span].Name} line {E(zA)} (finished grade − slab {Sh(def.Deck.Thickness)} − haunch {Sh(def.Deck.Haunch)}), " +
                        $"beam straight to the {f.Supports[span + 1].Name} line {E(zB)}: grade {Pct(grade)} × {L(dist)} along the girder";
         return (z, basis, span);
+
+        double TopAtPoint(Vec2 q, double haunch)
+        {
+            var so = a.Inverse(q);
+            return def.Deck.FinishedElevation(a, so.Station, so.Offset) - def.Deck.Thickness - haunch;
+        }
     }
 
     /// <summary>Chain at a prestressed girder CL at any point: finished grade down to the bottom of the beam.</summary>
