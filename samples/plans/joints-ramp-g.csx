@@ -7,7 +7,8 @@
 //  * DECK END BLOCKS ("end dam diaphragm"): piers 2'-2 deep, soffit flat for 3'-3 (1'-2 + 2'-1, sheet 135 section B-B; the neighbouring
 //    dimension string gives 3'-3 1/2) then 45 degrees to the slab soffit. South Abutment (sheet 135 section A-A): 8 1/16" BELOW the slab soffit
 //    (16 1/16" total) for ~1'-9 1/2 from the deck end (scaled, not dimensioned), stepping up to the slab soffit; its W24x68 diaphragm top flange
-//    is cast into the block, flush with the soffit. Set DECK_END_BLOCKS = false below to switch them off. Reinforcing is NOT modeled.
+//    is cast into the block, flush with the soffit. Set DECK_END_BLOCKS = false below to switch them off. Reinforcing: 5d2-5d5 at
+//    Piers 5G/9G/14G placed by deck-rebar-ramp-g.csx, the rest schedule only (docs/plan-data/deck-rebar.md section 6). The Pier 19G end of slab (Details A/B) is set by deck-end-kinks.csx.
 //  * One body per joint: Unit 1 owns 5G, Unit 2 owns 9G, Unit 3 owns 14G; Unit 4 owns 19G (the other side, I-80 Unit 3, has no 19G line in the model).
 using SBM.Core.Bridge;
 using SBM.Core.Geometry;

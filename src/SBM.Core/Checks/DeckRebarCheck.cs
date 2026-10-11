@@ -31,8 +31,11 @@ public static class DeckRebarCheck
         var deck = def.Deck;
         var a = f.Alignment;
         var dr = f.Deck;
-        var bars = cm.Bars.Where(b => b.Group == "Deck" && b.Unit == "").ToList();
-        if (bars.Count == 0 || dr == null) return null;
+        var damMarks = deck.Reinforcement.Plan?.EndDam.Select(e => e.Mark).ToHashSet() ?? new HashSet<string>();
+        var all = cm.Bars.Where(b => b.Group == "Deck" && b.Unit == "").ToList();
+        if (all.Count == 0 || dr == null) return null;
+        var bars = all.Where(b => !damMarks.Contains(b.Mark)).ToList();
+        var dams = all.Where(b => damMarks.Contains(b.Mark)).ToList();
         var sizeOf = cm.Marks.Where(m => m.Unit == "").GroupBy(m => m.Mark).ToDictionary(g => g.Key, g => g.First().Size);
         var rd = deck.Reinforcement;
         double t = deck.Thickness;
@@ -134,6 +137,7 @@ public static class DeckRebarCheck
                          $"(required {u.FormatLength(rd.BottomCover, LengthKind.Short)}), min edge distance {L(minEdge)} (required {u.FormatLength(rd.SideCover, LengthKind.Short)}), " +
                          $"min distance from the begin / end deck-end line {L(minBegin)} / {L(minEnd)}, steel clashes {clash} bars (worst {L(worstClash)}).");
         void D(DiagnosticSeverity s, string m) => cm.Diagnostics.Add(new Diagnostic(s, m));
+        if (dams.Count > 0) CheckEndDams(f, steel, cm, u, dams, sizeOf, D);
         if (topShort > 0) D(DiagnosticSeverity.Warning, $"Deck reinforcing check: {topShort} top-mat bars have less than {u.FormatLength(rd.TopCover, LengthKind.Short)} cover to the top of slab (min {L(minTop)}).");
         if (botShort > 0) D(DiagnosticSeverity.Warning, $"Deck reinforcing check: {botShort} bottom-mat bars have less than {u.FormatLength(rd.BottomCover, LengthKind.Short)} cover to the soffit (min {L(minBot)}).");
         if (edgeShort > 0) D(DiagnosticSeverity.Warning, $"Deck reinforcing check: {edgeShort} bars are closer than {u.FormatLength(rd.SideCover, LengthKind.Short)} to a deck edge (min {L(minEdge)}).");
@@ -145,6 +149,83 @@ public static class DeckRebarCheck
             D(DiagnosticSeverity.Warning, $"Deck reinforcing check: {clash} bars pass through the top of the steel (top flanges / splice plates), worst {L(worstClash)}: e.g. " +
                 string.Join("; ", worst.OrderByDescending(w => w.pen).Take(3).Select(w => $"{w.where} ({u.FormatLength(w.pen, LengthKind.Short)})")));
         return res;
+    }
+
+    /// <summary>
+    /// End dam diaphragm bars: clear cover inside the concrete of the deck end (top of slab, deck-end face, end block soffit or slab soffit beyond it), the deck edges,
+    /// and the steel under them. Required clear = 1 1/2" (the smallest clear the end dam sections print); nothing is moved.
+    /// </summary>
+    private static void CheckEndDams(BridgeFraming f, SteelModel? steel, ConcreteModel cm, UnitSystem u, List<BarPlacement> dams, Dictionary<string, RebarSize> sizeOf,
+        Action<DiagnosticSeverity, string> D)
+    {
+        var deck = f.Definition.Deck; var a = f.Alignment; var dr = f.Deck!;
+        // exact steel test (end dam bars run beside the top flanges): up-facing triangles of the top flanges / splice plates within 3 m of a deck end
+        var tris = new List<(Vec3 p0, Vec3 p1, Vec3 p2, Vec3 n, double x0, double x1, double y0, double y1)>();
+        if (steel != null)
+        {
+            var asm = steel.Assemblies.ToDictionary(x => x.Mark, x => x, StringComparer.Ordinal);
+            foreach (var part in steel.Parts.Where(p => p.Category is PartCategory.FlangePlate or PartCategory.SplicePlate or PartCategory.FillerPlate
+                                                      && asm.TryGetValue(p.Assembly, out var aa) && aa.Kind is AssemblyKind.GirderFieldSection or AssemblyKind.FieldSplice))
+            {
+                var pos = part.Mesh.Positions; var idx = part.Mesh.Indices;
+                for (int i = 0; i + 2 < idx.Count; i += 3)
+                {
+                    var p0 = pos[idx[i]]; var p1 = pos[idx[i + 1]]; var p2 = pos[idx[i + 2]];
+                    var n = Vec3.Cross(p1 - p0, p2 - p0);
+                    if (n.Z <= 0.3 * n.Length) continue;
+                    if (Math.Min(dr.FromBegin(p0.XY), dr.FromEnd(p0.XY)) > 3 && Math.Min(dr.FromBegin(p1.XY), dr.FromEnd(p1.XY)) > 3) continue;
+                    tris.Add((p0, p1, p2, n, Math.Min(p0.X, Math.Min(p1.X, p2.X)), Math.Max(p0.X, Math.Max(p1.X, p2.X)), Math.Min(p0.Y, Math.Min(p1.Y, p2.Y)), Math.Max(p0.Y, Math.Max(p1.Y, p2.Y))));
+                }
+            }
+        }
+        double t = deck.Thickness, req = In(1.5);
+        double minTop = double.MaxValue, minBot = double.MaxValue, minFace = double.MaxValue, minEdge = double.MaxValue, worstClash = 0;
+        int shortBars = 0, clash = 0;
+        var worst = new List<string>();
+        var lk = new object();
+        Parallel.ForEach(dams, bar =>
+        {
+            if (!sizeOf.TryGetValue(bar.Mark, out var size)) return;
+            double r = size.Diameter / 2;
+            double lTop = double.MaxValue, lBot = double.MaxValue, lFace = double.MaxValue, lEdge = double.MaxValue, pen = 0;
+            foreach (var p in bar.Points)
+            {
+                double xb = dr.FromBegin(p.XY), xe = dr.FromEnd(p.XY);
+                bool begin = xb <= xe;
+                double x = begin ? xb : xe;
+                var so = a.Inverse(p.XY);
+                double drop = deck.FinishedElevation(a, so.Station, so.Offset) - p.Z;
+                var block = cm.Joints.FirstOrDefault(j => j.AtBegin == begin)?.EndBlock;
+                double soff = block != null && !double.IsNaN(block.SoffitDropAt(x)) ? block.SoffitDropAt(x) : t;
+                lTop = Math.Min(lTop, drop - r);
+                lBot = Math.Min(lBot, soff - drop - r);
+                lFace = Math.Min(lFace, x - r);
+                lEdge = Math.Min(lEdge, Math.Min(so.Offset - deck.LeftAt(so.Station), deck.RightAt(so.Station) - so.Offset));
+                foreach (var tr in tris)
+                {
+                    if (p.X < tr.x0 - r || p.X > tr.x1 + r || p.Y < tr.y0 - r || p.Y > tr.y1 + r) continue;
+                    double zt = PlaneZ(p.X, p.Y, tr.p0, tr.n);
+                    if (zt <= p.Z - r + Tol) continue;
+                    // the bar (radius r) overlaps the plate in plan when its center or a point r away lies over the triangle
+                    bool over = InTri(p.X, p.Y, tr.p0, tr.p1, tr.p2) || InTri(p.X + r, p.Y, tr.p0, tr.p1, tr.p2) || InTri(p.X - r, p.Y, tr.p0, tr.p1, tr.p2)
+                                || InTri(p.X, p.Y + r, tr.p0, tr.p1, tr.p2) || InTri(p.X, p.Y - r, tr.p0, tr.p1, tr.p2);
+                    if (over) pen = Math.Max(pen, zt - (p.Z - r));
+                }
+            }
+            lock (lk)
+            {
+                minTop = Math.Min(minTop, lTop); minBot = Math.Min(minBot, lBot); minFace = Math.Min(minFace, lFace); minEdge = Math.Min(minEdge, lEdge);
+                if (Math.Min(Math.Min(lTop, lBot), Math.Min(lFace, lEdge)) < req - Tol) shortBars++;
+                if (pen > 0) { clash++; worstClash = Math.Max(worstClash, pen); if (worst.Count < 3) worst.Add($"{bar.Mark} at {bar.Points[0].X:F2},{bar.Points[0].Y:F2}"); }
+            }
+        });
+        string L(double v) => v == double.MaxValue ? "-" : u.FormatLength(v, LengthKind.Short);
+        lock (cm.Notes)
+            cm.Notes.Add($"Deck end dam bar check ({dams.Count} bars): min clear to the top of slab {L(minTop)}, to the end block / slab soffit {L(minBot)}, to the deck-end face {L(minFace)}, to a deck edge {L(minEdge)}; steel clashes {clash} bars (worst {L(worstClash)}).");
+        if (shortBars > 0)
+            D(DiagnosticSeverity.Warning, $"Deck reinforcing check: {shortBars} end dam bars have less than {u.FormatLength(req, LengthKind.Short)} clear inside the deck end concrete (top {L(minTop)}, soffit {L(minBot)}, face {L(minFace)}, edge {L(minEdge)}) - not moved.");
+        if (clash > 0)
+            D(DiagnosticSeverity.Warning, $"Deck reinforcing check: {clash} end dam bars pass through the top of the steel (top flanges / splice plates), worst {L(worstClash)}: e.g. {string.Join("; ", worst)} - not moved.");
     }
 
     private static bool InTri(double x, double y, Vec3 a, Vec3 b, Vec3 c)

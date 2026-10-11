@@ -14,9 +14,13 @@
 //    + 10 spa. @ 9" bottom, 23 bars); stock 39'-2 (U1, U3), 38'-9 (U2), 39'-11 (U4), min. lap 3'-0 (sheet 135 plan).
 //  * COUNT CHECK: 6b1 / (pieces per line) = 85 lines in every unit = 69 bay lines + 16 in the overhangs.  The overhang positions are NOT dimensioned at readable
 //    resolution (only "2" from the edge"): they are INFERRED as 8 lines per overhang at the bay pattern (4 1/2" apart, first 2" from the edge, alternating top/bottom).
-//  * Not placed (schedule only): 5a4 slab at drains, 5a5 insert anchors, end dam bars 5d1-5d5, 4d6/4d7, 5e1-5e8 (sections B-B/C-C/E-E).
+//  * END DAM DIAPHRAGM bars at the expansion piers 5G, 9G, 14G (PDF 137 section B-B, bend diagrams PDF 141, layout along the joint PDF 138 "PARTIAL SECTION NEAR
+//    EXPANSION-EXPANSION PIER"): 5d2 / 5d3 hoops, 5d4 U, 5d5 Z, placed in 3D (see END_DAM below). Everything else of the end dams is schedule only with an UNRESOLVED warning.
+//  * Not placed (schedule only): 5a4 slab at drains, 5a5 insert anchors (drain positions, sheets 158+), the end dam bars listed in Unresolved below.
 using SBM.Core.Bridge;
 using System.Globalization;
+
+const bool END_DAM = true;     // false = the end dam bars stay schedule only (as before)
 
 double FI(double ft, double inch) => Ft(ft) + In(inch);
 double ParseFtIn(string s)
@@ -42,6 +46,46 @@ List<DeckPlanBarLine> BarList(string br, int unit)
         });
     }
     return res;
+}
+
+// ---- END DAM DIAPHRAGM bars (expansion piers).  Section B-B (PDF 137), all inches, X from the deck-end face into the deck, Drop below the top of slab:
+//  block 2'-2 deep, blockout 2'-1 x 1'-2, soffit flat 3'-3 then 45 deg to the 8" slab soffit (joints-ramp-g.csx).  Printed clears: 3" CLR. from the deck-end face,
+//  2" CLR. (TYP.) from the blockout wall, 1 1/2" CLR. above the soffit (to the 5d4 bottom leg); elsewhere the superstructure notes' 2" clear (PDF 85).
+//  * 5d4 (U 4'-0 / 1'-9 / 1'-6, PDF 141): vertical leg 3" from the face, bottom leg 1 1/2" above the soffit -> top leg at 26 - 1.5 - 21 = 3.5" below the top (just under the
+//    7a top bars, 2 1/2" clear + 7/8" = 3 3/8").
+//  * 5d3 (hoop 2'-10 x 8, 6" tails): 3" from the face, resting on the 5d4 bottom leg as drawn (bottom 1 1/2" + 5/8" above the soffit).
+//  * 5d2 (hoop 11 x 1'-8, 6" tails): 2" clear from the blockout wall (X 27..38), bottom level with the 5d3 bottom as drawn.
+//  * 5d5 (1'-6, 2'-5 at 45 deg = 1'-8 1/2 x 1'-8 1/2, 1'-6): bottom leg 1 1/2" above the soffit (with 5d4), slope 2" clear from the 45 deg soffit -> bottom bend at X = 65 - 2 sqrt 2 - 24.5.
+//  Along the joint (PARTIAL SECTION, PDF 138): per bay 10" from the girder CL + 8 spa. @ 1'-0 + 10" (9 bars, girders 9'-8 apart); outside the exterior girders 10" and 1'-0 more
+//  (then 1'-3 to the edge).  The four marks of a set ("9-5d2, 9-5d3, 9-5d4, 9-5d5") are at the SAME position along the joint, as printed (no side-by-side offset:
+//  DeckEndDamBar.SideOffset = 0; where two of them share a leg, e.g. the 5d3 / 5d4 legs at the face, the 3D bars coincide).
+//  Pier 19G (Unit 4 end, section E-E PDF 140): "10 bars between girders and 3 outside exterior girders at equal spacing" on the 33 deg skewed joint - the partial section
+//  says "reinforcing for Pier No. 19G similar" but gives no dimensions for it: those 36 bars per mark are counted, not modeled (UNRESOLVED).
+void EndDam(DeckPlanReinforcement plan, int unit)
+{
+    double db = In(0.625);
+    var ends = unit == 1 ? DeckEndSide.End : unit == 4 ? DeckEndSide.Begin : DeckEndSide.Both;
+    int unplaced = unit == 4 ? 36 : 0;
+    string why = unit == 4 ? "Pier 19G end of Unit 4 (section E-E, PDF 140): 10 bars per bay and 3 outside the exterior girders 'at equal spacing' on the skewed joint; positions along the joint not dimensioned (the partial section PDF 138 dimensions Piers 5G/9G/14G only) - 36 bars counted, not modeled" : "";
+    DeckEndDamPoint P(double x, double d) => new(In(x), In(d));
+    DeckEndDamBar B(string mark, double listedFt, double listedIn, double side) => new()
+    {
+        Mark = mark, Size = "#5", Ends = ends, Pin = In(2.5), ListedLength = FI(listedFt, listedIn), FromGirder = In(10), Spacing = In(12), PerBay = 9,
+        Overhang = { In(10), In(22) }, SideOffset = side * db, Unplaced = unplaced, Unresolved = why,
+    };
+    var d2 = B("5d2", 6, 2, 0); d2.HoopWidth = In(11); d2.HoopHeight = In(20); d2.HoopLapSide = In(6); d2.HoopLapTop = In(6); d2.HoopCorner = P(27, 26 - 1.5 - 0.625 - 20);
+    var d3 = B("5d3", 8, 0, 0); d3.HoopWidth = In(34); d3.HoopHeight = In(8); d3.HoopLapSide = In(6); d3.HoopLapTop = In(6); d3.HoopCorner = P(3, 26 - 1.5 - 0.625 - 8);
+    var d4 = B("5d4", 7, 3, 0); d4.Outside = new() { P(51, 3.5), P(3, 3.5), P(3, 24.5), P(21, 24.5) }; d4.Dims = new() { In(48), In(21), In(18) };
+    double xb = 65 - 2 * Math.Sqrt(2) - 24.5;                         // bottom bend of 5d5 (outside face), 2" clear from the 45 deg soffit X + Drop = 65
+    var d5 = B("5d5", 5, 5, 0); d5.Outside = new() { P(xb - 18, 24.5), P(xb, 24.5), P(xb + 20.5, 4.0), P(xb + 38.5, 4.0) }; d5.Dims = new() { In(18), In(29), In(18) };
+    plan.EndDam.AddRange(new[] { d2, d3, d4, d5 });
+    string ends5 = unit == 1 ? "South Abutment (section A-A, PDF 137) and Pier 5G" : unit == 4 ? "Piers 14G and 19G (sections B-B PDF 137, E-E PDF 140)" : "both expansion piers (section B-B, PDF 137)";
+    plan.Unresolved.Add($"Ramp G Unit {unit} end dam longitudinal bars 5e* at {ends5}: the bars along the joint are drawn as dots in the sections but only those at hoop corners follow " +
+        "from dimensions (the other 5d3-hoop bars, the 5e4 / 5e8 bars in the blockout) - schedule only.");
+    plan.Unresolved.Add($"Ramp G Unit {unit} end dam bars 4d6 / 4d7 under the barriers (section C-C, PDF 138): '4-4d6 EQ. SPA.' without the extent along the joint, 4d7 position not dimensioned; " +
+        "the reduced end block under the barrier (1'-3 at the bottom) is not modeled - schedule only.");
+    if (unit == 1)
+        plan.Unresolved.Add("Ramp G Unit 1 South Abutment 5d1 hoops (section A-A, PDF 137, 36 bars 'parallel to longit. 6b1 bars'): spacing along the joint not dimensioned - schedule only.");
 }
 
 // unit: stock 6b1, top start / count, bottom start / count (inches), U4 special
@@ -122,6 +166,7 @@ foreach (var sp in specs)
         lz.Add(z);
     }
     var right = L("right overhang (inferred)", DeckLongRef.OfGirder(4), DeckLongRef.Edge(DeckBarSide.Right)); right.Positions = ov.ToList(); right.PositionsFromRight = true; lz.Add(right);
+    if (END_DAM) EndDam(plan, sp.U);
     r.Plan = plan;
 }
 
@@ -134,6 +179,6 @@ foreach (var sp in specs)
     var cm = Doc.Concrete(name);
     Print($"== {name}");
     foreach (var n in cm.Notes.Where(n => n.StartsWith("Plan-driven") || n.StartsWith("  ") || n.StartsWith("Edge") || n.StartsWith("Transverse zone") || n.StartsWith("Top:") || n.StartsWith("Bottom:"))) Print("   " + n);
-    foreach (var d in cm.Diagnostics.Where(d => d.Message.StartsWith("Deck reinforc"))) Print($"   {d.Severity}: {d.Message}");
+    foreach (var d in cm.Diagnostics.Where(d => d.Message.StartsWith("Deck reinforc") || d.Message.StartsWith("UNRESOLVED") || d.Message.StartsWith("Deck end dam"))) Print($"   {d.Severity}: {d.Message}");
 }
 Doc.Save();

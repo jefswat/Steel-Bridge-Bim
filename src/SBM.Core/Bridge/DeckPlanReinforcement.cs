@@ -130,6 +130,65 @@ public sealed class DeckPlanBarLine
     public DeckPlanBarLine Clone() => (DeckPlanBarLine)MemberwiseClone();
 }
 
+/// <summary>Which deck end(s) of the unit an end dam bar group is placed at.</summary>
+public enum DeckEndSide { Begin, End, Both }
+
+/// <summary>Point of an end dam bar outline in the section normal to the joint: X from the deck-end face (+ into the deck), Drop below the finished top of slab.</summary>
+public sealed class DeckEndDamPoint
+{
+    public double X { get; set; }
+    public double Drop { get; set; }
+    public DeckEndDamPoint() { }
+    public DeckEndDamPoint(double x, double drop) { X = x; Drop = drop; }
+    public DeckEndDamPoint Clone() => (DeckEndDamPoint)MemberwiseClone();
+}
+
+/// <summary>
+/// OPTIONAL end dam diaphragm bars (the "5d" bars of the plans' end dam sections B-B / C-C / E-E): one mark, bent in the plane normal to the deck-end line, repeated
+/// along the joint. The shape is the plan's bend diagram, ALL DIMENSIONS OUT TO OUT, placed by its OUTSIDE outline in the section (<see cref="Outside"/>, or a closed hoop
+/// <see cref="HoopWidth"/> x <see cref="HoopHeight"/> whose outside corner nearest the face and top is <see cref="HoopCorner"/>); the bar follows the finished grade
+/// (Drop below it). Along the joint: per girder bay the first bar <see cref="FromGirder"/> from the left girder line then <see cref="Spacing"/> (bars <see cref="PerBay"/>),
+/// and outside the exterior girders at <see cref="Overhang"/> distances from the exterior girder lines (all measured along the deck-end line at the face).
+/// Bars of one set listed at the same position ("9-5d2, 9-5d3, 9-5d4, 9-5d5") are tied side by side: <see cref="SideOffset"/> moves this mark along the joint.
+/// <see cref="Unplaced"/> bars count toward the mark but are not modeled (their end's layout is not dimensioned; <see cref="Unresolved"/> is raised as a warning).
+/// </summary>
+public sealed class DeckEndDamBar
+{
+    public string Mark { get; set; } = "";
+    public string Size { get; set; } = "#5";
+    public DeckEndSide Ends { get; set; } = DeckEndSide.Both;
+    /// <summary>Outside outline (tips and outside corners) of an open bent bar, in section coordinates; <see cref="BodySide"/> = +1 when the bar body lies left of the travel direction (X right, Drop down), -1 right.</summary>
+    public List<DeckEndDamPoint>? Outside { get; set; }
+    public int BodySide { get; set; } = 1;
+    /// <summary>Printed out-to-out dimensions of the segments of <see cref="Outside"/> (for the bend diagram); empty = the outline's segment lengths.</summary>
+    public List<double> Dims { get; set; } = new();
+    /// <summary>Closed hoop: out-to-out width (along X) and height (along Drop), lap tails along the side at the face and along the top; null = an open bar.</summary>
+    public double? HoopWidth { get; set; }
+    public double HoopHeight { get; set; }
+    public double HoopLapSide { get; set; }
+    public double HoopLapTop { get; set; }
+    /// <summary>Outside corner of the hoop at the face side and the top (smallest X, smallest Drop).</summary>
+    public DeckEndDamPoint HoopCorner { get; set; } = new();
+    /// <summary>Pin diameter of the bend diagram (0 = the minimum for the size).</summary>
+    public double Pin { get; set; }
+    /// <summary>Bar-list length (the plain sum of the out-to-out dimensions).</summary>
+    public double ListedLength { get; set; }
+    public double FromGirder { get; set; }
+    public double Spacing { get; set; }
+    public int PerBay { get; set; }
+    public List<double> Overhang { get; set; } = new();
+    public double SideOffset { get; set; }
+    public int Unplaced { get; set; }
+    public string Unresolved { get; set; } = "";
+    public DeckEndDamBar Clone()
+    {
+        var b = (DeckEndDamBar)MemberwiseClone();
+        b.Outside = Outside?.Select(p => p.Clone()).ToList();
+        b.Dims = Dims.ToList(); b.Overhang = Overhang.ToList(); b.HoopCorner = HoopCorner.Clone();
+        return b;
+    }
+}
+
 /// <summary>
 /// OPTIONAL plan-driven deck reinforcing (null = the generic generator): zones of transverse lines and longitudinal bays as the plans'
 /// slab sheets print them, plus the plan's bar list for the unit. Marks, counts, lengths and weights reproduce the bar list; bar-list rows
@@ -156,8 +215,13 @@ public sealed class DeckPlanReinforcement
     public double TransverseEndClear { get; set; }
     /// <summary>Relative tolerance used when comparing the model with the plan bar list (counts exactly, weights by this fraction).</summary>
     public double WeightTolerance { get; set; } = 0.03;
+    /// <summary>End dam diaphragm bars placed in 3D (bar-list rows not covered stay schedule only).</summary>
+    public List<DeckEndDamBar> EndDam { get; set; } = new();
+    /// <summary>Plan items that are NOT dimensioned (with the PDF page): each is raised as an "UNRESOLVED" warning, nothing is assumed.</summary>
+    public List<string> Unresolved { get; set; } = new();
     public DeckPlanReinforcement Clone() => new()
     {
+        EndDam = EndDam.Select(b => b.Clone()).ToList(), Unresolved = Unresolved.ToList(),
         Transverse = Transverse.Select(z => z.Clone()).ToList(),
         Longitudinal = Longitudinal.Select(z => z.Clone()).ToList(),
         PlanBarList = PlanBarList.Select(l => l.Clone()).ToList(), Families = Families.ToList(),

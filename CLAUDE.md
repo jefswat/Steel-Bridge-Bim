@@ -276,7 +276,13 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   = the plans' "end dam diaphragm" (2'-2 deep, flat soffit then 45 degrees to the slab soffit, full deck width, girder ends cast into it). `ConcreteGenerator.BuildEndBlock`
   -> `ExpansionJointResult.EndBlock` (`DeckEndBlockResult.Probe`); the blockout is then built to its full plan depth. `Checks/DeckEndBlockCheck` (run in
   `RegenerationCache`) reports steel inside a block: girder ends/studs/W strut flange flush = INTENDED (Info), anything else = CLASH warning; nothing is moved.
-  Block rebar is not modeled. Data/evidence: `docs/plan-data/deck-end-blocks.md`; scripts `joints-i80.csx`, `joints-ramp-g.csx` (DECK_END_BLOCKS flag). Snapshot `--closeup EBLKn[@Bridge]`.
+  Block rebar: see `DeckPlanReinforcement.EndDam` below. Data/evidence: `docs/plan-data/deck-end-blocks.md`; scripts `joints-i80.csx`, `joints-ramp-g.csx` (DECK_END_BLOCKS flag). Snapshot `--closeup EBLKn[@Bridge]`.
+- Kinked deck ends (OPTIONAL `SupportDefinition.DeckEndPoints` on the first / last support = the plan's break points of the end of slab as station / offset, left to right, monotone; first and last
+  segments extend; null / < 2 points = the straight `DeckEndOffset` line): `Framing/DeckEndPolyline.cs` (`SignedDistance` = shortest distance, + into the deck; `Inset` = parallel offset with miter vertices,
+  vanished middle segments dropped, end segments kept; `Clip` of a plan segment; `CrossOffsetCurve`). `DeckResult.BeginPolyline/EndPolyline` + `FromBegin/FromEnd` (use these, not `BeginLinePoint`, for
+  distances from a deck end). Followed by the deck outline (break points are vertices), slab solid (extra columns through the break points, `VarColumns`/`DeckOffsets`), blockouts / end blocks / joint
+  bodies (`EndD`, `PlanX`), transverse bar clipping (`ClipToEnds`) and longitudinal bar ends (`EndsVar`), `DeckRebarCheck`. `BeginLinePoint/Direction` stay the straight lines (gap checks, drains, views).
+  Plan data: `samples/plans/deck-end-kinks.csx` (I-80 U2 at Pier 5WB / 6A, Ramp G U4 at Pier 19G incl. its straight right-edge flare as a `RightEdgeTable`); run before the deck-rebar scripts.
 - Camber / blocking (OPTIONAL `GirderLayoutDefinition.Camber` = `GirderCamberDefinition` per girder: DatumPoint, Keys (plan point number -> support index / FS number /
   `GirderEnd`), Points (camber, steel and slab+barrier deflection)): `Framing/CamberBlocking.cs` -> `BridgeFraming.Camber` (per point: final top of web, girder-line haunch
   elevation H = grade - slab + slab deflection, no-load top of web N = web + deflections, BLOCKING = N - N(datum), camber from the no-load shape = N - chord(N) between splices).
@@ -289,9 +295,15 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   `TransverseBeginClear/EndClear`. `DeckLongZone` = equal spaces between two reference lines (girder web line / edge / offset, margins, alternating layers) or explicit `Positions` (+ `PositionLayers`,
   `PositionsFromRight`), stock chains with laps; zones that abut between the same references form a RUN and their lines continue across zones (nearest line of the same layer) so bar counts follow the length
   of the lines. `PlanBarList` (+ `Families`, e.g. "6b") = the plan's bar list per unit: every placed mark is compared (counts exactly, weight 3%) with warnings for differences, rows without a placed bar become
-  schedule-only marks (no 3D bar; end dam 5d/5e are NOT placed). Marks are the plan's (7a1, 6b1, 5j1...), the generic AssignMarks is bypassed. `Checks/DeckRebarCheck` (run in RegenerationCache for every deck
-  with bars): cover top/bottom, edges, deck-end/blockout distance, bars vs the highest steel surface (top flanges, splice plates, fillers) -> `ConcreteModel.Notes` / Diagnostics. Plan data and results:
-  `docs/plan-data/deck-rebar.md`, `deck-bar-lists.csv`; scripts `samples/plans/deck-rebar-i80.csx`, `deck-rebar-ramp-g.csx` (run LAST, after the joint/deck-edge/girder scripts), `report-deck-rebar.csx`,
+  schedule-only marks (no 3D bar). Marks are the plan's (7a1, 6b1, 5j1...), the generic AssignMarks is bypassed. End dam diaphragm bars (`DeckPlanReinforcement.EndDam` = `DeckEndDamBar`,
+  `Concrete/ConcreteEndDam.cs`): bend-diagram shape (open bar by its OUTSIDE outline in section coordinates X from the deck-end face / Drop below grade, or a hoop w x h with lap tails, built with
+  `SubstructureGenerator.PlanBent/PlanHoop`) in the plane normal to the deck-end line, repeated per girder bay (`FromGirder`, `Spacing`, `PerBay`, `Overhang` from the exterior girder lines, girders found where
+  their web lines cross the deck end); `Unplaced` bars count toward the mark (location "... not modeled - UNRESOLVED") with `Unresolved` raised; `DeckPlanReinforcement.Unresolved` = plan items not dimensioned,
+  each an "UNRESOLVED (deck reinforcing): ..." warning. Placed: Ramp G 5d2-5d5 at Piers 5G/9G/14G; I-80 and the rest of the end dams are schedule only (reasons + pages in `docs/plan-data/deck-rebar.md` 5-6).
+  `Checks/DeckRebarCheck` (run in RegenerationCache for every deck
+  with bars): cover top/bottom, edges, deck-end/blockout distance, bars vs the highest steel surface (top flanges, splice plates, fillers) -> `ConcreteModel.Notes` / Diagnostics; end dam marks are checked
+  separately (`CheckEndDams`: clear inside the deck-end concrete incl. the end block soffit, exact test against the top flange / splice plate triangles near the ends). Plan data and results:
+  `docs/plan-data/deck-rebar.md`, `deck-bar-lists.csv`; scripts `samples/plans/deck-rebar-i80.csx`, `deck-rebar-ramp-g.csx` (run LAST, after the joint/deck-edge/girder scripts and `deck-end-kinks.csx`), `report-deck-rebar.csx`,
   `check-deck-rebar.csx`. The typical-section sheet text and the database group "deck reinforcing" (unit bar schedule in its properties, incl. schedule-only marks) follow the plan.
 - Variable deck width: `DeckDefinition.LeftAt/RightAt(station)`; constant decks keep the old code path.
 - Deck edge strip (OPTIONAL, default off, PROJECT-SPECIFIC to the Iowa plans): `DeckDefinition.EdgeStrip` (`DeckEdgeStrip` Width inboard from the edge, follows
