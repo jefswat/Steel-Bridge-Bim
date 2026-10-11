@@ -171,6 +171,11 @@ public partial class MainWindow
                     reg.Bars.Add(new LodBar(rp, model, layer, lo, hi));
                     reg.ModelOf[rp] = model;
                 }
+            foreach (var g in reg.Bars.GroupBy(b => b.Layer))
+            {
+                var f = g.First().Tag.Bar.Points[0];
+                ViewModels.MainViewModel.Log($"REBAR LOD layer {g.Key}: {g.Count():N0} bars, e.g. world {f.X:F2},{f.Y:F2},{f.Z:F2}");
+            }
             ViewModels.MainViewModel.Log($"REBAR LOD registry: {reg.Bars.Count:N0} bars in {src.Count} models; light rebar meshes hold {coarseTris:N0} triangles");
             return reg;
         });

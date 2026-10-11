@@ -131,6 +131,7 @@ public partial class MainWindow : Window
                     kc.Width = kv[6];
                     KeepCameraInRange();
                 }
+                if (args.Contains("--noterrain")) SetTerrainVisible(false);
                 // --width W: orthographic view width in meters (after --closeup / --camera), e.g. to look at bars.
                 int wi = Array.IndexOf(args, "--width");
                 if (wi >= 0 && wi + 1 < args.Length && View.Camera is OrthographicCamera wc) wc.Width = double.Parse(args[wi + 1], System.Globalization.CultureInfo.InvariantCulture);
@@ -174,6 +175,7 @@ public partial class MainWindow : Window
                     }
                     if (_lodBusy && ++lodWaits < 120) { t2.Interval = TimeSpan.FromMilliseconds(500); return; } // let the near-view rebar finish
                     t2.Stop();
+                    if (args.Contains("--noterrain")) SetTerrainVisible(false); // terrain may have finished loading after the first call
                     // --pickafter fx,fy / --hideafter fx,fy: like --pick / --hide but once the near-view rebar is in place.
                     foreach (var opt in new[] { "--hideafter", "--pickafter" })
                     {
