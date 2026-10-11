@@ -57,7 +57,8 @@ public partial class MainWindow
         View.RotateAroundMouseDownPoint = false;
         View.ZoomAroundMouseDownPoint = false;
         View.IsInertiaEnabled = false;
-        _navTimer = new DispatcherTimer(DispatcherPriority.Background) { Interval = TimeSpan.FromMilliseconds(250) };
+        // Normal priority: a Background timer can starve while the viewport keeps rendering.
+        _navTimer = new DispatcherTimer(DispatcherPriority.Normal) { Interval = TimeSpan.FromMilliseconds(250) };
         _navTimer.Tick += (_, _) =>
         {
             _navTimer!.Stop();
@@ -107,9 +108,29 @@ public partial class MainWindow
         }
     }
 
+    /// <summary>What the orthographic view shows: view direction, width and the eye projected on the plane normal to the view
+    /// (sliding the eye along the view, as <see cref="KeepCameraInRange"/> does, changes nothing on screen).</summary>
+    private (Vec3 look, double width, Vec3 eye)? _lastViewKey;
+    private int _cameraEvents, _cameraMoves;
+
+    private bool ViewReallyChanged()
+    {
+        if (CurrentView() is not { } v) return true;
+        var eye = v.Position - v.Look * Vec3.Dot(v.Position, v.Look);
+        if (_lastViewKey is { } k && (k.look - v.Look).Length < 1e-7 && Math.Abs(k.width - v.Width) <= 1e-7 * Math.Max(1, v.Width)
+            && (k.eye - eye).Length < 1e-5) return false;
+        _lastViewKey = (v.Look, v.Width, eye);
+        return true;
+    }
+
     private void OnCameraMoved()
     {
         if (_detailBounds.Count == 0 || _navTimer == null) return;
+        _cameraEvents++;
+        // CameraChanged also fires for updates that change nothing on screen (KeepCameraInRange re-setting the eye depth and
+        // the look length); those must not count as navigation, or the timer restarts forever and detail (rebar) never returns.
+        if (!ViewReallyChanged()) return;
+        _cameraMoves++;
         if (!_navigating)
         {
             _navigating = true;
@@ -140,16 +161,25 @@ public partial class MainWindow
         foreach (var (m, (layer, lo, hi)) in _detailBounds)
         {
             if (!layerOnCache.TryGetValue(layer, out bool lon)) layerOnCache[layer] = lon = !_planMode && _vm.IsLayerVisible(layer);
-            bool near = _detailRadius <= 0 || o is not { } oo || SnapMath.LineHitsBox(oo, inv!.Value, lo, hi, radius);
-            m.Visibility = lon && !_navigating && near ? Visibility.Visible : Visibility.Collapsed;
+            bool near = _detailRadius <= 0 || o is not { } oo || SnapMath.LineHitsBox(oo, inv!.Value, lo, hi, radius);            m.Visibility = lon && !_navigating && near ? Visibility.Visible : Visibility.Collapsed;
         }
     }
 
     /// <summary>Snapshot diagnostics: per detail layer, tiles drawn / total (DETAIL: lines in the session log).</summary>
     private void LogDetailVisibility()
     {
+        ViewModels.MainViewModel.Log($"DETAIL: {_cameraEvents} camera events, {_cameraMoves} real view changes, navigating: {_navigating}, nav timer running: {_navTimer?.IsEnabled}");
         foreach (var g in _detailBounds.GroupBy(kv => kv.Value.layer))
-            ViewModels.MainViewModel.Log($"DETAIL {g.Key}: {g.Count(kv => kv.Key.Visibility == Visibility.Visible)} of {g.Count()} tiles drawn (layer on: {_vm.IsLayerVisible(g.Key)}, navigating: {_navigating}, radius {_detailRadius} m)");
+        {
+            // For comparison: the old rule (horizontal distance from camera position + look direction).
+            int old = 0;
+            if (View.Camera is ProjectionCamera cam)
+            {
+                var t = cam.Position + cam.LookDirection;
+                old = g.Count(kv => { var c = (kv.Value.min + kv.Value.max) / 2; return new Vector2(c.X - (float)t.X, c.Y - (float)t.Y).Length() <= _detailRadius; });
+            }
+            ViewModels.MainViewModel.Log($"DETAIL {g.Key}: {g.Count(kv => kv.Key.Visibility == Visibility.Visible)} of {g.Count()} tiles drawn (layer on: {_vm.IsLayerVisible(g.Key)}, radius {_detailRadius} m; old target-point rule would draw {old})");
+        }
     }
 
     // ------------------------------------------------------------------ camera <-> ViewNav
@@ -303,9 +333,7 @@ public partial class MainWindow
     {
         if (_snapIndex == null) { EnsureSnapIndex(); return null; }
         if (RayAt(screen) is not { } ray) return null;
-        var req = new SnapRequest { Origin = ray.Origin, Dir = ray.Dir, ViewRight = ray.Right, ViewUp = ray.Up, PixelSize = ray.Pixel, TolerancePx = 1, Modes = SnapModes.None };
-        var hit = _snapIndex.Find(req, MakeEnv(), out _);
-        return hit is { Kind: SnapKind.Surface } ? hit : null;
+        return _snapIndex.RayCast(ray.Origin, ray.Dir, MakeEnv());
     }
 
     private Point3D? SelectionCentroid()
@@ -321,6 +349,34 @@ public partial class MainWindow
     {
         _orbitAroundSelection = PivotSelToggle.IsChecked == true;
         PivotSelToggle.Content = _orbitAroundSelection ? "Pivot: selection" : "Pivot: cursor";
+    }
+
+    /// <summary>Snapshot option <c>--orbit fx,fy,dx,dy</c>: an orbit drag starting at the view fraction (fx, fy) by (dx, dy) pixels,
+    /// as the mouse would do it; logs the chosen pivot (ORBIT:) and leaves its marker on screen.</summary>
+    private void SnapshotOrbit(string spec)
+    {
+        var a = spec.Split(',').Select(x => double.Parse(x, System.Globalization.CultureInfo.InvariantCulture)).ToArray();
+        WaitForSnapIndex();
+        var start = new Point(a[0] * View.ActualWidth, a[1] * View.ActualHeight);
+        var sw = System.Diagnostics.Stopwatch.StartNew();
+        var (p, what) = ChoosePivot(start);
+        double pickMs = sw.Elapsed.TotalMilliseconds;
+        _pivot = p;
+        ViewModels.MainViewModel.Log($"ORBIT pick: {pickMs:F1} ms");
+        var before = ViewNav.ToScreen(CurrentView()!.Value, p, View.ActualWidth, View.ActualHeight);
+        var (yaw, pitch) = ViewNav.DragToAngles(a[2], a[3]);
+        SetView(ViewNav.Orbit(CurrentView()!.Value, p, yaw, pitch));
+        KeepCameraInRange();
+        var after = ViewNav.ToScreen(CurrentView()!.Value, p, View.ActualWidth, View.ActualHeight);
+        var w = ToWorld(new Vector3((float)p.X, (float)p.Y, (float)p.Z));
+        ViewModels.MainViewModel.Log($"ORBIT: pivot = {what} at E {w.X:F2} N {w.Y:F2} Z {w.Z:F2}; cursor ({start.X:F0}, {start.Y:F0}); pivot on screen before ({before.x:F1}, {before.y:F1}) after ({after.x:F1}, {after.y:F1}); pitch {ViewNav.Pitch(CurrentView()!.Value.Look) * 180 / Math.PI:F1} deg");
+        ShowPivotMarker(p);
+        if (View.Camera is OrthographicCamera oc)
+        {
+            var lk = oc.LookDirection; lk.Normalize();
+            double depth = Vector3D.DotProduct(new Point3D(p.X, p.Y, p.Z) - oc.Position, lk);
+            ViewModels.MainViewModel.Log($"ORBIT camera: pos {oc.Position}, look {oc.LookDirection}, up {oc.UpDirection}, width {oc.Width:F2}, near {oc.NearPlaneDistance:F1}, far {oc.FarPlaneDistance:F1}, pivot depth {depth:F1}");
+        }
     }
 
     private void OnNavHelp(object sender, RoutedEventArgs e)

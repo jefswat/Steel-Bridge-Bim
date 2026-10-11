@@ -156,6 +156,8 @@ public partial class MainWindow : Window
                         ViewModels.MainViewModel.Log("PICK: " + string.Join(" | ", _vm.SelectedProperties.Select(r => $"{r.Name}={r.Value}")));
                     }, System.Windows.Threading.DispatcherPriority.ApplicationIdle);
                 }
+                int obi = Array.IndexOf(args, "--orbit");
+                if (obi >= 0 && obi + 1 < args.Length) SnapshotOrbit(args[obi + 1]);
                 UpdateRebarLod();
                 RunMeasureSnapshot(args);
                 int lodWaits = 0;
@@ -802,7 +804,7 @@ public partial class MainWindow : Window
         var row2 = new System.Windows.Controls.StackPanel { Orientation = System.Windows.Controls.Orientation.Horizontal };
         row2.Children.Add(new System.Windows.Controls.TextBlock { Text = "Bolts / studs / rebar drawn within (0 = all)", VerticalAlignment = VerticalAlignment.Center });
         row2.Children.Add(rbox);
-        menu.Items.Add(new System.Windows.Controls.MenuItem { Header = row2, StaysOpenOnClick = true, ToolTip = "Horizontal distance from the view center. Detail is hidden while the view moves." });
+        menu.Items.Add(new System.Windows.Controls.MenuItem { Header = row2, StaysOpenOnClick = true, ToolTip = "Distance from the line of sight through the view center. Detail is hidden while the view moves." });
         menu.IsOpen = true;
     }
 

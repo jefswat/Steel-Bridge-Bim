@@ -366,7 +366,9 @@
                     <Border Width="10"/>
                     <RadioButton Content="Extents" GroupName="ZoomCmds" Style="{StaticResource ModeToggle}" Click="OnZoomExtentsButton" ToolTip="Zoom extents"/>
                     <RadioButton Content="Window" GroupName="ZoomCmds" Style="{StaticResource ModeToggle}" Click="OnZoomWindowButton" ToolTip="Zoom window: drag a rectangle"/>
-                    <Border Width="10"/>
+                </StackPanel>
+                <!-- Navigation: orbit pivot mode + mouse bindings help (top right, clear of the Model / Sheets switch) -->
+                <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="10" Panel.ZIndex="4">
                     <ToggleButton x:Name="PivotSelToggle" Content="Pivot: cursor" Style="{StaticResource ModeToggle}" Click="OnPivotModeToggle"
                                   ToolTip="Orbit pivot. Cursor (default): the model point under the cursor when the orbit starts. Selection: the centroid of the selected element (falls back to the cursor when nothing is selected)."/>
                     <ToggleButton x:Name="NavHelp" Content="Mouse ?" Style="{StaticResource ModeToggle}" IsHitTestVisible="True" Focusable="False"
