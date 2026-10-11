@@ -900,7 +900,7 @@ public static class IfcExporter
                 {
                     1 => ("Anchor bolt", boltRef!.Diameter, ".ANCHORBOLT.", "ASTM F1554"),
                     2 => ("Shear stud", steel.StudDiameter, ".STUDSHEARCONNECTOR.", "ASTM A108 (AWS D1.5 Type B)"),
-                    _ => ("Bolt", boltRef is { Diameter: > 0 } ? boltRef.Diameter : steel.Bolt.Diameter, ".BOLT.", $"ASTM F3125 Gr. {steel.BoltGrade}"),
+                    _ => ("Bolt", boltRef is { Diameter: > 0 } ? boltRef.Diameter : steel.Bolt.Diameter, ".BOLT.", (steel.BoltGrade.StartsWith("ASTM") ? steel.BoltGrade : $"ASTM F3125 Gr. {steel.BoltGrade}")),
                 };
                 var k2 = (kind, (long)Math.Round(bolt.Grip * 1e5), (long)Math.Round(bolt.Length * 1e5),
                     kind == 1 ? (long)Math.Round(boltRef!.Diameter * 1e5 + boltRef.Embedment * 1e9) : kind == 0 ? (long)Math.Round(dia * 1e5) : 0L);

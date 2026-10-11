@@ -142,29 +142,46 @@ br.Deck.Barrier.Left = false;
 unresolved.Add("U10 (PDF p.38): Iowa aesthetic barrier (east side, 3'-8 x 1'-7) profile - the sheet's profile dimensions have not all been transcribed into the plan data yet; no barrier modeled.");
 
 // ---------------------------------------------------------------- beams (beam layout p.21 / DS 19)
-// 5 beam lines D, E, F, G, H (west to east; A-C are stage 2). Iowa BTD beams: depth 4'-6. PLACEHOLDER shape = Tx54
-// (54" deep, same depth) until the Iowa BTx catalog lands (prestressed queue item 1); strands / standard lengths there too.
+// 5 beam lines D, E, F, G, H (west to east; A-C are stage 2). Iowa standard BTD beams (user rule: standard beams at the standard
+// length / strands): span 1 BTD55, span 2 BTD105, span 3 BTD60 (p.21, p.27 beam data; Iowa standard sheets 4732 / 4742 / 4733 =
+// Iowa Beams.pdf p.100 / 110 / 101: 55'-0 / 105'-0 / 60'-0 CL to CL bearings, 56'-4 / 106'-4 / 61'-4 end to end, 8" end to CL
+// bearing; data sheet 4730 p.98). The layout bearing chords equal the standard lengths within 1/16" (see the layout note below),
+// so the beams sit on the layout bearings and no placement rule is needed.
 br.Girders.Count = 5;
 br.Girders.Kind = GirderKind.TxDotPrestressed;
-br.Girders.Prestressed.Type = TxGirderType.Tx54;
-br.Girders.Prestressed.StrandCount = 14;
-br.Girders.Prestressed.StrandDiameter = In(0.6);
-br.Girders.Prestressed.BearingToEnd = In(8);    // end of beam to CL bearing 8" (p.28-30)
-br.Girders.Prestressed.EndGapAtBent = In(4);    // beam ends 8" apart over the piers (Detail A p.20), centred on CL pier
-br.Girders.Prestressed.PadLength = In(9);       // pier pads 9 x 1 x 2'-4 1/2 plain neoprene (p.20); abutments: 3x3 bar (not modeled)
-br.Girders.Prestressed.PadWidth = Len("2'-4 1/2\"");
-br.Girders.Prestressed.PadThickness = In(1);
+PrestressedBeamDefinition Btd(string name)
+{
+    var d = SBM.Core.Prestressed.StandardBeamCatalog.Beam(name)!;
+    d.EndGapAtBent = In(4);    // beam ends 8" apart over the piers (Detail A p.20), 4" + 8" = 1'-0 CL pier to CL brg along the beam
+    d.PadLength = In(9);       // pier pads: plain neoprene 9 x 1 x 2'-4 1/2 (p.20); abutments: 3x3 x 2'-4 1/2 steel bar (feature E / T7, not modeled - pad drawn)
+    d.PadWidth = Len("2'-4 1/2\"");
+    d.PadThickness = In(1);
+    d.PierPadOrientation = PadOrientation.ParallelToSupport;   // p.20 TOP OF PIER DETAILS part plan: pads parallel to CL pier (user decision 17)
+    return d;
+}
+br.Girders.Prestressed = Btd("BTD55");
+br.Girders.Prestressed.SpanBeams = new()
+{
+    new PrestressedSpanBeam { Spans = new() { 1 }, Beam = Btd("BTD105") },
+    new PrestressedSpanBeam { Spans = new() { 2 }, Beam = Btd("BTD60") },
+};
 // Default offsets (unused: every span has a span layout) - only the starting guesses of the framing.
 br.Girders.FirstGirderOffset = Ft(30);
 br.Girders.Spacings = Enumerable.Repeat(Ft(8), 4).ToList();
 br.Girders.PlanLayout = GirderPlanLayout.Chorded;
 
-// Per-span layout. Beam D "measured along CL bearing" from CL NB roadway (W.P. = CL pier x CL NB roadway); the pier
-// bearing lines are 1'-0 each side of CL pier measured along CL NB roadway; the other beams parallel to beam D at the span's
-// spacing "measured perpendicular to CL beam". Haunch at each bearing = deck thickness at beams T (p.24) - 8" slab.
+// Per-span layout (p.21). Beam D "measured along CL bearing" from the W.P. (= CL pier x CL NB roadway; at the abutments CL brg x
+// CL NB): an aligned dimension, i.e. from the W.P.'s foot on the bearing line (OffsetOrigin = WorkPoint). The pier bearing
+// lines are 1'-0 from CL pier ALONG THE BEAM (ShiftMeasure = AlongGirder): p.21 prints the perpendicular distances 11 13/16 /
+// 11 3/4 (pier 1 back / ahead) and 11 3/4 / 11 5/8 (pier 2) = 1'-0 x cos(beam angle) - different each side, which a 1'-0 along
+// CL NB cannot give; the "1'-0" on the CL NB string is then 11 15/16 to 1'-0 1/16 (within 1/16"). With this reading every beam's
+// CL-CL bearing chord is the STANDARD length within 1/16" (55'-0 -0.02", 105'-0 -0.05", 60'-0 +0.00") and the p.33 beam-line
+// top of deck / p.25 seats reproduce (check-woodbury.csx). The other beams are parallel to beam D at the span's spacing
+// "measured perpendicular to CL beam". Haunch at each bearing = deck thickness at beams T (p.24) - 8" slab.
 GirderSpanEnd End(double shift, string beamD, double[] tIn) => new()
 {
-    LineShift = shift, Measure = SpanOffsetMeasure.AlongLine, ReferenceOffset = Ft(27.00),
+    LineShift = shift, ShiftMeasure = SpanLineShiftMeasure.AlongGirder, OffsetOrigin = SpanOffsetOrigin.WorkPoint,
+    Measure = SpanOffsetMeasure.AlongLine, ReferenceOffset = Ft(27.00),
     Offsets = { Len(beamD) }, Haunches = tIn.Select(t => In(t - 8)).ToList(),
 };
 double F(int whole, int num = 0, int den = 1) => whole + (double)num / den;
@@ -198,11 +215,59 @@ br.Girders.SpanLayouts = new()
     },
 };
 br.CrossFrames.MaxSpacing = Ft(25);
+
+// ---------------------------------------------------------------- steel intermediate diaphragms (p.31 / DS 29, p.32 / DS 30)
+// Iowa standard 1036-1-BTD / 1036-2-BTD (Iowa Beams.pdf p.14 / p.15) as modified on DS 29-30: one staggered line per span near
+// midspan, square to the beams (p.21 "90 deg 00'00" (TYP.)"). Cast web-hole CHAINS per beam line from the beam end at the lower
+// station ("INTERMEDIATE DIAPHRAGM BOLT HOLE LOCATIONS", docs/plan-data/woodbury-i29-floyd/diaphragm-bolt-holes.csv; each chain sums
+// to the standard end-to-end length 56'-4 / 106'-4 / 61'-4). Bay g..g+1 uses the left beam's FIRST hole and the right beam's
+// matching hole (the second one; H has one hole) - the hole difference = the beam-end stagger along the skewed bearing line.
+// D's second hole is for the stage-2 bay C-D (Design 217, not in this model). Members p.31 table: C15x33.9 (11), W21x50 + W14x38
+// (G-H span 2, over the traveled roadway). User decisions 2026-10-11: member LEVEL as p.32 labels it (12 / Q4 = A, the
+// default); WD-3 (19 = A): the member and the bent-plate 9" leg lie on the side of the web holes toward INCREASING station
+// (p.32 PART SECTION A-A draws the diaphragm above the bend plate = upstation; structurally irrelevant).
+string PlanDir()
+{
+    for (var d = new System.IO.DirectoryInfo(Environment.CurrentDirectory); d != null; d = d.Parent)
+    {
+        var q = System.IO.Path.Combine(d.FullName, "docs", "plan-data", "woodbury-i29-floyd");
+        if (System.IO.Directory.Exists(q)) return q;
+    }
+    throw new System.IO.DirectoryNotFoundException("docs/plan-data/woodbury-i29-floyd not found above the current directory - run from the repo.");
+}
+var dia = new PsSteelDiaphragmDefinition
+{
+    Elevation = PsDiaphragmMemberElevation.Level,
+    MemberSide = PsDiaphragmMemberSide.TowardIncreasingStation,
+    BeamLineNames = new() { "D", "E", "F", "G", "H" },
+    PlanSteelWeightLb = 4258,
+};
+string[] lineNames = { "D", "E", "F", "G", "H" };
+foreach (var line in System.IO.File.ReadAllLines(System.IO.Path.Combine(PlanDir(), "diaphragm-bolt-holes.csv")).Skip(1))
+{
+    var c = System.Text.RegularExpressions.Regex.Matches(line, "\"[^\"]*\"|[^,]+|(?<=,)(?=,)").Select(m => m.Value.Trim('"')).ToArray();
+    if (c.Length < 5 || !int.TryParse(c[0], out int span)) continue;
+    var dims = c.Skip(2).Take(3).Where(x => x.Length > 0).Select(x => Len(x + "\"")).ToList();
+    foreach (var bl in c[1].Split('/'))
+        dia.Holes.Add(new PsDiaphragmHoleChain { Span = span, Girder = Array.IndexOf(lineNames, bl) + 1, Dims = dims });
+}
+string[] c15Len = { "6'-10\"", "6'-9 1/2\"", "6'-8 3/4\"" };   // p.31 member table per span (beam spacing 8'-0 5/16 / 7'-11 13/16 / 7'-11)
+for (int span = 1; span <= 3; span++)
+    for (int g = 1; g <= 4; g++)
+    {
+        var bay = new PsDiaphragmBay { Span = span, LeftGirder = g, LeftHole = 1, RightHole = g + 1 == 5 ? 1 : 2, PlanLength = Len(c15Len[span - 1]) };
+        if (span == 2 && g == 4)
+        {
+            bay.Member = "W21x50"; bay.PlanLength = Len("6'-9 5/8\""); bay.Connection = "D";
+            bay.Lower = "W14x38"; bay.LowerPlanLength = Len("5'-4 7/8\"");
+        }
+        dia.Bays.Add(bay);
+    }
+br.PsSteelDiaphragms = dia;
 Doc.Project.Bridges.Add(br);
 
-unresolved.Add("U3 is CLOSED by the user (PDF p.27-30: standard BTD55 / BTD105 / BTD60 at the STANDARD lengths) - listed here only because this model still follows the layout chords with a placeholder Tx54 shape (program work, not a plan question).");
 unresolved.Add("U4: plan skews to the local tangent at Pier 2 (13 deg 00'40\") and N. Abut. (14 deg 29'57\") do not reproduce from the parallel 10 deg 09'36\" (PDF p.21 vs p.7); the parallel lines through the staking points govern.");
-unresolved.Add("Beam ends (PDF p.20, p.28-30): square or parallel to the pier at the piers, integral abutment embedment - given on these sheets but not modeled yet (prestressed / abutment program work, not a plan question).");
+unresolved.Add("Beam ends at the piers: square to the beam or parallel to the pier is not dimensioned (PDF p.20 Detail A / part plan at the pier, 1'-4 VARIES not legible at the available resolution) - modeled square (generator default InteriorEnds = Square).");
 
 var rep = Doc.Regenerate(includeSteel: false);
 foreach (var e in rep.Errors) Print("ERROR " + e);

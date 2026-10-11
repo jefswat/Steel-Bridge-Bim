@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Name": "Woodbury I-29 NB over Floyd",
+  "Name": "Untitled",
   "UnitSystem": "US",
   "Foot": "International",
   "Alignments": [
@@ -150,6 +150,8 @@
             "PedestalSizeAlong": 0,
             "PedestalSizeAcross": 0,
             "PedestalShared": false,
+            "PedestalSizeAcrossAhead": 0,
+            "PedestalRowJoint": "NaN",
             "ColumnCount": 0,
             "ColumnSpacings": [],
             "FirstColumnOffset": "NaN",
@@ -231,6 +233,9 @@
               "FlareCover": 0.08889999999999999,
               "FlareTieSize": "#6",
               "FlareTieSpacing": 0.30479999999999996,
+              "FlareTieStyle": "ClosedTie",
+              "FlareTieOverlap": 0,
+              "FlareTieSpaces": 0,
               "ColumnSplice": "Continuous",
               "DowelHookLength": 0,
               "DowelPin": 0,
@@ -291,6 +296,8 @@
             "PedestalSizeAlong": 0,
             "PedestalSizeAcross": 0,
             "PedestalShared": false,
+            "PedestalSizeAcrossAhead": 0,
+            "PedestalRowJoint": "NaN",
             "ColumnCount": 3,
             "ColumnSpacings": [
               4.572,
@@ -375,6 +382,9 @@
               "FlareCover": 0.08889999999999999,
               "FlareTieSize": "#6",
               "FlareTieSpacing": 0.30479999999999996,
+              "FlareTieStyle": "ClosedTie",
+              "FlareTieOverlap": 0,
+              "FlareTieSpaces": 0,
               "ColumnSplice": "Continuous",
               "DowelHookLength": 0,
               "DowelPin": 0,
@@ -435,6 +445,8 @@
             "PedestalSizeAlong": 0,
             "PedestalSizeAcross": 0,
             "PedestalShared": false,
+            "PedestalSizeAcrossAhead": 0,
+            "PedestalRowJoint": "NaN",
             "ColumnCount": 3,
             "ColumnSpacings": [
               4.572,
@@ -519,6 +531,9 @@
               "FlareCover": 0.08889999999999999,
               "FlareTieSize": "#6",
               "FlareTieSpacing": 0.30479999999999996,
+              "FlareTieStyle": "ClosedTie",
+              "FlareTieOverlap": 0,
+              "FlareTieSpaces": 0,
               "ColumnSplice": "Continuous",
               "DowelHookLength": 0,
               "DowelPin": 0,
@@ -579,6 +594,8 @@
             "PedestalSizeAlong": 0,
             "PedestalSizeAcross": 0,
             "PedestalShared": false,
+            "PedestalSizeAcrossAhead": 0,
+            "PedestalRowJoint": "NaN",
             "ColumnCount": 0,
             "ColumnSpacings": [],
             "FirstColumnOffset": "NaN",
@@ -660,6 +677,9 @@
               "FlareCover": 0.08889999999999999,
               "FlareTieSize": "#6",
               "FlareTieSpacing": 0.30479999999999996,
+              "FlareTieStyle": "ClosedTie",
+              "FlareTieOverlap": 0,
+              "FlareTieSpaces": 0,
               "ColumnSplice": "Continuous",
               "DowelHookLength": 0,
               "DowelPin": 0,
@@ -739,6 +759,8 @@
             "Count": 5,
             "Begin": {
               "LineShift": 0,
+              "ShiftMeasure": "AlongGirder",
+              "OffsetOrigin": "WorkPoint",
               "Measure": "AlongLine",
               "ReferenceOffset": 8.2296,
               "Offsets": [
@@ -755,6 +777,8 @@
             },
             "End": {
               "LineShift": -0.3048,
+              "ShiftMeasure": "AlongGirder",
+              "OffsetOrigin": "WorkPoint",
               "Measure": "AlongLine",
               "ReferenceOffset": 8.2296,
               "Offsets": [
@@ -781,6 +805,8 @@
             "Count": 5,
             "Begin": {
               "LineShift": 0.3048,
+              "ShiftMeasure": "AlongGirder",
+              "OffsetOrigin": "WorkPoint",
               "Measure": "AlongLine",
               "ReferenceOffset": 8.2296,
               "Offsets": [
@@ -797,6 +823,8 @@
             },
             "End": {
               "LineShift": -0.3048,
+              "ShiftMeasure": "AlongGirder",
+              "OffsetOrigin": "WorkPoint",
               "Measure": "AlongLine",
               "ReferenceOffset": 8.2296,
               "Offsets": [
@@ -823,6 +851,8 @@
             "Count": 5,
             "Begin": {
               "LineShift": 0.3048,
+              "ShiftMeasure": "AlongGirder",
+              "OffsetOrigin": "WorkPoint",
               "Measure": "AlongLine",
               "ReferenceOffset": 8.2296,
               "Offsets": [
@@ -839,6 +869,8 @@
             },
             "End": {
               "LineShift": 0,
+              "ShiftMeasure": "AlongGirder",
+              "OffsetOrigin": "WorkPoint",
               "Measure": "AlongLine",
               "ReferenceOffset": 8.2296,
               "Offsets": [
@@ -885,16 +917,741 @@
           "StrandStrength": 270,
           "DepressedStrands": 0,
           "DepressedTopAtEnd": 0,
-          "StrandLayout": null,
+          "StrandLayout": [
+            {
+              "X": -0.3302,
+              "Y": 0.0508,
+              "YEnd": 0.0508,
+              "XEnd": "NaN",
+              "Harped": false,
+              "DebondStart": 0,
+              "DebondEnd": 0,
+              "DebondSymbol": ""
+            },
+            {
+              "X": -0.2286,
+              "Y": 0.0508,
+              "YEnd": 0.0508,
+              "XEnd": "NaN",
+              "Harped": false,
+              "DebondStart": 0,
+              "DebondEnd": 0,
+              "DebondSymbol": ""
+            },
+            {
+              "X": -0.127,
+              "Y": 0.0508,
+              "YEnd": 0.0508,
+              "XEnd": "NaN",
+              "Harped": false,
+              "DebondStart": 0,
+              "DebondEnd": 0,
+              "DebondSymbol": ""
+            },
+            {
+              "X": -0.07619999999999999,
+              "Y": 0.0508,
+              "YEnd": 0.0508,
+              "XEnd": "NaN",
+              "Harped": false,
+              "DebondStart": 0,
+              "DebondEnd": 0,
+              "DebondSymbol": ""
+            },
+            {
+              "X": 0.07619999999999999,
+              "Y": 0.0508,
+              "YEnd": 0.0508,
+              "XEnd": "NaN",
+              "Harped": false,
+              "DebondStart": 0,
+              "DebondEnd": 0,
+              "DebondSymbol": ""
+            },
+            {
+              "X": 0.127,
+              "Y": 0.0508,
+              "YEnd": 0.0508,
+              "XEnd": "NaN",
+              "Harped": false,
+              "DebondStart": 0,
+              "DebondEnd": 0,
+              "DebondSymbol": ""
+            },
+            {
+              "X": 0.2286,
+              "Y": 0.0508,
+              "YEnd": 0.0508,
+              "XEnd": "NaN",
+              "Harped": false,
+              "DebondStart": 0,
+              "DebondEnd": 0,
+              "DebondSymbol": ""
+            },
+            {
+              "X": 0.3302,
+              "Y": 0.0508,
+              "YEnd": 0.0508,
+              "XEnd": "NaN",
+              "Harped": false,
+              "DebondStart": 0,
+              "DebondEnd": 0,
+              "DebondSymbol": ""
+            },
+            {
+              "X": -0.3302,
+              "Y": 0.15239999999999998,
+              "YEnd": 0.15239999999999998,
+              "XEnd": "NaN",
+              "Harped": false,
+              "DebondStart": 0,
+              "DebondEnd": 0,
+              "DebondSymbol": ""
+            },
+            {
+              "X": -0.2286,
+              "Y": 0.15239999999999998,
+              "YEnd": 0.15239999999999998,
+              "XEnd": "NaN",
+              "Harped": false,
+              "DebondStart": 0,
+              "DebondEnd": 0,
+              "DebondSymbol": ""
+            },
+            {
+              "X": -0.127,
+              "Y": 0.15239999999999998,
+              "YEnd": 0.15239999999999998,
+              "XEnd": "NaN",
+              "Harped": false,
+              "DebondStart": 0,
+              "DebondEnd": 0,
+              "DebondSymbol": ""
+            },
+            {
+              "X": 0.127,
+              "Y": 0.15239999999999998,
+              "YEnd": 0.15239999999999998,
+              "XEnd": "NaN",
+              "Harped": false,
+              "DebondStart": 0,
+              "DebondEnd": 0,
+              "DebondSymbol": ""
+            },
+            {
+              "X": 0.2286,
+              "Y": 0.15239999999999998,
+              "YEnd": 0.15239999999999998,
+              "XEnd": "NaN",
+              "Harped": false,
+              "DebondStart": 0,
+              "DebondEnd": 0,
+              "DebondSymbol": ""
+            },
+            {
+              "X": 0.3302,
+              "Y": 0.15239999999999998,
+              "YEnd": 0.15239999999999998,
+              "XEnd": "NaN",
+              "Harped": false,
+              "DebondStart": 0,
+              "DebondEnd": 0,
+              "DebondSymbol": ""
+            }
+          ],
           "HarpPointFraction": 0,
-          "ConcreteStrength": 8.5,
-          "ReleaseStrength": 6,
+          "ConcreteStrength": 5,
+          "ReleaseStrength": 4.5,
           "EndGapAtBent": 0.1016,
           "BearingToEnd": 0.2032,
           "InteriorEnds": "Square",
           "PadLength": 0.2286,
           "PadWidth": 0.7239,
-          "PadThickness": 0.0254
+          "PadThickness": 0.0254,
+          "PierPadOrientation": "ParallelToSupport",
+          "Standard": "IA BTD",
+          "Designation": "BTD55",
+          "StandardBearingLength": 16.764,
+          "StandardOverallLength": 17.1704,
+          "Placement": null,
+          "PlacementBasis": "",
+          "HoldDownFromMidspan": 0,
+          "HarpedColumns": null,
+          "HarpedTopBelowTopAtEnd": 0,
+          "HarpedEndSpacing": 0.0508,
+          "SheathThickness": 0.0015875,
+          "Source": "Iowa DOT standard BTD beam BTD55: Woodbury Design 817 p.27 (DS 25) beam data, Woodbury p.28 (DS 26) strand pattern",
+          "Unresolved": null,
+          "SpanBeams": [
+            {
+              "Spans": [
+                1
+              ],
+              "Girders": null,
+              "Beam": {
+                "Type": "Tx54",
+                "CustomSection": null,
+                "StrandCount": 34,
+                "StrandDiameter": 0.015239999999999998,
+                "StrandStrength": 270,
+                "DepressedStrands": 6,
+                "DepressedTopAtEnd": 0,
+                "StrandLayout": [
+                  {
+                    "X": -0.3302,
+                    "Y": 0.0508,
+                    "YEnd": 0.0508,
+                    "XEnd": "NaN",
+                    "Harped": false,
+                    "DebondStart": 0,
+                    "DebondEnd": 0,
+                    "DebondSymbol": ""
+                  },
+                  {
+                    "X": -0.2794,
+                    "Y": 0.0508,
+                    "YEnd": 0.0508,
+                    "XEnd": "NaN",
+                    "Harped": false,
+                    "DebondStart": 0,
+                    "DebondEnd": 0,
+                    "DebondSymbol": ""
+                  },
+                  {
+                    "X": -0.2286,
+                    "Y": 0.0508,
+                    "YEnd": 0.0508,
+                    "XEnd": "NaN",
+                    "Harped": false,
+                    "DebondStart": 0,
+                    "DebondEnd": 0,
+                    "DebondSymbol": ""
+                  },
+                  {
+                    "X": -0.17779999999999999,
+                    "Y": 0.0508,
+                    "YEnd": 0.0508,
+                    "XEnd": "NaN",
+                    "Harped": false,
+                    "DebondStart": 0,
+                    "DebondEnd": 0,
+                    "DebondSymbol": ""
+                  },
+                  {
+                    "X": -0.127,
+                    "Y": 0.0508,
+                    "YEnd": 0.0508,
+                    "XEnd": "NaN",
+                    "Harped": false,
+                    "DebondStart": 0,
+                    "DebondEnd": 0,
+                    "DebondSymbol": ""
+                  },
+                  {
+                    "X": -0.07619999999999999,
+                    "Y": 0.0508,
+                    "YEnd": 0.0508,
+                    "XEnd": "NaN",
+                    "Harped": false,
+                    "DebondStart": 0,
+                    "DebondEnd": 0,
+                    "DebondSymbol": ""
+                  },
+                  {
+                    "X": -0.0254,
+                    "Y": 0.0508,
+                    "YEnd": 0.0508,
+                    "XEnd": "NaN",
+                    "Harped": false,
+                    "DebondStart": 0,
+                    "DebondEnd": 0,
+                    "DebondSymbol": ""
+                  },
+                  {
+                    "X": 0.0254,
+                    "Y": 0.0508,
+                    "YEnd": 0.0508,
+                    "XEnd": "NaN",
+                    "Harped": false,
+                    "DebondStart": 0,
+                    "DebondEnd": 0,
+                    "DebondSymbol": ""
+                  },
+                  {
+                    "X": 0.07619999999999999,
+                    "Y": 0.0508,
+                    "YEnd": 0.0508,
+                    "XEnd": "NaN",
+                    "Harped": false,
+                    "DebondStart": 0,
+                    "DebondEnd": 0,
+                    "DebondSymbol": ""
+                  },
+                  {
+                    "X": 0.127,
+                    "Y": 0.0508,
+                    "YEnd": 0.0508,
+                    "XEnd": "NaN",
+                    "Harped": false,
+                    "DebondStart": 0,
+                    "DebondEnd": 0,
+                    "DebondSymbol": ""
+                  },
+                  {
+                    "X": 0.17779999999999999,
+                    "Y": 0.0508,
+                    "YEnd": 0.0508,
+                    "XEnd": "NaN",
+                    "Harped": false,
+                    "DebondStart": 0,
+                    "DebondEnd": 0,
+                    "DebondSymbol": ""
+                  },
+                  {
+                    "X": 0.2286,
+                    "Y": 0.0508,
+                    "YEnd": 0.0508,
+                    "XEnd": "NaN",
+                    "Harped": false,
+                    "DebondStart": 0,
+                    "DebondEnd": 0,
+                    "DebondSymbol": ""
+                  },
+                  {
+                    "X": 0.2794,
+                    "Y": 0.0508,
+                    "YEnd": 0.0508,
+                    "XEnd": "NaN",
+                    "Harped": false,
+                    "DebondStart": 0,
+                    "DebondEnd": 0,
+                    "DebondSymbol": ""
+                  },
+                  {
+                    "X": 0.3302,
+                    "Y": 0.0508,
+                    "YEnd": 0.0508,
+                    "XEnd": "NaN",
+                    "Harped": false,
+                    "DebondStart": 0,
+                    "DebondEnd": 0,
+                    "DebondSymbol": ""
+                  },
+                  {
+                    "X": -0.3302,
+                    "Y": 0.1016,
+                    "YEnd": 0.1016,
+                    "XEnd": "NaN",
+                    "Harped": false,
+                    "DebondStart": 0,
+                    "DebondEnd": 0,
+                    "DebondSymbol": ""
+                  },
+                  {
+                    "X": -0.2286,
+                    "Y": 0.1016,
+                    "YEnd": 0.1016,
+                    "XEnd": "NaN",
+                    "Harped": false,
+                    "DebondStart": 0,
+                    "DebondEnd": 0,
+                    "DebondSymbol": ""
+                  },
+                  {
+                    "X": -0.17779999999999999,
+                    "Y": 0.1016,
+                    "YEnd": 0.1016,
+                    "XEnd": "NaN",
+                    "Harped": false,
+                    "DebondStart": 0,
+                    "DebondEnd": 0,
+                    "DebondSymbol": ""
+                  },
+                  {
+                    "X": -0.127,
+                    "Y": 0.1016,
+                    "YEnd": 0.1016,
+                    "XEnd": "NaN",
+                    "Harped": false,
+                    "DebondStart": 0,
+                    "DebondEnd": 0,
+                    "DebondSymbol": ""
+                  },
+                  {
+                    "X": -0.07619999999999999,
+                    "Y": 0.1016,
+                    "YEnd": 0.1016,
+                    "XEnd": "NaN",
+                    "Harped": false,
+                    "DebondStart": 0,
+                    "DebondEnd": 0,
+                    "DebondSymbol": ""
+                  },
+                  {
+                    "X": -0.0254,
+                    "Y": 0.1016,
+                    "YEnd": 0.1016,
+                    "XEnd": "NaN",
+                    "Harped": false,
+                    "DebondStart": 0,
+                    "DebondEnd": 0,
+                    "DebondSymbol": ""
+                  },
+                  {
+                    "X": 0.0254,
+                    "Y": 0.1016,
+                    "YEnd": 0.1016,
+                    "XEnd": "NaN",
+                    "Harped": false,
+                    "DebondStart": 0,
+                    "DebondEnd": 0,
+                    "DebondSymbol": ""
+                  },
+                  {
+                    "X": 0.07619999999999999,
+                    "Y": 0.1016,
+                    "YEnd": 0.1016,
+                    "XEnd": "NaN",
+                    "Harped": false,
+                    "DebondStart": 0,
+                    "DebondEnd": 0,
+                    "DebondSymbol": ""
+                  },
+                  {
+                    "X": 0.127,
+                    "Y": 0.1016,
+                    "YEnd": 0.1016,
+                    "XEnd": "NaN",
+                    "Harped": false,
+                    "DebondStart": 0,
+                    "DebondEnd": 0,
+                    "DebondSymbol": ""
+                  },
+                  {
+                    "X": 0.17779999999999999,
+                    "Y": 0.1016,
+                    "YEnd": 0.1016,
+                    "XEnd": "NaN",
+                    "Harped": false,
+                    "DebondStart": 0,
+                    "DebondEnd": 0,
+                    "DebondSymbol": ""
+                  },
+                  {
+                    "X": 0.2286,
+                    "Y": 0.1016,
+                    "YEnd": 0.1016,
+                    "XEnd": "NaN",
+                    "Harped": false,
+                    "DebondStart": 0,
+                    "DebondEnd": 0,
+                    "DebondSymbol": ""
+                  },
+                  {
+                    "X": 0.3302,
+                    "Y": 0.1016,
+                    "YEnd": 0.1016,
+                    "XEnd": "NaN",
+                    "Harped": false,
+                    "DebondStart": 0,
+                    "DebondEnd": 0,
+                    "DebondSymbol": ""
+                  },
+                  {
+                    "X": -0.3302,
+                    "Y": 0.15239999999999998,
+                    "YEnd": 0.15239999999999998,
+                    "XEnd": "NaN",
+                    "Harped": false,
+                    "DebondStart": 0,
+                    "DebondEnd": 0,
+                    "DebondSymbol": ""
+                  },
+                  {
+                    "X": -0.2286,
+                    "Y": 0.15239999999999998,
+                    "YEnd": 0.15239999999999998,
+                    "XEnd": "NaN",
+                    "Harped": false,
+                    "DebondStart": 0,
+                    "DebondEnd": 0,
+                    "DebondSymbol": ""
+                  },
+                  {
+                    "X": -0.07619999999999999,
+                    "Y": 0.15239999999999998,
+                    "YEnd": 0.15239999999999998,
+                    "XEnd": "NaN",
+                    "Harped": false,
+                    "DebondStart": 0,
+                    "DebondEnd": 0,
+                    "DebondSymbol": ""
+                  },
+                  {
+                    "X": -0.0254,
+                    "Y": 0.15239999999999998,
+                    "YEnd": 0.15239999999999998,
+                    "XEnd": "NaN",
+                    "Harped": false,
+                    "DebondStart": 0,
+                    "DebondEnd": 0,
+                    "DebondSymbol": ""
+                  },
+                  {
+                    "X": 0.0254,
+                    "Y": 0.15239999999999998,
+                    "YEnd": 0.15239999999999998,
+                    "XEnd": "NaN",
+                    "Harped": false,
+                    "DebondStart": 0,
+                    "DebondEnd": 0,
+                    "DebondSymbol": ""
+                  },
+                  {
+                    "X": 0.07619999999999999,
+                    "Y": 0.15239999999999998,
+                    "YEnd": 0.15239999999999998,
+                    "XEnd": "NaN",
+                    "Harped": false,
+                    "DebondStart": 0,
+                    "DebondEnd": 0,
+                    "DebondSymbol": ""
+                  },
+                  {
+                    "X": 0.2286,
+                    "Y": 0.15239999999999998,
+                    "YEnd": 0.15239999999999998,
+                    "XEnd": "NaN",
+                    "Harped": false,
+                    "DebondStart": 0,
+                    "DebondEnd": 0,
+                    "DebondSymbol": ""
+                  },
+                  {
+                    "X": 0.3302,
+                    "Y": 0.15239999999999998,
+                    "YEnd": 0.15239999999999998,
+                    "XEnd": "NaN",
+                    "Harped": false,
+                    "DebondStart": 0,
+                    "DebondEnd": 0,
+                    "DebondSymbol": ""
+                  }
+                ],
+                "HarpPointFraction": 0,
+                "ConcreteStrength": 7,
+                "ReleaseStrength": 6,
+                "EndGapAtBent": 0.1016,
+                "BearingToEnd": 0.2032,
+                "InteriorEnds": "Square",
+                "PadLength": 0.2286,
+                "PadWidth": 0.7239,
+                "PadThickness": 0.0254,
+                "PierPadOrientation": "ParallelToSupport",
+                "Standard": "IA BTD",
+                "Designation": "BTD105",
+                "StandardBearingLength": 32.004000000000005,
+                "StandardOverallLength": 32.4104,
+                "Placement": null,
+                "PlacementBasis": "",
+                "HoldDownFromMidspan": 3.2004,
+                "HarpedColumns": [
+                  -0.0254,
+                  0.0254
+                ],
+                "HarpedTopBelowTopAtEnd": 0.1016,
+                "HarpedEndSpacing": 0.0508,
+                "SheathThickness": 0.0015875,
+                "Source": "Iowa DOT standard BTD beam BTD105: Woodbury Design 817 p.27 (DS 25) beam data, Woodbury p.30 (DS 28) strand pattern",
+                "Unresolved": null,
+                "SpanBeams": null
+              }
+            },
+            {
+              "Spans": [
+                2
+              ],
+              "Girders": null,
+              "Beam": {
+                "Type": "Tx54",
+                "CustomSection": null,
+                "StrandCount": 14,
+                "StrandDiameter": 0.015239999999999998,
+                "StrandStrength": 270,
+                "DepressedStrands": 2,
+                "DepressedTopAtEnd": 0,
+                "StrandLayout": [
+                  {
+                    "X": -0.3302,
+                    "Y": 0.0508,
+                    "YEnd": 0.0508,
+                    "XEnd": "NaN",
+                    "Harped": false,
+                    "DebondStart": 0,
+                    "DebondEnd": 0,
+                    "DebondSymbol": ""
+                  },
+                  {
+                    "X": -0.2286,
+                    "Y": 0.0508,
+                    "YEnd": 0.0508,
+                    "XEnd": "NaN",
+                    "Harped": false,
+                    "DebondStart": 0,
+                    "DebondEnd": 0,
+                    "DebondSymbol": ""
+                  },
+                  {
+                    "X": -0.127,
+                    "Y": 0.0508,
+                    "YEnd": 0.0508,
+                    "XEnd": "NaN",
+                    "Harped": false,
+                    "DebondStart": 0,
+                    "DebondEnd": 0,
+                    "DebondSymbol": ""
+                  },
+                  {
+                    "X": -0.07619999999999999,
+                    "Y": 0.0508,
+                    "YEnd": 0.0508,
+                    "XEnd": "NaN",
+                    "Harped": false,
+                    "DebondStart": 0,
+                    "DebondEnd": 0,
+                    "DebondSymbol": ""
+                  },
+                  {
+                    "X": -0.0254,
+                    "Y": 0.0508,
+                    "YEnd": 0.0508,
+                    "XEnd": "NaN",
+                    "Harped": false,
+                    "DebondStart": 0,
+                    "DebondEnd": 0,
+                    "DebondSymbol": ""
+                  },
+                  {
+                    "X": 0.0254,
+                    "Y": 0.0508,
+                    "YEnd": 0.0508,
+                    "XEnd": "NaN",
+                    "Harped": false,
+                    "DebondStart": 0,
+                    "DebondEnd": 0,
+                    "DebondSymbol": ""
+                  },
+                  {
+                    "X": 0.07619999999999999,
+                    "Y": 0.0508,
+                    "YEnd": 0.0508,
+                    "XEnd": "NaN",
+                    "Harped": false,
+                    "DebondStart": 0,
+                    "DebondEnd": 0,
+                    "DebondSymbol": ""
+                  },
+                  {
+                    "X": 0.127,
+                    "Y": 0.0508,
+                    "YEnd": 0.0508,
+                    "XEnd": "NaN",
+                    "Harped": false,
+                    "DebondStart": 0,
+                    "DebondEnd": 0,
+                    "DebondSymbol": ""
+                  },
+                  {
+                    "X": 0.2286,
+                    "Y": 0.0508,
+                    "YEnd": 0.0508,
+                    "XEnd": "NaN",
+                    "Harped": false,
+                    "DebondStart": 0,
+                    "DebondEnd": 0,
+                    "DebondSymbol": ""
+                  },
+                  {
+                    "X": 0.3302,
+                    "Y": 0.0508,
+                    "YEnd": 0.0508,
+                    "XEnd": "NaN",
+                    "Harped": false,
+                    "DebondStart": 0,
+                    "DebondEnd": 0,
+                    "DebondSymbol": ""
+                  },
+                  {
+                    "X": -0.3302,
+                    "Y": 0.15239999999999998,
+                    "YEnd": 0.15239999999999998,
+                    "XEnd": "NaN",
+                    "Harped": false,
+                    "DebondStart": 0,
+                    "DebondEnd": 0,
+                    "DebondSymbol": ""
+                  },
+                  {
+                    "X": -0.07619999999999999,
+                    "Y": 0.15239999999999998,
+                    "YEnd": 0.15239999999999998,
+                    "XEnd": "NaN",
+                    "Harped": false,
+                    "DebondStart": 0,
+                    "DebondEnd": 0,
+                    "DebondSymbol": ""
+                  },
+                  {
+                    "X": 0.07619999999999999,
+                    "Y": 0.15239999999999998,
+                    "YEnd": 0.15239999999999998,
+                    "XEnd": "NaN",
+                    "Harped": false,
+                    "DebondStart": 0,
+                    "DebondEnd": 0,
+                    "DebondSymbol": ""
+                  },
+                  {
+                    "X": 0.3302,
+                    "Y": 0.15239999999999998,
+                    "YEnd": 0.15239999999999998,
+                    "XEnd": "NaN",
+                    "Harped": false,
+                    "DebondStart": 0,
+                    "DebondEnd": 0,
+                    "DebondSymbol": ""
+                  }
+                ],
+                "HarpPointFraction": 0,
+                "ConcreteStrength": 5,
+                "ReleaseStrength": 4.5,
+                "EndGapAtBent": 0.1016,
+                "BearingToEnd": 0.2032,
+                "InteriorEnds": "Square",
+                "PadLength": 0.2286,
+                "PadWidth": 0.7239,
+                "PadThickness": 0.0254,
+                "PierPadOrientation": "ParallelToSupport",
+                "Standard": "IA BTD",
+                "Designation": "BTD60",
+                "StandardBearingLength": 18.288,
+                "StandardOverallLength": 18.6944,
+                "Placement": null,
+                "PlacementBasis": "",
+                "HoldDownFromMidspan": 1.8288000000000002,
+                "HarpedColumns": [
+                  -0.0254,
+                  0.0254
+                ],
+                "HarpedTopBelowTopAtEnd": 0.1016,
+                "HarpedEndSpacing": 0.0508,
+                "SheathThickness": 0.0015875,
+                "Source": "Iowa DOT standard BTD beam BTD60: Woodbury Design 817 p.27 (DS 25) beam data, Woodbury p.29 (DS 27) strand pattern",
+                "Unresolved": null,
+                "SpanBeams": null
+              }
+            }
+          ]
         }
       },
       "Deck": {
@@ -1088,7 +1845,341 @@
       },
       "Drains": [],
       "InspectionAccess": null,
-      "Misc": null
+      "Misc": null,
+      "PsSteelDiaphragms": {
+        "Holes": [
+          {
+            "Span": 1,
+            "Girder": 1,
+            "Dims": [
+              8.36295,
+              0.46355,
+              8.3439
+            ],
+            "Total": 17.1704
+          },
+          {
+            "Span": 1,
+            "Girder": 2,
+            "Dims": [
+              8.36295,
+              0.4445,
+              8.36295
+            ],
+            "Total": 17.1704
+          },
+          {
+            "Span": 1,
+            "Girder": 3,
+            "Dims": [
+              8.36295,
+              0.4445,
+              8.36295
+            ],
+            "Total": 17.1704
+          },
+          {
+            "Span": 1,
+            "Girder": 4,
+            "Dims": [
+              8.36295,
+              0.4445,
+              8.36295
+            ],
+            "Total": 17.1704
+          },
+          {
+            "Span": 1,
+            "Girder": 5,
+            "Dims": [
+              8.80745,
+              8.36295
+            ],
+            "Total": 17.1704
+          },
+          {
+            "Span": 2,
+            "Girder": 1,
+            "Dims": [
+              15.9512,
+              0.536575,
+              15.922625
+            ],
+            "Total": 32.410399999999996
+          },
+          {
+            "Span": 2,
+            "Girder": 2,
+            "Dims": [
+              15.9512,
+              0.508,
+              15.9512
+            ],
+            "Total": 32.410399999999996
+          },
+          {
+            "Span": 2,
+            "Girder": 3,
+            "Dims": [
+              15.9512,
+              0.508,
+              15.9512
+            ],
+            "Total": 32.410399999999996
+          },
+          {
+            "Span": 2,
+            "Girder": 4,
+            "Dims": [
+              15.9512,
+              0.508,
+              15.9512
+            ],
+            "Total": 32.410399999999996
+          },
+          {
+            "Span": 2,
+            "Girder": 5,
+            "Dims": [
+              16.4592,
+              15.9512
+            ],
+            "Total": 32.410399999999996
+          },
+          {
+            "Span": 3,
+            "Girder": 1,
+            "Dims": [
+              9.04875,
+              0.62865,
+              9.017
+            ],
+            "Total": 18.6944
+          },
+          {
+            "Span": 3,
+            "Girder": 2,
+            "Dims": [
+              9.04875,
+              0.5969,
+              9.04875
+            ],
+            "Total": 18.6944
+          },
+          {
+            "Span": 3,
+            "Girder": 3,
+            "Dims": [
+              9.04875,
+              0.5969,
+              9.04875
+            ],
+            "Total": 18.6944
+          },
+          {
+            "Span": 3,
+            "Girder": 4,
+            "Dims": [
+              9.04875,
+              0.5969,
+              9.04875
+            ],
+            "Total": 18.6944
+          },
+          {
+            "Span": 3,
+            "Girder": 5,
+            "Dims": [
+              9.64565,
+              9.04875
+            ],
+            "Total": 18.6944
+          }
+        ],
+        "Bays": [
+          {
+            "Span": 1,
+            "LeftGirder": 1,
+            "LeftHole": 1,
+            "RightHole": 2,
+            "Member": "C15x33.9",
+            "Lower": null,
+            "PlanLength": 2.0828,
+            "LowerPlanLength": "NaN",
+            "Connection": "F"
+          },
+          {
+            "Span": 1,
+            "LeftGirder": 2,
+            "LeftHole": 1,
+            "RightHole": 2,
+            "Member": "C15x33.9",
+            "Lower": null,
+            "PlanLength": 2.0828,
+            "LowerPlanLength": "NaN",
+            "Connection": "F"
+          },
+          {
+            "Span": 1,
+            "LeftGirder": 3,
+            "LeftHole": 1,
+            "RightHole": 2,
+            "Member": "C15x33.9",
+            "Lower": null,
+            "PlanLength": 2.0828,
+            "LowerPlanLength": "NaN",
+            "Connection": "F"
+          },
+          {
+            "Span": 1,
+            "LeftGirder": 4,
+            "LeftHole": 1,
+            "RightHole": 1,
+            "Member": "C15x33.9",
+            "Lower": null,
+            "PlanLength": 2.0828,
+            "LowerPlanLength": "NaN",
+            "Connection": "F"
+          },
+          {
+            "Span": 2,
+            "LeftGirder": 1,
+            "LeftHole": 1,
+            "RightHole": 2,
+            "Member": "C15x33.9",
+            "Lower": null,
+            "PlanLength": 2.0701,
+            "LowerPlanLength": "NaN",
+            "Connection": "F"
+          },
+          {
+            "Span": 2,
+            "LeftGirder": 2,
+            "LeftHole": 1,
+            "RightHole": 2,
+            "Member": "C15x33.9",
+            "Lower": null,
+            "PlanLength": 2.0701,
+            "LowerPlanLength": "NaN",
+            "Connection": "F"
+          },
+          {
+            "Span": 2,
+            "LeftGirder": 3,
+            "LeftHole": 1,
+            "RightHole": 2,
+            "Member": "C15x33.9",
+            "Lower": null,
+            "PlanLength": 2.0701,
+            "LowerPlanLength": "NaN",
+            "Connection": "F"
+          },
+          {
+            "Span": 2,
+            "LeftGirder": 4,
+            "LeftHole": 1,
+            "RightHole": 1,
+            "Member": "W21x50",
+            "Lower": "W14x38",
+            "PlanLength": 2.073275,
+            "LowerPlanLength": 1.647825,
+            "Connection": "D"
+          },
+          {
+            "Span": 3,
+            "LeftGirder": 1,
+            "LeftHole": 1,
+            "RightHole": 2,
+            "Member": "C15x33.9",
+            "Lower": null,
+            "PlanLength": 2.05105,
+            "LowerPlanLength": "NaN",
+            "Connection": "F"
+          },
+          {
+            "Span": 3,
+            "LeftGirder": 2,
+            "LeftHole": 1,
+            "RightHole": 2,
+            "Member": "C15x33.9",
+            "Lower": null,
+            "PlanLength": 2.05105,
+            "LowerPlanLength": "NaN",
+            "Connection": "F"
+          },
+          {
+            "Span": 3,
+            "LeftGirder": 3,
+            "LeftHole": 1,
+            "RightHole": 2,
+            "Member": "C15x33.9",
+            "Lower": null,
+            "PlanLength": 2.05105,
+            "LowerPlanLength": "NaN",
+            "Connection": "F"
+          },
+          {
+            "Span": 3,
+            "LeftGirder": 4,
+            "LeftHole": 1,
+            "RightHole": 1,
+            "Member": "C15x33.9",
+            "Lower": null,
+            "PlanLength": 2.05105,
+            "LowerPlanLength": "NaN",
+            "Connection": "F"
+          }
+        ],
+        "Connection": {
+          "LowerHoleAboveBottom": 0.5206999999999999,
+          "HolePitch": 0.238125,
+          "CastHoleDiameter": 0.038099999999999995,
+          "BentLongLeg": 0.2286,
+          "BentShortLeg": 0.15239999999999998,
+          "BentThickness": 0.0127,
+          "PlateLength": 0.339725,
+          "PlateEndDistance": 0.0508,
+          "HoleToLongLegFace": 0.08889999999999999,
+          "BackingWidth": 0.15239999999999998,
+          "BackingThickness": 0.009524999999999999,
+          "PlateHoleDiameter": 0.026987499999999998,
+          "BoltDiameter": 0.022224999999999998,
+          "WebBoltLength": 0.23495,
+          "LegSlotWidth": 0.0254,
+          "LegSlotLength": 0.0508,
+          "LegSlotFromFreeEdge": 0.08889999999999999,
+          "SlotHeights": [
+            0.0508,
+            0.13017499999999999,
+            0.20955,
+            0.288925
+          ],
+          "MemberSlotWidth": 0.0254,
+          "MemberSlotLength": 0.038099999999999995,
+          "MemberSlotFromEnd": 0.041275,
+          "MemberBoltLength": 0.06985,
+          "LowerBoltRows": 9,
+          "LowerBoltEndDistance": 0.15239999999999998,
+          "LowerBoltLength": 0.0635,
+          "EndPlateWidth": 0.1651,
+          "EndPlateThickness": 0.009524999999999999,
+          "EndPlateLength": 0.3556,
+          "ShimsPerEnd": 2,
+          "ShimThickness": 0.003175
+        },
+        "Elevation": "Level",
+        "MemberSide": "TowardIncreasingStation",
+        "BeamLineNames": [
+          "D",
+          "E",
+          "F",
+          "G",
+          "H"
+        ],
+        "PlanSteelWeightLb": 4258,
+        "Material": "Structural steel (A709 grade not given, p.5), galvanized",
+        "BoltGrade": "ASTM A449 (web bolts) / H.S. (member bolts)"
+      }
     }
   ],
   "References": []

@@ -212,13 +212,19 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
     properties integrated from it, printed values in `PrintedArea/Yb/Ix`, `PropertyCheck`); `Beam("BTD55"|"BTD60"|"BTD105")`
     = standard beam definitions (Woodbury p.27-30). `PrestressedBeamDefinition`: `Standard`, `Designation`,
     `StandardBearingLength`/`StandardOverallLength` (beam built at the STANDARD length along the sloped beam, CHECK warning vs
-    layout, never stretched), `Placement` (NO default: null = UNRESOLVED, drawn centred), `SpanBeams` (per span / beam line,
+    layout, never stretched; within 1/16" of the layout = fits, Info per span, no placement needed), `Placement` (NO default: null = UNRESOLVED
+  only when the difference exceeds 1/16", drawn centred), CL bearings = the span layout's bearing points (`LayoutBegin/End`) when present,
+  `PierPadOrientation` (SquareToBeam default | ParallelToSupport = pad width along the pier line, Woodbury p.20; abutments square), `SpanBeams` (per span / beam line,
     last match wins; `For(span, girder)`), `HarpedColumns` + `HarpedTopBelowTopAtEnd` (`StrandPatterns.Resolve`),
     `HoldDownFromMidspan`, `Unresolved` list, `StrandPoint.DebondStart/End/Symbol` (`StrandPatterns.Debond`). Beams with a
     profile carry `PrestressedBeam.Body` -> IFC IfcArbitraryClosedProfileDef over IfcIndexedPolyCurve (IfcArcIndex) extruded
     and clipped by the end planes; debond sheathing = IfcTendonConduit (key `IfcKeys.PsSheath`) + Pset SBM_Debonding.
     Demo: `samples/plans/prestressed-shapes-demo.csx`; tests `PrestressedStandardTests`.
-  - `Diaphragms/PsSteelDiaphragmDetailer` (T4, NOT hooked up yet - T6 does generator/RegenerationCache/IFC): Iowa 1036-BTD
+  - `Diaphragms/PsSteelDiaphragmDetailer` (T4; hooked up by T6: `BridgeDefinition.PsSteelDiaphragms` -> `RegenerationCache.SteelDiaphragms`
+    after the prestressed beams -> `PrestressedModel.SteelDiaphragms` (holes, bay fits, diagnostics into the prestressed diagnostics) AND the
+    bridge's `SteelModel` (= diaphragm parts / bolts / assemblies only, so viewport, IFC IfcMember/IfcPlate/IfcMechanicalFastener, database,
+    quantities need no special code; `PsSteelDiaphragmDefinition.BoltGrade` "ASTM ..." is written as is). SheetSet bearing-detail sheets
+    stay steel-girder only (`ctx.Prestressed == null`). Iowa 1036-BTD
     steel intermediate diaphragms between prestressed beams. Pure function `Detail(PsSteelDiaphragmDefinition,
     IReadOnlyList<PsDiaphragmBeamLine>)` -> `PsSteelDiaphragmModel` (SteelParts, BoltInstances with Diameter, cast holes,
     per-bay fit/length/weight results, diagnostics). Input `Bridge/PsSteelDiaphragmDefinition.cs`: hole CHAINS per beam
@@ -379,14 +385,17 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
 - Per-span girder layouts (OPTIONAL): `GirderLayoutDefinition.SpanLayouts` (`Bridge/GirderSpanLayout.cs`) = per listed span, straight chord
   girders between their points on a begin and an end line (`GirderSpanEnd`: the support line moved parallel by `LineShift` along the
   `ReferenceOffset` curve, e.g. "CL brg 1'-0 from CL pier along CL NB"; offsets `NormalToAlignment` or `AlongLine` from the reference
-  point (W.P.), optional `Spacings`, prestressed `Haunches` per girder = plan T - slab). `PerpendicularSpacings` = girders parallel to
+  point (W.P.), optional `Spacings`, prestressed `Haunches` per girder = plan T - slab; `ShiftMeasure` AlongReference (default) | AlongGirder =
+  LineShift along the span's first girder (iterated), `OffsetOrigin` LineCrossing (default) | WorkPoint = along-line offsets from the foot
+  of the W.P. (support line x reference curve) on the shifted line - an aligned dimension from the W.P.; Woodbury uses AlongGirder + WorkPoint). `PerpendicularSpacings` = girders parallel to
   the first one's chord at spacings measured perpendicular to it. Same girder count in every span (else an error). It overrides the
   offset curves and `PlanGeometry` in that span (warning). `FramingGenerator.SetupSpanLayouts` -> `_chord` (support-line points S0/S1,
   layout points L0/L1 with the prestressed top of beam); `GirderSpanCurve` gets `LayoutBegin/LayoutEnd`. Back and ahead points at an
   interior support may differ (prestressed): `SupportLineResult.Bearings` = behind, `AheadBearings` = ahead (null if equal). Use
   `BridgeFraming.SpanBearing(girder, span, atEnd)` for anything that belongs to one span. For steel a jog is an error (continuous girders).
   The prestressed elevation check names the layout. Data: `samples/plans/build-woodbury.csx` / `check-woodbury.csx` (Iowa Design 817).
-  OPEN: `PrestressedGenerator.BuildBeam` still uses `Supports[j].Bearings` (it must switch to `SpanBearing`).
+  `PrestressedGenerator.BuildBeam` uses `SpanBearing` and the layout bearing points. Haunch solids sample the girder path at <= 1.5 m
+  (`ConcreteGenerator.HaunchSamples`, jogs kept) so the haunch follows the soffit along straight chords in every geometry mode.
 - As-designed girder plan geometry (OPTIONAL): `GirderLayoutDefinition.PlanGeometry` = per girder a start point (alignment station/offset),
   start direction (degrees from the alignment tangent, + toward the right) and a chain of tangent / left / right arc elements (radius, length;
   first extended backwards, last forwards) = the plan's "P.C. STA ..., R = ..." data. `FramingGenerator` builds a `GirderPlanCurve` and uses

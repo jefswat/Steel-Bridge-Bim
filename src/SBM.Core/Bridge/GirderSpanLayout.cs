@@ -10,6 +10,27 @@ public enum SpanOffsetMeasure
     AlongLine,
 }
 
+/// <summary>How <see cref="GirderSpanEnd.LineShift"/> is measured.</summary>
+public enum SpanLineShiftMeasure
+{
+    /// <summary>Along the <see cref="GirderSpanEnd.ReferenceOffset"/> curve from the support line (default).</summary>
+    AlongReference,
+    /// <summary>Along the (first) girder of the span from the support line (e.g. "CL pier to CL bearing 1'-0 along the beam"):
+    /// the line is moved parallel by LineShift x cos(angle between the girder and the support-line normal); solved
+    /// iteratively with the girder direction.</summary>
+    AlongGirder,
+}
+
+/// <summary>Zero point of <see cref="SpanOffsetMeasure.AlongLine"/> offsets on a span end's line.</summary>
+public enum SpanOffsetOrigin
+{
+    /// <summary>Where the end's line crosses the reference offset curve (default).</summary>
+    LineCrossing,
+    /// <summary>The foot of the W.P. (the SUPPORT line x the reference curve) on the end's line: an aligned dimension "measured
+    /// along CL bearing" from the W.P. at CL pier x CL roadway (Woodbury p.21). Same as LineCrossing when LineShift = 0.</summary>
+    WorkPoint,
+}
+
 /// <summary>
 /// One end (begin or end support) of a <see cref="GirderSpanLayout"/>: the line on which the girder positions are given and the
 /// positions on it. The line is the support line (CL bearing / CL pier) moved parallel to itself by <see cref="LineShift"/>,
@@ -21,6 +42,10 @@ public sealed class GirderSpanEnd
     /// <summary>Distance from the support line to the line the offsets are given on, along the reference offset curve
     /// (up-station positive). At a pier the back span's end is usually negative and the ahead span's begin positive.</summary>
     public double LineShift { get; set; }
+    /// <summary>How <see cref="LineShift"/> is measured (default along the reference curve).</summary>
+    public SpanLineShiftMeasure ShiftMeasure { get; set; } = SpanLineShiftMeasure.AlongReference;
+    /// <summary>Zero point of <see cref="SpanOffsetMeasure.AlongLine"/> offsets (default: the line x the reference curve).</summary>
+    public SpanOffsetOrigin OffsetOrigin { get; set; } = SpanOffsetOrigin.LineCrossing;
     public SpanOffsetMeasure Measure { get; set; } = SpanOffsetMeasure.NormalToAlignment;
     /// <summary>Normal offset of the reference curve from the alignment (right positive): the curve <see cref="LineShift"/> is
     /// measured along and, for <see cref="SpanOffsetMeasure.AlongLine"/>, the zero point on the line (the plans' W.P.).</summary>
@@ -46,7 +71,7 @@ public sealed class GirderSpanEnd
 
     public GirderSpanEnd Clone() => new()
     {
-        LineShift = LineShift, Measure = Measure, ReferenceOffset = ReferenceOffset, Offsets = Offsets.ToList(),
+        LineShift = LineShift, ShiftMeasure = ShiftMeasure, OffsetOrigin = OffsetOrigin, Measure = Measure, ReferenceOffset = ReferenceOffset, Offsets = Offsets.ToList(),
         Spacings = Spacings?.ToList(), Haunches = Haunches?.ToList(),
     };
 }

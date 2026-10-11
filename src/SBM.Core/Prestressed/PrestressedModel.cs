@@ -128,6 +128,10 @@ public sealed class PrestressedModel
     public List<BearingSeat> BearingSeats { get; } = new();
     public List<Diagnostic> Diagnostics { get; } = new();
     public TimeSpan GenerationTime { get; set; }
+    /// <summary>Steel intermediate diaphragms between the beams (Iowa 1036-BTD, <see cref="Bridge.BridgeDefinition.PsSteelDiaphragms"/>):
+    /// parts, bolts, cast web holes and per-bay checks; null = none. Their parts / bolts are also the bridge's <c>SteelModel</c>
+    /// (<see cref="Project.BridgeModel.Steel"/>) so the viewport, IFC, database and quantities show them like cross frames.</summary>
+    public Diaphragms.PsSteelDiaphragmModel? SteelDiaphragms { get; set; }
 
     public double ConcreteVolume => Beams.Sum(b => b.Volume);
     public double TotalMass => Beams.Sum(b => b.Mass);

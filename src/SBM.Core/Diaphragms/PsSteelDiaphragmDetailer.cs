@@ -245,7 +245,7 @@ public static class PsSteelDiaphragmDetailer
                 string mode = def.Elevation == PsDiaphragmMemberElevation.Level ? "level member (p.32 \"(LEVEL)\")" : "member along the hole line";
                 Warn($"Steel diaphragm {where} ({bay.Member}): slot tolerance exceeded with a {mode}: hole groups differ by {dz / In(1):0.00}\" in height; " +
                      $"member slot offset {Math.Max(fitL.MemberSlotOffset, fitR.MemberSlotOffset) / In(1):0.00}\" (take-up ±{memberCap / In(1):0.00}\", 1\" x 1 1/2\" slots), " +
-                     $"leg slot offset {Math.Max(fitL.PlateSlotOffset, fitR.PlateSlotOffset) / In(1):0.00}\" (take-up ±{plateCap / In(1):0.00}\", 1\" x 2\" slots). Open question Q4 / WD-1 (p.32).");
+                     $"leg slot offset {Math.Max(fitL.PlateSlotOffset, fitR.PlateSlotOffset) / In(1):0.00}\" (take-up ±{plateCap / In(1):0.00}\", 1\" x 2\" slots). Q4 / WD-1 (p.32): {(def.Elevation == PsDiaphragmMemberElevation.Level ? "member level as labelled" : "member along the hole line")} - reported, nothing adjusted.");
             }
             double edgeReach = offs.Max(Math.Abs) + c.MemberSlotLength / 2;
             if (edgeReach > depth / 2 - kdes)

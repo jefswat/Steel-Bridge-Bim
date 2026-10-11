@@ -117,7 +117,7 @@ public static class SheetSet
             foreach (var (title, view) in TableViews.ElevationTable(ctx, slab, W, H))
                 specs.Add(new SheetSpec(slab ? "Top of slab elevations" : "Top of web elevations", "At the supports and quarter points along each girder", new[] { Full(new ViewSpec(title, _ => view, ScaleFamily.Architectural, PaperSpace: true)) }));
         // Bearing details at the piers (anchor bolts).
-        if (ctx.Substructure != null && ctx.Steel != null)
+        if (ctx.Substructure != null && ctx.Steel != null && ctx.Prestressed == null)
             foreach (var unit in ctx.Substructure.Units.Where(u => u.Type == SupportType.Pier))
                 specs.Add(new SheetSpec($"{unit.Name} bearing details", "Anchor bolts, pedestal and cap clearances", new[]
                 {

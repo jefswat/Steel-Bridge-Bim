@@ -308,7 +308,7 @@ public sealed partial class ConcreteGenerator
         var sec = new[] { new Vec2(-1, 0), new Vec2(1, 0), new Vec2(1, 1), new Vec2(-1, 1) };
         foreach (var sw in sweeps)
         {
-            var us = _geo!.ChordTolerance > 0 ? sw.Samples(_geo.ChordTolerance) : ss.Where(s => s >= sw.U0 - 1e-9 && s <= sw.U1 + 1e-9).ToList();
+            var us = _geo!.ChordTolerance > 0 ? sw.Samples(_geo.ChordTolerance) : HaunchSamples(ss.Where(s => s >= sw.U0 - 1e-9 && s <= sw.U1 + 1e-9).ToList());
             int tri0 = mesh.TriangleCount;
             MeshBuilder.AddLoft(mesh, sec, us.Select(sw.Ring).ToList());
             mesh.AddNurbs(sw.ToSolid("haunch"), tri0);

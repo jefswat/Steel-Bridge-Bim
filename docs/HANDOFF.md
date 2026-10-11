@@ -280,8 +280,10 @@ Queue (shared by both sets first):
    Other Iowa BTx (BTA-BTE except D) and other MH depths: NOT entered yet.
 2. ✅ `PrestressedBeamDefinition.SpanBeams` (per span / beam line), `StandardBearingLength` / `StandardOverallLength`
    (built at standard length, CHECK warning vs layout), `StandardBeamCatalog.Beam("BTD55"|"BTD60"|"BTD105")`.
-   OPEN (user): `Placement` (Centered / AtStartBearing / AtEndBearing / AtPierBearing) has NO default — null =
-   UNRESOLVED per beam whose length differs (drawn centred for display). Woodbury pier pad orientation also pending.
+   `Placement` (Centered / AtStartBearing / AtEndBearing / AtPierBearing) has NO default — null = UNRESOLVED only when the
+   layout differs from the standard by more than 1/16" (within 1/16" = fits, Info). DONE 2026-10-11 (decision 8): Woodbury's
+   chords ARE the standard lengths within 1/16" once the p.21 offsets are measured from the W.P. (see item 7) — no placement
+   needed. Pier pads parallel to the pier: `PierPadOrientation = ParallelToSupport` (decision 17).
    Framing still uses the base beam depth for seats / haunch (warning when a per-span beam is deeper).
 3. ✅ Debonding: `StrandPoint.DebondStart/DebondEnd/DebondSymbol`, `StrandPatterns.Debond`; sheathing = IfcTendonConduit
    + Pset SBM_Debonding; PGSuper `DebondInfo` (Strand/Length1/Length2) read. `build-br02069.csx` still has the
@@ -289,17 +291,26 @@ Queue (shared by both sets first):
 4. ✅ `HarpedColumns` + `HarpedTopBelowTopAtEnd` + `HarpedEndSpacing`, `HoldDownFromMidspan`.
    Demo: `samples/plans/prestressed-shapes-demo.csx`.
 5. Integral / semi-integral abutments with concrete end diaphragms (beams embedded), pier continuity diaphragms on pads.
-6. Steel intermediate diaphragms between prestressed beams (C15 / W21 / W14; the prestressed path skips cross frames).
+6. DONE 2026-10-11 (T6, dec-woodbury): steel intermediate diaphragms hooked up (`BridgeDefinition.PsSteelDiaphragms`, viewport /
+   IFC / DB via the bridge SteelModel); Woodbury from the p.31 hole chains, member LEVEL (decision 12), WD-3 toward increasing
+   station (decision 19). All 12 bays exceed the 1" x 1 1/2" member-slot take-up with a level member (1.47-2.42" vs 1/4") — warning.
+   Concrete end / pier diaphragms: dec-concrete agent.
 7. DONE 2026-10-11: straight chord girders per span - `GirderLayoutDefinition.SpanLayouts` (`GirderSpanLayout`, see CLAUDE.md).
    Woodbury superstructure geometry: `samples/plans/build-woodbury.csx` + `check-woodbury.csx` ("Woodbury I-29 NB over Floyd.sbm").
-   Check: 403 PASS / 48 FAIL / 45 INFO. Staking, spans, spacing, CL NB profile, T at bearings and all offset-line top of deck
+   Check (before 2026-10-11 decision 8): 403 PASS / 48 FAIL / 45 INFO; AFTER: 465 PASS / 9 FAIL / 49 INFO (rows added for the
+   pier bearing lines and the beam chords vs standard). Cause of the 48 FAILs found: p.21 beam-D offsets "measured along CL bearing" are
+   aligned dimensions from the W.P. (CL pier x CL NB), not from the pier bearing line's crossing of CL NB (`SpanOffsetOrigin.WorkPoint`);
+   pier bearing lines 1'-0 along the beam (`SpanLineShiftMeasure.AlongGirder`, reproduces the four perpendicular 11 13/16 / 11 3/4 /
+   11 3/4 / 11 5/8). The 9 remaining FAILs are p.34 haunch elevations in span 2 (-0.010 to -0.013 ft) where the plan's own p.33 top of
+   deck - 8" + p.34 deflection differs from its p.34 haunch value by -0.006 to -0.016 ft (rounded tables; shown in the row note).
+   Haunch quantity (default mesh) 15.49 -> 19.20 cy (NURBS exact 19.23 cy): haunch rings now every <= 1.5 m along the chords.
+   Old text: Staking, spans, spacing, CL NB profile, T at bearings and all offset-line top of deck
    points are within 0.01 ft. FAILs (all <= 0.018 ft): beam-line top of deck (14 of 216) and haunch elevations (24 of 135)
    near the piers (pattern: + back / - ahead of pier 2) and beam seats at the pier bearings (10 of 30). The plan's beam-line
    points next to the piers are not reproduced to 0.01 ft; the reason was not found (open). T at quarter points = INFO (no
    camber in the model, item 9).
-   OPEN for the prestressed work: `PrestressedGenerator.BuildBeam` takes `f.Supports[j].Bearings[i]` / `[j+1]`. With span
-   layouts it must use `f.SpanBearing(i, j, false/true)` (the ahead point at an interior support). Not changed here because
-   Prestressed/ belongs to the other agent. How standard-length beams sit on the layout span: user decision pending.
+   DONE: `PrestressedGenerator.BuildBeam` uses `SpanBearing` and the layout bearing points; build-woodbury.csx now builds the
+   standard BTD55 / BTD105 / BTD60 (StandardBeamCatalog) instead of the Tx54 placeholder.
 8. DONE 2026-10-11: profile grade line / cross-slope pivot offset - `CrossSlopeTable.PivotOffset` (constant) plus the new
    optional `PivotOffsets` station table. Elevation check rows show "on the PGL x RT of the alignment".
 9. Smaller: round CIP pipe piles, curved-plate bearings, future-beam pedestals, MnDOT Type S / Iowa aesthetic
