@@ -1,0 +1,1042 @@
+# Plan values (feet unless noted) of the substructure elevation sheets: I-80 WB Design 116 (set I80) and Ramp G Design 316 (set G).
+# Columns: set,pier,key,idx,plan,unit,pdf,half,note.  Decimal elevations are taken from the PDF text layer; ft-in dimensions were read on clips (fractions are inch fractions).
+# half: blank = main polyline / all pedestals; A = ahead polyline (model CapTopAhead, CapOutlineAhead) or the ahead pedestal row; B = back pedestal row (N <= cap mid line).
+I80,Pier 1WB,TOP_L,1,999.33,ft,19,,"cap top, left corner"
+I80,Pier 1WB,TOP_R,1,999.33,ft,19,,"cap top, right corner"
+I80,Pier 1WB,TIPD_L,1,4.5,ft,19,,"vertical, top corner to beak tip, left"
+I80,Pier 1WB,TIPD_R,1,4.5,ft,19,,"vertical, top corner to beak tip, right"
+I80,Pier 1WB,TIPS_L,1,2.5,ft,19,,"beak tip to the soffit line (2'-6 / 3'-6), left"
+I80,Pier 1WB,TIPS_R,1,2.5,ft,19,,"beak tip to the soffit line (2'-6 / 3'-6), right"
+I80,Pier 1WB,DEPTH_L,1,7,ft,19,,cap depth: top line to soffit at the left kink
+I80,Pier 1WB,DEPTH_R,1,7,ft,19,,cap depth: top line to soffit at the right kink
+I80,Pier 1WB,COLH_A,1,18,ft,19,,column 1: soffit to top of footing (Dim A / printed column height)
+I80,Pier 1WB,COLH_A,2,18,ft,19,,column 2: soffit to top of footing (Dim A / printed column height)
+I80,Pier 1WB,COLH_A,3,18,ft,19,,column 3: soffit to top of footing (Dim A / printed column height)
+I80,Pier 1WB,FTG_BOT,1,968.83,ft,19,,bottom of footing
+I80,Pier 1WB,FTG_THK,1,5.5,ft,19,,footing thickness
+I80,Pier 1WB,OVERALL,1,30.5,ft,19,,"overall vertical dimension, top line at the column to bottom of footing"
+I80,Pier 1WB,PILE_HEAD,1,1,ft,19,,"top of pile above bottom of footing (TOP OF PILE, 1'-0)"
+I80,Pier 1WB,PILE_LEN,1,100,ft,22,,contract length of piles (pier notes)
+I80,Pier 1WB,PED,1,999.66,ft,19,,"pedestal top (*ELEV.), 1 from the left"
+I80,Pier 1WB,PED,2,1000.04,ft,19,,"pedestal top (*ELEV.), 2 from the left"
+I80,Pier 1WB,PED,3,1000.4,ft,19,,"pedestal top (*ELEV.), 3 from the left"
+I80,Pier 1WB,PED,4,1000.32,ft,19,,"pedestal top (*ELEV.), 4 from the left"
+I80,Pier 1WB,PED,5,1000.16,ft,19,,"pedestal top (*ELEV.), 5 from the left"
+I80,Pier 1WB,PED,6,1000,ft,19,,"pedestal top (*ELEV.), 6 from the left"
+I80,Pier 1WB,PEDH,1,4,in,19,,"printed pedestal height, 1 from the left"
+I80,Pier 1WB,PEDH,2,8.5,in,19,,"printed pedestal height, 2 from the left"
+I80,Pier 1WB,PEDH,3,12.8125,in,19,,"printed pedestal height, 3 from the left"
+I80,Pier 1WB,PEDH,4,11.875,in,19,,"printed pedestal height, 4 from the left"
+I80,Pier 1WB,PEDH,5,9.9375,in,19,,"printed pedestal height, 5 from the left"
+I80,Pier 1WB,PEDH,6,8.0625,in,19,,"printed pedestal height, 6 from the left"
+I80,Pier 2WB,TOP_L,1,1002.88,ft,23,,"cap top, left corner"
+I80,Pier 2WB,TOP_R,1,1002.88,ft,23,,"cap top, right corner"
+I80,Pier 2WB,TIPD_L,1,4.5,ft,23,,"vertical, top corner to beak tip, left"
+I80,Pier 2WB,TIPD_R,1,4.5,ft,23,,"vertical, top corner to beak tip, right"
+I80,Pier 2WB,TIPS_L,1,2.5,ft,23,,"beak tip to the soffit line (2'-6 / 3'-6), left"
+I80,Pier 2WB,TIPS_R,1,2.5,ft,23,,"beak tip to the soffit line (2'-6 / 3'-6), right"
+I80,Pier 2WB,DEPTH_L,1,7,ft,23,,cap depth: top line to soffit at the left kink
+I80,Pier 2WB,DEPTH_R,1,7,ft,23,,cap depth: top line to soffit at the right kink
+I80,Pier 2WB,COLH_A,1,22,ft,23,,column 1: soffit to top of footing (Dim A / printed column height)
+I80,Pier 2WB,COLH_A,2,22,ft,23,,column 2: soffit to top of footing (Dim A / printed column height)
+I80,Pier 2WB,COLH_A,3,22,ft,23,,column 3: soffit to top of footing (Dim A / printed column height)
+I80,Pier 2WB,FTG_BOT,1,968.38,ft,23,,bottom of footing
+I80,Pier 2WB,FTG_THK,1,5.5,ft,23,,footing thickness
+I80,Pier 2WB,OVERALL,1,34.5,ft,23,,"overall vertical dimension, top line at the column to bottom of footing"
+I80,Pier 2WB,PILE_HEAD,1,1,ft,23,,"top of pile above bottom of footing (TOP OF PILE, 1'-0)"
+I80,Pier 2WB,PILE_LEN,1,90,ft,26,,contract length of piles (pier notes)
+I80,Pier 2WB,PED,1,1003.21,ft,23,,"pedestal top (*ELEV.), 1 from the left"
+I80,Pier 2WB,PED,2,1003.57,ft,23,,"pedestal top (*ELEV.), 2 from the left"
+I80,Pier 2WB,PED,3,1003.93,ft,23,,"pedestal top (*ELEV.), 3 from the left"
+I80,Pier 2WB,PED,4,1003.84,ft,23,,"pedestal top (*ELEV.), 4 from the left"
+I80,Pier 2WB,PED,5,1003.68,ft,23,,"pedestal top (*ELEV.), 5 from the left"
+I80,Pier 2WB,PED,6,1003.51,ft,23,,"pedestal top (*ELEV.), 6 from the left"
+I80,Pier 2WB,PEDH,1,4,in,23,,"printed pedestal height, 1 from the left"
+I80,Pier 2WB,PEDH,2,8.4375,in,23,,"printed pedestal height, 2 from the left"
+I80,Pier 2WB,PEDH,3,12.625,in,23,,"printed pedestal height, 3 from the left"
+I80,Pier 2WB,PEDH,4,11.6875,in,23,,"printed pedestal height, 4 from the left"
+I80,Pier 2WB,PEDH,5,9.625,in,23,,"printed pedestal height, 5 from the left"
+I80,Pier 2WB,PEDH,6,7.625,in,23,,"printed pedestal height, 6 from the left"
+I80,Pier 3WB,TOP_L,1,1006.3,ft,27,,"cap top, left corner"
+I80,Pier 3WB,TOP_R,1,1006.3,ft,27,,"cap top, right corner"
+I80,Pier 3WB,TIPD_L,1,4.5,ft,27,,"vertical, top corner to beak tip, left"
+I80,Pier 3WB,TIPD_R,1,4.5,ft,27,,"vertical, top corner to beak tip, right"
+I80,Pier 3WB,TIPS_L,1,2.5,ft,27,,"beak tip to the soffit line (2'-6 / 3'-6), left"
+I80,Pier 3WB,TIPS_R,1,2.5,ft,27,,"beak tip to the soffit line (2'-6 / 3'-6), right"
+I80,Pier 3WB,DEPTH_L,1,7,ft,27,,cap depth: top line to soffit at the left kink
+I80,Pier 3WB,DEPTH_R,1,7,ft,27,,cap depth: top line to soffit at the right kink
+I80,Pier 3WB,COLH_A,1,25,ft,27,,column 1: soffit to top of footing (Dim A / printed column height)
+I80,Pier 3WB,COLH_A,2,25,ft,27,,column 2: soffit to top of footing (Dim A / printed column height)
+I80,Pier 3WB,COLH_A,3,25,ft,27,,column 3: soffit to top of footing (Dim A / printed column height)
+I80,Pier 3WB,FTG_BOT,1,969.3,ft,27,,bottom of footing
+I80,Pier 3WB,FTG_THK,1,5,ft,27,,footing thickness
+I80,Pier 3WB,OVERALL,1,37,ft,27,,"overall vertical dimension, top line at the column to bottom of footing"
+I80,Pier 3WB,PILE_HEAD,1,1,ft,27,,"top of pile above bottom of footing (TOP OF PILE, 1'-0)"
+I80,Pier 3WB,PILE_LEN,1,95,ft,30,,contract length of piles (pier notes)
+I80,Pier 3WB,PED,1,1006.63,ft,27,,"pedestal top (*ELEV.), 1 from the left"
+I80,Pier 3WB,PED,2,1007,ft,27,,"pedestal top (*ELEV.), 2 from the left"
+I80,Pier 3WB,PED,3,1007.36,ft,27,,"pedestal top (*ELEV.), 3 from the left"
+I80,Pier 3WB,PED,4,1007.27,ft,27,,"pedestal top (*ELEV.), 4 from the left"
+I80,Pier 3WB,PED,5,1007.1,ft,27,,"pedestal top (*ELEV.), 5 from the left"
+I80,Pier 3WB,PED,6,1006.93,ft,27,,"pedestal top (*ELEV.), 6 from the left"
+I80,Pier 3WB,PEDH,1,4,in,27,,"printed pedestal height, 1 from the left"
+I80,Pier 3WB,PEDH,2,8.4375,in,27,,"printed pedestal height, 2 from the left"
+I80,Pier 3WB,PEDH,3,12.75,in,27,,"printed pedestal height, 3 from the left"
+I80,Pier 3WB,PEDH,4,11.6875,in,27,,"printed pedestal height, 4 from the left"
+I80,Pier 3WB,PEDH,5,9.625,in,27,,"printed pedestal height, 5 from the left"
+I80,Pier 3WB,PEDH,6,7.625,in,27,,"printed pedestal height, 6 from the left"
+I80,Pier 4WB,TOP_L,1,1009.24,ft,31,,"cap top, left corner"
+I80,Pier 4WB,TOP_R,1,1009.24,ft,31,,"cap top, right corner"
+I80,Pier 4WB,TIPD_L,1,4.5,ft,31,,"vertical, top corner to beak tip, left"
+I80,Pier 4WB,TIPD_R,1,4.5,ft,31,,"vertical, top corner to beak tip, right"
+I80,Pier 4WB,TIPS_L,1,2.5,ft,31,,"beak tip to the soffit line (2'-6 / 3'-6), left"
+I80,Pier 4WB,TIPS_R,1,2.5,ft,31,,"beak tip to the soffit line (2'-6 / 3'-6), right"
+I80,Pier 4WB,DEPTH_L,1,7,ft,31,,cap depth: top line to soffit at the left kink
+I80,Pier 4WB,DEPTH_R,1,7,ft,31,,cap depth: top line to soffit at the right kink
+I80,Pier 4WB,COLH_A,1,29,ft,31,,column 1: soffit to top of footing (Dim A / printed column height)
+I80,Pier 4WB,COLH_A,2,29,ft,31,,column 2: soffit to top of footing (Dim A / printed column height)
+I80,Pier 4WB,COLH_B,1,17,ft,31,,column 1: soffit to flare elevation (Dim B / printed height above the flare)
+I80,Pier 4WB,COLH_B,2,17,ft,31,,column 2: soffit to flare elevation (Dim B / printed height above the flare)
+I80,Pier 4WB,FLARE_ELEV,1,985.24,ft,31,,top of flared base (ELEV. ... (TYP.))
+I80,Pier 4WB,FLARE_HT,1,12,ft,31,,flared base height (flare elevation to top of footing)
+I80,Pier 4WB,FTG_BOT,1,967.24,ft,31,,bottom of footing
+I80,Pier 4WB,FTG_THK,1,6,ft,31,,footing thickness
+I80,Pier 4WB,OVERALL,1,42,ft,31,,"overall vertical dimension, top line at the column to bottom of footing"
+I80,Pier 4WB,PILE_HEAD,1,1,ft,31,,"top of pile above bottom of footing (TOP OF PILE, 1'-0)"
+I80,Pier 4WB,PILE_LEN,1,75,ft,34,,contract length of piles (pier notes)
+I80,Pier 4WB,PED,1,1009.98,ft,31,,"pedestal top (*ELEV.), 1 from the left"
+I80,Pier 4WB,PED,2,1010.21,ft,31,,"pedestal top (*ELEV.), 2 from the left"
+I80,Pier 4WB,PED,3,1010.42,ft,31,,"pedestal top (*ELEV.), 3 from the left"
+I80,Pier 4WB,PED,4,1010.19,ft,31,,"pedestal top (*ELEV.), 4 from the left"
+I80,Pier 4WB,PED,5,1009.88,ft,31,,"pedestal top (*ELEV.), 5 from the left"
+I80,Pier 4WB,PED,6,1009.57,ft,31,,"pedestal top (*ELEV.), 6 from the left"
+I80,Pier 4WB,PEDH,1,8.9375,in,31,,"printed pedestal height, 1 from the left"
+I80,Pier 4WB,PEDH,2,11.6875,in,31,,"printed pedestal height, 2 from the left"
+I80,Pier 4WB,PEDH,3,14.1875,in,31,,"printed pedestal height, 3 from the left"
+I80,Pier 4WB,PEDH,4,11.4375,in,31,,"printed pedestal height, 4 from the left"
+I80,Pier 4WB,PEDH,5,7.75,in,31,,"printed pedestal height, 5 from the left"
+I80,Pier 4WB,PEDH,6,4,in,31,,"printed pedestal height, 6 from the left"
+I80,Pier 5WB,TOP_L,1,1012.32,ft,35,,"cap top, left corner"
+I80,Pier 5WB,TOP_R,1,1012.32,ft,35,,"cap top, right corner"
+I80,Pier 5WB,TIPD_L,1,4.5,ft,35,,"vertical, top corner to beak tip, left"
+I80,Pier 5WB,TIPD_R,1,4.5,ft,35,,"vertical, top corner to beak tip, right"
+I80,Pier 5WB,TIPS_L,1,2.5,ft,35,,"beak tip to the soffit line (2'-6 / 3'-6), left"
+I80,Pier 5WB,TIPS_R,1,2.5,ft,35,,"beak tip to the soffit line (2'-6 / 3'-6), right"
+I80,Pier 5WB,DEPTH_L,1,7,ft,35,,cap depth: top line to soffit at the left kink
+I80,Pier 5WB,DEPTH_R,1,7,ft,35,,cap depth: top line to soffit at the right kink
+I80,Pier 5WB,COLH_A,1,32,ft,35,,column 1: soffit to top of footing (Dim A / printed column height)
+I80,Pier 5WB,COLH_A,2,32,ft,35,,column 2: soffit to top of footing (Dim A / printed column height)
+I80,Pier 5WB,COLH_B,1,19,ft,35,,column 1: soffit to flare elevation (Dim B / printed height above the flare)
+I80,Pier 5WB,COLH_B,2,19,ft,35,,column 2: soffit to flare elevation (Dim B / printed height above the flare)
+I80,Pier 5WB,FLARE_ELEV,1,986.32,ft,35,,top of flared base (ELEV. ... (TYP.))
+I80,Pier 5WB,FLARE_HT,1,13,ft,35,,flared base height (flare elevation to top of footing)
+I80,Pier 5WB,FTG_BOT,1,967.82,ft,35,,bottom of footing
+I80,Pier 5WB,FTG_THK,1,5.5,ft,35,,footing thickness
+I80,Pier 5WB,OVERALL,1,44.5,ft,35,,"overall vertical dimension, top line at the column to bottom of footing"
+I80,Pier 5WB,PILE_HEAD,1,1,ft,35,,"top of pile above bottom of footing (TOP OF PILE, 1'-0)"
+I80,Pier 5WB,PILE_LEN,1,75,ft,38,,contract length of piles (pier notes)
+I80,Pier 5WB,PED,1,1012.93,ft,35,B,"pedestal top (*ELEV.), 1 from the left, row B"
+I80,Pier 5WB,PED,2,1013.22,ft,35,B,"pedestal top (*ELEV.), 2 from the left, row B"
+I80,Pier 5WB,PED,3,1013.43,ft,35,B,"pedestal top (*ELEV.), 3 from the left, row B"
+I80,Pier 5WB,PED,4,1013.21,ft,35,B,"pedestal top (*ELEV.), 4 from the left, row B"
+I80,Pier 5WB,PED,5,1012.93,ft,35,B,"pedestal top (*ELEV.), 5 from the left, row B"
+I80,Pier 5WB,PED,6,1012.65,ft,35,B,"pedestal top (*ELEV.), 6 from the left, row B"
+I80,Pier 5WB,PED,1,1012.93,ft,35,A,"pedestal top (*ELEV.), 1 from the left, row A"
+I80,Pier 5WB,PED,2,1013.22,ft,35,A,"pedestal top (*ELEV.), 2 from the left, row A"
+I80,Pier 5WB,PED,3,1013.43,ft,35,A,"pedestal top (*ELEV.), 3 from the left, row A"
+I80,Pier 5WB,PED,4,1013.21,ft,35,A,"pedestal top (*ELEV.), 4 from the left, row A"
+I80,Pier 5WB,PED,5,1012.93,ft,35,A,"pedestal top (*ELEV.), 5 from the left, row A"
+I80,Pier 5WB,PED,6,1012.65,ft,35,A,"pedestal top (*ELEV.), 6 from the left, row A"
+I80,Pier 5WB,PEDH,1,7.375,in,35,B,"printed pedestal height, 1 from the left, row B"
+I80,Pier 5WB,PEDH,2,10.8125,in,35,B,"printed pedestal height, 2 from the left, row B"
+I80,Pier 5WB,PEDH,3,13.375,in,35,B,"printed pedestal height, 3 from the left, row B"
+I80,Pier 5WB,PEDH,4,10.75,in,35,B,"printed pedestal height, 4 from the left, row B"
+I80,Pier 5WB,PEDH,5,7.375,in,35,B,"printed pedestal height, 5 from the left, row B"
+I80,Pier 5WB,PEDH,6,4,in,35,B,"printed pedestal height, 6 from the left, row B"
+I80,Pier 5WB,PEDH,1,7.375,in,35,A,"printed pedestal height, 1 from the left, row A"
+I80,Pier 5WB,PEDH,2,10.8125,in,35,A,"printed pedestal height, 2 from the left, row A"
+I80,Pier 5WB,PEDH,3,13.375,in,35,A,"printed pedestal height, 3 from the left, row A"
+I80,Pier 5WB,PEDH,4,10.75,in,35,A,"printed pedestal height, 4 from the left, row A"
+I80,Pier 5WB,PEDH,5,7.375,in,35,A,"printed pedestal height, 5 from the left, row A"
+I80,Pier 5WB,PEDH,6,4,in,35,A,"printed pedestal height, 6 from the left, row A"
+I80,Pier 6A,TOP_L,1,1011.5,ft,39,,"cap top, left corner"
+I80,Pier 6A,TOP_R,1,1013.28,ft,39,,"cap top, right corner"
+I80,Pier 6A,TOPA_L,1,1010.75,ft,39,,"cap top, left corner (ahead half, model CapOutlineAhead)"
+I80,Pier 6A,TOPA_R,1,1012.51,ft,39,,"cap top, right corner (ahead half)"
+I80,Pier 6A,TIPD_L,1,5,ft,39,A,"vertical, top corner to beak tip, left"
+I80,Pier 6A,TIPD_R,1,5,ft,39,A,"vertical, top corner to beak tip, right"
+I80,Pier 6A,TIPS_L,1,3.5,ft,39,A,"beak tip to the soffit line (2'-6 / 3'-6), left"
+I80,Pier 6A,TIPS_R,1,3.5,ft,39,A,"beak tip to the soffit line (2'-6 / 3'-6), right"
+I80,Pier 6A,DEPTH_L,1,8.5,ft,39,A,cap depth: top line to soffit at the left kink
+I80,Pier 6A,DEPTH_R,1,8.5,ft,39,A,cap depth: top line to soffit at the right kink
+I80,Pier 6A,SOFF_KINK_L,1,1002.94,ft,39,,soffit elevation at the left kink
+I80,Pier 6A,SOFF_KINK_R,1,1003.31,ft,39,,soffit elevation at the right kink
+I80,Pier 6A,COLH_A,1,29,ft,39,,column 1: soffit to top of footing (Dim A / printed column height)
+I80,Pier 6A,DEPTH_CL,1,8.50521,ft,39,A,vertical top-to-soffit at the column CL (printed 9'-0 3/16 etc.)
+I80,Pier 6A,FTG_BOT,1,968.62,ft,39,,bottom of footing
+I80,Pier 6A,FTG_THK,1,5.5,ft,39,,footing thickness
+I80,Pier 6A,OVERALL,1,43.00521,ft,39,A,"overall vertical dimension, top line at the column to bottom of footing"
+I80,Pier 6A,PILE_HEAD,1,1,ft,39,,"top of pile above bottom of footing (TOP OF PILE, 1'-0)"
+I80,Pier 6A,PILE_LEN,1,75,ft,42,,contract length of piles (pier notes)
+I80,Pier 6A,PED,1,1011.24,ft,39,,"pedestal top (*ELEV.), 1 from the left"
+I80,Pier 6A,PED,2,1011.63,ft,39,,"pedestal top (*ELEV.), 2 from the left"
+I80,Pier 6A,PED,3,1012.01,ft,39,,"pedestal top (*ELEV.), 3 from the left"
+I80,Pier 6A,PED,4,1012.41,ft,39,,"pedestal top (*ELEV.), 4 from the left"
+I80,Pier 6A,PED,5,1012.73,ft,39,,"pedestal top (*ELEV.), 5 from the left"
+I80,Pier 6WB,TOP_L,1,1013.07,ft,43,,"cap top, left corner"
+I80,Pier 6WB,TOP_R,1,1014.92,ft,43,,"cap top, right corner"
+I80,Pier 6WB,TIPD_L,1,4.5,ft,43,,"vertical, top corner to beak tip, left"
+I80,Pier 6WB,TIPD_R,1,4.5,ft,43,,"vertical, top corner to beak tip, right"
+I80,Pier 6WB,TIPS_L,1,2.5,ft,43,,"beak tip to the soffit line (2'-6 / 3'-6), left"
+I80,Pier 6WB,TIPS_R,1,2.5,ft,43,,"beak tip to the soffit line (2'-6 / 3'-6), right"
+I80,Pier 6WB,DEPTH_L,1,7,ft,43,,cap depth: top line to soffit at the left kink
+I80,Pier 6WB,DEPTH_R,1,7,ft,43,,cap depth: top line to soffit at the right kink
+I80,Pier 6WB,SOFF_COL,1,1006.28,ft,43,,soffit elevation at column 1
+I80,Pier 6WB,SOFF_COL,2,1006.75,ft,43,,soffit elevation at column 2
+I80,Pier 6WB,SOFF_COL,3,1007.23,ft,43,,soffit elevation at column 3
+I80,Pier 6WB,SOFF_COL,4,1007.7,ft,43,,soffit elevation at column 4
+I80,Pier 6WB,COLH_A,1,39,ft,43,,column 1: soffit to top of footing (Dim A / printed column height)
+I80,Pier 6WB,COLH_A,2,39.46875,ft,43,,column 2: soffit to top of footing (Dim A / printed column height)
+I80,Pier 6WB,COLH_A,3,39.94792,ft,43,,column 3: soffit to top of footing (Dim A / printed column height)
+I80,Pier 6WB,COLH_A,4,40.42188,ft,43,,column 4: soffit to top of footing (Dim A / printed column height)
+I80,Pier 6WB,COLH_B,1,20,ft,43,,column 1: soffit to flare elevation (Dim B / printed height above the flare)
+I80,Pier 6WB,COLH_B,2,20.46875,ft,43,,column 2: soffit to flare elevation (Dim B / printed height above the flare)
+I80,Pier 6WB,COLH_B,3,20.94792,ft,43,,column 3: soffit to flare elevation (Dim B / printed height above the flare)
+I80,Pier 6WB,COLH_B,4,21.42188,ft,43,,column 4: soffit to flare elevation (Dim B / printed height above the flare)
+I80,Pier 6WB,FLARE_ELEV,1,986.28,ft,43,,top of flared base (ELEV. ... (TYP.))
+I80,Pier 6WB,FLARE_HT,1,19,ft,43,,flared base height (flare elevation to top of footing)
+I80,Pier 6WB,FTG_BOT,1,961.28,ft,43,,bottom of footing
+I80,Pier 6WB,FTG_THK,1,6,ft,43,,footing thickness
+I80,Pier 6WB,PILE_HEAD,1,1,ft,43,,"top of pile above bottom of footing (TOP OF PILE, 1'-0)"
+I80,Pier 6WB,PILE_LEN,1,65,ft,46,,contract length of piles (pier notes)
+I80,Pier 6WB,PED,1,1013.5,ft,43,,"pedestal top (*ELEV.), 1 from the left"
+I80,Pier 6WB,PED,2,1013.79,ft,43,,"pedestal top (*ELEV.), 2 from the left"
+I80,Pier 6WB,PED,3,1014.1,ft,43,,"pedestal top (*ELEV.), 3 from the left"
+I80,Pier 6WB,PED,4,1014.38,ft,43,,"pedestal top (*ELEV.), 4 from the left"
+I80,Pier 6WB,PED,5,1014.58,ft,43,,"pedestal top (*ELEV.), 5 from the left"
+I80,Pier 6WB,PED,6,1014.79,ft,43,,"pedestal top (*ELEV.), 6 from the left"
+I80,Pier 6WB,PED,7,1015.13,ft,43,,"pedestal top (*ELEV.), 7 from the left"
+I80,Pier 6WB,PED,8,1015.36,ft,43,,"pedestal top (*ELEV.), 8 from the left"
+I80,Pier 6WB,PED,9,1015.32,ft,43,,"pedestal top (*ELEV.), 9 from the left"
+I80,Pier 6WB,PED,10,1015.28,ft,43,,"pedestal top (*ELEV.), 10 from the left"
+I80,Pier 6WB,PED,11,1015.24,ft,43,,"pedestal top (*ELEV.), 11 from the left"
+I80,Pier 7WB,TOP_L,1,1014.6,ft,47,,"cap top, left corner"
+I80,Pier 7WB,TOP_R,1,1017.01,ft,47,,"cap top, right corner"
+I80,Pier 7WB,TIPD_L,1,4.5,ft,47,,"vertical, top corner to beak tip, left"
+I80,Pier 7WB,TIPD_R,1,4.5,ft,47,,"vertical, top corner to beak tip, right"
+I80,Pier 7WB,TIPS_L,1,2.5,ft,47,,"beak tip to the soffit line (2'-6 / 3'-6), left"
+I80,Pier 7WB,TIPS_R,1,2.5,ft,47,,"beak tip to the soffit line (2'-6 / 3'-6), right"
+I80,Pier 7WB,DEPTH_L,1,7,ft,47,,cap depth: top line to soffit at the left kink
+I80,Pier 7WB,DEPTH_R,1,7,ft,47,,cap depth: top line to soffit at the right kink
+I80,Pier 7WB,SOFF_COL,1,1007.92,ft,47,,soffit elevation at column 1
+I80,Pier 7WB,SOFF_COL,2,1008.8,ft,47,,soffit elevation at column 2
+I80,Pier 7WB,SOFF_COL,3,1009.69,ft,47,,soffit elevation at column 3
+I80,Pier 7WB,COLH_A,1,31,ft,47,,column 1: soffit to top of footing (Dim A / printed column height)
+I80,Pier 7WB,COLH_A,2,31.88542,ft,47,,column 2: soffit to top of footing (Dim A / printed column height)
+I80,Pier 7WB,COLH_A,3,32.77083,ft,47,,column 3: soffit to top of footing (Dim A / printed column height)
+I80,Pier 7WB,COLH_B,1,19,ft,47,,column 1: soffit to flare elevation (Dim B / printed height above the flare)
+I80,Pier 7WB,COLH_B,2,19.88542,ft,47,,column 2: soffit to flare elevation (Dim B / printed height above the flare)
+I80,Pier 7WB,COLH_B,3,20.77083,ft,47,,column 3: soffit to flare elevation (Dim B / printed height above the flare)
+I80,Pier 7WB,FLARE_ELEV,1,988.92,ft,47,,top of flared base (ELEV. ... (TYP.))
+I80,Pier 7WB,FLARE_HT,1,12,ft,47,,flared base height (flare elevation to top of footing)
+I80,Pier 7WB,FTG_BOT,1,969.92,ft,47,,bottom of footing
+I80,Pier 7WB,FTG_THK,1,7,ft,47,,footing thickness
+I80,Pier 7WB,PILE_HEAD,1,1,ft,47,,"top of pile above bottom of footing (TOP OF PILE, 1'-0)"
+I80,Pier 7WB,PILE_LEN,1,75,ft,50,,contract length of piles (pier notes)
+I80,Pier 7WB,PED,1,1015.08,ft,47,,"pedestal top (*ELEV.), 1 from the left"
+I80,Pier 7WB,PED,2,1015.31,ft,47,,"pedestal top (*ELEV.), 2 from the left"
+I80,Pier 7WB,PED,3,1015.57,ft,47,,"pedestal top (*ELEV.), 3 from the left"
+I80,Pier 7WB,PED,4,1015.76,ft,47,,"pedestal top (*ELEV.), 4 from the left"
+I80,Pier 7WB,PED,5,1015.98,ft,47,,"pedestal top (*ELEV.), 5 from the left"
+I80,Pier 7WB,PED,6,1016.32,ft,47,,"pedestal top (*ELEV.), 6 from the left"
+I80,Pier 7WB,PED,7,1016.58,ft,47,,"pedestal top (*ELEV.), 7 from the left"
+I80,Pier 7WB,PED,8,1016.83,ft,47,,"pedestal top (*ELEV.), 8 from the left"
+I80,Pier 7WB,PED,9,1017.08,ft,47,,"pedestal top (*ELEV.), 9 from the left"
+I80,Pier 7WB,PED,10,1017.33,ft,47,,"pedestal top (*ELEV.), 10 from the left"
+I80,Pier 8WB,TOP_L,1,1013.97,ft,51,,"cap top, left corner"
+I80,Pier 8WB,TOP_R,1,1017.38,ft,51,,"cap top, right corner"
+I80,Pier 8WB,TIPD_L,1,4.5,ft,51,,"vertical, top corner to beak tip, left"
+I80,Pier 8WB,TIPD_R,1,4.5,ft,51,,"vertical, top corner to beak tip, right"
+I80,Pier 8WB,TIPS_L,1,2.5,ft,51,,"beak tip to the soffit line (2'-6 / 3'-6), left"
+I80,Pier 8WB,TIPS_R,1,2.5,ft,51,,"beak tip to the soffit line (2'-6 / 3'-6), right"
+I80,Pier 8WB,DEPTH_L,1,7,ft,51,,cap depth: top line to soffit at the left kink
+I80,Pier 8WB,DEPTH_R,1,7,ft,51,,cap depth: top line to soffit at the right kink
+I80,Pier 8WB,SOFF_COL,1,1007.33,ft,51,,soffit elevation at column 1
+I80,Pier 8WB,SOFF_COL,2,1008.23,ft,51,,soffit elevation at column 2
+I80,Pier 8WB,SOFF_COL,3,1009.12,ft,51,,soffit elevation at column 3
+I80,Pier 8WB,SOFF_COL,4,1010,ft,51,,soffit elevation at column 4
+I80,Pier 8WB,COLH_A,1,25,ft,51,,column 1: soffit to top of footing (Dim A / printed column height)
+I80,Pier 8WB,COLH_A,2,25.90104,ft,51,,column 2: soffit to top of footing (Dim A / printed column height)
+I80,Pier 8WB,COLH_A,3,26.79167,ft,51,,column 3: soffit to top of footing (Dim A / printed column height)
+I80,Pier 8WB,COLH_A,4,27.67188,ft,51,,column 4: soffit to top of footing (Dim A / printed column height)
+I80,Pier 8WB,COLH_B,1,13,ft,51,,column 1: soffit to flare elevation (Dim B / printed height above the flare)
+I80,Pier 8WB,COLH_B,2,13.90104,ft,51,,column 2: soffit to flare elevation (Dim B / printed height above the flare)
+I80,Pier 8WB,COLH_B,3,14.79167,ft,51,,column 3: soffit to flare elevation (Dim B / printed height above the flare)
+I80,Pier 8WB,COLH_B,4,15.67188,ft,51,,column 4: soffit to flare elevation (Dim B / printed height above the flare)
+I80,Pier 8WB,FLARE_ELEV,1,994.33,ft,51,,top of flared base (ELEV. ... (TYP.))
+I80,Pier 8WB,FLARE_HT,1,12,ft,51,,flared base height (flare elevation to top of footing)
+I80,Pier 8WB,FTG_BOT,1,976.33,ft,51,,bottom of footing
+I80,Pier 8WB,FTG_THK,1,6,ft,51,,footing thickness
+I80,Pier 8WB,PILE_HEAD,1,1,ft,51,,"top of pile above bottom of footing (TOP OF PILE, 1'-0)"
+I80,Pier 8WB,PILE_LEN,1,85,ft,54,,contract length of piles (pier notes)
+I80,Pier 8WB,PED,1,1014.64,ft,51,,"pedestal top (*ELEV.), 1 from the left"
+I80,Pier 8WB,PED,2,1014.87,ft,51,,"pedestal top (*ELEV.), 2 from the left"
+I80,Pier 8WB,PED,3,1015.1,ft,51,,"pedestal top (*ELEV.), 3 from the left"
+I80,Pier 8WB,PED,4,1015.37,ft,51,,"pedestal top (*ELEV.), 4 from the left"
+I80,Pier 8WB,PED,5,1015.81,ft,51,,"pedestal top (*ELEV.), 5 from the left"
+I80,Pier 8WB,PED,6,1016.28,ft,51,,"pedestal top (*ELEV.), 6 from the left"
+I80,Pier 8WB,PED,7,1016.76,ft,51,,"pedestal top (*ELEV.), 7 from the left"
+I80,Pier 8WB,PED,8,1017.27,ft,51,,"pedestal top (*ELEV.), 8 from the left"
+I80,Pier 8WB,PED,9,1017.79,ft,51,,"pedestal top (*ELEV.), 9 from the left"
+I80,Pier 9WB,TOP_L,1,1012.57,ft,55,,"cap top, left corner"
+I80,Pier 9WB,TOP_R,1,1016.75,ft,55,,"cap top, right corner"
+I80,Pier 9WB,TIPD_L,1,4.5,ft,55,,"vertical, top corner to beak tip, left"
+I80,Pier 9WB,TIPD_R,1,4.5,ft,55,,"vertical, top corner to beak tip, right"
+I80,Pier 9WB,TIPS_L,1,2.5,ft,55,,"beak tip to the soffit line (2'-6 / 3'-6), left"
+I80,Pier 9WB,TIPS_R,1,2.5,ft,55,,"beak tip to the soffit line (2'-6 / 3'-6), right"
+I80,Pier 9WB,DEPTH_L,1,7,ft,55,,cap depth: top line to soffit at the left kink
+I80,Pier 9WB,DEPTH_R,1,7,ft,55,,cap depth: top line to soffit at the right kink
+I80,Pier 9WB,SOFF_COL,1,1006.1,ft,55,,soffit elevation at column 1
+I80,Pier 9WB,SOFF_COL,2,1007.65,ft,55,,soffit elevation at column 2
+I80,Pier 9WB,SOFF_COL,3,1009.21,ft,55,,soffit elevation at column 3
+I80,Pier 9WB,COLH_A,1,24,ft,55,,column 1: soffit to top of footing (Dim A / printed column height)
+I80,Pier 9WB,COLH_A,2,25.55208,ft,55,,column 2: soffit to top of footing (Dim A / printed column height)
+I80,Pier 9WB,COLH_A,3,27.10938,ft,55,,column 3: soffit to top of footing (Dim A / printed column height)
+I80,Pier 9WB,COLH_B,1,13,ft,55,,column 1: soffit to flare elevation (Dim B / printed height above the flare)
+I80,Pier 9WB,COLH_B,2,14.55208,ft,55,,column 2: soffit to flare elevation (Dim B / printed height above the flare)
+I80,Pier 9WB,COLH_B,3,16.10938,ft,55,,column 3: soffit to flare elevation (Dim B / printed height above the flare)
+I80,Pier 9WB,FLARE_ELEV,1,993.1,ft,55,,top of flared base (ELEV. ... (TYP.))
+I80,Pier 9WB,FLARE_HT,1,11,ft,55,,flared base height (flare elevation to top of footing)
+I80,Pier 9WB,FTG_BOT,1,977.1,ft,55,,bottom of footing
+I80,Pier 9WB,FTG_THK,1,5,ft,55,,footing thickness
+I80,Pier 9WB,PILE_HEAD,1,1,ft,55,,"top of pile above bottom of footing (TOP OF PILE, 1'-0)"
+I80,Pier 9WB,PILE_LEN,1,80,ft,58,,contract length of piles (pier notes)
+I80,Pier 9WB,PED,1,1013.19,ft,55,,"pedestal top (*ELEV.), 1 from the left"
+I80,Pier 9WB,PED,2,1013.55,ft,55,,"pedestal top (*ELEV.), 2 from the left"
+I80,Pier 9WB,PED,3,1013.9,ft,55,,"pedestal top (*ELEV.), 3 from the left"
+I80,Pier 9WB,PED,4,1014.53,ft,55,,"pedestal top (*ELEV.), 4 from the left"
+I80,Pier 9WB,PED,5,1015.15,ft,55,,"pedestal top (*ELEV.), 5 from the left"
+I80,Pier 9WB,PED,6,1015.78,ft,55,,"pedestal top (*ELEV.), 6 from the left"
+I80,Pier 9WB,PED,7,1016.41,ft,55,,"pedestal top (*ELEV.), 7 from the left"
+I80,Pier 9WB,PED,8,1017.04,ft,55,,"pedestal top (*ELEV.), 8 from the left"
+I80,Pier 10WB,TOP_L,1,1011.7,ft,59,,"cap top, left corner"
+I80,Pier 10WB,TOP_R,1,1015.83,ft,59,,"cap top, right corner"
+I80,Pier 10WB,TIPD_L,1,4.5,ft,59,,"vertical, top corner to beak tip, left"
+I80,Pier 10WB,TIPD_R,1,4.5,ft,59,,"vertical, top corner to beak tip, right"
+I80,Pier 10WB,TIPS_L,1,2.5,ft,59,,"beak tip to the soffit line (2'-6 / 3'-6), left"
+I80,Pier 10WB,TIPS_R,1,2.5,ft,59,,"beak tip to the soffit line (2'-6 / 3'-6), right"
+I80,Pier 10WB,DEPTH_L,1,7,ft,59,,cap depth: top line to soffit at the left kink
+I80,Pier 10WB,DEPTH_R,1,7,ft,59,,cap depth: top line to soffit at the right kink
+I80,Pier 10WB,SOFF_COL,1,1005.26,ft,59,,soffit elevation at column 1
+I80,Pier 10WB,SOFF_COL,2,1006.76,ft,59,,soffit elevation at column 2
+I80,Pier 10WB,SOFF_COL,3,1008.25,ft,59,,soffit elevation at column 3
+I80,Pier 10WB,COLH_A,1,26,ft,59,,column 1: soffit to top of footing (Dim A / printed column height)
+I80,Pier 10WB,COLH_A,2,27.5,ft,59,,column 2: soffit to top of footing (Dim A / printed column height)
+I80,Pier 10WB,COLH_A,3,28.98958,ft,59,,column 3: soffit to top of footing (Dim A / printed column height)
+I80,Pier 10WB,COLH_B,1,14,ft,59,,column 1: soffit to flare elevation (Dim B / printed height above the flare)
+I80,Pier 10WB,COLH_B,2,15.5,ft,59,,column 2: soffit to flare elevation (Dim B / printed height above the flare)
+I80,Pier 10WB,COLH_B,3,16.98958,ft,59,,column 3: soffit to flare elevation (Dim B / printed height above the flare)
+I80,Pier 10WB,FLARE_ELEV,1,991.26,ft,59,,top of flared base (ELEV. ... (TYP.))
+I80,Pier 10WB,FLARE_HT,1,12,ft,59,,flared base height (flare elevation to top of footing)
+I80,Pier 10WB,FTG_BOT,1,974.26,ft,59,,bottom of footing
+I80,Pier 10WB,FTG_THK,1,5,ft,59,,footing thickness
+I80,Pier 10WB,PILE_HEAD,1,1,ft,59,,"top of pile above bottom of footing (TOP OF PILE, 1'-0)"
+I80,Pier 10WB,PILE_LEN,1,85,ft,62,,contract length of piles (pier notes)
+I80,Pier 10WB,PED,1,1012.32,ft,59,,"pedestal top (*ELEV.), 1 from the left"
+I80,Pier 10WB,PED,2,1012.95,ft,59,,"pedestal top (*ELEV.), 2 from the left"
+I80,Pier 10WB,PED,3,1013.59,ft,59,,"pedestal top (*ELEV.), 3 from the left"
+I80,Pier 10WB,PED,4,1014.22,ft,59,,"pedestal top (*ELEV.), 4 from the left"
+I80,Pier 10WB,PED,5,1014.86,ft,59,,"pedestal top (*ELEV.), 5 from the left"
+I80,Pier 10WB,PED,6,1015.49,ft,59,,"pedestal top (*ELEV.), 6 from the left"
+I80,Pier 10WB,PED,7,1016.13,ft,59,,"pedestal top (*ELEV.), 7 from the left"
+I80,Pier 12WB,TOP_L,1,1010.53,ft,67,,"cap top, left corner"
+I80,Pier 12WB,TOP_R,1,1016.33,ft,67,,"cap top, right corner"
+I80,Pier 12WB,TIPD_L,1,4.5,ft,67,,"vertical, top corner to beak tip, left"
+I80,Pier 12WB,TIPD_R,1,4.5,ft,67,,"vertical, top corner to beak tip, right"
+I80,Pier 12WB,TIPS_L,1,2.5,ft,67,,"beak tip to the soffit line (2'-6 / 3'-6), left"
+I80,Pier 12WB,TIPS_R,1,2.5,ft,67,,"beak tip to the soffit line (2'-6 / 3'-6), right"
+I80,Pier 12WB,DEPTH_L,1,7,ft,67,,cap depth: top line to soffit at the left kink
+I80,Pier 12WB,DEPTH_R,1,7,ft,67,,cap depth: top line to soffit at the right kink
+I80,Pier 12WB,SOFF_COL,1,1004.17,ft,67,,soffit elevation at column 1
+I80,Pier 12WB,SOFF_COL,2,1005.67,ft,67,,soffit elevation at column 2
+I80,Pier 12WB,SOFF_COL,3,1007.17,ft,67,,soffit elevation at column 3
+I80,Pier 12WB,SOFF_COL,4,1008.67,ft,67,,soffit elevation at column 4
+I80,Pier 12WB,COLH_A,1,27,ft,67,,column 1: soffit to top of footing (Dim A / printed column height)
+I80,Pier 12WB,COLH_A,2,28.5,ft,67,,column 2: soffit to top of footing (Dim A / printed column height)
+I80,Pier 12WB,COLH_A,3,30,ft,67,,column 3: soffit to top of footing (Dim A / printed column height)
+I80,Pier 12WB,COLH_A,4,31.5,ft,67,,column 4: soffit to top of footing (Dim A / printed column height)
+I80,Pier 12WB,COLH_B,1,13,ft,67,,column 1: soffit to flare elevation (Dim B / printed height above the flare)
+I80,Pier 12WB,COLH_B,2,14.5,ft,67,,column 2: soffit to flare elevation (Dim B / printed height above the flare)
+I80,Pier 12WB,COLH_B,3,16,ft,67,,column 3: soffit to flare elevation (Dim B / printed height above the flare)
+I80,Pier 12WB,COLH_B,4,17.5,ft,67,,column 4: soffit to flare elevation (Dim B / printed height above the flare)
+I80,Pier 12WB,FLARE_ELEV,1,991.17,ft,67,,top of flared base (ELEV. ... (TYP.))
+I80,Pier 12WB,FLARE_HT,1,14,ft,67,,flared base height (flare elevation to top of footing)
+I80,Pier 12WB,FTG_BOT,1,971.67,ft,67,,bottom of footing
+I80,Pier 12WB,FTG_THK,1,5.5,ft,67,,footing thickness
+I80,Pier 12WB,PILE_HEAD,1,1,ft,67,,"top of pile above bottom of footing (TOP OF PILE, 1'-0)"
+I80,Pier 12WB,PILE_LEN,1,80,ft,70,,contract length of piles (pier notes)
+I80,Pier 12WB,PED,1,1011.19,ft,67,,"pedestal top (*ELEV.), 1 from the left"
+I80,Pier 12WB,PED,2,1011.63,ft,67,,"pedestal top (*ELEV.), 2 from the left"
+I80,Pier 12WB,PED,3,1012.07,ft,67,,"pedestal top (*ELEV.), 3 from the left"
+I80,Pier 12WB,PED,4,1012.7,ft,67,,"pedestal top (*ELEV.), 4 from the left"
+I80,Pier 12WB,PED,5,1013.35,ft,67,,"pedestal top (*ELEV.), 5 from the left"
+I80,Pier 12WB,PED,6,1014,ft,67,,"pedestal top (*ELEV.), 6 from the left"
+I80,Pier 12WB,PED,7,1014.65,ft,67,,"pedestal top (*ELEV.), 7 from the left"
+I80,Pier 12WB,PED,8,1015.3,ft,67,,"pedestal top (*ELEV.), 8 from the left"
+I80,Pier 12WB,PED,9,1015.95,ft,67,,"pedestal top (*ELEV.), 9 from the left"
+I80,Pier 12WB,PED,10,1016.6,ft,67,,"pedestal top (*ELEV.), 10 from the left"
+I80,Pier 13WB,TOP_L,1,1010.23,ft,71,,"cap top, left corner"
+I80,Pier 13WB,TOP_R,1,1015.25,ft,71,,"cap top, right corner"
+I80,Pier 13WB,TIPD_L,1,4.5,ft,71,,"vertical, top corner to beak tip, left"
+I80,Pier 13WB,TIPD_R,1,4.5,ft,71,,"vertical, top corner to beak tip, right"
+I80,Pier 13WB,TIPS_L,1,2.5,ft,71,,"beak tip to the soffit line (2'-6 / 3'-6), left"
+I80,Pier 13WB,TIPS_R,1,2.5,ft,71,,"beak tip to the soffit line (2'-6 / 3'-6), right"
+I80,Pier 13WB,DEPTH_L,1,7,ft,71,,cap depth: top line to soffit at the left kink
+I80,Pier 13WB,DEPTH_R,1,7,ft,71,,cap depth: top line to soffit at the right kink
+I80,Pier 13WB,SOFF_COL,1,1003.9,ft,71,,soffit elevation at column 1
+I80,Pier 13WB,SOFF_COL,2,1005.73,ft,71,,soffit elevation at column 2
+I80,Pier 13WB,SOFF_COL,3,1007.57,ft,71,,soffit elevation at column 3
+I80,Pier 13WB,COLH_A,1,27,ft,71,,column 1: soffit to top of footing (Dim A / printed column height)
+I80,Pier 13WB,COLH_A,2,28.83333,ft,71,,column 2: soffit to top of footing (Dim A / printed column height)
+I80,Pier 13WB,COLH_A,3,30.67188,ft,71,,column 3: soffit to top of footing (Dim A / printed column height)
+I80,Pier 13WB,COLH_B,1,15,ft,71,,column 1: soffit to flare elevation (Dim B / printed height above the flare)
+I80,Pier 13WB,COLH_B,2,16.83333,ft,71,,column 2: soffit to flare elevation (Dim B / printed height above the flare)
+I80,Pier 13WB,COLH_B,3,18.67188,ft,71,,column 3: soffit to flare elevation (Dim B / printed height above the flare)
+I80,Pier 13WB,FLARE_ELEV,1,988.9,ft,71,,top of flared base (ELEV. ... (TYP.))
+I80,Pier 13WB,FLARE_HT,1,12,ft,71,,flared base height (flare elevation to top of footing)
+I80,Pier 13WB,FTG_BOT,1,970.9,ft,71,,bottom of footing
+I80,Pier 13WB,FTG_THK,1,6,ft,71,,footing thickness
+I80,Pier 13WB,PILE_HEAD,1,1,ft,71,,"top of pile above bottom of footing (TOP OF PILE, 1'-0)"
+I80,Pier 13WB,PILE_LEN,1,65,ft,74,,contract length of piles (pier notes)
+I80,Pier 13WB,PED,1,1010.89,ft,71,,"pedestal top (*ELEV.), 1 from the left"
+I80,Pier 13WB,PED,2,1011.23,ft,71,,"pedestal top (*ELEV.), 2 from the left"
+I80,Pier 13WB,PED,3,1011.59,ft,71,,"pedestal top (*ELEV.), 3 from the left"
+I80,Pier 13WB,PED,4,1012.25,ft,71,,"pedestal top (*ELEV.), 4 from the left"
+I80,Pier 13WB,PED,5,1012.9,ft,71,,"pedestal top (*ELEV.), 5 from the left"
+I80,Pier 13WB,PED,6,1013.56,ft,71,,"pedestal top (*ELEV.), 6 from the left"
+I80,Pier 13WB,PED,7,1014.22,ft,71,,"pedestal top (*ELEV.), 7 from the left"
+I80,Pier 13WB,PED,8,1014.87,ft,71,,"pedestal top (*ELEV.), 8 from the left"
+I80,Pier 13WB,PED,9,1015.53,ft,71,,"pedestal top (*ELEV.), 9 from the left"
+I80,Pier 14WB,TOP_L,1,1009.49,ft,75,,"cap top, left corner"
+I80,Pier 14WB,TOP_R,1,1014.17,ft,75,,"cap top, right corner"
+I80,Pier 14WB,TIPD_L,1,4.5,ft,75,,"vertical, top corner to beak tip, left"
+I80,Pier 14WB,TIPD_R,1,4.5,ft,75,,"vertical, top corner to beak tip, right"
+I80,Pier 14WB,TIPS_L,1,2.5,ft,75,,"beak tip to the soffit line (2'-6 / 3'-6), left"
+I80,Pier 14WB,TIPS_R,1,2.5,ft,75,,"beak tip to the soffit line (2'-6 / 3'-6), right"
+I80,Pier 14WB,DEPTH_L,1,7,ft,75,,cap depth: top line to soffit at the left kink
+I80,Pier 14WB,DEPTH_R,1,7,ft,75,,cap depth: top line to soffit at the right kink
+I80,Pier 14WB,SOFF_COL,1,1003.18,ft,75,,soffit elevation at column 1
+I80,Pier 14WB,SOFF_COL,2,1004.82,ft,75,,soffit elevation at column 2
+I80,Pier 14WB,SOFF_COL,3,1006.47,ft,75,,soffit elevation at column 3
+I80,Pier 14WB,COLH_A,1,26,ft,75,,column 1: soffit to top of footing (Dim A / printed column height)
+I80,Pier 14WB,COLH_A,2,27.64062,ft,75,,column 2: soffit to top of footing (Dim A / printed column height)
+I80,Pier 14WB,COLH_A,3,29.29167,ft,75,,column 3: soffit to top of footing (Dim A / printed column height)
+I80,Pier 14WB,COLH_B,1,14,ft,75,,column 1: soffit to flare elevation (Dim B / printed height above the flare)
+I80,Pier 14WB,COLH_B,2,15.64062,ft,75,,column 2: soffit to flare elevation (Dim B / printed height above the flare)
+I80,Pier 14WB,COLH_B,3,17.29167,ft,75,,column 3: soffit to flare elevation (Dim B / printed height above the flare)
+I80,Pier 14WB,FLARE_ELEV,1,989.18,ft,75,,top of flared base (ELEV. ... (TYP.))
+I80,Pier 14WB,FLARE_HT,1,12,ft,75,,flared base height (flare elevation to top of footing)
+I80,Pier 14WB,FTG_BOT,1,972.18,ft,75,,bottom of footing
+I80,Pier 14WB,FTG_THK,1,5,ft,75,,footing thickness
+I80,Pier 14WB,PILE_HEAD,1,1,ft,75,,"top of pile above bottom of footing (TOP OF PILE, 1'-0)"
+I80,Pier 14WB,PILE_LEN,1,85,ft,78,,contract length of piles (pier notes)
+I80,Pier 14WB,PED,1,1010.15,ft,75,,"pedestal top (*ELEV.), 1 from the left"
+I80,Pier 14WB,PED,2,1010.49,ft,75,,"pedestal top (*ELEV.), 2 from the left"
+I80,Pier 14WB,PED,3,1011.15,ft,75,,"pedestal top (*ELEV.), 3 from the left"
+I80,Pier 14WB,PED,4,1011.81,ft,75,,"pedestal top (*ELEV.), 4 from the left"
+I80,Pier 14WB,PED,5,1012.48,ft,75,,"pedestal top (*ELEV.), 5 from the left"
+I80,Pier 14WB,PED,6,1013.14,ft,75,,"pedestal top (*ELEV.), 6 from the left"
+I80,Pier 14WB,PED,7,1013.8,ft,75,,"pedestal top (*ELEV.), 7 from the left"
+I80,Pier 14WB,PED,8,1014.46,ft,75,,"pedestal top (*ELEV.), 8 from the left"
+I80,Pier 15WB,TOP_L,1,1008.39,ft,79,,"cap top, left corner"
+I80,Pier 15WB,TOP_R,1,1013.1,ft,79,,"cap top, right corner"
+I80,Pier 15WB,TIPD_L,1,4.5,ft,79,,"vertical, top corner to beak tip, left"
+I80,Pier 15WB,TIPD_R,1,4.5,ft,79,,"vertical, top corner to beak tip, right"
+I80,Pier 15WB,TIPS_L,1,2.5,ft,79,,"beak tip to the soffit line (2'-6 / 3'-6), left"
+I80,Pier 15WB,TIPS_R,1,2.5,ft,79,,"beak tip to the soffit line (2'-6 / 3'-6), right"
+I80,Pier 15WB,DEPTH_L,1,7,ft,79,,cap depth: top line to soffit at the left kink
+I80,Pier 15WB,DEPTH_R,1,7,ft,79,,cap depth: top line to soffit at the right kink
+I80,Pier 15WB,SOFF_COL,1,1002.1,ft,79,,soffit elevation at column 1
+I80,Pier 15WB,SOFF_COL,2,1003.73,ft,79,,soffit elevation at column 2
+I80,Pier 15WB,SOFF_COL,3,1005.37,ft,79,,soffit elevation at column 3
+I80,Pier 15WB,COLH_A,1,19,ft,79,,column 1: soffit to top of footing (Dim A / printed column height)
+I80,Pier 15WB,COLH_A,2,20.63021,ft,79,,column 2: soffit to top of footing (Dim A / printed column height)
+I80,Pier 15WB,COLH_A,3,22.27083,ft,79,,column 3: soffit to top of footing (Dim A / printed column height)
+I80,Pier 15WB,FTG_BOT,1,978.1,ft,79,,bottom of footing
+I80,Pier 15WB,FTG_THK,1,5,ft,79,,footing thickness
+I80,Pier 15WB,PILE_HEAD,1,1,ft,79,,"top of pile above bottom of footing (TOP OF PILE, 1'-0)"
+I80,Pier 15WB,PILE_LEN,1,85,ft,82,,contract length of piles (pier notes)
+I80,Pier 15WB,PED,1,1009.04,ft,79,,"pedestal top (*ELEV.), 1 from the left"
+I80,Pier 15WB,PED,2,1009.39,ft,79,,"pedestal top (*ELEV.), 2 from the left"
+I80,Pier 15WB,PED,3,1010.06,ft,79,,"pedestal top (*ELEV.), 3 from the left"
+I80,Pier 15WB,PED,4,1010.72,ft,79,,"pedestal top (*ELEV.), 4 from the left"
+I80,Pier 15WB,PED,5,1011.39,ft,79,,"pedestal top (*ELEV.), 5 from the left"
+I80,Pier 15WB,PED,6,1012.06,ft,79,,"pedestal top (*ELEV.), 6 from the left"
+I80,Pier 15WB,PED,7,1012.73,ft,79,,"pedestal top (*ELEV.), 7 from the left"
+I80,Pier 15WB,PED,8,1013.4,ft,79,,"pedestal top (*ELEV.), 8 from the left"
+I80,Pier 11WB,TOP_L,1,1010.95,ft,63,,"cap top, left corner"
+I80,Pier 11WB,TOP_R,1,1015.18,ft,63,,"cap top, right corner"
+I80,Pier 11WB,TOPA_L,1,1012.98,ft,63,,"cap top, left corner (ahead half, model CapOutlineAhead)"
+I80,Pier 11WB,TOPA_R,1,1017.21,ft,63,,"cap top, right corner (ahead half)"
+I80,Pier 11WB,TIPD_L,1,4.5,ft,63,,"vertical, top corner to beak tip, left"
+I80,Pier 11WB,TIPD_R,1,4.5,ft,63,,"vertical, top corner to beak tip, right"
+I80,Pier 11WB,TIPS_L,1,2.5,ft,63,,"beak tip to the soffit line (2'-6 / 3'-6), left"
+I80,Pier 11WB,TIPS_R,1,2.5,ft,63,,"beak tip to the soffit line (2'-6 / 3'-6), right"
+I80,Pier 11WB,DEPTH_L,1,7,ft,63,,cap depth: top line to soffit at the left kink
+I80,Pier 11WB,DEPTH_R,1,7,ft,63,,cap depth: top line to soffit at the right kink
+I80,Pier 11WB,SOFF_COL,1,1004.51,ft,63,,soffit elevation at column 1
+I80,Pier 11WB,SOFF_COL,2,1006.52,ft,63,,soffit elevation at column 2
+I80,Pier 11WB,SOFF_COL,3,1007.59,ft,63,,soffit elevation at column 3
+I80,Pier 11WB,COLH_A,1,27,ft,63,,column 1: soffit to top of footing (Dim A / printed column height)
+I80,Pier 11WB,COLH_A,2,29.01042,ft,63,,column 2: soffit to top of footing (Dim A / printed column height)
+I80,Pier 11WB,COLH_A,3,30.08333,ft,63,,column 3: soffit to top of footing (Dim A / printed column height)
+I80,Pier 11WB,COLH_B,1,14,ft,63,,column 1: soffit to flare elevation (Dim B / printed height above the flare)
+I80,Pier 11WB,COLH_B,2,16.01042,ft,63,,column 2: soffit to flare elevation (Dim B / printed height above the flare)
+I80,Pier 11WB,COLH_B,3,17.08333,ft,63,,column 3: soffit to flare elevation (Dim B / printed height above the flare)
+I80,Pier 11WB,FLARE_ELEV,1,990.51,ft,63,,top of flared base (ELEV. ... (TYP.))
+I80,Pier 11WB,FLARE_HT,1,13,ft,63,,flared base height (flare elevation to top of footing)
+I80,Pier 11WB,FTG_BOT,1,971.01,ft,63,,bottom of footing
+I80,Pier 11WB,FTG_THK,1,6.5,ft,63,,footing thickness
+I80,Pier 11WB,PILE_HEAD,1,1,ft,63,,"top of pile above bottom of footing (TOP OF PILE, 1'-0)"
+I80,Pier 11WB,PILE_LEN,1,70,ft,66,,contract length of piles (pier notes)
+I80,Pier 11WB,PED,1,1011.54,ft,63,B,"pedestal top (*ELEV.), 1 from the left, row B"
+I80,Pier 11WB,PED,2,1012.19,ft,63,B,"pedestal top (*ELEV.), 2 from the left, row B"
+I80,Pier 11WB,PED,3,1012.83,ft,63,B,"pedestal top (*ELEV.), 3 from the left, row B"
+I80,Pier 11WB,PED,4,1013.48,ft,63,B,"pedestal top (*ELEV.), 4 from the left, row B"
+I80,Pier 11WB,PED,5,1014.12,ft,63,B,"pedestal top (*ELEV.), 5 from the left, row B"
+I80,Pier 11WB,PED,6,1014.77,ft,63,B,"pedestal top (*ELEV.), 6 from the left, row B"
+I80,Pier 11WB,PED,7,1015.41,ft,63,B,"pedestal top (*ELEV.), 7 from the left, row B"
+I80,Pier 11WB,PED,1,1013.66,ft,63,A,"pedestal top (*ELEV.), 1 from the left, row A"
+I80,Pier 11WB,PED,2,1014.3,ft,63,A,"pedestal top (*ELEV.), 2 from the left, row A"
+I80,Pier 11WB,PED,3,1014.94,ft,63,A,"pedestal top (*ELEV.), 3 from the left, row A"
+I80,Pier 11WB,PED,4,1015.59,ft,63,A,"pedestal top (*ELEV.), 4 from the left, row A"
+I80,Pier 11WB,PED,5,1016.24,ft,63,A,"pedestal top (*ELEV.), 5 from the left, row A"
+I80,Pier 11WB,PED,6,1016.88,ft,63,A,"pedestal top (*ELEV.), 6 from the left, row A"
+I80,Pier 11WB,PED,7,1017.53,ft,63,A,"pedestal top (*ELEV.), 7 from the left, row A"
+G,Pier 1G,TOP_L,1,1000.79,ft,19,,"cap top, left corner"
+G,Pier 1G,TOP_R,1,1001.49,ft,19,,"cap top, right corner"
+G,Pier 1G,TIPD_L,1,5.5,ft,19,,"vertical, top corner to beak tip, left"
+G,Pier 1G,TIPD_R,1,5.5,ft,19,,"vertical, top corner to beak tip, right"
+G,Pier 1G,TIPS_L,1,3.5,ft,19,,"beak tip to the soffit line (2'-6 / 3'-6), left"
+G,Pier 1G,TIPS_R,1,3.5,ft,19,,"beak tip to the soffit line (2'-6 / 3'-6), right"
+G,Pier 1G,DEPTH_L,1,9,ft,19,,cap depth: top line to soffit at the left kink
+G,Pier 1G,DEPTH_R,1,9,ft,19,,cap depth: top line to soffit at the right kink
+G,Pier 1G,SOFF_KINK_L,1,992.03,ft,19,,soffit elevation at the left kink
+G,Pier 1G,SOFF_KINK_R,1,992.25,ft,19,,soffit elevation at the right kink
+G,Pier 1G,COLH_A,1,25,ft,19,,column 1: soffit to top of footing (Dim A / printed column height)
+G,Pier 1G,DEPTH_CL,1,9,ft,19,,vertical top-to-soffit at the column CL (printed 9'-0 3/16 etc.)
+G,Pier 1G,FTG_BOT,1,961.64,ft,19,,bottom of footing
+G,Pier 1G,FTG_THK,1,5.5,ft,19,,footing thickness
+G,Pier 1G,OVERALL,1,39.5,ft,19,,"overall vertical dimension, top line at the column to bottom of footing"
+G,Pier 1G,PILE_HEAD,1,1,ft,19,,"top of pile above bottom of footing (TOP OF PILE, 1'-0)"
+G,Pier 1G,PILE_LEN,1,90,ft,21,,contract length of piles (pier notes)
+G,Pier 1G,PED,1,1001.23,ft,19,,"pedestal top (*ELEV.), 1 from the left"
+G,Pier 1G,PED,2,1001.42,ft,19,,"pedestal top (*ELEV.), 2 from the left"
+G,Pier 1G,PED,3,1001.62,ft,19,,"pedestal top (*ELEV.), 3 from the left"
+G,Pier 1G,PED,4,1001.81,ft,19,,"pedestal top (*ELEV.), 4 from the left"
+G,Pier 2G,TOP_L,1,1008.62,ft,22,,"cap top, left corner"
+G,Pier 2G,TOP_R,1,1008.29,ft,22,,"cap top, right corner"
+G,Pier 2G,TIPD_L,1,5.5,ft,22,,"vertical, top corner to beak tip, left"
+G,Pier 2G,TIPD_R,1,5.5,ft,22,,"vertical, top corner to beak tip, right"
+G,Pier 2G,TIPS_L,1,3.5,ft,22,,"beak tip to the soffit line (2'-6 / 3'-6), left"
+G,Pier 2G,TIPS_R,1,3.5,ft,22,,"beak tip to the soffit line (2'-6 / 3'-6), right"
+G,Pier 2G,DEPTH_L,1,9,ft,22,,cap depth: top line to soffit at the left kink
+G,Pier 2G,DEPTH_R,1,9,ft,22,,cap depth: top line to soffit at the right kink
+G,Pier 2G,SOFF_KINK_L,1,999.51,ft,22,,soffit elevation at the left kink
+G,Pier 2G,SOFF_KINK_R,1,999.4,ft,22,,soffit elevation at the right kink
+G,Pier 2G,COLH_B,1,20,ft,22,,column 1: soffit to flare elevation (Dim B / printed height above the flare)
+G,Pier 2G,DEPTH_CL,1,9,ft,22,,vertical top-to-soffit at the column CL (printed 9'-0 3/16 etc.)
+G,Pier 2G,FLARE_ELEV,1,979.46,ft,22,,top of flared base (ELEV. ... (TYP.))
+G,Pier 2G,FLARE_HT,1,12,ft,22,,flared base height (flare elevation to top of footing)
+G,Pier 2G,FTG_BOT,1,960.46,ft,22,,bottom of footing
+G,Pier 2G,FTG_THK,1,7,ft,22,,footing thickness
+G,Pier 2G,OVERALL,1,48,ft,22,,"overall vertical dimension, top line at the column to bottom of footing"
+G,Pier 2G,PILE_HEAD,1,1,ft,22,,"top of pile above bottom of footing (TOP OF PILE, 1'-0)"
+G,Pier 2G,PILE_LEN,1,90,ft,24,,contract length of piles (pier notes)
+G,Pier 2G,PED,1,1008.95,ft,22,,"pedestal top (*ELEV.), 1 from the left"
+G,Pier 2G,PED,2,1008.86,ft,22,,"pedestal top (*ELEV.), 2 from the left"
+G,Pier 2G,PED,3,1008.77,ft,22,,"pedestal top (*ELEV.), 3 from the left"
+G,Pier 2G,PED,4,1008.68,ft,22,,"pedestal top (*ELEV.), 4 from the left"
+G,Pier 3G,TOP_L,1,1016.47,ft,25,,"cap top, left corner"
+G,Pier 3G,TOP_R,1,1014.4,ft,25,,"cap top, right corner"
+G,Pier 3G,TIPD_L,1,5.5,ft,25,,"vertical, top corner to beak tip, left"
+G,Pier 3G,TIPD_R,1,5.5,ft,25,,"vertical, top corner to beak tip, right"
+G,Pier 3G,TIPS_L,1,3.5,ft,25,,"beak tip to the soffit line (2'-6 / 3'-6), left"
+G,Pier 3G,TIPS_R,1,3.5,ft,25,,"beak tip to the soffit line (2'-6 / 3'-6), right"
+G,Pier 3G,DEPTH_L,1,9,ft,25,,cap depth: top line to soffit at the left kink
+G,Pier 3G,DEPTH_R,1,9,ft,25,,cap depth: top line to soffit at the right kink
+G,Pier 3G,SOFF_KINK_L,1,1006.74,ft,25,,soffit elevation at the left kink
+G,Pier 3G,SOFF_KINK_R,1,1006.09,ft,25,,soffit elevation at the right kink
+G,Pier 3G,COLH_B,1,25,ft,25,,column 1: soffit to flare elevation (Dim B / printed height above the flare)
+G,Pier 3G,DEPTH_CL,1,9.01562,ft,25,,vertical top-to-soffit at the column CL (printed 9'-0 3/16 etc.)
+G,Pier 3G,FLARE_ELEV,1,981.42,ft,25,,top of flared base (ELEV. ... (TYP.))
+G,Pier 3G,FLARE_HT,1,14,ft,25,,flared base height (flare elevation to top of footing)
+G,Pier 3G,FTG_BOT,1,961.42,ft,25,,bottom of footing
+G,Pier 3G,FTG_THK,1,6,ft,25,,footing thickness
+G,Pier 3G,OVERALL,1,54.01562,ft,25,,"overall vertical dimension, top line at the column to bottom of footing"
+G,Pier 3G,PILE_HEAD,1,1,ft,25,,"top of pile above bottom of footing (TOP OF PILE, 1'-0)"
+G,Pier 3G,PILE_LEN,1,90,ft,27,,contract length of piles (pier notes)
+G,Pier 3G,PED,1,1016.77,ft,25,,"pedestal top (*ELEV.), 1 from the left"
+G,Pier 3G,PED,2,1016.2,ft,25,,"pedestal top (*ELEV.), 2 from the left"
+G,Pier 3G,PED,3,1015.63,ft,25,,"pedestal top (*ELEV.), 3 from the left"
+G,Pier 3G,PED,4,1015.06,ft,25,,"pedestal top (*ELEV.), 4 from the left"
+G,Pier 4G,TOP_L,1,1024.07,ft,28,,"cap top, left corner"
+G,Pier 4G,TOP_R,1,1022,ft,28,,"cap top, right corner"
+G,Pier 4G,TIPD_L,1,5.5,ft,28,,"vertical, top corner to beak tip, left"
+G,Pier 4G,TIPD_R,1,5.5,ft,28,,"vertical, top corner to beak tip, right"
+G,Pier 4G,TIPS_L,1,3.5,ft,28,,"beak tip to the soffit line (2'-6 / 3'-6), left"
+G,Pier 4G,TIPS_R,1,3.5,ft,28,,"beak tip to the soffit line (2'-6 / 3'-6), right"
+G,Pier 4G,DEPTH_L,1,9,ft,28,,cap depth: top line to soffit at the left kink
+G,Pier 4G,DEPTH_R,1,9,ft,28,,cap depth: top line to soffit at the right kink
+G,Pier 4G,SOFF_KINK_L,1,1014.34,ft,28,,soffit elevation at the left kink
+G,Pier 4G,SOFF_KINK_R,1,1013.69,ft,28,,soffit elevation at the right kink
+G,Pier 4G,COLH_B,1,29,ft,28,,column 1: soffit to flare elevation (Dim B / printed height above the flare)
+G,Pier 4G,DEPTH_CL,1,9.01562,ft,28,,vertical top-to-soffit at the column CL (printed 9'-0 3/16 etc.)
+G,Pier 4G,FLARE_ELEV,1,985.02,ft,28,,top of flared base (ELEV. ... (TYP.))
+G,Pier 4G,FLARE_HT,1,17,ft,28,,flared base height (flare elevation to top of footing)
+G,Pier 4G,FTG_BOT,1,962.02,ft,28,,bottom of footing
+G,Pier 4G,FTG_THK,1,6,ft,28,,footing thickness
+G,Pier 4G,OVERALL,1,61.01562,ft,28,,"overall vertical dimension, top line at the column to bottom of footing"
+G,Pier 4G,PILE_HEAD,1,1,ft,28,,"top of pile above bottom of footing (TOP OF PILE, 1'-0)"
+G,Pier 4G,PILE_LEN,1,90,ft,30,,contract length of piles (pier notes)
+G,Pier 4G,PED,1,1024.37,ft,28,,"pedestal top (*ELEV.), 1 from the left"
+G,Pier 4G,PED,2,1023.8,ft,28,,"pedestal top (*ELEV.), 2 from the left"
+G,Pier 4G,PED,3,1023.23,ft,28,,"pedestal top (*ELEV.), 3 from the left"
+G,Pier 4G,PED,4,1022.66,ft,28,,"pedestal top (*ELEV.), 4 from the left"
+G,Pier 5G,TOP_L,1,1030.08,ft,31,,"cap top, left corner"
+G,Pier 5G,TOP_R,1,1028.01,ft,31,,"cap top, right corner"
+G,Pier 5G,TIPD_L,1,5.5,ft,31,,"vertical, top corner to beak tip, left"
+G,Pier 5G,TIPD_R,1,5.5,ft,31,,"vertical, top corner to beak tip, right"
+G,Pier 5G,TIPS_L,1,3.5,ft,31,,"beak tip to the soffit line (2'-6 / 3'-6), left"
+G,Pier 5G,TIPS_R,1,3.5,ft,31,,"beak tip to the soffit line (2'-6 / 3'-6), right"
+G,Pier 5G,DEPTH_L,1,9,ft,31,,cap depth: top line to soffit at the left kink
+G,Pier 5G,DEPTH_R,1,9,ft,31,,cap depth: top line to soffit at the right kink
+G,Pier 5G,SOFF_KINK_L,1,1020.35,ft,31,,soffit elevation at the left kink
+G,Pier 5G,SOFF_KINK_R,1,1019.7,ft,31,,soffit elevation at the right kink
+G,Pier 5G,COLH_B,1,29,ft,31,,column 1: soffit to flare elevation (Dim B / printed height above the flare)
+G,Pier 5G,DEPTH_CL,1,9.01562,ft,31,,vertical top-to-soffit at the column CL (printed 9'-0 3/16 etc.)
+G,Pier 5G,FLARE_ELEV,1,991.03,ft,31,,top of flared base (ELEV. ... (TYP.))
+G,Pier 5G,FLARE_HT,1,16,ft,31,,flared base height (flare elevation to top of footing)
+G,Pier 5G,FTG_BOT,1,968.03,ft,31,,bottom of footing
+G,Pier 5G,FTG_THK,1,7,ft,31,,footing thickness
+G,Pier 5G,OVERALL,1,60.01562,ft,31,,"overall vertical dimension, top line at the column to bottom of footing"
+G,Pier 5G,PILE_HEAD,1,1,ft,31,,"top of pile above bottom of footing (TOP OF PILE, 1'-0)"
+G,Pier 5G,PILE_LEN,1,95,ft,33,,contract length of piles (pier notes)
+G,Pier 5G,PED,1,1030.38,ft,31,B,"pedestal top (*ELEV.), 1 from the left, row B"
+G,Pier 5G,PED,2,1029.84,ft,31,B,"pedestal top (*ELEV.), 2 from the left, row B"
+G,Pier 5G,PED,3,1029.27,ft,31,B,"pedestal top (*ELEV.), 3 from the left, row B"
+G,Pier 5G,PED,4,1028.7,ft,31,B,"pedestal top (*ELEV.), 4 from the left, row B"
+G,Pier 5G,PED,1,1030.38,ft,31,A,"pedestal top (*ELEV.), 1 from the left, row A"
+G,Pier 5G,PED,2,1029.84,ft,31,A,"pedestal top (*ELEV.), 2 from the left, row A"
+G,Pier 5G,PED,3,1029.27,ft,31,A,"pedestal top (*ELEV.), 3 from the left, row A"
+G,Pier 5G,PED,4,1028.7,ft,31,A,"pedestal top (*ELEV.), 4 from the left, row A"
+G,Pier 6G,TOP_L,1,1036.62,ft,34,,"cap top, left corner"
+G,Pier 6G,TOP_R,1,1034.55,ft,34,,"cap top, right corner"
+G,Pier 6G,TIPD_L,1,5.5,ft,34,,"vertical, top corner to beak tip, left"
+G,Pier 6G,TIPD_R,1,5.5,ft,34,,"vertical, top corner to beak tip, right"
+G,Pier 6G,TIPS_L,1,3.5,ft,34,,"beak tip to the soffit line (2'-6 / 3'-6), left"
+G,Pier 6G,TIPS_R,1,3.5,ft,34,,"beak tip to the soffit line (2'-6 / 3'-6), right"
+G,Pier 6G,DEPTH_L,1,9,ft,34,,cap depth: top line to soffit at the left kink
+G,Pier 6G,DEPTH_R,1,9,ft,34,,cap depth: top line to soffit at the right kink
+G,Pier 6G,SOFF_KINK_L,1,1026.89,ft,34,,soffit elevation at the left kink
+G,Pier 6G,SOFF_KINK_R,1,1026.24,ft,34,,soffit elevation at the right kink
+G,Pier 6G,COLH_B,1,32,ft,34,,column 1: soffit to flare elevation (Dim B / printed height above the flare)
+G,Pier 6G,DEPTH_CL,1,9.01562,ft,34,,vertical top-to-soffit at the column CL (printed 9'-0 3/16 etc.)
+G,Pier 6G,FLARE_ELEV,1,994.57,ft,34,,top of flared base (ELEV. ... (TYP.))
+G,Pier 6G,FLARE_HT,1,18,ft,34,,flared base height (flare elevation to top of footing)
+G,Pier 6G,FTG_BOT,1,970.57,ft,34,,bottom of footing
+G,Pier 6G,FTG_THK,1,6,ft,34,,footing thickness
+G,Pier 6G,OVERALL,1,65.01562,ft,34,,"overall vertical dimension, top line at the column to bottom of footing"
+G,Pier 6G,PILE_HEAD,1,1,ft,34,,"top of pile above bottom of footing (TOP OF PILE, 1'-0)"
+G,Pier 6G,PILE_LEN,1,105,ft,36,,contract length of piles (pier notes)
+G,Pier 6G,PED,1,1036.92,ft,34,,"pedestal top (*ELEV.), 1 from the left"
+G,Pier 6G,PED,2,1036.37,ft,34,,"pedestal top (*ELEV.), 2 from the left"
+G,Pier 6G,PED,3,1035.8,ft,34,,"pedestal top (*ELEV.), 3 from the left"
+G,Pier 6G,PED,4,1035.23,ft,34,,"pedestal top (*ELEV.), 4 from the left"
+G,Pier 7G,TOP_L,1,1041.92,ft,37,,"cap top, left corner"
+G,Pier 7G,TOP_R,1,1039.85,ft,37,,"cap top, right corner"
+G,Pier 7G,TIPD_L,1,5.5,ft,37,,"vertical, top corner to beak tip, left"
+G,Pier 7G,TIPD_R,1,5.5,ft,37,,"vertical, top corner to beak tip, right"
+G,Pier 7G,TIPS_L,1,3.5,ft,37,,"beak tip to the soffit line (2'-6 / 3'-6), left"
+G,Pier 7G,TIPS_R,1,3.5,ft,37,,"beak tip to the soffit line (2'-6 / 3'-6), right"
+G,Pier 7G,DEPTH_L,1,9,ft,37,,cap depth: top line to soffit at the left kink
+G,Pier 7G,DEPTH_R,1,9,ft,37,,cap depth: top line to soffit at the right kink
+G,Pier 7G,SOFF_KINK_L,1,1032.19,ft,37,,soffit elevation at the left kink
+G,Pier 7G,SOFF_KINK_R,1,1031.54,ft,37,,soffit elevation at the right kink
+G,Pier 7G,COLH_B,1,29,ft,37,,column 1: soffit to flare elevation (Dim B / printed height above the flare)
+G,Pier 7G,DEPTH_CL,1,9.01562,ft,37,,vertical top-to-soffit at the column CL (printed 9'-0 3/16 etc.)
+G,Pier 7G,FLARE_ELEV,1,1002.87,ft,37,,top of flared base (ELEV. ... (TYP.))
+G,Pier 7G,FLARE_HT,1,16,ft,37,,flared base height (flare elevation to top of footing)
+G,Pier 7G,FTG_BOT,1,978.87,ft,37,,bottom of footing
+G,Pier 7G,FTG_THK,1,8,ft,37,,footing thickness
+G,Pier 7G,OVERALL,1,62.01562,ft,37,,"overall vertical dimension, top line at the column to bottom of footing"
+G,Pier 7G,PILE_HEAD,1,1,ft,37,,"top of pile above bottom of footing (TOP OF PILE, 1'-0)"
+G,Pier 7G,PILE_LEN,1,100,ft,39,,contract length of piles (pier notes)
+G,Pier 7G,PED,1,1042.22,ft,37,,"pedestal top (*ELEV.), 1 from the left"
+G,Pier 7G,PED,2,1041.66,ft,37,,"pedestal top (*ELEV.), 2 from the left"
+G,Pier 7G,PED,3,1041.09,ft,37,,"pedestal top (*ELEV.), 3 from the left"
+G,Pier 7G,PED,4,1040.52,ft,37,,"pedestal top (*ELEV.), 4 from the left"
+G,Pier 8G,TOP_L,1,1044.04,ft,40,,"cap top, left corner"
+G,Pier 8G,TOP_R,1,1041.97,ft,40,,"cap top, right corner"
+G,Pier 8G,TIPD_L,1,5.5,ft,40,,"vertical, top corner to beak tip, left"
+G,Pier 8G,TIPD_R,1,5.5,ft,40,,"vertical, top corner to beak tip, right"
+G,Pier 8G,TIPS_L,1,3.5,ft,40,,"beak tip to the soffit line (2'-6 / 3'-6), left"
+G,Pier 8G,TIPS_R,1,3.5,ft,40,,"beak tip to the soffit line (2'-6 / 3'-6), right"
+G,Pier 8G,DEPTH_L,1,9,ft,40,,cap depth: top line to soffit at the left kink
+G,Pier 8G,DEPTH_R,1,9,ft,40,,cap depth: top line to soffit at the right kink
+G,Pier 8G,SOFF_KINK_L,1,1034.31,ft,40,,soffit elevation at the left kink
+G,Pier 8G,SOFF_KINK_R,1,1033.66,ft,40,,soffit elevation at the right kink
+G,Pier 8G,COLH_B,1,39,ft,40,,column 1: soffit to flare elevation (Dim B / printed height above the flare)
+G,Pier 8G,DEPTH_CL,1,9.01562,ft,40,,vertical top-to-soffit at the column CL (printed 9'-0 3/16 etc.)
+G,Pier 8G,FLARE_ELEV,1,994.99,ft,40,,top of flared base (ELEV. ... (TYP.))
+G,Pier 8G,FLARE_HT,1,21,ft,40,,flared base height (flare elevation to top of footing)
+G,Pier 8G,FTG_BOT,1,966.49,ft,40,,bottom of footing
+G,Pier 8G,FTG_THK,1,7.5,ft,40,,footing thickness
+G,Pier 8G,OVERALL,1,76.51562,ft,40,,"overall vertical dimension, top line at the column to bottom of footing"
+G,Pier 8G,PILE_HEAD,1,1,ft,40,,"top of pile above bottom of footing (TOP OF PILE, 1'-0)"
+G,Pier 8G,PILE_LEN,1,90,ft,42,,contract length of piles (pier notes)
+G,Pier 8G,PED,1,1044.34,ft,40,,"pedestal top (*ELEV.), 1 from the left"
+G,Pier 8G,PED,2,1043.78,ft,40,,"pedestal top (*ELEV.), 2 from the left"
+G,Pier 8G,PED,3,1043.2,ft,40,,"pedestal top (*ELEV.), 3 from the left"
+G,Pier 8G,PED,4,1042.63,ft,40,,"pedestal top (*ELEV.), 4 from the left"
+G,Pier 9G,TOP_L,1,1042.9,ft,43,,"cap top, left corner"
+G,Pier 9G,TOP_R,1,1040.83,ft,43,,"cap top, right corner"
+G,Pier 9G,TIPD_L,1,5.5,ft,43,,"vertical, top corner to beak tip, left"
+G,Pier 9G,TIPD_R,1,5.5,ft,43,,"vertical, top corner to beak tip, right"
+G,Pier 9G,TIPS_L,1,3.5,ft,43,,"beak tip to the soffit line (2'-6 / 3'-6), left"
+G,Pier 9G,TIPS_R,1,3.5,ft,43,,"beak tip to the soffit line (2'-6 / 3'-6), right"
+G,Pier 9G,DEPTH_L,1,9,ft,43,,cap depth: top line to soffit at the left kink
+G,Pier 9G,DEPTH_R,1,9,ft,43,,cap depth: top line to soffit at the right kink
+G,Pier 9G,SOFF_KINK_L,1,1033.17,ft,43,,soffit elevation at the left kink
+G,Pier 9G,SOFF_KINK_R,1,1032.52,ft,43,,soffit elevation at the right kink
+G,Pier 9G,COLH_B,1,38,ft,43,,column 1: soffit to flare elevation (Dim B / printed height above the flare)
+G,Pier 9G,DEPTH_CL,1,9.01562,ft,43,,vertical top-to-soffit at the column CL (printed 9'-0 3/16 etc.)
+G,Pier 9G,FLARE_ELEV,1,994.85,ft,43,,top of flared base (ELEV. ... (TYP.))
+G,Pier 9G,FLARE_HT,1,21,ft,43,,flared base height (flare elevation to top of footing)
+G,Pier 9G,FTG_BOT,1,967.85,ft,43,,bottom of footing
+G,Pier 9G,FTG_THK,1,6,ft,43,,footing thickness
+G,Pier 9G,OVERALL,1,74.01562,ft,43,,"overall vertical dimension, top line at the column to bottom of footing"
+G,Pier 9G,PILE_HEAD,1,1,ft,43,,"top of pile above bottom of footing (TOP OF PILE, 1'-0)"
+G,Pier 9G,PILE_LEN,1,95,ft,45,,contract length of piles (pier notes)
+G,Pier 9G,PED,1,1044.12,ft,43,B,"pedestal top (*ELEV.), 1 from the left, row B"
+G,Pier 9G,PED,2,1043.58,ft,43,B,"pedestal top (*ELEV.), 2 from the left, row B"
+G,Pier 9G,PED,3,1043.01,ft,43,B,"pedestal top (*ELEV.), 3 from the left, row B"
+G,Pier 9G,PED,4,1042.44,ft,43,B,"pedestal top (*ELEV.), 4 from the left, row B"
+G,Pier 9G,PED,1,1043.2,ft,43,A,"pedestal top (*ELEV.), 1 from the left, row A"
+G,Pier 9G,PED,2,1042.67,ft,43,A,"pedestal top (*ELEV.), 2 from the left, row A"
+G,Pier 9G,PED,3,1042.1,ft,43,A,"pedestal top (*ELEV.), 3 from the left, row A"
+G,Pier 9G,PED,4,1041.53,ft,43,A,"pedestal top (*ELEV.), 4 from the left, row A"
+G,Pier 10G,TOP_L,1,1041.86,ft,46,,"cap top, left corner"
+G,Pier 10G,TOP_R,1,1039.79,ft,46,,"cap top, right corner"
+G,Pier 10G,TIPD_L,1,5.5,ft,46,,"vertical, top corner to beak tip, left"
+G,Pier 10G,TIPD_R,1,5.5,ft,46,,"vertical, top corner to beak tip, right"
+G,Pier 10G,TIPS_L,1,3.5,ft,46,,"beak tip to the soffit line (2'-6 / 3'-6), left"
+G,Pier 10G,TIPS_R,1,3.5,ft,46,,"beak tip to the soffit line (2'-6 / 3'-6), right"
+G,Pier 10G,DEPTH_L,1,9,ft,46,,cap depth: top line to soffit at the left kink
+G,Pier 10G,DEPTH_R,1,9,ft,46,,cap depth: top line to soffit at the right kink
+G,Pier 10G,SOFF_KINK_L,1,1032.13,ft,46,,soffit elevation at the left kink
+G,Pier 10G,SOFF_KINK_R,1,1031.48,ft,46,,soffit elevation at the right kink
+G,Pier 10G,COLH_B,1,38,ft,46,,column 1: soffit to flare elevation (Dim B / printed height above the flare)
+G,Pier 10G,DEPTH_CL,1,9.01562,ft,46,,vertical top-to-soffit at the column CL (printed 9'-0 3/16 etc.)
+G,Pier 10G,FLARE_ELEV,1,993.81,ft,46,,top of flared base (ELEV. ... (TYP.))
+G,Pier 10G,FLARE_HT,1,20,ft,46,,flared base height (flare elevation to top of footing)
+G,Pier 10G,FTG_BOT,1,966.31,ft,46,,bottom of footing
+G,Pier 10G,FTG_THK,1,7.5,ft,46,,footing thickness
+G,Pier 10G,OVERALL,1,74.51562,ft,46,,"overall vertical dimension, top line at the column to bottom of footing"
+G,Pier 10G,PILE_HEAD,1,1,ft,46,,"top of pile above bottom of footing (TOP OF PILE, 1'-0)"
+G,Pier 10G,PILE_LEN,1,90,ft,48,,contract length of piles (pier notes)
+G,Pier 10G,PED,1,1042.16,ft,46,,"pedestal top (*ELEV.), 1 from the left"
+G,Pier 10G,PED,2,1041.61,ft,46,,"pedestal top (*ELEV.), 2 from the left"
+G,Pier 10G,PED,3,1041.04,ft,46,,"pedestal top (*ELEV.), 3 from the left"
+G,Pier 10G,PED,4,1040.47,ft,46,,"pedestal top (*ELEV.), 4 from the left"
+G,Pier 11G,TOP_L,1,1040.55,ft,49,,"cap top, left corner"
+G,Pier 11G,TOP_R,1,1038.48,ft,49,,"cap top, right corner"
+G,Pier 11G,TIPD_L,1,5.5,ft,49,,"vertical, top corner to beak tip, left"
+G,Pier 11G,TIPD_R,1,5.5,ft,49,,"vertical, top corner to beak tip, right"
+G,Pier 11G,TIPS_L,1,3.5,ft,49,,"beak tip to the soffit line (2'-6 / 3'-6), left"
+G,Pier 11G,TIPS_R,1,3.5,ft,49,,"beak tip to the soffit line (2'-6 / 3'-6), right"
+G,Pier 11G,DEPTH_L,1,9,ft,49,,cap depth: top line to soffit at the left kink
+G,Pier 11G,DEPTH_R,1,9,ft,49,,cap depth: top line to soffit at the right kink
+G,Pier 11G,SOFF_KINK_L,1,1030.82,ft,49,,soffit elevation at the left kink
+G,Pier 11G,SOFF_KINK_R,1,1030.17,ft,49,,soffit elevation at the right kink
+G,Pier 11G,COLH_B,1,35,ft,49,,column 1: soffit to flare elevation (Dim B / printed height above the flare)
+G,Pier 11G,DEPTH_CL,1,9.01562,ft,49,,vertical top-to-soffit at the column CL (printed 9'-0 3/16 etc.)
+G,Pier 11G,FLARE_ELEV,1,995.5,ft,49,,top of flared base (ELEV. ... (TYP.))
+G,Pier 11G,FLARE_HT,1,20,ft,49,,flared base height (flare elevation to top of footing)
+G,Pier 11G,FTG_BOT,1,968,ft,49,,bottom of footing
+G,Pier 11G,FTG_THK,1,7.5,ft,49,,footing thickness
+G,Pier 11G,OVERALL,1,71.51562,ft,49,,"overall vertical dimension, top line at the column to bottom of footing"
+G,Pier 11G,PILE_HEAD,1,1,ft,49,,"top of pile above bottom of footing (TOP OF PILE, 1'-0)"
+G,Pier 11G,PILE_LEN,1,85,ft,51,,contract length of piles (pier notes)
+G,Pier 11G,PED,1,1040.85,ft,49,,"pedestal top (*ELEV.), 1 from the left"
+G,Pier 11G,PED,2,1040.28,ft,49,,"pedestal top (*ELEV.), 2 from the left"
+G,Pier 11G,PED,3,1039.71,ft,49,,"pedestal top (*ELEV.), 3 from the left"
+G,Pier 11G,PED,4,1039.14,ft,49,,"pedestal top (*ELEV.), 4 from the left"
+G,Pier 12G,TOP_L,1,1037.37,ft,52,,"cap top, left corner"
+G,Pier 12G,TOP_R,1,1035.3,ft,52,,"cap top, right corner"
+G,Pier 12G,TIPD_L,1,5.5,ft,52,,"vertical, top corner to beak tip, left"
+G,Pier 12G,TIPD_R,1,5.5,ft,52,,"vertical, top corner to beak tip, right"
+G,Pier 12G,TIPS_L,1,3.5,ft,52,,"beak tip to the soffit line (2'-6 / 3'-6), left"
+G,Pier 12G,TIPS_R,1,3.5,ft,52,,"beak tip to the soffit line (2'-6 / 3'-6), right"
+G,Pier 12G,DEPTH_L,1,9,ft,52,,cap depth: top line to soffit at the left kink
+G,Pier 12G,DEPTH_R,1,9,ft,52,,cap depth: top line to soffit at the right kink
+G,Pier 12G,SOFF_KINK_L,1,1027.64,ft,52,,soffit elevation at the left kink
+G,Pier 12G,SOFF_KINK_R,1,1026.99,ft,52,,soffit elevation at the right kink
+G,Pier 12G,COLH_B,1,35,ft,52,,column 1: soffit to flare elevation (Dim B / printed height above the flare)
+G,Pier 12G,DEPTH_CL,1,9.01562,ft,52,,vertical top-to-soffit at the column CL (printed 9'-0 3/16 etc.)
+G,Pier 12G,FLARE_ELEV,1,992.32,ft,52,,top of flared base (ELEV. ... (TYP.))
+G,Pier 12G,FLARE_HT,1,23,ft,52,,flared base height (flare elevation to top of footing)
+G,Pier 12G,FTG_BOT,1,961.82,ft,52,,bottom of footing
+G,Pier 12G,FTG_THK,1,7.5,ft,52,,footing thickness
+G,Pier 12G,OVERALL,1,74.51562,ft,52,,"overall vertical dimension, top line at the column to bottom of footing"
+G,Pier 12G,PILE_HEAD,1,1,ft,52,,"top of pile above bottom of footing (TOP OF PILE, 1'-0)"
+G,Pier 12G,PILE_LEN,1,60,ft,54,,contract length of piles (pier notes)
+G,Pier 12G,PED,1,1037.67,ft,52,,"pedestal top (*ELEV.), 1 from the left"
+G,Pier 12G,PED,2,1037.11,ft,52,,"pedestal top (*ELEV.), 2 from the left"
+G,Pier 12G,PED,3,1036.54,ft,52,,"pedestal top (*ELEV.), 3 from the left"
+G,Pier 12G,PED,4,1035.97,ft,52,,"pedestal top (*ELEV.), 4 from the left"
+G,Pier 13G,TOP_L,1,1032.13,ft,55,,"cap top, left corner"
+G,Pier 13G,TOP_R,1,1030.06,ft,55,,"cap top, right corner"
+G,Pier 13G,TIPD_L,1,5.5,ft,55,,"vertical, top corner to beak tip, left"
+G,Pier 13G,TIPD_R,1,5.5,ft,55,,"vertical, top corner to beak tip, right"
+G,Pier 13G,TIPS_L,1,3.5,ft,55,,"beak tip to the soffit line (2'-6 / 3'-6), left"
+G,Pier 13G,TIPS_R,1,3.5,ft,55,,"beak tip to the soffit line (2'-6 / 3'-6), right"
+G,Pier 13G,DEPTH_L,1,9,ft,55,,cap depth: top line to soffit at the left kink
+G,Pier 13G,DEPTH_R,1,9,ft,55,,cap depth: top line to soffit at the right kink
+G,Pier 13G,SOFF_KINK_L,1,1022.4,ft,55,,soffit elevation at the left kink
+G,Pier 13G,SOFF_KINK_R,1,1021.75,ft,55,,soffit elevation at the right kink
+G,Pier 13G,COLH_B,1,31,ft,55,,column 1: soffit to flare elevation (Dim B / printed height above the flare)
+G,Pier 13G,DEPTH_CL,1,9.01562,ft,55,,vertical top-to-soffit at the column CL (printed 9'-0 3/16 etc.)
+G,Pier 13G,FLARE_ELEV,1,991.08,ft,55,,top of flared base (ELEV. ... (TYP.))
+G,Pier 13G,FLARE_HT,1,17,ft,55,,flared base height (flare elevation to top of footing)
+G,Pier 13G,FTG_BOT,1,968.08,ft,55,,bottom of footing
+G,Pier 13G,FTG_THK,1,6,ft,55,,footing thickness
+G,Pier 13G,OVERALL,1,63.01562,ft,55,,"overall vertical dimension, top line at the column to bottom of footing"
+G,Pier 13G,PILE_HEAD,1,1,ft,55,,"top of pile above bottom of footing (TOP OF PILE, 1'-0)"
+G,Pier 13G,PILE_LEN,1,60,ft,57,,contract length of piles (pier notes)
+G,Pier 13G,PED,1,1032.43,ft,55,,"pedestal top (*ELEV.), 1 from the left"
+G,Pier 13G,PED,2,1031.86,ft,55,,"pedestal top (*ELEV.), 2 from the left"
+G,Pier 13G,PED,3,1031.29,ft,55,,"pedestal top (*ELEV.), 3 from the left"
+G,Pier 13G,PED,4,1030.72,ft,55,,"pedestal top (*ELEV.), 4 from the left"
+G,Pier 14G,TOP_L,1,1027.95,ft,58,,"cap top, left corner"
+G,Pier 14G,TOP_R,1,1025.88,ft,58,,"cap top, right corner"
+G,Pier 14G,TIPD_L,1,5.5,ft,58,,"vertical, top corner to beak tip, left"
+G,Pier 14G,TIPD_R,1,5.5,ft,58,,"vertical, top corner to beak tip, right"
+G,Pier 14G,TIPS_L,1,3.5,ft,58,,"beak tip to the soffit line (2'-6 / 3'-6), left"
+G,Pier 14G,TIPS_R,1,3.5,ft,58,,"beak tip to the soffit line (2'-6 / 3'-6), right"
+G,Pier 14G,DEPTH_L,1,9,ft,58,,cap depth: top line to soffit at the left kink
+G,Pier 14G,DEPTH_R,1,9,ft,58,,cap depth: top line to soffit at the right kink
+G,Pier 14G,SOFF_KINK_L,1,1018.22,ft,58,,soffit elevation at the left kink
+G,Pier 14G,SOFF_KINK_R,1,1017.57,ft,58,,soffit elevation at the right kink
+G,Pier 14G,COLH_B,1,29,ft,58,,column 1: soffit to flare elevation (Dim B / printed height above the flare)
+G,Pier 14G,DEPTH_CL,1,9.01562,ft,58,,vertical top-to-soffit at the column CL (printed 9'-0 3/16 etc.)
+G,Pier 14G,FLARE_ELEV,1,988.9,ft,58,,top of flared base (ELEV. ... (TYP.))
+G,Pier 14G,FLARE_HT,1,16,ft,58,,flared base height (flare elevation to top of footing)
+G,Pier 14G,FTG_BOT,1,966.9,ft,58,,bottom of footing
+G,Pier 14G,FTG_THK,1,6,ft,58,,footing thickness
+G,Pier 14G,OVERALL,1,60.01562,ft,58,,"overall vertical dimension, top line at the column to bottom of footing"
+G,Pier 14G,PILE_HEAD,1,1,ft,58,,"top of pile above bottom of footing (TOP OF PILE, 1'-0)"
+G,Pier 14G,PILE_LEN,1,65,ft,60,,contract length of piles (pier notes)
+G,Pier 14G,PED,1,1028.25,ft,58,B,"pedestal top (*ELEV.), 1 from the left, row B"
+G,Pier 14G,PED,2,1027.7,ft,58,B,"pedestal top (*ELEV.), 2 from the left, row B"
+G,Pier 14G,PED,3,1027.13,ft,58,B,"pedestal top (*ELEV.), 3 from the left, row B"
+G,Pier 14G,PED,4,1026.56,ft,58,B,"pedestal top (*ELEV.), 4 from the left, row B"
+G,Pier 14G,PED,1,1028.25,ft,58,A,"pedestal top (*ELEV.), 1 from the left, row A"
+G,Pier 14G,PED,2,1027.7,ft,58,A,"pedestal top (*ELEV.), 2 from the left, row A"
+G,Pier 14G,PED,3,1027.13,ft,58,A,"pedestal top (*ELEV.), 3 from the left, row A"
+G,Pier 14G,PED,4,1026.56,ft,58,A,"pedestal top (*ELEV.), 4 from the left, row A"
+G,Pier 15G,TOP_L,1,1023.95,ft,61,,"cap top, left corner"
+G,Pier 15G,TOP_R,1,1022.41,ft,61,,"cap top, right corner"
+G,Pier 15G,TIPD_L,1,5.5,ft,61,,"vertical, top corner to beak tip, left"
+G,Pier 15G,TIPD_R,1,5.5,ft,61,,"vertical, top corner to beak tip, right"
+G,Pier 15G,TIPS_L,1,3.5,ft,61,,"beak tip to the soffit line (2'-6 / 3'-6), left"
+G,Pier 15G,TIPS_R,1,3.5,ft,61,,"beak tip to the soffit line (2'-6 / 3'-6), right"
+G,Pier 15G,DEPTH_L,1,9,ft,61,,cap depth: top line to soffit at the left kink
+G,Pier 15G,DEPTH_R,1,9,ft,61,,cap depth: top line to soffit at the right kink
+G,Pier 15G,SOFF_KINK_L,1,1014.41,ft,61,,soffit elevation at the left kink
+G,Pier 15G,SOFF_KINK_R,1,1013.93,ft,61,,soffit elevation at the right kink
+G,Pier 15G,COLH_B,1,24,ft,61,,column 1: soffit to flare elevation (Dim B / printed height above the flare)
+G,Pier 15G,DEPTH_CL,1,9.01042,ft,61,,vertical top-to-soffit at the column CL (printed 9'-0 3/16 etc.)
+G,Pier 15G,FLARE_ELEV,1,990.17,ft,61,,top of flared base (ELEV. ... (TYP.))
+G,Pier 15G,FLARE_HT,1,14,ft,61,,flared base height (flare elevation to top of footing)
+G,Pier 15G,FTG_BOT,1,970.17,ft,61,,bottom of footing
+G,Pier 15G,FTG_THK,1,6,ft,61,,footing thickness
+G,Pier 15G,OVERALL,1,53.01042,ft,61,,"overall vertical dimension, top line at the column to bottom of footing"
+G,Pier 15G,PILE_HEAD,1,1,ft,61,,"top of pile above bottom of footing (TOP OF PILE, 1'-0)"
+G,Pier 15G,PILE_LEN,1,65,ft,63,,contract length of piles (pier notes)
+G,Pier 15G,PED,1,1024.26,ft,61,,"pedestal top (*ELEV.), 1 from the left"
+G,Pier 15G,PED,2,1023.84,ft,61,,"pedestal top (*ELEV.), 2 from the left"
+G,Pier 15G,PED,3,1023.41,ft,61,,"pedestal top (*ELEV.), 3 from the left"
+G,Pier 15G,PED,4,1022.99,ft,61,,"pedestal top (*ELEV.), 4 from the left"
+G,Pier 16G,TOP_L,1,1018.98,ft,64,,"cap top, left corner"
+G,Pier 16G,TOP_R,1,1018.98,ft,64,,"cap top, right corner"
+G,Pier 16G,TIPD_L,1,4.5,ft,64,,"vertical, top corner to beak tip, left"
+G,Pier 16G,TIPD_R,1,4.5,ft,64,,"vertical, top corner to beak tip, right"
+G,Pier 16G,TIPS_L,1,2.5,ft,64,,"beak tip to the soffit line (2'-6 / 3'-6), left"
+G,Pier 16G,TIPS_R,1,2.5,ft,64,,"beak tip to the soffit line (2'-6 / 3'-6), right"
+G,Pier 16G,DEPTH_L,1,7,ft,64,,cap depth: top line to soffit at the left kink
+G,Pier 16G,DEPTH_R,1,7,ft,64,,cap depth: top line to soffit at the right kink
+G,Pier 16G,COLH_A,1,29,ft,64,,column 1: soffit to top of footing (Dim A / printed column height)
+G,Pier 16G,COLH_A,2,29,ft,64,,column 2: soffit to top of footing (Dim A / printed column height)
+G,Pier 16G,FTG_BOT,1,977.48,ft,64,,bottom of footing
+G,Pier 16G,FTG_THK,1,5.5,ft,64,,footing thickness
+G,Pier 16G,OVERALL,1,41.5,ft,64,,"overall vertical dimension, top line at the column to bottom of footing"
+G,Pier 16G,PILE_HEAD,1,1,ft,64,,"top of pile above bottom of footing (TOP OF PILE, 1'-0)"
+G,Pier 16G,PILE_LEN,1,70,ft,67,,contract length of piles (pier notes)
+G,Pier 16G,PED,1,1019.46,ft,64,,"pedestal top (*ELEV.), 1 from the left"
+G,Pier 16G,PED,2,1019.34,ft,64,,"pedestal top (*ELEV.), 2 from the left"
+G,Pier 16G,PED,3,1019.31,ft,64,,"pedestal top (*ELEV.), 3 from the left"
+G,Pier 16G,PED,4,1019.38,ft,64,,"pedestal top (*ELEV.), 4 from the left"
+G,Pier 16G,PEDH,1,5.8125,in,64,,"printed pedestal height, 1 from the left"
+G,Pier 16G,PEDH,2,4.375,in,64,,"printed pedestal height, 2 from the left"
+G,Pier 16G,PEDH,3,4,in,64,,"printed pedestal height, 3 from the left"
+G,Pier 16G,PEDH,4,4.8125,in,64,,"printed pedestal height, 4 from the left"
+G,Pier 17G,TOP_L,1,1012.75,ft,68,,"cap top, left corner"
+G,Pier 17G,TOP_R,1,1014.08,ft,68,,"cap top, right corner"
+G,Pier 17G,TIPD_L,1,4.5,ft,68,,"vertical, top corner to beak tip, left"
+G,Pier 17G,TIPD_R,1,4.5,ft,68,,"vertical, top corner to beak tip, right"
+G,Pier 17G,TIPS_L,1,2.5,ft,68,,"beak tip to the soffit line (2'-6 / 3'-6), left"
+G,Pier 17G,TIPS_R,1,2.5,ft,68,,"beak tip to the soffit line (2'-6 / 3'-6), right"
+G,Pier 17G,DEPTH_L,1,7,ft,68,,cap depth: top line to soffit at the left kink
+G,Pier 17G,DEPTH_R,1,7,ft,68,,cap depth: top line to soffit at the right kink
+G,Pier 17G,SOFF_COL,1,1006.06,ft,68,,soffit elevation at column 1
+G,Pier 17G,SOFF_COL,2,1006.76,ft,68,,soffit elevation at column 2
+G,Pier 17G,COLH_A,1,24,ft,68,,column 1: soffit to top of footing (Dim A / printed column height)
+G,Pier 17G,COLH_A,2,24.70312,ft,68,,column 2: soffit to top of footing (Dim A / printed column height)
+G,Pier 17G,FTG_BOT,1,976.56,ft,68,,bottom of footing
+G,Pier 17G,FTG_THK,1,5.5,ft,68,,footing thickness
+G,Pier 17G,PILE_HEAD,1,1,ft,68,,"top of pile above bottom of footing (TOP OF PILE, 1'-0)"
+G,Pier 17G,PILE_LEN,1,70,ft,71,,contract length of piles (pier notes)
+G,Pier 17G,PED,1,1013.28,ft,68,,"pedestal top (*ELEV.), 1 from the left"
+G,Pier 17G,PED,2,1013.64,ft,68,,"pedestal top (*ELEV.), 2 from the left"
+G,Pier 17G,PED,3,1014.01,ft,68,,"pedestal top (*ELEV.), 3 from the left"
+G,Pier 17G,PED,4,1014.38,ft,68,,"pedestal top (*ELEV.), 4 from the left"
+G,Pier 18G,TOP_L,1,1009.93,ft,72,,"cap top, left corner"
+G,Pier 18G,TOP_R,1,1012,ft,72,,"cap top, right corner"
+G,Pier 18G,TIPD_L,1,5.5,ft,72,,"vertical, top corner to beak tip, left"
+G,Pier 18G,TIPD_R,1,5.5,ft,72,,"vertical, top corner to beak tip, right"
+G,Pier 18G,TIPS_L,1,3.5,ft,72,,"beak tip to the soffit line (2'-6 / 3'-6), left"
+G,Pier 18G,TIPS_R,1,3.5,ft,72,,"beak tip to the soffit line (2'-6 / 3'-6), right"
+G,Pier 18G,DEPTH_L,1,9,ft,72,,cap depth: top line to soffit at the left kink
+G,Pier 18G,DEPTH_R,1,9,ft,72,,cap depth: top line to soffit at the right kink
+G,Pier 18G,SOFF_KINK_L,1,1001.62,ft,72,,soffit elevation at the left kink
+G,Pier 18G,SOFF_KINK_R,1,1002.27,ft,72,,soffit elevation at the right kink
+G,Pier 18G,COLH_A,1,22,ft,72,,column 1: soffit to top of footing (Dim A / printed column height)
+G,Pier 18G,DEPTH_CL,1,9.01562,ft,72,,vertical top-to-soffit at the column CL (printed 9'-0 3/16 etc.)
+G,Pier 18G,FTG_BOT,1,972.95,ft,72,,bottom of footing
+G,Pier 18G,FTG_THK,1,7,ft,72,,footing thickness
+G,Pier 18G,OVERALL,1,38.01562,ft,72,,"overall vertical dimension, top line at the column to bottom of footing"
+G,Pier 18G,PILE_HEAD,1,1,ft,72,,"top of pile above bottom of footing (TOP OF PILE, 1'-0)"
+G,Pier 18G,PILE_LEN,1,70,ft,74,,contract length of piles (pier notes)
+G,Pier 18G,PED,1,1010.59,ft,72,,"pedestal top (*ELEV.), 1 from the left"
+G,Pier 18G,PED,2,1011.16,ft,72,,"pedestal top (*ELEV.), 2 from the left"
+G,Pier 18G,PED,3,1011.73,ft,72,,"pedestal top (*ELEV.), 3 from the left"
+G,Pier 18G,PED,4,1012.3,ft,72,,"pedestal top (*ELEV.), 4 from the left"
+G,Pier 19G,TOP_L,1,1009.61,ft,75,,"cap top, left corner"
+G,Pier 19G,TOP_R,1,1011.56,ft,75,,"cap top, right corner"
+G,Pier 19G,TOPA_L,1,1010.81,ft,75,,"cap top, left corner (ahead half, model CapOutlineAhead)"
+G,Pier 19G,TOPA_R,1,1012.77,ft,75,,"cap top, right corner (ahead half)"
+G,Pier 19G,TIPD_L,1,5.5,ft,75,,"vertical, top corner to beak tip, left"
+G,Pier 19G,TIPD_R,1,5.5,ft,75,,"vertical, top corner to beak tip, right"
+G,Pier 19G,TIPS_L,1,3.5,ft,75,,"beak tip to the soffit line (2'-6 / 3'-6), left"
+G,Pier 19G,TIPS_R,1,3.5,ft,75,,"beak tip to the soffit line (2'-6 / 3'-6), right"
+G,Pier 19G,DEPTH_L,1,9,ft,75,,cap depth: top line to soffit at the left kink
+G,Pier 19G,DEPTH_R,1,9,ft,75,,cap depth: top line to soffit at the right kink
+G,Pier 19G,SOFF_KINK_L,1,1001.36,ft,75,,soffit elevation at the left kink
+G,Pier 19G,SOFF_KINK_R,1,1001.89,ft,75,,soffit elevation at the right kink
+G,Pier 19G,COLH_A,1,24,ft,75,,column 1: soffit to top of footing (Dim A / printed column height)
+G,Pier 19G,DEPTH_CL,1,9.01042,ft,75,,vertical top-to-soffit at the column CL (printed 9'-0 3/16 etc.)
+G,Pier 19G,FTG_BOT,1,972.62,ft,75,,bottom of footing
+G,Pier 19G,FTG_THK,1,5,ft,75,,footing thickness
+G,Pier 19G,OVERALL,1,38.01042,ft,75,,"overall vertical dimension, top line at the column to bottom of footing"
+G,Pier 19G,PILE_HEAD,1,1,ft,75,,"top of pile above bottom of footing (TOP OF PILE, 1'-0)"
+G,Pier 19G,PILE_LEN,1,70,ft,77,,contract length of piles (pier notes)
+G,Pier 19G,PED,1,1010.2,ft,75,B,"pedestal top (*ELEV.), 1 from the left, row B"
+G,Pier 19G,PED,2,1010.76,ft,75,B,"pedestal top (*ELEV.), 2 from the left, row B"
+G,Pier 19G,PED,3,1011.32,ft,75,B,"pedestal top (*ELEV.), 3 from the left, row B"
+G,Pier 19G,PED,4,1011.88,ft,75,B,"pedestal top (*ELEV.), 4 from the left, row B"
+G,Pier 19G,PED,1,1011.5,ft,75,A,"pedestal top (*ELEV.), 1 from the left, row A"
+G,Pier 19G,PED,2,1012.24,ft,75,A,"pedestal top (*ELEV.), 2 from the left, row A"
+G,Pier 19G,PED,3,1012.94,ft,75,A,"pedestal top (*ELEV.), 3 from the left, row A"
+I80,Pier 6A,NA,1,1012,ft,39,,"pedestal top, Ramp A2 bridge row (not part of this design), 1 from the left: no model equivalent"
+I80,Pier 6A,NA,2,1012.4,ft,39,,"pedestal top, Ramp A2 bridge row (not part of this design), 2 from the left: no model equivalent"
+I80,Pier 6A,NA,3,1012.8,ft,39,,"pedestal top, Ramp A2 bridge row (not part of this design), 3 from the left: no model equivalent"
+I80,Pier 6A,NA,4,1013.2,ft,39,,"pedestal top, Ramp A2 bridge row (not part of this design), 4 from the left: no model equivalent"
+I80,Pier 6A,NA,5,1013.6,ft,39,,"pedestal top, Ramp A2 bridge row (not part of this design), 5 from the left: no model equivalent"
+I80,Pier 6WB,NA,6,3,ft,45,,"concrete seal coat thickness under the footings (excavate and dewater notes, 'if used', water elev. 975): not modeled"
+I80,West Abut,ABUT_FTG_BOT,1,992.82,ft,85,,"bottom of footing, level (rear elevation, girder A end)"
+I80,West Abut,ABUT_FTG_BOT,2,992.82,ft,85,,"bottom of footing, level (girder F end)"
+I80,West Abut,ABUT_FTG_DEPTH,1,4,ft,86,,"footing depth (section through abutment, 4'-0)"
+I80,West Abut,ABUT_WASH_DEPTH,1,4.08333,ft,86,,"footing bottom to the wash (seat base) surface, 4'-1"
+I80,West Abut,ABUT_BW_TOP,1,1008.15,ft,86,,top of backwall at CL abutment bearing (crown line)
+I80,West Abut,ABUT_PILE_LEN,1,125,ft,86,,contract length of the abutment piles (notes)
+I80,West Abut,ABUT_PILE_HEAD,1,2,ft,86,,top of piles above bottom of footing (2'-0)
+I80,West Abut,ABUT_PED,1,997.15,ft,85,,"beam step top (*ELEV.), girder A"
+I80,West Abut,ABUT_PED,2,997.51,ft,85,,"beam step top (*ELEV.), girder B"
+I80,West Abut,ABUT_PED,3,997.87,ft,85,,"beam step top (*ELEV.), girder C"
+I80,West Abut,ABUT_PED,4,997.78,ft,85,,"beam step top (*ELEV.), girder D"
+I80,West Abut,ABUT_PED,5,997.62,ft,85,,"beam step top (*ELEV.), girder E"
+I80,West Abut,ABUT_PED,6,997.45,ft,85,,"beam step top (*ELEV.), girder F"
+I80,West Abut,NA,1,996.65,ft,85,,bottom of backwall (rear elevation): no model equivalent
+I80,West Abut,NA,2,3.83333,ft,86,,"footing bottom to bottom of backwall, 3'-10: no model equivalent"
+I80,West Abut,NA,3,1007.65,ft,85,,top of backwall extension (girder F end): no model equivalent
+I80,West Abut,NA,4,1007.32,ft,87,,wing A-A top at the backwall (girder A end): no model equivalent
+I80,West Abut,NA,5,1006.97,ft,87,,wing A-A top at the free end: no model equivalent
+I80,West Abut,NA,6,1007.65,ft,87,,wing K-K top at the backwall (girder F end): no model equivalent
+I80,West Abut,NA,7,1007.3,ft,87,,wing K-K top at the free end: no model equivalent
+I80,West Abut,NA,8,993.82,ft,87,,wing A-A bottom at the backwall: no model equivalent
+I80,West Abut,NA,9,994.17,ft,87,,wing K-K bottom at the backwall: no model equivalent
+I80,West Abut,NA,10,996.68,ft,87,,"wing footing top, A-A No.1: no model equivalent"
+I80,West Abut,NA,11,1000.27,ft,87,,"wing footing top, A-A No.2: no model equivalent"
+I80,West Abut,NA,12,997.41,ft,87,,"wing footing top, K-K No.1: no model equivalent"
+I80,West Abut,NA,13,1000.78,ft,87,,"wing footing top, K-K No.2: no model equivalent"
+I80,East Abut,ABUT_FTG_BOT,1,1003.44,ft,89,,"bottom of footing, girder A end (sloped footing)"
+I80,East Abut,ABUT_FTG_BOT,2,1008.27,ft,89,,"bottom of footing, girder J end"
+I80,East Abut,ABUT_FTG_DEPTH,1,4,ft,89,,"footing depth (section through abutment, 4'-0)"
+I80,East Abut,ABUT_WASH_DEPTH,1,4.08333,ft,89,,"footing bottom to the wash (seat base) surface, 4'-1"
+I80,East Abut,ABUT_BW_TOP,1,1018.71,ft,89,,top of backwall at CL abutment bearing (crown line)
+I80,East Abut,ABUT_PILE_LEN,1,115,ft,90,,contract length of the abutment piles (notes)
+I80,East Abut,ABUT_PILE_HEAD,1,2,ft,89,,top of piles above bottom of footing (2'-0)
+I80,East Abut,ABUT_PED,1,1008.2,ft,89,,"beam step top (*ELEV.), girder A"
+I80,East Abut,ABUT_PED,2,1008.54,ft,89,,"beam step top (*ELEV.), girder D"
+I80,East Abut,ABUT_PED,3,1009.22,ft,89,,"beam step top (*ELEV.), girder E"
+I80,East Abut,ABUT_PED,4,1009.89,ft,89,,"beam step top (*ELEV.), girder F"
+I80,East Abut,ABUT_PED,5,1010.57,ft,89,,"beam step top (*ELEV.), girder G"
+I80,East Abut,ABUT_PED,6,1011.23,ft,89,,"beam step top (*ELEV.), girder H"
+I80,East Abut,ABUT_PED,7,1011.91,ft,89,,"beam step top (*ELEV.), girder I"
+I80,East Abut,ABUT_PED,8,1012.58,ft,89,,"beam step top (*ELEV.), girder J"
+I80,East Abut,NA,1,1008.46,ft,89,,bottom of backwall extension (girder J end): no model equivalent
+I80,East Abut,NA,2,1021.09,ft,89,,top of backwall extension (girder J end): no model equivalent
+I80,East Abut,NA,3,1020.8,ft,91,,wing K-K (J end) top at the backwall: no model equivalent
+I80,East Abut,NA,4,1020.67,ft,91,,wing K-K top at the free end: no model equivalent
+I80,East Abut,NA,5,1016.24,ft,91,,wing A-A (A end) top at the backwall: no model equivalent
+I80,East Abut,NA,6,1016.11,ft,91,,wing A-A top at the free end: no model equivalent
+I80,East Abut,NA,7,1008.8,ft,91,,wing K-K bottom at the backwall: no model equivalent
+I80,East Abut,NA,8,1004.24,ft,91,,wing A-A bottom at the backwall: no model equivalent
+I80,East Abut,NA,9,1010.78,ft,91,,"wing footing top, K-K No.1: no model equivalent"
+I80,East Abut,NA,10,1014.15,ft,91,,"wing footing top, K-K No.2: no model equivalent"
+I80,East Abut,NA,11,1006.29,ft,91,,"wing footing top, A-A No.1: no model equivalent"
+I80,East Abut,NA,12,1009.61,ft,91,,"wing footing top, A-A No.2: no model equivalent"
+G,South Abut,ABUT_FTG_BOT,1,991.18,ft,80,,"bottom of footing, level (girder A end)"
+G,South Abut,ABUT_FTG_BOT,2,991.18,ft,80,,"bottom of footing, level (girder D end)"
+G,South Abut,ABUT_FTG_DEPTH,1,4,ft,80,,"footing depth (section through abutment, 4'-0)"
+G,South Abut,ABUT_WASH_DEPTH,1,4.08333,ft,80,,"footing bottom to the wash (seat base) surface, 4'-1"
+G,South Abut,ABUT_BW_TOP,1,1004.22,ft,80,,top of backwall at CL Ramp G
+G,South Abut,ABUT_PILE_LEN,1,125,ft,81,,contract length of the abutment piles (notes)
+G,South Abut,ABUT_PILE_HEAD,1,2,ft,80,,top of piles above bottom of footing (2'-0)
+G,South Abut,ABUT_PED,1,995.51,ft,80,,"beam step top (*ELEV.), girder A"
+G,South Abut,ABUT_PED,2,995.71,ft,80,,"beam step top (*ELEV.), girder B"
+G,South Abut,ABUT_PED,3,995.9,ft,80,,"beam step top (*ELEV.), girder C"
+G,South Abut,ABUT_PED,4,996.09,ft,80,,"beam step top (*ELEV.), girder D"
+G,South Abut,NA,1,995.01,ft,80,,bottom of backwall (rear elevation): no model equivalent
+G,South Abut,NA,2,3.83333,ft,80,,"footing bottom to bottom of backwall, 3'-10: no model equivalent"
+G,South Abut,NA,3,1003.98,ft,82,,wing A-A top at the backwall: no model equivalent
+G,South Abut,NA,4,1003.08,ft,82,,wing A-A top at the free end: no model equivalent
+G,South Abut,NA,5,1004.66,ft,82,,wing B-B top at the backwall: no model equivalent
+G,South Abut,NA,6,1003.74,ft,82,,wing B-B top at the free end: no model equivalent
+G,South Abut,NA,7,991.98,ft,82,,wing A-A bottom at the backwall: no model equivalent
+G,South Abut,NA,8,992.66,ft,82,,wing B-B bottom at the backwall: no model equivalent
+G,South Abut,NA,9,994,ft,82,,"wing footing top, A-A No.1: no model equivalent"
+G,South Abut,NA,10,996.54,ft,82,,"wing footing top, A-A No.2: no model equivalent"
+G,South Abut,NA,11,994.68,ft,82,,"wing footing top, B-B No.1: no model equivalent"
+G,South Abut,NA,12,997.21,ft,82,,"wing footing top, B-B No.2: no model equivalent"
