@@ -41,12 +41,12 @@ public static class CompanionDatabase
         return dir == null || !Directory.Exists(dir) ? null : Directory.EnumerateFiles(dir, "sheet-links*.json").OrderBy(f => f).FirstOrDefault();
     }
 
-    public static string? FindScript()
+    public static string? FindScript(string name = "plan_split.py")
     {
         foreach (var start in new[] { AppContext.BaseDirectory, Directory.GetCurrentDirectory() })
             for (var d = new DirectoryInfo(start); d != null; d = d.Parent)
             {
-                string f = Path.Combine(d.FullName, "tools", "plan_split.py");
+                string f = Path.Combine(d.FullName, "tools", name);
                 if (File.Exists(f)) return f;
             }
         return null;

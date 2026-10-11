@@ -25,6 +25,7 @@ public sealed class Sheet
 {
     public required string Title { get; init; }
     public required string Number { get; set; }
+    public string Subtitle { get; init; } = "";
     public required PlanDrawing Drawing { get; init; }
     public double WidthIn { get; init; }
     public double HeightIn { get; init; }
@@ -56,7 +57,7 @@ public static class SheetComposer
     public static Sheet Compose(SheetSpec spec, SheetFormat fmt, UnitSystem u)
     {
         var dwg = new PlanDrawing();
-        var sheet = new Sheet { Title = spec.Title, Number = "", Drawing = dwg, WidthIn = fmt.WidthIn, HeightIn = fmt.HeightIn };
+        var sheet = new Sheet { Title = spec.Title, Subtitle = spec.Subtitle, Number = "", Drawing = dwg, WidthIn = fmt.WidthIn, HeightIn = fmt.HeightIn };
         var (ax0, ay0, ax1, ay1) = fmt.Area;
         foreach (var panel in spec.Panels)
         {
@@ -83,6 +84,7 @@ public static class SheetComposer
                     if (ratio < bestRatio - 0.02) { bestRatio = ratio; view = v; scale = s; }
                 }
             }
+            if (!panel.View.PaperSpace && !view!.PaperSpace) LabelPlacer.Resolve(view.Drawing);
             var ext = view!.Drawing.Extents();
             if (ext.IsEmpty) continue;
             double k = 1 / scale; // model meters → paper meters
@@ -153,6 +155,7 @@ public static class SheetComposer
         T("SCALES", SheetFormat.Left + 0.12, y1 - 0.15, 0.08);
         var notes = sheet.ScaleNotes.Distinct().Take(5).ToList();
         for (int i = 0; i < notes.Count; i++) T(notes[i], SheetFormat.Left + 0.12, y1 - 0.33 - i * 0.14, 0.08);
-        T("GEOMETRY FROM THE PARAMETRIC MODEL. NOT FOR CONSTRUCTION UNLESS SEALED.", SheetFormat.Left + 0.12, y0 + 0.1, 0.055);
+        T("GEOMETRY FROM THE PARAMETRIC MODEL.", SheetFormat.Left + 0.12, y0 + 0.2, 0.055);
+        T("NOT FOR CONSTRUCTION UNLESS SEALED.", SheetFormat.Left + 0.12, y0 + 0.1, 0.055);
     }
 }

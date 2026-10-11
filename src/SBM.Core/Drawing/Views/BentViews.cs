@@ -90,8 +90,9 @@ public static class BentViews
                 double bw = def.BearingsAt(sl.Index).Footprint(def.SupportAt(sl.Index).FixityOf(p.Girder)).Width / 2;
                 d.Rect(SheetLayers.Bearing, p.S - bw, p.SeatZ, p.S + bw, br.BottomOfSteelElevation);
             }
-            d.Leader(new Vec2(p.S, p.SeatZ), new Vec2(p.S + d.Paper(0.25), p.SeatZ - d.Paper(0.55) - (p.Girder % 2) * d.Paper(0.25)),
-                $"G{p.Girder + 1} SEAT {d.Elev(p.SeatZ)}, PED {d.Short(p.Height)}");
+            if (unit.Pedestals.Count <= 2)
+                d.Leader(new Vec2(p.S, p.SeatZ), new Vec2(p.S + d.Paper(0.25), p.SeatZ - d.Paper(0.55) - (p.Girder % 2) * d.Paper(0.25)),
+                    $"G{p.Girder + 1} SEAT {d.Elev(p.SeatZ)}, PED {d.Short(p.Height)}");
         }
 
         // ---- cap (and backwall)
@@ -260,6 +261,15 @@ public static class BentViews
 
         // ---- Section A-A through the cap (to the right)
         CapSection(d, ctx, unit, box.MaxX + d.Paper(2.0), marks);
+        // Many bearings: the seat elevations are listed in a table beside the section instead of a leader per bearing.
+        if (unit.Pedestals.Count > 2)
+        {
+            double tx = box.MaxX + d.Paper(1.0), ty = unit.CapBottomAt((unit.CapS0 + unit.CapS1) / 2) - d.Paper(2.6);
+            d.Text("BEARING SEAT ELEVATIONS", new Vec2(tx, ty), d.TextH * 1.1, 0, TextAlign.Left, SheetLayers.Title);
+            int row = 1;
+            foreach (var p in unit.Pedestals.OrderBy(p => p.Girder).ThenBy(p => p.S))
+                d.Text($"G{p.Girder + 1}: SEAT EL {d.Elev(p.SeatZ)}, PEDESTAL {d.Short(p.Height)}", new Vec2(tx, ty - row++ * d.TextH * 1.6), d.SmallTextH, 0, TextAlign.Left);
+        }
         return new SheetView($"{unit.Name} elevation and cap section", unit.Name.Replace(" ", ""), dwg, d.Scale,
             $"{kind.ToLowerInvariant()} elevation along the support line with pedestals, columns, foundations and reinforcing; Section A–A through the cap.");
     }

@@ -126,6 +126,14 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
     detailer â€” keep it in sync when changing CrossFrameDetailer), `BearingViews` (anchor bolts from `BoltKind.Anchor`
     instances; 3D clearance checks vs cap bars). `SBM.IO.Pdf.PdfWriter` = minimal vector PDF (Helvetica, print colors via
     `PrintStyle`, also used by the app's paper preview).
+  - Sheets (2026-10 additions): `Views/LabelPlacer` = generic label collision avoidance run on every non-table view (SheetComposer per panel, DrawingSet);
+    dimension texts are placed first, other texts move perpendicular to their baseline / along it to the nearest free spot with a leader; title and grid texts are fixed; paper-space
+    table views (bar lists, notes, data tables) are skipped. `PlanDrawing.Extents` uses `LabelPlacer.WidthInHeights` (Helvetica widths). New views: `FramingViews` (steel framing plan,
+    developed, spans grouped by `SpanGroups`), `SpliceViews` (distinct splice types from the generated FS assemblies: plate silhouettes + bolt positions in the girder frame, schedule),
+    `CrossGirderViews` (front-face outlines of the generated XG parts), `PierViews` (cap plan with pedestals/columns/column heights, footing + pile layout in S/N), `TableViews` (paged
+    tables in paper inches: bearing data, girder spacing, top of slab / top of web, cross slope, camber and blocking, estimated quantities; `Paged(..., blocks)`).
+    Notes and callouts that quote numbers MUST come from the model: cross frame bolt notes from `CrossFrameDetail2D.Bolts` (`SteelDetailViews.BoltGroups`), steel notes from `Steel.Parts[].Material`.
+    Plan comparison: `tools/detail_inventory.py` -> `docs/plan-data/detail-inventory.md`; `sbm compare-sheets` / `sbm qc-sheet` -> `tools/compare_sheets.py` (PyMuPDF; qc rows keyed `gen:<bridge>:<S-n>`).
   - App 3D: `MainWindow.Viewport3D.cs` â€” camera depth range follows the scene (`KeepCameraInRange` on CameraChanged; do
     not hand-set Near/Far elsewhere); section cut = CPU clipping of all solids/lines/text (Helix
     `CrossSectionMeshGeometryModel3D` was tried: transparent models stop rendering when it is in the scene â€” don't use

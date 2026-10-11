@@ -275,6 +275,17 @@ public sealed class SbmDocument
         return sheets.Count;
     }
 
+    /// <summary>Writes the plan set PDF and a JSON list of its sheets (number, title, subtitle, view names, page) for the side-by-side comparison with the plans.</summary>
+    public int ExportSheetsWithMeta(string pdfPath, string metaPath, string? bridgeName = null)
+    {
+        var sheets = Sheets(bridgeName);
+        string bridge = Bridge(bridgeName).Name;
+        SBM.IO.Pdf.PdfWriter.Write(pdfPath, sheets, bridge);
+        var list = sheets.Select((s, i) => new { number = s.Number, title = s.Title, subtitle = s.Subtitle, bridge, page = i + 1, views = s.ScaleNotes.Select(n => n.Split(':')[0]).Distinct().ToList() });
+        System.IO.File.WriteAllText(metaPath, System.Text.Json.JsonSerializer.Serialize(list));
+        return sheets.Count;
+    }
+
     // ------------------------------------------------------------------ export
 
     public void ExportIfc(string path)

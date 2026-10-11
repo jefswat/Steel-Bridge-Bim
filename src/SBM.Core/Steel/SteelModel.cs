@@ -106,6 +106,9 @@ public sealed class CrossFrameDetail2D
     public double WeldLap { get; init; }
     public double WeldSize { get; init; }
     public string ChannelName { get; init; } = "";
+    /// <summary>Bolt diameter actually used by this frame (style or bridge) and the style name ("" = automatic layout).</summary>
+    public double BoltDiameter { get; init; }
+    public string StyleName { get; init; } = "";
 }
 
 /// <summary>Explicit 3D steel model derived from a <see cref="BridgeFraming"/>.</summary>

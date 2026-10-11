@@ -168,6 +168,7 @@ public sealed partial class SteelModelGenerator
             Mark = mark, AtSupport = cf.AtSupport, Type = cf.Type, Span = span, LeftWebTop = pl.Z, RightWebTop = prZ, LeftWebFace = xfl, RightWebFace = xfr,
             PlateWidth = wcp, PlateThickness = tp, GussetThickness = tg, WorkPoints = new[] { A, B, C, D }, WeldLap = def.WeldLap, WeldSize = def.MemberWeldSize,
             ChannelName = cf.Type == ResolvedCrossFrameType.Diaphragm ? def.DiaphragmChannel : "",
+            BoltDiameter = bg.Diameter, StyleName = st?.Name ?? "",
         };
         _cfDetails.Add(det);
 
