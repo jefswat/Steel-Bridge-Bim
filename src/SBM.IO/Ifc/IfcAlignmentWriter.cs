@@ -87,6 +87,8 @@ public sealed class IfcAlignmentWriter
         _written.FirstOrDefault(kv => kv.Key.Name.Equals(alignmentName, StringComparison.OrdinalIgnoreCase)).Value;
 
     private string L(double meters) => R(meters * _scale);
+    /// <summary>Full-precision STEP real in exponent form (tiny polynomial coefficients would lose digits with <see cref="R"/>).</summary>
+    private static string Sci(double v) => v == 0 ? "0.0" : v.ToString("0.0###############E+00", System.Globalization.CultureInfo.InvariantCulture);
     private string Lc(double meters) => C(meters * _scale);
     private string P2(Vec2 p) => $"({Lc(p.X - _base.X)},{Lc(p.Y - _base.Y)})";
 
@@ -265,7 +267,7 @@ public sealed class IfcAlignmentWriter
                 if (s.Type == "PARABOLICARC")
                 {
                     double c = (s.EndGradient - s.StartGradient) / (2 * s.HorizontalLength);
-                    parent = _w.Add("IFCPOLYNOMIALCURVE", $"{Ref(Pos2)},(0.0,1.0),(0.0,{R(s.StartGradient)},{R(c / _scale)}),$");
+                    parent = _w.Add("IFCPOLYNOMIALCURVE", $"{Ref(Pos2)},(0.0,1.0),(0.0,{R(s.StartGradient)},{Sci(c / _scale)}),$");
                     length = ParabolaLength(s.StartGradient, c, s.HorizontalLength);
                 }
                 else

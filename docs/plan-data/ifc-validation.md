@@ -99,11 +99,12 @@ vertical breakpoints), `tools/validate_ifc.py` and the US bridge IDS `usBrSpec_G
 
 | Model | Alignment | Horizontal | Vertical segs | Max plan / height dev | Schema + EXPRESS (alignment) | IDS Alignment specs |
 |---|---|---|---|---|---|---|
-| Synthetic (spirals L/R, sym + unsym VC, station equation) | Spiral test | 10 | 9 | 0.0005 / 0.0016 mm | 0 | 7/7 pass |
-| Woodbury I-29 NB over Floyd (arc, PGL 5 ft RT) | CL I-29 | 4 | 4 | 0.0000 / 0.0021 mm | 0 | 7/7 pass |
+| Synthetic (spirals L/R, sym + unsym VC, station equation) | Spiral test | 10 | 9 | 0.0005 / 0.0000 mm | 0 | 7/7 pass |
+| Woodbury I-29 NB over Floyd (arc, PGL 5 ft RT) | CL I-29 | 4 | 4 | 0.0000 / 0.0000 mm | 0 | 7/7 pass |
 | Br02069 TH65 | SB65 | 2 | 4 | 0.0000 / 0.0000 mm | 0 | 7/7 pass |
-| I-80 WB and Ramp G (alignments only, abv mode) | I-80 WB, Ramp G | 4, 6 | 188, 9 | 0.0000 / 0.0055 mm | 0 | 7/7 pass |
+| I-80 WB and Ramp G (alignments only, abv mode) | I-80 WB, Ramp G | 4, 6 | 188, 9 | 0.0000 / 0.0000 mm | 0 | 7/7 pass |
 
 Layout vs geometry (ifcopenshell.api.alignment maps each layout segment to geometry; end vs next segment start): max 0.0012 mm.
+The IfcPolynomialCurve x² coefficient is written in full-precision exponent form (10 decimals cost up to 0.005 mm on I-80).
 The full Woodbury / Br02069 exports have 15 / 7 schema issues, all `IfcBeam` `.GIRDER.` (not in ADD2 IfcBeamTypeEnum,
 prestressed beams) — unrelated to the alignment.
