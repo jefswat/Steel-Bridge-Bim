@@ -129,8 +129,11 @@ foreach (var s in unit1.Supports) Print($"  {s.Name}: support frames {cf1.Suppor
 // PREVIOUS girder from its bearing to the radial through the next girder's bearing (verified to 0.003 ft). So these lines are
 // entered per girder (Girder = X, Distance = X's cumulative bearing distance, explicit Bays + BayStyles); the K-string dims that
 // land on those radials are only advanced (Skip), K's own bearing lines stay on the K string.
-// UNRESOLVED (not placed): 8WB A radial bay B-C (obscured by the "9'-0 13/16" dimension). The 8WB G radial bay G-H is a 4.6 pt stub
-// (rest hidden by a note) and the 8WB I radial types follow the report's input lines; both are flagged in the report.
+// Settled from the PDF 110 vectors (docs/plan-data/cross-frame-gaps.md "Visual checks"): 8WB A radial bay B-C is ABSENT (no frame linework
+// under the "9'-0 13/16" dimension, the connection ticks at B and C are one-sided: A-B ends at B, C-F starts at C); 8WB G radial bay G-H is
+// PRESENT (two frame pieces either side of the "42 41'27"" text and a one-sided tick at H); 8WB I radial: Type 4 only in C-F and F-G (double
+// lines + "4" marks), A-B and B-C single lines = Type 3; 8WB K radial "bay B-F" is the cross girder XG-C (drawn in the cross girder callout;
+// the line is 0.045 ft from its CL), not a cross frame.
 var u2 = new List<CrossFrameLine>();
 lines = u2;
 x = 0;
@@ -150,7 +153,7 @@ Skip(19 + 10.8125 / 12);                                          // F
 Skip(21 + 10 / 12.0);                                             // H
 Skip(21 + 2.8125 / 12);                                           // J
 double kBrg8 = x + 10 + 4.8125 / 12;
-Run(1, 10 + 4.8125 / 12, _ => (new[] { 0, 1, 5, 6, 7, 8, 9 }, new[] { (5, "4"), (6, "4"), (7, "4"), (8, "9") }));   // K's Pier 8WB bearing
+Run(1, 10 + 4.8125 / 12, _ => (new[] { 0, 5, 6, 7, 8, 9 }, new[] { (5, "4"), (6, "4"), (7, "4"), (8, "9") }));   // K's Pier 8WB bearing (B-F = cross girder XG-C)
 Run(5, 23 + 8 / 12.0, k => k == 1 ? (null, new[] { (6, "4"), (7, "4"), (8, "4"), (9, "4") }) : (null, Array.Empty<(int, string)>()));   // K + 23'-8: G-H..J-K Type 4
 Skip(23 + 11.5625 / 12);                                          // A's 9WB radial
 Skip(20 + 5.5625 / 12);                                           // G
@@ -219,19 +222,22 @@ cf2.Links = new() { new CrossFrameLink { LeftGirder = 4, LeftSupport = "Pier 6A"
 // east abutment. Spacing along girder J (cumulative from J's CL bearing at Pier 11WB); J's span lengths from the girder
 // data: 158'-3 11/16, 194'-11 15/16, 195'-0 3/16, 195'-0 11/16, 160'-0 1/16 (each bearing falls on a string dimension).
 // Type 6 in the north bay (A-D) from mid Span 14WB to Span 16WB; one line of Type 8 plate diaphragms in Span 16WB.
-// Near the skewed piers the plans add partial lines measured along girder A (upper bays); the three at Pier 11WB are
-// included, the others (12WB: 21'-11 3/16; 13WB: 16'-1 15/16, 12'-10 7/8, 7'-4 1/8) are NOT placed: UNRESOLVED (the plan dims do not
-// reconcile with the model's bearings, docs/plan-data/cross-frame-gaps.md section 3).
+// Near the skewed piers the plans add partial lines (upper bays) measured along girder A or from a girder's bearing; the three
+// at Pier 11WB are along A. Piers 12WB / 13WB (PDF 115 / 117, docs/plan-data/cross-frame-gaps.md section 3): the J-string lines next
+// to the piers have only the bays drawn, plus per-girder lines (P3 below) positioned by the plan dimensions.
 var u3 = new List<CrossFrameLine>();
 lines = u3;
 x = 0;
 Run(1, 23 + 2.375 / 12);
 Run(3, 23);
-Run(1, 20 + 11.0625 / 12);
-Run(2, 22 + 7.125 / 12); lines.RemoveAt(lines.Count - 1);       // J's Pier 12WB bearing: support frames
+Run(1, 20 + 11.0625 / 12, _ => (new[] { 1, 2, 3, 4, 5, 6, 7, 8 }, Array.Empty<(int, string)>()));   // J - 45'-2 1/4: no A-B (it would lie on the pier line)
+// "2 SPA @ 22'-7 1/8" to J's 12WB bearing: the plan draws NO line at J - 22'-7 1/8; the line drawn there is the straight radial
+// through F's bearing (21'-11 3/16 along A, 5'-0 along E; P3 below), which crosses J at J - 20.32: the J dim is advanced only.
+Skip(22 + 7.125 / 12);
+Run(1, 22 + 7.125 / 12); lines.RemoveAt(lines.Count - 1);       // J's Pier 12WB bearing: support frames
 Run(1, 23);
 Run(6, 23);
-Run(1, 17);
+Run(1, 17, _ => (new[] { 7, 8 }, Array.Empty<(int, string)>()));   // J - 16'-11 15/16: only H-I, I-J drawn (A-E: the G radial below)
 Run(1, 16 + 11.9375 / 12); lines.RemoveAt(lines.Count - 1);     // J's Pier 13WB bearing
 Run(1, 9 + 4 / 12.0);
 Run(1, 19 + 5.1875 / 12);
@@ -254,7 +260,35 @@ foreach (var l3 in u3) l3.Girder = 9;
 double xa = 0;
 foreach (double sp in new[] { 20 + 4.25 / 12, 17 + 8.4375 / 12, 17 + 1.625 / 12 })
     u3.Add(new CrossFrameLine { Girder = 0, Distance = Ft(xa += sp) });
-Print($"Unit 3: {u3.Count} frame lines, J to East Abut bearing {x:F3} ft (spans sum 903.380)");
+// Per-girder lines at Piers 12WB / 13WB (radial; distance = the girder's bearing distance from its first bearing + the plan dim).
+var f3 = Doc.Model("I-80 WB Unit 3").Framing;
+double Brg3(int g, int j) => (f3.Girders[g].DistanceAt(j, 0) - f3.Girders[g].DistanceAt(0, 0)) / Ft(1);
+void P3(int g, double ft, int[] bays, params string[] notes)
+{
+    var l = new CrossFrameLine { Girder = g, Distance = Ft(ft), Bays = bays.ToList() };
+    l.Unresolved.AddRange(notes);
+    u3.Add(l);
+}
+// Pier 12WB (PDF 115): "21'-11 3/16" along A from A's bearing; the same radial crosses E at +5.007 = the "5'-0" along E (from E's bearing to
+// the line drawn at F's bearing): frames A-B..D-E and G-H..I-J (one straight line on the plan; no frame touches F on it).
+P3(0, Brg3(0, 1) + 21 + 11.1875 / 12, new[] { 0, 1, 2, 3, 6, 7, 8 },
+   "Pier 12WB, PDF 115: the J string '2 SPA @ 22'-7 1/8 = 45'-2 1/4' to J's bearing puts a line at J - 22'-7 1/8, but the line drawn there is this straight " +
+   "radial (21'-11 3/16 along A, 5'-0 along E), which crosses J at J - 20.32 ft; its G-H..I-J frames are modeled on the drawn line (the I-J frame is partly " +
+   "under the 6'-11 3/8 dimension). The line is drawn through F's bearing; in the model it passes 0.067 ft from it (F's bearing radial crosses A at +21.999)");
+// "6'-11 3/8" along I from I's bearing: frames A-B..H-I (I-J absent); the line is the radial through J's ahead jacking stiffener (J + 2'-0).
+P3(8, Brg3(8, 1) + 6 + 11.375 / 12, new[] { 0, 1, 2, 3, 4, 5, 6, 7 },
+   "Pier 12WB, PDF 115: placed by the dimension 6'-11 3/8 along I from I's CL bearing; the frame linework is drawn about 2 ft further ahead (scaled: crosses A " +
+   "about 45.5 ft past A's bearing vs 43.44 ft from the dimension)");
+// Pier 13WB (PDF 117): A-string chain from A's bearing 16'-1 15/16, 12'-10 7/8, 7'-4 1/8 (the last line is the J-string line J + 9'-4,
+// which the model crosses with A at +36.416 = the chain). The 16'-1 15/16 line is drawn through G's bearing (frames A-C, C-D, D-E; it
+// crosses E at +7.995 = the "8'-0" along E); the 12'-10 7/8 line is the sign truss support bracket line (PDF 117 / 180) with a frame in A-C only.
+double a13 = Brg3(0, 2);
+P3(0, a13 + 16 + 1.9375 / 12, new[] { 0, 2, 3 },
+   "Pier 13WB, PDF 117: line drawn through G's CL bearing, but in the model the radial at 16'-1 15/16 along A (= 8'-0 along E, both plan dims) passes 0.15 ft " +
+   "from G's bearing (G's bearing radial crosses A at +16.01): check G's 13WB bearing / girder geometry (no frame in bays E-G on this line). Also the 13WB " +
+   "pier-line spacings A-C 6'-3 7/16, C-D 6'-9 1/16 vs model 6.345 / 6.707 ft (A-D 13.04 = model 13.05): girder C's 13WB bearing is about 0.05 ft off along the pier");
+P3(0, a13 + 16 + 1.9375 / 12 + 12 + 10.875 / 12, new[] { 0 });
+Print($"Unit 3: {u3.Count} frame lines, J to East Abut bearing {x:F3} ft (spans sum 903.380); bearings A/F/I at 12WB {Brg3(0, 1):F3}/{Brg3(5, 1):F3}/{Brg3(8, 1):F3}, A at 13WB {a13:F3} ft");
 
 var unit3 = Doc.Project.Bridges.First(b => b.Name == "I-80 WB Unit 3");
 var cf3 = unit3.CrossFrames;

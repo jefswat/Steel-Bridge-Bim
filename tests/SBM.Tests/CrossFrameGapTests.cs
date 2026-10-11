@@ -103,4 +103,21 @@ public class CrossFrameGapTests
         var f = doc.Model(b.Name).Framing;
         Assert.Contains(f.Diagnostics, d => d.Message.Contains("listed bay with left girder G41"));
     }
+
+    [Fact]
+    public void LineUnresolvedNotes_AreRaisedWithTheLineAndCloned()
+    {
+        var doc = Doc(out var b);
+        b.CrossFrames.IntermediateStyle = "B";
+        var line = new CrossFrameLine { Girder = 2, Distance = Ft(60), Bays = new() { 1, 2 }, Unresolved = { "dims conflict (PDF 115)" } };
+        b.CrossFrames.Lines.Add(line);
+        Assert.Empty(doc.Regenerate().Errors);
+        var f = doc.Model(b.Name).Framing;
+        Assert.Single(f.Diagnostics, d => d.Message.Contains("UNRESOLVED") && d.Message.Contains("dims conflict (PDF 115)") && d.Message.Contains("60.00 ft along G3"));
+        // Frames of the line are still generated as listed.
+        Assert.Contains(f.CrossFrames, c => !c.AtSupport && c.Bay == 1);
+        var c2 = line.Clone();
+        c2.Unresolved.Add("x");
+        Assert.Single(line.Unresolved);
+    }
 }

@@ -905,6 +905,8 @@ public sealed class FramingGenerator
             double total = SpanStart(g, NSpan - 1) + _curves[g][NSpan - 1].Length - s0;
             string where = $"Frame line {line.Distance / 0.3048:F2} ft along G{g + 1}";
             if (line.Distance < 0 || line.Distance > total + 1e-6) { Warn($"{where}: beyond the girder ({total / 0.3048:F2} ft)."); continue; }
+            foreach (var note in line.Unresolved)
+                Warn($"{where}: UNRESOLVED (plan, nothing invented) - {note}");
             var (rj, ru) = LocateOnGirder(g, s0 + line.Distance);
             var rc = _curves[g][rj];
             var p = rc.PointAt(ru);

@@ -13,7 +13,7 @@
 // of the plan (the earlier version had the types one line late and no B line).
 // NOT dimensioned (UNRESOLVED, nothing invented, raised as warnings by the generator through CrossFrameStyle.Unresolved): tie plate
 // length (the model's 10" stays), the abutment frame's WT5x15 bottom bolt row pitch, the lengthwise stud pitch of the studs on the
-// W top struts (studs are not modeled). The Pier 16G zone (sheet 98) was not part of this pass.
+// W top struts (studs are not modeled). The Pier 16G zone (sheet 98) is also one line per girder bearing (types read from the plan).
 using SBM.Core.Bridge;
 
 double I(double inch) => In(inch);
@@ -134,15 +134,28 @@ Apply("Ramp G Unit 4", () =>
     // anchored at the bearing, so the last regular space takes the difference.
     At(1); Run(1, F(21, 4.5625)); Run(7, F(21, 2.75));
     At(2); L(x, null, All("2"));
-    // Pier 16G zone (sheet 99): 3 spaces of about 14'-7 9/16 from A's bearing.
-    double z = F(43, 10.625) / 3;
-    x += z; L(x, null, All("3"));
-    x += z; L(x, null, (0, "2"), (1, "3"), (2, "3"));
-    x += z; L(x, null, All("2"));
+    // Pier 16G zone (sheet 98, PDF 100): "3 SPA @ ABT. 14'-7 9/16 = 43'-10 5/8" along A and along D = one radial line through EACH girder's
+    // CL bearing (A above, then B, C, D; the model's radials through B, C, D cross A at +14.629, +29.258, +43.887 ft and D at -29.258,
+    // -14.629: the plan's "about" spaces to 0.002 ft). Types (circle marks both sides of each frame): A (2,2,2), B (3,3,2), C (2,3,3), D (2,2,2).
+    {
+        var fr = Doc.Model("Ramp G Unit 4").Framing;
+        double BrgG(int g) => (fr.Girders[g].DistanceAt(2, 0) - fr.Girders[g].DistanceAt(0, 0)) / Ft(1);
+        void PL(int g, params (int, string)[] types)
+        {
+            var l = new CrossFrameLine { Girder = g, Distance = Ft(BrgG(g)) };
+            foreach (var (bb, t) in types) l.BayStyles[bb] = t;
+            lines.Add(l);
+        }
+        PL(1, (0, "3"), (1, "3"), (2, "2"));
+        PL(2, (0, "2"), (1, "3"), (2, "3"));
+        PL(3, All("2"));
+        Print($"  16G: bearings along B/C/D {BrgG(1):F3}/{BrgG(2):F3}/{BrgG(3):F3} ft; A's at {x:F3}");
+    }
+    x += F(43, 10.625);                                     // A string: the 3 spaces end on the D line
     Run(1, F(21, 9.625));
-    // 9 spaces to A's bearing at the skewed bent 17G = L1 of the pier zone (sheet 100): A-B Type 3, B-C Type 3, C-D Type 2.
+    // 9 spaces to A's bearing at the skewed bent 17G = L1 of the pier zone (sheet 99, PDF 101): A-B Type 3, B-C Type 3, C-D Type 2.
     Run(9, F(193, 4.0625) / 9, k => k == 9 ? new[] { (0, "3"), (1, "3"), (2, "2") } : None(k));
-    // Pier 17G zone (sheet 100): a frame line through EACH girder's CL bearing (radial to Ramp G). L1 = A (above); L2 = B's bearing
+    // Pier 17G zone (sheet 99, PDF 101): a frame line through EACH girder's CL bearing (radial to Ramp G). L1 = A (above); L2 = B's bearing
     // (B-C Type 2, new); L3 = C's bearing = A + 21'-11 1/4 (A-B, C-D Type 2); L4 = D's bearing = + 10'-7 11/16 (A-B 2, B-C 3, C-D 3);
     // L5 regular = + 22'-5 (C-D Type 2, others Type 1).
     {
