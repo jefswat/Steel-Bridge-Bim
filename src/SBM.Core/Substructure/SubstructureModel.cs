@@ -16,6 +16,11 @@ public sealed record SubSolid(SubElementKind Kind, string Name, string Descripti
 public sealed record PedestalInfo(int Girder, double S, double N, double LengthS, double WidthN, double CapTopZ, double SeatZ)
 {
     public double Height => SeatZ - CapTopZ;
+    /// <summary>The bearing seat's own position when the pedestal geometry (S, N, size) is a shared plan block of several seats; NaN = the pedestal is the seat's.</summary>
+    public double SeatS { get; init; } = double.NaN;
+    public double SeatN { get; init; } = double.NaN;
+    public double RowS => double.IsNaN(SeatS) ? S : SeatS;
+    public double RowN => double.IsNaN(SeatN) ? N : SeatN;
 }
 
 /// <summary>Column (pier) in cap coordinates; top is where it meets the cap bottom at its center.</summary>
@@ -81,7 +86,10 @@ public sealed class SubstructureUnit
     public string CapTopDescription { get; set; } = "";
     /// <summary>Texture band lines on the cap face (S, Z), clipped to the cap: the texture edge and each layer line.</summary>
     public List<List<Vec2>> ReliefLines { get; } = new();
+    /// <summary>One entry per bearing seat (SeatZ / Height as the elevation checks need them; with a shared plan pedestal the geometry is the block's).</summary>
     public List<PedestalInfo> Pedestals { get; } = new();
+    /// <summary>The pedestal solids: one per block (= <see cref="Pedestals"/> unless a plan pedestal carries several seats). The pedestal bars are placed per block.</summary>
+    public List<PedestalInfo> PedestalBlocks { get; } = new();
     public List<ColumnInfo> Columns { get; } = new();
     public List<FoundationInfo> Foundations { get; } = new();
     /// <summary>Abutment backwall: front/back faces (N) and top profile (S, Z); bottom is the cap top.</summary>
@@ -144,7 +152,11 @@ public sealed record AbutmentStepInfo(int Girder, double S, double S0, double S1
 
 /// <summary>A counterfort with its wing footing (plan frame: X along the wall rearward, Y = alignment offset).</summary>
 public sealed record CounterfortInfo(int Index, double Start, double Width, double Projection, double TopZ, double FootingTop, double FootingBottom,
-    double YWall0, double YWall1, double YFoot0, double YFoot1, double YCf0, double YCf1, double StationC, Vec2 Origin, Vec2 Tangent);
+    double YWall0, double YWall1, double YFoot0, double YFoot1, double YCf0, double YCf1, double StationC, Vec2 Origin, Vec2 Tangent)
+{
+    /// <summary>Width of the counterfort body along the wall (the footing is <see cref="Width"/>).</summary>
+    public double BodyWidth { get; init; }
+}
 
 /// <summary>A wingwall of an as-designed abutment: path along the gutter line and elevation functions of u (distance rearward from the CL bearing line).</summary>
 public sealed class WingInfo
@@ -160,10 +172,16 @@ public sealed class WingInfo
     public required Func<double, double> Top { get; init; }
     public required Func<double, double> Bottom { get; init; }
     public List<CounterfortInfo> Counterforts { get; } = new();
+    /// <summary>Wing footing foundations in counterfort order (index = counterfort number - 1).</summary>
+    public List<FoundationInfo> Footings { get; } = new();
     public Vec2 Point(Alignment a, double u, double off) => a.PointAt(Sta(u), off);
 }
 
-public sealed record MaskInfo(AbutmentEnd End, double EOuter, double EInner, double TopZ, double BaseZ);
+public sealed record MaskInfo(AbutmentEnd End, double EOuter, double EInner, double TopZ, double BaseZ)
+{
+    /// <summary>The two ends of the wall's line at the given alignment offset, in cap coordinates (S, N): back (fill side) and front (span side) end.</summary>
+    public Func<double, (Vec2 Back, Vec2 Front)>? EndsAt { get; init; }
+}
 
 /// <summary>Geometry of an as-designed abutment, shared by the rebar generator, the views and the exporters.</summary>
 public sealed class AbutmentGeometry

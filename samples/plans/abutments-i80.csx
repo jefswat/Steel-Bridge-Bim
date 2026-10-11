@@ -47,7 +47,7 @@ void Build(string bridgeName, bool first, string source, double leftEnd, double 
     ad.BackwallTop.Add(new CapProfilePoint(SOf(al, sl, 0), Ft(topCl)));
     ad.BackwallTop.Add(new CapProfilePoint(SOf(al, sl, top1Off), Ft(top1)));
     for (int i = 0; i < stepsTop.Length; i++) if (!double.IsNaN(stepsTop[i])) ad.Steps.Add(new AbutmentStepDefinition(i + 1, Ft(stepsTop[i])));
-    ad.Masks.Add(new MaskwallDefinition { End = AbutmentEnd.Left, Height = maskHeight, Thickness = In(10), Setback = In(2) });
+    ad.Masks.Add(new MaskwallDefinition { End = AbutmentEnd.Left, Height = maskHeight, Thickness = In(10) });          // Setback 0: the panel is the OUTERMOST 10" of the zone, flush with the footing end line (p85/p89 plan, abutment-followups.md 5.1)
     ad.Extension = new BackwallExtensionDefinition { End = AbutmentEnd.Right, Width = extWidth, TopElevation = Ft(extTop) };
     ad.PileBackRowToBearing = F(1, 11.5); ad.PileFrontRowToBearing = F(1, 9); ad.PileTopAboveFootingBottom = F(2);
     ad.PileLength = F(first ? 125 : 115);   // contract lengths: West 125 ft, East 115 ft (PDF 90; substructure-elevation-check.md)
@@ -61,9 +61,11 @@ void Build(string bridgeName, bool first, string source, double leftEnd, double 
         for (int k = 0; k < cfStart.Length; k++)
             wd.Counterforts.Add(new CounterfortDefinition
             {
-                Start = cfStart[k], Width = F(3), Projection = F(3, 6), Height = cfHeight[k], FootingTop = Ft(w.footTops[k]),
+                Start = cfStart[k], Width = F(3), BodyWidth = F(1, 10), Projection = F(3, 6), Height = cfHeight[k], FootingTop = Ft(w.footTops[k]),
                 HoopSpaces = k == 0 ? (first ? 9 : 8) : 5, VerticalBarsPerSide = 10, VerticalMark = k == 0 ? "6h2" : "6h3",
             });
+        // 8j3 uplift anchors: the circled pile of each wing footing = the fill-side (inner) pile, footings No.1 and No.2 of every wing (p86/p90 legends, abutment-followups.md 2)
+        wd.UpliftPiles.Add(new UpliftPileDefinition { Footing = 1, Pile = 2 }); wd.UpliftPiles.Add(new UpliftPileDefinition { Footing = 2, Pile = 2 });
         ad.Wings.Add(wd);
     }
     var rb = ad.Rebar;
@@ -119,23 +121,41 @@ var eastList = new List<PlanBarLine>
 Build("I-80 WB Unit 1", true, "Iowa DOT Design 116 West abutment, sheets 85-88",
     -F(26, 11), F(37, 9), 992.82, 992.82, -F(24), 1007.32, 1008.15, F(36), 1007.65,
     new[] { 997.15, 997.51, 997.87, 997.78, 997.62, 997.45 }, F(14, 2),
-    F(4, 6.375), 1007.65, F(31, 9), new[] { F(14, 3), F(24, 3) }, new[] { F(8, 10), F(5, 4) },
+    ((F(2, 9.375) + F(3, 9.875)) / 2) / Math.Cos(44 * Math.PI / 180), 1007.65, F(31, 9), new[] { F(14, 3), F(24, 3) }, new[] { F(8, 10), F(5, 4) },
     (1007.32, 1006.97, 993.82, F(1, 6), new[] { 996.68, 1000.27 }), (1007.65, 1007.30, 994.17, F(1, 6), new[] { 997.41, 1000.78 }),
     -F(24), F(36), In(9), 9, 0, 5, 11, westList);
+// Footing plan outline of the West abutment (p86 piling layout; abutment-followups.md 4): the end lines (offsets -26'-11 / +37'-9) end in horizontal notches = lines of constant
+// station. y = distance along the approach CL (up-station +) from the crossing of the footing centre line with the CL approach roadway.
+{
+    var b1 = Doc.Project.Bridges.First(x => x.Name == "I-80 WB Unit 1");
+    var ad1 = b1.Supports[0].Substructure!.Abutment!;
+    var sl1 = Doc.Framing("I-80 WB Unit 1").SupportLine(0); var al1 = Doc.Alignment(b1.AlignmentName);
+    double xc1 = (-(F(1, 10) + F(1.5) + In(1.5)) + F(3, 3)) / 2;
+    var t1 = Vec2.FromAngle(al1.AngleAt(sl1.Station)); var n1 = new Vec2(-sl1.Direction.Y, sl1.Direction.X); if (Vec2.Dot(n1, t1) < 0) n1 = -n1;
+    double s1c = SOf(al1, sl1, 0, xc1);
+    double staC = al1.Inverse(sl1.AlignmentPoint + sl1.Direction * s1c + n1 * xc1).Station;
+    ad1.FootingNotches.Clear();
+    ad1.FootingNotches.Add(new FootingNotchDefinition { End = AbutmentEnd.Left, FrontStation = staC + Ft(-18.514), BackStation = staC + Ft(-28.921) });
+    ad1.FootingNotches.Add(new FootingNotchDefinition { End = AbutmentEnd.Right, FrontStation = staC + Ft(39.427) });
+}
+// Printed backwall vertical strings (6d1 at 6", 5d2 at 1'-0): West 171 / 86 spaces, East 159 / 79 spaces (the bar lists add 1 / 2 corner bars that the strings do not show)
+Doc.Project.Bridges.First(x => x.Name == "I-80 WB Unit 1").Supports[0].Substructure!.Abutment!.Rebar.BackFaceCount = 172;
+Doc.Project.Bridges.First(x => x.Name == "I-80 WB Unit 1").Supports[0].Substructure!.Abutment!.Rebar.FrontFaceCount = 87;
 Piles("I-80 WB Unit 1", true, new[] { -33.568, -26.734, -19.901, -13.068, -6.234, 0.599, 7.432, 14.266, 21.099, 27.932, 34.766, 41.599, 48.432 }, null);
 
 // ---- East abutment: Unit 3, last support. Gutter lines 36'-0 (J, right) / 42'-0 (A, left); footing ends 36+1'-9 and 42+2'-11 (the printed
 // 37'-11 / 45'-1 1/2 are along the line = offset / cos 5.45); footing bottom 1003.44 (A end) to 1008.27 (J end).
-// UNRESOLVED: the East backwall-extension width is not printed; 3'-5 is DERIVED from the plan extension concrete (2.3 CY over 1'-6 x 12'-2).
+// East backwall extension: printed 3'-3 1/2 from the cap to the footing end line (p89), cap perpendicular to the strip.
 Build("I-80 WB Unit 3", false, "Iowa DOT Design 116 East abutment, sheets 89-92",
     -(F(42) + F(2, 11)), F(36) + F(1, 9), 1003.44, 1008.27, -F(42), 1016.24, 1018.71, F(36), 1020.80,
     new[] { 1008.20, double.NaN, double.NaN, 1008.54, 1009.22, 1009.89, 1010.57, 1011.23, 1011.91, 1012.58 }, F(12, 4),
-    F(3, 5), 1021.09, F(27), new[] { F(9, 6), F(19, 6) }, new[] { F(8, 8), F(5, 4) },
+    F(3, 3.5), 1021.09, F(27), new[] { F(9, 6), F(19, 6) }, new[] { F(8, 8), F(5, 4) },
     (1016.24, 1016.11, 1004.24, 0.0, new[] { 1006.29, 1009.61 }), (1020.80, 1020.67, 1008.80, 0.0, new[] { 1010.78, 1014.15 }),
     -F(42), F(36), In(8), 8, 3, 3, 9, eastList);
 Piles("I-80 WB Unit 3", false, null,
     Enumerable.Range(0, 6).Select(i => 2.51 + 6.0 * i).Concat(Enumerable.Range(0, 8).Select(i => 38.51 + 6.0 * i)).ToArray());
-Print("UNRESOLVED: East backwall-extension width (3'-5) derived from the plan quantity; West extension width 4'-6 3/8 = printed dimension whose span is ambiguous; maskwall position inside its 1'-2 zone.");
+{ var e3 = Doc.Project.Bridges.First(x => x.Name == "I-80 WB Unit 3"); var rb3 = e3.Supports[e3.Supports.Count - 1].Substructure!.Abutment!.Rebar; rb3.BackFaceCount = 160; rb3.FrontFaceCount = 80; }
+Print("Extension: West axis length 4.59 ft = mean of the printed 2'-9 3/8 / cos44 and 3'-9 7/8 / cos44 (perpendicular cap); East printed 3'-3 1/2. East / South footing notches: not read (plain end lines).");
 
 var res = Doc.Regenerate();
 Print($"Regenerated {res.Bridges} bridges, {res.Errors.Count} errors.");

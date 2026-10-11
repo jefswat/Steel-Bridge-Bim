@@ -22,15 +22,17 @@ public sealed class MaskwallDefinition
     public double Thickness { get; set; } = In(10);
     /// <summary>Height above the footing top (wash level) at the panel; the top is level.</summary>
     public double Height { get; set; }
-    /// <summary>Distance from the footing end line to the outer face of the panel (the plans' 1'-2 zone holds the 10" panel).</summary>
-    public double Setback { get; set; } = In(2);
+    /// <summary>Distance from the footing end line to the outer face of the panel. Plans (West/East p85/p89, South p80): the panel is the OUTERMOST 10" of the
+    /// wall zone, outer face flush with the footing end line = 0.</summary>
+    public double Setback { get; set; }
 }
 
-/// <summary>Backwall extension at one end: backwall-thickness wall of the given width along the line, level top.</summary>
+/// <summary>Backwall extension at one end: backwall-thickness wall BEYOND the footing end line, from the footing-bottom line up to a level top, ending in a cap
+/// perpendicular to the strip (West p85: cap corners 4'-6 3/8 / 2'-9 3/8 / 3'-9 7/8 from the gutter / end line; East p89: 3'-3 1/2 to the end line).</summary>
 public sealed class BackwallExtensionDefinition
 {
     public AbutmentEnd End { get; set; }
-    /// <summary>Width along the abutment line, from the footing end line.</summary>
+    /// <summary>Length of the strip axis from the footing end line (measured at the backwall mid-thickness) to the perpendicular cap.</summary>
     public double Width { get; set; } = Ft(4.5);
     public double TopElevation { get; set; }
 }
@@ -40,8 +42,11 @@ public sealed class CounterfortDefinition
 {
     /// <summary>Start of the counterfort (and of its footing) along the gutter line from the CL bearing line, rearward.</summary>
     public double Start { get; set; }
-    /// <summary>Width along the wall.</summary>
+    /// <summary>Width of the WING FOOTING along the wall (centred on the counterfort).</summary>
     public double Width { get; set; } = Ft(3);
+    /// <summary>Width of the COUNTERFORT itself along the wall, centred on the footing (plans: 1'-10 between 7" margins, sections E-E / F-F). 0 = same as <see cref="Width"/>.</summary>
+    public double BodyWidth { get; set; }
+    [System.Text.Json.Serialization.JsonIgnore] public double BodyWidthResolved => BodyWidth > 0 ? BodyWidth : Width;
     /// <summary>Projection from the wall's fill-side face.</summary>
     public double Projection { get; set; } = Ft(3.5);
     /// <summary>Counterfort height above the wing footing top.</summary>
@@ -91,6 +96,15 @@ public sealed class WingwallDefinition
     public List<UpliftPileDefinition> UpliftPiles { get; set; } = new();
 }
 
+/// <summary>Notches of the footing plan outline at one end (West p86 piling layout): between a face and the end line (parallel to the alignment) the outline runs along a
+/// line of constant STATION. Front = span side (x toward the span), back = fill side. Absolute station (m) of that line; NaN = no notch on that side.</summary>
+public sealed class FootingNotchDefinition
+{
+    public AbutmentEnd End { get; set; }
+    public double FrontStation { get; set; } = double.NaN;
+    public double BackStation { get; set; } = double.NaN;
+}
+
 /// <summary>Plan bar-list line used to check the model (mark, count, length, weight as printed).</summary>
 public sealed class PlanBarLine
 {
@@ -135,6 +149,10 @@ public sealed class AbutmentRebarDefinition
     public double HoopHeight { get; set; } = Ft(3) + In(5);
     /// <summary>Backwall vertical bars (printed straight lengths, hung from the top of the backwall less the cover): back face (6d1) and front face (5d2),
     /// their spacing and the distance of the first bar from the backwall end.</summary>
+    /// <summary>Printed numbers of backwall verticals (the plan strings: West 171 spaces @ 6" = 172 bars, 86 spaces @ 1'-0 = 87 bars; the list adds corner bars that are not drawn).
+    /// 0 = as many as fit between the backwall ends at the spacing.</summary>
+    public int BackFaceCount { get; set; }
+    public int FrontFaceCount { get; set; }
     public double BackFaceBarLength { get; set; }
     public double FrontFaceBarLength { get; set; }
     public double BackFaceSpacing { get; set; } = In(6);
@@ -196,6 +214,8 @@ public sealed class AbutmentDefinition
     public double StepLength { get; set; } = Ft(4.5);
     public List<AbutmentStepDefinition> Steps { get; set; } = new();
     public List<MaskwallDefinition> Masks { get; set; } = new();
+    /// <summary>True footing plan outline: end notches (empty = ends are plain alignment-offset lines).</summary>
+    public List<FootingNotchDefinition> FootingNotches { get; set; } = new();
     public BackwallExtensionDefinition? Extension { get; set; }
     // ---- piles (S coordinates along the line of each station; two rows)
     public List<double> PileStations { get; set; } = new();

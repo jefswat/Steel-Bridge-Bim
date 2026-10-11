@@ -216,6 +216,22 @@ foreach (var p in ip)
     Print($"    {p.name}: {sd.Footings.Sum(f => f.Piles.Count(q => q.IsBattered))} battered piles in {sd.Footings.Count} footing(s)");
     if (pl.Count != p.expect) Print($"    PILE COUNT {pl.Count} -- PLANS SAY {p.expect}");
 }
+// ---- Plan pedestal sizes (inches: along the cap x across it). Printed on the cap plan / pedestal bar layout of every pier sheet ("4, 5 EQ. SPA., 4" with the
+// total below, e.g. 5'-6 x 5'-8) and confirmed by the 5m1 / 5n1 U-bar bases (base + 4" or 5" = pedestal); docs/plan-data/pier-pedestals.md. NOT set (sizes not
+// settled by the sheets, the bearing-footprint pedestals stay): Pier 6A (Ramp A2 pedestals share the cap), Pier 11WB (two staggered rows, along size not printed).
+// Pier 5WB: ONE 5'-0 x 7'-8 block per girder line carries the back and ahead bearing (36 5n1 bars = 6 blocks x 6).
+{
+    var peds = new Dictionary<string, (double along, double across, bool shared)>
+    {
+        ["Pier 1WB"] = (66, 68, false), ["Pier 2WB"] = (66, 68, false), ["Pier 3WB"] = (78, 68, false), ["Pier 4WB"] = (66, 68, false), ["Pier 5WB"] = (60, 92, true),
+        ["Pier 6WB"] = (66, 68, false), ["Pier 7WB"] = (75, 68, false), ["Pier 8WB"] = (66, 68, false), ["Pier 9WB"] = (66, 68, false), ["Pier 10WB"] = (66, 68, false),
+        ["Pier 12WB"] = (66, 68, false), ["Pier 13WB"] = (66, 68, false), ["Pier 14WB"] = (66, 68, false), ["Pier 15WB"] = (66, 68, false),
+    };
+    foreach (var bridge in Doc.Project.Bridges.Where(x => x.Name.StartsWith("I-80")))
+        foreach (var sup in bridge.Supports)
+            if (sup.Substructure != null && peds.TryGetValue(sup.Name, out var v))
+            { sup.Substructure.PedestalSizeAlong = In(v.along); sup.Substructure.PedestalSizeAcross = In(v.across); sup.Substructure.PedestalShared = v.shared; }
+}
 Doc.Regenerate();
 foreach (var b in Doc.Project.Bridges.Where(x => x.Name.StartsWith("I-80")))
     foreach (var u in Doc.Model(b.Name).Substructure?.Units ?? new())

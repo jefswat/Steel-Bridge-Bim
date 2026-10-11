@@ -14,7 +14,7 @@ namespace SBM.Core.Substructure;
 /// </summary>
 public sealed partial class SubstructureGenerator
 {
-    private sealed record PBar(string Mark, Vec3[] Pts);
+    private sealed record PBar(string Mark, Vec3[] Pts, BarShape? Shape = null);
 
     private static string SizeOfMark(string mark) => "#" + new string(mark.TakeWhile(char.IsDigit).ToArray());
 
@@ -79,17 +79,24 @@ public sealed partial class SubstructureGenerator
         var vFront = RebarCatalog.Size(SizeOfMark(frontMark));
         double xBack = g.XBwBack + rb.BackwallBarCover + vBack.Diameter / 2, xFront = g.XBwFront - rb.BackwallBarCover - vFront.Diameter / 2;
         if (rb.BackFaceBarLength > 0)
-            for (double s = bwL + rb.BackFaceEdge; s <= bwR - rb.BackFaceEdge + 1e-6; s += rb.BackFaceSpacing)
+            for (int i = 0; ; i++)
             {
+                double s = bwL + rb.BackFaceEdge + i * rb.BackFaceSpacing;
+                if (rb.BackFaceCount > 0 ? i >= rb.BackFaceCount : s > bwR - rb.BackFaceEdge + 1e-6) break;
                 double top = g.BackwallTop(s) - rb.BackwallBarCover;
                 placed.Add(new PBar(backMark, new[] { P(s, xBack, top - rb.BackFaceBarLength), P(s, xBack, top) }));
             }
         if (rb.FrontFaceBarLength > 0)
-            for (double s = bwL + rb.FrontFaceEdge; s <= bwR - rb.FrontFaceEdge + 1e-6; s += rb.FrontFaceSpacing)
+            for (int i = 0; ; i++)
             {
+                double s = bwL + rb.FrontFaceEdge + i * rb.FrontFaceSpacing;
+                if (rb.FrontFaceCount > 0 ? i >= rb.FrontFaceCount : s > bwR - rb.FrontFaceEdge + 1e-6) break;
                 double top = g.BackwallTop(s) - rb.BackwallBarCover;
                 placed.Add(new PBar(frontMark, new[] { P(s, xFront, top - rb.FrontFaceBarLength), P(s, xFront, top) }));
             }
+
+        // ---- maskwall, counterfort and uplift bars (SubstructureAbutmentWingBars.cs)
+        AbutmentWingBars(unit, g, placed);
 
         // ---- marks
         bool epoxy = unit.Definition.Reinforcement.EpoxyCoated;
@@ -100,7 +107,7 @@ public sealed partial class SubstructureGenerator
         {
             var size = RebarCatalog.Size(SizeOfMark(grp.Key));
             var lens = grp.Select(p => Length3(p.Pts)).ToList();
-            BarShape shape = grp.Key == "5b1" ? hoopShape : BarShape.Straight(lens.Max());
+            BarShape shape = grp.Key == "5b1" ? hoopShape : grp.First().Shape ?? BarShape.Straight(lens.Max());
             bool varies = lens.Max() - lens.Min() > In(1) && grp.Key != "5b1";
             marks.Add(new BarMark
             {
@@ -137,9 +144,12 @@ public sealed partial class SubstructureGenerator
                 Warn($"{name}: bar {line.Mark}: {mk.Count} bars from the placement string / section vs {line.Count} in the plan bar list - NOT adjusted (list rows at the corners / ends are not drawn).");
         }
         if (scheduleOnly.Count > 0)
-            Warn($"{name}: reinforcing - only the footing longitudinals, footing hoops at the pile pitch and the backwall verticals are placed in 3D; the plan bar list rows without a proven placement are in the schedule at the printed count/length (no 3D bar; schedule shape = the plan bend diagram where it was read: U, L, hoop, hat, V marks): {string.Join(", ", scheduleOnly)}.");
-        if (ad.Wings.Any(w => w.UpliftPiles.Count == 0))
-            Warn($"{name}: UNRESOLVED - the circled wing-footing piles (pile uplift anchors 8j3, 8 bars = 4 circled piles) could not be identified from the sheets; no anchor is placed (the 8j3 line stays in the schedule).");
+        {
+            Warn($"{name}: reinforcing - placed in 3D: footing longitudinals, footing hoops at the pile pitch, backwall verticals (printed strings), maskwall 5e2 / 5e3, counterfort verticals and 5h4 hoops, pile uplift anchors 8j3; the other plan bar-list rows are in the schedule at the printed count/length with the plan bend diagram where read: {string.Join(", ", scheduleOnly)}.");
+            ReportUnresolvedAbutmentMarks(name, scheduleOnly.Select(x => x.Split(' ')[0]));
+        }
+        if (ad.Wings.Any(w => w.UpliftPiles.Count == 0) && rb.PlanBarList.Any(l => l.Mark == "8j3"))
+            Warn($"{name}: UNRESOLVED - no circled (uplift anchor) wing-footing piles are given for every wing; the 8j3 bars of those wings stay in the schedule.");
         lock (m) { m.Marks.AddRange(marks); m.Bars.AddRange(places); }
     }
 
@@ -181,6 +191,7 @@ public sealed partial class SubstructureGenerator
     private static string LocationOf(string mark) => mark switch
     {
         "9a1" or "8a1" => "abutment footing longitudinal", "5b1" => "abutment footing hoops", "6d1" => "backwall back face vertical", "5d2" => "backwall front face vertical",
+        "5e2" => "maskwall vertical", "5e3" => "maskwall horizontal", "6h2" or "6h3" => "counterfort vertical", "5h4" => "counterfort hoop (U staple)", "8j3" => "wing-footing pile uplift anchor (V through the web hole)",
         _ => "Abutment (plan bar list)",
     };
 
