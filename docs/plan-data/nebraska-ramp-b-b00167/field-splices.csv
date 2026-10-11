@@ -1,0 +1,5 @@
+splice,min_top_flange_width_in,plate_B_top_outer,plate_C_top_inner_2req,top_bolt_spacing,top_bolt_gage,web_plate_A_2req,web_bolt_column_spacing,web_bolt_row_spacing,dim_S_in,min_bot_flange_width_in,plate_D_bot_inner_2req,plate_E_bot_outer,bot_bolt_spacing,bot_bolt_gage,location,source,tag
+1,18,7/16x18x2'-11,1/2x8x2'-11,7 @ 2 = 1'-2,5,5/16x13x5'-11 1/4,1 @ 3 = 0'-3,21 @ 3 1/4 = 5'-8 1/4,3 7/8,22,9/16x10x2'-7,1/2x22x2'-7,4 @ 3 = 1'-0,6,51'-0 before CL pier 1 (span 1),p.34 / DS 33; location p.27/28,RASTER
+2,16,3/8x16x2'-11,7/16x7x2'-11,7 @ 2 = 1'-2,4,5/16x13x5'-11 1/4,1 @ 3 = 0'-3,21 @ 3 1/4 = 5'-8 1/4,3 7/8,20,9/16x9x3'-1,1/2x20x3'-1,5 @ 3 = 1'-3,5,54'-6 after CL pier 1 (span 2),p.34 / DS 33,RASTER
+3,16,3/8x16x2'-11,7/16x7x2'-11,7 @ 2 = 1'-2,4,5/16x13x5'-11 1/4,1 @ 3 = 0'-3,21 @ 3 1/4 = 5'-8 1/4,3 7/8,20,9/16x9x2'-7,1/2x20x2'-7,4 @ 3 = 1'-0,5,59'-0 before CL pier 2 (span 2),p.34 / DS 33,RASTER
+4,24,7/16x24x2'-1,1/2x11x2'-1,3 @ 3 = 0'-9,2 @ 3 1/2,5/16x13x6'-0,1 @ 3 = 0'-3,23 @ 3 = 5'-9,3 1/2,24,9/16x11x2'-7,1/2x24x2'-7,4 @ 3 = 1'-0,2 @ 3 1/2,PC + 53'-6 11/16..54'-4 11/16 (span 3; varies by girder),p.34 / DS 33,RASTER

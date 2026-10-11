@@ -1,0 +1,5 @@
+girder_line,A_CL_S_abut_brg,B_FS1,C_CL_pier1,D_FS2,E_FS3,F_CL_pier2,G_FS4,H_CL_N_abut_brg,unit,source,tag
+A,6.69,6.21,5.45,4.92,3.77,2.79,1.97,0.00,ft,p.36 / DS 35 Blocking data,RASTER
+B,6.59,6.07,5.29,4.72,3.58,2.68,2.04,0.00,ft,p.36 / DS 35,RASTER
+C,6.49,5.92,5.12,4.53,3.38,2.55,2.09,0.00,ft,p.36 / DS 35,RASTER
+D,6.39,5.78,4.96,4.34,3.19,2.42,2.16,0.00,ft,p.36 / DS 35,RASTER
