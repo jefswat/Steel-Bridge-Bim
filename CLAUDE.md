@@ -284,7 +284,8 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   unchanged; element GlobalIds, materials and psets are the same (the SBM_Fabrication pset GlobalIds are keyed by STEP id,
   so they differ between modes). Prestressed girders are IfcBeam `.GIRDER_SEGMENT.` in all modes (`.GIRDER.` is not in
   IFC4X3_ADD2's IfcBeamTypeEnum; it is valid only for IfcElementAssembly / IfcBridge).
-  Volumes vs Parametric: `python -I tools/compare_ifc_volumes.py par.ifc abv.ifc --changed-only`. Cost: I-80 WB and
+  Volumes vs Parametric: `python -I tools/compare_ifc_volumes.py par.ifc abv.ifc --changed-only --exact-ref [--max N]`
+  (exact-ref = analytic extrusion volumes; OpenCascade meshes hole circles coarsely; AbV meshing is ~2x slower, ~0.15 s/plate). Cost: I-80 WB and
   Ramp G: Parametric 330 MB / 3.76 M entities / 3.7 s, ReferenceView 730 MB / 6.03 M / 6.5 s (ifczip 69 vs 168 MB);
   the growth is the ~324 k bolt holes (9 wall quads + 18 points each). Full-model AbV result: 0 schema + 0 EXPRESS issues,
   AbV Exclusions IDS 261/261 pass (docs/plan-data/ifc-validation.md). NOT done: IfcSectionedSolidHorizontal along the

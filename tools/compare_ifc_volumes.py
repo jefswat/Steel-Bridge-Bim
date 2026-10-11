@@ -6,12 +6,15 @@ usage:
   --changed-only  only products whose Body in OTHER uses an IfcPolygonalFaceSet (the solids ReferenceView rewrites)
   --max N         at most N products per IFC class (random sample, default 0 = all)
   --tol F         relative volume tolerance (default 0.005 = 0.5 %)
+  --exact-ref     reference products whose Body is only IfcExtrudedAreaSolid over a polyline profile with IfcCircle voids
+                  get their EXACT volume (area x depth x direction.z) instead of a mesh volume (OpenCascade meshes the
+                  hole circles as coarse polygons, which skews thin-walled tubes by several %)
 
 Meshes with ifcopenshell.geom (local coordinates), volume about the mesh centroid (tools/validate_ifc.py mesh_volume).
 The files are opened one after the other (OTHER first, then REFERENCE) to keep memory down on full models.
 Also reports products missing from either side and meshes of OTHER that are not closed shells.
 """
-import argparse, collections, gc, json, os, random, sys, time
+import argparse, collections, gc, json, math, os, random, sys, time
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import ifcopenshell, ifcopenshell.geom
@@ -31,7 +34,35 @@ def products(f):
         yield p
 
 
-def mesh_all(f, gids):
+def exact_volume(p):
+    """Analytic volume (file units^3) of a Body made only of IfcExtrudedAreaSolid with an IfcArbitraryClosedProfileDef /
+    WithVoids over an IfcIndexedPolyCurve of straight segments and IfcCircle voids; None otherwise."""
+    items = list(body_items(p))
+    if not items:
+        return None
+    v = 0.0
+    for it in items:
+        if not it.is_a("IfcExtrudedAreaSolid"):
+            return None
+        pr = it.SweptArea
+        oc = pr.OuterCurve
+        if not oc.is_a("IfcIndexedPolyCurve") or (oc.Segments and any(not sg.is_a("IfcLineIndex") for sg in oc.Segments)):
+            return None
+        pts = oc.Points.CoordList
+        a = 0.0
+        for i in range(len(pts)):
+            x0, y0 = pts[i][:2]; x1, y1 = pts[(i + 1) % len(pts)][:2]
+            a += x0 * y1 - x1 * y0
+        a = abs(a) / 2
+        for c in (pr.InnerCurves if pr.is_a("IfcArbitraryProfileDefWithVoids") else []):
+            if not c.is_a("IfcCircle"):
+                return None
+            a -= math.pi * c.Radius ** 2
+        v += a * it.Depth * abs(it.ExtrudedDirection.DirectionRatios[2])
+    return v
+
+
+def mesh_all(f, gids, exact=False):
     s = ifcopenshell.geom.settings()
     s.set("use-world-coords", False)
     sc = length_scale(f)
@@ -42,6 +73,11 @@ def mesh_all(f, gids):
         except Exception:
             out[gid] = None
             continue
+        if exact:
+            ev = exact_volume(p)
+            if ev is not None:
+                out[gid] = (ev * sc ** 3, 0, p.is_a(), p.Name or "", (p.Description or "")[:50])
+                continue
         try:
             g = ifcopenshell.geom.create_shape(s, p).geometry
             vol, open_edges = mesh_volume(g)
@@ -59,6 +95,7 @@ def main():
     ap.add_argument("--tol", type=float, default=0.005)
     ap.add_argument("--seed", type=int, default=1)
     ap.add_argument("--json")
+    ap.add_argument("--exact-ref", action="store_true")
     a = ap.parse_args()
     t0 = time.time()
 
@@ -77,7 +114,7 @@ def main():
     del f; gc.collect()
     print(f"  meshed other in {time.time() - t0:.0f} s", flush=True)
     f = ifcopenshell.open(a.ref)
-    vr, sr = mesh_all(f, gids)
+    vr, sr = mesh_all(f, gids, a.exact_ref)
     del f; gc.collect()
     print(f"  meshed reference in {time.time() - t0:.0f} s", flush=True)
 
@@ -91,7 +128,7 @@ def main():
             st["missing"] += 1; bad.append({"gid": gid, "class": cls, "why": "missing"}); continue
         if o[0] == "fail" or r[0] == "fail":
             st["failed"] += 1; bad.append({"gid": gid, "class": cls, "name": o[3], "why": "fail", "other": o[1] if o[0] == "fail" else "", "ref": r[1] if r[0] == "fail" else ""}); continue
-        vo_m3, vr_m3 = o[0] * so ** 3, r[0] * sr ** 3
+        vo_m3, vr_m3 = o[0], r[0]  # ifcopenshell.geom meshes are in metres
         st["compared"] += 1
         if o[1]: st["open (other)"] += 1
         if r[1]: st["open (ref)"] += 1
