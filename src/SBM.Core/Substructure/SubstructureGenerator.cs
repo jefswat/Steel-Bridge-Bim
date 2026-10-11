@@ -300,29 +300,75 @@ public sealed partial class SubstructureGenerator
             unit.Backwall = (Math.Min(bwFront, bwBack), Math.Max(bwFront, bwBack), top);
         }
 
-        // ---- pedestals
+        // ---- pedestals: one per seat from the bearing footprint, or the plan size (optionally one block per girder line carrying several seats)
         double tallest = 0;
-        foreach (var x in seats)
+        bool planPed = sd.PedestalSizeAlong > 0 && sd.PedestalSizeAcross > 0;
+        if (sd.PedestalShared && !planPed) Warn($"{sl.Name}: PedestalShared needs the plan pedestal size (PedestalSizeAlong / PedestalSizeAcross); ignored.");
+        var groups = new List<List<Seat>>();
+        if (planPed && sd.PedestalShared)
         {
-            double ps0 = x.Footprint.Min(q => q.X) - sd.PedestalProjection, ps1 = x.Footprint.Max(q => q.X) + sd.PedestalProjection;
-            double pn0 = x.Footprint.Min(q => q.Y) - sd.PedestalProjection, pn1 = x.Footprint.Max(q => q.Y) + sd.PedestalProjection;
-            double sMid = (ps0 + ps1) / 2, nMid = (pn0 + pn1) / 2;
-            var ped = new PedestalInfo(x.Girder, sMid, nMid, ps1 - ps0, pn1 - pn0, unit.CapTopAt(x.S, x.N), x.Z);
-            unit.Pedestals.Add(ped);
-            tallest = Math.Max(tallest, ped.Height);
-            if (profile != null && ped.Height < -In(0.25))
-                Warn($"{sl.Name}: bearing seat {(x.Label != "" ? x.Label : $"G{x.Girder + 1}")} is {Sh(-ped.Height)} BELOW the as-designed cap top — check the bearing stack and the cap elevations.");
-            if (ped.Height < In(0.125)) continue;
+            foreach (var x in seats.OrderBy(q => q.S))
+            {
+                var g = groups.LastOrDefault();
+                if (g != null && Math.Abs(x.S - g.Average(q => q.S)) < sd.PedestalSizeAlong / 2) g.Add(x); else groups.Add(new List<Seat> { x });
+            }
+        }
+        else groups.AddRange(seats.Select(x => new List<Seat> { x }));
+        foreach (var grp in groups)
+        {
+            double sMid, nMid, ps0, ps1, pn0, pn1;
+            string whoP = string.Join("/", grp.Select(q => q.Label != "" ? q.Label : $"G{q.Girder + 1}"));
+            if (planPed)
+            {
+                sMid = grp.Average(q => (q.Footprint.Min(f => f.X) + q.Footprint.Max(f => f.X)) / 2);
+                nMid = grp.Average(q => (q.Footprint.Min(f => f.Y) + q.Footprint.Max(f => f.Y)) / 2);
+                ps0 = sMid - sd.PedestalSizeAlong / 2; ps1 = sMid + sd.PedestalSizeAlong / 2;
+                pn0 = nMid - sd.PedestalSizeAcross / 2; pn1 = nMid + sd.PedestalSizeAcross / 2;
+                foreach (var q in grp)
+                {
+                    double out0 = Math.Max(ps0 - q.Footprint.Min(f => f.X), Math.Max(q.Footprint.Max(f => f.X) - ps1, Math.Max(pn0 - q.Footprint.Min(f => f.Y), q.Footprint.Max(f => f.Y) - pn1)));
+                    if (out0 > In(0.125)) Warn($"{sl.Name}: bearing footprint at {whoP} extends {Sh(out0)} beyond the plan pedestal ({Sh(sd.PedestalSizeAlong)} x {Sh(sd.PedestalSizeAcross)}).");
+                }
+                double zMax = grp.Max(q => q.Z), zMin = grp.Min(q => q.Z);
+                if (zMax - zMin > In(0.125))
+                    Warn($"{sl.Name}: pedestal {whoP} carries {grp.Count} seats {Sh(zMax - zMin)} apart ({El(zMin)} to {El(zMax)}); the block top follows the highest seat - check the bearing stacks.");
+            }
+            else
+            {
+                var x0 = grp[0];
+                ps0 = x0.Footprint.Min(q => q.X) - sd.PedestalProjection; ps1 = x0.Footprint.Max(q => q.X) + sd.PedestalProjection;
+                pn0 = x0.Footprint.Min(q => q.Y) - sd.PedestalProjection; pn1 = x0.Footprint.Max(q => q.Y) + sd.PedestalProjection;
+                sMid = (ps0 + ps1) / 2; nMid = (pn0 + pn1) / 2;
+            }
+            double zTop = grp.Max(q => q.Z);
+            foreach (var x in grp)
+            {
+                var ped = new PedestalInfo(x.Girder, sMid, nMid, ps1 - ps0, pn1 - pn0, unit.CapTopAt(x.S, x.N), x.Z) { SeatS = x.S, SeatN = x.N };
+                unit.Pedestals.Add(ped);
+                tallest = Math.Max(tallest, ped.Height);
+                if (profile != null && ped.Height < -In(0.25))
+                    Warn($"{sl.Name}: bearing seat {(x.Label != "" ? x.Label : $"G{x.Girder + 1}")} is {Sh(-ped.Height)} BELOW the as-designed cap top — check the bearing stack and the cap elevations.");
+            }
+            var block = new PedestalInfo(grp[0].Girder, sMid, nMid, ps1 - ps0, pn1 - pn0, unit.CapTopAt(grp[0].S, grp[0].N), zTop);
+            unit.PedestalBlocks.Add(block);
+            if (block.Height < In(0.125)) continue;
             var mesh = new Mesh();
             var foot = new[] { new Vec2(ps0, pn0), new Vec2(ps1, pn0), new Vec2(ps1, pn1), new Vec2(ps0, pn1) };
-            var bottom = foot.Select(q => unit.World(q.X, q.Y, unit.CapTopAt(q.X, x.N))).ToArray();
-            var topR = foot.Select(q => unit.World(q.X, q.Y, x.Z)).ToArray();
+            var bottom = foot.Select(q => unit.World(q.X, q.Y, planPed && grp.Count > 1 ? unit.CapTopAt(q.X, q.Y) : unit.CapTopAt(q.X, grp[0].N))).ToArray();
+            var topR = foot.Select(q => unit.World(q.X, q.Y, zTop)).ToArray();
             MeshBuilder.AddLoft(mesh, foot, new[] { bottom, topR });
-            string side = seats.Count(o => o.Girder == x.Girder) > 1 ? (x.N < 0 ? " back" : " ahead") : "";
-            string who = x.Label != "" ? x.Label : $"G{x.Girder + 1}";
-            unit.Solids.Add(new SubSolid(SubElementKind.Pedestal, $"{sl.Name} pedestal {who}{side}",
-                $"Pedestal {Sh(ped.LengthS)} x {Sh(ped.WidthN)}, {Sh(ped.Height)} high at CL bearing", mesh));
+            string side = !planPed && seats.Count(o => o.Girder == grp[0].Girder) > 1 ? (grp[0].N < 0 ? " back" : " ahead") : "";
+            unit.Solids.Add(new SubSolid(SubElementKind.Pedestal, $"{sl.Name} pedestal {whoP}{side}",
+                $"Pedestal {Sh(ps1 - ps0)} x {Sh(pn1 - pn0)}{(planPed ? " (plan size)" : "")}, {Sh(block.Height)} high at CL bearing{(grp.Count > 1 ? $", {grp.Count} seats" : "")}", mesh));
         }
+        if (planPed)
+            for (int i = 0; i < unit.PedestalBlocks.Count; i++)
+                for (int k = i + 1; k < unit.PedestalBlocks.Count; k++)
+                {
+                    var a1 = unit.PedestalBlocks[i]; var b1 = unit.PedestalBlocks[k];
+                    if (Math.Abs(a1.S - b1.S) < (a1.LengthS + b1.LengthS) / 2 - In(0.125) && Math.Abs(a1.N - b1.N) < (a1.WidthN + b1.WidthN) / 2 - In(0.125))
+                        Warn($"{sl.Name}: plan pedestals at S {Sh(a1.S)} and {Sh(b1.S)} overlap - check the pedestal size / seats.");
+                }
         if (tallest > sd.MaxPedestalHeight)
             Warn($"{sl.Name}: tallest pedestal is {Sh(tallest)} (limit {Sh(sd.MaxPedestalHeight)}); consider a sloped, crowned or seat-following cap top.");
         Note($"{sl.Name}: cap top {how}; pedestals {Sh(unit.Pedestals.Min(p => p.Height))} to {Sh(tallest)}.");

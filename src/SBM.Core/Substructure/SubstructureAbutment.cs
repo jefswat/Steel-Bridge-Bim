@@ -123,10 +123,71 @@ public sealed partial class SubstructureGenerator
         if (!double.IsNaN(ad.BackwallRightOffset)) bwR = EndPlane(ad.BackwallRightOffset);
         else if (maskR != null) bwR = EndPlane(ad.RightEndOffset - maskR.Setback - maskR.Thickness);
         var ext = ad.Extension;
-        if (ext != null)
+
+        // ---- footing plan outline: notches between a face and the end line follow a line of constant STATION (West p86); the kinks need section vertices
+        (double s, double n) AtStaOff(double sta, double e) { var p = a.PointAt(sta, e); return (Vec2.Dot(p - unit.Origin, unit.D), Vec2.Dot(p - unit.Origin, unit.N)); }
+        Plane StationPlane(double sta) => n =>
         {
-            if (ext.End == AbutmentEnd.Right) bwR = ConstPlane(rightEnd(nMid) - ext.Width);
-            else bwL = ConstPlane(leftEnd(nMid) + ext.Width);
+            double s = AtStaOff(sta, 0).s;
+            for (int i = 0; i < 12; i++)
+            {
+                var r = a.Inverse(unit.Plan(s, n));
+                double f = r.Station - sta;
+                if (Math.Abs(f) < 1e-9) break;
+                double d = Vec2.Dot(unit.D, Vec2.FromAngle(a.AngleAt(r.Station)));
+                s -= f / (Math.Abs(d) < 0.2 ? 0.2 * Math.Sign(d == 0 ? 1 : d) : d);
+            }
+            return s;
+        };
+        var kinks = new List<double>();                        // x of the section vertices the notched end planes need
+        var addOns = new List<(bool front, double e, List<Vec2> poly)>();     // outline parts beyond the faces (end line longer than the face-to-face parallelogram)
+        Plane Notched(Plane basic, double e, FootingNotchDefinition? nt)
+        {
+            if (nt == null) return basic;
+            double xTf = double.NaN, xTb = double.NaN;
+            Plane pf = basic, pb = basic;
+            if (!double.IsNaN(nt.FrontStation)) { xTf = sg * AtStaOff(nt.FrontStation, e).n; pf = StationPlane(nt.FrontStation); }
+            if (!double.IsNaN(nt.BackStation)) { xTb = sg * AtStaOff(nt.BackStation, e).n; pb = StationPlane(nt.BackStation); }
+            bool remF = !double.IsNaN(xTf) && xTf < xFF - 1e-6, remB = !double.IsNaN(xTb) && xTb > xFB + 1e-6;
+            if (remF) kinks.Add(xTf);
+            if (remB) kinks.Add(xTb);
+            void AddOn(bool front, double sta, double xT)
+            {
+                double nFace = Nx(front ? xFF : xFB);
+                var p3 = AtStaOff(sta, e);
+                addOns.Add((front, e, new List<Vec2> { new Vec2(StationPlane(sta)(nFace), nFace), new Vec2(basic(nFace), nFace), new Vec2(p3.s, p3.n) }));
+            }
+            if (!double.IsNaN(xTf) && !remF && xTf > xFF + 1e-6) AddOn(true, nt.FrontStation, xTf);
+            if (!double.IsNaN(xTb) && !remB && xTb < xFB - 1e-6) AddOn(false, nt.BackStation, xTb);
+            return n =>
+            {
+                double x = sg * n;
+                if (remF && x > xTf) return pf(n);
+                if (remB && x < xTb) return pb(n);
+                return basic(n);
+            };
+        }
+        var footL = Notched(leftEnd, ad.LeftEndOffset, ad.FootingNotches.FirstOrDefault(k => k.End == AbutmentEnd.Left));
+        var footR = Notched(rightEnd, ad.RightEndOffset, ad.FootingNotches.FirstOrDefault(k => k.End == AbutmentEnd.Right));
+        // end line extent (N) of each end: the notch intersections (maskwalls span the end line)
+        (Vec2 back, Vec2 front) EndsOf(AbutmentEnd end, double e)
+        {
+            var nt = ad.FootingNotches.FirstOrDefault(k => k.End == end);
+            Vec2 At(bool front)
+            {
+                double st = nt == null ? double.NaN : front ? nt.FrontStation : nt.BackStation;
+                if (!double.IsNaN(st)) { var p = AtStaOff(st, e); return new Vec2(p.s, p.n); }
+                double nf = Nx(front ? xFF : xFB);
+                return new Vec2(SolveS(e, nf), nf);
+            }
+            return (At(false), At(true));
+        }
+        double EndX(AbutmentEnd end, bool front)
+        {
+            var nt = ad.FootingNotches.FirstOrDefault(k => k.End == end);
+            double e = end == AbutmentEnd.Left ? ad.LeftEndOffset : ad.RightEndOffset;
+            double st = nt == null ? double.NaN : front ? nt.FrontStation : nt.BackStation;
+            return double.IsNaN(st) ? (front ? xFF : xFB) : sg * AtStaOff(st, e).n;
         }
         double s0Mid = leftEnd(nMid), s1Mid = rightEnd(nMid);
 
@@ -149,20 +210,38 @@ public sealed partial class SubstructureGenerator
         var bwTop = new[] { s0Mid }.Concat(topPts.Select(p => p.X).Where(x => x > s0Mid && x < s1Mid)).Append(s1Mid).Select(s => new Vec2(s, Crown(s))).ToList();
         unit.Backwall = (Math.Min(Nx(xBwB), Nx(xBwF)), Math.Max(Nx(xBwB), Nx(xBwF)), bwTop);
 
-        // ---- footing (three pours' worth of cross-section: plain end zones, keyed under the backwall)
+        // ---- footing (three pours' worth of cross-section: plain end zones, keyed under the backwall); notched ends have extra section vertices at the kinks
         var footMesh = new Mesh();
         {
-            var plain = new (double x, double h)[] { (xFB, 0), (xFF, 0), (xFF, D + W), (xBwF, D + W), (xBwF, D), (xFB, D) };
-            var keyed = new (double x, double h)[] { (xFB, 0), (xFF, 0), (xFF, D + W), (xBwF, D + W), (xBwF, K), (xBwB, K), (xBwB, D), (xFB, D) };
-            SV[] V((double x, double h)[] poly) => poly.Select(p => new SV(Nx(p.x), s => FB(s) + p.h)).ToArray();
+            var plain = new List<(double x, double h)> { (xFB, 0), (xFF, 0), (xFF, D + W), (xBwF, D + W), (xBwF, D), (xFB, D) };
+            var keyed = new List<(double x, double h)> { (xFB, 0), (xFF, 0), (xFF, D + W), (xBwF, D + W), (xBwF, K), (xBwB, K), (xBwB, D), (xFB, D) };
+            static List<(double x, double h)> WithKinks(List<(double x, double h)> poly, IEnumerable<double> xs)
+            {
+                var r = poly.ToList();
+                foreach (double xk in xs)
+                    for (int i = 0; i < r.Count; i++)
+                    {
+                        var p0 = r[i]; var p1 = r[(i + 1) % r.Count];
+                        if (Math.Abs(p0.h - p1.h) < 1e-12 && xk > Math.Min(p0.x, p1.x) + 1e-9 && xk < Math.Max(p0.x, p1.x) - 1e-9) { r.Insert(i + 1, (xk, p0.h)); break; }
+                    }
+                return r;
+            }
+            SV[] V(List<(double x, double h)> poly) => WithKinks(poly, kinks).Select(p => new SV(Nx(p.x), s => FB(s) + p.h)).ToArray();
             var fb = fbPts.Select(p => p.X).ToList();
             bool leftZone = Math.Abs(bwL(nMid) - leftEnd(nMid)) > 1e-4, rightZone = Math.Abs(bwR(nMid) - rightEnd(nMid)) > 1e-4;
-            if (leftZone) AddSlab(footMesh, unit, V(plain), leftEnd, bwL, fb);
-            AddSlab(footMesh, unit, V(keyed), bwL, bwR, fb);
-            if (rightZone) AddSlab(footMesh, unit, V(plain), bwR, rightEnd, fb);
+            if (leftZone) AddSlab(footMesh, unit, V(plain), footL, bwL, fb);
+            AddSlab(footMesh, unit, V(keyed), leftZone ? bwL : footL, rightZone ? bwR : footR, fb);
+            if (rightZone) AddSlab(footMesh, unit, V(plain), bwR, footR, fb);
+            foreach (var (front, _, poly) in addOns)
+            {
+                double zb = poly.Average(q => FB(q.X));
+                if (poly.Max(q => FB(q.X)) - poly.Min(q => FB(q.X)) > In(0.125))
+                    Warn($"{name}: footing outline corner piece spans a sloping footing bottom; built level at the mean bottom {El(zb)}.");
+                MeshBuilder.AddExtrusion(footMesh, poly, Frame(unit, 0, 0), zb, zb + D + (front ? W : 0));
+            }
         }
         unit.Solids.Add(new SubSolid(SubElementKind.Footing, $"{name} footing",
-            $"Abutment footing {L(s1Mid - s0Mid)} long (along the line), {Sh(ad.FootingWidth)} wide x {Sh(D)} deep (+{Sh(W)} wash in front of the backwall), ends parallel to the alignment, as designed", footMesh));
+            $"Abutment footing {L(s1Mid - s0Mid)} long (along the line), {Sh(ad.FootingWidth)} wide x {Sh(D)} deep (+{Sh(W)} wash in front of the backwall), ends parallel to the alignment{(ad.FootingNotches.Count > 0 ? " with the plan's end notches" : "")}, as designed", footMesh));
 
         // ---- backwall: lower pour, upper pour with the corbel, device pour above the ledge
         var bw = new List<double>(topPts.Select(p => p.X)).Concat(fbPts.Select(p => p.X)).ToList();
@@ -193,25 +272,25 @@ public sealed partial class SubstructureGenerator
         if (Math.Abs(gap - sd.BackwallGap) > In(0.125))
             Warn($"{name}: the as-designed backwall front is {Sh(gap)} from the deck end but BackwallGap is {Sh(sd.BackwallGap)}; the as-designed abutment dimension governs (BackwallGap is not used).");
 
-        // ---- backwall extension
+        // ---- backwall extension: the backwall strip continues BEYOND the footing end line to a cap perpendicular to the strip, bottom at the footing-bottom line
         if (ext != null)
         {
-            Warn($"{name}: UNRESOLVED - the backwall extension is dimensioned from the footing-bottom line (14'-10 3/8 high) but is modeled from the backwall base up (it stands on the footing); its width along the line ({Sh(ext.Width)}) is read from the plan dimension 4'-6 3/8 whose span is not unambiguous.");
             var em = new Mesh();
-            Plane pa = ext.End == AbutmentEnd.Right ? ConstPlane(rightEnd(nMid) - ext.Width) : leftEnd;
-            Plane pb = ext.End == AbutmentEnd.Right ? rightEnd : ConstPlane(leftEnd(nMid) + ext.Width);
+            double nBw = Nx((xBwF + xBwB) / 2);
+            bool extR = ext.End == AbutmentEnd.Right;
+            double sCap = extR ? rightEnd(nBw) + ext.Width : leftEnd(nBw) - ext.Width;
+            Plane pa = extR ? rightEnd : ConstPlane(sCap);
+            Plane pb = extR ? ConstPlane(sCap) : leftEnd;
             double zt = ext.TopElevation;
             AddSlab(em, unit, new[]
             {
-                new SV(Nx(xBwF), s => FB(s) + K), new SV(Nx(xBwB), s => FB(s) + K), new SV(Nx(xBwB), _ => zt), new SV(Nx(xBwF), _ => zt),
+                new SV(Nx(xBwF), s => FB(s)), new SV(Nx(xBwB), s => FB(s)), new SV(Nx(xBwB), _ => zt), new SV(Nx(xBwF), _ => zt),
             }, pa, pb, fbPts.Select(p => p.X));
-            unit.Solids.Add(new SubSolid(SubElementKind.Backwall, $"{name} backwall extension", $"Backwall extension {Sh(ext.Width)} wide at the {ext.End.ToString().ToLowerInvariant()} end, level top {El(zt)}", em));
-            geo.Extension = (ext.End, pa(nMid), pb(nMid), zt);
+            unit.Solids.Add(new SubSolid(SubElementKind.Backwall, $"{name} backwall extension", $"Backwall extension {Sh(ext.Width)} long beyond the footing end line at the {ext.End.ToString().ToLowerInvariant()} end (perpendicular cap), from the footing-bottom line to the level top {El(zt)}", em));
+            geo.Extension = (ext.End, extR ? rightEnd(nBw) : sCap, extR ? sCap : leftEnd(nBw), zt);
         }
 
-        // ---- maskwalls
-        if (ad.Masks.Count > 0)
-            Warn($"{name}: UNRESOLVED - the plans give the maskwall zone (1'-2 beyond the wing) and panel thickness (10\") but not the panel's position inside the zone; the panel is placed {Sh(ad.Masks[0].Setback)} from the footing end line (input Setback). Confirm on the plan sheet.");
+        // ---- maskwalls: the OUTERMOST part of the wall zone, outer face at Setback (plans: 0 = flush) from the footing end line; they span the end line of the outline
         foreach (var mk in ad.Masks)
         {
             bool left = mk.End == AbutmentEnd.Left;
@@ -220,15 +299,17 @@ public sealed partial class SubstructureGenerator
             Plane pa = EndPlane(left ? eo : ei), pb = EndPlane(left ? ei : eo);
             double sEnd = left ? leftEnd(nMid) : rightEnd(nMid);
             double zBase = FB(sEnd) + D + W, zt = zBase + mk.Height;
+            double xMB = EndX(mk.End, false), xMF = EndX(mk.End, true);
             var mm = new Mesh();
             AddSlab(mm, unit, new[]
             {
-                new SV(Nx(xFB), s => FB(s) + D + W), new SV(Nx(xFF), s => FB(s) + D + W), new SV(Nx(xFF), _ => zt), new SV(Nx(xFB), _ => zt),
+                new SV(Nx(xMB), s => FB(s) + D), new SV(Nx(xBwF), s => FB(s) + D), new SV(Nx(xBwF), s => FB(s) + D + W), new SV(Nx(xMF), s => FB(s) + D + W),
+                new SV(Nx(xMF), _ => zt), new SV(Nx(xMB), _ => zt),
             }, pa, pb, fbPts.Select(p => p.X));
-            double width = Math.Abs(SolveS(left ? eo : ei, Nx(xFF)) - SolveS(left ? eo : ei, Nx(xFB)));
+            double width = Math.Abs(SolveS(left ? eo : ei, Nx(xMF)) - SolveS(left ? eo : ei, Nx(xMB)));
             unit.Solids.Add(new SubSolid(SubElementKind.Maskwall, $"{name} maskwall {(left ? "left" : "right")}",
-                $"End panel {Sh(mk.Thickness)} thick, {Sh(mk.Height)} above the footing top (top {El(zt)}), spanning the footing width ({Sh(width)} along the wall face)", mm));
-            geo.Masks.Add(new MaskInfo(mk.End, eo, ei, zt, zBase));
+                $"End panel {Sh(mk.Thickness)} thick, {Sh(mk.Height)} above the footing top (top {El(zt)}), spanning the end line ({Sh(width)} along the wall face), {Sh(mk.Setback)} from the footing end line", mm));
+            geo.Masks.Add(new MaskInfo(mk.End, eo, ei, zt, zBase) { EndsAt = e => EndsOf(mk.End, e) });
         }
 
         // ---- beam steps (seat blocks) in front of the backwall, one per bearing
@@ -250,7 +331,7 @@ public sealed partial class SubstructureGenerator
             unit.Solids.Add(new SubSolid(SubElementKind.Pedestal, $"{name} beam step G{seat.Girder + 1}",
                 $"Beam step {Sh(ad.StepLength)} x {Sh(xStepF - xBwF)}, top {El(top)}, {Sh(hMid)} above the wash at the girder", sm));
             geo.Steps.Add(new AbutmentStepInfo(seat.Girder, seat.S, s0, s1, top, FB(seat.S) + D + W, Math.Min(Nx(xBwF), Nx(xStepF)), Math.Max(Nx(xBwF), Nx(xStepF))));
-            unit.Pedestals.Add(new PedestalInfo(seat.Girder, seat.S, Nx((xBwF + xStepF) / 2), ad.StepLength, xStepF - xBwF, FB(seat.S) + D + W, top));
+            { var pi = new PedestalInfo(seat.Girder, seat.S, Nx((xBwF + xStepF) / 2), ad.StepLength, xStepF - xBwF, FB(seat.S) + D + W, top); unit.Pedestals.Add(pi); unit.PedestalBlocks.Add(pi); }
         }
 
         // ---- main footing foundation and piles at the plan stations (two rows normal to the line)
@@ -359,20 +440,25 @@ public sealed partial class SubstructureGenerator
             unit.Solids.Add(new SubSolid(SubElementKind.WingFooting, $"{name} wing footing {wname} {ci}",
                 $"Wing footing {Sh(cf.Width)} along the wall x {Sh(f1 - f0)} across x {Sh(wd.FootingDepth)} deep, top {El(cf.FootingTop)}", fm));
             var cm = new Mesh();
-            MeshBuilder.AddExtrusion(cm, Rect(-cf.Width / 2, cf.Width / 2, c0, c1), frame, cf.FootingTop, cfTop);
+            double bw = cf.BodyWidthResolved;
+            MeshBuilder.AddExtrusion(cm, Rect(-bw / 2, bw / 2, c0, c1), frame, cf.FootingTop, cfTop);
             unit.Solids.Add(new SubSolid(SubElementKind.Counterfort, $"{name} counterfort {wname} {ci}",
-                $"Counterfort {Sh(cf.Width)} wide x {Sh(cf.Projection)} projection, {Sh(cf.Height)} above the footing, top {El(cfTop)}", cm));
-            info.Counterforts.Add(new CounterfortInfo(ci, cf.Start, cf.Width, cf.Projection, cfTop, cf.FootingTop, fBot, yw0, yw1, f0, f1, c0, c1, sta, p0, t));
+                $"Counterfort {Sh(bw)} wide x {Sh(cf.Projection)} projection, {Sh(cf.Height)} above the footing, top {El(cfTop)}", cm));
+            info.Counterforts.Add(new CounterfortInfo(ci, cf.Start, cf.Width, cf.Projection, cfTop, cf.FootingTop, fBot, yw0, yw1, f0, f1, c0, c1, sta, p0, t) { BodyWidth = bw });
             // wing footing piles: two across the footing, centred
             var foot = new FoundationInfo { Type = FoundationType.PileCap, S = Vec2.Dot(p0 - unit.Origin, unit.D), N = NOf(p0), TopZ = cf.FootingTop, BottomZ = fBot, SizeS = cf.Width, SizeN = f1 - f0 };
             unit.Foundations.Add(foot);
+            info.Footings.Add(foot);
+            // pile web across the wall (the 7'-0 direction), flanges parallel to the wall: read from the H symbols of the plan legends (p86 / p90 / p81)
+            var across = new Vec2(-t.Y, t.X);
+            double webS = Vec2.Dot(across, unit.D), webN = Vec2.Dot(across, unit.N);
             double yc = (f0 + f1) / 2;
             for (int pi = 0; pi < 2; pi++)
             {
                 // pile 1 = the outside pile
                 double e = yc + side * wd.FootingPileSpacing / 2 * (pi == 0 ? 1 : -1);
                 var pp = a.PointAt(sta, 0) + (a.PointAt(sta, e) - a.PointAt(sta, 0));
-                var pt = new FootingPoint(Vec2.Dot(pp - unit.Origin, unit.D), NOf(pp));
+                var pt = new FootingPoint(Vec2.Dot(pp - unit.Origin, unit.D), NOf(pp)) { WebDirS = webS, WebDirN = webN };
                 AddPilesAt(unit, sd, foot, 0, 0, fBot, new List<FootingPoint> { pt }, ad.PileLength, 0, $"{name} wing footing {wname} {ci}", embedment: wd.FootingPileTopAbove);
             }
         }

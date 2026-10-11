@@ -566,7 +566,7 @@ public sealed partial class SubstructureGenerator
             }
         }
         // ---- pedestal bars: U bars over each pedestal (base in the pedestal, legs into the cap), hoops round the pedestals
-        var peds = unit.Pedestals;
+        var peds = unit.PedestalBlocks;
         foreach (var g in groups.Where(g => g.Kind is PlanBarKind.PedestalLongitudinal or PlanBarKind.PedestalTransverse or PlanBarKind.PedestalHoop))
         {
             var size = RebarCatalog.Size(g.Size);

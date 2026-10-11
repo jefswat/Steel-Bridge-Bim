@@ -1745,6 +1745,9 @@
             "MinPedestalHeight": 0.07619999999999999,
             "PedestalProjection": 0.07619999999999999,
             "MaxPedestalHeight": 0.45720000000000005,
+            "PedestalSizeAlong": 0,
+            "PedestalSizeAcross": 0,
+            "PedestalShared": false,
             "ColumnCount": 0,
             "ColumnSpacings": [],
             "FirstColumnOffset": "NaN",
@@ -1854,12 +1857,24 @@
                   "End": "Left",
                   "Thickness": 0.254,
                   "Height": 4.318,
-                  "Setback": 0.0508
+                  "Setback": 0
+                }
+              ],
+              "FootingNotches": [
+                {
+                  "End": "Left",
+                  "FrontStation": 230996.02706710502,
+                  "BackStation": 230992.85501350503
+                },
+                {
+                  "End": "Right",
+                  "FrontStation": 231013.68748390503,
+                  "BackStation": "NaN"
                 }
               ],
               "Extension": {
                 "End": "Right",
-                "Width": 1.381125,
+                "Width": 1.3991649002685116,
                 "TopElevation": 307.13172000000003
               },
               "PileStations": [
@@ -1898,6 +1913,7 @@
                     {
                       "Start": 4.3434,
                       "Width": 0.9144000000000001,
+                      "BodyWidth": 0.5588,
                       "Projection": 1.0668000000000002,
                       "Height": 2.6924,
                       "FootingTop": 303.788064,
@@ -1909,6 +1925,7 @@
                     {
                       "Start": 7.391400000000001,
                       "Width": 0.9144000000000001,
+                      "BodyWidth": 0.5588,
                       "Projection": 1.0668000000000002,
                       "Height": 1.6256,
                       "FootingTop": 304.882296,
@@ -1923,7 +1940,16 @@
                   "FootingDepth": 0.9144000000000001,
                   "FootingPileSpacing": 1.2192,
                   "FootingPileTopAbove": 0.3048,
-                  "UpliftPiles": []
+                  "UpliftPiles": [
+                    {
+                      "Footing": 1,
+                      "Pile": 2
+                    },
+                    {
+                      "Footing": 2,
+                      "Pile": 2
+                    }
+                  ]
                 },
                 {
                   "Name": "F",
@@ -1941,6 +1967,7 @@
                     {
                       "Start": 4.3434,
                       "Width": 0.9144000000000001,
+                      "BodyWidth": 0.5588,
                       "Projection": 1.0668000000000002,
                       "Height": 2.6924,
                       "FootingTop": 304.010568,
@@ -1952,6 +1979,7 @@
                     {
                       "Start": 7.391400000000001,
                       "Width": 0.9144000000000001,
+                      "BodyWidth": 0.5588,
                       "Projection": 1.0668000000000002,
                       "Height": 1.6256,
                       "FootingTop": 305.03774400000003,
@@ -1966,7 +1994,16 @@
                   "FootingDepth": 0.9144000000000001,
                   "FootingPileSpacing": 1.2192,
                   "FootingPileTopAbove": 0.3048,
-                  "UpliftPiles": []
+                  "UpliftPiles": [
+                    {
+                      "Footing": 1,
+                      "Pile": 2
+                    },
+                    {
+                      "Footing": 2,
+                      "Pile": 2
+                    }
+                  ]
                 }
               ],
               "Rebar": {
@@ -1984,6 +2021,8 @@
                 "EndStapleFirst": 0.07619999999999999,
                 "HoopWidth": 1.9431000000000003,
                 "HoopHeight": 1.0414,
+                "BackFaceCount": 172,
+                "FrontFaceCount": 87,
                 "BackFaceBarLength": 3.9878,
                 "FrontFaceBarLength": 3.8862000000000005,
                 "BackFaceSpacing": 0.15239999999999998,
@@ -2701,6 +2740,9 @@
             "MinPedestalHeight": 0.07619999999999999,
             "PedestalProjection": 0.07619999999999999,
             "MaxPedestalHeight": 0.45720000000000005,
+            "PedestalSizeAlong": 1.6764,
+            "PedestalSizeAcross": 1.7271999999999998,
+            "PedestalShared": false,
             "ColumnCount": 3,
             "ColumnSpacings": [
               9.906,
@@ -4539,6 +4581,9 @@
             "MinPedestalHeight": 0.07619999999999999,
             "PedestalProjection": 0.07619999999999999,
             "MaxPedestalHeight": 0.45720000000000005,
+            "PedestalSizeAlong": 1.6764,
+            "PedestalSizeAcross": 1.7271999999999998,
+            "PedestalShared": false,
             "ColumnCount": 3,
             "ColumnSpacings": [
               9.4488,
@@ -6377,6 +6422,9 @@
             "MinPedestalHeight": 0.07619999999999999,
             "PedestalProjection": 0.07619999999999999,
             "MaxPedestalHeight": 0.45720000000000005,
+            "PedestalSizeAlong": 1.9811999999999999,
+            "PedestalSizeAcross": 1.7271999999999998,
+            "PedestalShared": false,
             "ColumnCount": 3,
             "ColumnSpacings": [
               9.4488,
@@ -7996,6 +8044,9 @@
             "MinPedestalHeight": 0.07619999999999999,
             "PedestalProjection": 0.07619999999999999,
             "MaxPedestalHeight": 0.45720000000000005,
+            "PedestalSizeAlong": 1.6764,
+            "PedestalSizeAcross": 1.7271999999999998,
+            "PedestalShared": false,
             "ColumnCount": 2,
             "ColumnSpacings": [
               11.5824
@@ -9570,6 +9621,9 @@
             "MinPedestalHeight": 0.07619999999999999,
             "PedestalProjection": 0.07619999999999999,
             "MaxPedestalHeight": 0.45720000000000005,
+            "PedestalSizeAlong": 1.524,
+            "PedestalSizeAcross": 2.3367999999999998,
+            "PedestalShared": true,
             "ColumnCount": 2,
             "ColumnSpacings": [
               11.5824
@@ -20321,6 +20375,9 @@
             "MinPedestalHeight": 0.07619999999999999,
             "PedestalProjection": 0.07619999999999999,
             "MaxPedestalHeight": 0.45720000000000005,
+            "PedestalSizeAlong": 1.524,
+            "PedestalSizeAcross": 2.3367999999999998,
+            "PedestalShared": true,
             "ColumnCount": 3,
             "ColumnSpacings": [
               4.572,
@@ -20629,6 +20686,9 @@
             "MinPedestalHeight": 0.07619999999999999,
             "PedestalProjection": 0.07619999999999999,
             "MaxPedestalHeight": 0.45720000000000005,
+            "PedestalSizeAlong": 1.6764,
+            "PedestalSizeAcross": 1.7271999999999998,
+            "PedestalShared": false,
             "ColumnCount": 4,
             "ColumnSpacings": [
               8.33118984,
@@ -22860,6 +22920,9 @@
             "MinPedestalHeight": 0.07619999999999999,
             "PedestalProjection": 0.07619999999999999,
             "MaxPedestalHeight": 0.45720000000000005,
+            "PedestalSizeAlong": 1.905,
+            "PedestalSizeAcross": 1.7271999999999998,
+            "PedestalShared": false,
             "ColumnCount": 3,
             "ColumnSpacings": [
               10.515600000000001,
@@ -24837,6 +24900,9 @@
             "MinPedestalHeight": 0.07619999999999999,
             "PedestalProjection": 0.07619999999999999,
             "MaxPedestalHeight": 0.45720000000000005,
+            "PedestalSizeAlong": 1.6764,
+            "PedestalSizeAcross": 1.7271999999999998,
+            "PedestalShared": false,
             "ColumnCount": 4,
             "ColumnSpacings": [
               9.144,
@@ -26989,6 +27055,9 @@
             "MinPedestalHeight": 0.07619999999999999,
             "PedestalProjection": 0.07619999999999999,
             "MaxPedestalHeight": 0.45720000000000005,
+            "PedestalSizeAlong": 1.6764,
+            "PedestalSizeAcross": 1.7271999999999998,
+            "PedestalShared": false,
             "ColumnCount": 3,
             "ColumnSpacings": [
               11.125200000000001,
@@ -28625,6 +28694,9 @@
             "MinPedestalHeight": 0.07619999999999999,
             "PedestalProjection": 0.07619999999999999,
             "MaxPedestalHeight": 0.45720000000000005,
+            "PedestalSizeAlong": 1.6764,
+            "PedestalSizeAcross": 1.7271999999999998,
+            "PedestalShared": false,
             "ColumnCount": 3,
             "ColumnSpacings": [
               9.906,
@@ -30286,6 +30358,9 @@
             "MinPedestalHeight": 0.07619999999999999,
             "PedestalProjection": 0.07619999999999999,
             "MaxPedestalHeight": 0.9144000000000001,
+            "PedestalSizeAlong": 0,
+            "PedestalSizeAcross": 0,
+            "PedestalShared": false,
             "ColumnCount": 3,
             "ColumnSpacings": [
               12.3444,
@@ -32527,6 +32602,9 @@
             "MinPedestalHeight": 0.07619999999999999,
             "PedestalProjection": 0.07619999999999999,
             "MaxPedestalHeight": 0.45720000000000005,
+            "PedestalSizeAlong": 0,
+            "PedestalSizeAcross": 0,
+            "PedestalShared": false,
             "ColumnCount": 1,
             "ColumnSpacings": [],
             "FirstColumnOffset": -16.2142829611093,
@@ -49866,6 +49944,9 @@
             "MinPedestalHeight": 0.07619999999999999,
             "PedestalProjection": 0.07619999999999999,
             "MaxPedestalHeight": 0.45720000000000005,
+            "PedestalSizeAlong": 0,
+            "PedestalSizeAcross": 0,
+            "PedestalShared": false,
             "ColumnCount": 3,
             "ColumnSpacings": [
               4.572,
@@ -50173,6 +50254,9 @@
             "MinPedestalHeight": 0.07619999999999999,
             "PedestalProjection": 0.07619999999999999,
             "MaxPedestalHeight": 0.45720000000000005,
+            "PedestalSizeAlong": 1.6764,
+            "PedestalSizeAcross": 1.7271999999999998,
+            "PedestalShared": false,
             "ColumnCount": 4,
             "ColumnSpacings": [
               8.8392,
@@ -52228,6 +52312,9 @@
             "MinPedestalHeight": 0.07619999999999999,
             "PedestalProjection": 0.07619999999999999,
             "MaxPedestalHeight": 0.45720000000000005,
+            "PedestalSizeAlong": 1.6764,
+            "PedestalSizeAcross": 1.7271999999999998,
+            "PedestalShared": false,
             "ColumnCount": 3,
             "ColumnSpacings": [
               10.3632,
@@ -54070,6 +54157,9 @@
             "MinPedestalHeight": 0.07619999999999999,
             "PedestalProjection": 0.07619999999999999,
             "MaxPedestalHeight": 0.45720000000000005,
+            "PedestalSizeAlong": 1.6764,
+            "PedestalSizeAcross": 1.7271999999999998,
+            "PedestalShared": false,
             "ColumnCount": 3,
             "ColumnSpacings": [
               8.9916,
@@ -55645,6 +55735,9 @@
             "MinPedestalHeight": 0.07619999999999999,
             "PedestalProjection": 0.07619999999999999,
             "MaxPedestalHeight": 0.45720000000000005,
+            "PedestalSizeAlong": 1.6764,
+            "PedestalSizeAcross": 1.7271999999999998,
+            "PedestalShared": false,
             "ColumnCount": 3,
             "ColumnSpacings": [
               8.6868,
@@ -57116,6 +57209,9 @@
             "MinPedestalHeight": 0.07619999999999999,
             "PedestalProjection": 0.07619999999999999,
             "MaxPedestalHeight": 0.45720000000000005,
+            "PedestalSizeAlong": 0,
+            "PedestalSizeAcross": 0,
+            "PedestalShared": false,
             "ColumnCount": 0,
             "ColumnSpacings": [],
             "FirstColumnOffset": "NaN",
@@ -57237,12 +57333,13 @@
                   "End": "Left",
                   "Thickness": 0.254,
                   "Height": 3.7592000000000003,
-                  "Setback": 0.0508
+                  "Setback": 0
                 }
               ],
+              "FootingNotches": [],
               "Extension": {
                 "End": "Right",
-                "Width": 1.0414,
+                "Width": 1.0033,
                 "TopElevation": 311.22823200000005
               },
               "PileStations": [
@@ -57282,6 +57379,7 @@
                     {
                       "Start": 2.8956000000000004,
                       "Width": 0.9144000000000001,
+                      "BodyWidth": 0.5588,
                       "Projection": 1.0668000000000002,
                       "Height": 2.6416,
                       "FootingTop": 306.717192,
@@ -57293,6 +57391,7 @@
                     {
                       "Start": 5.9436,
                       "Width": 0.9144000000000001,
+                      "BodyWidth": 0.5588,
                       "Projection": 1.0668000000000002,
                       "Height": 1.6256,
                       "FootingTop": 307.729128,
@@ -57307,7 +57406,16 @@
                   "FootingDepth": 0.9144000000000001,
                   "FootingPileSpacing": 1.2192,
                   "FootingPileTopAbove": 0.3048,
-                  "UpliftPiles": []
+                  "UpliftPiles": [
+                    {
+                      "Footing": 1,
+                      "Pile": 2
+                    },
+                    {
+                      "Footing": 2,
+                      "Pile": 2
+                    }
+                  ]
                 },
                 {
                   "Name": "J",
@@ -57325,6 +57433,7 @@
                     {
                       "Start": 2.8956000000000004,
                       "Width": 0.9144000000000001,
+                      "BodyWidth": 0.5588,
                       "Projection": 1.0668000000000002,
                       "Height": 2.6416,
                       "FootingTop": 308.08574400000003,
@@ -57336,6 +57445,7 @@
                     {
                       "Start": 5.9436,
                       "Width": 0.9144000000000001,
+                      "BodyWidth": 0.5588,
                       "Projection": 1.0668000000000002,
                       "Height": 1.6256,
                       "FootingTop": 309.11292000000003,
@@ -57350,7 +57460,16 @@
                   "FootingDepth": 0.9144000000000001,
                   "FootingPileSpacing": 1.2192,
                   "FootingPileTopAbove": 0.3048,
-                  "UpliftPiles": []
+                  "UpliftPiles": [
+                    {
+                      "Footing": 1,
+                      "Pile": 2
+                    },
+                    {
+                      "Footing": 2,
+                      "Pile": 2
+                    }
+                  ]
                 }
               ],
               "Rebar": {
@@ -57368,6 +57487,8 @@
                 "EndStapleFirst": 0.07619999999999999,
                 "HoopWidth": 1.9431000000000003,
                 "HoopHeight": 1.0414,
+                "BackFaceCount": 160,
+                "FrontFaceCount": 80,
                 "BackFaceBarLength": 3.2004,
                 "FrontFaceBarLength": 3.0988,
                 "BackFaceSpacing": 0.15239999999999998,
@@ -72736,6 +72857,9 @@
             "MinPedestalHeight": 0.07619999999999999,
             "PedestalProjection": 0.07619999999999999,
             "MaxPedestalHeight": 0.45720000000000005,
+            "PedestalSizeAlong": 0,
+            "PedestalSizeAcross": 0,
+            "PedestalShared": false,
             "ColumnCount": 0,
             "ColumnSpacings": [],
             "FirstColumnOffset": "NaN",
@@ -72837,15 +72961,16 @@
                   "End": "Left",
                   "Thickness": 0.254,
                   "Height": 3.8354000000000004,
-                  "Setback": 0.0508
+                  "Setback": 0
                 },
                 {
                   "End": "Right",
                   "Thickness": 0.254,
                   "Height": 4.0386,
-                  "Setback": 0.0508
+                  "Setback": 0
                 }
               ],
+              "FootingNotches": [],
               "Extension": null,
               "PileStations": [
                 -2.1591016002404197,
@@ -72876,6 +73001,7 @@
                     {
                       "Start": 2.8702000000000005,
                       "Width": 0.9144000000000001,
+                      "BodyWidth": 0.5588,
                       "Projection": 1.0668000000000002,
                       "Height": 2.5146,
                       "FootingTop": 302.9712,
@@ -72887,6 +73013,7 @@
                     {
                       "Start": 5.3086,
                       "Width": 0.9144000000000001,
+                      "BodyWidth": 0.5588,
                       "Projection": 1.0668000000000002,
                       "Height": 1.6764000000000001,
                       "FootingTop": 303.745392,
@@ -72901,7 +73028,16 @@
                   "FootingDepth": 0.9144000000000001,
                   "FootingPileSpacing": 1.2192,
                   "FootingPileTopAbove": 0.3048,
-                  "UpliftPiles": []
+                  "UpliftPiles": [
+                    {
+                      "Footing": 1,
+                      "Pile": 2
+                    },
+                    {
+                      "Footing": 2,
+                      "Pile": 2
+                    }
+                  ]
                 },
                 {
                   "Name": "D",
@@ -72919,6 +73055,7 @@
                     {
                       "Start": 2.8702000000000005,
                       "Width": 0.9144000000000001,
+                      "BodyWidth": 0.5588,
                       "Projection": 1.0668000000000002,
                       "Height": 2.5146,
                       "FootingTop": 303.178464,
@@ -72930,6 +73067,7 @@
                     {
                       "Start": 5.3086,
                       "Width": 0.9144000000000001,
+                      "BodyWidth": 0.5588,
                       "Projection": 1.0668000000000002,
                       "Height": 1.6764000000000001,
                       "FootingTop": 303.949608,
@@ -72944,7 +73082,16 @@
                   "FootingDepth": 0.9144000000000001,
                   "FootingPileSpacing": 1.2192,
                   "FootingPileTopAbove": 0.3048,
-                  "UpliftPiles": []
+                  "UpliftPiles": [
+                    {
+                      "Footing": 1,
+                      "Pile": 2
+                    },
+                    {
+                      "Footing": 2,
+                      "Pile": 2
+                    }
+                  ]
                 }
               ],
               "Rebar": {
@@ -72962,6 +73109,8 @@
                 "EndStapleFirst": 0.07619999999999999,
                 "HoopWidth": 1.7272,
                 "HoopHeight": 1.0414,
+                "BackFaceCount": 63,
+                "FrontFaceCount": 31,
                 "BackFaceBarLength": 3.4544,
                 "FrontFaceBarLength": 3.3528000000000002,
                 "BackFaceSpacing": 0.15239999999999998,
@@ -73612,6 +73761,9 @@
             "MinPedestalHeight": 0.07619999999999999,
             "PedestalProjection": 0.07619999999999999,
             "MaxPedestalHeight": 0.45720000000000005,
+            "PedestalSizeAlong": 1.524,
+            "PedestalSizeAcross": 1.8288,
+            "PedestalShared": false,
             "ColumnCount": 1,
             "ColumnSpacings": [],
             "FirstColumnOffset": 3.048,
@@ -74754,6 +74906,9 @@
             "MinPedestalHeight": 0.07619999999999999,
             "PedestalProjection": 0.07619999999999999,
             "MaxPedestalHeight": 0.45720000000000005,
+            "PedestalSizeAlong": 1.7271999999999998,
+            "PedestalSizeAcross": 1.8288,
+            "PedestalShared": false,
             "ColumnCount": 1,
             "ColumnSpacings": [],
             "FirstColumnOffset": 3.048,
@@ -75960,6 +76115,9 @@
             "MinPedestalHeight": 0.07619999999999999,
             "PedestalProjection": 0.07619999999999999,
             "MaxPedestalHeight": 0.45720000000000005,
+            "PedestalSizeAlong": 1.524,
+            "PedestalSizeAcross": 1.8288,
+            "PedestalShared": false,
             "ColumnCount": 1,
             "ColumnSpacings": [],
             "FirstColumnOffset": 3.048,
@@ -77158,6 +77316,9 @@
             "MinPedestalHeight": 0.07619999999999999,
             "PedestalProjection": 0.07619999999999999,
             "MaxPedestalHeight": 0.45720000000000005,
+            "PedestalSizeAlong": 1.524,
+            "PedestalSizeAcross": 1.8288,
+            "PedestalShared": false,
             "ColumnCount": 1,
             "ColumnSpacings": [],
             "FirstColumnOffset": 3.048,
@@ -78368,6 +78529,9 @@
             "MinPedestalHeight": 0.07619999999999999,
             "PedestalProjection": 0.07619999999999999,
             "MaxPedestalHeight": 0.45720000000000005,
+            "PedestalSizeAlong": 1.524,
+            "PedestalSizeAcross": 1.8288,
+            "PedestalShared": true,
             "ColumnCount": 1,
             "ColumnSpacings": [],
             "FirstColumnOffset": 3.047278104364632,
@@ -85160,6 +85324,9 @@
             "MinPedestalHeight": 0.07619999999999999,
             "PedestalProjection": 0.07619999999999999,
             "MaxPedestalHeight": 0.45720000000000005,
+            "PedestalSizeAlong": 1.524,
+            "PedestalSizeAcross": 1.8288,
+            "PedestalShared": true,
             "ColumnCount": 3,
             "ColumnSpacings": [
               4.572,
@@ -85461,6 +85628,9 @@
             "MinPedestalHeight": 0.07619999999999999,
             "PedestalProjection": 0.07619999999999999,
             "MaxPedestalHeight": 0.45720000000000005,
+            "PedestalSizeAlong": 1.524,
+            "PedestalSizeAcross": 1.8288,
+            "PedestalShared": false,
             "ColumnCount": 1,
             "ColumnSpacings": [],
             "FirstColumnOffset": 3.048,
@@ -86671,6 +86841,9 @@
             "MinPedestalHeight": 0.07619999999999999,
             "PedestalProjection": 0.07619999999999999,
             "MaxPedestalHeight": 0.45720000000000005,
+            "PedestalSizeAlong": 1.7271999999999998,
+            "PedestalSizeAcross": 1.8288,
+            "PedestalShared": false,
             "ColumnCount": 1,
             "ColumnSpacings": [],
             "FirstColumnOffset": 3.048,
@@ -88037,6 +88210,9 @@
             "MinPedestalHeight": 0.07619999999999999,
             "PedestalProjection": 0.07619999999999999,
             "MaxPedestalHeight": 0.45720000000000005,
+            "PedestalSizeAlong": 1.524,
+            "PedestalSizeAcross": 1.8288,
+            "PedestalShared": false,
             "ColumnCount": 1,
             "ColumnSpacings": [],
             "FirstColumnOffset": 3.048,
@@ -89355,6 +89531,9 @@
             "MinPedestalHeight": 0.07619999999999999,
             "PedestalProjection": 0.07619999999999999,
             "MaxPedestalHeight": 0.45720000000000005,
+            "PedestalSizeAlong": 0,
+            "PedestalSizeAcross": 0,
+            "PedestalShared": false,
             "ColumnCount": 1,
             "ColumnSpacings": [],
             "FirstColumnOffset": 3.047278104363529,
@@ -95623,6 +95802,9 @@
             "MinPedestalHeight": 0.07619999999999999,
             "PedestalProjection": 0.07619999999999999,
             "MaxPedestalHeight": 0.45720000000000005,
+            "PedestalSizeAlong": 0,
+            "PedestalSizeAcross": 0,
+            "PedestalShared": false,
             "ColumnCount": 3,
             "ColumnSpacings": [
               4.572,
@@ -95924,6 +96106,9 @@
             "MinPedestalHeight": 0.07619999999999999,
             "PedestalProjection": 0.07619999999999999,
             "MaxPedestalHeight": 0.45720000000000005,
+            "PedestalSizeAlong": 1.524,
+            "PedestalSizeAcross": 1.8288,
+            "PedestalShared": false,
             "ColumnCount": 1,
             "ColumnSpacings": [],
             "FirstColumnOffset": 3.048,
@@ -97242,6 +97427,9 @@
             "MinPedestalHeight": 0.07619999999999999,
             "PedestalProjection": 0.07619999999999999,
             "MaxPedestalHeight": 0.45720000000000005,
+            "PedestalSizeAlong": 1.7271999999999998,
+            "PedestalSizeAcross": 1.8288,
+            "PedestalShared": false,
             "ColumnCount": 1,
             "ColumnSpacings": [],
             "FirstColumnOffset": 3.048,
@@ -98591,6 +98779,9 @@
             "MinPedestalHeight": 0.07619999999999999,
             "PedestalProjection": 0.07619999999999999,
             "MaxPedestalHeight": 0.45720000000000005,
+            "PedestalSizeAlong": 1.7271999999999998,
+            "PedestalSizeAcross": 1.8288,
+            "PedestalShared": false,
             "ColumnCount": 1,
             "ColumnSpacings": [],
             "FirstColumnOffset": 3.048,
@@ -99940,6 +100131,9 @@
             "MinPedestalHeight": 0.07619999999999999,
             "PedestalProjection": 0.07619999999999999,
             "MaxPedestalHeight": 0.45720000000000005,
+            "PedestalSizeAlong": 1.524,
+            "PedestalSizeAcross": 1.8288,
+            "PedestalShared": false,
             "ColumnCount": 1,
             "ColumnSpacings": [],
             "FirstColumnOffset": 3.048,
@@ -101150,6 +101344,9 @@
             "MinPedestalHeight": 0.07619999999999999,
             "PedestalProjection": 0.07619999999999999,
             "MaxPedestalHeight": 0.45720000000000005,
+            "PedestalSizeAlong": 1.524,
+            "PedestalSizeAcross": 1.8288,
+            "PedestalShared": true,
             "ColumnCount": 1,
             "ColumnSpacings": [],
             "FirstColumnOffset": 3.0472781043631616,
@@ -108743,6 +108940,9 @@
             "MinPedestalHeight": 0.07619999999999999,
             "PedestalProjection": 0.07619999999999999,
             "MaxPedestalHeight": 0.45720000000000005,
+            "PedestalSizeAlong": 1.524,
+            "PedestalSizeAcross": 1.8288,
+            "PedestalShared": true,
             "ColumnCount": 3,
             "ColumnSpacings": [
               4.572,
@@ -109044,6 +109244,9 @@
             "MinPedestalHeight": 0.07619999999999999,
             "PedestalProjection": 0.07619999999999999,
             "MaxPedestalHeight": 0.45720000000000005,
+            "PedestalSizeAlong": 1.524,
+            "PedestalSizeAcross": 1.8288,
+            "PedestalShared": false,
             "ColumnCount": 1,
             "ColumnSpacings": [],
             "FirstColumnOffset": 3.048,
@@ -110242,6 +110445,9 @@
             "MinPedestalHeight": 0.07619999999999999,
             "PedestalProjection": 0.07619999999999999,
             "MaxPedestalHeight": 0.45720000000000005,
+            "PedestalSizeAlong": 2.1844,
+            "PedestalSizeAcross": 1.7271999999999998,
+            "PedestalShared": false,
             "ColumnCount": 2,
             "ColumnSpacings": [
               11.5824
@@ -111735,6 +111941,9 @@
             "MinPedestalHeight": 0.07619999999999999,
             "PedestalProjection": 0.07619999999999999,
             "MaxPedestalHeight": 0.45720000000000005,
+            "PedestalSizeAlong": 1.8288,
+            "PedestalSizeAcross": 1.7271999999999998,
+            "PedestalShared": false,
             "ColumnCount": 2,
             "ColumnSpacings": [
               8.5344
@@ -113225,6 +113434,9 @@
             "MinPedestalHeight": 0.07619999999999999,
             "PedestalProjection": 0.07619999999999999,
             "MaxPedestalHeight": 0.45720000000000005,
+            "PedestalSizeAlong": 1.7271999999999998,
+            "PedestalSizeAcross": 1.8288,
+            "PedestalShared": false,
             "ColumnCount": 1,
             "ColumnSpacings": [],
             "FirstColumnOffset": 3.048,
@@ -114480,6 +114692,9 @@
             "MinPedestalHeight": 0.07619999999999999,
             "PedestalProjection": 0.07619999999999999,
             "MaxPedestalHeight": 0.45720000000000005,
+            "PedestalSizeAlong": 0,
+            "PedestalSizeAcross": 0,
+            "PedestalShared": false,
             "ColumnCount": 1,
             "ColumnSpacings": [],
             "FirstColumnOffset": 3.9430257339991694,

@@ -971,6 +971,7 @@ I80,West Abut,ABUT_WASH_DEPTH,1,4.08333,ft,86,,"footing bottom to the wash (seat
 I80,West Abut,ABUT_BW_TOP,1,1008.15,ft,86,,top of backwall at CL abutment bearing (crown line)
 I80,West Abut,ABUT_PILE_LEN,1,125,ft,86,,contract length of the abutment piles (notes)
 I80,West Abut,ABUT_PILE_HEAD,1,2,ft,86,,top of piles above bottom of footing (2'-0)
+I80,West Abut,ABUT_WING_PILE_HEAD,1,1,ft,88,,"top of wing footing piles above the bottom of the wing footing (1'-0, section H-H)"
 I80,West Abut,ABUT_PED,1,997.15,ft,85,,"beam step top (*ELEV.), girder A"
 I80,West Abut,ABUT_PED,2,997.51,ft,85,,"beam step top (*ELEV.), girder B"
 I80,West Abut,ABUT_PED,3,997.87,ft,85,,"beam step top (*ELEV.), girder C"
@@ -997,6 +998,7 @@ I80,East Abut,ABUT_WASH_DEPTH,1,4.08333,ft,89,,"footing bottom to the wash (seat
 I80,East Abut,ABUT_BW_TOP,1,1018.71,ft,89,,top of backwall at CL abutment bearing (crown line)
 I80,East Abut,ABUT_PILE_LEN,1,115,ft,90,,contract length of the abutment piles (notes)
 I80,East Abut,ABUT_PILE_HEAD,1,2,ft,89,,top of piles above bottom of footing (2'-0)
+I80,East Abut,ABUT_WING_PILE_HEAD,1,1,ft,92,,"top of wing footing piles above the bottom of the wing footing (1'-0, section H-H)"
 I80,East Abut,ABUT_PED,1,1008.2,ft,89,,"beam step top (*ELEV.), girder A"
 I80,East Abut,ABUT_PED,2,1008.54,ft,89,,"beam step top (*ELEV.), girder D"
 I80,East Abut,ABUT_PED,3,1009.22,ft,89,,"beam step top (*ELEV.), girder E"
@@ -1024,6 +1026,7 @@ G,South Abut,ABUT_WASH_DEPTH,1,4.08333,ft,80,,"footing bottom to the wash (seat 
 G,South Abut,ABUT_BW_TOP,1,1004.22,ft,80,,top of backwall at CL Ramp G
 G,South Abut,ABUT_PILE_LEN,1,125,ft,81,,contract length of the abutment piles (notes)
 G,South Abut,ABUT_PILE_HEAD,1,2,ft,80,,top of piles above bottom of footing (2'-0)
+G,South Abut,ABUT_WING_PILE_HEAD,1,1,ft,83,,"top of wing footing piles above the bottom of the wing footing (1'-0, section H-H)"
 G,South Abut,ABUT_PED,1,995.51,ft,80,,"beam step top (*ELEV.), girder A"
 G,South Abut,ABUT_PED,2,995.71,ft,80,,"beam step top (*ELEV.), girder B"
 G,South Abut,ABUT_PED,3,995.9,ft,80,,"beam step top (*ELEV.), girder C"

@@ -38,6 +38,19 @@ public sealed partial class MiscItemsGenerator
         return (lo + hi) / 2;
     }
 
+    /// <summary>Flags the pier-system parts whose position / size the plans do not dimension (Ramp G PDF 154-158).</summary>
+    private void FlagPier(string asm)
+    {
+        Flag(asm + " neoprene trough", "U-section width and sag of the trough are not dimensioned (Ramp G PDF 154 sections A-A / C-C, PDF 156 section B-B).", "strip as wide as the joint blockout, invert at the deck underside at the high end");
+        Flag(asm + " trough collection box", "Only the distance of the box from the roadway edge is printed (PDF 154); its orientation and vertical position are not.", "2'-2 side along the pier line, top at the trough invert at the box");
+        Flag(asm + " pier collection box", "Position of the pier collection box across the cap (N) and its top 'below the pier top 1\" min / 1/4\" max' are not dimensioned (PDF 154 section A-A, PDF 155 / 157).", "centred on the column in N, top 1/4\" below the cap top");
+        Flag(asm + " pipe 1", "The longitudinal run of the 1:12 pipe from the trough box to the pier collection box is not dimensioned (PDF 154 sections A-A / C-C).", "straight in plan between the box centres at 1:12 from the box low end");
+        Flag(asm + " pier pipe", "Route of the pipe along the cap soffit and the face / standoff of the vertical pipe on the column are not dimensioned (PDF 157 drain pipe elevations).", "pipe tangent under the cap soffit at the box, exactly the minimum slope to the column, vertical tangent to the back face of the column");
+        Flag(asm + " pipe supports", "Support positions follow the pipe route, which is not dimensioned (PDF 157; spacing 6'-0 / 4'-0 max is printed).", "first clamp 1'-0 below the soffit run end, then at the maximum spacing");
+        Flag(asm + " outlet leg", "Direction of the 45 deg outlet leg is not printed (PDF 157 outlet detail).", "away from the column on the back side");
+        Flag(asm + " erosion stone mattress", "Plan position of the mattress under the outlet follows the unresolved outlet leg direction (PDF 157).", "centred under the outlet end");
+    }
+
     private void BuildPierDrain(PierDrainDefinition pd)
     {
         string asm = $"Pier drain {pd.Support}";
@@ -138,6 +151,14 @@ public sealed partial class MiscItemsGenerator
             if (e.Z > zFl) em.Append(MiscMesh.Tube(e, e.XY.WithZ(zFl), coll.Od / 2, coll.Od / 2 - coll.Wall));
             Add(MiscGroup.Drainage, MiscKind.DrainPipe, asm, asm + " collector end", $"{coll.Name} elbow down toward the pier collection box", em, "ASTM A53 Gr B, galvanized");
             if (e.Z > zFl) Record(asm, "collector end", e, e.XY.WithZ(zFl), coll.Od / 2, sl.Station);
+            string clash = "";
+            if (e.Z > zFl)
+            {
+                var (cc, ag, _) = MiscMesh.Clearance(_steelIndex, e, e.XY.WithZ(zFl), coll.Od / 2);
+                clash = double.IsNaN(cc) ? "" : $" Modeled drop clearance to steel: {Sh(cc)} to {ag}.";
+            }
+            Flag(asm + " collector end", $"The plans (Ramp G PDF 154 partial plan, PDF 157) do not give the routing of the span 19G collector from its end at the bearing line to the pier collection box ({Sh(dd)} apart in plan).{clash} The straight drop also overlaps the Pier 19G masonry plate where modeled (see the clearance records).",
+                "elbow straight down at the pipe end to the box flange level");
         }
 
         // cap pipe: box bottom -> soffit -> 8% toward the column -> vertical on the back face
@@ -192,6 +213,7 @@ public sealed partial class MiscItemsGenerator
             MeshBuilder.AddBox(mat, MiscMesh.Plan(pE, unit.D), -pd.MattressSize / 2, pd.MattressSize / 2, -pd.MattressSize / 2, pd.MattressSize / 2, gg - pd.MattressThickness, gg);
             Add(MiscGroup.Drainage, MiscKind.ErosionMattress, asm, asm + " erosion stone mattress", $"Erosion stone mattress {Sh(pd.MattressSize)} x {Sh(pd.MattressSize)} x {Sh(pd.MattressThickness)} on engineering fabric, centred under the outlet", mat, "Erosion stone on engineering fabric");
         }
+        FlagPier(asm);
         Warn($"{asm}: placement conventions to confirm - CL pier = CL column (S), N of the pier collection box = CL column, vertical pipe on the back (down-station) face, trough invert at the deck underside at its high end, cleanouts / flanges / hanger rods not modeled.");
     }
 }
