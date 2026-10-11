@@ -126,24 +126,17 @@ public sealed class AbutmentRebarDefinition
     public double EndStapleFirst { get; set; } = In(3);
     public double HoopWidth { get; set; } = Ft(6) + In(4.5);
     public double HoopHeight { get; set; } = Ft(3) + In(5);
-    /// <summary>6d1 back-face verticals, 5d2 front-face verticals: spacing and end offsets from the backwall ends.</summary>
+    /// <summary>Backwall vertical bars (printed straight lengths, hung from the top of the backwall less the cover): back face (6d1) and front face (5d2),
+    /// their spacing and the distance of the first bar from the backwall end.</summary>
+    public double BackFaceBarLength { get; set; }
+    public double FrontFaceBarLength { get; set; }
     public double BackFaceSpacing { get; set; } = In(6);
     public double FrontFaceSpacing { get; set; } = Ft(1);
     public double BackFaceEdge { get; set; } = In(6);
     public double FrontFaceEdge { get; set; } = Ft(1);
-    /// <summary>Verticals' lower end above the footing bottom (13'-1 bars end 2'-1 above it on the West sheet).</summary>
-    public double VerticalBottomAboveFooting { get; set; } = Ft(2) + In(1);
-    public int BackwallLongRowsPerFace { get; set; } = 11;
-    public double BackwallLongLap { get; set; } = Ft(2) + In(11);
-    public int BackwallLongPieces { get; set; } = 2;
-    public double NotchBarSpacing { get; set; } = Ft(1);
-    public double NotchDowelSpacing { get; set; } = Ft(2);
-    public double NotchLongLap { get; set; } = Ft(2) + In(2);
-    public int NotchLongBars { get; set; } = 4;
-    public double HairpinSpacing { get; set; } = Ft(1);
     public double BackwallBarCover { get; set; } = In(2);
-    public double FootingCover { get; set; } = In(3);
-    public double WallCover { get; set; } = In(4);
+    public int BackwallLongRowsPerFace { get; set; } = 11;
+    public int BackwallLongPieces { get; set; } = 2;
     /// <summary>Beam steps: transverse U bars (5m1) per step, longitudinal (5n1) per step, hoop (5n2) at these girders only.</summary>
     public int StepUBars { get; set; } = 4;
     public int StepLongBars { get; set; } = 4;

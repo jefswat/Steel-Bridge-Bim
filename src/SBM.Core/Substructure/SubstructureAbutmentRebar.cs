@@ -5,7 +5,154 @@ using static SBM.Core.Units.UnitSystem;
 
 namespace SBM.Core.Substructure;
 
+/// <summary>
+/// Reinforcing of the as-designed abutment. Only bars whose placement the plans PROVE are placed in 3D: the footing longitudinals (rows from the
+/// section: 6 / 4 equal spaces), the footing hoops at the pile pitch, and the backwall verticals (placement strings, printed straight lengths).
+/// Every other mark of the plan bar list is entered in the schedule at its printed count and length ("schedule only": no 3D bar, no bend diagram)
+/// and reported in one warning, so nothing is placed by a rule the plans do not state. Count differences between the placement strings and
+/// the list are reported, never adjusted.
+/// </summary>
 public sealed partial class SubstructureGenerator
 {
-    private void AbutmentBars(SubstructureUnit unit, List<RawBar> bars) { }
+    private sealed record PBar(string Mark, Vec3[] Pts);
+
+    private static string SizeOfMark(string mark) => "#" + new string(mark.TakeWhile(char.IsDigit).ToArray());
+
+    private void AbutmentBars(SubstructureModel m, SubstructureUnit unit)
+    {
+        var g = unit.Abutment!;
+        var ad = g.Def;
+        var rb = ad.Rebar;
+        string name = unit.Name;
+        double sg = g.Sigma;
+        double D = ad.FootingDepth;
+        var placed = new List<PBar>();
+        Vec3 P(double s, double x, double z) => unit.World(s, g.N(x), z);
+
+        // ---- footing longitudinals: rows from the section (top/bottom rows of FootingRowBars, SideInterior bars on each side face)
+        var big = RebarCatalog.Size(SizeOfMark(rb.FootingLongMark));
+        var hoop = RebarCatalog.Size("#5");
+        double cTop = In(2), cBot = In(3), cSide = In(2);       // printed "2" CL." (top, sides) and "3" CL." (bottom)
+        double xa = g.XFootBack + cSide + hoop.Diameter + big.Diameter / 2, xb = g.XFootFront - cSide - hoop.Diameter - big.Diameter / 2;
+        double hBot = cBot + hoop.Diameter + big.Diameter / 2, hTop = D - cTop - hoop.Diameter - big.Diameter / 2;
+        var rows = new List<(double x, double h)>();
+        for (int i = 0; i < rb.FootingRowBars; i++)
+        {
+            double x = xa + (xb - xa) * i / Math.Max(1, rb.FootingRowBars - 1);
+            rows.Add((x, hBot)); rows.Add((x, hTop));
+        }
+        for (int i = 1; i <= rb.FootingSideInteriorBars; i++)
+        {
+            double h = hBot + (hTop - hBot) * i / (rb.FootingSideInteriorBars + 1);
+            rows.Add((xa, h)); rows.Add((xb, h));
+        }
+        double endCover = In(2);
+        foreach (var (x, h) in rows)
+        {
+            double n = g.N(x);
+            double sL = g.LeftEndS(n) + endCover, sR = g.RightEndS(n) - endCover;
+            int pieces = Math.Max(1, rb.FootingLongPieces);
+            double piece = ((sR - sL) + (pieces - 1) * rb.FootingLongLap) / pieces;
+            for (int k = 0; k < pieces; k++)
+            {
+                double s0 = sL + k * (piece - rb.FootingLongLap), s1 = s0 + piece;
+                placed.Add(new PBar(rb.FootingLongMark, new[] { P(s0, x, g.FootingBottom(s0) + h), P(s1, x, g.FootingBottom(s1) + h) }));
+            }
+        }
+
+        // ---- footing hoops at the pile pitch (each in a plane normal to the line)
+        var stations = ad.PileStations.OrderBy(x => x).ToList();
+        var (hoopShape, hoopLocal) = ClosedStirrup(rb.HoopWidth, rb.HoopHeight, hoop);
+        for (int k = 0; k + 1 < stations.Count; k++)
+            for (int i = 0; i < rb.HoopsPerPitch; i++)
+            {
+                double s = stations[k] + rb.HoopFirstOffset + i * rb.HoopSpacing;
+                double x0 = g.XFootBack + cSide, z0 = g.FootingBottom(s) + cBot;
+                placed.Add(new PBar("5b1", hoopLocal.Select(p => P(s, x0 + p.X, z0 + p.Y)).ToArray()));
+            }
+
+        // ---- backwall verticals along the backwall (placement strings)
+        double nBack = g.N(g.XBwBack), nFront = g.N(g.XBwFront);
+        double bwL = g.BwLeftS(nBack), bwR = g.BwRightS(nBack);
+        var vBack = RebarCatalog.Size("#6");
+        const string backMark = "6d1", frontMark = "5d2";      // printed marks on all three abutments
+        var vFront = RebarCatalog.Size(SizeOfMark(frontMark));
+        double xBack = g.XBwBack + rb.BackwallBarCover + vBack.Diameter / 2, xFront = g.XBwFront - rb.BackwallBarCover - vFront.Diameter / 2;
+        if (rb.BackFaceBarLength > 0)
+            for (double s = bwL + rb.BackFaceEdge; s <= bwR - rb.BackFaceEdge + 1e-6; s += rb.BackFaceSpacing)
+            {
+                double top = g.BackwallTop(s) - rb.BackwallBarCover;
+                placed.Add(new PBar(backMark, new[] { P(s, xBack, top - rb.BackFaceBarLength), P(s, xBack, top) }));
+            }
+        if (rb.FrontFaceBarLength > 0)
+            for (double s = bwL + rb.FrontFaceEdge; s <= bwR - rb.FrontFaceEdge + 1e-6; s += rb.FrontFaceSpacing)
+            {
+                double top = g.BackwallTop(s) - rb.BackwallBarCover;
+                placed.Add(new PBar(frontMark, new[] { P(s, xFront, top - rb.FrontFaceBarLength), P(s, xFront, top) }));
+            }
+
+        // ---- marks
+        bool epoxy = unit.Definition.Reinforcement.EpoxyCoated;
+        var marks = new List<BarMark>();
+        var places = new List<BarPlacement>();
+        var done = new HashSet<string>();
+        foreach (var grp in placed.GroupBy(p => p.Mark).OrderBy(x => x.Key, StringComparer.Ordinal))
+        {
+            var size = RebarCatalog.Size(SizeOfMark(grp.Key));
+            var lens = grp.Select(p => Length3(p.Pts)).ToList();
+            BarShape shape = grp.Key == "5b1" ? hoopShape : BarShape.Straight(lens.Max());
+            bool varies = lens.Max() - lens.Min() > In(1) && grp.Key != "5b1";
+            marks.Add(new BarMark
+            {
+                Mark = grp.Key, Size = size, Shape = shape, Location = LocationOf(grp.Key), Unit = unit.Name, Epoxy = epoxy && grp.Key != "5d5", Count = grp.Count(),
+                VaryingLengths = varies ? lens : null,
+            });
+            places.AddRange(grp.Select(p => new BarPlacement { Mark = grp.Key, Points = p.Pts, Group = "Sub", Unit = unit.Name }));
+            done.Add(grp.Key);
+        }
+        // schedule-only marks: the rest of the plan bar list at its printed count / length
+        var scheduleOnly = new List<string>();
+        foreach (var line in rb.PlanBarList)
+        {
+            if (done.Contains(line.Mark)) continue;
+            var size = RebarCatalog.Size(SizeOfMark(line.Mark));
+            List<double>? varying = null;
+            if (line.Varies && line.WeightLb > 0 && line.Count > 1)
+            {
+                double avg = line.WeightLb * 0.45359237 / size.MassPerLength / line.Count;      // weight-consistent individual length
+                varying = Enumerable.Repeat(avg, line.Count).ToList();
+                varying[0] = line.Length;                                                         // the printed maximum
+            }
+            marks.Add(new BarMark
+            {
+                Mark = line.Mark, Size = size, Shape = BarShape.Straight(line.Length), Location = LocationOf(line.Mark) + " (schedule only)", Unit = unit.Name,
+                Epoxy = epoxy && line.Mark != "5d5", Count = line.Count, VaryingLengths = varying,
+            });
+            scheduleOnly.Add($"{line.Mark} x{line.Count}");
+        }
+        foreach (var line in rb.PlanBarList)
+        {
+            var mk = marks.FirstOrDefault(x => x.Mark == line.Mark);
+            if (mk != null && done.Contains(line.Mark) && mk.Count != line.Count)
+                Warn($"{name}: bar {line.Mark}: {mk.Count} bars from the placement string / section vs {line.Count} in the plan bar list - NOT adjusted (list rows at the corners / ends are not drawn).");
+        }
+        if (scheduleOnly.Count > 0)
+            Warn($"{name}: reinforcing - only the footing longitudinals, footing hoops at the pile pitch and the backwall verticals are placed in 3D; the plan bar list rows without a proven placement are in the schedule at the printed count/length (no 3D bar, no bend diagram): {string.Join(", ", scheduleOnly)}.");
+        if (ad.Wings.Any(w => w.UpliftPiles.Count == 0))
+            Warn($"{name}: UNRESOLVED - the circled wing-footing piles (pile uplift anchors 8j3, 8 bars = 4 circled piles) could not be identified from the sheets; no anchor is placed (the 8j3 line stays in the schedule).");
+        lock (m) { m.Marks.AddRange(marks); m.Bars.AddRange(places); }
+    }
+
+    private static string LocationOf(string mark) => mark switch
+    {
+        "9a1" or "8a1" => "Footing, longitudinal", "5b1" => "Footing, hoops", "6d1" => "Backwall, back face, vertical", "5d2" => "Backwall, front face, vertical",
+        _ => "Abutment (plan bar list)",
+    };
+
+    private static double Length3(Vec3[] pts)
+    {
+        double l = 0;
+        for (int i = 1; i < pts.Length; i++) l += (pts[i] - pts[i - 1]).Length;
+        return l;
+    }
 }

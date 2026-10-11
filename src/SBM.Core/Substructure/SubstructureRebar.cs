@@ -23,7 +23,7 @@ public sealed partial class SubstructureGenerator
             var r = unit.Definition.Reinforcement;
             if (!r.Enabled) continue;
             var bars = new List<RawBar>();
-            if (unit.Abutment != null) { AbutmentBars(unit, bars); perUnit.Add((unit, bars)); continue; }
+            if (unit.Abutment != null) { AbutmentBars(m, unit); continue; }
             CapBars(unit, bars);
             if (unit.Backwall != null) BackwallBars(unit, bars);
             foreach (var c in unit.Columns) ColumnBars(unit, c, bars);

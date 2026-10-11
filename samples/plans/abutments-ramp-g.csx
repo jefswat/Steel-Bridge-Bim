@@ -86,6 +86,7 @@ foreach (var w in wings)
 var rb = ad.Rebar;
 rb.FootingLongMark = "8a1"; rb.FootingRowBars = 5; rb.FootingLongPieces = 1; rb.HoopsPerPitch = 9; rb.HoopFirstOffset = In(9);
 rb.EndHoopsEach = 2; rb.EndStaplesEach = 3; rb.BackwallLongRowsPerFace = 11; rb.BackwallLongPieces = 1; rb.HoopWidth = F(5, 8); rb.PlanBarList = list;
+rb.BackFaceBarLength = F(11, 4); rb.FrontFaceBarLength = F(11);
 rb.StepHoopGirders = new() { 4 };                                          // 5n2 hoop at girder D only (printed)
 var sd = sup.ResolvedSubstructure.Clone();
 sd.Abutment = ad;

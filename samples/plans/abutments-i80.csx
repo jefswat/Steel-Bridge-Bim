@@ -68,6 +68,7 @@ void Build(string bridgeName, bool first, string source, double leftEnd, double 
     var rb = ad.Rebar;
     rb.FootingLongMark = "9a1"; rb.FootingRowBars = 7; rb.FootingLongPieces = 2; rb.FootingLongLap = F(9, 1);
     rb.HoopsPerPitch = hoopsPerPitch; rb.HoopFirstOffset = hoopFirst; rb.EndHoopsEach = endHoops; rb.EndStaplesEach = staples;
+    rb.BackFaceBarLength = first ? F(13, 1) : F(10, 6); rb.FrontFaceBarLength = first ? F(12, 9) : F(10, 2);
     rb.BackwallLongRowsPerFace = rowsPerFace; rb.BackwallLongPieces = 2; rb.PlanBarList = list;
     if (first) rb.StepHoopGirders = new() { 3, 4 };           // 5n2 hoops at girders C and D only (printed)
     var sd = sup.ResolvedSubstructure.Clone();
