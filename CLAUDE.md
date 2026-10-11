@@ -1,4 +1,4 @@
-﻿# Steel Bridge Modeler â€” notes for Claude
+# Steel Bridge Modeler â€” notes for Claude
 
 Desktop BIM modeler for steel plate girder bridges and substructures (Windows, .NET 10, WPF). The user is a bridge
 engineer who directs and tests; Claude writes and maintains all code. Keep this file current when architecture changes.
@@ -66,6 +66,8 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
     `ResolvedSubstructure`). `SubstructureGenerator` runs AFTER steel (needs `SteelModel.BearingSeats`), per support in
     parallel: cap coordinates S (along the skewed support line from the alignment point, right +), N (normal, up-station +).
     Cap top = shape g(S) + c with c set so min pedestal = MinPedestalHeight; pedestals take the rest (variable).
+    Plan pedestal sizes (OPTIONAL): `PedestalSizeAlong/Across` (S x N, centred on the bearing footprint; 0 = footprint + `PedestalProjection`) and `PedestalShared` (ONE block per girder
+    line carries the back + ahead seats, top = highest seat, differences reported). Set by `piers-i80.csx` / `piers-ramp-g.csx` (not 6A, 11WB, 9G, 19G: sizes not settled).
     `SubstructureRebar.cs` = bars + marks (per unit; `BarMark.Unit`/`BarPlacement.Unit`; straight bars within 2" share a
     mark cut to the shortest). Ground for automatic foundation tops: `RegenerationCache.Ground` (+ `GroundVersion` in key);
     app sets it from loaded terrains, `SbmDocument` loads terrain references itself.
