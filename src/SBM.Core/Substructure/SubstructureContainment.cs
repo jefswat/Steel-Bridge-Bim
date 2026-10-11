@@ -25,10 +25,14 @@ public sealed partial class SubstructureGenerator
         return inside ? d : -d;
     }
 
-    /// <summary>Which face of the cap outline (S-Z) is nearest to a point: top (edge flatter than 45 deg above the point), soffit (below) or end.</summary>
+    /// <summary>Which face of the cap outline (S-Z) is nearest to a point, by the edge's outward normal: top (normal within 45 deg of up),
+    /// soffit (of down) or end.</summary>
     private static string OutlineFace(IReadOnlyList<Vec2> poly, double s, double z)
     {
         var p = new Vec2(s, z); double best = double.MaxValue; string face = "cap outline";
+        double area = 0;
+        for (int i = 0, j = poly.Count - 1; i < poly.Count; j = i++) area += poly[j].X * poly[i].Y - poly[i].X * poly[j].Y;
+        double sign = area >= 0 ? 1 : -1;                                // counter-clockwise: outward normal of edge e = (e.Y, -e.X)
         for (int i = 0, j = poly.Count - 1; i < poly.Count; j = i++)
         {
             var a = poly[j]; var b = poly[i]; var e = b - a;
@@ -36,7 +40,8 @@ public sealed partial class SubstructureGenerator
             var q = a + e * t; double d = Vec2.Distance(p, q);
             if (d >= best) continue;
             best = d;
-            face = Math.Abs(e.Y) < Math.Abs(e.X) ? (q.Y > z ? "cap top" : "cap soffit") : "cap end";
+            double nx = sign * e.Y, ny = -sign * e.X;
+            face = Math.Abs(ny) > Math.Abs(nx) ? (ny > 0 ? "cap top" : "cap soffit") : "cap end";
         }
         return face;
     }

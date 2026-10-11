@@ -288,16 +288,32 @@ public sealed partial class SubstructureGenerator
                         var outline = new[] { new Vec2(0, 0), new Vec2(flat, 0), new Vec2(flat + run, -rise) };
                         var (cs, cl) = PlanBent(size, outline, new[] { flat, slant }, +1, "CS", $"Bar {Dim(flat)} flat + {Dim(slant)} slanted ({Dim(run)} x {Dim(rise)}) out to out", g.Pin, g.Length);
                         double sTip = end == 0 ? s0 : s1, inward = end == 0 ? 1 : -1;
-                        double zb = BotAt(sTip + inward * (cov + flat / 2)) + cov + st.Diameter + 3 * size.Diameter * rowsB;
-                        double sv = sTip;                                                       // pushed in from the (raked) end face only as far as the clear cover needs
-                        bool foundCs = false;
-                        for (int it = 0; it < 800 && !foundCs; it++)
+                        // The bar is placed as low as the clear cover allows and pushed in from the (raked) end face only as far as the cover needs:
+                        // for each set-back from the tip (1/4" steps) the lowest elevation of the bar (1/4" steps from the soffit) whose every point
+                        // (sampled along the segments: the soffit bevel ends in a re-entrant corner) keeps the cover. Earlier the elevation was fixed
+                        // from the soffit 1 ft inside the tip, below the end-face corner, and only the set-back was searched: the slanted run is longer
+                        // than the soffit bevel (8'-9 vs ~9'-2 1/2 incl. the 2'-0 flat), so no set-back fitted and every 6b2 was reported.
+                        var samp = new List<Vec2>();
+                        for (int k = 0; k + 1 < cl.Length; k++)
                         {
-                            foundCs = true;
-                            foreach (var q in cl) if (Clr(sv + inward * q.X, zb + q.Y) < cov + size.Diameter / 2 - 1e-4) { foundCs = false; break; }
-                            if (!foundCs) sv += inward * In(0.25);
+                            int ns2 = Math.Max(1, (int)Math.Ceiling(Vec2.Distance(cl[k], cl[k + 1]) / In(1)));
+                            for (int m2 = 0; m2 < ns2; m2++) samp.Add(Vec2.Lerp(cl[k], cl[k + 1], m2 / (double)ns2));
                         }
-                        if (!foundCs) sv = sTip + inward * cov;                                  // no position keeps the cover: at the end face, reported by the check
+                        samp.Add(cl[^1]);
+                        double need = cov + st.Diameter + size.Diameter / 2 - 1e-4, sv = sTip, zb = 0;
+                        bool foundCs = false;
+                        for (int it = 0; it < 800 && !foundCs; it++, sv += inward * In(0.25))
+                        {
+                            double zLow = cl.Max(q => BotAt(sv + inward * q.X) - q.Y) + cov + st.Diameter;                       // lowest point on the soffit + cover
+                            for (int jz = 0; jz < 48 && !foundCs; jz++)
+                            {
+                                zb = zLow + jz * In(0.25);
+                                foundCs = samp.All(q => Clr(sv + inward * q.X, zb + q.Y) >= need);
+                            }
+                        }
+                        if (foundCs) sv -= inward * In(0.25);
+                        else { sv = sTip + inward * cov; zb = BotAt(sTip + inward * (cov + flat / 2)) + cov + st.Diameter; }   // no position keeps the cover: reported by the check
+                        zb += 3 * size.Diameter * rowsB;                                                                  // second group (6b3) one row up
                         bars.Add(new RawBar("B", size, cs, $"{loc} {g.Mark} cantilever bottom", cl.Select(q => unit.World(sv + inward * q.X, n, zb + q.Y)).ToArray()));
                         continue;
                     }
