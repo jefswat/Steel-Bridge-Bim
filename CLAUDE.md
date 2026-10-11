@@ -285,14 +285,20 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   so they differ between modes). Prestressed girders are IfcBeam `.GIRDER_SEGMENT.` in all modes (`.GIRDER.` is not in
   IFC4X3_ADD2's IfcBeamTypeEnum; it is valid only for IfcElementAssembly / IfcBridge).
   Volumes vs Parametric: `python -I tools/compare_ifc_volumes.py par.ifc abv.ifc --changed-only`. Cost: I-80 WB and
-  Ramp G __SIZES__. Not done yet: IfcSectionedSolidHorizontal along the IFC 4.3 alignment
-  (needs IfcAlignmentWriter's IfcGradientCurve / IfcCompositeCurve): girder plates (flanges/webs, profile = plate section
-  at field-section ends / thickness changes), deck slab (deck section with haunches at cross-section stations) and
-  barriers (barrier profile, constant) would each become IfcSectionedSolidHorizontal(Directrix = the alignment's gradient
-  curve, CrossSections = IfcArbitraryClosedProfileDef polylines (no arcs needed: IfcIndexedPolyCurve is allowed),
-  CrossSectionPositions = IfcAxis2PlacementLinear(IfcPointByDistanceExpression(station - start, offset, z))) in place of
-  their face set; hook = a branch in `Body`/`ExportConcrete` taking the alignment curve id from IfcAlignmentWriter, same
-  style / GlobalId; holes / clips stay face sets.
+  Ramp G: Parametric 330 MB / 3.76 M entities / 3.7 s, ReferenceView 730 MB / 6.03 M / 6.5 s (ifczip 69 vs 168 MB);
+  the growth is the ~324 k bolt holes (9 wall quads + 18 points each). Full-model AbV result: 0 schema + 0 EXPRESS issues,
+  AbV Exclusions IDS 261/261 pass (docs/plan-data/ifc-validation.md). NOT done: IfcSectionedSolidHorizontal along the
+  alignment. How it would plug in (alignment entities come from `alignmentWriter.For(name)`, written before the bridges):
+  deck slab, barriers and girder flange/web plates would each become IfcSectionedSolidHorizontal(Directrix =
+  `AxisCurve` (the IfcGradientCurve), CrossSections = IfcArbitraryClosedProfileDef over IfcIndexedPolyCurve polylines in the
+  section plane (x = lateral, + = LEFT as IFC; y = up from the directrix), CrossSectionPositions = IfcAxis2PlacementLinear(
+  IfcPointByDistanceExpression(distance from alignment start (`al.StationToDistance`), lateral, vertical, AxisCurve))) at
+  the stations where the section changes (deck: the loft rings of `ConcreteGenerator` = deck + haunch outline per station;
+  barriers: `BarrierProfiles.For` offset by the deck edge; girders: plate sections at field-section ends / thickness
+  transitions, offset = girder line). Hook = a ReferenceView branch next to `Body` / the deck `FaceSet` items in
+  `ExportConcrete` (same style, GlobalId, psets). Caveat: the solid ends are sections NORMAL to the directrix, so skewed
+  deck/barrier/girder ends cannot be represented exactly without a clip (AbV forbids booleans) - either keep the skewed
+  end zones as face sets (two items) or accept a squared end; holes / clips / bolts stay face sets.
 - `src/SBM.App` â€” WPF (Fluent dark theme), MVVM via CommunityToolkit.Mvvm, GPU viewport = HelixToolkit.Wpf.SharpDX 3.x
   (DirectX 11, System.Numerics types; namespaces `HelixToolkit`, `HelixToolkit.SharpDX`, `HelixToolkit.Wpf.SharpDX`).
   - `Viewport/SceneBuilder` batches each layer into one LineGeometry3D + one BillboardText3D; vertices are rebased to a
