@@ -263,6 +263,47 @@ public class PrestressedStandardTests(Xunit.Abstractions.ITestOutputHelper outpu
         finally { File.Delete(path); }
     }
 
+    [Fact]
+    public void SpanLayoutJogAtPier_BeamsUseTheirOwnSpanBearings()
+    {
+        // Tx beams on the layout bearings (a standard-length beam would be moved off them by its placement).
+        var doc = Sample(_ => { });
+        var b = doc.Bridge();
+        int n = b.Girders.Count;
+        List<double> Shifted(double d) => b.Girders.UniformOffsets().Select(o => o + d).ToList();
+        b.Girders.SpanLayouts = new()
+        {
+            new GirderSpanLayout { Span = 0, Count = n, Begin = new() { Offsets = Shifted(0) }, End = new() { Offsets = Shifted(Ft(0.5)) } },
+            new GirderSpanLayout
+            {
+                Span = 1, Count = n, Begin = new() { Offsets = Shifted(-Ft(0.4)), Haunches = Enumerable.Repeat(In(2), n).ToList() },
+                End = new() { Offsets = Shifted(Ft(0.2)) },
+            },
+        };
+        Assert.Empty(doc.Regenerate().Errors);
+        var f = doc.Model().Framing;
+        var ps = doc.Model().Prestressed!;
+        for (int i = 0; i < n; i++)
+        {
+            var back = f.SpanBearing(i, 0, true)!;
+            var ahead = f.SpanBearing(i, 1, false)!;
+            Assert.NotSame(back, ahead);
+            foreach (var (span, br, start) in new[] { (0, back, false), (1, ahead, true) })
+            {
+                var beam = ps.Beams.Single(x => x.Girder == i && x.Span == span);
+                var chord = f.Girders[i].Spans[span];
+                var p = start ? chord.Start : chord.End;
+                // Top of beam extended to the chord end point = that span's own bearing elevation.
+                double run = (beam.TopEnd.XY - beam.TopStart.XY).Length, rise = beam.TopEnd.Z - beam.TopStart.Z;
+                double z = beam.TopStart.Z + rise / run * Vec2.Dot(p - beam.TopStart.XY, (beam.TopEnd.XY - beam.TopStart.XY) * (1 / run));
+                Assert.Equal(br.TopOfSteel.Z, z, 6);
+                // The span's pad at the pier sits by its own bearing point (back and ahead points are 0.9 ft apart).
+                var pad = ps.Pads.Where(x => x.Girder == i && x.Span == span).MinBy(x => (x.Center.XY - p).Length)!;
+                Assert.True((pad.Center.XY - p).Length < (pad.Center.XY - (start ? back : ahead).TopOfSteel.XY).Length);
+            }
+        }
+    }
+
     private static int CountOf(string text, string what)
     {
         int n = 0, i = 0;

@@ -91,8 +91,9 @@ public static class PrestressedGenerator
         var c = g.Spans[j];
         var supA = f.Supports[j];
         var supB = f.Supports[j + 1];
-        var brA = supA.Bearings[i] ?? throw new InvalidOperationException("no bearing");
-        var brB = supB.Bearings[i] ?? throw new InvalidOperationException("no bearing");
+        // Per-span bearing points (a span layout may give the girder different points each side of an interior support).
+        var brA = f.SpanBearing(i, j, false) ?? throw new InvalidOperationException("no bearing");
+        var brB = f.SpanBearing(i, j, true) ?? throw new InvalidOperationException("no bearing");
         var pa = c.Start;
         var pb = c.End;
         double lc = (pb - pa).Length;
