@@ -198,6 +198,33 @@ public sealed partial class SubstructureGenerator
             BwLeftS = n => bwL(n), BwRightS = n => bwR(n), JointDepth = cjD,
         };
         unit.Abutment = geo;
+        // plan outline of the footing from the same end planes (notches) and corner pieces: back face -> right end -> front face -> left end
+        {
+            var xs = new List<double> { xFB, xFF };
+            xs.AddRange(kinks.Where(x => x > xFB + 1e-9 && x < xFF - 1e-9));
+            xs = xs.Distinct().OrderBy(x => x).ToList();
+            List<Vec2> Chain(Plane end, double e)
+            {
+                var r = new List<Vec2>();
+                var back = addOns.FirstOrDefault(q => !q.front && Math.Abs(q.e - e) < 1e-9).poly;
+                var front = addOns.FirstOrDefault(q => q.front && Math.Abs(q.e - e) < 1e-9).poly;
+                if (back != null) { r.Add(back[0]); r.Add(back[2]); }
+                for (int i = 0; i < xs.Count; i++)
+                {
+                    int sub = i == xs.Count - 1 ? 1 : 8;                    // end lines follow offsets / stations: sample between the kinks
+                    for (int k = 0; k < sub; k++)
+                    {
+                        double x = i == xs.Count - 1 ? xs[i] : xs[i] + (xs[i + 1] - xs[i]) * k / sub;
+                        double n = Nx(x);
+                        r.Add(new Vec2(end(n), n));
+                    }
+                }
+                if (front != null) { r.Add(front[2]); r.Add(front[0]); }
+                return r;
+            }
+            geo.FootingOutline.AddRange(Chain(footR, ad.RightEndOffset));
+            geo.FootingOutline.AddRange(Enumerable.Reverse(Chain(footL, ad.LeftEndOffset)));
+        }
         unit.CapS0 = s0Mid; unit.CapS1 = s1Mid;
         unit.CapN0 = Math.Min(Nx(xFB), Nx(xFF)); unit.CapN1 = Math.Max(Nx(xFB), Nx(xFF)); unit.CapMidN = nMid;
         var capBreaks = fbPts.Select(p => p.X).Concat(topPts.Select(p => p.X)).Where(x => x > s0Mid && x < s1Mid).Distinct().OrderBy(x => x).ToList();

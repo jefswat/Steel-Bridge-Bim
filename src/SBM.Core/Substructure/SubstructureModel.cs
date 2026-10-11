@@ -212,5 +212,8 @@ public sealed class AbutmentGeometry
     public (AbutmentEnd End, double S0, double S1, double TopZ)? Extension { get; set; }
     /// <summary>Pile positions of the main footing (S, N).</summary>
     public List<(double S, double N)> PileXY { get; } = new();
+    /// <summary>Plan outline of the main footing as built (X = S, Y = N), closed, counter-clockwise or clockwise as generated: back face, right end
+    /// (with its notches / corner pieces), front face, left end. Same planes as the footing solid.</summary>
+    public List<Vec2> FootingOutline { get; } = new();
     public double[] PileStationsS { get; set; } = Array.Empty<double>();
 }

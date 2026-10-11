@@ -1,6 +1,7 @@
 using SBM.Api;
 using SBM.Core.Bridge;
 using SBM.Core.Geometry;
+using SBM.Core.Solids;
 using SBM.Core.Substructure;
 using Xunit;
 
@@ -166,6 +167,29 @@ public class AbutmentTests
         Assert.NotEqual(v0, v1, 3);
         Assert.True(Math.Abs(v1 - v0) > 0.1 && Math.Abs(v1 - v0) < 5, $"notch changes the footing volume by {v1 - v0:F3} m3");
         _ = u0; _ = sl; _ = baseline;
+        // the plan outline (generator) and the piling-layout view follow the notched footing: same area as the footing solid's bottom face
+        var un = doc.Substructure().Units.First(x => x.SupportIndex == 0);
+        var outline = un.Abutment!.FootingOutline;
+        Assert.True(outline.Count > 4, "notched outline has more than the 4 parallelogram corners");
+        double aOut = Math.Abs(MeshBuilder.SignedArea(outline));
+        Assert.InRange(aOut / BottomArea(un.Solids.Single(s => s.Kind == SubElementKind.Footing).Mesh), 0.999, 1.001);
+        var view = doc.Drawings().Single(v => v.Name == un.Name + " piling and wing layout");
+        var concrete = view.Drawing.Layers.Where(l => l.Style == SBM.Core.Drawing.Views.SheetLayers.Concrete).SelectMany(l => l.Polylines).Where(p => p.Closed).ToList();
+        var drawn = concrete.Single(p => p.Points.Length == outline.Count);
+        Assert.Equal(aOut, Math.Abs(MeshBuilder.SignedArea(drawn.Points.Select(q => new Vec2(q.X, q.Y)).ToList())), 4);
+    }
+
+    /// <summary>Plan area of the downward-facing triangles of a solid.</summary>
+    private static double BottomArea(Mesh m)
+    {
+        double a = 0, zMin = m.Positions.Min(p => p.Z);
+        for (int t = 0; t < m.TriangleCount; t++)
+        {
+            var p0 = m.Positions[m.Indices[3 * t]]; var p1 = m.Positions[m.Indices[3 * t + 1]]; var p2 = m.Positions[m.Indices[3 * t + 2]];
+            if (Math.Max(p0.Z, Math.Max(p1.Z, p2.Z)) > zMin + 1e-6) continue;          // level footing bottom only
+            a += Math.Abs(Vec3.Cross(p1 - p0, p2 - p0).Z) / 2;
+        }
+        return a;
     }
 
     [Fact]

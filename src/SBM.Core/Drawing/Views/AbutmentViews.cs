@@ -128,8 +128,8 @@ public static class AbutmentViews
         var dP = new Drafter(dwgP, u, ctx.Options.BentScale);
         double ox = 0, oy = 0;
         Vec2 Pl(double s, double n) => new(ox + (s - s0), oy + g.Sigma * n);
-        var outline = new[] { (g.N(g.XFootBack)), g.N(g.XFootFront) };
-        dP.Poly(SheetLayers.Concrete, new[] { Pl(g.LeftEndS(outline[0]), outline[0]), Pl(g.RightEndS(outline[0]), outline[0]), Pl(g.RightEndS(outline[1]), outline[1]), Pl(g.LeftEndS(outline[1]), outline[1]) }, true);
+        // footing outline as built by the generator (end lines along the alignment offsets, notches along constant stations, corner pieces)
+        dP.Poly(SheetLayers.Concrete, g.FootingOutline.Select(p => Pl(p.X, p.Y)), true);
         dP.Poly(SheetLayers.ConcreteHidden, new[] { Pl(g.BwLeftS(g.N(g.XBwBack)), g.N(g.XBwBack)), Pl(g.BwRightS(g.N(g.XBwBack)), g.N(g.XBwBack)), Pl(g.BwRightS(g.N(g.XBwFront)), g.N(g.XBwFront)), Pl(g.BwLeftS(g.N(g.XBwFront)), g.N(g.XBwFront)) }, true);
         foreach (var (ps, pn) in g.PileXY)
         {
