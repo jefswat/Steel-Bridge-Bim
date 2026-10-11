@@ -425,10 +425,16 @@ public partial class MainWindow : Window
         if (!Environment.GetCommandLineArgs().Contains("--editors")) return;
         string stem = System.IO.Path.ChangeExtension(path, null);
         var project = _vm.Project;
+        var cmd = Environment.GetCommandLineArgs();
+        // --editbridge NAME: the bridge shown in the bridge editor renders (default: the first bridge); --editsupport NAME: the support
+        // selected on its Substructure / Deck Ends tabs.
+        int ebi = Array.IndexOf(cmd, "--editbridge");
+        var editBridge = (ebi >= 0 && ebi + 1 < cmd.Length ? project.Bridges.FirstOrDefault(b => b.Name == cmd[ebi + 1]) : null) ?? project.Bridges[0];
         foreach (var (name, window) in new (string, Window)[]
                  {
                      ("alignment", Editors.AlignmentEditorWindow.CreateForPreview(project.Alignments[0], project.Units)),
-                     ("bridge", Editors.BridgeEditorWindow.CreateForPreview(project.Bridges[0], project, project.Units)),
+                     ("bridge", Editors.BridgeEditorWindow.CreateForPreview(editBridge, project, project.Units,
+                         Array.IndexOf(cmd, "--editsupport") is int esi && esi >= 0 && esi + 1 < cmd.Length ? cmd[esi + 1] : null)),
                  })
         {
             window.Owner = this;
@@ -441,6 +447,18 @@ public partial class MainWindow : Window
                 window.UpdateLayout();
                 Dispatcher.Invoke(() => { }, System.Windows.Threading.DispatcherPriority.ApplicationIdle);
                 SaveElement((FrameworkElement)window.Content, $"{stem}_{name}{t}.png");
+                // Long field lists: also render the rest of the tab a page at a time (_p1, _p2, ...).
+                if (tabs != null && FindChild<System.Windows.Controls.ScrollViewer>(tabs) is { ScrollableHeight: > 0 } sv)
+                {
+                    for (int page = 1; page <= 16 && sv.VerticalOffset < sv.ScrollableHeight - 0.5; page++)
+                    {
+                        sv.ScrollToVerticalOffset(sv.VerticalOffset + Math.Max(50, sv.ViewportHeight - 40));
+                        window.UpdateLayout();
+                        Dispatcher.Invoke(() => { }, System.Windows.Threading.DispatcherPriority.ApplicationIdle);
+                        SaveElement((FrameworkElement)window.Content, $"{stem}_{name}{t}_p{page}.png");
+                    }
+                    sv.ScrollToTop();
+                }
             }
             window.Close();
         }

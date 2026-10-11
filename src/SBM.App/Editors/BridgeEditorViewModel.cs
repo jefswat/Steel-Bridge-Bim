@@ -21,9 +21,24 @@ public sealed partial class SupportRowVm : ObservableObject
     public SubstructureDefinition Substructure { get; set; }
     /// <summary>True once the user has edited (or the file had) an explicit substructure; otherwise defaults follow the type.</summary>
     public bool SubstructureExplicit { get; set; }
+    /// <summary>The support as loaded. Inputs without an editor (shared pier, per-girder fixities, bearing override, kinked deck end
+    /// points, ...) are carried over from it unchanged.</summary>
+    public SupportDefinition Source { get; }
+    /// <summary>Expansion joint being edited (Type None = plain deck end); used at the first / last support only.</summary>
+    public ExpansionJointDefinition Joint { get; }
+    /// <summary>Thickened deck end being edited (kept while <see cref="HasEndBlock"/> is off so toggling loses nothing).</summary>
+    public DeckEndBlockDefinition EndBlock { get; }
+    public bool HasEndBlock { get; set; }
+    /// <summary>Name the girder beginnings refer to (auxiliary supports), to follow renames.</summary>
+    public string LastName { get; set; }
 
     public SupportRowVm(UnitSystem u, SupportDefinition s)
     {
+        Source = s.Clone();
+        Joint = s.ExpansionJoint?.Clone() ?? new ExpansionJointDefinition { Type = ExpansionJointType.None };
+        EndBlock = Joint.EndBlock?.Clone() ?? new DeckEndBlockDefinition();
+        HasEndBlock = Joint.EndBlock != null;
+        LastName = s.Name;
         Substructure = s.Substructure?.Clone() ?? SubstructureDefinition.Default(s.Type);
         SubstructureExplicit = s.Substructure != null;
         _name = s.Name;
@@ -49,6 +64,19 @@ public sealed partial class PlateRowVm : ObservableObject
         EndStation = new CellValue(u, ValueKind.Station, double.IsNaN(s.EndStation) ? null : s.EndStation, true);
         Width = new CellValue(u, ValueKind.LengthShort, s.Plate == GirderPlate.Web ? null : s.Width, true);
         Thickness = new CellValue(u, ValueKind.LengthShort, s.Thickness);
+    }
+}
+
+/// <summary>A girder that begins on an auxiliary support line (<see cref="GirderBeginning"/>); girder number 1 = G1.</summary>
+public sealed partial class BeginningRowVm : ObservableObject
+{
+    public CellValue Girder { get; }
+    [ObservableProperty] private string _support;
+
+    public BeginningRowVm(UnitSystem u, GirderBeginning b)
+    {
+        Girder = new CellValue(u, ValueKind.Integer, b.Girder + 1);
+        _support = b.Support;
     }
 }
 
@@ -178,6 +206,17 @@ public sealed partial class BridgeEditorViewModel : ObservableObject
     public IReadOnlyList<BearingFixity> Fixities { get; } = Enum.GetValues<BearingFixity>();
     public ObservableCollection<FieldBase> StudBracingFields { get; } = new();
     public ObservableCollection<FieldBase> SubstructureFields { get; } = new();
+    /// <summary>Auxiliary support lines (girders begin there; they do not divide spans).</summary>
+    public ObservableCollection<SupportRowVm> AuxSupports { get; } = new();
+    public ObservableCollection<BeginningRowVm> Beginnings { get; } = new();
+    /// <summary>Names of the auxiliary supports, for the beginnings' support column.</summary>
+    public ObservableCollection<string> AuxNames { get; } = new();
+    /// <summary>Supports then auxiliary supports: every line that can carry a substructure.</summary>
+    public ObservableCollection<SupportRowVm> SubstructureChoices { get; } = new();
+    /// <summary>First and last support (the deck ends): where expansion joints are built.</summary>
+    public ObservableCollection<SupportRowVm> JointSupports { get; } = new();
+    public ObservableCollection<FieldBase> JointFields { get; } = new();
+    [ObservableProperty] private SupportRowVm? _jointSupport;
     [ObservableProperty] private SupportRowVm? _substructureSupport;
     [ObservableProperty] private string _copySubstructureLabel = "Copy to all piers";
     public IReadOnlyList<GirderPlate> PlateTypes { get; } = Enum.GetValues<GirderPlate>();
@@ -187,6 +226,7 @@ public sealed partial class BridgeEditorViewModel : ObservableObject
     [ObservableProperty] private bool _flared;
 
     private readonly SpacingField _spacing;
+    private readonly DeckEdgeStrip _edgeStrip;
 
     public BridgeEditorViewModel(BridgeDefinition def, BridgeProject project, UnitSystem u)
     {
@@ -202,8 +242,15 @@ public sealed partial class BridgeEditorViewModel : ObservableObject
             () => w.AlignmentName, v => w.AlignmentName = (string)v));
 
         foreach (var s in w.Supports) Supports.Add(new SupportRowVm(u, s));
+        foreach (var s in w.AuxiliarySupports) AuxSupports.Add(new SupportRowVm(u, s));
+        foreach (var gb in w.Girders.Beginnings) Beginnings.Add(new BeginningRowVm(u, gb));
         UpdateSpanLengths();
+        RefreshAuxNames();
+        RefreshSupportLists();
+        Supports.CollectionChanged += (_, _) => RefreshSupportLists();
+        AuxSupports.CollectionChanged += (_, _) => { RefreshSupportLists(); RefreshAuxNames(); };
         SubstructureSupport = Supports.FirstOrDefault(r => r.Type == SupportType.Pier) ?? Supports.FirstOrDefault();
+        JointSupport = JointSupports.FirstOrDefault(r => r.Joint.Type != ExpansionJointType.None) ?? JointSupports.FirstOrDefault();
 
         // --- Girders
         var g = w.Girders;
@@ -267,6 +314,12 @@ public sealed partial class BridgeEditorViewModel : ObservableObject
         DeckFields.Add(new TextField(u, "Overhang thickness", ValueKind.LengthShort, () => d.OverhangThickness, v => d.OverhangThickness = v, Positive));
         DeckFields.Add(new BoolField("Stay-in-place metal forms", () => d.StayInPlaceForms, v => d.StayInPlaceForms = v));
         DeckFields.Add(new TextField(u, "SIP form depth", ValueKind.LengthShort, () => d.SipFormDepth, v => d.SipFormDepth = v, NonNegative));
+        var es = _edgeStrip = d.EdgeStrip?.Clone() ?? new DeckEdgeStrip();
+        DeckFields.Add(new HeaderField { Label = "Level strip at the deck edges (optional, project-specific)" });
+        DeckFields.Add(new TextField(u, "Strip width from deck edge", ValueKind.LengthShort, () => es.Width, v => es.Width = v, NonNegative,
+            "Measured inboard from the deck edge (follows a variable deck width); the strip starts at the gutter line. 0 = none: the cross-slope plane runs to the edge."));
+        DeckFields.Add(new BoolField("Level where deck falls to barrier", () => es.LowSideLevel, v => es.LowSideLevel = v,
+            "Per side and station: where the cross slope falls toward the edge the strip is level at the gutter elevation, otherwise the cross-slope plane continues."));
         DeckFields.Add(new HeaderField { Label = "Barrier" });
         var b = d.Barrier;
         DeckFields.Add(ChoiceField.ForEnum("Barrier type", () => b.Type, v => b.Type = v, v => v switch
@@ -538,11 +591,138 @@ public sealed partial class BridgeEditorViewModel : ObservableObject
         var src = SubstructureSupport;
         if (src == null) return;
         foreach (var f in SubstructureFields) if (!f.Commit()) return;
-        foreach (var r in Supports.Where(r => r != src && r.Type == src.Type))
+        foreach (var r in Supports.Concat(AuxSupports).Where(r => r != src && r.Type == src.Type))
         {
             r.Substructure = src.Substructure.Clone();
             r.SubstructureExplicit = true;
         }
+    }
+
+    // ------------------------------------------------------------------ support lists (aux supports, joints)
+
+    /// <summary>Rebuilds the substructure (supports + aux supports) and deck-end (first / last support) choices, keeping the selections.</summary>
+    public void RefreshSupportLists()
+    {
+        var sub = SubstructureSupport;
+        var all = Supports.Concat(AuxSupports).ToList();
+        if (!all.SequenceEqual(SubstructureChoices))
+        {
+            SubstructureChoices.Clear();
+            foreach (var r in all) SubstructureChoices.Add(r);
+        }
+        if (sub != null && !all.Contains(sub)) sub = all.FirstOrDefault();
+        if (SubstructureSupport != sub) SubstructureSupport = sub;
+
+        var joint = JointSupport;
+        var ends = Supports.Count == 0 ? new List<SupportRowVm>() : Supports.Count == 1 ? new() { Supports[0] } : new() { Supports[0], Supports[^1] };
+        if (!ends.SequenceEqual(JointSupports))
+        {
+            JointSupports.Clear();
+            foreach (var r in ends) JointSupports.Add(r);
+        }
+        if (joint == null || !ends.Contains(joint)) joint = ends.FirstOrDefault();
+        if (JointSupport != joint) JointSupport = joint;
+    }
+
+    /// <summary>Refreshes the auxiliary support names offered to the beginnings; a renamed support carries its beginnings along.</summary>
+    public void RefreshAuxNames()
+    {
+        foreach (var r in AuxSupports)
+        {
+            string name = (r.Name ?? "").Trim();
+            if (name != r.LastName)
+            {
+                foreach (var b in Beginnings.Where(b => b.Support == r.LastName)) b.Support = name;
+                r.LastName = name;
+            }
+        }
+        var names = AuxSupports.Select(r => (r.Name ?? "").Trim()).Where(n => n.Length > 0).Distinct().ToList();
+        if (!names.SequenceEqual(AuxNames))
+        {
+            AuxNames.Clear();
+            foreach (var n in names) AuxNames.Add(n);
+        }
+    }
+
+    public SupportRowVm NewAuxSupport()
+    {
+        double sta = 0;
+        if (AuxSupports.Count > 0) AuxSupports[^1].Station.TryGet(out sta);
+        else if (Supports.Count > 0) Supports[0].Station.TryGet(out sta);
+        var taken = Supports.Concat(AuxSupports).Select(r => r.Name).ToHashSet();
+        int k = AuxSupports.Count + 1;
+        while (taken.Contains($"Aux {k}")) k++;
+        return new SupportRowVm(Units, new SupportDefinition { Name = $"Aux {k}", Type = SupportType.Pier, Station = sta, Fixity = BearingFixity.Expansion });
+    }
+
+    public BeginningRowVm NewBeginning()
+    {
+        int next = Beginnings.Count == 0 ? 0 : Beginnings.Select(b => b.Girder.TryGet(out double g) ? (int)g : 0).Max();
+        return new BeginningRowVm(Units, new GirderBeginning { Girder = Math.Min(next, Math.Max(0, _work.Girders.Count - 1)), Support = AuxNames.FirstOrDefault() ?? "" });
+    }
+
+    partial void OnJointSupportChanging(SupportRowVm? oldValue, SupportRowVm? newValue)
+    {
+        if (oldValue != null) CommitJointFields(oldValue);
+    }
+
+    partial void OnJointSupportChanged(SupportRowVm? value)
+    {
+        JointFields.Clear();
+        if (value == null) return;
+        foreach (var f in BuildJointFields(value)) JointFields.Add(f);
+    }
+
+    private bool CommitJointFields(SupportRowVm r, List<string>? errors = null)
+    {
+        bool ok = true;
+        foreach (var f in JointFields)
+            if (!f.Commit()) { ok = false; errors?.Add($"Deck ends ({r.Name}) ▸ {f.Label}: {f.Error}"); }
+        return ok;
+    }
+
+    private IEnumerable<FieldBase> BuildJointFields(SupportRowVm r)
+    {
+        var u = Units;
+        var j = r.Joint;
+        var eb = r.EndBlock;
+        string? Positive(double v) => v > 0 ? null : "Must be greater than zero.";
+        string? NonNegative(double v) => v >= 0 ? null : "Must not be negative.";
+        double Opt(double? v) => v ?? double.NaN;
+        double? Nul(double v) => double.IsNaN(v) ? null : v;
+
+        yield return new HeaderField { Label = "Expansion joint — blockout + generic device envelope (the device itself is by the manufacturer)" };
+        yield return ChoiceField.ForEnum("Joint type", () => j.Type, v => j.Type = v, v => v switch
+        {
+            ExpansionJointType.Modular => "Modular joint",
+            ExpansionJointType.StripSeal => "Strip seal",
+            _ => "None (plain deck end)",
+        });
+        yield return new TextField(u, "Opening \"C\" at 50°F", ValueKind.LengthShort, () => j.GapAt50F, v => j.GapAt50F = v, NonNegative,
+            "Between this unit's deck-end face and the face across the joint (the other unit's deck end, or the backwall), perpendicular to the joint.");
+        yield return new TextField(u, "Blockout width \"D\"", ValueKind.LengthShort, () => j.BlockoutWidth, v => j.BlockoutWidth = v, Positive,
+            "From the deck-end face, perpendicular to the joint.");
+        yield return new TextField(u, "Blockout depth", ValueKind.LengthShort, () => j.BlockoutDepth, v => j.BlockoutDepth = v, Positive, "Below the top of slab.");
+        yield return new TextField(u, "Device set down", ValueKind.LengthShort, () => j.SetDown, v => j.SetDown = v, NonNegative, "Top of the device below the top of slab.");
+        yield return new TextField(u, "Plan CL brg to deck end (check)", ValueKind.LengthShort, () => Opt(j.DeckEndOffset), v => j.DeckEndOffset = Nul(v),
+            tip: "Check value only: a different deck end offset on the Supports tab is reported, never changed.") { BlankMeans = "no check" };
+        yield return new TextField(u, "Number of seals", ValueKind.Integer, () => j.SealCount is { } n ? n : double.NaN, v => j.SealCount = double.IsNaN(v) ? null : (int)v,
+            v => double.IsNaN(v) || v >= 0 ? null : "Must not be negative.") { BlankMeans = "by the manufacturer" };
+        yield return new BoolField("Build the device body here", () => j.Body, v => j.Body = v,
+            "Two units meeting at a pier share one joint: build the body on one side only (it spans the whole opening).");
+        yield return new TextField(u, "Body clearance from deck edge", ValueKind.LengthShort, () => Opt(j.EdgeInset), v => j.EdgeInset = Nul(v),
+            tip: "Barrier-side clearance kept free at each end of the body.") { BlankMeans = "the barrier base" };
+
+        yield return new HeaderField { Label = "Thickened deck end (\"end dam diaphragm\") under the blockout" };
+        yield return new BoolField("Model a thickened deck end", () => r.HasEndBlock, v => r.HasEndBlock = v,
+            "Off = the deck keeps its plain thickness and the blockout is limited to the slab (a warning is given when the plans' blockout is deeper).");
+        yield return new TextField(u, "Depth below top of slab", ValueKind.LengthShort, () => eb.Depth, v => eb.Depth = v, Positive, "At the deck-end face (plans: 2'-2).");
+        yield return new TextField(u, "Flat length from deck end", ValueKind.LengthShort, () => eb.FlatLength, v => eb.FlatLength = v, NonNegative,
+            "Deck-end face to the start of the soffit chamfer.");
+        yield return new TextField(u, "Chamfer run", ValueKind.LengthShort, () => Opt(eb.ChamferRun), v => eb.ChamferRun = Nul(v),
+            tip: "Horizontal run of the soffit chamfer up to the slab soffit.") { BlankMeans = "45° (depth − slab)" };
+        if (eb.Soffit.Count >= 2)
+            yield return new HeaderField { Label = $"An explicit soffit profile ({eb.Soffit.Count} points, set by script) overrides depth, flat length and chamfer." };
     }
 
     private IEnumerable<FieldBase> BuildSubstructureFields(SubstructureDefinition sd, SupportType type)
@@ -583,6 +763,12 @@ public sealed partial class BridgeEditorViewModel : ObservableObject
         yield return new TextField(u, "Pedestal projection", ValueKind.LengthShort, () => sd.PedestalProjection, v => sd.PedestalProjection = v, NonNegative,
             "Beyond the masonry plate / pad, each side.");
         yield return new TextField(u, "Report pedestals taller than", ValueKind.LengthShort, () => sd.MaxPedestalHeight, v => sd.MaxPedestalHeight = v, Positive);
+        yield return new TextField(u, "Plan size along cap (S)", ValueKind.LengthShort, () => sd.PedestalSizeAlong, v => sd.PedestalSizeAlong = v, NonNegative,
+            "Pedestal plan size as the plans print it (cap plan / pedestal bar layout), centred on the bearing. 0 = bearing footprint + projection.");
+        yield return new TextField(u, "Plan size across cap (N)", ValueKind.LengthShort, () => sd.PedestalSizeAcross, v => sd.PedestalSizeAcross = v, NonNegative,
+            "0 = bearing footprint + projection.");
+        yield return new BoolField("One block per girder line", () => sd.PedestalShared, v => sd.PedestalShared = v,
+            "One pedestal carries every seat of a girder line (back and ahead bearings of an expansion pier); its top follows the highest seat. Needs both plan sizes.");
 
         if (pier)
         {
@@ -597,6 +783,16 @@ public sealed partial class BridgeEditorViewModel : ObservableObject
             yield return new TextField(u, "Column diameter", ValueKind.LengthShort, () => sd.ColumnDiameter, v => sd.ColumnDiameter = v, Positive);
             yield return new TextField(u, "Rectangular: width along cap", ValueKind.LengthShort, () => sd.ColumnWidth, v => sd.ColumnWidth = v, Positive);
             yield return new TextField(u, "Rectangular: depth", ValueKind.LengthShort, () => sd.ColumnDepth, v => sd.ColumnDepth = v, Positive);
+            yield return new TextField(u, "Corner chamfer along cap (S)", ValueKind.LengthShort, () => sd.ColumnChamferS, v => sd.ColumnChamferS = v, NonNegative,
+                "Rectangular columns: chamfered (octagonal) corners, e.g. 3'-4 x 1'-9. 0 = square corners.");
+            yield return new TextField(u, "Corner chamfer across cap (N)", ValueKind.LengthShort, () => sd.ColumnChamferN, v => sd.ColumnChamferN = v, NonNegative);
+            yield return new HeaderField { Label = "Flared column base (optional)" };
+            yield return new TextField(u, "Flare top elevation", ValueKind.Elevation, () => sd.ColumnFlareElevation, v => sd.ColumnFlareElevation = v,
+                tip: "Below this elevation the column has the larger flare section.") { BlankMeans = "no flare" };
+            yield return new TextField(u, "Flare width along cap", ValueKind.LengthShort, () => sd.ColumnFlareWidth, v => sd.ColumnFlareWidth = v, NonNegative);
+            yield return new TextField(u, "Flare depth", ValueKind.LengthShort, () => sd.ColumnFlareDepth, v => sd.ColumnFlareDepth = v, NonNegative);
+            yield return new TextField(u, "Flare chamfer along cap (S)", ValueKind.LengthShort, () => sd.ColumnFlareChamferS, v => sd.ColumnFlareChamferS = v, NonNegative);
+            yield return new TextField(u, "Flare chamfer across cap (N)", ValueKind.LengthShort, () => sd.ColumnFlareChamferN, v => sd.ColumnFlareChamferN = v, NonNegative);
         }
         else
         {
@@ -658,6 +854,65 @@ public sealed partial class BridgeEditorViewModel : ObservableObject
             yield return Bar("Column bar size", () => r.ColumnBarSize, v => r.ColumnBarSize = v);
             yield return Bar("Spiral / tie size", () => r.ColumnSpiralSize, v => r.ColumnSpiralSize = v);
             yield return new TextField(u, "Spiral pitch / tie spacing", ValueKind.LengthShort, () => r.ColumnSpiralPitch, v => r.ColumnSpiralPitch = v, Positive);
+
+            string? Count(double v) => v >= 0 && v <= 60 ? null : "0 to 60.";
+            const string GroupTip = "Spacing 0 = equal spaces over the face with bars at both (inset) corners, shared with the next face; > 0 = a group centred on the face.";
+            yield return new HeaderField { Label = "Rectangular / chamfered column bars — per face (all counts 0 = vertical bars at equal spaces around)" };
+            yield return new TextField(u, "Bars on each S face (along cap)", ValueKind.Integer, () => r.ColumnFaceBarsS, v => r.ColumnFaceBarsS = (int)v, Count);
+            yield return new TextField(u, "S face bar spacing", ValueKind.LengthShort, () => r.ColumnFaceSpacingS, v => r.ColumnFaceSpacingS = v, NonNegative, GroupTip);
+            yield return new TextField(u, "Bars on each N face (across)", ValueKind.Integer, () => r.ColumnFaceBarsN, v => r.ColumnFaceBarsN = (int)v, Count);
+            yield return new TextField(u, "N face bar spacing", ValueKind.LengthShort, () => r.ColumnFaceSpacingN, v => r.ColumnFaceSpacingN = v, NonNegative, GroupTip);
+            yield return new TextField(u, "Bars on each chamfer face", ValueKind.Integer, () => r.ColumnChamferBars, v => r.ColumnChamferBars = (int)v, Count);
+            yield return new TextField(u, "Chamfer bar spacing", ValueKind.LengthShort, () => r.ColumnChamferSpacing, v => r.ColumnChamferSpacing = v, NonNegative, GroupTip);
+            yield return new LengthListField(u, "Chamfer bar positions", LengthKind.Short, () => r.ColumnChamferBarPositions, v => r.ColumnChamferBarPositions = v, "count / spacing above",
+                "Uneven groups: distances along the OUTSIDE chamfer face from its S-face end, e.g. 8, 15 1/4, 22 1/2. Overrides the chamfer count.");
+            yield return new TextField(u, "Hoop overlap (two hoops)", ValueKind.LengthShort, () => r.ColumnHoopOverlap, v => r.ColumnHoopOverlap = v, NonNegative,
+                "Ties as two closed hoops, each around one end of the section, overlapping this width in the middle. 0 = one closed tie around the section.");
+            yield return new ChoiceField("Crosstie size", sizes.Prepend(new Choice("None", "")), () => r.ColumnCrosstieSize, v => r.ColumnCrosstieSize = (string)v,
+                "135° crossties across each side between the middle bars of the upper and lower chamfers, at every tie level.");
+            yield return new TextField(u, "Chamfer bar the crossties wrap", ValueKind.Integer, () => r.ColumnCrosstieBar, v => r.ColumnCrosstieBar = (int)v, Count,
+                "Counted from the S-face end of the chamfer (1 = first); 0 = the bar nearest the chamfer middle.");
+
+            yield return new HeaderField { Label = "Flared base cage — own bars and ties around the flare section (all counts 0 = none)" };
+            yield return new ChoiceField("Flare bar size", sizes.Prepend(new Choice("None", "")), () => r.FlareBarSize, v => r.FlareBarSize = (string)v);
+            yield return new TextField(u, "Flare bars on each S face", ValueKind.Integer, () => r.FlareFaceBarsS, v => r.FlareFaceBarsS = (int)v, Count);
+            yield return new TextField(u, "Flare S face bar spacing", ValueKind.LengthShort, () => r.FlareFaceSpacingS, v => r.FlareFaceSpacingS = v, NonNegative, GroupTip);
+            yield return new TextField(u, "Flare bars on each N face", ValueKind.Integer, () => r.FlareFaceBarsN, v => r.FlareFaceBarsN = (int)v, Count);
+            yield return new TextField(u, "Flare N face bar spacing", ValueKind.LengthShort, () => r.FlareFaceSpacingN, v => r.FlareFaceSpacingN = v, NonNegative, GroupTip);
+            yield return new TextField(u, "Flare bars on each chamfer", ValueKind.Integer, () => r.FlareChamferBars, v => r.FlareChamferBars = (int)v, Count);
+            yield return new TextField(u, "Flare cover", ValueKind.LengthShort, () => r.FlareCover, v => r.FlareCover = v, Positive);
+            yield return Bar("Flare tie size", () => r.FlareTieSize, v => r.FlareTieSize = v);
+            yield return new TextField(u, "Flare tie spacing", ValueKind.LengthShort, () => r.FlareTieSpacing, v => r.FlareTieSpacing = v, Positive);
+
+            yield return new HeaderField { Label = "Footing dowels / column splices (chamfered columns on a footing)" };
+            yield return ChoiceField.ForEnum("Column bar splice", () => r.ColumnSplice, v => r.ColumnSplice = v, v => v switch
+            {
+                ColumnSpliceType.Lap => "Lap with L-shaped footing dowels",
+                ColumnSpliceType.Coupler => "Mechanical couplers at two levels",
+                _ => "Continuous from the footing mat (no dowels)",
+            });
+            yield return new TextField(u, "Dowel hook leg length", ValueKind.LengthShort, () => r.DowelHookLength, v => r.DowelHookLength = v, NonNegative,
+                "Out-to-out. 0 = #11 2'-0, #14 2'-7, #18 3'-5.");
+            yield return new TextField(u, "Dowel hook bend diameter", ValueKind.LengthShort, () => r.DowelPin, v => r.DowelPin = v, NonNegative,
+                "Inside bend diameter. 0 = #11 1'-0, #14 1'-6 1/4, #18 2'-0, other sizes 6 db.");
+            yield return new TextField(u, "Dowel hook above ftg. bottom", ValueKind.LengthShort, () => r.DowelBottomAboveFooting, v => r.DowelBottomAboveFooting = v, NonNegative,
+                "Underside of the hook leg (it sits on the bottom mat).");
+            yield return new TextField(u, "Lap: dowel projection", ValueKind.LengthLong, () => r.ColumnLapLength, v => r.ColumnLapLength = v, NonNegative,
+                "Above the footing top. 0 = Class B lap computed (the plans print 8'-4 uncoated / 12'-6 epoxy).");
+            yield return new TextField(u, "Lap: upper bars start (two-stage)", ValueKind.LengthLong, () => r.ColumnMidLapStart, v => r.ColumnMidLapStart = v, NonNegative,
+                "Two-stage column: upper bars start this far above the footing top, the lower bars run a lap past it. 0 = single stage.");
+            yield return new TextField(u, "Coupler: lower level", ValueKind.LengthLong, () => r.CouplerLow, v => r.CouplerLow = v, NonNegative, "Above the footing top.");
+            yield return new TextField(u, "Coupler: upper level", ValueKind.LengthLong, () => r.CouplerHigh, v => r.CouplerHigh = v, NonNegative, "Above the footing top.");
+            yield return new TextField(u, "Coupler length", ValueKind.LengthShort, () => r.CouplerLength, v => r.CouplerLength = v, NonNegative, "Generic body. 0 = 6 db.");
+            yield return new TextField(u, "Coupler diameter", ValueKind.LengthShort, () => r.CouplerDiameter, v => r.CouplerDiameter = v, NonNegative, "0 = 1.75 db.");
+            yield return new StringField("Splice pattern (H / L / T)", () => r.ColumnSplicePattern, v => r.ColumnSplicePattern = v.ToUpperInvariant(),
+                v => v.All(c => "HLThlt".Contains(c)) ? null : "Letters H, L or T only.",
+                "One letter per vertical bar, counter-clockwise from +S (plan: S right, N up-station): H = splice at the upper level, L = lower level, "
+                + "T = lower level and the bar ends the terminating length above it. Blank = alternate H, L around the section.") { AllowEmpty = true };
+            yield return new TextField(u, "Terminating (T) bar length", ValueKind.LengthLong, () => r.ColumnTerminatingBarLength, v => r.ColumnTerminatingBarLength = v, NonNegative,
+                "0 = the T bars run to the common bar top.");
+            yield return new TextField(u, "Column bar top above soffit", ValueKind.LengthLong, () => r.ColumnBarEmbedInCap, v => r.ColumnBarEmbedInCap = v, NonNegative,
+                "Embedment into the cap above the soffit at the column centre. 0 = 3\" below the cap top cover.");
         }
         else
         {
@@ -782,6 +1037,8 @@ public sealed partial class BridgeEditorViewModel : ObservableObject
         CommitList(ConnectionFields, "Connections");
         CommitList(StudBracingFields, "Studs & bracing");
         if (SubstructureSupport != null) CommitList(SubstructureFields, $"Substructure ({SubstructureSupport.Name})");
+        if (JointSupport != null) CommitJointFields(JointSupport, errors);
+        _work.Deck.EdgeStrip = _edgeStrip.Width > 0 ? _edgeStrip.Clone() : null;
 
         var plates = new List<PlateSegment>();
         for (int i = 0; i < PlateRows.Count; i++)
@@ -803,21 +1060,59 @@ public sealed partial class BridgeEditorViewModel : ObservableObject
         }
         _work.Girders.Section.PlateChanges = plates;
 
-        var sups = new List<SupportDefinition>();
-        for (int i = 0; i < Supports.Count; i++)
+        SupportDefinition? BuildSupport(SupportRowVm r, string row, string defaultName)
         {
-            var r = Supports[i];
             bool ok = r.Station.TryGet(out double sta) & r.Skew.TryGet(out double skew) & r.DeckEndOffset.TryGet(out double deo)
                       & r.GirderExtension.TryGet(out double ext);
-            if (!ok) { errors.Add($"Support row {i + 1}: invalid value."); continue; }
-            sups.Add(new SupportDefinition
+            if (!ok) { errors.Add($"{row}: invalid value."); return null; }
+            // Start from the loaded support so inputs without an editor (shared pier, per-girder fixities, bearings, deck end points) survive.
+            var s = r.Source.Clone();
+            s.Name = string.IsNullOrWhiteSpace(r.Name) ? defaultName : r.Name.Trim();
+            s.Type = r.Type;
+            s.Station = sta;
+            s.SkewDegrees = skew;
+            s.DeckEndOffset = deo;
+            s.GirderEndExtension = ext;
+            s.Fixity = r.Fixity;
+            s.Substructure = r.SubstructureExplicit || !SameAsDefault(r) ? r.Substructure.Clone() : null;
+            if (r.Joint.Type == ExpansionJointType.None) s.ExpansionJoint = null;
+            else
             {
-                Name = string.IsNullOrWhiteSpace(r.Name) ? $"Support {i + 1}" : r.Name.Trim(), Type = r.Type, Station = sta,
-                SkewDegrees = skew, DeckEndOffset = deo, GirderEndExtension = ext, Fixity = r.Fixity,
-                Substructure = r.SubstructureExplicit || !SameAsDefault(r) ? r.Substructure.Clone() : null,
-            });
+                var j = r.Joint.Clone();
+                j.EndBlock = r.HasEndBlock ? r.EndBlock.Clone() : null;
+                s.ExpansionJoint = j;
+            }
+            return s;
         }
+
+        var sups = new List<SupportDefinition>();
+        for (int i = 0; i < Supports.Count; i++)
+            if (BuildSupport(Supports[i], $"Support row {i + 1}", $"Support {i + 1}") is { } s) sups.Add(s);
         _work.Supports = sups;
+
+        var aux = new List<SupportDefinition>();
+        for (int i = 0; i < AuxSupports.Count; i++)
+            if (BuildSupport(AuxSupports[i], $"Auxiliary support row {i + 1}", $"Aux {i + 1}") is { } s) aux.Add(s);
+        foreach (var dup in sups.Concat(aux).GroupBy(s => s.Name).Where(g => g.Count() > 1 && g.Any(s => aux.Contains(s))))
+            errors.Add($"Auxiliary supports: the name \"{dup.Key}\" is used more than once.");
+        foreach (var a in aux.Where(a => Math.Abs(a.SkewDegrees) >= 75))
+            errors.Add($"{a.Name}: skew must be less than 75°.");
+        _work.AuxiliarySupports = aux;
+
+        var begins = new List<GirderBeginning>();
+        for (int i = 0; i < Beginnings.Count; i++)
+        {
+            var b = Beginnings[i];
+            string sup = (b.Support ?? "").Trim();
+            if (!b.Girder.TryGet(out double gn) || gn < 1 || gn > _work.Girders.Count)
+                errors.Add($"Girder beginning row {i + 1}: girder must be 1 to {_work.Girders.Count}.");
+            else if (!aux.Any(a => a.Name == sup))
+                errors.Add($"Girder beginning row {i + 1}: \"{sup}\" is not an auxiliary support.");
+            else if (begins.Any(x => x.Girder == (int)gn - 1))
+                errors.Add($"Girder beginning row {i + 1}: G{(int)gn} begins on more than one line.");
+            else begins.Add(new GirderBeginning { Girder = (int)gn - 1, Support = sup });
+        }
+        _work.Girders.Beginnings = begins.OrderBy(b => b.Girder).ToList();
 
         var splices = new List<FieldSpliceDefinition>();
         for (int i = 0; i < Splices.Count; i++)
