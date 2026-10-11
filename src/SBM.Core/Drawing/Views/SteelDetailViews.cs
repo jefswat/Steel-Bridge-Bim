@@ -108,7 +108,7 @@ public static class SteelDetailViews
             for (int i = 1; i < ys.Count; i++) if (ys[i] - ys[i - 1] > 1e-4) { pitchData = pitchData == 0 ? ys[i] - ys[i - 1] : Math.Min(pitchData, ys[i] - ys[i - 1]); }
             bool upper = grp.Average(q => q.Y) > (cf.WorkPoints[0].Y + cf.WorkPoints[1].Y) / 2;
             string note = $"{(upper ? "TOP" : "BOTTOM")}: {grp.Count} - {d.Short(boltD)} DIA {grade} BOLTS" +
-                (cols > 1 ? $" ({cols} COL.)" : "") + (pitchData > 0 ? $", {d.Short(pitchData)} PITCH" : "");
+                (cols > 1 ? $" ({Math.Max(1, grp.Count / cols)} ROWS x {cols} COL.)" : "") + (pitchData > 0 ? $", {d.Short(pitchData)} PITCH" : "");
             if (!seenNotes.Add(note)) continue;
             var bp = grp.OrderByDescending(q => q.Y).First();
             d.Leader(bp, bp + new Vec2(-d.Paper(0.5), d.Paper(upper ? 0.5 : -0.75)), note);
@@ -167,7 +167,7 @@ public static class SteelDetailViews
         foreach (var b in bolts)
         {
             double nn = double.MaxValue;
-            foreach (var o in bolts) if (!ReferenceEquals(o, b) && (o.X != b.X || o.Y != b.Y)) nn = Math.Min(nn, Vec2.Distance(b, o));
+            foreach (var o in bolts) if (o.X != b.X || o.Y != b.Y) nn = Math.Min(nn, Vec2.Distance(b, o));
             if (nn < double.MaxValue) maxNn = Math.Max(maxNn, nn);
         }
         double link = maxNn > 0 ? maxNn * 1.6 : 1;
