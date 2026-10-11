@@ -1,4 +1,4 @@
-﻿# Steel Bridge Modeler â€” notes for Claude
+# Steel Bridge Modeler â€” notes for Claude
 
 Desktop BIM modeler for steel plate girder bridges and substructures (Windows, .NET 10, WPF). The user is a bridge
 engineer who directs and tests; Claude writes and maintains all code. Keep this file current when architecture changes.
