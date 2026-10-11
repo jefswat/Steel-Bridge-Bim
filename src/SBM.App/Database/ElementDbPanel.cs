@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using System.IO;
 using System.Globalization;
 using System.Windows;
@@ -33,6 +32,8 @@ public sealed class ElementDbPanel : UserControl
 
     /// <summary>The text of the last shown record (chain + sheets), for logs and snapshot checks.</summary>
     public string LastSummary { get; private set; } = "";
+    /// <summary>How the last Open PDF was done (viewer, page), for logs.</summary>
+    public string LastOpen { get; private set; } = "";
 
     public ElementDbPanel()
     {
@@ -170,11 +171,17 @@ public sealed class ElementDbPanel : UserControl
         var sheets = db.Sheets(globalId);
         _body.Children.Add(Header($"Based on plan sheets ({sheets.Count})"));
         if (sheets.Count == 0)
-            _body.Children.Add(new TextBlock { Text = db.SheetCount == 0 ? "No plan pages in the database yet (Import plan pages…)." : "No sheet is linked to this element or its parents.", Foreground = Muted, FontSize = 11, TextWrapping = TextWrapping.Wrap });
+            _body.Children.Add(new TextBlock
+            {
+                Text = db.SheetCount == 0
+                    ? "No plan sheets in the database: there is no sheet-links*.json for this model beside it (plan sets, sheet index and link rules; see docs/API.md), or it has no sheet index (then use Import plan pages…)."
+                    : db.LinkCount == 0 ? "The database has plan sheets but no links yet: rebuild it." : "No sheet is linked to this element or its parents.",
+                Foreground = Muted, FontSize = 11, TextWrapping = TextWrapping.Wrap,
+            });
         foreach (var s in sheets)
         {
             _body.Children.Add(SheetCard(db, globalId, s));
-            sum.Append($" | sheet {s.PlanSet} {s.DesignSheet}/p{s.PdfPage} {s.Title} [{s.Role}, {s.QcStatus}]");
+            sum.Append($" | sheet {s.PlanSet} {s.DesignSheet}/p{s.PdfPage} {s.Title} [{s.Role}, {s.QcStatus}{(s.Inherited ? ", via " + s.LinkRootName : "")}]");
         }
         LastSummary = sum.ToString();
     }
@@ -183,7 +190,10 @@ public sealed class ElementDbPanel : UserControl
     {
         var card = new Border { Background = Card, Margin = new Thickness(0, 3, 0, 3), Padding = new Thickness(6, 4, 6, 4), CornerRadius = new CornerRadius(3) };
         var sp = new StackPanel();
-        sp.Children.Add(new TextBlock { Text = $"{s.Title}", FontWeight = FontWeights.SemiBold, TextWrapping = TextWrapping.Wrap, FontSize = 11.5 });
+        sp.Children.Add(new TextBlock
+        {
+            Text = (s.DesignSheet.Length > 0 ? $"Sheet {s.DesignSheet} · " : "") + s.Title, FontWeight = FontWeights.SemiBold, TextWrapping = TextWrapping.Wrap, FontSize = 11.5,
+        });
         sp.Children.Add(new TextBlock
         {
             Text = $"{s.PlanSet}  ·  design sheet {(s.DesignSheet.Length > 0 ? s.DesignSheet : "-")}  ·  PDF page {s.PdfPage}", Foreground = Muted, FontSize = 11,
@@ -196,13 +206,23 @@ public sealed class ElementDbPanel : UserControl
         var row = new WrapPanel { Margin = new Thickness(0, 3, 0, 0) };
         var open = Btn("Open PDF");
         var prev = Btn("Preview");
-        string pdf = s.PageFile.Length > 0 ? db.Resolve(s.PageFile) : "";
+        var target = db.PdfTarget(s);
+        string pdf = target?.File ?? "";
         string img = s.PreviewFile.Length > 0 ? db.Resolve(s.PreviewFile) : "";
-        open.IsEnabled = pdf.Length > 0 && File.Exists(pdf);
+        open.IsEnabled = target != null;
         prev.IsEnabled = img.Length > 0 && File.Exists(img);
-        open.ToolTip = pdf;
-        open.Click += (_, _) => Process.Start(new ProcessStartInfo(pdf) { UseShellExecute = true });
-        prev.Click += (_, _) => PlanPreviewWindow.ShowSheet(Window.GetWindow(this)!, $"{s.PlanSet} · design sheet {s.DesignSheet} · PDF {s.PdfPage} · {s.Title}", img, pdf);
+        // ToolTipService.ShowOnDisabled so the reason shows on a disabled button too.
+        ToolTipService.SetShowOnDisabled(open, true);
+        ToolTipService.SetShowOnDisabled(prev, true);
+        open.ToolTip = target is { } t ? $"{t.File}, page {t.Page}" : $"Plan PDF not found ({(s.PdfPath.Length > 0 ? s.PdfPath : s.PlanSet)}): put it beside the model, in a folder named in the rules file's planFolders or in %SBM_PLANS%, then rebuild.";
+        prev.ToolTip = prev.IsEnabled ? img : "No preview image: Import plan pages… (splits the PDF and renders previews).";
+        open.Click += (_, _) =>
+        {
+            if (db.PdfTarget(s) is not { } tt) return;
+            try { LastOpen = PdfOpener.Open(tt.File, tt.Page); }
+            catch (Exception ex) { MessageBox.Show(Window.GetWindow(this)!, ex.Message, "Open PDF", MessageBoxButton.OK, MessageBoxImage.Warning); }
+        };
+        prev.Click += (_, _) => PlanPreviewWindow.ShowSheet(Window.GetWindow(this)!, $"{s.PlanSet} · design sheet {s.DesignSheet} · PDF {s.PdfPage} · {s.Title}", img, pdf, target?.Page ?? 1);
         row.Children.Add(open); row.Children.Add(prev);
         var status = new ComboBox { MinWidth = 90, Margin = new Thickness(0, 0, 6, 4), ItemsSource = new[] { "unchecked", "ok", "issue" }, SelectedItem = s.QcStatus };
         row.Children.Add(status);

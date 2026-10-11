@@ -211,4 +211,93 @@ public class DatabaseTests : IDisposable
         Assert.Equal("issue", again.Sheets(plate2.id).Single().QcStatus);
         Assert.Equal("hole pattern differs", again.Sheets(plate2.id).Single().Note);
     }
+
+    private const string IndexRules = """
+        { "models": [ "m.sbm" ], "planFolders": [ "pdfs" ],
+          "planSets": [ { "id": "set1", "pdf": "plan*.pdf", "bridgeGroup": "",
+            "sheets": [ { "p": 1, "s": "", "t": "TITLE SHEET" }, { "p": 2, "s": "5", "t": "FIELD SPLICE DETAILS" },
+                        { "p": 3, "s": "6", "t": "FIELD SPLICE DETAILS" }, { "p": 4, "s": "7", "t": "SUMMARY`OF`QUANTITIES" } ] } ],
+          "administrative": [ "^TITLE SHEET" ],
+          "rules": [
+            { "id": "splices", "sheets": "^FIELD SPLICE", "pages": [ 3 ], "basis": "splices", "target": [ { "level": "assembly", "category": "field splice", "bridge_group": "*" } ] },
+            { "id": "qty", "sheets": "^SUMMARY OF QUANTITIES", "role": "general", "basis": "quantities", "target": [ { "level": "unit", "bridge_group": "*" } ] } ] }
+        """;
+
+    [Fact]
+    public void SheetIndex_GivesLinksWithoutSplitting_AndRulesFileIsPickedPerModel()
+    {
+        var doc = SbmDocument.Sample();
+        string model = Path.Combine(_dir, "m.sbm");
+        // Two rules files beside the model: the one naming another model sorts first and must be skipped.
+        File.WriteAllText(Path.Combine(_dir, "sheet-links-a.json"), """{ "models": [ "other.sbm" ], "planSets": [], "rules": [] }""");
+        File.WriteAllText(Path.Combine(_dir, "sheet-links-m.json"), IndexRules);
+        Assert.Equal(Path.Combine(_dir, "sheet-links-m.json"), CompanionDatabase.FindLinksFile(model));
+        Assert.Null(CompanionDatabase.FindLinksFile(Path.Combine(_dir, "third.sbm")));
+
+        string db = Path.Combine(_dir, "m.sqlite");
+        var res = doc.ExportDatabase(db, new DatabaseOptions { ModelFile = model });
+        Assert.Equal(4, res.Sheets);
+        Assert.NotNull(res.Links);
+        Assert.True(res.Links!.Links > 0);
+        using (var mdb = new ModelDb(db))
+        {
+            var all = Rows(db);
+            string splice = all.First(r => r.category == "field splice").id;
+            string boltGroup = all.First(p => p.parent == splice && p.level == "group").id;
+            var bolt = all.First(r => r.parent == boltGroup);
+            var sheets = mdb.Sheets(bolt.id);
+            // pages filter: only p.3 of the two FIELD SPLICE DETAILS sheets; the unit's general link is inherited too
+            var sp = Assert.Single(sheets, s => s.Title == "FIELD SPLICE DETAILS");
+            Assert.Equal(3, sp.PdfPage);
+            Assert.Equal("6", sp.DesignSheet);
+            Assert.True(sp.Inherited);
+            Assert.Contains(sheets, s => s.Title == "SUMMARY OF QUANTITIES" && s.Role == "general");   // backticks normalized
+            Assert.Null(mdb.PdfTarget(sp));   // no PDF anywhere yet
+        }
+
+        // The PDF appears in a planFolders folder: a relink (no element rebuild) records it and Open PDF goes to the sheet's page.
+        Directory.CreateDirectory(Path.Combine(_dir, "pdfs"));
+        File.WriteAllText(Path.Combine(_dir, "pdfs", "plan set.pdf"), "%PDF-1.4");
+        var rl = CompanionDatabase.Relink(db, "t", new DatabaseOptions { ModelFile = model });
+        Assert.Equal(4, rl.Sheets);
+        using (var mdb = new ModelDb(db))
+        {
+            var all = Rows(db);
+            string splice = all.First(r => r.category == "field splice").id;
+            var s = mdb.Sheets(splice).Single(x => x.Title == "FIELD SPLICE DETAILS");
+            Assert.False(s.Inherited);
+            var t = mdb.PdfTarget(s);
+            Assert.NotNull(t);
+            Assert.Equal(Path.Combine(_dir, "pdfs", "plan set.pdf"), t!.Value.File);
+            Assert.Equal(3, t.Value.Page);
+            Assert.Equal(Path.Combine(_dir, "sheet-links-m.json"), mdb.Meta("links_file"));
+        }
+    }
+
+    private static string RepoFile(string rel)
+    {
+        for (var d = new DirectoryInfo(AppContext.BaseDirectory); d != null; d = d.Parent)
+            if (File.Exists(Path.Combine(d.FullName, "SteelBridgeModeler.sln"))) return Path.Combine(d.FullName, rel);
+        throw new FileNotFoundException("repository root not found");
+    }
+
+    [Theory]
+    [InlineData("sheet-links-i80-rampg.json", "I-80 WB and Ramp G.sbm", 414)]
+    [InlineData("sheet-links-woodbury.json", "Woodbury I-29 NB over Floyd.sbm", 48)]
+    [InlineData("sheet-links-br02069.json", "Br02069 TH65.sbm", 39)]
+    public void ShippedLinkRules_HaveASheetIndex_AndEveryRuleMatchesASheet(string file, string model, int pages)
+    {
+        string path = RepoFile(Path.Combine("samples", "plans", file));
+        var rules = LinkRules.Load(path);
+        Assert.True(rules.IsFor(model));
+        Assert.Equal(path, CompanionDatabase.FindLinksFile(RepoFile(Path.Combine("samples", "plans", model))));
+        var index = rules.PlanSets.SelectMany(p => (p.Sheets ?? new()).Select(s => (set: p.Id, s.Page, title: PlanSheets.NormalizeTitle(s.Title)))).ToList();
+        Assert.Equal(pages, index.Count);
+        foreach (var r in rules.Rules)
+        {
+            var rx = new Regex(r.Sheets, RegexOptions.IgnoreCase);
+            Assert.True(index.Any(s => (r.PlanSets == null || r.PlanSets.Contains(s.set)) && (r.Pages == null || r.Pages.Contains(s.Page)) && rx.IsMatch(s.title)),
+                $"{file}: rule '{r.Id}' matches no sheet of the index");
+        }
+    }
 }
