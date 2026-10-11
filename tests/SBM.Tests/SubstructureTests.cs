@@ -402,6 +402,24 @@ public class SubstructureTests
     }
 
     [Fact]
+    public void PlanBars_Containment_ReportsBarsOutsideTheCap_AndNothingElse()
+    {
+        SubstructureModel Run(double hairpinLength) => Build(p =>
+        {
+            p.CapWidth = Ft(6); p.CapDepth = Ft(5);
+            p.Reinforcement.CapBars = new()
+            {
+                new PlanBarGroup { Mark = "11a1", Kind = PlanBarKind.CapTop, Size = "#11", Count = 14, Length = Ft(30) },
+                new PlanBarGroup { Mark = "6c1", Kind = PlanBarKind.CapHoop, Size = "#6", Count = 30, Length = Ft(15) },
+                new PlanBarGroup { Mark = "5c5", Kind = PlanBarKind.CapHairpin, Size = "#5", Count = 4, Length = hairpinLength },
+            };
+        });
+        Assert.DoesNotContain(Run(Ft(8)).Diagnostics, d => d.Message.Contains("lie outside the concrete"));
+        // A 20 ft hairpin cannot fit a 5 ft deep cap: kept as listed and reported.
+        Assert.Contains(Run(Ft(20)).Diagnostics, d => d.Message.Contains("5c5 hairpins") && d.Message.Contains("lie outside the concrete"));
+    }
+
+    [Fact]
     public void SegmentDistance_Works()
     {
         Assert.Equal(1, SubstructureGenerator.SegmentDistance(new Vec3(0, 0, 0), new Vec3(0, 0, 10), new Vec3(1, 0, 0), new Vec3(1, 0, 10)), 9);
