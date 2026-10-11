@@ -81,6 +81,18 @@ public sealed class CrossSlopeTable
                 }
             return z + s * (distance - x0);
         }
+        /// <summary>Slope in force at a distance from the pivot (the segment ending at or after it; a break applies beyond its distance).</summary>
+        public double SlopeAt(double distance)
+        {
+            double s = Slope;
+            if (Breaks != null)
+                foreach (var (at, sl) in Breaks)
+                {
+                    if (distance <= at) break;
+                    s = sl;
+                }
+            return s;
+        }
         /// <summary>Segments out to a distance: (from, to, slope).</summary>
         public IEnumerable<(double From, double To, double Slope)> Segments(double distance)
         {

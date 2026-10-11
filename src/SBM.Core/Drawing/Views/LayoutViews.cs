@@ -230,7 +230,7 @@ public static class LayoutViews
             for (int i = 0; i <= n; i++)
             {
                 double s = staBegin + (staEnd - staBegin) * i / n;
-                bt.Add(new Vec2(s, a.ElevationAt(s, eo) + bh));
+                bt.Add(new Vec2(s, def.Deck.FinishedElevation(a, s, eo) + bh));
             }
             d.Poly(SheetLayers.Barrier, bt);
             d.Line(SheetLayers.Barrier, bt[0], new Vec2(bt[0].X, top[0].Y));

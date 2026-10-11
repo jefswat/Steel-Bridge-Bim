@@ -37,7 +37,7 @@ public static partial class ElevationCheck
         double TopAtSupport(Vec2 q)
         {
             var so = a.Inverse(q);
-            return a.ElevationAt(so.Station, so.Offset) - def.Deck.Thickness - def.Deck.Haunch;
+            return def.Deck.FinishedElevation(a, so.Station, so.Offset) - def.Deck.Thickness - def.Deck.Haunch;
         }
         double zA = TopAtSupport(cs.Start), zB = TopAtSupport(cs.End);
         double lc = (cs.End - cs.Start).Length;
@@ -58,7 +58,7 @@ public static partial class ElevationCheck
         string Sh(double m) => u.FormatLength(m, LengthKind.Short);
         var so = f.Alignment.Inverse(p);
         var ch = new ElevationChain { Title = title, Station = so.Station, Offset = so.Offset };
-        double z = AddGrade(ch, f.Alignment, so.Station, so.Offset, u);
+        double z = AddGrade(ch, f.Alignment, so.Station, so.Offset, u, def.Deck);
         z -= def.Deck.Thickness;
         ch.Steps.Add(new CalcStep("− Deck slab", $"slab thickness {Sh(def.Deck.Thickness)}", -def.Deck.Thickness, z, "Bottom of deck"));
         var (zt, basis, _) = PsTopOfBeam(f, girder, p, u);

@@ -156,7 +156,7 @@ public sealed class ConcreteGenerator
 
     // ================================================================== surfaces & end lines
 
-    private double Top(double d, double o) => _a.ElevationAt(_a.DistanceToStation(d), o);
+    private double Top(double d, double o) => Deck.FinishedElevation(_a, _a.DistanceToStation(d), o);
 
     /// <summary>Alignment distances where the offset curve crosses the begin/end deck lines (optionally inset, toward the deck).</summary>
     private (double b, double e) Ends(double o, double inset = 0) => Ends(o, inset, inset);
@@ -214,7 +214,48 @@ public sealed class ConcreteGenerator
         for (int i = 1; i < n; i++) list.Add(l + (r - l) * i / n);
         double piv = _a.CrossSlope.PivotOffset;
         if (piv > l && piv < r) list.Add(piv);
+        foreach (var g in StripLines(l, r)) list.Add(g);
         return list.Distinct().OrderBy(x => x).ToList();
+    }
+
+    /// <summary>Gutter lines (edge strip start) strictly inside [l, r] of a constant-width deck, when the edge strip option is on.</summary>
+    private IEnumerable<double> StripLines(double l, double r)
+    {
+        if (Deck.EdgeStrip is not { LowSideLevel: true, Width: > 0 } es) yield break;
+        if (Deck.LeftEdgeOffset + es.Width > l + 1e-6 && Deck.LeftEdgeOffset + es.Width < r - 1e-6) yield return Deck.LeftEdgeOffset + es.Width;
+        if (Deck.RightEdgeOffset - es.Width > l + 1e-6 && Deck.RightEdgeOffset - es.Width < r - 1e-6) yield return Deck.RightEdgeOffset - es.Width;
+    }
+
+    /// <summary>
+    /// Variable width: across-the-deck columns as offset functions of the alignment distance, between the edges inset by li / ri. Columns sit at
+    /// fixed fractions of the width; with the edge strip option on, the gutter lines (edge -/+ strip width) are columns too, so the level strip
+    /// has its own cells.
+    /// </summary>
+    private List<Func<double, double>> VarColumns(double li, double ri)
+    {
+        var list = new List<Func<double, double>>();
+        double wMax = Deck.MaxRight - Deck.MinLeft;
+        if (Deck.EdgeStrip is { LowSideLevel: true, Width: > 0 } es)
+        {
+            double w = es.Width;
+            bool gl = li < w - 1e-6, gr = ri < w - 1e-6;
+            int ni = Math.Max(1, (int)Math.Ceiling((wMax - 2 * w) / 1.0));
+            Func<double, double> lo = d => gl ? LeftAtD(d) + w : LeftAtD(d) + li;
+            Func<double, double> hi = d => gr ? RightAtD(d) - w : RightAtD(d) - ri;
+            list.Add(d => LeftAtD(d) + li);
+            if (gl) list.Add(lo);
+            for (int k = 1; k < ni; k++) { double t = (double)k / ni; list.Add(d => lo(d) + (hi(d) - lo(d)) * t); }
+            if (gr) list.Add(hi);
+            list.Add(d => RightAtD(d) - ri);
+            return list;
+        }
+        int nk = Math.Max(2, (int)Math.Ceiling(wMax / 1.0)) + 1;
+        for (int k = 0; k < nk; k++)
+        {
+            double t = (double)k / (nk - 1);
+            list.Add(d => { double l = LeftAtD(d) + li, r = RightAtD(d) - ri; return l + (r - l) * t; });
+        }
+        return list;
     }
 
     private int AlongSamples(double length) => Math.Clamp((int)Math.Ceiling(length / 1.5), 2, 2000);
@@ -278,17 +319,15 @@ public sealed class ConcreteGenerator
     /// <summary>Variable width: columns at fixed fractions of the width between the edges at each station.</summary>
     private void BuildVariableDeckSolid()
     {
-        double wMax = Deck.MaxRight - Deck.MinLeft;
-        int nk = Math.Max(2, (int)Math.Ceiling(wMax / 1.0)) + 1;
-        var fr = Enumerable.Range(0, nk).Select(k => (double)k / (nk - 1)).ToArray();
+        var cols = VarColumns(0, 0);
+        int nk = cols.Count;
         var (b0, e0) = Ends(0, InsetB, InsetE);
         int ni = AlongSamples(e0 - b0) + 1;
         var top = new Vec3[ni, nk];
         var bot = new Vec3[ni, nk];
         for (int k = 0; k < nk; k++)
         {
-            double t = fr[k];
-            double Off(double d) => LeftAtD(d) + (RightAtD(d) - LeftAtD(d)) * t;
+            var Off = cols[k];
             var (db, de) = EndsVar(Off, InsetB, InsetE);
             for (int i = 0; i < ni; i++)
             {
@@ -340,7 +379,7 @@ public sealed class ConcreteGenerator
     private double DeckBottomAt(Vec2 p)
     {
         var so = _a.Inverse(p);
-        return _a.ElevationAt(so.Station, so.Offset) - Deck.Thickness;
+        return Deck.FinishedElevation(_a, so.Station, so.Offset) - Deck.Thickness;
     }
 
     private void BuildBarriers()
@@ -401,17 +440,7 @@ public sealed class ConcreteGenerator
     private List<Func<double, double>> JointColumns(double li, double ri)
     {
         var list = new List<Func<double, double>>();
-        if (Deck.VariableWidth)
-        {
-            double wMax = Deck.MaxRight - Deck.MinLeft;
-            int nk = Math.Max(2, (int)Math.Ceiling(wMax / 1.0)) + 1;
-            for (int k = 0; k < nk; k++)
-            {
-                double t = (double)k / (nk - 1);
-                list.Add(d => { double l = LeftAtD(d) + li, r = RightAtD(d) - ri; return l + (r - l) * t; });
-            }
-            return list;
-        }
+        if (Deck.VariableWidth) return VarColumns(li, ri);
         var offs = DeckOffsets(1.0);
         if (li == 0 && ri == 0) return offs.Select(o => (Func<double, double>)(_ => o)).ToList();
         double l0 = Deck.LeftEdgeOffset + li, r0 = Deck.RightEdgeOffset - ri;
@@ -419,6 +448,7 @@ public sealed class ConcreteGenerator
         var os = Enumerable.Range(0, n + 1).Select(i => l0 + (r0 - l0) * i / n).ToList();
         double piv = _a.CrossSlope.PivotOffset;
         if (piv > l0 && piv < r0) os.Add(piv);
+        os.AddRange(StripLines(l0, r0));
         return os.Distinct().OrderBy(x => x).Select(o => (Func<double, double>)(_ => o)).ToList();
     }
 
@@ -495,7 +525,7 @@ public sealed class ConcreteGenerator
         {
             var so = _a.Inverse(p.XY);
             bool on = so.Offset >= Deck.LeftAt(so.Station) - 1e-6 && so.Offset <= Deck.RightAt(so.Station) + 1e-6;
-            return (_a.ElevationAt(so.Station, so.Offset) - p.Z, on);
+            return (Deck.FinishedElevation(_a, so.Station, so.Offset) - p.Z, on);
         }
         return new DeckEndBlockResult
         {
@@ -627,7 +657,7 @@ public sealed class ConcreteGenerator
                 double o = offs[j];
                 var (b, e) = Ends(o, c);
                 var line = _a.SamplePolyline(b, e, o, 0.01, 1.5).Select(p => p.WithZ(0)).ToList();
-                var pts = line.Select(p => { var so = _a.Inverse(p.XY); return p.XY.WithZ(_a.ElevationAt(so.Station, so.Offset) + zOff); }).ToArray();
+                var pts = line.Select(p => { var so = _a.Inverse(p.XY); return p.XY.WithZ(Deck.FinishedElevation(_a, so.Station, so.Offset) + zOff); }).ToArray();
                 // Stagger laps on alternate bars by half a bar length.
                 foreach (var piece in SplitBar(pts, r.MaxBarLength, lap, j % 2 == 1 ? r.MaxBarLength / 2 : r.MaxBarLength))
                     bars.Add((series, size, BarShape.Straight(Length(piece)), loc, epoxy, new BarPlacement { Mark = series, Points = piece }));
@@ -744,7 +774,7 @@ public sealed class ConcreteGenerator
         {
             var p = Vec2.Lerp(p0, p1, tt);
             var so = _a.Inverse(p);
-            return p.WithZ(_a.ElevationAt(so.Station, so.Offset) + zOff);
+            return p.WithZ(Deck.FinishedElevation(_a, so.Station, so.Offset) + zOff);
         }).ToArray();
     }
 

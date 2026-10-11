@@ -173,7 +173,7 @@ public static class PrestressedGenerator
             double s = brgA + (brgB - brgA) * k / 20.0;
             var q = P(s, 0, D);
             var so = a.Inverse(q.XY);
-            double h = a.ElevationAt(so.Station, so.Offset) - def.Deck.Thickness - q.Z;
+            double h = def.Deck.FinishedElevation(a, so.Station, so.Offset) - def.Deck.Thickness - q.Z;
             hMin = Math.Min(hMin, h);
             hMax = Math.Max(hMax, h);
         }

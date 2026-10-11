@@ -135,12 +135,12 @@ public sealed class FramingGenerator
         return _offsets[j][girder] + (_offsets[j + 1][girder] - _offsets[j][girder]) * t;
     }
 
-    private double DeckElevation(double d, double offset) => _align.ElevationAt(_align.DistanceToStation(d), offset);
+    private double DeckElevation(double d, double offset) => _def.Deck.FinishedElevation(_align, _align.DistanceToStation(d), offset);
 
     private double DeckElevationAtPoint(Vec2 p)
     {
         var so = _align.Inverse(p);
-        return _align.ElevationAt(so.Station, so.Offset);
+        return _def.Deck.FinishedElevation(_align, so.Station, so.Offset);
     }
 
     private bool IntersectSupportWithOffsetCurve(int support, Func<double, double> offsetAt, double offsetGuess, Vec2 linePoint, out double d)
@@ -220,13 +220,13 @@ public sealed class FramingGenerator
             return (DeckElevation(d, c.OffsetAtU(u)) - WebTopDrop, _align.DistanceToStation(d));
         }
         var so = _align.Inverse(c.PointAt(u));
-        return (_align.ElevationAt(so.Station, so.Offset) - WebTopDrop, so.Station);
+        return (_def.Deck.FinishedElevation(_align, so.Station, so.Offset) - WebTopDrop, so.Station);
     }
 
     private (double webTop, double station) WebTopAtPoint(Vec2 p)
     {
         var so = _align.Inverse(p);
-        return (_align.ElevationAt(so.Station, so.Offset) - WebTopDrop, so.Station);
+        return (_def.Deck.FinishedElevation(_align, so.Station, so.Offset) - WebTopDrop, so.Station);
     }
 
     /// <summary>Top of steel (top of top flange) at web centerline.</summary>

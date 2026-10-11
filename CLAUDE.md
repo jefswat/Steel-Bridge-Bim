@@ -262,6 +262,13 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   (camber_table), `sbm blocking`. Plan data/results: `docs/plan-data/camber-blocking.md` (section 9), `docs/plan-data/camber/*.csv`; scripts `samples/plans/camber-i80.csx`,
   `camber-ramp-g.csx` (run after the girder/splice/termination scripts) and `check-blocking.csx`.
 - Variable deck width: `DeckDefinition.LeftAt/RightAt(station)`; constant decks keep the old code path.
+- Deck edge strip (OPTIONAL, default off, PROJECT-SPECIFIC to the Iowa plans): `DeckDefinition.EdgeStrip` (`DeckEdgeStrip` Width inboard from the edge, follows
+  `LeftAt/RightAt`). `DeckDefinition.FinishedElevation(alignment, sta, off)` = `Alignment.ElevationAt` except beyond the gutter line (edge -/+ Width) on a side whose
+  slope at the gutter line falls toward the edge: level at the gutter elevation (switches exactly at the slope's sign change; `CrossSlopeTable.Side.SlopeAt`).
+  Everything that reads the DECK surface must call it, not `Alignment.ElevationAt`: deck solid (extra gutter columns, `VarColumns`/`StripLines`), framing
+  (web tops, deck lines), haunches, rebar/barrier Z, drains, prestressed, ElevationCheck (`Edge strip level` row; pass the deck to `AddGrade`/`Grade`),
+  section/bent/layout views, the top-of-slab check scripts. Set by `samples/plans/deck-edge-strip.csx` (run after the build scripts); data in
+  `docs/plan-data/superelevation-8wb.md` section 5.
 - Drainage: `BridgeDefinition.Drains` â†’ `SubstructureModel.Drainage` (built in SubstructureGenerator, needs terrain for basins).
 - Raster terrain: `ElevationGrid` (full-res bilinear) + decimated display mesh; `TerrainModel(grid, mesh)`.
 - Cross girders as designed (OPTIONAL fields on `CrossGirderSection`; defaults = the simple legacy cross girder): `CrossGirderDetailer.cs`

@@ -23,7 +23,7 @@ foreach (var (bn, sn, tos) in plan)
         var br = line.Bearings.ElementAtOrDefault(g);
         if (br == null) { cells.Add("  n/a"); continue; }
         var so = al.Inverse(br.TopOfSteel.XY);
-        double z = al.ElevationAt(so.Station, so.Offset);
+        double z = b.Deck.FinishedElevation(al, so.Station, so.Offset);
         cells.Add($"{(z / Ft(1) - tos[g]) * 12,5:+0.0;-0.0}");
     }
     Print($"{bn,-15} {sn,-9} model - plan top of slab (in): {string.Join(" ", cells)}");

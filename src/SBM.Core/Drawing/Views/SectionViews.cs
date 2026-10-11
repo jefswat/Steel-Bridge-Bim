@@ -26,12 +26,17 @@ public static class SectionViews
             : (f.Supports[0].Station + f.Supports[1].Station) / 2;
         var deck = def.Deck;
         double l = deck.LeftAt(sta), r = deck.RightAt(sta), t = deck.Thickness;
-        double Top(double o) => a.ElevationAt(sta, o);
+        double Top(double o) => deck.FinishedElevation(a, sta, o);
 
         // ---- slab (cut)
         var xs = new List<double> { l, r };
         double piv = a.CrossSlope.PivotOffset;
         if (piv > l && piv < r) xs.Add(piv);
+        if (deck.EdgeStrip is { LowSideLevel: true, Width: > 0 } strip)
+        {
+            if (l + strip.Width < r) xs.Add(l + strip.Width);
+            if (r - strip.Width > l) xs.Add(r - strip.Width);
+        }
         xs.Sort();
         var slabTop = xs.Select(o => new Vec2(o, Top(o))).ToList();
         var slab = slabTop.Concat(Enumerable.Reverse(slabTop).Select(p => new Vec2(p.X, p.Y - t))).ToList();
