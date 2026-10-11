@@ -266,8 +266,8 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   spaces + IfcPlane) into ONE face set cut exactly by the skewed end planes (arcs polygonized to the tolerance).
   Triangle meshes, swept-disk bars/strands, mapped bolt types (IfcTriangulatedFaceSet sources) are already allowed and
   unchanged; element GlobalIds, materials and psets are the same (the SBM_Fabrication pset GlobalIds are keyed by STEP id,
-  so they differ between modes). AbV also writes prestressed IfcBeam `.GIRDER_SEGMENT.` (`.GIRDER.` is not in
-  IfcBeamTypeEnum of IFC4X3_ADD2 — Parametric still writes it, a schema error left as is to keep Parametric unchanged).
+  so they differ between modes). Prestressed girders are IfcBeam `.GIRDER_SEGMENT.` in all modes (`.GIRDER.` is not in
+  IFC4X3_ADD2's IfcBeamTypeEnum; it is valid only for IfcElementAssembly / IfcBridge).
   Volumes vs Parametric: `python -I tools/compare_ifc_volumes.py par.ifc abv.ifc --changed-only`. Cost: I-80 WB and
   Ramp G __SIZES__. Not done yet: IfcSectionedSolidHorizontal along the IFC 4.3 alignment
   (needs IfcAlignmentWriter's IfcGradientCurve / IfcCompositeCurve): girder plates (flanges/webs, profile = plate section

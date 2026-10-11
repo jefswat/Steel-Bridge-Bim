@@ -238,6 +238,7 @@ public class IfcReferenceViewTests
             var e = Parse(rt);
             // Prestressed girders (pier caps are IfcBeam PIERCAP). IfcBeamTypeEnum has no GIRDER in IFC4X3_ADD2.
             Assert.DoesNotContain(e.Values, v => v.Type == "IFCBEAM" && v.Body.EndsWith(".GIRDER."));
+            Assert.DoesNotContain(Parse(pt).Values, v => v.Type == "IFCBEAM" && v.Body.EndsWith(".GIRDER."));
             var beams = e.Where(kv => kv.Value.Type == "IFCBEAM" && kv.Value.Body.EndsWith(".GIRDER_SEGMENT.")).ToList();
             Assert.Equal(ps.Beams.Count, beams.Count);
             foreach (var (_, (_, body)) in beams)
