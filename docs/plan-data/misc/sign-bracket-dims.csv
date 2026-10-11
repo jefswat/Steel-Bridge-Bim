@@ -1,0 +1,24 @@
+parameter,unit2_pier7WB,unit3_pier13WB,source
+truss span CL post to CL post,100'-0,90'-0,I-80 PDF 176/180
+post spacing along girder (bracket CL to bracket CL),7'-4 (3'-8 each side of CL truss),7'-4 (7'-4 1/8 along curved girder A),PDF 176/180
+truss CL station on WB approach roadway CL,7595+82.22 41.08' LT,7607+12.18 41.08' LT,PDF 176/180
+CL pier station (same offset),7595+76.39,7606+94.77,I-80 PDF 10/12
+truss skew,90d00'00" to pier (parallel to pier),89d54'39" (parallel to cross frames; pier skew 18d48'56"),PDF 176/180
+exterior girders carrying brackets,A (north) and K (south),A (north) and J (south),PDF 178/180
+post line ahead of CL pier along girder,2'-2 (plan PDF 110),J: 2'-0 (A: UNRESOLVED origin of the 12'-10 7/8 dim),I-80 PDF 110/117
+bracket overall height (stub),8'-6,6'-4,PDF 178/180
+lower portion below the 4'-6 mark,4'-6,4'-6,PDF 178/180
+top of base elevation north/south,1026.33/1028.33,1020.32/1024.32,PDF 178/180
+vertical dim elevation line to level line girder A west/east,1'-3 3/4 / 1'-3 5/8,1'-8 5/8 / 1'-8 3/4,PDF 178/180
+vertical dim girder K (U2) or J (U3) west/east,1'-0 3/8 / 1'-0,1'-0 1/4 / 1'-0 3/4,PDF 178/180
+section D-D girder A (left post / right post),6'-3 / 6'-7 7/16; 92d52'02",5'-4 5/8 / 5'-9 1/2; 93d19'39" / 93d00'30" (revised),PDF 178/181
+section D-D girder K (U2) or J (U3),6'-1 3/4 typ; 90d,5'-0 3/8 / 5'-0 1/4; 89d49'28",PDF 178/181
+truss CL line to near post line (typ.),2'-3,2'-3,PDF 178/181
+bracket plan footprint / spreader beam,2'-2 x 2'-4; beam 10'-0 (1'-4 + 7'-4 + 1'-4),same,PDF 178/182
+anchor bolts per post,8 x 1 1/2" dia F1554 Gr 105 on 1'-8 dia circle at 22d30',same,PDF 176/178/182
+top plate (anchor level),1 7/8 x 28,same,PDF 178
+bottom flange plate,1 1/4 x 22,1 1/4 x 26,PDF 178/180
+web 3/4; stiffeners 1 1/8 x 12 1/2 each side; 1 1/2 x 13 1/2 vertical top; 1 3/8 x 15 1/2,,,PDF 178/180/181
+channels MC18x45.8; diagonals/struts WT5x22.5; connection angles L5x3 1/2x1/2 on 3/4 dia bars,,,PDF 178/182
+web splice 3/8 x 13 each side: 19 spa @ 5 = 7'-11 (U2) / 14 spa @ 5 = 5'-10 (U3); fill 5/16 (U2) / 3/16 (U3),,,PDF 178/180
+flange splices 5/8 x 22 outer; 5/8 x 10 inner (bottom) 5/8 x 12 inner (top) each side,,,PDF 178/180

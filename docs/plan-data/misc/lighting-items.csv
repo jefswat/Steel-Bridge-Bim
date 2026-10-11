@@ -1,0 +1,16 @@
+bridge,item,station_or_location,side,detail,source
+I-80,pole base,Pier 13WB (CL base 5'-0 back of CL pier),south barrier,2'-0 x 2'-6 projection block + 4'-4 blockout,I-80 PDF 233/235
+I-80,pole base,Pier 14WB (CL base = CL pier),south barrier,same,I-80 PDF 233
+I-80,pole base,Pier 15WB (CL base = CL pier),south barrier,same,I-80 PDF 233
+I-80,pole base,East Abutment (CL base 10'-0 max from end of superstructure),south barrier,same,I-80 PDF 233
+I-80,Type 1 power supply JB + underdeck stub,7583+40.50 (CL JB),deck,underdeck lighting,I-80 PDF 236
+I-80,Type 1 power supply JB,7588+69.64 (CL Pier 4WB),deck,,I-80 PDF 236
+I-80,underdeck stub out,7582+45.00 12'-3 LT,slab,3" min stub bottom of deck,I-80 PDF 236
+I-80,underdeck stub out,7582+70.00 57'-11 LT,slab,3" min stub bottom of deck,I-80 PDF 236
+Ramp G,pole base,Pier 8G (CL base = CL pier),right barrier only,16" bolt circle,Ramp G PDF 168/169
+Ramp G,Type 1 JBs (power + ITS),Pier 8G: 2'-6 min each side of CL pier,right barrier,ITS box one side / power box other,Ramp G PDF 168
+Ramp G,Type 1 power supply JB,67474+90.40 (Pier 5G),deck,underdeck lighting,Ramp G PDF 170
+Ramp G,underdeck stub out,67475+53.29 2'-5 LT,slab,Loop D,Ramp G PDF 170
+Ramp G,underdeck stub out,67477+44.79 2'-5 LT,slab,,Ramp G PDF 170
+Ramp G,Type 1 JB + underdeck stub,67487+45.83 2'-5 LT,slab,,Ramp G PDF 170
+Ramp G,Type 1 JB,67486+92.70 (CL Pier 11G),slab,,Ramp G PDF 170

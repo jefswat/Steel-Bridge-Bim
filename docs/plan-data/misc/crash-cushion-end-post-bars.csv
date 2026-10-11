@@ -1,0 +1,35 @@
+location,bar,type,part,count,length,weight_lb
+Ramp A (6A / 5WB) PDF 229,6c2,epoxy,end block vertical,8,4'-8,56
+Ramp A,5c4,epoxy,rail vertical,6,7'-1,44
+Ramp A,6d1,epoxy,rail horizontal,24,3'-7,129
+Ramp A,6d2,epoxy,end block horizontal,8,7'-2,86
+Ramp A,6d3,epoxy,end block horizontal,3,7'-2,32
+Ramp A,6d4,epoxy,rail horizontal,2,3'-7,11
+Ramp A,5d5,epoxy,end block horizontal,2,7'-2,15
+Ramp A,6c1,stainless,end block vertical,6,6'-3,56
+Ramp A,6c3,stainless,end block vertical,10,VARIES (vertical leg 3'-4 min to 4'-0 max),100
+Ramp A,5c5,stainless,rail vertical,6,5'-10,37
+Ramp A,5c6,stainless,end block vertical,2,5'-4,11
+Ramp A,5c7,stainless,end block vertical,2,5'-5,11
+Ramp A,5c8,stainless,end block vertical,2,5'-11,12
+Ramp A,5c9,stainless,end block vertical,2,6'-0,13
+Ramp G (19G / 11WB) PDF 230,6c2,epoxy,end block vertical,3,4'-8,21
+Ramp G,6c4,epoxy,end block vertical,5,VARIES,37
+Ramp G,5c5,epoxy,rail vertical,7,7'-1,52
+Ramp G,5c11,epoxy,rail vertical,2,7'-5,15
+Ramp G,6d1,epoxy,rail horizontal,12,3'-10,69
+Ramp G,6d2,epoxy,end block horizontal,8,7'-2,86
+Ramp G,6d3,epoxy,end block horizontal,4,7'-2,43
+Ramp G,6d4,epoxy,rail horizontal,1,3'-5,5
+Ramp G,6d5,epoxy,rail horizontal,1,5'-0,8
+Ramp G,6d6,epoxy,rail horizontal,12,5'-6,99
+Ramp G,5d7,epoxy,end block horizontal,1,7'-2,7
+Ramp G,5d8,epoxy,end block horizontal,1,7'-3,8
+Ramp G,6c1,stainless,end block vertical,6,6'-3,56
+Ramp G,6c3,stainless,end block vertical,10,VARIES,100
+Ramp G,5c6,stainless,rail vertical,7,5'-10,43
+Ramp G,5c7,stainless,end block vertical,2,5'-7,12
+Ramp G,5c8,stainless,end block vertical,2,5'-8,12
+Ramp G,5c9,stainless,end block vertical,2,6'-2,13
+Ramp G,5c10,stainless,end block vertical,2,6'-3,13
+Ramp G,5c12,stainless,rail vertical,2,6'-0,13
