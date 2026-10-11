@@ -34,7 +34,9 @@ public sealed class StrandPoint
 }
 
 /// <summary>How a standard-length beam sits between layout bearings whose distance differs from its standard CL-CL bearing length.</summary>
-public enum StandardBeamPlacement { Centered, AtStartBearing, AtEndBearing }
+/// <remarks>AtPierBearing: the standard CL bearing on the layout bearing at the pier (interior support) end; ambiguous when both
+/// or neither end is at a pier (UNRESOLVED, drawn centred).</remarks>
+public enum StandardBeamPlacement { Centered, AtStartBearing, AtEndBearing, AtPierBearing }
 
 /// <summary>
 /// A beam definition for some spans / beam lines (e.g. Woodbury: BTD55 in span 1, BTD105 in span 2, BTD60 in span 3).
@@ -110,10 +112,11 @@ public sealed class PrestressedBeamDefinition
     public double StandardBearingLength { get; set; }
     /// <summary>STANDARD overall length (end to end along the CL); 0 = StandardBearingLength + 2 × BearingToEnd.</summary>
     public double StandardOverallLength { get; set; }
-    /// <summary>Placement of the standard-length beam between the layout bearings when they differ.</summary>
-    public StandardBeamPlacement Placement { get; set; } = StandardBeamPlacement.Centered;
-    /// <summary>Plan reference that fixes <see cref="Placement"/>; "" = not stated on the plans → UNRESOLVED warning when the
-    /// standard length differs from the layout.</summary>
+    /// <summary>Placement of the standard-length beam between the layout bearings when they differ. NO default: null = not
+    /// decided (the plans don't state it) → UNRESOLVED warning for every beam whose length differs; such a beam is drawn
+    /// centred between the layout bearings for display only.</summary>
+    public StandardBeamPlacement? Placement { get; set; }
+    /// <summary>Plan reference / decision record for <see cref="Placement"/> (quoted in the CHECK warning).</summary>
     public string PlacementBasis { get; set; } = "";
     /// <summary>Hold-down points each side of MIDSPAN of the beam (e.g. 6'-0 / 10'-6 Iowa BTD); 0 = <see cref="HarpPointFraction"/>.</summary>
     public double HoldDownFromMidspan { get; set; }

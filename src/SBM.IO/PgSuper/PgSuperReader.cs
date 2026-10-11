@@ -30,6 +30,9 @@ public sealed class PgsGirderData
     public double FcKsi { get; init; }
     public double FciKsi { get; init; }
     public int DebondedStraight { get; init; }
+    /// <summary>Straight strand debonding (PGSuper CDebondData "DebondInfo": Strand = straight grid index, Length1 / Length2 =
+    /// debonded length at the start / end of the girder, m). A pair grid entry debonds both strands.</summary>
+    public List<(int GridIndex, double Start, double End)> Debond { get; init; } = new();
     public string Key => $"{StrandInputType}/{NumStraight}/{NumHarped}/{NumPermanent}/{EndMeasure}:{EndOffset:0.####}/{HpMeasure}:{HpOffset:0.####}/{StrandDiameter:0.####}/{FcKsi:0.##}/{FciKsi:0.##}";
 }
 
@@ -177,6 +180,8 @@ public static class PgSuperReader
                 FcKsi = D(conc, "Fc") / KsiPa,
                 FciKsi = D(conc, "Fci") / KsiPa,
                 DebondedStraight = (int)D(ps.Element("StraightStrandDebonding"), "DebondInfoCount"),
+                Debond = (ps.Element("StraightStrandDebonding")?.Elements("DebondInfo") ?? Enumerable.Empty<XElement>())
+                    .Select(x => ((int)D(x, "Strand", -1), D(x, "Length1"), D(x, "Length2"))).Where(x => x.Item1 >= 0).ToList(),
             });
         }
 

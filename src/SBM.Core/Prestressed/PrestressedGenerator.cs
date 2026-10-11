@@ -125,20 +125,30 @@ public static class PrestressedGenerator
         // Standard beam: built at the STANDARD length (CL-CL bearing + overall, along the CL), never stretched to the layout;
         // the difference against the layout bearings is a CHECK warning, the placement between them an input (UNRESOLVED when
         // the plans don't state it and the lengths differ).
-        double layoutSpan = brgB - brgA, lengthDiff = 0;
+        // Lengths along the sloped beam = plan-chord parameter s × kSlope (the section is kept vertical).
+        double kSlope = Math.Sqrt(1 + slope * slope);
+        double layoutSpan = (brgB - brgA) * kSlope, lengthDiff = 0;
         bool standardLength = pd.StandardBearingLength > 0;
         Assumption? assumption = null;
         if (standardLength)
         {
-            double ls = pd.StandardBearingLength;
-            double lo = pd.StandardOverallLength > 0 ? pd.StandardOverallLength : ls + 2 * pd.BearingToEnd;
-            double e = (lo - ls) / 2;
-            lengthDiff = ls - layoutSpan;
-            double a0 = pd.Placement switch
+            double lsTrue = pd.StandardBearingLength;
+            double lo = pd.StandardOverallLength > 0 ? pd.StandardOverallLength : lsTrue + 2 * pd.BearingToEnd;
+            lengthDiff = lsTrue - layoutSpan;
+            double ls = lsTrue / kSlope, e = (lo - lsTrue) / 2 / kSlope; // in s
+            // Effective placement: AtPierBearing resolves to the end at the (single) pier; null / ambiguous = undecided.
+            StandardBeamPlacement? place = pd.Placement switch
+            {
+                StandardBeamPlacement.AtPierBearing when abutA && !abutB => StandardBeamPlacement.AtEndBearing,
+                StandardBeamPlacement.AtPierBearing when !abutA && abutB => StandardBeamPlacement.AtStartBearing,
+                StandardBeamPlacement.AtPierBearing => null,
+                var p => p,
+            };
+            double a0 = place switch
             {
                 StandardBeamPlacement.AtStartBearing => brgA,
                 StandardBeamPlacement.AtEndBearing => brgB - ls,
-                _ => brgA - lengthDiff / 2,
+                _ => brgA - lengthDiff / kSlope / 2,
             };
             brgA = a0;
             brgB = a0 + ls;
@@ -147,19 +157,23 @@ public static class PrestressedGenerator
             if (Math.Abs(lengthDiff) >= In(1.0 / 32))
             {
                 string L(double m) => u.FormatLength(m);
-                warn.Enqueue($"CHECK (standard beam length): G{i + 1} span {j + 1} {typeName}: standard CL-CL bearing {L(ls)} vs layout {L(layoutSpan)} along the beam " +
+                string how = place switch
+                {
+                    StandardBeamPlacement.AtStartBearing => "standard CL bearing on the layout bearing at the start",
+                    StandardBeamPlacement.AtEndBearing => "standard CL bearing on the layout bearing at the end",
+                    StandardBeamPlacement.Centered => "centred between the layout bearings",
+                    _ => "placement NOT SET - drawn centred between the layout bearings for display only",
+                };
+                warn.Enqueue($"CHECK (standard beam length): G{i + 1} span {j + 1} {typeName}: standard CL-CL bearing {L(lsTrue)} vs layout {L(layoutSpan)} along the beam " +
                              $"(standard {(lengthDiff > 0 ? "longer" : "shorter")} by {u.FormatLength(Math.Abs(lengthDiff), LengthKind.Short)}); the beam is modeled at the standard length " +
-                             $"({pd.Placement}{(pd.PlacementBasis != "" ? ", " + pd.PlacementBasis : "")}), not stretched.");
-                if (pd.PlacementBasis == "")
+                             $"({how}{(pd.PlacementBasis != "" ? ", " + pd.PlacementBasis : "")}), not stretched.");
+                if (place == null)
                     assumption = Assumption.Unresolved(
-                        $"placement of the standard {typeName} beam between layout bearings that differ from its standard CL-CL bearing length is not stated on the plans" +
+                        (pd.Placement == StandardBeamPlacement.AtPierBearing
+                            ? $"placement 'at the pier bearing' of the standard {typeName} beam is ambiguous (both or neither end at a pier)"
+                            : $"placement of the standard {typeName} beam between layout bearings that differ from its standard CL-CL bearing length is not set (not stated on the plans)") +
                         (pd.Source != "" ? $" ({pd.Source})" : ""),
-                        pd.Placement switch
-                        {
-                            StandardBeamPlacement.AtStartBearing => "standard CL bearing on the layout bearing at the start",
-                            StandardBeamPlacement.AtEndBearing => "standard CL bearing on the layout bearing at the end",
-                            _ => "centred between the layout bearings",
-                        });
+                        "centred between the layout bearings (display only)");
             }
         }
         // s of the end face at section point (x, y): skewed or square in plan; square to the axis in elevation at interior bents.
@@ -185,7 +199,7 @@ public static class PrestressedGenerator
         // ---- strands: explicit layout (PGSuper) or the IGND fill with the lowest A-position pairs depressed
         double spanL = brgB - brgA;
         double hold = pd.HarpPointFraction > 0 ? pd.HarpPointFraction * spanL : Math.Max(len / 20, Ft(5));
-        double holdFromEnd = pd.HoldDownFromMidspan > 0 ? Math.Max(0, len / 2 - pd.HoldDownFromMidspan) : Math.Max(0, len / 2 - hold);
+        double holdFromEnd = pd.HoldDownFromMidspan > 0 ? Math.Max(0, len / 2 - pd.HoldDownFromMidspan / kSlope) : Math.Max(0, len / 2 - hold);
         var layout = new List<(Vec2 p, double yEnd, bool harped, double xEnd)>();
         var debond = new List<(double s, double e, string sym)>();
         if (StrandPatterns.Resolve(pd, D) is { } sl) // explicit (possibly empty = no strands), grid-column harping applied

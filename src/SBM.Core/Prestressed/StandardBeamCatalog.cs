@@ -138,7 +138,7 @@ public static class StandardBeamCatalog
     /// pattern on the 2" grid), deflected strands and hold-down points, concrete. Iowa BTD55 / BTD60 / BTD105: Woodbury Design 817
     /// PDF p.27 (DS 25, beam data table) and p.28-30 (DS 26-28, strand patterns). Null if unknown.
     /// The placement of a standard beam between layout bearings that differ from its standard length is not stated on those
-    /// sheets (<see cref="PrestressedBeamDefinition.PlacementBasis"/> stays empty = UNRESOLVED warning when they differ).
+    /// sheets: <see cref="PrestressedBeamDefinition.Placement"/> stays null (user decision pending) = UNRESOLVED warning when they differ.
     /// </summary>
     public static PrestressedBeamDefinition? Beam(string name)
     {
