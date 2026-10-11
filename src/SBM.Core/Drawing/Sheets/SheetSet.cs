@@ -80,6 +80,14 @@ public static class SheetSet
         // Bents and abutments.
         if (ctx.Substructure != null)
             foreach (var unit in ctx.Substructure.Units)
+                if (unit.Abutment != null)
+                    specs.Add(new SheetSpec($"{unit.Name} abutment", "Rear elevation, section, piling and wing layout", new[]
+                    {
+                        new Panel(new ViewSpec(unit.Name + " rear elevation", s => AbutmentViews.Abutment(WithScale(ctx, s), unit, 0), ScaleFamily.Architectural), 0, H * 0.55, W, H),
+                        new Panel(new ViewSpec(unit.Name + " piling", s => AbutmentViews.Abutment(WithScale(ctx, s), unit, 2), ScaleFamily.Architectural), 0, 0, W * 0.68, H * 0.55),
+                        new Panel(new ViewSpec(unit.Name + " section", s => AbutmentViews.Abutment(WithScale(ctx, s), unit, 1), ScaleFamily.Architectural), W * 0.68, 0, W, H * 0.55),
+                    }));
+                else
                 specs.Add(new SheetSpec($"{unit.Name} {(unit.Type == SupportType.Pier ? "bent" : "abutment")}", "Elevation and cap section",
                     new[] { Full(new ViewSpec(unit.Name, s => BentViews.Bent(WithScale(ctx, s), unit), ScaleFamily.Architectural)) }));
 

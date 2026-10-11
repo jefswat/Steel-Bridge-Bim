@@ -35,7 +35,7 @@
     { "id": "abutment-details", "sheets": "^(?<n>WEST|EAST|SOUTH|NORTH) ABUTMENT DETAILS", "basis": "{n} abutment cap, backwall, piles and reinforcing",
       "target": [ { "level": "part", "category": "abutment", "support": "{n} Abut" } ] },
     { "id": "abutment-aesthetics", "sheets": "^ABUTMENT AESTHETIC DETAILS", "basis": "Abutment treatment",
-      "target": [ { "level": "group", "category": [ "cap group", "backwall group" ], "support": "%Abut%" } ] },
+      "target": [ { "level": "group", "category": [ "cap group", "backwall group", "wingwall group", "maskwall group" ], "support": "%Abut%" } ] },
 
     { "id": "typical-section", "sheets": "^TYPICAL CROSS SECTIONS? - UNIT (?<u>\\d+)", "basis": "Typical section: deck, haunch, barrier, girder spacing",
       "target": [ { "level": "part", "category": "deck", "unit": "Unit {u}" }, { "level": "group", "category": "girder", "unit": "Unit {u}" } ] },
@@ -97,7 +97,7 @@
     { "sheets": "BARRIER RAIL AESTHETIC", "suggests": "Barrier rail surface treatment (form liner, recess). Barrier is the plain SSTR profile." },
     { "sheets": "LIGHTING", "suggests": "Bridge lighting: poles, bases, conduit and junction boxes. Not modeled." },
     { "sheets": "MACADAM|SLOPE PROTECTION", "suggests": "Slope protection under the bridge at the abutments (macadam stone). No slope-protection / earthwork elements." },
-    { "sheets": "WING ARMORING", "suggests": "Abutment wing armoring (wingwalls). Wingwalls are not modeled." },
+    { "sheets": "WING ARMORING", "suggests": "Abutment wing armoring (stone/armor on the wing slopes). Wingwalls themselves are modeled (as-designed abutments); armoring is not." },
     { "sheets": "ABUTMENT BACKFILL", "suggests": "Abutment backfill zone / drainage fill and approach. No backfill, approach slab or roadway elements." },
     { "sheets": "SUBDRAIN", "suggests": "Subdrain behind the abutments. Not modeled." }
   ]

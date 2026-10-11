@@ -145,7 +145,7 @@ public sealed partial class SubstructureGenerator
 
     private static string LocationOf(string mark) => mark switch
     {
-        "9a1" or "8a1" => "Footing, longitudinal", "5b1" => "Footing, hoops", "6d1" => "Backwall, back face, vertical", "5d2" => "Backwall, front face, vertical",
+        "9a1" or "8a1" => "abutment footing longitudinal", "5b1" => "abutment footing hoops", "6d1" => "backwall back face vertical", "5d2" => "backwall front face vertical",
         _ => "Abutment (plan bar list)",
     };
 

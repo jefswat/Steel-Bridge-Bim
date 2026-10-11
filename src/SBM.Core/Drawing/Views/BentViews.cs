@@ -18,6 +18,7 @@ public static class BentViews
 {
     public static SheetView Bent(ViewContext ctx, SubstructureUnit unit)
     {
+        if (unit.Abutment != null) return AbutmentViews.Abutment(ctx, unit);
         var f = ctx.Framing;
         var a = f.Alignment;
         var def = f.Definition;

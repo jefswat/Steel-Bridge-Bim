@@ -367,6 +367,9 @@ public static class IfcExporter
                     {
                         SBM.Core.Substructure.SubElementKind.Cap => w.Add("IFCBEAM", $"{common},$,{Ref(pl)},{Ref(pds)},$,.PIERCAP."),
                         SBM.Core.Substructure.SubElementKind.Backwall => w.Add("IFCWALL", $"{common},'BACKWALL',{Ref(pl)},{Ref(pds)},$,.RETAININGWALL."),
+                        SBM.Core.Substructure.SubElementKind.Wingwall => w.Add("IFCWALL", $"{common},'WINGWALL',{Ref(pl)},{Ref(pds)},$,.RETAININGWALL."),
+                        SBM.Core.Substructure.SubElementKind.Counterfort => w.Add("IFCWALL", $"{common},'COUNTERFORT',{Ref(pl)},{Ref(pds)},$,.USERDEFINED."),
+                        SBM.Core.Substructure.SubElementKind.Maskwall => w.Add("IFCWALL", $"{common},'MASKWALL',{Ref(pl)},{Ref(pds)},$,.SOLIDWALL."),
                         SBM.Core.Substructure.SubElementKind.Pedestal => w.Add("IFCCOLUMN", $"{common},'PEDESTAL',{Ref(pl)},{Ref(pds)},$,.USERDEFINED."),
                         SBM.Core.Substructure.SubElementKind.Column => w.Add("IFCCOLUMN", $"{common},$,{Ref(pl)},{Ref(pds)},$,.PIERSTEM."),
                         SBM.Core.Substructure.SubElementKind.DrilledShaft => w.Add("IFCPILE", $"{common},'DRILLED_SHAFT',{Ref(pl)},{Ref(pds)},$,.BORED.,$"),
