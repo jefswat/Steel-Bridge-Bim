@@ -117,6 +117,8 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
     along the axis from the head; head/tip cut horizontal; section = plumb orientation rotated minimally onto the axis (oblique
     extrusion = exact IFC solid). `PileInfo` has head (S,N,TopZ) + tip (TipS,TipN,TipZ). Axis-distance clearance warnings
     (`CheckPileClearances`). Snapshot `--closeup FTGn@Bridge` frames the foundation. Conventions are flagged for user confirmation.
+    `PileType.CipPipe` = cast-in-place concrete-filled steel pipe pile (round 32-gon solid of `PileSize` = outside diameter, `PileShellThickness`;
+    `SubSolid.ShellThickness`); IFC: ONE IfcPile DRIVEN / ConstructionType COMPOSITE + Pset `SBM_PipePile` (shell as a property). `sd.PileLabel(...)` for views.
   - Footing dowels / column splices (`SubstructureReinforcementDefinition.ColumnSplice` = Continuous | Lap | Coupler; `SplicedVerticals` in SubstructureRebar.cs): L-shaped
     dowel per column bar (`DowelL`, mark series "L", scheduled length = A + B as the plans list, hook on the bottom mat `DowelBottomAboveFooting`), column bars start at the
     footing top (lap: dowel projects `ColumnLapLength`, in contact on the inside) or meet it at `CouplerLow/High` (generic coupler cylinder = `SubElementKind.Coupler`,
@@ -146,7 +148,8 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
     (`AddSlab` = prism between two vertical planes with per-vertex elevation functions; end lines are alignment offsets, so S depends on N),
     `SubstructureAbutmentRebar.cs` (only proven placements in 3D, rest of the plan bar list = schedule-only marks, mismatches = warnings),
     `AbutmentViews` (3 sheet panels; the plan draws `AbutmentGeometry.FootingOutline` = generator outline with notches), `SubElementKind.Wingwall/Counterfort/Maskwall/WingFooting`,
-    `unit.Abutment` (`AbutmentGeometry`). Backwall runs behind the wings to the maskwalls; `CorbelLeft/RightOffset` limit the corbel to the wing inner faces. Standing rule:
+    `unit.Abutment` (`AbutmentGeometry`). `AbutmentDefinition.StandalonePedestals` = pedestals WITHOUT a bearing (Br02069 Type B / D for the future beam lines,
+    built now): same section as the beam steps, `PedestalInfo` / `AbutmentStepInfo` with Girder = -1 and `Label` (views print `Tag`). Backwall runs behind the wings to the maskwalls; `CorbelLeft/RightOffset` limit the corbel to the wing inner faces. Standing rule:
     no invented defaults - unresolved plan items are generator warnings ("UNRESOLVED"). Docs `docs/plan-data/abutments-model.md`; scripts `samples/plans/abutments-*.csx`.
     `AbutmentDefinition.PileRowOffsets` (x of each pile row from CL brg; empty = the two legacy rows `PileRows`). `Kind` = Stub (default, all of the above) |
     Integral (Iowa integral pile cap, Woodbury p.15-17; `SubstructureAbutmentIntegral.cs`, concrete-bridge design feature A / T1): cap faces `CapBack/FrontToBearing`
@@ -466,6 +469,9 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   assemblies > elements (`MiscItems` in ModelDatabase; keys `IfcKeys.MiscAssembly/MiscElement`), sheet rules in `sheet-links-i80-rampg.json`. Viewport layers `3D-DRAIN-*`,
   `3D-SIGN-SUPPORT`, `3D-CRASH-CUSHION`, `3D-LIGHTING`, `3D-PLACEHOLDER`. Plan data scripts (re-runnable): `samples/plans/drains-ramp-g.csx`, `signs-i80.csx`, `end-posts.csx`,
   `lighting.csx`; data/results/unresolved list: `docs/plan-data/misc-items-data.md` (section "Model").
+  UNRESOLVED WARNING TEXT (user rule): every flag names the plan page AND a short plain reason why it is open - build new ones with
+  `UnresolvedFlag.Text(pages, item, why, then)` (SBM.Core/Assumption.cs) -> "UNRESOLVED (p.17): CMP casing bottom - it is the bottom of the EPS fill, which is in the
+  road plans, not this set. ..."; generic generators use the definition's `Source` for the page when they have one. Diagnostics have no structured reason field.
   UNRESOLVED FLAG (general, reusable): `SBM.Core/Assumption.cs` `Assumption{Status="UNRESOLVED", Reason (what the plans lack + PDF page), Basis (what was assumed)}` on the element
   (`MiscElement.Assumption`; set with `Flag(name, reason, basis)`). Consumers: viewport layer `3D-UNRESOLVED` (all flagged elements, orange, removed from their normal layers; reason in the pick
   properties; isolate with the layer toggles), IFC Pset `SBM_Status` {Status, Reason, Basis}, database props `status/reason/assumed` + view `v_unresolved` (with QC status), one warning per reason.
