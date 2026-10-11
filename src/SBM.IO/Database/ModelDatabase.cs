@@ -622,7 +622,7 @@ public static class ModelDatabase
             // bolts, anchor bolts, studs: numbered exactly like the IFC export (bolts then studs, one running counter)
             int no = 0;
             var perAsm = new Dictionary<string, int>();
-            string boltMat = $"ASTM F3125 Gr. {steel.BoltGrade}";
+            string boltMat = steel.BoltGrade.StartsWith("ASTM") ? steel.BoltGrade : $"ASTM F3125 Gr. {steel.BoltGrade}";
             void Fastener(object tagObj, int kind, Frame3 f, string asmMark, double grip, double len, double dia, double embed)
             {
                 string gid = Id(IfcKeys.Fastener(bk, kind, asmMark, no++));

@@ -176,13 +176,14 @@ public class ConcreteDiaphragmTests
         // preformed filler around the pads: bottom flange footprint inside the diaphragm minus the pad, 1" high
         var fill = Assert.Single(cd.Accessories, a => a.Kind == DiaphragmAccessoryKind.Filler);
         // pad 9" x 2'-0 centred 1'-0 from the CL pier: wholly inside the 1'-2 embedment (4" .. 1'-6)
-        Assert.Equal(6 * (shape.BottomWidth * embed - In(24) * In(9)) * In(1), fill.Volume, 7);
+        double zoneW = Math.Max(shape.BottomWidth, shape.TopWidth);   // bearing zone width = open-below void width
+        Assert.Equal(6 * (zoneW * embed - In(24) * In(9)) * In(1), fill.Volume, 7);
         // bearing zone open below the beams (pads + filler, not concrete): minus the bottom-flange footprint x 1" per beam end
         def.OpenBelowBeams = true;
         doc.Regenerate();
         Assert.True(doc.Prestressed().ConcreteDiaphragms!.Diaphragms.Count == 1, string.Join(" | ", doc.Prestressed().ConcreteDiaphragms!.Diagnostics.Select(x => x.Message)));
         var open = doc.Prestressed().ConcreteDiaphragms!.Diaphragms[0];
-        Assert.Equal(expected - 6 * shape.BottomWidth * embed * In(1), open.Volume, 5);
+        Assert.True(Math.Abs(expected - 6 * zoneW * embed * In(1) - open.Volume) < 1e-5, string.Join("; ", open.Pieces.Select(pc => { var bb = pc.Bounds(); return $"{Math.Abs(pc.Volume()):0.0000} x{bb.Min.X:0.00}..{bb.Max.X:0.00} y{bb.Min.Y:0.00}..{bb.Max.Y:0.00}"; })));
     }
 
     [Theory]

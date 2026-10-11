@@ -108,3 +108,33 @@ Layout vs geometry (ifcopenshell.api.alignment maps each layout segment to geome
 The IfcPolynomialCurve x² coefficient is written in full-precision exponent form (10 decimals cost up to 0.005 mm on I-80).
 The full Woodbury / Br02069 exports have 15 / 7 schema issues, all `IfcBeam` `.GIRDER.` (not in ADD2 IfcBeamTypeEnum,
 prestressed beams) — unrelated to the alignment.
+(Fixed on branch ifc-abv: prestressed girders are now `IfcBeam` `.GIRDER_SEGMENT.` in every mode -> 0 schema issues.)
+
+## ReferenceView / Alignment-based View geometry (2026-10-11, branch ifc-abv)
+
+`sbm export model.sbm --ifc x.ifc --geometry abv` (`IfcGeometryMode.ReferenceView`, `Ifc/IfcReferenceViewGeometry.cs`):
+recorded extrusions -> IfcPolygonalFaceSet (end caps IfcIndexedPolygonalFaceWithVoids, bolt holes = equal-area polygon
+void loops, sides / hole walls planar quads), arc-profile prestressed beams -> one face set cut exactly by the skewed end
+planes. Chord tolerance 1/32 in (0.79 mm) -> 9-sided 15/16 in bolt holes. Checks: `tools/validate_ifc.py`,
+`tools/run_ids.py x.ifc "usBrSpec_AbV Exclusions.ids"` (261 forbidden entities), `tools/compare_ifc_volumes.py par.ifc
+abv.ifc --changed-only --exact-ref` (AbV face-set mesh volume vs the analytic Parametric extrusion volume, same GlobalId).
+
+| Model | Mode | Size | Entities | Export | Schema + EXPRESS | AbV Exclusions IDS |
+|---|---|---|---|---|---|---|
+| Br02069 TH65 | Parametric | 0.46 MB | 4,988 | 0.1 s | 0 + 0 | 257/261 (IfcExtrudedAreaSolid, IfcBooleanClippingResult, IfcHalfSpaceSolid, IfcPlane) |
+| Br02069 TH65 | ReferenceView | 0.50 MB | 5,323 | 0.1 s | 0 + 0 | 261/261 |
+| Woodbury I-29 NB over Floyd | Parametric | 0.26 MB | 2,011 | <0.1 s | 0 + 0 | 260/261 (IfcExtrudedAreaSolid) |
+| Woodbury I-29 NB over Floyd | ReferenceView | 0.27 MB | 2,080 | <0.1 s | 0 + 0 | 261/261 |
+| I-80 WB and Ramp G | Parametric | 345.7 MB (ifczip 72 MB) | 3,757,439 | 3.7 s | (0 + 0, see above) | 45,834 IfcExtrudedAreaSolid |
+| I-80 WB and Ramp G | ReferenceView | 765.5 MB (ifczip 177 MB) | 6,031,963 | 6.6 s | 0 + 0 (every instance, 1,125 s) | 261/261 |
+
+(Export = the IfcExporter call only, after regeneration.) The I-80 growth is the ~324,000 bolt holes: 9 wall quads,
+18 points and two void loops each (4.36 M IfcIndexedPolygonalFace). Geometry, I-80 changed products (face sets), up to
+1,500 per class (5,489 products): 0 over 0.5 %, max |ratio - 1| about 1e-5 (coordinate rounding), 0 tessellation
+failures; Br02069 beams 1.00004, Woodbury beams 1.0000000. Earlier variants for the record: inscribed hole polygons left
+2" conduits 10.6 % and web splices 0.5 % too heavy -> equal-area polygons. Mesh comparisons against the Parametric file
+are misleading for tubes (OpenCascade meshes the IfcCircle bores coarsely: 8" pipes then look 4 % off) -> `--exact-ref`.
+"Open" AbV meshes (angles = two touching leg solids, a few plates) are the same shapes the Parametric mesh reports open.
+Consumers: ifcopenshell.geom needs ~0.15 s per AbV plate with holes vs ~0.07 s for the extrusion.
+GlobalIds: every element GlobalId is the same in both modes; SBM_Fabrication property sets are keyed by the STEP id of
+their first element, so their GlobalIds differ between modes (pre-existing keying).

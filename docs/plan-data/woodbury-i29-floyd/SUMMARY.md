@@ -50,7 +50,7 @@ PC + 2320 atan(x/2347): x = 9.84 / 116.22 / 176.38 ft reproduce 463+95.87 27.02 
 | Spans along CL NB roadway (curved) | 55'-11 15/16, 106'-11 7/16, 60'-11 1/2; total 223'-10 7/8 | - | p.6, p.21 | RASTER | sum = 223'-10 7/8 DERIVED ok |
 | Spans along extended tangent | 55'-11 7/8, 106'-4 5/8, 60'-1 13/16 | - | p.7 / DS 5 | RASTER | DERIVED from staking x: 56.00, 106.38, 60.16 ft (within 0.01) |
 | Beam CL-CL bearing (along CL NB) | span 1 54'-11 15/16, span 2 104'-11 7/16, span 3 59'-11 1/2 | - | p.21 / DS 19 | RASTER | pier bearings 1'-0 each side of CL pier (along CL NB) |
-| Beam bearing lines at piers | 1'-0 off CL pier along CL NB; 11 13/16 and 11 3/4 (pier 1), 11 3/4 and 11 5/8 (pier 2) measured perpendicular to the pier | in | p.21, p.9 | RASTER | |
+| Beam bearing lines at piers | 1'-0 CL pier to CL brg (dimension string "measured along CL NB"); 11 13/16 and 11 3/4 (pier 1 back / ahead), 11 3/4 and 11 5/8 (pier 2) measured perpendicular to the pier | in | p.21, p.9 | RASTER | DERIVED (2026-10-11): the four perpendicular values = 1'-0 x cos(beam angle) of each side's beams (1'-0 ALONG THE BEAM: 11.810 / 11.745 / 11.745 / 11.647); 1'-0 along CL NB would give 11.80 / 11.80 / 11.69 / 11.69. Model: 1'-0 along the beam (CL NB string then 11.94-12.05 in, within 1/16) |
 | Units / joints | one continuous unit, no deck joints (integral abutments) | - | p.18-20 | TEXT | |
 | Deck length | 226'-11 3/4 face to face of paving notches / out to out of deck along CL NB; deck end 1'-6 1/4 beyond CL S abut brg, 1'-6 5/8 beyond CL N abut brg | - | p.6, p.22 | RASTER | DERIVED 1'-6 1/4 + 223'-10 7/8 + 1'-6 5/8 = 226'-11 3/4 ok; general notes table: 227.0 LF, 37.6 LF, 8,528 SF |
 | Deck width | 37'-7 out to out = 36'-0 roadway (CL NB roadway to east gutter line) + 1'-7 barrier | - | p.8, p.18 | RASTER | west edge of deck = CL NB roadway = longitudinal construction joint to stage 2 (no barrier, 3'-3 bar projection) |
@@ -104,6 +104,26 @@ lengths along CL NB roadway (54'-11 15/16 / 104'-11 7/16 / 59'-11 1/2) - see U3.
 designed for this bridge. Model every beam at the STANDARD length (55'-0 / 105'-0 / 60'-0 CL-CL bearing, 56'-4 /
 106'-4 / 61'-4 overall) with the standard's strands and details. The layout bearing distances are NOT beam lengths;
 report the difference against the layout per beam line as a check (warning), do not stretch the beams.
+
+**Decision 8 (2026-10-11, user: "these beams are chorded ... something is wrong with the geometry"): FOUND.** The model read the
+p.21 beam-D offsets "measured along CL bearing" from the point where each PIER BEARING LINE crosses CL NB; they are aligned
+dimensions from the W.P. (note on p.21: W.P. = CL pier x CL NB), i.e. from the W.P.'s foot on the bearing line. At the piers the
+bearing line is 1'-0 off the pier, so the two zero points are 12 sin(skew) apart along the line (2.2" at pier 1, 2.7" at pier 2,
+opposite directions back / ahead): every span's beams were rotated 0.19-0.21 deg. Verified independently (python, from the plan
+values only) and in the model. With the W.P. origin (and the pier bearing lines 1'-0 along the beam, see the row above) the
+CL-CL bearing CHORD of every beam (3D, along the sloped beam) is the standard length within 1/16":
+
+| span | standard (p.27; std sheets 4732 / 4742 / 4733 = Iowa Beams.pdf p.100 / 110 / 101) | chord before | chord now (D..H) | layout along curved CL NB (p.21) |
+|---|---|---|---|---|
+| 1 BTD55 | 55'-0 | 54'-11.60 (-0.40") | 54'-11.98 to 55'-0.01 (-0.017 to +0.013") | 54'-11 15/16 |
+| 2 BTD105 | 105'-0 | 104'-10.95 (-1.05") | 104'-11.95 to 104'-11.98 (-0.053 to -0.024") | 104'-11 7/16 |
+| 3 BTD60 | 60'-0 | 59'-11.31 (-0.69") | 60'-0.00 (0.000") | 59'-11 1/2 |
+
+The p.21 CL NB values are along the CURVED CL NB at a different angle from the beams, not beam lengths. The standard-length beam
+therefore sits on the layout bearings; no placement rule is needed (generator: Info "Standard beam fit", no UNRESOLVED). The same
+error caused the 48 check-woodbury fails next to the piers (beam-line top of deck, haunch elevations, pier seats) and the along-bearing
+spacing 8'-1.80 vs 8'-1 7/8: now spacing 8'-1.86 / 8'-1.90 / 8'-1.88, top of deck 216/216, seats 30/30. Hole chains (p.31) sum to the
+standard end-to-end lengths 56'-4 / 106'-4 / 61'-4, consistent.
 
 ## 4. Substructure
 
@@ -194,7 +214,7 @@ report the difference against the layout per beam line as a check (warning), do 
 |---|---|---|---|
 | U1 | Horizontal coordinates / datum of the alignment (N/E of PC/PI, projection) | p.6 | not in this set (road plans IM-NHS-029-7(49)); model can be built in local coordinates from stations |
 | U2 | Exact reference line of the cross-slope pivot | p.6, p.18 | DERIVED: PGL NB at 5.00 ft RT of CL I-29, plane slope to the east edge reproduces p.6 and p.33 to 0.01 ft; not stated as text |
-| U3 (CLOSED by user: standard length governs, see beam data note) | Standard beam lengths (55'-0 / 105'-0 / 60'-0 CL-CL brg, 56'-4 / 106'-4 / 61'-4 overall) vs layout CL-CL beam bearings along CL NB (54'-11 15/16 / 104'-11 7/16 / 59'-11 1/2) and per-beam actual lengths along chords | p.21, 27 | plan gives no per-beam length table; true chord lengths per beam line must be computed from the bearing points |
+| U3 (CLOSED by user: standard length governs; chords = standard within 1/16", see decision 8) | Standard beam lengths (55'-0 / 105'-0 / 60'-0 CL-CL brg, 56'-4 / 106'-4 / 61'-4 overall) vs layout CL-CL beam bearings along CL NB (54'-11 15/16 / 104'-11 7/16 / 59'-11 1/2) and per-beam actual lengths along chords | p.21, 27 | plan gives no per-beam length table; true chord lengths per beam line must be computed from the bearing points |
 | U4 | (also: N wing angle 75 deg 38'46" on p.17 implies 14 deg 21'14") Local-tangent skews at pier 2 (13 deg 00'40") and N abut (14 deg 29'57") do not reproduce from 10 deg 09'36" + deflection at the staked CL NB point (12 deg 59'50", 14 deg 27'28") | p.21, p.7 | reference point of the "local tangent" not stated; the parallel 10 deg 09'36" to the extended tangent (p.7) reconciles with staking |
 | U5 (CLOSED) | Abutment CL NB to gutter along CL S abut. brg: 36'-6 7/8 governs | p.7, p.15, p.17 | proven by geometry: 36'-0 roadway / cos(10 deg 09'36") = 438.871 in -> 36'-6 7/8 (15/16 would be 0.066 in off); p.17 chain 3 5/16 + 36'-6 7/8 = 2'-6 + 33'-6 + 10 3/16 = 36'-10 3/16 closes. p.15's 36'-6 15/16 is only the sum of its own rounded chain 3 5/16 + 3'-1 11/16 + 32'-7 1/2 + 6 7/16 on a dimension line drawn off the CL brg (not a design value) |
 | U6 (CLOSED) | Pier pile batter: outer two rows (3 + 3 piles) batter 1:4 away from CL pier, perpendicular to the pier; middle rows vertical; circled piles = Detail 1 uplift anchors, not batter | p.11 | see Piers table |

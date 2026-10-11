@@ -84,6 +84,7 @@ public sealed class RegenerationCache
                 var tp = Task.Run(() => Prestressed.PrestressedGenerator.Generate(f, project.Units));
                 cm = Concrete.ConcreteGenerator.Generate(f, project.Units, geo);
                 ps = tp.Result;
+                if (b.PsSteelDiaphragms is { } dd) st = SteelDiaphragms(dd, ps);
             }
             else if (includeSteel && !f.HasErrors)
             {
@@ -165,6 +166,23 @@ public sealed class RegenerationCache
             foreach (var stale in _sub.Keys.Where(k => !used.Contains(k)).ToList()) _sub.Remove(stale);
         }
         return results.ToList();
+    }
+
+    /// <summary>Steel intermediate diaphragms between the prestressed beams (T6 hook-up of the T4 detailer): detailed from the generated
+    /// beams, kept on <see cref="Prestressed.PrestressedModel.SteelDiaphragms"/> and returned as the bridge's steel model (diaphragm
+    /// parts, bolts and assemblies only) so every steel consumer (viewport, IFC, database, quantities) includes them. Diagnostics go
+    /// to the prestressed model.</summary>
+    internal static SteelModel SteelDiaphragms(PsSteelDiaphragmDefinition dd, Prestressed.PrestressedModel ps)
+    {
+        var lines = ps.Beams.Select(be => Diaphragms.PsDiaphragmBeamLine.FromPrestressed(be, be.Shape.Depth, be.Shape.WebWidth)).ToList();
+        var dm = Diaphragms.PsSteelDiaphragmDetailer.Detail(dd, lines);
+        ps.SteelDiaphragms = dm;
+        ps.Diagnostics.AddRange(dm.Diagnostics);
+        var st = new SteelModel { Bolt = new BoltGeometry(dd.Connection.BoltDiameter), BoltGrade = dd.BoltGrade };
+        st.Assemblies.AddRange(dm.Assemblies);
+        st.Parts.AddRange(dm.Parts);
+        st.Bolts.AddRange(dm.Bolts);
+        return st;
     }
 
     /// <summary>Another bridge's bearing seats on its support <paramref name="j"/>, located in plan (for a shared pier).</summary>

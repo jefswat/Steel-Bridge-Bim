@@ -139,7 +139,7 @@ public static class ConcreteDiaphragmGenerator
             double xbc = XbAt(k, c);
             int sg = KeepSign(k);
             var cl = ClipHalf(v.ToList(), p => sg * (p.X - xbc));
-            return cl.Count < 3 || Math.Abs(MeshBuilder.SignedArea(cl)) < 1e-8 ? null : cl.ToArray();
+            return cl.Count < 3 || Math.Abs(MeshBuilder.SignedArea(cl)) < 1e-12 ? null : cl.ToArray();
         }
         /// <summary>Slice positions where the clip line of a square end passes an outline vertex (topology events).</summary>
         public IEnumerable<double> SquareEvents(Frame k) => Void.Select(p => p.X).Distinct()
@@ -179,7 +179,9 @@ public static class ConcreteDiaphragmGenerator
             int f = v.FindIndex(p => p.Y < eps), l = v.FindLastIndex(p => p.Y < eps);
             if (f < 0) throw new InvalidOperationException($"beam outline {shape.Name} has no bottom");
             var w = v.Take(f + 1).ToList();
-            foreach (var q in new[] { new Vec2(-hb, 0), new Vec2(-hb, -Big), new Vec2(hb, -Big), new Vec2(hb, 0) })
+            // the strip below has the haunch width when that is wider (BTD): top and bottom extensions then clip alike at square ends
+            double ho = Math.Max(hb, hw);
+            foreach (var q in new[] { new Vec2(-ho, 0), new Vec2(-ho, -Big), new Vec2(ho, -Big), new Vec2(ho, 0) })
                 if ((q - w[^1]).Length > 1e-9) w.Add(q);
             foreach (var q in v.Skip(l)) if ((q - w[^1]).Length > 1e-9) w.Add(q);
             v = w;
@@ -400,6 +402,7 @@ public static class ConcreteDiaphragmGenerator
     {
         var m = new Mesh();
         MeshBuilder.AddLoft(m, section, rings);
+        if (Math.Abs(m.Volume()) < 1e-8) return;   // sliver (< 0.01 litre) from nearly coincident events: left out
         mesh.Append(m);
         PieceTable.GetOrCreateValue(mesh).Add(m);
     }
@@ -470,6 +473,7 @@ public static class ConcreteDiaphragmGenerator
         for (int i = 0; i + 1 < merged.Count; i++)
         {
             double xa = merged[i], xb = merged[i + 1], xm = (xa + xb) / 2;
+            if (xb - xa < 1e-4) continue;   // sliver slab between two nearly coincident events (< 0.1 mm): left out
             var lo = lower.FirstOrDefault(e => e.X0 <= xm && e.X1 >= xm) ?? throw new InvalidOperationException($"no lower edge at x {xm:0.###} m (section not vertically convex?)");
             var up = upper.FirstOrDefault(e => e.X0 <= xm && e.X1 >= xm) ?? throw new InvalidOperationException($"no upper edge at x {xm:0.###} m");
             var present = beams.Where(b => b.VoidAt(k, xm, openBelow) != null).ToList();
@@ -498,6 +502,11 @@ public static class ConcreteDiaphragmGenerator
     {
         {
             if (r0.Count != r1.Count) throw new InvalidOperationException($"slice topology changed in x {xa:0.###}..{xb:0.###} m");
+            // drop vertices that repeat the previous one in BOTH slices (structural duplicates, e.g. a zero-width panel bottom)
+            bool Dup(List<(double S, double Z)> r, int q) { var a = r[q]; var b = r[(q + r.Count - 1) % r.Count]; return Math.Abs(a.S - b.S) < 1e-9 && Math.Abs(a.Z - b.Z) < 1e-9; }
+            var keep = Enumerable.Range(0, r0.Count).Where(q => !(Dup(r0, q) && Dup(r1, q))).ToList();
+            if (keep.Count < r0.Count) { r0 = keep.Select(q => r0[q]).ToList(); r1 = keep.Select(q => r1[q]).ToList(); }
+            if (r0.Count < 3) return;
             if (eps > 0)
             {
                 // every vertex moves linearly with x inside the slab: extrapolate the inset slices back to the slab faces (no gaps)
@@ -655,8 +664,7 @@ public static class ConcreteDiaphragmGenerator
             var rb = p == np - 1 ? new List<(double S, double Z)> { (sr, Low(sr)), (sr, Top(sr)) } : chains[p].Left;
             double a = lb[0].S, b = rb[0].S, ta = lb[^1].S, tb = rb[^1].S;
             var sp = spec?[p];
-            if (sp == null && b - a < 1e-6 && tb - ta < 1e-6) sp = new PanelSpec(0, new(), 0, new(), new(), Skip: true);
-            else if (sp == null && (b - a < -1e-6 || tb - ta < -1e-6)) throw new InvalidOperationException($"beams overlap or cross an end at x {x:0.###} m");
+            if (sp == null && (b - a < -1e-6 || tb - ta < -1e-6)) throw new InvalidOperationException($"beams overlap or cross an end at x {x:0.###} m");
             if (sp == null)
             {
                 var risers = lo.Ref == DiaphragmZRef.Bottom ? k.Risers.Where(r => r > a + 1e-6 && r < b - 1e-6).ToList() : new List<double>();
@@ -868,7 +876,7 @@ public static class ConcreteDiaphragmGenerator
         double xRate = k.Xs * Vec2.Dot(into, k.N);    // dx/du
         double vRate = k.Xs * Vec2.Dot(into.Right, k.N);  // dx/dv
         double UAtX(double x, double vv) => (x - e.Xd - vRate * vv) / xRate;
-        double hb = e.Hb;
+        double hb = Math.Max(e.Hb, e.Hw);   // same width as the open-below beam void (bearing zone)
         var pad = ps.Pads.FirstOrDefault(p => p.Girder == e.Beam.Girder && p.Span == e.Beam.Span && p.Support == sup.Name);
         var pieces = new List<List<Vec2>>();
         double U0(double vv) => e.Square ? 0 : UAtX(e.Xd, vv);   // square end: the face is u = 0

@@ -20,7 +20,12 @@ unless stated. These are checks, not inputs: no model input was changed. Differe
 | (S4) footings (centre S, N, size S x N) | 69 | 60 | 9 | Pier 11WB & 19G: -10 11/16" along the pier |
 | (S5) alignment ties (11WB/19G, 77'-6 7/8) | 3 | 3 | 0 | 0.04" |
 
-Model findings that need a decision (inputs, NOT changed):
+**2026-10-11: findings 1-4 DECIDED by the user and APPLIED** (branch dec-i80; docs/HANDOFF.md section 4a-bis): 11WB from the PDF 63 cap plan
+(11 5/16" at the ahead bearing row, chained from the right top corner; WB CL 0.937" right of the CL pier), 6A 13'-2 15/16, 6WB 2'-2 3/8, Ramp G camber
+CSVs (all midpoint-column shifts, 78 cells). After: S4 footings 67/69 within 1/16"; the 2 beyond are PLAN CONFLICTS reported separately by check-staking
+(11WB footing 1: staking 40'-7 vs pier details 40'-6, +1.01"; Ramp G 5G size, finding 5). H5 13 -> 0, H2 26 -> 19. The table above is the state BEFORE.
+
+Model findings that needed a decision (inputs, NOT changed at the time of this check):
 1. **Pier 11WB & 19G substructure is 10 11/16" too far left along the pier line** (I-80 Unit 2 support 6; cap profile, columns, footings).
    Staking PDF 16: footing centres 31'-1 15/16 left, 9'-5 1/16 and 30'-11 1/16 right of the staked CL point (I-80 STA 7603+32.45, 41.08' LT).
    Model: 31'-11 5/8 left, 8'-6 3/8 and 30'-0 3/8 right. Pier details PDF 63 (sheet 61, raster-confirmed) give the column spacing 40'-6 / 21'-6

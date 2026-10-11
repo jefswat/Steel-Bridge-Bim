@@ -127,7 +127,7 @@ public sealed partial class MiscItemsGenerator
         int j = SupportIndex(s.Support);
         if (j < 0 || s.BackFromBearing is not { } back)
         {
-            Warn($"{asm}: exit sign station is UNRESOLVED (sheets 104 / 108 show only a tick on the north girder): block, W6x15 stubs and outrigger bracket NOT placed; bar list scheduled.");
+            Warn($"{asm}: " + UnresolvedFlag.Text("I-80 sheets 104 / 108", "exit sign base station", "the sheets show only a tick on the north girder, no station or dimension", "Block, W6x15 stubs and outrigger bracket NOT placed; bar list scheduled."));
             return;
         }
         var sl = _f.SupportLine(j);
@@ -159,7 +159,7 @@ public sealed partial class MiscItemsGenerator
             AddMarks(asm, "end post", e.Bars);
             if (e.Station is not { } sta || e.Offset is not { } off || e.DirectionDegrees is not { } dd || e.PierEndWidth is not { } w0)
             {
-                Warn($"{asm}: position (distance from the CL pier to the start of the end block), wedge direction and the plan width at the pier end are UNRESOLVED in the plans (Ramp G wedge is skewed 27d27'55\"); wedge, cushion placeholder NOT placed; the bar list is scheduled.");
+                Warn($"{asm}: " + UnresolvedFlag.Text("I-80 PDF 229 / 230 end post details", "end post position from the CL pier, wedge direction and plan width at the pier end", "the details show the end post shape only, these are not dimensioned (the Ramp G wedge is also skewed 27d27'55\")", "Wedge and cushion placeholder NOT placed; the bar list is scheduled."));
                 continue;
             }
             var p = Pt(sta, off);
@@ -238,7 +238,7 @@ public sealed partial class MiscItemsGenerator
         AddMarks(asm, "pole base", pb.Bars);
         if (pb.AlongFromSupport is not { } along)
         {
-            Warn($"{asm}: position is UNRESOLVED (plans: 10'-0 max from the end of the superstructure): not placed; bar list scheduled.");
+            Warn($"{asm}: " + UnresolvedFlag.Text("I-80 PDF 233-236 lighting", "pole base position", "the plans give only '10'-0 max from the end of the superstructure', no station", "Not placed; bar list scheduled."));
             return;
         }
         var (sta, edge, T, outDir) = BarrierFrame(pb.Support, along, pb.Side, out bool ok, asm);

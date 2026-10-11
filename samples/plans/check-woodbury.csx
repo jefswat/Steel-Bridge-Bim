@@ -154,11 +154,44 @@ string[][] dOff = { new[] { "3'-1 11/16\"", "3'-3 1/2\"" }, new[] { "2'-10 15/16
 for (int j = 0; j < NS - 1; j++)
     foreach (bool e in new[] { false, true })
     {
+        // Aligned dimension from the W.P. (CL support x CL NB, p.21 note) along the CL bearing: projection on the bearing line.
         var (lp, ld) = BearingLine(j, e);
-        var w = al.PointAt(CrossOffset(lp, ld, clNb), clNb);
+        var sl = fr.Supports[e ? j + 1 : j];
+        var w = al.PointAt(CrossOffset(sl.AlignmentPoint, sl.Direction, clNb), clNb);
         var c = fr.Girders[0].Spans[j];
         var pD = (e ? c.LayoutEnd : c.LayoutBegin)!.Value.XY;
-        Row("Beam D on brg line", $"Span {j + 1} {(e ? "end" : "begin")}: W.P. to beam D along brg", Len(dOff[j][e ? 1 : 0]) / ft, Vec2.Distance(w, pD) / ft);
+        Row("Beam D on brg line", $"Span {j + 1} {(e ? "end" : "begin")}: W.P. to beam D along brg", Len(dOff[j][e ? 1 : 0]) / ft, Vec2.Dot(pD - w, ld) / ft);
+    }
+// CL pier to CL beam bearing (p.21): 1'-0 along the beam; printed perpendicular to the pier 11 13/16 / 11 3/4 (pier 1 back / ahead),
+// 11 3/4 / 11 5/8 (pier 2); the 1'-0 also on the CL NB dimension string (INFO: along CL NB).
+string[][] perpBrg = { new[] { "11 13/16", "11 3/4" }, new[] { "11 3/4", "11 5/8" } };
+for (int k = 1; k <= 2; k++)
+    foreach (bool ahead in new[] { false, true })
+    {
+        var sl = fr.Supports[k];
+        int span = ahead ? k : k - 1;
+        var (lp, ld) = BearingLine(span, !ahead);
+        var nrm = sl.Direction.Left;
+        double perp = Math.Abs(Vec2.Dot(lp - sl.AlignmentPoint, nrm));
+        Row("Pier brg lines (p.21)", $"Pier {k} {(ahead ? "ahead" : "back")}: CL pier to CL brg perpendicular (in)", Frac(perpBrg[k - 1][ahead ? 1 : 0]), perp / In(1), "", 1.0 / 16, "F4");
+        var g = fr.Girders[0].Spans[span];
+        var pB = (ahead ? g.LayoutBegin : g.LayoutEnd)!.Value.XY;
+        var t = (g.End - g.Start).Normalized();
+        double along = perp / Math.Abs(Vec2.Dot(t, nrm));
+        Row("Pier brg lines (p.21)", $"Pier {k} {(ahead ? "ahead" : "back")}: CL pier to CL brg along the beam (in)", 12, along / In(1), "", 1.0 / 16, "F4");
+        double sP = CrossOffset(sl.AlignmentPoint, sl.Direction, clNb), sB = CrossOffset(lp, ld, clNb);
+        Row("Pier brg lines (p.21)", $"Pier {k} {(ahead ? "ahead" : "back")}: CL pier to CL brg along CL NB (in)", 12, Arc(Math.Min(sP, sB), Math.Max(sP, sB), clNb) / In(1), "1'-0 on the CL NB string", 1.0 / 16, "F4", info: true);
+    }
+// Beam CL-CL bearing along each beam (chord, 3D along the sloped beam) vs the STANDARD beam length (p.27; Iowa standard sheets
+// 4732 BTD55 / 4733 BTD60 / 4742 BTD105: 55'-0 / 60'-0 / 105'-0 CL to CL bearings, 8" end to CL bearing).
+double[] stdBrg = { Ft(55), Ft(105), Ft(60) };
+string[] stdName = { "BTD55", "BTD105", "BTD60" };
+for (int j = 0; j < NS - 1; j++)
+    for (int g = 0; g < NG; g++)
+    {
+        var c = fr.Girders[g].Spans[j];
+        double L = (c.LayoutEnd!.Value - c.LayoutBegin!.Value).Length;
+        Row("Beam chord vs std", $"Span {j + 1} beam {beamNames[g]} CL-CL brg (in)", stdBrg[j] / In(1), L / In(1), stdName[j], 1.0 / 16, "F4");
     }
 
 // CL NB profile at the supports (p.6): CL brg (abutments) / CL pier on curved CL NB.
@@ -212,12 +245,15 @@ foreach (var r in Csv("top-of-deck-elevations.csv"))
 }
 
 // ---------------------------------------------------------------- beam line haunch elevations (p.34)
+var tod = Csv("top-of-deck-elevations.csv").Where(r => r[0].StartsWith("Beam line ")).ToDictionary(r => (r[0].Substring(10), int.Parse(r[1])), r => r[3]);
 var defl = Csv("haunch-misc-data.csv").ToDictionary(r => int.Parse(r[0]), r => Frac(r[1]));
 foreach (var r in Csv("haunch-elevations.csv"))
 {
     int g = Array.IndexOf(beamNames, r[0]), pt = int.Parse(r[1]);
     double model = Fin(linePts[$"Beam line {r[0]}"][pt - 1]) - b.Deck.Thickness + In(defl[pt]);
-    Row("Haunch elev (p.34)", $"{r[0]} pt {pt}", Num(r[2]), model / ft, $"FG - 8\" + defl {defl[pt]:0.###}\"");
+    // The plan's own residual: p.33 top of deck - 8" + p.34 deflection - p.34 haunch elevation (rounded tables).
+    double own = Num(tod[(r[0], pt)]) - 8.0 / 12 + defl[pt] / 12 - Num(r[2]);
+    Row("Haunch elev (p.34)", $"{r[0]} pt {pt}", Num(r[2]), model / ft, $"FG - 8\" + defl {defl[pt]:0.###}\"; plan p.33 - 8\" + defl - p.34 = {own:+0.000;-0.000;0.000}");
 }
 
 // ---------------------------------------------------------------- deck thickness at beams T (p.24) and seats (p.25)

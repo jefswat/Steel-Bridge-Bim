@@ -484,9 +484,9 @@ straight part; still compute); member length vs table; total weight vs 4,258 lb;
 
 | id | item | p. |
 |---|---|---|
-| WD-1 | member elevation / slope: the hole heights are fixed above each beam bottom but adjacent beam bottoms differ by spacing x cross slope (8'-0 x 5 % = 4.8"); p.32 labels the W21x50 / W14x38 "(LEVEL)" and requires equal "a" dimensions, while the slots take only 1/2" (1" x 1 1/2"). Is the member level (and how does the connection absorb 4.8"), or parallel to the line through the two hole pairs? | p.32 |
+| WD-1 | RESOLVED (user 2026-10-11, decision 12 = A): LEVEL as p.32 labels it (`Elevation = Level`, the default); the fit is reported per bay (Woodbury: 1.47-2.42" member-slot offset vs +-1/4" take-up in all 12 bays - warning, nothing adjusted). Original question: member elevation / slope: the hole heights are fixed above each beam bottom but adjacent beam bottoms differ by spacing x cross slope (8'-0 x 5 % = 4.8"); p.32 labels the W21x50 / W14x38 "(LEVEL)" and requires equal "a" dimensions, while the slots take only 1/2" (1" x 1 1/2"). Is the member level (and how does the connection absorb 4.8"), or parallel to the line through the two hole pairs? | p.32 |
 | WD-2 | RESOLVED (T4): Detail D = both ends of the W21x50 diaphragm (G-H span 2), Detail F = both ends of every C15x33.9 (2 D + 22 F = 12 diaphragms x 2); the plates are the same | p.31 table, p.32 sections |
-| WD-3 | side of the web hole on which the bent-plate 9" leg and the member lie (toward increasing or decreasing station): PART SECTION A-A has no station arrow and is drawn with the opposite stagger hand to the p.21 beam layout, so both mirror readings fit. `MemberSide` input, default `Unresolved` = cast holes only, no steel | p.32 A-A, p.21 |
+| WD-3 | RESOLVED (user 2026-10-11, decision 19 = A): toward INCREASING station (p.32 Part Section A-A draws the diaphragm above the bend plate = upstation; structurally irrelevant) - `MemberSide = TowardIncreasingStation` in build-woodbury.csx. Original question: side of the web hole on which the bent-plate 9" leg and the member lie (toward increasing or decreasing station): PART SECTION A-A has no station arrow and is drawn with the opposite stagger hand to the p.21 beam layout, so both mirror readings fit. `MemberSide` input, default `Unresolved` = cast holes only, no steel | p.32 A-A, p.21 |
 | WD-4 | C15x33.9 vertical position on the plates: the "a equal" note sits on the W21x50 slotted-hole detail; applied to the C15 as Detail F draws it (bolt group centred on the depth) - Info diagnostic | p.32 |
 | WD-5 | 4 - 7/8" x 2" bolts "for shim PL connection as required" (W14x38 end plates / 1/8" shims against the bottom bulbs) are not dimensioned: not placed (warning); W14 flange bolt gage not dimensioned: AISC workable gage 3 1/2 used (Info) | p.31, p.32 B-B |
 
@@ -503,6 +503,21 @@ x 2 bolts in 8 equal spaces with 6" ends, PL 6 1/2 x 3/8 x 1'-2 end plates and 2
 option (`Elevation`, default `Level`); on a 5 % cross slope the level member is 2.4" off each end vs +-1/4" slot take-up
 and is reported per bay; `AlongHoleLine` fits (leg slots take the 0.23" tilt offset). Not done (T6): hook-up, IFC,
 views, hole-vs-strand clearance.
+
+### 5.9 Status (T6 steel-diaphragm hook-up done, 2026-10-11, branch dec-woodbury)
+
+Standard confirmed on Iowa Beams.pdf: 1036-1-BTD (p.14) / 1036-2-BTD (p.15), BTD data 4730 (p.98), BTD55 4732 (p.100), BTD60 4733
+(p.101), BTD105 4742 (p.110): 55'-0 / 60'-0 / 105'-0 CL to CL bearings, 56'-4 / 61'-4 / 106'-4 end to end (8" end to CL bearing); web
+bolts ASTM A449, member bolts "H.S." only. Hook-up: `BridgeDefinition.PsSteelDiaphragms` (null = none) -> `RegenerationCache` details
+after `PrestressedGenerator` (`RegenerationCache.SteelDiaphragms`): result on `PrestressedModel.SteelDiaphragms` and as the bridge's
+`SteelModel` (diaphragm parts / bolts / assemblies only), so the viewport (verified `--snapshot --closeup ID2-GH`), IFC (IfcElementAssembly
+CROSS_BRACING per diaphragm, IfcMember MEMBER, IfcPlate GUSSET_PLATE / FILLER_PLATE, IfcMechanicalFastener BOLT with material
+`PsSteelDiaphragmDefinition.BoltGrade`), database and quantities take them with no special code; detailer diagnostics go to the prestressed
+diagnostics. Only IFC / DB edit: a bolt grade starting with "ASTM" is written as is. Woodbury (build-woodbury.csx, p.31 chains from
+`diaphragm-bolt-holes.csv`): 12 diaphragms, 13 members, 54 plates, 162 bolts, 27 cast hole pairs; modelled steel 3,937 lb (members
+3,075 lb) vs plan 4,258 lb incl. bolts; IfcOpenShell: 0 EXPRESS issues, all 229 diaphragm products mesh (15 schema issues = the
+pre-existing IfcBeam .GIRDER. enum, also in the base build; 24 bent plates are non-closed meshes = T4 detailer's two overlapping legs).
+Still open: cast holes as IfcOpeningElement in the beams, hole-vs-strand clearance, WD-5 shim bolts, steel diaphragm 2D views (sheets).
 
 ---------------------------------------------------------------------------------------------------------------------
 
@@ -539,7 +554,7 @@ Serialization: definitions serialize directly (new properties need no DTO work; 
 | T3 IFC + views for T1/T2 | new IfcWall/IfcColumn/IfcPile mappings, casing part; `AbutmentViews` panels for stepped cap / stem | `SBM.IO/Ifc/IfcExporter.cs` (substructure block only), `Drawing/Views/AbutmentViews.cs` | T1, T2 | after T2 |
 | T4 Steel intermediate diaphragms (prestressed) | `Bridge/PsSteelDiaphragmDefinition.cs`, `Diaphragms/PsSteelDiaphragmDetailer.cs`, `Diaphragms/DiaphragmModel.cs`, preset `IowaBtd()`, unit tests against `diaphragm-bolt-holes.csv` and the member table; NOT hooked into regeneration yet (tests call it with a generated PrestressedModel) | new files only | read-only use of `PrestressedModel` (API may change under the Prestressed agent: rebase) | DONE 2026-10-11 (see 5.8; result class `PsSteelDiaphragmModel`, not `DiaphragmModel.cs`) |
 | T5 Concrete diaphragms | `Bridge/DiaphragmDefinition.cs`, `Diaphragms/ConcreteDiaphragmGenerator.cs` (panel method), checks; tests on a synthetic 2-span bridge | new files only | T1 (cap top steps), T2 (stem seat refs); read-only PrestressedModel / ConcreteModel | after T1 (T2 for Br02069) |
-| T6 Hook-up | `SupportDefinition.Diaphragm` / bridge-level `PsSteelDiaphragms` property, `BridgeModel.Diaphragms`, phase-2 call in `RegenerationCache`, IFC export of diaphragms, 3D scene layer | `Bridge/BridgeDefinition.cs` (support class only), `Project/RegenerationCache.cs`, `SBM.IO/Ifc/IfcExporter.cs`, app scene builder | Prestressed + Framing agents MERGED; T4, T5 | after those merges |
+| T6 Hook-up | `SupportDefinition.Diaphragm` / bridge-level `PsSteelDiaphragms` property, `BridgeModel.Diaphragms`, phase-2 call in `RegenerationCache`, IFC export of diaphragms, 3D scene layer | `Bridge/BridgeDefinition.cs` (support class only), `Project/RegenerationCache.cs`, `SBM.IO/Ifc/IfcExporter.cs`, app scene builder | Prestressed + Framing agents MERGED; T4, T5 | STEEL DIAPHRAGMS DONE 2026-10-11 (5.9); concrete diaphragms (T5) by the dec-concrete agent |
 | T7 Bearings | `PrestressedBearingDefinition`, `Bearings/PrestressedBearingBuilder.cs`, one call in `PrestressedGenerator`; 3x3 bar + curved plate F1/E1; seat stack in the elevation check | new files + one call site in Prestressed/ | Prestressed agent merged | after that merge |
 | T8 Plan-data scripts + comparisons | `samples/plans/woodbury-*.csx`, `br02069-*.csx` for abutments / diaphragms / bearings; quantity and elevation comparisons into `docs/plan-data/.../SUMMARY.md` | samples + docs | T1-T7 | last |
 
@@ -557,7 +572,7 @@ should be ONE agent after the Prestressed/ and Framing/ branches merge.
    ending flush with beam H outside face and at the stage-2 edge of deck at beam D.
 3. Woodbury steps: the step diagram (p.17) places the risers between the beams - at MID-BAY, or at a dimension from each beam
    CL that the standard 2087-BTCD gives? (Proposal: mid-bay only if you confirm; otherwise UNRESOLVED.)
-4. Steel diaphragm member elevation (WD-1): level as labelled on p.32, or along the line through the two beams' hole pairs
+4. ANSWERED 2026-10-11 (A): level as labelled. Steel diaphragm member elevation (WD-1): level as labelled on p.32, or along the line through the two beams' hole pairs
    (5 % cross slope = 4.8" difference per bay)?
 5. CMP casings: model them with an UNRESOLVED bottom (no solid until the EPS bottom elevation is supplied), or do you have the
    road plans' EPS bottom elevation?
@@ -565,6 +580,6 @@ should be ONE agent after the Prestressed/ and Framing/ branches merge.
    semi-integral standard (B816 family) as the source - if so, which standard sheet/figure should be read?
 7. Br02069 future pedestals (Type B): model them as substructure pedestals flagged Future (IFC property), no bearing/beam - OK?
 8. CIP pipe pile: one IfcPile (COMPOSITE) with the 1/4" shell as a property, or a separate shell solid?
-9. Woodbury pier pads: plan shows the 9 x 2'-4 1/2 pads parallel to the CL pier (p.20 part plan) while the generator places
+9. ANSWERED 2026-10-11 (A, prestressed core): `PrestressedBeamDefinition.PierPadOrientation = ParallelToSupport` (Woodbury). Woodbury pier pads: plan shows the 9 x 2'-4 1/2 pads parallel to the CL pier (p.20 part plan) while the generator places
    pads square to the girder - handled by the Prestressed/ agent or in T7?
 10. Should the 1" / 3" polystyrene, preformed fillers and 2x8 keyways be 3D solids or notes/schedule items only?

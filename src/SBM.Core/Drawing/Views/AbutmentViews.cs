@@ -50,7 +50,7 @@ public static class AbutmentViews
         foreach (var st in g.Steps)
         {
             d.Poly(SheetLayers.Concrete, new[] { new Vec2(Xs(st.S0), g.SeatBaseZ(st.S0)), new Vec2(Xs(st.S0), st.TopZ), new Vec2(Xs(st.S1), st.TopZ), new Vec2(Xs(st.S1), g.SeatBaseZ(st.S1)) });
-            d.Text($"G{st.Girder + 1}", new Vec2(Xs(st.S), st.TopZ + d.Paper(0.12)), d.TextH, 0, TextAlign.Center);
+            d.Text(st.Tag, new Vec2(Xs(st.S), st.TopZ + d.Paper(0.12)), d.TextH, 0, TextAlign.Center);
         }
         foreach (var mk in g.Masks)
         {
@@ -77,7 +77,7 @@ public static class AbutmentViews
         if (g.Steps.Count > 1)
             d.DimChain(g.Steps.OrderBy(x => x.S).Select(x => new Vec2(Xs(x.S), zLow - d.Paper(0.3))).ToList(), 0);
         d.Dim(new Vec2(Xs(s0), zLow - d.Paper(0.9)), new Vec2(Xs(s1), zLow - d.Paper(0.9)), 0, $"{d.Len(s1 - s0)} FOOTING (ALONG SKEW)");
-        d.Text("BEAM STEP TOPS: " + string.Join("  ", g.Steps.OrderBy(x => x.S).Select(x => $"G{x.Girder + 1} {d.Elev(x.TopZ)}")), new Vec2(Xs(s0), zLow - d.Paper(1.35)), d.SmallTextH, 0, TextAlign.Left);
+        d.Text("BEAM STEP TOPS: " + string.Join("  ", g.Steps.OrderBy(x => x.S).Select(x => $"{x.Tag} {d.Elev(x.TopZ)}")), new Vec2(Xs(s0), zLow - d.Paper(1.35)), d.SmallTextH, 0, TextAlign.Left);
         d.Line(SheetLayers.Center, new Vec2(0, zLow - d.Paper(1.1)), new Vec2(0, tops.Max(p => p.Y) + d.Paper(0.4)));
         d.Text("CL ALIGNMENT", new Vec2(0, tops.Max(p => p.Y) + d.Paper(0.55)), d.TextH, 0, TextAlign.Center);
         var box = dwg.Extents();
@@ -167,7 +167,7 @@ public static class AbutmentViews
                 }
             }
         var box3 = dwgP.Extents();
-        dP.Title("PILING AND WING LAYOUT", $"{unit.Foundations.Sum(f => f.Piles.Count)} piles {unit.Definition.PileSection}; stations along the line, plan at the bottom of footing · Scale {DrawingOptions.ScaleText(dP.Scale, u)}",
+        dP.Title("PILING AND WING LAYOUT", $"{unit.Foundations.Sum(f => f.Piles.Count)} piles {unit.Definition.PileLabel(dP.Short)}; stations along the line, plan at the bottom of footing · Scale {DrawingOptions.ScaleText(dP.Scale, u)}",
             new Vec2(ox + (s1 - s0) / 2, box3.MinY - dP.Paper(0.5)));
         var chosen = part == 1 ? dwgS : part == 2 ? dwgP : dwg;
         string[] names = { "rear elevation", "section through abutment", "piling and wing layout" };

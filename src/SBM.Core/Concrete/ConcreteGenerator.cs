@@ -442,7 +442,7 @@ public sealed partial class ConcreteGenerator
                 })) continue;
             var rings = new List<Vec3[]>(ss.Count);
             Vec2[]? sec = null;
-            foreach (double s in ss)
+            foreach (double s in HaunchSamples(ss))
             {
                 var (p, t, sta) = path.At(s);
                 double hw, tf;
@@ -463,6 +463,24 @@ public sealed partial class ConcreteGenerator
             MeshBuilder.AddLoft(mesh, sec!, rings);
         }
         _m.Haunches = mesh;
+    }
+
+    /// <summary>Haunch ring stations: the girder path samples plus points at most 1.5 m apart in between, so the haunch top follows the
+    /// deck soffit (profile / vertical curve, cross slope) along straight chords whose path has samples only at the span ends
+    /// (prestressed beams, chorded girders). Path jogs (samples &lt; 0.1 mm apart, per-span layouts) are kept as they are.</summary>
+    public static List<double> HaunchSamples(IReadOnlyList<double> ss)
+    {
+        var r = new List<double>(ss.Count * 2);
+        for (int i = 0; i < ss.Count; i++)
+        {
+            r.Add(ss[i]);
+            if (i + 1 == ss.Count) break;
+            double ds = ss[i + 1] - ss[i];
+            if (ds < 1e-4) continue;
+            int n = (int)Math.Ceiling(ds / 1.5 - 1e-9);
+            for (int k = 1; k < n; k++) r.Add(ss[i] + ds * k / n);
+        }
+        return r;
     }
 
     private double DeckBottomAt(Vec2 p)

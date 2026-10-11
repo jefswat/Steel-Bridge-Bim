@@ -59,6 +59,11 @@ sbm import-landxml "C:\Jobs\Br12\Br12.sbm" "C:\Jobs\Br12\alignments.xml"
 sbm regen  "C:\Jobs\Br12\Br12.sbm"
 sbm export "C:\Jobs\Br12\Br12.sbm" --ifc Br12.ifc --dxf Br12.dxf --landxml Br12.xml
 sbm export "C:\Jobs\Br12\Br12.sbm" --ifc Br12.ifczip   # compressed IFC-ZIP (about 5x smaller; same model inside)
+sbm export "C:\Jobs\Br12\Br12.sbm" --ifc Br12.ifc --geometry abv [--chord-tol 0.8]
+                                                 # IFC 4.3 Alignment-based View: no extrusions / booleans / half spaces; plates with
+                                                 # holes and clipped beam profiles as IfcPolygonalFaceSet (holes = void loops), hole
+                                                 # circles and profile arcs polygonized to --chord-tol mm (default 1/32" = 0.79 mm).
+                                                 # --geometry parametric (default) = exact extrusions. Prints time, size, entity count.
 sbm run    "samples\scripts\web-depth-study.csx" "C:\Jobs\Br12\Br12.sbm"
 sbm bench  "C:\Jobs\Br12\Br12.sbm"
 sbm set    "C:\Jobs\Br12\Br12.sbm" "Geometry.ExactCurvedGeometry=true"   # project setting: exact NURBS for curved parts (default off)
@@ -201,6 +206,7 @@ doc.Project.Units.TryParseStation("22+00", out var sta);
 var g3      = doc.GirderElevations(2, sta);          // girder G3 web CL at a station
 doc.Save();                                          // or Save("other.sbm")
 doc.ExportIfc("Br12.ifc");
+var res = doc.ExportIfc("Br12-abv.ifc", IfcGeometryMode.ReferenceView);   // AbV geometry; optional 3rd arg chord tolerance (m)
 ```
 
 ## Plan-driven deck reinforcing

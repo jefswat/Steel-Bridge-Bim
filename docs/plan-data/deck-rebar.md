@@ -38,7 +38,7 @@ All seven bar lists are in `deck-bar-lists.csv` and add up to the printed unit t
 
 1. **Where slab bars stop at a joint.** Transverse bar ends are held back from the deck-end line (`TransverseBeginClear/EndClear`): calibrated on the printed lengths of the
    skewed-end bars (first/last lines of the runs): Unit 1 begin 7a4/7a7 (1'-10 / 59'-10, 2'-2 / 59'-7) -> 17"; Unit 2 end 7a2/7a13 -> 27"; Unit 3 begin 7a4/7a15 -> 26.5-27";
-   Unit 3 end 7a3/7a10/7a13 -> 17.5"; Ramp G Unit 4 end (Pier 19G, 33 deg skew) 7a2/7a3 (33'-3 .. 3'-1 / 33'-10 .. 2'-6) -> 27" (`deck-rebar-ramp-g.csx`). That is the joint blockout D (abutments 18", piers 25") -1" / +2". Longitudinal bar ends (`LongitudinalBegin/EndCover`) are set to D: this reproduces
+   Unit 3 end 7a3/7a10/7a13 -> 17.5"; Ramp G Unit 4 end (Pier 19G, 33 deg skew) 7a2/7a3 (33'-3 .. 3'-1 / 33'-10 .. 2'-6) -> 27" (`deck-rebar-ramp-g.csx`; CALIBRATED, accepted by the user 2026-10-11). That is the joint blockout D (abutments 18", piers 25") -1" / +2". Longitudinal bar ends (`LongitudinalBegin/EndCover`) are set to D: this reproduces
    the Ramp G 6b1 counts of Units 1, 2, 4 exactly. The check reports bars ending up to 1" inside a blockout (Unit 1 begin, Unit 3 end).
 2. **Overhang bars.** Detail A (I-80 sheet 97) read from the vector section: 8 dots between the edge and the girder CL (5.1, 7.1, 10.1, 13.1, 15.1, 19.1, 23.4, 27.6" from the edge; top/bottom
    T B T B T T B T). Ramp G: the typical section shows only part of the overhang bars; **8 lines per overhang INFERRED** (4 1/2" apart, first 2" from the edge, alternating): the count is
@@ -110,7 +110,9 @@ Bar list (count / lb, model = plan count, weight within 0.2%): U1 5d2-5d5 31 / 1
 
 Check (`check-deck-rebar.csx`, end dam part = `DeckRebarCheck.CheckEndDams`: clear inside the deck-end concrete + exact test against the top flange plates): Ramp G Units 1, 2, 4: min clear 3 3/8" top,
 1 1/2" soffit, 3" face, 14 11/16" edge, no steel; **Unit 3: 40 bars pass through the top flanges** - its girders have 20" top flanges at the 9G / 14G ends, so the bars printed 10" from the girder CL sit on the
-flange edge (Units 1, 2, 4: 18" flanges, 11/16" clear). Not moved (plan conflict to confirm).
+flange edge (Units 1, 2, 4: 18" flanges, 11/16" clear). Not moved. User decision 2026-10-11: 5d4 (10 bars) is reported as Info "field cut per the
+plan note with Section B-B, PDF 137" (`DeckEndDamBar.FieldCutNote`; the note: 5d4 bars shall be field cut or spaced as required at expansion joint support boxes);
+5d2, 5d3, 5d5 (10 each) are PLAN CONFLICT warnings with that one-line reason (`ConflictNote`).
 
 ## 7. Kinked slab ends (2026-10-11, `SupportDefinition.DeckEndPoints`, `samples/plans/deck-end-kinks.csx`)
 

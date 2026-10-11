@@ -1123,6 +1123,9 @@ public sealed class BridgeDefinition
     public InspectionAccessDefinition? InspectionAccess { get; set; }
     /// <summary>Drain collectors, pier drains, sign supports, crash cushion end posts, lighting (null = none).</summary>
     public MiscItemsDefinition? Misc { get; set; }
+    /// <summary>Steel intermediate diaphragms between PRESTRESSED beams bolted through cast web holes (Iowa 1036-BTD; null = none).
+    /// Detailed after the beams by <c>Diaphragms.PsSteelDiaphragmDetailer</c> in <c>RegenerationCache</c>.</summary>
+    public PsSteelDiaphragmDefinition? PsSteelDiaphragms { get; set; }
 
     /// <summary>A typical two-span continuous layout starting at the given station.</summary>
     public static BridgeDefinition CreateDefault(double beginStation, string alignmentName)

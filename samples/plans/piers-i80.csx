@@ -45,11 +45,39 @@ void Report(string bridge, int j, (string label, double planElevFt)[] seats)
 // (x = -35.5 / +35.5); soffit parallel to the back top between the kinks. Curved soffit lines are aesthetic only.
 // Columns: octagonal 8'-0 x 4'-6 (chamfers 2'-4 x 1'-3) above elev. 990.51, flared 9'-0 x 5'-6 (2'-8 1/2 x 1'-5 5/8)
 // below; at x = -31.0, +9.5, +31.0. Footings 18'-0 x 18'-0 x 6'-6, bottom 971.01 (top 977.51); HP14x73 piles, 70 ft.
-// The roadway CL (girder G) is 11 5/8" right of the CL pier.
+// Position along the pier line (user decision 2026-10-11, option A): the cap plan (PDF 63, raster-read) does not dimension
+// the WB CL at the CL pier. From the RIGHT top corner of the cap (42'-6 right of the CL pier "SYMM. U.N.O."):
+//   AHEAD BRG. row (Unit 3): 2'-9 3/16(+) to CL girder J, + 12'-10 15/16 + 12'-11 3/16 + 12'-11 3/8 = 41'-6 11/16 to
+//     "CL GIRDER G & CL WESTBOUND APPROACH ROADWAY" = 42'-6 - 11 5/16 -> the WB CL is 11 5/16" RIGHT of the CL pier there;
+//   BACK BRG. row (Unit 2): 4'-5 5/8 to CL girder K, + 12'-11 1/16 + 12'-11 5/16 + 12'-11 1/2 = 43'-3 1/2 to
+//     "CL GIRDER H & CL WESTBOUND APPROACH ROADWAY" = 42'-6 + 9 1/2 -> 9 1/2" LEFT of the CL pier there.
+// The 11 5/16" is applied at the ahead bearing row where it is drawn; the model's skewed WB CL then gives the crossing at
+// the CL pier (about 29/32" right). Checks printed below: the back row (-9 1/2") and the pile layout (PDF 65: CL WB
+// 9'-5 1/16 left of CL column & footing no. 2, i.e. 15/16" right of the CL pier). Staking PDF 16 prints footing 1 at
+// 31'-1 15/16 left (40'-7 from footing 2) vs 40'-6 on PDF 63/65: CONFLICT (1"), reported by check-staking.csx.
+// (Before 2026-10-11 the script used 11 5/8" at the CL pier: 10 11/16" too far left.)
+// PIER_POSITION_ONLY=1: on an existing model, update only the position fields (CapProfile, CapProfileAhead, FirstColumnOffset)
+// of the substructures this script builds, so later scripts (rebar, aesthetics, pedestal blocks, footing bars) are not undone.
+bool posOnly = Environment.GetEnvironmentVariable("PIER_POSITION_ONLY") == "1";
+void SetSub(SupportDefinition sup, SubstructureDefinition sd)
+{
+    if (!posOnly || sup.Substructure == null) { sup.Substructure = sd; return; }
+    sup.Substructure.CapProfile = sd.CapProfile; sup.Substructure.CapProfileAhead = sd.CapProfileAhead; sup.Substructure.FirstColumnOffset = sd.FirstColumnOffset;
+}
 {
     var b = Doc.Project.Bridges.First(x => x.Name == "I-80 WB Unit 2");
     int j = b.Supports.Count - 1;
-    var S = SFromPlan(b, j, 11.625 / 12);
+    var fr2 = Doc.Model(b.Name).Framing.Supports[j];                                   // back bearing line (S = 0 at its alignment point)
+    var fr3 = Doc.Model("I-80 WB Unit 3").Framing.Supports[0];                         // ahead bearing line
+    var t0 = Vec2.FromAngle(Doc.Alignment(b.AlignmentName).AngleAt(fr2.Station));
+    var n0 = fr2.Direction.Left; if (Vec2.Dot(n0, t0) < 0) n0 = -n0;
+    double off0 = b.Supports[j].PierCenterOffset;
+    double sPier = Vec2.Dot(t0, fr2.Direction) * off0 / Vec2.Dot(t0, n0);              // WB CL x CL pier, as SFromPlan
+    double sAhead = Vec2.Dot(fr3.AlignmentPoint - fr2.AlignmentPoint, fr2.Direction);  // WB CL x ahead brg row (projected normal to the pier)
+    double xRoad11 = 11.3125 / 12 - (sAhead - sPier) / Ft(1);                          // WB CL at the CL pier, plan x (ft, right +)
+    Print($"  Pier 11WB: WB CL crosses the CL pier {xRoad11 * 12:F3}\" right of the symmetry line (11 5/16\" at the ahead row);" +
+          $" back row gives {(xRoad11 - sPier / Ft(1)) * 12:F3}\" (plan -9.500\"); pile layout PDF 65: 0.938\" (9'-6 - 9'-5 1/16)");
+    var S = SFromPlan(b, j, xRoad11);
     double topL = 1010.95, topR = 1015.18, step = 1012.98 - 1010.95;
     double m = (topR - topL) / 85.0;
     double Top(double x) => topL + m * (x + 42.5);
@@ -101,7 +129,7 @@ void Report(string bridge, int j, (string label, double planElevFt)[] seats)
         new FootingDefinition { Column = 3, Piles = Piles(full, 1) },
     };
     Print($"  piles per footing: {string.Join(", ", sd.Footings.Select(x => x.Piles.Count))} (plans: 26, 26, 29)");
-    b.Supports[j].Substructure = sd;
+    SetSub(b.Supports[j], sd);
     Doc.Regenerate();
     Report(b.Name, j, new[]
     {
@@ -148,7 +176,7 @@ var ip = new (string name, string bridge, int j, double half, double extL, doubl
     ("Pier 3WB", "I-80 WB Unit 1", 3, 43.5, 1.2083, 1.2083, 1006.30, 1006.30, L(-31, 0, 31), double.NaN, 22, 22, 5, 969.30, r3, 95, 0, 8.3385, 21, -1),
     ("Pier 4WB", "I-80 WB Unit 1", 4, 31.5, 1.2083, 1.2083, 1009.24, 1009.24, L(-19, 19), 985.24, 14.5, 21.5, 6, 967.24, r4, 75, -19, 13.0, 24, 1),
     ("Pier 5WB", "I-80 WB Unit 1", 5, 31.5, 0, 1.2083, 1012.32, 1012.32, L(-19, 19), 986.32, 16, 20, 5.5, 967.82, r5, 75, -19, 13.2292, 16, 1),
-    ("Pier 6WB", "I-80 WB Unit 2", 1, 53.5, 1.1302, 1.2813, 1013.07, 1014.92, L(-41, -41 + 27.3333, 41 - 27.3333, 41), 986.28, 18, 20, 6, 961.28, r6, 65, 41 - 27.3333, 2.1823, 21, 0),
+    ("Pier 6WB", "I-80 WB Unit 2", 1, 53.5, 1.1302, 1.2813, 1013.07, 1014.92, L(-41, -41 + 27.3333, 41 - 27.3333, 41), 986.28, 18, 20, 6, 961.28, r6, 65, 41 - 27.3333, 2 + 2.375 / 12, 21, 0),   // 6WB road 2'-2 3/8 (PDF 16, 43, 45; was 2'-2 3/16 - user decision 2026-10-11)
     ("Pier 7WB", "I-80 WB Unit 2", 2, 47, 1.0885, 1.3229, 1014.60, 1017.01, L(-34.5, 0, 34.5), 988.92, 20, 29, 7, 969.92, r7, 75, 0, 9.3542, 26, 1),
     ("Pier 8WB", "I-80 WB Unit 2", 3, 57.5, 1.0729, 1.3385, 1013.97, 1017.38, L(-45, -15, 15, 45), 994.33, 21.5, 14.5, 6, 976.33, r8, 85, 15, 8.4635, 18, -1),
     ("Pier 9WB", "I-80 WB Unit 2", 4, 49, 1.0156, 1.3958, 1012.57, 1016.75, L(-36.5, 0, 36.5), 993.10, 26, 17.5, 5, 977.10, r9, 80, 0, 1.2188, 18, 1),
@@ -212,7 +240,7 @@ foreach (var p in ip)
     // diagonals and no S-edge piles; the other piers (1WB-3WB, 8WB, 9WB, 15WB) are plumb. Ratio read as 1 H : 4 V (to be confirmed).
     if (new[] { "Pier 4WB", "Pier 5WB", "Pier 6WB", "Pier 7WB", "Pier 10WB", "Pier 12WB", "Pier 13WB", "Pier 14WB" }.Contains(p.name))
         foreach (var fd in sd.Footings) { fd.BatterPerimeter(4, false, false); fd.PileWeb = PileWebMode.AlongBatter; }   // pile symbols: web along the batter (N rows -> web along N, as plumb)
-    b.Supports[p.j].Substructure = sd;
+    SetSub(b.Supports[p.j], sd);
     Print($"    {p.name}: {sd.Footings.Sum(f => f.Piles.Count(q => q.IsBattered))} battered piles in {sd.Footings.Count} footing(s)");
     if (pl.Count != p.expect) Print($"    PILE COUNT {pl.Count} -- PLANS SAY {p.expect}");
 }

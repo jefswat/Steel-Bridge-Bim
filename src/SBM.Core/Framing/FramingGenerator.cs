@@ -177,7 +177,17 @@ public sealed class FramingGenerator
     }
 
     /// <summary>The layout line of one span end and the girder points on it (only the first when perpendicular spacings give the rest).</summary>
-    private (Vec2 linePoint, List<Vec2> points)? LayoutLine(int support, GirderSpanEnd e, int count, string where)
+    /// <summary>Unit normal of a support line pointing up-station.</summary>
+    private Vec2 UpStationNormal(int support)
+    {
+        var t = Vec2.FromAngle(_align.EvaluateAtDistance(_dSup[support]).Item2);
+        var n = _supDir[support].Left;
+        return Vec2.Dot(n, t) < 0 ? -n : n;
+    }
+
+    /// <param name="perpShift">Set for <see cref="SpanLineShiftMeasure.AlongGirder"/>: the line is the support line moved by this
+    /// distance along its up-station normal (instead of <see cref="GirderSpanEnd.LineShift"/> along the reference curve).</param>
+    private (Vec2 linePoint, List<Vec2> points)? LayoutLine(int support, GirderSpanEnd e, int count, string where, double? perpShift = null)
     {
         var sup = _def.Supports[support];
         var a = _align.PointAtDistance(_dSup[support]);
@@ -189,14 +199,32 @@ public sealed class FramingGenerator
             Error($"{where}: the {sup.Name} support line does not cross the reference offset {e.ReferenceOffset:0.###} m.");
             return null;
         }
-        double dLine = MoveAlongOffsetCurve(dRef, e.ReferenceOffset, e.LineShift);
-        var r = _align.PointAtDistance(dLine, e.ReferenceOffset);
+        var wp = _align.PointAtDistance(dRef, e.ReferenceOffset);
+        double dLine;
+        Vec2 r;
+        if (perpShift is { } ps)
+        {
+            var q = wp + UpStationNormal(support) * ps;
+            if (!LineCrossesOffset(q, dir, e.ReferenceOffset, dRef + ps, skew, out r))
+            {
+                Error($"{where}: the {sup.Name} bearing line does not cross the reference offset {e.ReferenceOffset:0.###} m.");
+                return null;
+            }
+            dLine = _align.Inverse(r).Distance;
+        }
+        else
+        {
+            dLine = MoveAlongOffsetCurve(dRef, e.ReferenceOffset, e.LineShift);
+            r = _align.PointAtDistance(dLine, e.ReferenceOffset);
+        }
+        // Zero of the along-line offsets: the line crossing (default) or the foot of the W.P. on the line.
+        var origin = e.OffsetOrigin == SpanOffsetOrigin.WorkPoint ? r + dir * Vec2.Dot(wp - r, dir) : r;
         var offs = e.Resolved();
         var pts = new List<Vec2>();
         for (int i = 0; i < count; i++)
         {
             double o = offs[i];
-            if (e.Measure == SpanOffsetMeasure.AlongLine) pts.Add(r + dir * o);
+            if (e.Measure == SpanOffsetMeasure.AlongLine) pts.Add(origin + dir * o);
             else
             {
                 double near = dLine + (o - e.ReferenceOffset) * Math.Tan(Numerics.DegToRad(skew));
@@ -228,6 +256,18 @@ public sealed class FramingGenerator
             var lb = LayoutLine(j, lay.Begin, count, where + " (begin)");
             var le = LayoutLine(j + 1, lay.End, count, where + " (end)");
             if (lb == null || le == null) return;
+            // LineShift measured along the girder: move the lines by shift x cos(girder to support-line normal), iterated with
+            // the first girder's direction (converges in a few steps: the angle changes by hundredths of a degree).
+            if (lay.Begin.ShiftMeasure == SpanLineShiftMeasure.AlongGirder || lay.End.ShiftMeasure == SpanLineShiftMeasure.AlongGirder)
+                for (int it = 0; it < 8; it++)
+                {
+                    var g0 = (le.Value.points[0] - lb.Value.points[0]).Normalized();
+                    double? P(GirderSpanEnd e, int k) => e.ShiftMeasure == SpanLineShiftMeasure.AlongGirder
+                        ? e.LineShift * Math.Abs(Vec2.Dot(g0, UpStationNormal(k))) : null;
+                    lb = LayoutLine(j, lay.Begin, count, where + " (begin)", P(lay.Begin, j));
+                    le = LayoutLine(j + 1, lay.End, count, where + " (end)", P(lay.End, j + 1));
+                    if (lb == null || le == null) return;
+                }
             var (pb, qb) = lb.Value;
             var (pe, qe) = le.Value;
             var ends = new (Vec2 a, Vec2 b)[NG];
@@ -1133,7 +1173,7 @@ public sealed class FramingGenerator
             double aL = Numerics.RadToDeg(Math.Acos(Math.Clamp(Math.Abs(Vec2.Dot(chord.Normalized(), DirOf(sl))), 0, 1)));
             double aR = Numerics.RadToDeg(Math.Acos(Math.Clamp(Math.Abs(Vec2.Dot(chord.Normalized(), DirOf(sr))), 0, 1)));
             Warn($"{what} (style {st}): frame plane through the two CL bearings; it differs from the bearing stiffener planes by {aL:F2} deg at G{link.LeftGirder + 1} and {aR:F2} deg at G{link.RightGirder + 1} " +
-                 "(plans: note location for fit up). UNRESOLVED: whether the frame bolts to the ahead or the back stiffener of each pair (not dimensioned) - the model uses the pair at the CL bearing.");
+                 "(plans: note location for fit up). UNRESOLVED (framing plan / support frame section of this link): which stiffener of each pair the frame bolts to - the plans draw the frame between the two CL bearings but do not say ahead or back stiffener; the model uses the pair at the CL bearing.");
             frames.Add(new CrossFrameResult
             {
                 Span = spl, Bay = link.LeftGirder, RightGirder = link.RightGirder, AtSupport = true,
@@ -1164,7 +1204,7 @@ public sealed class FramingGenerator
             string where = $"Frame line {line.Distance / 0.3048:F2} ft along G{g + 1}";
             if (line.Distance < 0 || line.Distance > total + 1e-6) { Warn($"{where}: beyond the girder ({total / 0.3048:F2} ft)."); continue; }
             foreach (var note in line.Unresolved)
-                Warn($"{where}: UNRESOLVED (plan, nothing invented) - {note}");
+                Warn($"{where}: UNRESOLVED (framing plan, page and reason in the note; nothing invented) - {note}");
             var (rj, ru) = LocateOnGirder(g, s0 + line.Distance);
             var rc = _curves[g][rj];
             var p = rc.PointAt(ru);

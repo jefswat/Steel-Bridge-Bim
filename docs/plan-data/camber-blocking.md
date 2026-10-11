@@ -6,6 +6,11 @@ coordinates (not OCR); decimals only. Everything the plans PRINT is recorded as 
 labelled OBSERVED RELATION (checked numerically against the printed data; NOT stated on the plans). Gaps are
 marked **UNRESOLVED** with the PDF page. Machine-readable tables: `docs\plan-data\camber\*.csv` (list at the end).
 
+**Correction 2026-10-11 (user decision 4):** in the Ramp G camber, steel and slab deflection CSVs the point just BEFORE each unnumbered
+"MIDPOINT OF FIELD SECTION" column held the midpoint value (U1 pt 25; U2 7, 51, 72; U3 35, 83, 106; U4 55; 78 cells, PDF 111-125). Fixed from the text
+layer (PDF 116 U2 pt 7 raster-confirmed 3.05 / 2.87 / 2.71 / 2.55 slab, 1.30 / 1.17 / 1.03 / 0.89 steel; PDF 115 camber 4.04 / 3.81 / 3.59 / 3.37). I-80 CSVs
+compared cell by cell with the text layer: no shift. `camber-ramp-g.csx` re-run on the sample model.
+
 PDF fractions are custom glyphs and the text layer is wrong for them (one glyph code stands for several
 fractions), so every fraction below was read from raster clips (2.2x). Decimal table values are not affected.
 

@@ -77,7 +77,7 @@ public static class PierViews
         var dwg = new PlanDrawing();
         var d = new Drafter(dwg, u, ctx.Options.BentScale);
         var sd = unit.Definition;
-        string pileName = sd.PileType == PileType.SteelHP ? sd.PileSection : d.Short(sd.PileSize) + " SQ";
+        string pileName = sd.PileLabel(d.Short);
         int fi = 0;
         foreach (var fd in unit.Foundations)
         {

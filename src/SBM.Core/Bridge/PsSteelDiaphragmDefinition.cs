@@ -178,4 +178,7 @@ public sealed class PsSteelDiaphragmDefinition
     /// <summary>Plates and members. Woodbury p.5 lists A709 Gr. 36 / 50 / 50W without naming the diaphragm grade, so the
     /// grade is left open; p.31: all diaphragm materials galvanized.</summary>
     public string Material { get; set; } = "Structural steel (A709 grade not given, p.5), galvanized";
+    /// <summary>Bolt material for schedules / IFC: std 1036-1-BTD (Iowa Beams.pdf p.14) requires ASTM A449 for the 7/8" web bolts; the
+    /// member bolts are "H.S." only (grade not stated).</summary>
+    public string BoltGrade { get; set; } = "ASTM A449 (web bolts) / H.S. (member bolts)";
 }

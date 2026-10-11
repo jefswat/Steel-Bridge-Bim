@@ -102,6 +102,8 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
     side-by-side as-designed piers ("Pier 11WB & 19G"): every support with a CapProfile owns its cap and takes only the
     seats on it (RegenerationCache owners). Conflicts (seats off the cap, seat below cap top, column not under cap) are
     WARNINGS, never auto-fixed. Plan-set data: `samples/plans/piers-i80.csx`, `piers-ramp-g.csx`, `deck-edges-i80.csx`.
+    `piers-i80.csx` / `pier-6a.csx` with env `PIER_POSITION_ONLY=1` update only the position fields (CapProfile, CapProfileAhead,
+    FirstColumnOffset) of existing piers, so later scripts' data (rebar, aesthetics, pedestals, footing bars) survive a position fix.
     Chamfered (octagonal) column rebar (`SubstructureRebar.ColumnBars`): verticals per face from the OUTSIDE-face
     dimensions (centred groups, explicit chamfer positions, or equal spaces with shared corners) set in normal to the
     face; ties follow the section (`PolygonTie`, hooks at the sharpest corner), optionally as two overlapping end hoops
@@ -117,6 +119,8 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
     along the axis from the head; head/tip cut horizontal; section = plumb orientation rotated minimally onto the axis (oblique
     extrusion = exact IFC solid). `PileInfo` has head (S,N,TopZ) + tip (TipS,TipN,TipZ). Axis-distance clearance warnings
     (`CheckPileClearances`). Snapshot `--closeup FTGn@Bridge` frames the foundation. Conventions are flagged for user confirmation.
+    `PileType.CipPipe` = cast-in-place concrete-filled steel pipe pile (round 32-gon solid of `PileSize` = outside diameter, `PileShellThickness`;
+    `SubSolid.ShellThickness`); IFC: ONE IfcPile DRIVEN / ConstructionType COMPOSITE + Pset `SBM_PipePile` (shell as a property). `sd.PileLabel(...)` for views.
   - Footing dowels / column splices (`SubstructureReinforcementDefinition.ColumnSplice` = Continuous | Lap | Coupler; `SplicedVerticals` in SubstructureRebar.cs): L-shaped
     dowel per column bar (`DowelL`, mark series "L", scheduled length = A + B as the plans list, hook on the bottom mat `DowelBottomAboveFooting`), column bars start at the
     footing top (lap: dowel projects `ColumnLapLength`, in contact on the inside) or meet it at `CouplerLow/High` (generic coupler cylinder = `SubElementKind.Coupler`,
@@ -146,7 +150,8 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
     (`AddSlab` = prism between two vertical planes with per-vertex elevation functions; end lines are alignment offsets, so S depends on N),
     `SubstructureAbutmentRebar.cs` (only proven placements in 3D, rest of the plan bar list = schedule-only marks, mismatches = warnings),
     `AbutmentViews` (3 sheet panels; the plan draws `AbutmentGeometry.FootingOutline` = generator outline with notches), `SubElementKind.Wingwall/Counterfort/Maskwall/WingFooting`,
-    `unit.Abutment` (`AbutmentGeometry`). Backwall runs behind the wings to the maskwalls; `CorbelLeft/RightOffset` limit the corbel to the wing inner faces. Standing rule:
+    `unit.Abutment` (`AbutmentGeometry`). `AbutmentDefinition.StandalonePedestals` = pedestals WITHOUT a bearing (Br02069 Type B / D for the future beam lines,
+    built now): same section as the beam steps, `PedestalInfo` / `AbutmentStepInfo` with Girder = -1 and `Label` (views print `Tag`). Backwall runs behind the wings to the maskwalls; `CorbelLeft/RightOffset` limit the corbel to the wing inner faces. Standing rule:
     no invented defaults - unresolved plan items are generator warnings ("UNRESOLVED"). Docs `docs/plan-data/abutments-model.md`; scripts `samples/plans/abutments-*.csx`.
     `AbutmentDefinition.PileRowOffsets` (x of each pile row from CL brg; empty = the two legacy rows `PileRows`). `Kind` = Stub (default, all of the above) |
     Integral (Iowa integral pile cap, Woodbury p.15-17; `SubstructureAbutmentIntegral.cs`, concrete-bridge design feature A / T1): cap faces `CapBack/FrontToBearing`
@@ -207,13 +212,19 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
     properties integrated from it, printed values in `PrintedArea/Yb/Ix`, `PropertyCheck`); `Beam("BTD55"|"BTD60"|"BTD105")`
     = standard beam definitions (Woodbury p.27-30). `PrestressedBeamDefinition`: `Standard`, `Designation`,
     `StandardBearingLength`/`StandardOverallLength` (beam built at the STANDARD length along the sloped beam, CHECK warning vs
-    layout, never stretched), `Placement` (NO default: null = UNRESOLVED, drawn centred), `SpanBeams` (per span / beam line,
+    layout, never stretched; within 1/16" of the layout = fits, Info per span, no placement needed), `Placement` (NO default: null = UNRESOLVED
+  only when the difference exceeds 1/16", drawn centred), CL bearings = the span layout's bearing points (`LayoutBegin/End`) when present,
+  `PierPadOrientation` (SquareToBeam default | ParallelToSupport = pad width along the pier line, Woodbury p.20; abutments square), `SpanBeams` (per span / beam line,
     last match wins; `For(span, girder)`), `HarpedColumns` + `HarpedTopBelowTopAtEnd` (`StrandPatterns.Resolve`),
     `HoldDownFromMidspan`, `Unresolved` list, `StrandPoint.DebondStart/End/Symbol` (`StrandPatterns.Debond`). Beams with a
     profile carry `PrestressedBeam.Body` -> IFC IfcArbitraryClosedProfileDef over IfcIndexedPolyCurve (IfcArcIndex) extruded
     and clipped by the end planes; debond sheathing = IfcTendonConduit (key `IfcKeys.PsSheath`) + Pset SBM_Debonding.
     Demo: `samples/plans/prestressed-shapes-demo.csx`; tests `PrestressedStandardTests`.
-  - `Diaphragms/PsSteelDiaphragmDetailer` (T4, NOT hooked up yet - T6 does generator/RegenerationCache/IFC): Iowa 1036-BTD
+  - `Diaphragms/PsSteelDiaphragmDetailer` (T4; hooked up by T6: `BridgeDefinition.PsSteelDiaphragms` -> `RegenerationCache.SteelDiaphragms`
+    after the prestressed beams -> `PrestressedModel.SteelDiaphragms` (holes, bay fits, diagnostics into the prestressed diagnostics) AND the
+    bridge's `SteelModel` (= diaphragm parts / bolts / assemblies only, so viewport, IFC IfcMember/IfcPlate/IfcMechanicalFastener, database,
+    quantities need no special code; `PsSteelDiaphragmDefinition.BoltGrade` "ASTM ..." is written as is). SheetSet bearing-detail sheets
+    stay steel-girder only (`ctx.Prestressed == null`). Iowa 1036-BTD
     steel intermediate diaphragms between prestressed beams. Pure function `Detail(PsSteelDiaphragmDefinition,
     IReadOnlyList<PsDiaphragmBeamLine>)` -> `PsSteelDiaphragmModel` (SteelParts, BoltInstances with Diameter, cast holes,
     per-bay fit/length/weight results, diagnostics). Input `Bridge/PsSteelDiaphragmDefinition.cs`: hole CHAINS per beam
@@ -292,6 +303,35 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   distance m from the alignment START (not a station: `al.StationToDistance`), offsetLateral (IFC: + = LEFT), offsetVertical)`.
   Check: `sbm run tools/ifc-alignment-points.csx model.sbm -- a.ifc pts.json [abv] [--alignments-only|--spiral]` then
   `python -I tools/check_ifc_alignment.py a.ifc pts.json` (ifcopenshell.geom vs SBM, 1 mm); IDS: `python -I tools/run_ids.py a.ifc x.ids`.
+  Geometry modes (`IfcExportOptions(Geometry, ChordTolerance)`, `SbmDocument.ExportIfc(path, mode, chordTol)`, CLI
+  `sbm export --geometry parametric|abv [--chord-tol mm]`): **Parametric** (default, byte-identical to the pre-mode output)
+  = exact IfcExtrudedAreaSolid / IfcBooleanClippingResult. **ReferenceView** (`abv`, header `ViewDefinition
+  [AlignmentBasedView]`) writes only geometry the bSI AbV allows (checked against usBrSpec_AbV Exclusions.ids, 261
+  entities; `python -I tools/run_ids.py model.ifc <ids>`): `Ifc/IfcReferenceViewGeometry.cs` turns every recorded
+  `ExtrudedSolid` into an IfcPolygonalFaceSet (end caps = IfcIndexedPolygonalFaceWithVoids, holes = void loops of an
+  EQUAL-AREA polygon (volume = Parametric), as many sides (>= 8) as an inscribed polygon with sagitta <= chord tolerance, default 1/32 in = 0.79 mm -> 9 sides for a 15/16 in hole;
+  sides / hole walls = planar quads) and the arc-profile prestressed beams (Parametric: extrusion clipped by two half
+  spaces + IfcPlane) into ONE face set cut exactly by the skewed end planes (arcs polygonized to the tolerance).
+  Triangle meshes, swept-disk bars/strands, mapped bolt types (IfcTriangulatedFaceSet sources) are already allowed and
+  unchanged; element GlobalIds, materials and psets are the same (the SBM_Fabrication pset GlobalIds are keyed by STEP id,
+  so they differ between modes). Prestressed girders are IfcBeam `.GIRDER_SEGMENT.` in all modes (`.GIRDER.` is not in
+  IFC4X3_ADD2's IfcBeamTypeEnum; it is valid only for IfcElementAssembly / IfcBridge).
+  Volumes vs Parametric: `python -I tools/compare_ifc_volumes.py par.ifc abv.ifc --changed-only --exact-ref [--max N]`
+  (exact-ref = analytic extrusion volumes; OpenCascade meshes hole circles coarsely; AbV meshing is ~2x slower, ~0.15 s/plate). Cost: I-80 WB and
+  Ramp G: Parametric 346 MB / 3.76 M entities / 3.7 s, ReferenceView 765 MB / 6.03 M / 6.6 s (ifczip 72 vs 177 MB);
+  the growth is the ~324 k bolt holes (9 wall quads + 18 points each). Full-model AbV result: 0 schema + 0 EXPRESS issues,
+  AbV Exclusions IDS 261/261 pass (docs/plan-data/ifc-validation.md). NOT done: IfcSectionedSolidHorizontal along the
+  alignment. How it would plug in (alignment entities come from `alignmentWriter.For(name)`, written before the bridges):
+  deck slab, barriers and girder flange/web plates would each become IfcSectionedSolidHorizontal(Directrix =
+  `AxisCurve` (the IfcGradientCurve), CrossSections = IfcArbitraryClosedProfileDef over IfcIndexedPolyCurve polylines in the
+  section plane (x = lateral, + = LEFT as IFC; y = up from the directrix), CrossSectionPositions = IfcAxis2PlacementLinear(
+  IfcPointByDistanceExpression(distance from alignment start (`al.StationToDistance`), lateral, vertical, AxisCurve))) at
+  the stations where the section changes (deck: the loft rings of `ConcreteGenerator` = deck + haunch outline per station;
+  barriers: `BarrierProfiles.For` offset by the deck edge; girders: plate sections at field-section ends / thickness
+  transitions, offset = girder line). Hook = a ReferenceView branch next to `Body` / the deck `FaceSet` items in
+  `ExportConcrete` (same style, GlobalId, psets). Caveat: the solid ends are sections NORMAL to the directrix, so skewed
+  deck/barrier/girder ends cannot be represented exactly without a clip (AbV forbids booleans) - either keep the skewed
+  end zones as face sets (two items) or accept a squared end; holes / clips / bolts stay face sets.
 - `src/SBM.App` â€” WPF (Fluent dark theme), MVVM via CommunityToolkit.Mvvm, GPU viewport = HelixToolkit.Wpf.SharpDX 3.x
   (DirectX 11, System.Numerics types; namespaces `HelixToolkit`, `HelixToolkit.SharpDX`, `HelixToolkit.Wpf.SharpDX`).
   - `Viewport/SceneBuilder` batches each layer into one LineGeometry3D + one BillboardText3D; vertices are rebased to a
@@ -345,14 +385,17 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
 - Per-span girder layouts (OPTIONAL): `GirderLayoutDefinition.SpanLayouts` (`Bridge/GirderSpanLayout.cs`) = per listed span, straight chord
   girders between their points on a begin and an end line (`GirderSpanEnd`: the support line moved parallel by `LineShift` along the
   `ReferenceOffset` curve, e.g. "CL brg 1'-0 from CL pier along CL NB"; offsets `NormalToAlignment` or `AlongLine` from the reference
-  point (W.P.), optional `Spacings`, prestressed `Haunches` per girder = plan T - slab). `PerpendicularSpacings` = girders parallel to
+  point (W.P.), optional `Spacings`, prestressed `Haunches` per girder = plan T - slab; `ShiftMeasure` AlongReference (default) | AlongGirder =
+  LineShift along the span's first girder (iterated), `OffsetOrigin` LineCrossing (default) | WorkPoint = along-line offsets from the foot
+  of the W.P. (support line x reference curve) on the shifted line - an aligned dimension from the W.P.; Woodbury uses AlongGirder + WorkPoint). `PerpendicularSpacings` = girders parallel to
   the first one's chord at spacings measured perpendicular to it. Same girder count in every span (else an error). It overrides the
   offset curves and `PlanGeometry` in that span (warning). `FramingGenerator.SetupSpanLayouts` -> `_chord` (support-line points S0/S1,
   layout points L0/L1 with the prestressed top of beam); `GirderSpanCurve` gets `LayoutBegin/LayoutEnd`. Back and ahead points at an
   interior support may differ (prestressed): `SupportLineResult.Bearings` = behind, `AheadBearings` = ahead (null if equal). Use
   `BridgeFraming.SpanBearing(girder, span, atEnd)` for anything that belongs to one span. For steel a jog is an error (continuous girders).
   The prestressed elevation check names the layout. Data: `samples/plans/build-woodbury.csx` / `check-woodbury.csx` (Iowa Design 817).
-  OPEN: `PrestressedGenerator.BuildBeam` still uses `Supports[j].Bearings` (it must switch to `SpanBearing`).
+  `PrestressedGenerator.BuildBeam` uses `SpanBearing` and the layout bearing points. Haunch solids sample the girder path at <= 1.5 m
+  (`ConcreteGenerator.HaunchSamples`, jogs kept) so the haunch follows the soffit along straight chords in every geometry mode.
 - As-designed girder plan geometry (OPTIONAL): `GirderLayoutDefinition.PlanGeometry` = per girder a start point (alignment station/offset),
   start direction (degrees from the alignment tangent, + toward the right) and a chain of tangent / left / right arc elements (radius, length;
   first extended backwards, last forwards) = the plan's "P.C. STA ..., R = ..." data. `FramingGenerator` builds a `GirderPlanCurve` and uses
@@ -417,7 +460,8 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   `Concrete/ConcreteEndDam.cs`): bend-diagram shape (open bar by its OUTSIDE outline in section coordinates X from the deck-end face / Drop below grade, or a hoop w x h with lap tails, built with
   `SubstructureGenerator.PlanBent/PlanHoop`) in the plane normal to the deck-end line, repeated per girder bay (`FromGirder`, `Spacing`, `PerBay`, `Overhang` from the exterior girder lines, girders found where
   their web lines cross the deck end); `Unplaced` bars count toward the mark (location "... not modeled - UNRESOLVED") with `Unresolved` raised; `DeckPlanReinforcement.Unresolved` = plan items not dimensioned,
-  each an "UNRESOLVED (deck reinforcing): ..." warning. Placed: Ramp G 5d2-5d5 at Piers 5G/9G/14G; I-80 and the rest of the end dams are schedule only (reasons + pages in `docs/plan-data/deck-rebar.md` 5-6).
+  each an "UNRESOLVED (deck reinforcing): ..." warning. Steel clashes of end dam bars are reported per mark: `DeckEndDamBar.FieldCutNote` (plan note
+  allowing field cutting, Ramp G 5d4) -> Info quoting it; any other mark -> "PLAN CONFLICT" warning with `ConflictNote` (plain reason); never moved. Placed: Ramp G 5d2-5d5 at Piers 5G/9G/14G; I-80 and the rest of the end dams are schedule only (reasons + pages in `docs/plan-data/deck-rebar.md` 5-6).
   `Checks/DeckRebarCheck` (run in RegenerationCache for every deck
   with bars): cover top/bottom, edges, deck-end/blockout distance, bars vs the highest steel surface (top flanges, splice plates, fillers) -> `ConcreteModel.Notes` / Diagnostics; end dam marks are checked
   separately (`CheckEndDams`: clear inside the deck-end concrete incl. the end block soffit, exact test against the top flange / splice plate triangles near the ends). Plan data and results:
@@ -466,6 +510,9 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   assemblies > elements (`MiscItems` in ModelDatabase; keys `IfcKeys.MiscAssembly/MiscElement`), sheet rules in `sheet-links-i80-rampg.json`. Viewport layers `3D-DRAIN-*`,
   `3D-SIGN-SUPPORT`, `3D-CRASH-CUSHION`, `3D-LIGHTING`, `3D-PLACEHOLDER`. Plan data scripts (re-runnable): `samples/plans/drains-ramp-g.csx`, `signs-i80.csx`, `end-posts.csx`,
   `lighting.csx`; data/results/unresolved list: `docs/plan-data/misc-items-data.md` (section "Model").
+  UNRESOLVED WARNING TEXT (user rule): every flag names the plan page AND a short plain reason why it is open - build new ones with
+  `UnresolvedFlag.Text(pages, item, why, then)` (SBM.Core/Assumption.cs) -> "UNRESOLVED (p.17): CMP casing bottom - it is the bottom of the EPS fill, which is in the
+  road plans, not this set. ..."; generic generators use the definition's `Source` for the page when they have one. Diagnostics have no structured reason field.
   UNRESOLVED FLAG (general, reusable): `SBM.Core/Assumption.cs` `Assumption{Status="UNRESOLVED", Reason (what the plans lack + PDF page), Basis (what was assumed)}` on the element
   (`MiscElement.Assumption`; set with `Flag(name, reason, basis)`). Consumers: viewport layer `3D-UNRESOLVED` (all flagged elements, orange, removed from their normal layers; reason in the pick
   properties; isolate with the layer toggles), IFC Pset `SBM_Status` {Status, Reason, Basis}, database props `status/reason/assumed` + view `v_unresolved` (with QC status), one warning per reason.

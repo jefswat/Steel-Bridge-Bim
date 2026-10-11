@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using SBM.Core.Bridge;
 using SBM.Core.Concrete;
 using SBM.Core.Framing;
 using SBM.Core.Geometry;
@@ -137,7 +138,7 @@ public static class DeckRebarCheck
                          $"(required {u.FormatLength(rd.BottomCover, LengthKind.Short)}), min edge distance {L(minEdge)} (required {u.FormatLength(rd.SideCover, LengthKind.Short)}), " +
                          $"min distance from the begin / end deck-end line {L(minBegin)} / {L(minEnd)}, steel clashes {clash} bars (worst {L(worstClash)}).");
         void D(DiagnosticSeverity s, string m) => cm.Diagnostics.Add(new Diagnostic(s, m));
-        if (dams.Count > 0) CheckEndDams(f, steel, cm, u, dams, sizeOf, D);
+        if (dams.Count > 0) CheckEndDams(f, steel, cm, u, dams, sizeOf, deck.Reinforcement.Plan?.EndDam ?? new List<DeckEndDamBar>(), D);
         if (topShort > 0) D(DiagnosticSeverity.Warning, $"Deck reinforcing check: {topShort} top-mat bars have less than {u.FormatLength(rd.TopCover, LengthKind.Short)} cover to the top of slab (min {L(minTop)}).");
         if (botShort > 0) D(DiagnosticSeverity.Warning, $"Deck reinforcing check: {botShort} bottom-mat bars have less than {u.FormatLength(rd.BottomCover, LengthKind.Short)} cover to the soffit (min {L(minBot)}).");
         if (edgeShort > 0) D(DiagnosticSeverity.Warning, $"Deck reinforcing check: {edgeShort} bars are closer than {u.FormatLength(rd.SideCover, LengthKind.Short)} to a deck edge (min {L(minEdge)}).");
@@ -156,7 +157,7 @@ public static class DeckRebarCheck
     /// and the steel under them. Required clear = 1 1/2" (the smallest clear the end dam sections print); nothing is moved.
     /// </summary>
     private static void CheckEndDams(BridgeFraming f, SteelModel? steel, ConcreteModel cm, UnitSystem u, List<BarPlacement> dams, Dictionary<string, RebarSize> sizeOf,
-        Action<DiagnosticSeverity, string> D)
+        List<DeckEndDamBar> defs, Action<DiagnosticSeverity, string> D)
     {
         var deck = f.Definition.Deck; var a = f.Alignment; var dr = f.Deck!;
         // exact steel test (end dam bars run beside the top flanges): up-facing triangles of the top flanges / splice plates within 3 m of a deck end
@@ -181,7 +182,7 @@ public static class DeckRebarCheck
         double t = deck.Thickness, req = In(1.5);
         double minTop = double.MaxValue, minBot = double.MaxValue, minFace = double.MaxValue, minEdge = double.MaxValue, worstClash = 0;
         int shortBars = 0, clash = 0;
-        var worst = new List<string>();
+        var clashByMark = new SortedDictionary<string, (int n, double worst, string at)>(StringComparer.Ordinal);
         var lk = new object();
         Parallel.ForEach(dams, bar =>
         {
@@ -216,7 +217,12 @@ public static class DeckRebarCheck
             {
                 minTop = Math.Min(minTop, lTop); minBot = Math.Min(minBot, lBot); minFace = Math.Min(minFace, lFace); minEdge = Math.Min(minEdge, lEdge);
                 if (Math.Min(Math.Min(lTop, lBot), Math.Min(lFace, lEdge)) < req - Tol) shortBars++;
-                if (pen > 0) { clash++; worstClash = Math.Max(worstClash, pen); if (worst.Count < 3) worst.Add($"{bar.Mark} at {bar.Points[0].X:F2},{bar.Points[0].Y:F2}"); }
+                if (pen > 0)
+                {
+                    clash++; worstClash = Math.Max(worstClash, pen);
+                    var c = clashByMark.TryGetValue(bar.Mark, out var cc) ? cc : (n: 0, worst: 0.0, at: "");
+                    clashByMark[bar.Mark] = (c.n + 1, Math.Max(c.worst, pen), c.at != "" ? c.at : $"{bar.Points[0].X:F2},{bar.Points[0].Y:F2}");
+                }
             }
         });
         string L(double v) => v == double.MaxValue ? "-" : u.FormatLength(v, LengthKind.Short);
@@ -224,8 +230,19 @@ public static class DeckRebarCheck
             cm.Notes.Add($"Deck end dam bar check ({dams.Count} bars): min clear to the top of slab {L(minTop)}, to the end block / slab soffit {L(minBot)}, to the deck-end face {L(minFace)}, to a deck edge {L(minEdge)}; steel clashes {clash} bars (worst {L(worstClash)}).");
         if (shortBars > 0)
             D(DiagnosticSeverity.Warning, $"Deck reinforcing check: {shortBars} end dam bars have less than {u.FormatLength(req, LengthKind.Short)} clear inside the deck end concrete (top {L(minTop)}, soffit {L(minBot)}, face {L(minFace)}, edge {L(minEdge)}) - not moved.");
-        if (clash > 0)
-            D(DiagnosticSeverity.Warning, $"Deck reinforcing check: {clash} end dam bars pass through the top of the steel (top flanges / splice plates), worst {L(worstClash)}: e.g. {string.Join("; ", worst)} - not moved.");
+        // Steel clashes per mark: a mark the plan lets be field cut (FieldCutNote) is Info quoting the note; any other mark is a PLAN CONFLICT (bars are never moved).
+        string Note(string mark, Func<DeckEndDamBar, string> sel) => defs.Where(d => d.Mark == mark).Select(sel).FirstOrDefault(x => !string.IsNullOrWhiteSpace(x)) ?? "";
+        foreach (var (mark, c) in clashByMark)
+        {
+            string fc = Note(mark, d => d.FieldCutNote);
+            string what = $"{c.n} {mark} end dam bars pass through the top of the steel (top flanges / splice plates), worst {L(c.worst)}, e.g. at {c.at}";
+            if (fc != "") D(DiagnosticSeverity.Info, $"Deck reinforcing check: {what} - field cut per the plan note: {fc}. Not moved.");
+            else
+            {
+                string why = Note(mark, d => d.ConflictNote);
+                D(DiagnosticSeverity.Warning, $"Deck reinforcing check: PLAN CONFLICT: {what} - {(why != "" ? why : "the bars as the plan places them and the steel do not fit")}. Not moved.");
+            }
+        }
     }
 
     private static bool InTri(double x, double y, Vec3 a, Vec3 b, Vec3 c)

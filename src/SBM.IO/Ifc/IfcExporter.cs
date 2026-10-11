@@ -22,6 +22,10 @@ public sealed class IfcExportResult
     /// <summary>Solids written as exact extrusions vs. triangle meshes.</summary>
     public int ExtrudedSolids { get; set; }
     public int TessellatedSolids { get; set; }
+    /// <summary>ReferenceView: solids written as IfcPolygonalFaceSet (recorded extrusions, clipped beam profiles) and the
+    /// chord tolerance (m) used for their hole circles / profile arcs.</summary>
+    public int PolygonalSolids { get; set; }
+    public double ChordTolerance { get; set; }
 }
 
 /// <summary>How solids are written.</summary>
@@ -35,7 +39,9 @@ public enum IfcGeometryMode
     ReferenceView,
 }
 
-public sealed record IfcExportOptions(IfcGeometryMode Geometry = IfcGeometryMode.Parametric);
+/// <param name="ChordTolerance">ReferenceView: max sagitta (m) of the polygons replacing hole circles and profile arcs;
+/// 0 = default 1/32 in (0.79 mm).</param>
+public sealed record IfcExportOptions(IfcGeometryMode Geometry = IfcGeometryMode.Parametric, double ChordTolerance = 0);
 
 /// <summary>
 /// Exports the model to IFC 4.3 (IFC4X3_ADD2) with semantic entities:
@@ -74,7 +80,8 @@ public static class IfcExporter
         var u = project.Units;
         double scale = 1 / u.LongUnit; // meters → project length units
         var w = new StepWriter(tw);
-        w.Header(fileName, "IFC4X3_ADD2", "ReferenceView");
+        bool abv = options.Geometry == IfcGeometryMode.ReferenceView;
+        w.Header(fileName, "IFC4X3_ADD2", abv ? "AlignmentBasedView" : "ReferenceView");
 
         // Base point: rounded center of the first bridge (or first alignment start).
         var basePt = Vec3.Zero;
@@ -91,6 +98,8 @@ public static class IfcExporter
         }
         string P(Vec3 p) => $"({C((p.X - basePt.X) * scale)},{C((p.Y - basePt.Y) * scale)},{C((p.Z - basePt.Z) * scale)})";
         string key = project.Name;
+        // AbV: no extrusions / booleans / half spaces; polygonal face sets instead (IfcReferenceViewGeometry).
+        var rv = abv ? new IfcReferenceViewGeometry(w, P, options.ChordTolerance) : null;
 
         // ---- units
         int lenUnit;
@@ -281,6 +290,7 @@ public static class IfcExporter
         {
             if (m.HasExactSolids && ExtrusionsPay(m) && m.Solids!.All(HolesInside))
             {
+                if (rv != null) return RvShape(m.Solids!.Select(rv.Prism).ToList(), style);
                 extrudedParts++;
                 var items = m.Solids!.Select(e => Extruded(e, style)).ToList();
                 int rep = w.Add("IFCSHAPEREPRESENTATION", $"{Ref(body)},'Body','SweptSolid',{Refs(items)}");
@@ -288,6 +298,13 @@ public static class IfcExporter
             }
             meshParts++;
             return Shape(FaceSet(m, style));
+        }
+
+        int RvShape(List<int> items, int? style)
+        {
+            if (style is { } st) foreach (int it in items) w.Add("IFCSTYLEDITEM", $"{Ref(it)},({Ref(st)}),$");
+            int rep = w.Add("IFCSHAPEREPRESENTATION", $"{Ref(body)},'Body','Tessellation',{Refs(items)}");
+            return w.Add("IFCPRODUCTDEFINITIONSHAPE", $"$,$,({Ref(rep)})");
         }
 
         var materials = new Dictionary<string, List<int>>();
@@ -300,6 +317,7 @@ public static class IfcExporter
         var miscStatus = new List<(int id, SBM.Core.Assumption a)>();
         // Debonded strands: Pset SBM_Debonding (tendon id, its key, lengths from the start / end of the beam, plan symbol).
         var debondPsets = new List<(int id, string key, double start, double end, string symbol)>();
+        var pipePiles = new List<(int id, string key, double diameter, double shell)>();   // CIP pipe piles -> SBM_PipePile
 
         // Beam with an exact profile (true arcs): IfcArbitraryClosedProfileDef over an IfcIndexedPolyCurve (IfcLineIndex /
         // IfcArcIndex), extruded along the sloped beam axis and clipped by the two end planes (IfcBooleanClippingResult).
@@ -512,6 +530,8 @@ public static class IfcExporter
         // Substructure: one IfcBridgePart (PIER / ABUTMENT) per support under a SUBSTRUCTURE part; caps (IfcBeam PIERCAP),
         // backwalls (IfcWall RETAININGWALL), pedestals and columns (IfcColumn), drilled shafts and piles (IfcPile),
         // footings (IfcFooting) and reinforcing.
+        // Steel area share of a concrete-filled pipe of outside diameter d and wall t (0 when t is not given).
+        static double PipeShellShare(double d, double t) => double.IsNaN(t) || d <= 0 ? 0 : 1 - Math.Pow(Math.Max(d - 2 * t, 0) / d, 2);
         int ExportSubstructure(SBM.Core.Substructure.SubstructureModel sub, string bk, int partPl, int pl)
         {
             int subPart = w.Add("IFCBRIDGEPART", $"{Guid(IfcKeys.SubPart(bk))},$,'Substructure',$,$,{Ref(partPl)},$,$,.ELEMENT.,.LATERAL.,.SUBSTRUCTURE.");
@@ -544,16 +564,20 @@ public static class IfcExporter
                         SBM.Core.Substructure.SubElementKind.Pedestal => w.Add("IFCCOLUMN", $"{common},'PEDESTAL',{Ref(pl)},{Ref(pds)},$,.USERDEFINED."),
                         SBM.Core.Substructure.SubElementKind.Column => w.Add("IFCCOLUMN", $"{common},$,{Ref(pl)},{Ref(pds)},$,.PIERSTEM."),
                         SBM.Core.Substructure.SubElementKind.DrilledShaft => w.Add("IFCPILE", $"{common},'DRILLED_SHAFT',{Ref(pl)},{Ref(pds)},$,.BORED.,$"),
+                        // CIP concrete-filled pipe pile: ONE IfcPile, ConstructionType COMPOSITE (steel shell + concrete fill), shell in SBM_PipePile.
+                        SBM.Core.Substructure.SubElementKind.Pile when so.ShellThickness != 0 => w.Add("IFCPILE", $"{common},'CIP_PIPE_PILE',{Ref(pl)},{Ref(pds)},$,.DRIVEN.,.COMPOSITE."),
                         SBM.Core.Substructure.SubElementKind.Pile => w.Add("IFCPILE", $"{common},$,{Ref(pl)},{Ref(pds)},$,.DRIVEN.,$"),
                         // Generic mechanical splice coupler between column bars and footing dowels (IFC4X3 PredefinedType COUPLER).
                         SBM.Core.Substructure.SubElementKind.Coupler => w.Add("IFCMECHANICALFASTENER", $"{common},'REBAR_COUPLER',{Ref(pl)},{Ref(pds)},$,$,$,.COUPLER."),
                         _ => w.Add("IFCFOOTING", $"{common},$,{Ref(pl)},{Ref(pds)},$,{footingType}"),
                     };
                     contained.Add(id);
-                    string mat = so.IsConcrete ? concreteMat : so.Kind == SBM.Core.Substructure.SubElementKind.Coupler ? "Steel (mechanical splice coupler)" : "ASTM A572 Gr. 50 (HP piling)";
+                    string mat = so.ShellThickness != 0 ? "Steel pipe shell, concrete filled" : so.IsConcrete ? concreteMat : so.Kind == SBM.Core.Substructure.SubElementKind.Coupler ? "Steel (mechanical splice coupler)" : "ASTM A572 Gr. 50 (HP piling)";
                     AddMaterial(mat, id);
                     double vol = Math.Abs(so.Mesh.Volume());
-                    psetTargets.Add((id, so.Name, so.Description, 0, vol * (so.IsConcrete ? 2400 : 7850)));
+                    double steelShare = so.ShellThickness != 0 ? PipeShellShare(unit.Definition.PileSize, so.ShellThickness) : so.IsConcrete ? 0 : 1;
+                    psetTargets.Add((id, so.Name, so.Description, 0, vol * (steelShare * 7850 + (1 - steelShare) * 2400)));
+                    if (so.ShellThickness != 0) pipePiles.Add((id, uk + "/pipe-pile/" + k, unit.Definition.PileSize, so.ShellThickness));
                 }
                 var marks = sub.Marks.Where(m => m.Unit == unit.Name).ToDictionary(m => m.Mark);
                 ExportBars(sub.Bars.Where(b => b.Unit == unit.Name).Select(b => (b, marks[b.Mark])), i => IfcKeys.SubBar(uk, i), contained, pl, unit.Definition.Reinforcement.SteelYieldKsi);
@@ -668,10 +692,12 @@ public static class IfcExporter
                 string k = IfcKeys.PsAssembly(bk, b.Mark);
                 int asm = w.Add("IFCELEMENTASSEMBLY", $"{Guid(k)},$,{S(b.Mark)},{S($"{b.TypeName} prestressed girder")},$,{Ref(pl)},$,{S(b.Mark)},.FACTORY.,.GIRDER.");
                 contained.Add(asm);
-                int pds = b.Body != null && b.Shape.Profile != null ? ProfileBody(b, beamStyle) : Body(b.Mesh, beamStyle);
+                int pds = b.Body != null && b.Shape.Profile != null
+                    ? rv != null ? RvShape(new List<int> { rv.ClippedBeam(b.Body, b.Shape.Profile) }, beamStyle) : ProfileBody(b, beamStyle)
+                    : Body(b.Mesh, beamStyle);
                 string desc = $"{b.TypeName}, {b.Strands.Count} - {bStrandSize} strands ({b.Strands.Count(x => x.Depressed)} depressed" +
                               (b.Strands.Any(x => x.Debonded) ? $", {b.Strands.Count(x => x.Debonded)} debonded" : "") + $"), L = {u.FormatLength(b.Length)}";
-                int beam = w.Add("IFCBEAM", $"{Guid(IfcKeys.PsBeam(bk, b.Mark))},$,{S(b.Mark)},{S(desc)},$,{Ref(pl)},{Ref(pds)},{S(b.Mark)},.GIRDER.");
+                int beam = w.Add("IFCBEAM", $"{Guid(IfcKeys.PsBeam(bk, b.Mark))},$,{S(b.Mark)},{S(desc)},$,{Ref(pl)},{Ref(pds)},{S(b.Mark)},.GIRDER_SEGMENT.");
                 AddMaterial(b.Definition == null ? concreteMat : bConcrete, beam);
                 psetTargets.Add((beam, b.Mark, b.TypeName, b.Length, b.Mass));
                 if (b.Assumption != null) miscStatus.Add((beam, b.Assumption));
@@ -920,7 +946,7 @@ public static class IfcExporter
                 {
                     1 => ("Anchor bolt", boltRef!.Diameter, ".ANCHORBOLT.", "ASTM F1554"),
                     2 => ("Shear stud", steel.StudDiameter, ".STUDSHEARCONNECTOR.", "ASTM A108 (AWS D1.5 Type B)"),
-                    _ => ("Bolt", boltRef is { Diameter: > 0 } ? boltRef.Diameter : steel.Bolt.Diameter, ".BOLT.", $"ASTM F3125 Gr. {steel.BoltGrade}"),
+                    _ => ("Bolt", boltRef is { Diameter: > 0 } ? boltRef.Diameter : steel.Bolt.Diameter, ".BOLT.", (steel.BoltGrade.StartsWith("ASTM") ? steel.BoltGrade : $"ASTM F3125 Gr. {steel.BoltGrade}")),
                 };
                 var k2 = (kind, (long)Math.Round(bolt.Grip * 1e5), (long)Math.Round(bolt.Length * 1e5),
                     kind == 1 ? (long)Math.Round(boltRef!.Diameter * 1e5 + boltRef.Embedment * 1e9) : kind == 0 ? (long)Math.Round(dia * 1e5) : 0L);
@@ -1043,6 +1069,20 @@ public static class IfcExporter
             w.Add("IFCRELDEFINESBYPROPERTIES", $"{Guid(sk + "/reldebond")},$,$,$,({Ref(id)}),{Ref(pset)}");
         }
 
+        foreach (var (id, pk, dia, shell) in pipePiles)
+        {
+            var props = new List<int>
+            {
+                w.Add("IFCPROPERTYSINGLEVALUE", "'PileType',$,IFCLABEL('CIP concrete-filled steel pipe'),$"),
+                w.Add("IFCPROPERTYSINGLEVALUE", $"'OutsideDiameter',$,IFCPOSITIVELENGTHMEASURE({R(dia * scale)}),$"),
+            };
+            if (!double.IsNaN(shell)) props.Add(w.Add("IFCPROPERTYSINGLEVALUE", $"'ShellThickness',$,IFCPOSITIVELENGTHMEASURE({R(shell * scale)}),$"));
+            else props.Add(w.Add("IFCPROPERTYSINGLEVALUE", "'ShellThickness',$,IFCLABEL('UNRESOLVED: not given'),$"));
+            props.Add(w.Add("IFCPROPERTYSINGLEVALUE", "'Fill',$,IFCLABEL('concrete'),$"));
+            int ps = w.Add("IFCPROPERTYSET", $"{Guid(pk + "/pipepile")},$,'SBM_PipePile',$,{Refs(props)}");
+            w.Add("IFCRELDEFINESBYPROPERTIES", $"{Guid(pk + "/relpipepile")},$,$,$,({Ref(id)}),{Ref(ps)}");
+        }
+
         foreach (var (id, a) in miscStatus)
         {
             int q1 = w.Add("IFCPROPERTYSINGLEVALUE", $"'Status',$,IFCLABEL({S(a.Status)}),$");
@@ -1056,6 +1096,7 @@ public static class IfcExporter
         result.EntityCount = w.Count;
         result.ExtrudedSolids = extrudedParts;
         result.TessellatedSolids = meshParts;
+        if (rv != null) { result.PolygonalSolids = rv.FaceSets; result.ChordTolerance = rv.ChordTolerance; }
         return result;
     }
 }
