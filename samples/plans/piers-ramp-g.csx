@@ -268,7 +268,7 @@ foreach (var p in new (string name, double xRoad, double half, double eL, double
 
 // ---- Plan pedestal sizes (inches: along the cap x across it): cap plan / pedestal bar layout of each pier sheet (e.g. 1G "2'-6 | 2'-6 = 5'-0" along, "6 | 5 SPA. @ 1'-0 | 6"
 // = 6'-0" across; 16G 7'-2 x 5'-8) and confirmed by the 5m1 / 5n1 U-bar bases (base + 4" = pedestal); docs/plan-data/pier-pedestals.md. 5G and 14G: ONE block per girder
-// line carries the back and ahead bearing (24 5n1 bars = 4 blocks x 6). NOT set: 9G (separate back / ahead pedestals 17" apart in elevation, bar groups 5n1 + 5n3), 19G (two rows
+// line carries the back and ahead bearing (24 5n1 bars = 4 blocks x 6). NOT set: 9G (separate back / ahead pedestals about 11" (0.91-0.92 ft) apart in elevation, bar groups 5n1 + 5n3), 19G (two rows
 // of different bridges on the shared line).
 {
     var peds = new Dictionary<string, (double along, double across, bool shared)>
