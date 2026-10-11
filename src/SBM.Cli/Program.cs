@@ -404,8 +404,8 @@ public static class Program
             double moff = g.Sum(r => offVol.GetValueOrDefault((r.Bridge, r.Element), double.NaN));
             double maxOff = g.Max(r => Math.Abs(offVol.GetValueOrDefault((r.Bridge, r.Element), double.NaN) / r.ExactVolume - 1) * 100);
             double maxOn = g.Max(r => Math.Abs(r.VolumeDiffPercent));
-            Console.WriteLine($"{g.Key,-28} {g.Count(),5} {g.Sum(r => r.Faces),7} {g.Sum(r => r.Holes),6} {In3(ex),14:F3} {(mon / ex - 1) * 100,8:+0.0000;-0.0000}% max {maxOn:0.000}% " +
-                $"{(moff / ex - 1) * 100,8:+0.0000;-0.0000}% max {maxOff:0.000}% {g.Max(r => r.MaxDeviation) * 1000,9:0.0000} mm");
+            Console.WriteLine($"{g.Key,-28} {g.Count(),5} {g.Sum(r => r.Faces),7} {g.Sum(r => r.Holes),6} {In3(ex),14:F3} {(mon / ex - 1) * 100,8:+0.0000;-0.0000;0.0000}% max {maxOn:0.000}% " +
+                $"{(moff / ex - 1) * 100,8:+0.0000;-0.0000;0.0000}% max {maxOff:0.000}% {g.Max(r => r.MaxDeviation) * 1000,9:0.0000} mm");
         }
         if (Opt("--csv") is { } csv)
         {

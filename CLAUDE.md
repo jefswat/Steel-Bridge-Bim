@@ -34,7 +34,7 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   (`v_element_sheets`). `tools/plan_split.py` splits plan PDFs. App: `MainWindow.Database.cs` + `SBM.App/Database/` (panel, preview window).
   Keep `ModelDatabase.Builder` numbering in step with `IfcExporter` (test `GlobalIds_AreTheIfcGlobalIds`). CLI `sbm db`, docs in docs/API.md.
 - `src/SBM.Cli` — `sbm.exe` command line over SBM.Api (new/info/get/set/add/remove/import-landxml/regen/export/run/bench/
-  elevations/drawings/sheets).
+  elevations/drawings/sheets/nurbs).
 - `src/SBM.Core` â€” no UI. All geometry and the parametric model.
   - `Geometry/` Vec2/Vec3 (double), Box2, Numerics (Gauss-Legendre, Brent, FindRoots, line intersection).
   - `Alignments/` `HorizontalElement` = one class for line/arc/clothoid (linear curvature K0â†’K1, partial spirals OK);
@@ -61,6 +61,27 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
     0.5 mm) for IFC IfcIndexedPolyCurve (IfcArcIndex). Spirals stay true helices in the model (32 samples/turn, exact
     length; close end turns climb 1 db/turn); IFC has no helix, arcs stay within 0.5 mm. Long curved deck bars stay
     polylines (IfcOpenShell mis-sweeps flat 3D arcs).
+  - Exact curved geometry (NURBS, project setting `BridgeProject.Geometry` = `GeometrySettings`: `ExactCurvedGeometry` default OFF, `FitTolerance`
+    0 = 1/256" US / 0.1 mm SI, `ChordTolerance` 0 = today's sample density; saved in the .sbm only when non-default; app ribbon "Units & geometry";
+    part of the RegenerationCache key). OFF must leave every output byte-identical (checked: IFC of Woodbury / Ramp G U4 vs the base build).
+    Math in `Geometry/Nurbs/` (no kernel): `BSpline` (Cox-de Boor basis + derivatives, knot checks), `NurbsCurve` / `NurbsSurface` (rational,
+    derivatives, closest point, ruled, ReversedV), `NurbsArc` (exact rational quadratic arcs), `NurbsFit.FitCommon` (several curves on ONE
+    knot vector, LSQ with ends + C0 breaks interpolated, adaptive knot insertion until the same-parameter deviation <= tol) and `Interpolate`.
+    B-rep light `Solids/NurbsSolid` (faces = NURBS surface whose whole domain is the face, Su x Sv OUTWARD, or planar polygon; `NurbsHole`
+    circular trims; Volume (divergence theorem, Gauss per knot span) / Area / Bounds), `NurbsSweep` (polygon section swept: corner curves fitted
+    together, ruled faces, planar ends; plates (s, w, t) with holes -> half-cylinder walls; `PlateMap` = bilinear blend used to TESSELLATE),
+    `NurbsSlab` (deck: panels along x bands across, tensor surfaces, bottom = top translated by the depth; panels fit in parallel),
+    `NurbsSection.Cut` (exact plane section points), `NurbsReport`. Fit to the generators' EXACT functions, never to triangles:
+    `GirderPath.Exact` / `ExactAt` / `ExactPoint` / `ExactBreaks` (FramingGenerator: span curves + `WebTopAt`; chorded spans / extensions = the
+    linear path; breaks at span ends, grade / cross-slope kink stations `ConcreteGenerator.KinkStations`), carried through terminations /
+    beginnings. Generators: `SteelNurbs.LongPlate` (girder flanges / webs, field splice plates, fillers; only when the plate is curved; hole at
+    an edge -> today's plate + fallback reason), `ConcreteNurbs` (deck: hard columns = edges, gutter lines, pivot, cross-slope break offsets,
+    CUT (inset) kinked-end vertices; panels at kink stations, clamped to skewed ends + per-panel columns where a kink line meets an end;
+    haunch per girder split at per-span-layout jogs; barriers). The mesh is tessellated FROM the NURBS (`Mesh.Nurbs`, `NurbsTriangles`,
+    `HasExactNurbs`, `ExactVolume()`); every consumer (viewport, drawings, checks, IFC, quantities) still reads the mesh. Opt-ins: `SteelPart.ExactVolume`,
+    `NurbsQuantities.Rows` / `SbmDocument.ExactQuantities`, `sbm nurbs` (timings off/on, fallbacks, exact vs mesh volumes, csv). Not wired yet:
+    drawings section cuts, view-dependent viewport tessellation, welds / stiffeners / deck end blocks / joint shelves (stay meshes).
+    Cost (2026-10-11): I-80 + Ramp G full regen 27 s OFF -> 41 s ON; Woodbury 0.2 -> 1.1 s cold. Tests `NurbsTests`.
   - `Solids/PlateBuilder.cs` â€” plates WITH HOLES: polygon+holes triangulation (horizontal bridge to the +x ray hit â€”
     don't change to a vertex bridge; that crossed unmerged holes and caused the bearing-stiffener artifact), long girder
     plates built in strips/cells (â‰¤1 hole per cell keeps it linear), Sutherlandâ€“Hodgman half-plane clip.

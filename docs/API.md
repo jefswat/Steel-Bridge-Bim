@@ -61,6 +61,9 @@ sbm export "C:\Jobs\Br12\Br12.sbm" --ifc Br12.ifc --dxf Br12.dxf --landxml Br12.
 sbm export "C:\Jobs\Br12\Br12.sbm" --ifc Br12.ifczip   # compressed IFC-ZIP (about 5x smaller; same model inside)
 sbm run    "samples\scripts\web-depth-study.csx" "C:\Jobs\Br12\Br12.sbm"
 sbm bench  "C:\Jobs\Br12\Br12.sbm"
+sbm set    "C:\Jobs\Br12\Br12.sbm" "Geometry.ExactCurvedGeometry=true"   # project setting: exact NURBS for curved parts (default off)
+sbm nurbs  "C:\Jobs\Br12\Br12.sbm" [--bridge "Br12 Unit 2"] [--chord 1/32"] [--tol 1/256"] [--csv nurbs.csv]
+                                                 # regenerates with the setting off and on: timings, what became NURBS, fit deviation, exact vs mesh volumes
 sbm sheets     "C:\Jobs\Br12\Br12.sbm" "C:\Jobs\Br12\Br12 Sheets.pdf"   # 11x17 plan set (vector PDF)
 sbm compare-sheets "C:\Jobs\Br12\Br12.sbm" "Br12 Unit 2" --plans "C:\Jobs\Br12\plans" --db Br12.sqlite --out compare.pdf
                                                  # each generated sheet side by side (vector) with the matching plan page + checklist/QC strip; needs Python + PyMuPDF
@@ -206,6 +209,30 @@ doc.ExportIfc("Br12.ifc");
 `deck-rebar-ramp-g.csx` (C# scripts building it from the plan sheets) and `docs/plan-data/deck-rebar.md`. After `Regenerate`, `Doc.Concrete(bridge).Marks / Bars / Notes / Diagnostics` give the placed
 marks (plan marks 7a1, 6b1, ...), the per-mark comparison with the plan bar list and the containment check ("Deck rebar containment check ..."). `samples/plans/report-deck-rebar.csx` prints the comparison,
 `check-deck-rebar.csx` the containment check. Plain numbers in paths follow the field's display unit (`StartDistance`, `Length` in ft; `Spacing`, `LeftMargin`, `TransverseBeginClear` in inches).
+
+## Exact curved geometry (NURBS)
+
+Project setting `Geometry` (saved in the .sbm only when changed; app ribbon "Units & geometry" > "Exact curves"):
+
+| Path | Default | Meaning |
+|---|---|---|
+| `Geometry.ExactCurvedGeometry` | `false` | Curved parts are built as exact NURBS solids and their meshes tessellated from them. Off = everything exactly as before. |
+| `Geometry.FitTolerance` | `0` | Maximum deviation of the NURBS from the generator's exact geometry; 0 = 1/256" (US) / 0.1 mm (SI). Plain numbers in inches / mm. |
+| `Geometry.ChordTolerance` | `0` | Chord tolerance of the derived meshes; 0 = today's sample density (same vertex layout, vertices on the NURBS). |
+
+What carries NURBS: girder flange and web plates (incl. bolt holes as circular trims + half-cylinder walls), field splice
+plates and fillers on curved / graded girders, the deck slab (bands between crown / gutter / break / kinked-end columns,
+panels between grade and cross-slope kink stations), haunches and barriers. Straight parts are unchanged. Each such mesh has
+`Mesh.Nurbs` (`NurbsSolid`: faces = `NurbsSurface` or planar polygon, `NurbsHole` trims) and `Mesh.ExactVolume()`;
+`SteelPart.ExactVolume`, `SteelModel.Nurbs` / `ConcreteModel.Nurbs` (`NurbsReport`: counts, fallbacks with reasons, worst fit),
+`Doc.ExactQuantities()` (exact vs mesh volume / area per element), `NurbsSection.Cut(solid, point, normal)` (exact plane
+section: points on the NURBS surfaces). Quantities, drawings, checks, viewport and IFC keep using the meshes.
+
+```csharp
+Doc.Set("Geometry.ExactCurvedGeometry", "true");
+Doc.Regenerate();
+foreach (var r in Doc.ExactQuantities("Br12 Unit 2")) Print($"{r.Element} {r.Kind}: exact {r.ExactVolume:F4} m3, mesh {r.VolumeDiffPercent:+0.000;-0.000}%");
+```
 
 ## Performance notes
 
