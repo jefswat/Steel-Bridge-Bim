@@ -152,10 +152,9 @@ public sealed partial class MiscItemsGenerator
             Add(MiscGroup.Drainage, MiscKind.DrainPipe, asm, asm + " collector end", $"{coll.Name} elbow down toward the pier collection box", em, "ASTM A53 Gr B, galvanized");
             if (e.Z > zFl) Record(asm, "collector end", e, e.XY.WithZ(zFl), coll.Od / 2, sl.Station);
             string clash = "";
-            if (e.Z > zFl && _steelIndex.Count + 0 >= 0)
+            if (e.Z > zFl)
             {
                 var (cc, ag, _) = MiscMesh.Clearance(_steelIndex, e, e.XY.WithZ(zFl), coll.Od / 2);
-                var bs = _sub.Units.Where(u => u.SupportIndex == j).ToList();
                 clash = double.IsNaN(cc) ? "" : $" Modeled drop clearance to steel: {Sh(cc)} to {ag}.";
             }
             Flag(asm + " collector end", $"The plans (Ramp G PDF 154 partial plan, PDF 157) do not give the routing of the span 19G collector from its end at the bearing line to the pier collection box ({Sh(dd)} apart in plan).{clash} The straight drop also overlaps the Pier 19G masonry plate where modeled (see the clearance records).",
