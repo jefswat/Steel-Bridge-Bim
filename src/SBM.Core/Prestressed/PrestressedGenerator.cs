@@ -184,7 +184,7 @@ public static class PrestressedGenerator
                     assumption = Assumption.Unresolved(
                         (pd.Placement == StandardBeamPlacement.AtPierBearing
                             ? $"placement 'at the pier bearing' of the standard {typeName} beam is ambiguous (both or neither end at a pier)"
-                            : $"the layout CL-CL bearing distance differs from the standard {typeName} CL-CL bearing length by more than 1/16\" and the plans do not say where the standard beam sits between the layout bearings (Placement not set)") +
+                            : $"placement of the standard {typeName} beam is not set: the layout CL-CL bearing distance differs from its standard CL-CL bearing length by more than 1/16\" and the plans do not say where it sits between the layout bearings") +
                         (pd.Source != "" ? $" ({pd.Source})" : ""),
                         "centred between the layout bearings (display only)");
             }

@@ -468,7 +468,7 @@ public sealed partial class ConcreteGenerator
     /// <summary>Haunch ring stations: the girder path samples plus points at most 1.5 m apart in between, so the haunch top follows the
     /// deck soffit (profile / vertical curve, cross slope) along straight chords whose path has samples only at the span ends
     /// (prestressed beams, chorded girders). Path jogs (samples &lt; 0.1 mm apart, per-span layouts) are kept as they are.</summary>
-    internal static List<double> HaunchSamples(IReadOnlyList<double> ss)
+    public static List<double> HaunchSamples(IReadOnlyList<double> ss)
     {
         var r = new List<double>(ss.Count * 2);
         for (int i = 0; i < ss.Count; i++)
