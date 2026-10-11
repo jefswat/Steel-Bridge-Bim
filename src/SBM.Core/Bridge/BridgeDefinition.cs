@@ -735,11 +735,15 @@ public sealed class CrossFrameLine
     /// <summary>Bays (by left girder index) that get a frame on this line; null = every bay the line crosses
     /// (plans: frames staggered through skewed supports use only some bays of each line).</summary>
     public List<int>? Bays { get; set; }
+    /// <summary>Plan items of this line that are not dimensioned or that conflict between dimensions (with the plan page);
+    /// raised as UNRESOLVED warnings with the line location, nothing is changed by them.</summary>
+    public List<string> Unresolved { get; set; } = new();
     public CrossFrameLine Clone()
     {
         var c = (CrossFrameLine)MemberwiseClone();
         c.BayStyles = new Dictionary<int, string>(BayStyles);
         c.Bays = Bays?.ToList();
+        c.Unresolved = Unresolved.ToList();
         return c;
     }
 }

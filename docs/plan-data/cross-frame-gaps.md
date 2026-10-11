@@ -154,6 +154,8 @@ Items marked UNRESOLVED need a visual check of the original drawing (PDF 110: A 
 
 ## 3. Unit 3 (sheets 112, 113A, 114 = PDF 115, 117, 118)
 
+(Superseded by section 8 - the partial lines are now placed from the plan dimensions; the table below is the first pass.)
+
 Does NOT follow the Unit 2 rule exactly - the plan dims do not equal the model bearing offsets:
 
 | plan | plan value | model (line thru next bearing) |
@@ -256,7 +258,7 @@ Checks: the K-string distances land on the table values (8WB 734.771, 9WB 934.36
 bearing crosses A 21.939 ft ahead of A's bearing (plan 21'-11 1/4 = 21.9375), L4 +10.640, L5 +22.417; B's bearing at 17G 627.183 ft as in the report; the link frame's
 plan length is 9.687 ft; no frame lines of the new inputs fall in splice plates or within 3 ft of a bearing (generator reports none).
 
-Raised, not placed (UNRESOLVED):
+Raised, not placed (UNRESOLVED) - first pass; see section 8 for what was settled since:
 - 8WB K radial, bay B-F: the line lies 0.045 ft from the centre line of the cross girder XG-C (C ends 59'-1 1/16 past its 8WB bearing), so a B-F frame cannot be built there;
   the generator reports it. Either the plan's mark is the cross girder itself or the line is mis-read - check PDF page 110.
 - 8WB A radial bay B-C (hidden by the "9'-0 13/16" dimension); 8WB G radial bay G-H and the I radial's types are entered as in the report's input block (the table text
@@ -267,3 +269,79 @@ Raised, not placed (UNRESOLVED):
 - Unit 3 12WB/13WB partial lines (section 3) and the Pier 16G zone of Ramp G were not placed.
 Resolved: top gusset 2 bolt rows (styles), I-80 abutment bottom rows 6" apart, Ramp G abutment W24x68 top 4" below the top of the top flange (work point 14.975" below the
 top of web with tf = 7/8").
+
+## 8. Second pass (2026-10-11): Unit 3 partial lines, Ramp G 16G zone, visual checks
+
+Method: frame linework per bay from the PDF vectors (`temp\cf\gen2.py`: non-straddling 0.6 pt segments, x per bay), identified against
+radial test lines generated in the model ONE LINE PER RUN (`temp\cf\probe1.csx`). Note: the first pass (section 3) probed several lines in one
+run and matched frames by the crossing at the reference girder; a line within 6" of a bearing snaps to it, so frames of a different line were
+picked up. That is why section 3 read "21.999 vs 21.932": both numbers are right, for two different lines (F's bearing radial / the A dim).
+
+### 8.1 I-80 Unit 3, Pier 12WB (PDF 115) - placed
+
+Drawn lines near the pier (x at mid-bay A-B, pt; model crossing relative to each girder's 12WB bearing):
+
+| drawn line | bays drawn | model / plan |
+|---|---|---|
+| J - 66'-1 (556-565) | all | J string, unchanged |
+| J - 45'-2 1/4 (596..632) | B-C..I-J (A-B absent: it would lie on the pier line, A-2.01 / B-5.50) | J string, bay A-B removed |
+| A + 21'-11 3/16 (673..686) | A-B, B-C, C-D, D-E, G-H, H-I, I-J (one straight line; E-F, F-G absent) | new line (Girder A, A's bearing + 21.932); crosses E at +5.007 = the "5'-0" (E's bearing to the line), J at -20.320 |
+| I + 6'-11 3/8 (714..727) | A-B..H-I (I-J absent) | new line (Girder I, I's bearing + 6.948); identical to the radial through J's ahead jacking stiffener (J + 2'-0, A +43.436 both ways) |
+| J + 23'-0 (749..765) | C-D..I-J (A-B/B-C at B's cross girder) | J string, unchanged |
+
+Checks: pier-line spacings A-B 8'-5 1/4, B-C 8'-7 7/8 = model 8.4375 / 8.6563 ft. The J-string line at J - 22'-7 1/8 (2 SPA @ 22'-7 1/8 = 45'-2 1/4)
+is NOT drawn: the lower bays G-H..I-J lie on the A + 21'-11 3/16 line (collinear with the upper bays to 0.2 pt; scaled I-J crossing I - 15.2 vs
+-15.26 for that line and -17.53 for J - 22.6). Modeled per the A / E dims and raised as UNRESOLVED (plan conflict) on that line.
+The line is drawn through F's bearing; in the model F's bearing radial crosses A at +21.999 (0.067 ft from the dim) - noted in the same warning.
+The I + 6'-11 3/8 line: frame linework scales about 2 ft further ahead than the dimension (A about +45.5); placed by the dimension, raised as UNRESOLVED.
+The small "half circle" dims are not to scale on this sheet (5'-0 is drawn 6.7 pt = 3.9 ft, 6'-11 3/8 13.4 pt = 7.7 ft at 1.73 pt/ft).
+
+### 8.2 I-80 Unit 3, Pier 13WB (PDF 117, sign support location plan PDF 180) - placed
+
+| drawn line | bays drawn | model / plan |
+|---|---|---|
+| J - 33'-11 15/16 (356-361) | all | J string, unchanged |
+| J - 16'-11 15/16 (397) | H-I, I-J only | J string, bays A-C..G-H removed (A-E is the G radial below; F-G, G-H absent) |
+| A + 16'-1 15/16 (412) | A-C, C-D, D-E | new line (Girder A); crosses E at +7.995 = the "8'-0" along E |
+| A + 29'-0 13/16 (+12'-10 7/8; 438-440) | A-C only | new line; it is the sign truss support bracket line (box on PDF 117, "CL sign truss support brackets" 7'-4 apart on PDF 180); the frame is drawn beside the bracket stiffener as on the J + 9'-4 line |
+| A + 36'-5 (+7'-4 1/8) = J + 9'-4 (455-457) | all | J string, unchanged: the model crosses A at +36.416 = the chain 16'-1 15/16 + 12'-10 7/8 + 7'-4 1/8 to 0.000 ft |
+
+UNRESOLVED (raised on the A + 16'-1 15/16 line): it is drawn through G's bearing, but G's bearing radial crosses A at +16.009 (0.15 ft from the
+plan chain, consistent at A and E) - check G's 13WB bearing / girder geometry. Pier-line spacings at 13WB: A-C 6'-3 7/16, C-D 6'-9 1/16 (300 dpi
+clips) vs model 6.345 / 6.707 ft; A-D 13.042 vs 13.052: girder C's 13WB bearing is about 0.05 ft off along the pier line (model input, not a cross
+frame item).
+
+### 8.3 Ramp G Unit 4, Pier 16G zone (sheet 98 = PDF 100) - transcribed
+
+"3 SPA @ ABT. 14'-7 9/16 = 43'-10 5/8" along A and along D = one radial line through each girder's CL bearing (jacking stiffeners 3'-3 each
+side): the model's radials through B, C, D cross A at +14.629, +29.258, +43.887 and D at -29.258, -14.629. Types (circle marks both sides of each
+frame, 220 dpi): A line (2, 2, 2); B line (3, 3, 2); C line (2, 3, 3); D line (2, 2, 2). The earlier input had C-D = Type 3 on the B line (now 2) and
+equal A-string spaces (now per-girder bearing lines). Pier 17G zone (sheet 99 = PDF 101): re-read, types and lines as section 4/7 (no change).
+
+### 8.4 Visual checks on PDF 110 (8WB) - settled from the vectors
+
+- A radial bay B-C: ABSENT. No 0.6 pt linework at x 788-789 between B (y 122.6) and C (y 135.6); only the 0.24 pt "9'-0 13/16" dimension crosses there.
+  The connection ticks are one-sided (at B toward A-B, at C toward C-F), as on the C radial whose B-C bay is also empty. (Input unchanged.)
+- G radial bay G-H: PRESENT. Frame pieces at x 850.1-850.3, y 175.4-179.8 and 188.0-195.2 either side of the "42 41'27"" text (y 181-188), and a
+  one-sided tick at H. (Input unchanged.)
+- I radial types: double lines + "4" marks only in C-F and F-G = Type 4 in bays 2 and 5; A-B, B-C single lines = Type 3 (the input block was right).
+- K radial "bay B-F": the line inside the cross girder callout (obround) is the cross girder XG-C itself (C ends 59'-1 1/16 past 8WB; the radial is
+  0.045 ft from its CL) - removed from the K line's bays; its "not generated" warning is gone.
+
+### 8.5 Counts and warnings (model copy, scripts re-run: cross-frames-i80.csx then cross-frames-ramp-g.csx)
+
+| unit | before | after |
+|---|---|---|
+| I-80 Unit 1 | 272 | 272 |
+| I-80 Unit 2 | 450 | 450 (K line bay B-F was never generated) |
+| I-80 Unit 3 | 331 (293 x 5) | 336 (298 x 5): 12WB +6 (A-B removed, J-22.6 line 8 -> A+21.93 line 7, I line +8), 13WB -1 (J-17 line 7 -> 2, +3, +1) |
+| Ramp G Unit 4 | 144 (16 x 2, 9 x 3) | 144 (17 x 2, 8 x 3) |
+
+Generator warnings: removed - the 8WB K radial B-F "listed but NOT generated" (Unit 2) and the five Unit 3 "closer than 3.0 ft to a bearing"
+(113.12, 135.71 x2, 336.31 x2 along J). Added - three UNRESOLVED line notes (`CrossFrameLine.Unresolved`, above). Remaining frames inside splice
+plates: five in Unit 3, all plan-consistent by dimension: J + 69'-2 3/8 (11WB string) A-B / B-C at 2.18 ft from FS22 on B (B: F.S. 22 to Pier 12WB
+= 50'-0), J + 115'-0 (12WB string) D-E / E-F / F-G at 2.22 ft (E) and 2.02 ft (F) from FS24 - kept, not next to the piers. (The 7 near-splice
+frames of the earlier handoff are gone; Ramp G and I-80 Units 1-2 report none.)
+
+New input: `CrossFrameLine.Unresolved` (notes raised as "Frame line ... UNRESOLVED (plan, nothing invented) - note"; the frames are generated
+as listed).

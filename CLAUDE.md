@@ -260,7 +260,8 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   Tee`); unknown sections are reported. Gap inputs (docs/plan-data/cross-frame-gaps.md "Implementation"): `CrossFrameDefinition.Links` (`CrossFrameLink`: frame
   between girder g1 at support / aux support line s1 and g2 at s2 - plane through the two CL bearings, E-F at Pier 6A / 5WB), `SupportBayStyles[support][bay]`
   (Type 6 in bay A-D at 14WB/15WB), `CrossFrameStyle.BottomBoltPitch`, `CrossFrameStyle.Unresolved` (plan items not dimensioned: raised once per bridge as UNRESOLVED
-  warnings, nothing invented), per-girder lines at skewed piers (Girder = X, Distance = X's bearing distance, explicit Bays) and a warning for every listed bay a
+  warnings, nothing invented), `CrossFrameLine.Unresolved` (per-line plan conflicts / undimensioned items, raised with the line location; frames still
+  generated as listed), per-girder lines at skewed piers (Girder = X, Distance = X's bearing distance, explicit Bays) and a warning for every listed bay a
   line cannot generate (`BuildFrameLines`). Plan data: `samples/plans/cross-frames-i80.csx`, `cross-frames-ramp-g.csx`.
   Rolled sections come from the embedded AISC Shapes Database v16.0 extract `Steel/AiscShapes.csv` (all W, WT, C, MC, L:
   dims, A, W lb/ft, kdes/kdet/k1, x/y, workable gages WGi/WGo; angle gages g/g1/g2 = AISC Manual Table 1-7A in code).

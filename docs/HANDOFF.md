@@ -155,9 +155,10 @@ as "…before bearing iteration.sbm". The run confirmed item 2.3: girder C has n
    - I-80 Unit 2 skewed Piers 8WB–10WB: frames on K's string and K's bearing lines only; the plans' extra partial frames
      placed from other girders' bearings ("measured along girder" dims) are not transcribed; Type 4 bays partly read.
    - I-80 Unit 2 bay E–F frame at Pier 5WB/6A (special orientation, sheet 117 detail) not modeled.
-   - I-80 Unit 3 partial lines along girder A at Piers 12WB/13WB (21'-11 3/16; 16'-1 15/16, 12'-10 7/8, 7'-4 1/8) not added;
-     Type 6 pier frames in bay A–D at 14WB/15WB modeled as Type 5 (support styles are per support, not per bay).
-   - Ramp G Pier 17G zone Types 2/3 partly approximate. **Ramp G Span 16G along girder A is 193.48 ft in the model vs
+   - ✅ (2026-10-11) I-80 Unit 3 partial lines at Piers 12WB/13WB placed from the plan dims, Ramp G Pier 16G zone transcribed
+     (per-bearing lines, B line C-D = Type 2), PDF 110 visual checks settled; 3 plan conflicts raised as line UNRESOLVED notes;
+     5 plan-consistent frames inside splice plates remain (Unit 3 FS22/FS24). See `docs/plan-data/cross-frame-gaps.md` section 8.
+   - Ramp G Pier 17G zone: verified against the plan (no change). **Ramp G Span 16G along girder A is 193.48 ft in the model vs
      191'-2 9/16 in the plan girder data (2.26 ft)** — Pier 16G location/skew in my inputs likely off (straddle bent, 3.4).
    - Assumed: tie plate length 10"; top gusset bolt rows; abutment frame bottom bolt rows; Ramp G abutment W24x68 4"
      below the top of web; inspection walkways not modeled; studs on W top struts not modeled.
