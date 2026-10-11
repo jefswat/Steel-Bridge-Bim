@@ -7,8 +7,8 @@
 //      U1 top 3 5/8" + 1040 spa. @ 10 (1041 bars), bottom 8 5/8" + 1039 spa.;  U2 top 2'-7 7/16 + 900 spa., bottom 3'-0 7/16 + 899 spa.;
 //      U3 top 2'-3 + 1300 spa., bottom 2'-8 + 1299 spa.;  U4 top: 350 spa. along the left edge (351 bars) from 2'-3, then 826 spa. (827 bars) and 24 spa. (25 bars, 7a2
 //      33'-3 .. 3'-1) measured along the RIGHT edge, "10" between the runs; bottom the same from 2'-8 with 825 spa. (826) and 25 spa. (26 bars, 7a3 33'-10 .. 2'-6).
-//      The 25/26 bars of the last run are placed 10" after the previous run (as drawn); the plan puts the last one 4'-7 1/2 / 4'-2 1/2 before the end of the right edge, but the
-//      model's right edge is 2 5/8" shorter than the plan's 1002'-2 1/4 (the kinked deck end at Pier 19G, sheet 139 Detail A, is not in the deck outline).
+//      The 25/26 bars of the last run are placed 10" after the previous run (as drawn); the plan puts the last one 4'-7 1/2 / 4'-2 1/2 before the end of the right edge
+//      (model: 4'-7 9/16 / 4'-2 9/16; right edge 1002'-2 3/16 vs the plan's 1002'-2 1/4 with the Pier 19G end of slab of sheet 139 Details A/B, deck-end-kinks.csx).
 //  * 5j1 #5 x 6'-10 top transverse "at rail", at the left and at the right edge, centered between the 7a bars.
 //  * 6b1 #6 longitudinal, top and bottom alternating: per girder bay 22 equal spaces of 4 1/2" between lines 8 1/2" inside the girders (the section's 11 spa. @ 9" top
 //    + 10 spa. @ 9" bottom, 23 bars); stock 39'-2 (U1, U3), 38'-9 (U2), 39'-11 (U4), min. lap 3'-0 (sheet 135 plan).
@@ -62,6 +62,12 @@ foreach (var sp in specs)
     var plan = new DeckPlanReinforcement { LongitudinalBeginCover = In(sp.U == 1 ? 4 : 25), LongitudinalEndCover = In(25), WeightTolerance = 0.03, PlanBarList = BarList("Ramp G", sp.U) };
     if (double.TryParse(Environment.GetEnvironmentVariable("DR_LB"), out var lbIn)) plan.LongitudinalBeginCover = In(lbIn);
     if (double.TryParse(Environment.GetEnvironmentVariable("DR_LE"), out var leIn)) plan.LongitudinalEndCover = In(leIn);
+    // CALIBRATION (not dimensioned on the plans, as for I-80 in docs\plan-data\deck-rebar.md section 3): where the transverse bars stop at the skewed
+    // Pier 19G end of Unit 4. The printed last bars 7a2 3'-1 (4'-7 1/2 before the end of the right edge) and 7a3 2'-6 (4'-2 1/2) and the first 7a2 33'-3
+    // need the bar ends 27" from the end of slab, normal to it (= blockout D 25" + 2", as at the I-80 Unit 2 end): model 33'-2 7/8 .. 3'-1 5/8 / 33'-10 3/8 .. 2'-6.
+    // The other Ramp G ends are radial (no clipped lines).
+    if (sp.U == 4) plan.TransverseEndClear = In(27);
+    if (sp.U == 4 && double.TryParse(Environment.GetEnvironmentVariable("DR_TE"), out var teIn)) plan.TransverseEndClear = In(teIn);
     DeckLinePiece P(string mark, double len = 0) => new() { Mark = mark, Length = len };
     DeckTransverseZone T(string name, DeckBarLayer layer, double startIn, int n, string mark, DeckBarSide refEdge = DeckBarSide.Left) => new()
     {

@@ -1318,8 +1318,29 @@ public sealed class FramingGenerator
         return (begin ? a - ahead * off : a + ahead * off, dir);
     }
 
+    private readonly DeckEndPolyline?[] _endPolys = new DeckEndPolyline?[2];
+    private readonly bool[] _endPolysBuilt = new bool[2];
+
+    /// <summary>Kinked end-of-slab line of the first / last support (<see cref="SupportDefinition.DeckEndPoints"/>), null = straight.</summary>
+    private DeckEndPolyline? EndPolyline(bool begin)
+    {
+        int k = begin ? 0 : 1;
+        if (_endPolysBuilt[k]) return _endPolys[k];
+        _endPolysBuilt[k] = true;
+        var sup = _def.Supports[begin ? 0 : NS - 1];
+        if (sup.DeckEndPoints is not { Count: >= 2 } pts) return null;
+        var poly = new DeckEndPolyline(pts.Select(q => _align.PointAt(q.Station, q.Offset)).ToList(), begin);
+        if (!poly.IsMonotone)
+        {
+            Warn($"Deck end points at {sup.Name}: the points must run left to right without turning back; the kinked deck end is ignored (straight deck end used).");
+            return null;
+        }
+        return _endPolys[k] = poly;
+    }
+
     private bool EdgeAtEndLine(double offset, (Vec2 p, Vec2 dir) line, int support, out double d)
     {
+        if (EndPolyline(support == 0) is { } poly && (support == 0 || support == NS - 1)) return poly.CrossOffsetCurve(_align, _ => offset, out d);
         double skew = Numerics.DegToRad(_def.Supports[support].SkewDegrees);
         double guess = _align.Inverse(line.p).Distance + offset * Math.Tan(skew);
         double w = Math.Abs(offset) * (Math.Abs(Math.Tan(skew)) + 0.5) + 10;
@@ -1341,6 +1362,7 @@ public sealed class FramingGenerator
         double F(double d) => offsetAtStation(_align.DistanceToStation(d));
         bool Hit((Vec2 p, Vec2 dir) line, int support, out double d)
         {
+            if (EndPolyline(support == 0) is { } poly) return poly.CrossOffsetCurve(_align, F, out d);
             double o = offsetAtStation(_align.Inverse(line.p).Station);
             double skew = Numerics.DegToRad(_def.Supports[support].SkewDegrees);
             double guess = _align.Inverse(line.p).Distance + o * Math.Tan(skew);
@@ -1370,8 +1392,13 @@ public sealed class FramingGenerator
             Warn("Could not close the deck outline at the end supports.");
             return;
         }
+        // kinked deck ends: the break points between the edges are outline vertices (end line left -> right, begin line right -> left)
+        Func<double, double> lAtD = d => deck.LeftAt(_align.DistanceToStation(d)), rAtD = d => deck.RightAt(_align.DistanceToStation(d));
+        Vec3 OnDeck(Vec2 p) => p.WithZ(DeckElevationAtPoint(p));
         var outline = new List<Vec3>(left);
+        if (EndPolyline(false) is { } ep) outline.AddRange(ep.VerticesBetween(_align, lAtD, rAtD).Select(OnDeck));
         outline.AddRange(Enumerable.Reverse(right));
+        if (EndPolyline(true) is { } bp) outline.AddRange(bp.VerticesBetween(_align, lAtD, rAtD).Reverse().Select(OnDeck));
         outline.Add(left[0]);
 
         double area = 0;
@@ -1413,6 +1440,7 @@ public sealed class FramingGenerator
         var bl = DeckEndLine(0, true);
         var el = DeckEndLine(NS - 1, false);
         _result.Deck = new DeckResult { Outline = outline, BarrierLines = barriers, Area = area,
-            BeginLinePoint = bl.p, BeginLineDirection = bl.dir, EndLinePoint = el.p, EndLineDirection = el.dir };
+            BeginLinePoint = bl.p, BeginLineDirection = bl.dir, EndLinePoint = el.p, EndLineDirection = el.dir,
+            BeginPolyline = EndPolyline(true), EndPolyline = EndPolyline(false) };
     }
 }

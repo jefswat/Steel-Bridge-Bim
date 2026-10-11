@@ -57,6 +57,15 @@ public sealed class SupportDefinition
     /// <summary>Deck expansion joint at this END support (blockout + generic device); null = none.</summary>
     public ExpansionJointDefinition? ExpansionJoint { get; set; }
 
+    /// <summary>
+    /// OPTIONAL kinked end of slab at this END support (first or last support of the bridge): the plan's break points of the end-of-slab
+    /// line as station / offset on the bridge alignment, LEFT to RIGHT, monotone along the line; the first and last segments extend to the
+    /// deck edges. Null or fewer than 2 points = the straight line <see cref="DeckEndOffset"/> from the CL bearing (the default). When set it
+    /// governs the deck outline, the slab solid, the joint blockout / end block and the clipping of the deck bars at this end;
+    /// <see cref="DeckEndOffset"/> is still used for the opening / gap checks.
+    /// </summary>
+    public List<DeckEndPoint>? DeckEndPoints { get; set; }
+
     [System.Text.Json.Serialization.JsonIgnore]
     public SubstructureDefinition ResolvedSubstructure => Substructure ?? SubstructureDefinition.Default(Type);
 
@@ -67,8 +76,19 @@ public sealed class SupportDefinition
         c.Bearings = Bearings?.Clone();
         c.ExpansionJoint = ExpansionJoint?.Clone();
         c.GirderFixities = GirderFixities?.ToList();
+        c.DeckEndPoints = DeckEndPoints?.Select(p => p.Clone()).ToList();
         return c;
     }
+}
+
+/// <summary>A break point of a kinked end-of-slab line (<see cref="SupportDefinition.DeckEndPoints"/>): station / offset on the bridge alignment.</summary>
+public sealed class DeckEndPoint
+{
+    public double Station { get; set; }
+    public double Offset { get; set; }
+    public DeckEndPoint() { }
+    public DeckEndPoint(double station, double offset) { Station = station; Offset = offset; }
+    public DeckEndPoint Clone() => (DeckEndPoint)MemberwiseClone();
 }
 
 public enum GirderPlanLayout

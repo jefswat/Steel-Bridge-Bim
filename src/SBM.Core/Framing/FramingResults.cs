@@ -212,6 +212,13 @@ public sealed class DeckResult
     public Vec2 BeginLineDirection { get; init; }
     public Vec2 EndLinePoint { get; init; }
     public Vec2 EndLineDirection { get; init; }
+    /// <summary>Kinked end-of-slab lines (<see cref="Bridge.SupportDefinition.DeckEndPoints"/>); null = the straight lines above govern.</summary>
+    public DeckEndPolyline? BeginPolyline { get; init; }
+    public DeckEndPolyline? EndPolyline { get; init; }
+
+    /// <summary>Distance of a plan point from the begin / end deck-end line, + toward the deck (kinked lines when given).</summary>
+    public double FromBegin(Vec2 p) => BeginPolyline?.SignedDistance(p) ?? Vec2.Dot(p - BeginLinePoint, BeginLineDirection.Left);
+    public double FromEnd(Vec2 p) => EndPolyline?.SignedDistance(p) ?? Vec2.Dot(p - EndLinePoint, -EndLineDirection.Left);
 }
 
 public enum DiagnosticSeverity { Info, Warning, Error }

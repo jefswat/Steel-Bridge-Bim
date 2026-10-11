@@ -71,7 +71,6 @@ public static class DeckRebarCheck
         int topShort = 0, botShort = 0, edgeShort = 0, inBlock = 0, clash = 0;
         double worstClash = 0, maxIntr = 0;
         var worst = new List<(double pen, string where)>();
-        var nb = dr.BeginLineDirection.Left; var ne = -dr.EndLineDirection.Left;
         double bw = def.Supports[0].ExpansionJoint?.BlockoutWidth ?? 0, ew = def.Supports[^1].ExpansionJoint?.BlockoutWidth ?? 0;
         var lk = new object();
         Parallel.ForEach(bars, bar =>
@@ -93,8 +92,8 @@ public static class DeckRebarCheck
                 if (top) lMinTop = Math.Min(lMinTop, -(rel + r));            // grade to the top of the bar
                 else lMinBot = Math.Min(lMinBot, (rel + t) - r);             // bar underside to the soffit
                 lMinEdge = Math.Min(lMinEdge, Math.Min(so.Offset - deck.LeftAt(so.Station), deck.RightAt(so.Station) - so.Offset));
-                lBeg = Math.Min(lBeg, Vec2.Dot(p.XY - dr.BeginLinePoint, nb));
-                lEnd = Math.Min(lEnd, Vec2.Dot(p.XY - dr.EndLinePoint, ne));
+                lBeg = Math.Min(lBeg, dr.FromBegin(p.XY));
+                lEnd = Math.Min(lEnd, dr.FromEnd(p.XY));
             }
             // steel: sample along the bar every <= 0.15 m
             double pen = 0; string at = "";
