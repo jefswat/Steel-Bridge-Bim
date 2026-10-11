@@ -1,4 +1,6 @@
+using SBM.Core.Alignments;
 using SBM.Core.Framing;
+using SBM.Core.Steel;
 using SBM.Core.Geometry;
 using SBM.Core.Units;
 
@@ -12,11 +14,12 @@ public static class TableViews
 {
     private sealed record Col(string Header, double Width);
 
-    private static List<(string title, SheetView view)> Paged(ViewContext ctx, string title, Col[] cols, List<string[]> rows, IList<string> notes, double areaW, double areaH, string stem)
+    private static List<(string title, SheetView view)> Paged(ViewContext ctx, string title, Col[] cols, List<string[]> rows, IList<string> notes, double areaW, double areaH, string stem, int blocks = 1)
     {
         var pages = new List<(string, SheetView)>();
-        double rowH = 0.19;
-        int perPage = Math.Max(5, (int)Math.Floor((areaH - 1.1 - 0.2 * notes.Count) / rowH) - 1);
+        double rowH = 0.19, gap = 0.35;
+        int perBlock = Math.Max(5, (int)Math.Floor((areaH - 1.1 - 0.2 * notes.Count) / rowH) - 1);
+        int perPage = perBlock * blocks;
         int nPages = Math.Max(1, (rows.Count + perPage - 1) / perPage);
         for (int p = 0; p < nPages; p++)
         {
@@ -26,30 +29,37 @@ public static class TableViews
             double tw = d.Paper(cols.Sum(c => c.Width)), rh = d.Paper(rowH);
             var page = rows.Skip(p * perPage).Take(perPage).ToList();
             d.Text(t, new Vec2(0, d.Paper(0.3)), d.Paper(0.14), 0, TextAlign.Left, SheetLayers.Title);
-            d.Rect(SheetLayers.Text, 0, -rh * (page.Count + 1), tw, 0);
-            double x = 0;
-            foreach (var c in cols)
+            int usedBlocks = Math.Max(1, (page.Count + perBlock - 1) / perBlock);
+            for (int bk = 0; bk < usedBlocks; bk++)
             {
-                d.Text(c.Header, new Vec2(x + d.Paper(0.05), -rh / 2), d.Paper(0.075), 0, TextAlign.Left);
-                x += d.Paper(c.Width);
-                d.Line(SheetLayers.Text, new Vec2(x, 0), new Vec2(x, -rh * (page.Count + 1)));
-            }
-            d.Line(SheetLayers.Text, new Vec2(0, -rh), new Vec2(tw, -rh));
-            for (int i = 0; i < page.Count; i++)
-            {
-                double ry = -rh * (i + 1);
-                d.Line(SheetLayers.Text, new Vec2(0, ry - rh), new Vec2(tw, ry - rh));
-                x = 0;
-                for (int k = 0; k < cols.Length; k++)
+                var part = page.Skip(bk * perBlock).Take(perBlock).ToList();
+                double x0 = bk * (tw + d.Paper(gap));
+                d.Rect(SheetLayers.Text, x0, -rh * (part.Count + 1), x0 + tw, 0);
+                double x = x0;
+                foreach (var c in cols)
                 {
-                    string v = k < page[i].Length ? page[i][k] : "";
-                    d.Text(v, new Vec2(x + d.Paper(0.05), ry - rh / 2), d.Paper(0.075), 0, TextAlign.Left);
-                    x += d.Paper(cols[k].Width);
+                    d.Text(c.Header, new Vec2(x + d.Paper(0.05), -rh / 2), d.Paper(0.075), 0, TextAlign.Left);
+                    x += d.Paper(c.Width);
+                    d.Line(SheetLayers.Text, new Vec2(x, 0), new Vec2(x, -rh * (part.Count + 1)));
+                }
+                d.Line(SheetLayers.Text, new Vec2(x0, -rh), new Vec2(x0 + tw, -rh));
+                for (int i = 0; i < part.Count; i++)
+                {
+                    double ry = -rh * (i + 1);
+                    d.Line(SheetLayers.Text, new Vec2(x0, ry - rh), new Vec2(x0 + tw, ry - rh));
+                    x = x0;
+                    for (int k = 0; k < cols.Length; k++)
+                    {
+                        string v = k < part[i].Length ? part[i][k] : "";
+                        d.Text(v, new Vec2(x + d.Paper(0.05), ry - rh / 2), d.Paper(0.075), 0, TextAlign.Left);
+                        x += d.Paper(cols[k].Width);
+                    }
                 }
             }
+            int rowsInFirst = Math.Min(page.Count, perBlock);
             if (p == nPages - 1)
                 for (int i = 0; i < notes.Count; i++)
-                    d.Text(notes[i], new Vec2(0, -rh * (page.Count + 1) - d.Paper(0.25 + 0.17 * i)), d.Paper(0.075), 0, TextAlign.Left);
+                    d.Text(notes[i], new Vec2(0, -rh * (rowsInFirst + 1) - d.Paper(0.25 + 0.17 * i)), d.Paper(0.075), 0, TextAlign.Left);
             dwg.Layer(SheetLayers.Grid).Circles.Add(new CircleItem(new Vec3(0, 0.0254 * 0.3, 0), 0));
             dwg.Layer(SheetLayers.Grid).Circles.Add(new CircleItem(new Vec3(0.0254 * (areaW - 0.1), -0.0254 * (areaH - 0.4), 0), 0));
             pages.Add((t, new SheetView(stem + (nPages > 1 ? $" {p + 1}" : ""), "Table", dwg, 1, "", PaperSpace: true)));
@@ -84,6 +94,98 @@ public static class TableViews
         var notes = new[] { "SPACING = DISTANCE BETWEEN ADJACENT CL BEARINGS ALONG THE SUPPORT LINE (PLAN, FROM THE MODEL). A DASH = A GIRDER OF THE PAIR HAS NO BEARING AT THAT SUPPORT.",
                             "SKEW: ANGLE OF THE SUPPORT LINE FROM THE RADIAL (NORMAL TO THE CL ALIGNMENT); RT = RIGHT END UP-STATION." };
         return Paged(ctx, "GIRDER SPACING AT THE SUPPORT LINES", cols.ToArray(), rows, notes, areaW, areaH, "Girder spacing");
+    }
+
+    private static string Dec(UnitSystem u, double m) => u.IsUS ? $"{m / 0.0254:0.00}\"" : $"{m * 1000:0.0} mm";
+    private static string Pct(double slope) => double.IsNaN(slope) ? "-" : $"{slope * 100:0.###}%";
+
+    /// <summary>Camber, deflections and blocking per numbered point of every girder that has camber data.</summary>
+    public static List<(string title, SheetView view)> CamberBlocking(ViewContext ctx, double areaW, double areaH)
+    {
+        var u = ctx.Units;
+        var rows = new List<string[]>();
+        if (ctx.Framing.Camber == null) return new();
+        foreach (var g in ctx.Framing.Camber.Girders.OrderBy(g => g.Girder))
+            foreach (var p in g.Points)
+                rows.Add(new[] { g.Name, p.Number.ToString(), p.Label.Length > 0 ? p.Label : p.Kind, u.FormatStation(p.Station), Dec(u, p.Camber), Dec(u, p.SteelDeflection), Dec(u, p.SlabDeflection),
+                    u.FormatLength(p.HaunchElevation, LengthKind.Coordinate), double.IsNaN(p.Blocking) ? "-" : Dec(u, p.Blocking) });
+        if (rows.Count == 0) return new();
+        var cols = new[] { new Col("GIR.", 0.5), new Col("PT", 0.45), new Col("LOCATION", 0.85), new Col("STATION", 0.95), new Col("CAMBER", 0.65), new Col("STEEL DEFL", 0.75), new Col("SLAB+BARR", 0.75),
+            new Col("HAUNCH EL", 0.9), new Col("BLOCKING", 0.7) };
+        var notes = new[] { "AS COMPUTED FROM THE MODEL'S CAMBER INPUT (DEFLECTIONS AND CAMBER ORDINATES AS GIVEN); BLOCKING = NO-LOAD TOP OF WEB ABOVE A HORIZONTAL LINE THROUGH THE DATUM POINT.",
+                            "POINTS BETWEEN BEARINGS AND FIELD SPLICES ARE EQUALLY SPACED ALONG THE GIRDER. A DASH = NO DATUM POINT LOCATED." };
+        return Paged(ctx, "CAMBER AND BLOCKING", cols, rows, notes, areaW, areaH, "Camber and blocking", blocks: 2);
+    }
+
+    /// <summary>The alignment's cross slope table (rows near the bridge): slopes and breaks.</summary>
+    public static List<(string title, SheetView view)> CrossSlope(ViewContext ctx, double areaW, double areaH)
+    {
+        var u = ctx.Units;
+        var a = ctx.Framing.Alignment;
+        var (b, e) = LayoutViews.DeckEndStations(ctx.Framing);
+        double margin = 100 * u.LongUnit;
+        var all = a.CrossSlope.Rows.OrderBy(r => r.Station).ToList();
+        var rows = new List<string[]>();
+        for (int i = 0; i < all.Count; i++)
+        {
+            var r = all[i];
+            bool near = r.Station >= b - margin && r.Station <= e + margin;
+            bool bracket = (i + 1 < all.Count && all[i + 1].Station >= b - margin && r.Station < b - margin) || (i > 0 && all[i - 1].Station <= e + margin && r.Station > e + margin);
+            if (!near && !bracket) continue;
+            string Brk(double d, double sl, List<CrossSlopeBreak>? more) => d > 0 ? $"{u.FormatLength(d)} / {Pct(sl)}" + (more?.Count > 0 ? "; " + string.Join("; ", more.Select(m => $"{u.FormatLength(m.Distance)} / {Pct(m.Slope)}")) : "") : "-";
+            rows.Add(new[] { u.FormatStation(r.Station), Pct(r.LeftSlope), Pct(r.RightSlope), Brk(r.LeftBreak, r.LeftOuterSlope, r.LeftMoreBreaks), Brk(r.RightBreak, r.RightOuterSlope, r.RightMoreBreaks) });
+        }
+        if (rows.Count == 0) return new();
+        var cols = new[] { new Col("STATION", 1.6), new Col("LEFT SLOPE", 1.3), new Col("RIGHT SLOPE", 1.3), new Col("LEFT BREAKS (DISTANCE FROM PIVOT / SLOPE BEYOND)", 5.0), new Col("RIGHT BREAKS", 5.0) };
+        var notes = new[] { $"CROSS SLOPE TABLE OF {a.Name.ToUpperInvariant()} (ROWS WITHIN 100 FT OF THE BRIDGE AND THE BRACKETING ROWS); SLOPE = RISE / RUN, NEGATIVE = FALLING AWAY FROM THE PIVOT; SLOPES INTERPOLATE BETWEEN STATIONS." };
+        return Paged(ctx, "CROSS SLOPE GEOMETRICS", cols, rows, notes, areaW, areaH, "Cross slope");
+    }
+
+    /// <summary>Estimated quantities from the generated model: structural steel by assembly kind, bolts, studs, concrete and reinforcing.</summary>
+    public static List<(string title, SheetView view)> Quantities(ViewContext ctx, double areaW, double areaH)
+    {
+        var u = ctx.Units;
+        double wk = u.IsUS ? 2.20462 : 1; string wn = u.IsUS ? "LB" : "KG";
+        double vk = u.IsUS ? 1.307951 : 1; string vn = u.IsUS ? "CY" : "M3";
+        var rows = new List<string[]>();
+        void Row(string item, string qty, string unit, string basis) => rows.Add(new[] { item, qty, unit, basis });
+        if (ctx.Steel != null)
+        {
+            var st = ctx.Steel;
+            var kinds = st.Assemblies.ToDictionary(a => a.Mark, a => a.Kind);
+            double Sum(Func<SteelPart, bool> f) => st.Parts.Where(f).Sum(p => p.Mass) * wk;
+            string[] names = { "GIRDER FIELD SECTIONS", "CROSS FRAMES AND CROSS GIRDERS", "FIELD SPLICES", "BEARINGS", "LATERAL BRACING" };
+            var ak = new[] { AssemblyKind.GirderFieldSection, AssemblyKind.CrossFrame, AssemblyKind.FieldSplice, AssemblyKind.Bearing, AssemblyKind.LateralBracing };
+            double total = 0;
+            for (int i = 0; i < ak.Length; i++)
+            {
+                double m = Sum(p => kinds.TryGetValue(p.Assembly, out var k) && k == ak[i]);
+                if (m > 0) { Row("STRUCTURAL STEEL - " + names[i], $"{m:N0}", wn, "SUM OF PART MASSES (PLATES BY VOLUME, ROLLED SHAPES BY NOMINAL WEIGHT)"); total += m; }
+            }
+            double insp = Sum(p => kinds.TryGetValue(p.Assembly, out var k) && (k == AssemblyKind.InspectionCable || k == AssemblyKind.InspectionWalkway));
+            if (insp > 0) { Row("STRUCTURAL STEEL - INSPECTION ACCESS", $"{insp:N0}", wn, "SUM OF PART MASSES"); total += insp; }
+            Row("STRUCTURAL STEEL - TOTAL", $"{total:N0}", wn, "");
+            foreach (var g in st.Bolts.Where(b => b.Kind == BoltKind.Structural).GroupBy(b => Math.Round((b.Diameter > 0 ? b.Diameter : st.Bolt.Diameter) / 0.0254 * 1000) / 1000).OrderBy(g => g.Key))
+                Row($"HIGH-STRENGTH BOLTS {st.BoltGrade}, {g.Key:0.###}\" DIA", $"{g.Count():N0}", "EACH", "COUNT OF BOLT INSTANCES");
+            if (st.Bolts.Any(b => b.Kind == BoltKind.Anchor)) Row("ANCHOR BOLTS", $"{st.Bolts.Count(b => b.Kind == BoltKind.Anchor):N0}", "EACH", "COUNT");
+            if (st.Studs.Count > 0) Row($"SHEAR STUDS {st.StudDiameter / 0.0254:0.###}\" DIA", $"{st.Studs.Count:N0}", "EACH", "COUNT");
+        }
+        if (ctx.Concrete is { } c)
+        {
+            if (c.DeckVolume > 0) Row("CONCRETE - DECK SLAB", $"{c.DeckVolume * vk:N1}", vn, "SOLID VOLUME (HAUNCHES SEPARATE)");
+            if (c.HaunchVolume > 0) Row("CONCRETE - HAUNCHES", $"{c.HaunchVolume * vk:N1}", vn, "SOLID VOLUME");
+            if (c.BarrierVolume > 0) Row("CONCRETE - BARRIER RAIL", $"{c.BarrierVolume * vk:N1}", vn, "SOLID VOLUME");
+            if (c.RebarMass > 0) Row("REINFORCING STEEL - SUPERSTRUCTURE", $"{c.RebarMass * wk:N0}", wn, "SUM OF BAR MARKS (GENERATED BARS; AS-DESIGNED DECK / RAIL BARS MAY DIFFER)");
+        }
+        if (ctx.Substructure is { } sub)
+        {
+            if (sub.ConcreteVolume > 0) Row("CONCRETE - SUBSTRUCTURE", $"{sub.ConcreteVolume * vk:N1}", vn, "SOLID VOLUME OF THE SUPPORT UNITS GENERATED FOR THIS BRIDGE (CAPS, COLUMNS, FOOTINGS, ABUTMENTS)");
+            if (sub.RebarMass > 0) Row("REINFORCING STEEL - SUBSTRUCTURE", $"{sub.RebarMass * wk:N0}", wn, "SUM OF BAR MARKS");
+        }
+        if (rows.Count == 0) return new();
+        var cols = new[] { new Col("ITEM", 6.2), new Col("QUANTITY", 1.5), new Col("UNIT", 0.9), new Col("BASIS", 6.0) };
+        var notes = new[] { "QUANTITIES OF THIS BRIDGE FROM THE GENERATED MODEL; THEY ARE NOT BID QUANTITIES (NO WASTE, NO ITEMS THE MODEL DOES NOT HAVE)." };
+        return Paged(ctx, "ESTIMATED QUANTITIES", cols, rows, notes, areaW, areaH, "Quantities");
     }
 
     private static string Off(UnitSystem u, double off) => $"{u.FormatLength(Math.Abs(off))} {(off < 0 ? "LT" : "RT")}";

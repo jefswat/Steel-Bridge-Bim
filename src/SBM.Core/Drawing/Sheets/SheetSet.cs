@@ -109,6 +109,10 @@ public static class SheetSet
             specs.Add(new SheetSpec("Girder spacing at supports", "Spacing, station and skew of every support line", new[] { Full(new ViewSpec(title, _ => view, ScaleFamily.Architectural, PaperSpace: true)) }));
         foreach (var (title, view) in TableViews.BearingData(ctx, W, H))
             specs.Add(new SheetSpec(title.Replace("BEARING DATA", "Bearing data"), "Type, fixity, station and elevations at every bearing", new[] { Full(new ViewSpec(title, _ => view, ScaleFamily.Architectural, PaperSpace: true)) }));
+        foreach (var (title, view) in TableViews.CrossSlope(ctx, W, H))
+            specs.Add(new SheetSpec("Cross slope geometrics", "Cross slope table of the alignment along the bridge", new[] { Full(new ViewSpec(title, _ => view, ScaleFamily.Architectural, PaperSpace: true)) }));
+        foreach (var (title, view) in TableViews.CamberBlocking(ctx, W, H))
+            specs.Add(new SheetSpec("Camber and blocking", "Camber, deflections and blocking from the model", new[] { Full(new ViewSpec(title, _ => view, ScaleFamily.Architectural, PaperSpace: true)) }));
         foreach (bool slab in new[] { true, false })
             foreach (var (title, view) in TableViews.ElevationTable(ctx, slab, W, H))
                 specs.Add(new SheetSpec(slab ? "Top of slab elevations" : "Top of web elevations", "At the supports and quarter points along each girder", new[] { Full(new ViewSpec(title, _ => view, ScaleFamily.Architectural, PaperSpace: true)) }));
@@ -145,6 +149,9 @@ public static class SheetSet
                 else
                 specs.Add(new SheetSpec($"{unit.Name} {(unit.Type == SupportType.Pier ? "bent" : "abutment")}", "Elevation and cap section",
                     new[] { Full(new ViewSpec(unit.Name, s => BentViews.Bent(WithScale(ctx, s), unit), ScaleFamily.Architectural)) }));
+
+        foreach (var (title, view) in TableViews.Quantities(ctx, W, H))
+            specs.Add(new SheetSpec("Estimated quantities", "Steel, concrete and reinforcing from the generated model", new[] { Full(new ViewSpec(title, _ => view, ScaleFamily.Architectural, PaperSpace: true)) }));
 
         // Bar lists.
         foreach (var (title, view) in BarSheet.Pages(ctx, W, H))
