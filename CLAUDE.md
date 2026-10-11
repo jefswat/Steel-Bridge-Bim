@@ -1,4 +1,4 @@
-# Steel Bridge Modeler â€” notes for Claude
+﻿# Steel Bridge Modeler â€” notes for Claude
 
 Desktop BIM modeler for steel plate girder bridges and substructures (Windows, .NET 10, WPF). The user is a bridge
 engineer who directs and tests; Claude writes and maintains all code. Keep this file current when architecture changes.
@@ -206,7 +206,7 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   deterministic GlobalIds; a *.ifczip path writes a buildingSMART IFC-ZIP = one DEFLATE entry <name>.ifc, streamed). NOTE: in ADD2 IfcFacilityPart is abstract â€” use IfcBridgePart(..., UsageType, PredefinedType).
   Validate with IfcOpenShell (`pip install ifcopenshell pytest`; `ifcopenshell.validate.validate(f, log, express_rules=True)`);
   reusable: `python -I tools/validate_ifc.py model.ifc [--express-sample N] [--geom N] [--geom-all REGEX] [--json out]`.
-  Last full-model result (2026-10-11, 344 MB, 3.75 M entities): 0 schema + 0 EXPRESS issues; see docs/plan-data/ifc-validation.md.
+  Last full-model result (2026-10-11, 347 MB, 3.76 M entities): 0 schema + 0 EXPRESS issues; see docs/plan-data/ifc-validation.md.
   Exports must be reproducible (test `Ifc_RegeneratedModel_ExportsIdentically`): anything numbered from a parallel
   generator's ConcurrentBag (stiffener marks, bar order, hole order) must be put in a fixed order first. Bar role:
   TIE/HOOP/CROSSTIE/SPIRAL/SSTR-S = LIGATURE.
