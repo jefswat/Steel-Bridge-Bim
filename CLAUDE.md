@@ -233,6 +233,21 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
     `Elevation` (Q4: `Level` default as p.32 labels it, or `AlongHoleLine`; warns when the 1" x 1 1/2" member slots
     (+-1/4) or 1" x 2" leg slots (+-1/2) cannot take the offset), `MemberSide` (WD-3: `Unresolved` default = holes only,
     no steel). `PsDiaphragmBeamLine.FromPrestressed(beam, depth, web)` adapts generated beams. Tests: PsSteelDiaphragmTests.
+  - Concrete END / PIER diaphragms (design feature C, T5/T6): input `SupportDefinition.Diaphragm` = `Bridge/ConcreteDiaphragmDefinition.cs` (OPTIONAL,
+    omitted from the .sbm when null): `Parts` (section polygons in (x normal to the support - abutments + toward the span, piers + ahead; z = ref
+    DeckTop / Soffit / Bottom (stepped `BottomSteps` per beam line, `Risers` Unresolved = mid-bay drawn + Assumption flag | MidBay | Explicit) /
+    Elevation + dz), vertically convex, non-vertical edges keep one ref), ends `DiaphragmEnd` (Offset line | AlongLineFromOffset | FasciaOutside =
+    top-flange edge line of the fascia beam), a part with `Unresolved` text is NOT built (warning), `OpenBelowBeams` (bearing zone under the beams is
+    pads + filler, not concrete), `Fillers` (EndFace / Section / AroundBearings / Interface; thin solids, plan material names), `Keyways`, `BeamHoles`
+    (cast web holes: positions + strand clearance, records only), `PlanBearingGap` check. Generator `Diaphragms/ConcreteDiaphragmGenerator.cs`, run in
+    RegenerationCache phase 2 after the substructure (result `PrestressedModel.ConcreteDiaphragms`, `SbmDocument.Diaphragms`): superstructure element
+    split from the deck at the soffit; exact, no booleans: x-SLABS at every section vertex / beam-end event, each slice a simple polygon in (S, z)
+    with a NOTCH per beam (outline + haunch to the soffit; skewed ends at the top-CL end x, SQUARE ends = outline clipped where the face meets the
+    slice, events at every outline vertex, slices inset 1e-5 m and extrapolated) or, open below, PANELS between the beams; every slab = closed loft
+    (`Pieces`, one IFC face set each). IFC: IfcBeam .DIAPHRAGM. ('END_DIAPHRAGM' / 'PIER_DIAPHRAGM'), keyways IfcBuildingElementPart 'SHEAR_KEY'
+    aggregated into it, fillers IfcBuildingElementPart 'JOINT_FILLER'; Assumption -> SBM_Status. Viewport layers 3D-DIAPHRAGMS / -FILLERS /
+    3D-UNRESOLVED-DIAPHRAGMS, material rows. Data: `samples/plans/diaphragms-woodbury.csx`, `diaphragms-br02069.csx` (run by the build scripts),
+    report `check-diaphragms.csx`. Tests `ConcreteDiaphragmTests`. Not yet: 2D sheet views, database groups, diaphragm rebar.
   - `SBM.IO/PgSuper/` â€” `PgSuperReader` (.pgs BridgeDescription schema v6+ or ReportExportAgent export XML; strand key
     bits per WBFL PsStrand; end distances normalized to CL-bearing-to-end; straight-strand `DebondInfo` Strand/Length1/Length2
     -> StrandPoint debond lengths) and `PgSuperImport.Apply` (onto an alignment).

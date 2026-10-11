@@ -1,6 +1,6 @@
 # Concrete-bridge features: design proposal (for review BEFORE implementation)
 
-Status: PROPOSAL; **T1 (feature A, integral abutment) IMPLEMENTED** (see 2.7); the open questions in section 8 are still unanswered.
+Status: PROPOSAL; **T1 (feature A, integral abutment) IMPLEMENTED** (see 2.7); **T5/T6 feature C (concrete end / pier diaphragms) IMPLEMENTED** (see 4.7); the open questions in section 8 are still unanswered.
 Author: design study agent, 2026-10-11. Scope = HANDOFF section 5 items 5, 6 and the
 substructure parts of item 9 (round CIP pipe piles, curved-plate bearings, future-beam pedestals), for the two prestressed
 plan sets:
@@ -405,6 +405,48 @@ contained in the superstructure IfcBridgePart; panels merged into one body per s
 | WC-4 | Br02069: exact top profile at the approach panel (4" / 5 1/2" / 8" / 1'-4 chain - read in the task) | p.21 |
 
 ---------------------------------------------------------------------------------------------------------------------
+
+### 4.7 Implementation status (T5 + T6, 2026-10-11)
+
+User decisions applied: diaphragms are SUPERSTRUCTURE elements (own generator after beams and substructure, IfcBeam .DIAPHRAGM., split from the
+deck at the soffit; pile cap / stem / wing extension stay substructure) (Q9); Woodbury pier diaphragm centred on CL pier, 2'-10, flush with beam H
+outside face, ending at the stage-2 deck edge (Q10); Br02069 front-part bottom UNRESOLVED (Q14); polystyrene / preformed fillers / keyways are thin
+SOLIDS (Q18). Code / inputs: see CLAUDE.md ("Concrete END / PIER diaphragms"). The section is given as section polygons with elevation references
+(4.2 sketch) - the generator method is the 4.3 panel idea generalised to x-slabs (exact for skewed AND square beam ends; tests reproduce
+gross - A x axial embedment to 1e-6 m3).
+
+Readings closed with the standards / plan rasters (C:\SBMData, C:\SBM\dist\standards):
+- WC-1 CLOSED: Iowa std 2087-BTCD (Iowa BT Beams Integral Abutment Bridges.pdf, PDF p.13 Part Section B-B, same figures as Woodbury p.15 B-B):
+  paving bracket BEHIND the back face: top 1'-1 below the top of deck (constant depth), 1'-3 projection, 1'-3 vertical face, then 45 deg
+  (1'-3 x 1'-3) back to the back face; 1" chamfer at the outer top corner. Back face = deck end = cap back face (1'-6 behind CL brg).
+- WC-2 CLOSED by the user (Q10).
+- WC-3 stays UNRESOLVED (Q14): p.21 A-A / B-B dimension only the back part ('VARIES') and the 1'-0 x 1'-0 front fillet. MnDOT B814 is the
+  PARAPET-abutment concrete end diaphragm; Fig. 5-397.560 (= Br02069 p.17) sends integral / semi-integral abutments to the superstructure details
+  (B816 for integral) - B814 does not apply to Br02069 (semi-integral, stem with back ledge). Graphically the front part bottom lies about the
+  bearing height above the seat, i.e. near the beam bottom - not used (not dimensioned).
+- WC-4 CLOSED (raster p.21): back part 1'-3 on the ledge on 1" Type A polystyrene, 3" Type B polystyrene against the seat riser (ledge -> seat
+  1'-0), paving bracket 8" x 1'-4 below the deck top, slab end 1'-10 from CL brg; 1/2" x 7" bit. felt.
+- Woodbury p.20 TOP OF PIER DETAILS (raster): keyway (beveled 2 x 8) centred on the CL pier (Section B-B), 1/4" preformed expansion joint filler
+  at the diaphragm / cap interface (B-B), 1" strips around bearings, faces of steps, sides / ends of keyways; pads 9 x 2'-4 1/2 drawn with the long
+  side PARALLEL to the CL pier.
+- Fig. 5-397.560 30MH row: A 3", B 11", C 3 1/2", D 1'-1 1/4", E 7 1/2" (cast web holes 1 1/2").
+
+Built (models rebuilt on main 606c00f + this branch):
+| item | Woodbury | Br02069 |
+|---|---|---|
+| end diaphragms | S 20.89 CY, N 21.41 CY (3'-0 + paving bracket, beams embedded, length 36'-10 3/16 / 37'-10 1/2 = p.17) | back part only: S 8.25 CY, N 8.75 CY, 41'-0 |
+| pier diaphragms | Pier 1 15.48 CY, Pier 2 15.66 CY (2'-10, bearing zone open below) | - |
+| fillers | 1" preformed around bearings (1.28 / 1.30 CF), 1/4" interface layer (1.10 / 1.09 CF) | 1" Type B ends, 1" Type A on ledge (4.27 CF), 3" Type B at seat riser (10.25 CF) per abutment |
+| keyways | 8" x 2" between beams at all four supports (2.5 / 2.8 CF) | - |
+Plan quantities: neither set prints a diaphragm-only quantity (Woodbury deck placements 1 / 3 / 4 / 5 = 66.9 / 71.3 / 45.1 / 45.0 CY include
+the deck; MnDOT bills the diaphragm with the superstructure). Info: pier placement 4 = 28'-4 x 37'-7 x 8" deck (26.2 CY) + haunches (~1 CY) +
+pier diaphragm 15.5 CY = ~43 CY vs 45.1 CY.
+
+Still UNRESOLVED / open: Q3 riser position of the stepped cap tops (Woodbury abutments and piers: drawn at mid-bay, diaphragms flagged
+UNRESOLVED, Assumption); keyway bevel (2x8 'beveled', not dimensioned: modeled rectangular 8" x 2", flagged); 1" filler on step faces / keyway
+sides and the keyway lining (extent follows the unresolved risers); Woodbury abutment 1/4" filler (B-B) extent; Br02069 front part (WC-3) and
+therefore the beam embedment there; diaphragm reinforcing (schedule only); PVC sleeve (S abut, "+/-" position). Program follow-ups: 2D sheet views
+of the diaphragms, companion-database groups, pier pad orientation (model pads square to the beam vs p.20 parallel to the pier).
 
 ## 5. Feature D: steel intermediate diaphragms between prestressed beams (Woodbury, Iowa std 1036-1/2-BTD modified)
 
