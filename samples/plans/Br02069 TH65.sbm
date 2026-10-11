@@ -140,9 +140,10 @@
             "FootingLength": 3.048,
             "FootingWidth": 3.048,
             "FootingThickness": 0.9144000000000001,
-            "PileType": "PrecastConcrete",
+            "PileType": "CipPipe",
             "PileSection": "HP14x73",
             "PileSize": 0.30479999999999996,
+            "PileShellThickness": 0.00635,
             "PileRows": 3,
             "PileColumns": 3,
             "PileSpacing": 0.9144000000000001,
@@ -219,6 +220,26 @@
                 {
                   "Girder": 7,
                   "TopElevation": 281.59862400000003
+                }
+              ],
+              "StandalonePedestals": [
+                {
+                  "S": 10.0584,
+                  "TopElevation": 281.488896,
+                  "Length": "NaN",
+                  "Label": "FUTURE BEAM"
+                },
+                {
+                  "S": 8.2296,
+                  "TopElevation": 281.52547200000004,
+                  "Length": "NaN",
+                  "Label": "FUTURE BEAM"
+                },
+                {
+                  "S": 6.4008,
+                  "TopElevation": 281.562048,
+                  "Length": "NaN",
+                  "Label": "FUTURE BEAM"
                 }
               ],
               "Masks": [
@@ -423,9 +444,10 @@
             "FootingLength": 3.048,
             "FootingWidth": 3.048,
             "FootingThickness": 0.9144000000000001,
-            "PileType": "PrecastConcrete",
+            "PileType": "CipPipe",
             "PileSection": "HP14x73",
             "PileSize": 0.30479999999999996,
+            "PileShellThickness": 0.00635,
             "PileRows": 3,
             "PileColumns": 3,
             "PileSpacing": 0.9144000000000001,
@@ -502,6 +524,26 @@
                 {
                   "Girder": 7,
                   "TopElevation": 281.534616
+                }
+              ],
+              "StandalonePedestals": [
+                {
+                  "S": 10.0584,
+                  "TopElevation": 281.424888,
+                  "Length": "NaN",
+                  "Label": "FUTURE BEAM"
+                },
+                {
+                  "S": 8.2296,
+                  "TopElevation": 281.461464,
+                  "Length": "NaN",
+                  "Label": "FUTURE BEAM"
+                },
+                {
+                  "S": 6.4008,
+                  "TopElevation": 281.49804,
+                  "Length": "NaN",
+                  "Label": "FUTURE BEAM"
                 }
               ],
               "Masks": [

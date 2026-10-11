@@ -187,8 +187,6 @@ G("Optional top strands 2 x 1/2\" (p16) and beam bars G301E..G806E, stirrups (p1
 //      set to zero size (CorbelProjection/Vertical/Taper = 0) and the pour joints are only solid splits.
 G("Abutment stem: AbutmentDefinition has no stem face set back from the footing front - the 1'-3\" front toe is built to the seat elevation (p11 A-A); seat 1\" slope (p11) built level at the seat-front elevation. Needs: MnDOT stem/seat/ledge section for AbutmentDefinition.");
 G("Abutment infill wall: AbutmentDefinition always builds a corbel and three backwall pours (Iowa); set to zero size here. Needs: optional corbel / plain wall.");
-G("Future pedestals: 3 future Type B pedestals per abutment at +21/+27/+33 (p5, p10) not built - beam steps are created only under bearings. Needs: standalone (future) pedestals.");
-G("Pile type: 12\" CIP pipe piles 1/4\" shell (p4, p9, p29) modeled as 12\" square precast concrete piles (closest PileType). Needs: round CIP pipe pile type.");
 G("Test piles: one test pile per abutment longer (S 105 vs 95 ft, N 100 vs 90 ft, back row, p4/p9) - one PileLength per abutment; contract lengths used. Needs: per-pile length.");
 G("Abutment reinforcing (bar-lists.csv A/B series, p6-p8, p12-p14; bend diagrams U3) not entered; the Iowa abutment rebar generator would invent placements -> substructure reinforcement off. Needs: plan bar data for a MnDOT abutment.");
 U("Mask walls: east-end and corner extents not dimensioned (U9, p3/p5/p10/p11) - only the west mask wall (MSE Ret. Wall 20 / 23 tie-ins, p1) is built.");
@@ -221,6 +219,14 @@ void SetAbutment(SupportDefinition sup, string side, double ledge, double seatFr
     ad.Masks.Add(new MaskwallDefinition { End = AbutmentEnd.Left, Thickness = In(17.5), Height = Ft(maskTop) - Ft(seatFront), Setback = 0 });
     // Piles: 7 per row @ 9'-5", 1'-6" from the W end (1'-7" E) (p4, p9). Skew 0 on a tangent: S along the line = alignment offset.
     for (int k = 0; k < 7; k++) ad.PileStations.Add(-F(23, 7) + F(1, 6) + k * F(9, 5));
+    // Pedestals for the FUTURE beam lines (+21, +27, +33; S Type B p5 note 6 / p6, N Type D p10 note 6 / p12) are BUILT NOW - only the beams are
+    // future: their bars are in this contract's abutment bar lists (p8 A527M 24 = 3 x 8, A528M 15 = 3 x 5; p14 B527M 18 = 3 x 6, B528M 12 = 3 x 4),
+    // carried in the abutment quantities (p4 Cr-epoxy 480 lb = A508M + A613M + A527M + A528M; p9 390 lb) and p2 SOQ footnote 2 (Cr-epoxy bars
+    // "include ... future abutment pedestal reinforcement"). Same size as the beam pedestals (p5 4'-8" / p10 3'-6" along the abutment, 2'-4" along
+    // the beam, p6 / p12); centres at 6'-0" spacing from the dimension chains (p5: 3" W end + 10 x 4'-8" + 9 x 1'-4" + 8" E end = 59'-7";
+    // p10: 10" + 10 x 3'-6" + 9 x 2'-6" + 1'-3"); tops from the elevation (seat-elevations.csv, p5 / p10).
+    foreach (var row in seatRows.Where(r => r[0] == side && r[2].Contains("future")))
+        ad.StandalonePedestals.Add(new AbutmentPedestalDefinition(Ft(double.Parse(row[3])), Ft(double.Parse(row[5])), "FUTURE BEAM"));
     // Pedestal (beam step) tops = plan pedestal elevations (seat-elevations.csv) for the 7 beam lines G1 (-21) .. G7 (+15).
     for (int g = 0; g < 7; g++)
     {
@@ -230,7 +236,7 @@ void SetAbutment(SupportDefinition sup, string side, double ledge, double seatFr
     }
     var sd = SubstructureDefinition.Default(SupportType.Abutment);
     sd.Abutment = ad;
-    sd.PileType = PileType.PrecastConcrete; sd.PileSize = In(12);  // GAP: 12" CIP pipe pile
+    sd.PileType = PileType.CipPipe; sd.PileSize = In(12); sd.PileShellThickness = In(0.25);  // 12" C-I-P concrete piling (p4 / p9 pile notes: "nominal diameter of 12" (and a thickness of 1/4")"; splice B201 p29)
     sd.Reinforcement.Enabled = false;                                // GAP: abutment bars not entered
     sd.BackwallGap = Ft(1) - F(1, 10);                               // deck end 1'-10" vs infill face 1'-0": end diaphragm zone (no gap) -> report only
     sup.Substructure = sd;
