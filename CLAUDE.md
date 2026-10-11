@@ -307,6 +307,19 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   connections, bent-plate posts at skewed frames; grating = one solid slab (mass from nominal weight). Data: `samples/plans/inspection-i80.csx`,
   `inspection-ramp-g.csx`. BoltInstance.Diameter is honored per instance (viewport, IFC fastener types, material list).
   Snapshot: `--closeup MARK@Bridge name` also selects one bridge for steel assemblies (walkway marks repeat in every bridge).
+- Misc items (OPTIONAL, `BridgeDefinition.Misc` = `MiscItemsDefinition` + `DeckDrainDefinition.Trench`; null = none; `Bridge/MiscItemsDefinition.cs`, generator `SBM.Core/Misc/`
+  `MiscItemsGenerator` (+ `MiscPierDrains`, `MiscOthers`, `MiscMesh`), result `MiscModel` hung on `SubstructureModel.Misc` and built in `RegenerationCache` after the substructure):
+  Ramp G deck drainage (trench inlets positioned FROM THE GUTTER LINE = deck edge - EdgeStrip width, tube, grate, splash basin, 12" span collector at the printed
+  deck-top-to-CL heights, pier joint collection systems at 5G/9G/14G/19G), I-80 sign truss brackets (steel + anchor bolts; post base plate = placeholder) and exit sign bases,
+  crash cushion end posts, lighting (pole bases, junction boxes, conduit in the barrier). Rules: nothing is assumed - unknown plan values are nullable inputs / `Unresolved`
+  strings raised as WARNINGS ("UNRESOLVED ..."); things by others are placeholders (`MiscElement.Placeholder`, IFC Pset `SBM_Placeholder` with the plan basis); plan bar lists are
+  schedule-only `BarMark`s (`MiscBarRow`, `BarMark.Coating`). DRAIN CLEARANCE: every tube / drop pipe / collector / pier pipe is checked against the steel parts of its bridge
+  (`MiscMesh.Clearance` = exact segment-triangle distance, convex ternary search) -> `MiscModel.Clearances` + CONFLICT (overlap) / TIGHT (< 1") warnings; drains are never moved.
+  IFC (`ExportMisc`): IfcElementAssembly per drain / bracket / pole base, IfcWasteTerminal, IfcPipeSegment, IfcPipeFitting, IfcTank, IfcJunctionBox, IfcCableCarrierSegment,
+  IfcFooting, IfcMechanicalFastener ANCHORBOLT, proxies for placeholders; deck-piercing inlets void the slab. Database: groups drainage / sign supports / crash cushion / lighting >
+  assemblies > elements (`MiscItems` in ModelDatabase; keys `IfcKeys.MiscAssembly/MiscElement`), sheet rules in `sheet-links-i80-rampg.json`. Viewport layers `3D-DRAIN-*`,
+  `3D-SIGN-SUPPORT`, `3D-CRASH-CUSHION`, `3D-LIGHTING`, `3D-PLACEHOLDER`. Plan data scripts (re-runnable): `samples/plans/drains-ramp-g.csx`, `signs-i80.csx`, `end-posts.csx`,
+  `lighting.csx`; data/results/unresolved list: `docs/plan-data/misc-items-data.md` (section "Model").
 - Plan-set test models: `samples/plans/*.csx` (Iowa DOT Designs 116/316); data in C:\SBMData (not in OneDrive).
 
 ## Conventions (bridge engineering)
