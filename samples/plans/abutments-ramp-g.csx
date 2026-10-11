@@ -57,8 +57,8 @@ ad.BackwallTop.Add(new CapProfilePoint(0, Ft(1004.22)));
 ad.BackwallTop.Add(new CapProfilePoint(SOf(al, sl, F(26)), Ft(1004.66)));
 double[] steps = { 995.51, 995.71, 995.90, 996.09 };
 for (int i = 0; i < steps.Length; i++) ad.Steps.Add(new AbutmentStepDefinition(i + 1, Ft(steps[i])));
-ad.Masks.Add(new MaskwallDefinition { End = AbutmentEnd.Left, Height = F(12, 7), Thickness = In(10), Setback = In(2) });
-ad.Masks.Add(new MaskwallDefinition { End = AbutmentEnd.Right, Height = F(13, 3), Thickness = In(10), Setback = In(2) });
+ad.Masks.Add(new MaskwallDefinition { End = AbutmentEnd.Left, Height = F(12, 7), Thickness = In(10) });
+ad.Masks.Add(new MaskwallDefinition { End = AbutmentEnd.Right, Height = F(13, 3), Thickness = In(10) });
 // piles: 6 stations from the A end (printed spacing 6'-10, 1'-10 to the end), two rows
 double sA = SOf(al, sl, ad.LeftEndOffset, nc);
 foreach (double d in new[] { 1.833, 8.667, 15.5, 22.333, 29.167, 36.0 }) ad.PileStations.Add(sA + Ft(d));
@@ -78,15 +78,17 @@ foreach (var w in wings)
     for (int k = 0; k < 2; k++)
         wd.Counterforts.Add(new CounterfortDefinition
         {
-            Start = cfStart[k], Width = F(3), Projection = F(3, 6), Height = cfH[k], FootingTop = Ft(w.Foot[k]),
+            Start = cfStart[k], Width = F(3), BodyWidth = F(1, 10), Projection = F(3, 6), Height = cfH[k], FootingTop = Ft(w.Foot[k]),
             HoopSpaces = k == 0 ? 8 : 5, VerticalBarsPerSide = 10, VerticalMark = k == 0 ? "6h2" : "6h3", VerticalFoot = F(1),
         });
+    wd.UpliftPiles.Add(new UpliftPileDefinition { Footing = 1, Pile = 2 }); wd.UpliftPiles.Add(new UpliftPileDefinition { Footing = 2, Pile = 2 });   // circled = inner pile of footings 1, 2 (p81)
     ad.Wings.Add(wd);
 }
 var rb = ad.Rebar;
 rb.FootingLongMark = "8a1"; rb.FootingRowBars = 5; rb.FootingLongPieces = 1; rb.HoopsPerPitch = 9; rb.HoopFirstOffset = In(9);
 rb.EndHoopsEach = 2; rb.EndStaplesEach = 3; rb.BackwallLongRowsPerFace = 11; rb.BackwallLongPieces = 1; rb.HoopWidth = F(5, 8); rb.PlanBarList = list;
 rb.BackFaceBarLength = F(11, 4); rb.FrontFaceBarLength = F(11);
+rb.BackFaceCount = 63; rb.FrontFaceCount = 31;                            // printed strings: 62 spaces @ 6" (63), 30 spaces @ 1'-0 (31)
 rb.StepHoopGirders = new() { 4 };                                          // 5n2 hoop at girder D only (printed)
 var sd = sup.ResolvedSubstructure.Clone();
 sd.Abutment = ad;
@@ -94,7 +96,7 @@ sd.PileSection = "HP14x73"; sd.PileType = PileType.SteelHP;
 sd.BackwallGap = F(0, 2.5);                                                // plans: 2 1/2" between the deck end (1'-2 1/2) and the backwall face (1'-5)
 sd.Reinforcement.EpoxyCoated = true;
 sup.Substructure = sd;
-Print("UNRESOLVED: maskwall position inside its 1'-2 zone; Ramp G step transverse bars 5m1 (20 = 4 steps x 5 vs 4 per step on I-80); which wing footing piles are circled.");
+Print("UNRESOLVED: Ramp G step transverse bars 5m1 (20 = 4 steps x 5 vs 4 per step on I-80).");
 
 var res = Doc.Regenerate();
 Print($"Regenerated {res.Bridges} bridges, {res.Errors.Count} errors.");

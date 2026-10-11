@@ -47,6 +47,23 @@ public class SubstructureTests
     }
 
     [Fact]
+    public void PlanPedestalSize_IsUsedForEveryPedestal_AndSharedBlocksMergeSeatsOfOneGirderLine()
+    {
+        var plan = Build(p => { p.PedestalSizeAlong = In(66); p.PedestalSizeAcross = In(68); }).Units.Single(u => u.Type == SupportType.Pier);
+        Assert.Equal(5, plan.Pedestals.Count);
+        Assert.Equal(plan.Pedestals.Count, plan.PedestalBlocks.Count);
+        Assert.All(plan.PedestalBlocks, p => { Assert.Equal(In(66), p.LengthS, 6); Assert.Equal(In(68), p.WidthN, 6); });
+        Assert.All(plan.Solids.Where(s => s.Kind == SubElementKind.Pedestal), s => Assert.Contains("plan size", s.Description));
+        // shared: seats closer than half the pedestal length along the cap share one block (here every seat is its own girder line: nothing merges)
+        var shared = Build(p => { p.PedestalSizeAlong = In(66); p.PedestalSizeAcross = In(68); p.PedestalShared = true; }).Units.Single(u => u.Type == SupportType.Pier);
+        Assert.Equal(5, shared.PedestalBlocks.Count);
+        // a block wider than the girder spacing merges neighbours (the plan size is the plan's: 40 ft along the cap swallows all five seats)
+        var wide = Build(p => { p.PedestalSizeAlong = Ft(40); p.PedestalSizeAcross = In(68); p.PedestalShared = true; }).Units.Single(u => u.Type == SupportType.Pier);
+        Assert.Equal(5, wide.Pedestals.Count);
+        Assert.True(wide.PedestalBlocks.Count < 5);
+    }
+
+    [Fact]
     public void FollowSeats_GivesUniformPedestals_LevelGivesVariable()
     {
         var follow = Build(p => { p.TopShape = CapTopShape.FollowSeats; p.MinPedestalHeight = In(3); }).Units.Single(u => u.Type == SupportType.Pier);

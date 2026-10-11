@@ -56,7 +56,7 @@ public static class AbutmentViews
             d.ElevationTag(new Vec2(Xs(sm), mk.TopZ), $"MASKWALL TOP EL {d.Elev(mk.TopZ)}", right: mir * (mk.End == AbutmentEnd.Left ? -1 : 1) > 0);
         }
         if (g.Extension is { } ex)
-            d.Poly(SheetLayers.Concrete, new[] { new Vec2(Xs(ex.S0), g.BackwallBaseZ(ex.S0)), new Vec2(Xs(ex.S0), ex.TopZ), new Vec2(Xs(ex.S1), ex.TopZ), new Vec2(Xs(ex.S1), g.BackwallBaseZ(ex.S1)) });
+            d.Poly(SheetLayers.Concrete, new[] { new Vec2(Xs(ex.S0), g.FootingBottom(ex.S0)), new Vec2(Xs(ex.S0), ex.TopZ), new Vec2(Xs(ex.S1), ex.TopZ), new Vec2(Xs(ex.S1), g.FootingBottom(ex.S1)) });
         foreach (var (ps, _) in g.PileXY.GroupBy(p => p.S).Select(x => (x.Key, 0)))
         {
             double top = g.FootingBottom(ps) + ad.PileTopAboveFootingBottom, bot = g.FootingBottom(ps) - Ft(3);
@@ -147,16 +147,19 @@ public static class AbutmentViews
             foreach (var c in w.Counterforts)
             {
                 var R = new Vec2(c.Tangent.Y, -c.Tangent.X);
-                Vec2[] Rect(double e0, double e1) => new[] { c.Origin + c.Tangent * (-c.Width / 2) + R * e0, c.Origin + c.Tangent * (c.Width / 2) + R * e0, c.Origin + c.Tangent * (c.Width / 2) + R * e1, c.Origin + c.Tangent * (-c.Width / 2) + R * e1 };
-                dP.Poly(SheetLayers.Concrete, Rect(c.YCf0, c.YCf1).Select(ToPlan), true);
-                dP.Poly(SheetLayers.ConcreteHidden, Rect(c.YFoot0, c.YFoot1).Select(ToPlan), true);
+                Vec2[] Rect(double w, double e0, double e1) => new[] { c.Origin + c.Tangent * (-w / 2) + R * e0, c.Origin + c.Tangent * (w / 2) + R * e0, c.Origin + c.Tangent * (w / 2) + R * e1, c.Origin + c.Tangent * (-w / 2) + R * e1 };
+                dP.Poly(SheetLayers.Concrete, Rect(c.BodyWidth > 0 ? c.BodyWidth : c.Width, c.YCf0, c.YCf1).Select(ToPlan), true);
+                dP.Poly(SheetLayers.ConcreteHidden, Rect(c.Width, c.YFoot0, c.YFoot1).Select(ToPlan), true);
             }
         }
         foreach (var f in unit.Foundations.Skip(1))
             foreach (var p in f.Piles)
             {
                 double a = In(7.3), b = In(6.8);
-                dP.Poly(SheetLayers.Steel, new[] { Pl(p.S - a, p.N - b), Pl(p.S + a, p.N - b), Pl(p.S + a, p.N + b), Pl(p.S - a, p.N + b) }, true);
+                {
+                    var wv = new Vec2(p.WebS, p.WebN); var fv = new Vec2(wv.Y, -wv.X);        // web (depth) and flange directions
+                    dP.Poly(SheetLayers.Steel, new[] { (-a, -b), (a, -b), (a, b), (-a, b) }.Select(q => Pl(p.S + fv.X * q.Item1 + wv.X * q.Item2, p.N + fv.Y * q.Item1 + wv.Y * q.Item2)), true);
+                }
             }
         var box3 = dwgP.Extents();
         dP.Title("PILING AND WING LAYOUT", $"{unit.Foundations.Sum(f => f.Piles.Count)} piles {unit.Definition.PileSection}; stations along the line, plan at the bottom of footing · Scale {DrawingOptions.ScaleText(dP.Scale, u)}",

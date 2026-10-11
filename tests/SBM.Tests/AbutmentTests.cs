@@ -67,6 +67,7 @@ public class AbutmentTests
         ad.Rebar.FootingLongMark = "9a1"; ad.Rebar.BackFaceBarLength = Ft(13) + In(1); ad.Rebar.FrontFaceBarLength = Ft(12.75);
         ad.Rebar.PlanBarList.Add(new PlanBarLine("5g3", 4, Ft(42.6), 178));
         ad.Rebar.PlanBarList.Add(new PlanBarLine("6d1", 999, Ft(13), 0));
+        ad.Rebar.PlanBarList.Add(new PlanBarLine("8j3", 8, Ft(5), 107));
         var sd = doc.Bridge().Supports[0].ResolvedSubstructure.Clone();
         sd.Abutment = ad;
         doc.Bridge().Supports[0].Substructure = sd;
@@ -105,6 +106,66 @@ public class AbutmentTests
             Assert.Contains("IFCFOOTING", text);
         }
         finally { File.Delete(path); }
+    }
+
+    [Fact]
+    public void CounterfortBody_IsNarrowerThanItsFooting_AndUpliftAnchorsSitOnTheInnerPile()
+    {
+        var (doc, ad) = Setup();
+        ad.Wings[0].Counterforts[0].BodyWidth = In(22);
+        ad.Wings[0].Counterforts[0].VerticalMark = "6h2";
+        ad.Wings[0].UpliftPiles.Add(new UpliftPileDefinition { Footing = 1, Pile = 2 });
+        ad.Rebar.PlanBarList.Add(new PlanBarLine("6h2", 10, Ft(11.4), 0));
+        ad.Rebar.PlanBarList.Add(new PlanBarLine("8j3", 2, Ft(5), 0).Shaped("V", In(6), In(30), In(32), In(25.5)));
+        var sd = doc.Bridge().Supports[0].ResolvedSubstructure.Clone();
+        sd.Abutment = ad; sd.PileSection = "HP14x73"; sd.PileType = PileType.SteelHP;
+        doc.Bridge().Supports[0].Substructure = sd;
+        doc.Regenerate();
+        var m = doc.Substructure();
+        var u = m.Units.First(x => x.SupportIndex == 0);
+        var wf = u.Solids.Single(s => s.Kind == SubElementKind.WingFooting);
+        var cf = u.Solids.Single(s => s.Kind == SubElementKind.Counterfort);
+        // footing 3'-0 along the wall x 7'-0 across (default) x 3'-0 deep; counterfort 1'-10 x 3'-6
+        Assert.InRange(Math.Abs(wf.Mesh.Volume()), Ft(3) * Ft(7) * Ft(3) * 0.99, Ft(3) * Ft(7) * Ft(3) * 1.01);
+        Assert.InRange(Math.Abs(cf.Mesh.Volume()) / (In(22) * Ft(3.5) * Ft(6)), 0.99, 1.01);
+        // two V bars on the inner (second) pile of footing 1, 6" above the footing bottom
+        var anchors = m.Bars.Where(b => b.Unit == u.Name && b.Mark == "8j3").ToList();
+        Assert.Equal(2, anchors.Count);
+        var f1 = u.Foundations[1];
+        foreach (var a in anchors) Assert.Equal(f1.BottomZ + In(6), a.Points.Min(p => p.Z), 3);
+        Assert.Equal(10, m.Bars.Count(b => b.Unit == u.Name && b.Mark == "6h2"));
+        // the circled pile's web runs across the wall: both piles of the footing share it
+        Assert.All(f1.Piles, p => Assert.Equal(1.0, Math.Sqrt(p.WebS * p.WebS + p.WebN * p.WebN), 6));
+    }
+
+    [Fact]
+    public void FootingNotch_RemovesTheAcuteCorner_AndMaskwallIsFlushWithTheEndLine()
+    {
+        var (doc, ad) = Setup();
+        var u0 = doc.Substructure().Units.First(u => u.SupportIndex == 0);
+        var sl = doc.Framing().SupportLine(0);
+        var al = doc.Alignment();
+        var baseline = doc.Substructure().Units.First(u => u.SupportIndex == 0);
+        ad.Masks.Add(new MaskwallDefinition { End = AbutmentEnd.Left, Height = Ft(10), Thickness = In(10) });
+        var sd = doc.Bridge().Supports[0].ResolvedSubstructure.Clone();
+        sd.Abutment = ad;
+        doc.Bridge().Supports[0].Substructure = sd;
+        doc.Regenerate();
+        double v0 = Math.Abs(doc.Substructure().Units.First(x => x.SupportIndex == 0).Solids.Single(s => s.Kind == SubElementKind.Footing).Mesh.Volume());
+        var mk = doc.Substructure().Units.First(x => x.SupportIndex == 0).Abutment!.Masks.Single();
+        Assert.Equal(ad.LeftEndOffset, mk.EOuter, 9);                       // outer face flush with the footing end line
+        Assert.Equal(ad.LeftEndOffset + In(10), mk.EInner, 9);
+        // a notch on the span-side face at the left end: a line of constant station through the end line, 2 ft rearward of the face corner
+        var g = doc.Substructure().Units.First(x => x.SupportIndex == 0).Abutment!;
+        double nF = g.N(g.XFootFront);
+        var pFace = al.Inverse(doc.Substructure().Units.First(x => x.SupportIndex == 0).Plan(g.LeftEndS(nF), nF));
+        ad.FootingNotches.Add(new FootingNotchDefinition { End = AbutmentEnd.Left, FrontStation = pFace.Station - Ft(2) });
+        sd.Abutment = ad;
+        doc.Regenerate();
+        double v1 = Math.Abs(doc.Substructure().Units.First(x => x.SupportIndex == 0).Solids.Single(s => s.Kind == SubElementKind.Footing).Mesh.Volume());
+        Assert.NotEqual(v0, v1, 3);
+        Assert.True(Math.Abs(v1 - v0) > 0.1 && Math.Abs(v1 - v0) < 5, $"notch changes the footing volume by {v1 - v0:F3} m3");
+        _ = u0; _ = sl; _ = baseline;
     }
 
     [Fact]
