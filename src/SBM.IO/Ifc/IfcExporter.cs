@@ -33,8 +33,6 @@ public enum IfcGeometryMode
     /// <summary>Alignment-based Reference View (AbV): only geometry the view allows (no IfcExtrudedAreaSolid, booleans or half
     /// spaces) - face sets, swept disks, and solids placed along the IFC 4.3 alignment.</summary>
     ReferenceView,
-    /// <summary>Exact curved surfaces as NURBS (IfcAdvancedBrep with B-spline faces) for curved parts; NOT allowed in AbV.</summary>
-    Nurbs,
 }
 
 public sealed record IfcExportOptions(IfcGeometryMode Geometry = IfcGeometryMode.Parametric);
