@@ -186,16 +186,44 @@ public sealed partial class SubstructureGenerator
         double midHi = unit.Columns.Count > 0 ? unit.Columns.Max(c => c.S) + colHalf : s1 - cov;
         midLo = Math.Max(midLo, s0 + cov + In(3)); midHi = Math.Min(midHi, s1 - cov - In(3));
 
-        // Centred polyline following z(s) for a bar of the given listed length; extra path length from slopes is trimmed off equally.
-        Vec3[] Follow(double n, double length, Func<double, double> z, double centre)
+        var poly = unit.CapOutline.Count >= 3 ? unit.CapOutline.ToList() : unit.CapTop.Concat(Enumerable.Reverse(unit.CapBottom)).ToList();
+        double Clr(double s, double z) => PolyClear(poly, new Vec2(s, z));                  // distance to the cap outline (S-Z), + inside
+        double Setb(double s, double z) => LateralSetback(unit, s, z);
+
+        // Centred polyline following z(s) for a bar of the given listed length. The ends keep the cover to the (raked) end faces where the
+        // cap allows; a bar that is longer than the room is kept as listed (extended past the cover) and reported by the containment check.
+        Vec3[] Follow(double n, double length, Func<double, double> z, double centre, double endCover = -1, int hook = 0)
         {
-            double a = Math.Max(s0 + cov, centre - length / 2), b = Math.Min(s1 - cov, centre + length / 2);
-            var s = ss.Where(x => x > a + 1e-6 && x < b - 1e-6).Prepend(a).Append(b).ToList();
-            var pts = s.Select(x => unit.World(x, n, z(x))).ToArray();
+            if (endCover < 0) endCover = cov;
+            double lo = s0, hi = s1;
+            for (double x = s0; x < sMid; x += In(1)) { if (Clr(x, z(x)) >= endCover - 1e-6) { lo = x; break; } }
+            for (double x = s1; x > sMid; x -= In(1)) { if (Clr(x, z(x)) >= endCover - 1e-6) { hi = x; break; } }
+            double legH = 0;
+            if (hook != 0 && length > hi - lo + 1e-6)
+            {   // listed length beyond the room between the end faces: the excess is turned down (top bars) / up (bottom bars) in a hook at each end, as the plans' bent bars
+                legH = (length - (hi - lo)) / 2; length = hi - lo; centre = (lo + hi) / 2;
+            }
+            double a = Math.Max(lo, centre - length / 2), b = Math.Min(hi, centre + length / 2);
+            if (b - a < length - 1e-6 && Math.Abs(centre - sMid) < 1e-6 + capLen) { double mid = (a + b) / 2; a = mid - length / 2; b = mid + length / 2; if (a < lo - 1e-6 || b > hi + 1e-6) { a = Math.Min(a, Math.Max(lo, a)); } }
+            var sl = ss.Where(x => x > a + 1e-6 && x < b - 1e-6).Prepend(a).Append(b).ToList();
+            var pts = sl.Select(x => unit.World(x, n, z(x))).ToArray();
             double tot = 0;
             for (int i = 1; i < pts.Length; i++) tot += (pts[i] - pts[i - 1]).Length;
-            if (tot > length + 1e-6) pts = SubPolyline(pts, (tot - length) / 2, tot - (tot - length) / 2);
+            if (legH > 0)
+                pts = pts.Prepend(pts[0] + new Vec3(0, 0, hook * legH)).Append(pts[^1] + new Vec3(0, 0, hook * legH)).ToArray();
+            else if (tot > length + 1e-6) pts = SubPolyline(pts, (tot - length) / 2, tot - (tot - length) / 2);
+            else if (tot < length - 1e-6)
+            {                                                                  // listed length is longer than the room: keep it, extend both ends straight
+                double ex = (length - tot) / 2; var d0 = (pts[0] - pts[1]).Normalized(); var d1 = (pts[^1] - pts[^2]).Normalized();
+                pts[0] = pts[0] + d0 * ex; pts[^1] = pts[^1] + d1 * ex;
+            }
             return pts;
+        }
+        // Moves a station inward from the cap ends until the test holds (cap deep / wide enough with the cover to the end faces).
+        double FitS(double s, int dir, Func<double, bool> ok)
+        {
+            for (int k = 0; k < 400 && !ok(s); k++) s += dir * In(1);
+            return Math.Clamp(s, s0, s1);
         }
         double nA = nLo + cov + st.Diameter, nB = nHi - cov - st.Diameter;           // inside the stirrups
 
@@ -217,7 +245,7 @@ public sealed partial class SubstructureGenerator
                     double n = mine.Count == 1 ? (nA + nB) / 2 : nA + size.Diameter / 2 + (avail - size.Diameter) * j / (mine.Count - 1);
                     double off = dir * row * (dbMax + In(1.5));
                     Func<double, double> z = s => z0(s) + off;
-                    var pts = Follow(n, g.Length, z, sMid);
+                    var pts = Follow(n, g.Length, z, sMid, -1, dir < 0 ? -1 : 1);
                     bars.Add(PlanBarFixed(series, size, $"{loc} {g.Mark} {what}", pts, g.Length));
                 }
             }
@@ -236,7 +264,7 @@ public sealed partial class SubstructureGenerator
                 {
                     double n = cnt == 1 ? (nA + nB) / 2 : nA + (nB - nA) * j / (cnt - 1);
                     double centre = end == 0 ? s0 + cov + g.Length / 2 : s1 - cov - g.Length / 2;
-                    var pts = Follow(n, g.Length, s => BotAt(s) + cov + st.Diameter + size.Diameter / 2 + 3 * size.Diameter * (1 + rowsB), centre);
+                    var pts = Follow(n, g.Length, s => BotAt(s) + cov + st.Diameter + size.Diameter / 2 + 3 * size.Diameter * (1 + rowsB), centre, -1, 1);
                     bars.Add(PlanBarFixed("B", size, $"{loc} {g.Mark} cantilever bottom", pts, g.Length));
                 }
             }
@@ -277,6 +305,8 @@ public sealed partial class SubstructureGenerator
                     s = Even(i, g.Count, midLo + In(3), midHi - In(3)) + (g.Kind == PlanBarKind.CapTie ? (midHi - midLo) / (2.0 * g.Count) : 0);
                 else s = Even(i, g.Count, midLo, midHi);
                 s = Math.Clamp(s, s0 + cov, s1 - cov);
+                int dirIn = s < sMid ? 1 : -1;
+                s = FitS(s, dirIn, x => Clr(x, TopAt(x) - cov) >= cov - 1e-4 && Clr(x, BotAt(x) + cov) >= cov - 1e-4);
                 double zt = TopAt(s) - cov, zb = BotAt(s) + cov;
                 if (zt - zb < In(12)) continue;
                 string where = $"{loc} {g.Mark}";
@@ -292,8 +322,8 @@ public sealed partial class SubstructureGenerator
                 else if (g.Kind == PlanBarKind.CapTie)
                 {
                     double leg = Math.Max(In(6), (g.Length - w) / 2);
-                    double z0 = zb, z1 = Math.Min(zt, zb + leg);
-                    var pts = new[] { unit.World(s, nLo + cov, z1), unit.World(s, nLo + cov, z0), unit.World(s, nHi - cov, z0), unit.World(s, nHi - cov, z1) };
+                    double rd = size.Diameter / 2, z0 = zb + rd, z1 = Math.Min(zt - rd, zb + leg);
+                    var pts = new[] { unit.World(s, nLo + cov + rd, z1), unit.World(s, nLo + cov + rd, z0), unit.World(s, nHi - cov - rd, z0), unit.World(s, nHi - cov - rd, z1) };
                     bars.Add(PlanBarFixed("S", size, $"{where} ties", pts, g.Length > 0 ? g.Length : w + 2 * leg));
                 }
                 else
@@ -315,10 +345,15 @@ public sealed partial class SubstructureGenerator
                 string where = $"{loc} {g.Mark}";
                 if (g.Kind == PlanBarKind.CapTransverse)
                 {
+                    // 4c5 / 4c7: straight base with 4 1/2" legs turned up at both ends (7'-5 + 2 x 4 1/2 = 8'-2 on the 1G list).
                     double s = Math.Clamp(Even(i, g.Count, s0 + cov + In(3), s1 - cov - In(3)), s0 + cov, s1 - cov);
-                    double z = (TopAt(s) + BotAt(s)) / 2;
-                    double len = Math.Min(g.Length, nHi - nLo - 2 * cov);
-                    bars.Add(PlanBarFixed("T", size, $"{where} transverse", new[] { unit.World(s, (nLo + nHi) / 2 - g.Length / 2, z), unit.World(s, (nLo + nHi) / 2 + g.Length / 2, z) }, g.Length));
+                    s = FitS(s, s < sMid ? 1 : -1, x => TopAt(x) - BotAt(x) > In(24) && Clr(x, (TopAt(x) + BotAt(x)) / 2) >= cov + size.Diameter / 2 + In(5));
+                    double leg = In(4.5), bas = Math.Max(In(12), g.Length - 2 * leg), z = (TopAt(s) + BotAt(s)) / 2, nc = (unit.CapN0 + unit.CapN1) / 2;
+                    // highest elevation (full width above the relief curve) where the base fits between the cap sides with the cover
+                    for (double zz = TopAt(s) - cov - In(6); zz > BotAt(s) + cov + In(12); zz -= In(2))
+                        if (unit.CapN1 - unit.CapN0 - 2 * Setb(s, zz) - 2 * (cov + size.Diameter / 2) >= bas + 1e-6 && Clr(s, zz + leg) >= cov) { z = zz - leg; break; }
+                    var pts = new[] { unit.World(s, nc - bas / 2, z + leg), unit.World(s, nc - bas / 2, z), unit.World(s, nc + bas / 2, z), unit.World(s, nc + bas / 2, z + leg) };
+                    bars.Add(PlanBarFixed("T", size, $"{where} transverse", pts, g.Length));
                 }
                 else
                 {
@@ -326,7 +361,7 @@ public sealed partial class SubstructureGenerator
                     double need = vertical ? g.Length : Math.Max(In(12), (g.Length - w) / 2) + In(6);
                     double s = end == 0 ? s0 + cov + In(2) : s1 - cov - In(2);
                     // move in from the tip until the cap is deep enough for the bar
-                    for (int step = 0; step < 200 && TopAt(s) - BotAt(s) - 2 * cov < need; step++) s += (end == 0 ? 1 : -1) * In(3);
+                    s = FitS(s, end == 0 ? 1 : -1, x => TopAt(x) - BotAt(x) - 2 * cov >= need && Clr(x, TopAt(x) - cov) >= cov - 1e-4 && Clr(x, BotAt(x) + cov) >= cov - 1e-4);
                     double zt = TopAt(s) - cov, zb = BotAt(s) + cov;
                     if (zt - zb < In(6)) continue;
                     if (vertical)
@@ -340,7 +375,10 @@ public sealed partial class SubstructureGenerator
                         double z = per == 1 ? (zt + zb) / 2 : zb + (zt - zb) * (k + 0.5) / per;
                         double leg = Math.Max(In(3), (g.Length - w) / 2);
                         z = Math.Min(z, zt - leg);
-                        var pts = new[] { unit.World(s, nLo + cov, z + leg), unit.World(s, nLo + cov, z), unit.World(s, nHi - cov, z), unit.World(s, nHi - cov, z + leg) };
+                        double sbz = Setb(s, z), a = unit.CapN0 + sbz + cov + size.Diameter / 2, bb = unit.CapN1 - sbz - cov - size.Diameter / 2;
+                        double bas = Math.Min(bb - a, g.Length - 2 * leg), nc = (unit.CapN0 + unit.CapN1) / 2;
+                        leg = (g.Length - bas) / 2; z = Math.Min(z, zt - leg);
+                        var pts = new[] { unit.World(s, nc - bas / 2, z + leg), unit.World(s, nc - bas / 2, z), unit.World(s, nc + bas / 2, z), unit.World(s, nc + bas / 2, z + leg) };
                         bars.Add(PlanBarFixed("E", size, $"{where} end transverse", pts, g.Length));
                     }
                 }
@@ -354,13 +392,14 @@ public sealed partial class SubstructureGenerator
             string where = $"{loc} {g.Mark}";
             if (g.Kind == PlanBarKind.PedestalHoop)
             {
-                double zh = (peds.Count > 0 ? peds.Min(p => p.CapTopZ) : TopAt(sMid)) - In(6);
-                double sLen = Math.Max(g.Length / 2 - w, In(12));
+                double zh = TopAt(sMid) - cov - size.Diameter / 2 - In(3);
+                double wh = unit.CapN1 - unit.CapN0 - 2 * Setb(sMid, zh) - 2 * (cov + size.Diameter / 2);
+                double sLen = Math.Max(g.Length / 2 - wh, In(12));
                 for (int i = 0; i < g.Count; i++)
                 {
-                    var line = new[] { new Vec2(-sLen / 2, -w / 2), new Vec2(sLen / 2, -w / 2), new Vec2(sLen / 2, w / 2), new Vec2(-sLen / 2, w / 2) };
+                    var line = new[] { new Vec2(-sLen / 2, -wh / 2), new Vec2(sLen / 2, -wh / 2), new Vec2(sLen / 2, wh / 2), new Vec2(-sLen / 2, wh / 2) };
                     var (shape, local) = PolygonTie(line, size);
-                    var pts = local.Select(p => unit.World(sMid + p.X, (nLo + nHi) / 2 + p.Y, zh - i * In(3))).ToArray();
+                    var pts = local.Select(p => unit.World(sMid + p.X, (unit.CapN0 + unit.CapN1) / 2 + p.Y, zh - i * In(3))).ToArray();
                     bars.Add(new RawBar("M", size, shape, $"{where} pedestal hoops", pts));
                 }
                 continue;
@@ -370,8 +409,11 @@ public sealed partial class SubstructureGenerator
             {
                 var p = peds[i % peds.Count];
                 bool alongS = g.Kind == PlanBarKind.PedestalLongitudinal;
-                double baseLen = Math.Clamp(g.Length - In(54), In(12), alongS ? Ft(8) : w), leg = (g.Length - baseLen) / 2;
-                double zTop = p.SeatZ - In(3);
+                // The pedestal bars are U bars in the top of the cap under the bearing seat (the pedestal itself is only inches high): base just under
+                // the cap top, legs down into the cap; the base keeps the cover to the cap sides at that elevation (full width above the relief curve).
+                double zTop = TopAt(p.S) - cov - size.Diameter / 2;
+                double nAvail = unit.CapN1 - unit.CapN0 - 2 * Setb(p.S, zTop) - 2 * (cov + size.Diameter / 2);
+                double baseLen = Math.Clamp(g.Length - In(54), In(12), alongS ? Ft(8) : Math.Max(In(12), nAvail)), leg = (g.Length - baseLen) / 2;
                 double lateral = ((i / peds.Count) - ((g.Count + peds.Count - 1) / peds.Count - 1) / 2.0) * In(6);
                 Vec3 P(double a, double z) => alongS ? unit.World(p.S + a, p.N + lateral, z) : unit.World(p.S + lateral, p.N + a, z);
                 var pts = new[] { P(-baseLen / 2, zTop - leg), P(-baseLen / 2, zTop), P(baseLen / 2, zTop), P(baseLen / 2, zTop - leg) };

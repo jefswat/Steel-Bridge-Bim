@@ -37,6 +37,7 @@ public sealed partial class SubstructureGenerator
                     if (fd is { Bars.Count: > 0 }) FootingPlanBars(unit, f, fd, bars); else FootingBars(unit, f, bars);
                 }
             }
+            CheckContainment(unit, bars);
             perUnit.Add((unit, bars));
         }
         foreach (var (unit, bars) in perUnit) AssignMarks(m, unit, bars);
