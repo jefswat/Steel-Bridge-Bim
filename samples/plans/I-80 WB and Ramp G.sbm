@@ -1747,7 +1747,7 @@
             "Footings": [],
             "BearingToCapFront": 0.45720000000000005,
             "BackwallThickness": 0.3048,
-            "BackwallGap": 0.0254,
+            "BackwallGap": 0.15239999999999998,
             "BackwallTopBelowGrade": 0,
             "AbutmentFoundationCount": 4,
             "AbutmentFoundationSpacing": 3.6576000000000004,
@@ -19219,12 +19219,12 @@
         {
           "Name": "Pier 11WB",
           "Type": "Pier",
-          "Station": 231745.9553937256,
-          "SkewDegrees": 27.46527777777778,
+          "Station": 231745.83994561245,
+          "SkewDegrees": 27.51091112139377,
           "DeckEndOffset": 0.3937,
           "GirderEndExtension": 0.30479999999999996,
           "SharedPier": "Pier 11WB \u0026 19G",
-          "PierCenterOffset": 0.45720000000000005,
+          "PierCenterOffset": 0.508,
           "Fixity": "GuidedExpansion",
           "ResolvedFixity": "GuidedExpansion",
           "GirderFixities": [
@@ -19283,53 +19283,53 @@
             "CapOffset": 0,
             "CapProfile": [
               {
-                "S": -13.011623787979907,
+                "S": -12.984703969308647,
                 "Elevation": 308.13756
               },
               {
-                "S": 12.896376212020094,
+                "S": 12.923296030691354,
                 "Elevation": 309.426864
               },
               {
-                "S": 13.331325812020093,
+                "S": 13.358245630691354,
                 "Elevation": 308.055264
               },
               {
-                "S": 10.762776212020094,
+                "S": 10.789696030691355,
                 "Elevation": 307.1870860235294
               },
               {
-                "S": -10.878023787979908,
+                "S": -10.851103969308648,
                 "Elevation": 306.11013797647064
               },
               {
-                "S": -13.310022987979908,
+                "S": -13.283103169308648,
                 "Elevation": 306.76596
               }
             ],
             "CapProfileAhead": [
               {
-                "S": -13.011623787979907,
+                "S": -12.984703969308647,
                 "Elevation": 308.756304
               },
               {
-                "S": 12.896376212020094,
+                "S": 12.923296030691354,
                 "Elevation": 310.045608
               },
               {
-                "S": 13.331325812020093,
+                "S": 13.358245630691354,
                 "Elevation": 308.055264
               },
               {
-                "S": 10.762776212020094,
+                "S": 10.789696030691355,
                 "Elevation": 307.1870860235294
               },
               {
-                "S": -10.878023787979908,
+                "S": -10.851103969308648,
                 "Elevation": 306.11013797647064
               },
               {
-                "S": -13.310022987979908,
+                "S": -13.283103169308648,
                 "Elevation": 306.76596
               }
             ],
@@ -19425,7 +19425,7 @@
               12.3444,
               6.5532
             ],
-            "FirstColumnOffset": -9.506423787979907,
+            "FirstColumnOffset": -9.479503969308647,
             "ColumnShape": "Rectangular",
             "ColumnDiameter": 0.9144000000000001,
             "ColumnWidth": 2.4384,
@@ -25754,8 +25754,8 @@
         {
           "Name": "Pier 11WB",
           "Type": "Pier",
-          "Station": 231746.9205937256,
-          "SkewDegrees": 27.46527777777778,
+          "Station": 231746.98500486417,
+          "SkewDegrees": 27.41966331825965,
           "DeckEndOffset": 0.3937,
           "GirderEndExtension": 0.30479999999999996,
           "SharedPier": "Pier 11WB \u0026 19G",
@@ -31634,7 +31634,7 @@
             "Footings": [],
             "BearingToCapFront": 0.45720000000000005,
             "BackwallThickness": 0.3048,
-            "BackwallGap": 0.0254,
+            "BackwallGap": 0.15239999999999998,
             "BackwallTopBelowGrade": 0,
             "AbutmentFoundationCount": 4,
             "AbutmentFoundationSpacing": 3.6576000000000004,
@@ -31729,14 +31729,14 @@
         "PlanGeometry": [
           {
             "Girder": 0,
-            "StartStation": 231734.91532567452,
-            "StartOffset": -22.282150000456866,
-            "StartDirectionDegrees": 4.157644088537669,
+            "StartStation": 231735.00328849655,
+            "StartOffset": -22.282150000439806,
+            "StartDirectionDegrees": 4.160897335844539,
             "Elements": [
               {
                 "Kind": "ArcLeft",
                 "Radius": 691.4134,
-                "Length": 106.89898612933436
+                "Length": 106.81349513857008
               },
               {
                 "Kind": "ArcLeft",
@@ -31752,27 +31752,27 @@
           },
           {
             "Girder": 1,
-            "StartStation": 231737.14725521856,
-            "StartOffset": -18.259425000738812,
-            "StartDirectionDegrees": 1.9179454911705045,
+            "StartStation": 231737.23080781716,
+            "StartOffset": -18.259424999770797,
+            "StartDirectionDegrees": 1.918456560202503,
             "Elements": [
               {
                 "Kind": "ArcLeft",
                 "Radius": 852.4748000000001,
-                "Length": 141.15374122688422
+                "Length": 141.07050270590148
               }
             ]
           },
           {
             "Girder": 2,
-            "StartStation": 231739.26539615382,
-            "StartOffset": -14.392275000378012,
-            "StartDirectionDegrees": 0.2585626825381473,
+            "StartStation": 231739.34477691492,
+            "StartOffset": -14.392274999394438,
+            "StartDirectionDegrees": 0.25612616213224754,
             "Elements": [
               {
                 "Kind": "ArcLeft",
                 "Radius": 851.916,
-                "Length": 201.3067250492525
+                "Length": 201.22725349478802
               }
             ]
           }

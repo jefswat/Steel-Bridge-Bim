@@ -185,8 +185,12 @@ PDF page numbers (1-based) of `B00168` (I-80, design 116) and `B00169` (Ramp G, 
 - **Strip seal (Ramp G pdf 150, section C-C and expansion opening detail):** "D" is the JOINT SETTING (2" at 50 F, 15/16" at 90 F, 3 1/16" at 10 F);
   concrete ends are D + 1/2" apart = 2 1/2" at 50 F. The pocket is "4 +/-" each side of the gland (flared); its depth is not dimensioned (model: 4" wide,
   8 1/16" = slab end block depth, approximate).
-- **Model conflicts found by joints-i80.csx:** Pier 11WB support lines are 3'-2 apart in the model, the plans give 2 x 1'-8 = 3'-4 (opening 7" instead of 9");
-  abutment backwall front face is 17" from CL bearing in the model, 22" per plan (deck end 1'-4 + C 6"). Not changed.
+- **Model conflicts found by joints-i80.csx (resolved 2026-10-10):** (1) Pier 11WB support lines were 3'-2 apart (model) vs 2 x 1'-8 = 3'-4 on the plans: fixed by
+  `support-lines-i80.csx` (parallel to the CL pier, 1'-8 normal each side). (2) The "opening 14.08 in" the script then printed was a CHECK error, not a model error:
+  the deck end is DeckEndOffset NORMAL to the support line (`FramingGenerator.DeckEndLine`), but the check subtracted the offsets from the station difference
+  along the alignment (support lines are 3.76 ft apart along the CL at the 27.5 deg skew). `joints-i80.csx`/`joints-ramp-g.csx` now measure the opening normal
+  to the (parallel) support lines: Pier 5WB 9.00, 11WB 9.00 (plan 9), Ramp G 5G 9.00, 9G 9.00, 14G 10.00. (3) Abutment backwall face was 17" from CL bearing
+  (BackwallGap default 1"); joints-i80.csx now sets BackwallGap = C = 6" at both I-80 abutments: 22" = plan (deck end 1'-4 + 6").
 
 ## 7. What the model builds
 `SupportDefinition.ExpansionJoint` (`ExpansionJointDefinition`, optional, default off) on an END support: blockout (width D from the deck-end face,

@@ -31,9 +31,10 @@ B 7WB +0.02, 8WB -0.08, 9WB +0.21; C 7WB +0.01, 8WB +0.10; D 7WB +0.01. Before: 
 | B | one arc R 2796'-10 from 11WB through 12WB (ends 60'-3 11/16 past 12WB) |
 | C | one arc R 2795'-0 from 11WB through 12WB (ends 53'-2 11/16 past 13WB) |
 At 12WB the sheet gives the pier dims A-B 8'-5 1/4 and B-C 8'-7 7/8 (along the pier; the script places B and C from the A bearing). D-J R 2324'-5 ... 2393'-5 concentric.
-Model - plan span lengths: A 13WB -0.25", 14WB -0.16"; C 13WB +0.18"; D 13WB -0.01". Spans 12WB (11WB end) read +2.9" to +3.4" on EVERY girder
-including the parallel D-J: the 11WB support line of Unit 3 is about 0.25 ft off the plan (Unit 2 end: +0.4 ft, A 11WB +4.9" and F +4.75"),
-not a girder-geometry matter (open, with the joint / Pier 11WB items).
+Model - plan span lengths: A 12WB -0.16", 13WB -0.18", 14WB -0.11"; B 12WB +0.08"; C 12WB +0.15", 13WB +0.12"; D-J all within 0.03".
+The 11WB support lines (both units) were wrong before `support-lines-i80.csx` (spans touching 11WB read +2.9..3.4" Unit 3 / +4.7..4.9" Unit 2 on EVERY girder):
+now 11WB end of Unit 2 F-K -0.02..+0.02" and A +0.03"; Unit 3 12WB D-J -0.03..+0.03". Full table of all I-80 spans: `samples/plans/check-spans-i80.csx`
+(109 girder spans; remaining > 1/16" are only the explicit north-girder arcs, <= 0.21", and Unit 2 B-E from Pier 6A -0.07..-0.09")
 
 ## Earlier "x cos(skew)" pier offsets were the error
 `girders-i80.csx` / `pier-6a.csx` converted the plan's dimensions along the skewed pier lines to offsets normal to the alignment as

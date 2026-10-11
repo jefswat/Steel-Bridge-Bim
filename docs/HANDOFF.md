@@ -10,7 +10,7 @@ Use this to start the next session. Architecture notes are in `CLAUDE.md`. The u
 - **Program:** `dist\SteelBridgeModeler\` (app plus `sbm.exe`), republished 20:02 with generic bearings. Matches the source; tests 128/128 pass.
 - **Test model:** `samples\plans\I-80 WB and Ramp G.sbm`, saved 13:48. Iowa DOT Designs 116 (WB I-80) and 316 (Ramp G), georeferenced to UTM 15N.
   - Rebuild order:
-    1. `build-i80-wb.csx`
+    1. `build-i80-wb.csx`, then `support-lines-i80.csx` (11WB bearing lines parallel to the CL pier, 1'-8 normal each side; re-runnable)
     2. `build-ramp-g.csx`
     3. `geolocate-cbis.csx`
     4. `cross-slope-i80.csx`, then `deck-edges-i80.csx`
@@ -18,7 +18,7 @@ Use this to start the next session. Architecture notes are in `CLAUDE.md`. The u
     6. `piers-i80.csx`
     7. `piers-ramp-g.csx`
     8. `bearings.csx` (plan bearing data tables; check with `check-top-of-bearing.csx`)
-    9. `column-rebar.csx` (plan column / flare cages of the as-designed piers)
+    9. `column-rebar.csx` (then `pier-aesthetics.csx`, `girder-geometry-i80.csx` after girders-i80/pier-6a, then `joints-i80.csx`, `joints-ramp-g.csx`; checks: `check-spans-i80.csx`, `check-top-of-bearing.csx`, `check-top-of-slab.csx`) (plan column / flare cages of the as-designed piers)
     10. `cross-frames-i80.csx`, then `cross-frames-ramp-g.csx` (plan cross frame types and framing plan lines)
   - Backups are in `C:\SBMData\CouncilBluffs_I80\`. The latest is "…before Ramp G offset fix.sbm" (2026-10-10).
   - Ramp G only (re-runnable on the georeferenced model; Ramp G is placed by best fit to the I-80 WB alignment):
