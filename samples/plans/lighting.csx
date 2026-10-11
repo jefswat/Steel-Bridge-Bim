@@ -29,6 +29,10 @@ List<MiscBarRow> PoleBars() => new()
 PoleBaseDefinition Pole(string name, string support, double along, double circle) => new()
 {
     Name = name, Support = support, AlongFromSupport = along, Side = LightingSide.Right, BoltCircleDiameter = circle, Bars = PoleBars(),
+    // Section D-D (I-80 PDF 235, Ramp G PDF 169): 2'-6 projection, 2'-7 1/2 high at the deck edge with its bottom flush with the slab soffit (cast against
+    // the slab edge, keyway), outer face 1'-8 1/2, soffit R = 3'-0 dropping 11" over 1'-11 3/4, then 4 1/4 flat. The "5" over the top is the anchor bolt
+    // projection, not a ledge height (the earlier "top 5\" above the deck" reading put the block too low).
+    BottomAtSlabSoffit = true, HeightAtBarrier = F(2, 7.5), HeightAtOuterEdge = F(1, 8.5), SoffitRise = In(11), SoffitRun = F(1, 11.75), SoffitRadius = F(3, 0),
 };
 JunctionBoxDefinition Jb(string name, string support, double along) => new() { Name = name, Support = support, AlongFromSupport = along, Side = LightingSide.Right, Kind = JunctionBoxKind.Unresolved };
 
@@ -67,6 +71,7 @@ foreach (var b in new[] { u3, gu2 })
     var misc = Doc.Substructure(b.Name).Misc;
     if (misc == null) { Print($"{b.Name}: no misc model"); continue; }
     Print($"{b.Name}: {misc.Assemblies.Count} assemblies, {misc.Elements.Count} elements, pole-base rebar {misc.Marks.Where(m => m.Unit.StartsWith("Pole")).Sum(m => m.TotalMass) / 0.45359237:F0} lb");
+    foreach (var d in misc.Diagnostics.Where(d => d.Message.Contains("block top"))) Print($"   {d.Severity}: {d.Message}");
     foreach (var d in misc.Diagnostics.Where(d => d.Severity != SBM.Core.Framing.DiagnosticSeverity.Info && (d.Message.Contains("ole") || d.Message.Contains("unction") || d.Message.Contains("onduit") || d.Message.Contains("UNRESOLVED")))) Print($"   {d.Severity}: {d.Message}");
 }
 Doc.Save();

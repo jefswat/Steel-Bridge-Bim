@@ -150,6 +150,15 @@ public sealed class SignBracketDefinition
     public double Height { get; set; }
     /// <summary>Bottom flange plate width (22" Unit 2, 26" Unit 3).</summary>
     public double BottomFlangeWidth { get; set; }
+    /// <summary>
+    /// OPTIONAL (plan Section D-D / C-C): CL girder (W.P.) to CL post along the bracket, i.e. the bracket cantilevers OUTBOARD of the girder and carries
+    /// the post outside the deck edge / barrier. Null = legacy placement (stub centred on the girder web, overlapping it).
+    /// </summary>
+    public double? PostOutboard { get; set; }
+    /// <summary>Plan angle from the girder's ahead tangent, turning toward the outboard side, to the bracket (Section D-D; 90 = square).</summary>
+    public double AngleToGirderDegrees { get; set; } = 90;
+    /// <summary>Top of base elevation down to the top of the bracket top flange at the post (View J-J "elevation line to level line"); null = legacy (no stub, bracket top at the top of base).</summary>
+    public double? StubHeight { get; set; }
     public SignBracketDefinition Clone() => (SignBracketDefinition)MemberwiseClone();
 }
 
@@ -181,6 +190,10 @@ public sealed class SignSupportDefinition
     public double BasePlateThickness { get; set; } = In(2);
     public double PostOuterDiameter { get; set; } = In(14);
     public double PostWall { get; set; } = In(0.5);
+    /// <summary>CL post to the outer end of the bracket (Section D-D "2'-3 (TYP.)"); used with <see cref="SignBracketDefinition.PostOutboard"/>.</summary>
+    public double EndBeyondPost { get; set; } = Ft(2) + In(3);
+    /// <summary>Bracket top flange width (View J-J "1 7/8 x 26 FLANGE PL"; thickness = <see cref="TopPlateThickness"/>).</summary>
+    public double BracketTopFlangeWidth { get; set; } = In(26);
     // Exit sign base (outrigger block): placed only when BackFromBearing is given.
     public int Girder { get; set; }
     public double? BackFromBearing { get; set; }
@@ -240,6 +253,17 @@ public sealed class PoleBaseDefinition
     public double HeightAtBarrier { get; set; } = Ft(2) + In(7.5);
     public double HeightAtOuterEdge { get; set; } = In(11);
     public double SoffitRadius { get; set; } = Ft(3);
+    /// <summary>
+    /// OPTIONAL plan section (I-80 PDF 235 Section D-D / Ramp G PDF 169): when true the block is placed with its bottom at the barrier side FLUSH WITH THE
+    /// SLAB SOFFIT at the deck edge (the block is cast against the slab edge) and its top <see cref="HeightAtBarrier"/> above it; the outer face is
+    /// <see cref="HeightAtOuterEdge"/> high, then the soffit arc (R <see cref="SoffitRadius"/>) drops <see cref="SoffitRise"/> over <see cref="SoffitRun"/>
+    /// to the flat bottom. False = the legacy placement (top <see cref="TopAboveLedge"/> above the deck-edge top, arc between the two end heights).
+    /// </summary>
+    public bool BottomAtSlabSoffit { get; set; }
+    /// <summary>Vertical drop of the soffit arc (plans: 11"); used with <see cref="BottomAtSlabSoffit"/>.</summary>
+    public double SoffitRise { get; set; } = In(11);
+    /// <summary>Horizontal run of the soffit arc from the outer face (plans: 1'-11 3/4); used with <see cref="BottomAtSlabSoffit"/>.</summary>
+    public double SoffitRun { get; set; } = Ft(1) + In(11.75);
     public PoleBaseDefinition Clone() { var c = (PoleBaseDefinition)MemberwiseClone(); c.Bars = Bars.Select(b => b.Clone()).ToList(); return c; }
 }
 

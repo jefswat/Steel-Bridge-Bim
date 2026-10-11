@@ -77,6 +77,7 @@ public sealed partial class MiscItemsGenerator
             double sPost = sb + b.AheadOfSupport;
             var (web, tan, _) = g.Path.At(sPost);
             var P = web.XY;
+            if (b.PostOutboard is { } outb) { BuildOutboardBracket(s, b, asm, g, sPost, outb); continue; }
             var frame = MiscMesh.Plan(P, tan);                     // x along the girder, y to the left of the girder
             double zTop = b.TopOfBaseElevation, zBot = zTop - b.Height;
             double BL = s.TopPlateLength;
@@ -107,16 +108,94 @@ public sealed partial class MiscItemsGenerator
             Add(MiscGroup.SignSupport, MiscKind.SignPlaceholder, asm, asm + " base plate (by others)", $"Base plate {Sh(s.BasePlateDiameter)} dia x {Sh(s.BasePlateThickness)} (not part of this contract)", bp, "By others", true,
                 $"Plans: base plate {Sh(s.BasePlateDiameter)} dia x {Sh(s.BasePlateThickness)}, HSS {s.PostOuterDiameter / 0.0254:F3}x{s.PostWall / 0.0254:F3} truss post and the {L(s.TrussSpan)} sign truss are by others; their heights are not in the plans", $"{s.Support}, girder {g.Name}");
         }
+        bool outboard = s.Brackets.Count > 0 && s.Brackets.All(b => b.PostOutboard != null);
         foreach (var el in _m.Elements.Where(e => e.Group == MiscGroup.SignSupport && e.Assembly.StartsWith(s.Name + " bracket")).ToList())
         {
             if (el.Kind == MiscKind.SignAnchorBolt)
                 Flag(el.Name, "Anchor bolt lengths are not printed (I-80 PDF 178 / 182).", "standard bolt geometry with a 2\" / 3 1/2\" stick-out about the top plate");
-            else if (el.Kind is MiscKind.SignPlate or MiscKind.SignStiffener && !el.Name.EndsWith("(by others)"))
+            else if (outboard && (el.Name.EndsWith(" post stub web") || el.Name.EndsWith(" top plate") || el.Name.EndsWith(" stiffeners")))
+                Flag(el.Name, "The post stub plate lengths along the bracket (top plate, stub web, stiffeners) are not printed (I-80 PDF 178 / 180 View J-J, Section C-C).", "2'-4 plate lengths along the bracket, centred on the CL post");
+            else if (!outboard && el.Kind is MiscKind.SignPlate or MiscKind.SignStiffener && !el.Name.EndsWith("(by others)"))
                 Flag(el.Name, "The bracket's plan size and its connection to the girder (details B-G, PDF 178 / 182) are not fully dimensioned; the web is modeled in the girder web plane and overlaps the girder web.", "2'-4 plate lengths along the girder, centred on the girder CL");
         }
-        Warn($"{s.Name}: not modeled - the bolted connection to the girder (the bracket web is modeled in the plane of the girder web, so it overlaps the girder web over the height below the top of web; the plans' field-splice-type connection geometry is not resolved), MC18x45.8 flange members, WT5x22.5 diagonal / horizontal bracing, web and flange splice plates and bolts to the girder, 45 deg clips, 3/4\" bar connections (details A-G); anchor bolt lengths are not printed; the HSS post height and the {L(s.TrussSpan)} truss (size, elevation) are not in the plans (placeholder base plate only).");
-        if (s.Brackets.Count > 0)
+        if (outboard)
+            Warn($"{s.Name}: not modeled - the field-splice-type connection of the bracket to the girder (splice / fill plates, bolts; Detail A 1/4\" gaps, R 2\"), MC18x45.8 spreader beam, WT5x22.5 diagonal / horizontal bracing, 45 deg clips, 3/4\" bar connections, the tapered bottom at the bracket's outer end (View J-J), flanges following the girder slope (modeled level); anchor bolt lengths are not printed; the HSS post height and the {L(s.TrussSpan)} truss (size, elevation) are not in the plans (placeholder base plate only).");
+        else Warn($"{s.Name}: not modeled - the bolted connection to the girder (the bracket web is modeled in the plane of the girder web, so it overlaps the girder web over the height below the top of web; the plans' field-splice-type connection geometry is not resolved), MC18x45.8 flange members, WT5x22.5 diagonal / horizontal bracing, web and flange splice plates and bolts to the girder, 45 deg clips, 3/4\" bar connections (details A-G); anchor bolt lengths are not printed; the HSS post height and the {L(s.TrussSpan)} truss (size, elevation) are not in the plans (placeholder base plate only).");
+        if (s.Brackets.Count > 0 && !outboard)
             Info($"{s.Name}: bracket plan geometry follows the plan dimensions 2'-2 x 2'-4; plate lengths along the girder = 2'-4 (modeling convention; details B-E not fully dimensioned in the extract).");
+    }
+
+    /// <summary>
+    /// Sign truss support bracket per plan Sections C-C / D-D and View J-J (I-80 PDF 178, 180-181): a plate-girder cantilever from girder g, square to the
+    /// spreader beam, at <see cref="SignBracketDefinition.AngleToGirderDegrees"/> to the girder's ahead tangent on its OUTBOARD side; post CL
+    /// <see cref="SignBracketDefinition.PostOutboard"/> from CL girder, bracket ends <see cref="SignSupportDefinition.EndBeyondPost"/> beyond it.
+    /// Bracket top flange top = top of base - StubHeight; web depth = Height; post stub (web, top plate, stiffeners) above the bracket at the post.
+    /// </summary>
+    private void BuildOutboardBracket(SignSupportDefinition s, SignBracketDefinition b, string asm, GirderResult g, double sPost, double outb)
+    {
+        var (web, tan, _) = g.Path.At(sPost);
+        var P = web.XY;
+        double sta = _a.Inverse(P).Station, offG = _a.Inverse(P).Offset;
+        // outboard side = away from the neighbouring girder
+        int other = g.Index == 0 ? 1 : g.Index - 1;
+        bool left;
+        if (other >= 0 && other < _f.Girders.Count && other != g.Index)
+        {
+            var go = _f.Girders[other];
+            var (_, _, so) = GirderAt(go, sta);
+            left = offG < _a.Inverse(go.Path.At(so).Item1.XY).Offset;
+        }
+        else left = offG < 0;
+        double ang = b.AngleToGirderDegrees * Math.PI / 180 * (left ? 1 : -1);
+        var d = Vec2.FromAngle(Math.Atan2(tan.Y, tan.X) + ang);   // bracket direction, outboard
+        var Q = P + d * outb;                                      // CL post
+        var frame = MiscMesh.Plan(Q, d);                          // x outboard along the bracket, y across, z up
+        double tp = s.TopPlateThickness, bf = s.BottomFlangeThickness, wt = s.WebThickness, BL = s.TopPlateLength;
+        double zTop = b.TopOfBaseElevation, stub = b.StubHeight ?? 0;
+        double zTF = zTop - stub;                                  // top of the bracket top flange
+        double zW1 = zTF - tp, zW0 = zW1 - b.Height, zB = zW0 - bf;
+        var tf = g.PlateAt(GirderPlate.TopFlange, sPost);
+        var bfl = g.PlateAt(GirderPlate.BottomFlange, sPost);
+        double sinA = Math.Max(Math.Abs(Math.Sin(ang)), 0.2);
+        double gWeb = g.PlateAt(GirderPlate.Web, sPost)?.Thickness ?? In(0.75);
+        double xWeb = -outb + gWeb / 2 / sinA;                     // bracket web starts at the girder web face
+        double xTopF = -outb + (tf?.Width ?? 0) / 2 / sinA, xBotF = -outb + (bfl?.Width ?? 0) / 2 / sinA;   // flanges start at the girder flange edges
+        double x1 = s.EndBeyondPost;
+        Mesh Box(double x0, double x1_, double y0, double y1, double z0, double z1) { var m = new Mesh(); MeshBuilder.AddBox(m, frame, x0, x1_, y0, y1, z0, z1); return m; }
+        Asm(MiscGroup.SignSupport, asm, $"Sign truss support bracket at {s.Support}: cantilever from girder {g.Name}, CL post {Sh(outb)} outboard of CL girder at {b.AngleToGirderDegrees:0.###} deg, {Sh(b.Height)} web, top of base {zTop / 0.3048:F2}", "sign support");
+        Add(MiscGroup.SignSupport, MiscKind.SignPlate, asm, asm + " bracket web", $"PL {Sh(wt)} bracket web {Sh(b.Height)} deep, girder web face to {Sh(x1)} beyond the CL post", Box(xWeb, x1, -wt / 2, wt / 2, zW0, zW1), PlansSteel);
+        Add(MiscGroup.SignSupport, MiscKind.SignPlate, asm, asm + " bracket top flange", $"PL {Sh(tp)} x {Sh(s.BracketTopFlangeWidth)} bracket top flange (level; plans: follows the girder slope)", Box(xTopF, x1, -s.BracketTopFlangeWidth / 2, s.BracketTopFlangeWidth / 2, zW1, zTF), PlansSteel);
+        Add(MiscGroup.SignSupport, MiscKind.SignPlate, asm, asm + " bracket bottom flange", $"PL {Sh(bf)} x {Sh(b.BottomFlangeWidth)} bracket bottom flange (level)", Box(xBotF, x1, -b.BottomFlangeWidth / 2, b.BottomFlangeWidth / 2, zB, zW0), PlansSteel);
+        if (stub > tp + 1e-4)
+        {
+            Add(MiscGroup.SignSupport, MiscKind.SignPlate, asm, asm + " post stub web", $"PL {Sh(wt)} post stub web, {Sh(stub - tp)} high", Box(-BL / 2, BL / 2, -wt / 2, wt / 2, zTF, zTop - tp), PlansSteel);
+            var st = new Mesh();
+            foreach (double x in new[] { -s.StiffenerOffset, s.StiffenerOffset })
+                foreach (int sg in new[] { -1, 1 })
+                    st.Append(Box(x - s.StiffenerThickness / 2, x + s.StiffenerThickness / 2, sg > 0 ? wt / 2 : -wt / 2 - s.StiffenerWidth, sg > 0 ? wt / 2 + s.StiffenerWidth : -wt / 2, zTF, zTop - tp));
+            Add(MiscGroup.SignSupport, MiscKind.SignStiffener, asm, asm + " stiffeners", $"4 PL {Sh(s.StiffenerThickness)} x {Sh(s.StiffenerWidth)} post stub stiffeners at {Sh(s.StiffenerOffset)} each side of the CL post", st, PlansSteel);
+        }
+        Add(MiscGroup.SignSupport, MiscKind.SignPlate, asm, asm + " top plate", $"PL {Sh(tp)} x {Sh(s.TopPlateWidth)} x {Sh(BL)} (anchor level)",
+            Box(-BL / 2, BL / 2, -s.TopPlateWidth / 2, s.TopPlateWidth / 2, zTop - tp, zTop), PlansSteel);
+        var bolts = new Mesh();
+        double r = s.AnchorCircleDiameter / 2;
+        for (int i = 0; i < s.AnchorBoltCount; i++)
+        {
+            double a2 = (s.AnchorStartAngleDegrees + 360.0 * i / s.AnchorBoltCount) * Math.PI / 180;
+            var c = frame.ToWorld(r * Math.Cos(a2), r * Math.Sin(a2), 0);
+            bolts.Append(AnchorBolt(c.XY, zTop - tp, zTop, s.AnchorBoltDiameter, In(2), In(3.5)));
+        }
+        Add(MiscGroup.SignSupport, MiscKind.SignAnchorBolt, asm, asm + " anchor bolts", $"{s.AnchorBoltCount} anchor bolts {Sh(s.AnchorBoltDiameter)} dia F1554 Gr 105 on a {Sh(s.AnchorCircleDiameter)} dia circle starting {s.AnchorStartAngleDegrees:0.#} deg; nuts, washers; lengths NOT printed (stand-in stick-out)", bolts, "ASTM F1554 Gr 105");
+        var bp = MiscMesh.Cylinder(frame.ToWorld(0, 0, zTop), frame.ToWorld(0, 0, zTop + s.BasePlateThickness), s.BasePlateDiameter / 2);
+        Add(MiscGroup.SignSupport, MiscKind.SignPlaceholder, asm, asm + " base plate (by others)", $"Base plate {Sh(s.BasePlateDiameter)} dia x {Sh(s.BasePlateThickness)} (not part of this contract)", bp, "By others", true,
+            $"Plans: base plate {Sh(s.BasePlateDiameter)} dia x {Sh(s.BasePlateThickness)}, HSS {s.PostOuterDiameter / 0.0254:F3}x{s.PostWall / 0.0254:F3} truss post and the {L(s.TrussSpan)} sign truss are by others; their heights are not in the plans", $"{s.Support}, girder {g.Name}");
+        // plan vs model: post outside the deck edge, bracket top flange vs girder top flange
+        var qso = _a.Inverse(Q);
+        double edge = left ? _deck.LeftAt(qso.Station) : _deck.RightAt(qso.Station);
+        double outside = left ? edge - qso.Offset : qso.Offset - edge;
+        double gTopOfSteel = web.Z + (tf?.Thickness ?? 0);
+        Info($"{asm}: CL post STA {_u.FormatStation(qso.Station)}, {L(Math.Abs(qso.Offset))} {(qso.Offset < 0 ? "LT" : "RT")}, {Sh(outside)} outside the deck edge (base plate edge {Sh(outside - s.BasePlateDiameter / 2)} outside); bracket top flange top {zTF / 0.3048:F2} vs girder top of steel {gTopOfSteel / 0.3048:F2} at the W.P. ({(zTF - gTopOfSteel) / 0.0254:+0.00;-0.00}\").");
+        if (outside < s.BasePlateDiameter / 2) Warn($"{asm}: the post base plate reaches over the deck edge ({Sh(outside)} from the CL post to the deck edge) - check the plan offset.");
     }
 
     private void BuildExitBase(SignSupportDefinition s)
@@ -245,6 +324,7 @@ public sealed partial class MiscItemsGenerator
         if (!ok) return;
         var pe = Pt(sta, edge);
         double zl = Ztop(sta, edge);
+        if (pb.BottomAtSlabSoffit) { BuildPoleBaseOnSoffit(pb, asm, sta, edge, T, outDir, pe, zl); return; }
         double zt = zl + pb.TopAboveLedge;
         // block section in (out, z): top flat, soffit an arc of radius R between the printed end heights
         double Y = pb.BlockOut, h1 = pb.HeightAtBarrier, h2 = pb.HeightAtOuterEdge;
@@ -280,6 +360,50 @@ public sealed partial class MiscItemsGenerator
         Flag(asm + " block", "Vertical position of the block top above the deck ('5\" above the base ledge') and its plan position are not fully dimensioned (I-80 PDF 235 / Ramp G PDF 169).", "top 5\" above the deck-edge top, block centred on the CL base along the barrier");
         Flag(asm + " anchor bolts", "Bolt circle position on the block and the bolt pattern orientation are not dimensioned (I-80 PDF 235 / Ramp G PDF 169).", "circle centred on the block along the barrier, half the block width outboard, pattern at 45 deg to the barrier");
         Warn($"{asm}: placement conventions to confirm - bolt circle centred on the block along the barrier and {Sh(pb.BlockAlong / 2)} outboard of the barrier, pattern at 45 deg to the barrier, block top above the deck-edge top; the pole and luminaire are not in the contract.");
+    }
+
+    /// <summary>Pole base per the plan section: bottom at the barrier side flush with the slab soffit at the deck edge, outer face, R soffit arc, flat bottom.</summary>
+    private void BuildPoleBaseOnSoffit(PoleBaseDefinition pb, string asm, double sta, double edge, Vec2 T, Vec2 outDir, Vec2 pe, double zDeck)
+    {
+        double zBot = zDeck - _deck.Thickness, zt = zBot + pb.HeightAtBarrier;
+        double Y = pb.BlockOut, hOut = pb.HeightAtOuterEdge, rise = pb.SoffitRise, run = pb.SoffitRun;
+        // section in (out from the barrier back face / deck edge, z below the block top)
+        var B = new Vec2(Y, -hOut);                       // bottom of the outer face
+        var C = new Vec2(Y - run, -(hOut + rise));        // end of the soffit arc
+        double hBot = pb.HeightAtBarrier;
+        var chord = C - B; double c = chord.Length, R = pb.SoffitRadius;
+        var mid = Vec2.Lerp(B, C, 0.5);
+        var n = chord.Left.Normalized(); if (n.Y > 0) n = -n;   // centre BELOW the chord: the arc bulges up into the block (as drawn)
+        var center = mid + n * Math.Sqrt(Math.Max(R * R - c * c / 4, 0));
+        double a0 = Math.Atan2(B.Y - center.Y, B.X - center.X), a1 = Math.Atan2(C.Y - center.Y, C.X - center.X);
+        double da = a1 - a0; while (da > Math.PI) da -= 2 * Math.PI; while (da < -Math.PI) da += 2 * Math.PI;
+        var poly = new List<Vec2> { new(0, 0), new(Y, 0), B };
+        for (int i = 1; i < 10; i++) poly.Add(center + Vec2.FromAngle(a0 + da * i / 10) * R);
+        poly.Add(C);
+        poly.Add(new Vec2(0, -hBot));
+        var pts = poly.Select(q => new Vec2(q.X, zt + q.Y)).ToList();
+        var block = MiscMesh.VerticalSection(pe, outDir, pts, pb.BlockAlong / 2);
+        Add(MiscGroup.Lighting, MiscKind.PoleBaseConcrete, asm, asm + " block",
+            $"Pole base block {Sh(pb.BlockAlong)} x {Sh(pb.BlockOut)}, {Sh(pb.HeightAtBarrier)} high at the deck edge (bottom flush with the slab soffit), outer face {Sh(hOut)}, soffit R {Sh(R)} over {Sh(run)} x {Sh(rise)}; top {Sh(zt - zDeck)} above the deck-edge top",
+            block, "Class C concrete");
+        var bolts = new Mesh();
+        var cp = pe + outDir * (pb.BlockAlong / 2);
+        double r = pb.BoltCircleDiameter / 2;
+        for (int i = 0; i < pb.BoltCount; i++)
+        {
+            double ang = (45 + 360.0 * i / pb.BoltCount) * Math.PI / 180;
+            var q = cp + T * (r * Math.Cos(ang)) + outDir * (r * Math.Sin(ang));
+            var f = new Frame3(q.WithZ(0), new Vec3(1, 0, 0), new Vec3(0, 1, 0), new Vec3(0, 0, 1));
+            var g = new BoltGeometry(pb.BoltDiameter);
+            MeshBuilder.AddPrism(bolts, f, pb.BoltDiameter / 2, 12, zt + In(5) - pb.BoltLength, zt + In(5));
+            MeshBuilder.AddPrism(bolts, f, g.NutAcrossFlats / Math.Sqrt(3), 6, zt + In(5) - pb.BoltLength, zt + In(5) - pb.BoltLength + g.NutHeight);
+        }
+        Add(MiscGroup.Lighting, MiscKind.PoleAnchorBolt, asm, asm + " anchor bolts", $"{pb.BoltCount} anchor bolts {Sh(pb.BoltDiameter)} x {Sh(pb.BoltLength)} galvanized on a {Sh(pb.BoltCircleDiameter)} circle, 5\" projection above the top; anchor plate, nuts above the top not modeled", bolts, "Galvanized steel");
+        double chainGap = Y - run - In(4.25);
+        Flag(asm + " block", "No dimension ties the block to the deck: the sections (I-80 PDF 235 D-D / section through base; Ramp G PDF 169) draw its bottom flush with the slab soffit at the deck edge, cast against the slab edge (keyway). The plan chain 1'-11 3/4 + 4 1/4 = 2'-4 does not close to the 2'-6 projection"
+            + $" ({Sh(chainGap)} left over: modeled as flat bottom to the barrier back face).", $"bottom at the slab soffit (deck-edge top - {Sh(_deck.Thickness)} slab), top {Sh(pb.HeightAtBarrier)} above it");
+        Flag(asm + " anchor bolts", "Bolt circle position on the block and the bolt pattern orientation are not dimensioned (I-80 PDF 235 / Ramp G PDF 169).", "circle centred on the block along the barrier, half the block width outboard, pattern at 45 deg to the barrier");
+        Info($"{asm}: block top {(zt - zDeck) / 0.0254:F2}\" above the deck-edge top (slab {_deck.Thickness / 0.0254:F2}\", block {pb.HeightAtBarrier / 0.0254:F2}\" from the slab soffit).");
     }
 
     private void BuildJunctionBox(JunctionBoxDefinition jb)
