@@ -28,6 +28,11 @@ public sealed partial class SubstructureGenerator
         double D = ad.FootingDepth;
         var placed = new List<PBar>();
         Vec3 P(double s, double x, double z) => unit.World(s, g.N(x), z);
+        // integral pile cap: no placement is proven yet (the stub rows / hoops / backwall strings do not apply) - the whole plan list is schedule-only
+        bool integral = ad.Kind == AbutmentKind.Integral;
+        BarShape? hoopShape = null;
+        if (!integral)
+        {
 
         // ---- footing longitudinals: rows from the section (top/bottom rows of FootingRowBars, SideInterior bars on each side face)
         var big = RebarCatalog.Size(SizeOfMark(rb.FootingLongMark));
@@ -62,7 +67,8 @@ public sealed partial class SubstructureGenerator
 
         // ---- footing hoops at the pile pitch (each in a plane normal to the line)
         var stations = ad.PileStations.OrderBy(x => x).ToList();
-        var (hoopShape, hoopLocal) = ClosedStirrup(rb.HoopWidth, rb.HoopHeight, hoop);
+        var (hoopShape0, hoopLocal) = ClosedStirrup(rb.HoopWidth, rb.HoopHeight, hoop);
+        hoopShape = hoopShape0;
         for (int k = 0; k + 1 < stations.Count; k++)
             for (int i = 0; i < rb.HoopsPerPitch; i++)
             {
@@ -97,6 +103,7 @@ public sealed partial class SubstructureGenerator
 
         // ---- maskwall, counterfort and uplift bars (SubstructureAbutmentWingBars.cs)
         AbutmentWingBars(unit, g, placed);
+        }
 
         // ---- marks
         bool epoxy = unit.Definition.Reinforcement.EpoxyCoated;
@@ -107,7 +114,7 @@ public sealed partial class SubstructureGenerator
         {
             var size = RebarCatalog.Size(SizeOfMark(grp.Key));
             var lens = grp.Select(p => Length3(p.Pts)).ToList();
-            BarShape shape = grp.Key == "5b1" ? hoopShape : grp.First().Shape ?? BarShape.Straight(lens.Max());
+            BarShape shape = grp.Key == "5b1" && hoopShape != null ? hoopShape : grp.First().Shape ?? BarShape.Straight(lens.Max());
             bool varies = lens.Max() - lens.Min() > In(1) && grp.Key != "5b1";
             marks.Add(new BarMark
             {
@@ -143,7 +150,10 @@ public sealed partial class SubstructureGenerator
             if (mk != null && done.Contains(line.Mark) && mk.Count != line.Count)
                 Warn($"{name}: bar {line.Mark}: {mk.Count} bars from the placement string / section vs {line.Count} in the plan bar list - NOT adjusted (list rows at the corners / ends are not drawn).");
         }
-        if (scheduleOnly.Count > 0)
+        if (integral) IntegralPileSpiral(unit, ad, marks, epoxy);
+        if (scheduleOnly.Count > 0 && integral)
+            Warn($"{name}: reinforcing - integral abutment: no bar placement is proven yet; the plan bar-list rows are in the schedule at the printed count/length: {string.Join(", ", scheduleOnly)}.");
+        else if (scheduleOnly.Count > 0)
         {
             Warn($"{name}: reinforcing - placed in 3D: footing longitudinals, footing hoops at the pile pitch, backwall verticals (printed strings), maskwall 5e2 / 5e3, counterfort verticals and 5h4 hoops, pile uplift anchors 8j3; the other plan bar-list rows are in the schedule at the printed count/length with the plan bend diagram where read: {string.Join(", ", scheduleOnly)}.");
             ReportUnresolvedAbutmentMarks(name, scheduleOnly.Select(x => x.Split(' ')[0]));
