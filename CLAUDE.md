@@ -334,6 +334,10 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   assemblies > elements (`MiscItems` in ModelDatabase; keys `IfcKeys.MiscAssembly/MiscElement`), sheet rules in `sheet-links-i80-rampg.json`. Viewport layers `3D-DRAIN-*`,
   `3D-SIGN-SUPPORT`, `3D-CRASH-CUSHION`, `3D-LIGHTING`, `3D-PLACEHOLDER`. Plan data scripts (re-runnable): `samples/plans/drains-ramp-g.csx`, `signs-i80.csx`, `end-posts.csx`,
   `lighting.csx`; data/results/unresolved list: `docs/plan-data/misc-items-data.md` (section "Model").
+  UNRESOLVED FLAG (general, reusable): `SBM.Core/Assumption.cs` `Assumption{Status="UNRESOLVED", Reason (what the plans lack + PDF page), Basis (what was assumed)}` on the element
+  (`MiscElement.Assumption`; set with `Flag(name, reason, basis)`). Consumers: viewport layer `3D-UNRESOLVED` (all flagged elements, orange, removed from their normal layers; reason in the pick
+  properties; isolate with the layer toggles), IFC Pset `SBM_Status` {Status, Reason, Basis}, database props `status/reason/assumed` + view `v_unresolved` (with QC status), one warning per reason.
+  Plan dimension that governs over a derived one (piped drains 22-25: tube 1'-8 from CL girder A) is modeled and the disagreement raised as `CONFLICT (plan vs model)`.
 - Plan-set test models: `samples/plans/*.csx` (Iowa DOT Designs 116/316); data in C:\SBMData (not in OneDrive).
 
 ## Conventions (bridge engineering)

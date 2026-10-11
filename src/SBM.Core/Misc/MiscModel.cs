@@ -22,7 +22,7 @@ public enum MiscKind
 
 /// <summary>One solid of a misc assembly. <see cref="Opening"/> = solid that voids the deck slab (IFC opening), when the element passes through it. <see cref="Placeholder"/> elements are envelopes of things by others (Pset SBM_Placeholder in IFC).</summary>
 public sealed record MiscElement(MiscGroup Group, MiscKind Kind, string Assembly, string Name, string Description, Mesh Mesh, string Material,
-    bool Placeholder = false, string PlaceholderBasis = "", string Location = "", Mesh? Opening = null);
+    bool Placeholder = false, string PlaceholderBasis = "", string Location = "", Mesh? Opening = null, Assumption? Assumption = null);
 
 /// <summary>An assembly (one drain, one bracket, one pole base ...).</summary>
 public sealed record MiscAssembly(MiscGroup Group, string Name, string Description, string Category);

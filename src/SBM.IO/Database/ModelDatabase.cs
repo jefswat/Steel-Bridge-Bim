@@ -118,6 +118,12 @@ public static class ModelDatabase
         DROP VIEW IF EXISTS v_unused_sheets;
         CREATE VIEW v_unused_sheets AS
           SELECT s.* FROM sheets s WHERE NOT EXISTS (SELECT 1 FROM element_sheet l WHERE l.sheet_id = s.sheet_id) AND COALESCE(s.kind,'') <> 'administrative';
+        DROP VIEW IF EXISTS v_unresolved;
+        CREATE VIEW v_unresolved AS
+          SELECT e.global_id, e.level, e.category, e.name, e.bridge, e.unit, e.support,
+                 json_extract(e.properties, '$.status') AS status, json_extract(e.properties, '$.reason') AS reason, json_extract(e.properties, '$.assumed') AS assumed,
+                 COALESCE((SELECT q.status FROM qc q WHERE q.global_id = e.global_id ORDER BY q.checked_at DESC LIMIT 1), 'unchecked') AS qc_status
+          FROM elements e WHERE json_extract(e.properties, '$.status') = 'UNRESOLVED';
         DROP VIEW IF EXISTS v_element_qc;
         CREATE VIEW v_element_qc AS
           SELECT e.global_id, e.level, e.category, e.name, e.mark, e.bridge, e.unit, e.support, e.girder,
@@ -207,7 +213,7 @@ public static class ModelDatabase
         using (var cn = Open(path))
         {
             Exec(cn, "PRAGMA journal_mode=OFF; PRAGMA synchronous=OFF;");
-            Exec(cn, "DROP VIEW IF EXISTS v_element_sheets; DROP VIEW IF EXISTS v_element_path; DROP VIEW IF EXISTS v_unused_sheets; DROP VIEW IF EXISTS v_element_qc; DROP VIEW IF EXISTS elements;");
+            Exec(cn, "DROP VIEW IF EXISTS v_element_sheets; DROP VIEW IF EXISTS v_element_path; DROP VIEW IF EXISTS v_unused_sheets; DROP VIEW IF EXISTS v_element_qc; DROP VIEW IF EXISTS v_unresolved; DROP VIEW IF EXISTS elements;");
             Exec(cn, "DROP INDEX IF EXISTS ix_el_parent; DROP INDEX IF EXISTS ix_el_cat;");
             Exec(cn, "DELETE FROM el; DELETE FROM strings; DELETE FROM props;");
             using (var tx = cn.BeginTransaction())
@@ -984,6 +990,7 @@ public static class ModelDatabase
                 r.Box = el.Mesh.Bounds(); StationOf(r, r.Box);
                 var pj = new Json().Add("description", el.Description);
                 if (el.Placeholder) pj.Add("placeholder", true).Add("basis", el.PlaceholderBasis);
+                if (el.Assumption is { } asu) pj.Add("status", asu.Status).Add("reason", asu.Reason).Add("assumed", asu.Basis);
                 r.Props = pj.ToString();
                 _w.Add(r);
             }
