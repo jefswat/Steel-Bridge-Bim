@@ -1751,11 +1751,508 @@
             "BackwallTopBelowGrade": 0,
             "AbutmentFoundationCount": 4,
             "AbutmentFoundationSpacing": 3.6576000000000004,
+            "Abutment": {
+              "Source": "Iowa DOT Design 116 West abutment, sheets 85-88",
+              "LeftEndOffset": -8.2042,
+              "RightEndOffset": 11.506200000000002,
+              "BackwallLeftOffset": "NaN",
+              "BackwallRightOffset": "NaN",
+              "FootingBackToBackwallBack": 0.038099999999999995,
+              "BackwallThickness": 0.45720000000000005,
+              "BackwallFrontToBearing": 0.5588,
+              "BearingToStepFront": 0.6858,
+              "BearingToFootingFront": 0.9906000000000001,
+              "PlanFootingWidth": 2.0447,
+              "FootingDepth": 1.2192,
+              "WashHeight": 0.0254,
+              "BackwallBaseAboveFootingBottom": 1.1684,
+              "FootingBottom": [
+                {
+                  "S": -11.435840751921397,
+                  "Elevation": 302.61153600000006
+                }
+              ],
+              "BackwallTop": [
+                {
+                  "S": -10.169324701851576,
+                  "Elevation": 307.031136
+                },
+                {
+                  "S": -6.278934403614374E-10,
+                  "Elevation": 307.28412000000003
+                },
+                {
+                  "S": 15.253987050579735,
+                  "Elevation": 307.13172000000003
+                }
+              ],
+              "LedgeBelowTop": 0.45720000000000005,
+              "CorbelProjection": 0.381,
+              "CorbelVertical": 0.381,
+              "CorbelTaperRise": 0.381,
+              "JointBelowTaper": 0.07619999999999999,
+              "StepLength": 1.3716000000000002,
+              "Steps": [
+                {
+                  "Girder": 1,
+                  "TopElevation": 303.93132
+                },
+                {
+                  "Girder": 2,
+                  "TopElevation": 304.041048
+                },
+                {
+                  "Girder": 3,
+                  "TopElevation": 304.150776
+                },
+                {
+                  "Girder": 4,
+                  "TopElevation": 304.12334400000003
+                },
+                {
+                  "Girder": 5,
+                  "TopElevation": 304.07457600000004
+                },
+                {
+                  "Girder": 6,
+                  "TopElevation": 304.02276
+                }
+              ],
+              "Masks": [
+                {
+                  "End": "Left",
+                  "Thickness": 0.254,
+                  "Height": 4.318,
+                  "Setback": 0.0508
+                }
+              ],
+              "Extension": {
+                "End": "Right",
+                "Width": 1.381125,
+                "TopElevation": 307.13172000000003
+              },
+              "PileStations": [
+                -10.262187020005845,
+                -8.179183820005846,
+                -6.096485420005846,
+                -4.013787020005846,
+                -1.9307838200058454,
+                0.15191457999415484,
+                2.2346129799941554,
+                4.317616179994155,
+                6.400314579994156,
+                8.483012979994156,
+                10.566016179994154,
+                12.648714579994154,
+                14.731412979994156
+              ],
+              "PileBackRowToBearing": 0.5969,
+              "PileFrontRowToBearing": 0.5334,
+              "PileTopAboveFootingBottom": 0.6096,
+              "PileLength": 38.1,
+              "Wings": [
+                {
+                  "Name": "A",
+                  "End": "Left",
+                  "GutterOffset": -7.315200000000001,
+                  "Thickness": 0.5334,
+                  "Length": 9.6774,
+                  "TopAtBackwall": 307.031136,
+                  "TopAtEnd": 306.924456,
+                  "EndHeight": 1.2192,
+                  "BottomAtBackwall": 302.91633600000006,
+                  "LevelReach": 0.4572,
+                  "BottomAtEnd": "NaN",
+                  "Counterforts": [
+                    {
+                      "Start": 4.3434,
+                      "Width": 0.9144000000000001,
+                      "Projection": 1.0668000000000002,
+                      "Height": 2.6924,
+                      "FootingTop": 303.788064,
+                      "HoopSpaces": 9,
+                      "VerticalBarsPerSide": 10,
+                      "VerticalMark": "6h2",
+                      "VerticalFoot": 0
+                    },
+                    {
+                      "Start": 7.391400000000001,
+                      "Width": 0.9144000000000001,
+                      "Projection": 1.0668000000000002,
+                      "Height": 1.6256,
+                      "FootingTop": 304.882296,
+                      "HoopSpaces": 5,
+                      "VerticalBarsPerSide": 10,
+                      "VerticalMark": "6h3",
+                      "VerticalFoot": 0
+                    }
+                  ],
+                  "FootingOutside": 0.45720000000000005,
+                  "FootingFillSide": 1.143,
+                  "FootingDepth": 0.9144000000000001,
+                  "FootingPileSpacing": 1.2192,
+                  "FootingPileTopAbove": 0.3048,
+                  "UpliftPiles": []
+                },
+                {
+                  "Name": "F",
+                  "End": "Right",
+                  "GutterOffset": 10.972800000000001,
+                  "Thickness": 0.5334,
+                  "Length": 9.6774,
+                  "TopAtBackwall": 307.13172000000003,
+                  "TopAtEnd": 307.02504,
+                  "EndHeight": 1.2192,
+                  "BottomAtBackwall": 303.023016,
+                  "LevelReach": 0.4572,
+                  "BottomAtEnd": "NaN",
+                  "Counterforts": [
+                    {
+                      "Start": 4.3434,
+                      "Width": 0.9144000000000001,
+                      "Projection": 1.0668000000000002,
+                      "Height": 2.6924,
+                      "FootingTop": 304.010568,
+                      "HoopSpaces": 9,
+                      "VerticalBarsPerSide": 10,
+                      "VerticalMark": "6h2",
+                      "VerticalFoot": 0
+                    },
+                    {
+                      "Start": 7.391400000000001,
+                      "Width": 0.9144000000000001,
+                      "Projection": 1.0668000000000002,
+                      "Height": 1.6256,
+                      "FootingTop": 305.03774400000003,
+                      "HoopSpaces": 5,
+                      "VerticalBarsPerSide": 10,
+                      "VerticalMark": "6h3",
+                      "VerticalFoot": 0
+                    }
+                  ],
+                  "FootingOutside": 0.45720000000000005,
+                  "FootingFillSide": 1.143,
+                  "FootingDepth": 0.9144000000000001,
+                  "FootingPileSpacing": 1.2192,
+                  "FootingPileTopAbove": 0.3048,
+                  "UpliftPiles": []
+                }
+              ],
+              "Rebar": {
+                "FootingLongMark": "9a1",
+                "FootingRowBars": 7,
+                "FootingSideInteriorBars": 3,
+                "FootingLongPieces": 2,
+                "FootingLongLap": 2.7686,
+                "HoopsPerPitch": 9,
+                "HoopFirstOffset": 0.2286,
+                "HoopSpacing": 0.2032,
+                "EndHoopsEach": 0,
+                "EndStaplesEach": 5,
+                "EndStapleSpacing": 0.3048,
+                "EndStapleFirst": 0.07619999999999999,
+                "HoopWidth": 1.9431000000000003,
+                "HoopHeight": 1.0414,
+                "BackFaceBarLength": 3.9878,
+                "FrontFaceBarLength": 3.8862000000000005,
+                "BackFaceSpacing": 0.15239999999999998,
+                "FrontFaceSpacing": 0.3048,
+                "BackFaceEdge": 0.15239999999999998,
+                "FrontFaceEdge": 0.3048,
+                "BackwallBarCover": 0.0508,
+                "BackwallLongRowsPerFace": 11,
+                "BackwallLongPieces": 2,
+                "StepUBars": 4,
+                "StepLongBars": 4,
+                "StepHoopGirders": [
+                  3,
+                  4
+                ],
+                "PlanBarList": [
+                  {
+                    "Mark": "9a1",
+                    "Count": 40,
+                    "Length": 14.732000000000001,
+                    "WeightLb": 6573,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "5b1",
+                    "Count": 108,
+                    "Length": 6.2738000000000005,
+                    "WeightLb": 2319,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "5b2",
+                    "Count": 10,
+                    "Length": 1.9050000000000002,
+                    "WeightLb": 168,
+                    "Varies": true
+                  },
+                  {
+                    "Mark": "5b3",
+                    "Count": 5,
+                    "Length": 3.5306,
+                    "WeightLb": 60,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "5b4",
+                    "Count": 5,
+                    "Length": 5.7912,
+                    "WeightLb": 99,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "6d1",
+                    "Count": 173,
+                    "Length": 3.9878,
+                    "WeightLb": 3400,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "5d2",
+                    "Count": 88,
+                    "Length": 3.8862000000000005,
+                    "WeightLb": 1170,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "5d3",
+                    "Count": 83,
+                    "Length": 1.3462,
+                    "WeightLb": 382,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "5d4",
+                    "Count": 83,
+                    "Length": 1.1176000000000001,
+                    "WeightLb": 317,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "4d6",
+                    "Count": 86,
+                    "Length": 2.6924,
+                    "WeightLb": 507,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "5d7",
+                    "Count": 11,
+                    "Length": 4.3942,
+                    "WeightLb": 165,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "4d8",
+                    "Count": 6,
+                    "Length": 0.9652000000000001,
+                    "WeightLb": 13,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "5e1",
+                    "Count": 52,
+                    "Length": 3.9878,
+                    "WeightLb": 456,
+                    "Varies": true
+                  },
+                  {
+                    "Mark": "5e2",
+                    "Count": 21,
+                    "Length": 4.7244,
+                    "WeightLb": 339,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "5e3",
+                    "Count": 30,
+                    "Length": 3.048,
+                    "WeightLb": 313,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "5e4",
+                    "Count": 54,
+                    "Length": 3.9116000000000004,
+                    "WeightLb": 467,
+                    "Varies": true
+                  },
+                  {
+                    "Mark": "6f1",
+                    "Count": 8,
+                    "Length": 7.8232,
+                    "WeightLb": 308,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "6f2",
+                    "Count": 16,
+                    "Length": 7.518400000000001,
+                    "WeightLb": 358,
+                    "Varies": true
+                  },
+                  {
+                    "Mark": "6f3",
+                    "Count": 2,
+                    "Length": 8.2042,
+                    "WeightLb": 81,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "6f4",
+                    "Count": 8,
+                    "Length": 1.8288000000000002,
+                    "WeightLb": 72,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "6f5",
+                    "Count": 8,
+                    "Length": 8.2296,
+                    "WeightLb": 324,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "6f6",
+                    "Count": 16,
+                    "Length": 7.8994,
+                    "WeightLb": 371,
+                    "Varies": true
+                  },
+                  {
+                    "Mark": "6f7",
+                    "Count": 2,
+                    "Length": 8.6614,
+                    "WeightLb": 85,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "6g1",
+                    "Count": 44,
+                    "Length": 13.7414,
+                    "WeightLb": 2979,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "5g2",
+                    "Count": 22,
+                    "Length": 1.397,
+                    "WeightLb": 105,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "5g3",
+                    "Count": 4,
+                    "Length": 12.9794,
+                    "WeightLb": 178,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "6g4",
+                    "Count": 44,
+                    "Length": 1.9812000000000003,
+                    "WeightLb": 430,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "6g5",
+                    "Count": 32,
+                    "Length": 2.4384,
+                    "WeightLb": 385,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "5h1",
+                    "Count": 24,
+                    "Length": 1.2192,
+                    "WeightLb": 100,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "6h2",
+                    "Count": 20,
+                    "Length": 3.4798,
+                    "WeightLb": 343,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "6h3",
+                    "Count": 20,
+                    "Length": 2.413,
+                    "WeightLb": 238,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "5h4",
+                    "Count": 32,
+                    "Length": 3.6576000000000004,
+                    "WeightLb": 401,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "5j1",
+                    "Count": 32,
+                    "Length": 3.5052000000000003,
+                    "WeightLb": 384,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "5j2",
+                    "Count": 32,
+                    "Length": 3.5052000000000003,
+                    "WeightLb": 384,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "8j3",
+                    "Count": 8,
+                    "Length": 1.524,
+                    "WeightLb": 107,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "5m1",
+                    "Count": 24,
+                    "Length": 2.4892000000000003,
+                    "WeightLb": 204,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "5n1",
+                    "Count": 24,
+                    "Length": 1.27,
+                    "WeightLb": 104,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "5n2",
+                    "Count": 2,
+                    "Length": 5.130800000000001,
+                    "WeightLb": 35,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "5d5",
+                    "Count": 42,
+                    "Length": 1.0668000000000002,
+                    "WeightLb": 153,
+                    "Varies": false
+                  }
+                ]
+              },
+              "FootingBackX": -1.0541,
+              "FootingFrontX": 0.9906000000000001,
+              "FootingWidth": 2.0447
+            },
             "Reinforcement": {
               "Enabled": true,
               "ConcreteStrengthKsi": 3.6,
               "SteelYieldKsi": 60,
-              "EpoxyCoated": false,
+              "EpoxyCoated": true,
               "CapCover": 0.0508,
               "ColumnCover": 0.0635,
               "ShaftCover": 0.07619999999999999,
@@ -2873,6 +3370,7 @@
             "BackwallTopBelowGrade": 0,
             "AbutmentFoundationCount": 4,
             "AbutmentFoundationSpacing": 3.6576000000000004,
+            "Abutment": null,
             "Reinforcement": {
               "Enabled": true,
               "ConcreteStrengthKsi": 3.6,
@@ -4320,6 +4818,7 @@
             "BackwallTopBelowGrade": 0,
             "AbutmentFoundationCount": 4,
             "AbutmentFoundationSpacing": 3.6576000000000004,
+            "Abutment": null,
             "Reinforcement": {
               "Enabled": true,
               "ConcreteStrengthKsi": 3.6,
@@ -5650,6 +6149,7 @@
             "BackwallTopBelowGrade": 0,
             "AbutmentFoundationCount": 4,
             "AbutmentFoundationSpacing": 3.6576000000000004,
+            "Abutment": null,
             "Reinforcement": {
               "Enabled": true,
               "ConcreteStrengthKsi": 3.6,
@@ -6902,6 +7402,7 @@
             "BackwallTopBelowGrade": 0,
             "AbutmentFoundationCount": 4,
             "AbutmentFoundationSpacing": 3.6576000000000004,
+            "Abutment": null,
             "Reinforcement": {
               "Enabled": true,
               "ConcreteStrengthKsi": 3.6,
@@ -8026,6 +8527,7 @@
             "BackwallTopBelowGrade": 0,
             "AbutmentFoundationCount": 4,
             "AbutmentFoundationSpacing": 3.6576000000000004,
+            "Abutment": null,
             "Reinforcement": {
               "Enabled": true,
               "ConcreteStrengthKsi": 3.6,
@@ -11385,6 +11887,7 @@
             "BackwallTopBelowGrade": 0,
             "AbutmentFoundationCount": 4,
             "AbutmentFoundationSpacing": 3.6576000000000004,
+            "Abutment": null,
             "Reinforcement": {
               "Enabled": true,
               "ConcreteStrengthKsi": 3.6,
@@ -12851,6 +13354,7 @@
             "BackwallTopBelowGrade": 0,
             "AbutmentFoundationCount": 4,
             "AbutmentFoundationSpacing": 3.6576000000000004,
+            "Abutment": null,
             "Reinforcement": {
               "Enabled": true,
               "ConcreteStrengthKsi": 3.6,
@@ -14489,6 +14993,7 @@
             "BackwallTopBelowGrade": 0,
             "AbutmentFoundationCount": 4,
             "AbutmentFoundationSpacing": 3.6576000000000004,
+            "Abutment": null,
             "Reinforcement": {
               "Enabled": true,
               "ConcreteStrengthKsi": 3.6,
@@ -16199,6 +16704,7 @@
             "BackwallTopBelowGrade": 0,
             "AbutmentFoundationCount": 4,
             "AbutmentFoundationSpacing": 3.6576000000000004,
+            "Abutment": null,
             "Reinforcement": {
               "Enabled": true,
               "ConcreteStrengthKsi": 3.6,
@@ -17509,6 +18015,7 @@
             "BackwallTopBelowGrade": 0,
             "AbutmentFoundationCount": 4,
             "AbutmentFoundationSpacing": 3.6576000000000004,
+            "Abutment": null,
             "Reinforcement": {
               "Enabled": true,
               "ConcreteStrengthKsi": 3.6,
@@ -18819,6 +19326,7 @@
             "BackwallTopBelowGrade": 0,
             "AbutmentFoundationCount": 4,
             "AbutmentFoundationSpacing": 3.6576000000000004,
+            "Abutment": null,
             "Reinforcement": {
               "Enabled": true,
               "ConcreteStrengthKsi": 3.6,
@@ -20633,6 +21141,7 @@
             "BackwallTopBelowGrade": 0,
             "AbutmentFoundationCount": 4,
             "AbutmentFoundationSpacing": 3.6576000000000004,
+            "Abutment": null,
             "Reinforcement": {
               "Enabled": true,
               "ConcreteStrengthKsi": 3.6,
@@ -21616,6 +22125,7 @@
             "BackwallTopBelowGrade": 0,
             "AbutmentFoundationCount": 4,
             "AbutmentFoundationSpacing": 3.6576000000000004,
+            "Abutment": null,
             "Reinforcement": {
               "Enabled": true,
               "ConcreteStrengthKsi": 3.6,
@@ -25863,6 +26373,7 @@
             "BackwallTopBelowGrade": 0,
             "AbutmentFoundationCount": 4,
             "AbutmentFoundationSpacing": 3.6576000000000004,
+            "Abutment": null,
             "Reinforcement": {
               "Enabled": true,
               "ConcreteStrengthKsi": 3.6,
@@ -27168,6 +27679,7 @@
             "BackwallTopBelowGrade": 0,
             "AbutmentFoundationCount": 4,
             "AbutmentFoundationSpacing": 3.6576000000000004,
+            "Abutment": null,
             "Reinforcement": {
               "Enabled": true,
               "ConcreteStrengthKsi": 3.6,
@@ -28630,6 +29142,7 @@
             "BackwallTopBelowGrade": 0,
             "AbutmentFoundationCount": 4,
             "AbutmentFoundationSpacing": 3.6576000000000004,
+            "Abutment": null,
             "Reinforcement": {
               "Enabled": true,
               "ConcreteStrengthKsi": 3.6,
@@ -29879,6 +30392,7 @@
             "BackwallTopBelowGrade": 0,
             "AbutmentFoundationCount": 4,
             "AbutmentFoundationSpacing": 3.6576000000000004,
+            "Abutment": null,
             "Reinforcement": {
               "Enabled": true,
               "ConcreteStrengthKsi": 3.6,
@@ -31128,6 +31642,7 @@
             "BackwallTopBelowGrade": 0,
             "AbutmentFoundationCount": 4,
             "AbutmentFoundationSpacing": 3.6576000000000004,
+            "Abutment": null,
             "Reinforcement": {
               "Enabled": true,
               "ConcreteStrengthKsi": 3.6,
@@ -31636,11 +32151,469 @@
             "BackwallTopBelowGrade": 0,
             "AbutmentFoundationCount": 4,
             "AbutmentFoundationSpacing": 3.6576000000000004,
+            "Abutment": {
+              "Source": "Iowa DOT Design 116 East abutment, sheets 89-92",
+              "LeftEndOffset": -13.6906,
+              "RightEndOffset": 11.506200000000002,
+              "BackwallLeftOffset": "NaN",
+              "BackwallRightOffset": "NaN",
+              "FootingBackToBackwallBack": 0.038099999999999995,
+              "BackwallThickness": 0.45720000000000005,
+              "BackwallFrontToBearing": 0.5588,
+              "BearingToStepFront": 0.6858,
+              "BearingToFootingFront": 0.9906000000000001,
+              "PlanFootingWidth": 2.0447,
+              "FootingDepth": 1.2192,
+              "WashHeight": 0.0254,
+              "BackwallBaseAboveFootingBottom": 1.1684,
+              "FootingBottom": [
+                {
+                  "S": -13.750789784714733,
+                  "Elevation": 305.848512
+                },
+                {
+                  "S": 11.56051032025319,
+                  "Elevation": 307.320696
+                }
+              ],
+              "BackwallTop": [
+                {
+                  "S": -12.86069116661179,
+                  "Elevation": 309.749952
+                },
+                {
+                  "S": -5.987625590241307E-10,
+                  "Elevation": 310.502808
+                },
+                {
+                  "S": 11.02178889238974,
+                  "Elevation": 311.13984
+                }
+              ],
+              "LedgeBelowTop": 0.45720000000000005,
+              "CorbelProjection": 0.381,
+              "CorbelVertical": 0.381,
+              "CorbelTaperRise": 0.381,
+              "JointBelowTaper": 0.07619999999999999,
+              "StepLength": 1.3716000000000002,
+              "Steps": [
+                {
+                  "Girder": 1,
+                  "TopElevation": 307.29936000000004
+                },
+                {
+                  "Girder": 4,
+                  "TopElevation": 307.402992
+                },
+                {
+                  "Girder": 5,
+                  "TopElevation": 307.61025600000005
+                },
+                {
+                  "Girder": 6,
+                  "TopElevation": 307.814472
+                },
+                {
+                  "Girder": 7,
+                  "TopElevation": 308.02173600000003
+                },
+                {
+                  "Girder": 8,
+                  "TopElevation": 308.222904
+                },
+                {
+                  "Girder": 9,
+                  "TopElevation": 308.430168
+                },
+                {
+                  "Girder": 10,
+                  "TopElevation": 308.634384
+                }
+              ],
+              "Masks": [
+                {
+                  "End": "Left",
+                  "Thickness": 0.254,
+                  "Height": 3.7592000000000003,
+                  "Setback": 0.0508
+                }
+              ],
+              "Extension": {
+                "End": "Right",
+                "Width": 1.0414,
+                "TopElevation": 311.22823200000005
+              },
+              "PileStations": [
+                10.79546232025319,
+                8.96666232025319,
+                7.1378623202531895,
+                5.30906232025319,
+                3.480262320253191,
+                1.6514623202531897,
+                -0.17733767974680958,
+                -2.0061376797468107,
+                -3.83493767974681,
+                -5.663737679746809,
+                -7.49253767974681,
+                -9.321337679746808,
+                -11.150137679746809,
+                -12.97893767974681
+              ],
+              "PileBackRowToBearing": 0.5969,
+              "PileFrontRowToBearing": 0.5334,
+              "PileTopAboveFootingBottom": 0.6096,
+              "PileLength": 38.1,
+              "Wings": [
+                {
+                  "Name": "A",
+                  "End": "Left",
+                  "GutterOffset": -12.8016,
+                  "Thickness": 0.5334,
+                  "Length": 8.2296,
+                  "TopAtBackwall": 309.749952,
+                  "TopAtEnd": 309.710328,
+                  "EndHeight": 1.2192,
+                  "BottomAtBackwall": 306.092352,
+                  "LevelReach": 0,
+                  "BottomAtEnd": "NaN",
+                  "Counterforts": [
+                    {
+                      "Start": 2.8956000000000004,
+                      "Width": 0.9144000000000001,
+                      "Projection": 1.0668000000000002,
+                      "Height": 2.6416,
+                      "FootingTop": 306.717192,
+                      "HoopSpaces": 8,
+                      "VerticalBarsPerSide": 10,
+                      "VerticalMark": "6h2",
+                      "VerticalFoot": 0
+                    },
+                    {
+                      "Start": 5.9436,
+                      "Width": 0.9144000000000001,
+                      "Projection": 1.0668000000000002,
+                      "Height": 1.6256,
+                      "FootingTop": 307.729128,
+                      "HoopSpaces": 5,
+                      "VerticalBarsPerSide": 10,
+                      "VerticalMark": "6h3",
+                      "VerticalFoot": 0
+                    }
+                  ],
+                  "FootingOutside": 0.45720000000000005,
+                  "FootingFillSide": 1.143,
+                  "FootingDepth": 0.9144000000000001,
+                  "FootingPileSpacing": 1.2192,
+                  "FootingPileTopAbove": 0.3048,
+                  "UpliftPiles": []
+                },
+                {
+                  "Name": "J",
+                  "End": "Right",
+                  "GutterOffset": 10.972800000000001,
+                  "Thickness": 0.5334,
+                  "Length": 8.2296,
+                  "TopAtBackwall": 311.13984,
+                  "TopAtEnd": 311.100216,
+                  "EndHeight": 1.2192,
+                  "BottomAtBackwall": 307.48224,
+                  "LevelReach": 0,
+                  "BottomAtEnd": "NaN",
+                  "Counterforts": [
+                    {
+                      "Start": 2.8956000000000004,
+                      "Width": 0.9144000000000001,
+                      "Projection": 1.0668000000000002,
+                      "Height": 2.6416,
+                      "FootingTop": 308.08574400000003,
+                      "HoopSpaces": 8,
+                      "VerticalBarsPerSide": 10,
+                      "VerticalMark": "6h2",
+                      "VerticalFoot": 0
+                    },
+                    {
+                      "Start": 5.9436,
+                      "Width": 0.9144000000000001,
+                      "Projection": 1.0668000000000002,
+                      "Height": 1.6256,
+                      "FootingTop": 309.11292000000003,
+                      "HoopSpaces": 5,
+                      "VerticalBarsPerSide": 10,
+                      "VerticalMark": "6h3",
+                      "VerticalFoot": 0
+                    }
+                  ],
+                  "FootingOutside": 0.45720000000000005,
+                  "FootingFillSide": 1.143,
+                  "FootingDepth": 0.9144000000000001,
+                  "FootingPileSpacing": 1.2192,
+                  "FootingPileTopAbove": 0.3048,
+                  "UpliftPiles": []
+                }
+              ],
+              "Rebar": {
+                "FootingLongMark": "9a1",
+                "FootingRowBars": 7,
+                "FootingSideInteriorBars": 3,
+                "FootingLongPieces": 2,
+                "FootingLongLap": 2.7686,
+                "HoopsPerPitch": 8,
+                "HoopFirstOffset": 0.2032,
+                "HoopSpacing": 0.2032,
+                "EndHoopsEach": 3,
+                "EndStaplesEach": 3,
+                "EndStapleSpacing": 0.3048,
+                "EndStapleFirst": 0.07619999999999999,
+                "HoopWidth": 1.9431000000000003,
+                "HoopHeight": 1.0414,
+                "BackFaceBarLength": 3.2004,
+                "FrontFaceBarLength": 3.0988,
+                "BackFaceSpacing": 0.15239999999999998,
+                "FrontFaceSpacing": 0.3048,
+                "BackFaceEdge": 0.15239999999999998,
+                "FrontFaceEdge": 0.3048,
+                "BackwallBarCover": 0.0508,
+                "BackwallLongRowsPerFace": 9,
+                "BackwallLongPieces": 2,
+                "StepUBars": 4,
+                "StepLongBars": 4,
+                "StepHoopGirders": [],
+                "PlanBarList": [
+                  {
+                    "Mark": "9a1",
+                    "Count": 40,
+                    "Length": 13.995400000000002,
+                    "WeightLb": 6245,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "5b1",
+                    "Count": 110,
+                    "Length": 6.2738000000000005,
+                    "WeightLb": 2362,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "5b2",
+                    "Count": 6,
+                    "Length": 2.8194000000000004,
+                    "WeightLb": 58,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "6d1",
+                    "Count": 162,
+                    "Length": 3.2004,
+                    "WeightLb": 0,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "5d2",
+                    "Count": 82,
+                    "Length": 3.0988,
+                    "WeightLb": 0,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "5d3",
+                    "Count": 79,
+                    "Length": 1.3462,
+                    "WeightLb": 0,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "5d4",
+                    "Count": 79,
+                    "Length": 1.1176000000000001,
+                    "WeightLb": 0,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "4d6",
+                    "Count": 80,
+                    "Length": 2.6924,
+                    "WeightLb": 0,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "5d7",
+                    "Count": 8,
+                    "Length": 3.7084000000000006,
+                    "WeightLb": 0,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "4d8",
+                    "Count": 4,
+                    "Length": 0.9652000000000001,
+                    "WeightLb": 0,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "5e1",
+                    "Count": 96,
+                    "Length": 3.5306,
+                    "WeightLb": 768,
+                    "Varies": true
+                  },
+                  {
+                    "Mark": "5e2",
+                    "Count": 15,
+                    "Length": 4.1656,
+                    "WeightLb": 0,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "5e3",
+                    "Count": 26,
+                    "Length": 1.9304000000000001,
+                    "WeightLb": 0,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "6f1",
+                    "Count": 16,
+                    "Length": 7.086600000000001,
+                    "WeightLb": 0,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "6f2",
+                    "Count": 28,
+                    "Length": 6.731000000000001,
+                    "WeightLb": 0,
+                    "Varies": true
+                  },
+                  {
+                    "Mark": "6f3",
+                    "Count": 4,
+                    "Length": 7.442200000000001,
+                    "WeightLb": 0,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "6f4",
+                    "Count": 12,
+                    "Length": 1.6002,
+                    "WeightLb": 0,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "6g1",
+                    "Count": 36,
+                    "Length": 12.928600000000001,
+                    "WeightLb": 0,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "5g2",
+                    "Count": 18,
+                    "Length": 1.8542000000000003,
+                    "WeightLb": 0,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "5g3",
+                    "Count": 4,
+                    "Length": 12.2174,
+                    "WeightLb": 0,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "6g4",
+                    "Count": 36,
+                    "Length": 1.651,
+                    "WeightLb": 0,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "6g5",
+                    "Count": 28,
+                    "Length": 1.9558000000000002,
+                    "WeightLb": 0,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "5h1",
+                    "Count": 24,
+                    "Length": 1.2192,
+                    "WeightLb": 0,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "6h2",
+                    "Count": 20,
+                    "Length": 3.4290000000000003,
+                    "WeightLb": 0,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "6h3",
+                    "Count": 20,
+                    "Length": 2.413,
+                    "WeightLb": 0,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "5h4",
+                    "Count": 30,
+                    "Length": 3.6576000000000004,
+                    "WeightLb": 0,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "5j1",
+                    "Count": 32,
+                    "Length": 3.5052000000000003,
+                    "WeightLb": 0,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "5j2",
+                    "Count": 32,
+                    "Length": 3.5052000000000003,
+                    "WeightLb": 0,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "8j3",
+                    "Count": 8,
+                    "Length": 1.524,
+                    "WeightLb": 0,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "5m1",
+                    "Count": 32,
+                    "Length": 2.3622,
+                    "WeightLb": 0,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "5n1",
+                    "Count": 32,
+                    "Length": 1.27,
+                    "WeightLb": 0,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "5d5",
+                    "Count": 39,
+                    "Length": 1.0668000000000002,
+                    "WeightLb": 142,
+                    "Varies": false
+                  }
+                ]
+              },
+              "FootingBackX": -1.0541,
+              "FootingFrontX": 0.9906000000000001,
+              "FootingWidth": 2.0447
+            },
             "Reinforcement": {
               "Enabled": true,
               "ConcreteStrengthKsi": 3.6,
               "SteelYieldKsi": 60,
-              "EpoxyCoated": false,
+              "EpoxyCoated": true,
               "CapCover": 0.0508,
               "ColumnCover": 0.0635,
               "ShaftCover": 0.07619999999999999,
@@ -37672,15 +38645,435 @@
             "Footings": [],
             "BearingToCapFront": 0.45720000000000005,
             "BackwallThickness": 0.3048,
-            "BackwallGap": 0.0254,
+            "BackwallGap": 0.0635,
             "BackwallTopBelowGrade": 0,
             "AbutmentFoundationCount": 4,
             "AbutmentFoundationSpacing": 3.6576000000000004,
+            "Abutment": {
+              "Source": "Iowa DOT Design 316 Ramp G South abutment, sheets 80-83",
+              "LeftEndOffset": -2.7178000000000004,
+              "RightEndOffset": 8.8138,
+              "BackwallLeftOffset": -1.8288000000000002,
+              "BackwallRightOffset": 7.9248,
+              "FootingBackToBackwallBack": 0.038099999999999995,
+              "BackwallThickness": 0.45720000000000005,
+              "BackwallFrontToBearing": 0.43179999999999996,
+              "BearingToStepFront": 0.6858,
+              "BearingToFootingFront": 0.9017,
+              "PlanFootingWidth": 1.8288000000000002,
+              "FootingDepth": 1.2192,
+              "WashHeight": 0.0254,
+              "BackwallBaseAboveFootingBottom": 1.1684,
+              "FootingBottom": [
+                {
+                  "S": 0,
+                  "Elevation": 302.111664
+                }
+              ],
+              "BackwallTop": [
+                {
+                  "S": -1.8288000001167122,
+                  "Elevation": 306.013104
+                },
+                {
+                  "S": 0,
+                  "Elevation": 306.08625600000005
+                },
+                {
+                  "S": 7.9247999995872735,
+                  "Elevation": 306.220368
+                }
+              ],
+              "LedgeBelowTop": 0.3302,
+              "CorbelProjection": 0.381,
+              "CorbelVertical": 0.381,
+              "CorbelTaperRise": 0.381,
+              "JointBelowTaper": 0.07619999999999999,
+              "StepLength": 1.3716000000000002,
+              "Steps": [
+                {
+                  "Girder": 1,
+                  "TopElevation": 303.431448
+                },
+                {
+                  "Girder": 2,
+                  "TopElevation": 303.492408
+                },
+                {
+                  "Girder": 3,
+                  "TopElevation": 303.55032
+                },
+                {
+                  "Girder": 4,
+                  "TopElevation": 303.60823200000004
+                }
+              ],
+              "Masks": [
+                {
+                  "End": "Left",
+                  "Thickness": 0.254,
+                  "Height": 3.8354000000000004,
+                  "Setback": 0.0508
+                },
+                {
+                  "End": "Right",
+                  "Thickness": 0.254,
+                  "Height": 4.0386,
+                  "Setback": 0.0508
+                }
+              ],
+              "Extension": null,
+              "PileStations": [
+                -2.1591016002404197,
+                -0.07609840024041947,
+                2.0065999997595805,
+                4.08929839975958,
+                6.172301599759582,
+                8.254999999759582
+              ],
+              "PileBackRowToBearing": 0.4699,
+              "PileFrontRowToBearing": 0.4445,
+              "PileTopAboveFootingBottom": 0.6096,
+              "PileLength": 38.1,
+              "Wings": [
+                {
+                  "Name": "A",
+                  "End": "Left",
+                  "GutterOffset": -1.8288000000000002,
+                  "Thickness": 0.5334,
+                  "Length": 7.747,
+                  "TopAtBackwall": 306.013104,
+                  "TopAtEnd": 305.738784,
+                  "EndHeight": 1.2192,
+                  "BottomAtBackwall": 302.355504,
+                  "LevelReach": 0,
+                  "BottomAtEnd": "NaN",
+                  "Counterforts": [
+                    {
+                      "Start": 2.8702000000000005,
+                      "Width": 0.9144000000000001,
+                      "Projection": 1.0668000000000002,
+                      "Height": 2.5146,
+                      "FootingTop": 302.9712,
+                      "HoopSpaces": 8,
+                      "VerticalBarsPerSide": 10,
+                      "VerticalMark": "6h2",
+                      "VerticalFoot": 0.3048
+                    },
+                    {
+                      "Start": 5.3086,
+                      "Width": 0.9144000000000001,
+                      "Projection": 1.0668000000000002,
+                      "Height": 1.6764000000000001,
+                      "FootingTop": 303.745392,
+                      "HoopSpaces": 5,
+                      "VerticalBarsPerSide": 10,
+                      "VerticalMark": "6h3",
+                      "VerticalFoot": 0.3048
+                    }
+                  ],
+                  "FootingOutside": 0.45720000000000005,
+                  "FootingFillSide": 1.143,
+                  "FootingDepth": 0.9144000000000001,
+                  "FootingPileSpacing": 1.2192,
+                  "FootingPileTopAbove": 0.3048,
+                  "UpliftPiles": []
+                },
+                {
+                  "Name": "D",
+                  "End": "Right",
+                  "GutterOffset": 7.9248,
+                  "Thickness": 0.5334,
+                  "Length": 7.747,
+                  "TopAtBackwall": 306.220368,
+                  "TopAtEnd": 305.939952,
+                  "EndHeight": 1.2192,
+                  "BottomAtBackwall": 302.562768,
+                  "LevelReach": 0,
+                  "BottomAtEnd": "NaN",
+                  "Counterforts": [
+                    {
+                      "Start": 2.8702000000000005,
+                      "Width": 0.9144000000000001,
+                      "Projection": 1.0668000000000002,
+                      "Height": 2.5146,
+                      "FootingTop": 303.178464,
+                      "HoopSpaces": 8,
+                      "VerticalBarsPerSide": 10,
+                      "VerticalMark": "6h2",
+                      "VerticalFoot": 0.3048
+                    },
+                    {
+                      "Start": 5.3086,
+                      "Width": 0.9144000000000001,
+                      "Projection": 1.0668000000000002,
+                      "Height": 1.6764000000000001,
+                      "FootingTop": 303.949608,
+                      "HoopSpaces": 5,
+                      "VerticalBarsPerSide": 10,
+                      "VerticalMark": "6h3",
+                      "VerticalFoot": 0.3048
+                    }
+                  ],
+                  "FootingOutside": 0.45720000000000005,
+                  "FootingFillSide": 1.143,
+                  "FootingDepth": 0.9144000000000001,
+                  "FootingPileSpacing": 1.2192,
+                  "FootingPileTopAbove": 0.3048,
+                  "UpliftPiles": []
+                }
+              ],
+              "Rebar": {
+                "FootingLongMark": "8a1",
+                "FootingRowBars": 5,
+                "FootingSideInteriorBars": 3,
+                "FootingLongPieces": 1,
+                "FootingLongLap": 2.7686,
+                "HoopsPerPitch": 9,
+                "HoopFirstOffset": 0.2286,
+                "HoopSpacing": 0.2032,
+                "EndHoopsEach": 2,
+                "EndStaplesEach": 3,
+                "EndStapleSpacing": 0.3048,
+                "EndStapleFirst": 0.07619999999999999,
+                "HoopWidth": 1.7272,
+                "HoopHeight": 1.0414,
+                "BackFaceBarLength": 3.4544,
+                "FrontFaceBarLength": 3.3528000000000002,
+                "BackFaceSpacing": 0.15239999999999998,
+                "FrontFaceSpacing": 0.3048,
+                "BackFaceEdge": 0.15239999999999998,
+                "FrontFaceEdge": 0.3048,
+                "BackwallBarCover": 0.0508,
+                "BackwallLongRowsPerFace": 11,
+                "BackwallLongPieces": 1,
+                "StepUBars": 4,
+                "StepLongBars": 4,
+                "StepHoopGirders": [
+                  4
+                ],
+                "PlanBarList": [
+                  {
+                    "Mark": "8a1",
+                    "Count": 16,
+                    "Length": 11.430000000000001,
+                    "WeightLb": 1602,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "5b1",
+                    "Count": 49,
+                    "Length": 5.842,
+                    "WeightLb": 0,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "5b2",
+                    "Count": 6,
+                    "Length": 2.6162,
+                    "WeightLb": 0,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "6d1",
+                    "Count": 67,
+                    "Length": 3.4544,
+                    "WeightLb": 0,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "5d2",
+                    "Count": 35,
+                    "Length": 3.3528000000000002,
+                    "WeightLb": 0,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "5d3",
+                    "Count": 31,
+                    "Length": 1.3462,
+                    "WeightLb": 0,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "5d4",
+                    "Count": 31,
+                    "Length": 1.1176000000000001,
+                    "WeightLb": 0,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "4d6",
+                    "Count": 31,
+                    "Length": 2.4384,
+                    "WeightLb": 0,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "5e1",
+                    "Count": 92,
+                    "Length": 3.5306,
+                    "WeightLb": 736,
+                    "Varies": true
+                  },
+                  {
+                    "Mark": "5e2",
+                    "Count": 26,
+                    "Length": 4.445,
+                    "WeightLb": 0,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "5e3",
+                    "Count": 56,
+                    "Length": 1.7272,
+                    "WeightLb": 0,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "6f1",
+                    "Count": 20,
+                    "Length": 6.7564,
+                    "WeightLb": 0,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "6f2",
+                    "Count": 24,
+                    "Length": 6.426200000000001,
+                    "WeightLb": 0,
+                    "Varies": true
+                  },
+                  {
+                    "Mark": "6f3",
+                    "Count": 4,
+                    "Length": 7.035800000000001,
+                    "WeightLb": 0,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "6f4",
+                    "Count": 8,
+                    "Length": 1.6002,
+                    "WeightLb": 0,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "6g1",
+                    "Count": 22,
+                    "Length": 9.652000000000001,
+                    "WeightLb": 1046,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "5g2",
+                    "Count": 44,
+                    "Length": 1.8542000000000003,
+                    "WeightLb": 0,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "5g3",
+                    "Count": 2,
+                    "Length": 9.652000000000001,
+                    "WeightLb": 0,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "6g4",
+                    "Count": 36,
+                    "Length": 1.651,
+                    "WeightLb": 0,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "5h1",
+                    "Count": 24,
+                    "Length": 1.2192,
+                    "WeightLb": 0,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "6h2",
+                    "Count": 20,
+                    "Length": 3.5814000000000004,
+                    "WeightLb": 0,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "6h3",
+                    "Count": 20,
+                    "Length": 2.7432000000000003,
+                    "WeightLb": 0,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "5h4",
+                    "Count": 30,
+                    "Length": 3.6576000000000004,
+                    "WeightLb": 0,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "5j1",
+                    "Count": 32,
+                    "Length": 3.5052000000000003,
+                    "WeightLb": 0,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "5j2",
+                    "Count": 32,
+                    "Length": 3.5052000000000003,
+                    "WeightLb": 0,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "8j3",
+                    "Count": 8,
+                    "Length": 1.524,
+                    "WeightLb": 0,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "5m1",
+                    "Count": 20,
+                    "Length": 2.4638,
+                    "WeightLb": 0,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "5n1",
+                    "Count": 20,
+                    "Length": 1.27,
+                    "WeightLb": 0,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "5n2",
+                    "Count": 1,
+                    "Length": 5.3086,
+                    "WeightLb": 0,
+                    "Varies": false
+                  },
+                  {
+                    "Mark": "5d5",
+                    "Count": 16,
+                    "Length": 1.0668000000000002,
+                    "WeightLb": 58,
+                    "Varies": false
+                  }
+                ]
+              },
+              "FootingBackX": -0.9271,
+              "FootingFrontX": 0.9017,
+              "FootingWidth": 1.8288
+            },
             "Reinforcement": {
               "Enabled": true,
               "ConcreteStrengthKsi": 3.6,
               "SteelYieldKsi": 60,
-              "EpoxyCoated": false,
+              "EpoxyCoated": true,
               "CapCover": 0.0508,
               "ColumnCover": 0.0635,
               "ShaftCover": 0.07619999999999999,
@@ -38302,6 +39695,7 @@
             "BackwallTopBelowGrade": 0,
             "AbutmentFoundationCount": 4,
             "AbutmentFoundationSpacing": 3.6576000000000004,
+            "Abutment": null,
             "Reinforcement": {
               "Enabled": true,
               "ConcreteStrengthKsi": 3.6,
@@ -39271,6 +40665,7 @@
             "BackwallTopBelowGrade": 0,
             "AbutmentFoundationCount": 4,
             "AbutmentFoundationSpacing": 3.6576000000000004,
+            "Abutment": null,
             "Reinforcement": {
               "Enabled": true,
               "ConcreteStrengthKsi": 3.6,
@@ -40224,6 +41619,7 @@
             "BackwallTopBelowGrade": 0,
             "AbutmentFoundationCount": 4,
             "AbutmentFoundationSpacing": 3.6576000000000004,
+            "Abutment": null,
             "Reinforcement": {
               "Enabled": true,
               "ConcreteStrengthKsi": 3.6,
@@ -41189,6 +42585,7 @@
             "BackwallTopBelowGrade": 0,
             "AbutmentFoundationCount": 4,
             "AbutmentFoundationSpacing": 3.6576000000000004,
+            "Abutment": null,
             "Reinforcement": {
               "Enabled": true,
               "ConcreteStrengthKsi": 3.6,
@@ -42138,6 +43535,7 @@
             "BackwallTopBelowGrade": 0,
             "AbutmentFoundationCount": 4,
             "AbutmentFoundationSpacing": 3.6576000000000004,
+            "Abutment": null,
             "Reinforcement": {
               "Enabled": true,
               "ConcreteStrengthKsi": 3.6,
@@ -45084,6 +46482,7 @@
             "BackwallTopBelowGrade": 0,
             "AbutmentFoundationCount": 4,
             "AbutmentFoundationSpacing": 3.6576000000000004,
+            "Abutment": null,
             "Reinforcement": {
               "Enabled": true,
               "ConcreteStrengthKsi": 3.6,
@@ -45761,6 +47160,7 @@
             "BackwallTopBelowGrade": 0,
             "AbutmentFoundationCount": 4,
             "AbutmentFoundationSpacing": 3.6576000000000004,
+            "Abutment": null,
             "Reinforcement": {
               "Enabled": true,
               "ConcreteStrengthKsi": 3.6,
@@ -46882,6 +48282,7 @@
             "BackwallTopBelowGrade": 0,
             "AbutmentFoundationCount": 4,
             "AbutmentFoundationSpacing": 3.6576000000000004,
+            "Abutment": null,
             "Reinforcement": {
               "Enabled": true,
               "ConcreteStrengthKsi": 3.6,
@@ -47955,6 +49356,7 @@
             "BackwallTopBelowGrade": 0,
             "AbutmentFoundationCount": 4,
             "AbutmentFoundationSpacing": 3.6576000000000004,
+            "Abutment": null,
             "Reinforcement": {
               "Enabled": true,
               "ConcreteStrengthKsi": 3.6,
@@ -48894,6 +50296,7 @@
             "BackwallTopBelowGrade": 0,
             "AbutmentFoundationCount": 4,
             "AbutmentFoundationSpacing": 3.6576000000000004,
+            "Abutment": null,
             "Reinforcement": {
               "Enabled": true,
               "ConcreteStrengthKsi": 3.6,
@@ -51613,6 +53016,7 @@
             "BackwallTopBelowGrade": 0,
             "AbutmentFoundationCount": 4,
             "AbutmentFoundationSpacing": 3.6576000000000004,
+            "Abutment": null,
             "Reinforcement": {
               "Enabled": true,
               "ConcreteStrengthKsi": 3.6,
@@ -52398,6 +53802,7 @@
             "BackwallTopBelowGrade": 0,
             "AbutmentFoundationCount": 4,
             "AbutmentFoundationSpacing": 3.6576000000000004,
+            "Abutment": null,
             "Reinforcement": {
               "Enabled": true,
               "ConcreteStrengthKsi": 3.6,
@@ -53524,6 +54929,7 @@
             "BackwallTopBelowGrade": 0,
             "AbutmentFoundationCount": 4,
             "AbutmentFoundationSpacing": 3.6576000000000004,
+            "Abutment": null,
             "Reinforcement": {
               "Enabled": true,
               "ConcreteStrengthKsi": 3.6,
@@ -54650,6 +56056,7 @@
             "BackwallTopBelowGrade": 0,
             "AbutmentFoundationCount": 4,
             "AbutmentFoundationSpacing": 3.6576000000000004,
+            "Abutment": null,
             "Reinforcement": {
               "Enabled": true,
               "ConcreteStrengthKsi": 3.6,
@@ -55615,6 +57022,7 @@
             "BackwallTopBelowGrade": 0,
             "AbutmentFoundationCount": 4,
             "AbutmentFoundationSpacing": 3.6576000000000004,
+            "Abutment": null,
             "Reinforcement": {
               "Enabled": true,
               "ConcreteStrengthKsi": 3.6,
@@ -56548,6 +57956,7 @@
             "BackwallTopBelowGrade": 0,
             "AbutmentFoundationCount": 4,
             "AbutmentFoundationSpacing": 3.6576000000000004,
+            "Abutment": null,
             "Reinforcement": {
               "Enabled": true,
               "ConcreteStrengthKsi": 3.6,
@@ -59799,6 +61208,7 @@
             "BackwallTopBelowGrade": 0,
             "AbutmentFoundationCount": 4,
             "AbutmentFoundationSpacing": 3.6576000000000004,
+            "Abutment": null,
             "Reinforcement": {
               "Enabled": true,
               "ConcreteStrengthKsi": 3.6,
@@ -60464,6 +61874,7 @@
             "BackwallTopBelowGrade": 0,
             "AbutmentFoundationCount": 4,
             "AbutmentFoundationSpacing": 3.6576000000000004,
+            "Abutment": null,
             "Reinforcement": {
               "Enabled": true,
               "ConcreteStrengthKsi": 3.6,
@@ -61625,6 +63036,7 @@
             "BackwallTopBelowGrade": 0,
             "AbutmentFoundationCount": 4,
             "AbutmentFoundationSpacing": 3.6576000000000004,
+            "Abutment": null,
             "Reinforcement": {
               "Enabled": true,
               "ConcreteStrengthKsi": 3.6,
@@ -62822,6 +64234,7 @@
             "BackwallTopBelowGrade": 0,
             "AbutmentFoundationCount": 4,
             "AbutmentFoundationSpacing": 3.6576000000000004,
+            "Abutment": null,
             "Reinforcement": {
               "Enabled": true,
               "ConcreteStrengthKsi": 3.6,
@@ -63830,6 +65243,7 @@
             "BackwallTopBelowGrade": 0,
             "AbutmentFoundationCount": 4,
             "AbutmentFoundationSpacing": 3.6576000000000004,
+            "Abutment": null,
             "Reinforcement": {
               "Enabled": true,
               "ConcreteStrengthKsi": 3.6,
@@ -64681,6 +66095,7 @@
             "BackwallTopBelowGrade": 0,
             "AbutmentFoundationCount": 4,
             "AbutmentFoundationSpacing": 3.6576000000000004,
+            "Abutment": null,
             "Reinforcement": {
               "Enabled": true,
               "ConcreteStrengthKsi": 3.6,

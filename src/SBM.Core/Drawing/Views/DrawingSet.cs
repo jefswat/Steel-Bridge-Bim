@@ -12,7 +12,7 @@ public static class DrawingSet
             SectionViews.TypicalSection(ctx),
         };
         if (ctx.Substructure != null)
-            foreach (var unit in ctx.Substructure.Units) views.Add(BentViews.Bent(ctx, unit));
+            foreach (var unit in ctx.Substructure.Units) { if (unit.Abutment != null) for (int k = 0; k < 3; k++) views.Add(AbutmentViews.Abutment(ctx, unit, k)); else views.Add(BentViews.Bent(ctx, unit)); }
         if ((ctx.Concrete?.Marks.Count ?? 0) + (ctx.Substructure?.Marks.Count ?? 0) > 0) views.Add(BarSheet.Build(ctx));
         return views;
     }

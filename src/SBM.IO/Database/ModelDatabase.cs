@@ -747,6 +747,7 @@ public static class ModelDatabase
         // ------------------------------------------------------------ substructure
 
         private static readonly Regex ColNo = new(@"column (\d+)", RegexOptions.Compiled);
+        private static readonly Regex WingNo = new(@"(?:wingwall|counterfort|wing footing) (\S+?)(?: \d+)?(?: pile \d+)?$", RegexOptions.Compiled);
         private static readonly Regex PileGroupNo = new(@"pile group (\d+)", RegexOptions.Compiled);
 
         private void Substructure(SubstructureModel sub, string bk, string subId, string superId)
@@ -779,15 +780,25 @@ public static class ModelDatabase
                 Vec2 ColPos(int idx) => unit.Plan(unit.Columns[idx].S, unit.Columns[idx].N);
                 Vec2 FtgPos(int idx) => unit.Plan(unit.Foundations[idx].S, unit.Foundations[idx].N);
 
+                string WingG(string solidName)
+                {
+                    var wm = WingNo.Match(solidName);
+                    string w = wm.Success ? wm.Groups[1].Value : "";
+                    return G("wing" + w, $"Wingwall {w}", "wingwall group");
+                }
                 string ParentOfSolid(SubSolid so)
                 {
                     switch (so.Kind)
                     {
                         case SubElementKind.Cap: case SubElementKind.Pedestal: return CapG();
                         case SubElementKind.Backwall: return G("backwall", "Backwall", "backwall group");
+                        case SubElementKind.Maskwall: return G("mask" + so.Name, so.Name.Substring(unit.Name.Length).Trim(), "maskwall group");
+                        case SubElementKind.Wingwall: case SubElementKind.Counterfort: case SubElementKind.WingFooting: return WingG(so.Name);
+                        case SubElementKind.Footing when !ColNo.IsMatch(so.Name) && !PileGroupNo.IsMatch(so.Name): return FtgG(1);
                         case SubElementKind.Column:
                             return ColNo.Match(so.Name) is { Success: true } c1 ? ColG(int.Parse(c1.Groups[1].Value)) : uid;
                         default:
+                            if (so.Kind == SubElementKind.Pile && WingNo.IsMatch(so.Name)) return WingG(so.Name);
                             if (PileGroupNo.Match(so.Name) is { Success: true } pg) return PileGroupG(int.Parse(pg.Groups[1].Value));
                             if (ColNo.Match(so.Name) is { Success: true } c2) return FtgG(int.Parse(c2.Groups[1].Value));
                             return uid;
@@ -803,6 +814,10 @@ public static class ModelDatabase
                         SubElementKind.Cap => (abut ? "abutment cap" : "pier cap", "IFCBEAM"),
                         SubElementKind.Backwall => ("backwall", "IFCWALL"),
                         SubElementKind.Pedestal => ("pedestal", "IFCCOLUMN"),
+                        SubElementKind.Wingwall => ("wingwall", "IFCWALL"),
+                        SubElementKind.Counterfort => ("counterfort", "IFCWALL"),
+                        SubElementKind.Maskwall => ("maskwall", "IFCWALL"),
+                        SubElementKind.WingFooting => ("wing footing", "IFCFOOTING"),
                         SubElementKind.Column => ("column", "IFCCOLUMN"),
                         SubElementKind.DrilledShaft => ("drilled shaft", "IFCPILE"),
                         SubElementKind.Pile => ("pile", "IFCPILE"),

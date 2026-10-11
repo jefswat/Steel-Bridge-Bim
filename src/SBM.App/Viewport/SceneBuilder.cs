@@ -299,10 +299,10 @@ public static class SceneBuilder
         }
         var jobs = new Func<SolidLayer?>[]
         {
-            () => Layer("3D-SUB-CAP", 196, 190, 176, x => x.Kind is SBM.Core.Substructure.SubElementKind.Cap or SBM.Core.Substructure.SubElementKind.Backwall, 0.6f),
+            () => Layer("3D-SUB-CAP", 196, 190, 176, x => x.Kind is SBM.Core.Substructure.SubElementKind.Cap or SBM.Core.Substructure.SubElementKind.Backwall or SBM.Core.Substructure.SubElementKind.Wingwall or SBM.Core.Substructure.SubElementKind.Counterfort or SBM.Core.Substructure.SubElementKind.Maskwall, 0.6f),
             () => Layer("3D-SUB-PEDESTAL", 214, 196, 160, x => x.Kind == SBM.Core.Substructure.SubElementKind.Pedestal),
             () => Layer("3D-SUB-COLUMN", 186, 182, 170, x => x.Kind == SBM.Core.Substructure.SubElementKind.Column, 0.6f),
-            () => Layer("3D-SUB-FOUNDATION", 160, 150, 135, x => x.Kind is SBM.Core.Substructure.SubElementKind.DrilledShaft or SBM.Core.Substructure.SubElementKind.Footing
+            () => Layer("3D-SUB-FOUNDATION", 160, 150, 135, x => x.Kind is SBM.Core.Substructure.SubElementKind.DrilledShaft or SBM.Core.Substructure.SubElementKind.Footing or SBM.Core.Substructure.SubElementKind.WingFooting
                 || (x.Kind == SBM.Core.Substructure.SubElementKind.Pile && x.IsConcrete), 0.6f),
             () => Layer("3D-SUB-PILE", 120, 130, 150, x => x.Kind == SBM.Core.Substructure.SubElementKind.Pile && !x.IsConcrete),
             () => Layer("3D-SUB-COUPLER", 214, 140, 60, x => x.Kind == SBM.Core.Substructure.SubElementKind.Coupler),

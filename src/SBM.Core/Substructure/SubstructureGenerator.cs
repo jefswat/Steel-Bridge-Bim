@@ -59,7 +59,7 @@ public sealed partial class SubstructureGenerator
                 var sub = defs[j].ResolvedSubstructure;
                 if (!sub.Enabled || skipSupport?.Invoke(j) == true) return;
                 try { units2[j] = g.Build(j, sub); }
-                catch (Exception ex) { g.Warn($"{defs[j].Name}: substructure could not be generated ({ex.Message})."); }
+                catch (Exception ex) { g.Warn($"{defs[j].Name}: substructure could not be generated ({ex.Message}) {(ex is InvalidOperationException ? "" : string.Join(" | ", (ex.StackTrace ?? "").Split((char)10).Take(5).Select(l => l.Trim())))}."); }
             });
         m.Units.AddRange(units2.OfType<SubstructureUnit>());
         g.CheckPileClearances();
@@ -144,6 +144,7 @@ public sealed partial class SubstructureGenerator
             }
         if (seats.Count == 0) throw new InvalidOperationException("no bearing seats");
         seats.Sort((x, y) => x.S.CompareTo(y.S));
+        if (sl.Type == SupportType.Abutment && sd.Abutment != null) return BuildDesignedAbutment(j, unit, sd, sl, seats);
 
         // ---- cap extents along the support line
         double sMin = seats.Min(x => x.Footprint.Min(c => c.X)), sMax = seats.Max(x => x.Footprint.Max(c => c.X));
