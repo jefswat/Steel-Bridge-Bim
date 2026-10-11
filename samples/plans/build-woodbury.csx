@@ -1,6 +1,6 @@
 // Iowa DOT Design 817 (File 30377): I-29 NB over Floyd Blvd, Sioux City (Woodbury County) - STAGE 1.
 // 223'-10 7/8 x 36'-0 pretensioned prestressed concrete beam bridge, 3 spans, BTD bulb tees, integral abutments.
-// SUPERSTRUCTURE GEOMETRY ONLY: alignment (local coordinates, no datum - U1), profile on the PGL 5.00' RT of CL I-29,
+// Alignment (local coordinates, no datum - U1), profile on the PGL 5.00' RT of CL I-29,
 // superelevation, supports (all parallel, 10 deg 09'36" to the extended tangent), deck, per-span beam layout + haunches.
 // Plan data: docs/plan-data/woodbury-i29-floyd/SUMMARY.md (sections 1-3) and its CSVs.
 //   sbm run samples\plans\build-woodbury.csx -- "samples\plans\Woodbury I-29 NB over Floyd.sbm"
@@ -16,22 +16,39 @@ var unresolved = new List<string>();
 
 // ---------------------------------------------------------------- CL I-29 (situation plan, PDF p.6 / DS 4)
 // PI STA 469+93.34, Delta = 29 deg 19'58.71" LT, R = 2320.00' (T 607.19, L 1187.74, PC 463+86.15, PT 475+73.89), no spirals,
-// no station equations. Local frame (U1: no coordinates in the set): PI at (N 10000, E 10000), back tangent heading north.
+// no station equations. PLACEMENT (APPROXIMATE, U1): the set has no survey coordinates. The model is placed in NAD83 / UTM zone 14N (metres,
+// the internal unit) from (a) the plan GPS point (p.6 LOCATION: lat 42.486925, long -96.395158 = UTM14N E 714080.96, N 4707129.31; 2 m from the
+// OSM I-29 NB bridge centerline, terrain there = Floyd Blvd pavement) taken as CL I-29 x CL Floyd Blvd, STA 464+51.66 (offset 0), and (b) the
+// p.6 north arrow (-47.35 deg on the sheet; extended back tangent of CL I-29 at -0.81 deg -> back tangent TRUE azimuth 313.54 deg, true north
+// assumed), minus the grid convergence there (true north = grid azimuth -1.760 deg) -> GRID azimuth 311.78 deg (OSM cross-check: 310.87 deg true
+// on the curve at the GPS point, about 0.1 deg from the plan value). Exact N/E would come from the road plans IM-NHS-029-7(49).
 double R = Ft(2320.00), delta = Deg(29, 19, 58.71), T = R * Math.Tan(delta / 2);
 double piSta = S("469+93.34"), startSta = S("458+00"), endPast = Ft(300);
-var back = new Vec2(0, 1);                       // heading (x = east, y = north)
+var back = new Vec2(0, 1);                       // heading (x = east, y = north) in the construction frame
 var ahead = back.Rotate(delta);                  // left curve
-var pi = new Vec2(Ft(10000), Ft(10000));
+var pi = new Vec2(0, 0);
 var pStart = pi - back * (piSta - startSta);
 var pEnd = pi + ahead * (T + endPast);
-Doc.Project.Alignments.RemoveAll(a => a.Name == "CL I-29");
+Doc.Project.Alignments.RemoveAll(a => a.Name == "CL I-29" || a.Name == "CL I-29 (construction)");
+var tmpAl = Doc.AddAlignment("CL I-29 (construction)", startSta, new[] { new PiRow(pStart.Y, pStart.X), new PiRow(pi.Y, pi.X, R), new PiRow(pEnd.Y, pEnd.X) });
+var anchorLocal = tmpAl.PointAt(S("464+51.66"), 0);
+Doc.Project.Alignments.RemoveAll(a => a.Name == "CL I-29 (construction)");
+double gridAz = 311.78, rotGeo = (360 - gridAz) * Math.PI / 180;        // construction frame (back tangent north) -> UTM grid (ccw rotation)
+var anchorUtm = new Vec2(714080.96, 4707129.31);                        // metres
+Vec2 Geo(Vec2 p) => anchorUtm + (p - anchorLocal).Rotate(rotGeo);
+pStart = Geo(pStart); pi = Geo(pi); pEnd = Geo(pEnd);
+back = back.Rotate(rotGeo); ahead = ahead.Rotate(rotGeo);
 var al = Doc.AddAlignment("CL I-29", startSta, new[]
 {
     new PiRow(pStart.Y, pStart.X), new PiRow(pi.Y, pi.X, R), new PiRow(pEnd.Y, pEnd.X),
 });
-al.Description = "CL I-29 (Iowa DOT Design 817, local coordinates - no datum in the plan set)";
+al.Description = "CL I-29 (Iowa DOT Design 817) - APPROXIMATE placement in NAD83 / UTM 14N (m) from the p.6 GPS point + north arrow, not survey coordinates";
 Print($"PC {Doc.Units.FormatStation(piSta - T)} (plan 463+86.15), T {T / 0.3048:F2}' (plan 607.19), L {R * delta / 0.3048:F2}' (plan 1187.74)");
-unresolved.Add("U1: horizontal coordinates / datum of CL I-29 not in the plan set (PDF p.6) - model in local coordinates (PI at N 10000', E 10000', back tangent north).");
+{
+    var q = al.PointAt(S("464+51.66"), 0);
+    Print($"Placement (APPROXIMATE): CL I-29 STA 464+51.66 at UTM14N E {q.X:F2} N {q.Y:F2} m; back tangent grid azimuth {gridAz:F2} deg; PI E {pi.X:F2} N {pi.Y:F2} m");
+}
+unresolved.Add("U1: no survey coordinates in the set (PDF p.6). APPROXIMATE placement in NAD83 / UTM 14N from the p.6 GPS point (CL I-29 x Floyd, STA 464+51.66) and the p.6 north arrow (back tangent grid azimuth 311.78 deg); exact N/E = road plans IM-NHS-029-7(49).");
 
 // Profile on the P.G.L. I-29 N.B. (5.00' RT of CL I-29): PVI 462+50.00 elev 1124.11, VC 700', G1 +1.9791 %, G2 -0.6143 %.
 double pviSta = S("462+50.00"), pviZ = Ft(1124.11), g1 = 0.019791, g2 = -0.006143;
@@ -117,7 +134,6 @@ for (int k = 0; k < 4; k++)
     var (sta, skew) = Line(stakes[k]);
     bool abut = k == 0 || k == 3;
     var sub = SubstructureDefinition.Default(abut ? SupportType.Abutment : SupportType.Pier);
-    sub.Enabled = false;      // superstructure geometry only (substructure: later step)
     br.Supports.Add(new SupportDefinition
     {
         Name = names[k], Type = abut ? SupportType.Abutment : SupportType.Pier, Station = sta, SkewDegrees = skew, Substructure = sub,
@@ -275,10 +291,33 @@ unresolved.Add("Beam ends at the piers: square to the beam or parallel to the pi
     Print(dr.Output.TrimEnd());
     if (!dr.Success) Print("ERROR in diaphragms-woodbury.csx: " + dr.Error);
 }
+// ---------------------------------------------------------------- substructure: piers 1 / 2 + integral abutments (substructure-woodbury.csx, run from the repo root)
+{
+    var sr = await SBM.Api.ScriptHost.RunFileAsync(@"samples\plans\substructure-woodbury.csx", Doc, Args);
+    Print(sr.Output.TrimEnd());
+    if (!sr.Success) Print("ERROR in substructure-woodbury.csx: " + sr.Error);
+}
 
-var rep = Doc.Regenerate(includeSteel: false);
+// Existing ground (user-approved): USGS 3DEP 2020 lidar 1 m DEM, NAD83 UTM 14N, metres, NAVD88 metres (= the plan datum, no vertical shift).
+Doc.Project.References.RemoveAll(x => x.Name == "3DEP lidar 1 m (Sioux City I-29)");
+Doc.Project.References.Add(new SBM.Core.References.ReferenceModelDefinition
+{
+    Name = "3DEP lidar 1 m (Sioux City I-29)", Path = @"C:\SBM\dist\terrain\sioux-city-i29-3dep-1m-utm14n.flt",
+    Kind = SBM.Core.References.ReferenceKind.Terrain, Format = SBM.Core.References.ReferenceFormat.Grid, UnitScale = 1.0,
+    ContourInterval = Ft(2), R = 150, G = 140, B = 120,
+});
+var rep = Doc.Regenerate();
 foreach (var e in rep.Errors) Print("ERROR " + e);
 foreach (var w in rep.Warnings.Take(30)) Print("warning " + w);
+{
+    var subm = Doc.Model(br.Name).Substructure;
+    if (subm == null) Print("ERROR substructure not generated");
+    else
+    {
+        foreach (var d in subm.Diagnostics) Print($"substructure {d.Severity}: {d.Message}");
+        foreach (var u in subm.Units) Print($"substructure unit {u.Name}: {u.Solids.Count} solids, {u.Foundations.Sum(f => f.Piles.Count)} piles");
+    }
+}
 foreach (var u in unresolved) Print("UNRESOLVED " + u);
 Doc.Save(outPath);
 Print($"Saved {outPath}");

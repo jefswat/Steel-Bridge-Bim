@@ -106,6 +106,10 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
     side-by-side as-designed piers ("Pier 11WB & 19G"): every support with a CapProfile owns its cap and takes only the
     seats on it (RegenerationCache owners). Conflicts (seats off the cap, seat below cap top, column not under cap) are
     WARNINGS, never auto-fixed. Plan-set data: `samples/plans/piers-i80.csx`, `piers-ramp-g.csx`, `deck-edges-i80.csx`.
+    Woodbury additions (OPTIONAL): `PedestalSideAngleDeg` (plan pedestal blocks as parallelograms, sides at that angle from the cap normal),
+    `ColumnProjectionS` / `ColumnProjectionWidth` (rectangular column with a centred reveal projection on both S faces; rebar uses the core rectangle),
+    `CapBlocks` (`CapBlockDefinition`: plan prism on an as-designed cap, base = cap top or soffit, top = plane; Kind Cap | Maskwall; Woodbury maskwall
+    + 4" end reveal). Woodbury substructure: `samples/plans/substructure-woodbury.csx` (piers + integral abutments, called by build-woodbury.csx).
     `piers-i80.csx` / `pier-6a.csx` with env `PIER_POSITION_ONLY=1` update only the position fields (CapProfile, CapProfileAhead,
     FirstColumnOffset) of existing piers, so later scripts' data (rebar, aesthetics, pedestals, footing bars) survive a position fix.
     Chamfered (octagonal) column rebar (`SubstructureRebar.ColumnBars`): verticals per face from the OUTSIDE-face

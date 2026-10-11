@@ -311,6 +311,14 @@ Queue (shared by both sets first):
    camber in the model, item 9).
    DONE: `PrestressedGenerator.BuildBeam` uses `SpanBearing` and the layout bearing points; build-woodbury.csx now builds the
    standard BTD55 / BTD105 / BTD60 (StandardBeamCatalog) instead of the Tx54 placeholder.
+7a. DONE 2026-10-11 (woodbury-sub): Woodbury SUBSTRUCTURE built - `samples/plans/substructure-woodbury.csx` (called by build-woodbury.csx):
+   Piers 1 / 2 as designed (cap profile J/K top, soffit through L/M/N, parallelogram step blocks D..H, 4" end reveal + maskwall = new
+   `CapBlocks`, columns with reveal projections = new `ColumnProjectionS/Width`, 3 footings 10'-0 x 13'-6 x 5'-0 bottom 1090.00, 12 HP12x84
+   each with the outer rows battered 1:4 away from CL pier, 8f6 on the 8 circled piles, footing + cap + pedestal plan bars, column verticals /
+   dowels / generic ties); S / N integral abutments (piles, wing extension + wing pile, casings scheduled, spiral; pile CAP NOT BUILT: riser
+   positions UNRESOLVED, decision 11 / U13 - the plan quantities point to the 1'-9 drawn on the rear elevations, user to decide).
+   Approximate UTM14N placement (GPS point + north arrow, U1) and the 3DEP terrain reference. check-woodbury: 587 PASS / 9 FAIL (the known
+   p.34 haunch rows) / 117 INFO. Diaphragm question: W21x50 + W14x38 at span 2 bay G-H = plan note p.32; model matches (SUMMARY section 8).
 8. DONE 2026-10-11: profile grade line / cross-slope pivot offset - `CrossSlopeTable.PivotOffset` (constant) plus the new
    optional `PivotOffsets` station table. Elevation check rows show "on the PGL x RT of the alignment".
 9. Smaller: round CIP pipe piles, curved-plate bearings, future-beam pedestals, MnDOT Type S / Iowa aesthetic
