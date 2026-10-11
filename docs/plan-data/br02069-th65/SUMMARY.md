@@ -1,6 +1,6 @@
 # Br. 02069 - T.H. 65 S.B. over 117th Ave (MnDOT) - plan data summary
 
-Set `br02069-th65`, `Br02069_Certified Plans_20250926.pdf` (39 pages, PDF page = sheet). Standard: `../EXTRACTION.md`. Index: `INDEX.md`. CSVs: `working-points.csv`, `strands-30MH-B1.csv`, `seat-elevations.csv`, `bar-lists.csv`. Scripts/caches: `temp/br02069/` (not committed; `checks.py` alignment/profile/WP recompute, `bars.py` bar CSV + weight check). Tags: TEXT / RASTER / DERIVED / UNVERIFIED / UNRESOLVED.
+Set `br02069-th65`, `Br02069_Certified Plans_20250926.pdf` (39 pages, PDF page = sheet). Standard: `../EXTRACTION.md`. Index: `INDEX.md`. CSVs: `working-points.csv`, `strands-30MH-B1.csv`, `seat-elevations.csv`, `bar-lists.csv`, `bend-diagrams.csv`. Scripts/caches: `temp/br02069/` (not committed; `checks.py` alignment/profile/WP recompute, `bars.py` bar CSV + weight check). Tags: TEXT / RASTER / DERIVED / UNVERIFIED / UNRESOLVED.
 
 Tools: `python` on PATH has PyMuPDF but not pypdfium2; the pypdfium2 scripts (`words.py`, `clips.py`, `clip.py`) run with `C:\SBM\temp\pytools\python.exe -I`.
 
@@ -65,7 +65,17 @@ Bridge: single simple span 99'-3" CL-CL brg, 0 deg skew, seven MnDOT 30MH preten
 | Camber | erection 7 3/8"; DL defl 5 1/4" int / 5 1/8" ext; residual 2 1/8" int / 2 1/4" ext | in | p16 | RASTER | differences ok |
 | Beam bars | G301E, G402E, G303E, G505E, G508E, 4-G806E; stirrups 9@4", 19@9", 27@14" | - | p16 | RASTER | no bill |
 | Intermediate diaphragms | none | - | p2, p16 | TEXT | temp. bracing |
-| End diaphragms | concrete, both abutments | - | p15, p17, p20, p21 | TEXT | dims U2 |
+| End diaphragms | concrete, both abutments, semi-integral (p17 "integral & semi-integral abutment") | - | p15, p17, p20, p21 | TEXT | detail rows below |
+| End diaph. thickness | 3'-0" (plan: 1'-6" back face -> CL end diaph + 1'-6" -> front face) | - | p20 plan, p21 A-A/B-B | TEXT | |
+| End diaph. stations across | back face = back face of abutment; CL brg 2'-6" from back face (1'-3" + 3" + 1'-0"); front face of diaph 6" ahead of CL brg; front face of abut 1'-6" ahead of CL brg | - | p21 A-A/B-B, p20 plan (10"+1'-0"+6"+1'-0" stack) | TEXT | 1'-3"+3"+1'-0"+1'-6" = 4'-0" stem ok; 2'-6"+6" = 3'-0" ok |
+| End diaph. bottom | rear 1'-3" sits on the abutment back ledge on 1" Type A polystyrene; 3" Type B polystyrene against the seat riser (the 3" in the dim chain); 1" backer rod at back face | - | p21 A-A, p11 Detail A | TEXT | bottom elevation = back ledge + 1" (S 922.35 / N 922.15 DERIVED, sec. 4) |
+| End diaph. depth | "VARIES" (top of deck to bottom); back face: 1'-4" paving-bracket notch, then S609E B.F. 2 eq. sps + 2 eq. sps + 4" | - | p21 A-A/B-B | TEXT | total not dimensioned; follows deck profile |
+| Paving bracket | 8" wide x 1'-4" deep notch at back face top; 1/2" x 7" bit. felt; 4" (note 1: to approach panel dowel bar); 5 1/2" deck end to first S615M; 4 1/2" clr S617S; sawcut joint (note 4) | - | p21, p20 plan (8" paving bracket) | RASTER | 5 1/2, 4 1/2 confirmed on clip |
+| Front fillet | between beams, front face of diaph meets slab underside with a 1'-0" (vert, A-A) x 1'-0" (horiz, B-B) 45 deg fillet; S405E 2 bars | - | p21 A-A, B-B | TEXT | slab 9" above fillet |
+| Beam embedment | beam ends 7 1/2" behind CL brg inside diaph (std table E); 2 x 1 1/2" dia. holes per beam for 2-S506E thru beams: 30MH C = 3 1/2", D = 1'-1 1/4" above bottom of beam, E = 7 1/2" along CL beam; A/B (parapet abut.), X/Y NA | - | p17 table (30MH row), p20/21 | RASTER | |
+| End diaph. length | not dimensioned (W end against mask wall, E end 1" Type B polystyrene, Detail C p11); S609E / S405E 40'-8" | - | p20, p11 | UNRESOLVED | 40'-8" + 2 x 2" clr = 41'-0" deck width would fit, but end clear not stated |
+| PVC sleeve | 3" dia. PVC through diaph, 1'-0"+/- from WL, 2'-0" below top, S abut only (note 1) | - | p20 | TEXT | lighting conduit |
+| Diaph. rebar sets | between beams 2 sps @ 1'-0" (3 sets S510E/S511E/S513E/S615M/S616M/S617S); at beams 4 sps @ 1'-0" (3 sets S510E/S512E/S514E/S615M); 1 set at each end; 5-S609E B.F., 4/3-S609E, S607E/S608E F.F. between beams | - | p20 | TEXT | |
 | Slab | 9" min; top clr 2", bottom 1" | - | p2, p3, p19 | TEXT | |
 | Stool at CL brg | 4 1/4" both | in | p3 | RASTER | |
 | Roadway-to-seat | S 9+4 1/4+30+3 1/4=46 1/2" (3.88'); N 9+4 1/4+30+6 1/2=49 3/4" (4.15') | - | p3 | RASTER | ok |
@@ -110,7 +120,7 @@ bar-lists.csv: 93 marks (A 29 p8, B 29 p14, S 17 p21, R 18 p24; 10 R rows RASTER
 | Bridge | 19200 / 19970 / 250 (p2) | DERIVED | ok |
 | Deck transverse | 137 S403M top, 137 S404M bot, 136 @ 9" (p18) | TEXT | |
 | Deck longit. | S401M 60'-0" + S402M 45'-2", 2'-7" lap; 55 bot + 29 top lines (p18/19) | TEXT | length ok; U4 |
-| Bend diagrams | p8, p14, p21, p24 | UNRESOLVED | |
+| Bend diagrams | bend-diagrams.csv: 52 bent marks of the bills (A 17 p8, B 17 p14, S 8 p21, R 10 p24) + 5 beam G bars (p16, no bill). 25 OK (sum of out-to-out dims = listed length exactly); 22 have one leg / hook not dimensioned on the sheet (listed - dims given as DERIVED, not checkable); 5 barrier loops R505M/R517E/R506E/R507E/R518E NOT RECONCILED (-2 9/16 .. +3/16 in vs true-length sum; std barrier sheet length convention not stated) | RASTER | convention p8/p14 note: "ALL BENT BAR DIMENSIONS ARE GIVEN OUT-TO-OUT"; p21/p24 no note; pin diameters not shown on any sheet |
 | Beam bars | p16 | TEXT | |
 
 ## 6. Misc
