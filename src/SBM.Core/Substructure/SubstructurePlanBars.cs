@@ -63,7 +63,8 @@ public sealed partial class SubstructureGenerator
                 case PlanBarKind.FootingMat:
                 {
                     double along = g.AlongN ? f.SizeN : f.SizeS, across = g.AlongN ? f.SizeS : f.SizeN;
-                    double off = In(6), run = (g.Length > 0 ? g.Length - 2 * g.HookExtra : along - In(4)) / 2;
+                    // Listed length = out-to-out: a mat bar ends 2" short of the face; a hooked bar's up-turned leg has its OUTSIDE face 2" from the face
+                    double off = In(6), run = g.HookExtra > 0 ? along / 2 - In(2) - db / 2 : (g.Length > 0 ? g.Length : along - In(4)) / 2;
                     double z = g.Top ? f.TopZ - In(3) - db / 2 - Cum(true, g.Order, db) : f.BottomZ + embed + In(1) + db / 2 + Cum(false, g.Order, db);
                     string what = g.Top ? "top mat" : "bottom mat";
                     for (int i = 0; i < g.Count; i++)
