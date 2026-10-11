@@ -478,7 +478,7 @@ public sealed partial class SubstructureGenerator
             + $"so the face bars and stirrups there lie {Sh(ae.StepSetback - cover)} OUTSIDE the lower section (the plans bend them with the relief) - cap bar layout not adapted.");
         var mesh = new Mesh();
         int built = 0;
-        unit.ReliefLines.Clear();
+        unit.ReliefLines.Clear(); unit.ReliefLineTags.Clear();
 
         void Face(List<Vec2> outline, double nCore, double dirN)
         {
@@ -546,8 +546,11 @@ public sealed partial class SubstructureGenerator
                 built++;
             }
             // Lines for the 2D views: each layer line clipped to the cap, in (S, Z) (drawn once per face; identical for both when the profiles match).
-            foreach (var ch in ae.Layers.Where(c => c.Nodes.Count >= 2))
+            for (int li = 0; li < m; li++)
             {
+                var ch = ae.Layers[li];
+                if (ch.Nodes.Count < 2) continue;
+                void AddRun(List<Vec2> rr) { unit.ReliefLines.Add(rr); unit.ReliefLineTags.Add(((int)dirN, li)); }
                 var pts = Pts(ch, 0);
                 var run = new List<Vec2>();
                 for (int i = 1; i < pts.Count; i++)
@@ -563,12 +566,12 @@ public sealed partial class SubstructureGenerator
                         if (den > 0) t0 = Math.Max(t0, tt); else t1 = Math.Min(t1, tt);
                         if (t0 > t1) { ok = false; break; }
                     }
-                    if (!ok) { if (run.Count > 1) unit.ReliefLines.Add(run); run = new List<Vec2>(); continue; }
+                    if (!ok) { if (run.Count > 1) AddRun(run); run = new List<Vec2>(); continue; }
                     var s0 = Un(pts[i - 1] + dv * t0); var s1 = Un(pts[i - 1] + dv * t1);
-                    if (run.Count == 0 || (run[^1] - s0).Length > 1e-6) { if (run.Count > 1) unit.ReliefLines.Add(run); run = new List<Vec2> { s0 }; }
+                    if (run.Count == 0 || (run[^1] - s0).Length > 1e-6) { if (run.Count > 1) AddRun(run); run = new List<Vec2> { s0 }; }
                     run.Add(s1);
                 }
-                if (run.Count > 1) unit.ReliefLines.Add(run);
+                if (run.Count > 1) AddRun(run);
             }
         }
         // Back face (N0, projects toward -N) and ahead face (N1, toward +N), each on its own half's outline.

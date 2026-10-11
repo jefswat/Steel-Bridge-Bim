@@ -53,5 +53,8 @@ public sealed class PlanBarGroup
     public double ZoneMargin { get; set; }
     /// <summary>Short cap skin bars (5a11 / 5a12): -1 = at the begin (left, S0) end of the cap, +1 = at the far end, 0 = not read from the plan elevation.</summary>
     public int End { get; set; }
+    /// <summary>Pedestal hoops (5n2): the girders whose pedestals carry them, as the plan note prints them ("AT GIRDERS C &amp; D ONLY" = "C,D";
+    /// "B-D" = a range; letter A = girder index 0, a seat of the ahead span counts too). "" = not given: the hoops are placed at mid-cap and flagged UNRESOLVED.</summary>
+    public string Girders { get; set; } = "";
     public PlanBarGroup Clone() => (PlanBarGroup)MemberwiseClone();
 }
