@@ -272,6 +272,7 @@ public static class ConcreteDiaphragmGenerator
                 var xsec = part.Section.Select(p => p.X).ToList();
                 dia.Parts.Add(new ConcreteDiaphragmPart(pn, mesh, vol, xsec.Min(), xsec.Max()));
                 dia.Mesh.Append(mesh);
+                dia.Pieces.AddRange(PiecesOf(mesh));
                 if (used.Count > 0) Info($"{pn}: beams embedded {string.Join(", ", used.Select(e => e.Beam.Mark))}.");
             }
             catch (InvalidOperationException ex) { Warn($"{pn} not built - {ex.Message}"); dia.UnbuiltParts.Add(pn); }
@@ -352,7 +353,7 @@ public static class ConcreteDiaphragmGenerator
                 if (mesh.IsEmpty) { Warn($"filler {fd.Name}: nothing to build."); continue; }
                 model.Accessories.Add(new DiaphragmAccessory
                 {
-                    Name = $"{sup.Name} {fd.Name}", Support = sup.Name, Kind = DiaphragmAccessoryKind.Filler, Material = fd.Material, Mesh = mesh,
+                    Name = $"{sup.Name} {fd.Name}", Support = sup.Name, Kind = DiaphragmAccessoryKind.Filler, Material = fd.Material, Mesh = mesh, Pieces = PiecesOf(mesh),
                     Description = $"{fd.Material}{(fd.Thickness > 0 ? ", " + L(fd.Thickness) : "")}{(fd.Source != "" ? " (" + fd.Source + ")" : "")}",
                     Assumption = assumption != null && fd.Kind != DiaphragmFillerKind.EndFace ? assumption : null,
                 });
@@ -369,13 +370,27 @@ public static class ConcreteDiaphragmGenerator
                 if (kd.Unresolved != "") Warn($"UNRESOLVED: keyway {kd.Name}: {kd.Unresolved} - {kd.Basis}.");
                 model.Accessories.Add(new DiaphragmAccessory
                 {
-                    Name = $"{sup.Name} {kd.Name}", Support = sup.Name, Kind = DiaphragmAccessoryKind.Keyway, Material = dd.Material, Mesh = mesh, Assumption = ka,
+                    Name = $"{sup.Name} {kd.Name}", Support = sup.Name, Kind = DiaphragmAccessoryKind.Keyway, Material = dd.Material, Mesh = mesh, Pieces = PiecesOf(mesh), Assumption = ka,
                     Description = $"Keyway {L(kd.Width)} x {L(kd.Depth)} in the substructure top, filled by the diaphragm pour{(kd.Source != "" ? " (" + kd.Source + ")" : "")}",
                 });
             }
             catch (InvalidOperationException ex) { Warn($"keyway {kd.Name} not built - {ex.Message}"); }
         }
     }
+
+    // ------------------------------------------------------------------------------------------------ closed pieces
+    // Every loft is a closed solid; a diaphragm / filler is a set of them sharing faces. Consumers that need watertight bodies (IFC
+    // face sets) take the pieces, the merged mesh is for display / volume.
+    private static readonly System.Runtime.CompilerServices.ConditionalWeakTable<Mesh, List<Mesh>> PieceTable = new();
+    private static void Loft(Mesh mesh, IReadOnlyList<Vec2> section, IReadOnlyList<Vec3[]> rings)
+    {
+        var m = new Mesh();
+        MeshBuilder.AddLoft(m, section, rings);
+        mesh.Append(m);
+        PieceTable.GetOrCreateValue(mesh).Add(m);
+    }
+    /// <summary>The closed lofts a merged mesh of this generator was built from (empty for other meshes).</summary>
+    internal static List<Mesh> PiecesOf(Mesh mesh) => PieceTable.TryGetValue(mesh, out var l) ? l : new List<Mesh>();
 
     // ------------------------------------------------------------------------------------------------ prism builder
 
@@ -446,16 +461,24 @@ public static class ConcreteDiaphragmGenerator
             var present = beams.Where(b => b.VoidAt(k, xm) != null).ToList();
             foreach (var b in present) usedBeams.Add(b);
             // square beam ends: evaluate the end slices a hair inside the slab so the clip line never sits on an outline vertex
-            double eps = present.Any(b => b.Square) ? 1e-5 : 0;
+            double eps = present.Any(b => b.Square) ? Math.Min(1e-5, (xb - xa) / 4) : 0;
             var plan = SlicePlan(k, xm, lo, up, left, right, present, fasciaBeams);
             var r0 = Slice(k, xa + eps, lo, up, left, right, present, fasciaBeams, plan);
             var r1 = Slice(k, xb - eps, lo, up, left, right, present, fasciaBeams, plan);
-            xa += eps; xb -= eps;
             if (r0.Count != r1.Count) throw new InvalidOperationException($"slice topology changed in x {xa:0.###}..{xb:0.###} m");
-            var sec = r0.Select(p => new Vec2(p.S, p.Z)).ToList();
+            if (eps > 0)
+            {
+                // every vertex moves linearly with x inside the slab: extrapolate the inset slices back to the slab faces (no gaps)
+                double f = eps / (xb - xa - 2 * eps);
+                var e0 = r0.Select((p, q) => (p.S + (p.S - r1[q].S) * f, p.Z + (p.Z - r1[q].Z) * f)).ToList();
+                var e1 = r1.Select((p, q) => (p.S + (p.S - r0[q].S) * f, p.Z + (p.Z - r0[q].Z) * f)).ToList();
+                r0 = e0; r1 = e1;
+            }
+            // cap triangulation from the mid-slab slice (generic: no clip point sits on an outline vertex there)
+            var sec = r0.Select((p, q) => new Vec2((p.S + r1[q].S) / 2, (p.Z + r1[q].Z) / 2)).ToList();
             var ring0 = r0.Select(p => k.W(p.S, xa).WithZ(p.Z)).ToArray();
             var ring1 = r1.Select(p => k.W(p.S, xb).WithZ(p.Z)).ToArray();
-            MeshBuilder.AddLoft(mesh, sec, new[] { ring0, ring1 });
+            Loft(mesh, sec, new[] { ring0, ring1 });
         }
         return usedBeams.ToList();
     }
@@ -498,7 +521,9 @@ public static class ConcreteDiaphragmGenerator
             ev.Add((Math.Max(a, c), 1, i));
             ev.Add((Math.Min(a, c), 2, i));
         }
-        foreach (var s in kinks) ev.Add((s, 3, -1));
+        // kinks under a beam's top flange (full width, so the decision does not change with a square-end clip) are dropped
+        var under = present.Select(b => (lo: Math.Min(b.Map(k, x, b.Hw, b.D).S, b.Map(k, x, -b.Hw, b.D).S), hi: Math.Max(b.Map(k, x, b.Hw, b.D).S, b.Map(k, x, -b.Hw, b.D).S))).ToList();
+        foreach (var s in kinks) if (!under.Any(u => s > u.lo - 1e-4 && s < u.hi + 1e-4)) ev.Add((s, 3, -1));
         ev.Add((sl, 0, -1));
         // keep the void pairs together; kinks inside a void are dropped
         var res = new List<(double s, int kind, int beam)>();
@@ -702,7 +727,7 @@ public static class ConcreteDiaphragmGenerator
                 return P(q.X, q.Y).WithZ(e.Top.Z + e.Beam.Slope * s - e.D);
             }).ToArray();
             if (top.Zip(bot).Any(t => t.First.Z - t.Second.Z < 1e-5)) continue;
-            MeshBuilder.AddLoft(mesh, poly, new[] { bot, top });
+            Loft(mesh, poly, new[] { bot, top });
         }
     }
 
@@ -771,7 +796,7 @@ public static class ConcreteDiaphragmGenerator
                 if (Math.Abs(MeshBuilder.SignedArea(quad)) < 1e-8) continue;
                 var bot = quad.Select(q => k.W(q.X, q.Y).WithZ(z - kd.Depth)).ToArray();
                 var top = quad.Select(q => k.W(q.X, q.Y).WithZ(z)).ToArray();
-                MeshBuilder.AddLoft(mesh, quad, new[] { bot, top });
+                Loft(mesh, quad, new[] { bot, top });
             }
         }
         return mesh;

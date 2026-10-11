@@ -22,6 +22,8 @@ public sealed class ConcreteDiaphragm
     public List<ConcreteDiaphragmPart> Parts { get; } = new();
     /// <summary>All built parts merged (for the viewport / IFC body).</summary>
     public Mesh Mesh { get; } = new();
+    /// <summary>The closed solids (one per slab) the merged <see cref="Mesh"/> is made of - watertight bodies for IFC.</summary>
+    public List<Mesh> Pieces { get; } = new();
     public double Volume => Parts.Sum(p => p.Volume);
     /// <summary>Set when the diaphragm is modeled on an item the plans do not fix (e.g. bottom risers between beams).</summary>
     public Assumption? Assumption { get; set; }
@@ -45,6 +47,8 @@ public sealed class DiaphragmAccessory
     public required DiaphragmAccessoryKind Kind { get; init; }
     public required string Material { get; init; }
     public required Mesh Mesh { get; init; }
+    /// <summary>Closed solids the mesh is made of (IFC items).</summary>
+    public List<Mesh> Pieces { get; init; } = new();
     public double Volume => Math.Abs(Mesh.Volume());
     public Assumption? Assumption { get; init; }
     public string Description { get; init; } = "";
