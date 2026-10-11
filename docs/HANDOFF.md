@@ -218,6 +218,19 @@ as "…before bearing iteration.sbm". The run confirmed item 2.3: girder C has n
 - Editor UI for the new column-rebar inputs (faces, chamfer positions, hoop overlap, crossties, flare cage).
 - Generic bearings: bearing body 16"×16" and masonry plate 1¾" are assumptions (vendor items).
 
+## 4b. Staking check findings: AWAITING USER REVIEW (2026-10-11; user is checking on the computer, do not change yet)
+
+From `check-staking.csx` / `docs/plan-data/haunch-staking-check.md`:
+1. Pier 11WB & 19G is 10 11/16" left along the pier line vs the staking footing centres (PDF 16: -31'-1 15/16, +9'-5 1/16,
+   +30'-11 1/16; model -31'-11 5/8, +8'-6 3/8, +30'-0 3/8). PDF 63 gives CL WB 11 5/16" from CL pier at one bearing row;
+   `piers-i80.csx` uses 11 5/8" at the pier CL. Staking vs pier sheet also differ 1" on footing 1-2 (40'-7 vs 40'-6).
+2. Pier 6A: 13'-2 15/16 from CL Ramp A2 on PDF 15, 39, 41; `pier-6a.csx` uses 13'-2 5/16.
+3. Pier 6WB footings: 2'-2 3/8 on PDF 16, 43, 45; `piers-i80.csx` uses 2'-2 3/16.
+4. `docs/plan-data/camber/RG-unit2-defl_slab_in.csv` point 7 holds the unnumbered "midpoint of field section" column
+   (3.13/2.95/2.78/2.61); PDF 116 point 7 = 3.05/2.87/2.71/2.55. Check the steel deflection / camber CSVs for the same shift.
+Plan-only (no input change): Ramp G 5G footing staking 31'-6 x 22'-0 vs details 29'-0 x 24'-0 (model follows details);
+allowable field haunch MAX in tension zones below the plans' nominal geometry (365 points).
+
 ## 5. Prestressed plan sets: extracted, program improvements QUEUED (user, 2026-10-11)
 
 Plan data: `docs/plan-data/woodbury-i29-floyd/` (Iowa Design 817, 3-span BTD, integral abutments) and
