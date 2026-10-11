@@ -135,7 +135,7 @@ no production cover is stated, so every pier with a relief step carries an UNRES
    read and reconciled (see the tables) but not given a model shape (slanted segments need their angles). 5b1 in the model keeps 135 degree hooks (plan: 6" lap tails).
 6. **Pedestal 5n2 hoops** (printed "AT GIRDERS C & D ONLY", Pier 1WB): (2026-10-11) the notes are read for 1WB-3WB (C & D), 4WB (B-D), 6WB (F-I) and 5WB
    ("AT AHEAD BRG. GIRDERS G-I & AT BACK BRG. GIRDERS B-D ONLY"); the hoops go round those pedestal blocks (`PlanBarGroup.Girders`, csx `;G=`). 5WB: the note selects 4
-   shared blocks for 3 hoops - UNRESOLVED, mid-cap as before. 9G (4 hoops at one back pedestal): pedestals not set - UNRESOLVED, mid-cap.
+   shared blocks for 3 hoops - UNRESOLVED, mid-cap as before. 9G (4 hoops 2'-8 x 4'-8, one round each BACK pedestal, PDF 43 plan): placed with `R=BACK` (2026-10-11).
 7. **Pedestal size**: the plan pedestals (5'-6 x 5'-8 on 1WB) differ from the model's bearing-seat pedestals (58 x 58"), which changes where the 4" end bars fall.
 8. **Deck slab bars**: not compared (see scope).
 
@@ -378,10 +378,10 @@ bar that is straight / bent where the plan is bent / straight), **not decoded**,
 | 5a8 | CAP, SIDES, LONGITUDINAL | straight | 51'-11" | BENT 51'-11" | +0.00" | MISMATCH (model bent) |
 | 5a9 | CAP, SIDES, LONGITUDINAL | straight | 29'-0" | BENT 29'-0" (kinks < 12 deg: follows the cap profile) | +0.00" | match |
 | 5a10 | CAP, SIDES, LONGITUDINAL | straight | 19'-5" | BENT 19'-5" (kinks < 12 deg: follows the cap profile) | +0.00" | match |
-| 5a11 | CAP, SIDES, LONGITUDINAL | arcs: (not reconciled) ; R 63'-9 1/2" | 52'-10" | BENT 5 5/16" + 52'-1" + 4 15/16" |  | not decoded |
+| 5a11 | CAP, SIDES, LONGITUDINAL | reverse curve (raster 2026-10-11): sag R 83'-8 1/2 over 26'-9 1/2, crest R 63'-9 1/2 over 25'-9, left end 11 1/2 below / right end 1'-3 above the reference line; developed 52'-10.7 | 52'-10" | RC (`PlanReverseCurve`), fitted to the relief line + 3 1/2" | length +0.7" | match (2026-10-11) |
 | 5a14 | CAP, ENDS, TRANSVERSE | straight | 11'-3" | BENT 11'-3" | +0.00" | MISMATCH (model bent) |
-| 6a15 | CAP, END, VERTICAL | U: 4'-6" + 2'-0" + 1'-0" (sum = list length) ; D 4 1/2" | 7'-6" | STR 7'-6" | 4'-6" vs 7'-6" (+36.00"); 2'-0" vs missing; 1'-0" vs missing pin: plan 4 1/2" / model none (straight) | MISMATCH (model straight) |
-| 6a16 | CAP, END, VERTICAL | U: 4'-9" + 2'-0" + 1'-0" (sum = list length) ; D 4 1/2" | 7'-9" | STR 7'-9" | 4'-9" vs 7'-9" (+36.00"); 2'-0" vs missing; 1'-0" vs missing pin: plan 4 1/2" / model none (straight) | MISMATCH (model straight) |
+| 6a15 | CAP, END, VERTICAL | A14 (raster 2026-10-11): 2'-0 leg + 4'-6 top + 1'-0 slanted (3" run, along the raked left end) ; D 4 1/2" | 7'-6" | A14 2'-0 + 4'-6 + 1'-0 (3" run) ; D 4 1/2", left end (`E=-1`, "7-6a15" PDF 39 / 41) | | match (2026-10-11) |
+| 6a16 | CAP, END, VERTICAL | unequal U (raster 2026-10-11): 2'-0 leg + 4'-9 top + 1'-0 leg ; D 4 1/2" | 7'-9" | A14 2'-0 + 4'-9 + 1'-0 (0 run) ; D 4 1/2", right end (`E=1`, "7-6a16" PDF 41) | | match (2026-10-11) |
 | 8b1 | CAP, BOTTOM, LONGITUDINAL | U: 21'-4 1/2" + 20'-7 1/2" + 10'-11" (sum = list length) ; D 6" | 52'-11" | BENT 31'-7 5/8" + 21'-3 1/4" (OTO from centerline) | 21'-4 1/2" vs 31'-7 5/8" (+123.10"); 20'-7 1/2" vs 21'-3 1/4" (+7.77"); 10'-11" vs missing pin: plan 6" / model none (straight) | MISMATCH |
 | 6c1 | CAP, HOOPS | bent: 8'-2" + 8'-2" + 4'-8" + 4'-8" + 1'-0" + 1'-0" (sum = list length) ; D 4 1/2" | 27'-8" | HOOP 8'-2" + 4'-8" + 1'-0" ; D 4 1/2" (as scheduled (A,B...)) | 8'-2" vs 8'-2"; 4'-8" vs 4'-8"; 1'-0" vs 1'-0" | match |
 | 6c2 | CAP, HOOPS, CANTILEVER | bent: (not reconciled) ; 4'-11" MIN., 8'-1" MAX. ; D 4 1/2" | VARIES | HOOP 8'-1" + 4'-8" + 1'-0" + 1'-0" ; D 4 1/2" |  | not decoded |
@@ -678,7 +678,7 @@ bar that is straight / bent where the plan is bent / straight), **not decoded**,
 | 6e1 | COLUMN, HOOPS | bent: 4'-2" + 3'-5" + 3'-5" + 2'-6 1/2" + 2'-6 1/2" + 2'-6 1/2" + 1'-2 1/2" (sum = list length) ; D 4 1/2" | 19'-10" | TIE 5'-5 3/4" + 4'-2" ; D 4 1/2" (as scheduled (A,B...)) | 4'-2" vs 5'-5 3/4" (+15.78"); 3'-5" vs 4'-2" (+9.00"); 2'-6 1/2" vs missing; 1'-2 1/2" vs missing | MISMATCH |
 | 5e2 | COLUMN, TIES | U: 3'-1" + 6" + 6" (sum = list length) ; D 2 1/2" | 4'-1" | CROSSTIE 2'-9 1/2" ; D 2 1/2" (as scheduled (A,B...)) | 3'-1" vs 2'-9 1/2" (-3.49"); 6" vs missing | MISMATCH |
 | 6e3 | PLINTH, HAIRPINS | bent: 3'-1" + 2'-10" + 2'-10" + 2'-10" + 2'-6" (sum = list length) ; D 4 1/2" | 14'-1" | - |  | not modeled |
-| 5m1 | CAP, PEDESTAL, LONGITUDINAL | bent: (not reconciled) ; D 2 1/2" | 9'-0" | BENT 2'-3 5/16" + 4'-6 5/8" + 2'-3 5/16" |  | not decoded |
+| 5m1 | CAP, PEDESTAL, LONGITUDINAL | U: 4'-8" + 2'-2" + 2'-2" (shared diagram "5m1, 5n1, 5n2", raster 2026-10-11; sum = list length) ; D 2 1/2" | 9'-0" | U 2'-2" + 4'-8" + 2'-2" ; D 2 1/2" | 4'-8" vs 4'-8"; 2'-2" vs 2'-2"; 2'-2" vs 2'-2" | match (2026-10-11) |
 | 8m2 | CAP, STEP, LONGITUDINAL | straight | 45'-11" | STR 45'-11" | +0.00" | match |
 | 6m3 | CAP, STEP, LONGITUDINAL | straight | 44'-6" | STR 44'-6" | +0.00" | match |
 | 5n1 | CAP, PEDESTAL, TRANSVERSE | U: 3'-7" + 2'-2" + 2'-2" (sum = list length) ; D 2 1/2" | 7'-11" | U 2'-2" + 3'-7" + 2'-2" ; D 2 1/2" | 3'-7" vs 3'-7"; 2'-2" vs 2'-2"; 2'-2" vs 2'-2" | match |

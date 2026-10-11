@@ -45,6 +45,14 @@ text layout: the along value is the horizontal "4, n EQ., 4" string on the cap p
 | 13WB | 71 (69) / 74 (72) | 5'-6 | 5'-8 | 5'-2 + 4 = 66 | 5'-4 + 4 = 68 | 54 / 54 | 66 x 68 | yes |
 | 14WB | 75 (73) / 78 (76) | 5'-6 | 5'-8 | 5'-2 + 4 = 66 | 5'-4 + 4 = 68 | 48 / 48 | 66 x 68 | yes |
 | 15WB | 79 (77) / 82 (80) | 5'-6 | 5'-8 | 5'-2 + 4 = 66 | 5'-4 + 4 = 68 | 48 / 48 | 66 x 68 | yes |
+| 11WB | 63 (61) / 66 (64) | 2'-6 \| 2'-6 = 5'-0 (TYP.) | BACK row 3'-11, AHEAD row 3'-9 | 4'-8 + 4 = 60 | 5n1 3'-7 + 4 = 47 (back), 5n2 3'-5 + 4 = 45 (ahead) | 56 / 42 + 42 = 14 x 4 / 7 x 6 + 7 x 6 | 60 x 47, ahead 45, rows abut 1" ahead of the CL pier | yes (2026-10-11) |
+
+Pier 11WB, two staggered rows (raster of the cap plan, Design 116 PDF 63, 2026-10-11): from the back face 2" | 3'-11 BACK BRG. block | 3'-9 AHEAD BRG.
+block | 2" = 8'-0; the joint between the rows is dimensioned 1" ahead of the CL pier (the bearings are 1'-8 each side of it, so the blocks are not centred on
+their seats: back block centre 2 1/2" behind, ahead block 3 1/2" ahead of its bearing line). Along: "2'-6 | 2'-6 (TYP.)" about the girder CL and "5'-0" at
+girder F; bar layout "4, 5 EQ. SPA., 4" (5n1 / 5n2) and "4, 3 EQ. SPA., 4" (5m1). The shared bend diagram "5m1, 5n1, 5n2" (PDF 66): 4'-8 / 3'-7 / 3'-5,
+legs 2'-2, D = 2 1/2 (5m1 is a U, not an undecoded bent bar). Input: `PedestalSizeAlong = 60`, `PedestalSizeAcross = 47` (back), `PedestalSizeAcrossAhead = 45`,
+`PedestalRowJoint = 1"`; bars `5n1 ;R=BACK`, `5n2 ;R=AHEAD`. The cap position / columns of 11WB are not touched (the line position is under review).
 
 Pier 5WB, shared block: 36 5n1 = 6 blocks x 6 bars, and 48 5m1 = 6 x 8. That is one block per girder line (girders A-F)
 for the back and ahead bearings together. The 7'-8 across size is what makes room for both bearing rows.
@@ -75,6 +83,14 @@ Pedestal bar layout printed on the cap plan:
 | 16G | 64 (62) / 67 (65) | 7'-2 | 5'-8 (5 SPA.) | 6'-10 + 4 = 86 | 5'-4 + 4 = 68 | 24 / 32 = 4 x 6 / 4 x 8 | 86 x 68 | yes |
 | 17G | 68 (66) / 71 (69) | 6'-0 | 5'-8 (5 SPA.) | 5'-8 + 4 = 72 | 5'-4 + 4 = 68 | 24 / 28 = 4 x 6 / 4 x 7 | 72 x 68 | yes |
 | 18G | 72 (70) / 74 (72) | 5'-8 | 6'-0 | 5'-4 + 4 = 68 | 5'-8 + 4 = 72 | 24 / 24 | 68 x 72 | yes |
+| 9G | 43 (41) / 45 (43) | 2'-6 \| 2'-6 = 5'-0 (TYP.) | 3'-0 per block (6, 2 SPA. @ 1'-0, 6), two blocks per girder line | 4'-6 + 6 = 60 | 5n1 5'-7 spans both blocks (6'-0 - 5"); 5n3 2'-6 (back block) | 24 / 24 + 24 = 8 x 3 / 4 x 6 + 4 x 6 | 60 x 36, separate | yes (2026-10-11) |
+
+Pier 9G, separate back / ahead pedestals (raster of the cap plan, Design 316 PDF 43, 2026-10-11): across the 8'-0 cap "1'-0 | 6, 2 SPA. @ 1'-0 = 2'-0; 3-5m1 BARS, 1'-0,
+2 SPA. @ 1'-0 = 2'-0; 3-5m1 BARS, 6 | 1'-0" with "6'-0" over both blocks: two 3'-0 blocks abutting on the cap centre line, centred on the bearings (1'-6 each side of
+the CL pier). Along "5, 5 SPA. @ 10, 5" with "2'-6 | 2'-6" and "5'-0 (TYP.)". The back (lower in the plan) block carries the 5n3 pairs and the 5n2 hoop; the back
+pedestals are about 11" higher (tops 1044.12 / 1043.20 ...). Bend diagram "5m1, 5n1, 5n3" (PDF 45): 4'-6 / 5'-7 / 2'-6, legs 3'-1; 5n2 hoop 2'-8 x 4'-8. So 5n1
+(6 per girder line) runs across BOTH blocks under the ahead block's top (`R=LINE`), 5n3 and 5n2 only in the back blocks (`R=BACK`), 5m1 three per block 6" from
+the edges (`X=6`; 5n bars `X=5`). Input: `PedestalSizeAlong = 60`, `PedestalSizeAcross = 36`, not shared.
 
 ### Shared blocks at 5G and 14G
 
@@ -88,8 +104,8 @@ has only 24 5n1 and 24 5m1 = 4 blocks x 6. That means one 5'-0 x 6'-0 block per 
 | Pier | PDF p. (sheet) | What the plans show (text layer) | Why it is not set |
 |---|---|---|---|
 | 6A (I-80) | 39 (37) / 42 (40) | <ul><li>Along: "4 SPA. @ 11 = 3'-8; 5-5n1 BARS" and "2'-3 \| 2'-3" (4'-6). 5m1 base 4'-2 + 4 = 4'-6.</li><li>Across: "3 SPA. @ 1'-0 = 3'-0; 4-5m1 BARS" and "3'-10". 5n1 base 3'-6 + 4 = 3'-10.</li><li>Bar list: 40 5m1 / 50 5n1 = 10 pedestals x 4 / 5.</li></ul> | <ul><li>The cap carries two bridges: the ahead bearings of I-80 Unit 2 girders A-E and the back bearings of the Ramp A2 bridge, which is not part of this design and not modeled. The 10 pedestals are both rows (script: "Ramp A2 pedestals share the cap").</li><li>6A is an auxiliary support built by `pier-6a.csx`, and the pedestal block in `piers-i80.csx` does not cover it.</li><li>The 4'-6 x 3'-10 size reconciles in the text, but the clip was not rasterized, so it is not confirmed that the I-80 row uses this size and orientation: UNVERIFIED.</li></ul> |
-| 11WB (I-80) | 63 (61) / 66 (64) | <ul><li>Two rows, labeled BACK BRG. and AHEAD BRG., staggered across the CL pier.</li><li>Across: back row 3'-11 ("3'-11  3 SPA."; 5n1 base 3'-7 + 4 = 3'-11); ahead row 3'-9 (5n2 CAP, PEDESTAL, TRANSVERSE, base 3'-5 + 4 = 3'-9). The two rows differ.</li><li>Along: "4, 5 EQ., 4". 5m1 is a BENT bar (list 9'-0) whose diagram is not decoded.</li><li>A "2'-6 \| 2'-6 \| 5'-0" string sits at the far left of the cap plan and cannot be tied to the pedestals without a raster: UNVERIFIED.</li></ul> | <ul><li>Two different across sizes on one support. The input has a single size per support.</li><li>The along total is not established (script: "two staggered rows, along size not printed").</li></ul> |
-| 9G (Ramp G) | 43 (41) / 45 (43) | <ul><li>Separate back and ahead pedestals on each girder line. Bar groups are 6-5n1 (back) and 6-5n3 (ahead), each "5 SPA. @ 10 = 4'-2" with "2'-6 \| 2'-6" (5'-0).</li><li>Across: "2 SPA. @ 1'-0 = 2'-0; 3-5m1 BARS" per pedestal.</li><li>Bar list: 24 5m1 = 8 pedestals x 3; 24 5n1 + 24 5n3 = 4 + 4 pedestals x 6.</li><li>Bases: 5m1 4'-6, 5n1 5'-7, 5n3 2'-6, all with 3'-1 legs. 5n1 5'-7 + 4 = 5'-11 does not equal the 5'-0 along layout, and 5n3 is a different bar. The base + 4" rule does not close.</li><li>Pedestal tops: back / ahead 1044.12 / 1043.20, 1043.01 / 1042.10, 1042.44 / 1041.53. Back is 0.91 to 0.92 ft (11") higher.</li></ul> | <ul><li>Two pedestals per girder line with different bars.</li><li>The bar bases do not reconcile with one block size.</li><li>`PedestalShared` is wrong here: the plans show separate blocks.</li></ul> |
+| 11WB (I-80) | 63 (61) / 66 (64) | (set 2026-10-11, see the I-80 table) | |
+| 9G (Ramp G) | 43 (41) / 45 (43) | (set 2026-10-11, see the Ramp G table) | |
 | 19G (Ramp G) | 75 (73) / 77 (75) | <ul><li>The cap is on the shared "Pier 11WB & 19G" line and carries two rows.</li><li>Ramp G back bearings (girders A-D): along "5 SPA. @ 10 = 4'-2; 6-5n1" with "2'-6 \| 2'-6" (5'-0); across "3 SPA. @ 1'-0 = 3'-0; 4-5m1".</li><li>I-80 Unit 3 ahead bearings (girders A-C): a different layout ("2 SPA. @ 6 = 1'-0 \| 3 SPA. @ 8 = 2'-0 \| 2 SPA. @ 6 = 1'-0"), with a note to see the I-80 WB sheets.</li><li>Bar list: 28 5m1 / 42 5n1 = 7 pedestals x 4 / 6. 5m1 base 4'-8 + 4 = 5'-0. 5n1 base 3'-5 + 4 = 3'-9. The across total 3'-9 is not printed as such.</li></ul> | <ul><li>Two rows from two bridges with different bar layouts on one line.</li><li>The across size is only implied by the bar base.</li><li>The sizes of the I-80 row are not settled from this sheet.</li></ul> |
 
 ## Script vs plan
@@ -109,7 +125,7 @@ has only 24 5n1 and 24 5m1 = 4 blocks x 6. That means one 5'-0 x 6'-0 block per 
   (Design 116 PDF 46: 5'-1 / 5'-3, legs 2'-9, D = 2 1/2; Design 316 PDF 33 / 60: 4'-8 / 5'-8, legs 2'-3, D = 2 1/2). The csx lines now carry the shapes.
 - Ramp G across "5 SPA. @ 1'-0 = 5'-0;": the trailing glyph is not decoded. The 6'-0 total is confirmed by
   5n1 5'-8 + 4.
-- 6A 4'-6 x 3'-10 (orientation and whether it applies to the I-80 row), the 11WB "5'-0" along candidate, and the 19G
-  I-80 row size: these need a raster clip.
+- 6A 4'-6 x 3'-10 (orientation and whether it applies to the I-80 row) and the 19G I-80 row size: these need a raster clip.
+  (The 11WB "5'-0" is the along size: closed 2026-10-11.)
 - No fraction needed raster confirmation. Every pedestal dimension used is a whole inch. When PyMuPDF is available, a
   clip of each cap plan's pedestal callout would close the items above.

@@ -688,7 +688,7 @@ public sealed partial class SubstructureGenerator
                 // "6-5m1" detail): the base lies in the TOP of the pedestal block (pedestals are 8 .. 12" high), the 5n1 bases (dots in the elevation) on top with the
                 // plan cover below the pedestal top, the 5m1 base one 5n1 bar below them; the legs hang through the pedestal into the cap. (Earlier the base was put
                 // under the cap top: the legs reached a pedestal height deeper, below the relief line into the 6" narrower lower section.) Only with the plan pedestal
-                // size (PedestalSizeAlong / Across): the bearing-footprint pedestals (9G, 19G, 11WB, 6A: plan size not settled) are smaller than these bars, whose
+                // size (PedestalSizeAlong / Across): the bearing-footprint pedestals (19G, 6A: plan size not settled) are smaller than these bars, whose
                 // base then stays under the cap top as before (reported by the check).
                 bool planPed = unit.Definition.PedestalSizeAlong > 0 && unit.Definition.PedestalSizeAcross > 0;
                 int per = g.Count / blocks.Count;

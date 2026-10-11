@@ -8,21 +8,21 @@ to satisfy cover; a violation means the placement rule or an input is wrong (fix
 
 ## Counts (I-80 WB + Ramp G model, all substructure units)
 
-| kind | main before (565) | after |
-|---|---|---|
-| 6b2 cantilever bottom | 136 | 0 |
-| 5m1 pedestal bars | 180 | 56 (11WB) |
-| 5n1 pedestal bars | 91 | 36 (11WB 12, 9G 24) |
-| 5n2 pedestal bars / hoops | 26 | 12 (11WB 5n2 transverse U) |
-| 5c5 hairpins | 32 | 0 |
-| 5a13 end transverse | 17 | 0 |
-| 5a15 end vertical (5WB) | 9 | 0 |
-| 5c3 hairpins (6A) | 28 | 28 |
-| 5c4 hairpins (19G) | 4 | 4 |
-| 6a15 / 6a16 end verticals (6A) | 6 | 6 |
-| 5a11 side faces (6A) | 2 | 2 |
-| 5a12 side faces (Ramp G relief bars) | 34 | 34 |
-| **total** | **565** | **178** |
+| kind | main before (565) | after | after plan data (2026-10-11, second pass) |
+|---|---|---|---|
+| 6b2 cantilever bottom | 136 | 0 | 0 |
+| 5m1 pedestal bars | 180 | 56 (11WB) | 0 |
+| 5n1 pedestal bars | 91 | 36 (11WB 12, 9G 24) | 0 |
+| 5n2 pedestal bars / hoops | 26 | 12 (11WB 5n2 transverse U) | 0 |
+| 5c5 hairpins | 32 | 0 | 0 |
+| 5a13 end transverse | 17 | 0 | 0 |
+| 5a15 end vertical (5WB) | 9 | 0 | 0 |
+| 5c3 hairpins (6A) | 28 | 28 | 0 |
+| 5c4 hairpins (19G) | 4 | 4 | 4 |
+| 6a15 / 6a16 end verticals (6A) | 6 | 6 | 0 |
+| 5a11 side faces (6A) | 2 | 2 | 2 (now the plan's reverse curve: 19 5/8" through the left beak soffit, plan conflict) |
+| 5a12 side faces (Ramp G relief bars) | 34 | 34 | 34 |
+| **total** | **565** | **178** | **40** |
 
 (The handoff's 2,103 was the state before the bend-diagram and pedestal-size work; that work brought it to 565 on main.)
 
@@ -55,6 +55,26 @@ to satisfy cover; a violation means the placement rule or an input is wrong (fix
    counts its own layers once. (b) The pedestal blocks are now part of the host concrete for pedestal bars (`PedestalBarSlack`: cover to the block sides / top; under a block the
    cap top is not a free face).
 
+10. **Pier 11WB pedestals (80 -> 0), input.** Cap plan (Design 116 PDF 63, raster): two staggered rows, BACK BRG. 3'-11 and AHEAD BRG. 3'-9 across, each 2" from
+    its face, abutting 1" ahead of the CL pier; along 2'-6 | 2'-6 = 5'-0 (TYP.). New inputs `PedestalSizeAcrossAhead` / `PedestalRowJoint` (back = `PedestalSizeAcross`).
+    The 5m1 "bent bar" is the U of the shared diagram "5m1, 5n1, 5n2" (PDF 66: 4'-8 / 3'-7 / 3'-5, legs 2'-2); 5n1 goes in the back blocks, 5n2 in the ahead blocks
+    (`PlanBarGroup.PedestalRow`, csx `;R=BACK|AHEAD`). `pier-pedestals.md`.
+11. **Pier 9G pedestals (24 -> 0), input.** Cap plan (Design 316 PDF 43, raster): per girder line a back and an ahead block, each 5'-0 x 3'-0, abutting on the cap
+    centre line (1'-0 to each face); 5n1 (base 5'-7) runs across both blocks (`R=LINE`), 5n3 and the 5n2 hoops in the back blocks (`R=BACK`), 5m1 3 per block 6" from
+    the edges (`X=6`). The check treats abutting blocks as one body up to the lower block's top.
+12. **Pier 6A 6a15 / 6a16 (6 -> 0), shapes.** PDF 42 bend diagrams (raster): 6a15 = 2'-0 + 4'-6 + 1'-0 slanted (3" run) = 7'-6, 6a16 = 2'-0 + 4'-9 + 1'-0 = 7'-9,
+    D = 4 1/2; plan elevation PDF 41: "7-6a15" at the left (raked) end, "7-6a16" at the right end. A14 shapes with `E=-1` / `E=1`.
+13. **Pier 6A 5c3 (28 -> 0), input (question 4 settled).** The 6A relief band is measured from the LOWER half's top on both faces (`CapAestheticsDefinition.BandFromLowerTop`,
+    `pier-aesthetics.csx`): (a) the structural elevations dimension the beak 5'-0 (TYP.) / 8'-6 (TYP.) from the "Δ ELEV. 1012.51" face-of-cap line of the lower half
+    (PDF 39 right end; the upper top 1013.28 is not a dimension origin), (b) section A-A (PDF 40) hangs the 5c3 hairpins from the lower top and ends both legs at the first
+    step, the step on the upper-half face drawn no higher, (c) 5a11 (E.F.) is one bar for both faces. Before, the back face was measured from the upper top (9" higher).
+14. **Pier 6A 5a11, shape (2 remain, plan conflict).** PDF 42 bend diagram (raster): sag R 83'-8 1/2 over 26'-9 1/2, crest R 63'-9 1/2 over 25'-9, left end 11 1/2 below and
+    right end 1'-3 above the reference line; developed 52'-10.7 vs list 52'-10 (so "52'-10 in a 52'-0 cap" is right: 52'-6 1/2 horizontal, the beak ends of the cap
+    reach beyond the top corners). The radii are the aesthetic figure's R 84'-0 / R 63'-6 relief arcs 3 1/2" toward the full-width zone (PDF 83). New shape `RC`
+    (`PlanReverseCurve`); the bar is fitted rigidly to each face's relief line + 3 1/2" (fit residual 1/16", rotation 2.13 deg). Its left 26'-9 1/2 sag follows the
+    R 84'-0 arc past where that arc leaves the cap through the beak soffit (the aesthetic sheet's 6'-9 band depth at the tip vs the structural 5'-0 tip,
+    `pier-cap-aesthetics.md` CONFLICT): 19 5/8" outside the soffit at S -24.3 m. Kept (plan data conflict, not moved).
+
 ## Question (5): which bars get the 3 1/2" clear at the textured face
 
 The plans print **3 1/2" CL.** from the cap face to the **5c hairpin legs** at **both** faces of every cap section (Design 116 PDF 20 sections A-A / B-B; Pier 6A PDF 40
@@ -64,21 +84,24 @@ verifies 3 1/2" from the full-width faces for every cap hairpin (`HairpinFaceCle
 statement is the MOCKUP note (PDF 83): "A SINGLE MAT OF NO. 5 REINFORCING BARS ... SHALL BE SET 2 INCHES CLEAR TO THE BOTTOM OF THE TEXTURED FACE" (texture B up to 1 1/2"
 deep). Raised as an UNRESOLVED warning on every pier with a relief step; the other bars stay checked against 2" to the form face.
 
-## Remaining (178), kept as warnings
+## Remaining (40), kept as warnings
 
-* **11WB pedestal bars 5m1 / 5n1 / 5n2 (80)** - the plan pedestals are not set (two staggered rows, BACK / AHEAD across sizes 3'-11 / 3'-9, along size not printed;
-  `pier-pedestals.md`); the U bars are sized for the plan pedestals and sit in the bearing-footprint pedestals. 5m1 is a bent bar whose diagram is not decoded.
-* **9G 5n1 (24)** - pedestals not set (separate back / ahead pedestals about 11" apart, 5n1 + 5n3 groups); 5n1 base 5'-7 vs the footprint pedestals.
-* **6A 5c3 hairpins (28)** - the cap top of 6A has an upper (Ramp A2) and a lower (Unit 2) half 0.75 ft apart (`pier-6a.csx`); the hairpins hang from the structural (lower)
-  top across the full width, while the back face's relief band is measured from the upper half's top, 9" higher, so the 2'-10 legs end up to 4 3/16" below the back face's relief
-  line. Section A-A (PDF 40) appears to show the legs ending at the first step. Which top the 6A band depth refers to is not dimensioned (UNRESOLVED input).
-* **6A 6a15 / 6a16 (6), 5a11 (2)** - the 6A variants of the end bars have no decoded bend diagram (straight bars of the listed length); 6A 5a11 is 52'-10 long in a 52'-0 cap.
+* **6A 5a11 (2)** - plan reverse-curve bar along the relief line; at the left beak the relief arc (band 6'-9 deep at the tip, PDF 83) runs below the structural beak soffit
+  (tip 5'-0 below the top, PDF 39): plan conflict between the aesthetic and structural sheets (item 14).
 * **Ramp G 5a12 (34)** - the long relief bars (37'-5 in a 35'-0 / 37'-11 3/8 cap) follow the curved relief in the elevations (e.g. Design 316 PDF 20, 1G "5a12 (E.F.)");
   that path is not dimensioned, the model keeps a straight bar at a fractional height, too long for the raked ends there by 0.3" .. 1.2".
 * **19G 5c4 (4)** - legs longer than the full-width zone of the explicit 19G relief figure at S 3.6 .. 4.0 m (the figure's CL-pier mark conflicts with the structural sheet:
   18'-0 1/2 vs 22'-0 from the corners, `pier-cap-aesthetics.md`).
+* Not counted by the check but not plan-true: Ramp G 1G-18G pedestal U bars use the 4" end-bar rule (`X=` not set) where the cap plans print "5, 5 SPA. @ 10, 5" /
+  "6, 5 SPA. @ 1'-0, 6"; 9G 5n1 and 5n3 sit at the same S (the plan draws them as offset pairs, offset not dimensioned).
 
 ## Re-run on the main model
 
 `samples/plans/pier-rebar-i80.csx` and `samples/plans/pier-rebar-ramp-g.csx` (new shapes / `G=` / `E=` data; the generator changes need nothing else), then
 `samples/plans/check-sub-cover.csx` to list the result.
+
+Second pass (2026-10-11, items 10-14): only the final "plan pedestal sizes" block of `samples/plans/piers-i80.csx` / `piers-ramp-g.csx` changed (11WB two rows,
+9G 5'-0 x 3'-0). Those scripts rebuild the substructure definitions, so either re-run the chain from them onward (docs/HANDOFF.md order), or set just the fields on the
+model (11WB: `PedestalSizeAlong = 60"`, `PedestalSizeAcross = 47"`, `PedestalSizeAcrossAhead = 45"`, `PedestalRowJoint = 1"`; 9G: `60" x 36"`, not shared; on every
+support of that name). Then `pier-aesthetics.csx` (6A `BandFromLowerTop`), `pier-rebar-i80.csx`, `pier-rebar-ramp-g.csx` (R= / X= / RC / A14 data) and
+`check-sub-cover.csx` (TOTAL 40 on the worktree copy).
