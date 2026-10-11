@@ -10,6 +10,7 @@
 //    is cast into the block, flush with the soffit. Set DECK_END_BLOCKS = false below to switch them off. Reinforcing is NOT modeled.
 //  * One body per joint: Unit 1 owns 5G, Unit 2 owns 9G, Unit 3 owns 14G; Unit 4 owns 19G (the other side, I-80 Unit 3, has no 19G line in the model).
 using SBM.Core.Bridge;
+using SBM.Core.Geometry;
 
 const bool DECK_END_BLOCKS = true;
 double FI(int ft, double inch) => Ft(ft) + In(inch);
@@ -40,17 +41,25 @@ Joint(units[2].Supports[^1], FI(1, 1), 10, 25, true);       // Pier 14G (C = 10"
 Joint(units[3].Supports[0], FI(1, 1), 10, 25, false);
 Joint(units[3].Supports[^1], FI(1, 3.5), 9, 25, true);      // Pier 19G
 
-void Gap(string pier, SupportDefinition a, SupportDefinition b, double cIn)
+// Opening C between the two deck-end faces = distance between the two support lines measured NORMAL to them (the deck end is
+// DeckEndOffset normal to each CL bearing line, see FramingGenerator.DeckEndLine) minus both offsets. Needs the regenerated framing.
+void Gap(string pier, BridgeDefinition ba, SupportDefinition a, BridgeDefinition bb, SupportDefinition b, double cIn)
 {
-    double actual = (b.Station - a.Station) - a.DeckEndOffset - b.DeckEndOffset;
-    Print($"  {pier}: model opening between deck ends {actual / In(1):F2} in, plan C = {cIn} in" + (Math.Abs(actual - In(cIn)) > In(0.25) ? "   <-- CONFLICT (check support stations)" : ""));
+    var fa = Doc.Model(ba.Name).Framing.SupportLine(ba.Supports.IndexOf(a));
+    var fb = Doc.Model(bb.Name).Framing.SupportLine(bb.Supports.IndexOf(b));
+    var n = fa.Direction.Left;
+    if (Vec2.Dot(n, fb.AlignmentPoint - fa.AlignmentPoint) < 0) n = -n;
+    double between = Vec2.Dot(fb.AlignmentPoint - fa.AlignmentPoint, n);
+    double nonPar = Math.Abs(Vec2.Dot(fb.Direction, n));
+    double actual = between - a.DeckEndOffset - b.DeckEndOffset;
+    Print($"  {pier}: support lines {between / In(1):F2} in apart (normal), model opening between deck ends {actual / In(1):F2} in, plan C = {cIn} in" + (nonPar > 0.001 ? $"   (lines not parallel: {nonPar * 180 / Math.PI * 1:F3} deg)" : "") + (Math.Abs(actual - In(cIn)) > In(1.0 / 16) ? "   <-- CONFLICT (check support lines)" : ""));
 }
-Gap("Pier 5G", units[0].Supports[^1], units[1].Supports[0], 9);
-Gap("Pier 9G", units[1].Supports[^1], units[2].Supports[0], 9);
-Gap("Pier 14G", units[2].Supports[^1], units[3].Supports[0], 10);
 var res = Doc.Regenerate();
 Print($"Regenerated {res.Bridges} bridges in {res.Elapsed.TotalSeconds:F1} s, {res.Errors.Count} errors.");
 foreach (var e in res.Errors) Print("  ERROR " + e);
+Gap("Pier 5G", units[0], units[0].Supports[^1], units[1], units[1].Supports[0], 9);
+Gap("Pier 9G", units[1], units[1].Supports[^1], units[2], units[2].Supports[0], 9);
+Gap("Pier 14G", units[2], units[2].Supports[^1], units[3], units[3].Supports[0], 10);
 foreach (var u in units)
 {
     var cm = Doc.Concrete(u.Name);
