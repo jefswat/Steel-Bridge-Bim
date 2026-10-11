@@ -418,7 +418,14 @@ public sealed class DeckReinforcementDefinition
     /// increase). 0 = every inch is its own mark.
     /// </summary>
     public double MarkLengthTolerance { get; set; } = In(2);
-    public DeckReinforcementDefinition Clone() => (DeckReinforcementDefinition)MemberwiseClone();
+    /// <summary>OPTIONAL plan-driven layout (zones + the plan bar list); null = the generic layout above. Sizes/covers above still apply to it.</summary>
+    public DeckPlanReinforcement? Plan { get; set; }
+    public DeckReinforcementDefinition Clone()
+    {
+        var c = (DeckReinforcementDefinition)MemberwiseClone();
+        c.Plan = Plan?.Clone();
+        return c;
+    }
 }
 
 public sealed class BarrierDefinition
