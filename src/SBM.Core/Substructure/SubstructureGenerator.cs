@@ -175,7 +175,7 @@ public sealed partial class SubstructureGenerator
         {
             if (profile != null)
             {
-                if (cs - colHalf < s0 || cs + colHalf > s1) Warn($"{sl.Name}: column at {L(cs)} is not under the as-designed cap â€” check the column locations.");
+                if (cs - colHalf < s0 - In(1.0 / 32) || cs + colHalf > s1 + In(1.0 / 32)) Warn($"{sl.Name}: column at {L(cs)} is not under the as-designed cap â€” check the column locations.");
                 continue;
             }
             if (cs - colHalf < s0 || cs + colHalf > s1)

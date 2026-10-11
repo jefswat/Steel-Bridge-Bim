@@ -1,6 +1,6 @@
 // Iowa DOT Design 817 (File 30377): I-29 NB over Floyd Blvd, Sioux City (Woodbury County) - STAGE 1.
 // 223'-10 7/8 x 36'-0 pretensioned prestressed concrete beam bridge, 3 spans, BTD bulb tees, integral abutments.
-// SUPERSTRUCTURE GEOMETRY ONLY: alignment (local coordinates, no datum - U1), profile on the PGL 5.00' RT of CL I-29,
+// Alignment (local coordinates, no datum - U1), profile on the PGL 5.00' RT of CL I-29,
 // superelevation, supports (all parallel, 10 deg 09'36" to the extended tangent), deck, per-span beam layout + haunches.
 // Plan data: docs/plan-data/woodbury-i29-floyd/SUMMARY.md (sections 1-3) and its CSVs.
 //   sbm run samples\plans\build-woodbury.csx -- "samples\plans\Woodbury I-29 NB over Floyd.sbm"
@@ -117,7 +117,6 @@ for (int k = 0; k < 4; k++)
     var (sta, skew) = Line(stakes[k]);
     bool abut = k == 0 || k == 3;
     var sub = SubstructureDefinition.Default(abut ? SupportType.Abutment : SupportType.Pier);
-    sub.Enabled = false;      // superstructure geometry only (substructure: later step)
     br.Supports.Add(new SupportDefinition
     {
         Name = names[k], Type = abut ? SupportType.Abutment : SupportType.Pier, Station = sta, SkewDegrees = skew, Substructure = sub,
@@ -275,10 +274,25 @@ unresolved.Add("Beam ends at the piers: square to the beam or parallel to the pi
     Print(dr.Output.TrimEnd());
     if (!dr.Success) Print("ERROR in diaphragms-woodbury.csx: " + dr.Error);
 }
+// ---------------------------------------------------------------- substructure: piers 1 / 2 + integral abutments (substructure-woodbury.csx, run from the repo root)
+{
+    var sr = await SBM.Api.ScriptHost.RunFileAsync(@"samples\plans\substructure-woodbury.csx", Doc, Args);
+    Print(sr.Output.TrimEnd());
+    if (!sr.Success) Print("ERROR in substructure-woodbury.csx: " + sr.Error);
+}
 
-var rep = Doc.Regenerate(includeSteel: false);
+var rep = Doc.Regenerate();
 foreach (var e in rep.Errors) Print("ERROR " + e);
 foreach (var w in rep.Warnings.Take(30)) Print("warning " + w);
+{
+    var subm = Doc.Model(br.Name).Substructure;
+    if (subm == null) Print("ERROR substructure not generated");
+    else
+    {
+        foreach (var d in subm.Diagnostics) Print($"substructure {d.Severity}: {d.Message}");
+        foreach (var u in subm.Units) Print($"substructure unit {u.Name}: {u.Solids.Count} solids, {u.Foundations.Sum(f => f.Piles.Count)} piles");
+    }
+}
 foreach (var u in unresolved) Print("UNRESOLVED " + u);
 Doc.Save(outPath);
 Print($"Saved {outPath}");
