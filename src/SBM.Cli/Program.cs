@@ -27,7 +27,7 @@ public static class Program
                                                             messages, undo, close. "sbm app help" lists them; "sbm app list"
                                                             shows running copies. (All other commands work on .sbm files.)
           sbm regen <file.sbm>                              Regenerate; print counts, warnings, timing
-          sbm export <file.sbm> [--ifc a.ifc|a.ifczip] [--dxf b.dxf] [--landxml c.xml]
+          sbm export <file.sbm> [--ifc a.ifc|a.ifczip] [--geometry parametric|abv|nurbs] [--dxf b.dxf] [--landxml c.xml]
           sbm db <file.sbm> [out.sqlite] [--pages] [--plans <folder>[,<folder>]] [--links rules.json] [--no-previews] [--no-vacuum]
                                                             [--unused report.md]
                                                             Companion SQLite database: every element (IFC GlobalIds + hierarchy),
@@ -177,7 +177,14 @@ public static class Program
                     Need(args, 2);
                     var doc = SbmDocument.Open(args[1]);
                     string? Opt(string name) { int i = Array.IndexOf(args, name); return i > 0 && i + 1 < args.Length ? args[i + 1] : null; }
-                    if (Opt("--ifc") is { } ifc) { doc.ExportIfc(ifc); Console.WriteLine($"  IFC 4.3 → {ifc}"); }
+                    var geometry = Opt("--geometry")?.ToLowerInvariant() switch
+                    {
+                        null or "parametric" => SBM.IO.Ifc.IfcGeometryMode.Parametric,
+                        "abv" or "referenceview" => SBM.IO.Ifc.IfcGeometryMode.ReferenceView,
+                        "nurbs" => SBM.IO.Ifc.IfcGeometryMode.Nurbs,
+                        var g => throw new ArgumentException($"--geometry {g}: use parametric, abv or nurbs"),
+                    };
+                    if (Opt("--ifc") is { } ifc) { doc.ExportIfc(ifc, geometry); Console.WriteLine($"  IFC 4.3 ({geometry}) → {ifc}"); }
                     if (Opt("--dxf") is { } dxf) { doc.ExportDxf(dxf); Console.WriteLine($"  DXF → {dxf}"); }
                     if (Opt("--landxml") is { } lx) { doc.ExportLandXml(lx); Console.WriteLine($"  LandXML → {lx}"); }
                     return 0;

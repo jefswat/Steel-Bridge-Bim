@@ -24,6 +24,21 @@ public sealed class IfcExportResult
     public int TessellatedSolids { get; set; }
 }
 
+/// <summary>How solids are written.</summary>
+public enum IfcGeometryMode
+{
+    /// <summary>Current behaviour: exact extrusions where recorded (plates with holes, straight parts, standard beams clipped by
+    /// half spaces), triangle meshes elsewhere.</summary>
+    Parametric,
+    /// <summary>Alignment-based Reference View (AbV): only geometry the view allows (no IfcExtrudedAreaSolid, booleans or half
+    /// spaces) - face sets, swept disks, and solids placed along the IFC 4.3 alignment.</summary>
+    ReferenceView,
+    /// <summary>Exact curved surfaces as NURBS (IfcAdvancedBrep with B-spline faces) for curved parts; NOT allowed in AbV.</summary>
+    Nurbs,
+}
+
+public sealed record IfcExportOptions(IfcGeometryMode Geometry = IfcGeometryMode.Parametric);
+
 /// <summary>
 /// Exports the model to IFC 4.3 (IFC4X3_ADD2) with semantic entities:
 /// IfcProject → IfcSite → IfcBridge → IfcBridgePart (superstructure) → IfcElementAssembly (girder field sections,
@@ -38,7 +53,7 @@ public static class IfcExporter
 {
     /// <summary>Writes <paramref name="path"/>: plain STEP for *.ifc, or a buildingSMART IFC-ZIP container for *.ifczip
     /// (a standard DEFLATE zip holding the single model <c>&lt;name&gt;.ifc</c>, streamed — no full copy in memory).</summary>
-    public static IfcExportResult Export(string path, BridgeProject project, IReadOnlyList<IfcBridgeData> bridges)
+    public static IfcExportResult Export(string path, BridgeProject project, IReadOnlyList<IfcBridgeData> bridges, IfcExportOptions? options = null)
     {
         if (IsIfcZip(path))
         {
@@ -47,16 +62,17 @@ public static class IfcExporter
             using var zip = new System.IO.Compression.ZipArchive(file, System.IO.Compression.ZipArchiveMode.Create);
             var entry = zip.CreateEntry(inner, System.IO.Compression.CompressionLevel.SmallestSize);
             using var es = new StreamWriter(entry.Open(), new UTF8Encoding(false), 1 << 20);
-            return Export(es, inner, project, bridges);
+            return Export(es, inner, project, bridges, options);
         }
         using var fs = new StreamWriter(path, false, new UTF8Encoding(false), 1 << 20);
-        return Export(fs, Path.GetFileName(path), project, bridges);
+        return Export(fs, Path.GetFileName(path), project, bridges, options);
     }
 
     public static bool IsIfcZip(string path) => path.EndsWith(".ifczip", StringComparison.OrdinalIgnoreCase);
 
-    public static IfcExportResult Export(TextWriter tw, string fileName, BridgeProject project, IReadOnlyList<IfcBridgeData> bridges)
+    public static IfcExportResult Export(TextWriter tw, string fileName, BridgeProject project, IReadOnlyList<IfcBridgeData> bridges, IfcExportOptions? options = null)
     {
+        options ??= new IfcExportOptions();
         var u = project.Units;
         double scale = 1 / u.LongUnit; // meters → project length units
         var w = new StepWriter(tw);
