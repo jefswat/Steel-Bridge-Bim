@@ -79,6 +79,11 @@ public sealed class FramingGenerator
             BuildPlateRuns();
         }
         BuildDeck();
+        if (_def.Girders.Camber.Count > 0)
+        {
+            _result.Camber = CamberBlocking.Compute(_def, _align, _result);
+            foreach (var w in _result.Camber.Warnings) Warn(w);
+        }
     }
 
     // ------------------------------------------------------------------ supports & offsets

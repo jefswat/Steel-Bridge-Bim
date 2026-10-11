@@ -40,6 +40,30 @@ public class DatabaseTests : IDisposable
     }
 
     [Fact]
+    public void GirderGroup_CarriesCamberAndBlocking()
+    {
+        var doc = SbmDocument.Sample();
+        var b = doc.Project.Bridges[0];
+        var gc = new SBM.Core.Bridge.GirderCamberDefinition { Girder = 0, DatumPoint = 1 };
+        gc.Keys.Add(new SBM.Core.Bridge.CamberKeyPoint { Number = 1, Support = 0 });
+        gc.Keys.Add(new SBM.Core.Bridge.CamberKeyPoint { Number = 3, Support = 1 });
+        for (int i = 1; i <= 3; i++)
+            gc.Points.Add(new SBM.Core.Bridge.CamberPoint { Number = i, Camber = 0.0254 * i, SteelDeflection = 0.0254 * i, SlabDeflection = 0.0254 * 2 * i });
+        b.Girders.Camber.Add(gc);
+        doc.Regenerate();
+        string db = Path.Combine(_dir, "c.sqlite");
+        doc.ExportDatabase(db);
+        using var cn = ModelDatabase.Open(db);
+        using var c = cn.CreateCommand();
+        c.CommandText = "SELECT properties FROM elements WHERE level = 'group' AND category = 'girder' AND name = 'G1'";
+        string props = (string)c.ExecuteScalar()!;
+        Assert.Contains("\"camber_points\":3", props);
+        Assert.Contains("\"camber_datum_point\":1", props);
+        Assert.Contains("blocking_max_ft", props);
+        Assert.Contains("camber_table", props);
+    }
+
+    [Fact]
     public void GlobalIds_AreTheIfcGlobalIds()
     {
         var (doc, db, res) = Build();

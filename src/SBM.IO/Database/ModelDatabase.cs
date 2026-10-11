@@ -467,8 +467,24 @@ public static class ModelDatabase
             string deckSlabId = "";
             if (b.Concrete != null) deckSlabId = Concrete(b.Concrete, def, bk, deckPartId);
             if (b.Prestressed != null) Prestressed(b.Prestressed, bk, superId);
-            if (b.Steel != null) Steel(b.Steel, bk, superId);
+            if (b.Steel != null) Steel(b.Steel, bk, superId, framing.Camber);
             _ = deckSlabId;
+        }
+
+        /// <summary>Camber / blocking of a girder as properties of its group: summary values plus the point table.</summary>
+        private static string CamberProps(SBM.Core.Framing.GirderCamberResult cg)
+        {
+            const double ft = 0.3048, inch = 0.0254;
+            var inv = CultureInfo.InvariantCulture;
+            var rows = cg.Points.Select(p => string.Join(",", p.Number.ToString(inv), (p.PathDistance / ft).ToString("F3", inv), (p.Camber / inch).ToString("F2", inv),
+                (p.SteelDeflection / inch).ToString("F2", inv), (p.SlabDeflection / inch).ToString("F2", inv), (p.HaunchElevation / ft).ToString("F3", inv),
+                double.IsNaN(p.Blocking) ? "" : (p.Blocking / ft).ToString("F3", inv)));
+            var bl = cg.Points.Where(p => !double.IsNaN(p.Blocking)).ToList();
+            var j = new Json().Add("camber_points", cg.Points.Count).Add("camber_datum_point", cg.DatumPoint)
+                .Add("camber_max_in", cg.Points.Max(p => p.Camber) / inch).Add("camber_min_in", cg.Points.Min(p => p.Camber) / inch);
+            if (bl.Count > 0) j.Add("blocking_max_ft", bl.Max(p => p.Blocking) / ft).Add("blocking_min_ft", bl.Min(p => p.Blocking) / ft);
+            return j.Add("camber_table_columns", "point,distance_along_girder_ft,camber_in(up+),steel_deflection_in(down+),slab_barrier_deflection_in(down+),girder_line_haunch_elevation_ft,blocking_ft")
+                .Add("camber_table", string.Join(";", rows)).ToString();
         }
 
         private static Row Part(Row r, Row from) { r.StaBegin = from.StaBegin; r.StaEnd = from.StaEnd; return r; }
@@ -477,7 +493,7 @@ public static class ModelDatabase
 
         private sealed record AsmInfo(string GlobalId, string Support, string Girder, string Subtype);
 
-        private void Steel(SteelModel steel, string bk, string superId)
+        private void Steel(SteelModel steel, string bk, string superId, SBM.Core.Framing.CamberResult? camber = null)
         {
             var asmInfo = new Dictionary<string, AsmInfo>();
             var girderGroup = new Dictionary<int, string>();
@@ -488,6 +504,7 @@ public static class ModelDatabase
                 id = Id($"{bk}/girder/G{g + 1}");
                 var r = New(id, superId, "group", "girder", "", $"G{g + 1}");
                 r.InIfc = false; r.Girder = $"G{g + 1}";
+                if (camber?.Girder(g) is { Points.Count: > 0 } cg) r.Props = CamberProps(cg);
                 _w.Add(r);
                 return girderGroup[g] = id;
             }

@@ -313,6 +313,8 @@ public sealed class GirderLayoutDefinition
 {
     /// <summary>As-designed plan geometry per girder (optional, see <see cref="GirderPlanGeometry"/>).</summary>
     public List<GirderPlanGeometry> PlanGeometry { get; set; } = new();
+    /// <summary>As-designed camber / deflection data per girder (optional, see <see cref="GirderCamberDefinition"/>); blocking is computed from it.</summary>
+    public List<GirderCamberDefinition> Camber { get; set; } = new();
     /// <summary>Girders that end on cross girders inside the bridge (e.g. a widening that tapers out).</summary>
     public List<GirderTermination> Terminations { get; set; } = new();
     /// <summary>Girders that begin on an auxiliary support line (see <see cref="GirderBeginning"/>).</summary>
@@ -362,6 +364,7 @@ public sealed class GirderLayoutDefinition
         Prestressed = Prestressed.Clone(),
         Terminations = Terminations.Select(t => t.Clone()).ToList(),
         PlanGeometry = PlanGeometry.Select(t => t.Clone()).ToList(),
+        Camber = Camber.Select(t => t.Clone()).ToList(),
         Beginnings = Beginnings.Select(t => t.Clone()).ToList(),
         CrossGirder = CrossGirder.Clone(),
     };

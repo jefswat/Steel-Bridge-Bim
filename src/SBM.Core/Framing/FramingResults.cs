@@ -265,6 +265,8 @@ public sealed class BridgeFraming
     public List<StiffenerResult> Stiffeners { get; } = new();
     public List<FieldSpliceResult> Splices { get; } = new();
     public DeckResult? Deck { get; set; }
+    /// <summary>Camber / blocking of the girders that have camber data (null = none given).</summary>
+    public CamberResult? Camber { get; set; }
     public List<Diagnostic> Diagnostics { get; } = new();
     public TimeSpan GenerationTime { get; set; }
 

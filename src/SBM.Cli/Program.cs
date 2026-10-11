@@ -35,6 +35,7 @@ public static class Program
           sbm run <script.csx> [file.sbm] [-- args...]      Run a C# script (globals: Doc, Print, Ft, In, Sta, Len)
           sbm bench <file.sbm> [n]                          Time cold/warm regeneration
           sbm elevations <file.sbm> [bridge]                Step-by-step elevations, grade to bearing seat, at every bearing
+          sbm blocking <file.sbm> [bridge] [--all]          Camber / blocking per girder (key points; --all = every plan point)
           sbm drawings <file.sbm> <folder> [bridge]         2D DXF models: layout plan + elevation, plan, sections, bents, bar bending
           sbm sheets <file.sbm> <out.pdf> [bridge]          11x17 plan set as a vector PDF
 
@@ -218,6 +219,17 @@ public static class Program
                     var chains = doc.BearingElevations(args.Length > 2 ? args[2] : null);
                     Console.Write(SBM.Core.Checks.ElevationCheck.ToText(chains, doc.Project.Units));
                     return chains.Any(c => c.Mismatch) ? 2 : 0;
+                }
+                case "blocking":
+                {
+                    Need(args, 2);
+                    var doc = SbmDocument.Open(args[1]);
+                    string? bn = args.Skip(2).FirstOrDefault(a => !a.StartsWith("--"));
+                    var names = bn != null ? new[] { bn } : doc.Project.Bridges.Select(b => b.Name).ToArray();
+                    foreach (var n in names)
+                        if (doc.Framing(n).Camber is { } cr)
+                            Console.Write(SBM.Core.Framing.CamberBlocking.ToText(n, cr, doc.Project.Units, args.Contains("--all")));
+                    return 0;
                 }
                 case "drawings":
                 {

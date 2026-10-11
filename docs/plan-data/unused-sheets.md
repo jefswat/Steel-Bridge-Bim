@@ -5,16 +5,14 @@ no element of the model is based on it (no row in `element_sheet`). Such a sheet
 model definition does not contain yet (the "Suggests" column), or the link rules need a rule for it
 (`samples/plans/sheet-links-i80-rampg.json`). "Design" = design sheet number, "PDF" = PDF page.
 
-72 of 414 sheets are unlinked (4 administrative sheets - cover, revision - are excluded).
+49 of 414 sheets are unlinked (4 administrative sheets - cover, revision - are excluded).
 
 | Sheet title | Sheets (set: design sheet / PDF page) | Suggests missing from the model |
 |---|---|---|
 | ABUTMENT BACKFILL DETAILS | design-116: 232/239; design-316: 171/173 | Abutment backfill zone / drainage fill and approach. No backfill, approach slab or roadway elements. |
 | BARRIER RAIL AESTHETIC DETAILS | design-116: 224/231, 225/232; design-316: 164/166, 165/167 | Barrier rail surface treatment (form liner, recess). Barrier is the plain SSTR profile. |
 | BNSF SHORING DETAILS | design-116: 16/18; design-316: 16/18 | Temporary works: shoring next to the railroad. No temporary / construction-stage elements in the model. |
-| BRIDGE WING ARMORING | design-116: 231/238; design-316: 170/172 | Abutment wing armoring (stone/armor on the wing slopes). Wingwalls themselves are modeled (as-designed abutments); armoring is not. |
-| CAMBER & BLOCKING - UNIT n | design-116: 128/132, 129/133, 130/134, 131/135, 135/139, 136/140, 137/141, 138/142, 139/143, 140/144, 147/151, 148/152, 149/153, 150/154 | Camber and blocking: girder camber/blocking diagrams. Camber is not modeled (deferred). |
-| CAMBER AND BLOCKING - UNIT n | design-316: 109/111, 110/112, 113/115, 114/116, 117/119, 118/120, 119/121, 122/124, 123/125 | Camber and blocking: girder camber/blocking diagrams. Camber is not modeled (deferred). |
+| BRIDGE WING ARMORING | design-116: 231/238; design-316: 170/172 | Abutment wing armoring (wingwalls). Wingwalls are not modeled. |
 | CRASH CUSHION END POST DETAILS AT RAMP A | design-116: 222/229 | Crash cushion / end post at barrier ends (Ramp A, Ramp G). Not modeled. |
 | CRASH CUSHION END POST DETAILS AT RAMP G | design-116: 223/230 | Crash cushion / end post at barrier ends (Ramp A, Ramp G). Not modeled. |
 | DRAINAGE DETAILS | design-316: 152/154, 153/155, 154/156, 155/157, 156/158, 157/159, 158/160, 159/161 | Rule 'drainage' (Deck drainage) matches this sheet, but the model has no such element: it is missing from the model. |
