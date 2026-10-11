@@ -277,6 +277,26 @@ public sealed partial class SubstructureGenerator
                 for (int j = 0; j < cnt; j++)
                 {
                     double n = cnt == 1 ? (nA + nB) / 2 : nA + (nB - nA) * j / (cnt - 1);
+                    if (g.Shape == "CS" && g.Dims.Length == 4)
+                    {
+                        // 6b2 (plan bend diagram): flat run 2'-0, then a slanted run of 9'-1 (8'-9 along S, 2'-4 1/2 down), out to out along the bottom face - the
+                        // bar follows the sloping soffit of the cantilever. Starts at the end face (cover) and descends toward the columns.
+                        double flat = g.Dims[0], slant = g.Dims[1], run = g.Dims[2], rise = g.Dims[3];
+                        var outline = new[] { new Vec2(0, 0), new Vec2(flat, 0), new Vec2(flat + run, -rise) };
+                        var (cs, cl) = PlanBent(size, outline, new[] { flat, slant }, +1, "CS", $"Bar {Dim(flat)} flat + {Dim(slant)} slanted ({Dim(run)} x {Dim(rise)}) out to out", g.Pin, g.Length);
+                        double sTip = end == 0 ? s0 : s1, inward = end == 0 ? 1 : -1;
+                        double zb = BotAt(sTip + inward * (cov + flat / 2)) + cov + st.Diameter + 3 * size.Diameter * rowsB;
+                        double sv = sTip;                                                       // pushed in from the (raked) end face only as far as the clear cover needs
+                        for (int it = 0; it < 800; it++)
+                        {
+                            bool ok = true;
+                            foreach (var q in cl) if (Clr(sv + inward * q.X, zb + q.Y) < cov + size.Diameter / 2 - 1e-4) { ok = false; break; }
+                            if (ok) break;
+                            sv += inward * In(0.25);
+                        }
+                        bars.Add(new RawBar("B", size, cs, $"{loc} {g.Mark} cantilever bottom", cl.Select(q => unit.World(sv + inward * q.X, n, zb + q.Y)).ToArray()));
+                        continue;
+                    }
                     double centre = end == 0 ? s0 + cov + g.Length / 2 : s1 - cov - g.Length / 2;
                     var pts = Follow(n, g.Length, s => BotAt(s) + cov + st.Diameter + size.Diameter / 2 + 3 * size.Diameter * (1 + rowsB), centre, -1, 1, size.Diameter / 2);
                     bars.Add(PlanBarFixed("B", size, $"{loc} {g.Mark} cantilever bottom", pts, g.Length));
@@ -398,6 +418,16 @@ public sealed partial class SubstructureGenerator
                 if (g.Kind is PlanBarKind.CapHoop or PlanBarKind.CapCantileverHoop)
                 {
                     double h = zt - zb;
+                    if (g.Shape is "HOOP" or "HOOPV" && g.Dims.Length == 4)
+                    {
+                        // plan bend diagram: HOOP {w, h, lap, lap}; HOOPV (cantilever hoops) {w, h min, h max, lap} - height = the local depth within the printed range.
+                        // Centred across the cap (the section sketch puts the hoops off-centre; which side is not decoded).
+                        double hw = g.Dims[0], hh = g.Shape == "HOOP" ? g.Dims[1] : Math.Clamp(zt - zb, g.Dims[1], g.Dims[2]), lp = g.Shape == "HOOP" ? g.Dims[2] : g.Dims[3];
+                        var (hs2, hl2) = PlanHoop(size, hw, hh, lp, g.Shape == "HOOP" ? g.Dims[3] : lp, g.Pin, g.Shape == "HOOP" ? g.Length : 2 * (hw + hh) + 2 * lp);
+                        double ncHoop = (unit.CapN0 + unit.CapN1) / 2;
+                        bars.Add(new RawBar("S", size, hs2, $"{where} {(cant ? "cantilever hoops" : "hoops")}", hl2.Select(p => unit.World(s, ncHoop + p.X - hw / 2, zt - hh + p.Y)).ToArray()));
+                        continue;
+                    }
                     if (!cant && g.Length > 0) h = Math.Min(h, SolveHoopHeight(w, g.Length, size));
                     var (shape, local) = ClosedStirrup(w, h, size);
                     double zTopHoop = zt;
@@ -521,6 +551,15 @@ public sealed partial class SubstructureGenerator
                 double zh = TopAt(sMid) - cov - size.Diameter / 2 - In(3);
                 double wh = unit.CapN1 - unit.CapN0 - 2 * Setb(sMid, zh) - 2 * (cov + size.Diameter / 2);
                 double sLen = Math.Max(g.Length / 2 - wh, In(12));
+                if (g.Shape == "HOOP" && g.Dims.Length == 4)
+                {
+                    // 5n2 (plan bend diagram): hoop 5'-2 (along S) x 5'-4 (along N), 6" lap tails, out to out; the plan puts them at the pedestals of girders C and D
+                    // ("AT GIRDERS C & D ONLY", Pier 1WB) - which pedestals is not decoded for the other piers: placed at mid-cap, one above the other (as before).
+                    var (hs, hl) = PlanHoop(size, g.Dims[0], g.Dims[1], g.Dims[2], g.Dims[3], g.Pin, g.Length);
+                    for (int i = 0; i < g.Count; i++)
+                        bars.Add(new RawBar("M", size, hs, $"{where} pedestal hoops", hl.Select(q => unit.World(sMid + q.X - g.Dims[0] / 2, (unit.CapN0 + unit.CapN1) / 2 + q.Y - g.Dims[1] / 2, zh - i * In(3))).ToArray()));
+                    continue;
+                }
                 for (int i = 0; i < g.Count; i++)
                 {
                     var line = new[] { new Vec2(-sLen / 2, -wh / 2), new Vec2(sLen / 2, -wh / 2), new Vec2(sLen / 2, wh / 2), new Vec2(-sLen / 2, wh / 2) };

@@ -16,7 +16,8 @@ for design in ('116', '316'):
             marks = [x.strip() for x in key.split(',')]
             for mk in marks:
                 mine = [d for d in dims if d['label'] == key and (d['own'] in (None, mk)) and not (d['own'] and d['own'] != mk)]
-                ds = [dict(val=d['val'], pre=d['pre'], suf=d['suf'], vert=d['b'] != 0, x=round(d['x']), y=round(d['y']), own=d['own']) for d in mine]
+                import math as _m
+                ds = [dict(val=d['val'], pre=d['pre'], suf=d['suf'], vert=d['b'] != 0, ang=round(_m.degrees(_m.atan2(d['b'], d['a'])), 1), x=round(d['x']), y=round(d['y']), own=d['own']) for d in mine]
                 L = lens.get(mk.lower(), lens.get(mk, (None, '', '', '')))
                 out.append(dict(design=design, page=page, sheet=title, title=key, mark=mk, listed=L[0], listed_txt=L[1], desc=L[2], count=L[3], dims=ds,
                                 recon=bendx.recon(mine, L[0])))

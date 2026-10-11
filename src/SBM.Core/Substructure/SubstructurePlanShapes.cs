@@ -69,4 +69,37 @@ public sealed partial class SubstructureGenerator
         return PlanBent(size, new[] { new Vec2(0, -vLeg), new Vec2(0, 0), new Vec2(top, 0), new Vec2(top + slantRun, -drop) }, new[] { vLeg, top, slant }, -1,
             "A14", $"Bar {Dim(vLeg)} + {Dim(top)} + {Dim(slant)} slanted ({Dim(slantRun)} run), out to out", pin, listed);
     }
+
+    /// <summary>
+    /// Hoop of the plan's bend diagram (6c1 / 6c2 / 5n2): rectangle <paramref name="w"/> x <paramref name="h"/> out to out with two straight tails that lap
+    /// <paramref name="lapV"/> down the right side and <paramref name="lapH"/> along the top (list length = 2 (w + h) + the two laps). The tails run
+    /// one bar diameter inside the closing pass. Local: u across, v up; the bar starts on the right side, runs up, left along the top, down, along the bottom, up the right
+    /// side and ends along the top.
+    /// </summary>
+    internal static (BarShape shape, Vec2[] sharp) PlanHoop(RebarSize size, double w, double h, double lapV, double lapH, double pin, double listed)
+    {
+        double db = size.Diameter, r = db / 2;
+        var c = new List<Vec2>
+        {
+            new Vec2(w - r - db, h - lapV), new Vec2(w - r - db, h - r - db), new Vec2(r, h - r - db), new Vec2(r, r), new Vec2(w - r, r), new Vec2(w - r, h - r),
+            new Vec2(w - r - lapH, h - r),
+        };
+        // the tails are inset one bar diameter: start tail inside the final rise, final top pass outside the first top pass
+        c[0] = new Vec2(w - r - db, h - lapV); c[1] = new Vec2(w - r - db, h - r - db); c[2] = new Vec2(r, h - r - db);
+        c[5] = new Vec2(w - r, h - r); c[6] = new Vec2(w - r - lapH, h - r);
+        if (pin <= 0) pin = size.MinPinDiameter;
+        double rc = pin / 2 + r;
+        var bends = new List<(Vec2, double)>();
+        var shape = new BarShape
+        {
+            Code = "HOOP", Description = $"Hoop {Dim(w)} x {Dim(h)} with {Dim(lapV)} / {Dim(lapH)} lap tails, out to out", Centerline = BarShape.Rounded(c, rc, bends), PinDiameter = pin, FixedLength = listed,
+            Dimensions =
+            {
+                new BarDimension("A", h, new Vec2(0, 0), new Vec2(0, h), new Vec2(-1, 0)), new BarDimension("B", w, new Vec2(0, h), new Vec2(w, h), new Vec2(0, 1)),
+                new BarDimension("C", lapV, new Vec2(w, h - lapV), new Vec2(w, h), new Vec2(1, 0)), new BarDimension("D", lapH, new Vec2(w - lapH, h), new Vec2(w, h), new Vec2(0, 1)),
+            },
+        };
+        shape.Bends.AddRange(bends);
+        return (shape, c.ToArray());
+    }
 }

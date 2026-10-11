@@ -15,7 +15,7 @@ def fmt(v):
 
 def spec(r, kind, vertical=False):
     mark = r['mark'].lower()
-    if not r.get('solved'): return None
+    if not r.get('solved') and kind != 'CapCantileverHoop': return None
     pin = r['pin'] or 0
     if kind in ('CapEnd',) and vertical:
         used = {(u['val'], u['vert']): u['mult'] for u in r['used']}
@@ -24,6 +24,28 @@ def spec(r, kind, vertical=False):
         H = [u['val'] for u in r['used'] if not u['vert']]
         if len(H) == 1 and len(V) == 2 and 2.5 in un:
             return 'A14:%s,%s,%s,%s:%s' % (fmt(V[1]), fmt(H[0]), fmt(V[0]), '2.5', fmt(pin))
+        return None
+    if kind == 'CapCantilever' and r.get('used') and len(r['used']) == 2:
+        un = [u['val'] for u in r['unused']]
+        import math
+        slant = max(r['used'], key=lambda u: u['val'])['val']
+        flat = min(r['used'], key=lambda u: u['val'])['val']
+        for a in un:
+            for b in un:
+                if a != b and abs(math.hypot(a, b) - slant) <= 1.0:
+                    return 'CS:%s,%s,%s,%s:%s' % (fmt(flat), fmt(slant), fmt(max(a, b)), fmt(min(a, b)), fmt(pin))
+        return None
+    if kind in ('CapHoop', 'PedestalHoop') and r.get('used'):
+        ms = sorted([u['val'] for u in r['used'] for _ in range(u['mult'])], reverse=True)
+        if len(ms) == 6 and ms[0] == ms[1] and ms[2] == ms[3] and ms[4] == ms[5] and ms[0] > ms[2] > ms[4]:
+            return 'HOOP:%s,%s,%s,%s:%s' % (fmt(ms[2]), fmt(ms[0]), fmt(ms[4]), fmt(ms[4]), fmt(pin))
+        return None
+    if kind == 'CapCantileverHoop' and r.get('minmax') and len(r['minmax']) == 2:
+        mm = sorted(v for v, suf, vert in r['minmax'])
+        rem = [v for v in r.get('raw', []) if v not in mm]
+        rem = sorted(set(rem))
+        if len(rem) == 2 and mm[0] > rem[1]:
+            return 'HOOPV:%s,%s,%s,%s:%s' % (fmt(rem[1]), fmt(mm[0]), fmt(mm[1]), fmt(rem[0]), fmt(pin))
         return None
     if r['shape'] == 'U' and kind in ('FootingMat', 'CapEnd', 'CapTransverse', 'CapHairpin', 'PedestalLongitudinal', 'PedestalTransverse'):
         if kind == 'CapEnd' and vertical: return None

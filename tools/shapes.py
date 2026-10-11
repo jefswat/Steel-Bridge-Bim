@@ -13,7 +13,9 @@ def solve(dims, L):
     if len(cand) > 10:
         cand = sorted(cand, key=lambda d: (d['own'] is None))[:10]
         rng = [(0, 1, 2)] * 10
+    obl = [i for i, d in enumerate(cand) if (lambda a: min(abs(a % 90), 90 - abs(a % 90)) > 3)(d.get('ang', 0))]
     for mult in itertools.product(*rng):
+        if any(not mult[i] for i in obl): continue          # text rotated at an oblique angle = the length of a slanted segment: always part of the sum
         t = sum(m * d['val'] for m, d in zip(mult, cand))
         if abs(t - L) > 0.51: continue
         used = [i for i, m in enumerate(mult) if m]
@@ -31,6 +33,7 @@ for o in D:
     mm = [(d['val'], d['suf'], d['vert']) for d in o['dims'] if d['suf']]
     rec = dict(design=o['design'], page=o['page'], sheet=o['sheet'], mark=o['mark'], listed=o['listed'], listed_txt=o['listed_txt'], desc=o['desc'], count=o['count'],
                pin=pins[0] if pins else None, pins=pins, radii=rad, minmax=mm, solved=mult is not None)
+    rec['raw'] = [d['val'] for d in o['dims'] if not d['pre'] and not d['suf']]
     if mult is not None:
         used = [dict(val=d['val'], vert=d['vert'], mult=m) for m, d in zip(mult, cand) if m]
         unused = [dict(val=d['val'], vert=d['vert']) for m, d in zip(mult, cand) if not m]
