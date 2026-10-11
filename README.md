@@ -3,7 +3,21 @@
 3D BIM modeler for steel plate girder bridges and their substructures.
 
 ## Running it
-Double-click `dist\SteelBridgeModeler\SteelBridgeModeler.exe`. It opens with a sample project loaded.
+The built program is not stored in this repository (`dist\` is git-ignored). Either:
+
+- **Download a release** (when available) from the GitHub *Releases* page, unzip it anywhere and double-click
+  `SteelBridgeModeler.exe` (it opens with a sample project). `sbm.exe` beside it is the command-line tool.
+  - A *self-contained* release runs on any 64-bit Windows 10/11 with nothing to install.
+  - A *framework-dependent* release needs the free **.NET 10 Desktop Runtime (x64)** from Microsoft installed once.
+- **Build it yourself** (needs the .NET 10 SDK):
+  ```
+  dotnet publish src/SBM.App -c Release -r win-x64 --self-contained false -p:PublishReadyToRun=true -o dist/SteelBridgeModeler
+  dotnet publish src/SBM.Cli -c Release -r win-x64 --self-contained false -p:PublishReadyToRun=true -o dist/SteelBridgeModeler
+  ```
+  then double-click `dist\SteelBridgeModeler\SteelBridgeModeler.exe`. Use `--self-contained true` instead to get a folder
+  that runs without the runtime installed.
+
+Plan-set PDFs used for the sample models are not part of the repository.
 
 ## Milestone 1: what works now
 **Alignments**
