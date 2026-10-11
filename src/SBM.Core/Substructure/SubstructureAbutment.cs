@@ -331,7 +331,7 @@ public sealed partial class SubstructureGenerator
             unit.Solids.Add(new SubSolid(SubElementKind.Pedestal, $"{name} beam step G{seat.Girder + 1}",
                 $"Beam step {Sh(ad.StepLength)} x {Sh(xStepF - xBwF)}, top {El(top)}, {Sh(hMid)} above the wash at the girder", sm));
             geo.Steps.Add(new AbutmentStepInfo(seat.Girder, seat.S, s0, s1, top, FB(seat.S) + D + W, Math.Min(Nx(xBwF), Nx(xStepF)), Math.Max(Nx(xBwF), Nx(xStepF))));
-            unit.Pedestals.Add(new PedestalInfo(seat.Girder, seat.S, Nx((xBwF + xStepF) / 2), ad.StepLength, xStepF - xBwF, FB(seat.S) + D + W, top));
+            { var pi = new PedestalInfo(seat.Girder, seat.S, Nx((xBwF + xStepF) / 2), ad.StepLength, xStepF - xBwF, FB(seat.S) + D + W, top); unit.Pedestals.Add(pi); unit.PedestalBlocks.Add(pi); }
         }
 
         // ---- main footing foundation and piles at the plan stations (two rows normal to the line)

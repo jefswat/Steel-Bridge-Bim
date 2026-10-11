@@ -60,9 +60,10 @@ List<Vec2> TopLine(SubstructureUnit u, string half) => half == "A" && u.CapTopAh
 List<PedestalInfo> Row(SubstructureUnit u, string half)
 {
     IEnumerable<PedestalInfo> q = u.Pedestals;
-    if (half == "B") q = q.Where(p => p.N <= u.CapMidN + 0.25 * F);
-    else if (half == "A") q = q.Where(p => p.N > u.CapMidN + 0.25 * F);
-    return q.OrderBy(p => p.S).ToList();
+    // rows by the SEAT position (a shared plan pedestal carries the back and ahead seat; its own N is the block centre)
+    if (half == "B") q = q.Where(p => p.RowN <= u.CapMidN + 0.25 * F);
+    else if (half == "A") q = q.Where(p => p.RowN > u.CapMidN + 0.25 * F);
+    return q.OrderBy(p => p.RowS).ToList();
 }
 // returns model value (ft, or in for PEDH), or NaN with a reason
 (double V, string Why) Model(string key, int idx, string half, SubstructureUnit u)

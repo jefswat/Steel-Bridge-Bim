@@ -319,6 +319,13 @@ public sealed class SubstructureDefinition
     public double PedestalProjection { get; set; } = In(3);
     /// <summary>Pedestals taller than this are reported (consider sloping the cap).</summary>
     public double MaxPedestalHeight { get; set; } = Ft(1.5);
+    /// <summary>Plan size of the bearing pedestals as the plans print it (cap plan, pedestal bar layout): along the cap (S) and across it (N), e.g. 5'-6 x 5'-8.
+    /// Centred on the bearing footprint (on the mean of the seats when <see cref="PedestalShared"/>). 0 = derived from the bearing footprint + <see cref="PedestalProjection"/>.</summary>
+    public double PedestalSizeAlong { get; set; }
+    public double PedestalSizeAcross { get; set; }
+    /// <summary>One pedestal block carries every seat of a girder line (back and ahead bearing of an expansion / continuity pier: 4 anchor bolts in one 5'-0 x 6'-0 block, the
+    /// pedestal bar list counts 6 bars per BLOCK). The block top follows the highest seat; seats that differ are reported. Needs <see cref="PedestalSizeAlong"/> / Across.</summary>
+    public bool PedestalShared { get; set; }
 
     // ---------------- Columns (piers)
     public int ColumnCount { get; set; } = 3;
