@@ -19943,7 +19943,8 @@
           "InletLength": 0.6095999999999999,
           "InletWidth": 0.30479999999999996,
           "PipeDiameter": 0.2032,
-          "DropBelowGirders": 0.3048
+          "DropBelowGirders": 0.3048,
+          "Trench": null
         },
         {
           "Station": 231003.348,
@@ -19955,7 +19956,8 @@
           "InletLength": 0.6095999999999999,
           "InletWidth": 0.30479999999999996,
           "PipeDiameter": 0.2032,
-          "DropBelowGirders": 0.3048
+          "DropBelowGirders": 0.3048,
+          "Trench": null
         },
         {
           "Station": 231015.23520000002,
@@ -19967,7 +19969,8 @@
           "InletLength": 0.6095999999999999,
           "InletWidth": 0.30479999999999996,
           "PipeDiameter": 0.2032,
-          "DropBelowGirders": 0.3048
+          "DropBelowGirders": 0.3048,
+          "Trench": null
         },
         {
           "Station": 231018.2832,
@@ -19979,7 +19982,8 @@
           "InletLength": 0.6095999999999999,
           "InletWidth": 0.30479999999999996,
           "PipeDiameter": 0.2032,
-          "DropBelowGirders": 0.3048
+          "DropBelowGirders": 0.3048,
+          "Trench": null
         },
         {
           "Station": 231071.31840000002,
@@ -19991,7 +19995,8 @@
           "InletLength": 0.6095999999999999,
           "InletWidth": 0.30479999999999996,
           "PipeDiameter": 0.2032,
-          "DropBelowGirders": 0.3048
+          "DropBelowGirders": 0.3048,
+          "Trench": null
         },
         {
           "Station": 231080.6148,
@@ -20003,7 +20008,8 @@
           "InletLength": 0.6095999999999999,
           "InletWidth": 0.30479999999999996,
           "PipeDiameter": 0.2032,
-          "DropBelowGirders": 0.3048
+          "DropBelowGirders": 0.3048,
+          "Trench": null
         },
         {
           "Station": 231160.62480000002,
@@ -20015,7 +20021,8 @@
           "InletLength": 0.6095999999999999,
           "InletWidth": 0.30479999999999996,
           "PipeDiameter": 0.2032,
-          "DropBelowGirders": 0.3048
+          "DropBelowGirders": 0.3048,
+          "Trench": null
         },
         {
           "Station": 231168.5496,
@@ -20027,7 +20034,8 @@
           "InletLength": 0.6095999999999999,
           "InletWidth": 0.30479999999999996,
           "PipeDiameter": 0.2032,
-          "DropBelowGirders": 0.3048
+          "DropBelowGirders": 0.3048,
+          "Trench": null
         },
         {
           "Station": 231264.56160000002,
@@ -20039,7 +20047,8 @@
           "InletLength": 0.6095999999999999,
           "InletWidth": 0.30479999999999996,
           "PipeDiameter": 0.2032,
-          "DropBelowGirders": 0.3048
+          "DropBelowGirders": 0.3048,
+          "Trench": null
         },
         {
           "Station": 231264.56160000002,
@@ -20051,7 +20060,8 @@
           "InletLength": 0.6095999999999999,
           "InletWidth": 0.30479999999999996,
           "PipeDiameter": 0.2032,
-          "DropBelowGirders": 0.3048
+          "DropBelowGirders": 0.3048,
+          "Trench": null
         },
         {
           "Station": 231310.28160000002,
@@ -20063,7 +20073,8 @@
           "InletLength": 0.6095999999999999,
           "InletWidth": 0.30479999999999996,
           "PipeDiameter": 0.2032,
-          "DropBelowGirders": 0.3048
+          "DropBelowGirders": 0.3048,
+          "Trench": null
         },
         {
           "Station": 231310.28160000002,
@@ -20075,7 +20086,8 @@
           "InletLength": 0.6095999999999999,
           "InletWidth": 0.30479999999999996,
           "PipeDiameter": 0.2032,
-          "DropBelowGirders": 0.3048
+          "DropBelowGirders": 0.3048,
+          "Trench": null
         },
         {
           "Station": 231343.8096,
@@ -20087,7 +20099,8 @@
           "InletLength": 0.6095999999999999,
           "InletWidth": 0.30479999999999996,
           "PipeDiameter": 0.2032,
-          "DropBelowGirders": 0.3048
+          "DropBelowGirders": 0.3048,
+          "Trench": null
         }
       ],
       "InspectionAccess": {
@@ -20203,6 +20216,29 @@
         },
         "GratingAboveWebBottom": 0.0635,
         "WalkwayEndClearance": 0.1016
+      },
+      "Misc": {
+        "Unresolved": [],
+        "Collectors": [],
+        "PierDrains": [],
+        "SignSupports": [],
+        "EndPosts": [],
+        "Lighting": {
+          "PoleBases": [],
+          "JunctionBoxes": [],
+          "Conduits": [
+            {
+              "Name": "ITS conduit I-80 WB Unit 1",
+              "Side": "Right",
+              "Kind": "Its",
+              "FromStation": 231001.714272,
+              "ToStation": 231375.170472,
+              "NominalDiameter": 0.0508,
+              "HeightAboveBase": 0.508,
+              "FromTrafficFace": 0.127
+            }
+          ]
+        }
       }
     },
     {
@@ -48832,7 +48868,8 @@
           "InletLength": 0.6095999999999999,
           "InletWidth": 0.30479999999999996,
           "PipeDiameter": 0.2032,
-          "DropBelowGirders": 0.3048
+          "DropBelowGirders": 0.3048,
+          "Trench": null
         },
         {
           "Station": 231381.72367200002,
@@ -48844,7 +48881,8 @@
           "InletLength": 0.6095999999999999,
           "InletWidth": 0.30479999999999996,
           "PipeDiameter": 0.2032,
-          "DropBelowGirders": 0.3048
+          "DropBelowGirders": 0.3048,
+          "Trench": null
         },
         {
           "Station": 231384.771672,
@@ -48856,7 +48894,8 @@
           "InletLength": 0.6095999999999999,
           "InletWidth": 0.30479999999999996,
           "PipeDiameter": 0.2032,
-          "DropBelowGirders": 0.3048
+          "DropBelowGirders": 0.3048,
+          "Trench": null
         },
         {
           "Station": 231415.251672,
@@ -48868,7 +48907,8 @@
           "InletLength": 0.6095999999999999,
           "InletWidth": 0.30479999999999996,
           "PipeDiameter": 0.2032,
-          "DropBelowGirders": 0.3048
+          "DropBelowGirders": 0.3048,
+          "Trench": null
         },
         {
           "Station": 231445.73167200002,
@@ -48880,7 +48920,8 @@
           "InletLength": 0.6095999999999999,
           "InletWidth": 0.30479999999999996,
           "PipeDiameter": 0.2032,
-          "DropBelowGirders": 0.3048
+          "DropBelowGirders": 0.3048,
+          "Trench": null
         },
         {
           "Station": 231470.115672,
@@ -48892,7 +48933,8 @@
           "InletLength": 0.6095999999999999,
           "InletWidth": 0.30479999999999996,
           "PipeDiameter": 0.2032,
-          "DropBelowGirders": 0.3048
+          "DropBelowGirders": 0.3048,
+          "Trench": null
         },
         {
           "Station": 231491.45167200002,
@@ -48904,7 +48946,8 @@
           "InletLength": 0.6095999999999999,
           "InletWidth": 0.30479999999999996,
           "PipeDiameter": 0.2032,
-          "DropBelowGirders": 0.3048
+          "DropBelowGirders": 0.3048,
+          "Trench": null
         },
         {
           "Station": 231512.787672,
@@ -48916,7 +48959,8 @@
           "InletLength": 0.6095999999999999,
           "InletWidth": 0.30479999999999996,
           "PipeDiameter": 0.2032,
-          "DropBelowGirders": 0.3048
+          "DropBelowGirders": 0.3048,
+          "Trench": null
         },
         {
           "Station": 231546.74239200001,
@@ -48928,7 +48972,8 @@
           "InletLength": 0.6095999999999999,
           "InletWidth": 0.30479999999999996,
           "PipeDiameter": 0.2032,
-          "DropBelowGirders": 0.3048
+          "DropBelowGirders": 0.3048,
+          "Trench": null
         },
         {
           "Station": 231719.91449152763,
@@ -48940,7 +48985,8 @@
           "InletLength": 0.6095999999999999,
           "InletWidth": 0.30479999999999996,
           "PipeDiameter": 0.2032,
-          "DropBelowGirders": 0.3048
+          "DropBelowGirders": 0.3048,
+          "Trench": null
         },
         {
           "Station": 231722.9103199276,
@@ -48952,7 +48998,8 @@
           "InletLength": 0.6095999999999999,
           "InletWidth": 0.30479999999999996,
           "PipeDiameter": 0.2032,
-          "DropBelowGirders": 0.3048
+          "DropBelowGirders": 0.3048,
+          "Trench": null
         },
         {
           "Station": 231725.9061483276,
@@ -48964,7 +49011,8 @@
           "InletLength": 0.6095999999999999,
           "InletWidth": 0.30479999999999996,
           "PipeDiameter": 0.2032,
-          "DropBelowGirders": 0.3048
+          "DropBelowGirders": 0.3048,
+          "Trench": null
         },
         {
           "Station": 231728.90197672762,
@@ -48976,7 +49024,8 @@
           "InletLength": 0.6095999999999999,
           "InletWidth": 0.30479999999999996,
           "PipeDiameter": 0.2032,
-          "DropBelowGirders": 0.3048
+          "DropBelowGirders": 0.3048,
+          "Trench": null
         },
         {
           "Station": 231731.8978051276,
@@ -48988,7 +49037,8 @@
           "InletLength": 0.6095999999999999,
           "InletWidth": 0.30479999999999996,
           "PipeDiameter": 0.2032,
-          "DropBelowGirders": 0.3048
+          "DropBelowGirders": 0.3048,
+          "Trench": null
         },
         {
           "Station": 231734.89363352762,
@@ -49000,7 +49050,8 @@
           "InletLength": 0.6095999999999999,
           "InletWidth": 0.30479999999999996,
           "PipeDiameter": 0.2032,
-          "DropBelowGirders": 0.3048
+          "DropBelowGirders": 0.3048,
+          "Trench": null
         },
         {
           "Station": 231737.8894619276,
@@ -49012,7 +49063,8 @@
           "InletLength": 0.6095999999999999,
           "InletWidth": 0.30479999999999996,
           "PipeDiameter": 0.2032,
-          "DropBelowGirders": 0.3048
+          "DropBelowGirders": 0.3048,
+          "Trench": null
         }
       ],
       "InspectionAccess": {
@@ -49092,6 +49144,647 @@
         },
         "GratingAboveWebBottom": 0.0635,
         "WalkwayEndClearance": 0.1016
+      },
+      "Misc": {
+        "Unresolved": [
+          "[sign] Unit 2 sign truss: truss CL parallel to the pier at STA 7595\u002B82.22 (pier \u002B 5\u0027-10); sheets 171A/172A give the post lines 2\u0027-2 and 9\u0027-6 ahead of the CL pier (plan sheet 110 \u00222\u0027-2 (TYP.)\u0022); the sheet title-block station 7595\u002B67.24 is the bridge reference, not a sign location.",
+          "[sign] Exit sign bases: station not printed (sheets 104 / 108 show only a tick on the north girder; scaled about 50\u0027-0 back of CL bearing Pier 5WB and about 60\u0027 back of Pier 11WB): not placed.",
+          "[cushion] End posts: start of the end block from the CL pier (scaled about 2\u0027-1 on Ramp A), wedge direction, plan width at the pier end (two 1\u0027-5 rails \u002B gap) and the skewed Ramp G plan are not dimensioned; the I.M. 455 crash cushion has no geometry in the plans."
+        ],
+        "Collectors": [],
+        "PierDrains": [],
+        "SignSupports": [
+          {
+            "Bars": [],
+            "Name": "Sign truss Unit 2 (Pier 7WB)",
+            "Kind": "OverheadTrussBracket",
+            "Support": "Pier 7WB",
+            "Brackets": [
+              {
+                "Girder": 0,
+                "AheadOfSupport": 0.6604,
+                "TopOfBaseElevation": 312.825384,
+                "Height": 2.5908,
+                "BottomFlangeWidth": 0.5588
+              },
+              {
+                "Girder": 0,
+                "AheadOfSupport": 2.8956000000000004,
+                "TopOfBaseElevation": 312.825384,
+                "Height": 2.5908,
+                "BottomFlangeWidth": 0.5588
+              },
+              {
+                "Girder": 10,
+                "AheadOfSupport": 0.6604,
+                "TopOfBaseElevation": 313.434984,
+                "Height": 2.5908,
+                "BottomFlangeWidth": 0.5588
+              },
+              {
+                "Girder": 10,
+                "AheadOfSupport": 2.8956000000000004,
+                "TopOfBaseElevation": 313.434984,
+                "Height": 2.5908,
+                "BottomFlangeWidth": 0.5588
+              }
+            ],
+            "TrussSpan": 30.48,
+            "WebThickness": 0.019049999999999997,
+            "TopPlateThickness": 0.047625,
+            "TopPlateWidth": 0.7111999999999999,
+            "TopPlateLength": 0.7112,
+            "BottomFlangeThickness": 0.03175,
+            "StiffenerThickness": 0.028575,
+            "StiffenerWidth": 0.3175,
+            "StiffenerOffset": 0.3048,
+            "AnchorBoltCount": 8,
+            "AnchorBoltDiameter": 0.038099999999999995,
+            "AnchorCircleDiameter": 0.508,
+            "AnchorStartAngleDegrees": 22.5,
+            "BasePlateDiameter": 0.6604,
+            "BasePlateThickness": 0.0508,
+            "PostOuterDiameter": 0.35559999999999997,
+            "PostWall": 0.0127,
+            "Girder": 0,
+            "BackFromBearing": null,
+            "BlockAlong": 0.6096,
+            "BlockOut": 1.8796000000000002,
+            "BlockHeight": 0.762
+          },
+          {
+            "Bars": [
+              {
+                "Mark": "5x1",
+                "Size": "#5",
+                "Count": 2,
+                "Length": 2.8956000000000004,
+                "WeightLb": 0,
+                "Lengths": null,
+                "Epoxy": true,
+                "Coating": "",
+                "Location": "base bottom"
+              },
+              {
+                "Mark": "5x2",
+                "Size": "#5",
+                "Count": 3,
+                "Length": 5.3086,
+                "WeightLb": 0,
+                "Lengths": null,
+                "Epoxy": true,
+                "Coating": "",
+                "Location": "base hoops horizontal"
+              },
+              {
+                "Mark": "5x3",
+                "Size": "#5",
+                "Count": 4,
+                "Length": 2.4892000000000003,
+                "WeightLb": 0,
+                "Lengths": null,
+                "Epoxy": true,
+                "Coating": "",
+                "Location": "base top"
+              },
+              {
+                "Mark": "5x4",
+                "Size": "#5",
+                "Count": 9,
+                "Length": 2.6416,
+                "WeightLb": 0,
+                "Lengths": null,
+                "Epoxy": true,
+                "Coating": "",
+                "Location": "base hoops transverse vertical"
+              }
+            ],
+            "Name": "Exit sign base Ramp A (Pier 5WB)",
+            "Kind": "ExitSignBase",
+            "Support": "Pier 5WB",
+            "Brackets": [],
+            "TrussSpan": 0,
+            "WebThickness": 0.019049999999999997,
+            "TopPlateThickness": 0.047625,
+            "TopPlateWidth": 0.7111999999999999,
+            "TopPlateLength": 0.7112,
+            "BottomFlangeThickness": 0.03175,
+            "StiffenerThickness": 0.028575,
+            "StiffenerWidth": 0.3175,
+            "StiffenerOffset": 0.3048,
+            "AnchorBoltCount": 8,
+            "AnchorBoltDiameter": 0.038099999999999995,
+            "AnchorCircleDiameter": 0.508,
+            "AnchorStartAngleDegrees": 22.5,
+            "BasePlateDiameter": 0.6604,
+            "BasePlateThickness": 0.0508,
+            "PostOuterDiameter": 0.35559999999999997,
+            "PostWall": 0.0127,
+            "Girder": 0,
+            "BackFromBearing": null,
+            "BlockAlong": 0.6096,
+            "BlockOut": 1.8796000000000002,
+            "BlockHeight": 0.762
+          },
+          {
+            "Bars": [
+              {
+                "Mark": "5x1",
+                "Size": "#5",
+                "Count": 2,
+                "Length": 2.8956000000000004,
+                "WeightLb": 0,
+                "Lengths": null,
+                "Epoxy": true,
+                "Coating": "",
+                "Location": "base bottom"
+              },
+              {
+                "Mark": "5x2",
+                "Size": "#5",
+                "Count": 3,
+                "Length": 5.3086,
+                "WeightLb": 0,
+                "Lengths": null,
+                "Epoxy": true,
+                "Coating": "",
+                "Location": "base hoops horizontal"
+              },
+              {
+                "Mark": "5x3",
+                "Size": "#5",
+                "Count": 4,
+                "Length": 2.4892000000000003,
+                "WeightLb": 0,
+                "Lengths": null,
+                "Epoxy": true,
+                "Coating": "",
+                "Location": "base top"
+              },
+              {
+                "Mark": "5x4",
+                "Size": "#5",
+                "Count": 9,
+                "Length": 2.6416,
+                "WeightLb": 0,
+                "Lengths": null,
+                "Epoxy": true,
+                "Coating": "",
+                "Location": "base hoops transverse vertical"
+              }
+            ],
+            "Name": "Exit sign base Ramp G (Pier 11WB)",
+            "Kind": "ExitSignBase",
+            "Support": "Pier 11WB",
+            "Brackets": [],
+            "TrussSpan": 0,
+            "WebThickness": 0.019049999999999997,
+            "TopPlateThickness": 0.047625,
+            "TopPlateWidth": 0.7111999999999999,
+            "TopPlateLength": 0.7112,
+            "BottomFlangeThickness": 0.03175,
+            "StiffenerThickness": 0.028575,
+            "StiffenerWidth": 0.3175,
+            "StiffenerOffset": 0.3048,
+            "AnchorBoltCount": 8,
+            "AnchorBoltDiameter": 0.038099999999999995,
+            "AnchorCircleDiameter": 0.508,
+            "AnchorStartAngleDegrees": 22.5,
+            "BasePlateDiameter": 0.6604,
+            "BasePlateThickness": 0.0508,
+            "PostOuterDiameter": 0.35559999999999997,
+            "PostWall": 0.0127,
+            "Girder": 0,
+            "BackFromBearing": null,
+            "BlockAlong": 0.6096,
+            "BlockOut": 1.8796000000000002,
+            "BlockHeight": 0.762
+          }
+        ],
+        "EndPosts": [
+          {
+            "Bars": [
+              {
+                "Mark": "6c2",
+                "Size": "#6",
+                "Count": 8,
+                "Length": 1.4224,
+                "WeightLb": 56,
+                "Lengths": null,
+                "Epoxy": true,
+                "Coating": "",
+                "Location": "end block vertical"
+              },
+              {
+                "Mark": "5c4",
+                "Size": "#5",
+                "Count": 6,
+                "Length": 2.159,
+                "WeightLb": 44,
+                "Lengths": null,
+                "Epoxy": true,
+                "Coating": "",
+                "Location": "rail vertical"
+              },
+              {
+                "Mark": "6d1",
+                "Size": "#6",
+                "Count": 24,
+                "Length": 1.0922,
+                "WeightLb": 129,
+                "Lengths": null,
+                "Epoxy": true,
+                "Coating": "",
+                "Location": "rail horizontal"
+              },
+              {
+                "Mark": "6d2",
+                "Size": "#6",
+                "Count": 8,
+                "Length": 2.1844,
+                "WeightLb": 86,
+                "Lengths": null,
+                "Epoxy": true,
+                "Coating": "",
+                "Location": "end block horizontal"
+              },
+              {
+                "Mark": "6d3",
+                "Size": "#6",
+                "Count": 3,
+                "Length": 2.1844,
+                "WeightLb": 32,
+                "Lengths": null,
+                "Epoxy": true,
+                "Coating": "",
+                "Location": "end block horizontal"
+              },
+              {
+                "Mark": "6d4",
+                "Size": "#6",
+                "Count": 2,
+                "Length": 1.0922,
+                "WeightLb": 11,
+                "Lengths": null,
+                "Epoxy": true,
+                "Coating": "",
+                "Location": "rail horizontal"
+              },
+              {
+                "Mark": "5d5",
+                "Size": "#5",
+                "Count": 2,
+                "Length": 2.1844,
+                "WeightLb": 15,
+                "Lengths": null,
+                "Epoxy": true,
+                "Coating": "",
+                "Location": "end block horizontal"
+              },
+              {
+                "Mark": "6c1",
+                "Size": "#6",
+                "Count": 6,
+                "Length": 1.9050000000000002,
+                "WeightLb": 56,
+                "Lengths": null,
+                "Epoxy": false,
+                "Coating": "stainless",
+                "Location": "end block vertical"
+              },
+              {
+                "Mark": "6c3",
+                "Size": "#6",
+                "Count": 10,
+                "Length": 0,
+                "WeightLb": 100,
+                "Lengths": null,
+                "Epoxy": false,
+                "Coating": "stainless",
+                "Location": "end block vertical, vertical leg 3\u0027-4 min to 4\u0027-0 max"
+              },
+              {
+                "Mark": "5c5",
+                "Size": "#5",
+                "Count": 6,
+                "Length": 1.778,
+                "WeightLb": 37,
+                "Lengths": null,
+                "Epoxy": false,
+                "Coating": "stainless",
+                "Location": "rail vertical"
+              },
+              {
+                "Mark": "5c6",
+                "Size": "#5",
+                "Count": 2,
+                "Length": 1.6256,
+                "WeightLb": 11,
+                "Lengths": null,
+                "Epoxy": false,
+                "Coating": "stainless",
+                "Location": "end block vertical"
+              },
+              {
+                "Mark": "5c7",
+                "Size": "#5",
+                "Count": 2,
+                "Length": 1.651,
+                "WeightLb": 11,
+                "Lengths": null,
+                "Epoxy": false,
+                "Coating": "stainless",
+                "Location": "end block vertical"
+              },
+              {
+                "Mark": "5c8",
+                "Size": "#5",
+                "Count": 2,
+                "Length": 1.8034,
+                "WeightLb": 12,
+                "Lengths": null,
+                "Epoxy": false,
+                "Coating": "stainless",
+                "Location": "end block vertical"
+              },
+              {
+                "Mark": "5c9",
+                "Size": "#5",
+                "Count": 2,
+                "Length": 1.8288000000000002,
+                "WeightLb": 13,
+                "Lengths": null,
+                "Epoxy": false,
+                "Coating": "stainless",
+                "Location": "end block vertical"
+              }
+            ],
+            "Name": "Crash cushion end post Ramp A (Pier 5WB)",
+            "Support": "Pier 5WB",
+            "Station": null,
+            "Offset": null,
+            "DirectionDegrees": null,
+            "Length": 2.286,
+            "TaperLength": 1.524,
+            "EndWidth": 0.6096,
+            "PierEndWidth": null,
+            "HeightRailEnd": 1.1176000000000001,
+            "HeightAtEnd": 0.8636,
+            "CushionLength": null
+          },
+          {
+            "Bars": [
+              {
+                "Mark": "6c2",
+                "Size": "#6",
+                "Count": 3,
+                "Length": 1.4224,
+                "WeightLb": 21,
+                "Lengths": null,
+                "Epoxy": true,
+                "Coating": "",
+                "Location": "end block vertical"
+              },
+              {
+                "Mark": "6c4",
+                "Size": "#6",
+                "Count": 5,
+                "Length": 0,
+                "WeightLb": 37,
+                "Lengths": null,
+                "Epoxy": true,
+                "Coating": "",
+                "Location": "end block vertical, varies"
+              },
+              {
+                "Mark": "5c5",
+                "Size": "#5",
+                "Count": 7,
+                "Length": 2.159,
+                "WeightLb": 52,
+                "Lengths": null,
+                "Epoxy": true,
+                "Coating": "",
+                "Location": "rail vertical"
+              },
+              {
+                "Mark": "5c11",
+                "Size": "#5",
+                "Count": 2,
+                "Length": 2.2606,
+                "WeightLb": 15,
+                "Lengths": null,
+                "Epoxy": true,
+                "Coating": "",
+                "Location": "rail vertical"
+              },
+              {
+                "Mark": "6d1",
+                "Size": "#6",
+                "Count": 12,
+                "Length": 1.1684,
+                "WeightLb": 69,
+                "Lengths": null,
+                "Epoxy": true,
+                "Coating": "",
+                "Location": "rail horizontal"
+              },
+              {
+                "Mark": "6d2",
+                "Size": "#6",
+                "Count": 8,
+                "Length": 2.1844,
+                "WeightLb": 86,
+                "Lengths": null,
+                "Epoxy": true,
+                "Coating": "",
+                "Location": "end block horizontal"
+              },
+              {
+                "Mark": "6d3",
+                "Size": "#6",
+                "Count": 4,
+                "Length": 2.1844,
+                "WeightLb": 43,
+                "Lengths": null,
+                "Epoxy": true,
+                "Coating": "",
+                "Location": "end block horizontal"
+              },
+              {
+                "Mark": "6d4",
+                "Size": "#6",
+                "Count": 1,
+                "Length": 1.0414,
+                "WeightLb": 5,
+                "Lengths": null,
+                "Epoxy": true,
+                "Coating": "",
+                "Location": "rail horizontal"
+              },
+              {
+                "Mark": "6d5",
+                "Size": "#6",
+                "Count": 1,
+                "Length": 1.524,
+                "WeightLb": 8,
+                "Lengths": null,
+                "Epoxy": true,
+                "Coating": "",
+                "Location": "rail horizontal"
+              },
+              {
+                "Mark": "6d6",
+                "Size": "#6",
+                "Count": 12,
+                "Length": 1.6764000000000001,
+                "WeightLb": 99,
+                "Lengths": null,
+                "Epoxy": true,
+                "Coating": "",
+                "Location": "rail horizontal"
+              },
+              {
+                "Mark": "5d7",
+                "Size": "#5",
+                "Count": 1,
+                "Length": 2.1844,
+                "WeightLb": 7,
+                "Lengths": null,
+                "Epoxy": true,
+                "Coating": "",
+                "Location": "end block horizontal"
+              },
+              {
+                "Mark": "5d8",
+                "Size": "#5",
+                "Count": 1,
+                "Length": 2.2098,
+                "WeightLb": 8,
+                "Lengths": null,
+                "Epoxy": true,
+                "Coating": "",
+                "Location": "end block horizontal"
+              },
+              {
+                "Mark": "6c1",
+                "Size": "#6",
+                "Count": 6,
+                "Length": 1.9050000000000002,
+                "WeightLb": 56,
+                "Lengths": null,
+                "Epoxy": false,
+                "Coating": "stainless",
+                "Location": "end block vertical"
+              },
+              {
+                "Mark": "6c3",
+                "Size": "#6",
+                "Count": 10,
+                "Length": 0,
+                "WeightLb": 100,
+                "Lengths": null,
+                "Epoxy": false,
+                "Coating": "stainless",
+                "Location": "end block vertical, varies"
+              },
+              {
+                "Mark": "5c6",
+                "Size": "#5",
+                "Count": 7,
+                "Length": 1.778,
+                "WeightLb": 43,
+                "Lengths": null,
+                "Epoxy": false,
+                "Coating": "stainless",
+                "Location": "rail vertical"
+              },
+              {
+                "Mark": "5c7",
+                "Size": "#5",
+                "Count": 2,
+                "Length": 1.7018,
+                "WeightLb": 12,
+                "Lengths": null,
+                "Epoxy": false,
+                "Coating": "stainless",
+                "Location": "end block vertical"
+              },
+              {
+                "Mark": "5c8",
+                "Size": "#5",
+                "Count": 2,
+                "Length": 1.7272,
+                "WeightLb": 12,
+                "Lengths": null,
+                "Epoxy": false,
+                "Coating": "stainless",
+                "Location": "end block vertical"
+              },
+              {
+                "Mark": "5c9",
+                "Size": "#5",
+                "Count": 2,
+                "Length": 1.8796000000000002,
+                "WeightLb": 13,
+                "Lengths": null,
+                "Epoxy": false,
+                "Coating": "stainless",
+                "Location": "end block vertical"
+              },
+              {
+                "Mark": "5c10",
+                "Size": "#5",
+                "Count": 2,
+                "Length": 1.9050000000000002,
+                "WeightLb": 13,
+                "Lengths": null,
+                "Epoxy": false,
+                "Coating": "stainless",
+                "Location": "end block vertical"
+              },
+              {
+                "Mark": "5c12",
+                "Size": "#5",
+                "Count": 2,
+                "Length": 1.8288000000000002,
+                "WeightLb": 13,
+                "Lengths": null,
+                "Epoxy": false,
+                "Coating": "stainless",
+                "Location": "rail vertical"
+              }
+            ],
+            "Name": "Crash cushion end post Ramp G (Pier 11WB)",
+            "Support": "Pier 11WB",
+            "Station": null,
+            "Offset": null,
+            "DirectionDegrees": null,
+            "Length": 2.286,
+            "TaperLength": 1.524,
+            "EndWidth": 0.6096,
+            "PierEndWidth": null,
+            "HeightRailEnd": 1.1176000000000001,
+            "HeightAtEnd": 0.8636,
+            "CushionLength": null
+          }
+        ],
+        "Lighting": {
+          "PoleBases": [],
+          "JunctionBoxes": [],
+          "Conduits": [
+            {
+              "Name": "ITS conduit I-80 WB Unit 2",
+              "Side": "Right",
+              "Kind": "Its",
+              "FromStation": 231376.084872,
+              "ToStation": 231745.83994561245,
+              "NominalDiameter": 0.0508,
+              "HeightAboveBase": 0.508,
+              "FromTrafficFace": 0.127
+            }
+          ]
+        }
       }
     },
     {
@@ -71217,7 +71910,8 @@
           "InletLength": 0.6095999999999999,
           "InletWidth": 0.30479999999999996,
           "PipeDiameter": 0.2032,
-          "DropBelowGirders": 0.3048
+          "DropBelowGirders": 0.3048,
+          "Trench": null
         },
         {
           "Station": 231788.71968239042,
@@ -71229,7 +71923,8 @@
           "InletLength": 0.6095999999999999,
           "InletWidth": 0.30479999999999996,
           "PipeDiameter": 0.2032,
-          "DropBelowGirders": 0.3048
+          "DropBelowGirders": 0.3048,
+          "Trench": null
         },
         {
           "Station": 231804.63352285122,
@@ -71241,7 +71936,8 @@
           "InletLength": 0.6095999999999999,
           "InletWidth": 0.30479999999999996,
           "PipeDiameter": 0.2032,
-          "DropBelowGirders": 0.3048
+          "DropBelowGirders": 0.3048,
+          "Trench": null
         },
         {
           "Station": 231835.08312270883,
@@ -71253,7 +71949,8 @@
           "InletLength": 0.6095999999999999,
           "InletWidth": 0.30479999999999996,
           "PipeDiameter": 0.2032,
-          "DropBelowGirders": 0.3048
+          "DropBelowGirders": 0.3048,
+          "Trench": null
         },
         {
           "Station": 231861.74599546884,
@@ -71265,7 +71962,8 @@
           "InletLength": 0.6095999999999999,
           "InletWidth": 0.30479999999999996,
           "PipeDiameter": 0.2032,
-          "DropBelowGirders": 0.3048
+          "DropBelowGirders": 0.3048,
+          "Trench": null
         },
         {
           "Station": 231879.72096586882,
@@ -71277,7 +71975,8 @@
           "InletLength": 0.6095999999999999,
           "InletWidth": 0.30479999999999996,
           "PipeDiameter": 0.2032,
-          "DropBelowGirders": 0.3048
+          "DropBelowGirders": 0.3048,
+          "Trench": null
         },
         {
           "Station": 231900.69176466882,
@@ -71289,7 +71988,8 @@
           "InletLength": 0.6095999999999999,
           "InletWidth": 0.30479999999999996,
           "PipeDiameter": 0.2032,
-          "DropBelowGirders": 0.3048
+          "DropBelowGirders": 0.3048,
+          "Trench": null
         },
         {
           "Station": 231920.19161172444,
@@ -71301,7 +72001,8 @@
           "InletLength": 0.6095999999999999,
           "InletWidth": 0.30479999999999996,
           "PipeDiameter": 0.2032,
-          "DropBelowGirders": 0.3048
+          "DropBelowGirders": 0.3048,
+          "Trench": null
         },
         {
           "Station": 231941.1624105244,
@@ -71313,7 +72014,8 @@
           "InletLength": 0.6095999999999999,
           "InletWidth": 0.30479999999999996,
           "PipeDiameter": 0.2032,
-          "DropBelowGirders": 0.3048
+          "DropBelowGirders": 0.3048,
+          "Trench": null
         },
         {
           "Station": 231962.1332093244,
@@ -71325,7 +72027,8 @@
           "InletLength": 0.6095999999999999,
           "InletWidth": 0.30479999999999996,
           "PipeDiameter": 0.2032,
-          "DropBelowGirders": 0.3048
+          "DropBelowGirders": 0.3048,
+          "Trench": null
         },
         {
           "Station": 232012.5140555272,
@@ -71337,7 +72040,8 @@
           "InletLength": 0.6095999999999999,
           "InletWidth": 0.30479999999999996,
           "PipeDiameter": 0.2032,
-          "DropBelowGirders": 0.3048
+          "DropBelowGirders": 0.3048,
+          "Trench": null
         },
         {
           "Station": 232015.50988392718,
@@ -71349,7 +72053,8 @@
           "InletLength": 0.6095999999999999,
           "InletWidth": 0.30479999999999996,
           "PipeDiameter": 0.2032,
-          "DropBelowGirders": 0.3048
+          "DropBelowGirders": 0.3048,
+          "Trench": null
         },
         {
           "Station": 232018.5057123272,
@@ -71361,7 +72066,8 @@
           "InletLength": 0.6095999999999999,
           "InletWidth": 0.30479999999999996,
           "PipeDiameter": 0.2032,
-          "DropBelowGirders": 0.3048
+          "DropBelowGirders": 0.3048,
+          "Trench": null
         }
       ],
       "InspectionAccess": {
@@ -71441,6 +72147,520 @@
         },
         "GratingAboveWebBottom": 0.0635,
         "WalkwayEndClearance": 0.1016
+      },
+      "Misc": {
+        "Unresolved": [
+          "[sign] Unit 3 sign truss: the two brackets on girder A (north, top of base 1020.32) are NOT placed - the plan dimension 12\u0027-10 7/8 (I-80 PDF 117) starts from a vertical reference line whose meaning is unresolved; girder A section D-D (PDF 181) was revised (5\u0027-4 5/8, 5\u0027-9 1/2; angles 93d19\u002739\u0022 / 93d00\u002730\u0022, struck values illegible).",
+          "[sign] Sign supports: vertical dimensions \u0022elevation line to level line\u0022 (1\u0027-3 3/4 etc., PDF 178/180), anchor bolt lengths, the HSS 14.000x0.500 post height and the sign truss size / elevation are not in the plans.",
+          "[light] I-80 lighting: East Abutment pole base (10\u0027-0 max from the end of the superstructure), the power conduit side, underdeck junction boxes / stub-outs (7583\u002B40.50, 7588\u002B69.64, 7582\u002B45.00 12\u0027-3 LT, 7582\u002B70.00 57\u0027-11 LT), pier-top Type 2 boxes and expansion fittings are schematic or not dimensioned: not modeled; pole base rebar for the abutment base is scheduled only."
+        ],
+        "Collectors": [],
+        "PierDrains": [],
+        "SignSupports": [
+          {
+            "Bars": [],
+            "Name": "Sign truss Unit 3 (Pier 13WB)",
+            "Kind": "OverheadTrussBracket",
+            "Support": "Pier 13WB",
+            "Brackets": [
+              {
+                "Girder": 9,
+                "AheadOfSupport": 0.6096,
+                "TopOfBaseElevation": 312.212736,
+                "Height": 1.9304000000000001,
+                "BottomFlangeWidth": 0.6604
+              },
+              {
+                "Girder": 9,
+                "AheadOfSupport": 2.8448,
+                "TopOfBaseElevation": 312.212736,
+                "Height": 1.9304000000000001,
+                "BottomFlangeWidth": 0.6604
+              }
+            ],
+            "TrussSpan": 27.432000000000002,
+            "WebThickness": 0.019049999999999997,
+            "TopPlateThickness": 0.047625,
+            "TopPlateWidth": 0.7111999999999999,
+            "TopPlateLength": 0.7112,
+            "BottomFlangeThickness": 0.03175,
+            "StiffenerThickness": 0.028575,
+            "StiffenerWidth": 0.3175,
+            "StiffenerOffset": 0.3048,
+            "AnchorBoltCount": 8,
+            "AnchorBoltDiameter": 0.038099999999999995,
+            "AnchorCircleDiameter": 0.508,
+            "AnchorStartAngleDegrees": 22.5,
+            "BasePlateDiameter": 0.6604,
+            "BasePlateThickness": 0.0508,
+            "PostOuterDiameter": 0.35559999999999997,
+            "PostWall": 0.0127,
+            "Girder": 0,
+            "BackFromBearing": null,
+            "BlockAlong": 0.6096,
+            "BlockOut": 1.8796000000000002,
+            "BlockHeight": 0.762
+          }
+        ],
+        "EndPosts": [],
+        "Lighting": {
+          "PoleBases": [
+            {
+              "Bars": [
+                {
+                  "Mark": "6x1",
+                  "Size": "#6",
+                  "Count": 4,
+                  "Length": 1.8288000000000002,
+                  "WeightLb": 0,
+                  "Lengths": null,
+                  "Epoxy": false,
+                  "Coating": "",
+                  "Location": "base anchor bottom (coating not given)"
+                },
+                {
+                  "Mark": "6x2",
+                  "Size": "#6",
+                  "Count": 3,
+                  "Length": 1.143,
+                  "WeightLb": 0,
+                  "Lengths": null,
+                  "Epoxy": false,
+                  "Coating": "",
+                  "Location": "base anchor middle (coating not given)"
+                },
+                {
+                  "Mark": "6x3",
+                  "Size": "#6",
+                  "Count": 3,
+                  "Length": 1.6002,
+                  "WeightLb": 0,
+                  "Lengths": null,
+                  "Epoxy": false,
+                  "Coating": "",
+                  "Location": "base anchor top (coating not given)"
+                },
+                {
+                  "Mark": "5x4",
+                  "Size": "#5",
+                  "Count": 3,
+                  "Length": 3.1242,
+                  "WeightLb": 0,
+                  "Lengths": null,
+                  "Epoxy": false,
+                  "Coating": "",
+                  "Location": "base hoops horizontal (coating not given)"
+                },
+                {
+                  "Mark": "5x5",
+                  "Size": "#5",
+                  "Count": 5,
+                  "Length": 0,
+                  "WeightLb": 42,
+                  "Lengths": null,
+                  "Epoxy": false,
+                  "Coating": "",
+                  "Location": "base hoops transverse vertical, varies (leg dims 1\u0027-5 5/8, 1\u0027-7 1/4, 1\u0027-9 3/4, 2\u0027-1 1/8, 2\u0027-3 3/4; length from the printed weight; coating not given)"
+                },
+                {
+                  "Mark": "5x11",
+                  "Size": "#5",
+                  "Count": 5,
+                  "Length": 2.2606,
+                  "WeightLb": 0,
+                  "Lengths": null,
+                  "Epoxy": true,
+                  "Coating": "",
+                  "Location": "barrier blockout vertical"
+                },
+                {
+                  "Mark": "5x10",
+                  "Size": "#5",
+                  "Count": 5,
+                  "Length": 1.8288000000000002,
+                  "WeightLb": 0,
+                  "Lengths": null,
+                  "Epoxy": false,
+                  "Coating": "stainless",
+                  "Location": "barrier blockout vertical slab"
+                }
+              ],
+              "Name": "Pole base Pier 13WB",
+              "Support": "Pier 13WB",
+              "AlongFromSupport": -1.524,
+              "Side": "Right",
+              "BoltCircleDiameter": 0.3429,
+              "BoltCount": 4,
+              "BoltDiameter": 0.0254,
+              "BoltLength": 0.5842,
+              "BlockAlong": 0.6096,
+              "BlockOut": 0.762,
+              "TopAboveLedge": 0.127,
+              "HeightAtBarrier": 0.8001,
+              "HeightAtOuterEdge": 0.2794,
+              "SoffitRadius": 0.9144000000000001
+            },
+            {
+              "Bars": [
+                {
+                  "Mark": "6x1",
+                  "Size": "#6",
+                  "Count": 4,
+                  "Length": 1.8288000000000002,
+                  "WeightLb": 0,
+                  "Lengths": null,
+                  "Epoxy": false,
+                  "Coating": "",
+                  "Location": "base anchor bottom (coating not given)"
+                },
+                {
+                  "Mark": "6x2",
+                  "Size": "#6",
+                  "Count": 3,
+                  "Length": 1.143,
+                  "WeightLb": 0,
+                  "Lengths": null,
+                  "Epoxy": false,
+                  "Coating": "",
+                  "Location": "base anchor middle (coating not given)"
+                },
+                {
+                  "Mark": "6x3",
+                  "Size": "#6",
+                  "Count": 3,
+                  "Length": 1.6002,
+                  "WeightLb": 0,
+                  "Lengths": null,
+                  "Epoxy": false,
+                  "Coating": "",
+                  "Location": "base anchor top (coating not given)"
+                },
+                {
+                  "Mark": "5x4",
+                  "Size": "#5",
+                  "Count": 3,
+                  "Length": 3.1242,
+                  "WeightLb": 0,
+                  "Lengths": null,
+                  "Epoxy": false,
+                  "Coating": "",
+                  "Location": "base hoops horizontal (coating not given)"
+                },
+                {
+                  "Mark": "5x5",
+                  "Size": "#5",
+                  "Count": 5,
+                  "Length": 0,
+                  "WeightLb": 42,
+                  "Lengths": null,
+                  "Epoxy": false,
+                  "Coating": "",
+                  "Location": "base hoops transverse vertical, varies (leg dims 1\u0027-5 5/8, 1\u0027-7 1/4, 1\u0027-9 3/4, 2\u0027-1 1/8, 2\u0027-3 3/4; length from the printed weight; coating not given)"
+                },
+                {
+                  "Mark": "5x11",
+                  "Size": "#5",
+                  "Count": 5,
+                  "Length": 2.2606,
+                  "WeightLb": 0,
+                  "Lengths": null,
+                  "Epoxy": true,
+                  "Coating": "",
+                  "Location": "barrier blockout vertical"
+                },
+                {
+                  "Mark": "5x10",
+                  "Size": "#5",
+                  "Count": 5,
+                  "Length": 1.8288000000000002,
+                  "WeightLb": 0,
+                  "Lengths": null,
+                  "Epoxy": false,
+                  "Coating": "stainless",
+                  "Location": "barrier blockout vertical slab"
+                }
+              ],
+              "Name": "Pole base Pier 14WB",
+              "Support": "Pier 14WB",
+              "AlongFromSupport": 0,
+              "Side": "Right",
+              "BoltCircleDiameter": 0.3429,
+              "BoltCount": 4,
+              "BoltDiameter": 0.0254,
+              "BoltLength": 0.5842,
+              "BlockAlong": 0.6096,
+              "BlockOut": 0.762,
+              "TopAboveLedge": 0.127,
+              "HeightAtBarrier": 0.8001,
+              "HeightAtOuterEdge": 0.2794,
+              "SoffitRadius": 0.9144000000000001
+            },
+            {
+              "Bars": [
+                {
+                  "Mark": "6x1",
+                  "Size": "#6",
+                  "Count": 4,
+                  "Length": 1.8288000000000002,
+                  "WeightLb": 0,
+                  "Lengths": null,
+                  "Epoxy": false,
+                  "Coating": "",
+                  "Location": "base anchor bottom (coating not given)"
+                },
+                {
+                  "Mark": "6x2",
+                  "Size": "#6",
+                  "Count": 3,
+                  "Length": 1.143,
+                  "WeightLb": 0,
+                  "Lengths": null,
+                  "Epoxy": false,
+                  "Coating": "",
+                  "Location": "base anchor middle (coating not given)"
+                },
+                {
+                  "Mark": "6x3",
+                  "Size": "#6",
+                  "Count": 3,
+                  "Length": 1.6002,
+                  "WeightLb": 0,
+                  "Lengths": null,
+                  "Epoxy": false,
+                  "Coating": "",
+                  "Location": "base anchor top (coating not given)"
+                },
+                {
+                  "Mark": "5x4",
+                  "Size": "#5",
+                  "Count": 3,
+                  "Length": 3.1242,
+                  "WeightLb": 0,
+                  "Lengths": null,
+                  "Epoxy": false,
+                  "Coating": "",
+                  "Location": "base hoops horizontal (coating not given)"
+                },
+                {
+                  "Mark": "5x5",
+                  "Size": "#5",
+                  "Count": 5,
+                  "Length": 0,
+                  "WeightLb": 42,
+                  "Lengths": null,
+                  "Epoxy": false,
+                  "Coating": "",
+                  "Location": "base hoops transverse vertical, varies (leg dims 1\u0027-5 5/8, 1\u0027-7 1/4, 1\u0027-9 3/4, 2\u0027-1 1/8, 2\u0027-3 3/4; length from the printed weight; coating not given)"
+                },
+                {
+                  "Mark": "5x11",
+                  "Size": "#5",
+                  "Count": 5,
+                  "Length": 2.2606,
+                  "WeightLb": 0,
+                  "Lengths": null,
+                  "Epoxy": true,
+                  "Coating": "",
+                  "Location": "barrier blockout vertical"
+                },
+                {
+                  "Mark": "5x10",
+                  "Size": "#5",
+                  "Count": 5,
+                  "Length": 1.8288000000000002,
+                  "WeightLb": 0,
+                  "Lengths": null,
+                  "Epoxy": false,
+                  "Coating": "stainless",
+                  "Location": "barrier blockout vertical slab"
+                }
+              ],
+              "Name": "Pole base Pier 15WB",
+              "Support": "Pier 15WB",
+              "AlongFromSupport": 0,
+              "Side": "Right",
+              "BoltCircleDiameter": 0.3429,
+              "BoltCount": 4,
+              "BoltDiameter": 0.0254,
+              "BoltLength": 0.5842,
+              "BlockAlong": 0.6096,
+              "BlockOut": 0.762,
+              "TopAboveLedge": 0.127,
+              "HeightAtBarrier": 0.8001,
+              "HeightAtOuterEdge": 0.2794,
+              "SoffitRadius": 0.9144000000000001
+            },
+            {
+              "Bars": [
+                {
+                  "Mark": "6x1",
+                  "Size": "#6",
+                  "Count": 4,
+                  "Length": 1.8288000000000002,
+                  "WeightLb": 0,
+                  "Lengths": null,
+                  "Epoxy": false,
+                  "Coating": "",
+                  "Location": "base anchor bottom (coating not given)"
+                },
+                {
+                  "Mark": "6x2",
+                  "Size": "#6",
+                  "Count": 3,
+                  "Length": 1.143,
+                  "WeightLb": 0,
+                  "Lengths": null,
+                  "Epoxy": false,
+                  "Coating": "",
+                  "Location": "base anchor middle (coating not given)"
+                },
+                {
+                  "Mark": "6x3",
+                  "Size": "#6",
+                  "Count": 3,
+                  "Length": 1.6002,
+                  "WeightLb": 0,
+                  "Lengths": null,
+                  "Epoxy": false,
+                  "Coating": "",
+                  "Location": "base anchor top (coating not given)"
+                },
+                {
+                  "Mark": "5x4",
+                  "Size": "#5",
+                  "Count": 3,
+                  "Length": 3.1242,
+                  "WeightLb": 0,
+                  "Lengths": null,
+                  "Epoxy": false,
+                  "Coating": "",
+                  "Location": "base hoops horizontal (coating not given)"
+                },
+                {
+                  "Mark": "5x5",
+                  "Size": "#5",
+                  "Count": 5,
+                  "Length": 0,
+                  "WeightLb": 42,
+                  "Lengths": null,
+                  "Epoxy": false,
+                  "Coating": "",
+                  "Location": "base hoops transverse vertical, varies (leg dims 1\u0027-5 5/8, 1\u0027-7 1/4, 1\u0027-9 3/4, 2\u0027-1 1/8, 2\u0027-3 3/4; length from the printed weight; coating not given)"
+                },
+                {
+                  "Mark": "5x11",
+                  "Size": "#5",
+                  "Count": 5,
+                  "Length": 2.2606,
+                  "WeightLb": 0,
+                  "Lengths": null,
+                  "Epoxy": true,
+                  "Coating": "",
+                  "Location": "barrier blockout vertical"
+                },
+                {
+                  "Mark": "5x10",
+                  "Size": "#5",
+                  "Count": 5,
+                  "Length": 1.8288000000000002,
+                  "WeightLb": 0,
+                  "Lengths": null,
+                  "Epoxy": false,
+                  "Coating": "stainless",
+                  "Location": "barrier blockout vertical slab"
+                }
+              ],
+              "Name": "Pole base East Abutment",
+              "Support": "East Abut",
+              "AlongFromSupport": null,
+              "Side": "Right",
+              "BoltCircleDiameter": 0.3429,
+              "BoltCount": 4,
+              "BoltDiameter": 0.0254,
+              "BoltLength": 0.5842,
+              "BlockAlong": 0.6096,
+              "BlockOut": 0.762,
+              "TopAboveLedge": 0.127,
+              "HeightAtBarrier": 0.8001,
+              "HeightAtOuterEdge": 0.2794,
+              "SoffitRadius": 0.9144000000000001
+            }
+          ],
+          "JunctionBoxes": [
+            {
+              "Name": "Junction box Pier 13WB back",
+              "Support": "Pier 13WB",
+              "AlongFromSupport": -0.762,
+              "Side": "Right",
+              "Kind": "Unresolved",
+              "Width": 0.4572,
+              "Height": 0.15239999999999998,
+              "Depth": 0.127
+            },
+            {
+              "Name": "Junction box Pier 13WB ahead",
+              "Support": "Pier 13WB",
+              "AlongFromSupport": 0.762,
+              "Side": "Right",
+              "Kind": "Unresolved",
+              "Width": 0.4572,
+              "Height": 0.15239999999999998,
+              "Depth": 0.127
+            },
+            {
+              "Name": "Junction box Pier 14WB back",
+              "Support": "Pier 14WB",
+              "AlongFromSupport": -0.762,
+              "Side": "Right",
+              "Kind": "Unresolved",
+              "Width": 0.4572,
+              "Height": 0.15239999999999998,
+              "Depth": 0.127
+            },
+            {
+              "Name": "Junction box Pier 14WB ahead",
+              "Support": "Pier 14WB",
+              "AlongFromSupport": 0.762,
+              "Side": "Right",
+              "Kind": "Unresolved",
+              "Width": 0.4572,
+              "Height": 0.15239999999999998,
+              "Depth": 0.127
+            },
+            {
+              "Name": "Junction box Pier 15WB back",
+              "Support": "Pier 15WB",
+              "AlongFromSupport": -0.762,
+              "Side": "Right",
+              "Kind": "Unresolved",
+              "Width": 0.4572,
+              "Height": 0.15239999999999998,
+              "Depth": 0.127
+            },
+            {
+              "Name": "Junction box Pier 15WB ahead",
+              "Support": "Pier 15WB",
+              "AlongFromSupport": 0.762,
+              "Side": "Right",
+              "Kind": "Unresolved",
+              "Width": 0.4572,
+              "Height": 0.15239999999999998,
+              "Depth": 0.127
+            }
+          ],
+          "Conduits": [
+            {
+              "Name": "ITS conduit I-80 WB Unit 3",
+              "Side": "Right",
+              "Kind": "Its",
+              "FromStation": 231746.98500486417,
+              "ToStation": 232022.74480951318,
+              "NominalDiameter": 0.0508,
+              "HeightAboveBase": 0.508,
+              "FromTrafficFace": 0.127
+            }
+          ]
+        }
       }
     },
     {
@@ -83485,7 +84705,225 @@
         "GussetThickness": 0.0127,
         "BoltsPerConnection": 4
       },
-      "Drains": [],
+      "Drains": [
+        {
+          "Station": 2056373.6469600003,
+          "Left": true,
+          "FromGutter": 0.2286,
+          "Type": "Trench",
+          "Outlet": "FreeFall",
+          "SplashBasin": false,
+          "InletLength": 0.6095999999999999,
+          "InletWidth": 0.30479999999999996,
+          "PipeDiameter": 0.2032,
+          "DropBelowGirders": 0.3048,
+          "Trench": {
+            "GutterFromEdge": 0.48260000000000003,
+            "InletStartFromGutter": 0.0127,
+            "InletAcrossDeck": 1.2192,
+            "InletAlongRoad": 0.254,
+            "SidePlate": 0.009524999999999999,
+            "TubeFromGutter": 0.9271000000000001,
+            "TubeDiameter": 0.2032,
+            "TubeWall": 0.009524999999999999,
+            "TrenchDepth": 0.10794999999999999,
+            "GrateThickness": 0.038099999999999995,
+            "TubeFromGirderCl": null,
+            "ReferenceGirder": 0,
+            "TableCrossSlope": 0.02,
+            "Collector": "",
+            "Label": "1 (South Abut. ahead)",
+            "BasinSize": 3.048,
+            "BasinDepth": 0.6096
+          }
+        },
+        {
+          "Station": 2056375.1709600003,
+          "Left": true,
+          "FromGutter": 0.2286,
+          "Type": "Trench",
+          "Outlet": "FreeFall",
+          "SplashBasin": false,
+          "InletLength": 0.6095999999999999,
+          "InletWidth": 0.30479999999999996,
+          "PipeDiameter": 0.2032,
+          "DropBelowGirders": 0.3048,
+          "Trench": {
+            "GutterFromEdge": 0.48260000000000003,
+            "InletStartFromGutter": 0.0127,
+            "InletAcrossDeck": 1.2192,
+            "InletAlongRoad": 0.254,
+            "SidePlate": 0.009524999999999999,
+            "TubeFromGutter": 0.9271000000000001,
+            "TubeDiameter": 0.2032,
+            "TubeWall": 0.009524999999999999,
+            "TrenchDepth": 0.10794999999999999,
+            "GrateThickness": 0.038099999999999995,
+            "TubeFromGirderCl": null,
+            "ReferenceGirder": 0,
+            "TableCrossSlope": 0.02,
+            "Collector": "",
+            "Label": "2 (South Abut. ahead)",
+            "BasinSize": 3.048,
+            "BasinDepth": 0.6096
+          }
+        },
+        {
+          "Station": 2056420.8909600002,
+          "Left": true,
+          "FromGutter": 0.2286,
+          "Type": "Trench",
+          "Outlet": "FreeFall",
+          "SplashBasin": true,
+          "InletLength": 0.6095999999999999,
+          "InletWidth": 0.30479999999999996,
+          "PipeDiameter": 0.2032,
+          "DropBelowGirders": 0.3048,
+          "Trench": {
+            "GutterFromEdge": 0.48260000000000003,
+            "InletStartFromGutter": 0.0127,
+            "InletAcrossDeck": 1.2192,
+            "InletAlongRoad": 0.254,
+            "SidePlate": 0.009524999999999999,
+            "TubeFromGutter": 0.9271000000000001,
+            "TubeDiameter": 0.2032,
+            "TubeWall": 0.009524999999999999,
+            "TrenchDepth": 0.10794999999999999,
+            "GrateThickness": 0.038099999999999995,
+            "TubeFromGirderCl": null,
+            "ReferenceGirder": 0,
+            "TableCrossSlope": 0.02,
+            "Collector": "",
+            "Label": "3 (Pier 1G ahead)",
+            "BasinSize": 3.048,
+            "BasinDepth": 0.6096
+          }
+        },
+        {
+          "Station": 2056478.8029600002,
+          "Left": false,
+          "FromGutter": 0.2286,
+          "Type": "Trench",
+          "Outlet": "FreeFall",
+          "SplashBasin": true,
+          "InletLength": 0.6095999999999999,
+          "InletWidth": 0.30479999999999996,
+          "PipeDiameter": 0.2032,
+          "DropBelowGirders": 0.3048,
+          "Trench": {
+            "GutterFromEdge": 0.48260000000000003,
+            "InletStartFromGutter": 0.0127,
+            "InletAcrossDeck": 1.2192,
+            "InletAlongRoad": 0.254,
+            "SidePlate": 0.009524999999999999,
+            "TubeFromGutter": 0.9271000000000001,
+            "TubeDiameter": 0.2032,
+            "TubeWall": 0.009524999999999999,
+            "TrenchDepth": 0.10794999999999999,
+            "GrateThickness": 0.038099999999999995,
+            "TubeFromGirderCl": null,
+            "ReferenceGirder": 0,
+            "TableCrossSlope": 0.0167,
+            "Collector": "",
+            "Label": "4 (Pier 2G ahead)",
+            "BasinSize": 3.048,
+            "BasinDepth": 0.6096
+          }
+        },
+        {
+          "Station": 2056481.8509600002,
+          "Left": false,
+          "FromGutter": 0.2286,
+          "Type": "Trench",
+          "Outlet": "FreeFall",
+          "SplashBasin": true,
+          "InletLength": 0.6095999999999999,
+          "InletWidth": 0.30479999999999996,
+          "PipeDiameter": 0.2032,
+          "DropBelowGirders": 0.3048,
+          "Trench": {
+            "GutterFromEdge": 0.48260000000000003,
+            "InletStartFromGutter": 0.0127,
+            "InletAcrossDeck": 1.2192,
+            "InletAlongRoad": 0.254,
+            "SidePlate": 0.009524999999999999,
+            "TubeFromGutter": 0.9271000000000001,
+            "TubeDiameter": 0.2032,
+            "TubeWall": 0.009524999999999999,
+            "TrenchDepth": 0.10794999999999999,
+            "GrateThickness": 0.038099999999999995,
+            "TubeFromGirderCl": null,
+            "ReferenceGirder": 0,
+            "TableCrossSlope": 0.0202,
+            "Collector": "",
+            "Label": "5 (Pier 2G ahead)",
+            "BasinSize": 3.048,
+            "BasinDepth": 0.6096
+          }
+        },
+        {
+          "Station": 2056536.7149600002,
+          "Left": false,
+          "FromGutter": 0.2286,
+          "Type": "Trench",
+          "Outlet": "FreeFall",
+          "SplashBasin": true,
+          "InletLength": 0.6095999999999999,
+          "InletWidth": 0.30479999999999996,
+          "PipeDiameter": 0.2032,
+          "DropBelowGirders": 0.3048,
+          "Trench": {
+            "GutterFromEdge": 0.48260000000000003,
+            "InletStartFromGutter": 0.0127,
+            "InletAcrossDeck": 1.2192,
+            "InletAlongRoad": 0.254,
+            "SidePlate": 0.009524999999999999,
+            "TubeFromGutter": 0.9271000000000001,
+            "TubeDiameter": 0.2032,
+            "TubeWall": 0.009524999999999999,
+            "TrenchDepth": 0.10794999999999999,
+            "GrateThickness": 0.038099999999999995,
+            "TubeFromGirderCl": null,
+            "ReferenceGirder": 0,
+            "TableCrossSlope": 0.059000000000000004,
+            "Collector": "",
+            "Label": "6 (Pier 3G ahead)",
+            "BasinSize": 3.048,
+            "BasinDepth": 0.6096
+          }
+        },
+        {
+          "Station": 2056582.4349600002,
+          "Left": false,
+          "FromGutter": 0.2286,
+          "Type": "Trench",
+          "Outlet": "FreeFall",
+          "SplashBasin": true,
+          "InletLength": 0.6095999999999999,
+          "InletWidth": 0.30479999999999996,
+          "PipeDiameter": 0.2032,
+          "DropBelowGirders": 0.3048,
+          "Trench": {
+            "GutterFromEdge": 0.48260000000000003,
+            "InletStartFromGutter": 0.0127,
+            "InletAcrossDeck": 1.2192,
+            "InletAlongRoad": 0.254,
+            "SidePlate": 0.009524999999999999,
+            "TubeFromGutter": 0.9271000000000001,
+            "TubeDiameter": 0.2032,
+            "TubeWall": 0.009524999999999999,
+            "TrenchDepth": 0.10794999999999999,
+            "GrateThickness": 0.038099999999999995,
+            "TubeFromGirderCl": null,
+            "ReferenceGirder": 0,
+            "TableCrossSlope": 0.059000000000000004,
+            "Collector": "",
+            "Label": "7 (Pier 4G back)",
+            "BasinSize": 3.048,
+            "BasinDepth": 0.6096
+          }
+        }
+      ],
       "InspectionAccess": {
         "Enabled": true,
         "RopeDiameter": 0.0127,
@@ -83585,6 +85023,68 @@
         },
         "GratingAboveWebBottom": 0.0635,
         "WalkwayEndClearance": 0.1016
+      },
+      "Misc": {
+        "Unresolved": [],
+        "Collectors": [],
+        "PierDrains": [
+          {
+            "Support": "Pier 5G",
+            "CollectRight": true,
+            "TroughSlope": 0.059,
+            "BoxFromGutter": 1.0668000000000002,
+            "BoxLength": 0.6604,
+            "BoxWidth": 0.3048,
+            "BoxHighEndHeight": 0.48260000000000003,
+            "BoxBottomSlope": 0.07619999999999999,
+            "PrintedTroughDrop": 0.508,
+            "PipeNominalDiameter": 0.2032,
+            "Pipe1Slope": 0.08333333333333333,
+            "CapBoxFromColumn": 3.81,
+            "CapBoxLengthN": 0.4064,
+            "CapBoxWidthS": 0.4572,
+            "CapBoxDepth": 0.6096,
+            "CapBoxBelowTop": null,
+            "CapPipeSlope": 0.08,
+            "CapPipeNominalDiameter": 0.2032,
+            "SupportSpacing": 1.8288000000000002,
+            "Outlet": "ErosionMattress",
+            "MattressSize": 1.2192,
+            "MattressThickness": 0.3048,
+            "OutletAboveMattress": 0.3048,
+            "OutletLegLength": 0.3048,
+            "PavementElevation": null,
+            "Collector": ""
+          }
+        ],
+        "SignSupports": [],
+        "EndPosts": [],
+        "Lighting": {
+          "PoleBases": [],
+          "JunctionBoxes": [],
+          "Conduits": [
+            {
+              "Name": "ITS conduit Ramp G Unit 1",
+              "Side": "Right",
+              "Kind": "Its",
+              "FromStation": 2056370.59896,
+              "ToStation": 2056633.793759811,
+              "NominalDiameter": 0.0508,
+              "HeightAboveBase": 0.508,
+              "FromTrafficFace": 0.127
+            },
+            {
+              "Name": "Power conduit Ramp G Unit 1",
+              "Side": "Left",
+              "Kind": "Power",
+              "FromStation": 2056370.59896,
+              "ToStation": 2056633.793759811,
+              "NominalDiameter": 0.0508,
+              "HeightAboveBase": 0.17779999999999999,
+              "FromTrafficFace": 0.127
+            }
+          ]
+        }
       }
     },
     {
@@ -93633,7 +95133,163 @@
         "GussetThickness": 0.0127,
         "BoltsPerConnection": 4
       },
-      "Drains": [],
+      "Drains": [
+        {
+          "Station": 2056638.8229600003,
+          "Left": false,
+          "FromGutter": 0.2286,
+          "Type": "Trench",
+          "Outlet": "FreeFall",
+          "SplashBasin": true,
+          "InletLength": 0.6095999999999999,
+          "InletWidth": 0.30479999999999996,
+          "PipeDiameter": 0.2032,
+          "DropBelowGirders": 0.3048,
+          "Trench": {
+            "GutterFromEdge": 0.48260000000000003,
+            "InletStartFromGutter": 0.0127,
+            "InletAcrossDeck": 1.2192,
+            "InletAlongRoad": 0.254,
+            "SidePlate": 0.009524999999999999,
+            "TubeFromGutter": 0.9271000000000001,
+            "TubeDiameter": 0.2032,
+            "TubeWall": 0.009524999999999999,
+            "TrenchDepth": 0.10794999999999999,
+            "GrateThickness": 0.038099999999999995,
+            "TubeFromGirderCl": null,
+            "ReferenceGirder": 0,
+            "TableCrossSlope": 0.059000000000000004,
+            "Collector": "",
+            "Label": "8 (Pier 5G ahead)",
+            "BasinSize": 3.048,
+            "BasinDepth": 0.6096
+          }
+        },
+        {
+          "Station": 2056675.3989600001,
+          "Left": false,
+          "FromGutter": 0.2286,
+          "Type": "Trench",
+          "Outlet": "FreeFall",
+          "SplashBasin": true,
+          "InletLength": 0.6095999999999999,
+          "InletWidth": 0.30479999999999996,
+          "PipeDiameter": 0.2032,
+          "DropBelowGirders": 0.3048,
+          "Trench": {
+            "GutterFromEdge": 0.48260000000000003,
+            "InletStartFromGutter": 0.0127,
+            "InletAcrossDeck": 1.2192,
+            "InletAlongRoad": 0.254,
+            "SidePlate": 0.009524999999999999,
+            "TubeFromGutter": 0.9271000000000001,
+            "TubeDiameter": 0.2032,
+            "TubeWall": 0.009524999999999999,
+            "TrenchDepth": 0.10794999999999999,
+            "GrateThickness": 0.038099999999999995,
+            "TubeFromGirderCl": null,
+            "ReferenceGirder": 0,
+            "TableCrossSlope": 0.059000000000000004,
+            "Collector": "",
+            "Label": "9 (Pier 6G back)",
+            "BasinSize": 3.048,
+            "BasinDepth": 0.6096
+          }
+        },
+        {
+          "Station": 2056693.68696,
+          "Left": false,
+          "FromGutter": 0.2286,
+          "Type": "Trench",
+          "Outlet": "FreeFall",
+          "SplashBasin": true,
+          "InletLength": 0.6095999999999999,
+          "InletWidth": 0.30479999999999996,
+          "PipeDiameter": 0.2032,
+          "DropBelowGirders": 0.3048,
+          "Trench": {
+            "GutterFromEdge": 0.48260000000000003,
+            "InletStartFromGutter": 0.0127,
+            "InletAcrossDeck": 1.2192,
+            "InletAlongRoad": 0.254,
+            "SidePlate": 0.009524999999999999,
+            "TubeFromGutter": 0.9271000000000001,
+            "TubeDiameter": 0.2032,
+            "TubeWall": 0.009524999999999999,
+            "TrenchDepth": 0.10794999999999999,
+            "GrateThickness": 0.038099999999999995,
+            "TubeFromGirderCl": null,
+            "ReferenceGirder": 0,
+            "TableCrossSlope": 0.059000000000000004,
+            "Collector": "",
+            "Label": "10 (Pier 6G ahead)",
+            "BasinSize": 3.048,
+            "BasinDepth": 0.6096
+          }
+        },
+        {
+          "Station": 2056746.41736,
+          "Left": false,
+          "FromGutter": 0.2286,
+          "Type": "Trench",
+          "Outlet": "FreeFall",
+          "SplashBasin": true,
+          "InletLength": 0.6095999999999999,
+          "InletWidth": 0.30479999999999996,
+          "PipeDiameter": 0.2032,
+          "DropBelowGirders": 0.3048,
+          "Trench": {
+            "GutterFromEdge": 0.48260000000000003,
+            "InletStartFromGutter": 0.0127,
+            "InletAcrossDeck": 1.2192,
+            "InletAlongRoad": 0.254,
+            "SidePlate": 0.009524999999999999,
+            "TubeFromGutter": 0.9271000000000001,
+            "TubeDiameter": 0.2032,
+            "TubeWall": 0.009524999999999999,
+            "TrenchDepth": 0.10794999999999999,
+            "GrateThickness": 0.038099999999999995,
+            "TubeFromGirderCl": null,
+            "ReferenceGirder": 0,
+            "TableCrossSlope": 0.059000000000000004,
+            "Collector": "",
+            "Label": "11 (Pier 7G back)",
+            "BasinSize": 3.048,
+            "BasinDepth": 0.6096
+          }
+        },
+        {
+          "Station": 2056798.8429600003,
+          "Left": false,
+          "FromGutter": 0.2286,
+          "Type": "Trench",
+          "Outlet": "FreeFall",
+          "SplashBasin": true,
+          "InletLength": 0.6095999999999999,
+          "InletWidth": 0.30479999999999996,
+          "PipeDiameter": 0.2032,
+          "DropBelowGirders": 0.3048,
+          "Trench": {
+            "GutterFromEdge": 0.48260000000000003,
+            "InletStartFromGutter": 0.0127,
+            "InletAcrossDeck": 1.2192,
+            "InletAlongRoad": 0.254,
+            "SidePlate": 0.009524999999999999,
+            "TubeFromGutter": 0.9271000000000001,
+            "TubeDiameter": 0.2032,
+            "TubeWall": 0.009524999999999999,
+            "TrenchDepth": 0.10794999999999999,
+            "GrateThickness": 0.038099999999999995,
+            "TubeFromGirderCl": null,
+            "ReferenceGirder": 0,
+            "TableCrossSlope": 0.059000000000000004,
+            "Collector": "",
+            "Label": "12 (Pier 8G back)",
+            "BasinSize": 3.048,
+            "BasinDepth": 0.6096
+          }
+        }
+      ],
       "InspectionAccess": {
         "Enabled": true,
         "RopeDiameter": 0.0127,
@@ -93711,6 +95367,187 @@
         },
         "GratingAboveWebBottom": 0.0635,
         "WalkwayEndClearance": 0.1016
+      },
+      "Misc": {
+        "Unresolved": [
+          "[light] Ramp G lighting: which of the two junction boxes at Pier 8G is power / ITS is not printed; underdeck boxes and stub-outs (67474\u002B90.40, 67475\u002B53.29, 67477\u002B44.79, 67486\u002B92.70, 67487\u002B45.83) and expansion fittings are schematic: not modeled."
+        ],
+        "Collectors": [],
+        "PierDrains": [
+          {
+            "Support": "Pier 9G",
+            "CollectRight": true,
+            "TroughSlope": 0.059,
+            "BoxFromGutter": 1.0668000000000002,
+            "BoxLength": 0.6604,
+            "BoxWidth": 0.3048,
+            "BoxHighEndHeight": 0.48260000000000003,
+            "BoxBottomSlope": 0.07619999999999999,
+            "PrintedTroughDrop": 0.508,
+            "PipeNominalDiameter": 0.2032,
+            "Pipe1Slope": 0.08333333333333333,
+            "CapBoxFromColumn": 3.81,
+            "CapBoxLengthN": 0.4064,
+            "CapBoxWidthS": 0.4572,
+            "CapBoxDepth": 0.6096,
+            "CapBoxBelowTop": null,
+            "CapPipeSlope": 0.08,
+            "CapPipeNominalDiameter": 0.2032,
+            "SupportSpacing": 1.8288000000000002,
+            "Outlet": "ErosionMattress",
+            "MattressSize": 1.2192,
+            "MattressThickness": 0.3048,
+            "OutletAboveMattress": 0.3048,
+            "OutletLegLength": 0.3048,
+            "PavementElevation": null,
+            "Collector": ""
+          }
+        ],
+        "SignSupports": [],
+        "EndPosts": [],
+        "Lighting": {
+          "PoleBases": [
+            {
+              "Bars": [
+                {
+                  "Mark": "6x1",
+                  "Size": "#6",
+                  "Count": 4,
+                  "Length": 1.8288000000000002,
+                  "WeightLb": 0,
+                  "Lengths": null,
+                  "Epoxy": false,
+                  "Coating": "",
+                  "Location": "base anchor bottom (coating not given)"
+                },
+                {
+                  "Mark": "6x2",
+                  "Size": "#6",
+                  "Count": 3,
+                  "Length": 1.143,
+                  "WeightLb": 0,
+                  "Lengths": null,
+                  "Epoxy": false,
+                  "Coating": "",
+                  "Location": "base anchor middle (coating not given)"
+                },
+                {
+                  "Mark": "6x3",
+                  "Size": "#6",
+                  "Count": 3,
+                  "Length": 1.6002,
+                  "WeightLb": 0,
+                  "Lengths": null,
+                  "Epoxy": false,
+                  "Coating": "",
+                  "Location": "base anchor top (coating not given)"
+                },
+                {
+                  "Mark": "5x4",
+                  "Size": "#5",
+                  "Count": 3,
+                  "Length": 3.1242,
+                  "WeightLb": 0,
+                  "Lengths": null,
+                  "Epoxy": false,
+                  "Coating": "",
+                  "Location": "base hoops horizontal (coating not given)"
+                },
+                {
+                  "Mark": "5x5",
+                  "Size": "#5",
+                  "Count": 5,
+                  "Length": 0,
+                  "WeightLb": 42,
+                  "Lengths": null,
+                  "Epoxy": false,
+                  "Coating": "",
+                  "Location": "base hoops transverse vertical, varies (leg dims 1\u0027-5 5/8, 1\u0027-7 1/4, 1\u0027-9 3/4, 2\u0027-1 1/8, 2\u0027-3 3/4; length from the printed weight; coating not given)"
+                },
+                {
+                  "Mark": "5x11",
+                  "Size": "#5",
+                  "Count": 5,
+                  "Length": 2.2606,
+                  "WeightLb": 0,
+                  "Lengths": null,
+                  "Epoxy": true,
+                  "Coating": "",
+                  "Location": "barrier blockout vertical"
+                },
+                {
+                  "Mark": "5x10",
+                  "Size": "#5",
+                  "Count": 5,
+                  "Length": 1.8288000000000002,
+                  "WeightLb": 0,
+                  "Lengths": null,
+                  "Epoxy": false,
+                  "Coating": "stainless",
+                  "Location": "barrier blockout vertical slab"
+                }
+              ],
+              "Name": "Pole base Pier 8G",
+              "Support": "Pier 8G",
+              "AlongFromSupport": 0,
+              "Side": "Right",
+              "BoltCircleDiameter": 0.4064,
+              "BoltCount": 4,
+              "BoltDiameter": 0.0254,
+              "BoltLength": 0.5842,
+              "BlockAlong": 0.6096,
+              "BlockOut": 0.762,
+              "TopAboveLedge": 0.127,
+              "HeightAtBarrier": 0.8001,
+              "HeightAtOuterEdge": 0.2794,
+              "SoffitRadius": 0.9144000000000001
+            }
+          ],
+          "JunctionBoxes": [
+            {
+              "Name": "Junction box Pier 8G back",
+              "Support": "Pier 8G",
+              "AlongFromSupport": -0.762,
+              "Side": "Right",
+              "Kind": "Unresolved",
+              "Width": 0.4572,
+              "Height": 0.15239999999999998,
+              "Depth": 0.127
+            },
+            {
+              "Name": "Junction box Pier 8G ahead",
+              "Support": "Pier 8G",
+              "AlongFromSupport": 0.762,
+              "Side": "Right",
+              "Kind": "Unresolved",
+              "Width": 0.4572,
+              "Height": 0.15239999999999998,
+              "Depth": 0.127
+            }
+          ],
+          "Conduits": [
+            {
+              "Name": "ITS conduit Ramp G Unit 2",
+              "Side": "Right",
+              "Kind": "Its",
+              "FromStation": 2056634.70816019,
+              "ToStation": 2056862.3937598104,
+              "NominalDiameter": 0.0508,
+              "HeightAboveBase": 0.508,
+              "FromTrafficFace": 0.127
+            },
+            {
+              "Name": "Power conduit Ramp G Unit 2",
+              "Side": "Left",
+              "Kind": "Power",
+              "FromStation": 2056634.70816019,
+              "ToStation": 2056862.3937598104,
+              "NominalDiameter": 0.0508,
+              "HeightAboveBase": 0.17779999999999999,
+              "FromTrafficFace": 0.127
+            }
+          ]
+        }
       }
     },
     {
@@ -106504,7 +108341,194 @@
         "GussetThickness": 0.0127,
         "BoltsPerConnection": 4
       },
-      "Drains": [],
+      "Drains": [
+        {
+          "Station": 2056871.9949600003,
+          "Left": false,
+          "FromGutter": 0.2286,
+          "Type": "Trench",
+          "Outlet": "FreeFall",
+          "SplashBasin": true,
+          "InletLength": 0.6095999999999999,
+          "InletWidth": 0.30479999999999996,
+          "PipeDiameter": 0.2032,
+          "DropBelowGirders": 0.3048,
+          "Trench": {
+            "GutterFromEdge": 0.48260000000000003,
+            "InletStartFromGutter": 0.0127,
+            "InletAcrossDeck": 1.2192,
+            "InletAlongRoad": 0.254,
+            "SidePlate": 0.009524999999999999,
+            "TubeFromGutter": 0.9271000000000001,
+            "TubeDiameter": 0.2032,
+            "TubeWall": 0.009524999999999999,
+            "TrenchDepth": 0.10794999999999999,
+            "GrateThickness": 0.038099999999999995,
+            "TubeFromGirderCl": null,
+            "ReferenceGirder": 0,
+            "TableCrossSlope": 0.059000000000000004,
+            "Collector": "",
+            "Label": "13 (Pier 9G ahead)",
+            "BasinSize": 3.048,
+            "BasinDepth": 0.6096
+          }
+        },
+        {
+          "Station": 2056917.7149600002,
+          "Left": false,
+          "FromGutter": 0.2286,
+          "Type": "Trench",
+          "Outlet": "FreeFall",
+          "SplashBasin": true,
+          "InletLength": 0.6095999999999999,
+          "InletWidth": 0.30479999999999996,
+          "PipeDiameter": 0.2032,
+          "DropBelowGirders": 0.3048,
+          "Trench": {
+            "GutterFromEdge": 0.48260000000000003,
+            "InletStartFromGutter": 0.0127,
+            "InletAcrossDeck": 1.2192,
+            "InletAlongRoad": 0.254,
+            "SidePlate": 0.009524999999999999,
+            "TubeFromGutter": 0.9271000000000001,
+            "TubeDiameter": 0.2032,
+            "TubeWall": 0.009524999999999999,
+            "TrenchDepth": 0.10794999999999999,
+            "GrateThickness": 0.038099999999999995,
+            "TubeFromGirderCl": null,
+            "ReferenceGirder": 0,
+            "TableCrossSlope": 0.059000000000000004,
+            "Collector": "",
+            "Label": "14 (Pier 10G back)",
+            "BasinSize": 3.048,
+            "BasinDepth": 0.6096
+          }
+        },
+        {
+          "Station": 2057007.6309600002,
+          "Left": false,
+          "FromGutter": 0.2286,
+          "Type": "Trench",
+          "Outlet": "FreeFall",
+          "SplashBasin": true,
+          "InletLength": 0.6095999999999999,
+          "InletWidth": 0.30479999999999996,
+          "PipeDiameter": 0.2032,
+          "DropBelowGirders": 0.3048,
+          "Trench": {
+            "GutterFromEdge": 0.48260000000000003,
+            "InletStartFromGutter": 0.0127,
+            "InletAcrossDeck": 1.2192,
+            "InletAlongRoad": 0.254,
+            "SidePlate": 0.009524999999999999,
+            "TubeFromGutter": 0.9271000000000001,
+            "TubeDiameter": 0.2032,
+            "TubeWall": 0.009524999999999999,
+            "TrenchDepth": 0.10794999999999999,
+            "GrateThickness": 0.038099999999999995,
+            "TubeFromGirderCl": null,
+            "ReferenceGirder": 0,
+            "TableCrossSlope": 0.059000000000000004,
+            "Collector": "",
+            "Label": "15 (Pier 11G ahead)",
+            "BasinSize": 3.048,
+            "BasinDepth": 0.6096
+          }
+        },
+        {
+          "Station": 2057062.4949600003,
+          "Left": false,
+          "FromGutter": 0.2286,
+          "Type": "Trench",
+          "Outlet": "FreeFall",
+          "SplashBasin": true,
+          "InletLength": 0.6095999999999999,
+          "InletWidth": 0.30479999999999996,
+          "PipeDiameter": 0.2032,
+          "DropBelowGirders": 0.3048,
+          "Trench": {
+            "GutterFromEdge": 0.48260000000000003,
+            "InletStartFromGutter": 0.0127,
+            "InletAcrossDeck": 1.2192,
+            "InletAlongRoad": 0.254,
+            "SidePlate": 0.009524999999999999,
+            "TubeFromGutter": 0.9271000000000001,
+            "TubeDiameter": 0.2032,
+            "TubeWall": 0.009524999999999999,
+            "TrenchDepth": 0.10794999999999999,
+            "GrateThickness": 0.038099999999999995,
+            "TubeFromGirderCl": null,
+            "ReferenceGirder": 0,
+            "TableCrossSlope": 0.059000000000000004,
+            "Collector": "",
+            "Label": "16 (Pier 12G back)",
+            "BasinSize": 3.048,
+            "BasinDepth": 0.6096
+          }
+        },
+        {
+          "Station": 2057131.07496,
+          "Left": false,
+          "FromGutter": 0.2286,
+          "Type": "Trench",
+          "Outlet": "FreeFall",
+          "SplashBasin": true,
+          "InletLength": 0.6095999999999999,
+          "InletWidth": 0.30479999999999996,
+          "PipeDiameter": 0.2032,
+          "DropBelowGirders": 0.3048,
+          "Trench": {
+            "GutterFromEdge": 0.48260000000000003,
+            "InletStartFromGutter": 0.0127,
+            "InletAcrossDeck": 1.2192,
+            "InletAlongRoad": 0.254,
+            "SidePlate": 0.009524999999999999,
+            "TubeFromGutter": 0.9271000000000001,
+            "TubeDiameter": 0.2032,
+            "TubeWall": 0.009524999999999999,
+            "TrenchDepth": 0.10794999999999999,
+            "GrateThickness": 0.038099999999999995,
+            "TubeFromGirderCl": null,
+            "ReferenceGirder": 0,
+            "TableCrossSlope": 0.059000000000000004,
+            "Collector": "",
+            "Label": "17 (Pier 13G back)",
+            "BasinSize": 3.048,
+            "BasinDepth": 0.6096
+          }
+        },
+        {
+          "Station": 2057185.9389600002,
+          "Left": false,
+          "FromGutter": 0.2286,
+          "Type": "Trench",
+          "Outlet": "FreeFall",
+          "SplashBasin": true,
+          "InletLength": 0.6095999999999999,
+          "InletWidth": 0.30479999999999996,
+          "PipeDiameter": 0.2032,
+          "DropBelowGirders": 0.3048,
+          "Trench": {
+            "GutterFromEdge": 0.48260000000000003,
+            "InletStartFromGutter": 0.0127,
+            "InletAcrossDeck": 1.2192,
+            "InletAlongRoad": 0.254,
+            "SidePlate": 0.009524999999999999,
+            "TubeFromGutter": 0.9271000000000001,
+            "TubeDiameter": 0.2032,
+            "TubeWall": 0.009524999999999999,
+            "TrenchDepth": 0.10794999999999999,
+            "GrateThickness": 0.038099999999999995,
+            "TubeFromGirderCl": null,
+            "ReferenceGirder": 0,
+            "TableCrossSlope": 0.059000000000000004,
+            "Collector": "",
+            "Label": "18 (Pier 14G back)",
+            "BasinSize": 3.048,
+            "BasinDepth": 0.6096
+          }
+        }
+      ],
       "InspectionAccess": {
         "Enabled": true,
         "RopeDiameter": 0.0127,
@@ -106582,6 +108606,68 @@
         },
         "GratingAboveWebBottom": 0.0635,
         "WalkwayEndClearance": 0.1016
+      },
+      "Misc": {
+        "Unresolved": [],
+        "Collectors": [],
+        "PierDrains": [
+          {
+            "Support": "Pier 14G",
+            "CollectRight": true,
+            "TroughSlope": 0.059,
+            "BoxFromGutter": 1.0668000000000002,
+            "BoxLength": 0.6604,
+            "BoxWidth": 0.3048,
+            "BoxHighEndHeight": 0.48260000000000003,
+            "BoxBottomSlope": 0.07619999999999999,
+            "PrintedTroughDrop": 0.508,
+            "PipeNominalDiameter": 0.2032,
+            "Pipe1Slope": 0.08333333333333333,
+            "CapBoxFromColumn": 3.81,
+            "CapBoxLengthN": 0.4064,
+            "CapBoxWidthS": 0.4572,
+            "CapBoxDepth": 0.6096,
+            "CapBoxBelowTop": null,
+            "CapPipeSlope": 0.08,
+            "CapPipeNominalDiameter": 0.2032,
+            "SupportSpacing": 1.8288000000000002,
+            "Outlet": "ErosionMattress",
+            "MattressSize": 1.2192,
+            "MattressThickness": 0.3048,
+            "OutletAboveMattress": 0.3048,
+            "OutletLegLength": 0.3048,
+            "PavementElevation": null,
+            "Collector": ""
+          }
+        ],
+        "SignSupports": [],
+        "EndPosts": [],
+        "Lighting": {
+          "PoleBases": [],
+          "JunctionBoxes": [],
+          "Conduits": [
+            {
+              "Name": "ITS conduit Ramp G Unit 3",
+              "Side": "Right",
+              "Kind": "Its",
+              "FromStation": 2056863.3081601902,
+              "ToStation": 2057191.57775981,
+              "NominalDiameter": 0.0508,
+              "HeightAboveBase": 0.508,
+              "FromTrafficFace": 0.127
+            },
+            {
+              "Name": "Power conduit Ramp G Unit 3",
+              "Side": "Left",
+              "Kind": "Power",
+              "FromStation": 2056863.3081601902,
+              "ToStation": 2057191.57775981,
+              "NominalDiameter": 0.0508,
+              "HeightAboveBase": 0.17779999999999999,
+              "FromTrafficFace": 0.127
+            }
+          ]
+        }
       }
     },
     {
@@ -118941,7 +121027,225 @@
         "GussetThickness": 0.0127,
         "BoltsPerConnection": 4
       },
-      "Drains": [],
+      "Drains": [
+        {
+          "Station": 2057235.9261600003,
+          "Left": false,
+          "FromGutter": 0.2286,
+          "Type": "Trench",
+          "Outlet": "FreeFall",
+          "SplashBasin": true,
+          "InletLength": 0.6095999999999999,
+          "InletWidth": 0.30479999999999996,
+          "PipeDiameter": 0.2032,
+          "DropBelowGirders": 0.3048,
+          "Trench": {
+            "GutterFromEdge": 0.48260000000000003,
+            "InletStartFromGutter": 0.0127,
+            "InletAcrossDeck": 1.2192,
+            "InletAlongRoad": 0.254,
+            "SidePlate": 0.009524999999999999,
+            "TubeFromGutter": 0.9271000000000001,
+            "TubeDiameter": 0.2032,
+            "TubeWall": 0.009524999999999999,
+            "TrenchDepth": 0.10794999999999999,
+            "GrateThickness": 0.038099999999999995,
+            "TubeFromGirderCl": null,
+            "ReferenceGirder": 0,
+            "TableCrossSlope": 0.0516,
+            "Collector": "",
+            "Label": "19 (Pier 15G back)",
+            "BasinSize": 3.048,
+            "BasinDepth": 0.6096
+          }
+        },
+        {
+          "Station": 2057266.71096,
+          "Left": false,
+          "FromGutter": 0.2286,
+          "Type": "Trench",
+          "Outlet": "FreeFall",
+          "SplashBasin": true,
+          "InletLength": 0.6095999999999999,
+          "InletWidth": 0.30479999999999996,
+          "PipeDiameter": 0.2032,
+          "DropBelowGirders": 0.3048,
+          "Trench": {
+            "GutterFromEdge": 0.48260000000000003,
+            "InletStartFromGutter": 0.0127,
+            "InletAcrossDeck": 1.2192,
+            "InletAlongRoad": 0.254,
+            "SidePlate": 0.009524999999999999,
+            "TubeFromGutter": 0.9271000000000001,
+            "TubeDiameter": 0.2032,
+            "TubeWall": 0.009524999999999999,
+            "TrenchDepth": 0.10794999999999999,
+            "GrateThickness": 0.038099999999999995,
+            "TubeFromGirderCl": null,
+            "ReferenceGirder": 0,
+            "TableCrossSlope": 0.0176,
+            "Collector": "",
+            "Label": "20 (Pier 15G ahead)",
+            "BasinSize": 3.048,
+            "BasinDepth": 0.6096
+          }
+        },
+        {
+          "Station": 2057274.3309600002,
+          "Left": false,
+          "FromGutter": 0.2286,
+          "Type": "Trench",
+          "Outlet": "FreeFall",
+          "SplashBasin": true,
+          "InletLength": 0.6095999999999999,
+          "InletWidth": 0.30479999999999996,
+          "PipeDiameter": 0.2032,
+          "DropBelowGirders": 0.3048,
+          "Trench": {
+            "GutterFromEdge": 0.48260000000000003,
+            "InletStartFromGutter": 0.0127,
+            "InletAcrossDeck": 1.2192,
+            "InletAlongRoad": 0.254,
+            "SidePlate": 0.009524999999999999,
+            "TubeFromGutter": 0.9271000000000001,
+            "TubeDiameter": 0.2032,
+            "TubeWall": 0.009524999999999999,
+            "TrenchDepth": 0.10794999999999999,
+            "GrateThickness": 0.038099999999999995,
+            "TubeFromGirderCl": null,
+            "ReferenceGirder": 0,
+            "TableCrossSlope": 0.0091,
+            "Collector": "",
+            "Label": "21 (Pier 15G ahead)",
+            "BasinSize": 3.048,
+            "BasinDepth": 0.6096
+          }
+        },
+        {
+          "Station": 2057445.9333600001,
+          "Left": true,
+          "FromGutter": 0.2286,
+          "Type": "Trench",
+          "Outlet": "PipedToPier",
+          "SplashBasin": false,
+          "InletLength": 0.6095999999999999,
+          "InletWidth": 0.30479999999999996,
+          "PipeDiameter": 0.2032,
+          "DropBelowGirders": 0.3048,
+          "Trench": {
+            "GutterFromEdge": 0.48260000000000003,
+            "InletStartFromGutter": 0.0127,
+            "InletAcrossDeck": 1.2192,
+            "InletAlongRoad": 0.254,
+            "SidePlate": 0.009524999999999999,
+            "TubeFromGutter": 0.9271000000000001,
+            "TubeDiameter": 0.2032,
+            "TubeWall": 0.009524999999999999,
+            "TrenchDepth": 0.10794999999999999,
+            "GrateThickness": 0.038099999999999995,
+            "TubeFromGirderCl": 0.508,
+            "ReferenceGirder": 0,
+            "TableCrossSlope": 0.059000000000000004,
+            "Collector": "Span 19G collection pipe",
+            "Label": "22 (Pier 18G ahead)",
+            "BasinSize": 3.048,
+            "BasinDepth": 0.6096
+          }
+        },
+        {
+          "Station": 2057461.1733600001,
+          "Left": true,
+          "FromGutter": 0.2286,
+          "Type": "Trench",
+          "Outlet": "PipedToPier",
+          "SplashBasin": false,
+          "InletLength": 0.6095999999999999,
+          "InletWidth": 0.30479999999999996,
+          "PipeDiameter": 0.2032,
+          "DropBelowGirders": 0.3048,
+          "Trench": {
+            "GutterFromEdge": 0.48260000000000003,
+            "InletStartFromGutter": 0.0127,
+            "InletAcrossDeck": 1.2192,
+            "InletAlongRoad": 0.254,
+            "SidePlate": 0.009524999999999999,
+            "TubeFromGutter": 0.9271000000000001,
+            "TubeDiameter": 0.2032,
+            "TubeWall": 0.009524999999999999,
+            "TrenchDepth": 0.10794999999999999,
+            "GrateThickness": 0.038099999999999995,
+            "TubeFromGirderCl": 0.508,
+            "ReferenceGirder": 0,
+            "TableCrossSlope": 0.059000000000000004,
+            "Collector": "Span 19G collection pipe",
+            "Label": "23 (Pier 18G ahead)",
+            "BasinSize": 3.048,
+            "BasinDepth": 0.6096
+          }
+        },
+        {
+          "Station": 2057476.4133600001,
+          "Left": true,
+          "FromGutter": 0.2286,
+          "Type": "Trench",
+          "Outlet": "PipedToPier",
+          "SplashBasin": false,
+          "InletLength": 0.6095999999999999,
+          "InletWidth": 0.30479999999999996,
+          "PipeDiameter": 0.2032,
+          "DropBelowGirders": 0.3048,
+          "Trench": {
+            "GutterFromEdge": 0.48260000000000003,
+            "InletStartFromGutter": 0.0127,
+            "InletAcrossDeck": 1.2192,
+            "InletAlongRoad": 0.254,
+            "SidePlate": 0.009524999999999999,
+            "TubeFromGutter": 0.9271000000000001,
+            "TubeDiameter": 0.2032,
+            "TubeWall": 0.009524999999999999,
+            "TrenchDepth": 0.10794999999999999,
+            "GrateThickness": 0.038099999999999995,
+            "TubeFromGirderCl": 0.508,
+            "ReferenceGirder": 0,
+            "TableCrossSlope": 0.059000000000000004,
+            "Collector": "Span 19G collection pipe",
+            "Label": "24 (Pier 19G back)",
+            "BasinSize": 3.048,
+            "BasinDepth": 0.6096
+          }
+        },
+        {
+          "Station": 2057487.0813600002,
+          "Left": true,
+          "FromGutter": 0.2286,
+          "Type": "Trench",
+          "Outlet": "PipedToPier",
+          "SplashBasin": false,
+          "InletLength": 0.6095999999999999,
+          "InletWidth": 0.30479999999999996,
+          "PipeDiameter": 0.2032,
+          "DropBelowGirders": 0.3048,
+          "Trench": {
+            "GutterFromEdge": 0.48260000000000003,
+            "InletStartFromGutter": 0.0127,
+            "InletAcrossDeck": 1.2192,
+            "InletAlongRoad": 0.254,
+            "SidePlate": 0.009524999999999999,
+            "TubeFromGutter": 0.9271000000000001,
+            "TubeDiameter": 0.2032,
+            "TubeWall": 0.009524999999999999,
+            "TrenchDepth": 0.10794999999999999,
+            "GrateThickness": 0.038099999999999995,
+            "TubeFromGirderCl": 0.508,
+            "ReferenceGirder": 0,
+            "TableCrossSlope": 0.059000000000000004,
+            "Collector": "Span 19G collection pipe",
+            "Label": "25 (Pier 19G back)",
+            "BasinSize": 3.048,
+            "BasinDepth": 0.6096
+          }
+        }
+      ],
       "InspectionAccess": {
         "Enabled": true,
         "RopeDiameter": 0.0127,
@@ -119019,6 +121323,106 @@
         },
         "GratingAboveWebBottom": 0.0635,
         "WalkwayEndClearance": 0.1016
+      },
+      "Misc": {
+        "Unresolved": [],
+        "Collectors": [
+          {
+            "Name": "Span 19G collection pipe",
+            "NominalDiameter": 0.30479999999999996,
+            "ReferenceGirder": 0,
+            "OffsetFromGirder": 0.508,
+            "Slope": 0.0178,
+            "StartStation": 2057445.9333600001,
+            "EndSupport": "Pier 19G",
+            "Points": [
+              {
+                "Station": 2057445.9333600001,
+                "DeckTopToCl": 0.8382000000000001,
+                "Note": "drain 22"
+              },
+              {
+                "Station": 2057461.1733600001,
+                "DeckTopToCl": 1.0382250000000002,
+                "Note": "drain 23"
+              },
+              {
+                "Station": 2057476.4133600001,
+                "DeckTopToCl": 1.279525,
+                "Note": "drain 24"
+              },
+              {
+                "Station": 2057487.0813600002,
+                "DeckTopToCl": 1.45415,
+                "Note": "drain 25"
+              }
+            ],
+            "HangerSpacing": 1.524,
+            "CouplerStations": [
+              2057459.9541600002,
+              2057475.1941600002,
+              2057486.47176
+            ]
+          }
+        ],
+        "PierDrains": [
+          {
+            "Support": "Pier 19G",
+            "CollectRight": false,
+            "TroughSlope": 0.049,
+            "BoxFromGutter": 1.2192,
+            "BoxLength": 0.6604,
+            "BoxWidth": 0.3048,
+            "BoxHighEndHeight": 0.48260000000000003,
+            "BoxBottomSlope": 0.07619999999999999,
+            "PrintedTroughDrop": 0.508,
+            "PipeNominalDiameter": 0.2032,
+            "Pipe1Slope": 0.08333333333333333,
+            "CapBoxFromColumn": -5.584825,
+            "CapBoxLengthN": 0.4064,
+            "CapBoxWidthS": 0.4572,
+            "CapBoxDepth": 0.6096,
+            "CapBoxBelowTop": null,
+            "CapPipeSlope": 0.08,
+            "CapPipeNominalDiameter": 0.30479999999999996,
+            "SupportSpacing": 1.2192,
+            "Outlet": "Pavement",
+            "MattressSize": 1.2192,
+            "MattressThickness": 0.3048,
+            "OutletAboveMattress": 0.3048,
+            "OutletLegLength": 0.3048,
+            "PavementElevation": 299.0088,
+            "Collector": "Span 19G collection pipe"
+          }
+        ],
+        "SignSupports": [],
+        "EndPosts": [],
+        "Lighting": {
+          "PoleBases": [],
+          "JunctionBoxes": [],
+          "Conduits": [
+            {
+              "Name": "ITS conduit Ramp G Unit 4",
+              "Side": "Right",
+              "Kind": "Its",
+              "FromStation": 2057192.49216019,
+              "ToStation": 2057490.1335039116,
+              "NominalDiameter": 0.0508,
+              "HeightAboveBase": 0.508,
+              "FromTrafficFace": 0.127
+            },
+            {
+              "Name": "Power conduit Ramp G Unit 4",
+              "Side": "Left",
+              "Kind": "Power",
+              "FromStation": 2057192.49216019,
+              "ToStation": 2057490.1335039116,
+              "NominalDiameter": 0.0508,
+              "HeightAboveBase": 0.17779999999999999,
+              "FromTrafficFace": 0.127
+            }
+          ]
+        }
       }
     }
   ],
