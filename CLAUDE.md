@@ -98,6 +98,14 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
     pile uplift V-bars through the web holes of `UpliftPiles`) and `SubstructureReinforcementDefinition.CapBars` (longitudinal rows, side bars, hoops with the height solved from the
     listed length, cantilever hoops, ties, hairpins, ends, c7, pedestal bars; all inside the lower, narrower cap section). Counts / sizes / lengths = the plan bar list so weights reproduce it;
     positions follow documented simple rules (zones and sketches not all decoded). Data generated from the plan bar lists: `samples/plans/pier-rebar-i80.csx`, `pier-rebar-ramp-g.csx`.
+  - Plan BEND DIAGRAMS (`SubstructurePlanShapes.cs`; `PlanBarGroup.Shape/Dims/Pin`, hairpin `ZoneStations/ZoneMargin`, skin-bar `End`; abutment `PlanBarLine.Shaped`): plan convention is
+    "ALL DIMENSIONS ARE OUT TO OUT. D = PIN DIAMETER" and the bar-list length = the plain SUM of the out-to-out segments (no bend deductions). `PlanBent/PlanU/PlanL/PlanA14/PlanHoop` build
+    the `BarShape` (Dimensions = printed values, centerline = outline inset db/2, printed pin, FixedLength = listed) and the sharp 3D centerline; marks: 5m1/5n1 pedestal U, 5a13/6a14 end U,
+    5a14/6a15 end bars in the longitudinal plane (leg + top run + slanted leg along the raked face), 5c5/5c6 (5c3/5c4) hairpins = U across the width (3 1/2" clear at both faces) hanging from the top
+    in the plan's zone order, 4c7/4c5 U, 11g/10g bottom mats U, 6c1/6c2/5n2 hoops with lap tails (`PlanHoop`), 6b2 cantilever flat + slant (`CS`), 5a11/5a12 short end bars. Data is appended to the
+    csx lines as `;S=shape:dims:pin` (+ `;Z=..;M=..` hairpins, `;E=-1/1`) by `tools/patch_*.py` from `tools/extract_all.py`/`shapes.py` (plan text + fraction glyph decoder `plantext.py`);
+    plan vs model for every mark: `docs/plan-data/bend-diagram-comparison.md` (`tools/compare.py`, `make_doc.py`; abutment diagrams hand-read in `tools/abut_hand.py`). Bars are never moved to
+    satisfy cover - containment violations are raised. `LateralSetback` continues each relief line level beyond its ends (the plans' arcs start at the cap tips).
   - As-designed abutment (OPTIONAL `SubstructureDefinition.Abutment`, `AbutmentDefinition.cs`; null = parametric abutment): `SubstructureAbutment.cs`
     (`AddSlab` = prism between two vertical planes with per-vertex elevation functions; end lines are alignment offsets, so S depends on N),
     `SubstructureAbutmentRebar.cs` (only proven placements in 3D, rest of the plan bar list = schedule-only marks, mismatches = warnings),

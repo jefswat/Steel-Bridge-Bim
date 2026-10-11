@@ -402,6 +402,34 @@ public class SubstructureTests
     }
 
     [Fact]
+    public void PlanBars_BendDiagrams_KeepThePrintedOutToOutDimensions()
+    {
+        // Printed: 4c7 U 4'-8 base, 4 1/2" legs (D 2"); 6c1 hoop 3'-7 x 6'-8 with 1'-0 / 1'-0 lap tails (D 4 1/2"); listed lengths are the plain sums of the printed dimensions.
+        var m = Build(p =>
+        {
+            p.CapWidth = Ft(6); p.CapDepth = Ft(7);
+            p.Reinforcement.CapBars = new()
+            {
+                new PlanBarGroup { Mark = "4c7", Kind = PlanBarKind.CapTransverse, Size = "#4", Count = 6, Length = In(65), Shape = "U", Dims = new[] { In(4.5), In(56), In(4.5) }, Pin = In(2) },
+                new PlanBarGroup { Mark = "6c1", Kind = PlanBarKind.CapHoop, Size = "#6", Count = 10, Length = In(270), Shape = "HOOP", Dims = new[] { In(43), In(80), In(12), In(12) }, Pin = In(4.5) },
+            };
+        });
+        var u = m.Units.Single(x => x.Type == SupportType.Pier);
+        var marks = m.Marks.Where(k => k.Unit == u.Name && k.Location.Contains(" cap")).ToList();
+        var c7 = marks.First(k => k.Location.Contains("4c7"));
+        Assert.Equal("U", c7.Shape.Code);
+        Assert.Equal(In(56), c7.Shape.Dimensions.Single(d => d.Letter == "B").Value, 6);
+        Assert.Equal(In(4.5), c7.Shape.Dimensions.Single(d => d.Letter == "A").Value, 6);
+        Assert.Equal(In(2), c7.Shape.PinDiameter, 6);
+        Assert.Equal(In(65), c7.Length, 6);                                                       // listed length = 56 + 2 x 4 1/2
+        var hoop = marks.First(k => k.Location.Contains("6c1"));
+        Assert.Equal("HOOP", hoop.Shape.Code);
+        Assert.Equal(In(270), hoop.Length, 6);                                                    // 2 (43 + 80) + 12 + 12
+        Assert.Equal(In(43), hoop.Shape.Dimensions.Single(d => d.Letter == "B").Value, 6);
+        Assert.Equal(In(80), hoop.Shape.Dimensions.Single(d => d.Letter == "A").Value, 6);
+    }
+
+    [Fact]
     public void PlanBars_Containment_ReportsBarsOutsideTheCap_AndNothingElse()
     {
         SubstructureModel Run(double hairpinLength) => Build(p =>

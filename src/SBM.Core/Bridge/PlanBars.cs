@@ -37,5 +37,21 @@ public sealed class PlanBarGroup
     public bool Vertical { get; set; }
     /// <summary>True = top mat (footing mats only).</summary>
     public bool Top { get; set; }
+    /// <summary>
+    /// The plan's bend diagram of this mark (OPTIONAL; "" = straight or not read): "U" = <see cref="Dims"/> {leg, base, leg}, "L" = {leg, long run},
+    /// "A14" = {vertical leg, top run, slanted leg length, slanted leg horizontal projection}. All out-to-out as the plans print them
+    /// (the bar list length = their sum, no bend deductions).
+    /// </summary>
+    public string Shape { get; set; } = "";
+    /// <summary>Printed dimensions of <see cref="Shape"/> (meters, order as documented there).</summary>
+    public double[] Dims { get; set; } = Array.Empty<double>();
+    /// <summary>Printed pin (bend) diameter D of the bend diagram, meters; 0 = not printed / straight.</summary>
+    public double Pin { get; set; }
+    /// <summary>Hairpins (5c5 / 5c6): stations of THIS mark in each zone of the plan's elevation (zones left to right, 0 = zone of another mark; "N SPA. @ 1'-4; k-5c5 BARS" gives k / 2 stations).</summary>
+    public int[] ZoneStations { get; set; } = Array.Empty<int>();
+    /// <summary>Distance of the first / last station from the top end of the cap (the plan's "4" / "6"), meters.</summary>
+    public double ZoneMargin { get; set; }
+    /// <summary>Short cap skin bars (5a11 / 5a12): -1 = at the begin (left, S0) end of the cap, +1 = at the far end, 0 = not read from the plan elevation.</summary>
+    public int End { get; set; }
     public PlanBarGroup Clone() => (PlanBarGroup)MemberwiseClone();
 }

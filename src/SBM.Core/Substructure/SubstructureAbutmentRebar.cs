@@ -8,7 +8,7 @@ namespace SBM.Core.Substructure;
 /// <summary>
 /// Reinforcing of the as-designed abutment. Only bars whose placement the plans PROVE are placed in 3D: the footing longitudinals (rows from the
 /// section: 6 / 4 equal spaces), the footing hoops at the pile pitch, and the backwall verticals (placement strings, printed straight lengths).
-/// Every other mark of the plan bar list is entered in the schedule at its printed count and length ("schedule only": no 3D bar, no bend diagram)
+/// Every other mark of the plan bar list is entered in the schedule at its printed count and length ("schedule only": no 3D bar; the bend diagram is entered where read)
 /// and reported in one warning, so nothing is placed by a rule the plans do not state. Count differences between the placement strings and
 /// the list are reported, never adjusted.
 /// </summary>
@@ -125,7 +125,7 @@ public sealed partial class SubstructureGenerator
             }
             marks.Add(new BarMark
             {
-                Mark = line.Mark, Size = size, Shape = BarShape.Straight(line.Length), Location = LocationOf(line.Mark) + " (schedule only)", Unit = unit.Name,
+                Mark = line.Mark, Size = size, Shape = ScheduleShape(line, size), Location = LocationOf(line.Mark) + " (schedule only)", Unit = unit.Name,
                 Epoxy = epoxy && line.Mark != "5d5", Count = line.Count, VaryingLengths = varying,
             });
             scheduleOnly.Add($"{line.Mark} x{line.Count}");
@@ -137,10 +137,45 @@ public sealed partial class SubstructureGenerator
                 Warn($"{name}: bar {line.Mark}: {mk.Count} bars from the placement string / section vs {line.Count} in the plan bar list - NOT adjusted (list rows at the corners / ends are not drawn).");
         }
         if (scheduleOnly.Count > 0)
-            Warn($"{name}: reinforcing - only the footing longitudinals, footing hoops at the pile pitch and the backwall verticals are placed in 3D; the plan bar list rows without a proven placement are in the schedule at the printed count/length (no 3D bar, no bend diagram): {string.Join(", ", scheduleOnly)}.");
+            Warn($"{name}: reinforcing - only the footing longitudinals, footing hoops at the pile pitch and the backwall verticals are placed in 3D; the plan bar list rows without a proven placement are in the schedule at the printed count/length (no 3D bar; schedule shape = the plan bend diagram where it was read: U, L, hoop, hat, V marks): {string.Join(", ", scheduleOnly)}.");
         if (ad.Wings.Any(w => w.UpliftPiles.Count == 0))
             Warn($"{name}: UNRESOLVED - the circled wing-footing piles (pile uplift anchors 8j3, 8 bars = 4 circled piles) could not be identified from the sheets; no anchor is placed (the 8j3 line stays in the schedule).");
         lock (m) { m.Marks.AddRange(marks); m.Bars.AddRange(places); }
+    }
+
+    /// <summary>Schedule shape of a plan bar-list line from its read bend diagram (no 3D placement); straight when no diagram is entered.</summary>
+    private static BarShape ScheduleShape(PlanBarLine line, RebarSize size)
+    {
+        var d = line.Dims;
+        double len = line.Length;
+        switch (line.Shape)
+        {
+            case "U" when d.Length == 3: return PlanU(size, d[0], d[1], d[2], line.Pin, len).shape;
+            case "L" when d.Length == 2: return PlanL(size, d[0], d[1], line.Pin, len).shape;
+            case "HOOP" when d.Length == 4: return PlanHoop(size, d[0], d[1], d[2], d[3], line.Pin, len).shape;
+            case "HAT" when d.Length == 5:
+            {
+                var c = new[] { new Vec2(0, 0), new Vec2(d[0], 0), new Vec2(d[0], d[1]), new Vec2(d[0] + d[2], d[1]), new Vec2(d[0] + d[2], 0), new Vec2(d[0] + d[2] + d[4], 0) };
+                double pin = line.Pin > 0 ? line.Pin : size.MinPinDiameter;
+                var bends = new List<(Vec2, double)>();
+                var sh = new BarShape { Code = "HAT", Description = "Hat bar, out to out", Centerline = BarShape.Rounded(c, pin / 2 + size.Diameter / 2, bends), PinDiameter = pin, FixedLength = len };
+                sh.Bends.AddRange(bends);
+                for (int i = 0; i < 5; i++) sh.Dimensions.Add(new BarDimension(((char)('A' + i)).ToString(), d[i], c[i], c[i + 1], new Vec2(0, 1)));
+                return sh;
+            }
+            case "V" when d.Length == 3:
+            {
+                double pin = line.Pin > 0 ? line.Pin : size.MinPinDiameter;
+                var c = new[] { new Vec2(-d[1] / 2, d[2]), new Vec2(0, 0), new Vec2(d[1] / 2, d[2]) };
+                var bends = new List<(Vec2, double)>();
+                var sh = new BarShape { Code = "V", Description = "V bar, out to out", Centerline = BarShape.Rounded(c, pin / 2 + size.Diameter / 2, bends), PinDiameter = pin, FixedLength = len };
+                sh.Bends.AddRange(bends);
+                sh.Dimensions.Add(new BarDimension("A", d[0], c[1], c[0], new Vec2(-1, 0)));
+                sh.Dimensions.Add(new BarDimension("W", d[1], c[0], c[2], new Vec2(0, 1)));
+                return sh;
+            }
+        }
+        return BarShape.Straight(len);
     }
 
     private static string LocationOf(string mark) => mark switch

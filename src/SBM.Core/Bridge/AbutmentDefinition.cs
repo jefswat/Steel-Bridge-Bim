@@ -100,6 +100,13 @@ public sealed class PlanBarLine
     public double Length { get; set; }
     public double WeightLb { get; set; }
     public bool Varies { get; set; }
+    /// <summary>The plan's bend diagram of this mark (schedule shape, no 3D placement): "U" {leg, base, leg}, "L" {leg, run}, "HOOP" {w, h, lap, lap}, "HAT" {foot, leg, top, leg, foot},
+    /// "V" {arm, width, depth}; all out to out as printed. "" = straight / not entered.</summary>
+    public string Shape { get; set; } = "";
+    public double[] Dims { get; set; } = Array.Empty<double>();
+    /// <summary>Printed pin diameter D of the diagram (m).</summary>
+    public double Pin { get; set; }
+    public PlanBarLine Shaped(string shape, double pin, params double[] dims) { Shape = shape; Pin = pin; Dims = dims; return this; }
     public PlanBarLine() { }
     public PlanBarLine(string mark, int count, double length, double weightLb, bool varies = false) { Mark = mark; Count = count; Length = length; WeightLb = weightLb; Varies = varies; }
 }
