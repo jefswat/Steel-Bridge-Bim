@@ -175,10 +175,28 @@ public static class SectionViews
         var rf = deck.Reinforcement;
         if (rf.Enabled && ctx.Options.IncludeRebar)
         {
-            var tt = RebarCatalog.Size(rf.TopTransverseSize);
-            var bt = RebarCatalog.Size(rf.BottomTransverseSize);
-            var tl = RebarCatalog.Size(rf.TopLongitudinalSize);
-            var bl = RebarCatalog.Size(rf.BottomLongitudinalSize);
+            // sizes / spacings: the generic layout, or the plan-driven one (the main transverse zones, the longitudinal bays)
+            string ttName = rf.TopTransverseSize, btName = rf.BottomTransverseSize, tlName = rf.TopLongitudinalSize, blName = rf.BottomLongitudinalSize;
+            double ttSp = rf.TopTransverseSpacing, btSp = rf.BottomTransverseSpacing, tlSp = rf.TopLongitudinalSpacing, blSp = rf.BottomLongitudinalSpacing;
+            bool planned = rf.Plan != null;
+            if (rf.Plan is { } pl)
+            {
+                var zt = pl.Transverse.Where(z => z.Layer == DeckBarLayer.Top && z.BetweenZone < 0).OrderByDescending(z => z.Count).FirstOrDefault();
+                var zb = pl.Transverse.Where(z => z.Layer == DeckBarLayer.Bottom && z.BetweenZone < 0).OrderByDescending(z => z.Count).FirstOrDefault();
+                if (zt != null) { ttName = zt.Size; ttSp = zt.Spacing; }
+                if (zb != null) { btName = zb.Size; btSp = zb.Spacing; }
+                var zl = pl.Longitudinal.FirstOrDefault(z => z.Spaces > 0);
+                if (zl != null)
+                {
+                    tlName = blName = zl.Size;
+                    double bay = gx.Count > 1 ? gx[1].o - gx[0].o : 3.5;
+                    tlSp = blSp = 2 * Math.Max(0.05, bay - zl.LeftMargin - zl.RightMargin) / zl.Spaces;
+                }
+            }
+            var tt = RebarCatalog.Size(ttName);
+            var bt = RebarCatalog.Size(btName);
+            var tl = RebarCatalog.Size(tlName);
+            var bl = RebarCatalog.Size(blName);
             double x0 = l + rf.SideCover, x1 = r - rf.SideCover;
             var xr = xs.Where(x => x > x0 && x < x1).Prepend(x0).Append(x1).ToList();
             var topBar = xr.Select(o => new Vec2(o, Top(o) - rf.TopCover - tt.Diameter / 2)).ToList();
@@ -186,16 +204,18 @@ public static class SectionViews
             d.Poly(SheetLayers.Rebar, topBar);
             d.Poly(SheetLayers.Rebar, botBar);
             double dot = Math.Max(d.Paper(0.01), tl.Diameter / 2);
-            for (double o = x0 + rf.TopLongitudinalSpacing / 2; o < x1; o += rf.TopLongitudinalSpacing)
+            for (double o = x0 + tlSp / 2; o < x1; o += tlSp)
                 d.Circle(SheetLayers.Rebar, new Vec2(o, Top(o) - rf.TopCover - tt.Diameter - tl.Diameter / 2), dot, true);
-            for (double o = x0 + rf.BottomLongitudinalSpacing / 2; o < x1; o += rf.BottomLongitudinalSpacing)
+            for (double o = x0 + blSp / 2; o < x1; o += blSp)
                 d.Circle(SheetLayers.Rebar, new Vec2(o, Top(o) - t + rf.BottomCover + bt.Diameter + bl.Diameter / 2), dot, true);
             double lx = gx.Count > 1 ? (gx[^2].o + gx[^1].o) / 2 : (x0 + x1) / 2;
             string S(double v) => u.FormatLength(v, LengthKind.Short);
+            string longT = planned ? $"{tlName} @ {S(tlSp)} LONGIT. (ALT. TOP & BOTT.)" : $"{tlName} @ {S(tlSp)} LONGIT.";
+            string longB = planned ? $"{blName} @ {S(blSp)} LONGIT. (ALT. TOP & BOTT.)" : $"{blName} @ {S(blSp)} LONGIT.";
             d.Leader(new Vec2(lx, Top(lx) - rf.TopCover), new Vec2(lx + d.Paper(0.5), Top(lx) + d.Paper(0.55)),
-                $"{rf.TopTransverseSize} @ {S(rf.TopTransverseSpacing)} TOP TRANSV., {rf.TopLongitudinalSize} @ {S(rf.TopLongitudinalSpacing)} LONGIT. ({S(rf.TopCover)} CLR)");
+                $"{ttName} @ {S(ttSp)} TOP TRANSV., {longT} ({S(rf.TopCover)} CLR)");
             d.Leader(new Vec2(lx + d.Paper(0.2), Top(lx) - t + rf.BottomCover), new Vec2(lx + d.Paper(0.7), Top(lx) - t - d.Paper(1.1)),
-                $"{rf.BottomTransverseSize} @ {S(rf.BottomTransverseSpacing)} BOTT. TRANSV., {rf.BottomLongitudinalSize} @ {S(rf.BottomLongitudinalSpacing)} LONGIT. ({S(rf.BottomCover)} CLR)");
+                $"{btName} @ {S(btSp)} BOTT. TRANSV., {longB} ({S(rf.BottomCover)} CLR)");
         }
 
         // ---- dimensions

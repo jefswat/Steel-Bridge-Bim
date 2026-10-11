@@ -168,4 +168,25 @@ public class DeckPlanRebarTests
         Assert.Contains("min bottom cover 1\"", note);
         Assert.Contains("steel clashes 0 bars", note);
     }
+
+    [Fact]
+    public void IfcExport_WithPlanBarsAndScheduleOnlyMarks_Works()
+    {
+        var doc = SbmDocument.Sample();
+        var r = doc.Project.Bridges[0].Deck.Reinforcement;
+        r.Plan = new DeckPlanReinforcement();
+        r.Plan.Transverse.Add(new DeckTransverseZone { Layer = DeckBarLayer.Top, Size = "#7", StartDistance = Ft(60), Spacing = In(7), Count = 6, Pieces = { new DeckLinePiece { Mark = "7a1" } } });
+        r.Plan.Longitudinal.Add(new DeckLongZone { Left = DeckLongRef.OfGirder(1), Right = DeckLongRef.OfGirder(2), Spaces = 8, LeftMargin = In(8.5), RightMargin = In(8.5), Mark = "6b1", ClosureMark = "6b2", StockLength = Ft(40), Lap = Ft(3) });
+        r.Plan.PlanBarList.Add(new DeckPlanBarLine { Mark = "5e1", Size = "#5", Count = 30, Length = Ft(9), WeightLb = 280 });
+        doc.Regenerate();
+        string path = Path.Combine(Path.GetTempPath(), "sbm_planbars_" + Guid.NewGuid().ToString("N") + ".ifc");
+        try
+        {
+            doc.ExportIfc(path);
+            string text = File.ReadAllText(path);
+            int n = System.Text.RegularExpressions.Regex.Matches(text, @"IFCREINFORCINGBAR[(]").Count;
+            Assert.True(n >= doc.Concrete().Bars.Count);       // deck bars (+ the substructure bars of the sample)
+        }
+        finally { try { File.Delete(path); } catch (IOException) { } }
+    }
 }
