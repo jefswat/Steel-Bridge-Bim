@@ -222,6 +222,9 @@ public sealed class SubstructureReinforcementDefinition
     public FlareTieType FlareTieStyle { get; set; } = FlareTieType.ClosedTie;
     /// <summary>Out-to-out overlap along S of the pair (hairpins: between the leg ends; hoops: between the outside faces of the closing legs).</summary>
     public double FlareTieOverlap { get; set; }
+    /// <summary>Pairs only: number of equal spaces between the levels (plans' "N SPA. @ ABT. s"), 3" above the footing to 3" below
+    /// the plinth top; 0 = equal spaces not exceeding <see cref="FlareTieSpacing"/>.</summary>
+    public int FlareTieSpaces { get; set; }
 
     // ---- Footing dowels / column splices (chamfered columns on a footing; ColumnSplice = Continuous keeps the old behaviour).
     // One L-shaped dowel (90 degree hook at the bottom, lying on the bottom mat) per column bar. Elevations are measured above the
