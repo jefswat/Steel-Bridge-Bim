@@ -88,3 +88,22 @@ crossties, verticals, dowels) mesh within 2 % (about −1.1 %, the polygonal dis
 450° with lap, single arcs up to 340°) mesh within 1.1 %. The hoops are reported "open" (643) because the 450° hoop's lap
 overlaps itself (non-manifold edges where the sweep re-enters its own volume); the volume is still right. The old 2–4×
 figure is most likely the same volume-about-origin artefact on such non-closed meshes. Nothing to fix in the exporter.
+
+## IFC 4.3 alignment (2026-10-11, branch ifc-alignment)
+
+`IfcAlignmentWriter` replaces the 3D polyline axis with the bSI alignment layout (horizontal LINE / CIRCULARARC / CLOTHOID,
+vertical CONSTANTGRADIENT / PARABOLICARC, zero-length end segments), IfcCompositeCurve + IfcGradientCurve and stationing
+referents. Checked with `tools/ifc-alignment-points.csx` + `tools/check_ifc_alignment.py` (ifcopenshell.geom
+function_item_evaluator vs SBM `Alignment.PointAtDistance` / `VerticalProfile.ElevationAt`, every 2.5 m plus element and
+vertical breakpoints), `tools/validate_ifc.py` and the US bridge IDS `usBrSpec_General.ids`:
+
+| Model | Alignment | Horizontal | Vertical segs | Max plan / height dev | Schema + EXPRESS (alignment) | IDS Alignment specs |
+|---|---|---|---|---|---|---|
+| Synthetic (spirals L/R, sym + unsym VC, station equation) | Spiral test | 10 | 9 | 0.0005 / 0.0016 mm | 0 | 7/7 pass |
+| Woodbury I-29 NB over Floyd (arc, PGL 5 ft RT) | CL I-29 | 4 | 4 | 0.0000 / 0.0021 mm | 0 | 7/7 pass |
+| Br02069 TH65 | SB65 | 2 | 4 | 0.0000 / 0.0000 mm | 0 | 7/7 pass |
+| I-80 WB and Ramp G (alignments only, abv mode) | I-80 WB, Ramp G | 4, 6 | 188, 9 | 0.0000 / 0.0055 mm | 0 | 7/7 pass |
+
+Layout vs geometry (ifcopenshell.api.alignment maps each layout segment to geometry; end vs next segment start): max 0.0012 mm.
+The full Woodbury / Br02069 exports have 15 / 7 schema issues, all `IfcBeam` `.GIRDER.` (not in ADD2 IfcBeamTypeEnum,
+prestressed beams) — unrelated to the alignment.
