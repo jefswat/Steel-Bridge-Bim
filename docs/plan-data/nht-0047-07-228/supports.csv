@@ -1,0 +1,17 @@
+support,station_layout,station_foundation_schedule,shaft_offset_ft,shaft_dia_ft,skew_to_tangent,pier_line_bearing,support_type,superstructure_back,superstructure_ahead,source,tag,note
+Abutment 1,20+49.30 (face of backwall),20+49.30,4.500 LT / 4.500 RT,3.0 (2 shafts),90 deg,N 40 deg 38'49.54" E,abutment (2 drilled shafts),-,Tx28 unit spans 1-3,PDF p.94 / sh 145; p.84 / sh 135,RASTER,SEJ-B(MOD)(4") + BS-EJCP at abutment
+Pier 2,20+97.18,20+97.18,-,4.0,90 deg,N 45 deg 34'41.18" E,single-column approach pier,Tx28,Tx28,PDF p.94 / sh 145,RASTER,
+Pier 3,21+27.18,21+27.18,-,4.0,90 deg,N 74 deg 13'33.58" E,single-column approach pier,Tx28,Tx28,PDF p.94 / sh 145,RASTER,
+Pier 4,21+57.18,21+57.18,-,4.0,90 deg,S 77 deg 07'34.02" E,single-column approach pier,Tx28 (end of unit 1-3),Tx28 (unit 4-6),PDF p.94 / sh 145,RASTER,expansion joint between units
+Pier 5,21+87.18,21+87.18,-,4.0,90 deg,S 48 deg 28'41.61" E,single-column approach pier,Tx28,Tx28,PDF p.94 / sh 145,RASTER,
+Pier 6,22+17.18,22+17.18,3.782 RT,4.0,90 deg,S 19 deg 49'49.21" E,single-column approach pier (P6 & 7 type),Tx28,Tx28,PDF p.94 / sh 145,RASTER,shaft offset right
+Pier 7,22+54.18,22+54.18,3.782 RT,4.0,90 deg,S 02 deg 47'08.14" E,single-column approach pier (P6 & 7 type),Tx28 (end unit 4-6),Tx28 (unit 7-9),PDF p.94 / sh 145,RASTER,expansion joint (SEJ-B(MOD) 4") at CL pier 7
+Pier 8,23+13.74,23+13.74,-,4.0,90 deg,S 06 deg 14'22.28" W,single-column approach pier,Tx28,Tx28,PDF p.94 / sh 145,RASTER,
+Pier 9,23+38.74,23+38.74,-,4.0,90 deg,S 11 deg 58'08.76" W,single-column approach pier,Tx28,Tx28,PDF p.94 / sh 145,RASTER,
+Pier 10 (arch pier),24+17.92,24+17.92,0.584 LT,6.5,19 deg 34'40.83" (p.102: 19 deg 34'41" to tangent of curve at CL pier),S 00 deg 11'21.26" E,hammerhead arch pier (cap 24'-0 x 6'-0),Tx28 (end unit 7-9; SEJ 9 1/4 back of CL pier),tied arch (partially fixed elastomeric bearings),PDF p.94 / sh 145; p.102 / sh 153,RASTER,shaft offset 0.584 ft = 7 in = CL1 offset from CL pier (p.119)
+Pier 11 (arch pier),26+19.60,26+19.60,0.584 RT,6.5,19 deg 34'40.83",S 00 deg 11'49.94" E,hammerhead arch pier,tied arch,Tx28 (unit 11-12; SEJ 9 1/4 ahead of CL pier),PDF p.94 / sh 145; p.102 / sh 153,RASTER,
+Pier 12,26+86.87,26+86.67,-,4.0,90 deg,S 06 deg 14'11.62" W (layout N 06 deg 14'12" E),single-column approach pier,Tx28,Tx28,PDF p.87 / sh 138 (layout); p.94 / sh 145,RASTER,STATION CONFLICT 0.20 ft - see UNRESOLVED U2; 27+42.87 - 56.00 = 26+86.87 supports the layout
+Pier 13,27+42.87,27+42.87,-,4.0,90 deg,S 00 deg 13'49.49" E,single-column approach pier,Tx28 (end unit 11-12),Tx28 (unit 13-15),PDF p.94 / sh 145,RASTER,expansion joint
+Pier 14,27+98.87,27+98.87,3.782 RT,4.0,90 deg,S 00 deg 13'49.49" E,single-column approach pier (P14 & 15 type),Tx28,Tx28,PDF p.94 / sh 145,RASTER,
+Pier 15,28+54.87,28+54.87,3.782 RT,4.0,90 deg,S 05 deg 50'19.38" W,single-column approach pier (P14 & 15 type),Tx28,Tx28,PDF p.94 / sh 145,RASTER,
+Abutment 16,29+10.87 (face of backwall),29+10.87,4.500 LT / 4.500 RT,3.0 (2 shafts),90 deg,S 05 deg 03'08.70" W,abutment (2 drilled shafts),Tx28 unit spans 13-15,-,PDF p.94 / sh 145,RASTER,
