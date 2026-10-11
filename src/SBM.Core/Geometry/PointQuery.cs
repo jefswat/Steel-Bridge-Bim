@@ -38,8 +38,30 @@ public sealed record PointReadout(Vec3 World, string Alignment, double Station, 
     public double DeltaToProfile => World.Z - ProfileElevation;
 }
 
+/// <summary>A distance between two points expressed in an alignment's directions. <see cref="DStation"/> /
+/// <see cref="DOffset"/> follow the (curved) alignment: change in distance along it and change in offset (right +).
+/// <see cref="AlongTangent"/> / <see cref="AcrossTangent"/> split the straight plan vector A→B along and across the
+/// alignment's tangent at A's station (across: right +).</summary>
+public sealed record AlignmentDelta(string Alignment, double DStation, double DOffset, double AlongTangent, double AcrossTangent, double DZ,
+    bool OnAlignment);
+
 public static class PointQuery
 {
+    /// <summary>A→B in the station / offset directions of one alignment (both points projected onto the same one).</summary>
+    public static AlignmentDelta? Delta(Alignment a, Vec3 from, Vec3 to)
+    {
+        if (a.Elements.Count == 0) return null;
+        var sa = a.Inverse(from.XY);
+        var sb = a.Inverse(to.XY);
+        var (_, ang) = a.EvaluateAtDistance(Math.Clamp(sa.Distance, 0, a.Length));
+        var t = Vec2.FromAngle(ang);
+        var d = to.XY - from.XY;
+        double along = d.X * t.X + d.Y * t.Y;
+        double across = Vec2.Dot(d, t.Right);
+        return new AlignmentDelta(a.Name, sb.Distance - sa.Distance, sb.Offset - sa.Offset, along, across, to.Z - from.Z,
+            sa.OnAlignment && sb.OnAlignment);
+    }
+
     /// <summary>Station / offset / grades of a world point on one alignment (stations honor station equations).</summary>
     public static PointReadout? Query(Alignment a, Vec3 world)
     {

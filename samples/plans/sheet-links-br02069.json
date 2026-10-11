@@ -1,0 +1,110 @@
+{
+  // Plan sheet links of the Br02069 model (MnDOT Br. 02069, T.H. 65 S.B. over 117th Ave; one span, seven 30MH PPC beams).
+  // Format: see sheet-links-i80-rampg.json (header) and docs/API.md "Companion database". Sheet index and families:
+  // docs/plan-data/br02069-th65/INDEX.md (PDF page = sheet number for all 39 pages). The titles are written here because the
+  // split tool's title-block reader (Iowa DOT blocks) does not read the MnDOT / HDR title box.
+  // Hierarchy in this model: unit > superstructure > prestressed girder (assembly: beam, strands, debond sheathing) | bearing pad;
+  //   unit > deck > deck slab, barrier group > barrier; unit > substructure > abutment > cap group (pedestals / beam steps) |
+  //   backwall group | footing group (footing, piles) | maskwall group. Concrete end diaphragms and all rebar are not in the database yet.
+
+  "models": [ "Br02069 TH65.sbm" ],
+  "planFolders": [ "plans", "C:/SBMData" ],
+
+  "planSets": [
+    { "id": "br02069", "pdf": "Br02069*.pdf", "bridgeGroup": "Br02069 TH65 SB",
+      "sheets": [
+        { "p": 1, "s": "1", "t": "GENERAL PLAN AND ELEVATION" },
+        { "p": 2, "s": "2", "t": "TRANSVERSE SECTION, CONSTRUCTION NOTES & SOQ" },
+        { "p": 3, "s": "3", "t": "BRIDGE LAYOUT" },
+        { "p": 4, "s": "4", "t": "SOUTH ABUTMENT DETAILS 1" },
+        { "p": 5, "s": "5", "t": "SOUTH ABUTMENT DETAILS 2" },
+        { "p": 6, "s": "6", "t": "SOUTH ABUTMENT REINFORCEMENT 1" },
+        { "p": 7, "s": "7", "t": "SOUTH ABUTMENT REINFORCEMENT 2" },
+        { "p": 8, "s": "8", "t": "SOUTH ABUTMENT REINFORCEMENT 3" },
+        { "p": 9, "s": "9", "t": "NORTH ABUTMENT DETAILS 1" },
+        { "p": 10, "s": "10", "t": "NORTH ABUTMENT DETAILS 2" },
+        { "p": 11, "s": "11", "t": "ABUTMENT DETAILS" },
+        { "p": 12, "s": "12", "t": "NORTH ABUTMENT REINFORCEMENT 1" },
+        { "p": 13, "s": "13", "t": "NORTH ABUTMENT REINFORCEMENT 2" },
+        { "p": 14, "s": "14", "t": "NORTH ABUTMENT REINFORCEMENT 3" },
+        { "p": 15, "s": "15", "t": "FRAMING PLAN" },
+        { "p": 16, "s": "16", "t": "30MH PRESTRESSED CONCRETE BEAM (PRETENSIONED) 30MH-101 (FIG. 5-397.501 MOD.)" },
+        { "p": 17, "s": "17", "t": "PRESTRESSED CONCRETE BEAM DIAPHRAGM CONNECTION DETAILS (FIG. 5-397.560)" },
+        { "p": 18, "s": "18", "t": "SUPERSTRUCTURE DETAILS 1" },
+        { "p": 19, "s": "19", "t": "SUPERSTRUCTURE DETAILS 2" },
+        { "p": 20, "s": "20", "t": "SUPERSTRUCTURE DETAILS 3" },
+        { "p": 21, "s": "21", "t": "SUPERSTRUCTURE DETAILS 4" },
+        { "p": 22, "s": "22", "t": "BARRIER LAYOUT" },
+        { "p": 23, "s": "23", "t": "PIPE RAILING DETAILS" },
+        { "p": 24, "s": "24", "t": "CONCRETE BARRIER 36\" TYPE S (FIG. 5-397.138(A) MOD.)" },
+        { "p": 25, "s": "25", "t": "MISCELLANEOUS CONCRETE BARRIER AND PARAPET DETAILS (FIG. 5-397.174)" },
+        { "p": 26, "s": "26", "t": "UNDERPASS LIGHTING DETAILS" },
+        { "p": 27, "s": "27", "t": "BRIDGE APPROACH PANEL BARRIER / PARAPET COVER PLATE DETAILS (FIG. 5-397.635(A))" },
+        { "p": 28, "s": "28", "t": "CONCRETE SLOPE PAVING" },
+        { "p": 29, "s": "29", "t": "BRIDGE DETAILS 1 (B201 PILE SPLICE)" },
+        { "p": 30, "s": "30", "t": "BRIDGE DETAILS 2 (B303 SOLE PLATE, B307 PAD RESTRAINT)" },
+        { "p": 31, "s": "31", "t": "BRIDGE DETAILS 3 (B310 / B311 PLATE BEARING ASSEMBLY)" },
+        { "p": 32, "s": "32", "t": "BRIDGE DETAILS 4 (B830 BARRIER OR PARAPET)" },
+        { "p": 33, "s": "33", "t": "AS-BUILT BRIDGE DATA (FIG. 5-397.900)" },
+        { "p": 34, "s": "34", "t": "BRIDGE SURVEY" },
+        { "p": 35, "s": "35", "t": "PROFILES" },
+        { "p": 36, "s": "36", "t": "ALIGNMENT TABULATION 1" },
+        { "p": 37, "s": "37", "t": "ALIGNMENT TABULATION 2" },
+        { "p": 38, "s": "38", "t": "INPLACE TOPOGRAPHY AND UTILITIES" },
+        { "p": 39, "s": "39", "t": "BORINGS" }
+      ] }
+  ],
+
+  "administrative": [ "^AS-BUILT BRIDGE DATA" ],
+
+  "rules": [
+    { "id": "general-plan", "sheets": "^GENERAL PLAN AND ELEVATION", "role": "general", "basis": "General plan and elevation, design data, list of sheets",
+      "target": [ { "level": "unit" }, { "level": "alignment", "bridge_group": "SB65" } ] },
+    { "id": "transverse-section", "sheets": "^TRANSVERSE SECTION", "basis": "Transverse section: deck, beam spacing, barrier; construction notes and quantities",
+      "target": [ { "level": "part", "category": "deck" }, { "level": "assembly", "category": "prestressed girder" } ] },
+    { "id": "transverse-section-notes", "sheets": "^TRANSVERSE SECTION", "role": "general", "basis": "Construction notes and schedule of quantities",
+      "target": [ { "level": "unit" } ] },
+    { "id": "layout", "sheets": "^BRIDGE LAYOUT", "basis": "Bridge layout: working points, top of roadway to seat",
+      "target": [ { "level": "part", "category": [ "superstructure", "abutment" ] } ] },
+
+    { "id": "abutment-details", "sheets": "^(?<n>SOUTH|NORTH) ABUTMENT (DETAILS|REINFORCEMENT)", "basis": "{n} abutment: cap, backwall, beam seats, piles and reinforcing",
+      "target": [ { "level": "part", "category": "abutment", "support": "{n} Abutment" } ] },
+    { "id": "abutment-common", "sheets": "^ABUTMENT DETAILS", "basis": "Abutment details common to both abutments",
+      "target": [ { "level": "part", "category": "abutment" } ] },
+
+    { "id": "framing-plan", "sheets": "^FRAMING PLAN", "basis": "Framing plan: beam lines, bearings, diaphragms",
+      "target": [ { "level": "part", "category": "superstructure" } ] },
+    { "id": "beam", "sheets": "^30MH PRESTRESSED CONCRETE BEAM", "basis": "30MH beam: section, strand pattern, debonding",
+      "target": [ { "level": "assembly", "category": "prestressed girder" } ] },
+    { "id": "diaphragm-connection", "sheets": "^PRESTRESSED CONCRETE BEAM DIAPHRAGM CONNECTION", "basis": "Beam / end diaphragm connection (inserts in the beams)",
+      "target": [ { "level": "assembly", "category": "prestressed girder" } ] },
+    { "id": "superstructure", "sheets": "^SUPERSTRUCTURE DETAILS", "basis": "Deck, end diaphragms, deck reinforcing and bar list",
+      "target": [ { "level": "part", "category": "deck" } ] },
+
+    { "id": "barrier", "sheets": "^(BARRIER LAYOUT|CONCRETE BARRIER|MISCELLANEOUS CONCRETE BARRIER|BRIDGE DETAILS 4)", "basis": "Concrete barrier: layout, profile, reinforcing",
+      "target": [ { "level": "group", "category": "barrier group" } ] },
+    { "id": "barrier-cover-plate", "sheets": "^BRIDGE APPROACH PANEL BARRIER", "role": "general", "basis": "Barrier end at the approach panel (cover plate; not modeled)",
+      "target": [ { "level": "group", "category": "barrier group" } ] },
+    { "id": "pile-splice", "sheets": "^BRIDGE DETAILS 1", "basis": "Standard pile splice (B201)",
+      "target": [ { "level": "element", "category": "pile" } ] },
+    { "id": "bearings-b303", "sheets": "^BRIDGE DETAILS 2", "basis": "Sole plate (B303) and pad restraint (B307)",
+      "target": [ { "level": "element", "category": "bearing pad" } ] },
+    { "id": "bearings-b311", "sheets": "^BRIDGE DETAILS 3", "basis": "Plate bearing assemblies (B310 fixed / B311 expansion)",
+      "target": [ { "level": "element", "category": "bearing pad" } ] },
+    { "id": "bearings-framing", "sheets": "^FRAMING PLAN", "basis": "Bearing types and locations",
+      "target": [ { "level": "element", "category": "bearing pad" } ] },
+
+    { "id": "survey", "sheets": "^(BRIDGE SURVEY|ALIGNMENT TABULATION 1)", "role": "general", "basis": "Survey and alignment tabulation (SB65)",
+      "target": [ { "level": "alignment", "bridge_group": "SB65" } ] },
+    { "id": "borings", "sheets": "^BORINGS", "role": "general", "basis": "Borings (pile design basis)",
+      "target": [ { "level": "group", "category": "footing group" } ] }
+  ],
+
+  "hints": [
+    { "sheets": "PIPE RAILING", "suggests": "Pipe railing on the barrier: not modeled." },
+    { "sheets": "LIGHTING", "suggests": "Underpass lighting: not modeled." },
+    { "sheets": "SLOPE PAVING", "suggests": "Concrete slope paving under the bridge: no slope-protection elements." },
+    { "sheets": "PROFILES|ALIGNMENT TABULATION 2", "suggests": "Profiles / alignments of the roads under the bridge (117th Ave, ramps): not in the model." },
+    { "sheets": "TOPOGRAPHY", "suggests": "Existing topography and utilities: no terrain / utility elements in this model." }
+  ]
+}

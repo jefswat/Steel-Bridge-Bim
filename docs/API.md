@@ -254,12 +254,29 @@ foreach (var r in Doc.ExactQuantities("Br12 Unit 2")) Print($"{r.Element} {r.Kin
 
 ## Companion database (`sbm db`)
 
-`sbm db <model.sbm> [out.sqlite] [--pages] [--plans <folder>] [--links rules.json] [--unused report.md] [--no-previews] [--no-vacuum]`
+`sbm db <model.sbm> [out.sqlite] [--pages] [--plans <folder>] [--links rules.json] [--unused report.md] [--no-previews] [--no-vacuum] [--relink]`
 writes `<model>.sqlite` (SQLite): one row per model element with the IFC GlobalId, hierarchy (project > site > bridge > unit > superstructure /
 deck / substructure > groups such as girder, deck reinforcing, pier column n, footing n, FS4 bolts > elements), quantities and bounding box.
 Tables: `elements` (view over the compact `el`/`strings`/`props`), `sheets`, `element_sheet` (links, stored on the group / assembly that the plan
 organizes the information by), `qc` (status unchecked/ok/issue, checked_by, checked_at, note). Views: `v_element_sheets` (links resolved to every
 child), `v_element_path`, `v_unused_sheets`, `v_element_qc`. `--pages` splits the plan PDFs (PyMuPDF, `tools/plan_split.py`) into
-`<model dir>/plans/<set>/p###.pdf` + JPEG previews (git-ignored) and fills `sheets`. Link rules: `samples/plans/sheet-links-i80-rampg.json`
-(JSON, documented in its header). A rebuild keeps sheets and QC. The size is always printed (a note appears above 100 MB; informational only).
-In the app the Properties side shows the record of the selected element (hierarchy links, sheets with Open PDF / Preview, QC).
+`<model dir>/plans/<set>/p###.pdf` + JPEG previews (git-ignored) and fills `sheets`. A rebuild keeps sheets and QC. The size is always printed
+(a note appears above 100 MB; informational only).
+
+**Plan sheet links by default.** The link rules file of a model is the `sheet-links*.json` beside it (or in its `plans` subfolder) whose
+`"models"` list names the model file (a file without `"models"` applies to any model in the folder); `--links` overrides it. Shipped:
+`samples/plans/sheet-links-i80-rampg.json` (I-80 WB + Ramp G, Designs 116 / 316), `sheet-links-woodbury.json` (Iowa Design 817),
+`sheet-links-br02069.json` (MnDOT Br. 02069); the format is documented in the I-80 file's header. Each plan set carries its **sheet index**
+(`"sheets": [ { "p": <PDF page>, "s": "<design sheet>", "t": "<title>" } ]`, from `docs/plan-data/*/INDEX.md` or a `--pages` run's
+`sheets.json`), so every build (`sbm db` without `--pages`, the app's Create / Rebuild database) fills `sheets` and `element_sheet` with no
+PDF splitting and no Python; index titles also replace the split tool's title-block text (which reads Iowa DOT blocks only). Rules may limit
+themselves to PDF pages (`"pages": [24]`) when sheets share a title. The plan PDF is looked up (for Open PDF at the sheet's page; column
+`sheets.pdf_path`) in `--plans`, the rules file's `"planFolders"` (relative to the rules file), the database and model folders and their `plans`
+subfolders, `%SBM_PLANS%` (;-separated) and the program folder; a missing PDF only disables Open PDF. `--relink` re-applies the sheet index and
+rules to an existing database in about a second (no regeneration; QC kept). Without a rules file the build prints that no plan sheet links were made.
+
+In the app the Properties side shows the record of the selected element: hierarchy links and every plan sheet it is based on, its own or
+inherited from a group / assembly ("via ..."), as "Sheet <n> · <title>", plan set, design sheet, PDF page, role and basis, with **Open PDF**
+(the split single page if present, else the whole plan PDF at that page through Acrobat / Reader `/A page=N`, SumatraPDF `-page N` or Edge
+`#page=N`), Preview (after Import plan pages…) and QC. When a model's database has no links, or its rules file changed since the links were
+made, the app relinks it in the background when the model loads (log line `DB: plan sheet links from ...`).

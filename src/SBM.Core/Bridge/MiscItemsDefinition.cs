@@ -80,8 +80,9 @@ public sealed class DrainCollectorDefinition
 public enum PierDrainOutlet { ErosionMattress, Pavement }
 
 /// <summary>Deck-joint collection system at a pier (Ramp G Piers 5G, 9G, 14G, 19G): neoprene trough under the joint, trough collection box,
-/// 8" pipe at 1:12 min to the pier collection box on the cap, pipe along the cap soffit at 8% min to the column, vertical down the column face.
-/// Placement conventions are flagged by the generator; unknown dimensions stay null.</summary>
+/// 8" pipe at 1:12 min to the pier collection box, which hangs on the (back) FACE of the cap (Ramp G PDF 155 sections A-A / C-C, PDF 157 box details),
+/// then a pipe from the box bottom at 8% min along the cap face toward the CL pier and vertical down the column (PDF 157 drain pipe elevations).
+/// Nothing passes through the cap concrete. Placement conventions are flagged by the generator; unknown dimensions stay null.</summary>
 public sealed class PierDrainDefinition
 {
     /// <summary>END support of the unit that owns the joint (name).</summary>
@@ -93,18 +94,30 @@ public sealed class PierDrainDefinition
     public double BoxFromGutter { get; set; } = Ft(3.5);
     public double BoxLength { get; set; } = Ft(2) + In(2);
     public double BoxWidth { get; set; } = Ft(1);
-    public double BoxHighEndHeight { get; set; } = Ft(1) + In(7);
+    /// <summary>Trough box depth at the high end (PDF 156: 1'-4; the bottom falls <see cref="BoxBottomSlope"/> = 3" to the 1'-7 low end). BoxLength (2'-2) runs across the joint, BoxWidth (1'-0) along it.</summary>
+    public double BoxHighEndHeight { get; set; } = Ft(1) + In(4);
     public double BoxBottomSlope { get; set; } = In(3);
-    /// <summary>Drop of the trough at the collection end printed on the sheet (1'-8): only compared with slope x run.</summary>
+    /// <summary>Deck underside to the top of the trough collection box at the collection end, printed on the PDF 154 elevations (1'-8); null = trough at exactly <see cref="TroughSlope"/>.</summary>
     public double? PrintedTroughDrop { get; set; }
     public double PipeNominalDiameter { get; set; } = In(8);
     public double Pipe1Slope { get; set; } = 1.0 / 12;
     /// <summary>Cap collection box position along the cap from the CL column (S, right positive): +12'-6 at 5G/9G/14G, -18'-3 7/8 at 19G.</summary>
     public double CapBoxFromColumn { get; set; }
-    public double CapBoxLengthN { get; set; } = Ft(1) + In(4);
-    public double CapBoxWidthS { get; set; } = Ft(1) + In(6);
+    /// <summary>Cap face the pier collection box is fastened to (PDF 155 sections A-A / C-C and the PDF 157 elevations looking ahead: the back face).</summary>
+    public CapFaceSide CapBoxFace { get; set; } = CapFaceSide.Back;
+    /// <summary>Box width along the cap face (PDF 157 view A-A: 1'-4).</summary>
+    public double CapBoxAlongFace { get; set; } = Ft(1) + In(4);
+    /// <summary>Box projection from the cap face at the top (PDF 157 box elevation: 1'-6) and at the bottom (1'-4, the outer wall tapers over the lower 1'-0).</summary>
+    public double CapBoxOutTop { get; set; } = Ft(1) + In(6);
+    public double CapBoxOutBottom { get; set; } = Ft(1) + In(4);
+    /// <summary>CL of the pipe dropping into the box from the cap face (PDF 155 sections A-A / C-C, PDF 157: 9" at 50 F).</summary>
+    public double CapBoxInletFromFace { get; set; } = In(9);
+    /// <summary>Clear distance from the cap face to the outside of the outlet pipe at the box bottom (PDF 157 box elevation: 1 1/2").</summary>
+    public double CapBoxOutletClear { get; set; } = In(1.5);
+    /// <summary>Depth the inlet pipe enters the box below its top (PDF 157 box elevation / view A-A: 4").</summary>
+    public double CapBoxInletEmbed { get; set; } = In(4);
     public double CapBoxDepth { get; set; } = Ft(2);
-    /// <summary>Box top below the cap top (plans: 1" min / 1/4" max): null = UNRESOLVED (generator raises and uses the 1/4" maximum).</summary>
+    /// <summary>Box top below the cap top (plans: 1/4" min / 1" max; section A-A: 1" at CL box): null = UNRESOLVED (generator raises and uses the 1/4" minimum).</summary>
     public double? CapBoxBelowTop { get; set; }
     public double CapPipeSlope { get; set; } = 0.08;
     public double CapPipeNominalDiameter { get; set; } = In(8);

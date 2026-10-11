@@ -16,13 +16,15 @@ public sealed class PlanPreviewWindow : Window
     private readonly ScrollViewer _scroll;
     private readonly TextBlock _title = new() { FontWeight = FontWeights.SemiBold, Margin = new Thickness(8, 6, 8, 6), TextTrimming = TextTrimming.CharacterEllipsis };
     private string _pdf = "";
+    private int _page = 1;
 
     private static PlanPreviewWindow? _instance;
 
     /// <summary>Shows (reusing one window) the preview image of a sheet.</summary>
-    public static void ShowSheet(Window owner, string title, string previewFile, string pdfFile)
+    public static void ShowSheet(Window owner, string title, string previewFile, string pdfFile, int page = 1)
     {
         if (_instance == null || !_instance.IsLoaded) _instance = new PlanPreviewWindow { Owner = owner };
+        _instance._page = page;
         _instance.Load(title, previewFile, pdfFile);
         _instance.Show();
         _instance.Activate();
@@ -36,7 +38,7 @@ public sealed class PlanPreviewWindow : Window
         _image.LayoutTransform = _scale;
         _scroll = new ScrollViewer { HorizontalScrollBarVisibility = ScrollBarVisibility.Auto, VerticalScrollBarVisibility = ScrollBarVisibility.Auto, Content = _image };
         var open = new Button { Content = "Open PDF page", Margin = new Thickness(8, 4, 8, 4), Padding = new Thickness(10, 2, 10, 2) };
-        open.Click += (_, _) => { if (_pdf.Length > 0 && File.Exists(_pdf)) Process.Start(new ProcessStartInfo(_pdf) { UseShellExecute = true }); };
+        open.Click += (_, _) => { if (_pdf.Length > 0 && File.Exists(_pdf)) PdfOpener.Open(_pdf, _page); };
         var fit = new Button { Content = "Fit", Margin = new Thickness(0, 4, 8, 4), Padding = new Thickness(10, 2, 10, 2) };
         fit.Click += (_, _) => Fit();
         var bar = new DockPanel { LastChildFill = true };
