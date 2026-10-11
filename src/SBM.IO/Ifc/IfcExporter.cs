@@ -692,7 +692,7 @@ public static class IfcExporter
                     : Body(b.Mesh, beamStyle);
                 string desc = $"{b.TypeName}, {b.Strands.Count} - {bStrandSize} strands ({b.Strands.Count(x => x.Depressed)} depressed" +
                               (b.Strands.Any(x => x.Debonded) ? $", {b.Strands.Count(x => x.Debonded)} debonded" : "") + $"), L = {u.FormatLength(b.Length)}";
-                int beam = w.Add("IFCBEAM", $"{Guid(IfcKeys.PsBeam(bk, b.Mark))},$,{S(b.Mark)},{S(desc)},$,{Ref(pl)},{Ref(pds)},{S(b.Mark)},.GIRDER.");
+                int beam = w.Add("IFCBEAM", $"{Guid(IfcKeys.PsBeam(bk, b.Mark))},$,{S(b.Mark)},{S(desc)},$,{Ref(pl)},{Ref(pds)},{S(b.Mark)},{(abv ? ".GIRDER_SEGMENT." : ".GIRDER.")}");
                 AddMaterial(b.Definition == null ? concreteMat : bConcrete, beam);
                 psetTargets.Add((beam, b.Mark, b.TypeName, b.Length, b.Mass));
                 if (b.Assumption != null) miscStatus.Add((beam, b.Assumption));
