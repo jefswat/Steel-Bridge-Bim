@@ -303,6 +303,8 @@ public sealed partial class SubstructureGenerator
         // ---- pedestals: one per seat from the bearing footprint, or the plan size (optionally one block per girder line carrying several seats)
         double tallest = 0;
         bool planPed = sd.PedestalSizeAlong > 0 && sd.PedestalSizeAcross > 0;
+        double shear = planPed && sd.PedestalSideAngleDeg != 0 ? Math.Tan(sd.PedestalSideAngleDeg * Math.PI / 180) : 0;
+        if (!planPed && sd.PedestalSideAngleDeg != 0) Warn($"{sl.Name}: PedestalSideAngleDeg needs the plan pedestal size (PedestalSizeAlong / PedestalSizeAcross); ignored.");
         if (sd.PedestalShared && !planPed) Warn($"{sl.Name}: PedestalShared needs the plan pedestal size (PedestalSizeAlong / PedestalSizeAcross); ignored.");
         // Two rows (plan "BACK BRG." / "AHEAD BRG."): the ahead (+N of the CL pier) blocks may have their own across size, and the rows may abut on a printed line
         bool rows = planPed && !sd.PedestalShared && (sd.PedestalSizeAcrossAhead > 0 || !double.IsNaN(sd.PedestalRowJoint));
@@ -339,7 +341,10 @@ public sealed partial class SubstructureGenerator
                 }
                 foreach (var q in grp)
                 {
-                    double out0 = Math.Max(ps0 - q.Footprint.Min(f => f.X), Math.Max(q.Footprint.Max(f => f.X) - ps1, Math.Max(pn0 - q.Footprint.Min(f => f.Y), q.Footprint.Max(f => f.Y) - pn1)));
+                    // parallelogram blocks: compare in the sheared frame (S measured along the cap from the slanted side line)
+                    double nm = nMid;
+                    var fp = q.Footprint.Select(f => new Vec2(f.X - shear * (f.Y - nm), f.Y)).ToList();
+                    double out0 = Math.Max(ps0 - fp.Min(f => f.X), Math.Max(fp.Max(f => f.X) - ps1, Math.Max(pn0 - fp.Min(f => f.Y), fp.Max(f => f.Y) - pn1)));
                     if (out0 > In(0.125)) Warn($"{sl.Name}: bearing footprint at {whoP} extends {Sh(out0)} beyond the plan pedestal ({Sh(sd.PedestalSizeAlong)} x {Sh(across)}).");
                 }
                 double zMax = grp.Max(q => q.Z), zMin = grp.Min(q => q.Z);
@@ -366,13 +371,14 @@ public sealed partial class SubstructureGenerator
             unit.PedestalBlocks.Add(block);
             if (block.Height < In(0.125)) continue;
             var mesh = new Mesh();
-            var foot = new[] { new Vec2(ps0, pn0), new Vec2(ps1, pn0), new Vec2(ps1, pn1), new Vec2(ps0, pn1) };
+            double sh = planPed ? shear : 0, nmF = nMid;
+            var foot = new[] { new Vec2(ps0, pn0), new Vec2(ps1, pn0), new Vec2(ps1, pn1), new Vec2(ps0, pn1) }.Select(q => new Vec2(q.X + sh * (q.Y - nmF), q.Y)).ToArray();
             var bottom = foot.Select(q => unit.World(q.X, q.Y, planPed && grp.Count > 1 ? unit.CapTopAt(q.X, q.Y) : unit.CapTopAt(q.X, grp[0].N))).ToArray();
             var topR = foot.Select(q => unit.World(q.X, q.Y, zTop)).ToArray();
             MeshBuilder.AddLoft(mesh, foot, new[] { bottom, topR });
             string side = !planPed && seats.Count(o => o.Girder == grp[0].Girder) > 1 ? (grp[0].N < 0 ? " back" : " ahead") : "";
             unit.Solids.Add(new SubSolid(SubElementKind.Pedestal, $"{sl.Name} pedestal {whoP}{side}",
-                $"Pedestal {Sh(ps1 - ps0)} x {Sh(pn1 - pn0)}{(planPed ? " (plan size)" : "")}, {Sh(block.Height)} high at CL bearing{(grp.Count > 1 ? $", {grp.Count} seats" : "")}", mesh));
+                $"Pedestal {Sh(ps1 - ps0)} x {Sh(pn1 - pn0)}{(planPed ? " (plan size)" : "")}{(sh != 0 ? $", parallelogram, sides {sd.PedestalSideAngleDeg:0.###} deg from the cap normal" : "")}, {Sh(block.Height)} high at CL bearing{(grp.Count > 1 ? $", {grp.Count} seats" : "")}", mesh));
         }
         if (planPed)
             for (int i = 0; i < unit.PedestalBlocks.Count; i++)
@@ -412,6 +418,7 @@ public sealed partial class SubstructureGenerator
             if (profile == null) Warn($"{sl.Name}: cap section step ignored - it needs an as-designed cap profile.");
             else BuildCapStep(unit, sl.Name, ae, unit.CapOutline, unit.CapOutlineAhead.Count >= 3 ? unit.CapOutlineAhead : unit.CapOutline);
         }
+        foreach (var cb in sd.CapBlocks) BuildCapBlock(unit, sl.Name, cb, profile != null);
         if (unit.Backwall is { } bw)
         {
             var bwMesh = new Mesh();
@@ -450,7 +457,8 @@ public sealed partial class SubstructureGenerator
                 var botRing = sec.Select(q => unit.World(cs + q.X, nc + q.Y, zShaft)).ToArray();
                 var topRing = sec.Select(q => unit.World(cs + q.X, nc + q.Y, unit.CapBottomAt(cs + q.X) + In(0.01))).ToArray();
                 MeshBuilder.AddLoft(cm, sec, new[] { botRing, topRing });
-                string size = sd.ColumnShape == ColumnShape.Round ? $"{Sh(sd.ColumnDiameter)} dia" : $"{Sh(sd.ColumnWidth)} x {Sh(sd.ColumnDepth)}";
+                string size = sd.ColumnShape == ColumnShape.Round ? $"{Sh(sd.ColumnDiameter)} dia" : $"{Sh(sd.ColumnWidth)} x {Sh(sd.ColumnDepth)}"
+                    + (sec.Length == 12 ? $" + {Sh(sd.ColumnProjectionS)} x {Sh(sd.ColumnProjectionWidth)} projections on both S faces" : "");
                 unit.Solids.Add(new SubSolid(SubElementKind.Column, $"{sl.Name} column {k + 1}", $"Column {size}, {L(topZ - fTop)} high", cm));
                 AddFoundation(unit, sd, cs, nc, fTop, groundZ, k + 1);
                 k++;
@@ -695,8 +703,40 @@ public sealed partial class SubstructureGenerator
         return Math.Abs(dot) > 1e-6 ? pivot / dot : 0;
     }
 
+    /// <summary>Plan prism on an as-designed cap (maskwall / end reveal): vertical sides on the plan outline, bottom on the cap top or soffit at each vertex,
+    /// top on the block's plane. Missing top elevation = UNRESOLVED (not built).</summary>
+    private void BuildCapBlock(SubstructureUnit unit, string name, CapBlockDefinition cb, bool asDesigned)
+    {
+        string what = string.IsNullOrWhiteSpace(cb.Name) ? cb.Kind.ToString().ToLowerInvariant() : cb.Name;
+        if (!asDesigned) { Warn($"{name}: cap block '{what}' ignored - it needs an as-designed cap profile."); return; }
+        if (cb.Outline.Count < 3) { Warn($"{name}: cap block '{what}' has no plan outline; not built."); return; }
+        if (double.IsNaN(cb.TopElevation)) { Warn($"{name}: " + UnresolvedFlag.Text(cb.Source == "" ? "plan" : cb.Source, $"top of '{what}'", "no top elevation was entered", "Not built.")); return; }
+        var outline = cb.Outline.Select(p => new Vec2(p.S, p.N)).ToList();
+        if (MeshBuilder.SignedArea(outline) < 0) outline.Reverse();
+        double Top(double s) => cb.TopElevation + cb.TopSlopeS * (s - cb.TopRefS);
+        double Bot(double s, double n) => cb.Base == CapBlockBase.CapBottom ? unit.CapBottomAt(s) : unit.CapTopAt(s, n);
+        var bot = outline.Select(q => unit.World(q.X, q.Y, Bot(q.X, q.Y))).ToArray();
+        var top = outline.Select(q => unit.World(q.X, q.Y, Top(q.X))).ToArray();
+        if (outline.Any(q => Top(q.X) <= Bot(q.X, q.Y) + 1e-4)) { Warn($"{name}: cap block '{what}': top is not above its base at every vertex; not built."); return; }
+        var mesh = new Mesh();
+        MeshBuilder.AddLoft(mesh, outline, new[] { bot, top });
+        double hMax = outline.Max(q => Top(q.X) - Bot(q.X, q.Y));
+        unit.Solids.Add(new SubSolid(cb.Kind == CapBlockKind.Maskwall ? SubElementKind.Maskwall : SubElementKind.Cap, $"{name} {what}",
+            $"{(cb.Kind == CapBlockKind.Maskwall ? "Maskwall" : "Cap block")} '{what}' on the cap {(cb.Base == CapBlockBase.CapTop ? "top" : "soffit")}, top {El(outline.Min(q => Top(q.X)))} .. {El(outline.Max(q => Top(q.X)))}, up to {Sh(hMax)} high{(cb.Source != "" ? $" ({cb.Source})" : "")}", mesh));
+    }
+
     private static Vec2[] ColumnSection(SubstructureDefinition sd)
     {
+        if (sd.ColumnShape == ColumnShape.Rectangular && sd.ColumnProjectionS > 0 && sd.ColumnProjectionWidth > 0 && sd.ColumnChamferS <= 0 && sd.ColumnChamferN <= 0)
+        {
+            // rectangle with a centred projection (reveal) on both S faces, counter-clockwise
+            double a = sd.ColumnWidth / 2, b = sd.ColumnDepth / 2, p = a + sd.ColumnProjectionS, h = Math.Min(sd.ColumnProjectionWidth, sd.ColumnDepth) / 2;
+            return new[]
+            {
+                new Vec2(-a, -b), new Vec2(a, -b), new Vec2(a, -h), new Vec2(p, -h), new Vec2(p, h), new Vec2(a, h),
+                new Vec2(a, b), new Vec2(-a, b), new Vec2(-a, h), new Vec2(-p, h), new Vec2(-p, -h), new Vec2(-a, -h),
+            };
+        }
         if (sd.ColumnShape == ColumnShape.Rectangular) return Octagon(sd.ColumnWidth, sd.ColumnDepth, sd.ColumnChamferS, sd.ColumnChamferN);
         return Circle(sd.ColumnDiameter / 2, 32);
     }
