@@ -72,7 +72,7 @@ public partial class MainWindow
             ov.Visibility = Visibility.Collapsed;
             View.Items.Remove(ov);
             _fullMeshes.Remove(ov);
-            _detailCenter.Remove(ov);
+            _detailBounds.Remove(ov);
             foreach (var list in _layerModels.Values) list.Remove(ov);
         }
         _lodOverlays.Clear();
@@ -203,7 +203,7 @@ public partial class MainWindow
             list!.Add(ov);
             View.Items.Add(ov);
             var b = mesh.Bound;
-            _detailCenter[ov] = (layer, (b.Minimum + b.Maximum) / 2);
+            _detailBounds[ov] = (layer, b.Minimum, b.Maximum);
             changed.Add(ov);
         }
         foreach (var m in changed) ApplyToModel(m);

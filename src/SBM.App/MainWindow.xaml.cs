@@ -49,8 +49,7 @@ public partial class MainWindow : Window
         InitDatabase();
         View.PreviewMouseLeftButtonDown += OnViewportMouseDown;
         View.PreviewMouseLeftButtonUp += OnViewportMouseUp;
-        View.PreviewMouseRightButtonDown += OnViewportRightDown;
-        View.PreviewMouseRightButtonUp += OnViewportRightUp;
+        // Right button down / up go through MainWindow.Navigation (OnNavDown / OnNavUp): right-drag orbits, a right click opens the menu.
         PreviewKeyDown += (_, e) =>
         {
             if (e.Key == Key.S && Keyboard.Modifiers == (ModifierKeys.Control | ModifierKeys.Shift)) { OnToggleSection(this, new RoutedEventArgs()); e.Handled = true; }
@@ -641,6 +640,7 @@ public partial class MainWindow : Window
 
     private void ZoomExtents()
     {
+        _pivot = null;
         if (_scene == null || _scene.Extents.IsEmpty) { View.ZoomExtents(0); return; }
         if (_planMode)
         {
