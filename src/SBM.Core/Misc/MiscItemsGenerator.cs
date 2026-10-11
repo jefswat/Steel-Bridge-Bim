@@ -187,6 +187,27 @@ public sealed partial class MiscItemsGenerator
         double endSta = sl.Bearings.ElementAtOrDefault(c.ReferenceGirder)?.Station ?? sl.Station;
         double s0 = c.StartStation;
         if (endSta <= s0) { Warn($"{name}: end support is not ahead of the start station."); return; }
+        // a pier drain fed by this collector: the collector ends over the pier collection box inlet, 9" (at 50 F) off the cap face
+        // (Ramp G PDF 155 section C-C, PDF 154 partial plan), not at the bearing line
+        var feed = _def.Misc?.PierDrains.FirstOrDefault(p => string.Equals(p.Collector, name, StringComparison.OrdinalIgnoreCase) && SupportIndex(p.Support) == j);
+        var fu = feed == null ? null : _sub.Units.FirstOrDefault(u => u.SupportIndex == j);
+        if (feed != null && fu != null)
+        {
+            double side = feed.CapBoxFace == CapFaceSide.Back ? -1 : 1;
+            double nT = (side < 0 ? fu.CapN0 : fu.CapN1) + side * feed.CapBoxInletFromFace;
+            double Nof(double sta) => Vec2.Dot(Plan(sta) - fu.Origin, fu.N) - nT;
+            double lo = s0, hi = endSta;
+            if (Nof(lo) < 0 && Nof(hi) > 0)
+                for (int it = 0; it < 60; it++) { double mid = (lo + hi) / 2; if (Nof(mid) > 0) hi = mid; else lo = mid; }
+            if (lo > s0 && c.Points.Max(p => p.Station) >= lo)
+                Warn($"{name}: the {feed.Support} pier collection box inlet ({Sh(feed.CapBoxInletFromFace)} off the cap face, STA {_u.FormatStation(lo)}) is behind the last vertical-dimension point; the collector ends at the bearing line.");
+            else if (lo > s0)
+            {
+                Info($"{name}: ends over the {feed.Support} pier collection box inlet, {Sh(feed.CapBoxInletFromFace)} off the {(side < 0 ? "back" : "ahead")} cap face (PDF 155 section C-C), STA {_u.FormatStation(lo)}, {Sh(endSta - lo)} short of the bearing line.");
+                endSta = lo;
+            }
+            else Warn($"{name}: the {feed.Support} pier collection box inlet line ({Sh(feed.CapBoxInletFromFace)} off the cap face) does not cross the collector between its start and the bearing line; the collector ends at the bearing line.");
+        }
         var (od, wall) = MiscMesh.PipeSch40(c.NominalDiameter);
 
         // stations: every ~3 m plus the knots and couplers

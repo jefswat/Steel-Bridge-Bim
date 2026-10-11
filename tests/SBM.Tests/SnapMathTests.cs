@@ -148,4 +148,25 @@ public class SnapMathTests
         Assert.Equal("A", PointQuery.QueryNearest(new[] { a1, a2 }, new Vec3(500, 10, 0))!.Alignment);
         Assert.Equal("B", PointQuery.QueryNearest(new[] { a1, a2 }, new Vec3(500, 90, 0))!.Alignment);
     }
+
+    [Fact]
+    public void PointQuery_Delta_StationOffsetAndTangentComponents()
+    {
+        var line = new Alignment(new[] { HorizontalElement.Line(Vec2.Zero, new Vec2(1000, 0)) }) { Name = "L" };
+        var d = PointQuery.Delta(line, new Vec3(100, -5, 0), new Vec3(130, 3, 2))!;
+        Assert.Equal(30, d.DStation, 9);
+        Assert.Equal(-8, d.DOffset, 9);          // 5 RT -> 3 LT
+        Assert.Equal(30, d.AlongTangent, 9);
+        Assert.Equal(-8, d.AcrossTangent, 9);
+        Assert.Equal(2, d.DZ, 9);
+
+        // Left curve R 100: two points on the CL 50 apart along the curve.
+        var arc = new Alignment(new[] { new HorizontalElement(Vec2.Zero, 0, 200, 0.01, 0.01) }) { Name = "C" };
+        var p0 = arc.PointAtDistance(0); var p1 = arc.PointAtDistance(50);
+        var c = PointQuery.Delta(arc, p0.WithZ(0), p1.WithZ(0))!;
+        Assert.Equal(50, c.DStation, 6);
+        Assert.Equal(0, c.DOffset, 6);
+        Assert.Equal(100 * Math.Sin(0.5), c.AlongTangent, 6);
+        Assert.Equal(-100 * (1 - Math.Cos(0.5)), c.AcrossTangent, 6); // chord falls LEFT of the tangent
+    }
 }

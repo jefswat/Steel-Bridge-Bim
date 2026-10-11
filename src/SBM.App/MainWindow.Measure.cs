@@ -652,6 +652,17 @@ public partial class MainWindow
 
     private static string Signed(UnitSystem u, double meters) => (meters >= 0 ? "+" : "-") + u.FormatLength(Math.Abs(meters));
 
+    /// <summary>A→B in the alignment's directions (the alignment nearest A, or the one picked in the panel):
+    /// station / offset change along the curved alignment, and the straight plan vector split along / across the tangent at A.</summary>
+    private IEnumerable<string> AlignmentDeltaLines(Vec3 a, Vec3 b)
+    {
+        if (AlignmentFor(a) is not { } al || PointQuery.Delta(al, a, b) is not { } d) yield break;
+        var u = _vm.Units;
+        yield return $"  {d.Alignment}{(d.OnAlignment ? "" : "  (beyond the ends)")}:";
+        yield return $"    dSta {Signed(u, d.DStation)}   dOff {Signed(u, d.DOffset)} (RT +)   dZ {Signed(u, d.DZ)}   (along the curved alignment)";
+        yield return $"    along tangent {Signed(u, d.AlongTangent)}   across {Signed(u, d.AcrossTangent)} (RT +)   (straight line, tangent at A)";
+    }
+
     private string FormatRecord(MeasureRecord rec, int number)
     {
         var u = _vm.Units;
@@ -675,6 +686,7 @@ public partial class MainWindow
         sb.AppendLine($"  dE {Signed(u, m.DX)}   dN {Signed(u, m.DY)}   dZ {Signed(u, m.DZ)}");
         sb.AppendLine(double.IsNaN(m.Slope) ? "  Slope          (plumb)" : $"  Slope          {UnitSystem.FormatSlope(m.Slope)}  ({m.ElevationAngleDegrees:F3} deg)");
         sb.AppendLine(double.IsNaN(m.PlanAngle) ? "  Plan bearing   -" : $"  Plan bearing   {UnitSystem.FormatBearing(m.PlanAngle)}   (azimuth {m.AzimuthDegrees:F4} deg)");
+        foreach (var line in AlignmentDeltaLines(m.A, m.B)) sb.AppendLine(line);
         sb.AppendLine("  A " + Coord(m.A));
         sb.AppendLine("   " + StationLine(m.A).TrimStart());
         sb.AppendLine("  B " + Coord(m.B));
@@ -693,7 +705,9 @@ public partial class MainWindow
         {
             var m = new MeasureResult(_msPins[^2].p, _msPins[^1].p);
             var u = _vm.Units;
-            sb.AppendLine($"PIN {_msPins.Count - 1} to {_msPins.Count}: {u.FormatLength(m.Distance3D)} (plan {u.FormatLength(m.PlanDistance)}, dZ {Signed(u, m.DZ)})").AppendLine();
+            sb.AppendLine($"PIN {_msPins.Count - 1} to {_msPins.Count}: {u.FormatLength(m.Distance3D)} (plan {u.FormatLength(m.PlanDistance)}, dZ {Signed(u, m.DZ)})");
+            foreach (var line in AlignmentDeltaLines(m.A, m.B)) sb.AppendLine(line);
+            sb.AppendLine();
         }
         for (int i = 0; i < _msRecords.Count; i++)
             sb.AppendLine(FormatRecord(_msRecords[i], i + 1)).AppendLine();

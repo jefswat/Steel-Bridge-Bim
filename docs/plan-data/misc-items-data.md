@@ -40,15 +40,17 @@ engineering fabric, centered directly under the drain, side slope 4:1 (typical s
 ### a3. Pier collection system (Piers 5G, 9G, 14G, 19G; PDF 154-159)
 - Where: the deck joint over each of these piers (CL pier = CL expansion joint, 8" slab). A 1/4" reinforced neoprene trough runs in a U between each pair of girders (section B-B, PDF 156)
   under the joint, bolted with 1/2" threaded concrete inserts + 1/2" galvanized bolts at 1'-6 max (Detail A: 3 x 1/2 x 4 galvanized straps), 4" min lap (1'-0 lap, 2 offset). Slope 5.9% min
-  (Piers 5G/9G/14G) and 4.9% min (Pier 19G) toward the collection end (girder D side at 5G/9G/14G, girder A side at 19G, as drawn on PDF 154); the dimension 1'-8 shown below the deck at the collection end is UNRESOLVED as to exact meaning (trough sag vs drop).
-- Trough collection box (PDF 156): 3/8 plate, 2'-2 long x 1'-0 wide, 1'-7 high at the high end with the bottom sloping 3" (1'-4 + 3), round-edged R = 1'-1 1/2 cut for the trough (centre 6 1/2 above),
+  (Piers 5G/9G/14G) and 4.9% min (Pier 19G) toward the collection end (girder D side at 5G/9G/14G, girder A side at 19G, as drawn on PDF 154); the 1'-8 shown below the deck at the collection end (PDF 154 elevations) is measured from the deck underside to the TOP OF THE TROUGH COLLECTION BOX (the dimension's lower arrow is on the box top).
+- Trough collection box (PDF 156): 3/8 plate, 2'-2 long x 1'-0 wide, 1'-4 deep at the high end, bottom sloping 3" to 1'-7 at the low end, round-edged R = 1'-1 1/2 cut for the trough in the 2'-2 faces (centre 6 1/2 above),
+  so the 2'-2 side runs ACROSS the joint (along the bridge; PDF 155 section A-A shows it centred on CL pier) and the low end with the pipe faces the pier collection box (back),
   8 dia drain pipe welded on the low side (CL pipe 1 1/2 above the low floor). Location (PDF 154): Pier 5G/9G/14G collection box 3'-6 from the roadway edge on the girder D side;
   Pier 19G: 4'-0 from the left end of the pier (measured along CL pier), 38'-10 15/16 overall, partial plan: 4'-9 from CL pier to the back bearing line side, 4'-0 from CL girder A.
 - 8 dia pipe (ASTM A53 Gr B Sch 40) from the trough box: slopes down at 1 in 12 min (PDF 155), turns vertical 9" (at 50 F; expansion allowance) off the cap face and ends in the pier collection box; drain pipe
   flange: 1/2 plate + 1/2 neoprene gasket, A = 11", B = 1'-2 (8") / A = 1'-3, B = 1'-6 (12"), 4 holes 1" dia for 7/8 bolts, 1 1/2" rim (PDF 158).
-- Pier collection box (PDF 157): steel 3/8 plate box on the cap top, 1'-4 x 2'-0 deep (1'-0 + 1'-0) tapered, 1'-6 wide cover (cover table PDF 158: 8" pipe A 1'-8, B 1'-6, C 8 5/8;
-  12" pipe A 1'-6, B 1'-6, C 12 3/4), anchored with 1/2 dia concrete studs/slots, P 3/8 x 4 straps; top 1" min/ 1/4 max below pier top face.
-- Pier drain pipe (PDF 157): at Piers 5G/9G/14G the collection box is 12'-6 from CL pier along the cap (pier 9G looking ahead), 8 dia pipe at 8% slope min toward the CL pier
+- Pier collection box (PDF 157): steel 3/8 plate box HUNG ON THE BACK (down-station) FACE OF THE CAP (straps P3/8x4 on 1/2" stud anchors into the face; PDF 155 sections A-A / C-C and the PDF 157 elevations looking ahead show it on the back face),
+  1'-4 along the face, 1'-6 out from the face at the top / 1'-4 at the bottom (outer wall tapers over the lower 1'-0), 2'-0 deep; inlet pipe CL 9" (at 50 F) off the face and 4" into the box; outlet pipe 1 1/2" clear of the face; 1'-6 wide cover (cover table PDF 158: 8" pipe A 1'-8, B 1'-6, C 8 5/8;
+  12" pipe A 1'-6, B 1'-6, C 12 3/4), anchored with 1/2 dia concrete studs/slots, P 3/8 x 4 straps; top 1/4" min / 1" max below the top of cap (glyph confirmed on the raster; section A-A: 1" at CL box).
+- Pier drain pipe (PDF 157): at Piers 5G/9G/14G the collection box is 12'-6 from CL pier along the cap (pier 9G looking ahead), 8 dia pipe from the box bottom, bend, then 8% slope min ALONG THE CAP FACE toward the CL pier
   (cleanouts at both bends), then vertical down the pier face with pipe supports (steel clamps on 3/4 dia rods into concrete inserts) every 6'-0 max, outlet 1'-0 +/- above a
   4'-0 x 4'-0 x 1'-0 erosion stone mattress (45 deg elbow, 1'-0 leg). At Pier 19G the collection box is 18'-3 7/8 from CL column, 12 dia pipe at 8% min, vertical with supports at 4'-0 max,
   ending 1" clear above the pavement (collar 3/8 plate, 18 dia pipe sleeve; top of pavement elev 981 +/-; "for continuation see roadway plans").
@@ -186,8 +188,14 @@ Scripts (re-runnable, optional inputs): `samples/plans/drains-ramp-g.csx`, `sign
   the web connection, not locatable), splash basins 10' x 10' x 2' where the table says YES, piped drains 22-25 into the 12" collector. The table's cross slope is compared with the model.
 - **12" collector (span 19G)**: A53 Sch 40 (OD 12.75"), 1'-8 right of CL girder A, elevations = deck top at the pipe minus the printed heights (drains 22-25; the cross frame rows have no station),
   couplers 4'-0 / 4'-0 / 2'-0 upstream of drains 23 / 24 / 25, hangers 5'-0 max, ends at the Pier 19G bearing line.
-- **Pier joint systems**: trough (slope 5.9% / 4.9%, invert at the deck underside at the high end; the printed 1'-8 drop = slope x run is reproduced, see the log), trough collection box,
-  8" pipe, pier collection box (12'-6 / 18'-3 7/8 from the CL column on the cap), pipe along the cap soffit at 8%, vertical clamps 6'-0 / 4'-0, 45 deg outlet + 4' x 4' x 1' mattress.
+- **Pier joint systems** (all outside the concrete; fixed 2026-10 after the user saw the 5G pipe run diagonally through the cap): trough from the deck underside at the high end to the
+  trough collection box, whose top is 1'-8 below the deck underside (PDF 154; trough falls 11.7% at 5G/9G/14G, 9.7% at 19G >= the printed 5.9% / 4.9% min; the deck underside itself falls 1'-8,
+  which is why the old reading "1'-8 = 5.9% x run" matched), box 2'-2 across the joint, low end toward the cap; 8" pipe 1:12 back-station 3'-8 to a turn-down 9" off the BACK cap face, down 4" into the
+  pier collection box hung on that face at 12'-6 / 18'-3 7/8 from CL column; pier pipe out of the box bottom 1 1/2" clear of the face, 8% along the face to CL column, then vertical (10 1/2" clear of
+  the column face, which is 9" behind the cap face), clamps 6'-0 / 4'-0, 45 deg outlet + mattress. Pier 19G: the span collector now ends over the box inlet (STA 67502+90.18, 31 1/4" before the
+  bearing line) and turns down into the box; the 8" trough pipe joins its elbow (section C-C). The printed box position and the collector line meet within 1/8" in plan.
+  Before the fix the box was centred in the cap (N = CL column) and the pier pipe ran in a straight line in plan from there to the back face of the column (12'-6 along, 3'-7 across) at 8%, i.e. diagonally
+  through the cap; the 19G collector ran to the bearing line and its drop overlapped the masonry plate.
 - **Sign brackets** (4 on Unit 2 at Pier 7WB, 2 on Unit 3 at Pier 13WB): web, top plate 1 7/8, bottom flange plate, 4 stiffeners, 8 x 1 1/2" anchor bolts on the 1'-8 circle, base plate placeholder.
 - **Lighting**: pole bases Pier 13WB / 14WB / 15WB (Unit 3) and Pier 8G (Ramp G Unit 2), 6 + 2 junction boxes (placeholders), ITS conduit (right barrier) / power conduit (Ramp G left barrier).
 - **Bar lists** (schedule only, weights reproduce the plans): pole base 221 lb, exit sign base 189 lb, end posts epoxy 373 / 450 lb and stainless 240 / 262 lb.
@@ -196,13 +204,13 @@ Scripts (re-runnable, optional inputs): `samples/plans/drains-ramp-g.csx`, `sign
 Free-fall tubes (8" OD): 5 1/2" (drains 1, 2, 20, 21), 4 1/2" (3-8, 12, 18), 3 1/2" (13), 2 1/2" (11, 16, 17), 2 9/16" (19), **1 1/2" (9, 10, 15)**, **overlap 1/2" with the top flange
 at drain 14** (Pier 10G back, G4 top flange, wide flange near the pier). Piped drains 22-25: tube 2 1/2" / 5 1/2" / 5 1/2" / 5 1/2", 8" drop pipe 3 9/16" / 6 3/16" (G1 top flange); the 12" collector
 clears everything by 3/16" at its tightest (cross frame diagonal CF139-D1 at STA 67502+85.7 to 67502+92.8; TIGHT warning). Pier systems: pipe 1 vs a cross frame top chord 9 1/2", pier pipe 2' + from the bearing
-elements; the Pier 19G collector elbow overlaps the masonry plate by 4 3/8" because its plan routing to the box is not printed (consequence of the straight-down assumption). The tube to CL girder A at drains 22-25 is
+elements; pipe 1 passes 6 5/16" under the Type 4 top chord at 5G/9G/14G (section A-A), the 19G collector drop clears G1 by 2 5/8" (the old masonry plate overlap is gone). The tube to CL girder A at drains 22-25 is
 18 1/2" in the model against the plan's 1'-8: the 1 1/2" difference is reported, nothing is moved.
 
 ### UNRESOLVED (raised as warnings by the generator)
 - Drain tube bottom for free fall ("1'-0 MIN below the girder web connection": connection location not printed); trench depth 3 1/2" vs 4 1/4"; 45 deg tee / cleanout geometry; upstream cleanout of the collector.
-- Pier systems: N position of the pier collection box on the cap (section A-A shows the pipe running back-station about 6-7 ft by scale), standoff / face of the vertical pipe, box top 1" min / 1/4" max below the cap top
-  (1/4" used), trough U width / sag (width = joint blockout), box orientation; conventions are listed in the generator warning "placement conventions to confirm". Pier 19G pipe routing from the collector end to the box.
+- Pier systems: box top 1/4" min / 1" max below the cap top (1/4" used), level of the bend under the box and stand-off of the vertical pipe from the column face (kept in the plane of the box outlet,
+  no offset bends), pipe 1 plan route (straight, exactly 1:12), trough U width / sag (width = joint blockout), which point of the trough box the 3'-6 / 4'-0 locates (centre); conventions are listed in the generator warning "placement conventions to confirm". Pier 19G pipe routing from the collector end to the box.
 - Sign supports: Unit 3 girder A brackets (reference of the 12'-10 7/8 dimension), the connection of the stub to the girder (the model's bracket web overlaps the girder web), MC18 / WT bracing / splice plates, anchor bolt lengths,
   HSS post height and truss size / elevation (placeholder base plate only). Exit sign bases: station (tick only), not placed.
 - Crash cushion end posts: position from the CL pier, wedge direction, plan width at the pier end, skewed Ramp G plan, cushion geometry; not placed, bars scheduled.

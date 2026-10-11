@@ -61,6 +61,43 @@ public partial class MainWindow
             if (_dbScenes > 1) _dbStale = true;
         }
         RefreshDbStatus();
+        _ = RelinkIfNeededAsync();
+    }
+
+    private string? _dbRelinked;
+
+    /// <summary>
+    /// Plan sheet links by default: when the database has no links, or the model's <c>sheet-links*.json</c> changed (or is a different file)
+    /// since the links were made, re-applies the sheet index + link rules to the existing database in the background (no element rebuild;
+    /// QC is kept). Once per database and rules file version per session.
+    /// </summary>
+    private async Task RelinkIfNeededAsync()
+    {
+        if (_db == null || _dbBusy || DbPath is not { } path || CompanionDatabase.FindLinksFile(_vm.FilePath) is not { } links) return;
+        string key = path + "|" + links + "|" + File.GetLastWriteTimeUtc(links).Ticks;
+        if (_dbRelinked == key) return;
+        bool applied = DateTime.TryParse(_db.Meta("links_applied_at"), null, System.Globalization.DateTimeStyles.RoundtripKind, out var at);
+        bool current = _db.LinkCount > 0 && applied && File.GetLastWriteTimeUtc(links) <= at.ToUniversalTime()
+                       && string.Equals(_db.Meta("links_file"), Path.GetFullPath(links), StringComparison.OrdinalIgnoreCase);
+        _dbRelinked = key;
+        if (current) return;
+        _dbBusy = true;
+        _db.Dispose();
+        _db = null;
+        RefreshDbStatus();
+        string name = _vm.Project.Name;
+        string? model = _vm.FilePath;
+        try
+        {
+            var res = await Task.Run(() => CompanionDatabase.Relink(path, name, new DatabaseOptions { ModelFile = model, LinksFile = links, Log = m => ViewModels.MainViewModel.Log("DB: " + m) }));
+            ViewModels.MainViewModel.Log($"DB: plan sheet links from {Path.GetFileName(links)}: {res.Sheets} sheets, {res.Links?.Links ?? 0} links in {res.Elapsed.TotalSeconds:F1} s");
+            if (res.Coverage.Length > 0) ViewModels.MainViewModel.Log("DB: " + res.Coverage);
+        }
+        catch (Exception ex) { ViewModels.MainViewModel.Log("DB relink failed: " + ex.Message); }
+        _dbBusy = false;
+        OpenDb();
+        RefreshDbStatus();
+        if (_dbShown != null) ShowDbElement(_dbShown);
     }
 
     private void OpenDb()
@@ -87,7 +124,8 @@ public partial class MainWindow
         if (_db == null) { DbPanel.SetStatus($"No database yet ({Path.GetFileName(DbPath)}). Create it to see the sheets each element is based on.", true, true, false); return; }
         string built = _db.Meta("built_at");
         double mb = new FileInfo(_db.Path).Length / 1048576.0;
-        DbPanel.SetStatus($"{Path.GetFileName(_db.Path)}: {_db.ElementCount:N0} elements, {_db.SheetCount} plan sheets, built {built}, {mb:F0} MB." + (mb > ModelDatabase.SizeNoteMb ? $" (Note: larger than {ModelDatabase.SizeNoteMb:F0} MB; informational only.)" : "")
+        DbPanel.SetStatus($"{Path.GetFileName(_db.Path)}: {_db.ElementCount:N0} elements, {_db.SheetCount} plan sheets, {_db.LinkCount:N0} sheet links"
+            + (_db.Meta("links_file") is { Length: > 0 } lf ? $" ({Path.GetFileName(lf)})" : _db.SheetCount == 0 ? " (no sheet-links*.json for this model)" : "") + $", built {built}, {mb:F0} MB." + (mb > ModelDatabase.SizeNoteMb ? $" (Note: larger than {ModelDatabase.SizeNoteMb:F0} MB; informational only.)" : "")
             + (_dbStale ? " The model changed since: rebuild to update (QC is kept)." : ""), true, false, true);
     }
 
@@ -98,7 +136,7 @@ public partial class MainWindow
         string? links = CompanionDatabase.FindLinksFile(_vm.FilePath);
         if (pages)
         {
-            if (links == null) { MessageBox.Show(this, "No sheet-links*.json (plan sets and link rules) beside the model.", "Plan pages", MessageBoxButton.OK, MessageBoxImage.Information); return; }
+            if (links == null) { MessageBox.Show(this, "No sheet-links*.json (plan sets and link rules) naming this model beside it.", "Plan pages", MessageBoxButton.OK, MessageBoxImage.Information); return; }
             var dlg = new OpenFolderDialog { Title = "Folder with the plan set PDFs" };
             if (dlg.ShowDialog(this) != true) return;
             folder = dlg.FolderName;
@@ -121,7 +159,10 @@ public partial class MainWindow
             _dbTags = res.Build.Tags;
             _dbTagTask = Task.FromResult(res.Build.Tags);
             _dbStale = false;
-            ViewModels.MainViewModel.Log($"DB: built {res.Build.Elements:N0} elements in {res.Elapsed.TotalSeconds:F1} s, {res.Sheets} sheets, {res.Links?.Links ?? 0} links");
+            ViewModels.MainViewModel.Log($"DB: built {res.Build.Elements:N0} elements in {res.Elapsed.TotalSeconds:F1} s, {res.Sheets} sheets, {res.Links?.Links ?? 0} links"
+                + (res.LinksFile != null ? $" ({Path.GetFileName(res.LinksFile)})" : " (no sheet-links*.json for this model)"));
+            if (res.Coverage.Length > 0) ViewModels.MainViewModel.Log("DB: " + res.Coverage);
+            if (links != null) _dbRelinked = _vm.FilePath is { } fp ? CompanionDatabase.DefaultPath(fp) + "|" + links + "|" + File.GetLastWriteTimeUtc(links).Ticks : null;
             StatusText($"Database built: {res.Build.Elements:N0} elements, {res.Sheets} sheets in {res.Elapsed.TotalSeconds:F1} s");
             ViewModels.MainViewModel.Log("DB: " + ModelDatabase.SizeText(path));
         }

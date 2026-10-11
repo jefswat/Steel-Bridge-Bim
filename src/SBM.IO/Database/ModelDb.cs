@@ -41,6 +41,8 @@ public sealed class SheetLink
     public string Title { get; init; } = "";
     public string PageFile { get; init; } = "";
     public string PreviewFile { get; init; } = "";
+    /// <summary>Absolute path of the whole plan-set PDF found when the database was built ("" = not found).</summary>
+    public string PdfPath { get; init; } = "";
     public string Role { get; init; } = "";
     public string Basis { get; init; } = "";
     /// <summary>Name of the element the link is stored on (the element itself, or the ancestor it is inherited from).</summary>
@@ -72,6 +74,7 @@ public sealed class ModelDb : IDisposable
     public string Meta(string key) => ModelDatabase.Scalar<string>(_cn, "SELECT value FROM meta WHERE key=$k", ("$k", key)) ?? "";
     public int ElementCount => ModelDatabase.Scalar<int>(_cn, "SELECT COUNT(*) FROM elements");
     public int SheetCount => ModelDatabase.Scalar<int>(_cn, "SELECT COUNT(*) FROM sheets");
+    public int LinkCount => ModelDatabase.Scalar<int>(_cn, "SELECT COUNT(*) FROM element_sheet");
 
     private const string Cols = "global_id,parent_global_id,level,category,subtype,ifc_class,in_ifc,name,mark,bridge_group,bridge,unit,support,girder,station_begin,station_end,material,mass_kg,volume_m3,length_m,properties";
 
@@ -182,7 +185,7 @@ public sealed class ModelDb : IDisposable
             using var c = _cn.CreateCommand();
             c.CommandText = """
                 SELECT s.sheet_id, s.plan_set, s.pdf_page, s.design_sheet, s.title, s.page_file, s.preview_file, l.role, l.basis,
-                       q.status, q.checked_by, q.checked_at, q.note
+                       q.status, q.checked_by, q.checked_at, q.note, s.pdf_path
                 FROM element_sheet l JOIN sheets s ON s.sheet_id = l.sheet_id
                 LEFT JOIN qc q ON q.global_id = $g AND q.sheet_id = l.sheet_id
                 WHERE l.global_id = $a ORDER BY (l.role = 'detail') DESC, s.plan_set, s.pdf_page
@@ -197,7 +200,7 @@ public sealed class ModelDb : IDisposable
                 list.Add(new SheetLink
                 {
                     SheetId = id, PlanSet = S(r, 1), PdfPage = r.GetInt32(2), DesignSheet = S(r, 3), Title = S(r, 4), PageFile = S(r, 5), PreviewFile = S(r, 6),
-                    Role = S(r, 7), Basis = S(r, 8), QcStatus = r.IsDBNull(9) ? "unchecked" : r.GetString(9), CheckedBy = S(r, 10), CheckedAt = S(r, 11), Note = S(r, 12),
+                    Role = S(r, 7), Basis = S(r, 8), PdfPath = S(r, 13), QcStatus = r.IsDBNull(9) ? "unchecked" : r.GetString(9), CheckedBy = S(r, 10), CheckedAt = S(r, 11), Note = S(r, 12),
                     LinkRootName = chain[i].Name, LinkRootId = chain[i].GlobalId, Inherited = i != chain.Count - 1,
                 });
             }
@@ -207,6 +210,15 @@ public sealed class ModelDb : IDisposable
 
     /// <summary>Absolute path of a sheet's page file or preview (stored relative to the database folder).</summary>
     public string Resolve(string relative) => System.IO.Path.GetFullPath(System.IO.Path.Combine(Folder, relative));
+
+    /// <summary>What opens a sheet: the single-page PDF of a split (page 1 of it) when it exists, else the whole plan-set PDF at the sheet's
+    /// page; null when neither file exists.</summary>
+    public (string File, int Page)? PdfTarget(SheetLink s)
+    {
+        if (s.PageFile.Length > 0 && Resolve(s.PageFile) is var pf && File.Exists(pf)) return (pf, 1);
+        if (s.PdfPath.Length > 0 && File.Exists(s.PdfPath)) return (s.PdfPath, s.PdfPage);
+        return null;
+    }
 
     public void SetQc(string globalId, string sheetId, string status, string? by, string? note)
     {

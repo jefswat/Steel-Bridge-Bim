@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using Microsoft.Data.Sqlite;
 
@@ -15,6 +16,21 @@ public sealed class PlanSetSpec
     public string Pdf { get; set; } = "";
     /// <summary>Value of <c>elements.bridge_group</c> for the structures this plan set describes (also the alignment name).</summary>
     public string BridgeGroup { get; set; } = "";
+    /// <summary>Sheet index of the PDF (page → design sheet → title). With it the database gets its <c>sheets</c> table, and so the
+    /// element → sheet links, without splitting the PDF (no Python needed); its titles also replace the title-block text read by the
+    /// split tool (which reads Iowa DOT title blocks only).</summary>
+    public List<SheetIndexEntry>? Sheets { get; set; }
+}
+
+/// <summary>One page of a plan set's sheet index: <c>{ "p": 19, "s": "17", "t": "PIER NO. 1WB DETAILS" }</c>.</summary>
+public sealed class SheetIndexEntry
+{
+    /// <summary>PDF page (1-based).</summary>
+    [JsonPropertyName("p")] public int Page { get; set; }
+    /// <summary>Design / project sheet number as printed in the title block ("" when none).</summary>
+    [JsonPropertyName("s")] public string Sheet { get; set; } = "";
+    /// <summary>Sheet title (the rules match it).</summary>
+    [JsonPropertyName("t")] public string Title { get; set; } = "";
 }
 
 public sealed class LinkRule
@@ -23,6 +39,8 @@ public sealed class LinkRule
     /// <summary>Regex on the normalized sheet title (named groups become <c>{name}</c> placeholders in the targets).</summary>
     public string Sheets { get; set; } = "";
     public List<string>? PlanSets { get; set; }
+    /// <summary>Optional PDF pages the rule is limited to (sheets with the same title that show different things).</summary>
+    public List<int>? Pages { get; set; }
     public string Role { get; set; } = "detail";
     public string Basis { get; set; } = "";
     /// <summary>OR of selectors; a selector is field → value (string with {captures} and % wildcards, or a list of those).</summary>
@@ -37,17 +55,48 @@ public sealed class SheetHint
 
 public sealed class LinkRules
 {
+    /// <summary>Model files (names or * ? globs, e.g. <c>I-80 WB and Ramp G.sbm</c>) these rules belong to; picks the rules file when a
+    /// folder holds several. Empty = any model in the folder.</summary>
+    public List<string> Models { get; set; } = new();
+    /// <summary>Extra folders searched for the plan PDFs (absolute, %ENV% allowed, or relative to the rules file); missing folders are skipped.</summary>
+    public List<string> PlanFolders { get; set; } = new();
     public List<PlanSetSpec> PlanSets { get; set; } = new();
     public List<LinkRule> Rules { get; set; } = new();
     /// <summary>Title regexes of sheets that need no model element (cover, revision sheet).</summary>
     public List<string> Administrative { get; set; } = new();
     public List<SheetHint> Hints { get; set; } = new();
 
-    public static LinkRules Load(string path) => JsonSerializer.Deserialize<LinkRules>(File.ReadAllText(path), new JsonSerializerOptions
+    /// <summary>The file the rules were loaded from (null when built in code).</summary>
+    [JsonIgnore] public string? SourceFile { get; set; }
+
+    public static LinkRules Load(string path)
     {
-        PropertyNameCaseInsensitive = true, ReadCommentHandling = JsonCommentHandling.Skip, AllowTrailingCommas = true,
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-    }) ?? new LinkRules();
+        var r = JsonSerializer.Deserialize<LinkRules>(File.ReadAllText(path), new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true, ReadCommentHandling = JsonCommentHandling.Skip, AllowTrailingCommas = true,
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        }) ?? new LinkRules();
+        r.SourceFile = Path.GetFullPath(path);
+        return r;
+    }
+
+    /// <summary>True when <see cref="Models"/> names <paramref name="modelFile"/> (file name; * and ? globs; case-insensitive).</summary>
+    public bool IsFor(string modelFile)
+    {
+        string name = Path.GetFileName(modelFile);
+        return Models.Any(m => Regex.IsMatch(name, "^" + Regex.Escape(m).Replace(@"\*", ".*").Replace(@"\?", ".") + "$", RegexOptions.IgnoreCase));
+    }
+
+    /// <summary>The plan folders named in the file, resolved against the rules file's folder.</summary>
+    public IEnumerable<string> ResolvedPlanFolders()
+    {
+        string baseDir = SourceFile != null ? Path.GetDirectoryName(SourceFile)! : Directory.GetCurrentDirectory();
+        foreach (var f in PlanFolders)
+        {
+            string p = Environment.ExpandEnvironmentVariables(f);
+            yield return Path.GetFullPath(Path.IsPathRooted(p) ? p : Path.Combine(baseDir, p));
+        }
+    }
 }
 
 public sealed class LinkResult
@@ -78,14 +127,14 @@ public static class PlanSheets
         foreach (var dir in folders)
         {
             if (!Directory.Exists(dir)) continue;
-            var hit = Directory.EnumerateFiles(dir, spec.Pdf.Contains('*') || spec.Pdf.Contains('?') ? spec.Pdf : spec.Pdf).FirstOrDefault();
+            var hit = Directory.EnumerateFiles(dir, spec.Pdf).FirstOrDefault();
             if (hit != null) return hit;
         }
         return null;
     }
 
     /// <summary>Reads <c>sheets.json</c> written by the split tool into the <c>sheets</c> table. <paramref name="relDir"/> is the page folder relative to the database file.</summary>
-    public static int ImportSheets(SqliteConnection cn, string planSet, string sheetsJson, string relDir)
+    public static int ImportSheets(SqliteConnection cn, string planSet, string sheetsJson, string relDir, string? pdfPath = null)
     {
         using var doc = JsonDocument.Parse(File.ReadAllText(sheetsJson));
         string pdf = doc.RootElement.GetProperty("pdf_file").GetString() ?? "";
@@ -96,7 +145,7 @@ public static class PlanSheets
         del.Parameters.AddWithValue("$s", planSet);
         del.ExecuteNonQuery();
         using var cmd = cn.CreateCommand();
-        cmd.CommandText = "INSERT OR REPLACE INTO sheets(sheet_id,plan_set,pdf_file,pdf_page,design_sheet,title,page_file,preview_file) VALUES($id,$ps,$pdf,$pg,$ds,$t,$pf,$pv)";
+        cmd.CommandText = "INSERT OR REPLACE INTO sheets(sheet_id,plan_set,pdf_file,pdf_page,design_sheet,title,page_file,preview_file,pdf_path) VALUES($id,$ps,$pdf,$pg,$ds,$t,$pf,$pv,$pp)";
         foreach (var s in doc.RootElement.GetProperty("sheets").EnumerateArray())
         {
             int page = s.GetProperty("pdf_page").GetInt32();
@@ -110,6 +159,7 @@ public static class PlanSheets
             cmd.Parameters.AddWithValue("$pf", relDir.TrimEnd('/', '\\').Replace('\\', '/') + "/" + s.GetProperty("page_file").GetString());
             string prev = s.GetProperty("preview_file").GetString() ?? "";
             cmd.Parameters.AddWithValue("$pv", prev.Length == 0 ? DBNull.Value : relDir.TrimEnd('/', '\\').Replace('\\', '/') + "/" + prev);
+            cmd.Parameters.AddWithValue("$pp", pdfPath != null ? Path.GetFullPath(pdfPath) : DBNull.Value);
             cmd.ExecuteNonQuery();
             n++;
         }
@@ -118,6 +168,41 @@ public static class PlanSheets
     }
 
     public static string SheetId(string planSet, int page) => $"{planSet}:p{page:000}";
+
+    /// <summary>Fills / updates the <c>sheets</c> rows of a plan set from its sheet index (no PDF splitting). Page and preview files of an
+    /// earlier split are kept; titles and design sheet numbers come from the index; <c>pdf_path</c> = the plan PDF found (kept from before
+    /// when not found now); rows of pages not in the index are removed. Returns the number of sheets.</summary>
+    public static int ImportIndex(SqliteConnection cn, PlanSetSpec set, string? pdfPath)
+    {
+        if (set.Sheets == null) return 0;
+        ModelDatabase.Exec(cn, "BEGIN");
+        using var cmd = cn.CreateCommand();
+        cmd.CommandText = """
+            INSERT INTO sheets(sheet_id, plan_set, pdf_file, pdf_page, design_sheet, title, pdf_path) VALUES($id, $ps, $pdf, $pg, $ds, $t, $pp)
+            ON CONFLICT(sheet_id) DO UPDATE SET plan_set = excluded.plan_set, design_sheet = excluded.design_sheet, title = excluded.title,
+              pdf_page = excluded.pdf_page, pdf_file = COALESCE(excluded.pdf_file, sheets.pdf_file), pdf_path = COALESCE(excluded.pdf_path, sheets.pdf_path)
+            """;
+        var pages = new List<int>();
+        foreach (var e in set.Sheets)
+        {
+            pages.Add(e.Page);
+            cmd.Parameters.Clear();
+            cmd.Parameters.AddWithValue("$id", SheetId(set.Id, e.Page));
+            cmd.Parameters.AddWithValue("$ps", set.Id);
+            cmd.Parameters.AddWithValue("$pdf", pdfPath != null ? Path.GetFileName(pdfPath) : DBNull.Value);
+            cmd.Parameters.AddWithValue("$pg", e.Page);
+            cmd.Parameters.AddWithValue("$ds", e.Sheet ?? "");
+            cmd.Parameters.AddWithValue("$t", NormalizeTitle(e.Title));
+            cmd.Parameters.AddWithValue("$pp", pdfPath != null ? Path.GetFullPath(pdfPath) : DBNull.Value);
+            cmd.ExecuteNonQuery();
+        }
+        ModelDatabase.Exec(cn, $"DELETE FROM sheets WHERE plan_set = $s AND pdf_page NOT IN ({string.Join(",", pages.DefaultIfEmpty(-1))})", ("$s", set.Id));
+        ModelDatabase.Exec(cn, "COMMIT");
+        return set.Sheets.Count;
+    }
+
+    /// <summary>Same normalization as the split tool: backticks (used as spaces in some title blocks) and runs of white space.</summary>
+    public static string NormalizeTitle(string? t) => Regex.Replace((t ?? "").Replace('`', ' '), @"\s+", " ").Trim();
 
     // ================================================================== link rules
 
@@ -159,6 +244,7 @@ public static class PlanSheets
             foreach (var s in sheets)
             {
                 if (rule.PlanSets != null && !rule.PlanSets.Contains(s.set)) continue;
+                if (rule.Pages is { Count: > 0 } && !rule.Pages.Contains(s.page)) continue;
                 var m = rx.Match(s.title);
                 if (!m.Success) continue;
                 sets.TryGetValue(s.set, out var set);
@@ -257,7 +343,7 @@ public static class PlanSheets
         sb.AppendLine("Generated by `sbm db ... --links ...` from the companion database (view `v_unused_sheets`). A sheet appears here when");
         sb.AppendLine("no element of the model is based on it (no row in `element_sheet`). Such a sheet either describes something the");
         sb.AppendLine("model definition does not contain yet (the \"Suggests\" column), or the link rules need a rule for it");
-        sb.AppendLine("(`samples/plans/sheet-links-i80-rampg.json`). \"Design\" = design sheet number, \"PDF\" = PDF page.");
+        sb.AppendLine($"(`{(rules.SourceFile != null ? Path.GetFileName(rules.SourceFile) : "sheet-links*.json")}`). \"Design\" = design sheet number, \"PDF\" = PDF page.");
         sb.AppendLine();
         sb.AppendLine($"{rows.Count} of {total} sheets are unlinked ({admin} administrative sheets - cover, revision - are excluded).");
         sb.AppendLine();

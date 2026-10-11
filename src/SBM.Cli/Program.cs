@@ -214,11 +214,26 @@ public static class Program
                     };
                     if (Opt("--plans") is { } pl) o.PlanFolders.AddRange(pl.Split(','));
                     string? outPath = args.Length > 2 && !args[2].StartsWith("--") ? args[2] : null;
+                    if (args.Contains("--relink"))
+                    {
+                        // Sheets + links only, on the existing database (no regeneration, element registry untouched).
+                        o.ModelFile = Path.GetFullPath(args[1]);
+                        string dbFile = outPath ?? SBM.IO.Database.CompanionDatabase.DefaultPath(args[1]);
+                        if (!File.Exists(dbFile)) { Console.Error.WriteLine($"{dbFile} does not exist: build it first (sbm db {args[1]})."); return 1; }
+                        var rl = SBM.IO.Database.CompanionDatabase.Relink(dbFile, doc.Project.Name, o);
+                        Console.WriteLine(rl.LinksFile != null ? $"  link rules {rl.LinksFile}" : "  link rules: none found");
+                        if (rl.Links is { } ll) Console.WriteLine($"  sheets {ll.Sheets}, links {ll.Links:N0}, sheets linked {ll.SheetsLinked}, unlinked {ll.SheetsUnused} ({rl.Elapsed.TotalSeconds:F1} s)");
+                        if (rl.Coverage.Length > 0) Console.WriteLine(rl.Coverage);
+                        if (rl.Links != null) foreach (var w in rl.Links.Warnings) Console.WriteLine("  warning: " + w);
+                        return 0;
+                    }
                     var r = doc.ExportDatabase(outPath, o);
                     Console.WriteLine($"Database {r.Build.Path}: {r.Build.Elements:N0} elements in {r.Elapsed.TotalSeconds:F1} s (registry {r.Build.Elapsed.TotalSeconds:F1} s)");
                     foreach (var (lv, n) in r.Build.ByLevel.OrderByDescending(x => x.Value)) Console.WriteLine($"  {lv,-10} {n,9:N0}");
+                    Console.WriteLine(r.LinksFile != null ? $"  link rules {r.LinksFile}" : "  link rules: none found (no sheet-links*.json naming this model beside it): no plan sheet links");
                     if (r.Links is { } l)
                         Console.WriteLine($"  sheets {l.Sheets}, links {l.Links:N0}, sheets linked {l.SheetsLinked}, unlinked {l.SheetsUnused}");
+                    else if (r.LinksFile != null) Console.WriteLine($"  sheets {r.Sheets}: no links (no sheet index in the rules and no imported pages: run with --pages)");
                     Console.WriteLine("  " + SBM.IO.Database.ModelDatabase.SizeText(r.Build.Path));
                     if (r.Coverage.Length > 0) Console.WriteLine(r.Coverage);
                     if (r.Links != null) foreach (var w in r.Links.Warnings) Console.WriteLine("  warning: " + w);

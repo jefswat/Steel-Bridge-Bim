@@ -31,7 +31,11 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
 - Companion database: `SBM.IO/Database` (`ModelDatabase` writer + schema, `PlanSheets` sheets/link rules/reports, `ModelDb` reader, `CompanionDatabase`
   orchestration; `IfcKeys` = the key patterns behind the IFC GlobalIds, shared with `IfcExporter` — never change a pattern). Compact layout `el` +
   `strings` + `props`, readable VIEW `elements`; groups (no IFC entity) at the plans' granularity; links on groups/assemblies, children inherit
-  (`v_element_sheets`). `tools/plan_split.py` splits plan PDFs. App: `MainWindow.Database.cs` + `SBM.App/Database/` (panel, preview window).
+  (`v_element_sheets`). `tools/plan_split.py` splits plan PDFs. App: `MainWindow.Database.cs` + `SBM.App/Database/` (panel, preview window, `PdfOpener` = open at page).
+  Sheet links need no PDF split: rules files `samples/plans/sheet-links-{i80-rampg,woodbury,br02069}.json` carry each plan set's sheet index
+  (`sheets: [{p,s,t}]`) and `models` (which .sbm they belong to; `CompanionDatabase.FindLinksFile` picks by it) + `planFolders` (PDF lookup ->
+  `sheets.pdf_path`). Every build applies them; `CompanionDatabase.Relink` / `sbm db --relink` re-applies to an existing db; the app relinks on
+  load when links are missing or the rules file is newer. A new bridge needs its own `sheet-links-<name>.json` with an index (tests check every rule matches a sheet).
   Keep `ModelDatabase.Builder` numbering in step with `IfcExporter` (test `GlobalIds_AreTheIfcGlobalIds`). CLI `sbm db`, docs in docs/API.md.
 - `src/SBM.Cli` — `sbm.exe` command line over SBM.Api (new/info/get/set/add/remove/import-landxml/regen/export/run/bench/
   elevations/drawings/sheets/nurbs).
@@ -515,7 +519,9 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
 - Misc items (OPTIONAL, `BridgeDefinition.Misc` = `MiscItemsDefinition` + `DeckDrainDefinition.Trench`; null = none; `Bridge/MiscItemsDefinition.cs`, generator `SBM.Core/Misc/`
   `MiscItemsGenerator` (+ `MiscPierDrains`, `MiscOthers`, `MiscMesh`), result `MiscModel` hung on `SubstructureModel.Misc` and built in `RegenerationCache` after the substructure):
   Ramp G deck drainage (trench inlets positioned FROM THE GUTTER LINE = deck edge - EdgeStrip width, tube, grate, splash basin, 12" span collector at the printed
-  deck-top-to-CL heights, pier joint collection systems at 5G/9G/14G/19G), I-80 sign truss brackets (steel + anchor bolts; post base plate = placeholder) and exit sign bases,
+  deck-top-to-CL heights, pier joint collection systems at 5G/9G/14G/19G: pier collection box HUNG ON THE BACK CAP FACE (`PierDrainDefinition.CapBoxFace`, inlet 9" / outlet 1 1/2" clear
+  of the face), pier pipe in the vertical plane of the box outlet along the face to CL column then down - nothing passes through the cap; trough box top 1'-8 below the deck underside; a span collector
+  feeding a pier box ends over its inlet), I-80 sign truss brackets (steel + anchor bolts; post base plate = placeholder) and exit sign bases,
   crash cushion end posts, lighting (pole bases, junction boxes, conduit in the barrier). Rules: nothing is assumed - unknown plan values are nullable inputs / `Unresolved`
   strings raised as WARNINGS ("UNRESOLVED ..."); things by others are placeholders (`MiscElement.Placeholder`, IFC Pset `SBM_Placeholder` with the plan basis); plan bar lists are
   schedule-only `BarMark`s (`MiscBarRow`, `BarMark.Coating`). DRAIN CLEARANCE: every tube / drop pipe / collector / pier pipe is checked against the steel parts of its bridge
