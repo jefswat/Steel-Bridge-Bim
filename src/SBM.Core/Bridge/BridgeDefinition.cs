@@ -1,4 +1,5 @@
 using static SBM.Core.Units.UnitSystem;
+using SBM.Core.Alignments;
 
 namespace SBM.Core.Bridge;
 
@@ -441,8 +442,47 @@ public sealed class DeckEdgePoint
     public DeckEdgePoint Clone() => (DeckEdgePoint)MemberwiseClone();
 }
 
+/// <summary>
+/// OPTIONAL strip along each deck edge placed LEVEL where the finished grade falls toward the barrier (project-specific: Iowa DOT
+/// plans note "where the deck slopes downward towards the barrier rail, the deck under the barrier rail shall be placed level ...
+/// where it slopes downward away from the barrier rail, along the same cross slope as the deck"). Width is measured inboard from the
+/// deck edge (follows a variable deck width); the strip starts at the "gutter line" = edge - Width. Per side and station, by the sign of
+/// that side's cross slope at the gutter line: it falls toward the edge (outward slope &lt; 0) -> the strip is level at the gutter
+/// elevation; otherwise the cross-slope plane continues. Applies only when the gutter line lies on the same side of the pivot as the edge.
+/// </summary>
+public sealed class DeckEdgeStrip
+{
+    public double Width { get; set; }
+    public bool LowSideLevel { get; set; } = true;
+    public DeckEdgeStrip Clone() => (DeckEdgeStrip)MemberwiseClone();
+}
+
 public sealed class DeckDefinition
 {
+    /// <summary>Optional level strip at the deck edges (see <see cref="DeckEdgeStrip"/>); null = the cross-slope plane to the edge.</summary>
+    public DeckEdgeStrip? EdgeStrip { get; set; }
+
+    /// <summary>
+    /// Finished grade (top of deck) at a station / offset: the alignment's profile + cross slope, with the optional
+    /// <see cref="EdgeStrip"/> applied. The gutter-line offset at which a level strip took over is returned in <paramref name="levelAt"/>
+    /// (NaN when the plane is used).
+    /// </summary>
+    public double FinishedElevation(Alignment a, double station, double offset) => FinishedElevation(a, station, offset, out _);
+
+    public double FinishedElevation(Alignment a, double station, double offset, out double levelAt)
+    {
+        levelAt = double.NaN;
+        if (EdgeStrip is { LowSideLevel: true, Width: > 0 } es && a.CrossSlope.Rows.Count > 0)
+        {
+            double piv = a.CrossSlope.PivotOffset;
+            var (l, r) = a.CrossSlope.SidesAt(station);
+            double gr = RightAt(station) - es.Width, gl = LeftAt(station) + es.Width;
+            if (offset > gr && gr > piv && r.SlopeAt(gr - piv) < 0) levelAt = gr;
+            else if (offset < gl && gl < piv && l.SlopeAt(piv - gl) < 0) levelAt = gl;
+        }
+        return a.ElevationAt(station, double.IsNaN(levelAt) ? offset : levelAt);
+    }
+
     /// <summary>Left deck edge offset from the alignment (right positive, so usually negative).</summary>
     public double LeftEdgeOffset { get; set; } = Ft(-21.5);
     public double RightEdgeOffset { get; set; } = Ft(21.5);
@@ -488,7 +528,7 @@ public sealed class DeckDefinition
         LeftEdgeOffset = LeftEdgeOffset, RightEdgeOffset = RightEdgeOffset, Thickness = Thickness, Haunch = Haunch,
         LeftEdgeTable = LeftEdgeTable?.Select(p => p.Clone()).ToList(), RightEdgeTable = RightEdgeTable?.Select(p => p.Clone()).ToList(),
         OverhangThickness = OverhangThickness, StayInPlaceForms = StayInPlaceForms, SipFormDepth = SipFormDepth,
-        Barrier = Barrier.Clone(), Reinforcement = Reinforcement.Clone(),
+        Barrier = Barrier.Clone(), Reinforcement = Reinforcement.Clone(), EdgeStrip = EdgeStrip?.Clone(),
     };
 }
 

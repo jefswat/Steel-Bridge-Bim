@@ -92,7 +92,7 @@ public partial class ElevationCheckWindow : Window
             else
             {
                 if (!_u.TryParseLength(OffBox.Text, LengthKind.Long, out double off)) { CalcError.Text = "Enter an offset (right positive)"; return; }
-                c = ElevationCheck.Grade(_f.Alignment, sta, off, _u, $"Finished grade at STA {_u.FormatStation(sta)}, offset {_u.FormatLength(off)}");
+                c = ElevationCheck.Grade(_f.Alignment, sta, off, _u, $"Finished grade at STA {_u.FormatStation(sta)}, offset {_u.FormatLength(off)}", _f.Definition.Deck);
             }
             BearingGrid.SelectedIndex = -1;
             Show(c);

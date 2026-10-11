@@ -569,7 +569,7 @@ public sealed partial class SubstructureGenerator
             var p = a.PointAt(dr.Station, edge);
             double ang = a.AngleAt(dr.Station);
             var t = Vec2.FromAngle(ang);
-            double zTop = a.ElevationAt(dr.Station, edge);
+            double zTop = deck.FinishedElevation(a, dr.Station, edge);
             double zSlabBot = zTop - deck.Thickness;
             // Inlet: steel box through the slab, 6" below it.
             var f = new Frame3(p.WithZ(0), new Vec3(t.X, t.Y, 0), new Vec3(-t.Y, t.X, 0), Up);

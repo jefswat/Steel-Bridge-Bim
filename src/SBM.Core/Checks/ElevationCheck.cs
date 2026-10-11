@@ -44,14 +44,14 @@ public static partial class ElevationCheck
     private static string Pct(double s) => (s * 100).ToString("+0.000;-0.000;0.000", Inv) + "%";
 
     /// <summary>Finished grade at a station/offset with the profile and cross-slope math shown.</summary>
-    public static ElevationChain Grade(Alignment a, double station, double offset, UnitSystem u, string title)
+    public static ElevationChain Grade(Alignment a, double station, double offset, UnitSystem u, string title, DeckDefinition? deck = null)
     {
         var ch = new ElevationChain { Title = title, Station = station, Offset = offset };
-        AddGrade(ch, a, station, offset, u);
+        AddGrade(ch, a, station, offset, u, deck);
         return ch;
     }
 
-    private static double AddGrade(ElevationChain ch, Alignment a, double station, double offset, UnitSystem u)
+    private static double AddGrade(ElevationChain ch, Alignment a, double station, double offset, UnitSystem u, DeckDefinition? deck = null)
     {
         string E(double z) => u.FormatLength(z, LengthKind.Coordinate);
         var (pgl, how) = a.Profile.Explain(station, s => u.FormatStation(s), E, x => u.FormatLength(x));
@@ -72,9 +72,25 @@ public static partial class ElevationCheck
         ch.Steps.Add(new CalcStep($"Cross slope × offset",
             slopeText + (d < 0 ? " — slope applies away from the pivot" : ""),
             dz, pgl + dz, "Top of deck (finished grade)"));
-        double model = a.ElevationAt(station, offset);
-        if (Math.Abs(model - (pgl + dz)) > 1e-6) { ch.Mismatch = true; ch.Checks.Add($"Finished grade differs from the alignment engine by {u.FormatLength(model - pgl - dz, LengthKind.Short)}"); }
-        return pgl + dz;
+        double result = pgl + dz, levelAt;
+        double model = deck != null ? deck.FinishedElevation(a, station, offset) : a.ElevationAt(station, offset);
+        if (deck != null && deck.EdgeStrip is { } es && !double.IsNaN(levelAt = LevelOffset(deck, a, station, offset)))
+        {
+            double zg = a.ElevationAt(station, levelAt);
+            ch.Steps.Add(new CalcStep("Edge strip level",
+                $"offset {u.FormatLength(offset)} is outside the gutter line {u.FormatLength(levelAt)} (deck edge {(offset < 0 ? "LT" : "RT")} inboard {u.FormatLength(es.Width, LengthKind.Short)}) where the surface falls toward the barrier: " +
+                $"deck placed level at the gutter elevation (plan note, typical section) instead of continuing the cross slope",
+                zg - result, zg, "Top of deck (finished grade, level strip)"));
+            result = zg;
+        }
+        if (Math.Abs(model - result) > 1e-6) { ch.Mismatch = true; ch.Checks.Add($"Finished grade differs from the alignment engine by {u.FormatLength(model - result, LengthKind.Short)}"); }
+        return result;
+    }
+
+    private static double LevelOffset(DeckDefinition deck, Alignment a, double station, double offset)
+    {
+        deck.FinishedElevation(a, station, offset, out double levelAt);
+        return levelAt;
     }
 
     private static string CrossSlopeSource(CrossSlopeTable cs, double station, UnitSystem u)
@@ -146,7 +162,7 @@ public static partial class ElevationCheck
         }
         var so = f.Alignment.Inverse(p.XY);
         var ch = new ElevationChain { Title = $"{g.Name} web centerline at STA {u.FormatStation(station)}", Station = so.Station, Offset = so.Offset };
-        double z = AddGrade(ch, f.Alignment, so.Station, so.Offset, u);
+        double z = AddGrade(ch, f.Alignment, so.Station, so.Offset, u, f.Definition.Deck);
         var (topOfWeb, _) = AddGirderSection(ch, f.Definition, z, so.Station, u, g, (s0 + s1) / 2);
         // The 3D girder is sampled along its length and interpolated linearly, so between samples it can sit a few
         // hundredths of an inch off the exact surface; 1/16" is the tolerance for a match.
@@ -170,7 +186,7 @@ public static partial class ElevationCheck
             Title = $"{f.SupportLine(support).Name} — G{girder + 1} bearing (CL bearing at web CL)",
             Station = br.Station, Offset = br.Offset,
         };
-        double z = AddGrade(ch, a, br.Station, br.Offset, u);
+        double z = AddGrade(ch, a, br.Station, br.Offset, u, def.Deck);
 
         var gb = f.Girders[girder];
         double sb = !double.IsNaN(br.PathDistance) ? br.PathDistance

@@ -32,7 +32,7 @@ public static class BentViews
 
         // ---- deck cut along the support line (with barriers) and girders cut at the bearings
         double sL = def.Deck.LeftAt(unit.Station) / k, sR = def.Deck.RightAt(unit.Station) / k;
-        double Grade(double s) { var so = a.Inverse(unit.Plan(s, 0)); return a.ElevationAt(so.Station, so.Offset); }
+        double Grade(double s) { var so = a.Inverse(unit.Plan(s, 0)); return def.Deck.FinishedElevation(a, so.Station, so.Offset); }
         int nS = 40;
         var deckTop = Enumerable.Range(0, nS + 1).Select(i => sL + (sR - sL) * i / nS).Select(s => new Vec2(s, Grade(s))).ToList();
         d.CutConcrete(deckTop.Concat(Enumerable.Reverse(deckTop).Select(p => new Vec2(p.X, p.Y - def.Deck.Thickness))).ToList(), 0.06);
