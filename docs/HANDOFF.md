@@ -219,6 +219,12 @@ as "…before bearing iteration.sbm". The run confirmed item 2.3: girder C has n
 - Editor UI for the new column-rebar inputs (faces, chamfer positions, hoop overlap, crossties, flare cage).
 - Generic bearings: bearing body 16"×16" and masonry plate 1¾" are assumptions (vendor items).
 
+## 4a-bis. Open decisions page (2026-10-11)
+
+All pending user decisions (staking 1-4, Ramp G 19G 27" bar end calibration, Ramp G U3 end dam bars vs 20" flanges,
+standard beam sheets download, Woodbury standard-beam placement) are on https://claude.ai/artifact/HGTVUujx3prgBrmWAjn5ra
+(source temp/decisions/). The user saves choices there: read them with ArtifactData list, collection "decisions".
+
 ## 4b. Staking check findings: AWAITING USER REVIEW (2026-10-11; user is checking on the computer, do not change yet)
 
 From `check-staking.csx` / `docs/plan-data/haunch-staking-check.md`:
