@@ -18,6 +18,8 @@ public class DatabaseTests : IDisposable
     {
         "IFCRELAGGREGATES", "IFCRELCONTAINEDINSPATIALSTRUCTURE", "IFCPROPERTYSET", "IFCRELDEFINESBYPROPERTIES", "IFCRELASSOCIATESMATERIAL",
         "IFCRELDEFINESBYTYPE", "IFCMECHANICALFASTENERTYPE", "IFCOPENINGELEMENT", "IFCRELVOIDSELEMENT",
+        // IFC 4.3 alignment structure below the IfcAlignment row (layouts, segments, stationing referents) and its relations.
+        "IFCRELNESTS", "IFCRELREFERENCEDINSPATIALSTRUCTURE", "IFCALIGNMENTHORIZONTAL", "IFCALIGNMENTVERTICAL", "IFCALIGNMENTSEGMENT", "IFCREFERENT",
     };
 
     private (SbmDocument doc, string db, CompanionResult res) Build()
