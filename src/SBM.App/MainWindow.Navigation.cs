@@ -145,6 +145,13 @@ public partial class MainWindow
         }
     }
 
+    /// <summary>Snapshot diagnostics: per detail layer, tiles drawn / total (DETAIL: lines in the session log).</summary>
+    private void LogDetailVisibility()
+    {
+        foreach (var g in _detailBounds.GroupBy(kv => kv.Value.layer))
+            ViewModels.MainViewModel.Log($"DETAIL {g.Key}: {g.Count(kv => kv.Key.Visibility == Visibility.Visible)} of {g.Count()} tiles drawn (layer on: {_vm.IsLayerVisible(g.Key)}, navigating: {_navigating}, radius {_detailRadius} m)");
+    }
+
     // ------------------------------------------------------------------ camera <-> ViewNav
 
     private OrthoView? CurrentView() =>

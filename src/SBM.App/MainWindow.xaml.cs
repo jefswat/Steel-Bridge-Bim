@@ -185,6 +185,7 @@ public partial class MainWindow : Window
                         ViewModels.MainViewModel.Log("PICKAFTER: " + string.Join(" | ", _vm.SelectedProperties.Select(r => $"{r.Name}={r.Value}")) + $" (smooth bars {_lodSkip.Count})");
                         if (opt == "--hideafter" && _selectedTag != null) { HideElement(_selectedTag, _selectedTitle); ViewModels.MainViewModel.Log($"HIDEAFTER: {_hiddenList.Count} hidden: {string.Join(", ", _hiddenList.Select(h => h.label))}"); }
                     }
+                    LogDetailVisibility();
                     SaveSnapshot(path);
                     SnapshotEditors(path);
                     _vm.IsDirty = false;
