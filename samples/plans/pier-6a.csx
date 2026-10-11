@@ -98,6 +98,7 @@ var piles = all6.Select(s => Q(s, 8)).Concat(new[] { -12.5, -7.5, 7.5, 12.5 }.Se
     .Concat(new[] { -12.5, -2.5, 2.5, 12.5 }.Select(s => Q(s, 0))).Concat(new[] { -12.5, -7.5, 7.5, 12.5 }.Select(s => Q(s, -4)))
     .Concat(all6.Select(s => Q(s, -8))).ToList();
 sd.Footings = new() { new FootingDefinition { Column = 1, Piles = piles } };
+sd.Footings[0].PileWeb = PileWebMode.AlongBatter;   // plan pile symbols: web along the batter direction (flanges across it); plumb piles web along N
 sd.Footings[0].BatterPerimeter(4, false, false);   // plans: the 12 piles of both outer N rows (N = +-8) batter 1:4 outward in N
 pier6a.Substructure = sd;
 

@@ -371,10 +371,12 @@ public static class IfcExporter
                         SBM.Core.Substructure.SubElementKind.Column => w.Add("IFCCOLUMN", $"{common},$,{Ref(pl)},{Ref(pds)},$,.PIERSTEM."),
                         SBM.Core.Substructure.SubElementKind.DrilledShaft => w.Add("IFCPILE", $"{common},'DRILLED_SHAFT',{Ref(pl)},{Ref(pds)},$,.BORED.,$"),
                         SBM.Core.Substructure.SubElementKind.Pile => w.Add("IFCPILE", $"{common},$,{Ref(pl)},{Ref(pds)},$,.DRIVEN.,$"),
+                        // Generic mechanical splice coupler between column bars and footing dowels (IFC4X3 PredefinedType COUPLER).
+                        SBM.Core.Substructure.SubElementKind.Coupler => w.Add("IFCMECHANICALFASTENER", $"{common},'REBAR_COUPLER',{Ref(pl)},{Ref(pds)},$,$,$,.COUPLER."),
                         _ => w.Add("IFCFOOTING", $"{common},$,{Ref(pl)},{Ref(pds)},$,{footingType}"),
                     };
                     contained.Add(id);
-                    string mat = so.IsConcrete ? concreteMat : "ASTM A572 Gr. 50 (HP piling)";
+                    string mat = so.IsConcrete ? concreteMat : so.Kind == SBM.Core.Substructure.SubElementKind.Coupler ? "Steel (mechanical splice coupler)" : "ASTM A572 Gr. 50 (HP piling)";
                     AddMaterial(mat, id);
                     double vol = Math.Abs(so.Mesh.Volume());
                     psetTargets.Add((id, so.Name, so.Description, 0, vol * (so.IsConcrete ? 2400 : 7850)));

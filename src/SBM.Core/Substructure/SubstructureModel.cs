@@ -6,7 +6,7 @@ using SBM.Core.Solids;
 
 namespace SBM.Core.Substructure;
 
-public enum SubElementKind { Cap, Pedestal, Backwall, Column, DrilledShaft, Footing, Pile, DeckDrain, DrainPipe, SplashBasin }
+public enum SubElementKind { Cap, Pedestal, Backwall, Column, DrilledShaft, Footing, Pile, DeckDrain, DrainPipe, SplashBasin, Coupler }
 
 /// <summary>A solid of the substructure with its quantity data.</summary>
 public sealed record SubSolid(SubElementKind Kind, string Name, string Description, Mesh Mesh, bool IsConcrete = true);
@@ -21,8 +21,8 @@ public sealed record PedestalInfo(int Girder, double S, double N, double LengthS
 public sealed record ColumnInfo(int Index, double S, double N, double TopZ, double BottomZ, ColumnShape Shape, double SizeS, double SizeN);
 
 /// <summary>A pile in cap coordinates: (S, N, TopZ) is the head centre (cut horizontal), (TipS, TipN, TipZ) the tip centre; they
-/// differ in plan for a battered pile. Plumb piles: TipS = S, TipN = N.</summary>
-public sealed record PileInfo(double S, double N, double TopZ, double TipZ, double TipS, double TipN)
+/// differ in plan for a battered pile. Plumb piles: TipS = S, TipN = N. (WebS, WebN) = unit plan direction of the H-pile web.</summary>
+public sealed record PileInfo(double S, double N, double TopZ, double TipZ, double TipS, double TipN, double WebS = 0, double WebN = 1)
 {
     public PileInfo(double s, double n, double topZ, double tipZ) : this(s, n, topZ, tipZ, s, n) { }
     public bool IsBattered => Math.Abs(TipS - S) > 1e-9 || Math.Abs(TipN - N) > 1e-9;

@@ -20,11 +20,12 @@ public sealed partial class SubstructureGenerator
     /// <paramref name="batterRatio"/> vertical, so the head (footing bottom + embedment) is slightly inside the plan point and
     /// the tip moves outward. The length is measured ALONG THE AXIS from the head centre (assumption, not stated on the plans).
     /// Head and tip are cut horizontal ("battered piles shall be trimmed to a horizontal line"). The cross-section stays
-    /// perpendicular to the axis, in the same orientation as a plumb pile (flanges parallel to the cap line, web across it —
-    /// minimal rotation of the plumb section), so the pile reads like its plumb neighbours; no rotation is invented.
+    /// perpendicular to the axis; its plan orientation is the plumb one (flanges parallel to the cap line, web across it —
+    /// minimal rotation of the plumb section) unless a web direction is given (FootingPoint.WebDir*, or
+    /// FootingDefinition.PileWeb = AlongBatter: web along the batter direction, as the plan pile symbols show).
     /// </summary>
     private void AddPilesAt(SubstructureUnit unit, SubstructureDefinition sd, FoundationInfo f, double s, double n, double capBottom,
-        List<FootingPoint> at, double length, double batterRatio, string where)
+        List<FootingPoint> at, double length, double batterRatio, string where, PileWebMode webMode = PileWebMode.Default)
     {
         double top = capBottom + sd.PileEmbedment;
         bool steel = sd.PileType == PileType.SteelHP;
@@ -32,16 +33,24 @@ public sealed partial class SubstructureGenerator
         var section = PileSection(sd);
         double width = sd.PileType == PileType.PrecastConcrete ? sd.PileSize : section.Max(p => Math.Max(Math.Abs(p.X), Math.Abs(p.Y))) * 2;
         double h = batterRatio > 0 ? 1.0 / batterRatio : 0;
+        var section0 = section;
         foreach (var q in at)
         {
             double ps = s + q.S, pn = n + q.N;
+            // Web direction in plan (footing frame): own direction, else along the batter if asked, else along N.
+            double ws = 0, wn = 1;
+            if (q.HasWebDir) { double l = Math.Sqrt(q.WebDirS * q.WebDirS + q.WebDirN * q.WebDirN); ws = q.WebDirS / l; wn = q.WebDirN / l; }
+            else if (webMode == PileWebMode.AlongBatter && q.IsBattered && h > 0)
+            { double l = Math.Sqrt(q.BatterDirS * q.BatterDirS + q.BatterDirN * q.BatterDirN); ws = q.BatterDirS / l; wn = q.BatterDirN / l; }
+            // Pure rotation about the vertical taking the web axis (0, 1) onto (ws, wn) and the flange axis (1, 0) onto (wn, -ws).
+            section = ws == 0 && wn == 1 ? section0 : section0.Select(p => new Vec2(p.X * wn + p.Y * ws, -p.X * ws + p.Y * wn)).ToArray();
             var m = new Mesh();
             string batter = "";
             PileInfo info;
             if (!q.IsBattered || h <= 0)
             {
                 double tip = top - length;
-                info = new PileInfo(ps, pn, top, tip);
+                info = new PileInfo(ps, pn, top, tip, ps, pn, ws, wn);
                 MeshBuilder.AddExtrusion(m, section, Frame(unit, ps, pn), tip, top);
             }
             else
@@ -53,7 +62,7 @@ public sealed partial class SubstructureGenerator
                 double drop = length * a.Z;                                  // vertical tip-to-head distance
                 double hs = ps - us * h * sd.PileEmbedment, hn = pn - un * h * sd.PileEmbedment;   // head centre
                 double ts = hs + us * h * drop, tn = hn + un * h * drop;
-                info = new PileInfo(hs, hn, top, top - drop, ts, tn);
+                info = new PileInfo(hs, hn, top, top - drop, ts, tn, ws, wn);
                 // Minimal rotation of the frame (x = S, y = N, z = up) taking z onto the axis (Rodrigues).
                 var k = Vec3.Cross(new Vec3(0, 0, 1), a);
                 double sinT = k.Length, cosT = a.Z;

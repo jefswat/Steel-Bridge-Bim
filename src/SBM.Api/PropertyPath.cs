@@ -124,7 +124,8 @@ public static partial class PropertyPath
         if (n.Contains("degrees")) return ValueKindHint.Angle;
         if (n.Contains("slope")) return ValueKindHint.Slope;
         if (n.Contains("ratio") || n.Contains("scale") || n.Contains("fraction") || n.Contains("ksi") || n.Contains("opacity") || n.Contains("strength")) return ValueKindHint.Plain;
-        if (n is "depressedtopatend" or "bearingtoend" or "padlength" or "genericbodylength") return ValueKindHint.Short;
+        if (n is "depressedtopatend" or "bearingtoend" or "padlength" or "genericbodylength" or "dowelhooklength" or "dowelpin"
+            or "dowelbottomabovefooting" or "couplerlength" or "couplerdiameter") return ValueKindHint.Short;
         if (n is "maxbarlength") return ValueKindHint.Long;
         if (n.Contains("cover") || n.Contains("lapoverride") || n.Contains("tolerance")) return ValueKindHint.Short;
         // Cross girder / inspection access inputs: small dimensions in inches, run lengths and spacings in feet.

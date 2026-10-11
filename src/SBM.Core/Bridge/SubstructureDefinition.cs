@@ -34,11 +34,27 @@ public sealed class FootingPoint
     /// from its plan position; (0, 0) = plumb. The batter ratio is <see cref="FootingDefinition.BatterRatio"/>.</summary>
     public double BatterDirS { get; set; }
     public double BatterDirN { get; set; }
+    /// <summary>Piles only: plan direction (S, N components, footing frame) of the pile's WEB (the H section's web runs along it,
+    /// the flanges across it). (0, 0) = automatic: web along N, or along the batter direction when the footing's
+    /// <see cref="FootingDefinition.PileWeb"/> is <see cref="PileWebMode.AlongBatter"/> and the pile is battered.</summary>
+    public double WebDirS { get; set; }
+    public double WebDirN { get; set; }
+    [System.Text.Json.Serialization.JsonIgnore] public bool HasWebDir => WebDirS * WebDirS + WebDirN * WebDirN > 1e-12;
     [System.Text.Json.Serialization.JsonIgnore] public bool IsBattered => BatterDirS * BatterDirS + BatterDirN * BatterDirN > 1e-12;
     public FootingPoint() { }
     public FootingPoint(double s, double n) { S = s; N = n; }
     public FootingPoint(double s, double n, double batterDirS, double batterDirN) { S = s; N = n; BatterDirS = batterDirS; BatterDirN = batterDirN; }
-    public FootingPoint Clone() => new(S, N, BatterDirS, BatterDirN);
+    public FootingPoint Clone() => new(S, N, BatterDirS, BatterDirN) { WebDirS = WebDirS, WebDirN = WebDirN };
+}
+
+/// <summary>How the web of the (steel H) piles of a footing is oriented in plan when a pile gives no direction of its own.</summary>
+public enum PileWebMode
+{
+    /// <summary>Web across the cap (along N), flanges parallel to the cap line, for every pile (battered piles keep that section
+    /// orientation rotated only by the batter).</summary>
+    Default,
+    /// <summary>Battered piles: web along the batter direction (flanges across it), as the plan pile symbols show; plumb piles as Default.</summary>
+    AlongBatter,
 }
 
 /// <summary>
@@ -58,9 +74,19 @@ public sealed class FootingDefinition
     /// <summary>Batter of the piles that have a direction: 4 = "1:4" = 1 horizontal per 4 vertical (the plans do not define
     /// the ratio in words; this is the standard H:V reading, to be confirmed). Measured along the batter direction in plan.</summary>
     public double BatterRatio { get; set; } = 4;
+    /// <summary>Plan orientation of the H-pile webs (see <see cref="PileWebMode"/>); a pile's own WebDirS/N overrides it.</summary>
+    public PileWebMode PileWeb { get; set; } = PileWebMode.Default;
+    /// <summary>As-designed reinforcing of this footing (the plan bar list: mats, side bars, uplift anchors). Empty = the generic
+    /// mats of <see cref="SubstructureReinforcementDefinition.FootingBarSize"/> / spacing.</summary>
+    public List<PlanBarGroup> Bars { get; set; } = new();
+    /// <summary>Indices (into <see cref="Piles"/>) of the circled piles that carry the pile uplift anchors (the plans' 8f6 detail).</summary>
+    public List<int> UpliftPiles { get; set; } = new();
+    /// <summary>Uplift anchor V-bars per circled pile (the plans: 3, at 4 in. along the web).</summary>
+    public int UpliftBarsPerPile { get; set; } = 3;
     public FootingDefinition Clone() => new()
     {
-        Column = Column, PileLength = PileLength, BatterRatio = BatterRatio,
+        Bars = Bars.Select(b => b.Clone()).ToList(), UpliftPiles = UpliftPiles.ToList(), UpliftBarsPerPile = UpliftBarsPerPile,
+        Column = Column, PileLength = PileLength, BatterRatio = BatterRatio, PileWeb = PileWeb,
         Outline = Outline.Select(p => p.Clone()).ToList(), Piles = Piles.Select(p => p.Clone()).ToList(),
     };
 
@@ -110,6 +136,10 @@ public enum FoundationType
 }
 
 public enum PileType { SteelHP, PrecastConcrete }
+
+/// <summary>How chamfered-column vertical bars connect to the footing: run continuous from the footing mat (default), or
+/// lap with L-shaped footing dowels, or mechanical couplers at two splice levels (alternate bars at different levels).</summary>
+public enum ColumnSpliceType { Continuous, Lap, Coupler }
 
 /// <summary>Reinforcing for caps, columns, shafts, footings and backwalls (US bar sizes).</summary>
 public sealed class SubstructureReinforcementDefinition
@@ -179,6 +209,38 @@ public sealed class SubstructureReinforcementDefinition
     public string FlareTieSize { get; set; } = "#6";
     public double FlareTieSpacing { get; set; } = In(12);
 
+    // ---- Footing dowels / column splices (chamfered columns on a footing; ColumnSplice = Continuous keeps the old behaviour).
+    // One L-shaped dowel (90 degree hook at the bottom, lying on the bottom mat) per column bar. Elevations are measured above the
+    // footing top. Lap: the column bars start at the footing top and the dowels project ColumnLapLength above it (side by side, in
+    // contact, on the inside of the column bar). Coupler: the column bar and its dowel are coaxial and meet at a coupler at the
+    // level given by the bar's pattern letter.
+    public ColumnSpliceType ColumnSplice { get; set; } = ColumnSpliceType.Continuous;
+    /// <summary>Hook leg length of the dowels, out-to-out (0 = #11 2'-0, #14 2'-7, #18 3'-5).</summary>
+    public double DowelHookLength { get; set; }
+    /// <summary>Inside bend diameter of the dowel hook (0 = #11 1'-0, #14 1'-6 1/4, #18 2'-0, other sizes 6 db).</summary>
+    public double DowelPin { get; set; }
+    /// <summary>Underside of the dowel hook leg above the footing BOTTOM (the hook sits on the bottom mat).</summary>
+    public double DowelBottomAboveFooting { get; set; } = In(16);
+    /// <summary>Lap splice: dowel projection above the footing top (0 = Class B lap computed). The plans print 8'-4 uncoated / 12'-6 epoxy.</summary>
+    public double ColumnLapLength { get; set; }
+    /// <summary>Coupler splices: elevations above the footing top of the lower and the upper splice level.</summary>
+    public double CouplerLow { get; set; }
+    public double CouplerHigh { get; set; }
+    /// <summary>Coupler body (generic: the plans do not give the make): length and diameter, 0 = 6 db / 1.75 db.</summary>
+    public double CouplerLength { get; set; }
+    public double CouplerDiameter { get; set; }
+    /// <summary>One letter per vertical bar of a column, counter-clockwise from the +S axis (plan: S right, N up-station): H = splices
+    /// at the upper level, L = lower level, T = lower level and ends <see cref="ColumnTerminatingBarLength"/> above it (bars that
+    /// stop at the column top to clear the cap steel). Empty = alternate H, L around the section.</summary>
+    public string ColumnSplicePattern { get; set; } = "";
+    /// <summary>Length of the T bars of the pattern (0 = they run to the common bar top).</summary>
+    public double ColumnTerminatingBarLength { get; set; }
+    /// <summary>Column bar top above the soffit at the column centre (0 = 3 in. below the cap top cover as before).</summary>
+    public double ColumnBarEmbedInCap { get; set; }
+    /// <summary>Lap splice only: two-stage column (plans, Ramp G 9G): the upper bars start this far above the footing top and the lower bars
+    /// run a lap length past that; 0 = single stage.</summary>
+    public double ColumnMidLapStart { get; set; }
+
     public int ShaftBarCount { get; set; } = 12;
     public string ShaftBarSize { get; set; } = "#9";
     public string ShaftSpiralSize { get; set; } = "#4";
@@ -194,10 +256,14 @@ public sealed class SubstructureReinforcementDefinition
 
     public double MaxBarLength { get; set; } = Ft(60);
 
+    /// <summary>As-designed cap and pedestal reinforcing (the plan bar list); when present it replaces the generic cap bars and stirrups.</summary>
+    public List<PlanBarGroup> CapBars { get; set; } = new();
+
     public SubstructureReinforcementDefinition Clone()
     {
         var c = (SubstructureReinforcementDefinition)MemberwiseClone();
         c.ColumnChamferBarPositions = ColumnChamferBarPositions?.ToList();
+        c.CapBars = CapBars.Select(b => b.Clone()).ToList();
         return c;
     }
 }
