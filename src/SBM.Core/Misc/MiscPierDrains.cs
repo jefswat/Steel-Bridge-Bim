@@ -39,15 +39,16 @@ public sealed partial class MiscItemsGenerator
     }
 
     /// <summary>Flags the pier-system parts whose position / size the plans do not dimension (Ramp G PDF 154-158).</summary>
-    private void FlagPier(string asm)
+    private void FlagPier(string asm, string standoff)
     {
         Flag(asm + " neoprene trough", "U-section width and sag of the trough are not dimensioned (Ramp G PDF 154 sections A-A / C-C, PDF 156 section B-B).", "strip as wide as the joint blockout, invert at the deck underside at the high end");
         Flag(asm + " trough collection box", "Only the distance of the box from the roadway edge is printed (PDF 154); its orientation and vertical position are not.", "2'-2 side along the pier line, top at the trough invert at the box");
-        Flag(asm + " pier collection box", "Position of the pier collection box across the cap (N) and its top 'below the pier top 1\" min / 1/4\" max' are not dimensioned (PDF 154 section A-A, PDF 155 / 157).", "centred on the column in N, top 1/4\" below the cap top");
-        Flag(asm + " pipe 1", "The longitudinal run of the 1:12 pipe from the trough box to the pier collection box is not dimensioned (PDF 154 sections A-A / C-C).", "straight in plan between the box centres at 1:12 from the box low end");
-        Flag(asm + " pier pipe", "Route of the pipe along the cap soffit and the face / standoff of the vertical pipe on the column are not dimensioned (PDF 157 drain pipe elevations).", "pipe tangent under the cap soffit at the box, exactly the minimum slope to the column, vertical tangent to the back face of the column");
-        Flag(asm + " pipe supports", "Support positions follow the pipe route, which is not dimensioned (PDF 157; spacing 6'-0 / 4'-0 max is printed).", "first clamp 1'-0 below the soffit run end, then at the maximum spacing");
-        Flag(asm + " outlet leg", "Direction of the 45 deg outlet leg is not printed (PDF 157 outlet detail).", "away from the column on the back side");
+        Flag(asm + " pier collection box", "The box top is printed as a range, 1/4\" min / 1\" max below the top of cap (PDF 157 box elevation; PDF 155 section A-A shows 1\" at CL box), not one value. Face, 9\" inlet and 1 1/2\" outlet clearance are printed (PDF 155 / 157).", "top 1/4\" below the cap top (the minimum)");
+        Flag(asm + " pipe 1", "Only the 1:12 minimum slope and the turn-down 9\" (at 50 F) off the cap face are printed (PDF 155 sections A-A / C-C); the plan route from the trough box to the turn-down is not dimensioned (PDF 154 partial plan at 19G: 'orientation to clear inspection walkway and cross frame').", "straight in plan from the trough box to the turn-down, exactly 1:12 from the box low side");
+        Flag(asm + " pier pipe", "PDF 157 drain pipe elevations show the pipe leaving the box bottom, a cleanout bend to 8% min along the cap face toward the CL pier, and a cleanout bend down the column; the level of the first bend and the stand-off of the vertical run from the column face are not dimensioned.",
+            $"bend directly under the box (pipe crown at the box bottom), exactly 8%, the whole run in the vertical plane of the box outlet 1 1/2\" clear of the cap face (only the two printed bends, no offset), so the vertical run is {standoff}");
+        Flag(asm + " pipe supports", "Support positions follow the pipe route, which is not dimensioned (PDF 157; spacing 6'-0 / 4'-0 max is printed).", "first clamp 1'-0 below the bend, then at the maximum spacing");
+        Flag(asm + " outlet leg", "Direction of the 45 deg outlet leg is not printed (PDF 157 outlet detail).", "away from the pier on the box side");
         Flag(asm + " erosion stone mattress", "Plan position of the mattress under the outlet follows the unresolved outlet leg direction (PDF 157).", "centred under the outlet end");
     }
 
@@ -104,76 +105,82 @@ public sealed partial class MiscItemsGenerator
         Add(MiscGroup.Drainage, MiscKind.DrainBox, asm, asm + " trough collection box", $"Trough collection box, 3/8\" plate, {Sh(pd.BoxLength)} x {Sh(pd.BoxWidth)}, {Sh(H)} high at the high end, bottom sloping {Sh(sl3)}; solid envelope; top at the trough invert (modeling convention)",
             boxMesh, "ASTM A36 3/8 plate, galvanized");
 
-        // cap collection box (S from the column CL; on the column's N)
+        // pier collection box: fastened to the cap FACE (PDF 155 sections A-A / C-C, PDF 157 box details), S from the column CL
         var col = unit.Columns.OrderBy(c => Math.Abs(c.S)).FirstOrDefault();
         if (col == null) { Warn($"{asm}: the pier has no column; pier collection box and pipes not built."); return; }
         if (unit.Columns.Count != 1) Warn($"{asm}: {unit.Columns.Count} columns; the 'CL pier / CL column' distance is taken from the column nearest the support line.");
-        double sCb = col.S + pd.CapBoxFromColumn, nCb = col.N;
-        double capTop = unit.CapTopAt(sCb, nCb);
+        double side = pd.CapBoxFace == CapFaceSide.Back ? -1 : 1;
+        double nFace = side < 0 ? unit.CapN0 : unit.CapN1;
+        Vec2 outw = unit.N * side;                                       // away from the cap, normal to the face
+        string faceName = side < 0 ? "back (down-station)" : "ahead (up-station)";
+        double sCb = col.S + pd.CapBoxFromColumn;
+        double capTop = unit.CapTopAt(sCb, nFace);
         if (double.IsNaN(capTop)) { Warn($"{asm}: no cap top at S = {L(sCb)}."); return; }
         if (sCb < unit.CapS0 || sCb > unit.CapS1) Warn($"{asm}: the cap collection box (S = {L(sCb)}) is off the cap (S {L(unit.CapS0)} to {L(unit.CapS1)}).");
-        if (pd.CapBoxBelowTop == null) Warn($"{asm}: " + UnresolvedFlag.Text("Ramp G PDF 157", "pier collection box top below the cap top", "it is printed as a range '1\" min / 1/4\" max', not one value", "1/4\" modeled."));
+        if (pd.CapBoxBelowTop == null) Warn($"{asm}: " + UnresolvedFlag.Text("Ramp G PDF 157", "pier collection box top below the cap top", "it is printed as a range '1/4\" min / 1\" max', not one value", "1/4\" (the minimum) modeled."));
         double boxTop = capTop - (pd.CapBoxBelowTop ?? In(0.25));
-        var pCap = unit.Plan(sCb, nCb);
-        var capBox = new Mesh();
-        MeshBuilder.AddBox(capBox, MiscMesh.Plan(pCap, unit.D), -pd.CapBoxWidthS / 2, pd.CapBoxWidthS / 2, -pd.CapBoxLengthN / 2, pd.CapBoxLengthN / 2, boxTop - pd.CapBoxDepth, boxTop);
-        Add(MiscGroup.Drainage, MiscKind.DrainBox, asm, asm + " pier collection box", $"Pier collection box on the cap, 3/8\" plate, {Sh(pd.CapBoxLengthN)} x {Sh(pd.CapBoxWidthS)} x {Sh(pd.CapBoxDepth)} deep, {Sh(pd.CapBoxFromColumn < 0 ? -pd.CapBoxFromColumn : pd.CapBoxFromColumn)} from CL column; N position = CL column (not dimensioned); solid envelope (tapered bottom not modeled)",
-            capBox, "ASTM A36 3/8 plate, galvanized");
+        double zBoxBot = boxTop - pd.CapBoxDepth;
+        var pFace = unit.Plan(sCb, nFace);
+        var pIn = pFace + outw * pd.CapBoxInletFromFace;                 // CL of the pipe dropping into the box
+        var (odc, wc) = MiscMesh.PipeSch40(pd.CapPipeNominalDiameter);
+        double rc = odc / 2;
+        var pOut = pFace + outw * (pd.CapBoxOutletClear + rc);           // CL of the outlet pipe at the box bottom
+        double hTaper = Math.Min(Ft(1), pd.CapBoxDepth);
+        var capBoxMesh = MiscMesh.VerticalSection(pFace, outw, new[] { new Vec2(0, boxTop), new Vec2(pd.CapBoxOutTop, boxTop), new Vec2(pd.CapBoxOutTop, zBoxBot + hTaper), new Vec2(pd.CapBoxOutBottom, zBoxBot), new Vec2(0, zBoxBot) }, pd.CapBoxAlongFace / 2);
+        Add(MiscGroup.Drainage, MiscKind.DrainBox, asm, asm + " pier collection box", $"Pier collection box on the {faceName} face of the cap, 3/8\" plate, {Sh(pd.CapBoxAlongFace)} along the face x {Sh(pd.CapBoxOutTop)} ({Sh(pd.CapBoxOutBottom)} at the bottom) out from the face x {Sh(pd.CapBoxDepth)} deep, {Sh(Math.Abs(pd.CapBoxFromColumn))} from CL column, strapped to the face with 1/2\" stud anchors; solid envelope",
+            capBoxMesh, "ASTM A36 3/8 plate, galvanized");
+        Info($"{asm}: pier collection box on the {faceName} cap face at S = {L(sCb)} (cap face N = {L(nFace)}), top {L(boxTop)}; inlet CL {Sh(pd.CapBoxInletFromFace)} and outlet CL {Sh(pd.CapBoxOutletClear + rc)} off the face (PDF 155 / 157).");
 
-        // pipe 1: trough box low end, slope 1:12 to above the cap box, then vertical
+        // collector end (Pier 19G): the span collector turns down into the box (PDF 155 section C-C)
+        bool collectorFeeds = false;
+        double zIn = boxTop - pd.CapBoxInletEmbed;
+        if (pd.Collector != "" && _collectors.TryGetValue(pd.Collector, out var coll))
+        {
+            collectorFeeds = true;
+            var e = coll.Pts[^1];
+            double dd = (pIn - e.XY).Length;
+            if (dd > In(1)) Warn($"{asm}: the span collector ends {Sh(dd)} (plan) from the box inlet axis {Sh(pd.CapBoxInletFromFace)} off the cap face: the printed box position ({Sh(Math.Abs(pd.CapBoxFromColumn))} from CL column) and the collector line ({coll.Name}) do not meet; the elbow is modeled straight down at the pipe end (PDF 154 partial plan shows the collector ending over the box).");
+            else Info($"{asm}: the span collector ends over the box inlet ({Sh(dd)} in plan).");
+            var em = new Mesh();
+            if (e.Z > zIn) em.Append(MiscMesh.Tube(e, e.XY.WithZ(zIn), coll.Od / 2, coll.Od / 2 - coll.Wall));
+            Add(MiscGroup.Drainage, MiscKind.DrainPipe, asm, asm + " collector end", $"{coll.Name} elbow down into the pier collection box", em, "ASTM A53 Gr B, galvanized");
+            if (e.Z > zIn) Record(asm, "collector end", e, e.XY.WithZ(zIn), coll.Od / 2, sl.Station);
+        }
+
+        // pipe 1: trough box low side, 1:12 to the turn-down 9" off the cap face, then vertical into the box (or into the collector drop at 19G)
         var (od1, w1) = MiscMesh.PipeSch40(pd.PipeNominalDiameter);
         var p0 = pBox;
         double z0 = zBox - H - sl3 + In(1.5);
-        double runP = (pCap - p0).Length;
-        var dSN = pCap - p0;
-        Info($"{asm}: pipe 1 plan run {L(runP)} (along the pier line {L(Vec2.Dot(dSN, dir))}, along the bridge {L(Vec2.Dot(dSN, ahead))}) from the trough box to the pier collection box.");
-        if (runP < In(6)) Warn($"{asm}: the pier collection box is almost directly under the trough box (run {Sh(runP)}): the plan's 1:12 pipe needs a longitudinal run (section A-A) whose length is not dimensioned (UNRESOLVED (Ramp G PDF 154 section A-A / PDF 157): N position of the cap box - not dimensioned, the section shows the run by scale only); modeled as computed.");
-        else Warn($"{asm}: N position of the pier collection box on the cap is not dimensioned (section A-A shows the pipe running back-station about 6-7 ft by scale): placed on the CL column.");
+        double runP = (pIn - p0).Length;
+        var dSN = pIn - p0;
+        Info($"{asm}: pipe 1 plan run {L(runP)} (along the pier line {L(Vec2.Dot(dSN, dir))}, along the bridge {L(Vec2.Dot(dSN, ahead))}) from the trough box to the turn-down {Sh(pd.CapBoxInletFromFace)} off the cap face.");
         double z1 = z0 - runP * pd.Pipe1Slope;
-        double zFl = boxTop + In(4);
         var pipe1 = new Mesh();
-        pipe1.Append(MiscMesh.Tube(p0.WithZ(z0), pCap.WithZ(z1), od1 / 2, od1 / 2 - w1));
-        if (z1 > zFl) pipe1.Append(MiscMesh.Tube(pCap.WithZ(z1), pCap.WithZ(zFl), od1 / 2, od1 / 2 - w1));
-        else Warn($"{asm}: pipe 1 reaches the cap box at {L(z1)}, below the box flange level {L(zFl)} (run {L(runP)} at 1:{1 / pd.Pipe1Slope:F0}): the plan's vertical relationships do not close with the modeled trough level.");
-        Add(MiscGroup.Drainage, MiscKind.DrainPipe, asm, asm + " pipe 1", $"{Sh(pd.PipeNominalDiameter)} Sch 40 pipe from the trough collection box, 1:{1 / pd.Pipe1Slope:F0} to the pier collection box ({L(runP)}), then vertical", pipe1, "ASTM A53 Gr B, galvanized");
-        Record(asm, "pipe 1", p0.WithZ(z0), pCap.WithZ(z1), od1 / 2, sl.Station);
-        if (z1 > zFl) Record(asm, "pipe 1 vertical leg", pCap.WithZ(z1), pCap.WithZ(zFl), od1 / 2, sl.Station);
+        pipe1.Append(MiscMesh.Tube(p0.WithZ(z0), pIn.WithZ(z1), od1 / 2, od1 / 2 - w1));
+        bool leg = !collectorFeeds && z1 > zIn;
+        if (leg) pipe1.Append(MiscMesh.Tube(pIn.WithZ(z1), pIn.WithZ(zIn), od1 / 2, od1 / 2 - w1));
+        else if (!collectorFeeds) Warn($"{asm}: pipe 1 reaches the turn-down at {L(z1)}, below the box inlet level {L(zIn)} (run {L(runP)} at 1:{1 / pd.Pipe1Slope:F0}): the plan's vertical relationships do not close with the modeled trough level.");
+        Add(MiscGroup.Drainage, MiscKind.DrainPipe, asm, asm + " pipe 1", collectorFeeds
+                ? $"{Sh(pd.PipeNominalDiameter)} Sch 40 pipe from the trough collection box, 1:{1 / pd.Pipe1Slope:F0} ({L(runP)}) into the drop of the span collector over the pier collection box"
+                : $"{Sh(pd.PipeNominalDiameter)} Sch 40 pipe from the trough collection box, 1:{1 / pd.Pipe1Slope:F0} ({L(runP)}), turning down {Sh(pd.CapBoxInletFromFace)} off the cap face into the pier collection box",
+            pipe1, "ASTM A53 Gr B, galvanized");
+        Record(asm, "pipe 1", p0.WithZ(z0), pIn.WithZ(z1), od1 / 2, sl.Station);
+        if (leg) Record(asm, "pipe 1 vertical leg", pIn.WithZ(z1), pIn.WithZ(zIn), od1 / 2, sl.Station);
 
-        // collector end (Pier 19G): horizontal to the box, then down
-        var (odc, wc) = MiscMesh.PipeSch40(pd.CapPipeNominalDiameter);
-        if (pd.Collector != "" && _collectors.TryGetValue(pd.Collector, out var coll))
-        {
-            var e = coll.Pts[^1];
-            double dd = (pCap - e.XY).Length;
-            if (dd > In(12)) Warn($"{asm}: the span collector turns down at its end ({L(e.Z)}), {Sh(dd)} (plan) from the pier collection box centre; the elbow is modeled straight down at the pipe end (the plan gives no plan routing to the box, so a clearance conflict of this elbow is a consequence of that assumption).");
-            var em = new Mesh();
-            double zEl = Math.Max(zFl, 0);
-            if (e.Z > zFl) em.Append(MiscMesh.Tube(e, e.XY.WithZ(zFl), coll.Od / 2, coll.Od / 2 - coll.Wall));
-            Add(MiscGroup.Drainage, MiscKind.DrainPipe, asm, asm + " collector end", $"{coll.Name} elbow down toward the pier collection box", em, "ASTM A53 Gr B, galvanized");
-            if (e.Z > zFl) Record(asm, "collector end", e, e.XY.WithZ(zFl), coll.Od / 2, sl.Station);
-            string clash = "";
-            if (e.Z > zFl)
-            {
-                var (cc, ag, _) = MiscMesh.Clearance(_steelIndex, e, e.XY.WithZ(zFl), coll.Od / 2);
-                clash = double.IsNaN(cc) ? "" : $" Modeled drop clearance to steel: {Sh(cc)} to {ag}.";
-            }
-            Flag(asm + " collector end", $"The plans (Ramp G PDF 154 partial plan, PDF 157) do not give the routing of the span 19G collector from its end at the bearing line to the pier collection box ({Sh(dd)} apart in plan).{clash} The straight drop also overlaps the Pier 19G masonry plate where modeled (see the clearance records).",
-                "elbow straight down at the pipe end to the box flange level");
-        }
-
-        // cap pipe: box bottom -> soffit -> 8% toward the column -> vertical on the back face
-        double capBot = unit.CapBottomAt(sCb);
-        if (double.IsNaN(capBot)) { Warn($"{asm}: no cap soffit at the box: pipe along the cap and down the column not built."); return; }
-        double rc = odc / 2;
-        double zBoxBot = boxTop - pd.CapBoxDepth;
-        double zB = capBot - rc;
-        if (zBoxBot < zB) Warn($"{asm}: the pier collection box bottom ({L(zBoxBot)}) is below the cap soffit under it ({L(capBot)}): box deeper than the cap is thick.");
-        var pCol = unit.Plan(col.S, col.N - col.SizeN / 2 - rc);
-        double runC = (pCol - pCap).Length;
-        double zC = Math.Min(zBoxBot, zB) - runC * pd.CapPipeSlope;
+        // pier pipe: box bottom -> bend under the box -> 8% along the cap face toward the CL pier -> vertical down the column, all in the plane of the box outlet
+        double nPipe = nFace + side * (pd.CapBoxOutletClear + rc);
+        double zBend = zBoxBot - rc;
+        var pCol = unit.Plan(col.S, nPipe);
+        double runC = (pCol - pOut).Length;
+        double zC = zBend - runC * pd.CapPipeSlope;
+        double colFace = col.N + side * col.SizeN / 2;
+        double gap = side * (nPipe - colFace) - rc;                     // clear from the column face to the pipe
+        string standoff = gap >= 0 ? $"{Sh(gap)} clear of the {faceName} column face" : $"{Sh(-gap)} INTO the column";
+        if (gap < 0) Warn($"{asm}: CONFLICT - the vertical pier pipe in the plane of the box outlet overlaps the column by {Sh(-gap)} (column face N = {L(colFace)}).");
+        else Info($"{asm}: pier pipe runs {Sh(pd.CapBoxOutletClear)} clear of the cap face; the vertical run is {standoff} (cap face {Sh(side * (nFace - colFace))} proud of the column face).");
         double? pav = pd.PavementElevation;
         double? gz = pav is { } pv ? pv : _ground?.Invoke(pCol);
-        var pts = new List<Vec3> { pCap.WithZ(zBoxBot), pCap.WithZ(Math.Min(zBoxBot, zB)), pCol.WithZ(zC) };
+        var pts = new List<Vec3> { pOut.WithZ(zBoxBot), pOut.WithZ(zBend), pCol.WithZ(zC) };
         double zD = double.NaN;
         Vec2 pE = pCol;
         double zE = double.NaN;
@@ -182,12 +189,12 @@ public sealed partial class MiscItemsGenerator
         else zD = g0 + pd.OutletAboveMattress;
         if (!double.IsNaN(zD))
         {
-            if (zD >= zC) Warn($"{asm}: ground / pavement at the pipe ({L(zD)}) is above the pipe where it reaches the column ({L(zC)}).");
+            if (zD >= zC) Warn($"{asm}: ground / pavement at the pipe ({L(zD)}) is above the pipe where it reaches the CL pier ({L(zC)}).");
             else pts.Add(pCol.WithZ(zD));
         }
         var cp = new Mesh();
         for (int i = 1; i < pts.Count; i++) cp.Append(MiscMesh.Tube(pts[i - 1], pts[i], rc, rc - wc));
-        Add(MiscGroup.Drainage, MiscKind.DrainPipe, asm, asm + " pier pipe", $"{Sh(pd.CapPipeNominalDiameter)} Sch 40 pipe from the pier collection box through the cap, {pd.CapPipeSlope * 100:F0}% along the soffit toward the CL column, then vertical on the back face of the column (face and stand-off not dimensioned: tangent to the back face, 8% exactly)",
+        Add(MiscGroup.Drainage, MiscKind.DrainPipe, asm, asm + " pier pipe", $"{Sh(pd.CapPipeNominalDiameter)} Sch 40 pipe from the bottom of the pier collection box, {pd.CapPipeSlope * 100:F0}% along the {faceName} cap face toward the CL column ({L(runC)}), then vertical down the column ({standoff}); outside the concrete, {Sh(pd.CapBoxOutletClear)} clear of the cap face",
             cp, "ASTM A53 Gr B, galvanized");
         for (int i = 1; i < pts.Count; i++) Record(asm, i == 3 ? "pier pipe vertical" : "pier pipe", pts[i - 1], pts[i], rc, sl.Station);
         // clamps on the vertical run
@@ -204,16 +211,15 @@ public sealed partial class MiscItemsGenerator
         // outlet: 45 deg elbow + 1'-0 leg and erosion stone mattress (pier 5G/9G/14G); 19G ends 1" above the pavement
         if (!double.IsNaN(zD) && pd.Outlet == PierDrainOutlet.ErosionMattress && gz is { } gg)
         {
-            var e2 = -unit.N;
-            pE = pCol + e2 * (pd.OutletLegLength * Math.Cos(Math.PI / 4));
+            pE = pCol + outw * (pd.OutletLegLength * Math.Cos(Math.PI / 4));
             zE = zD - pd.OutletLegLength * Math.Sin(Math.PI / 4);
-            Add(MiscGroup.Drainage, MiscKind.DrainPipe, asm, asm + " outlet leg", $"45 deg outlet leg {Sh(pd.OutletLegLength)} long (direction away from the column: not printed), outlet {Sh(zE - gg)} above the mattress",
+            Add(MiscGroup.Drainage, MiscKind.DrainPipe, asm, asm + " outlet leg", $"45 deg outlet leg {Sh(pd.OutletLegLength)} long (direction away from the pier: not printed), outlet {Sh(zE - gg)} above the mattress",
                 MiscMesh.Tube(pCol.WithZ(zD), pE.WithZ(zE), rc, rc - wc), "ASTM A53 Gr B, galvanized");
             var mat = new Mesh();
             MeshBuilder.AddBox(mat, MiscMesh.Plan(pE, unit.D), -pd.MattressSize / 2, pd.MattressSize / 2, -pd.MattressSize / 2, pd.MattressSize / 2, gg - pd.MattressThickness, gg);
             Add(MiscGroup.Drainage, MiscKind.ErosionMattress, asm, asm + " erosion stone mattress", $"Erosion stone mattress {Sh(pd.MattressSize)} x {Sh(pd.MattressSize)} x {Sh(pd.MattressThickness)} on engineering fabric, centred under the outlet", mat, "Erosion stone on engineering fabric");
         }
-        FlagPier(asm);
-        Warn($"{asm}: placement conventions to confirm - CL pier = CL column (S), N of the pier collection box = CL column, vertical pipe on the back (down-station) face, trough invert at the deck underside at its high end, cleanouts / flanges / hanger rods not modeled.");
+        FlagPier(asm, standoff);
+        Warn($"{asm}: placement conventions to confirm - CL pier = CL column (S), trough invert at the deck underside at its high end, cleanouts / flanges / hanger rods not modeled.");
     }
 }
