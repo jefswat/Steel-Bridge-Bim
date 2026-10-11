@@ -92390,7 +92390,7 @@
               "shear studs on the W top strut (2 across) are not modeled: their lengthwise pitch / number per strut is not dimensioned (Section A-A: 2 in from the edge)",
               "pitch of the 2 bottom bolt rows on the WT5x15 chord is not dimensioned (the common 3 in pitch is kept)"
             ],
-            "TopWorkPointOffset": 0.374015,
+            "TopWorkPointOffset": 0.40258999999999995,
             "BottomWorkPointOffset": 0.15239999999999998,
             "TiePlateThickness": 0.0127,
             "TiePlateLength": 0.254,
@@ -104879,7 +104879,7 @@
               "shear studs on the W top strut (2 across) are not modeled: their lengthwise pitch / number per strut is not dimensioned (Section A-A: 2 in from the edge)",
               "pitch of the 2 bottom bolt rows on the WT5x15 chord is not dimensioned (the common 3 in pitch is kept)"
             ],
-            "TopWorkPointOffset": 0.37718999999999997,
+            "TopWorkPointOffset": 0.40258999999999995,
             "BottomWorkPointOffset": 0.15239999999999998,
             "TiePlateThickness": 0.0127,
             "TiePlateLength": 0.254,
@@ -117765,7 +117765,7 @@
               "shear studs on the W top strut (2 across) are not modeled: their lengthwise pitch / number per strut is not dimensioned (Section A-A: 2 in from the edge)",
               "pitch of the 2 bottom bolt rows on the WT5x15 chord is not dimensioned (the common 3 in pitch is kept)"
             ],
-            "TopWorkPointOffset": 0.38036499999999995,
+            "TopWorkPointOffset": 0.40258999999999995,
             "BottomWorkPointOffset": 0.15239999999999998,
             "TiePlateThickness": 0.0127,
             "TiePlateLength": 0.254,
