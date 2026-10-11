@@ -1,0 +1,45 @@
+girder,span,segment,length_ftin,length_ft,source,tag,note
+A,1,CL S abut brg to FS1,126'-10 13/16,126.9010,p.27 / DS 26 Girder Data,RASTER,horizontal no allowance for grade
+A,1,FS1 to CL pier 1,51'-0,51.0000,p.27 / DS 26,RASTER,
+A,1,span length,177'-10 13/16,177.9010,p.27 / DS 26,RASTER,sum ok DERIVED
+B,1,CL S abut brg to FS1,127'-9 1/4,127.7708,p.27 / DS 26,RASTER,
+B,1,FS1 to CL pier 1,51'-0,51.0000,p.27 / DS 26,RASTER,
+B,1,span length,178'-9 1/4,178.7708,p.27 / DS 26,RASTER,sum ok
+C,1,CL S abut brg to FS1,128'-7 11/16,128.6406,p.27 / DS 26,RASTER,
+C,1,FS1 to CL pier 1,51'-0,51.0000,p.27 / DS 26,RASTER,
+C,1,span length,179'-7 11/16,179.6406,p.27 / DS 26,RASTER,sum ok
+D,1,CL S abut brg to FS1,129'-6 1/8,129.5104,p.27 / DS 26,RASTER,
+D,1,FS1 to CL pier 1,51'-0,51.0000,p.27 / DS 26,RASTER,
+D,1,span length,180'-6 1/8,180.5104,p.27 / DS 26,RASTER,sum ok
+A,2,CL pier 1 to FS2,54'-6,54.5000,p.27 / DS 26,RASTER,
+A,2,FS2 to FS3,91'-6 5/8,91.5521,p.27 / DS 26,RASTER,
+A,2,FS3 to CL pier 2,59'-0,59.0000,p.27 / DS 26,RASTER,CL pier 2 = CL integral steel pier cap
+A,2,span length,205'-0 5/8,205.0521,p.27 / DS 26,RASTER,sum ok
+B,2,CL pier 1 to FS2,54'-6,54.5000,p.27 / DS 26,RASTER,
+B,2,FS2 to FS3,90'-8 7/16,90.7031,p.27 / DS 26,RASTER,
+B,2,FS3 to CL pier 2,59'-0,59.0000,p.27 / DS 26,RASTER,
+B,2,span length,204'-2 7/16,204.2031,p.27 / DS 26,RASTER,sum ok
+C,2,CL pier 1 to FS2,54'-6,54.5000,p.27 / DS 26,RASTER,
+C,2,FS2 to FS3,89'-10 3/16,89.8490,p.27 / DS 26,RASTER,
+C,2,FS3 to CL pier 2,59'-0,59.0000,p.27 / DS 26,RASTER,
+C,2,span length,203'-4 3/16,203.3490,p.27 / DS 26,RASTER,sum ok
+D,2,CL pier 1 to FS2,54'-6,54.5000,p.27 / DS 26,RASTER,
+D,2,FS2 to FS3,89'-0,89.0000,p.27 / DS 26,RASTER,
+D,2,FS3 to CL pier 2,59'-0,59.0000,p.27 / DS 26,RASTER,
+D,2,span length,202'-6,202.5000,p.27 / DS 26,RASTER,sum ok
+A,3,CL pier 2 to PC,3'-1 5/16,3.1094,p.27 / DS 26,RASTER,PC STA 2476+53.67; girders curved PC -> N abut
+A,3,PC to FS4,53'-6 11/16,53.5573,p.27 / DS 26,RASTER,arc length (R 1481'-6)
+A,3,FS4 to CL N abut brg,128'-0 3/4,128.0625,p.27 / DS 26,RASTER,
+A,3,span length,184'-8 3/4,184.7292,p.27 / DS 26,RASTER,sum ok
+B,3,CL pier 2 to PC,3'-1 5/16,3.1094,p.27 / DS 26,RASTER,
+B,3,PC to FS4,53'-10 1/16,53.8385,p.27 / DS 26,RASTER,R 1489'-2
+B,3,FS4 to CL N abut brg,128'-8 11/16,128.7240,p.27 / DS 26,RASTER,
+B,3,span length,185'-8 1/16,185.6719,p.27 / DS 26,RASTER,sum ok
+C,3,CL pier 2 to PC,3'-1 5/16,3.1094,p.27 / DS 26,RASTER,
+C,3,PC to FS4,54'-1 3/8,54.1146,p.27 / DS 26,RASTER,R 1496'-10
+C,3,FS4 to CL N abut brg,129'-4 11/16,129.3906,p.27 / DS 26,RASTER,
+C,3,span length,186'-7 3/8,186.6146,p.27 / DS 26,RASTER,sum ok
+D,3,CL pier 2 to PC,3'-1 5/16,3.1094,p.27 / DS 26,RASTER,
+D,3,PC to FS4,54'-4 11/16,54.3906,p.27 / DS 26,RASTER,R 1504'-6
+D,3,FS4 to CL N abut brg,130'-0 5/8,130.0521,p.27 / DS 26,RASTER,
+D,3,span length,187'-6 5/8,187.5521,p.27 / DS 26,RASTER,sum ok
