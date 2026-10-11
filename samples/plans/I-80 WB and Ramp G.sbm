@@ -2567,7 +2567,8 @@
             },
             "Active": true,
             "TypeName": "Modular"
-          }
+          },
+          "DeckEndPoints": null
         },
         {
           "Name": "Pier 1WB",
@@ -4458,7 +4459,8 @@
               ]
             }
           },
-          "ExpansionJoint": null
+          "ExpansionJoint": null,
+          "DeckEndPoints": null
         },
         {
           "Name": "Pier 2WB",
@@ -6349,7 +6351,8 @@
               ]
             }
           },
-          "ExpansionJoint": null
+          "ExpansionJoint": null,
+          "DeckEndPoints": null
         },
         {
           "Name": "Pier 3WB",
@@ -8006,7 +8009,8 @@
               ]
             }
           },
-          "ExpansionJoint": null
+          "ExpansionJoint": null,
+          "DeckEndPoints": null
         },
         {
           "Name": "Pier 4WB",
@@ -9630,7 +9634,8 @@
               ]
             }
           },
-          "ExpansionJoint": null
+          "ExpansionJoint": null,
+          "DeckEndPoints": null
         },
         {
           "Name": "Pier 5WB",
@@ -11197,7 +11202,8 @@
             },
             "Active": true,
             "TypeName": "Modular"
-          }
+          },
+          "DeckEndPoints": null
         }
       ],
       "AuxiliarySupports": [],
@@ -18289,7 +18295,12 @@
             "LongitudinalBeginCover": 0.4572,
             "TransverseBeginClear": 0.43179999999999996,
             "TransverseEndClear": 0.6858,
-            "WeightTolerance": 0.03
+            "WeightTolerance": 0.03,
+            "EndDam": [],
+            "Unresolved": [
+              "I-80 WB Unit 1 end dam diaphragm bars 5d / 4d at West Abutment (section B-B) and Pier 5WB (section C-C), PDF 185: positions along the joint not dimensioned (bar counts per bay and \u0027@ 1\u0027-0\u0027 only; no distance from the girder lines, \u00272 bars at equal spacing outside exterior girders\u0027 without the outer reference) - schedule only.",
+              "I-80 WB Unit 1 end dam longitudinal bars 5e at West Abutment (section B-B) and Pier 5WB (section C-C), PDF 185: section positions drawn as dots, only partly dimensioned (hoop corners, \u0027EQ. SPA.\u0027 groups) - schedule only."
+            ]
           }
         }
       },
@@ -20799,7 +20810,25 @@
             },
             "Active": true,
             "TypeName": "Modular"
-          }
+          },
+          "DeckEndPoints": [
+            {
+              "Station": 231378.03170890396,
+              "Offset": -44.45568506330938
+            },
+            {
+              "Station": 231375.70322814287,
+              "Offset": -7.953877528419602
+            },
+            {
+              "Station": 231375.741972,
+              "Offset": -7.797799999773899
+            },
+            {
+              "Station": 231375.74197200002,
+              "Offset": 40.9701999997786
+            }
+          ]
         },
         {
           "Name": "Pier 6WB",
@@ -23100,7 +23129,8 @@
               ]
             }
           },
-          "ExpansionJoint": null
+          "ExpansionJoint": null,
+          "DeckEndPoints": null
         },
         {
           "Name": "Pier 7WB",
@@ -25129,7 +25159,8 @@
               ]
             }
           },
-          "ExpansionJoint": null
+          "ExpansionJoint": null,
+          "DeckEndPoints": null
         },
         {
           "Name": "Pier 8WB",
@@ -27341,7 +27372,8 @@
               ]
             }
           },
-          "ExpansionJoint": null
+          "ExpansionJoint": null,
+          "DeckEndPoints": null
         },
         {
           "Name": "Pier 9WB",
@@ -29020,7 +29052,8 @@
               ]
             }
           },
-          "ExpansionJoint": null
+          "ExpansionJoint": null,
+          "DeckEndPoints": null
         },
         {
           "Name": "Pier 10WB",
@@ -30699,7 +30732,8 @@
               ]
             }
           },
-          "ExpansionJoint": null
+          "ExpansionJoint": null,
+          "DeckEndPoints": null
         },
         {
           "Name": "Pier 11WB",
@@ -33046,7 +33080,8 @@
             },
             "Active": true,
             "TypeName": "Modular"
-          }
+          },
+          "DeckEndPoints": null
         }
       ],
       "AuxiliarySupports": [
@@ -34233,7 +34268,8 @@
               ]
             }
           },
-          "ExpansionJoint": null
+          "ExpansionJoint": null,
+          "DeckEndPoints": null
         }
       ],
       "Girders": {
@@ -47319,7 +47355,12 @@
             "LongitudinalBeginCover": 0.635,
             "TransverseBeginClear": 0.6858,
             "TransverseEndClear": 0.6858,
-            "WeightTolerance": 0.03
+            "WeightTolerance": 0.03,
+            "EndDam": [],
+            "Unresolved": [
+              "I-80 WB Unit 2 end dam diaphragm bars 5d / 4d at Piers 5WB / 6A (kinked end) and 11WB, PDF 190 (note: 10 bars between girders A-D and F-K, 8 between D-F, 2 outside at 5WB / 6A; 10 between girders and 2 outside at 11WB): positions along the joint not dimensioned (bar counts per bay and \u0027@ 1\u0027-0\u0027 only; no distance from the girder lines, \u00272 bars at equal spacing outside exterior girders\u0027 without the outer reference) - schedule only.",
+              "I-80 WB Unit 2 end dam longitudinal bars 5e at Piers 5WB / 6A (kinked end) and 11WB, PDF 190 (note: 10 bars between girders A-D and F-K, 8 between D-F, 2 outside at 5WB / 6A; 10 between girders and 2 outside at 11WB): section positions drawn as dots, only partly dimensioned (hoop corners, \u0027EQ. SPA.\u0027 groups) - schedule only."
+            ]
           }
         }
       },
@@ -50775,7 +50816,8 @@
             },
             "Active": true,
             "TypeName": "Modular"
-          }
+          },
+          "DeckEndPoints": null
         },
         {
           "Name": "Pier 12WB",
@@ -52890,7 +52932,8 @@
               ]
             }
           },
-          "ExpansionJoint": null
+          "ExpansionJoint": null,
+          "DeckEndPoints": null
         },
         {
           "Name": "Pier 13WB",
@@ -54784,7 +54827,8 @@
               ]
             }
           },
-          "ExpansionJoint": null
+          "ExpansionJoint": null,
+          "DeckEndPoints": null
         },
         {
           "Name": "Pier 14WB",
@@ -56402,7 +56446,8 @@
               ]
             }
           },
-          "ExpansionJoint": null
+          "ExpansionJoint": null,
+          "DeckEndPoints": null
         },
         {
           "Name": "Pier 15WB",
@@ -58020,7 +58065,8 @@
               ]
             }
           },
-          "ExpansionJoint": null
+          "ExpansionJoint": null,
+          "DeckEndPoints": null
         },
         {
           "Name": "East Abut",
@@ -58845,7 +58891,8 @@
             },
             "Active": true,
             "TypeName": "Modular"
-          }
+          },
+          "DeckEndPoints": null
         }
       ],
       "AuxiliarySupports": [],
@@ -71275,7 +71322,12 @@
             "LongitudinalBeginCover": 0.635,
             "TransverseBeginClear": 0.6858,
             "TransverseEndClear": 0.4445,
-            "WeightTolerance": 0.03
+            "WeightTolerance": 0.03,
+            "EndDam": [],
+            "Unresolved": [
+              "I-80 WB Unit 3 end dam diaphragm bars 5d / 4d at Pier 11WB (12 bars A-B, 11 B-D, 10 D-J, 2 outside) and the East Abutment (5 bars A-D, 10 D-J, 2 outside), PDF 195: positions along the joint not dimensioned (bar counts per bay and \u0027@ 1\u0027-0\u0027 only; no distance from the girder lines, \u00272 bars at equal spacing outside exterior girders\u0027 without the outer reference) - schedule only.",
+              "I-80 WB Unit 3 end dam longitudinal bars 5e at Pier 11WB (12 bars A-B, 11 B-D, 10 D-J, 2 outside) and the East Abutment (5 bars A-D, 10 D-J, 2 outside), PDF 195: section positions drawn as dots, only partly dimensioned (hoop corners, \u0027EQ. SPA.\u0027 groups) - schedule only."
+            ]
           }
         }
       },
@@ -74591,7 +74643,8 @@
             },
             "Active": true,
             "TypeName": "Strip seal"
-          }
+          },
+          "DeckEndPoints": null
         },
         {
           "Name": "Pier 1G",
@@ -75767,7 +75820,8 @@
               ]
             }
           },
-          "ExpansionJoint": null
+          "ExpansionJoint": null,
+          "DeckEndPoints": null
         },
         {
           "Name": "Pier 2G",
@@ -77007,7 +77061,8 @@
               ]
             }
           },
-          "ExpansionJoint": null
+          "ExpansionJoint": null,
+          "DeckEndPoints": null
         },
         {
           "Name": "Pier 3G",
@@ -78239,7 +78294,8 @@
               ]
             }
           },
-          "ExpansionJoint": null
+          "ExpansionJoint": null,
+          "DeckEndPoints": null
         },
         {
           "Name": "Pier 4G",
@@ -79483,7 +79539,8 @@
               ]
             }
           },
-          "ExpansionJoint": null
+          "ExpansionJoint": null,
+          "DeckEndPoints": null
         },
         {
           "Name": "Pier 5G",
@@ -80729,7 +80786,8 @@
             },
             "Active": true,
             "TypeName": "Modular"
-          }
+          },
+          "DeckEndPoints": null
         }
       ],
       "AuxiliarySupports": [],
@@ -84558,7 +84616,168 @@
             "LongitudinalBeginCover": 0.1016,
             "TransverseBeginClear": 0,
             "TransverseEndClear": 0,
-            "WeightTolerance": 0.03
+            "WeightTolerance": 0.03,
+            "EndDam": [
+              {
+                "Mark": "5d2",
+                "Size": "#5",
+                "Ends": "End",
+                "Outside": null,
+                "BodySide": 1,
+                "Dims": [],
+                "HoopWidth": 0.2794,
+                "HoopHeight": 0.508,
+                "HoopLapSide": 0.15239999999999998,
+                "HoopLapTop": 0.15239999999999998,
+                "HoopCorner": {
+                  "X": 0.6858,
+                  "Drop": 0.098425
+                },
+                "Pin": 0.0635,
+                "ListedLength": 1.8796000000000002,
+                "FromGirder": 0.254,
+                "Spacing": 0.30479999999999996,
+                "PerBay": 9,
+                "Overhang": [
+                  0.254,
+                  0.5588
+                ],
+                "SideOffset": 0,
+                "Unplaced": 0,
+                "Unresolved": ""
+              },
+              {
+                "Mark": "5d3",
+                "Size": "#5",
+                "Ends": "End",
+                "Outside": null,
+                "BodySide": 1,
+                "Dims": [],
+                "HoopWidth": 0.8635999999999999,
+                "HoopHeight": 0.2032,
+                "HoopLapSide": 0.15239999999999998,
+                "HoopLapTop": 0.15239999999999998,
+                "HoopCorner": {
+                  "X": 0.07619999999999999,
+                  "Drop": 0.403225
+                },
+                "Pin": 0.0635,
+                "ListedLength": 2.4384,
+                "FromGirder": 0.254,
+                "Spacing": 0.30479999999999996,
+                "PerBay": 9,
+                "Overhang": [
+                  0.254,
+                  0.5588
+                ],
+                "SideOffset": 0,
+                "Unplaced": 0,
+                "Unresolved": ""
+              },
+              {
+                "Mark": "5d4",
+                "Size": "#5",
+                "Ends": "End",
+                "Outside": [
+                  {
+                    "X": 1.2953999999999999,
+                    "Drop": 0.08889999999999999
+                  },
+                  {
+                    "X": 0.07619999999999999,
+                    "Drop": 0.08889999999999999
+                  },
+                  {
+                    "X": 0.07619999999999999,
+                    "Drop": 0.6223
+                  },
+                  {
+                    "X": 0.5334,
+                    "Drop": 0.6223
+                  }
+                ],
+                "BodySide": 1,
+                "Dims": [
+                  1.2191999999999998,
+                  0.5334,
+                  0.4572
+                ],
+                "HoopWidth": null,
+                "HoopHeight": 0,
+                "HoopLapSide": 0,
+                "HoopLapTop": 0,
+                "HoopCorner": {
+                  "X": 0,
+                  "Drop": 0
+                },
+                "Pin": 0.0635,
+                "ListedLength": 2.2098,
+                "FromGirder": 0.254,
+                "Spacing": 0.30479999999999996,
+                "PerBay": 9,
+                "Overhang": [
+                  0.254,
+                  0.5588
+                ],
+                "SideOffset": 0,
+                "Unplaced": 0,
+                "Unresolved": ""
+              },
+              {
+                "Mark": "5d5",
+                "Size": "#5",
+                "Ends": "End",
+                "Outside": [
+                  {
+                    "X": 0.4996579510314467,
+                    "Drop": 0.6223
+                  },
+                  {
+                    "X": 0.9568579510314467,
+                    "Drop": 0.6223
+                  },
+                  {
+                    "X": 1.4775579510314467,
+                    "Drop": 0.1016
+                  },
+                  {
+                    "X": 1.9347579510314468,
+                    "Drop": 0.1016
+                  }
+                ],
+                "BodySide": 1,
+                "Dims": [
+                  0.4572,
+                  0.7365999999999999,
+                  0.4572
+                ],
+                "HoopWidth": null,
+                "HoopHeight": 0,
+                "HoopLapSide": 0,
+                "HoopLapTop": 0,
+                "HoopCorner": {
+                  "X": 0,
+                  "Drop": 0
+                },
+                "Pin": 0.0635,
+                "ListedLength": 1.651,
+                "FromGirder": 0.254,
+                "Spacing": 0.30479999999999996,
+                "PerBay": 9,
+                "Overhang": [
+                  0.254,
+                  0.5588
+                ],
+                "SideOffset": 0,
+                "Unplaced": 0,
+                "Unresolved": ""
+              }
+            ],
+            "Unresolved": [
+              "Ramp G Unit 1 end dam longitudinal bars 5e* at South Abutment (section A-A, PDF 137) and Pier 5G: the bars along the joint are drawn as dots in the sections but only those at hoop corners follow from dimensions (the other 5d3-hoop bars, the 5e4 / 5e8 bars in the blockout) - schedule only.",
+              "Ramp G Unit 1 end dam bars 4d6 / 4d7 under the barriers (section C-C, PDF 138): \u00274-4d6 EQ. SPA.\u0027 without the extent along the joint, 4d7 position not dimensioned; the reduced end block under the barrier (1\u0027-3 at the bottom) is not modeled - schedule only.",
+              "Ramp G Unit 1 South Abutment 5d1 hoops (section A-A, PDF 137, 36 bars \u0027parallel to longit. 6b1 bars\u0027): spacing along the joint not dimensioned - schedule only."
+            ]
           }
         }
       },
@@ -86654,7 +86873,8 @@
             },
             "Active": true,
             "TypeName": "Modular"
-          }
+          },
+          "DeckEndPoints": null
         },
         {
           "Name": "Pier 6G",
@@ -87898,7 +88118,8 @@
               ]
             }
           },
-          "ExpansionJoint": null
+          "ExpansionJoint": null,
+          "DeckEndPoints": null
         },
         {
           "Name": "Pier 7G",
@@ -89298,7 +89519,8 @@
               ]
             }
           },
-          "ExpansionJoint": null
+          "ExpansionJoint": null,
+          "DeckEndPoints": null
         },
         {
           "Name": "Pier 8G",
@@ -90650,7 +90872,8 @@
               ]
             }
           },
-          "ExpansionJoint": null
+          "ExpansionJoint": null,
+          "DeckEndPoints": null
         },
         {
           "Name": "Pier 9G",
@@ -91935,7 +92158,8 @@
             },
             "Active": true,
             "TypeName": "Modular"
-          }
+          },
+          "DeckEndPoints": null
         }
       ],
       "AuxiliarySupports": [],
@@ -95219,7 +95443,167 @@
             "LongitudinalBeginCover": 0.635,
             "TransverseBeginClear": 0,
             "TransverseEndClear": 0,
-            "WeightTolerance": 0.03
+            "WeightTolerance": 0.03,
+            "EndDam": [
+              {
+                "Mark": "5d2",
+                "Size": "#5",
+                "Ends": "Both",
+                "Outside": null,
+                "BodySide": 1,
+                "Dims": [],
+                "HoopWidth": 0.2794,
+                "HoopHeight": 0.508,
+                "HoopLapSide": 0.15239999999999998,
+                "HoopLapTop": 0.15239999999999998,
+                "HoopCorner": {
+                  "X": 0.6858,
+                  "Drop": 0.098425
+                },
+                "Pin": 0.0635,
+                "ListedLength": 1.8796000000000002,
+                "FromGirder": 0.254,
+                "Spacing": 0.30479999999999996,
+                "PerBay": 9,
+                "Overhang": [
+                  0.254,
+                  0.5588
+                ],
+                "SideOffset": 0,
+                "Unplaced": 0,
+                "Unresolved": ""
+              },
+              {
+                "Mark": "5d3",
+                "Size": "#5",
+                "Ends": "Both",
+                "Outside": null,
+                "BodySide": 1,
+                "Dims": [],
+                "HoopWidth": 0.8635999999999999,
+                "HoopHeight": 0.2032,
+                "HoopLapSide": 0.15239999999999998,
+                "HoopLapTop": 0.15239999999999998,
+                "HoopCorner": {
+                  "X": 0.07619999999999999,
+                  "Drop": 0.403225
+                },
+                "Pin": 0.0635,
+                "ListedLength": 2.4384,
+                "FromGirder": 0.254,
+                "Spacing": 0.30479999999999996,
+                "PerBay": 9,
+                "Overhang": [
+                  0.254,
+                  0.5588
+                ],
+                "SideOffset": 0,
+                "Unplaced": 0,
+                "Unresolved": ""
+              },
+              {
+                "Mark": "5d4",
+                "Size": "#5",
+                "Ends": "Both",
+                "Outside": [
+                  {
+                    "X": 1.2953999999999999,
+                    "Drop": 0.08889999999999999
+                  },
+                  {
+                    "X": 0.07619999999999999,
+                    "Drop": 0.08889999999999999
+                  },
+                  {
+                    "X": 0.07619999999999999,
+                    "Drop": 0.6223
+                  },
+                  {
+                    "X": 0.5334,
+                    "Drop": 0.6223
+                  }
+                ],
+                "BodySide": 1,
+                "Dims": [
+                  1.2191999999999998,
+                  0.5334,
+                  0.4572
+                ],
+                "HoopWidth": null,
+                "HoopHeight": 0,
+                "HoopLapSide": 0,
+                "HoopLapTop": 0,
+                "HoopCorner": {
+                  "X": 0,
+                  "Drop": 0
+                },
+                "Pin": 0.0635,
+                "ListedLength": 2.2098,
+                "FromGirder": 0.254,
+                "Spacing": 0.30479999999999996,
+                "PerBay": 9,
+                "Overhang": [
+                  0.254,
+                  0.5588
+                ],
+                "SideOffset": 0,
+                "Unplaced": 0,
+                "Unresolved": ""
+              },
+              {
+                "Mark": "5d5",
+                "Size": "#5",
+                "Ends": "Both",
+                "Outside": [
+                  {
+                    "X": 0.4996579510314467,
+                    "Drop": 0.6223
+                  },
+                  {
+                    "X": 0.9568579510314467,
+                    "Drop": 0.6223
+                  },
+                  {
+                    "X": 1.4775579510314467,
+                    "Drop": 0.1016
+                  },
+                  {
+                    "X": 1.9347579510314468,
+                    "Drop": 0.1016
+                  }
+                ],
+                "BodySide": 1,
+                "Dims": [
+                  0.4572,
+                  0.7365999999999999,
+                  0.4572
+                ],
+                "HoopWidth": null,
+                "HoopHeight": 0,
+                "HoopLapSide": 0,
+                "HoopLapTop": 0,
+                "HoopCorner": {
+                  "X": 0,
+                  "Drop": 0
+                },
+                "Pin": 0.0635,
+                "ListedLength": 1.651,
+                "FromGirder": 0.254,
+                "Spacing": 0.30479999999999996,
+                "PerBay": 9,
+                "Overhang": [
+                  0.254,
+                  0.5588
+                ],
+                "SideOffset": 0,
+                "Unplaced": 0,
+                "Unresolved": ""
+              }
+            ],
+            "Unresolved": [
+              "Ramp G Unit 2 end dam longitudinal bars 5e* at both expansion piers (section B-B, PDF 137): the bars along the joint are drawn as dots in the sections but only those at hoop corners follow from dimensions (the other 5d3-hoop bars, the 5e4 / 5e8 bars in the blockout) - schedule only.",
+              "Ramp G Unit 2 end dam bars 4d6 / 4d7 under the barriers (section C-C, PDF 138): \u00274-4d6 EQ. SPA.\u0027 without the extent along the joint, 4d7 position not dimensioned; the reduced end block under the barrier (1\u0027-3 at the bottom) is not modeled - schedule only."
+            ]
           }
         }
       },
@@ -97293,7 +97677,8 @@
             },
             "Active": true,
             "TypeName": "Modular"
-          }
+          },
+          "DeckEndPoints": null
         },
         {
           "Name": "Pier 10G",
@@ -98645,7 +99030,8 @@
               ]
             }
           },
-          "ExpansionJoint": null
+          "ExpansionJoint": null,
+          "DeckEndPoints": null
         },
         {
           "Name": "Pier 11G",
@@ -100025,7 +100411,8 @@
               ]
             }
           },
-          "ExpansionJoint": null
+          "ExpansionJoint": null,
+          "DeckEndPoints": null
         },
         {
           "Name": "Pier 12G",
@@ -101405,7 +101792,8 @@
               ]
             }
           },
-          "ExpansionJoint": null
+          "ExpansionJoint": null,
+          "DeckEndPoints": null
         },
         {
           "Name": "Pier 13G",
@@ -102649,7 +103037,8 @@
               ]
             }
           },
-          "ExpansionJoint": null
+          "ExpansionJoint": null,
+          "DeckEndPoints": null
         },
         {
           "Name": "Pier 14G",
@@ -103879,7 +104268,8 @@
             },
             "Active": true,
             "TypeName": "Modular"
-          }
+          },
+          "DeckEndPoints": null
         }
       ],
       "AuxiliarySupports": [],
@@ -108251,7 +108641,167 @@
             "LongitudinalBeginCover": 0.635,
             "TransverseBeginClear": 0,
             "TransverseEndClear": 0,
-            "WeightTolerance": 0.03
+            "WeightTolerance": 0.03,
+            "EndDam": [
+              {
+                "Mark": "5d2",
+                "Size": "#5",
+                "Ends": "Both",
+                "Outside": null,
+                "BodySide": 1,
+                "Dims": [],
+                "HoopWidth": 0.2794,
+                "HoopHeight": 0.508,
+                "HoopLapSide": 0.15239999999999998,
+                "HoopLapTop": 0.15239999999999998,
+                "HoopCorner": {
+                  "X": 0.6858,
+                  "Drop": 0.098425
+                },
+                "Pin": 0.0635,
+                "ListedLength": 1.8796000000000002,
+                "FromGirder": 0.254,
+                "Spacing": 0.30479999999999996,
+                "PerBay": 9,
+                "Overhang": [
+                  0.254,
+                  0.5588
+                ],
+                "SideOffset": 0,
+                "Unplaced": 0,
+                "Unresolved": ""
+              },
+              {
+                "Mark": "5d3",
+                "Size": "#5",
+                "Ends": "Both",
+                "Outside": null,
+                "BodySide": 1,
+                "Dims": [],
+                "HoopWidth": 0.8635999999999999,
+                "HoopHeight": 0.2032,
+                "HoopLapSide": 0.15239999999999998,
+                "HoopLapTop": 0.15239999999999998,
+                "HoopCorner": {
+                  "X": 0.07619999999999999,
+                  "Drop": 0.403225
+                },
+                "Pin": 0.0635,
+                "ListedLength": 2.4384,
+                "FromGirder": 0.254,
+                "Spacing": 0.30479999999999996,
+                "PerBay": 9,
+                "Overhang": [
+                  0.254,
+                  0.5588
+                ],
+                "SideOffset": 0,
+                "Unplaced": 0,
+                "Unresolved": ""
+              },
+              {
+                "Mark": "5d4",
+                "Size": "#5",
+                "Ends": "Both",
+                "Outside": [
+                  {
+                    "X": 1.2953999999999999,
+                    "Drop": 0.08889999999999999
+                  },
+                  {
+                    "X": 0.07619999999999999,
+                    "Drop": 0.08889999999999999
+                  },
+                  {
+                    "X": 0.07619999999999999,
+                    "Drop": 0.6223
+                  },
+                  {
+                    "X": 0.5334,
+                    "Drop": 0.6223
+                  }
+                ],
+                "BodySide": 1,
+                "Dims": [
+                  1.2191999999999998,
+                  0.5334,
+                  0.4572
+                ],
+                "HoopWidth": null,
+                "HoopHeight": 0,
+                "HoopLapSide": 0,
+                "HoopLapTop": 0,
+                "HoopCorner": {
+                  "X": 0,
+                  "Drop": 0
+                },
+                "Pin": 0.0635,
+                "ListedLength": 2.2098,
+                "FromGirder": 0.254,
+                "Spacing": 0.30479999999999996,
+                "PerBay": 9,
+                "Overhang": [
+                  0.254,
+                  0.5588
+                ],
+                "SideOffset": 0,
+                "Unplaced": 0,
+                "Unresolved": ""
+              },
+              {
+                "Mark": "5d5",
+                "Size": "#5",
+                "Ends": "Both",
+                "Outside": [
+                  {
+                    "X": 0.4996579510314467,
+                    "Drop": 0.6223
+                  },
+                  {
+                    "X": 0.9568579510314467,
+                    "Drop": 0.6223
+                  },
+                  {
+                    "X": 1.4775579510314467,
+                    "Drop": 0.1016
+                  },
+                  {
+                    "X": 1.9347579510314468,
+                    "Drop": 0.1016
+                  }
+                ],
+                "BodySide": 1,
+                "Dims": [
+                  0.4572,
+                  0.7365999999999999,
+                  0.4572
+                ],
+                "HoopWidth": null,
+                "HoopHeight": 0,
+                "HoopLapSide": 0,
+                "HoopLapTop": 0,
+                "HoopCorner": {
+                  "X": 0,
+                  "Drop": 0
+                },
+                "Pin": 0.0635,
+                "ListedLength": 1.651,
+                "FromGirder": 0.254,
+                "Spacing": 0.30479999999999996,
+                "PerBay": 9,
+                "Overhang": [
+                  0.254,
+                  0.5588
+                ],
+                "SideOffset": 0,
+                "Unplaced": 0,
+                "Unresolved": ""
+              }
+            ],
+            "Unresolved": [
+              "Ramp G Unit 3 end dam longitudinal bars 5e* at both expansion piers (section B-B, PDF 137): the bars along the joint are drawn as dots in the sections but only those at hoop corners follow from dimensions (the other 5d3-hoop bars, the 5e4 / 5e8 bars in the blockout) - schedule only.",
+              "Ramp G Unit 3 end dam bars 4d6 / 4d7 under the barriers (section C-C, PDF 138): \u00274-4d6 EQ. SPA.\u0027 without the extent along the joint, 4d7 position not dimensioned; the reduced end block under the barrier (1\u0027-3 at the bottom) is not modeled - schedule only."
+            ]
           }
         }
       },
@@ -110633,7 +111183,8 @@
             },
             "Active": true,
             "TypeName": "Modular"
-          }
+          },
+          "DeckEndPoints": null
         },
         {
           "Name": "Pier 15G",
@@ -111865,7 +112416,8 @@
               ]
             }
           },
-          "ExpansionJoint": null
+          "ExpansionJoint": null,
+          "DeckEndPoints": null
         },
         {
           "Name": "Pier 16G",
@@ -113403,7 +113955,8 @@
               ]
             }
           },
-          "ExpansionJoint": null
+          "ExpansionJoint": null,
+          "DeckEndPoints": null
         },
         {
           "Name": "Pier 17G",
@@ -114937,7 +115490,8 @@
               ]
             }
           },
-          "ExpansionJoint": null
+          "ExpansionJoint": null,
+          "DeckEndPoints": null
         },
         {
           "Name": "Pier 18G",
@@ -116201,7 +116755,8 @@
               ]
             }
           },
-          "ExpansionJoint": null
+          "ExpansionJoint": null,
+          "DeckEndPoints": null
         },
         {
           "Name": "Pier 19G",
@@ -117408,7 +117963,25 @@
             },
             "Active": true,
             "TypeName": "Modular"
-          }
+          },
+          "DeckEndPoints": [
+            {
+              "Station": 2057489.1794271937,
+              "Offset": -2.3113999999801704
+            },
+            {
+              "Station": 2057489.1794271937,
+              "Offset": -2.184399999507393
+            },
+            {
+              "Station": 2057496.0019463631,
+              "Offset": 8.5140800009525
+            },
+            {
+              "Station": 2057495.9937120003,
+              "Offset": 8.641079999788762
+            }
+          ]
         }
       ],
       "AuxiliarySupports": [],
@@ -120971,7 +121544,80 @@
         "LeftEdgeOffset": -2.3114,
         "RightEdgeOffset": 8.4074,
         "LeftEdgeTable": null,
-        "RightEdgeTable": null,
+        "RightEdgeTable": [
+          {
+            "Station": 2057491.177872,
+            "Offset": 8.4074
+          },
+          {
+            "Station": 2057491.4612821976,
+            "Offset": 8.419762170698192
+          },
+          {
+            "Station": 2057491.744677722,
+            "Offset": 8.432297375844445
+          },
+          {
+            "Station": 2057492.0280583696,
+            "Offset": 8.445005602050093
+          },
+          {
+            "Station": 2057492.3114239378,
+            "Offset": 8.457886836392888
+          },
+          {
+            "Station": 2057492.5947742243,
+            "Offset": 8.470941065397364
+          },
+          {
+            "Station": 2057492.8781090265,
+            "Offset": 8.48416827315862
+          },
+          {
+            "Station": 2057493.1614281414,
+            "Offset": 8.497568445958493
+          },
+          {
+            "Station": 2057493.444731367,
+            "Offset": 8.511141569532581
+          },
+          {
+            "Station": 2057493.7280185008,
+            "Offset": 8.524887629906067
+          },
+          {
+            "Station": 2057494.0112893404,
+            "Offset": 8.538806612557515
+          },
+          {
+            "Station": 2057494.2945436835,
+            "Offset": 8.5528984995781
+          },
+          {
+            "Station": 2057494.577781328,
+            "Offset": 8.567163278984486
+          },
+          {
+            "Station": 2057494.8610020718,
+            "Offset": 8.581600934479633
+          },
+          {
+            "Station": 2057495.144205713,
+            "Offset": 8.596211450112623
+          },
+          {
+            "Station": 2057495.4273920495,
+            "Offset": 8.610994810271729
+          },
+          {
+            "Station": 2057495.710560879,
+            "Offset": 8.625950998792442
+          },
+          {
+            "Station": 2057495.9937120003,
+            "Offset": 8.641079999788762
+          }
+        ],
         "Thickness": 0.2032,
         "Haunch": 0.08889999999999999,
         "OverhangThickness": 0.2286,
@@ -121629,8 +122275,168 @@
             "LongitudinalEndCover": 0.635,
             "LongitudinalBeginCover": 0.635,
             "TransverseBeginClear": 0,
-            "TransverseEndClear": 0,
-            "WeightTolerance": 0.03
+            "TransverseEndClear": 0.6858,
+            "WeightTolerance": 0.03,
+            "EndDam": [
+              {
+                "Mark": "5d2",
+                "Size": "#5",
+                "Ends": "Begin",
+                "Outside": null,
+                "BodySide": 1,
+                "Dims": [],
+                "HoopWidth": 0.2794,
+                "HoopHeight": 0.508,
+                "HoopLapSide": 0.15239999999999998,
+                "HoopLapTop": 0.15239999999999998,
+                "HoopCorner": {
+                  "X": 0.6858,
+                  "Drop": 0.098425
+                },
+                "Pin": 0.0635,
+                "ListedLength": 1.8796000000000002,
+                "FromGirder": 0.254,
+                "Spacing": 0.30479999999999996,
+                "PerBay": 9,
+                "Overhang": [
+                  0.254,
+                  0.5588
+                ],
+                "SideOffset": 0,
+                "Unplaced": 36,
+                "Unresolved": "Pier 19G end of Unit 4 (section E-E, PDF 140): 10 bars per bay and 3 outside the exterior girders \u0027at equal spacing\u0027 on the skewed joint; positions along the joint not dimensioned (the partial section PDF 138 dimensions Piers 5G/9G/14G only) - 36 bars counted, not modeled"
+              },
+              {
+                "Mark": "5d3",
+                "Size": "#5",
+                "Ends": "Begin",
+                "Outside": null,
+                "BodySide": 1,
+                "Dims": [],
+                "HoopWidth": 0.8635999999999999,
+                "HoopHeight": 0.2032,
+                "HoopLapSide": 0.15239999999999998,
+                "HoopLapTop": 0.15239999999999998,
+                "HoopCorner": {
+                  "X": 0.07619999999999999,
+                  "Drop": 0.403225
+                },
+                "Pin": 0.0635,
+                "ListedLength": 2.4384,
+                "FromGirder": 0.254,
+                "Spacing": 0.30479999999999996,
+                "PerBay": 9,
+                "Overhang": [
+                  0.254,
+                  0.5588
+                ],
+                "SideOffset": 0,
+                "Unplaced": 36,
+                "Unresolved": "Pier 19G end of Unit 4 (section E-E, PDF 140): 10 bars per bay and 3 outside the exterior girders \u0027at equal spacing\u0027 on the skewed joint; positions along the joint not dimensioned (the partial section PDF 138 dimensions Piers 5G/9G/14G only) - 36 bars counted, not modeled"
+              },
+              {
+                "Mark": "5d4",
+                "Size": "#5",
+                "Ends": "Begin",
+                "Outside": [
+                  {
+                    "X": 1.2953999999999999,
+                    "Drop": 0.08889999999999999
+                  },
+                  {
+                    "X": 0.07619999999999999,
+                    "Drop": 0.08889999999999999
+                  },
+                  {
+                    "X": 0.07619999999999999,
+                    "Drop": 0.6223
+                  },
+                  {
+                    "X": 0.5334,
+                    "Drop": 0.6223
+                  }
+                ],
+                "BodySide": 1,
+                "Dims": [
+                  1.2191999999999998,
+                  0.5334,
+                  0.4572
+                ],
+                "HoopWidth": null,
+                "HoopHeight": 0,
+                "HoopLapSide": 0,
+                "HoopLapTop": 0,
+                "HoopCorner": {
+                  "X": 0,
+                  "Drop": 0
+                },
+                "Pin": 0.0635,
+                "ListedLength": 2.2098,
+                "FromGirder": 0.254,
+                "Spacing": 0.30479999999999996,
+                "PerBay": 9,
+                "Overhang": [
+                  0.254,
+                  0.5588
+                ],
+                "SideOffset": 0,
+                "Unplaced": 36,
+                "Unresolved": "Pier 19G end of Unit 4 (section E-E, PDF 140): 10 bars per bay and 3 outside the exterior girders \u0027at equal spacing\u0027 on the skewed joint; positions along the joint not dimensioned (the partial section PDF 138 dimensions Piers 5G/9G/14G only) - 36 bars counted, not modeled"
+              },
+              {
+                "Mark": "5d5",
+                "Size": "#5",
+                "Ends": "Begin",
+                "Outside": [
+                  {
+                    "X": 0.4996579510314467,
+                    "Drop": 0.6223
+                  },
+                  {
+                    "X": 0.9568579510314467,
+                    "Drop": 0.6223
+                  },
+                  {
+                    "X": 1.4775579510314467,
+                    "Drop": 0.1016
+                  },
+                  {
+                    "X": 1.9347579510314468,
+                    "Drop": 0.1016
+                  }
+                ],
+                "BodySide": 1,
+                "Dims": [
+                  0.4572,
+                  0.7365999999999999,
+                  0.4572
+                ],
+                "HoopWidth": null,
+                "HoopHeight": 0,
+                "HoopLapSide": 0,
+                "HoopLapTop": 0,
+                "HoopCorner": {
+                  "X": 0,
+                  "Drop": 0
+                },
+                "Pin": 0.0635,
+                "ListedLength": 1.651,
+                "FromGirder": 0.254,
+                "Spacing": 0.30479999999999996,
+                "PerBay": 9,
+                "Overhang": [
+                  0.254,
+                  0.5588
+                ],
+                "SideOffset": 0,
+                "Unplaced": 36,
+                "Unresolved": "Pier 19G end of Unit 4 (section E-E, PDF 140): 10 bars per bay and 3 outside the exterior girders \u0027at equal spacing\u0027 on the skewed joint; positions along the joint not dimensioned (the partial section PDF 138 dimensions Piers 5G/9G/14G only) - 36 bars counted, not modeled"
+              }
+            ],
+            "Unresolved": [
+              "Ramp G Unit 4 end dam longitudinal bars 5e* at Piers 14G and 19G (sections B-B PDF 137, E-E PDF 140): the bars along the joint are drawn as dots in the sections but only those at hoop corners follow from dimensions (the other 5d3-hoop bars, the 5e4 / 5e8 bars in the blockout) - schedule only.",
+              "Ramp G Unit 4 end dam bars 4d6 / 4d7 under the barriers (section C-C, PDF 138): \u00274-4d6 EQ. SPA.\u0027 without the extent along the joint, 4d7 position not dimensioned; the reduced end block under the barrier (1\u0027-3 at the bottom) is not modeled - schedule only."
+            ]
           }
         }
       },
