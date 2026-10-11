@@ -1,0 +1,76 @@
+beam_line,location,T_in,source,tag
+D,CL S abut brg,9,PDF p.24 / DS 22,RASTER
+D,Q,9,PDF p.24 / DS 22,RASTER
+D,R,9 1/8,PDF p.24 / DS 22,RASTER
+D,S,9 1/2,PDF p.24 / DS 22,RASTER
+D,CL pier 1 brg (back),9 7/8,PDF p.24 / DS 22,RASTER
+D,CL pier 1 brg (ahead),10,PDF p.24 / DS 22,RASTER
+D,U,9 3/16,PDF p.24 / DS 22,RASTER
+D,V,9,PDF p.24 / DS 22,RASTER
+D,W,9 5/8,PDF p.24 / DS 22,RASTER
+D,CL pier 2 brg (back),10,PDF p.24 / DS 22,RASTER
+D,CL pier 2 brg (ahead),9 7/8,PDF p.24 / DS 22,RASTER
+D,X,9 3/8,PDF p.24 / DS 22,RASTER
+D,Y,9 3/16,PDF p.24 / DS 22,RASTER
+D,Z,9,PDF p.24 / DS 22,RASTER
+D,CL N abut brg,9 1/8,PDF p.24 / DS 22,RASTER
+E,CL S abut brg,9,PDF p.24 / DS 22,RASTER
+E,Q,9,PDF p.24 / DS 22,RASTER
+E,R,9 1/16,PDF p.24 / DS 22,RASTER
+E,S,9 5/16,PDF p.24 / DS 22,RASTER
+E,CL pier 1 brg (back),9 3/4,PDF p.24 / DS 22,RASTER
+E,CL pier 1 brg (ahead),9 7/8,PDF p.24 / DS 22,RASTER
+E,U,9 3/16,PDF p.24 / DS 22,RASTER
+E,V,9,PDF p.24 / DS 22,RASTER
+E,W,9 5/8,PDF p.24 / DS 22,RASTER
+E,CL pier 2 brg (back),9 7/8,PDF p.24 / DS 22,RASTER
+E,CL pier 2 brg (ahead),9 3/4,PDF p.24 / DS 22,RASTER
+E,X,9 3/8,PDF p.24 / DS 22,RASTER
+E,Y,9 1/8,PDF p.24 / DS 22,RASTER
+E,Z,9,PDF p.24 / DS 22,RASTER
+E,CL N abut brg,9 1/8,PDF p.24 / DS 22,RASTER
+F,CL S abut brg,9,PDF p.24 / DS 22,RASTER
+F,Q,9,PDF p.24 / DS 22,RASTER
+F,R,9 1/16,PDF p.24 / DS 22,RASTER
+F,S,9 1/4,PDF p.24 / DS 22,RASTER
+F,CL pier 1 brg (back),9 5/8,PDF p.24 / DS 22,RASTER
+F,CL pier 1 brg (ahead),9 3/4,PDF p.24 / DS 22,RASTER
+F,U,9 3/16,PDF p.24 / DS 22,RASTER
+F,V,9,PDF p.24 / DS 22,RASTER
+F,W,9 5/8,PDF p.24 / DS 22,RASTER
+F,CL pier 2 brg (back),9 3/4,PDF p.24 / DS 22,RASTER
+F,CL pier 2 brg (ahead),9 3/4,PDF p.24 / DS 22,RASTER
+F,X,9 3/8,PDF p.24 / DS 22,RASTER
+F,Y,9 1/8,PDF p.24 / DS 22,RASTER
+F,Z,9 1/16,PDF p.24 / DS 22,RASTER
+F,CL N abut brg,9 1/8,PDF p.24 / DS 22,RASTER
+G,CL S abut brg,9 1/8,PDF p.24 / DS 22,RASTER
+G,Q,9,PDF p.24 / DS 22,RASTER
+G,R,9 1/8,PDF p.24 / DS 22,RASTER
+G,S,9 5/16,PDF p.24 / DS 22,RASTER
+G,CL pier 1 brg (back),9 1/2,PDF p.24 / DS 22,RASTER
+G,CL pier 1 brg (ahead),9 3/4,PDF p.24 / DS 22,RASTER
+G,U,9 1/8,PDF p.24 / DS 22,RASTER
+G,V,9,PDF p.24 / DS 22,RASTER
+G,W,9 5/8,PDF p.24 / DS 22,RASTER
+G,CL pier 2 brg (back),9 3/4,PDF p.24 / DS 22,RASTER
+G,CL pier 2 brg (ahead),9 3/4,PDF p.24 / DS 22,RASTER
+G,X,9 3/8,PDF p.24 / DS 22,RASTER
+G,Y,9 3/16,PDF p.24 / DS 22,RASTER
+G,Z,9,PDF p.24 / DS 22,RASTER
+G,CL N abut brg,9 1/8,PDF p.24 / DS 22,RASTER
+H,CL S abut brg,9 1/8,PDF p.24 / DS 22,RASTER
+H,Q,9,PDF p.24 / DS 22,RASTER
+H,R,9 1/16,PDF p.24 / DS 22,RASTER
+H,S,9 3/8,PDF p.24 / DS 22,RASTER
+H,CL pier 1 brg (back),9 5/8,PDF p.24 / DS 22,RASTER
+H,CL pier 1 brg (ahead),9 7/8,PDF p.24 / DS 22,RASTER
+H,U,9 3/16,PDF p.24 / DS 22,RASTER
+H,V,9,PDF p.24 / DS 22,RASTER
+H,W,9 11/16,PDF p.24 / DS 22,RASTER
+H,CL pier 2 brg (back),9 7/8,PDF p.24 / DS 22,RASTER
+H,CL pier 2 brg (ahead),9 7/8,PDF p.24 / DS 22,RASTER
+H,X,9 3/8,PDF p.24 / DS 22,RASTER
+H,Y,9 1/8,PDF p.24 / DS 22,RASTER
+H,Z,9,PDF p.24 / DS 22,RASTER
+H,CL N abut brg,9 1/8,PDF p.24 / DS 22,RASTER

@@ -1,0 +1,11 @@
+span,beam_line,dim_1,dim_2,dim_3,note,source,tag
+1,D,"27'-5 1/4","1'-6 1/4","27'-4 1/2",chain from beam end in direction of increasing station; sums = beam end-to-end length,PDF p.31 / DS 29,RASTER
+1,E/F/G,"27'-5 1/4","1'-5 1/2","27'-5 1/4",chain from beam end in direction of increasing station; sums = beam end-to-end length,PDF p.31 / DS 29,RASTER
+1,H,"28'-10 3/4","","27'-5 1/4",chain from beam end in direction of increasing station; sums = beam end-to-end length,PDF p.31 / DS 29,RASTER
+2,D,"52'-4","1'-9 1/8","52'-2 7/8",chain from beam end in direction of increasing station; sums = beam end-to-end length,PDF p.31 / DS 29,RASTER
+2,E/F/G,"52'-4","1'-8","52'-4",chain from beam end in direction of increasing station; sums = beam end-to-end length,PDF p.31 / DS 29,RASTER
+2,H,"54'-0","","52'-4",chain from beam end in direction of increasing station; sums = beam end-to-end length,PDF p.31 / DS 29,RASTER
+3,D,"29'-8 1/4","2'-0 3/4","29'-7",chain from beam end in direction of increasing station; sums = beam end-to-end length,PDF p.31 / DS 29,RASTER
+3,E/F/G,"29'-8 1/4","1'-11 1/2","29'-8 1/4",chain from beam end in direction of increasing station; sums = beam end-to-end length,PDF p.31 / DS 29,RASTER
+3,H,"31'-7 3/4","","29'-8 1/4",chain from beam end in direction of increasing station; sums = beam end-to-end length,PDF p.31 / DS 29,RASTER
+-,-,"","","",members: W21x50 7'-11 13/16 spacing 6'-9 5/8 long (1); C15x33.9 8'-0 5/16 / 6'-10 (4); C15x33.9 7'-11 13/16 / 6'-9 1/2 (3); C15x33.9 7'-11 / 6'-8 3/4 (4); W14x38 7'-11 13/16 / 5'-4 7/8 (1); total 4258 lb,PDF p.31 / DS 29,RASTER
