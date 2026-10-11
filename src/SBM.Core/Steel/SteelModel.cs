@@ -9,9 +9,11 @@ public enum PartCategory
     FlangePlate, WebPlate, BearingStiffener, ConnectionStiffener, IntermediateStiffener,
     Gusset, FillerPlate, Angle, Channel, SolePlate, BearingPad, Weld,
     SplicePlate, BearingPlate, MasonryPlate, BearingDisc, ShearPin, GuideBar, Ptfe,
+    // Inspection access (cables on WT brackets, walkways).
+    InspectionBracket, InspectionCable, Grating, WalkwayStringer, WalkwayPost, WalkwayRail, WalkwayPlate,
 }
 
-public enum AssemblyKind { GirderFieldSection, CrossFrame, Bearing, FieldSplice, LateralBracing }
+public enum AssemblyKind { GirderFieldSection, CrossFrame, Bearing, FieldSplice, LateralBracing, InspectionCable, InspectionWalkway }
 
 /// <summary>Member role, used for IFC predefined types and reports.</summary>
 public enum MemberRole { None, TopChord, BottomChord, Diagonal, Diaphragm, Lateral }

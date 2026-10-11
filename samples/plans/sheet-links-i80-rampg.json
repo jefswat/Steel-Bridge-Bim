@@ -51,6 +51,14 @@
       "target": [ { "level": "assembly", "category": [ "cross frame", "lateral bracing" ] } ] },
     { "id": "cross-girder", "sheets": "^CROSS GIRDER DETAILS", "basis": "Cross girder details (discontinuous girders)",
       "target": [ { "level": "assembly", "category": "cross girder" } ] },
+    { "id": "inspection-plan-unit", "sheets": "^INSPECTION ACCESS PLAN - UNIT (?<u>\\d+)", "basis": "Inspection access plan of the unit: cable runs and walkways",
+      "target": [ { "level": "assembly", "category": [ "inspection cable", "inspection walkway" ], "unit": "Unit {u}" } ] },
+    { "id": "inspection-plan", "sheets": "^INSPECTION ACCESS PLAN$", "basis": "Inspection access plan: cable runs and walkways",
+      "target": [ { "level": "assembly", "category": [ "inspection cable", "inspection walkway" ] } ] },
+    { "id": "inspection-cable", "sheets": "^INSPECTION CABLE DETAILS", "basis": "Inspection cable details: wire rope, WT brackets and anchorages",
+      "target": [ { "level": "assembly", "category": "inspection cable" } ] },
+    { "id": "inspection-walkway", "sheets": "^INSPECTION WALKWAY DETAILS", "basis": "Inspection walkway details: stringers, grating, rails and posts",
+      "target": [ { "level": "assembly", "category": "inspection walkway" } ] },
     { "id": "field-splice", "sheets": "^FIELD SPLICE DETAILS", "basis": "Field splice schedule and details",
       "target": [ { "level": "assembly", "category": "field splice" } ] },
     { "id": "haunch", "sheets": "^FIELD HAUNCH DATA - UNIT (?<u>\\d+)", "basis": "Field haunch data: haunch heights to compare with the model",
@@ -82,7 +90,6 @@
 
   "hints": [
     { "sheets": "BNSF SHORING", "suggests": "Temporary works: shoring next to the railroad. No temporary / construction-stage elements in the model." },
-    { "sheets": "INSPECTION (ACCESS|CABLE|WALKWAY)", "suggests": "Inspection access: walkways, cables, access openings, hatches (and the cut-off diaphragm openings). Not modeled." },
     { "sheets": "SIGN SUPPORT|EXIT SIGN", "suggests": "Sign structures: sign supports, brackets, bases and foundations on the bridge (I-80). Not modeled." },
     { "sheets": "CAMBER", "suggests": "Camber and blocking: girder camber/blocking diagrams. Camber is not modeled (deferred)." },
     { "sheets": "MOMENT & REACTION", "suggests": "Design reactions and moments: load data for bearings and girders. No load/reaction properties on bearings or girders yet." },

@@ -152,7 +152,7 @@ public sealed partial class MainViewModel : ObservableObject
                 var sm = SteelModels.Values.FirstOrDefault();
                 title = anchor ? $"Anchor bolt — {bolt.Assembly}" : $"Bolt — {bolt.Assembly}";
                 R("Type", anchor ? "Anchor bolt with plate washer and nuts" : $"High-strength bolt {sm?.BoltGrade}");
-                R("Diameter", S(anchor ? bolt.Diameter : sm?.Bolt.Diameter ?? bolt.Diameter));
+                R("Diameter", S(anchor || bolt.Diameter > 0 ? bolt.Diameter : sm?.Bolt.Diameter ?? bolt.Diameter));
                 R("Length", S(bolt.Length));
                 R(anchor ? "Plate thickness" : "Grip", S(bolt.Grip));
                 if (anchor) R("Embedment", S(bolt.Embedment));
@@ -1312,9 +1312,10 @@ public sealed partial class MainViewModel : ObservableObject
                         grp.Key.Category == PartCategory.BearingPad ? "—" : $"{grp.Sum(p => p.Mass) / massUnit:N0} {mu}"));
                 foreach (var grp in sm.Parts.Where(p => p.Category == PartCategory.Weld).GroupBy(p => p.Description).OrderBy(g => g.Key))
                     MaterialRows.Add(new MaterialRow(b.Name, "Weld", grp.Key, grp.Count(), u.FormatLength(grp.Sum(p => p.Length)), ""));
-                foreach (var grp in sm.Bolts.Where(x => x.Kind == BoltKind.Structural).GroupBy(x => Math.Round(x.Length, 5)).OrderBy(g => g.Key))
+                foreach (var grp in sm.Bolts.Where(x => x.Kind == BoltKind.Structural).GroupBy(x => (Dia: Math.Round(x.Diameter > 0 ? x.Diameter : sm.Bolt.Diameter, 5), Len: Math.Round(x.Length, 5)))
+                             .OrderBy(g => g.Key.Dia).ThenBy(g => g.Key.Len))
                     MaterialRows.Add(new MaterialRow(b.Name, "Bolt",
-                        $"{u.FormatLength(sm.Bolt.Diameter, LengthKind.Short)} {sm.BoltGrade} x {u.FormatLength(grp.Key, LengthKind.Short)} w/ nut & washer",
+                        $"{u.FormatLength(grp.Key.Dia, LengthKind.Short)} {sm.BoltGrade} x {u.FormatLength(grp.Key.Len, LengthKind.Short)} w/ nut & washer",
                         grp.Count(), "", ""));
                 foreach (var grp in sm.Bolts.Where(x => x.Kind == BoltKind.Anchor).GroupBy(x => (Math.Round(x.Diameter, 5), Math.Round(x.Embedment, 5))))
                     MaterialRows.Add(new MaterialRow(b.Name, "Anchor bolt",

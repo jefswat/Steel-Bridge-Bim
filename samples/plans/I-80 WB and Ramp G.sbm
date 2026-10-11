@@ -4819,7 +4819,29 @@
           "WebThickness": 0.015875,
           "FlangeWidth": 0.381,
           "FlangeThickness": 0.015875,
-          "EndGap": 0.019049999999999997
+          "EndGap": 0.019049999999999997,
+          "TopBelowDiscontinuousWebTop": null,
+          "AngleLeg": 0.127,
+          "AngleThickness": 0.0127,
+          "AngleLength": 0,
+          "EndAngleLength": 0,
+          "AngleBoltPitch": 0,
+          "AngleBoltEndDistance": 0.0508,
+          "AngleBoltGage": 0.07619999999999999,
+          "BoltDiameter": 0,
+          "StiffenerWidth": 0,
+          "StiffenerThickness": 0,
+          "StiffenerFromOpening": 0.15239999999999998,
+          "OpeningWidth": 0,
+          "OpeningHeight": 0,
+          "OpeningRadius": 0.15239999999999998,
+          "OpeningPlateFromTop": 0,
+          "OpeningPlateWidth": 0,
+          "OpeningPlateThickness": 0,
+          "OpeningPlateToOpening": 0.0127,
+          "OpeningPlateEndClear": 0.07619999999999999,
+          "WebFlangeWeld": 0,
+          "StiffenerWeld": 0
         },
         "Count": 6,
         "Spacings": [
@@ -7455,7 +7477,121 @@
           "PipeDiameter": 0.2032,
           "DropBelowGirders": 0.3048
         }
-      ]
+      ],
+      "InspectionAccess": {
+        "Enabled": true,
+        "RopeDiameter": 0.0127,
+        "RopeHeightAboveWebBottom": 1.3716000000000002,
+        "RopeOffsetFromWeb": 0.07619999999999999,
+        "AnchorBracket": "WT5x44",
+        "SupportBracket": "WT5x15",
+        "BracketBoltDiameter": 0.022224999999999998,
+        "MaxAnchorSpacing": 60.96,
+        "BracketClearOfAnchor": 0.6096,
+        "AnchorBracketLength": 0.2286,
+        "SupportBracketLength": 0.17779999999999999,
+        "BracketBoltEdge": 0.038099999999999995,
+        "Cables": [
+          {
+            "Girder": 0,
+            "LeftFace": true,
+            "BeginSupport": 0,
+            "BeginOffset": 0.2032,
+            "EndSupport": -1,
+            "EndOffset": -0.2032
+          },
+          {
+            "Girder": 5,
+            "LeftFace": false,
+            "BeginSupport": 0,
+            "BeginOffset": 0.2032,
+            "EndSupport": -1,
+            "EndOffset": -0.2032
+          }
+        ],
+        "DefaultWalkway": "A",
+        "Walkways": [
+          {
+            "Bay": 0,
+            "RightGirder": -1,
+            "Type": "A",
+            "FirstLine": 2,
+            "LastLine": -1
+          },
+          {
+            "Bay": 1,
+            "RightGirder": -1,
+            "Type": "A",
+            "FirstLine": 3,
+            "LastLine": -1
+          },
+          {
+            "Bay": 2,
+            "RightGirder": -1,
+            "Type": "A",
+            "FirstLine": 3,
+            "LastLine": -1
+          },
+          {
+            "Bay": 3,
+            "RightGirder": -1,
+            "Type": "A",
+            "FirstLine": 4,
+            "LastLine": -1
+          },
+          {
+            "Bay": 4,
+            "RightGirder": -1,
+            "Type": "A",
+            "FirstLine": 4,
+            "LastLine": -1
+          }
+        ],
+        "TypeA": {
+          "ClearWidth": 0.635,
+          "GratingThickness": 0.019049999999999997,
+          "GratingWeightLbPerSqFt": 5.3,
+          "Stringer": "C7x12.25",
+          "LongStringer": "C7x14.75",
+          "StringerSpanLimit": 7.62,
+          "DiaphragmPlateWidth": 0.127,
+          "DiaphragmPlateThickness": 0.009524999999999999,
+          "DiaphragmAngle": "",
+          "MidDiaphragmsOnLongSpans": true,
+          "PostAngle": "L3x3x5/16",
+          "TopRailAngle": "L3x3x5/16",
+          "TopRailHeight": 1.0668,
+          "IntermediateRailHeight": 0.6096,
+          "RailPlateWidth": 0.1016,
+          "RailPlateThickness": 0.009524999999999999,
+          "ToeBoard": true,
+          "ToeBoardClearance": 0.0127,
+          "MaxPostSpacing": 2.5908
+        },
+        "TypeB": {
+          "ClearWidth": 0.6604,
+          "GratingThickness": 0.019049999999999997,
+          "GratingWeightLbPerSqFt": 5.3,
+          "Stringer": "L8x4x1/2",
+          "LongStringer": "L8x4x1/2",
+          "StringerSpanLimit": 7.62,
+          "DiaphragmPlateWidth": 0,
+          "DiaphragmPlateThickness": 0.009524999999999999,
+          "DiaphragmAngle": "L3-1/2x3-1/2x5/16",
+          "MidDiaphragmsOnLongSpans": false,
+          "PostAngle": "L3x3x5/16",
+          "TopRailAngle": "L3x3x5/16",
+          "TopRailHeight": 1.0668,
+          "IntermediateRailHeight": 0.6096,
+          "RailPlateWidth": 0.1016,
+          "RailPlateThickness": 0.009524999999999999,
+          "ToeBoard": false,
+          "ToeBoardClearance": 0.0127,
+          "MaxPostSpacing": 2.5908
+        },
+        "GratingAboveWebBottom": 0.0635,
+        "WalkwayEndClearance": 0.1016
+      }
     },
     {
       "Name": "I-80 WB Unit 2",
@@ -12613,22 +12749,26 @@
           {
             "Girder": 4,
             "Support": 1,
-            "Distance": 26.4175875
+            "Distance": 26.4175875,
+            "CrossGirderAngleDegrees": 89.27305555555556
           },
           {
             "Girder": 3,
             "Support": 2,
-            "Distance": 19.58975
+            "Distance": 19.58975,
+            "CrossGirderAngleDegrees": 88.54638888888888
           },
           {
             "Girder": 2,
             "Support": 3,
-            "Distance": 18.0101875
+            "Distance": 18.0101875,
+            "CrossGirderAngleDegrees": 87.66777777777779
           },
           {
             "Girder": 1,
             "Support": 4,
-            "Distance": 15.3289
+            "Distance": 15.3289,
+            "CrossGirderAngleDegrees": 90
           }
         ],
         "Beginnings": [
@@ -12655,10 +12795,32 @@
         ],
         "CrossGirder": {
           "WebDepth": 2.032,
-          "WebThickness": 0.015875,
+          "WebThickness": 0.0142875,
           "FlangeWidth": 0.381,
           "FlangeThickness": 0.015875,
-          "EndGap": 0.019049999999999997
+          "EndGap": 0.019049999999999997,
+          "TopBelowDiscontinuousWebTop": 0.2794,
+          "AngleLeg": 0.127,
+          "AngleThickness": 0.0127,
+          "AngleLength": 1.6256,
+          "EndAngleLength": 1.6256,
+          "AngleBoltPitch": 0.15239999999999998,
+          "AngleBoltEndDistance": 0.0508,
+          "AngleBoltGage": 0.07619999999999999,
+          "BoltDiameter": 0.0254,
+          "StiffenerWidth": 0.1905,
+          "StiffenerThickness": 0.015875,
+          "StiffenerFromOpening": 0.15239999999999998,
+          "OpeningWidth": 0.6095999999999999,
+          "OpeningHeight": 0.9144,
+          "OpeningRadius": 0.15239999999999998,
+          "OpeningPlateFromTop": 0.5588,
+          "OpeningPlateWidth": 0.15239999999999998,
+          "OpeningPlateThickness": 0.015875,
+          "OpeningPlateToOpening": 0.0127,
+          "OpeningPlateEndClear": 0.07619999999999999,
+          "WebFlangeWeld": 0.0079375,
+          "StiffenerWeld": 0.00635
         },
         "Count": 11,
         "Spacings": [
@@ -16156,7 +16318,85 @@
           "PipeDiameter": 0.2032,
           "DropBelowGirders": 0.3048
         }
-      ]
+      ],
+      "InspectionAccess": {
+        "Enabled": true,
+        "RopeDiameter": 0.0127,
+        "RopeHeightAboveWebBottom": 1.3716000000000002,
+        "RopeOffsetFromWeb": 0.07619999999999999,
+        "AnchorBracket": "WT5x44",
+        "SupportBracket": "WT5x15",
+        "BracketBoltDiameter": 0.022224999999999998,
+        "MaxAnchorSpacing": 60.96,
+        "BracketClearOfAnchor": 0.6096,
+        "AnchorBracketLength": 0.2286,
+        "SupportBracketLength": 0.17779999999999999,
+        "BracketBoltEdge": 0.038099999999999995,
+        "Cables": [
+          {
+            "Girder": 0,
+            "LeftFace": true,
+            "BeginSupport": 0,
+            "BeginOffset": 0.2032,
+            "EndSupport": -1,
+            "EndOffset": -0.2032
+          },
+          {
+            "Girder": 10,
+            "LeftFace": false,
+            "BeginSupport": 0,
+            "BeginOffset": 0.2032,
+            "EndSupport": -1,
+            "EndOffset": -0.2032
+          }
+        ],
+        "DefaultWalkway": "A",
+        "Walkways": [],
+        "TypeA": {
+          "ClearWidth": 0.635,
+          "GratingThickness": 0.019049999999999997,
+          "GratingWeightLbPerSqFt": 5.3,
+          "Stringer": "C7x12.25",
+          "LongStringer": "C7x14.75",
+          "StringerSpanLimit": 7.62,
+          "DiaphragmPlateWidth": 0.127,
+          "DiaphragmPlateThickness": 0.009524999999999999,
+          "DiaphragmAngle": "",
+          "MidDiaphragmsOnLongSpans": true,
+          "PostAngle": "L3x3x5/16",
+          "TopRailAngle": "L3x3x5/16",
+          "TopRailHeight": 1.0668,
+          "IntermediateRailHeight": 0.6096,
+          "RailPlateWidth": 0.1016,
+          "RailPlateThickness": 0.009524999999999999,
+          "ToeBoard": true,
+          "ToeBoardClearance": 0.0127,
+          "MaxPostSpacing": 2.5908
+        },
+        "TypeB": {
+          "ClearWidth": 0.6604,
+          "GratingThickness": 0.019049999999999997,
+          "GratingWeightLbPerSqFt": 5.3,
+          "Stringer": "L8x4x1/2",
+          "LongStringer": "L8x4x1/2",
+          "StringerSpanLimit": 7.62,
+          "DiaphragmPlateWidth": 0,
+          "DiaphragmPlateThickness": 0.009524999999999999,
+          "DiaphragmAngle": "L3-1/2x3-1/2x5/16",
+          "MidDiaphragmsOnLongSpans": false,
+          "PostAngle": "L3x3x5/16",
+          "TopRailAngle": "L3x3x5/16",
+          "TopRailHeight": 1.0668,
+          "IntermediateRailHeight": 0.6096,
+          "RailPlateWidth": 0.1016,
+          "RailPlateThickness": 0.009524999999999999,
+          "ToeBoard": false,
+          "ToeBoardClearance": 0.0127,
+          "MaxPostSpacing": 2.5908
+        },
+        "GratingAboveWebBottom": 0.0635,
+        "WalkwayEndClearance": 0.1016
+      }
     },
     {
       "Name": "I-80 WB Unit 3",
@@ -19117,12 +19357,14 @@
           {
             "Girder": 1,
             "Support": 1,
-            "Distance": 18.3816625
+            "Distance": 18.3816625,
+            "CrossGirderAngleDegrees": 87.1125
           },
           {
             "Girder": 2,
             "Support": 2,
-            "Distance": 16.222662500000002
+            "Distance": 16.222662500000002,
+            "CrossGirderAngleDegrees": 88.00361111111111
           }
         ],
         "Beginnings": [],
@@ -19131,7 +19373,29 @@
           "WebThickness": 0.019049999999999997,
           "FlangeWidth": 0.30479999999999996,
           "FlangeThickness": 0.022224999999999998,
-          "EndGap": 0.019049999999999997
+          "EndGap": 0.019049999999999997,
+          "TopBelowDiscontinuousWebTop": 0.2032,
+          "AngleLeg": 0.127,
+          "AngleThickness": 0.0127,
+          "AngleLength": 1.3208,
+          "EndAngleLength": 1.3208,
+          "AngleBoltPitch": 0.15239999999999998,
+          "AngleBoltEndDistance": 0.0508,
+          "AngleBoltGage": 0.07619999999999999,
+          "BoltDiameter": 0.0254,
+          "StiffenerWidth": 0.15239999999999998,
+          "StiffenerThickness": 0.0127,
+          "StiffenerFromOpening": 0.15239999999999998,
+          "OpeningWidth": 0.6095999999999999,
+          "OpeningHeight": 0.9144,
+          "OpeningRadius": 0.15239999999999998,
+          "OpeningPlateFromTop": 0.30479999999999996,
+          "OpeningPlateWidth": 0.15239999999999998,
+          "OpeningPlateThickness": 0.015875,
+          "OpeningPlateToOpening": 0.0127,
+          "OpeningPlateEndClear": 0.07619999999999999,
+          "WebFlangeWeld": 0.0079375,
+          "StiffenerWeld": 0.00635
         },
         "Count": 10,
         "Spacings": [
@@ -24800,7 +25064,85 @@
           "PipeDiameter": 0.2032,
           "DropBelowGirders": 0.3048
         }
-      ]
+      ],
+      "InspectionAccess": {
+        "Enabled": true,
+        "RopeDiameter": 0.0127,
+        "RopeHeightAboveWebBottom": 1.3716000000000002,
+        "RopeOffsetFromWeb": 0.07619999999999999,
+        "AnchorBracket": "WT5x44",
+        "SupportBracket": "WT5x15",
+        "BracketBoltDiameter": 0.022224999999999998,
+        "MaxAnchorSpacing": 60.96,
+        "BracketClearOfAnchor": 0.6096,
+        "AnchorBracketLength": 0.2286,
+        "SupportBracketLength": 0.17779999999999999,
+        "BracketBoltEdge": 0.038099999999999995,
+        "Cables": [
+          {
+            "Girder": 0,
+            "LeftFace": true,
+            "BeginSupport": 0,
+            "BeginOffset": 0.2032,
+            "EndSupport": -1,
+            "EndOffset": -0.2032
+          },
+          {
+            "Girder": 9,
+            "LeftFace": false,
+            "BeginSupport": 0,
+            "BeginOffset": 0.2032,
+            "EndSupport": -1,
+            "EndOffset": -0.2032
+          }
+        ],
+        "DefaultWalkway": "B",
+        "Walkways": [],
+        "TypeA": {
+          "ClearWidth": 0.635,
+          "GratingThickness": 0.019049999999999997,
+          "GratingWeightLbPerSqFt": 5.3,
+          "Stringer": "C7x12.25",
+          "LongStringer": "C7x14.75",
+          "StringerSpanLimit": 7.62,
+          "DiaphragmPlateWidth": 0.127,
+          "DiaphragmPlateThickness": 0.009524999999999999,
+          "DiaphragmAngle": "",
+          "MidDiaphragmsOnLongSpans": true,
+          "PostAngle": "L3x3x5/16",
+          "TopRailAngle": "L3x3x5/16",
+          "TopRailHeight": 1.0668,
+          "IntermediateRailHeight": 0.6096,
+          "RailPlateWidth": 0.1016,
+          "RailPlateThickness": 0.009524999999999999,
+          "ToeBoard": true,
+          "ToeBoardClearance": 0.0127,
+          "MaxPostSpacing": 2.5908
+        },
+        "TypeB": {
+          "ClearWidth": 0.6604,
+          "GratingThickness": 0.019049999999999997,
+          "GratingWeightLbPerSqFt": 5.3,
+          "Stringer": "L8x4x1/2",
+          "LongStringer": "L8x4x1/2",
+          "StringerSpanLimit": 7.62,
+          "DiaphragmPlateWidth": 0,
+          "DiaphragmPlateThickness": 0.009524999999999999,
+          "DiaphragmAngle": "L3-1/2x3-1/2x5/16",
+          "MidDiaphragmsOnLongSpans": false,
+          "PostAngle": "L3x3x5/16",
+          "TopRailAngle": "L3x3x5/16",
+          "TopRailHeight": 1.0668,
+          "IntermediateRailHeight": 0.6096,
+          "RailPlateWidth": 0.1016,
+          "RailPlateThickness": 0.009524999999999999,
+          "ToeBoard": false,
+          "ToeBoardClearance": 0.0127,
+          "MaxPostSpacing": 2.5908
+        },
+        "GratingAboveWebBottom": 0.0635,
+        "WalkwayEndClearance": 0.1016
+      }
     },
     {
       "Name": "Ramp G Unit 1",
@@ -27302,7 +27644,29 @@
           "WebThickness": 0.015875,
           "FlangeWidth": 0.381,
           "FlangeThickness": 0.015875,
-          "EndGap": 0.019049999999999997
+          "EndGap": 0.019049999999999997,
+          "TopBelowDiscontinuousWebTop": null,
+          "AngleLeg": 0.127,
+          "AngleThickness": 0.0127,
+          "AngleLength": 0,
+          "EndAngleLength": 0,
+          "AngleBoltPitch": 0,
+          "AngleBoltEndDistance": 0.0508,
+          "AngleBoltGage": 0.07619999999999999,
+          "BoltDiameter": 0,
+          "StiffenerWidth": 0,
+          "StiffenerThickness": 0,
+          "StiffenerFromOpening": 0.15239999999999998,
+          "OpeningWidth": 0,
+          "OpeningHeight": 0,
+          "OpeningRadius": 0.15239999999999998,
+          "OpeningPlateFromTop": 0,
+          "OpeningPlateWidth": 0,
+          "OpeningPlateThickness": 0,
+          "OpeningPlateToOpening": 0.0127,
+          "OpeningPlateEndClear": 0.07619999999999999,
+          "WebFlangeWeld": 0,
+          "StiffenerWeld": 0
         },
         "Count": 4,
         "Spacings": [
@@ -29609,7 +29973,107 @@
         "GussetThickness": 0.0127,
         "BoltsPerConnection": 4
       },
-      "Drains": []
+      "Drains": [],
+      "InspectionAccess": {
+        "Enabled": true,
+        "RopeDiameter": 0.0127,
+        "RopeHeightAboveWebBottom": 1.3716000000000002,
+        "RopeOffsetFromWeb": 0.07619999999999999,
+        "AnchorBracket": "WT5x44",
+        "SupportBracket": "WT5x15",
+        "BracketBoltDiameter": 0.022224999999999998,
+        "MaxAnchorSpacing": 60.96,
+        "BracketClearOfAnchor": 0.6096,
+        "AnchorBracketLength": 0.2286,
+        "SupportBracketLength": 0.17779999999999999,
+        "BracketBoltEdge": 0.038099999999999995,
+        "Cables": [
+          {
+            "Girder": 0,
+            "LeftFace": true,
+            "BeginSupport": 0,
+            "BeginOffset": 22.6822,
+            "EndSupport": -1,
+            "EndOffset": -0.2032
+          },
+          {
+            "Girder": 3,
+            "LeftFace": false,
+            "BeginSupport": 0,
+            "BeginOffset": 22.6822,
+            "EndSupport": -1,
+            "EndOffset": -0.2032
+          }
+        ],
+        "DefaultWalkway": "B",
+        "Walkways": [
+          {
+            "Bay": 0,
+            "RightGirder": -1,
+            "Type": "B",
+            "FirstLine": 3,
+            "LastLine": -1
+          },
+          {
+            "Bay": 1,
+            "RightGirder": -1,
+            "Type": "B",
+            "FirstLine": 3,
+            "LastLine": -1
+          },
+          {
+            "Bay": 2,
+            "RightGirder": -1,
+            "Type": "B",
+            "FirstLine": 3,
+            "LastLine": -1
+          }
+        ],
+        "TypeA": {
+          "ClearWidth": 0.635,
+          "GratingThickness": 0.019049999999999997,
+          "GratingWeightLbPerSqFt": 5.3,
+          "Stringer": "C7x12.25",
+          "LongStringer": "C7x14.75",
+          "StringerSpanLimit": 7.62,
+          "DiaphragmPlateWidth": 0.127,
+          "DiaphragmPlateThickness": 0.009524999999999999,
+          "DiaphragmAngle": "",
+          "MidDiaphragmsOnLongSpans": true,
+          "PostAngle": "L3x3x5/16",
+          "TopRailAngle": "L3x3x5/16",
+          "TopRailHeight": 1.0668,
+          "IntermediateRailHeight": 0.6096,
+          "RailPlateWidth": 0.1016,
+          "RailPlateThickness": 0.009524999999999999,
+          "ToeBoard": true,
+          "ToeBoardClearance": 0.0127,
+          "MaxPostSpacing": 2.5908
+        },
+        "TypeB": {
+          "ClearWidth": 0.6604,
+          "GratingThickness": 0.019049999999999997,
+          "GratingWeightLbPerSqFt": 5.3,
+          "Stringer": "L8x4x1/2",
+          "LongStringer": "L8x4x1/2",
+          "StringerSpanLimit": 7.62,
+          "DiaphragmPlateWidth": 0,
+          "DiaphragmPlateThickness": 0.009524999999999999,
+          "DiaphragmAngle": "L3-1/2x3-1/2x5/16",
+          "MidDiaphragmsOnLongSpans": false,
+          "PostAngle": "L3x3x5/16",
+          "TopRailAngle": "L3x3x5/16",
+          "TopRailHeight": 1.0668,
+          "IntermediateRailHeight": 0.6096,
+          "RailPlateWidth": 0.1016,
+          "RailPlateThickness": 0.009524999999999999,
+          "ToeBoard": false,
+          "ToeBoardClearance": 0.0127,
+          "MaxPostSpacing": 2.5908
+        },
+        "GratingAboveWebBottom": 0.0635,
+        "WalkwayEndClearance": 0.1016
+      }
     },
     {
       "Name": "Ramp G Unit 2",
@@ -31856,7 +32320,29 @@
           "WebThickness": 0.015875,
           "FlangeWidth": 0.381,
           "FlangeThickness": 0.015875,
-          "EndGap": 0.019049999999999997
+          "EndGap": 0.019049999999999997,
+          "TopBelowDiscontinuousWebTop": null,
+          "AngleLeg": 0.127,
+          "AngleThickness": 0.0127,
+          "AngleLength": 0,
+          "EndAngleLength": 0,
+          "AngleBoltPitch": 0,
+          "AngleBoltEndDistance": 0.0508,
+          "AngleBoltGage": 0.07619999999999999,
+          "BoltDiameter": 0,
+          "StiffenerWidth": 0,
+          "StiffenerThickness": 0,
+          "StiffenerFromOpening": 0.15239999999999998,
+          "OpeningWidth": 0,
+          "OpeningHeight": 0,
+          "OpeningRadius": 0.15239999999999998,
+          "OpeningPlateFromTop": 0,
+          "OpeningPlateWidth": 0,
+          "OpeningPlateThickness": 0,
+          "OpeningPlateToOpening": 0.0127,
+          "OpeningPlateEndClear": 0.07619999999999999,
+          "WebFlangeWeld": 0,
+          "StiffenerWeld": 0
         },
         "Count": 4,
         "Spacings": [
@@ -33932,7 +34418,85 @@
         "GussetThickness": 0.0127,
         "BoltsPerConnection": 4
       },
-      "Drains": []
+      "Drains": [],
+      "InspectionAccess": {
+        "Enabled": true,
+        "RopeDiameter": 0.0127,
+        "RopeHeightAboveWebBottom": 1.3716000000000002,
+        "RopeOffsetFromWeb": 0.07619999999999999,
+        "AnchorBracket": "WT5x44",
+        "SupportBracket": "WT5x15",
+        "BracketBoltDiameter": 0.022224999999999998,
+        "MaxAnchorSpacing": 60.96,
+        "BracketClearOfAnchor": 0.6096,
+        "AnchorBracketLength": 0.2286,
+        "SupportBracketLength": 0.17779999999999999,
+        "BracketBoltEdge": 0.038099999999999995,
+        "Cables": [
+          {
+            "Girder": 0,
+            "LeftFace": true,
+            "BeginSupport": 0,
+            "BeginOffset": 0.2032,
+            "EndSupport": -1,
+            "EndOffset": -0.2032
+          },
+          {
+            "Girder": 3,
+            "LeftFace": false,
+            "BeginSupport": 0,
+            "BeginOffset": 0.2032,
+            "EndSupport": -1,
+            "EndOffset": -0.2032
+          }
+        ],
+        "DefaultWalkway": "B",
+        "Walkways": [],
+        "TypeA": {
+          "ClearWidth": 0.635,
+          "GratingThickness": 0.019049999999999997,
+          "GratingWeightLbPerSqFt": 5.3,
+          "Stringer": "C7x12.25",
+          "LongStringer": "C7x14.75",
+          "StringerSpanLimit": 7.62,
+          "DiaphragmPlateWidth": 0.127,
+          "DiaphragmPlateThickness": 0.009524999999999999,
+          "DiaphragmAngle": "",
+          "MidDiaphragmsOnLongSpans": true,
+          "PostAngle": "L3x3x5/16",
+          "TopRailAngle": "L3x3x5/16",
+          "TopRailHeight": 1.0668,
+          "IntermediateRailHeight": 0.6096,
+          "RailPlateWidth": 0.1016,
+          "RailPlateThickness": 0.009524999999999999,
+          "ToeBoard": true,
+          "ToeBoardClearance": 0.0127,
+          "MaxPostSpacing": 2.5908
+        },
+        "TypeB": {
+          "ClearWidth": 0.6604,
+          "GratingThickness": 0.019049999999999997,
+          "GratingWeightLbPerSqFt": 5.3,
+          "Stringer": "L8x4x1/2",
+          "LongStringer": "L8x4x1/2",
+          "StringerSpanLimit": 7.62,
+          "DiaphragmPlateWidth": 0,
+          "DiaphragmPlateThickness": 0.009524999999999999,
+          "DiaphragmAngle": "L3-1/2x3-1/2x5/16",
+          "MidDiaphragmsOnLongSpans": false,
+          "PostAngle": "L3x3x5/16",
+          "TopRailAngle": "L3x3x5/16",
+          "TopRailHeight": 1.0668,
+          "IntermediateRailHeight": 0.6096,
+          "RailPlateWidth": 0.1016,
+          "RailPlateThickness": 0.009524999999999999,
+          "ToeBoard": false,
+          "ToeBoardClearance": 0.0127,
+          "MaxPostSpacing": 2.5908
+        },
+        "GratingAboveWebBottom": 0.0635,
+        "WalkwayEndClearance": 0.1016
+      }
     },
     {
       "Name": "Ramp G Unit 3",
@@ -36846,7 +37410,29 @@
           "WebThickness": 0.015875,
           "FlangeWidth": 0.381,
           "FlangeThickness": 0.015875,
-          "EndGap": 0.019049999999999997
+          "EndGap": 0.019049999999999997,
+          "TopBelowDiscontinuousWebTop": null,
+          "AngleLeg": 0.127,
+          "AngleThickness": 0.0127,
+          "AngleLength": 0,
+          "EndAngleLength": 0,
+          "AngleBoltPitch": 0,
+          "AngleBoltEndDistance": 0.0508,
+          "AngleBoltGage": 0.07619999999999999,
+          "BoltDiameter": 0,
+          "StiffenerWidth": 0,
+          "StiffenerThickness": 0,
+          "StiffenerFromOpening": 0.15239999999999998,
+          "OpeningWidth": 0,
+          "OpeningHeight": 0,
+          "OpeningRadius": 0.15239999999999998,
+          "OpeningPlateFromTop": 0,
+          "OpeningPlateWidth": 0,
+          "OpeningPlateThickness": 0,
+          "OpeningPlateToOpening": 0.0127,
+          "OpeningPlateEndClear": 0.07619999999999999,
+          "WebFlangeWeld": 0,
+          "StiffenerWeld": 0
         },
         "Count": 4,
         "Spacings": [
@@ -39480,7 +40066,85 @@
         "GussetThickness": 0.0127,
         "BoltsPerConnection": 4
       },
-      "Drains": []
+      "Drains": [],
+      "InspectionAccess": {
+        "Enabled": true,
+        "RopeDiameter": 0.0127,
+        "RopeHeightAboveWebBottom": 1.3716000000000002,
+        "RopeOffsetFromWeb": 0.07619999999999999,
+        "AnchorBracket": "WT5x44",
+        "SupportBracket": "WT5x15",
+        "BracketBoltDiameter": 0.022224999999999998,
+        "MaxAnchorSpacing": 60.96,
+        "BracketClearOfAnchor": 0.6096,
+        "AnchorBracketLength": 0.2286,
+        "SupportBracketLength": 0.17779999999999999,
+        "BracketBoltEdge": 0.038099999999999995,
+        "Cables": [
+          {
+            "Girder": 0,
+            "LeftFace": true,
+            "BeginSupport": 0,
+            "BeginOffset": 0.2032,
+            "EndSupport": -1,
+            "EndOffset": -0.2032
+          },
+          {
+            "Girder": 3,
+            "LeftFace": false,
+            "BeginSupport": 0,
+            "BeginOffset": 0.2032,
+            "EndSupport": -1,
+            "EndOffset": -0.2032
+          }
+        ],
+        "DefaultWalkway": "B",
+        "Walkways": [],
+        "TypeA": {
+          "ClearWidth": 0.635,
+          "GratingThickness": 0.019049999999999997,
+          "GratingWeightLbPerSqFt": 5.3,
+          "Stringer": "C7x12.25",
+          "LongStringer": "C7x14.75",
+          "StringerSpanLimit": 7.62,
+          "DiaphragmPlateWidth": 0.127,
+          "DiaphragmPlateThickness": 0.009524999999999999,
+          "DiaphragmAngle": "",
+          "MidDiaphragmsOnLongSpans": true,
+          "PostAngle": "L3x3x5/16",
+          "TopRailAngle": "L3x3x5/16",
+          "TopRailHeight": 1.0668,
+          "IntermediateRailHeight": 0.6096,
+          "RailPlateWidth": 0.1016,
+          "RailPlateThickness": 0.009524999999999999,
+          "ToeBoard": true,
+          "ToeBoardClearance": 0.0127,
+          "MaxPostSpacing": 2.5908
+        },
+        "TypeB": {
+          "ClearWidth": 0.6604,
+          "GratingThickness": 0.019049999999999997,
+          "GratingWeightLbPerSqFt": 5.3,
+          "Stringer": "L8x4x1/2",
+          "LongStringer": "L8x4x1/2",
+          "StringerSpanLimit": 7.62,
+          "DiaphragmPlateWidth": 0,
+          "DiaphragmPlateThickness": 0.009524999999999999,
+          "DiaphragmAngle": "L3-1/2x3-1/2x5/16",
+          "MidDiaphragmsOnLongSpans": false,
+          "PostAngle": "L3x3x5/16",
+          "TopRailAngle": "L3x3x5/16",
+          "TopRailHeight": 1.0668,
+          "IntermediateRailHeight": 0.6096,
+          "RailPlateWidth": 0.1016,
+          "RailPlateThickness": 0.009524999999999999,
+          "ToeBoard": false,
+          "ToeBoardClearance": 0.0127,
+          "MaxPostSpacing": 2.5908
+        },
+        "GratingAboveWebBottom": 0.0635,
+        "WalkwayEndClearance": 0.1016
+      }
     },
     {
       "Name": "Ramp G Unit 4",
@@ -42103,7 +42767,29 @@
           "WebThickness": 0.015875,
           "FlangeWidth": 0.381,
           "FlangeThickness": 0.015875,
-          "EndGap": 0.019049999999999997
+          "EndGap": 0.019049999999999997,
+          "TopBelowDiscontinuousWebTop": null,
+          "AngleLeg": 0.127,
+          "AngleThickness": 0.0127,
+          "AngleLength": 0,
+          "EndAngleLength": 0,
+          "AngleBoltPitch": 0,
+          "AngleBoltEndDistance": 0.0508,
+          "AngleBoltGage": 0.07619999999999999,
+          "BoltDiameter": 0,
+          "StiffenerWidth": 0,
+          "StiffenerThickness": 0,
+          "StiffenerFromOpening": 0.15239999999999998,
+          "OpeningWidth": 0,
+          "OpeningHeight": 0,
+          "OpeningRadius": 0.15239999999999998,
+          "OpeningPlateFromTop": 0,
+          "OpeningPlateWidth": 0,
+          "OpeningPlateThickness": 0,
+          "OpeningPlateToOpening": 0.0127,
+          "OpeningPlateEndClear": 0.07619999999999999,
+          "WebFlangeWeld": 0,
+          "StiffenerWeld": 0
         },
         "Count": 4,
         "Spacings": [
@@ -43994,7 +44680,85 @@
         "GussetThickness": 0.0127,
         "BoltsPerConnection": 4
       },
-      "Drains": []
+      "Drains": [],
+      "InspectionAccess": {
+        "Enabled": true,
+        "RopeDiameter": 0.0127,
+        "RopeHeightAboveWebBottom": 1.3716000000000002,
+        "RopeOffsetFromWeb": 0.07619999999999999,
+        "AnchorBracket": "WT5x44",
+        "SupportBracket": "WT5x15",
+        "BracketBoltDiameter": 0.022224999999999998,
+        "MaxAnchorSpacing": 60.96,
+        "BracketClearOfAnchor": 0.6096,
+        "AnchorBracketLength": 0.2286,
+        "SupportBracketLength": 0.17779999999999999,
+        "BracketBoltEdge": 0.038099999999999995,
+        "Cables": [
+          {
+            "Girder": 0,
+            "LeftFace": true,
+            "BeginSupport": 0,
+            "BeginOffset": 0.2032,
+            "EndSupport": -1,
+            "EndOffset": -0.2032
+          },
+          {
+            "Girder": 3,
+            "LeftFace": false,
+            "BeginSupport": 0,
+            "BeginOffset": 0.2032,
+            "EndSupport": -1,
+            "EndOffset": -0.2032
+          }
+        ],
+        "DefaultWalkway": "B",
+        "Walkways": [],
+        "TypeA": {
+          "ClearWidth": 0.635,
+          "GratingThickness": 0.019049999999999997,
+          "GratingWeightLbPerSqFt": 5.3,
+          "Stringer": "C7x12.25",
+          "LongStringer": "C7x14.75",
+          "StringerSpanLimit": 7.62,
+          "DiaphragmPlateWidth": 0.127,
+          "DiaphragmPlateThickness": 0.009524999999999999,
+          "DiaphragmAngle": "",
+          "MidDiaphragmsOnLongSpans": true,
+          "PostAngle": "L3x3x5/16",
+          "TopRailAngle": "L3x3x5/16",
+          "TopRailHeight": 1.0668,
+          "IntermediateRailHeight": 0.6096,
+          "RailPlateWidth": 0.1016,
+          "RailPlateThickness": 0.009524999999999999,
+          "ToeBoard": true,
+          "ToeBoardClearance": 0.0127,
+          "MaxPostSpacing": 2.5908
+        },
+        "TypeB": {
+          "ClearWidth": 0.6604,
+          "GratingThickness": 0.019049999999999997,
+          "GratingWeightLbPerSqFt": 5.3,
+          "Stringer": "L8x4x1/2",
+          "LongStringer": "L8x4x1/2",
+          "StringerSpanLimit": 7.62,
+          "DiaphragmPlateWidth": 0,
+          "DiaphragmPlateThickness": 0.009524999999999999,
+          "DiaphragmAngle": "L3-1/2x3-1/2x5/16",
+          "MidDiaphragmsOnLongSpans": false,
+          "PostAngle": "L3x3x5/16",
+          "TopRailAngle": "L3x3x5/16",
+          "TopRailHeight": 1.0668,
+          "IntermediateRailHeight": 0.6096,
+          "RailPlateWidth": 0.1016,
+          "RailPlateThickness": 0.009524999999999999,
+          "ToeBoard": false,
+          "ToeBoardClearance": 0.0127,
+          "MaxPostSpacing": 2.5908
+        },
+        "GratingAboveWebBottom": 0.0635,
+        "WalkwayEndClearance": 0.1016
+      }
     }
   ],
   "References": [

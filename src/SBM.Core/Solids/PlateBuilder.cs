@@ -45,7 +45,8 @@ public static class PlateBuilder
     }
 
     private static void AddPrismCore(Mesh mesh, IReadOnlyList<Vec2> outline, IReadOnlyList<Hole> holes,
-        Func<double, double, double, Vec3> map, Func<Vec2, double> t0, Func<Vec2, double> t1, IReadOnlyList<bool>? walls)
+        Func<double, double, double, Vec3> map, Func<Vec2, double> t0, Func<Vec2, double> t1, IReadOnlyList<bool>? walls,
+        IReadOnlyList<Vec2[]>? openings = null)
     {
         var outer = outline.ToList();
         var wallFlags = walls?.ToList() ?? Enumerable.Repeat(true, outer.Count).ToList();
@@ -70,6 +71,13 @@ public static class PlateBuilder
         bool flip = Vec3.Dot(Vec3.Cross(du, dw), dt) * Math.Sign(tm1 - tm0 == 0 ? 1 : tm1 - tm0) < 0;
 
         var holeLoops = holes.Select(h => Circle(h)).ToList();
+        if (openings != null)
+            foreach (var o in openings)
+            {
+                var loop = o.ToArray();
+                if (MeshBuilder.SignedArea(loop) > 0) Array.Reverse(loop);   // holes run clockwise
+                holeLoops.Add(loop);
+            }
         var (verts, tris) = TriangulateWithHoles(outer, holeLoops);
 
         void Tri(Vec3 a, Vec3 b, Vec3 cc)
@@ -109,6 +117,28 @@ public static class PlateBuilder
         }
         Walls(outer, wallFlags);
         foreach (var h in holeLoops) Walls(h, null);
+    }
+
+    /// <summary>Planar plate with round holes AND polygonal openings (e.g. a rounded-rectangle web opening). Openings have no
+    /// exact-solid recipe (the plate is exported as a tessellated solid).</summary>
+    public static void AddPlanarWithOpenings(Mesh mesh, IReadOnlyList<Vec2> outline, IReadOnlyList<Hole> holes, IReadOnlyList<Vec2[]> openings,
+        Frame3 f, double z0, double z1) =>
+        AddPrismCore(mesh, outline, holes, (u, w, t) => f.ToWorld(u, w, t), _ => z0, _ => z1, null, openings);
+
+    /// <summary>Rounded rectangle (corner radius r) centred at c, counter-clockwise, as an opening outline.</summary>
+    public static Vec2[] RoundedRectangle(Vec2 c, double width, double height, double r, int segmentsPerCorner = 8)
+    {
+        r = Math.Min(r, Math.Min(width, height) / 2);
+        var pts = new List<Vec2>();
+        double hx = width / 2 - r, hy = height / 2 - r;
+        var centers = new[] { new Vec2(hx, -hy), new Vec2(hx, hy), new Vec2(-hx, hy), new Vec2(-hx, -hy) };
+        for (int k = 0; k < 4; k++)
+            for (int i = 0; i <= segmentsPerCorner; i++)
+            {
+                double a = -Math.PI / 2 + k * Math.PI / 2 + Math.PI / 2 * i / segmentsPerCorner;
+                pts.Add(c + centers[k] + Vec2.FromAngle(a) * r);
+            }
+        return pts.ToArray();
     }
 
     /// <summary>Planar plate in a frame: outline in (x, y), thickness along z from z0 to z1.</summary>

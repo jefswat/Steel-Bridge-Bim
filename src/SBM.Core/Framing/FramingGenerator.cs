@@ -427,7 +427,9 @@ public sealed class FramingGenerator
             var (span, u) = LocateOnGirder(i, sCl);
             var c = _curves[i][span];
             var center = Point3(c, u);
-            var dir = c.TangentAt(u).Right;
+            var tan0 = c.TangentAt(u);
+            // Cross girder square to the discontinuous girder unless the plans dimension its angle (clockwise from the tangent).
+            var dir = t.CrossGirderAngleDegrees is { } ang ? tan0.Rotate(-Numerics.DegToRad(ang)).Normalized() : tan0.Right;
             int l = Enumerable.Range(0, i).Reverse().FirstOrDefault(k => EndS(k) > GirderDistanceAtLine(k, center.XY, dir) + 0.5, -1);
             int r = Enumerable.Range(i + 1, NG - i - 1).FirstOrDefault(k => EndS(k) > GirderDistanceAtLine(k, center.XY, dir) + 0.5, -1);
             if (l < 0 || r < 0) { Warn($"G{i + 1}: no continuing girder on both sides for its cross girder."); continue; }

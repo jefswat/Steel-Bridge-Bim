@@ -5,7 +5,7 @@ no element of the model is based on it (no row in `element_sheet`). Such a sheet
 model definition does not contain yet (the "Suggests" column), or the link rules need a rule for it
 (`samples/plans/sheet-links-i80-rampg.json`). "Design" = design sheet number, "PDF" = PDF page.
 
-89 of 414 sheets are unlinked (4 administrative sheets - cover, revision - are excluded).
+72 of 414 sheets are unlinked (4 administrative sheets - cover, revision - are excluded).
 
 | Sheet title | Sheets (set: design sheet / PDF page) | Suggests missing from the model |
 |---|---|---|
@@ -19,10 +19,6 @@ model definition does not contain yet (the "Suggests" column), or the link rules
 | CRASH CUSHION END POST DETAILS AT RAMP G | design-116: 223/230 | Crash cushion / end post at barrier ends (Ramp A, Ramp G). Not modeled. |
 | DRAINAGE DETAILS | design-316: 152/154, 153/155, 154/156, 155/157, 156/158, 157/159, 158/160, 159/161 | Rule 'drainage' (Deck drainage) matches this sheet, but the model has no such element: it is missing from the model. |
 | EXIT SIGN SUPPORT BASES | design-116: 176/183 | Sign structures: sign supports, brackets, bases and foundations on the bridge (I-80). Not modeled. |
-| INSPECTION ACCESS PLAN | design-316: 130/132, 131/133 | Inspection access: walkways, cables, access openings, hatches (and the cut-off diaphragm openings). Not modeled. |
-| INSPECTION ACCESS PLAN - UNIT n | design-116: 159/163, 160/164, 161/165, 162/166 | Inspection access: walkways, cables, access openings, hatches (and the cut-off diaphragm openings). Not modeled. |
-| INSPECTION CABLE DETAILS | design-116: 163/167, 164/168; design-316: 132/134 | Inspection access: walkways, cables, access openings, hatches (and the cut-off diaphragm openings). Not modeled. |
-| INSPECTION WALKWAY DETAILS | design-116: 165/169, 166/170, 167/171, 168/172, 169/173, 170/174; design-316: 133/135, 134/136 | Inspection access: walkways, cables, access openings, hatches (and the cut-off diaphragm openings). Not modeled. |
 | LIGHTING DETAILS | design-116: 226/233, 227/234, 228/235, 229/236; design-316: 166/168, 167/169, 168/170 | Bridge lighting: poles, bases, conduit and junction boxes. Not modeled. |
 | MACADAM STONE SLOPE PROTECTION | design-116: 230/237; design-316: 169/171 | Slope protection under the bridge at the abutments (macadam stone). No slope-protection / earthwork elements. |
 | MOMENT & REACTION TABLE - UNIT n | design-116: 123/127, 124/128, 125/129, 126/130, 127/131; design-316: 105/107, 106/108, 107/109, 108/110 | Design reactions and moments: load data for bearings and girders. No load/reaction properties on bearings or girders yet. |

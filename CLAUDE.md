@@ -238,6 +238,26 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
 - Variable deck width: `DeckDefinition.LeftAt/RightAt(station)`; constant decks keep the old code path.
 - Drainage: `BridgeDefinition.Drains` â†’ `SubstructureModel.Drainage` (built in SubstructureGenerator, needs terrain for basins).
 - Raster terrain: `ElevationGrid` (full-res bilinear) + decimated display mesh; `TerrainModel(grid, mesh)`.
+- Cross girders as designed (OPTIONAL fields on `CrossGirderSection`; defaults = the simple legacy cross girder): `CrossGirderDetailer.cs`
+  (`BuildCrossGirder`, runs in the CONNECTIONS phase so the angle bolts register holes in the continuing girders' webs and in the
+  discontinuous girder's web). Frame: x along the XG, -y = near side (the discontinuous girder's side), z = 0 at the top of the top flange.
+  `TopBelowDiscontinuousWebTop` = top of XG 11" (Unit 2) / 8" (Unit 3) under the discontinuous girder's top of web; angles L5x5x1/2 centred in
+  the web with a single bolt line in both legs; 3'-0 x 2'-0 R6" web opening each side of the discontinuous girder
+  (`PlateBuilder.AddPlanarWithOpenings`, tessellated in IFC), far-side edge plates, near-side stiffeners, fillet welds.
+  `GirderTermination.CrossGirderAngleDegrees` = plan angle girder to XG (CW from the ahead tangent to the left-to-right XG direction; null = square).
+  Plan data: `samples/plans/cross-girders-i80.csx`. Girder webs are treated as perpendicular to the XG when locating holes (plan angles 85-90 deg).
+- Inspection access (OPTIONAL `BridgeDefinition.InspectionAccess`, null = none; `InspectionAccessDefinition.cs`, `InspectionAccessDetailer.cs`, CONNECTIONS
+  phase): 1/2" wire-rope cables (`InspectionCableDefinition` = girder face + begin/end support and offset from the CL bearing; rope 4'-6 above the
+  web bottom, 3" off the web) on WT5x44 anchorages / intermediate supports (<= 200') and WT5x15 brackets at the cross-frame connection plates, bolted
+  THROUGH THE WEB (holes registered); walkways (Type A: C7 stringers, Type B: L8x4x1/2) in every bay on chords between consecutive cross frame lines
+  (`InspectionWalkwayDefinition` per bay: type, first/last line), ending 1" clear of cross girder webs. New `PartCategory.InspectionBracket/
+  InspectionCable/Grating/Walkway*`, `AssemblyKind.InspectionCable/InspectionWalkway`, viewport layer `3D-INSPECTION`; IFC: IfcMember (USERDEFINED
+  'CABLE_BRACKET', STRUCTURALCABLE rope, STRINGER, POST), IfcRailing HANDRAIL, IfcPlate USERDEFINED (GRATING, WALKWAY_PLATE), assemblies
+  ACCESSORY_ASSEMBLY (IfcOpenShell: 0 issues). Database: group "Inspection access" with assembly categories `inspection cable` / `inspection walkway`,
+  linked to the INSPECTION ACCESS PLAN / CABLE / WALKWAY sheets in `sheet-links-i80-rampg.json`. Not modeled: rope hardware, chains, walkway end
+  connections, bent-plate posts at skewed frames; grating = one solid slab (mass from nominal weight). Data: `samples/plans/inspection-i80.csx`,
+  `inspection-ramp-g.csx`. BoltInstance.Diameter is honored per instance (viewport, IFC fastener types, material list).
+  Snapshot: `--closeup MARK@Bridge name` also selects one bridge for steel assemblies (walkway marks repeat in every bridge).
 - Plan-set test models: `samples/plans/*.csx` (Iowa DOT Designs 116/316); data in C:\SBMData (not in OneDrive).
 
 ## Conventions (bridge engineering)
