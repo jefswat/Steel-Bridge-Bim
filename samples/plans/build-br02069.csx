@@ -171,7 +171,7 @@ b.Girders.Prestressed = new PrestressedBeamDefinition
 Print($"Strands: {strands.Count} (plan 44), debonded {strands.Count(s => s.DebondStart > 0)} (plan 14)");
 G("Bearings: MnDOT curved-plate bearings F1 (B310, fixed, L 3 1/4\") / E1 (B311, expansion, L 6 1/2\") (p31) - only a plain pad (12\" x 30\") whose thickness PrestressedBeamDefinition.PadThickness applies to BOTH ends of the beam; 3 1/4\" used, so the North seats are 3 1/4\" too high. Needs: a per-support (per beam end) prestressed bearing height, e.g. PadThickness per support / PrestressedGenerator reading a per-support value, or a curved-plate bearing assembly.");
 G("Sole plate B303 (p16, p30; dims U6) not modeled. Needs: sole plate for prestressed beams.");
-G("Concrete end diaphragms at both abutments (p15, p17, p20, p21; dims U2) not modeled. Needs: concrete end diaphragm / semi-integral abutment element.");
+// Concrete end diaphragms (p15, p17, p20, p21; U2 closed): SupportDefinition.Diaphragm, set by diaphragms-br02069.csx (below); front-part bottom UNRESOLVED (p.21).
 G("Optional top strands 2 x 1/2\" (p16) and beam bars G301E..G806E, stirrups (p16) not modeled. Needs: prestressed beam mild reinforcing.");
 
 // ================================================================ 4. abutments (p4, p5, p9, p10, p11)
@@ -197,8 +197,9 @@ G("Abutment reinforcing (bar-lists.csv A/B series, p6-p8, p12-p14; bend diagrams
 //    the infill wall is only in the E 18'-5" (+17'-7" .. +36'-0"); under the superstructure the end diaphragm sits on the back ledge.
 G("Abutment infill wall extent: the plans have it only in the E 18'-5\" (WL +17'-7\" .. +36'-0\", p5 / p10 / p11 Detail C); the AbutmentDefinition backwall runs from the W mask wall to +36'-0\". Needs: backwall end offsets / end diaphragm on the ledge (p20, p21).");
 U("p4, p9", "pile tip elevations (U8)", "the pile notes give only estimated lengths (95 / 90 ft, test piles 105 / 100 ft), no tip elevations", "Piles hang the contract length from the head.");
-// U2 closed (SUMMARY sec. 3: end diaphragm geometry read from p17 / p20 / p21) - the end diaphragm itself is a GAP (listed above).
+// U2 closed (SUMMARY sec. 3); the end diaphragm is modeled by diaphragms-br02069.csx (front-part bottom UNRESOLVED, below).
 U("p8, p14, p21, p24", "bend dimensions of 22 bent marks and the barrier loop lengths (U3)", "one leg or hook of those marks is not dimensioned on the sheet, the barrier loops R505M / R517E / R506E / R507E / R518E do not add up to the listed length, and no sheet shows pin diameters", "No bars of these marks are modeled (reinforcement GAPs).");
+U("p21", "bottom of the end diaphragm FRONT part between the beams", "p.21 A-A / B-B dimension only the back part (VARIES) and the 1'-0 x 1'-0 front fillet; B814 is the parapet-abutment detail (Fig. 5-397.560 refers semi-integral abutments to the superstructure details)", "Front part not built; back part, paving bracket and polystyrene modeled (diaphragms-br02069.csx).");
 
 var seatRows = Csv("seat-elevations.csv");
 void SetAbutment(SupportDefinition sup, string side, double ledge, double seatFront, double infillTop, double maskTop, double pedAlong, double pileLen, string pages)
@@ -252,9 +253,16 @@ void SetAbutment(SupportDefinition sup, string side, double ledge, double seatFr
 SetAbutment(b.Supports[0], "S", 922.35, 923.27, 927.73, 930.61, F(4, 8), 95, "p4, p5, p11");
 // N: ledge 922.15, seat front 923.06, infill 927.80, mask top 930.67, pedestals 3'-6", piles 90 ft (13 + test 100)
 SetAbutment(b.Supports[1], "N", 922.15, 923.06, 927.80, 930.67, F(3, 6), 90, "p9, p10, p11");
-G("Deck end 1'-10\" from CL brg is 10\" BEYOND the infill wall face (1'-0\" behind CL brg): the slab end sits over the end diaphragm (semi-integral, p18 / p20 / p21); without the end diaphragm the model reports the overlap only.");
+G("Deck end 1'-10\" from CL brg is 10\" BEYOND the infill wall face (1'-0\" behind CL brg): the slab end sits over the end diaphragm (semi-integral, p18 / p20 / p21); the end diaphragm back part (diaphragms-br02069.csx) is under the slab end, the backwall (infill) still runs the full length (GAP above).");
 
 Doc.Project.Bridges.Add(b);
+
+// ---------------------------------------------------------------- concrete end / pier diaphragms + fillers / keyways (diaphragms-br02069.csx, run from the repo root)
+{
+    var dr = await SBM.Api.ScriptHost.RunFileAsync(@"samples\plans\diaphragms-br02069.csx", Doc, Args);
+    Print(dr.Output.TrimEnd());
+    if (!dr.Success) Print("ERROR in diaphragms-br02069.csx: " + dr.Error);
+}
 
 // ================================================================ regenerate, report, save
 var res = Doc.Regenerate();

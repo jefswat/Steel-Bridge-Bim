@@ -128,6 +128,9 @@ public sealed class PrestressedModel
     public List<BearingSeat> BearingSeats { get; } = new();
     public List<Diagnostic> Diagnostics { get; } = new();
     public TimeSpan GenerationTime { get; set; }
+    /// <summary>Concrete end / pier diaphragms (<see cref="Bridge.SupportDefinition.Diaphragm"/>), set by RegenerationCache phase 2
+    /// (after the substructure); null = none.</summary>
+    public Diaphragms.ConcreteDiaphragmModel? ConcreteDiaphragms { get; set; }
     /// <summary>Steel intermediate diaphragms between the beams (Iowa 1036-BTD, <see cref="Bridge.BridgeDefinition.PsSteelDiaphragms"/>):
     /// parts, bolts, cast web holes and per-bay checks; null = none. Their parts / bolts are also the bridge's <c>SteelModel</c>
     /// (<see cref="Project.BridgeModel.Steel"/>) so the viewport, IFC, database and quantities show them like cross frames.</summary>

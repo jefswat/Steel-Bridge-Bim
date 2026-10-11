@@ -206,7 +206,8 @@ public sealed class SbmDocument
         foreach (var m in _models.OfType<BridgeModel>())
         {
             foreach (var d in m.Framing.Diagnostics.Concat(m.Steel?.Diagnostics ?? Enumerable.Empty<Diagnostic>())
-                         .Concat(m.Prestressed?.Diagnostics ?? Enumerable.Empty<Diagnostic>()))
+                         .Concat(m.Prestressed?.Diagnostics ?? Enumerable.Empty<Diagnostic>())
+                         .Concat((m.Prestressed?.ConcreteDiaphragms?.Diagnostics ?? Enumerable.Empty<Diagnostic>()).Where(x => x.Severity != DiagnosticSeverity.Info)))
                 (d.Severity == DiagnosticSeverity.Error ? err : warn).Add($"{m.Definition.Name}: {d.Message}");
         }
         var ok = _models.OfType<BridgeModel>().ToList();
@@ -234,6 +235,9 @@ public sealed class SbmDocument
     public SBM.Core.Substructure.SubstructureModel Substructure(string? bridgeName = null) => Model(bridgeName).Substructure ?? throw new InvalidOperationException("Substructure was not generated (framing errors).");
     /// <summary>TxDOT prestressed girders (bridges whose girder kind is TxDotPrestressed).</summary>
     public SBM.Core.Prestressed.PrestressedModel Prestressed(string? bridgeName = null) => Model(bridgeName).Prestressed ?? throw new InvalidOperationException("This bridge has no prestressed girders (or framing errors).");
+    /// <summary>Concrete end / pier diaphragms of a prestressed bridge (SupportDefinition.Diaphragm), with their diagnostics (incl. Info rows).</summary>
+    public SBM.Core.Diaphragms.ConcreteDiaphragmModel Diaphragms(string? bridgeName = null) =>
+        Prestressed(bridgeName).ConcreteDiaphragms ?? throw new InvalidOperationException("This bridge has no concrete diaphragms (no SupportDefinition.Diaphragm).");
     public SBM.Core.Concrete.ConcreteModel Concrete(string? bridgeName = null) => Model(bridgeName).Concrete ?? throw new InvalidOperationException("Concrete was not generated (framing errors).");
 
     /// <summary>Hand-checkable elevation chains (profile grade → deck → haunch → web → flange → sole plate → bearing seat) for every bearing.</summary>

@@ -153,6 +153,9 @@ public sealed class RegenerationCache
                     sub.Misc = Misc.MiscItemsGenerator.Generate(pt.f, pt.s, sub, project.Units, Ground);
                 lock (_lock) _sub[subKey] = sub;
             }
+            // Concrete end / pier diaphragms: superstructure elements built after the beams and the substructure (cheap; always rebuilt).
+            if (includeSteel && pt.ps != null && !pt.f.HasErrors)
+                pt.ps.ConcreteDiaphragms = Diaphragms.ConcreteDiaphragmGenerator.Generate(pt.f, pt.ps, project.Units);
             lock (_lock) { if (pt.hit && found) Hits++; else Misses++; }
             results[i] = new BridgeModel(b, pt.f, pt.s, pt.hit && found, pt.cm, sub, pt.ps);
         });

@@ -177,6 +177,7 @@
             "PileType": "SteelHP",
             "PileSection": "HP14x73",
             "PileSize": 0.4572,
+            "PileShellThickness": "NaN",
             "PileRows": 3,
             "PileColumns": 3,
             "PileSpacing": 0.9144000000000001,
@@ -262,7 +263,126 @@
             }
           },
           "ExpansionJoint": null,
-          "DeckEndPoints": null
+          "DeckEndPoints": null,
+          "Diaphragm": {
+            "Kind": "IntegralEnd",
+            "Name": "S. Abut. diaphragm",
+            "Source": "p.15, p.17, p.20; std 2087-BTCD p.13 B-B",
+            "Material": "Structural concrete (deck mix, cast with the deck)",
+            "Parts": [
+              {
+                "Name": "abutment diaphragm",
+                "Section": [
+                  {
+                    "X": -0.45720000000000005,
+                    "Ref": "Bottom",
+                    "Dz": 0
+                  },
+                  {
+                    "X": 0.45720000000000005,
+                    "Ref": "Bottom",
+                    "Dz": 0
+                  },
+                  {
+                    "X": 0.45720000000000005,
+                    "Ref": "Soffit",
+                    "Dz": 0
+                  },
+                  {
+                    "X": -0.45720000000000005,
+                    "Ref": "Soffit",
+                    "Dz": 0
+                  },
+                  {
+                    "X": -0.45720000000000005,
+                    "Ref": "DeckTop",
+                    "Dz": -0.3302
+                  },
+                  {
+                    "X": -0.8128000000000001,
+                    "Ref": "DeckTop",
+                    "Dz": -0.3302
+                  },
+                  {
+                    "X": -0.8382000000000001,
+                    "Ref": "DeckTop",
+                    "Dz": -0.35559999999999997
+                  },
+                  {
+                    "X": -0.8382000000000001,
+                    "Ref": "DeckTop",
+                    "Dz": -0.7111999999999999
+                  },
+                  {
+                    "X": -0.45720000000000005,
+                    "Ref": "DeckTop",
+                    "Dz": -1.0922
+                  }
+                ],
+                "Left": null,
+                "Right": null,
+                "Unresolved": ""
+              }
+            ],
+            "Left": {
+              "Kind": "Offset",
+              "Offset": 8.14705,
+              "Distance": 0,
+              "Source": "west: stage CJ, abut. end 3 1/4 from CL NB measured perpendicular to the roadway (p.17; 3 5/16 along CL brg)"
+            },
+            "Right": {
+              "Kind": "Offset",
+              "Offset": 19.2024,
+              "Distance": 0,
+              "Source": "east: into the wing extension wall, inner face = gutter line (p.15 A-A, p.17)"
+            },
+            "BottomSteps": [
+              {
+                "Girder": 1,
+                "Elevation": 340.61400000000003
+              },
+              {
+                "Girder": 2,
+                "Elevation": 340.67800800000003
+              },
+              {
+                "Girder": 3,
+                "Elevation": 340.74201600000004
+              },
+              {
+                "Girder": 4,
+                "Elevation": 340.79992799999997
+              },
+              {
+                "Girder": 5,
+                "Elevation": 340.860888
+              }
+            ],
+            "Risers": "Unresolved",
+            "RiserS": [],
+            "RiserSource": "the cap top steps one level per beam line, but the riser position between the beams is not dimensioned (p.17 ABUTMENT STEP DIAGRAM / p.9 pier steps; std 2087-BTCD p.13 step diagram draws the risers between the beams without a dimension) - user question Q3 open",
+            "Fillers": [],
+            "Keyways": [
+              {
+                "Name": "keyway",
+                "X": 0,
+                "Width": 0.2032,
+                "Depth": 0.0508,
+                "TopAbove": 0,
+                "BetweenBeams": true,
+                "Unresolved": "keyway \u0027formed by beveled 2x8\u0027 (p.15 B-B / p.20; std 2087-BTCD p.13): the bevel is drawn but not dimensioned",
+                "Basis": "rectangular 8\u0022 x 2\u0022 (the printed 2x8 size), between the beams, centred on the CL brg",
+                "Source": "p.15 B-B; std 2087-BTCD p.13 (centred on CL brg / CL piles)"
+              }
+            ],
+            "BeamHoles": [],
+            "OpenBelowBeams": false,
+            "PlanBearingGap": 0.07619999999999999,
+            "Unresolved": [
+              "abutment diaphragm reinforcing (8g1, 8g3, 5d2..5d8, 5k1/5k2, p.26 bar list) not placed (schedule only)",
+              "1/4\u0022 filler of section B-B (p.20) not dimensioned in extent - not modeled"
+            ]
+          }
         },
         {
           "Name": "Pier 1",
@@ -326,6 +446,7 @@
             "PileType": "SteelHP",
             "PileSection": "HP14x73",
             "PileSize": 0.4572,
+            "PileShellThickness": "NaN",
             "PileRows": 3,
             "PileColumns": 3,
             "PileSpacing": 0.9144000000000001,
@@ -411,7 +532,154 @@
             }
           },
           "ExpansionJoint": null,
-          "DeckEndPoints": null
+          "DeckEndPoints": null,
+          "Diaphragm": {
+            "Kind": "PierContinuity",
+            "Name": "Pier 1 diaphragm",
+            "Source": "p.20 part section at pier, Details A / B; p.26",
+            "Material": "Structural concrete (deck mix, cast with the deck)",
+            "Parts": [
+              {
+                "Name": "back half",
+                "Section": [
+                  {
+                    "X": -0.4318,
+                    "Ref": "Bottom",
+                    "Dz": 0.00635
+                  },
+                  {
+                    "X": 0,
+                    "Ref": "Bottom",
+                    "Dz": 0.00635
+                  },
+                  {
+                    "X": 0,
+                    "Ref": "Soffit",
+                    "Dz": 0
+                  },
+                  {
+                    "X": -0.4318,
+                    "Ref": "Soffit",
+                    "Dz": 0
+                  }
+                ],
+                "Left": null,
+                "Right": null,
+                "Unresolved": ""
+              },
+              {
+                "Name": "ahead half",
+                "Section": [
+                  {
+                    "X": 0,
+                    "Ref": "Bottom",
+                    "Dz": 0.00635
+                  },
+                  {
+                    "X": 0.4318,
+                    "Ref": "Bottom",
+                    "Dz": 0.00635
+                  },
+                  {
+                    "X": 0.4318,
+                    "Ref": "Soffit",
+                    "Dz": 0
+                  },
+                  {
+                    "X": 0,
+                    "Ref": "Soffit",
+                    "Dz": 0
+                  }
+                ],
+                "Left": null,
+                "Right": null,
+                "Unresolved": ""
+              }
+            ],
+            "Left": {
+              "Kind": "Offset",
+              "Offset": 8.2296,
+              "Distance": 0,
+              "Source": "west: stage-2 edge of deck at beam D side (p.20 part section at pier)"
+            },
+            "Right": {
+              "Kind": "FasciaOutside",
+              "Offset": 0,
+              "Distance": 0,
+              "Source": "east: flush with the outside face of beam H (p.20 Detail B)"
+            },
+            "BottomSteps": [
+              {
+                "Girder": 1,
+                "Elevation": 340.74811200000005
+              },
+              {
+                "Girder": 2,
+                "Elevation": 340.83650400000005
+              },
+              {
+                "Girder": 3,
+                "Elevation": 340.924896
+              },
+              {
+                "Girder": 4,
+                "Elevation": 341.01024
+              },
+              {
+                "Girder": 5,
+                "Elevation": 341.089488
+              }
+            ],
+            "Risers": "Unresolved",
+            "RiserS": [],
+            "RiserSource": "the cap top steps one level per beam line, but the riser position between the beams is not dimensioned (p.17 ABUTMENT STEP DIAGRAM / p.9 pier steps; std 2087-BTCD p.13 step diagram draws the risers between the beams without a dimension) - user question Q3 open",
+            "Fillers": [
+              {
+                "Name": "filler around bearings",
+                "Material": "1\u0022 preformed expansion joint filler",
+                "Kind": "AroundBearings",
+                "Side": 0,
+                "Thickness": 0.0254,
+                "Section": [],
+                "X0": 0,
+                "X1": 0,
+                "Source": "p.20 top of pier details: around bearings"
+              },
+              {
+                "Name": "interface filler",
+                "Material": "1/4\u0022 preformed expansion joint filler",
+                "Kind": "Interface",
+                "Side": 0,
+                "Thickness": 0.00635,
+                "Section": [],
+                "X0": -0.4318,
+                "X1": 0.4318,
+                "Source": "p.20 Section B-B (full diaphragm width, interrupted at the keyway)"
+              }
+            ],
+            "Keyways": [
+              {
+                "Name": "keyway",
+                "X": 0,
+                "Width": 0.2032,
+                "Depth": 0.0508,
+                "TopAbove": 0.00635,
+                "BetweenBeams": true,
+                "Unresolved": "keyway \u0027formed by beveled 2x8\u0027 (p.15 B-B / p.20; std 2087-BTCD p.13): the bevel is drawn but not dimensioned; its 1/4\u0022 filler lining (Section B-B) is not modeled",
+                "Basis": "rectangular 8\u0022 x 2\u0022 (the printed 2x8 size), between the beams, centred on the CL pier, joined to the diaphragm through the 1/4\u0022 layer",
+                "Source": "p.20 top of pier details, Section B-B (centred on the CL pier)"
+              }
+            ],
+            "BeamHoles": [],
+            "OpenBelowBeams": true,
+            "PlanBearingGap": 0.0254,
+            "Unresolved": [
+              "1\u0022 preformed filler on the faces of the steps and the sides / ends of the keyways (p.20 part plan): step faces follow the unresolved risers, keyway bevel undimensioned - not modeled",
+              "bearing pads: p.20 part plan draws the 9 x 2\u0027-4 1/2 pads with the long side PARALLEL to the CL pier; the model pads are square to the beam (prestressed generator) - the filler is cut around the model pads",
+              "pier diaphragm reinforcing (5d13-5d18, 5e1/5e2/5e6/5e7, p.26) not placed (schedule only)",
+              "junction boxes in the pier diaphragm (lighting, p.35-37) not modeled"
+            ]
+          }
         },
         {
           "Name": "Pier 2",
@@ -475,6 +743,7 @@
             "PileType": "SteelHP",
             "PileSection": "HP14x73",
             "PileSize": 0.4572,
+            "PileShellThickness": "NaN",
             "PileRows": 3,
             "PileColumns": 3,
             "PileSpacing": 0.9144000000000001,
@@ -560,7 +829,154 @@
             }
           },
           "ExpansionJoint": null,
-          "DeckEndPoints": null
+          "DeckEndPoints": null,
+          "Diaphragm": {
+            "Kind": "PierContinuity",
+            "Name": "Pier 2 diaphragm",
+            "Source": "p.20 part section at pier, Details A / B; p.26",
+            "Material": "Structural concrete (deck mix, cast with the deck)",
+            "Parts": [
+              {
+                "Name": "back half",
+                "Section": [
+                  {
+                    "X": -0.4318,
+                    "Ref": "Bottom",
+                    "Dz": 0.00635
+                  },
+                  {
+                    "X": 0,
+                    "Ref": "Bottom",
+                    "Dz": 0.00635
+                  },
+                  {
+                    "X": 0,
+                    "Ref": "Soffit",
+                    "Dz": 0
+                  },
+                  {
+                    "X": -0.4318,
+                    "Ref": "Soffit",
+                    "Dz": 0
+                  }
+                ],
+                "Left": null,
+                "Right": null,
+                "Unresolved": ""
+              },
+              {
+                "Name": "ahead half",
+                "Section": [
+                  {
+                    "X": 0,
+                    "Ref": "Bottom",
+                    "Dz": 0.00635
+                  },
+                  {
+                    "X": 0.4318,
+                    "Ref": "Bottom",
+                    "Dz": 0.00635
+                  },
+                  {
+                    "X": 0.4318,
+                    "Ref": "Soffit",
+                    "Dz": 0
+                  },
+                  {
+                    "X": 0,
+                    "Ref": "Soffit",
+                    "Dz": 0
+                  }
+                ],
+                "Left": null,
+                "Right": null,
+                "Unresolved": ""
+              }
+            ],
+            "Left": {
+              "Kind": "Offset",
+              "Offset": 8.2296,
+              "Distance": 0,
+              "Source": "west: stage-2 edge of deck at beam D side (p.20 part section at pier)"
+            },
+            "Right": {
+              "Kind": "FasciaOutside",
+              "Offset": 0,
+              "Distance": 0,
+              "Source": "east: flush with the outside face of beam H (p.20 Detail B)"
+            },
+            "BottomSteps": [
+              {
+                "Girder": 1,
+                "Elevation": 340.83040800000003
+              },
+              {
+                "Girder": 2,
+                "Elevation": 340.955376
+              },
+              {
+                "Girder": 3,
+                "Elevation": 341.080344
+              },
+              {
+                "Girder": 4,
+                "Elevation": 341.202264
+              },
+              {
+                "Girder": 5,
+                "Elevation": 341.321136
+              }
+            ],
+            "Risers": "Unresolved",
+            "RiserS": [],
+            "RiserSource": "the cap top steps one level per beam line, but the riser position between the beams is not dimensioned (p.17 ABUTMENT STEP DIAGRAM / p.9 pier steps; std 2087-BTCD p.13 step diagram draws the risers between the beams without a dimension) - user question Q3 open",
+            "Fillers": [
+              {
+                "Name": "filler around bearings",
+                "Material": "1\u0022 preformed expansion joint filler",
+                "Kind": "AroundBearings",
+                "Side": 0,
+                "Thickness": 0.0254,
+                "Section": [],
+                "X0": 0,
+                "X1": 0,
+                "Source": "p.20 top of pier details: around bearings"
+              },
+              {
+                "Name": "interface filler",
+                "Material": "1/4\u0022 preformed expansion joint filler",
+                "Kind": "Interface",
+                "Side": 0,
+                "Thickness": 0.00635,
+                "Section": [],
+                "X0": -0.4318,
+                "X1": 0.4318,
+                "Source": "p.20 Section B-B (full diaphragm width, interrupted at the keyway)"
+              }
+            ],
+            "Keyways": [
+              {
+                "Name": "keyway",
+                "X": 0,
+                "Width": 0.2032,
+                "Depth": 0.0508,
+                "TopAbove": 0.00635,
+                "BetweenBeams": true,
+                "Unresolved": "keyway \u0027formed by beveled 2x8\u0027 (p.15 B-B / p.20; std 2087-BTCD p.13): the bevel is drawn but not dimensioned; its 1/4\u0022 filler lining (Section B-B) is not modeled",
+                "Basis": "rectangular 8\u0022 x 2\u0022 (the printed 2x8 size), between the beams, centred on the CL pier, joined to the diaphragm through the 1/4\u0022 layer",
+                "Source": "p.20 top of pier details, Section B-B (centred on the CL pier)"
+              }
+            ],
+            "BeamHoles": [],
+            "OpenBelowBeams": true,
+            "PlanBearingGap": 0.0254,
+            "Unresolved": [
+              "1\u0022 preformed filler on the faces of the steps and the sides / ends of the keyways (p.20 part plan): step faces follow the unresolved risers, keyway bevel undimensioned - not modeled",
+              "bearing pads: p.20 part plan draws the 9 x 2\u0027-4 1/2 pads with the long side PARALLEL to the CL pier; the model pads are square to the beam (prestressed generator) - the filler is cut around the model pads",
+              "pier diaphragm reinforcing (5d13-5d18, 5e1/5e2/5e6/5e7, p.26) not placed (schedule only)",
+              "junction boxes in the pier diaphragm (lighting, p.35-37) not modeled"
+            ]
+          }
         },
         {
           "Name": "N. Abut.",
@@ -621,6 +1037,7 @@
             "PileType": "SteelHP",
             "PileSection": "HP14x73",
             "PileSize": 0.4572,
+            "PileShellThickness": "NaN",
             "PileRows": 3,
             "PileColumns": 3,
             "PileSpacing": 0.9144000000000001,
@@ -706,7 +1123,126 @@
             }
           },
           "ExpansionJoint": null,
-          "DeckEndPoints": null
+          "DeckEndPoints": null,
+          "Diaphragm": {
+            "Kind": "IntegralEnd",
+            "Name": "N. Abut. diaphragm",
+            "Source": "p.16, p.17, p.20; std 2087-BTCD p.13 B-B",
+            "Material": "Structural concrete (deck mix, cast with the deck)",
+            "Parts": [
+              {
+                "Name": "abutment diaphragm",
+                "Section": [
+                  {
+                    "X": -0.45720000000000005,
+                    "Ref": "Bottom",
+                    "Dz": 0
+                  },
+                  {
+                    "X": 0.45720000000000005,
+                    "Ref": "Bottom",
+                    "Dz": 0
+                  },
+                  {
+                    "X": 0.45720000000000005,
+                    "Ref": "Soffit",
+                    "Dz": 0
+                  },
+                  {
+                    "X": -0.45720000000000005,
+                    "Ref": "Soffit",
+                    "Dz": 0
+                  },
+                  {
+                    "X": -0.45720000000000005,
+                    "Ref": "DeckTop",
+                    "Dz": -0.3302
+                  },
+                  {
+                    "X": -0.8128000000000001,
+                    "Ref": "DeckTop",
+                    "Dz": -0.3302
+                  },
+                  {
+                    "X": -0.8382000000000001,
+                    "Ref": "DeckTop",
+                    "Dz": -0.35559999999999997
+                  },
+                  {
+                    "X": -0.8382000000000001,
+                    "Ref": "DeckTop",
+                    "Dz": -0.7111999999999999
+                  },
+                  {
+                    "X": -0.45720000000000005,
+                    "Ref": "DeckTop",
+                    "Dz": -1.0922
+                  }
+                ],
+                "Left": null,
+                "Right": null,
+                "Unresolved": ""
+              }
+            ],
+            "Left": {
+              "Kind": "AlongLineFromOffset",
+              "Offset": 19.2024,
+              "Distance": 11.544300000000002,
+              "Source": "west: abut. end / CJ 37\u0027-10 1/2 along CL N abut brg from CL abut x gutter line (p.17)"
+            },
+            "Right": {
+              "Kind": "Offset",
+              "Offset": 19.2024,
+              "Distance": 0,
+              "Source": "east: into the wing extension wall, inner face = gutter line (p.15 A-A, p.17)"
+            },
+            "BottomSteps": [
+              {
+                "Girder": 1,
+                "Elevation": 340.73287200000004
+              },
+              {
+                "Girder": 2,
+                "Elevation": 340.85479200000003
+              },
+              {
+                "Girder": 3,
+                "Elevation": 340.97976000000006
+              },
+              {
+                "Girder": 4,
+                "Elevation": 341.10168
+              },
+              {
+                "Girder": 5,
+                "Elevation": 341.226648
+              }
+            ],
+            "Risers": "Unresolved",
+            "RiserS": [],
+            "RiserSource": "the cap top steps one level per beam line, but the riser position between the beams is not dimensioned (p.17 ABUTMENT STEP DIAGRAM / p.9 pier steps; std 2087-BTCD p.13 step diagram draws the risers between the beams without a dimension) - user question Q3 open",
+            "Fillers": [],
+            "Keyways": [
+              {
+                "Name": "keyway",
+                "X": 0,
+                "Width": 0.2032,
+                "Depth": 0.0508,
+                "TopAbove": 0,
+                "BetweenBeams": true,
+                "Unresolved": "keyway \u0027formed by beveled 2x8\u0027 (p.15 B-B / p.20; std 2087-BTCD p.13): the bevel is drawn but not dimensioned",
+                "Basis": "rectangular 8\u0022 x 2\u0022 (the printed 2x8 size), between the beams, centred on the CL brg",
+                "Source": "p.15 B-B; std 2087-BTCD p.13 (centred on CL brg / CL piles)"
+              }
+            ],
+            "BeamHoles": [],
+            "OpenBelowBeams": false,
+            "PlanBearingGap": 0.07619999999999999,
+            "Unresolved": [
+              "abutment diaphragm reinforcing (8g1, 8g3, 5d2..5d8, 5k1/5k2, p.26 bar list) not placed (schedule only)",
+              "1/4\u0022 filler of section B-B (p.20) not dimensioned in extent - not modeled"
+            ]
+          }
         }
       ],
       "AuxiliarySupports": [],
