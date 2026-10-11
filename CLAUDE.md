@@ -250,6 +250,12 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   -> `ExpansionJointResult.EndBlock` (`DeckEndBlockResult.Probe`); the blockout is then built to its full plan depth. `Checks/DeckEndBlockCheck` (run in
   `RegenerationCache`) reports steel inside a block: girder ends/studs/W strut flange flush = INTENDED (Info), anything else = CLASH warning; nothing is moved.
   Block rebar is not modeled. Data/evidence: `docs/plan-data/deck-end-blocks.md`; scripts `joints-i80.csx`, `joints-ramp-g.csx` (DECK_END_BLOCKS flag). Snapshot `--closeup EBLKn[@Bridge]`.
+- Camber / blocking (OPTIONAL `GirderLayoutDefinition.Camber` = `GirderCamberDefinition` per girder: DatumPoint, Keys (plan point number -> support index / FS number /
+  `GirderEnd`), Points (camber, steel and slab+barrier deflection)): `Framing/CamberBlocking.cs` -> `BridgeFraming.Camber` (per point: final top of web, girder-line haunch
+  elevation H = grade - slab + slab deflection, no-load top of web N = web + deflections, BLOCKING = N - N(datum), camber from the no-load shape = N - chord(N) between splices).
+  The model geometry stays the final shape. Points between key points are equally spaced along each girder. Girder properties, material report, DB girder-group properties
+  (camber_table), `sbm blocking`. Plan data/results: `docs/plan-data/camber-blocking.md` (section 9), `docs/plan-data/camber/*.csv`; scripts `samples/plans/camber-i80.csx`,
+  `camber-ramp-g.csx` (run after the girder/splice/termination scripts) and `check-blocking.csx`.
 - Variable deck width: `DeckDefinition.LeftAt/RightAt(station)`; constant decks keep the old code path.
 - Drainage: `BridgeDefinition.Drains` â†’ `SubstructureModel.Drainage` (built in SubstructureGenerator, needs terrain for basins).
 - Raster terrain: `ElevationGrid` (full-res bilinear) + decimated display mesh; `TerrainModel(grid, mesh)`.

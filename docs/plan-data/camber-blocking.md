@@ -323,3 +323,37 @@ Camber at piers (points 25, 57, 87, 115): -2.97, -3.03, -2.43, -3.15 in; at spli
 `<BR>-unit<n>-points.csv` (point, blocking letter, distance along the measuring girder, header text read), `-camber_in.csv`, `-defl_steel_in.csv`, `-defl_slab_in.csv`, `-haunch_elev_ft.csv`
 (rows = points, columns = girder lines), `-blocking_ft.csv` (rows = letters), `*-unnumbered.csv` (discontinuous tails, printed order). BR = I80 or RG.
 Cells: blank = not printed ("-" on the sheet). Column headings from the table are repeated in `-points.csv` col 4 (UNCERTAIN where it includes a stray "SPAN NO. nWB").
+
+## 9. Model implementation and what the comparison proved (feature/camber)
+Input `GirderLayoutDefinition.Camber` (`GirderCamberDefinition`: DatumPoint, Keys, Points). Keys = the plans' CL bearings (framing support index) and field
+splices (FS number) with their point numbers (top-of-slab CSV "B" rows); points between consecutive keys are equally spaced along EACH girder (this is the
+mapping of point numbers onto girders other than the measuring girder: UNRESOLVED item 1 is resolved by the comparison below). Points carry camber (in, up +),
+steel deflection and slab+barrier deflection (in, down +). Scripts: `samples/plans/camber-i80.csx`, `camber-ramp-g.csx` (re-runnable; after the girder, splice and
+termination scripts), check `samples/plans/check-blocking.csx`, report `sbm blocking <model> [bridge] [--all]`.
+Computed by `SBM.Core.Framing.CamberBlocking` into `BridgeFraming.Camber` (model geometry stays the FINAL shape):
+- H (plan "girder line haunch elevation") = finished grade - slab thickness + slab/barrier deflection = final top of web + haunch + slab deflection.
+- No-load top of web N = final top of web + steel + slab/barrier deflection. BLOCKING = N - N(datum point) (= R2: H - H(datum) + steel deflection difference).
+- Datum = the girder end whose blocking the plans print as 0.00 (an input, `DatumPoint`; observed, not printed). Ends of discontinuous girders use the girder end.
+Verified results (model vs plan, all 27 + 16 girders; 4,703 haunch-elevation points, 595 blocking values; residuals in ft, plan precision 0.01):
+| unit | H mean | H mean abs | H max abs | blocking mean abs | blocking max abs |
+|---|---|---|---|---|---|
+| I-80 U1 | 0.000 | 0.003 | 0.009 | 0.003 | 0.010 |
+| I-80 U2 | -0.004 | 0.005 | 0.019 | 0.004 | 0.018 |
+| I-80 U3 | -0.004 | 0.004 | 0.012 | 0.003 | 0.011 |
+| Ramp G U1 | +0.001 | 0.003 | 0.009 | 0.002 | 0.005 |
+| Ramp G U2 | 0.000 | 0.003 | 0.012 | 0.002 | 0.007 |
+| Ramp G U3 | -0.003 | 0.003 | 0.010 | 0.002 | 0.005 |
+| Ramp G U4 | -0.003 | 0.004 | 0.010 | 0.003 | 0.008 |
+Nothing exceeds 0.02 ft. 106 points exceed 0.01 ft, all marginal (0.01-0.019): 96 in I-80 U2 (girders A-K, mostly A-C and F-H over Piers 6WB-9WB, where the model is 0.01-0.02 ft low,
+the same spans where the top-of-slab check shows small residuals), 7 on I-80 U3 girder A, 3 on Ramp G. Plan precision is met everywhere; no input change is proposed.
+Findings that CORRECT section 3:
+- R1 is not general. The plans' camber is measured from the chord between the splices to the cambered (no-load) top of web, i.e. camber = (N - chord of N), which contains the
+  vertical-curve departure of the profile from its chord. On the nearly straight grades of I-80 U1/U3 this equals "total deflection - chord of deflection" (R1), on I-80 U2 and
+  Ramp G it does not (R1 off by up to 2.0 in, mean +0.2..0.7 in); with the model's profile the relation holds: mean abs residual 0.004-0.011 in, max 0.18 in (Ramp G U1 girder D,
+  point 25), 5-10 points per unit beyond 0.02 in (I-80 U2: 177, mostly the first segment of A-E from Pier 6A and the 6WB-9WB bays). This explains the "A end sections off 0.14-0.24 in" (item 5): it is the profile term.
+- Item 2 (tails of the discontinuous girders) is resolved by the data: the tail tables are the points from the CL bearing of the termination pier to the girder end (`Terminations`
+  distance), n values = n-1 equal spaces, numbered from the pier's point number; the star (*) value is that end point (I-80 U2 E: tail 25..35 against letter E = 33, U3 B: 19..27 against
+  letter D = 25 - letters are labels, the spacing is the girder's own). First of the two deflection tables per girder (page order) = slab+barrier, second = steel (swapping them
+  worsens the haunch residuals to 0.05-0.09 ft). All tail haunch elevations, camber relations and blocking (incl. the datum 0.00* of U3 B/C) agree with the model within plan precision.
+- Datum (item 3): the printed 0.00 end of each girder's blocking row (first or last letter; U3 A, U2 F-H and others have it at the last point).
+Remaining UNRESOLVED: items 4 (field haunch detail dot, misc data tables in fractions), 6, 7 (segment fractions are not used: the model's own splice/bearing distances locate the points).
