@@ -38,6 +38,10 @@ public sealed class StrandPoint
 /// or neither end is at a pier (UNRESOLVED, drawn centred).</remarks>
 public enum StandardBeamPlacement { Centered, AtStartBearing, AtEndBearing, AtPierBearing }
 
+/// <summary>Plan orientation of a bearing pad: length along the beam (square to the beam) or along the support-line normal
+/// (width parallel to the support line).</summary>
+public enum PadOrientation { SquareToBeam, ParallelToSupport }
+
 /// <summary>
 /// A beam definition for some spans / beam lines (e.g. Woodbury: BTD55 in span 1, BTD105 in span 2, BTD60 in span 3).
 /// Matching entries are tried in order, the LAST match wins; no match = the bridge's base definition.
@@ -99,6 +103,10 @@ public sealed class PrestressedBeamDefinition
     public double PadWidth { get; set; } = In(21);
     /// <summary>Total pad height (IGEB: ¼" covers + 6 × ¼" layers + 0.105" laminates ≈ 2¾").</summary>
     public double PadThickness { get; set; } = In(2.75);
+    /// <summary>Plan orientation of the pads at interior supports (piers / bents): square to the beam (default, TxDOT IGEB) or
+    /// with the pad width along the support line (Woodbury p.20 TOP OF PIER DETAILS part plan: 9 x 2'-4 1/2 pads parallel to
+    /// CL pier). Abutment pads stay square to the beam.</summary>
+    public PadOrientation PierPadOrientation { get; set; } = PadOrientation.SquareToBeam;
 
     // ---- state standard beams (all OPTIONAL; defaults keep the TxDOT / PGSuper behavior)
 

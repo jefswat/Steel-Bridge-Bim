@@ -142,18 +142,29 @@ br.Deck.Barrier.Left = false;
 unresolved.Add("U10: Iowa aesthetic barrier (east side, 3'-8 x 1'-7) profile not fully transcribed (PDF p.38) - no barrier modeled.");
 
 // ---------------------------------------------------------------- beams (beam layout p.21 / DS 19)
-// 5 beam lines D, E, F, G, H (west to east; A-C are stage 2). Iowa BTD beams: depth 4'-6. PLACEHOLDER shape = Tx54
-// (54" deep, same depth) until the Iowa BTx catalog lands (prestressed queue item 1); strands / standard lengths there too.
+// 5 beam lines D, E, F, G, H (west to east; A-C are stage 2). Iowa standard BTD beams (user rule: standard beams at the standard
+// length / strands): span 1 BTD55, span 2 BTD105, span 3 BTD60 (p.21, p.27 beam data; Iowa standard sheets 4732 / 4742 / 4733 =
+// Iowa Beams.pdf p.100 / 110 / 101: 55'-0 / 105'-0 / 60'-0 CL to CL bearings, 56'-4 / 106'-4 / 61'-4 end to end, 8" end to CL
+// bearing; data sheet 4730 p.98). The layout bearing chords equal the standard lengths within 1/16" (see the layout note below),
+// so the beams sit on the layout bearings and no placement rule is needed.
 br.Girders.Count = 5;
 br.Girders.Kind = GirderKind.TxDotPrestressed;
-br.Girders.Prestressed.Type = TxGirderType.Tx54;
-br.Girders.Prestressed.StrandCount = 14;
-br.Girders.Prestressed.StrandDiameter = In(0.6);
-br.Girders.Prestressed.BearingToEnd = In(8);    // end of beam to CL bearing 8" (p.28-30)
-br.Girders.Prestressed.EndGapAtBent = In(4);    // beam ends 8" apart over the piers (Detail A p.20), centred on CL pier
-br.Girders.Prestressed.PadLength = In(9);       // pier pads 9 x 1 x 2'-4 1/2 plain neoprene (p.20); abutments: 3x3 bar (not modeled)
-br.Girders.Prestressed.PadWidth = Len("2'-4 1/2\"");
-br.Girders.Prestressed.PadThickness = In(1);
+PrestressedBeamDefinition Btd(string name)
+{
+    var d = SBM.Core.Prestressed.StandardBeamCatalog.Beam(name)!;
+    d.EndGapAtBent = In(4);    // beam ends 8" apart over the piers (Detail A p.20), 4" + 8" = 1'-0 CL pier to CL brg along the beam
+    d.PadLength = In(9);       // pier pads: plain neoprene 9 x 1 x 2'-4 1/2 (p.20); abutments: 3x3 x 2'-4 1/2 steel bar (feature E / T7, not modeled - pad drawn)
+    d.PadWidth = Len("2'-4 1/2\"");
+    d.PadThickness = In(1);
+    d.PierPadOrientation = PadOrientation.ParallelToSupport;   // p.20 TOP OF PIER DETAILS part plan: pads parallel to CL pier (user decision 17)
+    return d;
+}
+br.Girders.Prestressed = Btd("BTD55");
+br.Girders.Prestressed.SpanBeams = new()
+{
+    new PrestressedSpanBeam { Spans = new() { 1 }, Beam = Btd("BTD105") },
+    new PrestressedSpanBeam { Spans = new() { 2 }, Beam = Btd("BTD60") },
+};
 // Default offsets (unused: every span has a span layout) - only the starting guesses of the framing.
 br.Girders.FirstGirderOffset = Ft(30);
 br.Girders.Spacings = Enumerable.Repeat(Ft(8), 4).ToList();
@@ -206,9 +217,8 @@ br.Girders.SpanLayouts = new()
 br.CrossFrames.MaxSpacing = Ft(25);
 Doc.Project.Bridges.Add(br);
 
-unresolved.Add("U3 (closed by the user): beams are standard BTD55 / BTD105 / BTD60 at the STANDARD lengths - the beam generator change belongs to the prestressed work; this model's beams follow the layout chords (placeholder Tx54 shape).");
 unresolved.Add("U4: plan skews to the local tangent at Pier 2 (13 deg 00'40\") and N. Abut. (14 deg 29'57\") do not reproduce from the parallel 10 deg 09'36\" (PDF p.21 vs p.7); the parallel lines through the staking points govern.");
-unresolved.Add("Beam ends at the piers (square or parallel to the pier) and abutment end details (integral, beams embedded) - prestressed/abutment work (PDF p.20, p.28-30).");
+unresolved.Add("Beam ends at the piers: square to the beam or parallel to the pier is not dimensioned (PDF p.20 Detail A / part plan at the pier, 1'-4 VARIES not legible at the available resolution) - modeled square (generator default InteriorEnds = Square).");
 
 var rep = Doc.Regenerate(includeSteel: false);
 foreach (var e in rep.Errors) Print("ERROR " + e);

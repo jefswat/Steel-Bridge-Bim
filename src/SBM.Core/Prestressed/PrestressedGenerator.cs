@@ -59,6 +59,13 @@ public static class PrestressedGenerator
                 if (seats[i, j] is { } s) model.BearingSeats.AddRange(s);
             }
         foreach (var w in warn.Distinct()) model.Diagnostics.Add(new Diagnostic(DiagnosticSeverity.Warning, w));
+        foreach (var grp in model.Beams.Where(b => b.IsStandardLength && Math.Abs(b.LengthDifference) <= In(1.0 / 16)).GroupBy(b => b.Span))
+        {
+            var worst = grp.OrderByDescending(b => Math.Abs(b.LengthDifference)).First();
+            model.Diagnostics.Add(new Diagnostic(DiagnosticSeverity.Info,
+                $"Standard beam fit, span {grp.Key + 1}: {grp.Count()} {worst.Designation} beam(s) at the standard CL-CL bearing length; layout bearings differ by at most " +
+                $"{Math.Abs(worst.LengthDifference) / In(1):0.000}\" ({worst.Mark}) - within 1/16\", the beam sits on the layout bearings (no placement rule needed)."));
+        }
         // Beams modeled on an assumption the plans do not fix: one warning per reason.
         foreach (var grp in model.Beams.Where(b => b.Assumption != null).GroupBy(b => (b.Assumption!.Reason, b.Assumption.Basis)))
             model.Diagnostics.Add(new Diagnostic(DiagnosticSeverity.Warning,
@@ -120,6 +127,9 @@ public static class PrestressedGenerator
         double endB = abutB ? lc + pd.BearingToEnd / Cos(supB) : lc - pd.EndGapAtBent - (squareB ? hwMax * Math.Abs(kB) : 0);
         double brgA = abutA ? 0 : pd.EndGapAtBent + pd.BearingToEnd;
         double brgB = abutB ? lc : lc - pd.EndGapAtBent - pd.BearingToEnd;
+        // Per-span layout: the layout's bearing points are the CL bearings (e.g. Woodbury "1'-0 from CL pier along the beam").
+        if (c.LayoutBegin is { } lb0) brgA = Vec2.Dot(lb0.XY - pa, t);
+        if (c.LayoutEnd is { } lb1) brgB = Vec2.Dot(lb1.XY - pa, t);
         double fkA = squareA ? 0 : kA, fkB = squareB ? 0 : kB;
         string typeName = pd.Designation != "" ? pd.Designation : shape.Name;
 
@@ -129,6 +139,7 @@ public static class PrestressedGenerator
         // Lengths along the sloped beam = plan-chord parameter s × kSlope (the section is kept vertical).
         double kSlope = Math.Sqrt(1 + slope * slope);
         double layoutSpan = (brgB - brgA) * kSlope, lengthDiff = 0;
+        double fitTol = In(1.0 / 16);
         bool standardLength = pd.StandardBearingLength > 0;
         Assumption? assumption = null;
         if (standardLength)
@@ -155,7 +166,8 @@ public static class PrestressedGenerator
             brgB = a0 + ls;
             endA = brgA - e;
             endB = brgB + e;
-            if (Math.Abs(lengthDiff) >= In(1.0 / 32))
+            // Within 1/16": the standard beam fits the layout bearings (Info per span in Generate); no placement rule needed.
+            if (Math.Abs(lengthDiff) > fitTol)
             {
                 string L(double m) => u.FormatLength(m);
                 string how = place switch
@@ -172,7 +184,7 @@ public static class PrestressedGenerator
                     assumption = Assumption.Unresolved(
                         (pd.Placement == StandardBeamPlacement.AtPierBearing
                             ? $"placement 'at the pier bearing' of the standard {typeName} beam is ambiguous (both or neither end at a pier)"
-                            : $"placement of the standard {typeName} beam between layout bearings that differ from its standard CL-CL bearing length is not set (not stated on the plans)") +
+                            : $"the layout CL-CL bearing distance differs from the standard {typeName} CL-CL bearing length by more than 1/16\" and the plans do not say where the standard beam sits between the layout bearings (Placement not set)") +
                         (pd.Source != "" ? $" ({pd.Source})" : ""),
                         "centred between the layout bearings (display only)");
             }
@@ -347,18 +359,28 @@ public static class PrestressedGenerator
                        (clipA > 0 ? $", clipped {u.FormatLength(clipA, LengthKind.Short)} x {u.FormatLength(clipB, LengthKind.Short)}" : "");
             }
             if (MeshBuilder.SignedArea(poly) < 0) poly.Reverse();
-            var fr = new Frame3(new Vec3(cBot.X, cBot.Y, 0), new Vec3(t.X, t.Y, 0), new Vec3(right.X, right.Y, 0), new Vec3(0, 0, 1));
+            // Pad axis: along the beam, or (interior supports, PierPadOrientation = ParallelToSupport) along the support-line normal
+            // so the pad width lies along the support line (Woodbury p.20).
+            bool parallel = !abut && pd.PierPadOrientation == PadOrientation.ParallelToSupport;
+            var ax = t;
+            if (parallel)
+            {
+                ax = sup.Direction.Left;
+                if (Vec2.Dot(ax, t) < 0) ax = -ax;
+            }
+            var fr = new Frame3(new Vec3(cBot.X, cBot.Y, 0), new Vec3(ax.X, ax.Y, 0), new Vec3(ax.Right.X, ax.Right.Y, 0), new Vec3(0, 0, 1));
             var pm = new Mesh();
             MeshBuilder.AddExtrusion(pm, poly, fr, z0, z1);
             padList.Add(new PrestressedPad
             {
                 Mark = $"{mark}-{(end == 0 ? "B" : "E")}", Support = sup.Name, Girder = i, Span = j, Mesh = pm,
                 Center = cBot.XY.WithZ((z0 + z1) / 2), Length = pl, Width = round ? pl : pw, Thickness = pd.PadThickness,
-                Description = $"Elastomeric {desc} x {u.FormatLength(pd.PadThickness, LengthKind.Short)}" + (pd.PadLength > 0 ? "" : " (IGEB)"),
+                Description = $"Elastomeric {desc} x {u.FormatLength(pd.PadThickness, LengthKind.Short)}" + (pd.PadLength > 0 ? "" : " (IGEB)") +
+                              (parallel ? ", parallel to the support" : ""),
                 OffNominal = Math.Abs(sPad - sNom),
             });
             var so = a.Inverse(cBot.XY);
-            seatList.Add(new BearingSeat(sup.Name, i, so.Station, z0, 0, "Elastomeric", "", cBot.XY, t, pl, round ? pl : pw));
+            seatList.Add(new BearingSeat(sup.Name, i, so.Station, z0, 0, "Elastomeric", "", cBot.XY, ax, pl, round ? pl : pw));
         }
         return (beam, padList, seatList);
     }
