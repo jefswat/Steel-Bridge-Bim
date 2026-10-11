@@ -207,7 +207,15 @@ as "…before bearing iteration.sbm". The run confirmed item 2.3: girder C has n
 - **Close-ups:** `--closeup SUBn@Bridge` uses a station section cut, which is wrong for Ramp G (other alignment). The free `--camera E,N,Z,dx,dy,dz,width[,dist]` often frames poorly; it needs testing.
 - **IfcOpenShell meshing of round-column ties** (Piers 4WB–7WB): those ties come out 2–4× their volume, cause unknown. Spirals and stirrups are fine.
 - **Possible further IFC size cuts:** rebar typed by mark, about −35 MB; coordinates trimmed to 5 decimals, about −12 MB.
-- **Elevation check** (`Checks/ElevationCheck`) doesn't know about as-designed caps yet.
+- ✅ **Elevation check knows the as-designed substructure** (2026-10-11, `Checks/ElevationCheckSubstructure.cs`): every
+  bearing chain continues seat → pedestal (plan size / shared block = highest seat) or abutment beam step → cap top from
+  the `CapProfile` / stepped `CapProfileAhead` polygon → cap bottom → column top (soffit at the nearest column) → flare →
+  footing / shaft → pile head, each row with its source, compared with the generated unit. Shared piers built by the other
+  bridge are found too. Model run: 244/244 chains reach the foundation (was 216 reaching the cap), 0 mismatches (was 18:
+  as-designed abutment steps), 6 REPORTED shared-block seat differences (5WB G6, 5G ×4, 14G; 1/8"-5/16", not adjusted).
+  `samples\plans\check-substructure-chains.csx` reconciles the chain with the plan data: 779 values, 13 flags = the 13
+  known seat / pedestal-height rows of `docs\plan-data\substructure-elevation-check.md` §2.3; substructure elevation check
+  unchanged at 49 flags (Pier 5G overall-dimension misprint still the only closure failure).
 
 ## 4a. To do: column rebar approximations (from `column-rebar.csx`)
 

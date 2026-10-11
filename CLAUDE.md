@@ -170,7 +170,15 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
     The user's PGSuper/BridgeLink tooling lives in `Documents\PGSuper-master\copilot` (agent, MCP) â€” reuse its export.
   - `Checks/ElevationCheck.cs` â€” transparent elevation chains (`CalcStep` rows: profile via `VerticalProfile.Explain`,
     cross slope, slab, haunch, web, flange, sole plate, bearing stack) reconciled against framing + `BearingSeats`.
-    MUST mirror `BearingDetailer` math; tests fail if they drift.
+    MUST mirror `BearingDetailer` math; tests fail if they drift. Below the seat, `Checks/ElevationCheckSubstructure.cs`
+    (`AddSubstructure`) continues the chain: pedestal (plan size / shared block top = highest seat) or as-designed abutment
+    beam step → cap top from the `CapProfile` polygon upper envelope (stepped `CapProfileAhead` on the ahead half, cap
+    section step as an info row) → cap bottom → soffit at the nearest column (= column top) → flare → footing / shaft →
+    pile head. Each row states its input; values are compared with the `SubstructureGenerator` unit (MUST mirror it;
+    `ElevationCheckSubstructureTests`) and exposed as `ElevationChain.Substructure`. Input differences (seats that differ
+    on a shared block, seats beyond the cap, step top vs seat) go to `ElevationChain.Reported` — never adjusted. Shared
+    piers built by another bridge are found via `others` (`SbmDocument.BearingElevations` passes the other bridges' units).
+    Plan reconciliation: `samples\plans\check-substructure-chains.csx`.
   - `Project/RegenerationCache.cs` â€” per-bridge hash cache used by app and API.
   - Steel generator phases: layouts â†’ connections (cross frames, field splices, lateral bracing register bolt holes
     in `_holes` / `_stiffHoles` / `_studExclusions`) â†’ members (girder plates, stiffeners, bearings, studs). Files:

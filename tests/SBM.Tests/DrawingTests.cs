@@ -83,7 +83,9 @@ public class DrawingTests
         var chains = doc.BearingElevations();
         Assert.All(chains, c => Assert.False(c.Mismatch, string.Join("; ", c.Checks)));
         Assert.All(chains, c => Assert.Contains(c.Steps, s => s.Item == "− Pedestal"));
-        Assert.All(chains, c => Assert.Equal("Bottom of cap at CL bearing", c.Steps[^1].Result));
-        Assert.All(chains, c => Assert.Contains(c.Checks, t => t.StartsWith("Pedestal height and cap top match")));
+        Assert.All(chains, c => Assert.Contains(c.Steps, s => s.Result == "Bottom of cap under the bearing"));
+        // ... and on down to the foundation (sample: drilled shafts under the pier columns and the abutment caps).
+        Assert.All(chains, c => Assert.Contains(c.Steps, s => s.Result.StartsWith("Tip of drilled shaft")));
+        Assert.All(chains, c => Assert.Contains(c.Checks, t => t.StartsWith("Substructure chain matches the generated unit")));
     }
 }
