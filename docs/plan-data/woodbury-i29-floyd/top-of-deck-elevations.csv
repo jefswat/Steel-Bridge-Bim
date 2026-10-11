@@ -1,0 +1,217 @@
+line,point,location,elev_ft,source,tag
+CL NB roadway & west edge of deck,1,CL S abut brg,1122.92,PDF p.33 / DS 31,TEXT
+CL NB roadway & west edge of deck,2,span 1,1122.98,PDF p.33 / DS 31,TEXT
+CL NB roadway & west edge of deck,3,span 1,1123.04,PDF p.33 / DS 31,TEXT
+CL NB roadway & west edge of deck,4,span 1,1123.09,PDF p.33 / DS 31,TEXT
+CL NB roadway & west edge of deck,5,span 1,1123.15,PDF p.33 / DS 31,TEXT
+CL NB roadway & west edge of deck,6,span 1,1123.20,PDF p.33 / DS 31,TEXT
+CL NB roadway & west edge of deck,7,CL pier 1 brg (back),1123.24,PDF p.33 / DS 31,TEXT
+CL NB roadway & west edge of deck,8,CL pier 1 brg (ahead),1123.25,PDF p.33 / DS 31,TEXT
+CL NB roadway & west edge of deck,9,span 2,1123.29,PDF p.33 / DS 31,TEXT
+CL NB roadway & west edge of deck,10,span 2,1123.33,PDF p.33 / DS 31,TEXT
+CL NB roadway & west edge of deck,11,span 2,1123.36,PDF p.33 / DS 31,TEXT
+CL NB roadway & west edge of deck,12,span 2,1123.39,PDF p.33 / DS 31,TEXT
+CL NB roadway & west edge of deck,13,span 2,1123.42,PDF p.33 / DS 31,TEXT
+CL NB roadway & west edge of deck,14,span 2,1123.45,PDF p.33 / DS 31,TEXT
+CL NB roadway & west edge of deck,15,span 2,1123.47,PDF p.33 / DS 31,TEXT
+CL NB roadway & west edge of deck,16,span 2,1123.49,PDF p.33 / DS 31,TEXT
+CL NB roadway & west edge of deck,17,span 2,1123.51,PDF p.33 / DS 31,TEXT
+CL NB roadway & west edge of deck,18,span 2,1123.52,PDF p.33 / DS 31,TEXT
+CL NB roadway & west edge of deck,19,span 2,1123.51,PDF p.33 / DS 31,TEXT
+CL NB roadway & west edge of deck,20,CL pier 2 brg (back),1123.49,PDF p.33 / DS 31,TEXT
+CL NB roadway & west edge of deck,21,CL pier 2 brg (ahead),1123.48,PDF p.33 / DS 31,TEXT
+CL NB roadway & west edge of deck,22,span 3,1123.46,PDF p.33 / DS 31,TEXT
+CL NB roadway & west edge of deck,23,span 3,1123.43,PDF p.33 / DS 31,TEXT
+CL NB roadway & west edge of deck,24,span 3,1123.39,PDF p.33 / DS 31,TEXT
+CL NB roadway & west edge of deck,25,span 3,1123.35,PDF p.33 / DS 31,TEXT
+CL NB roadway & west edge of deck,26,span 3,1123.31,PDF p.33 / DS 31,TEXT
+CL NB roadway & west edge of deck,27,CL N abut brg,1123.27,PDF p.33 / DS 31,TEXT
+Beam line D,1,CL S abut brg,1123.00,PDF p.33 / DS 31,TEXT
+Beam line D,2,span 1,1123.07,PDF p.33 / DS 31,TEXT
+Beam line D,3,span 1,1123.13,PDF p.33 / DS 31,TEXT
+Beam line D,4,span 1,1123.19,PDF p.33 / DS 31,TEXT
+Beam line D,5,span 1,1123.25,PDF p.33 / DS 31,TEXT
+Beam line D,6,span 1,1123.30,PDF p.33 / DS 31,TEXT
+Beam line D,7,CL pier 1 brg (back),1123.35,PDF p.33 / DS 31,TEXT
+Beam line D,8,CL pier 1 brg (ahead),1123.36,PDF p.33 / DS 31,TEXT
+Beam line D,9,span 2,1123.39,PDF p.33 / DS 31,TEXT
+Beam line D,10,span 2,1123.43,PDF p.33 / DS 31,TEXT
+Beam line D,11,span 2,1123.46,PDF p.33 / DS 31,TEXT
+Beam line D,12,span 2,1123.49,PDF p.33 / DS 31,TEXT
+Beam line D,13,span 2,1123.52,PDF p.33 / DS 31,TEXT
+Beam line D,14,span 2,1123.55,PDF p.33 / DS 31,TEXT
+Beam line D,15,span 2,1123.58,PDF p.33 / DS 31,TEXT
+Beam line D,16,span 2,1123.60,PDF p.33 / DS 31,TEXT
+Beam line D,17,span 2,1123.63,PDF p.33 / DS 31,TEXT
+Beam line D,18,span 2,1123.65,PDF p.33 / DS 31,TEXT
+Beam line D,19,span 2,1123.64,PDF p.33 / DS 31,TEXT
+Beam line D,20,CL pier 2 brg (back),1123.63,PDF p.33 / DS 31,TEXT
+Beam line D,21,CL pier 2 brg (ahead),1123.62,PDF p.33 / DS 31,TEXT
+Beam line D,22,span 3,1123.59,PDF p.33 / DS 31,TEXT
+Beam line D,23,span 3,1123.55,PDF p.33 / DS 31,TEXT
+Beam line D,24,span 3,1123.52,PDF p.33 / DS 31,TEXT
+Beam line D,25,span 3,1123.48,PDF p.33 / DS 31,TEXT
+Beam line D,26,span 3,1123.44,PDF p.33 / DS 31,TEXT
+Beam line D,27,CL N abut brg,1123.40,PDF p.33 / DS 31,TEXT
+Beam line E,1,CL S abut brg,1123.21,PDF p.33 / DS 31,TEXT
+Beam line E,2,span 1,1123.29,PDF p.33 / DS 31,TEXT
+Beam line E,3,span 1,1123.36,PDF p.33 / DS 31,TEXT
+Beam line E,4,span 1,1123.43,PDF p.33 / DS 31,TEXT
+Beam line E,5,span 1,1123.50,PDF p.33 / DS 31,TEXT
+Beam line E,6,span 1,1123.57,PDF p.33 / DS 31,TEXT
+Beam line E,7,CL pier 1 brg (back),1123.63,PDF p.33 / DS 31,TEXT
+Beam line E,8,CL pier 1 brg (ahead),1123.64,PDF p.33 / DS 31,TEXT
+Beam line E,9,span 2,1123.69,PDF p.33 / DS 31,TEXT
+Beam line E,10,span 2,1123.73,PDF p.33 / DS 31,TEXT
+Beam line E,11,span 2,1123.78,PDF p.33 / DS 31,TEXT
+Beam line E,12,span 2,1123.82,PDF p.33 / DS 31,TEXT
+Beam line E,13,span 2,1123.86,PDF p.33 / DS 31,TEXT
+Beam line E,14,span 2,1123.90,PDF p.33 / DS 31,TEXT
+Beam line E,15,span 2,1123.94,PDF p.33 / DS 31,TEXT
+Beam line E,16,span 2,1123.97,PDF p.33 / DS 31,TEXT
+Beam line E,17,span 2,1124.01,PDF p.33 / DS 31,TEXT
+Beam line E,18,span 2,1124.04,PDF p.33 / DS 31,TEXT
+Beam line E,19,span 2,1124.04,PDF p.33 / DS 31,TEXT
+Beam line E,20,CL pier 2 brg (back),1124.03,PDF p.33 / DS 31,TEXT
+Beam line E,21,CL pier 2 brg (ahead),1124.02,PDF p.33 / DS 31,TEXT
+Beam line E,22,span 3,1123.99,PDF p.33 / DS 31,TEXT
+Beam line E,23,span 3,1123.96,PDF p.33 / DS 31,TEXT
+Beam line E,24,span 3,1123.92,PDF p.33 / DS 31,TEXT
+Beam line E,25,span 3,1123.88,PDF p.33 / DS 31,TEXT
+Beam line E,26,span 3,1123.84,PDF p.33 / DS 31,TEXT
+Beam line E,27,CL N abut brg,1123.80,PDF p.33 / DS 31,TEXT
+Beam line F,1,CL S abut brg,1123.42,PDF p.33 / DS 31,TEXT
+Beam line F,2,span 1,1123.51,PDF p.33 / DS 31,TEXT
+Beam line F,3,span 1,1123.60,PDF p.33 / DS 31,TEXT
+Beam line F,4,span 1,1123.68,PDF p.33 / DS 31,TEXT
+Beam line F,5,span 1,1123.76,PDF p.33 / DS 31,TEXT
+Beam line F,6,span 1,1123.83,PDF p.33 / DS 31,TEXT
+Beam line F,7,CL pier 1 brg (back),1123.91,PDF p.33 / DS 31,TEXT
+Beam line F,8,CL pier 1 brg (ahead),1123.92,PDF p.33 / DS 31,TEXT
+Beam line F,9,span 2,1123.98,PDF p.33 / DS 31,TEXT
+Beam line F,10,span 2,1124.04,PDF p.33 / DS 31,TEXT
+Beam line F,11,span 2,1124.09,PDF p.33 / DS 31,TEXT
+Beam line F,12,span 2,1124.14,PDF p.33 / DS 31,TEXT
+Beam line F,13,span 2,1124.20,PDF p.33 / DS 31,TEXT
+Beam line F,14,span 2,1124.24,PDF p.33 / DS 31,TEXT
+Beam line F,15,span 2,1124.29,PDF p.33 / DS 31,TEXT
+Beam line F,16,span 2,1124.34,PDF p.33 / DS 31,TEXT
+Beam line F,17,span 2,1124.38,PDF p.33 / DS 31,TEXT
+Beam line F,18,span 2,1124.43,PDF p.33 / DS 31,TEXT
+Beam line F,19,span 2,1124.44,PDF p.33 / DS 31,TEXT
+Beam line F,20,CL pier 2 brg (back),1124.43,PDF p.33 / DS 31,TEXT
+Beam line F,21,CL pier 2 brg (ahead),1124.43,PDF p.33 / DS 31,TEXT
+Beam line F,22,span 3,1124.39,PDF p.33 / DS 31,TEXT
+Beam line F,23,span 3,1124.36,PDF p.33 / DS 31,TEXT
+Beam line F,24,span 3,1124.32,PDF p.33 / DS 31,TEXT
+Beam line F,25,span 3,1124.29,PDF p.33 / DS 31,TEXT
+Beam line F,26,span 3,1124.25,PDF p.33 / DS 31,TEXT
+Beam line F,27,CL N abut brg,1124.21,PDF p.33 / DS 31,TEXT
+Beam line G,1,CL S abut brg,1123.62,PDF p.33 / DS 31,TEXT
+Beam line G,2,span 1,1123.72,PDF p.33 / DS 31,TEXT
+Beam line G,3,span 1,1123.82,PDF p.33 / DS 31,TEXT
+Beam line G,4,span 1,1123.92,PDF p.33 / DS 31,TEXT
+Beam line G,5,span 1,1124.01,PDF p.33 / DS 31,TEXT
+Beam line G,6,span 1,1124.10,PDF p.33 / DS 31,TEXT
+Beam line G,7,CL pier 1 brg (back),1124.18,PDF p.33 / DS 31,TEXT
+Beam line G,8,CL pier 1 brg (ahead),1124.20,PDF p.33 / DS 31,TEXT
+Beam line G,9,span 2,1124.27,PDF p.33 / DS 31,TEXT
+Beam line G,10,span 2,1124.34,PDF p.33 / DS 31,TEXT
+Beam line G,11,span 2,1124.40,PDF p.33 / DS 31,TEXT
+Beam line G,12,span 2,1124.46,PDF p.33 / DS 31,TEXT
+Beam line G,13,span 2,1124.52,PDF p.33 / DS 31,TEXT
+Beam line G,14,span 2,1124.59,PDF p.33 / DS 31,TEXT
+Beam line G,15,span 2,1124.64,PDF p.33 / DS 31,TEXT
+Beam line G,16,span 2,1124.70,PDF p.33 / DS 31,TEXT
+Beam line G,17,span 2,1124.76,PDF p.33 / DS 31,TEXT
+Beam line G,18,span 2,1124.81,PDF p.33 / DS 31,TEXT
+Beam line G,19,span 2,1124.84,PDF p.33 / DS 31,TEXT
+Beam line G,20,CL pier 2 brg (back),1124.83,PDF p.33 / DS 31,TEXT
+Beam line G,21,CL pier 2 brg (ahead),1124.83,PDF p.33 / DS 31,TEXT
+Beam line G,22,span 3,1124.80,PDF p.33 / DS 31,TEXT
+Beam line G,23,span 3,1124.76,PDF p.33 / DS 31,TEXT
+Beam line G,24,span 3,1124.73,PDF p.33 / DS 31,TEXT
+Beam line G,25,span 3,1124.69,PDF p.33 / DS 31,TEXT
+Beam line G,26,span 3,1124.65,PDF p.33 / DS 31,TEXT
+Beam line G,27,CL N abut brg,1124.61,PDF p.33 / DS 31,TEXT
+Beam line H,1,CL S abut brg,1123.82,PDF p.33 / DS 31,TEXT
+Beam line H,2,span 1,1123.93,PDF p.33 / DS 31,TEXT
+Beam line H,3,span 1,1124.04,PDF p.33 / DS 31,TEXT
+Beam line H,4,span 1,1124.15,PDF p.33 / DS 31,TEXT
+Beam line H,5,span 1,1124.26,PDF p.33 / DS 31,TEXT
+Beam line H,6,span 1,1124.36,PDF p.33 / DS 31,TEXT
+Beam line H,7,CL pier 1 brg (back),1124.45,PDF p.33 / DS 31,TEXT
+Beam line H,8,CL pier 1 brg (ahead),1124.47,PDF p.33 / DS 31,TEXT
+Beam line H,9,span 2,1124.55,PDF p.33 / DS 31,TEXT
+Beam line H,10,span 2,1124.63,PDF p.33 / DS 31,TEXT
+Beam line H,11,span 2,1124.71,PDF p.33 / DS 31,TEXT
+Beam line H,12,span 2,1124.78,PDF p.33 / DS 31,TEXT
+Beam line H,13,span 2,1124.85,PDF p.33 / DS 31,TEXT
+Beam line H,14,span 2,1124.92,PDF p.33 / DS 31,TEXT
+Beam line H,15,span 2,1124.99,PDF p.33 / DS 31,TEXT
+Beam line H,16,span 2,1125.06,PDF p.33 / DS 31,TEXT
+Beam line H,17,span 2,1125.13,PDF p.33 / DS 31,TEXT
+Beam line H,18,span 2,1125.19,PDF p.33 / DS 31,TEXT
+Beam line H,19,span 2,1125.24,PDF p.33 / DS 31,TEXT
+Beam line H,20,CL pier 2 brg (back),1125.23,PDF p.33 / DS 31,TEXT
+Beam line H,21,CL pier 2 brg (ahead),1125.23,PDF p.33 / DS 31,TEXT
+Beam line H,22,span 3,1125.20,PDF p.33 / DS 31,TEXT
+Beam line H,23,span 3,1125.16,PDF p.33 / DS 31,TEXT
+Beam line H,24,span 3,1125.13,PDF p.33 / DS 31,TEXT
+Beam line H,25,span 3,1125.09,PDF p.33 / DS 31,TEXT
+Beam line H,26,span 3,1125.06,PDF p.33 / DS 31,TEXT
+Beam line H,27,CL N abut brg,1125.02,PDF p.33 / DS 31,TEXT
+East gutter line,1,CL S abut brg,1123.84,PDF p.33 / DS 31,TEXT
+East gutter line,2,span 1,1123.96,PDF p.33 / DS 31,TEXT
+East gutter line,3,span 1,1124.07,PDF p.33 / DS 31,TEXT
+East gutter line,4,span 1,1124.17,PDF p.33 / DS 31,TEXT
+East gutter line,5,span 1,1124.28,PDF p.33 / DS 31,TEXT
+East gutter line,6,span 1,1124.39,PDF p.33 / DS 31,TEXT
+East gutter line,7,CL pier 1 brg (back),1124.48,PDF p.33 / DS 31,TEXT
+East gutter line,8,CL pier 1 brg (ahead),1124.50,PDF p.33 / DS 31,TEXT
+East gutter line,9,span 2,1124.59,PDF p.33 / DS 31,TEXT
+East gutter line,10,span 2,1124.68,PDF p.33 / DS 31,TEXT
+East gutter line,11,span 2,1124.76,PDF p.33 / DS 31,TEXT
+East gutter line,12,span 2,1124.84,PDF p.33 / DS 31,TEXT
+East gutter line,13,span 2,1124.92,PDF p.33 / DS 31,TEXT
+East gutter line,14,span 2,1125.00,PDF p.33 / DS 31,TEXT
+East gutter line,15,span 2,1125.07,PDF p.33 / DS 31,TEXT
+East gutter line,16,span 2,1125.14,PDF p.33 / DS 31,TEXT
+East gutter line,17,span 2,1125.20,PDF p.33 / DS 31,TEXT
+East gutter line,18,span 2,1125.27,PDF p.33 / DS 31,TEXT
+East gutter line,19,span 2,1125.32,PDF p.33 / DS 31,TEXT
+East gutter line,20,CL pier 2 brg (back),1125.31,PDF p.33 / DS 31,TEXT
+East gutter line,21,CL pier 2 brg (ahead),1125.30,PDF p.33 / DS 31,TEXT
+East gutter line,22,span 3,1125.28,PDF p.33 / DS 31,TEXT
+East gutter line,23,span 3,1125.25,PDF p.33 / DS 31,TEXT
+East gutter line,24,span 3,1125.22,PDF p.33 / DS 31,TEXT
+East gutter line,25,span 3,1125.19,PDF p.33 / DS 31,TEXT
+East gutter line,26,span 3,1125.15,PDF p.33 / DS 31,TEXT
+East gutter line,27,CL N abut brg,1125.11,PDF p.33 / DS 31,TEXT
+East edge of deck,1,CL S abut brg,1123.88,PDF p.33 / DS 31,TEXT
+East edge of deck,2,span 1,1124.00,PDF p.33 / DS 31,TEXT
+East edge of deck,3,span 1,1124.11,PDF p.33 / DS 31,TEXT
+East edge of deck,4,span 1,1124.22,PDF p.33 / DS 31,TEXT
+East edge of deck,5,span 1,1124.33,PDF p.33 / DS 31,TEXT
+East edge of deck,6,span 1,1124.43,PDF p.33 / DS 31,TEXT
+East edge of deck,7,CL pier 1 brg (back),1124.53,PDF p.33 / DS 31,TEXT
+East edge of deck,8,CL pier 1 brg (ahead),1124.55,PDF p.33 / DS 31,TEXT
+East edge of deck,9,span 2,1124.64,PDF p.33 / DS 31,TEXT
+East edge of deck,10,span 2,1124.74,PDF p.33 / DS 31,TEXT
+East edge of deck,11,span 2,1124.82,PDF p.33 / DS 31,TEXT
+East edge of deck,12,span 2,1124.90,PDF p.33 / DS 31,TEXT
+East edge of deck,13,span 2,1124.98,PDF p.33 / DS 31,TEXT
+East edge of deck,14,span 2,1125.06,PDF p.33 / DS 31,TEXT
+East edge of deck,15,span 2,1125.13,PDF p.33 / DS 31,TEXT
+East edge of deck,16,span 2,1125.21,PDF p.33 / DS 31,TEXT
+East edge of deck,17,span 2,1125.28,PDF p.33 / DS 31,TEXT
+East edge of deck,18,span 2,1125.35,PDF p.33 / DS 31,TEXT
+East edge of deck,19,span 2,1125.40,PDF p.33 / DS 31,TEXT
+East edge of deck,20,CL pier 2 brg (back),1125.39,PDF p.33 / DS 31,TEXT
+East edge of deck,21,CL pier 2 brg (ahead),1125.38,PDF p.33 / DS 31,TEXT
+East edge of deck,22,span 3,1125.36,PDF p.33 / DS 31,TEXT
+East edge of deck,23,span 3,1125.33,PDF p.33 / DS 31,TEXT
+East edge of deck,24,span 3,1125.30,PDF p.33 / DS 31,TEXT
+East edge of deck,25,span 3,1125.27,PDF p.33 / DS 31,TEXT
+East edge of deck,26,span 3,1125.23,PDF p.33 / DS 31,TEXT
+East edge of deck,27,CL N abut brg,1125.19,PDF p.33 / DS 31,TEXT
