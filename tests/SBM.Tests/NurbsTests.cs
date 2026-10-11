@@ -1,4 +1,7 @@
+using SBM.Core.Framing;
 using SBM.Core.Geometry;
+using SBM.Core.Project;
+using SBM.Core.Steel;
 using SBM.Core.Geometry.Nurbs;
 using SBM.Core.Solids;
 using Xunit;
@@ -191,5 +194,80 @@ public class NurbsTests
             Assert.InRange(p.Z, -1e-6, 0.04 + 1e-6);
         }
         Assert.Equal(4, loops.Count);   // one segment per side face
+    }
+
+    [Fact]
+    public void Setting_DefaultOff_IsNotWrittenToTheProjectFile_AndRoundTrips()
+    {
+        var p = SampleProject.Create();
+        Assert.False(p.Geometry.ExactCurvedGeometry);
+        Assert.DoesNotContain("\"Geometry\"", p.ToJson());
+        p.Geometry.ExactCurvedGeometry = true;
+        p.Geometry.ChordTolerance = 0.002;
+        var q = BridgeProject.FromJson(p.ToJson());
+        Assert.True(q.Geometry.ExactCurvedGeometry);
+        Assert.Equal(0.002, q.Geometry.ChordTolerance);
+        Assert.Null(GeometrySettings.Active(SampleProject.Create()));
+    }
+
+    [Fact]
+    public void SampleBridge_ExactGeometry_SameMeshLayout_ExactVolumesClose()
+    {
+        var p = SampleProject.Create();
+        var f = FramingGenerator.Generate(p.Bridges[0], p.Alignments[0]);
+        var off = SteelModelGenerator.Generate(f, p.Units);
+        Assert.Null(off.Nurbs);
+        Assert.All(off.Parts, x => Assert.Null(x.Mesh.Nurbs));
+        var on = SteelModelGenerator.Generate(f, p.Units, new GeometrySettings { ExactCurvedGeometry = true });
+        Assert.NotNull(on.Nurbs);
+        Assert.Empty(on.Nurbs!.Fallbacks);
+        var curved = on.Parts.Where(x => x.Mesh.Nurbs != null).ToList();
+        Assert.Contains(curved, x => x.Category == PartCategory.FlangePlate);
+        Assert.Contains(curved, x => x.Category == PartCategory.WebPlate);
+        Assert.True(on.Nurbs.MaxDeviation <= 0.0254 / 256 + 1e-12);
+        var offByMark = off.Parts.ToDictionary(x => x.Mark);
+        foreach (var part in curved)
+        {
+            var o = offByMark[part.Mark];
+            // default chord tolerance = today's density: same vertex / triangle layout, vertices moved by at most the fit tolerance + chord
+            Assert.Equal(o.Mesh.Positions.Count, part.Mesh.Positions.Count);
+            Assert.Equal(o.Mesh.TriangleCount, part.Mesh.TriangleCount);
+            Assert.True(part.Mesh.HasExactNurbs);
+            double exact = part.ExactVolume!.Value;
+            Assert.InRange(Math.Abs(part.Volume / exact - 1), 0, 2e-3);
+            Assert.InRange(Math.Abs(o.Volume / exact - 1), 0, 2e-3);
+            // B-rep: 4 sides + 2 ends + 2 half-cylinder walls per hole; holes trim both t faces
+            var s = part.Mesh.Nurbs![0];
+            int holes = s.Faces.Sum(fc => fc.Holes.Count) / 2;
+            Assert.Equal(6 + 2 * holes, s.Faces.Count);
+        }
+    }
+
+    [Fact]
+    public void SampleDeck_ExactGeometry()
+    {
+        var p = SampleProject.Create();
+        var f = FramingGenerator.Generate(p.Bridges[0], p.Alignments[0]);
+        var off = SBM.Core.Concrete.ConcreteGenerator.Generate(f, p.Units);
+        var on = SBM.Core.Concrete.ConcreteGenerator.Generate(f, p.Units, new GeometrySettings { ExactCurvedGeometry = true });
+        Assert.Empty(on.Nurbs!.Fallbacks);
+        Assert.NotNull(on.Deck!.Nurbs);
+        double exact = on.Deck.ExactVolume()!.Value;
+        Assert.InRange(Math.Abs(off.DeckVolume / exact - 1), 0, 1e-3);
+        foreach (var (_, b) in on.Barriers) Assert.InRange(Math.Abs(Math.Abs(b.Volume()) / b.ExactVolume()!.Value - 1), 0, 1e-3);
+        // a radial section through the deck: points on the exact top / bottom surfaces
+        var a = p.Alignments[0];
+        var (pt, ang) = a.EvaluateAtDistance((f.Deck!.Outline.Select(q => a.Inverse(q.XY).Distance).Min() + f.Deck.Outline.Select(q => a.Inverse(q.XY).Distance).Max()) / 2);
+        var n = Vec2.FromAngle(ang);
+        var cut = NurbsSection.Cut(on.Deck.Nurbs![0], pt.WithZ(0), new Vec3(n.X, n.Y, 0));
+        Assert.NotEmpty(cut);
+        foreach (var pnt in cut.SelectMany(c => c))
+        {
+            var so = a.Inverse(pnt.XY);
+            double top = p.Bridges[0].Deck.FinishedElevation(a, so.Station, so.Offset);
+            double dz = Math.Min(Math.Abs(pnt.Z - top), Math.Abs(pnt.Z - (top - p.Bridges[0].Deck.Thickness)));
+            if (dz > 1e-3) Assert.InRange(pnt.Z, top - p.Bridges[0].Deck.Thickness - 1e-3, top + 1e-3);   // side / end faces: between
+            else Assert.True(dz < 1.5e-4, $"section point {dz * 1000:0.###} mm off the exact deck surface");
+        }
     }
 }

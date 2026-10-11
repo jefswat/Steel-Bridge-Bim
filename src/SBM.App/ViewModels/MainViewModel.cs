@@ -86,6 +86,7 @@ public sealed partial class MainViewModel : ObservableObject
     [ObservableProperty] private string _statusText = "Ready";
     [ObservableProperty] private string _cursorText = "";
     [ObservableProperty] private string _unitsText = "US (ft)";
+    [ObservableProperty] private string _exactGeometryText = "Exact curves: Off";
     [ObservableProperty] private bool _isBusy;
     [ObservableProperty] private ExplorerNode? _selectedNode;
     [ObservableProperty] private string _windowTitle = "Steel Bridge Modeler";
@@ -288,6 +289,7 @@ public sealed partial class MainViewModel : ObservableObject
         _undo.Clear();
         _redo.Clear();
         UnitsText = Units.IsUS ? "US (ft)" : "SI (m)";
+        ExactGeometryText = p.Geometry.ExactCurvedGeometry ? "Exact curves: On" : "Exact curves: Off";
         UndoCommand.NotifyCanExecuteChanged();
         RedoCommand.NotifyCanExecuteChanged();
         UpdateTitle();
@@ -461,6 +463,16 @@ public sealed partial class MainViewModel : ObservableObject
         Checkpoint();
         Units.Kind = Units.IsUS ? UnitSystemKind.SI : UnitSystemKind.US;
         UnitsText = Units.IsUS ? "US (ft)" : "SI (m)";
+        _ = RegenerateAsync(false);
+    }
+
+    /// <summary>Project setting Geometry.ExactCurvedGeometry: curved parts as exact NURBS, meshes tessellated from them.</summary>
+    [RelayCommand]
+    private void ToggleExactGeometry()
+    {
+        Checkpoint();
+        _project.Geometry.ExactCurvedGeometry = !_project.Geometry.ExactCurvedGeometry;
+        ExactGeometryText = _project.Geometry.ExactCurvedGeometry ? "Exact curves: On" : "Exact curves: Off";
         _ = RegenerateAsync(false);
     }
 
