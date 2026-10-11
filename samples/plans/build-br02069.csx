@@ -1,0 +1,262 @@
+// MnDOT Br. 02069 - T.H. 65 S.B. over 117th Ave (S.P. 0208-02069, certified plans 9/26/2025, 39 sheets; PDF page = sheet).
+// Single span 99'-3" CL-CL bearing, seven MnDOT 30MH pretensioned beams @ 6'-0", 9" CIP slab 41'-0" o-o, 0 deg skew,
+// pile-supported abutments behind MSE walls. Builds the model FROM SCRATCH (re-runnable; replaces the alignment and bridge):
+//   sbm new  "samples\plans\Br02069 TH65.sbm"
+//   sbm run  "samples\plans\build-br02069.csx" "samples\plans\Br02069 TH65.sbm"        (run from the repo root)
+// Data: docs/plan-data/br02069-th65/SUMMARY.md + CSVs (strands-30MH-B1.csv, seat-elevations.csv, working-points.csv).
+// Check: samples/plans/check-br02069.csx. Results / GAP list: docs/plan-data/br02069-th65/MODEL.md.
+//
+// Rules (user): model the plans; nothing unstated is invented - UNRESOLVED items are printed with their PDF page; where the
+// program has no input for a plan feature the closest existing input is used and the line is marked "// GAP: ...".
+// Plan precision 1/16" and 0.01 ft.
+//
+// HORIZONTAL DATUM (U1): the plans do not state it (p34/p36/p37). The plan X/Y (easting/northing, ft) are used as a LOCAL GRID.
+// Feet: the project's default (international) foot is used for every value, plan coordinates included, so all plan
+// distances and elevations are reproduced exactly; no geodetic meaning is attached to the coordinates.
+using System.IO;
+using SBM.Core.Alignments;
+using SBM.Core.Bridge;
+using SBM.Core.Geometry;
+using SBM.Core.Prestressed;
+
+double F(double ft, double inch = 0) => Ft(ft) + In(inch);
+var unresolved = new List<string>();
+var gaps = new List<string>();
+void U(string s) => unresolved.Add(s);
+void G(string s) => gaps.Add(s);
+
+string DataDir()
+{
+    for (var d = new DirectoryInfo(Environment.CurrentDirectory); d != null; d = d.Parent)
+    {
+        var p = Path.Combine(d.FullName, "docs", "plan-data", "br02069-th65");
+        if (Directory.Exists(p)) return p;
+    }
+    throw new DirectoryNotFoundException("docs/plan-data/br02069-th65 not found above the current directory - run from the repo.");
+}
+string dataDir = DataDir();
+List<string[]> Csv(string name) => File.ReadAllLines(Path.Combine(dataDir, name)).Skip(1).Where(l => l.Trim().Length > 0)
+    .Select(l => l.Split(',').Select(x => x.Trim()).ToArray()).ToList();   // no field of these CSVs contains a comma (inch marks are not quotes)
+
+// ================================================================ 1. SB65 alignment (p36 Alignment Tabulation 1, p1)
+// Region R7 tangent: POT 208+26.273 R7 (pt 1074, X 508139.723, Y 149812.027) -> PC 261+56.990 R7 (pt 1075, X 508208.766,
+// Y 155142.296), azimuth 0 deg 44'31.598". The last SB65 equation (208+26.909 R6 BK = 208+26.273 R7 AH, p36) is at the POT,
+// so the whole bridge (248+32.92 .. 249+35.83) lies in region R7 on this tangent; the model alignment starts at that equation
+// and carries R7 stations only (regions R1..R6 are off the bridge and not modeled). The next curve (HPI 264+63.237,
+// R 90000, PC 261+56.990) starts beyond the bridge and is not needed.
+const string AlName = "SB65";
+Doc.Project.Alignments.RemoveAll(a => a.Name == AlName);
+var al = Doc.AddAlignment(AlName, Sta("208+26.273"), new[]
+{
+    new PiRow(Ft(149812.027), Ft(508139.723)),
+    new PiRow(Ft(155142.296), Ft(508208.766)),
+});
+al.Description = "SB65 working line, region R7 tangent (Br. 02069 p36); local grid X/Y - horizontal datum not stated (U1)";
+{
+    double len = (al.PointAt(Sta("261+56.990")) - al.PointAt(Sta("208+26.273"))).Length;
+    var pc = al.PointAt(Sta("261+56.990"));
+    Print($"SB65 tangent: length {len / Ft(1):F3} ft (plan stations 5330.717), PC misfit dX {(pc.X - Ft(508208.766)) / Ft(1):+0.000;-0.000} dY {(pc.Y - Ft(155142.296)) / Ft(1):+0.000;-0.000} ft");
+    double az = Math.Atan2(pc.X - Ft(508139.723), pc.Y - Ft(149812.027)) * 180 / Math.PI;
+    int dd = (int)az; double mm = (az - dd) * 60; double ss = (mm - (int)mm) * 60;
+    Print($"SB65 azimuth {dd} deg {(int)mm}' {ss:F3}\" (plan 0 deg 44' 31.598\")");
+}
+// Profile (p1, p34): crest VC, VPC 242+75.000 EL 920.329, VPI 249+00.000 EL 935.954, VPT 255+25.000 EL 920.329,
+// G1 +2.500 %, G2 -2.500 %, L = 1250.000'. The begin / end points carry the plan grades to the alignment ends.
+double vpi = Sta("249+00.000"), zVpi = Ft(935.954);
+double s0 = al.StartStation, s1 = al.EndStation;
+al.Profile = new VerticalProfile
+{
+    Vpis =
+    {
+        new Vpi(s0, zVpi - 0.025 * (vpi - s0)),
+        new Vpi(vpi, zVpi, Ft(1250)),
+        new Vpi(s1, zVpi - 0.025 * (s1 - vpi)),
+    },
+};
+Print($"Profile: VPC 242+75 EL {al.Profile.ElevationAt(Sta("242+75")) / Ft(1):F3} (plan 920.329), VPT 255+25 EL {al.Profile.ElevationAt(Sta("255+25")) / Ft(1):F3} (plan 920.329)");
+// Cross slope (p2, p19): crown at the working line, -0.02 ft/ft both sides, constant; no superelevation on the bridge.
+al.CrossSlope = new CrossSlopeTable { PivotOffset = 0, Rows = { new CrossSlopeRow(s0, -0.02, -0.02) } };
+
+// ================================================================ 2. bridge, supports, girders, deck (p1, p2, p3, p15)
+const string BrName = "Br02069 TH65 SB";
+Doc.Project.Bridges.RemoveAll(x => x.Name == BrName);
+var b = new BridgeDefinition { Name = BrName, AlignmentName = AlName, Structure = "Br. 02069 (T.H. 65 S.B. over 117th Ave)" };
+b.FieldSplices.Clear();
+b.Studs.Enabled = false;
+// Supports: CL brg S abut 248+34.75, N abut 249+34.00 (p1, p3, p15), skew 0 both; end of slab 1'-10" from CL brg (p1, p18).
+// Bearings (p15, p31): 7 F1 fixed (B310) at the S abutment, 7 E1 expansion (B311) at the N abutment.
+SupportDefinition Abut(string name, string sta, BearingFixity fix) => new()
+{
+    Name = name, Type = SupportType.Abutment, Station = Sta(sta), SkewDegrees = 0, DeckEndOffset = F(1, 10),
+    GirderEndExtension = In(7.5), Fixity = fix,
+};
+b.Supports.Add(Abut("South Abutment", "248+34.75", BearingFixity.Fixed));
+b.Supports.Add(Abut("North Abutment", "249+34.00", BearingFixity.Expansion));
+
+// Girders: 7 lines, 6 @ 6'-0" = 36'-0", offsets -21, -15, -9, -3, +3, +9, +15 from the working line (+ = right / east) (p3, p15).
+b.Girders.Count = 7;
+b.Girders.FirstGirderOffset = -Ft(21);
+b.Girders.Spacings = Enumerable.Repeat(Ft(6), 6).ToList();
+b.Girders.Kind = GirderKind.TxDotPrestressed;
+
+// Deck (p1, p2, p18, p19): 41'-0" out to out, edges -23.50 / +17.50 (1'-6" + 22'-0" W of WL, 16'-0" + 1'-6" E), 9" slab,
+// stool (haunch) 4 1/4" at the CL bearings (p3 roadway-to-seat chain 9 + 4 1/4 + 30 + bearing).
+b.Deck.LeftEdgeOffset = -Ft(23.5);
+b.Deck.RightEdgeOffset = Ft(17.5);
+b.Deck.Thickness = In(9);
+b.Deck.OverhangThickness = In(9);
+b.Deck.Haunch = In(4.25);
+// GAP: no camber in the prestressed model (SUMMARY gap 10): the stool is constant 4 1/4" along the beam (plan value at CL brg only;
+//      erection camber 7 3/8", residual 2 1/8" int / 2 1/4" ext, p16 - camber shape U10).
+G("Prestressed camber / variable stool: the beams are straight, stool 4 1/4\" constant (plan value at CL brg only); camber 7 3/8\" erection, residual 2 1/8\"/2 1/4\" (p16, U10) not modeled. Needs: prestressed camber in the haunch (GirderLayoutDefinition.Camber for prestressed).");
+// Deck reinforcing: the plan bar list (S401M-S404M..., p18/p19/p21) is not entered; the generic generator would invent bars -> off.
+b.Deck.Reinforcement.Enabled = false;
+G("Deck reinforcing: generic deck bars switched off; plan bars S401M-S404M etc. (p18, p19, p21; U4 line counts) need a DeckPlanReinforcement for this deck (data entry, no new feature).");
+
+// Barriers (p1, p2, p24): MnDOT Concrete Barrier 36" Type S, 1'-6" wide at the base, both edges.
+// GAP: only TxDOT SSTR / F-shape / single-slope profiles exist; Type S is modeled as the generic single slope (vertical back face,
+//      sloped traffic face) 36" high x 1'-6" base. The top width and the face geometry of Fig. 5-397.138(A) are not read (p24) ->
+//      the program default top width is kept and flagged.
+b.Deck.Barrier.Type = BarrierType.SingleSlope;
+b.Deck.Barrier.Height = In(36);
+b.Deck.Barrier.BaseWidth = In(18);
+b.Deck.Barrier.Reinforcement = false;            // R-bars (p24 bill) not modeled; SSTR bars would be invented
+G($"Barrier: MnDOT Type S 36\" profile not in BarrierProfiles - modeled as SingleSlope 36\" x 1'-6\" base, top width = program default {b.Deck.Barrier.TopWidth / In(1):0.##}\" (not read, p24); barrier bars R501M..R612M (p24) not modeled. Needs: MnDOT Type S barrier profile + plan barrier bars.");
+U("Barrier Type S top width / traffic-face breaks not read from Fig. 5-397.138(A) (p24).");
+
+// ================================================================ 3. prestressed beams (p16 30MH-101, Beam B1)
+// MnDOT 30MH: H 30", top flange 2'-10", bottom flange 3'-3", web 6 1/2". Verticals top down 5", 1 5/8", 1'-0 7/16", 5 7/16", 5 1/2";
+// top flange from the web face: 5 5/16" taper + 8 7/16" flat to the edge; bottom flange from the web face 4 1/8" + 10 3/4" + 1 3/8".
+// GAP: no MnDOT shapes in the catalog (another branch adds them; switch to the catalog 30MH when it lands). Custom PGSuper-style
+//      dims approximate the outline: straight segments only (6" R web fillets, 1" R / 2" R corners not modeled), bottom flange taper
+//      taken from the 4 1/8" point straight to the outer edge top (the 1 3/8" flat at the edge is folded into the taper, the 4 1/8"
+//      ledge next to the web is level). Depth, widths, web and all printed verticals are kept.
+var mh30 = PrecastIBeamDims.Inches("MnDOT 30MH (approx.)",
+    d1: 5, d2: 1.625, d3: 0, d4: 0, d5: 5.4375, d6: 5.5, h: 30,
+    t1: 6.5, t2: 6.5, w1: 8.4375, w2: 5.3125, w3: 0, w4: 4.125, w5: 10.75 + 1.375, c1: 0.75);
+G("30MH section: TxGirderType.Custom with PrecastIBeamDims approximating MnDOT 30MH (no fillets / round corners; bottom flange 1 3/8\" edge flat folded into the taper). Needs: MnDOT 30MH in the beam catalog (in progress on another branch).");
+var strands = new List<StrandPoint>();
+int debonded = 0;
+foreach (var r in Csv("strands-30MH-B1.csv"))
+{
+    strands.Add(new StrandPoint { X = In(double.Parse(r[2])), Y = In(double.Parse(r[3])), YEnd = In(double.Parse(r[3])), Harped = false });
+    if (r[4].Length > 0) debonded++;
+}
+b.Girders.Prestressed = new PrestressedBeamDefinition
+{
+    Type = TxGirderType.Custom,
+    CustomSection = mh30,
+    StrandLayout = strands,                // 44 x 0.6" straight: 18 @ 2", 18 @ 4", 8 @ 6" (2" grid), strands-30MH-B1.csv
+    StrandCount = strands.Count,
+    StrandDiameter = In(0.6),
+    StrandStrength = 300,                  // Gr 300 low relaxation (p16)
+    ConcreteStrength = 9.5, ReleaseStrength = 8.0,   // f'c 9.5, f'ci 8.0 ksi (p16)
+    BearingToEnd = In(7.5),                // 7 1/2" end of beam to CL brg (p16); 100'-6" o-o = 99'-3" + 2 x 7 1/2"
+    // GAP: no curved-plate bearing assemblies (B310 / B311, p31). The bearing is a pad of the plan pad plan size 12" x 30" with the
+    //      thickness = the plan bearing height L at the SOUTH abutment (3 1/4" = 1/2" pad + 1 1/4" curved plate + 1 1/2" brg plate).
+    //      One pad thickness per bridge: the NORTH bearing L = 6 1/2" (E1) cannot be entered -> N bearing seats 3 1/4" high (check).
+    PadLength = In(12), PadWidth = In(30), PadThickness = In(3.25),
+};
+Print($"Strands: {strands.Count} (plan 44), debonded {debonded} (plan 14, not modeled)");
+G($"Debonding: {debonded} of 44 strands debonded (A 4 @ 9'-0\", B 6 @ 13'-0\", C 4 @ 17'-0\", p16) - StrandPoint has no debond length; strands run full length. Needs: debonding on StrandPoint (in progress on another branch).");
+G("Bearings: MnDOT curved-plate bearings F1 (B310, fixed, L 3 1/4\") / E1 (B311, expansion, L 6 1/2\") (p31) - only a plain pad (12\" x 30\") with ONE thickness per bridge exists; 3 1/4\" used, so the North seats are 3 1/4\" too high. Needs: per-support prestressed bearing height / curved-plate bearing assembly.");
+G("Sole plate B303 (p16, p30; dims U6) not modeled. Needs: sole plate for prestressed beams.");
+G("Concrete end diaphragms at both abutments (p15, p17, p20, p21; dims U2) not modeled. Needs: concrete end diaphragm / semi-integral abutment element.");
+G("Optional top strands 2 x 1/2\" (p16) and beam bars G301E..G806E, stirrups (p16) not modeled. Needs: prestressed beam mild reinforcing.");
+
+// ================================================================ 4. abutments (p4, p5, p9, p10, p11)
+// Section (p11 A-A, p4/p9): footing 6'-0" x 3'-0", bottom EL 917.75, back face 3'-3" behind CL brg, front 2'-9" ahead; stem 4'-0"
+// (back toe 9", front toe 1'-3") = back ledge 1'-6" + seat 2'-6" (1'-0" behind CL brg, 1'-6" ahead). Back ledge S 922.35 / N 922.15
+// (footing -> ledge 1'-7 1/4" / 1'-4 3/4"); seat front S 923.27 / N 923.06 (p5, p10), seat slopes 1" to the front; infill wall 1'-6"
+// on the back ledge, top S 927.73 / N 927.80; pedestals 2'-6" along the beam on the seat.
+// Mapping onto the Iowa-type AbutmentDefinition (backwall + footing + beam steps):
+//   backwall           = infill wall on the back ledge, 1'-6" thick, front face 1'-0" behind CL brg;
+//   footing keyed zone = stem back ledge: BackwallBaseAboveFootingBottom = ledge - footing bottom;
+//   wash               = stem / seat in front of the infill wall: FootingDepth + WashHeight = seat front - footing bottom;
+//   beam steps         = pedestals, 2'-6" (CL brg -1'-0" .. +1'-6") x plan size along the abutment.
+// GAP: the wash runs to the FOOTING front, so the 1'-3" front toe is built up to the seat (plan: footing top 920.75 in front of the
+//      stem face at +1'-6"); the 1" seat slope is level at the seat-front elevation.
+// GAP: the generator always builds a corbel / paving notch and three backwall pours; the MnDOT infill wall has none -> the corbel is
+//      set to zero size (CorbelProjection/Vertical/Taper = 0) and the pour joints are only solid splits.
+G("Abutment stem: AbutmentDefinition has no stem face set back from the footing front - the 1'-3\" front toe is built to the seat elevation (p11 A-A); seat 1\" slope (p11) built level at the seat-front elevation. Needs: MnDOT stem/seat/ledge section for AbutmentDefinition.");
+G("Abutment infill wall: AbutmentDefinition always builds a corbel and three backwall pours (Iowa); set to zero size here. Needs: optional corbel / plain wall.");
+G("Future pedestals: 3 future Type B pedestals per abutment at +21/+27/+33 (p5, p10) not built - beam steps are created only under bearings. Needs: standalone (future) pedestals.");
+G("Pile type: 12\" CIP pipe piles 1/4\" shell (p4, p9, p29) modeled as 12\" square precast concrete piles (closest PileType). Needs: round CIP pipe pile type.");
+G("Test piles: one test pile per abutment longer (S 105 vs 95 ft, N 100 vs 90 ft, back row, p4/p9) - one PileLength per abutment; contract lengths used. Needs: per-pile length.");
+G("Abutment reinforcing (bar-lists.csv A/B series, p6-p8, p12-p14; bend diagrams U3) not entered; the Iowa abutment rebar generator would invent placements -> substructure reinforcement off. Needs: plan bar data for a MnDOT abutment.");
+U("Mask walls: east-end and corner extents not dimensioned (U9, p3/p5/p10/p11) - only the west mask wall (MSE Ret. Wall 20 / 23 tie-ins, p1) is built.");
+U("Pile tip elevations not given (U8, p4/p9) - piles hang the contract length from the head.");
+U("End diaphragm geometry (U2, p17/p20/p21); pedestal Type A/B details (U7, p6); bend dimensions (U3).");
+
+var seatRows = Csv("seat-elevations.csv");
+void SetAbutment(SupportDefinition sup, string side, double ledge, double seatFront, double infillTop, double maskTop, double pedAlong, double pileLen, string pages)
+{
+    var ad = new AbutmentDefinition
+    {
+        Source = $"MnDOT Br. 02069 {sup.Name}, {pages}",
+        LeftEndOffset = -F(23, 7), RightEndOffset = Ft(36),            // 59'-7" footing, -23.58 to +36.00 (future widening, p2/p5/p10)
+        PlanFootingWidth = Ft(6),
+        BackwallThickness = F(1, 6), BackwallFrontToBearing = Ft(1), FootingBackToBackwallBack = In(9), BearingToFootingFront = F(2, 9),
+        FootingDepth = Ft(3),
+        BackwallBaseAboveFootingBottom = Ft(ledge) - Ft(917.75),       // back ledge
+        WashHeight = Ft(seatFront) - Ft(917.75) - Ft(3),               // seat front above the footing top
+        BearingToStepFront = F(1, 6),                                  // pedestal 2'-6" along the beam (seat -1'-0" .. +1'-6")
+        StepLength = pedAlong,
+        // zero-size corbel (see GAP above); the device-pour split = the top 1'-6" of the infill wall, joint 1'-6" + 0
+        CorbelProjection = 0, CorbelVertical = 0, CorbelTaperRise = 0, LedgeBelowTop = F(1, 6), JointBelowTaper = 0,
+        PileBackRowToBearing = F(1, 9), PileFrontRowToBearing = F(1, 3),  // 2 rows: 1'-9" behind, 1'-3" ahead of CL brg (p4, p9, p11)
+        PileTopAboveFootingBottom = Ft(1),                              // 1'-0" embedment
+        PileLength = Ft(pileLen),
+    };
+    ad.FootingBottom.Add(new CapProfilePoint(0, Ft(917.75)));
+    ad.BackwallTop.Add(new CapProfilePoint(0, Ft(infillTop)));
+    // West mask wall 1'-5 1/2" (p11), top as printed; Height is measured from the seat (wash) level of the model.
+    ad.Masks.Add(new MaskwallDefinition { End = AbutmentEnd.Left, Thickness = In(17.5), Height = Ft(maskTop) - Ft(seatFront), Setback = 0 });
+    // Piles: 7 per row @ 9'-5", 1'-6" from the W end (1'-7" E) (p4, p9). Skew 0 on a tangent: S along the line = alignment offset.
+    for (int k = 0; k < 7; k++) ad.PileStations.Add(-F(23, 7) + F(1, 6) + k * F(9, 5));
+    // Pedestal (beam step) tops = plan pedestal elevations (seat-elevations.csv) for the 7 beam lines G1 (-21) .. G7 (+15).
+    for (int g = 0; g < 7; g++)
+    {
+        double off = -21 + 6 * g;
+        var row = seatRows.First(r => r[0] == side && Math.Abs(double.Parse(r[3]) - off) < 1e-6);
+        ad.Steps.Add(new AbutmentStepDefinition(g + 1, Ft(double.Parse(row[5]))));
+    }
+    var sd = SubstructureDefinition.Default(SupportType.Abutment);
+    sd.Abutment = ad;
+    sd.PileType = PileType.PrecastConcrete; sd.PileSize = In(12);  // GAP: 12" CIP pipe pile
+    sd.Reinforcement.Enabled = false;                                // GAP: abutment bars not entered
+    sd.BackwallGap = Ft(1) - F(1, 10);                               // deck end 1'-10" vs infill face 1'-0": end diaphragm zone (no gap) -> report only
+    sup.Substructure = sd;
+}
+// S: ledge 922.35, seat front 923.27, infill 927.73, mask top 930.61, pedestals 4'-8" along the abutment, piles 95 ft (13 + test 105)
+SetAbutment(b.Supports[0], "S", 922.35, 923.27, 927.73, 930.61, F(4, 8), 95, "p4, p5, p11");
+// N: ledge 922.15, seat front 923.06, infill 927.80, mask top 930.67, pedestals 3'-6", piles 90 ft (13 + test 100)
+SetAbutment(b.Supports[1], "N", 922.15, 923.06, 927.80, 930.67, F(3, 6), 90, "p9, p10, p11");
+U("Deck end 1'-10\" from CL brg is 10\" BEYOND the infill wall face (1'-0\" behind CL brg): the slab end sits over the end diaphragm / infill wall (semi-integral, p18/p20); the model reports the overlap only.");
+
+Doc.Project.Bridges.Add(b);
+
+// ================================================================ regenerate, report, save
+var res = Doc.Regenerate();
+Print($"Regenerated {res.Bridges} bridge(s), {res.Errors.Count} errors, {res.Warnings.Count} warnings.");
+foreach (var e in res.Errors) Print("  ERROR " + e);
+foreach (var w in res.Warnings) Print("  WARN  " + w);
+var fr = Doc.Framing(BrName);
+var ps = Doc.Prestressed(BrName);
+Print($"Beams: {ps.Beams.Count} x {ps.Shape.Name}, length {ps.Beams[0].Length / Ft(1):F3} ft (plan 100.500), bearing span {ps.Beams[0].BearingSpan / Ft(1):F3} ft (plan 99.250), area {ps.Shape.Area:F1} in2");
+Print($"Deck area {fr.Deck!.Area / (Ft(1) * Ft(1)):F1} SF (plan SOQ 4220 SF)");
+var sub = Doc.Substructure(BrName);
+foreach (var u in sub.Units)
+{
+    Print($"== {u.Name}");
+    foreach (var g in u.Solids.GroupBy(s => s.Kind)) Print($"  {g.Key}: {g.Count()} solids, {g.Sum(s => Math.Abs(s.Mesh.Volume())) / 0.764554857984:F1} CY");
+    Print($"  piles: {u.Foundations.Sum(f => f.Piles.Count)}");
+}
+foreach (var d in sub.Diagnostics) Print($"  SUB {d.Severity}: {d.Message}");
+Print("");
+Print("UNRESOLVED (plan items not stated / not read):");
+foreach (var s in unresolved) Print("  UNRESOLVED " + s);
+Print("GAPS (program features missing; closest input used):");
+foreach (var s in gaps) Print("  GAP " + s);
+Doc.Save();
+Print($"Saved {Doc.FilePath}");
