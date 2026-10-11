@@ -1,0 +1,58 @@
+unit,mark,shape,dims_path_order,other_printed_dims,pin_dia_in,listed_length,sum_of_path_dims,check,page,tag,note
+Pier 1 & 2,10a1,U with splayed legs (cap top longit.),4'-6 ; 41'-3 ; 4'-6,legs vertical 4'-5 15/16; leg toe inset 2 1/2 at each end,10 3/4,50'-3,50'-3,OK,PDF p.12 / DS 10,RASTER,
+Pier 1 & 2,5c1,"closed hoop, 6 in hooks at one corner",6 ; 4'-8 ; 3'-0 ; 4'-8 ; 3'-0 ; 6,,2 1/2,16'-4,16'-4,OK,PDF p.12 / DS 10,RASTER,
+Pier 1 & 2,4c2,U,4 1/2 ; 3'-10 ; 4 1/2,,2,4'-7,4'-7,OK,PDF p.12 / DS 10,RASTER,
+Pier 1 & 2,5c3,U,1'-6 ; 3'-9 ; 1'-6,,2 1/2,6'-9,6'-9,OK,PDF p.12 / DS 10,RASTER,
+Pier 1 & 2,5c4,U,8 ; 2'-6 ; 8,,2 1/2,3'-10,3'-10,OK,PDF p.12 / DS 10,RASTER,
+Pier 1 & 2,5c5,"tapered closed hoop (maskwall), round end D=3",6 (hook) ; 1'-0 ; 3'-9 ; 3'-10 ; 6 (hook),3'-6 3/4 top straight to start of round end; 3'-8 bottom straight; 4 3/8 arc of round end,"2 1/2 (corners), 3 (round end)",9'-11,9'-7,NOT RECONCILED,PDF p.12 / DS 10,RASTER,sum of the printed out-to-out segments 6 + 1'-0 + 3'-9 + 3'-10 + 6 = 9'-7 (9'-7 1/8 with 3'-6 3/4 + 4 3/8 arc + 3'-8); listed 9'-11 is 4 in longer - UNRESOLVED (U9a)
+Pier 1 & 2,10d2,L (footing to column dowel),1'-10 ; 14'-1,,10 3/4 (printed without 'D='),15'-11,15'-11,OK,PDF p.12 / DS 10,RASTER,
+Pier 1 & 2,5e1,"closed hoop, 6 in hooks",6 ; 2'-6 ; 5'-6 ; 2'-6 ; 5'-6 ; 6,,2 1/2,17'-0,17'-0,OK,PDF p.12 / DS 10,RASTER,
+Pier 1 & 2,5e2,"closed hoop, 6 in hooks",6 ; 3'-7 1/2 ; 4'-9 ; 3'-7 1/2 ; 4'-9 ; 6,,2 1/2,17'-9,17'-9,OK,PDF p.12 / DS 10,RASTER,
+Pier 1 & 2,5e3,"tie, 135-deg hook one end (dashed), 90-deg other",5 1/2 (hook) ; 3'-7 1/2 ; 6,,2 1/2,4'-7,4'-7,OK,PDF p.12 / DS 10,RASTER,
+Pier 1 & 2,5n1,U,2'-0 ; 3'-10 ; 2'-0,,2 1/2,7'-10,7'-10,OK,PDF p.12 / DS 10,RASTER,
+Pier 1 & 2,8f6,V (pile uplift anchor),2'-6 ; 2'-6,spread at open end 2'-8; depth 2'-1 1/2; half-spread 1'-4,6,5'-0,5'-0,OK,PDF p.12 / DS 10,RASTER,
+Pier 1 & 2,9g1,U,1'-7 ; 13'-2 ; 1'-7,,9 1/2,16'-4,16'-4,OK,PDF p.12 / DS 10,RASTER,
+Pier 1 & 2,7g2,U,1'-2 ; 9'-8 ; 1'-2,,5 1/4,12'-0,12'-0,OK,PDF p.12 / DS 10,RASTER,
+Deck/abut/diaph,6a7,U,3'-1 ; 4'-10 ; 3'-1,,4 1/2,11'-0,11'-0,OK,PDF p.26 / DS 24,RASTER,
+Deck/abut/diaph,5d5,L,2'-7 ; 1'-10,,2 1/2,4'-5,4'-5,OK,PDF p.26 / DS 24,RASTER,
+Deck/abut/diaph,5d6,straight + sloped end,36'-10 ; 1'-5,"sloped end: horizontal 1'-4 3/4, drop 3",2 1/2,38'-3,38'-3,OK,PDF p.26 / DS 24,RASTER,
+Deck/abut/diaph,5d17,"crank: horizontal, slope, horizontal",2'-6 ; 5'-9 ; 2'-6,"slope: horizontal 5'-6, rise 1'-8 1/8",2 1/2,10'-9,10'-9,OK,PDF p.26 / DS 24,RASTER,
+Deck/abut/diaph,5d18 (stainless),horizontal + slope,2'-6 ; 4'-2,"slope: horizontal 3'-11 7/8, rise 1'-2 1/2",2 1/2,6'-8,6'-8,OK,PDF p.26 / DS 24,RASTER,
+Deck/abut/diaph,5d19,horizontal + vertical + slope,2'-7 ; 1'-4 1/2 ; 1'-5 1/2,"sloped leg: horizontal 4 1/4, rise 1'-5",2 1/2,5'-5,5'-5,OK,PDF p.26 / DS 24,RASTER,
+Deck/abut/diaph,5d20,straight + sloped end,37'-4 ; 1'-5,"sloped end: horizontal 1'-4 1/2, drop 4 1/8",2 1/2,38'-9,38'-9,OK,PDF p.26 / DS 24,RASTER,
+Deck/abut/diaph,5e1,open stirrup with 6 in inward top returns,6 ; 5'-4 ; 2'-6 ; 5'-4 ; 6,,2 1/2,14'-2,14'-2,OK,PDF p.26 / DS 24,RASTER,bar-lists.csv says 'closed hoop'; the diagram is a U with two 6 in top returns (gap between) - same for 5e2/5e6/5e7
+Deck/abut/diaph,5e2,open stirrup with 6 in inward top returns,6 ; 4'-11 ; 2'-6 ; 4'-11 ; 6,,2 1/2,13'-4,13'-4,OK,PDF p.26 / DS 24,RASTER,
+Deck/abut/diaph,5e6,open stirrup with 6 in inward top returns,6 ; 4'-11 ; 2'-7 ; 4'-11 ; 6,,2 1/2,13'-5,13'-5,OK,PDF p.26 / DS 24,RASTER,
+Deck/abut/diaph,5e7,open stirrup with 6 in inward top returns,6 ; 5'-4 ; 2'-7 ; 5'-4 ; 6,,2 1/2,14'-3,14'-3,OK,PDF p.26 / DS 24,RASTER,
+Deck/abut/diaph,5e3,U,6 1/2 ; 2'-6 ; 6 1/2,,2 1/2,3'-7,3'-7,OK,PDF p.26 / DS 24,RASTER,
+Deck/abut/diaph,5e5,U,6 1/2 ; 2'-7 ; 6 1/2,,2 1/2,3'-8,3'-8,OK,PDF p.26 / DS 24,RASTER,
+Deck/abut/diaph,8f1,straight + sloped end,36'-5 ; 1'-5,"sloped end: horizontal 1'-4 3/4, drop 3",6,37'-10,37'-10,OK,PDF p.26 / DS 24,RASTER,
+Deck/abut/diaph,8f5,straight + sloped end,37'-4 ; 1'-5,"sloped end: horizontal 1'-4 1/2, drop 4 1/8",6,38'-9,38'-9,OK,PDF p.26 / DS 24,RASTER,
+Deck/abut/diaph,8f3,L,2'-6 ; 7'-8,,6,10'-2,10'-2,OK,PDF p.26 / DS 24,RASTER,
+Deck/abut/diaph,8f4,L,2'-6 ; 6'-2,,6,8'-8,8'-8,OK,PDF p.26 / DS 24,RASTER,
+Deck/abut/diaph,8f6,L,2'-6 ; 5'-11,,6,8'-5,8'-5,OK,PDF p.26 / DS 24,RASTER,
+Deck/abut/diaph,8g3,L,12'-0 ; 3'-9,,8,15'-9,15'-9,OK,PDF p.26 / DS 24,RASTER,
+Deck/abut/diaph,5k1,L,3'-9 ; 1'-0,,2 1/2,4'-9,4'-9,OK,PDF p.26 / DS 24,RASTER,
+Deck/abut/diaph,5k2,vertical + 45-deg slope + horizontal,1'-0 ; 1'-5 ; 1'-0,"slope: horizontal 1'-0, vertical 1'-0",2 1/2,3'-5,3'-5,OK,PDF p.26 / DS 24,RASTER,
+Deck/abut/diaph,5p1,"closed hoop, 6 in hooks",6 ; 2'-2 ; 2'-7 ; 2'-2 ; 2'-7 ; 6,,2 1/2,10'-6,10'-6,OK,PDF p.26 / DS 24,RASTER,
+Deck/abut/diaph,5p2,"closed hoop, 6 in hooks",6 ; 2'-2 ; 2'-7 1/2 ; 2'-2 ; 2'-7 1/2 ; 6,,2 1/2,10'-7,10'-7,OK,PDF p.26 / DS 24,RASTER,
+Deck/abut/diaph,5p4,"closed hoop, 6 in hooks",6 ; 2'-2 ; 2'-8 ; 2'-2 ; 2'-8 ; 6,,2 1/2,10'-8,10'-8,OK,PDF p.26 / DS 24,RASTER,
+Deck/abut/diaph,6p3,V with flat bottom,3'-0 ; 8 ; 3'-0,horizontal projections 1'-6 1/8 + 8 + 1'-6 1/8 = 3'-8 1/4; height 2'-7 1/8,4 1/2,6'-8,6'-8,OK,PDF p.26 / DS 24,RASTER,
+Deck/abut/diaph,4t1,V with flat bottom,1'-4 1/2 ; 2'-7 ; 1'-4 1/2,horizontal projections 11 11/16 + 2'-7 + 11 11/16 = 4'-6 3/8; height 11 11/16,2,5'-4,5'-4,OK,PDF p.26 / DS 24,RASTER,
+Deck/abut/diaph,#2 (non-coated),"pile spiral: 7 turns, 21 in diameter, 3 in pitch (note on p.15/p.16 Section B-B)",7 turns x pi x 21,3 - L 7/8 x 7/8 x 1/8 spacers punched to hold spiral,-,38'-6,38'-6 (7 x pi x 21 in = 461.8 in = 38.48 ft),OK,PDF p.26 / DS 24,RASTER,spiral data from the note on PDF p.15/p.16; 16 spirals = 8 piles x 2 abutments
+BTD beams,5b1 (epoxy),"hairpin, 6 in foot shown in side view",4'-9 ; 3 7/8 (width) ; 4'-9 ; 6 (foot),,2 5/8,10'-8,10'-4 (legs + width + one foot) / 10'-10 (feet on both legs),NOT RECONCILED,PDF p.27 / DS 25,RASTER,no reading of the printed out-to-out dims gives 10'-8 - UNRESOLVED (U9b); standard 4730 bar
+BTD beams,5b1 alternate (uncoated),"hairpin, 6 in foot (side view)",4'-1 ; 3 7/8 ; 4'-1 ; 6,,2 5/8,-,-,n/a,PDF p.27 / DS 25,RASTER,alternate bar per the alternate bar notes; not in the bar list
+BTD beams,5b2 alternate (epoxy),hairpin,2'-8 ; 3 7/8 ; 2'-8,,2 5/8,-,-,n/a,PDF p.27 / DS 25,RASTER,alternate bar; not in the bar list
+BTD beams,6b3 (epoxy),"Z: hook, vertical, foot",6 ; 4'-8 1/2 ; 6,,4 1/2 (sheet default #6),5'-9,5'-8 1/2,OK (rounded up to inch),PDF p.27 / DS 25,RASTER,
+BTD beams,6b4,U,6 ; 4'-1 ; 6,,4 1/2 (sheet default #6),5'-1,5'-1,OK,PDF p.27 / DS 25,RASTER,
+BTD beams,4d1,"stirrup: two top legs 4 apart, sloped, vertical, bottom",6 ; 1'-1 ; 5 1/2 ; 2'-3 1/2 ; 5 1/2 ; 1'-1 ; 6,"top gap 4, 11 3/4 each side; slope rise 5 1/8",2 (sheet default #4),6'-5,6'-4 1/2,OK (rounded up to inch),PDF p.27 / DS 25,RASTER,
+BTD beams,4d1 alternate,two-piece stirrup (one half shown),6 ; 1'-1 ; 5 1/2 ; 1'-7 3/4,11 3/4; 1'-0 lap; 5 1/8,2,-,-,n/a,PDF p.27 / DS 25,RASTER,alternate bar
+BTD beams,4e1,U,5 ; 2'-3 1/2 ; 5,,2 (sheet default #4),3'-2,3'-1 1/2,OK (rounded up to inch),PDF p.27 / DS 25,RASTER,
+BTD beams,4h1,hairpin,3'-11 ; 3 (width) ; 3'-11,,2 (sheet default #4),8'-0,7'-10 (legs) / 8'-1 (legs + width),NOT RECONCILED,PDF p.27 / DS 25,RASTER,UNRESOLVED (U9b); standard 4730 bar
+Barrier rail,5c1,vertical + top bend (arc) + sloped face leg + hook with dashed tail,3'-1 5/16 ; 6 5/8 (arc) ; 2'-8 1/2 ; 5 5/16 ; 7 (tail),overall height 3'-3 13/16; top width 8 1/4; 2 1/8 offset of sloped leg at top; sloped-leg vertical 2'-10 9/16 + 6 1/4,3 3/4,7'-5,7'-4 3/4,OK (rounded up to inch),PDF p.39 / DS 37,RASTER,
+Barrier rail,5c8,L,1'-1 ; 8,,2 1/2,1'-9,1'-9,OK,PDF p.39 / DS 37,RASTER,
+Barrier rail,4d2,"open loop, 4 1/2 returns",4 1/2 ; 1'-3 ; 4'-6 ; 1'-3 ; 4 1/2,,2,7'-9,7'-9,OK,PDF p.39 / DS 37,RASTER,
+Barrier rail,4d3,"open loop, 4 1/2 returns",4 1/2 ; 11 ; 4'-2 ; 11 ; 4 1/2,,2,6'-9,6'-9,OK,PDF p.39 / DS 37,RASTER,
+Barrier rail,5c2 (stainless),"closed bent (barrier outline): top return, back vertical, bottom, front vertical, two sloped legs, hook + 7 tail",5 1/2 ; 2'-0 ; (bottom not printed) ; 9 13/16 ; 6 7/16 ; 7 1/4 ; 7 (tail),top: 5 1/2 return; 5 1/2 + 3 3/4 hook to front face; vertical breaks 7 1/4 / 5 1/4 / 9 13/16,3 3/4,6'-0,- (bottom not printed),UNRESOLVED,PDF p.39 / DS 37,RASTER,bottom leg not dimensioned; printed segments sum 5'-0 - UNRESOLVED (U9c)
+Barrier rail,5c3 (stainless),L,2'-10 ; 5,,3 3/4,3'-3,3'-3,OK,PDF p.39 / DS 37,RASTER,
+Barrier rail,5c14 (stainless),vertical + 2 sloped legs + hook + 7 tail,2'-0 1/2 ; 6 7/16 ; 7 1/4 ; 7 (tail),1 7/8 and 4 horizontal offsets; 5 and 1'-2 1/8 vertical,3 3/4,3'-10,3'-9 3/16,OK (rounded up to inch; hook arc not dimensioned),PDF p.39 / DS 37,RASTER,
