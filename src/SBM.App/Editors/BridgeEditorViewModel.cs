@@ -823,10 +823,10 @@ public sealed partial class BridgeEditorViewModel : ObservableObject
         yield return new TextField(u, "Footing length (along cap)", ValueKind.LengthLong, () => sd.FootingLength, v => sd.FootingLength = v, Positive);
         yield return new TextField(u, "Footing width", ValueKind.LengthLong, () => sd.FootingWidth, v => sd.FootingWidth = v, Positive);
         yield return new TextField(u, "Footing thickness", ValueKind.LengthShort, () => sd.FootingThickness, v => sd.FootingThickness = v, Positive);
-        yield return ChoiceField.ForEnum("Pile type", () => sd.PileType, v => sd.PileType = v, v => v == PileType.SteelHP ? "Steel HP" : "Precast concrete (square)");
+        yield return ChoiceField.ForEnum("Pile type", () => sd.PileType, v => sd.PileType = v, v => v switch { PileType.SteelHP => "Steel HP", PileType.CipPipe => "CIP concrete-filled pipe (round)", _ => "Precast concrete (square)" });
         yield return new ChoiceField("Steel HP section", SBM.Core.Substructure.SubstructureGenerator.HpSections.Select(x => new Choice(x, x)),
             () => sd.PileSection, v => sd.PileSection = (string)v);
-        yield return new TextField(u, "Precast pile size", ValueKind.LengthShort, () => sd.PileSize, v => sd.PileSize = v, Positive);
+        yield return new TextField(u, "Precast pile size / pipe pile diameter", ValueKind.LengthShort, () => sd.PileSize, v => sd.PileSize = v, Positive);
         yield return new TextField(u, "Pile rows (across cap)", ValueKind.Integer, () => sd.PileRows, v => sd.PileRows = (int)v, v => v >= 1 ? null : "At least 1.");
         if (pier) yield return new TextField(u, "Piles along cap (per group)", ValueKind.Integer, () => sd.PileColumns, v => sd.PileColumns = (int)v, v => v >= 1 ? null : "At least 1.");
         yield return new TextField(u, "Pile spacing", ValueKind.LengthLong, () => sd.PileSpacing, v => sd.PileSpacing = v, Positive);

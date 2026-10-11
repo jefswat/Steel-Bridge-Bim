@@ -30,10 +30,12 @@ public sealed partial class SubstructureGenerator
         double emb = double.IsNaN(embedment) ? sd.PileEmbedment : embedment;
         double top = capBottom + emb;
         bool steel = sd.PileType == PileType.SteelHP;
-        string size = steel ? sd.PileSection : $"{Sh(sd.PileSize)} square precast";
+        string size = PileSizeText(sd);
         var section = PileSection(sd);
-        double width = sd.PileType == PileType.PrecastConcrete ? sd.PileSize : section.Max(p => Math.Max(Math.Abs(p.X), Math.Abs(p.Y))) * 2;
+        double width = sd.PileType != PileType.SteelHP ? sd.PileSize : section.Max(p => Math.Max(Math.Abs(p.X), Math.Abs(p.Y))) * 2;
         double h = batterRatio > 0 ? 1.0 / batterRatio : 0;
+        if (sd.PileType == PileType.CipPipe && double.IsNaN(sd.PileShellThickness) && f.Piles.Count == 0)
+            Warn($"UNRESOLVED: {where}: CIP pipe pile shell thickness not entered (PileShellThickness) - the round {Sh(sd.PileSize)} pile is built, the shell is left blank because no thickness was given.");
         var section0 = section;
         foreach (var q in at)
         {
@@ -86,7 +88,7 @@ public sealed partial class SubstructureGenerator
             var hw = unit.World(info.S, info.N, info.TopZ); var tw = unit.World(info.TipS, info.TipN, info.TipZ);
             _pileAxes.Enqueue(new PileAxis(where, f.Piles.Count, hw, tw, width, info.IsBattered));
             unit.Solids.Add(new SubSolid(SubElementKind.Pile, $"{where} pile {f.Piles.Count}",
-                $"Pile {size}, {L(length)}{(info.IsBattered ? " along axis" : "")}{batter}, tip {El(info.TipZ)}", m, IsConcrete: !steel));
+                $"Pile {size}, {L(length)}{(info.IsBattered ? " along axis" : "")}{batter}, tip {El(info.TipZ)}", m, IsConcrete: !steel) { ShellThickness = PileShell(sd) });
         }
     }
 

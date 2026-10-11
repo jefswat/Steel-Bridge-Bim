@@ -58,6 +58,7 @@ public sealed partial class SubstructureGenerator
         if (ad.Extension != null) ignored.Add("Extension");
         if (ad.FootingNotches.Count > 0) ignored.Add("FootingNotches");
         if (ad.BackwallTop.Count > 0) ignored.Add("BackwallTop");
+        if (ad.StandalonePedestals.Count > 0) ignored.Add("StandalonePedestals");
         if (ignored.Count > 0) Warn($"{name}: integral abutment - stub-abutment inputs not used: {string.Join(", ", ignored)}.");
 
         // ---- steps: one level step per girder at the plan top; checked against the bearing seat
