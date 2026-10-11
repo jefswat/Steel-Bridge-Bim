@@ -1,0 +1,8 @@
+unit,from,to,type,length_SEJ_to_SEJ_ft,spans_ft,length_CL_support_ft,check,source,tag
+1 (spans 1-3),FFBW Abut 1,CL Pier 4,Tx28 prestressed I-girder (2 girders),107.88,47.88 / 30.00 / 30.00,107.88,DERIVED stations 20+49.30 -> 21+57.18 = 107.88 OK,PDF p.84 / sh 135; p.108-109,RASTER (layout text read at 140 dpi)
+2 (spans 4-6),CL Pier 4,CL Pier 7,Tx28 (2 girders),97.00,30.00 / 30.00 / 37.00,97.00,DERIVED 21+57.18 -> 22+54.18 OK,PDF p.110-111,RASTER
+3 (spans 7-9),CL Pier 7,SEJ near Pier 10,Tx28 (2 girders),162.92,59.56 / 25.00 / 78.36,163.74 (CL P7 - CL P10),DERIVED 22+54.18 -> 24+17.92 = 163.74; 78.36 + 0.82 = 79.18 OK; SEJ offset 9 1/4 perp. to CL pier = 0.771 ft / cos(19 deg 34'41") = 0.818 ft along CL NHT,PDF p.112-113 / sh 163-164,RASTER
+Arch (span 10),SEJ at Pier 10,SEJ at Pier 11,steel tied arch (inclined W14x132 ribs; T-section tie girders curved in plan; built-up floorbeams; CIP deck on corrugated steel deck; PT),203.32,201.68 (CL P10 - CL P11),201.68,DERIVED 26+19.60 - 24+17.92 = 201.68; 201.68 + 2 x 0.82 = 203.32 OK; local chord CL1-CL2 = 201.000 (7 in off each CL pier),PDF p.85-86; p.119,RASTER
+4 (spans 11-12),SEJ at Pier 11,CL Pier 13,Tx28 (2 girders),122.45,66.45 / 56.00,123.27,DERIVED 27+42.87 - 26+19.60 = 123.27 = 122.45 + 0.82 OK,PDF p.114-115 / sh 165-166,RASTER
+5 (spans 13-15),CL Pier 13,FFBW Abut 16,Tx28 (2 girders),168.00,56.00 / 56.00 / 56.00,168.00,DERIVED 29+10.87 - 27+42.87 = 168.00 OK,PDF p.116-117 / sh 167-168,RASTER
+Total,FFBW Abut 1,FFBW Abut 16,,861.57,,861.57,DERIVED 29+10.87 - 20+49.30 = 861.57 = layout 'overall bridge length 861.57' measured along CL NHT OK,PDF p.84-88,RASTER
