@@ -41,13 +41,13 @@ void Apply(SubstructureDefinition sd, string size, int nS, double sS, int nN, do
     r.ColumnSpiralSize = "#6"; r.ColumnSpiralPitch = I(tieSpacing); r.ColumnHoopOverlap = I(overlap);
     r.ColumnCrosstieSize = "#5"; r.ColumnCrosstieBar = crossBar;
 }
-void Flare(SubstructureDefinition sd, int nS, double sS, int nN, double sN, int nC, double hoopSpacing)
+void Flare(SubstructureDefinition sd, int nS, double sS, int nN, double sN, int nC, double tieSpacing, FlareTieType style, double overlap)
 {
     var r = sd.Reinforcement;
     if (double.IsNaN(sd.ColumnFlareElevation)) { r.FlareBarSize = ""; return; }
     r.FlareBarSize = "#7"; r.FlareCover = I(3.5);
     r.FlareFaceBarsS = nS; r.FlareFaceSpacingS = I(sS); r.FlareFaceBarsN = nN; r.FlareFaceSpacingN = I(sN); r.FlareChamferBars = nC;
-    r.FlareTieSize = "#6"; r.FlareTieSpacing = I(hoopSpacing);
+    r.FlareTieSize = "#6"; r.FlareTieSpacing = I(tieSpacing); r.FlareTieStyle = style; r.FlareTieOverlap = I(overlap);
 }
 
 // One letter per column bar, counter-clockwise from +S: H = splices at the upper coupler, L = lower, T = lower and stops
@@ -99,8 +99,8 @@ foreach (var b in Doc.Project.Bridges.Where(x => x.Name.StartsWith("I-80") || x.
         {
             string size = n is "Pier 8G" or "Pier 10G" ? "#14" : n is "Pier 2G" or "Pier 7G" or "Pier 11G" or "Pier 12G" or "Pier 18G" ? "#18" : "#11";
             Apply(sd, size, 7, 6, 6, 6, 0, 0, Pos(7.375, 14.375, 21.375, 28.375, 35.375), rampG ? 10 : 12, 40, 2);
-            if (n is "Pier 11G" or "Pier 12G") Flare(sd, 7, 6, 6, 6, 5, 5);
-            else Flare(sd, 5, 0, 5, 0, 5, rampG ? 5 : 6);
+            if (n is "Pier 11G" or "Pier 12G") Flare(sd, 7, 6, 6, 6, 5, 10, FlareTieType.HoopPair, 43);
+            else Flare(sd, 5, 0, 5, 0, 5, 10, FlareTieType.HairpinPair, 33);
         }
         else if (n is "Pier 16G" or "Pier 17G")            // Ramp G two-column bents, 8'-0 x 4'-6 (section C-C, PDF 65 / 69)
         {
@@ -108,14 +108,14 @@ foreach (var b in Doc.Project.Bridges.Where(x => x.Name.StartsWith("I-80") || x.
             // outside chamfer face (10 3/8 | 9 3/4 | 11 5/8); 6e1 paired hoops + 5e2 crossties around the chamfer bar
             // nearest the 8'-0 face, 29-30 spaces @ about 1'-0.
             Apply(sd, "#14", 6, 7.5, 4, 6.25, 0, 0, Pos(10.375, 20.125), 12, 40, 1);
-            Flare(sd, 0, 0, 0, 0, 0, 0);
+            Flare(sd, 0, 0, 0, 0, 0, 0, FlareTieType.ClosedTie, 0);
         }
         else                                               // I-80 8'-0 x 4'-6 (incl. Pier 11WB & 19G)
         {
             if (n is "Pier 3WB" or "Pier 13WB") Apply(sd, "#18", 6, 7.5, 4, 6, 0, 0, Pos(6.5, 15.5, 21.25), 12, 40, 2);
             else if (n == "Pier 7WB") Apply(sd, "#18", 7, 6.25, 4, 6, 3, 5.75, null, 12, 40, 2);
             else Apply(sd, "#11", 6, 7.5, 4, 6.5, 0, 0, Pos(8, 15.25, 22.5), 12, 40, 2);
-            Flare(sd, 5, 0, 4, 0, 4, 6);
+            Flare(sd, 5, 0, 4, 0, 4, 12, FlareTieType.HairpinPair, 33);
         }
         Splice(sd, n, b.Name.StartsWith("Ramp G"));
         done++;
