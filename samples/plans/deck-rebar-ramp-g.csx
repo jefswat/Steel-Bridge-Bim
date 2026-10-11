@@ -58,7 +58,10 @@ foreach (var sp in specs)
     var r = b.Deck.Reinforcement;
     r.Enabled = true; r.EpoxyCoated = true;
     r.TopCover = In(2.5); r.BottomCover = In(1); r.SideCover = In(2);
-    var plan = new DeckPlanReinforcement { LongitudinalEndCover = In(2), WeightTolerance = 0.03, PlanBarList = BarList("Ramp G", sp.U) };
+    // longitudinal bars stop at the joint blockout (D: 4" South Abutment, 25" piers): reproduces the 6b1 counts of Units 1, 2 and 4 exactly (Unit 3: -0.7%)
+    var plan = new DeckPlanReinforcement { LongitudinalBeginCover = In(sp.U == 1 ? 4 : 25), LongitudinalEndCover = In(25), WeightTolerance = 0.03, PlanBarList = BarList("Ramp G", sp.U) };
+    if (double.TryParse(Environment.GetEnvironmentVariable("DR_LB"), out var lbIn)) plan.LongitudinalBeginCover = In(lbIn);
+    if (double.TryParse(Environment.GetEnvironmentVariable("DR_LE"), out var leIn)) plan.LongitudinalEndCover = In(leIn);
     DeckLinePiece P(string mark, double len = 0) => new() { Mark = mark, Length = len };
     DeckTransverseZone T(string name, DeckBarLayer layer, double startIn, int n, string mark, DeckBarSide refEdge = DeckBarSide.Left) => new()
     {

@@ -129,7 +129,7 @@ IEnumerable<DeckLongZone> VarBays((string sta, (int l, int r, int n)[] rows)[] c
     var lz1 = new List<DeckLongZone> { Overhang(true, 1, "6b1", F(39, 0), "6b1c", false) };
     lz1.AddRange(ConstBays(1, 6, "6b1", F(39, 0), "6b1c", false));
     lz1.Add(Overhang(false, 6, "6b1", F(39, 0), "6b1c", false));
-    r.Plan = new DeckPlanReinforcement { WeightTolerance = 0.03, PlanBarList = BarList("I-80 WB", 1), Transverse = t, Longitudinal = lz1, Families = new() { "6b" }, TransverseBeginClear = In(17), TransverseEndClear = In(27), LongitudinalBeginCover = In(17), LongitudinalEndCover = In(27) };
+    r.Plan = new DeckPlanReinforcement { WeightTolerance = 0.03, PlanBarList = BarList("I-80 WB", 1), Transverse = t, Longitudinal = lz1, Families = new() { "6b" }, TransverseBeginClear = In(17), TransverseEndClear = In(27), LongitudinalBeginCover = In(18), LongitudinalEndCover = In(25) };
 }
 
 // ---------------------------------------------------------------- Unit 2
@@ -196,7 +196,7 @@ IEnumerable<DeckLongZone> VarBays((string sta, (int l, int r, int n)[] rows)[] c
     }, "6b1", F(39, 10), "6b1c", false));
     lz2.AddRange(ConstBays(6, 11, "6b1", F(39, 10), "6b1c", false));
     lz2.Add(Overhang(false, 11, "6b1", F(39, 10), "6b1c", false));
-    r.Plan = new DeckPlanReinforcement { WeightTolerance = 0.03, PlanBarList = BarList("I-80 WB", 2), Transverse = t, Longitudinal = lz2, Families = new() { "6b" }, TransverseBeginClear = In(27), TransverseEndClear = In(27), LongitudinalBeginCover = In(27), LongitudinalEndCover = In(27) };
+    r.Plan = new DeckPlanReinforcement { WeightTolerance = 0.03, PlanBarList = BarList("I-80 WB", 2), Transverse = t, Longitudinal = lz2, Families = new() { "6b" }, TransverseBeginClear = In(27), TransverseEndClear = In(27), LongitudinalBeginCover = In(25), LongitudinalEndCover = In(25) };
 }
 
 // ---------------------------------------------------------------- Unit 3
@@ -255,7 +255,7 @@ IEnumerable<DeckLongZone> VarBays((string sta, (int l, int r, int n)[] rows)[] c
     }, "6b2", F(39, 9), "", true));
     lz3.AddRange(ConstBays(4, 10, "6b1", F(39, 1), "", true));
     lz3.Add(Overhang(false, 10, "6b1", F(39, 1), "", true));
-    r.Plan = new DeckPlanReinforcement { WeightTolerance = 0.03, PlanBarList = BarList("I-80 WB", 3), Transverse = t, Longitudinal = lz3, TransverseBeginClear = In(27), TransverseEndClear = In(17.5), LongitudinalBeginCover = In(27), LongitudinalEndCover = In(17.5) };
+    r.Plan = new DeckPlanReinforcement { WeightTolerance = 0.03, PlanBarList = BarList("I-80 WB", 3), Transverse = t, Longitudinal = lz3, TransverseBeginClear = In(27), TransverseEndClear = In(17.5), LongitudinalBeginCover = In(25), LongitudinalEndCover = In(18) };
 }
 
 var res = Doc.Regenerate();
