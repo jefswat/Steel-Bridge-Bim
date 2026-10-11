@@ -148,7 +148,7 @@ as "…before bearing iteration.sbm". The run confirmed item 2.3: girder C has n
      1 1/4x24 / 2x24 | 1 1/8x22 end. B-D: top as A but 1 1/8x20/2x20 at 2G and 1x20/2x20 at 3G, 4G; bottom
      7/8x18 | 1 1/8x20 / 1 7/8x20 | 7/8x18 | 1 1/8x20 / 2x20 | 7/8x20 | 1 1/4x20 / 2x20 | 7/8x18 | 1 1/8x20 / 2x20 | 7/8x18.
 4. **Ramp G Piers 16G and 17G** (data extracted: `docs\plan-data\ramp-g-piers-16g-18g.md`; two-column bents, pages 64–71) and **18G** (pages 72–74; data partly read: 31'-6"×42'-6"×7'-0" footing, 34 HP14x73).
-5. **Deck reinforcing** per the plan layout (sheets 182–184 and others). Bar M1 near FS4-G1-P9 was reported wrong; the cause is not yet identified.
+5. **Deck reinforcing** per the plan layout: DONE on `feature/deckrebar` (`docs/plan-data/deck-rebar.md`): plan-driven transverse (7a), longitudinal (6b), 5j1 and the plan bar lists for all units of both bridges; slab bars within 0.5% of the lists (I-80) / 0.3% (Ramp G). Open: end dam bars 5d/5e/4d are schedule-only (not placed in 3D), the kinked slab ends at Pier 6A / 19G, I-80 U3 north bays 6b2 +10%, overhang positions of Ramp G (count proven, positions inferred). Bar M1 near FS4-G1-P9: not reproducible (generic layout passes the new containment check; see section 6 of deck-rebar.md).
 6. **Drain routing** per sheets 205–220: downspouts, collectors, pipe hangers. The current piped drains run generically to the nearest pier.
 7. **Modular expansion joints** (sheets 203–204). Plans give blockouts/deck ends only; hardware is manufacturer-designed (`docs\plan-data\expansion-joints.md`). **User decision pending** on whether to model them (blockout + generic body).
 8. **Battered piles** (1:4 corner and edge piles): modeled plumb. Needs a batter direction per pile in `FootingDefinition`.

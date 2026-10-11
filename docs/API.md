@@ -197,6 +197,13 @@ doc.Save();                                          // or Save("other.sbm")
 doc.ExportIfc("Br12.ifc");
 ```
 
+## Plan-driven deck reinforcing
+
+`Bridges[i].Deck.Reinforcement.Plan` (optional, default null = the generic layout) holds `Transverse` zones, `Longitudinal` zones and the plan `PlanBarList` of the unit; see `samples/plans/deck-rebar-i80.csx` and
+`deck-rebar-ramp-g.csx` (C# scripts building it from the plan sheets) and `docs/plan-data/deck-rebar.md`. After `Regenerate`, `Doc.Concrete(bridge).Marks / Bars / Notes / Diagnostics` give the placed
+marks (plan marks 7a1, 6b1, ...), the per-mark comparison with the plan bar list and the containment check ("Deck rebar containment check ..."). `samples/plans/report-deck-rebar.csx` prints the comparison,
+`check-deck-rebar.csx` the containment check. Plain numbers in paths follow the field's display unit (`StartDistance`, `Length` in ft; `Spacing`, `LeftMargin`, `TransverseBeginClear` in inches).
+
 ## Performance notes
 
 - **Incremental regeneration:** each bridge is keyed by a hash of its definition, alignment and units. Unchanged
