@@ -310,6 +310,10 @@ public sealed class SubstructureDefinition
     public int AbutmentFoundationCount { get; set; } = 4;
     public double AbutmentFoundationSpacing { get; set; } = Ft(12);
 
+    /// <summary>OPTIONAL as-designed abutment (footing, backwall with corbel, beam steps, maskwalls, wingwalls, piles, bar list); null = the
+    /// standard parametric abutment above. Abutments only.</summary>
+    public AbutmentDefinition? Abutment { get; set; }
+
     public SubstructureReinforcementDefinition Reinforcement { get; set; } = new();
 
     public static SubstructureDefinition Default(SupportType type) => type == SupportType.Pier
@@ -361,6 +365,7 @@ public sealed class SubstructureDefinition
         c.CapProfileAhead = CapProfileAhead.Select(p => new CapProfilePoint(p.S, p.Elevation)).ToList();
         c.Footings = Footings.Select(f => f.Clone()).ToList();
         c.Aesthetics = Aesthetics?.Clone();
+        c.Abutment = Abutment?.Clone();
         return c;
     }
 }

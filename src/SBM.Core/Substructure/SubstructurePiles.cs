@@ -24,9 +24,10 @@ public sealed partial class SubstructureGenerator
     /// minimal rotation of the plumb section), so the pile reads like its plumb neighbours; no rotation is invented.
     /// </summary>
     private void AddPilesAt(SubstructureUnit unit, SubstructureDefinition sd, FoundationInfo f, double s, double n, double capBottom,
-        List<FootingPoint> at, double length, double batterRatio, string where)
+        List<FootingPoint> at, double length, double batterRatio, string where, double embedment = double.NaN)
     {
-        double top = capBottom + sd.PileEmbedment;
+        double emb = double.IsNaN(embedment) ? sd.PileEmbedment : embedment;
+        double top = capBottom + emb;
         bool steel = sd.PileType == PileType.SteelHP;
         string size = steel ? sd.PileSection : $"{Sh(sd.PileSize)} square precast";
         var section = PileSection(sd);
@@ -51,7 +52,7 @@ public sealed partial class SubstructureGenerator
                 double us = q.BatterDirS / dl, un = q.BatterDirN / dl;
                 var a = new Vec3(-us * h, -un * h, 1).Normalized();         // axis, tip to head
                 double drop = length * a.Z;                                  // vertical tip-to-head distance
-                double hs = ps - us * h * sd.PileEmbedment, hn = pn - un * h * sd.PileEmbedment;   // head centre
+                double hs = ps - us * h * emb, hn = pn - un * h * emb;   // head centre
                 double ts = hs + us * h * drop, tn = hn + un * h * drop;
                 info = new PileInfo(hs, hn, top, top - drop, ts, tn);
                 // Minimal rotation of the frame (x = S, y = N, z = up) taking z onto the axis (Rodrigues).

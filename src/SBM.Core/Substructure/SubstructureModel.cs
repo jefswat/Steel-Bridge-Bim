@@ -3,10 +3,11 @@ using SBM.Core.Concrete;
 using SBM.Core.Framing;
 using SBM.Core.Geometry;
 using SBM.Core.Solids;
+using SBM.Core.Alignments;
 
 namespace SBM.Core.Substructure;
 
-public enum SubElementKind { Cap, Pedestal, Backwall, Column, DrilledShaft, Footing, Pile, DeckDrain, DrainPipe, SplashBasin }
+public enum SubElementKind { Cap, Pedestal, Backwall, Column, DrilledShaft, Footing, Pile, DeckDrain, DrainPipe, SplashBasin, Wingwall, Counterfort, Maskwall, WingFooting }
 
 /// <summary>A solid of the substructure with its quantity data.</summary>
 public sealed record SubSolid(SubElementKind Kind, string Name, string Description, Mesh Mesh, bool IsConcrete = true);
@@ -86,6 +87,8 @@ public sealed class SubstructureUnit
     /// <summary>Abutment backwall: front/back faces (N) and top profile (S, Z); bottom is the cap top.</summary>
     public (double N0, double N1, List<Vec2> Top)? Backwall { get; set; }
     public List<SubSolid> Solids { get; } = new();
+    /// <summary>As-designed abutment data (footing, backwall, steps, wings...) when the support has an <see cref="AbutmentDefinition"/>; else null.</summary>
+    public AbutmentGeometry? Abutment { get; set; }
 
     public Vec2 Plan(double s, double n) => Origin + D * s + N * n;
     public Vec3 World(double s, double n, double z) => Plan(s, n).WithZ(z);
@@ -132,4 +135,62 @@ public sealed class SubstructureModel
     public TimeSpan GenerationTime { get; set; }
     public double ConcreteVolume => Units.SelectMany(u => u.Solids).Where(s => s.IsConcrete).Sum(s => Math.Abs(s.Mesh.Volume()));
     public double RebarMass => Marks.Sum(m => m.TotalMass);
+}
+
+/// <summary>A beam step (seat block) of an as-designed abutment.</summary>
+public sealed record AbutmentStepInfo(int Girder, double S, double S0, double S1, double TopZ, double BaseZ, double N0, double N1);
+
+/// <summary>A counterfort with its wing footing (plan frame: X along the wall rearward, Y = alignment offset).</summary>
+public sealed record CounterfortInfo(int Index, double Start, double Width, double Projection, double TopZ, double FootingTop, double FootingBottom,
+    double YWall0, double YWall1, double YFoot0, double YFoot1, double YCf0, double YCf1, double StationC, Vec2 Origin, Vec2 Tangent);
+
+/// <summary>A wingwall of an as-designed abutment: path along the gutter line and elevation functions of u (distance rearward from the CL bearing line).</summary>
+public sealed class WingInfo
+{
+    public required WingwallDefinition Def { get; init; }
+    public required double SideSign { get; init; }
+    /// <summary>Offsets of the fill-side (inner) and outer faces.</summary>
+    public required double EIn { get; init; }
+    public required double EOut { get; init; }
+    public required double UBack { get; init; }
+    public required double Length { get; init; }
+    public required Func<double, double> Sta { get; init; }
+    public required Func<double, double> Top { get; init; }
+    public required Func<double, double> Bottom { get; init; }
+    public List<CounterfortInfo> Counterforts { get; } = new();
+    public Vec2 Point(Alignment a, double u, double off) => a.PointAt(Sta(u), off);
+}
+
+public sealed record MaskInfo(AbutmentEnd End, double EOuter, double EInner, double TopZ, double BaseZ);
+
+/// <summary>Geometry of an as-designed abutment, shared by the rebar generator, the views and the exporters.</summary>
+public sealed class AbutmentGeometry
+{
+    public required AbutmentDefinition Def { get; init; }
+    public required double Sigma { get; init; }
+    public required double XFootBack { get; init; }
+    public required double XBwBack { get; init; }
+    public required double XBwFront { get; init; }
+    public required double XStepFront { get; init; }
+    public required double XFootFront { get; init; }
+    public required Func<double, double> FootingBottom { get; init; }
+    public required Func<double, double> BackwallTop { get; init; }
+    /// <summary>N to S of the footing end lines and of the backwall ends (planes).</summary>
+    public required Func<double, double> LeftEndS { get; init; }
+    public required Func<double, double> RightEndS { get; init; }
+    public required Func<double, double> BwLeftS { get; init; }
+    public required Func<double, double> BwRightS { get; init; }
+    public required double JointDepth { get; init; }
+    public double N(double x) => Sigma * x;
+    public double FootingTopZ(double s) => FootingBottom(s) + Def.FootingDepth;
+    public double SeatBaseZ(double s) => FootingBottom(s) + Def.FootingDepth + Def.WashHeight;
+    public double BackwallBaseZ(double s) => FootingBottom(s) + Def.BackwallBaseAboveFootingBottom;
+    public List<AbutmentStepInfo> Steps { get; } = new();
+    public List<WingInfo> Wings { get; } = new();
+    public List<MaskInfo> Masks { get; } = new();
+    /// <summary>S range of the backwall extension, when present.</summary>
+    public (AbutmentEnd End, double S0, double S1, double TopZ)? Extension { get; set; }
+    /// <summary>Pile positions of the main footing (S, N).</summary>
+    public List<(double S, double N)> PileXY { get; } = new();
+    public double[] PileStationsS { get; set; } = Array.Empty<double>();
 }
