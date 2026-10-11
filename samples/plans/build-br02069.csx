@@ -125,28 +125,32 @@ G($"Barrier: MnDOT Type S 36\" profile not in BarrierProfiles - modeled as Singl
 U("Barrier Type S top width / traffic-face breaks not read from Fig. 5-397.138(A) (p24).");
 
 // ================================================================ 3. prestressed beams (p16 30MH-101, Beam B1)
-// MnDOT 30MH: H 30", top flange 2'-10", bottom flange 3'-3", web 6 1/2". Verticals top down 5", 1 5/8", 1'-0 7/16", 5 7/16", 5 1/2";
-// top flange from the web face: 5 5/16" taper + 8 7/16" flat to the edge; bottom flange from the web face 4 1/8" + 10 3/4" + 1 3/8".
-// GAP: no MnDOT shapes in the catalog (another branch adds them; switch to the catalog 30MH when it lands). Custom PGSuper-style
-//      dims approximate the outline: straight segments only (6" R web fillets, 1" R / 2" R corners not modeled), bottom flange taper
-//      taken from the 4 1/8" point straight to the outer edge top (the 1 3/8" flat at the edge is folded into the taper, the 4 1/8"
-//      ledge next to the web is level). Depth, widths, web and all printed verticals are kept.
-var mh30 = PrecastIBeamDims.Inches("MnDOT 30MH (approx.)",
-    d1: 5, d2: 1.625, d3: 0, d4: 0, d5: 5.4375, d6: 5.5, h: 30,
-    t1: 6.5, t2: 6.5, w1: 8.4375, w2: 5.3125, w3: 0, w4: 4.125, w5: 10.75 + 1.375, c1: 0.75);
-G("30MH section: TxGirderType.Custom with PrecastIBeamDims approximating MnDOT 30MH (no fillets / round corners; bottom flange 1 3/8\" edge flat folded into the taper). Needs: MnDOT 30MH in the beam catalog (in progress on another branch).");
+// MnDOT 30MH from the standard catalog (StandardBeamCatalog "MN 30MH", Fig. 5-397.501 mod. / p16): H 30", top flange 2'-10",
+// bottom flange 3'-3", web 6 1/2", verticals top down 5", 1 5/8", 1'-0 7/16", 5 7/16", 5 1/2"; 6" R web fillets, 1" R / 2" R
+// flange corners, 3/4" bottom chamfer (exact outline). The beam is the project beam 30MH-101 (drape removed, debonding added):
+// it spans the layout bearings (99'-3" + 2 x 7 1/2" = 100'-6", p16), no standard length is entered, so no Placement is needed.
+// Strands (strands-30MH-B1.csv, p16 END VIEW): 44 x 0.6" straight, 18 @ 2", 18 @ 4", 8 @ 6" (2" grid); debonded (sheathed) at
+// EACH end: A 4 @ 9'-0", B 6 @ 13'-0", C 4 @ 17'-0" (14 of 44, p16).
+double FtIn(string s)      // 13'-0" -> length
+{
+    var t = s.Replace("\"", "").Split('\'');
+    return F(double.Parse(t[0]), double.Parse(t[1].TrimStart('-')));
+}
 var strands = new List<StrandPoint>();
-int debonded = 0;
 foreach (var r in Csv("strands-30MH-B1.csv"))
 {
-    strands.Add(new StrandPoint { X = In(double.Parse(r[2])), Y = In(double.Parse(r[3])), YEnd = In(double.Parse(r[3])), Harped = false });
-    if (r[4].Length > 0) debonded++;
+    double y = In(double.Parse(r[3]));
+    double db = r[4].Length > 0 ? FtIn(r[5]) : 0;
+    strands.Add(new StrandPoint { X = In(double.Parse(r[2])), Y = y, YEnd = y, Harped = false, DebondStart = db, DebondEnd = db, DebondSymbol = r[4] });
 }
+foreach (var g in strands.Where(s => s.DebondSymbol != "").GroupBy(s => s.DebondSymbol).OrderBy(g => g.Key))
+    Print($"Debond {g.Key}: {g.Count()} strands @ {g.First().DebondStart / Ft(1):F3} ft each end");
 b.Girders.Prestressed = new PrestressedBeamDefinition
 {
-    Type = TxGirderType.Custom,
-    CustomSection = mh30,
-    StrandLayout = strands,                // 44 x 0.6" straight: 18 @ 2", 18 @ 4", 8 @ 6" (2" grid), strands-30MH-B1.csv
+    Standard = "MN 30MH",
+    Designation = "30MH-101",
+    Source = "MnDOT Br. 02069 p16 (30MH-101, Beam B1)",
+    StrandLayout = strands,                // 44 x 0.6" straight with debonding, strands-30MH-B1.csv
     StrandCount = strands.Count,
     StrandDiameter = In(0.6),
     StrandStrength = 300,                  // Gr 300 low relaxation (p16)
@@ -154,12 +158,14 @@ b.Girders.Prestressed = new PrestressedBeamDefinition
     BearingToEnd = In(7.5),                // 7 1/2" end of beam to CL brg (p16); 100'-6" o-o = 99'-3" + 2 x 7 1/2"
     // GAP: no curved-plate bearing assemblies (B310 / B311, p31). The bearing is a pad of the plan pad plan size 12" x 30" with the
     //      thickness = the plan bearing height L at the SOUTH abutment (3 1/4" = 1/2" pad + 1 1/4" curved plate + 1 1/2" brg plate).
-    //      One pad thickness per bridge: the NORTH bearing L = 6 1/2" (E1) cannot be entered -> N bearing seats 3 1/4" high (check).
+    //      PrestressedBeamDefinition.PadThickness is ONE value for both ends of a beam (PrestressedGenerator uses pd.PadThickness at
+    //      both supports; SpanBeams select per span / beam line, not per end; SupportDefinition.Bearings is the steel
+    //      BearingDefinition and is not read for prestressed beams) -> the NORTH bearing L = 6 1/2" (E1) cannot be entered and the
+    //      N bearing seats are 3 1/4" high (check).
     PadLength = In(12), PadWidth = In(30), PadThickness = In(3.25),
 };
-Print($"Strands: {strands.Count} (plan 44), debonded {debonded} (plan 14, not modeled)");
-G($"Debonding: {debonded} of 44 strands debonded (A 4 @ 9'-0\", B 6 @ 13'-0\", C 4 @ 17'-0\", p16) - StrandPoint has no debond length; strands run full length. Needs: debonding on StrandPoint (in progress on another branch).");
-G("Bearings: MnDOT curved-plate bearings F1 (B310, fixed, L 3 1/4\") / E1 (B311, expansion, L 6 1/2\") (p31) - only a plain pad (12\" x 30\") with ONE thickness per bridge exists; 3 1/4\" used, so the North seats are 3 1/4\" too high. Needs: per-support prestressed bearing height / curved-plate bearing assembly.");
+Print($"Strands: {strands.Count} (plan 44), debonded {strands.Count(s => s.DebondStart > 0)} (plan 14)");
+G("Bearings: MnDOT curved-plate bearings F1 (B310, fixed, L 3 1/4\") / E1 (B311, expansion, L 6 1/2\") (p31) - only a plain pad (12\" x 30\") whose thickness PrestressedBeamDefinition.PadThickness applies to BOTH ends of the beam; 3 1/4\" used, so the North seats are 3 1/4\" too high. Needs: a per-support (per beam end) prestressed bearing height, e.g. PadThickness per support / PrestressedGenerator reading a per-support value, or a curved-plate bearing assembly.");
 G("Sole plate B303 (p16, p30; dims U6) not modeled. Needs: sole plate for prestressed beams.");
 G("Concrete end diaphragms at both abutments (p15, p17, p20, p21; dims U2) not modeled. Needs: concrete end diaphragm / semi-integral abutment element.");
 G("Optional top strands 2 x 1/2\" (p16) and beam bars G301E..G806E, stirrups (p16) not modeled. Needs: prestressed beam mild reinforcing.");
@@ -168,12 +174,13 @@ G("Optional top strands 2 x 1/2\" (p16) and beam bars G301E..G806E, stirrups (p1
 // Section (p11 A-A, p4/p9): footing 6'-0" x 3'-0", bottom EL 917.75, back face 3'-3" behind CL brg, front 2'-9" ahead; stem 4'-0"
 // (back toe 9", front toe 1'-3") = back ledge 1'-6" + seat 2'-6" (1'-0" behind CL brg, 1'-6" ahead). Back ledge S 922.35 / N 922.15
 // (footing -> ledge 1'-7 1/4" / 1'-4 3/4"); seat front S 923.27 / N 923.06 (p5, p10), seat slopes 1" to the front; infill wall 1'-6"
-// on the back ledge, top S 927.73 / N 927.80; pedestals 2'-6" along the beam on the seat.
+// on the back ledge, top S 927.73 / N 927.80; pedestals 2'-4" along the beam on the seat (1'-0" behind + 1'-4" ahead of CL brg,
+// flush with the seat back edge, 2" short of the seat front face; S Type A p6, N Type C p12).
 // Mapping onto the Iowa-type AbutmentDefinition (backwall + footing + beam steps):
 //   backwall           = infill wall on the back ledge, 1'-6" thick, front face 1'-0" behind CL brg;
 //   footing keyed zone = stem back ledge: BackwallBaseAboveFootingBottom = ledge - footing bottom;
 //   wash               = stem / seat in front of the infill wall: FootingDepth + WashHeight = seat front - footing bottom;
-//   beam steps         = pedestals, 2'-6" (CL brg -1'-0" .. +1'-6") x plan size along the abutment.
+//   beam steps         = pedestals, 2'-4" (CL brg -1'-0" .. +1'-4") x plan size along the abutment.
 // GAP: the wash runs to the FOOTING front, so the 1'-3" front toe is built up to the seat (plan: footing top 920.75 in front of the
 //      stem face at +1'-6"); the 1" seat slope is level at the seat-front elevation.
 // GAP: the generator always builds a corbel / paving notch and three backwall pours; the MnDOT infill wall has none -> the corbel is
@@ -186,7 +193,7 @@ G("Test piles: one test pile per abutment longer (S 105 vs 95 ft, N 100 vs 90 ft
 G("Abutment reinforcing (bar-lists.csv A/B series, p6-p8, p12-p14; bend diagrams U3) not entered; the Iowa abutment rebar generator would invent placements -> substructure reinforcement off. Needs: plan bar data for a MnDOT abutment.");
 U("Mask walls: east-end and corner extents not dimensioned (U9, p3/p5/p10/p11) - only the west mask wall (MSE Ret. Wall 20 / 23 tie-ins, p1) is built.");
 U("Pile tip elevations not given (U8, p4/p9) - piles hang the contract length from the head.");
-U("End diaphragm geometry (U2, p17/p20/p21); pedestal Type A/B details (U7, p6); bend dimensions (U3).");
+U("End diaphragm geometry (U2, p17/p20/p21) - not modeled; bend dimensions (U3, p8/p14/p21/p24) - bars not modeled.");
 
 var seatRows = Csv("seat-elevations.csv");
 void SetAbutment(SupportDefinition sup, string side, double ledge, double seatFront, double infillTop, double maskTop, double pedAlong, double pileLen, string pages)
@@ -200,7 +207,7 @@ void SetAbutment(SupportDefinition sup, string side, double ledge, double seatFr
         FootingDepth = Ft(3),
         BackwallBaseAboveFootingBottom = Ft(ledge) - Ft(917.75),       // back ledge
         WashHeight = Ft(seatFront) - Ft(917.75) - Ft(3),               // seat front above the footing top
-        BearingToStepFront = F(1, 6),                                  // pedestal 2'-6" along the beam (seat -1'-0" .. +1'-6")
+        BearingToStepFront = F(1, 4),                                  // pedestal 2'-4" along the beam (CL brg -1'-0" .. +1'-4", 2" short of the seat front; p6 / p12, U7)
         StepLength = pedAlong,
         // zero-size corbel (see GAP above); the device-pour split = the top 1'-6" of the infill wall, joint 1'-6" + 0
         CorbelProjection = 0, CorbelVertical = 0, CorbelTaperRise = 0, LedgeBelowTop = F(1, 6), JointBelowTaper = 0,

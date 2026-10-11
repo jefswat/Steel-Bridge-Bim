@@ -116,6 +116,8 @@
             "PedestalSizeAlong": 0,
             "PedestalSizeAcross": 0,
             "PedestalShared": false,
+            "PedestalSizeAcrossAhead": 0,
+            "PedestalRowJoint": "NaN",
             "ColumnCount": 0,
             "ColumnSpacings": [],
             "FirstColumnOffset": "NaN",
@@ -155,6 +157,7 @@
             "AbutmentFoundationSpacing": 3.6576000000000004,
             "Abutment": {
               "Source": "MnDOT Br. 02069 South Abutment, p4, p5, p11",
+              "Kind": "Stub",
               "LeftEndOffset": -7.188200000000001,
               "RightEndOffset": 10.972800000000001,
               "BackwallLeftOffset": "NaN",
@@ -164,7 +167,7 @@
               "FootingBackToBackwallBack": 0.2286,
               "BackwallThickness": 0.4572,
               "BackwallFrontToBearing": 0.3048,
-              "BearingToStepFront": 0.4572,
+              "BearingToStepFront": 0.4064,
               "BearingToFootingFront": 0.8382000000000001,
               "PlanFootingWidth": 1.8288000000000002,
               "FootingDepth": 0.9144000000000001,
@@ -228,6 +231,17 @@
               ],
               "FootingNotches": [],
               "Extension": null,
+              "CapBackToBearing": "NaN",
+              "CapFrontToBearing": "NaN",
+              "StepBoundaryS": [],
+              "StepRisersAtMidBay": false,
+              "StepToSeat": "NaN",
+              "PlanCapDepthLeft": "NaN",
+              "PlanCapDepthRight": "NaN",
+              "PlanCapVolume": "NaN",
+              "WingExtension": null,
+              "PileCasing": null,
+              "PileSpiral": null,
               "PileStations": [
                 -6.731000000000001,
                 -3.8608000000000002,
@@ -237,6 +251,7 @@
                 7.620000000000002,
                 10.490200000000002
               ],
+              "PileRowOffsets": [],
               "PileBackRowToBearing": 0.5334,
               "PileFrontRowToBearing": 0.381,
               "PileTopAboveFootingBottom": 0.3048,
@@ -321,6 +336,9 @@
               "FlareCover": 0.08889999999999999,
               "FlareTieSize": "#6",
               "FlareTieSpacing": 0.30479999999999996,
+              "FlareTieStyle": "ClosedTie",
+              "FlareTieOverlap": 0,
+              "FlareTieSpaces": 0,
               "ColumnSplice": "Continuous",
               "DowelHookLength": 0,
               "DowelPin": 0,
@@ -381,6 +399,8 @@
             "PedestalSizeAlong": 0,
             "PedestalSizeAcross": 0,
             "PedestalShared": false,
+            "PedestalSizeAcrossAhead": 0,
+            "PedestalRowJoint": "NaN",
             "ColumnCount": 0,
             "ColumnSpacings": [],
             "FirstColumnOffset": "NaN",
@@ -420,6 +440,7 @@
             "AbutmentFoundationSpacing": 3.6576000000000004,
             "Abutment": {
               "Source": "MnDOT Br. 02069 North Abutment, p9, p10, p11",
+              "Kind": "Stub",
               "LeftEndOffset": -7.188200000000001,
               "RightEndOffset": 10.972800000000001,
               "BackwallLeftOffset": "NaN",
@@ -429,7 +450,7 @@
               "FootingBackToBackwallBack": 0.2286,
               "BackwallThickness": 0.4572,
               "BackwallFrontToBearing": 0.3048,
-              "BearingToStepFront": 0.4572,
+              "BearingToStepFront": 0.4064,
               "BearingToFootingFront": 0.8382000000000001,
               "PlanFootingWidth": 1.8288000000000002,
               "FootingDepth": 0.9144000000000001,
@@ -493,6 +514,17 @@
               ],
               "FootingNotches": [],
               "Extension": null,
+              "CapBackToBearing": "NaN",
+              "CapFrontToBearing": "NaN",
+              "StepBoundaryS": [],
+              "StepRisersAtMidBay": false,
+              "StepToSeat": "NaN",
+              "PlanCapDepthLeft": "NaN",
+              "PlanCapDepthRight": "NaN",
+              "PlanCapVolume": "NaN",
+              "WingExtension": null,
+              "PileCasing": null,
+              "PileSpiral": null,
               "PileStations": [
                 -6.731000000000001,
                 -3.8608000000000002,
@@ -502,6 +534,7 @@
                 7.620000000000002,
                 10.490200000000002
               ],
+              "PileRowOffsets": [],
               "PileBackRowToBearing": 0.5334,
               "PileFrontRowToBearing": 0.381,
               "PileTopAboveFootingBottom": 0.3048,
@@ -586,6 +619,9 @@
               "FlareCover": 0.08889999999999999,
               "FlareTieSize": "#6",
               "FlareTieSpacing": 0.30479999999999996,
+              "FlareTieStyle": "ClosedTie",
+              "FlareTieOverlap": 0,
+              "FlareTieSpaces": 0,
               "ColumnSplice": "Continuous",
               "DowelHookLength": 0,
               "DowelPin": 0,
@@ -661,6 +697,7 @@
         ],
         "FirstGirderOffset": -6.4008,
         "OffsetsAtSupports": null,
+        "SpanLayouts": null,
         "PlanLayout": "CurvedParallel",
         "Section": {
           "TopFlange": {
@@ -678,25 +715,8 @@
         },
         "Kind": "TxDotPrestressed",
         "Prestressed": {
-          "Type": "Custom",
-          "CustomSection": {
-            "Name": "MnDOT 30MH (approx.)",
-            "D1": 0.127,
-            "D2": 0.041275,
-            "D3": 0,
-            "D4": 0,
-            "D5": 0.1381125,
-            "D6": 0.1397,
-            "H": 0.762,
-            "T1": 0.1651,
-            "T2": 0.1651,
-            "W1": 0.2143125,
-            "W2": 0.1349375,
-            "W3": 0,
-            "W4": 0.104775,
-            "W5": 0.307975,
-            "C1": 0.019049999999999997
-          },
+          "Type": "Tx54",
+          "CustomSection": null,
           "StrandCount": 44,
           "StrandDiameter": 0.015239999999999998,
           "StrandStrength": 300,
@@ -708,308 +728,440 @@
               "Y": 0.0508,
               "YEnd": 0.0508,
               "XEnd": "NaN",
-              "Harped": false
+              "Harped": false,
+              "DebondStart": 0,
+              "DebondEnd": 0,
+              "DebondSymbol": ""
             },
             {
               "X": -0.381,
               "Y": 0.0508,
               "YEnd": 0.0508,
               "XEnd": "NaN",
-              "Harped": false
+              "Harped": false,
+              "DebondStart": 0,
+              "DebondEnd": 0,
+              "DebondSymbol": ""
             },
             {
               "X": -0.3302,
               "Y": 0.0508,
               "YEnd": 0.0508,
               "XEnd": "NaN",
-              "Harped": false
+              "Harped": false,
+              "DebondStart": 3.9624,
+              "DebondEnd": 3.9624,
+              "DebondSymbol": "B"
             },
             {
               "X": -0.2794,
               "Y": 0.0508,
               "YEnd": 0.0508,
               "XEnd": "NaN",
-              "Harped": false
+              "Harped": false,
+              "DebondStart": 0,
+              "DebondEnd": 0,
+              "DebondSymbol": ""
             },
             {
               "X": -0.2286,
               "Y": 0.0508,
               "YEnd": 0.0508,
               "XEnd": "NaN",
-              "Harped": false
+              "Harped": false,
+              "DebondStart": 2.7432000000000003,
+              "DebondEnd": 2.7432000000000003,
+              "DebondSymbol": "A"
             },
             {
               "X": -0.17779999999999999,
               "Y": 0.0508,
               "YEnd": 0.0508,
               "XEnd": "NaN",
-              "Harped": false
+              "Harped": false,
+              "DebondStart": 0,
+              "DebondEnd": 0,
+              "DebondSymbol": ""
             },
             {
               "X": -0.127,
               "Y": 0.0508,
               "YEnd": 0.0508,
               "XEnd": "NaN",
-              "Harped": false
+              "Harped": false,
+              "DebondStart": 2.7432000000000003,
+              "DebondEnd": 2.7432000000000003,
+              "DebondSymbol": "A"
             },
             {
               "X": -0.07619999999999999,
               "Y": 0.0508,
               "YEnd": 0.0508,
               "XEnd": "NaN",
-              "Harped": false
+              "Harped": false,
+              "DebondStart": 0,
+              "DebondEnd": 0,
+              "DebondSymbol": ""
             },
             {
               "X": -0.0254,
               "Y": 0.0508,
               "YEnd": 0.0508,
               "XEnd": "NaN",
-              "Harped": false
+              "Harped": false,
+              "DebondStart": 0,
+              "DebondEnd": 0,
+              "DebondSymbol": ""
             },
             {
               "X": 0.0254,
               "Y": 0.0508,
               "YEnd": 0.0508,
               "XEnd": "NaN",
-              "Harped": false
+              "Harped": false,
+              "DebondStart": 0,
+              "DebondEnd": 0,
+              "DebondSymbol": ""
             },
             {
               "X": 0.07619999999999999,
               "Y": 0.0508,
               "YEnd": 0.0508,
               "XEnd": "NaN",
-              "Harped": false
+              "Harped": false,
+              "DebondStart": 0,
+              "DebondEnd": 0,
+              "DebondSymbol": ""
             },
             {
               "X": 0.127,
               "Y": 0.0508,
               "YEnd": 0.0508,
               "XEnd": "NaN",
-              "Harped": false
+              "Harped": false,
+              "DebondStart": 2.7432000000000003,
+              "DebondEnd": 2.7432000000000003,
+              "DebondSymbol": "A"
             },
             {
               "X": 0.17779999999999999,
               "Y": 0.0508,
               "YEnd": 0.0508,
               "XEnd": "NaN",
-              "Harped": false
+              "Harped": false,
+              "DebondStart": 0,
+              "DebondEnd": 0,
+              "DebondSymbol": ""
             },
             {
               "X": 0.2286,
               "Y": 0.0508,
               "YEnd": 0.0508,
               "XEnd": "NaN",
-              "Harped": false
+              "Harped": false,
+              "DebondStart": 2.7432000000000003,
+              "DebondEnd": 2.7432000000000003,
+              "DebondSymbol": "A"
             },
             {
               "X": 0.2794,
               "Y": 0.0508,
               "YEnd": 0.0508,
               "XEnd": "NaN",
-              "Harped": false
+              "Harped": false,
+              "DebondStart": 0,
+              "DebondEnd": 0,
+              "DebondSymbol": ""
             },
             {
               "X": 0.3302,
               "Y": 0.0508,
               "YEnd": 0.0508,
               "XEnd": "NaN",
-              "Harped": false
+              "Harped": false,
+              "DebondStart": 3.9624,
+              "DebondEnd": 3.9624,
+              "DebondSymbol": "B"
             },
             {
               "X": 0.381,
               "Y": 0.0508,
               "YEnd": 0.0508,
               "XEnd": "NaN",
-              "Harped": false
+              "Harped": false,
+              "DebondStart": 0,
+              "DebondEnd": 0,
+              "DebondSymbol": ""
             },
             {
               "X": 0.43179999999999996,
               "Y": 0.0508,
               "YEnd": 0.0508,
               "XEnd": "NaN",
-              "Harped": false
+              "Harped": false,
+              "DebondStart": 0,
+              "DebondEnd": 0,
+              "DebondSymbol": ""
             },
             {
               "X": -0.43179999999999996,
               "Y": 0.1016,
               "YEnd": 0.1016,
               "XEnd": "NaN",
-              "Harped": false
+              "Harped": false,
+              "DebondStart": 0,
+              "DebondEnd": 0,
+              "DebondSymbol": ""
             },
             {
               "X": -0.381,
               "Y": 0.1016,
               "YEnd": 0.1016,
               "XEnd": "NaN",
-              "Harped": false
+              "Harped": false,
+              "DebondStart": 5.1816,
+              "DebondEnd": 5.1816,
+              "DebondSymbol": "C"
             },
             {
               "X": -0.3302,
               "Y": 0.1016,
               "YEnd": 0.1016,
               "XEnd": "NaN",
-              "Harped": false
+              "Harped": false,
+              "DebondStart": 0,
+              "DebondEnd": 0,
+              "DebondSymbol": ""
             },
             {
               "X": -0.2794,
               "Y": 0.1016,
               "YEnd": 0.1016,
               "XEnd": "NaN",
-              "Harped": false
+              "Harped": false,
+              "DebondStart": 5.1816,
+              "DebondEnd": 5.1816,
+              "DebondSymbol": "C"
             },
             {
               "X": -0.2286,
               "Y": 0.1016,
               "YEnd": 0.1016,
               "XEnd": "NaN",
-              "Harped": false
+              "Harped": false,
+              "DebondStart": 0,
+              "DebondEnd": 0,
+              "DebondSymbol": ""
             },
             {
               "X": -0.17779999999999999,
               "Y": 0.1016,
               "YEnd": 0.1016,
               "XEnd": "NaN",
-              "Harped": false
+              "Harped": false,
+              "DebondStart": 3.9624,
+              "DebondEnd": 3.9624,
+              "DebondSymbol": "B"
             },
             {
               "X": -0.127,
               "Y": 0.1016,
               "YEnd": 0.1016,
               "XEnd": "NaN",
-              "Harped": false
+              "Harped": false,
+              "DebondStart": 0,
+              "DebondEnd": 0,
+              "DebondSymbol": ""
             },
             {
               "X": -0.07619999999999999,
               "Y": 0.1016,
               "YEnd": 0.1016,
               "XEnd": "NaN",
-              "Harped": false
+              "Harped": false,
+              "DebondStart": 3.9624,
+              "DebondEnd": 3.9624,
+              "DebondSymbol": "B"
             },
             {
               "X": -0.0254,
               "Y": 0.1016,
               "YEnd": 0.1016,
               "XEnd": "NaN",
-              "Harped": false
+              "Harped": false,
+              "DebondStart": 0,
+              "DebondEnd": 0,
+              "DebondSymbol": ""
             },
             {
               "X": 0.0254,
               "Y": 0.1016,
               "YEnd": 0.1016,
               "XEnd": "NaN",
-              "Harped": false
+              "Harped": false,
+              "DebondStart": 0,
+              "DebondEnd": 0,
+              "DebondSymbol": ""
             },
             {
               "X": 0.07619999999999999,
               "Y": 0.1016,
               "YEnd": 0.1016,
               "XEnd": "NaN",
-              "Harped": false
+              "Harped": false,
+              "DebondStart": 3.9624,
+              "DebondEnd": 3.9624,
+              "DebondSymbol": "B"
             },
             {
               "X": 0.127,
               "Y": 0.1016,
               "YEnd": 0.1016,
               "XEnd": "NaN",
-              "Harped": false
+              "Harped": false,
+              "DebondStart": 0,
+              "DebondEnd": 0,
+              "DebondSymbol": ""
             },
             {
               "X": 0.17779999999999999,
               "Y": 0.1016,
               "YEnd": 0.1016,
               "XEnd": "NaN",
-              "Harped": false
+              "Harped": false,
+              "DebondStart": 3.9624,
+              "DebondEnd": 3.9624,
+              "DebondSymbol": "B"
             },
             {
               "X": 0.2286,
               "Y": 0.1016,
               "YEnd": 0.1016,
               "XEnd": "NaN",
-              "Harped": false
+              "Harped": false,
+              "DebondStart": 0,
+              "DebondEnd": 0,
+              "DebondSymbol": ""
             },
             {
               "X": 0.2794,
               "Y": 0.1016,
               "YEnd": 0.1016,
               "XEnd": "NaN",
-              "Harped": false
+              "Harped": false,
+              "DebondStart": 5.1816,
+              "DebondEnd": 5.1816,
+              "DebondSymbol": "C"
             },
             {
               "X": 0.3302,
               "Y": 0.1016,
               "YEnd": 0.1016,
               "XEnd": "NaN",
-              "Harped": false
+              "Harped": false,
+              "DebondStart": 0,
+              "DebondEnd": 0,
+              "DebondSymbol": ""
             },
             {
               "X": 0.381,
               "Y": 0.1016,
               "YEnd": 0.1016,
               "XEnd": "NaN",
-              "Harped": false
+              "Harped": false,
+              "DebondStart": 5.1816,
+              "DebondEnd": 5.1816,
+              "DebondSymbol": "C"
             },
             {
               "X": 0.43179999999999996,
               "Y": 0.1016,
               "YEnd": 0.1016,
               "XEnd": "NaN",
-              "Harped": false
+              "Harped": false,
+              "DebondStart": 0,
+              "DebondEnd": 0,
+              "DebondSymbol": ""
             },
             {
               "X": -0.17779999999999999,
               "Y": 0.15239999999999998,
               "YEnd": 0.15239999999999998,
               "XEnd": "NaN",
-              "Harped": false
+              "Harped": false,
+              "DebondStart": 0,
+              "DebondEnd": 0,
+              "DebondSymbol": ""
             },
             {
               "X": -0.127,
               "Y": 0.15239999999999998,
               "YEnd": 0.15239999999999998,
               "XEnd": "NaN",
-              "Harped": false
+              "Harped": false,
+              "DebondStart": 0,
+              "DebondEnd": 0,
+              "DebondSymbol": ""
             },
             {
               "X": -0.07619999999999999,
               "Y": 0.15239999999999998,
               "YEnd": 0.15239999999999998,
               "XEnd": "NaN",
-              "Harped": false
+              "Harped": false,
+              "DebondStart": 0,
+              "DebondEnd": 0,
+              "DebondSymbol": ""
             },
             {
               "X": -0.0254,
               "Y": 0.15239999999999998,
               "YEnd": 0.15239999999999998,
               "XEnd": "NaN",
-              "Harped": false
+              "Harped": false,
+              "DebondStart": 0,
+              "DebondEnd": 0,
+              "DebondSymbol": ""
             },
             {
               "X": 0.0254,
               "Y": 0.15239999999999998,
               "YEnd": 0.15239999999999998,
               "XEnd": "NaN",
-              "Harped": false
+              "Harped": false,
+              "DebondStart": 0,
+              "DebondEnd": 0,
+              "DebondSymbol": ""
             },
             {
               "X": 0.07619999999999999,
               "Y": 0.15239999999999998,
               "YEnd": 0.15239999999999998,
               "XEnd": "NaN",
-              "Harped": false
+              "Harped": false,
+              "DebondStart": 0,
+              "DebondEnd": 0,
+              "DebondSymbol": ""
             },
             {
               "X": 0.127,
               "Y": 0.15239999999999998,
               "YEnd": 0.15239999999999998,
               "XEnd": "NaN",
-              "Harped": false
+              "Harped": false,
+              "DebondStart": 0,
+              "DebondEnd": 0,
+              "DebondSymbol": ""
             },
             {
               "X": 0.17779999999999999,
               "Y": 0.15239999999999998,
               "YEnd": 0.15239999999999998,
               "XEnd": "NaN",
-              "Harped": false
+              "Harped": false,
+              "DebondStart": 0,
+              "DebondEnd": 0,
+              "DebondSymbol": ""
             }
           ],
           "HarpPointFraction": 0,
@@ -1020,7 +1172,21 @@
           "InteriorEnds": "Square",
           "PadLength": 0.30479999999999996,
           "PadWidth": 0.762,
-          "PadThickness": 0.08255
+          "PadThickness": 0.08255,
+          "Standard": "MN 30MH",
+          "Designation": "30MH-101",
+          "StandardBearingLength": 0,
+          "StandardOverallLength": 0,
+          "Placement": null,
+          "PlacementBasis": "",
+          "HoldDownFromMidspan": 0,
+          "HarpedColumns": null,
+          "HarpedTopBelowTopAtEnd": 0,
+          "HarpedEndSpacing": 0.0508,
+          "SheathThickness": 0.0015875,
+          "Source": "MnDOT Br. 02069 p16 (30MH-101, Beam B1)",
+          "Unresolved": null,
+          "SpanBeams": null
         }
       },
       "Deck": {
