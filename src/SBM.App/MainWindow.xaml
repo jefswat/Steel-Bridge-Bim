@@ -72,10 +72,15 @@
                             <StackPanel><TextBlock Style="{StaticResource RibbonIcon}" Text="&#xE943;"/><TextBlock Style="{StaticResource RibbonLabel}" Text="Run Script"/></StackPanel>
                         </Button>
                     </HeaderedContentControl>
-                    <HeaderedContentControl Header="Units" Style="{StaticResource RibbonGroup}">
+                    <HeaderedContentControl Header="Units &amp; geometry" Style="{StaticResource RibbonGroup}">
+                        <StackPanel Orientation="Horizontal">
                         <Button Style="{StaticResource RibbonButton}" Command="{Binding ToggleUnitsCommand}" ToolTip="Switch display units between US and SI">
                             <StackPanel><TextBlock Style="{StaticResource RibbonIcon}" Text="&#xE9E9;"/><TextBlock Style="{StaticResource RibbonLabel}" Text="{Binding UnitsText}"/></StackPanel>
                         </Button>
+                        <Button Style="{StaticResource RibbonButton}" Command="{Binding ToggleExactGeometryCommand}" ToolTip="Project setting: curved girder plates, deck slab, haunches and barriers as exact NURBS (meshes tessellated from them). Slower regeneration; off = unchanged behaviour.">
+                            <StackPanel><TextBlock Style="{StaticResource RibbonIcon}" Text="&#xE879;"/><TextBlock Style="{StaticResource RibbonLabel}" Text="{Binding ExactGeometryText}"/></StackPanel>
+                        </Button>
+                        </StackPanel>
                     </HeaderedContentControl>
                 </StackPanel>
             </TabItem>

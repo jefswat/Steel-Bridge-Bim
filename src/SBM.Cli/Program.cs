@@ -1,3 +1,4 @@
+using SBM.Core.Project;
 using System.Diagnostics;
 using SBM.Api;
 
@@ -34,6 +35,10 @@ public static class Program
                                                             plan sheets (--pages splits the plan PDFs), element -> sheet links, QC
           sbm run <script.csx> [file.sbm] [-- args...]      Run a C# script (globals: Doc, Print, Ft, In, Sta, Len)
           sbm bench <file.sbm> [n]                          Time cold/warm regeneration
+          sbm nurbs <file.sbm> [--bridge NAME] [--chord LEN] [--tol LEN] [--csv out.csv]
+                                                            Exact curved geometry (NURBS) report: regenerates with the project
+                                                            setting Geometry.ExactCurvedGeometry off and on, prints timings, what
+                                                            became NURBS (fallbacks), fit deviation and exact vs mesh volumes
           sbm elevations <file.sbm> [bridge]                Step-by-step elevations, grade to bearing seat, at every bearing
           sbm blocking <file.sbm> [bridge] [--all]          Camber / blocking per girder (key points; --all = every plan point)
           sbm drawings <file.sbm> <folder> [bridge]         2D DXF models: layout plan + elevation, plan, sections, bents, bar bending
@@ -304,6 +309,8 @@ public static class Program
                     p.WaitForExit();
                     return p.ExitCode;
                 }
+                case "nurbs":
+                    return NurbsCommand(args);
                 case "bench":
                 {
                     Need(args, 2);
@@ -337,6 +344,79 @@ public static class Program
             Console.Error.WriteLine("Error: " + ex.Message);
             return 1;
         }
+    }
+
+    private static int NurbsCommand(string[] args)
+    {
+        Need(args, 2);
+        string? Opt(string name) { int i = Array.IndexOf(args, name); return i > 0 && i + 1 < args.Length ? args[i + 1] : null; }
+        SbmDocument Load(bool on)
+        {
+            var d = SbmDocument.Open(args[1]);
+            if (Opt("--bridge") is { } b) d.Project.Bridges.RemoveAll(x => !string.Equals(x.Name, b, StringComparison.OrdinalIgnoreCase));
+            d.Project.Geometry.ExactCurvedGeometry = on;
+            if (Opt("--chord") is { } c) d.Project.Geometry.ChordTolerance = d.Length(c);
+            if (Opt("--tol") is { } tl) d.Project.Geometry.FitTolerance = d.Length(tl);
+            return d;
+        }
+        var offVol = new Dictionary<(string, string), double>();
+        var times = new Dictionary<bool, List<double>> { [false] = new(), [true] = new() };
+        SbmDocument? doc = null;
+        foreach (bool on in new[] { false, true, false, true })
+        {
+            doc = null;
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            doc = Load(on);
+            var r = doc.Regenerate();
+            times[on].Add(r.Elapsed.TotalMilliseconds);
+            Console.WriteLine($"  regeneration, exact geometry {(on ? "ON " : "OFF")}: {r.Elapsed.TotalMilliseconds:F0} ms ({r.Parts} parts), " +
+                $"{System.Diagnostics.Process.GetCurrentProcess().WorkingSet64 / 1048576} MB working set");
+            if (!on)
+                foreach (var b in doc.Project.Bridges)
+                {
+                    var m = doc.Model(b.Name);
+                    if (m.Steel != null) foreach (var p in m.Steel.Parts) offVol[(b.Name, p.Mark)] = p.Volume;
+                    if (m.Concrete is { } c)
+                    {
+                        if (c.Deck != null) offVol[(b.Name, "Deck slab")] = Math.Abs(c.Deck.Volume());
+                        if (c.Haunches != null) offVol[(b.Name, "Haunches")] = Math.Abs(c.Haunches.Volume());
+                        foreach (var (n, mm) in c.Barriers) offVol[(b.Name, n)] = Math.Abs(mm.Volume());
+                    }
+                }
+        }
+        Console.WriteLine($"Regeneration (second runs): OFF {times[false][^1]:F0} ms, ON {times[true][^1]:F0} ms");
+        var rows = new List<NurbsQuantityRow>();
+        foreach (var b in doc!.Project.Bridges)
+        {
+            var m = doc.Model(b.Name);
+            Console.WriteLine($"{b.Name}:");
+            if (m.Steel?.Nurbs is { } sn) Console.WriteLine("  steel: " + sn.Summary());
+            if (m.Concrete?.Nurbs is { } cn) Console.WriteLine("  concrete: " + cn.Summary());
+            rows.AddRange(NurbsQuantities.Rows(m));
+        }
+        double In3(double v) => doc.Units.IsUS ? v / Math.Pow(0.3048, 3) : v;
+        string vu = doc.Units.IsUS ? "ft3" : "m3";
+        Console.WriteLine($"{"kind",-28} {"n",5} {"faces",7} {"holes",6} {"exact " + vu,14} {"mesh-ON vs exact",17} {"mesh-OFF vs exact",18} {"max fit dev",12}");
+        foreach (var g in rows.GroupBy(r => r.Kind).OrderBy(g => g.Key))
+        {
+            double ex = g.Sum(r => r.ExactVolume), mon = g.Sum(r => r.MeshVolume);
+            double moff = g.Sum(r => offVol.GetValueOrDefault((r.Bridge, r.Element), double.NaN));
+            double maxOff = g.Max(r => Math.Abs(offVol.GetValueOrDefault((r.Bridge, r.Element), double.NaN) / r.ExactVolume - 1) * 100);
+            double maxOn = g.Max(r => Math.Abs(r.VolumeDiffPercent));
+            Console.WriteLine($"{g.Key,-28} {g.Count(),5} {g.Sum(r => r.Faces),7} {g.Sum(r => r.Holes),6} {In3(ex),14:F3} {(mon / ex - 1) * 100,8:+0.0000;-0.0000;0.0000}% max {maxOn:0.000}% " +
+                $"{(moff / ex - 1) * 100,8:+0.0000;-0.0000;0.0000}% max {maxOff:0.000}% {g.Max(r => r.MaxDeviation) * 1000,9:0.0000} mm");
+        }
+        if (Opt("--csv") is { } csv)
+        {
+            using var w = new StreamWriter(csv);
+            w.WriteLine("bridge,element,kind,solids,faces,holes,exact_m3,mesh_on_m3,mesh_off_m3,exact_area_m2,mesh_area_m2,max_dev_m");
+            foreach (var r in rows)
+                w.WriteLine(string.Join(",", $"\"{r.Bridge}\"", $"\"{r.Element}\"", r.Kind, r.Solids, r.Faces, r.Holes, r.ExactVolume.ToString("R"), r.MeshVolume.ToString("R"),
+                    offVol.GetValueOrDefault((r.Bridge, r.Element), double.NaN).ToString("R"), r.ExactArea.ToString("R"), r.MeshArea.ToString("R"), r.MaxDeviation.ToString("R")));
+            Console.WriteLine($"  per element -> {csv}");
+        }
+        return 0;
     }
 
     private static void Need(string[] args, int n)

@@ -95,7 +95,7 @@ public sealed partial class SteelModelGenerator
             string fl = isTop ? "top" : "bottom";
 
             var outer = new Mesh();
-            PlateBuilder.AddLongPlate(outer, sj - ls, sj + ls, path.S, _ => -b / 2, _ => b / 2, _ => zo0, _ => zo1, hs, Map);
+            LongPlate(outer, path, sj - ls, sj + ls, path.S, Array.Empty<double>(), _ => -b / 2, _ => b / 2, _ => zo0, _ => zo1, hs, Map, false, "splice plate");
             Part(outer, PartCategory.SplicePlate, $"Outside {fl} flange splice {Pl(b, to)} x {In(2 * ls)}", 2 * ls);
 
             // Inside plates: the scheduled width from the flange edge, else clear of the web weld.
@@ -104,8 +104,8 @@ public sealed partial class SteelModelGenerator
             {
                 var m = new Mesh();
                 double r0 = side < 0 ? -b / 2 : rin, r1 = side < 0 ? -rin : b / 2;
-                PlateBuilder.AddLongPlate(m, sj - ls, sj + ls, path.S, _ => r0, _ => r1, _ => zi0, _ => zi1,
-                    hs.Where(h => h.Center.Y > r0 && h.Center.Y < r1).ToList(), Map);
+                LongPlate(m, path, sj - ls, sj + ls, path.S, Array.Empty<double>(), _ => r0, _ => r1, _ => zi0, _ => zi1,
+                    hs.Where(h => h.Center.Y > r0 && h.Center.Y < r1).ToList(), Map, false, "splice plate");
                 Part(m, PartCategory.SplicePlate, $"Inside {fl} flange splice {Pl(r1 - r0, ti)} x {In(2 * ls)}", 2 * ls);
             }
 
@@ -116,8 +116,8 @@ public sealed partial class SteelModelGenerator
                 double a0 = thin < 0 ? sj - ls : sj + gap / 2, a1 = thin < 0 ? sj - gap / 2 : sj + ls;
                 var (zf0, zf1) = Z(tmin, tmax);
                 var fm = new Mesh();
-                PlateBuilder.AddLongPlate(fm, a0, a1, path.S, _ => -b / 2, _ => b / 2, _ => zf0, _ => zf1,
-                    hs.Where(h => h.Center.X > a0 && h.Center.X < a1).ToList(), Map);
+                LongPlate(fm, path, a0, a1, path.S, Array.Empty<double>(), _ => -b / 2, _ => b / 2, _ => zf0, _ => zf1,
+                    hs.Where(h => h.Center.X > a0 && h.Center.X < a1).ToList(), Map, false, "filler plate");
                 Part(fm, PartCategory.FillerPlate, $"Filler {Pl(b, tmax - tmin)} x {In(a1 - a0)} ({fl} flange)", a1 - a0);
                 if (tmax - tmin >= Inch(0.25))
                     Warn($"{mark}: {fl} flange filler is {In(tmax - tmin)} thick; check filler development (AASHTO 6.13.6.1.5).");
@@ -172,7 +172,7 @@ public sealed partial class SteelModelGenerator
             {
                 var m = new Mesh();
                 double r0 = side < 0 ? -tw / 2 - twp : tw / 2, r1 = side < 0 ? -tw / 2 : tw / 2 + twp;
-                PlateBuilder.AddLongPlate(m, sj - lw, sj + lw, path.S, _ => zBotPlate, _ => zTopPlate, _ => r0, _ => r1, hs, WebMap);
+                LongPlate(m, path, sj - lw, sj + lw, path.S, Array.Empty<double>(), _ => zBotPlate, _ => zTopPlate, _ => r0, _ => r1, hs, WebMap, true, "splice plate");
                 Part(m, PartCategory.SplicePlate, $"Web splice {Pl(h, twp)} x {In(2 * lw)}", 2 * lw);
             }
             double grip = 2 * twp + tw;

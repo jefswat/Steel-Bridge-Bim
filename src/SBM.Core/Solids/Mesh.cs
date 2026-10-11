@@ -46,6 +46,44 @@ public sealed class Mesh
         SolidTriangles += triangles;
     }
 
+    /// <summary>Exact NURBS definitions of (curved) solids in this mesh, when the generator built the mesh by tessellating them
+    /// (project setting <c>Geometry.ExactCurvedGeometry</c>). Null = the mesh is the only definition.</summary>
+    public List<NurbsSolid>? Nurbs { get; private set; }
+
+    /// <summary>Triangle ranges (start, count) tessellated from <see cref="Nurbs"/>.</summary>
+    public List<(int start, int count)>? NurbsTriangles { get; private set; }
+
+    /// <summary>Records a NURBS solid; the triangles added since <paramref name="triStart"/> are its tessellation.</summary>
+    public void AddNurbs(NurbsSolid solid, int triStart)
+    {
+        (Nurbs ??= new()).Add(solid);
+        (NurbsTriangles ??= new()).Add((triStart, TriangleCount - triStart));
+    }
+
+    /// <summary>True when NURBS solids describe every triangle.</summary>
+    public bool HasExactNurbs => Nurbs is { Count: > 0 } && NurbsTriangles!.Sum(r => r.count) == TriangleCount;
+
+    /// <summary>Exact volume: the NURBS solids plus any triangles they do not describe (closed sub-meshes); null without NURBS.</summary>
+    public double? ExactVolume()
+    {
+        if (Nurbs is not { Count: > 0 }) return null;
+        double v = Nurbs.Sum(s => Math.Abs(s.Volume()));
+        var covered = new bool[TriangleCount];
+        foreach (var (s, c) in NurbsTriangles!) for (int i = s; i < s + c; i++) covered[i] = true;
+        if (covered.All(x => x)) return v;
+        var o = Positions[0];
+        double rest = 0;
+        for (int i = 0; i < TriangleCount; i++)
+        {
+            if (covered[i]) continue;
+            var a = Positions[Indices[3 * i]] - o;
+            var b = Positions[Indices[3 * i + 1]] - o;
+            var cc = Positions[Indices[3 * i + 2]] - o;
+            rest += Vec3.Dot(a, Vec3.Cross(b, cc));
+        }
+        return v + Math.Abs(rest / 6);
+    }
+
     public int Add(Vec3 p)
     {
         Positions.Add(p);
@@ -65,6 +103,12 @@ public sealed class Mesh
         Positions.AddRange(other.Positions);
         foreach (int i in other.Indices) Indices.Add(i + o);
         if (other.Solids != null) { (Solids ??= new()).AddRange(other.Solids); SolidTriangles += other.SolidTriangles; }
+        if (other.Nurbs != null)
+        {
+            int to = TriangleCount - other.TriangleCount;
+            (Nurbs ??= new()).AddRange(other.Nurbs);
+            (NurbsTriangles ??= new()).AddRange(other.NurbsTriangles!.Select(r => (r.start + to, r.count)));
+        }
     }
 
     /// <summary>Enclosed volume (divergence theorem). Valid for closed, consistently oriented meshes.</summary>
