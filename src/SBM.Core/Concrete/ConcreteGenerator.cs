@@ -1074,7 +1074,8 @@ public sealed partial class ConcreteGenerator
     {
         const int MinRepeat = 4;
         double tolIn = Math.Round(Deck.Reinforcement.MarkLengthTolerance / In(1));
-        foreach (var series in bars.GroupBy(b => b.series).OrderBy(g => SeriesOrder(g.Key)))
+        // Parallel producers: fixed geometric order first, so ties in the length sorts (and the bar numbering) are reproducible.
+        foreach (var series in InStableOrder(bars, b => b.placement.Points).GroupBy(b => b.series).OrderBy(g => SeriesOrder(g.Key)))
         {
             // Snap straight bar lengths within the grouping tolerance to the shortest length of their cluster.
             var snapped = new Dictionary<BarPlacement, double>();
@@ -1133,6 +1134,11 @@ public sealed partial class ConcreteGenerator
             }
         }
     }
+
+    /// <summary>Items from a concurrent collection in a run-independent order: by first, then last centerline point.</summary>
+    private static IOrderedEnumerable<T> InStableOrder<T>(IEnumerable<T> items, Func<T, Vec3[]> pts) =>
+        items.OrderBy(b => pts(b)[0].X).ThenBy(b => pts(b)[0].Y).ThenBy(b => pts(b)[0].Z)
+            .ThenBy(b => pts(b)[^1].X).ThenBy(b => pts(b)[^1].Y).ThenBy(b => pts(b)[^1].Z).ThenBy(b => pts(b).Length);
 
     private static int SeriesOrder(string s) => s switch { "T" => 0, "B" => 1, "L" => 2, "M" => 3, "N" => 4, "S" => 5, "U" => 6, "R" => 7, _ => 9 };
 }

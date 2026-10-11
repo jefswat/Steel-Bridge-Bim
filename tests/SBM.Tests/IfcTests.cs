@@ -50,6 +50,23 @@ public class IfcTests
     }
 
     [Fact]
+    public void Ifc_RegeneratedModel_ExportsIdentically()
+    {
+        // The steel generator builds parts in parallel: stiffener numbers (part marks -> GlobalIds) and hole order must
+        // not depend on thread timing. Same input, same file (apart from the FILE_NAME time stamp).
+        static string Data(string ifc) => ifc[ifc.IndexOf("DATA;", StringComparison.Ordinal)..];
+        var first = Data(ExportSample()).Split('\n');
+        for (int i = 0; i < 3; i++)
+        {
+            var again = Data(ExportSample()).Split('\n');
+            int k = 0;
+            while (k < first.Length && k < again.Length && first[k] == again[k]) k++;
+            Assert.True(k == first.Length && k == again.Length,
+                $"export differs between regenerations at data line {k}:\n{(k < first.Length ? first[k] : "<end>")}\n{(k < again.Length ? again[k] : "<end>")}");
+        }
+    }
+
+    [Fact]
     public void IfcZip_IsOneDeflatedModelMatchingThePlainExport()
     {
         var p = SampleProject.Create();
