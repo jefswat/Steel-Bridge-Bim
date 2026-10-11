@@ -97,8 +97,8 @@ Use this to start the next session. Architecture notes are in `CLAUDE.md`. The u
 - **Running branches:** feature/bends (bend diagrams, every printed dimension), feature/deckrebar (deck reinforcing to
   the plans — biggest model error), feature/sheets (overprinting, model-driven notes, missing sheets).
 - **Backlog:** Ramp G drains (25 inlets modelable), sign supports / crash cushion end posts / lighting (placeholders),
-  DB refresh + "missing detail" report, rule-placed rebar positions, full-model IFC validation (IfcOpenShell not
-  installed — needs user OK), cross-frame approximations (partial lines at skewed piers, bay E-F 5WB/6A, 6A joint),
+  DB refresh + "missing detail" report, rule-placed rebar positions, ~~full-model IFC validation~~ (done 2026-10-11: 0 issues,
+  `docs/plan-data/ifc-validation.md`), cross-frame approximations (partial lines at skewed piers, bay E-F 5WB/6A, 6A joint),
   pier close-up rebar display bug, prestressed plan sets.
 - **Unknown-origin local files:** `sandbox/` and docker lines in `CLAUDE.md` (stashed around merges, never committed).
 
@@ -205,7 +205,11 @@ as "…before bearing iteration.sbm". The run confirmed item 2.3: girder C has n
   11G/12G inner 6e4 ties not modeled. Editor UI: bridge editor Substructure tab (per-face bars, chamfer positions, hoops, crossties, flare cage, splices).
 
 - **Close-ups:** `--closeup SUBn@Bridge` uses a station section cut, which is wrong for Ramp G (other alignment). The free `--camera E,N,Z,dx,dy,dz,width[,dist]` often frames poorly; it needs testing.
-- **IfcOpenShell meshing of round-column ties** (Piers 4WB–7WB): those ties come out 2–4× their volume, cause unknown. Spirals and stirrups are fine.
+- ✅ **IfcOpenShell meshing of round-column ties** (Piers 4WB–7WB, was 2–4× their volume): not reproducible on the current model with
+  IfcOpenShell 0.9.0 — all 2,874 column bars of 4WB–7WB (hoops, flare ties, crossties, verticals, dowels) mesh within 2 % (≈ −1.1 %,
+  the polygonal disk); synthetic flat round hoops (4×90° arcs, 450° with lap, arcs up to 340°) mesh within 1.1 % too.
+  Remaining IfcOpenShell issue (kernel, not ours): long gently-kinked deck bars (polylines with 0.1–2° kinks) sometimes
+  tessellate with dropped faces (open mesh, volume low). See `docs/plan-data/ifc-validation.md`.
 - **Possible further IFC size cuts:** rebar typed by mark, about −35 MB; coordinates trimmed to 5 decimals, about −12 MB.
 - ✅ **Elevation check knows the as-designed substructure** (2026-10-11, `Checks/ElevationCheckSubstructure.cs`): every
   bearing chain continues seat → pedestal (plan size / shared block = highest seat) or abutment beam step → cap top from

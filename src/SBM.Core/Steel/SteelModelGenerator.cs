@@ -43,6 +43,9 @@ public sealed partial class SteelModelGenerator
     private sealed class GirderHoles
     {
         public readonly ConcurrentBag<Hole> Top = new(), Bottom = new(), Web = new();
+        /// <summary>The holes of one plate in a run-independent order (the bags fill from parallel connection tasks).</summary>
+        public static List<Hole> Sorted(IEnumerable<Hole> bag) =>
+            bag.OrderBy(h => h.Center.X).ThenBy(h => h.Center.Y).ThenBy(h => h.Diameter).ToList();
     }
 
     private SteelModelGenerator(BridgeFraming f, UnitSystem u)
@@ -103,7 +106,19 @@ public sealed partial class SteelModelGenerator
         // Phase 3: members.
         var members = new List<Action>();
         foreach (var g in _f.Girders) { var gg = g; members.Add(() => BuildGirder(gg)); members.Add(() => BuildStuds(gg)); }
-        foreach (var s in _f.Stiffeners) { var ss = s; members.Add(() => BuildStiffener(ss)); }
+        // Stiffener numbers (G2-2-CS1, CS2 ...) are assigned up front in girder-distance order, not by whichever parallel
+        // task gets there first: a mark (and the IFC GlobalId derived from it) must name the same plate on every run.
+        var stiffNo = new int[_f.Stiffeners.Count];
+        var counters = new Dictionary<string, int>();
+        foreach (int i in Enumerable.Range(0, _f.Stiffeners.Count)
+                     .OrderBy(i => _f.Stiffeners[i].Girder).ThenBy(i => _f.Stiffeners[i].GirderDistance).ThenBy(i => i))
+        {
+            var st = _f.Stiffeners[i];
+            if (st.Side is not (StiffenerSide.Both or StiffenerSide.Right or StiffenerSide.Left)) continue;   // no plate (BuildStiffener returns)
+            string key = SectionMark(st.Girder, st.GirderDistance) + StiffenerCode(st.Kind);
+            stiffNo[i] = counters[key] = counters.GetValueOrDefault(key) + 1;
+        }
+        for (int i = 0; i < _f.Stiffeners.Count; i++) { var ss = _f.Stiffeners[i]; int no = stiffNo[i]; members.Add(() => BuildStiffener(ss, no)); }
         foreach (var b in _f.Bearings) { var bb = b; members.Add(() => BuildBearing(bb)); }
         Parallel.ForEach(members, a => a());
     }
@@ -295,9 +310,9 @@ public sealed partial class SteelModelGenerator
         var bot = _bot[g.Index];
         var web = _web[g.Index];
         var holes = _holes[g.Index];
-        var topHoles = holes.Top.ToList();
-        var botHoles = holes.Bottom.ToList();
-        var webHoles = holes.Web.ToList();
+        var topHoles = GirderHoles.Sorted(holes.Top);
+        var botHoles = GirderHoles.Sorted(holes.Bottom);
+        var webHoles = GirderHoles.Sorted(holes.Web);
         var breaks = path.S.Concat(top.Breaks).Concat(bot.Breaks).ToList();
 
         Func<double, double, double, Vec3> map = (s, r, z) => GirderPoint(path, s, r, z);
@@ -377,8 +392,7 @@ public sealed partial class SteelModelGenerator
 
     // ================================================================== stiffeners
 
-    private readonly ConcurrentDictionary<string, int> _counters = new();
-    private int Next(string key) => _counters.AddOrUpdate(key, 1, (_, v) => v + 1);
+    private static string StiffenerCode(StiffenerKind k) => k switch { StiffenerKind.Bearing => "BS", StiffenerKind.ConnectionPlate => "CS", _ => "IS" };
 
     private static long SKey(double s) => (long)Math.Round(s * 100); // 1 cm buckets
 
@@ -391,10 +405,11 @@ public sealed partial class SteelModelGenerator
         long k = SKey(s);
         for (long dk = -1; dk <= 1; dk++)
             if (_stiffHoles.TryGetValue((girder, k + dk), out var bag))
-                foreach (var h in bag) yield return h;
+                foreach (var h in bag.OrderBy(h => h.c.X).ThenBy(h => h.c.Y).ThenBy(h => h.c.Z).ThenBy(h => h.d))   // run-independent order
+                    yield return h;
     }
 
-    private void BuildStiffener(StiffenerResult s)
+    private void BuildStiffener(StiffenerResult s, int n)
     {
         var g = _f.Girders[s.Girder];
         var (p, t, sta) = g.Path.At(s.GirderDistance);
@@ -459,7 +474,6 @@ public sealed partial class SteelModelGenerator
         if (mesh.IsEmpty) return;
         string desc = Pl(w, tp) + (s.SkewAngle > Numerics.DegToRad(0.5) ? $", skewed {Numerics.RadToDeg(s.SkewAngle):F1}°" : "")
                       + (s.Side == StiffenerSide.Both ? " (pair)" : "");
-        int n = Next(mark + code);
         _parts.Add(new SteelPart { Mark = $"{mark}-{code}{n}", Category = cat, Assembly = mark, Description = desc, Mesh = mesh, Length = h });
         _parts.Add(new SteelPart
         {
@@ -479,7 +493,7 @@ public sealed partial class SteelModelGenerator
         var align = _f.Alignment;
         double clear = sd.Clearance;
         var excl = _studExclusions[g.Index].ToList();
-        var boltHoles = _holes[g.Index].Top.ToList();
+        var boltHoles = GirderHoles.Sorted(_holes[g.Index].Top);
         double slab = _def.Deck.Thickness, haunch = _def.Deck.Haunch;
         double headR = _model.Bolt.HeadAcrossFlats / Math.Sqrt(3);
         bool coverWarned = false;

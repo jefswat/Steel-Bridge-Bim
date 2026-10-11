@@ -229,15 +229,43 @@ public static class IfcExporter
         }
 
         int extrudedParts = 0, meshParts = 0;
+        // Every hole circle strictly inside the outline polygon (center inside, clear of every edge) and clear of the other holes.
+        static bool HolesInside(ExtrudedSolid e)
+        {
+            var o = e.Outline;
+            const double tol = 1e-6;
+            for (int k = 0; k < e.Holes.Length; k++)
+            {
+                var h = e.Holes[k];
+                double r = h.Diameter / 2;
+                var c = h.Center;
+                bool inside = false;
+                for (int i = 0, j = o.Length - 1; i < o.Length; j = i++)
+                {
+                    var a = o[i]; var b = o[j];
+                    if ((a.Y > c.Y) != (b.Y > c.Y) && c.X < a.X + (c.Y - a.Y) * (b.X - a.X) / (b.Y - a.Y)) inside = !inside;
+                    var ab = b - a;
+                    double len2 = Vec2.Dot(ab, ab);
+                    double t = len2 > 0 ? Math.Clamp(Vec2.Dot(c - a, ab) / len2, 0, 1) : 0;
+                    if (Vec2.Distance(a + ab * t, c) <= r + tol) return false;
+                }
+                if (!inside) return false;
+                for (int q = 0; q < k; q++)
+                    if (Vec2.Distance(e.Holes[q].Center, c) <= r + e.Holes[q].Diameter / 2 + tol) return false;
+            }
+            return true;
+        }
         // Approximate bytes: an extrusion with its profile/placement entities vs. merged-vertex triangles. Curved plates
         // recorded strip by strip are smaller as triangles.
         static bool ExtrusionsPay(Mesh m) =>
             m.Solids!.Sum(e => 450L + 22L * e.Outline.Length + 170L * e.Holes.Length) <= 15L * m.Positions.Count + 16L * m.TriangleCount;
 
         // Body representation of a solid: exact extrusions when the builders described the whole mesh, else triangles.
+        // A profile whose hole is not strictly inside the outline (e.g. cross-frame bolt holes running off a narrow skewed
+        // bearing stiffener) is not a valid IfcArbitraryProfileDefWithVoids — viewers drop faces — so that solid goes as triangles.
         int Body(Mesh m, int? style)
         {
-            if (m.HasExactSolids && ExtrusionsPay(m))
+            if (m.HasExactSolids && ExtrusionsPay(m) && m.Solids!.All(HolesInside))
             {
                 extrudedParts++;
                 var items = m.Solids!.Select(e => Extruded(e, style)).ToList();
@@ -386,7 +414,8 @@ public static class IfcExporter
                 w.Add("IFCSTYLEDITEM", $"{Ref(disk)},({Ref(barStyle)}),$");
                 int rep = w.Add("IFCSHAPEREPRESENTATION", $"{Ref(body)},'Body','AdvancedSweptSolid',({Ref(disk)})");
                 int pds = w.Add("IFCPRODUCTDEFINITIONSHAPE", $"$,$,({Ref(rep)})");
-                string role = mk.Shape.Code is "TIE" or "SPIRAL" or "SSTR-S" ? ".LIGATURE." : mk.Shape.Code == "SSTR-U" ? ".ANCHORING." : ".MAIN.";
+                // Ties, hoops, crossties, spirals and stirrups confine / tie the main bars: LIGATURE.
+                string role = mk.Shape.Code is "TIE" or "HOOP" or "CROSSTIE" or "SPIRAL" or "SSTR-S" ? ".LIGATURE." : mk.Shape.Code == "SSTR-U" ? ".ANCHORING." : ".MAIN.";
                 string tag = string.IsNullOrEmpty(mk.Unit) ? mk.Mark : $"{mk.Unit} {mk.Mark}";
                 int id = w.Add("IFCREINFORCINGBAR",
                     $"{Guid(barKey(n++))},$,{S("Bar " + mk.Mark)},{S($"{mk.Size.Name} {mk.Location}")},$,{Ref(pl)},{Ref(pds)},{S(tag)},$," +
