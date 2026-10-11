@@ -1,4 +1,4 @@
-set,bridge,support,pdf_page,footing,s_center_ft,n_center_ft,size_s_ft,size_n_ft,printed_dims,tag,note
+set,bridge,support,pdf_page,footing,s_center_ft,n_center_ft,size_s_ft,size_n_ft,printed_dims,tag,note,conflict
 116,I-80 WB Unit 1,Pier 1WB,15,1,-23.9375,0,18,16,23'-11 1/4 | 8'-6 3/4 | 32'-6; 18'-0 (9'-0 typ) x 16'-0 (8'-0 typ),RASTER+DERIVED,S = along the pier line from the staked CL point (right + looking up-station); N = 0 means centred on the CL pier
 116,I-80 WB Unit 1,Pier 1WB,15,2,8.5625,0,18,16,,RASTER,
 116,I-80 WB Unit 1,Pier 1WB,15,3,41.0625,0,18,16,,RASTER+DERIVED,8'-6 3/4 + 32'-6
@@ -30,7 +30,7 @@ set,bridge,support,pdf_page,footing,s_center_ft,n_center_ft,size_s_ft,size_n_ft,
 116,I-80 WB Unit 2,Pier 10WB,16,1,-32.635417,0,26,17.5,32'-6 | 1 5/8 | 32'-4 3/8; 26'-0 (13'-0 typ) x 17'-6 (8'-9 typ),RASTER+DERIVED,
 116,I-80 WB Unit 2,Pier 10WB,16,2,-0.135417,0,26,17.5,,RASTER,
 116,I-80 WB Unit 2,Pier 10WB,16,3,32.364583,0,26,17.5,,RASTER,
-116,I-80 WB Unit 2,Pier 11WB,16,1,-31.161458,0,18,18,31'-1 15/16 | 9'-5 1/16 | 21'-6; 18'-0 (9'-0 typ) x 18'-0 (9'-0 typ); footings 1-2 clipped 11'-3 / 11'-3 around the storm sewer,RASTER,
+116,I-80 WB Unit 2,Pier 11WB,16,1,-31.161458,0,18,18,31'-1 15/16 | 9'-5 1/16 | 21'-6; 18'-0 (9'-0 typ) x 18'-0 (9'-0 typ); footings 1-2 clipped 11'-3 / 11'-3 around the storm sewer,RASTER,,PLAN CONFLICT: staking PDF 16 puts footing 1 31'-1 15/16 left of the staked point = 40'-7 from footing 2; pier details PDF 63 (elevation) and pile layout PDF 65 give 40'-6 - model follows the pier details (footings 2 and 3 agree with the staking)
 116,I-80 WB Unit 2,Pier 11WB,16,2,9.421875,0,18,18,,RASTER,
 116,I-80 WB Unit 2,Pier 11WB,16,3,30.921875,0,18,18,,RASTER+DERIVED,
 116,I-80 WB Unit 3,Pier 12WB,17,1,-58.161458,0,16,20.5,29'-0 | 29'-0 | 1 15/16 | 28'-10 1/16; 16'-0 (8'-0 typ) x 20'-6 (10'-3 typ),RASTER+DERIVED,
@@ -51,7 +51,7 @@ set,bridge,support,pdf_page,footing,s_center_ft,n_center_ft,size_s_ft,size_n_ft,
 316,Ramp G Unit 1,Pier 2G,14,1,10.0,0,29,31.5,10'-0; 29'-0 (14'-6 x2) x 31'-6 (15'-9 x2),RASTER,
 316,Ramp G Unit 1,Pier 3G,14,1,10.0,0,28,18,10'-0; 28'-0 (14'-0 x2) x 18'-0 (9'-0 x2),RASTER,
 316,Ramp G Unit 1,Pier 4G,14,1,10.0,0,28,26.5,10'-0; 28'-0 (14'-0 x2) x 26'-6 (13'-3 x2),RASTER,
-316,Ramp G Unit 1,Pier 5G,14,1,10.0,0,31.5,22,10'-0; 31'-6 (15'-9 x2) x 22'-0 (11'-0 x2),RASTER,Pier 5G details (PDF 32 / sheet 30) show 29'-0 x 24'-0
+316,Ramp G Unit 1,Pier 5G,14,1,10.0,0,31.5,22,10'-0; 31'-6 (15'-9 x2) x 22'-0 (11'-0 x2),RASTER,Pier 5G details (PDF 32 / sheet 30) show 29'-0 x 24'-0,PLAN CONFLICT: staking PDF 14 prints 31'-6 x 22'-0; Pier 5G details PDF 32 give 29'-0 x 24'-0 (30-pile layout needs 24'-0) - model follows the details
 316,Ramp G Unit 2,Pier 6G,15,1,10.0,0,28,26.5,10'-0; 28'-0 (14'-0 x2) x 26'-6 (13'-3 x2),RASTER,
 316,Ramp G Unit 2,Pier 7G,15,1,10.0,0,35.5,28,10'-0; 35'-6 (17'-9 x2) x 28'-0 (14'-0 x2),RASTER,
 316,Ramp G Unit 2,Pier 8G,15,1,10.0,0,34,25,10'-0; 34'-0 (17'-0 x2) x 25'-0 (12'-6 x2),RASTER,

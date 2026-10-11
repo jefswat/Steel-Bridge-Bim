@@ -21407,27 +21407,27 @@
             "CapOffset": 0,
             "CapProfile": [
               {
-                "S": -21.1375752,
+                "S": -21.14233516,
                 "Elevation": 308.78373600000003
               },
               {
-                "S": 11.476024800000001,
+                "S": 11.471264840000002,
                 "Elevation": 309.347616
               },
               {
-                "S": 11.866565040000003,
+                "S": 11.861805080000002,
                 "Elevation": 307.97581100610404
               },
               {
-                "S": 9.037624800000001,
+                "S": 9.032864840000002,
                 "Elevation": 307.1715378682698
               },
               {
-                "S": -18.6991752,
+                "S": -18.70393516,
                 "Elevation": 306.6919763729427
               },
               {
-                "S": -21.482060160000003,
+                "S": -21.48682012,
                 "Elevation": 307.41193100610406
               }
             ],
@@ -21531,7 +21531,7 @@
               8.33122032,
               8.33118984
             ],
-            "FirstColumnOffset": -17.3275752,
+            "FirstColumnOffset": -17.33233516,
             "ColumnShape": "Rectangular",
             "ColumnDiameter": 0.9144000000000001,
             "ColumnWidth": 2.4384,
@@ -31830,53 +31830,53 @@
             "CapOffset": 0,
             "CapProfile": [
               {
-                "S": -12.984703969308647,
+                "S": -12.71322348369663,
                 "Elevation": 308.13756
               },
               {
-                "S": 12.923296030691354,
+                "S": 13.19477651630337,
                 "Elevation": 309.426864
               },
               {
-                "S": 13.358245630691354,
+                "S": 13.629726116303372,
                 "Elevation": 308.0535666487362
               },
               {
-                "S": 10.789696030691355,
+                "S": 11.061176516303371,
                 "Elevation": 307.1844456993413
               },
               {
-                "S": -10.851103969308648,
+                "S": -10.57962348369663,
                 "Elevation": 306.1074976522825
               },
               {
-                "S": -13.283103169308648,
+                "S": -13.011622683696629,
                 "Elevation": 306.76426264873623
               }
             ],
             "CapProfileAhead": [
               {
-                "S": -12.984703969308647,
+                "S": -12.71322348369663,
                 "Elevation": 308.756304
               },
               {
-                "S": 12.923296030691354,
+                "S": 13.19477651630337,
                 "Elevation": 310.045608
               },
               {
-                "S": 13.358245630691354,
+                "S": 13.629726116303372,
                 "Elevation": 308.0535666487362
               },
               {
-                "S": 10.789696030691355,
+                "S": 11.061176516303371,
                 "Elevation": 307.1844456993413
               },
               {
-                "S": -10.851103969308648,
+                "S": -10.57962348369663,
                 "Elevation": 306.1074976522825
               },
               {
-                "S": -13.283103169308648,
+                "S": -13.011622683696629,
                 "Elevation": 306.76426264873623
               }
             ],
@@ -31978,7 +31978,7 @@
               12.3444,
               6.5532
             ],
-            "FirstColumnOffset": -9.479503969308647,
+            "FirstColumnOffset": -9.208023483696628,
             "ColumnShape": "Rectangular",
             "ColumnDiameter": 0.9144000000000001,
             "ColumnWidth": 2.4384,
@@ -34262,53 +34262,53 @@
             "CapOffset": 0,
             "CapProfile": [
               {
-                "S": -24.139082961109303,
+                "S": -24.12320796142519,
                 "Elevation": 308.3052
               },
               {
-                "S": -8.2894829611093,
+                "S": -8.273607961425189,
                 "Elevation": 308.84774400000003
               },
               {
-                "S": -7.829107961109301,
+                "S": -7.813232961425189,
                 "Elevation": 307.089048
               },
               {
-                "S": -14.5378829611093,
+                "S": -14.522007961425189,
                 "Elevation": 305.808888
               },
               {
-                "S": -17.890682961109302,
+                "S": -17.87480796142519,
                 "Elevation": 305.696112
               },
               {
-                "S": -24.4946829611093,
+                "S": -24.47880796142519,
                 "Elevation": 306.55260000000004
               }
             ],
             "CapProfileAhead": [
               {
-                "S": -24.139082961109303,
+                "S": -24.12320796142519,
                 "Elevation": 308.07660000000004
               },
               {
-                "S": -8.2894829611093,
+                "S": -8.273607961425189,
                 "Elevation": 308.613048
               },
               {
-                "S": -7.829107961109301,
+                "S": -7.813232961425189,
                 "Elevation": 307.089048
               },
               {
-                "S": -14.5378829611093,
+                "S": -14.522007961425189,
                 "Elevation": 305.808888
               },
               {
-                "S": -17.890682961109302,
+                "S": -17.87480796142519,
                 "Elevation": 305.696112
               },
               {
-                "S": -24.4946829611093,
+                "S": -24.47880796142519,
                 "Elevation": 306.55260000000004
               }
             ],
@@ -34407,7 +34407,7 @@
             "PedestalRowJoint": "NaN",
             "ColumnCount": 1,
             "ColumnSpacings": [],
-            "FirstColumnOffset": -16.2142829611093,
+            "FirstColumnOffset": -16.19840796142519,
             "ColumnShape": "Rectangular",
             "ColumnDiameter": 0.9144000000000001,
             "ColumnWidth": 3.048,
@@ -35519,14 +35519,14 @@
         "PlanGeometry": [
           {
             "Girder": 0,
-            "StartStation": 231377.0283667848,
-            "StartOffset": -23.3407537536398,
-            "StartDirectionDegrees": 2.871776932764164,
+            "StartStation": 231377.02735615944,
+            "StartOffset": -23.324910955999005,
+            "StartDirectionDegrees": 2.86727505362802,
             "Elements": [
               {
                 "Kind": "Line",
                 "Radius": 0,
-                "Length": 202.02355100392907
+                "Length": 202.02376724401594
               },
               {
                 "Kind": "ArcLeft",
@@ -35542,14 +35542,14 @@
           },
           {
             "Girder": 1,
-            "StartStation": 231376.80431114906,
-            "StartOffset": -19.828405346705154,
-            "StartDirectionDegrees": 2.41218382539086,
+            "StartStation": 231376.8033005237,
+            "StartOffset": -19.81256254906436,
+            "StartDirectionDegrees": 2.407900850440493,
             "Elements": [
               {
                 "Kind": "Line",
                 "Radius": 0,
-                "Length": 212.31895298911462
+                "Length": 212.3192965186744
               },
               {
                 "Kind": "ArcLeft",
@@ -35560,14 +35560,14 @@
           },
           {
             "Girder": 2,
-            "StartStation": 231376.5863192653,
-            "StartOffset": -16.411113729338588,
-            "StartDirectionDegrees": 2.0888303052897963,
+            "StartStation": 231376.58530863994,
+            "StartOffset": -16.39527093076697,
+            "StartDirectionDegrees": 2.0832436667476797,
             "Elements": [
               {
                 "Kind": "Line",
                 "Radius": 0,
-                "Length": 162.75089771084194
+                "Length": 162.75133098590047
               },
               {
                 "Kind": "ArcLeft",
@@ -35578,27 +35578,27 @@
           },
           {
             "Girder": 3,
-            "StartStation": 231376.36165725437,
-            "StartOffset": -12.8892596428875,
-            "StartDirectionDegrees": 1.460654817435095,
+            "StartStation": 231376.360646629,
+            "StartOffset": -12.873416845246705,
+            "StartDirectionDegrees": 1.4542796105790816,
             "Elements": [
               {
                 "Kind": "Line",
                 "Radius": 0,
-                "Length": 234.0083401803269
+                "Length": 234.00894751940672
               }
             ]
           },
           {
             "Girder": 4,
-            "StartStation": 231376.17489369333,
-            "StartOffset": -9.961510497303431,
-            "StartDirectionDegrees": 0.7437834681531275,
+            "StartStation": 231376.17388306797,
+            "StartOffset": -9.945667698731807,
+            "StartDirectionDegrees": 0.7294704925699304,
             "Elements": [
               {
                 "Kind": "Line",
                 "Radius": 0,
-                "Length": 154.90612584213068
+                "Length": 154.90693270560428
               }
             ]
           }
@@ -83080,9 +83080,9 @@
               },
               {
                 "Number": 25,
-                "Camber": 0.02413,
+                "Camber": 0.024637999999999997,
                 "SteelDeflection": 0.019049999999999997,
-                "SlabDeflection": 0.057658
+                "SlabDeflection": 0.05740399999999999
               },
               {
                 "Number": 26,
@@ -83712,9 +83712,9 @@
               },
               {
                 "Number": 25,
-                "Camber": 0.041656,
+                "Camber": 0.040132,
                 "SteelDeflection": 0.019812,
-                "SlabDeflection": 0.05841999999999999
+                "SlabDeflection": 0.058165999999999995
               },
               {
                 "Number": 26,
@@ -84344,9 +84344,9 @@
               },
               {
                 "Number": 25,
-                "Camber": 0.059435999999999996,
-                "SteelDeflection": 0.020574000000000002,
-                "SlabDeflection": 0.05969
+                "Camber": 0.056133999999999996,
+                "SteelDeflection": 0.02032,
+                "SlabDeflection": 0.059435999999999996
               },
               {
                 "Number": 26,
@@ -84976,9 +84976,9 @@
               },
               {
                 "Number": 25,
-                "Camber": 0.07721599999999999,
+                "Camber": 0.07213599999999999,
                 "SteelDeflection": 0.021081999999999997,
-                "SlabDeflection": 0.061467999999999995
+                "SlabDeflection": 0.061214000000000005
               },
               {
                 "Number": 26,
@@ -86709,7 +86709,9 @@
                 ],
                 "SideOffset": 0,
                 "Unplaced": 0,
-                "Unresolved": ""
+                "Unresolved": "",
+                "FieldCutNote": "",
+                "ConflictNote": ""
               },
               {
                 "Mark": "5d3",
@@ -86737,7 +86739,9 @@
                 ],
                 "SideOffset": 0,
                 "Unplaced": 0,
-                "Unresolved": ""
+                "Unresolved": "",
+                "FieldCutNote": "",
+                "ConflictNote": ""
               },
               {
                 "Mark": "5d4",
@@ -86786,7 +86790,9 @@
                 ],
                 "SideOffset": 0,
                 "Unplaced": 0,
-                "Unresolved": ""
+                "Unresolved": "",
+                "FieldCutNote": "Section B-B, PDF 137: \u00275d4 bars shall be field cut or spaced as required at expansion joint support boxes\u0027",
+                "ConflictNote": ""
               },
               {
                 "Mark": "5d5",
@@ -86835,7 +86841,9 @@
                 ],
                 "SideOffset": 0,
                 "Unplaced": 0,
-                "Unresolved": ""
+                "Unresolved": "",
+                "FieldCutNote": "",
+                "ConflictNote": ""
               }
             ],
             "Unresolved": [
@@ -94622,9 +94630,9 @@
               },
               {
                 "Number": 7,
-                "Camber": 0.104648,
-                "SteelDeflection": 0.034036000000000004,
-                "SlabDeflection": 0.07950199999999999
+                "Camber": 0.102616,
+                "SteelDeflection": 0.03302,
+                "SlabDeflection": 0.07747
               },
               {
                 "Number": 8,
@@ -94886,9 +94894,9 @@
               },
               {
                 "Number": 51,
-                "Camber": 0.069342,
-                "SteelDeflection": 0.02286,
-                "SlabDeflection": 0.059944
+                "Camber": 0.06883399999999999,
+                "SteelDeflection": 0.022606,
+                "SlabDeflection": 0.05969
               },
               {
                 "Number": 52,
@@ -95013,8 +95021,8 @@
               {
                 "Number": 72,
                 "Camber": 0.084074,
-                "SteelDeflection": 0.023875999999999998,
-                "SlabDeflection": 0.061214000000000005
+                "SteelDeflection": 0.024384,
+                "SlabDeflection": 0.062738
               },
               {
                 "Number": 73,
@@ -95164,9 +95172,9 @@
               },
               {
                 "Number": 7,
-                "Camber": 0.09906,
-                "SteelDeflection": 0.030479999999999997,
-                "SlabDeflection": 0.07493
+                "Camber": 0.096774,
+                "SteelDeflection": 0.029717999999999998,
+                "SlabDeflection": 0.072898
               },
               {
                 "Number": 8,
@@ -95428,9 +95436,9 @@
               },
               {
                 "Number": 51,
-                "Camber": 0.067564,
-                "SteelDeflection": 0.022098,
-                "SlabDeflection": 0.05841999999999999
+                "Camber": 0.067056,
+                "SteelDeflection": 0.021844,
+                "SlabDeflection": 0.05791199999999999
               },
               {
                 "Number": 52,
@@ -95555,8 +95563,8 @@
               {
                 "Number": 72,
                 "Camber": 0.079756,
-                "SteelDeflection": 0.021589999999999998,
-                "SlabDeflection": 0.05715
+                "SteelDeflection": 0.022098,
+                "SlabDeflection": 0.05841999999999999
               },
               {
                 "Number": 73,
@@ -95706,9 +95714,9 @@
               },
               {
                 "Number": 7,
-                "Camber": 0.093472,
-                "SteelDeflection": 0.026924,
-                "SlabDeflection": 0.070612
+                "Camber": 0.09118599999999999,
+                "SteelDeflection": 0.026162,
+                "SlabDeflection": 0.06883399999999999
               },
               {
                 "Number": 8,
@@ -95970,9 +95978,9 @@
               },
               {
                 "Number": 51,
-                "Camber": 0.06604,
-                "SteelDeflection": 0.021335999999999997,
-                "SlabDeflection": 0.05715
+                "Camber": 0.06527799999999999,
+                "SteelDeflection": 0.021081999999999997,
+                "SlabDeflection": 0.056642
               },
               {
                 "Number": 52,
@@ -96097,8 +96105,8 @@
               {
                 "Number": 72,
                 "Camber": 0.075438,
-                "SteelDeflection": 0.019303999999999998,
-                "SlabDeflection": 0.05334
+                "SteelDeflection": 0.019558,
+                "SlabDeflection": 0.054356
               },
               {
                 "Number": 73,
@@ -96248,9 +96256,9 @@
               },
               {
                 "Number": 7,
-                "Camber": 0.08763,
-                "SteelDeflection": 0.023368,
-                "SlabDeflection": 0.06629399999999999
+                "Camber": 0.085598,
+                "SteelDeflection": 0.022606,
+                "SlabDeflection": 0.06477
               },
               {
                 "Number": 8,
@@ -96512,9 +96520,9 @@
               },
               {
                 "Number": 51,
-                "Camber": 0.06426199999999999,
+                "Camber": 0.06375399999999999,
                 "SteelDeflection": 0.02032,
-                "SlabDeflection": 0.056133999999999996
+                "SlabDeflection": 0.055625999999999995
               },
               {
                 "Number": 52,
@@ -96639,8 +96647,8 @@
               {
                 "Number": 72,
                 "Camber": 0.07111999999999999,
-                "SteelDeflection": 0.016764,
-                "SlabDeflection": 0.049783999999999995
+                "SteelDeflection": 0.017018000000000002,
+                "SlabDeflection": 0.0508
               },
               {
                 "Number": 73,
@@ -97832,7 +97840,9 @@
                 ],
                 "SideOffset": 0,
                 "Unplaced": 0,
-                "Unresolved": ""
+                "Unresolved": "",
+                "FieldCutNote": "",
+                "ConflictNote": ""
               },
               {
                 "Mark": "5d3",
@@ -97860,7 +97870,9 @@
                 ],
                 "SideOffset": 0,
                 "Unplaced": 0,
-                "Unresolved": ""
+                "Unresolved": "",
+                "FieldCutNote": "",
+                "ConflictNote": ""
               },
               {
                 "Mark": "5d4",
@@ -97909,7 +97921,9 @@
                 ],
                 "SideOffset": 0,
                 "Unplaced": 0,
-                "Unresolved": ""
+                "Unresolved": "",
+                "FieldCutNote": "Section B-B, PDF 137: \u00275d4 bars shall be field cut or spaced as required at expansion joint support boxes\u0027",
+                "ConflictNote": ""
               },
               {
                 "Mark": "5d5",
@@ -97958,7 +97972,9 @@
                 ],
                 "SideOffset": 0,
                 "Unplaced": 0,
-                "Unresolved": ""
+                "Unresolved": "",
+                "FieldCutNote": "",
+                "ConflictNote": ""
               }
             ],
             "Unresolved": [
@@ -107266,9 +107282,9 @@
               },
               {
                 "Number": 35,
-                "Camber": 0.078232,
-                "SteelDeflection": 0.079756,
-                "SlabDeflection": 0.115316
+                "Camber": 0.07747,
+                "SteelDeflection": 0.079248,
+                "SlabDeflection": 0.1143
               },
               {
                 "Number": 36,
@@ -107554,8 +107570,8 @@
               },
               {
                 "Number": 83,
-                "Camber": 0.066548,
-                "SteelDeflection": 0.041401999999999994,
+                "Camber": 0.06629399999999999,
+                "SteelDeflection": 0.041656,
                 "SlabDeflection": 0.08534399999999999
               },
               {
@@ -107693,8 +107709,8 @@
               {
                 "Number": 106,
                 "Camber": 0.074168,
-                "SteelDeflection": 0.027432,
-                "SlabDeflection": 0.06781799999999999
+                "SteelDeflection": 0.027686000000000002,
+                "SlabDeflection": 0.06858
               },
               {
                 "Number": 107,
@@ -108036,9 +108052,9 @@
               },
               {
                 "Number": 35,
-                "Camber": 0.07137399999999999,
-                "SteelDeflection": 0.066548,
-                "SlabDeflection": 0.10845799999999998
+                "Camber": 0.070866,
+                "SteelDeflection": 0.06604,
+                "SlabDeflection": 0.107696
               },
               {
                 "Number": 36,
@@ -108324,7 +108340,7 @@
               },
               {
                 "Number": 83,
-                "Camber": 0.06045199999999999,
+                "Camber": 0.060198,
                 "SteelDeflection": 0.036322,
                 "SlabDeflection": 0.07848599999999999
               },
@@ -108463,8 +108479,8 @@
               {
                 "Number": 106,
                 "Camber": 0.06731,
-                "SteelDeflection": 0.025145999999999998,
-                "SlabDeflection": 0.061975999999999996
+                "SteelDeflection": 0.0254,
+                "SlabDeflection": 0.062484
               },
               {
                 "Number": 107,
@@ -108806,9 +108822,9 @@
               },
               {
                 "Number": 35,
-                "Camber": 0.06426199999999999,
-                "SteelDeflection": 0.05334,
-                "SlabDeflection": 0.10185399999999999
+                "Camber": 0.06375399999999999,
+                "SteelDeflection": 0.053085999999999994,
+                "SlabDeflection": 0.101092
               },
               {
                 "Number": 36,
@@ -109094,7 +109110,7 @@
               },
               {
                 "Number": 83,
-                "Camber": 0.05461,
+                "Camber": 0.054356,
                 "SteelDeflection": 0.031242,
                 "SlabDeflection": 0.07213599999999999
               },
@@ -109233,8 +109249,8 @@
               {
                 "Number": 106,
                 "Camber": 0.06095999999999999,
-                "SteelDeflection": 0.02286,
-                "SlabDeflection": 0.056642
+                "SteelDeflection": 0.023114,
+                "SlabDeflection": 0.05715
               },
               {
                 "Number": 107,
@@ -109576,9 +109592,9 @@
               },
               {
                 "Number": 35,
-                "Camber": 0.056896,
-                "SteelDeflection": 0.040132,
-                "SlabDeflection": 0.09525
+                "Camber": 0.056388,
+                "SteelDeflection": 0.039878,
+                "SlabDeflection": 0.09474199999999999
               },
               {
                 "Number": 36,
@@ -109864,9 +109880,9 @@
               },
               {
                 "Number": 83,
-                "Camber": 0.048768,
+                "Camber": 0.04826,
                 "SteelDeflection": 0.025908,
-                "SlabDeflection": 0.06604
+                "SlabDeflection": 0.065786
               },
               {
                 "Number": 84,
@@ -110003,8 +110019,8 @@
               {
                 "Number": 106,
                 "Camber": 0.054356,
-                "SteelDeflection": 0.02032,
-                "SlabDeflection": 0.051308
+                "SteelDeflection": 0.020574000000000002,
+                "SlabDeflection": 0.05206999999999999
               },
               {
                 "Number": 107,
@@ -111378,7 +111394,9 @@
                 ],
                 "SideOffset": 0,
                 "Unplaced": 0,
-                "Unresolved": ""
+                "Unresolved": "",
+                "FieldCutNote": "",
+                "ConflictNote": "the partial section (PDF 138) puts the first bar 10\u0022 from each girder CL, but Unit 3\u0027s top flanges at Piers 9G / 14G are 20\u0022 wide (10\u0022 each side), so the bar sits on the flange edge and its leg below the slab runs through the flange (Units 1, 2, 4 have 18\u0022 flanges: 11/16\u0022 clear)"
               },
               {
                 "Mark": "5d3",
@@ -111406,7 +111424,9 @@
                 ],
                 "SideOffset": 0,
                 "Unplaced": 0,
-                "Unresolved": ""
+                "Unresolved": "",
+                "FieldCutNote": "",
+                "ConflictNote": "the partial section (PDF 138) puts the first bar 10\u0022 from each girder CL, but Unit 3\u0027s top flanges at Piers 9G / 14G are 20\u0022 wide (10\u0022 each side), so the bar sits on the flange edge and its leg below the slab runs through the flange (Units 1, 2, 4 have 18\u0022 flanges: 11/16\u0022 clear)"
               },
               {
                 "Mark": "5d4",
@@ -111455,7 +111475,9 @@
                 ],
                 "SideOffset": 0,
                 "Unplaced": 0,
-                "Unresolved": ""
+                "Unresolved": "",
+                "FieldCutNote": "Section B-B, PDF 137: \u00275d4 bars shall be field cut or spaced as required at expansion joint support boxes\u0027",
+                "ConflictNote": ""
               },
               {
                 "Mark": "5d5",
@@ -111504,7 +111526,9 @@
                 ],
                 "SideOffset": 0,
                 "Unplaced": 0,
-                "Unresolved": ""
+                "Unresolved": "",
+                "FieldCutNote": "",
+                "ConflictNote": "the partial section (PDF 138) puts the first bar 10\u0022 from each girder CL, but Unit 3\u0027s top flanges at Piers 9G / 14G are 20\u0022 wide (10\u0022 each side), so the bar sits on the flange edge and its leg below the slab runs through the flange (Units 1, 2, 4 have 18\u0022 flanges: 11/16\u0022 clear)"
               }
             ],
             "Unresolved": [
@@ -121502,9 +121526,9 @@
               },
               {
                 "Number": 55,
-                "Camber": 0.061975999999999996,
-                "SteelDeflection": 0.061467999999999995,
-                "SlabDeflection": 0.125222
+                "Camber": 0.060198,
+                "SteelDeflection": 0.060706,
+                "SlabDeflection": 0.123698
               },
               {
                 "Number": 56,
@@ -122248,9 +122272,9 @@
               },
               {
                 "Number": 55,
-                "Camber": 0.084836,
-                "SteelDeflection": 0.064516,
-                "SlabDeflection": 0.13106399999999999
+                "Camber": 0.084582,
+                "SteelDeflection": 0.06375399999999999,
+                "SlabDeflection": 0.129794
               },
               {
                 "Number": 56,
@@ -122994,9 +123018,9 @@
               },
               {
                 "Number": 55,
-                "Camber": 0.09779,
-                "SteelDeflection": 0.06985,
-                "SlabDeflection": 0.141986
+                "Camber": 0.098298,
+                "SteelDeflection": 0.069088,
+                "SlabDeflection": 0.140716
               },
               {
                 "Number": 56,
@@ -123740,9 +123764,9 @@
               },
               {
                 "Number": 55,
-                "Camber": 0.099314,
-                "SteelDeflection": 0.076454,
-                "SlabDeflection": 0.15697199999999997
+                "Camber": 0.099822,
+                "SteelDeflection": 0.07619999999999999,
+                "SlabDeflection": 0.15621000000000002
               },
               {
                 "Number": 56,
@@ -125417,7 +125441,9 @@
                 ],
                 "SideOffset": 0,
                 "Unplaced": 36,
-                "Unresolved": "Pier 19G end of Unit 4 (section E-E, PDF 140): 10 bars per bay and 3 outside the exterior girders \u0027at equal spacing\u0027 on the skewed joint; positions along the joint not dimensioned (the partial section PDF 138 dimensions Piers 5G/9G/14G only) - 36 bars counted, not modeled"
+                "Unresolved": "Pier 19G end of Unit 4 (section E-E, PDF 140): 10 bars per bay and 3 outside the exterior girders \u0027at equal spacing\u0027 on the skewed joint; positions along the joint not dimensioned (the partial section PDF 138 dimensions Piers 5G/9G/14G only) - 36 bars counted, not modeled",
+                "FieldCutNote": "",
+                "ConflictNote": ""
               },
               {
                 "Mark": "5d3",
@@ -125445,7 +125471,9 @@
                 ],
                 "SideOffset": 0,
                 "Unplaced": 36,
-                "Unresolved": "Pier 19G end of Unit 4 (section E-E, PDF 140): 10 bars per bay and 3 outside the exterior girders \u0027at equal spacing\u0027 on the skewed joint; positions along the joint not dimensioned (the partial section PDF 138 dimensions Piers 5G/9G/14G only) - 36 bars counted, not modeled"
+                "Unresolved": "Pier 19G end of Unit 4 (section E-E, PDF 140): 10 bars per bay and 3 outside the exterior girders \u0027at equal spacing\u0027 on the skewed joint; positions along the joint not dimensioned (the partial section PDF 138 dimensions Piers 5G/9G/14G only) - 36 bars counted, not modeled",
+                "FieldCutNote": "",
+                "ConflictNote": ""
               },
               {
                 "Mark": "5d4",
@@ -125494,7 +125522,9 @@
                 ],
                 "SideOffset": 0,
                 "Unplaced": 36,
-                "Unresolved": "Pier 19G end of Unit 4 (section E-E, PDF 140): 10 bars per bay and 3 outside the exterior girders \u0027at equal spacing\u0027 on the skewed joint; positions along the joint not dimensioned (the partial section PDF 138 dimensions Piers 5G/9G/14G only) - 36 bars counted, not modeled"
+                "Unresolved": "Pier 19G end of Unit 4 (section E-E, PDF 140): 10 bars per bay and 3 outside the exterior girders \u0027at equal spacing\u0027 on the skewed joint; positions along the joint not dimensioned (the partial section PDF 138 dimensions Piers 5G/9G/14G only) - 36 bars counted, not modeled",
+                "FieldCutNote": "Section B-B, PDF 137: \u00275d4 bars shall be field cut or spaced as required at expansion joint support boxes\u0027",
+                "ConflictNote": ""
               },
               {
                 "Mark": "5d5",
@@ -125543,7 +125573,9 @@
                 ],
                 "SideOffset": 0,
                 "Unplaced": 36,
-                "Unresolved": "Pier 19G end of Unit 4 (section E-E, PDF 140): 10 bars per bay and 3 outside the exterior girders \u0027at equal spacing\u0027 on the skewed joint; positions along the joint not dimensioned (the partial section PDF 138 dimensions Piers 5G/9G/14G only) - 36 bars counted, not modeled"
+                "Unresolved": "Pier 19G end of Unit 4 (section E-E, PDF 140): 10 bars per bay and 3 outside the exterior girders \u0027at equal spacing\u0027 on the skewed joint; positions along the joint not dimensioned (the partial section PDF 138 dimensions Piers 5G/9G/14G only) - 36 bars counted, not modeled",
+                "FieldCutNote": "",
+                "ConflictNote": ""
               }
             ],
             "Unresolved": [
