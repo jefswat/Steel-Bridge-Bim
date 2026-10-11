@@ -255,6 +255,28 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   Exports must be reproducible (test `Ifc_RegeneratedModel_ExportsIdentically`): anything numbered from a parallel
   generator's ConcurrentBag (stiffener marks, bar order, hole order) must be put in a fixed order first. Bar role:
   TIE/HOOP/CROSSTIE/SPIRAL/SSTR-S = LIGATURE.
+  Geometry modes (`IfcExportOptions(Geometry, ChordTolerance)`, `SbmDocument.ExportIfc(path, mode, chordTol)`, CLI
+  `sbm export --geometry parametric|abv [--chord-tol mm]`): **Parametric** (default, byte-identical to the pre-mode output)
+  = exact IfcExtrudedAreaSolid / IfcBooleanClippingResult. **ReferenceView** (`abv`, header `ViewDefinition
+  [AlignmentBasedView]`) writes only geometry the bSI AbV allows (checked against usBrSpec_AbV Exclusions.ids, 261
+  entities; `python -I tools/run_ids.py model.ifc <ids>`): `Ifc/IfcReferenceViewGeometry.cs` turns every recorded
+  `ExtrudedSolid` into an IfcPolygonalFaceSet (end caps = IfcIndexedPolygonalFaceWithVoids, holes = void loops of an
+  inscribed polygon, >= 8 sides, sagitta <= chord tolerance, default 1/32 in = 0.79 mm -> 9 sides for a 15/16 in hole;
+  sides / hole walls = planar quads) and the arc-profile prestressed beams (Parametric: extrusion clipped by two half
+  spaces + IfcPlane) into ONE face set cut exactly by the skewed end planes (arcs polygonized to the tolerance).
+  Triangle meshes, swept-disk bars/strands, mapped bolt types (IfcTriangulatedFaceSet sources) are already allowed and
+  unchanged; element GlobalIds, materials and psets are the same (the SBM_Fabrication pset GlobalIds are keyed by STEP id,
+  so they differ between modes). AbV also writes prestressed IfcBeam `.GIRDER_SEGMENT.` (`.GIRDER.` is not in
+  IfcBeamTypeEnum of IFC4X3_ADD2 — Parametric still writes it, a schema error left as is to keep Parametric unchanged).
+  Volumes vs Parametric: `python -I tools/compare_ifc_volumes.py par.ifc abv.ifc --changed-only`. Cost: I-80 WB and
+  Ramp G __SIZES__. Not done yet: IfcSectionedSolidHorizontal along the IFC 4.3 alignment
+  (needs IfcAlignmentWriter's IfcGradientCurve / IfcCompositeCurve): girder plates (flanges/webs, profile = plate section
+  at field-section ends / thickness changes), deck slab (deck section with haunches at cross-section stations) and
+  barriers (barrier profile, constant) would each become IfcSectionedSolidHorizontal(Directrix = the alignment's gradient
+  curve, CrossSections = IfcArbitraryClosedProfileDef polylines (no arcs needed: IfcIndexedPolyCurve is allowed),
+  CrossSectionPositions = IfcAxis2PlacementLinear(IfcPointByDistanceExpression(station - start, offset, z))) in place of
+  their face set; hook = a branch in `Body`/`ExportConcrete` taking the alignment curve id from IfcAlignmentWriter, same
+  style / GlobalId; holes / clips stay face sets.
 - `src/SBM.App` â€” WPF (Fluent dark theme), MVVM via CommunityToolkit.Mvvm, GPU viewport = HelixToolkit.Wpf.SharpDX 3.x
   (DirectX 11, System.Numerics types; namespaces `HelixToolkit`, `HelixToolkit.SharpDX`, `HelixToolkit.Wpf.SharpDX`).
   - `Viewport/SceneBuilder` batches each layer into one LineGeometry3D + one BillboardText3D; vertices are rebased to a
