@@ -43,13 +43,12 @@ internal sealed class IfcReferenceViewGeometry
     public double ChordTolerance => _tol;
     public int FaceSets { get; private set; }
 
-    /// <summary>Segments of a full circle of radius <paramref name="r"/> with sagitta &lt;= <paramref name="tol"/>:
-    /// at least 8 and a multiple of 4 (symmetric about both hole axes).</summary>
+    /// <summary>Segments of a full circle of radius <paramref name="r"/> with sagitta &lt;= <paramref name="tol"/>, at least 8
+    /// (a 15/16 in bolt hole at 1/32 in: 9). Hole walls dominate the file size, so no rounding up beyond the tolerance.</summary>
     public static int CircleSegments(double r, double tol)
     {
-        int n = tol >= r ? 8 : (int)Math.Ceiling(Math.PI / Math.Acos(1 - tol / r));
-        n = Math.Max(n, 8);
-        return (n + 3) / 4 * 4;
+        int n = tol >= r ? 8 : (int)Math.Ceiling(Math.PI / Math.Acos(1 - tol / r) - 1e-9);
+        return Math.Max(n, 8);
     }
 
     /// <summary>Segments of an arc of radius <paramref name="r"/> sweeping <paramref name="sweep"/> rad with sagitta &lt;= tol.</summary>
