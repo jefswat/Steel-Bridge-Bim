@@ -1010,16 +1010,32 @@ public static class ModelDatabase
                 r.Tag = b;
                 r.Mark = b.Mark; r.Girder = a.Girder; r.Material = b.Material; r.Volume = b.Volume; r.Mass = b.Mass; r.Length = b.Length;
                 r.Box = b.Mesh.Bounds(); StationOf(r, r.Box);
-                r.Props = new Json().Add("shape", b.Shape.Name).Add("strands", b.Strands.Count).ToString();
+                var props = new Json().Add("shape", b.Shape.Name).Add("strands", b.Strands.Count);
+                if (b.Designation != "") props.Add("designation", b.Designation);
+                if (b.IsStandardLength) props.Add("layout_bearing_span", b.LayoutBearingSpan).Add("standard_minus_layout", b.LengthDifference);
+                if (b.Assumption != null) props.Add("status", b.Assumption.Status).Add("reason", b.Assumption.Reason).Add("assumed", b.Assumption.Basis);
+                r.Props = props.ToString();
                 _w.Add(r);
                 int n = 0;
                 foreach (var st in b.Strands)
                 {
-                    var s = New(Id(IfcKeys.PsStrand(bk, b.Mark, n++)), aid, "bar", st.Depressed ? "depressed strand" : "strand", "IFCTENDON", st.Depressed ? "Depressed strand" : "Strand");
+                    int sn = n++;
+                    var s = New(Id(IfcKeys.PsStrand(bk, b.Mark, sn)), aid, "bar", st.Depressed ? "depressed strand" : "strand", "IFCTENDON", st.Depressed ? "Depressed strand" : "Strand");
                     s.Tag = st;
                     s.Girder = a.Girder; s.Length = SBM.Core.Prestressed.PrestressedModel.PolyLength(st.Points);
                     foreach (var p in st.Points) s.Box.Add(p);
+                    if (st.Debonded) s.Props = new Json().Add("debond_start", st.DebondStart).Add("debond_end", st.DebondEnd).Add("debond_symbol", st.DebondSymbol).ToString();
                     _w.Add(s);
+                    int e = 0;
+                    foreach (var piece in st.Sheathing())
+                    {
+                        int end = st.DebondStart > 0 && e == 0 ? 0 : 1;
+                        e++;
+                        var h = New(Id(IfcKeys.PsSheath(bk, b.Mark, sn, end)), aid, "element", "debond sheathing", "IFCTENDONCONDUIT", "Debond sheathing");
+                        h.Girder = a.Girder; h.Length = SBM.Core.Prestressed.PrestressedModel.PolyLength(piece);
+                        foreach (var p in piece) h.Box.Add(p);
+                        _w.Add(h);
+                    }
                 }
             }
             foreach (var p in ps.Pads)

@@ -138,7 +138,13 @@ public static class PgSuperImport
                 ps.DepressedStrands = layout.Count(x => x.Harped);
                 if (layout.Count == 0) warnings.Add("The PGSuper girders have no strands yet (not designed); the beams are modeled without strands.");
             }
-            if (gd.DebondedStraight > 0) notes.Add($"{gd.DebondedStraight} debonded strand entries are modeled full length (debonding is not drawn).");
+            if (gd.DebondedStraight > 0 && layout != null)
+            {
+                int nd = layout.Count(x => x.DebondStart > 0 || x.DebondEnd > 0);
+                notes.Add($"{gd.Debond.Count} PGSuper debond entries: {nd} straight strands debonded (sheathing modeled).");
+                if (gd.Debond.Count < gd.DebondedStraight)
+                    warnings.Add($"PGSuper lists {gd.DebondedStraight} debonded strand entries but only {gd.Debond.Count} DebondInfo records were read; the others are modeled bonded.");
+            }
             notes.Add($"Strands: {layout?.Count ?? 0} – {TxGirderCatalog.StrandSize(gd.StrandDiameter, u)} ({gd.NumStraight} straight, {gd.NumHarped} harped), f'c {ps.ConcreteStrength:0.0#} ksi, f'ci {ps.ReleaseStrength:0.0#} ksi.");
         }
         // Harping points: library location (fraction of span from the girder CL), else TxDOT L/20.
@@ -174,6 +180,7 @@ public static class PgSuperImport
     {
         // Grid entries in PGSuper's fill order; an entry is a pair when any of its X values is non-zero.
         var straight = new List<(PgsGridPoint p, int n)>();
+        int GridIndex(PgsGridPoint p) { for (int k = 0; k < pg.StraightGrid.Count; k++) if (ReferenceEquals(pg.StraightGrid[k], p)) return k; return -1; }
         var harped = new List<(PgsGridPoint p, int n)>();
         bool Pair(PgsGridPoint p, bool h) => (h ? Math.Max(p.X, Math.Max(p.Xhp, p.Xend)) : p.X) > 1e-6;
         void Fill(IEnumerable<(bool h, PgsGridPoint p)> order, int nStraight, int nHarped, int nTotal)
@@ -212,8 +219,15 @@ public static class PgSuperImport
 
         var pts = new List<StrandPoint>();
         foreach (var (p, c) in straight)
+        {
+            // Debonding of this grid entry (both strands of a pair).
+            int gi = GridIndex(p);
+            var db = gd.Debond.FirstOrDefault(d => d.GridIndex == gi);
             foreach (double x in c == 2 ? new[] { -p.X, p.X } : new[] { 0.0 })
-                pts.Add(new StrandPoint { X = x, Y = p.Y, YEnd = p.Y });
+                pts.Add(new StrandPoint { X = x, Y = p.Y, YEnd = p.Y, DebondStart = Math.Max(0, db.Start), DebondEnd = Math.Max(0, db.End) });
+        }
+        foreach (var d in gd.Debond.Where(d => !straight.Any(s => GridIndex(s.p) == d.GridIndex)))
+            warnings.Add($"PGSuper debonds straight grid position {d.GridIndex}, which is not filled; ignored.");
         if (harped.Count > 0)
         {
             var hp = new List<(double x, double y, double xe, double ye)>();

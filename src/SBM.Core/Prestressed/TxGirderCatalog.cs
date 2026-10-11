@@ -63,7 +63,27 @@ public sealed class TxGirderShape
     public double Iy { get; init; }
     public double WeightPlf { get; init; }
 
+    // ---- state standard shapes (StandardBeamCatalog): exact outline with true radius fillets
+    /// <summary>State of the standard ("TX", "IA", "MN"); "" for a PGSuper custom section.</summary>
+    public string State { get; init; } = "";
+    /// <summary>Family of the standard ("Tx", "BT" bulb tee, "MH" mesa).</summary>
+    public string Family { get; init; } = "";
+    /// <summary>Exact outline (lines + arcs, meters). Null = the PGSuper / WBFL straight-taper polygon of <see cref="Dims"/>.</summary>
+    public SectionProfile? Profile { get; init; }
+    /// <summary>Where the shape is defined (plan sheet / standard).</summary>
+    public string Source { get; init; } = "";
+    /// <summary>Properties printed on the standard (in², in, in⁴); null = not printed. Computed values are in Area / Yb / Ix.</summary>
+    public double? PrintedArea { get; init; }
+    public double? PrintedYb { get; init; }
+    public double? PrintedIx { get; init; }
+
     public bool IsTx => Type != TxGirderType.Custom;
+    /// <summary>A state standard shape other than TxDOT (BTD, 30MH, ...): explicit strands only (no IGND grid).</summary>
+    public bool IsStateStandard => !IsTx && State != "";
+    /// <summary>Catalog key ("IA BTD", "MN 30MH", "TX Tx54").</summary>
+    public string Key => State == "" ? Name : $"{State} {Name}";
+    /// <summary>Text for notes and labels: "TxDOT Tx54 (IGD)", "Iowa BTD", "MnDOT 30MH", or the custom name.</summary>
+    public string Designation => IsTx ? $"TxDOT {Name} (IGD)" : State switch { "IA" => $"Iowa {Name}", "MN" => $"MnDOT {Name}", "" => Name, _ => $"{State} {Name}" };
     public double Depth => Dims.H;
     public double DepthIn => Dims.H / In(1);
     public double TopWidth => Dims.T1 + 2 * (Dims.W1 + Dims.W2 + Dims.W3);
@@ -76,9 +96,13 @@ public sealed class TxGirderShape
     public double BottomEdgeIn => Dims.D6 / In(1);
     public string Name => IsTx ? Type.ToString() : (string.IsNullOrWhiteSpace(Dims.Name) ? "Custom I-beam" : Dims.Name);
 
-    /// <summary>Counter-clockwise outline in section coordinates (x right, y up from the bottom of the girder), meters.</summary>
+    private Vec2[]? _outline;
+
+    /// <summary>Counter-clockwise outline in section coordinates (x right, y up from the bottom of the girder), meters.
+    /// Shapes with an exact <see cref="Profile"/> return it with the arcs split into pieces of at most 7.5 degrees.</summary>
     public Vec2[] Outline()
     {
+        if (Profile != null) return (Vec2[])(_outline ??= Profile.Tessellate()).Clone();
         var d = Dims;
         double hb = BottomWidth / 2, ht = TopWidth / 2, c = d.C1;
         double yWebBot = d.D6 + d.D5 + d.D4, yWebTop = d.H - d.D1 - d.D2 - d.D3;
@@ -105,6 +129,7 @@ public sealed class TxGirderShape
     /// <summary>Strands per row of the IGND grid (rows at 2½", 4½", …; positions at 1", 3", … each side of the CL).</summary>
     public int[] RowCapacity()
     {
+        if (IsStateStandard) return Array.Empty<int>(); // strands come from the standard's own pattern (StrandLayout)
         int nRows = (int)Math.Floor((DepthIn - 3.5 - 2.5) / 2) + 1;
         var cap = new int[nRows];
         int[] bottom = BottomEdgeIn < 8 ? new[] { 14, 14, 12, 8, 4 } : new[] { 14, 14, 14, 12, 8, 4 };
@@ -132,7 +157,7 @@ public sealed class TxGirderShape
     }
 
     /// <summary>Highest "A" grid position (y), the default top of the depressed strands at the ends.</summary>
-    public double HighestAPosition => In(2.5 + 2 * (RowCapacity().Length - 1));
+    public double HighestAPosition => In(2.5 + 2 * Math.Max(0, RowCapacity().Length - 1));
 
     /// <summary>Shape from arbitrary dimensions with properties computed from the outline.</summary>
     public static TxGirderShape FromDims(PrecastIBeamDims d)
@@ -169,13 +194,13 @@ public static class TxGirderCatalog
 
     private static readonly TxGirderShape[] Shapes =
     {
-        new() { Type = TxGirderType.Tx28, Dims = Tx("Tx28", 28, 2, 6.75, 12.5), Yt = 15.02, Yb = 12.98, Area = 585, Ix = 52772, Iy = 40559, WeightPlf = 630 },
-        new() { Type = TxGirderType.Tx34, Dims = Tx("Tx34", 34, 2, 6.75, 12.5), Yt = 18.49, Yb = 15.51, Area = 627, Ix = 88355, Iy = 40731, WeightPlf = 675 },
-        new() { Type = TxGirderType.Tx40, Dims = Tx("Tx40", 40, 2, 6.75, 12.5), Yt = 21.90, Yb = 18.10, Area = 669, Ix = 134990, Iy = 40902, WeightPlf = 720 },
-        new() { Type = TxGirderType.Tx46, Dims = Tx("Tx46", 46, 2, 8.75, 12.5), Yt = 25.90, Yb = 20.10, Area = 761, Ix = 198089, Iy = 46478, WeightPlf = 819 },
-        new() { Type = TxGirderType.Tx54, Dims = Tx("Tx54", 54, 2, 8.75, 12.5), Yt = 30.49, Yb = 23.51, Area = 817, Ix = 299740, Iy = 46707, WeightPlf = 880 },
-        new() { Type = TxGirderType.Tx62, Dims = Tx("Tx62", 62, 2.5, 8.75, 15.5), Yt = 33.72, Yb = 28.28, Area = 910, Ix = 463072, Iy = 57351, WeightPlf = 980 },
-        new() { Type = TxGirderType.Tx70, Dims = Tx("Tx70", 70, 2.5, 8.75, 15.5), Yt = 38.09, Yb = 31.91, Area = 966, Ix = 628747, Iy = 57579, WeightPlf = 1040 },
+        new() { State = "TX", Family = "Tx", Source = "TxDOT IGD (Aug 2017)", Type = TxGirderType.Tx28, Dims = Tx("Tx28", 28, 2, 6.75, 12.5), Yt = 15.02, Yb = 12.98, Area = 585, Ix = 52772, Iy = 40559, WeightPlf = 630 },
+        new() { State = "TX", Family = "Tx", Source = "TxDOT IGD (Aug 2017)", Type = TxGirderType.Tx34, Dims = Tx("Tx34", 34, 2, 6.75, 12.5), Yt = 18.49, Yb = 15.51, Area = 627, Ix = 88355, Iy = 40731, WeightPlf = 675 },
+        new() { State = "TX", Family = "Tx", Source = "TxDOT IGD (Aug 2017)", Type = TxGirderType.Tx40, Dims = Tx("Tx40", 40, 2, 6.75, 12.5), Yt = 21.90, Yb = 18.10, Area = 669, Ix = 134990, Iy = 40902, WeightPlf = 720 },
+        new() { State = "TX", Family = "Tx", Source = "TxDOT IGD (Aug 2017)", Type = TxGirderType.Tx46, Dims = Tx("Tx46", 46, 2, 8.75, 12.5), Yt = 25.90, Yb = 20.10, Area = 761, Ix = 198089, Iy = 46478, WeightPlf = 819 },
+        new() { State = "TX", Family = "Tx", Source = "TxDOT IGD (Aug 2017)", Type = TxGirderType.Tx54, Dims = Tx("Tx54", 54, 2, 8.75, 12.5), Yt = 30.49, Yb = 23.51, Area = 817, Ix = 299740, Iy = 46707, WeightPlf = 880 },
+        new() { State = "TX", Family = "Tx", Source = "TxDOT IGD (Aug 2017)", Type = TxGirderType.Tx62, Dims = Tx("Tx62", 62, 2.5, 8.75, 15.5), Yt = 33.72, Yb = 28.28, Area = 910, Ix = 463072, Iy = 57351, WeightPlf = 980 },
+        new() { State = "TX", Family = "Tx", Source = "TxDOT IGD (Aug 2017)", Type = TxGirderType.Tx70, Dims = Tx("Tx70", 70, 2.5, 8.75, 15.5), Yt = 38.09, Yb = 31.91, Area = 966, Ix = 628747, Iy = 57579, WeightPlf = 1040 },
     };
 
     public static IReadOnlyList<TxGirderShape> All => Shapes;
@@ -183,9 +208,11 @@ public static class TxGirderCatalog
     /// <summary>A Tx shape (for <see cref="TxGirderType.Custom"/> use <see cref="Get(PrestressedBeamDefinition)"/>).</summary>
     public static TxGirderShape Get(TxGirderType t) => t == TxGirderType.Custom ? Shapes[(int)TxGirderType.Tx54] : Shapes[(int)t];
 
-    /// <summary>The definition's shape: a Tx girder, or its custom (PGSuper) section.</summary>
+    /// <summary>The definition's shape: a state standard (<see cref="PrestressedBeamDefinition.Standard"/>), a Tx girder, or
+    /// its custom (PGSuper) section.</summary>
     public static TxGirderShape Get(PrestressedBeamDefinition pd) =>
-        pd.Type == TxGirderType.Custom && pd.CustomSection is { } c ? TxGirderShape.FromDims(c) : Get(pd.Type);
+        !string.IsNullOrWhiteSpace(pd.Standard) && StandardBeamCatalog.Find(pd.Standard) is { } std ? std
+        : pd.Type == TxGirderType.Custom && pd.CustomSection is { } c ? TxGirderShape.FromDims(c) : Get(pd.Type);
 
     /// <summary>Tx girder by name ("Tx54", "TX54", "Tx 54"), else null.</summary>
     public static TxGirderType? ParseTx(string name)

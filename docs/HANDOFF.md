@@ -257,11 +257,20 @@ Plan data: `docs/plan-data/woodbury-i29-floyd/` (Iowa Design 817, 3-span BTD, in
 model them at the STANDARD length/strands/details; differences vs the layout are check warnings, never stretched beams.
 
 Queue (shared by both sets first):
-1. Beam shape catalog beyond Tx: Iowa BTA-BTE bulb tees (BTD first) and MnDOT MH (30MH), with true radius fillets
-   (R 8 / R 2 BTD, 6" R 30MH) — the WBFL PrecastIBeam dims can't do them; per-shape standard data (lengths, strands).
-2. Per-span (per beam line) prestressed beam definitions: type, standard length, strand pattern (BTD55/105/60).
-3. Strand debonding (`StrandPoint` debond lengths; PGSuper import too) — Br02069 14 of 44 strands.
-4. Harped strands at given grid columns + hold-down distance from midspan (vs `HarpPointFraction`).
+1. ✅ (2026-10-11, prestressed core) `StandardBeamCatalog` + `SectionProfile` (exact outline, true arcs): Iowa BTD and
+   MnDOT 30MH; properties from the outline (BTD vs printed: A 748.24 / 748.8, yb 24.643 / 24.64, I 284,901 / 285,860 in4);
+   IFC IfcArbitraryClosedProfileDef + IfcIndexedPolyCurve arcs, clipped extrusion (IfcOpenShell 0.9 validate: 0 issues).
+   Other Iowa BTx (BTA-BTE except D) and other MH depths: NOT entered yet.
+2. ✅ `PrestressedBeamDefinition.SpanBeams` (per span / beam line), `StandardBearingLength` / `StandardOverallLength`
+   (built at standard length, CHECK warning vs layout), `StandardBeamCatalog.Beam("BTD55"|"BTD60"|"BTD105")`.
+   OPEN (user): `Placement` (Centered / AtStartBearing / AtEndBearing / AtPierBearing) has NO default — null =
+   UNRESOLVED per beam whose length differs (drawn centred for display). Woodbury pier pad orientation also pending.
+   Framing still uses the base beam depth for seats / haunch (warning when a per-span beam is deeper).
+3. ✅ Debonding: `StrandPoint.DebondStart/DebondEnd/DebondSymbol`, `StrandPatterns.Debond`; sheathing = IfcTendonConduit
+   + Pset SBM_Debonding; PGSuper `DebondInfo` (Strand/Length1/Length2) read. `build-br02069.csx` still has the
+   GAP lines for the 30MH shape and debonding (switch to `Standard = "MN 30MH"` + the CSV debond columns).
+4. ✅ `HarpedColumns` + `HarpedTopBelowTopAtEnd` + `HarpedEndSpacing`, `HoldDownFromMidspan`.
+   Demo: `samples/plans/prestressed-shapes-demo.csx`.
 5. Integral / semi-integral abutments with concrete end diaphragms (beams embedded), pier continuity diaphragms on pads.
 6. Steel intermediate diaphragms between prestressed beams (C15 / W21 / W14; the prestressed path skips cross frames).
 7. DONE 2026-10-11: straight chord girders per span - `GirderLayoutDefinition.SpanLayouts` (`GirderSpanLayout`, see CLAUDE.md).
