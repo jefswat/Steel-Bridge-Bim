@@ -50,6 +50,10 @@ Use this to start the next session. Architecture notes are in `CLAUDE.md`. The u
   NOT pushed from the sandbox (no GitHub credentials there): push `main` from the host. Still open from abutfix:
   `docs\plan-data\pier-pedestals.md` (referenced by the scripts, missing), notched footing outline in AbutmentViews,
   South backwall 19.4 vs 21.5 CY.
+  -> branch `worktree-agent-aefd082a948c047f5`: notched outline drawn (`AbutmentGeometry.FootingOutline`); South backwall now 21.6 CY
+  (backwall maskwall to maskwall behind the wings per rear elevation p80, corbel only between the wings: `CorbelLeft/RightOffset`;
+  same for I-80). Pour split 11.1/10.5 vs plan 11.5/10.0 = minor CONFLICT (plan split computed without the 3" c.j. offset).
+  Main model must re-run `abutments-i80.csx` + `abutments-ramp-g.csx` after merge. See docs/plan-data/abutments-model.md.
 - (was) **PAUSED FOR RESTART (2026-10-11):** two branches committed but NOT merged — verify (full build + tests), merge
   (keep main's .sbm, re-run scripts with temp\cli-main), push:
   - `feature/abutfix` (c8e2515, last commit WIP): counterfort 1'-10, maskwall flush, extensions, West footing notches,

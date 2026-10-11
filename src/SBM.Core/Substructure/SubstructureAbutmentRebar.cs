@@ -73,7 +73,7 @@ public sealed partial class SubstructureGenerator
 
         // ---- backwall verticals along the backwall (placement strings)
         double nBack = g.N(g.XBwBack), nFront = g.N(g.XBwFront);
-        double bwL = g.BwLeftS(nBack), bwR = g.BwRightS(nBack);
+        double bwL = double.IsNaN(g.StringStartS) ? g.BwLeftS(nBack) : g.StringStartS, bwR = g.BwRightS(nBack);
         var vBack = RebarCatalog.Size("#6");
         const string backMark = "6d1", frontMark = "5d2";      // printed marks on all three abutments
         var vFront = RebarCatalog.Size(SizeOfMark(frontMark));

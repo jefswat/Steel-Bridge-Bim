@@ -157,6 +157,8 @@ public sealed class AbutmentRebarDefinition
     public double FrontFaceBarLength { get; set; }
     public double BackFaceSpacing { get; set; } = In(6);
     public double FrontFaceSpacing { get; set; } = Ft(1);
+    /// <summary>Alignment offset from which BackFaceEdge / FrontFaceEdge of the backwall vertical strings are measured (NaN = the left backwall end).</summary>
+    public double BackwallStringStartOffset { get; set; } = double.NaN;
     public double BackFaceEdge { get; set; } = In(6);
     public double FrontFaceEdge { get; set; } = Ft(1);
     public double BackwallBarCover { get; set; } = In(2);
@@ -187,6 +189,11 @@ public sealed class AbutmentDefinition
     /// <summary>Backwall end offsets (NaN = the footing end lines).</summary>
     public double BackwallLeftOffset { get; set; } = double.NaN;
     public double BackwallRightOffset { get; set; } = double.NaN;
+    /// <summary>Alignment offsets between which the corbel / paving notch runs on the back face (rear elevations p80 / p85 / p89: the ledge and taper
+    /// lines stop at the wing inner faces = gutter lines; the backwall continues behind the wings to the maskwall / extension as a plain wall).
+    /// NaN = the backwall ends.</summary>
+    public double CorbelLeftOffset { get; set; } = double.NaN;
+    public double CorbelRightOffset { get; set; } = double.NaN;
     // ---- section chain
     public double FootingBackToBackwallBack { get; set; } = In(1.5);
     public double BackwallThickness { get; set; } = Ft(1.5);

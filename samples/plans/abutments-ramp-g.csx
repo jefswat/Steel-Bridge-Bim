@@ -46,12 +46,17 @@ double nc = (xFoot + xFront) / 2;                                        // firs
 var ad = new AbutmentDefinition
 {
     Source = "Iowa DOT Design 316 Ramp G South abutment, sheets 80-83", LeftEndOffset = -(F(6) + F(2, 11)), RightEndOffset = F(26) + F(2, 11),
-    BackwallLeftOffset = -F(6), BackwallRightOffset = F(26),             // the backwall spans gutter to gutter (6g1 31'-8 + 4" cover = 32'-0)
+    // Backwall = maskwall to maskwall (default ends = maskwall inner faces, 8'-1 / 28'-1). Rear elevation p80: the top line and the c.j. continue
+    // BEHIND the 1'-9 wings (+ 4") to the maskwalls (dashed, "LEVEL" at the A end, "SLOPED" at the D end); only the corbel / ledge lines stop at
+    // the wing inner faces = gutter lines (32'-0 roadway; 6g1 31'-8 + 2 x 2" = 32'-0 runs between them). This reconciles the plan quantity
+    // (p83: below c.j. 11.5 + above c.j. 10.0 = 21.5 CY); the earlier gutter-to-gutter backwall gave 19.4 CY. docs/plan-data/abutments-model.md.
+    CorbelLeftOffset = -F(6), CorbelRightOffset = F(26),
     PlanFootingWidth = F(6), BackwallFrontToBearing = In(17), BearingToFootingFront = F(2, 11.5),
     LedgeBelowTop = F(1, 1),                                              // Ramp G: 1'-1 (3'-7 to the bottom of the taper)
     PileBackRowToBearing = F(1, 6.5), PileFrontRowToBearing = F(1, 5.5), PileTopAboveFootingBottom = F(2), PileLength = F(125),
 };
 ad.FootingBottom.Add(new CapProfilePoint(0, Ft(991.18)));
+ad.BackwallTop.Add(new CapProfilePoint(SOf(al, sl, -(F(6) + F(1, 9) + In(4))), Ft(1003.98)));   // p80 "LEVEL" behind wing A to the maskwall (D end: "SLOPED" = the crown slope continued)
 ad.BackwallTop.Add(new CapProfilePoint(SOf(al, sl, -F(6)), Ft(1003.98)));
 ad.BackwallTop.Add(new CapProfilePoint(0, Ft(1004.22)));
 ad.BackwallTop.Add(new CapProfilePoint(SOf(al, sl, F(26)), Ft(1004.66)));
@@ -89,6 +94,7 @@ rb.FootingLongMark = "8a1"; rb.FootingRowBars = 5; rb.FootingLongPieces = 1; rb.
 rb.EndHoopsEach = 2; rb.EndStaplesEach = 3; rb.BackwallLongRowsPerFace = 11; rb.BackwallLongPieces = 1; rb.HoopWidth = F(5, 8); rb.PlanBarList = list;
 rb.BackFaceBarLength = F(11, 4); rb.FrontFaceBarLength = F(11);
 rb.BackFaceCount = 63; rb.FrontFaceCount = 31;                            // printed strings: 62 spaces @ 6" (63), 30 spaces @ 1'-0 (31)
+rb.BackwallStringStartOffset = -F(6);                                     // the strings span the 32'-0 roadway between the wing inner faces (unchanged placement)
 rb.StepHoopGirders = new() { 4 };                                          // 5n2 hoop at girder D only (printed)
 var sd = sup.ResolvedSubstructure.Clone();
 sd.Abutment = ad;
@@ -97,6 +103,8 @@ sd.BackwallGap = F(0, 2.5);                                                // pl
 sd.Reinforcement.EpoxyCoated = true;
 sup.Substructure = sd;
 Print("UNRESOLVED: Ramp G step transverse bars 5m1 (20 = 4 steps x 5 vs 4 per step on I-80).");
+Print("CONFLICT (minor, not adjusted): Ramp G backwall pour split - p83 prints below c.j. 11.5 / above c.j. 10.0 CY; the model (c.j. 3\" below the taper per section p80, " +
+      "5'-6 1/8 at the CL) gives 11.1 / 10.5 CY. The total agrees (21.6 vs 21.5); the plan split matches a c.j. at the bottom of the taper (no 3\"). docs/plan-data/abutments-model.md.");
 
 var res = Doc.Regenerate();
 Print($"Regenerated {res.Bridges} bridges, {res.Errors.Count} errors.");

@@ -49,6 +49,9 @@ void Build(string bridgeName, bool first, string source, double leftEnd, double 
     for (int i = 0; i < stepsTop.Length; i++) if (!double.IsNaN(stepsTop[i])) ad.Steps.Add(new AbutmentStepDefinition(i + 1, Ft(stepsTop[i])));
     ad.Masks.Add(new MaskwallDefinition { End = AbutmentEnd.Left, Height = maskHeight, Thickness = In(10) });          // Setback 0: the panel is the OUTERMOST 10" of the zone, flush with the footing end line (p85/p89 plan, abutment-followups.md 5.1)
     ad.Extension = new BackwallExtensionDefinition { End = AbutmentEnd.Right, Width = extWidth, TopElevation = Ft(extTop) };
+    // corbel / paving notch only between the wing inner faces (rear elevation p85 / p89: the ledge and taper lines stop at the wings; the top line and the
+    // c.j. continue behind the wings to the maskwall / extension) - the backwall itself spans maskwall to extension
+    ad.CorbelLeftOffset = leftGutter; ad.CorbelRightOffset = rightGutter;
     ad.PileBackRowToBearing = F(1, 11.5); ad.PileFrontRowToBearing = F(1, 9); ad.PileTopAboveFootingBottom = F(2);
     ad.PileLength = F(first ? 125 : 115);   // contract lengths: West 125 ft, East 115 ft (PDF 90; substructure-elevation-check.md)
     foreach (var (end, gut, w) in new[] { (AbutmentEnd.Left, leftGutter, wl), (AbutmentEnd.Right, rightGutter, wr) })

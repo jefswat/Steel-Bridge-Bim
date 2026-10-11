@@ -201,6 +201,11 @@ public sealed class AbutmentGeometry
     public required Func<double, double> BwLeftS { get; init; }
     public required Func<double, double> BwRightS { get; init; }
     public required double JointDepth { get; init; }
+    /// <summary>N to S of the corbel ends (= the backwall ends unless <see cref="AbutmentDefinition.CorbelLeftOffset"/> / Right are set).</summary>
+    public Func<double, double>? CorbelLeftS { get; set; }
+    public Func<double, double>? CorbelRightS { get; set; }
+    /// <summary>S (at the backwall back face) from which the backwall vertical strings are measured.</summary>
+    public double StringStartS { get; set; } = double.NaN;
     public double N(double x) => Sigma * x;
     public double FootingTopZ(double s) => FootingBottom(s) + Def.FootingDepth;
     public double SeatBaseZ(double s) => FootingBottom(s) + Def.FootingDepth + Def.WashHeight;
@@ -212,5 +217,8 @@ public sealed class AbutmentGeometry
     public (AbutmentEnd End, double S0, double S1, double TopZ)? Extension { get; set; }
     /// <summary>Pile positions of the main footing (S, N).</summary>
     public List<(double S, double N)> PileXY { get; } = new();
+    /// <summary>Plan outline of the main footing as built (X = S, Y = N), closed, counter-clockwise or clockwise as generated: back face, right end
+    /// (with its notches / corner pieces), front face, left end. Same planes as the footing solid.</summary>
+    public List<Vec2> FootingOutline { get; } = new();
     public double[] PileStationsS { get; set; } = Array.Empty<double>();
 }

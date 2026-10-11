@@ -198,6 +198,33 @@ public sealed partial class SubstructureGenerator
             BwLeftS = n => bwL(n), BwRightS = n => bwR(n), JointDepth = cjD,
         };
         unit.Abutment = geo;
+        // plan outline of the footing from the same end planes (notches) and corner pieces: back face -> right end -> front face -> left end
+        {
+            var xs = new List<double> { xFB, xFF };
+            xs.AddRange(kinks.Where(x => x > xFB + 1e-9 && x < xFF - 1e-9));
+            xs = xs.Distinct().OrderBy(x => x).ToList();
+            List<Vec2> Chain(Plane end, double e)
+            {
+                var r = new List<Vec2>();
+                var back = addOns.FirstOrDefault(q => !q.front && Math.Abs(q.e - e) < 1e-9).poly;
+                var front = addOns.FirstOrDefault(q => q.front && Math.Abs(q.e - e) < 1e-9).poly;
+                if (back != null) { r.Add(back[0]); r.Add(back[2]); }
+                for (int i = 0; i < xs.Count; i++)
+                {
+                    int sub = i == xs.Count - 1 ? 1 : 8;                    // end lines follow offsets / stations: sample between the kinks
+                    for (int k = 0; k < sub; k++)
+                    {
+                        double x = i == xs.Count - 1 ? xs[i] : xs[i] + (xs[i + 1] - xs[i]) * k / sub;
+                        double n = Nx(x);
+                        r.Add(new Vec2(end(n), n));
+                    }
+                }
+                if (front != null) { r.Add(front[2]); r.Add(front[0]); }
+                return r;
+            }
+            geo.FootingOutline.AddRange(Chain(footR, ad.RightEndOffset));
+            geo.FootingOutline.AddRange(Enumerable.Reverse(Chain(footL, ad.LeftEndOffset)));
+        }
         unit.CapS0 = s0Mid; unit.CapS1 = s1Mid;
         unit.CapN0 = Math.Min(Nx(xFB), Nx(xFF)); unit.CapN1 = Math.Max(Nx(xFB), Nx(xFF)); unit.CapMidN = nMid;
         var capBreaks = fbPts.Select(p => p.X).Concat(topPts.Select(p => p.X)).Where(x => x > s0Mid && x < s1Mid).Distinct().OrderBy(x => x).ToList();
@@ -256,9 +283,21 @@ public sealed partial class SubstructureGenerator
 
             double L1 = ad.LedgeBelowTop, Cv = ad.CorbelVertical, Tr = ad.CorbelTaperRise, P = ad.CorbelProjection;
             var upperPoly = new (double x, double d)[] { (xBwF, cjD), (xBwF, L1), (xBwB, L1), (xBwB - P, L1), (xBwB - P, L1 + Cv), (xBwB, L1 + Cv + Tr), (xBwB, cjD) };
+            var plainPoly = new (double x, double d)[] { (xBwF, cjD), (xBwF, L1), (xBwB, L1), (xBwB, cjD) };
             var upper = new Mesh();
-            AddSlab(upper, unit, upperPoly.Select(p => new SV(Nx(p.x), s => Crown(s) - p.d)).ToArray(), bwL, bwR, bw);
-            unit.Solids.Add(new SubSolid(SubElementKind.Backwall, $"{name} backwall (upper, corbel)", $"Upper backwall pour with the corbel / paving notch: ledge {Sh(L1)} under the top, corbel {Sh(P)} projection, {Sh(Cv)} vertical face, {Sh(Tr)} 45 deg taper", upper));
+            // corbel only between the corbel planes (plans: wing inner faces); plain wall beyond, behind the wings
+            Plane cL = double.IsNaN(ad.CorbelLeftOffset) ? bwL : EndPlane(ad.CorbelLeftOffset), cR = double.IsNaN(ad.CorbelRightOffset) ? bwR : EndPlane(ad.CorbelRightOffset);
+            double nB = Nx(xBwB);
+            if (cL(nB) < bwL(nB) - 1e-4 || cR(nB) > bwR(nB) + 1e-4 || cL(nB) >= cR(nB))
+                throw new InvalidOperationException($"{name}: the corbel offsets must lie within the backwall ends");
+            SV[] Up(IEnumerable<(double x, double d)> poly) => poly.Select(p => new SV(Nx(p.x), s => Crown(s) - p.d)).ToArray();
+            bool leftPlain = cL(nB) > bwL(nB) + 1e-4, rightPlain = cR(nB) < bwR(nB) - 1e-4;
+            if (leftPlain) AddSlab(upper, unit, Up(plainPoly), bwL, cL, bw);
+            AddSlab(upper, unit, Up(upperPoly), cL, cR, bw);
+            if (rightPlain) AddSlab(upper, unit, Up(plainPoly), cR, bwR, bw);
+            geo.CorbelLeftS = n => cL(n); geo.CorbelRightS = n => cR(n);
+            geo.StringStartS = double.IsNaN(ad.Rebar.BackwallStringStartOffset) ? bwL(nB) : SolveS(ad.Rebar.BackwallStringStartOffset, nB);
+            unit.Solids.Add(new SubSolid(SubElementKind.Backwall, $"{name} backwall (upper, corbel)", $"Upper backwall pour with the corbel / paving notch: ledge {Sh(L1)} under the top, corbel {Sh(P)} projection, {Sh(Cv)} vertical face, {Sh(Tr)} 45 deg taper{(leftPlain || rightPlain ? "; corbel between the wing inner faces, plain wall behind the wings" : "")}", upper));
 
             var cap = new Mesh();
             AddSlab(cap, unit, new[]
