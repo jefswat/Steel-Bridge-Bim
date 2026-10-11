@@ -283,9 +283,21 @@ public sealed partial class SubstructureGenerator
 
             double L1 = ad.LedgeBelowTop, Cv = ad.CorbelVertical, Tr = ad.CorbelTaperRise, P = ad.CorbelProjection;
             var upperPoly = new (double x, double d)[] { (xBwF, cjD), (xBwF, L1), (xBwB, L1), (xBwB - P, L1), (xBwB - P, L1 + Cv), (xBwB, L1 + Cv + Tr), (xBwB, cjD) };
+            var plainPoly = new (double x, double d)[] { (xBwF, cjD), (xBwF, L1), (xBwB, L1), (xBwB, cjD) };
             var upper = new Mesh();
-            AddSlab(upper, unit, upperPoly.Select(p => new SV(Nx(p.x), s => Crown(s) - p.d)).ToArray(), bwL, bwR, bw);
-            unit.Solids.Add(new SubSolid(SubElementKind.Backwall, $"{name} backwall (upper, corbel)", $"Upper backwall pour with the corbel / paving notch: ledge {Sh(L1)} under the top, corbel {Sh(P)} projection, {Sh(Cv)} vertical face, {Sh(Tr)} 45 deg taper", upper));
+            // corbel only between the corbel planes (plans: wing inner faces); plain wall beyond, behind the wings
+            Plane cL = double.IsNaN(ad.CorbelLeftOffset) ? bwL : EndPlane(ad.CorbelLeftOffset), cR = double.IsNaN(ad.CorbelRightOffset) ? bwR : EndPlane(ad.CorbelRightOffset);
+            double nB = Nx(xBwB);
+            if (cL(nB) < bwL(nB) - 1e-4 || cR(nB) > bwR(nB) + 1e-4 || cL(nB) >= cR(nB))
+                throw new InvalidOperationException($"{name}: the corbel offsets must lie within the backwall ends");
+            SV[] Up(IEnumerable<(double x, double d)> poly) => poly.Select(p => new SV(Nx(p.x), s => Crown(s) - p.d)).ToArray();
+            bool leftPlain = cL(nB) > bwL(nB) + 1e-4, rightPlain = cR(nB) < bwR(nB) - 1e-4;
+            if (leftPlain) AddSlab(upper, unit, Up(plainPoly), bwL, cL, bw);
+            AddSlab(upper, unit, Up(upperPoly), cL, cR, bw);
+            if (rightPlain) AddSlab(upper, unit, Up(plainPoly), cR, bwR, bw);
+            geo.CorbelLeftS = n => cL(n); geo.CorbelRightS = n => cR(n);
+            geo.StringStartS = double.IsNaN(ad.Rebar.BackwallStringStartOffset) ? bwL(nB) : SolveS(ad.Rebar.BackwallStringStartOffset, nB);
+            unit.Solids.Add(new SubSolid(SubElementKind.Backwall, $"{name} backwall (upper, corbel)", $"Upper backwall pour with the corbel / paving notch: ledge {Sh(L1)} under the top, corbel {Sh(P)} projection, {Sh(Cv)} vertical face, {Sh(Tr)} 45 deg taper{(leftPlain || rightPlain ? "; corbel between the wing inner faces, plain wall behind the wings" : "")}", upper));
 
             var cap = new Mesh();
             AddSlab(cap, unit, new[]

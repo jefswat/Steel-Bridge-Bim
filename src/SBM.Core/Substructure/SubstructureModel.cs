@@ -201,6 +201,11 @@ public sealed class AbutmentGeometry
     public required Func<double, double> BwLeftS { get; init; }
     public required Func<double, double> BwRightS { get; init; }
     public required double JointDepth { get; init; }
+    /// <summary>N to S of the corbel ends (= the backwall ends unless <see cref="AbutmentDefinition.CorbelLeftOffset"/> / Right are set).</summary>
+    public Func<double, double>? CorbelLeftS { get; set; }
+    public Func<double, double>? CorbelRightS { get; set; }
+    /// <summary>S (at the backwall back face) from which the backwall vertical strings are measured.</summary>
+    public double StringStartS { get; set; } = double.NaN;
     public double N(double x) => Sigma * x;
     public double FootingTopZ(double s) => FootingBottom(s) + Def.FootingDepth;
     public double SeatBaseZ(double s) => FootingBottom(s) + Def.FootingDepth + Def.WashHeight;

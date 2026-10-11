@@ -37,8 +37,13 @@ public static class AbutmentViews
         var xsB = new[] { sbL }.Concat(ad.BackwallTop.Select(p => p.S).Where(x => x > sbL && x < sbR)).Append(sbR).ToList();
         // the four lines parallel to the crown line (top, ledge, bottom of the vertical corbel face, bottom of the taper) and the construction joint
         double[] offs = { 0, ad.LedgeBelowTop, ad.LedgeBelowTop + ad.CorbelVertical, ad.LedgeBelowTop + ad.CorbelVertical + ad.CorbelTaperRise, g.JointDepth };
+        // the corbel lines (ledge, vertical face, taper) stop at the corbel ends (wing inner faces)
+        double scL = g.CorbelLeftS?.Invoke(g.N(g.XBwBack)) ?? sbL, scR = g.CorbelRightS?.Invoke(g.N(g.XBwBack)) ?? sbR;
+        var xsC = new[] { scL }.Concat(ad.BackwallTop.Select(p => p.S).Where(x => x > scL && x < scR)).Append(scR).ToList();
         for (int k = 0; k < offs.Length; k++)
-            d.Poly(k == 4 ? SheetLayers.ConcreteHidden : SheetLayers.Concrete, xsB.Select(s => new Vec2(Xs(s), g.BackwallTop(s) - offs[k])));
+            d.Poly(k == 4 ? SheetLayers.ConcreteHidden : SheetLayers.Concrete, (k is >= 1 and <= 3 ? xsC : xsB).Select(s => new Vec2(Xs(s), g.BackwallTop(s) - offs[k])));
+        foreach (double sc in new[] { scL, scR }.Where(s => s > sbL + 1e-4 && s < sbR - 1e-4))
+            d.Line(SheetLayers.Concrete, new Vec2(Xs(sc), g.BackwallTop(sc)), new Vec2(Xs(sc), g.BackwallBaseZ(sc)));      // wing inner face (seen from the rear)
         d.Line(SheetLayers.Concrete, new Vec2(Xs(sbL), g.BackwallTop(sbL)), new Vec2(Xs(sbL), g.BackwallBaseZ(sbL) + D * 0));
         d.Line(SheetLayers.Concrete, new Vec2(Xs(sbR), g.BackwallTop(sbR)), new Vec2(Xs(sbR), g.BackwallBaseZ(sbR)));
         d.Poly(SheetLayers.Concrete, new[] { new Vec2(Xs(sbL), g.BackwallBaseZ(sbL)), new Vec2(Xs(sbR), g.BackwallBaseZ(sbR)) });
