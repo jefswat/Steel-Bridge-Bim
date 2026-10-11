@@ -11,8 +11,16 @@
 //      crossties; Ramp G tie levels about 10" apart.
 //  * Flared bases (3 1/2" clear): #7 bars (7d12 / 7d5) at equal spaces with shared corners - I-80 9'-0 x 5'-6: S faces
 //      4 spaces, N faces 3, chamfers 3; Ramp G 11'-0 x 7'-6: 4 spaces on every face, except 11G / 12G: 7 @ 6 and 6 @ 6
-//      on the S / N faces with 4 spaces on the chamfers. Flare hoops 6e3 come in lapped pairs at the column tie
-//      spacing; modeled as single closed hoops at HALF that spacing (same count).
+//      on the S / N faces with 4 spaces on the chamfers. Plinth ties per level = a LAPPED PAIR at the column tie spacing
+//      ("N-6e1, N-6e3 & N-5e2", "n SPA. @ ABT. 10 / 1'-0"), from 3" above the footing to 3" below the plinth top:
+//      6e3 PLINTH HAIRPINS = open U around each S end (bending diagrams: I-80 legs 3'-1 / chamfer 2'-10 / end 2'-3, 14'-1;
+//      Ramp G 3'-1 / 3'-11 / 3'-3, 17'-3), the legs lapping 2'-9 out-to-out along the long faces (U 5'-7 / 6'-7 along S,
+//      twice that minus the 8'-5 / 10'-5 between covers); 11G / 12G: 6e4 PLINTH HOOPS = two closed end hoops (3'-6 / 3'-11 /
+//      3'-3, 7'-0 along S, 27'-0) overlapping 3'-7 out-to-out. Space counts from the elevation callouts (= bar list / 2 /
+//      columns - 1): the plans' "about" spacing is not a fixed rounding of the zone length.
+//  * 18d9 (7WB) / 18d7 (2G, 7G, 11G, 12G) / 18d5 (18G) "BAR TERMINATES AT TOP OF COLUMN": the half-filled symbol in the
+//      legend is a TAG whose leader points at the circled perimeter bar wrapped by the crosstie (34 / 46 perimeter bars =
+//      the dowel count); those bars are the 'T' letters below, cut to the listed length from their coupler.
 //  * FOOTING DOWELS / COLUMN SPLICES (docs/plan-data/piles-capstep-dowels.md, section 3): every column bar has an L-shaped
 //    footing dowel (hook on the bottom mat: 2'-0 #11 / 2'-7 #14 / 3'-5 #18 hook, hook underside 1'-4 [Ramp G] / 1'-3 [I-80]
 //    above the footing bottom, DERIVED from the printed laps) and the column bar either laps it (printed "8'-4 / 12'-6 MIN. LAP":
@@ -23,7 +31,7 @@
 //    top, d7/d5/d9), read from the PDF vector symbols and written as SplicePattern strings: one letter per bar, counter-clockwise
 //    from +S (plan view, S right, N up-station; the mirror is not shown on the plans - UNCERTAIN, only swaps which bar is d1/d2).
 //    Bar tops = soffit at the column CL + the embedment derived from the bar lists. 9G: second lap at mid-height (27'-1).
-// Not modeled: plinth dowels (7d6 / 7d13) and flare bars starting at the footing top; 11G / 12G inner 6e4 ties.
+// Not modeled: plinth dowels (7d6 / 7d13) and flare bars starting at the footing top.
 // Re-runnable; run after piers-i80.csx, pier-6a.csx and piers-ramp-g.csx.
 using SBM.Core.Bridge;
 
@@ -41,15 +49,23 @@ void Apply(SubstructureDefinition sd, string size, int nS, double sS, int nN, do
     r.ColumnSpiralSize = "#6"; r.ColumnSpiralPitch = I(tieSpacing); r.ColumnHoopOverlap = I(overlap);
     r.ColumnCrosstieSize = "#5"; r.ColumnCrosstieBar = crossBar;
 }
-void Flare(SubstructureDefinition sd, int nS, double sS, int nN, double sN, int nC, double hoopSpacing)
+void Flare(SubstructureDefinition sd, int nS, double sS, int nN, double sN, int nC, double tieSpacing, FlareTieType style, double overlap, int spaces = 0)
 {
     var r = sd.Reinforcement;
     if (double.IsNaN(sd.ColumnFlareElevation)) { r.FlareBarSize = ""; return; }
     r.FlareBarSize = "#7"; r.FlareCover = I(3.5);
     r.FlareFaceBarsS = nS; r.FlareFaceSpacingS = I(sS); r.FlareFaceBarsN = nN; r.FlareFaceSpacingN = I(sN); r.FlareChamferBars = nC;
-    r.FlareTieSize = "#6"; r.FlareTieSpacing = I(hoopSpacing);
+    r.FlareTieSize = "#6"; r.FlareTieSpacing = I(tieSpacing); r.FlareTieStyle = style; r.FlareTieOverlap = I(overlap); r.FlareTieSpaces = spaces;
 }
 
+// Plinth tie spaces per column (pier elevations "n SPA. @ ABT. s"; check: plinth hairpins / hoops in the bar list = 2 x (n + 1) x columns).
+var plinthSpaces = new Dictionary<string, int>
+{
+    ["Pier 2G"] = 14, ["Pier 3G"] = 16, ["Pier 4G"] = 20, ["Pier 5G"] = 19, ["Pier 6G"] = 21, ["Pier 7G"] = 19, ["Pier 8G"] = 25,
+    ["Pier 9G"] = 25, ["Pier 10G"] = 24, ["Pier 11G"] = 24, ["Pier 12G"] = 27, ["Pier 13G"] = 20, ["Pier 14G"] = 19, ["Pier 15G"] = 16,
+    ["Pier 4WB"] = 12, ["Pier 5WB"] = 13, ["Pier 6WB"] = 19, ["Pier 7WB"] = 12, ["Pier 8WB"] = 12, ["Pier 9WB"] = 11, ["Pier 10WB"] = 12,
+    ["Pier 11WB"] = 13, ["Pier 12WB"] = 14, ["Pier 13WB"] = 12, ["Pier 14WB"] = 12,
+};
 // One letter per column bar, counter-clockwise from +S: H = splices at the upper coupler, L = lower, T = lower and stops
 // short of the cap steel. 10'-0 x 6'-6 columns (46 bars), 8'-0 x 4'-6 columns (32 / 34 bars) and the Ramp G two-column bents (28).
 const string P46 = "HLHLHLHLHLHLHLHLHLHLHLHLLHLHLHLHLHLHLHLHLHLHLH", P46T = "HLHLHTHLHLHLHLHLHTHLHLHLLHLHTHLHLHLHLHLHTHLHLH";
@@ -99,8 +115,8 @@ foreach (var b in Doc.Project.Bridges.Where(x => x.Name.StartsWith("I-80") || x.
         {
             string size = n is "Pier 8G" or "Pier 10G" ? "#14" : n is "Pier 2G" or "Pier 7G" or "Pier 11G" or "Pier 12G" or "Pier 18G" ? "#18" : "#11";
             Apply(sd, size, 7, 6, 6, 6, 0, 0, Pos(7.375, 14.375, 21.375, 28.375, 35.375), rampG ? 10 : 12, 40, 2);
-            if (n is "Pier 11G" or "Pier 12G") Flare(sd, 7, 6, 6, 6, 5, 5);
-            else Flare(sd, 5, 0, 5, 0, 5, rampG ? 5 : 6);
+            if (n is "Pier 11G" or "Pier 12G") Flare(sd, 7, 6, 6, 6, 5, 10, FlareTieType.HoopPair, 43, plinthSpaces[n]);
+            else Flare(sd, 5, 0, 5, 0, 5, 10, FlareTieType.HairpinPair, 33, plinthSpaces.GetValueOrDefault(n));
         }
         else if (n is "Pier 16G" or "Pier 17G")            // Ramp G two-column bents, 8'-0 x 4'-6 (section C-C, PDF 65 / 69)
         {
@@ -108,14 +124,14 @@ foreach (var b in Doc.Project.Bridges.Where(x => x.Name.StartsWith("I-80") || x.
             // outside chamfer face (10 3/8 | 9 3/4 | 11 5/8); 6e1 paired hoops + 5e2 crossties around the chamfer bar
             // nearest the 8'-0 face, 29-30 spaces @ about 1'-0.
             Apply(sd, "#14", 6, 7.5, 4, 6.25, 0, 0, Pos(10.375, 20.125), 12, 40, 1);
-            Flare(sd, 0, 0, 0, 0, 0, 0);
+            Flare(sd, 0, 0, 0, 0, 0, 0, FlareTieType.ClosedTie, 0);
         }
         else                                               // I-80 8'-0 x 4'-6 (incl. Pier 11WB & 19G)
         {
             if (n is "Pier 3WB" or "Pier 13WB") Apply(sd, "#18", 6, 7.5, 4, 6, 0, 0, Pos(6.5, 15.5, 21.25), 12, 40, 2);
             else if (n == "Pier 7WB") Apply(sd, "#18", 7, 6.25, 4, 6, 3, 5.75, null, 12, 40, 2);
             else Apply(sd, "#11", 6, 7.5, 4, 6.5, 0, 0, Pos(8, 15.25, 22.5), 12, 40, 2);
-            Flare(sd, 5, 0, 4, 0, 4, 6);
+            Flare(sd, 5, 0, 4, 0, 4, 12, FlareTieType.HairpinPair, 33, plinthSpaces.GetValueOrDefault(n));
         }
         Splice(sd, n, b.Name.StartsWith("Ramp G"));
         done++;

@@ -414,8 +414,8 @@ public static class IfcExporter
                 w.Add("IFCSTYLEDITEM", $"{Ref(disk)},({Ref(barStyle)}),$");
                 int rep = w.Add("IFCSHAPEREPRESENTATION", $"{Ref(body)},'Body','AdvancedSweptSolid',({Ref(disk)})");
                 int pds = w.Add("IFCPRODUCTDEFINITIONSHAPE", $"$,$,({Ref(rep)})");
-                // Ties, hoops, crossties, spirals and stirrups confine / tie the main bars: LIGATURE.
-                string role = mk.Shape.Code is "TIE" or "HOOP" or "CROSSTIE" or "SPIRAL" or "SSTR-S" ? ".LIGATURE." : mk.Shape.Code == "SSTR-U" ? ".ANCHORING." : ".MAIN.";
+                // Ties, hairpins, hoops, crossties, spirals and stirrups confine / tie the main bars: LIGATURE.
+                string role = mk.Shape.Code is "TIE" or "HAIRPIN" or "HOOP" or "CROSSTIE" or "SPIRAL" or "SSTR-S" ? ".LIGATURE." : mk.Shape.Code == "SSTR-U" ? ".ANCHORING." : ".MAIN.";
                 string tag = string.IsNullOrEmpty(mk.Unit) ? mk.Mark : $"{mk.Unit} {mk.Mark}";
                 int id = w.Add("IFCREINFORCINGBAR",
                     $"{Guid(barKey(n++))},$,{S("Bar " + mk.Mark)},{S($"{mk.Size.Name} {mk.Location}")},$,{Ref(pl)},{Ref(pds)},{S(tag)},$," +

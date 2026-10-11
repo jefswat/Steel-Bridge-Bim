@@ -133,6 +133,44 @@ public class SubstructureTests
         }
     }
 
+    [Theory]
+    [InlineData(FlareTieType.HairpinPair, 33.0)]
+    [InlineData(FlareTieType.HoopPair, 43.0)]
+    public void FlareTies_LappedPairs_AtThePlanLevels(FlareTieType style, double overlapIn)
+    {
+        // I-80 plinth 9'-0 x 5'-6 (2'-8 1/2 x 1'-5 5/8 chamfers): 6e3 hairpins = open U (legs 3'-1, chamfer 2'-10, end 2'-3 =
+        // 14'-1) lapping 2'-9; or two closed end hoops; 12 spaces from 3" above the footing to 3" below the plinth top.
+        var m = Build(p =>
+        {
+            p.ColumnShape = ColumnShape.Rectangular; p.ColumnWidth = Ft(8); p.ColumnDepth = Ft(4.5);
+            p.ColumnChamferS = Ft(2 + 4 / 12.0); p.ColumnChamferN = Ft(1.25);
+            p.ColumnFlareElevation = Ft(512); p.ColumnFlareWidth = Ft(9); p.ColumnFlareDepth = Ft(5.5);
+            p.ColumnFlareChamferS = Ft(2 + 8.5 / 12); p.ColumnFlareChamferN = Ft(1 + 5.625 / 12);
+            p.FoundationTopElevation = Ft(500); p.Foundation = FoundationType.PileCap;
+            var r = p.Reinforcement;
+            r.ColumnBarSize = "#11"; r.ColumnSpiralSize = "#6"; r.ColumnSpiralPitch = In(12);
+            r.FlareBarSize = "#7"; r.FlareFaceBarsS = 5; r.FlareFaceBarsN = 4; r.FlareChamferBars = 4;
+            r.FlareTieSpacing = In(12); r.FlareTieStyle = style; r.FlareTieOverlap = In(overlapIn); r.FlareTieSpaces = 12;
+        });
+        var u = m.Units.Single(x => x.Type == SupportType.Pier);
+        var c = u.Columns[0];
+        var marks = m.Marks.Where(mk => mk.Unit == u.Name && mk.Location.Contains("flare h")).ToList();
+        var mk = Assert.Single(marks);                                       // the two ends of a pair share one mark
+        Assert.Equal(style == FlareTieType.HairpinPair ? "HAIRPIN" : "TIE", mk.Shape.Code);
+        Assert.Equal(2 * 13 * u.Columns.Count, mk.Count);
+        var mine = m.Bars.Where(b => b.Mark == mk.Mark && Math.Abs(b.Points.Average(p => Vec2.Dot(p.XY - u.Origin, u.D)) - c.S) < Ft(6)).ToList();
+        var zs = mine.Select(b => b.Points.Min(p => p.Z)).Distinct().OrderBy(z => z).ToList();
+        Assert.Equal(c.BottomZ + In(3), zs[0], 6);
+        Assert.Equal(Ft(512) - In(3), zs[^2], 6);                            // top pair: 3" below the plinth top (+ one tie dia.)
+        if (style == FlareTieType.HairpinPair)
+        {
+            Assert.Equal(Ft(14) + In(1), mk.Length, In(0.5));                // bar list 14'-1 (out-to-out)
+            // Leg ends +-1'-4 1/2 from the column centre (2'-9 lap).
+            var ends = mine.Select(b => Math.Abs(Vec2.Dot(b.Points[0].XY - u.Origin, u.D) - c.S)).Distinct().ToList();
+            Assert.All(ends, e => Assert.Equal(In(16.5), e, 6));
+        }
+    }
+
     [Fact]
     public void PileCap_HasPileGroups_AndRebarMarks()
     {

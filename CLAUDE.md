@@ -84,7 +84,11 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
     Chamfered (octagonal) column rebar (`SubstructureRebar.ColumnBars`): verticals per face from the OUTSIDE-face
     dimensions (centred groups, explicit chamfer positions, or equal spaces with shared corners) set in normal to the
     face; ties follow the section (`PolygonTie`, hooks at the sharpest corner), optionally as two overlapping end hoops
-    (`ColumnHoopOverlap`, legs mapped like the S-face corner) + crossties (`Crosstie`); flared base gets its own cage.
+    (`ColumnHoopOverlap`, legs mapped like the S-face corner) + crossties (`Crosstie`); flared base gets its own cage, its ties
+    per level one closed tie or a lapped PAIR (`FlareTieStyle` HairpinPair = open U "PLINTH, HAIRPINS" 6e3, shape HAIRPIN scheduled
+    out-to-out / HoopPair = closed end hoops "PLINTH, HOOPS" 6e4; `FlareTieOverlap` out-to-out along S; `FlareTieSpaces` = the plan's
+    "n SPA. @ ABT." count, 3" above the footing to 3" below the plinth top). Terminating bars (18d9/18d7/18d5) = the circled perimeter
+    bars the half-filled legend tags point at (splice pattern 'T').
     Bar sizes include #14/#18. Plan data: `samples/plans/column-rebar.csx`.
     Battered piles (`SubstructurePiles.cs`): `FootingPoint.BatterDirS/N` (unit plan direction of the tip movement, 0 = plumb) +
     `FootingDefinition.BatterRatio` (4 = 1H:4V; diagonal batter measured along the diagonal); `FootingDefinition.BatterPerimeter`

@@ -378,9 +378,125 @@ public sealed partial class SubstructureGenerator
                 r.FlareChamferBars, 0, null, 0, $"{loc} flare bars"))
                 AddRun(bars, "F", fv, $"{loc} flare bars", new[] { unit.World(c.S + p.X, c.N + p.Y, zBot), unit.World(c.S + p.X, c.N + p.Y, fTopBar) },
                     r.MaxBarLength, Lap(fv, r, r.FlareCover, In(6)));
-            SectionTies(unit, bars, c.S, c.N, InsetConvex(fsec, r.FlareCover + ft.Diameter / 2), ft, r.FlareTieSpacing,
-                c.BottomZ + In(3), sd.ColumnFlareElevation - r.FlareCover, 0, "P", $"{loc} flare ties");
+            var fLine = InsetConvex(fsec, r.FlareCover + ft.Diameter / 2);
+            double fz0 = c.BottomZ + In(3), fz1 = sd.ColumnFlareElevation - r.FlareCover;
+            double fo = r.FlareTieOverlap, fReach = fLine.Max(q => q.X) + ft.Diameter / 2;
+            bool pair = r.FlareTieStyle != FlareTieType.ClosedTie && fo > 0 && fo < 2 * fReach;
+            if (r.FlareTieStyle != FlareTieType.ClosedTie && !pair)
+                Warn($"{loc}: flare tie overlap {Sh(fo)} does not fit the {Sh(2 * fReach)} flare tie width - one closed tie per level used.");
+            double fsp = r.FlareTieSpacing;
+            if (pair)
+            {
+                // Plan elevations: pairs from 3" above the footing to 3" below the plinth top, "N SPA. @ ABT. s" (the plans'
+                // space count is not a fixed rounding of the zone, e.g. 13'-6 = 16 spaces but 19'-6 = 24 spaces @ about 10,
+                // so it is input; 0 = equal spaces not exceeding the spacing).
+                fz1 = sd.ColumnFlareElevation - In(3);
+                int nsp = r.FlareTieSpaces > 0 ? r.FlareTieSpaces : Math.Max(1, (int)Math.Ceiling((fz1 - fz0) / fsp - 1e-9));
+                fsp = (fz1 - fz0) / nsp + 1e-9;
+            }
+            if (pair && r.FlareTieStyle == FlareTieType.HairpinPair)
+            {
+                // Two open U hairpins per level (plans' "PLINTH, HAIRPINS"), each around one end, their straight legs lapping
+                // along the long faces; the bar ends are fo / 2 past the section centre (fo = out-to-out lap along S).
+                HairpinTies(unit, bars, c.S, c.N, fLine, ft, fsp, fz0, fz1, fo / 2, $"{loc} flare hairpins");
+            }
+            else if (pair)
+            {
+                // Two closed hoops per level (plans' "PLINTH, HOOPS"), each around one end; the outside faces of the closing
+                // legs are fo / 2 either side of the section centre (fo = out-to-out overlap along S). Stacked one tie diameter apart.
+                double h = fo / 2 - ft.Diameter / 2;
+                SectionTies(unit, bars, c.S, c.N, SquareStub(ClipX(fLine, h, false), h), ft, fsp, fz0, fz1, 0, "P", $"{loc} flare hoops");
+                SectionTies(unit, bars, c.S, c.N, SquareStub(ClipX(fLine, -h, true), -h), ft, fsp, fz0, fz1, ft.Diameter, "P", $"{loc} flare hoops");
+            }
+            else
+                SectionTies(unit, bars, c.S, c.N, fLine, ft, r.FlareTieSpacing, fz0, fz1, 0, "P", $"{loc} flare ties");
         }
+    }
+
+    /// <summary>
+    /// Lapped hairpin pairs: per level an open U around each S end of the tie line (<paramref name="line"/>, counter-clockwise),
+    /// the straight legs running along the long faces to <paramref name="reach"/> past the centre (so the pair laps 2 x reach),
+    /// corners bent around the tie pin, square-cut ends. The second U of a level sits one tie diameter higher.
+    /// </summary>
+    private void HairpinTies(SubstructureUnit unit, List<RawBar> bars, double s, double n, Vec2[] line, RebarSize size, double spacing,
+        double z0, double z1, double reach, string loc)
+    {
+        if (z1 <= z0) return;
+        double db = size.Diameter;
+        double pin = (size.Name is "#6" or "#7" or "#8" ? 6 : 4) * db;
+        var us = new[] { Hairpin(ClipX(line, reach, false), reach, pin, db), Hairpin(ClipX(line, -reach, true), -reach, pin, db) };
+        int nt = (int)Math.Ceiling((z1 - z0) / spacing - 1e-9) + 1;
+        for (int i = 0; i < nt; i++)
+        {
+            double z = z0 + (z1 - z0) * i / Math.Max(1, nt - 1);
+            for (int k = 0; k < 2; k++)
+                bars.Add(new RawBar("P", size, us[k].shape, loc, us[k].local.Select(p => unit.World(s + p.X, n + p.Y, z + k * db)).ToArray()));
+        }
+    }
+
+    /// <summary>
+    /// A closing leg x = x0 just past a long-face corner of the tie line would leave a short chamfer stub (a few inches), which
+    /// no bending diagram shows: the long leg runs straight to the closing leg instead (stub vertex dropped, the corner moved
+    /// onto x0 at the long leg's level). The bar may then sit slightly outside the tie line there; the cover check reports it.
+    /// </summary>
+    private static Vec2[] SquareStub(Vec2[] clipped, double x0)
+    {
+        var res = clipped.ToList();
+        for (int i = 0; i < res.Count && res.Count > 4; i++)
+        {
+            if (Math.Abs(res[i].X - x0) > 1e-9) continue;
+            foreach (int j in new[] { (i + 1) % res.Count, (i - 1 + res.Count) % res.Count })
+            {
+                if (Math.Abs(res[j].X - x0) < 1e-9 || Math.Abs(res[j].X - x0) > In(2)) continue;
+                res[i] = new Vec2(x0, res[j].Y);
+                res.RemoveAt(j);
+                if (j < i) i--;
+                break;
+            }
+        }
+        return res.ToArray();
+    }
+
+    /// <summary>Open U from a clipped closed polygon: drops the clip edge at x = x0 and rounds the remaining corners.</summary>
+    private static (BarShape shape, Vec2[] local) Hairpin(Vec2[] clipped, double x0, double pin, double db)
+    {
+        int m = clipped.Length, i0 = -1;
+        for (int i = 0; i < m; i++)
+            if (Math.Abs(clipped[i].X - x0) < 1e-9 && Math.Abs(clipped[(i + 1) % m].X - x0) < 1e-9) { i0 = i; break; }
+        var path = Enumerable.Range(1, m).Select(k => clipped[(i0 + k) % m]).ToList();   // from the clip edge's end around to its start
+        var bends = new List<(Vec2, double)>();
+        var local = BarShape.Rounded(path, pin / 2 + db / 2, bends);
+        double minX = path.Min(p => p.X) - db / 2, maxX = path.Max(p => p.X) + db / 2, minY = path.Min(p => p.Y) - db / 2, maxY = path.Max(p => p.Y) + db / 2;
+        double legEnd = x0, end = x0 > 0 ? minX : maxX;
+        // Scheduled length = sum of the out-to-out segment lengths (the plans' bending diagrams / bar lists): the path's
+        // segments offset outward (right of the counter-clockwise travel) by db / 2, adjacent ones intersected.
+        var outer = new List<Vec2>();
+        for (int i = 0; i < path.Count; i++)
+        {
+            if (i == 0 || i == path.Count - 1)
+            {
+                var e = (i == 0 ? path[1] - path[0] : path[i] - path[i - 1]).Normalized();
+                outer.Add(path[i] + e.Right * (db / 2));
+                continue;
+            }
+            var ea = (path[i] - path[i - 1]).Normalized(); var eb = (path[i + 1] - path[i]).Normalized();
+            Vec2 pa = path[i] + ea.Right * (db / 2), pb = path[i] + eb.Right * (db / 2);
+            double den = Vec2.Cross(ea, eb);
+            outer.Add(Math.Abs(den) < 1e-12 ? pa : pa + ea * (Vec2.Cross(pb - pa, eb) / den));
+        }
+        double scheduled = 0;
+        for (int i = 1; i < outer.Count; i++) scheduled += Vec2.Distance(outer[i - 1], outer[i]);
+        var shape = new BarShape
+        {
+            Code = "HAIRPIN", Description = "Open U hairpin (lapped pair), square-cut ends", Centerline = local, PinDiameter = pin, FixedLength = scheduled,
+            Dimensions =
+            {
+                new BarDimension("A", maxY - minY, new Vec2(end, minY), new Vec2(end, maxY), new Vec2(x0 > 0 ? -1 : 1, 0)),
+                new BarDimension("B", Math.Abs(legEnd - end), new Vec2(Math.Min(legEnd, end), maxY), new Vec2(Math.Max(legEnd, end), maxY), new Vec2(0, 1)),
+            },
+        };
+        shape.Bends.AddRange(bends);
+        return (shape, local);
     }
 
     // ------------------------------------------------------------------ footing dowels and column splices

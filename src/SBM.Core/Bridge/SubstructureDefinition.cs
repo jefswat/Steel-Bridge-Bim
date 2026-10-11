@@ -141,6 +141,9 @@ public enum PileType { SteelHP, PrecastConcrete }
 /// lap with L-shaped footing dowels, or mechanical couplers at two splice levels (alternate bars at different levels).</summary>
 public enum ColumnSpliceType { Continuous, Lap, Coupler }
 
+/// <summary>Ties of a flared column base: one closed tie per level, or lapped pairs of open U hairpins / closed end hoops.</summary>
+public enum FlareTieType { ClosedTie, HairpinPair, HoopPair }
+
 /// <summary>Reinforcing for caps, columns, shafts, footings and backwalls (US bar sizes).</summary>
 public sealed class SubstructureReinforcementDefinition
 {
@@ -214,6 +217,14 @@ public sealed class SubstructureReinforcementDefinition
     public double FlareCover { get; set; } = In(3.5);
     public string FlareTieSize { get; set; } = "#6";
     public double FlareTieSpacing { get; set; } = In(12);
+    /// <summary>Flare ties: one closed tie per level (default), or per level a lapped pair of open U hairpins / of closed end
+    /// hoops around the two S ends (plans' "PLINTH, HAIRPINS" / "PLINTH, HOOPS"), lapping <see cref="FlareTieOverlap"/>.</summary>
+    public FlareTieType FlareTieStyle { get; set; } = FlareTieType.ClosedTie;
+    /// <summary>Out-to-out overlap along S of the pair (hairpins: between the leg ends; hoops: between the outside faces of the closing legs).</summary>
+    public double FlareTieOverlap { get; set; }
+    /// <summary>Pairs only: number of equal spaces between the levels (plans' "N SPA. @ ABT. s"), 3" above the footing to 3" below
+    /// the plinth top; 0 = equal spaces not exceeding <see cref="FlareTieSpacing"/>.</summary>
+    public int FlareTieSpaces { get; set; }
 
     // ---- Footing dowels / column splices (chamfered columns on a footing; ColumnSplice = Continuous keeps the old behaviour).
     // One L-shaped dowel (90 degree hook at the bottom, lying on the bottom mat) per column bar. Elevations are measured above the
