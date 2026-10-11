@@ -173,3 +173,37 @@ Elements (IFC): pole base = `IfcFooting`/`IfcBuildingElementPart` + anchor bolts
 - Exit sign base is outboard of the barrier on an outrigger bracket from girder A, block 2'-0 x 6'-2 x 2'-6, locations only as ticks on sheets 104/108.
 - Overhead sign locations: Unit 2 Pier 7WB (truss Sta 7595+82.22) and Unit 3 Pier 13WB (Sta 7607+12.18); the title-block station is not a location. Girders A+K (U2) and A+J (U3); unit 3 bracket height 6'-4 (unit 2: 8'-6).
 - Ramp G drains: inlet is transverse 4'-0 x 10", tube 3'-0 1/2 from the gutter line; Pier 19G drain pipes are 8" drops into one 12" collection pipe 1'-8 right of CL girder A.
+
+---------------------------------------------------------------------------------------------------------------------------------
+
+## Model (feature/misc): what is built, clearance results, unresolved items
+
+Scripts (re-runnable, optional inputs): `samples/plans/drains-ramp-g.csx`, `signs-i80.csx`, `end-posts.csx`, `lighting.csx`. Code: `SBM.Core/Misc/`. Every number below is a plan value or is flagged.
+
+### Built
+- **Ramp G drains 1-25**: trench (4'-0 x 10" + 3/8" plates, floor 4 1/4" below the grate; the 3 1/2" / 4 1/4" conflict stays raised) from 1/2" past the gutter line (deck edge - 1'-7),
+  two grate panels, 8 x 3/8 vertical tube 3'-0 1/2 from the gutter line (the offset from CL Ramp G follows from the deck edge), free fall ending 1'-0 below the bottom flange (plan: 1'-0 min below
+  the web connection, not locatable), splash basins 10' x 10' x 2' where the table says YES, piped drains 22-25 into the 12" collector. The table's cross slope is compared with the model.
+- **12" collector (span 19G)**: A53 Sch 40 (OD 12.75"), 1'-8 right of CL girder A, elevations = deck top at the pipe minus the printed heights (drains 22-25; the cross frame rows have no station),
+  couplers 4'-0 / 4'-0 / 2'-0 upstream of drains 23 / 24 / 25, hangers 5'-0 max, ends at the Pier 19G bearing line.
+- **Pier joint systems**: trough (slope 5.9% / 4.9%, invert at the deck underside at the high end; the printed 1'-8 drop = slope x run is reproduced, see the log), trough collection box,
+  8" pipe, pier collection box (12'-6 / 18'-3 7/8 from the CL column on the cap), pipe along the cap soffit at 8%, vertical clamps 6'-0 / 4'-0, 45 deg outlet + 4' x 4' x 1' mattress.
+- **Sign brackets** (4 on Unit 2 at Pier 7WB, 2 on Unit 3 at Pier 13WB): web, top plate 1 7/8, bottom flange plate, 4 stiffeners, 8 x 1 1/2" anchor bolts on the 1'-8 circle, base plate placeholder.
+- **Lighting**: pole bases Pier 13WB / 14WB / 15WB (Unit 3) and Pier 8G (Ramp G Unit 2), 6 + 2 junction boxes (placeholders), ITS conduit (right barrier) / power conduit (Ramp G left barrier).
+- **Bar lists** (schedule only, weights reproduce the plans): pole base 221 lb, exit sign base 189 lb, end posts epoxy 373 / 450 lb and stainless 240 / 262 lb.
+
+### Drain clearance to the girders (surface to steel; negative = overlap); `drains-ramp-g.csx` prints it
+Free-fall tubes (8" OD): 5 1/2" (drains 1, 2, 20, 21), 4 1/2" (3-8, 12, 18), 3 1/2" (13), 2 1/2" (11, 16, 17), 2 9/16" (19), **1 1/2" (9, 10, 15)**, **overlap 1/2" with the top flange
+at drain 14** (Pier 10G back, G4 top flange, wide flange near the pier). Piped drains 22-25: tube 2 1/2" / 5 1/2" / 5 1/2" / 5 1/2", 8" drop pipe 3 9/16" / 6 3/16" (G1 top flange); the 12" collector
+clears everything by 3/16" at its tightest (cross frame diagonal CF139-D1 at STA 67502+85.7 to 67502+92.8; TIGHT warning). Pier systems: pipe 1 vs a cross frame top chord 9 1/2", pier pipe 2' + from the bearing
+elements; the Pier 19G collector elbow overlaps the masonry plate by 4 3/8" because its plan routing to the box is not printed (consequence of the straight-down assumption). The tube to CL girder A at drains 22-25 is
+18 1/2" in the model against the plan's 1'-8: the 1 1/2" difference is reported, nothing is moved.
+
+### UNRESOLVED (raised as warnings by the generator)
+- Drain tube bottom for free fall ("1'-0 MIN below the girder web connection": connection location not printed); trench depth 3 1/2" vs 4 1/4"; 45 deg tee / cleanout geometry; upstream cleanout of the collector.
+- Pier systems: N position of the pier collection box on the cap (section A-A shows the pipe running back-station about 6-7 ft by scale), standoff / face of the vertical pipe, box top 1" min / 1/4" max below the cap top
+  (1/4" used), trough U width / sag (width = joint blockout), box orientation; conventions are listed in the generator warning "placement conventions to confirm". Pier 19G pipe routing from the collector end to the box.
+- Sign supports: Unit 3 girder A brackets (reference of the 12'-10 7/8 dimension), the connection of the stub to the girder (the model's bracket web overlaps the girder web), MC18 / WT bracing / splice plates, anchor bolt lengths,
+  HSS post height and truss size / elevation (placeholder base plate only). Exit sign bases: station (tick only), not placed.
+- Crash cushion end posts: position from the CL pier, wedge direction, plan width at the pier end, skewed Ramp G plan, cushion geometry; not placed, bars scheduled.
+- Lighting: East Abutment pole base (10'-0 max), which junction box is power / ITS, LI-104 box size (placeholder 18" x 6" x 5", flagged), underdeck boxes / stub-outs, expansion fittings, power conduit side on I-80, coating of the pole base bars.

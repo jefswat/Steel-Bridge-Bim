@@ -151,6 +151,8 @@ public sealed class BarMark
     /// <summary>Structural unit the mark belongs to ("" = superstructure; otherwise e.g. "Pier 1"). Marks are unique per unit.</summary>
     public string Unit { get; init; } = "";
     public bool Epoxy { get; init; }
+    /// <summary>Other coating / material note ("stainless"); empty = plain or epoxy per <see cref="Epoxy"/>.</summary>
+    public string Coating { get; init; } = "";
     public int Count { get; set; }
     /// <summary>Individual lengths for variable-length marks (straight bars whose lengths vary, e.g. at skewed ends).</summary>
     public List<double>? VaryingLengths { get; init; }

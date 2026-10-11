@@ -1,4 +1,4 @@
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -146,6 +146,8 @@ public sealed class RegenerationCache
                 }
                 bool Skip(int j) => b.SupportAt(j).SharedPier is { Length: > 0 } id && owners.ContainsKey(id) && !IsOwner(id, i);
                 sub = Substructure.SubstructureGenerator.Generate(pt.f, seats, project.Units, Ground, foreign, Skip);
+                if (sub != null && (b.Misc != null || b.Drains.Any(d => d.Trench != null)))
+                    sub.Misc = Misc.MiscItemsGenerator.Generate(pt.f, pt.s, sub, project.Units, Ground);
                 lock (_lock) _sub[subKey] = sub;
             }
             lock (_lock) { if (pt.hit && found) Hits++; else Misses++; }

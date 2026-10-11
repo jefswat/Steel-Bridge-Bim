@@ -1045,7 +1045,9 @@ public sealed class DeckDrainDefinition
     public double PipeDiameter { get; set; } = In(8);
     /// <summary>Free fall: downspout bottom below the bottom of the girders.</summary>
     public double DropBelowGirders { get; set; } = Ft(1);
-    public DeckDrainDefinition Clone() => (DeckDrainDefinition)MemberwiseClone();
+    /// <summary>Trench-type inlet as designed on the plans (null = the simple legacy inlet above).</summary>
+    public DrainTrenchDefinition? Trench { get; set; }
+    public DeckDrainDefinition Clone() { var c = (DeckDrainDefinition)MemberwiseClone(); c.Trench = Trench?.Clone(); return c; }
 }
 
 /// <summary>The complete parametric definition of one steel girder superstructure.</summary>
@@ -1080,6 +1082,8 @@ public sealed class BridgeDefinition
     public List<DeckDrainDefinition> Drains { get; set; } = new();
     /// <summary>Inspection cables and walkways (null = none).</summary>
     public InspectionAccessDefinition? InspectionAccess { get; set; }
+    /// <summary>Drain collectors, pier drains, sign supports, crash cushion end posts, lighting (null = none).</summary>
+    public MiscItemsDefinition? Misc { get; set; }
 
     /// <summary>A typical two-span continuous layout starting at the given station.</summary>
     public static BridgeDefinition CreateDefault(double beginStation, string alignmentName)
@@ -1163,5 +1167,6 @@ public sealed class BridgeDefinition
         LateralBracing = LateralBracing.Clone(),
         Drains = Drains.Select(d => d.Clone()).ToList(),
         InspectionAccess = InspectionAccess?.Clone(),
+        Misc = Misc?.Clone(),
     };
 }

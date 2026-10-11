@@ -468,6 +468,7 @@ public static class ModelDatabase
             if (b.Concrete != null) deckSlabId = Concrete(b.Concrete, def, bk, deckPartId);
             if (b.Prestressed != null) Prestressed(b.Prestressed, bk, superId);
             if (b.Steel != null) Steel(b.Steel, bk, superId, framing.Camber);
+            if (b.Substructure?.Misc is { IsEmpty: false } misc) MiscItems(misc, bk, superId, def.Name);
             _ = deckSlabId;
         }
 
@@ -912,6 +913,78 @@ public static class ModelDatabase
                 if (tm.Success) r.Subtype = tm.Groups[1].Value;
                 r.Volume = Math.Abs(so.Mesh.Volume()); r.Box = so.Mesh.Bounds(); StationOf(r, r.Box);
                 r.Props = new Json().Add("description", so.Description).ToString();
+                _w.Add(r);
+            }
+        }
+
+        // ------------------------------------------------------------ misc items (drainage, sign supports, crash cushion, lighting)
+
+        private void MiscItems(SBM.Core.Misc.MiscModel misc, string bk, string superId, string bridgeName)
+        {
+            string who = _unit.Length > 0 ? $"{_bridgeGroup} {_unit}" : bridgeName;
+            var groups = new Dictionary<SBM.Core.Misc.MiscGroup, string>();
+            string GroupOf(SBM.Core.Misc.MiscGroup g)
+            {
+                if (groups.TryGetValue(g, out var id)) return id;
+                var (title, cat) = g switch
+                {
+                    SBM.Core.Misc.MiscGroup.Drainage => ("deck drainage", "drainage"),
+                    SBM.Core.Misc.MiscGroup.SignSupport => ("sign supports", "sign supports"),
+                    SBM.Core.Misc.MiscGroup.CrashCushion => ("crash cushion end posts", "crash cushion"),
+                    _ => ("lighting", "lighting"),
+                };
+                return groups[g] = Group($"{bk}/misc-grp/{g}", superId, $"{who} {title}", cat);
+            }
+            var asm = new Dictionary<string, string>();
+            foreach (var a in misc.Assemblies)
+            {
+                if (asm.ContainsKey(a.Name)) continue;
+                string id = Id(IfcKeys.MiscAssembly(bk, a.Name));
+                var r = New(id, GroupOf(a.Group), "assembly", a.Category, "IFCELEMENTASSEMBLY", a.Name);
+                r.Mark = a.Name;
+                if (!_keysOnly) r.Props = new Json().Add("description", a.Description).ToString();
+                _w.Add(r);
+                asm[a.Name] = id;
+            }
+            int n = 0;
+            foreach (var el in misc.Elements)
+            {
+                var (cat, cls) = el.Kind switch
+                {
+                    SBM.Core.Misc.MiscKind.DrainTrench => ("deck drain", "IFCWASTETERMINAL"),
+                    SBM.Core.Misc.MiscKind.DrainGrate => ("drain grate", "IFCPLATE"),
+                    SBM.Core.Misc.MiscKind.DrainTube or SBM.Core.Misc.MiscKind.DrainPipe => ("drain pipe", "IFCPIPESEGMENT"),
+                    SBM.Core.Misc.MiscKind.PipeFitting => ("pipe fitting", "IFCPIPEFITTING"),
+                    SBM.Core.Misc.MiscKind.PipeHanger => ("pipe hanger", "IFCDISCRETEACCESSORY"),
+                    SBM.Core.Misc.MiscKind.PipeSupport => ("pipe support", "IFCDISCRETEACCESSORY"),
+                    SBM.Core.Misc.MiscKind.DrainBox => ("collection box", "IFCTANK"),
+                    SBM.Core.Misc.MiscKind.DrainTrough => ("drain trough", "IFCBUILDINGELEMENTPROXY"),
+                    SBM.Core.Misc.MiscKind.SplashBasin => ("splash basin", "IFCCOURSE"),
+                    SBM.Core.Misc.MiscKind.ErosionMattress => ("erosion mattress", "IFCCOURSE"),
+                    SBM.Core.Misc.MiscKind.SignPlate => ("sign bracket plate", "IFCPLATE"),
+                    SBM.Core.Misc.MiscKind.SignStiffener => ("sign bracket stiffener", "IFCPLATE"),
+                    SBM.Core.Misc.MiscKind.SignAnchorBolt or SBM.Core.Misc.MiscKind.PoleAnchorBolt => ("anchor bolt group", "IFCMECHANICALFASTENER"),
+                    SBM.Core.Misc.MiscKind.SignPlaceholder => ("sign base plate (by others)", "IFCBUILDINGELEMENTPROXY"),
+                    SBM.Core.Misc.MiscKind.SignBlock => ("exit sign base", "IFCFOOTING"),
+                    SBM.Core.Misc.MiscKind.EndPostConcrete => ("crash cushion end post", "IFCBUILDINGELEMENTPROXY"),
+                    SBM.Core.Misc.MiscKind.CushionPlaceholder => ("crash cushion (by others)", "IFCBUILDINGELEMENTPROXY"),
+                    SBM.Core.Misc.MiscKind.PoleBaseConcrete => ("pole base", "IFCFOOTING"),
+                    SBM.Core.Misc.MiscKind.JunctionBox => ("junction box", "IFCJUNCTIONBOX"),
+                    _ => ("conduit", "IFCCABLECARRIERSEGMENT"),
+                };
+                string parent = asm.TryGetValue(el.Assembly, out var pid) ? pid : GroupOf(el.Group);
+                var r = New(Id(IfcKeys.MiscElement(bk, n++)), parent, "element", cat, cls, el.Name);
+                r.Tag = el;
+                if (_keysOnly) { _w.Add(r); continue; }
+                r.Material = el.Material;
+                r.Volume = Math.Abs(el.Mesh.Volume());
+                bool concrete = el.Material.StartsWith("Class C", StringComparison.OrdinalIgnoreCase);
+                bool steel = el.Material.Contains("steel", StringComparison.OrdinalIgnoreCase) || el.Material.Contains("A53") || el.Material.Contains("A36") || el.Material.Contains("A500") || el.Material.Contains("F1554");
+                if (concrete) r.Mass = r.Volume * 2400; else if (steel && !el.Placeholder) r.Mass = r.Volume * 7850;
+                r.Box = el.Mesh.Bounds(); StationOf(r, r.Box);
+                var pj = new Json().Add("description", el.Description);
+                if (el.Placeholder) pj.Add("placeholder", true).Add("basis", el.PlaceholderBasis);
+                r.Props = pj.ToString();
                 _w.Add(r);
             }
         }

@@ -1,4 +1,4 @@
-using SBM.Core.Bridge;
+﻿using SBM.Core.Bridge;
 using SBM.Core.Concrete;
 using SBM.Core.Framing;
 using SBM.Core.Geometry;
@@ -130,6 +130,8 @@ public sealed class SubstructureModel
     public List<BarPlacement> Bars { get; } = new();
     /// <summary>Deck drainage: inlets, downspouts / collector pipes, splash basins (not tied to one support).</summary>
     public List<SubSolid> Drainage { get; } = new();
+    /// <summary>Optional misc items (Ramp G drainage, sign supports, end posts, lighting); set by the regeneration cache after the substructure.</summary>
+    public Misc.MiscModel? Misc { get; set; }
     public List<string> Notes { get; } = new();
     public List<Diagnostic> Diagnostics { get; } = new();
     public TimeSpan GenerationTime { get; set; }

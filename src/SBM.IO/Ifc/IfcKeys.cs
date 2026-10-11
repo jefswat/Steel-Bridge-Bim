@@ -23,6 +23,8 @@ public static class IfcKeys
     public static string JointDevice(string jk) => jk + "/device";
     public static string DeckBar(string bk, int n) => $"{bk}/bar/{n}";
     public static string Drain(string bk, int n) => $"{bk}/drain/{n}";
+    public static string MiscAssembly(string bk, string name) => $"{bk}/misc/{name}";
+    public static string MiscElement(string bk, int n) => $"{bk}/misc/el/{n}";
     public static string Assembly(string bk, string mark) => bk + "/asm/" + mark;
     public static string Part(string bk, string mark) => bk + "/part/" + mark;
     public static string Fastener(string bk, int kind, string assembly, int no) => $"{bk}/fastener/{kind}/{assembly}/{no}";

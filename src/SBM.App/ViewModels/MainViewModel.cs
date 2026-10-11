@@ -1405,6 +1405,17 @@ public sealed partial class MainViewModel : ObservableObject
                         u.FormatLength(g.Sum(m => m.TotalLength)), $"{g.Sum(m => m.TotalMass) / massUnit:N0} {mu}"));
                 if (smod.Marks.Count > 0)
                     MaterialRows.Add(new MaterialRow(b.Name, "TOTAL SUBSTRUCTURE REINFORCING", "", smod.Marks.Sum(m => m.Count), "", $"{smod.RebarMass / massUnit:N0} {mu}"));
+                if (smod.Misc is { IsEmpty: false } misc)
+                {
+                    foreach (var g in misc.Elements.Where(x => !x.Placeholder).GroupBy(x => (x.Group, x.Material)))
+                        MaterialRows.Add(new MaterialRow(b.Name, "Misc: " + ChoiceField.Humanize(g.Key.Group.ToString()).ToLowerInvariant(), g.Key.Material, g.Count(), "",
+                            g.Key.Material.StartsWith("Class C") ? $"{g.Sum(x => Math.Abs(x.Mesh.Volume())) / cy:N2} {vu}" : ""));
+                    foreach (var x in misc.Elements.Where(x => x.Placeholder))
+                        MaterialRows.Add(new MaterialRow(b.Name, "Misc: by others (placeholder)", x.Name, 1, "", "by others"));
+                    foreach (var g in misc.Marks.GroupBy(m => (m.Size.Name, m.Epoxy, m.Coating)))
+                        MaterialRows.Add(new MaterialRow(b.Name, "Reinforcing (misc items)", $"{g.Key.Name}{(g.Key.Coating != "" ? ", " + g.Key.Coating : g.Key.Epoxy ? ", epoxy" : "")}: {string.Join(", ", g.Select(m => m.Mark).Distinct())}",
+                            g.Sum(m => m.Count), u.FormatLength(g.Sum(m => m.TotalLength)), $"{g.Sum(m => m.TotalMass) / massUnit:N0} {mu}"));
+                }
             }
             foreach (var c in f.CrossFrames)
                 CrossFrameRows.Add(new CrossFrameRow(c.Mark, (c.Span + 1).ToString(), $"G{c.Bay + 1}–G{c.RightGirder + 1}",
