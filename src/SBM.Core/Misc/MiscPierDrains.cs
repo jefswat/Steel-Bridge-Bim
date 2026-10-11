@@ -41,8 +41,8 @@ public sealed partial class MiscItemsGenerator
     /// <summary>Flags the pier-system parts whose position / size the plans do not dimension (Ramp G PDF 154-158).</summary>
     private void FlagPier(string asm, string standoff)
     {
-        Flag(asm + " neoprene trough", "U-section width and sag of the trough are not dimensioned (Ramp G PDF 154 sections A-A / C-C, PDF 156 section B-B).", "strip as wide as the joint blockout, invert at the deck underside at the high end");
-        Flag(asm + " trough collection box", "Only the distance of the box from the roadway edge is printed (PDF 154); its orientation and vertical position are not.", "2'-2 side along the pier line, top at the trough invert at the box");
+        Flag(asm + " neoprene trough", "U-section width and sag of the trough are not dimensioned (Ramp G PDF 154 sections A-A / C-C, PDF 156 section B-B).", "strip as wide as the joint blockout, from the deck underside at the high end to the box top");
+        Flag(asm + " trough collection box", "Position along the pier is printed to the box (3'-6 / 4'-0 from the roadway edge, PDF 154) without saying to which point of the box; the L8x8x1/2 hanger to the cross frame top chord (PDF 155 sections E-E / H-H) is not modeled.", "centre of the box at the printed distance");
         Flag(asm + " pier collection box", "The box top is printed as a range, 1/4\" min / 1\" max below the top of cap (PDF 157 box elevation; PDF 155 section A-A shows 1\" at CL box), not one value. Face, 9\" inlet and 1 1/2\" outlet clearance are printed (PDF 155 / 157).", "top 1/4\" below the cap top (the minimum)");
         Flag(asm + " pipe 1", "Only the 1:12 minimum slope and the turn-down 9\" (at 50 F) off the cap face are printed (PDF 155 sections A-A / C-C); the plan route from the trough box to the turn-down is not dimensioned (PDF 154 partial plan at 19G: 'orientation to clear inspection walkway and cross frame').", "straight in plan from the trough box to the turn-down, exactly 1:12 from the box low side");
         Flag(asm + " pier pipe", "PDF 157 drain pipe elevations show the pipe leaving the box bottom, a cleanout bend to 8% min along the cap face toward the CL pier, and a cleanout bend down the column; the level of the first bend and the stand-off of the vertical run from the column face are not dimensioned.",
@@ -80,29 +80,39 @@ public sealed partial class MiscItemsGenerator
         double tFar = pd.CollectRight ? tL : tR;
         double tBox = pd.CollectRight ? tR - pd.BoxFromGutter : tL + pd.BoxFromGutter;
         Vec2 pFar = q + dir * tFar, pBox = q + dir * tBox;
-        Vec2 u = pd.CollectRight ? -dir : dir;                         // toward the high end of the trough
         double Soffit(Vec2 p) { var so = _a.Inverse(p); return Ztop(so.Station, so.Offset) - _deck.Thickness; }
         double zHi = Soffit(pFar);
         double run = Math.Abs(tBox - tFar);
-        double drop = pd.TroughSlope * run;
-        double zBox = zHi - drop;
+        double soffitBox = Soffit(pBox);
+        // trough collection box top: the printed 1'-8 is measured from the deck underside to the top of the box at the collection end (PDF 154 elevations)
+        double zBox;
         if (pd.PrintedTroughDrop is { } pdrop)
         {
-            if (Math.Abs(drop - pdrop) > In(2)) Warn($"{asm}: trough drop {Sh(drop)} (slope {pd.TroughSlope * 100:F1}% x run {L(run)}) differs from the printed {Sh(pdrop)}.");
-            else Info($"{asm}: trough drop {Sh(drop)} from the deck underside over {L(run)} at {pd.TroughSlope * 100:F1}% (printed {Sh(pdrop)}).");
+            zBox = soffitBox - pdrop;
+            double slope = (zHi - zBox) / Math.Max(run, 1e-9);
+            if (slope + 1e-4 < pd.TroughSlope) Warn($"{asm}: the trough from the deck underside at its high end to the box top ({Sh(pdrop)} below the deck underside at the box) falls only {slope * 100:F1}%, less than the printed {pd.TroughSlope * 100:F1}% minimum.");
+            else Info($"{asm}: trough collection box top {Sh(pdrop)} below the deck underside (PDF 154); the trough falls {Sh(zHi - zBox)} over {L(run)} = {slope * 100:F1}% (printed {pd.TroughSlope * 100:F1}% min; the deck underside itself falls {Sh(zHi - soffitBox)}).");
         }
+        else
+        {
+            zBox = zHi - pd.TroughSlope * run;
+            Warn($"{asm}: no printed box depth below the deck: trough modeled at exactly {pd.TroughSlope * 100:F1}% from the deck underside at the high end.");
+        }
+        double drop = zHi - zBox;
         Info($"{asm}: roadway between gutter lines along the pier line {L(span)}; trough box {Sh(pd.BoxFromGutter)} inboard of the {(pd.CollectRight ? "right" : "left")} gutter line.");
 
-        // trough: sloped strip along the joint, invert at the deck underside at the high end (hung from the deck by inserts), width = blockout width (not dimensioned)
+        // trough: sloped strip along the joint, from the deck underside at the high end to the box top (hung from the deck by inserts), width = blockout width (not dimensioned)
         double tw = ej.BlockoutWidth > 0 ? ej.BlockoutWidth : Ft(1);
         var trough = MiscMesh.Strip(pFar.WithZ(zHi), pBox.WithZ(zBox), new Vec3(ahead.X, ahead.Y, 0), tw, In(0.25));
-        Add(MiscGroup.Drainage, MiscKind.DrainTrough, asm, asm + " neoprene trough", $"1/4\" reinforced neoprene trough under the joint, slope {pd.TroughSlope * 100:F1}%, {L(run)} long, dropping {Sh(drop)} to the collection box",
-            trough, "Reinforced neoprene", true, $"Plans give slope and bolting only: the U section (width, sag) is not dimensioned; width modeled = joint blockout {Sh(tw)}; invert modeled at the deck underside at the high end");
+        Add(MiscGroup.Drainage, MiscKind.DrainTrough, asm, asm + " neoprene trough", $"1/4\" reinforced neoprene trough under the joint, {L(run)} long, falling {Sh(drop)} ({drop / Math.Max(run, 1e-9) * 100:F1}%, {pd.TroughSlope * 100:F1}% min printed) to the collection box",
+            trough, "Reinforced neoprene", true, $"Plans give slope and bolting only: the U section (width, sag) is not dimensioned; width modeled = joint blockout {Sh(tw)}; modeled from the deck underside at the high end to the box top");
 
-        // trough collection box
+        // trough collection box (PDF 156): the 2'-2 faces carry the R 1'-1 1/2 cut for the trough, so the 2'-2 side runs across the joint (along the bridge,
+        // PDF 155 section A-A shows it centred on CL pier); 1'-4 deep at the high end, bottom falling 3" to the low end, which faces the pier collection box and carries the 8" pipe
+        Vec2 lowDir = pd.CapBoxFace == CapFaceSide.Back ? -ahead : ahead;
         double H = pd.BoxHighEndHeight, sl3 = pd.BoxBottomSlope;
-        var boxMesh = MiscMesh.VerticalSection(pBox, u, new[] { new Vec2(-pd.BoxLength / 2, zBox), new Vec2(pd.BoxLength / 2, zBox), new Vec2(pd.BoxLength / 2, zBox - H), new Vec2(-pd.BoxLength / 2, zBox - H - sl3) }, pd.BoxWidth / 2);
-        Add(MiscGroup.Drainage, MiscKind.DrainBox, asm, asm + " trough collection box", $"Trough collection box, 3/8\" plate, {Sh(pd.BoxLength)} x {Sh(pd.BoxWidth)}, {Sh(H)} high at the high end, bottom sloping {Sh(sl3)}; solid envelope; top at the trough invert (modeling convention)",
+        var boxMesh = MiscMesh.VerticalSection(pBox, lowDir, new[] { new Vec2(-pd.BoxLength / 2, zBox), new Vec2(pd.BoxLength / 2, zBox), new Vec2(pd.BoxLength / 2, zBox - H - sl3), new Vec2(-pd.BoxLength / 2, zBox - H) }, pd.BoxWidth / 2);
+        Add(MiscGroup.Drainage, MiscKind.DrainBox, asm, asm + " trough collection box", $"Trough collection box, 3/8\" plate, {Sh(pd.BoxLength)} across the joint x {Sh(pd.BoxWidth)} along it, {Sh(H)} deep at the high end, {Sh(H + sl3)} at the low end; top {Sh(soffitBox - zBox)} below the deck underside; solid envelope",
             boxMesh, "ASTM A36 3/8 plate, galvanized");
 
         // pier collection box: fastened to the cap FACE (PDF 155 sections A-A / C-C, PDF 157 box details), S from the column CL
@@ -133,11 +143,13 @@ public sealed partial class MiscItemsGenerator
 
         // collector end (Pier 19G): the span collector turns down into the box (PDF 155 section C-C)
         bool collectorFeeds = false;
+        double zJoin = double.NaN;                                       // CL of the span collector at its end (19G)
         double zIn = boxTop - pd.CapBoxInletEmbed;
         if (pd.Collector != "" && _collectors.TryGetValue(pd.Collector, out var coll))
         {
             collectorFeeds = true;
             var e = coll.Pts[^1];
+            zJoin = e.Z;
             double dd = (pIn - e.XY).Length;
             if (dd > In(1)) Warn($"{asm}: the span collector ends {Sh(dd)} (plan) from the box inlet axis {Sh(pd.CapBoxInletFromFace)} off the cap face: the printed box position ({Sh(Math.Abs(pd.CapBoxFromColumn))} from CL column) and the collector line ({coll.Name}) do not meet; the elbow is modeled straight down at the pipe end (PDF 154 partial plan shows the collector ending over the box).");
             else Info($"{asm}: the span collector ends over the box inlet ({Sh(dd)} in plan).");
@@ -149,7 +161,7 @@ public sealed partial class MiscItemsGenerator
 
         // pipe 1: trough box low side, 1:12 to the turn-down 9" off the cap face, then vertical into the box (or into the collector drop at 19G)
         var (od1, w1) = MiscMesh.PipeSch40(pd.PipeNominalDiameter);
-        var p0 = pBox;
+        var p0 = pBox + lowDir * (pd.BoxLength / 2);                    // low end wall of the trough box
         double z0 = zBox - H - sl3 + In(1.5);
         double runP = (pIn - p0).Length;
         var dSN = pIn - p0;
@@ -157,15 +169,16 @@ public sealed partial class MiscItemsGenerator
         double z1 = z0 - runP * pd.Pipe1Slope;
         var pipe1 = new Mesh();
         pipe1.Append(MiscMesh.Tube(p0.WithZ(z0), pIn.WithZ(z1), od1 / 2, od1 / 2 - w1));
-        bool leg = !collectorFeeds && z1 > zIn;
-        if (leg) pipe1.Append(MiscMesh.Tube(pIn.WithZ(z1), pIn.WithZ(zIn), od1 / 2, od1 / 2 - w1));
-        else if (!collectorFeeds) Warn($"{asm}: pipe 1 reaches the turn-down at {L(z1)}, below the box inlet level {L(zIn)} (run {L(runP)} at 1:{1 / pd.Pipe1Slope:F0}): the plan's vertical relationships do not close with the modeled trough level.");
+        double zLegEnd = collectorFeeds ? zJoin : zIn;                   // into the box, or down to the collector elbow it joins (PDF 155 section C-C)
+        bool leg = z1 > zLegEnd;
+        if (leg) pipe1.Append(MiscMesh.Tube(pIn.WithZ(z1), pIn.WithZ(zLegEnd), od1 / 2, od1 / 2 - w1));
+        else Warn($"{asm}: pipe 1 reaches the turn-down at {L(z1)}, below the {(collectorFeeds ? "span collector" : "box inlet")} level {L(zLegEnd)} (run {L(runP)} at 1:{1 / pd.Pipe1Slope:F0}): the plan's vertical relationships do not close with the modeled trough level.");
         Add(MiscGroup.Drainage, MiscKind.DrainPipe, asm, asm + " pipe 1", collectorFeeds
-                ? $"{Sh(pd.PipeNominalDiameter)} Sch 40 pipe from the trough collection box, 1:{1 / pd.Pipe1Slope:F0} ({L(runP)}) into the drop of the span collector over the pier collection box"
+                ? $"{Sh(pd.PipeNominalDiameter)} Sch 40 pipe from the trough collection box, 1:{1 / pd.Pipe1Slope:F0} ({L(runP)}), then down into the end elbow of the span collector over the pier collection box"
                 : $"{Sh(pd.PipeNominalDiameter)} Sch 40 pipe from the trough collection box, 1:{1 / pd.Pipe1Slope:F0} ({L(runP)}), turning down {Sh(pd.CapBoxInletFromFace)} off the cap face into the pier collection box",
             pipe1, "ASTM A53 Gr B, galvanized");
         Record(asm, "pipe 1", p0.WithZ(z0), pIn.WithZ(z1), od1 / 2, sl.Station);
-        if (leg) Record(asm, "pipe 1 vertical leg", pIn.WithZ(z1), pIn.WithZ(zIn), od1 / 2, sl.Station);
+        if (leg) Record(asm, "pipe 1 vertical leg", pIn.WithZ(z1), pIn.WithZ(zLegEnd), od1 / 2, sl.Station);
 
         // pier pipe: box bottom -> bend under the box -> 8% along the cap face toward the CL pier -> vertical down the column, all in the plane of the box outlet
         double nPipe = nFace + side * (pd.CapBoxOutletClear + rc);

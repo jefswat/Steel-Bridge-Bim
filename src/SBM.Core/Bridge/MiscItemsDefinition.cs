@@ -94,9 +94,10 @@ public sealed class PierDrainDefinition
     public double BoxFromGutter { get; set; } = Ft(3.5);
     public double BoxLength { get; set; } = Ft(2) + In(2);
     public double BoxWidth { get; set; } = Ft(1);
-    public double BoxHighEndHeight { get; set; } = Ft(1) + In(7);
+    /// <summary>Trough box depth at the high end (PDF 156: 1'-4; the bottom falls <see cref="BoxBottomSlope"/> = 3" to the 1'-7 low end). BoxLength (2'-2) runs across the joint, BoxWidth (1'-0) along it.</summary>
+    public double BoxHighEndHeight { get; set; } = Ft(1) + In(4);
     public double BoxBottomSlope { get; set; } = In(3);
-    /// <summary>Drop of the trough at the collection end printed on the sheet (1'-8): only compared with slope x run.</summary>
+    /// <summary>Deck underside to the top of the trough collection box at the collection end, printed on the PDF 154 elevations (1'-8); null = trough at exactly <see cref="TroughSlope"/>.</summary>
     public double? PrintedTroughDrop { get; set; }
     public double PipeNominalDiameter { get; set; } = In(8);
     public double Pipe1Slope { get; set; } = 1.0 / 12;

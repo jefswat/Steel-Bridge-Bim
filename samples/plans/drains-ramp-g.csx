@@ -6,6 +6,8 @@
 //    the tube 1'-8 from CL girder A (only CHECKED against the model, the drain is never moved).
 //  * Collection pipe: vertical dims from the deck top at CL pipe (PDF 159 table; the cross frame rows have no station and are not used), 1.78%.
 //  * Pier systems: 5G / 9G / 14G collect at the right (girder D side), 19G at the left (girder A side).
+//    Pier collection box on the BACK face of the cap (PDF 155 sections A-A / C-C, PDF 157), pipes outside the concrete: 8" pipe 1:12 to 9" off the face, pier pipe
+//    from the box bottom 8% along the face to CL column, then down the column. Trough box top 1'-8 below the deck underside (PDF 154). The 19G collector ends over the box.
 //  * UNRESOLVED items are reported by the generator (warnings), nothing is guessed.
 using SBM.Core.Bridge;
 

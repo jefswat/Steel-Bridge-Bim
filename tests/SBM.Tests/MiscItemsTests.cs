@@ -107,6 +107,36 @@ public class MiscItemsTests
     }
 
     [Fact]
+    public void RampGPierDrains_HangOnTheBackCapFace_AndNeverPassThroughTheCap()
+    {
+        string? dir = AppContext.BaseDirectory;
+        while (dir != null && !File.Exists(Path.Combine(dir, "samples", "plans", "I-80 WB and Ramp G.sbm"))) dir = Path.GetDirectoryName(dir);
+        Assert.NotNull(dir);
+        var doc = SbmDocument.Open(Path.Combine(dir!, "samples", "plans", "I-80 WB and Ramp G.sbm"));
+        Assert.Empty(doc.Regenerate().Errors);
+        foreach (var (bridge, pier) in new[] { ("Ramp G Unit 1", "Pier 5G"), ("Ramp G Unit 2", "Pier 9G"), ("Ramp G Unit 3", "Pier 14G"), ("Ramp G Unit 4", "Pier 19G") })
+        {
+            var sub = doc.Substructure(bridge);
+            var unit = sub.Units.Single(u => u.Name == pier);
+            double N(Vec3 p) => Vec2.Dot(p.XY - unit.Origin, unit.N);
+            var misc = sub.Misc!;
+            // pier collection box and pier pipe: entirely outside the back face of the cap (PDF 155 sections A-A / C-C, PDF 157)
+            foreach (var name in new[] { "pier collection box", "pier pipe" })
+            {
+                var e = misc.Elements.Single(x => x.Name == $"Pier drain {pier} {name}");
+                Assert.True(e.Mesh.Positions.Max(N) <= unit.CapN0 + 1e-6, $"{pier} {name} reaches into the cap");
+            }
+            // the 8% run is parallel to the cap face: one N for the whole pier pipe (no diagonal in plan)
+            var pp = misc.Elements.Single(x => x.Name == $"Pier drain {pier} pier pipe").Mesh.Positions;
+            var (od, _) = MiscMesh.PipeSch40(pier == "Pier 19G" ? In(12) : In(8));
+            Assert.InRange(pp.Max(N) - pp.Min(N), od - 0.005, od + 0.002);
+            Assert.DoesNotContain(misc.Clearances, c => c.Drain == $"Pier drain {pier}" && c.Clearance <= 0);
+        }
+        // Pier 19G: the span collector ends over the box inlet (printed 18'-3 7/8 from CL column and 9" off the cap face meet the collector line)
+        Assert.Contains(doc.Substructure("Ramp G Unit 4").Misc!.Diagnostics, d => d.Message.Contains("span collector ends over the box inlet"));
+    }
+
+    [Fact]
     public void UnresolvedItems_AreRaised_AndBarListsAreScheduledOnly()
     {
         var doc = Doc();

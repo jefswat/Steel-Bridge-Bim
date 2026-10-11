@@ -515,7 +515,9 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
 - Misc items (OPTIONAL, `BridgeDefinition.Misc` = `MiscItemsDefinition` + `DeckDrainDefinition.Trench`; null = none; `Bridge/MiscItemsDefinition.cs`, generator `SBM.Core/Misc/`
   `MiscItemsGenerator` (+ `MiscPierDrains`, `MiscOthers`, `MiscMesh`), result `MiscModel` hung on `SubstructureModel.Misc` and built in `RegenerationCache` after the substructure):
   Ramp G deck drainage (trench inlets positioned FROM THE GUTTER LINE = deck edge - EdgeStrip width, tube, grate, splash basin, 12" span collector at the printed
-  deck-top-to-CL heights, pier joint collection systems at 5G/9G/14G/19G), I-80 sign truss brackets (steel + anchor bolts; post base plate = placeholder) and exit sign bases,
+  deck-top-to-CL heights, pier joint collection systems at 5G/9G/14G/19G: pier collection box HUNG ON THE BACK CAP FACE (`PierDrainDefinition.CapBoxFace`, inlet 9" / outlet 1 1/2" clear
+  of the face), pier pipe in the vertical plane of the box outlet along the face to CL column then down - nothing passes through the cap; trough box top 1'-8 below the deck underside; a span collector
+  feeding a pier box ends over its inlet), I-80 sign truss brackets (steel + anchor bolts; post base plate = placeholder) and exit sign bases,
   crash cushion end posts, lighting (pole bases, junction boxes, conduit in the barrier). Rules: nothing is assumed - unknown plan values are nullable inputs / `Unresolved`
   strings raised as WARNINGS ("UNRESOLVED ..."); things by others are placeholders (`MiscElement.Placeholder`, IFC Pset `SBM_Placeholder` with the plan basis); plan bar lists are
   schedule-only `BarMark`s (`MiscBarRow`, `BarMark.Coating`). DRAIN CLEARANCE: every tube / drop pipe / collector / pier pipe is checked against the steel parts of its bridge
