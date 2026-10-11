@@ -100,6 +100,10 @@ BTD beam data (p.27 / DS 25, RASTER):
 
 Note: standard beam lengths (55'-0 / 105'-0 / 60'-0 CL-CL bearing) differ from the layout CL-CL beam bearing
 lengths along CL NB roadway (54'-11 15/16 / 104'-11 7/16 / 59'-11 1/2) - see U3.
+**USER DECISION (2026-10-11, U3 closed):** the beams are the Iowa standard BTD beams, taken from the standard, not
+designed for this bridge. Model every beam at the STANDARD length (55'-0 / 105'-0 / 60'-0 CL-CL bearing, 56'-4 /
+106'-4 / 61'-4 overall) with the standard's strands and details. The layout bearing distances are NOT beam lengths;
+report the difference against the layout per beam line as a check (warning), do not stretch the beams.
 
 ## 4. Substructure
 
@@ -166,7 +170,7 @@ lengths along CL NB roadway (54'-11 15/16 / 104'-11 7/16 / 59'-11 1/2) - see U3.
 |---|---|---|---|
 | U1 | Horizontal coordinates / datum of the alignment (N/E of PC/PI, projection) | p.6 | not in this set (road plans IM-NHS-029-7(49)); model can be built in local coordinates from stations |
 | U2 | Exact reference line of the cross-slope pivot | p.6, p.18 | DERIVED: PGL NB at 5.00 ft RT of CL I-29, plane slope to the east edge reproduces p.6 and p.33 to 0.01 ft; not stated as text |
-| U3 | Standard beam lengths (55'-0 / 105'-0 / 60'-0 CL-CL brg, 56'-4 / 106'-4 / 61'-4 overall) vs layout CL-CL beam bearings along CL NB (54'-11 15/16 / 104'-11 7/16 / 59'-11 1/2) and per-beam actual lengths along chords | p.21, 27 | plan gives no per-beam length table; true chord lengths per beam line must be computed from the bearing points |
+| U3 (CLOSED by user: standard length governs, see beam data note) | Standard beam lengths (55'-0 / 105'-0 / 60'-0 CL-CL brg, 56'-4 / 106'-4 / 61'-4 overall) vs layout CL-CL beam bearings along CL NB (54'-11 15/16 / 104'-11 7/16 / 59'-11 1/2) and per-beam actual lengths along chords | p.21, 27 | plan gives no per-beam length table; true chord lengths per beam line must be computed from the bearing points |
 | U4 | Local-tangent skews at pier 2 (13 deg 00'40") and N abut (14 deg 29'57") do not reproduce from 10 deg 09'36" + deflection at the staked CL NB point (12 deg 59'50", 14 deg 27'28") | p.21, p.7 | reference point of the "local tangent" not stated; the parallel 10 deg 09'36" to the extended tangent (p.7) reconciles with staking |
 | U5 | Abutment length to gutter: 36'-6 15/16 (p.15) vs 36'-6 7/8 (p.7, p.17) | p.15 | 1/16 in; reference points differ (3 vs 3 5/16 from CL NB) - not resolved |
 | U6 | Pier pile batter directions (which of the 8 circled piles batter which way) | p.11 | graphics only ("1:4 in direction shown"), arrows not readable at clip resolution |

@@ -214,10 +214,27 @@ as "…before bearing iteration.sbm". The run confirmed item 2.3: girder C has n
 - Editor UI for the new column-rebar inputs (faces, chamfer positions, hoop overlap, crossties, flare cage).
 - Generic bearings: bearing body 16"×16" and masonry plate 1¾" are assumptions (vendor items).
 
-## 5. Other plan sets not started
+## 5. Prestressed plan sets: extracted, program improvements QUEUED (user, 2026-10-11)
 
-- Prestressed sets in `dist\SteelBridgeModeler\`: Woodbury I-29 NB over Floyd Blvd, and Br02069 (TH 65).
-- Include borings in the IFC geotech representation where they're shown.
+Plan data: `docs/plan-data/woodbury-i29-floyd/` (Iowa Design 817, 3-span BTD, integral abutments) and
+`docs/plan-data/br02069-th65/` (MnDOT, 1 span 7 x 30MH). Each SUMMARY.md "Model mapping" lists the gaps in detail.
+**User rule:** standard beams (Iowa BTx, MnDOT MH, ...) are taken from the state standard, not designed per bridge —
+model them at the STANDARD length/strands/details; differences vs the layout are check warnings, never stretched beams.
+
+Queue (shared by both sets first):
+1. Beam shape catalog beyond Tx: Iowa BTA-BTE bulb tees (BTD first) and MnDOT MH (30MH), with true radius fillets
+   (R 8 / R 2 BTD, 6" R 30MH) — the WBFL PrecastIBeam dims can't do them; per-shape standard data (lengths, strands).
+2. Per-span (per beam line) prestressed beam definitions: type, standard length, strand pattern (BTD55/105/60).
+3. Strand debonding (`StrandPoint` debond lengths; PGSuper import too) — Br02069 14 of 44 strands.
+4. Harped strands at given grid columns + hold-down distance from midspan (vs `HarpPointFraction`).
+5. Integral / semi-integral abutments with concrete end diaphragms (beams embedded), pier continuity diaphragms on pads.
+6. Steel intermediate diaphragms between prestressed beams (C15 / W21 / W14; the prestressed path skips cross frames).
+7. Straight chord girders with different spacing per span / different offsets each side of a pier (Woodbury).
+8. Profile grade line offset from the stationing line (Woodbury pivot 5.00 ft RT).
+9. Smaller: round CIP pipe piles, curved-plate bearings, future-beam pedestals, MnDOT Type S / Iowa aesthetic
+   barriers, columns with brick-reveal projections, stage-joint deck edge, prestressed camber in the haunch check,
+   beam bar generator (stirrups, end bars).
+- Also: include borings in the IFC geotech representation where they're shown.
 
 ## 6. Last: cap aesthetic features (requested by the user)
 
