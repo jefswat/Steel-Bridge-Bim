@@ -255,6 +255,22 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   Exports must be reproducible (test `Ifc_RegeneratedModel_ExportsIdentically`): anything numbered from a parallel
   generator's ConcurrentBag (stiffener marks, bar order, hole order) must be put in a fixed order first. Bar role:
   TIE/HOOP/CROSSTIE/SPIRAL/SSTR-S = LIGATURE.
+  Alignments (`Ifc/IfcAlignmentWriter.cs`, same in every IfcGeometryMode): IFC 4.3 bSI alignment concepts = IfcAlignment
+  (aggregated by IfcProject, IfcRelReferencedInSpatialStructure from the site; GlobalId `IfcKeys.Alignment`) nesting
+  IfcAlignmentHorizontal (IfcAlignmentSegment + IfcAlignmentHorizontalSegment LINE/CIRCULARARC/CLOTHOID; radius + = left, 0 =
+  straight) and, with a profile, IfcAlignmentVertical (CONSTANTGRADIENT/PARABOLICARC by distance along, cut at PVC/PVT/grade
+  breaks/unsym. VPI/station equations; RadiusOfCurvature = L/(g2-g1)), each ending with a zero-length segment; geometry
+  IfcCompositeCurve of IfcCurveSegment (IfcLine/IfcCircle/IfcClothoid, mapping as ifcopenshell.api.alignment) + IfcGradientCurve
+  ('FootPrint'/'Curve2D' + 'Axis'/'Curve3D'; no profile: only 'Axis'/'Curve2D'); IfcReferent STATION + Pset_Stationing at the
+  start and every station equation (IfcLinearPlacement on the composite curve). Local coords = minus the export base point,
+  project length units. Heights = the PROFILE (PGL) elevation at the alignment's plan point, even with a PGL/pivot offset.
+  NO IfcAlignmentCant / IfcSegmentedReferenceCurve: cross slopes are road superelevation about the PGL, not rail cant (the US
+  bridge IDS forbids cant). API for code that places along an alignment (inside `IfcExporter.Export`): `alignmentWriter.For(name)`
+  / `.Written[alignment]` -> `IfcAlignmentEntities` {Alignment, Horizontal, Vertical, CompositeCurve, GradientCurve, Referents,
+  AxisCurve = gradient curve or the 2D composite without a profile} (STEP ids), and `alignmentWriter.LinearPlacement(curve, al,
+  distance m from the alignment START (not a station: `al.StationToDistance`), offsetLateral (IFC: + = LEFT), offsetVertical)`.
+  Check: `sbm run tools/ifc-alignment-points.csx model.sbm -- a.ifc pts.json [abv] [--alignments-only|--spiral]` then
+  `python -I tools/check_ifc_alignment.py a.ifc pts.json` (ifcopenshell.geom vs SBM, 1 mm); IDS: `python -I tools/run_ids.py a.ifc x.ids`.
 - `src/SBM.App` â€” WPF (Fluent dark theme), MVVM via CommunityToolkit.Mvvm, GPU viewport = HelixToolkit.Wpf.SharpDX 3.x
   (DirectX 11, System.Numerics types; namespaces `HelixToolkit`, `HelixToolkit.SharpDX`, `HelixToolkit.Wpf.SharpDX`).
   - `Viewport/SceneBuilder` batches each layer into one LineGeometry3D + one BillboardText3D; vertices are rebased to a

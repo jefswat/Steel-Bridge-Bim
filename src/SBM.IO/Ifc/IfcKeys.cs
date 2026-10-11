@@ -9,6 +9,12 @@ public static class IfcKeys
 {
     public static string Project(string key) => key + "/project";
     public static string Alignment(string key, string name) => key + "/alignment/" + name;
+    /// <summary>IfcAlignmentHorizontal ("h") / IfcAlignmentVertical ("v") of an alignment (ak = <see cref="Alignment"/>).</summary>
+    public static string AlignmentLayout(string ak, string layout) => $"{ak}/{layout}";
+    /// <summary>IfcAlignmentSegment i of the horizontal ("h") or vertical ("v") layout.</summary>
+    public static string AlignmentSegment(string ak, string layout, int i) => $"{ak}/{layout}/seg/{i}";
+    /// <summary>Stationing IfcReferent i (0 = start station, then the station equations).</summary>
+    public static string AlignmentReferent(string ak, int i) => $"{ak}/station/{i}";
     public static string Bridge(string key, string bridgeName) => key + "/" + bridgeName;
     public static string SuperPart(string bk) => bk + "/super";
     public static string DeckPart(string bk) => bk + "/deck";
