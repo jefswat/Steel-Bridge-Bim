@@ -58,14 +58,34 @@ public static class PrestressedGenerator
                 if (pads[i, j] is { } p) model.Pads.AddRange(p);
                 if (seats[i, j] is { } s) model.BearingSeats.AddRange(s);
             }
-        foreach (var w in warn) model.Diagnostics.Add(new Diagnostic(DiagnosticSeverity.Warning, w));
+        foreach (var w in warn.Distinct()) model.Diagnostics.Add(new Diagnostic(DiagnosticSeverity.Warning, w));
+        // Beams modeled on an assumption the plans do not fix: one warning per reason.
+        foreach (var grp in model.Beams.Where(b => b.Assumption != null).GroupBy(b => (b.Assumption!.Reason, b.Assumption.Basis)))
+            model.Diagnostics.Add(new Diagnostic(DiagnosticSeverity.Warning,
+                $"UNRESOLVED (prestressed): {grp.Key.Reason} — {grp.Count()} beam(s): {string.Join(", ", grp.Select(b => b.Mark))}. Modeled: {grp.Key.Basis}."));
+        // Plan items of the beam definitions that are not on the sheets.
+        var seen = new HashSet<string>();
+        var used = model.Beams.Select(b => b.Definition).OfType<PrestressedBeamDefinition>().Distinct().ToList();
+        foreach (var d in used)
+            foreach (var r in d.Unresolved ?? new List<string>())
+                if (seen.Add(r))
+                    model.Diagnostics.Add(new Diagnostic(DiagnosticSeverity.Warning, $"UNRESOLVED (prestressed {(d.Designation != "" ? d.Designation : TxGirderCatalog.Get(d).Name)}): {r}"));
+        if (model.Beams.Any(b => b.Strands.Any(s => s.Debonded)))
+            model.Diagnostics.Add(new Diagnostic(DiagnosticSeverity.Warning,
+                "UNRESOLVED (prestressed): debond sheathing product / size is not dimensioned on the plans; the sheathing is drawn " +
+                $"{u.FormatLength(used.FirstOrDefault()?.SheathThickness ?? In(1.0 / 16), LengthKind.Short)} thick around the strand (display only, IfcTendonConduit)."));
         model.GenerationTime = sw.Elapsed;
         return model;
     }
 
-    private static (PrestressedBeam, List<PrestressedPad>, List<BearingSeat>) BuildBeam(BridgeFraming f, UnitSystem u, TxGirderShape shape,
-        PrestressedBeamDefinition pd, int i, int j, System.Collections.Concurrent.ConcurrentQueue<string> warn)
+    private static (PrestressedBeam, List<PrestressedPad>, List<BearingSeat>) BuildBeam(BridgeFraming f, UnitSystem u, TxGirderShape baseShape,
+        PrestressedBeamDefinition basePd, int i, int j, System.Collections.Concurrent.ConcurrentQueue<string> warn)
     {
+        // Per-span / per-beam-line definition (BTD55 / BTD105 / BTD60 in one bridge).
+        var pd = basePd.For(j, i);
+        var shape = TxGirderCatalog.Get(pd);
+        if (Math.Abs(shape.Depth - baseShape.Depth) > 1e-6)
+            warn.Enqueue($"G{i + 1} span {j + 1}: {shape.Name} is {u.FormatLength(shape.Depth, LengthKind.Short)} deep but the framing (top of beam, haunch, seats) uses the base beam depth {u.FormatLength(baseShape.Depth, LengthKind.Short)}.");
         var def = f.Definition;
         var g = f.Girders[i];
         var c = g.Spans[j];
@@ -100,6 +120,48 @@ public static class PrestressedGenerator
         double brgA = abutA ? 0 : pd.EndGapAtBent + pd.BearingToEnd;
         double brgB = abutB ? lc : lc - pd.EndGapAtBent - pd.BearingToEnd;
         double fkA = squareA ? 0 : kA, fkB = squareB ? 0 : kB;
+        string typeName = pd.Designation != "" ? pd.Designation : shape.Name;
+
+        // Standard beam: built at the STANDARD length (CL-CL bearing + overall, along the CL), never stretched to the layout;
+        // the difference against the layout bearings is a CHECK warning, the placement between them an input (UNRESOLVED when
+        // the plans don't state it and the lengths differ).
+        double layoutSpan = brgB - brgA, lengthDiff = 0;
+        bool standardLength = pd.StandardBearingLength > 0;
+        Assumption? assumption = null;
+        if (standardLength)
+        {
+            double ls = pd.StandardBearingLength;
+            double lo = pd.StandardOverallLength > 0 ? pd.StandardOverallLength : ls + 2 * pd.BearingToEnd;
+            double e = (lo - ls) / 2;
+            lengthDiff = ls - layoutSpan;
+            double a0 = pd.Placement switch
+            {
+                StandardBeamPlacement.AtStartBearing => brgA,
+                StandardBeamPlacement.AtEndBearing => brgB - ls,
+                _ => brgA - lengthDiff / 2,
+            };
+            brgA = a0;
+            brgB = a0 + ls;
+            endA = brgA - e;
+            endB = brgB + e;
+            if (Math.Abs(lengthDiff) >= In(1.0 / 32))
+            {
+                string L(double m) => u.FormatLength(m);
+                warn.Enqueue($"CHECK (standard beam length): G{i + 1} span {j + 1} {typeName}: standard CL-CL bearing {L(ls)} vs layout {L(layoutSpan)} along the beam " +
+                             $"(standard {(lengthDiff > 0 ? "longer" : "shorter")} by {u.FormatLength(Math.Abs(lengthDiff), LengthKind.Short)}); the beam is modeled at the standard length " +
+                             $"({pd.Placement}{(pd.PlacementBasis != "" ? ", " + pd.PlacementBasis : "")}), not stretched.");
+                if (pd.PlacementBasis == "")
+                    assumption = Assumption.Unresolved(
+                        $"placement of the standard {typeName} beam between layout bearings that differ from its standard CL-CL bearing length is not stated on the plans" +
+                        (pd.Source != "" ? $" ({pd.Source})" : ""),
+                        pd.Placement switch
+                        {
+                            StandardBeamPlacement.AtStartBearing => "standard CL bearing on the layout bearing at the start",
+                            StandardBeamPlacement.AtEndBearing => "standard CL bearing on the layout bearing at the end",
+                            _ => "centred between the layout bearings",
+                        });
+            }
+        }
         // s of the end face at section point (x, y): skewed or square in plan; square to the axis in elevation at interior bents.
         double SA(double x, double y) => endA + x * fkA + (abutA ? 0 : slope * (D - y));
         double SB(double x, double y) => endB + x * fkB + (abutB ? 0 : slope * (D - y));
@@ -123,15 +185,21 @@ public static class PrestressedGenerator
         // ---- strands: explicit layout (PGSuper) or the IGND fill with the lowest A-position pairs depressed
         double spanL = brgB - brgA;
         double hold = pd.HarpPointFraction > 0 ? pd.HarpPointFraction * spanL : Math.Max(len / 20, Ft(5));
-        double holdFromEnd = Math.Max(0, len / 2 - hold);
+        double holdFromEnd = pd.HoldDownFromMidspan > 0 ? Math.Max(0, len / 2 - pd.HoldDownFromMidspan) : Math.Max(0, len / 2 - hold);
         var layout = new List<(Vec2 p, double yEnd, bool harped, double xEnd)>();
-        if (pd.StrandLayout is { } sl) // explicit (possibly empty = no strands)
+        var debond = new List<(double s, double e, string sym)>();
+        if (StrandPatterns.Resolve(pd, D) is { } sl) // explicit (possibly empty = no strands), grid-column harping applied
+        {
             layout.AddRange(sl.Select(q =>
             {
                 double xe = double.IsNaN(q.XEnd) ? q.X : q.XEnd;
                 bool h = q.Harped && (Math.Abs(q.YEnd - q.Y) > 1e-6 || Math.Abs(xe - q.X) > 1e-6);
                 return (new Vec2(q.X, q.Y), h ? q.YEnd : q.Y, h, xe);
             }));
+            debond.AddRange(sl.Select(q => (q.DebondStart, q.DebondEnd, q.DebondSymbol)));
+            if (sl.Any(q => q.DebondStart + q.DebondEnd > len))
+                warn.Enqueue($"G{i + 1} span {j + 1}: debond lengths exceed the beam length {u.FormatLength(len)}.");
+        }
         else
         {
             var pos = shape.StrandPositions().Take(pd.StrandCount).ToList();
@@ -150,19 +218,46 @@ public static class PrestressedGenerator
             }
         }
         var strands = new List<StrandInstance>();
-        foreach (var (p, yEnd, harped, xEnd) in layout)
+        for (int n = 0; n < layout.Count; n++)
         {
+            var (p, yEnd, harped, xEnd) = layout[n];
+            var (dbS, dbE, sym) = n < debond.Count ? debond[n] : (0.0, 0.0, "");
             if (!harped)
             {
-                strands.Add(new StrandInstance { Points = new[] { P(SA(p.X, p.Y), p.X, p.Y), P(SB(p.X, p.Y), p.X, p.Y) }, Section = p, EndHeight = p.Y });
+                strands.Add(new StrandInstance
+                {
+                    Points = new[] { P(SA(p.X, p.Y), p.X, p.Y), P(SB(p.X, p.Y), p.X, p.Y) }, Section = p, EndHeight = p.Y,
+                    DebondStart = dbS, DebondEnd = dbE, DebondSymbol = sym,
+                });
                 continue;
             }
             double h0 = endA + holdFromEnd, h1 = endB - holdFromEnd;
             strands.Add(new StrandInstance
             {
                 Points = new[] { P(SA(xEnd, yEnd), xEnd, yEnd), P(h0, p.X, p.Y), P(h1, p.X, p.Y), P(SB(xEnd, yEnd), xEnd, yEnd) },
-                Section = p, Depressed = true, EndHeight = yEnd,
+                Section = p, Depressed = true, EndHeight = yEnd, DebondStart = dbS, DebondEnd = dbE, DebondSymbol = sym,
             });
+        }
+
+        // ---- exact body for shapes with arcs (IFC: clipped extrusion of the true profile)
+        BeamBody? body = null;
+        if (shape.Profile != null)
+        {
+            double sLo = outline.Min(q => SA(q.X, q.Y)) - 0.01, sHi = outline.Max(q => SB(q.X, q.Y)) + 0.01;
+            var up = new Vec3(0, 0, 1);
+            var t3 = new Vec3(t.X, t.Y, 0);
+            var bx = Vec3.Cross(up, t3).Normalized();
+            var org = P(sLo, 0, 0);
+            (Vec3 pt, Vec3 nrm) Plane(Func<double, double, double> sf, double sign)
+            {
+                var p0 = P(sf(0, 0), 0, 0);
+                var n = Vec3.Cross(P(sf(1, 0), 1, 0) - p0, P(sf(0, 1), 0, 1) - p0).Normalized();
+                return (p0, Vec3.Dot(n, t3) * sign < 0 ? -n : n);
+            }
+            var (pa0, na) = Plane(SA, -1);
+            var (pb0, nb) = Plane(SB, 1);
+            body = new BeamBody(new Frame3(org, bx, up, Vec3.Cross(bx, up)), Vec3.Dot(bx, new Vec3(right.X, right.Y, 0)),
+                P(sHi, 0, 0) - org, pa0, na, pb0, nb);
         }
 
         // ---- haunch along the beam (deck bottom − top of beam at the CL)
@@ -187,6 +282,8 @@ public static class PrestressedGenerator
             TopStart = P(endA, 0, D), TopEnd = P(endB, 0, D), BearingStart = P(brgA, 0, D), BearingEnd = P(brgB, 0, D),
             Slope = slope, SkewStart = skewA, SkewEnd = skewB, StrandDiameter = pd.StrandDiameter, HoldDownFromEnd = holdFromEnd,
             MinHaunch = hMin, MaxHaunch = hMax,
+            Definition = pd, Designation = pd.Designation, LayoutBearingSpan = layoutSpan, LengthDifference = lengthDiff,
+            IsStandardLength = standardLength, Assumption = assumption, Body = body,
         };
         beam.Strands.AddRange(strands);
 
@@ -195,6 +292,8 @@ public static class PrestressedGenerator
         var padList = new List<PrestressedPad>();
         var seatList = new List<BearingSeat>();
         var padType = shape.IsTx ? shape.Type : shape.DepthIn > 58 ? TxGirderType.Tx62 : TxGirderType.Tx54;
+        if (shape.IsStateStandard && pd.PadLength <= 0)
+            warn.Enqueue($"UNRESOLVED (prestressed {typeName}): no bearing pad size given (PadLength = 0); the TxDOT IGEB pad table is used as a placeholder.");
         foreach (var (sNom, sup, end, abut, k, fk, eCl) in new[] { (brgA, supA, 0, abutA, kA, fkA, endA), (brgB, supB, 1, abutB, kB, fkB, endB) })
         {
             double skew = def.Supports[sup.Index].SkewDegrees;

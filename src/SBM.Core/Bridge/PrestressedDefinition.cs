@@ -24,7 +24,31 @@ public sealed class StrandPoint
     /// <summary>Right of the CL at the girder ends (harped strands fanned from a bundle at the hold-downs); NaN = X.</summary>
     public double XEnd { get; set; } = double.NaN;
     public bool Harped { get; set; }
+    /// <summary>Debonded (sheathed) length from the START end of the beam (0 = bonded to the end).</summary>
+    public double DebondStart { get; set; }
+    /// <summary>Debonded (sheathed) length from the END of the beam (0 = bonded to the end).</summary>
+    public double DebondEnd { get; set; }
+    /// <summary>Plan symbol of the debond group ("A", "B", ...), for schedules.</summary>
+    public string DebondSymbol { get; set; } = "";
     public StrandPoint Clone() => (StrandPoint)MemberwiseClone();
+}
+
+/// <summary>How a standard-length beam sits between layout bearings whose distance differs from its standard CL-CL bearing length.</summary>
+public enum StandardBeamPlacement { Centered, AtStartBearing, AtEndBearing }
+
+/// <summary>
+/// A beam definition for some spans / beam lines (e.g. Woodbury: BTD55 in span 1, BTD105 in span 2, BTD60 in span 3).
+/// Matching entries are tried in order, the LAST match wins; no match = the bridge's base definition.
+/// </summary>
+public sealed class PrestressedSpanBeam
+{
+    /// <summary>Span indices (0 = first span); null = every span.</summary>
+    public List<int>? Spans { get; set; }
+    /// <summary>Girder (beam line) indices (0 = G1); null = every beam line.</summary>
+    public List<int>? Girders { get; set; }
+    public PrestressedBeamDefinition Beam { get; set; } = new();
+    public bool Matches(int span, int girder) => (Spans == null || Spans.Contains(span)) && (Girders == null || Girders.Contains(girder));
+    public PrestressedSpanBeam Clone() => new() { Spans = Spans?.ToList(), Girders = Girders?.ToList(), Beam = Beam.Clone() };
 }
 
 /// <summary>
@@ -74,17 +98,93 @@ public sealed class PrestressedBeamDefinition
     /// <summary>Total pad height (IGEB: ¼" covers + 6 × ¼" layers + 0.105" laminates ≈ 2¾").</summary>
     public double PadThickness { get; set; } = In(2.75);
 
+    // ---- state standard beams (all OPTIONAL; defaults keep the TxDOT / PGSuper behavior)
+
+    /// <summary>State standard shape key from <see cref="StandardBeamCatalog"/> ("IA BTD", "MN 30MH"); overrides <see cref="Type"/>.
+    /// Null / "" = Type / CustomSection.</summary>
+    public string? Standard { get; set; }
+    /// <summary>Beam designation for marks and schedules ("BTD55"); "" = the shape name.</summary>
+    public string Designation { get; set; } = "";
+    /// <summary>STANDARD CL-CL bearing length of the beam (along the beam CL). 0 = the beam spans the layout bearings (Tx path).
+    /// When set, the beam is built at this length and the difference against the layout is reported (CHECK warning), never stretched.</summary>
+    public double StandardBearingLength { get; set; }
+    /// <summary>STANDARD overall length (end to end along the CL); 0 = StandardBearingLength + 2 × BearingToEnd.</summary>
+    public double StandardOverallLength { get; set; }
+    /// <summary>Placement of the standard-length beam between the layout bearings when they differ.</summary>
+    public StandardBeamPlacement Placement { get; set; } = StandardBeamPlacement.Centered;
+    /// <summary>Plan reference that fixes <see cref="Placement"/>; "" = not stated on the plans → UNRESOLVED warning when the
+    /// standard length differs from the layout.</summary>
+    public string PlacementBasis { get; set; } = "";
+    /// <summary>Hold-down points each side of MIDSPAN of the beam (e.g. 6'-0 / 10'-6 Iowa BTD); 0 = <see cref="HarpPointFraction"/>.</summary>
+    public double HoldDownFromMidspan { get; set; }
+    /// <summary>Deflected strands by grid column: x of the columns (right of the CL) in <see cref="StrandLayout"/>; every strand in a
+    /// column is deflected (with <see cref="HarpedTopBelowTopAtEnd"/>). Null = per-strand Harped / YEnd only.</summary>
+    public List<double>? HarpedColumns { get; set; }
+    /// <summary>Top deflected strand of each column at the beam ends: distance BELOW THE TOP of the beam (Iowa "4 in below top").</summary>
+    public double HarpedTopBelowTopAtEnd { get; set; }
+    /// <summary>Spacing of the deflected strands of one column at the ends (2" grid).</summary>
+    public double HarpedEndSpacing { get; set; } = In(2);
+    /// <summary>Wall thickness of the debond sheathing drawn around debonded strands (display; the product is not dimensioned on the plans).</summary>
+    public double SheathThickness { get; set; } = In(1.0 / 16);
+    /// <summary>Plan reference of this definition (for warnings).</summary>
+    public string Source { get; set; } = "";
+    /// <summary>Plan items of this beam not on the sheets: each raised as an "UNRESOLVED (prestressed): ..." warning (with the PDF page).</summary>
+    public List<string>? Unresolved { get; set; }
+    /// <summary>Different beams per span / beam line (base definition = this one). Null = this beam everywhere.</summary>
+    public List<PrestressedSpanBeam>? SpanBeams { get; set; }
+
+    /// <summary>The definition that applies to a span and beam line (last matching <see cref="SpanBeams"/> entry, else this).</summary>
+    public PrestressedBeamDefinition For(int span, int girder)
+    {
+        if (SpanBeams != null)
+            for (int k = SpanBeams.Count - 1; k >= 0; k--)
+                if (SpanBeams[k].Matches(span, girder)) return SpanBeams[k].Beam;
+        return this;
+    }
+
+    /// <summary>Every definition in use: this one and the per-span ones.</summary>
+    public IEnumerable<PrestressedBeamDefinition> AllDefinitions() => new[] { this }.Concat(SpanBeams?.Select(s => s.Beam) ?? Enumerable.Empty<PrestressedBeamDefinition>());
+
     public PrestressedBeamDefinition Clone()
     {
         var c = (PrestressedBeamDefinition)MemberwiseClone();
         c.CustomSection = CustomSection?.Clone();
         c.StrandLayout = StrandLayout?.Select(s => s.Clone()).ToList();
+        c.HarpedColumns = HarpedColumns?.ToList();
+        c.Unresolved = Unresolved?.ToList();
+        c.SpanBeams = SpanBeams?.Select(s => s.Clone()).ToList();
         return c;
     }
 
     public List<string> Validate()
     {
         var e = new List<string>();
+        if (SpanBeams != null)
+            foreach (var sb in SpanBeams)
+                foreach (var m in sb.Beam.Validate())
+                    e.Add($"Spans {(sb.Spans == null ? "all" : string.Join(",", sb.Spans.Select(x => x + 1)))}: {m}");
+        if (!string.IsNullOrWhiteSpace(Standard))
+        {
+            var std = StandardBeamCatalog.Find(Standard);
+            if (std == null) e.Add($"Prestressed: unknown standard beam shape '{Standard}' (known: {string.Join(", ", StandardBeamCatalog.All.Select(s => s.Key))}).");
+            else if (std.IsStateStandard && StrandLayout == null) e.Add($"Prestressed: {std.Designation} needs an explicit strand layout (the standard's pattern).");
+            if (StandardBearingLength < 0 || StandardOverallLength < 0) e.Add("Prestressed: standard lengths must not be negative.");
+            if (StandardOverallLength > 0 && StandardOverallLength < StandardBearingLength) e.Add("Prestressed: the standard overall length is shorter than the CL-CL bearing length.");
+            if (std is { IsStateStandard: true }) return Finish(e);
+        }
+        return Finish(ValidateBase(e));
+    }
+
+    private List<string> Finish(List<string> e)
+    {
+        if (StrandDiameter <= 0) e.Add("Prestressed: the strand diameter must be positive.");
+        if (BearingToEnd <= 0 || PadLength < 0 || PadWidth <= 0 || PadThickness <= 0) e.Add("Prestressed: bearing dimensions must be positive.");
+        if (StrandLayout != null && StrandLayout.Any(s => s.DebondStart < 0 || s.DebondEnd < 0)) e.Add("Prestressed: debond lengths must not be negative.");
+        return e;
+    }
+
+    private List<string> ValidateBase(List<string> e)
+    {
         if (Type == TxGirderType.Custom)
         {
             if (CustomSection == null) e.Add("Prestressed: a custom girder type needs a section (import one from PGSuper).");
@@ -98,8 +198,6 @@ public sealed class PrestressedBeamDefinition
             if (StrandCount > capacity) e.Add($"Prestressed: {shape.Name} holds at most {capacity} strands.");
             if (DepressedStrands < 0 || DepressedStrands % 2 != 0) e.Add("Prestressed: depressed strands must be an even number.");
         }
-        if (StrandDiameter <= 0) e.Add("Prestressed: the strand diameter must be positive.");
-        if (BearingToEnd <= 0 || PadLength < 0 || PadWidth <= 0 || PadThickness <= 0) e.Add("Prestressed: bearing dimensions must be positive.");
         return e;
     }
 }

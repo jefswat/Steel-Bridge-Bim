@@ -256,6 +256,61 @@ public static class IfcExporter
         var miscPlaceholders = new List<(int id, string location, string basis)>();
         // Elements modeled on an assumption the plans do not fix: Pset SBM_Status (Status, Reason, Basis).
         var miscStatus = new List<(int id, SBM.Core.Assumption a)>();
+        // Debonded strands: Pset SBM_Debonding (tendon id, its key, lengths from the start / end of the beam, plan symbol).
+        var debondPsets = new List<(int id, string key, double start, double end, string symbol)>();
+
+        // Beam with an exact profile (true arcs): IfcArbitraryClosedProfileDef over an IfcIndexedPolyCurve (IfcLineIndex /
+        // IfcArcIndex), extruded along the sloped beam axis and clipped by the two end planes (IfcBooleanClippingResult).
+        int ProfileBody(SBM.Core.Prestressed.PrestressedBeam b, int style)
+        {
+            var bb = b.Body!;
+            var segs = b.Shape.Profile!.Segments.ToList();
+            if (bb.SectionXSign < 0) // section x runs against the placement X: mirror and keep the outline counter-clockwise
+            {
+                static Vec2 M(Vec2 p) => new(-p.X, p.Y);
+                segs = segs.Select(g => new SBM.Core.Prestressed.ProfileSegment(M(g.End), M(g.Start), g.Center is { } c ? M(c) : null, g.Ccw)).Reverse().ToList();
+            }
+            var pts = new List<Vec2>();
+            int AddPt(Vec2 p) { pts.Add(p); return pts.Count; }
+            var idx = new StringBuilder("(");
+            int first = AddPt(segs[0].Start), cur = first;
+            for (int i = 0; i < segs.Count; i++)
+            {
+                var g = segs[i];
+                int end = i == segs.Count - 1 ? first : AddPt(g.End);
+                if (i > 0) idx.Append(',');
+                if (g.IsArc) idx.Append("IFCARCINDEX((").Append(cur).Append(',').Append(AddPt(g.Mid)).Append(',').Append(end).Append("))");
+                else idx.Append("IFCLINEINDEX((").Append(cur).Append(',').Append(end).Append("))");
+                cur = end;
+            }
+            idx.Append(')');
+            int pl2 = w.Add("IFCCARTESIANPOINTLIST2D", "(" + string.Join(",", pts.Select(p => $"({C(p.X * scale)},{C(p.Y * scale)})")) + "),$");
+            int curve = w.Add("IFCINDEXEDPOLYCURVE", $"{Ref(pl2)},{idx},.F.");
+            int profile = w.Add("IFCARBITRARYCLOSEDPROFILEDEF", $".AREA.,{S(b.Shape.Key)},{Ref(curve)}");
+            var f = bb.Frame;
+            int o = w.Add("IFCCARTESIANPOINT", P(f.Origin));
+            int place = w.Add("IFCAXIS2PLACEMENT3D", $"{Ref(o)},{Ref(Dir(f.Z))},{Ref(Dir(f.X))}");
+            var d = bb.Extrusion;
+            double depth = d.Length;
+            var dl = new Vec3(Vec3.Dot(d, f.X), Vec3.Dot(d, f.Y), Vec3.Dot(d, f.Z)) * (1 / depth);
+            int solid = w.Add("IFCEXTRUDEDAREASOLID", $"{Ref(profile)},{Ref(place)},{Ref(Dir(dl))},{C(depth * scale)}");
+            int HalfSpace(Vec3 p, Vec3 n)
+            {
+                var refDir = Vec3.Cross(new Vec3(0, 0, 1), n);
+                if (refDir.Length < 1e-6) refDir = Vec3.Cross(new Vec3(1, 0, 0), n);
+                int c = w.Add("IFCCARTESIANPOINT", P(p));
+                int ap = w.Add("IFCAXIS2PLACEMENT3D", $"{Ref(c)},{Ref(Dir(n))},{Ref(Dir(refDir.Normalized()))}");
+                int plane = w.Add("IFCPLANE", Ref(ap));
+                // AgreementFlag .F.: the half space lies on the side the (outward) normal points to = beyond the beam end.
+                return w.Add("IFCHALFSPACESOLID", $"{Ref(plane)},.F.");
+            }
+            int c1 = w.Add("IFCBOOLEANCLIPPINGRESULT", $".DIFFERENCE.,{Ref(solid)},{Ref(HalfSpace(bb.StartPoint, bb.StartNormal))}");
+            int c2 = w.Add("IFCBOOLEANCLIPPINGRESULT", $".DIFFERENCE.,{Ref(c1)},{Ref(HalfSpace(bb.EndPoint, bb.EndNormal))}");
+            w.Add("IFCSTYLEDITEM", $"{Ref(c2)},({Ref(style)}),$");
+            int rep = w.Add("IFCSHAPEREPRESENTATION", $"{Ref(body)},'Body','Clipping',({Ref(c2)})");
+            extrudedParts++;
+            return w.Add("IFCPRODUCTDEFINITIONSHAPE", $"$,$,({Ref(rep)})");
+        }
 
         int RgbStyle(string name, double r, double g, double b, double transparency = 0)
         {
@@ -558,31 +613,63 @@ public static class IfcExporter
             double strandArea = SBM.Core.Prestressed.TxGirderCatalog.StrandAreaIn2(pd.StrandDiameter) * 0.0254 * 0.0254;
             string strandSize = SBM.Core.Prestressed.TxGirderCatalog.StrandSize(pd.StrandDiameter, u);
             var contained = new List<int>();
+            int sheathStyle = 0;
             foreach (var b in ps.Beams)
             {
+                // Per-span beam definitions (standard beams): their own strands and concrete.
+                var bpd = b.Definition ?? pd;
+                string bStrandSize = SBM.Core.Prestressed.TxGirderCatalog.StrandSize(bpd.StrandDiameter, u);
+                double bStrandArea = SBM.Core.Prestressed.TxGirderCatalog.StrandAreaIn2(bpd.StrandDiameter) * 0.0254 * 0.0254;
+                string bConcrete = $"{(b.Shape.IsTx ? "Class H concrete" : "Precast concrete")}, f'c = {bpd.ConcreteStrength:0.0#} ksi, f'ci = {bpd.ReleaseStrength:0.0#} ksi";
+                string bStrandMat = $"ASTM A416 Gr. {bpd.StrandStrength:0} low-relaxation strand";
                 string k = IfcKeys.PsAssembly(bk, b.Mark);
-                int asm = w.Add("IFCELEMENTASSEMBLY", $"{Guid(k)},$,{S(b.Mark)},{S($"{b.Shape.Name} prestressed girder")},$,{Ref(pl)},$,{S(b.Mark)},.FACTORY.,.GIRDER.");
+                int asm = w.Add("IFCELEMENTASSEMBLY", $"{Guid(k)},$,{S(b.Mark)},{S($"{b.TypeName} prestressed girder")},$,{Ref(pl)},$,{S(b.Mark)},.FACTORY.,.GIRDER.");
                 contained.Add(asm);
-                int pds = Body(b.Mesh, beamStyle);
-                string desc = $"{b.Shape.Name}, {b.Strands.Count} - {strandSize} strands ({b.Strands.Count(x => x.Depressed)} depressed), L = {u.FormatLength(b.Length)}";
+                int pds = b.Body != null && b.Shape.Profile != null ? ProfileBody(b, beamStyle) : Body(b.Mesh, beamStyle);
+                string desc = $"{b.TypeName}, {b.Strands.Count} - {bStrandSize} strands ({b.Strands.Count(x => x.Depressed)} depressed" +
+                              (b.Strands.Any(x => x.Debonded) ? $", {b.Strands.Count(x => x.Debonded)} debonded" : "") + $"), L = {u.FormatLength(b.Length)}";
                 int beam = w.Add("IFCBEAM", $"{Guid(IfcKeys.PsBeam(bk, b.Mark))},$,{S(b.Mark)},{S(desc)},$,{Ref(pl)},{Ref(pds)},{S(b.Mark)},.GIRDER.");
-                AddMaterial(concreteMat, beam);
-                psetTargets.Add((beam, b.Mark, b.Shape.Name, b.Length, b.Mass));
+                AddMaterial(b.Definition == null ? concreteMat : bConcrete, beam);
+                psetTargets.Add((beam, b.Mark, b.TypeName, b.Length, b.Mass));
+                if (b.Assumption != null) miscStatus.Add((beam, b.Assumption));
                 var kids = new List<int> { beam };
                 int n = 0;
                 foreach (var st in b.Strands)
                 {
                     var (curve, _) = Directrix(st.Points);
-                    int disk = w.Add("IFCSWEPTDISKSOLID", $"{Ref(curve)},{R(pd.StrandDiameter / 2 * scale)},$,$,$");
+                    int disk = w.Add("IFCSWEPTDISKSOLID", $"{Ref(curve)},{R(bpd.StrandDiameter / 2 * scale)},$,$,$");
                     w.Add("IFCSTYLEDITEM", $"{Ref(disk)},({Ref(strandStyle)}),$");
                     int rep = w.Add("IFCSHAPEREPRESENTATION", $"{Ref(body)},'Body','AdvancedSweptSolid',({Ref(disk)})");
                     int spds = w.Add("IFCPRODUCTDEFINITIONSHAPE", $"$,$,({Ref(rep)})");
-                    double len = SBM.Core.Prestressed.PrestressedModel.PolyLength(st.Points);
+                    int strandNo = n++;
+                    string sk = IfcKeys.PsStrand(bk, b.Mark, strandNo);
                     int id = w.Add("IFCTENDON",
-                        $"{Guid(IfcKeys.PsStrand(bk, b.Mark, n++))},$,{S(st.Depressed ? "Depressed strand" : "Strand")},{S(strandSize + " strand")},$,{Ref(pl)},{Ref(spds)},$,$,.STRAND.," +
-                        $"{R(pd.StrandDiameter * scale)},{R(strandArea * scale * scale)},$,$,$,$,$");
-                    AddMaterial(strandMat, id);
+                        $"{Guid(sk)},$,{S(st.Depressed ? "Depressed strand" : "Strand")},{S(bStrandSize + " strand")},$,{Ref(pl)},{Ref(spds)},$,$,.STRAND.," +
+                        $"{R(bpd.StrandDiameter * scale)},{R(bStrandArea * scale * scale)},$,$,$,$,$");
+                    AddMaterial(b.Definition == null ? strandMat : bStrandMat, id);
                     kids.Add(id);
+                    if (!st.Debonded) continue;
+                    // Debonded strand: Pset SBM_Debonding on the tendon + one sheathing solid (IfcTendonConduit) per debonded end.
+                    debondPsets.Add((id, sk, st.DebondStart, st.DebondEnd, st.DebondSymbol));
+                    if (sheathStyle == 0) sheathStyle = RgbStyle("Debond sheathing", 0.95, 0.55, 0.15);
+                    int e = 0;
+                    foreach (var piece in st.Sheathing())
+                    {
+                        int end = st.DebondStart > 0 && e == 0 ? 0 : 1;
+                        e++;
+                        var (sc, _) = Directrix(piece);
+                        double ri = bpd.StrandDiameter / 2, ro = ri + Math.Max(bpd.SheathThickness, 1e-4);
+                        int sd = w.Add("IFCSWEPTDISKSOLID", $"{Ref(sc)},{R(ro * scale)},{R(ri * scale)},$,$");
+                        w.Add("IFCSTYLEDITEM", $"{Ref(sd)},({Ref(sheathStyle)}),$");
+                        int srep = w.Add("IFCSHAPEREPRESENTATION", $"{Ref(body)},'Body','AdvancedSweptSolid',({Ref(sd)})");
+                        int spd = w.Add("IFCPRODUCTDEFINITIONSHAPE", $"$,$,({Ref(srep)})");
+                        double dl = end == 0 ? st.DebondStart : st.DebondEnd;
+                        int cid = w.Add("IFCTENDONCONDUIT",
+                            $"{Guid(IfcKeys.PsSheath(bk, b.Mark, strandNo, end))},$,{S("Debond sheathing")},{S($"{(st.DebondSymbol != "" ? st.DebondSymbol + ": " : "")}debonded {u.FormatLength(dl)} from the {(end == 0 ? "start" : "end")} of the beam")}," +
+                            $"'DEBOND_SHEATHING',{Ref(pl)},{Ref(spd)},$,$,.USERDEFINED.");
+                        AddMaterial("Debond sheathing (plastic)", cid);
+                        kids.Add(cid);
+                    }
                 }
                 w.Add("IFCRELAGGREGATES", $"{Guid(k + "/rel")},$,$,$,{Ref(asm)},{Refs(kids)}");
                 result.ElementCount += kids.Count;
@@ -863,6 +950,15 @@ public static class IfcExporter
             int q3 = w.Add("IFCPROPERTYSINGLEVALUE", $"'Location',$,IFCLABEL({S(location)}),$");
             int ps = w.Add("IFCPROPERTYSET", $"{Guid(key + "/placeholder/" + id)},$,'SBM_Placeholder',$,({Ref(q1)},{Ref(q2)},{Ref(q3)})");
             w.Add("IFCRELDEFINESBYPROPERTIES", $"{Guid(key + "/relplaceholder/" + id)},$,$,$,({Ref(id)}),{Ref(ps)}");
+        }
+
+        foreach (var (id, sk, ds, de, sym) in debondPsets)
+        {
+            int q1 = w.Add("IFCPROPERTYSINGLEVALUE", $"'DebondLengthAtStart',$,IFCPOSITIVELENGTHMEASURE({R(Math.Max(ds, 1e-9) * scale)}),$");
+            int q2 = w.Add("IFCPROPERTYSINGLEVALUE", $"'DebondLengthAtEnd',$,IFCPOSITIVELENGTHMEASURE({R(Math.Max(de, 1e-9) * scale)}),$");
+            int q3 = w.Add("IFCPROPERTYSINGLEVALUE", $"'DebondSymbol',$,IFCLABEL({S(sym)}),$");
+            int pset = w.Add("IFCPROPERTYSET", $"{Guid(sk + "/debond")},$,'SBM_Debonding',$,({Ref(q1)},{Ref(q2)},{Ref(q3)})");
+            w.Add("IFCRELDEFINESBYPROPERTIES", $"{Guid(sk + "/reldebond")},$,$,$,({Ref(id)}),{Ref(pset)}");
         }
 
         foreach (var (id, a) in miscStatus)

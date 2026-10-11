@@ -31,6 +31,8 @@ public static class IfcKeys
     public static string PsAssembly(string bk, string mark) => $"{bk}/ps/{mark}";
     public static string PsBeam(string bk, string mark) => $"{bk}/ps/{mark}/beam";
     public static string PsStrand(string bk, string mark, int n) => $"{bk}/ps/{mark}/strand/{n}";
+    /// <summary>Debond sheathing of strand n at the start (end 0) or end (end 1) of the beam.</summary>
+    public static string PsSheath(string bk, string mark, int n, int end) => $"{bk}/ps/{mark}/strand/{n}/sheath/{end}";
     public static string PsPad(string bk, string mark) => $"{bk}/ps/pad/{mark}";
 
     /// <summary>Unquoted 22-character IFC GlobalId of a key.</summary>

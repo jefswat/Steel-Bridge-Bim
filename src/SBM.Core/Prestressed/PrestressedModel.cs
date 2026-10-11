@@ -15,7 +15,42 @@ public sealed class StrandInstance
     public bool Depressed { get; init; }
     /// <summary>Height above the bottom at the girder ends (= Section.Y for straight strands).</summary>
     public double EndHeight { get; init; }
+    /// <summary>Debonded (sheathed) length from the start / end face of the beam along the strand; 0 = bonded.</summary>
+    public double DebondStart { get; init; }
+    public double DebondEnd { get; init; }
+    public string DebondSymbol { get; init; } = "";
+    public bool Debonded => DebondStart > 0 || DebondEnd > 0;
+    /// <summary>Sheathing pieces: the strand path from each end face over its debond length (0, 1 or 2 polylines).</summary>
+    public List<Vec3[]> Sheathing()
+    {
+        var list = new List<Vec3[]>();
+        if (DebondStart > 0) list.Add(Cut(Points, DebondStart));
+        if (DebondEnd > 0) list.Add(Cut(Points.Reverse().ToArray(), DebondEnd));
+        return list;
+    }
+
+    /// <summary>The first <paramref name="length"/> of a polyline.</summary>
+    public static Vec3[] Cut(IReadOnlyList<Vec3> p, double length)
+    {
+        var r = new List<Vec3> { p[0] };
+        double left = length;
+        for (int i = 0; i + 1 < p.Count && left > 1e-9; i++)
+        {
+            double l = (p[i + 1] - p[i]).Length;
+            if (l >= left) { r.Add(p[i] + (p[i + 1] - p[i]) * (left / l)); break; }
+            r.Add(p[i + 1]);
+            left -= l;
+        }
+        return r.ToArray();
+    }
 }
+
+/// <summary>
+/// Exact body of a beam with an exact <see cref="TxGirderShape.Profile"/>: the section profile in the vertical plane through
+/// <see cref="Frame"/> (X = section x direction, Y = up, Z = X × Y), swept along <see cref="Extrusion"/> (the sloped beam axis),
+/// then cut by the two end planes (points + OUTWARD normals). IFC: IfcExtrudedAreaSolid (arcs kept) clipped by two half spaces.
+/// </summary>
+public sealed record BeamBody(Frame3 Frame, double SectionXSign, Vec3 Extrusion, Vec3 StartPoint, Vec3 StartNormal, Vec3 EndPoint, Vec3 EndNormal);
 
 /// <summary>One simple-span TxDOT I-girder between two bearing lines.</summary>
 public sealed class PrestressedBeam
@@ -49,6 +84,21 @@ public sealed class PrestressedBeam
     /// <summary>Mass at 155 pcf (IGD: total weight of concrete and reinforcing).</summary>
     public double Mass => Volume * 2482.9;
     public string Name => $"G{Girder + 1} Span {Span + 1}";
+
+    /// <summary>The beam definition used for this beam (the bridge's base one or a per-span one).</summary>
+    public PrestressedBeamDefinition? Definition { get; init; }
+    /// <summary>Beam designation ("BTD55"); "" = the shape name.</summary>
+    public string Designation { get; init; } = "";
+    public string TypeName => Designation != "" ? Designation : Shape.Name;
+    /// <summary>Layout CL-CL bearing distance along this beam (from the framing), and standard − layout (0 when the beam is built to the layout).</summary>
+    public double LayoutBearingSpan { get; init; }
+    public double LengthDifference { get; init; }
+    /// <summary>True when the beam was built at its standard length (<see cref="PrestressedBeamDefinition.StandardBearingLength"/>).</summary>
+    public bool IsStandardLength { get; init; }
+    /// <summary>Set when the beam is modeled on an assumption the plans do not fix (e.g. placement of a standard-length beam).</summary>
+    public Assumption? Assumption { get; init; }
+    /// <summary>Exact body (shapes with arcs); null = the mesh is the body.</summary>
+    public BeamBody? Body { get; init; }
 }
 
 /// <summary>Elastomeric bearing pad under a prestressed beam end.</summary>
@@ -83,6 +133,9 @@ public sealed class PrestressedModel
     public double TotalMass => Beams.Sum(b => b.Mass);
     /// <summary>Total strand length.</summary>
     public double StrandLength => Beams.Sum(b => b.Strands.Sum(s => PolyLength(s.Points)));
+
+    /// <summary>Total debonded (sheathed) strand length.</summary>
+    public double DebondedLength => Beams.Sum(b => b.Strands.Sum(s => s.DebondStart + s.DebondEnd));
 
     public static double PolyLength(IReadOnlyList<Vec3> p)
     {
