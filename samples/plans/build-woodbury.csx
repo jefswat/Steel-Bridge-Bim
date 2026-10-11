@@ -215,6 +215,55 @@ br.Girders.SpanLayouts = new()
     },
 };
 br.CrossFrames.MaxSpacing = Ft(25);
+
+// ---------------------------------------------------------------- steel intermediate diaphragms (p.31 / DS 29, p.32 / DS 30)
+// Iowa standard 1036-1-BTD / 1036-2-BTD (Iowa Beams.pdf p.14 / p.15) as modified on DS 29-30: one staggered line per span near
+// midspan, square to the beams (p.21 "90 deg 00'00" (TYP.)"). Cast web-hole CHAINS per beam line from the beam end at the lower
+// station ("INTERMEDIATE DIAPHRAGM BOLT HOLE LOCATIONS", docs/plan-data/woodbury-i29-floyd/diaphragm-bolt-holes.csv; each chain sums
+// to the standard end-to-end length 56'-4 / 106'-4 / 61'-4). Bay g..g+1 uses the left beam's FIRST hole and the right beam's
+// matching hole (the second one; H has one hole) - the hole difference = the beam-end stagger along the skewed bearing line.
+// D's second hole is for the stage-2 bay C-D (Design 217, not in this model). Members p.31 table: C15x33.9 (11), W21x50 + W14x38
+// (G-H span 2, over the traveled roadway). User decisions 2026-10-11: member LEVEL as p.32 labels it (12 / Q4 = A, the
+// default); WD-3 (19 = A): the member and the bent-plate 9" leg lie on the side of the web holes toward INCREASING station
+// (p.32 PART SECTION A-A draws the diaphragm above the bend plate = upstation; structurally irrelevant).
+string PlanDir()
+{
+    for (var d = new System.IO.DirectoryInfo(Environment.CurrentDirectory); d != null; d = d.Parent)
+    {
+        var q = System.IO.Path.Combine(d.FullName, "docs", "plan-data", "woodbury-i29-floyd");
+        if (System.IO.Directory.Exists(q)) return q;
+    }
+    throw new System.IO.DirectoryNotFoundException("docs/plan-data/woodbury-i29-floyd not found above the current directory - run from the repo.");
+}
+var dia = new PsSteelDiaphragmDefinition
+{
+    Elevation = PsDiaphragmMemberElevation.Level,
+    MemberSide = PsDiaphragmMemberSide.TowardIncreasingStation,
+    BeamLineNames = new() { "D", "E", "F", "G", "H" },
+    PlanSteelWeightLb = 4258,
+};
+string[] lineNames = { "D", "E", "F", "G", "H" };
+foreach (var line in System.IO.File.ReadAllLines(System.IO.Path.Combine(PlanDir(), "diaphragm-bolt-holes.csv")).Skip(1))
+{
+    var c = System.Text.RegularExpressions.Regex.Matches(line, "\"[^\"]*\"|[^,]+|(?<=,)(?=,)").Select(m => m.Value.Trim('"')).ToArray();
+    if (c.Length < 5 || !int.TryParse(c[0], out int span)) continue;
+    var dims = c.Skip(2).Take(3).Where(x => x.Length > 0).Select(x => Len(x + "\"")).ToList();
+    foreach (var bl in c[1].Split('/'))
+        dia.Holes.Add(new PsDiaphragmHoleChain { Span = span, Girder = Array.IndexOf(lineNames, bl) + 1, Dims = dims });
+}
+string[] c15Len = { "6'-10\"", "6'-9 1/2\"", "6'-8 3/4\"" };   // p.31 member table per span (beam spacing 8'-0 5/16 / 7'-11 13/16 / 7'-11)
+for (int span = 1; span <= 3; span++)
+    for (int g = 1; g <= 4; g++)
+    {
+        var bay = new PsDiaphragmBay { Span = span, LeftGirder = g, LeftHole = 1, RightHole = g + 1 == 5 ? 1 : 2, PlanLength = Len(c15Len[span - 1]) };
+        if (span == 2 && g == 4)
+        {
+            bay.Member = "W21x50"; bay.PlanLength = Len("6'-9 5/8\""); bay.Connection = "D";
+            bay.Lower = "W14x38"; bay.LowerPlanLength = Len("5'-4 7/8\"");
+        }
+        dia.Bays.Add(bay);
+    }
+br.PsSteelDiaphragms = dia;
 Doc.Project.Bridges.Add(br);
 
 unresolved.Add("U4: plan skews to the local tangent at Pier 2 (13 deg 00'40\") and N. Abut. (14 deg 29'57\") do not reproduce from the parallel 10 deg 09'36\" (PDF p.21 vs p.7); the parallel lines through the staking points govern.");
