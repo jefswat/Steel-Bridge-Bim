@@ -39,6 +39,7 @@ Deck/abut/diaph,5p2,"closed hoop, 6 in hooks",6 ; 2'-2 ; 2'-7 1/2 ; 2'-2 ; 2'-7 
 Deck/abut/diaph,5p4,"closed hoop, 6 in hooks",6 ; 2'-2 ; 2'-8 ; 2'-2 ; 2'-8 ; 6,,2 1/2,10'-8,10'-8,OK,PDF p.26 / DS 24,RASTER,
 Deck/abut/diaph,6p3,V with flat bottom,3'-0 ; 8 ; 3'-0,horizontal projections 1'-6 1/8 + 8 + 1'-6 1/8 = 3'-8 1/4; height 2'-7 1/8,4 1/2,6'-8,6'-8,OK,PDF p.26 / DS 24,RASTER,
 Deck/abut/diaph,4t1,V with flat bottom,1'-4 1/2 ; 2'-7 ; 1'-4 1/2,horizontal projections 11 11/16 + 2'-7 + 11 11/16 = 4'-6 3/8; height 11 11/16,2,5'-4,5'-4,OK,PDF p.26 / DS 24,RASTER,
+Deck/abut/diaph,#2 (non-coated),"pile spiral: 7 turns, 21 in diameter, 3 in pitch (note on p.15/p.16 Section B-B)",7 turns x pi x 21,3 - L 7/8 x 7/8 x 1/8 spacers punched to hold spiral,-,38'-6,38'-6 (7 x pi x 21 in = 461.8 in = 38.48 ft),OK,PDF p.26 / DS 24,RASTER,spiral data from the note on PDF p.15/p.16; 16 spirals = 8 piles x 2 abutments
 BTD beams,5b1 (epoxy),"hairpin, 6 in foot shown in side view",4'-9 ; 3 7/8 (width) ; 4'-9 ; 6 (foot),,2 5/8,10'-8,10'-4 (legs + width + one foot) / 10'-10 (feet on both legs),NOT RECONCILED,PDF p.27 / DS 25,RASTER,no reading of the printed out-to-out dims gives 10'-8 - UNRESOLVED (U9b); standard 4730 bar
 BTD beams,5b1 alternate (uncoated),"hairpin, 6 in foot (side view)",4'-1 ; 3 7/8 ; 4'-1 ; 6,,2 5/8,-,-,n/a,PDF p.27 / DS 25,RASTER,alternate bar per the alternate bar notes; not in the bar list
 BTD beams,5b2 alternate (epoxy),hairpin,2'-8 ; 3 7/8 ; 2'-8,,2 5/8,-,-,n/a,PDF p.27 / DS 25,RASTER,alternate bar; not in the bar list
