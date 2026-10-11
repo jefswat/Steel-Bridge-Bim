@@ -608,6 +608,9 @@ public sealed class CrossFrameDefinition
     public string IntermediateStyle { get; set; } = "";
     /// <summary>Style of support frames per support name ("none" = no frames on that support line); missing = <see cref="SupportStyle"/>.</summary>
     public Dictionary<string, string> SupportStyles { get; set; } = new();
+    /// <summary>Style of single bays of a support line, by support name then bay (left girder index, as <see cref="CrossFrameLine.Bays"/>);
+    /// bays not listed use <see cref="SupportStyles"/> (plans: Type 6 in the north bay of Piers 14WB / 15WB, Type 5 elsewhere).</summary>
+    public Dictionary<string, Dictionary<int, string>> SupportBayStyles { get; set; } = new();
     /// <summary>Default style of support frames ("" = the members above, "none" = no support frames).</summary>
     public string SupportStyle { get; set; } = "";
     /// <summary>
@@ -615,6 +618,9 @@ public sealed class CrossFrameDefinition
     /// the automatic spacing: each line gets a frame in every bay whose two girders it crosses within the same span.
     /// </summary>
     public List<CrossFrameLine> Lines { get; set; } = new();
+    /// <summary>Frames whose two ends are on DIFFERENT support lines (plans: the E-F end frame between girder E at Pier 6A and
+    /// girder F at Pier 5WB).</summary>
+    public List<CrossFrameLink> Links { get; set; } = new();
 
     public CrossFrameStyle? FindStyle(string name) => Styles.FirstOrDefault(s => s.Name == name);
 
@@ -623,7 +629,9 @@ public sealed class CrossFrameDefinition
         var c = (CrossFrameDefinition)MemberwiseClone();
         c.Styles = Styles.Select(s => s.Clone()).ToList();
         c.SupportStyles = new Dictionary<string, string>(SupportStyles);
+        c.SupportBayStyles = SupportBayStyles.ToDictionary(k => k.Key, k => new Dictionary<int, string>(k.Value));
         c.Lines = Lines.Select(l => l.Clone()).ToList();
+        c.Links = Links.Select(l => l.Clone()).ToList();
         return c;
     }
 }
@@ -666,6 +674,11 @@ public sealed class CrossFrameStyle
     /// <summary>Shift of the bottom gusset bolt group centre from the bottom work point (+ = up), e.g. to keep a taller group
     /// clear of the bottom flange.</summary>
     public double BottomBoltOffset { get; set; }
+    /// <summary>Pitch of the bottom gusset bolt rows (0 = <see cref="BoltPitch"/>); plans: I-80 abutment frames 6".</summary>
+    public double BottomBoltPitch { get; set; }
+    /// <summary>Plan items of this type that are NOT dimensioned (tie plate length, stud pitch ...): each is reported as an
+    /// UNRESOLVED warning once per bridge in which the style is used. Nothing is invented for them.</summary>
+    public List<string> Unresolved { get; set; } = new();
     /// <summary>Top work point below the top of web / bottom work point above the bottom flange (NaN = the definition's).</summary>
     public double TopWorkPointOffset { get; set; } = double.NaN;
     public double BottomWorkPointOffset { get; set; } = double.NaN;
@@ -687,8 +700,22 @@ public sealed class CrossFrameStyle
     {
         var c = (CrossFrameStyle)MemberwiseClone();
         c.TiePlateOffsets = TiePlateOffsets.ToList();
+        c.Unresolved = Unresolved.ToList();
         return c;
     }
+}
+
+/// <summary>A frame between girder <see cref="LeftGirder"/> at support line <see cref="LeftSupport"/> and girder
+/// <see cref="RightGirder"/> at support line <see cref="RightSupport"/> (names of supports or auxiliary supports); the frame
+/// plane is the vertical plane through the two CL bearing points.</summary>
+public sealed class CrossFrameLink
+{
+    public int LeftGirder { get; set; }
+    public string LeftSupport { get; set; } = "";
+    public int RightGirder { get; set; }
+    public string RightSupport { get; set; } = "";
+    public string Style { get; set; } = "";
+    public CrossFrameLink Clone() => (CrossFrameLink)MemberwiseClone();
 }
 
 /// <summary>An intermediate frame line of the framing plan.</summary>

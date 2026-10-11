@@ -104,10 +104,16 @@ public sealed partial class SteelModelGenerator
         return (SteelCatalog.Angle(_def.CrossFrames.ChordAngle), null, null, null, false);
     }
 
+    private readonly System.Collections.Concurrent.ConcurrentDictionary<string, bool> _unresolvedShown = new();
+
     private void BuildCrossFrame(CrossFrameResult cf)
     {
         var def = _def.CrossFrames;
         var st = cf.Style != "" ? def.FindStyle(cf.Style) : null;
+        if (st != null)
+            foreach (var note in st.Unresolved)
+                if (_unresolvedShown.TryAdd(st.Name + "|" + note, true))
+                    Warn($"Cross frame Type {st.Name}: UNRESOLVED (not dimensioned on the plans, nothing invented) - {note}");
         var bolts = _def.Bolts;
         var gl = _f.Girders[cf.Bay];
         var gr = _f.Girders[cf.RightGirder];
@@ -396,12 +402,13 @@ public sealed partial class SteelModelGenerator
             double boltLen = bg.LengthForGrip(grip);
             // Rows centred on the work point; columns from the plate edge (1 3/4" in) toward the web at the gage.
             int rows = key[0] == 'T' && st is { TopBoltRows: > 0 } ? st.TopBoltRows : nb;
+            double rowPitch = key[0] == 'B' && st is { BottomBoltPitch: > 0 } ? st.BottomBoltPitch : pitch;
             int cols = Math.Max(1, st?.BoltColumns ?? 1);
             double gage = st?.BoltGage ?? 0, sideX = key[1] == 'L' ? -1 : 1;
             var bpts = new List<Vec2>();
             for (int col = 0; col < cols; col++)
                 for (int i = 0; i < rows; i++)
-                    bpts.Add(new Vec2(wp.X + sideX * col * gage, wp.Y + (key[0] == 'B' ? st?.BottomBoltOffset ?? 0 : 0) + (i - (rows - 1) / 2.0) * pitch));
+                    bpts.Add(new Vec2(wp.X + sideX * col * gage, wp.Y + (key[0] == 'B' ? st?.BottomBoltOffset ?? 0 : 0) + (i - (rows - 1) / 2.0) * rowPitch));
             det.Bolts.AddRange(bpts);
             foreach (var b in bpts)
             {

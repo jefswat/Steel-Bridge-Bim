@@ -600,10 +600,12 @@ public sealed class FramingGenerator
         return ResolveType(legacy, width);
     }
 
-    private string SupportStyleOf(int support)
+    private string SupportStyleOf(int support, int bay = -1)
     {
         var cf = _def.CrossFrames;
-        return cf.SupportStyles.TryGetValue(_def.SupportAt(support).Name, out var st) ? st : cf.SupportStyle;
+        string name = _def.SupportAt(support).Name;
+        if (bay >= 0 && cf.SupportBayStyles.TryGetValue(name, out var perBay) && perBay.TryGetValue(bay, out var bs)) return bs;
+        return cf.SupportStyles.TryGetValue(name, out var st) ? st : cf.SupportStyle;
     }
 
     /// <summary>Intersects the frame line anchored at alignment distance d with both girders of a bay.</summary>
@@ -650,7 +652,7 @@ public sealed class FramingGenerator
                 var r = _result.Supports[j].Bearings[bR]!;
                 double width = (r.TopOfSteel.XY - l.TopOfSteel.XY).Length;
                 bool atEnd = j == NS - 1;
-                string sst = SupportStyleOf(j);
+                string sst = SupportStyleOf(j, b);
                 if (sst == "none") continue;
                 frames.Add(new CrossFrameResult
                 {
@@ -672,7 +674,7 @@ public sealed class FramingGenerator
                 var l = line.Bearings[b]!;
                 var r = line.Bearings[bR]!;
                 double width = (r.TopOfSteel.XY - l.TopOfSteel.XY).Length;
-                string sst = SupportStyleOf(line.Index);
+                string sst = SupportStyleOf(line.Index, b);
                 if (sst == "none") continue;
                 frames.Add(new CrossFrameResult
                 {
@@ -682,6 +684,8 @@ public sealed class FramingGenerator
                 });
             }
         }
+
+        BuildLinks(frames);
 
         // Intermediate cross frames.
         var jobs = new List<(int span, int bay, int right)>();
@@ -840,6 +844,48 @@ public sealed class FramingGenerator
         _result.CrossFrames.AddRange(ordered);
     }
 
+    /// <summary>Frames between two different support lines (<see cref="CrossFrameDefinition.Links"/>).</summary>
+    private void BuildLinks(ConcurrentBag<CrossFrameResult> frames)
+    {
+        var cf = _def.CrossFrames;
+        int total = NS + _def.AuxiliarySupports.Count;
+        int Find(string name) { for (int i = 0; i < total; i++) if (_def.SupportAt(i).Name == name) return i; return -1; }
+        foreach (var link in cf.Links)
+        {
+            string what = $"Cross frame link G{link.LeftGirder + 1} at {link.LeftSupport} - G{link.RightGirder + 1} at {link.RightSupport}";
+            int sl = Find(link.LeftSupport), sr = Find(link.RightSupport);
+            if (sl < 0 || sr < 0) { Warn($"{what}: support not found."); continue; }
+            if (link.LeftGirder < 0 || link.RightGirder >= NG || link.LeftGirder >= link.RightGirder) { Warn($"{what}: girders must be a left girder and a right girder."); continue; }
+            var bl = _result.SupportLine(sl).Bearings[link.LeftGirder];
+            var br = _result.SupportLine(sr).Bearings[link.RightGirder];
+            if (bl == null || br == null) { Warn($"{what}: the girder has no bearing on that support line."); continue; }
+            string st = link.Style != "" ? link.Style : cf.IntermediateStyle;
+            if (st == "none") continue;
+            // Position along each girder in the frame's (span, distance from span start) convention.
+            (int span, double dist) Where(int sup, int g, BearingResult b)
+                => sup >= NS ? (0, b.PathDistance - SpanStart(g, 0))
+                    : (Math.Min(sup, NSpan - 1), sup == NS - 1 ? _curves[g][Math.Min(sup, NSpan - 1)].Length : 0);
+            var (spl, dl) = Where(sl, link.LeftGirder, bl);
+            var (spr, dr) = Where(sr, link.RightGirder, br);
+            if (spr != spl) { Warn($"{what}: the two bearings are in different spans ({spl + 1} and {spr + 1}); not supported, no frame."); continue; }
+            var chord = (br.TopOfSteel.XY - bl.TopOfSteel.XY);
+            double width = chord.Length;
+            // The stiffeners stay in their support line planes: report how far the frame plane is from each.
+            Vec2 DirOf(int sup) => sup >= NS ? _auxDir[sup - NS] : _supDir[sup];
+            double aL = Numerics.RadToDeg(Math.Acos(Math.Clamp(Math.Abs(Vec2.Dot(chord.Normalized(), DirOf(sl))), 0, 1)));
+            double aR = Numerics.RadToDeg(Math.Acos(Math.Clamp(Math.Abs(Vec2.Dot(chord.Normalized(), DirOf(sr))), 0, 1)));
+            Warn($"{what} (style {st}): frame plane through the two CL bearings; it differs from the bearing stiffener planes by {aL:F2} deg at G{link.LeftGirder + 1} and {aR:F2} deg at G{link.RightGirder + 1} " +
+                 "(plans: note location for fit up). UNRESOLVED: whether the frame bolts to the ahead or the back stiffener of each pair (not dimensioned) - the model uses the pair at the CL bearing.");
+            frames.Add(new CrossFrameResult
+            {
+                Span = spl, Bay = link.LeftGirder, RightGirder = link.RightGirder, AtSupport = true,
+                Type = StyleType(st, cf.SupportType, width), Style = cf.FindStyle(st) != null ? st : "",
+                Left = bl.TopOfSteel, Right = br.TopOfSteel, Station = bl.Station, SupportIndex = -1,
+                LeftGirderDistance = dl, RightGirderDistance = dr,
+            });
+        }
+    }
+
     /// <summary>
     /// Frames on the framing plan's lines: each line passes through the point at the given distance along its reference
     /// girder (from that girder's first bearing), radial to the alignment or normal to the girder; it gets a frame in every
@@ -888,10 +934,12 @@ public sealed class FramingGenerator
                 if (at.Count > 0) hits.Add((i, at));
             }
             double minD = cf.MinDistanceFromBearing;
+            var visited = new HashSet<int>();
             for (int q = 0; q + 1 < hits.Count; q++)
             {
                 int b = hits[q].g, bR = hits[q + 1].g;
                 if (line.Bays != null && !line.Bays.Contains(b)) continue;
+                visited.Add(b);
                 var common = hits[q].at.Select(x => x.span).Intersect(hits[q + 1].at.Select(x => x.span)).ToList();
                 if (common.Count == 0)                                // the bay straddles a support line
                 {
@@ -906,7 +954,13 @@ public sealed class FramingGenerator
                 string st = line.BayStyles.TryGetValue(b, out var bs) ? bs : line.Style != "" ? line.Style : cf.IntermediateStyle;
                 if (st == "none") continue;
                 var h = new FrameHit(d, ul, uR, sl, sr);
-                if (!BayValidAt(j, b, bR, h)) continue;
+                if (!BayValidAt(j, b, bR, h))
+                {
+                    // A bay the plan line lists but the geometry rejects is reported, never silently dropped.
+                    if (line.Bays != null)
+                        Warn($"{where}, span {j + 1}, bay G{b + 1}-G{bR + 1}: listed on the plan line but NOT generated - a girder of the bay ends (cross girder) within {(_def.Girders.CrossGirder.FlangeWidth + Units.UnitSystem.In(6)) / 0.3048:F2} ft of the line, or a girder between them has not ended. Check the line location / termination data.");
+                    continue;
+                }
                 double ll = _curves[b][j].Length, lr = _curves[bR][j].Length;
                 // Frames AT a bearing (pier zones of skewed supports) are deliberate; report only those near one.
                 double near = new[] { sl, ll - sl, sr, lr - sr }.Where(x => x > 0.01).DefaultIfEmpty(double.MaxValue).Min();
@@ -924,6 +978,9 @@ public sealed class FramingGenerator
                     Left = pl, Right = pr, Station = _align.DistanceToStation(d), LeftGirderDistance = sl, RightGirderDistance = sr,
                 });
             }
+            if (line.Bays != null)
+                foreach (int lb in line.Bays.Where(x => !visited.Contains(x)))
+                    Warn($"{where}: listed bay with left girder G{lb + 1} is not crossed by the line (girder not there at that location); no frame.");
         }
         return spans;
     }
