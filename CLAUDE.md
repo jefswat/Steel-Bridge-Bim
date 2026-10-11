@@ -81,6 +81,17 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
     along the axis from the head; head/tip cut horizontal; section = plumb orientation rotated minimally onto the axis (oblique
     extrusion = exact IFC solid). `PileInfo` has head (S,N,TopZ) + tip (TipS,TipN,TipZ). Axis-distance clearance warnings
     (`CheckPileClearances`). Snapshot `--closeup FTGn@Bridge` frames the foundation. Conventions are flagged for user confirmation.
+  - Footing dowels / column splices (`SubstructureReinforcementDefinition.ColumnSplice` = Continuous | Lap | Coupler; `SplicedVerticals` in SubstructureRebar.cs): L-shaped
+    dowel per column bar (`DowelL`, mark series "L", scheduled length = A + B as the plans list, hook on the bottom mat `DowelBottomAboveFooting`), column bars start at the
+    footing top (lap: dowel projects `ColumnLapLength`, in contact on the inside) or meet it at `CouplerLow/High` (generic coupler cylinder = `SubElementKind.Coupler`,
+    IFC IfcMechanicalFastener COUPLER). `ColumnSplicePattern` = one letter per bar, counter-clockwise from +S (H upper / L lower level / T lower + stops short, length
+    `ColumnTerminatingBarLength`), read from the plan sections' bar symbols; `ColumnBarEmbedInCap`, `ColumnMidLapStart` (9G). Data + comparison: `samples/plans/column-rebar.csx`.
+  - Pile web orientation: `FootingPoint.WebDirS/N` (own) or `FootingDefinition.PileWeb` (Default = web along N; AlongBatter = battered piles web along the batter direction, as the
+    plan pile symbols show); `PileInfo.WebS/WebN`. Plan data: `samples/plans/pile-web.csx` (and the PileWeb lines in the pier scripts).
+  - Plan bar lists (OPTIONAL, `SubstructurePlanBars.cs`, inputs `PlanBarGroup` in Bridge/PlanBars.cs): `FootingDefinition.Bars` (mats with hooks, 1" clear above the pile heads, side bars, 8f6
+    pile uplift V-bars through the web holes of `UpliftPiles`) and `SubstructureReinforcementDefinition.CapBars` (longitudinal rows, side bars, hoops with the height solved from the
+    listed length, cantilever hoops, ties, hairpins, ends, c7, pedestal bars; all inside the lower, narrower cap section). Counts / sizes / lengths = the plan bar list so weights reproduce it;
+    positions follow documented simple rules (zones and sketches not all decoded). Data generated from the plan bar lists: `samples/plans/pier-rebar-i80.csx`, `pier-rebar-ramp-g.csx`.
   - Cap section step / aesthetic relief (OPTIONAL, `SubstructureDefinition.Aesthetics` = `CapAestheticsDefinition`, as-designed caps only): the
     cap is W above the relief curve and W - 1'-0 below (StepSetback 6" per face, BOTH faces). The cap solid itself is the narrower core; `BuildCapStep`
     adds full-width strips above each layer line (`Layers` = BandChains, lowest line first; plans: fan arcs R5, R4, R3, 2" each, drafted 7 deg) as a

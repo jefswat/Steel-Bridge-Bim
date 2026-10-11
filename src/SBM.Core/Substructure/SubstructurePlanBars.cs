@@ -106,8 +106,14 @@ public sealed partial class SubstructureGenerator
                         {
                             double z = cnt == 1 ? (zLo + zHi) / 2 : zLo + (zHi - zLo) * k / (cnt - 1);
                             double t = (face == 0 ? -1 : 1) * (across / 2 - inset);
-                            Vec3 P(double a) => g.AlongN ? unit.World(cx + t, cy + a, z) : unit.World(cx + a, cy + t, z);
-                            bars.Add(PlanBarFixed("K", size, $"{where} side bars (horizontal)", new[] { P(-len / 2), P(len / 2) }, len));
+                            Vec3 P(double a, double tt) => g.AlongN ? unit.World(cx + tt, cy + a, z) : unit.World(cx + a, cy + tt, z);
+                            // A listed length beyond the face-to-face run is turned in 90 degrees at both ends (the bars wrap the corners).
+                            double avail = along - 2 * In(3), leg = len > avail ? (len - avail) / 2 : 0, run = len - 2 * leg;
+                            double tIn = t - Math.Sign(t) * leg;
+                            var pts = leg > 0
+                                ? new[] { P(-run / 2, tIn), P(-run / 2, t), P(run / 2, t), P(run / 2, tIn) }
+                                : new[] { P(-len / 2, t), P(len / 2, t) };
+                            bars.Add(PlanBarFixed("K", size, $"{where} side bars (horizontal)", pts, len));
                         }
                     }
                     break;
@@ -171,7 +177,7 @@ public sealed partial class SubstructureGenerator
         double s0 = unit.CapS0, s1 = unit.CapS1, capLen = s1 - s0, sMid = (s0 + s1) / 2;
         string loc = $"{unit.Name} cap";
         var topLine = unit.CapTopLine();
-        double TopAt(double s) => SubstructureUnit.Interp(topLine, s);
+        double TopAt(double s) => Math.Min(SubstructureUnit.Interp(topLine, s), unit.CapTopAt(s));      // never above the concrete (raked / beak ends)
         double BotAt(double s) => unit.CapBottomAt(s);
         var ss = unit.CapTop.Select(p => p.X).Concat(unit.CapBottom.Select(p => p.X)).Where(x => x > s0 && x < s1).Distinct().OrderBy(x => x).ToList();
         var groups = r.CapBars;
@@ -317,7 +323,10 @@ public sealed partial class SubstructureGenerator
                 else
                 {
                     int end = i % 2, k = i / 2, per = (g.Count + 1) / 2;
+                    double need = vertical ? g.Length : Math.Max(In(12), (g.Length - w) / 2) + In(6);
                     double s = end == 0 ? s0 + cov + In(2) : s1 - cov - In(2);
+                    // move in from the tip until the cap is deep enough for the bar
+                    for (int step = 0; step < 200 && TopAt(s) - BotAt(s) - 2 * cov < need; step++) s += (end == 0 ? 1 : -1) * In(3);
                     double zt = TopAt(s) - cov, zb = BotAt(s) + cov;
                     if (zt - zb < In(6)) continue;
                     if (vertical)
@@ -330,6 +339,7 @@ public sealed partial class SubstructureGenerator
                     {
                         double z = per == 1 ? (zt + zb) / 2 : zb + (zt - zb) * (k + 0.5) / per;
                         double leg = Math.Max(In(3), (g.Length - w) / 2);
+                        z = Math.Min(z, zt - leg);
                         var pts = new[] { unit.World(s, nLo + cov, z + leg), unit.World(s, nLo + cov, z), unit.World(s, nHi - cov, z), unit.World(s, nHi - cov, z + leg) };
                         bars.Add(PlanBarFixed("E", size, $"{where} end transverse", pts, g.Length));
                     }
@@ -360,7 +370,7 @@ public sealed partial class SubstructureGenerator
             {
                 var p = peds[i % peds.Count];
                 bool alongS = g.Kind == PlanBarKind.PedestalLongitudinal;
-                double leg = In(27), baseLen = Math.Max(In(12), g.Length - 2 * leg);
+                double baseLen = Math.Clamp(g.Length - In(54), In(12), alongS ? Ft(8) : w), leg = (g.Length - baseLen) / 2;
                 double zTop = p.SeatZ - In(3);
                 double lateral = ((i / peds.Count) - ((g.Count + peds.Count - 1) / peds.Count - 1) / 2.0) * In(6);
                 Vec3 P(double a, double z) => alongS ? unit.World(p.S + a, p.N + lateral, z) : unit.World(p.S + lateral, p.N + a, z);
