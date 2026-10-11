@@ -59,7 +59,7 @@
 
   "rules": [
     { "id": "general-plan", "sheets": "^GENERAL PLAN AND ELEVATION", "role": "general", "basis": "General plan and elevation, design data, list of sheets",
-      "target": [ { "level": "unit" }, { "level": "alignment" } ] },
+      "target": [ { "level": "unit" }, { "level": "alignment", "bridge_group": "SB65" } ] },
     { "id": "transverse-section", "sheets": "^TRANSVERSE SECTION", "basis": "Transverse section: deck, beam spacing, barrier; construction notes and quantities",
       "target": [ { "level": "part", "category": "deck" }, { "level": "assembly", "category": "prestressed girder" } ] },
     { "id": "transverse-section-notes", "sheets": "^TRANSVERSE SECTION", "role": "general", "basis": "Construction notes and schedule of quantities",
@@ -95,7 +95,7 @@
       "target": [ { "level": "element", "category": "bearing pad" } ] },
 
     { "id": "survey", "sheets": "^(BRIDGE SURVEY|ALIGNMENT TABULATION 1)", "role": "general", "basis": "Survey and alignment tabulation (SB65)",
-      "target": [ { "level": "alignment" } ] },
+      "target": [ { "level": "alignment", "bridge_group": "SB65" } ] },
     { "id": "borings", "sheets": "^BORINGS", "role": "general", "basis": "Borings (pile design basis)",
       "target": [ { "level": "group", "category": "footing group" } ] }
   ],
