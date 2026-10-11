@@ -1,0 +1,15 @@
+location,type,girder_or_column,top_of_bearing_elev_ft,long_slope_sole_pct,transv_slope_sole_pct,bearing_height_in,str_vert_max_k,str_vert_min_k,str_horiz_transv_k,str_horiz_long_k,ee_horiz_transv_k,ee_horiz_long_k,svc_vert_max_k,svc_vert_min_k,svc_horiz_transv_k,svc_horiz_long_k,total_long_movement_in,anchor_dim_X_in,anchor_dim_Y_in,anchor_bolts_each,anchor_min_embed,orientation,source,tag
+S abutment,GE,A,1117.43,0.11,0.00,9,321,25,20,-,16,-,225,66,12,-,2.11,1'-3,8,4-1 1/2 dia,1'-6,thermal line 89-51-01 to CL S abut brg,p.42 DS 41,RASTER
+S abutment,GE,B,1117.72,-0.11,0.00,9,321,25,20,-,16,-,225,66,12,-,2.11,1'-3,8,4-1 1/2 dia,1'-6,,p.42 DS 41,RASTER
+S abutment,GE,C,1118.00,-0.34,0.00,9,321,25,20,-,16,-,225,66,12,-,2.11,1'-3,8,4-1 1/2 dia,1'-6,,p.42 DS 41,RASTER
+S abutment,GE,D,1118.28,-0.59,0.00,9,321,25,20,-,16,-,225,66,12,-,2.11,1'-3,8,4-1 1/2 dia,1'-6,,p.42 DS 41,RASTER
+Pier 1,FX,A,1116.11,-1.10,0.00,9,798,152,42,69,160 (any single direction),160 (any single direction),577,253,19,49,0.00,1'-3,8,4-1 3/4 dia,1'-9,fixed; assumed point of zero movement; 96-19-46,p.42 DS 41,RASTER
+Pier 1,FX,B,1116.33,-1.10,0.00,9,798,152,42,69,160 (any single direction),160 (any single direction),577,253,19,49,0.00,1'-3,8,4-1 3/4 dia,1'-9,,p.42 DS 41,RASTER
+Pier 1,FX,C,1116.55,-1.10,0.00,9,798,152,42,69,160 (any single direction),160 (any single direction),577,253,19,49,0.00,1'-3,8,4-1 3/4 dia,1'-9,,p.42 DS 41,RASTER
+Pier 1,FX,D,1116.77,-1.10,0.00,9,798,152,42,69,160 (any single direction),160 (any single direction),577,253,19,49,0.00,1'-3,8,4-1 3/4 dia,1'-9,,p.42 DS 41,RASTER
+Pier 2,GE,Column No. 1,1111.55,0.00,3.39,14,1554,471,90,-,106,-,1191,664,39,-,2.36,1'-0,2'-5,4-1 3/4 dia,1'-9,under integral steel pier cap; 90-00-00; transverse = along cap; disc 28 in dia min; rotation lock-up at 0.02 rad,p.42 DS 41 / p.40 notes,RASTER
+Pier 2,GE,Column No. 2,1113.15,0.00,3.39,14,1554,471,90,-,106,-,1191,664,39,-,2.36,1'-0,2'-5,4-1 3/4 dia,1'-9,,p.42 DS 41,RASTER
+N abutment,GE,A,1110.70,-1.55,0.00,9,391,15,21,-,17,-,262,42,12,-,4.56,1'-5,8,4-1 1/2 dia,1'-6,84-37-26,p.42 DS 41,RASTER
+N abutment,GE,B,1111.09,-1.55,0.00,9,391,15,21,-,17,-,262,42,12,-,4.56,1'-5,8,4-1 1/2 dia,1'-6,,p.42 DS 41,RASTER
+N abutment,GE,C,1111.47,-1.55,0.00,9,391,15,21,-,17,-,262,42,12,-,4.56,1'-5,8,4-1 1/2 dia,1'-6,,p.42 DS 41,RASTER
+N abutment,GE,D,1111.85,-1.55,0.00,9,391,15,21,-,17,-,262,42,12,-,4.56,1'-5,8,4-1 1/2 dia,1'-6,,p.42 DS 41,RASTER
