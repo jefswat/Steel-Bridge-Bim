@@ -1,5 +1,6 @@
 using SBM.Core.Alignments;
 using SBM.Core.Bridge;
+using SBM.Core.Framing;
 using SBM.Core.Geometry;
 using SBM.Core.Solids;
 using static SBM.Core.Units.UnitSystem;
