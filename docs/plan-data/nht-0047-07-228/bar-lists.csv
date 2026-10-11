@@ -1,0 +1,50 @@
+unit,mark,type,no,size,length,weight_lb,calc_weight_lb,check,source,tag,note
+Arch piers 10 & 11,A1,ST,22,#11,"23'-6""",2744,2747,OK,PDF p.104 / sheet 155,RASTER,combined P10 + P11 table
+Arch piers 10 & 11,E1,BT,24,#5,"7'-5""",187,186,OK,PDF p.104 / sheet 155,RASTER,combined P10 + P11 table
+Arch piers 10 & 11,E2,BT,12,#5,"8'-10""",112,111,OK,PDF p.104 / sheet 155,RASTER,combined P10 + P11 table
+Arch piers 10 & 11,E3,BT,12,#5,"9'-2""",116,115,OK,PDF p.104 / sheet 155,RASTER,combined P10 + P11 table
+Arch piers 10 & 11,M,BT,16,#8,"16'-6""",710,705,DIFF -5,PDF p.104 / sheet 155,RASTER,combined P10 + P11 table
+Arch piers 10 & 11,S1,BT,66,#5,"16'-8""",1160,1147,DIFF -13,PDF p.104 / sheet 155,RASTER,combined P10 + P11 table
+Arch piers 10 & 11,S2,BT,33,#5,"12'-4""",429,425,DIFF -4,PDF p.104 / sheet 155,RASTER,combined P10 + P11 table
+Arch piers 10 & 11,S3,BT,66,#5,"12'-4""",859,849,DIFF -10,PDF p.104 / sheet 155,RASTER,combined P10 + P11 table
+Arch piers 10 & 11,S4,BT,33,#5,"12'-4""",429,425,DIFF -4,PDF p.104 / sheet 155,RASTER,combined P10 + P11 table
+Arch piers 10 & 11,S5,BT,4,#5,"16'-2""",68,67,OK,PDF p.104 / sheet 155,RASTER,combined P10 + P11 table
+Arch piers 10 & 11,S6,BT,4,#5,"16'-7""",70,69,OK,PDF p.104 / sheet 155,RASTER,combined P10 + P11 table
+Arch piers 10 & 11,S7,BT,4,#5,"17'-0""",72,71,OK,PDF p.104 / sheet 155,RASTER,combined P10 + P11 table
+Arch piers 10 & 11,S8,BT,4,#5,"17'-5""",73,73,OK,PDF p.104 / sheet 155,RASTER,combined P10 + P11 table
+Arch piers 10 & 11,S9,BT,4,#5,"17'-10""",75,74,OK,PDF p.104 / sheet 155,RASTER,combined P10 + P11 table
+Arch piers 10 & 11,S10,BT,4,#5,"18'-3""",77,76,OK,PDF p.104 / sheet 155,RASTER,combined P10 + P11 table
+Arch piers 10 & 11,S11,BT,4,#5,"18'-8""",79,78,OK,PDF p.104 / sheet 155,RASTER,combined P10 + P11 table
+Arch piers 10 & 11,S12,BT,4,#5,"19'-1""",81,80,OK,PDF p.104 / sheet 155,RASTER,combined P10 + P11 table
+Arch piers 10 & 11,S13,BT,4,#5,"19'-6""",82,81,OK,PDF p.104 / sheet 155,RASTER,combined P10 + P11 table
+Arch piers 10 & 11,S14,BT,4,#5,"19'-10""",84,83,OK,PDF p.104 / sheet 155,RASTER,combined P10 + P11 table
+Arch piers 10 & 11,S15,BT,4,#5,"20'-4""",86,85,OK,PDF p.104 / sheet 155,RASTER,combined P10 + P11 table
+Arch piers 10 & 11,S16,BT,4,#5,"20'-8""",87,86,OK,PDF p.104 / sheet 155,RASTER,combined P10 + P11 table
+Arch piers 10 & 11,S17,BT,4,#5,"21'-1""",89,88,OK,PDF p.104 / sheet 155,RASTER,combined P10 + P11 table
+Arch piers 10 & 11,S18,BT,4,#5,"21'-6""",91,90,OK,PDF p.104 / sheet 155,RASTER,combined P10 + P11 table
+Arch piers 10 & 11,S19,BT,4,#5,"21'-11""",92,91,OK,PDF p.104 / sheet 155,RASTER,combined P10 + P11 table
+Arch piers 10 & 11,S20,BT,14,#5,"22'-0""",325,321,DIFF -4,PDF p.104 / sheet 155,RASTER,combined P10 + P11 table
+Arch piers 10 & 11,S21,BT,4,#5,"9'-8""",41,40,OK,PDF p.104 / sheet 155,RASTER,combined P10 + P11 table
+Arch piers 10 & 11,S22,BT,4,#5,"10'-1""",43,42,OK,PDF p.104 / sheet 155,RASTER,combined P10 + P11 table
+Arch piers 10 & 11,S23,BT,4,#5,"10'-6""",44,44,OK,PDF p.104 / sheet 155,RASTER,combined P10 + P11 table
+Arch piers 10 & 11,S24,BT,4,#5,"10'-11""",46,46,OK,PDF p.104 / sheet 155,RASTER,combined P10 + P11 table
+Arch piers 10 & 11,S25,BT,4,#5,"11'-4""",48,47,OK,PDF p.104 / sheet 155,RASTER,combined P10 + P11 table
+Arch piers 10 & 11,S26,BT,4,#5,"11'-9""",50,49,OK,PDF p.104 / sheet 155,RASTER,combined P10 + P11 table
+Arch piers 10 & 11,S27,BT,4,#5,"12'-2""",51,51,OK,PDF p.104 / sheet 155,RASTER,combined P10 + P11 table
+Arch piers 10 & 11,S28,BT,4,#5,"12'-7""",53,52,OK,PDF p.104 / sheet 155,RASTER,combined P10 + P11 table
+Arch piers 10 & 11,S29,BT,4,#5,"13'-0""",55,54,OK,PDF p.104 / sheet 155,RASTER,combined P10 + P11 table
+Arch piers 10 & 11,S30,BT,4,#5,"13'-4""",56,56,OK,PDF p.104 / sheet 155,RASTER,combined P10 + P11 table
+Arch piers 10 & 11,S31,BT,4,#5,"13'-10""",58,58,OK,PDF p.104 / sheet 155,RASTER,combined P10 + P11 table
+Arch piers 10 & 11,S32,BT,4,#5,"14'-2""",60,59,OK,PDF p.104 / sheet 155,RASTER,combined P10 + P11 table
+Arch piers 10 & 11,S33,BT,4,#5,"14'-7""",62,61,OK,PDF p.104 / sheet 155,RASTER,combined P10 + P11 table
+Arch piers 10 & 11,S34,BT,4,#5,"15'-0""",63,63,OK,PDF p.104 / sheet 155,RASTER,combined P10 + P11 table
+Arch piers 10 & 11,S35,BT,4,#5,"15'-5""",65,64,OK,PDF p.104 / sheet 155,RASTER,combined P10 + P11 table
+Arch piers 10 & 11,S36,BT,14,#5,"15'-6""",229,226,OK,PDF p.104 / sheet 155,RASTER,combined P10 + P11 table
+Arch piers 10 & 11,T1,ST,16,#8,"9'-7""",412,409,OK,PDF p.104 / sheet 155,RASTER,combined P10 + P11 table
+Arch piers 10 & 11,T2,ST,4,#8,"14'-1""",151,150,OK,PDF p.104 / sheet 155,RASTER,combined P10 + P11 table
+Arch piers 10 & 11,T3,ST,4,#8,"18'-7""",200,198,OK,PDF p.104 / sheet 155,RASTER,combined P10 + P11 table
+Arch piers 10 & 11,T4,ST,12,#8,"23'-7""",761,756,DIFF -5,PDF p.104 / sheet 155,RASTER,combined P10 + P11 table
+Arch piers 10 & 11,V2,ST,28,#11,"22'-10""",3394,3397,OK,PDF p.104 / sheet 155,RASTER,Pier 10 only (28-V2 pier 10)
+Arch piers 10 & 11,V3,ST,28,#11,"19'-7""",2911,2913,OK,PDF p.104 / sheet 155,RASTER,Pier 11 only (28-V3 pier 11)
+Arch piers 10 & 11,TOTAL P10,,,,,8937,,sum of all rows = 17130 = 8937 + 8193 (DERIVED OK),PDF p.104 / sheet 155,RASTER,for contractor information only
+Arch piers 10 & 11,TOTAL P11,,,,,8193,,see TOTAL P10,PDF p.104 / sheet 155,RASTER,for contractor information only
