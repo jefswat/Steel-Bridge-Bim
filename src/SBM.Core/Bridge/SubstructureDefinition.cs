@@ -152,6 +152,12 @@ public sealed class SubstructureReinforcementDefinition
     public double ColumnCover { get; set; } = In(2.5);
     public double ShaftCover { get; set; } = In(3);
     public double FootingCover { get; set; } = In(3);
+    // Clear covers used by the containment check, from the plans (not generator inputs): general note "minimum clear distance from face of
+    // concrete to near reinforcing bar is to be 2 in. unless otherwise noted or shown" (footing sides, caps); footing top 3 in. as drawn on the
+    // footing sections; footing bottom mat 1 in. clear ABOVE the top of the piles (pile section note "1 in. CL. top of pile").
+    public double FootingSideClear { get; set; } = In(2);
+    public double FootingTopClear { get; set; } = In(3);
+    public double PileTopClear { get; set; } = In(1);
 
     // Cap
     public int CapTopBarCount { get; set; } = 7;

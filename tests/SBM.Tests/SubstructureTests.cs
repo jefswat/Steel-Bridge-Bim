@@ -414,9 +414,26 @@ public class SubstructureTests
                 new PlanBarGroup { Mark = "5c5", Kind = PlanBarKind.CapHairpin, Size = "#5", Count = 4, Length = hairpinLength },
             };
         });
-        Assert.DoesNotContain(Run(Ft(8)).Diagnostics, d => d.Message.Contains("lie outside the concrete"));
+        Assert.DoesNotContain(Run(Ft(8)).Diagnostics, d => d.Message.Contains("violate the clear-cover envelope"));
         // A 20 ft hairpin cannot fit a 5 ft deep cap: kept as listed and reported.
-        Assert.Contains(Run(Ft(20)).Diagnostics, d => d.Message.Contains("5c5 hairpins") && d.Message.Contains("lie outside the concrete"));
+        Assert.Contains(Run(Ft(20)).Diagnostics, d => d.Message.Contains("5c5 hairpins") && d.Message.Contains("violate the clear-cover envelope"));
+    }
+
+    [Fact]
+    public void PlanBars_Containment_FootingMatsUseBarRadiusAndPlanCovers()
+    {
+        SubstructureModel Run(double len) => Build(p =>
+        {
+            p.Foundation = FoundationType.PileCap; p.FoundationTopElevation = Ft(500); p.FootingThickness = Ft(5.5); p.PileEmbedment = Ft(1);
+            p.FootingLength = Ft(18); p.FootingWidth = Ft(16);
+            var fd = new FootingDefinition { Column = 1 };
+            fd.Bars = new() { new PlanBarGroup { Mark = "7f1", Kind = PlanBarKind.FootingMat, Size = "#7", Count = 10, Length = len, Top = true } };
+            p.Footings = Enumerable.Range(1, 3).Select(k => { var c = fd.Clone(); c.Column = k; return c; }).ToList();
+            p.CapProfile = new() { new CapProfilePoint { S = -Ft(20), Elevation = Ft(520) }, new CapProfilePoint { S = Ft(20), Elevation = Ft(520) }, new CapProfilePoint { S = Ft(20), Elevation = Ft(525) }, new CapProfilePoint { S = -Ft(20), Elevation = Ft(525) } };
+        });
+        // 17'-8 ends 2" short of the face of an 18'-0 footing; 18'-0 reaches the face.
+        Assert.DoesNotContain(Run(Ft(17) + In(8)).Diagnostics, d => d.Message.Contains("violate the clear-cover envelope") && d.Message.Contains("7f1"));
+        Assert.Contains(Run(Ft(18)).Diagnostics, d => d.Message.Contains("violate the clear-cover envelope") && d.Message.Contains("7f1"));
     }
 
     [Fact]
