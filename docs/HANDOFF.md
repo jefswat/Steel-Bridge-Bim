@@ -211,11 +211,11 @@ as "…before bearing iteration.sbm". The run confirmed item 2.3: girder C has n
 
 ## 4a. To do: column rebar approximations (from `column-rebar.csx`)
 
-- Flare 6e3 hoops: the plans have lapped pairs at the column tie spacing; modeled as single closed hoops at half the spacing (same count).
-- Column verticals run continuous from the footing. The plans have 11d2 footing-to-column dowels with an 8'-4 min. lap, and mechanical couplers on the #18 bars (18d3/18d4 below, 18d1/18d2 above).
-- Pier 11G/12G inner 6e4 ties are not modeled.
-- Bar 18d9 (terminates at the column top to clear the cap bars) is modeled running full height.
-- Chamfer bar groups on the plans are slightly off-centre (e.g. 8 / 9¼ ends); exact positions are used where given, centred groups elsewhere.
+- DONE (2026-10-11): flare 6e3 plinth hairpins are modeled as lapped pairs of open U's at the plan levels (`FlareTieStyle = HairpinPair`, legs lapping 2'-9, `FlareTieSpaces` from the elevation callouts); 11G/12G 6e4 plinth hoops as pairs of closed end hoops overlapping 3'-7 (`HoopPair`). Counts equal the bar lists on every pier; weights within 0.5% (6e3) / 4% (6e4: centreline length with 135° hooks vs the listed 27'-0).
+- DONE: footing dowels / couplers (`ColumnSplice`), see CLAUDE.md.
+- DONE: terminating bars 18d9 (7WB) / 18d7 (2G, 7G, 11G, 12G) / 18d5 (18G) stop at the listed length (splice letter 'T'); the half-filled legend symbols are tags pointing at the circled perimeter bars (the dowel counts confirm 34 / 46 bars per column, no inner bars).
+- CHECKED: chamfer bar positions are the plan's on every pier (I-80 #11: 8 / 15¼ / 22½ from the S-face end, 9¼ at the other; 3WB/13WB: 6½ / 15½ / 21¼; 7WB: centred, 10⅛ both ends; 6A and Ramp G: 7⅜ + 4 @ 7, 9¾ at the other end; 16G/17G: 10⅜ / 20⅛).
+- Open: column 6e1 hoop counts are a few short of the bar lists (e.g. 2G 78 vs 80): the plans count the plinth and column zones separately ("14 SPA. ... & 24 SPA."), the model spaces one zone over the full height.
 - Editor UI for the new column-rebar inputs (faces, chamfer positions, hoop overlap, crossties, flare cage).
 - Generic bearings: bearing body 16"×16" and masonry plate 1¾" are assumptions (vendor items).
 
