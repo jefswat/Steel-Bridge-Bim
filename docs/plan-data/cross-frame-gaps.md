@@ -241,3 +241,29 @@ Not covered: the Pier 16G zone (sheet 98).
 3. `SupportBayStyles` (style per support per bay) for Unit 3 Type 6 at 14WB/15WB.
 4. Per-connection bottom bolt pitch (or `BottomBoltPitch`) for abutment frames (6" on I-80).
 5. Generator: bay B-F at K's 8WB radial is dropped (needs a reason / BayValidAt check).
+
+## 7. Implementation (feature/xframes)
+
+Inputs added: `CrossFrameDefinition.Links` (E-F frame, section 2), `CrossFrameDefinition.SupportBayStyles` (section 3), `CrossFrameStyle.BottomBoltPitch`
+(I-80 abutment, 6"), `CrossFrameStyle.Unresolved` (notes raised as UNRESOLVED warnings once per bridge), plus a generator warning for every bay a plan line
+lists but cannot generate. Scripts: `samples/plans/cross-frames-i80.csx`, `cross-frames-ramp-g.csx` (re-runnable).
+
+Frame counts before -> after (all frames incl. support frames): I-80 Unit 2 467 -> 450 (extra bays removed, missing radials added, +1 E-F link, Type 4 +1, Type 9
+now in bay I-J at 9WB/10WB); I-80 Unit 3 331 -> 331 (Type 6 13 -> 15 at the 14WB/15WB support frames, Type 5 295 -> 293); Ramp G Unit 4 144 -> 144 (Type 2 15 -> 16, Type 1 114 -> 113,
+new B line); all other units unchanged.
+
+Checks: the K-string distances land on the table values (8WB 734.771, 9WB 934.365, 10WB 1100.328 ft against 734.769 / 934.364 / 1100.329); the Ramp G L3 line through C's
+bearing crosses A 21.939 ft ahead of A's bearing (plan 21'-11 1/4 = 21.9375), L4 +10.640, L5 +22.417; B's bearing at 17G 627.183 ft as in the report; the link frame's
+plan length is 9.687 ft; no frame lines of the new inputs fall in splice plates or within 3 ft of a bearing (generator reports none).
+
+Raised, not placed (UNRESOLVED):
+- 8WB K radial, bay B-F: the line lies 0.045 ft from the centre line of the cross girder XG-C (C ends 59'-1 1/16 past its 8WB bearing), so a B-F frame cannot be built there;
+  the generator reports it. Either the plan's mark is the cross girder itself or the line is mis-read - check PDF page 110.
+- 8WB A radial bay B-C (hidden by the "9'-0 13/16" dimension); 8WB G radial bay G-H and the I radial's types are entered as in the report's input block (the table text
+  reads "0, 1, 2 = Type 4" for I, the input block gives Type 4 only for bays 2 and 5: the input block was followed).
+- Link frame (E-F): which stiffener of the pair it bolts to (ahead/back, not dimensioned); the frame plane differs from the bearing stiffener planes by 1.90 deg (E) and
+  1.75 deg (F) ("note location for fit up").
+- Tie plate length (10" kept, warning), stud pitch on the W top struts (studs not modeled, warning), Ramp G abutment WT5x15 bottom row pitch (3" kept, warning).
+- Unit 3 12WB/13WB partial lines (section 3) and the Pier 16G zone of Ramp G were not placed.
+Resolved: top gusset 2 bolt rows (styles), I-80 abutment bottom rows 6" apart, Ramp G abutment W24x68 top 4" below the top of the top flange (work point 14.975" below the
+top of web with tf = 7/8").
