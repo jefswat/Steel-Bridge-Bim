@@ -1,4 +1,4 @@
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Diagnostics;
 using SBM.Core.Bridge;
 using SBM.Core.Framing;
@@ -554,14 +554,14 @@ public sealed partial class SubstructureGenerator
     private void BuildDrainage(SubstructureModel m)
     {
         var def = _f.Definition;
-        if (def.Drains.Count == 0 || _f.HasErrors) return;
+        if (def.Drains.Count(d => d.Trench == null) == 0 || _f.HasErrors) return;
         var a = _f.Alignment;
         var deck = def.Deck;
         double depth = def.Girders.IsPrestressed ? Prestressed.TxGirderCatalog.Get(def.Girders.Prestressed).Depth
             : def.Girders.Section.TotalDepth;
         var (toe, _, _) = Concrete.BarrierProfiles.PlanLines(deck.Barrier);
         int k = 0;
-        foreach (var dr in def.Drains)
+        foreach (var dr in def.Drains.Where(d => d.Trench == null))
         {
             k++;
             string name = $"Drain {k} ({dr.Type}) STA {_u.FormatStation(dr.Station)} {(dr.Left ? "LT" : "RT")}";
