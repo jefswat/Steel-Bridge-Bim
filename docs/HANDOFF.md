@@ -260,8 +260,18 @@ Queue (shared by both sets first):
 4. Harped strands at given grid columns + hold-down distance from midspan (vs `HarpPointFraction`).
 5. Integral / semi-integral abutments with concrete end diaphragms (beams embedded), pier continuity diaphragms on pads.
 6. Steel intermediate diaphragms between prestressed beams (C15 / W21 / W14; the prestressed path skips cross frames).
-7. Straight chord girders with different spacing per span / different offsets each side of a pier (Woodbury).
-8. Profile grade line offset from the stationing line (Woodbury pivot 5.00 ft RT).
+7. DONE 2026-10-11: straight chord girders per span - `GirderLayoutDefinition.SpanLayouts` (`GirderSpanLayout`, see CLAUDE.md).
+   Woodbury superstructure geometry: `samples/plans/build-woodbury.csx` + `check-woodbury.csx` ("Woodbury I-29 NB over Floyd.sbm").
+   Check: 403 PASS / 48 FAIL / 45 INFO. Staking, spans, spacing, CL NB profile, T at bearings and all offset-line top of deck
+   points are within 0.01 ft. FAILs (all <= 0.018 ft): beam-line top of deck (14 of 216) and haunch elevations (24 of 135)
+   near the piers (pattern: + back / - ahead of pier 2) and beam seats at the pier bearings (10 of 30). The plan's beam-line
+   points next to the piers are not reproduced to 0.01 ft; the reason was not found (open). T at quarter points = INFO (no
+   camber in the model, item 9).
+   OPEN for the prestressed work: `PrestressedGenerator.BuildBeam` takes `f.Supports[j].Bearings[i]` / `[j+1]`. With span
+   layouts it must use `f.SpanBearing(i, j, false/true)` (the ahead point at an interior support). Not changed here because
+   Prestressed/ belongs to the other agent. How standard-length beams sit on the layout span: user decision pending.
+8. DONE 2026-10-11: profile grade line / cross-slope pivot offset - `CrossSlopeTable.PivotOffset` (constant) plus the new
+   optional `PivotOffsets` station table. Elevation check rows show "on the PGL x RT of the alignment".
 9. Smaller: round CIP pipe piles, curved-plate bearings, future-beam pedestals, MnDOT Type S / Iowa aesthetic
    barriers, columns with brick-reveal projections, stage-joint deck edge, prestressed camber in the haunch check,
    beam bar generator (stirrups, end bars).

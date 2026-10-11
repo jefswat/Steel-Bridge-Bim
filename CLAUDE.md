@@ -40,7 +40,10 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   - `Alignments/` `HorizontalElement` = one class for line/arc/clothoid (linear curvature K0â†’K1, partial spirals OK);
     `Alignment` (distance-based internally, station APIs public, station equations, Inverse = pointâ†’sta/off);
     `PiDefinition` (PI table â†’ exact elements incl. asymmetric spirals; `TryExtract` recovers PIs from elements);
-    `VerticalProfile` (sym/unsym parabolic VCs); `CrossSlopeTable` (station rows, pivot offset).
+    `VerticalProfile` (sym/unsym parabolic VCs); `CrossSlopeTable` (station rows, pivot offset = the
+    profile grade line the profile is given on and the slopes pivot about, constant `PivotOffset` or OPTIONAL station table
+    `PivotOffsets` (linear, held beyond the ends); always read it with `PivotOffsetAt(station)`; profile stations = alignment
+    stations; the elevation check prints "on the PGL x RT of the alignment").
   - `Bridge/BridgeDefinition.cs` â€” the parametric input (supports, girders, deck, barrier, cross frames, stiffeners, splices).
   - `Framing/FramingGenerator.cs` â€” pure function definition+alignment â†’ `BridgeFraming` (bearings, girder curves,
     cross frames, stiffeners, splices, deck outline, diagnostics). Parallel per girder / per bay.
@@ -264,6 +267,17 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   `BridgeDefinition.SupportAt(i)` for any index from a bearing, frame or substructure unit â€” never index `Supports` directly.
   Support cross frames and bearing stiffeners are built on aux lines; substructure units, elevation check, bent/bearing/
   girder views include them. Data example: `samples/plans/pier-6a.csx` (I-80 Pier 6A).
+- Per-span girder layouts (OPTIONAL): `GirderLayoutDefinition.SpanLayouts` (`Bridge/GirderSpanLayout.cs`) = per listed span, straight chord
+  girders between their points on a begin and an end line (`GirderSpanEnd`: the support line moved parallel by `LineShift` along the
+  `ReferenceOffset` curve, e.g. "CL brg 1'-0 from CL pier along CL NB"; offsets `NormalToAlignment` or `AlongLine` from the reference
+  point (W.P.), optional `Spacings`, prestressed `Haunches` per girder = plan T - slab). `PerpendicularSpacings` = girders parallel to
+  the first one's chord at spacings measured perpendicular to it. Same girder count in every span (else an error). It overrides the
+  offset curves and `PlanGeometry` in that span (warning). `FramingGenerator.SetupSpanLayouts` -> `_chord` (support-line points S0/S1,
+  layout points L0/L1 with the prestressed top of beam); `GirderSpanCurve` gets `LayoutBegin/LayoutEnd`. Back and ahead points at an
+  interior support may differ (prestressed): `SupportLineResult.Bearings` = behind, `AheadBearings` = ahead (null if equal). Use
+  `BridgeFraming.SpanBearing(girder, span, atEnd)` for anything that belongs to one span. For steel a jog is an error (continuous girders).
+  The prestressed elevation check names the layout. Data: `samples/plans/build-woodbury.csx` / `check-woodbury.csx` (Iowa Design 817).
+  OPEN: `PrestressedGenerator.BuildBeam` still uses `Supports[j].Bearings` (it must switch to `SpanBearing`).
 - As-designed girder plan geometry (OPTIONAL): `GirderLayoutDefinition.PlanGeometry` = per girder a start point (alignment station/offset),
   start direction (degrees from the alignment tangent, + toward the right) and a chain of tangent / left / right arc elements (radius, length;
   first extended backwards, last forwards) = the plan's "P.C. STA ..., R = ..." data. `FramingGenerator` builds a `GirderPlanCurve` and uses
