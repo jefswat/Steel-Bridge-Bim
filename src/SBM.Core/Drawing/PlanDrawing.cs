@@ -74,7 +74,7 @@ public sealed class PlanDrawing
             foreach (var t in l.Texts)
             {
                 // Approximate text box (0.62 h per character), honoring alignment and rotation.
-                double w = t.Text.Length * t.Height * 0.62;
+                double w = Views.LabelPlacer.WidthInHeights(t.Text) * t.Height;
                 double x0 = t.Align switch { TextAlign.Center => -w / 2, TextAlign.Right => -w, _ => 0 };
                 var dir = Vec2.FromAngle(t.Rotation);
                 var up = dir.Left;

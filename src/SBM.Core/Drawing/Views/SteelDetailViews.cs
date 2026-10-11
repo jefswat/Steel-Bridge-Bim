@@ -59,7 +59,7 @@ public static class SteelDetailViews
             d.Line(SheetLayers.SteelHidden, m.HeelA, m.HeelB);
         }
         if (cf.Filler != null) d.Poly(SheetLayers.Steel, cf.Filler, true);
-        double bd = def.Bolts.Diameter;
+        double bd = cf.BoltDiameter > 0 ? cf.BoltDiameter : def.Bolts.Diameter;
         foreach (var b in cf.Bolts) d.Circle(SheetLayers.Steel, b, bd / 2);
         // Work lines (WP to WP) and work point symbols.
         foreach (var (_, w1, w2) in cf.WorkLines) d.Line(SheetLayers.Center, w1, w2);
@@ -96,11 +96,23 @@ public static class SteelDetailViews
             var gp = go[0];
             d.Leader(gp, gp + new Vec2(-d.Paper(0.4), d.Paper(0.65)), $"PL {d.Short(cf.GussetThickness)} GUSSET (TYP)");
         }
-        int perConn = Math.Max(1, def.Bolts.BoltsPerConnection);
-        if (cf.Bolts.Count > 0)
+        // Bolt notes come from the detailed bolt pattern of THIS frame (clusters of the recorded bolt positions).
+        double boltD = cf.BoltDiameter > 0 ? cf.BoltDiameter : bd;
+        string grade = ctx.Steel?.BoltGrade ?? def.Bolts.Grade;
+        var seenNotes = new HashSet<string>();
+        foreach (var grp in BoltGroups(cf.Bolts))
         {
-            var bp = cf.Bolts[0];
-            d.Leader(bp, bp + new Vec2(-d.Paper(0.5), -d.Paper(0.75)), $"{perConn} - {d.Short(bd)} DIA {def.Bolts.Grade} BOLTS (TYP), {d.Short(def.Bolts.Pitch)} PITCH");
+            var cols = grp.Select(q => Math.Round(q.X / In(1.0 / 16))).Distinct().Count();
+            var ys = grp.Select(q => q.Y).OrderBy(y => y).ToList();
+            double pitchData = 0;
+            for (int i = 1; i < ys.Count; i++) if (ys[i] - ys[i - 1] > 1e-4) { pitchData = pitchData == 0 ? ys[i] - ys[i - 1] : Math.Min(pitchData, ys[i] - ys[i - 1]); }
+            bool upper = grp.Average(q => q.Y) > (cf.WorkPoints[0].Y + cf.WorkPoints[1].Y) / 2;
+            string note = $"{(upper ? "TOP" : "BOTTOM")}: {grp.Count} - {d.Short(boltD)} DIA {grade} BOLTS" +
+                (cols > 1 ? $" ({cols} COL.)" : "") + (pitchData > 0 ? $", {d.Short(pitchData)} PITCH" : "");
+            if (!seenNotes.Add(note)) continue;
+            var bp = grp.OrderByDescending(q => q.Y).First();
+            d.Leader(bp, bp + new Vec2(-d.Paper(0.5), d.Paper(upper ? 0.5 : -0.75)), note);
+            if (seenNotes.Count >= 4) break;
         }
         var plate = support ? def.Stiffeners.BearingStiffener : def.Stiffeners.ConnectionPlate;
         d.Leader(new Vec2(cf.RightWebFace - cf.PlateWidth / 2, cf.RightWebTop - wd * 0.15), new Vec2(cf.RightWebFace - cf.PlateWidth / 2 + d.Paper(0.6), cf.RightWebTop + d.Paper(0.6)),
@@ -144,6 +156,32 @@ public static class SteelDetailViews
         d.Title($"{title} — {type} ({cf.Mark} SHOWN)", support ? "Plumb, in the plane of the support line" : "Normal to the flanges; dimensions in the plane of the frame",
             new Vec2(cf.Span / 2, box.MinY - d.Paper(0.3)));
         return new SheetView(title, support ? "CF Support" : "CF Intermediate", dwg, d.Scale, $"{title.ToLowerInvariant()} as detailed ({cf.Mark}).");
+    }
+
+    /// <summary>Connected clusters of bolt positions (neighbor distance within 1.6 x the largest nearest-neighbor spacing).</summary>
+    public static List<List<Vec2>> BoltGroups(IReadOnlyList<Vec2> bolts)
+    {
+        var groups = new List<List<Vec2>>();
+        if (bolts.Count == 0) return groups;
+        double maxNn = 0;
+        foreach (var b in bolts)
+        {
+            double nn = double.MaxValue;
+            foreach (var o in bolts) if (!ReferenceEquals(o, b) && (o.X != b.X || o.Y != b.Y)) nn = Math.Min(nn, Vec2.Distance(b, o));
+            if (nn < double.MaxValue) maxNn = Math.Max(maxNn, nn);
+        }
+        double link = maxNn > 0 ? maxNn * 1.6 : 1;
+        var left = bolts.ToList();
+        while (left.Count > 0)
+        {
+            var g = new List<Vec2> { left[^1] };
+            left.RemoveAt(left.Count - 1);
+            for (int i = 0; i < g.Count; i++)
+                for (int k = left.Count - 1; k >= 0; k--)
+                    if (Vec2.Distance(g[i], left[k]) <= link) { g.Add(left[k]); left.RemoveAt(k); }
+            groups.Add(g);
+        }
+        return groups;
     }
 
     /// <summary>
@@ -266,25 +304,50 @@ public static class SteelDetailViews
         var dwg = new PlanDrawing();
         var d = new Drafter(dwg, u, 1);
         string S(double m) => u.FormatLength(m, LengthKind.Short);
-        var lines = new List<string>
+        // Materials as assigned in the model, grouped by part category.
+        string Cats(IEnumerable<PartCategory> cs) => string.Join(", ", cs.Select(c => c switch
         {
-            "STRUCTURAL STEEL NOTES",
-            "",
-            "1. GIRDER PLATES, STIFFENERS AND GUSSETS: ASTM A709 GR. 50.",
-            "   CROSS-FRAME ANGLES AND CHANNELS: ASTM A709 GR. 36.",
-            $"2. HIGH-STRENGTH BOLTS: ASTM F3125 GR. {def.Bolts.Grade}, {S(def.Bolts.Diameter)} DIA,",
-            $"   STANDARD HOLES, {S(def.Bolts.EdgeDistance)} MIN EDGE DISTANCE.",
-            "3. WELDING: AASHTO/AWS D1.5 BRIDGE WELDING CODE.",
-            "4. CROSS FRAMES: INTERMEDIATE FRAMES AND CONNECTION",
-            "   PLATES ARE NORMAL TO THE FLANGES; SUPPORT FRAMES",
-            "   AND BEARING STIFFENERS ARE PLUMB.",
-            $"5. CROSS FRAMES {(def.CrossFrames.Orientation == CrossFrameOrientation.Auto ? $"PARALLEL TO SKEW IF SKEW <= {def.CrossFrames.SkewLimitDegrees:0} DEG," : def.CrossFrames.Orientation.ToString().ToUpperInvariant())}",
-            def.CrossFrames.Orientation == CrossFrameOrientation.Auto ? "   OTHERWISE NORMAL TO THE GIRDERS (AASHTO 6.7.4.2)." : "",
-            "6. FIELD SPLICES: SLIP-CRITICAL BOLTED, NSBA DETAILS.",
-            $"7. SHEAR STUDS: {S(def.Studs.Diameter)} DIA, {def.Studs.RowsAcross} PER ROW @ {S(def.Studs.Pitch)}.",
-            "8. CROSS-FRAME DETAILS SHOW THE FRAME AS DETAILED IN THE",
-            "   3D MODEL; SEE THE IFC MODEL FOR EVERY FRAME.",
-        };
+            PartCategory.FlangePlate => "FLANGES", PartCategory.WebPlate => "WEBS", PartCategory.BearingStiffener or PartCategory.ConnectionStiffener or PartCategory.IntermediateStiffener => "STIFFENERS",
+            PartCategory.Gusset => "GUSSETS", PartCategory.Angle => "ANGLES", PartCategory.Channel => "CHANNELS", PartCategory.SplicePlate => "SPLICE PLATES",
+            PartCategory.FillerPlate => "FILLERS", PartCategory.SolePlate or PartCategory.BearingPlate or PartCategory.MasonryPlate => "BEARING PLATES",
+            PartCategory.BearingDisc or PartCategory.ShearPin or PartCategory.GuideBar => "BEARING PARTS",
+            PartCategory.InspectionBracket or PartCategory.Grating or PartCategory.WalkwayStringer or PartCategory.WalkwayPost or PartCategory.WalkwayRail or PartCategory.WalkwayPlate => "INSPECTION ACCESS",
+            _ => System.Text.RegularExpressions.Regex.Replace(c.ToString(), "([a-z])([A-Z])", "$1 $2").ToUpperInvariant(),
+        }).Distinct());
+        var mats = ctx.Steel == null ? new List<(string, string)>() : ctx.Steel.Parts
+            .Where(p => p.Category is not (PartCategory.Weld or PartCategory.BearingPad or PartCategory.Ptfe or PartCategory.InspectionCable) && p.Material.StartsWith("ASTM", StringComparison.OrdinalIgnoreCase))
+            .GroupBy(p => p.Material).OrderBy(g => g.Key)
+            .Select(g => (g.Key.ToUpperInvariant(), Cats(g.Select(p => p.Category).Distinct()))).ToList();
+        var lines = new List<string> { "STRUCTURAL STEEL NOTES", "" };
+        int n = 1;
+        foreach (var (m, c) in mats)
+        {
+            lines.Add($"{n++}. {c}:");
+            lines.Add($"   {m}.");
+        }
+        double hole = def.Bolts.Diameter + In(1.0 / 16);
+        lines.Add($"{n++}. HIGH-STRENGTH BOLTS: ASTM F3125 GR. {def.Bolts.Grade}, {S(def.Bolts.Diameter)} DIA (BRIDGE DEFAULT; FRAME BOLT NOTES GOVERN),");
+        lines.Add($"   {S(hole)} DIA HOLES, {S(def.Bolts.EdgeDistance)} EDGE DISTANCE.");
+        lines.Add($"{n++}. CROSS FRAMES: INTERMEDIATE FRAMES AND CONNECTION PLATES ARE NORMAL TO THE FLANGES;");
+        lines.Add("   SUPPORT FRAMES AND BEARING STIFFENERS ARE PLUMB.");
+        if (def.CrossFrames.Orientation == CrossFrameOrientation.Auto)
+            lines.Add($"{n++}. CROSS FRAMES PARALLEL TO SKEW IF SKEW <= {def.CrossFrames.SkewLimitDegrees:0} DEG, OTHERWISE NORMAL TO THE GIRDERS.");
+        else lines.Add($"{n++}. CROSS FRAME ORIENTATION: {def.CrossFrames.Orientation.ToString().ToUpperInvariant()}.");
+        lines.Add($"{n++}. SHEAR STUDS: {S(def.Studs.Diameter)} DIA, {def.Studs.RowsAcross} PER ROW @ {S(def.Studs.Pitch)}.");
+        lines.Add($"{n++}. CROSS-FRAME DETAILS SHOW THE FRAME AS DETAILED IN THE 3D MODEL.");
+        var wrapped = new List<string>();
+        foreach (var ln0 in lines)
+        {
+            string ln = ln0.TrimStart();
+            var cur = "";
+            foreach (var w in ln.Split(' ', StringSplitOptions.RemoveEmptyEntries))
+            {
+                if (cur.Length + w.Length + 1 > 46 && cur.Trim().Length > 0) { wrapped.Add(cur); cur = "    " + w; }
+                else cur = cur.Length == 0 ? w : cur + " " + w;
+            }
+            wrapped.Add(cur);
+        }
+        lines = wrapped;
         for (int i = 0; i < lines.Count; i++)
             d.Text(lines[i], new Vec2(0, -i * d.Paper(0.2)), d.Paper(i == 0 ? 0.13 : 0.09), 0, TextAlign.Left, i == 0 ? SheetLayers.Title : SheetLayers.Text);
         return new SheetView("Steel notes", "Notes", dwg, 1, "", PaperSpace: true);

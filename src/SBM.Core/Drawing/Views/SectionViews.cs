@@ -118,13 +118,13 @@ public static class SectionViews
                 foreach (var (_, outline) in det.Gussets) d.Poly(SheetLayers.Steel, outline.Select(Map), true);
                 foreach (var m in det.Members) d.Poly(m.Front ? SheetLayers.Steel : SheetLayers.SteelHidden, m.Outline.Select(Map), true);
                 if (det.Filler != null) d.Poly(SheetLayers.Steel, det.Filler.Select(Map), true);
-                foreach (var b in det.Bolts) d.Circle(SheetLayers.Steel, Map(b), def.Bolts.Diameter / 2);
+                foreach (var b in det.Bolts) d.Circle(SheetLayers.Steel, Map(b), (det.BoltDiameter > 0 ? det.BoltDiameter : def.Bolts.Diameter) / 2);
                 // Leader to the top chord / diaphragm; as-designed styles may have neither (e.g. a strut or WT chord only).
                 int li = det.Members.FindIndex(m => m.Code is "TC" or "DIA");
                 if (li < 0) li = det.Members.FindIndex(m => m.Outline.Length > 2);
                 if (bay == 0 && li >= 0)
                     d.Leader(Map(det.Members[li].Outline[2]), Map(det.Members[li].Outline[2]) + new Vec2(d.Paper(0.3), d.Paper(0.9)),
-                        $"{ResolvedName(cf.Type)} {cf.Mark} (BEYOND), {cfDef.ChordAngle} CHORDS, {cfDef.DiagonalAngle} DIAGONALS");
+                        $"{ResolvedName(cf.Type)} {cf.Mark} (BEYOND)\n{string.Join(", ", det.Members.Select(m => $"{m.Code} {m.Angle}").Distinct())}");
             }
             else
             switch (cf.Type)

@@ -266,13 +266,14 @@ public static class LayoutViews
                 d.Line(SheetLayers.Steel, new Vec2(sta, z), new Vec2(sta, z - sec.WebDepth + (st.Kind == StiffenerKind.Intermediate ? def.Stiffeners.IntermediateBottomGap : 0)));
             }
             // Field splices.
-            foreach (var sp in f.Splices.Where(s => s.Girder == g.Index))
+            int spIx = 0;
+            foreach (var sp in f.Splices.Where(s => s.Girder == g.Index).OrderBy(s => s.GirderDistance))
             {
                 var (pt, _, sta) = path.At(sp.GirderDistance);
                 var sd = def.SpliceDetail;
                 double half = (sd.WebBoltColumns - 1) * def.Bolts.Pitch + def.Bolts.EdgeDistance + def.FieldSpliceGap / 2;
                 d.Rect(SheetLayers.Steel, sta - half, pt.Z - sec.WebDepth + sd.WebPlateFlangeClearance, sta + half, pt.Z - sd.WebPlateFlangeClearance);
-                d.Leader(new Vec2(sta, pt.Z - sec.WebDepth / 2), new Vec2(sta + d.Paper(0.35), pt.Z - sec.WebDepth - d.Paper(0.3)), $"FIELD SPLICE  STA {u.FormatStation(sp.Location.XY == default ? sta : a.Inverse(sp.Location.XY).Station)}");
+                d.Leader(new Vec2(sta, pt.Z - sec.WebDepth / 2), new Vec2(sta + d.Paper(0.35), pt.Z - sec.WebDepth - d.Paper(0.3 + 0.2 * (spIx++ % 4))), $"FIELD SPLICE  STA {u.FormatStation(sp.Location.XY == default ? sta : a.Inverse(sp.Location.XY).Station)}");
             }
             d.Leader(new Vec2(tf[tf.Count / 4].X, (tf[tf.Count / 4].Y + bfB[bfB.Count / 4].Y) / 2),
                 new Vec2(tf[tf.Count / 4].X + d.Paper(0.4), bfB[bfB.Count / 4].Y - d.Paper(0.45)), $"{g.Name} (BEYOND)");
