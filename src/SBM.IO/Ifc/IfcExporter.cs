@@ -252,6 +252,8 @@ public static class IfcExporter
         var psetTargets = new List<(int id, string mark, string desc, double length, double massKg)>();
         // Generic expansion joint devices: (accessory, location text) -> SBM_Placeholder property set.
         var placeholders = new List<(int id, string location, string type)>();
+        // Misc items by others (sign base plates, crash cushion, junction boxes, trough): SBM_Placeholder with the plan basis.
+        var miscPlaceholders = new List<(int id, string location, string basis)>();
 
         int RgbStyle(string name, double r, double g, double b, double transparency = 0)
         {
@@ -336,6 +338,74 @@ public static class IfcExporter
                 AddMaterial($"ASTM A615 Gr. {fy:0}" + (mk.Epoxy ? ", epoxy coated" : ""), id);
                 psetTargets.Add((id, tag, mk.Size.Name, len, len * mk.Size.MassPerLength));
             }
+        }
+
+        // Misc items (optional): drainage, sign supports, crash cushion end posts, lighting. One IfcElementAssembly per assembly (drain, bracket,
+        // pole base ...) aggregating its solids; deck-piercing elements void the deck slab; items by others carry SBM_Placeholder.
+        // Schedule-only reinforcing (no placements) is not exported.
+        void ExportMisc(SBM.Core.Misc.MiscModel misc, string bk, int superPart, int pl, int deckSlabId)
+        {
+            int GroupStyle(SBM.Core.Misc.MiscGroup g) => g switch
+            {
+                SBM.Core.Misc.MiscGroup.Drainage => RgbStyle("Drainage", 0.35, 0.65, 0.8),
+                SBM.Core.Misc.MiscGroup.SignSupport => RgbStyle("Sign support", 0.55, 0.62, 0.7),
+                SBM.Core.Misc.MiscGroup.CrashCushion => RgbStyle("Crash cushion", 0.8, 0.72, 0.2),
+                _ => RgbStyle("Lighting", 0.9, 0.85, 0.4),
+            };
+            var styles = new Dictionary<SBM.Core.Misc.MiscGroup, int>();
+            var asmIds = new Dictionary<string, int>();
+            foreach (var a in misc.Assemblies)
+            {
+                if (asmIds.ContainsKey(a.Name)) continue;
+                asmIds[a.Name] = w.Add("IFCELEMENTASSEMBLY",
+                    $"{Guid(IfcKeys.MiscAssembly(bk, a.Name))},$,{S(a.Name)},{S(a.Description)},{S(a.Category.ToUpperInvariant().Replace(' ', '_'))},{Ref(pl)},$,{S(a.Name)},.SITE.,.USERDEFINED.");
+            }
+            if (asmIds.Count > 0) w.Add("IFCRELCONTAINEDINSPATIALSTRUCTURE", $"{Guid(bk + "/rel/misc")},$,$,$,{Refs(asmIds.Values)},{Ref(superPart)}");
+            var children = asmIds.Keys.ToDictionary(k => k, _ => new List<int>());
+            int n = 0;
+            foreach (var el in misc.Elements)
+            {
+                if (!styles.TryGetValue(el.Group, out int st)) styles[el.Group] = st = GroupStyle(el.Group);
+                int pds = Body(el.Mesh, st);
+                string common = $"{Guid(IfcKeys.MiscElement(bk, n))},$,{S(el.Name)},{S(el.Description)}";
+                string no = n.ToString();
+                n++;
+                string Fs(string objType, string pred) => $"{common},{objType},{Ref(pl)},{Ref(pds)},$,{pred}";
+                int id = el.Kind switch
+                {
+                    SBM.Core.Misc.MiscKind.DrainTrench => w.Add("IFCWASTETERMINAL", Fs("'BRIDGE_DECK_DRAIN'", ".USERDEFINED.")),
+                    SBM.Core.Misc.MiscKind.DrainGrate => w.Add("IFCPLATE", Fs("'DRAIN_GRATE'", ".USERDEFINED.")),
+                    SBM.Core.Misc.MiscKind.DrainTube or SBM.Core.Misc.MiscKind.DrainPipe => w.Add("IFCPIPESEGMENT", Fs("$", ".RIGIDSEGMENT.")),
+                    SBM.Core.Misc.MiscKind.PipeFitting => w.Add("IFCPIPEFITTING", Fs("'FLEXIBLE_COUPLER'", ".CONNECTOR.")),
+                    SBM.Core.Misc.MiscKind.PipeHanger => w.Add("IFCDISCRETEACCESSORY", Fs("'PIPE_HANGER'", ".USERDEFINED.")),
+                    SBM.Core.Misc.MiscKind.PipeSupport => w.Add("IFCDISCRETEACCESSORY", Fs("'PIPE_SUPPORT'", ".USERDEFINED.")),
+                    SBM.Core.Misc.MiscKind.DrainBox => w.Add("IFCTANK", Fs("'COLLECTION_BOX'", ".USERDEFINED.")),
+                    SBM.Core.Misc.MiscKind.DrainTrough => w.Add("IFCBUILDINGELEMENTPROXY", Fs("'DRAIN_TROUGH'", ".USERDEFINED.")),
+                    SBM.Core.Misc.MiscKind.SplashBasin or SBM.Core.Misc.MiscKind.ErosionMattress => w.Add("IFCCOURSE", Fs("$", ".ARMOUR.")),
+                    SBM.Core.Misc.MiscKind.SignPlate => w.Add("IFCPLATE", Fs("'SIGN_BRACKET_PLATE'", ".USERDEFINED.")),
+                    SBM.Core.Misc.MiscKind.SignStiffener => w.Add("IFCPLATE", Fs("$", ".STIFFENER_PLATE.")),
+                    SBM.Core.Misc.MiscKind.SignAnchorBolt or SBM.Core.Misc.MiscKind.PoleAnchorBolt => w.Add("IFCMECHANICALFASTENER", $"{common},'ANCHOR_BOLT_GROUP',{Ref(pl)},{Ref(pds)},$,$,$,.ANCHORBOLT."),
+                    SBM.Core.Misc.MiscKind.SignPlaceholder => w.Add("IFCBUILDINGELEMENTPROXY", Fs("'SIGN_POST_BASE_PLATE'", ".USERDEFINED.")),
+                    SBM.Core.Misc.MiscKind.SignBlock or SBM.Core.Misc.MiscKind.PoleBaseConcrete => w.Add("IFCFOOTING", Fs("$", ".PAD_FOOTING.")),
+                    SBM.Core.Misc.MiscKind.EndPostConcrete => w.Add("IFCBUILDINGELEMENTPROXY", Fs("'CRASH_CUSHION_END_POST'", ".USERDEFINED.")),
+                    SBM.Core.Misc.MiscKind.CushionPlaceholder => w.Add("IFCBUILDINGELEMENTPROXY", Fs("'CRASH_CUSHION'", ".USERDEFINED.")),
+                    SBM.Core.Misc.MiscKind.JunctionBox => w.Add("IFCJUNCTIONBOX", Fs("'LI-104_TYPE_1'", ".USERDEFINED.")),
+                    _ => w.Add("IFCCABLECARRIERSEGMENT", Fs("$", ".CONDUITSEGMENT.")),
+                };
+                AddMaterial(el.Material, id);
+                if (children.TryGetValue(el.Assembly, out var list)) list.Add(id);
+                if (el.Placeholder) miscPlaceholders.Add((id, string.IsNullOrEmpty(el.Location) ? el.Assembly : el.Location, el.PlaceholderBasis));
+                // The element passes through the deck slab: a real opening (IfcOpeningElement voiding it).
+                if (el.Opening is { IsEmpty: false } && deckSlabId > 0)
+                {
+                    int opds = Body(el.Opening, null);
+                    int open = w.Add("IFCOPENINGELEMENT", $"{Guid($"{bk}/misc-opening/{no}")},$,{S(el.Name + " opening")},$,$,{Ref(pl)},{Ref(opds)},$,.OPENING.");
+                    w.Add("IFCRELVOIDSELEMENT", $"{Guid($"{bk}/misc-void/{no}")},$,$,$,{Ref(deckSlabId)},{Ref(open)}");
+                }
+            }
+            foreach (var (name, ids) in children)
+                if (ids.Count > 0) w.Add("IFCRELAGGREGATES", $"{Guid(bk + "/rel/misc-asm/" + name)},$,$,$,{Ref(asmIds[name])},{Refs(ids)}");
+            result.ElementCount += misc.Elements.Count;
         }
 
         // Substructure: one IfcBridgePart (PIER / ABUTMENT) per support under a SUBSTRUCTURE part; caps (IfcBeam PIERCAP),
@@ -600,6 +670,7 @@ public static class IfcExporter
                 w.Add("IFCRELCONTAINEDINSPATIALSTRUCTURE", $"{Guid(bk + "/rel/drain")},$,$,$,{Refs(ids)},{Ref(superPart)}");
                 result.ElementCount += ids.Count;
             }
+            if (substructure?.Misc is { IsEmpty: false } misc) ExportMisc(misc, bk, superPart, elemPl, deckSlabId);
             if (steel == null) continue;
 
             var asmIds = new Dictionary<string, int>();
@@ -779,6 +850,15 @@ public static class IfcExporter
             int q3 = w.Add("IFCPROPERTYSINGLEVALUE", $"'Location',$,IFCLABEL({S(location)}),$");
             int q4 = w.Add("IFCPROPERTYSINGLEVALUE", $"'DeviceType',$,IFCLABEL({S(type)}),$");
             int ps = w.Add("IFCPROPERTYSET", $"{Guid(key + "/placeholder/" + id)},$,'SBM_Placeholder',$,({Ref(q1)},{Ref(q2)},{Ref(q3)},{Ref(q4)})");
+            w.Add("IFCRELDEFINESBYPROPERTIES", $"{Guid(key + "/relplaceholder/" + id)},$,$,$,({Ref(id)}),{Ref(ps)}");
+        }
+
+        foreach (var (id, location, basis) in miscPlaceholders)
+        {
+            int q1 = w.Add("IFCPROPERTYSINGLEVALUE", "'IsPlaceholder',$,IFCBOOLEAN(.T.),$");
+            int q2 = w.Add("IFCPROPERTYSINGLEVALUE", $"'Basis',$,IFCTEXT({S(basis)}),$");
+            int q3 = w.Add("IFCPROPERTYSINGLEVALUE", $"'Location',$,IFCLABEL({S(location)}),$");
+            int ps = w.Add("IFCPROPERTYSET", $"{Guid(key + "/placeholder/" + id)},$,'SBM_Placeholder',$,({Ref(q1)},{Ref(q2)},{Ref(q3)})");
             w.Add("IFCRELDEFINESBYPROPERTIES", $"{Guid(key + "/relplaceholder/" + id)},$,$,$,({Ref(id)}),{Ref(ps)}");
         }
 

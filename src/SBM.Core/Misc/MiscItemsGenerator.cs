@@ -44,6 +44,7 @@ public sealed partial class MiscItemsGenerator
         if (!any || f.HasErrors) return null;
         var g = new MiscItemsGenerator(f, steel, sub, u, ground);
         if (steel != null) g._steelIndex = MiscMesh.Index(steel.Parts);
+        foreach (var s in d.Misc?.Unresolved ?? new()) g.Warn("UNRESOLVED " + s);
         try
         {
             g.BuildDrainage();
@@ -260,9 +261,6 @@ public sealed partial class MiscItemsGenerator
         // support angles at Type 1 cross frames are not located on the plan (frame stations come from the framing): not modeled.
         Info($"{name}: L3x3x3/8 support angles on 5/8\" U-bolts at the Type 1 cross frames are not modeled (plan gives no frame stations for the span).");
 
-        for (int i = 1; i < pts.Count; i += 1)
-            if (i % 1 == 0 && (i == 1 || i == pts.Count - 1 || i % 5 == 0))
-                Record(name, $"pipe STA {_u.FormatStation(list[i - 1])}-{_u.FormatStation(list[i])}", pts[i - 1], pts[i], od / 2, list[i - 1]);
         // full-length minimum
         double bestC = double.MaxValue; string bestA = ""; double bestZ = 0, bestS = 0;
         for (int i = 1; i < pts.Count; i++)

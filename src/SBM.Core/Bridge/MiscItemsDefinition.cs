@@ -290,6 +290,8 @@ public sealed class LightingDefinition
 /// <summary>Container of the optional misc items of one bridge (null on the bridge = none).</summary>
 public sealed class MiscItemsDefinition
 {
+    /// <summary>Plan items that could not be determined (data scripts list them): raised as warnings by the generator, never guessed.</summary>
+    public List<string> Unresolved { get; set; } = new();
     public List<DrainCollectorDefinition> Collectors { get; set; } = new();
     public List<PierDrainDefinition> PierDrains { get; set; } = new();
     public List<SignSupportDefinition> SignSupports { get; set; } = new();
@@ -302,5 +304,6 @@ public sealed class MiscItemsDefinition
         SignSupports = SignSupports.Select(c => c.Clone()).ToList(),
         EndPosts = EndPosts.Select(c => c.Clone()).ToList(),
         Lighting = Lighting?.Clone(),
+        Unresolved = Unresolved.ToList(),
     };
 }

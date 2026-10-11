@@ -109,10 +109,13 @@ public sealed partial class MiscItemsGenerator
 
         // pipe 1: trough box low end, slope 1:12 to above the cap box, then vertical
         var (od1, w1) = MiscMesh.PipeSch40(pd.PipeNominalDiameter);
-        var p0 = pBox - u * (pd.BoxLength / 2);
+        var p0 = pBox;
         double z0 = zBox - H - sl3 + In(1.5);
         double runP = (pCap - p0).Length;
-        if (Vec2.Dot(pCap - p0, -u) <= 0) Warn($"{asm}: the cap collection box is on the high-trough side of the trough box: pipe 1 would run uphill.");
+        var dSN = pCap - p0;
+        Info($"{asm}: pipe 1 plan run {L(runP)} (along the pier line {L(Vec2.Dot(dSN, dir))}, along the bridge {L(Vec2.Dot(dSN, ahead))}) from the trough box to the pier collection box.");
+        if (runP < In(6)) Warn($"{asm}: the pier collection box is almost directly under the trough box (run {Sh(runP)}): the plan's 1:12 pipe needs a longitudinal run (section A-A) whose length is not dimensioned (UNRESOLVED N position of the cap box); modeled as computed.");
+        else Warn($"{asm}: N position of the pier collection box on the cap is not dimensioned (section A-A shows the pipe running back-station about 6-7 ft by scale): placed on the CL column.");
         double z1 = z0 - runP * pd.Pipe1Slope;
         double zFl = boxTop + In(4);
         var pipe1 = new Mesh();
@@ -129,12 +132,12 @@ public sealed partial class MiscItemsGenerator
         {
             var e = coll.Pts[^1];
             double dd = (pCap - e.XY).Length;
-            if (dd > In(12)) Warn($"{asm}: the span collector ends {Sh(dd)} (plan) from the pier collection box centre; connected by a horizontal run (the plan gives no plan routing).");
+            if (dd > In(12)) Warn($"{asm}: the span collector turns down at its end ({L(e.Z)}), {Sh(dd)} (plan) from the pier collection box centre; the elbow is modeled straight down at the pipe end (the plan gives no plan routing to the box, so a clearance conflict of this elbow is a consequence of that assumption).");
             var em = new Mesh();
-            if (dd > 1e-3) em.Append(MiscMesh.Tube(e, pCap.WithZ(e.Z), coll.Od / 2, coll.Od / 2 - coll.Wall));
-            if (e.Z > zFl) em.Append(MiscMesh.Tube(pCap.WithZ(e.Z), pCap.WithZ(zFl), coll.Od / 2, coll.Od / 2 - coll.Wall));
-            Add(MiscGroup.Drainage, MiscKind.DrainPipe, asm, asm + " collector end", $"{coll.Name} elbow down into the pier collection box", em, "ASTM A53 Gr B, galvanized");
-            Record(asm, "collector end", e, pCap.WithZ(zFl), coll.Od / 2, sl.Station);
+            double zEl = Math.Max(zFl, 0);
+            if (e.Z > zFl) em.Append(MiscMesh.Tube(e, e.XY.WithZ(zFl), coll.Od / 2, coll.Od / 2 - coll.Wall));
+            Add(MiscGroup.Drainage, MiscKind.DrainPipe, asm, asm + " collector end", $"{coll.Name} elbow down toward the pier collection box", em, "ASTM A53 Gr B, galvanized");
+            if (e.Z > zFl) Record(asm, "collector end", e, e.XY.WithZ(zFl), coll.Od / 2, sl.Station);
         }
 
         // cap pipe: box bottom -> soffit -> 8% toward the column -> vertical on the back face
