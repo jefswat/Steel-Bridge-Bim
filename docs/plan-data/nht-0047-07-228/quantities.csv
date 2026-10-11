@@ -1,0 +1,24 @@
+item,code,description,unit,csj_0918_47_242,csj_0047_07_228,total,check,source,tag
+0405,6003,Foundation load test (ASTM D4945)(drilled shaft),EA,1,1,2,,PDF p.91 / sh 142,RASTER
+0416,6004,Drill shaft (36 in) *sulfate resistant,LF,106,,106,,PDF p.91 / sh 142,RASTER
+0416,6006,Drill shaft (48 in) *,LF,240,,240,,PDF p.91 / sh 142,RASTER
+0416,6011,Drill shaft (78 in) *,LF,,46,46,piers 10 & 11,PDF p.91 / sh 142,RASTER
+0420,6014,CL C conc (abut)(HPC),CY,13.0,,13.0,,PDF p.91 / sh 142,RASTER
+0420,6030,CL C conc (cap)(HPC),CY,57.6,52.0,109.6,p.102: P10 26.0 + P11 26.0 = 52.0 OK,PDF p.91 / sh 142,RASTER
+0420,6038,CL C conc (column)(HPC),CY,55.4,24.0,79.4,p.102: 13.2 + 10.8 = 24.0 OK,PDF p.91 / sh 142,RASTER
+0422,6002,Reinf conc slab (HPC),SF,8370,1949,10319,unit rows 1691/1520/1326/1199/2634 (0918) + 1228/721 (0047),PDF p.91 / sh 142,RASTER
+0422,6047,Reinf conc slab (HPC)(arch),SF,,3698,3698,= p.151 'span 7' 3698,PDF p.91 / sh 142,RASTER
+0425,6035,Prestr conc girder (Tx28),LF,1057.62,246.63,1304.25,213.45/191.83/167.31/151.74/333.29 + 155.64/90.99,PDF p.91 / sh 142,RASTER
+0432,6045,Riprap (mow strip)(4 in),CY,6.1,,6.1,,PDF p.91 / sh 142,RASTER
+0434,6133,Elastomeric bearing (fixed)(arch),EA,,4,4,p.107 table: 2 at P10 + 2 at P11,PDF p.91 / sh 142,RASTER
+0442,6007,Str steel (misc non-bridge) (BS-EJCP),LB,970,412,1382,note: abut 1 194; P4 194; P7 194; P10 206; P11 206; P13 194; abut 16 194 = 1382 OK,PDF p.91 / sh 142,RASTER
+0442,6029,Str steel (arch)(Gr 50),LB,,31300,31300,= upper lateral bracing 21600 (p.128) + knuckle 9700 (p.123) OK,PDF p.91 / sh 142,RASTER
+0442,6030,Str steel (arch)(Gr 50-T1),LB,,120100,120100,= floor system 61000 (p.143) + arch rib 59100 (p.127) OK,PDF p.91 / sh 142,RASTER
+0442,6031,Str steel (arch)(Gr 50-F1),LB,,37000,37000,= tie girders 33200 (p.143) + cable fin plates 3800 (p.148) OK,PDF p.91 / sh 142,RASTER
+0450,6091,Rail T80SS (MOD),LF,,78.0,78.0,piers 10 & 11 traffic barrier,PDF p.91 / sh 142,RASTER
+0454,6024,Sealed expansion joint (4 in)(SEJ-B)(MOD),LF,75,32,107,,PDF p.91 / sh 142,RASTER
+0740,6005,Anti-graffiti coating (permanent ty III),SF,1752,1423,3175,p.102: 741 + 682 = 1423 OK,PDF p.91 / sh 142,RASTER
+4176,6001,Tip testing of drilled shafts,EA,4,2,6,,PDF p.91 / sh 142,RASTER
+4181,6001,Cable hangers,LS,,1,1,,PDF p.91 / sh 142,RASTER
+5110,6001,Rail (ped)(low),LF,579.0,,579.0,215.8 + 194.0 + 169.2,PDF p.91 / sh 142,RASTER
+5110,6002,Rail (ped)(high),LF,488.9,655.3,1144.2,152.9 + 336.0 / 156.4 + 91.7 + 407.2,PDF p.91 / sh 142,RASTER
