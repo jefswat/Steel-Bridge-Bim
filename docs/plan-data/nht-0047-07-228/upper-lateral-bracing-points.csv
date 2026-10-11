@@ -1,0 +1,33 @@
+point,X_ft,Y_ft,Z_ft,rib_radius_check_ft,plane_dev_ft,source,tag,note
+U1,-86.999,-7.044,10.618,126.079,+0.685,PDF p.128 / sh 179,RASTER,south rib panel point; DERIVED radius about (x 4.5; 76 ft below chord in rib plane) and deviation from 5-deg rib plane
+U2,-71.769,-5.853,24.222,126.071,+0.686,PDF p.128 / sh 179,RASTER,south rib panel point; DERIVED radius about (x 4.5; 76 ft below chord in rib plane) and deviation from 5-deg rib plane
+U3,-54.532,-4.893,35.194,126.070,+0.686,PDF p.128 / sh 179,RASTER,south rib panel point; DERIVED radius about (x 4.5; 76 ft below chord in rib plane) and deviation from 5-deg rib plane
+U4,-35.74,-4.189,43.244,126.069,+0.686,PDF p.128 / sh 179,RASTER,south rib panel point; DERIVED radius about (x 4.5; 76 ft below chord in rib plane) and deviation from 5-deg rib plane
+U5,-15.888,-3.759,48.161,126.069,+0.685,PDF p.128 / sh 179,RASTER,south rib panel point; DERIVED radius about (x 4.5; 76 ft below chord in rib plane) and deviation from 5-deg rib plane
+U6,4.5,-3.614,49.814,126.069,+0.686,PDF p.128 / sh 179,RASTER,south rib panel point; DERIVED radius about (x 4.5; 76 ft below chord in rib plane) and deviation from 5-deg rib plane
+U7,24.888,-3.759,48.161,126.069,+0.685,PDF p.128 / sh 179,RASTER,south rib panel point; DERIVED radius about (x 4.5; 76 ft below chord in rib plane) and deviation from 5-deg rib plane
+U8,44.74,-4.189,43.244,126.069,+0.686,PDF p.128 / sh 179,RASTER,south rib panel point; DERIVED radius about (x 4.5; 76 ft below chord in rib plane) and deviation from 5-deg rib plane
+U9,63.532,-4.893,35.194,126.070,+0.686,PDF p.128 / sh 179,RASTER,south rib panel point; DERIVED radius about (x 4.5; 76 ft below chord in rib plane) and deviation from 5-deg rib plane
+U10,80.769,-5.853,24.222,126.071,+0.686,PDF p.128 / sh 179,RASTER,south rib panel point; DERIVED radius about (x 4.5; 76 ft below chord in rib plane) and deviation from 5-deg rib plane
+U11,95.999,-7.044,10.618,126.079,+0.685,PDF p.128 / sh 179,RASTER,south rib panel point; DERIVED radius about (x 4.5; 76 ft below chord in rib plane) and deviation from 5-deg rib plane
+U1',86.999,7.044,10.618,,,PDF p.128 / sh 179,RASTER,north rib = (-X;-Y;Z) of U1 (printed)
+U2',71.769,5.853,24.222,,,PDF p.128 / sh 179,RASTER,north rib = (-X;-Y;Z) of U2 (printed)
+U3',54.532,4.893,35.194,,,PDF p.128 / sh 179,RASTER,north rib = (-X;-Y;Z) of U3 (printed)
+U4',35.74,4.189,43.244,,,PDF p.128 / sh 179,RASTER,north rib = (-X;-Y;Z) of U4 (printed)
+U5',15.888,3.759,48.161,,,PDF p.128 / sh 179,RASTER,north rib = (-X;-Y;Z) of U5 (printed)
+U6',-4.5,3.614,49.814,,,PDF p.128 / sh 179,RASTER,north rib = (-X;-Y;Z) of U6 (printed)
+U7',-24.888,3.759,48.161,,,PDF p.128 / sh 179,RASTER,north rib = (-X;-Y;Z) of U7 (printed)
+U8',-44.74,4.189,43.244,,,PDF p.128 / sh 179,RASTER,north rib = (-X;-Y;Z) of U8 (printed)
+U9',-63.532,4.893,35.194,,,PDF p.128 / sh 179,RASTER,north rib = (-X;-Y;Z) of U9 (printed)
+U10',-80.769,5.853,24.222,,,PDF p.128 / sh 179,RASTER,north rib = (-X;-Y;Z) of U10 (printed)
+U11',-95.999,7.044,10.618,,,PDF p.128 / sh 179,RASTER,north rib = (-X;-Y;Z) of U11 (printed)
+UL1,-83.57,0.055,18.106,,,PDF p.128 / sh 179,RASTER,X-brace crossing point between ribs
+UL2,-67.231,0.068,30.267,,,PDF p.128 / sh 179,RASTER,X-brace crossing point between ribs
+UL3,-49.173,0.077,39.6,,,PDF p.128 / sh 179,RASTER,X-brace crossing point between ribs
+UL4,-29.924,0.071,45.879,,,PDF p.128 / sh 179,RASTER,X-brace crossing point between ribs
+UL5,-10.035,0.031,49.011,,,PDF p.128 / sh 179,RASTER,X-brace crossing point between ribs
+UL6,10.035,-0.031,49.011,,,PDF p.128 / sh 179,RASTER,X-brace crossing point between ribs
+UL7,29.924,-0.071,45.879,,,PDF p.128 / sh 179,RASTER,X-brace crossing point between ribs
+UL8,49.173,-0.077,39.6,,,PDF p.128 / sh 179,RASTER,X-brace crossing point between ribs
+UL9,67.231,-0.068,30.267,,,PDF p.128 / sh 179,RASTER,X-brace crossing point between ribs
+UL10,83.57,-0.055,18.106,,,PDF p.128 / sh 179,RASTER,X-brace crossing point between ribs
