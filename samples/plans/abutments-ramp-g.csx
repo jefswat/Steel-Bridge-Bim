@@ -78,6 +78,7 @@ foreach (var w in wings)
     {
         Name = w.Name, End = w.End, GutterOffset = w.Gut, Thickness = F(1, 9), Length = F(25, 5), EndHeight = F(4), LevelReach = 0,
         TopAtBackwall = Ft(w.Top), TopAtEnd = Ft(w.TopEnd), BottomAtBackwall = Ft(w.Bot),
+        BottomOnFootings = true,   // wall carried down onto each wing footing (views A-A / B-B p82: vertical steps at the footing ends)
     };
     var cfStart = new[] { F(9, 5), F(17, 5) }; var cfH = new[] { F(8, 3), F(5, 6) };
     for (int k = 0; k < 2; k++)

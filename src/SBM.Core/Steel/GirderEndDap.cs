@@ -132,8 +132,8 @@ public sealed class GirderEndDap
             if (brg.Count > 0)
             {
                 double x = atStart ? brg.Min() : g.Length - brg.Max();
-                double expected = atStart ? g.StartExtension : x;
-                if (x > 0 && x < 3 && Math.Abs(x - expected) < 0.05) xb = x;
+                // nearest bearing stiffener within 3 m of the end (StartExtension is not used: girders re-based on an auxiliary support carry a negative value)
+                if (x > 0 && x < 3) xb = x;
             }
             if (xb == null) { warn($"{g.Name}: girder end dap at {sup.Name} not built - no bearing stiffener near the girder {(atStart ? "start" : "end")} to measure the dap from."); continue; }
             var dap = new GirderEndDap(dd, atStart, g.Length, xb.Value, sup.Name);

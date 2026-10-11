@@ -448,7 +448,14 @@ public sealed partial class SubstructureGenerator
         double Top(double u) => wd.TopAtBackwall + (wd.TopAtEnd - wd.TopAtBackwall) * (u - ub) / Math.Max(len - ub, 1e-9);
         double lvl = ub + wd.LevelReach;
         double Bot(double u) => u <= lvl ? wd.BottomAtBackwall : wd.BottomAtBackwall + (bEnd - wd.BottomAtBackwall) * (u - lvl) / Math.Max(len - lvl, 1e-9);
-        var info = new WingInfo { Def = wd, SideSign = side, EIn = eIn, EOut = eOut, UBack = ub, Length = len, Sta = path.Sta, Top = Top, Bottom = Bot };
+        // OPTIONAL (plan views A-A / K-K): over each wing footing the wall comes down onto the footing top; elsewhere the bottom is the sloped line.
+        var seats = wd.BottomOnFootings ? wd.Counterforts.Select(c => (u0: c.Start, u1: c.Start + c.Width, z: c.FootingTop)).ToList() : new();
+        double BotSeated(double u)
+        {
+            foreach (var (u0, u1, z) in seats) if (u >= u0 - 1e-9 && u <= u1 + 1e-9) return Math.Min(z, Bot(u));
+            return Bot(u);
+        }
+        var info = new WingInfo { Def = wd, SideSign = side, EIn = eIn, EOut = eOut, UBack = ub, Length = len, Sta = path.Sta, Top = Top, Bottom = BotSeated };
         geo.Wings.Add(info);
 
         // rings: [near end at the backwall back face] .. breaks .. [free end]
@@ -477,6 +484,25 @@ public sealed partial class SubstructureGenerator
         for (int i = 1; i < uu.Count; i++) { double s = path.Sta(uu[i]); if (uu[i] > ub + 1e-6) rings.Add(RingAt(s, s)); }
         var wm = new Mesh();
         MeshBuilder.AddLoft(wm, sec, rings);
+        // wall between the sloped bottom line and each wing footing top (vertical steps at the footing ends, as the plan views draw them)
+        double maxGap = 0;
+        foreach (var (u0, u1, z) in seats)
+        {
+            var uz = new List<double> { u0, u1 };
+            if (lvl > u0 && lvl < u1) uz.Insert(1, lvl);
+            double gap = uz.Max(u => Bot(u)) - z;
+            if (gap <= 1e-6) continue;
+            maxGap = Math.Max(maxGap, gap);
+            var fr = uz.Select(u =>
+            {
+                double s = path.Sta(u); var pi = a.PointAt(s, eIn); var po = a.PointAt(s, eOut);
+                double zt = Math.Max(Bot(u), z + 1e-6);
+                return new[] { pi.WithZ(z), po.WithZ(z), po.WithZ(zt), pi.WithZ(zt) };
+            }).ToList();
+            MeshBuilder.AddLoft(wm, sec, fr);
+        }
+        if (seats.Count > 0)
+            Note($"{name}: wing {wd.Name} seated on its {seats.Count} wing footing(s) - wall carried down to the footing tops (the sloped bottom line is up to {Sh(maxGap)} above them).");
         string wname = string.IsNullOrEmpty(wd.Name) ? $"wing {(wd.End == AbutmentEnd.Left ? "left" : "right")}" : wd.Name;
         unit.Solids.Add(new SubSolid(SubElementKind.Wingwall, $"{name} wingwall {wname}",
             $"Wingwall {Sh(wd.Thickness)} thick outboard of the gutter line, {L(len - ub)} from the backwall face, top {El(wd.TopAtBackwall)} to {El(wd.TopAtEnd)}, bottom {El(wd.BottomAtBackwall)} to {El(bEnd)}", wm));
