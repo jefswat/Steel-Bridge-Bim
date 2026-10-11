@@ -137,8 +137,15 @@ public sealed class DeckPlanReinforcement
     public List<DeckTransverseZone> Transverse { get; set; } = new();
     public List<DeckLongZone> Longitudinal { get; set; } = new();
     public List<DeckPlanBarLine> PlanBarList { get; set; } = new();
-    /// <summary>Clear distance of the longitudinal bar ends from the deck-end line (the plans' covers; 0 = use the deck side cover).</summary>
+    /// <summary>Clear distance of the longitudinal bar ends from the deck-end lines (0 = use the deck side cover).</summary>
     public double LongitudinalEndCover { get; set; }
+    public double LongitudinalBeginCover { get; set; }
+    /// <summary>
+    /// Clear distance of the transverse bar ends from the begin / end deck-end line, normal to the line (0 = the deck side cover). The plans' bars stop short of the
+    /// expansion joint blockout; the value is calibrated on the bar lengths the plans print at the skewed ends (docs/plan-data/deck-rebar.md).
+    /// </summary>
+    public double TransverseBeginClear { get; set; }
+    public double TransverseEndClear { get; set; }
     /// <summary>Relative tolerance used when comparing the model with the plan bar list (counts exactly, weights by this fraction).</summary>
     public double WeightTolerance { get; set; } = 0.03;
     public DeckPlanReinforcement Clone() => new()
@@ -146,6 +153,6 @@ public sealed class DeckPlanReinforcement
         Transverse = Transverse.Select(z => z.Clone()).ToList(),
         Longitudinal = Longitudinal.Select(z => z.Clone()).ToList(),
         PlanBarList = PlanBarList.Select(l => l.Clone()).ToList(),
-        LongitudinalEndCover = LongitudinalEndCover, WeightTolerance = WeightTolerance,
+        LongitudinalEndCover = LongitudinalEndCover, LongitudinalBeginCover = LongitudinalBeginCover, TransverseBeginClear = TransverseBeginClear, TransverseEndClear = TransverseEndClear, WeightTolerance = WeightTolerance,
     };
 }

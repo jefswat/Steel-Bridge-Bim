@@ -744,12 +744,14 @@ public sealed partial class ConcreteGenerator
     }
 
     /// <summary>Clips a plan segment to the deck between the end lines inset by the cover.</summary>
-    private bool ClipToEnds(ref Vec2 p0, ref Vec2 p1, double cover)
+    private bool ClipToEnds(ref Vec2 p0, ref Vec2 p1, double cover) => ClipToEnds(ref p0, ref p1, cover, cover);
+
+    private bool ClipToEnds(ref Vec2 p0, ref Vec2 p1, double coverBegin, double coverEnd)
     {
         var nb = DR.BeginLineDirection.Left;
         var ne = -DR.EndLineDirection.Left;
-        var qb = DR.BeginLinePoint + nb * cover;
-        var qe = DR.EndLinePoint + ne * cover;
+        var qb = DR.BeginLinePoint + nb * coverBegin;
+        var qe = DR.EndLinePoint + ne * coverEnd;
         foreach (var (q, n) in new[] { (qb, nb), (qe, ne) })
         {
             double s0 = Vec2.Dot(p0 - q, n), s1 = Vec2.Dot(p1 - q, n);

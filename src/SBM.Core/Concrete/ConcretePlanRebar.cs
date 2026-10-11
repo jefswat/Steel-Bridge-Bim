@@ -60,10 +60,22 @@ public sealed partial class ConcreteGenerator
     private sealed class EdgePath
     {
         public required Vec2[] P; public required double[] D; public required double[] S;
+        /// <summary>Point of the edge at an alignment distance (also beyond the deck, along the same offset curve).</summary>
+        public required Func<double, Vec2> PointAtD;
         public (Vec2 p, double d) At(double s)
         {
-            if (s <= 0) return (P[0], D[0]);
-            if (s >= S[^1]) return (P[^1], D[^1]);
+            if (s < 0)
+            {
+                double dd = D[0] + s * (D[1] - D[0]) / Math.Max(S[1] - S[0], 1e-9);
+                return (PointAtD(dd), dd);
+            }
+            if (s > S[^1])
+            {
+                int n = S.Length - 1;
+                double dd = D[n] + (s - S[n]) * (D[n] - D[n - 1]) / Math.Max(S[n] - S[n - 1], 1e-9);
+                return (PointAtD(dd), dd);
+            }
+            if (s == 0) return (P[0], D[0]);
             int i = Array.BinarySearch(S, s);
             if (i < 0) i = ~i;
             double f = (s - S[i - 1]) / Math.Max(S[i] - S[i - 1], 1e-12);
@@ -85,7 +97,7 @@ public sealed partial class ConcreteGenerator
             P[i] = _a.PointAtDistance(D[i], off(D[i]));
             if (i > 0) S[i] = S[i - 1] + Vec2.Distance(P[i - 1], P[i]);
         }
-        return new EdgePath { P = P, D = D, S = S };
+        return new EdgePath { P = P, D = D, S = S, PointAtD = d => _a.PointAtDistance(d, off(d)) };
     });
 
     private bool LineAcrossVar(Vec2 a, Vec2 dir, Func<double, double> l, Func<double, double> r, double guess, out Vec2 p0, out Vec2 p1)
@@ -101,8 +113,9 @@ public sealed partial class ConcreteGenerator
 
     private static double SAtD(EdgePath e, double d)
     {
-        if (d <= e.D[0]) return 0;
-        if (d >= e.D[^1]) return e.S[^1];
+        if (d < e.D[0]) return (d - e.D[0]) * (e.S[1] - e.S[0]) / Math.Max(e.D[1] - e.D[0], 1e-9);
+        int n = e.D.Length - 1;
+        if (d > e.D[n]) return e.S[n] + (d - e.D[n]) * (e.S[n] - e.S[n - 1]) / Math.Max(e.D[n] - e.D[n - 1], 1e-9);
         int i = Array.BinarySearch(e.D, d);
         if (i >= 0) return e.S[i];
         i = ~i;
@@ -153,10 +166,10 @@ public sealed partial class ConcreteGenerator
             for (int k = 0; k < z.Count; k++)
             {
                 double sk = s0 + k * z.Spacing;
-                if (sk < -1e-6 || sk > edge.S[^1] + 1e-6) { outside++; continue; }
+                if (sk < -Ft(400) || sk > edge.S[^1] + Ft(400)) { outside++; continue; }
                 list.Add(edge.At(sk).d);
             }
-            if (outside > 0) Warn($"Deck reinforcing, transverse zone {i + 1} ({z.Name}): {outside} of {z.Count} lines lie beyond the {z.Reference.ToString().ToLower()} edge ({_u.FormatLength(edge.S[^1], LengthKind.Long)} long) - not placed.");
+            if (outside > 0) Warn($"Deck reinforcing, transverse zone {i + 1} ({z.Name}): {outside} of {z.Count} lines lie more than 400 ft beyond the {z.Reference.ToString().ToLower()} edge ({_u.FormatLength(edge.S[^1], LengthKind.Long)} long) - not placed.");
             if (list.Count > 0)
                 notes.Add($"Transverse zone {i + 1} ({z.Name}, {z.Layer}): {z.Count} lines, first at {_u.FormatLength(s0, LengthKind.Long)}, last at {_u.FormatLength(s0 + (z.Count - 1) * z.Spacing, LengthKind.Long)} along the {z.Reference.ToString().ToLower()} edge" +
                     (list.Count > 0 && z.Reference == DeckBarSide.Right ? "" : "") + ".");
@@ -184,8 +197,11 @@ public sealed partial class ConcreteGenerator
         var size = RebarCatalog.Size(z.Size);
         double zOff = zT(z.Layer, size.Diameter);
         string loc = $"Deck {(z.Layer == DeckBarLayer.Top ? "top" : "bottom")} transverse";
+        var pl = Deck.Reinforcement.Plan!;
+        double clearB = pl.TransverseBeginClear > 0 ? pl.TransverseBeginClear : cover, clearE = pl.TransverseEndClear > 0 ? pl.TransverseEndClear : cover;
         int missed = 0, shortened = 0;
         var sink = new ConcurrentBag<PlanBar>();
+        var stats = new ConcurrentDictionary<int, (double L, string pieces)>();
         Parallel.For(0, lineD.Count, i =>
         {
             double d = lineD[i];
@@ -193,7 +209,7 @@ public sealed partial class ConcreteGenerator
             var dir = tangent.Right;
             if (z.AngleDegrees != 0) dir = dir.Rotate(z.AngleDegrees * Math.PI / 180);
             var a = _a.PointAtDistance(d);
-            if (!LineAcrossVar(a, dir, x => LeftAtD(x) + cover, x => RightAtD(x) - cover, d, out var p0, out var p1) || !ClipToEnds(ref p0, ref p1, cover))
+            if (!LineAcrossVar(a, dir, x => LeftAtD(x) + cover, x => RightAtD(x) - cover, d, out var p0, out var p1) || !ClipToEnds(ref p0, ref p1, clearB, clearE))
             { Interlocked.Increment(ref missed); return; }
             // reference point must lie on the line (the line is anchored at the reference edge point by construction when AngleDegrees = 0)
             double L = Vec2.Distance(p0, p1);
@@ -204,6 +220,7 @@ public sealed partial class ConcreteGenerator
             var u = fromLeft ? dirLine : -dirLine;
             double cursor = 0;
             bool clipped = false;
+            var desc = new System.Text.StringBuilder();
             for (int k = 0; k < z.Pieces.Count; k++)
             {
                 var pc = z.Pieces[k];
@@ -217,11 +234,20 @@ public sealed partial class ConcreteGenerator
                 if (en - st < In(1)) continue;
                 var pts = SampleBar(o + u * st, o + u * en, zOff);
                 sink.Add(new PlanBar(pc.Mark, size, loc, pc.Length, en - st, pts));
+                desc.Append(desc.Length > 0 ? " + " : "").Append(pc.Mark).Append(' ').Append(_u.FormatLength(en - st, LengthKind.Long));
                 cursor = en - z.Lap;
             }
+            stats[i] = (L, desc.ToString());
             if (clipped) Interlocked.Increment(ref shortened);
         });
         foreach (var b in sink) bag.Add(b);
+        if (stats.Count > 0)
+        {
+            int f = stats.Keys.Min(), l = stats.Keys.Max();
+            lock (_m.Notes)
+                _m.Notes.Add($"  {zn}: {stats.Count} lines; line {f + 1}: {_u.FormatLength(stats[f].L, LengthKind.Long)} = {stats[f].pieces}; line {l + 1}: {_u.FormatLength(stats[l].L, LengthKind.Long)} = {stats[l].pieces}; "
+                           + $"shortest {_u.FormatLength(stats.Values.Min(v => v.L), LengthKind.Long)}, longest {_u.FormatLength(stats.Values.Max(v => v.L), LengthKind.Long)}.");
+        }
         if (missed > 0) Warn($"Deck reinforcing, {zn}: {missed} of {lineD.Count} lines fall outside the deck - not placed.");
         if (shortened > 0) Warn($"Deck reinforcing, {zn}: {shortened} of {lineD.Count} lines are shorter than the listed fixed pieces; the pieces were shortened to the deck (plan marks for such lines are not distinguished).");
     }
@@ -269,7 +295,8 @@ public sealed partial class ConcreteGenerator
         var oR = RefOffset(z.Right, zn);
         if (oL == null || oR == null) return;
         if (z.StockLength <= z.Lap + Ft(1) || z.Mark.Length == 0) { Warn($"Deck reinforcing, {zn}: stock length / lap / mark missing - skipped."); return; }
-        double cover = plan.LongitudinalEndCover > 0 ? plan.LongitudinalEndCover : Deck.Reinforcement.SideCover;
+        double coverE = plan.LongitudinalEndCover > 0 ? plan.LongitudinalEndCover : Deck.Reinforcement.SideCover;
+        double coverB = plan.LongitudinalBeginCover > 0 ? plan.LongitudinalBeginCover : coverE;
         bool begin = double.IsNaN(z.StartStation), end = double.IsNaN(z.EndStation);
         double dS = begin ? 0 : _a.StationToDistance(z.StartStation);
         double dE = end ? 0 : _a.StationToDistance(z.EndStation);
@@ -290,7 +317,7 @@ public sealed partial class ConcreteGenerator
             }
             var layer = z.Alternate && k % 2 == 1 ? (z.FirstLayer == DeckBarLayer.Top ? DeckBarLayer.Bottom : DeckBarLayer.Top) : z.FirstLayer;
             double zOff = layer == DeckBarLayer.Top ? zTop : zBot;
-            var (eb, ee) = EndsVar(off, cover, cover);
+            var (eb, ee) = EndsVar(off, coverB, coverE);
             double d0 = begin ? eb : dS, d1 = end ? ee : dE + z.Lap;
             if (d1 > ee) d1 = ee;
             if (d0 < eb) d0 = eb;
