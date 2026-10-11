@@ -1,0 +1,1490 @@
+bridge,unit,page,table,group,point,value_in,printed,tag
+I80,3,156,slab_deflection,A,1,0,0,VECTOR
+I80,3,156,slab_deflection,A,2,0.8125,13/16,VECTOR
+I80,3,156,slab_deflection,A,3,1.5625,1 9/16,VECTOR
+I80,3,156,slab_deflection,A,4,2.25,2 1/4,VECTOR
+I80,3,156,slab_deflection,A,5,2.75,2 3/4,VECTOR
+I80,3,156,slab_deflection,A,6,3.1875,3 3/16,VECTOR
+I80,3,156,slab_deflection,A,7,3.4375,3 7/16,VECTOR
+I80,3,156,slab_deflection,A,8,3.5625,3 9/16,VECTOR
+I80,3,156,slab_deflection,A,9,3.5,3 1/2,VECTOR
+I80,3,156,slab_deflection,A,10,3.375,3 3/8,VECTOR
+I80,3,156,slab_deflection,A,11,3.0625,3 1/16,VECTOR
+I80,3,156,slab_deflection,A,12,2.625,2 5/8,VECTOR
+I80,3,156,slab_deflection,A,13,2.125,2 1/8,VECTOR
+I80,3,156,slab_deflection,A,14,1.6875,1 11/16,VECTOR
+I80,3,156,slab_deflection,A,15,1.3125,1 5/16,VECTOR
+I80,3,156,slab_deflection,A,16,0.875,7/8,VECTOR
+I80,3,156,slab_deflection,A,17,0.5,1/2,VECTOR
+I80,3,156,slab_deflection,A,18,0.25,1/4,VECTOR
+I80,3,156,slab_deflection,A,19,0,0,VECTOR
+I80,3,156,slab_deflection,A,20,-0.0625,-1/16,VECTOR
+I80,3,156,slab_deflection,A,21,-0.0625,-1/16,VECTOR
+I80,3,156,slab_deflection,A,22,0,0,VECTOR
+I80,3,156,slab_deflection,A,23,0.125,1/8,VECTOR
+I80,3,156,slab_deflection,A,24,0.3125,5/16,VECTOR
+I80,3,156,slab_deflection,A,25,0.5625,9/16,VECTOR
+I80,3,156,slab_deflection,A,26,0.8125,13/16,VECTOR
+I80,3,156,slab_deflection,A,27,1.0625,1 1/16,VECTOR
+I80,3,156,slab_deflection,A,28,1.3125,1 5/16,VECTOR
+I80,3,156,slab_deflection,A,29,1.5,1 1/2,VECTOR
+I80,3,156,slab_deflection,A,30,1.6875,1 11/16,VECTOR
+I80,3,156,slab_deflection,A,31,1.75,1 3/4,VECTOR
+I80,3,156,slab_deflection,A,32,1.6875,1 11/16,VECTOR
+I80,3,156,slab_deflection,A,33,1.625,1 5/8,VECTOR
+I80,3,156,slab_deflection,B,1,0,0,VECTOR
+I80,3,156,slab_deflection,B,2,0.75,3/4,VECTOR
+I80,3,156,slab_deflection,B,3,1.5,1 1/2,VECTOR
+I80,3,156,slab_deflection,B,4,2.125,2 1/8,VECTOR
+I80,3,156,slab_deflection,B,5,2.625,2 5/8,VECTOR
+I80,3,156,slab_deflection,B,6,3,3,VECTOR
+I80,3,156,slab_deflection,B,7,3.25,3 1/4,VECTOR
+I80,3,156,slab_deflection,B,8,3.375,3 3/8,VECTOR
+I80,3,156,slab_deflection,B,9,3.3125,3 5/16,VECTOR
+I80,3,156,slab_deflection,B,10,3.125,3 1/8,VECTOR
+I80,3,156,slab_deflection,B,11,2.875,2 7/8,VECTOR
+I80,3,156,slab_deflection,B,12,2.5,2 1/2,VECTOR
+I80,3,156,slab_deflection,B,13,2.0625,2 1/16,VECTOR
+I80,3,156,slab_deflection,B,14,1.625,1 5/8,VECTOR
+I80,3,156,slab_deflection,B,15,1.1875,1 3/16,VECTOR
+I80,3,156,slab_deflection,B,16,0.8125,13/16,VECTOR
+I80,3,156,slab_deflection,B,17,0.5,1/2,VECTOR
+I80,3,156,slab_deflection,B,18,0.1875,3/16,VECTOR
+I80,3,156,slab_deflection,C,1,0,0,VECTOR
+I80,3,156,slab_deflection,C,2,0.75,3/4,VECTOR
+I80,3,156,slab_deflection,C,3,1.4375,1 7/16,VECTOR
+I80,3,156,slab_deflection,C,4,2,2,VECTOR
+I80,3,156,slab_deflection,C,5,2.5,2 1/2,VECTOR
+I80,3,156,slab_deflection,C,6,2.875,2 7/8,VECTOR
+I80,3,156,slab_deflection,C,7,3.125,3 1/8,VECTOR
+I80,3,156,slab_deflection,C,8,3.1875,3 3/16,VECTOR
+I80,3,156,slab_deflection,C,9,3.125,3 1/8,VECTOR
+I80,3,156,slab_deflection,C,10,2.9375,2 15/16,VECTOR
+I80,3,156,slab_deflection,C,11,2.625,2 5/8,VECTOR
+I80,3,156,slab_deflection,C,12,2.25,2 1/4,VECTOR
+I80,3,156,slab_deflection,C,13,1.8125,1 13/16,VECTOR
+I80,3,156,slab_deflection,C,14,1.4375,1 7/16,VECTOR
+I80,3,156,slab_deflection,C,15,1.0625,1 1/16,VECTOR
+I80,3,156,slab_deflection,C,16,0.75,3/4,VECTOR
+I80,3,156,slab_deflection,C,17,0.4375,7/16,VECTOR
+I80,3,156,slab_deflection,C,18,0.1875,3/16,VECTOR
+I80,3,156,slab_deflection,C,19,0,0,VECTOR
+I80,3,156,slab_deflection,C,20,-0.0625,-1/16,VECTOR
+I80,3,156,slab_deflection,C,21,0,0,VECTOR
+I80,3,156,slab_deflection,C,22,0.0625,1/16,VECTOR
+I80,3,156,slab_deflection,C,23,0.25,1/4,VECTOR
+I80,3,156,slab_deflection,C,24,0.5,1/2,VECTOR
+I80,3,156,slab_deflection,C,25,0.75,3/4,VECTOR
+I80,3,156,slab_deflection,C,26,1,1,VECTOR
+I80,3,156,slab_deflection,C,27,1.25,1 1/4,VECTOR
+I80,3,156,slab_deflection,C,28,1.5,1 1/2,VECTOR
+I80,3,156,slab_deflection,C,29,1.625,1 5/8,VECTOR
+I80,3,156,slab_deflection,C,30,1.75,1 3/4,VECTOR
+I80,3,156,slab_deflection,C,31,1.8125,1 13/16,VECTOR
+I80,3,156,slab_deflection,C,32,1.8125,1 13/16,VECTOR
+I80,3,156,slab_deflection,C,33,1.6875,1 11/16,VECTOR
+I80,3,156,slab_deflection,D,1,0,0,VECTOR
+I80,3,156,slab_deflection,D,2,0.6875,11/16,VECTOR
+I80,3,156,slab_deflection,D,3,1.3125,1 5/16,VECTOR
+I80,3,156,slab_deflection,D,4,1.875,1 7/8,VECTOR
+I80,3,156,slab_deflection,D,5,2.375,2 3/8,VECTOR
+I80,3,156,slab_deflection,D,6,2.6875,2 11/16,VECTOR
+I80,3,156,slab_deflection,D,7,2.9375,2 15/16,VECTOR
+I80,3,156,slab_deflection,D,8,3,3,VECTOR
+I80,3,156,slab_deflection,D,9,3,3,VECTOR
+I80,3,156,slab_deflection,D,10,2.875,2 7/8,VECTOR
+I80,3,156,slab_deflection,D,11,2.5625,2 9/16,VECTOR
+I80,3,156,slab_deflection,D,12,2.25,2 1/4,VECTOR
+I80,3,156,slab_deflection,D,13,1.875,1 7/8,VECTOR
+I80,3,156,slab_deflection,D,14,1.4375,1 7/16,VECTOR
+I80,3,156,slab_deflection,D,15,1.0625,1 1/16,VECTOR
+I80,3,156,slab_deflection,D,16,0.75,3/4,VECTOR
+I80,3,156,slab_deflection,D,17,0.4375,7/16,VECTOR
+I80,3,156,slab_deflection,D,18,0.1875,3/16,VECTOR
+I80,3,156,slab_deflection,D,19,0,0,VECTOR
+I80,3,156,slab_deflection,D,20,0,0,VECTOR
+I80,3,156,slab_deflection,D,21,0.0625,1/16,VECTOR
+I80,3,156,slab_deflection,D,22,0.1875,3/16,VECTOR
+I80,3,156,slab_deflection,D,23,0.4375,7/16,VECTOR
+I80,3,156,slab_deflection,D,24,0.6875,11/16,VECTOR
+I80,3,156,slab_deflection,D,25,1,1,VECTOR
+I80,3,156,slab_deflection,D,26,1.25,1 1/4,VECTOR
+I80,3,156,slab_deflection,D,27,1.4375,1 7/16,VECTOR
+I80,3,156,slab_deflection,D,28,1.625,1 5/8,VECTOR
+I80,3,156,slab_deflection,D,29,1.8125,1 13/16,VECTOR
+I80,3,156,slab_deflection,D,30,1.875,1 7/8,VECTOR
+I80,3,156,slab_deflection,D,31,1.875,1 7/8,VECTOR
+I80,3,156,slab_deflection,D,32,1.875,1 7/8,VECTOR
+I80,3,156,slab_deflection,D,33,1.75,1 3/4,VECTOR
+I80,3,156,slab_deflection,E,1,0,0,VECTOR
+I80,3,156,slab_deflection,E,2,0.6875,11/16,VECTOR
+I80,3,156,slab_deflection,E,3,1.25,1 1/4,VECTOR
+I80,3,156,slab_deflection,E,4,1.8125,1 13/16,VECTOR
+I80,3,156,slab_deflection,E,5,2.25,2 1/4,VECTOR
+I80,3,156,slab_deflection,E,6,2.625,2 5/8,VECTOR
+I80,3,156,slab_deflection,E,7,2.8125,2 13/16,VECTOR
+I80,3,156,slab_deflection,E,8,2.9375,2 15/16,VECTOR
+I80,3,156,slab_deflection,E,9,2.875,2 7/8,VECTOR
+I80,3,156,slab_deflection,E,10,2.75,2 3/4,VECTOR
+I80,3,156,slab_deflection,E,11,2.5,2 1/2,VECTOR
+I80,3,156,slab_deflection,E,12,2.125,2 1/8,VECTOR
+I80,3,156,slab_deflection,E,13,1.75,1 3/4,VECTOR
+I80,3,156,slab_deflection,E,14,1.375,1 3/8,VECTOR
+I80,3,156,slab_deflection,E,15,1,1,VECTOR
+I80,3,156,slab_deflection,E,16,0.6875,11/16,VECTOR
+I80,3,156,slab_deflection,E,17,0.375,3/8,VECTOR
+I80,3,156,slab_deflection,E,18,0.1875,3/16,VECTOR
+I80,3,156,slab_deflection,E,19,0,0,VECTOR
+I80,3,156,slab_deflection,E,20,0,0,VECTOR
+I80,3,156,slab_deflection,E,21,0.0625,1/16,VECTOR
+I80,3,156,slab_deflection,E,22,0.1875,3/16,VECTOR
+I80,3,156,slab_deflection,E,23,0.4375,7/16,VECTOR
+I80,3,156,slab_deflection,E,24,0.6875,11/16,VECTOR
+I80,3,156,slab_deflection,E,25,1,1,VECTOR
+I80,3,156,slab_deflection,E,26,1.25,1 1/4,VECTOR
+I80,3,156,slab_deflection,E,27,1.5,1 1/2,VECTOR
+I80,3,156,slab_deflection,E,28,1.75,1 3/4,VECTOR
+I80,3,156,slab_deflection,E,29,1.875,1 7/8,VECTOR
+I80,3,156,slab_deflection,E,30,2,2,VECTOR
+I80,3,156,slab_deflection,E,31,2,2,VECTOR
+I80,3,156,slab_deflection,E,32,2,2,VECTOR
+I80,3,156,slab_deflection,E,33,1.875,1 7/8,VECTOR
+I80,3,156,slab_deflection,F,1,0,0,VECTOR
+I80,3,156,slab_deflection,F,2,0.625,5/8,VECTOR
+I80,3,156,slab_deflection,F,3,1.25,1 1/4,VECTOR
+I80,3,156,slab_deflection,F,4,1.75,1 3/4,VECTOR
+I80,3,156,slab_deflection,F,5,2.1875,2 3/16,VECTOR
+I80,3,156,slab_deflection,F,6,2.5,2 1/2,VECTOR
+I80,3,156,slab_deflection,F,7,2.75,2 3/4,VECTOR
+I80,3,156,slab_deflection,F,8,2.8125,2 13/16,VECTOR
+I80,3,156,slab_deflection,F,9,2.8125,2 13/16,VECTOR
+I80,3,156,slab_deflection,F,10,2.625,2 5/8,VECTOR
+I80,3,156,slab_deflection,F,11,2.375,2 3/8,VECTOR
+I80,3,156,slab_deflection,F,12,2.0625,2 1/16,VECTOR
+I80,3,156,slab_deflection,F,13,1.6875,1 11/16,VECTOR
+I80,3,156,slab_deflection,F,14,1.3125,1 5/16,VECTOR
+I80,3,156,slab_deflection,F,15,0.9375,15/16,VECTOR
+I80,3,156,slab_deflection,F,16,0.625,5/8,VECTOR
+I80,3,156,slab_deflection,F,17,0.375,3/8,VECTOR
+I80,3,156,slab_deflection,F,18,0.125,1/8,VECTOR
+I80,3,156,slab_deflection,F,19,0,0,VECTOR
+I80,3,156,slab_deflection,F,20,0,0,VECTOR
+I80,3,156,slab_deflection,F,21,0.125,1/8,VECTOR
+I80,3,156,slab_deflection,F,22,0.25,1/4,VECTOR
+I80,3,156,slab_deflection,F,23,0.5,1/2,VECTOR
+I80,3,156,slab_deflection,F,24,0.75,3/4,VECTOR
+I80,3,156,slab_deflection,F,25,1.0625,1 1/16,VECTOR
+I80,3,156,slab_deflection,F,26,1.375,1 3/8,VECTOR
+I80,3,156,slab_deflection,F,27,1.625,1 5/8,VECTOR
+I80,3,156,slab_deflection,F,28,1.8125,1 13/16,VECTOR
+I80,3,156,slab_deflection,F,29,2,2,VECTOR
+I80,3,156,slab_deflection,F,30,2.125,2 1/8,VECTOR
+I80,3,156,slab_deflection,F,31,2.125,2 1/8,VECTOR
+I80,3,156,slab_deflection,F,32,2.0625,2 1/16,VECTOR
+I80,3,156,slab_deflection,F,33,1.9375,1 15/16,VECTOR
+I80,3,156,slab_deflection,G,1,0,0,VECTOR
+I80,3,156,slab_deflection,G,2,0.625,5/8,VECTOR
+I80,3,156,slab_deflection,G,3,1.25,1 1/4,VECTOR
+I80,3,156,slab_deflection,G,4,1.75,1 3/4,VECTOR
+I80,3,156,slab_deflection,G,5,2.1875,2 3/16,VECTOR
+I80,3,156,slab_deflection,G,6,2.5,2 1/2,VECTOR
+I80,3,156,slab_deflection,G,7,2.6875,2 11/16,VECTOR
+I80,3,156,slab_deflection,G,8,2.75,2 3/4,VECTOR
+I80,3,156,slab_deflection,G,9,2.6875,2 11/16,VECTOR
+I80,3,156,slab_deflection,G,10,2.5,2 1/2,VECTOR
+I80,3,156,slab_deflection,G,11,2.25,2 1/4,VECTOR
+I80,3,156,slab_deflection,G,12,1.875,1 7/8,VECTOR
+I80,3,156,slab_deflection,G,13,1.5,1 1/2,VECTOR
+I80,3,156,slab_deflection,G,14,1.125,1 1/8,VECTOR
+I80,3,156,slab_deflection,G,15,0.8125,13/16,VECTOR
+I80,3,156,slab_deflection,G,16,0.5625,9/16,VECTOR
+I80,3,156,slab_deflection,G,17,0.3125,5/16,VECTOR
+I80,3,156,slab_deflection,G,18,0.125,1/8,VECTOR
+I80,3,156,slab_deflection,G,19,0,0,VECTOR
+I80,3,156,slab_deflection,G,20,0,0,VECTOR
+I80,3,156,slab_deflection,G,21,0.125,1/8,VECTOR
+I80,3,156,slab_deflection,G,22,0.3125,5/16,VECTOR
+I80,3,156,slab_deflection,G,23,0.5625,9/16,VECTOR
+I80,3,156,slab_deflection,G,24,0.875,7/8,VECTOR
+I80,3,156,slab_deflection,G,25,1.1875,1 3/16,VECTOR
+I80,3,156,slab_deflection,G,26,1.4375,1 7/16,VECTOR
+I80,3,156,slab_deflection,G,27,1.6875,1 11/16,VECTOR
+I80,3,156,slab_deflection,G,28,1.9375,1 15/16,VECTOR
+I80,3,156,slab_deflection,G,29,2.125,2 1/8,VECTOR
+I80,3,156,slab_deflection,G,30,2.1875,2 3/16,VECTOR
+I80,3,156,slab_deflection,G,31,2.1875,2 3/16,VECTOR
+I80,3,156,slab_deflection,G,32,2.125,2 1/8,VECTOR
+I80,3,156,slab_deflection,G,33,2,2,VECTOR
+I80,3,156,slab_deflection,H,1,0,0,VECTOR
+I80,3,156,slab_deflection,H,2,0.625,5/8,VECTOR
+I80,3,156,slab_deflection,H,3,1.1875,1 3/16,VECTOR
+I80,3,156,slab_deflection,H,4,1.6875,1 11/16,VECTOR
+I80,3,156,slab_deflection,H,5,2.125,2 1/8,VECTOR
+I80,3,156,slab_deflection,H,6,2.4375,2 7/16,VECTOR
+I80,3,156,slab_deflection,H,7,2.6875,2 11/16,VECTOR
+I80,3,156,slab_deflection,H,8,2.75,2 3/4,VECTOR
+I80,3,156,slab_deflection,H,9,2.6875,2 11/16,VECTOR
+I80,3,156,slab_deflection,H,10,2.5625,2 9/16,VECTOR
+I80,3,156,slab_deflection,H,11,2.3125,2 5/16,VECTOR
+I80,3,156,slab_deflection,H,12,2,2,VECTOR
+I80,3,156,slab_deflection,H,13,1.625,1 5/8,VECTOR
+I80,3,156,slab_deflection,H,14,1.25,1 1/4,VECTOR
+I80,3,156,slab_deflection,H,15,0.9375,15/16,VECTOR
+I80,3,156,slab_deflection,H,16,0.625,5/8,VECTOR
+I80,3,156,slab_deflection,H,17,0.3125,5/16,VECTOR
+I80,3,156,slab_deflection,H,18,0.125,1/8,VECTOR
+I80,3,156,slab_deflection,H,19,0,0,VECTOR
+I80,3,156,slab_deflection,H,20,0.0625,1/16,VECTOR
+I80,3,156,slab_deflection,H,21,0.125,1/8,VECTOR
+I80,3,156,slab_deflection,H,22,0.3125,5/16,VECTOR
+I80,3,156,slab_deflection,H,23,0.625,5/8,VECTOR
+I80,3,156,slab_deflection,H,24,0.9375,15/16,VECTOR
+I80,3,156,slab_deflection,H,25,1.25,1 1/4,VECTOR
+I80,3,156,slab_deflection,H,26,1.5625,1 9/16,VECTOR
+I80,3,156,slab_deflection,H,27,1.8125,1 13/16,VECTOR
+I80,3,156,slab_deflection,H,28,2.0625,2 1/16,VECTOR
+I80,3,156,slab_deflection,H,29,2.1875,2 3/16,VECTOR
+I80,3,156,slab_deflection,H,30,2.3125,2 5/16,VECTOR
+I80,3,156,slab_deflection,H,31,2.3125,2 5/16,VECTOR
+I80,3,156,slab_deflection,H,32,2.25,2 1/4,VECTOR
+I80,3,156,slab_deflection,H,33,2.0625,2 1/16,VECTOR
+I80,3,156,slab_deflection,I,1,0,0,VECTOR
+I80,3,156,slab_deflection,I,2,0.625,5/8,VECTOR
+I80,3,156,slab_deflection,I,3,1.1875,1 3/16,VECTOR
+I80,3,156,slab_deflection,I,4,1.75,1 3/4,VECTOR
+I80,3,156,slab_deflection,I,5,2.1875,2 3/16,VECTOR
+I80,3,156,slab_deflection,I,6,2.5,2 1/2,VECTOR
+I80,3,156,slab_deflection,I,7,2.6875,2 11/16,VECTOR
+I80,3,156,slab_deflection,I,8,2.75,2 3/4,VECTOR
+I80,3,156,slab_deflection,I,9,2.75,2 3/4,VECTOR
+I80,3,156,slab_deflection,I,10,2.5625,2 9/16,VECTOR
+I80,3,156,slab_deflection,I,11,2.3125,2 5/16,VECTOR
+I80,3,156,slab_deflection,I,12,2,2,VECTOR
+I80,3,156,slab_deflection,I,13,1.625,1 5/8,VECTOR
+I80,3,156,slab_deflection,I,14,1.25,1 1/4,VECTOR
+I80,3,156,slab_deflection,I,15,0.9375,15/16,VECTOR
+I80,3,156,slab_deflection,I,16,0.625,5/8,VECTOR
+I80,3,156,slab_deflection,I,17,0.3125,5/16,VECTOR
+I80,3,156,slab_deflection,I,18,0.125,1/8,VECTOR
+I80,3,156,slab_deflection,I,19,0,0,VECTOR
+I80,3,156,slab_deflection,I,20,0.0625,1/16,VECTOR
+I80,3,156,slab_deflection,I,21,0.1875,3/16,VECTOR
+I80,3,156,slab_deflection,I,22,0.4375,7/16,VECTOR
+I80,3,156,slab_deflection,I,23,0.75,3/4,VECTOR
+I80,3,156,slab_deflection,I,24,1.0625,1 1/16,VECTOR
+I80,3,156,slab_deflection,I,25,1.4375,1 7/16,VECTOR
+I80,3,156,slab_deflection,I,26,1.75,1 3/4,VECTOR
+I80,3,156,slab_deflection,I,27,2,2,VECTOR
+I80,3,156,slab_deflection,I,28,2.1875,2 3/16,VECTOR
+I80,3,156,slab_deflection,I,29,2.3125,2 5/16,VECTOR
+I80,3,156,slab_deflection,I,30,2.375,2 3/8,VECTOR
+I80,3,156,slab_deflection,I,31,2.375,2 3/8,VECTOR
+I80,3,156,slab_deflection,I,32,2.3125,2 5/16,VECTOR
+I80,3,156,slab_deflection,I,33,2.125,2 1/8,VECTOR
+I80,3,156,slab_deflection,J,1,0,0,VECTOR
+I80,3,156,slab_deflection,J,2,0.6875,11/16,VECTOR
+I80,3,156,slab_deflection,J,3,1.25,1 1/4,VECTOR
+I80,3,156,slab_deflection,J,4,1.8125,1 13/16,VECTOR
+I80,3,156,slab_deflection,J,5,2.25,2 1/4,VECTOR
+I80,3,156,slab_deflection,J,6,2.5625,2 9/16,VECTOR
+I80,3,156,slab_deflection,J,7,2.75,2 3/4,VECTOR
+I80,3,156,slab_deflection,J,8,2.8125,2 13/16,VECTOR
+I80,3,156,slab_deflection,J,9,2.75,2 3/4,VECTOR
+I80,3,156,slab_deflection,J,10,2.625,2 5/8,VECTOR
+I80,3,156,slab_deflection,J,11,2.375,2 3/8,VECTOR
+I80,3,156,slab_deflection,J,12,2,2,VECTOR
+I80,3,156,slab_deflection,J,13,1.625,1 5/8,VECTOR
+I80,3,156,slab_deflection,J,14,1.25,1 1/4,VECTOR
+I80,3,156,slab_deflection,J,15,0.875,7/8,VECTOR
+I80,3,156,slab_deflection,J,16,0.5625,9/16,VECTOR
+I80,3,156,slab_deflection,J,17,0.3125,5/16,VECTOR
+I80,3,156,slab_deflection,J,18,0.125,1/8,VECTOR
+I80,3,156,slab_deflection,J,19,0,0,VECTOR
+I80,3,156,slab_deflection,J,20,0.0625,1/16,VECTOR
+I80,3,156,slab_deflection,J,21,0.1875,3/16,VECTOR
+I80,3,156,slab_deflection,J,22,0.4375,7/16,VECTOR
+I80,3,156,slab_deflection,J,23,0.6875,11/16,VECTOR
+I80,3,156,slab_deflection,J,24,1.0625,1 1/16,VECTOR
+I80,3,156,slab_deflection,J,25,1.4375,1 7/16,VECTOR
+I80,3,156,slab_deflection,J,26,1.75,1 3/4,VECTOR
+I80,3,156,slab_deflection,J,27,2,2,VECTOR
+I80,3,156,slab_deflection,J,28,2.25,2 1/4,VECTOR
+I80,3,156,slab_deflection,J,29,2.4375,2 7/16,VECTOR
+I80,3,156,slab_deflection,J,30,2.5,2 1/2,VECTOR
+I80,3,156,slab_deflection,J,31,2.5,2 1/2,VECTOR
+I80,3,156,slab_deflection,J,32,2.375,2 3/8,VECTOR
+I80,3,156,slab_deflection,J,33,2.25,2 1/4,VECTOR
+I80,3,156,cross_slope_adjustment,"A, D-J",1,0.5,1/2,VECTOR
+I80,3,156,cross_slope_adjustment,"A, D-J",2,0.5,1/2,VECTOR
+I80,3,156,cross_slope_adjustment,"A, D-J",3,0.5,1/2,VECTOR
+I80,3,156,cross_slope_adjustment,"A, D-J",4,0.5,1/2,VECTOR
+I80,3,156,cross_slope_adjustment,"A, D-J",5,0.5,1/2,VECTOR
+I80,3,156,cross_slope_adjustment,"A, D-J",6,0.5,1/2,VECTOR
+I80,3,156,cross_slope_adjustment,"A, D-J",7,0.5,1/2,VECTOR
+I80,3,156,cross_slope_adjustment,"A, D-J",8,0.5,1/2,VECTOR
+I80,3,156,cross_slope_adjustment,"A, D-J",9,0.5,1/2,VECTOR
+I80,3,156,cross_slope_adjustment,"A, D-J",10,0.5,1/2,VECTOR
+I80,3,156,cross_slope_adjustment,"A, D-J",11,0.5,1/2,VECTOR
+I80,3,156,cross_slope_adjustment,"A, D-J",12,0.5,1/2,VECTOR
+I80,3,156,cross_slope_adjustment,"A, D-J",13,0.75,3/4,VECTOR
+I80,3,156,cross_slope_adjustment,"A, D-J",14,0.75,3/4,VECTOR
+I80,3,156,cross_slope_adjustment,"A, D-J",15,0.75,3/4,VECTOR
+I80,3,156,cross_slope_adjustment,"A, D-J",16,0.75,3/4,VECTOR
+I80,3,156,cross_slope_adjustment,"A, D-J",17,0.75,3/4,VECTOR
+I80,3,156,cross_slope_adjustment,"A, D-J",18,0.75,3/4,VECTOR
+I80,3,156,cross_slope_adjustment,"A, D-J",19,0.75,3/4,VECTOR
+I80,3,156,cross_slope_adjustment,"A, D-J",20,0.75,3/4,VECTOR
+I80,3,156,cross_slope_adjustment,"A, D-J",21,0.75,3/4,VECTOR
+I80,3,156,cross_slope_adjustment,"A, D-J",22,0.75,3/4,VECTOR
+I80,3,156,cross_slope_adjustment,"A, D-J",23,0.75,3/4,VECTOR
+I80,3,156,cross_slope_adjustment,"A, D-J",24,0.75,3/4,VECTOR
+I80,3,156,cross_slope_adjustment,"A, D-J",25,0.75,3/4,VECTOR
+I80,3,156,cross_slope_adjustment,"A, D-J",26,0.5,1/2,VECTOR
+I80,3,156,cross_slope_adjustment,"A, D-J",27,0.5,1/2,VECTOR
+I80,3,156,cross_slope_adjustment,"A, D-J",28,0.5,1/2,VECTOR
+I80,3,156,cross_slope_adjustment,"A, D-J",29,0.5,1/2,VECTOR
+I80,3,156,cross_slope_adjustment,"A, D-J",30,0.5,1/2,VECTOR
+I80,3,156,cross_slope_adjustment,"A, D-J",31,0.5,1/2,VECTOR
+I80,3,156,cross_slope_adjustment,"A, D-J",32,0.5,1/2,VECTOR
+I80,3,156,cross_slope_adjustment,"A, D-J",33,0.5,1/2,VECTOR
+I80,3,156,cross_slope_adjustment,B,1,0.5,1/2,VECTOR
+I80,3,156,cross_slope_adjustment,B,2,0.5,1/2,VECTOR
+I80,3,156,cross_slope_adjustment,B,3,0.5,1/2,VECTOR
+I80,3,156,cross_slope_adjustment,B,4,0.5,1/2,VECTOR
+I80,3,156,cross_slope_adjustment,B,5,0.5,1/2,VECTOR
+I80,3,156,cross_slope_adjustment,B,6,0.5,1/2,VECTOR
+I80,3,156,cross_slope_adjustment,B,7,0.5,1/2,VECTOR
+I80,3,156,cross_slope_adjustment,B,8,0.5,1/2,VECTOR
+I80,3,156,cross_slope_adjustment,B,9,0.5,1/2,VECTOR
+I80,3,156,cross_slope_adjustment,B,10,0.5,1/2,VECTOR
+I80,3,156,cross_slope_adjustment,B,11,0.5,1/2,VECTOR
+I80,3,156,cross_slope_adjustment,B,12,0.5,1/2,VECTOR
+I80,3,156,cross_slope_adjustment,B,13,0.75,3/4,VECTOR
+I80,3,156,cross_slope_adjustment,B,14,0.75,3/4,VECTOR
+I80,3,156,cross_slope_adjustment,B,15,0.75,3/4,VECTOR
+I80,3,156,cross_slope_adjustment,B,16,0.75,3/4,VECTOR
+I80,3,156,cross_slope_adjustment,B,17,0.75,3/4,VECTOR
+I80,3,156,cross_slope_adjustment,B,18,0.75,3/4,VECTOR
+I80,3,156,cross_slope_adjustment,C,1,0.5,1/2,VECTOR
+I80,3,156,cross_slope_adjustment,C,2,0.5,1/2,VECTOR
+I80,3,156,cross_slope_adjustment,C,3,0.5,1/2,VECTOR
+I80,3,156,cross_slope_adjustment,C,4,0.5,1/2,VECTOR
+I80,3,156,cross_slope_adjustment,C,5,0.5,1/2,VECTOR
+I80,3,156,cross_slope_adjustment,C,6,0.5,1/2,VECTOR
+I80,3,156,cross_slope_adjustment,C,7,0.5,1/2,VECTOR
+I80,3,156,cross_slope_adjustment,C,8,0.5,1/2,VECTOR
+I80,3,156,cross_slope_adjustment,C,9,0.5,1/2,VECTOR
+I80,3,156,cross_slope_adjustment,C,10,0.5,1/2,VECTOR
+I80,3,156,cross_slope_adjustment,C,11,0.5,1/2,VECTOR
+I80,3,156,cross_slope_adjustment,C,12,0.5,1/2,VECTOR
+I80,3,156,cross_slope_adjustment,C,13,0.75,3/4,VECTOR
+I80,3,156,cross_slope_adjustment,C,14,0.75,3/4,VECTOR
+I80,3,156,cross_slope_adjustment,C,15,0.75,3/4,VECTOR
+I80,3,156,cross_slope_adjustment,C,16,0.75,3/4,VECTOR
+I80,3,156,cross_slope_adjustment,C,17,0.75,3/4,VECTOR
+I80,3,156,cross_slope_adjustment,C,18,0.75,3/4,VECTOR
+I80,3,156,cross_slope_adjustment,C,19,0.75,3/4,VECTOR
+I80,3,156,cross_slope_adjustment,C,20,0.75,3/4,VECTOR
+I80,3,156,cross_slope_adjustment,C,21,0.75,3/4,VECTOR
+I80,3,156,cross_slope_adjustment,C,22,0.75,3/4,VECTOR
+I80,3,156,cross_slope_adjustment,C,23,0.75,3/4,VECTOR
+I80,3,156,cross_slope_adjustment,C,24,0.75,3/4,VECTOR
+I80,3,156,cross_slope_adjustment,C,25,0.75,3/4,VECTOR
+I80,3,156,cross_slope_adjustment,C,26,0.5,1/2,VECTOR
+I80,3,156,cross_slope_adjustment,C,27,0.5,1/2,VECTOR
+I80,3,156,cross_slope_adjustment,C,28,0.5,1/2,VECTOR
+I80,3,156,cross_slope_adjustment,C,29,0.5,1/2,VECTOR
+I80,3,156,cross_slope_adjustment,C,30,0.5,1/2,VECTOR
+I80,3,156,cross_slope_adjustment,C,31,0.5,1/2,VECTOR
+I80,3,156,cross_slope_adjustment,C,32,0.5,1/2,VECTOR
+I80,3,156,cross_slope_adjustment,C,33,0.5,1/2,VECTOR
+I80,3,156,allowable_min,"A, D-J",1,1,1,VECTOR
+I80,3,156,allowable_min,"A, D-J",2,1,1,VECTOR
+I80,3,156,allowable_min,"A, D-J",3,1,1,VECTOR
+I80,3,156,allowable_min,"A, D-J",4,1,1,VECTOR
+I80,3,156,allowable_min,"A, D-J",5,1,1,VECTOR
+I80,3,156,allowable_min,"A, D-J",6,1,1,VECTOR
+I80,3,156,allowable_min,"A, D-J",7,1,1,VECTOR
+I80,3,156,allowable_min,"A, D-J",8,1,1,VECTOR
+I80,3,156,allowable_min,"A, D-J",9,1,1,VECTOR
+I80,3,156,allowable_min,"A, D-J",10,1,1,VECTOR
+I80,3,156,allowable_min,"A, D-J",11,1,1,VECTOR
+I80,3,156,allowable_min,"A, D-J",12,1,1,VECTOR
+I80,3,156,allowable_min,"A, D-J",13,0.25,1/4,VECTOR
+I80,3,156,allowable_min,"A, D-J",14,0.25,1/4,VECTOR
+I80,3,156,allowable_min,"A, D-J",15,0.25,1/4,VECTOR
+I80,3,156,allowable_min,"A, D-J",16,0.25,1/4,VECTOR
+I80,3,156,allowable_min,"A, D-J",17,0.25,1/4,VECTOR
+I80,3,156,allowable_min,"A, D-J",18,0.25,1/4,VECTOR
+I80,3,156,allowable_min,"A, D-J",19,0.25,1/4,VECTOR
+I80,3,156,allowable_min,"A, D-J",20,0.25,1/4,VECTOR
+I80,3,156,allowable_min,"A, D-J",21,0.25,1/4,VECTOR
+I80,3,156,allowable_min,"A, D-J",22,0.25,1/4,VECTOR
+I80,3,156,allowable_min,"A, D-J",23,0.25,1/4,VECTOR
+I80,3,156,allowable_min,"A, D-J",24,0.25,1/4,VECTOR
+I80,3,156,allowable_min,"A, D-J",25,0.25,1/4,VECTOR
+I80,3,156,allowable_min,"A, D-J",26,1,1,VECTOR
+I80,3,156,allowable_min,"A, D-J",27,1,1,VECTOR
+I80,3,156,allowable_min,"A, D-J",28,1,1,VECTOR
+I80,3,156,allowable_min,"A, D-J",29,1,1,VECTOR
+I80,3,156,allowable_min,"A, D-J",30,1,1,VECTOR
+I80,3,156,allowable_min,"A, D-J",31,1,1,VECTOR
+I80,3,156,allowable_min,"A, D-J",32,1,1,VECTOR
+I80,3,156,allowable_min,"A, D-J",33,1,1,VECTOR
+I80,3,156,allowable_max,"A, D-J",1,3.5,3 1/2,VECTOR
+I80,3,156,allowable_max,"A, D-J",2,3.5,3 1/2,VECTOR
+I80,3,156,allowable_max,"A, D-J",3,3.5,3 1/2,VECTOR
+I80,3,156,allowable_max,"A, D-J",4,3.5,3 1/2,VECTOR
+I80,3,156,allowable_max,"A, D-J",5,3.5,3 1/2,VECTOR
+I80,3,156,allowable_max,"A, D-J",6,3.5,3 1/2,VECTOR
+I80,3,156,allowable_max,"A, D-J",7,3.5,3 1/2,VECTOR
+I80,3,156,allowable_max,"A, D-J",8,3.5,3 1/2,VECTOR
+I80,3,156,allowable_max,"A, D-J",9,3.5,3 1/2,VECTOR
+I80,3,156,allowable_max,"A, D-J",10,3.5,3 1/2,VECTOR
+I80,3,156,allowable_max,"A, D-J",11,3.5,3 1/2,VECTOR
+I80,3,156,allowable_max,"A, D-J",12,3.5,3 1/2,VECTOR
+I80,3,156,allowable_max,"A, D-J",13,2.25,2 1/4,VECTOR
+I80,3,156,allowable_max,"A, D-J",14,2.25,2 1/4,VECTOR
+I80,3,156,allowable_max,"A, D-J",15,2.25,2 1/4,VECTOR
+I80,3,156,allowable_max,"A, D-J",16,2.25,2 1/4,VECTOR
+I80,3,156,allowable_max,"A, D-J",17,2.25,2 1/4,VECTOR
+I80,3,156,allowable_max,"A, D-J",18,2.25,2 1/4,VECTOR
+I80,3,156,allowable_max,"A, D-J",19,2.25,2 1/4,VECTOR
+I80,3,156,allowable_max,"A, D-J",20,2.25,2 1/4,VECTOR
+I80,3,156,allowable_max,"A, D-J",21,2.25,2 1/4,VECTOR
+I80,3,156,allowable_max,"A, D-J",22,2.25,2 1/4,VECTOR
+I80,3,156,allowable_max,"A, D-J",23,2.25,2 1/4,VECTOR
+I80,3,156,allowable_max,"A, D-J",24,2.25,2 1/4,VECTOR
+I80,3,156,allowable_max,"A, D-J",25,2.25,2 1/4,VECTOR
+I80,3,156,allowable_max,"A, D-J",26,3.5,3 1/2,VECTOR
+I80,3,156,allowable_max,"A, D-J",27,3.5,3 1/2,VECTOR
+I80,3,156,allowable_max,"A, D-J",28,3.5,3 1/2,VECTOR
+I80,3,156,allowable_max,"A, D-J",29,3.5,3 1/2,VECTOR
+I80,3,156,allowable_max,"A, D-J",30,3.5,3 1/2,VECTOR
+I80,3,156,allowable_max,"A, D-J",31,3.5,3 1/2,VECTOR
+I80,3,156,allowable_max,"A, D-J",32,3.5,3 1/2,VECTOR
+I80,3,156,allowable_max,"A, D-J",33,3.5,3 1/2,VECTOR
+I80,3,156,allowable_min,B,1,1,1,VECTOR
+I80,3,156,allowable_min,B,2,1,1,VECTOR
+I80,3,156,allowable_min,B,3,1,1,VECTOR
+I80,3,156,allowable_min,B,4,1,1,VECTOR
+I80,3,156,allowable_min,B,5,1,1,VECTOR
+I80,3,156,allowable_min,B,6,1,1,VECTOR
+I80,3,156,allowable_min,B,7,1,1,VECTOR
+I80,3,156,allowable_min,B,8,1,1,VECTOR
+I80,3,156,allowable_min,B,9,1,1,VECTOR
+I80,3,156,allowable_min,B,10,1,1,VECTOR
+I80,3,156,allowable_min,B,11,1,1,VECTOR
+I80,3,156,allowable_min,B,12,1,1,VECTOR
+I80,3,156,allowable_min,B,13,0.25,1/4,VECTOR
+I80,3,156,allowable_min,B,14,0.25,1/4,VECTOR
+I80,3,156,allowable_min,B,15,0.25,1/4,VECTOR
+I80,3,156,allowable_min,B,16,0.25,1/4,VECTOR
+I80,3,156,allowable_min,B,17,0.25,1/4,VECTOR
+I80,3,156,allowable_min,B,18,0.25,1/4,VECTOR
+I80,3,156,allowable_max,B,1,3.5,3 1/2,VECTOR
+I80,3,156,allowable_max,B,2,3.5,3 1/2,VECTOR
+I80,3,156,allowable_max,B,3,3.5,3 1/2,VECTOR
+I80,3,156,allowable_max,B,4,3.5,3 1/2,VECTOR
+I80,3,156,allowable_max,B,5,3.5,3 1/2,VECTOR
+I80,3,156,allowable_max,B,6,3.5,3 1/2,VECTOR
+I80,3,156,allowable_max,B,7,3.5,3 1/2,VECTOR
+I80,3,156,allowable_max,B,8,3.5,3 1/2,VECTOR
+I80,3,156,allowable_max,B,9,3.5,3 1/2,VECTOR
+I80,3,156,allowable_max,B,10,3.5,3 1/2,VECTOR
+I80,3,156,allowable_max,B,11,3.5,3 1/2,VECTOR
+I80,3,156,allowable_max,B,12,3.5,3 1/2,VECTOR
+I80,3,156,allowable_max,B,13,2.25,2 1/4,VECTOR
+I80,3,156,allowable_max,B,14,2.25,2 1/4,VECTOR
+I80,3,156,allowable_max,B,15,2.25,2 1/4,VECTOR
+I80,3,156,allowable_max,B,16,2.25,2 1/4,VECTOR
+I80,3,156,allowable_max,B,17,2.25,2 1/4,VECTOR
+I80,3,156,allowable_max,B,18,2.25,2 1/4,VECTOR
+I80,3,156,allowable_min,C,1,1,1,VECTOR
+I80,3,156,allowable_min,C,2,1,1,VECTOR
+I80,3,156,allowable_min,C,3,1,1,VECTOR
+I80,3,156,allowable_min,C,4,1,1,VECTOR
+I80,3,156,allowable_min,C,5,1,1,VECTOR
+I80,3,156,allowable_min,C,6,1,1,VECTOR
+I80,3,156,allowable_min,C,7,1,1,VECTOR
+I80,3,156,allowable_min,C,8,1,1,VECTOR
+I80,3,156,allowable_min,C,9,1,1,VECTOR
+I80,3,156,allowable_min,C,10,1,1,VECTOR
+I80,3,156,allowable_min,C,11,1,1,VECTOR
+I80,3,156,allowable_min,C,12,1,1,VECTOR
+I80,3,156,allowable_min,C,13,0.25,1/4,VECTOR
+I80,3,156,allowable_min,C,14,0.25,1/4,VECTOR
+I80,3,156,allowable_min,C,15,0.25,1/4,VECTOR
+I80,3,156,allowable_min,C,16,0.25,1/4,VECTOR
+I80,3,156,allowable_min,C,17,0.25,1/4,VECTOR
+I80,3,156,allowable_min,C,18,0.25,1/4,VECTOR
+I80,3,156,allowable_min,C,19,0.25,1/4,VECTOR
+I80,3,156,allowable_min,C,20,0.25,1/4,VECTOR
+I80,3,156,allowable_min,C,21,0.25,1/4,VECTOR
+I80,3,156,allowable_min,C,22,0.25,1/4,VECTOR
+I80,3,156,allowable_min,C,23,0.25,1/4,VECTOR
+I80,3,156,allowable_min,C,24,0.25,1/4,VECTOR
+I80,3,156,allowable_min,C,25,0.25,1/4,VECTOR
+I80,3,156,allowable_min,C,26,1,1,VECTOR
+I80,3,156,allowable_min,C,27,1,1,VECTOR
+I80,3,156,allowable_min,C,28,1,1,VECTOR
+I80,3,156,allowable_min,C,29,1,1,VECTOR
+I80,3,156,allowable_min,C,30,1,1,VECTOR
+I80,3,156,allowable_min,C,31,1,1,VECTOR
+I80,3,156,allowable_min,C,32,1,1,VECTOR
+I80,3,156,allowable_min,C,33,1,1,VECTOR
+I80,3,156,allowable_max,C,1,3.5,3 1/2,VECTOR
+I80,3,156,allowable_max,C,2,3.5,3 1/2,VECTOR
+I80,3,156,allowable_max,C,3,3.5,3 1/2,VECTOR
+I80,3,156,allowable_max,C,4,3.5,3 1/2,VECTOR
+I80,3,156,allowable_max,C,5,3.5,3 1/2,VECTOR
+I80,3,156,allowable_max,C,6,3.5,3 1/2,VECTOR
+I80,3,156,allowable_max,C,7,3.5,3 1/2,VECTOR
+I80,3,156,allowable_max,C,8,3.5,3 1/2,VECTOR
+I80,3,156,allowable_max,C,9,3.5,3 1/2,VECTOR
+I80,3,156,allowable_max,C,10,3.5,3 1/2,VECTOR
+I80,3,156,allowable_max,C,11,3.5,3 1/2,VECTOR
+I80,3,156,allowable_max,C,12,3.5,3 1/2,VECTOR
+I80,3,156,allowable_max,C,13,2.25,2 1/4,VECTOR
+I80,3,156,allowable_max,C,14,2.25,2 1/4,VECTOR
+I80,3,156,allowable_max,C,15,2.25,2 1/4,VECTOR
+I80,3,156,allowable_max,C,16,2.25,2 1/4,VECTOR
+I80,3,156,allowable_max,C,17,2.25,2 1/4,VECTOR
+I80,3,156,allowable_max,C,18,2.25,2 1/4,VECTOR
+I80,3,156,allowable_max,C,19,2.25,2 1/4,VECTOR
+I80,3,156,allowable_max,C,20,2.25,2 1/4,VECTOR
+I80,3,156,allowable_max,C,21,2.25,2 1/4,VECTOR
+I80,3,156,allowable_max,C,22,2.25,2 1/4,VECTOR
+I80,3,156,allowable_max,C,23,2.25,2 1/4,VECTOR
+I80,3,156,allowable_max,C,24,2.25,2 1/4,VECTOR
+I80,3,156,allowable_max,C,25,2.25,2 1/4,VECTOR
+I80,3,156,allowable_max,C,26,3.5,3 1/2,VECTOR
+I80,3,156,allowable_max,C,27,3.5,3 1/2,VECTOR
+I80,3,156,allowable_max,C,28,3.5,3 1/2,VECTOR
+I80,3,156,allowable_max,C,29,3.5,3 1/2,VECTOR
+I80,3,156,allowable_max,C,30,3.5,3 1/2,VECTOR
+I80,3,156,allowable_max,C,31,3.5,3 1/2,VECTOR
+I80,3,156,allowable_max,C,32,3.5,3 1/2,VECTOR
+I80,3,156,allowable_max,C,33,3.5,3 1/2,VECTOR
+I80,3,156,slab_deflection,A,34,1.4375,1 7/16,VECTOR
+I80,3,156,slab_deflection,A,35,1.25,1 1/4,VECTOR
+I80,3,156,slab_deflection,A,36,1.0625,1 1/16,VECTOR
+I80,3,156,slab_deflection,A,37,0.8125,13/16,VECTOR
+I80,3,156,slab_deflection,A,38,0.625,5/8,VECTOR
+I80,3,156,slab_deflection,A,39,0.4375,7/16,VECTOR
+I80,3,156,slab_deflection,A,40,0.25,1/4,VECTOR
+I80,3,156,slab_deflection,A,41,0.125,1/8,VECTOR
+I80,3,156,slab_deflection,A,42,0.0625,1/16,VECTOR
+I80,3,156,slab_deflection,A,43,0,0,VECTOR
+I80,3,156,slab_deflection,A,44,0.0625,1/16,VECTOR
+I80,3,156,slab_deflection,A,45,0.1875,3/16,VECTOR
+I80,3,156,slab_deflection,A,46,0.3125,5/16,VECTOR
+I80,3,156,slab_deflection,A,47,0.4375,7/16,VECTOR
+I80,3,156,slab_deflection,A,48,0.6875,11/16,VECTOR
+I80,3,156,slab_deflection,A,49,0.875,7/8,VECTOR
+I80,3,156,slab_deflection,A,50,1.125,1 1/8,VECTOR
+I80,3,156,slab_deflection,A,51,1.375,1 3/8,VECTOR
+I80,3,156,slab_deflection,A,52,1.625,1 5/8,VECTOR
+I80,3,156,slab_deflection,A,53,1.875,1 7/8,VECTOR
+I80,3,156,slab_deflection,A,54,2,2,VECTOR
+I80,3,156,slab_deflection,A,55,2.125,2 1/8,VECTOR
+I80,3,156,slab_deflection,A,56,2.125,2 1/8,VECTOR
+I80,3,156,slab_deflection,A,57,2,2,VECTOR
+I80,3,156,slab_deflection,A,58,1.8125,1 13/16,VECTOR
+I80,3,156,slab_deflection,A,59,1.625,1 5/8,VECTOR
+I80,3,156,slab_deflection,A,60,1.3125,1 5/16,VECTOR
+I80,3,156,slab_deflection,A,61,1,1,VECTOR
+I80,3,156,slab_deflection,A,62,0.75,3/4,VECTOR
+I80,3,156,slab_deflection,A,63,0.5625,9/16,VECTOR
+I80,3,156,slab_deflection,A,64,0.375,3/8,VECTOR
+I80,3,156,slab_deflection,A,65,0.1875,3/16,VECTOR
+I80,3,156,slab_deflection,A,66,0.0625,1/16,VECTOR
+I80,3,156,slab_deflection,C,34,1.5,1 1/2,VECTOR
+I80,3,156,slab_deflection,C,35,1.3125,1 5/16,VECTOR
+I80,3,156,slab_deflection,C,36,1.125,1 1/8,VECTOR
+I80,3,156,slab_deflection,C,37,0.875,7/8,VECTOR
+I80,3,156,slab_deflection,C,38,0.6875,11/16,VECTOR
+I80,3,156,slab_deflection,C,39,0.4375,7/16,VECTOR
+I80,3,156,slab_deflection,C,40,0.3125,5/16,VECTOR
+I80,3,156,slab_deflection,C,41,0.125,1/8,VECTOR
+I80,3,156,slab_deflection,C,42,0.0625,1/16,VECTOR
+I80,3,156,slab_deflection,D,34,1.5625,1 9/16,VECTOR
+I80,3,156,slab_deflection,D,35,1.375,1 3/8,VECTOR
+I80,3,156,slab_deflection,D,36,1.1875,1 3/16,VECTOR
+I80,3,156,slab_deflection,D,37,0.9375,15/16,VECTOR
+I80,3,156,slab_deflection,D,38,0.6875,11/16,VECTOR
+I80,3,156,slab_deflection,D,39,0.5,1/2,VECTOR
+I80,3,156,slab_deflection,D,40,0.3125,5/16,VECTOR
+I80,3,156,slab_deflection,D,41,0.1875,3/16,VECTOR
+I80,3,156,slab_deflection,D,42,0.0625,1/16,VECTOR
+I80,3,156,slab_deflection,D,43,0,0,VECTOR
+I80,3,156,slab_deflection,D,44,0.0625,1/16,VECTOR
+I80,3,156,slab_deflection,D,45,0.125,1/8,VECTOR
+I80,3,156,slab_deflection,D,46,0.3125,5/16,VECTOR
+I80,3,156,slab_deflection,D,47,0.4375,7/16,VECTOR
+I80,3,156,slab_deflection,D,48,0.6875,11/16,VECTOR
+I80,3,156,slab_deflection,D,49,0.875,7/8,VECTOR
+I80,3,156,slab_deflection,D,50,1.125,1 1/8,VECTOR
+I80,3,156,slab_deflection,D,51,1.375,1 3/8,VECTOR
+I80,3,156,slab_deflection,D,52,1.6875,1 11/16,VECTOR
+I80,3,156,slab_deflection,D,53,1.875,1 7/8,VECTOR
+I80,3,156,slab_deflection,D,54,2.0625,2 1/16,VECTOR
+I80,3,156,slab_deflection,D,55,2.1875,2 3/16,VECTOR
+I80,3,156,slab_deflection,D,56,2.1875,2 3/16,VECTOR
+I80,3,156,slab_deflection,D,57,2.0625,2 1/16,VECTOR
+I80,3,156,slab_deflection,D,58,1.9375,1 15/16,VECTOR
+I80,3,156,slab_deflection,D,59,1.6875,1 11/16,VECTOR
+I80,3,156,slab_deflection,D,60,1.375,1 3/8,VECTOR
+I80,3,156,slab_deflection,D,61,1.0625,1 1/16,VECTOR
+I80,3,156,slab_deflection,D,62,0.8125,13/16,VECTOR
+I80,3,156,slab_deflection,D,63,0.5625,9/16,VECTOR
+I80,3,156,slab_deflection,D,64,0.375,3/8,VECTOR
+I80,3,156,slab_deflection,D,65,0.1875,3/16,VECTOR
+I80,3,156,slab_deflection,D,66,0.0625,1/16,VECTOR
+I80,3,156,slab_deflection,E,34,1.6875,1 11/16,VECTOR
+I80,3,156,slab_deflection,E,35,1.4375,1 7/16,VECTOR
+I80,3,156,slab_deflection,E,36,1.25,1 1/4,VECTOR
+I80,3,156,slab_deflection,E,37,1,1,VECTOR
+I80,3,156,slab_deflection,E,38,0.75,3/4,VECTOR
+I80,3,156,slab_deflection,E,39,0.5,1/2,VECTOR
+I80,3,156,slab_deflection,E,40,0.3125,5/16,VECTOR
+I80,3,156,slab_deflection,E,41,0.1875,3/16,VECTOR
+I80,3,156,slab_deflection,E,42,0.0625,1/16,VECTOR
+I80,3,156,slab_deflection,E,43,0,0,VECTOR
+I80,3,156,slab_deflection,E,44,0.0625,1/16,VECTOR
+I80,3,156,slab_deflection,E,45,0.1875,3/16,VECTOR
+I80,3,156,slab_deflection,E,46,0.3125,5/16,VECTOR
+I80,3,156,slab_deflection,E,47,0.5,1/2,VECTOR
+I80,3,156,slab_deflection,E,48,0.6875,11/16,VECTOR
+I80,3,156,slab_deflection,E,49,0.9375,15/16,VECTOR
+I80,3,156,slab_deflection,E,50,1.1875,1 3/16,VECTOR
+I80,3,156,slab_deflection,E,51,1.4375,1 7/16,VECTOR
+I80,3,156,slab_deflection,E,52,1.75,1 3/4,VECTOR
+I80,3,156,slab_deflection,E,53,2,2,VECTOR
+I80,3,156,slab_deflection,E,54,2.1875,2 3/16,VECTOR
+I80,3,156,slab_deflection,E,55,2.3125,2 5/16,VECTOR
+I80,3,156,slab_deflection,E,56,2.3125,2 5/16,VECTOR
+I80,3,156,slab_deflection,E,57,2.25,2 1/4,VECTOR
+I80,3,156,slab_deflection,E,58,2.0625,2 1/16,VECTOR
+I80,3,156,slab_deflection,E,59,1.8125,1 13/16,VECTOR
+I80,3,156,slab_deflection,E,60,1.5,1 1/2,VECTOR
+I80,3,156,slab_deflection,E,61,1.1875,1 3/16,VECTOR
+I80,3,156,slab_deflection,E,62,0.875,7/8,VECTOR
+I80,3,156,slab_deflection,E,63,0.625,5/8,VECTOR
+I80,3,156,slab_deflection,E,64,0.375,3/8,VECTOR
+I80,3,156,slab_deflection,E,65,0.1875,3/16,VECTOR
+I80,3,156,slab_deflection,E,66,0.0625,1/16,VECTOR
+I80,3,156,slab_deflection,F,34,1.75,1 3/4,VECTOR
+I80,3,156,slab_deflection,F,35,1.5,1 1/2,VECTOR
+I80,3,156,slab_deflection,F,36,1.25,1 1/4,VECTOR
+I80,3,156,slab_deflection,F,37,1,1,VECTOR
+I80,3,156,slab_deflection,F,38,0.75,3/4,VECTOR
+I80,3,156,slab_deflection,F,39,0.5625,9/16,VECTOR
+I80,3,156,slab_deflection,F,40,0.3125,5/16,VECTOR
+I80,3,156,slab_deflection,F,41,0.1875,3/16,VECTOR
+I80,3,156,slab_deflection,F,42,0.0625,1/16,VECTOR
+I80,3,156,slab_deflection,F,43,0,0,VECTOR
+I80,3,156,slab_deflection,F,44,0.0625,1/16,VECTOR
+I80,3,156,slab_deflection,F,45,0.1875,3/16,VECTOR
+I80,3,156,slab_deflection,F,46,0.3125,5/16,VECTOR
+I80,3,156,slab_deflection,F,47,0.5,1/2,VECTOR
+I80,3,156,slab_deflection,F,48,0.6875,11/16,VECTOR
+I80,3,156,slab_deflection,F,49,0.9375,15/16,VECTOR
+I80,3,156,slab_deflection,F,50,1.1875,1 3/16,VECTOR
+I80,3,156,slab_deflection,F,51,1.4375,1 7/16,VECTOR
+I80,3,156,slab_deflection,F,52,1.75,1 3/4,VECTOR
+I80,3,156,slab_deflection,F,53,2.0625,2 1/16,VECTOR
+I80,3,156,slab_deflection,F,54,2.25,2 1/4,VECTOR
+I80,3,156,slab_deflection,F,55,2.375,2 3/8,VECTOR
+I80,3,156,slab_deflection,F,56,2.4375,2 7/16,VECTOR
+I80,3,156,slab_deflection,F,57,2.375,2 3/8,VECTOR
+I80,3,156,slab_deflection,F,58,2.1875,2 3/16,VECTOR
+I80,3,156,slab_deflection,F,59,1.9375,1 15/16,VECTOR
+I80,3,156,slab_deflection,F,60,1.625,1 5/8,VECTOR
+I80,3,156,slab_deflection,F,61,1.25,1 1/4,VECTOR
+I80,3,156,slab_deflection,F,62,0.9375,15/16,VECTOR
+I80,3,156,slab_deflection,F,63,0.6875,11/16,VECTOR
+I80,3,156,slab_deflection,F,64,0.4375,7/16,VECTOR
+I80,3,156,slab_deflection,F,65,0.25,1/4,VECTOR
+I80,3,156,slab_deflection,F,66,0.0625,1/16,VECTOR
+I80,3,156,slab_deflection,G,34,1.8125,1 13/16,VECTOR
+I80,3,156,slab_deflection,G,35,1.5625,1 9/16,VECTOR
+I80,3,156,slab_deflection,G,36,1.3125,1 5/16,VECTOR
+I80,3,156,slab_deflection,G,37,1.0625,1 1/16,VECTOR
+I80,3,156,slab_deflection,G,38,0.8125,13/16,VECTOR
+I80,3,156,slab_deflection,G,39,0.5625,9/16,VECTOR
+I80,3,156,slab_deflection,G,40,0.3125,5/16,VECTOR
+I80,3,156,slab_deflection,G,41,0.1875,3/16,VECTOR
+I80,3,156,slab_deflection,G,42,0.0625,1/16,VECTOR
+I80,3,156,slab_deflection,G,43,0,0,VECTOR
+I80,3,156,slab_deflection,G,44,0.0625,1/16,VECTOR
+I80,3,156,slab_deflection,G,45,0.1875,3/16,VECTOR
+I80,3,156,slab_deflection,G,46,0.3125,5/16,VECTOR
+I80,3,156,slab_deflection,G,47,0.5,1/2,VECTOR
+I80,3,156,slab_deflection,G,48,0.6875,11/16,VECTOR
+I80,3,156,slab_deflection,G,49,0.9375,15/16,VECTOR
+I80,3,156,slab_deflection,G,50,1.1875,1 3/16,VECTOR
+I80,3,156,slab_deflection,G,51,1.4375,1 7/16,VECTOR
+I80,3,156,slab_deflection,G,52,1.8125,1 13/16,VECTOR
+I80,3,156,slab_deflection,G,53,2.125,2 1/8,VECTOR
+I80,3,156,slab_deflection,G,54,2.3125,2 5/16,VECTOR
+I80,3,156,slab_deflection,G,55,2.5,2 1/2,VECTOR
+I80,3,156,slab_deflection,G,56,2.5,2 1/2,VECTOR
+I80,3,156,slab_deflection,G,57,2.4375,2 7/16,VECTOR
+I80,3,156,slab_deflection,G,58,2.3125,2 5/16,VECTOR
+I80,3,156,slab_deflection,G,59,2,2,VECTOR
+I80,3,156,slab_deflection,G,60,1.6875,1 11/16,VECTOR
+I80,3,156,slab_deflection,G,61,1.3125,1 5/16,VECTOR
+I80,3,156,slab_deflection,G,62,1,1,VECTOR
+I80,3,156,slab_deflection,G,63,0.6875,11/16,VECTOR
+I80,3,156,slab_deflection,G,64,0.4375,7/16,VECTOR
+I80,3,156,slab_deflection,G,65,0.25,1/4,VECTOR
+I80,3,156,slab_deflection,G,66,0.0625,1/16,VECTOR
+I80,3,156,slab_deflection,H,34,1.875,1 7/8,VECTOR
+I80,3,156,slab_deflection,H,35,1.625,1 5/8,VECTOR
+I80,3,156,slab_deflection,H,36,1.375,1 3/8,VECTOR
+I80,3,156,slab_deflection,H,37,1.0625,1 1/16,VECTOR
+I80,3,156,slab_deflection,H,38,0.8125,13/16,VECTOR
+I80,3,156,slab_deflection,H,39,0.5625,9/16,VECTOR
+I80,3,156,slab_deflection,H,40,0.375,3/8,VECTOR
+I80,3,156,slab_deflection,H,41,0.1875,3/16,VECTOR
+I80,3,156,slab_deflection,H,42,0.0625,1/16,VECTOR
+I80,3,156,slab_deflection,H,43,0,0,VECTOR
+I80,3,156,slab_deflection,H,44,0.0625,1/16,VECTOR
+I80,3,156,slab_deflection,H,45,0.1875,3/16,VECTOR
+I80,3,156,slab_deflection,H,46,0.3125,5/16,VECTOR
+I80,3,156,slab_deflection,H,47,0.5,1/2,VECTOR
+I80,3,156,slab_deflection,H,48,0.6875,11/16,VECTOR
+I80,3,156,slab_deflection,H,49,0.9375,15/16,VECTOR
+I80,3,156,slab_deflection,H,50,1.1875,1 3/16,VECTOR
+I80,3,156,slab_deflection,H,51,1.4375,1 7/16,VECTOR
+I80,3,156,slab_deflection,H,52,1.8125,1 13/16,VECTOR
+I80,3,156,slab_deflection,H,53,2.125,2 1/8,VECTOR
+I80,3,156,slab_deflection,H,54,2.375,2 3/8,VECTOR
+I80,3,156,slab_deflection,H,55,2.5625,2 9/16,VECTOR
+I80,3,156,slab_deflection,H,56,2.625,2 5/8,VECTOR
+I80,3,156,slab_deflection,H,57,2.5625,2 9/16,VECTOR
+I80,3,156,slab_deflection,H,58,2.375,2 3/8,VECTOR
+I80,3,156,slab_deflection,H,59,2.125,2 1/8,VECTOR
+I80,3,156,slab_deflection,H,60,1.8125,1 13/16,VECTOR
+I80,3,156,slab_deflection,H,61,1.4375,1 7/16,VECTOR
+I80,3,156,slab_deflection,H,62,1.0625,1 1/16,VECTOR
+I80,3,156,slab_deflection,H,63,0.75,3/4,VECTOR
+I80,3,156,slab_deflection,H,64,0.5,1/2,VECTOR
+I80,3,156,slab_deflection,H,65,0.25,1/4,VECTOR
+I80,3,156,slab_deflection,H,66,0.0625,1/16,VECTOR
+I80,3,156,slab_deflection,I,34,1.9375,1 15/16,VECTOR
+I80,3,156,slab_deflection,I,35,1.6875,1 11/16,VECTOR
+I80,3,156,slab_deflection,I,36,1.375,1 3/8,VECTOR
+I80,3,156,slab_deflection,I,37,1.125,1 1/8,VECTOR
+I80,3,156,slab_deflection,I,38,0.8125,13/16,VECTOR
+I80,3,156,slab_deflection,I,39,0.5625,9/16,VECTOR
+I80,3,156,slab_deflection,I,40,0.375,3/8,VECTOR
+I80,3,156,slab_deflection,I,41,0.1875,3/16,VECTOR
+I80,3,156,slab_deflection,I,42,0.0625,1/16,VECTOR
+I80,3,156,slab_deflection,I,43,0,0,VECTOR
+I80,3,156,slab_deflection,I,44,0.0625,1/16,VECTOR
+I80,3,156,slab_deflection,I,45,0.1875,3/16,VECTOR
+I80,3,156,slab_deflection,I,46,0.3125,5/16,VECTOR
+I80,3,156,slab_deflection,I,47,0.5,1/2,VECTOR
+I80,3,156,slab_deflection,I,48,0.6875,11/16,VECTOR
+I80,3,156,slab_deflection,I,49,0.9375,15/16,VECTOR
+I80,3,156,slab_deflection,I,50,1.125,1 1/8,VECTOR
+I80,3,156,slab_deflection,I,51,1.375,1 3/8,VECTOR
+I80,3,156,slab_deflection,I,52,1.8125,1 13/16,VECTOR
+I80,3,156,slab_deflection,I,53,2.125,2 1/8,VECTOR
+I80,3,156,slab_deflection,I,54,2.4375,2 7/16,VECTOR
+I80,3,156,slab_deflection,I,55,2.625,2 5/8,VECTOR
+I80,3,156,slab_deflection,I,56,2.6875,2 11/16,VECTOR
+I80,3,156,slab_deflection,I,57,2.625,2 5/8,VECTOR
+I80,3,156,slab_deflection,I,58,2.5,2 1/2,VECTOR
+I80,3,156,slab_deflection,I,59,2.25,2 1/4,VECTOR
+I80,3,156,slab_deflection,I,60,1.875,1 7/8,VECTOR
+I80,3,156,slab_deflection,I,61,1.5,1 1/2,VECTOR
+I80,3,156,slab_deflection,I,62,1.125,1 1/8,VECTOR
+I80,3,156,slab_deflection,I,63,0.8125,13/16,VECTOR
+I80,3,156,slab_deflection,I,64,0.5,1/2,VECTOR
+I80,3,156,slab_deflection,I,65,0.25,1/4,VECTOR
+I80,3,156,slab_deflection,I,66,0.125,1/8,VECTOR
+I80,3,156,slab_deflection,J,34,2,2,VECTOR
+I80,3,156,slab_deflection,J,35,1.6875,1 11/16,VECTOR
+I80,3,156,slab_deflection,J,36,1.4375,1 7/16,VECTOR
+I80,3,156,slab_deflection,J,37,1.125,1 1/8,VECTOR
+I80,3,156,slab_deflection,J,38,0.8125,13/16,VECTOR
+I80,3,156,slab_deflection,J,39,0.5625,9/16,VECTOR
+I80,3,156,slab_deflection,J,40,0.375,3/8,VECTOR
+I80,3,156,slab_deflection,J,41,0.1875,3/16,VECTOR
+I80,3,156,slab_deflection,J,42,0.0625,1/16,VECTOR
+I80,3,156,slab_deflection,J,43,0,0,VECTOR
+I80,3,156,slab_deflection,J,44,0.0625,1/16,VECTOR
+I80,3,156,slab_deflection,J,45,0.1875,3/16,VECTOR
+I80,3,156,slab_deflection,J,46,0.3125,5/16,VECTOR
+I80,3,156,slab_deflection,J,47,0.5,1/2,VECTOR
+I80,3,156,slab_deflection,J,48,0.6875,11/16,VECTOR
+I80,3,156,slab_deflection,J,49,0.875,7/8,VECTOR
+I80,3,156,slab_deflection,J,50,1.125,1 1/8,VECTOR
+I80,3,156,slab_deflection,J,51,1.375,1 3/8,VECTOR
+I80,3,156,slab_deflection,J,52,1.8125,1 13/16,VECTOR
+I80,3,156,slab_deflection,J,53,2.1875,2 3/16,VECTOR
+I80,3,156,slab_deflection,J,54,2.5,2 1/2,VECTOR
+I80,3,156,slab_deflection,J,55,2.6875,2 11/16,VECTOR
+I80,3,156,slab_deflection,J,56,2.8125,2 13/16,VECTOR
+I80,3,156,slab_deflection,J,57,2.75,2 3/4,VECTOR
+I80,3,156,slab_deflection,J,58,2.625,2 5/8,VECTOR
+I80,3,156,slab_deflection,J,59,2.375,2 3/8,VECTOR
+I80,3,156,slab_deflection,J,60,2,2,VECTOR
+I80,3,156,slab_deflection,J,61,1.5625,1 9/16,VECTOR
+I80,3,156,slab_deflection,J,62,1.1875,1 3/16,VECTOR
+I80,3,156,slab_deflection,J,63,0.8125,13/16,VECTOR
+I80,3,156,slab_deflection,J,64,0.5,1/2,VECTOR
+I80,3,156,slab_deflection,J,65,0.25,1/4,VECTOR
+I80,3,156,slab_deflection,J,66,0.125,1/8,VECTOR
+I80,3,156,cross_slope_adjustment,"A, D-J",34,0.5,1/2,VECTOR
+I80,3,156,cross_slope_adjustment,"A, D-J",35,0.75,3/4,VECTOR
+I80,3,156,cross_slope_adjustment,"A, D-J",36,0.75,3/4,VECTOR
+I80,3,156,cross_slope_adjustment,"A, D-J",37,0.75,3/4,VECTOR
+I80,3,156,cross_slope_adjustment,"A, D-J",38,0.75,3/4,VECTOR
+I80,3,156,cross_slope_adjustment,"A, D-J",39,0.75,3/4,VECTOR
+I80,3,156,cross_slope_adjustment,"A, D-J",40,0.75,3/4,VECTOR
+I80,3,156,cross_slope_adjustment,"A, D-J",41,0.75,3/4,VECTOR
+I80,3,156,cross_slope_adjustment,"A, D-J",42,0.75,3/4,VECTOR
+I80,3,156,cross_slope_adjustment,"A, D-J",43,0.75,3/4,VECTOR
+I80,3,156,cross_slope_adjustment,"A, D-J",44,0.75,3/4,VECTOR
+I80,3,156,cross_slope_adjustment,"A, D-J",45,0.75,3/4,VECTOR
+I80,3,156,cross_slope_adjustment,"A, D-J",46,0.75,3/4,VECTOR
+I80,3,156,cross_slope_adjustment,"A, D-J",47,0.75,3/4,VECTOR
+I80,3,156,cross_slope_adjustment,"A, D-J",48,0.75,3/4,VECTOR
+I80,3,156,cross_slope_adjustment,"A, D-J",49,0.75,3/4,VECTOR
+I80,3,156,cross_slope_adjustment,"A, D-J",50,0.75,3/4,VECTOR
+I80,3,156,cross_slope_adjustment,"A, D-J",51,0.75,3/4,VECTOR
+I80,3,156,cross_slope_adjustment,"A, D-J",52,0.5,1/2,VECTOR
+I80,3,156,cross_slope_adjustment,"A, D-J",53,0.5,1/2,VECTOR
+I80,3,156,cross_slope_adjustment,"A, D-J",54,0.5,1/2,VECTOR
+I80,3,156,cross_slope_adjustment,"A, D-J",55,0.5,1/2,VECTOR
+I80,3,156,cross_slope_adjustment,"A, D-J",56,0.5,1/2,VECTOR
+I80,3,156,cross_slope_adjustment,"A, D-J",57,0.5,1/2,VECTOR
+I80,3,156,cross_slope_adjustment,"A, D-J",58,0.5,1/2,VECTOR
+I80,3,156,cross_slope_adjustment,"A, D-J",59,0.5,1/2,VECTOR
+I80,3,156,cross_slope_adjustment,"A, D-J",60,0.5,1/2,VECTOR
+I80,3,156,cross_slope_adjustment,"A, D-J",61,0.75,3/4,VECTOR
+I80,3,156,cross_slope_adjustment,"A, D-J",62,0.75,3/4,VECTOR
+I80,3,156,cross_slope_adjustment,"A, D-J",63,0.75,3/4,VECTOR
+I80,3,156,cross_slope_adjustment,"A, D-J",64,0.75,3/4,VECTOR
+I80,3,156,cross_slope_adjustment,"A, D-J",65,0.75,3/4,VECTOR
+I80,3,156,cross_slope_adjustment,"A, D-J",66,0.75,3/4,VECTOR
+I80,3,156,cross_slope_adjustment,C,34,0.5,1/2,VECTOR
+I80,3,156,cross_slope_adjustment,C,35,0.75,3/4,VECTOR
+I80,3,156,cross_slope_adjustment,C,36,0.75,3/4,VECTOR
+I80,3,156,cross_slope_adjustment,C,37,0.75,3/4,VECTOR
+I80,3,156,cross_slope_adjustment,C,38,0.75,3/4,VECTOR
+I80,3,156,cross_slope_adjustment,C,39,0.75,3/4,VECTOR
+I80,3,156,cross_slope_adjustment,C,40,0.75,3/4,VECTOR
+I80,3,156,cross_slope_adjustment,C,41,0.75,3/4,VECTOR
+I80,3,156,cross_slope_adjustment,C,42,0.75,3/4,VECTOR
+I80,3,156,allowable_min,"A, D-J",34,1,1,VECTOR
+I80,3,156,allowable_min,"A, D-J",35,0.25,1/4,VECTOR
+I80,3,156,allowable_min,"A, D-J",36,0.25,1/4,VECTOR
+I80,3,156,allowable_min,"A, D-J",37,0.25,1/4,VECTOR
+I80,3,156,allowable_min,"A, D-J",38,0.25,1/4,VECTOR
+I80,3,156,allowable_min,"A, D-J",39,0.25,1/4,VECTOR
+I80,3,156,allowable_min,"A, D-J",40,0.25,1/4,VECTOR
+I80,3,156,allowable_min,"A, D-J",41,0.25,1/4,VECTOR
+I80,3,156,allowable_min,"A, D-J",42,0.25,1/4,VECTOR
+I80,3,156,allowable_min,"A, D-J",43,0.25,1/4,VECTOR
+I80,3,156,allowable_min,"A, D-J",44,0.25,1/4,VECTOR
+I80,3,156,allowable_min,"A, D-J",45,0.25,1/4,VECTOR
+I80,3,156,allowable_min,"A, D-J",46,0.25,1/4,VECTOR
+I80,3,156,allowable_min,"A, D-J",47,0.25,1/4,VECTOR
+I80,3,156,allowable_min,"A, D-J",48,0.25,1/4,VECTOR
+I80,3,156,allowable_min,"A, D-J",49,0.25,1/4,VECTOR
+I80,3,156,allowable_min,"A, D-J",50,0.25,1/4,VECTOR
+I80,3,156,allowable_min,"A, D-J",51,0.25,1/4,VECTOR
+I80,3,156,allowable_min,"A, D-J",52,1,1,VECTOR
+I80,3,156,allowable_min,"A, D-J",53,1,1,VECTOR
+I80,3,156,allowable_min,"A, D-J",54,1,1,VECTOR
+I80,3,156,allowable_min,"A, D-J",55,1,1,VECTOR
+I80,3,156,allowable_min,"A, D-J",56,1,1,VECTOR
+I80,3,156,allowable_min,"A, D-J",57,1,1,VECTOR
+I80,3,156,allowable_min,"A, D-J",58,1,1,VECTOR
+I80,3,156,allowable_min,"A, D-J",59,1,1,VECTOR
+I80,3,156,allowable_min,"A, D-J",60,1,1,VECTOR
+I80,3,156,allowable_min,"A, D-J",61,0.25,1/4,VECTOR
+I80,3,156,allowable_min,"A, D-J",62,0.25,1/4,VECTOR
+I80,3,156,allowable_min,"A, D-J",63,0.25,1/4,VECTOR
+I80,3,156,allowable_min,"A, D-J",64,0.25,1/4,VECTOR
+I80,3,156,allowable_min,"A, D-J",65,0.25,1/4,VECTOR
+I80,3,156,allowable_min,"A, D-J",66,0.25,1/4,VECTOR
+I80,3,156,allowable_max,"A, D-J",34,3.5,3 1/2,VECTOR
+I80,3,156,allowable_max,"A, D-J",35,2.25,2 1/4,VECTOR
+I80,3,156,allowable_max,"A, D-J",36,2.25,2 1/4,VECTOR
+I80,3,156,allowable_max,"A, D-J",37,2.25,2 1/4,VECTOR
+I80,3,156,allowable_max,"A, D-J",38,2.25,2 1/4,VECTOR
+I80,3,156,allowable_max,"A, D-J",39,2.25,2 1/4,VECTOR
+I80,3,156,allowable_max,"A, D-J",40,2.25,2 1/4,VECTOR
+I80,3,156,allowable_max,"A, D-J",41,2.25,2 1/4,VECTOR
+I80,3,156,allowable_max,"A, D-J",42,2.25,2 1/4,VECTOR
+I80,3,156,allowable_max,"A, D-J",43,2.25,2 1/4,VECTOR
+I80,3,156,allowable_max,"A, D-J",44,2.25,2 1/4,VECTOR
+I80,3,156,allowable_max,"A, D-J",45,2.25,2 1/4,VECTOR
+I80,3,156,allowable_max,"A, D-J",46,2.25,2 1/4,VECTOR
+I80,3,156,allowable_max,"A, D-J",47,2.25,2 1/4,VECTOR
+I80,3,156,allowable_max,"A, D-J",48,2.25,2 1/4,VECTOR
+I80,3,156,allowable_max,"A, D-J",49,2.25,2 1/4,VECTOR
+I80,3,156,allowable_max,"A, D-J",50,2.25,2 1/4,VECTOR
+I80,3,156,allowable_max,"A, D-J",51,2.25,2 1/4,VECTOR
+I80,3,156,allowable_max,"A, D-J",52,3.5,3 1/2,VECTOR
+I80,3,156,allowable_max,"A, D-J",53,3.5,3 1/2,VECTOR
+I80,3,156,allowable_max,"A, D-J",54,3.5,3 1/2,VECTOR
+I80,3,156,allowable_max,"A, D-J",55,3.5,3 1/2,VECTOR
+I80,3,156,allowable_max,"A, D-J",56,3.5,3 1/2,VECTOR
+I80,3,156,allowable_max,"A, D-J",57,3.5,3 1/2,VECTOR
+I80,3,156,allowable_max,"A, D-J",58,3.5,3 1/2,VECTOR
+I80,3,156,allowable_max,"A, D-J",59,3.5,3 1/2,VECTOR
+I80,3,156,allowable_max,"A, D-J",60,3.5,3 1/2,VECTOR
+I80,3,156,allowable_max,"A, D-J",61,2.25,2 1/4,VECTOR
+I80,3,156,allowable_max,"A, D-J",62,2.25,2 1/4,VECTOR
+I80,3,156,allowable_max,"A, D-J",63,2.25,2 1/4,VECTOR
+I80,3,156,allowable_max,"A, D-J",64,2.25,2 1/4,VECTOR
+I80,3,156,allowable_max,"A, D-J",65,2.25,2 1/4,VECTOR
+I80,3,156,allowable_max,"A, D-J",66,2.25,2 1/4,VECTOR
+I80,3,156,allowable_min,C,34,1,1,VECTOR
+I80,3,156,allowable_min,C,35,0.25,1/4,VECTOR
+I80,3,156,allowable_min,C,36,0.25,1/4,VECTOR
+I80,3,156,allowable_min,C,37,0.25,1/4,VECTOR
+I80,3,156,allowable_min,C,38,0.25,1/4,VECTOR
+I80,3,156,allowable_min,C,39,0.25,1/4,VECTOR
+I80,3,156,allowable_min,C,40,0.25,1/4,VECTOR
+I80,3,156,allowable_min,C,41,0.25,1/4,VECTOR
+I80,3,156,allowable_min,C,42,0.25,1/4,VECTOR
+I80,3,156,allowable_max,C,34,3.5,3 1/2,VECTOR
+I80,3,156,allowable_max,C,35,2.25,2 1/4,VECTOR
+I80,3,156,allowable_max,C,36,2.25,2 1/4,VECTOR
+I80,3,156,allowable_max,C,37,2.25,2 1/4,VECTOR
+I80,3,156,allowable_max,C,38,2.25,2 1/4,VECTOR
+I80,3,156,allowable_max,C,39,2.25,2 1/4,VECTOR
+I80,3,156,allowable_max,C,40,2.25,2 1/4,VECTOR
+I80,3,156,allowable_max,C,41,2.25,2 1/4,VECTOR
+I80,3,156,allowable_max,C,42,2.25,2 1/4,VECTOR
+I80,3,157,slab_deflection,A,67,0,0,VECTOR
+I80,3,157,slab_deflection,A,68,0,0,VECTOR
+I80,3,157,slab_deflection,A,69,0.125,1/8,VECTOR
+I80,3,157,slab_deflection,A,70,0.25,1/4,VECTOR
+I80,3,157,slab_deflection,A,71,0.4375,7/16,VECTOR
+I80,3,157,slab_deflection,A,72,0.6875,11/16,VECTOR
+I80,3,157,slab_deflection,A,73,0.9375,15/16,VECTOR
+I80,3,157,slab_deflection,A,74,1.25,1 1/4,VECTOR
+I80,3,157,slab_deflection,A,75,1.5,1 1/2,VECTOR
+I80,3,157,slab_deflection,A,76,1.6875,1 11/16,VECTOR
+I80,3,157,slab_deflection,A,77,1.8125,1 13/16,VECTOR
+I80,3,157,slab_deflection,A,78,1.875,1 7/8,VECTOR
+I80,3,157,slab_deflection,A,79,1.8125,1 13/16,VECTOR
+I80,3,157,slab_deflection,A,80,1.75,1 3/4,VECTOR
+I80,3,157,slab_deflection,A,81,1.5625,1 9/16,VECTOR
+I80,3,157,slab_deflection,A,82,1.3125,1 5/16,VECTOR
+I80,3,157,slab_deflection,A,83,1,1,VECTOR
+I80,3,157,slab_deflection,A,84,0.75,3/4,VECTOR
+I80,3,157,slab_deflection,A,85,0.5,1/2,VECTOR
+I80,3,157,slab_deflection,A,86,0.3125,5/16,VECTOR
+I80,3,157,slab_deflection,A,87,0.125,1/8,VECTOR
+I80,3,157,slab_deflection,A,88,0.0625,1/16,VECTOR
+I80,3,157,slab_deflection,A,89,0,0,VECTOR
+I80,3,157,slab_deflection,A,90,0.0625,1/16,VECTOR
+I80,3,157,slab_deflection,A,91,0.25,1/4,VECTOR
+I80,3,157,slab_deflection,A,92,0.5,1/2,VECTOR
+I80,3,157,slab_deflection,A,93,0.75,3/4,VECTOR
+I80,3,157,slab_deflection,A,94,1,1,VECTOR
+I80,3,157,slab_deflection,A,95,1.25,1 1/4,VECTOR
+I80,3,157,slab_deflection,A,96,1.5625,1 9/16,VECTOR
+I80,3,157,slab_deflection,A,97,1.8125,1 13/16,VECTOR
+I80,3,157,slab_deflection,A,98,2,2,VECTOR
+I80,3,157,slab_deflection,A,99,2.125,2 1/8,VECTOR
+I80,3,157,slab_deflection,D,67,0,0,VECTOR
+I80,3,157,slab_deflection,D,68,0,0,VECTOR
+I80,3,157,slab_deflection,D,69,0.125,1/8,VECTOR
+I80,3,157,slab_deflection,D,70,0.25,1/4,VECTOR
+I80,3,157,slab_deflection,D,71,0.5,1/2,VECTOR
+I80,3,157,slab_deflection,D,72,0.6875,11/16,VECTOR
+I80,3,157,slab_deflection,D,73,0.9375,15/16,VECTOR
+I80,3,157,slab_deflection,D,74,1.25,1 1/4,VECTOR
+I80,3,157,slab_deflection,D,75,1.5,1 1/2,VECTOR
+I80,3,157,slab_deflection,D,76,1.75,1 3/4,VECTOR
+I80,3,157,slab_deflection,D,77,1.875,1 7/8,VECTOR
+I80,3,157,slab_deflection,D,78,1.9375,1 15/16,VECTOR
+I80,3,157,slab_deflection,D,79,1.875,1 7/8,VECTOR
+I80,3,157,slab_deflection,D,80,1.75,1 3/4,VECTOR
+I80,3,157,slab_deflection,D,81,1.5625,1 9/16,VECTOR
+I80,3,157,slab_deflection,D,82,1.3125,1 5/16,VECTOR
+I80,3,157,slab_deflection,D,83,1.0625,1 1/16,VECTOR
+I80,3,157,slab_deflection,D,84,0.75,3/4,VECTOR
+I80,3,157,slab_deflection,D,85,0.5,1/2,VECTOR
+I80,3,157,slab_deflection,D,86,0.3125,5/16,VECTOR
+I80,3,157,slab_deflection,D,87,0.125,1/8,VECTOR
+I80,3,157,slab_deflection,D,88,0,0,VECTOR
+I80,3,157,slab_deflection,D,89,0,0,VECTOR
+I80,3,157,slab_deflection,D,90,0.0625,1/16,VECTOR
+I80,3,157,slab_deflection,D,91,0.25,1/4,VECTOR
+I80,3,157,slab_deflection,D,92,0.5,1/2,VECTOR
+I80,3,157,slab_deflection,D,93,0.75,3/4,VECTOR
+I80,3,157,slab_deflection,D,94,1,1,VECTOR
+I80,3,157,slab_deflection,D,95,1.3125,1 5/16,VECTOR
+I80,3,157,slab_deflection,D,96,1.625,1 5/8,VECTOR
+I80,3,157,slab_deflection,D,97,1.875,1 7/8,VECTOR
+I80,3,157,slab_deflection,D,98,2.0625,2 1/16,VECTOR
+I80,3,157,slab_deflection,D,99,2.1875,2 3/16,VECTOR
+I80,3,157,slab_deflection,E,67,0,0,VECTOR
+I80,3,157,slab_deflection,E,68,0,0,VECTOR
+I80,3,157,slab_deflection,E,69,0.125,1/8,VECTOR
+I80,3,157,slab_deflection,E,70,0.3125,5/16,VECTOR
+I80,3,157,slab_deflection,E,71,0.5,1/2,VECTOR
+I80,3,157,slab_deflection,E,72,0.75,3/4,VECTOR
+I80,3,157,slab_deflection,E,73,1,1,VECTOR
+I80,3,157,slab_deflection,E,74,1.3125,1 5/16,VECTOR
+I80,3,157,slab_deflection,E,75,1.625,1 5/8,VECTOR
+I80,3,157,slab_deflection,E,76,1.8125,1 13/16,VECTOR
+I80,3,157,slab_deflection,E,77,2,2,VECTOR
+I80,3,157,slab_deflection,E,78,2.0625,2 1/16,VECTOR
+I80,3,157,slab_deflection,E,79,2,2,VECTOR
+I80,3,157,slab_deflection,E,80,1.875,1 7/8,VECTOR
+I80,3,157,slab_deflection,E,81,1.6875,1 11/16,VECTOR
+I80,3,157,slab_deflection,E,82,1.4375,1 7/16,VECTOR
+I80,3,157,slab_deflection,E,83,1.125,1 1/8,VECTOR
+I80,3,157,slab_deflection,E,84,0.8125,13/16,VECTOR
+I80,3,157,slab_deflection,E,85,0.5625,9/16,VECTOR
+I80,3,157,slab_deflection,E,86,0.3125,5/16,VECTOR
+I80,3,157,slab_deflection,E,87,0.125,1/8,VECTOR
+I80,3,157,slab_deflection,E,88,0,0,VECTOR
+I80,3,157,slab_deflection,E,89,0,0,VECTOR
+I80,3,157,slab_deflection,E,90,0.125,1/8,VECTOR
+I80,3,157,slab_deflection,E,91,0.3125,5/16,VECTOR
+I80,3,157,slab_deflection,E,92,0.5,1/2,VECTOR
+I80,3,157,slab_deflection,E,93,0.8125,13/16,VECTOR
+I80,3,157,slab_deflection,E,94,1.0625,1 1/16,VECTOR
+I80,3,157,slab_deflection,E,95,1.375,1 3/8,VECTOR
+I80,3,157,slab_deflection,E,96,1.75,1 3/4,VECTOR
+I80,3,157,slab_deflection,E,97,2,2,VECTOR
+I80,3,157,slab_deflection,E,98,2.25,2 1/4,VECTOR
+I80,3,157,slab_deflection,E,99,2.375,2 3/8,VECTOR
+I80,3,157,slab_deflection,F,67,0,0,VECTOR
+I80,3,157,slab_deflection,F,68,0,0,VECTOR
+I80,3,157,slab_deflection,F,69,0.125,1/8,VECTOR
+I80,3,157,slab_deflection,F,70,0.3125,5/16,VECTOR
+I80,3,157,slab_deflection,F,71,0.5625,9/16,VECTOR
+I80,3,157,slab_deflection,F,72,0.8125,13/16,VECTOR
+I80,3,157,slab_deflection,F,73,1.0625,1 1/16,VECTOR
+I80,3,157,slab_deflection,F,74,1.375,1 3/8,VECTOR
+I80,3,157,slab_deflection,F,75,1.6875,1 11/16,VECTOR
+I80,3,157,slab_deflection,F,76,1.9375,1 15/16,VECTOR
+I80,3,157,slab_deflection,F,77,2.0625,2 1/16,VECTOR
+I80,3,157,slab_deflection,F,78,2.125,2 1/8,VECTOR
+I80,3,157,slab_deflection,F,79,2.125,2 1/8,VECTOR
+I80,3,157,slab_deflection,F,80,2,2,VECTOR
+I80,3,157,slab_deflection,F,81,1.75,1 3/4,VECTOR
+I80,3,157,slab_deflection,F,82,1.5,1 1/2,VECTOR
+I80,3,157,slab_deflection,F,83,1.1875,1 3/16,VECTOR
+I80,3,157,slab_deflection,F,84,0.875,7/8,VECTOR
+I80,3,157,slab_deflection,F,85,0.5625,9/16,VECTOR
+I80,3,157,slab_deflection,F,86,0.3125,5/16,VECTOR
+I80,3,157,slab_deflection,F,87,0.125,1/8,VECTOR
+I80,3,157,slab_deflection,F,88,0,0,VECTOR
+I80,3,157,slab_deflection,F,89,0,0,VECTOR
+I80,3,157,slab_deflection,F,90,0.125,1/8,VECTOR
+I80,3,157,slab_deflection,F,91,0.3125,5/16,VECTOR
+I80,3,157,slab_deflection,F,92,0.5625,9/16,VECTOR
+I80,3,157,slab_deflection,F,93,0.8125,13/16,VECTOR
+I80,3,157,slab_deflection,F,94,1.125,1 1/8,VECTOR
+I80,3,157,slab_deflection,F,95,1.5,1 1/2,VECTOR
+I80,3,157,slab_deflection,F,96,1.8125,1 13/16,VECTOR
+I80,3,157,slab_deflection,F,97,2.125,2 1/8,VECTOR
+I80,3,157,slab_deflection,F,98,2.375,2 3/8,VECTOR
+I80,3,157,slab_deflection,F,99,2.5,2 1/2,VECTOR
+I80,3,157,slab_deflection,G,67,0,0,VECTOR
+I80,3,157,slab_deflection,G,68,0.0625,1/16,VECTOR
+I80,3,157,slab_deflection,G,69,0.1875,3/16,VECTOR
+I80,3,157,slab_deflection,G,70,0.3125,5/16,VECTOR
+I80,3,157,slab_deflection,G,71,0.5625,9/16,VECTOR
+I80,3,157,slab_deflection,G,72,0.8125,13/16,VECTOR
+I80,3,157,slab_deflection,G,73,1.125,1 1/8,VECTOR
+I80,3,157,slab_deflection,G,74,1.4375,1 7/16,VECTOR
+I80,3,157,slab_deflection,G,75,1.75,1 3/4,VECTOR
+I80,3,157,slab_deflection,G,76,2,2,VECTOR
+I80,3,157,slab_deflection,G,77,2.1875,2 3/16,VECTOR
+I80,3,157,slab_deflection,G,78,2.25,2 1/4,VECTOR
+I80,3,157,slab_deflection,G,79,2.1875,2 3/16,VECTOR
+I80,3,157,slab_deflection,G,80,2.0625,2 1/16,VECTOR
+I80,3,157,slab_deflection,G,81,1.8125,1 13/16,VECTOR
+I80,3,157,slab_deflection,G,82,1.5625,1 9/16,VECTOR
+I80,3,157,slab_deflection,G,83,1.1875,1 3/16,VECTOR
+I80,3,157,slab_deflection,G,84,0.875,7/8,VECTOR
+I80,3,157,slab_deflection,G,85,0.5625,9/16,VECTOR
+I80,3,157,slab_deflection,G,86,0.3125,5/16,VECTOR
+I80,3,157,slab_deflection,G,87,0.125,1/8,VECTOR
+I80,3,157,slab_deflection,G,88,0,0,VECTOR
+I80,3,157,slab_deflection,G,89,0,0,VECTOR
+I80,3,157,slab_deflection,G,90,0.125,1/8,VECTOR
+I80,3,157,slab_deflection,G,91,0.3125,5/16,VECTOR
+I80,3,157,slab_deflection,G,92,0.5625,9/16,VECTOR
+I80,3,157,slab_deflection,G,93,0.875,7/8,VECTOR
+I80,3,157,slab_deflection,G,94,1.1875,1 3/16,VECTOR
+I80,3,157,slab_deflection,G,95,1.5625,1 9/16,VECTOR
+I80,3,157,slab_deflection,G,96,1.9375,1 15/16,VECTOR
+I80,3,157,slab_deflection,G,97,2.25,2 1/4,VECTOR
+I80,3,157,slab_deflection,G,98,2.4375,2 7/16,VECTOR
+I80,3,157,slab_deflection,G,99,2.625,2 5/8,VECTOR
+I80,3,157,slab_deflection,H,67,0,0,VECTOR
+I80,3,157,slab_deflection,H,68,0.0625,1/16,VECTOR
+I80,3,157,slab_deflection,H,69,0.1875,3/16,VECTOR
+I80,3,157,slab_deflection,H,70,0.375,3/8,VECTOR
+I80,3,157,slab_deflection,H,71,0.5625,9/16,VECTOR
+I80,3,157,slab_deflection,H,72,0.875,7/8,VECTOR
+I80,3,157,slab_deflection,H,73,1.125,1 1/8,VECTOR
+I80,3,157,slab_deflection,H,74,1.5,1 1/2,VECTOR
+I80,3,157,slab_deflection,H,75,1.8125,1 13/16,VECTOR
+I80,3,157,slab_deflection,H,76,2.0625,2 1/16,VECTOR
+I80,3,157,slab_deflection,H,77,2.25,2 1/4,VECTOR
+I80,3,157,slab_deflection,H,78,2.3125,2 5/16,VECTOR
+I80,3,157,slab_deflection,H,79,2.25,2 1/4,VECTOR
+I80,3,157,slab_deflection,H,80,2.125,2 1/8,VECTOR
+I80,3,157,slab_deflection,H,81,1.875,1 7/8,VECTOR
+I80,3,157,slab_deflection,H,82,1.5625,1 9/16,VECTOR
+I80,3,157,slab_deflection,H,83,1.25,1 1/4,VECTOR
+I80,3,157,slab_deflection,H,84,0.875,7/8,VECTOR
+I80,3,157,slab_deflection,H,85,0.5625,9/16,VECTOR
+I80,3,157,slab_deflection,H,86,0.3125,5/16,VECTOR
+I80,3,157,slab_deflection,H,87,0.125,1/8,VECTOR
+I80,3,157,slab_deflection,H,88,0,0,VECTOR
+I80,3,157,slab_deflection,H,89,0,0,VECTOR
+I80,3,157,slab_deflection,H,90,0.125,1/8,VECTOR
+I80,3,157,slab_deflection,H,91,0.3125,5/16,VECTOR
+I80,3,157,slab_deflection,H,92,0.625,5/8,VECTOR
+I80,3,157,slab_deflection,H,93,0.9375,15/16,VECTOR
+I80,3,157,slab_deflection,H,94,1.25,1 1/4,VECTOR
+I80,3,157,slab_deflection,H,95,1.625,1 5/8,VECTOR
+I80,3,157,slab_deflection,H,96,2,2,VECTOR
+I80,3,157,slab_deflection,H,97,2.3125,2 5/16,VECTOR
+I80,3,157,slab_deflection,H,98,2.5625,2 9/16,VECTOR
+I80,3,157,slab_deflection,H,99,2.6875,2 11/16,VECTOR
+I80,3,157,slab_deflection,I,67,0,0,VECTOR
+I80,3,157,slab_deflection,I,68,0.0625,1/16,VECTOR
+I80,3,157,slab_deflection,I,69,0.1875,3/16,VECTOR
+I80,3,157,slab_deflection,I,70,0.375,3/8,VECTOR
+I80,3,157,slab_deflection,I,71,0.625,5/8,VECTOR
+I80,3,157,slab_deflection,I,72,0.875,7/8,VECTOR
+I80,3,157,slab_deflection,I,73,1.1875,1 3/16,VECTOR
+I80,3,157,slab_deflection,I,74,1.5625,1 9/16,VECTOR
+I80,3,157,slab_deflection,I,75,1.875,1 7/8,VECTOR
+I80,3,157,slab_deflection,I,76,2.125,2 1/8,VECTOR
+I80,3,157,slab_deflection,I,77,2.3125,2 5/16,VECTOR
+I80,3,157,slab_deflection,I,78,2.375,2 3/8,VECTOR
+I80,3,157,slab_deflection,I,79,2.3125,2 5/16,VECTOR
+I80,3,157,slab_deflection,I,80,2.1875,2 3/16,VECTOR
+I80,3,157,slab_deflection,I,81,1.9375,1 15/16,VECTOR
+I80,3,157,slab_deflection,I,82,1.625,1 5/8,VECTOR
+I80,3,157,slab_deflection,I,83,1.25,1 1/4,VECTOR
+I80,3,157,slab_deflection,I,84,0.9375,15/16,VECTOR
+I80,3,157,slab_deflection,I,85,0.625,5/8,VECTOR
+I80,3,157,slab_deflection,I,86,0.3125,5/16,VECTOR
+I80,3,157,slab_deflection,I,87,0.125,1/8,VECTOR
+I80,3,157,slab_deflection,I,88,0,0,VECTOR
+I80,3,157,slab_deflection,I,89,0,0,VECTOR
+I80,3,157,slab_deflection,I,90,0.125,1/8,VECTOR
+I80,3,157,slab_deflection,I,91,0.375,3/8,VECTOR
+I80,3,157,slab_deflection,I,92,0.625,5/8,VECTOR
+I80,3,157,slab_deflection,I,93,0.9375,15/16,VECTOR
+I80,3,157,slab_deflection,I,94,1.3125,1 5/16,VECTOR
+I80,3,157,slab_deflection,I,95,1.6875,1 11/16,VECTOR
+I80,3,157,slab_deflection,I,96,2.0625,2 1/16,VECTOR
+I80,3,157,slab_deflection,I,97,2.375,2 3/8,VECTOR
+I80,3,157,slab_deflection,I,98,2.625,2 5/8,VECTOR
+I80,3,157,slab_deflection,I,99,2.8125,2 13/16,VECTOR
+I80,3,157,slab_deflection,J,67,0,0,VECTOR
+I80,3,157,slab_deflection,J,68,0.0625,1/16,VECTOR
+I80,3,157,slab_deflection,J,69,0.1875,3/16,VECTOR
+I80,3,157,slab_deflection,J,70,0.375,3/8,VECTOR
+I80,3,157,slab_deflection,J,71,0.625,5/8,VECTOR
+I80,3,157,slab_deflection,J,72,0.9375,15/16,VECTOR
+I80,3,157,slab_deflection,J,73,1.25,1 1/4,VECTOR
+I80,3,157,slab_deflection,J,74,1.625,1 5/8,VECTOR
+I80,3,157,slab_deflection,J,75,1.9375,1 15/16,VECTOR
+I80,3,157,slab_deflection,J,76,2.1875,2 3/16,VECTOR
+I80,3,157,slab_deflection,J,77,2.375,2 3/8,VECTOR
+I80,3,157,slab_deflection,J,78,2.4375,2 7/16,VECTOR
+I80,3,157,slab_deflection,J,79,2.375,2 3/8,VECTOR
+I80,3,157,slab_deflection,J,80,2.25,2 1/4,VECTOR
+I80,3,157,slab_deflection,J,81,2,2,VECTOR
+I80,3,157,slab_deflection,J,82,1.625,1 5/8,VECTOR
+I80,3,157,slab_deflection,J,83,1.25,1 1/4,VECTOR
+I80,3,157,slab_deflection,J,84,0.9375,15/16,VECTOR
+I80,3,157,slab_deflection,J,85,0.625,5/8,VECTOR
+I80,3,157,slab_deflection,J,86,0.3125,5/16,VECTOR
+I80,3,157,slab_deflection,J,87,0.125,1/8,VECTOR
+I80,3,157,slab_deflection,J,88,0,0,VECTOR
+I80,3,157,slab_deflection,J,89,0,0,VECTOR
+I80,3,157,slab_deflection,J,90,0.125,1/8,VECTOR
+I80,3,157,slab_deflection,J,91,0.375,3/8,VECTOR
+I80,3,157,slab_deflection,J,92,0.625,5/8,VECTOR
+I80,3,157,slab_deflection,J,93,1,1,VECTOR
+I80,3,157,slab_deflection,J,94,1.375,1 3/8,VECTOR
+I80,3,157,slab_deflection,J,95,1.75,1 3/4,VECTOR
+I80,3,157,slab_deflection,J,96,2.125,2 1/8,VECTOR
+I80,3,157,slab_deflection,J,97,2.5,2 1/2,VECTOR
+I80,3,157,slab_deflection,J,98,2.75,2 3/4,VECTOR
+I80,3,157,slab_deflection,J,99,2.9375,2 15/16,VECTOR
+I80,3,157,cross_slope_adjustment,"A, D-J",67,0.75,3/4,VECTOR
+I80,3,157,cross_slope_adjustment,"A, D-J",68,0.75,3/4,VECTOR
+I80,3,157,cross_slope_adjustment,"A, D-J",69,0.75,3/4,VECTOR
+I80,3,157,cross_slope_adjustment,"A, D-J",70,0.75,3/4,VECTOR
+I80,3,157,cross_slope_adjustment,"A, D-J",71,0.75,3/4,VECTOR
+I80,3,157,cross_slope_adjustment,"A, D-J",72,0.75,3/4,VECTOR
+I80,3,157,cross_slope_adjustment,"A, D-J",73,0.75,3/4,VECTOR
+I80,3,157,cross_slope_adjustment,"A, D-J",74,0.5,1/2,VECTOR
+I80,3,157,cross_slope_adjustment,"A, D-J",75,0.5,1/2,VECTOR
+I80,3,157,cross_slope_adjustment,"A, D-J",76,0.5,1/2,VECTOR
+I80,3,157,cross_slope_adjustment,"A, D-J",77,0.5,1/2,VECTOR
+I80,3,157,cross_slope_adjustment,"A, D-J",78,0.5,1/2,VECTOR
+I80,3,157,cross_slope_adjustment,"A, D-J",79,0.5,1/2,VECTOR
+I80,3,157,cross_slope_adjustment,"A, D-J",80,0.5,1/2,VECTOR
+I80,3,157,cross_slope_adjustment,"A, D-J",81,0.5,1/2,VECTOR
+I80,3,157,cross_slope_adjustment,"A, D-J",82,0.5,1/2,VECTOR
+I80,3,157,cross_slope_adjustment,"A, D-J",83,0.75,3/4,VECTOR
+I80,3,157,cross_slope_adjustment,"A, D-J",84,0.75,3/4,VECTOR
+I80,3,157,cross_slope_adjustment,"A, D-J",85,0.75,3/4,VECTOR
+I80,3,157,cross_slope_adjustment,"A, D-J",86,0.75,3/4,VECTOR
+I80,3,157,cross_slope_adjustment,"A, D-J",87,0.75,3/4,VECTOR
+I80,3,157,cross_slope_adjustment,"A, D-J",88,0.75,3/4,VECTOR
+I80,3,157,cross_slope_adjustment,"A, D-J",89,0.75,3/4,VECTOR
+I80,3,157,cross_slope_adjustment,"A, D-J",90,0.75,3/4,VECTOR
+I80,3,157,cross_slope_adjustment,"A, D-J",91,0.75,3/4,VECTOR
+I80,3,157,cross_slope_adjustment,"A, D-J",92,0.75,3/4,VECTOR
+I80,3,157,cross_slope_adjustment,"A, D-J",93,0.75,3/4,VECTOR
+I80,3,157,cross_slope_adjustment,"A, D-J",94,0.75,3/4,VECTOR
+I80,3,157,cross_slope_adjustment,"A, D-J",95,0.75,3/4,VECTOR
+I80,3,157,cross_slope_adjustment,"A, D-J",96,0.5625,9/16,VECTOR
+I80,3,157,cross_slope_adjustment,"A, D-J",97,0.5625,9/16,VECTOR
+I80,3,157,cross_slope_adjustment,"A, D-J",98,0.5625,9/16,VECTOR
+I80,3,157,cross_slope_adjustment,"A, D-J",99,0.5625,9/16,VECTOR
+I80,3,157,allowable_min,"A, D-J",67,0.25,1/4,VECTOR
+I80,3,157,allowable_min,"A, D-J",68,0.25,1/4,VECTOR
+I80,3,157,allowable_min,"A, D-J",69,0.25,1/4,VECTOR
+I80,3,157,allowable_min,"A, D-J",70,0.25,1/4,VECTOR
+I80,3,157,allowable_min,"A, D-J",71,0.25,1/4,VECTOR
+I80,3,157,allowable_min,"A, D-J",72,0.25,1/4,VECTOR
+I80,3,157,allowable_min,"A, D-J",73,0.25,1/4,VECTOR
+I80,3,157,allowable_min,"A, D-J",74,1,1,VECTOR
+I80,3,157,allowable_min,"A, D-J",75,1,1,VECTOR
+I80,3,157,allowable_min,"A, D-J",76,1,1,VECTOR
+I80,3,157,allowable_min,"A, D-J",77,1,1,VECTOR
+I80,3,157,allowable_min,"A, D-J",78,1,1,VECTOR
+I80,3,157,allowable_min,"A, D-J",79,1,1,VECTOR
+I80,3,157,allowable_min,"A, D-J",80,1,1,VECTOR
+I80,3,157,allowable_min,"A, D-J",81,1,1,VECTOR
+I80,3,157,allowable_min,"A, D-J",82,1,1,VECTOR
+I80,3,157,allowable_min,"A, D-J",83,0.25,1/4,VECTOR
+I80,3,157,allowable_min,"A, D-J",84,0.25,1/4,VECTOR
+I80,3,157,allowable_min,"A, D-J",85,0.25,1/4,VECTOR
+I80,3,157,allowable_min,"A, D-J",86,0.25,1/4,VECTOR
+I80,3,157,allowable_min,"A, D-J",87,0.25,1/4,VECTOR
+I80,3,157,allowable_min,"A, D-J",88,0.25,1/4,VECTOR
+I80,3,157,allowable_min,"A, D-J",89,0.25,1/4,VECTOR
+I80,3,157,allowable_min,"A, D-J",90,0.25,1/4,VECTOR
+I80,3,157,allowable_min,"A, D-J",91,0.25,1/4,VECTOR
+I80,3,157,allowable_min,"A, D-J",92,0.25,1/4,VECTOR
+I80,3,157,allowable_min,"A, D-J",93,0.25,1/4,VECTOR
+I80,3,157,allowable_min,"A, D-J",94,0.25,1/4,VECTOR
+I80,3,157,allowable_min,"A, D-J",95,0.25,1/4,VECTOR
+I80,3,157,allowable_min,"A, D-J",96,1.0625,1 1/16,VECTOR
+I80,3,157,allowable_min,"A, D-J",97,1.0625,1 1/16,VECTOR
+I80,3,157,allowable_min,"A, D-J",98,1.0625,1 1/16,VECTOR
+I80,3,157,allowable_min,"A, D-J",99,1.0625,1 1/16,VECTOR
+I80,3,157,allowable_max,"A, D-J",67,2.25,2 1/4,VECTOR
+I80,3,157,allowable_max,"A, D-J",68,2.25,2 1/4,VECTOR
+I80,3,157,allowable_max,"A, D-J",69,2.25,2 1/4,VECTOR
+I80,3,157,allowable_max,"A, D-J",70,2.25,2 1/4,VECTOR
+I80,3,157,allowable_max,"A, D-J",71,2.25,2 1/4,VECTOR
+I80,3,157,allowable_max,"A, D-J",72,2.25,2 1/4,VECTOR
+I80,3,157,allowable_max,"A, D-J",73,2.25,2 1/4,VECTOR
+I80,3,157,allowable_max,"A, D-J",74,3.5,3 1/2,VECTOR
+I80,3,157,allowable_max,"A, D-J",75,3.5,3 1/2,VECTOR
+I80,3,157,allowable_max,"A, D-J",76,3.5,3 1/2,VECTOR
+I80,3,157,allowable_max,"A, D-J",77,3.5,3 1/2,VECTOR
+I80,3,157,allowable_max,"A, D-J",78,3.5,3 1/2,VECTOR
+I80,3,157,allowable_max,"A, D-J",79,3.5,3 1/2,VECTOR
+I80,3,157,allowable_max,"A, D-J",80,3.5,3 1/2,VECTOR
+I80,3,157,allowable_max,"A, D-J",81,3.5,3 1/2,VECTOR
+I80,3,157,allowable_max,"A, D-J",82,3.5,3 1/2,VECTOR
+I80,3,157,allowable_max,"A, D-J",83,2.25,2 1/4,VECTOR
+I80,3,157,allowable_max,"A, D-J",84,2.25,2 1/4,VECTOR
+I80,3,157,allowable_max,"A, D-J",85,2.25,2 1/4,VECTOR
+I80,3,157,allowable_max,"A, D-J",86,2.25,2 1/4,VECTOR
+I80,3,157,allowable_max,"A, D-J",87,2.25,2 1/4,VECTOR
+I80,3,157,allowable_max,"A, D-J",88,2.25,2 1/4,VECTOR
+I80,3,157,allowable_max,"A, D-J",89,2.25,2 1/4,VECTOR
+I80,3,157,allowable_max,"A, D-J",90,2.25,2 1/4,VECTOR
+I80,3,157,allowable_max,"A, D-J",91,2.25,2 1/4,VECTOR
+I80,3,157,allowable_max,"A, D-J",92,2.25,2 1/4,VECTOR
+I80,3,157,allowable_max,"A, D-J",93,2.25,2 1/4,VECTOR
+I80,3,157,allowable_max,"A, D-J",94,2.25,2 1/4,VECTOR
+I80,3,157,allowable_max,"A, D-J",95,2.25,2 1/4,VECTOR
+I80,3,157,allowable_max,"A, D-J",96,3.4375,3 7/16,VECTOR
+I80,3,157,allowable_max,"A, D-J",97,3.4375,3 7/16,VECTOR
+I80,3,157,allowable_max,"A, D-J",98,3.4375,3 7/16,VECTOR
+I80,3,157,allowable_max,"A, D-J",99,3.4375,3 7/16,VECTOR
+I80,3,157,slab_deflection,A,100,2.1875,2 3/16,VECTOR
+I80,3,157,slab_deflection,A,101,2.125,2 1/8,VECTOR
+I80,3,157,slab_deflection,A,102,1.9375,1 15/16,VECTOR
+I80,3,157,slab_deflection,A,103,1.6875,1 11/16,VECTOR
+I80,3,157,slab_deflection,A,104,1.375,1 3/8,VECTOR
+I80,3,157,slab_deflection,A,105,0.9375,15/16,VECTOR
+I80,3,157,slab_deflection,A,106,0.5,1/2,VECTOR
+I80,3,157,slab_deflection,A,107,0,0,VECTOR
+I80,3,157,slab_deflection,D,100,2.25,2 1/4,VECTOR
+I80,3,157,slab_deflection,D,101,2.1875,2 3/16,VECTOR
+I80,3,157,slab_deflection,D,102,2,2,VECTOR
+I80,3,157,slab_deflection,D,103,1.75,1 3/4,VECTOR
+I80,3,157,slab_deflection,D,104,1.375,1 3/8,VECTOR
+I80,3,157,slab_deflection,D,105,1,1,VECTOR
+I80,3,157,slab_deflection,D,106,0.5,1/2,VECTOR
+I80,3,157,slab_deflection,D,107,0,0,VECTOR
+I80,3,157,slab_deflection,E,100,2.375,2 3/8,VECTOR
+I80,3,157,slab_deflection,E,101,2.3125,2 5/16,VECTOR
+I80,3,157,slab_deflection,E,102,2.125,2 1/8,VECTOR
+I80,3,157,slab_deflection,E,103,1.875,1 7/8,VECTOR
+I80,3,157,slab_deflection,E,104,1.5,1 1/2,VECTOR
+I80,3,157,slab_deflection,E,105,1.0625,1 1/16,VECTOR
+I80,3,157,slab_deflection,E,106,0.5625,9/16,VECTOR
+I80,3,157,slab_deflection,E,107,0,0,VECTOR
+I80,3,157,slab_deflection,F,100,2.5,2 1/2,VECTOR
+I80,3,157,slab_deflection,F,101,2.4375,2 7/16,VECTOR
+I80,3,157,slab_deflection,F,102,2.25,2 1/4,VECTOR
+I80,3,157,slab_deflection,F,103,2,2,VECTOR
+I80,3,157,slab_deflection,F,104,1.5625,1 9/16,VECTOR
+I80,3,157,slab_deflection,F,105,1.125,1 1/8,VECTOR
+I80,3,157,slab_deflection,F,106,0.5625,9/16,VECTOR
+I80,3,157,slab_deflection,F,107,0,0,VECTOR
+I80,3,157,slab_deflection,G,100,2.625,2 5/8,VECTOR
+I80,3,157,slab_deflection,G,101,2.5625,2 9/16,VECTOR
+I80,3,157,slab_deflection,G,102,2.375,2 3/8,VECTOR
+I80,3,157,slab_deflection,G,103,2.0625,2 1/16,VECTOR
+I80,3,157,slab_deflection,G,104,1.625,1 5/8,VECTOR
+I80,3,157,slab_deflection,G,105,1.1875,1 3/16,VECTOR
+I80,3,157,slab_deflection,G,106,0.625,5/8,VECTOR
+I80,3,157,slab_deflection,G,107,0,0,VECTOR
+I80,3,157,slab_deflection,H,100,2.75,2 3/4,VECTOR
+I80,3,157,slab_deflection,H,101,2.6875,2 11/16,VECTOR
+I80,3,157,slab_deflection,H,102,2.4375,2 7/16,VECTOR
+I80,3,157,slab_deflection,H,103,2.125,2 1/8,VECTOR
+I80,3,157,slab_deflection,H,104,1.6875,1 11/16,VECTOR
+I80,3,157,slab_deflection,H,105,1.1875,1 3/16,VECTOR
+I80,3,157,slab_deflection,H,106,0.625,5/8,VECTOR
+I80,3,157,slab_deflection,H,107,0,0,VECTOR
+I80,3,157,slab_deflection,I,100,2.875,2 7/8,VECTOR
+I80,3,157,slab_deflection,I,101,2.75,2 3/4,VECTOR
+I80,3,157,slab_deflection,I,102,2.5625,2 9/16,VECTOR
+I80,3,157,slab_deflection,I,103,2.25,2 1/4,VECTOR
+I80,3,157,slab_deflection,I,104,1.75,1 3/4,VECTOR
+I80,3,157,slab_deflection,I,105,1.25,1 1/4,VECTOR
+I80,3,157,slab_deflection,I,106,0.625,5/8,VECTOR
+I80,3,157,slab_deflection,I,107,0,0,VECTOR
+I80,3,157,slab_deflection,J,100,2.9375,2 15/16,VECTOR
+I80,3,157,slab_deflection,J,101,2.875,2 7/8,VECTOR
+I80,3,157,slab_deflection,J,102,2.625,2 5/8,VECTOR
+I80,3,157,slab_deflection,J,103,2.3125,2 5/16,VECTOR
+I80,3,157,slab_deflection,J,104,1.875,1 7/8,VECTOR
+I80,3,157,slab_deflection,J,105,1.3125,1 5/16,VECTOR
+I80,3,157,slab_deflection,J,106,0.6875,11/16,VECTOR
+I80,3,157,slab_deflection,J,107,0,0,VECTOR
+I80,3,157,cross_slope_adjustment,"A, D-J",100,0.5625,9/16,VECTOR
+I80,3,157,cross_slope_adjustment,"A, D-J",101,0.5625,9/16,VECTOR
+I80,3,157,cross_slope_adjustment,"A, D-J",102,0.5625,9/16,VECTOR
+I80,3,157,cross_slope_adjustment,"A, D-J",103,0.5625,9/16,VECTOR
+I80,3,157,cross_slope_adjustment,"A, D-J",104,0.5625,9/16,VECTOR
+I80,3,157,cross_slope_adjustment,"A, D-J",105,0.5625,9/16,VECTOR
+I80,3,157,cross_slope_adjustment,"A, D-J",106,0.5625,9/16,VECTOR
+I80,3,157,cross_slope_adjustment,"A, D-J",107,0.5625,9/16,VECTOR
+I80,3,157,allowable_min,"A, D-J",100,1.0625,1 1/16,VECTOR
+I80,3,157,allowable_min,"A, D-J",101,1.0625,1 1/16,VECTOR
+I80,3,157,allowable_min,"A, D-J",102,1.0625,1 1/16,VECTOR
+I80,3,157,allowable_min,"A, D-J",103,1.0625,1 1/16,VECTOR
+I80,3,157,allowable_min,"A, D-J",104,1.0625,1 1/16,VECTOR
+I80,3,157,allowable_min,"A, D-J",105,1.0625,1 1/16,VECTOR
+I80,3,157,allowable_min,"A, D-J",106,1.0625,1 1/16,VECTOR
+I80,3,157,allowable_min,"A, D-J",107,1.0625,1 1/16,VECTOR
+I80,3,157,allowable_max,"A, D-J",100,3.4375,3 7/16,VECTOR
+I80,3,157,allowable_max,"A, D-J",101,3.4375,3 7/16,VECTOR
+I80,3,157,allowable_max,"A, D-J",102,3.4375,3 7/16,VECTOR
+I80,3,157,allowable_max,"A, D-J",103,3.4375,3 7/16,VECTOR
+I80,3,157,allowable_max,"A, D-J",104,3.4375,3 7/16,VECTOR
+I80,3,157,allowable_max,"A, D-J",105,3.4375,3 7/16,VECTOR
+I80,3,157,allowable_max,"A, D-J",106,3.4375,3 7/16,VECTOR
+I80,3,157,allowable_max,"A, D-J",107,3.4375,3 7/16,VECTOR
+I80,3,157,slab_deflection_discontinuous,B,1,0,0,VECTOR
+I80,3,157,slab_deflection_discontinuous,B,2,-0.0625,-1/16,VECTOR
+I80,3,157,slab_deflection_discontinuous,B,3,-0.0625,-1/16,VECTOR
+I80,3,157,slab_deflection_discontinuous,B,4,0,0,VECTOR
+I80,3,157,slab_deflection_discontinuous,B,5,0.125,1/8,VECTOR
+I80,3,157,slab_deflection_discontinuous,B,6,0.25,1/4,VECTOR
+I80,3,157,slab_deflection_discontinuous,B,7,0.4375,7/16,VECTOR
+I80,3,157,slab_deflection_discontinuous,B,8,0.6875,11/16,VECTOR
+I80,3,157,slab_deflection_discontinuous,B,9,0.875,7/8,VECTOR
+I80,3,157,slab_deflection_discontinuous,C,1,0,0,VECTOR
+I80,3,157,slab_deflection_discontinuous,C,2,0.0625,1/16,VECTOR
+I80,3,157,slab_deflection_discontinuous,C,3,0.125,1/8,VECTOR
+I80,3,157,slab_deflection_discontinuous,C,4,0.25,1/4,VECTOR
+I80,3,157,slab_deflection_discontinuous,C,5,0.375,3/8,VECTOR
+I80,3,157,slab_deflection_discontinuous,C,6,0.5625,9/16,VECTOR
+I80,3,157,slab_deflection_discontinuous,C,7,0.75,3/4,VECTOR
+I80,3,157,slab_deflection_discontinuous,C,8,0.9375,15/16,VECTOR
+I80,3,157,slab_deflection_discontinuous,C,9,1.1875,1 3/16,VECTOR
+I80,3,157,cross_slope_adjustment_discontinuous,B,1,0.75,3/4,VECTOR
+I80,3,157,cross_slope_adjustment_discontinuous,B,2,0.75,3/4,VECTOR
+I80,3,157,cross_slope_adjustment_discontinuous,B,3,0.75,3/4,VECTOR
+I80,3,157,cross_slope_adjustment_discontinuous,B,4,0.75,3/4,VECTOR
+I80,3,157,cross_slope_adjustment_discontinuous,B,5,0.75,3/4,VECTOR
+I80,3,157,cross_slope_adjustment_discontinuous,B,6,0.75,3/4,VECTOR
+I80,3,157,cross_slope_adjustment_discontinuous,B,7,0.75,3/4,VECTOR
+I80,3,157,cross_slope_adjustment_discontinuous,B,8,0.75,3/4,VECTOR
+I80,3,157,cross_slope_adjustment_discontinuous,B,9,0.75,3/4,VECTOR
+I80,3,157,cross_slope_adjustment_discontinuous,C,1,0.75,3/4,VECTOR
+I80,3,157,cross_slope_adjustment_discontinuous,C,2,0.75,3/4,VECTOR
+I80,3,157,cross_slope_adjustment_discontinuous,C,3,0.75,3/4,VECTOR
+I80,3,157,cross_slope_adjustment_discontinuous,C,4,0.75,3/4,VECTOR
+I80,3,157,cross_slope_adjustment_discontinuous,C,5,0.75,3/4,VECTOR
+I80,3,157,cross_slope_adjustment_discontinuous,C,6,0.75,3/4,VECTOR
+I80,3,157,cross_slope_adjustment_discontinuous,C,7,0.75,3/4,VECTOR
+I80,3,157,cross_slope_adjustment_discontinuous,C,8,0.75,3/4,VECTOR
+I80,3,157,cross_slope_adjustment_discontinuous,C,9,0.75,3/4,VECTOR
+I80,3,157,allowable_min_discontinuous,B,1,0.25,1/4,VECTOR
+I80,3,157,allowable_min_discontinuous,B,2,0.25,1/4,VECTOR
+I80,3,157,allowable_min_discontinuous,B,3,0.25,1/4,VECTOR
+I80,3,157,allowable_min_discontinuous,B,4,0.25,1/4,VECTOR
+I80,3,157,allowable_min_discontinuous,B,5,0.25,1/4,VECTOR
+I80,3,157,allowable_min_discontinuous,B,6,0.25,1/4,VECTOR
+I80,3,157,allowable_min_discontinuous,B,7,0.25,1/4,VECTOR
+I80,3,157,allowable_min_discontinuous,B,8,0.25,1/4,VECTOR
+I80,3,157,allowable_min_discontinuous,B,9,0.25,1/4,VECTOR
+I80,3,157,allowable_max_discontinuous,B,1,2.25,2 1/4,VECTOR
+I80,3,157,allowable_max_discontinuous,B,2,2.25,2 1/4,VECTOR
+I80,3,157,allowable_max_discontinuous,B,3,2.25,2 1/4,VECTOR
+I80,3,157,allowable_max_discontinuous,B,4,2.25,2 1/4,VECTOR
+I80,3,157,allowable_max_discontinuous,B,5,2.25,2 1/4,VECTOR
+I80,3,157,allowable_max_discontinuous,B,6,2.25,2 1/4,VECTOR
+I80,3,157,allowable_max_discontinuous,B,7,2.25,2 1/4,VECTOR
+I80,3,157,allowable_max_discontinuous,B,8,2.25,2 1/4,VECTOR
+I80,3,157,allowable_max_discontinuous,B,9,2.25,2 1/4,VECTOR
+I80,3,157,allowable_min_discontinuous,C,1,0.25,1/4,VECTOR
+I80,3,157,allowable_min_discontinuous,C,2,0.25,1/4,VECTOR
+I80,3,157,allowable_min_discontinuous,C,3,0.25,1/4,VECTOR
+I80,3,157,allowable_min_discontinuous,C,4,0.25,1/4,VECTOR
+I80,3,157,allowable_min_discontinuous,C,5,0.25,1/4,VECTOR
+I80,3,157,allowable_min_discontinuous,C,6,0.25,1/4,VECTOR
+I80,3,157,allowable_min_discontinuous,C,7,0.25,1/4,VECTOR
+I80,3,157,allowable_min_discontinuous,C,8,0.25,1/4,VECTOR
+I80,3,157,allowable_min_discontinuous,C,9,0.25,1/4,VECTOR
+I80,3,157,allowable_max_discontinuous,C,1,2.25,2 1/4,VECTOR
+I80,3,157,allowable_max_discontinuous,C,2,2.25,2 1/4,VECTOR
+I80,3,157,allowable_max_discontinuous,C,3,2.25,2 1/4,VECTOR
+I80,3,157,allowable_max_discontinuous,C,4,2.25,2 1/4,VECTOR
+I80,3,157,allowable_max_discontinuous,C,5,2.25,2 1/4,VECTOR
+I80,3,157,allowable_max_discontinuous,C,6,2.25,2 1/4,VECTOR
+I80,3,157,allowable_max_discontinuous,C,7,2.25,2 1/4,VECTOR
+I80,3,157,allowable_max_discontinuous,C,8,2.25,2 1/4,VECTOR
+I80,3,157,allowable_max_discontinuous,C,9,2.25,2 1/4,VECTOR

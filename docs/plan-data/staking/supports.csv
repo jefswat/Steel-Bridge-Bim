@@ -1,0 +1,39 @@
+set,bridge,support,pdf_page,design_sheet,alignment,station,offset_lt_ft,skew_printed,skew_deg,skew_ref,tag,note
+116,I-80 WB Unit 1,West Abut,15,13,CL I-80,7578+79.64,41.08,44°00'00",44.0,pier line vs normal,TEXT+RASTER,CL bearing; 41.08' LT of CL I-80 = CL WB approach roadway
+116,I-80 WB Unit 1,Pier 1WB,15,13,CL I-80,7580+86.64,41.08,45°30'00",45.5,pier line vs normal,TEXT+RASTER,
+116,I-80 WB Unit 1,Pier 2WB,15,13,CL I-80,7583+64.64,41.08,44°00'00",44.0,pier line vs normal,TEXT+RASTER,
+116,I-80 WB Unit 1,Pier 3WB,15,13,CL I-80,7586+29.64,41.08,44°00'00",44.0,pier line vs normal,TEXT+RASTER,offset printed "41.08 LT."
+116,I-80 WB Unit 1,Pier 4WB,15,13,CL I-80,7588+69.64,41.08,90°00'00",0.0,pier line vs CL,TEXT+RASTER,
+116,I-80 WB Unit 1,Pier 5WB,15,13,CL I-80,7591+06.39,41.08,90°00'00",0.0,pier line vs CL,TEXT+RASTER,CL pier (model support line = CL bearing 1'-6 back)
+116,I-80 WB Unit 2,Pier 6A,15,13,CL I-80,7591+08.83,107.43,90°00'00",,local tangent of CL Ramp A2,TEXT+RASTER,tie point = CL Ramp A2 STA 61591+08.76 (Ramp A2 is not in the model: skew not comparable)
+116,I-80 WB Unit 2,Pier 6WB,16,14,CL I-80,7593+16.39,41.08,90°00'00",0.0,pier line vs CL,TEXT+RASTER,offset printed "41.08 LT."
+116,I-80 WB Unit 2,Pier 7WB,16,14,CL I-80,7595+76.39,41.08,90°00'00",0.0,pier line vs CL,TEXT+RASTER,
+116,I-80 WB Unit 2,Pier 8WB,16,14,CL I-80,7598+11.13,41.08,42°41'27",42.690833,local tangent,TEXT+RASTER,
+116,I-80 WB Unit 2,Pier 9WB,16,14,CL I-80,7600+15.47,41.08,38°38'00",38.633333,local tangent,TEXT+RASTER,
+116,I-80 WB Unit 2,Pier 10WB,16,14,CL I-80,7601+86.39,41.08,33°43'51",33.730833,local tangent,TEXT+RASTER,
+116,I-80 WB Unit 2,Pier 11WB,16,14,CL I-80,7603+32.45,41.08,27°27'55",27.465278,local tangent,TEXT+RASTER,CL Pier 11WB & 19G (model support line = CL bearing 1'-6 back)
+116,I-80 WB Unit 3,Pier 12WB,17,15,CL I-80,7604+95.87,41.08,23°40'36",23.676667,local tangent,TEXT+RASTER,
+116,I-80 WB Unit 3,Pier 13WB,17,15,CL I-80,7606+94.77,41.08,18°48'56",18.815556,local tangent,TEXT+RASTER,
+116,I-80 WB Unit 3,Pier 14WB,17,15,CL I-80,7608+93.43,41.08,14°04'22",14.072778,local tangent,TEXT+RASTER,
+116,I-80 WB Unit 3,Pier 15WB,17,15,CL I-80,7610+92.01,41.08,9°19'56",9.332222,local tangent,TEXT+RASTER,
+116,I-80 WB Unit 3,East Abut,17,15,CL I-80,7612+54.84,41.08,5°26'43",5.445278,local tangent,TEXT+RASTER,CL bearing
+316,Ramp G Unit 1,South Abut,14,12,CL Ramp G,67466+22.70,0,90° to local tangent (typ.),0.0,local tangent,TEXT+RASTER,CL bearing
+316,Ramp G Unit 1,Pier 1G,14,12,CL Ramp G,67467+67.70,0,90° to local tangent (typ.),0.0,local tangent,TEXT+RASTER,
+316,Ramp G Unit 1,Pier 2G,14,12,CL Ramp G,67469+57.70,0,90° to local tangent (typ.),0.0,local tangent,TEXT+RASTER,
+316,Ramp G Unit 1,Pier 3G,14,12,CL Ramp G,67471+47.70,0,90° to local tangent (typ.),0.0,local tangent,TEXT+RASTER,
+316,Ramp G Unit 1,Pier 4G,14,12,CL Ramp G,67473+37.70,0,90° to local tangent (typ.),0.0,local tangent,TEXT+RASTER,
+316,Ramp G Unit 1,Pier 5G,14,12,CL Ramp G,67474+87.70,0,90° to local tangent (typ.),0.0,local tangent,TEXT+RASTER,CL pier (model support line = CL bearing 1'-6 back)
+316,Ramp G Unit 2,Pier 6G,15,13,CL Ramp G,67476+62.70,0,90° to local tangent (typ.),0.0,local tangent,TEXT+RASTER,
+316,Ramp G Unit 2,Pier 7G,15,13,CL Ramp G,67478+75.70,0,90° to local tangent (typ.),0.0,local tangent,TEXT+RASTER,
+316,Ramp G Unit 2,Pier 8G,15,13,CL Ramp G,67480+77.70,0,90° to local tangent (typ.),0.0,local tangent,TEXT+RASTER,
+316,Ramp G Unit 2,Pier 9G,15,13,CL Ramp G,67482+37.70,0,90° to local tangent (typ.),0.0,local tangent,TEXT+RASTER,CL pier
+316,Ramp G Unit 3,Pier 10G,16,14,CL Ramp G,67484+37.70,0,90° to local tangent (typ.),0.0,local tangent,TEXT+RASTER,
+316,Ramp G Unit 3,Pier 11G,16,14,CL Ramp G,67486+92.70,0,90° to local tangent (typ.),0.0,local tangent,TEXT+RASTER,
+316,Ramp G Unit 3,Pier 12G,16,14,CL Ramp G,67489+12.70,0,90° to local tangent (typ.),0.0,local tangent,TEXT+RASTER,
+316,Ramp G Unit 3,Pier 13G,16,14,CL Ramp G,67491+37.70,0,90° to local tangent (typ.),0.0,local tangent,TEXT+RASTER,
+316,Ramp G Unit 3,Pier 14G,16,14,CL Ramp G,67493+17.70,0,90° to local tangent (typ.),0.0,local tangent,TEXT+RASTER,CL pier
+316,Ramp G Unit 4,Pier 15G,17,15,CL Ramp G,67494+84.70,0,90° to local tangent (typ.),0.0,local tangent,TEXT+RASTER,
+316,Ramp G Unit 4,Pier 16G,17,15,CL Ramp G,67496+82.70,0,56°32'38",56.543889,local tangent,TEXT+RASTER,
+316,Ramp G Unit 4,Pier 17G,17,15,CL Ramp G,67499+40.70,0,49°00'00",49.0,local tangent,TEXT+RASTER,
+316,Ramp G Unit 4,Pier 18G,17,15,CL Ramp G,67501+45.70,0,90° to local tangent (typ.),0.0,local tangent,TEXT+RASTER,
+316,Ramp G Unit 4,Pier 19G,17,15,CL Ramp G,67502+97.70,0,32°55'29",32.924722,local tangent,TEXT+RASTER,CL Pier 11WB & 19G; = I-80 STA 7602+94.96 109.63' LT (PDF 16)
