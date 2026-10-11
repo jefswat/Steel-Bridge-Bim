@@ -2,6 +2,10 @@ using static SBM.Core.Units.UnitSystem;
 
 namespace SBM.Core.Bridge;
 
+/// <summary>Kind of as-designed abutment. Stub = footing + backwall + corbel + beam steps (the default, the I-80 / Ramp G plans);
+/// Integral = Iowa integral abutment pile cap (std 2087-BTCD, Woodbury p.15-17): stepped top, ONE pile row, no backwall (the diaphragm is cast with the deck).</summary>
+public enum AbutmentKind { Stub, Integral }
+
 /// <summary>Which end of an abutment line (S direction: Left = down S / A end of the plans' rear elevation, Right = up S).</summary>
 public enum AbutmentEnd { Left, Right }
 
@@ -172,6 +176,76 @@ public sealed class AbutmentRebarDefinition
     public List<PlanBarLine> PlanBarList { get; set; } = new();
 }
 
+/// <summary>Elevation of a wall top at a distance U along the wall (m from the wall's start).</summary>
+public sealed class WallTopPoint
+{
+    public double U { get; set; }
+    public double Elevation { get; set; }
+    public WallTopPoint() { }
+    public WallTopPoint(double u, double elevation) { U = u; Elevation = elevation; }
+}
+
+/// <summary>A pile of an integral wing extension footing: Along = distance along the gutter line from the cap back face (rearward), Across = from the
+/// gutter line, + outboard. NaN = not read from the plans (UNRESOLVED, no pile).</summary>
+public sealed class WingExtensionPileDefinition
+{
+    public double Along { get; set; } = double.NaN;
+    public double Across { get; set; } = double.NaN;
+}
+
+/// <summary>
+/// Iowa integral wing extension (Woodbury p.15 A-A, p.17, p.20 A-A): a wall OUTBOARD of the gutter line on its own level-bottom footing, running rearward along
+/// the gutter line from the pile-cap back face. Every elevation / position is a plan input: NaN or empty = UNRESOLVED (the part is not built).
+/// </summary>
+public sealed class WingExtensionDefinition
+{
+    public AbutmentEnd End { get; set; }
+    /// <summary>Alignment offset (right +) of the gutter line = the wall's inner face; the wall is outboard (away from the alignment).</summary>
+    public double GutterOffset { get; set; }
+    /// <summary>Length along the gutter line from the pile-cap back face (Woodbury 6'-6).</summary>
+    public double Length { get; set; } = double.NaN;
+    /// <summary>Wall thickness outboard of the gutter line (Woodbury 1'-7).</summary>
+    public double WallThickness { get; set; } = double.NaN;
+    /// <summary>Footing width INBOARD of the gutter line (Woodbury 1'-5; the footing is this + the wall thickness wide).</summary>
+    public double FootingInside { get; set; } = double.NaN;
+    /// <summary>Level footing bottom (Woodbury S 1114.60).</summary>
+    public double FootingBottomElevation { get; set; } = double.NaN;
+    /// <summary>Level footing top = wall bottom (not printed in the Woodbury set as far as read: UNRESOLVED until entered).</summary>
+    public double FootingTopElevation { get; set; } = double.NaN;
+    /// <summary>Wall top along the wall (U from the cap back face along the gutter line; the p.20 A / B / C table). 1 point = level; empty = UNRESOLVED.</summary>
+    public List<WallTopPoint> WallTop { get; set; } = new();
+    public List<WingExtensionPileDefinition> Piles { get; set; } = new();
+    /// <summary>Piles the plans show in this extension (Woodbury 1). More than the positioned <see cref="Piles"/> = UNRESOLVED warning.</summary>
+    public int PlanPileCount { get; set; }
+    /// <summary>Pile head above the footing bottom (NaN = UNRESOLVED, no pile).</summary>
+    public double PileTopAboveFootingBottom { get; set; } = double.NaN;
+}
+
+/// <summary>Corrugated metal pipe casing around each abutment pile through the EPS fill (Woodbury p.17: 24" CMP, flowable fill). The casing runs from the
+/// bottom of the concrete (cap / wing footing) down to <see cref="BottomElevation"/>; NaN = bottom of the EPS fill, not in the set = UNRESOLVED (no solid,
+/// schedule records with an unknown length).</summary>
+public sealed class PileCasingDefinition
+{
+    public double Diameter { get; set; } = double.NaN;
+    public double BottomElevation { get; set; } = double.NaN;
+    public string Fill { get; set; } = "";
+    /// <summary>Plan total length of casing for the BRIDGE (m; Woodbury 281 LF for both abutments, p.3 / p.5); 0 = none (reported only).</summary>
+    public double PlanTotalLength { get; set; }
+}
+
+/// <summary>Pile-head spiral (Woodbury p.15 note: 7 turns No. 2 bar, 21" dia, 3" pitch): schedule-only bar, one per abutment pile.</summary>
+public sealed class PileSpiralDefinition
+{
+    /// <summary>Schedule label ("" = "pile spiral"; the plans give no mark).</summary>
+    public string Mark { get; set; } = "";
+    /// <summary>Bar size "#2" .. "#18" (No. 2 = 1/4" plain).</summary>
+    public string BarSize { get; set; } = "";
+    /// <summary>Spiral diameter as printed (out to out).</summary>
+    public double Diameter { get; set; } = double.NaN;
+    public double Pitch { get; set; } = double.NaN;
+    public int Turns { get; set; }
+}
+
 /// <summary>
 /// As-designed abutment (OPTIONAL on <see cref="SubstructureDefinition.Abutment"/>; null = the standard parametric abutment): pile-supported
 /// footing with a vertical backwall (corbel / paving notch on the back face), beam steps in front of it, maskwall end panels, backwall
@@ -182,6 +256,8 @@ public sealed class AbutmentRebarDefinition
 public sealed class AbutmentDefinition
 {
     public string Source { get; set; } = "";
+    /// <summary>Stub (default, today's footing + backwall) or Integral (pile cap with a stepped top; the "Integral" inputs below).</summary>
+    public AbutmentKind Kind { get; set; } = AbutmentKind.Stub;
     // ---- plan
     /// <summary>Alignment offsets of the footing end lines (left is negative), parallel to the alignment.</summary>
     public double LeftEndOffset { get; set; }
@@ -224,8 +300,34 @@ public sealed class AbutmentDefinition
     /// <summary>True footing plan outline: end notches (empty = ends are plain alignment-offset lines).</summary>
     public List<FootingNotchDefinition> FootingNotches { get; set; } = new();
     public BackwallExtensionDefinition? Extension { get; set; }
+    // ---- integral pile cap (Kind = Integral): section from the CL bearing, stepped top from Steps (one level step per girder)
+    /// <summary>Integral: cap back face behind the CL bearing (Woodbury 1'-6: the 3'-0 cap centred on CL brg and the piles). NaN = required input missing.</summary>
+    public double CapBackToBearing { get; set; } = double.NaN;
+    /// <summary>Integral: cap front face ahead of the CL bearing (Woodbury 1'-6).</summary>
+    public double CapFrontToBearing { get; set; } = double.NaN;
+    /// <summary>Integral: S (along the support line, from the alignment point) of each step riser, one between each pair of adjacent girders, in S order.
+    /// Empty = not given: see <see cref="StepRisersAtMidBay"/>.</summary>
+    public List<double> StepBoundaryS { get; set; } = new();
+    /// <summary>Integral: risers at mid-bay between the girder bearings. Set only when the plans / designer confirm it (Woodbury p.17 step diagram: open question Q3);
+    /// with neither this nor <see cref="StepBoundaryS"/> the riser positions are UNRESOLVED and the cap solid is not built.</summary>
+    public bool StepRisersAtMidBay { get; set; }
+    /// <summary>Integral: printed step-top to bearing-seat (beam bottom) distance, e.g. the 3" steel bar (NaN = the step top is compared with the seat directly).</summary>
+    public double StepToSeat { get; set; } = double.NaN;
+    /// <summary>Integral: printed cap depth (step top to bottom) at the left / right end, checked against the model (step diagram p.17; NaN = no check).</summary>
+    public double PlanCapDepthLeft { get; set; } = double.NaN;
+    public double PlanCapDepthRight { get; set; } = double.NaN;
+    /// <summary>Printed concrete volume of the cap (m3; NaN = no check). Woodbury S 18.1 cy, N 19.5 cy (p.17).</summary>
+    public double PlanCapVolume { get; set; } = double.NaN;
+    public WingExtensionDefinition? WingExtension { get; set; }
+    public PileCasingDefinition? PileCasing { get; set; }
+    public PileSpiralDefinition? PileSpiral { get; set; }
     // ---- piles (S coordinates along the line of each station; two rows)
     public List<double> PileStations { get; set; } = new();
+    /// <summary>x (from the CL bearing, + toward the span) of each pile row. Empty = the two legacy rows (-<see cref="PileBackRowToBearing"/>,
+    /// +<see cref="PileFrontRowToBearing"/>). Woodbury integral: [0] (piles on the CL bearing).</summary>
+    public List<double> PileRowOffsets { get; set; } = new();
+    [System.Text.Json.Serialization.JsonIgnore]
+    public IReadOnlyList<double> PileRows => PileRowOffsets.Count > 0 ? PileRowOffsets : new[] { -PileBackRowToBearing, PileFrontRowToBearing };
     public double PileBackRowToBearing { get; set; } = Ft(1) + In(11.5);
     public double PileFrontRowToBearing { get; set; } = Ft(1) + In(9);
     public double PileTopAboveFootingBottom { get; set; } = Ft(2);
@@ -235,8 +337,8 @@ public sealed class AbutmentDefinition
     public List<WingwallDefinition> Wings { get; set; } = new();
     public AbutmentRebarDefinition Rebar { get; set; } = new();
 
-    public double FootingBackX => -(BackwallFrontToBearing + BackwallThickness + FootingBackToBackwallBack);
-    public double FootingFrontX => BearingToFootingFront;
+    public double FootingBackX => Kind == AbutmentKind.Integral ? -CapBackToBearing : -(BackwallFrontToBearing + BackwallThickness + FootingBackToBackwallBack);
+    public double FootingFrontX => Kind == AbutmentKind.Integral ? CapFrontToBearing : BearingToFootingFront;
     public double FootingWidth => FootingFrontX - FootingBackX;
 
     private static readonly System.Text.Json.JsonSerializerOptions CloneOptions = new() { Converters = { new System.Text.Json.Serialization.JsonStringEnumConverter() }, NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.AllowNamedFloatingPointLiterals };

@@ -76,6 +76,7 @@ public sealed partial class SubstructureGenerator
     private SubstructureUnit BuildDesignedAbutment(int j, SubstructureUnit unit, SubstructureDefinition sd, SupportLineResult sl, List<Seat> seats)
     {
         var ad = sd.Abutment!;
+        if (ad.Kind == AbutmentKind.Integral) return BuildIntegralAbutment(j, unit, sd, sl, seats);
         var a = _f.Alignment;
         var def = _f.Definition;
         var sup = def.SupportAt(j);
@@ -373,13 +374,13 @@ public sealed partial class SubstructureGenerator
             { var pi = new PedestalInfo(seat.Girder, seat.S, Nx((xBwF + xStepF) / 2), ad.StepLength, xStepF - xBwF, FB(seat.S) + D + W, top); unit.Pedestals.Add(pi); unit.PedestalBlocks.Add(pi); }
         }
 
-        // ---- main footing foundation and piles at the plan stations (two rows normal to the line)
+        // ---- main footing foundation and piles at the plan stations (rows normal to the line: PileRowOffsets, default the two legacy rows)
         var main = new FoundationInfo { Type = FoundationType.PileCap, S = (s0Mid + s1Mid) / 2, N = nMid, TopZ = FB((s0Mid + s1Mid) / 2) + D, BottomZ = FB((s0Mid + s1Mid) / 2), SizeS = s1Mid - s0Mid, SizeN = ad.FootingWidth };
         unit.Foundations.Add(main);
         geo.PileStationsS = ad.PileStations.ToArray();
         string where = $"{name} pile group 1";
         foreach (double ps in ad.PileStations.OrderBy(x => x))
-            foreach (double xr in new[] { -ad.PileBackRowToBearing, ad.PileFrontRowToBearing })
+            foreach (double xr in ad.PileRows)
             {
                 double pn = Nx(xr);
                 if (ps < leftEnd(pn) + In(6) || ps > rightEnd(pn) - In(6))
@@ -391,7 +392,7 @@ public sealed partial class SubstructureGenerator
         // ---- wingwalls, counterforts, wing footings with piles
         foreach (var wd in ad.Wings) BuildWing(unit, sd, geo, wd, a, sg, name, Nx(xBwB), SolveS);
 
-        Note($"{name}: as-designed abutment, footing {L(s1Mid - s0Mid)} along the line, {ad.PileStations.Count * 2} footing piles + {unit.Foundations.Skip(1).Sum(f => f.Piles.Count)} wing piles, {ad.Wings.Count} wingwalls ({ad.Source}).");
+        Note($"{name}: as-designed abutment, footing {L(s1Mid - s0Mid)} along the line, {ad.PileStations.Count * ad.PileRows.Count} footing piles + {unit.Foundations.Skip(1).Sum(f => f.Piles.Count)} wing piles, {ad.Wings.Count} wingwalls ({ad.Source}).");
         return unit;
     }
 

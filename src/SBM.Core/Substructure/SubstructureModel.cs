@@ -7,7 +7,7 @@ using SBM.Core.Alignments;
 
 namespace SBM.Core.Substructure;
 
-public enum SubElementKind { Cap, Pedestal, Backwall, Column, DrilledShaft, Footing, Pile, DeckDrain, DrainPipe, SplashBasin, Coupler, Wingwall, Counterfort, Maskwall, WingFooting }
+public enum SubElementKind { Cap, Pedestal, Backwall, Column, DrilledShaft, Footing, Pile, DeckDrain, DrainPipe, SplashBasin, Coupler, Wingwall, Counterfort, Maskwall, WingFooting, PileCasing }
 
 /// <summary>A solid of the substructure with its quantity data.</summary>
 public sealed record SubSolid(SubElementKind Kind, string Name, string Description, Mesh Mesh, bool IsConcrete = true);
@@ -230,4 +230,20 @@ public sealed class AbutmentGeometry
     /// (with its notches / corner pieces), front face, left end. Same planes as the footing solid.</summary>
     public List<Vec2> FootingOutline { get; } = new();
     public double[] PileStationsS { get; set; } = Array.Empty<double>();
+    // ---- integral abutment (AbutmentKind.Integral; SubstructureAbutmentIntegral.cs)
+    /// <summary>Stepped cap top (level per girder step, vertical risers); null = stub abutment or riser positions UNRESOLVED.</summary>
+    public Func<double, double>? StepTop { get; set; }
+    /// <summary>S of the step risers as built (empty = none / UNRESOLVED).</summary>
+    public List<double> StepRisersS { get; } = new();
+    /// <summary>Cap depth (end step top - bottom) at the left / right end on the cap centreline (NaN = not available).</summary>
+    public double DepthAtLeftEnd { get; set; } = double.NaN;
+    public double DepthAtRightEnd { get; set; } = double.NaN;
+    /// <summary>Pile casings (CMP) as scheduled; Bottom / Length NaN = UNRESOLVED.</summary>
+    public List<PileCasingInfo> Casings { get; } = new();
+}
+
+/// <summary>A pile casing: pile position (S, N), top (bottom of the concrete) and bottom elevation (NaN = UNRESOLVED).</summary>
+public sealed record PileCasingInfo(double S, double N, double Top, double Bottom, double Diameter)
+{
+    public double Length => Top - Bottom;
 }

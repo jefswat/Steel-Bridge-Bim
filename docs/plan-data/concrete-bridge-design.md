@@ -1,6 +1,7 @@
 # Concrete-bridge features: design proposal (for review BEFORE implementation)
 
-Status: PROPOSAL, no code changed. Author: design study agent, 2026-10-11. Scope = HANDOFF section 5 items 5, 6 and the
+Status: PROPOSAL; **T1 (feature A, integral abutment) IMPLEMENTED** (see 2.7); the open questions in section 8 are still unanswered.
+Author: design study agent, 2026-10-11. Scope = HANDOFF section 5 items 5, 6 and the
 substructure parts of item 9 (round CIP pipe piles, curved-plate bearings, future-beam pedestals), for the two prestressed
 plan sets:
 
@@ -163,6 +164,28 @@ others; optionally IfcEarthworksFill later).
 | WA-3 | positions of wingwall elevation points A / B / C along the extension | p.20 |
 | WA-4 | north abutment details (p.16) - read before scripting; mirror is NOT assumed | p.16 |
 | WA-5 | abutment length 36'-6 15/16 (p.15) vs 36'-6 7/8 (p.7/p.17) = old U5 | p.15 |
+
+### 2.7 Implementation status (T1, 2026-10-11)
+
+Done: `AbutmentKind { Stub, Integral }` (default Stub = unchanged), `PileRowOffsets` (both kinds; empty = legacy two rows),
+`CapBackToBearing` / `CapFrontToBearing` (required for Integral), stepped cap top from `Steps` with risers at `StepBoundaryS` or
+`StepRisersAtMidBay`, end-depth check `PlanCapDepthLeft/Right`, `PlanCapVolume`, `StepToSeat`, `WingExtensionDefinition`
+(wall + level footing + piles, `WallTopPoint` table), `PileCasingDefinition` (+ `AbutmentGeometry.Casings` schedule records),
+`PileSpiralDefinition` (schedule-only mark), `SubElementKind.PileCasing`. Code: `Substructure/SubstructureAbutmentIntegral.cs`; the
+stub path is untouched except the pile rows. Tests: `tests/SBM.Tests/IntegralAbutmentTests.cs` (11; the p.17 depths 3'-9 1/2,
+3'-8 1/2, 3'-11 3/4, 3'-10 1/2 are reproduced from the step / bottom elevations within 1/8").
+
+Deviations from the sketch in 2.2, all to avoid invented defaults: `StepBoundaryS` empty no longer means mid-bay - mid-bay needs
+`StepRisersAtMidBay = true` (Q3); without either the risers are UNRESOLVED and the cap solid is not built (piles, depths and checks
+still are). Wing extension: `FootingTopElevation` (wall bottom) and `PileTopAboveFootingBottom` are explicit inputs (not printed as far
+as read) - NaN = UNRESOLVED; `PlanPileCount` > positioned piles = UNRESOLVED (WA-1). Casing: NaN bottom = UNRESOLVED (WA-2 / Q5),
+no solid, records with unknown length; with a bottom, a 24-gon envelope solid (casing + fill) per pile. Spiral length uses the
+printed diameter as the helix diameter. Integral rebar: nothing placed in 3D; the plan bar list is schedule-only.
+
+Still open / waiting: Q3 (riser position), Q5 / WA-2 (casing bottom), WA-1 (wing pile position), WA-3 (A/B/C positions), WA-4 (north
+abutment p.16), wing footing top elevation; Woodbury script `samples/plans/abutments-woodbury.csx` not written (needs WA-1/3/4).
+T3: IFC mapping of `PileCasing` (currently falls to the IfcFooting default; only built once a casing bottom is entered) and the
+abutment view panels for the stepped cap (views currently reuse the stub panels with the cap as the "backwall").
 
 ---------------------------------------------------------------------------------------------------------------------
 

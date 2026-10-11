@@ -122,6 +122,14 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
     `AbutmentViews` (3 sheet panels; the plan draws `AbutmentGeometry.FootingOutline` = generator outline with notches), `SubElementKind.Wingwall/Counterfort/Maskwall/WingFooting`,
     `unit.Abutment` (`AbutmentGeometry`). Backwall runs behind the wings to the maskwalls; `CorbelLeft/RightOffset` limit the corbel to the wing inner faces. Standing rule:
     no invented defaults - unresolved plan items are generator warnings ("UNRESOLVED"). Docs `docs/plan-data/abutments-model.md`; scripts `samples/plans/abutments-*.csx`.
+    `AbutmentDefinition.PileRowOffsets` (x of each pile row from CL brg; empty = the two legacy rows `PileRows`). `Kind` = Stub (default, all of the above) |
+    Integral (Iowa integral pile cap, Woodbury p.15-17; `SubstructureAbutmentIntegral.cs`, concrete-bridge design feature A / T1): cap faces `CapBack/FrontToBearing`
+    (required), stepped top = one level step per girder (`Steps`) with vertical risers at `StepBoundaryS` or `StepRisersAtMidBay` (only when confirmed - user question Q3;
+    neither = UNRESOLVED, no cap solid), bottom = `FootingBottom`; no backwall / corbel / step blocks (diaphragm = feature C); checks `PlanCapDepthLeft/Right`
+    (p.17 step diagram), `PlanCapVolume`, `StepToSeat`; `WingExtensionDefinition` (wall outboard of the gutter line + level footing from the cap back face, every
+    missing elevation / position UNRESOLVED), `PileCasingDefinition` (CMP from the concrete bottom to `BottomElevation`; NaN = UNRESOLVED, `AbutmentGeometry.Casings`
+    schedule records only; solid = `SubElementKind.PileCasing`, IFC mapping pending T3), `PileSpiralDefinition` (schedule-only mark, one per pile). Integral rebar:
+    no 3D placement, the plan bar list is schedule-only. `AbutmentGeometry.StepTop/StepRisersS/DepthAtLeftEnd/DepthAtRightEnd`. Views reuse the stub panels (T3 pending).
   - Cap section step / aesthetic relief (OPTIONAL, `SubstructureDefinition.Aesthetics` = `CapAestheticsDefinition`, as-designed caps only): the
     cap is W above the relief curve and W - 1'-0 below (StepSetback 6" per face, BOTH faces). The cap solid itself is the narrower core; `BuildCapStep`
     adds full-width strips above each layer line (`Layers` = BandChains, lowest line first; plans: fan arcs R5, R4, R3, 2" each, drafted 7 deg) as a
