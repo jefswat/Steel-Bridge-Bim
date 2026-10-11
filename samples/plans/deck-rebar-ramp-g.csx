@@ -78,6 +78,13 @@ void EndDam(DeckPlanReinforcement plan, int unit)
     var d4 = B("5d4", 7, 3, 0); d4.Outside = new() { P(51, 3.5), P(3, 3.5), P(3, 24.5), P(21, 24.5) }; d4.Dims = new() { In(48), In(21), In(18) };
     double xb = 65 - 2 * Math.Sqrt(2) - 24.5;                         // bottom bend of 5d5 (outside face), 2" clear from the 45 deg soffit X + Drop = 65
     var d5 = B("5d5", 5, 5, 0); d5.Outside = new() { P(xb - 18, 24.5), P(xb, 24.5), P(xb + 20.5, 4.0), P(xb + 38.5, 4.0) }; d5.Dims = new() { In(18), In(29), In(18) };
+    // User decision 2026-10-11 (option A): 5d4 clashes with the steel are covered by the plan note with Section B-B (PDF 137) - reported as Info, not moved.
+    d4.FieldCutNote = "Section B-B, PDF 137: '5d4 bars shall be field cut or spaced as required at expansion joint support boxes'";
+    // Any other mark that meets the steel stays a PLAN CONFLICT (bars never moved). Unit 3: its girders have 20" top flanges at the Pier 9G / 14G ends.
+    if (unit == 3)
+        foreach (var d in new[] { d2, d3, d5 })
+            d.ConflictNote = "the partial section (PDF 138) puts the first bar 10\" from each girder CL, but Unit 3's top flanges at Piers 9G / 14G are 20\" wide (10\" each side), " +
+                             "so the bar sits on the flange edge and its leg below the slab runs through the flange (Units 1, 2, 4 have 18\" flanges: 11/16\" clear)";
     plan.EndDam.AddRange(new[] { d2, d3, d4, d5 });
     string ends5 = unit == 1 ? "South Abutment (section A-A, PDF 137) and Pier 5G" : unit == 4 ? "Piers 14G and 19G (sections B-B PDF 137, E-E PDF 140)" : "both expansion piers (section B-B, PDF 137)";
     plan.Unresolved.Add($"Ramp G Unit {unit} end dam longitudinal bars 5e* at {ends5}: the bars along the joint are drawn as dots in the sections but only those at hoop corners follow " +
@@ -109,8 +116,8 @@ foreach (var sp in specs)
     // CALIBRATION (not dimensioned on the plans, as for I-80 in docs\plan-data\deck-rebar.md section 3): where the transverse bars stop at the skewed
     // Pier 19G end of Unit 4. The printed last bars 7a2 3'-1 (4'-7 1/2 before the end of the right edge) and 7a3 2'-6 (4'-2 1/2) and the first 7a2 33'-3
     // need the bar ends 27" from the end of slab, normal to it (= blockout D 25" + 2", as at the I-80 Unit 2 end): model 33'-2 7/8 .. 3'-1 5/8 / 33'-10 3/8 .. 2'-6.
-    // The other Ramp G ends are radial (no clipped lines).
-    if (sp.U == 4) plan.TransverseEndClear = In(27);
+    // The other Ramp G ends are radial (no clipped lines). CALIBRATED value, not a plan dimension: accepted by the user 2026-10-11 (decision 5, option A).
+    if (sp.U == 4) plan.TransverseEndClear = In(27);   // CALIBRATED (Pier 19G slab bar end clear, 27" normal to the end of slab)
     if (sp.U == 4 && double.TryParse(Environment.GetEnvironmentVariable("DR_TE"), out var teIn)) plan.TransverseEndClear = In(teIn);
     DeckLinePiece P(string mark, double len = 0) => new() { Mark = mark, Length = len };
     DeckTransverseZone T(string name, DeckBarLayer layer, double startIn, int n, string mark, DeckBarSide refEdge = DeckBarSide.Left) => new()
