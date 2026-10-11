@@ -1,0 +1,58 @@
+mark,shape,dims,pin,page,sum_dims_in,listed_length,listed_in,listed_minus_sum_in,check,tag,note
+A502E,"closed rectangular stirrup, 135-deg hooks at one corner",1'-9 x 5'-6 (out-to-out); hooks undimensioned,not shown,p8 / sh8,174,"15'-6""",186.0,12.0,"2 x 135-deg hook extension not dimensioned; listed - dims = 12 in (DERIVED, not checkable)",TEXT,hook allowance = 12 in total
+A503E,U with 180-deg hooks at both leg tops,"legs 3'-3 (out-to-out to top of hooks), base 3'-8; hook returns undimensioned",not shown,p8 / sh8,122.0,"11'-4""",136.0,14.0,"2 x 180-deg hook return not dimensioned; listed - dims = 14 in (DERIVED, not checkable)",TEXT,hook allowance = 14 in total
+A504E,L (vertical leg + horizontal),horizontal 3'-5; vertical leg undimensioned,not shown,p8 / sh8,41,"8'-1""",97.0,56.0,"vertical leg not dimensioned; listed - dims = 56 in (DERIVED, not checkable)",TEXT,
+A505E,L (vertical leg + horizontal),horizontal 6'-7; vertical leg undimensioned,not shown,p8 / sh8,79.0,"7'-5""",89.0,10.0,"vertical leg not dimensioned; listed - dims = 10 in (DERIVED, not checkable)",TEXT,
+A514E,L (vertical leg + horizontal),horizontal 2'-0; vertical leg undimensioned,not shown,p8 / sh8,24,"6'-8""",80.0,56.0,"vertical leg not dimensioned; listed - dims = 56 in (DERIVED, not checkable)",TEXT,
+A420E,vertical leg up + horizontal + short leg down,"horizontal 1'-1, down leg 5; vertical leg undimensioned",not shown,p8 / sh8,18,"2'-2""",26.0,8.0,"vertical leg not dimensioned; listed - dims = 8 in (DERIVED, not checkable)",TEXT,
+A423E,vertical leg up + horizontal + short leg down,"horizontal 1'-0, down leg 4; vertical leg undimensioned",not shown,p8 / sh8,16,"2'-0""",24.0,8.0,"vertical leg not dimensioned; listed - dims = 8 in (DERIVED, not checkable)",TEXT,
+A506E,U (two equal legs + base),"legs 10, base 3'-8",not shown,p8 / sh8,64.0,"5'-4""",64.0,0.0,OK (sum of out-to-out dims = listed),TEXT,
+A507E,U (two equal legs + base),"legs 2'-1, base 2'-2",not shown,p8 / sh8,76.0,"6'-4""",76.0,0.0,OK (sum of out-to-out dims = listed),TEXT,
+A508M,U (two equal legs + base),"legs 2'-1, base 2'-2",not shown,p8 / sh8,76.0,"6'-4""",76.0,0.0,OK (sum of out-to-out dims = listed),TEXT,
+A516E,U (two equal legs + base),"legs 10, base 1'-2",not shown,p8 / sh8,34.0,"2'-10""",34.0,0.0,OK (sum of out-to-out dims = listed),TEXT,
+A524E,U (two equal legs + base),"legs 10, base 1'-0",not shown,p8 / sh8,32.0,"2'-8""",32.0,0.0,OK (sum of out-to-out dims = listed),TEXT,
+A525E,U (two equal legs + base),"legs 2'-7, base 1'-10",not shown,p8 / sh8,84.0,"7'-0""",84.0,0.0,OK (sum of out-to-out dims = listed),TEXT,
+A526E,U (two equal legs + base),"legs 2'-7, base 4'-2",not shown,p8 / sh8,112.0,"9'-4""",112.0,0.0,OK (sum of out-to-out dims = listed),TEXT,
+A527M,U (two equal legs + base),"legs 2'-2, base 1'-10",not shown,p8 / sh8,74.0,"6'-2""",74.0,0.0,OK (sum of out-to-out dims = listed),TEXT,
+A528M,U (two equal legs + base),"legs 2'-2, base 4'-2",not shown,p8 / sh8,102.0,"8'-6""",102.0,0.0,OK (sum of out-to-out dims = listed),TEXT,
+A529E,U (two equal legs + base),"legs 3'-5, base 2'-0",not shown,p8 / sh8,106.0,"8'-10""",106.0,0.0,OK (sum of out-to-out dims = listed),TEXT,
+B502E,"closed rectangular stirrup, 135-deg hooks at one corner",1'-9 x 5'-6 (out-to-out); hooks undimensioned,not shown,p14 / sh14,174,"15'-6""",186.0,12.0,"2 x 135-deg hook extension not dimensioned; listed - dims = 12 in (DERIVED, not checkable)",TEXT,hook allowance = 12 in total
+B503E,U with 180-deg hooks at both leg tops,"legs 3'-0 (out-to-out to top of hooks), base 3'-8; hook returns undimensioned",not shown,p14 / sh14,116.0,"10'-10""",130.0,14.0,"2 x 180-deg hook return not dimensioned; listed - dims = 14 in (DERIVED, not checkable)",TEXT,hook allowance = 14 in total
+B504E,L (vertical leg + horizontal),horizontal 3'-5; vertical leg undimensioned,not shown,p14 / sh14,41,"8'-1""",97.0,56.0,"vertical leg not dimensioned; listed - dims = 56 in (DERIVED, not checkable)",TEXT,
+B505E,L (vertical leg + horizontal),horizontal 6'-8; vertical leg undimensioned,not shown,p14 / sh14,80.0,"7'-6""",90.0,10.0,"vertical leg not dimensioned; listed - dims = 10 in (DERIVED, not checkable)",TEXT,
+B514E,L (vertical leg + horizontal),horizontal 2'-0; vertical leg undimensioned,not shown,p14 / sh14,24,"6'-8""",80.0,56.0,"vertical leg not dimensioned; listed - dims = 56 in (DERIVED, not checkable)",TEXT,
+B420E,vertical leg up + horizontal + short leg down,"horizontal 1'-1, down leg 5; vertical leg undimensioned",not shown,p14 / sh14,18,"2'-2""",26.0,8.0,"vertical leg not dimensioned; listed - dims = 8 in (DERIVED, not checkable)",TEXT,
+B423E,vertical leg up + horizontal + short leg down,"horizontal 1'-0, down leg 4; vertical leg undimensioned",not shown,p14 / sh14,16,"2'-0""",24.0,8.0,"vertical leg not dimensioned; listed - dims = 8 in (DERIVED, not checkable)",TEXT,
+B506E,U (two equal legs + base),"legs 10, base 3'-8",not shown,p14 / sh14,64.0,"5'-4""",64.0,0.0,OK (sum of out-to-out dims = listed),TEXT,
+B507E,U (two equal legs + base),"legs 1'-11, base 2'-2",not shown,p14 / sh14,72.0,"6'-0""",72.0,0.0,OK (sum of out-to-out dims = listed),TEXT,
+B508M,U (two equal legs + base),"legs 1'-11, base 2'-2",not shown,p14 / sh14,72.0,"6'-0""",72.0,0.0,OK (sum of out-to-out dims = listed),TEXT,
+B516E,U (two equal legs + base),"legs 10, base 1'-2",not shown,p14 / sh14,34.0,"2'-10""",34.0,0.0,OK (sum of out-to-out dims = listed),TEXT,
+B524E,U (two equal legs + base),"legs 10, base 1'-0",not shown,p14 / sh14,32.0,"2'-8""",32.0,0.0,OK (sum of out-to-out dims = listed),TEXT,
+B525E,U (two equal legs + base),"legs 2'-7, base 1'-10",not shown,p14 / sh14,84.0,"7'-0""",84.0,0.0,OK (sum of out-to-out dims = listed),TEXT,
+B526E,U (two equal legs + base),"legs 2'-7, base 3'-0",not shown,p14 / sh14,98.0,"8'-2""",98.0,0.0,OK (sum of out-to-out dims = listed),TEXT,
+B527M,U (two equal legs + base),"legs 2'-2, base 1'-10",not shown,p14 / sh14,74.0,"6'-2""",74.0,0.0,OK (sum of out-to-out dims = listed),TEXT,
+B528M,U (two equal legs + base),"legs 2'-2, base 3'-0",not shown,p14 / sh14,88.0,"7'-4""",88.0,0.0,OK (sum of out-to-out dims = listed),TEXT,
+B529E,U (two equal legs + base),"legs 2'-10, base 2'-0",not shown,p14 / sh14,92.0,"7'-8""",92.0,0.0,OK (sum of out-to-out dims = listed),TEXT,
+S510E,U (two equal legs + base),"legs 2'-9, base 11",not shown,p21 / sh21,77.0,"6'-5""",77.0,0.0,OK (sum of out-to-out dims = listed),TEXT,
+S512E,U (two equal legs + base),"legs 1'-8, base 1'-6",not shown,p21 / sh21,58.0,"4'-10""",58.0,0.0,OK (sum of out-to-out dims = listed),TEXT,
+S513E,U (two equal legs + base),"legs 1'-0, base 2'-8",not shown,p21 / sh21,56.0,"4'-8""",56.0,0.0,OK (sum of out-to-out dims = listed),TEXT,
+S514E,U (two equal legs + base),"legs 1'-0, base 1'-6",not shown,p21 / sh21,42.0,"3'-6""",42.0,0.0,OK (sum of out-to-out dims = listed),TEXT,base printed 1'-6' (single prime)
+S511E,"U with unequal legs (longer leg in deck, note 3)","legs 1'-10 and 2'-10, base 2'-8",not shown,p21 / sh21,88,"7'-4""",88.0,0.0,OK (sum of out-to-out dims = listed),TEXT,
+S615M,L (vertical leg + horizontal in deck),horizontal 3'-6; vertical leg undimensioned,not shown,p21 / sh21,42,"6'-0""",72.0,30.0,"vertical leg not dimensioned; listed - dims = 30 in (DERIVED, not checkable)",TEXT,
+S616M,horizontal + 45-deg (12:12) up-leg,horizontal 3'-10; sloped leg undimensioned,not shown,p21 / sh21,46,"5'-10""",70.0,24.0,"45-deg leg not dimensioned; listed - dims = 24 in (DERIVED, not checkable)",TEXT,
+S617S,straight with 180-deg hook at one end,3'-6 out-to-out incl. hook; hook diameter/return undimensioned,not shown,p21 / sh21,42,"4'-2""",50.0,8.0,"180-deg hook return not dimensioned; listed - dims = 8 in (DERIVED, not checkable)",TEXT,
+R501M,dowel: tail in deck + 2 3/8:12 sloped leg + top + vertical leg + foot,"tail 1'-6, slope 2 3/8:12, top 9, height 1'-5; foot undimensioned",not shown,p24 / sh24 (std),61.33,"5'-7""",67.0,5.67,"foot at vertical leg bottom not dimensioned; listed - dims = 5.67 in (DERIVED, not checkable)",RASTER,sloped leg taken as true length h*sqrt(1+(2.375/12)^2)
+R502E,dowel: tail in deck + 2 3/8:12 sloped leg + top + vertical leg + foot,"tail 1'-6, slope 2 3/8:12, top 9, height 1'-6; foot undimensioned",not shown,p24 / sh24 (std),63.349,"5'-9""",69.0,5.651,"foot at vertical leg bottom not dimensioned; listed - dims = 5.651 in (DERIVED, not checkable)",RASTER,sloped leg taken as true length h*sqrt(1+(2.375/12)^2)
+R503E,dowel: tail in deck + 2 3/8:12 sloped leg + top + vertical leg + foot,"tail 1'-6, slope 2 3/8:12, top 7 1/2, height 1'-6; foot undimensioned",not shown,p24 / sh24 (std),61.849,"5'-8""",68.0,6.151,"foot at vertical leg bottom not dimensioned; listed - dims = 6.151 in (DERIVED, not checkable)",RASTER,sloped leg taken as true length h*sqrt(1+(2.375/12)^2)
+R504E,dowel: tail in deck + 2 3/8:12 sloped leg + top + vertical leg + foot,"tail 1'-6, slope 2 3/8:12, top 7, height 1'-6; foot undimensioned",not shown,p24 / sh24 (std),61.349,"5'-7""",67.0,5.651,"foot at vertical leg bottom not dimensioned; listed - dims = 5.651 in (DERIVED, not checkable)",RASTER,sloped leg taken as true length h*sqrt(1+(2.375/12)^2)
+R505M,"closed tapered loop (vertical back, sloped front) + 8 in leg (typ.)","top 4 1/2, height 2'-8, bottom 10 1/2, 8 leg",not shown,p24 / sh24 (std),87.558,"7'-1""",85.0,-2.558,NOT RECONCILED,RASTER,sum uses true sloped length; std sheet length convention for this shape not stated
+R517E,"closed tapered loop (vertical back, sloped front) + 8 in leg (typ.)","top 4 1/2, height 2'-8, bottom 10 1/2, 8 leg",not shown,p24 / sh24 (std),87.558,"7'-1""",85.0,-2.558,NOT RECONCILED,RASTER,sum uses true sloped length; std sheet length convention for this shape not stated
+R506E,"closed tapered loop (vertical back, sloped front) + 8 in leg (typ.)","top 5, height 2'-6, bottom 10, 8 leg",not shown,p24 / sh24 (std),83.414,"6'-9""",81.0,-2.414,NOT RECONCILED,RASTER,sum uses true sloped length; std sheet length convention for this shape not stated
+R507E,"closed tapered loop (vertical back, sloped front) + 8 in leg (typ.)","top 5, height 2'-4, bottom 9, 8 leg",not shown,p24 / sh24 (std),78.284,"6'-5""",77.0,-1.284,NOT RECONCILED,RASTER,sum uses true sloped length; std sheet length convention for this shape not stated
+R518E,"closed tapered loop (vertical back, sloped front) + 8 in leg (typ.)","top 4 1/2, height 1'-8, bottom 8, 8 leg",not shown,p24 / sh24 (std),60.804,"5'-1""",61.0,0.196,NOT RECONCILED,RASTER,sum uses true sloped length; std sheet length convention for this shape not stated
+R408E,straight + 2:12 sloped end,straight 11'-7; sloped leg undimensioned,not shown,p24 / sh24 (std),139,"13'-0""",156.0,17.0,"2:12 leg not dimensioned; listed - dims = 17 in (DERIVED, not checkable)",TEXT,
+G301E,straight,2'-6,not shown,p16 / sh16 (std mod.),30,,,,no bill length (no bar list for beam bars),TEXT,
+G303E,bottom-flange bar: horizontal + 3 1/2 offset + 4:12 sloped leg,"horizontal 2'-11, offset 3 1/2, sloped 1'-10 (4:12)",not shown,p16 / sh16 (std mod.),60.5,,,,no bill length (no bar list for beam bars),RASTER,
+G508E,L,"vertical 2'-10, top leg 1'-0",not shown,p16 / sh16 (std mod.),46,,,,no bill length (no bar list for beam bars),TEXT,note 11: each pair may be replaced by one No. 5 bulbed bar
+G402E,hairpin (180-deg top),"height 2'-10, width 4 (out-to-out)",not shown,p16 / sh16 (std mod.),72,,,,no bill length (no bar list for beam bars),TEXT,sum is not a bar length (180-deg bend)
+G505E,C (vertical + top flange leg + bottom leg),"vertical 2'-1, top flange leg 3'-6, bottom leg 1'-0",not shown,p16 / sh16 (std mod.),79,,,,no bill length (no bar list for beam bars),TEXT,
