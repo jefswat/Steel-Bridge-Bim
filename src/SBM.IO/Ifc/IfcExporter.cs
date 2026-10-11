@@ -37,8 +37,6 @@ public enum IfcGeometryMode
     /// <summary>Alignment-based Reference View (AbV): only geometry the view allows (no IfcExtrudedAreaSolid, booleans or half
     /// spaces) - face sets, swept disks, and solids placed along the IFC 4.3 alignment.</summary>
     ReferenceView,
-    /// <summary>Exact curved surfaces as NURBS (IfcAdvancedBrep with B-spline faces) for curved parts; NOT allowed in AbV.</summary>
-    Nurbs,
 }
 
 /// <param name="ChordTolerance">ReferenceView: max sagitta (m) of the polygons replacing hole circles and profile arcs;
@@ -53,7 +51,7 @@ public sealed record IfcExportOptions(IfcGeometryMode Geometry = IfcGeometryMode
 /// Solids the builders recorded as exact extrusions (plates with bolt holes, angles, boxes, straight girder plates) are
 /// IfcExtrudedAreaSolid with an IfcArbitraryProfileDefWithVoids (polyline outline, IfcCircle holes); everything else is
 /// an IfcTriangulatedFaceSet with merged vertices. Bolts/studs are mapped items; bars and strands are swept disks.
-/// Alignments are IfcAlignment with a 3D polyline axis.
+/// Alignments are IFC 4.3 alignments (layout, IfcGradientCurve, stationing): see <see cref="IfcAlignmentWriter"/>.
 /// </summary>
 public static class IfcExporter
 {
@@ -751,28 +749,21 @@ public static class IfcExporter
                 w.Add("IFCRELCONTAINEDINSPATIALSTRUCTURE", $"{Guid(bk + "/rel/ps/" + i)},$,$,$,{Refs(contained.Skip(i).Take(5000))},{Ref(superPart)}");
         }
 
-        // ---- alignments
+        // ---- alignments: IFC 4.3 layout + IfcCompositeCurve / IfcGradientCurve + stationing (IfcAlignmentWriter), the same in
+        // every geometry mode. Aggregated to the project (bSI: alignments belong to IfcProject) and referenced by the site.
+        // Code that places products along an alignment uses alignmentWriter.For(name) / .Written (curve ids, LinearPlacement).
+        var alignmentWriter = new IfcAlignmentWriter(w, scale, basePt, axisCtx, u);
         var alignmentIds = new List<int>();
         foreach (var al in project.Alignments.Where(a => a.Elements.Count > 0))
         {
-            var pts = al.SamplePolyline(0, al.Length, 0, 0.005, 5);
-            var sb = new StringBuilder("(");
-            for (int i = 0; i < pts.Count; i++)
-            {
-                if (i > 0) sb.Append(',');
-                var so = al.Inverse(pts[i]);
-                double z = al.Profile.IsEmpty ? 0 : al.Profile.ElevationAt(so.Station);
-                sb.Append(P(pts[i].WithZ(z)));
-            }
-            sb.Append("),$");
-            int pl = w.Add("IFCCARTESIANPOINTLIST3D", sb.ToString());
-            int curve = w.Add("IFCINDEXEDPOLYCURVE", $"{Ref(pl)},$,.F.");
-            int pds = Shape(curve, "Curve3D", axisCtx);
             int alPl = w.Add("IFCLOCALPLACEMENT", $"{Ref(sitePl)},{Ref(axis)}");
-            alignmentIds.Add(w.Add("IFCALIGNMENT", $"{Guid(IfcKeys.Alignment(key, al.Name))},$,{S(al.Name)},{S(al.Description)},$,{Ref(alPl)},{Ref(pds)},.NOTDEFINED."));
+            alignmentIds.Add(alignmentWriter.Write(al, key, alPl).Alignment);
         }
         if (alignmentIds.Count > 0)
-            w.Add("IFCRELCONTAINEDINSPATIALSTRUCTURE", $"{Guid(key + "/rel/site-alignments")},$,$,$,{Refs(alignmentIds)},{Ref(site)}");
+        {
+            w.Add("IFCRELAGGREGATES", $"{Guid(key + "/rel/project-alignments")},$,$,$,{Ref(proj)},{Refs(alignmentIds)}");
+            w.Add("IFCRELREFERENCEDINSPATIALSTRUCTURE", $"{Guid(key + "/rel/site-alignments")},$,$,$,{Refs(alignmentIds)},{Ref(site)}");
+        }
 
         // ---- bridges
         var bridgeIds = new List<int>();

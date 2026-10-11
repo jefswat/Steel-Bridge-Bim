@@ -27,7 +27,7 @@ public static class Program
                                                             messages, undo, close. "sbm app help" lists them; "sbm app list"
                                                             shows running copies. (All other commands work on .sbm files.)
           sbm regen <file.sbm>                              Regenerate; print counts, warnings, timing
-          sbm export <file.sbm> [--ifc a.ifc|a.ifczip] [--geometry parametric|abv|nurbs] [--chord-tol mm] [--dxf b.dxf] [--landxml c.xml]
+          sbm export <file.sbm> [--ifc a.ifc|a.ifczip] [--geometry parametric|abv] [--chord-tol mm] [--dxf b.dxf] [--landxml c.xml]
           sbm db <file.sbm> [out.sqlite] [--pages] [--plans <folder>[,<folder>]] [--links rules.json] [--no-previews] [--no-vacuum]
                                                             [--unused report.md]
                                                             Companion SQLite database: every element (IFC GlobalIds + hierarchy),
@@ -181,8 +181,7 @@ public static class Program
                     {
                         null or "parametric" => SBM.IO.Ifc.IfcGeometryMode.Parametric,
                         "abv" or "referenceview" => SBM.IO.Ifc.IfcGeometryMode.ReferenceView,
-                        "nurbs" => SBM.IO.Ifc.IfcGeometryMode.Nurbs,
-                        var g => throw new ArgumentException($"--geometry {g}: use parametric, abv or nurbs"),
+                        var g => throw new ArgumentException($"--geometry {g}: use parametric or abv"),
                     };
                     // --chord-tol <mm>: ReferenceView polygon tolerance for hole circles / profile arcs (default 1/32 in = 0.79 mm).
                     double chord = Opt("--chord-tol") is { } ct ? double.Parse(ct, System.Globalization.CultureInfo.InvariantCulture) / 1000 : 0;
