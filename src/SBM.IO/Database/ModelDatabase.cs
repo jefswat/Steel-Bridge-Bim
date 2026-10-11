@@ -69,7 +69,7 @@ public static class ModelDatabase
           props_id INTEGER);
         CREATE TABLE IF NOT EXISTS sheets(
           sheet_id TEXT PRIMARY KEY, plan_set TEXT NOT NULL, pdf_file TEXT, pdf_page INTEGER, design_sheet TEXT, title TEXT,
-          page_file TEXT, preview_file TEXT, kind TEXT, note TEXT);
+          page_file TEXT, preview_file TEXT, kind TEXT, note TEXT, pdf_path TEXT);
         CREATE TABLE IF NOT EXISTS element_sheet(
           global_id TEXT NOT NULL, sheet_id TEXT NOT NULL, role TEXT NOT NULL DEFAULT 'detail', basis TEXT, source TEXT,
           PRIMARY KEY(global_id, sheet_id)) WITHOUT ROWID;
@@ -143,6 +143,7 @@ public static class ModelDatabase
         if (Scalar<int>(cn, "SELECT COUNT(*) FROM sqlite_master WHERE name='elements' AND type='table'") > 0) Exec(cn, "DROP TABLE elements");
         Exec(cn, SchemaSql);
         if (Scalar<int>(cn, "SELECT COUNT(*) FROM pragma_table_info('sheets') WHERE name='note'") == 0) Exec(cn, "ALTER TABLE sheets ADD COLUMN note TEXT");
+        if (Scalar<int>(cn, "SELECT COUNT(*) FROM pragma_table_info('sheets') WHERE name='pdf_path'") == 0) Exec(cn, "ALTER TABLE sheets ADD COLUMN pdf_path TEXT");
         return cn;
     }
 

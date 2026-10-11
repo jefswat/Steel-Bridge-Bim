@@ -1,0 +1,133 @@
+{
+  // Plan sheet links of the Woodbury model (Iowa DOT Design 817, I-29 NB over Floyd Blvd, stage 1; PPC BTD beams).
+  // Format: see sheet-links-i80-rampg.json (header) and docs/API.md "Companion database". Sheet index and families:
+  // docs/plan-data/woodbury-i29-floyd/INDEX.md (PDF page p = design sheet p-2 for pages 3-44).
+  // Hierarchy in this model: unit > superstructure > prestressed girder (assembly: beam + strands) | cross frame group > cross frame
+  //   (steel diaphragm: channel, gussets, fillers, bolts) | bearing pad; unit > deck > deck slab. The substructure of this model is
+  //   disabled (Substructure.Enabled = false) and the concrete diaphragms are not in the database yet, so the pier / abutment rules
+  //   below link the bearing pads at that support and are ready for the pier / abutment parts when they are generated.
+
+  "models": [ "Woodbury I-29 NB over Floyd.sbm" ],
+  "planFolders": [ "plans", "C:/SBMData" ],
+
+  "planSets": [
+    { "id": "design-817", "pdf": "Woodbury 0817*.pdf", "bridgeGroup": "I-29 NB over Floyd Blvd - Stage 1",
+      "sheets": [
+        { "p": 1, "s": "", "t": "TITLE SHEET" },
+        { "p": 2, "s": "", "t": "REVISION SHEET" },
+        { "p": 3, "s": "1", "t": "ESTIMATED QUANTITIES" },
+        { "p": 4, "s": "2", "t": "SUMMARY OF ITEMIZED QUANTITIES" },
+        { "p": 5, "s": "3", "t": "GENERAL NOTES" },
+        { "p": 6, "s": "4", "t": "SITUATION PLAN (NB)" },
+        { "p": 7, "s": "5", "t": "STAKING DIAGRAM" },
+        { "p": 8, "s": "6", "t": "CONSTRUCTION STAGING" },
+        { "p": 9, "s": "7", "t": "PIER DETAILS" },
+        { "p": 10, "s": "8", "t": "PIER DETAILS" },
+        { "p": 11, "s": "9", "t": "PIER DETAILS" },
+        { "p": 12, "s": "10", "t": "PIER DETAILS" },
+        { "p": 13, "s": "11", "t": "PIER AESTHETIC DETAILS" },
+        { "p": 14, "s": "12", "t": "PIER AESTHETIC DETAILS" },
+        { "p": 15, "s": "13", "t": "SOUTH ABUTMENT DETAILS" },
+        { "p": 16, "s": "14", "t": "NORTH ABUTMENT DETAILS" },
+        { "p": 17, "s": "15", "t": "ABUTMENT PILE PLAN & STEP DIAGRAM" },
+        { "p": 18, "s": "16", "t": "SUPERSTRUCTURE DETAILS" },
+        { "p": 19, "s": "17", "t": "SUPERSTRUCTURE DETAILS" },
+        { "p": 20, "s": "18", "t": "LONGITUDINAL SECTION" },
+        { "p": 21, "s": "19", "t": "BEAM LAYOUT" },
+        { "p": 22, "s": "20", "t": "DECK PLAN & REINFORCEMENT" },
+        { "p": 23, "s": "21", "t": "TRANSVERSE DECK REINFORCING" },
+        { "p": 24, "s": "22", "t": "SUPERSTRUCTURE DETAILS" },
+        { "p": 25, "s": "23", "t": "P.P.C. BEAM DATA SHEET" },
+        { "p": 26, "s": "24", "t": "DECK, ABUT. & DIAPH. QUANTITIES" },
+        { "p": 27, "s": "25", "t": "BTD BEAM DETAILS" },
+        { "p": 28, "s": "26", "t": "BTD55 BEAM DETAILS" },
+        { "p": 29, "s": "27", "t": "BTD60 BEAM DETAILS" },
+        { "p": 30, "s": "28", "t": "BTD105 BEAM DETAILS" },
+        { "p": 31, "s": "29", "t": "STEEL DIAPHRAGM DETAILS" },
+        { "p": 32, "s": "30", "t": "STEEL DIAPHRAGM DETAILS" },
+        { "p": 33, "s": "31", "t": "TOP OF DECK ELEVATIONS" },
+        { "p": 34, "s": "32", "t": "HAUNCH DATA DETAILS" },
+        { "p": 35, "s": "33", "t": "LIGHTING DETAILS" },
+        { "p": 36, "s": "34", "t": "LIGHTING DETAILS" },
+        { "p": 37, "s": "35", "t": "LIGHTING DETAILS" },
+        { "p": 38, "s": "36", "t": "BARRIER RAIL DETAILS" },
+        { "p": 39, "s": "37", "t": "BARRIER RAIL DETAILS" },
+        { "p": 40, "s": "38", "t": "CONCRETE SLOPE PROTECTION" },
+        { "p": 41, "s": "39", "t": "CONCRETE SLOPE PROTECTION" },
+        { "p": 42, "s": "40", "t": "SUBDRAIN DETAILS" },
+        { "p": 43, "s": "41", "t": "ABUTMENT BACKFILL DETAILS" },
+        { "p": 44, "s": "42", "t": "CONCRETE TEXTURE & RUSTICATION DETAILS" },
+        { "p": 45, "s": "SPS.1", "t": "SOIL PROFILE SHEET 1" },
+        { "p": 46, "s": "SPS.2", "t": "SOIL PROFILE SHEET 2" },
+        { "p": 47, "s": "SPS.3", "t": "SOIL PROFILE SHEET 3" },
+        { "p": 48, "s": "A.3", "t": "PACKAGING OVERVIEW" }
+      ] }
+  ],
+
+  "administrative": [ "^TITLE SHEET", "^REVISION SHEET", "^PACKAGING OVERVIEW" ],
+
+  "rules": [
+    { "id": "general-notes", "sheets": "^(ESTIMATED QUANTITIES|SUMMARY OF ITEMIZED QUANTITIES|GENERAL NOTES)\\b", "role": "general",
+      "basis": "General notes, estimated and itemized quantities", "target": [ { "level": "unit" } ] },
+    { "id": "situation", "sheets": "^SITUATION PLAN", "role": "general", "basis": "Situation plan: curve data, profile, superelevation",
+      "target": [ { "level": "alignment" }, { "level": "unit" } ] },
+    { "id": "staking", "sheets": "^STAKING DIAGRAM", "role": "general", "basis": "Staking diagram: support lines and beam layout",
+      "target": [ { "level": "unit" } ] },
+    { "id": "staging", "sheets": "^CONSTRUCTION STAGING", "role": "general", "basis": "Construction staging (stage 1 of the NB bridge)",
+      "target": [ { "level": "unit" } ] },
+
+    { "id": "pier-details", "sheets": "^PIER DETAILS", "basis": "Pier caps, columns, footings, piles and reinforcing (bar lists p.12)",
+      "target": [ { "level": "part", "category": "pier" }, { "level": "element", "category": "bearing pad", "support": "Pier%" } ] },
+    { "id": "pier-aesthetics", "sheets": "^PIER AESTHETIC DETAILS", "basis": "Pier treatment (thin veneer brick)",
+      "target": [ { "level": "group", "category": [ "cap group", "column group" ], "support": "Pier%" } ] },
+    { "id": "south-abutment", "sheets": "^SOUTH ABUTMENT DETAILS", "basis": "South (integral) abutment: cap, piles, end diaphragm, beam seats",
+      "target": [ { "level": "part", "category": "abutment", "support": "S%Abut%" }, { "level": "element", "category": "bearing pad", "support": "S%Abut%" } ] },
+    { "id": "north-abutment", "sheets": "^NORTH ABUTMENT DETAILS", "basis": "North (integral) abutment: cap, piles, end diaphragm, beam seats",
+      "target": [ { "level": "part", "category": "abutment", "support": "N%Abut%" }, { "level": "element", "category": "bearing pad", "support": "N%Abut%" } ] },
+    { "id": "abutment-piles", "sheets": "^ABUTMENT PILE PLAN", "basis": "Abutment pile plan, step diagram and seat elevations",
+      "target": [ { "level": "part", "category": "abutment" }, { "level": "element", "category": "bearing pad", "support": "%Abut%" } ] },
+
+    { "id": "typical-section", "sheets": "^SUPERSTRUCTURE DETAILS", "pages": [ 18, 19 ], "basis": "Typical section: deck, haunch, beam spacing, barrier",
+      "target": [ { "level": "part", "category": "deck" }, { "level": "assembly", "category": "prestressed girder" } ] },
+    { "id": "camber", "sheets": "^SUPERSTRUCTURE DETAILS", "pages": [ 24 ], "basis": "Beam camber data, deck thickness at the beams",
+      "target": [ { "level": "assembly", "category": "prestressed girder" }, { "level": "part", "category": "deck" } ] },
+    { "id": "longitudinal-section", "sheets": "^LONGITUDINAL SECTION", "basis": "Longitudinal section: spans, top of pier details, bearing pads",
+      "target": [ { "level": "part", "category": "superstructure" } ] },
+    { "id": "beam-layout", "sheets": "^BEAM LAYOUT", "basis": "Beam layout: beam lines, work points, diaphragm locations",
+      "target": [ { "level": "part", "category": "superstructure" } ] },
+    { "id": "deck", "sheets": "^(DECK PLAN & REINFORCEMENT|TRANSVERSE DECK REINFORCING)", "basis": "Deck plan, reinforcing and placement",
+      "target": [ { "level": "part", "category": "deck" } ] },
+    { "id": "quantities-bar-list", "sheets": "^DECK, ABUT\\. & DIAPH\\. QUANTITIES", "basis": "Deck / abutment / diaphragm bar list and quantities",
+      "target": [ { "level": "part", "category": [ "deck", "abutment" ] } ] },
+    { "id": "beam-data", "sheets": "^(P\\.P\\.C\\. BEAM DATA SHEET|BTD BEAM DETAILS)", "basis": "PPC beam data: camber, bearing seats, beam bar list",
+      "target": [ { "level": "assembly", "category": "prestressed girder" }, { "level": "element", "category": "bearing pad" } ] },
+    { "id": "btd55", "sheets": "^BTD55 BEAM DETAILS", "basis": "BTD55 standard beam: section, strand pattern (span 1)",
+      "target": [ { "level": "assembly", "category": "prestressed girder", "name": "%-S1" } ] },
+    { "id": "btd105", "sheets": "^BTD105 BEAM DETAILS", "basis": "BTD105 standard beam: section, strand pattern (span 2)",
+      "target": [ { "level": "assembly", "category": "prestressed girder", "name": "%-S2" } ] },
+    { "id": "btd60", "sheets": "^BTD60 BEAM DETAILS", "basis": "BTD60 standard beam: section, strand pattern (span 3)",
+      "target": [ { "level": "assembly", "category": "prestressed girder", "name": "%-S3" } ] },
+    { "id": "steel-diaphragms", "sheets": "^STEEL DIAPHRAGM DETAILS", "basis": "Steel intermediate diaphragms (std 1036-BTD): members, bolt holes",
+      "target": [ { "level": "group", "category": "cross frame group" } ] },
+    { "id": "top-of-deck", "sheets": "^TOP OF DECK ELEVATIONS", "basis": "Top of deck elevations",
+      "target": [ { "level": "part", "category": "deck" } ] },
+    { "id": "haunch", "sheets": "^HAUNCH DATA DETAILS", "basis": "Haunch data along the beams",
+      "target": [ { "level": "assembly", "category": "prestressed girder" }, { "level": "part", "category": "deck" } ] },
+    { "id": "barrier", "sheets": "^BARRIER RAIL DETAILS", "basis": "Barrier rail profile, reinforcing and bar list",
+      "target": [ { "level": "group", "category": "barrier group" }, { "level": "element", "category": "barrier" } ] },
+    { "id": "lighting", "sheets": "^LIGHTING DETAILS", "basis": "Lighting",
+      "target": [ { "level": "group", "category": "lighting" } ] }
+  ],
+
+  "hints": [
+    { "sheets": "PIER DETAILS|PIER AESTHETIC", "suggests": "Piers: the model's substructure is disabled (Substructure.Enabled = false); only the bearing pads at the piers link here." },
+    { "sheets": "ABUTMENT DETAILS", "suggests": "Abutments: the model's substructure is disabled; only the bearing pads link here." },
+    { "sheets": "LIGHTING", "suggests": "Lighting (poles, conduit, junction boxes) is not in this model." },
+    { "sheets": "BARRIER RAIL", "suggests": "Barrier: not generated in this model (no barrier group in the database)." },
+    { "sheets": "SLOPE PROTECTION", "suggests": "Slope protection under the bridge: no earthwork / slope-protection elements." },
+    { "sheets": "SUBDRAIN", "suggests": "Subdrain behind the abutments: not modeled." },
+    { "sheets": "BACKFILL", "suggests": "Abutment backfill: not modeled." },
+    { "sheets": "TEXTURE", "suggests": "Concrete texture / rustication (surface treatment): not modeled." },
+    { "sheets": "SOIL PROFILE", "suggests": "Soil borings: no geotechnical elements." }
+  ]
+}
