@@ -6,7 +6,7 @@
 // line to soffit at the kinks, DEPTH_CL = same at the column, SOFF_KINK_*, SOFF_COL k = soffit at column k, COLH_A k = soffit to top of
 // footing, COLH_B k = soffit to the flare elevation, FLARE_ELEV/FLARE_HT, FTG_BOT/FTG_THK, OVERALL k = top line at column k to bottom of
 // footing, PILE_HEAD (pile head above footing bottom), PILE_LEN, PED k = k-th pedestal top from the left (half A/B = ahead/back row),
-// PEDH k = its height (in), ABUT_* = abutment items, NA = printed but no model equivalent. half A on DEPTH/TIPD/OVERALL uses the ahead cap top.
+// PEDH k = its height (in), ABUT_* = abutment items (ABUT_PILE_HEAD = main-footing piles vs the local footing bottom, ABUT_WING_PILE_HEAD = wing-footing piles vs the wing footing bottom), NA = printed but no model equivalent. half A on DEPTH/TIPD/OVERALL uses the ahead cap top.
 // Plan-only closure of the printed dimension strings is listed too (tolerance 0.015 ft: the plan elevations are rounded to 0.01).
 // Env: SUBELEV_OUT=<file> writes every comparison as CSV. Tolerance: differences > 0.01 ft (0.12 in) are flagged.
 using System.Globalization;
@@ -106,11 +106,13 @@ List<PedestalInfo> Row(SubstructureUnit u, string half)
                 return (key == "PEDH" ? r[ci].Height / I : r[ci].SeatZ / F, "");
             }
         case "ABUT_FTG_BOT": return u.CapBottom.Count < 2 ? (double.NaN, "no cap") : ((idx == 1 ? u.CapBottom.First().Y : u.CapBottom.Last().Y) / F, "");
-        case "ABUT_FTG_DEPTH":
-        case "ABUT_WASH_DEPTH": return u.CapBottom.Count < 2 ? (double.NaN, "no cap") : ((u.CapTop.First().Y - u.CapBottom.First().Y) / F, "model cap depth (parametric)");
+        case "ABUT_WASH_DEPTH": return u.CapBottom.Count < 2 ? (double.NaN, "no cap") : ((u.CapTop.First().Y - u.CapBottom.First().Y + (u.Abutment?.Def.WashHeight ?? 0)) / F, "footing depth + the wash in front of the backwall");
+        case "ABUT_FTG_DEPTH": return u.CapBottom.Count < 2 ? (double.NaN, "no cap") : ((u.CapTop.First().Y - u.CapBottom.First().Y) / F, "model cap depth (parametric)");
         case "ABUT_BW_TOP": return u.Backwall is { } bw ? (SubstructureUnit.Interp(bw.Top, 0.0) / F, "backwall top at S = 0 (support line meets the alignment)") : (double.NaN, "no backwall");
         case "ABUT_PILE_LEN": { var v = u.Foundations.SelectMany(q => q.Piles.Select(p => p.Length / F)).ToList(); return v.Count == 0 ? (double.NaN, "no piles") : (v.Average(), ""); }
-        case "ABUT_PILE_HEAD": { var v = u.Foundations.SelectMany(q => q.Piles.Select(p => (p.TopZ - q.BottomZ) / F)).ToList(); return v.Count == 0 ? (double.NaN, "no piles") : (v.Average(), ""); }
+        // main footing piles only, above the LOCAL footing bottom (the East bottom is sloped; CapBottom = the (S, footing bottom) line); the wing footings have their own key
+        case "ABUT_PILE_HEAD": { var v = u.Foundations.Take(1).SelectMany(q => q.Piles.Select(p => (p.TopZ - SubstructureUnit.Interp(u.CapBottom, p.S)) / F)).ToList(); return v.Count == 0 ? (double.NaN, "no piles") : (v.Average(), "main footing piles vs the local footing bottom"); }
+        case "ABUT_WING_PILE_HEAD": { var v = u.Foundations.Skip(1).SelectMany(q => q.Piles.Select(p => (p.TopZ - q.BottomZ) / F)).ToList(); return v.Count == 0 ? (double.NaN, "no wing piles") : (v.Average(), "wing footing piles vs the wing footing bottom"); }
     }
     return (double.NaN, "unknown key");
 }
