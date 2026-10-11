@@ -493,14 +493,27 @@ public sealed partial class SubstructureGenerator
         int built = 0;
         unit.ReliefLines.Clear(); unit.ReliefLineTags.Clear();
 
-        void Face(List<Vec2> outline, double nCore, double dirN)
+        // Top line = top corners of the outline (upper envelope without the steep raked end faces).
+        List<Vec2> TopLine(List<Vec2> outline)
         {
-            // Top line = top corners of the outline (upper envelope without the steep raked end faces).
             var xs = outline.Select(p => p.X).Distinct().OrderBy(x => x).ToList();
             var top = xs.Select(x => new Vec2(x, Envelope(outline, x).hi)).ToList();
             static bool Steep(Vec2 a, Vec2 b) => Math.Abs(b.Y - a.Y) > Math.Abs(b.X - a.X);
             while (top.Count > 2 && Steep(top[0], top[1])) top.RemoveAt(0);
             while (top.Count > 2 && Steep(top[^2], top[^1])) top.RemoveAt(top.Count - 1);
+            return top;
+        }
+        // BandFromLowerTop (stepped top, Pier 6A): both faces' lines are measured from the lower half's top line
+        List<Vec2>? lowerTop = null;
+        if (ae.BandFromLowerTop)
+        {
+            var tb = TopLine(outlineBack); var ta = TopLine(outlineAhead);
+            lowerTop = tb.Average(p => p.Y) <= ta.Average(p => p.Y) ? tb : ta;
+        }
+
+        void Face(List<Vec2> outline, double nCore, double dirN)
+        {
+            var top = lowerTop ?? TopLine(outline);
             var o = top[0];
             var t = (top[^1] - o).Normalized();
             var down = new Vec2(t.Y, -t.X);

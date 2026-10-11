@@ -87,10 +87,14 @@ public sealed class CapAestheticsDefinition
     public List<BandChain> Layers { get; set; } = new();
     /// <summary>Where the numbers came from / how the shape was derived (shown in notes).</summary>
     public string Source { get; set; } = "";
+    /// <summary>Stepped cap top (own back / ahead profiles): true = the layer lines of BOTH faces are measured from the LOWER half's top line (Pier 6A: the
+    /// structural sheets dimension the beak and band depths 5'-0 / 8'-6 from the face-of-cap top 1012.51 of the lower half, section A-A ends the 5c3 hairpins
+    /// hung from that top at the step on both faces, and the 5a11 (E.F.) relief bar is one mark for both faces); false = each face from its own half's top.</summary>
+    public bool BandFromLowerTop { get; set; }
 
     public CapAestheticsDefinition Clone() => new()
     {
-        Face = Face, StepSetback = StepSetback, DraftDegrees = DraftDegrees, Source = Source,
+        Face = Face, StepSetback = StepSetback, DraftDegrees = DraftDegrees, Source = Source, BandFromLowerTop = BandFromLowerTop,
         Layers = Layers.Select(l => l.Clone()).ToList(),
     };
 }

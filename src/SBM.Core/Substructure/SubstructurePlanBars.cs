@@ -339,6 +339,11 @@ public sealed partial class SubstructureGenerator
                 // 5a11 / 5a12: short bars at the cap ends (plan elevation: "5a11 (E.F.)" at the left end, "5a12 (E.F.)" at the right); their height along the end is not dimensioned
                 // The bar end keeps the cover to the (raked) end face at the bar's own height: s0 / s1 are the top corners, at mid-height the end face is inches
                 // further in (centring on s0 + cover put the end through the raked face; Follow then re-centres a bar it has to shorten, so it must fit as given).
+                if (g.Shape == "RC" && g.Dims.Length == 6)
+                {
+                    bars.Add(ReverseCurveSideBar(unit, g, size, face == 0 ? -1 : 1, face == 0 ? nLo + In(3.5) + size.Diameter / 2 : nHi - In(3.5) - size.Diameter / 2, sMid, loc));
+                    continue;
+                }
                 double endC = sMid;
                 if (g.End != 0)
                 {
@@ -739,6 +744,75 @@ public sealed partial class SubstructureGenerator
         return unit.PedestalBlocks.Where(p => unit.Pedestals.Any(q => idx.Contains(q.Girder % 1000)
                 && Math.Abs(q.RowS - p.S) <= p.LengthS / 2 + 1e-6 && Math.Abs(q.RowN - p.N) <= p.WidthN / 2 + 1e-6))
             .OrderBy(p => p.S).ToList();
+    }
+
+    /// <summary>
+    /// Reverse-curve skin bar (Pier 6A 5a11 (E.F.), bend diagram Design 116 PDF 42: R 83'-8 1/2 sag over 26'-9 1/2, R 63'-9 1/2 crest over 25'-9, ends 11 1/2 below /
+    /// 1'-3 above the reference line). The radii are the relief arcs of the aesthetic figure (PDF 83: long arc R 84'-0, fan R 63'-6) 3 1/2" toward the full-width
+    /// section, and the plan elevation PDF 41 ("5a11 (E.F.)") draws the bar along the relief step, section A-A (PDF 40) at the step corner 3 1/2" CL. from the
+    /// face. Its position along the cap is not dimensioned: the rigid bar (shape as printed) is fitted (rotation, S, Z; least squares) to this face's highest
+    /// relief line + 3 1/2" (normal), and the fit residual is reported. Not moved for cover.
+    /// </summary>
+    private RawBar ReverseCurveSideBar(SubstructureUnit unit, PlanBarGroup g, RebarSize size, int side, double n, double sMid, string loc)
+    {
+        var (rs, rp, rlen) = PlanReverseCurve(g.Dims[0], g.Dims[1], g.Dims[2], g.Dims[3], g.Dims[4], g.Dims[5], g.Length);
+        if (Math.Abs(rlen - g.Length) > In(1))
+            Warn($"{unit.Name}: {g.Mark} reverse curve from the bend diagram is {Dim(rlen)} long, the bar list {Dim(g.Length)}.");
+        bool tagged = unit.ReliefLineTags.Count == unit.ReliefLines.Count;
+        var lines = Enumerable.Range(0, unit.ReliefLines.Count).Where(j => unit.ReliefLines[j].Count > 1 && (!tagged || unit.ReliefLineTags[j].Side == side))
+            .Select(j => unit.ReliefLines[j]).ToList();
+        double off = In(3.5);
+        double Target(double sx)
+        {
+            double zr = double.NaN, slope = 0;
+            foreach (var l in lines)
+                if (sx >= l[0].X && sx <= l[^1].X)
+                {
+                    double v = SubstructureUnit.Interp(l, sx);
+                    if (double.IsNaN(zr) || v > zr) { zr = v; slope = (SubstructureUnit.Interp(l, Math.Min(sx + 0.05, l[^1].X)) - SubstructureUnit.Interp(l, Math.Max(sx - 0.05, l[0].X))) / 0.1; }
+                }
+            return double.IsNaN(zr) ? double.NaN : zr + off * Math.Sqrt(1 + slope * slope);
+        }
+        double sC = sMid - (g.Dims[2] - g.Dims[0]) / 2;     // chord centred on mid-cap as the start
+        (double cost, double dz) Eval(double phi, double ds, int stride)
+        {
+            double c = Math.Cos(phi), sn = Math.Sin(phi), sum = 0, sum2 = 0; int cnt = 0, tot = 0;
+            for (int i = 0; i < rp.Length; i += stride)
+            {
+                tot++;
+                double sx = sC + ds + rp[i].X * c - rp[i].Y * sn, zx = rp[i].X * sn + rp[i].Y * c, tz = Target(sx);
+                if (double.IsNaN(tz)) continue;
+                double r = tz - zx; sum += r; sum2 += r * r; cnt++;
+            }
+            if (cnt < tot * 0.6) return (double.MaxValue, 0);
+            double mean = sum / cnt;
+            return (sum2 / cnt - mean * mean, mean);
+        }
+        if (lines.Count == 0)
+        {
+            Warn($"{unit.Name}: UNRESOLVED {g.Mark} reverse-curve bar - no relief line on this face to place it by; placed with its chord level at mid-cap under the top.");
+            double z0 = unit.CapTopAt(sMid) - Ft(4);
+            return new RawBar("C", size, rs, $"{loc} {g.Mark} side faces", rp.Select(p => unit.World(sC + p.X, n, z0 + p.Y)).ToArray());
+        }
+        double bp = 0, bs = 0, bc = double.MaxValue;
+        for (double phi = -0.07; phi <= 0.07 + 1e-9; phi += 0.0035)
+            for (double ds = -Ft(4); ds <= Ft(4) + 1e-9; ds += In(2))
+            { var e = Eval(phi, ds, 4); if (e.cost < bc) { bc = e.cost; bp = phi; bs = ds; } }
+        double p0 = bp, s0f = bs;
+        for (double phi = p0 - 0.0035; phi <= p0 + 0.0035 + 1e-9; phi += 0.0001)
+            for (double ds = s0f - In(2); ds <= s0f + In(2) + 1e-9; ds += In(0.0625))
+            { var e = Eval(phi, ds, 1); if (e.cost < bc) { bc = e.cost; bp = phi; bs = ds; } }
+        var (fc, dzf) = Eval(bp, bs, 1);
+        double cs = Math.Cos(bp), ss = Math.Sin(bp), maxDev = 0;
+        var pts = rp.Select(p =>
+        {
+            double sx = sC + bs + p.X * cs - p.Y * ss, zx = dzf + p.X * ss + p.Y * cs, tz = Target(sx);
+            if (!double.IsNaN(tz)) maxDev = Math.Max(maxDev, Math.Abs(zx - tz));
+            return unit.World(sx, n, zx);
+        }).ToArray();
+        Warn($"{unit.Name}: {g.Mark} ({(side < 0 ? "back" : "ahead")} face) reverse-curve bar fitted to the relief line + 3 1/2\": rotation {bp * 180 / Math.PI:0.00} deg, "
+            + $"rms {Dim(Math.Sqrt(Math.Max(fc, 0)))}, max {Dim(maxDev)} off the offset relief line (its position along the cap is not dimensioned).");
+        return new RawBar("C", size, rs, $"{loc} {g.Mark} side faces", pts);
     }
 
     /// <summary>Pedestal blocks (in cap order) of one bearing row: "BACK" = centre on the -N side of the CL pier, "AHEAD" = +N side.</summary>
