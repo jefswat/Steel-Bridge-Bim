@@ -57,6 +57,9 @@ public sealed partial class MiscItemsGenerator
         {
             g.Warn($"Misc items could not be generated ({ex.Message}) {string.Join(" | ", (ex.StackTrace ?? "").Split('\n').Take(4).Select(l => l.Trim()))}.");
         }
+        // One warning per distinct reason (the elements carry the flag; the viewport layer 3D-UNRESOLVED, Pset SBM_Status and view v_unresolved list them).
+        foreach (var grp in g._m.Elements.Where(e => e.Assumption != null).GroupBy(e => (e.Assumption!.Reason, e.Assumption.Basis)))
+            g.Warn($"UNRESOLVED ({grp.Count()} element{(grp.Count() == 1 ? "" : "s")}: {string.Join("; ", grp.Take(3).Select(e => e.Name))}{(grp.Count() > 3 ? "; ..." : "")}) {grp.Key.Reason} Assumed: {grp.Key.Basis}");
         return g._m;
     }
 
@@ -73,6 +76,14 @@ public sealed partial class MiscItemsGenerator
     {
         if (mesh.IsEmpty) return;
         _m.Elements.Add(new MiscElement(g, k, asm, name, desc, mesh, material, placeholder, basis, location, opening));
+    }
+
+    /// <summary>Marks an already added element (by exact name) as UNRESOLVED: modeled on an assumption the plans do not fix.</summary>
+    private void Flag(string name, string reason, string basis)
+    {
+        int i = _m.Elements.FindIndex(e => e.Name == name);
+        if (i < 0) return;
+        _m.Elements[i] = _m.Elements[i] with { Assumption = Assumption.Unresolved(reason, basis) };
     }
 
     private double Ztop(double sta, double off) => _deck.FinishedElevation(_a, sta, off);
@@ -291,6 +302,17 @@ public sealed partial class MiscItemsGenerator
         double gut = edge + inb * gfe;
         double off0 = gut + inb * tr.InletStartFromGutter, off1 = off0 + inb * tr.InletAcrossDeck, offT = gut + inb * tr.TubeFromGutter;
         var p0 = Pt(sta, off0); var p1 = Pt(sta, off1); var pT = Pt(sta, offT);
+        if (tr.Collector != "" && tr.TubeFromGirderCl is { } gcl && tr.ReferenceGirder >= 0 && tr.ReferenceGirder < _f.Girders.Count)
+        {
+            // The plan's specific dimension (tube 1'-8 from CL girder) governs over the gutter-line position; the difference is a plan / model conflict, reported.
+            var (wb0, tn0, _) = GirderAt(_f.Girders[tr.ReferenceGirder], sta);
+            var pG = wb0.XY + tn0.Right * gcl;
+            double distG = (pT - pG).Length;
+            double offG = _a.Inverse(pG).Offset;
+            if (distG > In(0.25))
+                Warn($"CONFLICT (plan vs model) {who}: the gutter-line dimension puts the tube {Sh(Math.Abs(Vec2.Dot(pT - wb0.XY, tn0.Right)))} from CL girder {_f.Girders[tr.ReferenceGirder].Name}, the plan says {Sh(gcl)}: modeled at {Sh(gcl)} from the girder (governs); offset from the gutter line becomes {Sh(Math.Abs(offG - gut))} (plan {Sh(tr.TubeFromGutter)}). Either the trench / gutter-line geometry (deck edge - 1'-7) or the model's girder {_f.Girders[tr.ReferenceGirder].Name} offset disagrees by {Sh(distG)}; nothing else was adjusted.");
+            pT = pG; offT = offG;
+        }
         var dir = (p1 - p0).Normalized();
         double len = (p1 - p0).Length;
         double z0 = Ztop(sta, off0), z1 = Ztop(sta, off1), zT = Ztop(sta, offT);
@@ -342,13 +364,6 @@ public sealed partial class MiscItemsGenerator
             var drop = MiscMesh.Tube(pT.WithZ(zFlange), pT.WithZ(zCl), pod / 2, pod / 2 - pwall);
             Add(MiscGroup.Drainage, MiscKind.DrainPipe, asm, asm + " drop pipe", $"{Sh(coll.Od)}-class 8\" Sch 40 drop pipe from the flange into the {coll.Name} (45 deg tee geometry not printed: modeled as a straight vertical drop)", drop, "ASTM A53 Gr B, galvanized");
             Record(who, "drop pipe", pT.WithZ(zFlange), pT.WithZ(zCl + coll.Od / 2), pod / 2, sta);
-            if (tr.TubeFromGirderCl is { } gc && tr.ReferenceGirder < _f.Girders.Count)
-            {
-                var (wb, tn, _) = GirderAt(_f.Girders[tr.ReferenceGirder], sta);
-                double dist = Vec2.Dot(pT - wb.XY, tn.Right);
-                if (Math.Abs(Math.Abs(dist) - gc) > In(1)) Warn($"{who}: tube is {Sh(Math.Abs(dist))} from CL girder {_f.Girders[tr.ReferenceGirder].Name}, the plan says {Sh(gc)}: the gutter-line dimension and the girder dimension disagree.");
-                else Info($"{who}: tube {Sh(Math.Abs(dist))} from CL girder {_f.Girders[tr.ReferenceGirder].Name} (plan {Sh(gc)}).");
-            }
             tubeDesc = "piped";
         }
         else
@@ -360,6 +375,8 @@ public sealed partial class MiscItemsGenerator
             Add(MiscGroup.Drainage, MiscKind.DrainTube, asm, asm + " tube", $"{Sh(tr.TubeDiameter)} dia x {Sh(tr.TubeWall)} structural tube, vertical, free fall, {L(zFloor - zEnd)} long, ends {Sh(dr.DropBelowGirders)} below the bottom of the girders",
                 tube, "ASTM A500 structural tube, galvanized", false, "", "", MiscMesh.Cylinder(pT.WithZ(zFloor), pT.WithZ(zSlabBot), rOut));
             Record(who, "tube", pT.WithZ(zFloor), pT.WithZ(zEnd), rOut, sta);
+            Flag(asm + " tube", "Free-fall tube bottom is not fixed: Ramp G PDF 161 section A-A requires at least 1'-0 below the bottom of the girder web connection (L5x3x1/4 x 0'-8 on the web), whose location on the web is not printed.",
+                $"tube ends {Sh(dr.DropBelowGirders)} below the bottom of the bottom flange nearest the tube");
             tubeDesc = "free fall";
             if (dr.SplashBasin)
             {

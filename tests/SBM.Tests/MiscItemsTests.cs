@@ -69,6 +69,15 @@ public class MiscItemsTests
         // outer diameter 8"
         Assert.Equal(In(8), bb.Max.X - bb.Min.X, 1);
         Assert.Contains(misc.Clearances, x => x.Drain.StartsWith("Drain 1") && x.Element == "tube");
+        // free-fall tube bottom is not fixed by the plans: flagged UNRESOLVED (Reason / Basis), and IFC writes Pset SBM_Status
+        var flagged = misc.Elements.Single(e => e.Kind == MiscKind.DrainTube);
+        Assert.Equal("UNRESOLVED", flagged.Assumption!.Status);
+        Assert.Contains("PDF 161", flagged.Assumption.Reason);
+        Assert.Contains(misc.Diagnostics, d => d.Message.StartsWith("UNRESOLVED (1 element"));
+        var sw = new StringWriter();
+        var mm = doc.Model();
+        IfcExporter.Export(sw, "t.ifc", doc.Project, new[] { new IfcBridgeData(doc.Framing(), mm.Steel, mm.Concrete, mm.Substructure) });
+        Assert.Contains("'SBM_Status'", sw.ToString());
         // the trench starts 1/2" clear of the gutter line and is 4'-0 long: inboard extent
         var tr = misc.Elements.Single(e => e.Kind == MiscKind.DrainTrench).Mesh.Bounds();
         Assert.NotNull(misc.Elements.Single(e => e.Kind == MiscKind.DrainTrench).Opening);

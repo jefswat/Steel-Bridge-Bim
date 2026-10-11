@@ -107,6 +107,13 @@ public sealed partial class MiscItemsGenerator
             Add(MiscGroup.SignSupport, MiscKind.SignPlaceholder, asm, asm + " base plate (by others)", $"Base plate {Sh(s.BasePlateDiameter)} dia x {Sh(s.BasePlateThickness)} (not part of this contract)", bp, "By others", true,
                 $"Plans: base plate {Sh(s.BasePlateDiameter)} dia x {Sh(s.BasePlateThickness)}, HSS {s.PostOuterDiameter / 0.0254:F3}x{s.PostWall / 0.0254:F3} truss post and the {L(s.TrussSpan)} sign truss are by others; their heights are not in the plans", $"{s.Support}, girder {g.Name}");
         }
+        foreach (var el in _m.Elements.Where(e => e.Group == MiscGroup.SignSupport && e.Assembly.StartsWith(s.Name + " bracket")).ToList())
+        {
+            if (el.Kind == MiscKind.SignAnchorBolt)
+                Flag(el.Name, "Anchor bolt lengths are not printed (I-80 PDF 178 / 182).", "standard bolt geometry with a 2\" / 3 1/2\" stick-out about the top plate");
+            else if (el.Kind is MiscKind.SignPlate or MiscKind.SignStiffener && !el.Name.EndsWith("(by others)"))
+                Flag(el.Name, "The bracket's plan size and its connection to the girder (details B-G, PDF 178 / 182) are not fully dimensioned; the web is modeled in the girder web plane and overlaps the girder web.", "2'-4 plate lengths along the girder, centred on the girder CL");
+        }
         Warn($"{s.Name}: not modeled - the bolted connection to the girder (the bracket web is modeled in the plane of the girder web, so it overlaps the girder web over the height below the top of web; the plans' field-splice-type connection geometry is not resolved), MC18x45.8 flange members, WT5x22.5 diagonal / horizontal bracing, web and flange splice plates and bolts to the girder, 45 deg clips, 3/4\" bar connections (details A-G); anchor bolt lengths are not printed; the HSS post height and the {L(s.TrussSpan)} truss (size, elevation) are not in the plans (placeholder base plate only).");
         if (s.Brackets.Count > 0)
             Info($"{s.Name}: bracket plan geometry follows the plan dimensions 2'-2 x 2'-4; plate lengths along the girder = 2'-4 (modeling convention; details B-E not fully dimensioned in the extract).");
@@ -270,6 +277,8 @@ public sealed partial class MiscItemsGenerator
             MeshBuilder.AddPrism(bolts, f, g.NutAcrossFlats / Math.Sqrt(3), 6, zt + In(5) - pb.BoltLength, zt + In(5) - pb.BoltLength + g.NutHeight);
         }
         Add(MiscGroup.Lighting, MiscKind.PoleAnchorBolt, asm, asm + " anchor bolts", $"{pb.BoltCount} anchor bolts {Sh(pb.BoltDiameter)} x {Sh(pb.BoltLength)} galvanized on a {Sh(pb.BoltCircleDiameter)} circle, 5\" thread above the top; anchor plate, nuts above the top not modeled", bolts, "Galvanized steel");
+        Flag(asm + " block", "Vertical position of the block top above the deck ('5\" above the base ledge') and its plan position are not fully dimensioned (I-80 PDF 235 / Ramp G PDF 169).", "top 5\" above the deck-edge top, block centred on the CL base along the barrier");
+        Flag(asm + " anchor bolts", "Bolt circle position on the block and the bolt pattern orientation are not dimensioned (I-80 PDF 235 / Ramp G PDF 169).", "circle centred on the block along the barrier, half the block width outboard, pattern at 45 deg to the barrier");
         Warn($"{asm}: placement conventions to confirm - bolt circle centred on the block along the barrier and {Sh(pb.BlockAlong / 2)} outboard of the barrier, pattern at 45 deg to the barrier, block top above the deck-edge top; the pole and luminaire are not in the contract.");
     }
 
@@ -292,6 +301,7 @@ public sealed partial class MiscItemsGenerator
         Add(MiscGroup.Lighting, MiscKind.JunctionBox, asm, asm, $"Iowa LI-104 Type 1 flush cast iron junction box, {kind}, {Sh(jb.Depth)} deep, {Sh(jb.Height)} high", m, "Cast iron", true,
             "Plans: depth 5\" and height 6\"; plan size is in standard road plan LI-104 (not in the set); width, height of the centre above the barrier base (1'-0) and stand-in values flagged",
             $"{jb.Support} {(jb.AlongFromSupport >= 0 ? "+" : "-")}{Sh(Math.Abs(jb.AlongFromSupport))}");
+        Flag(asm, "Plan size of the LI-104 Type 1 box and its height above the barrier base are not in the plan set (I-80 PDF 233-235).", "18\" x 6\" x 5\" box centred 1'-0 above the barrier base on the traffic face");
         Warn($"{asm}: junction box size is not in the plan set (LI-104): placeholder {Sh(jb.Width)} x {Sh(jb.Height)} x {Sh(jb.Depth)}; centre 1'-0 above the barrier base (\"within the textured lower portion\"; exact height not printed).");
     }
 
