@@ -30,7 +30,7 @@ public static class SectionViews
 
         // ---- slab (cut)
         var xs = new List<double> { l, r };
-        double piv = a.CrossSlope.PivotOffset;
+        double piv = a.CrossSlope.PivotOffsetAt(sta);
         if (piv > l && piv < r) xs.Add(piv);
         if (deck.EdgeStrip is { LowSideLevel: true, Width: > 0 } strip)
         {

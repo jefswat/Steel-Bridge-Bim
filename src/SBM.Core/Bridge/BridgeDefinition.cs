@@ -356,6 +356,15 @@ public sealed class GirderLayoutDefinition
     /// </summary>
     public List<List<double>>? OffsetsAtSupports { get; set; }
 
+    /// <summary>
+    /// OPTIONAL per-span layouts (see <see cref="GirderSpanLayout"/>): straight chord girders with their own offsets at the begin
+    /// and end line of each listed span. Null / empty = the offset curves above for every span (default).
+    /// </summary>
+    public List<GirderSpanLayout>? SpanLayouts { get; set; }
+
+    /// <summary>The span layout of a span, or null.</summary>
+    public GirderSpanLayout? SpanLayoutOf(int span) => SpanLayouts?.FirstOrDefault(l => l.Span == span);
+
     public GirderPlanLayout PlanLayout { get; set; } = GirderPlanLayout.CurvedParallel;
 
     public GirderSection Section { get; set; } = new();
@@ -379,6 +388,7 @@ public sealed class GirderLayoutDefinition
         Spacings = Spacings.ToList(),
         FirstGirderOffset = FirstGirderOffset,
         OffsetsAtSupports = OffsetsAtSupports?.Select(l => l.ToList()).ToList(),
+        SpanLayouts = SpanLayouts?.Select(l => l.Clone()).ToList(),
         PlanLayout = PlanLayout,
         Section = Section.Clone(),
         Kind = Kind,
@@ -504,7 +514,7 @@ public sealed class DeckDefinition
         levelAt = double.NaN;
         if (EdgeStrip is { LowSideLevel: true, Width: > 0 } es && a.CrossSlope.Rows.Count > 0)
         {
-            double piv = a.CrossSlope.PivotOffset;
+            double piv = a.CrossSlope.PivotOffsetAt(station);
             var (l, r) = a.CrossSlope.SidesAt(station);
             double gr = RightAt(station) - es.Width, gl = LeftAt(station) + es.Width;
             if (offset > gr && gr > piv && r.SlopeAt(gr - piv) < 0) levelAt = gr;
@@ -1163,6 +1173,12 @@ public sealed class BridgeDefinition
                 if (e.Kind != GirderPlanElementKind.Line && e.Radius <= 0) errors.Add($"{gn}: arc radius must be positive.");
             }
         }
+        if (Girders.SpanLayouts is { } sls)
+            foreach (var sl in sls)
+            {
+                errors.AddRange(sl.Validate(Girders.Count, Supports.Count - 1, Girders.IsPrestressed));
+                if (sls.Count(o => o.Span == sl.Span) > 1) errors.Add($"Span {sl.Span + 1} girder layout is given more than once.");
+            }
         if (Deck.RightEdgeOffset <= Deck.LeftEdgeOffset) errors.Add("Deck right edge must be right of the left edge.");
         if (Girders.IsPrestressed) errors.AddRange(Girders.Prestressed.Validate());
         if (CrossFrames.MaxSpacing <= 0) errors.Add("Cross-frame maximum spacing must be positive.");
