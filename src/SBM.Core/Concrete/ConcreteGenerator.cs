@@ -96,6 +96,8 @@ public sealed class ConcreteModel
     public List<BarPlacement> Bars { get; } = new();
     public List<string> Notes { get; } = new();
     public List<Diagnostic> Diagnostics { get; } = new();
+    /// <summary>Exact-geometry option: what was built as NURBS (null when the option is off).</summary>
+    public NurbsReport? Nurbs { get; set; }
     public double DeckVolume => Math.Abs(Deck?.Volume() ?? 0);
     public double HaunchVolume => Math.Abs(Haunches?.Volume() ?? 0);
     public double BarrierVolume => Barriers.Sum(b => Math.Abs(b.Mesh.Volume()));
@@ -127,12 +129,19 @@ public sealed partial class ConcreteGenerator
         _u = u;
     }
 
-    public static ConcreteModel Generate(BridgeFraming framing, UnitSystem units)
+    public static ConcreteModel Generate(BridgeFraming framing, UnitSystem units, Project.GeometrySettings? geometry = null)
     {
         var g = new ConcreteGenerator(framing, units);
+        if (geometry is { ExactCurvedGeometry: true })
+        {
+            g._geo = geometry;
+            g._fitTol = geometry.FitToleranceFor(units);
+            g._m.Nurbs = g._nurbs = new NurbsReport { Tolerance = g._fitTol };
+        }
         var sw = Stopwatch.StartNew();
         if (!framing.HasErrors && framing.Deck != null) g.Run();
         g._m.Diagnostics.AddRange(g._diag);
+        if (g._nurbs is { } nr && g._m.Deck != null) g._m.Diagnostics.Add(new Diagnostic(DiagnosticSeverity.Info, "Concrete: " + nr.Summary()));
         g._m.GenerationTime = sw.Elapsed;
         return g._m;
     }
@@ -359,6 +368,13 @@ public sealed partial class ConcreteGenerator
         var offs = DeckOffsets(1.0);
         var (b0, e0) = Ends(0, InsetB, InsetE);
         int ni = AlongSamples(e0 - b0) + 1;
+        if (_geo != null && NurbsDeck(offs.Select(o => (Func<double, double>)(_ => o)).ToList(), ref ni, out var nt, out var nb) is { } slab)
+        {
+            _m.Deck = GridSolid(nt, nb);
+            _m.Deck.AddNurbs(slab.ToSolid("deck slab"), 0);
+            AddJointShelves();
+            return;
+        }
         var top = new Vec3[ni, offs.Count];
         var bot = new Vec3[ni, offs.Count];
         for (int k = 0; k < offs.Count; k++)
@@ -384,6 +400,13 @@ public sealed partial class ConcreteGenerator
         int nk = cols.Count;
         var (b0, e0) = Ends(0, InsetB, InsetE);
         int ni = AlongSamples(e0 - b0) + 1;
+        if (_geo != null && NurbsDeck(cols, ref ni, out var nt, out var nb) is { } slab)
+        {
+            _m.Deck = GridSolid(nt, nb);
+            _m.Deck.AddNurbs(slab.ToSolid("deck slab"), 0);
+            AddJointShelves();
+            return;
+        }
         var top = new Vec3[ni, nk];
         var bot = new Vec3[ni, nk];
         for (int k = 0; k < nk; k++)
@@ -412,6 +435,12 @@ public sealed partial class ConcreteGenerator
             var path = g.Path;
             var ss = path.S.ToList();
             if (ss.Count < 2) continue;
+            if (_geo != null && NurbsHaunch(mesh, g, s =>
+                {
+                    if (_def.Girders.IsPrestressed) return (Prestressed.TxGirderCatalog.Get(_def.Girders.Prestressed).TopWidth / 2, 0.0);
+                    var sg = _def.Girders.Section.SegmentAt(GirderPlate.TopFlange, path.At(s).station);
+                    return (sg.Width / 2, sg.Thickness);
+                })) continue;
             var rings = new List<Vec3[]>(ss.Count);
             Vec2[]? sec = null;
             foreach (double s in ss)
@@ -455,6 +484,18 @@ public sealed partial class ConcreteGenerator
             var (b0, e0) = Deck.VariableWidth ? EndsVar(edgeAt) : Ends(edgeAt(0));
             int ni = AlongSamples(e0 - b0) + 1;
             var ends = prof.Select(q => Deck.VariableWidth ? EndsVar(d => OffAt(d, q.X)) : Ends(OffAt(0, q.X))).ToArray();
+            if (_geo != null && NurbsBarrier(prof, (u, k) =>
+                {
+                    double d = ends[k].b + (ends[k].e - ends[k].b) * u;
+                    double o = OffAt(d, prof[k].X);
+                    var p = _a.PointAtDistance(d, o);
+                    double zBase = prof[k].Y < 1e-9 ? Top(d, o) : Top(d, edgeAt(d));
+                    return p.WithZ(zBase + prof[k].Y);
+                }, ni) is { } nm)
+            {
+                _m.Barriers.Add((side < 0 ? "Left barrier" : "Right barrier", nm));
+                continue;
+            }
             var rings = new List<Vec3[]>(ni);
             for (int i = 0; i < ni; i++)
             {

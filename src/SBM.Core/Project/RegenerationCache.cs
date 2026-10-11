@@ -65,7 +65,9 @@ public sealed class RegenerationCache
             var b = bridges[i];
             var a = project.FindAlignment(b.AlignmentName);
             if (a == null) return;
-            string key = Key(b, a, project.Units) + (includeSteel ? "+steel" : "");
+            var geo = GeometrySettings.Active(project);
+            string key = Key(b, a, project.Units) + (includeSteel ? "+steel" : "")
+                + (geo == null ? "" : $"+nurbs:{geo.FitToleranceFor(project.Units):R}:{geo.ChordTolerance:R}");
             keys[i] = key;
             lock (_lock) used.Add(key);
             (BridgeFraming, SteelModel?, Concrete.ConcreteModel?, Prestressed.PrestressedModel?) hit;
@@ -80,14 +82,14 @@ public sealed class RegenerationCache
             {
                 // Prestressed concrete girders instead of steel.
                 var tp = Task.Run(() => Prestressed.PrestressedGenerator.Generate(f, project.Units));
-                cm = Concrete.ConcreteGenerator.Generate(f, project.Units);
+                cm = Concrete.ConcreteGenerator.Generate(f, project.Units, geo);
                 ps = tp.Result;
             }
             else if (includeSteel && !f.HasErrors)
             {
                 // Steel and concrete are independent: generate them concurrently.
-                var ts = Task.Run(() => SteelModelGenerator.Generate(f, project.Units));
-                cm = Concrete.ConcreteGenerator.Generate(f, project.Units);
+                var ts = Task.Run(() => SteelModelGenerator.Generate(f, project.Units, geo));
+                cm = Concrete.ConcreteGenerator.Generate(f, project.Units, geo);
                 st = ts.Result;
                 if (cm != null && st != null) { Checks.DeckEndBlockCheck.Run(f, st, cm, project.Units); Checks.DeckRebarCheck.Run(f, st, cm, project.Units); }
             }
