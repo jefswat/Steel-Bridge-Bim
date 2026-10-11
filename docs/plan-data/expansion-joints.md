@@ -194,3 +194,7 @@ full deck width, depth min(1'-2, slab)) is cut out of the deck and made as its o
 (opening C wide, set 1/8" down, to blockout depth, between the barrier faces) is the placeholder "Generic modular expansion joint (manufacturer-designed
 placeholder)". The plans' 2'-2 end block (deeper than the modeled 8" slab) is OPTIONAL (`ExpansionJointDefinition.EndBlock`, see `deck-end-blocks.md`); without it a warning says the blockout is limited to the slab. Sample data: `samples/plans/joints-i80.csx`, `joints-ramp-g.csx`.
 Not modeled: barrier slider/cover plates, beams, support boxes, anchors, seals, drainage troughs.
+
+
+## Abutment backwall front (22" vs 17") - resolved in the as-designed abutment
+See `abutments-model.md`: the as-designed abutment models the plan 22" (I-80) / 17" (Ramp G) from the CL bearing; deck end (1'-4 / 1'-2 1/2) to backwall face is the plan 6" / 2 1/2" gap, so the joint line and deck end are unchanged.

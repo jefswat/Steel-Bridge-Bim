@@ -87,6 +87,11 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
     along the axis from the head; head/tip cut horizontal; section = plumb orientation rotated minimally onto the axis (oblique
     extrusion = exact IFC solid). `PileInfo` has head (S,N,TopZ) + tip (TipS,TipN,TipZ). Axis-distance clearance warnings
     (`CheckPileClearances`). Snapshot `--closeup FTGn@Bridge` frames the foundation. Conventions are flagged for user confirmation.
+  - As-designed abutment (OPTIONAL `SubstructureDefinition.Abutment`, `AbutmentDefinition.cs`; null = parametric abutment): `SubstructureAbutment.cs`
+    (`AddSlab` = prism between two vertical planes with per-vertex elevation functions; end lines are alignment offsets, so S depends on N),
+    `SubstructureAbutmentRebar.cs` (only proven placements in 3D, rest of the plan bar list = schedule-only marks, mismatches = warnings),
+    `AbutmentViews` (3 sheet panels), `SubElementKind.Wingwall/Counterfort/Maskwall/WingFooting`, `unit.Abutment` (`AbutmentGeometry`). Standing rule:
+    no invented defaults - unresolved plan items are generator warnings ("UNRESOLVED"). Docs `docs/plan-data/abutments-model.md`; scripts `samples/plans/abutments-*.csx`.
   - Cap section step / aesthetic relief (OPTIONAL, `SubstructureDefinition.Aesthetics` = `CapAestheticsDefinition`, as-designed caps only): the
     cap is W above the relief curve and W - 1'-0 below (StepSetback 6" per face, BOTH faces). The cap solid itself is the narrower core; `BuildCapStep`
     adds full-width strips above each layer line (`Layers` = BandChains, lowest line first; plans: fan arcs R5, R4, R3, 2" each, drafted 7 deg) as a
