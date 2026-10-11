@@ -43,6 +43,18 @@ Use this to start the next session. Architecture notes are in `CLAUDE.md`. The u
 
 ## 0a. State at the end of 2026-10-10 (evening) — START HERE
 
+- **PAUSED FOR RESTART (2026-10-11):** two branches committed but NOT merged — verify (full build + tests), merge
+  (keep main's .sbm, re-run scripts with temp\cli-main), push:
+  - `feature/abutfix` (c8e2515, last commit WIP): counterfort 1'-10, maskwall flush, extensions, West footing notches,
+    wing uplift anchors 8j3, placed maskwall/counterfort bars, pile-head check fix, plan PEDESTAL sizes
+    (PedestalSizeAlong/Across/Shared; containment 633 -> 565). TODO: docs/CLAUDE.md, pier-pedestals.md, notched outline
+    in AbutmentViews, full tests, regenerate model. South backwall 19.4 vs 21.5 CY unresolved.
+  - `feature/misc` (488994a): general UNRESOLVED flag (Assumption record; viewport layer/filter, IFC Pset SBM_Status,
+    DB view v_unresolved) on plan-undefined drain parts (Pier 19G drop modeled + flagged), drains 22-25 at the plan's
+    1'-8 from CL girder A (conflict with gutter position reported). Agent did not send its final report - read the
+    commit and check before merging.
+- Release v0.1 (self-contained win-x64, 92 MB, private): https://github.com/jefswat/Steel-Bridge-Bim/releases/tag/v0.1
+  (`gh` CLI installed and logged in as jefswat).
 - **Git + GitHub:** local repo, `main` pushed to https://github.com/jefswat/Steel-Bridge-Bim (private) after every verified
   merge (user-approved routine). Feature work in `.worktrees\<name>` (branch `feature/<name>`), merged one at a time:
   keep main's `.sbm`, re-run the branch's scripts with a CLI built to `temp\cli-main` (`dotnet build src/SBM.Cli -o
