@@ -23,14 +23,37 @@ deck end to backwall face is 6" / 2 1/2" = the plans' "6" @ 50 F" / "2 1/2"": th
 ## Plan vs model quantities (CY; rebar lb)
 | | West plan / model | East plan / model | Ramp G plan / model |
 |---|---|---|---|
-| footing + steps | 92.4 / 92.7 | 84.8 / 85.4 | 35.2 / 35.1 |
-| backwall incl. extension | 66.1 / 62.4 | 49.3 / 47.0 | 21.5 / 19.4 |
-| wingwalls (+ counterforts in model) | 38.8 / 42.6 | 31.6 / 35.4 | 30.2 / 34.0 |
-| maskwall(s) | 4.1 / 4.1 | 2.4 / 2.6 | 4.4 / 4.8 |
+| footing + steps | 92.4 / 91.9 | 84.8 / 85.4 | 35.2 / 35.1 |
+| backwall incl. extension | 66.1 / 66.0 | 49.3 / 49.3 | 21.5 / 21.6 |
+| wingwalls (+ counterforts in model) | 38.8 / 38.3 | 31.6 / 31.2 | 30.2 / 29.8 |
+| maskwall(s) | 4.1 / 4.6 | 2.4 / 2.6 | 4.4 / 4.8 |
 | wing footings | 9.3 / 9.3 | 9.3 / 9.3 | 9.3 / 9.3 |
-| total | 210.7 / 211.1 | 177.4 / 179.7 | 100.6 / 102.6 |
-| rebar (epoxy + stainless) | 24,877 / 24,972 | 21,451 / 21,499 | 11,399 / 11,476 |
-The plan wing quantity probably includes the counterforts in a different way; the plan splits are not itemized.
+| total | 210.7 / 210.1 | 177.4 / 177.8 | 100.6 / 100.6 |
+| rebar (epoxy + stainless) | 24,877 / 24,966 | 21,451 / 21,610 | 11,399 / 11,476 |
+Model values from `sbm run` of abutments-i80.csx / abutments-ramp-g.csx (2026-10-11); footing + steps = footing + pedestal (beam step) solids.
+
+## Backwall extent and corbel ends (Ramp G 19.4 -> 21.6 CY)
+Plan quantity (PDF p83, CONCRETE PLACEMENT QUANTITIES, South Abut.): BACKWALL BELOW CONSTR. JOINT 11.5 + ABOVE CONSTR. JOINT 10.0 = 21.5 CY.
+The model gave 19.4 CY because the script ran the backwall gutter to gutter (`BackwallLeft/RightOffset` = -6'-0 / +26'-0, the 32'-0 roadway).
+REAR ELEVATION (PDF p80, raster-checked): the top line and the construction joint continue as dashed lines BEHIND the 1'-9 wings and the 4" to the
+10" maskwalls ("LEVEL" at the A end, "SLOPED" at the D end); only the ledge / corbel-face / taper lines stop at the wing inner faces (gutter lines).
+So the backwall runs maskwall inner face to maskwall inner face (-8'-1 / +28'-1 = 36'-2) with the corbel / paving notch only over the 32'-0 between
+the wings. Generator: new `AbutmentDefinition.CorbelLeftOffset / CorbelRightOffset` (NaN = backwall ends) - the upper pour is a plain wall outside them;
+the rear elevation view draws the corbel lines only between them plus the wing inner-face lines. `AbutmentRebarDefinition.BackwallStringStartOffset`
+keeps the printed 6d1 / 5d2 strings measured from the gutter (unchanged placement). Corroboration: the bar list prints 67 6d1 / 35 5d2 vs the
+63 / 31 of the printed strings over the 32'-0 - 4 more bars each, consistent with bars in the wall behind the wings (still a NOT-adjusted count warning).
+Model now: lower 11.10 + upper (corbel) 8.30 + device pour 2.18 = 21.6 CY (plan 21.5).
+I-80 (p85 / p89) shows the same arrangement; abutments-i80.csx sets the corbel offsets to the gutter lines (backwall maskwall to extension unchanged):
+West 66.0 / East 49.3 CY vs plan 66.1 / 49.3.
+
+CONFLICT (minor, not adjusted): the plan pour split. Model below / above c.j. = 11.1 / 10.5 CY with the c.j. 3" below the bottom of the taper
+(SECTION p80; 5'-6 1/8 ** c.j. to the bottom of the backwall at the back face at the CL, matches the model). With the c.j. AT the taper bottom (no 3")
+the model gives 11.6 / 10.0 CY - i.e. the plan split appears to have been computed without the 3". Totals agree; the script prints this as CONFLICT.
+
+## Plan view footing outline
+`AbutmentGeometry.FootingOutline` is the plan outline of the main footing built by the generator from the same end planes, notches and corner pieces
+as the footing solid; `AbutmentViews` (piling and wing layout) draws it instead of a 4-corner parallelogram, so the West footing notches show.
+Test: `FootingNotch_RemovesTheAcuteCorner_AndMaskwallIsFlushWithTheEndLine` (outline area = footing bottom face area; the view polyline = the outline).
 
 ## Not placed / unresolved (all reported as generator warnings, nothing substituted)
 Only the footing longitudinals, footing hoops at the pile pitch and the backwall verticals are placed in 3D; every other bar-list row is in the schedule at its printed

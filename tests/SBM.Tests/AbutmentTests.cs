@@ -179,6 +179,35 @@ public class AbutmentTests
         Assert.Equal(aOut, Math.Abs(MeshBuilder.SignedArea(drawn.Points.Select(q => new Vec2(q.X, q.Y)).ToList())), 4);
     }
 
+    [Fact]
+    public void CorbelOffsets_LeaveAPlainWallBehindTheWing_AndTheRearElevationStopsTheCorbelLines()
+    {
+        var (doc, ad) = Setup();
+        var sd = doc.Bridge().Supports[0].ResolvedSubstructure.Clone();
+        sd.Abutment = ad;
+        doc.Bridge().Supports[0].Substructure = sd;
+        doc.Regenerate();
+        double Upper() => Math.Abs(doc.Substructure().Units.First(x => x.SupportIndex == 0).Solids.Single(s => s.Name.EndsWith("backwall (upper, corbel)")).Mesh.Volume());
+        double v0 = Upper();
+        ad.CorbelLeftOffset = ad.LeftEndOffset + Ft(3);
+        sd.Abutment = ad;
+        doc.Regenerate();
+        double v1 = Upper();
+        var g = doc.Substructure().Units.First(x => x.SupportIndex == 0).Abutment!;
+        double nB = g.N(g.XBwBack);
+        double plainS = g.CorbelLeftS!(nB) - g.BwLeftS(nB);
+        Assert.True(plainS > Ft(2.9), $"plain reach {plainS:F3} m");
+        // removed = corbel section (projection x vertical face + 45 deg taper triangle) over the plain reach
+        double area = ad.CorbelProjection * ad.CorbelVertical + ad.CorbelProjection * ad.CorbelTaperRise / 2;
+        Assert.InRange((v0 - v1) / (area * plainS), 0.9, 1.1);
+        // backwall extent unchanged (the plain wall continues to the end), corbel offsets outside the backwall are rejected
+        Assert.Equal(g.BwLeftS(nB), g.LeftEndS(nB), 6);
+        ad.CorbelLeftOffset = ad.LeftEndOffset - Ft(1);
+        sd.Abutment = ad;
+        var res = doc.Regenerate();
+        Assert.True(res.Errors.Count > 0 || doc.Substructure().Diagnostics.Any(d => d.Message.Contains("corbel offsets")), "corbel outside the backwall must be reported");
+    }
+
     /// <summary>Plan area of the downward-facing triangles of a solid.</summary>
     private static double BottomArea(Mesh m)
     {

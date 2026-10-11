@@ -103,6 +103,8 @@ sd.BackwallGap = F(0, 2.5);                                                // pl
 sd.Reinforcement.EpoxyCoated = true;
 sup.Substructure = sd;
 Print("UNRESOLVED: Ramp G step transverse bars 5m1 (20 = 4 steps x 5 vs 4 per step on I-80).");
+Print("CONFLICT (minor, not adjusted): Ramp G backwall pour split - p83 prints below c.j. 11.5 / above c.j. 10.0 CY; the model (c.j. 3\" below the taper per section p80, " +
+      "5'-6 1/8 at the CL) gives 11.1 / 10.5 CY. The total agrees (21.6 vs 21.5); the plan split matches a c.j. at the bottom of the taper (no 3\"). docs/plan-data/abutments-model.md.");
 
 var res = Doc.Regenerate();
 Print($"Regenerated {res.Bridges} bridges, {res.Errors.Count} errors.");
