@@ -188,6 +188,9 @@ public sealed partial class SubstructureGenerator
         var topLine = unit.CapTopLine();
         double TopAt(double s) => Math.Min(SubstructureUnit.Interp(topLine, s), unit.CapTopAt(s));      // never above the concrete (raked / beak ends)
         double BotAt(double s) => unit.CapBottomAt(s);
+        // lowest cap top over a horizontal bar's S extent [sa, sb] and N extent [na, nb] (a level bar must keep its cover under the lowest point of the top)
+        double TopSpan(double sa, double sb, double na, double nb) =>
+            new[] { TopAt(sa), TopAt(sb), unit.CapTopAt(sa, na), unit.CapTopAt(sb, na), unit.CapTopAt(sa, nb), unit.CapTopAt(sb, nb) }.Min();
         var ss = unit.CapTop.Select(p => p.X).Concat(unit.CapBottom.Select(p => p.X)).Where(x => x > s0 && x < s1).Distinct().OrderBy(x => x).ToList();
         var groups = r.CapBars;
         double colHalf = unit.Columns.Count > 0 ? unit.Columns.Max(c => c.SizeS) / 2 : 0;
@@ -287,13 +290,14 @@ public sealed partial class SubstructureGenerator
                         double sTip = end == 0 ? s0 : s1, inward = end == 0 ? 1 : -1;
                         double zb = BotAt(sTip + inward * (cov + flat / 2)) + cov + st.Diameter + 3 * size.Diameter * rowsB;
                         double sv = sTip;                                                       // pushed in from the (raked) end face only as far as the clear cover needs
-                        for (int it = 0; it < 800; it++)
+                        bool foundCs = false;
+                        for (int it = 0; it < 800 && !foundCs; it++)
                         {
-                            bool ok = true;
-                            foreach (var q in cl) if (Clr(sv + inward * q.X, zb + q.Y) < cov + size.Diameter / 2 - 1e-4) { ok = false; break; }
-                            if (ok) break;
-                            sv += inward * In(0.25);
+                            foundCs = true;
+                            foreach (var q in cl) if (Clr(sv + inward * q.X, zb + q.Y) < cov + size.Diameter / 2 - 1e-4) { foundCs = false; break; }
+                            if (!foundCs) sv += inward * In(0.25);
                         }
+                        if (!foundCs) sv = sTip + inward * cov;                                  // no position keeps the cover: at the end face, reported by the check
                         bars.Add(new RawBar("B", size, cs, $"{loc} {g.Mark} cantilever bottom", cl.Select(q => unit.World(sv + inward * q.X, n, zb + q.Y)).ToArray()));
                         continue;
                     }
@@ -337,9 +341,8 @@ public sealed partial class SubstructureGenerator
             else
             {
                 int ns = totalBars / perStation;
-                double zMaxTop = poly.Max(q => q.Y);
-                var topV = poly.Where(q => q.Y >= zMaxTop - 1e-6).ToList();
-                double sTopL = topV.Min(q => q.X), sTopR = topV.Max(q => q.X);
+                // ends of the top face: the highest outline vertex on each side of mid-cap (the top may be sloped, with only one vertex at the maximum)
+                double sTopL = poly.Where(q => q.X < sMid).OrderByDescending(q => q.Y).First().X, sTopR = poly.Where(q => q.X > sMid).OrderByDescending(q => q.Y).First().X;
                 double LowZ(double sx)
                 {
                     double zl = double.MaxValue;
@@ -374,7 +377,7 @@ public sealed partial class SubstructureGenerator
                     foreach (var sx in zoned ? zoneOf[g] : byDepth.Skip(at).Take(g.Count / perStation))
                         for (int b = 0; b < perStation; b++)
                         {
-                            double sp = sx + (b - (perStation - 1) / 2.0) * size.Diameter, zOut = TopAt(sp) - cov;
+                            double sp = sx + (b - (perStation - 1) / 2.0) * size.Diameter, zOut = TopSpan(sp, sp, ncH - g.Dims[1] / 2, ncH + g.Dims[1] / 2) - cov;
                             bars.Add(new RawBar("R", size, hs, $"{loc} {g.Mark} hairpins", hl.Select(q => unit.World(sp, ncH + q.X - g.Dims[1] / 2, zOut - q.Y)).ToArray()));
                         }
                     at += g.Count / perStation;
@@ -492,17 +495,48 @@ public sealed partial class SubstructureGenerator
                         var (es, el) = PlanA14(size, g.Dims[0], g.Dims[1], g.Dims[2], g.Dims[3], g.Pin, g.Length);
                         double nEnd = per == 1 ? (unit.CapN0 + unit.CapN1) / 2 : unit.CapN0 + In(9) + (unit.CapN1 - unit.CapN0 - In(18)) * k / (per - 1);
                         double dirOut = end == 0 ? -1 : 1, sv0 = end == 0 ? s0 : s1;
-                        double zTopOut = Math.Min(TopAt(sv0 - dirOut * g.Dims[1]), TopAt(sv0 - dirOut * (g.Dims[1] + g.Dims[3]))) - cov;
-                        double sv = sv0 - dirOut * (g.Dims[1] + g.Dims[3] + cov);                // start clear of the end, move inward until the cover holds
-                        for (int it = 0; it < 800; it++)
+                        double extent = g.Dims[1] + g.Dims[3];
+                        double sv = sv0 - dirOut * (extent + cov), zTopOut = 0, svFirst = sv;
+                        bool found = false;
+                        for (int it = 0; it < 1600 && !found; it++)
                         {
-                            bool ok = true;
+                            double sOut = sv + dirOut * extent;
+                            zTopOut = Math.Min(TopAt(sv), TopAt(sOut)) - cov;                    // level top run: under the lowest point of the (sloped) top
+                            found = true;
                             foreach (var q in el)
-                                if (Clr(sv + dirOut * q.X, zTopOut - size.Diameter / 2 + q.Y + size.Diameter / 2) < cov - 1e-4) { ok = false; break; }
-                            if (ok) break;
-                            sv -= dirOut * In(0.25);
+                                if (Clr(sv + dirOut * q.X, zTopOut + q.Y) < cov + size.Diameter / 2 - 1e-4) { found = false; break; }
+                            if (!found) sv -= dirOut * In(0.25);
                         }
+                        if (!found) { sv = svFirst; zTopOut = Math.Min(TopAt(sv), TopAt(sv + dirOut * extent)) - cov; }          // no position keeps the cover: at the end face, reported by the check
                         bars.Add(new RawBar("E", size, es, $"{where} end bars", el.Select(q => unit.World(sv + dirOut * q.X, nEnd, zTopOut + q.Y)).ToArray()));
+                        continue;
+                    }
+                    if (!vertical && g.Shape == "U" && g.Dims.Length == 3)
+                    {
+                        // 5a13 / 6a14 (plan bend diagram): U with a 5'-3 base and 2'-0 legs, out to out; 4 at each end stacked at equal spaces ("3 EQ. SPA., 4-5a13 BARS").
+                        // The plane / leg direction of the sketch are not dimensioned - the legs stand up from the base in the transverse plane (as before). The stack is set
+                        // back from the (raked) end face only as far as the clear cover needs and spans the cover-to-cover depth there.
+                        var (us, ul) = PlanU(size, g.Dims[0], g.Dims[1], g.Dims[2], g.Pin, g.Length);
+                        double ncU = (unit.CapN0 + unit.CapN1) / 2, legU = Math.Max(g.Dims[0], g.Dims[2]), rU = size.Diameter / 2;
+                        double sTipU = end == 0 ? s0 : s1, inwardU = end == 0 ? 1 : -1;
+                        bool placedU = false;
+                        for (int it = 0; it < 1600 && !placedU; it++)
+                        {
+                            double sx = sTipU + inwardU * it * In(0.25);
+                            double zlo = double.NaN, zhi = double.NaN;
+                            for (double zz = BotAt(sx); zz <= TopAt(sx) + 1e-9; zz += In(0.25)) if (Clr(sx, zz) >= cov + rU - 1e-4) { zlo = zz; break; }
+                            for (double zz = TopAt(sx); zz >= BotAt(sx) - 1e-9; zz -= In(0.25)) if (Clr(sx, zz) >= cov + rU - 1e-4) { zhi = zz; break; }
+                            if (double.IsNaN(zlo) || double.IsNaN(zhi) || zhi - zlo < legU + 2 * rU) continue;
+                            double zb0 = per == 1 ? zlo : zlo + (zhi - zlo - legU) * k / (per - 1);       // outside face of the base (bar centre at + r)
+                            bars.Add(new RawBar("E", size, us, $"{where} end transverse", ul.Select(q => unit.World(sx, ncU + q.X - g.Dims[1] / 2, zb0 + q.Y)).ToArray()));
+                            placedU = true;
+                        }
+                        if (!placedU)
+                        {                                                                       // no position keeps the cover: at the end face over the cover-to-cover depth, reported by the check
+                            double sx = sTipU + inwardU * cov, zlo = BotAt(sx) + cov + rU, zhi = TopAt(sx) - cov - rU;
+                            double zb0 = per == 1 ? zlo : zlo + Math.Max(zhi - zlo - legU, 0) * k / (per - 1);
+                            bars.Add(new RawBar("E", size, us, $"{where} end transverse", ul.Select(q => unit.World(sx, ncU + q.X - g.Dims[1] / 2, zb0 + q.Y)).ToArray()));
+                        }
                         continue;
                     }
                     double need = vertical ? g.Length : Math.Max(In(12), (g.Length - w) / 2) + In(6);
@@ -516,15 +550,6 @@ public sealed partial class SubstructureGenerator
                         double n = per == 1 ? (nLo + nHi) / 2 : nLo + cov + (nHi - nLo - 2 * cov) * k / (per - 1);
                         double len = Math.Min(g.Length, zt - zb);
                         bars.Add(PlanBarFixed("E", size, $"{where} end vertical", new[] { unit.World(s, n, zt), unit.World(s, n, zt - g.Length) }, g.Length));
-                    }
-                    else if (g.Shape == "U" && g.Dims.Length == 3)
-                    {
-                        // 5a13 (plan bend diagram): U with a 5'-3 base and 2'-0 legs, out to out; 4 at each end stacked at equal spaces. Plane / leg direction of the
-                        // sketch are not dimensioned - the legs stand up from the base in the transverse plane (as before).
-                        var (us, ul) = PlanU(size, g.Dims[0], g.Dims[1], g.Dims[2], g.Pin, g.Length);
-                        double zb0 = per == 1 ? (zt + zb) / 2 : zb + (zt - zb - Math.Max(g.Dims[0], g.Dims[2])) * k / Math.Max(1, per - 1);
-                        double nc = (unit.CapN0 + unit.CapN1) / 2;
-                        bars.Add(new RawBar("E", size, us, $"{where} end transverse", ul.Select(q => unit.World(s, nc + q.X - g.Dims[1] / 2, zb0 + q.Y)).ToArray()));
                     }
                     else
                     {
@@ -581,7 +606,7 @@ public sealed partial class SubstructureGenerator
                 foreach (var p in peds)
                 {
                     double across = alongS2 ? p.WidthN : p.LengthS;
-                    double zOut = TopAt(p.S) - cov;
+                    double zOut = TopSpan(p.S - (alongS2 ? g.Dims[1] / 2 : across / 2), p.S + (alongS2 ? g.Dims[1] / 2 : across / 2), p.N - (alongS2 ? across / 2 : g.Dims[1] / 2), p.N + (alongS2 ? across / 2 : g.Dims[1] / 2)) - cov;
                     for (int k = 0; k < per; k++)
                     {
                         double t = per == 1 ? 0 : -across / 2 + In(4) + (across - In(8)) * k / (per - 1);

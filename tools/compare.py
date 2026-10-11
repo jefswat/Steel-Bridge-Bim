@@ -188,6 +188,8 @@ for key, rowlist in unitrows.items():
         for u in used:
             pdims += [(u['val'], 'v' if u['vert'] else 'h')] * u['mult']
         ptxt = ' + '.join(ftin(v) for v, o in sorted(pdims, key=lambda t: -t[0])) if pdims else '(not reconciled)'
+        if pdims and rec.get('hand'): ptxt += ' (read on clip; sum = list length)' if rec.get('sumok') else ' (read on clip)'
+        elif pdims: ptxt += ' (sum = list length)'
         if rec['radii']: ptxt += ' ; R ' + ', '.join(ftin(x) for x in rec['radii'])
         if rec['minmax']: ptxt += ' ; ' + ', '.join(f"{ftin(a)} {b}" for a, b, c in rec['minmax'])
         pin = rec['pin']
@@ -202,7 +204,7 @@ for key, rowlist in unitrows.items():
         if not solved or not pdims:
             tbl.append((row['mark'], row['desc'], f'{pshape}: {ptxt}', ftin(listed) if listed else row['len'],
                         f"{best['code']} " + ' + '.join(ftin(v) for v in odims) + (f' ; D {ftin(best["pin"])}' if best['pin'] else ''), '', 'not decoded'))
-            tot['dims_notdecoded'] += len(rec.get('dims', [])) or (len(rec['pins']) + 2)
+            tot['dims_notdecoded'] += len(rec.get('raw', [])) + len(rec['radii']) + len(rec['minmax']) + (1 if rec['pin'] else 0)
             tot['marks_notdecoded'] += 1
             continue
         # pair largest-with-largest

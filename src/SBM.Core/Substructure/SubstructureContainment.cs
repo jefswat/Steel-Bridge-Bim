@@ -32,12 +32,15 @@ public sealed partial class SubstructureGenerator
         var ae = unit.Definition.Aesthetics;
         if (ae is not { Layers.Count: > 0 }) return 0;
         int m = ae.Layers.Count, above = 0;
+        if (!unit.ReliefLines.Any(l => l.Count > 1)) return ae.StepSetback;                  // no relief line at all: the full setback (conservative)
         foreach (var line in unit.ReliefLines)
         {
-            if (line.Count < 2 || s < line[0].X - 1e-9 || s > line[^1].X + 1e-9) continue;
-            if (SubstructureUnit.Interp(line, s) > z) above++;
+            if (line.Count < 2) continue;
+            // beyond the ends of a line (the cap tips) the line continues level at its end elevation: the plans' relief arcs start at the tips
+            double sx = Math.Clamp(s, line[0].X, line[^1].X);
+            if (SubstructureUnit.Interp(line, sx) > z) above++;
         }
-        return ae.StepSetback / m * Math.Min(m, above == 0 && !unit.ReliefLines.Any(l => l.Count > 1 && s >= l[0].X && s <= l[^1].X) ? m : above);
+        return ae.StepSetback / m * Math.Min(m, above);
     }
 
     /// <summary>
