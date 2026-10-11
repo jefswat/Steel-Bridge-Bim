@@ -25,6 +25,7 @@ public sealed class Sheet
 {
     public required string Title { get; init; }
     public required string Number { get; set; }
+    public string Subtitle { get; init; } = "";
     public required PlanDrawing Drawing { get; init; }
     public double WidthIn { get; init; }
     public double HeightIn { get; init; }
@@ -56,7 +57,7 @@ public static class SheetComposer
     public static Sheet Compose(SheetSpec spec, SheetFormat fmt, UnitSystem u)
     {
         var dwg = new PlanDrawing();
-        var sheet = new Sheet { Title = spec.Title, Number = "", Drawing = dwg, WidthIn = fmt.WidthIn, HeightIn = fmt.HeightIn };
+        var sheet = new Sheet { Title = spec.Title, Subtitle = spec.Subtitle, Number = "", Drawing = dwg, WidthIn = fmt.WidthIn, HeightIn = fmt.HeightIn };
         var (ax0, ay0, ax1, ay1) = fmt.Area;
         foreach (var panel in spec.Panels)
         {

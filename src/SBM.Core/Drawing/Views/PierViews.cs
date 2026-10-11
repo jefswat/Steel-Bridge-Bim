@@ -59,6 +59,13 @@ public static class PierViews
             d.DimChain(cols.Select(s => new Vec2(s, unit.CapN0)).ToList(), -0.45, i => d.Len(cols[i + 1] - cols[i]));
         d.Dim(new Vec2(unit.CapS0, unit.CapN0), new Vec2(unit.CapS0, unit.CapN1), 0.45, d.Short(unit.CapN1 - unit.CapN0));
         var box = dwg.Extents();
+        if (unit.Columns.Count > 0)
+        {
+            // Column heights as generated: bottom of cap at the column to the top of the foundation (bottom of the column).
+            var lines = unit.Columns.OrderBy(c => c.S).Select((c, i) => $"C{i + 1}: {d.Len(c.TopZ - c.BottomZ)}   (EL {d.Elev(c.TopZ)} TO {d.Elev(c.BottomZ)})");
+            d.Text("COLUMN HEIGHTS (BOTTOM OF CAP TO COLUMN BOTTOM)\n" + string.Join("\n", lines), new Vec2(unit.CapS0, box.MinY - d.Paper(1.1)), d.SmallTextH, 0, TextAlign.Left);
+            box = dwg.Extents();
+        }
         d.Title($"{unit.Name.ToUpperInvariant()} — CAP PLAN", $"S along the support line (skew {FormatAngleDms(Math.Abs(unit.Definition == null ? 0 : ctx.Framing.SupportLine(unit.SupportIndex).SkewDegrees) * Math.PI / 180, false)}); pedestals at the girder bearings; columns dashed · Scale {DrawingOptions.ScaleText(d.Scale, u)}",
             new Vec2((unit.CapS0 + unit.CapS1) / 2, box.MinY - d.Paper(0.45)));
         return new SheetView($"{unit.Name} cap plan", unit.Name.Replace(" ", "") + "-CapPlan", dwg, d.Scale, "Cap plan with pedestals and columns.");

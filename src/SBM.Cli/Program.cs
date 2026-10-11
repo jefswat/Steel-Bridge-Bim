@@ -38,6 +38,11 @@ public static class Program
           sbm blocking <file.sbm> [bridge] [--all]          Camber / blocking per girder (key points; --all = every plan point)
           sbm drawings <file.sbm> <folder> [bridge]         2D DXF models: layout plan + elevation, plan, sections, bents, bar bending
           sbm sheets <file.sbm> <out.pdf> [bridge]          11x17 plan set as a vector PDF
+          sbm compare-sheets <file.sbm> [bridge] [--plans <folder>] [--db <file.sqlite>] [--out compare.pdf]
+                                                            Generated sheets side by side with the matching plan sheets + checklist/QC strip (PyMuPDF;
+                                                            plans = folder with the plan PDFs or split pages; default <model folder>\plans)
+          sbm qc-sheet <db.sqlite> "<bridge>:<S-n>" <plan set>:<pdf page> <ok|issue|unchecked> [note]
+                                                            Store the check result of a generated sheet vs a plan page in the companion database (qc table)
 
         Paths:   Bridges[0].Supports[1].SkewDegrees   Bridges["Sample Bridge"].Girders.Section.WebDepth
                  Alignments[0].StartStation           Bridges[0].FieldSplices   Units.Kind
@@ -250,6 +255,48 @@ public static class Program
                     int n = doc.ExportPdf(args[2], args.Length > 3 ? args[3] : null);
                     Console.WriteLine($"{n} sheets → {args[2]} in {sw.ElapsedMilliseconds} ms");
                     return 0;
+                }
+                case "compare-sheets":
+                {
+                    Need(args, 2);
+                    string? Opt(string name) { int i = Array.IndexOf(args, name); return i >= 0 && i + 1 < args.Length ? args[i + 1] : null; }
+                    var optNames = new HashSet<string> { "--plans", "--db", "--out" };
+                    var pos = args.Skip(2).Where((a, i) => !a.StartsWith("--") && !(i > 0 && optNames.Contains(args[i + 1]))).ToList();
+                    var doc = SbmDocument.Open(args[1]);
+                    doc.Regenerate();
+                    string modelDir = Path.GetDirectoryName(Path.GetFullPath(args[1]))!;
+                    string plans = Opt("--plans") ?? Path.Combine(modelDir, "plans");
+                    string? db = Opt("--db");
+                    string outPath = Opt("--out") ?? Path.Combine(modelDir, "compare.pdf");
+                    string? script = SBM.IO.Database.CompanionDatabase.FindScript("compare_sheets.py") ?? throw new FileNotFoundException("tools/compare_sheets.py not found.");
+                    var bridges = pos.Count > 0 ? new[] { pos[0] } : doc.Project.Bridges.Select(b => b.Name).ToArray();
+                    foreach (var bn in bridges)
+                    {
+                        string tmp = Path.Combine(Path.GetTempPath(), "sbm-compare-" + Guid.NewGuid().ToString("N"));
+                        Directory.CreateDirectory(tmp);
+                        int n = doc.ExportSheetsWithMeta(Path.Combine(tmp, "sheets.pdf"), Path.Combine(tmp, "meta.json"), bn);
+                        string o = bridges.Length > 1 ? Path.Combine(Path.GetDirectoryName(outPath)!, Path.GetFileNameWithoutExtension(outPath) + " - " + bn + ".pdf") : outPath;
+                        var psi = new System.Diagnostics.ProcessStartInfo("python") { UseShellExecute = false };
+                        foreach (var a in new[] { "-I", script, "compare", "--gen", Path.Combine(tmp, "sheets.pdf"), "--meta", Path.Combine(tmp, "meta.json"), "--plans", plans, "--out", o }) psi.ArgumentList.Add(a);
+                        if (db != null) { psi.ArgumentList.Add("--db"); psi.ArgumentList.Add(db); }
+                        Console.WriteLine($"{bn}: {n} sheets");
+                        using var p = System.Diagnostics.Process.Start(psi)!;
+                        p.WaitForExit();
+                        try { Directory.Delete(tmp, true); } catch { }
+                        if (p.ExitCode != 0) return p.ExitCode;
+                    }
+                    return 0;
+                }
+                case "qc-sheet":
+                {
+                    Need(args, 5);
+                    string? script = SBM.IO.Database.CompanionDatabase.FindScript("compare_sheets.py") ?? throw new FileNotFoundException("tools/compare_sheets.py not found.");
+                    var psi = new System.Diagnostics.ProcessStartInfo("python") { UseShellExecute = false };
+                    foreach (var a in new[] { "-I", script, "qc", "--db", args[1], "--sheet", args[2], "--plan", args[3], "--status", args[4] }) psi.ArgumentList.Add(a);
+                    if (args.Length > 5) { psi.ArgumentList.Add("--note"); psi.ArgumentList.Add(string.Join(" ", args.Skip(5))); }
+                    using var p = System.Diagnostics.Process.Start(psi)!;
+                    p.WaitForExit();
+                    return p.ExitCode;
                 }
                 case "bench":
                 {
