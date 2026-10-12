@@ -165,7 +165,7 @@
   ],
   "Bridges": [
     {
-      "Name": "NHT Unit 1 (spans 1-3)",
+      "Name": "NHT Unit 1",
       "AlignmentName": "CL NHT (TRAILCLNEW)",
       "Structure": "US 75 Ped. Underpass at Northaven Trail (CSJ 0047-07-228)",
       "Supports": [
@@ -1390,7 +1390,7 @@
       "PsSteelDiaphragms": null
     },
     {
-      "Name": "NHT Unit 2 (spans 4-6)",
+      "Name": "NHT Unit 2",
       "AlignmentName": "CL NHT (TRAILCLNEW)",
       "Structure": "US 75 Ped. Underpass at Northaven Trail (CSJ 0047-07-228)",
       "Supports": [
@@ -2590,7 +2590,7 @@
       "PsSteelDiaphragms": null
     },
     {
-      "Name": "NHT Unit 3 (spans 7-9)",
+      "Name": "NHT Unit 3",
       "AlignmentName": "CL NHT (TRAILCLNEW)",
       "Structure": "US 75 Ped. Underpass at Northaven Trail (CSJ 0047-07-228)",
       "Supports": [
@@ -3895,7 +3895,7 @@
       "PsSteelDiaphragms": null
     },
     {
-      "Name": "NHT Unit 4 (spans 11-12)",
+      "Name": "NHT Unit 4",
       "AlignmentName": "CL NHT (TRAILCLNEW)",
       "Structure": "US 75 Ped. Underpass at Northaven Trail (CSJ 0047-07-228)",
       "Supports": [
@@ -4971,7 +4971,7 @@
       "PsSteelDiaphragms": null
     },
     {
-      "Name": "NHT Unit 5 (spans 13-15)",
+      "Name": "NHT Unit 5",
       "AlignmentName": "CL NHT (TRAILCLNEW)",
       "Structure": "US 75 Ped. Underpass at Northaven Trail (CSJ 0047-07-228)",
       "Supports": [

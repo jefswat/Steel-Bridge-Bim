@@ -34,7 +34,7 @@ List<string[]> Csv(string name) => File.ReadAllLines(Path.Combine(DataDir(), nam
 var rep = Doc.Regenerate();
 foreach (var e in rep.Errors) Print("ERROR " + e);
 var al = Doc.Alignment("CL NHT (TRAILCLNEW)");
-string[] unitNames = { "NHT Unit 1 (spans 1-3)", "NHT Unit 2 (spans 4-6)", "NHT Unit 3 (spans 7-9)", "NHT Unit 4 (spans 11-12)", "NHT Unit 5 (spans 13-15)" };
+string[] unitNames = { "NHT Unit 1", "NHT Unit 2", "NHT Unit 3", "NHT Unit 4", "NHT Unit 5" };
 int[] firstSpan = { 1, 4, 7, 11, 13 };
 
 // ---------------------------------------------------------------- 1. alignment and profile (p.18-20, 84, 88)

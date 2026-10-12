@@ -558,15 +558,15 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
 - Northaven Trail (TxDOT CSJ 0047-07-228, `samples/plans/build-nht.csx` -> `Northaven NHT.sbm`, check `check-nht.csx`, data
   `docs/plan-data/nht-0047-07-228/`): alignment "CL NHT (TRAILCLNEW)" built element by element from PT 102 = 20+49.30 (the PI table's touching
   reverse / compound curves overlap after coordinate rounding; curve 102's back tangent passes 5 ft from span 8, so it is left out), plan X/Y as a
-  local grid in feet. Five Tx28 approach units = five bridges ("NHT Unit 1 (spans 1-3)" .. "NHT Unit 5 (spans 13-15)", Structure "US 75 Ped.
+  local grid in feet. Five Tx28 approach units = five bridges ("NHT Unit 1" .. "NHT Unit 5", Structure "US 75 Ped.
   Underpass at Northaven Trail ..."), Piers 4 / 7 / 13 shared (`SharedPier`). Span layouts from the PIER REPORTs: offsets along the CL pier line
   + `GirderSpanEnd.BearingOffset` (1'-0 along the girder at piers, normal at abutments, 1'-9 1/4 normal at Piers 10 / 11).
-  **Arch interface (span 10 = GAP between Pier 10 and Pier 11, no girders):** Pier 10 = LAST support of "NHT Unit 3 (spans 7-9)", Pier 11 = FIRST
-  support of "NHT Unit 4 (spans 11-12)"; support line = CL pier (station 24+17.92 / 26+19.60, skew +19.578 deg from the radial). Their
+  **Arch interface (span 10 = GAP between Pier 10 and Pier 11, no girders):** Pier 10 = LAST support of "NHT Unit 3", Pier 11 = FIRST
+  support of "NHT Unit 4"; support line = CL pier (station 24+17.92 / 26+19.60, skew +19.578 deg from the radial). Their
   `SubstructureDefinition.CapBlocks` hold the arch pedestals as `CapBlockKind.Pedestal` blocks ("arch bearing south" / "arch bearing north",
   3'-4 x 1'-7 at 63 deg, plan tops EL. A / E p.102, `SeatS/SeatN` = CL bearing); after regeneration the substructure unit publishes them as
   `SubstructureUnit.FixedSeats` (Name, S, N, Z): world point = `unit.World(S, N, Z)` with
-  `unit = Doc.Model("NHT Unit 3 (spans 7-9)").Substructure.Units.First(u => u.Name == "Pier 10")` (Pier 11 likewise in Unit 4). Pier frame: S along
+  `unit = Doc.Model("NHT Unit 3").Substructure.Units.First(u => u.Name == "Pier 10")` (Pier 11 likewise in Unit 4). Pier frame: S along
   the pier line from the CL NHT point (right +), N normal (up-station +). CL arch bearing line = N +6 7/8" at Pier 10, -6 7/8" at Pier 11; the deck
   ends 9 1/4" from CL pier on the approach side (`DeckEndOffset` = -9 1/4"). B1-B3 (pedestal tops vs tie WP chain) are raised as generator warnings
   from `CapBlockDefinition.Reported`.

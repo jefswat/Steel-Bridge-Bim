@@ -12,8 +12,8 @@
 // Rules (user): model the plans; standard items from the standard; nothing unstated is invented - UNRESOLVED items name the PDF page and a
 // plain reason; where the program has no input the line is marked GAP; precision 1/16" and 0.01 ft; differences are reported, not fixed.
 //
-// ARCH INTERFACE (see CLAUDE.md "Northaven (NHT) arch interface"): bridges "NHT Unit 3 (spans 7-9)" (last support "Pier 10") and
-// "NHT Unit 4 (spans 11-12)" (first support "Pier 11"); their substructure units carry FixedSeats "arch bearing south" / "arch bearing north"
+// ARCH INTERFACE (see CLAUDE.md "Northaven (NHT) arch interface"): bridges "NHT Unit 3" (last support "Pier 10") and
+// "NHT Unit 4" (first support "Pier 11"); their substructure units carry FixedSeats "arch bearing south" / "arch bearing north"
 // (S, N in the pier frame, Z = plan pedestal top EL. A / EL. E, p.102) -> world point = unit.World(S, N, Z). CL arch bearing line =
 // CL pier + 6 7/8" toward the arch (normal to the pier line); pier lines 19 deg 34'41" from the radial.
 using System.IO;
@@ -214,11 +214,11 @@ const string Structure = "US 75 Ped. Underpass at Northaven Trail (CSJ 0047-07-2
 Doc.Project.Bridges.RemoveAll(b => b.Structure == Structure);
 var units = new (string name, string[] sups, int firstSpan)[]
 {
-    ("NHT Unit 1 (spans 1-3)", new[] { "Abutment 1", "Pier 2", "Pier 3", "Pier 4" }, 1),
-    ("NHT Unit 2 (spans 4-6)", new[] { "Pier 4", "Pier 5", "Pier 6", "Pier 7" }, 4),
-    ("NHT Unit 3 (spans 7-9)", new[] { "Pier 7", "Pier 8", "Pier 9", "Pier 10" }, 7),
-    ("NHT Unit 4 (spans 11-12)", new[] { "Pier 11", "Pier 12", "Pier 13" }, 11),
-    ("NHT Unit 5 (spans 13-15)", new[] { "Pier 13", "Pier 14", "Pier 15", "Abutment 16" }, 13),
+    ("NHT Unit 1", new[] { "Abutment 1", "Pier 2", "Pier 3", "Pier 4" }, 1),
+    ("NHT Unit 2", new[] { "Pier 4", "Pier 5", "Pier 6", "Pier 7" }, 4),
+    ("NHT Unit 3", new[] { "Pier 7", "Pier 8", "Pier 9", "Pier 10" }, 7),
+    ("NHT Unit 4", new[] { "Pier 11", "Pier 12", "Pier 13" }, 11),
+    ("NHT Unit 5", new[] { "Pier 13", "Pier 14", "Pier 15", "Abutment 16" }, 13),
 };
 var shared = new HashSet<string> { "Pier 4", "Pier 7", "Pier 13" };
 var bridges = new Dictionary<string, BridgeDefinition>();
@@ -506,7 +506,7 @@ foreach (var (uname, _, _) in units)
     var m = Doc.Model(uname);
     Print($"{uname}: {m.Prestressed?.Beams.Count ?? 0} beams, substructure units {m.Substructure?.Units.Count ?? 0}");
 }
-foreach (var (uname, pier) in new[] { ("NHT Unit 3 (spans 7-9)", "Pier 10"), ("NHT Unit 4 (spans 11-12)", "Pier 11") })
+foreach (var (uname, pier) in new[] { ("NHT Unit 3", "Pier 10"), ("NHT Unit 4", "Pier 11") })
 {
     var unit = Doc.Model(uname).Substructure?.Units.FirstOrDefault(x => x.Name == pier);
     if (unit == null) { Print($"ERROR {pier}: substructure unit not generated"); continue; }
