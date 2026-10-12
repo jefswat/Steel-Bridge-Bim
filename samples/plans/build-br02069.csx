@@ -278,6 +278,9 @@ Doc.Project.Bridges.Add(b);
     var ar = await SBM.Api.ScriptHost.RunFileAsync(@"samples\plans\rebar-abutments-br02069.csx", Doc, Args);
     Print(ar.Output.TrimEnd());
     if (!ar.Success) Print("ERROR in rebar-abutments-br02069.csx: " + ar.Error);
+    var dr2 = await SBM.Api.ScriptHost.RunFileAsync(@"samples\plans\rebar-diaphragms-br02069.csx", Doc, Args);
+    Print(dr2.Output.TrimEnd());
+    if (!dr2.Success) Print("ERROR in rebar-diaphragms-br02069.csx: " + dr2.Error);
 }
 
 // ---------------------------------------------------------------- beam mild reinforcing from the beam standard (beam-rebar-br02069.csx)
