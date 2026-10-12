@@ -208,6 +208,8 @@ public static class StandardBeamRebar
             "Modeled: 4d1 1 in clear to the bottom, 4e1 resting on the 6 in strand row, 6b4 top just under 4c1 (4'-1 o-o down), 6b3 from 5 in above the beam (4'-8 1/2 o-o), 4c1 centre 2 in below the top (as drawn)."));
         r.Notes.Add($"{n} 5b1 / 4h1 (U9b): shapes as drawn on the 4730 Bent Bar Detail (5b1 legs 4'-9 o-o, 3 7/8 wide, D = 2 5/8, 6 in feet; 4h1 legs 3'-11, 3 in wide); " +
                     "the drawn out-to-out dimensions do not add up to the bar list lengths 10'-8 / 8'-0 (bend allowances not stated) - scheduled at the bar list length.");
+        if (n == "BTD105" && !e15)
+            r.Notes.Add("BTD105 (4730 re-issue 2024): the BTD Beam Data weight 2,795 lb is the bar list with 5a1 = 35'-6; the bar list prints 36'-6 (needed for the 3'-5 min. lap to 5a2) - the bar list governs (2,807 lb).");
         r.Notes.Add($"{n} bar stations: chains of the {sheet} elevation ({page}); which bar sits on which station read from the to-scale CAD elevation and matching the 4730 bar list counts per beam.");
         return r;
     }
