@@ -197,6 +197,18 @@ foreach (var pd in pierData)
     }
     r.FootingCover = In(3);
     sup.Substructure = sd;
+    // Pier diaphragm bottom (diaphragms-woodbury.csx) = this cap top: the level step blocks (3'-8 along CL pier centred on the beam line, sides at the same
+    // 11 deg 30' from the cap normal as the blocks above) and the sloped J-K cap top between them (p.9 cap plan / elevation).
+    if (sup.Diaphragm is { } pdia)
+    {
+        pdia.Risers = DiaphragmRiserRule.Blocks;
+        pdia.RiserSource = "";
+        pdia.StepBlocks = new DiaphragmStepBlocks
+        {
+            Length = sd.PedestalSizeAlong, SideAngleDeg = sd.PedestalSideAngleDeg, Between = { new(sW, J), new(sE, K) },
+            Source = "p.9 cap plan: step blocks 1'-10 + 1'-10 at 78 deg 30' to CL pier, cap top J-K between them",
+        };
+    }
 }
 notes.Add("Piers p.12 bar list NOT placed in 3D (no generator rule for these Woodbury details): 5c1 cap hoops (140, two 3'-0 x 4'-8 hoops per station), 4c2 cap transverse U, " +
           "5c3 end U, maskwall 5c4 / 5c5 / 5d20, 8a7 cap dowels, stainless splice bars 10a3 / 10b2 / 5a6 (project 2'-0 / 3'-9 past the stage-joint end), column hoops 5e1 / 5e2 " +
@@ -253,12 +265,25 @@ foreach (var ab in abutData)
         CapBackToBearing = Ft(1.5), CapFrontToBearing = Ft(1.5),                 // 3'-0 cap centred on CL brg & CL piles (p.15 B-B, p.17)
         StepToSeat = In(3),                                                       // beam on the 3 x 3 x 2'-4 1/2 bar (p.25 BEAM BEARING 3")
         PlanCapDepthLeft = Len(ab.dL + "\""), PlanCapDepthRight = Len(ab.dR + "\""),
-        PlanCapVolume = ab.vol * CY,
+        // PlanCapVolume not set: the plan quantity 'abutment footing' 18.1 / 19.5 CY (p.17) is the pile cap PLUS the wing extension footing - compared in check-woodbury.csx
         PileRowOffsets = new() { 0 }, PileTopAboveFootingBottom = Ft(2), PileLength = Ft(ab.pile),
     };
     for (int g = 0; g < 5; g++) ad.Steps.Add(new AbutmentStepDefinition(g + 1, Ft(ab.steps[g])));
-    // Risers (decision 11): NOT dimensioned anywhere - p.17 step diagram draws them about 3'-4 past the lower beam's CL, the p.15 / p.16 rear elevations
-    // about 1'-9 (both scaled, inconsistent), std 2087-BTCD p.13 draws them without a dimension. -> UNRESOLVED: StepBoundaryS / StepRisersAtMidBay stay unset.
+    // Risers - USER DECISION 11 (2026-10-11): 1'-9 past the LOWER beam's CL, measured along the CL brg (the p.15 / p.16 rear elevations; no printed
+    // dimension anywhere - the p.17 step diagram draws about 3'-4, std 2087-BTCD p.13 none). Evidence: the plan quantity 'abutment footing' 18.1 / 19.5 CY
+    // (= pile cap + wing extension footing) needs 22.6" +-6.7" (S) / 19.9" +-3.3" (N) - check-woodbury.csx. The steps rise from beam D to beam H, so each
+    // riser is 1'-9 east of beam D, E, F, G. The abutment diaphragm bottom (diaphragms-woodbury.csx) gets the same risers.
+    {
+        int span = k == 0 ? 0 : 2;
+        ad.StepBoundaryS = Enumerable.Range(0, 4).Select(g => SBeam(k, span, g) + Len("1'-9\"")).ToList();
+        Print($"  {ab.name} abut cap step risers (1'-9 past beams D..G, decision 11): S = {string.Join(", ", ad.StepBoundaryS.Select(x => (x / ft).ToString("F3")))} ft");
+        if (sup.Diaphragm is { } adia)
+        {
+            adia.Risers = DiaphragmRiserRule.Explicit;
+            adia.RiserS = ad.StepBoundaryS.ToList();
+            adia.RiserSource = "";
+        }
+    }
     // Bottom (p.15 / p.16 rear elevation, p.17 step diagram): sloped from the west end to the wing footing's inner face (1'-5 inside the gutter), then
     // LEVEL for the 3'-0 under the wing extension.
     ad.FootingBottom = new()
@@ -292,9 +317,9 @@ foreach (var ab in abutData)
     sd.Reinforcement.EpoxyCoated = true;
     sup.Substructure = sd;
 }
-notes.Add("Abutments (decision 11): cap step riser positions are UNRESOLVED - not dimensioned on p.15 / p.16 / p.17 nor on std 2087-BTCD p.13; the p.17 step diagram draws them about 3'-4 past the lower beam CL, the p.15 / p.16 rear elevations about 1'-9 (scaled, inconsistent). The stepped pile cap solid is therefore NOT built (piles, wing extension, depths and checks are).");
+notes.Add("Abutments (USER DECISION 11, 2026-10-11, closes U13): cap step risers 1'-9 past the lower beam's CL along the CL brg (p.15 / p.16 rear elevations; not a printed dimension - p.17 step diagram draws about 3'-4); supported by the plan 'abutment footing' 18.1 / 19.5 CY. Stepped pile caps and the abutment diaphragm bottoms are built with them.");
 notes.Add("Abutments: CMP casing bottom = bottom of EPS fill (road plans IM-NHS-029-7(49), not in this set) - UNRESOLVED, casings scheduled with unknown length (plan total 281 LF).");
-notes.Add("Abutments: the 1'-7 wall over the cap end between the gutter line and the wing outer face (front of the cap back face) is neither in the diaphragm (ends at the gutter line) nor in the wing extension (starts at the cap back face) - not modeled.");
+notes.Add("Abutments (U18 closed): the 1'-7 over the cap end between the gutter line and the wing outer face is the abutment diaphragm, which runs to the wing outer face (p.15 / p.16 section A-A: 9 1/2 + 1'-7 = 2'-4 1/2 from CL beam H) - diaphragms-woodbury.csx.");
 notes.Add("Abutments: integral abutment rebar (p.26 bar list) is schedule only (no 3D placement in the integral generator).");
 
 foreach (var s in br.Supports) if (s.Substructure != null) s.Substructure.Enabled = true;

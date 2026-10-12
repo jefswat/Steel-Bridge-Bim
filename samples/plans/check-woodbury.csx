@@ -297,8 +297,8 @@ foreach (var r in bi)
 }
 
 // ---------------------------------------------------------------- substructure (p.9-12 piers, p.15-17 abutments, p.3 quantities)
-// Plan values as printed (0.01 ft elevations, 1/16" dimensions); counts exact. The abutment pile caps are not built while the step risers are
-// UNRESOLVED (decision 11), so their volumes are reported for the drawn riser candidates as INFO only.
+// Plan values as printed (0.01 ft elevations, 1/16" dimensions); counts exact. The abutment pile caps are built with the risers 1'-9 past the lower
+// beam (user decision 11); the volumes of the other drawn riser candidates stay as INFO evidence.
 var subm = Doc.Model(BrName).Substructure;
 if (subm == null) Row("Substructure", "substructure generated", 1, 0, "not generated");
 else
@@ -356,11 +356,24 @@ else
         Row("Abutment (p.15-17)", $"{ab.n} bottom of footing at the east end (level 3'-0)", ab.be, geo.FootingBottom(sR) / ft);
         Row("Abutment (p.15-17)", $"{ab.n} step diagram depth at the west end (in)", Len(ab.dl) / In(1), geo.DepthAtLeftEnd / In(1), "step D - bottom", 1.0 / 16, "F4");
         Row("Abutment (p.15-17)", $"{ab.n} step diagram depth at the east end (in)", Len(ab.dr) / In(1), geo.DepthAtRightEnd / In(1), "step H - bottom", 1.0 / 16, "F4");
-        Row("Abutment (p.15-17)", $"{ab.n} stepped pile cap solid built", 1, u.Solids.Any(s => s.Name.EndsWith("pile cap")) ? 1 : 0, "risers UNRESOLVED (decision 11)", 0, "F0", info: true);
+        Row("Abutment (p.15-17)", $"{ab.n} stepped pile cap solid built", 1, u.Solids.Any(s => s.Name.EndsWith("pile cap")) ? 1 : 0, "risers 1'-9 past the lower beam (user decision 11)", 0, "F0");
+        {
+            // Concrete vs the plan quantity 'ABUTMENT FOOTING' (p.17) = pile cap + wing extension footing (the diaphragm is cast with the deck)
+            double capCy = u.Solids.Where(s => s.Name.EndsWith("pile cap")).Sum(s => Math.Abs(s.Mesh.Volume())) / 0.764554857984;
+            double wingCy = u.Solids.Where(s => s.Name.Contains("wing extension") && s.Name.EndsWith("footing")).Sum(s => Math.Abs(s.Mesh.Volume())) / 0.764554857984;
+            Row("Abutment volume (p.17)", $"{ab.n} abutment footing cy = pile cap {capCy:F2} + wing ext. footing {wingCy:F2} (model)", ab.vol, capCy + wingCy, "plan quantity rounded to 0.1 cy; risers per decision 11", 0.05, "F2", info: true);
+            var risers = geo.StepRisersS;
+            Row("Abutment (p.15-17)", $"{ab.n} step risers built", 4, risers.Count, "decision 11", 0, "F0");
+        }
         Row("Abutment (p.15-17)", $"{ab.n} wing extension wall + footing solids", 2, u.Solids.Count(s => s.Kind is SBM.Core.Substructure.SubElementKind.Wingwall or SBM.Core.Substructure.SubElementKind.WingFooting), "", 0, "F0");
         Row("Abutment (p.15-17)", $"{ab.n} CMP casings scheduled", 8, geo.Casings.Count, "bottom UNRESOLVED (EPS, road plans)", 0, "F0");
-        // girder S on CL brg = the abutment's pile-cap top line breaks (placeholder line through the step tops)
-        var bS = u.CapTop.Skip(1).Take(u.CapTop.Count - 2).Select(p => p.X).ToList();
+        // girder S on CL brg (beam chords x the support line)
+        var bS = Enumerable.Range(0, 5).Select(g =>
+        {
+            var c = fr.Girders[g].Spans[ab.k == 0 ? 0 : 2];
+            Numerics.IntersectLines(fr.Supports[ab.k].AlignmentPoint, fr.Supports[ab.k].Direction, c.Start, (c.End - c.Start).Normalized(), out double t, out _);
+            return t;
+        }).ToList();
         if (bS.Count == 5)
         {
             double Vol(Func<int, double> riser)
@@ -387,6 +400,20 @@ else
             double tolX = 0.05 * 0.764554857984 / (rises * Ft(3));
             Row("Abutment volume (p.17)", $"{ab.n} riser offset past the lower beam CL that matches {ab.vol} cy (in)", 21, (lo + hi) / 2 / In(1), $"+-{tolX / In(1):F1}\" from the 0.1 cy rounding; plan value 21 = the 1'-9 drawn on the rear elevation", 0, "F1", info: true);
         }
+    }
+    // Concrete diaphragms (diaphragms-woodbury.csx): bottoms on the substructure tops - abutment risers per decision 11, pier step blocks p.9
+    {
+        var dm = Doc.Model(BrName).Prestressed?.ConcreteDiaphragms;
+        foreach (var nm in new[] { "S. Abut.", "Pier 1", "Pier 2", "N. Abut." })
+        {
+            var d = dm?.Diaphragms.FirstOrDefault(x => x.Support == nm);
+            Row("Diaphragms (p.15-20)", $"{nm} diaphragm built", 1, d == null ? 0 : 1, "", 0, "F0");
+            if (d == null) continue;
+            Row("Diaphragms (p.15-20)", $"{nm} diaphragm flagged UNRESOLVED (bottom)", 0, d.Assumption == null ? 0 : 1, d.Assumption?.Reason ?? "", 0, "F0");
+            Row("Diaphragms (p.15-20)", $"{nm} diaphragm concrete cy ({string.Join(", ", d.Parts.Select(p => $"{p.Name} {p.Volume / 0.764554857984:F2}"))})", 0, d.Volume / 0.764554857984, "model; plan quantity is in the deck concrete", 0, "F2", info: true);
+        }
+        foreach (var dg in (dm?.Diagnostics ?? new()).Where(x => x.Message.Contains("step blocks")))
+            Print("diaphragm: " + dg.Message);
     }
     // Piles: plan quantity 11,440 LF = 8 x 155 + 8 x 150 + 72 x 125 (contract lengths, p.3 / p.12 / p.17)
     var allPiles = subm.Units.SelectMany(x => x.Foundations).SelectMany(f => f.Piles).ToList();
