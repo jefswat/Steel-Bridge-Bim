@@ -15,7 +15,7 @@ namespace SBM.Core.Arch;
 /// floorbeams, upper bracing, knuckles (simplified), deck slab on a corrugated form deck, curbs, bearings on the pier seats. Plan values are
 /// built as given; every difference between plan values is reported (<see cref="ArchModel.Checks"/> / warnings), never adjusted.
 /// </summary>
-public static class ArchGenerator
+public static partial class ArchGenerator
 {
     public static ArchModel Generate(BridgeFraming framing, UnitSystem units)
     {
@@ -47,7 +47,7 @@ public static class ArchGenerator
         return new Frame3(origin.WithZ(fr.OriginElevation), x, y, z);
     }
 
-    private sealed class Gen
+    private sealed partial class Gen
     {
         private readonly BridgeFraming _f;
         private readonly BridgeDefinition _b;
@@ -96,7 +96,7 @@ public static class ArchGenerator
             BuildHangers();
             foreach (var fb in _d.Floorbeams) BuildFloorbeam(fb);
             BuildBracing();
-            foreach (var k in _d.Knuckles) BuildKnuckle(k);
+            foreach (var k in _d.Knuckles) { if (k.Detail is { } kd) BuildKnuckleV2(k, kd); else BuildKnuckle(k); }
             if (_d.Deck != null) BuildDeck(_d.Deck);
             for (int i = 0; i < _d.Bearings.Count; i++) BuildBearing(_d.Bearings[i], i);
         }
@@ -248,9 +248,12 @@ public static class ArchGenerator
             }
             // Pieces between the field splices (gap at each), splice plates + bolts at each splice.
             var cuts = t.SpliceAt.Select(x => x.Distance).Where(x => x > 0 && x < geo.Length).OrderBy(x => x).ToList();
-            var bounds = new List<double> { 0 };
+            // v2 knuckles: the tie field pieces start / end at the knuckle joints (end flange inner edge + half the joint gap).
+            double trimA = KnuckleJoint(t, geo, true) is { } ja ? ja + (_d.Knuckles.FirstOrDefault(kk => kk.Detail != null)?.Detail?.JointGap ?? 0) / 2 : 0;
+            double trimB = KnuckleJoint(t, geo, false) is { } jb ? geo.Length - jb - (_d.Knuckles.FirstOrDefault(kk => kk.Detail != null)?.Detail?.JointGap ?? 0) / 2 : geo.Length;
+            var bounds = new List<double> { trimA };
             bounds.AddRange(cuts);
-            bounds.Add(geo.Length);
+            bounds.Add(trimB);
             for (int k = 0; k + 1 < bounds.Count; k++)
             {
                 double sa = bounds[k] + (k > 0 ? t.SpliceGap / 2 : 0), sb = bounds[k + 1] - (k + 2 < bounds.Count ? t.SpliceGap / 2 : 0);
@@ -452,6 +455,7 @@ public static class ArchGenerator
                 double len = r.Radius * Math.Abs(ta - tb);
                 bool hasStubs = !double.IsNaN(r.StubBottomZ) && cuts.Count >= 2;
                 bool stub = hasStubs && (k == 0 || k == bounds.Count - 2);
+                if (stub && _d.Knuckles.Any(kk => kk.Detail != null && kk.Corners.Any(cc => string.Equals(cc.Rib, r.Name, StringComparison.OrdinalIgnoreCase)))) continue;   // v2 knuckle builds the stub
                 if (stub)
                 {
                     string km = $"{asm}-STUB{(k == 0 ? 1 : 2)}";

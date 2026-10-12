@@ -1,12 +1,12 @@
 {
   "Version": 1,
-  "Name": "Northaven NHT",
+  "Name": "nht",
   "UnitSystem": "US",
   "Foot": "International",
   "Alignments": [
     {
       "Name": "CL NHT (TRAILCLNEW)",
-      "Description": "CL NHT = TRAILCLNEW (CSJ 0047-07-228 p.18-19); plan X/Y as a local grid in ft (datum not in the set, U12)",
+      "Description": "CL NHT = TRAILCLNEW (CSJ 0047-07-228 p.18-19); plan X/Y = TxDOT surface coordinates, NAD83 Texas North Central, SAF 1.000136 (U12 resolved)",
       "StartStation": 624.6266400000001,
       "StationEquations": [],
       "Elements": [
@@ -7120,7 +7120,70 @@
             ],
             "SpliceGap": 0.0127,
             "StubBottomZ": 0.022224999999999998,
-            "StubUnresolved": "UNRESOLVED (p.123-124): knuckle arch stub below RS1 / above RS5 - the stub is built up from 1\u0022 arch flange plates, an end web and stiffeners whose outlines are only partly dimensioned. Modeled as the W14x132 envelope down to the end flange top."
+            "StubUnresolved": "UNRESOLVED (p.123-124): knuckle arch stub below RS1 / above RS5 - the stub is built up from 1\u0022 arch flange plates, an end web and stiffeners whose outlines are only partly dimensioned. Modeled as the W14x132 envelope down to the end flange top.",
+            "SpliceDetail": {
+              "Name": "p.127: flanges 14 1/2\u0022 x 5/8\u0022 outside \u002B 2 - 5 5/8\u0022 x 5/8\u0022 inside PL, web 2 - 10\u0022 x 3/4\u0022 curved PL, 7/8\u0022 A325 bolts",
+              "FlangeOuterWidth": 0.36829999999999996,
+              "FlangeOuterThickness": 0.015875,
+              "FlangeInnerWidth": 0.142875,
+              "FlangeInnerThickness": 0.015875,
+              "FlangeBoltFirst": 0.0508,
+              "FlangeBoltPitch": 0.0508,
+              "FlangeBoltColumns": 6,
+              "FlangeEndEdge": 0.044449999999999996,
+              "FlangeRows": [
+                {
+                  "Gage": 0.044449999999999996,
+                  "FirstColumn": 0,
+                  "ColumnStep": 2
+                },
+                {
+                  "Gage": 0.10794999999999999,
+                  "FirstColumn": 1,
+                  "ColumnStep": 2
+                }
+              ],
+              "FlangeClip": 0.044449999999999996,
+              "WebPlateWidth": 0.254,
+              "WebPlateThickness": 0.019049999999999997,
+              "WebPlateEdgeFromWebEnd": "NaN",
+              "WebBoltFirst": 0.0508,
+              "WebBoltPitch": 0.0508,
+              "WebBoltColumns": 4,
+              "WebEndEdge": 0.044449999999999996,
+              "WebRows": [
+                {
+                  "Gage": 0.038099999999999995,
+                  "FirstColumn": 0,
+                  "ColumnStep": 2
+                },
+                {
+                  "Gage": 0.08255,
+                  "FirstColumn": 1,
+                  "ColumnStep": 2
+                },
+                {
+                  "Gage": 0.127,
+                  "FirstColumn": 0,
+                  "ColumnStep": 2
+                },
+                {
+                  "Gage": 0.17145,
+                  "FirstColumn": 1,
+                  "ColumnStep": 2
+                },
+                {
+                  "Gage": 0.21589999999999998,
+                  "FirstColumn": 0,
+                  "ColumnStep": 2
+                }
+              ],
+              "WebClip": 0.044449999999999996,
+              "WebPlateNote": "CURVED to the rib",
+              "Material": "ASTM A709 Gr. 50-T1",
+              "CheckFlangePlateLength": "NaN",
+              "CheckWebPlateLength": "NaN"
+            }
           },
           {
             "Name": "North rib",
@@ -7140,7 +7203,70 @@
             ],
             "SpliceGap": 0.0127,
             "StubBottomZ": 0.022224999999999998,
-            "StubUnresolved": "UNRESOLVED (p.123-124): knuckle arch stub below RS1 / above RS5 - the stub is built up from 1\u0022 arch flange plates, an end web and stiffeners whose outlines are only partly dimensioned. Modeled as the W14x132 envelope down to the end flange top."
+            "StubUnresolved": "UNRESOLVED (p.123-124): knuckle arch stub below RS1 / above RS5 - the stub is built up from 1\u0022 arch flange plates, an end web and stiffeners whose outlines are only partly dimensioned. Modeled as the W14x132 envelope down to the end flange top.",
+            "SpliceDetail": {
+              "Name": "p.127: flanges 14 1/2\u0022 x 5/8\u0022 outside \u002B 2 - 5 5/8\u0022 x 5/8\u0022 inside PL, web 2 - 10\u0022 x 3/4\u0022 curved PL, 7/8\u0022 A325 bolts",
+              "FlangeOuterWidth": 0.36829999999999996,
+              "FlangeOuterThickness": 0.015875,
+              "FlangeInnerWidth": 0.142875,
+              "FlangeInnerThickness": 0.015875,
+              "FlangeBoltFirst": 0.0508,
+              "FlangeBoltPitch": 0.0508,
+              "FlangeBoltColumns": 6,
+              "FlangeEndEdge": 0.044449999999999996,
+              "FlangeRows": [
+                {
+                  "Gage": 0.044449999999999996,
+                  "FirstColumn": 0,
+                  "ColumnStep": 2
+                },
+                {
+                  "Gage": 0.10794999999999999,
+                  "FirstColumn": 1,
+                  "ColumnStep": 2
+                }
+              ],
+              "FlangeClip": 0.044449999999999996,
+              "WebPlateWidth": 0.254,
+              "WebPlateThickness": 0.019049999999999997,
+              "WebPlateEdgeFromWebEnd": "NaN",
+              "WebBoltFirst": 0.0508,
+              "WebBoltPitch": 0.0508,
+              "WebBoltColumns": 4,
+              "WebEndEdge": 0.044449999999999996,
+              "WebRows": [
+                {
+                  "Gage": 0.038099999999999995,
+                  "FirstColumn": 0,
+                  "ColumnStep": 2
+                },
+                {
+                  "Gage": 0.08255,
+                  "FirstColumn": 1,
+                  "ColumnStep": 2
+                },
+                {
+                  "Gage": 0.127,
+                  "FirstColumn": 0,
+                  "ColumnStep": 2
+                },
+                {
+                  "Gage": 0.17145,
+                  "FirstColumn": 1,
+                  "ColumnStep": 2
+                },
+                {
+                  "Gage": 0.21589999999999998,
+                  "FirstColumn": 0,
+                  "ColumnStep": 2
+                }
+              ],
+              "WebClip": 0.044449999999999996,
+              "WebPlateNote": "CURVED to the rib",
+              "Material": "ASTM A709 Gr. 50-T1",
+              "CheckFlangePlateLength": "NaN",
+              "CheckWebPlateLength": "NaN"
+            }
           }
         ],
         "Ties": [
@@ -7309,9 +7435,80 @@
             "FlangeThickness": 0.022224999999999998,
             "FlangeWidth": 0.35559999999999997,
             "Material": "ASTM A709 Gr. 50-F1 (FCM)",
-            "Splices": [
-              "TS (U5)"
-            ]
+            "Splices": [],
+            "SpliceAt": [
+              {
+                "Name": "TS(1)",
+                "Distance": 12.063412499999998
+              },
+              {
+                "Name": "TS(2)",
+                "Distance": 24.5094125
+              },
+              {
+                "Name": "TS(3)",
+                "Distance": 39.257287500000004
+              },
+              {
+                "Name": "TS(4)",
+                "Distance": 50.4967875
+              }
+            ],
+            "SpliceGap": 0.0127,
+            "SpliceDetail": {
+              "Name": "p.144: web 2 - 9\u0022 x 3/4\u0022 bent PL (top flush with top of web), flange 5/8\u0022 x 1\u0027-2 bottom \u002B 2 - 6\u0022 x 5/8\u0022 top PL, 1\u0027-6 1/2 long, 7/8\u0022 bolts in 15/16\u0022 holes",
+              "FlangeOuterWidth": 0.3556,
+              "FlangeOuterThickness": 0.015875,
+              "FlangeInnerWidth": 0.15239999999999998,
+              "FlangeInnerThickness": 0.015875,
+              "FlangeBoltFirst": 0.044449999999999996,
+              "FlangeBoltPitch": 0.07619999999999999,
+              "FlangeBoltColumns": 3,
+              "FlangeEndEdge": 0.038099999999999995,
+              "FlangeRows": [
+                {
+                  "Gage": 0.038099999999999995,
+                  "FirstColumn": 0,
+                  "ColumnStep": 1
+                },
+                {
+                  "Gage": 0.1143,
+                  "FirstColumn": 0,
+                  "ColumnStep": 1
+                }
+              ],
+              "FlangeClip": 0,
+              "WebPlateWidth": 0.2286,
+              "WebPlateThickness": 0.019049999999999997,
+              "WebPlateEdgeFromWebEnd": 0,
+              "WebBoltFirst": 0.044449999999999996,
+              "WebBoltPitch": 0.07619999999999999,
+              "WebBoltColumns": 3,
+              "WebEndEdge": 0.038099999999999995,
+              "WebRows": [
+                {
+                  "Gage": 0.038099999999999995,
+                  "FirstColumn": 0,
+                  "ColumnStep": 1
+                },
+                {
+                  "Gage": 0.1143,
+                  "FirstColumn": 0,
+                  "ColumnStep": 1
+                },
+                {
+                  "Gage": 0.1905,
+                  "FirstColumn": 0,
+                  "ColumnStep": 1
+                }
+              ],
+              "WebClip": 0,
+              "WebPlateNote": "BENT to the tie curve",
+              "Material": "ASTM A709 Gr. 50-F1 (FCM)",
+              "CheckFlangePlateLength": 0.4699,
+              "CheckWebPlateLength": 0.4699
+            },
+            "SpliceUnresolved": "UNRESOLVED (p.143, 120, 93): tie girder field splice positions (U5) - the framing plan shows TS(1)-TS(4) per tie (5 segments = erection \u0027tie segments 1-5\u0027, p.93) without dimensions, the north tie splices are not the 180 deg rotation of the south ones (S TS(1) T7-T8, N TS(1) T6\u0027-T7\u0027), and the p.120 elevation / table show only TS1-TS3 (T9-T10, T17-T18, T25-T26). Splices built per the framing plan at mid panel (the p.120 table TS points are the arc mid-panel points); the p.120 set is reported only."
           },
           {
             "Name": "North tie",
@@ -7478,9 +7675,80 @@
             "FlangeThickness": 0.022224999999999998,
             "FlangeWidth": 0.35559999999999997,
             "Material": "ASTM A709 Gr. 50-F1 (FCM)",
-            "Splices": [
-              "TS (U5)"
-            ]
+            "Splices": [],
+            "SpliceAt": [
+              {
+                "Name": "TS(1)",
+                "Distance": 10.2854125
+              },
+              {
+                "Name": "TS(2)",
+                "Distance": 20.9534125
+              },
+              {
+                "Name": "TS(3)",
+                "Distance": 35.5107875
+              },
+              {
+                "Name": "TS(4)",
+                "Distance": 48.623537500000005
+              }
+            ],
+            "SpliceGap": 0.0127,
+            "SpliceDetail": {
+              "Name": "p.144: web 2 - 9\u0022 x 3/4\u0022 bent PL (top flush with top of web), flange 5/8\u0022 x 1\u0027-2 bottom \u002B 2 - 6\u0022 x 5/8\u0022 top PL, 1\u0027-6 1/2 long, 7/8\u0022 bolts in 15/16\u0022 holes",
+              "FlangeOuterWidth": 0.3556,
+              "FlangeOuterThickness": 0.015875,
+              "FlangeInnerWidth": 0.15239999999999998,
+              "FlangeInnerThickness": 0.015875,
+              "FlangeBoltFirst": 0.044449999999999996,
+              "FlangeBoltPitch": 0.07619999999999999,
+              "FlangeBoltColumns": 3,
+              "FlangeEndEdge": 0.038099999999999995,
+              "FlangeRows": [
+                {
+                  "Gage": 0.038099999999999995,
+                  "FirstColumn": 0,
+                  "ColumnStep": 1
+                },
+                {
+                  "Gage": 0.1143,
+                  "FirstColumn": 0,
+                  "ColumnStep": 1
+                }
+              ],
+              "FlangeClip": 0,
+              "WebPlateWidth": 0.2286,
+              "WebPlateThickness": 0.019049999999999997,
+              "WebPlateEdgeFromWebEnd": 0,
+              "WebBoltFirst": 0.044449999999999996,
+              "WebBoltPitch": 0.07619999999999999,
+              "WebBoltColumns": 3,
+              "WebEndEdge": 0.038099999999999995,
+              "WebRows": [
+                {
+                  "Gage": 0.038099999999999995,
+                  "FirstColumn": 0,
+                  "ColumnStep": 1
+                },
+                {
+                  "Gage": 0.1143,
+                  "FirstColumn": 0,
+                  "ColumnStep": 1
+                },
+                {
+                  "Gage": 0.1905,
+                  "FirstColumn": 0,
+                  "ColumnStep": 1
+                }
+              ],
+              "WebClip": 0,
+              "WebPlateNote": "BENT to the tie curve",
+              "Material": "ASTM A709 Gr. 50-F1 (FCM)",
+              "CheckFlangePlateLength": 0.4699,
+              "CheckWebPlateLength": 0.4699
+            },
+            "SpliceUnresolved": "UNRESOLVED (p.143, 120, 93): tie girder field splice positions (U5) - the framing plan shows TS(1)-TS(4) per tie (5 segments = erection \u0027tie segments 1-5\u0027, p.93) without dimensions, the north tie splices are not the 180 deg rotation of the south ones (S TS(1) T7-T8, N TS(1) T6\u0027-T7\u0027), and the p.120 elevation / table show only TS1-TS3 (T9-T10, T17-T18, T25-T26). Splices built per the framing plan at mid panel (the p.120 table TS points are the arc mid-panel points); the p.120 set is reported only."
           }
         ],
         "Hangers": [
@@ -7495,12 +7763,31 @@
               "Z": 0.4062984
             },
             "RibAnchor": {
+              "Name": "H2",
+              "X": -26.063143200000003,
+              "Y": -2.3125176,
+              "Z": 3.3348168000000005
+            },
+            "PlanLength": 3.5978592000000003,
+            "RibWorkPoint": {
               "Name": "HC2",
               "X": -25.908304800000003,
               "Y": -2.3018496,
               "Z": 3.8529768
             },
-            "PlanLength": 3.5978592000000003
+            "RibFin": {
+              "AngleB": 151.923,
+              "P1": -0.0346202,
+              "P2": 0.5396738,
+              "P3": 0.37777419999999995,
+              "P4": 0.053974999999999995,
+              "WeldLength": 0.36507419999999996
+            },
+            "TieFin": {
+              "Panel": "T2",
+              "AngleA": 90.87,
+              "Orient": "RIGHT"
+            }
           },
           {
             "Name": "C1-N",
@@ -7513,12 +7800,31 @@
               "Z": 0.4062984
             },
             "RibAnchor": {
+              "Name": "H2\u0027",
+              "X": 26.063143200000003,
+              "Y": 2.3125176,
+              "Z": 3.3348168000000005
+            },
+            "PlanLength": 3.5978592000000003,
+            "RibWorkPoint": {
               "Name": "HC2\u0027",
               "X": 25.908304800000003,
               "Y": 2.3018496,
               "Z": 3.8529768
             },
-            "PlanLength": 3.5978592000000003
+            "RibFin": {
+              "AngleB": 151.923,
+              "P1": 0.0346202,
+              "P2": 0.5396738,
+              "P3": 0.37777419999999995,
+              "P4": 0.053974999999999995,
+              "WeldLength": 0.36507419999999996
+            },
+            "TieFin": {
+              "Panel": "T2\u0027",
+              "AngleA": 90.87,
+              "Orient": "RIGHT"
+            }
           },
           {
             "Name": "C2-S",
@@ -7531,12 +7837,31 @@
               "Z": 0.4062984
             },
             "RibAnchor": {
+              "Name": "H1",
+              "X": -26.689812,
+              "Y": -2.3689056,
+              "Z": 2.6688288
+            },
+            "PlanLength": 2.9382720000000004,
+            "RibWorkPoint": {
               "Name": "HC1",
               "X": -26.830020000000005,
               "Y": -2.3856696,
               "Z": 2.8937712
             },
-            "PlanLength": 2.9382720000000004
+            "RibFin": {
+              "AngleB": 105.002,
+              "P1": -0.0363982,
+              "P2": 0.2629662,
+              "P3": 0.18407379999999998,
+              "P4": 0.026288999999999996,
+              "WeldLength": 0.1713738
+            },
+            "TieFin": {
+              "Panel": "T3",
+              "AngleA": 90.758,
+              "Orient": "LEFT"
+            }
           },
           {
             "Name": "C2-N",
@@ -7549,12 +7874,31 @@
               "Z": 0.4062984
             },
             "RibAnchor": {
+              "Name": "H1\u0027",
+              "X": 26.689812,
+              "Y": 2.3689056,
+              "Z": 2.6688288
+            },
+            "PlanLength": 2.9382720000000004,
+            "RibWorkPoint": {
               "Name": "HC1\u0027",
               "X": 26.830020000000005,
               "Y": 2.3856696,
               "Z": 2.8937712
             },
-            "PlanLength": 2.9382720000000004
+            "RibFin": {
+              "AngleB": 105.002,
+              "P1": 0.0363982,
+              "P2": 0.2629662,
+              "P3": 0.18407379999999998,
+              "P4": 0.026288999999999996,
+              "WeldLength": 0.1713738
+            },
+            "TieFin": {
+              "Panel": "T3\u0027",
+              "AngleA": 90.758,
+              "Orient": "LEFT"
+            }
           },
           {
             "Name": "C3-S",
@@ -7567,12 +7911,31 @@
               "Z": 0.4062984
             },
             "RibAnchor": {
+              "Name": "H5",
+              "X": -21.4149432,
+              "Y": -1.9604736000000003,
+              "Z": 7.4048112
+            },
+            "PlanLength": 7.688580000000001,
+            "RibWorkPoint": {
               "Name": "HC5",
               "X": -21.3021672,
               "Y": -1.9562064000000001,
               "Z": 7.8031848
             },
-            "PlanLength": 7.688580000000001
+            "RibFin": {
+              "AngleB": 142.052,
+              "P1": -0.030505400000000002,
+              "P2": 0.4130548,
+              "P3": 0.28912819999999995,
+              "P4": 0.041300399999999994,
+              "WeldLength": 0.27642819999999996
+            },
+            "TieFin": {
+              "Panel": "T4",
+              "AngleA": 91.099,
+              "Orient": "RIGHT"
+            }
           },
           {
             "Name": "C3-N",
@@ -7585,12 +7948,31 @@
               "Z": 0.4062984
             },
             "RibAnchor": {
+              "Name": "H5\u0027",
+              "X": 21.4149432,
+              "Y": 1.9604736000000003,
+              "Z": 7.4048112
+            },
+            "PlanLength": 7.688580000000001,
+            "RibWorkPoint": {
               "Name": "HC5\u0027",
               "X": 21.3021672,
               "Y": 1.9562064000000001,
               "Z": 7.8031848
             },
-            "PlanLength": 7.688580000000001
+            "RibFin": {
+              "AngleB": 142.052,
+              "P1": 0.030505400000000002,
+              "P2": 0.4130548,
+              "P3": 0.28912819999999995,
+              "P4": 0.041300399999999994,
+              "WeldLength": 0.27642819999999996
+            },
+            "TieFin": {
+              "Panel": "T4\u0027",
+              "AngleA": 91.099,
+              "Orient": "RIGHT"
+            }
           },
           {
             "Name": "C4-S",
@@ -7603,12 +7985,31 @@
               "Z": 0.4062984
             },
             "RibAnchor": {
+              "Name": "H3",
+              "X": -24.2937792,
+              "Y": -2.165604,
+              "Z": 5.0407824
+            },
+            "PlanLength": 5.563514400000001,
+            "RibWorkPoint": {
               "Name": "HC3",
               "X": -24.420576000000004,
               "Y": -2.177796,
               "Z": 5.270601600000001
             },
-            "PlanLength": 5.563514400000001
+            "RibFin": {
+              "AngleB": 103.06,
+              "P1": -0.032181799999999997,
+              "P2": 0.2607564,
+              "P3": 0.1825244,
+              "P4": 0.026085799999999996,
+              "WeldLength": 0.1698244
+            },
+            "TieFin": {
+              "Panel": "T5",
+              "AngleA": 91.247,
+              "Orient": "LEFT"
+            }
           },
           {
             "Name": "C4-N",
@@ -7621,12 +8022,31 @@
               "Z": 0.4062984
             },
             "RibAnchor": {
+              "Name": "H3\u0027",
+              "X": 24.2937792,
+              "Y": 2.165604,
+              "Z": 5.0407824
+            },
+            "PlanLength": 5.563514400000001,
+            "RibWorkPoint": {
               "Name": "HC3\u0027",
               "X": 24.420576000000004,
               "Y": 2.177796,
               "Z": 5.270601600000001
             },
-            "PlanLength": 5.563514400000001
+            "RibFin": {
+              "AngleB": 103.06,
+              "P1": 0.032181799999999997,
+              "P2": 0.2607564,
+              "P3": 0.1825244,
+              "P4": 0.026085799999999996,
+              "WeldLength": 0.1698244
+            },
+            "TieFin": {
+              "Panel": "T5\u0027",
+              "AngleA": 91.247,
+              "Orient": "LEFT"
+            }
           },
           {
             "Name": "C5-S",
@@ -7639,12 +8059,31 @@
               "Z": 0.4062984
             },
             "RibAnchor": {
+              "Name": "H7",
+              "X": -17.1788328,
+              "Y": -1.7257776,
+              "Z": 10.1327712
+            },
+            "PlanLength": 10.4415336,
+            "RibWorkPoint": {
               "Name": "HC7",
               "X": -17.0849544,
               "Y": -1.7224248,
               "Z": 10.4747568
             },
-            "PlanLength": 10.4415336
+            "RibFin": {
+              "AngleB": 134.123,
+              "P1": -0.026593799999999997,
+              "P2": 0.35382199999999997,
+              "P3": 0.24767539999999996,
+              "P4": 0.035382199999999996,
+              "WeldLength": 0.23497539999999997
+            },
+            "TieFin": {
+              "Panel": "T6",
+              "AngleA": 90.664,
+              "Orient": "RIGHT"
+            }
           },
           {
             "Name": "C5-N",
@@ -7657,12 +8096,31 @@
               "Z": 0.4062984
             },
             "RibAnchor": {
+              "Name": "H7\u0027",
+              "X": 17.1788328,
+              "Y": 1.7257776,
+              "Z": 10.1327712
+            },
+            "PlanLength": 10.4415336,
+            "RibWorkPoint": {
               "Name": "HC7\u0027",
               "X": 17.0849544,
               "Y": 1.7224248,
               "Z": 10.4747568
             },
-            "PlanLength": 10.4415336
+            "RibFin": {
+              "AngleB": 134.123,
+              "P1": 0.026593799999999997,
+              "P2": 0.35382199999999997,
+              "P3": 0.24767539999999996,
+              "P4": 0.035382199999999996,
+              "WeldLength": 0.23497539999999997
+            },
+            "TieFin": {
+              "Panel": "T6\u0027",
+              "AngleA": 90.664,
+              "Orient": "RIGHT"
+            }
           },
           {
             "Name": "C6-S",
@@ -7675,12 +8133,31 @@
               "Z": 0.4062984
             },
             "RibAnchor": {
+              "Name": "H4",
+              "X": -22.082455200000002,
+              "Y": -2.0077176,
+              "Z": 6.8967096
+            },
+            "PlanLength": 7.8339696000000005,
+            "RibWorkPoint": {
               "Name": "HC4",
               "X": -22.214738399999998,
               "Y": -2.016252,
               "Z": 7.1170800000000005
             },
-            "PlanLength": 7.8339696000000005
+            "RibFin": {
+              "AngleB": 96.699,
+              "P1": -0.027584400000000002,
+              "P2": 0.2557526,
+              "P3": 0.1790192,
+              "P4": 0.025577799999999998,
+              "WeldLength": 0.1663192
+            },
+            "TieFin": {
+              "Panel": "T7",
+              "AngleA": 90.89,
+              "Orient": "LEFT"
+            }
           },
           {
             "Name": "C6-N",
@@ -7693,12 +8170,31 @@
               "Z": 0.4062984
             },
             "RibAnchor": {
+              "Name": "H4\u0027",
+              "X": 22.082455200000002,
+              "Y": 2.0077176,
+              "Z": 6.8967096
+            },
+            "PlanLength": 7.8339696000000005,
+            "RibWorkPoint": {
               "Name": "HC4\u0027",
               "X": 22.214738399999998,
               "Y": 2.016252,
               "Z": 7.1170800000000005
             },
-            "PlanLength": 7.8339696000000005
+            "RibFin": {
+              "AngleB": 96.699,
+              "P1": 0.027584400000000002,
+              "P2": 0.2557526,
+              "P3": 0.1790192,
+              "P4": 0.025577799999999998,
+              "WeldLength": 0.1663192
+            },
+            "TieFin": {
+              "Panel": "T7\u0027",
+              "AngleA": 90.89,
+              "Orient": "LEFT"
+            }
           },
           {
             "Name": "C7-S",
@@ -7711,12 +8207,31 @@
               "Z": 0.4062984
             },
             "RibAnchor": {
+              "Name": "H10",
+              "X": -12.4367544,
+              "Y": -1.5358872,
+              "Z": 12.351410400000002
+            },
+            "PlanLength": 12.8811528,
+            "RibWorkPoint": {
               "Name": "HC10",
               "X": -12.336475199999999,
               "Y": -1.5310104,
               "Z": 12.6623064
             },
-            "PlanLength": 12.8811528
+            "RibFin": {
+              "AngleB": 128.857,
+              "P1": -0.0223012,
+              "P2": 0.3261868,
+              "P3": 0.2283206,
+              "P4": 0.0326136,
+              "WeldLength": 0.21562060000000002
+            },
+            "TieFin": {
+              "Panel": "T8",
+              "AngleA": 90.156,
+              "Orient": "RIGHT"
+            }
           },
           {
             "Name": "C7-N",
@@ -7729,12 +8244,31 @@
               "Z": 0.4062984
             },
             "RibAnchor": {
+              "Name": "H10\u0027",
+              "X": 12.4367544,
+              "Y": 1.5358872,
+              "Z": 12.351410400000002
+            },
+            "PlanLength": 12.8811528,
+            "RibWorkPoint": {
               "Name": "HC10\u0027",
               "X": 12.336475199999999,
               "Y": 1.5310104,
               "Z": 12.6623064
             },
-            "PlanLength": 12.8811528
+            "RibFin": {
+              "AngleB": 128.857,
+              "P1": 0.0223012,
+              "P2": 0.3261868,
+              "P3": 0.2283206,
+              "P4": 0.0326136,
+              "WeldLength": 0.21562060000000002
+            },
+            "TieFin": {
+              "Panel": "T8\u0027",
+              "AngleA": 90.156,
+              "Orient": "RIGHT"
+            }
           },
           {
             "Name": "C8-S",
@@ -7747,12 +8281,31 @@
               "Z": 0.4062984
             },
             "RibAnchor": {
+              "Name": "H6",
+              "X": -19.024092,
+              "Y": -1.8251424000000003,
+              "Z": 9.040368
+            },
+            "PlanLength": 9.9462336,
+            "RibWorkPoint": {
               "Name": "HC6",
               "X": -19.1402208,
               "Y": -1.8278856,
               "Z": 9.2686632
             },
-            "PlanLength": 9.9462336
+            "RibFin": {
+              "AngleB": 95.177,
+              "P1": -0.0226314,
+              "P2": 0.2550414,
+              "P3": 0.1785366,
+              "P4": 0.0255016,
+              "WeldLength": 0.1658366
+            },
+            "TieFin": {
+              "Panel": "T9",
+              "AngleA": 90.481,
+              "Orient": "LEFT"
+            }
           },
           {
             "Name": "C8-N",
@@ -7765,12 +8318,31 @@
               "Z": 0.4062984
             },
             "RibAnchor": {
+              "Name": "H6\u0027",
+              "X": 19.024092,
+              "Y": 1.8251424000000003,
+              "Z": 9.040368
+            },
+            "PlanLength": 9.9462336,
+            "RibWorkPoint": {
               "Name": "HC6\u0027",
               "X": 19.1402208,
               "Y": 1.8278856,
               "Z": 9.2686632
             },
-            "PlanLength": 9.9462336
+            "RibFin": {
+              "AngleB": 95.177,
+              "P1": 0.0226314,
+              "P2": 0.2550414,
+              "P3": 0.1785366,
+              "P4": 0.0255016,
+              "WeldLength": 0.1658366
+            },
+            "TieFin": {
+              "Panel": "T9\u0027",
+              "AngleA": 90.481,
+              "Orient": "LEFT"
+            }
           },
           {
             "Name": "C9-S",
@@ -7783,12 +8355,31 @@
               "Z": 0.4062984
             },
             "RibAnchor": {
+              "Name": "H12",
+              "X": -8.165287200000002,
+              "Y": -1.420368,
+              "Z": 13.721486400000002
+            },
+            "PlanLength": 14.3871696,
+            "RibWorkPoint": {
               "Name": "HC12",
               "X": -8.066532,
               "Y": -1.4133575999999999,
               "Z": 14.009217600000001
             },
-            "PlanLength": 14.3871696
+            "RibFin": {
+              "AngleB": 123.219,
+              "P1": -0.018084799999999998,
+              "P2": 0.3036062,
+              "P3": 0.2125218,
+              "P4": 0.030353,
+              "WeldLength": 0.1998218
+            },
+            "TieFin": {
+              "Panel": "T10",
+              "AngleA": 89.846,
+              "Orient": "RIGHT"
+            }
           },
           {
             "Name": "C9-N",
@@ -7801,12 +8392,31 @@
               "Z": 0.4062984
             },
             "RibAnchor": {
+              "Name": "H12\u0027",
+              "X": 8.165287200000002,
+              "Y": 1.420368,
+              "Z": 13.721486400000002
+            },
+            "PlanLength": 14.3871696,
+            "RibWorkPoint": {
               "Name": "HC12\u0027",
               "X": 8.066532,
               "Y": 1.4133575999999999,
               "Z": 14.009217600000001
             },
-            "PlanLength": 14.3871696
+            "RibFin": {
+              "AngleB": 123.219,
+              "P1": 0.018084799999999998,
+              "P2": 0.3036062,
+              "P3": 0.2125218,
+              "P4": 0.030353,
+              "WeldLength": 0.1998218
+            },
+            "TieFin": {
+              "Panel": "T10\u0027",
+              "AngleA": 89.846,
+              "Orient": "RIGHT"
+            }
           },
           {
             "Name": "C10-S",
@@ -7819,12 +8429,31 @@
               "Z": 0.4062984
             },
             "RibAnchor": {
+              "Name": "H8",
+              "X": -16.0931352,
+              "Y": -1.6843248,
+              "Z": 10.7118912
+            },
+            "PlanLength": 11.7189504,
+            "RibWorkPoint": {
               "Name": "HC8",
               "X": -16.204692,
               "Y": -1.6815816000000001,
               "Z": 10.940796
             },
-            "PlanLength": 11.7189504
+            "RibFin": {
+              "AngleB": 91.195,
+              "P1": -0.0173228,
+              "P2": 0.2540508,
+              "P3": 0.17785079999999998,
+              "P4": 0.0254,
+              "WeldLength": 0.1651508
+            },
+            "TieFin": {
+              "Panel": "T11",
+              "AngleA": 89.302,
+              "Orient": "LEFT"
+            }
           },
           {
             "Name": "C10-N",
@@ -7837,12 +8466,31 @@
               "Z": 0.4062984
             },
             "RibAnchor": {
+              "Name": "H8\u0027",
+              "X": 16.0931352,
+              "Y": 1.6843248,
+              "Z": 10.7118912
+            },
+            "PlanLength": 11.7189504,
+            "RibWorkPoint": {
               "Name": "HC8\u0027",
               "X": 16.204692,
               "Y": 1.6815816000000001,
               "Z": 10.940796
             },
-            "PlanLength": 11.7189504
+            "RibFin": {
+              "AngleB": 91.195,
+              "P1": 0.0173228,
+              "P2": 0.2540508,
+              "P3": 0.17785079999999998,
+              "P4": 0.0254,
+              "WeldLength": 0.1651508
+            },
+            "TieFin": {
+              "Panel": "T11\u0027",
+              "AngleA": 89.302,
+              "Orient": "LEFT"
+            }
           },
           {
             "Name": "C11-S",
@@ -7855,12 +8503,31 @@
               "Z": 0.4062984
             },
             "RibAnchor": {
+              "Name": "H14",
+              "X": -4.0181784,
+              "Y": -1.3527024,
+              "Z": 14.547494400000001
+            },
+            "PlanLength": 15.353995200000002,
+            "RibWorkPoint": {
               "Name": "HC14",
               "X": -3.9191184000000003,
               "Y": -1.3426440000000002,
               "Z": 14.8175472
             },
-            "PlanLength": 15.353995200000002
+            "RibFin": {
+              "AngleB": 118.01,
+              "P1": -0.013335,
+              "P2": 0.2877058,
+              "P3": 0.2013966,
+              "P4": 0.0287782,
+              "WeldLength": 0.1886966
+            },
+            "TieFin": {
+              "Panel": "T12",
+              "AngleA": 88.95,
+              "Orient": "RIGHT"
+            }
           },
           {
             "Name": "C11-N",
@@ -7873,12 +8540,31 @@
               "Z": 0.4062984
             },
             "RibAnchor": {
+              "Name": "H14\u0027",
+              "X": 4.0181784,
+              "Y": 1.3527024,
+              "Z": 14.547494400000001
+            },
+            "PlanLength": 15.353995200000002,
+            "RibWorkPoint": {
               "Name": "HC14\u0027",
               "X": 3.9191184000000003,
               "Y": 1.3426440000000002,
               "Z": 14.8175472
             },
-            "PlanLength": 15.353995200000002
+            "RibFin": {
+              "AngleB": 118.01,
+              "P1": 0.013335,
+              "P2": 0.2877058,
+              "P3": 0.2013966,
+              "P4": 0.0287782,
+              "WeldLength": 0.1886966
+            },
+            "TieFin": {
+              "Panel": "T12\u0027",
+              "AngleA": 88.95,
+              "Orient": "RIGHT"
+            }
           },
           {
             "Name": "C12-S",
@@ -7891,12 +8577,31 @@
               "Z": 0.4062984
             },
             "RibAnchor": {
+              "Name": "H9",
+              "X": -12.9698496,
+              "Y": -1.565148,
+              "Z": 12.1407936
+            },
+            "PlanLength": 13.199364000000001,
+            "RibWorkPoint": {
               "Name": "HC9",
               "X": -13.077139200000001,
               "Y": -1.5566136000000002,
               "Z": 12.371527200000001
             },
-            "PlanLength": 13.199364000000001
+            "RibFin": {
+              "AngleB": 87.185,
+              "P1": -0.0114808,
+              "P2": 0.2543048,
+              "P3": 0.1780032,
+              "P4": 0.025425399999999997,
+              "WeldLength": 0.16530319999999998
+            },
+            "TieFin": {
+              "Panel": "T13",
+              "AngleA": 88.136,
+              "Orient": "LEFT"
+            }
           },
           {
             "Name": "C12-N",
@@ -7909,12 +8614,31 @@
               "Z": 0.4062984
             },
             "RibAnchor": {
+              "Name": "H9\u0027",
+              "X": 12.9698496,
+              "Y": 1.565148,
+              "Z": 12.1407936
+            },
+            "PlanLength": 13.199364000000001,
+            "RibWorkPoint": {
               "Name": "HC9\u0027",
               "X": 13.077139200000001,
               "Y": 1.5566136000000002,
               "Z": 12.371527200000001
             },
-            "PlanLength": 13.199364000000001
+            "RibFin": {
+              "AngleB": 87.185,
+              "P1": 0.0114808,
+              "P2": 0.2543048,
+              "P3": 0.1780032,
+              "P4": 0.025425399999999997,
+              "WeldLength": 0.16530319999999998
+            },
+            "TieFin": {
+              "Panel": "T13\u0027",
+              "AngleA": 88.136,
+              "Orient": "LEFT"
+            }
           },
           {
             "Name": "C13-S",
@@ -7927,12 +8651,31 @@
               "Z": 0.40599360000000007
             },
             "RibAnchor": {
+              "Name": "H16",
+              "X": 0.0082296,
+              "Y": -1.3270992000000001,
+              "Z": 14.904720000000001
+            },
+            "PlanLength": 15.8590488,
+            "RibWorkPoint": {
               "Name": "HC16",
               "X": 0.1085088,
               "Y": -1.3124688,
               "Z": 15.161666400000001
             },
-            "PlanLength": 15.8590488
+            "RibFin": {
+              "AngleB": 113.154,
+              "P1": -0.0077978,
+              "P2": 0.27625039999999995,
+              "P3": 0.1933702,
+              "P4": 0.027635200000000002,
+              "WeldLength": 0.1806702
+            },
+            "TieFin": {
+              "Panel": "T14",
+              "AngleA": 87.738,
+              "Orient": "RIGHT"
+            }
           },
           {
             "Name": "C13-N",
@@ -7945,12 +8688,31 @@
               "Z": 0.40599360000000007
             },
             "RibAnchor": {
+              "Name": "H16\u0027",
+              "X": -0.0082296,
+              "Y": 1.3270992000000001,
+              "Z": 14.904720000000001
+            },
+            "PlanLength": 15.8590488,
+            "RibWorkPoint": {
               "Name": "HC16\u0027",
               "X": -0.1085088,
               "Y": 1.3124688,
               "Z": 15.161666400000001
             },
-            "PlanLength": 15.8590488
+            "RibFin": {
+              "AngleB": 113.154,
+              "P1": 0.0077978,
+              "P2": 0.27625039999999995,
+              "P3": 0.1933702,
+              "P4": 0.027635200000000002,
+              "WeldLength": 0.1806702
+            },
+            "TieFin": {
+              "Panel": "T14\u0027",
+              "AngleA": 87.738,
+              "Orient": "RIGHT"
+            }
           },
           {
             "Name": "C14-S",
@@ -7963,12 +8725,31 @@
               "Z": 0.4062984
             },
             "RibAnchor": {
+              "Name": "H11",
+              "X": -9.6566736,
+              "Y": -1.4697456,
+              "Z": 13.3063488
+            },
+            "PlanLength": 14.3752824,
+            "RibWorkPoint": {
               "Name": "HC11",
               "X": -9.759696000000002,
               "Y": -1.4542008,
               "Z": 13.5401304
             },
-            "PlanLength": 14.3752824
+            "RibFin": {
+              "AngleB": 83.144,
+              "P1": -0.0048768,
+              "P2": 0.25582879999999997,
+              "P3": 0.17906999999999998,
+              "P4": 0.025577799999999998,
+              "WeldLength": 0.16637
+            },
+            "TieFin": {
+              "Panel": "T15",
+              "AngleA": 86.622,
+              "Orient": "LEFT"
+            }
           },
           {
             "Name": "C14-N",
@@ -7981,12 +8762,31 @@
               "Z": 0.4062984
             },
             "RibAnchor": {
+              "Name": "H11\u0027",
+              "X": 9.6566736,
+              "Y": 1.4697456,
+              "Z": 13.3063488
+            },
+            "PlanLength": 14.3752824,
+            "RibWorkPoint": {
               "Name": "HC11\u0027",
               "X": 9.759696000000002,
               "Y": 1.4542008,
               "Z": 13.5401304
             },
-            "PlanLength": 14.3752824
+            "RibFin": {
+              "AngleB": 83.144,
+              "P1": 0.0048768,
+              "P2": 0.25582879999999997,
+              "P3": 0.17906999999999998,
+              "P4": 0.025577799999999998,
+              "WeldLength": 0.16637
+            },
+            "TieFin": {
+              "Panel": "T15\u0027",
+              "AngleA": 86.622,
+              "Orient": "LEFT"
+            }
           },
           {
             "Name": "C15-S",
@@ -7999,12 +8799,31 @@
               "Z": 0.405384
             },
             "RibAnchor": {
+              "Name": "H18",
+              "X": 3.9121080000000004,
+              "Y": -1.3389864,
+              "Z": 14.844979200000001
+            },
+            "PlanLength": 15.958108800000002,
+            "RibWorkPoint": {
               "Name": "HC18",
               "X": 4.0148256,
               "Y": -1.3185647999999999,
               "Z": 15.091867200000001
             },
-            "PlanLength": 15.958108800000002
+            "RibFin": {
+              "AngleB": 108.614,
+              "P1": -0.0010921999999999998,
+              "P2": 0.2680208,
+              "P3": 0.1876044,
+              "P4": 0.026796999999999998,
+              "WeldLength": 0.1749044
+            },
+            "TieFin": {
+              "Panel": "T16",
+              "AngleA": 84.983,
+              "Orient": "RIGHT"
+            }
           },
           {
             "Name": "C15-N",
@@ -8017,12 +8836,31 @@
               "Z": 0.405384
             },
             "RibAnchor": {
+              "Name": "H18\u0027",
+              "X": -3.9121080000000004,
+              "Y": 1.3389864,
+              "Z": 14.844979200000001
+            },
+            "PlanLength": 15.958108800000002,
+            "RibWorkPoint": {
               "Name": "HC18\u0027",
               "X": -4.0148256,
               "Y": 1.3185647999999999,
               "Z": 15.091867200000001
             },
-            "PlanLength": 15.958108800000002
+            "RibFin": {
+              "AngleB": 108.614,
+              "P1": 0.0010921999999999998,
+              "P2": 0.2680208,
+              "P3": 0.1876044,
+              "P4": 0.026796999999999998,
+              "WeldLength": 0.1749044
+            },
+            "TieFin": {
+              "Panel": "T16\u0027",
+              "AngleA": 84.983,
+              "Orient": "RIGHT"
+            }
           },
           {
             "Name": "C16-S",
@@ -8035,12 +8873,31 @@
               "Z": 0.4062984
             },
             "RibAnchor": {
+              "Name": "H13",
+              "X": -6.153912000000001,
+              "Y": -1.4008608,
+              "Z": 14.1829536
+            },
+            "PlanLength": 15.230856000000001,
+            "RibWorkPoint": {
               "Name": "HC13",
               "X": -6.252362400000001,
               "Y": -1.3770864,
               "Z": 14.4210024
             },
-            "PlanLength": 15.230856000000001
+            "RibFin": {
+              "AngleB": 79.072,
+              "P1": 0.0028447999999999998,
+              "P2": 0.258699,
+              "P3": 0.18107659999999998,
+              "P4": 0.0258572,
+              "WeldLength": 0.1683766
+            },
+            "TieFin": {
+              "Panel": "T17",
+              "AngleA": 84.711,
+              "Orient": "LEFT"
+            }
           },
           {
             "Name": "C16-N",
@@ -8053,12 +8910,31 @@
               "Z": 0.4062984
             },
             "RibAnchor": {
+              "Name": "H13\u0027",
+              "X": 6.153912000000001,
+              "Y": 1.4008608,
+              "Z": 14.1829536
+            },
+            "PlanLength": 15.230856000000001,
+            "RibWorkPoint": {
               "Name": "HC13\u0027",
               "X": 6.252362400000001,
               "Y": 1.3770864,
               "Z": 14.4210024
             },
-            "PlanLength": 15.230856000000001
+            "RibFin": {
+              "AngleB": 79.072,
+              "P1": -0.0028447999999999998,
+              "P2": 0.258699,
+              "P3": 0.18107659999999998,
+              "P4": 0.0258572,
+              "WeldLength": 0.1683766
+            },
+            "TieFin": {
+              "Panel": "T17\u0027",
+              "AngleA": 84.711,
+              "Orient": "LEFT"
+            }
           },
           {
             "Name": "C17-S",
@@ -8071,12 +8947,31 @@
               "Z": 0.40477440000000003
             },
             "RibAnchor": {
+              "Name": "H20",
+              "X": 7.8339696000000005,
+              "Y": -1.3877544,
+              "Z": 14.3810736
+            },
+            "PlanLength": 15.6889704,
+            "RibWorkPoint": {
               "Name": "HC20",
               "X": 7.9415640000000005,
               "Y": -1.3600176,
               "Z": 14.6185128
             },
-            "PlanLength": 15.6889704
+            "RibFin": {
+              "AngleB": 104.355,
+              "P1": 0.0070104,
+              "P2": 0.2621788,
+              "P3": 0.1835404,
+              "P4": 0.0262128,
+              "WeldLength": 0.1708404
+            },
+            "TieFin": {
+              "Panel": "T18",
+              "AngleA": 82.767,
+              "Orient": "RIGHT"
+            }
           },
           {
             "Name": "C17-N",
@@ -8089,12 +8984,31 @@
               "Z": 0.40477440000000003
             },
             "RibAnchor": {
+              "Name": "H20\u0027",
+              "X": -7.8339696000000005,
+              "Y": 1.3877544,
+              "Z": 14.3810736
+            },
+            "PlanLength": 15.6889704,
+            "RibWorkPoint": {
               "Name": "HC20\u0027",
               "X": -7.9415640000000005,
               "Y": 1.3600176,
               "Z": 14.6185128
             },
-            "PlanLength": 15.6889704
+            "RibFin": {
+              "AngleB": 104.355,
+              "P1": -0.0070104,
+              "P2": 0.2621788,
+              "P3": 0.1835404,
+              "P4": 0.0262128,
+              "WeldLength": 0.1708404
+            },
+            "TieFin": {
+              "Panel": "T18\u0027",
+              "AngleA": 82.767,
+              "Orient": "RIGHT"
+            }
           },
           {
             "Name": "C18-S",
@@ -8107,12 +9021,31 @@
               "Z": 0.40599360000000007
             },
             "RibAnchor": {
+              "Name": "H15",
+              "X": -2.3472648,
+              "Y": -1.3591032,
+              "Z": 14.7495768
+            },
+            "PlanLength": 15.7801056,
+            "RibWorkPoint": {
               "Name": "HC15",
               "X": -2.4426672,
               "Y": -1.3270992000000001,
               "Z": 14.993416800000002
             },
-            "PlanLength": 15.7801056
+            "RibFin": {
+              "AngleB": 74.483,
+              "P1": 0.010591799999999998,
+              "P2": 0.2636012,
+              "P3": 0.18453099999999997,
+              "P4": 0.0263652,
+              "WeldLength": 0.17183099999999998
+            },
+            "TieFin": {
+              "Panel": "T19",
+              "AngleA": 82.323,
+              "Orient": "LEFT"
+            }
           },
           {
             "Name": "C18-N",
@@ -8125,12 +9058,31 @@
               "Z": 0.40599360000000007
             },
             "RibAnchor": {
+              "Name": "H15\u0027",
+              "X": 2.3472648,
+              "Y": 1.3591032,
+              "Z": 14.7495768
+            },
+            "PlanLength": 15.7801056,
+            "RibWorkPoint": {
               "Name": "HC15\u0027",
               "X": 2.4426672,
               "Y": 1.3270992000000001,
               "Z": 14.993416800000002
             },
-            "PlanLength": 15.7801056
+            "RibFin": {
+              "AngleB": 74.483,
+              "P1": -0.010591799999999998,
+              "P2": 0.2636012,
+              "P3": 0.18453099999999997,
+              "P4": 0.0263652,
+              "WeldLength": 0.17183099999999998
+            },
+            "TieFin": {
+              "Panel": "T19\u0027",
+              "AngleA": 82.323,
+              "Orient": "LEFT"
+            }
           },
           {
             "Name": "C19-S",
@@ -8143,12 +9095,31 @@
               "Z": 0.4044696
             },
             "RibAnchor": {
+              "Name": "H22",
+              "X": 11.315395200000001,
+              "Y": -1.4618208000000001,
+              "Z": 13.61694
+            },
+            "PlanLength": 14.9342856,
+            "RibWorkPoint": {
               "Name": "HC22",
               "X": 11.4220752,
               "Y": -1.4273784,
               "Z": 13.8491976
             },
-            "PlanLength": 14.9342856
+            "RibFin": {
+              "AngleB": 99.34,
+              "P1": 0.0141986,
+              "P2": 0.2574036,
+              "P3": 0.1801876,
+              "P4": 0.025730199999999995,
+              "WeldLength": 0.16748760000000001
+            },
+            "TieFin": {
+              "Panel": "T20",
+              "AngleA": 81.196,
+              "Orient": "RIGHT"
+            }
           },
           {
             "Name": "C19-N",
@@ -8161,12 +9132,31 @@
               "Z": 0.4044696
             },
             "RibAnchor": {
+              "Name": "H22\u0027",
+              "X": -11.315395200000001,
+              "Y": 1.4618208000000001,
+              "Z": 13.61694
+            },
+            "PlanLength": 14.9342856,
+            "RibWorkPoint": {
               "Name": "HC22\u0027",
               "X": -11.4220752,
               "Y": 1.4273784,
               "Z": 13.8491976
             },
-            "PlanLength": 14.9342856
+            "RibFin": {
+              "AngleB": 99.34,
+              "P1": -0.0141986,
+              "P2": 0.2574036,
+              "P3": 0.1801876,
+              "P4": 0.025730199999999995,
+              "WeldLength": 0.16748760000000001
+            },
+            "TieFin": {
+              "Panel": "T20\u0027",
+              "AngleA": 81.196,
+              "Orient": "RIGHT"
+            }
           },
           {
             "Name": "C20-S",
@@ -8179,12 +9169,31 @@
               "Z": 0.4056888
             },
             "RibAnchor": {
+              "Name": "H17",
+              "X": 1.8787872,
+              "Y": -1.3496544000000001,
+              "Z": 14.92758
+            },
+            "PlanLength": 15.828264,
+            "RibWorkPoint": {
               "Name": "HC17",
               "X": 1.7897856,
               "Y": -1.3109448000000001,
               "Z": 15.180259200000002
             },
-            "PlanLength": 15.828264
+            "RibFin": {
+              "AngleB": 70.141,
+              "P1": 0.0166624,
+              "P2": 0.2700528,
+              "P3": 0.18905219999999998,
+              "P4": 0.0270002,
+              "WeldLength": 0.1763522
+            },
+            "TieFin": {
+              "Panel": "T21",
+              "AngleA": 80.182,
+              "Orient": "LEFT"
+            }
           },
           {
             "Name": "C20-N",
@@ -8197,12 +9206,31 @@
               "Z": 0.4056888
             },
             "RibAnchor": {
+              "Name": "H17\u0027",
+              "X": -1.8787872,
+              "Y": 1.3496544000000001,
+              "Z": 14.92758
+            },
+            "PlanLength": 15.828264,
+            "RibWorkPoint": {
               "Name": "HC17\u0027",
               "X": -1.7897856,
               "Y": 1.3109448000000001,
               "Z": 15.180259200000002
             },
-            "PlanLength": 15.828264
+            "RibFin": {
+              "AngleB": 70.141,
+              "P1": -0.0166624,
+              "P2": 0.2700528,
+              "P3": 0.18905219999999998,
+              "P4": 0.0270002,
+              "WeldLength": 0.1763522
+            },
+            "TieFin": {
+              "Panel": "T21\u0027",
+              "AngleA": 80.182,
+              "Orient": "LEFT"
+            }
           },
           {
             "Name": "C21-S",
@@ -8215,12 +9243,31 @@
               "Z": 0.40416480000000005
             },
             "RibAnchor": {
+              "Name": "H24",
+              "X": 14.9681184,
+              "Y": -1.571244,
+              "Z": 12.435839999999999
+            },
+            "PlanLength": 13.867180800000002,
+            "RibWorkPoint": {
               "Name": "HC24",
               "X": 15.080894400000002,
               "Y": -1.5310104,
               "Z": 12.662001600000002
             },
-            "PlanLength": 13.867180800000002
+            "RibFin": {
+              "AngleB": 95.313,
+              "P1": 0.0202692,
+              "P2": 0.2550922,
+              "P3": 0.178562,
+              "P4": 0.0255016,
+              "WeldLength": 0.165862
+            },
+            "TieFin": {
+              "Panel": "T22",
+              "AngleA": 79.92,
+              "Orient": "RIGHT"
+            }
           },
           {
             "Name": "C21-N",
@@ -8233,12 +9280,31 @@
               "Z": 0.40416480000000005
             },
             "RibAnchor": {
+              "Name": "H24\u0027",
+              "X": -14.9681184,
+              "Y": 1.571244,
+              "Z": 12.435839999999999
+            },
+            "PlanLength": 13.867180800000002,
+            "RibWorkPoint": {
               "Name": "HC24\u0027",
               "X": -15.080894400000002,
               "Y": 1.5310104,
               "Z": 12.662001600000002
             },
-            "PlanLength": 13.867180800000002
+            "RibFin": {
+              "AngleB": 95.313,
+              "P1": -0.0202692,
+              "P2": 0.2550922,
+              "P3": 0.178562,
+              "P4": 0.0255016,
+              "WeldLength": 0.165862
+            },
+            "TieFin": {
+              "Panel": "T22\u0027",
+              "AngleA": 79.92,
+              "Orient": "RIGHT"
+            }
           },
           {
             "Name": "C22-S",
@@ -8251,12 +9317,31 @@
               "Z": 0.40507920000000003
             },
             "RibAnchor": {
+              "Name": "H19",
+              "X": 5.6467248,
+              "Y": -1.3749528000000002,
+              "Z": 14.692274400000002
+            },
+            "PlanLength": 15.640812,
+            "RibWorkPoint": {
               "Name": "HC19",
               "X": 5.5528464,
               "Y": -1.3304520000000002,
               "Z": 14.955012
             },
-            "PlanLength": 15.640812
+            "RibFin": {
+              "AngleB": 64.343,
+              "P1": 0.021488399999999998,
+              "P2": 0.28178759999999997,
+              "P3": 0.1972564,
+              "P4": 0.0281686,
+              "WeldLength": 0.18455639999999998
+            },
+            "TieFin": {
+              "Panel": "T23",
+              "AngleA": 79.215,
+              "Orient": "LEFT"
+            }
           },
           {
             "Name": "C22-N",
@@ -8269,12 +9354,31 @@
               "Z": 0.40507920000000003
             },
             "RibAnchor": {
+              "Name": "H19\u0027",
+              "X": -5.6467248,
+              "Y": 1.3749528000000002,
+              "Z": 14.692274400000002
+            },
+            "PlanLength": 15.640812,
+            "RibWorkPoint": {
               "Name": "HC19\u0027",
               "X": -5.5528464,
               "Y": 1.3304520000000002,
               "Z": 14.955012
             },
-            "PlanLength": 15.640812
+            "RibFin": {
+              "AngleB": 64.343,
+              "P1": -0.021488399999999998,
+              "P2": 0.28178759999999997,
+              "P3": 0.1972564,
+              "P4": 0.0281686,
+              "WeldLength": 0.18455639999999998
+            },
+            "TieFin": {
+              "Panel": "T23\u0027",
+              "AngleA": 79.215,
+              "Orient": "LEFT"
+            }
           },
           {
             "Name": "C23-S",
@@ -8287,12 +9391,31 @@
               "Z": 0.40416480000000005
             },
             "RibAnchor": {
+              "Name": "H25",
+              "X": 17.996001600000003,
+              "Y": -1.6907256,
+              "Z": 11.1337344
+            },
+            "PlanLength": 12.408408000000001,
+            "RibWorkPoint": {
               "Name": "HC25",
               "X": 18.1069488,
               "Y": -1.6450056000000002,
               "Z": 11.358981600000002
             },
-            "PlanLength": 12.408408000000001
+            "RibFin": {
+              "AngleB": 90.062,
+              "P1": 0.025679399999999998,
+              "P2": 0.254,
+              "P3": 0.17779999999999999,
+              "P4": 0.0254,
+              "WeldLength": 0.1651
+            },
+            "TieFin": {
+              "Panel": "T24",
+              "AngleA": 78.966,
+              "Orient": "RIGHT"
+            }
           },
           {
             "Name": "C23-N",
@@ -8305,12 +9428,31 @@
               "Z": 0.40416480000000005
             },
             "RibAnchor": {
+              "Name": "H25\u0027",
+              "X": -17.996001600000003,
+              "Y": 1.6907256,
+              "Z": 11.1337344
+            },
+            "PlanLength": 12.408408000000001,
+            "RibWorkPoint": {
               "Name": "HC25\u0027",
               "X": -18.1069488,
               "Y": 1.6450056000000002,
               "Z": 11.358981600000002
             },
-            "PlanLength": 12.408408000000001
+            "RibFin": {
+              "AngleB": 90.062,
+              "P1": -0.025679399999999998,
+              "P2": 0.254,
+              "P3": 0.17779999999999999,
+              "P4": 0.0254,
+              "WeldLength": 0.1651
+            },
+            "TieFin": {
+              "Panel": "T24\u0027",
+              "AngleA": 78.966,
+              "Orient": "RIGHT"
+            }
           },
           {
             "Name": "C24-S",
@@ -8323,12 +9465,31 @@
               "Z": 0.40477440000000003
             },
             "RibAnchor": {
+              "Name": "H21",
+              "X": 9.840163200000001,
+              "Y": -1.4410944,
+              "Z": 13.9839192
+            },
+            "PlanLength": 14.855037600000001,
+            "RibWorkPoint": {
               "Name": "HC21",
               "X": 9.7450656,
               "Y": -1.3911072,
               "Z": 14.262201600000001
             },
-            "PlanLength": 14.855037600000001
+            "RibFin": {
+              "AngleB": 58.747,
+              "P1": 0.025654,
+              "P2": 0.2971038,
+              "P3": 0.2079752,
+              "P4": 0.029717999999999998,
+              "WeldLength": 0.19527519999999998
+            },
+            "TieFin": {
+              "Panel": "T25",
+              "AngleA": 78.363,
+              "Orient": "LEFT"
+            }
           },
           {
             "Name": "C24-N",
@@ -8341,12 +9502,31 @@
               "Z": 0.40477440000000003
             },
             "RibAnchor": {
+              "Name": "H21\u0027",
+              "X": -9.840163200000001,
+              "Y": 1.4410944,
+              "Z": 13.9839192
+            },
+            "PlanLength": 14.855037600000001,
+            "RibWorkPoint": {
               "Name": "HC21\u0027",
               "X": -9.7450656,
               "Y": 1.3911072,
               "Z": 14.262201600000001
             },
-            "PlanLength": 14.855037600000001
+            "RibFin": {
+              "AngleB": 58.747,
+              "P1": -0.025654,
+              "P2": 0.2971038,
+              "P3": 0.2079752,
+              "P4": 0.029717999999999998,
+              "WeldLength": 0.19527519999999998
+            },
+            "TieFin": {
+              "Panel": "T25\u0027",
+              "AngleA": 78.363,
+              "Orient": "LEFT"
+            }
           },
           {
             "Name": "C25-S",
@@ -8359,12 +9539,31 @@
               "Z": 0.40416480000000005
             },
             "RibAnchor": {
+              "Name": "H27",
+              "X": 21.0613752,
+              "Y": -1.8403824000000002,
+              "Z": 9.479280000000001
+            },
+            "PlanLength": 10.633557600000001,
+            "RibWorkPoint": {
               "Name": "HC27",
               "X": 21.1750656,
               "Y": -1.7897856,
               "Z": 9.7039176
             },
-            "PlanLength": 10.633557600000001
+            "RibFin": {
+              "AngleB": 85.478,
+              "P1": 0.0306578,
+              "P2": 0.2547874,
+              "P3": 0.1783588,
+              "P4": 0.025476199999999997,
+              "WeldLength": 0.1656588
+            },
+            "TieFin": {
+              "Panel": "T26",
+              "AngleA": 77.949,
+              "Orient": "RIGHT"
+            }
           },
           {
             "Name": "C25-N",
@@ -8377,12 +9576,31 @@
               "Z": 0.40416480000000005
             },
             "RibAnchor": {
+              "Name": "H27\u0027",
+              "X": -21.0613752,
+              "Y": 1.8403824000000002,
+              "Z": 9.479280000000001
+            },
+            "PlanLength": 10.633557600000001,
+            "RibWorkPoint": {
               "Name": "HC27\u0027",
               "X": -21.1750656,
               "Y": 1.7897856,
               "Z": 9.7039176
             },
-            "PlanLength": 10.633557600000001
+            "RibFin": {
+              "AngleB": 85.478,
+              "P1": -0.0306578,
+              "P2": 0.2547874,
+              "P3": 0.1783588,
+              "P4": 0.025476199999999997,
+              "WeldLength": 0.1656588
+            },
+            "TieFin": {
+              "Panel": "T26\u0027",
+              "AngleA": 77.949,
+              "Orient": "RIGHT"
+            }
           },
           {
             "Name": "C26-S",
@@ -8395,12 +9613,31 @@
               "Z": 0.4044696
             },
             "RibAnchor": {
+              "Name": "H23",
+              "X": 14.179600800000001,
+              "Y": -1.5550896,
+              "Z": 12.726924000000002
+            },
+            "PlanLength": 13.491667200000002,
+            "RibWorkPoint": {
               "Name": "HC23",
               "X": 14.080845600000002,
               "Y": -1.4993112,
               "Z": 13.0268472
             },
-            "PlanLength": 13.491667200000002
+            "RibFin": {
+              "AngleB": 52.702,
+              "P1": 0.029463999999999997,
+              "P2": 0.31930339999999996,
+              "P3": 0.22352,
+              "P4": 0.0319278,
+              "WeldLength": 0.21082
+            },
+            "TieFin": {
+              "Panel": "T27",
+              "AngleA": 78.295,
+              "Orient": "LEFT"
+            }
           },
           {
             "Name": "C26-N",
@@ -8413,12 +9650,31 @@
               "Z": 0.4044696
             },
             "RibAnchor": {
+              "Name": "H23\u0027",
+              "X": -14.179600800000001,
+              "Y": 1.5550896,
+              "Z": 12.726924000000002
+            },
+            "PlanLength": 13.491667200000002,
+            "RibWorkPoint": {
               "Name": "HC23\u0027",
               "X": -14.080845600000002,
               "Y": 1.4993112,
               "Z": 13.0268472
             },
-            "PlanLength": 13.491667200000002
+            "RibFin": {
+              "AngleB": 52.702,
+              "P1": -0.029463999999999997,
+              "P2": 0.31930339999999996,
+              "P3": 0.22352,
+              "P4": 0.0319278,
+              "WeldLength": 0.21082
+            },
+            "TieFin": {
+              "Panel": "T27\u0027",
+              "AngleA": 78.295,
+              "Orient": "LEFT"
+            }
           },
           {
             "Name": "C27-S",
@@ -8431,12 +9687,31 @@
               "Z": 0.40386
             },
             "RibAnchor": {
+              "Name": "H29",
+              "X": 23.9402112,
+              "Y": -2.0122896000000003,
+              "Z": 7.5694032
+            },
+            "PlanLength": 8.529523200000002,
+            "RibWorkPoint": {
               "Name": "HC29",
               "X": 24.057559200000004,
               "Y": -1.9571208000000002,
               "Z": 7.7943456
             },
-            "PlanLength": 8.529523200000002
+            "RibFin": {
+              "AngleB": 80.911,
+              "P1": 0.0355092,
+              "P2": 0.2572258,
+              "P3": 0.18006060000000002,
+              "P4": 0.025730199999999995,
+              "WeldLength": 0.1673606
+            },
+            "TieFin": {
+              "Panel": "T28",
+              "AngleA": 77.624,
+              "Orient": "RIGHT"
+            }
           },
           {
             "Name": "C27-N",
@@ -8449,12 +9724,31 @@
               "Z": 0.40386
             },
             "RibAnchor": {
+              "Name": "H29\u0027",
+              "X": -23.9402112,
+              "Y": 2.0122896000000003,
+              "Z": 7.5694032
+            },
+            "PlanLength": 8.529523200000002,
+            "RibWorkPoint": {
               "Name": "HC29\u0027",
               "X": -24.057559200000004,
               "Y": 1.9571208000000002,
               "Z": 7.7943456
             },
-            "PlanLength": 8.529523200000002
+            "RibFin": {
+              "AngleB": 80.911,
+              "P1": -0.0355092,
+              "P2": 0.2572258,
+              "P3": 0.18006060000000002,
+              "P4": 0.025730199999999995,
+              "WeldLength": 0.1673606
+            },
+            "TieFin": {
+              "Panel": "T28\u0027",
+              "AngleA": 77.624,
+              "Orient": "RIGHT"
+            }
           },
           {
             "Name": "C28-S",
@@ -8467,12 +9761,31 @@
               "Z": 0.40416480000000005
             },
             "RibAnchor": {
+              "Name": "H26",
+              "X": 18.690031200000004,
+              "Y": -1.728216,
+              "Z": 10.7917488
+            },
+            "PlanLength": 11.4211608,
+            "RibWorkPoint": {
               "Name": "HC26",
               "X": 18.5848752,
               "Y": -1.665732,
               "Z": 11.1242856
             },
-            "PlanLength": 11.4211608
+            "RibFin": {
+              "AngleB": 46.057,
+              "P1": 0.033350199999999997,
+              "P2": 0.3527552,
+              "P3": 0.24693879999999999,
+              "P4": 0.0352806,
+              "WeldLength": 0.23423879999999997
+            },
+            "TieFin": {
+              "Panel": "T29",
+              "AngleA": 77.869,
+              "Orient": "LEFT"
+            }
           },
           {
             "Name": "C28-N",
@@ -8485,12 +9798,31 @@
               "Z": 0.40416480000000005
             },
             "RibAnchor": {
+              "Name": "H26\u0027",
+              "X": -18.690031200000004,
+              "Y": 1.728216,
+              "Z": 10.7917488
+            },
+            "PlanLength": 11.4211608,
+            "RibWorkPoint": {
               "Name": "HC26\u0027",
               "X": -18.5848752,
               "Y": 1.665732,
               "Z": 11.1242856
             },
-            "PlanLength": 11.4211608
+            "RibFin": {
+              "AngleB": 46.057,
+              "P1": -0.033350199999999997,
+              "P2": 0.3527552,
+              "P3": 0.24693879999999999,
+              "P4": 0.0352806,
+              "WeldLength": 0.23423879999999997
+            },
+            "TieFin": {
+              "Panel": "T29\u0027",
+              "AngleA": 77.869,
+              "Orient": "LEFT"
+            }
           },
           {
             "Name": "C29-S",
@@ -8503,12 +9835,31 @@
               "Z": 0.40386
             },
             "RibAnchor": {
+              "Name": "H30",
+              "X": 26.626413600000003,
+              "Y": -2.2061424,
+              "Z": 5.4135528
+            },
+            "PlanLength": 6.1017912,
+            "RibWorkPoint": {
               "Name": "HC30",
               "X": 26.7480288,
               "Y": -2.1454872,
               "Z": 5.6406288
             },
-            "PlanLength": 6.1017912
+            "RibFin": {
+              "AngleB": 76.342,
+              "P1": 0.0405638,
+              "P2": 0.2613914,
+              "P3": 0.1829816,
+              "P4": 0.026136599999999996,
+              "WeldLength": 0.17028159999999998
+            },
+            "TieFin": {
+              "Panel": "T30",
+              "AngleA": 77.45,
+              "Orient": "RIGHT"
+            }
           },
           {
             "Name": "C29-N",
@@ -8521,12 +9872,31 @@
               "Z": 0.40386
             },
             "RibAnchor": {
+              "Name": "H30\u0027",
+              "X": -26.626413600000003,
+              "Y": 2.2061424,
+              "Z": 5.4135528
+            },
+            "PlanLength": 6.1017912,
+            "RibWorkPoint": {
               "Name": "HC30\u0027",
               "X": -26.7480288,
               "Y": 2.1454872,
               "Z": 5.6406288
             },
-            "PlanLength": 6.1017912
+            "RibFin": {
+              "AngleB": 76.342,
+              "P1": -0.0405638,
+              "P2": 0.2613914,
+              "P3": 0.1829816,
+              "P4": 0.026136599999999996,
+              "WeldLength": 0.17028159999999998
+            },
+            "TieFin": {
+              "Panel": "T30\u0027",
+              "AngleA": 77.45,
+              "Orient": "RIGHT"
+            }
           },
           {
             "Name": "C30-S",
@@ -8539,12 +9909,31 @@
               "Z": 0.40416480000000005
             },
             "RibAnchor": {
+              "Name": "H28",
+              "X": 23.2345992,
+              "Y": -1.970532,
+              "Z": 8.0747616
+            },
+            "PlanLength": 8.5977984,
+            "RibWorkPoint": {
               "Name": "HC28",
               "X": 23.1093264,
               "Y": -1.8982944,
               "Z": 8.464296000000001
             },
-            "PlanLength": 8.5977984
+            "RibFin": {
+              "AngleB": 37.887,
+              "P1": 0.0378714,
+              "P2": 0.41361359999999997,
+              "P3": 0.2895346,
+              "P4": 0.0413512,
+              "WeldLength": 0.2768346
+            },
+            "TieFin": {
+              "Panel": "T31",
+              "AngleA": 77.369,
+              "Orient": "LEFT"
+            }
           },
           {
             "Name": "C30-N",
@@ -8557,12 +9946,31 @@
               "Z": 0.40416480000000005
             },
             "RibAnchor": {
+              "Name": "H28\u0027",
+              "X": -23.2345992,
+              "Y": 1.970532,
+              "Z": 8.0747616
+            },
+            "PlanLength": 8.5977984,
+            "RibWorkPoint": {
               "Name": "HC28\u0027",
               "X": -23.1093264,
               "Y": 1.8982944,
               "Z": 8.464296000000001
             },
-            "PlanLength": 8.5977984
+            "RibFin": {
+              "AngleB": 37.887,
+              "P1": -0.0378714,
+              "P2": 0.41361359999999997,
+              "P3": 0.2895346,
+              "P4": 0.0413512,
+              "WeldLength": 0.2768346
+            },
+            "TieFin": {
+              "Panel": "T31\u0027",
+              "AngleA": 77.369,
+              "Orient": "LEFT"
+            }
           },
           {
             "Name": "C31-S",
@@ -8575,12 +9983,31 @@
               "Z": 0.40386
             },
             "RibAnchor": {
+              "Name": "H32",
+              "X": 29.1894768,
+              "Y": -2.4289512,
+              "Z": 2.9373576000000003
+            },
+            "PlanLength": 3.3156144000000003,
+            "RibWorkPoint": {
               "Name": "HC32",
               "X": 29.3229792,
               "Y": -2.3625048000000004,
               "Z": 3.160776
             },
-            "PlanLength": 3.3156144000000003
+            "RibFin": {
+              "AngleB": 73.63,
+              "P1": 0.0468376,
+              "P2": 0.2647442,
+              "P3": 0.1853184,
+              "P4": 0.0264668,
+              "WeldLength": 0.1726184
+            },
+            "TieFin": {
+              "Panel": "T32",
+              "AngleA": 77.535,
+              "Orient": "RIGHT"
+            }
           },
           {
             "Name": "C31-N",
@@ -8593,12 +10020,31 @@
               "Z": 0.40386
             },
             "RibAnchor": {
+              "Name": "H32\u0027",
+              "X": -29.1894768,
+              "Y": 2.4289512,
+              "Z": 2.9373576000000003
+            },
+            "PlanLength": 3.3156144000000003,
+            "RibWorkPoint": {
               "Name": "HC32\u0027",
               "X": -29.3229792,
               "Y": 2.3625048000000004,
               "Z": 3.160776
             },
-            "PlanLength": 3.3156144000000003
+            "RibFin": {
+              "AngleB": 73.63,
+              "P1": -0.0468376,
+              "P2": 0.2647442,
+              "P3": 0.1853184,
+              "P4": 0.0264668,
+              "WeldLength": 0.1726184
+            },
+            "TieFin": {
+              "Panel": "T32\u0027",
+              "AngleA": 77.535,
+              "Orient": "RIGHT"
+            }
           },
           {
             "Name": "C32-S",
@@ -8611,12 +10057,31 @@
               "Z": 0.40386
             },
             "RibAnchor": {
+              "Name": "H31",
+              "X": 28.49118,
+              "Y": -2.3664672,
+              "Z": 3.6624768000000003
+            },
+            "PlanLength": 3.960876,
+            "RibWorkPoint": {
               "Name": "HC31",
               "X": 28.3506672,
               "Y": -2.2756368,
               "Z": 4.151985600000001
             },
-            "PlanLength": 3.960876
+            "RibFin": {
+              "AngleB": 29.544,
+              "P1": 0.04780279999999999,
+              "P2": 0.515112,
+              "P3": 0.36057839999999997,
+              "P4": 0.0515112,
+              "WeldLength": 0.3478784
+            },
+            "TieFin": {
+              "Panel": "T33",
+              "AngleA": 77.114,
+              "Orient": "LEFT"
+            }
           },
           {
             "Name": "C32-N",
@@ -8629,12 +10094,31 @@
               "Z": 0.40386
             },
             "RibAnchor": {
+              "Name": "H31\u0027",
+              "X": -28.49118,
+              "Y": 2.3664672,
+              "Z": 3.6624768000000003
+            },
+            "PlanLength": 3.960876,
+            "RibWorkPoint": {
               "Name": "HC31\u0027",
               "X": -28.3506672,
               "Y": 2.2756368,
               "Z": 4.151985600000001
             },
-            "PlanLength": 3.960876
+            "RibFin": {
+              "AngleB": 29.544,
+              "P1": -0.04780279999999999,
+              "P2": 0.515112,
+              "P3": 0.36057839999999997,
+              "P4": 0.0515112,
+              "WeldLength": 0.3478784
+            },
+            "TieFin": {
+              "Panel": "T33\u0027",
+              "AngleA": 77.114,
+              "Orient": "LEFT"
+            }
           }
         ],
         "HangerSystem": {
@@ -8683,7 +10167,19 @@
             "EndGap": 0.0127,
             "Material": "ASTM A709 Gr. 50-T1",
             "PtDimA": 1.8772632,
-            "PtDimB": 1.4798040000000001
+            "PtDimB": 1.4798040000000001,
+            "PtSlotLength": 0.1397,
+            "PtSlotHeight": 0.05715,
+            "PtSlotZ": 0.17779999999999999,
+            "PtPairSpacing": 0.4064,
+            "StudsPerFace": 32,
+            "StudZ": 0.17779999999999999,
+            "StudMinSpacing": 0.08889999999999999,
+            "StudMaxSpacing": 0.15239999999999998,
+            "StudLength": 0.174625,
+            "StudUnresolved": "UNRESOLVED (p.145): floorbeam shear stud length - Section A-A shows the 7/8\u0022 horizontal studs at 7\u0022 above the flange bottom (32 per face, 3 1/2 - 6\u0022 spacing) without a length. 6 7/8\u0022 (7\u0022 nominal stud as welded) scaled from Section A-A.",
+            "WebHoles": [],
+            "WebHoleDiameter": 0.0238125
           },
           {
             "Name": "FB2",
@@ -8700,7 +10196,19 @@
             "EndGap": 0.0127,
             "Material": "ASTM A709 Gr. 50-T1",
             "PtDimA": 2.1009864,
-            "PtDimB": 1.2606528000000001
+            "PtDimB": 1.2606528000000001,
+            "PtSlotLength": 0.1397,
+            "PtSlotHeight": 0.05715,
+            "PtSlotZ": 0.17779999999999999,
+            "PtPairSpacing": 0.4064,
+            "StudsPerFace": 32,
+            "StudZ": 0.17779999999999999,
+            "StudMinSpacing": 0.08889999999999999,
+            "StudMaxSpacing": 0.15239999999999998,
+            "StudLength": 0.174625,
+            "StudUnresolved": "UNRESOLVED (p.145): floorbeam shear stud length - Section A-A shows the 7/8\u0022 horizontal studs at 7\u0022 above the flange bottom (32 per face, 3 1/2 - 6\u0022 spacing) without a length. 6 7/8\u0022 (7\u0022 nominal stud as welded) scaled from Section A-A.",
+            "WebHoles": [],
+            "WebHoleDiameter": 0.0238125
           },
           {
             "Name": "FB3",
@@ -8717,7 +10225,19 @@
             "EndGap": 0.0127,
             "Material": "ASTM A709 Gr. 50-T1",
             "PtDimA": 2.2927056,
-            "PtDimB": 1.072896
+            "PtDimB": 1.072896,
+            "PtSlotLength": 0.1397,
+            "PtSlotHeight": 0.05715,
+            "PtSlotZ": 0.17779999999999999,
+            "PtPairSpacing": 0.4064,
+            "StudsPerFace": 32,
+            "StudZ": 0.17779999999999999,
+            "StudMinSpacing": 0.08889999999999999,
+            "StudMaxSpacing": 0.15239999999999998,
+            "StudLength": 0.174625,
+            "StudUnresolved": "UNRESOLVED (p.145): floorbeam shear stud length - Section A-A shows the 7/8\u0022 horizontal studs at 7\u0022 above the flange bottom (32 per face, 3 1/2 - 6\u0022 spacing) without a length. 6 7/8\u0022 (7\u0022 nominal stud as welded) scaled from Section A-A.",
+            "WebHoles": [],
+            "WebHoleDiameter": 0.0238125
           },
           {
             "Name": "FB4",
@@ -8734,7 +10254,19 @@
             "EndGap": 0.0127,
             "Material": "ASTM A709 Gr. 50-T1",
             "PtDimA": 2.4524208,
-            "PtDimB": 0.9314688000000001
+            "PtDimB": 0.9314688000000001,
+            "PtSlotLength": 0.1397,
+            "PtSlotHeight": 0.05715,
+            "PtSlotZ": 0.17779999999999999,
+            "PtPairSpacing": 0.4064,
+            "StudsPerFace": 32,
+            "StudZ": 0.17779999999999999,
+            "StudMinSpacing": 0.08889999999999999,
+            "StudMaxSpacing": 0.15239999999999998,
+            "StudLength": 0.174625,
+            "StudUnresolved": "UNRESOLVED (p.145): floorbeam shear stud length - Section A-A shows the 7/8\u0022 horizontal studs at 7\u0022 above the flange bottom (32 per face, 3 1/2 - 6\u0022 spacing) without a length. 6 7/8\u0022 (7\u0022 nominal stud as welded) scaled from Section A-A.",
+            "WebHoles": [],
+            "WebHoleDiameter": 0.0238125
           },
           {
             "Name": "FB5",
@@ -8751,7 +10283,19 @@
             "EndGap": 0.0127,
             "Material": "ASTM A709 Gr. 50-T1",
             "PtDimA": 2.5807416,
-            "PtDimB": 0.7909560000000001
+            "PtDimB": 0.7909560000000001,
+            "PtSlotLength": 0.1397,
+            "PtSlotHeight": 0.05715,
+            "PtSlotZ": 0.17779999999999999,
+            "PtPairSpacing": 0.4064,
+            "StudsPerFace": 32,
+            "StudZ": 0.17779999999999999,
+            "StudMinSpacing": 0.08889999999999999,
+            "StudMaxSpacing": 0.15239999999999998,
+            "StudLength": 0.174625,
+            "StudUnresolved": "UNRESOLVED (p.145): floorbeam shear stud length - Section A-A shows the 7/8\u0022 horizontal studs at 7\u0022 above the flange bottom (32 per face, 3 1/2 - 6\u0022 spacing) without a length. 6 7/8\u0022 (7\u0022 nominal stud as welded) scaled from Section A-A.",
+            "WebHoles": [],
+            "WebHoleDiameter": 0.0238125
           },
           {
             "Name": "FB6",
@@ -8768,7 +10312,19 @@
             "EndGap": 0.0127,
             "Material": "ASTM A709 Gr. 50-T1",
             "PtDimA": 2.6773632000000003,
-            "PtDimB": 0.6961632
+            "PtDimB": 0.6961632,
+            "PtSlotLength": 0.1397,
+            "PtSlotHeight": 0.05715,
+            "PtSlotZ": 0.17779999999999999,
+            "PtPairSpacing": 0.4064,
+            "StudsPerFace": 32,
+            "StudZ": 0.17779999999999999,
+            "StudMinSpacing": 0.08889999999999999,
+            "StudMaxSpacing": 0.15239999999999998,
+            "StudLength": 0.174625,
+            "StudUnresolved": "UNRESOLVED (p.145): floorbeam shear stud length - Section A-A shows the 7/8\u0022 horizontal studs at 7\u0022 above the flange bottom (32 per face, 3 1/2 - 6\u0022 spacing) without a length. 6 7/8\u0022 (7\u0022 nominal stud as welded) scaled from Section A-A.",
+            "WebHoles": [],
+            "WebHoleDiameter": 0.0238125
           },
           {
             "Name": "FB7",
@@ -8785,7 +10341,19 @@
             "EndGap": 0.0127,
             "Material": "ASTM A709 Gr. 50-T1",
             "PtDimA": 2.7428952000000004,
-            "PtDimB": 0.6321552
+            "PtDimB": 0.6321552,
+            "PtSlotLength": 0.1397,
+            "PtSlotHeight": 0.05715,
+            "PtSlotZ": 0.17779999999999999,
+            "PtPairSpacing": 0.4064,
+            "StudsPerFace": 32,
+            "StudZ": 0.17779999999999999,
+            "StudMinSpacing": 0.08889999999999999,
+            "StudMaxSpacing": 0.15239999999999998,
+            "StudLength": 0.174625,
+            "StudUnresolved": "UNRESOLVED (p.145): floorbeam shear stud length - Section A-A shows the 7/8\u0022 horizontal studs at 7\u0022 above the flange bottom (32 per face, 3 1/2 - 6\u0022 spacing) without a length. 6 7/8\u0022 (7\u0022 nominal stud as welded) scaled from Section A-A.",
+            "WebHoles": [],
+            "WebHoleDiameter": 0.0238125
           },
           {
             "Name": "FB8",
@@ -8802,7 +10370,19 @@
             "EndGap": 0.0127,
             "Material": "ASTM A709 Gr. 50-T1",
             "PtDimA": 2.7773376,
-            "PtDimB": 0.5983224
+            "PtDimB": 0.5983224,
+            "PtSlotLength": 0.1397,
+            "PtSlotHeight": 0.05715,
+            "PtSlotZ": 0.17779999999999999,
+            "PtPairSpacing": 0.4064,
+            "StudsPerFace": 32,
+            "StudZ": 0.17779999999999999,
+            "StudMinSpacing": 0.08889999999999999,
+            "StudMaxSpacing": 0.15239999999999998,
+            "StudLength": 0.174625,
+            "StudUnresolved": "UNRESOLVED (p.145): floorbeam shear stud length - Section A-A shows the 7/8\u0022 horizontal studs at 7\u0022 above the flange bottom (32 per face, 3 1/2 - 6\u0022 spacing) without a length. 6 7/8\u0022 (7\u0022 nominal stud as welded) scaled from Section A-A.",
+            "WebHoles": [],
+            "WebHoleDiameter": 0.0238125
           },
           {
             "Name": "FB9",
@@ -8819,7 +10399,19 @@
             "EndGap": 0.0127,
             "Material": "ASTM A709 Gr. 50-T1",
             "PtDimA": 2.7803856000000002,
-            "PtDimB": 0.5952744000000001
+            "PtDimB": 0.5952744000000001,
+            "PtSlotLength": 0.1397,
+            "PtSlotHeight": 0.05715,
+            "PtSlotZ": 0.17779999999999999,
+            "PtPairSpacing": 0.4064,
+            "StudsPerFace": 32,
+            "StudZ": 0.17779999999999999,
+            "StudMinSpacing": 0.08889999999999999,
+            "StudMaxSpacing": 0.15239999999999998,
+            "StudLength": 0.174625,
+            "StudUnresolved": "UNRESOLVED (p.145): floorbeam shear stud length - Section A-A shows the 7/8\u0022 horizontal studs at 7\u0022 above the flange bottom (32 per face, 3 1/2 - 6\u0022 spacing) without a length. 6 7/8\u0022 (7\u0022 nominal stud as welded) scaled from Section A-A.",
+            "WebHoles": [],
+            "WebHoleDiameter": 0.0238125
           },
           {
             "Name": "FB10",
@@ -8836,7 +10428,19 @@
             "EndGap": 0.0127,
             "Material": "ASTM A709 Gr. 50-T1",
             "PtDimA": 2.752344,
-            "PtDimB": 0.6227064000000001
+            "PtDimB": 0.6227064000000001,
+            "PtSlotLength": 0.1397,
+            "PtSlotHeight": 0.05715,
+            "PtSlotZ": 0.17779999999999999,
+            "PtPairSpacing": 0.4064,
+            "StudsPerFace": 32,
+            "StudZ": 0.17779999999999999,
+            "StudMinSpacing": 0.08889999999999999,
+            "StudMaxSpacing": 0.15239999999999998,
+            "StudLength": 0.174625,
+            "StudUnresolved": "UNRESOLVED (p.145): floorbeam shear stud length - Section A-A shows the 7/8\u0022 horizontal studs at 7\u0022 above the flange bottom (32 per face, 3 1/2 - 6\u0022 spacing) without a length. 6 7/8\u0022 (7\u0022 nominal stud as welded) scaled from Section A-A.",
+            "WebHoles": [],
+            "WebHoleDiameter": 0.0238125
           },
           {
             "Name": "FB11",
@@ -8853,7 +10457,19 @@
             "EndGap": 0.0127,
             "Material": "ASTM A709 Gr. 50-T1",
             "PtDimA": 2.6935176,
-            "PtDimB": 0.6806184000000001
+            "PtDimB": 0.6806184000000001,
+            "PtSlotLength": 0.1397,
+            "PtSlotHeight": 0.05715,
+            "PtSlotZ": 0.17779999999999999,
+            "PtPairSpacing": 0.4064,
+            "StudsPerFace": 32,
+            "StudZ": 0.17779999999999999,
+            "StudMinSpacing": 0.08889999999999999,
+            "StudMaxSpacing": 0.15239999999999998,
+            "StudLength": 0.174625,
+            "StudUnresolved": "UNRESOLVED (p.145): floorbeam shear stud length - Section A-A shows the 7/8\u0022 horizontal studs at 7\u0022 above the flange bottom (32 per face, 3 1/2 - 6\u0022 spacing) without a length. 6 7/8\u0022 (7\u0022 nominal stud as welded) scaled from Section A-A.",
+            "WebHoles": [],
+            "WebHoleDiameter": 0.0238125
           },
           {
             "Name": "FB12",
@@ -8870,7 +10486,19 @@
             "EndGap": 0.0127,
             "Material": "ASTM A709 Gr. 50-T1",
             "PtDimA": 2.602992,
-            "PtDimB": 0.7690104000000001
+            "PtDimB": 0.7690104000000001,
+            "PtSlotLength": 0.1397,
+            "PtSlotHeight": 0.05715,
+            "PtSlotZ": 0.17779999999999999,
+            "PtPairSpacing": 0.4064,
+            "StudsPerFace": 32,
+            "StudZ": 0.17779999999999999,
+            "StudMinSpacing": 0.08889999999999999,
+            "StudMaxSpacing": 0.15239999999999998,
+            "StudLength": 0.174625,
+            "StudUnresolved": "UNRESOLVED (p.145): floorbeam shear stud length - Section A-A shows the 7/8\u0022 horizontal studs at 7\u0022 above the flange bottom (32 per face, 3 1/2 - 6\u0022 spacing) without a length. 6 7/8\u0022 (7\u0022 nominal stud as welded) scaled from Section A-A.",
+            "WebHoles": [],
+            "WebHoleDiameter": 0.0238125
           },
           {
             "Name": "FB13",
@@ -8887,7 +10515,19 @@
             "EndGap": 0.0127,
             "Material": "ASTM A709 Gr. 50-T1",
             "PtDimA": 2.4813768,
-            "PtDimB": 0.8881872000000001
+            "PtDimB": 0.8881872000000001,
+            "PtSlotLength": 0.1397,
+            "PtSlotHeight": 0.05715,
+            "PtSlotZ": 0.17779999999999999,
+            "PtPairSpacing": 0.4064,
+            "StudsPerFace": 32,
+            "StudZ": 0.17779999999999999,
+            "StudMinSpacing": 0.08889999999999999,
+            "StudMaxSpacing": 0.15239999999999998,
+            "StudLength": 0.174625,
+            "StudUnresolved": "UNRESOLVED (p.145): floorbeam shear stud length - Section A-A shows the 7/8\u0022 horizontal studs at 7\u0022 above the flange bottom (32 per face, 3 1/2 - 6\u0022 spacing) without a length. 6 7/8\u0022 (7\u0022 nominal stud as welded) scaled from Section A-A.",
+            "WebHoles": [],
+            "WebHoleDiameter": 0.0238125
           },
           {
             "Name": "FB14",
@@ -8904,7 +10544,19 @@
             "EndGap": 0.0127,
             "Material": "ASTM A709 Gr. 50-T1",
             "PtDimA": 2.3280624,
-            "PtDimB": 1.0381488
+            "PtDimB": 1.0381488,
+            "PtSlotLength": 0.1397,
+            "PtSlotHeight": 0.05715,
+            "PtSlotZ": 0.17779999999999999,
+            "PtPairSpacing": 0.4064,
+            "StudsPerFace": 32,
+            "StudZ": 0.17779999999999999,
+            "StudMinSpacing": 0.08889999999999999,
+            "StudMaxSpacing": 0.15239999999999998,
+            "StudLength": 0.174625,
+            "StudUnresolved": "UNRESOLVED (p.145): floorbeam shear stud length - Section A-A shows the 7/8\u0022 horizontal studs at 7\u0022 above the flange bottom (32 per face, 3 1/2 - 6\u0022 spacing) without a length. 6 7/8\u0022 (7\u0022 nominal stud as welded) scaled from Section A-A.",
+            "WebHoles": [],
+            "WebHoleDiameter": 0.0238125
           },
           {
             "Name": "FB15",
@@ -8921,7 +10573,19 @@
             "EndGap": 0.0127,
             "Material": "ASTM A709 Gr. 50-T1",
             "PtDimA": 2.1430488,
-            "PtDimB": 1.2195048000000002
+            "PtDimB": 1.2195048000000002,
+            "PtSlotLength": 0.1397,
+            "PtSlotHeight": 0.05715,
+            "PtSlotZ": 0.17779999999999999,
+            "PtPairSpacing": 0.4064,
+            "StudsPerFace": 32,
+            "StudZ": 0.17779999999999999,
+            "StudMinSpacing": 0.08889999999999999,
+            "StudMaxSpacing": 0.15239999999999998,
+            "StudLength": 0.174625,
+            "StudUnresolved": "UNRESOLVED (p.145): floorbeam shear stud length - Section A-A shows the 7/8\u0022 horizontal studs at 7\u0022 above the flange bottom (32 per face, 3 1/2 - 6\u0022 spacing) without a length. 6 7/8\u0022 (7\u0022 nominal stud as welded) scaled from Section A-A.",
+            "WebHoles": [],
+            "WebHoleDiameter": 0.0238125
           },
           {
             "Name": "FB16",
@@ -8938,7 +10602,19 @@
             "EndGap": 0.0127,
             "Material": "ASTM A709 Gr. 50-T1",
             "PtDimA": 1.9260312000000002,
-            "PtDimB": 1.4322552
+            "PtDimB": 1.4322552,
+            "PtSlotLength": 0.1397,
+            "PtSlotHeight": 0.05715,
+            "PtSlotZ": 0.17779999999999999,
+            "PtPairSpacing": 0.4064,
+            "StudsPerFace": 32,
+            "StudZ": 0.17779999999999999,
+            "StudMinSpacing": 0.08889999999999999,
+            "StudMaxSpacing": 0.15239999999999998,
+            "StudLength": 0.174625,
+            "StudUnresolved": "UNRESOLVED (p.145): floorbeam shear stud length - Section A-A shows the 7/8\u0022 horizontal studs at 7\u0022 above the flange bottom (32 per face, 3 1/2 - 6\u0022 spacing) without a length. 6 7/8\u0022 (7\u0022 nominal stud as welded) scaled from Section A-A.",
+            "WebHoles": [],
+            "WebHoleDiameter": 0.0238125
           },
           {
             "Name": "FB17",
@@ -8955,7 +10631,19 @@
             "EndGap": 0.0127,
             "Material": "ASTM A709 Gr. 50-T1",
             "PtDimA": 1.6764000000000001,
-            "PtDimB": 1.6764000000000001
+            "PtDimB": 1.6764000000000001,
+            "PtSlotLength": 0.1397,
+            "PtSlotHeight": 0.05715,
+            "PtSlotZ": 0.17779999999999999,
+            "PtPairSpacing": 0.4064,
+            "StudsPerFace": 32,
+            "StudZ": 0.17779999999999999,
+            "StudMinSpacing": 0.08889999999999999,
+            "StudMaxSpacing": 0.15239999999999998,
+            "StudLength": 0.174625,
+            "StudUnresolved": "UNRESOLVED (p.145): floorbeam shear stud length - Section A-A shows the 7/8\u0022 horizontal studs at 7\u0022 above the flange bottom (32 per face, 3 1/2 - 6\u0022 spacing) without a length. 6 7/8\u0022 (7\u0022 nominal stud as welded) scaled from Section A-A.",
+            "WebHoles": [],
+            "WebHoleDiameter": 0.0238125
           },
           {
             "Name": "FB18",
@@ -8972,7 +10660,19 @@
             "EndGap": 0.0127,
             "Material": "ASTM A709 Gr. 50-T1",
             "PtDimA": 1.4322552,
-            "PtDimB": 1.9260312000000002
+            "PtDimB": 1.9260312000000002,
+            "PtSlotLength": 0.1397,
+            "PtSlotHeight": 0.05715,
+            "PtSlotZ": 0.17779999999999999,
+            "PtPairSpacing": 0.4064,
+            "StudsPerFace": 32,
+            "StudZ": 0.17779999999999999,
+            "StudMinSpacing": 0.08889999999999999,
+            "StudMaxSpacing": 0.15239999999999998,
+            "StudLength": 0.174625,
+            "StudUnresolved": "UNRESOLVED (p.145): floorbeam shear stud length - Section A-A shows the 7/8\u0022 horizontal studs at 7\u0022 above the flange bottom (32 per face, 3 1/2 - 6\u0022 spacing) without a length. 6 7/8\u0022 (7\u0022 nominal stud as welded) scaled from Section A-A.",
+            "WebHoles": [],
+            "WebHoleDiameter": 0.0238125
           },
           {
             "Name": "FB19",
@@ -8989,7 +10689,19 @@
             "EndGap": 0.0127,
             "Material": "ASTM A709 Gr. 50-T1",
             "PtDimA": 1.2195048000000002,
-            "PtDimB": 2.1430488
+            "PtDimB": 2.1430488,
+            "PtSlotLength": 0.1397,
+            "PtSlotHeight": 0.05715,
+            "PtSlotZ": 0.17779999999999999,
+            "PtPairSpacing": 0.4064,
+            "StudsPerFace": 32,
+            "StudZ": 0.17779999999999999,
+            "StudMinSpacing": 0.08889999999999999,
+            "StudMaxSpacing": 0.15239999999999998,
+            "StudLength": 0.174625,
+            "StudUnresolved": "UNRESOLVED (p.145): floorbeam shear stud length - Section A-A shows the 7/8\u0022 horizontal studs at 7\u0022 above the flange bottom (32 per face, 3 1/2 - 6\u0022 spacing) without a length. 6 7/8\u0022 (7\u0022 nominal stud as welded) scaled from Section A-A.",
+            "WebHoles": [],
+            "WebHoleDiameter": 0.0238125
           },
           {
             "Name": "FB20",
@@ -9006,7 +10718,19 @@
             "EndGap": 0.0127,
             "Material": "ASTM A709 Gr. 50-T1",
             "PtDimA": 1.0381488,
-            "PtDimB": 2.3280624
+            "PtDimB": 2.3280624,
+            "PtSlotLength": 0.1397,
+            "PtSlotHeight": 0.05715,
+            "PtSlotZ": 0.17779999999999999,
+            "PtPairSpacing": 0.4064,
+            "StudsPerFace": 32,
+            "StudZ": 0.17779999999999999,
+            "StudMinSpacing": 0.08889999999999999,
+            "StudMaxSpacing": 0.15239999999999998,
+            "StudLength": 0.174625,
+            "StudUnresolved": "UNRESOLVED (p.145): floorbeam shear stud length - Section A-A shows the 7/8\u0022 horizontal studs at 7\u0022 above the flange bottom (32 per face, 3 1/2 - 6\u0022 spacing) without a length. 6 7/8\u0022 (7\u0022 nominal stud as welded) scaled from Section A-A.",
+            "WebHoles": [],
+            "WebHoleDiameter": 0.0238125
           },
           {
             "Name": "FB21",
@@ -9023,7 +10747,19 @@
             "EndGap": 0.0127,
             "Material": "ASTM A709 Gr. 50-T1",
             "PtDimA": 0.8881872000000001,
-            "PtDimB": 2.4813768
+            "PtDimB": 2.4813768,
+            "PtSlotLength": 0.1397,
+            "PtSlotHeight": 0.05715,
+            "PtSlotZ": 0.17779999999999999,
+            "PtPairSpacing": 0.4064,
+            "StudsPerFace": 32,
+            "StudZ": 0.17779999999999999,
+            "StudMinSpacing": 0.08889999999999999,
+            "StudMaxSpacing": 0.15239999999999998,
+            "StudLength": 0.174625,
+            "StudUnresolved": "UNRESOLVED (p.145): floorbeam shear stud length - Section A-A shows the 7/8\u0022 horizontal studs at 7\u0022 above the flange bottom (32 per face, 3 1/2 - 6\u0022 spacing) without a length. 6 7/8\u0022 (7\u0022 nominal stud as welded) scaled from Section A-A.",
+            "WebHoles": [],
+            "WebHoleDiameter": 0.0238125
           },
           {
             "Name": "FB22",
@@ -9040,7 +10776,19 @@
             "EndGap": 0.0127,
             "Material": "ASTM A709 Gr. 50-T1",
             "PtDimA": 0.7690104000000001,
-            "PtDimB": 2.602992
+            "PtDimB": 2.602992,
+            "PtSlotLength": 0.1397,
+            "PtSlotHeight": 0.05715,
+            "PtSlotZ": 0.17779999999999999,
+            "PtPairSpacing": 0.4064,
+            "StudsPerFace": 32,
+            "StudZ": 0.17779999999999999,
+            "StudMinSpacing": 0.08889999999999999,
+            "StudMaxSpacing": 0.15239999999999998,
+            "StudLength": 0.174625,
+            "StudUnresolved": "UNRESOLVED (p.145): floorbeam shear stud length - Section A-A shows the 7/8\u0022 horizontal studs at 7\u0022 above the flange bottom (32 per face, 3 1/2 - 6\u0022 spacing) without a length. 6 7/8\u0022 (7\u0022 nominal stud as welded) scaled from Section A-A.",
+            "WebHoles": [],
+            "WebHoleDiameter": 0.0238125
           },
           {
             "Name": "FB23",
@@ -9057,7 +10805,19 @@
             "EndGap": 0.0127,
             "Material": "ASTM A709 Gr. 50-T1",
             "PtDimA": 0.6806184000000001,
-            "PtDimB": 2.6935176
+            "PtDimB": 2.6935176,
+            "PtSlotLength": 0.1397,
+            "PtSlotHeight": 0.05715,
+            "PtSlotZ": 0.17779999999999999,
+            "PtPairSpacing": 0.4064,
+            "StudsPerFace": 32,
+            "StudZ": 0.17779999999999999,
+            "StudMinSpacing": 0.08889999999999999,
+            "StudMaxSpacing": 0.15239999999999998,
+            "StudLength": 0.174625,
+            "StudUnresolved": "UNRESOLVED (p.145): floorbeam shear stud length - Section A-A shows the 7/8\u0022 horizontal studs at 7\u0022 above the flange bottom (32 per face, 3 1/2 - 6\u0022 spacing) without a length. 6 7/8\u0022 (7\u0022 nominal stud as welded) scaled from Section A-A.",
+            "WebHoles": [],
+            "WebHoleDiameter": 0.0238125
           },
           {
             "Name": "FB24",
@@ -9074,7 +10834,19 @@
             "EndGap": 0.0127,
             "Material": "ASTM A709 Gr. 50-T1",
             "PtDimA": 0.6227064000000001,
-            "PtDimB": 2.752344
+            "PtDimB": 2.752344,
+            "PtSlotLength": 0.1397,
+            "PtSlotHeight": 0.05715,
+            "PtSlotZ": 0.17779999999999999,
+            "PtPairSpacing": 0.4064,
+            "StudsPerFace": 32,
+            "StudZ": 0.17779999999999999,
+            "StudMinSpacing": 0.08889999999999999,
+            "StudMaxSpacing": 0.15239999999999998,
+            "StudLength": 0.174625,
+            "StudUnresolved": "UNRESOLVED (p.145): floorbeam shear stud length - Section A-A shows the 7/8\u0022 horizontal studs at 7\u0022 above the flange bottom (32 per face, 3 1/2 - 6\u0022 spacing) without a length. 6 7/8\u0022 (7\u0022 nominal stud as welded) scaled from Section A-A.",
+            "WebHoles": [],
+            "WebHoleDiameter": 0.0238125
           },
           {
             "Name": "FB25",
@@ -9091,7 +10863,19 @@
             "EndGap": 0.0127,
             "Material": "ASTM A709 Gr. 50-T1",
             "PtDimA": 0.5952744000000001,
-            "PtDimB": 2.7803856000000002
+            "PtDimB": 2.7803856000000002,
+            "PtSlotLength": 0.1397,
+            "PtSlotHeight": 0.05715,
+            "PtSlotZ": 0.17779999999999999,
+            "PtPairSpacing": 0.4064,
+            "StudsPerFace": 32,
+            "StudZ": 0.17779999999999999,
+            "StudMinSpacing": 0.08889999999999999,
+            "StudMaxSpacing": 0.15239999999999998,
+            "StudLength": 0.174625,
+            "StudUnresolved": "UNRESOLVED (p.145): floorbeam shear stud length - Section A-A shows the 7/8\u0022 horizontal studs at 7\u0022 above the flange bottom (32 per face, 3 1/2 - 6\u0022 spacing) without a length. 6 7/8\u0022 (7\u0022 nominal stud as welded) scaled from Section A-A.",
+            "WebHoles": [],
+            "WebHoleDiameter": 0.0238125
           },
           {
             "Name": "FB26",
@@ -9108,7 +10892,19 @@
             "EndGap": 0.0127,
             "Material": "ASTM A709 Gr. 50-T1",
             "PtDimA": 0.5983224,
-            "PtDimB": 2.7773376
+            "PtDimB": 2.7773376,
+            "PtSlotLength": 0.1397,
+            "PtSlotHeight": 0.05715,
+            "PtSlotZ": 0.17779999999999999,
+            "PtPairSpacing": 0.4064,
+            "StudsPerFace": 32,
+            "StudZ": 0.17779999999999999,
+            "StudMinSpacing": 0.08889999999999999,
+            "StudMaxSpacing": 0.15239999999999998,
+            "StudLength": 0.174625,
+            "StudUnresolved": "UNRESOLVED (p.145): floorbeam shear stud length - Section A-A shows the 7/8\u0022 horizontal studs at 7\u0022 above the flange bottom (32 per face, 3 1/2 - 6\u0022 spacing) without a length. 6 7/8\u0022 (7\u0022 nominal stud as welded) scaled from Section A-A.",
+            "WebHoles": [],
+            "WebHoleDiameter": 0.0238125
           },
           {
             "Name": "FB27",
@@ -9125,7 +10921,19 @@
             "EndGap": 0.0127,
             "Material": "ASTM A709 Gr. 50-T1",
             "PtDimA": 0.6321552,
-            "PtDimB": 2.7428952000000004
+            "PtDimB": 2.7428952000000004,
+            "PtSlotLength": 0.1397,
+            "PtSlotHeight": 0.05715,
+            "PtSlotZ": 0.17779999999999999,
+            "PtPairSpacing": 0.4064,
+            "StudsPerFace": 32,
+            "StudZ": 0.17779999999999999,
+            "StudMinSpacing": 0.08889999999999999,
+            "StudMaxSpacing": 0.15239999999999998,
+            "StudLength": 0.174625,
+            "StudUnresolved": "UNRESOLVED (p.145): floorbeam shear stud length - Section A-A shows the 7/8\u0022 horizontal studs at 7\u0022 above the flange bottom (32 per face, 3 1/2 - 6\u0022 spacing) without a length. 6 7/8\u0022 (7\u0022 nominal stud as welded) scaled from Section A-A.",
+            "WebHoles": [],
+            "WebHoleDiameter": 0.0238125
           },
           {
             "Name": "FB28",
@@ -9142,7 +10950,19 @@
             "EndGap": 0.0127,
             "Material": "ASTM A709 Gr. 50-T1",
             "PtDimA": 0.6961632,
-            "PtDimB": 2.6773632000000003
+            "PtDimB": 2.6773632000000003,
+            "PtSlotLength": 0.1397,
+            "PtSlotHeight": 0.05715,
+            "PtSlotZ": 0.17779999999999999,
+            "PtPairSpacing": 0.4064,
+            "StudsPerFace": 32,
+            "StudZ": 0.17779999999999999,
+            "StudMinSpacing": 0.08889999999999999,
+            "StudMaxSpacing": 0.15239999999999998,
+            "StudLength": 0.174625,
+            "StudUnresolved": "UNRESOLVED (p.145): floorbeam shear stud length - Section A-A shows the 7/8\u0022 horizontal studs at 7\u0022 above the flange bottom (32 per face, 3 1/2 - 6\u0022 spacing) without a length. 6 7/8\u0022 (7\u0022 nominal stud as welded) scaled from Section A-A.",
+            "WebHoles": [],
+            "WebHoleDiameter": 0.0238125
           },
           {
             "Name": "FB29",
@@ -9159,7 +10979,19 @@
             "EndGap": 0.0127,
             "Material": "ASTM A709 Gr. 50-T1",
             "PtDimA": 0.7909560000000001,
-            "PtDimB": 2.5807416
+            "PtDimB": 2.5807416,
+            "PtSlotLength": 0.1397,
+            "PtSlotHeight": 0.05715,
+            "PtSlotZ": 0.17779999999999999,
+            "PtPairSpacing": 0.4064,
+            "StudsPerFace": 32,
+            "StudZ": 0.17779999999999999,
+            "StudMinSpacing": 0.08889999999999999,
+            "StudMaxSpacing": 0.15239999999999998,
+            "StudLength": 0.174625,
+            "StudUnresolved": "UNRESOLVED (p.145): floorbeam shear stud length - Section A-A shows the 7/8\u0022 horizontal studs at 7\u0022 above the flange bottom (32 per face, 3 1/2 - 6\u0022 spacing) without a length. 6 7/8\u0022 (7\u0022 nominal stud as welded) scaled from Section A-A.",
+            "WebHoles": [],
+            "WebHoleDiameter": 0.0238125
           },
           {
             "Name": "FB30",
@@ -9176,7 +11008,19 @@
             "EndGap": 0.0127,
             "Material": "ASTM A709 Gr. 50-T1",
             "PtDimA": 0.9314688000000001,
-            "PtDimB": 2.4524208
+            "PtDimB": 2.4524208,
+            "PtSlotLength": 0.1397,
+            "PtSlotHeight": 0.05715,
+            "PtSlotZ": 0.17779999999999999,
+            "PtPairSpacing": 0.4064,
+            "StudsPerFace": 32,
+            "StudZ": 0.17779999999999999,
+            "StudMinSpacing": 0.08889999999999999,
+            "StudMaxSpacing": 0.15239999999999998,
+            "StudLength": 0.174625,
+            "StudUnresolved": "UNRESOLVED (p.145): floorbeam shear stud length - Section A-A shows the 7/8\u0022 horizontal studs at 7\u0022 above the flange bottom (32 per face, 3 1/2 - 6\u0022 spacing) without a length. 6 7/8\u0022 (7\u0022 nominal stud as welded) scaled from Section A-A.",
+            "WebHoles": [],
+            "WebHoleDiameter": 0.0238125
           },
           {
             "Name": "FB31",
@@ -9193,7 +11037,19 @@
             "EndGap": 0.0127,
             "Material": "ASTM A709 Gr. 50-T1",
             "PtDimA": 1.072896,
-            "PtDimB": 2.2927056
+            "PtDimB": 2.2927056,
+            "PtSlotLength": 0.1397,
+            "PtSlotHeight": 0.05715,
+            "PtSlotZ": 0.17779999999999999,
+            "PtPairSpacing": 0.4064,
+            "StudsPerFace": 32,
+            "StudZ": 0.17779999999999999,
+            "StudMinSpacing": 0.08889999999999999,
+            "StudMaxSpacing": 0.15239999999999998,
+            "StudLength": 0.174625,
+            "StudUnresolved": "UNRESOLVED (p.145): floorbeam shear stud length - Section A-A shows the 7/8\u0022 horizontal studs at 7\u0022 above the flange bottom (32 per face, 3 1/2 - 6\u0022 spacing) without a length. 6 7/8\u0022 (7\u0022 nominal stud as welded) scaled from Section A-A.",
+            "WebHoles": [],
+            "WebHoleDiameter": 0.0238125
           },
           {
             "Name": "FB32",
@@ -9210,7 +11066,19 @@
             "EndGap": 0.0127,
             "Material": "ASTM A709 Gr. 50-T1",
             "PtDimA": 1.2606528000000001,
-            "PtDimB": 2.1009864
+            "PtDimB": 2.1009864,
+            "PtSlotLength": 0.1397,
+            "PtSlotHeight": 0.05715,
+            "PtSlotZ": 0.17779999999999999,
+            "PtPairSpacing": 0.4064,
+            "StudsPerFace": 32,
+            "StudZ": 0.17779999999999999,
+            "StudMinSpacing": 0.08889999999999999,
+            "StudMaxSpacing": 0.15239999999999998,
+            "StudLength": 0.174625,
+            "StudUnresolved": "UNRESOLVED (p.145): floorbeam shear stud length - Section A-A shows the 7/8\u0022 horizontal studs at 7\u0022 above the flange bottom (32 per face, 3 1/2 - 6\u0022 spacing) without a length. 6 7/8\u0022 (7\u0022 nominal stud as welded) scaled from Section A-A.",
+            "WebHoles": [],
+            "WebHoleDiameter": 0.0238125
           },
           {
             "Name": "FB33",
@@ -9227,7 +11095,19 @@
             "EndGap": 0.0127,
             "Material": "ASTM A709 Gr. 50-T1",
             "PtDimA": 1.4798040000000001,
-            "PtDimB": 1.8772632
+            "PtDimB": 1.8772632,
+            "PtSlotLength": 0.1397,
+            "PtSlotHeight": 0.05715,
+            "PtSlotZ": 0.17779999999999999,
+            "PtPairSpacing": 0.4064,
+            "StudsPerFace": 32,
+            "StudZ": 0.17779999999999999,
+            "StudMinSpacing": 0.08889999999999999,
+            "StudMaxSpacing": 0.15239999999999998,
+            "StudLength": 0.174625,
+            "StudUnresolved": "UNRESOLVED (p.145): floorbeam shear stud length - Section A-A shows the 7/8\u0022 horizontal studs at 7\u0022 above the flange bottom (32 per face, 3 1/2 - 6\u0022 spacing) without a length. 6 7/8\u0022 (7\u0022 nominal stud as welded) scaled from Section A-A.",
+            "WebHoles": [],
+            "WebHoleDiameter": 0.0238125
           }
         ],
         "Bracing": [
@@ -9454,13 +11334,160 @@
             "EndWebThickness": 0.0254,
             "EndWebHeightAtChord": 0.307975,
             "EndWebHeightAtEnds": "NaN",
-            "EndWebScaledHeightAtEnds": 0.254,
-            "EndWebUnresolved": "UNRESOLVED (p.126): knuckle end web height at its ends - only the height at the CL1-CL2 chord (1\u0027-0 1/8) is dimensioned. End height 10\u0022 scaled from Section A-A.",
+            "EndWebScaledHeightAtEnds": 0.26034999999999997,
+            "EndWebUnresolved": "UNRESOLVED (p.126): knuckle end web height at its ends - only the height at the CL1-CL2 chord (1\u0027-0 1/8) is dimensioned. End height 10 1/4\u0022 scaled from Section A-A (1/2\u0022 = 1\u0027-0).",
             "DeckPlateThickness": 0.0254,
-            "DeckPlateTopZ": 0.022224999999999998,
-            "DeckPlateUnresolved": "UNRESOLVED (p.123-124): knuckle 1\u0022 deck plate elevation - the plate is shown in plan only. Top flush with the end flange top (7/8\u0022 above the tie WP).",
+            "DeckPlateTopZ": 0.047625,
+            "DeckPlateUnresolved": "",
             "Material": "ASTM A709 Gr. 50",
-            "PtAnchors": []
+            "PtAnchors": [],
+            "Detail": {
+              "FlangePlateThickness": 0.0254,
+              "FlangeHalfWidth": 0.187325,
+              "BendRadius": 0.15239999999999998,
+              "BottomClip": 0.0254,
+              "StubWebThickness": 0.0254,
+              "StubWebUnresolved": "UNRESOLVED (p.124 / 125 Section A-A): knuckle stub web thickness - the web plate milled to bear on the end flange (1\u0027-11 5/8 to the arch stiffener) is drawn but not labelled. 1\u0022 (as drawn, = the arch flange plates).",
+              "StiffenerFromSpringing": 0.17779999999999999,
+              "StiffenerThickness": 0.0254,
+              "StiffenerHeight": 0.2413,
+              "ArchStiffenerAlongRib": 0.600075,
+              "ArchStiffenerThickness": 0.0254,
+              "ArchStiffenerUnresolved": "UNRESOLVED (p.124 / 125 Section A-A): knuckle arch stiffener extent - the 1\u0022 arch stiffener is shown on the intrados side only, its width is not dimensioned. From the stub web face to the flange tip (7 3/8 from the rib CL).",
+              "JointGap": 0.0127,
+              "GussetThickness": 0.0127,
+              "GussetHeight": 0.2286,
+              "GussetTopBelowWeb": 0.0127,
+              "GussetBoltFirst": 0.0635,
+              "GussetBoltPitch": 0.07619999999999999,
+              "GussetBoltColumns": 3,
+              "GussetEdge": 0.038099999999999995,
+              "GussetRows": [
+                0.038099999999999995,
+                0.1143,
+                0.1905
+              ],
+              "GussetClip": 0.0254,
+              "FillThickness": 0.028575,
+              "SplicePlateThickness": 0.0254,
+              "SplicePlateLength": 0.6095999999999999,
+              "SpliceUnresolved": "UNRESOLVED (p.124 / 125): knuckle splice / fill plates under the tie flange - the 1\u0022 splice plate and 1 1/8\u0022 fill plate outlines and bolts are not dimensioned (Section A-A shows the 1\u0022 plate from the end of the end flange to ~1\u0027-1 past the joint). Tie flange width, 1\u0027-0 past the joint; bolts not modeled.",
+              "CheeseThickness": 0.0254,
+              "CheeseLength": 0.26034999999999997,
+              "CheeseWidth": 0.26034999999999997,
+              "JackFromBearing": 0.3302,
+              "BearingFromSpringing": 0.0508,
+              "CheeseUnresolved": "UNRESOLVED (p.124 / 125 Section A-A): knuckle jack cheese plates - the 1\u0022 cheese plates at the jacks (1\u0027-1 each side of CL bearing) are drawn ~10 1/4\u0022 long but not dimensioned in plan. 10 1/4\u0022 x 10 1/4\u0022 centred on the jacks.",
+              "Material": "ASTM A709 Gr. 50"
+            },
+            "Corners": [
+              {
+                "Point": "T34\u0027",
+                "Rib": "North rib",
+                "Tie": "North tie",
+                "Splice": "RS5\u0027",
+                "OutsideLegHeight": 0.2524125,
+                "InsideLegHeight": 0.2587625
+              },
+              {
+                "Point": "T0",
+                "Rib": "South rib",
+                "Tie": "South tie",
+                "Splice": "RS1",
+                "OutsideLegHeight": 0.2667,
+                "InsideLegHeight": 0.2667
+              }
+            ],
+            "EndWebOpeningsAt": [
+              -1.2572999999999999,
+              -0.8000999999999999,
+              0.8000999999999999,
+              1.2572999999999999
+            ],
+            "EndWebOpeningLength": 0.35559999999999997,
+            "EndWebOpeningHeight": 0.07619999999999999,
+            "EndWebOpeningZ": 0.155575,
+            "EndWebStudsAt": [
+              -2.47015,
+              -2.22885,
+              -1.98755,
+              -1.7462499999999999,
+              -1.50495,
+              -0.41275,
+              -0.17145,
+              0.06985,
+              0.31115,
+              0.55245,
+              1.64465,
+              1.88595,
+              2.12725,
+              2.36855,
+              2.60985
+            ],
+            "EndWebStudZ": 0.155575,
+            "EndWebStudLength": 0.17779999999999999,
+            "DeckPlateEdgeFromTieCL": 0.0254,
+            "DeckPlateEdgeFromFloorbeamCL": 0.0254,
+            "DeckPlateOverEndFlange": 0.07619999999999999,
+            "DeckStudRows": [
+              {
+                "Name": "R1",
+                "X": -0.20319999999999994,
+                "Y": 0,
+                "Z": 0.2032
+              },
+              {
+                "Name": "R2",
+                "X": 0.06667500000000004,
+                "Y": 0,
+                "Z": 0.2032
+              },
+              {
+                "Name": "R3",
+                "X": 0.33655,
+                "Y": 0,
+                "Z": 0.2032
+              },
+              {
+                "Name": "R4",
+                "X": 0.606425,
+                "Y": 0,
+                "Z": 0.17779999999999999
+              },
+              {
+                "Name": "R5",
+                "X": 0.8763,
+                "Y": 0,
+                "Z": 0.17779999999999999
+              },
+              {
+                "Name": "R6",
+                "X": 1.146175,
+                "Y": 0,
+                "Z": 0.17779999999999999
+              },
+              {
+                "Name": "R7",
+                "X": 1.4160499999999998,
+                "Y": 0,
+                "Z": 0.17779999999999999
+              },
+              {
+                "Name": "R8",
+                "X": 1.685925,
+                "Y": 0,
+                "Z": 0.17779999999999999
+              },
+              {
+                "Name": "R9",
+                "X": 1.9557999999999998,
+                "Y": 0,
+                "Z": 0.17779999999999999
+              }
+            ],
+            "DeckStudSpacing": 0.2413,
+            "DeckStudEdge": 0.07619999999999999,
+            "DeckStudUnresolved": "UNRESOLVED (p.126): knuckle end plate stud positions - the rows are 10 5/8\u0022 apart (dimensioned) but the first row offset and the column lines (6 @ 8 3/8, 5 @ 7 1/2, 4 @ 8 3/4 along the FB1 line, plus pairs at the tendons) are not reproduced. Rows from 5 3/8\u0022 inside the end flange edge (scaled), 9 1/2\u0022 along the rows (scaled), 3\u0022 clear of the plate edges."
           },
           {
             "Name": "East",
@@ -9480,15 +11507,325 @@
             "EndWebThickness": 0.0254,
             "EndWebHeightAtChord": 0.307975,
             "EndWebHeightAtEnds": "NaN",
-            "EndWebScaledHeightAtEnds": 0.254,
-            "EndWebUnresolved": "UNRESOLVED (p.126): knuckle end web height at its ends - only the height at the CL1-CL2 chord (1\u0027-0 1/8) is dimensioned. End height 10\u0022 scaled from Section A-A.",
+            "EndWebScaledHeightAtEnds": 0.26034999999999997,
+            "EndWebUnresolved": "UNRESOLVED (p.126): knuckle end web height at its ends - only the height at the CL1-CL2 chord (1\u0027-0 1/8) is dimensioned. End height 10 1/4\u0022 scaled from Section A-A (1/2\u0022 = 1\u0027-0).",
             "DeckPlateThickness": 0.0254,
-            "DeckPlateTopZ": 0.022224999999999998,
-            "DeckPlateUnresolved": "UNRESOLVED (p.123-124): knuckle 1\u0022 deck plate elevation - the plate is shown in plan only. Top flush with the end flange top (7/8\u0022 above the tie WP).",
+            "DeckPlateTopZ": 0.047625,
+            "DeckPlateUnresolved": "",
             "Material": "ASTM A709 Gr. 50",
-            "PtAnchors": []
+            "PtAnchors": [],
+            "Detail": {
+              "FlangePlateThickness": 0.0254,
+              "FlangeHalfWidth": 0.187325,
+              "BendRadius": 0.15239999999999998,
+              "BottomClip": 0.0254,
+              "StubWebThickness": 0.0254,
+              "StubWebUnresolved": "UNRESOLVED (p.124 / 125 Section A-A): knuckle stub web thickness - the web plate milled to bear on the end flange (1\u0027-11 5/8 to the arch stiffener) is drawn but not labelled. 1\u0022 (as drawn, = the arch flange plates).",
+              "StiffenerFromSpringing": 0.17779999999999999,
+              "StiffenerThickness": 0.0254,
+              "StiffenerHeight": 0.2413,
+              "ArchStiffenerAlongRib": 0.600075,
+              "ArchStiffenerThickness": 0.0254,
+              "ArchStiffenerUnresolved": "UNRESOLVED (p.124 / 125 Section A-A): knuckle arch stiffener extent - the 1\u0022 arch stiffener is shown on the intrados side only, its width is not dimensioned. From the stub web face to the flange tip (7 3/8 from the rib CL).",
+              "JointGap": 0.0127,
+              "GussetThickness": 0.0127,
+              "GussetHeight": 0.2286,
+              "GussetTopBelowWeb": 0.0127,
+              "GussetBoltFirst": 0.0635,
+              "GussetBoltPitch": 0.07619999999999999,
+              "GussetBoltColumns": 3,
+              "GussetEdge": 0.038099999999999995,
+              "GussetRows": [
+                0.038099999999999995,
+                0.1143,
+                0.1905
+              ],
+              "GussetClip": 0.0254,
+              "FillThickness": 0.028575,
+              "SplicePlateThickness": 0.0254,
+              "SplicePlateLength": 0.6095999999999999,
+              "SpliceUnresolved": "UNRESOLVED (p.124 / 125): knuckle splice / fill plates under the tie flange - the 1\u0022 splice plate and 1 1/8\u0022 fill plate outlines and bolts are not dimensioned (Section A-A shows the 1\u0022 plate from the end of the end flange to ~1\u0027-1 past the joint). Tie flange width, 1\u0027-0 past the joint; bolts not modeled.",
+              "CheeseThickness": 0.0254,
+              "CheeseLength": 0.26034999999999997,
+              "CheeseWidth": 0.26034999999999997,
+              "JackFromBearing": 0.3302,
+              "BearingFromSpringing": 0.0508,
+              "CheeseUnresolved": "UNRESOLVED (p.124 / 125 Section A-A): knuckle jack cheese plates - the 1\u0022 cheese plates at the jacks (1\u0027-1 each side of CL bearing) are drawn ~10 1/4\u0022 long but not dimensioned in plan. 10 1/4\u0022 x 10 1/4\u0022 centred on the jacks.",
+              "Material": "ASTM A709 Gr. 50"
+            },
+            "Corners": [
+              {
+                "Point": "T34",
+                "Rib": "South rib",
+                "Tie": "South tie",
+                "Splice": "RS5",
+                "OutsideLegHeight": 0.2524125,
+                "InsideLegHeight": 0.2587625
+              },
+              {
+                "Point": "T0\u0027",
+                "Rib": "North rib",
+                "Tie": "North tie",
+                "Splice": "RS1\u0027",
+                "OutsideLegHeight": 0.2667,
+                "InsideLegHeight": 0.2667
+              }
+            ],
+            "EndWebOpeningsAt": [
+              -1.2572999999999999,
+              -0.8000999999999999,
+              0.8000999999999999,
+              1.2572999999999999
+            ],
+            "EndWebOpeningLength": 0.35559999999999997,
+            "EndWebOpeningHeight": 0.07619999999999999,
+            "EndWebOpeningZ": 0.155575,
+            "EndWebStudsAt": [
+              -2.47015,
+              -2.22885,
+              -1.98755,
+              -1.7462499999999999,
+              -1.50495,
+              -0.41275,
+              -0.17145,
+              0.06985,
+              0.31115,
+              0.55245,
+              1.64465,
+              1.88595,
+              2.12725,
+              2.36855,
+              2.60985
+            ],
+            "EndWebStudZ": 0.155575,
+            "EndWebStudLength": 0.17779999999999999,
+            "DeckPlateEdgeFromTieCL": 0.0254,
+            "DeckPlateEdgeFromFloorbeamCL": 0.0254,
+            "DeckPlateOverEndFlange": 0.07619999999999999,
+            "DeckStudRows": [
+              {
+                "Name": "R1",
+                "X": -0.20319999999999994,
+                "Y": 0,
+                "Z": 0.2032
+              },
+              {
+                "Name": "R2",
+                "X": 0.06667500000000004,
+                "Y": 0,
+                "Z": 0.2032
+              },
+              {
+                "Name": "R3",
+                "X": 0.33655,
+                "Y": 0,
+                "Z": 0.2032
+              },
+              {
+                "Name": "R4",
+                "X": 0.606425,
+                "Y": 0,
+                "Z": 0.17779999999999999
+              },
+              {
+                "Name": "R5",
+                "X": 0.8763,
+                "Y": 0,
+                "Z": 0.17779999999999999
+              },
+              {
+                "Name": "R6",
+                "X": 1.146175,
+                "Y": 0,
+                "Z": 0.17779999999999999
+              },
+              {
+                "Name": "R7",
+                "X": 1.4160499999999998,
+                "Y": 0,
+                "Z": 0.17779999999999999
+              },
+              {
+                "Name": "R8",
+                "X": 1.685925,
+                "Y": 0,
+                "Z": 0.17779999999999999
+              },
+              {
+                "Name": "R9",
+                "X": 1.9557999999999998,
+                "Y": 0,
+                "Z": 0.17779999999999999
+              }
+            ],
+            "DeckStudSpacing": 0.2413,
+            "DeckStudEdge": 0.07619999999999999,
+            "DeckStudUnresolved": "UNRESOLVED (p.126): knuckle end plate stud positions - the rows are 10 5/8\u0022 apart (dimensioned) but the first row offset and the column lines (6 @ 8 3/8, 5 @ 7 1/2, 4 @ 8 3/4 along the FB1 line, plus pairs at the tendons) are not reproduced. Rows from 5 3/8\u0022 inside the end flange edge (scaled), 9 1/2\u0022 along the rows (scaled), 3\u0022 clear of the plate edges."
           }
         ],
+        "Fins": {
+          "RibThickness": 0.022224999999999998,
+          "RibTopClip": 0.0254,
+          "RibPinRadius": 0.05715,
+          "RibUnresolved": "UNRESOLVED (p.148): rib cable fin plate thickness and top corner clips - the rib fin plate table and Section A-A give P1-P4, angle B and weld D but no plate thickness, and the top clips are not dimensioned. 7/8\u0022 (= the tie fin plate p.149, same open socket and 1.378\u0022 pin) and 1\u0022 x 1\u0022 clips scaled from Section A-A.",
+          "PinHole": 0.035001199999999996,
+          "TieThickness": 0.022224999999999998,
+          "TieWidth": 0.2032,
+          "TiePinFromEdge": 0.047625,
+          "TieDepthBelowBend": 0.17779999999999999,
+          "TieBendAboveWeb": 0.0127,
+          "TiePinAboveBend": 0.1016,
+          "TieFarEdgeAboveBend": 0.0127,
+          "TiePinRadius": 0.05715,
+          "TieHoleEdge": 0.038099999999999995,
+          "TieHoleRows": [
+            0.0508,
+            0.1397,
+            0.0508,
+            0.1397
+          ],
+          "Material": "ASTM A709 Gr. 50-F1 (FCM)"
+        },
+        "CableConnectors": [
+          {
+            "Name": "C1xC2-S",
+            "CableA": "C1-S",
+            "CableB": "C2-S"
+          },
+          {
+            "Name": "C3xC4-S",
+            "CableA": "C3-S",
+            "CableB": "C4-S"
+          },
+          {
+            "Name": "C5xC6-S",
+            "CableA": "C5-S",
+            "CableB": "C6-S"
+          },
+          {
+            "Name": "C3xC6-S",
+            "CableA": "C3-S",
+            "CableB": "C6-S"
+          },
+          {
+            "Name": "C27xC28-S",
+            "CableA": "C27-S",
+            "CableB": "C28-S"
+          },
+          {
+            "Name": "C29xC30-S",
+            "CableA": "C29-S",
+            "CableB": "C30-S"
+          },
+          {
+            "Name": "C31xC32-S",
+            "CableA": "C31-S",
+            "CableB": "C32-S"
+          },
+          {
+            "Name": "C27xC30-S",
+            "CableA": "C27-S",
+            "CableB": "C30-S"
+          },
+          {
+            "Name": "C1xC2-N",
+            "CableA": "C1-N",
+            "CableB": "C2-N"
+          },
+          {
+            "Name": "C3xC4-N",
+            "CableA": "C3-N",
+            "CableB": "C4-N"
+          },
+          {
+            "Name": "C5xC6-N",
+            "CableA": "C5-N",
+            "CableB": "C6-N"
+          },
+          {
+            "Name": "C3xC6-N",
+            "CableA": "C3-N",
+            "CableB": "C6-N"
+          },
+          {
+            "Name": "C27xC28-N",
+            "CableA": "C27-N",
+            "CableB": "C28-N"
+          },
+          {
+            "Name": "C29xC30-N",
+            "CableA": "C29-N",
+            "CableB": "C30-N"
+          },
+          {
+            "Name": "C31xC32-N",
+            "CableA": "C31-N",
+            "CableB": "C32-N"
+          },
+          {
+            "Name": "C27xC30-N",
+            "CableA": "C27-N",
+            "CableB": "C30-N"
+          }
+        ],
+        "CableConnectorDetail": {
+          "PendantLength": 0.079375,
+          "PendantSide": 0.038099999999999995,
+          "PendantThickness": 0.004762499999999999,
+          "PendantEdgeAngleDeg": 23.25,
+          "BracketLength": 0.0508,
+          "BracketOuterRadius": 0.0174625,
+          "BracketThickness": 0.00635,
+          "BracketTab": 0.009524999999999999,
+          "Material": "UHMW-PE (ultra high molecular weight polyethylene)",
+          "DensityKgM3": 940,
+          "Basis": "p.150 pendant plate 3 1/8 x 3/16, sleeve brackets R 11/16 x 1/4 x 2\u0022 (N.T.S. details, UHMW-PE)"
+        },
+        "FloorbeamConnection": {
+          "StiffenerThickness": 0.0254,
+          "StiffenerTopFlat": 0.0254,
+          "StiffenerOuterHeight": 0.2032,
+          "StiffenerClip": 0.0254,
+          "PlateThickness": 0.015875,
+          "PlateLength": 0.3175,
+          "WebPlateHeight": 0.17779999999999999,
+          "BoltFirst": 0.041275,
+          "BoltPitch": 0.041275,
+          "BoltColumns": 3,
+          "WebRows": [
+            {
+              "Gage": 0.034925,
+              "FirstColumn": 0,
+              "ColumnStep": 2
+            },
+            {
+              "Gage": 0.08889999999999999,
+              "FirstColumn": 1,
+              "ColumnStep": 2
+            },
+            {
+              "Gage": 0.142875,
+              "FirstColumn": 0,
+              "ColumnStep": 2
+            }
+          ],
+          "FlangePlateWidth": 0.12541249999999998,
+          "FlangeRows": [
+            {
+              "Gage": 0.034925,
+              "FirstColumn": 0,
+              "ColumnStep": 2
+            },
+            {
+              "Gage": 0.0904875,
+              "FirstColumn": 1,
+              "ColumnStep": 2
+            }
+          ],
+          "BottomFlangePlates": true,
+          "BottomUnresolved": "UNRESOLVED (p.146): floorbeam flange connection plates below the flange - Detail 1 shows a 5/8\u0022 plate under the flange but Section B-B shows only the top plates in plan. Bottom plates = the top plates mirrored (2 per end).",
+          "Material": "ASTM A709 Gr. 50-T1"
+        },
         "Deck": {
           "RightTie": "South tie",
           "LeftTie": "North tie",
@@ -10347,6 +12684,8 @@
             "SeatElevation": 162.98448480000002,
             "SteelUndersideZ": -0.053974999999999995,
             "Fixity": "Partially fixed",
+            "LongAxisAngleDeg": 63,
+            "LongAxisSource": "p.102 pier plan: arch span pedestal 63 deg (TYP) to the CL pier; p.107 bearing plan inside it",
             "PadThickness": 0.003175,
             "MasonryLength": 0.9652000000000001,
             "MasonryWidth": 0.4318,
@@ -10373,6 +12712,8 @@
             "SeatElevation": 163.0006392,
             "SteelUndersideZ": -0.053974999999999995,
             "Fixity": "Partially fixed",
+            "LongAxisAngleDeg": 63,
+            "LongAxisSource": "p.102 pier plan: arch span pedestal 63 deg (TYP) to the CL pier; p.107 bearing plan inside it",
             "PadThickness": 0.003175,
             "MasonryLength": 0.9652000000000001,
             "MasonryWidth": 0.4318,
@@ -10399,6 +12740,8 @@
             "SeatElevation": 162.01522080000004,
             "SteelUndersideZ": -0.053974999999999995,
             "Fixity": "Partially fixed",
+            "LongAxisAngleDeg": 63,
+            "LongAxisSource": "p.102 pier plan: arch span pedestal 63 deg (TYP) to the CL pier; p.107 bearing plan inside it",
             "PadThickness": 0.003175,
             "MasonryLength": 0.9652000000000001,
             "MasonryWidth": 0.4318,
@@ -10425,6 +12768,8 @@
             "SeatElevation": 161.9993712,
             "SteelUndersideZ": -0.053974999999999995,
             "Fixity": "Partially fixed",
+            "LongAxisAngleDeg": 63,
+            "LongAxisSource": "p.102 pier plan: arch span pedestal 63 deg (TYP) to the CL pier; p.107 bearing plan inside it",
             "PadThickness": 0.003175,
             "MasonryLength": 0.9652000000000001,
             "MasonryWidth": 0.4318,
@@ -10450,8 +12795,8 @@
           "UNRESOLVED (p.102): which arch pedestal is EL A / EL E - the view direction of the pier elevation is not stated on the sheet. EL A = south at Pier 10 / north at Pier 11, as derived from p.102 \u002B p.91 by the approach model.",
           "UNRESOLVED (p.94, 102, 119): CL1 / CL2 relative to the piers (U3) - no combination of the layout offsets reproduces the plan chord 200\u0027-11 11/16. CL1/CL2 = 7\u0022 along the pier \u002B 4 13/16\u0022 toward the span; the local geometry is kept and the difference reported.",
           "UNRESOLVED (p.119-150): camber / no-load geometry (U4) - not given. Final geometry modeled.",
-          "UNRESOLVED (p.120, 143, 93): tie girder field splices (U5) - the TS1-TS3 table, TS(1)-TS(4) on the framing plan and the 5 erection segments disagree. Ties are continuous (no splice plates).",
-          "UNRESOLVED (p.147, 128): hanger anchor offsets from the rib WP (U6) - H points lie 0.81-0.84 ft inside the rib WP circle and U points 0.685 ft off its plane; the offset rule is not stated. Hanger and bracing points are taken from the tables as printed.",
+          "UNRESOLVED (p.128): upper bracing panel points vs the rib WP (U6, bracing part) - the U points lie 0.685 ft off the rib WP plane; the offset rule is not stated. Bracing points are taken from the table as printed.",
+          "CONFLICT (p.147 vs p.148, p.120): the p.147 table labels H(n) \u0027arch rib working point\u0027 and HC(n) \u0027arch rib cable anchor point\u0027, but HC(n) lies on the rib working line (R 126\u0027-0 through the RS points, within 0.0004\u0027) and H(n) lies 10\u0022 inside it on the cable axis, P1 off the arch plane - exactly the p.148 fin plate pin (P2 sin B = 10\u0022, P1). Modeled: rib pin = H(n), strand and sockets pin to pin; the p.147 cable length (TC to HC) is checked to HC(n) (U6 resolved for the hangers).",
           "UNRESOLVED (p.107, 93): sole plate weld target (U8) - the bearing note and the erection sequence name different plates. Not modeled (welds).",
           "UNRESOLVED (p.119, 124): WP position in the tie / steel underside at the bearings (U10) - the WP is at the bottom of the tie flange (p.119) but drawn inside the 2\u0022 end flange (p.124) and the plate below it is not dimensioned. End flange from 1 1/8\u0022 below to 7/8\u0022 above the WP (tie flange \u002B 1 1/8\u0022 fill = 2\u0022), steel underside 1\u0022 lower.",
           "UNRESOLVED (p.148): hanger sockets vs the supplied WireCo catalog - the plan sockets (pin 1.378\u0022, W 16.18\u0022 / 34.41\u0022) are not the catalog\u0027s 1\u0022 open strand socket (Table 6 p.20: pin 2 1/4\u0022, A 12\u0022). Sockets modeled at the plan table dimensions; the catalog row is reported by check-arch-nht.csx."
@@ -10459,5 +12804,15 @@
       }
     }
   ],
-  "References": []
+  "References": [],
+  "Georeference": {
+    "CrsName": "EPSG:2276",
+    "Description": "NAD83 / Texas North Central (ftUS); project X/Y = TxDOT surface coordinates (Dallas County SAF 1.000136), plan numbers used as ft",
+    "GeodeticDatum": "NAD83",
+    "MapProjection": "Lambert Conformal Conic",
+    "MapZone": "Texas North Central (4202)",
+    "MapUnitUsSurveyFoot": false,
+    "GridScale": 0.9998640184934849,
+    "Basis": "User GPS check 2026-10-11: 32.901380, -96.769012 -\u003E EPSG:2276 2499728.33 / 7015245.07, x 1.000136 = 2500068.29 / 7016199.14 vs model arch centre 2500079.15 / 7016198.76"
+  }
 }

@@ -157,13 +157,13 @@ string GroupOfAsm(string mark)
 {
     if (mark.Contains("-RIB")) return "rib";
     if (mark.Contains("-TIE")) return "tie";
-    if (mark.StartsWith("FB")) return "floor";
+    if (mark.StartsWith("FB") || mark.EndsWith("-EP")) return "floor";   // knuckle END PLATES (p.126) are in the floor system quantity (p.143 note 2)
     if (mark.StartsWith("UPPER-BRACING") || mark.StartsWith("BR")) return "bracing";
     if (mark.StartsWith("KNUCKLE")) return "knuckle";
     if (mark.StartsWith("FIN")) return "fin";
     return "other";
 }
-string GroupOf(SteelPart p) => p.Category switch
+string GroupOf(SteelPart p) => p.Assembly.EndsWith("-EP") ? "floor" : p.Category switch
 {
     PartCategory.ArchRib => "rib",
     PartCategory.KnucklePlate => "knuckle",
@@ -185,7 +185,7 @@ Q("arch rib Gr 50-T1 (p.127)", "rib", 59100, 59272, "plan incl. splice plates, s
 Q("tie girders Gr 50-F1 (p.143)", "tie", 33200, 30024, "plan incl. splice plates, shear studs, fasteners");
 Q("floor system Gr 50-T1 (p.143)", "floor", 61000, 36449, "plan incl. floorbeams, END PLATES, studs, stiffeners, connection plates, fasteners");
 Q("upper lateral bracing Gr 50 (p.128)", "bracing", 21600, 13038, "plan incl. gussets / connections");
-Q("knuckles Gr 50 (p.123)", "knuckle", 9700, 21923, "end flange + end web + deck plate + stub envelopes; CONFLICT kept: the 2\" x 32\" end flanges (9,219 lb) + 1\" deck plates (9,060 lb) alone exceed 9,700");
+Q("knuckles Gr 50 (p.123)", "knuckle", 9700, 21923, "v2 plates per p.124-126 (end plates moved to the floor system per p.143 note 2); CONFLICT kept: the two 2\" x 32\" x 21'-2 end flanges alone weigh 9,219 lb");
 if (gParts.ContainsKey("other")) Print($"     not in the Gr 50 / 50-T1 / 50-F1 groups (hangers, sockets, form deck, bearings): {gParts["other"]:N0} lb");
 foreach (var g in am.Steel.Parts.Where(p => p.Category == PartCategory.KnucklePlate).GroupBy(p => p.Description))
     Print($"     knuckle: {g.Count()} x {g.Key} = {g.Sum(p => p.Mass) * 2.20462262:N0} lb");

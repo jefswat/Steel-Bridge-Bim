@@ -434,6 +434,85 @@ public sealed class ArchKnuckleDefinition
     public string Material { get; set; } = "ASTM A709 Gr. 50";
     /// <summary>PT anchorages (data): local points of the tendon anchor centres.</summary>
     public List<ArchPoint> PtAnchors { get; set; } = new();
+
+    // ---- v2 detail (p.123-126; OPTIONAL: with Detail null the v1 simplified knuckle is built)
+    public ArchKnuckleDetail? Detail { get; set; }
+    /// <summary>Rib-to-tie corners of this knuckle (one per rib end on the end line).</summary>
+    public List<ArchKnuckleCorner> Corners { get; set; } = new();
+    /// <summary>End web PT openings: centres along the end line from the chord crossing (+ toward EndTo), size, centre height above the end flange top.</summary>
+    public List<double> EndWebOpeningsAt { get; set; } = new();
+    public double EndWebOpeningLength { get; set; } = In(14);
+    public double EndWebOpeningHeight { get; set; } = In(3);
+    public double EndWebOpeningZ { get; set; } = In(6.125);
+    /// <summary>End web shear studs (inside face): positions along the end line from the chord crossing, height above the end flange top, length.</summary>
+    public List<double> EndWebStudsAt { get; set; } = new();
+    public double EndWebStudZ { get; set; } = In(6.125);
+    public double EndWebStudLength { get; set; } = In(7);
+    /// <summary>Deck ("end") plate edges: from the tie CL (overlap on the tie flange), from the first floorbeam CL, over the end flange inner edge (NaN = v1 outline).</summary>
+    public double DeckPlateEdgeFromTieCL { get; set; } = double.NaN;
+    public double DeckPlateEdgeFromFloorbeamCL { get; set; } = double.NaN;
+    public double DeckPlateOverEndFlange { get; set; } = double.NaN;
+    /// <summary>Deck plate shear studs: rows parallel to the end line (X = distance from the end line toward the span, Z = stud length), spacing along a
+    /// row, clearance to the plate edges; UNRESOLVED text when the spacing along the rows is scaled.</summary>
+    public List<ArchPoint> DeckStudRows { get; set; } = new();
+    public double DeckStudSpacing { get; set; }
+    public double DeckStudEdge { get; set; } = In(3);
+    public string DeckStudUnresolved { get; set; } = "";
+}
+
+/// <summary>One rib-to-tie corner of a knuckle: the tie end point (= rib springing), the rib and tie, and the bent arch flange plate leg heights.</summary>
+public sealed class ArchKnuckleCorner
+{
+    public string Point { get; set; } = "";
+    public string Rib { get; set; } = "";
+    public string Tie { get; set; } = "";
+    /// <summary>Rib splice point where the built-up stub meets the rolled rib (e.g. RS1).</summary>
+    public string Splice { get; set; } = "";
+    /// <summary>Horizontal leg height of the outside / inside arch flange plate (in the plane of the plate).</summary>
+    public double OutsideLegHeight { get; set; }
+    public double InsideLegHeight { get; set; }
+}
+
+/// <summary>Knuckle corner detail (p.124 / p.125): bent 1" arch flange plates (rib flange width, R6 bends, 1" clip) from the end web to the first rib
+/// splice, stub web, vertical stiffener (normal to the chord, outward of the springing), arch stiffener (normal to the rib), tie joint at the end
+/// flange inner edge with 1/2" gussets (both faces, bolted), 1 1/8" fill + 1" splice plate under the tie flange, 1" cheese plates at the jacks.</summary>
+public sealed class ArchKnuckleDetail
+{
+    public double FlangePlateThickness { get; set; } = In(1);
+    public double FlangeHalfWidth { get; set; } = In(7.375);
+    public double BendRadius { get; set; } = In(6);
+    public double BottomClip { get; set; } = In(1);
+    public double StubWebThickness { get; set; } = In(1);
+    public string StubWebUnresolved { get; set; } = "";
+    public double StiffenerFromSpringing { get; set; } = In(7);
+    public double StiffenerThickness { get; set; } = In(1);
+    public double StiffenerHeight { get; set; } = In(9.5);
+    public double ArchStiffenerAlongRib { get; set; } = Ft(1) + In(11.625);
+    public double ArchStiffenerThickness { get; set; } = In(1);
+    public string ArchStiffenerUnresolved { get; set; } = "";
+    public double JointGap { get; set; } = In(0.5);
+    public double GussetThickness { get; set; } = In(0.5);
+    public double GussetHeight { get; set; } = In(9);
+    public double GussetTopBelowWeb { get; set; } = In(0.5);
+    public double GussetBoltFirst { get; set; } = In(2.5);
+    public double GussetBoltPitch { get; set; } = In(3);
+    public int GussetBoltColumns { get; set; } = 3;
+    public double GussetEdge { get; set; } = In(1.5);
+    public List<double> GussetRows { get; set; } = new() { In(1.5), In(4.5), In(7.5) };
+    public double GussetClip { get; set; } = In(1);
+    public double FillThickness { get; set; } = In(1.125);
+    public double SplicePlateThickness { get; set; } = In(1);
+    public double SplicePlateLength { get; set; } = In(24);
+    public string SpliceUnresolved { get; set; } = "";
+    public double CheeseThickness { get; set; } = In(1);
+    public double CheeseLength { get; set; } = In(10.25);
+    public double CheeseWidth { get; set; } = In(10.25);
+    /// <summary>Jacks: distance from the CL bearing along the chord, both sides (p.124: 1'-1).</summary>
+    public double JackFromBearing { get; set; } = Ft(1) + In(1);
+    /// <summary>CL bearing from the springing point along the chord toward the span (p.124: 2").</summary>
+    public double BearingFromSpringing { get; set; } = In(2);
+    public string CheeseUnresolved { get; set; } = "";
+    public string Material { get; set; } = "ASTM A709 Gr. 50";
 }
 
 /// <summary>Cast-in-place deck on a corrugated steel form deck spanning the floorbeams, curbs, longitudinal PT (data).</summary>

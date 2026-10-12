@@ -268,12 +268,44 @@ for (int n = 1; n <= 10; n++)
 arch.BracingOrientationUnresolved = U("p.128-142", "W8x28 upper lateral bracing web orientation and member ends", "the bracing details (p.129-142) are not transcribed and the U points lie 0.685 ft off the rib WP plane (U6)", "Web set in the plane of the member and the local Z axis, members work point to work point.");
 
 // ---------------------------------------------------------------- knuckles (p.123-126)
-string ewWhy = U("p.126", "knuckle end web height at its ends", "only the height at the CL1-CL2 chord (1'-0 1/8) is dimensioned", "End height 10\" scaled from Section A-A.");
-string dpWhy = U("p.123-124", "knuckle 1\" deck plate elevation", "the plate is shown in plan only", "Top flush with the end flange top (7/8\" above the tie WP).");
-arch.Knuckles.Add(new ArchKnuckleDefinition { Name = "West", EndFrom = "T34'", EndTo = "T0", DeckPlate = { "T34'", "T33'", "T1", "T0" },
-    EndWebScaledHeightAtEnds = In(10), EndWebUnresolved = ewWhy, DeckPlateUnresolved = dpWhy });
-arch.Knuckles.Add(new ArchKnuckleDefinition { Name = "East", EndFrom = "T34", EndTo = "T0'", DeckPlate = { "T34", "T33", "T1'", "T0'" },
-    EndWebScaledHeightAtEnds = In(10), EndWebUnresolved = ewWhy, DeckPlateUnresolved = dpWhy });
+// v2 detail (p.123-126, re-read at 300-500 dpi): end flange 2" x 32" x 21'-2 (1'-1 1/2 outside the end line), end web 1" (1'-0 1/8 at the chord), 4 PT
+// openings 14" x 3" (2'-7 1/2 and 4'-1 1/2 from the chord, at 6 1/8 above the end flange) and 7/8" x 7" studs @ 9 1/2; 1" deck ("END") plate on the
+// flange tops (3" over the end flange edge, 6" over the tie flanges, 5" over the FB1 flange = 1" off the tie / FB CLs) with 7/8" studs (rows 10 5/8 apart,
+// 7" on the plate, 8" on the end flange); per rib end: bent 1" arch flange plates (rib flange width, legs NW 9 15/16 / 10 3/16, SW 10 1/2 / 10 1/2,
+// R 6", 1" clip; SE = NW, NE = SW by the rotational symmetry of p.123), 1" stiffener 7" outside the springing (9 1/2), arch stiffener 1'-11 5/8 up the
+// rib, tie joint at the end flange edge with 2 - 1/2" gussets (9 x 20, 18 bolts), 1 1/8" fill + 1" splice plate, 1" cheese plates at the jacks.
+string ewWhy = U("p.126", "knuckle end web height at its ends", "only the height at the CL1-CL2 chord (1'-0 1/8) is dimensioned", "End height 10 1/4\" scaled from Section A-A (1/2\" = 1'-0).");
+var kDetail = new ArchKnuckleDetail
+{
+    StubWebUnresolved = U("p.124 / 125 Section A-A", "knuckle stub web thickness", "the web plate milled to bear on the end flange (1'-11 5/8 to the arch stiffener) is drawn but not labelled", "1\" (as drawn, = the arch flange plates)."),
+    ArchStiffenerUnresolved = U("p.124 / 125 Section A-A", "knuckle arch stiffener extent", "the 1\" arch stiffener is shown on the intrados side only, its width is not dimensioned", "From the stub web face to the flange tip (7 3/8 from the rib CL)."),
+    SpliceUnresolved = U("p.124 / 125", "knuckle splice / fill plates under the tie flange", "the 1\" splice plate and 1 1/8\" fill plate outlines and bolts are not dimensioned (Section A-A shows the 1\" plate from the end of the end flange to ~1'-1 past the joint)", "Tie flange width, 1'-0 past the joint; bolts not modeled."),
+    CheeseUnresolved = U("p.124 / 125 Section A-A", "knuckle jack cheese plates", "the 1\" cheese plates at the jacks (1'-1 each side of CL bearing) are drawn ~10 1/4\" long but not dimensioned in plan", "10 1/4\" x 10 1/4\" centred on the jacks."),
+};
+var studRows = new List<ArchPoint>();
+for (int i = -3; i <= 5; i++) studRows.Add(new ArchPoint($"R{i + 4}", In(23.875) + i * In(10.625), 0, i < 0 ? In(8) : In(7)));
+string dsWhy = U("p.126", "knuckle end plate stud positions", "the rows are 10 5/8\" apart (dimensioned) but the first row offset and the column lines (6 @ 8 3/8, 5 @ 7 1/2, 4 @ 8 3/4 along the FB1 line, plus pairs at the tendons) are not reproduced", "Rows from 5 3/8\" inside the end flange edge (scaled), 9 1/2\" along the rows (scaled), 3\" clear of the plate edges.");
+double[] openings = { -In(49.5), -In(31.5), In(31.5), In(49.5) };
+double[] webStuds = { -97.25, -87.75, -78.25, -68.75, -59.25, -16.25, -6.75, 2.75, 12.25, 21.75, 64.75, 74.25, 83.75, 93.25, 102.75 };
+ArchKnuckleDefinition Knuckle(string name, string from, string to, string[] deck, ArchKnuckleCorner[] corners)
+{
+    var k = new ArchKnuckleDefinition { Name = name, EndFrom = from, EndTo = to, DeckPlate = deck.ToList(), EndWebScaledHeightAtEnds = In(10.25), EndWebUnresolved = ewWhy,
+        DeckPlateTopZ = In(0.875) + In(1), Detail = kDetail, EndWebOpeningsAt = openings.ToList(), EndWebStudsAt = webStuds.Select(In).ToList(),
+        DeckPlateEdgeFromTieCL = In(1), DeckPlateEdgeFromFloorbeamCL = In(1), DeckPlateOverEndFlange = In(3),
+        DeckStudRows = studRows, DeckStudSpacing = In(9.5), DeckStudEdge = In(3), DeckStudUnresolved = dsWhy };
+    k.Corners.AddRange(corners);
+    return k;
+}
+arch.Knuckles.Add(Knuckle("West", "T34'", "T0", new[] { "T34'", "T33'", "T1", "T0" }, new[]
+{
+    new ArchKnuckleCorner { Point = "T34'", Rib = "North rib", Tie = "North tie", Splice = "RS5'", OutsideLegHeight = In(9.9375), InsideLegHeight = In(10.1875) },
+    new ArchKnuckleCorner { Point = "T0", Rib = "South rib", Tie = "South tie", Splice = "RS1", OutsideLegHeight = In(10.5), InsideLegHeight = In(10.5) },
+}));
+arch.Knuckles.Add(Knuckle("East", "T34", "T0'", new[] { "T34", "T33", "T1'", "T0'" }, new[]
+{
+    new ArchKnuckleCorner { Point = "T34", Rib = "South rib", Tie = "South tie", Splice = "RS5", OutsideLegHeight = In(9.9375), InsideLegHeight = In(10.1875) },
+    new ArchKnuckleCorner { Point = "T0'", Rib = "North rib", Tie = "North tie", Splice = "RS1'", OutsideLegHeight = In(10.5), InsideLegHeight = In(10.5) },
+}));
 
 // ---------------------------------------------------------------- deck (p.151-152, L.B. Foster 3" bridge decking), curbs, PT (data)
 var deck = new ArchDeckDefinition
