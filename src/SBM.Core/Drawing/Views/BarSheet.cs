@@ -114,9 +114,14 @@ public static class BarSheet
             x = 0;
             for (int i = 0; i < cols.Length; i++)
             {
+                // Cut to the column by the Helvetica width estimate (text height 0.085"), so nothing crosses the column line.
                 string v = vals[i];
-                double maxChars = cols[i].w / 0.062;
-                if (v.Length > maxChars) v = v[..Math.Max(1, (int)maxChars - 1)] + "…";
+                double maxH = (cols[i].w - 0.1) / 0.085;
+                if (LabelPlacer.WidthInHeights(v) > maxH)
+                {
+                    while (v.Length > 1 && LabelPlacer.WidthInHeights(v + "...") > maxH) v = v[..^1];
+                    v += "...";
+                }
                 d.Text(v, new Vec2(x + P(0.05), ry - rowH / 2), th, 0, TextAlign.Left);
                 x += P(cols[i].w);
             }
@@ -142,8 +147,26 @@ public static class BarSheet
         return Math.Min(tableBottom, diagBottom);
     }
 
-    /// <summary>One bending diagram in a cell whose top-left corner is <paramref name="o"/> (paper inches; small text).</summary>
-    private static void Diagram(Drafter d, UnitSystem u, BarMark m, Vec2 o, double cellW, double cellH)
+    /// <summary>One bending diagram in a cell whose top-left corner is <paramref name="o"/> (paper inches; small text). Drawn on its own
+    /// drawing first so the label placer can separate the dimension texts inside the cell (no overprint at short legs, nothing
+    /// outside the cell), then merged into the page.</summary>
+    private static void Diagram(Drafter page, UnitSystem u, BarMark m, Vec2 o, double cellW, double cellH)
+    {
+        var cell = new PlanDrawing();
+        var d = new Drafter(cell, u, page.Scale);
+        DiagramBody(d, u, m, o, cellW, cellH);
+        double P(double inch) => d.Paper(inch);
+        LabelPlacer.Resolve(cell, new Box2 { MinX = o.X + P(0.02), MaxX = o.X + P(cellW - 0.02), MinY = o.Y - P(cellH - 0.02), MaxY = o.Y - P(0.02) });
+        foreach (var l in cell.Layers)
+        {
+            var t = page.Drawing.Layer(l.Style);
+            t.Polylines.AddRange(l.Polylines);
+            t.Texts.AddRange(l.Texts);
+            t.Circles.AddRange(l.Circles);
+        }
+    }
+
+    private static void DiagramBody(Drafter d, UnitSystem u, BarMark m, Vec2 o, double cellW, double cellH)
     {
         double P(double inch) => d.Paper(inch);
         var dd = new Drafter(d.Drawing, u, 0.62);              // smaller dimension text and offsets inside the cell
@@ -170,19 +193,14 @@ public static class BarSheet
             double side = Vec2.Dot(dirAB.Left, n) >= 0 ? 1 : -1;
             dd.Dim(a, b, 0.17 * side, $"{dim.Letter} = {u.FormatLength(dim.Value, LengthKind.Short)}");
         }
-        // Bend radius at one bend (the lower right corner of ties), as the inside radius = pin / 2.
-        if (shape.Bends.Count > 0 && shape.PinDiameter > 0)
-        {
-            var (c, r) = shape.Bends.OrderByDescending(bnd => bnd.Center.X - bnd.Center.Y).First();
-            var arcPt = M(c + new Vec2(1, -1).Normalized() * r);
-            dd.Leader(arcPt, arcPt + new Vec2(P(0.12), -P(0.1)), $"R = {u.FormatLength(shape.PinDiameter / 2, LengthKind.Short)} (INSIDE)");
-        }
         var notes = new List<string>();
+        // Bend radius: inside radius = pin / 2 (in the note line, not a leader that would leave the cell).
+        if (shape.Bends.Count > 0 && shape.PinDiameter > 0) notes.Add($"R = {u.FormatLength(shape.PinDiameter / 2, LengthKind.Short)} INSIDE");
         foreach (var dim in shape.Dimensions.Where(q => Vec2.Distance(q.From, q.To) < 1e-9))
             notes.Add($"{dim.Letter} = {u.FormatLength(dim.Value, LengthKind.Short)}");
         if (shape.Code == "SPIRAL") notes.Insert(0, "H = HEIGHT, P = PITCH");
         if (shape.Code == "TIE") notes.Insert(0, "135° HOOKS, " + shape.Description.Split(',').Last().Trim().ToUpperInvariant());
-        if (shape.PinDiameter > 0) notes.Add($"PIN {u.FormatLength(shape.PinDiameter, LengthKind.Short)}");
+        if (shape.PinDiameter > 0 && !(shape.Bends.Count > 0)) notes.Add($"PIN {u.FormatLength(shape.PinDiameter, LengthKind.Short)}");
         if (notes.Count > 0) d.Text(string.Join("  ", notes), o + new Vec2(P(0.05), -P(cellH - 0.08)), P(0.045), 0, TextAlign.Left);
     }
 }
