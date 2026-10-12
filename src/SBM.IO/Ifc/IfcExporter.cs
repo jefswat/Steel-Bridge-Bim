@@ -602,17 +602,33 @@ public static class IfcExporter
             {
                 var items = new List<int> { FaceSet(c.Deck, concreteStyle) };
                 if (c.Haunches is { IsEmpty: false } h) items.Add(FaceSet(h, concreteStyle));
+                foreach (var (_, db) in c.DeckBumps) if (!db.IsEmpty) items.Add(FaceSet(db, concreteStyle));   // deck widenings under barrier zones
                 int rep = w.Add("IFCSHAPEREPRESENTATION", $"{Ref(body)},'Body','Tessellation',{Refs(items)}");
                 int pds = w.Add("IFCPRODUCTDEFINITIONSHAPE", $"$,$,({Ref(rep)})");
                 int slab = deckSlab = w.Add("IFCSLAB", $"{Guid(IfcKeys.DeckSlab(bk))},$,'Deck slab',{S($"{u.FormatLength(def.Deck.Thickness, LengthKind.Short)} cast-in-place deck with haunches")},'BRIDGE_DECK',{Ref(pl)},{Ref(pds)},'DECK',.USERDEFINED.");
                 contained.Add(slab);
                 AddMaterial(concreteMat, slab);
-                psetTargets.Add((slab, "DECK", "Deck slab", 0, (c.DeckVolume + c.HaunchVolume) * 2400));
+                psetTargets.Add((slab, "DECK", "Deck slab", 0, (c.DeckVolume + c.HaunchVolume + c.DeckBumpVolume) * 2400));
             }
             foreach (var (name, mesh) in c.Barriers)
             {
-                int pds = Body(mesh, concreteStyle);
-                int rail = w.Add("IFCRAILING", $"{Guid(IfcKeys.Barrier(bk, name))},$,{S(name)},{S(def.Deck.Barrier.Type == SBM.Core.Bridge.BarrierType.TxDotSstr ? "TxDOT Type SSTR" : def.Deck.Barrier.Type.ToString())},$,{Ref(pl)},{Ref(pds)},{S(name)},.GUARDRAIL.");
+                int pds;
+                if (c.BarrierPieces.TryGetValue(name, out var bpieces) && bpieces.Count > 1)
+                {
+                    // custom barrier with zones: one closed face set per section length (they share end faces)
+                    meshParts++;
+                    var bitems = bpieces.Select(pc => FaceSet(pc, concreteStyle)).ToList();
+                    int brep = w.Add("IFCSHAPEREPRESENTATION", $"{Ref(body)},'Body','Tessellation',{Refs(bitems)}");
+                    pds = w.Add("IFCPRODUCTDEFINITIONSHAPE", $"$,$,({Ref(brep)})");
+                }
+                else pds = Body(mesh, concreteStyle);
+                string btype = def.Deck.Barrier.Type switch
+                {
+                    SBM.Core.Bridge.BarrierType.TxDotSstr => "TxDOT Type SSTR",
+                    SBM.Core.Bridge.BarrierType.Custom => def.Deck.Barrier.ProfileName ?? "Custom barrier",
+                    var t => t.ToString(),
+                };
+                int rail = w.Add("IFCRAILING", $"{Guid(IfcKeys.Barrier(bk, name))},$,{S(name)},{S(btype)},$,{Ref(pl)},{Ref(pds)},{S(name)},.GUARDRAIL.");
                 contained.Add(rail);
                 AddMaterial(concreteMat, rail);
                 psetTargets.Add((rail, name, "Concrete barrier", 0, Math.Abs(mesh.Volume()) * 2400));

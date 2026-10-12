@@ -703,7 +703,7 @@ public static class ModelDatabase
             {
                 slabId = Id(IfcKeys.DeckSlab(bk));
                 var r = New(slabId, deckPartId, "element", "deck slab", "IFCSLAB", "Deck slab");
-                r.Material = concMat; r.Volume = c.DeckVolume + c.HaunchVolume; r.Mass = r.Volume * 2400;
+                r.Material = concMat; r.Volume = c.DeckVolume + c.HaunchVolume + c.DeckBumpVolume; r.Mass = r.Volume * 2400;
                 r.Box = c.Deck.Bounds(); if (c.Haunches is { IsEmpty: false } h) { var hb = h.Bounds(); r.Box.Add(hb.Min); r.Box.Add(hb.Max); }
                 StationOf(r, r.Box);
                 r.Props = new Json().Add("thickness_m", def.Deck.Thickness).Add("deck_volume_m3", c.DeckVolume).Add("haunch_volume_m3", c.HaunchVolume).ToString();

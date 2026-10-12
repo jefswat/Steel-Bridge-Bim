@@ -157,6 +157,8 @@ public sealed class SubstructureModel
     public List<SubSolid> Drainage { get; } = new();
     /// <summary>Optional misc items (Ramp G drainage, sign supports, end posts, lighting); set by the regeneration cache after the substructure.</summary>
     public Misc.MiscModel? Misc { get; set; }
+    /// <summary>Architectural surface treatments (form liner, thin brick) of the bridge, rebuilt after the diaphragms (<see cref="Surface.SurfaceTreatmentGenerator"/>).</summary>
+    public Surface.SurfaceTreatmentModel? SurfaceTreatments { get; set; }
     public List<string> Notes { get; } = new();
     public List<Diagnostic> Diagnostics { get; } = new();
     public TimeSpan GenerationTime { get; set; }

@@ -204,7 +204,7 @@ public static class SceneBuilder
                 {
                     (m.Deck, new NamedPick("Deck", "Deck slab", new[] { ("Volume", $"{m.DeckVolume / 0.764554857984:N1} CY") })),
                     (m.Haunches, new NamedPick("Deck", "Haunches", new[] { ("Volume", $"{m.HaunchVolume / 0.764554857984:N1} CY") })),
-                }).Where(x => x.Item1 is { IsEmpty: false }).ToList();
+                }.Concat(m.DeckBumps.Select(db => ((Mesh?)db.Mesh, (object)new NamedPick("Deck", db.Name, new[] { ("Volume", $"{Math.Abs(db.Mesh.Volume()) / 0.764554857984:N2} CY") }))))).Where(x => x.Item1 is { IsEmpty: false }).ToList();
                 if (items.Count == 0) return null;
                 var g = FlatShaded(items.Select(x => x.Item1!), o, items.Select(x => x.Item2).ToList());
                 return new SolidLayer { Name = "3D-DECK", R = 180, G = 180, B = 172, Parts = new() { (g, null) }, Triangles = g.Indices!.Count / 3, Opacity = 0.35f };

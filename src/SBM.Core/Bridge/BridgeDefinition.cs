@@ -1165,6 +1165,10 @@ public sealed class BridgeDefinition
     /// <summary>Steel intermediate diaphragms between PRESTRESSED beams bolted through cast web holes (Iowa 1036-BTD; null = none).
     /// Detailed after the beams by <c>Diaphragms.PsSteelDiaphragmDetailer</c> in <c>RegenerationCache</c>.</summary>
     public PsSteelDiaphragmDefinition? PsSteelDiaphragms { get; set; }
+    /// <summary>OPTIONAL architectural surface treatments (form liner texture, thin brick, ...) on barrier / substructure / diaphragm faces
+    /// (<see cref="SurfaceTreatmentDefinition"/>); null = none.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public List<SurfaceTreatmentDefinition>? SurfaceTreatments { get; set; }
 
     /// <summary>A typical two-span continuous layout starting at the given station.</summary>
     public static BridgeDefinition CreateDefault(double beginStation, string alignmentName)
@@ -1255,5 +1259,6 @@ public sealed class BridgeDefinition
         Drains = Drains.Select(d => d.Clone()).ToList(),
         InspectionAccess = InspectionAccess?.Clone(),
         Misc = Misc?.Clone(),
+        SurfaceTreatments = SurfaceTreatments?.Select(t => t.Clone()).ToList(),
     };
 }

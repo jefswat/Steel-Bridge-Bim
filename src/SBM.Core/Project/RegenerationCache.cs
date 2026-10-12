@@ -156,6 +156,12 @@ public sealed class RegenerationCache
             // Concrete end / pier diaphragms: superstructure elements built after the beams and the substructure (cheap; always rebuilt).
             if (includeSteel && pt.ps != null && !pt.f.HasErrors)
                 pt.ps.ConcreteDiaphragms = Diaphragms.ConcreteDiaphragmGenerator.Generate(pt.f, pt.ps, project.Units);
+            // Architectural surface treatments (form liner / thin brick) on the barrier, substructure and diaphragm faces: after everything they sit on
+            // (cheap; always rebuilt). Kept on the substructure model, which every consumer (viewport, IFC, database) already receives.
+            if (sub != null)
+                sub.SurfaceTreatments = includeSteel && !pt.f.HasErrors
+                    ? Surface.SurfaceTreatmentGenerator.Generate(pt.f, pt.cm, sub, pt.ps?.ConcreteDiaphragms, project.Units,
+                        pt.ps?.Beams.Select(x => x.Mesh).ToList()) : null;
             lock (_lock) { if (pt.hit && found) Hits++; else Misses++; }
             results[i] = new BridgeModel(b, pt.f, pt.s, pt.hit && found, pt.cm, sub, pt.ps);
         });
