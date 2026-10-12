@@ -139,6 +139,12 @@ Prestressed inputs live at `Bridges[i].Girders.Kind` (`SteelPlate` / `TxDotPrest
 `Bridges[i].Girders.Prestressed.*` (`Type` Tx28…Tx70 / Custom, `StrandCount`, `StrandDiameter`, `DepressedStrands`,
 `ConcreteStrength` (ksi), `EndGapAtBent`, `BearingToEnd`, `InteriorEnds`, `PadLength` (0 = IGEB table), …).
 
+Precast post-tensioned segmental box bridges (`Bridges[i].Segmental`, `Girders.Count = 0`; example `samples/plans/build-bonner-unit5.csx`):
+```csharp
+var sm = Doc.Segmental("Bonner Unit 5");     // Segments (type, stations, depths, chord, mesh), Tendons, Bearings, BentRows (WP / soffit / DIM A / B), Checks, Diagnostics
+Print(sm.ConcreteVolume / Math.Pow(Ft(1), 3) / 27);   // box concrete, CY
+```
+
 ## C# scripts
 
 These globals are available:
