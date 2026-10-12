@@ -844,6 +844,8 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   T80SS(MOD) at Pier 10 (section 5): RL-T80SS bridge-slab section + 1'-0 lower back face (= the p.105 D-D vectors), 9'-1 / 4'-6 / 7'-11 + 15'-0 1:10 taper +
   1'-8, base shaft top + 2'-9 (flagged), pavement 2'-4 x 1'-1; Pier 11 not drawn (76.33 vs 78 LF); bars / UHMW wedge UNRESOLVED.
   Check: the approach slab lengths / SF and rail LF are compared to the CL SEJ (cut-back strips added back in check-nht.csx).
+  check-nht.csx after build-nht + arch-nht: 827 PASS / 6 FAIL (4 arch pier CY +-0.3, p.91 low rail 579.0 vs 578.88 layout, T80SS 76.33 vs 78 LF);
+  IFC: validate_ifc 0 schema / EXPRESS issues, new products mesh closed (BS-EJCP sleeve anchors 1.03 volume ratio = tiny Pset mass rounding).
 - NHT railing / curbs / joints / mow strips: `samples/plans/rail-joints-nht.csx` (hooked at the end of build-nht.csx before its regeneration and in arch-nht.csx
   before its final regeneration; works on whatever NHT bridges exist). Curbs 10" x 4" with 3/4" chamfers (p.89, 113, 83). RAIL (PED) LOW / HIGH on the curb
   line (7'-0 from CL NHT = the p.84-88 "face of rail", LF reproduced to 0.006 ft per side), sections from the p.89 page VECTORS (1.5 pt/in) as flagged

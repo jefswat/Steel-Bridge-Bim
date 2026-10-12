@@ -118,15 +118,24 @@ public sealed partial class ConcreteGenerator
                             if (dirH.X * away.X + dirH.Y * away.Y < 0) dirH = dirH * -1;
                             var b = a + dirH * (ar.StudLength - (ar.StudBentLength > 0 ? 0 : ar.StudHeadHeight));
                             var m = new Mesh();
-                            Cyl(m, a, b, ar.StudDiameter / 2);
                             var tip = b; var tdir = dirH;
                             if (ar.StudBentLength > 0)
                             {
                                 double ang = ar.StudBendDegrees * Math.PI / 180;
                                 tdir = (dirH * Math.Cos(ang) + new Vec3(0, 0, -Math.Sin(ang))).Normalized();
                                 tip = b + tdir * (ar.StudBentLength - ar.StudHeadHeight);
-                                Cyl(m, b, tip, ar.StudDiameter / 2);
+                                // ONE closed shank: octagon swept start -> mitred bend -> tip (separate overlapping prisms do not mesh as closed shells)
+                                var sx = Vec3.Cross(new Vec3(0, 0, 1), dirH).Normalized();
+                                double rc = ar.StudDiameter / 2 / Math.Cos(Math.PI / 8);
+                                var oct = Enumerable.Range(0, 8).Select(k => Vec2.FromAngle(2 * Math.PI * k / 8) * rc).ToList();
+                                Vec3 Off(Vec3 z, Vec2 q) { var y = Vec3.Cross(z, sx); return sx * q.X + y * q.Y; }
+                                var nb = (dirH + tdir).Normalized();
+                                var r0 = oct.Select(q => a + Off(dirH, q)).ToArray();
+                                var r1 = oct.Select(q => { var v = Off(dirH, q); double tt = -Vec3.Dot(v, nb) / Vec3.Dot(dirH, nb); return b + v + dirH * tt; }).ToArray();
+                                var r2 = oct.Select(q => tip + Off(tdir, q)).ToArray();
+                                MeshBuilder.AddLoft(m, oct, new[] { r0, r1, r2 });
                             }
+                            else Cyl(m, a, b, ar.StudDiameter / 2);
                             Cyl(m, tip, tip + tdir * ar.StudHeadHeight, ar.StudHeadDiameter / 2);
                             parts.Add(new SteelPart
                             {
