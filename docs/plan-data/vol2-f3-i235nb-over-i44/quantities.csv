@@ -1,0 +1,31 @@
+item,unit,abutments,piers,superstructure,approach,slopewall,total_printed,sum_check,source,tag
+Substructure excavation common,CY,395.00,185.00,,,,580.00,580.00 ok,PDF p.12 / F3-2,RASTER
+CLSM backfill,CY,405.80,,,,,405.80,405.80 ok,PDF p.12,RASTER
+Approach slab,SY,,,,646.00,,646.00,646.00 ok,PDF p.12,RASTER
+Saw-cut grooving,SY,,,2075.30,567.40,,2642.70,2642.70 ok,PDF p.12,RASTER
+Sealed expansion joint,LF,,,160.96,,,160.96,160.96 ok,PDF p.12,RASTER
+42 in F-shaped parapet,LF,,,531.60,147.80,,679.40,679.40 ok,PDF p.12,RASTER
+Structural steel,LB,45.00,,896460.00,,,896505.00,896505 ok,PDF p.12,RASTER
+Stainless steel fixed bearing assembly,EA,,9.00,,,,9.00,9 ok (9 girders x 1 pier),PDF p.12,RASTER
+Stainless steel expansion bearing assembly,EA,18.00,,,,,18.00,18 ok (9 girders x 2 abutments),PDF p.12,RASTER
+Special concrete finish,SY,,,,,1298.00,1298.00,1298 ok,PDF p.12,RASTER
+Class AA concrete,CY,,7.50,544.50,,,552.00,552.00 ok,PDF p.12,RASTER
+Class A concrete,CY,255.80,274.00,,,,529.80,529.80 ok,PDF p.12,RASTER
+Slope wall (5 in),SY,,,,,1351.00,1351.00,1351 ok,PDF p.12,RASTER
+(SP) graffiti treatment,SF,3915.00,4572.00,4203.00,1179.00,11682.00,25551.00,25551 ok,PDF p.12,RASTER
+Epoxy coated reinforcing steel,LB,28340.00,64150.00,127610.00,,,220100.00,220100 ok,PDF p.12,RASTER
+"Piles furnished HP10x42",LF,293.00,,,,,293.00,293 ok,PDF p.12,RASTER
+"Piles furnished HP12x53",LF,1463.00,,,,,1463.00,1463 ok (abut1 944 + abut2 519),PDF p.12; p.20; p.24,RASTER
+"Piles driven HP10x42",LF,293.00,,,,,293.00,293 ok,PDF p.12,RASTER
+"Piles driven HP12x53",LF,2.00,,,,,2.00,PRINTED TOTAL 2.00 IS A SHIFTED ROW (should be 1463 = driven HP12x53) - plan misprint,PDF p.12,RASTER
+Metal pile shoes,EA,39.00,,,,,39.00,39 ok (abut1 20 + abut2 19),PDF p.12,RASTER
+"Pile splice H-pile (non-biddable)",EA,2.00,,,,,2.00,printed 2 (abut1 1 + abut2 1) ok,PDF p.12,RASTER
+Water repellent (visually inspected),SY,435.00,508.00,467.00,131.00,1298.00,2839.00,2839 ok,PDF p.12,RASTER
+"Drilled shafts 60 in diameter",LF,,104.00,,,,1.10 (printed in total column - shifted row),104.00 (4 shafts x 26.00),PDF p.12,RASTER
+Crosshole sonic logging,EA,,1.00,,,,1.00,1 ok,PDF p.12,RASTER
+Sealer crack preparation,LF,,,160.00,,,160.00,160 ok,PDF p.12,RASTER
+Sealer resin,GAL,,,1.10,,,1.10,PRINTED IN THE ROW LABELLED "Drilled shafts" TOTAL COLUMN - label/row shift in plan table,PDF p.12,RASTER
+Removal of bridge items,LSUM,,,,,,1.00,1 ok,PDF p.12,RASTER
+Abut 1 south: excavation 190.00 CY; CLSM 219.90 CY; structural steel 45.00 LB; Class A 131.30 CY; graffiti 1971.00 SF; epoxy rebar 13950.00 LB; HP10x42 181.00 LF; HP12x53 944.00 LF; shoes 20; splice 1; water repellent 219.00 SY; 6 in perf underdrain 80 LF; 6 in non-perf 100 LF; exp bearing assy 9,,,,,,,,PDF p.20 / F3-10,RASTER
+Abut 2 north: excavation 205.00 CY; CLSM 185.90 CY; structural steel 0.00; Class A 124.50 CY; graffiti 1944.00 SF; epoxy rebar 14390.00 LB; HP10x42 112.00 LF; HP12x53 519.00 LF; shoes 19; splice 1; water repellent 216.00 SY; underdrain 80/100 LF; exp bearing assy 9,,,,,,,,PDF p.24 / F3-14,RASTER
+Abut1+abut2 sums: excavation 395.00 ok; CLSM 405.80 ok; Class A 255.80 ok; graffiti 3915 ok; epoxy 28340 ok; HP10x42 293 ok; HP12x53 1463 ok; shoes 39 ok; water repellent 435 ok,,,,,,,,DERIVED,DERIVED

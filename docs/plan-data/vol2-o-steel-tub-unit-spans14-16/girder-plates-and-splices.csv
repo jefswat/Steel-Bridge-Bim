@@ -1,0 +1,35 @@
+girder,stack(as drawn on sheet),dimension_or_plate,value,source,tag
+1,A: CL brg pier 13 -> field splice 1 -> CL brg pier 14 (span 14),girder end beyond CL brg pier 13,"9 11/16"" (both girders; 9"" at pier 16 end)",PDF p.278 / O-24,RASTER 230dpi
+1,A: CL brg pier 13 -> field splice 1 -> CL brg pier 14 (span 14),CL brg to CL brg,"141'-4""",PDF p.278 / O-24,RASTER 230dpi
+1,A: CL brg pier 13 -> field splice 1 -> CL brg pier 14 (span 14),"to field splice 1 (row ""FIELD SPLICE"")","105'-9 7/8""",PDF p.278 / O-24,RASTER 230dpi
+1,A: CL brg pier 13 -> field splice 1 -> CL brg pier 14 (span 14),tension flange,"85'-9 3/4 BOTTOM, then 20'-0 1/8 BOTH (to splice 1); after splice 20'-4 1/2 BOTH",PDF p.278 / O-24,RASTER 230dpi
+1,A: CL brg pier 13 -> field splice 1 -> CL brg pier 14 (span 14),top flange,"2 PL 1 1/4 x 21 (to splice 1 and 20'-4 1/2 beyond), then 2 PL 1 7/8 x 21 for last 15'-1 5/8 to pier 14 (77'-6 string with 38'-5 7/16 TOP and 18'-8 1/16 BOTH is the span-15 side of the splice, see U-O3)",PDF p.278 / O-24,RASTER 230dpi
+1,A: CL brg pier 13 -> field splice 1 -> CL brg pier 14 (span 14),bottom flange,"PL 1 1/4 x 77 (to splice 1 + 20'-4 1/2), PL 1 7/8 x 77 last 15'-1 5/8 at pier 14 (end of segment 13'-11 15/16 / 27'-11 15/16 on span 15 side)",PDF p.278 / O-24,RASTER 230dpi
+1,A: CL brg pier 13 -> field splice 1 -> CL brg pier 14 (span 14),web,2 ~ PL 5/8 typical; 3/4 near piers (see below),PDF p.278 / O-24,RASTER 230dpi
+1,A: CL brg pier 13 -> field splice 1 -> CL brg pier 14 (span 14),studs,"124 spa @10 max; 8"" + 8"" double row at piers; omitted 1'-10 each side of splice",PDF p.278 / O-24,RASTER 230dpi
+1,B: pier 14 -> splice 2 -> splice 3 -> pier 15 (span 15),CL brg to CL brg,158'-6 3/4,PDF p.278 / O-24,RASTER 230dpi
+1,B: pier 14 -> splice 2 -> splice 3 -> pier 15 (span 15),top flange,2PL 1 7/8x21 -> 1 1/4x21 -> 1 3/8x21 -> 2 1/4x21 at pier 15,PDF p.278 / O-24,RASTER 230dpi
+1,B: pier 14 -> splice 2 -> splice 3 -> pier 15 (span 15),bottom flange,PL 1 7/8x77 (13'-11 15/16) -> 1 3/8x77 (27'-11 15/16 to splice 2) -> 1 3/8x77 (to splice 3) ; 1 3/8x77 37'-3 13/16 then 2 1/4x77 14'-0 5/16 at pier 15,PDF p.278 / O-24,RASTER 230dpi
+1,B: pier 14 -> splice 2 -> splice 3 -> pier 15 (span 15),web,2~PL 5/8 typical; 2~PL 3/4 for 14'-0 5/16 at pier 15,PDF p.278 / O-24,RASTER 230dpi
+1,B: pier 14 -> splice 2 -> splice 3 -> pier 15 (span 15),splice dims,"65'-2 3/4 BOTH (splice 2-3), 47'-11 1/4 TOP, 85'-7 3/16, 27'-11 7/8 BOTH, 62 spa @12 max, 59 spa @10 max, 48 spa @10 max",PDF p.278 / O-24,RASTER 230dpi
+1,C: pier 15 -> splice 4 -> pier 16 (span 16),CL brg to CL brg,157'-6 7/8,PDF p.278 / O-24,RASTER 230dpi
+1,C: pier 15 -> splice 4 -> pier 16 (span 16),splice 4 from pier,123'-3 13/16 (bottom tension 103'-5 5/16 + 19'-10 1/2 both),PDF p.278 / O-24,RASTER 230dpi
+1,C: pier 15 -> splice 4 -> pier 16 (span 16),top flange,2PL 2 1/4x21 (pier 15 end) -> 1 3/8x21 to splice 4 -> 1 3/8x21 to pier 16 (162 spa @ 9 max),PDF p.278 / O-24,RASTER 230dpi
+1,C: pier 15 -> splice 4 -> pier 16 (span 16),bottom flange,PL 2 1/4x77 (14'-8 15/16) -> 1 3/8x77 (19'-6 1/8) -> 1 3/8x77 to pier 16,PDF p.278 / O-24,RASTER 230dpi
+1,C: pier 15 -> splice 4 -> pier 16 (span 16),web,2~PL 3/4 (14'-8 15/16) then 5/8,PDF p.278 / O-24,RASTER 230dpi
+2,A: span 14,CL brg to CL brg,137'-2 5/16,PDF p.279 / O-25,RASTER 230dpi
+2,A: span 14,splice 1 from pier 13,100'-11 1/2,PDF p.279 / O-25,RASTER 230dpi
+2,A: span 14,tension flange,"80'-6 1/2 BOTTOM, 20'-5 BOTH, 18'-3 1/2 BOTH, 39'-2 7/8 TOP",PDF p.279 / O-25,RASTER 230dpi
+2,A: span 14,top flange,"2PL 1 1/4x21; 2PL 1 7/8x21 last 15'-4 7/8 (45 spa @9, 148 spa @8)",PDF p.279 / O-25,RASTER 230dpi
+2,A: span 14,bottom flange,PL 1 1/4x77 to 20'-9 15/16 before pier 14 then PL 1 7/8x77 for 15'-4 7/8,PDF p.279 / O-25,RASTER 230dpi
+2,A: span 14,web,2~PL 5/8,PDF p.279 / O-25,RASTER 230dpi
+2,B: span 15,CL brg to CL brg,161'-9 9/16,PDF p.279 / O-25,RASTER 230dpi
+2,B: span 15,top flange,1 7/8x21 (39'-2 7/8 TOP) -> 1 1/4x21 -> 1 3/8x21 -> 2 1/4x21 (48'-10 7/8 TOP at pier 15),PDF p.279 / O-25,RASTER 230dpi
+2,B: span 15,bottom flange,1 7/8x77 14'-3 9/16 -> 1 3/8x77 28'-6 9/16 (splice 2) ... 38'-1 3/16 1 3/8x77 -> 2 1/4x77 14'-3 9/16,PDF p.279 / O-25,RASTER 230dpi
+2,B: span 15,splice dims,"19'-0 5/8 BOTH, 66'-6 5/8 BOTH, 28'-6 3/4 BOTH, 87'-4 1/8",PDF p.279 / O-25,RASTER 230dpi
+2,B: span 15,studs,"54 spa @9, 76 spa @10, 67 spa @9, 44 spa @9",PDF p.279 / O-25,RASTER 230dpi
+2,C: span 16,CL brg to CL brg,160'-9 3/8,PDF p.279 / O-25,RASTER 230dpi
+2,C: span 16,splice 4,"125'-10 1/16 from pier 15; 105'-6 13/16 BOTTOM, 20'-3 1/4 BOTH, 9'-10 7/16 BOTH",PDF p.279 / O-25,RASTER 230dpi
+2,C: span 16,top flange,2PL 2 1/4x21 (15'-1 1/2) -> 1 3/8x21 (19'-9 7/8) -> 1 3/8x21,PDF p.279 / O-25,RASTER 230dpi
+2,C: span 16,bottom flange,2 1/4x77 -> 1 3/8x77,PDF p.279 / O-25,RASTER 230dpi
+2,C: span 16,studs,"186 spa @8 max, 44 spa @9",PDF p.279 / O-25,RASTER 230dpi

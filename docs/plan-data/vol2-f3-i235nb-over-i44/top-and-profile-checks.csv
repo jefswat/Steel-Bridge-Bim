@@ -1,0 +1,11 @@
+item,value,formula / note,source,tag
+Horizontal curve CRL I-235 NB,"R=3700.00 T=1015.72 L=1982.60 D=1 deg32'54.72"" A=30 deg42'04.73"" LT",R*tan(A/2)=1015.7; R*A=1982.6 (DERIVED ok),PDF p.11,RASTER
+Vertical curve (bridge),PVC 296+40.00 el 1126.60; PVI 301+20.00 el 1135.72; PVT 306+00.00 el 1126.98; VC 960 ft; g1=+1.900% g2=-1.821%; high point 301+30.32 el 1131.26,PVC el = 1135.72-480*0.019=1126.60 ok; PVT el = 1135.72-480*0.01821=1126.98 ok,PDF p.11 (300 dpi clip),RASTER
+Profile at begin bridge 300+27.82,1131.05 (calc) vs 1131.06 plan,"y=1126.60+0.019x-(0.03721/1920)x^2, x=387.82",DERIVED vs p.11,DERIVED
+Profile at pier 301+63.52,1131.24 (calc) vs 1131.24 plan,x=523.52,DERIVED vs p.11,DERIVED
+Profile at end bridge 302+93.98,1130.74 (calc) vs 1130.74 plan,x=653.98,DERIVED vs p.11,DERIVED
+Span 1 along CRL,"135'-8 3/8"" (plan); stations 301+63.52-300+27.82=135.70; N/E distance 135.69",ok,"PDF p.11, p.16",RASTER/DERIVED
+Span 2 along CRL,"130'-5 1/2"" (plan); stations 130.46; N/E distance 130.46",ok,"PDF p.11, p.16",RASTER/DERIVED
+Bridge length along CRL,"266'-1 7/8"" = 135'-8 3/8""+130'-5 1/2"" (DERIVED 266.1562 ft; stations 266.16)",plan string 266-ft 1 7/8-in confirmed on a 300 dpi clip,PDF p.11,RASTER
+Bearing to bearing along girder,"263'-8 9/16"" = 134'-0 3/4""+129'-7 13/16""",sum DERIVED ok,PDF p.33-34,RASTER
+Girder dims A..H,"A 94'-0 3/4, B 80'-0, C 89'-7 13/16, D 134'-0 3/4, E 129'-7 13/16, F 2'-0 3/4, G 2'-0, H 1'-11 13/16",A = D-40'-0; C = E-40'-0 (field splice 40'-0 each side of pier) ok,PDF p.34,RASTER

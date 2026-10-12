@@ -1,0 +1,8 @@
+point,station_CRL_I235NB,N_ft,E_ft,elev_ft,skew_to_tangent,source,tag
+"Abut 1 WP (front face backwall, CRL)",300+27.82,193004.71,2113206.89,1131.06 (profile at begin bridge); seat at CRL 1124.18,"78 deg 17'58.44""",PDF p.16 / F3-6; p.11 / F3-1,TEXT/RASTER
+Pier 1 WP (CL pier x CRL),301+63.52,193138.86,2113227.23,1131.24 profile; pier cap WP elev 1125.32,"80 deg 24'02.9""","PDF p.16, p.26",TEXT/RASTER
+"Abut 2 WP (front face backwall, CRL)",302+93.98,193268.47,2113242.14,1130.74 profile; seat at CRL 1125.13,"82 deg 25'16.11""",PDF p.16,TEXT/RASTER
+Begin approach slab,299+97.81,,,,,PDF p.11,RASTER
+End approach slab,303+36.99,,,,,PDF p.11,RASTER
+BM #08,,192243.09,2113053.52,1111.1,,PDF p.11,RASTER
+BM #06,,193276.13,2113178.7,1125.73,,PDF p.11,RASTER

@@ -1,0 +1,159 @@
+bridge_part,mark,size,qty,form,length,length_ft,remarks,calc_weight_lb,source,tag
+pier 1,BH1,#11,10,BNT,"101'-7""",101.583,"14'-6"" LAP",5397,PDF p.26 / F3-16,RASTER
+pier 1,BH2A,#11,10,BNT,"24'-2""",24.167,,1284,PDF p.26 / F3-16,RASTER
+pier 1,BH2B,#11,20,BNT,"26'-5""",26.417,,2807,PDF p.26 / F3-16,RASTER
+pier 1,BH2C,#11,10,BNT,"24'-2""",24.167,,1284,PDF p.26 / F3-16,RASTER
+pier 1,BH3,#6,2,STR,"90'-5""",90.417,"5'-5"" LAP",272,PDF p.26 / F3-16,RASTER
+pier 1,BH4,#6,6,STR,"90'-6""",90.500,"5'-5"" LAP",816,PDF p.26 / F3-16,RASTER
+pier 1,BH5,#6,24,STR,"12'-6""",12.500,"avg; 6'-6"" to 18'-5""",451,PDF p.26 / F3-16,RASTER
+pier 1,BV1A,#10,46,STR,"18'-7""",18.583,,3678,PDF p.26 / F3-16,RASTER
+pier 1,BV1B,#10,46,STR,"19'-7""",19.583,,3876,PDF p.26 / F3-16,RASTER
+pier 1,BV1C,#10,46,STR,"20'-7""",20.583,,4074,PDF p.26 / F3-16,RASTER
+pier 1,BV1D,#10,46,STR,"21'-7""",21.583,,4272,PDF p.26 / F3-16,RASTER
+pier 1,BV2,#10,184,BNT,"15'-9""",15.750,,12470,PDF p.26 / F3-16,RASTER
+pier 1,CD2,#7,140,STR,"6'-6""",6.500,,1860,PDF p.26 / F3-16,RASTER
+pier 1,CE1,#5,5,BNT,"8'-3""",8.250,,43,PDF p.26 / F3-16,RASTER
+pier 1,CE2,#5,5,BNT,"8'-7""",8.583,,45,PDF p.26 / F3-16,RASTER
+pier 1,CH1,#5,10,BNT,"8'-7""",8.583,,90,PDF p.26 / F3-16,RASTER
+pier 1,CH2,#5,16,BNT,"8'-7""",8.583,,143,PDF p.26 / F3-16,RASTER
+pier 1,CR1,#7,60,STR,"13'-10""",13.833,,1697,PDF p.26 / F3-16,RASTER
+pier 1,CR2,#7,20,STR,"31'-10""",31.833,,1301,PDF p.26 / F3-16,RASTER
+pier 1,F1,#11,56,STR,"8'-8""",8.667,,2579,PDF p.26 / F3-16,RASTER
+pier 1,F2,#6,32,STR,"8'-8""",8.667,,417,PDF p.26 / F3-16,RASTER
+pier 1,FS1,#5,24,BNT,"20'-11""",20.917,,524,PDF p.26 / F3-16,RASTER
+pier 1,P1,#5,54,BNT,"8'-5""",8.417,,474,PDF p.26 / F3-16,RASTER
+pier 1,P2,#5,54,BNT,"8'-8""",8.667,,488,PDF p.26 / F3-16,RASTER
+pier 1,S1,#5,28,BNT,"18'-0""",18.000,"avg; 16'-1"" to 19'-11""",526,PDF p.26 / F3-16,RASTER
+pier 1,S2,#5,180,BNT,"17'-10""",17.833,"avg; 15'-9"" to 19'-11""",3348,PDF p.26 / F3-16,RASTER
+pier 1,S3,#5,26,BNT,"18'-2""",18.167,"avg; 16'-5"" to 19'-11""",493,PDF p.26 / F3-16,RASTER
+pier 1,S4,#5,2,BNT,"15'-3""",15.250,,32,PDF p.26 / F3-16,RASTER
+pier 1,S5,#6,115,BNT,"20'-0""",20.000,,3455,PDF p.26 / F3-16,RASTER
+pier 1,T1,#5,70,BNT,"21'-2""",21.167,,1545,PDF p.26 / F3-16,RASTER
+pier 1,T2,#5,140,BNT,"7'-10""",7.833,,1144,PDF p.26 / F3-16,RASTER
+pier 1,T3,#5,420,BNT,"4'-7""",4.583,,2008,PDF p.26 / F3-16,RASTER
+pier 1 drilled shaft,DS1,#11,96,BNT,"32'-1""",32.083,,16364,PDF p.26 / F3-16,RASTER
+pier 1 drilled shaft,DT1,W20,4,BNT,"674'-11""",674.917,"3'-8"" LAP",,PDF p.26 / F3-16,RASTER
+abutment 1 south,BH1,#4,2,BNT,"81'-11""",81.917,"(1-2'-6"" lap)",109,PDF p.20 / F3-10,RASTER
+abutment 1 south,BH2,#4,6,BNT,"37'-6""",37.500,"avg; 18'-10"" to 56'-2""",150,PDF p.20 / F3-10,RASTER
+abutment 1 south,BH3,#4,2,BNT,"77'-4""",77.333,"(1-2'-6"" lap)",103,PDF p.20 / F3-10,RASTER
+abutment 1 south,BH4,#4,10,BNT,"81'-10""",81.833,"(1-2'-6"" lap)",547,PDF p.20 / F3-10,RASTER
+abutment 1 south,BH5,#6,6,BNT,"22'-10""",22.833,"avg; 22'-5"" to 23'-3""",206,PDF p.20 / F3-10,RASTER
+abutment 1 south,BH6,#4,4,BNT,"56'-4""",56.333,,151,PDF p.20 / F3-10,RASTER
+abutment 1 south,BH7,#5,2,BNT,"22'-10""",22.833,"avg; 22'-5"" to 23'-3""",48,PDF p.20 / F3-10,RASTER
+abutment 1 south,BH8,#5,2,BNT,"22'-5""",22.417,"avg; 22'-0"" to 22'-10""",47,PDF p.20 / F3-10,RASTER
+abutment 1 south,BH9,#6,6,STR,"33'-1""",33.083,,298,PDF p.20 / F3-10,RASTER
+abutment 1 south,BH10,#4,8,BNT,"29'-0""",29.000,,155,PDF p.20 / F3-10,RASTER
+abutment 1 south,BH11,#5,2,BNT,"50'-2""",50.167,"avg; 49'-9"" to 50'-7""",105,PDF p.20 / F3-10,RASTER
+abutment 1 south,BH12,#5,2,BNT,"49'-9""",49.750,"avg; 49'-4"" to 50'-2""",104,PDF p.20 / F3-10,RASTER
+abutment 1 south,BH13,#6,6,BNT,"34'-6""",34.500,"avg; 34'-1"" to 34'-10""",311,PDF p.20 / F3-10,RASTER
+abutment 1 south,BH14,#5,8,BNT,"82'-5""",82.417,"(1-3'-1"" lap)",688,PDF p.20 / F3-10,RASTER
+abutment 1 south,BH15,#6,6,BNT,"83'-1""",83.083,"(1-3'-9"" lap)",749,PDF p.20 / F3-10,RASTER
+abutment 1 south,BH16,#4,51,BNT,"5'-1""",5.083,,173,PDF p.20 / F3-10,RASTER
+abutment 1 south,BL1,#4,12,BNT,"9'-1""",9.083,,73,PDF p.20 / F3-10,RASTER
+abutment 1 south,BL2,#4,6,BNT,"7'-10""",7.833,,31,PDF p.20 / F3-10,RASTER
+abutment 1 south,BL3,#4,6,BNT,"6'-7""",6.583,,26,PDF p.20 / F3-10,RASTER
+abutment 1 south,BV1,#5,136,STR,"13'-0""",13.000,"avg; 11'-2"" to 14'-10""",1844,PDF p.20 / F3-10,RASTER
+abutment 1 south,P1,#4,54,BNT,"7'-6""",7.500,,271,PDF p.20 / F3-10,RASTER
+abutment 1 south,P2,#4,36,BNT,"9'-6""",9.500,,228,PDF p.20 / F3-10,RASTER
+abutment 1 south,S1,#5,24,BNT,"23'-1""",23.083,,578,PDF p.20 / F3-10,RASTER
+abutment 1 south,S2,#5,27,BNT,"20'-7""",20.583,,580,PDF p.20 / F3-10,RASTER
+abutment 1 south,S3,#5,30,BNT,"18'-1""",18.083,,566,PDF p.20 / F3-10,RASTER
+abutment 1 south,WC1,#5,2,BNT,"4'-0""",4.000,,8,PDF p.20 / F3-10,RASTER
+abutment 1 south,WC2,#5,2,BNT,"4'-0""",4.000,,8,PDF p.20 / F3-10,RASTER
+abutment 1 south,WC3,#5,2,BNT,"4'-0""",4.000,,8,PDF p.20 / F3-10,RASTER
+abutment 1 south,WC4,#5,2,BNT,"4'-0""",4.000,,8,PDF p.20 / F3-10,RASTER
+abutment 1 south,WH1,#6,26,STR,"26'-0""",26.000,"avg; 25'-4"" to 26'-7""",1015,PDF p.20 / F3-10,RASTER
+abutment 1 south,WH2,#6,24,STR,"13'-3""",13.250,"avg; 5'-6"" to 21'-0""",478,PDF p.20 / F3-10,RASTER
+abutment 1 south,WH3,#5,2,BNT,"6'-9""",6.750,,14,PDF p.20 / F3-10,RASTER
+abutment 1 south,WH4,#5,2,BNT,"20'-11""",20.917,,44,PDF p.20 / F3-10,RASTER
+abutment 1 south,WH5,#6,26,STR,"36'-7""",36.583,"avg; 36'-1"" to 37'-1""",1429,PDF p.20 / F3-10,RASTER
+abutment 1 south,WH6,#6,40,STR,"18'-8""",18.667,"avg; 5'-6"" to 31'-10""",1121,PDF p.20 / F3-10,RASTER
+abutment 1 south,WH7,#5,2,BNT,"6'-9""",6.750,,14,PDF p.20 / F3-10,RASTER
+abutment 1 south,WH8,#5,2,BNT,"32'-1""",32.083,,67,PDF p.20 / F3-10,RASTER
+abutment 1 south,WP1,#4,9,BNT,"8'-8""",8.667,,52,PDF p.20 / F3-10,RASTER
+abutment 1 south,WP2,#4,8,STR,"1'-7""",1.583,,8,PDF p.20 / F3-10,RASTER
+abutment 1 south,WP3,#4,4,STR,"1'-6""",1.500,"avg; 1'-0"" to 2'-0""",4,PDF p.20 / F3-10,RASTER
+abutment 1 south,WT1,#5,50,BNT,"5'-10""",5.833,,304,PDF p.20 / F3-10,RASTER
+abutment 1 south,WT2,#5,50,BNT,"5'-2""",5.167,,269,PDF p.20 / F3-10,RASTER
+abutment 1 south,WV1,#4,8,STR,"5'-7""",5.583,,30,PDF p.20 / F3-10,RASTER
+abutment 1 south,WV2,#4,32,STR,"8'-10""",8.833,"avg; 5'-11"" to 11'-8""",189,PDF p.20 / F3-10,RASTER
+abutment 1 south,WV3,#4,12,STR,"12'-0""",12.000,,96,PDF p.20 / F3-10,RASTER
+abutment 1 south,WV4,#4,2,STR,"4'-0""",4.000,,5,PDF p.20 / F3-10,RASTER
+abutment 1 south,WV5,#4,2,STR,"8'-0""",8.000,,11,PDF p.20 / F3-10,RASTER
+abutment 1 south,WV6,#5,2,STR,"12'-4""",12.333,,26,PDF p.20 / F3-10,RASTER
+abutment 1 south,WV7,#4,8,STR,"5'-7""",5.583,,30,PDF p.20 / F3-10,RASTER
+abutment 1 south,WV8,#4,54,STR,"10'-9""",10.750,"avg; 5'-11"" to 15'-7""",388,PDF p.20 / F3-10,RASTER
+abutment 1 south,WV9,#4,12,STR,"15'-11""",15.917,,128,PDF p.20 / F3-10,RASTER
+abutment 1 south,WV10,#4,2,STR,"5'-3""",5.250,,7,PDF p.20 / F3-10,RASTER
+abutment 1 south,WV11,#4,2,STR,"10'-7""",10.583,,14,PDF p.20 / F3-10,RASTER
+abutment 1 south,WV12,#5,2,STR,"16'-2""",16.167,,34,PDF p.20 / F3-10,RASTER
+abutment 2 north,BH1,#4,2,BNT,"81'-10""",81.833,"1-2'-6"" lap",109,PDF p.24 / F3-14,RASTER
+abutment 2 north,BH2,#4,6,BNT,"38'-0""",38.000,"avg; 18'-9"" to 57'-2""",152,PDF p.24 / F3-14,RASTER
+abutment 2 north,BH3,#4,2,BNT,"78'-11""",78.917,"1-2'-6"" lap",105,PDF p.24 / F3-14,RASTER
+abutment 2 north,BH4,#4,10,BNT,"81'-9""",81.750,"1-2'-6"" lap",546,PDF p.24 / F3-14,RASTER
+abutment 2 north,BH5,#6,6,BNT,"23'-3""",23.250,"avg; 22'-11"" to 23'-7""",210,PDF p.24 / F3-14,RASTER
+abutment 2 north,BH6,#4,4,BNT,"55'-3""",55.250,,148,PDF p.24 / F3-14,RASTER
+abutment 2 north,BH7,#5,2,BNT,"23'-3""",23.250,"avg; 22'-11"" to 23'-7""",48,PDF p.24 / F3-14,RASTER
+abutment 2 north,BH8,#5,2,BNT,"22'-10""",22.833,"avg; 22'-6"" to 23'-2""",48,PDF p.24 / F3-14,RASTER
+abutment 2 north,BH9,#6,6,STR,"32'-2""",32.167,,290,PDF p.24 / F3-14,RASTER
+abutment 2 north,BH10,#4,4,BNT,"27'-11""",27.917,,75,PDF p.24 / F3-14,RASTER
+abutment 2 north,BH11,#5,2,BNT,"50'-7""",50.583,"avg; 50'-3"" to 50'-11""",106,PDF p.24 / F3-14,RASTER
+abutment 2 north,BH12,#6,6,BNT,"34'-6""",34.500,"avg; 34'-3"" to 34'-9""",311,PDF p.24 / F3-14,RASTER
+abutment 2 north,BH13,#5,2,BNT,"50'-2""",50.167,"avg; 49'-10"" to 50'-6""",105,PDF p.24 / F3-14,RASTER
+abutment 2 north,BH14,#5,8,BNT,"82'-3""",82.250,"avg; 82'-2"" to 82'-4"" 1-3'-1"" lap",686,PDF p.24 / F3-14,RASTER
+abutment 2 north,BH15,#7,6,BNT,"82'-11""",82.917,"avg; 82'-10"" to 83'-0"" 1-3'-9"" lap",1017,PDF p.24 / F3-14,RASTER
+abutment 2 north,BH16,#4,51,BNT,"5'-1""",5.083,,173,PDF p.24 / F3-14,RASTER
+abutment 2 north,BL1,#4,6,BNT,"5'-10""",5.833,,23,PDF p.24 / F3-14,RASTER
+abutment 2 north,BL2,#4,6,BNT,"7'-1""",7.083,,28,PDF p.24 / F3-14,RASTER
+abutment 2 north,BL3,#4,12,BNT,"8'-4""",8.333,,67,PDF p.24 / F3-14,RASTER
+abutment 2 north,BV1,#5,164,STR,"12'-3""",12.250,"avg; 10'-5"" to 14'-1""",2095,PDF p.24 / F3-14,RASTER
+abutment 2 north,P1,#4,54,BNT,"7'-6""",7.500,,271,PDF p.24 / F3-14,RASTER
+abutment 2 north,P2,#4,36,BNT,"9'-6""",9.500,,228,PDF p.24 / F3-14,RASTER
+abutment 2 north,S1,#5,30,BNT,"16'-7""",16.583,,519,PDF p.24 / F3-14,RASTER
+abutment 2 north,S2,#5,28,BNT,"19'-1""",19.083,,557,PDF p.24 / F3-14,RASTER
+abutment 2 north,S3,#5,24,BNT,"21'-7""",21.583,,540,PDF p.24 / F3-14,RASTER
+abutment 2 north,WC1,#5,2,BNT,"4'-0""",4.000,,8,PDF p.24 / F3-14,RASTER
+abutment 2 north,WC2,#5,2,BNT,"4'-0""",4.000,,8,PDF p.24 / F3-14,RASTER
+abutment 2 north,WC3,#5,2,BNT,"4'-0""",4.000,,8,PDF p.24 / F3-14,RASTER
+abutment 2 north,WC4,#5,2,BNT,"4'-0""",4.000,,8,PDF p.24 / F3-14,RASTER
+abutment 2 north,WH1,#6,26,STR,"26'-11""",26.917,"avg; 26'-3"" to 27'-7""",1051,PDF p.24 / F3-14,RASTER
+abutment 2 north,WH2,#6,22,STR,"13'-9""",13.750,"avg; 5'-9"" to 21'-8""",454,PDF p.24 / F3-14,RASTER
+abutment 2 north,WH3,#5,2,BNT,"6'-9""",6.750,,14,PDF p.24 / F3-14,RASTER
+abutment 2 north,WH4,#5,2,BNT,"21'-8""",21.667,,45,PDF p.24 / F3-14,RASTER
+abutment 2 north,WH5,#6,26,STR,"40'-1""",40.083,"avg; 39'-6"" to 40'-7""",1565,PDF p.24 / F3-14,RASTER
+abutment 2 north,WH6,#6,36,STR,"20'-4""",20.333,"avg; 5'-9"" to 34'-11""",1099,PDF p.24 / F3-14,RASTER
+abutment 2 north,WH7,#5,2,BNT,"6'-9""",6.750,,14,PDF p.24 / F3-14,RASTER
+abutment 2 north,WH8,#5,2,BNT,"35'-1""",35.083,,73,PDF p.24 / F3-14,RASTER
+abutment 2 north,WP1,#4,9,BNT,"8'-8""",8.667,,52,PDF p.24 / F3-14,RASTER
+abutment 2 north,WP2,#4,8,STR,"1'-7""",1.583,,8,PDF p.24 / F3-14,RASTER
+abutment 2 north,WP3,#4,4,STR,"1'-7""",1.583,"avg; 1'-2"" to 1'-11""",4,PDF p.24 / F3-14,RASTER
+abutment 2 north,WT1,#5,47,BNT,"5'-10""",5.833,,286,PDF p.24 / F3-14,RASTER
+abutment 2 north,WT2,#5,47,BNT,"5'-2""",5.167,,253,PDF p.24 / F3-14,RASTER
+abutment 2 north,WV1,#4,8,STR,"5'-7""",5.583,,30,PDF p.24 / F3-14,RASTER
+abutment 2 north,WV2,#4,34,STR,"8'-7""",8.583,"avg; 5'-11"" to 11'-2""",195,PDF p.24 / F3-14,RASTER
+abutment 2 north,WV3,#4,12,STR,"11'-6""",11.500,,92,PDF p.24 / F3-14,RASTER
+abutment 2 north,WV4,#4,2,STR,"3'-10""",3.833,,5,PDF p.24 / F3-14,RASTER
+abutment 2 north,WV5,#4,2,STR,"7'-8""",7.667,,10,PDF p.24 / F3-14,RASTER
+abutment 2 north,WV6,#5,2,STR,"11'-10""",11.833,,25,PDF p.24 / F3-14,RASTER
+abutment 2 north,WV7,#4,8,STR,"5'-7""",5.583,,30,PDF p.24 / F3-14,RASTER
+abutment 2 north,WV8,#4,60,STR,"10'-4""",10.333,"avg; 5'-10"" to 14'-10""",414,PDF p.24 / F3-14,RASTER
+abutment 2 north,WV9,#4,12,STR,"15'-2""",15.167,,122,PDF p.24 / F3-14,RASTER
+abutment 2 north,WV10,#4,2,STR,"5'-1""",5.083,,7,PDF p.24 / F3-14,RASTER
+abutment 2 north,WV11,#4,2,STR,"10'-1""",10.083,,13,PDF p.24 / F3-14,RASTER
+abutment 2 north,WV12,#5,2,STR,"15'-5""",15.417,,32,PDF p.24 / F3-14,RASTER
+superstructure deck+parapet,A1,#5,508,STR,"80'-11""",80.917,"avg; 80'-8"" to 81'-2""; incl 1-3'-0"" lap",42873,PDF p.31 / F3-21,RASTER
+superstructure deck+parapet,A2,#5,4,STR,"70'-2""",70.167,"avg; 67'-4"" to 72'-11""; incl 1-3'-0"" lap",293,PDF p.31 / F3-21,RASTER
+superstructure deck+parapet,A3,#5,20,STR,"33'-4""",33.333,"avg; 7'-11"" to 58'-8""",695,PDF p.31 / F3-21,RASTER
+superstructure deck+parapet,A4,#5,6,BNT,"5'-10""",5.833,"avg; 2'-11"" to 8'-8""",37,PDF p.31 / F3-21,RASTER
+superstructure deck+parapet,A5,#5,4,STR,"70'-11""",70.917,"avg; 68'-0"" to 73'-9""; incl 1-3'-0"" lap",296,PDF p.31 / F3-21,RASTER
+superstructure deck+parapet,A6,#5,20,STR,"33'-5""",33.417,"avg; 7'-7"" to 59'-3""",697,PDF p.31 / F3-21,RASTER
+superstructure deck+parapet,A7,#5,6,BNT,"5'-5""",5.417,"avg; 2'-7"" to 8'-2""",34,PDF p.31 / F3-21,RASTER
+superstructure deck+parapet,AC,#6,1062,BNT,"10'-4""",10.333,,16483,PDF p.31 / F3-21,RASTER
+superstructure deck+parapet,AD1,#5,2,BNT,"82'-1""",82.083,"; incl 1-3'-0"" lap",171,PDF p.31 / F3-21,RASTER
+superstructure deck+parapet,AD2,#5,2,BNT,"81'-11""",81.917,"; incl 1-3'-0"" lap",171,PDF p.31 / F3-21,RASTER
+superstructure deck+parapet,E1,#5,152,STR,"277'-6""",277.500,"avg; 277'-5"" to 277'-6""; incl 4-3'-0"" laps",43994,PDF p.31 / F3-21,RASTER
+superstructure deck+parapet,E2,#7,79,STR,"90'-0""",90.000,"; incl 1-3'-0"" lap",14533,PDF p.31 / F3-21,RASTER
+superstructure deck+parapet,E3,#5,4,STR,"277'-6""",277.500,"; incl 4-3'-0"" laps",1158,PDF p.31 / F3-21,RASTER
+superstructure deck+parapet,E4,#5,4,STR,"277'-6""",277.500,"; incl 4-3'-0"" laps",1158,PDF p.31 / F3-21,RASTER
+superstructure deck+parapet,FS2,#5,533,BNT,"7'-4""",7.333,PARAPET (bend detail ODOT std FSHP-42-2),4077,PDF p.31 / F3-21,RASTER
+superstructure deck+parapet,UD,#5,158,BNT,"5'-8""",5.667,,934,PDF p.31 / F3-21,RASTER

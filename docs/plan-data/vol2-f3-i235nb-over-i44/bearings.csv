@@ -1,0 +1,4 @@
+location,type,A_bevel_slope_pct,anchor_plate,contact_angle,pad_C_width_in,pad_D_length_in,n_interior_layers,interior_layer_ht_in,n_laminates_1/8,exterior_layer_ht_in,total_pad_ht_J_in,source,tag
+Abut. no. 1,EXP.,0.4,"1 1/2x10x2'-3""","L8x8x1x1'-0""",20,9 1/2,7,3/8,8,1/4,4 1/8,PDF p.37 / F3-27,RASTER
+Pier no. 1,FIX,0.2,"1 1/2x14 1/2x2'-5 1/2""","L8x8x1x1'-4 1/2""",26,14,7,3/8,8,1/4,4 1/8,PDF p.37 / F3-27,RASTER
+Abut. no. 2,EXP.,0.7,"1 1/2x10x2'-3""","L8x8x1x1'-0""",20,9 1/2,7,3/8,8,1/4,4 1/8,PDF p.37 / F3-27,RASTER
