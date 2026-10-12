@@ -229,8 +229,8 @@ public static class SheetSet
                     unit.Type == SupportType.Pier
                         ? new[]
                         {
-                            new Panel(new ViewSpec(unit.Name, s => BentViews.Bent(WithScale(ctx, s), unit, withSection: false), ScaleFamily.Architectural), 0, 0, W * 0.68, H),
-                            new Panel(new ViewSpec(unit.Name + " section A-A", s => BentViews.CapSectionView(WithScale(ctx, s), unit), ScaleFamily.Architectural), W * 0.68, 0, W, H),
+                            new Panel(new ViewSpec(unit.Name, s => BentViews.Bent(WithScale(ctx, s), unit, withSection: false), ScaleFamily.Architectural), 0, 0, W * 0.74, H),
+                            new Panel(new ViewSpec(unit.Name + " section A-A", s => BentViews.CapSectionView(WithScale(ctx, s), unit), ScaleFamily.Architectural), W * 0.74, 0, W, H),
                         }
                         : new[] { Full(new ViewSpec(unit.Name, s => BentViews.Bent(WithScale(ctx, s), unit), ScaleFamily.Architectural)) }));
 

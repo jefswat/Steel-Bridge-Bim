@@ -149,7 +149,7 @@ public static class AbutmentViews
         dS.ElevationTag(new Vec2(X(g.XBwFront), cj), $"C.J. EL {dS.Elev(cj)}", right: true);
         string tallName = tall == null ? "" : tall.Tag;
         if (tall != null) dS.Text($"{tallName} STEP TOP EL {dS.Elev(tall.TopZ)}", new Vec2(X(g.XStepFront) + dS.Paper(0.15), tall.TopZ), dS.SmallTextH, 0, TextAlign.Left);
-        dS.Title("SECTION THROUGH ABUTMENT", $"Normal to the support line{(tall != null ? $" at {tallName} (tallest beam step)" : $" at STA {u.FormatStation(unit.Station)}")}; span side to the right · Scale {DrawingOptions.ScaleText(dS.Scale, u)}",
+        dS.Title("SECTION THROUGH ABUTMENT", $"Normal to the line{(tall != null ? $" at {tallName} (tallest step)" : "")}; span side right · Scale {DrawingOptions.ScaleText(dS.Scale, u)}",
             new Vec2(X((xB + xF) / 2), zb - dS.Paper(2.0)));
 
         // ================= piling / wing layout plan (S along the line, N across it, true plan shape)

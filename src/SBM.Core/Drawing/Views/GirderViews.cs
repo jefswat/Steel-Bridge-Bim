@@ -49,7 +49,7 @@ public static class GirderViews
         var web = Runs(GirderPlate.Web);
         // Plate labels in rows: a label that does not fit beside its neighbours goes to the next row with a leader (pier zones have
         // short plates at 1" = 100'); everything above / below the plate labels moves out by the rows used.
-        const double RowIn = 0.15;
+        const double RowIn = 0.12;
         int[] Rows(List<(double c, string text)> labels)
         {
             var rows = new int[labels.Count];
@@ -66,8 +66,9 @@ public static class GirderViews
             }
             return rows;
         }
-        var topLabels = top.Select(x => ((x.s0 + x.s1) / 2, $"TOP FL {Pl(x.seg)}")).ToList();
-        var botLabels = bot.Select(x => ((x.s0 + x.s1) / 2, $"BOT FL {Pl(x.seg)}")).ToList();
+        // Plate sizes only ("PL 18" x 7/8""): above the girder = top flange, below = bottom flange (title note); short labels need fewer rows.
+        var topLabels = top.Select(x => ((x.s0 + x.s1) / 2, Pl(x.seg))).ToList();
+        var botLabels = bot.Select(x => ((x.s0 + x.s1) / 2, Pl(x.seg))).ToList();
         var topRows = Rows(topLabels);
         var botRows = Rows(botLabels);
         double topShift = RowIn * (topRows.DefaultIfEmpty(0).Max()), botShift = RowIn * (botRows.DefaultIfEmpty(0).Max());
@@ -165,7 +166,7 @@ public static class GirderViews
         d.Dim(new Vec2(0, H + d.Paper(1.25 + topShift)), new Vec2(L, H + d.Paper(1.25 + topShift)), 0, $"{d.Len(L)} {ctx.GirderName(gi)} (END TO END, ALONG WEB CL)");
 
         var box = dwg.Extents();
-        d.Title($"{ctx.GirderTitle(gi)} ELEVATION" + (ctx.GirderName(gi) != g.Name ? $" ({g.Name})" : ""), "Developed along the web CL; depth not to scale. Plate changes at radial lines; stiffeners: solid = bearing, dashed = connection / intermediate.",
+        d.Title($"{ctx.GirderTitle(gi)} ELEVATION" + (ctx.GirderName(gi) != g.Name ? $" ({g.Name})" : ""), "Developed along the web CL; depth not to scale. Plates above the girder = top flange, below = bottom flange; stiffeners: solid = bearing, dashed = connection / intermediate.",
             new Vec2(L / 2, box.MinY - d.Paper(0.3)));
         return new SheetView($"{ctx.GirderName(gi)} elevation", $"Girder {g.Name}", dwg, d.Scale, $"{ctx.GirderName(gi)}: plate sizes and lengths, field sections, bearings, stiffeners, cross frames.");
     }

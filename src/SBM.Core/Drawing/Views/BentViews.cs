@@ -383,13 +383,14 @@ public static class BentViews
                 label.Add($"{marks[mk].Size.Name} BARS {mk}{PlanMark(marks[mk], unit.Name)}");
             if (label.Count == 0) label.Add("NO CAP BARS CROSS THIS SECTION IN THE MODEL");
             for (int i = 0; i < label.Count; i++)
-                d.Text(label[i], new Vec2(X(unit.CapN1) + d.Paper(0.3), zt - d.Paper(0.15) - i * d.TextH * 1.6), d.TextH, 0, TextAlign.Left);
-            legendBottom = zt - d.Paper(0.15) - label.Count * d.TextH * 1.6;
+                d.Text(label[i], new Vec2(X(unit.CapN0), zb - d.Paper(1.35) - i * d.TextH * 1.6), d.TextH, 0, TextAlign.Left);   // legend under the section (narrow panel)
+            legendBottom = zb - d.Paper(1.35) - label.Count * d.TextH * 1.6;
         }
         d.Dim(new Vec2(X(unit.CapN0), zb), new Vec2(X(unit.CapN1), zb), -0.35, d.Short(w));
         d.Dim(new Vec2(X(unit.CapN0), zb), new Vec2(X(unit.CapN0), zt), 0.35, d.Short(zt - zb));
-        string at = Math.Abs(sCut) < In(1) ? "at the CL alignment" : $"{d.Len(Math.Abs(sCut))} {(sCut < 0 ? "left" : "right")} of the CL alignment";
-        d.Title("SECTION A–A", $"Through the cap {at} · Scale {DrawingOptions.ScaleText(d.Scale, ctx.Units)}",
+        int colIx = unit.Columns.OrderBy(c => c.S).ToList().FindIndex(c => Math.Abs(c.S - sCut) < 1e-6);
+        string at = colIx >= 0 ? $"at column {colIx + 1}" : Math.Abs(sCut) < In(1) ? "at the CL alignment" : $"{d.Len(Math.Abs(sCut))} {(sCut < 0 ? "left" : "right")} of CL";
+        d.Title("SECTION A–A", $"Through the cap {at}\nScale {DrawingOptions.ScaleText(d.Scale, ctx.Units)}",
             new Vec2(X((unit.CapN0 + unit.CapN1) / 2), Math.Min(zb - d.Paper(1.6), legendBottom - d.Paper(0.4))));
     }
 
