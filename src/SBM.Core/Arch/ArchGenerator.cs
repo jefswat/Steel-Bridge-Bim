@@ -470,9 +470,11 @@ public static partial class ArchGenerator
                     if (P(sn) is not { } sp) continue;
                     double thc = Theta(sp);
                     Vec3 Dir(double th) => c * Math.Cos(th) + up * Math.Sin(th);
-                    // u = arc length along the WP circle from the joint (toward the chord end), w / t radial, binormal.
-                    Vec3 Fm(double u, double wr, double tb) => W(center + Dir(thc - u / r.Radius) * (r.Radius + wr) + binormal * tb);
-                    Vec3 Wm(double u, double vb, double tr) => W(center + Dir(thc - u / r.Radius) * (r.Radius + tr) + binormal * vb);
+                    // Splice plates are flat in the plane tangent to the rib at the joint (19 1/2" / 27 1/2" long on R 126'-0: <= 1/16" off the curve).
+                    // u along the tangent from the joint (toward the chord end), w / t radial, binormal.
+                    var radC = Dir(thc); var tanC = c * Math.Sin(thc) - up * Math.Cos(thc);
+                    Vec3 Fm(double u, double wr, double tb) => W(center + radC * (r.Radius + wr) + tanC * u + binormal * tb);
+                    Vec3 Wm(double u, double vb, double tr) => W(center + radC * (r.Radius + tr) + tanC * u + binormal * vb);
                     double h2 = w.Depth / 2;
                     var g = new SpliceGeo(Fm, new() { (h2, 1, w.FlangeThickness), (-h2, -1, w.FlangeThickness) }, Wm, w.WebThickness, h2 - w.FlangeThickness, -h2 + w.FlangeThickness);
                     string sm = $"{asm}-{sn}".ToUpperInvariant().Replace("'", "P");
@@ -667,10 +669,12 @@ public static partial class ArchGenerator
             if (sg < 0) { up = up.Select(qq => new Vec2(-qq.X, qq.Y)).Reverse().ToList(); }
             var nUp = Vec3.Cross(t3, v3).Normalized();
             Vec3 UpperMap(double u, double v, double t) => W(bend0 + t3 * u + v3 * v + nUp * t);
-            PlateBuilder.AddPrism(m, up, new[] { new Hole(new Vec2(sPin, vPin), fs.PinHole) }, UpperMap, _ => -fs.TieThickness / 2, _ => fs.TieThickness / 2);
+            var mu = new Mesh();
+            PlateBuilder.AddPrism(mu, up, new[] { new Hole(new Vec2(sPin, vPin), fs.PinHole) }, UpperMap, _ => -fs.TieThickness / 2, _ => fs.TieThickness / 2);
             string asm = def.Name.ToUpperInvariant().Replace(' ', '-');
-            AddPart($"{asm}-FIN-{h.Name}", PartCategory.FinPlate, asm, $"PL {L(fs.TieThickness)} bent cable fin plate at tie, {h.Name} at {tf.Panel} (A {aModel:F2} deg)", m, fs.Material,
-                fs.TieDepthBelowBend + vPin + r);
+            // Bent plate as two solids (legs below / above the bend line) so each IFC body is closed.
+            AddPart($"{asm}-FIN-{h.Name}", PartCategory.FinPlate, asm, $"PL {L(fs.TieThickness)} bent cable fin plate at tie, {h.Name} at {tf.Panel}, lower leg (bolted)", m, fs.Material, fs.TieDepthBelowBend);
+            AddPart($"{asm}-FIN-{h.Name}-U", PartCategory.FinPlate, asm, $"PL {L(fs.TieThickness)} bent cable fin plate at tie, {h.Name} at {tf.Panel}, upper leg (A {aModel:F2} deg, pin)", mu, fs.Material, vPin + r);
             // Bolts through the fin and the tie web (head on the fin).
             double grip = fs.TieThickness + def.WebThickness;
             foreach (var hl in holes)
