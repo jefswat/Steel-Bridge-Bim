@@ -115,7 +115,7 @@ U("p16", "camber shape along the beam (U10)", "the sheet prints single camber / 
 G("Prestressed camber / variable stool: the beams are straight, stool 4 1/4\" constant (plan value at CL brg only); camber 7 3/8\" erection, residual 2 1/8\"/2 1/4\" (p16, U10) not modeled. Needs: prestressed camber in the haunch (GirderLayoutDefinition.Camber for prestressed).");
 // Deck reinforcing: the plan bar list (S401M-S404M..., p18/p19/p21) is not entered; the generic generator would invent bars -> off.
 b.Deck.Reinforcement.Enabled = false;
-G("Deck reinforcing: generic deck bars switched off; plan bars S401M-S404M etc. (p18, p19, p21; U4 line counts) need a DeckPlanReinforcement for this deck (data entry, no new feature).");
+// Deck reinforcing S401M..S404M: plan deck bars (DeckReinforcementDefinition.Plan) set by rebar-deck-br02069.csx (below); 84 + 84 + 137 + 137 = plan bill p21.
 
 // Barriers (p1, p2, p24): MnDOT Concrete Barrier 36" Type S, 1'-6" wide at the base, both edges.
 // GAP: only TxDOT SSTR / F-shape / single-slope profiles exist; Type S is modeled as the generic single slope (vertical back face,
@@ -195,7 +195,7 @@ G("Sole plate B303 (p16, p30; dims U6) not modeled. Needs: sole plate for prestr
 G("Mask wall details (p11 C-C / D-D): the 5\" x 5\" toe notch with 2\" Type B polystyrene, the 2\" x 1'-1\" coping and the 4\" step of the outer 7\" at the back end are not modeled (plain 1'-5 1/2\" x 6'-0\" panel; net about +0.07 CY). Needs: maskwall section details.");
 G("Stem construction-joint keyway 2\" x 12\" on the footing top (p11 A-A note 5) not modeled (volume-neutral).");
 G("Test piles: one test pile per abutment longer (S 105 vs 95 ft, N 100 vs 90 ft, back row, p4/p9) - one PileLength per abutment; contract lengths used. Needs: per-pile length.");
-G("Abutment reinforcing (bar-lists.csv A/B series, p6-p8, p12-p14; bend diagrams U3) not entered; the Iowa abutment rebar generator would invent placements -> substructure reinforcement off. Needs: plan bar data for a MnDOT abutment.");
+// Abutment reinforcing A / B series (p6-p8, p12-p14): plan bar sets, rebar-abutments-br02069.csx (below); the Iowa abutment rebar generator stays off.
 // U9 closed (SUMMARY sec. 4): mask wall at the W end only (p5 / p10, no mask wall at the E end, which ends flush at +36'-0" with keyways for the widening);
 //    the infill wall is only in the E 18'-5" (+17'-7" .. +36'-0"); under the superstructure the end diaphragm sits on the back ledge.
 U("p4, p9", "pile tip elevations (U8)", "the pile notes give only estimated lengths (95 / 90 ft, test piles 105 / 100 ft), no tip elevations", "Piles hang the contract length from the head.");
@@ -278,6 +278,9 @@ Doc.Project.Bridges.Add(b);
     var ar = await SBM.Api.ScriptHost.RunFileAsync(@"samples\plans\rebar-abutments-br02069.csx", Doc, Args);
     Print(ar.Output.TrimEnd());
     if (!ar.Success) Print("ERROR in rebar-abutments-br02069.csx: " + ar.Error);
+    var dk = await SBM.Api.ScriptHost.RunFileAsync(@"samples\plans\rebar-deck-br02069.csx", Doc, Args);
+    Print(dk.Output.TrimEnd());
+    if (!dk.Success) Print("ERROR in rebar-deck-br02069.csx: " + dk.Error);
     var dr2 = await SBM.Api.ScriptHost.RunFileAsync(@"samples\plans\rebar-diaphragms-br02069.csx", Doc, Args);
     Print(dr2.Output.TrimEnd());
     if (!dr2.Success) Print("ERROR in rebar-diaphragms-br02069.csx: " + dr2.Error);

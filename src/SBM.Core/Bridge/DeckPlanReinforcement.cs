@@ -49,6 +49,10 @@ public sealed class DeckTransverseZone
     public DeckBarSide FirstFrom { get; set; } = DeckBarSide.Right;
     /// <summary>Alternate lines start from the other edge (staggers the laps).</summary>
     public bool Alternate { get; set; }
+    /// <summary>OPTIONAL clear distance of this zone's bar ends from the deck edges (0 = the deck side cover), e.g. a bottom mat shorter than the top
+    /// one (Br. 02069 S404M 40'-3" vs S403M 40'-8" on a 41'-0" deck).</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    public double SideClear { get; set; }
     public DeckTransverseZone Clone()
     {
         var z = (DeckTransverseZone)MemberwiseClone();
@@ -106,6 +110,10 @@ public sealed class DeckLongZone
     public double Lap { get; set; }
     /// <summary>True = the last bar of a line is also a stock bar (lapped further) instead of a shorter closing bar.</summary>
     public bool LastIsStock { get; set; }
+    /// <summary>OPTIONAL staggered laps: every other line (odd index) is laid from the END of the track (stock bar at the end, closing bar at the
+    /// begin) - the plans' "(STAGGERED)" lines (Br. 02069 p18 / p19: S401M + S402M).</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    public bool AlternateEnds { get; set; }
     public DeckLongZone Clone()
     {
         var z = (DeckLongZone)MemberwiseClone();
