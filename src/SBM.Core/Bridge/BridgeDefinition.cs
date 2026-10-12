@@ -70,6 +70,10 @@ public sealed class SupportDefinition
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
     public ConcreteDiaphragmDefinition? Diaphragm { get; set; }
 
+    /// <summary>OPTIONAL dapped steel girder ends on this support line (expansion joints, <see cref="GirderEndDapDefinition"/>); null = square ends.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public GirderEndDapDefinition? GirderEndDap { get; set; }
+
     [System.Text.Json.Serialization.JsonIgnore]
     public SubstructureDefinition ResolvedSubstructure => Substructure ?? SubstructureDefinition.Default(Type);
 
@@ -82,6 +86,7 @@ public sealed class SupportDefinition
         c.GirderFixities = GirderFixities?.ToList();
         c.DeckEndPoints = DeckEndPoints?.Select(p => p.Clone()).ToList();
         c.Diaphragm = Diaphragm?.Clone();
+        c.GirderEndDap = GirderEndDap?.Clone();
         return c;
     }
 }

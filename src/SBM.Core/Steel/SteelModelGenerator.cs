@@ -37,6 +37,23 @@ public sealed partial class SteelModelGenerator
     private readonly Dictionary<int, List<(double s0, double s1, string mark)>> _sections = new();
     private readonly Dictionary<int, PlateProfile> _top = new(), _bot = new(), _web = new();
     private readonly Dictionary<int, GirderHoles> _holes = new();
+    /// <summary>Per girder: dapped ends (OPTIONAL SupportDefinition.GirderEndDap); empty = square ends.</summary>
+    private readonly Dictionary<int, List<GirderEndDap>> _daps = new();
+
+    /// <summary>Lowering of the top of web at path distance s of girder g by a dapped end (0 = none).</summary>
+    private double DapDrop(int g, double s)
+    {
+        if (!_daps.TryGetValue(g, out var l) || l.Count == 0) return 0;
+        double d = 0;
+        foreach (var x in l) d = Math.Max(d, x.Drop(s));
+        return d;
+    }
+    private double DapAngle(int g, double s)
+    {
+        if (!_daps.TryGetValue(g, out var l)) return 0;
+        foreach (var x in l) if (x.Drop(s) > 0) return x.Angle(s);
+        return 0;
+    }
     private readonly Dictionary<int, ConcurrentBag<(double s0, double s1)>> _studExclusions = new();
     private readonly ConcurrentDictionary<(int girder, long key), ConcurrentBag<(Vec3 c, double d)>> _stiffHoles = new();
 
@@ -98,6 +115,13 @@ public sealed partial class SteelModelGenerator
             _web[g.Index] = BuildProfile(g, GirderPlate.Web);
             _holes[g.Index] = new GirderHoles();
             _studExclusions[g.Index] = new ConcurrentBag<(double, double)>();
+            _daps[g.Index] = GirderEndDap.For(_def, _f, g, Warn);
+        }
+        foreach (var grp in _daps.Values.SelectMany(l => l).GroupBy(d => (d.SupportName, d.HasCope)))
+        {
+            var d0 = grp.First();
+            _diag.Enqueue(new Diagnostic(DiagnosticSeverity.Info, $"Girder end dap at {grp.Key.SupportName}: {grp.Count()} girder end(s), top flange dropped {In(d0.Def.FlangeDrop)} over {In(d0.Def.DropRun)} (R {In(d0.Def.BendRadius)}), lowered to {In(d0.Def.LowFlatFromBearing)} past the CL bearing"
+                + (grp.Key.HasCope ? $", web end cope {In(d0.Def.CopeInset)} ({In(d0.Def.CopeEdge)} tabs, {In(d0.Def.CopeRun)} transition, R {In(d0.Def.CopeRadius)})" : "") + (d0.Def.Source != "" ? $" ({d0.Def.Source})" : "") + "."));
         }
 
         // Phase 2: connections (register holes).
@@ -320,6 +344,14 @@ public sealed partial class SteelModelGenerator
         var botHoles = GirderHoles.Sorted(holes.Bottom);
         var webHoles = GirderHoles.Sorted(holes.Web);
         var breaks = path.S.Concat(top.Breaks).Concat(bot.Breaks).ToList();
+        var daps = _daps[g.Index];
+        var dapS = daps.SelectMany(x => x.Samples()).ToList();
+        var copeS = daps.SelectMany(x => x.CopeSamples()).ToList();
+        int gi = g.Index;
+        Func<double, double> drop = s => DapDrop(gi, s);
+        var topBreaks = daps.Count == 0 ? breaks : breaks.Concat(dapS).ToList();
+        var webBreaks = daps.Count == 0 ? (IEnumerable<double>)path.S : path.S.Concat(dapS).Concat(copeS).ToList();
+        var topPlateBreaks = daps.Count == 0 ? top.Breaks : top.Breaks.Concat(dapS).ToList();
 
         Func<double, double, double, Vec3> map = (s, r, z) => GirderPoint(path, s, r, z);
         Func<double, double, double, Vec3> webMap = (s, z, r) => GirderPoint(path, s, r, z);
@@ -334,7 +366,11 @@ public sealed partial class SteelModelGenerator
             {
                 var mesh = new Mesh();
                 var hs = topHoles.Where(h => h.Center.X > a && h.Center.X < b).ToList();
-                LongPlate(mesh, path, a, b, breaks, top.Breaks, s => -top.Width(s) / 2, s => top.Width(s) / 2, _ => 0, top.Thickness, hs, map, false, "girder flange");
+                if (daps.Count == 0)
+                    LongPlate(mesh, path, a, b, breaks, top.Breaks, s => -top.Width(s) / 2, s => top.Width(s) / 2, _ => 0, top.Thickness, hs, map, false, "girder flange");
+                else   // bent flange at a dapped end: underside on the dap profile, thickness kept normal to the plate
+                    LongPlate(mesh, path, a, b, topBreaks, topPlateBreaks, s => -top.Width(s) / 2, s => top.Width(s) / 2, s => -drop(s),
+                        s => -drop(s) + top.Thickness(s) / Math.Cos(DapAngle(gi, s)), hs, map, false, "girder flange");
                 _parts.Add(new SteelPart { Mark = $"{mark}-TF{n++}", Category = PartCategory.FlangePlate, Assembly = mark, Mesh = mesh,
                     Length = b - a, Description = Pl(seg.Width, seg.Thickness) });
             }
@@ -344,7 +380,30 @@ public sealed partial class SteelModelGenerator
                 var mesh = new Mesh();
                 var hs = webHoles.Where(h => h.Center.X > a && h.Center.X < b).ToList();
                 double tw = seg.Thickness;
-                LongPlate(mesh, path, a, b, path.S, Array.Empty<double>(), _ => -d, _ => 0, _ => -tw / 2, _ => tw / 2, hs, webMap, true, "girder web");
+                if (daps.Count == 0)
+                    LongPlate(mesh, path, a, b, path.S, Array.Empty<double>(), _ => -d, _ => 0, _ => -tw / 2, _ => tw / 2, hs, webMap, true, "girder web");
+                else
+                {
+                    // dapped end: web top follows the lowered flange; a cope zone keeps only the two end tabs
+                    var cuts = new List<(double a, double b, bool cope, GirderEndDap? dap)>();
+                    double m0 = a, m1 = b;
+                    foreach (var dp in daps.Where(x => x.HasCope))
+                    {
+                        var (c0, c1) = dp.CopeZone;
+                        double p0 = Math.Max(a, c0), p1 = Math.Min(b, c1);
+                        if (p1 > p0 + 1e-6) cuts.Add((p0, p1, true, dp));
+                        if (dp.AtStart) m0 = Math.Max(m0, c1); else m1 = Math.Min(m1, c0);
+                    }
+                    if (m1 > m0 + 1e-6)
+                        LongPlate(mesh, path, m0, m1, webBreaks, dapS, _ => -d, s => -drop(s), _ => -tw / 2, _ => tw / 2,
+                            hs.Where(h => h.Center.X > m0 && h.Center.X < m1).ToList(), webMap, true, "girder web");
+                    foreach (var (p0, p1, _, dp) in cuts)
+                    {
+                        var none = Array.Empty<Hole>();
+                        LongPlate(mesh, path, p0, p1, webBreaks, Array.Empty<double>(), s => -drop(s) - dp!.CopeDepth(s), s => -drop(s), _ => -tw / 2, _ => tw / 2, none, webMap, true, "girder web");
+                        LongPlate(mesh, path, p0, p1, webBreaks, Array.Empty<double>(), _ => -d, s => -d + dp!.CopeDepth(s), _ => -tw / 2, _ => tw / 2, none, webMap, true, "girder web");
+                    }
+                }
                 _parts.Add(new SteelPart { Mark = $"{mark}-W{n++}", Category = PartCategory.WebPlate, Assembly = mark, Mesh = mesh,
                     Length = b - a, Description = Pl(d, tw) });
             }
@@ -363,11 +422,12 @@ public sealed partial class SteelModelGenerator
             var welds = new Mesh();
             foreach (var (rs, zs) in new[] { (-1, 0), (1, 0), (-1, 1), (1, 1) })
             {
-                double z = zs == 0 ? 0 : -d;
                 double dz = zs == 0 ? -aw : aw;
-                SweepAlongGirder(welds, path, s0, s1, Array.Empty<double>(), s =>
+                bool topWeld = zs == 0;
+                SweepAlongGirder(welds, path, s0, s1, topWeld ? dapS : Array.Empty<double>(), s =>
                 {
                     double tw = web.Thickness(s) / 2;
+                    double z = topWeld ? -drop(s) : -d;
                     return new[] { new Vec2(rs * tw, z), new Vec2(rs * (tw + aw), z), new Vec2(rs * tw, z + dz) };
                 });
             }
@@ -425,6 +485,8 @@ public sealed partial class SteelModelGenerator
         double c = sd.CornerClip;
         bool weldBottom = s.Kind != StiffenerKind.Intermediate;
         double h = weldBottom ? d : d - sd.IntermediateBottomGap;
+        double dapDrop = DapDrop(s.Girder, s.GirderDistance);
+        if (dapDrop > 0) { p -= Up * dapDrop; h -= dapDrop; }   // dapped girder end: the stiffener stops under the lowered flange
         double w = s.Plate.Width, tp = s.Plate.Thickness;
 
         var u = new Vec3(s.Direction.X, s.Direction.Y, 0);
@@ -529,7 +591,7 @@ public sealed partial class SteelModelGenerator
                     coverWarned = true;
                     Warn($"{g.Name}: {In(len)} studs at {_u.FormatStation(sta)} leave less than {In(sd.MinCover)} cover; check haunch and slab.");
                 }
-                var origin = p + right * r + Up * tf;
+                var origin = p + right * r + Up * (tf - DapDrop(g.Index, s));   // dapped end: studs stand on the lowered flange (length as computed for the normal haunch)
                 _studs.Add(new StudInstance { Frame = new Frame3(origin, new Vec3(t.X, t.Y, 0), Vec3.Cross(Up, new Vec3(t.X, t.Y, 0)), Up), Length = len, Assembly = mark });
             }
         }

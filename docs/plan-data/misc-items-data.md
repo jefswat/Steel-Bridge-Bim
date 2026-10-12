@@ -103,6 +103,12 @@ base-plate nuts by others in a future contract. Elevation data: top of base 1026
 Unit 3 girder A section D-D (PDF 181) was revised: 5'-4 5/8 (was 5'-3 15/16) and 5'-9 1/2 (was 5'-8 1/4); angles 93d19'39" and 93d00'30" (old values struck; digits of the struck angles UNRESOLVED).
 UNRESOLVED: which datum the "1'-3 3/4 ... " vertical dims (elevation line to level line) refer to, beyond "top of base elevation to the level line at the post, W/E posts" (PDF 178/180); bolt lengths (not printed).
 
+2026-10-11 CORRECTION (PDF 178 Sections C-C / D-D / View J-J, PDF 181 revised D-D): Section D-D is a PLAN view - the bracket is a plate-girder cantilever
+from the exterior girder (W.P. on CL girder) OUTBOARD to the post: CL girder to CL post 6'-3 (W) / 6'-7 7/16 (E) girder A at 92d52'02" to the girder (TYP.), 6'-1 3/4 at 90d
+girder K, Unit 3 girder J 5'-0 3/8 at 89d49'28" (W) / 5'-0 1/4 at 90d (E); bracket ends 2'-3 beyond the CL post; the 8'-6 / 6'-4 "height" is the bracket web (= girder web);
+the J-J "elevation line to level line" dims (1'-3 3/4 etc.) run from the top of base down to the top of the bracket 1 7/8 x 26 top flange. Model: `PostOutboard`,
+`AngleToGirderDegrees`, `StubHeight` (signs-i80.csx).
+
 ### b2. Exit sign support bases (PDF 183 = design 176; Ramp A gore at Pier 6A / 5WB and Ramp G gore at Pier 11WB)
 - Locations: north barrier at the gore, bracket on the north exterior girder ("GIRDER A OR F" on sheet 104 label; U2 "A OR K" sheet 108). Exact station/offset NOT printed (note says see sheets 104 and 108, which show only a tick
   on the north girder). Scaled from the plans: Unit 1 at the cross-frame line 50'-0 back of CL bearing Pier 5WB/6A (cross frames 25'-0 apart on the girder, tick on the second frame);
@@ -145,6 +151,9 @@ Not in contract: poles, luminaires, ITS devices and all conductors ("cost of fur
 conduit, junction boxes, expansion fittings. Poles/luminaires: omit or flagged placeholder only; the plans give no pole height or geometry.
 
 ### d1. Pole bases (4 on I-80, 1 on Ramp G; `misc/lighting-items.csv`)
+- 2026-10-11 CORRECTION (raster 220-450 dpi, PDF 235 Section D-D / section through base): the "5" above the block is the anchor bolt PROJECTION, not "top 5\" above the
+  base ledge". The block is cast against the slab edge (keyway c.j.) with its bottom drawn flush with the slab soffit; 2'-7 1/2 at the deck edge = 1'-8 1/2 outer face + 11"
+  arc drop over 1'-11 3/4 (R 3'-0, centre below the chord), 4 1/4 flat to the deck edge (chain 2'-4 vs 2'-6 projection does not close by 2"). Model: `BottomAtSlabSoffit`.
 - Block (PDF 235 / Ramp G 169): 2'-0 wide x 2'-6 projection outboard of the barrier, top 5" above the base ledge, height 2'-7 1/2 at the barrier face and 11" at the outer edge (soffit curved R = 3'-0, 1'-11 3/4 across, 4 1/4 return);
   4'-4 allowable blockout in the barrier along the rail, barrier 1'-5 base width; CL pole base at the barrier-side of the 2'-0 block, anchor bolt circle 13 1/2" dia (I-80, 4 holes at 4 3/4 / 4 3/4) or 16" dia (Ramp G, 5 5/8 / 5 5/8),
   4 anchor bolts 1" dia x 1'-11 galvanized heavy hex nuts, anchor plate 15 1/4 x 3/4 x 1'-3 1/4 with 3" slot, thread 5", 4" nut zone; 2" rigid conduit (I-80 / Ramp G power 1 1/2" at Pier 8G) bends up to the base center. 1.0 cu yd each.

@@ -60,6 +60,7 @@ void Build(string bridgeName, bool first, string source, double leftEnd, double 
         {
             Name = end == AbutmentEnd.Left ? "A" : (first ? "F" : "J"), End = end, GutterOffset = gut, Thickness = F(1, 9), Length = wingLen,
             TopAtBackwall = Ft(w.top), TopAtEnd = Ft(w.topEnd), BottomAtBackwall = Ft(w.bottom), LevelReach = w.level, EndHeight = F(4),
+            BottomOnFootings = true,   // wall carried down onto each wing footing (view A-A / K-K p87, p91: vertical steps at the footing ends)
         };
         for (int k = 0; k < cfStart.Length; k++)
             wd.Counterforts.Add(new CounterfortDefinition

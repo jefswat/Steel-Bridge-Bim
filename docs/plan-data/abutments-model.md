@@ -50,6 +50,13 @@ CONFLICT (minor, not adjusted): the plan pour split. Model below / above c.j. = 
 (SECTION p80; 5'-6 1/8 ** c.j. to the bottom of the backwall at the back face at the CL, matches the model). With the c.j. AT the taper bottom (no 3")
 the model gives 11.6 / 10.0 CY - i.e. the plan split appears to have been computed without the 3". Totals agree; the script prints this as CONFLICT.
 
+## Wing bottom on the wing footings (2026-10-11)
+Plan wing elevations (I-80 PDF 87 A-A / K-K, PDF 91, Ramp G PDF 82 A-A / B-B; raster 220-300 dpi): the wall bottom is the sloped line from the backwall (after the 1'-6 level
+reach on the West) to the free-end bottom, passing through the near top corners of the wing footings; OVER each wing footing the wall comes down to the footing top, with a
+vertical step at the footing's far end. The model ran the sloped line over the footings, leaving a gap (0 to ~1'-1) between the wall and the footing beside each counterfort.
+`WingwallDefinition.BottomOnFootings` (set by both scripts) fills it. Wingwalls + counterforts: West 32.0 + 6.7 = 38.7 (plan 38.8), East 24.9 + 6.7 = 31.6 (31.6),
+South 23.7 + 6.5 = 30.2 (30.2) CY.
+
 ## Plan view footing outline
 `AbutmentGeometry.FootingOutline` is the plan outline of the main footing built by the generator from the same end planes, notches and corner pieces
 as the footing solid; `AbutmentViews` (piling and wing layout) draws it instead of a 4-corner parallelogram, so the West footing notches show.

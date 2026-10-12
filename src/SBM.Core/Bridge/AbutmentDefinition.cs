@@ -114,6 +114,9 @@ public sealed class WingwallDefinition
     public double FootingPileTopAbove { get; set; } = Ft(1);
     /// <summary>Wing footing piles circled on the plans (uplift anchors 8j3).</summary>
     public List<UpliftPileDefinition> UpliftPiles { get; set; } = new();
+    /// <summary>OPTIONAL (default off = the plain sloped bottom): over each counterfort's wing footing (Start .. Start + Width) the wall bottom drops
+    /// to the footing top, with vertical steps at the footing ends (plan wing elevations: I-80 PDF 87 A-A / K-K, PDF 91, Ramp G PDF 82).</summary>
+    public bool BottomOnFootings { get; set; }
 }
 
 /// <summary>Notches of the footing plan outline at one end (West p86 piling layout): between a face and the end line (parallel to the alignment) the outline runs along a

@@ -75,6 +75,13 @@ Warnings (model vs plans, inputs not changed):
   the Ramp G detail has the W24 flange flush with the soffit. Check the I-80 abutment frame sheet.
 - Ramp G piers: W10x33 Type 4 end strut 2 1/4 to 2 5/16" above the soffit, bolts 3/8". Ramp G South Abut: W24x68 flange flush with the soffit, no clash.
 
+## 3a. Girder end daps (2026-10-11)
+The girder ends are DAPPED under the joint blockout: I-80 design sheet 104 (PDF 106) Detail A = top flange bent down 7 1/2 over a 7 1/2 run, R = 6 bends, lowered to 1'-2 past
+the CL bearing (CL bearing 1'-0 from the end) - West and East Abutments (PDF 103, 118); Detail B = the same + a 6" web end cope (10" tabs at both flanges, 6" transition,
+R = 6) - Piers 5WB, 6A, 11WB (PDF 106, 108, 111-115, 119). Ramp G sheet 91 (PDF 93) Detail A = I-80 Detail B, Piers 5G, 9G, 14G, 19G; South Abutment plain. The modular
+joint sections (I-80 PDF 209) draw the lowered flange under the support box. Model: `SupportDefinition.GirderEndDap`, `samples/plans/girder-end-daps.csx`: top of flange
+now 3.6"-4.9" below the 1'-2 blockout bottom (generated plates), was 2.9"-3.6" inside the blockout.
+
 ## 4. UNCERTAIN / open
 - Ramp G pier flat soffit length 3'-3 vs 3'-3 1/2 (two dimension strings); I-80 abutment/pier lengths read from dimension strings and confirmed by vector scaling (+/- 1/2").
 - Ramp G South Abutment block plan length (~1'-9 1/2) scaled from the drawing, not dimensioned.

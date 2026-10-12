@@ -14,16 +14,24 @@ var u2 = Doc.Project.Bridges.First(b => b.Name == "I-80 WB Unit 2");
 var u3 = Doc.Project.Bridges.First(b => b.Name == "I-80 WB Unit 3");
 foreach (var b in new[] { u2, u3 }) { b.Misc ??= new MiscItemsDefinition(); b.Misc.SignSupports.Clear(); b.Misc.Unresolved.RemoveAll(s => s.StartsWith("[sign]")); }
 
-SignBracketDefinition Br(int girder, double ahead, double topOfBaseFt, double height, double flange) =>
-    new() { Girder = girder, AheadOfSupport = ahead, TopOfBaseElevation = Ft(topOfBaseFt), Height = height, BottomFlangeWidth = flange };
+// Bracket = plate-girder cantilever OUTBOARD of the exterior girder (Section D-D / C-C PDF 178, 181): CL post `outb` from CL girder (W.P.) measured along the
+// bracket, bracket at `angle` (deg) from the girder's ahead tangent toward the outboard side, square to the spreader beam, 2'-3 beyond the CL post;
+// View J-J: top of base to the top of the bracket top flange = `stub` ("elevation line to level line", W = 2'-2 / 2'-0 post line, E = 9'-6 / 9'-4 post line),
+// web depth = the girder web (8'-6 Unit 2, 6'-4 Unit 3).
+SignBracketDefinition Br(int girder, double ahead, double topOfBaseFt, double height, double flange, double outb, double angle, double stub) =>
+    new() { Girder = girder, AheadOfSupport = ahead, TopOfBaseElevation = Ft(topOfBaseFt), Height = height, BottomFlangeWidth = flange,
+            PostOutboard = outb, AngleToGirderDegrees = angle, StubHeight = stub };
+double Dms(int d, int m, int s) => d + m / 60.0 + s / 3600.0;
 
 u2.Misc!.SignSupports.Add(new SignSupportDefinition
 {
     Name = "Sign truss Unit 2 (Pier 7WB)", Kind = SignSupportKind.OverheadTrussBracket, Support = "Pier 7WB", TrussSpan = Ft(100),
     Brackets =
     {
-        Br(0, F(2, 2), 1026.33, F(8, 6), In(22)), Br(0, F(9, 6), 1026.33, F(8, 6), In(22)),
-        Br(u2.Girders.Count - 1, F(2, 2), 1028.33, F(8, 6), In(22)), Br(u2.Girders.Count - 1, F(9, 6), 1028.33, F(8, 6), In(22)),
+        // girder A (north): D-D 6'-3 (W) / C-C 6'-7 7/16 (E), 92d52'02" (TYP.); J-J stub 1'-3 3/4 (W) / 1'-3 5/8 (E)
+        Br(0, F(2, 2), 1026.33, F(8, 6), In(22), F(6, 3), Dms(92, 52, 2), F(1, 3.75)), Br(0, F(9, 6), 1026.33, F(8, 6), In(22), F(6, 7 + 7 / 16.0), Dms(92, 52, 2), F(1, 3.625)),
+        // girder K (south): D-D 6'-1 3/4 (TYP.), 90d; stub 1'-0 3/8 (W) / 1'-0 (E)
+        Br(u2.Girders.Count - 1, F(2, 2), 1028.33, F(8, 6), In(22), F(6, 1.75), 90, F(1, 0.375)), Br(u2.Girders.Count - 1, F(9, 6), 1028.33, F(8, 6), In(22), F(6, 1.75), 90, F(1, 0)),
     },
 });
 u2.Misc.Unresolved.Add("[sign] Unit 2 sign truss: truss CL parallel to the pier at STA 7595+82.22 (pier + 5'-10); sheets 171A/172A give the post lines 2'-2 and 9'-6 ahead of the CL pier (plan sheet 110 \"2'-2 (TYP.)\"); the sheet title-block station 7595+67.24 is the bridge reference, not a sign location.");
@@ -34,11 +42,12 @@ u3.Misc!.SignSupports.Add(new SignSupportDefinition
     Brackets =
     {
         // girder J (south, last girder): 2'-0 and 9'-4 ahead of the pier. Girder A (north): the 12'-10 7/8 dimension starts from a reference line whose meaning is UNRESOLVED -> not placed.
-        Br(u3.Girders.Count - 1, F(2, 0), 1024.32, F(6, 4), In(26)), Br(u3.Girders.Count - 1, F(9, 4), 1024.32, F(6, 4), In(26)),
+        // girder J: revised Section D-D (PDF 181) 5'-0 3/8 at 89d49'28" (W) / 5'-0 1/4 at 90d (E); View J-J (PDF 180) stub 1'-0 1/4 (W) / 1'-0 3/4 (E)
+        Br(u3.Girders.Count - 1, F(2, 0), 1024.32, F(6, 4), In(26), F(5, 0.375), Dms(89, 49, 28), F(1, 0.25)), Br(u3.Girders.Count - 1, F(9, 4), 1024.32, F(6, 4), In(26), F(5, 0.25), 90, F(1, 0.75)),
     },
 });
 u3.Misc.Unresolved.Add("[sign] Unit 3 sign truss: the two brackets on girder A (north, top of base 1020.32) are NOT placed - the plan dimension 12'-10 7/8 (I-80 PDF 117) starts from a vertical reference line whose meaning is unresolved; girder A section D-D (PDF 181) was revised (5'-4 5/8, 5'-9 1/2; angles 93d19'39\" / 93d00'30\", struck values illegible).");
-u3.Misc.Unresolved.Add("[sign] Sign supports: vertical dimensions \"elevation line to level line\" (1'-3 3/4 etc., PDF 178/180), anchor bolt lengths, the HSS 14.000x0.500 post height and the sign truss size / elevation are not in the plans.");
+u3.Misc.Unresolved.Add("[sign] Sign supports: anchor bolt lengths, the post stub plate lengths, the HSS 14.000x0.500 post height and the sign truss size / elevation are not in the plans.");
 
 // exit sign bases (Unit 2: Ramp A gore at Pier 5WB, Ramp G gore at Pier 11WB), bars per base
 List<MiscBarRow> ExitBars() => new()
@@ -59,6 +68,6 @@ foreach (var b in new[] { u2, u3 })
     var misc = Doc.Substructure(b.Name).Misc;
     if (misc == null) { Print($"{b.Name}: no misc model"); continue; }
     Print($"{b.Name}: {misc.Assemblies.Count} assemblies, {misc.Elements.Count} elements, rebar marks {misc.Marks.Count}, {misc.RebarMass / 0.45359237:F0} lb");
-    foreach (var d in misc.Diagnostics.Where(d => d.Message.Contains("ign") || d.Message.Contains("xit"))) Print($"   {d.Severity}: {d.Message}");
+    foreach (var d in misc.Diagnostics.Where(d => d.Message.Contains("ign") || d.Message.Contains("xit") || d.Message.Contains("CL post"))) Print($"   {d.Severity}: {d.Message}");
 }
 Doc.Save();
