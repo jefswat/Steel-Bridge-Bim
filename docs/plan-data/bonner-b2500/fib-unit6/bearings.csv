@@ -1,0 +1,13 @@
+bent,side,span,elastomer,sole_plate,fixity,source,tag
+29,ahead,30,E1,P32,EXP,p422 S4-30,TEXT
+30,back,30,E2,P33,EXP,p422,TEXT
+30,ahead,31,E2,P33,EXP,p422,TEXT
+31,back,31,E2,P34,EXP,p422,TEXT
+31,ahead,32,E2,P14,EXP,p423 S4-31,TEXT
+32,back,32,E3,P35,FIX,p423,TEXT
+32,ahead,33,E3,P8,FIX,p423,TEXT
+33,back,33,E2,P36,EXP,p423,TEXT
+33,ahead,34,E2,P37,EXP,p424,TEXT
+34,back,34,E2,P38,EXP,p424,TEXT
+34,ahead,35,E2,P39,EXP,p424,TEXT
+35,back,35,E1,P40,EXP,p424,TEXT
