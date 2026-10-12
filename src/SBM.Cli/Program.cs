@@ -41,8 +41,13 @@ public static class Program
                                                             became NURBS (fallbacks), fit deviation and exact vs mesh volumes
           sbm elevations <file.sbm> [bridge]                Step-by-step elevations, grade to bearing seat, at every bearing
           sbm blocking <file.sbm> [bridge] [--all]          Camber / blocking per girder (key points; --all = every plan point)
-          sbm drawings <file.sbm> <folder> [bridge]         2D DXF models: layout plan + elevation, plan, sections, bents, bar bending
-          sbm sheets <file.sbm> <out.pdf> [bridge]          11x17 plan set as a vector PDF
+          sbm drawings <file.sbm> <folder|file.zip> [bridge] [--zip]
+                                                            2D DXF models: layout plan + elevation, plan, sections, bents, bar bending
+                                                            (a .zip target or --zip = one zip of the DXFs)
+          sbm sheets <file.sbm> <out.pdf> [bridge] [--dxf <folder|file.zip>] [--models]
+                                                            11x17 plan set as a vector PDF; --dxf also writes every sheet as a
+                                                            paper-space DXF (inches, border + title block) to a folder or one zip;
+                                                            --models adds the full-size 2D model DXFs (subfolder "models")
           sbm compare-sheets <file.sbm> [bridge] [--plans <folder>] [--db <file.sqlite>] [--out compare.pdf]
                                                             Generated sheets side by side with the matching plan sheets + checklist/QC strip (PyMuPDF;
                                                             plans = folder with the plan PDFs or split pages; default <model folder>\plans)
@@ -274,21 +279,35 @@ public static class Program
                 case "drawings":
                 {
                     Need(args, 3);
+                    var pos = Positional(args, "--zip");
                     var doc = SbmDocument.Open(args[1]);
                     var sw = Stopwatch.StartNew();
-                    var files = doc.ExportDrawings(args[2], args.Length > 3 ? args[3] : null);
+                    string target = args[2];
+                    if (args.Contains("--zip") && !SBM.IO.Dxf.SheetExport.IsZip(target)) target = target.TrimEnd('\\', '/') + ".zip";
+                    var files = doc.ExportDrawings(target, pos.Count > 3 ? pos[3] : null);
                     foreach (var f in files) Console.WriteLine($"  {f}");
-                    Console.WriteLine($"{files.Count} views in {sw.ElapsedMilliseconds} ms");
+                    Console.WriteLine($"{files.Count} views{(SBM.IO.Dxf.SheetExport.IsZip(target) ? " → " + target : "")} in {sw.ElapsedMilliseconds} ms");
                     return 0;
                 }
                 case "sheets":
                 {
                     Need(args, 3);
+                    string? Opt(string name) { int i = Array.IndexOf(args, name); return i > 0 && i + 1 < args.Length ? args[i + 1] : null; }
+                    var pos = Positional(args, "--models");
+                    string? bridge = pos.Count > 3 ? pos[3] : null;
                     var doc = SbmDocument.Open(args[1]);
                     doc.Regenerate();
                     var sw = Stopwatch.StartNew();
-                    int n = doc.ExportPdf(args[2], args.Length > 3 ? args[3] : null);
-                    Console.WriteLine($"{n} sheets → {args[2]} in {sw.ElapsedMilliseconds} ms");
+                    var sheets = doc.Sheets(bridge);
+                    string bname = doc.Bridge(bridge).Name;
+                    SBM.IO.Pdf.PdfWriter.Write(args[2], sheets, bname);
+                    Console.WriteLine($"{sheets.Count} sheets → {args[2]} in {sw.ElapsedMilliseconds} ms");
+                    if (Opt("--dxf") is { } dxf)
+                    {
+                        sw.Restart();
+                        var files = SBM.IO.Dxf.SheetExport.WriteSheets(dxf, bname, sheets, doc.Project.Units, args.Contains("--models") ? doc.Drawings(bridge) : null);
+                        Console.WriteLine($"{files.Count} DXF files → {dxf} in {sw.ElapsedMilliseconds} ms");
+                    }
                     return 0;
                 }
                 case "compare-sheets":
@@ -441,6 +460,19 @@ public static class Program
             Console.WriteLine($"  per element -> {csv}");
         }
         return 0;
+    }
+
+    /// <summary>Positional arguments: everything except "--" options; options in <paramref name="flags"/> take no value, any other
+    /// "--name" takes the next argument as its value.</summary>
+    private static List<string> Positional(string[] args, params string[] flags)
+    {
+        var res = new List<string>();
+        for (int i = 0; i < args.Length; i++)
+        {
+            if (!args[i].StartsWith("--")) { res.Add(args[i]); continue; }
+            if (!flags.Contains(args[i])) i++;
+        }
+        return res;
     }
 
     private static void Need(string[] args, int n)

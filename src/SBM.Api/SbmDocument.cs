@@ -263,11 +263,21 @@ public sealed class SbmDocument
         return DrawingSet.Build(ctx);
     }
 
-    /// <summary>Writes every 2D view as a DXF 2D model into a folder; returns the file paths.</summary>
+    /// <summary>Writes every 2D view as a DXF 2D model into a folder, or into one zip when <paramref name="folder"/> ends in ".zip";
+    /// returns the file paths (folder) or zip entry names.</summary>
     public List<string> ExportDrawings(string folder, string? bridgeName = null, DrawingOptions? options = null)
     {
         var b = Bridge(bridgeName);
-        return Drawings(bridgeName, options).Select(v => SheetExport.Write(folder, b.Name, v, Units)).ToList();
+        return SheetExport.WriteAll(folder, Drawings(bridgeName, options).Select(v => ("", b.Name, v)), Units);
+    }
+
+    /// <summary>Writes every sheet of the plan set as a paper-space DXF (inches / mm, border and title block included) into a folder,
+    /// or into one zip when <paramref name="target"/> ends in ".zip"; <paramref name="includeModels"/> adds the full-size 2D model
+    /// DXFs (<see cref="Drawings"/>) in a "models" subfolder. Returns the file paths / entry names.</summary>
+    public List<string> ExportSheetsDxf(string target, string? bridgeName = null, bool includeModels = false)
+    {
+        var b = Bridge(bridgeName);
+        return SheetExport.WriteSheets(target, b.Name, Sheets(bridgeName), Units, includeModels ? Drawings(bridgeName) : null);
     }
 
     /// <summary>The plan set on 11x17 (or another format): layout, typical section, girder elevations, steel and bearing

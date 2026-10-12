@@ -70,10 +70,15 @@ sbm set    "C:\Jobs\Br12\Br12.sbm" "Geometry.ExactCurvedGeometry=true"   # proje
 sbm nurbs  "C:\Jobs\Br12\Br12.sbm" [--bridge "Br12 Unit 2"] [--chord 1/32"] [--tol 1/256"] [--csv nurbs.csv]
                                                  # regenerates with the setting off and on: timings, what became NURBS, fit deviation, exact vs mesh volumes
 sbm sheets     "C:\Jobs\Br12\Br12.sbm" "C:\Jobs\Br12\Br12 Sheets.pdf"   # 11x17 plan set (vector PDF)
+sbm sheets     "C:\Jobs\Br12\Br12.sbm" "Br12 Sheets.pdf" "Br12 Unit 2" --dxf "Br12 Sheets DXF.zip" [--models]
+                                                 # + every sheet as a paper-space DXF (inches, border + title block) in one zip
+                                                 # (a folder path instead of *.zip writes the files); --models adds the full-size
+                                                 # 2D model DXFs under models/ in the zip / folder
 sbm compare-sheets "C:\Jobs\Br12\Br12.sbm" "Br12 Unit 2" --plans "C:\Jobs\Br12\plans" --db Br12.sqlite --out compare.pdf
                                                  # each generated sheet side by side (vector) with the matching plan page + checklist/QC strip; needs Python + PyMuPDF
 sbm qc-sheet   Br12.sqlite "Br12 Unit 2:S-17" design-116:43 ok|issue|unchecked "note"   # store the check result in the companion database (qc table)
 sbm drawings   "C:\Jobs\Br12\Br12.sbm" "C:\Jobs\Br12\dxf"   # 2D DXF models: layout, plan, typical section, bents, bar bending
+sbm drawings   "C:\Jobs\Br12\Br12.sbm" "C:\Jobs\Br12\dxf" --zip   # same views as one zip (dxf.zip); a target ending in .zip does the same
 sbm elevations "C:\Jobs\Br12\Br12.sbm"          # grade → deck → haunch → web → flange → sole plate → seat, every bearing
 sbm blocking   "C:\Jobs\Br12\Br12.sbm"          # camber, deflections, girder-line haunch elevation and blocking at each key point (--all: every plan point)
 ```
@@ -199,7 +204,8 @@ var framing = doc.Framing();                         // bearings, girder lines, 
 var steel   = doc.Steel();                           // 3D parts (meshes), bolts, studs, bearing seats
 var sub     = doc.Substructure();                    // bents/abutments: caps, pedestals, columns, foundations, rebar marks
 var sheets  = doc.Sheets();                          // composed 11x17 sheets; doc.ExportPdf("set.pdf")
-var views   = doc.Drawings();                        // 2D views (PlanDrawing per view); doc.ExportDrawings(folder) writes DXF
+var views   = doc.Drawings();                        // 2D views (PlanDrawing per view); doc.ExportDrawings(folder or "x.zip") writes DXF
+doc.ExportSheetsDxf("set.zip", includeModels: true); // sheets as paper-space DXFs (+ 2D models in models/) to a zip or a folder
 doc.Set("Bridges[0].Supports[1].Substructure", "{\"TopShape\":\"Crowned\",\"ColumnCount\":2,\"ColumnSpacings\":[6.1]}");  // JSON = SI units
 var chains  = doc.BearingElevations();              // step-by-step elevation chains, each checked against the model
 doc.Project.Units.TryParseStation("22+00", out var sta);
