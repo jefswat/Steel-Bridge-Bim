@@ -87,6 +87,8 @@ public sealed class SubstructureUnit
     public required Vec2 N { get; init; }
     public required double Station { get; init; }
 
+    /// <summary>OPTIONAL capless pier (<c>SubstructureDefinition.NoCap</c>): no cap solid; CapTop / CapBottom then hold the column tops (pedestal bottoms).</summary>
+    public bool NoCap { get; set; }
     public double CapS0 { get; set; }
     public double CapS1 { get; set; }
     public double CapN0 { get; set; }

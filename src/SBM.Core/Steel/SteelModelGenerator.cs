@@ -98,6 +98,10 @@ public sealed partial class SteelModelGenerator
         g._model.Bolts.AddRange(g._bolts.OrderBy(b => b.Assembly, MarkComparer.Instance));
         g._model.Studs.AddRange(g._studs.OrderBy(b => b.Assembly, MarkComparer.Instance));
         g._model.BearingSeats.AddRange(g._seats.OrderBy(s => s.Station).ThenBy(s => s.Girder));
+        g._model.IntegralCaps.AddRange(g._capReports.OrderBy(r => r.Mark, StringComparer.Ordinal));
+        foreach (var r in g._model.IntegralCaps)
+            r.SteelMassKg = g._model.Parts.Where(p => p.Category != PartCategory.Weld && (p.Assembly == r.Mark || p.Assembly.StartsWith(r.Mark + "-C", StringComparison.Ordinal))).Sum(p => p.Mass);
+        g.ApplyFabricationRules();
         g._model.Diagnostics.AddRange(g._diag.Distinct());
         g._model.GenerationTime = sw.Elapsed;
         return g._model;
@@ -111,6 +115,7 @@ public sealed partial class SteelModelGenerator
     private void Run()
     {
         // Phase 1: layouts.
+        SetupIntegralCaps();   // OPTIONAL integral steel caps: the girders are cut at the caps (before the field sections are formed)
         foreach (var g in _f.Girders)
         {
             _sections[g.Index] = FieldSections(g);
@@ -135,6 +140,7 @@ public sealed partial class SteelModelGenerator
         conn.Add(BuildLateralBracing);
         conn.Add(BuildInspectionAccess);
         foreach (var x in _f.CrossGirders) { var xx = x; conn.Add(() => BuildCrossGirder(xx)); }   // registers bolt holes in girder webs
+        foreach (var cp in _caps) { var cc = cp; conn.Add(() => BuildIntegralCap(cc)); }   // registers top flange holes and stud exclusions
         Parallel.ForEach(conn, a => a());
 
         // Phase 3: members.
@@ -153,7 +159,11 @@ public sealed partial class SteelModelGenerator
             stiffNo[i] = counters[key] = counters.GetValueOrDefault(key) + 1;
         }
         for (int i = 0; i < _f.Stiffeners.Count; i++) { var ss = _f.Stiffeners[i]; int no = stiffNo[i]; members.Add(() => BuildStiffener(ss, no)); }
-        foreach (var b in _f.Bearings) { var bb = b; members.Add(() => BuildBearing(bb)); }
+        foreach (var b in _f.Bearings)
+        {
+            if (_def.SupportAt(b.Support).IntegralSteelCap != null && _caps.Any(c => c.Support == b.Support)) continue;   // girders frame into the cap: no girder bearings
+            var bb = b; members.Add(() => BuildBearing(bb));
+        }
         Parallel.ForEach(members, a => a());
     }
 
@@ -190,10 +200,13 @@ public sealed partial class SteelModelGenerator
         var list = new List<(double, double, string)>();
         double a = 0;
         int k = 1;
-        foreach (double c in SpliceJoints(g.Index))
+        // Field splice joints and (OPTIONAL) integral steel cap cuts: the girder stops at the end plates on both sides of the cap.
+        var joints = SpliceJoints(g.Index).Select(c => (c, lo: gap / 2, hi: gap / 2))
+            .Concat(CapCutsOf(g.Index).Select(c => (c: c.SC, lo: c.Half, hi: c.Half))).OrderBy(x => x.c).ToList();
+        foreach (var (c, lo, hi) in joints)
         {
-            list.Add((a, c - gap / 2, $"{g.Name}-{k++}"));
-            a = c + gap / 2;
+            list.Add((a, c - lo, $"{g.Name}-{k++}"));
+            a = c + hi;
         }
         list.Add((a, g.Length, $"{g.Name}-{k}"));
         return list;
@@ -365,8 +378,15 @@ public sealed partial class SteelModelGenerator
             _assemblies.Add(new SteelAssembly { Mark = mark, Kind = AssemblyKind.GirderFieldSection, Girder = g.Index,
                 Description = $"{g.Name} field section, {_u.FormatLength(s1 - s0)}" });
 
+            // OPTIONAL integral steel cap at this section's end / start: the top flange stops short of the cap flange, the web is coped under it.
+            var capE = CapCutsOf(g.Index).FirstOrDefault(c => Math.Abs(c.SC - c.Half - s1) < 1e-6);
+            var capS = CapCutsOf(g.Index).FirstOrDefault(c => Math.Abs(c.SC + c.Half - s0) < 1e-6);
+            double tf0 = capS != null ? Math.Max(s0, capS.SC + capS.TopEnd) : s0, tf1 = capE != null ? Math.Min(s1, capE.SC - capE.TopEnd) : s1;
+            var copes = new List<(double a, double b, double depth)>();
+            if (capE != null && tf1 < s1 - 1e-6) copes.Add((tf1, s1, CopeDepth(path, capE)));
+            if (capS != null && tf0 > s0 + 1e-6) copes.Add((s0, tf0, CopeDepth(path, capS)));
             int n = 1;
-            foreach (var (a, b, seg) in top.PiecesWithin(s0, s1))
+            foreach (var (a, b, seg) in top.PiecesWithin(tf0, tf1))
             {
                 var mesh = new Mesh();
                 var hs = topHoles.Where(h => h.Center.X > a && h.Center.X < b).ToList();
@@ -384,8 +404,20 @@ public sealed partial class SteelModelGenerator
                 var mesh = new Mesh();
                 var hs = webHoles.Where(h => h.Center.X > a && h.Center.X < b).ToList();
                 double tw = seg.Thickness;
-                if (daps.Count == 0)
+                if (daps.Count == 0 && copes.Count == 0)
                     LongPlate(mesh, path, a, b, path.S, Array.Empty<double>(), _ => -d, _ => 0, _ => -tw / 2, _ => tw / 2, hs, webMap, true, "girder web");
+                else if (daps.Count == 0)
+                {
+                    // coped web at an integral cap: full height up to the flange end, then the top lowered under the cap flange
+                    var cutsW = copes.SelectMany(c => new[] { c.a, c.b }).Where(x => x > a + 1e-6 && x < b - 1e-6).Append(a).Append(b).Distinct().OrderBy(x => x).ToList();
+                    for (int ci = 0; ci + 1 < cutsW.Count; ci++)
+                    {
+                        double pa = cutsW[ci], pb = cutsW[ci + 1], mid = (pa + pb) / 2;
+                        double dep = copes.Where(c => mid > c.a && mid < c.b).Select(c => c.depth).DefaultIfEmpty(0).Max();
+                        LongPlate(mesh, path, pa, pb, path.S, Array.Empty<double>(), _ => -d, _ => -dep, _ => -tw / 2, _ => tw / 2,
+                            hs.Where(h => h.Center.X > pa && h.Center.X < pb).ToList(), webMap, true, "girder web");
+                    }
+                }
                 else
                 {
                     // dapped end: web top follows the lowered flange; a cope zone keeps only the two end tabs
@@ -428,7 +460,8 @@ public sealed partial class SteelModelGenerator
             {
                 double dz = zs == 0 ? -aw : aw;
                 bool topWeld = zs == 0;
-                SweepAlongGirder(welds, path, s0, s1, topWeld ? dapS : Array.Empty<double>(), s =>
+                if (topWeld && tf1 <= tf0 + 1e-6) continue;
+                SweepAlongGirder(welds, path, topWeld ? tf0 : s0, topWeld ? tf1 : s1, topWeld ? dapS : Array.Empty<double>(), s =>
                 {
                     double tw = web.Thickness(s) / 2;
                     double z = topWeld ? -drop(s) : -d;
@@ -437,10 +470,45 @@ public sealed partial class SteelModelGenerator
             }
             _parts.Add(new SteelPart
             {
-                Mark = $"{mark}-FW", Category = PartCategory.Weld, Assembly = mark, Mesh = welds, Length = 4 * (s1 - s0), Material = "E70XX",
+                Mark = $"{mark}-FW", Category = PartCategory.Weld, Assembly = mark, Mesh = welds, Length = 2 * (s1 - s0) + 2 * (tf1 - tf0), Material = "E70XX",
                 Description = $"Fillet weld {In(aw)}, flange to web, both sides",
             });
         }
+    }
+
+    /// <summary>Depth of the girder web cope under an integral cap's top flange (girder top of web down to the cap top of web less the clearance).</summary>
+    private static double CopeDepth(GirderPath path, CapCut c)
+    {
+        var p = path.At(c.SC).Item1;
+        double capTow = c.Cap.SurfaceZ(c.Cap.S(p.XY), c.Cap.ZTow);
+        return Math.Max(0, p.Z - (capTow - (c.Cap.D.Connection?.CopeClearance ?? 0)));
+    }
+
+    /// <summary>OPTIONAL plan fabrication notes (<see cref="BridgeDefinition.Fabrication"/>) merged onto the matching parts.</summary>
+    private void ApplyFabricationRules()
+    {
+        if (_def.Fabrication is not { Count: > 0 } rules) return;
+        var asm = _model.Assemblies.GroupBy(a => a.Mark).ToDictionary(gr => gr.Key, gr => gr.First());
+        int hit = 0;
+        foreach (var p in _model.Parts)
+        {
+            asm.TryGetValue(p.Assembly, out var a);
+            FabricationAttributes? acc = null;
+            foreach (var r in rules)
+            {
+                if (!r.Matches(p.Category.ToString(), a?.Kind.ToString(), p.Mark, a?.Description ?? "", p.Description, a?.Girder ?? -1)) continue;
+                if (r.Material is { Length: > 0 } mat) p.Material = mat;
+                var set = r.Set.Clone();
+                if (r.Note.Length > 0) set.Notes.Insert(0, r.Source.Length > 0 ? $"{r.Note} {r.Source}" : r.Note);
+                acc = acc == null ? set : acc.Merge(set);
+            }
+            if (acc == null) continue;
+            p.Fabrication = p.Fabrication == null ? acc : p.Fabrication.Merge(acc);
+            hit++;
+        }
+        _diag.Enqueue(new Diagnostic(DiagnosticSeverity.Info, $"Fabrication notes: {rules.Count} rules applied to {hit} of {_model.Parts.Count} parts."));
+        foreach (var r in rules.Where(r => !_model.Parts.Any(p => p.Fabrication?.Notes.Any(n => n.StartsWith(r.Note + " ", StringComparison.Ordinal) || n == r.Note) == true)))
+            if (r.Note.Length > 0) _diag.Enqueue(new Diagnostic(DiagnosticSeverity.Info, $"Fabrication note {r.Note} ({r.Source}) matches no generated part."));
     }
 
     /// <summary>Sweeps a section (r = lateral, z = relative to top of web) along the girder path from s0 to s1.</summary>

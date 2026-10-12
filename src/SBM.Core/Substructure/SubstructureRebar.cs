@@ -26,6 +26,7 @@ public sealed partial class SubstructureGenerator
             var bars = new List<RawBar>();
             if (r.PlanBarSets.Count > 0) { PlanSetBars(m, unit); continue; }
             if (unit.Abutment != null) { AbutmentBars(m, unit); continue; }
+            if (unit.NoCap) { Warn($"{unit.Name}: reinforcing of a capless pier is not placed in 3D (no generic layout for turned columns / capless pedestals)."); continue; }
             if (r.CapBars.Count > 0) CapPlanBars(unit, bars); else CapBars(unit, bars);
             if (unit.Backwall != null) BackwallBars(unit, bars);
             foreach (var c in unit.Columns) ColumnBars(unit, c, bars);

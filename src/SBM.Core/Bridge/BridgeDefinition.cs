@@ -74,6 +74,20 @@ public sealed class SupportDefinition
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
     public GirderEndDapDefinition? GirderEndDap { get; set; }
 
+    /// <summary>OPTIONAL integral steel pier cap on this support line (<see cref="IntegralSteelCapDefinition"/>): the girders frame into a steel cap
+    /// carried by its own bearings; null = none.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public IntegralSteelCapDefinition? IntegralSteelCap { get; set; }
+
+    /// <summary>OPTIONAL bearing stiffener plate at this support (plans with different stiffeners per support); null = the bridge's.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public PlateSize? BearingStiffener { get; set; }
+
+    /// <summary>OPTIONAL jacking stiffeners (same plate as the bearing stiffeners, plumb, pairs) at these distances along each girder from its CL
+    /// bearing on this support (+ = ahead / up-station, - = back); null = none.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public List<double>? JackingStiffenerOffsets { get; set; }
+
     [System.Text.Json.Serialization.JsonIgnore]
     public SubstructureDefinition ResolvedSubstructure => Substructure ?? SubstructureDefinition.Default(Type);
 
@@ -87,6 +101,9 @@ public sealed class SupportDefinition
         c.DeckEndPoints = DeckEndPoints?.Select(p => p.Clone()).ToList();
         c.Diaphragm = Diaphragm?.Clone();
         c.GirderEndDap = GirderEndDap?.Clone();
+        c.IntegralSteelCap = IntegralSteelCap?.Clone();
+        c.BearingStiffener = BearingStiffener?.Clone();
+        c.JackingStiffenerOffsets = JackingStiffenerOffsets?.ToList();
         return c;
     }
 }
@@ -1200,6 +1217,10 @@ public sealed class BridgeDefinition
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
     public List<PedestrianRailingDefinition>? Railings { get; set; }
 
+    /// <summary>OPTIONAL plan fabrication notes applied to the generated steel parts / welds (<see cref="FabricationRule"/>); null = none.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public List<FabricationRule>? Fabrication { get; set; }
+
     /// <summary>A typical two-span continuous layout starting at the given station.</summary>
     public static BridgeDefinition CreateDefault(double beginStation, string alignmentName)
     {
@@ -1296,5 +1317,6 @@ public sealed class BridgeDefinition
         Segmental = Segmental?.Clone(),
         SurfaceTreatments = SurfaceTreatments?.Select(t => t.Clone()).ToList(),
         Railings = Railings?.Select(r => r.Clone()).ToList(),
+        Fabrication = Fabrication?.Select(r => r.Clone()).ToList(),
     };
 }

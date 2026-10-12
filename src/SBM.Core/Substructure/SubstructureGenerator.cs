@@ -143,8 +143,22 @@ public sealed partial class SubstructureGenerator
                     .Select(q => new Vec2(S(q), Nn(q))).ToArray();
                 seats.Add(new Seat(1000 + seats.Count, S(p), Nn(p), seat.SeatElevation, corners, label));
             }
+        // OPTIONAL bearings off the girder lines (integral steel cap): seats with a plan location, girder index 2000+.
+        foreach (var seat in _seatList.Where(x => x.Girder >= 2000 && x.Location != null && x.Support == sl.Name))
+        {
+            var tx = (seat.Axis ?? d).Normalized();
+            var ty = tx.Left;
+            var p = seat.Location!.Value;
+            var (fl, fw) = bd.Footprint(def.SupportAt(j).ResolvedFixity);
+            double l = seat.FootprintLength > 0 ? seat.FootprintLength : fl, w = seat.FootprintWidth > 0 ? seat.FootprintWidth : fw;
+            var corners = new[] { (-1, -1), (1, -1), (1, 1), (-1, 1) }
+                .Select(c => p + tx * (c.Item1 * l / 2) + ty * (c.Item2 * w / 2))
+                .Select(q => new Vec2(S(q), Nn(q))).ToArray();
+            seats.Add(new Seat(seat.Girder, S(p), Nn(p), seat.SeatElevation, corners, seat.Label));
+        }
         if (seats.Count == 0) throw new InvalidOperationException("no bearing seats");
         seats.Sort((x, y) => x.S.CompareTo(y.S));
+        if (sd.NoCap && sl.Type == SupportType.Pier) return BuildCapless(j, unit, sd, sl, seats);
         if (sl.Type == SupportType.Abutment && sd.Abutment != null) return BuildDesignedAbutment(j, unit, sd, sl, seats);
 
         // ---- cap extents along the support line
@@ -773,7 +787,95 @@ public sealed partial class SubstructureGenerator
             $"{(cb.Kind == CapBlockKind.Maskwall ? "Maskwall" : cb.Kind == CapBlockKind.Pedestal ? "Fixed-elevation pedestal" : "Cap block")} '{what}' on the cap {(cb.Base == CapBlockBase.CapTop ? "top" : "soffit")}, top {El(outline.Min(q => Top(q.X)))} .. {El(outline.Max(q => Top(q.X)))}, up to {Sh(hMax)} high{(cb.Source != "" ? $" ({cb.Source})" : "")}", mesh));
     }
 
+    /// <summary>Column section outline in (S, N) about the column centre as built (projections, chamfers, OPTIONAL turn), for the drawings.</summary>
+    public static Vec2[] ColumnSectionOutline(SubstructureDefinition sd) => ColumnSection(sd);
+
     private static Vec2[] ColumnSection(SubstructureDefinition sd)
+    {
+        var sec = ColumnSectionCore(sd);
+        if (sd.ColumnRotationDeg == 0) return sec;
+        double r = sd.ColumnRotationDeg * Math.PI / 180, c = Math.Cos(r), sn = Math.Sin(r);
+        return sec.Select(q => new Vec2(q.X * c - q.Y * sn, q.X * sn + q.Y * c)).ToArray();
+    }
+
+    // ================================================================== capless pier (OPTIONAL SubstructureDefinition.NoCap)
+
+    /// <summary>Columns carrying the bearings directly (integral steel cap above): per column a pedestal (plan size, turned with the column) from the
+    /// column top to its seat, the column (turned by <see cref="SubstructureDefinition.ColumnRotationDeg"/>) and its foundation.</summary>
+    private SubstructureUnit BuildCapless(int j, SubstructureUnit unit, SubstructureDefinition sd, SupportLineResult sl, List<Seat> seats)
+    {
+        var sup = _f.Definition.SupportAt(j);
+        unit.NoCap = true;
+        double nc = sd.CapOffset + sup.PierCenterOffset;
+        double sCenter = (seats[0].S + seats[^1].S) / 2;
+        var colS = sd.ColumnOffsets(sCenter);
+        double rot = sd.ColumnRotationDeg * Math.PI / 180, cr = Math.Cos(rot), sr = Math.Sin(rot);
+        Vec2 R(Vec2 q) => rot == 0 ? q : new Vec2(q.X * cr - q.Y * sr, q.X * sr + q.Y * cr);
+        double colHalfS = sd.ColumnShape == ColumnShape.Round ? sd.ColumnDiameter / 2 : sd.ColumnWidth / 2 + sd.ColumnProjectionS;
+        double colHalfN = sd.ColumnShape == ColumnShape.Round ? sd.ColumnDiameter / 2 : sd.ColumnDepth / 2;
+        if (sd.CaplessPedestalHeight == null)
+            Warn(UnresolvedFlag.Text("plan", $"{sl.Name} pedestal height on the capless columns", "not given", "No pedestals; the columns reach the bearing seats."));
+        double hp = sd.CaplessPedestalHeight ?? 0;
+        var tops = new List<Vec2>();
+        var sec = ColumnSection(sd);
+        int k = 0;
+        foreach (double cs in colS)
+        {
+            var seat = seats.OrderBy(x => Math.Abs(x.S - cs)).First();
+            string who = seat.Label != "" ? seat.Label : $"G{seat.Girder + 1}";
+            if (Math.Abs(seat.S - cs) > colHalfS) Warn($"{sl.Name}: no bearing seat over column {k + 1} (nearest {who} is {L(Math.Abs(seat.S - cs))} away).");
+            double topZ = seat.Z - hp;
+            // pedestal (plan size, else the bearing footprint + projection), centred on the seat, turned with the column
+            double along = sd.PedestalSizeAlong > 0 ? sd.PedestalSizeAlong : seat.Footprint.Max(q => q.X) - seat.Footprint.Min(q => q.X) + 2 * sd.PedestalProjection;
+            double across = sd.PedestalSizeAcross > 0 ? sd.PedestalSizeAcross : seat.Footprint.Max(q => q.Y) - seat.Footprint.Min(q => q.Y) + 2 * sd.PedestalProjection;
+            var ped = new PedestalInfo(seat.Girder, seat.S, seat.N, along, across, topZ, seat.Z) { SeatS = seat.S, SeatN = seat.N, Label = seat.Label };
+            unit.Pedestals.Add(ped);
+            unit.PedestalBlocks.Add(ped);
+            if (hp > 0)
+            {
+                var foot = new[] { new Vec2(-along / 2, -across / 2), new Vec2(along / 2, -across / 2), new Vec2(along / 2, across / 2), new Vec2(-along / 2, across / 2) }.Select(R).ToArray();
+                var pm = new Mesh();
+                MeshBuilder.AddLoft(pm, foot, new[] { foot.Select(q => unit.World(seat.S + q.X, seat.N + q.Y, topZ)).ToArray(), foot.Select(q => unit.World(seat.S + q.X, seat.N + q.Y, seat.Z)).ToArray() });
+                unit.Solids.Add(new SubSolid(SubElementKind.Pedestal, $"{sl.Name} pedestal {who}",
+                    $"Pedestal {Sh(along)} x {Sh(across)}{(rot != 0 ? $" turned {sd.ColumnRotationDeg:0.###} deg" : "")}, {Sh(hp)} high (on the column, no cap)", pm));
+            }
+            double groundZ = GroundAt(unit.Plan(cs, nc));
+            double fTop = !double.IsNaN(sd.FoundationTopElevation) ? sd.FoundationTopElevation : !double.IsNaN(groundZ) ? groundZ - sd.GroundCover : topZ - Ft(20);
+            if (fTop >= topZ - Ft(1)) { Warn($"{sl.Name}: foundation top {El(fTop)} is at or above the column top; column {k + 1} omitted."); k++; continue; }
+            unit.Columns.Add(new ColumnInfo(k, cs, nc, topZ, fTop, sd.ColumnShape,
+                sd.ColumnShape == ColumnShape.Round ? sd.ColumnDiameter : sd.ColumnWidth, sd.ColumnShape == ColumnShape.Round ? sd.ColumnDiameter : sd.ColumnDepth));
+            var cm = new Mesh();
+            MeshBuilder.AddLoft(cm, sec, new[] { sec.Select(q => unit.World(cs + q.X, nc + q.Y, fTop)).ToArray(), sec.Select(q => unit.World(cs + q.X, nc + q.Y, topZ)).ToArray() });
+            string size = sd.ColumnShape == ColumnShape.Round ? $"{Sh(sd.ColumnDiameter)} dia" : $"{Sh(sd.ColumnWidth)} x {Sh(sd.ColumnDepth)}"
+                + (sd.ColumnProjectionS > 0 ? $" + {Sh(sd.ColumnProjectionS)} x {Sh(sd.ColumnProjectionWidth)} projections on both S faces" : "");
+            unit.Solids.Add(new SubSolid(SubElementKind.Column, $"{sl.Name} column {k + 1}",
+                $"Column {size}{(rot != 0 ? $", turned {sd.ColumnRotationDeg:0.###} deg" : "")}, {L(topZ - fTop)} high (carries {who})", cm));
+            if (sd.PlanColumnHeights is { } ph && k < ph.Count)
+            {
+                double diff = topZ - fTop - ph[k];
+                string msg = $"{sl.Name} column {k + 1}: height {L(topZ - fTop)} (seat {El(seat.Z)} - pedestal {Sh(hp)} - foundation top {El(fTop)}) vs plan {L(ph[k])}, difference {Sh(diff)}.";
+                if (Math.Abs(diff) > In(1.0 / 16)) Warn("PLAN DIFFERENCE (reported, not adjusted): " + msg); else Note(msg);
+            }
+            AddFoundation(unit, sd, cs, nc, fTop, groundZ, k + 1);
+            if (sd.MowStrip is { } ms) BuildMowStrip(unit, sl.Name, sd, ms, cs, nc, fTop, k + 1);
+            tops.Add(new Vec2(cs, topZ));
+            k++;
+        }
+        double ext = Math.Max(colHalfS, colHalfN);
+        unit.CapS0 = colS.Count > 0 ? colS.Min() - ext : seats[0].S;
+        unit.CapS1 = colS.Count > 0 ? colS.Max() + ext : seats[^1].S;
+        unit.CapN0 = nc - ext; unit.CapN1 = nc + ext; unit.CapMidN = nc;
+        if (tops.Count == 0) tops.Add(new Vec2(seats[0].S, seats[0].Z - hp));
+        if (tops.Count == 1) tops.Add(new Vec2(tops[0].X + 0.01, tops[0].Y));
+        tops = tops.OrderBy(q => q.X).ToList();
+        unit.CapTop.AddRange(tops);
+        unit.CapBottom.AddRange(tops);
+        unit.CapTopDescription = "no cap (columns carry the bearings on pedestals)";
+        Note($"{sl.Name}: no concrete cap - {unit.Columns.Count} columns{(rot != 0 ? $" turned {sd.ColumnRotationDeg:0.###} deg" : "")} carry {seats.Count} bearing seats on {Sh(hp)} pedestals.");
+        return unit;
+    }
+
+    private static Vec2[] ColumnSectionCore(SubstructureDefinition sd)
     {
         if (sd.ColumnShape == ColumnShape.Rectangular && sd.ColumnProjectionS > 0 && sd.ColumnProjectionWidth > 0 && sd.ColumnChamferS <= 0 && sd.ColumnChamferN <= 0)
         {
