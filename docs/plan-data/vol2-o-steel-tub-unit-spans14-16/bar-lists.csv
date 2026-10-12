@@ -1,0 +1,152 @@
+bridge_part,section,mark,size,qty,form,length,length_ft,remarks,calc_weight_lb,source,tag
+superstructure deck+parapet (whole Bridge O: spans 14-17),EPOXY,A1,#6,1959,STR,"31'-8""",31.667,,93177,PDF p.271 / O-17,RASTER (300 dpi)
+superstructure deck+parapet (whole Bridge O: spans 14-17),EPOXY,A2,#6,40,STR,"31'-11""",31.917,"AVG.; 31'-9"" to 32'-1""",1918,PDF p.271 / O-17,RASTER (300 dpi)
+superstructure deck+parapet (whole Bridge O: spans 14-17),EPOXY,A3,#6,44,STR,"16'-0""",16.000,"AVG.; 3'-0"" to 29'-0""",1057,PDF p.271 / O-17,RASTER (300 dpi)
+superstructure deck+parapet (whole Bridge O: spans 14-17),EPOXY,A4,#6,4,STR,"10'-2""",10.167,,61,PDF p.271 / O-17,RASTER (300 dpi)
+superstructure deck+parapet (whole Bridge O: spans 14-17),EPOXY,A5,#6,2,STR,"22'-3 1/2""",22.292,,67,PDF p.271 / O-17,RASTER (300 dpi)
+superstructure deck+parapet (whole Bridge O: spans 14-17),EPOXY,A6,#6,2,BNT,"34'-3""",34.250,,103,PDF p.271 / O-17,RASTER (300 dpi)
+superstructure deck+parapet (whole Bridge O: spans 14-17),EPOXY,AS1,#4,33,BNT,"5'-0""",5.000,,110,PDF p.271 / O-17,RASTER (300 dpi)
+superstructure deck+parapet (whole Bridge O: spans 14-17),EPOXY,B1,#5,121,STR,"31'-8""",31.667,,3996,PDF p.271 / O-17,RASTER (300 dpi)
+superstructure deck+parapet (whole Bridge O: spans 14-17),EPOXY,E1,#5,29,STR,"479'-6 1/2""",479.542,"AVG.; 476'-11"" to 482'-2""; incl 7-2'-4"" laps",14505,PDF p.271 / O-17,RASTER (300 dpi)
+superstructure deck+parapet (whole Bridge O: spans 14-17),EPOXY,E2,#5,33,STR,"58'-3""",58.250,"AVG.; 57'-2"" to 59'-4""",2005,PDF p.271 / O-17,RASTER (300 dpi)
+superstructure deck+parapet (whole Bridge O: spans 14-17),EPOXY,EB1,#5,37,STR,"479'-6 1/2""",479.542,"AVG.; 476'-11"" to 482'-2""; incl 7-2'-4"" laps",18506,PDF p.271 / O-17,RASTER (300 dpi)
+superstructure deck+parapet (whole Bridge O: spans 14-17),EPOXY,EB2,#5,50,STR,"58'-3""",58.250,"AVG.; 57'-2"" to 59'-4""",3038,PDF p.271 / O-17,RASTER (300 dpi)
+superstructure deck+parapet (whole Bridge O: spans 14-17),EPOXY,ET1,#6,28,STR,"93'-6""",93.500,"incl 1-3'-6"" lap",3932,PDF p.271 / O-17,RASTER (300 dpi)
+superstructure deck+parapet (whole Bridge O: spans 14-17),EPOXY,ET2,#6,28,STR,"108'-6""",108.500,"incl 1-3'-6"" lap",4563,PDF p.271 / O-17,RASTER (300 dpi)
+superstructure deck+parapet (whole Bridge O: spans 14-17),EPOXY,FS2,#5,1043,BNT,"7'-4""",7.333,see std FSHP-42,7978,PDF p.271 / O-17,RASTER (300 dpi)
+superstructure deck+parapet (whole Bridge O: spans 14-17),EPOXY,U1,#4,76,BNT,"4'-11""",4.917,,250,PDF p.271 / O-17,RASTER (300 dpi)
+superstructure deck+parapet (whole Bridge O: spans 14-17),EPOXY,U2,#4,64,BNT,"3'-9""",3.750,,160,PDF p.271 / O-17,RASTER (300 dpi)
+superstructure deck+parapet (whole Bridge O: spans 14-17),EPOXY,U3,#4,33,BNT,"2'-11""",2.917,,64,PDF p.271 / O-17,RASTER (300 dpi)
+superstructure deck+parapet (whole Bridge O: spans 14-17),EPOXY,H1,#4,117,BNT,"3'-8""",3.667,,287,PDF p.271 / O-17,RASTER (300 dpi)
+superstructure deck+parapet (whole Bridge O: spans 14-17),EPOXY,H2,#4,2,STR,"57'-5""",57.417,,77,PDF p.271 / O-17,RASTER (300 dpi)
+superstructure deck+parapet (whole Bridge O: spans 14-17),EPOXY,H3,#4,2,STR,"56'-2""",56.167,,75,PDF p.271 / O-17,RASTER (300 dpi)
+pier 14,PLAIN,DS1,#11,52,BNT,"55'-10""",55.833,,15425,PDF p.263 / O-9,TEXT
+pier 14,PLAIN,DT1,W20,2,BNT,"1,317'-4""",1317.333,W-20 SPIRAL,,PDF p.263 / O-9,TEXT
+pier 14,PLAIN,FH1,#5,6,BNT,"27'-3""",27.250,,171,PDF p.263 / O-9,TEXT
+pier 14,PLAIN,FT1,#4,6,BNT,"16'-3""",16.250,,65,PDF p.263 / O-9,TEXT
+pier 14,PLAIN,FS1,#5,16,BNT,"21'-1""",21.083,,352,PDF p.263 / O-9,TEXT
+pier 14,PLAIN,FL1,#5,32,BNT,"12'-5""",12.417,,414,PDF p.263 / O-9,TEXT
+pier 14,EPOXY,CD1,#9,52,BNT,"14'-9""",14.750,,2608,PDF p.263 / O-9,TEXT
+pier 14,EPOXY,C1,#8,26,STR,"24'-4""",24.333,,1689,PDF p.263 / O-9,TEXT
+pier 14,EPOXY,C2,#8,26,STR,"25'-6""",25.500,,1770,PDF p.263 / O-9,TEXT
+pier 14,EPOXY,T1,#4,41,BNT,"16'-11""",16.917,,463,PDF p.263 / O-9,TEXT
+pier 14,EPOXY,T2,#4,82,BNT,"5'-9""",5.750,,315,PDF p.263 / O-9,TEXT
+pier 14,EPOXY,T3,#4,205,BNT,"4'-6""",4.500,,616,PDF p.263 / O-9,TEXT
+pier 14,EPOXY,BH1,#11,8,BNT,"40'-8""",40.667,,1728,PDF p.263 / O-9,TEXT
+pier 14,EPOXY,BH2,#10,8,BNT,"27'-1""",27.083,,932,PDF p.263 / O-9,TEXT
+pier 14,EPOXY,BH3,#10,8,BNT,"27'-2""",27.167,,935,PDF p.263 / O-9,TEXT
+pier 14,EPOXY,BH4,#6,6,STR,"39'-6""",39.500,,356,PDF p.263 / O-9,TEXT
+pier 14,EPOXY,BH5,#6,4,STR,"14'-0""",14.000,,84,PDF p.263 / O-9,TEXT
+pier 14,EPOXY,PS1,#5,32,BNT,"16'-8""",16.667,AVG.-2 SETS,556,PDF p.263 / O-9,TEXT
+pier 14,EPOXY,PS2,#5,28,BNT,"16'-8""",16.667,AVG.-2 SETS,487,PDF p.263 / O-9,TEXT
+pier 14,EPOXY,PS3,#5,4,BNT,"15'-6""",15.500,AVG.,65,PDF p.263 / O-9,TEXT
+pier 14,EPOXY,P1,#4,12,BNT,"9'-0""",9.000,,72,PDF p.263 / O-9,TEXT
+pier 14,EPOXY,P2,#4,12,BNT,"9'-6""",9.500,,76,PDF p.263 / O-9,TEXT
+pier 14,EPOXY,CU1,#5,5,BNT,"7'-2""",7.167,,37,PDF p.263 / O-9,TEXT
+pier 14,EPOXY,CU2,#5,5,BNT,"7'-1""",7.083,,37,PDF p.263 / O-9,TEXT
+pier 14,EPOXY,CU3,#5,6,BNT,"7'-10""",7.833,,49,PDF p.263 / O-9,TEXT
+pier 15,PLAIN,DS1,#11,52,BNT,"71'-5""",71.417,,19731,PDF p.265 / O-11,TEXT
+pier 15,PLAIN,DT1,W20,2,BNT,"1,468'-3""",1468.250,W-20 SPIRAL,,PDF p.265 / O-11,TEXT
+pier 15,PLAIN,FH1,#5,6,BNT,"27'-3""",27.250,,171,PDF p.265 / O-11,TEXT
+pier 15,PLAIN,FT1,#4,6,BNT,"16'-3""",16.250,,65,PDF p.265 / O-11,TEXT
+pier 15,PLAIN,FS1,#5,16,BNT,"21'-1""",21.083,,352,PDF p.265 / O-11,TEXT
+pier 15,PLAIN,FL1,#5,32,BNT,"12'-5""",12.417,,414,PDF p.265 / O-11,TEXT
+pier 15,EPOXY,CD1,#9,52,BNT,"14'-9""",14.750,,2608,PDF p.265 / O-11,TEXT
+pier 15,EPOXY,C1,#8,26,STR,"22'-1""",22.083,,1533,PDF p.265 / O-11,TEXT
+pier 15,EPOXY,C2,#8,26,STR,"23'-3""",23.250,,1614,PDF p.265 / O-11,TEXT
+pier 15,EPOXY,T1,#4,37,BNT,"16'-11""",16.917,,418,PDF p.265 / O-11,TEXT
+pier 15,EPOXY,T2,#4,74,BNT,"5'-9""",5.750,,284,PDF p.265 / O-11,TEXT
+pier 15,EPOXY,T3,#4,185,BNT,"4'-6""",4.500,,556,PDF p.265 / O-11,TEXT
+pier 15,EPOXY,BH1,#11,8,BNT,"40'-8""",40.667,,1728,PDF p.265 / O-11,TEXT
+pier 15,EPOXY,BH2,#10,8,BNT,"27'-1""",27.083,,932,PDF p.265 / O-11,TEXT
+pier 15,EPOXY,BH3,#10,8,BNT,"27'-2""",27.167,,935,PDF p.265 / O-11,TEXT
+pier 15,EPOXY,BH4,#6,6,STR,"39'-6""",39.500,,356,PDF p.265 / O-11,TEXT
+pier 15,EPOXY,BH5,#6,4,STR,"14'-0""",14.000,,84,PDF p.265 / O-11,TEXT
+pier 15,EPOXY,PS1,#5,32,BNT,"16'-8""",16.667,AVG.-2 SETS,556,PDF p.265 / O-11,TEXT
+pier 15,EPOXY,PS2,#5,28,BNT,"16'-8""",16.667,AVG.-2 SETS,487,PDF p.265 / O-11,TEXT
+pier 15,EPOXY,PS3,#5,4,BNT,"15'-6""",15.500,AVG.,65,PDF p.265 / O-11,TEXT
+pier 15,EPOXY,P1,#4,12,BNT,"9'-0""",9.000,,72,PDF p.265 / O-11,TEXT
+pier 15,EPOXY,P2,#4,12,BNT,"9'-6""",9.500,,76,PDF p.265 / O-11,TEXT
+pier 15,EPOXY,CU1,#5,5,BNT,"7'-2""",7.167,,37,PDF p.265 / O-11,TEXT
+pier 15,EPOXY,CU2,#5,5,BNT,"7'-1""",7.083,,37,PDF p.265 / O-11,TEXT
+pier 15,EPOXY,CU3,#5,6,BNT,"7'-10""",7.833,,49,PDF p.265 / O-11,TEXT
+pier 16,PLAIN,DS1,#11,52,BNT,"71'-5""",71.417,,19731,PDF p.267 / O-13,TEXT
+pier 16,PLAIN,DT1,W20,2,BNT,"1,468'-3""",1468.250,W-20 SPIRAL,,PDF p.267 / O-13,TEXT
+pier 16,PLAIN,FH1,#5,6,BNT,"27'-3""",27.250,,171,PDF p.267 / O-13,TEXT
+pier 16,PLAIN,FT1,#4,6,BNT,"16'-3""",16.250,,65,PDF p.267 / O-13,TEXT
+pier 16,PLAIN,FS1,#5,16,BNT,"21'-1""",21.083,,352,PDF p.267 / O-13,TEXT
+pier 16,PLAIN,FL1,#5,32,BNT,"12'-5""",12.417,,414,PDF p.267 / O-13,TEXT
+pier 16,EPOXY,CD1,#9,52,BNT,"14'-9""",14.750,,2608,PDF p.267 / O-13,TEXT
+pier 16,EPOXY,C1,#8,26,STR,"15'-10""",15.833,,1099,PDF p.267 / O-13,TEXT
+pier 16,EPOXY,C2,#8,26,STR,"16'-10""",16.833,,1169,PDF p.267 / O-13,TEXT
+pier 16,EPOXY,T1,#4,25,BNT,"16'-11""",16.917,,283,PDF p.267 / O-13,TEXT
+pier 16,EPOXY,T2,#4,50,BNT,"5'-9""",5.750,,192,PDF p.267 / O-13,TEXT
+pier 16,EPOXY,T3,#4,125,BNT,"4'-6""",4.500,,376,PDF p.267 / O-13,TEXT
+pier 16,EPOXY,BH1,#11,8,BNT,"40'-8""",40.667,,1728,PDF p.267 / O-13,TEXT
+pier 16,EPOXY,BH2,#10,8,BNT,"27'-1""",27.083,,932,PDF p.267 / O-13,TEXT
+pier 16,EPOXY,BH3,#10,8,BNT,"27'-2""",27.167,,935,PDF p.267 / O-13,TEXT
+pier 16,EPOXY,BH4,#6,6,STR,"39'-6""",39.500,,356,PDF p.267 / O-13,TEXT
+pier 16,EPOXY,BH5,#6,4,STR,"14'-0""",14.000,,84,PDF p.267 / O-13,TEXT
+pier 16,EPOXY,PS1,#5,32,BNT,"16'-8""",16.667,AVG.-2 SETS,556,PDF p.267 / O-13,TEXT
+pier 16,EPOXY,PS2,#5,28,BNT,"16'-8""",16.667,AVG.-2 SETS,487,PDF p.267 / O-13,TEXT
+pier 16,EPOXY,PS3,#5,4,BNT,"15'-6""",15.500,AVG.,65,PDF p.267 / O-13,TEXT
+pier 16,EPOXY,P1,#4,16,BNT,"6'-8""",6.667,,71,PDF p.267 / O-13,TEXT
+pier 16,EPOXY,P2,#4,16,BNT,"11'-6""",11.500,,123,PDF p.267 / O-13,TEXT
+pier 16,EPOXY,CU1,#5,5,BNT,"7'-2""",7.167,,37,PDF p.267 / O-13,TEXT
+pier 16,EPOXY,CU2,#5,5,BNT,"7'-1""",7.083,,37,PDF p.267 / O-13,TEXT
+pier 16,EPOXY,CU3,#5,6,BNT,"7'-10""",7.833,,49,PDF p.267 / O-13,TEXT
+pier 13 (N sheets: WEST) (sheet N-47),PLAIN,DS1,#11,124,BNT,"26'-4""",26.333,,17349,PDF p.179 / N-47,TEXT
+pier 13 (N sheets: WEST) (sheet N-47),PLAIN,DT1,W20,2,BNT,"997'-2""",997.167,W-20 SPIRAL,,PDF p.179 / N-47,TEXT
+pier 13 (N sheets: WEST) (sheet N-47),PLAIN,FH1,#5,6,BNT,"39'-3""",39.250,,246,PDF p.179 / N-47,TEXT
+pier 13 (N sheets: WEST) (sheet N-47),PLAIN,FT1,#4,6,BNT,"25'-8""",25.667,,103,PDF p.179 / N-47,TEXT
+pier 13 (N sheets: WEST) (sheet N-47),PLAIN,FS1,#5,20,BNT,"27'-1""",27.083,,565,PDF p.179 / N-47,TEXT
+pier 13 (N sheets: WEST) (sheet N-47),PLAIN,FL1,#5,40,BNT,"15'-5""",15.417,,643,PDF p.179 / N-47,TEXT
+pier 13 (N sheets: WEST) (sheet N-47),EPOXY,CD1,#10,52,BNT,"15'-0""",15.000,,3356,PDF p.179 / N-47,TEXT
+pier 13 (N sheets: WEST) (sheet N-47),EPOXY,C1,#9,26,STR,"20'-0""",20.000,,1768,PDF p.179 / N-47,TEXT
+pier 13 (N sheets: WEST) (sheet N-47),EPOXY,C2,#9,26,STR,"21'-1""",21.083,,1864,PDF p.179 / N-47,TEXT
+pier 13 (N sheets: WEST) (sheet N-47),EPOXY,T1,#4,31,BNT,"18'-11""",18.917,,392,PDF p.179 / N-47,TEXT
+pier 13 (N sheets: WEST) (sheet N-47),EPOXY,T2,#4,62,BNT,"6'-9""",6.750,,280,PDF p.179 / N-47,TEXT
+pier 13 (N sheets: WEST) (sheet N-47),EPOXY,T3,#4,155,BNT,"4'-6""",4.500,,466,PDF p.179 / N-47,TEXT
+pier 13 (N sheets: WEST) (sheet N-47),EPOXY,BH1,#11,8,BNT,"43'-7""",43.583,,1852,PDF p.179 / N-47,TEXT
+pier 13 (N sheets: WEST) (sheet N-47),EPOXY,BH2,#10,8,BNT,"28'-6""",28.500,,981,PDF p.179 / N-47,TEXT
+pier 13 (N sheets: WEST) (sheet N-47),EPOXY,BH3,#10,8,BNT,"28'-4""",28.333,,975,PDF p.179 / N-47,TEXT
+pier 13 (N sheets: WEST) (sheet N-47),EPOXY,BH4,#6,6,STR,"41'-11""",41.917,,378,PDF p.179 / N-47,TEXT
+pier 13 (N sheets: WEST) (sheet N-47),EPOXY,BH5,#6,4,STR,"14'-9""",14.750,,89,PDF p.179 / N-47,TEXT
+pier 13 (N sheets: WEST) (sheet N-47),EPOXY,PS1,#5,28,BNT,"16'-7""",16.583,AVG.-2 SETS,484,PDF p.179 / N-47,TEXT
+pier 13 (N sheets: WEST) (sheet N-47),EPOXY,PS2,#5,18,BNT,"16'-5""",16.417,AVG.-2 SETS,308,PDF p.179 / N-47,TEXT
+pier 13 (N sheets: WEST) (sheet N-47),EPOXY,PS3,#5,16,BNT,"16'-7""",16.583,AVG.-2 SETS,277,PDF p.179 / N-47,TEXT
+pier 13 (N sheets: WEST) (sheet N-47),EPOXY,PS4,#5,2,BNT,"15'-6""",15.500,AVG.,32,PDF p.179 / N-47,TEXT
+pier 13 (N sheets: WEST) (sheet N-47),EPOXY,P1,#4,14,BNT,"9'-0""",9.000,,84,PDF p.179 / N-47,TEXT
+pier 13 (N sheets: WEST) (sheet N-47),EPOXY,P2,#4,12,BNT,"10'-6""",10.500,,84,PDF p.179 / N-47,TEXT
+pier 13 (N sheets: WEST) (sheet N-47),EPOXY,CU1,#5,5,BNT,"7'-2""",7.167,,37,PDF p.179 / N-47,TEXT
+pier 13 (N sheets: WEST) (sheet N-47),EPOXY,CU3,#5,6,BNT,"7'-10""",7.833,,49,PDF p.179 / N-47,TEXT
+pier 13 (N sheets: WEST) (sheet N-47),EPOXY,W1,#8,18,STR,"55'-0""",55.000,,2643,PDF p.179 / N-47,TEXT
+pier 13 (N sheets: WEST) (sheet N-47),EPOXY,WS1,#5,21,BNT,"13'-7""",13.583,,298,PDF p.179 / N-47,TEXT
+pier 13 (N sheets: EAST) (sheet N-49),PLAIN,DS1,#11,124,BNT,"71'-5""",71.417,,47050,PDF p.181 / N-49,TEXT
+pier 13 (N sheets: EAST) (sheet N-49),PLAIN,DT1,W20,2,BNT,"2,566'-3""",2566.250,W-20 SPIRAL,,PDF p.181 / N-49,TEXT
+pier 13 (N sheets: EAST) (sheet N-49),PLAIN,FH1,#5,6,BNT,"39'-3""",39.250,,246,PDF p.181 / N-49,TEXT
+pier 13 (N sheets: EAST) (sheet N-49),PLAIN,FT1,#4,6,BNT,"25'-8""",25.667,,103,PDF p.181 / N-49,TEXT
+pier 13 (N sheets: EAST) (sheet N-49),PLAIN,FS1,#5,20,BNT,"27'-1""",27.083,,565,PDF p.181 / N-49,TEXT
+pier 13 (N sheets: EAST) (sheet N-49),PLAIN,FL1,#5,40,BNT,"15'-5""",15.417,,643,PDF p.181 / N-49,TEXT
+pier 13 (N sheets: EAST) (sheet N-49),EPOXY,CD1,#10,52,BNT,"15'-0""",15.000,,3356,PDF p.181 / N-49,TEXT
+pier 13 (N sheets: EAST) (sheet N-49),EPOXY,C1,#9,26,STR,"22'-7""",22.583,,1996,PDF p.181 / N-49,TEXT
+pier 13 (N sheets: EAST) (sheet N-49),EPOXY,C2,#9,26,STR,"23'-6""",23.500,,2077,PDF p.181 / N-49,TEXT
+pier 13 (N sheets: EAST) (sheet N-49),EPOXY,T1,#4,35,BNT,"18'-11""",18.917,,442,PDF p.181 / N-49,TEXT
+pier 13 (N sheets: EAST) (sheet N-49),EPOXY,T2,#4,70,BNT,"6'-9""",6.750,,316,PDF p.181 / N-49,TEXT
+pier 13 (N sheets: EAST) (sheet N-49),EPOXY,T3,#4,175,BNT,"4'-6""",4.500,,526,PDF p.181 / N-49,TEXT
+pier 13 (N sheets: EAST) (sheet N-49),EPOXY,BH1,#11,8,BNT,"43'-7""",43.583,,1852,PDF p.181 / N-49,TEXT
+pier 13 (N sheets: EAST) (sheet N-49),EPOXY,BH2,#10,8,BNT,"28'-3""",28.250,,972,PDF p.181 / N-49,TEXT
+pier 13 (N sheets: EAST) (sheet N-49),EPOXY,BH3,#10,8,BNT,"28'-5""",28.417,,978,PDF p.181 / N-49,TEXT
+pier 13 (N sheets: EAST) (sheet N-49),EPOXY,BH4,#6,6,STR,"41'-11""",41.917,,378,PDF p.181 / N-49,TEXT
+pier 13 (N sheets: EAST) (sheet N-49),EPOXY,BH5,#6,4,STR,"14'-9""",14.750,,89,PDF p.181 / N-49,TEXT
+pier 13 (N sheets: EAST) (sheet N-49),EPOXY,PS1,#5,28,BNT,"16'-7""",16.583,AVG.-2 SETS,484,PDF p.181 / N-49,TEXT
+pier 13 (N sheets: EAST) (sheet N-49),EPOXY,PS2,#5,16,BNT,"16'-6""",16.500,AVG.-2 SETS,275,PDF p.181 / N-49,TEXT
+pier 13 (N sheets: EAST) (sheet N-49),EPOXY,PS3,#5,32,BNT,"16'-3""",16.250,AVG.-2 SETS,542,PDF p.181 / N-49,TEXT
+pier 13 (N sheets: EAST) (sheet N-49),EPOXY,PS4,#5,2,BNT,"14'-9""",14.750,AVG.,31,PDF p.181 / N-49,TEXT
+pier 13 (N sheets: EAST) (sheet N-49),EPOXY,P1,#4,7,BNT,"9'-0""",9.000,,42,PDF p.181 / N-49,TEXT
+pier 13 (N sheets: EAST) (sheet N-49),EPOXY,P2,#4,14,BNT,"10'-6""",10.500,,98,PDF p.181 / N-49,TEXT
+pier 13 (N sheets: EAST) (sheet N-49),EPOXY,P3,#4,14,BNT,"6'-6""",6.500,,61,PDF p.181 / N-49,TEXT
+pier 13 (N sheets: EAST) (sheet N-49),EPOXY,CU1,#5,5,BNT,"7'-1""",7.083,,37,PDF p.181 / N-49,TEXT
+pier 13 (N sheets: EAST) (sheet N-49),EPOXY,CU3,#5,3,BNT,"7'-10""",7.833,,25,PDF p.181 / N-49,TEXT
+pier 13 (N sheets: EAST) (sheet N-49),EPOXY,W1,#8,18,STR,"55'-0""",55.000,,2643,PDF p.181 / N-49,TEXT
+pier 13 (N sheets: EAST) (sheet N-49),EPOXY,WS1,#5,21,BNT,"13'-7""",13.583,,298,PDF p.181 / N-49,TEXT
