@@ -539,6 +539,17 @@ public static class ModelDatabase
             var asmInfo = new Dictionary<string, AsmInfo>();
             var girderGroup = new Dictionary<int, string>();
             string cfGroup = "", lbGroup = "", inspGroup = "", archGroup = "", railGroup = "";
+            // OPTIONAL integral steel pier caps: one group per cap (support from the report), holding the cap, its connections and its bearings
+            var capGroups = new Dictionary<string, (string Id, string Support)>();
+            (string Id, string Support) CapGroup(string capMark)
+            {
+                if (capGroups.TryGetValue(capMark, out var cg)) return cg;
+                var rep = steel.IntegralCaps.FirstOrDefault(c => c.Mark == capMark);
+                string sup = rep?.Support ?? "";
+                return capGroups[capMark] = (Group($"{bk}/group/cap/{capMark}", superId, $"Integral steel pier cap {capMark}", "integral steel cap group", sup), sup);
+            }
+            string? CapOfBearing(SteelAssembly a) => a.Girder < 0 && a.Description.Contains("integral steel cap")
+                ? steel.IntegralCaps.FirstOrDefault(c => a.Description.Contains(", " + c.Support + ","))?.Mark : null;
             string ArchGroup() => archGroup.Length > 0 ? archGroup : (archGroup = Group($"{bk}/group/arch", superId, "Tied arch", "tied arch"));
             string GirderGroup(int g)
             {
@@ -583,6 +594,15 @@ public static class ModelDatabase
                             var mm = Regex.Match(asm.Description, @"splice (\d+)");
                             if (mm.Success) { props.Add("splice_no", int.Parse(mm.Groups[1].Value)); sub = "FS" + mm.Groups[1].Value; }
                         }
+                        break;
+                    case AssemblyKind.PierCap:
+                        { var cg = CapGroup(asm.Mark); parent = cg.Id; support = cg.Support; cat = "integral steel pier cap"; }
+                        break;
+                    case AssemblyKind.PierCapConnection:
+                        { var cg = CapGroup(asm.Mark[..asm.Mark.LastIndexOf("-C", StringComparison.Ordinal)]); parent = cg.Id; support = cg.Support; cat = "pier cap connection"; }
+                        break;
+                    case AssemblyKind.Bearing when CapOfBearing(asm) is { } capMark:
+                        { var cg = CapGroup(capMark); parent = cg.Id; support = cg.Support; cat = "bearing"; sub = asm.Description.Split(", ")[0]; }
                         break;
                     case AssemblyKind.Bearing:
                         parent = GirderGroup(asm.Girder); cat = "bearing";
@@ -668,7 +688,8 @@ public static class ModelDatabase
                 }
                 var pjs = new Json().Add("description", part.Description).Add("assembly", part.Assembly)
                     .Add("role", part.Role == MemberRole.None ? null : part.Role.ToString()).Add("lb_per_ft", part.NominalWeightLbPerFt, 3);
-                if (part.Assumption is { } pas && SteelModel.IsRailing(part.Category)) pjs.Add("status", pas.Status).Add("reason", pas.Reason).Add("assumed", pas.Basis);
+                if (part.Assumption is { } pas && (SteelModel.IsRailing(part.Category) || IsCapPart(part))) pjs.Add("status", pas.Status).Add("reason", pas.Reason).Add("assumed", pas.Basis);
+                if (part.Fabrication is { IsEmpty: false } fab) foreach (var (fn, fv) in fab.Fields()) pjs.Add("fab_" + fn.ToLowerInvariant(), fv);
                 r.Props = pjs.ToString();
                 _w.Add(r);
             }
@@ -739,8 +760,14 @@ public static class ModelDatabase
             PartCategory.ArchStiffener => "stiffener", PartCategory.PtStrand => "PT strand", PartCategory.PtAnchorage => "PT anchorage",
             PartCategory.RolledTee => "tee", PartCategory.AccessDoor => "access door",
             PartCategory.RailPost => "railing post", PartCategory.RailHandrail => "handrail", PartCategory.RailMember => "rail member",
-            PartCategory.RailBasePlate => "post base plate", PartCategory.RailEnvelope => "railing envelope", _ => c.ToString(),
+            PartCategory.RailBasePlate => "post base plate", PartCategory.RailEnvelope => "railing envelope",
+            PartCategory.EndPlate => "end plate", PartCategory.ConnectorPlate => "connector plate", PartCategory.DiaphragmPlate => "connection diaphragm plate",
+            PartCategory.ContinuityPlate => "mill-to-bear plate", PartCategory.CoverPlate => "cover plate", PartCategory.HandholeCover => "handhole cover",
+            PartCategory.HandholeBacking => "handhole backing plate", PartCategory.MeshScreen => "wire mesh screen", _ => c.ToString(),
         };
+
+        private static bool IsCapPart(SteelPart p) => p.Category is PartCategory.EndPlate or PartCategory.ConnectorPlate or PartCategory.DiaphragmPlate
+            or PartCategory.ContinuityPlate or PartCategory.CoverPlate or PartCategory.HandholeCover or PartCategory.HandholeBacking or PartCategory.MeshScreen;
 
         private static string IfcClassOf(SteelPart p) => p.Category switch
         {
