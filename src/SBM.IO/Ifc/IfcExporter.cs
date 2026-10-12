@@ -781,7 +781,7 @@ public static class IfcExporter
             double strandArea = SBM.Core.Prestressed.TxGirderCatalog.StrandAreaIn2(pd.StrandDiameter) * 0.0254 * 0.0254;
             string strandSize = SBM.Core.Prestressed.TxGirderCatalog.StrandSize(pd.StrandDiameter, u);
             var contained = new List<int>();
-            int sheathStyle = 0;
+            int sheathStyle = 0, soleStyle = 0;
             foreach (var b in ps.Beams)
             {
                 // Per-span beam definitions (standard beams): their own strands and concrete.
@@ -796,7 +796,10 @@ public static class IfcExporter
                 int pds = b.Body != null && b.Shape.Profile != null
                     ? rv != null ? RvShape(new List<int> { rv.ClippedBeam(b.Body, b.Shape.Profile) }, beamStyle) : ProfileBody(b, beamStyle)
                     : Body(b.Mesh, beamStyle);
-                string desc = $"{b.TypeName}, {b.Strands.Count} - {bStrandSize} strands ({b.Strands.Count(x => x.Depressed)} depressed" +
+                int ownDiaStrands = b.Strands.Count(x => x.Diameter > 0 && Math.Abs(x.Diameter - bpd.StrandDiameter) > 1e-9);
+                string desc = $"{b.TypeName}, {b.Strands.Count - ownDiaStrands} - {bStrandSize} strands" +
+                              (ownDiaStrands > 0 ? $" + {string.Join(" + ", b.Strands.Where(x => x.Diameter > 0 && Math.Abs(x.Diameter - bpd.StrandDiameter) > 1e-9).GroupBy(x => x.Diameter).Select(g => $"{g.Count()} - {SBM.Core.Prestressed.TxGirderCatalog.StrandSize(g.Key, u)}"))}" : "") +
+                              $" ({b.Strands.Count(x => x.Depressed)} depressed" +
                               (b.Strands.Any(x => x.Debonded) ? $", {b.Strands.Count(x => x.Debonded)} debonded" : "") + $"), L = {u.FormatLength(b.Length)}";
                 int beam = w.Add("IFCBEAM", $"{Guid(IfcKeys.PsBeam(bk, b.Mark))},$,{S(b.Mark)},{S(desc)},$,{Ref(pl)},{Ref(pds)},{S(b.Mark)},.GIRDER_SEGMENT.");
                 AddMaterial(b.Definition == null ? concreteMat : bConcrete, beam);
@@ -807,15 +810,20 @@ public static class IfcExporter
                 foreach (var st in b.Strands)
                 {
                     var (curve, _) = Directrix(st.Points);
-                    int disk = w.Add("IFCSWEPTDISKSOLID", $"{Ref(curve)},{R(bpd.StrandDiameter / 2 * scale)},$,$,$");
+                    double sDia = st.DiameterIn(bpd.StrandDiameter);
+                    bool ownDia = st.Diameter > 0 && Math.Abs(st.Diameter - bpd.StrandDiameter) > 1e-9;
+                    string sSize = ownDia ? SBM.Core.Prestressed.TxGirderCatalog.StrandSize(sDia, u) : bStrandSize;
+                    double sArea = ownDia ? SBM.Core.Prestressed.TxGirderCatalog.StrandAreaIn2(sDia) * 0.0254 * 0.0254 : bStrandArea;
+                    int disk = w.Add("IFCSWEPTDISKSOLID", $"{Ref(curve)},{R(sDia / 2 * scale)},$,$,$");
                     w.Add("IFCSTYLEDITEM", $"{Ref(disk)},({Ref(strandStyle)}),$");
                     int rep = w.Add("IFCSHAPEREPRESENTATION", $"{Ref(body)},'Body','AdvancedSweptSolid',({Ref(disk)})");
                     int spds = w.Add("IFCPRODUCTDEFINITIONSHAPE", $"$,$,({Ref(rep)})");
                     int strandNo = n++;
                     string sk = IfcKeys.PsStrand(bk, b.Mark, strandNo);
+                    string sDesc = sSize + " strand" + (st.Label != null ? ", " + st.Label : "");
                     int id = w.Add("IFCTENDON",
-                        $"{Guid(sk)},$,{S(st.Depressed ? "Depressed strand" : "Strand")},{S(bStrandSize + " strand")},$,{Ref(pl)},{Ref(spds)},$,$,.STRAND.," +
-                        $"{R(bpd.StrandDiameter * scale)},{R(bStrandArea * scale * scale)},$,$,$,$,$");
+                        $"{Guid(sk)},$,{S(st.Depressed ? "Depressed strand" : "Strand")},{S(sDesc)},$,{Ref(pl)},{Ref(spds)},$,$,.STRAND.," +
+                        $"{R(sDia * scale)},{R(sArea * scale * scale)},$,$,$,$,$");
                     AddMaterial(b.Definition == null ? strandMat : bStrandMat, id);
                     kids.Add(id);
                     if (!st.Debonded) continue;
@@ -828,7 +836,7 @@ public static class IfcExporter
                         int end = st.DebondStart > 0 && e == 0 ? 0 : 1;
                         e++;
                         var (sc, _) = Directrix(piece);
-                        double ri = bpd.StrandDiameter / 2, ro = ri + Math.Max(bpd.SheathThickness, 1e-4);
+                        double ri = sDia / 2, ro = ri + Math.Max(bpd.SheathThickness, 1e-4);
                         int sd = w.Add("IFCSWEPTDISKSOLID", $"{Ref(sc)},{R(ro * scale)},{R(ri * scale)},$,$");
                         w.Add("IFCSTYLEDITEM", $"{Ref(sd)},({Ref(sheathStyle)}),$");
                         int srep = w.Add("IFCSHAPEREPRESENTATION", $"{Ref(body)},'Body','AdvancedSweptSolid',({Ref(sd)})");
@@ -855,6 +863,16 @@ public static class IfcExporter
                 AddMaterial("Elastomer (neoprene), steel laminated", id);
                 contained.Add(id);
                 result.ElementCount++;
+                if (p.SolePlate is { } sp)
+                {
+                    if (soleStyle == 0) soleStyle = RgbStyle("Steel sole plate", 0.55, 0.57, 0.60);
+                    int spd = Body(sp.Mesh, soleStyle);
+                    int sid = w.Add("IFCPLATE", $"{Guid(IfcKeys.PsSolePlate(bk, p.Mark))},$,{S(sp.Mark)},{S(sp.Description)},'SOLE_PLATE',{Ref(pl)},{Ref(spd)},{S(sp.Mark)},.USERDEFINED.");
+                    AddMaterial("Steel (galvanized sole plate)", sid);
+                    psetTargets.Add((sid, sp.Mark, "Sole plate", sp.Length, sp.Mass));
+                    contained.Add(sid);
+                    result.ElementCount++;
+                }
             }
             // Concrete end / pier diaphragms (superstructure): IfcBeam .DIAPHRAGM., keyways = IfcBuildingElementPart aggregated into it,
             // polystyrene / preformed fillers = IfcBuildingElementPart 'JOINT_FILLER' (thin solids). Flagged items get Pset SBM_Status.

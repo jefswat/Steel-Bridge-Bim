@@ -19,6 +19,12 @@ public sealed class StrandInstance
     public double DebondStart { get; init; }
     public double DebondEnd { get; init; }
     public string DebondSymbol { get; init; } = "";
+    /// <summary>OPTIONAL own diameter (<see cref="StrandPoint.Diameter"/>); 0 = the beam's <see cref="PrestressedBeam.StrandDiameter"/>.</summary>
+    public double Diameter { get; init; }
+    /// <summary>OPTIONAL plan description (<see cref="StrandPoint.Label"/>); null = none.</summary>
+    public string? Label { get; init; }
+    /// <summary>Diameter of this strand in a beam whose strands are <paramref name="beamDiameter"/>.</summary>
+    public double DiameterIn(double beamDiameter) => Diameter > 0 ? Diameter : beamDiameter;
     public bool Debonded => DebondStart > 0 || DebondEnd > 0;
     /// <summary>Sheathing pieces: the strand path from each end face over its debond length (0, 1 or 2 polylines).</summary>
     public List<Vec3[]> Sheathing()
@@ -121,6 +127,29 @@ public sealed class PrestressedPad
     public string Description { get; init; } = "";
     /// <summary>Distance the pad was moved off the nominal CL bearing to stay on the girder (square ends at skewed bents).</summary>
     public double OffNominal { get; init; }
+    /// <summary>Plan mark of the bearing ("E2"); "" = none (<see cref="Bridge.PrestressedBearingDefinition.Mark"/>).</summary>
+    public string BearingMark { get; init; } = "";
+    /// <summary>OPTIONAL steel sole plate between this pad and the beam; null = none.</summary>
+    public PrestressedSolePlate? SolePlate { get; init; }
+}
+
+/// <summary>Tapered steel sole plate between a bearing pad and the beam (<see cref="Bridge.SolePlateDefinition"/>).</summary>
+public sealed class PrestressedSolePlate
+{
+    public required string Mark { get; init; }
+    public required Mesh Mesh { get; init; }
+    public required double Length { get; init; }
+    public required double Width { get; init; }
+    public required double ThicknessBack { get; init; }
+    public required double ThicknessAhead { get; init; }
+    /// <summary>Thickness at the CL bearing (used in the bearing stack).</summary>
+    public required double ThicknessAtBearing { get; init; }
+    /// <summary>Plan taper (thickness drop per unit length toward the ahead end) minus the beam's fall per unit length (no camber).</summary>
+    public double TaperMinusSlope { get; init; }
+    public string Description { get; init; } = "";
+    public double Volume => Math.Abs(Mesh.Volume());
+    /// <summary>Steel mass at 7850 kg/m³.</summary>
+    public double Mass => Volume * 7850;
 }
 
 /// <summary>Generated TxDOT prestressed concrete superstructure (beams, strands, pads, bearing seats).</summary>

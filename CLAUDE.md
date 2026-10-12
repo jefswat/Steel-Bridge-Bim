@@ -32,7 +32,7 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   orchestration; `IfcKeys` = the key patterns behind the IFC GlobalIds, shared with `IfcExporter` — never change a pattern). Compact layout `el` +
   `strings` + `props`, readable VIEW `elements`; groups (no IFC entity) at the plans' granularity; links on groups/assemblies, children inherit
   (`v_element_sheets`). `tools/plan_split.py` splits plan PDFs. App: `MainWindow.Database.cs` + `SBM.App/Database/` (panel, preview window, `PdfOpener` = open at page).
-  Sheet links need no PDF split: rules files `samples/plans/sheet-links-{i80-rampg,woodbury,br02069,nht,odot-o,bonner-unit5}.json` carry each plan set's sheet index
+  Sheet links need no PDF split: rules files `samples/plans/sheet-links-{i80-rampg,woodbury,br02069,nht,odot-o,bonner-unit5,bonner-unit6}.json` carry each plan set's sheet index
   (`sheets: [{p,s,t}]`) and `models` (which .sbm they belong to; `CompanionDatabase.FindLinksFile` picks by it) + `planFolders` (PDF lookup ->
   `sheets.pdf_path`). Every build applies them; `CompanionDatabase.Relink` / `sbm db --relink` re-applies to an existing db; the app relinks on
   load when links are missing or the rules file is newer. A new bridge needs its own `sheet-links-<name>.json` with an index (tests check every rule matches a sheet).
@@ -277,6 +277,16 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
     profile carry `PrestressedBeam.Body` -> IFC IfcArbitraryClosedProfileDef over IfcIndexedPolyCurve (IfcArcIndex) extruded
     and clipped by the end planes; debond sheathing = IfcTendonConduit (key `IfcKeys.PsSheath`) + Pset SBM_Debonding.
     Demo: `samples/plans/prestressed-shapes-demo.csx`; tests `PrestressedStandardTests`.
+    Florida I-Beam "FL FIB-96" (also "FIB-96"): outline as DIMENSIONED on NCDOT B-2500 p.438 (no FDOT index cited; sharp web / bottom-slope
+    corner at 14.5" + R 15" fillet, 3/4" bottom chamfers drawn not dimensioned) -> A 1,226.6 in² (= the 49.9 CY quantity). OPTIONAL beam inputs
+    (all omitted from the .sbm when unused, output unchanged): `StartBearing` / `EndBearing` = `PrestressedBearingDefinition` per beam END (plan mark,
+    pad size along x across, total height, `SolePlateDefinition` = tapered steel "P" plate: length, width, thickness back / ahead station end,
+    `BearingFromBack`; stack uses the thickness AT the CL bearing) -> `PrestressedPad.BearingMark` / `.SolePlate` (`PrestressedSolePlate`: mesh,
+    taper vs beam slope Info; IFC IfcPlate 'SOLE_PLATE' key `IfcKeys.PsSolePlate`, DB element "sole plate", viewport 3D-BEARING-SOLE-PLATES,
+    elevation-check row "− Sole plate"); `StartBearingToEnd` / `EndBearingToEnd` (span-layout bearing offsets, 0 = BearingToEnd); `CamberTable`
+    (`PrestressedCamberPoint` fraction / camber / SDL / printed final; recorded + Info check, geometry stays uncambered) + `CamberSource`;
+    `PlanLength` / `PlanConcreteVolume` (check data); `StrandPoint.Diameter` / `Label` (e.g. 1/2" slack strands among 0.6") -> `StrandInstance.Diameter`
+    (`DiameterIn(beam)`), IFC tendon diameter / area / description, viewport tube.
     Beam mild reinforcing (OPTIONAL `PrestressedBeamDefinition.Reinforcement` = `Bridge/BeamReinforcementDefinition.cs`, JSON omitted when null = no
     beam bars, output unchanged): `BeamBarSet` = mark / size / coating, CENTERLINE path with sharp corners in beam coordinates (A along the beam from
     the station TOWARD MIDSPAN, X right of CL, Y above the bottom; centerline = out-to-out face - db/2) + `BendRadius`, `Mirror` (pairs), `Copies`
@@ -738,6 +748,13 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   Unit 5: `samples/plans/build-bonner-unit5.csx` (reads the segmental-unit5 CSVs; local grid alignment - coordinates p21-34 not extracted) ->
   `Bonner Unit 5 segmental.sbm`, `check-bonner-unit5.csx` (169 PASS / 23 DIFF, all reported), links `sheet-links-bonner-unit5.json`. Tests `SegmentalTests`.
   Not yet: 2D views, keys, rebar, temporary / bar PT, future PT pipes, blocks, openings, parapets, joints, piles, camber.
+- Bonner Unit 6 (spans 30-35, 4 x FIB-96, `samples/plans/build-bonner-unit6.csx` -> `Bonner Unit 6 FIB.sbm`, reads docs/plan-data/bonner-b2500/fib-unit6
+  CSVs; same -L- local grid as Unit 5): 24 SpanBeams, per-span layouts (G1 LEFT, CL bearing 1'-2" / 3'-2" bent 29 / 1'-4" bent 35), p439 strand pattern
+  read from the VECTOR drawing (72 + 4 slack, 8 draped, 20 debonded), E1/E2/E3 + P sole plates, camber tables, bents 30-35 (level precast cap profile,
+  two pedestal rows, 2 square columns = precast segmental flagged, one combined footing via `FootingDefinition.OnFootingOf`, battered 36" piles per the
+  footing plans). Check `check-bonner-unit6.csx` (143 PASS / 12 DIFF, all reported: station rounding, plan "A" per span pair); links
+  `sheet-links-bonner-unit6.json`; tests `BonnerFibTests`. Bent 29 substructure = Unit 5 model. GAPs: beam / deck bars, parapets, diaphragms, joints.
+  Substructure OPTIONAL `SubstructureDefinition.Unresolved` (raised as warnings) and `FootingDefinition.OnFootingOf` (combined footing: no footing / piles of its own).
 - Project georeference (OPTIONAL `BridgeProject.Georeference` = `Project/GeoreferenceDefinition.cs`, null = local grid, omitted from the .sbm): CRS name,
   datum / projection / zone, map unit, `GridScale` (map / project distance, e.g. 1 / TxDOT SAF) -> IFC IfcProjectedCRS + IfcMapConversion Scale with the
   base point converted to grid units; the model is never moved. NHT: EPSG:2276 x Dallas County SAF 1.000136 (U12 resolved from a user GPS check).
