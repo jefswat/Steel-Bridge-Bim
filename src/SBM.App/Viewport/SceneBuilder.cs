@@ -177,7 +177,8 @@ public static class SceneBuilder
         ("3D-ARCH-RIBS", 70, 130, 200, new[] { PartCategory.ArchRib }),
         ("3D-ARCH-TIES", 60, 110, 190, new[] { PartCategory.TiePlate }),
         ("3D-ARCH-FLOORBEAMS", 90, 150, 210, new[] { PartCategory.FloorbeamPlate }),
-        ("3D-ARCH-HANGERS", 215, 215, 225, new[] { PartCategory.Hanger, PartCategory.HangerSocket, PartCategory.CableConnector }),
+        ("3D-ARCH-HANGERS", 215, 215, 225, new[] { PartCategory.Hanger, PartCategory.HangerSocket }),
+        ("3D-ARCH-CABLE-CONNECTORS", 150, 150, 155, new[] { PartCategory.CableConnector }),   // p.150 UHMW-PE "shall be color gray"
         ("3D-ARCH-FIN-PLATES", 235, 150, 70, new[] { PartCategory.FinPlate }),
         ("3D-ARCH-CONNECTIONS", 120, 210, 230, new[] { PartCategory.ArchConnectionPlate, PartCategory.ArchStiffener }),
         ("3D-ARCH-PT", 230, 120, 40, new[] { PartCategory.PtStrand, PartCategory.PtAnchorage }),
@@ -211,8 +212,9 @@ public static class SceneBuilder
         {
             if (i == SolidLayerDefs.Length + 3)
             {
-                // Steel parts whose geometry the plans do not fix (SteelPart.Assumption): their own orange layer, removed from the normal layers.
-                var flagged = models.SelectMany(m => m.Parts).Where(p => p.Assumption != null && !p.Mesh.IsEmpty).ToList();
+                // Steel parts the plans may not have at all (SteelPart.Assumption, not DimensionOnly): their own orange layer, removed from the normal layers.
+                // Parts the plans show with only a dimension open (Assumption.DimensionOnly) stay on their normal layer, flagged in the pick properties.
+                var flagged = models.SelectMany(m => m.Parts).Where(p => p.Assumption is { DimensionOnly: false } && !p.Mesh.IsEmpty).ToList();
                 if (flagged.Count == 0) return;
                 var fm = FlatShaded(flagged.Select(p => p.Mesh), o, flagged);
                 layers[i] = new SolidLayer { Name = UnresolvedSteelLayer, R = 255, G = 110, B = 40, Parts = new() { (fm, null) }, Triangles = fm.Indices!.Count / 3 };
@@ -221,7 +223,7 @@ public static class SceneBuilder
             if (i < SolidLayerDefs.Length)
             {
                 var (name, r, g, b, cats) = SolidLayerDefs[i];
-                var parts = models.SelectMany(m => m.Parts).Where(p => cats.Contains(p.Category) && p.Assumption == null).ToList();
+                var parts = models.SelectMany(m => m.Parts).Where(p => cats.Contains(p.Category) && (p.Assumption == null || p.Assumption.DimensionOnly)).ToList();
                 if (parts.Count == 0) return;
                 if (name == "3D-WELDS")
                 {

@@ -229,6 +229,12 @@ arch seat table, no arch camber / deflection data, no review comment (none survi
 Model recommendation: take the p.102 pedestal tops as plan values (what gets built); report B1-B3 against the p.119 WP
 chain as warnings; fix neither side.
 
+2026-10-12 (v4, user review "the plate it's sitting on is wrong"): the stack built UP from the p.102 pedestal pushed the upper sole plate 1 9/16 - 2 3/8"
+INTO the knuckle splice plate. The bearing is now hung from the steel (`ArchBearingDefinition.HangFromSteel`): upper sole top in the plane of the
+splice plate underside (WP - 2 1/8"), the rest level below. Confirmation: the steel slope then gives the beveled sole exactly the p.107 table thickness
+(A 3 1/8 / C 2 7/8 at the 16" ends, within 1/16"). The pedestal concrete stays at the p.102 EL; the stack bottom is 1 3/4" (P10 N), 2 7/16" (P10 S),
+2 3/8" (P11 N), 1 3/4" (P11 S) below it - CONFLICT reported (p.107 note 8: pedestal adjusted to the fabricated bearing).
+
 ## Review comments
 None found: 0 PDF annotations on 155 pages; optional-content layer "Review" (xref 130) is defined but empty (toggling it
 changes no pixel); colour scan finds no red/blue markups (only blue PE signatures). Grey clouds such as "CAUTION OVERHEAD

@@ -86,6 +86,26 @@ public partial class MainWindow : Window
         Closed += (_, _) => _remoteCts?.Cancel();
     }
 
+    /// <summary>--camera E,N,Z,dx,dy,dz,width[,distance] (snapshot runs).</summary>
+    private void ApplyCameraArg(string[] args)
+    {
+        int ki = Array.IndexOf(args, "--camera");
+        if (ki >= 0 && ki + 1 < args.Length && _scene != null && View.Camera is OrthographicCamera kc)
+        {
+            var kv = args[ki + 1].Split(',').Select(x => double.Parse(x, System.Globalization.CultureInfo.InvariantCulture)).ToArray();
+            _planMode = false; View.IsRotationEnabled = true; SyncViewSwitch(false); ApplyLayerVisibility();
+            var kt = new Vec3(kv[0], kv[1], kv[2]) - _scene.Origin;
+            var klk = new Vector3D(kv[3], kv[4], kv[5]);
+            klk.Normalize();
+            double kd = kv.Length > 7 ? kv[7] : 50;   // optional 8th value: camera distance (m) in front of the target
+            kc.LookDirection = klk * kd;
+            kc.Position = new Point3D(kt.X, kt.Y, kt.Z) - klk * kd;
+            kc.UpDirection = new Vector3D(0, 0, 1);
+            kc.Width = kv[6];
+            KeepCameraInRange();
+        }
+    }
+
     /// <summary>
     /// Command line: --snapshot out.png [--3d] renders the window and the viewport to PNG files and exits.
     /// Used for automated visual checks.
@@ -97,6 +117,13 @@ public partial class MainWindow : Window
         if (i < 0 || i + 1 >= args.Length) return;
         string path = args[i + 1];
         bool threeD = args.Contains("--3d");
+        // --winsize W,H: window size in device-independent pixels (bigger close-ups)
+        int wsi = Array.IndexOf(args, "--winsize");
+        if (wsi >= 0 && wsi + 1 < args.Length)
+        {
+            var ws = args[wsi + 1].Split(',').Select(x => double.Parse(x, System.Globalization.CultureInfo.InvariantCulture)).ToArray();
+            WindowState = WindowState.Normal; Left = 0; Top = 0; Width = ws[0]; Height = ws[1];
+        }
         bool done = false;
         _vm.SceneReady += (_, _) =>
         {
@@ -125,21 +152,7 @@ public partial class MainWindow : Window
                     ApplyLayerVisibility();
                 }
                 // --camera E,N,Z,dx,dy,dz,width[,distance]: orthographic 3D view of the world point (E, N, Z in meters) looking along (dx, dy, dz).
-                int ki = Array.IndexOf(args, "--camera");
-                if (ki >= 0 && ki + 1 < args.Length && _scene != null && View.Camera is OrthographicCamera kc)
-                {
-                    var kv = args[ki + 1].Split(',').Select(x => double.Parse(x, System.Globalization.CultureInfo.InvariantCulture)).ToArray();
-                    _planMode = false; View.IsRotationEnabled = true; SyncViewSwitch(false); ApplyLayerVisibility();
-                    var kt = new Vec3(kv[0], kv[1], kv[2]) - _scene.Origin;
-                    var klk = new Vector3D(kv[3], kv[4], kv[5]);
-                    klk.Normalize();
-                    double kd = kv.Length > 7 ? kv[7] : 50;   // optional 8th value: camera distance (m) in front of the target
-                    kc.LookDirection = klk * kd;
-                    kc.Position = new Point3D(kt.X, kt.Y, kt.Z) - klk * kd;
-                    kc.UpDirection = new Vector3D(0, 0, 1);
-                    kc.Width = kv[6];
-                    KeepCameraInRange();
-                }
+                ApplyCameraArg(args);
                 if (args.Contains("--noterrain")) SetTerrainVisible(false);
                 // --width W: orthographic view width in meters (after --closeup / --camera), e.g. to look at bars.
                 int wi = Array.IndexOf(args, "--width");
@@ -173,6 +186,7 @@ public partial class MainWindow : Window
                 int lodWaits = 0;
                 bool frameBenchDone = false;
                 var t2 = new System.Windows.Threading.DispatcherTimer { Interval = TimeSpan.FromSeconds(threeD ? 1.5 : args.Any(x => x is "--measure" or "--query" or "--snapbench") ? 1.5 : 0.1) };
+                bool cameraAgain = false;
                 t2.Tick += (_, _) =>
                 {
                     int fbi = Array.IndexOf(args, "--framebench");
@@ -187,6 +201,11 @@ public partial class MainWindow : Window
                     if (_lodBusy && ++lodWaits < 120) { t2.Interval = TimeSpan.FromMilliseconds(500); return; } // let the near-view rebar finish
                     // terrain / references (loaded after the scene) and a scene rebuilt by the memory manager
                     if ((_vm.Project.References.Count > 0 && _vm.ReferenceLoads == 0 || _vm.IsBusy) && ++lodWaits < 240) { t2.Interval = TimeSpan.FromMilliseconds(500); return; }
+                    if (!cameraAgain && args.Contains("--camera"))
+                    {
+                        // again: the 3D switch animates a zoom extents (300 ms) that overrode the first one; one more tick for the detail tiles / frame
+                        cameraAgain = true; ApplyCameraArg(args); t2.Interval = TimeSpan.FromSeconds(1.5); return;
+                    }
                     t2.Stop();
                     if (args.Contains("--noterrain")) SetTerrainVisible(false); // terrain may have finished loading after the first call
                     // --pickafter fx,fy / --hideafter fx,fy: like --pick / --hide but once the near-view rebar is in place.

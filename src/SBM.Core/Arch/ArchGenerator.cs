@@ -459,7 +459,7 @@ public static partial class ArchGenerator
                 if (stub)
                 {
                     string km = $"{asm}-STUB{(k == 0 ? 1 : 2)}";
-                    var asu = r.StubUnresolved.Length > 0 ? Assumption.Unresolved(r.StubUnresolved, $"{w.Name} envelope from the knuckle to the end splice") : null;
+                    var asu = r.StubUnresolved.Length > 0 ? Assumption.UnresolvedDimension(r.StubUnresolved, $"{w.Name} envelope from the knuckle to the end splice") : null;
                     AddPart(km, PartCategory.KnucklePlate, asm, $"Knuckle arch stub ({w.Name} envelope)", m, "ASTM A709 Gr. 50", len, 0, asu);
                 }
                 else AddPart($"{asm}-{k + (hasStubs ? 0 : 1)}", PartCategory.ArchRib, asm, $"{w.Name} rib segment", m, r.Material, len, w.WeightPerFootLb);
@@ -596,7 +596,7 @@ public static partial class ArchGenerator
             if (MeshBuilder.SignedArea(outl) < 0) outl.Reverse();
             var m = new Mesh();
             PlateBuilder.AddPrism(m, outl, new[] { new Hole(Vec2.Zero, fs.PinHole) }, (u, v, t) => W(hc + bn * u + e * v + nf * t), _ => -fs.RibThickness / 2, _ => fs.RibThickness / 2);
-            var asu = fs.RibUnresolved.Length > 0 ? Assumption.Unresolved(fs.RibUnresolved, $"PL {L(fs.RibThickness)}, top clips {L(clip)}") : null;
+            var asu = fs.RibUnresolved.Length > 0 ? Assumption.UnresolvedDimension(fs.RibUnresolved, $"PL {L(fs.RibThickness)}, top clips {L(clip)}") : null;
             AddPart($"{RibAsm(h.Rib)}-FIN-{h.Name}", PartCategory.FinPlate, RibAsm(h.Rib),
                 $"PL {L(fs.RibThickness)} cable fin plate at rib, {h.Name} (P2 {L(yWeb)}, P3 {L(rf.P3)}, P4 {L(rf.P4)}{(double.IsNaN(rf.WeldLength) ? "" : $", weld D {L(rf.WeldLength)}")})",
                 m, fs.Material, yWeb - rf.P4 + r, 0, asu);
@@ -930,7 +930,7 @@ public static partial class ArchGenerator
             if (w == null) { Warn($"Arch: bracing section '{_d.BracingSection}' is not in the AISC catalog - bracing not built."); return; }
             var sec = SteelCatalog.WideFlangePolygon(w, -w.WebThickness / 2);
             AddAssembly("UPPER-BRACING", AssemblyKind.ArchBracing, $"Upper lateral bracing {w.Name}");
-            var asu = _d.BracingOrientationUnresolved.Length > 0 ? Assumption.Unresolved(_d.BracingOrientationUnresolved, "web in the plane of the member and the local Z axis, work point to work point") : null;
+            var asu = _d.BracingOrientationUnresolved.Length > 0 ? Assumption.UnresolvedDimension(_d.BracingOrientationUnresolved, "web in the plane of the member and the local Z axis, work point to work point") : null;
             // Member axes (world) first: crossing trims need the continuous members.
             var axes = new Dictionary<string, (Vec3 a, Vec3 b)>(StringComparer.OrdinalIgnoreCase);
             foreach (var br in _d.Bracing)
@@ -1019,7 +1019,7 @@ public static partial class ArchGenerator
             double ang3d = Math.Acos(Math.Min(1, Math.Abs(Vec3.Dot(sd, cd)))) * 180 / Math.PI;
             string asm = $"UPPER-BRACING";
             var hd = Model.Steel.Bolt.HoleDiameter;
-            var asu = cr.Unresolved.Length > 0 ? Assumption.Unresolved(cr.Unresolved, $"PL {L(cr.Thickness)}") : null;
+            var asu = cr.Unresolved.Length > 0 ? Assumption.UnresolvedDimension(cr.Unresolved, $"PL {L(cr.Thickness)}") : null;
             int nb = 0;
             foreach (var (top, l1, l2, l3, angPlan) in new[] { (true, cr.TopL1, cr.TopL2, cr.TopL3, cr.TopAngleDeg), (false, cr.BottomL1, cr.BottomL2, cr.BottomL3, cr.BottomAngleDeg) })
             {
@@ -1091,7 +1091,7 @@ public static partial class ArchGenerator
                 var web = new Mesh();
                 RolledBuilder.AddExtrusion(web, new[] { new Vec2(-half, zt), new Vec2(half, zt), new Vec2(half, zt + hEnd), new Vec2(0, zt + k.EndWebHeightAtChord), new Vec2(-half, zt + hEnd) },
                     org, et, _fr.Z, en, o0, o0 + k.EndWebThickness);
-                var asu = double.IsNaN(k.EndWebHeightAtEnds) && k.EndWebUnresolved.Length > 0 ? Assumption.Unresolved(k.EndWebUnresolved, $"end height {L(hEnd)} scaled") : null;
+                var asu = double.IsNaN(k.EndWebHeightAtEnds) && k.EndWebUnresolved.Length > 0 ? Assumption.UnresolvedDimension(k.EndWebUnresolved, $"end height {L(hEnd)} scaled") : null;
                 AddPart($"{asm}-EW", PartCategory.KnucklePlate, asm, $"PL {L(k.EndWebThickness)} end web", web, k.Material, k.EndLength, 0, asu);
             }
             else Warn(k.EndWebUnresolved.Length > 0 ? k.EndWebUnresolved : $"Arch: knuckle {k.Name} end web height at the ends not given - end web not built.");
@@ -1109,7 +1109,7 @@ public static partial class ArchGenerator
                 if (MeshBuilder.SignedArea(outline) < 0) outline.Reverse();
                 var dp = new Mesh();
                 MeshBuilder.AddExtrusion(dp, outline, _fr, k.DeckPlateTopZ - k.DeckPlateThickness, k.DeckPlateTopZ);
-                var asu = k.DeckPlateUnresolved.Length > 0 ? Assumption.Unresolved(k.DeckPlateUnresolved, $"top at local Z {L(k.DeckPlateTopZ)}") : null;
+                var asu = k.DeckPlateUnresolved.Length > 0 ? Assumption.UnresolvedDimension(k.DeckPlateUnresolved, $"top at local Z {L(k.DeckPlateTopZ)}") : null;
                 AddPart($"{asm}-DP", PartCategory.KnucklePlate, asm, $"PL {L(k.DeckPlateThickness)} deck plate", dp, k.Material, 0, 0, asu);
             }
             foreach (var pt in k.PtAnchors) Model.Tendons.Add(($"{k.Name} PT anchor {pt.Name}", new List<Vec3> { W(pt.Vec) }, "PT anchorage (data)"));
@@ -1279,7 +1279,7 @@ public static partial class ArchGenerator
             Model.Concrete.Deck = slab;
             Model.SlabEnds = ends;
             AddAssembly("FORM-DECK", AssemblyKind.ArchDeckForm, "Corrugated steel deck form spanning the floorbeams");
-            var fasu = dk.FormUnresolved.Length > 0 ? Assumption.Unresolved(dk.FormUnresolved, $"pitch {L(dk.FormPitch)}, top flat {L(dk.FormTopFlat)}, flute bottom {L(dk.FormFluteBottom)}") : null;
+            var fasu = dk.FormUnresolved.Length > 0 ? Assumption.UnresolvedDimension(dk.FormUnresolved, $"pitch {L(dk.FormPitch)}, top flat {L(dk.FormTopFlat)}, flute bottom {L(dk.FormFluteBottom)}") : null;
             AddPart("FORM-DECK", PartCategory.FormDeck, "FORM-DECK", dk.FormDescription.Length > 0 ? dk.FormDescription : $"{L(dk.FormDepth)} x {L(dk.FormPitch)} steel deck form", sheet,
                 "ASTM A653 Gr. 33, G165 galvanized", 0, 0, fasu);
             BuildCurbs(dk, ka, kb);
@@ -1391,7 +1391,10 @@ public static partial class ArchGenerator
                 Info($"Arch bearing {br.Name}: plates and anchor bolts along {br.LongAxisAngleDeg:0.###} deg to the {sl.Name} line ({br.LongAxisSource}); {toChord:F2} deg off the arch chord in plan.");
             }
             var across = along.Left;
-            var f0 = new Frame3(c2.WithZ(br.SeatElevation), along.WithZ(0), across.WithZ(0), new Vec3(0, 0, 1));
+            // Seat of the stack: the plan pedestal top, or (HangFromSteel) the level that puts the upper sole plate against the steel.
+            double stackBelowSteel = br.PadThickness + br.MasonryThickness + br.LowerSoleThickness + br.ElastomerHeight + br.UpperSoleB;
+            double seat = br.HangFromSteel ? top.Z - stackBelowSteel : br.SeatElevation;
+            var f0 = new Frame3(c2.WithZ(seat), along.WithZ(0), across.WithZ(0), new Vec3(0, 0, 1));
             string asm = $"BRG-{br.Name}";
             AddAssembly(asm, AssemblyKind.Bearing, $"Arch bearing {br.Name} ({br.Fixity}) at {br.Support}");
             double z = 0;
@@ -1408,8 +1411,26 @@ public static partial class ArchGenerator
             // Beveled upper sole: A at the -X (west) end, C at the +X end, B at the CL.
             var us = new Mesh();
             double hl = br.SoleLength / 2;
-            var prof = new[] { new Vec2(-hl, z), new Vec2(hl, z), new Vec2(hl, z + br.UpperSoleC), new Vec2(-hl, z + br.UpperSoleA) };
-            RolledBuilder.AddExtrusion(us, prof, f0.Origin, f0.X, f0.Z, f0.Y, -br.SoleWidth / 2, br.SoleWidth / 2);
+            if (br.HangFromSteel)
+            {
+                // Top in the plane of the steel underside (local XY plane through the bearing centre), bottom level: the bevel follows the steel.
+                var nz = _fr.Z;
+                double ZSteel(Vec3 p) => top.Z - (nz.X * (p.X - top.X) + nz.Y * (p.Y - top.Y)) / nz.Z;
+                var sec = new List<Vec2> { new(-hl, -br.SoleWidth / 2), new(hl, -br.SoleWidth / 2), new(hl, br.SoleWidth / 2), new(-hl, br.SoleWidth / 2) };
+                var bot = sec.Select(q => f0.ToWorld(q.X, q.Y, z)).ToArray();
+                var tp = bot.Select(q => new Vec3(q.X, q.Y, ZSteel(q))).ToArray();
+                MeshBuilder.AddLoft(us, sec, new[] { bot, tp });
+                double tA = ZSteel(f0.ToWorld(-hl, 0, 0)) - f0.ToWorld(0, 0, z).Z, tC = ZSteel(f0.ToWorld(hl, 0, 0)) - f0.ToWorld(0, 0, z).Z;
+                double cross = Math.Abs(ZSteel(f0.ToWorld(0, br.SoleWidth / 2, 0)) - ZSteel(f0.ToWorld(0, -br.SoleWidth / 2, 0)));
+                Check($"bearing {br.Name}: beveled upper sole thickness at the A end (top against the steel)", br.UpperSoleA, tA, In(1.0 / 16), L, "p.107 table A / B / C vs the steel underside slope along the plate (local structure plane, 1.039 deg tilt)");
+                Check($"bearing {br.Name}: beveled upper sole thickness at the C end (top against the steel)", br.UpperSoleC, tC, In(1.0 / 16), L, "p.107 table vs the steel underside slope");
+                Info($"Arch bearing {br.Name}: upper sole top in the plane of the steel underside; cross slope over its {L(br.SoleWidth)} width {L(cross)} (p.107 bevels one way only).");
+            }
+            else
+            {
+                var prof = new[] { new Vec2(-hl, z), new Vec2(hl, z), new Vec2(hl, z + br.UpperSoleC), new Vec2(-hl, z + br.UpperSoleA) };
+                RolledBuilder.AddExtrusion(us, prof, f0.Origin, f0.X, f0.Z, f0.Y, -br.SoleWidth / 2, br.SoleWidth / 2);
+            }
             AddPart($"{asm}-US", PartCategory.SolePlate, asm, $"PL beveled upper sole {L(br.UpperSoleA)} / {L(br.UpperSoleB)} / {L(br.UpperSoleC)}", us, "ASTM A709 Gr. 50", br.SoleLength);
             double zTop = z + br.UpperSoleB;
             var pin = new Mesh();
@@ -1422,11 +1443,19 @@ public static partial class ArchGenerator
                     Grip = br.MasonryThickness + br.PadThickness, Length = br.AnchorEmbedment, Assembly = asm, Kind = BoltKind.Anchor,
                     Diameter = br.AnchorDiameter, Embedment = br.AnchorEmbedment,
                 });
-            double stackTop = br.SeatElevation + zTop;
+            double stackTop = seat + zTop;
             Model.Bearings.Add(new ArchBearingResult(br.Name, br.Support, top, br.SeatElevation, stackTop, top.Z));
             Model.BearingNames.Add(br.Name);
-            Check($"bearing {br.Name}: underside of steel from the WP chain (plan) vs top of the {L(zTop)} bearing stack on the plan pedestal (model)", top.Z, stackTop, Tol,
-                v => $"{ToFt(v):F3}'", "pedestal tops are the plan values (p.102); the WP chain is p.119 / p.124 - B1-B3, reported only");
+            if (br.HangFromSteel)
+            {
+                Check($"bearing {br.Name}: plan pedestal top (p.102) vs the bottom of the {L(zTop)} bearing stack hung from the steel (model)", br.SeatElevation, seat, Tol,
+                    v => $"{ToFt(v):F3}'", "the upper sole plate bears on the knuckle splice plate (p.107 Section A-A, p.124 A-A); p.107 note 8: the contractor adjusts the pedestal elevations to the fabricated bearing - B1-B3, the pedestal concrete is NOT changed");
+                if (Math.Abs(seat - br.SeatElevation) > Tol)
+                    Warn($"Arch CONFLICT bearing {br.Name}: the bearing stack under the steel ends {L(Math.Abs(seat - br.SeatElevation))} {(seat < br.SeatElevation ? "BELOW" : "ABOVE")} the p.102 pedestal top EL {ToFt(br.SeatElevation):F3}' (p.107 note 8: pedestal to be adjusted; the plan pedestal is kept, the pad / masonry plate overlap it).");
+            }
+            else
+                Check($"bearing {br.Name}: underside of steel from the WP chain (plan) vs top of the {L(zTop)} bearing stack on the plan pedestal (model)", top.Z, stackTop, Tol,
+                    v => $"{ToFt(v):F3}'", "pedestal tops are the plan values (p.102); the WP chain is p.119 / p.124 - B1-B3, reported only");
             var so = _al.Inverse(c2);
             Model.Steel.BearingSeats.Add(new BearingSeat(sl.Name, Model.BearingNames.Count - 1, so.Station, br.SeatElevation, br.UpperSoleA,
                 "Elastomeric (arch)", br.Fixity, c2, along, br.MasonryLength, br.MasonryWidth));

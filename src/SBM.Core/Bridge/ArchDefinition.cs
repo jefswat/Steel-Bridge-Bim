@@ -624,6 +624,19 @@ public sealed class ArchKnuckleDetail
     public double FillThickness { get; set; } = In(1.125);
     public double SplicePlateThickness { get; set; } = In(1);
     public double SplicePlateLength { get; set; } = In(24);
+    /// <summary>OPTIONAL plan outline of the 1" splice plate and the fill (p.124 partial plan, dashed "1\" SPLICE PL AND FILL PL"; NaN = v2 tie-flange-wide
+    /// rectangle): half width each side of the chord through the T point, end edge parallel to the joint (end flange edge) this far past it, the
+    /// ACUTE end corner cut (along the side edge / along the end edge). The plate starts at the end web outside face.</summary>
+    public double SpliceHalfWidth { get; set; } = double.NaN;
+    public double SpliceBeyondJoint { get; set; } = double.NaN;
+    public double SpliceChamferSide { get; set; }
+    public double SpliceChamferEnd { get; set; }
+    /// <summary>OPTIONAL end flange-to-splice bolt rows (p.124 "7 SPA @ 4 3/8"): lateral offset each side of the chord, first bolt from the end web outside face
+    /// (along the chord), count, pitch. Count 0 = none.</summary>
+    public double SpliceBoltRowOffset { get; set; }
+    public double SpliceBoltFirst { get; set; }
+    public int SpliceBoltCount { get; set; }
+    public double SpliceBoltPitch { get; set; }
     public string SpliceUnresolved { get; set; } = "";
     public double CheeseThickness { get; set; } = In(1);
     public double CheeseLength { get; set; } = In(10.25);
@@ -769,6 +782,10 @@ public sealed class ArchBearingDefinition
     /// <summary>Local Z of the underside of the steel above the bearing (chain check).</summary>
     public double SteelUndersideZ { get; set; } = double.NaN;
     public string Fixity { get; set; } = "Partially fixed";
+    /// <summary>OPTIONAL (default false = stack built UP from the plan pedestal top): true = the stack is built DOWN from the underside of the steel
+    /// (SteelUndersideZ at the bearing centre): the beveled upper sole plate bears on the steel with its top in the plane of the steel underside, the
+    /// rest below it level; the plan pedestal top is then checked (p.107 note 8: the pedestal elevations are adjusted to the fabricated bearing).</summary>
+    public bool HangFromSteel { get; set; }
     /// <summary>Long axis of the masonry / sole plates in plan: angle (deg) from the support line +S (right) toward +N (up-station), as the plan
     /// pedestal (NaN = normal to the support line).</summary>
     public double LongAxisAngleDeg { get; set; } = double.NaN;

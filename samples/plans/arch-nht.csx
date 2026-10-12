@@ -343,7 +343,15 @@ var kDetail = new ArchKnuckleDetail
 {
     StubWebUnresolved = U("p.124 / 125 Section A-A", "knuckle stub web thickness", "the web plate milled to bear on the end flange (1'-11 5/8 to the arch stiffener) is drawn but not labelled", "1\" (as drawn, = the arch flange plates)."),
     ArchStiffenerUnresolved = U("p.124 / 125 Section A-A", "knuckle arch stiffener extent", "the 1\" arch stiffener is shown on the intrados side only, its width is not dimensioned", "From the stub web face to the flange tip (7 3/8 from the rib CL)."),
-    SpliceUnresolved = U("p.124 / 125", "knuckle splice / fill plates under the tie flange", "the 1\" splice plate and 1 1/8\" fill plate outlines and bolts are not dimensioned (Section A-A shows the 1\" plate from the end of the end flange to ~1'-1 past the joint)", "Tie flange width, 1'-0 past the joint; bolts not modeled."),
+    // v4: the splice / fill outline from the p.124 partial plan VECTOR linework (dashed "1\" SPLICE PL AND FILL PL", T34' origin, 1" = 1'-0 = 6 pt/in):
+    // sides at +-11.0" from the T0'-T34' chord (solid outer edge y = +11.00, dashed inner edge y = -11.00), end edge parallel to the end flange edge
+    // (joint) 11.76" past it, acute end corner cut from (26.58, -11.00) to (35.30, -2.30) = 13 1/4" along the side x 9 13/16" along the end; end flange
+    // bolt rows +-9 1/2" (1 1/2" from the edges) "7 SPA @ 4 3/8" (printed), first hole 2.82" from the end web outside face along the chord (vector).
+    // p.125 (SW) shows the same plate mirrored (end edge at the obtuse corner 28.6" from T0, 10.15" inside / scaled) -> one rule for the 4 corners.
+    SpliceHalfWidth = In(11), SpliceBeyondJoint = In(11.75), SpliceChamferSide = In(13.25), SpliceChamferEnd = In(9.8125),
+    SpliceBoltRowOffset = In(9.5), SpliceBoltFirst = In(2.8125), SpliceBoltCount = 8, SpliceBoltPitch = In(4.375),
+    SpliceUnresolved = U("p.124 / 125", "knuckle splice / fill plate outline", "the 1\" splice plate and 1 1/8\" fill plate are drawn dashed in the partial plans but only the bolt pitch is printed; the splice-to-tie flange bolts along the joint (3 SPA @ 3) are not dimensioned to the tie",
+        "Outline 1'-10 wide, end web to 11 3/4\" past the joint, acute corner cut 13 1/4 x 9 13/16 (VECTOR linework p.124, to scale); end flange bolt rows modeled, splice-to-tie bolts not modeled."),
     CheeseUnresolved = U("p.124 / 125 Section A-A", "knuckle jack cheese plates", "the 1\" cheese plates at the jacks (1'-1 each side of CL bearing) are drawn ~10 1/4\" long but not dimensioned in plan", "10 1/4\" x 10 1/4\" centred on the jacks."),
 };
 var studRows = new List<ArchPoint>();
@@ -419,7 +427,7 @@ deck.Tendons.AddRange(ptPaths.Values);
 // approach model from p.102 + p.91, build-nht.csx); in approach mode the tops are read from the pier units' FixedSeats instead. Underside of steel = end flange bottom (1 1/8" below the WP) - 1" plate below it (p.124, not dimensioned, U10).
 // Plan orientation: the masonry plate (3'-2 x 1'-5) sits in the 3'-4 x 1'-7 arch pedestal whose long axis is 63 deg to the pier line (p.102 plan, TYP;
 // both piers, in the pier frame S right / N up-station as the approach model's pedestals) -> the bearing plates and anchor bolts follow it.
-void Brg(string name, string support, string tpt, double seatFt) => arch.Bearings.Add(new ArchBearingDefinition { Name = name, Support = support, Point = "BRG-" + name, SeatElevation = F(seatFt), SteelUndersideZ = -In(1.125) - In(1),
+void Brg(string name, string support, string tpt, double seatFt) => arch.Bearings.Add(new ArchBearingDefinition { Name = name, Support = support, Point = "BRG-" + name, SeatElevation = F(seatFt), SteelUndersideZ = -In(1.125) - In(1), HangFromSteel = true,
     LongAxisAngleDeg = 63, LongAxisSource = "p.102 pier plan: arch span pedestal 63 deg (TYP) to the CL pier; p.107 bearing plan inside it" });
 Brg("NW", "Pier 10", "T34'", 534.726); Brg("SW", "Pier 10", "T0", 534.779); Brg("NE", "Pier 11", "T0'", 531.546); Brg("SE", "Pier 11", "T34", 531.494);
 foreach (var (bn, tn) in new[] { ("NW", "T34'"), ("SW", "T0"), ("NE", "T0'"), ("SE", "T34") })

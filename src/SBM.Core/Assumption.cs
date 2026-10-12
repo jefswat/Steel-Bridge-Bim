@@ -12,6 +12,12 @@ public sealed record Assumption(string Status, string Reason, string Basis)
 {
     public const string UnresolvedStatus = "UNRESOLVED";
     public static Assumption Unresolved(string reason, string basis) => new(UnresolvedStatus, reason, basis);
+    /// <summary>OPTIONAL (default false = the element itself is uncertain): true = the plans show the element, only a dimension / position is open.
+    /// Such an element stays on its NORMAL viewport layer with the status flag (pick properties, IFC SBM_Status, database status) instead of the
+    /// 3D-UNRESOLVED-* layer (user rule 2026-10-12, applied to the tied arch parts).</summary>
+    public bool DimensionOnly { get; init; }
+    /// <summary>UNRESOLVED dimension of an element that the plans clearly show (see <see cref="DimensionOnly"/>).</summary>
+    public static Assumption UnresolvedDimension(string reason, string basis) => new(UnresolvedStatus, reason, basis) { DimensionOnly = true };
 }
 
 /// <summary>
