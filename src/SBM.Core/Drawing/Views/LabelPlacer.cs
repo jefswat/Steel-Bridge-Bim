@@ -66,7 +66,7 @@ public static class LabelPlacer
         var boxes = new List<Box>();
         for (int li = 0; li < layers.Count; li++)
         {
-            bool fix = layers[li].Style.Name is "S-TITLE" or "S-GRID";
+            bool fix = layers[li].Style.Name is "S-TITLE" or "S-GRID" or "S-NOTES";
             for (int ti = 0; ti < layers[li].Texts.Count; ti++)
                 if (layers[li].Texts[ti].Text.Length > 0) boxes.Add(Make(li, ti, layers[li].Texts[ti], fix));
         }

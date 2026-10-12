@@ -47,19 +47,49 @@ public static class GirderViews
         var top = Runs(GirderPlate.TopFlange);
         var bot = Runs(GirderPlate.BottomFlange);
         var web = Runs(GirderPlate.Web);
-        foreach (var (s0, s1, p) in top)
+        // Plate labels in rows: a label that does not fit beside its neighbours goes to the next row with a leader (pier zones have
+        // short plates at 1" = 100'); everything above / below the plate labels moves out by the rows used.
+        const double RowIn = 0.15;
+        int[] Rows(List<(double c, string text)> labels)
         {
+            var rows = new int[labels.Count];
+            var ends = new List<double>();
+            double gap = d.Paper(0.06);
+            foreach (int i in Enumerable.Range(0, labels.Count).OrderBy(i => labels[i].c))
+            {
+                double hw = LabelPlacer.WidthInHeights(labels[i].text) * d.SmallTextH / 2;
+                int r = 0;
+                while (r < ends.Count && ends[r] + gap > labels[i].c - hw) r++;
+                if (r == ends.Count) ends.Add(double.NegativeInfinity);
+                ends[r] = labels[i].c + hw;
+                rows[i] = r;
+            }
+            return rows;
+        }
+        var topLabels = top.Select(x => ((x.s0 + x.s1) / 2, $"TOP FL {Pl(x.seg)}")).ToList();
+        var botLabels = bot.Select(x => ((x.s0 + x.s1) / 2, $"BOT FL {Pl(x.seg)}")).ToList();
+        var topRows = Rows(topLabels);
+        var botRows = Rows(botLabels);
+        double topShift = RowIn * (topRows.DefaultIfEmpty(0).Max()), botShift = RowIn * (botRows.DefaultIfEmpty(0).Max());
+        for (int i = 0; i < top.Count; i++)
+        {
+            var (s0, s1, p) = top[i];
             double t = Band(p.Thickness);
             d.Poly(SheetLayers.Steel, new[] { new Vec2(s0, H), new Vec2(s1, H), new Vec2(s1, H - t), new Vec2(s0, H - t) }, true);
-            d.Text($"TOP FL {Pl(p)}", new Vec2((s0 + s1) / 2, H + d.Paper(0.12)), d.SmallTextH, 0, TextAlign.Center);
-            d.Dim(new Vec2(s0, H), new Vec2(s1, H), 0.32, d.Len(s1 - s0));
+            double y = H + d.Paper(0.12 + RowIn * topRows[i]);
+            d.Text(topLabels[i].Item2, new Vec2(topLabels[i].Item1, y), d.SmallTextH, 0, TextAlign.Center);
+            if (topRows[i] > 0) d.Line(SheetLayers.Text, new Vec2(topLabels[i].Item1, H), new Vec2(topLabels[i].Item1, y - d.SmallTextH * 0.6));
+            d.Dim(new Vec2(s0, H), new Vec2(s1, H), 0.32 + topShift, d.Len(s1 - s0));
         }
-        foreach (var (s0, s1, p) in bot)
+        for (int i = 0; i < bot.Count; i++)
         {
+            var (s0, s1, p) = bot[i];
             double t = Band(p.Thickness);
             d.Poly(SheetLayers.Steel, new[] { new Vec2(s0, 0), new Vec2(s1, 0), new Vec2(s1, t), new Vec2(s0, t) }, true);
-            d.Text($"BOT FL {Pl(p)}", new Vec2((s0 + s1) / 2, -d.Paper(0.12)), d.SmallTextH, 0, TextAlign.Center);
-            d.Dim(new Vec2(s0, 0), new Vec2(s1, 0), -0.35, d.Len(s1 - s0));
+            double y = -d.Paper(0.12 + RowIn * botRows[i]);
+            d.Text(botLabels[i].Item2, new Vec2(botLabels[i].Item1, y), d.SmallTextH, 0, TextAlign.Center);
+            if (botRows[i] > 0) d.Line(SheetLayers.Text, new Vec2(botLabels[i].Item1, 0), new Vec2(botLabels[i].Item1, y + d.SmallTextH * 0.6));
+            d.Dim(new Vec2(s0, 0), new Vec2(s1, 0), -0.35 - botShift, d.Len(s1 - s0));
         }
         foreach (var (s0, s1, p) in web)
         {
@@ -78,7 +108,7 @@ public static class GirderViews
         foreach (var cf in f.CrossFrames.Where(c => c.Bay == gi || c.RightGirder == gi))
         {
             double s = cf.Bay == gi ? cf.LeftGlobalDistance : cf.RightGlobalDistance;
-            if (cf.Bay == gi) d.Text(cf.Mark, new Vec2(s, H + d.Paper(0.55)), d.SmallTextH * 0.85, Math.PI / 2, TextAlign.Left);
+            if (cf.Bay == gi) d.Text(cf.Mark, new Vec2(s, H + d.Paper(0.55 + topShift)), d.SmallTextH * 0.85, Math.PI / 2, TextAlign.Left);
         }
 
         // ---- bearings, spans
@@ -91,8 +121,8 @@ public static class GirderViews
             brgS.Add((s, f.Supports[j].Name));
             double h = d.Paper(0.1);
             d.Poly(SheetLayers.Bearing, new[] { new Vec2(s, 0), new Vec2(s - h * 0.7, -h), new Vec2(s + h * 0.7, -h) }, true);
-            d.Line(SheetLayers.Center, new Vec2(s, -d.Paper(1.3)), new Vec2(s, H + d.Paper(0.3)));
-            d.Text($"CL BRG {f.Supports[j].Name.ToUpperInvariant()}", new Vec2(s, -d.Paper(1.4)), d.SmallTextH, 0, TextAlign.Center);
+            d.Line(SheetLayers.Center, new Vec2(s, -d.Paper(1.3 + botShift)), new Vec2(s, H + d.Paper(0.3)));
+            d.Text($"CL BRG {f.Supports[j].Name.ToUpperInvariant()}", new Vec2(s, -d.Paper(1.4 + botShift)), d.SmallTextH, 0, TextAlign.Center);
         }
         foreach (var al in f.AuxSupports)
         {
@@ -101,12 +131,12 @@ public static class GirderViews
             brgS.Add((s, al.Name));
             double h = d.Paper(0.1);
             d.Poly(SheetLayers.Bearing, new[] { new Vec2(s, 0), new Vec2(s - h * 0.7, -h), new Vec2(s + h * 0.7, -h) }, true);
-            d.Line(SheetLayers.Center, new Vec2(s, -d.Paper(1.3)), new Vec2(s, H + d.Paper(0.3)));
-            d.Text($"CL BRG {al.Name.ToUpperInvariant()}", new Vec2(s, -d.Paper(1.4)), d.SmallTextH, 0, TextAlign.Center);
+            d.Line(SheetLayers.Center, new Vec2(s, -d.Paper(1.3 + botShift)), new Vec2(s, H + d.Paper(0.3)));
+            d.Text($"CL BRG {al.Name.ToUpperInvariant()}", new Vec2(s, -d.Paper(1.4 + botShift)), d.SmallTextH, 0, TextAlign.Center);
         }
         brgS.Sort((x, y) => x.s.CompareTo(y.s));
         for (int i = 1; i < brgS.Count; i++)
-            d.Dim(new Vec2(brgS[i - 1].s, -d.Paper(0.75)), new Vec2(brgS[i].s, -d.Paper(0.75)), 0, $"{d.Len(brgS[i].s - brgS[i - 1].s)} ALONG {g.Name}");
+            d.Dim(new Vec2(brgS[i - 1].s, -d.Paper(0.75 + botShift)), new Vec2(brgS[i].s, -d.Paper(0.75 + botShift)), 0, $"{d.Len(brgS[i].s - brgS[i - 1].s)} ALONG {g.Name}");
 
         // ---- field splices and field sections (with weights from the 3D model)
         var splices = f.Splices.Where(x => x.Girder == gi).Select(x => x.GirderDistance).OrderBy(x => x).ToList();
@@ -114,7 +144,7 @@ public static class GirderViews
         {
             d.Line(SheetLayers.Steel, new Vec2(s, -d.Paper(0.05)), new Vec2(s, H + d.Paper(0.05)));
             d.Line(SheetLayers.Steel, new Vec2(s + d.Paper(0.02), -d.Paper(0.05)), new Vec2(s + d.Paper(0.02), H + d.Paper(0.05)));
-            d.Text("FIELD SPLICE", new Vec2(s, H + d.Paper(1.0)), d.SmallTextH, 0, TextAlign.Center);
+            d.Text("FIELD SPLICE", new Vec2(s, H + d.Paper(1.0 + topShift)), d.SmallTextH, 0, TextAlign.Center);
         }
         var bounds = new List<double> { 0 };
         bounds.AddRange(splices);
@@ -130,9 +160,9 @@ public static class GirderViews
                 double mass = ctx.Steel.Parts.Where(p => p.Assembly == asms[i - 1] && p.Category != PartCategory.Weld).Sum(p => p.Mass) * wUnit;
                 label = $"{asms[i - 1]}: {label}, {mass:N0} {(u.IsUS ? "LB" : "KG")}";
             }
-            d.Dim(new Vec2(bounds[i - 1], -d.Paper(1.05)), new Vec2(bounds[i], -d.Paper(1.05)), 0, label);
+            d.Dim(new Vec2(bounds[i - 1], -d.Paper(1.05 + botShift)), new Vec2(bounds[i], -d.Paper(1.05 + botShift)), 0, label);
         }
-        d.Dim(new Vec2(0, H + d.Paper(1.25)), new Vec2(L, H + d.Paper(1.25)), 0, $"{d.Len(L)} {g.Name} (END TO END, ALONG WEB CL)");
+        d.Dim(new Vec2(0, H + d.Paper(1.25 + topShift)), new Vec2(L, H + d.Paper(1.25 + topShift)), 0, $"{d.Len(L)} {g.Name} (END TO END, ALONG WEB CL)");
 
         var box = dwg.Extents();
         d.Title($"{g.Name} ELEVATION", "Developed along the web CL; depth not to scale. Plate changes at radial lines; stiffeners: solid = bearing, dashed = connection / intermediate.",
