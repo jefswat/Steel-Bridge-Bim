@@ -166,12 +166,22 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
     distance hosts, used for the deck slab because the chorded loft's edge sagitta on tight curves exceeds 1/8"; drilled shaft 32-gons moved to the mid-sagitta)
     -> `SubstructureUnit.CoverViolations` / `ConcreteModel.CoverViolations` (`PlanBarCoverViolation`) + one warning per mark; bars never moved. Database grouping
     follows the location text (" cap " -> cap group, "column n" -> column group, "footing n" -> footing group (drilled shafts), "backwall"). Tests `PlanBarSetTests`.
+    Deck sets with `Element` "barrier" / "diaphragm" keep their bars in the groups "Rail" / "Diaphragm" (database: barrier reinforcing / diaphragm reinforcing; other
+    elements stay "Deck"). Br02069 uses them for all its plan bars (`rebar-abutments/-diaphragms/-barrier-br02069.csx`: a common script block turns frame-based
+    specs - support line W/U or alignment station/offset, z absolute or from the deck top, copies along W - into the explicit sets; `check-br02069.csx` adds
+    bill rows and an exterior-face cover report). Deck plan options (OPTIONAL, JSON omitted when default): `DeckTransverseZone.SideClear` (per-mat end clear),
+    `DeckLongZone.AlternateEnds` (staggered laps: odd lines laid from the end). Tests `DeckPlanOptionsTests`.
     NHT data: `samples/plans/rebar-nht-sub.csx`, `rebar-nht-approach.csx` (see the Northaven entry).
   - As-designed abutment (OPTIONAL `SubstructureDefinition.Abutment`, `AbutmentDefinition.cs`; null = parametric abutment): `SubstructureAbutment.cs`
     (`AddSlab` = prism between two vertical planes with per-vertex elevation functions; end lines are alignment offsets, so S depends on N),
     `SubstructureAbutmentRebar.cs` (only proven placements in 3D, rest of the plan bar list = schedule-only marks, mismatches = warnings),
     `AbutmentViews` (3 sheet panels; the plan draws `AbutmentGeometry.FootingOutline` = generator outline with notches), `SubElementKind.Wingwall/Counterfort/Maskwall/WingFooting`,
     `unit.Abutment` (`AbutmentGeometry`). `WingwallDefinition.BottomOnFootings` (OPTIONAL): over each counterfort wing footing the wall bottom drops to the footing top (plan wing elevations, vertical steps at the footing ends). `AbutmentDefinition.StandalonePedestals` = pedestals WITHOUT a bearing (Br02069 Type B / D for the future beam lines,
+    MnDOT STEM (OPTIONAL `AbutmentDefinition.Stem` = `AbutmentStemDefinition`, JSON omitted when null; Br02069 p11 A-A, semi-integral): plain footing block, stem from the
+    backwall back face to `FrontToBearing` with a BACK LEDGE (`LedgeTop`) and a SEAT in front of the riser on the backwall front-face line (`SeatBackTop` -> `SeatFrontTop`,
+    straight), backwall = one plain wall on the ledge between the backwall offsets (no corbel / pours), pedestals on the seat (`AbutmentGeometry.SeatAt / LedgeTop /
+    XStemFront`; `SeatBaseZ` = seat at the CL brg, mirrored by ElevationCheckSubstructure); missing input = stem not built (warning). `MaskwallDefinition.BottomElevation`
+    (OPTIONAL) = level panel bottom (mask wall beside the footing, Setback = -thickness). Tests `AbutmentTests.MnDotStem_*`.
     built now): same section as the beam steps, `PedestalInfo` / `AbutmentStepInfo` with Girder = -1 and `Label` (views print `Tag`). Backwall runs behind the wings to the maskwalls; `CorbelLeft/RightOffset` limit the corbel to the wing inner faces. Standing rule:
     no invented defaults - unresolved plan items are generator warnings ("UNRESOLVED"). Docs `docs/plan-data/abutments-model.md`; scripts `samples/plans/abutments-*.csx`.
     `AbutmentDefinition.PileRowOffsets` (x of each pile row from CL brg; empty = the two legacy rows `PileRows`). `Kind` = Stub (default, all of the above) |
@@ -346,7 +356,12 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
     Woodbury pier caps p.9) besides Explicit / MidBay / Unresolved. IFC: IfcBeam .DIAPHRAGM. ('END_DIAPHRAGM' / 'PIER_DIAPHRAGM'), keyways IfcBuildingElementPart 'SHEAR_KEY'
     aggregated into it, fillers IfcBuildingElementPart 'JOINT_FILLER'; Assumption -> SBM_Status. Viewport layers 3D-DIAPHRAGMS / -FILLERS /
     3D-UNRESOLVED-DIAPHRAGMS, material rows. Data: `samples/plans/diaphragms-woodbury.csx`, `diaphragms-br02069.csx` (run by the build scripts),
-    report `check-diaphragms.csx`. Tests `ConcreteDiaphragmTests`. Not yet: 2D sheet views, database groups, diaphragm rebar.
+    report `check-diaphragms.csx`. Tests `ConcreteDiaphragmTests`. Not yet: 2D sheet views, database groups (diaphragm SOLIDS; plan diaphragm bars: deck PlanBarSets).
+    Semi-integral (Br02069 p.21 A-A / B-B, p.11 Detail A): `DiaphragmRiserRule.BeamBottoms` = bottom = bottom of the beams (level under each bottom flange at the
+    beam's bottom, straight between adjacent flange edges, level beyond the fascia; per-piece `Frame.PieceZPerX` follows the beam slope across the part; 0.001 mm
+    under the beam so the open void crossing is stable); with `OpenBelowBeams`, extra slab cuts where a NON-Bottom lower edge (fillet) passes a beam-outline vertex
+    (`OpenBelowEvents`, slices inset there); a wedge slab whose bottom meets the top at one end is evaluated a hair inside and extrapolated; a top edge on the
+    Bottom reference breaks at the risers (fillers whose top follows the beam-bottom line). Outputs of other bridges unchanged (IFC byte-identical).
   - `SBM.IO/PgSuper/` â€” `PgSuperReader` (.pgs BridgeDescription schema v6+ or ReportExportAgent export XML; strand key
     bits per WBFL PsStrand; end distances normalized to CL-bearing-to-end; straight-strand `DebondInfo` Strand/Length1/Length2
     -> StrandPoint debond lengths) and `PgSuperImport.Apply` (onto an alignment).
