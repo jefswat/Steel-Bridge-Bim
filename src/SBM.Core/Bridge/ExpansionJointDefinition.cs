@@ -62,6 +62,14 @@ public sealed class ExpansionJointDefinition
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
     public string? Basis { get; set; }
 
+    /// <summary>OPTIONAL steel armor of a sealed / strip-seal joint (armor plates with seal retainer bars and stud anchors on both faces of the opening,
+    /// e.g. TxDOT SEJ-B); built only with <see cref="Body"/> (the device owner). Null = none, omitted from the .sbm.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public JointArmorDefinition? Armor { get; set; }
+    /// <summary>OPTIONAL walkway cover plate over the joint (e.g. TxDOT BS-EJCP); built only with <see cref="Body"/>. Null = none, omitted from the .sbm.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public JointCoverPlateDefinition? CoverPlate { get; set; }
+
     public bool Active => Type != ExpansionJointType.None;
 
     public string TypeName => Type switch
@@ -76,8 +84,83 @@ public sealed class ExpansionJointDefinition
     {
         var c = (ExpansionJointDefinition)MemberwiseClone();
         c.EndBlock = EndBlock?.Clone();
+        c.Armor = Armor?.Clone();
+        c.CoverPlate = CoverPlate?.Clone();
         return c;
     }
+}
+
+/// <summary>
+/// Steel armor of a sealed expansion joint (OPTIONAL <see cref="ExpansionJointDefinition.Armor"/>; generic, e.g. TxDOT SEJ-B "PL 1/2 x 4 with Bar 1/2 x 1/4 and
+/// 5/8 in stud anchors at 6 in max"). Each face of the opening gets a vertical plate (<see cref="PlateThickness"/> x <see cref="PlateDepth"/>, top flush with the top
+/// of slab) cast into the slab edge, a seal retainer bar on its joint face at the bottom, and headed stud anchors welded to its back. The NEAR plate's joint
+/// face is the deck-end face of the bridge that carries the joint; the FAR plate's joint face is <see cref="ExpansionJointDefinition.GapAt50F"/> (the
+/// opening) beyond it. Plates run along the joint between the alignment offsets of the deck edges moved inward by <see cref="EdgeInsetLeft"/> /
+/// <see cref="EdgeInsetRight"/> (measured normal to the alignment, e.g. the toes of the curbs). Steel parts go into the bridge's steel model (assembly kind
+/// ExpansionJoint, not structural steel). Lengths in meters.
+/// </summary>
+public sealed class JointArmorDefinition
+{
+    /// <summary>Standard / source text (part descriptions), e.g. "TxDOT SEJ-B (10-2024)".</summary>
+    public string Standard { get; set; } = "";
+    public double PlateThickness { get; set; } = In(0.5);
+    public double PlateDepth { get; set; } = In(4);
+    /// <summary>Seal retainer bar on the joint face at the plate bottom: projection into the opening x height (0 = none) and its rise above the plate bottom.</summary>
+    public double BarProjection { get; set; } = In(0.25);
+    public double BarHeight { get; set; } = In(0.5);
+    public double BarAboveBottom { get; set; } = In(0.25);
+    public double EdgeInsetLeft { get; set; }
+    public double EdgeInsetRight { get; set; }
+    /// <summary>Build the far plate too (false: the far face belongs to another structure that is not modeled).</summary>
+    public bool FarPlate { get; set; } = true;
+    /// <summary>Headed stud anchors on the back of each plate: diameter, centre below the top of slab, horizontal leg from the plate back, then an inclined
+    /// leg dropping at <see cref="StudBendDegrees"/> (0 = straight stud), head diameter / height; spacing max along the plate and first stud from each end.</summary>
+    public double StudDiameter { get; set; } = In(0.625);
+    public double StudDrop { get; set; } = In(1.5);
+    public double StudLength { get; set; } = In(4);
+    public double StudBentLength { get; set; }
+    public double StudBendDegrees { get; set; }
+    public double StudHeadDiameter { get; set; } = In(1.25);
+    public double StudHeadHeight { get; set; } = In(0.3125);
+    public double StudSpacing { get; set; } = In(6);
+    public double StudEndDistance { get; set; } = In(3);
+    public string Material { get; set; } = "ASTM A36";
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public string? Unresolved { get; set; }
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public string? Basis { get; set; }
+    public JointArmorDefinition Clone() => (JointArmorDefinition)MemberwiseClone();
+}
+
+/// <summary>
+/// Walkway expansion joint cover plate (OPTIONAL <see cref="ExpansionJointDefinition.CoverPlate"/>; generic, e.g. TxDOT BS-EJCP "1/4 in slip resistant plate
+/// 1'-4 wide, bent 1/4 in at the CL, countersunk 3/8 in flat head sleeve anchors at 6 in max in two staggered rows on one side"). The plate lies on the top of
+/// slab centred on the CL of the opening, from the deck edge offsets moved inward by <see cref="EdgeInsetLeft"/> / <see cref="EdgeInsetRight"/> plus
+/// <see cref="EndClearance"/> (along the joint). Corner clips and edge bevels are not modeled. Lengths in meters.
+/// </summary>
+public sealed class JointCoverPlateDefinition
+{
+    public string Standard { get; set; } = "";
+    public double Thickness { get; set; } = In(0.25);
+    public double Width { get; set; } = Ft(1) + In(4);
+    /// <summary>Rise of the bent CL above the plate edges.</summary>
+    public double Crown { get; set; } = In(0.25);
+    public double EdgeInsetLeft { get; set; }
+    public double EdgeInsetRight { get; set; }
+    public double EndClearance { get; set; } = In(1);
+    /// <summary>Anchors (on the near = deck side of the joint): diameter, length below the plate, rows at these distances from the plate edge (staggered),
+    /// spacing max between successive anchors along the plate (alternating rows), first anchor from each end.</summary>
+    public double AnchorDiameter { get; set; } = In(0.375);
+    public double AnchorLength { get; set; } = In(2.5);
+    public List<double> AnchorRows { get; set; } = new() { In(1.5), In(4.5) };
+    public double AnchorSpacing { get; set; } = In(6);
+    public double AnchorEndDistance { get; set; } = In(3);
+    public string Material { get; set; } = "Slip resistant steel plate, galvanized";
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public string? Unresolved { get; set; }
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public string? Basis { get; set; }
+    public JointCoverPlateDefinition Clone() { var c = (JointCoverPlateDefinition)MemberwiseClone(); c.AnchorRows = AnchorRows.ToList(); return c; }
 }
 
 /// <summary>One soffit vertex of an end block: distance from the deck-end face (perpendicular to the joint) and drop below the finished top of slab.</summary>
@@ -109,6 +192,20 @@ public sealed class DeckEndBlockDefinition
 
     /// <summary>Explicit soffit polyline from the deck-end face to the slab soffit (overrides Depth/FlatLength/ChamferRun).</summary>
     public List<EndBlockPoint> Soffit { get; set; } = new();
+
+    /// <summary>OPTIONAL lateral limits (alignment offsets, right +) of the block, e.g. between the top flanges of the outer girders (TxDOT IGTS thickened
+    /// slab end "between girders"); null = the deck edge. Omitted from the .sbm when null.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public double? LeftOffset { get; set; }
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public double? RightOffset { get; set; }
+    /// <summary>OPTIONAL source / standard text and UNRESOLVED flag (raised as a warning, carried by the block: IFC SBM_Status).</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public string? Source { get; set; }
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public string? Unresolved { get; set; }
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public string? Basis { get; set; }
 
     public DeckEndBlockDefinition Clone()
     {

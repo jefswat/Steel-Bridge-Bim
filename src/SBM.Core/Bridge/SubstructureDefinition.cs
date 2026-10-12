@@ -370,6 +370,9 @@ public sealed class SubstructureDefinition
     /// <summary>OPTIONAL concrete mow strip around each column at the ground (see <see cref="MowStripDefinition"/>); null = none, omitted from the .sbm.</summary>
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
     public MowStripDefinition? MowStrip { get; set; }
+    /// <summary>OPTIONAL concrete traffic barriers on the ground at this pier (see <see cref="GroundBarrierDefinition"/>); null = none, omitted from the .sbm.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public List<GroundBarrierDefinition>? GroundBarriers { get; set; }
     /// <summary>Optional architectural texture band on one face of an as-designed cap (see <see cref="CapAestheticsDefinition"/>).</summary>
     public CapAestheticsDefinition? Aesthetics { get; set; }
     public CapTopShape TopShape { get; set; } = CapTopShape.Sloped;
@@ -546,6 +549,7 @@ public sealed class SubstructureDefinition
         c.Footings = Footings.Select(f => f.Clone()).ToList();
         c.CapBlocks = CapBlocks.Select(b => b.Clone()).ToList();
         c.MowStrip = MowStrip?.Clone();
+        c.GroundBarriers = GroundBarriers?.Select(g => g.Clone()).ToList();
         c.Aesthetics = Aesthetics?.Clone();
         c.Abutment = Abutment?.Clone();
         c.Unresolved = Unresolved?.ToList();

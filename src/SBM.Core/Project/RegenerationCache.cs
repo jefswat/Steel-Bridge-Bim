@@ -119,6 +119,16 @@ public sealed class RegenerationCache
                 st.Diagnostics.AddRange(rm.Diagnostics);
                 st.Railings = rm;
             }
+            // Expansion joint hardware (OPTIONAL armor / cover plates): steel parts of the concrete joints, merged into the bridge's steel model.
+            if (cm != null && cm.Joints.Any(jr => jr.Hardware.Count > 0))
+            {
+                st ??= new SteelModel { Bolt = new BoltGeometry(Units.UnitSystem.In(0.875)), BoltGrade = "A325" };
+                foreach (var jr in cm.Joints.Where(x => x.Hardware.Count > 0))
+                {
+                    if (jr.HardwareAssembly != null) st.Assemblies.Add(jr.HardwareAssembly);
+                    st.Parts.AddRange(jr.Hardware);
+                }
+            }
             lock (_lock) _super[key] = (f, st, cm, ps);
             parts[i] = (f, st, cm, ps, false);
         });

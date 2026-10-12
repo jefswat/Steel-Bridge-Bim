@@ -468,6 +468,7 @@ public sealed partial class SubstructureGenerator
                 unit.Solids.Add(new SubSolid(SubElementKind.Column, $"{sl.Name} column {k + 1}", $"Column {size}, {L(topZ - fTop)} high", cm));
                 AddFoundation(unit, sd, cs, nc, fTop, groundZ, k + 1);
                 if (sd.MowStrip is { } ms) BuildMowStrip(unit, sl.Name, sd, ms, cs, nc, fTop, k + 1);
+                if (k == 0 && sd.GroundBarriers is { Count: > 0 } gbs) foreach (var gb in gbs) BuildGroundBarrier(unit, sl.Name, gb, fTop);
                 k++;
             }
         }
@@ -519,6 +520,68 @@ public sealed partial class SubstructureGenerator
             $"Mow strip {Sh(ms.Width)} wide each face of the column, {Sh(ms.Thickness)} thick, top {El(z1)}{(ms.Source.Length > 0 ? $" ({ms.Source})" : "")}", m)
         { Assumption = ms.Unresolved is { Length: > 0 } why ? Assumption.Unresolved(why, ms.Basis ?? "as modeled") : null });
         if (ms.Unresolved is { Length: > 0 } wy && col == 1) Warn($"{name}: {wy}");
+    }
+
+    // ================================================================== traffic barrier on the ground (OPTIONAL)
+
+    /// <summary>Barrier section swept along its path in the pier frame (heights linear between vertices, stretch zone shortened at lower vertices) and the
+    /// replacement pavement strip under it.</summary>
+    private void BuildGroundBarrier(SubstructureUnit unit, string name, GroundBarrierDefinition gb, double fTop)
+    {
+        string label = gb.Name.Length > 0 ? gb.Name : "traffic barrier";
+        if (gb.Profile.Count < 3 || gb.Path.Count < 2 || gb.FullHeight <= 0) { Warn($"{name} {label}: profile / path / height not given; not built."); return; }
+        double? b = gb.BaseElevation ?? (gb.BaseAboveFoundation is double above ? fTop + above : null);
+        if (b == null) { Warn($"{name} {label}: base elevation not given; not built."); return; }
+        double z0 = b.Value;
+        var flag = gb.Unresolved is { Length: > 0 } why ? Assumption.Unresolved(why, gb.Basis ?? "as modeled") : null;
+        if (gb.Unresolved is { Length: > 0 } w1) Warn($"{name} {label}: {w1}");
+        var pts = gb.Path.Select(v => new Vec2(v.S, v.N)).ToList();
+        // in-plane unit normal toward the traffic side at each vertex (mitred)
+        Vec2 SegN(int i) { var d = (pts[i + 1] - pts[i]).Normalized(); return (gb.TrafficSide >= 0 ? new Vec2(d.Y, -d.X) : new Vec2(-d.Y, d.X)); }
+        var nrm = new List<Vec2>();
+        for (int i = 0; i < pts.Count; i++)
+        {
+            var nv = i == 0 ? SegN(0) : i == pts.Count - 1 ? SegN(i - 1) : (SegN(i - 1) + SegN(i)).Normalized();
+            if (i > 0 && i < pts.Count - 1) nv = nv * (1 / Math.Max(0.2, Vec2.Dot(nv, SegN(i))));
+            nrm.Add(nv);
+        }
+        var sec = gb.Profile.Select(q => new Vec2(q.R, q.H)).ToList();
+        var rings = new List<Vec3[]>();
+        for (int i = 0; i < pts.Count; i++)
+        {
+            double drop = gb.FullHeight - gb.Path[i].Height;
+            double room = gb.Profile.Where(q => q.H > gb.StretchAt + 1e-9).Select(q => q.H).DefaultIfEmpty(gb.FullHeight).Min() - gb.StretchAt;
+            if (drop > room + 1e-9) Warn($"{name} {label}: vertex {i + 1} is lower than the stretch zone allows; the top shape is clipped.");
+            rings.Add(gb.Profile.Select(q =>
+            {
+                double h = q.H > gb.StretchAt + 1e-9 ? Math.Max(gb.StretchAt, q.H - drop) : q.H;
+                var p = pts[i] + nrm[i] * q.R;
+                return unit.World(p.X, p.Y, z0 + h);
+            }).ToArray());
+        }
+        var m = new Mesh();
+        MeshBuilder.AddLoft(m, sec, rings);
+        if (m.Volume() < 0) for (int t = 0; t < m.Indices.Count; t += 3) (m.Indices[t + 1], m.Indices[t + 2]) = (m.Indices[t + 2], m.Indices[t + 1]);
+        double len = 0;
+        for (int i = 1; i < pts.Count; i++) len += (pts[i] - pts[i - 1]).Length;
+        string type = gb.TypeName.Length > 0 ? gb.TypeName + " " : "";
+        unit.Solids.Add(new SubSolid(SubElementKind.TrafficBarrier, $"{name} {label}",
+            $"{type}traffic barrier, {L(len)} along the back face, {Sh(gb.Path.Max(v => v.Height))} max high, base {El(z0)}{(gb.Source.Length > 0 ? $" ({gb.Source})" : "")}", m) { Assumption = flag });
+        if (gb.PlanLength is double pl)
+            Note($"{name} {label}: length {L(len)} vs plan {L(pl)} ({(len - pl >= 0 ? "+" : "")}{Sh(len - pl)}).");
+        if (gb.PavementWidth > 0 && gb.PavementThickness > 0)
+        {
+            var ps = new List<Vec2> { new(gb.PavementR0, 0), new(gb.PavementR0 + gb.PavementWidth, 0), new(gb.PavementR0 + gb.PavementWidth, -gb.PavementThickness), new(gb.PavementR0, -gb.PavementThickness) };
+            var pr = new List<Vec3[]>();
+            for (int i = 0; i < pts.Count; i++) pr.Add(ps.Select(q => { var p = pts[i] + nrm[i] * q.X; return unit.World(p.X, p.Y, z0 + q.Y); }).ToArray());
+            var pm = new Mesh();
+            MeshBuilder.AddLoft(pm, ps, pr);
+            if (pm.Volume() < 0) for (int t = 0; t < pm.Indices.Count; t += 3) (pm.Indices[t + 1], pm.Indices[t + 2]) = (pm.Indices[t + 2], pm.Indices[t + 1]);
+            var pflag = gb.PavementUnresolved is { Length: > 0 } pw ? Assumption.Unresolved(pw, gb.PavementBasis ?? "as modeled") : flag;
+            if (gb.PavementUnresolved is { Length: > 0 } pw2) Warn($"{name} {label} pavement: {pw2}");
+            unit.Solids.Add(new SubSolid(SubElementKind.PavementStrip, $"{name} {label} pavement",
+                $"Replacement concrete pavement {Sh(gb.PavementWidth)} wide x {Sh(gb.PavementThickness)} under the {type}barrier, {L(len)}", pm) { Assumption = pflag });
+        }
     }
 
     // ================================================================== cap section step (aesthetic relief curve)
