@@ -513,7 +513,7 @@ public partial class MainWindow
         Plan = _planMode,
         XRay = _msXRay,
         ModelVisible = m => m == null || m.Visibility == Visibility.Visible,
-        IsHidden = t => _hidden.Count > 0 && _hidden.Contains(t),
+        IsHidden = TagHidden, // hidden elements and everything outside an isolate
         Kept = Kept,
     };
 

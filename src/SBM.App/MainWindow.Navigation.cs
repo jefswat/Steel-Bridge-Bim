@@ -168,7 +168,7 @@ public partial class MainWindow
         if (!_navigating) ApplyFarBridgeLod(o, inv);
         foreach (var (m, (layer, lo, hi)) in _detailBounds)
         {
-            if (!layerOnCache.TryGetValue(layer, out bool lon)) layerOnCache[layer] = lon = !_planMode && _vm.IsLayerVisible(layer);
+            if (!layerOnCache.TryGetValue(layer, out bool lon)) layerOnCache[layer] = lon = (!_planMode || _iso.ShowsInPlan(layer)) && _vm.IsLayerVisible(layer);
             bool near = _detailRadius <= 0 || o is not { } oo || SnapMath.LineHitsBox(oo, inv!.Value, lo, hi, radius);
             bool farBridge = _farBridges.Count > 0 && _modelBridge.TryGetValue(m, out int mb) && _farBridges.Contains(mb);
             bool show = lon && near && !drop && !farBridge;

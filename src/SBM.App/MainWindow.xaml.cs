@@ -38,9 +38,10 @@ public partial class MainWindow : Window
         SetPlanMode(true);
 
         _vm.SceneReady += OnSceneReady;
+        _vm.ProjectOpened += () => { if (_iso.Active) ExitIsolate(); };
         _vm.ZoomExtentsRequested += ZoomExtents;
         _vm.ViewModeRequested += SetPlanMode;
-        _vm.LayerVisibilityChanged += (_, _) => ApplyLayerVisibility();
+        _vm.LayerVisibilityChanged += (_, _) => { if (!_layerBatch) ApplyLayerVisibility(); };
         _vm.ReferencesReady += OnReferencesReady;
         _vm.SheetsRequested += () => ModeSheets.IsChecked = true;
         View.CameraChanged += (_, _) => KeepCameraInRange();
@@ -53,7 +54,15 @@ public partial class MainWindow : Window
         PreviewKeyDown += (_, e) =>
         {
             if (e.Key == Key.S && Keyboard.Modifiers == (ModifierKeys.Control | ModifierKeys.Shift)) { OnToggleSection(this, new RoutedEventArgs()); e.Handled = true; }
-            else if (e.Key == Key.Escape && Keyboard.FocusedElement is not System.Windows.Controls.TextBox) { CancelZoomWindow(); ClearHighlight(); _vm.SelectedProperties.Clear(); }
+            else if (e.Key == Key.Escape && Keyboard.FocusedElement is not System.Windows.Controls.TextBox)
+            {
+                // Esc: cancel the zoom window / clear the selection; with nothing selected it ends an isolate.
+                bool selected = _selectedTag != null || _groupSel != null || _vm.SelectedProperties.Count > 0;
+                CancelZoomWindow();
+                if (!selected && _iso.Active && !MeasureActive && !SheetsMode) ExitIsolate();
+                else ClearSelection();
+            }
+            else if (IsolateKey(e)) e.Handled = true;
         };
 
         View.Items.Add(new AmbientLight3D { Color = Color.FromRgb(90, 90, 95) });
@@ -190,10 +199,12 @@ public partial class MainWindow : Window
                         ViewModels.MainViewModel.Log("PICKAFTER: " + string.Join(" | ", _vm.SelectedProperties.Select(r => $"{r.Name}={r.Value}")) + $" (smooth bars {_lodSkip.Count})");
                         if (opt == "--hideafter" && _selectedTag != null) { HideElement(_selectedTag, _selectedTitle); ViewModels.MainViewModel.Log($"HIDEAFTER: {_hiddenList.Count} hidden: {string.Join(", ", _hiddenList.Select(h => h.label))}"); }
                     }
+                    SnapshotIsolate(args);
                     LogDetailVisibility();
                     LogVideoMemory("snapshot");
                     SaveSnapshot(path);
                     SnapshotEditors(path);
+                    SnapshotRecentDialog(path);
                     _vm.IsDirty = false;
                     Close();
                 };
@@ -651,6 +662,7 @@ public partial class MainWindow : Window
     private void ZoomExtents()
     {
         _pivot = null;
+        if (_iso.Active && ZoomToIsolated(true)) return; // isolated: zoom extents = the isolated set
         if (_scene == null || _scene.Extents.IsEmpty) { View.ZoomExtents(0); return; }
         if (_planMode)
         {
@@ -728,6 +740,7 @@ public partial class MainWindow : Window
             if (contours.Count > 0) _refModels[r.ContourLayerName] = contours;
             foreach (var m in models.Concat(contours)) View.Items.Add(m);
         }
+        IsolateNewLayers();
         ApplyLayerVisibility();
         if (_sectionOn) ApplySection();
         KeepCameraInRange();
@@ -766,9 +779,7 @@ public partial class MainWindow : Window
         }
         foreach (var (name, list) in _layerModels)
         {
-            bool is3D = name.StartsWith("3D-");
-            bool modeOk = _planMode ? !is3D : !PlanOnlyLayers.Contains(name);
-            bool visible = modeOk && _vm.IsLayerVisible(name);
+            bool visible = LayerModeOk(name) && _vm.IsLayerVisible(name);
             foreach (var m in list) m.Visibility = visible ? Visibility.Visible : Visibility.Collapsed;
         }
         ApplyDetailVisibility();

@@ -40,8 +40,11 @@
                             <Button Style="{StaticResource RibbonButton}" Command="{Binding NewCommand}" ToolTip="New project (Ctrl+N)">
                                 <StackPanel><TextBlock Style="{StaticResource RibbonIcon}" Text="&#xE8A5;"/><TextBlock Style="{StaticResource RibbonLabel}" Text="New"/></StackPanel>
                             </Button>
-                            <Button Style="{StaticResource RibbonButton}" Command="{Binding OpenCommand}" ToolTip="Open project (Ctrl+O)">
+                            <Button Style="{StaticResource RibbonButton}" Command="{Binding OpenCommand}" ToolTip="Open project (Ctrl+O): recent models, or browse for a file">
                                 <StackPanel><TextBlock Style="{StaticResource RibbonIcon}" Text="&#xE8E5;"/><TextBlock Style="{StaticResource RibbonLabel}" Text="Open"/></StackPanel>
+                            </Button>
+                            <Button x:Name="RecentButton" Style="{StaticResource RibbonButton}" Click="OnRecentMenu" ToolTip="Recent models: the last 10 opened or saved, newest first">
+                                <StackPanel><TextBlock Style="{StaticResource RibbonIcon}" Text="&#xE81C;"/><TextBlock Style="{StaticResource RibbonLabel}" Text="Recent"/></StackPanel>
                             </Button>
                             <Button Style="{StaticResource RibbonButton}" Command="{Binding SaveCommand}" ToolTip="Save project (Ctrl+S)">
                                 <StackPanel><TextBlock Style="{StaticResource RibbonIcon}" Text="&#xE74E;"/><TextBlock Style="{StaticResource RibbonLabel}" Text="Save"/></StackPanel>
@@ -382,6 +385,17 @@
                 </Canvas>
                 <!-- Orbit pivot marker (screen overlay: always on top, constant size) -->
                 <Canvas x:Name="PivotOverlay" Grid.Row="0" IsHitTestVisible="False" Panel.ZIndex="6" Visibility="Collapsed" ClipToBounds="True"/>
+                <!-- Isolate banner (MainWindow.Isolate.cs) -->
+                <Border x:Name="IsolateBanner" Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,44,0,0" Padding="10,4,4,4"
+                        CornerRadius="4" Background="#EE3A2F12" BorderBrush="#FFE0A526" BorderThickness="1" Visibility="Collapsed" Panel.ZIndex="5">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock x:Name="IsolateText" Foreground="#FFFFE2A0" VerticalAlignment="Center" MaxWidth="520" TextTrimming="CharacterEllipsis" Margin="0,0,10,0"/>
+                        <Button Style="{StaticResource ToolIconButton}" FontFamily="Segoe UI" FontSize="12" Padding="8,2" Content="Zoom" Click="OnIsolateZoom"
+                                ToolTip="Zoom extents on what is isolated"/>
+                        <Button Style="{StaticResource ToolIconButton}" FontFamily="Segoe UI" FontSize="12" Padding="8,2" Margin="0" Content="Exit" Click="OnIsolateExit"
+                                ToolTip="Exit isolate (Esc with nothing selected, or I): restores the previous visibility, including what you had hidden"/>
+                    </StackPanel>
+                </Border>
                 <!-- Live section cut (alignment coordinates, Z vertical) -->
                 <Border x:Name="SectionPanel" Grid.Row="0" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="10" Padding="12,8"
                         CornerRadius="4" Background="#EE252526" BorderBrush="#FF3F3F46" BorderThickness="1" Visibility="Collapsed" Width="360">

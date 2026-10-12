@@ -271,8 +271,9 @@ public partial class MainWindow
             {
                 var tags = im.Geometry is MeshGeometry3D ig && SceneBuilder.InstanceTags.TryGetValue(ig, out var t) ? t : null;
                 bool lod = _lodSkip.Count > 0;
+                bool iso = _iso.FiltersElements;
                 var vis = Enumerable.Range(0, all.Count).Where(i => Kept(all[i].Translation)
-                    && (tags == null || i >= tags.Count || (!_hidden.Contains(tags[i]) && !(lod && _lodSkip.Contains(tags[i]))))).ToList();
+                    && (tags == null || i >= tags.Count ? !iso : !TagHidden(tags[i]) && !(lod && _lodSkip.Contains(tags[i])))).ToList();
                 _visibleInstances[im] = vis;
                 im.Instances = vis.Count == all.Count ? all : vis.Select(i => all[i]).ToList();
                 break;
@@ -324,10 +325,16 @@ public partial class MainWindow
     {
         var res = new List<(int, int)>();
         bool lod = withLod && _lodSkip.Count > 0;
-        if ((_hidden.Count == 0 && !lod) || !SceneBuilder.Picks.TryGetValue(full, out var table)) return res;
+        bool filter = ElementFilterOn;
+        if (!filter && !lod) return res;
         int n = full.Indices!.Count / 3;
+        if (!SceneBuilder.Picks.TryGetValue(full, out var table))
+        {
+            if (_iso.FiltersElements) res.Add((0, n)); // no pick objects: nothing in it can be isolated
+            return res;
+        }
         for (int i = 0; i < table.Tags.Count; i++)
-            if (_hidden.Contains(table.Tags[i]) || (lod && _lodSkip.Contains(table.Tags[i])))
+            if ((filter && TagHidden(table.Tags[i])) || (lod && _lodSkip.Contains(table.Tags[i])))
                 res.Add((table.TriStart[i], i + 1 < table.TriStart.Count ? table.TriStart[i + 1] : n));
         return res;
     }
@@ -456,6 +463,7 @@ public partial class MainWindow
         ClearHighlight();
         _selectedTag = null;
         _selectedModel = null;
+        _groupSel = null;
         if (_planMode) { StatusText("Selection works in the 3D view (View ▸ 3D)."); return; }
         IList<HitTestResult> hits;
         try { hits = View.FindHits(pt); }
@@ -494,7 +502,7 @@ public partial class MainWindow
                 tag = table.Find(triangle, out int t0, out int t1);
                 if (tag != null) hl = Extract(full, t0, Math.Min(t1, full.Indices!.Count / 3));
             }
-            if (tag == null) continue;
+            if (tag == null || TagHidden(tag)) continue; // hidden / outside the isolate: not pickable
             _selectedTitle = _vm.ShowPicked(tag);
             _selectedTag = tag;
             _selectedModel = model;
@@ -521,7 +529,18 @@ public partial class MainWindow
         _rightDownAt = null;
         if ((pt - d0).Length > 4) return; // right-drag orbits
         if (MeasureCancelInProgress()) { e.Handled = true; return; }
-        if (!_planMode) Pick(pt);
+        var group = _groupSel;
+        if (!_planMode)
+        {
+            Pick(pt);
+            if (group is { } g && (_selectedTag == null || g.tags.Contains(_selectedTag)))
+            {
+                // Right-click on the highlighted database group (or on empty space) keeps the group as the selection.
+                ClearSelection();
+                _groupSel = group;
+                ShowHighlight(g.geo);
+            }
+        }
         ShowViewportMenu();
         e.Handled = true;
     }
@@ -539,15 +558,46 @@ public partial class MainWindow
             mi.Click += (_, _) => act();
             return mi;
         }
-        if (_selectedTag is { } tag && _selectedModel is { } model)
+        static string Short(string s) => s.Length > 48 ? s[..45] + "…" : s;
+        static string Ic(int code) => ((char)code).ToString();
+        if (_groupSel is { } grp)
         {
-            string name = _selectedTitle.Length > 48 ? _selectedTitle[..45] + "…" : _selectedTitle;
-            menu.Items.Add(Item($"Hide {name}", () => HideElement(tag, _selectedTitle), "\uED1A"));
-            if (LayerOf(model) is { } layer)
-                menu.Items.Add(Item($"Hide layer {layer}", () => HideLayer(layer), "\uE8D7"));
-            menu.Items.Add(Item("Clear selection", () => { ClearHighlight(); _selectedTag = null; _vm.SelectedProperties.Clear(); }));
+            var gi = Item($"Isolate {Short(grp.name)} ({grp.tags.Count} elements)", () => IsolateElements(grp.name, grp.tags), Ic(0xE71D));
+            gi.InputGestureText = "I";
+            menu.Items.Add(gi);
+            menu.Items.Add(Item("Clear selection", ClearSelection));
+        }
+        else if (_selectedTag is { } tag && _selectedModel is { } model)
+        {
+            string title = _selectedTitle;
+            string name = Short(title);
+            menu.Items.Add(Item($"Hide {name}", () => HideElement(tag, title), Ic(0xED1A)));
+            var layer = LayerOf(model);
+            if (layer != null)
+                menu.Items.Add(Item($"Hide layer {layer}", () => HideLayer(layer), Ic(0xE8D7)));
+            var ie = Item($"Isolate {name}", () => IsolateElements(title, new[] { tag }), Ic(0xE71D));
+            ie.InputGestureText = "I";
+            menu.Items.Add(ie);
+            if (layer != null)
+            {
+                var il = Item($"Isolate layer {layer}", () => IsolateLayer(layer), Ic(0xE81E));
+                il.InputGestureText = "Shift+I";
+                menu.Items.Add(il);
+            }
+            menu.Items.Add(Item("Clear selection", ClearSelection));
         }
         else menu.Items.Add(new MenuItem { Header = _planMode ? "Selection works in the 3D view" : "Nothing selected here", IsEnabled = false });
+        if (_iso.Active)
+        {
+            menu.Items.Add(new Separator());
+            var ex = Item($"Exit isolate ({Short(_iso.Name)})", ExitIsolate, Ic(0xE8BB));
+            ex.InputGestureText = "Esc / I";
+            menu.Items.Add(ex);
+            menu.Items.Add(Item("Zoom to isolated", () => ZoomToIsolated(true), Ic(0xE71E)));
+        }
+        var zoomOpt = new MenuItem { Header = "Zoom to isolated when isolating", IsCheckable = true, IsChecked = _isoZoomOnIsolate };
+        zoomOpt.Click += (_, _) => _isoZoomOnIsolate = zoomOpt.IsChecked;
+        menu.Items.Add(zoomOpt);
         menu.Items.Add(new Separator());
         var unhide = new MenuItem { Header = $"Unhide ({_hiddenList.Count})", IsEnabled = _hiddenList.Count > 0 };
         foreach (var (htag, label) in _hiddenList.ToList())

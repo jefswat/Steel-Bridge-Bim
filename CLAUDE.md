@@ -221,6 +221,20 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
     instanced meshes by `_visibleInstances`, through the same ClipMesh/ApplySection path as the section cut; `RemapHidden`
     re-matches hidden tags after regeneration via `HideKey`. Right-click (no drag) = context menu. Sheets mode: `MainWindow.Sheets.cs`. Snapshot options: `--section STA[,skew]`,
     `--pick fx,fy` (logs PICK: properties), `--sheets`, `--orbit fx,fy,dx,dy` (simulated orbit drag; logs ORBIT: pivot, leaves the marker), DETAIL: log lines = detail tiles drawn.
+  - Isolate (`MainWindow.Isolate.cs`, state + save/restore in `SBM.Core/Geometry/ViewIsolation.cs`, tests `IsolateAndRecentTests`): right-click
+    "Isolate <element>" / "Isolate <db group> (N elements)" (the group highlighted from the database panel, `_groupSel`, incl. its instanced bolts / bars;
+    a right-click on the group keeps it selected) / "Isolate layer <name>", "Exit isolate", "Zoom to isolated", option "Zoom to isolated when isolating".
+    Keys: I = isolate the selection (nothing selected + isolated = exit), Shift+I = isolate the selected element's layer, Esc with nothing selected = exit
+    (Ctrl+I stays the Station/Offset query). Banner `IsolateBanner` ("Isolated: <name>" + Zoom + Exit; hidden in Sheets mode). Mechanism: other layers are
+    switched off through the normal `LayerItems` (batched with `_layerBatch`, so detail tiles / VRAM residency / far-bridge LOD follow the usual paths);
+    element isolates also filter merged meshes + instances with `TagHidden` (= hidden OR outside the isolate; the same predicate drives `HiddenRanges`,
+    instance lists, `Pick`, the snap env `IsHidden` and therefore the orbit pivot ray cast); meshes without a pick table are hidden whole. `LayerModeOk`:
+    isolated 3D layers are ALSO drawn in the plan view (top view of the isolated set). The state before the FIRST isolate (all layer visibility + `_hiddenList`)
+    is restored exactly on exit (nested isolates keep it); regeneration remaps isolated + saved hidden tags by `HideKey` (`RemapIsolation`, ends the isolate
+    if none survive); new reference layers stay off (`IsolateNewLayers`); opening another project (`MainViewModel.ProjectOpened`) exits. Zoom extents while
+    isolated = zoom on the isolated set (`ZoomToIsolated`). Snapshot: `--isolate fx,fy` / `--isolatelayer NAME` [`--isolatezoom`] [`--isolatepick fx,fy`]
+    [`--isolateexit`: also writes `_isolated.png` / `_isolated_view.png` before exiting]; ISOLATE: log lines. Note: `RenderBitmap` lags one frame
+    (the `_view.png` after an in-tick change can show the previous state).
   - Navigation (`MainWindow.Navigation.cs`, math in `SBM.Core/Geometry/ViewNav.cs`, tests `ViewNavTests`): Tekla / CAD style, all camera moves are ours
     (`UseDefaultGestures="False"`, Helix InputBindings cleared, Preview handlers mark events handled). Bindings = table `NavPresets.Cad`
     (another preset = another table): middle-drag pan (grabbed point stays under the cursor) - Ctrl/Shift + middle-drag orbit - right-drag orbit
@@ -412,6 +426,13 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
     Foreground in App.xaml.cs. Any custom-templated style without BasedOn (RibbonButton, ToolIconButton) MUST set its
     own Foreground â€” the user saw black ribbon labels on screen even though `--snapshot` rendered them light.
   - Command search (Ctrl+K) in `MainWindow.Commands.cs` auto-collects every ribbon button (label, tab, group, tooltip).
+  - Recent models: list logic `SBM.Core/Project/RecentModels.cs` (`RecentModelList`: newest first, max 10, one entry per full path case-insensitive,
+    missing files kept until removed; tests `IsolateAndRecentTests`), stored in `%LOCALAPPDATA%\SteelBridgeModeler\recent-models.json`
+    (`MainViewModel.Recent` / `NoteRecent` on every SetProject with a path = Open / command line / remote open, and on Save / Save As / remote save;
+    `--snapshot` runs never write it). Open (ribbon, Ctrl+O) = unsaved-changes prompt, then `Editors/RecentModelsWindow` (rows: name, folder, last opened;
+    missing greyed with Remove; Clear list; Browse... = file dialog in the newest existing folder; empty list = file dialog directly). Home > Project > Recent
+    (`MainWindow.Recent.cs`) = the File > Recent menu (open, missing greyed with a Remove submenu, Remove missing files, Clear list). There is no start
+    screen (the app opens the sample / the command-line model). Snapshot `--recentdialog` renders the dialog from a copy (`_recent.png`).
   - `ViewModels/MainViewModel` â€” project, undo/redo (JSON snapshots), async regeneration (Task.Run + version counter).
 
   - Measure / query / snaps (App): `MainWindow.Measure.cs` (tools Measure, Measure Angle, Station/Offset query; overlay Canvas

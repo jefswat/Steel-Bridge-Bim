@@ -299,8 +299,13 @@ public sealed partial class MainViewModel : ObservableObject
         _origin = null;
         _refCache.Clear();
         _regenCache.Clear();
+        if (path != null) NoteRecent(path);
+        ProjectOpened?.Invoke();
         _ = LoadAfterRegen(zoom);
     }
+
+    /// <summary>A different project was opened / created / loaded (before its first regeneration).</summary>
+    public event Action? ProjectOpened;
 
     private async Task LoadAfterRegen(bool zoom)
     {
@@ -371,21 +376,81 @@ public sealed partial class MainViewModel : ObservableObject
         Info("Loaded sample: spiral-curve alignment with 6% superelevation, a 2-span skewed girder bridge, and an existing-ground TIN.");
     }
 
+    /// <summary>Open (ribbon, Ctrl+O): unsaved-changes prompt, then the recent models (when there are any) with Browse for the file dialog.</summary>
     [RelayCommand]
     private void Open()
     {
         if (!ConfirmDiscard()) return;
+        if (Recent.Items.Count > 0)
+        {
+            var w = new RecentModelsWindow(Recent, SaveRecent) { Owner = Application.Current?.MainWindow };
+            if (w.ShowDialog() != true) return;
+            if (w.SelectedPath is { } chosen) { LoadFile(chosen); return; }
+            if (!w.Browse) return;
+        }
         var dlg = new OpenFileDialog { Filter = "Steel Bridge Modeler project (*.sbm)|*.sbm|All files|*.*" };
+        if (Recent.Items.Select(i => i.Folder).FirstOrDefault(Directory.Exists) is { } dir) dlg.InitialDirectory = dir;
         if (dlg.ShowDialog() != true) return;
+        LoadFile(dlg.FileName);
+    }
+
+    /// <summary>Opens a model from the recent list (ribbon Recent menu): same as Open, with the unsaved-changes prompt.</summary>
+    public void OpenRecent(string path)
+    {
+        if (!File.Exists(path))
+        {
+            if (MessageBox.Show(path + Environment.NewLine + Environment.NewLine + "The file was not found. Remove it from the recent models?", "Recent models", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
+            {
+                Recent.Remove(path);
+                SaveRecent();
+            }
+            return;
+        }
+        if (!ConfirmDiscard()) return;
+        LoadFile(path);
+    }
+
+    private void LoadFile(string path)
+    {
         try
         {
-            SetProject(BridgeProject.Load(dlg.FileName), dlg.FileName, true);
-            Info($"Opened {dlg.FileName}");
+            SetProject(BridgeProject.Load(path), Path.GetFullPath(path), true);
+            Info($"Opened {path}");
         }
         catch (Exception ex)
         {
             Error($"Could not open project: {ex.Message}");
         }
+    }
+
+    // ------------------------------------------------------------------ recent models (app setting)
+
+    public static string RecentModelsPath { get; } = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SteelBridgeModeler", "recent-models.json");
+
+    /// <summary>Snapshot (test) runs read the list but never change it.</summary>
+    private static readonly bool RecordRecent = !Environment.GetCommandLineArgs().Contains("--snapshot");
+
+    /// <summary>The last models opened or saved, newest first (recent-models.json beside session.log in the local app data folder).</summary>
+    public RecentModelList Recent { get; } = RecentModelList.Load(RecentModelsPath);
+
+    public event Action? RecentChanged;
+
+    private void NoteRecent(string path)
+    {
+        if (!RecordRecent) return;
+        Recent.Touch(path, DateTime.UtcNow);
+        SaveRecent();
+    }
+
+    public void SaveRecent()
+    {
+        if (RecordRecent)
+        {
+            try { Recent.Save(RecentModelsPath); }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { Log("recent models not saved: " + ex.Message); }
+        }
+        RecentChanged?.Invoke();
     }
 
     /// <summary>Remote control: saves to the given path (or the current file). Returns a message; throws when there is no path.</summary>
@@ -395,6 +460,7 @@ public sealed partial class MainViewModel : ObservableObject
         _project.Save(path);
         FilePath = path;
         IsDirty = false;
+        NoteRecent(path);
         Info($"Saved {path}");
         return $"Saved {path}";
     }
@@ -423,6 +489,7 @@ public sealed partial class MainViewModel : ObservableObject
             _project.Save(path);
             FilePath = path;
             IsDirty = false;
+            NoteRecent(path);
             Info($"Saved {path}");
             return true;
         }
