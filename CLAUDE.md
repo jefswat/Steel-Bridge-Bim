@@ -164,7 +164,8 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
     `AbutmentDefinition.PileRowOffsets` (x of each pile row from CL brg; empty = the two legacy rows `PileRows`). `Kind` = Stub (default, all of the above) |
     Integral (Iowa integral pile cap, Woodbury p.15-17; `SubstructureAbutmentIntegral.cs`, concrete-bridge design feature A / T1): cap faces `CapBack/FrontToBearing`
     (required), stepped top = one level step per girder (`Steps`) with vertical risers at `StepBoundaryS` or `StepRisersAtMidBay` (only when confirmed - user question Q3;
-    neither = UNRESOLVED, no cap solid), bottom = `FootingBottom`; no backwall / corbel / step blocks (diaphragm = feature C); checks `PlanCapDepthLeft/Right`
+    neither = UNRESOLVED, no cap solid; Woodbury: user decision 11 = 1'-9 past the lower beam's CL, set by substructure-woodbury.csx, which also gives the
+    abutment / pier diaphragms their bottoms), bottom = `FootingBottom`; no backwall / corbel / step blocks (diaphragm = feature C); checks `PlanCapDepthLeft/Right`
     (p.17 step diagram), `PlanCapVolume`, `StepToSeat`; `WingExtensionDefinition` (wall outboard of the gutter line + level footing from the cap back face, every
     missing elevation / position UNRESOLVED), `PileCasingDefinition` (CMP from the concrete bottom to `BottomElevation`; NaN = UNRESOLVED, `AbutmentGeometry.Casings`
     schedule records only; solid = `SubElementKind.PileCasing`, IFC mapping pending T3), `PileSpiralDefinition` (schedule-only mark, one per pile). Integral rebar:
@@ -174,7 +175,19 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
     adds full-width strips above each layer line (`Layers` = BandChains, lowest line first; plans: fan arcs R5, R4, R3, 2" each, drafted 7 deg) as a
     separate Cap-kind SubSolid ("... cap section step"); lines go to `SubstructureUnit.ReliefLines` (bent elevation view). `CapBandBuilder` builds the
     tangent-arc S-curve from the plan tables (`FromTable`) or the explicit figures (`FromLongArc`). Cap bars are NOT adapted (warning). Data:
-    `samples/plans/pier-aesthetics.csx`, reading in `docs/plan-data/pier-cap-aesthetics.md` (Confirmed section). Stepped top (6A): `BandFromLowerTop` measures both faces' lines from the lower half's top. Texture itself / Detail A are not modeled.
+    `samples/plans/pier-aesthetics.csx`, reading in `docs/plan-data/pier-cap-aesthetics.md` (Confirmed section). Stepped top (6A): `BandFromLowerTop` measures both faces' lines from the lower half's top. Texture itself / Detail A are not modeled (see Surface treatments below for the generic texture / thin-brick regions).
+  - Surface treatments (OPTIONAL `BridgeDefinition.SurfaceTreatments` = `Bridge/SurfaceTreatment.cs`, null = none; generic for form liner texture, integral thin
+    brick / terra cotta, rustication): `SurfaceTreatmentDefinition` (Kind, Pattern, Products, Relief depth, Orientation, PlanQuantity m2 + QuantityItem, Source,
+    Unresolved) with `SurfaceRegion`s: Host Barrier (custom-barrier faces with a surface `Tag`) | Substructure (unit solids by `Elements` kinds / `NameContains`) |
+    Diaphragm; near-vertical, EXPOSED faces (centroid + 5 mm not inside another solid of the support, the beams or the haunches - ray parity), optional facing
+    (`FacingS/N` in the unit frame or `FacingOffsetSide` = outboard right/left), S range, `Lower`/`Upper` limit lines (`SurfaceLevel`: level, (S, z) polyline
+    along the support line, or `DeckTop` + offset = parallel to grade) and `Exclude` bands. `Surface/SurfaceTreatmentGenerator` (RegenerationCache phase 2,
+    after the diaphragms; result on `SubstructureModel.SurfaceTreatments` so every consumer has it): per region the AREA (clipped faces) and a RELIEF LAYER
+    (closed prism per face piece, offset outward by Relief); totals vs PlanQuantity as Info. Viewport layers 3D-THIN-BRICK / 3D-FORM-LINER; IFC one IfcCovering
+    per region (thin brick CLADDING, form liner USERDEFINED 'FORM_LINER_TEXTURE', key `IfcKeys.SurfaceTreatment`) + Pset SBM_SurfaceTreatment (kind, pattern,
+    products, orientation, host, Area, TreatmentTotalArea, PlanQuantity, ReliefDepth, source; area unit = m2) + SBM_Status when flagged; database group per
+    treatment (category "surface treatment", plan vs model in props) > elements "thin brick" / "form liner". The texture pattern itself is not modeled.
+    Data: `samples/plans/surface-treatments-woodbury.csx`. Tests `SurfaceTreatmentTests`.
   - `Drawing/Views/` â€” 2D views as `PlanDrawing`s (Z = 0) via `Drafter` (paper-inch sizes Ã— scale; dims with ticks,
     leaders, hatch, elevation tags, AWS weld symbols; ALL text is vertically middle-aligned â€” DxfWriter writes 72/73
     accordingly; "\n" in text = multi-line). Keep annotation text short/multi-line: paper-sized text does not shrink
@@ -263,7 +276,9 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
     split from the deck at the soffit; exact, no booleans: x-SLABS at every section vertex / beam-end event, each slice a simple polygon in (S, z)
     with a NOTCH per beam (outline + haunch to the soffit; skewed ends at the top-CL end x, SQUARE ends = outline clipped where the face meets the
     slice, events at every outline vertex, slices inset 1e-5 m and extrapolated) or, open below, PANELS between the beams; every slab = closed loft
-    (`Pieces`, one IFC face set each). IFC: IfcBeam .DIAPHRAGM. ('END_DIAPHRAGM' / 'PIER_DIAPHRAGM'), keyways IfcBuildingElementPart 'SHEAR_KEY'
+    (`Pieces`, one IFC face set each). Bottom = `Frame.Pieces` (z linear in S) with boundaries (risers) `Bounds` that may move with x (S + PerX x); rule
+    `DiaphragmRiserRule.Blocks` + `StepBlocks` (block length centred on the beam line, side angle, `Between` = substructure top (S, z) between the blocks,
+    Woodbury pier caps p.9) besides Explicit / MidBay / Unresolved. IFC: IfcBeam .DIAPHRAGM. ('END_DIAPHRAGM' / 'PIER_DIAPHRAGM'), keyways IfcBuildingElementPart 'SHEAR_KEY'
     aggregated into it, fillers IfcBuildingElementPart 'JOINT_FILLER'; Assumption -> SBM_Status. Viewport layers 3D-DIAPHRAGMS / -FILLERS /
     3D-UNRESOLVED-DIAPHRAGMS, material rows. Data: `samples/plans/diaphragms-woodbury.csx`, `diaphragms-br02069.csx` (run by the build scripts),
     report `check-diaphragms.csx`. Tests `ConcreteDiaphragmTests`. Not yet: 2D sheet views, database groups, diaphragm rebar.
@@ -293,7 +308,12 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
     keep BearingDetailer, ElevationCheck and BearingViews in step; steel `BearingSeat`s carry the footprint.
   - `Concrete/` â€” `ConcreteGenerator` (deck slab grid solid between skewed end lines following finished grade,
     haunch sweeps, barrier sweeps, deck mats, 1% negative-moment bars, TxDOT SSTR Bars S/U/R), `BarrierProfiles`
-    (SSTR per RL-SSTR Sept 2019 â€” 3/4" back-face step is an assumption), `Rebar.cs` (A615 sizes, AASHTO 5.10.8 Class B
+    (SSTR per RL-SSTR Sept 2019 â€” 3/4" back-face step is an assumption; `Expand` = custom section with fillets / chamfers / edge tags),
+    custom barriers `BarrierType.Custom` (`Bridge/BarrierCustom.cs`, `Concrete/ConcreteBarrierCustom.cs`; all inputs OPTIONAL and omitted from the .sbm when unused):
+    `Profile` (`BarrierProfilePoint` R inward from the deck edge / H, Radius, Chamfer, surface Tag of the next edge), `PerpendicularToDeck`, `Begin/EndExtension`
+    (square ends beyond the deck ends, along the toe line), `Zones` (`BarrierZone`: own section centred where a support CL crosses the deck edge, shortest zone wins,
+    optional `DeckWidening` -> `ConcreteModel.DeckBumps`, part of the deck slab), `PlanLength` check. Output: one mesh per barrier + `BarrierPieces` (closed solid per
+    section length, IFC items) + `TaggedSurfaces` (tagged faces incl. zone "returns") for the surface treatments. Woodbury: `samples/plans/barrier-woodbury.csx`. `Rebar.cs` (A615 sizes, AASHTO 5.10.8 Class B
     laps, `BarShape` centerlines + bend-diagram dims, `BarMark` incl. "varies" marks). Mark rules: â‰¥4 identical =
     own mark; straight bars within `MarkLengthTolerance` snap to the cluster's SHORTEST length; odd closures grouped
     into "varies" marks (â‰¤3 ft range). Negative-moment bars are one length centered on the pier. Equal-piece splits
