@@ -183,6 +183,7 @@ public static class IfcExporter
                 PartCategory.FormDeck => (0.7, 0.72, 0.75),
                 PartCategory.Grating => (0.6, 0.62, 0.66),
                 PartCategory.WalkwayStringer or PartCategory.WalkwayPost or PartCategory.WalkwayRail or PartCategory.WalkwayPlate => (0.45, 0.7, 0.5),
+                PartCategory.RailPost or PartCategory.RailHandrail or PartCategory.RailMember or PartCategory.RailBasePlate or PartCategory.RailEnvelope => (0.78, 0.80, 0.84),
                 _ => (0.95, 0.3, 0.2),
             };
             int rgb = w.Add("IFCCOLOURRGB", $"$,{R(r)},{R(g)},{R(b)}");
@@ -654,9 +655,11 @@ public static class IfcExporter
                         SBM.Core.Substructure.SubElementKind.Pile => w.Add("IFCPILE", $"{common},$,{Ref(pl)},{Ref(pds)},$,.DRIVEN.,$"),
                         // Generic mechanical splice coupler between column bars and footing dowels (IFC4X3 PredefinedType COUPLER).
                         SBM.Core.Substructure.SubElementKind.Coupler => w.Add("IFCMECHANICALFASTENER", $"{common},'REBAR_COUPLER',{Ref(pl)},{Ref(pds)},$,$,$,.COUPLER."),
+                        SBM.Core.Substructure.SubElementKind.MowStrip => w.Add("IFCSLAB", $"{common},'MOW_STRIP',{Ref(pl)},{Ref(pds)},$,.USERDEFINED."),
                         _ => w.Add("IFCFOOTING", $"{common},$,{Ref(pl)},{Ref(pds)},$,{footingType}"),
                     };
                     contained.Add(id);
+                    if (so.Assumption != null) miscStatus.Add((id, so.Assumption));
                     string mat = so.ShellThickness != 0 ? "Steel pipe shell, concrete filled" : so.IsConcrete ? concreteMat : so.Kind == SBM.Core.Substructure.SubElementKind.Coupler ? "Steel (mechanical splice coupler)" : "ASTM A572 Gr. 50 (HP piling)";
                     AddMaterial(mat, id);
                     double vol = Math.Abs(so.Mesh.Volume());
@@ -713,7 +716,9 @@ public static class IfcExporter
                     SBM.Core.Bridge.BarrierType.Custom => def.Deck.Barrier.ProfileName ?? "Custom barrier",
                     var t => t.ToString(),
                 };
-                int rail = w.Add("IFCRAILING", $"{Guid(IfcKeys.Barrier(bk, name))},$,{S(name)},{S(btype)},$,{Ref(pl)},{Ref(pds)},{S(name)},.GUARDRAIL.");
+                int rail = def.Deck.Barrier.IsCurb
+                    ? w.Add("IFCKERB", $"{Guid(IfcKeys.Barrier(bk, name))},$,{S(name)},{S(btype)},{S(btype)},{Ref(pl)},{Ref(pds)},{S(name)},.USERDEFINED.")
+                    : w.Add("IFCRAILING", $"{Guid(IfcKeys.Barrier(bk, name))},$,{S(name)},{S(btype)},$,{Ref(pl)},{Ref(pds)},{S(name)},.GUARDRAIL.");
                 contained.Add(rail);
                 AddMaterial(concreteMat, rail);
                 psetTargets.Add((rail, name, "Concrete barrier", 0, Math.Abs(mesh.Volume()) * 2400));
@@ -729,13 +734,16 @@ public static class IfcExporter
                 string jk = IfcKeys.Joint(bk, jn++);
                 string loc = $"{jr.Support}, {(jr.AtBegin ? "begin" : "end")} of {def.Name}";
                 string tname = jr.Definition.TypeName;
-                int bpds = Body(jr.Blockout, concreteStyle);
-                string bdesc = $"Blockout {u.FormatLength(jr.Definition.BlockoutWidth, LengthKind.Short)} wide x {u.FormatLength(jr.Definition.BlockoutDepth, LengthKind.Short)} deep, placed after the {tname.ToLowerInvariant()} joint is installed";
-                int bp = w.Add("IFCBUILDINGELEMENTPART", $"{Guid(IfcKeys.JointBlockout(jk))},$,{S(jr.BlockoutName)},{S(bdesc)},'JOINT_BLOCKOUT_CONCRETE',{Ref(pl)},{Ref(bpds)},$,.USERDEFINED.");
-                blockParts.Add(bp);
-                AddMaterial(concreteMat, bp);
-                psetTargets.Add((bp, "BLOCKOUT", jr.BlockoutName, 0, jr.BlockoutVolume * 2400));
-                result.ElementCount++;
+                if (!jr.Blockout.IsEmpty)
+                {
+                    int bpds = Body(jr.Blockout, concreteStyle);
+                    string bdesc = $"Blockout {u.FormatLength(jr.Definition.BlockoutWidth, LengthKind.Short)} wide x {u.FormatLength(jr.Definition.BlockoutDepth, LengthKind.Short)} deep, placed after the {tname.ToLowerInvariant()} joint is installed";
+                    int bp = w.Add("IFCBUILDINGELEMENTPART", $"{Guid(IfcKeys.JointBlockout(jk))},$,{S(jr.BlockoutName)},{S(bdesc)},'JOINT_BLOCKOUT_CONCRETE',{Ref(pl)},{Ref(bpds)},$,.USERDEFINED.");
+                    blockParts.Add(bp);
+                    AddMaterial(concreteMat, bp);
+                    psetTargets.Add((bp, "BLOCKOUT", jr.BlockoutName, 0, jr.BlockoutVolume * 2400));
+                    result.ElementCount++;
+                }
                 if (jr.EndBlock is { } eb && !eb.Mesh.IsEmpty)
                 {
                     int epds = Body(eb.Mesh, concreteStyle);
@@ -749,8 +757,11 @@ public static class IfcExporter
                 if (jr.Body != null)
                 {
                     int dpds = Body(jr.Body, jointStyle);
-                    string ddesc = "Envelope of the joint opening only. Generic placeholder: the device is designed and supplied by the manufacturer.";
+                    string ddesc = jr.Definition.Designation is { Length: > 0 } jd
+                        ? $"{jd}: envelope only (placeholder){(jr.Definition.PlanLength is double jpl ? $", plan length {u.FormatLength(jpl)}" : "")}"
+                        : "Envelope of the joint opening only. Generic placeholder: the device is designed and supplied by the manufacturer.";
                     int acc = w.Add("IFCDISCRETEACCESSORY", $"{Guid(IfcKeys.JointDevice(jk))},$,{S(jr.DeviceName)},{S(ddesc)},{S(tname.ToUpperInvariant() + "_EXPANSION_JOINT")},{Ref(pl)},{Ref(dpds)},$,.EXPANSION_JOINT_DEVICE.");
+                    if (jr.Assumption != null) miscStatus.Add((acc, jr.Assumption));
                     contained.Add(acc);
                     AddMaterial("Steel (placeholder, A36 minimum per plans)", acc);
                     placeholders.Add((acc, loc, tname));
@@ -1106,6 +1117,14 @@ public static class IfcExporter
                     AssemblyKind.ArchDeckForm => (".SITE.", ".USERDEFINED.", "'DECK_FORM'"),
                     _ => (".SITE.", ".USERDEFINED.", "'BEARING'"),
                 };
+                if (asm.Kind == AssemblyKind.Railing)
+                {
+                    // Pedestrian railing run: an IfcRailing aggregating its posts, rails, base plates and anchor bolts.
+                    asmIds[asm.Mark] = w.Add("IFCRAILING",
+                        $"{Guid(IfcKeys.Assembly(bk, asm.Mark))},$,{S(asm.Mark)},{S(asm.Description)},{(asm.ObjectType is { } ot ? S(ot) : "$")},{Ref(elemPl)},$,{S(asm.Mark)},.{asm.PredefinedType ?? "GUARDRAIL"}.");
+                    AddMaterial("Stainless steel (railing)", asmIds[asm.Mark]);
+                    continue;
+                }
                 asmIds[asm.Mark] = w.Add("IFCELEMENTASSEMBLY",
                     $"{Guid(IfcKeys.Assembly(bk, asm.Mark))},$,{S(asm.Mark)},{S(asm.Description)},{objType},{Ref(elemPl)},$,{S(asm.Mark)},{place},{type}");
             }
@@ -1162,6 +1181,12 @@ public static class IfcExporter
                     PartCategory.ArchConnectionPlate => w.Add("IFCPLATE", $"{common},$,{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.SPLICE_PLATE."),
                     PartCategory.ArchStiffener => w.Add("IFCPLATE", $"{common},$,{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.STIFFENER_PLATE."),
                     PartCategory.PtStrand => w.Add("IFCTENDON", $"{common},$,{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},$,.STRAND.,{R(steel.Arch?.PtStrandDiameter * scale ?? 0)},{R(steel.Arch?.PtStrandArea * scale * scale ?? 0)},$,$,$,$,$"),
+                    // Pedestrian railing parts (aggregated into the run's IfcRailing).
+                    PartCategory.RailPost => w.Add("IFCMEMBER", $"{common},$,{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.POST."),
+                    PartCategory.RailHandrail => w.Add("IFCRAILING", $"{common},$,{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.HANDRAIL."),
+                    PartCategory.RailMember => w.Add("IFCMEMBER", $"{common},$,{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.MEMBER."),
+                    PartCategory.RailBasePlate => w.Add("IFCPLATE", $"{common},$,{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.BASE_PLATE."),
+                    PartCategory.RailEnvelope => w.Add("IFCRAILING", $"{common},'RAILING_ENVELOPE',{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.USERDEFINED."),
                     PartCategory.PtAnchorage => w.Add("IFCTENDONANCHOR", $"{common},'PT_FLAT_ANCHORAGE',{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},$,.USERDEFINED."),
                     _ => w.Add("IFCFASTENER", $"{common},$,{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.WELD."),
                 };

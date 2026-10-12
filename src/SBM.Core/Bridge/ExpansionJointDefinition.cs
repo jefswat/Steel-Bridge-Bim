@@ -2,7 +2,7 @@ using static SBM.Core.Units.UnitSystem;
 
 namespace SBM.Core.Bridge;
 
-public enum ExpansionJointType { None, Modular, StripSeal }
+public enum ExpansionJointType { None, Modular, StripSeal, Sealed }
 
 /// <summary>
 /// Deck expansion joint at an END support (first or last support of the bridge). OPTIONAL: <c>SupportDefinition.ExpansionJoint</c>
@@ -45,12 +45,30 @@ public sealed class ExpansionJointDefinition
     /// </summary>
     public DeckEndBlockDefinition? EndBlock { get; set; }
 
+    // ---- OPTIONAL (omitted from the .sbm when unused): plan designation, centred device, checks, unresolved flag
+    /// <summary>Plan designation of the joint (device name, IFC description), e.g. "SEJ-B(MOD) 4 in sealed expansion joint + BS-EJCP cover plate".</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public string? Designation { get; set; }
+    /// <summary>The device body is centred on the deck-end line (half of <see cref="GapAt50F"/> each side) instead of filling the opening beyond it: for
+    /// plans that dimension the slab to the CL joint and give no opening (the body then overlaps the deck ends; it is a placeholder).</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    public bool BodyCentered { get; set; }
+    /// <summary>Plan length of the joint (bid LF), check value only.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public double? PlanLength { get; set; }
+    /// <summary>What the plans do not give (with the page): raised as a warning and carried by the device (IFC SBM_Status, database status).</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public string? Unresolved { get; set; }
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public string? Basis { get; set; }
+
     public bool Active => Type != ExpansionJointType.None;
 
     public string TypeName => Type switch
     {
         ExpansionJointType.Modular => "Modular",
         ExpansionJointType.StripSeal => "Strip seal",
+        ExpansionJointType.Sealed => "Sealed",
         _ => "None",
     };
 

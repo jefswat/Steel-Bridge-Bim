@@ -26,9 +26,13 @@ public sealed class ExpansionJointResult
     public DeckEndBlockResult? EndBlock { get; init; }
     public double BlockoutVolume => Math.Abs(Blockout.Volume());
     public double BodyVolume => Body == null ? 0 : Math.Abs(Body.Volume());
-    public string DeviceName => Definition.Type == ExpansionJointType.StripSeal
+    public string DeviceName => Definition.Designation is { Length: > 0 } dn ? $"{dn} (placeholder), {Support}"
+        : Definition.Type == ExpansionJointType.StripSeal
         ? "Generic strip seal expansion joint (manufacturer-designed placeholder)"
+        : Definition.Type == ExpansionJointType.Sealed ? "Generic sealed expansion joint (placeholder)"
         : "Generic modular expansion joint (manufacturer-designed placeholder)";
+    /// <summary>Device geometry the plans do not fix (from <see cref="ExpansionJointDefinition.Unresolved"/>); null = none.</summary>
+    public Assumption? Assumption => Definition.Unresolved is { Length: > 0 } why ? Assumption.Unresolved(why, Definition.Basis ?? "generic envelope") : null;
     public string BlockoutName => $"Joint blockout concrete, {Support}";
 }
 
@@ -618,7 +622,7 @@ public sealed partial class ConcreteGenerator
         foreach (bool begin in new[] { true, false })
         {
             var j = begin ? JointB : JointE;
-            if (j == null || EffectiveBlockoutDepth(j) >= Deck.Thickness - 1e-6) continue;
+            if (j == null || j.BlockoutWidth <= 1e-9 || EffectiveBlockoutDepth(j) >= Deck.Thickness - 1e-6) continue;
             _m.Deck!.Append(EndSlab(begin, 0, j.BlockoutWidth, EffectiveBlockoutDepth(j), Deck.Thickness));
         }
     }
@@ -692,17 +696,27 @@ public sealed partial class ConcreteGenerator
             if (j.SetDown >= Math.Min(j.BlockoutDepth, Deck.Thickness))
                 Warn($"Expansion joint at {sup.Name}: set-down is not smaller than the blockout depth.");
             double depth = block != null ? j.BlockoutDepth : Math.Min(j.BlockoutDepth, Deck.Thickness);
-            var blockout = EndSlab(begin, 0, j.BlockoutWidth, 0, depth);
+            // No blockout width = the plans give no blockout (the deck is not cut back; no blockout concrete).
+            var blockout = j.BlockoutWidth > 1e-9 ? EndSlab(begin, 0, j.BlockoutWidth, 0, depth) : new Mesh();
             Mesh? body = null;
             double length = 0;
             double li = Deck.Barrier.Left ? (j.EdgeInset ?? barrierBase) : 0, ri = Deck.Barrier.Right ? (j.EdgeInset ?? barrierBase) : 0;
             if (j.Body && j.GapAt50F > 1e-6)
             {
-                // Device envelope: fills the opening between the deck-end faces from just below top of slab (set-down) to the blockout depth.
-                body = EndSlab(begin, 0, -j.GapAt50F, Math.Min(j.SetDown, depth * 0.5), depth, li, ri);
+                // Device envelope: fills the opening between the deck-end faces from just below top of slab (set-down) to the blockout depth;
+                // centred on the deck-end line when the plans dimension the slab to the CL joint without an opening (BodyCentered, placeholder).
+                body = j.BodyCentered ? EndSlab(begin, j.GapAt50F / 2, -j.GapAt50F / 2, Math.Min(j.SetDown, depth * 0.5), depth, li, ri)
+                    : EndSlab(begin, 0, -j.GapAt50F, Math.Min(j.SetDown, depth * 0.5), depth, li, ri);
+            }
+            if (j.Body || j.PlanLength != null)
+            {
                 var pts = JointColumns(li, ri).Select(c => { double d = EndD(c, begin, 0); var p = _a.PointAtDistance(d, c(d)); return new Vec2(p.X, p.Y); }).ToList();
                 for (int k = 1; k < pts.Count; k++) length += (pts[k] - pts[k - 1]).Length;
             }
+            if (j.Unresolved is { Length: > 0 } jw) Warn($"Expansion joint at {sup.Name}: {jw}");
+            if (j.PlanLength is double jpl)
+                lock (_m.Diagnostics) _m.Diagnostics.Add(new(Math.Abs(length - jpl) <= 0.003048 ? DiagnosticSeverity.Info : DiagnosticSeverity.Warning,
+                    $"Expansion joint at {sup.Name}: length along the joint {_u.FormatLength(length)} vs plan {_u.FormatLength(jpl)}."));
             res.Add(new ExpansionJointResult { Support = sup.Name, AtBegin = begin, Definition = j, Blockout = blockout, Body = body, Length = length, EndBlock = block });
         }
         if (res.Count == 0) return;

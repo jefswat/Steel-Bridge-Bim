@@ -208,6 +208,9 @@ public static class TableViews
             double insp = Sum(p => kinds.TryGetValue(p.Assembly, out var k) && (k == AssemblyKind.InspectionCable || k == AssemblyKind.InspectionWalkway));
             if (insp > 0) { Row(Sup, "STRUCTURAL STEEL - INSPECTION ACCESS", insp, "N0", wn, "SUM OF PART MASSES"); total += insp; }
             if (total > 0) Row(Sup, "STRUCTURAL STEEL - TOTAL", total, "N0", wn, "");
+            if (st.Railings is { Runs.Count: > 0 } rails)
+                foreach (var g in rails.Runs.GroupBy(r => r.TypeName.Length > 0 ? r.TypeName : "PEDESTRIAN RAILING"))
+                    Row(Sup, g.Key.ToUpperInvariant(), g.Sum(r => r.Length) / (u.IsUS ? 0.3048 : 1), "N1", u.IsUS ? "LF" : "M", "LENGTH ALONG THE RAILING REFERENCE LINE");
             foreach (var g in st.Bolts.Where(b => b.Kind == BoltKind.Structural).GroupBy(b => Math.Round((b.Diameter > 0 ? b.Diameter : st.Bolt.Diameter) / 0.0254 * 1000) / 1000).OrderBy(g => g.Key))
                 Row(Sup, $"HIGH-STRENGTH BOLTS {st.BoltGrade}, {g.Key:0.###}\" DIA", g.Count(), "N0", "EACH", "COUNT OF BOLT INSTANCES");
             if (st.Bolts.Any(b => b.Kind == BoltKind.Anchor)) Row(Sup, "ANCHOR BOLTS", st.Bolts.Count(b => b.Kind == BoltKind.Anchor), "N0", "EACH", "COUNT");

@@ -108,6 +108,17 @@ public sealed class RegenerationCache
                 st = ts.Result;
                 if (cm != null && st != null) { Checks.DeckEndBlockCheck.Run(f, st, cm, project.Units); Checks.DeckRebarCheck.Run(f, st, cm, project.Units); }
             }
+            // Pedestrian railings (OPTIONAL): on the finished concrete (deck, curbs, arch curbs); parts merged into the bridge's steel model.
+            if (includeSteel && !f.HasErrors && b.Railings is { Count: > 0 })
+            {
+                var rm = Railing.PedestrianRailingGenerator.Generate(f, cm, project.Units);
+                st ??= new SteelModel { Bolt = new BoltGeometry(Units.UnitSystem.In(0.875)), BoltGrade = "A325" };
+                st.Assemblies.AddRange(rm.Assemblies);
+                st.Parts.AddRange(rm.Parts);
+                st.Bolts.AddRange(rm.Bolts);
+                st.Diagnostics.AddRange(rm.Diagnostics);
+                st.Railings = rm;
+            }
             lock (_lock) _super[key] = (f, st, cm, ps);
             parts[i] = (f, st, cm, ps, false);
         });

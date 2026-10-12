@@ -362,6 +362,9 @@ public sealed class SubstructureDefinition
     public List<CapProfilePoint> CapProfileAhead { get; set; } = new();
     /// <summary>Optional plan prisms added to an as-designed cap (end maskwall, end reveal projection; Woodbury p.9 / p.11 section C-C), see <see cref="CapBlockDefinition"/>.</summary>
     public List<CapBlockDefinition> CapBlocks { get; set; } = new();
+    /// <summary>OPTIONAL concrete mow strip around each column at the ground (see <see cref="MowStripDefinition"/>); null = none, omitted from the .sbm.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public MowStripDefinition? MowStrip { get; set; }
     /// <summary>Optional architectural texture band on one face of an as-designed cap (see <see cref="CapAestheticsDefinition"/>).</summary>
     public CapAestheticsDefinition? Aesthetics { get; set; }
     public CapTopShape TopShape { get; set; } = CapTopShape.Sloped;
@@ -537,6 +540,7 @@ public sealed class SubstructureDefinition
         c.CapProfileAhead = CapProfileAhead.Select(p => new CapProfilePoint(p.S, p.Elevation)).ToList();
         c.Footings = Footings.Select(f => f.Clone()).ToList();
         c.CapBlocks = CapBlocks.Select(b => b.Clone()).ToList();
+        c.MowStrip = MowStrip?.Clone();
         c.Aesthetics = Aesthetics?.Clone();
         c.Abutment = Abutment?.Clone();
         c.Unresolved = Unresolved?.ToList();
