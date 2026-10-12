@@ -586,7 +586,7 @@ public static class ArchGenerator
                     var line = new List<Vec2> { new(0, zTop) };
                     foreach (var (u, top) in prof) line.Add(new Vec2(u * f, top ? zTop : dk.FormBottomZ));
                     line.Add(new Vec2(w, zTop));
-                    foreach (var q in line) pts.Add(W((sa + e * q.X).WithZ(q.Y - dk.FormThickness)));
+                    foreach (var q in OffsetBelow(line, dk.FormThickness)) pts.Add(W((sa + e * q.X).WithZ(q.Y)));
                     for (int i = line.Count - 1; i >= 0; i--) pts.Add(W((sa + e * line[i].X).WithZ(line[i].Y)));
                     return pts.ToArray();
                 }
@@ -711,6 +711,22 @@ public static class ArchGenerator
             }
             Model.Curbs = curbs;
 
+        }
+
+        /// <summary>Polyline (u, z) offset by <paramref name="t"/> to its lower side, normal to each segment (mitered vertices).</summary>
+        private static List<Vec2> OffsetBelow(IReadOnlyList<Vec2> line, double t)
+        {
+            Vec2 N(int i) { var d = (line[i + 1] - line[i]).Normalized(); return new Vec2(d.Y, -d.X); }
+            var res = new List<Vec2> { line[0] + N(0) * t };
+            for (int i = 1; i + 1 < line.Count; i++)
+            {
+                var n1 = N(i - 1); var n2 = N(i);
+                var m = (n1 + n2);
+                double c = Vec2.Dot(m.Normalized(), n1);
+                res.Add(m.Length < 1e-9 || c < 0.1 ? line[i] + n2 * t : line[i] + m.Normalized() * (t / c));
+            }
+            res.Add(line[^1] + N(line.Count - 2) * t);
+            return res;
         }
 
         private static void Append(Mesh dst, Mesh src)
