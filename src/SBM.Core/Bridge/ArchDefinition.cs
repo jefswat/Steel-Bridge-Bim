@@ -573,6 +573,66 @@ public sealed class ArchDeckDefinition
     public double ConcreteStrengthKsi { get; set; } = 5;
     public List<ArchCurbDefinition> Curbs { get; set; } = new();
     public List<ArchTendon> Tendons { get; set; } = new();
+    /// <summary>PT system (OPTIONAL; null = tendons are data only): strands, anchorages at the knuckle end webs.</summary>
+    public ArchPtSystem? PtSystem { get; set; }
+    /// <summary>Deck reinforcement (OPTIONAL, null = none).</summary>
+    public ArchDeckRebar? Rebar { get; set; }
+    /// <summary>Corrugations (flute centres) on the longitudinal bottom bar grid (true: a flute at every <see cref="ArchDeckRebar.LongSpacing"/> from the
+    /// structure CL, "#5 bar in each corrugation"); false = profile from the south tie web face (v1).</summary>
+    public bool FlutesOnBarGrid { get; set; }
+}
+
+/// <summary>Longitudinal PT (p.155): strands per tendon (flat duct), strand size, jacking force, strand spacing in the duct, anchorage envelope at the
+/// knuckle end webs (the tendon ends run to the nearest end web PT opening).</summary>
+public sealed class ArchPtSystem
+{
+    public int StrandsPerTendon { get; set; } = 4;
+    public double StrandDiameter { get; set; } = In(0.6);
+    public double StrandArea { get; set; } = In(1) * In(1) * 0.217;
+    public double JackingForceKips { get; set; } = 170;
+    public double StrandSpacing { get; set; } = In(1.9375);
+    public double AnchorLength { get; set; } = In(10.5);
+    public double AnchorWidth { get; set; } = In(13);
+    public double AnchorHeight { get; set; } = In(4);
+    public string Unresolved { get; set; } = "";
+    public string StrandMaterial { get; set; } = "ASTM A416 Gr. 270 low-relaxation strand";
+    public string AnchorMaterial { get; set; } = "PT flat anchorage (DYWIDAG, by supplier)";
+    /// <summary>Anchorage zone bars (S2): distances from the end web inside face along the tendon, outline width x height around the tendon.</summary>
+    public List<double> ZoneBarsAt { get; set; } = new();
+    public double ZoneBarWidth { get; set; } = In(9.25);
+    public double ZoneBarHeight { get; set; } = In(6);
+    public string ZoneBarMark { get; set; } = "S2";
+    public string ZoneBarSize { get; set; } = "#5";
+}
+
+/// <summary>Deck bars (p.152 / 154): transverse top (A) and bottom (B) bars at a spacing along the structure CL, longitudinal top (D1) / bottom (D2) lines
+/// on a grid across the deck (count, spacing, bar length, lap), curb bars (S stirrups at a spacing, D4 corner bars), covers.</summary>
+public sealed class ArchDeckRebar
+{
+    public string TopTransMark { get; set; } = "A1";
+    public double TopTransLength { get; set; }
+    public string BottomTransMark { get; set; } = "B1";
+    public double BottomTransLength { get; set; }
+    public double TransSpacing { get; set; } = In(8);
+    public string TopLongMark { get; set; } = "D1";
+    public string BottomLongMark { get; set; } = "D2";
+    public int LongCount { get; set; } = 27;
+    public double LongSpacing { get; set; } = In(8);
+    public double LongBarLength { get; set; } = Ft(40);
+    public double LongLap { get; set; } = Ft(2) + In(8);
+    public string Size { get; set; } = "#5";
+    public double TopCover { get; set; } = In(2.5);
+    public double BottomClear { get; set; } = In(1.75);
+    public double EndCover { get; set; } = In(2);
+    public string CurbStirrupMark { get; set; } = "S1";
+    public string CurbStirrupSize { get; set; } = "#4";
+    public double CurbStirrupWidth { get; set; } = In(6);
+    public double CurbStirrupHeight { get; set; } = In(9);
+    public double CurbTopCover { get; set; } = In(2);
+    public string CurbLongMark { get; set; } = "D4";
+    public string Unresolved { get; set; } = "";
+    /// <summary>Plan bar list (check): mark, count, length.</summary>
+    public List<ArchPoint> PlanList { get; set; } = new();
 }
 
 /// <summary>Curb along an alignment offset: inner face at <see cref="InnerOffset"/> (right +), width toward the deck edge.</summary>

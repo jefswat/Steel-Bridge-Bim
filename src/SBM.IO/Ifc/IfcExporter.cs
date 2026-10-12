@@ -1038,6 +1038,8 @@ public static class IfcExporter
                     PartCategory.CableConnector => w.Add("IFCMECHANICALFASTENER", $"{common},'CABLE_CONNECTOR',{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},$,$,.USERDEFINED."),
                     PartCategory.ArchConnectionPlate => w.Add("IFCPLATE", $"{common},$,{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.SPLICE_PLATE."),
                     PartCategory.ArchStiffener => w.Add("IFCPLATE", $"{common},$,{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.STIFFENER_PLATE."),
+                    PartCategory.PtStrand => w.Add("IFCTENDON", $"{common},$,{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},$,.STRAND.,{R(steel.Arch?.PtStrandDiameter * scale ?? 0)},{R(steel.Arch?.PtStrandArea * scale * scale ?? 0)},$,$,$,$,$"),
+                    PartCategory.PtAnchorage => w.Add("IFCTENDONANCHOR", $"{common},'PT_FLAT_ANCHORAGE',{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},$,.USERDEFINED."),
                     _ => w.Add("IFCFASTENER", $"{common},$,{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.WELD."),
                 };
                 if (part.Assumption != null) miscStatus.Add((id, part.Assumption));

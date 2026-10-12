@@ -1109,13 +1109,26 @@ public static partial class ArchGenerator
             var prof = new List<(double u, bool top)>();
             double flute = dk.FormPitch - dk.FormTopFlat;
             double inset = (flute - dk.FormFluteBottom) / 2;
-            for (double u0 = 0; u0 + dk.FormPitch <= w0 + 1e-9; u0 += dk.FormPitch)
+            if (dk.FlutesOnBarGrid && dk.Rebar is { } rbg)
             {
-                prof.Add((u0 + dk.FormTopFlat, true));
-                prof.Add((u0 + dk.FormTopFlat + inset, false));
-                prof.Add((u0 + dk.FormTopFlat + inset + dk.FormFluteBottom, false));
-                prof.Add((u0 + dk.FormPitch, true));
+                // A corrugation under every longitudinal bottom bar ("#5 bar in each corrugation"): flute centres on the bar grid about the structure CL.
+                int kmax = (int)Math.Ceiling(w0 / 2 / rbg.LongSpacing) + 1;
+                for (int k = -kmax; k <= kmax; k++)
+                {
+                    double c = w0 / 2 + k * rbg.LongSpacing;
+                    double o0 = c - flute / 2, o1 = c + flute / 2;
+                    if (o0 <= 1e-6 || o1 >= w0 - 1e-6) continue;
+                    prof.Add((o0, true)); prof.Add((c - dk.FormFluteBottom / 2, false)); prof.Add((c + dk.FormFluteBottom / 2, false)); prof.Add((o1, true));
+                }
             }
+            else
+                for (double u0 = 0; u0 + dk.FormPitch <= w0 + 1e-9; u0 += dk.FormPitch)
+                {
+                    prof.Add((u0 + dk.FormTopFlat, true));
+                    prof.Add((u0 + dk.FormTopFlat + inset, false));
+                    prof.Add((u0 + dk.FormTopFlat + inset + dk.FormFluteBottom, false));
+                    prof.Add((u0 + dk.FormPitch, true));
+                }
             prof.RemoveAll(p => p.u >= w0 - 1e-6);
             double zTop = dk.FormBottomZ + dk.FormDepth;
 
@@ -1222,11 +1235,15 @@ public static partial class ArchGenerator
             AddPart("FORM-DECK", PartCategory.FormDeck, "FORM-DECK", dk.FormDescription.Length > 0 ? dk.FormDescription : $"{L(dk.FormDepth)} x {L(dk.FormPitch)} steel deck form", sheet,
                 "ASTM A653 Gr. 33, G165 galvanized", 0, 0, fasu);
             BuildCurbs(dk, ka, kb);
+            _deck = (ts, tn, knots.Select(k => (k.s, k.n)).ToList(), ka, kb);
             // Second body of the deck IfcSlab (ConcreteModel.Haunches = the extra deck items): knuckle-zone slab and curbs.
             var extra = new Mesh();
             foreach (var mm in new[] { Model.SlabEnds, Model.Curbs }) if (mm != null) Append(extra, mm);
             Model.Concrete.Haunches = extra;
             foreach (var t in dk.Tendons) Model.Tendons.Add((t.Name, t.Path.Select(p => W(p.Vec)).ToList(), t.Description));
+            if (dk.Rebar is { } rb) BuildDeckRebar(dk, rb);
+            if (dk.PtSystem is { } pt) BuildPt(dk, pt);
+            if (dk.Rebar is { } rb2) CheckBarList(rb2);
         }
 
         private void BuildCurbs(ArchDeckDefinition dk, ArchKnuckleDefinition? ka, ArchKnuckleDefinition? kb)

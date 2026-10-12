@@ -20,6 +20,9 @@ public sealed class ArchModel
     public List<ArchCheck> Checks { get; } = new();
     /// <summary>Bolt count per splice assembly (rib RS / tie TS splices).</summary>
     public Dictionary<string, int> SpliceBolts { get; } = new();
+    /// <summary>PT strand size (IFC IfcTendon) when tendon solids are built.</summary>
+    public double PtStrandDiameter { get; set; }
+    public double PtStrandArea { get; set; }
     /// <summary>Rib circle per rib: centre (local), plane basis (chord c, in-plane up u), radius, rise, arc length.</summary>
     public List<ArchRibResult> Ribs { get; } = new();
     public List<ArchTieResult> Ties { get; } = new();

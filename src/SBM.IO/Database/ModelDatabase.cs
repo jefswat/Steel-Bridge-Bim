@@ -729,7 +729,7 @@ public static class ModelDatabase
             PartCategory.Hanger => "hanger strand", PartCategory.HangerSocket => "hanger socket", PartCategory.ArchBracing => "upper lateral bracing",
             PartCategory.KnucklePlate => "knuckle plate", PartCategory.FormDeck => "steel deck form",
             PartCategory.FinPlate => "cable fin plate", PartCategory.CableConnector => "cable connector", PartCategory.ArchConnectionPlate => "connection plate",
-            PartCategory.ArchStiffener => "stiffener", _ => c.ToString(),
+            PartCategory.ArchStiffener => "stiffener", PartCategory.PtStrand => "PT strand", PartCategory.PtAnchorage => "PT anchorage", _ => c.ToString(),
         };
 
         private static string IfcClassOf(SteelPart p) => p.Category switch
@@ -738,6 +738,8 @@ public static class ModelDatabase
                 or PartCategory.WalkwayStringer or PartCategory.WalkwayPost
                 or PartCategory.ArchRib or PartCategory.Hanger or PartCategory.ArchBracing => "IFCMEMBER",
             PartCategory.HangerSocket or PartCategory.CableConnector => "IFCMECHANICALFASTENER",
+            PartCategory.PtStrand => "IFCTENDON",
+            PartCategory.PtAnchorage => "IFCTENDONANCHOR",
             PartCategory.WalkwayRail => "IFCRAILING",
             PartCategory.BearingPad or PartCategory.BearingDisc => "IFCBEARING",
             PartCategory.ShearPin => "IFCMECHANICALFASTENER",

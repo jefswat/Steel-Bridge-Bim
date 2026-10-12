@@ -320,8 +320,28 @@ var deck = new ArchDeckDefinition
 {
     RightTie = "South tie", LeftTie = "North tie", EndKnuckles = { "West", "East" },
     FormThickness = In(0.1046), FormDescription = "3\" x 8\" 12 ga galvanized steel deck form (Gr 33, G165), L.B. Foster 3\" bridge decking",
-    FormUnresolved = U("L.B. Foster brochure p.6", "steel deck form flute widths", "the brochure drawing is not dimensioned (3\" deep, 8\" pitch, 24\" cover only)", "Top flat 5 3/4\" and flute bottom 1 5/16\" scaled from the drawing."),
+    // p.152 "corrugated steel deck panel": 3" deep, 8" pitch, 2'-0 cover; pans 5 3/8 wide at the bottom, ribs 2 5/8 at the base / 1 1/2 at the top.
+    FormTopFlat = In(1.5), FormFluteBottom = In(5.375), FlutesOnBarGrid = true,
     ConcreteStrengthKsi = 5,
+};
+// Deck bars (p.152 section, p.154 bill): A1 #5 13'-10 top transverse @ 8 between the curbs, B1 #5 18'-2 bottom transverse @ 8, 27 - D1 (top) / D2 (bottom, one
+// in each corrugation) @ 8 = 17'-4, #5 40'-0 lapped 2'-8 min, curbs S1 #4 @ 8 (6 x 9 closed) with 4 - D4; covers 2 1/2 top, 1 3/4 above the deck pans.
+deck.Rebar = new ArchDeckRebar
+{
+    TopTransLength = FI(13, 10), BottomTransLength = FI(18, 2), TransSpacing = In(8), LongCount = 27, LongSpacing = In(8), LongBarLength = Ft(40), LongLap = FI(2, 8),
+    TopCover = In(2.5), BottomClear = In(1.75), EndCover = In(2), CurbStirrupWidth = In(6), CurbStirrupHeight = In(9), CurbTopCover = In(2),
+    Unresolved = U("p.151 / 152 / 154", "arch deck bar layout details", "the lap positions of the 40'-0 D1 / D2 / D4 bars (type BT, bent to the knuckle stud grid on p.151) are not dimensioned, the bill lists 606 A1 (two per 8\" space) while the section shows one, and the D3 edge bars are not located", "Lines lapped 2'-8 from the west end with a shorter last bar, one A1 per 8\" space, D3 not modeled; bill differences are CHECK rows."),
+    PlanList = { new ArchPoint("A1", 606, FI(13, 10), 0), new ArchPoint("B1", 303, FI(18, 2), 0), new ArchPoint("D1", 162, Ft(40), 0), new ArchPoint("D2", 162, Ft(40), 0),
+        new ArchPoint("D3", 68, FI(7, 5), 0), new ArchPoint("D4", 48, Ft(40), 0), new ArchPoint("S1", 606, FI(3, 3), 0), new ArchPoint("S2", 32, FI(2, 9), 0) },
+};
+// Longitudinal PT (p.155): 4 tendons of 4 - 0.6" strands (DYWIDAG flat anchorage drawn with 4 wedges; 170 kips jacking = 4 x 0.217 x 270 x 0.725), single-end
+// stressing; S2 anchorage-zone bars at 1'-0, 1'-4, 2'-10 1/2, 3'-2 1/2 from the end web.
+deck.PtSystem = new ArchPtSystem
+{
+    StrandsPerTendon = 4, StrandDiameter = In(0.6), StrandArea = In(1) * In(1) * 0.217, JackingForceKips = 170, StrandSpacing = In(1.9375),
+    AnchorLength = In(10.5), AnchorWidth = In(13), AnchorHeight = In(4),
+    ZoneBarsAt = { In(12), In(16), In(34.5), In(38.5) }, ZoneBarWidth = In(9.25), ZoneBarHeight = In(6),
+    Unresolved = U("p.155", "PT strand arrangement and anchorage envelope", "the flat duct, the strand spacing in it and the anchorage casting are drawn (Section A-A / B-B) but not dimensioned", "Strands side by side at 1 15/16\", anchorage 13\" x 4\" x 10 1/2\" (scaled); duct not modeled."),
 };
 deck.Curbs.Add(new ArchCurbDefinition { Name = "Curb LT", InnerOffset = -F(7) });
 deck.Curbs.Add(new ArchCurbDefinition { Name = "Curb RT", InnerOffset = F(7) });

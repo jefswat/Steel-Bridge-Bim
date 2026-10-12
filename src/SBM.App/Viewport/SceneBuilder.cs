@@ -180,6 +180,7 @@ public static class SceneBuilder
         ("3D-ARCH-HANGERS", 215, 215, 225, new[] { PartCategory.Hanger, PartCategory.HangerSocket, PartCategory.CableConnector }),
         ("3D-ARCH-FIN-PLATES", 235, 150, 70, new[] { PartCategory.FinPlate }),
         ("3D-ARCH-CONNECTIONS", 120, 210, 230, new[] { PartCategory.ArchConnectionPlate, PartCategory.ArchStiffener }),
+        ("3D-ARCH-PT", 230, 120, 40, new[] { PartCategory.PtStrand, PartCategory.PtAnchorage }),
         ("3D-ARCH-BRACING", 80, 200, 110, new[] { PartCategory.ArchBracing }),
         ("3D-ARCH-KNUCKLES", 235, 185, 70, new[] { PartCategory.KnucklePlate }),
         ("3D-ARCH-FORM-DECK", 175, 180, 190, new[] { PartCategory.FormDeck }),
