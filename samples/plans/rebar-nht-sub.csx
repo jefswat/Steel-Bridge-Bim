@@ -352,6 +352,7 @@ void ShaftCage(List<PlanBarSet> sets, string name, FoundationInfo f, double zTop
         FV.Add(new[] { V(f.S + rv * Math.Cos(a), f.N + rv * Math.Sin(a), zTop - I(2)), V(f.S + rv * Math.Cos(a), f.N + rv * Math.Sin(a), zTip + I(3)) });
     }
     FV.CoverTop = I(2);
+    FV.Unresolved = UnresolvedFlag.Text(src, $"{name} shaft verticals FV bottom end", "the shaft elevation draws the FV bars down to the tip but does not dimension their end; the shaft details are in the FD standard, which is not in the set", "Bars end 3\" above the tip (the typical 3\" clear).");
     sets.Add(FV);
     var SP = NewSet("SP", "#4", $"{name} footing 1 (drilled shaft) spiral (#4, {(double.IsNaN(upperPitch) ? "9\" pitch" : "6\" pitch over the top 6'-0, 9\" below")})", "drilled shaft", 0, src, cov, "SPIRAL");
     SP.Spirals.Add(new PlanSpiral { X = f.S, Y = f.N, Radius = R - cov - dSp / 2, TopZ = zTop - I(3) - dSp / 2, BottomZ = zTip + F(1) + dSp / 2, Pitch = pitch, FlatTurns = 1.5,
@@ -647,7 +648,7 @@ foreach (var (name, src, csvU) in new[] { ("Abutment 1", "p.95", "Abutment 1"), 
         {
             double z = zh0 - (zh0 - zh1) * k / (nh - 1), a0 = 0.6 * k;
             int np = 48;
-            HP.Add(Enumerable.Range(0, np + 1).Select(j => { double a = a0 + (2 * Math.PI + lapA) * j / np; double r = rh - d7 * Math.Clamp((a - a0 - (2 * Math.PI - lapA)) / lapA, 0, 1); return V(f.S + r * Math.Cos(a), f.N + r * Math.Sin(a), z); }));   // the lapped end runs inside the start (in contact), no self-overlap
+            HP.Add(Enumerable.Range(0, np + 1).Select(j => { double a = a0 + (2 * Math.PI + lapA) * j / np; double dz = 1.05 * d7 * Math.Clamp((a - a0 - (2 * Math.PI - lapA)) / lapA, 0, 1); return V(f.S + rh * Math.Cos(a), f.N + rh * Math.Sin(a), z - dz); }));   // the lapped end runs under the start (in contact), no self-overlap
         }
         HP.Note = $"{nh} hoops equally spaced ({(zh0 - zh1) / (nh - 1) / I(1):0.00}\") from 3\" below the top of shaft to 1'-0 above the tip, 4'-3\" lap (section B-B), laps staggered; not in the bill";
         sets.Add(HP);

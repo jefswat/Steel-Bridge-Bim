@@ -102,6 +102,8 @@ public sealed class PlanSpiral
     public double FlatTurns { get; set; } = 1.5;
     public double UpperPitch { get; set; }
     public double UpperZoneBottomZ { get; set; } = double.NaN;
+    /// <summary>Bar diameter: the flat end turns climb one bar diameter per turn (they rest on each other), m.</summary>
+    public double BarDiameter { get; set; } = In(0.5);
     public PlanSpiral Clone() => (PlanSpiral)MemberwiseClone();
 
     /// <summary>Centerline points (about 24 per turn), top to bottom.</summary>
@@ -121,15 +123,15 @@ public sealed class PlanSpiral
             }
         }
         pts.Add(new Vec3(X + Radius, Y, z));
-        Turn(FlatTurns, 0);
-        double total = TopZ - BottomZ;
+        Turn(FlatTurns, BarDiameter);
+        double total = TopZ - BottomZ - 2 * FlatTurns * BarDiameter;
         if (UpperPitch > 0 && !double.IsNaN(UpperZoneBottomZ) && UpperZoneBottomZ > BottomZ && UpperZoneBottomZ < TopZ)
         {
-            Turn((TopZ - UpperZoneBottomZ) / UpperPitch, UpperPitch);
-            Turn((UpperZoneBottomZ - BottomZ) / Pitch, Pitch);
+            Turn((TopZ - FlatTurns * BarDiameter - UpperZoneBottomZ) / UpperPitch, UpperPitch);
+            Turn((UpperZoneBottomZ - BottomZ - FlatTurns * BarDiameter) / Pitch, Pitch);
         }
         else Turn(total / Pitch, Pitch);
-        Turn(FlatTurns, 0);
+        Turn(FlatTurns, BarDiameter);
         return pts;
     }
 }

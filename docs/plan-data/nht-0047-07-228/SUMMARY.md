@@ -103,8 +103,24 @@ RW(EM), RW(MSE), PAZD, PB, PCO (p.37-78).
 ## 5. Reinforcing
 | item | value | PDF p. | tag | note |
 |---|---|---|---|---|
-| Arch piers 10 & 11 | `bar-lists.csv` (47 marks; 12 rows differ 3-13 lb from no x length x unit weight; totals reconcile) | p.104 | RASTER | bend A table S5-S36 |
-| Approach / abutments / arch deck | small per-sheet bar tables; arch deck bar bends p.154 | p.95-100, 109-117, 154 | - | not transcribed -> U13 |
+| Arch piers 10 & 11 | `bar-lists.csv` (47 marks; 12 rows differ 3-13 lb from no x length x unit weight; totals reconcile) | p.104 | RASTER | bend A table S5-S36; one bill for both piers (V2 = P10, V3 = P11); H1 drawn (B-B / C-C) but not billed |
+| Abutments 1 / 16 | A 10 #11 13'-7, H 8 #6 14'-2, S 13 #5 11'-2, U 4 (abut 16: U1 2 + U2 2) #6 8'-0, V 16 #5 10'-11 = 1,277 / 1,278 lb | p.95, 96 | RASTER | `bar-lists.csv`; 36" shaft cages in the FD standard (not in the set) |
+| Approach pier caps | type 1 (P2-5, 8, 9, 12, 13) 1,740 lb, type 2 (P6, 7, 14, 15) 1,861 lb per cap; D dowels omitted at P4, P13 / P7 | p.98, 100 | RASTER | `bar-lists.csv` |
+| Approach pier columns | V (20 #9) / V1 (12 #11, L) + V2 (16 #11), Z ties per pier (table of variable quantities) | p.98, 100 | RASTER | `bar-lists.csv`; shaft FD / FV / spiral not tabulated |
+| Approach decks | bar table A C CS D G H J M OA P T (+ UP p.113), no bar list: weight = 2.3 lb/SF x SF (3,890 / 3,496 / 5,876 / 4,417 / 6,060 lb) | p.109-117 | RASTER | G H J M = IGTS, P = PCP standards (not in set) |
+| Arch deck | bill p.154: A1 606, B1 303, D1 162, D2 162, D3 68, D4 48, S1 606, S2 32 = 29,377 lb | p.152, 154 | RASTER | two A1 per row (p.152 section) |
+
+**Model (2026-10-12, `rebar-nht-sub.csx`, `rebar-nht-approach.csx`, `arch-nht.csx`; `check-nht.csx` section 6).** Every tabulated count is modeled; scheduled weights
+(count x listed length) vs the tables, lb (model / plan): abutment 1 1,274 / 1,277, abutment 16 1,274 / 1,278; approach piers (cap + column) P2 2,399 / 2,410,
+P3 2,474 / 2,485, P4 2,602 / 2,613, P5 2,776 / 2,787, P6 4,358 / 4,370, P7 4,651 / 4,661, P8 3,228 / 3,239, P9 4,862 / 4,873, P12 4,542 / 4,553, P13 2,904 / 2,914,
+P14 4,201 / 4,212, P15 3,886 / 3,898 (S2 = the geometric variable lengths, -7 lb per cap vs the plan average); arch pier 10 8,900 / 8,937, pier 11 8,158 / 8,193
+(bill rows differ 3-13 lb from no x length x unit weight, see above); arch deck 30,427 / 29,377 (D1 / D2 / D4 +468 / +468 / +136: the bill weights are
+below 40'-0 x count; the model's last bar of each line is shorter - pre-existing layout). Not tabulated: approach shaft steel 1.9-4.0 k lb per pier, arch pier
+shafts 5.6 / 8.5 k lb. Approach decks (A T OA D C CS only) 5,901 / 5,324 / 8,534 / 6,446 / 8,789 lb vs the 2.3 lb/SF estimate 3,890 / 3,496 / 5,876 / 4,417 /
+6,060 lb (+45-52 %, before P / G / H / J / M / UP): the estimate factor is low for this deck (OA #5 at every 9" space of both overhangs and the curb steel alone
+are 1.5 lb/SF). Clear cover (bars never moved): violations only at type 2 pier FD dowels in the 48" shaft (2 per pier, 1.05-1.16": the right FD group drawn
+next to the column bars lies outside the shaft cage), arch pier end stirrups S5 / S21 (0.17", scaled stirrup top) and the lowest T4 at the 2'-9" cap ends
+(0.92": three T4 levels at the scaled spacing do not fit the end depth), and the curb bars CS / C of all approach units (the curbs are not modeled in this model).
 
 ## 6. Misc
 | item | value | PDF p. | tag |
@@ -179,6 +195,18 @@ to have stripped them. PDF bookmarks differ from the sheets ("162.77' ... UNIT",
 | U11 | Arch pier angle table (** 73 20'28" / 76 09'10", *** 73 28'39" / 76 31'36") | p.102 | reference lines of the ** / *** angles not identified |
 | U12 | Horizontal datum / projection / scale factor - RESOLVED 2026-10-11 | p.17-19 | survey sheets 1-2 not in set; user GPS of the approximate arch-span centre 32.901380, -96.769012 -> EPSG:2276 X 2499728.33, Y 7015245.07 -> x SAF 1.000136 (TxDOT Dallas County) = 2500068.29, 7016199.14 vs model arch centre 2500079.15, 7016198.76 (10.9 / 0.4 ft = approximate GPS) => plan X/Y are TxDOT surface coordinates, NAD83 Texas North Central, SAF 1.000136. Model unchanged; `Doc.Project.Georeference` (build-nht.csx) writes IfcProjectedCRS EPSG:2276 + IfcMapConversion.Scale 1/1.000136. U1 (pedestal / bearing ELEVATIONS) is vertical and stays open. |
 | U13 | (2026-10-11: the PIER / GIRDER REPORTs p.108-116, IGND table p.118, section depths X/Y p.109/113/115, approach / arch pier shaft tables p.98/100/101 and abutment 16 p.96 are now transcribed in `samples/plans/build-nht.csx` / `check-nht.csx`.) Not transcribed (scope): approach PIER / GIRDER REPORTs (p.108-116), other unit depth / deflection tables, abutment 16, arch deck bar bends (p.154), PT details (p.155), knuckle stud layout (p.126), bracing connections (p.129-142), arch pier barrier (p.105-106), force tables (p.121-122) | listed | legible at 300-400 dpi; time |
+
+**Reinforcing UNRESOLVED (2026-10-12)**
+| id | item | PDF p. | reason |
+|---|---|---|---|
+| R1 | Abutment 1 / 16 drilled shaft cages (2 x 36" each) | p.95, 96 | the sheets refer to the common foundation details standard FD, not in the set - no shaft bars modeled |
+| R2 | Approach shaft FV bottom ends | p.98, 100 | drawn to the tip, not dimensioned (FD standard) - 3" clear used |
+| R3 | Approach deck bars P, G / H / J / M, UP | p.109-117 (UP p.113) | P "SEE PCP", G H J M "SEE IGTS" (standards not in the set); UP listed in the p.113 table but not shown; the thickened slab ends are not modeled either |
+| R4 | Arch pier T1 | p.103-104 | bill 16 for both piers, the elevation / section show one per face per pier (4); 12 counted as schedule-only bars |
+| R5 | Arch pier H1 pedestal hairpins | p.103-104 | drawn (section B-B / C-C, 3 per pedestal around the anchor bolts) but not in the bill; bolt layout on bearing sheet 1 of 2 (not in set) - schedule-only, length DERIVED |
+| R6 | Arch pier column ties S2 / S3 / S4 arrangement | p.104 | section D-D draws two of each, the bill gives one S3 per 6" level and one S2 or S4 alternately - per-level pairing modeled as noted |
+| R7 | Arch deck A1 hook / D3 position, 303 rows vs 8" max | p.151, 152, 154 | hook and D3 drawn, not dimensioned (scaled 7 1/2" / 6" inside CL tie); 303 rows (bill) are 8.08" apart over the deck |
+| R8 | Positions SCALED from the sheets (side bar levels, arch pier stirrup top 6", OA start 11 1/4") | p.97-104, 113 | drawn, not dimensioned - each set's note says so |
 
 ## Model mapping
 | section | model inputs | notes / GAPs |

@@ -59,11 +59,12 @@ public class PlanBarSetTests
         var pts = sp.Points();
         Assert.Equal(10, pts[0].Z, 9);
         Assert.Equal(7, pts[^1].Z, 9);
-        // 1.5 flat turns at both ends: the first 36 samples (24 per turn) stay at the top
-        Assert.All(pts.Take(37), p => Assert.Equal(10, p.Z, 9));
+        // 1.5 flat turns at both ends (24 samples per turn) climbing one bar diameter per turn (resting on each other)
+        Assert.All(pts.Take(37), p => Assert.InRange(p.Z, 10 - 1.5 * In(0.5) - 1e-9, 10 + 1e-9));
+        Assert.Equal(10 - 1.5 * In(0.5), pts[36].Z, 9);
         Assert.All(pts, p => Assert.Equal(0.5, new Vec2(p.X, p.Y).Length, 6));
         double len = 0; for (int i = 1; i < pts.Count; i++) len += (pts[i] - pts[i - 1]).Length;
-        double turns = 3 + 3 / 0.25;
+        double turns = 3 + (3 - 3 * In(0.5)) / 0.25;
         Assert.InRange(len, turns * 2 * Math.PI * 0.5 * 0.99, turns * 2 * Math.PI * 0.5 * 1.01);
     }
 
