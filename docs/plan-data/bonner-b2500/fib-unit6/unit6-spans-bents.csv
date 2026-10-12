@@ -1,0 +1,15 @@
+item,id,value,source,tag,note
+bent,29,STA 92+95.00; shared with Unit 5; EXP; footing C-18 per ../bents.csv,p395 S4-03; ../bents.csv,TEXT,pile layout of bent 29 is on the Unit 5 sheets
+bent,30,"STA 94+55.83; EXP; 14 battered 36in sq PS piles; footing 43'-6"" x 21'-0"" x 6'-0""","p395, p458 S4-65, p459 S4-66",RASTER,
+bent,31,STA 96+16.67; EXP; same as bent 30,"p395, p458",RASTER,
+bent,32,"STA 97+77.50; FIX; 12 battered piles; footing 37'-0"" x 21'-0"" x 6'-0""","p395, p461 S4-68",RASTER,
+bent,33,"STA 99+38.33; EXP; 6 battered piles; footing 28'-6"" x 14'-0"" (typ. bents 33 and 35)","p395, p464 S4-71",RASTER,
+bent,34,"STA 100+99.17; EXP; 8 battered piles; footing 28'-6"" x 14'-0""","p395, p467 S4-74",RASTER,
+bent,35,STA 102+60.00; EXP; 6 battered piles; unit joint with Unit 7 (CL joint and bent 35 control line),"p395, p464, p457",RASTER,
+span,30,"160'-10"" along -L- (tangent); girder A 158'-3 1/2""; bearing-to-bearing 156'-6""","p422 S4-30, p428",TEXT/RASTER,"bearing offset from bent line 3'-2"" at bent 29, 1'-2"" at bent 30"
+span,31,"160'-10"" tangent; b-b 158'-6""",p422,TEXT,
+span,32,"160'-10"" tangent; b-b 158'-6""",p423 S4-31,TEXT,
+span,33,"160'-10"" tangent; b-b 158'-6""",p423,TEXT,
+span,34,"160'-10"" tangent; b-b 158'-6""",p424 S4-32,TEXT,
+span,35,"160'-10"" tangent/arc (PC STA 102+46.84, R 6050.00); b-b per girder in girders.csv; chord 160'-10 1/2"" left edge, 160'-9 3/8"" right edge","p424, p415 S4-23",TEXT/RASTER,"arc offsets from chord 0 to 1/8"" (5 ft stations)"
+unit,6,"965'-0"" TAN/ARC along -L- = 6 x 160'-10""; continuous for live load; modular expansion joint at bent 29, joint at bent 35","p395, p457 S4-64, p409",TEXT,

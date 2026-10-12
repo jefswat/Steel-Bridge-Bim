@@ -1,0 +1,16 @@
+part,plan_size,height_or_thickness,detail,qty,source,tag
+E1 elastomeric,"3'-0"" x 1'-2""","9 1/16"" printed","15 steel plates 12 gage, 1/2"" CL between plates, 1/4"" cover top and bottom",24,p440 S4-48,RASTER
+E2 elastomeric,"2'-8"" x 1'-0""","6 7/16"" printed","9 steel plates 12 gage, 5/8"" CL between plates",80,p442 S4-50,RASTER
+E3 elastomeric,"2'-4"" x 1'-0""","2 7/16"" printed","4 steel plates 12 gage, 1/2"" CL between plates",24,p444 S4-52,RASTER
+P1 sole plate (exp),"1'-6 3/4"" long","1 1/4"" flat",4 req,4,p440,RASTER
+P32 (exp),"1'-9 1/4""","2"" tapering to 1 1/4""",4 req,4,p440,RASTER
+P40 (exp),"1'-8 1/4""","1 15/16"" tapering to 1 1/4""",4 req,4,p440,RASTER
+P33 (exp),"1'-3 1/4""","1 15/16"" to 1 1/4""",8 req,8,p443 S4-51,RASTER
+P34 (exp),"1'-3 1/4""","2 1/16"" to 1 1/4""",4 req,4,p443,RASTER
+P14 (exp),"1'-3 1/4""","1 7/8"" to 1 1/4""",4 req,4,p442 S4-50,RASTER
+P36 (exp),"1'-7 3/4""","2 1/8"" to 1 1/4""",4 req,4,p443,RASTER
+P37 (exp),"1'-7 3/4""","1 13/16"" to 1 1/4""",4 req,4,p443,RASTER
+P38 (exp),"1'-7 3/4""","2"" to 1 1/4""",4 req,4,p443,RASTER
+P39 (exp),"1'-7 3/4""","1 3/4"" to 1 1/4""",4 req,4,p443,RASTER
+P8 (fixed),"1'-2""","1 3/4"" to 1 1/4""; 2 15/16"" dia holes",4 req,4,p444 S4-52,RASTER
+Anchor bolts,"2 1/2"" dia; length 2'-7"" (E2 exp), 2'-3"" (E3 fixed), 2'-10"" (E1)",,"3"" pipe sleeve, 5"" dia grout pockets, 15"" swedge",,"p440,p442,p444",RASTER (length of E1 bolt TEXT)

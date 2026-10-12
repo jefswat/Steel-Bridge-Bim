@@ -1,0 +1,7 @@
+bent,pile_type,count,max_factored_axial_tons,pile_tip_no_higher_than_el_ft,scour_critical_el_ft,source,tag
+30,"36in sq PS, batter 2:12",14,420,-110.0,-85.0,"p395, p398 S4-06",RASTER
+31,36in sq PS,14,400,-110.0,-85.0,p398,RASTER
+32,36in sq PS,12,415,-120.0,-85.0,p398,RASTER
+33,36in sq PS,6,530,-120.0,-85.0,p398,RASTER
+34,36in sq PS,8,440,-125.0,-85.0,p398,RASTER
+35,36in sq PS,6,545,-130.0,-85.0,p399 S4-07,TEXT

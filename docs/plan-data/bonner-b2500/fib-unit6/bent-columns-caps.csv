@@ -1,0 +1,7 @@
+bent,top_of_footing_el,column_segments_bottom_to_top,top_of_column_el,cap_top_el,column_section,cap,source,tag
+30,5.50,"CIP base to el 12.50; seg1 5'-0""; seg2 12'-0""; seg3 12'-0""; seg4 12'-0""; seg5 4'-9"" variable",58.25,63.92,"6'-0"" x 6'-0"", 4"" radius","42'-0"" long x 6'-6"" x 5'-6"", 8.0 ksi","p458, p477, p481, p483",RASTER
+31,5.50,"CIP base to el 12.50; seg1 5'-0""; seg2 12'-0""; seg3 12'-0""; seg4 8'-11"" variable",50.41,56.08,6 x 6 ft,same,"p458, p477, p483",RASTER
+32,5.50,"CIP base to el 12.50; seg1 5'-0""; seg2 12'-0""; seg3 14'-1"" variable",43.58,49.25,6 x 6 ft,same,"p461, p477, p483",RASTER
+33,5.50,"precast seg1 6'-10"" to el 12.50 (incl 2"" grout); seg2 5'-0""; seg3 12'-0""; seg4 7'-5""",36.91,42.58,"5'-0"" x 5'-0"", 4"" radius",same,"p464, p479, p484, p486",RASTER
+34,5.50,"seg1 6'-10""; seg2 5'-0""; seg3 14'-0""",31.50,37.17,5 x 5 ft,same,"p467, p479, p486",RASTER
+35,5.50,"seg1 6'-10""; seg2 5'-0""; seg3 9'-0""",26.50,32.17,5 x 5 ft,same,"p464, p479, p486",RASTER
