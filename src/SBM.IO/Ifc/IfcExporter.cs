@@ -527,6 +527,59 @@ public static class IfcExporter
             result.ElementCount += misc.Elements.Count;
         }
 
+        // Architectural surface treatments: one IfcCovering per region (thin brick = CLADDING, form liner texture = USERDEFINED 'FORM_LINER_TEXTURE')
+        // whose body is the relief layer (one closed face set per face piece); the treatment data are in Pset SBM_SurfaceTreatment.
+        void ExportSurfaceTreatments(SBM.Core.Surface.SurfaceTreatmentModel stm, string bk, int deckPartId, int subPartId, int pl)
+        {
+            int brickStyle = RgbStyle("Thin veneer brick", 0.55, 0.27, 0.18), linerStyle = RgbStyle("Form liner texture", 0.62, 0.55, 0.45);
+            var inDeck = new List<int>();
+            var inSub = new List<int>();
+            var totals = stm.Totals.ToDictionary(t => t.Treatment, t => t.Area);
+            foreach (var it in stm.Items)
+            {
+                var t = it.Treatment;
+                bool brick = t.Kind == SBM.Core.Bridge.SurfaceTreatmentKind.ThinBrick;
+                int style = brick ? brickStyle : linerStyle;
+                int pds;
+                if (it.Pieces.Count > 0)
+                {
+                    meshParts++;
+                    var items = it.Pieces.Select(pc => FaceSet(pc, style)).ToList();
+                    int rep = w.Add("IFCSHAPEREPRESENTATION", $"{Ref(body)},'Body','Tessellation',{Refs(items)}");
+                    pds = w.Add("IFCPRODUCTDEFINITIONSHAPE", $"$,$,({Ref(rep)})");
+                }
+                else pds = Body(it.Mesh, style);
+                string sk = IfcKeys.SurfaceTreatment(bk, it.Name);
+                string type = brick ? "$" : t.Kind == SBM.Core.Bridge.SurfaceTreatmentKind.FormLiner ? "'FORM_LINER_TEXTURE'" : $"{S(t.Kind.ToString().ToUpperInvariant())}";
+                string pre = brick ? ".CLADDING." : ".USERDEFINED.";
+                int id = w.Add("IFCCOVERING", $"{Guid(sk)},$,{S(it.Name)},{S(it.Description)},{type},{Ref(pl)},{Ref(pds)},$,{pre}");
+                AddMaterial(brick ? "Integral thin veneer brick" : t.Kind == SBM.Core.Bridge.SurfaceTreatmentKind.FormLiner ? "Concrete, form liner texture" : t.Kind.ToString(), id);
+                (it.Region.Host == SBM.Core.Bridge.SurfaceHost.Barrier ? inDeck : inSub).Add(id);
+                if (it.Assumption != null) miscStatus.Add((id, it.Assumption));
+                const double a2 = 1;                       // the project area unit is always SQUARE_METRE
+                var props = new List<int>
+                {
+                    w.Add("IFCPROPERTYSINGLEVALUE", $"'TreatmentKind',$,IFCLABEL({S(t.Kind.ToString())}),$"),
+                    w.Add("IFCPROPERTYSINGLEVALUE", $"'Treatment',$,IFCLABEL({S(t.Name)}),$"),
+                    w.Add("IFCPROPERTYSINGLEVALUE", $"'Pattern',$,IFCTEXT({S(t.Pattern)}),$"),
+                    w.Add("IFCPROPERTYSINGLEVALUE", $"'Products',$,IFCTEXT({S(t.Products)}),$"),
+                    w.Add("IFCPROPERTYSINGLEVALUE", $"'Orientation',$,IFCLABEL({S(t.Orientation)}),$"),
+                    w.Add("IFCPROPERTYSINGLEVALUE", $"'Host',$,IFCLABEL({S(it.Region.Host + (it.Region.Support != "" ? " " + it.Region.Support : "") + (it.Region.Tag != "" ? " tag " + it.Region.Tag : ""))}),$"),
+                    w.Add("IFCPROPERTYSINGLEVALUE", $"'Area',$,IFCAREAMEASURE({R(it.Area * a2)}),$"),
+                    w.Add("IFCPROPERTYSINGLEVALUE", $"'TreatmentTotalArea',$,IFCAREAMEASURE({R(totals[t] * a2)}),$"),
+                    w.Add("IFCPROPERTYSINGLEVALUE", $"'QuantityItem',$,IFCTEXT({S(t.QuantityItem)}),$"),
+                    w.Add("IFCPROPERTYSINGLEVALUE", $"'Source',$,IFCTEXT({S(it.Region.Source != "" ? it.Region.Source : t.Source)}),$"),
+                };
+                if (t.Relief > 0) props.Add(w.Add("IFCPROPERTYSINGLEVALUE", $"'ReliefDepth',$,IFCPOSITIVELENGTHMEASURE({R(t.Relief * scale)}),$"));
+                if (!double.IsNaN(t.PlanQuantity)) props.Add(w.Add("IFCPROPERTYSINGLEVALUE", $"'PlanQuantity',$,IFCAREAMEASURE({R(t.PlanQuantity * a2)}),$"));
+                int ps = w.Add("IFCPROPERTYSET", $"{Guid(sk + "/pset")},$,'SBM_SurfaceTreatment',$,{Refs(props)}");
+                w.Add("IFCRELDEFINESBYPROPERTIES", $"{Guid(sk + "/relpset")},$,$,$,({Ref(id)}),{Ref(ps)}");
+                result.ElementCount++;
+            }
+            if (inDeck.Count > 0) w.Add("IFCRELCONTAINEDINSPATIALSTRUCTURE", $"{Guid(bk + "/rel/surface-deck")},$,$,$,{Refs(inDeck)},{Ref(deckPartId)}");
+            if (inSub.Count > 0) w.Add("IFCRELCONTAINEDINSPATIALSTRUCTURE", $"{Guid(bk + "/rel/surface-sub")},$,$,$,{Refs(inSub)},{Ref(subPartId)}");
+        }
+
         // Substructure: one IfcBridgePart (PIER / ABUTMENT) per support under a SUBSTRUCTURE part; caps (IfcBeam PIERCAP),
         // backwalls (IfcWall RETAININGWALL), pedestals and columns (IfcColumn), drilled shafts and piles (IfcPile),
         // footings (IfcFooting) and reinforcing.
@@ -602,17 +655,33 @@ public static class IfcExporter
             {
                 var items = new List<int> { FaceSet(c.Deck, concreteStyle) };
                 if (c.Haunches is { IsEmpty: false } h) items.Add(FaceSet(h, concreteStyle));
+                foreach (var (_, db) in c.DeckBumps) if (!db.IsEmpty) items.Add(FaceSet(db, concreteStyle));   // deck widenings under barrier zones
                 int rep = w.Add("IFCSHAPEREPRESENTATION", $"{Ref(body)},'Body','Tessellation',{Refs(items)}");
                 int pds = w.Add("IFCPRODUCTDEFINITIONSHAPE", $"$,$,({Ref(rep)})");
                 int slab = deckSlab = w.Add("IFCSLAB", $"{Guid(IfcKeys.DeckSlab(bk))},$,'Deck slab',{S($"{u.FormatLength(def.Deck.Thickness, LengthKind.Short)} cast-in-place deck with haunches")},'BRIDGE_DECK',{Ref(pl)},{Ref(pds)},'DECK',.USERDEFINED.");
                 contained.Add(slab);
                 AddMaterial(concreteMat, slab);
-                psetTargets.Add((slab, "DECK", "Deck slab", 0, (c.DeckVolume + c.HaunchVolume) * 2400));
+                psetTargets.Add((slab, "DECK", "Deck slab", 0, (c.DeckVolume + c.HaunchVolume + c.DeckBumpVolume) * 2400));
             }
             foreach (var (name, mesh) in c.Barriers)
             {
-                int pds = Body(mesh, concreteStyle);
-                int rail = w.Add("IFCRAILING", $"{Guid(IfcKeys.Barrier(bk, name))},$,{S(name)},{S(def.Deck.Barrier.Type == SBM.Core.Bridge.BarrierType.TxDotSstr ? "TxDOT Type SSTR" : def.Deck.Barrier.Type.ToString())},$,{Ref(pl)},{Ref(pds)},{S(name)},.GUARDRAIL.");
+                int pds;
+                if (c.BarrierPieces.TryGetValue(name, out var bpieces) && bpieces.Count > 1)
+                {
+                    // custom barrier with zones: one closed face set per section length (they share end faces)
+                    meshParts++;
+                    var bitems = bpieces.Select(pc => FaceSet(pc, concreteStyle)).ToList();
+                    int brep = w.Add("IFCSHAPEREPRESENTATION", $"{Ref(body)},'Body','Tessellation',{Refs(bitems)}");
+                    pds = w.Add("IFCPRODUCTDEFINITIONSHAPE", $"$,$,({Ref(brep)})");
+                }
+                else pds = Body(mesh, concreteStyle);
+                string btype = def.Deck.Barrier.Type switch
+                {
+                    SBM.Core.Bridge.BarrierType.TxDotSstr => "TxDOT Type SSTR",
+                    SBM.Core.Bridge.BarrierType.Custom => def.Deck.Barrier.ProfileName ?? "Custom barrier",
+                    var t => t.ToString(),
+                };
+                int rail = w.Add("IFCRAILING", $"{Guid(IfcKeys.Barrier(bk, name))},$,{S(name)},{S(btype)},$,{Ref(pl)},{Ref(pds)},{S(name)},.GUARDRAIL.");
                 contained.Add(rail);
                 AddMaterial(concreteMat, rail);
                 psetTargets.Add((rail, name, "Concrete barrier", 0, Math.Abs(mesh.Volume()) * 2400));
@@ -869,6 +938,8 @@ public static class IfcExporter
                 result.ElementCount += ids.Count;
             }
             if (substructure?.Misc is { IsEmpty: false } misc) ExportMisc(misc, bk, superPart, elemPl, deckSlabId);
+            if (substructure?.SurfaceTreatments is { IsEmpty: false } stm)
+                ExportSurfaceTreatments(stm, bk, deckPart > 0 ? deckPart : superPart, subPart > 0 ? subPart : superPart, elemPl);
             if (steel == null) continue;
 
             var asmIds = new Dictionary<string, int>();

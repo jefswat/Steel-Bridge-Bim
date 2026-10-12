@@ -104,6 +104,23 @@ public enum DiaphragmRiserRule
     MidBay,
     /// <summary>At <see cref="ConcreteDiaphragmDefinition.RiserS"/>.</summary>
     Explicit,
+    /// <summary>The substructure top is a LEVEL BLOCK per step (<see cref="ConcreteDiaphragmDefinition.StepBlocks"/>: length along the line
+    /// centred on the beam line, sides at an angle) with the sloped cap top between the blocks (Woodbury pier caps p.9).</summary>
+    Blocks,
+}
+
+/// <summary>Level step blocks under the diaphragm (<see cref="DiaphragmRiserRule.Blocks"/>): one block per bottom step, centred on the step's
+/// beam line on the CL bearing / CL pier line; between and beyond the blocks the bottom is the substructure top <see cref="Between"/>.</summary>
+public sealed class DiaphragmStepBlocks
+{
+    /// <summary>Block length along the support line (at x = 0), centred on the beam line.</summary>
+    public double Length { get; set; } = double.NaN;
+    /// <summary>Angle of the block sides from the support-line normal (deg); the side S moves by tan(angle) per unit +x (x as the section).</summary>
+    public double SideAngleDeg { get; set; }
+    /// <summary>Substructure top between the blocks: (S along the support line, elevation) points, linear, held beyond the ends.</summary>
+    public List<CapProfilePoint> Between { get; set; } = new();
+    public string Source { get; set; } = "";
+    public DiaphragmStepBlocks Clone() { var c = (DiaphragmStepBlocks)MemberwiseClone(); c.Between = Between.Select(p => new CapProfilePoint(p.S, p.Elevation)).ToList(); return c; }
 }
 
 public enum DiaphragmFillerKind
@@ -196,6 +213,9 @@ public sealed class ConcreteDiaphragmDefinition
     public List<double> RiserS { get; set; } = new();
     /// <summary>Why the riser position is unresolved (plan page) - shown with <see cref="DiaphragmRiserRule.Unresolved"/>.</summary>
     public string RiserSource { get; set; } = "";
+    /// <summary><see cref="DiaphragmRiserRule.Blocks"/>: the step blocks and the substructure top between them.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public DiaphragmStepBlocks? StepBlocks { get; set; }
     public List<DiaphragmFillerDefinition> Fillers { get; set; } = new();
     public List<DiaphragmKeywayDefinition> Keyways { get; set; } = new();
     public List<DiaphragmBeamHole> BeamHoles { get; set; } = new();
@@ -215,6 +235,7 @@ public sealed class ConcreteDiaphragmDefinition
         c.Right = Right?.Clone();
         c.BottomSteps = BottomSteps.Select(s => s.Clone()).ToList();
         c.RiserS = RiserS.ToList();
+        c.StepBlocks = StepBlocks?.Clone();
         c.Fillers = Fillers.Select(f => f.Clone()).ToList();
         c.Keyways = Keyways.Select(k => k.Clone()).ToList();
         c.BeamHoles = BeamHoles.Select(h => h.Clone()).ToList();

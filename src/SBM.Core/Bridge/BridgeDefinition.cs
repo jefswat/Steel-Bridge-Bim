@@ -411,7 +411,8 @@ public sealed class GirderLayoutDefinition
     };
 }
 
-public enum BarrierType { TxDotSstr, FShape, SingleSlope, None }
+/// <summary>Custom = the section given point by point (<see cref="BarrierDefinition.Profile"/>, e.g. the Iowa aesthetic barrier).</summary>
+public enum BarrierType { TxDotSstr, FShape, SingleSlope, None, Custom }
 
 public enum TransverseBarOrientation
 {
@@ -481,7 +482,40 @@ public sealed class BarrierDefinition
     public double TopWidth { get; set; } = In(6);
     public bool Left { get; set; } = true;
     public bool Right { get; set; } = true;
-    public BarrierDefinition Clone() => (BarrierDefinition)MemberwiseClone();
+
+    // ---- OPTIONAL custom barrier (Type = Custom); omitted from the .sbm when not used
+    /// <summary>Section of a <see cref="BarrierType.Custom"/> barrier (see <see cref="BarrierProfilePoint"/>).</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public List<BarrierProfilePoint>? Profile { get; set; }
+    /// <summary>Name of the section (IFC object type, reports), e.g. "Iowa aesthetic barrier".</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public string? ProfileName { get; set; }
+    /// <summary>The section stands PERPENDICULAR to the top of deck (rotated with the cross slope) instead of plumb (Iowa "barrier rail orientation detail").</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    public bool PerpendicularToDeck { get; set; }
+    /// <summary>Custom barrier: length beyond the begin / end deck-end line, measured along the toe (gutter) line from where the deck end crosses it; the barrier
+    /// end is then square to the deck edge (e.g. "abut. diaph. ext." over an integral abutment). NaN = the end follows the deck end line.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public double? BeginExtension { get; set; }
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public double? EndExtension { get; set; }
+    /// <summary>Custom barrier: lengths with another section (bump-outs), see <see cref="BarrierZone"/>.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public List<BarrierZone>? Zones { get; set; }
+    /// <summary>Plan reference of the custom section / lengths.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public string? Source { get; set; }
+    /// <summary>Plan length of the barrier along the toe (gutter) line (bid length), for the check; null = none.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public double? PlanLength { get; set; }
+
+    public BarrierDefinition Clone()
+    {
+        var c = (BarrierDefinition)MemberwiseClone();
+        c.Profile = Profile?.Select(p => p.Clone()).ToList();
+        c.Zones = Zones?.Select(z => z.Clone()).ToList();
+        return c;
+    }
 }
 
 /// <summary>Deck edge offset at a station (variable-width decks; linear between points, held beyond the ends).</summary>
@@ -1131,6 +1165,10 @@ public sealed class BridgeDefinition
     /// <summary>Steel intermediate diaphragms between PRESTRESSED beams bolted through cast web holes (Iowa 1036-BTD; null = none).
     /// Detailed after the beams by <c>Diaphragms.PsSteelDiaphragmDetailer</c> in <c>RegenerationCache</c>.</summary>
     public PsSteelDiaphragmDefinition? PsSteelDiaphragms { get; set; }
+    /// <summary>OPTIONAL architectural surface treatments (form liner texture, thin brick, ...) on barrier / substructure / diaphragm faces
+    /// (<see cref="SurfaceTreatmentDefinition"/>); null = none.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public List<SurfaceTreatmentDefinition>? SurfaceTreatments { get; set; }
 
     /// <summary>A typical two-span continuous layout starting at the given station.</summary>
     public static BridgeDefinition CreateDefault(double beginStation, string alignmentName)
@@ -1221,5 +1259,6 @@ public sealed class BridgeDefinition
         Drains = Drains.Select(d => d.Clone()).ToList(),
         InspectionAccess = InspectionAccess?.Clone(),
         Misc = Misc?.Clone(),
+        SurfaceTreatments = SurfaceTreatments?.Select(t => t.Clone()).ToList(),
     };
 }

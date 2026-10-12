@@ -1,5 +1,6 @@
 using SBM.Core.Bridge;
 using SBM.Core.Geometry;
+using SBM.Core.Solids;
 using static SBM.Core.Units.UnitSystem;
 
 namespace SBM.Core.Concrete;
@@ -42,8 +43,59 @@ public static class BarrierProfiles
         BarrierType.TxDotSstr => TxDotSstr(),
         BarrierType.FShape => FShape(b),
         BarrierType.SingleSlope => SingleSlope(b),
+        BarrierType.Custom => b.Profile is { Count: >= 3 } pr ? Expand(pr).Points : null,
         _ => null,
     };
+
+    /// <summary>A custom section with its fillets / chamfers expanded: points (CCW) and the surface tag of every edge i -> i+1 ("" = none).</summary>
+    public sealed record Expanded(Vec2[] Points, string[] EdgeTags);
+
+    /// <summary>Expands <see cref="BarrierProfilePoint"/>s: a vertex with a Radius becomes a tangent arc (sampled at 7.5 deg or finer), a Chamfer two
+    /// points cut back along both edges. The tag of a vertex goes to the edge that leaves its last generated point; arc / chamfer edges are untagged.</summary>
+    public static Expanded Expand(IReadOnlyList<BarrierProfilePoint> pts)
+    {
+        int n = pts.Count;
+        var outPts = new List<Vec2>();
+        var tags = new List<string>();
+        for (int i = 0; i < n; i++)
+        {
+            var p = pts[i];
+            var v = new Vec2(p.R, p.H);
+            var a = new Vec2(pts[(i + n - 1) % n].R, pts[(i + n - 1) % n].H);
+            var c = new Vec2(pts[(i + 1) % n].R, pts[(i + 1) % n].H);
+            var u1 = (a - v).Normalized(); var u2 = (c - v).Normalized();
+            var gen = new List<Vec2>();
+            if (p.Radius > 0)
+            {
+                double th = Math.Acos(Math.Clamp(Vec2.Dot(u1, u2), -1, 1));
+                if (th < 1e-6 || Math.PI - th < 1e-6) gen.Add(v);
+                else
+                {
+                    double t = p.Radius / Math.Tan(th / 2);
+                    if (t > (a - v).Length || t > (c - v).Length) throw new ArgumentException($"barrier fillet R {p.Radius:0.####} at ({p.R:0.####}, {p.H:0.####}) does not fit between its neighbours");
+                    var t1 = v + u1 * t; var t2 = v + u2 * t;
+                    var bis = (u1 + u2).Normalized();
+                    var ctr = v + bis * (p.Radius / Math.Sin(th / 2));
+                    double a1 = Math.Atan2(t1.Y - ctr.Y, t1.X - ctr.X), a2 = Math.Atan2(t2.Y - ctr.Y, t2.X - ctr.X);
+                    double sweep = a2 - a1;
+                    while (sweep > Math.PI) sweep -= 2 * Math.PI;
+                    while (sweep < -Math.PI) sweep += 2 * Math.PI;
+                    int segs = Math.Max(2, (int)Math.Ceiling(Math.Abs(sweep) / (7.5 * Math.PI / 180)));
+                    for (int k = 0; k <= segs; k++) { double ang = a1 + sweep * k / segs; gen.Add(ctr + new Vec2(Math.Cos(ang), Math.Sin(ang)) * p.Radius); }
+                }
+            }
+            else if (p.Chamfer > 0) { gen.Add(v + u1 * p.Chamfer); gen.Add(v + u2 * p.Chamfer); }
+            else gen.Add(v);
+            for (int k = 0; k < gen.Count; k++)
+            {
+                outPts.Add(gen[k]);
+                tags.Add(k == gen.Count - 1 ? p.Tag ?? "" : "");
+            }
+        }
+        var arr = outPts.ToArray();
+        if (MeshBuilder.SignedArea(arr) <= 0) throw new ArgumentException("custom barrier section must be counter-clockwise in (R, H)");
+        return new Expanded(arr, tags.ToArray());
+    }
 
     /// <summary>Toe (base) width and top-of-rail traffic face distance from the back face, for plan linework.</summary>
     public static (double toe, double top, double height) PlanLines(BarrierDefinition b)

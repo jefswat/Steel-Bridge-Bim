@@ -1493,7 +1493,7 @@ public sealed partial class MainViewModel : ObservableObject
                 string mu = u.IsUS ? "lb" : "kg";
                 double cy = u.IsUS ? 0.764554857984 : 1;
                 string vu = u.IsUS ? "CY" : "m³";
-                MaterialRows.Add(new MaterialRow(b.Name, "Concrete", "Deck slab", 1, "", $"{cmod.DeckVolume / cy:N1} {vu}"));
+                MaterialRows.Add(new MaterialRow(b.Name, "Concrete", "Deck slab", 1, "", $"{(cmod.DeckVolume + cmod.DeckBumpVolume) / cy:N1} {vu}"));
                 MaterialRows.Add(new MaterialRow(b.Name, "Concrete", "Haunches", _project.Bridges.Count, "", $"{cmod.HaunchVolume / cy:N1} {vu}"));
                 if (cmod.Barriers.Count > 0)
                     MaterialRows.Add(new MaterialRow(b.Name, "Concrete", $"Barrier ({b.Deck.Barrier.Type})", cmod.Barriers.Count, "", $"{cmod.BarrierVolume / cy:N1} {vu}"));

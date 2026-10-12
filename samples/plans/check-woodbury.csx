@@ -297,8 +297,8 @@ foreach (var r in bi)
 }
 
 // ---------------------------------------------------------------- substructure (p.9-12 piers, p.15-17 abutments, p.3 quantities)
-// Plan values as printed (0.01 ft elevations, 1/16" dimensions); counts exact. The abutment pile caps are not built while the step risers are
-// UNRESOLVED (decision 11), so their volumes are reported for the drawn riser candidates as INFO only.
+// Plan values as printed (0.01 ft elevations, 1/16" dimensions); counts exact. The abutment pile caps are built with the risers 1'-9 past the lower
+// beam (user decision 11); the volumes of the other drawn riser candidates stay as INFO evidence.
 var subm = Doc.Model(BrName).Substructure;
 if (subm == null) Row("Substructure", "substructure generated", 1, 0, "not generated");
 else
@@ -356,11 +356,24 @@ else
         Row("Abutment (p.15-17)", $"{ab.n} bottom of footing at the east end (level 3'-0)", ab.be, geo.FootingBottom(sR) / ft);
         Row("Abutment (p.15-17)", $"{ab.n} step diagram depth at the west end (in)", Len(ab.dl) / In(1), geo.DepthAtLeftEnd / In(1), "step D - bottom", 1.0 / 16, "F4");
         Row("Abutment (p.15-17)", $"{ab.n} step diagram depth at the east end (in)", Len(ab.dr) / In(1), geo.DepthAtRightEnd / In(1), "step H - bottom", 1.0 / 16, "F4");
-        Row("Abutment (p.15-17)", $"{ab.n} stepped pile cap solid built", 1, u.Solids.Any(s => s.Name.EndsWith("pile cap")) ? 1 : 0, "risers UNRESOLVED (decision 11)", 0, "F0", info: true);
+        Row("Abutment (p.15-17)", $"{ab.n} stepped pile cap solid built", 1, u.Solids.Any(s => s.Name.EndsWith("pile cap")) ? 1 : 0, "risers 1'-9 past the lower beam (user decision 11)", 0, "F0");
+        {
+            // Concrete vs the plan quantity 'ABUTMENT FOOTING' (p.17) = pile cap + wing extension footing (the diaphragm is cast with the deck)
+            double capCy = u.Solids.Where(s => s.Name.EndsWith("pile cap")).Sum(s => Math.Abs(s.Mesh.Volume())) / 0.764554857984;
+            double wingCy = u.Solids.Where(s => s.Name.Contains("wing extension") && s.Name.EndsWith("footing")).Sum(s => Math.Abs(s.Mesh.Volume())) / 0.764554857984;
+            Row("Abutment volume (p.17)", $"{ab.n} abutment footing cy = pile cap {capCy:F2} + wing ext. footing {wingCy:F2} (model)", ab.vol, capCy + wingCy, "plan quantity rounded to 0.1 cy; risers per decision 11", 0.05, "F2", info: true);
+            var risers = geo.StepRisersS;
+            Row("Abutment (p.15-17)", $"{ab.n} step risers built", 4, risers.Count, "decision 11", 0, "F0");
+        }
         Row("Abutment (p.15-17)", $"{ab.n} wing extension wall + footing solids", 2, u.Solids.Count(s => s.Kind is SBM.Core.Substructure.SubElementKind.Wingwall or SBM.Core.Substructure.SubElementKind.WingFooting), "", 0, "F0");
         Row("Abutment (p.15-17)", $"{ab.n} CMP casings scheduled", 8, geo.Casings.Count, "bottom UNRESOLVED (EPS, road plans)", 0, "F0");
-        // girder S on CL brg = the abutment's pile-cap top line breaks (placeholder line through the step tops)
-        var bS = u.CapTop.Skip(1).Take(u.CapTop.Count - 2).Select(p => p.X).ToList();
+        // girder S on CL brg (beam chords x the support line)
+        var bS = Enumerable.Range(0, 5).Select(g =>
+        {
+            var c = fr.Girders[g].Spans[ab.k == 0 ? 0 : 2];
+            Numerics.IntersectLines(fr.Supports[ab.k].AlignmentPoint, fr.Supports[ab.k].Direction, c.Start, (c.End - c.Start).Normalized(), out double t, out _);
+            return t;
+        }).ToList();
         if (bS.Count == 5)
         {
             double Vol(Func<int, double> riser)
@@ -388,6 +401,20 @@ else
             Row("Abutment volume (p.17)", $"{ab.n} riser offset past the lower beam CL that matches {ab.vol} cy (in)", 21, (lo + hi) / 2 / In(1), $"+-{tolX / In(1):F1}\" from the 0.1 cy rounding; plan value 21 = the 1'-9 drawn on the rear elevation", 0, "F1", info: true);
         }
     }
+    // Concrete diaphragms (diaphragms-woodbury.csx): bottoms on the substructure tops - abutment risers per decision 11, pier step blocks p.9
+    {
+        var dm = Doc.Model(BrName).Prestressed?.ConcreteDiaphragms;
+        foreach (var nm in new[] { "S. Abut.", "Pier 1", "Pier 2", "N. Abut." })
+        {
+            var d = dm?.Diaphragms.FirstOrDefault(x => x.Support == nm);
+            Row("Diaphragms (p.15-20)", $"{nm} diaphragm built", 1, d == null ? 0 : 1, "", 0, "F0");
+            if (d == null) continue;
+            Row("Diaphragms (p.15-20)", $"{nm} diaphragm flagged UNRESOLVED (bottom)", 0, d.Assumption == null ? 0 : 1, d.Assumption?.Reason ?? "", 0, "F0");
+            Row("Diaphragms (p.15-20)", $"{nm} diaphragm concrete cy ({string.Join(", ", d.Parts.Select(p => $"{p.Name} {p.Volume / 0.764554857984:F2}"))})", 0, d.Volume / 0.764554857984, "model; plan quantity is in the deck concrete", 0, "F2", info: true);
+        }
+        foreach (var dg in (dm?.Diagnostics ?? new()).Where(x => x.Message.Contains("step blocks")))
+            Print("diaphragm: " + dg.Message);
+    }
     // Piles: plan quantity 11,440 LF = 8 x 155 + 8 x 150 + 72 x 125 (contract lengths, p.3 / p.12 / p.17)
     var allPiles = subm.Units.SelectMany(x => x.Foundations).SelectMany(f => f.Piles).ToList();
     Row("Quantities (p.3)", "Piles HP12x84 (count)", 88, allPiles.Count, "72 pier + 16 abutment", 0, "F0");
@@ -405,6 +432,41 @@ else
     var gen = subm.Marks.Where(m => (m.Unit == "Pier 1" || m.Unit == "Pier 2") && m.Location.Contains("column")).ToList();
     Row("Pier rebar (p.12)", "column bars of the generic column pipeline (lb, both piers; plan 10d1-10d5 + 10d2 + 5e1-5e3 + 6d13-6d16)",
         2 * (2580 + 5753 + 2661 + 2741 + 1596 + 1666 + 430 + 257 + 265 + 137 + 173), gen.Sum(m => m.TotalMass) / 0.45359237, "verticals + dowels + generic #5 ties; INFO", 1, "F0", info: true);
+}
+// ---------------------------------------------------------------- barrier rail (p.38 / DS 36; barrier-woodbury.csx)
+{
+    var cm = Doc.Model(BrName).Concrete;
+    var bar = cm?.Barriers.FirstOrDefault(x => x.Name == "Right barrier");
+    Row("Barrier (p.38)", "east barrier built (Iowa aesthetic, custom section)", 1, bar is { } bb && !bb.Mesh.IsEmpty ? 1 : 0, "", 0, "F0");
+    Row("Barrier (p.38)", "west barrier (none: stage-2 construction joint)", 0, cm?.Barriers.Count(x => x.Name == "Left barrier") ?? 0, "", 0, "F0");
+    var prof = SBM.Core.Concrete.BarrierProfiles.Expand(b.Deck.Barrier.Profile!).Points;
+    Row("Barrier (p.38)", "section base 1'-7 (deck edge to gutter / toe) (in)", 19, prof.Where(q => Math.Abs(q.Y) < 1e-9).Max(q => q.X) / In(1), "C-C", 1.0 / 16, "F4");
+    Row("Barrier (p.38)", "section height at the front corner 3'-8 (in)", 44, prof.Max(q => q.Y) / In(1), "C-C (3/8 chamfer drawn)", 1.0 / 16, "F4", info: true);
+    Row("Barrier (p.38)", "section height at the back 3'-7 5/8 (in)", 43.625, b.Deck.Barrier.Profile!.First(q => Math.Abs(q.R - In(0.5)) < 1e-9 && q.H > In(40)).H / In(1), "C-C", 1.0 / 16, "F4");
+    Row("Barrier (p.38)", "bump-out zones (strip returns + brick panel at Pier 1 / Pier 2)", 4, b.Deck.Barrier.Zones?.Count ?? 0, "G-G / H-H", 0, "F0");
+    Row("Barrier (p.22)", "deck bump-outs 1'-3 x 5'-2 (Detail C)", 2, cm?.DeckBumps.Count ?? 0, "", 0, "F0");
+    foreach (var n in cm?.Notes.Where(x => x.StartsWith("Right barrier")) ?? Enumerable.Empty<string>())
+    {
+        var mL = System.Text.RegularExpressions.Regex.Match(n, @"^Right barrier: .*?, (?<len>[^,]+?) along the toe");
+        var mS = System.Text.RegularExpressions.Regex.Match(n, @"deck end to deck end along it (?<len>[^,]+?),");
+        if (mL.Success) Row("Barrier (p.38)", "end to end of barrier rail along the gutter line (in)", Len("236'-9 3/8\"") / In(1), Len(mL.Groups["len"].Value) / In(1), "bid length 236.8 LF; = 4'-11 3/8 + 226'-10 1/4 + 4'-11 3/4 from the MODEL slab ends (their difference is the next row)", 1.0 / 16, "F3", info: true);
+        if (mS.Success) Row("Barrier (p.38)", "end to end of slab along the gutter line (in)", Len("226'-10 1/4\"") / In(1), Len(mS.Groups["len"].Value) / In(1), "model deck ends (1'-6 1/4 / 1'-6 5/8 along CL NB, p.6 / p.22)", 1.0 / 16, "F3");
+        Print("barrier: " + n);
+    }
+}
+// ---------------------------------------------------------------- surface treatments (p.44 / DS 42 form liner, p.13-14 / DS 11-12 thin brick; surface-treatments-woodbury.csx)
+{
+    var stm = Doc.Model(BrName).Substructure?.SurfaceTreatments;
+    Row("Surface treatment", "treatment regions built", 22, stm?.Items.Count ?? 0, "form liner: barrier 1 + abutments 8; thin brick: 2 piers x (3 columns + 2 cap faces + east end) + bump-outs", 0, "F0");
+    if (stm != null)
+    {
+        const double sf = 0.09290304;
+        foreach (var (t, a) in stm.Totals)
+            Row("Surface treatment", $"{t.Name} area (SF)", double.IsNaN(t.PlanQuantity) ? 0 : t.PlanQuantity / sf, a / sf,
+                double.IsNaN(t.PlanQuantity) ? "no plan quantity (in the concrete items)" : t.QuantityItem, 0, "F1", info: true);
+        foreach (var it in stm.Items)
+            Row("Surface treatment", $"  {it.Name} (SF){(it.Assumption != null ? " [UNRESOLVED]" : "")}", 0, it.Area / sf, it.Assumption?.Reason ?? it.Region.Source, 0, "F1", info: true);
+    }
 }
 // ---------------------------------------------------------------- steel diaphragm W21x50 + W14x38 (p.32 note: only between beam lines G and H over the traveled roadway, span 2)
 {

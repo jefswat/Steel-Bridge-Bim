@@ -60,7 +60,19 @@ public static class ConcreteDiaphragmGenerator
         public required Vec2 O, DS, N;
         public required double Xs;
         public List<(double S, double Z)> Steps = new();   // per girder line, sorted by S
-        public List<double> Risers = new();
+        /// <summary>Bottom pieces left to right: z = Z0 + Slope (s - SRef); between consecutive pieces a boundary (riser) at
+        /// S = Bounds[i].S + Bounds[i].PerX * x (vertical jump).</summary>
+        public List<(double Z0, double Slope, double SRef)> Pieces = new();
+        public List<(double S, double PerX)> Bounds = new();
+        public double RiserAt(int i, double x) => Bounds[i].S + Bounds[i].PerX * x;
+        public List<double> RisersAt(double x) => Enumerable.Range(0, Bounds.Count).Select(i => RiserAt(i, x)).ToList();
+        public int PieceAt(double s, double x)
+        {
+            int k = 0;
+            while (k < Bounds.Count && s > RiserAt(k, x)) k++;
+            return k;
+        }
+        public double BottomOn(int piece, double s) { var p = Pieces[Math.Min(piece, Pieces.Count - 1)]; return p.Z0 + p.Slope * (s - p.SRef); }
         public Vec2 W(double s, double x) => O + DS * s + N * (Xs * x);
         public double X(Vec2 p) => Xs * Vec2.Dot(p - O, N);
         public double S(Vec2 p) => Vec2.Dot(p - O, DS);
@@ -70,18 +82,16 @@ public static class ConcreteDiaphragmGenerator
             return Deck.FinishedElevation(Al, so.Station, so.Offset);
         }
         public double OffsetAt(double s, double x) => Al.Inverse(W(s, x)).Offset;
-        public double BottomAt(double s)
+        public double BottomAt(double s, double x = 0)
         {
-            if (Steps.Count == 0) throw new InvalidOperationException("a section point uses the Bottom reference but no BottomSteps are given");
-            int k = 0;
-            while (k < Risers.Count && s > Risers[k]) k++;
-            return Steps[Math.Min(k, Steps.Count - 1)].Z;
+            if (Steps.Count == 0 || Pieces.Count == 0) throw new InvalidOperationException("a section point uses the Bottom reference but no BottomSteps are given");
+            return BottomOn(PieceAt(s, x), s);
         }
         public double Z(DiaphragmZRef r, double dz, double s, double x) => r switch
         {
             DiaphragmZRef.DeckTop => DeckTop(s, x) + dz,
             DiaphragmZRef.Soffit => DeckTop(s, x) - Deck.Thickness + dz,
-            DiaphragmZRef.Bottom => BottomAt(s) + dz,
+            DiaphragmZRef.Bottom => BottomAt(s, x) + dz,
             _ => dz,
         };
         /// <summary>S on the slice x where the alignment offset equals <paramref name="o"/>.</summary>
@@ -228,16 +238,55 @@ public static class ConcreteDiaphragmGenerator
         }
         k.Steps.Sort((a, b) => a.S.CompareTo(b.S));
         Assumption? assumption = null;
-        if (k.Steps.Count > 1)
+        foreach (var st in k.Steps) k.Pieces.Add((st.Z, 0, st.S));
+        if (k.Steps.Count > 1 && dd.Risers == DiaphragmRiserRule.Blocks)
         {
+            var sb = dd.StepBlocks;
+            if (sb == null || double.IsNaN(sb.Length) || sb.Length <= 0 || sb.Between.Count == 0)
+                throw new InvalidOperationException("the Blocks riser rule needs StepBlocks (Length and the Between substructure top)");
+            var bp = sb.Between.OrderBy(p => p.S).Select(p => new Vec2(p.S, p.Elevation)).ToList();
+            double perX = Math.Tan(sb.SideAngleDeg * Math.PI / 180);
+            // substructure top between the blocks: the Between segment that holds the gap's middle
+            (double Z0, double Slope, double SRef) Line(double s)
+            {
+                if (bp.Count == 1) return (bp[0].Y, 0, bp[0].X);
+                int i = 0;
+                while (i < bp.Count - 2 && s > bp[i + 1].X) i++;
+                double sl = (bp[i + 1].Y - bp[i].Y) / (bp[i + 1].X - bp[i].X);
+                return (bp[i].Y, sl, bp[i].X);
+            }
+            double LineZ(double s) { var l = Line(s); return l.Z0 + l.Slope * (s - l.SRef); }
+            k.Pieces.Clear();
+            double h = sb.Length / 2;
+            for (int i = 0; i < k.Steps.Count; i++)
+            {
+                var st = k.Steps[i];
+                double lo = st.S - h, hi = st.S + h;
+                if (i > 0 && lo < k.Steps[i - 1].S + h + 1e-4) throw new InvalidOperationException($"step blocks {i} and {i + 1} overlap ({L(st.S - k.Steps[i - 1].S)} apart, blocks {L(sb.Length)} long)");
+                k.Pieces.Add(Line(i == 0 ? lo - Ft(1) : (k.Steps[i - 1].S + h + lo) / 2));
+                k.Bounds.Add((lo, perX));
+                k.Pieces.Add((st.Z, 0, st.S));
+                k.Bounds.Add((hi, perX));
+            }
+            k.Pieces.Add(Line(k.Steps[^1].S + h + Ft(1)));
+            foreach (var st in k.Steps)
+            {
+                double zs = Math.Max(LineZ(st.S - h), LineZ(st.S + h));
+                if (st.Z < zs - 1e-4) Warn($"step block at S {L(st.S)}: top {st.Z / Ft(1):0.00} is below the substructure top beside it ({zs / Ft(1):0.00}).");
+            }
+            Info($"bottom: {k.Steps.Count} level step blocks {L(sb.Length)} long (sides {sb.SideAngleDeg:0.###} deg from the support normal) on the sloped substructure top{(sb.Source != "" ? " (" + sb.Source + ")" : "")}.");
+        }
+        else if (k.Steps.Count > 1)
+        {
+            List<double> risers;
             switch (dd.Risers)
             {
                 case DiaphragmRiserRule.Explicit:
-                    k.Risers = dd.RiserS.OrderBy(x => x).ToList();
-                    if (k.Risers.Count != k.Steps.Count - 1) Warn($"{k.Risers.Count} explicit risers for {k.Steps.Count} steps (need {k.Steps.Count - 1}).");
+                    risers = dd.RiserS.OrderBy(x => x).ToList();
+                    if (risers.Count != k.Steps.Count - 1) Warn($"{risers.Count} explicit risers for {k.Steps.Count} steps (need {k.Steps.Count - 1}).");
                     break;
                 default:
-                    k.Risers = Enumerable.Range(0, k.Steps.Count - 1).Select(i => (k.Steps[i].S + k.Steps[i + 1].S) / 2).ToList();
+                    risers = Enumerable.Range(0, k.Steps.Count - 1).Select(i => (k.Steps[i].S + k.Steps[i + 1].S) / 2).ToList();
                     if (dd.Risers == DiaphragmRiserRule.Unresolved)
                     {
                         string why = dd.RiserSource != "" ? dd.RiserSource : "riser position between the bottom steps not dimensioned on the plans";
@@ -245,6 +294,8 @@ public static class ConcreteDiaphragmGenerator
                     }
                     break;
             }
+            foreach (var r in risers.Take(k.Steps.Count - 1)) k.Bounds.Add((r, 0));
+            while (k.Pieces.Count > k.Bounds.Count + 1) k.Pieces.RemoveAt(k.Pieces.Count - 1);
         }
 
         // Beam ends at this support: start ends of the span ahead, end ends of the span behind.
@@ -318,7 +369,7 @@ public static class ConcreteDiaphragmGenerator
             foreach (var e in ends)
             {
                 var brg = e.AtStart ? e.Beam.BearingStart : e.Beam.BearingEnd;
-                double gap = brg.Z - e.D - k.BottomAt(k.S(brg.XY));
+                double gap = brg.Z - e.D - k.BottomAt(k.S(brg.XY), k.X(brg.XY));
                 if (Math.Abs(gap - dd.PlanBearingGap) > In(1.0 / 16)) off.Add($"{e.Beam.Mark} {L(gap)}");
             }
             if (off.Count > 0)
@@ -543,7 +594,7 @@ public static class ConcreteDiaphragmGenerator
         var ev = TopEvents(k, x, sl, sr, present, order, topK);
         var topN = new int[ev.Count - 1];
         for (int i = 0; i + 1 < ev.Count; i++) topN[i] = Smooth(up.Ref) && ev[i].kind != 1 ? Math.Max(0, (int)Math.Ceiling(Math.Abs(ev[i].s - ev[i + 1].s) / Sample) - 1) : 0;
-        var bev = BottomEvents(k, sl, sr, lo, botK);
+        var bev = BottomEvents(k, x, sl, sr, lo, botK);
         var botN = new int[bev.Count - 1];
         for (int i = 0; i + 1 < bev.Count; i++) botN[i] = Smooth(lo.Ref) ? Math.Max(0, (int)Math.Ceiling(Math.Abs(bev[i + 1] - bev[i]) / Sample) - 1) : 0;
         return new Plan(topN, botN, topK.Select(s => k.OffsetAt(s, x)).ToList(), botK.Select(s => k.OffsetAt(s, x)).ToList(), order);
@@ -579,10 +630,10 @@ public static class ConcreteDiaphragmGenerator
         return res;
     }
 
-    private static List<double> BottomEvents(Frame k, double sl, double sr, Edge lo, List<double> kinks)
+    private static List<double> BottomEvents(Frame k, double x, double sl, double sr, Edge lo, List<double> kinks)
     {
         var ev = new List<double> { sl };
-        if (lo.Ref == DiaphragmZRef.Bottom) ev.AddRange(k.Risers.Where(r => r > sl + 1e-6 && r < sr - 1e-6));
+        if (lo.Ref == DiaphragmZRef.Bottom) ev.AddRange(k.RisersAt(x).Where(r => r > sl + 1e-6 && r < sr - 1e-6));
         ev.AddRange(kinks);
         ev.Add(sr);
         return ev.OrderBy(s => s).ToList();
@@ -599,16 +650,17 @@ public static class ConcreteDiaphragmGenerator
 
         // ---- bottom (left to right), risers as vertical jumps
         var bk = plan.BottomKinks.Select(o => Math.Clamp(k.SAtOffset(o, x), sl, sr)).ToList();
-        var bev = BottomEvents(k, sl, sr, lo, bk);
+        var bev = BottomEvents(k, x, sl, sr, lo, bk);
         if (bev.Count - 1 != plan.BottomSamples.Length) throw new InvalidOperationException("bottom topology changed (a riser / kink crosses an end inside a slab)");
         for (int i = 0; i + 1 < bev.Count; i++)
         {
             double a = bev[i], b = bev[i + 1];
-            double zA = lo.Ref == DiaphragmZRef.Bottom ? k.Z(lo.Ref, lo.DzAt(x), (a + b) / 2, x) : Low(a);
+            int pc = k.Pieces.Count > 0 ? k.PieceAt((a + b) / 2, x) : 0;
+            double zA = lo.Ref == DiaphragmZRef.Bottom ? k.BottomOn(pc, a) + lo.DzAt(x) : Low(a);
             poly.Add((a, zA));
             int m = plan.BottomSamples[i];
             for (int q = 1; q <= m; q++) { double s = a + (b - a) * q / (m + 1); poly.Add((s, Low(s))); }
-            if (lo.Ref == DiaphragmZRef.Bottom) poly.Add((b, zA));   // level step to the riser / end
+            if (lo.Ref == DiaphragmZRef.Bottom) poly.Add((b, k.BottomOn(pc, b) + lo.DzAt(x)));   // bottom piece (level step or sloped top) to the riser / end
         }
         if (lo.Ref != DiaphragmZRef.Bottom) poly.Add((sr, Low(sr)));
 
@@ -642,7 +694,7 @@ public static class ConcreteDiaphragmGenerator
     }
 
     /// <summary>Fixed parametrization of one panel (between two beams / an end and a beam) of an open-below slice.</summary>
-    private sealed record PanelSpec(int TopN, List<double> TopKinks, int BotN, List<double> BotKinks, List<double> Risers, bool Skip = false, bool NoTop = false);
+    private sealed record PanelSpec(int TopN, List<double> TopKinks, int BotN, List<double> BotKinks, List<int> Risers, bool Skip = false, bool NoTop = false);
 
     /// <summary>Slice polygons (CCW in S-z) when the beams are open below: one panel per gap between the diaphragm ends and the beams.</summary>
     private static List<(double S, double Z)>[] Panels(Frame k, double x, Edge lo, Edge up, DiaphragmEnd left, DiaphragmEnd right,
@@ -667,7 +719,7 @@ public static class ConcreteDiaphragmGenerator
             if (sp == null && (b - a < -1e-6 || tb - ta < -1e-6)) throw new InvalidOperationException($"beams overlap or cross an end at x {x:0.###} m");
             if (sp == null)
             {
-                var risers = lo.Ref == DiaphragmZRef.Bottom ? k.Risers.Where(r => r > a + 1e-6 && r < b - 1e-6).ToList() : new List<double>();
+                var risers = lo.Ref == DiaphragmZRef.Bottom ? Enumerable.Range(0, k.Bounds.Count).Where(i => k.RiserAt(i, x) > a + 1e-6 && k.RiserAt(i, x) < b - 1e-6).ToList() : new List<int>();
                 var bk = Smooth(lo.Ref) ? kinkOff.Where(o => { double s0 = k.SAtOffset(o, x); return s0 > a + 1e-4 && s0 < b - 1e-4; }).ToList() : new List<double>();
                 var tk = Smooth(up.Ref) ? kinkOff.Where(o => { double s0 = k.SAtOffset(o, x); return s0 > ta + 1e-4 && s0 < tb - 1e-4; }).ToList() : new List<double>();
                 sp = new PanelSpec(Smooth(up.Ref) ? Math.Max(0, (int)Math.Ceiling((tb - ta) / Sample) - 1) : 0, tk,
@@ -678,7 +730,7 @@ public static class ConcreteDiaphragmGenerator
             var poly = new List<(double S, double Z)>();
             // bottom a -> b (risers as vertical jumps)
             var bev = new List<double> { a };
-            bev.AddRange(sp.Risers.Select(r => Math.Clamp(r, a, b)));
+            bev.AddRange(sp.Risers.Select(r => Math.Clamp(k.RiserAt(r, x), a, b)));
             bev.AddRange(sp.BotKinks.Select(o => Math.Clamp(k.SAtOffset(o, x), a, b)));
             bev.Add(b);
             bev.Sort();
@@ -687,9 +739,9 @@ public static class ConcreteDiaphragmGenerator
                 double s0 = bev[i], s1 = bev[i + 1];
                 if (lo.Ref == DiaphragmZRef.Bottom)
                 {
-                    double z = k.Z(lo.Ref, lo.DzAt(x), (s0 + s1) / 2, x);
-                    poly.Add((s0, z));
-                    poly.Add((s1, z));
+                    int pc = k.PieceAt((s0 + s1) / 2, x);
+                    poly.Add((s0, k.BottomOn(pc, s0) + lo.DzAt(x)));
+                    poly.Add((s1, k.BottomOn(pc, s1) + lo.DzAt(x)));
                 }
                 else
                 {
@@ -893,7 +945,7 @@ public static class ConcreteDiaphragmGenerator
             pieces.Add(ClipV(mid, double.NegativeInfinity, v0));
             pieces.Add(ClipV(mid, v1, double.PositiveInfinity));
         }
-        double zBot = k.BottomAt(k.S(e.Top.XY));
+        double zBot = k.BottomAt(k.S(e.Top.XY), k.X(e.Top.XY));
         foreach (var pc in pieces)
         {
             if (pc.Count < 3 || Math.Abs(MeshBuilder.SignedArea(pc)) < 1e-8) continue;
@@ -971,17 +1023,18 @@ public static class ConcreteDiaphragmGenerator
         for (int b = 0; b < i0.Count; b++)
         {
             double aMid = (i0[b].a + i1[b].a) / 2, bMid = (i0[b].b + i1[b].b) / 2;
-            var rs = k.Risers.Where(r => r > aMid && r < bMid).ToList();
+            double xm = (x0 + x1) / 2;
+            var rs = Enumerable.Range(0, k.Bounds.Count).Where(i => k.RiserAt(i, xm) > aMid && k.RiserAt(i, xm) < bMid).ToList();
             for (int c = 0; c <= rs.Count; c++)
             {
-                double SA(double x) { var iv = x == x0 ? i0[b] : i1[b]; return c == 0 ? iv.a : rs[c - 1]; }
-                double SB(double x) { var iv = x == x0 ? i0[b] : i1[b]; return c == rs.Count ? iv.b : rs[c]; }
-                double z = k.BottomAt((SA(x0) + SB(x0)) / 2);
+                double SA(double x) { var iv = x == x0 ? i0[b] : i1[b]; return c == 0 ? iv.a : k.RiserAt(rs[c - 1], x); }
+                double SB(double x) { var iv = x == x0 ? i0[b] : i1[b]; return c == rs.Count ? iv.b : k.RiserAt(rs[c], x); }
+                int pc = k.PieceAt((SA(xm) + SB(xm)) / 2, xm);
                 var quad = new List<Vec2> { new(SA(x0), x0), new(SB(x0), x0), new(SB(x1), x1), new(SA(x1), x1) };
                 if (MeshBuilder.SignedArea(quad) < 0) quad.Reverse();
                 if (Math.Abs(MeshBuilder.SignedArea(quad)) < 1e-8) continue;
-                var bot = quad.Select(q => k.W(q.X, q.Y).WithZ(z + zLo)).ToArray();
-                var top = quad.Select(q => k.W(q.X, q.Y).WithZ(z + zHi)).ToArray();
+                var bot = quad.Select(q => k.W(q.X, q.Y).WithZ(k.BottomOn(pc, q.X) + zLo)).ToArray();
+                var top = quad.Select(q => k.W(q.X, q.Y).WithZ(k.BottomOn(pc, q.X) + zHi)).ToArray();
                 Loft(mesh, quad, new[] { bot, top });
             }
         }
