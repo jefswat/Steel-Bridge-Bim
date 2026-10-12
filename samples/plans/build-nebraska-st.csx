@@ -428,6 +428,40 @@ cap.Unresolved.AddRange(new[]
     SBM.Core.UnresolvedFlag.Text("p.30", "'4 1/4 (AT CL CAP)' in Section E-E", "the dimension's lower end reads as the top of the cap top flange, its upper end is not identifiable", "Compared as top of cap flange to top of girder flange (reported)."),
     SBM.Core.UnresolvedFlag.Text("p.30-31", "identity of 'PL 3/4' / '1/2 connector PL' (U4 / U6)", "read at 300-400 dpi as: 3/4 girder connection diaphragm plate in the girder web plane between 1/2 connector plates on the inner web faces, bolts end plate + web + connector plate", "Modeled that way; confirm."),
 });
+// concrete haunch over the cap (p.25 Section A-A + Section near Pier No. 2; p.29 plan "EDGE OF SLAB" jogs around the cap = the p.43 Detail D
+// bump-out; p.45 bar list + bend diagram): cast with the deck (placement section 5, p.43 / p.45), sides flush with the top flange edges (40 3/8 out
+// to out), cap steel (flange / top cover plate) to the deck soffit, between the deck edges; no chamfer or haunch dimension is drawn (depth = deck
+// soffit - cap steel). Bars: 5d2 U (6 + 8 + 3'-0 + 8 + 6 out to out, D = 2 1/2, 5'-4 listed), "2 CL." above the cap steel, "PLACE BETWEEN SHEAR
+// STUDS", 10 per bay + 4 at each overhang (38); 5e5 (between girder lines, 9 x 5'-4) / 5e6 (outside the exterior girders, 6 x 2'-5): 3 per bay, in
+// the two bottom corners of the 5d2 and at the CL cap (Section A-A). Corner bars nest in the 2 1/2" pin bends (centre = bend centre + (1 1/4 - 5/16)
+// toward the corner); the middle bar rests on the 5d2 bottom.
+{
+    double clr = 2, db = 0.625, rin = 1.25, d45 = (rin - db / 2) * Math.Sqrt(0.5);
+    double nC = 18 - db - rin + d45, hC = clr + db + rin - d45, hM = clr + db + db / 2;
+    var pos = new List<CapPoint> { new(-I(nC), I(hC)), new(0, I(hM)), new(I(nC), I(hC)) };
+    cap.Haunch = new CapHaunchDefinition
+    {
+        Source = "p.25 Section A-A / Section near Pier No. 2; p.29 plan; p.43 Detail D; p.45",
+        Width = 0,   // = top flanges out to out (2 x 10 3/16 + 20 = 40 3/8, Section A-A: haunch sides flush with the flange edges)
+        Stirrups =
+        {
+            new CapHaunchStirrups { Mark = "5d2", Size = "#5", Location = "INTEGRAL STEEL PIER CAP HAUNCH", BottomWidth = I(36), LegHeight = I(8), HookLength = I(6),
+                ClearAboveSteel = I(clr), ListedLength = L("5'-4"), PlanCount = 38, PlanWeightLb = 211, Source = "p.25 Section A-A, p.45 (5d2 bend diagram)" },
+        },
+        Bars =
+        {
+            new CapHaunchBars { Mark = "5e5", Size = "#5", Location = "INTEGRAL STEEL PIER CAP HAUNCH LONGIT.", Bay = CapHaunchBay.Interior, Positions = pos,
+                ListedLength = L("5'-4"), PlanCount = 9, PlanWeightLb = 50, Source = "p.25 Section A-A / Section near Pier No. 2 (3-5e5 TYP.), p.45" },
+            new CapHaunchBars { Mark = "5e6", Size = "#5", Location = "INTEGRAL STEEL PIER CAP HAUNCH LONGIT.", Bay = CapHaunchBay.Exterior, Positions = pos.Select(q => q.Clone()).ToList(),
+                ListedLength = L("2'-5"), PlanCount = 6, PlanWeightLb = 15, Source = "p.25 Section A-A / Section near Pier No. 2 (3-5e6 TYP.), p.45" },
+        },
+        Unresolved =
+        {
+            SBM.Core.UnresolvedFlag.Text("p.25", "position of the 5e5 / 5e6 corner bars inside the 5d2", "Section A-A draws them in the bottom corners without a dimension",
+                "Nested in the 2 1/2\" pin bends of the 5d2 (from the p.45 bend diagram)."),
+        },
+    };
+}
 br.Supports[2].IntegralSteelCap = cap;
 
 // ================================================================ fabrication notes (fabrication-notes.csv) -> part attributes / grades

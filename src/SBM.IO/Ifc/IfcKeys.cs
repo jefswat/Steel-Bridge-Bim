@@ -28,6 +28,8 @@ public static class IfcKeys
     public static string JointBlockout(string jk) => jk + "/blockout";
     public static string JointDevice(string jk) => jk + "/device";
     public static string DeckBar(string bk, int n) => $"{bk}/bar/{n}";
+    /// <summary>Concrete haunch over the integral steel pier cap of a support (IfcBuildingElementPart in the deck slab).</summary>
+    public static string CapHaunch(string bk, string support) => $"{bk}/cap-haunch/{support}";
     public static string Drain(string bk, int n) => $"{bk}/drain/{n}";
     public static string MiscAssembly(string bk, string name) => $"{bk}/misc/{name}";
     public static string MiscElement(string bk, int n) => $"{bk}/misc/el/{n}";

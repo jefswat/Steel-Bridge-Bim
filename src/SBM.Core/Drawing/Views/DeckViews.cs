@@ -63,7 +63,7 @@ public static class DeckViews
         }
         if (ctx.Concrete is { } c)
         {
-            notes.Add($"CONCRETE: DECK {c.DeckVolume * vk:N1} {vn}, HAUNCHES {c.HaunchVolume * vk:N1} {vn}" + (c.BarrierVolume > 0 ? $", BARRIER {c.BarrierVolume * vk:N1} {vn}" : "") + " (MODEL SOLIDS).");
+            notes.Add($"CONCRETE: DECK {c.DeckVolume * vk:N1} {vn}, HAUNCHES {c.HaunchVolume * vk:N1} {vn}" + (c.CapHaunches.Count > 0 ? $", PIER CAP HAUNCH {c.CapHaunchVolume * vk:N2} {vn}" : "") + (c.BarrierVolume > 0 ? $", BARRIER {c.BarrierVolume * vk:N1} {vn}" : "") + " (MODEL SOLIDS).");
             notes.Add(c.Marks.Count > 0 ? $"DECK / BARRIER REINFORCING: {c.Marks.Count} MARKS, {c.Marks.Sum(m => m.TotalMass) * (u.IsUS ? 2.20462 : 1):N0} {(u.IsUS ? "LB" : "KG")} (SEE THE BAR LIST)."
                                         : "DECK REINFORCING: NOT IN THE MODEL (NO DECK BARS GENERATED FOR THIS BRIDGE).");
         }

@@ -1571,6 +1571,7 @@ public sealed partial class MainViewModel : ObservableObject
                 string vu = u.IsUS ? "CY" : "m³";
                 MaterialRows.Add(new MaterialRow(b.Name, "Concrete", "Deck slab", 1, "", $"{(cmod.DeckVolume + cmod.DeckBumpVolume) / cy:N1} {vu}"));
                 MaterialRows.Add(new MaterialRow(b.Name, "Concrete", "Haunches", _project.Bridges.Count, "", $"{cmod.HaunchVolume / cy:N1} {vu}"));
+                foreach (var ch in cmod.CapHaunches) MaterialRows.Add(new MaterialRow(b.Name, "Concrete", ch.Name, 1, "", $"{ch.Volume / cy:N2} {vu}"));
                 if (cmod.Barriers.Count > 0)
                     MaterialRows.Add(new MaterialRow(b.Name, "Concrete", $"Barrier ({b.Deck.Barrier.Type})", cmod.Barriers.Count, "", $"{cmod.BarrierVolume / cy:N1} {vu}"));
                 foreach (var jr in cmod.Joints)

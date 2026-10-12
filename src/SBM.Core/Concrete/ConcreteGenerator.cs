@@ -106,6 +106,9 @@ public sealed class ConcreteModel
     /// <summary>Deck slab widenings under barrier zones (plan "deck bump-outs"), part of the deck slab.</summary>
     public List<(string Name, Mesh Mesh)> DeckBumps { get; } = new();
     public double DeckBumpVolume => DeckBumps.Sum(b => Math.Abs(b.Mesh.Volume()));
+    /// <summary>Concrete haunches over integral steel pier caps (<c>IntegralSteelCapDefinition.Haunch</c>), part of the deck placement.</summary>
+    public List<CapHaunchResult> CapHaunches { get; } = new();
+    public double CapHaunchVolume => CapHaunches.Sum(c => c.Volume);
     /// <summary>Faces carrying a surface tag (custom barrier sections), for the surface treatments.</summary>
     public List<TaggedSurface> TaggedSurfaces { get; } = new();
     public List<BarMark> Marks { get; } = new();
@@ -173,8 +176,9 @@ public sealed partial class ConcreteGenerator
 
     private void Run()
     {
-        var tasks = new List<Action> { BuildDeckSolid, BuildHaunches, BuildBarriers, BuildJoints };
+        var tasks = new List<Action> { BuildDeckSolid, BuildHaunches, BuildBarriers, BuildJoints, BuildCapHaunches };
         Parallel.ForEach(tasks, t => t());
+        _m.CapHaunches.Sort((x, y) => string.CompareOrdinal(x.Support, y.Support));
         var bars = new ConcurrentBag<(string series, RebarSize size, BarShape shape, string loc, bool epoxy, BarPlacement placement)>();
         var rebarTasks = new List<Action>();
         if (Deck.Reinforcement.Enabled)
@@ -184,6 +188,7 @@ public sealed partial class ConcreteGenerator
             if (Deck.Reinforcement.PlanBarSets.Count > 0) rebarTasks.Add(BuildPlanBarSets);
         }
         if (Deck.Barrier.Type == BarrierType.TxDotSstr && Deck.Barrier.Reinforcement) rebarTasks.Add(() => BuildSstrRebar(bars));
+        rebarTasks.Add(BuildCapHaunchRebar);   // OPTIONAL plan bars of integral steel cap haunches (their own definition, not the deck's switch)
         Parallel.ForEach(rebarTasks, t => t());
         AssignMarks(bars);
     }
@@ -208,6 +213,7 @@ public sealed partial class ConcreteGenerator
             return (best, n);
         }
         if (_m.Haunches != null) hosts.Add(_m.Haunches);
+        hosts.AddRange(_m.CapHaunches.Select(c => c.Mesh));
         hosts.AddRange(_m.DeckBumps.Select(b => b.Mesh));
         hosts.AddRange(_m.Barriers.Select(b => b.Mesh));
         hosts.AddRange(_m.Joints.Select(j => j.Blockout));

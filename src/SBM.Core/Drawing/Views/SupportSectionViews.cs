@@ -53,6 +53,7 @@ public static class SupportSectionViews
         {
             if (c.Deck != null) sec.Draw(d, c.Deck, SheetLayers.ConcreteCut, xa, xb);
             if (c.Haunches != null) sec.Draw(d, c.Haunches, SheetLayers.ConcreteCut, xa, xb);
+            foreach (var ch in c.CapHaunches.Where(x => x.Support == sl.Name)) sec.Draw(d, ch.Mesh, SheetLayers.ConcreteCut, xa, xb);
             foreach (var (_, m) in c.Barriers) sec.Draw(d, m, SheetLayers.ConcreteCut, xa, xb);
         }
         var box = dwg.Extents();

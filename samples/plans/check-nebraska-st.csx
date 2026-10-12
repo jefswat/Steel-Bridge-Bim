@@ -261,7 +261,8 @@ foreach (var (unit, plan) in new[] { ("Pier 1", 139.5), ("Pier 2", 130.9), ("S. 
 var cm = md.Concrete;
 if (cm != null)
 {
-    Row("8 quantities", "deck concrete (slab + haunches + bump-outs)", 460.2, (cm.DeckVolume + cm.HaunchVolume + cm.DeckBumpVolume) / cyF, 460.2 * 0.03, "CY", "p.45 placement sections 1-5 INCLUDE the abutment diaphragms (sections 1, 3) and the integral steel pier cap haunch concrete - neither is modeled", info: true);
+    Row("8 quantities", "deck concrete (slab + haunches + bump-outs + pier cap haunch)", 460.2, (cm.DeckVolume + cm.HaunchVolume + cm.DeckBumpVolume + cm.CapHaunchVolume) / cyF, 460.2 * 0.03, "CY", "p.45 placement sections 1-5 INCLUDE the abutment diaphragms (sections 1, 3; not modeled)", info: true);
+    Text("8 quantities", "integral steel pier cap haunch (p.25 Section A-A; no separate plan CY - inside p.45 section 5)", "", string.Join("; ", cm.CapHaunches.Select(c => $"{c.Volume / cyF:0.00} CY, depth {c.MinDepth / 0.0254:0.00}..{c.MaxDepth / 0.0254:0.00} in")), "INFO");
     Row("8 quantities", "barrier rail concrete (both rails)", 159.0, cm.BarrierVolume / cyF, 159.0 * 0.03, "CY", "p.56: incl. special sections on the wing extensions (not modeled)", info: true);
 }
 var stm = sub.SurfaceTreatments;

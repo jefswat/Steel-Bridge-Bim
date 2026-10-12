@@ -239,6 +239,7 @@ public static class TableViews
         {
             if (c.DeckVolume > 0) Row(Sup, "CONCRETE - DECK SLAB", c.DeckVolume * vk, "N1", vn, "SOLID VOLUME (HAUNCHES SEPARATE)");
             if (c.HaunchVolume > 0) Row(Sup, "CONCRETE - HAUNCHES", c.HaunchVolume * vk, "N1", vn, "SOLID VOLUME");
+            foreach (var ch in c.CapHaunches) Row(Sup, $"CONCRETE - PIER CAP HAUNCH ({ch.Support.ToUpperInvariant()})", ch.Volume * vk, "N2", vn, "SOLID VOLUME (DECK PLACEMENT)");
             if (c.BarrierVolume > 0) Row(Sup, "CONCRETE - BARRIER RAIL", c.BarrierVolume * vk, "N1", vn, "SOLID VOLUME");
         }
         if (ps?.ConcreteDiaphragms is { Diaphragms.Count: > 0 } cdm)
