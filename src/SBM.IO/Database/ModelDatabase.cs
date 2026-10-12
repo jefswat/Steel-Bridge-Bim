@@ -476,7 +476,39 @@ public static class ModelDatabase
             if (b.Prestressed != null) Prestressed(b.Prestressed, bk, superId);
             if (b.Steel != null) Steel(b.Steel, bk, superId, framing.Camber);
             if (b.Substructure?.Misc is { IsEmpty: false } misc) MiscItems(misc, bk, superId, def.Name);
+            if (b.Substructure?.SurfaceTreatments is { IsEmpty: false } stm) SurfaceTreatments(stm, bk, unitId, def.Name);
             _ = deckSlabId;
+        }
+
+        /// <summary>Surface treatments: one group per treatment (plan quantity vs model area in its properties), one element per region (IfcCovering).</summary>
+        private void SurfaceTreatments(SBM.Core.Surface.SurfaceTreatmentModel stm, string bk, string unitId, string bridgeName)
+        {
+            const double sf = 0.09290304;
+            var inv = CultureInfo.InvariantCulture;
+            foreach (var (t, area) in stm.Totals.ToList())
+            {
+                var pj = new Json().Add("treatment_kind", t.Kind.ToString()).Add("pattern", t.Pattern).Add("orientation", t.Orientation).Add("model_area_sf", Math.Round(area / sf, 1));
+                if (!double.IsNaN(t.PlanQuantity)) pj.Add("plan_quantity_sf", Math.Round(t.PlanQuantity / sf, 1)).Add("model_minus_plan_sf", Math.Round((area - t.PlanQuantity) / sf, 1));
+                pj.Add("quantity_item", t.QuantityItem).Add("source", t.Source);
+                string gid = Group($"{bk}/grp/surface/{t.Name}", unitId, $"{bridgeName} {t.Name}", "surface treatment", props: pj.ToString());
+                foreach (var it in stm.Items.Where(i => i.Treatment == t))
+                {
+                    bool brick = t.Kind == SBM.Core.Bridge.SurfaceTreatmentKind.ThinBrick;
+                    var r = New(Id(IfcKeys.SurfaceTreatment(bk, it.Name)), gid, "element", brick ? "thin brick" : "form liner", "IFCCOVERING", it.Name);
+                    r.Tag = it;
+                    r.Support = it.Region.Support;
+                    if (_keysOnly) { _w.Add(r); continue; }
+                    r.Material = brick ? "Integral thin veneer brick" : "Concrete, form liner texture";
+                    r.Volume = Math.Abs(it.Mesh.Volume());
+                    if (!it.Mesh.IsEmpty) { r.Box = it.Mesh.Bounds(); StationOf(r, r.Box); }
+                    var ej = new Json().Add("area_sf", Math.Round(it.Area / sf, 2)).Add("relief_in", Math.Round(t.Relief / 0.0254, 3)).Add("host", it.Region.Host.ToString())
+                        .Add("region_source", it.Region.Source).Add("description", it.Description);
+                    if (it.Assumption is { } asu) ej.Add("status", asu.Status).Add("reason", asu.Reason).Add("assumed", asu.Basis);
+                    r.Props = ej.ToString();
+                    _w.Add(r);
+                }
+            }
+            _ = inv;
         }
 
         /// <summary>Camber / blocking of a girder as properties of its group: summary values plus the point table.</summary>

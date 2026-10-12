@@ -433,6 +433,41 @@ else
     Row("Pier rebar (p.12)", "column bars of the generic column pipeline (lb, both piers; plan 10d1-10d5 + 10d2 + 5e1-5e3 + 6d13-6d16)",
         2 * (2580 + 5753 + 2661 + 2741 + 1596 + 1666 + 430 + 257 + 265 + 137 + 173), gen.Sum(m => m.TotalMass) / 0.45359237, "verticals + dowels + generic #5 ties; INFO", 1, "F0", info: true);
 }
+// ---------------------------------------------------------------- barrier rail (p.38 / DS 36; barrier-woodbury.csx)
+{
+    var cm = Doc.Model(BrName).Concrete;
+    var bar = cm?.Barriers.FirstOrDefault(x => x.Name == "Right barrier");
+    Row("Barrier (p.38)", "east barrier built (Iowa aesthetic, custom section)", 1, bar is { } bb && !bb.Mesh.IsEmpty ? 1 : 0, "", 0, "F0");
+    Row("Barrier (p.38)", "west barrier (none: stage-2 construction joint)", 0, cm?.Barriers.Count(x => x.Name == "Left barrier") ?? 0, "", 0, "F0");
+    var prof = SBM.Core.Concrete.BarrierProfiles.Expand(b.Deck.Barrier.Profile!).Points;
+    Row("Barrier (p.38)", "section base 1'-7 (deck edge to gutter / toe) (in)", 19, prof.Where(q => Math.Abs(q.Y) < 1e-9).Max(q => q.X) / In(1), "C-C", 1.0 / 16, "F4");
+    Row("Barrier (p.38)", "section height at the front corner 3'-8 (in)", 44, prof.Max(q => q.Y) / In(1), "C-C (3/8 chamfer drawn)", 1.0 / 16, "F4", info: true);
+    Row("Barrier (p.38)", "section height at the back 3'-7 5/8 (in)", 43.625, b.Deck.Barrier.Profile!.First(q => Math.Abs(q.R - In(0.5)) < 1e-9 && q.H > In(40)).H / In(1), "C-C", 1.0 / 16, "F4");
+    Row("Barrier (p.38)", "bump-out zones (strip returns + brick panel at Pier 1 / Pier 2)", 4, b.Deck.Barrier.Zones?.Count ?? 0, "G-G / H-H", 0, "F0");
+    Row("Barrier (p.22)", "deck bump-outs 1'-3 x 5'-2 (Detail C)", 2, cm?.DeckBumps.Count ?? 0, "", 0, "F0");
+    foreach (var n in cm?.Notes.Where(x => x.StartsWith("Right barrier")) ?? Enumerable.Empty<string>())
+    {
+        var mL = System.Text.RegularExpressions.Regex.Match(n, @"^Right barrier: .*?, (?<len>[^,]+?) along the toe");
+        var mS = System.Text.RegularExpressions.Regex.Match(n, @"deck end to deck end along it (?<len>[^,]+?),");
+        if (mL.Success) Row("Barrier (p.38)", "end to end of barrier rail along the gutter line (in)", Len("236'-9 3/8\"") / In(1), Len(mL.Groups["len"].Value) / In(1), "bid length 236.8 LF; = 4'-11 3/8 + 226'-10 1/4 + 4'-11 3/4 from the MODEL slab ends (their difference is the next row)", 1.0 / 16, "F3", info: true);
+        if (mS.Success) Row("Barrier (p.38)", "end to end of slab along the gutter line (in)", Len("226'-10 1/4\"") / In(1), Len(mS.Groups["len"].Value) / In(1), "model deck ends (1'-6 1/4 / 1'-6 5/8 along CL NB, p.6 / p.22)", 1.0 / 16, "F3");
+        Print("barrier: " + n);
+    }
+}
+// ---------------------------------------------------------------- surface treatments (p.44 / DS 42 form liner, p.13-14 / DS 11-12 thin brick; surface-treatments-woodbury.csx)
+{
+    var stm = Doc.Model(BrName).Substructure?.SurfaceTreatments;
+    Row("Surface treatment", "treatment regions built", 22, stm?.Items.Count ?? 0, "form liner: barrier 1 + abutments 8; thin brick: 2 piers x (3 columns + 2 cap faces + east end) + bump-outs", 0, "F0");
+    if (stm != null)
+    {
+        const double sf = 0.09290304;
+        foreach (var (t, a) in stm.Totals)
+            Row("Surface treatment", $"{t.Name} area (SF)", double.IsNaN(t.PlanQuantity) ? 0 : t.PlanQuantity / sf, a / sf,
+                double.IsNaN(t.PlanQuantity) ? "no plan quantity (in the concrete items)" : t.QuantityItem, 0, "F1", info: true);
+        foreach (var it in stm.Items)
+            Row("Surface treatment", $"  {it.Name} (SF){(it.Assumption != null ? " [UNRESOLVED]" : "")}", 0, it.Area / sf, it.Assumption?.Reason ?? it.Region.Source, 0, "F1", info: true);
+    }
+}
 // ---------------------------------------------------------------- steel diaphragm W21x50 + W14x38 (p.32 note: only between beam lines G and H over the traveled roadway, span 2)
 {
     var parts = Doc.Model(BrName).Steel?.Parts ?? new();

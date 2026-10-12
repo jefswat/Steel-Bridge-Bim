@@ -42,6 +42,8 @@ public static class IfcKeys
     public static string PsPad(string bk, string mark) => $"{bk}/ps/pad/{mark}";
     public static string Diaphragm(string bk, string support) => $"{bk}/diaphragm/{support}";
     public static string DiaphragmAccessory(string bk, string support, int n) => $"{bk}/diaphragm/{support}/acc/{n}";
+    /// <summary>Surface treatment region (IfcCovering), by its unique name "{treatment} - {region}".</summary>
+    public static string SurfaceTreatment(string bk, string name) => $"{bk}/surface/{name}";
 
     /// <summary>Unquoted 22-character IFC GlobalId of a key.</summary>
     public static string GlobalId(string key) => StepWriter.Guid(key).Trim('\'');

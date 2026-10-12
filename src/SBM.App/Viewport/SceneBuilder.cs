@@ -349,6 +349,9 @@ public static class SceneBuilder
             () => MiscLayer(models, o, "3D-LIGHTING", 230, 215, 90, e => e.Assumption == null && e.Group == SBM.Core.Misc.MiscGroup.Lighting && !e.Placeholder),
             () => MiscLayer(models, o, "3D-UNRESOLVED", 255, 110, 40, e => e.Assumption != null),
             () => MiscLayer(models, o, "3D-PLACEHOLDER", 200, 80, 200, e => e.Placeholder && e.Assumption == null, 0.55f),
+            // Architectural surface treatments: relief layers of the textured / thin-brick regions (flagged regions keep their layer; reason in the pick)
+            () => SurfaceLayer(models, o, "3D-THIN-BRICK", 150, 70, 45, k => k == SBM.Core.Bridge.SurfaceTreatmentKind.ThinBrick),
+            () => SurfaceLayer(models, o, "3D-FORM-LINER", 175, 150, 120, k => k != SBM.Core.Bridge.SurfaceTreatmentKind.ThinBrick),
             () =>
             {
                 var byTile = new Dictionary<(long, long), (List<Mesh> tubes, List<object> tags)>();
@@ -375,6 +378,17 @@ public static class SceneBuilder
         var results = new SolidLayer?[jobs.Length];
         Parallel.For(0, jobs.Length, i => results[i] = jobs[i]());
         scene.Solids.AddRange(results.OfType<SolidLayer>());
+    }
+
+    private static SolidLayer? SurfaceLayer(IReadOnlyList<SBM.Core.Substructure.SubstructureModel> models, Vec3 o, string name, byte r, byte g, byte b,
+        Func<SBM.Core.Bridge.SurfaceTreatmentKind, bool> pick)
+    {
+        var sel = models.Where(m => m.SurfaceTreatments != null).SelectMany(m => m.SurfaceTreatments!.Items).Where(e => !e.Mesh.IsEmpty && pick(e.Treatment.Kind)).ToList();
+        if (sel.Count == 0) return null;
+        var geo = FlatShaded(sel.Select(e => e.Mesh), o, sel.Select(e => (object)new NamedPick("Surface treatment", e.Name,
+            new[] { ("Info", e.Description), ("Area", $"{e.Area / 0.09290304:N1} SF"), ("Pattern", e.Treatment.Pattern), ("Orientation", e.Treatment.Orientation),
+                    ("UNRESOLVED", e.Assumption?.Reason ?? ""), ("Assumed", e.Assumption?.Basis ?? "") }.Where(x => x.Item2 != "").ToList())).ToList());
+        return new SolidLayer { Name = name, R = r, G = g, B = b, Parts = new() { (geo, null) }, Triangles = geo.Indices!.Count / 3 };
     }
 
     private static SolidLayer? MiscLayer(IReadOnlyList<SBM.Core.Substructure.SubstructureModel> models, Vec3 o, string name, byte r, byte g, byte b,

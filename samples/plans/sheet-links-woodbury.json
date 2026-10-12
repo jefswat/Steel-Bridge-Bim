@@ -4,9 +4,11 @@
   // docs/plan-data/woodbury-i29-floyd/INDEX.md (PDF page p = design sheet p-2 for pages 3-44).
   // Hierarchy in this model: unit > superstructure > prestressed girder (assembly: beam + strands) | cross frame group > cross frame
   //   (steel diaphragm: channel, gussets, fillers, bolts) | bearing pad; unit > deck > deck slab; unit > substructure > pier | abutment
-  //   (cap, pedestal step blocks, maskwall, columns, footings, piles; integral abutment: piles, wing extension wall / footing; built by
-  //   substructure-woodbury.csx since 2026-10-11 - the abutment pile caps are not built while their step risers are UNRESOLVED).
-  //   The concrete diaphragms are not in the database yet.
+  //   (cap, pedestal step blocks, maskwall, columns, footings, piles; integral abutment: stepped pile cap (category footing, risers per user
+  //   decision 11), piles, wing extension wall / footing; substructure-woodbury.csx); unit > deck > barrier group > barrier (Iowa aesthetic
+  //   barrier with the pier bump-outs, barrier-woodbury.csx; deck widenings are part of the deck slab); unit > surface treatment group
+  //   ("Form liner (barrier)", "Form liner (abutments)", "Integral thin veneer brick") > region elements (category "form liner" / "thin brick",
+  //   IfcCovering; surface-treatments-woodbury.csx). The concrete diaphragms are not in the database yet.
 
   "models": [ "Woodbury I-29 NB over Floyd.sbm" ],
   "planFolders": [ "plans", "C:/SBMData" ],
@@ -86,6 +88,19 @@
       "target": [ { "level": "group", "category": "footing group", "support": "Pier%" }, { "level": "element", "category": [ "footing", "pile" ], "support": "Pier%" } ] },
     { "id": "pier-aesthetics", "sheets": "^PIER AESTHETIC DETAILS", "basis": "Pier treatment (thin veneer brick)",
       "target": [ { "level": "group", "category": [ "cap group", "column group" ], "support": "Pier%" } ] },
+    { "id": "pier-thin-brick", "sheets": "^PIER AESTHETIC DETAILS", "basis": "Integral thin veneer brick on the columns and cap (Details A-E, notes, mockup)",
+      "target": [ { "level": "element", "category": "thin brick", "support": "Pier%" }, { "level": "group", "category": "surface treatment", "name": "%thin veneer brick%" } ] },
+    { "id": "abutment-texture-s", "sheets": "^SOUTH ABUTMENT DETAILS", "basis": "Note: abutment footing, diaphragm and wing extension include concrete texture (DS 42)",
+      "target": [ { "level": "element", "category": "form liner", "support": "S%Abut%" } ] },
+    { "id": "abutment-texture-n", "sheets": "^NORTH ABUTMENT DETAILS", "basis": "Note: abutment footing, diaphragm and wing extension include concrete texture (DS 42)",
+      "target": [ { "level": "element", "category": "form liner", "support": "N%Abut%" } ] },
+    { "id": "texture", "sheets": "^CONCRETE TEXTURE & RUSTICATION DETAILS", "basis": "Textured concrete (brick pattern form liner) and rustication notes, abutment / pier / barrier elevations",
+      "target": [ { "level": "group", "category": "surface treatment", "name": "%Form liner%" }, { "level": "element", "category": "form liner" },
+                  { "level": "element", "category": "thin brick", "name": "%bump-out%" } ] },
+    { "id": "berm-points", "sheets": "^SITUATION PLAN", "basis": "Berm slope location table (B points): bottom of the abutment form liner (1'-0 below the berm)",
+      "target": [ { "level": "element", "category": "form liner", "support": "%Abut%" } ] },
+    { "id": "slope-protection-berm", "sheets": "^CONCRETE SLOPE PROTECTION", "pages": [ 40 ], "basis": "Section A-A: berm 3'-0 at 1 in. per foot to the abutment face (top of berm at the wall)",
+      "target": [ { "level": "element", "category": "form liner", "support": "%Abut%" } ] },
     { "id": "south-abutment", "sheets": "^SOUTH ABUTMENT DETAILS", "basis": "South (integral) abutment: cap, piles, end diaphragm, beam seats",
       "target": [ { "level": "part", "category": "abutment", "support": "S%Abut%" }, { "level": "element", "category": "bearing pad", "support": "S%Abut%" } ] },
     { "id": "north-abutment", "sheets": "^NORTH ABUTMENT DETAILS", "basis": "North (integral) abutment: cap, piles, end diaphragm, beam seats",
@@ -128,19 +143,27 @@
       "target": [ { "level": "assembly", "category": "prestressed girder" }, { "level": "part", "category": "deck" } ] },
     { "id": "barrier", "sheets": "^BARRIER RAIL DETAILS", "basis": "Barrier rail profile, reinforcing and bar list",
       "target": [ { "level": "group", "category": "barrier group" }, { "level": "element", "category": "barrier" } ] },
+    { "id": "barrier-treatment", "sheets": "^BARRIER RAIL DETAILS", "pages": [ 38 ], "basis": "Part sections C-C / F-F (concrete texture on the back face), D-D / H-H (thin veneer brick on the bump-outs)",
+      "target": [ { "level": "element", "category": "form liner", "name": "%barrier%" }, { "level": "element", "category": "thin brick", "name": "%bump-out%" } ] },
+    { "id": "barrier-orientation", "sheets": "^SUPERSTRUCTURE DETAILS", "pages": [ 19 ], "basis": "Barrier rail orientation detail (perpendicular to the top of deck)",
+      "target": [ { "level": "element", "category": "barrier" } ] },
+    { "id": "barrier-bump-out-deck", "sheets": "^DECK PLAN & REINFORCEMENT", "basis": "Detail C: deck bump-out (1'-3 x 5'-2) at the CL piers = barrier bump-out locations",
+      "target": [ { "level": "element", "category": "barrier" } ] },
+    { "id": "brick-quantity", "sheets": "^ESTIMATED QUANTITIES", "basis": "Integral thin veneer brick for structural concrete 2,124 SF; concrete barrier railing, aesthetic 236.8 LF",
+      "target": [ { "level": "group", "category": "surface treatment", "name": "%thin veneer brick%" }, { "level": "group", "category": "barrier group" } ] },
     { "id": "lighting", "sheets": "^LIGHTING DETAILS", "basis": "Lighting",
       "target": [ { "level": "group", "category": "lighting" } ] }
   ],
 
   "hints": [
-    { "sheets": "PIER AESTHETIC", "suggests": "Thin veneer brick (pier aesthetics) is not modeled; the sheet links to the cap / column groups." },
-    { "sheets": "ABUTMENT DETAILS", "suggests": "Integral abutments: the stepped pile cap is NOT built (step riser positions UNRESOLVED, SUMMARY U13); piles, wing extension and casings (schedule) are." },
+    { "sheets": "PIER AESTHETIC", "suggests": "Thin veneer brick: modeled as surface treatment regions (relief layer + area) on the columns, cap faces and east end; the brick pattern itself is a property." },
+    { "sheets": "ABUTMENT DETAILS", "suggests": "Integral abutments: stepped pile cap with the risers 1'-9 past the lower beam (user decision 11); piles, wing extension, casings (schedule) and the form liner regions." },
     { "sheets": "LIGHTING", "suggests": "Lighting (poles, conduit, junction boxes) is not in this model." },
-    { "sheets": "BARRIER RAIL", "suggests": "Barrier: not generated in this model (Deck.Barrier.Type = None)." },
+    { "sheets": "BARRIER RAIL", "suggests": "Barrier: Iowa aesthetic barrier (custom section, rustication strips, pier bump-outs); barrier bars are not placed (p.39 bar list)." },
     { "sheets": "SLOPE PROTECTION", "suggests": "Slope protection under the bridge: no earthwork / slope-protection elements." },
     { "sheets": "SUBDRAIN", "suggests": "Subdrain behind the abutments: not modeled." },
     { "sheets": "BACKFILL", "suggests": "Abutment backfill: not modeled." },
-    { "sheets": "TEXTURE", "suggests": "Concrete texture / rustication (surface treatment): not modeled." },
+    { "sheets": "TEXTURE", "suggests": "Concrete texture: brick pattern form liner regions (barrier back face, abutment faces) with area and 1/4 in. relief layer; rustication strips are in the barrier solid." },
     { "sheets": "SOIL PROFILE", "suggests": "Soil borings: no geotechnical elements." }
   ]
 }
