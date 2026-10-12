@@ -620,6 +620,31 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
 - Per-row plan pedestals (OPTIONAL `SubstructureDefinition.PedestalSizeAlongAhead` / `PedestalSideAngleAheadDeg`, null = the common values):
   seats up-station of the CL pier (N > CapMidN) take their own along size / parallelogram angle (TxDOT "level 3'-0 seat" square to girders
   meeting the pier at different angles each side). Foreign seats of a shared pier keep their own girder numbering (`Girder` >= 1000).
+- Steel TIED ARCH (OPTIONAL `BridgeDefinition.Arch` = `Bridge/ArchDefinition.cs`, omitted from the .sbm when null; design note
+  `docs/plan-data/nht-0047-07-228/ARCH-DESIGN.md`): an arch is its OWN bridge with `Girders.Count = 0` (allowed only with `Arch`; FramingGenerator then
+  builds support lines only, `RunArchSupportsOnly`) whose supports are the arch piers WITHOUT SharedPier and with substructure disabled (the piers and the
+  fixed-elevation arch pedestals belong to the approach units; phase 2 skips arch bridges). `RegenerationCache` runs `SBM.Core.Arch.ArchGenerator`
+  (pure function framing -> `ArchModel`): bridge `Steel` = `ArchModel.Steel` (`SteelModel.Arch` back-reference; ALWAYS fully qualify `SBM.Core.Arch.ArchModel`
+  inside types that have an `Arch` member), `Concrete` = slab (`Deck`) + knuckle-zone slabs and curbs (`Haunches` = second deck body). Inputs in the LOCAL
+  structure CS (meters): `ArchFrameDefinition` (two plan WPs station/offset + their local X, origin elevation, tilt about the plan direction of a support line,
+  descending to +X; `ArchGenerator.BuildFrame`), named `Points`, ribs (circle through the chord ends, radius, inclination about the chord, AISC W bent about
+  the weak axis = web normal to the arch plane; pieces between splice points, end stubs below the first / above the last splice = KnucklePlate + Assumption when
+  `StubBottomZ` is set and >= 2 splices), ties (line / arc chain from a start point, start direction SOLVED so it closes on the end point, panel points by
+  distance; T section swept flat in local), hangers (straight strand between pin centres TC / HC, sockets as plan-letter envelopes A/B/G/L/W/dL/Db, fin plane =
+  cable x member tangent), floorbeams (between tie panel points, flange coplanar with the tie flanges, crowned web with the crown where the line crosses the
+  alignment), bracing (W shapes point to point), knuckles (end flange / end web / deck plate), deck (between the tie web faces, top = finished grade, corrugated
+  form deck profile -> slab bottom + sheet solid offset normal to the profile), bearings (stack built UP from the plan pedestal top, beveled upper sole, pin,
+  anchor bolts, `BearingSeat` with Location). Every plan-vs-plan difference = `ArchModel.Checks` + warning, never adjusted; `ArchDefinition.Unresolved` texts
+  and `SteelPart.Assumption` (new, OPTIONAL: IFC Pset SBM_Status) carry the UNRESOLVED items. New `PartCategory` (appended): ArchRib, TiePlate, FloorbeamPlate,
+  Hanger, HangerSocket, ArchBracing, KnucklePlate, FormDeck; `AssemblyKind`: ArchRib, ArchTie, ArchHanger, ArchFloorbeam, ArchBracing, ArchKnuckle, ArchDeckForm.
+  IFC: IfcMember ARCH_SEGMENT / SUSPENDER (IFC 4.3 has no CABLE) / BRACE, IfcPlate FLANGE/WEB_PLATE / SHEET / 'KNUCKLE_PLATE', IfcMechanicalFastener 'CABLE_SOCKET',
+  assemblies ARCH / GIRDER / SUSPENSIONASSEMBLY / CROSS_BRACING / 'KNUCKLE' / 'DECK_FORM' (IfcOpenShell 0 issues). Database: group "tied arch" with assembly
+  categories arch rib / tie girder / hanger / floorbeam / upper lateral bracing / knuckle / deck form / bearing (support from " at <pier>"); rules `arch-*`
+  in `sheet-links-nht.json` (selectors need `"bridge_group": "Arch span 10"` - the arch bridge name has no "Unit n"). Viewport layers 3D-ARCH-*.
+  NHT data: `samples/plans/arch-nht.csx` (run after build-nht.csx; finds Pier 10 / 11 in the approach bridges, reads the pier units' `FixedSeats` for the
+  seat tops; without an approach model builds a test alignment + 2 supports), `check-arch-nht.csx` (hangers / ribs / ties / floorbeams / bearings / deck /
+  weights vs plan tables / WireCo catalog). Not yet (v2): splice plates + bolts, fin plates, cable connectors, floorbeam connections / studs / PT slots,
+  knuckle detail plates, PT tendon solids, deck rebar, 2D sheets. Tests `ArchTests`.
 - NHT model check: `check-nht.csx` 414 PASS / 4 FAIL (2026-10-11; the 4 = arch pier cap / column CY vs the p.102 quantity table, +-0.3 CY).
 
 ## Conventions (bridge engineering)

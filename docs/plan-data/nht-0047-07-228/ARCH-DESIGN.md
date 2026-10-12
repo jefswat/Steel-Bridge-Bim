@@ -6,13 +6,13 @@ folder. This note fixes the data model and the generator before the code; sectio
 ## 1. Where the arch lives
 - The arch is its OWN `BridgeDefinition` ("Arch span 10") on the trail alignment with `Arch = ArchDefinition` (OPTIONAL, omitted from the
   .sbm when null -> every existing file and model is unchanged) and `Girders.Count = 0` (allowed only when `Arch` is set).
-- Its two supports are the arch piers ("Pier 10", "Pier 11") with `SharedPier` ids equal to the approach model's piers. The arch bridge never
-  builds substructure: the pier caps belong to the approach units (nht-approach `build-nht.csx`); the arch bearings reach them as FOREIGN
-  SEATS through the existing shared-pier mechanism (`RegenerationCache.ForeignSeats` takes seats with a plan `Location` from an arch bridge).
-- Script `samples/plans/arch-nht.csx` (run AFTER `build-nht.csx`) adds / replaces that bridge. Interface needed from the approach model:
-  alignment "CL NHT" (or the alignment named in `ARCH_ALIGNMENT`) with the TRAILNEW profile and the 1 % crown, and the pier 10 / 11 supports
-  (station, skew, SharedPier id) - read from the approach bridge whose supports are named "Pier 10" / "Pier 11"; without that model the script
-  builds its own test alignment (curves 104-107 + profile) and two supports.
+- Its two supports are the arch piers ("Pier 10", "Pier 11", same stations / skews as the approach units) WITHOUT a SharedPier link and with
+  substructure disabled: the pier caps and the fixed-elevation arch pedestals belong to the approach units ("NHT Unit 3" last support Pier 10,
+  "NHT Unit 4" first support Pier 11, CapBlocks "arch bearing south / north"). The arch bearings read the pedestal tops from the pier units'
+  `SubstructureUnit.FixedSeats` (nearest seat in plan; the plan distance CL bearing -> pedestal seat point is printed, ~1 1/8"). The bearing seats are
+  still published on `SteelModel.BearingSeats` with a plan Location (`RegenerationCache.ForeignSeats` can pass them to a shared pier if ever linked).
+- Script `samples/plans/arch-nht.csx` (run AFTER `build-nht.csx`) adds / replaces that bridge; without an approach model it builds its own test
+  alignment (curves 104-107 + TRAILNEW profile + 1 % crown) and two supports.
 
 ## 2. Local structure frame (p.119)
 `ArchFrameDefinition`: two plan work points WP1 / WP2 (station + offset on the alignment) with their local x (CL1 = -100.5 ft, CL2 = +100.5 ft),
