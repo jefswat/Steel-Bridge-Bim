@@ -32,7 +32,7 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   orchestration; `IfcKeys` = the key patterns behind the IFC GlobalIds, shared with `IfcExporter` — never change a pattern). Compact layout `el` +
   `strings` + `props`, readable VIEW `elements`; groups (no IFC entity) at the plans' granularity; links on groups/assemblies, children inherit
   (`v_element_sheets`). `tools/plan_split.py` splits plan PDFs. App: `MainWindow.Database.cs` + `SBM.App/Database/` (panel, preview window, `PdfOpener` = open at page).
-  Sheet links need no PDF split: rules files `samples/plans/sheet-links-{i80-rampg,woodbury,br02069,nht,odot-o}.json` carry each plan set's sheet index
+  Sheet links need no PDF split: rules files `samples/plans/sheet-links-{i80-rampg,woodbury,br02069,nht,odot-o,bonner-unit5}.json` carry each plan set's sheet index
   (`sheets: [{p,s,t}]`) and `models` (which .sbm they belong to; `CompanionDatabase.FindLinksFile` picks by it) + `planFolders` (PDF lookup ->
   `sheets.pdf_path`). Every build applies them; `CompanionDatabase.Relink` / `sbm db --relink` re-applies to an existing db; the app relinks on
   load when links are missing or the rules file is newer. A new bridge needs its own `sheet-links-<name>.json` with an index (tests check every rule matches a sheet).
@@ -710,6 +710,23 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   kg/m3, not in SteelMass), ArchConnectionPlate, ArchStiffener, PtStrand, PtAnchorage. Remaining GAPs: bracing U-point gussets (p.129-140), railing,
   duct, D3 bars, camber. Tests `ArchTests`, `ArchV2Tests`. Knuckle visual check without a snapshot: `temp`-style dump of part triangles + a small
   pymupdf painter's renderer (no matplotlib in the sandbox).
+- Precast PT SEGMENTAL box girder (OPTIONAL `BridgeDefinition.Segmental` = `Bridge/SegmentalDefinition.cs`, omitted from the .sbm when null; design note
+  `docs/plan-data/bonner-b2500/segmental-unit5/SEGMENTAL-DESIGN.md`): own bridge with `Girders.Count = 0` (support lines only, like the arch; supports =
+  bents with `Substructure.Enabled = false`). `SBM.Core.Segmental.SegmentalGenerator` (RegenerationCache phase 1 -> `ConcreteModel { Segmental = sm }`, no
+  deck; phase 2 takes `sm.Substructure` as the bridge's substructure): joints at their -L- stations, WP on the profile grade, joint plane normal to the graded
+  tangent and rotated by the cross slope (box square to the sloped top; soffit CL uphill of the WP vertical), segments = straight 3D chords, depth = printed
+  table at the joints + `ParabolaVertexX/Depth/Coefficient` reconstruction between (flagged), bent halves (soffit step `BentSoffitTransition`, solid
+  diaphragm `BentDiaphragm`, `SegmentalBent.DepthAtCl`), closures / end segments `ConstantDepth`. `SegmentalSection` (outline / void with R fillet, y DOWN
+  normal to the top), `SegmentalLoft` (ONE closed shell per segment, void on the hollow rings + void cap at a diaphragm). Tendons straight joint to joint in
+  their duct (`TendonLayout` Cantilever = tip faces of Dk / Uk, CentredOnClosure, FromEndSegment), transverse per segment type; bearings (generic block =
+  plan max plate x assumed height, top = pedestal top + height); bents as `SubstructureUnit`s (footing outline, column envelope, cap with taper, pedestals).
+  Results: `SegmentalModel` (Segments, Tendons, Bearings, BentRows = WP / soffit / DIM A / B per bent, Checks, Diagnostics), `SbmDocument.Segmental(name)`.
+  IFC: IfcElementAssembly GIRDER per cantilever > IfcBeam `.GIRDER_SEGMENT.` (ObjectType TYPICAL_SEGMENT / BENT_SEGMENT / CLOSURE_JOINT / END_SEGMENT; there is no
+  SEGMENT in IfcBeamTypeEnum) + IfcTendon STRAND (Pset SBM_Tendon), IfcBearing DISK; keys `IfcKeys.Seg*`. Database group "segmental box" > "segmental
+  cantilever" assemblies (`ModelDatabase.Segmental`). Viewport layers 3D-SEGMENTS / 3D-UNRESOLVED-SEGMENTS / 3D-PT-TENDONS / 3D-SEGMENTAL-BEARINGS. Bonner
+  Unit 5: `samples/plans/build-bonner-unit5.csx` (reads the segmental-unit5 CSVs; local grid alignment - coordinates p21-34 not extracted) ->
+  `Bonner Unit 5 segmental.sbm`, `check-bonner-unit5.csx` (169 PASS / 23 DIFF, all reported), links `sheet-links-bonner-unit5.json`. Tests `SegmentalTests`.
+  Not yet: 2D views, keys, rebar, temporary / bar PT, future PT pipes, blocks, openings, parapets, joints, piles, camber.
 - Project georeference (OPTIONAL `BridgeProject.Georeference` = `Project/GeoreferenceDefinition.cs`, null = local grid, omitted from the .sbm): CRS name,
   datum / projection / zone, map unit, `GridScale` (map / project distance, e.g. 1 / TxDOT SAF) -> IFC IfcProjectedCRS + IfcMapConversion Scale with the
   base point converted to grid units; the model is never moved. NHT: EPSG:2276 x Dallas County SAF 1.000136 (U12 resolved from a user GPS check).
