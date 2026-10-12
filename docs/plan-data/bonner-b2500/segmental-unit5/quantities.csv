@@ -1,0 +1,15 @@
+category,item,value,unit,source,tag,note
+transverse PT,typical 14' segments (count used in table),242,each,S3-34 p282,TEXT/RASTER,"= 2 x 13 (spans 19, 29) + 9 x 24 (spans 20-28): checked"
+transverse PT,"closure joints 4'-0"" / 3'-6""",9 / 2,each,S3-34 p282,TEXT/RASTER,"spans 20-28 / spans 19, 29: checked"
+transverse PT,total tendon/bar weight in superstructure,121624,lb,S3-34 p282,TEXT/RASTER,119161 + 2216 + 247
+longitudinal PT,"sum of plan 'total weight' column, T tendons (cantilever)",774968,lb,S3-57/58 p305-306,DERIVED (sum of csv),weights = 0.74 lb/ft/strand x strands x length: checked all 217 rows
+longitudinal PT,"sum, B tendons (bottom slab continuity)",267524,lb,S3-58 p306,DERIVED,
+longitudinal PT,"sum, C tendons (closure/top continuity)",25716,lb,S3-58 p306,DERIVED,
+longitudinal PT,"sum, all rows of pt-tendon-schedule.csv",1068208,lb,S3-57/58,DERIVED,plan prints no unit total: UNRESOLVED whether schedule is complete (T6 listed only for bents 22-25)
+reinforcing,typical segment XX-D3/U3 mild steel (plan BOM),8511,lb,S3-22 p270,RASTER,sum of 17 bar rows
+segment weights,end segment to be lifted,110,ton,S3-23 p271 note 9,TEXT,
+segment weights,split bent segment to be lifted,100,ton,S3-29 p277 note 6,TEXT,
+substructure CIP,"footing concrete per bent 18/29, 19, 20-22 & 25, 23-24, 26-28",282.4 / 338.1 / 467.2 / 631.6 / 338.1,CY,"BOM p336, 339, 342, 347, 350, 353",TEXT,
+substructure CIP,"stainless CIP reinforcing per bent 18/29, 19, 20-22, 23-24, 25, 26-28",47416 / 98356 / 110826 / 196360 / 106045 / 93322,lb,BOM same pages,TEXT,BOM notes: quantities are for CIP only; precast elements in working drawings
+substructure,36in sq PS piles per bent 18..29 (count),"18,20,24,24,24,30,30,24,24,24,24,18",each,S3-03..05 p251-253 and BOM,RASTER+TEXT,total 284 = sum
+superstructure concrete,"not given in S3 sheets (no unit concrete volume, strand or total mild-steel quantity)",,,,UNRESOLVED,see SUMMARY UNRESOLVED
