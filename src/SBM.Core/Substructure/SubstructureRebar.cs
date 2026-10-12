@@ -24,6 +24,7 @@ public sealed partial class SubstructureGenerator
             var r = unit.Definition.Reinforcement;
             if (!r.Enabled) continue;
             var bars = new List<RawBar>();
+            if (r.PlanBarSets.Count > 0) { PlanSetBars(m, unit); continue; }
             if (unit.Abutment != null) { AbutmentBars(m, unit); continue; }
             if (r.CapBars.Count > 0) CapPlanBars(unit, bars); else CapBars(unit, bars);
             if (unit.Backwall != null) BackwallBars(unit, bars);
@@ -42,6 +43,27 @@ public sealed partial class SubstructureGenerator
             perUnit.Add((unit, bars));
         }
         foreach (var (unit, bars) in perUnit) AssignMarks(m, unit, bars);
+    }
+
+    /// <summary>Explicit plan bars (<see cref="PlanBarSet"/>) of a unit: marks + bars in the unit frame, clear cover against the unit's concrete solids
+    /// (cap, pedestals, cap blocks, columns, shafts, footings, backwall - their union) -> <see cref="SubstructureUnit.CoverViolations"/> + warnings.</summary>
+    private void PlanSetBars(SubstructureModel m, SubstructureUnit unit)
+    {
+        var r = unit.Definition.Reinforcement;
+        var hosts = unit.Solids.Where(s => s.IsConcrete).Select(s => s.Mesh).ToList();
+        var res = PlanBarSetBuilder.Build(r.PlanBarSets, p => unit.World(p.X, p.Y, p.Z), unit.Name, "Sub", hosts, r.EpoxyCoated);
+        foreach (var v in res.Violations)
+        {
+            double s = Vec2.Dot(v.At.XY - unit.Origin, unit.D), n = Vec2.Dot(v.At.XY - unit.Origin, unit.N);
+            unit.CoverViolations.Add(new CoverViolation($"{v.Location} #{v.Bar + 1}", v.Mark, v.Excess, v.Face, s, n, v.At.Z));
+        }
+        foreach (var w in res.Warnings) Warn(w);
+        lock (m)
+        {
+            m.Marks.AddRange(res.Marks);
+            m.Bars.AddRange(res.Bars);
+            m.Notes.AddRange(res.Notes);
+        }
     }
 
     private double Lap(RebarSize size, SubstructureReinforcementDefinition r, double cover, double spacing) =>

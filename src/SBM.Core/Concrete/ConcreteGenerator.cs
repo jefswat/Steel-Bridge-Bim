@@ -101,6 +101,8 @@ public sealed class ConcreteModel
     public List<TaggedSurface> TaggedSurfaces { get; } = new();
     public List<BarMark> Marks { get; } = new();
     public List<BarPlacement> Bars { get; } = new();
+    /// <summary>Cover violations of explicit plan bars (<see cref="Bridge.PlanBarSet"/>), bars kept as placed.</summary>
+    public List<PlanBarCoverViolation> CoverViolations { get; } = new();
     public List<string> Notes { get; } = new();
     public List<Diagnostic> Diagnostics { get; } = new();
     /// <summary>Exact-geometry option: what was built as NURBS (null when the option is off).</summary>
@@ -166,10 +168,37 @@ public sealed partial class ConcreteGenerator
         Parallel.ForEach(tasks, t => t());
         var bars = new ConcurrentBag<(string series, RebarSize size, BarShape shape, string loc, bool epoxy, BarPlacement placement)>();
         var rebarTasks = new List<Action>();
-        if (Deck.Reinforcement.Enabled) rebarTasks.Add(Deck.Reinforcement.Plan != null ? BuildPlanDeckRebar : () => BuildDeckRebar(bars));
+        if (Deck.Reinforcement.Enabled)
+        {
+            if (Deck.Reinforcement.Plan != null) rebarTasks.Add(BuildPlanDeckRebar);
+            else if (Deck.Reinforcement.PlanBarSets.Count == 0) rebarTasks.Add(() => BuildDeckRebar(bars));
+            if (Deck.Reinforcement.PlanBarSets.Count > 0) rebarTasks.Add(BuildPlanBarSets);
+        }
         if (Deck.Barrier.Type == BarrierType.TxDotSstr && Deck.Barrier.Reinforcement) rebarTasks.Add(() => BuildSstrRebar(bars));
         Parallel.ForEach(rebarTasks, t => t());
         AssignMarks(bars);
+    }
+
+    /// <summary>Explicit plan bar sets of the deck (<see cref="PlanBarSet"/>, project coordinates): marks + bars, clear cover against the deck concrete
+    /// (slab, haunches, bump-outs, barriers / curbs, joint blockouts) -> warnings and <see cref="ConcreteModel.CoverViolations"/>.</summary>
+    private void BuildPlanBarSets()
+    {
+        var hosts = new List<Mesh>();
+        if (_m.Deck != null) hosts.Add(_m.Deck);
+        if (_m.Haunches != null) hosts.Add(_m.Haunches);
+        hosts.AddRange(_m.DeckBumps.Select(b => b.Mesh));
+        hosts.AddRange(_m.Barriers.Select(b => b.Mesh));
+        hosts.AddRange(_m.Joints.Select(j => j.Blockout));
+        hosts.AddRange(_m.Joints.Where(j => j.EndBlock != null).Select(j => j.EndBlock!.Mesh));
+        var res = PlanBarSetBuilder.Build(Deck.Reinforcement.PlanBarSets, p => p, "", "Deck", hosts, Deck.Reinforcement.EpoxyCoated);
+        foreach (var w in res.Warnings) Warn(w);
+        lock (_m)
+        {
+            _m.Marks.AddRange(res.Marks);
+            _m.Bars.AddRange(res.Bars);
+            _m.Notes.AddRange(res.Notes);
+            _m.CoverViolations.AddRange(res.Violations);
+        }
     }
 
     // ================================================================== surfaces & end lines

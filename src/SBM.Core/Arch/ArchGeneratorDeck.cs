@@ -19,19 +19,21 @@ public static partial class ArchGenerator
         private (List<Vec2> m, List<Vec2> e, List<double> S)? DeckLine()
         {
             if (_deck is not { } dd) return null;
-            var m = new List<Vec2>(); var e = new List<Vec2>();
+            var m = new List<Vec2>(); var e = new List<Vec2>(); var hw = new List<double>();
             for (int k = 0; k + 1 < dd.knots.Count; k++)
                 for (int i = 0; i < 8; i++)
                 {
                     double t = i / 8.0;
                     var a = dd.ts.At(dd.knots[k].s + (dd.knots[k + 1].s - dd.knots[k].s) * t).p;
                     var b = dd.tn.At(dd.knots[k].n + (dd.knots[k + 1].n - dd.knots[k].n) * t).p;
-                    m.Add((a + b) * 0.5); e.Add((b - a).Normalized());
+                    m.Add((a + b) * 0.5); e.Add((b - a).Normalized()); hw.Add((b - a).Length / 2);
                 }
             {
                 var a = dd.ts.At(dd.knots[^1].s).p; var b = dd.tn.At(dd.knots[^1].n).p;
-                m.Add((a + b) * 0.5); e.Add((b - a).Normalized());
+                m.Add((a + b) * 0.5); e.Add((b - a).Normalized()); hw.Add((b - a).Length / 2);
             }
+            hw.Insert(0, hw[0]); hw.Add(hw[^1]);
+            _deckHalfWidth = hw;
             // Extend to the end web inside faces.
             double ext0 = dd.ka is { } k0 ? k0.EndWebOffset - k0.EndWebThickness : 0, ext1 = dd.kb is { } k1 ? k1.EndWebOffset - k1.EndWebThickness : 0;
             var t0 = (m[1] - m[0]).Normalized(); var t1 = (m[^1] - m[^2]).Normalized();
@@ -40,6 +42,19 @@ public static partial class ArchGenerator
             var S = new List<double> { 0 };
             for (int i = 1; i < m.Count; i++) S.Add(S[^1] + (m[i] - m[i - 1]).Length);
             return (m, e, S);
+        }
+
+        /// <summary>Half distance between the tie CLs along each <see cref="DeckLine"/> sample (same indices), set by DeckLine.</summary>
+        private List<double>? _deckHalfWidth;
+
+        private double HalfWidthAt((List<Vec2> m, List<Vec2> e, List<double> S) dl, double s)
+        {
+            var hw = _deckHalfWidth!;
+            int i = dl.S.BinarySearch(s);
+            if (i < 0) i = ~i;
+            i = Math.Clamp(i, 1, dl.S.Count - 1);
+            double t = (s - dl.S[i - 1]) / Math.Max(1e-12, dl.S[i] - dl.S[i - 1]);
+            return hw[i - 1] + (hw[i] - hw[i - 1]) * Math.Clamp(t, 0, 1);
         }
 
         private static (Vec2 m, Vec2 e) AtS((List<Vec2> m, List<Vec2> e, List<double> S) dl, double s)
@@ -76,11 +91,16 @@ public static partial class ArchGenerator
             Vec3 Top(Vec2 p, double below) => W(p.WithZ(GradeZ(p.X, p.Y) - below));
             // Transverse bars.
             var aBars = new List<Vec3[]>(); var bBars = new List<Vec3[]>();
-            int nT = (int)Math.Floor((Lt - 2 * rb.EndCover) / rb.TransSpacing) + 1;
-            double s0 = (Lt - (nT - 1) * rb.TransSpacing) / 2;
+            int nT = rb.TransCount > 1 ? rb.TransCount : (int)Math.Floor((Lt - 2 * rb.EndCover) / rb.TransSpacing) + 1;
+            double sp = rb.TransCount > 1 ? (Lt - 2 * rb.EndCover) / (nT - 1) : rb.TransSpacing;
+            double s0 = (Lt - (nT - 1) * sp) / 2;
+            if (rb.TransCount > 1 && sp > rb.TransSpacing + In(1.0 / 32))
+                Warn($"Arch deck: {nT} transverse rows (bill count) over {L(Lt - 2 * rb.EndCover)} are {sp / In(1):0.00}\" apart, over the {rb.TransSpacing / In(1):0.##}\" maximum of the deck plan - the bill count is modeled.");
+            var hookInfo = new List<(double lap, double dev)>();
             for (int i = 0; i < nT; i++)
             {
-                var (m, e) = AtS(dl, s0 + i * rb.TransSpacing);
+                double sRow = s0 + i * sp;
+                var (m, e) = AtS(dl, sRow);
                 // B: centred on the structure CL.
                 bBars.Add(new[] { W((m - e * rb.BottomTransLength / 2).WithZ(zB)), W((m + e * rb.BottomTransLength / 2).WithZ(zB)) });
                 // A: centred where the ring crosses CL NHT, following the crown (3 points per foot).
@@ -88,8 +108,43 @@ public static partial class ArchGenerator
                 double lo = -rb.BottomTransLength / 2, hi = rb.BottomTransLength / 2, flo = Off(lo);
                 for (int it = 0; it < 50; it++) { double md = (lo + hi) / 2, fm = Off(md); if (Math.Sign(fm) == Math.Sign(flo)) { lo = md; flo = fm; } else hi = md; }
                 double yc = (lo + hi) / 2;
-                int np = Math.Max(2, (int)Math.Ceiling(rb.TopTransLength / Ft(1)) * 2);
-                aBars.Add(Enumerable.Range(0, np + 1).Select(k => Top(m + e * (yc - rb.TopTransLength / 2 + rb.TopTransLength * k / np), rb.TopCover + dA / 2)).ToArray());
+                if (rb.TopTransPerRow == 2)
+                {
+                    // two hooked bars per row (p.152): drop leg TopTransHookOffset inside each tie CL, return on top of the bottom bar, top run = listed - drop - return
+                    double hw = HalfWidthAt(dl, sRow);
+                    double zRet = zB + dA;
+                    double inner0 = double.NaN, inner1 = double.NaN;
+                    foreach (int side in new[] { -1, 1 })
+                    {
+                        double yHook = side * (hw - rb.TopTransHookOffset);
+                        var top0 = Top(m + e * yHook, rb.TopCover + dA / 2);
+                        var bot0 = W((m + e * yHook).WithZ(zRet));
+                        double drop = (top0 - bot0).Length;
+                        double run = rb.TopTransLength - drop - rb.TopTransHookReturn;
+                        double yIn = yHook - side * run;
+                        int npt = Math.Max(2, (int)Math.Ceiling(run / Ft(1)) * 2);
+                        var pts = new List<Vec3> { W((m + e * (yHook - side * rb.TopTransHookReturn)).WithZ(zRet)), bot0 };
+                        for (int k = 0; k <= npt; k++) pts.Add(Top(m + e * (yHook + (yIn - yHook) * k / npt), rb.TopCover + dA / 2));
+                        pts.Reverse();
+                        aBars.Add(pts.ToArray());
+                        if (side < 0) inner0 = yIn; else inner1 = yIn;
+                        double dev = 0; for (int k = 1; k < pts.Count; k++) dev += (pts[k] - pts[k - 1]).Length;
+                        hookInfo.Add((0, dev));
+                    }
+                    hookInfo[^1] = (inner0 - inner1, hookInfo[^1].dev);
+                }
+                else
+                {
+                    int np = Math.Max(2, (int)Math.Ceiling(rb.TopTransLength / Ft(1)) * 2);
+                    aBars.Add(Enumerable.Range(0, np + 1).Select(k => Top(m + e * (yc - rb.TopTransLength / 2 + rb.TopTransLength * k / np), rb.TopCover + dA / 2)).ToArray());
+                }
+            }
+            if (hookInfo.Count > 0)
+            {
+                var laps = hookInfo.Where(h => h.lap != 0).Select(h => h.lap).ToList();
+                Model.Checks.Add(new ArchCheck($"deck bar {rb.TopTransMark}: two hooked bars per row, centre lap (p.152 '2'-8\" min. lap')", $">= {L(Ft(2) + In(8))}",
+                    $"{L(laps.Min())} - {L(laps.Max())} (listed {L(rb.TopTransLength)}, hook {L(rb.TopTransHookOffset)} inside the tie CL, return {L(rb.TopTransHookReturn)})",
+                    laps.Min() - (Ft(2) + In(8)), laps.Min() >= Ft(2) + In(8) - In(1.0 / 16)));
             }
             // Longitudinal lines: grid about the structure CL, split into bars with laps from the west end.
             var d1 = new List<Vec3[]>(); var d2 = new List<Vec3[]>();
@@ -109,7 +164,16 @@ public static partial class ArchGenerator
                 d1.AddRange(SplitBars(top, rb.LongBarLength, rb.LongLap));
                 d2.AddRange(SplitBars(bot, rb.LongBarLength, rb.LongLap));
             }
-            AddBars(rb.TopTransMark, sz, "Arch deck top transverse (p.152)", aBars);
+            if (rb.TopTransPerRow == 2)
+            {
+                var aShape = new BarShape
+                {
+                    Code = "HOOK", Description = "Top transverse, hooked down at the deck edge with a return lapping the bottom bar (p.152)", FixedLength = rb.TopTransLength,
+                    Centerline = new[] { new Vec2(0, 0), new Vec2(Ft(10), 0), new Vec2(Ft(10), -In(5)), new Vec2(Ft(10) - rb.TopTransHookReturn, -In(5)) },
+                };
+                AddBars(rb.TopTransMark, sz, "Arch deck top transverse, two per row lapped at CL NHT, hooked at the tie (p.152)", aBars, aShape);
+            }
+            else AddBars(rb.TopTransMark, sz, "Arch deck top transverse (p.152)", aBars);
             AddBars(rb.BottomTransMark, sz, "Arch deck bottom transverse (p.152)", bBars);
             AddBars(rb.TopLongMark, sz, "Arch deck top longitudinal (p.152)", d1);
             AddBars(rb.BottomLongMark, sz, "Arch deck bottom longitudinal, one in each corrugation (p.152)", d2);
@@ -133,9 +197,10 @@ public static partial class ArchGenerator
                         Vec3 Pt(double u, double z) => (p0 + dir.Normalized() * u).WithZ(z);
                         return new[] { Pt(-hw, top), Pt(hw, top), Pt(hw, top - hh), Pt(-hw, top - hh), Pt(-hw, top) };
                     }
-                    int ns = (int)Math.Floor((st1 - st0) / rb.TransSpacing) + 1;
-                    double a0 = st0 + ((st1 - st0) - (ns - 1) * rb.TransSpacing) / 2;
-                    for (int i = 0; i < ns; i++) sBars.Add(Loop(a0 + i * rb.TransSpacing));
+                    int ns = rb.CurbStirrupCount > 1 ? rb.CurbStirrupCount : (int)Math.Floor((st1 - st0) / rb.TransSpacing) + 1;
+                    double csp = rb.CurbStirrupCount > 1 ? (st1 - st0) / (ns - 1) : rb.TransSpacing;
+                    double a0 = st0 + ((st1 - st0) - (ns - 1) * csp) / 2;
+                    for (int i = 0; i < ns; i++) sBars.Add(Loop(a0 + i * csp));
                     // Corner bars inside the stirrup corners, lapped like the deck bars.
                     foreach (var (u, zz) in new[] { (-1, 0), (1, 0), (-1, 1), (1, 1) })
                     {
@@ -155,6 +220,34 @@ public static partial class ArchGenerator
                     Centerline = new[] { new Vec2(0, 0), new Vec2(rb.CurbStirrupWidth, 0), new Vec2(rb.CurbStirrupWidth, rb.CurbStirrupHeight), new Vec2(0, rb.CurbStirrupHeight), new Vec2(0, 0) } };
                 AddBars(rb.CurbStirrupMark, st, "Arch curb stirrups (p.152)", sBars, sShape);
                 AddBars(rb.CurbLongMark, sz, "Arch curb longitudinal (p.152)", cBars);
+            }
+            // Edge bars (D3): one per tie per panel between consecutive floorbeam lines, centred, along the tie at EdgeBarOffset inside its CL, bottom bar level,
+            // up-hooks with returns at both ends ("BAR D3": 5'-9 + 2 x (5 + 5)).
+            if (rb.EdgeBarMark != "" && rb.EdgeBarLength > 0 && _deck is { } d3)
+            {
+                var dBars = new List<Vec3[]>();
+                double zE = zD2, h = rb.EdgeBarHook;
+                for (int k = 0; k + 1 < d3.knots.Count; k++)
+                    foreach (var (tie, other, s0k, s1k) in new[] { (d3.ts, d3.tn, d3.knots[k].s, d3.knots[k + 1].s), (d3.tn, d3.ts, d3.knots[k].n, d3.knots[k + 1].n) })
+                    {
+                        double sm = (s0k + s1k) / 2;
+                        var (pc, ang) = tie.At(sm);
+                        var t = Vec2.FromAngle(ang);
+                        var oth = other == d3.ts ? d3.ts.At(d3.knots[k].s).p : d3.tn.At(d3.knots[k].n).p;
+                        var inward = t.Left; if (Vec2.Dot(inward, oth - pc) < 0) inward = -inward;
+                        var c = pc + inward * rb.EdgeBarOffset;
+                        // the bar follows the tie chord between the hook ends (panels are 5'-10 to 6'-1 3/4 on R 342'-4 / 360'-8: the sagitta is 1/64")
+                        double half = rb.EdgeBarLength / 2 - dA / 2;
+                        Vec3 P(double u, double z) => W((c + t * u).WithZ(z));
+                        double ri = half + dA / 2 - h;  // return end: the hook's out-to-out return measured from the outside of the up leg
+                        dBars.Add(new[] { P(-ri, zE + h - dA), P(-half, zE + h - dA), P(-half, zE), P(half, zE), P(half, zE + h - dA), P(ri, zE + h - dA) });
+                    }
+                var dShape = new BarShape
+                {
+                    Code = "U2H", Description = "Edge bar, up-hooks with returns at both ends (p.154 BAR D3)", FixedLength = rb.EdgeBarLength + 4 * rb.EdgeBarHook,
+                    Centerline = new[] { new Vec2(h, h), new Vec2(0, h), new Vec2(0, 0), new Vec2(rb.EdgeBarLength, 0), new Vec2(rb.EdgeBarLength, h), new Vec2(rb.EdgeBarLength - h, h) },
+                };
+                AddBars(rb.EdgeBarMark, sz, "Arch deck edge bars along the tie webs, one per tie per floorbeam panel (p.152 / 154)", dBars, dShape);
             }
             if (rb.Unresolved.Length > 0) Warn(rb.Unresolved);
         }
