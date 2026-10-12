@@ -102,7 +102,7 @@ public sealed partial class UnitSystem
         int ft = (int)Math.Floor(rounded / 12.0 + 1e-9);
         double inches = rounded - ft * 12.0;
         if (inches < 0) inches = 0;
-        return (neg ? "-" : "") + ft.ToString(Inv) + "'-" + FormatInchValue(inches) + "\"";
+        return (neg ? "-" : "") + ft.ToString(Inv) + "'-" + FormatInchValue(inches, zeroWhole: true) + "\"";
     }
 
     public string FormatInches(double inches)
@@ -111,7 +111,8 @@ public sealed partial class UnitSystem
         return (neg ? "-" : "") + FormatInchValue(Math.Abs(inches)) + "\"";
     }
 
-    private string FormatInchValue(double inches)
+    /// <param name="zeroWhole">Feet-inches form: write the zero inches before a fraction (8'-0 5/16", as the plans print).</param>
+    private string FormatInchValue(double inches, bool zeroWhole = false)
     {
         double rounded = Math.Round(inches * InchFraction) / InchFraction;
         int whole = (int)Math.Floor(rounded + 1e-9);
@@ -120,7 +121,7 @@ public sealed partial class UnitSystem
         int den = InchFraction;
         int g = Gcd(num, den);
         num /= g; den /= g;
-        return whole == 0 ? $"{num}/{den}" : $"{whole} {num}/{den}";
+        return whole == 0 && !zeroWhole ? $"{num}/{den}" : $"{whole} {num}/{den}";
     }
 
     private static int Gcd(int a, int b) => b == 0 ? a : Gcd(b, a % b);
