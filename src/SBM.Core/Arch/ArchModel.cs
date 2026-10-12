@@ -28,6 +28,8 @@ public sealed class ArchModel
     public List<(string Name, List<Vec3> Path, string Description)> Tendons { get; } = new();
     /// <summary>Deck slab and curb meshes (also in <see cref="Concrete"/>).</summary>
     public Mesh? Slab { get; set; }
+    /// <summary>Slab over the knuckles (end line to the first / last floorbeam, on the knuckle deck plates).</summary>
+    public Mesh? SlabEnds { get; set; }
     public Mesh? Curbs { get; set; }
     public double SlabArea { get; set; }
     public List<Diagnostic> Diagnostics => Steel.Diagnostics;

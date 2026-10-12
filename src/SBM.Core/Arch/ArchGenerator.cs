@@ -611,10 +611,12 @@ public static class ArchGenerator
             }
 
             var slab = new Mesh();
+            var ends = new Mesh();   // knuckle zones: separate closed solids (they touch the main slab at the first / last floorbeam)
             var sheet = new Mesh();
             double area = 0;
             void Zone(int k0, int k1, bool form, double ext0z, double ext1z)
             {
+                var target = form ? slab : ends;
                 var rings = new List<Vec3[]>();
                 var srings = new List<Vec3[]>();
                 for (int k = k0; k < k1; k++)
@@ -636,7 +638,7 @@ public static class ArchGenerator
                 var ex2 = (r0[^1] - r0[0]).Normalized();
                 var ez = _fr.Z;
                 var sec = r0.Select(p => new Vec2(Vec3.Dot(p - r0[0], ex2), Vec3.Dot(p - r0[0], ez))).ToArray();
-                MeshBuilder.AddLoft(slab, sec, rings);
+                MeshBuilder.AddLoft(target, sec, rings);
                 for (int i = 0; i + 1 < rings.Count; i++)
                 {
                     // Top surface strip between two rings (top polyline = the last topN + 1 points).
@@ -658,11 +660,16 @@ public static class ArchGenerator
             Model.Slab = slab;
             Model.SlabArea = area;
             Model.Concrete.Deck = slab;
+            Model.SlabEnds = ends;
             AddAssembly("FORM-DECK", AssemblyKind.ArchDeckForm, "Corrugated steel deck form spanning the floorbeams");
             var fasu = dk.FormUnresolved.Length > 0 ? Assumption.Unresolved(dk.FormUnresolved, $"pitch {L(dk.FormPitch)}, top flat {L(dk.FormTopFlat)}, flute bottom {L(dk.FormFluteBottom)}") : null;
             AddPart("FORM-DECK", PartCategory.FormDeck, "FORM-DECK", dk.FormDescription.Length > 0 ? dk.FormDescription : $"{L(dk.FormDepth)} x {L(dk.FormPitch)} steel deck form", sheet,
                 "ASTM A653 Gr. 33, G165 galvanized", 0, 0, fasu);
             BuildCurbs(dk, ka, kb);
+            // Second body of the deck IfcSlab (ConcreteModel.Haunches = the extra deck items): knuckle-zone slab and curbs.
+            var extra = new Mesh();
+            foreach (var mm in new[] { Model.SlabEnds, Model.Curbs }) if (mm != null) Append(extra, mm);
+            Model.Concrete.Haunches = extra;
             foreach (var t in dk.Tendons) Model.Tendons.Add((t.Name, t.Path.Select(p => W(p.Vec)).ToList(), t.Description));
         }
 
@@ -703,7 +710,14 @@ public static class ArchGenerator
                 MeshBuilder.AddLoft(curbs, sec!, rings);
             }
             Model.Curbs = curbs;
-            Model.Concrete.Haunches = curbs;
+
+        }
+
+        private static void Append(Mesh dst, Mesh src)
+        {
+            int b = dst.Positions.Count;
+            dst.Positions.AddRange(src.Positions);
+            dst.Indices.AddRange(src.Indices.Select(i => i + b));
         }
 
         /// <summary>Station where the alignment offset line crosses a plan line (NaN if not within the alignment).</summary>
