@@ -174,6 +174,13 @@ public static class SceneBuilder
         ("3D-WELDS", 240, 80, 60, new[] { PartCategory.Weld }),
         ("3D-INSPECTION", 120, 195, 150, new[] { PartCategory.InspectionBracket, PartCategory.InspectionCable, PartCategory.Grating,
             PartCategory.WalkwayStringer, PartCategory.WalkwayPost, PartCategory.WalkwayRail, PartCategory.WalkwayPlate }),
+        ("3D-ARCH-RIBS", 70, 130, 200, new[] { PartCategory.ArchRib }),
+        ("3D-ARCH-TIES", 60, 110, 190, new[] { PartCategory.TiePlate }),
+        ("3D-ARCH-FLOORBEAMS", 90, 150, 210, new[] { PartCategory.FloorbeamPlate }),
+        ("3D-ARCH-HANGERS", 215, 215, 225, new[] { PartCategory.Hanger, PartCategory.HangerSocket }),
+        ("3D-ARCH-BRACING", 80, 200, 110, new[] { PartCategory.ArchBracing }),
+        ("3D-ARCH-KNUCKLES", 235, 185, 70, new[] { PartCategory.KnucklePlate }),
+        ("3D-ARCH-FORM-DECK", 175, 180, 190, new[] { PartCategory.FormDeck }),
     };
 
     /// <summary>Detail layers are split into square tiles (m) so the viewport can draw only tiles near the view.</summary>

@@ -3,7 +3,7 @@
   // Format: see sheet-links-i80-rampg.json (header) and docs/API.md "Companion database". Sheet index: docs/plan-data/nht-0047-07-228/INDEX.md
   // (PDF p.1-82 roadway / walls / drainage / utilities - indexed, no model elements; p.83-155 bridge, sheets 134-205; p.130 duplicates p.129).
   // Model (build-nht.csx): bridge group "NHT", bridges "NHT Unit 1" .. "NHT Unit 5" (the 14 Tx28 approach spans); span 10 (the tied arch, p.90,
-  // 92-93, 107 bearings, 119-155) is a separate model (Arch/) - its sheets link only the arch piers' arch pedestals here.
+  // 92-93, 107 bearings, 119-155) is the bridge "Arch span 10" added by arch-nht.csx (rules arch-* below).
   "models": [ "Northaven NHT.sbm" ],
   "planFolders": [ "plans", "C:/SBMData" ],
   "planSets": [
@@ -217,12 +217,37 @@
       "target": [ { "level": "part", "category": "deck", "unit": "Unit 4" }, { "level": "assembly", "category": "prestressed girder", "unit": "Unit 4" } ] },
     { "id": "unit-5", "sheets": "^168\\.00' PRESTR CONC GIRDER UNIT", "basis": "Unit spans 13-15: deck plan, section depths, deflections",
       "target": [ { "level": "part", "category": "deck", "unit": "Unit 5" }, { "level": "assembly", "category": "prestressed girder", "unit": "Unit 5" } ] },
+    { "id": "arch-typical", "sheets": "^TYPICAL SECTIONS ARCH SPAN", "basis": "Arch typical section: ties 18'-4, curbs, deck on steel deck forms, 1% crown",
+      "target": [ { "level": "part", "category": "deck", "bridge_group": "Arch span 10" }, { "level": "assembly", "category": [ "tie girder", "floorbeam" ], "bridge_group": "Arch span 10" } ] },
+    { "id": "arch-erection", "sheets": "^SUGGESTED ERECTION SEQUENCE", "role": "general", "basis": "Arch built off line, tie / rib segments, SPMT roll-in",
+      "target": [ { "level": "group", "category": "tied arch", "bridge_group": "Arch span 10" } ] },
+    { "id": "arch-bearing-steel", "sheets": "^ELASTOMERIC BEARINGS ARCH SPAN", "basis": "Arch bearings: 15 x 15 elastomer, beveled upper sole, masonry plate, anchor bolts / pin",
+      "target": [ { "level": "assembly", "category": "bearing", "bridge_group": "Arch span 10" } ] },
+    { "id": "arch-geometry", "sheets": "^ARCH SPAN GEOMETRY AND LAYOUT", "basis": "Local CS, work points, rib circle R 126'-0 / rise 50'-0 / 5 deg, rib and tie splice tables",
+      "target": [ { "level": "assembly", "category": [ "arch rib", "tie girder" ], "bridge_group": "Arch span 10" } ] },
+    { "id": "arch-forces", "sheets": "^ARCH SPAN MEMBER FORCE", "role": "general", "basis": "Member force tables (rib, tie, hangers)",
+      "target": [ { "level": "assembly", "category": [ "arch rib", "tie girder", "hanger" ], "bridge_group": "Arch span 10" } ] },
+    { "id": "arch-knuckle", "sheets": "^ARCH SPAN KNUCKLE JOINT", "basis": "Knuckles: end flange 2\" x 32\", end web, deck plate, rib stub, PT anchorages",
+      "target": [ { "level": "assembly", "category": "knuckle", "bridge_group": "Arch span 10" } ] },
+    { "id": "arch-rib", "sheets": "^ARCH SPAN ARCH RIB DETAILS", "basis": "W14x132 rib bent about Y-Y, rib field splices",
+      "target": [ { "level": "assembly", "category": "arch rib", "bridge_group": "Arch span 10" } ] },
+    { "id": "arch-bracing", "sheets": "^UPPER LATERAL BRACING", "basis": "W8x28 upper lateral X bracing, panel / crossing points U, U', UL",
+      "target": [ { "level": "assembly", "category": "upper lateral bracing", "bridge_group": "Arch span 10" } ] },
+    { "id": "arch-framing", "sheets": "^ARCH SPAN FRAMING PLAN", "basis": "Tie plan curves R 342'-4 / 360'-8, floorbeams FB1-FB33, tie section",
+      "target": [ { "level": "assembly", "category": [ "tie girder", "floorbeam" ], "bridge_group": "Arch span 10" } ] },
+    { "id": "arch-tie", "sheets": "^TIE GIRDER DETAILS", "basis": "Tie girder field splice details",
+      "target": [ { "level": "assembly", "category": "tie girder", "bridge_group": "Arch span 10" } ] },
+    { "id": "arch-floorbeams", "sheets": "^TYPICAL FLOORBEAM", "basis": "Floorbeam section, crown, PT openings (schedule A / B), connections",
+      "target": [ { "level": "assembly", "category": "floorbeam", "bridge_group": "Arch span 10" } ] },
+    { "id": "arch-hangers", "sheets": "^CABLE (HANGER|CONNECTOR)", "basis": "Hanger geometry table, sockets (open / adjustable), fin plates, cable connectors",
+      "target": [ { "level": "assembly", "category": "hanger", "bridge_group": "Arch span 10" } ] },
+    { "id": "arch-deck", "sheets": "^ARCH SPAN DECK", "basis": "Arch deck plan / section / pour sequence / bars / PT; 3\" x 8\" 12 ga steel deck forms, curbs",
+      "target": [ { "level": "part", "category": "deck", "bridge_group": "Arch span 10" }, { "level": "assembly", "category": "deck form", "bridge_group": "Arch span 10" } ] },
     { "id": "ignd", "sheets": "^PRESTRESSED CONCRETE I-GIRDER DESIGNS", "basis": "IGND design table: strands, depressed strands, f'ci / f'c per span",
       "target": [ { "level": "assembly", "category": "prestressed girder" } ] }
   ],
 
   "hints": [
-    { "sheets": "^ARCH SPAN|UPPER LATERAL BRACING|TIE GIRDER|FLOORBEAM|CABLE|TYPICAL SECTIONS ARCH", "suggests": "Tied arch (span 10): built in the separate arch model (Arch/), not in the approach bridges." },
     { "sheets": "TRAFFIC BARRIER", "suggests": "T80SS(MOD) traffic barrier on the arch piers: not modeled (GAP)." },
     { "sheets": "^(PROJECT LAYOUT|PROPOSED TYPICAL|SUMMARY OF QUANTITIES|PLAN & PROFILE|GRADING|PARKING|RETAINING|AESTHETIC|DRAINAGE|NORTHAVEN TRAIL PHASE|CITY OF DALLAS|TRAIL|SIDEWALK|CONC TRAFFIC|SPECIAL CONCRETE|TXDOT STD)", "suggests": "Roadway / walls / drainage / utility sheets: no bridge model elements." }
   ]
