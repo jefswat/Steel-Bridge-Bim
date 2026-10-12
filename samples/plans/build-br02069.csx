@@ -172,7 +172,8 @@ Print($"Strands: {strands.Count} (plan 44), debonded {strands.Count(s => s.Debon
 G("Bearings: MnDOT curved-plate bearings F1 (B310, fixed, L 3 1/4\") / E1 (B311, expansion, L 6 1/2\") (p31) - only a plain pad (12\" x 30\") whose thickness PrestressedBeamDefinition.PadThickness applies to BOTH ends of the beam; 3 1/4\" used, so the North seats are 3 1/4\" too high. Needs: a per-support (per beam end) prestressed bearing height, e.g. PadThickness per support / PrestressedGenerator reading a per-support value, or a curved-plate bearing assembly.");
 G("Sole plate B303 (p16, p30; dims U6) not modeled. Needs: sole plate for prestressed beams.");
 // Concrete end diaphragms (p15, p17, p20, p21; U2 closed): SupportDefinition.Diaphragm, set by diaphragms-br02069.csx (below); front-part bottom UNRESOLVED (p.21).
-G("Optional top strands 2 x 1/2\" (p16) and beam bars G301E..G806E, stirrups (p16) not modeled. Needs: prestressed beam mild reinforcing.");
+// GAP 10 closed: beam bars G301E / G303E / G402E / G505E / G508E placed by beam-rebar-br02069.csx (PrestressedBeamDefinition.Reinforcement);
+// G806E and the G303E paired with G402E stay UNRESOLVED (p16, no length / zone extent); optional 2 x 1/2" top strands not modeled (contractor's option).
 
 // ================================================================ 4. abutments (p4, p5, p9, p10, p11)
 // Section (p11 A-A, p4/p9): footing 6'-0" x 3'-0", bottom EL 917.75, back face 3'-3" behind CL brg, front 2'-9" ahead; stem 4'-0"
@@ -264,6 +265,12 @@ Doc.Project.Bridges.Add(b);
     if (!dr.Success) Print("ERROR in diaphragms-br02069.csx: " + dr.Error);
 }
 
+// ---------------------------------------------------------------- beam mild reinforcing from the beam standard (beam-rebar-br02069.csx)
+{
+    var br2 = await SBM.Api.ScriptHost.RunFileAsync(@"samples\plans\beam-rebar-br02069.csx", Doc, Args);
+    Print(br2.Output.TrimEnd());
+    if (!br2.Success) Print("ERROR in beam-rebar-br02069.csx: " + br2.Error);
+}
 // ================================================================ regenerate, report, save
 var res = Doc.Regenerate();
 Print($"Regenerated {res.Bridges} bridge(s), {res.Errors.Count} errors, {res.Warnings.Count} warnings.");

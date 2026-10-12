@@ -39,9 +39,8 @@ public static class PrestressedBeamRebar
         var bars = new List<BarPlacement>();
         var outside = new Dictionary<string, (int, double)>();
         double tol = In(1.0 / 16);
-        // beam length along the CL at mid-depth (the station of the far end)
-        double yMid = f.Depth / 2;
-        double lenS = f.SB(0, yMid) - f.SA(0, yMid);
+        // beam length along the CL at the top (= end to end of beam; the station of the far end)
+        double lenS = f.SB(0, f.Depth) - f.SA(0, f.Depth);
         foreach (var set in rd.Bars)
         {
             if (set.Unresolved.Length > 0 || set.Path.Count == 0) continue;
@@ -52,35 +51,38 @@ public static class PrestressedBeamRebar
                 variants.Add(set.Path.Select(p => new BeamBarPoint(p.A, p.X + o.X, p.Y + o.Y)).ToList());
                 if (set.Mirror) variants.Add(set.Path.Select(p => new BeamBarPoint(p.A, -(p.X + o.X), p.Y + o.Y)).ToList());
             }
-            // (end, station) pairs: stations from the start; from the end, skip those that coincide with a start station
+            // (end, station) pairs: stations from the start; from the end, skip those that coincide with a start station (a bar at midspan)
             var places = new List<(int end, double st)>();
             foreach (double st in set.Stations) places.Add((0, st + set.AlongOffset));
             if (set.Ends == BeamBarEnds.Both)
-            {
-                var fromStart = places.Select(p => p.st).ToList();
                 foreach (double st in set.Stations)
                 {
-                    double sFromStart = lenS * f.KSlope - (st + set.AlongOffset);
-                    if (fromStart.Any(a => Math.Abs(a - sFromStart) < tol)) continue;
+                    double fromStart = lenS * f.KSlope - st;
+                    if (set.Stations.Any(a => Math.Abs(a - fromStart) < tol)) continue;
                     places.Add((1, st + set.AlongOffset));
                 }
-            }
             foreach (var (end, st) in places)
                 foreach (var v in variants)
                 {
                     var local = Round(v.Select(p => new Vec3(p.A, p.X, p.Y)).ToList(), set.BendRadius);
-                    // station reference: end face at the CL (mid-depth), or at the bar's own first point (longitudinal bars)
-                    double xr = set.StationAtBar ? v[0].X : 0, yr = set.StationAtBar ? v[0].Y : yMid;
-                    double s0 = end == 0 ? f.SA(xr, yr) + st / f.KSlope : f.SB(xr, yr) - st / f.KSlope;
                     double dir = end == 0 ? 1 : -1;
-                    var pts = local.Select(q => f.P(s0 + dir * q.X / f.KSlope, q.Y, q.Z)).ToArray();
+                    // Station reference: transverse bars - the end face at the CL at each point's height (in elevation the bars are parallel
+                    // to that end face: plumb ends -> vertical, ends square to a sloped beam -> square); longitudinal bars - the face at the bar.
+                    double S(Vec3 q)
+                    {
+                        double face = set.StationAtBar
+                            ? (end == 0 ? f.SA(v[0].X, v[0].Y) : f.SB(v[0].X, v[0].Y))
+                            : (end == 0 ? f.SA(0, q.Z) : f.SB(0, q.Z));
+                        return face + dir * (st + q.X) / f.KSlope;
+                    }
+                    var pts = local.Select(q => f.P(S(q), q.Y, q.Z)).ToArray();
                     bars.Add(new BarPlacement { Mark = set.Mark, Points = pts, Group = "Beam", Unit = unit });
                     // inside the beam length? (points within the beam depth only; projections into the deck are outside by design)
                     double worst = 0;
                     foreach (var q in local)
                     {
                         if (q.Z > f.Depth - 1e-6) continue;
-                        double s = s0 + dir * q.X / f.KSlope;
+                        double s = S(q);
                         double outA = f.SA(q.Y, q.Z) - s, outB = s - f.SB(q.Y, q.Z);
                         worst = Math.Max(worst, Math.Max(outA, outB) * f.KSlope);
                     }
