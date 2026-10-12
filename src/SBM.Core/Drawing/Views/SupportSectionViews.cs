@@ -79,8 +79,7 @@ public static class SupportSectionViews
         var piles = unit.Foundations.SelectMany(fo => fo.Piles).ToList();
         if (piles.Count > 0)
         {
-            var tips = piles.Select(p => Math.Round(p.TipZ / u.LongUnit, 3)).Distinct().ToList();
-            string tip = tips.Count == 1 ? $"TIP EL {d.Elev(piles[0].TipZ)}" : $"TIP EL {d.Elev(piles.Min(p => p.TipZ))} TO {d.Elev(piles.Max(p => p.TipZ))}";
+            string tip = PierViews.TipText(piles, d);
             var pl = piles.Select(p => p.Length).ToList();
             string len = Math.Abs(pl.Max() - pl.Min()) < In(1) ? u.FormatLength(pl[0]) : $"{u.FormatLength(pl.Min())} TO {u.FormatLength(pl.Max())}";
             d.Text($"{piles.Count} PILES {unit.Definition.PileLabel(S)}, LENGTH {len} (MODEL), {tip}", new Vec2((X(s0) + X(s1)) / 2, yCut - d.Paper(0.7)), d.SmallTextH, 0, TextAlign.Center);

@@ -29,6 +29,29 @@ public static class PierViews
         }
     }
 
+    /// <summary>Tip elevations of a pile group, plumb and battered piles separately (a battered pile of the same length ends higher):
+    /// "TIP EL 966.000" or "TIP EL 966.000 (PLUMB), 969.732 (BATTERED)"; a range when the tips differ otherwise.</summary>
+    public static string TipText(IReadOnlyList<PileInfo> piles, Drafter d)
+    {
+        string Rng(IEnumerable<PileInfo> g)
+        {
+            double lo = g.Min(p => p.TipZ), hi = g.Max(p => p.TipZ);
+            return Math.Abs(hi - lo) < 0.002 ? d.Elev(lo) : $"{d.Elev(lo)} TO {d.Elev(hi)}";
+        }
+        var plumb = piles.Where(p => !p.IsBattered).ToList();
+        var bat = piles.Where(p => p.IsBattered).ToList();
+        if (plumb.Count > 0 && bat.Count > 0) return $"TIP EL {Rng(plumb)} (PLUMB), {Rng(bat)} (BATTERED)";
+        return piles.Count > 0 ? $"TIP EL {Rng(piles)}" : "";
+    }
+
+    /// <summary>Plan position of a pile where its axis crosses elevation <paramref name="z"/> (battered piles move with depth).</summary>
+    public static Vec2 PileAt(PileInfo p, double z)
+    {
+        double h = p.TopZ - p.TipZ;
+        double t = h > 1e-9 ? Math.Clamp((p.TopZ - z) / h, 0, 1) : 0;
+        return new Vec2(p.S + (p.TipS - p.S) * t, p.N + (p.TipN - p.N) * t);
+    }
+
     public static SheetView CapPlan(ViewContext ctx, SubstructureUnit unit)
     {
         var u = ctx.Units;
@@ -39,9 +62,13 @@ public static class PierViews
         foreach (var c in unit.Columns)
             d.Poly(SheetLayers.ConcreteHidden, Shape(c.Shape, c.S, c.N, c.SizeS, c.SizeN), true);
         foreach (var p in unit.Pedestals)
-        {
             d.Rect(SheetLayers.Steel, p.S - p.LengthS / 2, p.N - p.WidthN / 2, p.S + p.LengthS / 2, p.N + p.WidthN / 2);
-            d.Text($"G{p.Girder + 1}", new Vec2(p.S, p.N), d.SmallTextH, 0, TextAlign.Center);
+        // One label per pedestal; a pedestal carrying the back and ahead beams (two seats) says so instead of repeating the girder.
+        foreach (var g in unit.Pedestals.GroupBy(p => (p.Tag, Math.Round(p.S / 0.05))))
+        {
+            var p = g.First();
+            string seats = g.Count() > 1 ? (g.Select(x => Math.Sign(Math.Round(x.RowN / 0.01))).Distinct().Count() > 1 ? "\nBK + AH" : $"\n{g.Count()} SEATS") : "";
+            d.Text(p.Tag + seats, new Vec2(p.S, g.Average(x => x.N)), d.SmallTextH, 0, TextAlign.Center);
         }
         double nMid = 0;
         d.Line(SheetLayers.Center, new Vec2(unit.CapS0 - d.Paper(0.3), nMid), new Vec2(unit.CapS1 + d.Paper(0.3), nMid));
@@ -87,36 +114,48 @@ public static class PierViews
                 var pts = fd.Type == FoundationType.DrilledShaft ? Shape(ColumnShape.Round, fd.S, fd.N, fd.SizeS, fd.SizeN) : Shape(ColumnShape.Rectangular, fd.S, fd.N, fd.SizeS, fd.SizeN);
                 d.Poly(SheetLayers.Concrete, pts, true);
             }
-            foreach (var pile in fd.Piles)
+            // Pile positions at the bottom of the footing (the plan's reference), not at the embedded pile top.
+            var at = fd.Piles.Select(p => PileAt(p, fd.BottomZ)).ToList();
+            for (int k = 0; k < fd.Piles.Count; k++)
             {
+                var pile = fd.Piles[k];
+                var c = at[k];
                 double h = Math.Max(In(14), 0) / 2;
-                d.Poly(SheetLayers.Steel, new[] { new Vec2(pile.S - h, pile.N - h), new Vec2(pile.S + h, pile.N - h), new Vec2(pile.S + h, pile.N + h), new Vec2(pile.S - h, pile.N + h) }, true);
+                d.Poly(SheetLayers.Steel, new[] { new Vec2(c.X - h, c.Y - h), new Vec2(c.X + h, c.Y - h), new Vec2(c.X + h, c.Y + h), new Vec2(c.X - h, c.Y + h) }, true);
                 var w = new Vec2(pile.WebS, pile.WebN);
-                if (w.Length > 0.5 && sd.PileType == PileType.SteelHP) d.Line(SheetLayers.Steel, new Vec2(pile.S, pile.N) - w * h * 0.9, new Vec2(pile.S, pile.N) + w * h * 0.9);
+                if (w.Length > 0.5 && sd.PileType == PileType.SteelHP) d.Line(SheetLayers.Steel, c - w * h * 0.9, c + w * h * 0.9);
                 if (pile.IsBattered)
                 {
-                    d.Line(SheetLayers.SteelHidden, new Vec2(pile.S, pile.N), new Vec2(pile.TipS, pile.TipN));
-                    d.Circle(SheetLayers.SteelHidden, new Vec2(pile.TipS, pile.TipN), h * 0.5);
+                    // Batter direction as a short arrow (the tip is far outside the footing for long piles) with the batter.
+                    var dv = new Vec2(pile.TipS - pile.S, pile.TipN - pile.N);
+                    double run = dv.Length, rise = pile.TopZ - pile.TipZ;
+                    var e = dv.Normalized();
+                    var tipA = c + e * (h + d.Paper(0.3));
+                    d.Line(SheetLayers.Steel, c + e * h, tipA);
+                    d.Poly(SheetLayers.Steel, new[] { tipA, tipA - e * d.Paper(0.06) + e.Left * d.Paper(0.025), tipA - e * d.Paper(0.06) - e.Left * d.Paper(0.025) }, true);
+                    if (k == fd.Piles.FindIndex(q => q.IsBattered) && run > 1e-6)
+                        d.Text($"BATTER 1:{rise / run:0.##}", tipA + e * d.Paper(0.08), d.SmallTextH * 0.85, 0, e.X >= 0 ? TextAlign.Left : TextAlign.Right);
                 }
             }
             if (fd.Piles.Count > 0)
             {
-                double ss0 = fd.Piles.Min(p => p.S), ss1 = fd.Piles.Max(p => p.S);
-                var xs = Distinct(fd.Piles.Select(p => p.S), 0.005);
-                var ys = Distinct(fd.Piles.Select(p => p.N), 0.005);
+                var xs = Distinct(at.Select(p => p.X), 0.005);
+                var ys = Distinct(at.Select(p => p.Y), 0.005);
                 double ftop = fd.N + fd.SizeN / 2, fbot = fd.N - fd.SizeN / 2, fl = fd.S - fd.SizeS / 2, fr = fd.S + fd.SizeS / 2;
                 if (xs.Count > 1) d.DimChain(xs.Select(x => new Vec2(x, fbot)).ToList(), -0.35, i => d.Short(xs[i + 1] - xs[i]));
                 if (ys.Count > 1) d.DimChain(ys.Select(y => new Vec2(fr, y)).ToList(), -0.5, i => d.Short(ys[i + 1] - ys[i]));
                 if (fd.SizeS > 0) d.Dim(new Vec2(fl, fbot), new Vec2(fr, fbot), -0.75, d.Short(fd.SizeS));
                 int nb = fd.Piles.Count(p => p.IsBattered);
-                d.Text($"FTG {fi}: {fd.Piles.Count} {pileName}{(nb > 0 ? $"\n{nb} BATTERED" : "")}\nTIP EL {d.Elev(fd.Piles.Min(p => p.TipZ))}\nBOT. EL {d.Elev(fd.BottomZ)}",
-                    new Vec2(fd.S, ftop + d.Paper(0.35)), d.SmallTextH, 0, TextAlign.Center);
+                string note = $"FTG {fi}: {fd.Piles.Count} {pileName}{(nb > 0 ? $"\n{nb} BATTERED" : "")}\n{TipText(fd.Piles, d).Replace(", ", "\n")}\nBOT. EL {d.Elev(fd.BottomZ)}";
+                int nl = note.Split('\n').Length;
+                // The first line sits at the given point and the rest go down: start high enough to clear the batter arrows.
+                d.Text(note, new Vec2(fd.S, ftop + d.Paper(0.5) + (nl - 1) * d.SmallTextH * 1.55), d.SmallTextH, 0, TextAlign.Center);
             }
             else if (fd.SizeS > 0)
                 d.Text($"FOOTING {fi}\nBOTTOM EL {d.Elev(fd.BottomZ)}", new Vec2(fd.S, fd.N + fd.SizeN / 2 + d.Paper(0.3)), d.SmallTextH, 0, TextAlign.Center);
         }
         var box = dwg.Extents();
-        d.Title($"{unit.Name.ToUpperInvariant()} — FOOTING AND PILE LAYOUT", $"Plan at the bottom of the footing; battered piles: dashed line to the tip; positions in S (along the support line) and N · Scale {DrawingOptions.ScaleText(d.Scale, u)}",
+        d.Title($"{unit.Name.ToUpperInvariant()} — FOOTING AND PILE LAYOUT", $"Plan at the bottom of the footing; battered piles: arrow = batter direction; positions in S (along the support line) and N · Scale {DrawingOptions.ScaleText(d.Scale, u)}",
             new Vec2((box.MinX + box.MaxX) / 2, box.MinY - d.Paper(0.45)));
         return new SheetView($"{unit.Name} pile layout", unit.Name.Replace(" ", "") + "-Piles", dwg, d.Scale, "Footing and pile layout.");
     }

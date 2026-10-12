@@ -248,7 +248,7 @@ public static class BentViews
             int nBat = fd.Piles.Count(q => q.IsBattered);
             string batterNote = nBat > 0 ? "\n" + nBat + " BATTERED (SEE PLAN)" : "";
             string tip = fd.Type == FoundationType.DrilledShaft ? $"{d.Short(fd.SizeS)} DIA SHAFT, {d.Len(fd.TopZ - fd.BottomZ)} LONG, TIP EL {d.Elev(fd.BottomZ)}"
-                : fd.Piles.Count > 0 ? $"{fd.Piles.Count} PILES {sd.PileLabel(d.Short)}, TIP EL {d.Elev(fd.Piles[0].TipZ)}{batterNote}"
+                : fd.Piles.Count > 0 ? $"{fd.Piles.Count} PILES {sd.PileLabel(d.Short)}, {PierViews.TipText(fd.Piles, d)}{batterNote}"
                 : $"FOOTING {d.Len(fd.SizeS)} x {d.Len(fd.SizeN)} x {d.Short(sd.FootingThickness)}";
             double tz = cutZ.TryGetValue(fd.S, out double zc0) ? zc0 : fd.Piles.Count > 0 ? fd.Piles[0].TipZ : fd.BottomZ;
             // Below the cap / column dimension rows (zLow - 0.3 / - 0.6 in): the note does not run into them.
