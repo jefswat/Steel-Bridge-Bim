@@ -53,7 +53,7 @@ public sealed class ArchPoint
     public double Z { get; set; }
     public ArchPoint() { }
     public ArchPoint(string name, double x, double y, double z) { Name = name; X = x; Y = y; Z = z; }
-    public Geometry.Vec3 Vec => new(X, Y, Z);
+    [System.Text.Json.Serialization.JsonIgnore] public Geometry.Vec3 Vec => new(X, Y, Z);
 }
 
 /// <summary>

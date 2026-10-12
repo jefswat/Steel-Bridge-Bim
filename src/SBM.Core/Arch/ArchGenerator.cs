@@ -99,7 +99,6 @@ public static class ArchGenerator
             foreach (var k in _d.Knuckles) BuildKnuckle(k);
             if (_d.Deck != null) BuildDeck(_d.Deck);
             for (int i = 0; i < _d.Bearings.Count; i++) BuildBearing(_d.Bearings[i], i);
-            Info($"Arch: {Model.Steel.Parts.Count} steel parts, {Model.Steel.SteelMass * 2.20462:N0} lb steel (model), {Model.Hangers.Count} hangers, {Model.Floorbeams.Count} floorbeams.");
         }
 
         private Vec3? P(string name)
@@ -148,7 +147,7 @@ public static class ArchGenerator
             var p2 = _al.PointAt(fr.Wp2Station, fr.Wp2Offset);
             double planWp = (p2 - p1).Length;
             double planLocal = (fr.Wp2LocalX - fr.Wp1LocalX) * _fr.X.XY.Length;
-            Check("chord CL1-CL2 in plan (work points from the layout vs local chord)", planLocal, planWp, Tol, L,
+            Check("chord CL1-CL2 in plan (local chord 201'-0 projected vs work points from the layout)", planLocal, planWp, Tol, v => $"{ToFt(v):F3}'",
                 "the local geometry is kept; the work points only orient and place it (U3)");
             if (!double.IsNaN(fr.CheckWp1Elevation))
                 Check("WP1 elevation (local plane vs printed)", fr.CheckWp1Elevation, W(new Vec3(fr.Wp1LocalX, 0, 0)).Z, Tol, v => $"{ToFt(v):F3}'");
@@ -768,7 +767,7 @@ public static class ArchGenerator
             double stackTop = br.SeatElevation + zTop;
             Model.Bearings.Add(new ArchBearingResult(br.Name, br.Support, top, br.SeatElevation, stackTop, top.Z));
             Model.BearingNames.Add(br.Name);
-            Check($"bearing {br.Name}: top of stack (plan pedestal + {L(zTop)} stack) vs underside of steel (WP chain)", top.Z, stackTop, Tol,
+            Check($"bearing {br.Name}: underside of steel from the WP chain (plan) vs top of the {L(zTop)} bearing stack on the plan pedestal (model)", top.Z, stackTop, Tol,
                 v => $"{ToFt(v):F3}'", "pedestal tops are the plan values (p.102); the WP chain is p.119 / p.124 - B1-B3, reported only");
             var so = _al.Inverse(c2);
             Model.Steel.BearingSeats.Add(new BearingSeat(sl.Name, Model.BearingNames.Count - 1, so.Station, br.SeatElevation, br.UpperSoleA,
