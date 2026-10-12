@@ -88,6 +88,8 @@ public sealed class FabricationRule
     public string? DescriptionPattern { get; set; }
     public List<int>? Girders { get; set; }
     public FabricationAttributes Set { get; set; } = new();
+    /// <summary>OPTIONAL material / grade the note requires (replaces the part's material; last matching rule wins); null = unchanged.</summary>
+    public string? Material { get; set; }
 
     public bool Matches(string category, string? assemblyKind, string mark, string assemblyDescription, string description, int girder)
     {

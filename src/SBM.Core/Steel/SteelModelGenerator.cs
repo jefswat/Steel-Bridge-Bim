@@ -497,6 +497,7 @@ public sealed partial class SteelModelGenerator
             foreach (var r in rules)
             {
                 if (!r.Matches(p.Category.ToString(), a?.Kind.ToString(), p.Mark, a?.Description ?? "", p.Description, a?.Girder ?? -1)) continue;
+                if (r.Material is { Length: > 0 } mat) p.Material = mat;
                 var set = r.Set.Clone();
                 if (r.Note.Length > 0) set.Notes.Insert(0, r.Source.Length > 0 ? $"{r.Note} {r.Source}" : r.Note);
                 acc = acc == null ? set : acc.Merge(set);

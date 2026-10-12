@@ -57,7 +57,7 @@ public sealed class SteelPart
     /// <summary>Size description, e.g. PL 16" x 1" or L4x4x3/8.</summary>
     public required string Description { get; init; }
     public required Mesh Mesh { get; init; }
-    public string Material { get; init; } = "ASTM A709 Gr. 50";
+    public string Material { get; set; } = "ASTM A709 Gr. 50";
     public MemberRole Role { get; init; }
     /// <summary>Overall length (plates: along the girder or longest dimension; angles: cut length).</summary>
     public double Length { get; init; }
