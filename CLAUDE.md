@@ -575,7 +575,13 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   differences -> warnings). Results: `SubstructureUnit.FixedSeats`. Solid kind Pedestal (IFC IfcColumn 'PEDESTAL').
 - Bearing offset from the layout line (OPTIONAL, `GirderSpanEnd.BearingOffset` + `BearingMeasure` AlongGirder | NormalToSupport, default 0 =
   old behaviour): girder positions are given on the support line (PGSuper / TxDOT "girder spacing at CL pier"), the CL bearing / layout point is
-  moved this far into the span along each girder's chord (`FramingGenerator.SetupSpanLayouts`).
+  moved this far into the span along each girder's chord (`FramingGenerator.SetupSpanLayouts`). With an offset the prestressed beam end is
+  `BearingToEnd` beyond the CL bearing (along the CL, or normal to the support for NormalToSupport) = TxDOT IGND / IGEB length C-C brg + 2 x 9"
+  (`PrestressedGenerator.BuildBeam`). Note `PrestressedBeam.Length` / `BearingSpan` are PLAN (horizontal) lengths.
+- Per-row plan pedestals (OPTIONAL `SubstructureDefinition.PedestalSizeAlongAhead` / `PedestalSideAngleAheadDeg`, null = the common values):
+  seats up-station of the CL pier (N > CapMidN) take their own along size / parallelogram angle (TxDOT "level 3'-0 seat" square to girders
+  meeting the pier at different angles each side). Foreign seats of a shared pier keep their own girder numbering (`Girder` >= 1000).
+- NHT model check: `check-nht.csx` 414 PASS / 4 FAIL (2026-10-11; the 4 = arch pier cap / column CY vs the p.102 quantity table, +-0.3 CY).
 
 ## Conventions (bridge engineering)
 - Offsets right-positive (Civil 3D). Skew from the radial line; positive = right end of support line up-station.
