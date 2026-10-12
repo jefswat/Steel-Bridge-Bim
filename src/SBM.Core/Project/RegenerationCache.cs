@@ -85,6 +85,13 @@ public sealed class RegenerationCache
                 st = am.Steel;
                 cm = am.Concrete;
             }
+            else if (includeSteel && !f.HasErrors && b.Segmental != null)
+            {
+                // Precast segmental box: its own generator; segments / tendons / bearings / bents hang on a concrete model without a deck.
+                var sm = SBM.Core.Segmental.SegmentalGenerator.Generate(f, project.Units);
+                cm = new Concrete.ConcreteModel { Segmental = sm };
+                cm.Diagnostics.AddRange(sm.Diagnostics);
+            }
             else if (includeSteel && !f.HasErrors && b.Girders.IsPrestressed)
             {
                 // Prestressed concrete girders instead of steel.
@@ -137,8 +144,14 @@ public sealed class RegenerationCache
             Substructure.SubstructureModel? sub = null;
             bool found;
             lock (_lock) found = _sub.TryGetValue(subKey, out sub);
+            // A segmental bridge's bents come from the segmental generator.
+            if (!found && includeSteel && !pt.f.HasErrors && pt.cm?.Segmental is { } sgm)
+            {
+                sub = sgm.Substructure;
+                lock (_lock) _sub[subKey] = sub;
+            }
             // A tied-arch bridge builds no substructure: its bearings reach the approach units' piers as foreign seats.
-            if (!found && includeSteel && !pt.f.HasErrors && (pt.s != null || pt.ps != null) && b.Arch == null)
+            else if (!found && includeSteel && !pt.f.HasErrors && (pt.s != null || pt.ps != null) && b.Arch == null)
             {
                 var seats = (IReadOnlyList<BearingSeat>?)pt.ps?.BearingSeats ?? pt.s!.BearingSeats;
                 var foreign = new Dictionary<int, List<(string, BearingSeat)>>();

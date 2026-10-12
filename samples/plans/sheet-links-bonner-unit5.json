@@ -1,0 +1,1177 @@
+// Plan sheet links of the Bonner Bridge (NCDOT B-2500) navigation Unit 5 segmental model (build-bonner-unit5.csx). Format: see
+// sheet-links-i80-rampg.json (header) and docs/API.md "Companion database". Sheet index: docs/plan-data/bonner-b2500/sheet-index.csv (S3-01..S3-144 =
+// PDF pages 249-392, all current). Hierarchy: unit > superstructure > group "segmental box" > assembly "Bent n cantilever" (typical / bent segments,
+// cantilever + transverse tendons) | closure joints / end segments | span continuity tendon groups | disc bearings; unit > substructure > pier (Bent n).
+// Sheets without a rule (LRFR, parapets, rail, lighting, misc.) cover items that are not modeled.
+{
+  "models": [
+    "Bonner Unit 5 segmental.sbm"
+  ],
+  "planFolders": [
+    "plans",
+    "C:/SBMData"
+  ],
+  "planSets": [
+    {
+      "id": "b2500-s3",
+      "pdf": "B-2500 Bonner - Revision 3 Combined Plan Set*.pdf",
+      "bridgeGroup": "Bonner",
+      "sheets": [
+        {
+          "p": 249,
+          "s": "S3-01",
+          "t": "GENERAL DRAWING INDEX OF SHEETS - NAVIGATION UNIT"
+        },
+        {
+          "p": 250,
+          "s": "S3-02",
+          "t": "GENERAL DRAWING INDEX OF SHEETS - NAVIGATION UNIT"
+        },
+        {
+          "p": 251,
+          "s": "S3-03",
+          "t": "GENERAL DRAWING FOUNDATION LAYOUT - UNIT 5"
+        },
+        {
+          "p": 252,
+          "s": "S3-04",
+          "t": "GENERAL DRAWING FOUNDATION LAYOUT - UNIT 5"
+        },
+        {
+          "p": 253,
+          "s": "S3-05",
+          "t": "GENERAL DRAWING FOUNDATION LAYOUT - UNIT 5"
+        },
+        {
+          "p": 254,
+          "s": "S3-06",
+          "t": "PILE DATA UNIT 5 (1 OF 6)"
+        },
+        {
+          "p": 255,
+          "s": "S3-07",
+          "t": "PILE DATA UNIT 5 (2 OF 6)"
+        },
+        {
+          "p": 256,
+          "s": "S3-08",
+          "t": "PILE DATA UNIT 5 (3 OF 6)"
+        },
+        {
+          "p": 257,
+          "s": "S3-09",
+          "t": "PILE DATA UNIT 5 (4 OF 6)"
+        },
+        {
+          "p": 258,
+          "s": "S3-10",
+          "t": "PILE DATA UNIT 5 (5 OF 6)"
+        },
+        {
+          "p": 259,
+          "s": "S3-11",
+          "t": "PILE DATA UNIT 5 (6 OF 6)"
+        },
+        {
+          "p": 260,
+          "s": "S3-12",
+          "t": "LRFR SUMMARY NAVIGATION UNIT SPANS 19-29"
+        },
+        {
+          "p": 261,
+          "s": "S3-13",
+          "t": "LRFR SUMMARY NAVIGATION UNIT SPANS 19-29"
+        },
+        {
+          "p": 262,
+          "s": "S3-14",
+          "t": "TYPICAL SECTION"
+        },
+        {
+          "p": 263,
+          "s": "S3-15",
+          "t": "SEGMENT DESIGNATIONS"
+        },
+        {
+          "p": 264,
+          "s": "S3-16",
+          "t": "SEGMENT DESIGNATIONS"
+        },
+        {
+          "p": 265,
+          "s": "S3-17",
+          "t": "SEGMENT DESIGNATIONS"
+        },
+        {
+          "p": 266,
+          "s": "S3-18",
+          "t": "SEGMENT DESIGNATIONS"
+        },
+        {
+          "p": 267,
+          "s": "S3-19",
+          "t": "GEOMETRY CONTROL"
+        },
+        {
+          "p": 268,
+          "s": "S3-20",
+          "t": "SEGMENT DIMENSIONS"
+        },
+        {
+          "p": 269,
+          "s": "S3-21",
+          "t": "TYPICAL SEGMENT REINFORCEMENT"
+        },
+        {
+          "p": 270,
+          "s": "S3-22",
+          "t": "TYPICAL SEGMENT REINFORCEMENT"
+        },
+        {
+          "p": 271,
+          "s": "S3-23",
+          "t": "END SEGMENT DIMENSIONS"
+        },
+        {
+          "p": 272,
+          "s": "S3-24",
+          "t": "END SEGMENT POST-TENSIONING DETAILS"
+        },
+        {
+          "p": 273,
+          "s": "S3-25",
+          "t": "END SEGMENT REINFORCEMENT"
+        },
+        {
+          "p": 274,
+          "s": "S3-26",
+          "t": "END SEGMENT REINFORCEMENT"
+        },
+        {
+          "p": 275,
+          "s": "S3-27",
+          "t": "END SEGMENT REINFORCEMENT"
+        },
+        {
+          "p": 276,
+          "s": "S3-28",
+          "t": "END SEGMENT REINFORCEMENT"
+        },
+        {
+          "p": 277,
+          "s": "S3-29",
+          "t": "BENT SEGMENT DIMENSIONS"
+        },
+        {
+          "p": 278,
+          "s": "S3-30",
+          "t": "BENT SEGMENT POST-TENSIONING DETAILS"
+        },
+        {
+          "p": 279,
+          "s": "S3-31",
+          "t": "BENT SEGMENT REINFORCEMENT"
+        },
+        {
+          "p": 280,
+          "s": "S3-32",
+          "t": "BENT SEGMENT REINFORCEMENT"
+        },
+        {
+          "p": 281,
+          "s": "S3-33",
+          "t": "CLOSURE JOINT"
+        },
+        {
+          "p": 282,
+          "s": "S3-34",
+          "t": "TRANSVERSE POST-TENSIONING DETAILS"
+        },
+        {
+          "p": 283,
+          "s": "S3-35",
+          "t": "BULKHEAD AND SHEAR KEY DETAILS"
+        },
+        {
+          "p": 284,
+          "s": "S3-36",
+          "t": "LONGITUDINAL POST-TENSIONING NOTES"
+        },
+        {
+          "p": 285,
+          "s": "S3-37",
+          "t": "LONGITUDINAL POST-TENSIONING LAYOUT"
+        },
+        {
+          "p": 286,
+          "s": "S3-38",
+          "t": "LONGITUDINAL POST-TENSIONING LAYOUT"
+        },
+        {
+          "p": 287,
+          "s": "S3-39",
+          "t": "LONGITUDINAL POST-TENSIONING LAYOUT"
+        },
+        {
+          "p": 288,
+          "s": "S3-40",
+          "t": "LONGITUDINAL POST-TENSIONING LAYOUT"
+        },
+        {
+          "p": 289,
+          "s": "S3-41",
+          "t": "LONGITUDINAL POST-TENSIONING LAYOUT"
+        },
+        {
+          "p": 290,
+          "s": "S3-42",
+          "t": "LONGITUDINAL POST-TENSIONING LAYOUT"
+        },
+        {
+          "p": 291,
+          "s": "S3-43",
+          "t": "LONGITUDINAL POST-TENSIONING LAYOUT"
+        },
+        {
+          "p": 292,
+          "s": "S3-44",
+          "t": "LONGITUDINAL POST-TENSIONING LAYOUT"
+        },
+        {
+          "p": 293,
+          "s": "S3-45",
+          "t": "LONGITUDINAL POST-TENSIONING LAYOUT"
+        },
+        {
+          "p": 294,
+          "s": "S3-46",
+          "t": "LONGITUDINAL POST-TENSIONING LAYOUT"
+        },
+        {
+          "p": 295,
+          "s": "S3-47",
+          "t": "LONGITUDINAL POST-TENSIONING LAYOUT"
+        },
+        {
+          "p": 296,
+          "s": "S3-48",
+          "t": "LONGITUDINAL POST-TENSIONING LAYOUT"
+        },
+        {
+          "p": 297,
+          "s": "S3-49",
+          "t": "BOTTOM SLAB ANCHOR BLOCK DETAIL"
+        },
+        {
+          "p": 298,
+          "s": "S3-50",
+          "t": "TOP SLAB ANCHOR BLOCK DETAIL"
+        },
+        {
+          "p": 299,
+          "s": "S3-51",
+          "t": "BOTTOM ERECTION PT BAR ANCHOR BLOCK DETAILS"
+        },
+        {
+          "p": 300,
+          "s": "S3-52",
+          "t": "TOP ERECTION PT BAR ANCHOR BLOCK DETAILS"
+        },
+        {
+          "p": 301,
+          "s": "S3-53",
+          "t": "ERECTION PT BAR ANCHOR BLOCK REINFORCEMENT"
+        },
+        {
+          "p": 302,
+          "s": "S3-54",
+          "t": "DEVIATION BLOCK DETAIL"
+        },
+        {
+          "p": 303,
+          "s": "S3-55",
+          "t": "LONGITUDINAL POST-TENSIONING GEOMETRY DETAILS"
+        },
+        {
+          "p": 304,
+          "s": "S3-56",
+          "t": "LONGITUDINAL POST-TENSIONING GEOMETRY DETAILS"
+        },
+        {
+          "p": 305,
+          "s": "S3-57",
+          "t": "LONGITUDINAL POST-TENSIONING SCHEDULE"
+        },
+        {
+          "p": 306,
+          "s": "S3-58",
+          "t": "LONGITUDINAL POST-TENSIONING SCHEDULE"
+        },
+        {
+          "p": 307,
+          "s": "S3-59",
+          "t": "POST-TENSIONING DETAILS"
+        },
+        {
+          "p": 308,
+          "s": "S3-60",
+          "t": "FUTURE POST-TENSIONING LAYOUT"
+        },
+        {
+          "p": 309,
+          "s": "S3-61",
+          "t": "CONSTRUCTION SEQUENCE"
+        },
+        {
+          "p": 310,
+          "s": "S3-62",
+          "t": "CONSTRUCTION SEQUENCE"
+        },
+        {
+          "p": 311,
+          "s": "S3-63",
+          "t": "CONSTRUCTION SEQUENCE"
+        },
+        {
+          "p": 312,
+          "s": "S3-64",
+          "t": "CONSTRUCTION SEQUENCE"
+        },
+        {
+          "p": 313,
+          "s": "S3-65",
+          "t": "ERECTION PROCEDURE"
+        },
+        {
+          "p": 314,
+          "s": "S3-66",
+          "t": "VERMIN SCREEN DETAILS"
+        },
+        {
+          "p": 315,
+          "s": "S3-67",
+          "t": "ACCESS OPENING (A.O.B.) DETAILS"
+        },
+        {
+          "p": 316,
+          "s": "S3-68",
+          "t": "ACCESS OPENING (A.O.) DETAILS"
+        },
+        {
+          "p": 317,
+          "s": "S3-69",
+          "t": "BEARING DETAILS"
+        },
+        {
+          "p": 318,
+          "s": "S3-70",
+          "t": "BEARING DETAILS"
+        },
+        {
+          "p": 319,
+          "s": "S3-71",
+          "t": "BEARING DETAILS"
+        },
+        {
+          "p": 320,
+          "s": "S3-72",
+          "t": "BEARING REPLACEMENT DETAILS"
+        },
+        {
+          "p": 321,
+          "s": "S3-73",
+          "t": "MISCELLANEOUS DETAILS"
+        },
+        {
+          "p": 322,
+          "s": "S3-74",
+          "t": "MISCELLANEOUS DETAILS"
+        },
+        {
+          "p": 323,
+          "s": "S3-75",
+          "t": "CONCRETE PARAPET PLANS UNIT 5"
+        },
+        {
+          "p": 324,
+          "s": "S3-76",
+          "t": "CONCRETE PARAPET PLANS UNIT 5"
+        },
+        {
+          "p": 325,
+          "s": "S3-77",
+          "t": "CONCRETE PARAPET PLANS UNIT 5"
+        },
+        {
+          "p": 326,
+          "s": "S3-78",
+          "t": "CONCRETE PARAPET PLANS UNIT 5"
+        },
+        {
+          "p": 327,
+          "s": "S3-79",
+          "t": "CONCRETE PARAPET AND END POST DETAILS"
+        },
+        {
+          "p": 328,
+          "s": "S3-80",
+          "t": "RAIL POST SPACING FOR UNIT 5"
+        },
+        {
+          "p": 329,
+          "s": "S3-81",
+          "t": "RAIL POST SPACING FOR UNIT 5"
+        },
+        {
+          "p": 330,
+          "s": "S3-82",
+          "t": "RAIL POST SPACING FOR UNIT 5"
+        },
+        {
+          "p": 331,
+          "s": "S3-83",
+          "t": "RAIL POST SPACING FOR UNIT 5"
+        },
+        {
+          "p": 332,
+          "s": "S3-84",
+          "t": "SOLAR ARRAY SUPPORT PLATFORM"
+        },
+        {
+          "p": 333,
+          "s": "S3-85",
+          "t": "MODULAR EXPANSION JOINT SEAL DETAILS"
+        },
+        {
+          "p": 334,
+          "s": "S3-86",
+          "t": "SUBSTRUCTURE BENTS 18 & 29"
+        },
+        {
+          "p": 335,
+          "s": "S3-87",
+          "t": "SUBSTRUCTURE BENTS 18 & 29"
+        },
+        {
+          "p": 336,
+          "s": "S3-88",
+          "t": "SUBSTRUCTURE BENTS 18 & 29"
+        },
+        {
+          "p": 337,
+          "s": "S3-89",
+          "t": "SUBSTRUCTURE BENT 19"
+        },
+        {
+          "p": 338,
+          "s": "S3-90",
+          "t": "SUBSTRUCTURE BENT 19"
+        },
+        {
+          "p": 339,
+          "s": "S3-91",
+          "t": "SUBSTRUCTURE BENT 19"
+        },
+        {
+          "p": 340,
+          "s": "S3-92",
+          "t": "SUBSTRUCTURE BENTS 20 - 22"
+        },
+        {
+          "p": 341,
+          "s": "S3-93",
+          "t": "SUBSTRUCTURE BENTS 20 - 22"
+        },
+        {
+          "p": 342,
+          "s": "S3-94",
+          "t": "SUBSTRUCTURE BENTS 20 - 22"
+        },
+        {
+          "p": 343,
+          "s": "S3-95",
+          "t": "SUBSTRUCTURE BENTS 23 & 24"
+        },
+        {
+          "p": 344,
+          "s": "S3-96",
+          "t": "SUBSTRUCTURE BENTS 23 & 24"
+        },
+        {
+          "p": 345,
+          "s": "S3-97",
+          "t": "SUBSTRUCTURE BENTS 23 & 24"
+        },
+        {
+          "p": 346,
+          "s": "S3-98",
+          "t": "SUBSTRUCTURE BENTS 23 & 24"
+        },
+        {
+          "p": 347,
+          "s": "S3-99",
+          "t": "SUBSTRUCTURE BENTS 23 & 24"
+        },
+        {
+          "p": 348,
+          "s": "S3-100",
+          "t": "SUBSTRUCTURE BENT 25"
+        },
+        {
+          "p": 349,
+          "s": "S3-101",
+          "t": "SUBSTRUCTURE BENT 25"
+        },
+        {
+          "p": 350,
+          "s": "S3-102",
+          "t": "SUBSTRUCTURE BENT 25"
+        },
+        {
+          "p": 351,
+          "s": "S3-103",
+          "t": "SUBSTRUCTURE BENTS 26 - 28"
+        },
+        {
+          "p": 352,
+          "s": "S3-104",
+          "t": "SUBSTRUCTURE BENTS 26 - 28"
+        },
+        {
+          "p": 353,
+          "s": "S3-105",
+          "t": "SUBSTRUCTURE BENTS 26 - 28"
+        },
+        {
+          "p": 354,
+          "s": "S3-106",
+          "t": "SUBSTRUCTURE PRECAST BENT CAP DETAILS - BENT 18"
+        },
+        {
+          "p": 355,
+          "s": "S3-107",
+          "t": "SUBSTRUCTURE PRECAST BENT CAP DETAILS - BENT 18"
+        },
+        {
+          "p": 356,
+          "s": "S3-108",
+          "t": "SUBSTRUCTURE PRECAST BENT CAP DETAILS - BENT 18"
+        },
+        {
+          "p": 357,
+          "s": "S3-109",
+          "t": "SUBSTRUCTURE PRECAST BENT CAP DETAILS - BENT 18"
+        },
+        {
+          "p": 358,
+          "s": "S3-110",
+          "t": "SUBSTRUCTURE PRECAST BENT CAP DETAILS - BENT 18"
+        },
+        {
+          "p": 359,
+          "s": "S3-111",
+          "t": "SUBSTRUCTURE PRECAST BENT CAP DETAILS - BENTS 19 - 22"
+        },
+        {
+          "p": 360,
+          "s": "S3-112",
+          "t": "SUBSTRUCTURE PRECAST BENT CAP DETAILS - BENTS 19 - 22"
+        },
+        {
+          "p": 361,
+          "s": "S3-113",
+          "t": "SUBSTRUCTURE PRECAST BENT CAP DETAILS - BENTS 19 - 22"
+        },
+        {
+          "p": 362,
+          "s": "S3-114",
+          "t": "SUBSTRUCTURE PRECAST BENT CAP DETAILS - BENTS 19 - 22"
+        },
+        {
+          "p": 363,
+          "s": "S3-115",
+          "t": "SUBSTRUCTURE PRECAST BENT CAP DETAILS - BENTS 23 - 24"
+        },
+        {
+          "p": 364,
+          "s": "S3-116",
+          "t": "SUBSTRUCTURE PRECAST BENT CAP DETAILS - BENTS 23 - 24"
+        },
+        {
+          "p": 365,
+          "s": "S3-117",
+          "t": "SUBSTRUCTURE PRECAST BENT CAP DETAILS - BENTS 23 - 24"
+        },
+        {
+          "p": 366,
+          "s": "S3-118",
+          "t": "SUBSTRUCTURE PRECAST BENT CAP DETAILS - BENTS 23 - 24"
+        },
+        {
+          "p": 367,
+          "s": "S3-119",
+          "t": "SUBSTRUCTURE PRECAST BENT CAP DETAILS - BENTS 25 - 28"
+        },
+        {
+          "p": 368,
+          "s": "S3-120",
+          "t": "SUBSTRUCTURE PRECAST BENT CAP DETAILS - BENTS 25 - 28"
+        },
+        {
+          "p": 369,
+          "s": "S3-121",
+          "t": "SUBSTRUCTURE PRECAST BENT CAP DETAILS - BENTS 25 - 28"
+        },
+        {
+          "p": 370,
+          "s": "S3-122",
+          "t": "SUBSTRUCTURE PRECAST BENT CAP DETAILS - BENTS 25 - 28"
+        },
+        {
+          "p": 371,
+          "s": "S3-123",
+          "t": "SUBSTRUCTURE PRECAST BENT CAP DETAILS - BENT 29"
+        },
+        {
+          "p": 372,
+          "s": "S3-124",
+          "t": "SUBSTRUCTURE PRECAST BENT CAP DETAILS - BENT 29"
+        },
+        {
+          "p": 373,
+          "s": "S3-125",
+          "t": "SUBSTRUCTURE PRECAST BENT CAP DETAILS - BENT 29"
+        },
+        {
+          "p": 374,
+          "s": "S3-126",
+          "t": "SUBSTRUCTURE PRECAST BENT CAP DETAILS - BENT 29"
+        },
+        {
+          "p": 375,
+          "s": "S3-127",
+          "t": "SUBSTRUCTURE PRECAST BENT CAP DETAILS - BENT 29"
+        },
+        {
+          "p": 376,
+          "s": "S3-128",
+          "t": "SUBSTRUCTURE PRECAST COLUMN SEGMENT DETAILS BENTS 18 & 29 (1 OF 2)"
+        },
+        {
+          "p": 377,
+          "s": "S3-129",
+          "t": "SUBSTRUCTURE PRECAST COLUMN SEGMENT DETAILS BENTS 18 & 29 (2 OF 2)"
+        },
+        {
+          "p": 378,
+          "s": "S3-130",
+          "t": "SUBSTRUCTURE PRECAST COLUMN SEGMENT DETAILS BENTS 19 - 22"
+        },
+        {
+          "p": 379,
+          "s": "S3-131",
+          "t": "SUBSTRUCTURE PRECAST COLUMN SEGMENT DETAILS BENTS 19 & 28"
+        },
+        {
+          "p": 380,
+          "s": "S3-132",
+          "t": "SUBSTRUCTURE PRECAST COLUMN SEGMENT DETAILS BENTS 23 & 24"
+        },
+        {
+          "p": 381,
+          "s": "S3-133",
+          "t": "SUBSTRUCTURE PRECAST COLUMN SEGMENT DETAILS BENTS 25 - 28"
+        },
+        {
+          "p": 382,
+          "s": "S3-134",
+          "t": "SUBSTRUCTURE PRECAST CONCRETE REINFORCING DETAILS"
+        },
+        {
+          "p": 383,
+          "s": "S3-135",
+          "t": "SUBSTRUCTURE POST-TENSIONING DETAILS"
+        },
+        {
+          "p": 384,
+          "s": "S3-136",
+          "t": "SUBSTRUCTURE POST-TENSIONING DETAILS"
+        },
+        {
+          "p": 385,
+          "s": "S3-137",
+          "t": "BOX GIRDER LIGHTING SYSTEM"
+        },
+        {
+          "p": 386,
+          "s": "S3-138",
+          "t": "BOX GIRDER LIGHTING SYSTEM"
+        },
+        {
+          "p": 387,
+          "s": "S3-139",
+          "t": "BOX GIRDER LIGHTING SYSTEM"
+        },
+        {
+          "p": 388,
+          "s": "S3-140",
+          "t": "BOX GIRDER LIGHTING PLAN"
+        },
+        {
+          "p": 389,
+          "s": "S3-141",
+          "t": "BOX GIRDER LIGHTING PLAN"
+        },
+        {
+          "p": 390,
+          "s": "S3-142",
+          "t": "BOX GIRDER LIGHTING PLAN"
+        },
+        {
+          "p": 391,
+          "s": "S3-143",
+          "t": "BOX GIRDER LIGHTING PLAN"
+        },
+        {
+          "p": 392,
+          "s": "S3-144",
+          "t": "NAVIGATIONAL LIGHTING AND CONDUIT SYSTEM"
+        }
+      ]
+    }
+  ],
+  "administrative": [],
+  "rules": [
+    {
+      "id": "general",
+      "sheets": "^GENERAL DRAWING INDEX OF SHEETS - NAVIGATION UNIT",
+      "role": "general",
+      "basis": "Unit 5 sheet index, general notes for the navigation unit",
+      "target": [
+        {
+          "level": "unit"
+        }
+      ]
+    },
+    {
+      "id": "foundation-layout",
+      "sheets": "^GENERAL DRAWING FOUNDATION LAYOUT - UNIT 5",
+      "role": "general",
+      "basis": "Bent stations, footing plans (51'-0 x 36'-0, octagon 58'-6 at bents 23 / 24), pile layout and batter, curve 2 data",
+      "target": [
+        {
+          "level": "alignment",
+          "bridge_group": "-L- (NC 12)"
+        },
+        {
+          "level": "element",
+          "category": "footing"
+        }
+      ]
+    },
+    {
+      "id": "pile-data",
+      "sheets": "^PILE DATA UNIT 5",
+      "basis": "36 in sq PS pile data (piles not modeled: counts on the footings)",
+      "target": [
+        {
+          "level": "element",
+          "category": "footing"
+        }
+      ]
+    },
+    {
+      "id": "typical-section",
+      "sheets": "^TYPICAL SECTION$",
+      "basis": "42'-7 box, 40'-0 roadway, parapets (not modeled)",
+      "target": [
+        {
+          "level": "group",
+          "category": "segmental box"
+        }
+      ]
+    },
+    {
+      "id": "segment-designations",
+      "sheets": "^SEGMENT DESIGNATIONS",
+      "basis": "Segment layout per span (12 / 13 x 14'-0, 5'-0 bent halves, 4'-0 / 3'-6 closure joints, end segments)",
+      "target": [
+        {
+          "level": "assembly",
+          "category": "segmental cantilever"
+        },
+        {
+          "level": "part",
+          "category": [
+            "closure joint",
+            "end segment"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "geometry-control",
+      "sheets": "^GEOMETRY CONTROL",
+      "basis": "Box square to the top: DIM A / B, box height and slopes at bents 18-29; cross slope direction (looking upstation)",
+      "target": [
+        {
+          "level": "group",
+          "category": "segmental box"
+        },
+        {
+          "level": "part",
+          "category": "bent segment"
+        }
+      ]
+    },
+    {
+      "id": "segment-dimensions",
+      "sheets": "^SEGMENT DIMENSIONS",
+      "basis": "Box section and the variable depth / bottom slab table (sections 1-12)",
+      "target": [
+        {
+          "level": "part",
+          "category": [
+            "typical segment",
+            "closure joint"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "typical-reinforcement",
+      "sheets": "^TYPICAL SEGMENT REINFORCEMENT",
+      "basis": "Typical segment bars (not modeled)",
+      "target": [
+        {
+          "level": "part",
+          "category": "typical segment"
+        }
+      ]
+    },
+    {
+      "id": "end-segment",
+      "sheets": "^END SEGMENT (DIMENSIONS|POST-TENSIONING DETAILS|REINFORCEMENT)",
+      "basis": "End segment 8'-8: diaphragm, blockout, E1-E4, vertical bars",
+      "target": [
+        {
+          "level": "part",
+          "category": "end segment"
+        }
+      ]
+    },
+    {
+      "id": "bent-segment",
+      "sheets": "^BENT SEGMENT (DIMENSIONS|POST-TENSIONING DETAILS|REINFORCEMENT)",
+      "basis": "Split bent segment: 19'-3 at the CL, diaphragm, F1 / F2, PT bars",
+      "target": [
+        {
+          "level": "part",
+          "category": "bent segment"
+        }
+      ]
+    },
+    {
+      "id": "closure-joint",
+      "sheets": "^CLOSURE JOINT",
+      "basis": "Closure joint 4'-0 / 3'-6, deviation block",
+      "target": [
+        {
+          "level": "part",
+          "category": "closure joint"
+        }
+      ]
+    },
+    {
+      "id": "transverse-pt",
+      "sheets": "^TRANSVERSE POST-TENSIONING DETAILS",
+      "basis": "Transverse tendons 4 x 0.6, 41'-7, quantities 121,624 lb",
+      "target": [
+        {
+          "level": "element",
+          "category": "transverse tendon"
+        }
+      ]
+    },
+    {
+      "id": "shear-keys",
+      "sheets": "^BULKHEAD AND SHEAR KEY DETAILS",
+      "basis": "Duct grid rows A / B / C, web keys (keys not modeled)",
+      "target": [
+        {
+          "level": "part",
+          "category": [
+            "typical segment",
+            "bent segment"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "long-pt",
+      "sheets": "^LONGITUDINAL POST-TENSIONING (NOTES|LAYOUT|GEOMETRY DETAILS|SCHEDULE)",
+      "basis": "Cantilever T1-T14, bottom B1-B7, closure C1-C2: layout, anchor segments, schedule",
+      "target": [
+        {
+          "level": "element",
+          "category": [
+            "cantilever tendon",
+            "bottom continuity tendon",
+            "closure tendon"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pt-details",
+      "sheets": "^POST-TENSIONING DETAILS$",
+      "basis": "Anchorage / duct details",
+      "target": [
+        {
+          "level": "element",
+          "category": [
+            "cantilever tendon",
+            "bottom continuity tendon",
+            "closure tendon"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "anchor-blocks",
+      "sheets": "^(BOTTOM SLAB ANCHOR BLOCK|TOP SLAB ANCHOR BLOCK|DEVIATION BLOCK)",
+      "basis": "Anchor / deviation blocks (not modeled)",
+      "target": [
+        {
+          "level": "element",
+          "category": [
+            "bottom continuity tendon",
+            "closure tendon"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "erection",
+      "sheets": "^(CONSTRUCTION SEQUENCE|ERECTION PROCEDURE)",
+      "basis": "Balanced cantilever sequence (contractor information)",
+      "target": [
+        {
+          "level": "assembly",
+          "category": "segmental cantilever"
+        }
+      ]
+    },
+    {
+      "id": "bearings",
+      "sheets": "^BEARING (DETAILS|REPLACEMENT DETAILS)",
+      "basis": "Disc bearings: types I / II / III, assumed heights, masonry plate max sizes",
+      "target": [
+        {
+          "level": "element",
+          "category": "disc bearing"
+        }
+      ]
+    },
+    {
+      "id": "expansion-joint",
+      "sheets": "^MODULAR EXPANSION JOINT SEAL DETAILS",
+      "basis": "Joint at bents 18 / 29 (devices not modeled)",
+      "target": [
+        {
+          "level": "part",
+          "category": "end segment"
+        }
+      ]
+    },
+    {
+      "id": "bents-18-29",
+      "sheets": "^SUBSTRUCTURE (BENTS 18 & 29|PRECAST BENT CAP DETAILS - BENT (18|29)|PRECAST COLUMN SEGMENT DETAILS BENTS 18 & 29)",
+      "basis": "End bents: T-shaped cap, column segments, footing, pedestal tops",
+      "target": [
+        {
+          "level": "part",
+          "category": "pier",
+          "support": [
+            "Bent 18",
+            "Bent 29"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "bent-19",
+      "sheets": "^SUBSTRUCTURE BENT 19$",
+      "basis": "Bent 19",
+      "target": [
+        {
+          "level": "part",
+          "category": "pier",
+          "support": [
+            "Bent 19"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "bents-20-22",
+      "sheets": "^SUBSTRUCTURE BENTS 20 - 22",
+      "basis": "Bents 20-22",
+      "target": [
+        {
+          "level": "part",
+          "category": "pier",
+          "support": [
+            "Bent 20",
+            "Bent 21",
+            "Bent 22"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "bents-23-24",
+      "sheets": "^SUBSTRUCTURE BENTS 23 & 24",
+      "basis": "Bents 23-24 (fixed)",
+      "target": [
+        {
+          "level": "part",
+          "category": "pier",
+          "support": [
+            "Bent 23",
+            "Bent 24"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "bent-25",
+      "sheets": "^SUBSTRUCTURE BENT 25$",
+      "basis": "Bent 25",
+      "target": [
+        {
+          "level": "part",
+          "category": "pier",
+          "support": [
+            "Bent 25"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "bents-26-28",
+      "sheets": "^SUBSTRUCTURE BENTS 26 - 28",
+      "basis": "Bents 26-28",
+      "target": [
+        {
+          "level": "part",
+          "category": "pier",
+          "support": [
+            "Bent 26",
+            "Bent 27",
+            "Bent 28"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "caps-19-22",
+      "sheets": "^SUBSTRUCTURE PRECAST BENT CAP DETAILS - BENTS 19 - 22",
+      "basis": "Cap 18'-0 x 13'-0 x 5'-6, pedestal elevation table",
+      "target": [
+        {
+          "level": "part",
+          "category": "pier",
+          "support": [
+            "Bent 19",
+            "Bent 20",
+            "Bent 21",
+            "Bent 22"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "caps-23-24",
+      "sheets": "^SUBSTRUCTURE PRECAST BENT CAP DETAILS - BENTS 23 - 24",
+      "basis": "Cap, pedestal elevation table",
+      "target": [
+        {
+          "level": "part",
+          "category": "pier",
+          "support": [
+            "Bent 23",
+            "Bent 24"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "caps-25-28",
+      "sheets": "^SUBSTRUCTURE PRECAST BENT CAP DETAILS - BENTS 25 - 28",
+      "basis": "Cap, pedestal elevation table",
+      "target": [
+        {
+          "level": "part",
+          "category": "pier",
+          "support": [
+            "Bent 25",
+            "Bent 26",
+            "Bent 27",
+            "Bent 28"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "columns-19-22",
+      "sheets": "^SUBSTRUCTURE PRECAST COLUMN SEGMENT DETAILS BENTS (19 - 22|19 & 28)",
+      "basis": "Precast hollow column segments 16'-0 x 11'-0",
+      "target": [
+        {
+          "level": "part",
+          "category": "pier",
+          "support": [
+            "Bent 19",
+            "Bent 20",
+            "Bent 21",
+            "Bent 22",
+            "Bent 28"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "columns-23-24",
+      "sheets": "^SUBSTRUCTURE PRECAST COLUMN SEGMENT DETAILS BENTS 23 & 24",
+      "basis": "Column segments (size UNRESOLVED, no solid)",
+      "target": [
+        {
+          "level": "part",
+          "category": "pier",
+          "support": [
+            "Bent 23",
+            "Bent 24"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "columns-25-28",
+      "sheets": "^SUBSTRUCTURE PRECAST COLUMN SEGMENT DETAILS BENTS 25 - 28",
+      "basis": "Precast hollow column segments 16'-0 x 11'-0",
+      "target": [
+        {
+          "level": "part",
+          "category": "pier",
+          "support": [
+            "Bent 25",
+            "Bent 26",
+            "Bent 27",
+            "Bent 28"
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -46,6 +46,11 @@ public static class IfcKeys
     public static string DiaphragmAccessory(string bk, string support, int n) => $"{bk}/diaphragm/{support}/acc/{n}";
     /// <summary>Surface treatment region (IfcCovering), by its unique name "{treatment} - {region}".</summary>
     public static string SurfaceTreatment(string bk, string name) => $"{bk}/surface/{name}";
+    /// <summary>Segmental box: cantilever assembly of a bent, a segment / closure / end segment, a tendon, a bearing (all by their unique names).</summary>
+    public static string SegCantilever(string bk, string bent) => $"{bk}/seg/cantilever/{bent}";
+    public static string Segment(string bk, string name) => $"{bk}/seg/{name}";
+    public static string SegTendon(string bk, string name) => $"{bk}/seg/tendon/{name}";
+    public static string SegBearing(string bk, string name) => $"{bk}/seg/bearing/{name}";
 
     /// <summary>Unquoted 22-character IFC GlobalId of a key.</summary>
     public static string GlobalId(string key) => StepWriter.Guid(key).Trim('\'');

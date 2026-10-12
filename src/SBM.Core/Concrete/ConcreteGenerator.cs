@@ -105,6 +105,9 @@ public sealed class ConcreteModel
     public List<Diagnostic> Diagnostics { get; } = new();
     /// <summary>Exact-geometry option: what was built as NURBS (null when the option is off).</summary>
     public NurbsReport? Nurbs { get; set; }
+    /// <summary>Precast segmental box (bridges with <c>BridgeDefinition.Segmental</c>): segments, tendons, bearings and bents. Hung on the
+    /// concrete model so every consumer that receives the concrete model (viewport, IFC, database) finds it; null otherwise.</summary>
+    public SBM.Core.Segmental.SegmentalModel? Segmental { get; set; }
     public double DeckVolume => Math.Abs(Deck?.Volume() ?? 0);
     public double HaunchVolume => Math.Abs(Haunches?.Volume() ?? 0);
     public double BarrierVolume => Barriers.Sum(b => Math.Abs(b.Mesh.Volume()));

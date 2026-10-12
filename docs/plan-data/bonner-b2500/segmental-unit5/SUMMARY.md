@@ -15,7 +15,7 @@ Files in this folder (all CSVs have page + sheet + tag columns):
 ## Method notes
 - The text layer carries dimensions but stacked fractions are glyphs. Table (verified on raster): 1/16 U+02C6, 1/8 U+201E, 3/16 U+2030, 1/4 U+201A, 5/16 U+0160, 3/8 U+2026, 7/16 U+2039, 1/2 U+2022, 9/16 U+0152, 5/8 U+2020, 3/4 U+0192, 13/16 U+017D, 7/8 U+2021 (11/16 and 15/16 do not occur in S3). Every key table below was also read on a 130-220 dpi clip.
 - Vector measurements (S3-20): page scale 1.500 pt per inch (42'-7" = 766.4 pt); the box outline was read from the PDF drawing objects and checked against every printed dimension on the section (section 2).
-- **Side finding for the general-drawings summary (../SUMMARY.md):** S0 p31 prints the Unit 6/9-13 span as 160'-10 1/16" (not 160'-10"), p30 160'-7 1/16", p32 "803'-2 1/16"" for a 5-span unit (summary says 804'-2"); the earlier pass dropped the 1/16 glyph. Not corrected here.
+- **Side finding for the general-drawings summary (../SUMMARY.md) - WITHDRAWN 2026-10-12:** the 160'-10 1/16" (p31), 160'-7 1/16" (p30) and 803'-2 1/16" (p32) values are on the LONG CHORD LAYOUT sheets and are dimensions along the unit / span CHORDS ("CHORD", "ALONG CHORD" labels); the general drawing p9 prints 160'-10" along -L- (5 x 160'-10" = 804'-2"). ../SUMMARY.md and ../spans.csv are correct; no change.
 
 ## 0. What the unit is
 Navigation unit, 11 spans (19-29), 3,550'-0" along -L- (ARC/TAN), 12 supports (bents 18-29), STA 57+45.00 to 92+95.00. Variable-depth single-cell precast segmental concrete box girder (one box, 42'-7" out to out, carries the 40'-0" clear roadway),
@@ -155,7 +155,7 @@ AASHTO LRFD Bridge Design Specifications 5th Ed. 2010 (interims and errata throu
 | item | pdf page | reason |
 |---|---|---|
 | Equation / source of the variable depth curve | p268 | plan prints only the 12-value table; the parabola is a fit (max 0.051"); soffit shape between the bent CL (19'-3") and joint 1 (19'-0") 5'-0" away is not dimensioned |
-| Bottom slab thickness at the pier segment and at section 1 | p268, p277 | table T = 2'-0" vs drawn 20" in the "section at bent" sketch; S3-29 dimensions (2'-3", 2'-0", 3") not resolved to a thickness |
+| Bottom slab thickness at the pier segment and at section 1 | p268, p277 | table T = 2'-0" vs drawn 20" in the "section at bent" sketch. S3-29 (RASTER 130 dpi): 2'-0" slab + 3" = 2'-3" at the bent: the soffit is 3" lower in the bent zone (19'-0" -> 19'-3"), the slab top level; the length of the step (drawn within the 1'-6" next to the bulkhead) is not dimensioned |
 | Casting curve, camber, segment survey coordinates | p267 | not in the plans (bearing-offset notes only) |
 | Relation of span / segment lengths (chord along the girder CL) to arc length along -L- | p263, p251 | both stated, no conversion given |
 | B (bottom slab) tendon anchor segments, tendon vertical profiles / P.I. coordinates, anchor block sizes | p285-304 | drawings only; meaning of dashed T5 / T6 ducts not confirmed |
@@ -166,7 +166,7 @@ AASHTO LRFD Bridge Design Specifications 5th Ed. 2010 (interims and errata throu
 | Expansion joint opening and movement settings at bents 18 and 29 | S2 / S4 sheets | "bound under separate cover", not read |
 | Column plan sizes, cap sizes, cap / column / footing bar lists | p334-384 | not tabulated (text in sheet-text/) |
 | Own top-of-bent EL for bents 21, 22, 24 | p340, p343 | one value printed per shared sheet (20-22; 23-24); bent 19 fourth segment height derived |
-| Bearing transverse position vs the webs | p271, p277, p317 | "8'-3" typ." bearing lines vs 7'-8 1/4" half bottom width at the bent: plinth / pedestal geometry not resolved |
+| Bearing transverse position vs the webs | p271, p277, p317 | RESOLVED 2026-10-12 (RASTER): cantilever bents 19-28 CL bearing 5'-3" each side of CL (pedestal plans p359 / p363 / p367 'SYM. ABOUT CL - 5'-3" - GIRDER BRG. LINE', p277 section); 8'-3" applies to end bents 18 / 29 (p354, p371) |
 | Web key table column C meaning | p283 | legend shows "A" keys @ 6 1/2" = "B"; "C" location not verified |
 | Survey blockout / access opening location tables | p263-266 | not tabulated |
 | Cross slope direction and the 4.5% to 2.5% transition inside the unit | S0 p4 | not resolved (see ../SUMMARY.md) |

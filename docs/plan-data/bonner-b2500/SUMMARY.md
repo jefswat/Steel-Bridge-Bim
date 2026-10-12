@@ -31,7 +31,7 @@ Per-bent and per-span tables: bents.csv (station, foundation designation, fixity
 | item | value | unit | PDF p. / sheet | tag | note |
 |---|---|---|---|---|---|
 | Supports | EB1 (STA 28+68.00, integral, fixed, 20" sq PS piles), bents 1-81, EB2 (STA 176+67.51, integral) | | p3-16 | TEXT | span n = bent n-1 to n (EB1 = bent 0) |
-| Span lengths along -L- | 85 (spans 1-2), 157 (3-6), 167 (7-13), 182 (14-18), 200 (19, 29), 350 (20-28), 160'-10" (30-80), 85.01 (81), 85.00 (82) | ft | p3-16 | TEXT / DERIVED | sum = 14,799.51 = 14,799'-6 1/8" ok; span 81 plan label UNVERIFIED |
+| Span lengths along -L- | 85 (spans 1-2), 157 (3-6), 167 (7-13), 182 (14-18), 200 (19, 29), 350 (20-28), 160'-10" (30-80), 85.01 (81), 85.00 (82) | ft | p3-16 | TEXT / DERIVED | sum = 14,799.51 = 14,799'-6 1/8" ok; span 81 plan label UNVERIFIED Re-checked 2026-10-12 (p9, p30-32): the general drawing p9 prints 160'-10" along -L-; the 160'-10 1/16", 160'-7 1/16" and 803'-2 1/16" on p30-32 are LONG CHORD LAYOUT dimensions along the unit / span chords (labelled CHORD / ALONG CHORD), not lengths along -L- - no change. |
 | Units (continuous for live load) | 1: spans 1-2 (170'); 2: 3-6 (628'); 3: 7-13 (1169'); 4: 14-18 (910'); 5: 19-29 (3550', segmental box); 6: 30-35 (965'); 7: 36-40 (804'-2"); 8: 41-45 (804'-2"); 9: 46-51, 10: 52-57, 11: 58-63, 12: 64-69, 13: 70-75 (965' each); 14: 76-80 (804'-2"); 15: 81-82 (170') | ft | p3-16 | RASTER + DERIVED | unit ends inferred from labels and stations (965 = 6 x 160'-10") |
 | Skew | all bents radial to -L- | | p3 | TEXT | curved alignment; spans labelled ARC / TAN-ARC |
 | Foundations | P-3 (3 x 54" cylinder piles), P-4, P-4W (4); footings on 36" sq PS piles: S-10, S-12, S-16, S-16W, C-18, C-20, C-24, C-24W, C-30, N-6, N-8, N-12, N-14 (number = piles); batter 2:12 | | p3 foundation table | TEXT | designation per bent in bents.csv (RASTER) |
@@ -51,7 +51,7 @@ typical sections S1-06..14, S2-10..19, S3-14; precast bent caps/columns S1-59..6
 | Quantities / bills of material | S1-53/54, S2-71/72 etc. | not read |
 | Segmental box unit 5 (segments, PT, erection) | p249-392 | extracted in segmental-unit5/SUMMARY.md (open items listed there); SBM has no feature for it |
 | Coordinates N/E | p21-34 | not read |
-| Cross slope direction | p4 | arrows not decipherable on the 110 dpi clip |
+| Cross slope direction | p4 | arrows not decipherable on the 110 dpi clip. Unit 5 (bents 18-29): RESOLVED from S3-19 p267 (section 'looking upstation': slope down to the RIGHT) - see segmental-unit5/SEGMENTAL-DESIGN.md |
 | Fixity / foundation designation / top of footing per bent | p3-16 | read on 50-72 dpi strips, not confirmed at 300 dpi; pile bents have no footing elevation |
 | Bent 23 station | p7 | printed "73+4500" (typo); taken as 73+45.00 (equals 350' spacing) |
 

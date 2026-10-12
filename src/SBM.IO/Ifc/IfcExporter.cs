@@ -72,6 +72,13 @@ public static class IfcExporter
         return Export(fs, Path.GetFileName(path), project, bridges, options);
     }
 
+    /// <summary>IfcBeam ObjectType of a segmental box segment (shared with the companion database).</summary>
+    public static string SegmentObjectType(SBM.Core.Bridge.SegmentType t) => t switch
+    {
+        SBM.Core.Bridge.SegmentType.BentHalf => "BENT_SEGMENT", SBM.Core.Bridge.SegmentType.Closure => "CLOSURE_JOINT",
+        SBM.Core.Bridge.SegmentType.End => "END_SEGMENT", _ => "TYPICAL_SEGMENT",
+    };
+
     public static bool IsIfcZip(string path) => path.EndsWith(".ifczip", StringComparison.OrdinalIgnoreCase);
 
     public static IfcExportResult Export(TextWriter tw, string fileName, BridgeProject project, IReadOnlyList<IfcBridgeData> bridges, IfcExportOptions? options = null)
@@ -899,6 +906,98 @@ public static class IfcExporter
                 w.Add("IFCRELCONTAINEDINSPATIALSTRUCTURE", $"{Guid(bk + "/rel/ps/" + i)},$,$,$,{Refs(contained.Skip(i).Take(5000))},{Ref(superPart)}");
         }
 
+
+        // Precast segmental box (Concrete.Segmental): one IfcElementAssembly (GIRDER, built on site) per balanced cantilever aggregating its
+        // segments (IfcBeam GIRDER_SEGMENT; ObjectType = segment type), its cantilever tendons and the transverse tendons of its segments
+        // (IfcTendon STRAND, swept disk of the equal-area bundle along the duct path, Pset SBM_Tendon); closure joints, end segments,
+        // continuity tendons and the disc bearings (IfcBearing DISK) are contained in the superstructure. Flags -> SBM_Status.
+        void ExportSegmental(SBM.Core.Segmental.SegmentalModel sm, string bk, int superPart, int pl)
+        {
+            var sd = sm.Definition;
+            int precastStyle = RgbStyle("Precast segmental concrete", 0.80, 0.78, 0.72), cipStyle = RgbStyle("Cast-in-place closure concrete", 0.70, 0.70, 0.66);
+            int strandStyle = RgbStyle("Post-tensioning tendon", 0.25, 0.35, 0.55), bearingStyle = RgbStyle("Disc bearing", 0.55, 0.55, 0.6);
+            string precastMat = $"Precast segmental box concrete, f'c = {sd.ConcreteStrengthKsi:0.0#} ksi";
+            var contained = new List<int>();
+            var asm = new Dictionary<string, (int id, List<int> kids)>();
+            foreach (var bent in sm.Segments.Where(x => x.Bent != "").Select(x => x.Bent).Distinct())
+            {
+                int a = w.Add("IFCELEMENTASSEMBLY", $"{Guid(IfcKeys.SegCantilever(bk, bent))},$,{S(bent + " cantilever")},{S($"Balanced cantilever from {bent}: split bent segment and the segments erected from it")},$,{Ref(pl)},$,{S(bent)},.SITE.,.GIRDER.");
+                asm[bent] = (a, new List<int>());
+                contained.Add(a);
+            }
+            foreach (var g in sm.Segments)
+            {
+                int style = g.Type == SBM.Core.Bridge.SegmentType.Closure ? cipStyle : precastStyle;
+                int pds;
+                if (g.Pieces.Count > 1)
+                {
+                    meshParts++;
+                    var items = g.Pieces.Select(pc => FaceSet(pc, style)).ToList();
+                    int rep = w.Add("IFCSHAPEREPRESENTATION", $"{Ref(body)},'Body','Tessellation',{Refs(items)}");
+                    pds = w.Add("IFCPRODUCTDEFINITIONSHAPE", $"$,$,({Ref(rep)})");
+                }
+                else pds = Body(g.Mesh, style);
+                string ot = SegmentObjectType(g.Type);
+                int id = w.Add("IFCBEAM", $"{Guid(IfcKeys.Segment(bk, g.Name))},$,{S(g.Name)},{S(g.Description)},{S(ot)},{Ref(pl)},{Ref(pds)},{S(g.Name)},.GIRDER_SEGMENT.");
+                AddMaterial(g.Type == SBM.Core.Bridge.SegmentType.Closure ? "Cast-in-place closure joint concrete" : precastMat, id);
+                psetTargets.Add((id, g.Name, ot, g.ChordLength, g.Volume * 2400));
+                if (g.Assumption != null) miscStatus.Add((id, g.Assumption));
+                if (g.Bent != "" && asm.TryGetValue(g.Bent, out var aa)) aa.kids.Add(id); else contained.Add(id);
+            }
+            var segBent = sm.Segments.ToDictionary(x => x.Name, x => x.Bent);
+            var tendonProps = new List<(int id, string key, SBM.Core.Segmental.TendonResult t)>();
+            foreach (var t in sm.Tendons)
+            {
+                if (t.Points.Count < 2) continue;
+                double area = t.Strands * sd.StrandArea, r = Math.Sqrt(area / Math.PI);
+                var (curve, _) = Directrix(t.Points);
+                int disk = w.Add("IFCSWEPTDISKSOLID", $"{Ref(curve)},{R(r * scale)},$,$,$");
+                w.Add("IFCSTYLEDITEM", $"{Ref(disk)},({Ref(strandStyle)}),$");
+                int rep = w.Add("IFCSHAPEREPRESENTATION", $"{Ref(body)},'Body','AdvancedSweptSolid',({Ref(disk)})");
+                int pds = w.Add("IFCPRODUCTDEFINITIONSHAPE", $"$,$,({Ref(rep)})");
+                string tk = IfcKeys.SegTendon(bk, t.Name);
+                int id = w.Add("IFCTENDON", $"{Guid(tk)},$,{S(t.Name)},{S($"{t.Group} tendon, {t.Strands} - 0.6 in strands")},{S(t.Group.ToString().ToUpperInvariant() + "_TENDON")},{Ref(pl)},{Ref(pds)},{S(t.Name)},'Gr. 270',.STRAND.," +
+                    $"{R(2 * r * scale)},{R(area * scale * scale)},$,$,$,$,$");
+                AddMaterial(sd.StrandMaterial, id);
+                if (t.Assumption != null) miscStatus.Add((id, t.Assumption));
+                tendonProps.Add((id, tk, t));
+                string owner = t.Group == SBM.Core.Bridge.TendonGroup.Transverse ? segBent.GetValueOrDefault(t.Owner, "") : t.Owner;
+                if (owner != "" && asm.TryGetValue(owner, out var aa)) aa.kids.Add(id); else contained.Add(id);
+            }
+            foreach (var b in sm.Bearings)
+            {
+                int pds = b.Mesh is { IsEmpty: false } bm ? Body(bm, bearingStyle) : 0;
+                int id = w.Add("IFCBEARING", $"{Guid(IfcKeys.SegBearing(bk, b.Name))},$,{S(b.Name)},{S(b.Description)},{S("TYPE_" + b.Type)},{Ref(pl)},{(pds > 0 ? Ref(pds) : "$")},{S(b.Name)},.DISK.");
+                AddMaterial("Disc bearing (vendor designed; generic envelope)", id);
+                if (b.Assumption != null) miscStatus.Add((id, b.Assumption));
+                contained.Add(id);
+            }
+            foreach (var (bent, (a, kids)) in asm)
+                if (kids.Count > 0) w.Add("IFCRELAGGREGATES", $"{Guid(IfcKeys.SegCantilever(bk, bent) + "/rel")},$,$,$,{Ref(a)},{Refs(kids)}");
+            for (int i = 0; i < contained.Count; i += 5000)
+                w.Add("IFCRELCONTAINEDINSPATIALSTRUCTURE", $"{Guid(bk + "/rel/seg/" + i)},$,$,$,{Refs(contained.Skip(i).Take(5000))},{Ref(superPart)}");
+            foreach (var (id, tk, t) in tendonProps)
+            {
+                const double ftm = 0.3048;
+                var props = new List<int>
+                {
+                    w.Add("IFCPROPERTYSINGLEVALUE", $"'TendonGroup',$,IFCLABEL({S(t.Group.ToString())}),$"),
+                    w.Add("IFCPROPERTYSINGLEVALUE", $"'Location',$,IFCLABEL({S(t.Location)}),$"),
+                    w.Add("IFCPROPERTYSINGLEVALUE", $"'Strands',$,IFCINTEGER({t.Strands}),$"),
+                    w.Add("IFCPROPERTYSINGLEVALUE", $"'PlanLength',$,IFCLENGTHMEASURE({R(t.PlanLength * scale)}),$"),
+                    w.Add("IFCPROPERTYSINGLEVALUE", $"'ModelLength',$,IFCLENGTHMEASURE({R(t.Length * scale)}),$"),
+                    w.Add("IFCPROPERTYSINGLEVALUE", $"'PlanWeight_lb',$,IFCREAL({R(t.PlanWeightLb)}),$"),
+                    w.Add("IFCPROPERTYSINGLEVALUE", $"'ModelWeight_lb',$,IFCREAL({R(Math.Round(t.Strands * t.Length / ftm * sd.StrandWeightLbPerFt, 1))}),$"),
+                    w.Add("IFCPROPERTYSINGLEVALUE", $"'JackingForce_kip',$,IFCREAL({R(t.JackingForceKip)}),$"),
+                    w.Add("IFCPROPERTYSINGLEVALUE", $"'StressingEnd',$,IFCLABEL({S(t.StressingEnd)}),$"),
+                    w.Add("IFCPROPERTYSINGLEVALUE", $"'Anchors',$,IFCTEXT({S(t.Anchors)}),$"),
+                };
+                int ps = w.Add("IFCPROPERTYSET", $"{Guid(tk + "/pset")},$,'SBM_Tendon',$,{Refs(props)}");
+                w.Add("IFCRELDEFINESBYPROPERTIES", $"{Guid(tk + "/relpset")},$,$,$,({Ref(id)}),{Ref(ps)}");
+            }
+            result.ElementCount += sm.Segments.Count + sm.Tendons.Count + sm.Bearings.Count;
+        }
+
         // ---- alignments: IFC 4.3 layout + IfcCompositeCurve / IfcGradientCurve + stationing (IfcAlignmentWriter), the same in
         // every geometry mode. Aggregated to the project (bSI: alignments belong to IfcProject) and referenced by the site.
         // Code that places products along an alignment uses alignmentWriter.For(name) / .Written (curve ids, LinearPlacement).
@@ -936,6 +1035,7 @@ public static class IfcExporter
             w.Add("IFCRELAGGREGATES", $"{Guid(bk + "/rel/bridge-part")},$,$,$,{Ref(bridge)},({parts})");
             int deckSlabId = concrete != null ? ExportConcrete(concrete, framing.Definition, bk, deckPart, elemPl) : 0;
             if (prestressed != null) ExportPrestressed(prestressed, bk, superPart, elemPl);
+            if (concrete?.Segmental is { } segmental) ExportSegmental(segmental, bk, superPart, elemPl);
             if (substructure is { Drainage.Count: > 0 })
             {
                 int drainStyle = RgbStyle("Drainage", 0.35, 0.65, 0.8), stoneStyle = RgbStyle("Erosion stone", 0.55, 0.47, 0.35);

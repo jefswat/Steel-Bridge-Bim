@@ -287,6 +287,7 @@ public class DatabaseTests : IDisposable
     [InlineData("sheet-links-br02069.json", "Br02069 TH65.sbm", 39)]
     [InlineData("sheet-links-nht.json", "Northaven NHT.sbm", 155)]
     [InlineData("sheet-links-odot-o.json", "ODOT Bridge O tub unit.sbm", 49)]
+    [InlineData("sheet-links-bonner-unit5.json", "Bonner Unit 5 segmental.sbm", 144)]
     public void ShippedLinkRules_HaveASheetIndex_AndEveryRuleMatchesASheet(string file, string model, int pages)
     {
         string path = RepoFile(Path.Combine("samples", "plans", file));

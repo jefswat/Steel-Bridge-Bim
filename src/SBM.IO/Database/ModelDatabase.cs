@@ -474,6 +474,7 @@ public static class ModelDatabase
             string deckSlabId = "";
             if (b.Concrete != null) deckSlabId = Concrete(b.Concrete, def, bk, deckPartId);
             if (b.Prestressed != null) Prestressed(b.Prestressed, bk, superId);
+            if (b.Concrete?.Segmental is { } sgm) Segmental(sgm, bk, superId, def.Name);
             if (b.Steel != null) Steel(b.Steel, bk, superId, framing.Camber);
             if (b.Substructure?.Misc is { IsEmpty: false } misc) MiscItems(misc, bk, superId, def.Name);
             if (b.Substructure?.SurfaceTreatments is { IsEmpty: false } stm) SurfaceTreatments(stm, bk, unitId, def.Name);
@@ -1054,6 +1055,90 @@ public static class ModelDatabase
         }
 
         // ------------------------------------------------------------ prestressed
+
+        // ------------------------------------------------------------ precast segmental box
+
+        /// <summary>Segmental box: group "Segmental box" (summary in props) > cantilever assemblies (segments, cantilever + transverse tendons) and
+        /// the closure joints / end segments; continuity tendons per span group; bearings group. GlobalIds = the IFC keys (IfcKeys.Seg*).</summary>
+        private void Segmental(SBM.Core.Segmental.SegmentalModel sm, string bk, string superId, string bridgeName)
+        {
+            const double cy = 0.764554857984;
+            var types = sm.Segments.GroupBy(s => s.Type).ToDictionary(g => g.Key.ToString(), g => g.Count());
+            var gp = new Json().Add("segments", sm.Segments.Count).Add("typical", types.GetValueOrDefault("Typical")).Add("bent_halves", types.GetValueOrDefault("BentHalf"))
+                .Add("closure_joints", types.GetValueOrDefault("Closure")).Add("end_segments", types.GetValueOrDefault("End")).Add("tendons", sm.Tendons.Count)
+                .Add("bearings", sm.Bearings.Count).Add("box_concrete_cy", Math.Round(sm.ConcreteVolume / cy, 1)).Add("source", sm.Definition.Source);
+            string gid = Group($"{bk}/grp/segmental", superId, $"{bridgeName} segmental box", "segmental box", props: gp.ToString());
+            var asm = new Dictionary<string, string>();
+            foreach (var bent in sm.Segments.Where(x => x.Bent != "").Select(x => x.Bent).Distinct())
+            {
+                string aid = Id(IfcKeys.SegCantilever(bk, bent));
+                var a = New(aid, gid, "assembly", "segmental cantilever", "IFCELEMENTASSEMBLY", bent + " cantilever");
+                a.Support = bent; a.Mark = bent;
+                _w.Add(a);
+                asm[bent] = aid;
+            }
+            static string Cat(SBM.Core.Bridge.SegmentType t) => t switch
+            {
+                SBM.Core.Bridge.SegmentType.BentHalf => "bent segment", SBM.Core.Bridge.SegmentType.Closure => "closure joint",
+                SBM.Core.Bridge.SegmentType.End => "end segment", _ => "typical segment",
+            };
+            foreach (var s in sm.Segments)
+            {
+                var r = New(Id(IfcKeys.Segment(bk, s.Name)), s.Bent != "" ? asm[s.Bent] : gid, "part", Cat(s.Type), "IFCBEAM", s.Name);
+                r.Tag = s; r.Mark = s.Name; r.Support = s.Bent; r.Subtype = s.Span;
+                if (_keysOnly) { _w.Add(r); continue; }
+                r.Material = s.Type == SBM.Core.Bridge.SegmentType.Closure ? "Cast-in-place closure joint concrete" : $"Precast segmental box concrete, f'c = {sm.Definition.ConcreteStrengthKsi:0.0#} ksi";
+                r.Volume = s.Volume; r.Mass = s.Volume * 2400; r.Length = s.ChordLength;
+                r.Box = s.Mesh.Bounds(); SetStation(r, s.Station0, s.Station1);
+                var pj = new Json().Add("span", s.Span).Add("depth_start_ft", Math.Round(s.Depth0 / 0.3048, 4)).Add("depth_end_ft", Math.Round(s.Depth1 / 0.3048, 4))
+                    .Add("length_along_L_ft", Math.Round(s.AlignmentLength / 0.3048, 4)).Add("chord_length_ft", Math.Round(s.ChordLength / 0.3048, 4)).Add("description", s.Description);
+                if (s.Assumption is { } asu) pj.Add("status", asu.Status).Add("reason", asu.Reason).Add("assumed", asu.Basis);
+                r.Props = pj.ToString();
+                _w.Add(r);
+            }
+            var segBent = sm.Segments.ToDictionary(x => x.Name, x => x.Bent);
+            var spanGroups = new Dictionary<string, string>();
+            foreach (var t in sm.Tendons)
+            {
+                string owner = t.Group == SBM.Core.Bridge.TendonGroup.Transverse ? segBent.GetValueOrDefault(t.Owner, "") : t.Owner;
+                string parent;
+                if (owner != "" && asm.TryGetValue(owner, out var aid)) parent = aid;
+                else
+                {
+                    string key = t.Group == SBM.Core.Bridge.TendonGroup.Transverse ? "transverse tendons" : $"{t.Location} continuity tendons";
+                    if (!spanGroups.TryGetValue(key, out parent!)) spanGroups[key] = parent = Group($"{bk}/grp/segmental/{key}", gid, key, "tendon group");
+                }
+                string cat = t.Group switch
+                {
+                    SBM.Core.Bridge.TendonGroup.Cantilever => "cantilever tendon", SBM.Core.Bridge.TendonGroup.Bottom => "bottom continuity tendon",
+                    SBM.Core.Bridge.TendonGroup.Closure => "closure tendon", _ => "transverse tendon",
+                };
+                var r = New(Id(IfcKeys.SegTendon(bk, t.Name)), parent, "element", cat, "IFCTENDON", t.Name);
+                r.Tag = t; r.Mark = t.Name; r.Support = owner;
+                if (_keysOnly) { _w.Add(r); continue; }
+                r.Material = sm.Definition.StrandMaterial; r.Length = t.Length;
+                foreach (var p in t.Points) r.Box.Add(p);
+                StationOf(r, r.Box);
+                var pj = new Json().Add("location", t.Location).Add("strands", t.Strands).Add("plan_length_ft", Math.Round(t.PlanLength / 0.3048, 3))
+                    .Add("model_length_ft", Math.Round(t.Length / 0.3048, 3)).Add("plan_weight_lb", t.PlanWeightLb).Add("jacking_force_kip", t.JackingForceKip)
+                    .Add("stressing_end", t.StressingEnd).Add("anchors", t.Anchors);
+                if (t.Assumption is { } asu) pj.Add("status", asu.Status).Add("reason", asu.Reason).Add("assumed", asu.Basis);
+                r.Props = pj.ToString();
+                _w.Add(r);
+            }
+            string bg = sm.Bearings.Count > 0 ? Group($"{bk}/grp/segmental/bearings", gid, "Disc bearings", "bearing group") : "";
+            foreach (var b in sm.Bearings)
+            {
+                var r = New(Id(IfcKeys.SegBearing(bk, b.Name)), bg, "element", "disc bearing", "IFCBEARING", b.Name);
+                r.Tag = b; r.Support = b.Bent; r.Subtype = "Type " + b.Type; r.InIfc = true;
+                if (_keysOnly) { _w.Add(r); continue; }
+                if (b.Mesh is { IsEmpty: false } m) { r.Box = m.Bounds(); StationOf(r, r.Box); }
+                var pj = new Json().Add("description", b.Description).Add("soffit_el_ft", Math.Round(b.SoffitZ / 0.3048, 3)).Add("bearing_top_el_ft", Math.Round(b.Top.Z / 0.3048, 3));
+                if (b.Assumption is { } asu) pj.Add("status", asu.Status).Add("reason", asu.Reason).Add("assumed", asu.Basis);
+                r.Props = pj.ToString();
+                _w.Add(r);
+            }
+        }
 
         private void Prestressed(SBM.Core.Prestressed.PrestressedModel ps, string bk, string superId)
         {
