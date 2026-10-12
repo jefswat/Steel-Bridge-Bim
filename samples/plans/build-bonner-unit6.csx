@@ -240,23 +240,24 @@ List<StrandPoint> Strands()
 }
 
 // Bearings (bearings.csv; p440 E1 / p442 E2 / p444 E3 plan views and sections; sole plates p440-444): pad = plan size along the girder x across,
-// total height as printed. Sole plates 4'-6" across the girder (4" + 3'-0" / 3'-10" + 4"), thicker at the back-station end, CL bearing from the
-// back-station end as dimensioned on the sole plate details.
+// total height as printed. Sole plates 4'-6" across the girder (4" + 3'-0" / 3'-10" + 4"), thicker at the back-station end (elevations), CL bearing
+// from the back-station end as dimensioned in the PLAN views ("CL BRG." vs "CL SLOTS": e.g. P36 7 3/4 slots + 5 = 12 3/4; the elevation dimensions
+// run to the slots); plates whose plan shows only "CL SLOTS" / "CL HOLES" (P33, P34, P14, P8, P35) are centred on the bearing.
 var pads = new Dictionary<string, (double along, double across, double h, string page)>
 {
     ["E1"] = (F(1, 2), F(3), In(9 + 1.0 / 16), "p.440"), ["E2"] = (F(1), F(2, 8), In(6 + 7.0 / 16), "p.442"), ["E3"] = (F(1), F(2, 4), In(2 + 7.0 / 16), "p.444"),
 };
 var plates = new Dictionary<string, (double len, double back, double ahead, double brg, string page)>
 {
-    ["P32"] = (F(1, 9.25), In(2), In(1.25), F(1), "p.440"),
-    ["P40"] = (F(1, 8.25), In(1 + 15.0 / 16), In(1.25), In(9.25), "p.440"),
+    ["P32"] = (F(1, 9.25), In(2), In(1.25), In(8), "p.440"),
+    ["P40"] = (F(1, 8.25), In(1 + 15.0 / 16), In(1.25), In(12.25), "p.440"),
     ["P33"] = (F(1, 3.25), In(1 + 15.0 / 16), In(1.25), In(7.625), "p.443"),
     ["P34"] = (F(1, 3.25), In(2 + 1.0 / 16), In(1.25), In(7.625), "p.443"),
     ["P14"] = (F(1, 3.25), In(1.875), In(1.25), In(7.625), "p.442"),
-    ["P36"] = (F(1, 7.75), In(2.125), In(1.25), In(7.75), "p.443"),
-    ["P37"] = (F(1, 7.75), In(1 + 13.0 / 16), In(1.25), F(1), "p.443"),
-    ["P38"] = (F(1, 7.75), In(2), In(1.25), In(7.75), "p.443"),
-    ["P39"] = (F(1, 7.75), In(1.75), In(1.25), F(1), "p.443"),
+    ["P36"] = (F(1, 7.75), In(2.125), In(1.25), In(12.75), "p.443"),
+    ["P37"] = (F(1, 7.75), In(1 + 13.0 / 16), In(1.25), In(7), "p.443"),
+    ["P38"] = (F(1, 7.75), In(2), In(1.25), In(12.75), "p.443"),
+    ["P39"] = (F(1, 7.75), In(1.75), In(1.25), In(7), "p.443"),
     ["P35"] = (F(1, 2), In(1 + 15.0 / 16), In(1.25), In(7), "p.444"),
     ["P8"] = (F(1, 2), In(1.75), In(1.25), In(7), "p.444"),
 };
@@ -300,8 +301,8 @@ var commonUnresolved = new List<string>
 {
     UnresolvedFlag.Text("p.438", "FIB-96 bottom flange corner chamfer", "the 3/4\" chamfers at the bottom corners are drawn (vector drawing 0.73\") but not dimensioned", "3/4\" chamfer as drawn."),
     UnresolvedFlag.Text("p.428-431, p.422-424", "girder length 'A' vs bearing-to-bearing + end distances",
-        "A (e.g. spans 31-32 160'-1 7/8\") exceeds b-b + the 9\" end distances (158'-6\" + 1'-6\" = 160'-0\") by 1 1/8\" to 1 7/8\"; the sheets do not say how A is measured",
-        "Beams built from the framing plan: layout CL bearings (bent line +- 1'-2\" / 3'-2\") + the 9\" / 11\" end distances; the check reports A - model."),
+        "A is the length along the sloped girder (b-b + end distances x the grade factor: spans 30 and 32 reproduce within 1/16\"), but ONE A is printed for spans 31-32 and one for 33-34 although their grades differ (vertical curves), so A cannot hold for both spans of a pair",
+        "Beams built from the framing plan: layout CL bearings (bent line +- 1'-2\", 3'-2\" at bent 29, 1'-4\" at bent 35) + the 9\" / 11\" end distances along the beam; the check reports A - model."),
     UnresolvedFlag.Text("p.428", "girder end details (end bevel, embedded plates B-1, formed holes, top raking)", "drawn on the girder sheets, not modeled", "Square ends, plain outline."),
 };
 PrestressedBeamDefinition Beam(int span, int g)
@@ -334,8 +335,8 @@ br.Girders.Prestressed = beamDefs[0].Beam.Clone();
 br.Girders.Prestressed.SpanBeams = beamDefs;
 
 // Per-span layout (framing plans p422-424, cap plans p481 / p484): girders on the bent control line at -17'-3", -5'-9", 5'-9", 17'-3" along it
-// from the work line (G1 left), CL bearing 1'-2" from the bent control line into the span (3'-2" at bent 29, p409), measured normal to the radial
-// bent line; straight chord per span (span 35 tangent then arc). Haunch at each bearing = the BUILD-UP at CL bearing (p404 table).
+// from the work line (G1 left; at bent 35 "radial along bent control line", p424), CL bearing 1'-2" from the bent control line into the span
+// (3'-2" at bent 29, p422; 1'-4" from "CL joint & bent 35 control line" at bent 35, p424), measured normal to the radial bent line; straight chord per span (span 35 tangent then arc). Haunch at each bearing = the BUILD-UP at CL bearing (p404 table).
 double[] buildBack = { 5, 4.5, 5.25, 5.5, 5.75, 5.75 }, buildAhead = { 5, 5.5, 5.75, 5.75, 5.75, 6 };   // span 30..35 at its start / end bent
 GirderSpanEnd End(double bearingOffset, double buildUpIn) => new()
 {
@@ -346,7 +347,7 @@ GirderSpanEnd End(double bearingOffset, double buildUpIn) => new()
 };
 br.Girders.SpanLayouts = new();
 for (int k = 0; k < 6; k++)
-    br.Girders.SpanLayouts.Add(new GirderSpanLayout { Span = k, Count = 4, Begin = End(k == 0 ? F(3, 2) : F(1, 2), buildBack[k]), End = End(F(1, 2), buildAhead[k]) });
+    br.Girders.SpanLayouts.Add(new GirderSpanLayout { Span = k, Count = 4, Begin = End(k == 0 ? F(3, 2) : F(1, 2), buildBack[k]), End = End(k == 5 ? F(1, 4) : F(1, 2), buildAhead[k]) });
 U("p.404", "build-up between the bearings", "only the values at the CL bearings are tabulated ('varies along length of girder')", "The haunch follows the straight beam between the two tabulated bearing values (no camber).");
 G("Girder mild reinforcing S1-S8, V1, WWF (p428-431: counts and lengths per girder, 3,854 - 3,947 lb) - not placed: bar shapes and positions not transcribed.");
 G("Embedded plates B-1, anchor bolts / grout pockets, 1 1/2\" formed web holes, end bevels (p438-444) - not modeled.");

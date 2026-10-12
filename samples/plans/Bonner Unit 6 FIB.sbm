@@ -365,7 +365,7 @@
             "BottomShape": "ParallelToTop",
             "MinPedestalHeight": 0.07619999999999999,
             "PedestalProjection": 0.07619999999999999,
-            "MaxPedestalHeight": 0.45720000000000005,
+            "MaxPedestalHeight": 0.6096,
             "PedestalSizeAlong": 1.5748,
             "PedestalSizeAcross": 0.9144000000000001,
             "PedestalShared": false,
@@ -710,7 +710,7 @@
             "BottomShape": "ParallelToTop",
             "MinPedestalHeight": 0.07619999999999999,
             "PedestalProjection": 0.07619999999999999,
-            "MaxPedestalHeight": 0.45720000000000005,
+            "MaxPedestalHeight": 0.6096,
             "PedestalSizeAlong": 1.5748,
             "PedestalSizeAcross": 0.9144000000000001,
             "PedestalShared": false,
@@ -1055,7 +1055,7 @@
             "BottomShape": "ParallelToTop",
             "MinPedestalHeight": 0.07619999999999999,
             "PedestalProjection": 0.07619999999999999,
-            "MaxPedestalHeight": 0.45720000000000005,
+            "MaxPedestalHeight": 0.6096,
             "PedestalSizeAlong": 1.5748,
             "PedestalSizeAcross": 0.9144000000000001,
             "PedestalShared": false,
@@ -1384,7 +1384,7 @@
             "BottomShape": "ParallelToTop",
             "MinPedestalHeight": 0.07619999999999999,
             "PedestalProjection": 0.07619999999999999,
-            "MaxPedestalHeight": 0.45720000000000005,
+            "MaxPedestalHeight": 0.6096,
             "PedestalSizeAlong": 1.5748,
             "PedestalSizeAcross": 0.9144000000000001,
             "PedestalShared": false,
@@ -1665,7 +1665,7 @@
             "BottomShape": "ParallelToTop",
             "MinPedestalHeight": 0.07619999999999999,
             "PedestalProjection": 0.07619999999999999,
-            "MaxPedestalHeight": 0.45720000000000005,
+            "MaxPedestalHeight": 0.6096,
             "PedestalSizeAlong": 1.5748,
             "PedestalSizeAcross": 0.9144000000000001,
             "PedestalShared": false,
@@ -1962,7 +1962,7 @@
             "BottomShape": "ParallelToTop",
             "MinPedestalHeight": 0.07619999999999999,
             "PedestalProjection": 0.07619999999999999,
-            "MaxPedestalHeight": 0.45720000000000005,
+            "MaxPedestalHeight": 0.6096,
             "PedestalSizeAlong": 1.5748,
             "PedestalSizeAcross": 0.9144000000000001,
             "PedestalShared": false,
@@ -2531,7 +2531,7 @@
                 0.15239999999999998,
                 0.15239999999999998
               ],
-              "BearingOffset": 0.3556,
+              "BearingOffset": 0.4064,
               "BearingMeasure": "NormalToSupport"
             },
             "PerpendicularSpacings": null
@@ -3357,7 +3357,7 @@
           "Source": "p.428 S4-36",
           "Unresolved": [
             "UNRESOLVED (p.438): FIB-96 bottom flange corner chamfer - the 3/4\u0022 chamfers at the bottom corners are drawn (vector drawing 0.73\u0022) but not dimensioned. 3/4\u0022 chamfer as drawn.",
-            "UNRESOLVED (p.428-431, p.422-424): girder length \u0027A\u0027 vs bearing-to-bearing \u002B end distances - A (e.g. spans 31-32 160\u0027-1 7/8\u0022) exceeds b-b \u002B the 9\u0022 end distances (158\u0027-6\u0022 \u002B 1\u0027-6\u0022 = 160\u0027-0\u0022) by 1 1/8\u0022 to 1 7/8\u0022; the sheets do not say how A is measured. Beams built from the framing plan: layout CL bearings (bent line \u002B- 1\u0027-2\u0022 / 3\u0027-2\u0022) \u002B the 9\u0022 / 11\u0022 end distances; the check reports A - model.",
+            "UNRESOLVED (p.428-431, p.422-424): girder length \u0027A\u0027 vs bearing-to-bearing \u002B end distances - A is the length along the sloped girder (b-b \u002B end distances x the grade factor: spans 30 and 32 reproduce within 1/16\u0022), but ONE A is printed for spans 31-32 and one for 33-34 although their grades differ (vertical curves), so A cannot hold for both spans of a pair. Beams built from the framing plan: layout CL bearings (bent line \u002B- 1\u0027-2\u0022, 3\u0027-2\u0022 at bent 29, 1\u0027-4\u0022 at bent 35) \u002B the 9\u0022 / 11\u0022 end distances along the beam; the check reports A - model.",
             "UNRESOLVED (p.428): girder end details (end bevel, embedded plates B-1, formed holes, top raking) - drawn on the girder sheets, not modeled. Square ends, plain outline.",
             "UNRESOLVED (p.371 (Unit 5 sheets)): bent 29 pedestal under the span 30 bearings - bent 29 belongs to Unit 5 (no pedestal elevation on the Unit 6 sheets). The E1 bearing seats of bent 29 are reported, not checked."
           ],
@@ -4173,7 +4173,7 @@
                 "Source": "p.428 S4-36",
                 "Unresolved": [
                   "UNRESOLVED (p.438): FIB-96 bottom flange corner chamfer - the 3/4\u0022 chamfers at the bottom corners are drawn (vector drawing 0.73\u0022) but not dimensioned. 3/4\u0022 chamfer as drawn.",
-                  "UNRESOLVED (p.428-431, p.422-424): girder length \u0027A\u0027 vs bearing-to-bearing \u002B end distances - A (e.g. spans 31-32 160\u0027-1 7/8\u0022) exceeds b-b \u002B the 9\u0022 end distances (158\u0027-6\u0022 \u002B 1\u0027-6\u0022 = 160\u0027-0\u0022) by 1 1/8\u0022 to 1 7/8\u0022; the sheets do not say how A is measured. Beams built from the framing plan: layout CL bearings (bent line \u002B- 1\u0027-2\u0022 / 3\u0027-2\u0022) \u002B the 9\u0022 / 11\u0022 end distances; the check reports A - model.",
+                  "UNRESOLVED (p.428-431, p.422-424): girder length \u0027A\u0027 vs bearing-to-bearing \u002B end distances - A is the length along the sloped girder (b-b \u002B end distances x the grade factor: spans 30 and 32 reproduce within 1/16\u0022), but ONE A is printed for spans 31-32 and one for 33-34 although their grades differ (vertical curves), so A cannot hold for both spans of a pair. Beams built from the framing plan: layout CL bearings (bent line \u002B- 1\u0027-2\u0022, 3\u0027-2\u0022 at bent 29, 1\u0027-4\u0022 at bent 35) \u002B the 9\u0022 / 11\u0022 end distances along the beam; the check reports A - model.",
                   "UNRESOLVED (p.428): girder end details (end bevel, embedded plates B-1, formed holes, top raking) - drawn on the girder sheets, not modeled. Square ends, plain outline.",
                   "UNRESOLVED (p.371 (Unit 5 sheets)): bent 29 pedestal under the span 30 bearings - bent 29 belongs to Unit 5 (no pedestal elevation on the Unit 6 sheets). The E1 bearing seats of bent 29 are reported, not checked."
                 ],
@@ -4190,10 +4190,10 @@
                     "Width": 1.3716,
                     "ThicknessBack": 0.0508,
                     "ThicknessAhead": 0.03175,
-                    "BearingFromBack": 0.3048,
+                    "BearingFromBack": 0.2032,
                     "Source": "p.440",
-                    "BearingAt": 0.3048,
-                    "ThicknessAtBearing": 0.040042352941176466
+                    "BearingAt": 0.2032,
+                    "ThicknessAtBearing": 0.04362823529411765
                   }
                 },
                 "EndBearing": {
@@ -5159,7 +5159,7 @@
                 "Source": "p.428 S4-36",
                 "Unresolved": [
                   "UNRESOLVED (p.438): FIB-96 bottom flange corner chamfer - the 3/4\u0022 chamfers at the bottom corners are drawn (vector drawing 0.73\u0022) but not dimensioned. 3/4\u0022 chamfer as drawn.",
-                  "UNRESOLVED (p.428-431, p.422-424): girder length \u0027A\u0027 vs bearing-to-bearing \u002B end distances - A (e.g. spans 31-32 160\u0027-1 7/8\u0022) exceeds b-b \u002B the 9\u0022 end distances (158\u0027-6\u0022 \u002B 1\u0027-6\u0022 = 160\u0027-0\u0022) by 1 1/8\u0022 to 1 7/8\u0022; the sheets do not say how A is measured. Beams built from the framing plan: layout CL bearings (bent line \u002B- 1\u0027-2\u0022 / 3\u0027-2\u0022) \u002B the 9\u0022 / 11\u0022 end distances; the check reports A - model.",
+                  "UNRESOLVED (p.428-431, p.422-424): girder length \u0027A\u0027 vs bearing-to-bearing \u002B end distances - A is the length along the sloped girder (b-b \u002B end distances x the grade factor: spans 30 and 32 reproduce within 1/16\u0022), but ONE A is printed for spans 31-32 and one for 33-34 although their grades differ (vertical curves), so A cannot hold for both spans of a pair. Beams built from the framing plan: layout CL bearings (bent line \u002B- 1\u0027-2\u0022, 3\u0027-2\u0022 at bent 29, 1\u0027-4\u0022 at bent 35) \u002B the 9\u0022 / 11\u0022 end distances along the beam; the check reports A - model.",
                   "UNRESOLVED (p.428): girder end details (end bevel, embedded plates B-1, formed holes, top raking) - drawn on the girder sheets, not modeled. Square ends, plain outline.",
                   "UNRESOLVED (p.371 (Unit 5 sheets)): bent 29 pedestal under the span 30 bearings - bent 29 belongs to Unit 5 (no pedestal elevation on the Unit 6 sheets). The E1 bearing seats of bent 29 are reported, not checked."
                 ],
@@ -5176,10 +5176,10 @@
                     "Width": 1.3716,
                     "ThicknessBack": 0.0508,
                     "ThicknessAhead": 0.03175,
-                    "BearingFromBack": 0.3048,
+                    "BearingFromBack": 0.2032,
                     "Source": "p.440",
-                    "BearingAt": 0.3048,
-                    "ThicknessAtBearing": 0.040042352941176466
+                    "BearingAt": 0.2032,
+                    "ThicknessAtBearing": 0.04362823529411765
                   }
                 },
                 "EndBearing": {
@@ -6145,7 +6145,7 @@
                 "Source": "p.428 S4-36",
                 "Unresolved": [
                   "UNRESOLVED (p.438): FIB-96 bottom flange corner chamfer - the 3/4\u0022 chamfers at the bottom corners are drawn (vector drawing 0.73\u0022) but not dimensioned. 3/4\u0022 chamfer as drawn.",
-                  "UNRESOLVED (p.428-431, p.422-424): girder length \u0027A\u0027 vs bearing-to-bearing \u002B end distances - A (e.g. spans 31-32 160\u0027-1 7/8\u0022) exceeds b-b \u002B the 9\u0022 end distances (158\u0027-6\u0022 \u002B 1\u0027-6\u0022 = 160\u0027-0\u0022) by 1 1/8\u0022 to 1 7/8\u0022; the sheets do not say how A is measured. Beams built from the framing plan: layout CL bearings (bent line \u002B- 1\u0027-2\u0022 / 3\u0027-2\u0022) \u002B the 9\u0022 / 11\u0022 end distances; the check reports A - model.",
+                  "UNRESOLVED (p.428-431, p.422-424): girder length \u0027A\u0027 vs bearing-to-bearing \u002B end distances - A is the length along the sloped girder (b-b \u002B end distances x the grade factor: spans 30 and 32 reproduce within 1/16\u0022), but ONE A is printed for spans 31-32 and one for 33-34 although their grades differ (vertical curves), so A cannot hold for both spans of a pair. Beams built from the framing plan: layout CL bearings (bent line \u002B- 1\u0027-2\u0022, 3\u0027-2\u0022 at bent 29, 1\u0027-4\u0022 at bent 35) \u002B the 9\u0022 / 11\u0022 end distances along the beam; the check reports A - model.",
                   "UNRESOLVED (p.428): girder end details (end bevel, embedded plates B-1, formed holes, top raking) - drawn on the girder sheets, not modeled. Square ends, plain outline.",
                   "UNRESOLVED (p.371 (Unit 5 sheets)): bent 29 pedestal under the span 30 bearings - bent 29 belongs to Unit 5 (no pedestal elevation on the Unit 6 sheets). The E1 bearing seats of bent 29 are reported, not checked."
                 ],
@@ -6162,10 +6162,10 @@
                     "Width": 1.3716,
                     "ThicknessBack": 0.0508,
                     "ThicknessAhead": 0.03175,
-                    "BearingFromBack": 0.3048,
+                    "BearingFromBack": 0.2032,
                     "Source": "p.440",
-                    "BearingAt": 0.3048,
-                    "ThicknessAtBearing": 0.040042352941176466
+                    "BearingAt": 0.2032,
+                    "ThicknessAtBearing": 0.04362823529411765
                   }
                 },
                 "EndBearing": {
@@ -7131,7 +7131,7 @@
                 "Source": "p.428 S4-36",
                 "Unresolved": [
                   "UNRESOLVED (p.438): FIB-96 bottom flange corner chamfer - the 3/4\u0022 chamfers at the bottom corners are drawn (vector drawing 0.73\u0022) but not dimensioned. 3/4\u0022 chamfer as drawn.",
-                  "UNRESOLVED (p.428-431, p.422-424): girder length \u0027A\u0027 vs bearing-to-bearing \u002B end distances - A (e.g. spans 31-32 160\u0027-1 7/8\u0022) exceeds b-b \u002B the 9\u0022 end distances (158\u0027-6\u0022 \u002B 1\u0027-6\u0022 = 160\u0027-0\u0022) by 1 1/8\u0022 to 1 7/8\u0022; the sheets do not say how A is measured. Beams built from the framing plan: layout CL bearings (bent line \u002B- 1\u0027-2\u0022 / 3\u0027-2\u0022) \u002B the 9\u0022 / 11\u0022 end distances; the check reports A - model.",
+                  "UNRESOLVED (p.428-431, p.422-424): girder length \u0027A\u0027 vs bearing-to-bearing \u002B end distances - A is the length along the sloped girder (b-b \u002B end distances x the grade factor: spans 30 and 32 reproduce within 1/16\u0022), but ONE A is printed for spans 31-32 and one for 33-34 although their grades differ (vertical curves), so A cannot hold for both spans of a pair. Beams built from the framing plan: layout CL bearings (bent line \u002B- 1\u0027-2\u0022, 3\u0027-2\u0022 at bent 29, 1\u0027-4\u0022 at bent 35) \u002B the 9\u0022 / 11\u0022 end distances along the beam; the check reports A - model.",
                   "UNRESOLVED (p.428): girder end details (end bevel, embedded plates B-1, formed holes, top raking) - drawn on the girder sheets, not modeled. Square ends, plain outline.",
                   "UNRESOLVED (p.371 (Unit 5 sheets)): bent 29 pedestal under the span 30 bearings - bent 29 belongs to Unit 5 (no pedestal elevation on the Unit 6 sheets). The E1 bearing seats of bent 29 are reported, not checked."
                 ],
@@ -7148,10 +7148,10 @@
                     "Width": 1.3716,
                     "ThicknessBack": 0.0508,
                     "ThicknessAhead": 0.03175,
-                    "BearingFromBack": 0.3048,
+                    "BearingFromBack": 0.2032,
                     "Source": "p.440",
-                    "BearingAt": 0.3048,
-                    "ThicknessAtBearing": 0.040042352941176466
+                    "BearingAt": 0.2032,
+                    "ThicknessAtBearing": 0.04362823529411765
                   }
                 },
                 "EndBearing": {
@@ -8117,7 +8117,7 @@
                 "Source": "p.429 S4-37",
                 "Unresolved": [
                   "UNRESOLVED (p.438): FIB-96 bottom flange corner chamfer - the 3/4\u0022 chamfers at the bottom corners are drawn (vector drawing 0.73\u0022) but not dimensioned. 3/4\u0022 chamfer as drawn.",
-                  "UNRESOLVED (p.428-431, p.422-424): girder length \u0027A\u0027 vs bearing-to-bearing \u002B end distances - A (e.g. spans 31-32 160\u0027-1 7/8\u0022) exceeds b-b \u002B the 9\u0022 end distances (158\u0027-6\u0022 \u002B 1\u0027-6\u0022 = 160\u0027-0\u0022) by 1 1/8\u0022 to 1 7/8\u0022; the sheets do not say how A is measured. Beams built from the framing plan: layout CL bearings (bent line \u002B- 1\u0027-2\u0022 / 3\u0027-2\u0022) \u002B the 9\u0022 / 11\u0022 end distances; the check reports A - model.",
+                  "UNRESOLVED (p.428-431, p.422-424): girder length \u0027A\u0027 vs bearing-to-bearing \u002B end distances - A is the length along the sloped girder (b-b \u002B end distances x the grade factor: spans 30 and 32 reproduce within 1/16\u0022), but ONE A is printed for spans 31-32 and one for 33-34 although their grades differ (vertical curves), so A cannot hold for both spans of a pair. Beams built from the framing plan: layout CL bearings (bent line \u002B- 1\u0027-2\u0022, 3\u0027-2\u0022 at bent 29, 1\u0027-4\u0022 at bent 35) \u002B the 9\u0022 / 11\u0022 end distances along the beam; the check reports A - model.",
                   "UNRESOLVED (p.428): girder end details (end bevel, embedded plates B-1, formed holes, top raking) - drawn on the girder sheets, not modeled. Square ends, plain outline."
                 ],
                 "SpanBeams": null,
@@ -9101,7 +9101,7 @@
                 "Source": "p.429 S4-37",
                 "Unresolved": [
                   "UNRESOLVED (p.438): FIB-96 bottom flange corner chamfer - the 3/4\u0022 chamfers at the bottom corners are drawn (vector drawing 0.73\u0022) but not dimensioned. 3/4\u0022 chamfer as drawn.",
-                  "UNRESOLVED (p.428-431, p.422-424): girder length \u0027A\u0027 vs bearing-to-bearing \u002B end distances - A (e.g. spans 31-32 160\u0027-1 7/8\u0022) exceeds b-b \u002B the 9\u0022 end distances (158\u0027-6\u0022 \u002B 1\u0027-6\u0022 = 160\u0027-0\u0022) by 1 1/8\u0022 to 1 7/8\u0022; the sheets do not say how A is measured. Beams built from the framing plan: layout CL bearings (bent line \u002B- 1\u0027-2\u0022 / 3\u0027-2\u0022) \u002B the 9\u0022 / 11\u0022 end distances; the check reports A - model.",
+                  "UNRESOLVED (p.428-431, p.422-424): girder length \u0027A\u0027 vs bearing-to-bearing \u002B end distances - A is the length along the sloped girder (b-b \u002B end distances x the grade factor: spans 30 and 32 reproduce within 1/16\u0022), but ONE A is printed for spans 31-32 and one for 33-34 although their grades differ (vertical curves), so A cannot hold for both spans of a pair. Beams built from the framing plan: layout CL bearings (bent line \u002B- 1\u0027-2\u0022, 3\u0027-2\u0022 at bent 29, 1\u0027-4\u0022 at bent 35) \u002B the 9\u0022 / 11\u0022 end distances along the beam; the check reports A - model.",
                   "UNRESOLVED (p.428): girder end details (end bevel, embedded plates B-1, formed holes, top raking) - drawn on the girder sheets, not modeled. Square ends, plain outline."
                 ],
                 "SpanBeams": null,
@@ -10085,7 +10085,7 @@
                 "Source": "p.429 S4-37",
                 "Unresolved": [
                   "UNRESOLVED (p.438): FIB-96 bottom flange corner chamfer - the 3/4\u0022 chamfers at the bottom corners are drawn (vector drawing 0.73\u0022) but not dimensioned. 3/4\u0022 chamfer as drawn.",
-                  "UNRESOLVED (p.428-431, p.422-424): girder length \u0027A\u0027 vs bearing-to-bearing \u002B end distances - A (e.g. spans 31-32 160\u0027-1 7/8\u0022) exceeds b-b \u002B the 9\u0022 end distances (158\u0027-6\u0022 \u002B 1\u0027-6\u0022 = 160\u0027-0\u0022) by 1 1/8\u0022 to 1 7/8\u0022; the sheets do not say how A is measured. Beams built from the framing plan: layout CL bearings (bent line \u002B- 1\u0027-2\u0022 / 3\u0027-2\u0022) \u002B the 9\u0022 / 11\u0022 end distances; the check reports A - model.",
+                  "UNRESOLVED (p.428-431, p.422-424): girder length \u0027A\u0027 vs bearing-to-bearing \u002B end distances - A is the length along the sloped girder (b-b \u002B end distances x the grade factor: spans 30 and 32 reproduce within 1/16\u0022), but ONE A is printed for spans 31-32 and one for 33-34 although their grades differ (vertical curves), so A cannot hold for both spans of a pair. Beams built from the framing plan: layout CL bearings (bent line \u002B- 1\u0027-2\u0022, 3\u0027-2\u0022 at bent 29, 1\u0027-4\u0022 at bent 35) \u002B the 9\u0022 / 11\u0022 end distances along the beam; the check reports A - model.",
                   "UNRESOLVED (p.428): girder end details (end bevel, embedded plates B-1, formed holes, top raking) - drawn on the girder sheets, not modeled. Square ends, plain outline."
                 ],
                 "SpanBeams": null,
@@ -11069,7 +11069,7 @@
                 "Source": "p.429 S4-37",
                 "Unresolved": [
                   "UNRESOLVED (p.438): FIB-96 bottom flange corner chamfer - the 3/4\u0022 chamfers at the bottom corners are drawn (vector drawing 0.73\u0022) but not dimensioned. 3/4\u0022 chamfer as drawn.",
-                  "UNRESOLVED (p.428-431, p.422-424): girder length \u0027A\u0027 vs bearing-to-bearing \u002B end distances - A (e.g. spans 31-32 160\u0027-1 7/8\u0022) exceeds b-b \u002B the 9\u0022 end distances (158\u0027-6\u0022 \u002B 1\u0027-6\u0022 = 160\u0027-0\u0022) by 1 1/8\u0022 to 1 7/8\u0022; the sheets do not say how A is measured. Beams built from the framing plan: layout CL bearings (bent line \u002B- 1\u0027-2\u0022 / 3\u0027-2\u0022) \u002B the 9\u0022 / 11\u0022 end distances; the check reports A - model.",
+                  "UNRESOLVED (p.428-431, p.422-424): girder length \u0027A\u0027 vs bearing-to-bearing \u002B end distances - A is the length along the sloped girder (b-b \u002B end distances x the grade factor: spans 30 and 32 reproduce within 1/16\u0022), but ONE A is printed for spans 31-32 and one for 33-34 although their grades differ (vertical curves), so A cannot hold for both spans of a pair. Beams built from the framing plan: layout CL bearings (bent line \u002B- 1\u0027-2\u0022, 3\u0027-2\u0022 at bent 29, 1\u0027-4\u0022 at bent 35) \u002B the 9\u0022 / 11\u0022 end distances along the beam; the check reports A - model.",
                   "UNRESOLVED (p.428): girder end details (end bevel, embedded plates B-1, formed holes, top raking) - drawn on the girder sheets, not modeled. Square ends, plain outline."
                 ],
                 "SpanBeams": null,
@@ -12053,7 +12053,7 @@
                 "Source": "p.429 S4-37",
                 "Unresolved": [
                   "UNRESOLVED (p.438): FIB-96 bottom flange corner chamfer - the 3/4\u0022 chamfers at the bottom corners are drawn (vector drawing 0.73\u0022) but not dimensioned. 3/4\u0022 chamfer as drawn.",
-                  "UNRESOLVED (p.428-431, p.422-424): girder length \u0027A\u0027 vs bearing-to-bearing \u002B end distances - A (e.g. spans 31-32 160\u0027-1 7/8\u0022) exceeds b-b \u002B the 9\u0022 end distances (158\u0027-6\u0022 \u002B 1\u0027-6\u0022 = 160\u0027-0\u0022) by 1 1/8\u0022 to 1 7/8\u0022; the sheets do not say how A is measured. Beams built from the framing plan: layout CL bearings (bent line \u002B- 1\u0027-2\u0022 / 3\u0027-2\u0022) \u002B the 9\u0022 / 11\u0022 end distances; the check reports A - model.",
+                  "UNRESOLVED (p.428-431, p.422-424): girder length \u0027A\u0027 vs bearing-to-bearing \u002B end distances - A is the length along the sloped girder (b-b \u002B end distances x the grade factor: spans 30 and 32 reproduce within 1/16\u0022), but ONE A is printed for spans 31-32 and one for 33-34 although their grades differ (vertical curves), so A cannot hold for both spans of a pair. Beams built from the framing plan: layout CL bearings (bent line \u002B- 1\u0027-2\u0022, 3\u0027-2\u0022 at bent 29, 1\u0027-4\u0022 at bent 35) \u002B the 9\u0022 / 11\u0022 end distances along the beam; the check reports A - model.",
                   "UNRESOLVED (p.428): girder end details (end bevel, embedded plates B-1, formed holes, top raking) - drawn on the girder sheets, not modeled. Square ends, plain outline."
                 ],
                 "SpanBeams": null,
@@ -13037,7 +13037,7 @@
                 "Source": "p.429 S4-37",
                 "Unresolved": [
                   "UNRESOLVED (p.438): FIB-96 bottom flange corner chamfer - the 3/4\u0022 chamfers at the bottom corners are drawn (vector drawing 0.73\u0022) but not dimensioned. 3/4\u0022 chamfer as drawn.",
-                  "UNRESOLVED (p.428-431, p.422-424): girder length \u0027A\u0027 vs bearing-to-bearing \u002B end distances - A (e.g. spans 31-32 160\u0027-1 7/8\u0022) exceeds b-b \u002B the 9\u0022 end distances (158\u0027-6\u0022 \u002B 1\u0027-6\u0022 = 160\u0027-0\u0022) by 1 1/8\u0022 to 1 7/8\u0022; the sheets do not say how A is measured. Beams built from the framing plan: layout CL bearings (bent line \u002B- 1\u0027-2\u0022 / 3\u0027-2\u0022) \u002B the 9\u0022 / 11\u0022 end distances; the check reports A - model.",
+                  "UNRESOLVED (p.428-431, p.422-424): girder length \u0027A\u0027 vs bearing-to-bearing \u002B end distances - A is the length along the sloped girder (b-b \u002B end distances x the grade factor: spans 30 and 32 reproduce within 1/16\u0022), but ONE A is printed for spans 31-32 and one for 33-34 although their grades differ (vertical curves), so A cannot hold for both spans of a pair. Beams built from the framing plan: layout CL bearings (bent line \u002B- 1\u0027-2\u0022, 3\u0027-2\u0022 at bent 29, 1\u0027-4\u0022 at bent 35) \u002B the 9\u0022 / 11\u0022 end distances along the beam; the check reports A - model.",
                   "UNRESOLVED (p.428): girder end details (end bevel, embedded plates B-1, formed holes, top raking) - drawn on the girder sheets, not modeled. Square ends, plain outline."
                 ],
                 "SpanBeams": null,
@@ -14021,7 +14021,7 @@
                 "Source": "p.429 S4-37",
                 "Unresolved": [
                   "UNRESOLVED (p.438): FIB-96 bottom flange corner chamfer - the 3/4\u0022 chamfers at the bottom corners are drawn (vector drawing 0.73\u0022) but not dimensioned. 3/4\u0022 chamfer as drawn.",
-                  "UNRESOLVED (p.428-431, p.422-424): girder length \u0027A\u0027 vs bearing-to-bearing \u002B end distances - A (e.g. spans 31-32 160\u0027-1 7/8\u0022) exceeds b-b \u002B the 9\u0022 end distances (158\u0027-6\u0022 \u002B 1\u0027-6\u0022 = 160\u0027-0\u0022) by 1 1/8\u0022 to 1 7/8\u0022; the sheets do not say how A is measured. Beams built from the framing plan: layout CL bearings (bent line \u002B- 1\u0027-2\u0022 / 3\u0027-2\u0022) \u002B the 9\u0022 / 11\u0022 end distances; the check reports A - model.",
+                  "UNRESOLVED (p.428-431, p.422-424): girder length \u0027A\u0027 vs bearing-to-bearing \u002B end distances - A is the length along the sloped girder (b-b \u002B end distances x the grade factor: spans 30 and 32 reproduce within 1/16\u0022), but ONE A is printed for spans 31-32 and one for 33-34 although their grades differ (vertical curves), so A cannot hold for both spans of a pair. Beams built from the framing plan: layout CL bearings (bent line \u002B- 1\u0027-2\u0022, 3\u0027-2\u0022 at bent 29, 1\u0027-4\u0022 at bent 35) \u002B the 9\u0022 / 11\u0022 end distances along the beam; the check reports A - model.",
                   "UNRESOLVED (p.428): girder end details (end bevel, embedded plates B-1, formed holes, top raking) - drawn on the girder sheets, not modeled. Square ends, plain outline."
                 ],
                 "SpanBeams": null,
@@ -15005,7 +15005,7 @@
                 "Source": "p.429 S4-37",
                 "Unresolved": [
                   "UNRESOLVED (p.438): FIB-96 bottom flange corner chamfer - the 3/4\u0022 chamfers at the bottom corners are drawn (vector drawing 0.73\u0022) but not dimensioned. 3/4\u0022 chamfer as drawn.",
-                  "UNRESOLVED (p.428-431, p.422-424): girder length \u0027A\u0027 vs bearing-to-bearing \u002B end distances - A (e.g. spans 31-32 160\u0027-1 7/8\u0022) exceeds b-b \u002B the 9\u0022 end distances (158\u0027-6\u0022 \u002B 1\u0027-6\u0022 = 160\u0027-0\u0022) by 1 1/8\u0022 to 1 7/8\u0022; the sheets do not say how A is measured. Beams built from the framing plan: layout CL bearings (bent line \u002B- 1\u0027-2\u0022 / 3\u0027-2\u0022) \u002B the 9\u0022 / 11\u0022 end distances; the check reports A - model.",
+                  "UNRESOLVED (p.428-431, p.422-424): girder length \u0027A\u0027 vs bearing-to-bearing \u002B end distances - A is the length along the sloped girder (b-b \u002B end distances x the grade factor: spans 30 and 32 reproduce within 1/16\u0022), but ONE A is printed for spans 31-32 and one for 33-34 although their grades differ (vertical curves), so A cannot hold for both spans of a pair. Beams built from the framing plan: layout CL bearings (bent line \u002B- 1\u0027-2\u0022, 3\u0027-2\u0022 at bent 29, 1\u0027-4\u0022 at bent 35) \u002B the 9\u0022 / 11\u0022 end distances along the beam; the check reports A - model.",
                   "UNRESOLVED (p.428): girder end details (end bevel, embedded plates B-1, formed holes, top raking) - drawn on the girder sheets, not modeled. Square ends, plain outline."
                 ],
                 "SpanBeams": null,
@@ -15989,7 +15989,7 @@
                 "Source": "p.429 S4-37",
                 "Unresolved": [
                   "UNRESOLVED (p.438): FIB-96 bottom flange corner chamfer - the 3/4\u0022 chamfers at the bottom corners are drawn (vector drawing 0.73\u0022) but not dimensioned. 3/4\u0022 chamfer as drawn.",
-                  "UNRESOLVED (p.428-431, p.422-424): girder length \u0027A\u0027 vs bearing-to-bearing \u002B end distances - A (e.g. spans 31-32 160\u0027-1 7/8\u0022) exceeds b-b \u002B the 9\u0022 end distances (158\u0027-6\u0022 \u002B 1\u0027-6\u0022 = 160\u0027-0\u0022) by 1 1/8\u0022 to 1 7/8\u0022; the sheets do not say how A is measured. Beams built from the framing plan: layout CL bearings (bent line \u002B- 1\u0027-2\u0022 / 3\u0027-2\u0022) \u002B the 9\u0022 / 11\u0022 end distances; the check reports A - model.",
+                  "UNRESOLVED (p.428-431, p.422-424): girder length \u0027A\u0027 vs bearing-to-bearing \u002B end distances - A is the length along the sloped girder (b-b \u002B end distances x the grade factor: spans 30 and 32 reproduce within 1/16\u0022), but ONE A is printed for spans 31-32 and one for 33-34 although their grades differ (vertical curves), so A cannot hold for both spans of a pair. Beams built from the framing plan: layout CL bearings (bent line \u002B- 1\u0027-2\u0022, 3\u0027-2\u0022 at bent 29, 1\u0027-4\u0022 at bent 35) \u002B the 9\u0022 / 11\u0022 end distances along the beam; the check reports A - model.",
                   "UNRESOLVED (p.428): girder end details (end bevel, embedded plates B-1, formed holes, top raking) - drawn on the girder sheets, not modeled. Square ends, plain outline."
                 ],
                 "SpanBeams": null,
@@ -16023,10 +16023,10 @@
                     "Width": 1.3716,
                     "ThicknessBack": 0.053974999999999995,
                     "ThicknessAhead": 0.03175,
-                    "BearingFromBack": 0.19685,
+                    "BearingFromBack": 0.32384999999999997,
                     "Source": "p.443",
-                    "BearingAt": 0.19685,
-                    "ThicknessAtBearing": 0.04525379746835443
+                    "BearingAt": 0.32384999999999997,
+                    "ThicknessAtBearing": 0.039627215189873416
                   }
                 },
                 "CamberTable": [
@@ -16973,7 +16973,7 @@
                 "Source": "p.429 S4-37",
                 "Unresolved": [
                   "UNRESOLVED (p.438): FIB-96 bottom flange corner chamfer - the 3/4\u0022 chamfers at the bottom corners are drawn (vector drawing 0.73\u0022) but not dimensioned. 3/4\u0022 chamfer as drawn.",
-                  "UNRESOLVED (p.428-431, p.422-424): girder length \u0027A\u0027 vs bearing-to-bearing \u002B end distances - A (e.g. spans 31-32 160\u0027-1 7/8\u0022) exceeds b-b \u002B the 9\u0022 end distances (158\u0027-6\u0022 \u002B 1\u0027-6\u0022 = 160\u0027-0\u0022) by 1 1/8\u0022 to 1 7/8\u0022; the sheets do not say how A is measured. Beams built from the framing plan: layout CL bearings (bent line \u002B- 1\u0027-2\u0022 / 3\u0027-2\u0022) \u002B the 9\u0022 / 11\u0022 end distances; the check reports A - model.",
+                  "UNRESOLVED (p.428-431, p.422-424): girder length \u0027A\u0027 vs bearing-to-bearing \u002B end distances - A is the length along the sloped girder (b-b \u002B end distances x the grade factor: spans 30 and 32 reproduce within 1/16\u0022), but ONE A is printed for spans 31-32 and one for 33-34 although their grades differ (vertical curves), so A cannot hold for both spans of a pair. Beams built from the framing plan: layout CL bearings (bent line \u002B- 1\u0027-2\u0022, 3\u0027-2\u0022 at bent 29, 1\u0027-4\u0022 at bent 35) \u002B the 9\u0022 / 11\u0022 end distances along the beam; the check reports A - model.",
                   "UNRESOLVED (p.428): girder end details (end bevel, embedded plates B-1, formed holes, top raking) - drawn on the girder sheets, not modeled. Square ends, plain outline."
                 ],
                 "SpanBeams": null,
@@ -17007,10 +17007,10 @@
                     "Width": 1.3716,
                     "ThicknessBack": 0.053974999999999995,
                     "ThicknessAhead": 0.03175,
-                    "BearingFromBack": 0.19685,
+                    "BearingFromBack": 0.32384999999999997,
                     "Source": "p.443",
-                    "BearingAt": 0.19685,
-                    "ThicknessAtBearing": 0.04525379746835443
+                    "BearingAt": 0.32384999999999997,
+                    "ThicknessAtBearing": 0.039627215189873416
                   }
                 },
                 "CamberTable": [
@@ -17957,7 +17957,7 @@
                 "Source": "p.429 S4-37",
                 "Unresolved": [
                   "UNRESOLVED (p.438): FIB-96 bottom flange corner chamfer - the 3/4\u0022 chamfers at the bottom corners are drawn (vector drawing 0.73\u0022) but not dimensioned. 3/4\u0022 chamfer as drawn.",
-                  "UNRESOLVED (p.428-431, p.422-424): girder length \u0027A\u0027 vs bearing-to-bearing \u002B end distances - A (e.g. spans 31-32 160\u0027-1 7/8\u0022) exceeds b-b \u002B the 9\u0022 end distances (158\u0027-6\u0022 \u002B 1\u0027-6\u0022 = 160\u0027-0\u0022) by 1 1/8\u0022 to 1 7/8\u0022; the sheets do not say how A is measured. Beams built from the framing plan: layout CL bearings (bent line \u002B- 1\u0027-2\u0022 / 3\u0027-2\u0022) \u002B the 9\u0022 / 11\u0022 end distances; the check reports A - model.",
+                  "UNRESOLVED (p.428-431, p.422-424): girder length \u0027A\u0027 vs bearing-to-bearing \u002B end distances - A is the length along the sloped girder (b-b \u002B end distances x the grade factor: spans 30 and 32 reproduce within 1/16\u0022), but ONE A is printed for spans 31-32 and one for 33-34 although their grades differ (vertical curves), so A cannot hold for both spans of a pair. Beams built from the framing plan: layout CL bearings (bent line \u002B- 1\u0027-2\u0022, 3\u0027-2\u0022 at bent 29, 1\u0027-4\u0022 at bent 35) \u002B the 9\u0022 / 11\u0022 end distances along the beam; the check reports A - model.",
                   "UNRESOLVED (p.428): girder end details (end bevel, embedded plates B-1, formed holes, top raking) - drawn on the girder sheets, not modeled. Square ends, plain outline."
                 ],
                 "SpanBeams": null,
@@ -17991,10 +17991,10 @@
                     "Width": 1.3716,
                     "ThicknessBack": 0.053974999999999995,
                     "ThicknessAhead": 0.03175,
-                    "BearingFromBack": 0.19685,
+                    "BearingFromBack": 0.32384999999999997,
                     "Source": "p.443",
-                    "BearingAt": 0.19685,
-                    "ThicknessAtBearing": 0.04525379746835443
+                    "BearingAt": 0.32384999999999997,
+                    "ThicknessAtBearing": 0.039627215189873416
                   }
                 },
                 "CamberTable": [
@@ -18941,7 +18941,7 @@
                 "Source": "p.429 S4-37",
                 "Unresolved": [
                   "UNRESOLVED (p.438): FIB-96 bottom flange corner chamfer - the 3/4\u0022 chamfers at the bottom corners are drawn (vector drawing 0.73\u0022) but not dimensioned. 3/4\u0022 chamfer as drawn.",
-                  "UNRESOLVED (p.428-431, p.422-424): girder length \u0027A\u0027 vs bearing-to-bearing \u002B end distances - A (e.g. spans 31-32 160\u0027-1 7/8\u0022) exceeds b-b \u002B the 9\u0022 end distances (158\u0027-6\u0022 \u002B 1\u0027-6\u0022 = 160\u0027-0\u0022) by 1 1/8\u0022 to 1 7/8\u0022; the sheets do not say how A is measured. Beams built from the framing plan: layout CL bearings (bent line \u002B- 1\u0027-2\u0022 / 3\u0027-2\u0022) \u002B the 9\u0022 / 11\u0022 end distances; the check reports A - model.",
+                  "UNRESOLVED (p.428-431, p.422-424): girder length \u0027A\u0027 vs bearing-to-bearing \u002B end distances - A is the length along the sloped girder (b-b \u002B end distances x the grade factor: spans 30 and 32 reproduce within 1/16\u0022), but ONE A is printed for spans 31-32 and one for 33-34 although their grades differ (vertical curves), so A cannot hold for both spans of a pair. Beams built from the framing plan: layout CL bearings (bent line \u002B- 1\u0027-2\u0022, 3\u0027-2\u0022 at bent 29, 1\u0027-4\u0022 at bent 35) \u002B the 9\u0022 / 11\u0022 end distances along the beam; the check reports A - model.",
                   "UNRESOLVED (p.428): girder end details (end bevel, embedded plates B-1, formed holes, top raking) - drawn on the girder sheets, not modeled. Square ends, plain outline."
                 ],
                 "SpanBeams": null,
@@ -18975,10 +18975,10 @@
                     "Width": 1.3716,
                     "ThicknessBack": 0.053974999999999995,
                     "ThicknessAhead": 0.03175,
-                    "BearingFromBack": 0.19685,
+                    "BearingFromBack": 0.32384999999999997,
                     "Source": "p.443",
-                    "BearingAt": 0.19685,
-                    "ThicknessAtBearing": 0.04525379746835443
+                    "BearingAt": 0.32384999999999997,
+                    "ThicknessAtBearing": 0.039627215189873416
                   }
                 },
                 "CamberTable": [
@@ -19925,7 +19925,7 @@
                 "Source": "p.429 S4-37",
                 "Unresolved": [
                   "UNRESOLVED (p.438): FIB-96 bottom flange corner chamfer - the 3/4\u0022 chamfers at the bottom corners are drawn (vector drawing 0.73\u0022) but not dimensioned. 3/4\u0022 chamfer as drawn.",
-                  "UNRESOLVED (p.428-431, p.422-424): girder length \u0027A\u0027 vs bearing-to-bearing \u002B end distances - A (e.g. spans 31-32 160\u0027-1 7/8\u0022) exceeds b-b \u002B the 9\u0022 end distances (158\u0027-6\u0022 \u002B 1\u0027-6\u0022 = 160\u0027-0\u0022) by 1 1/8\u0022 to 1 7/8\u0022; the sheets do not say how A is measured. Beams built from the framing plan: layout CL bearings (bent line \u002B- 1\u0027-2\u0022 / 3\u0027-2\u0022) \u002B the 9\u0022 / 11\u0022 end distances; the check reports A - model.",
+                  "UNRESOLVED (p.428-431, p.422-424): girder length \u0027A\u0027 vs bearing-to-bearing \u002B end distances - A is the length along the sloped girder (b-b \u002B end distances x the grade factor: spans 30 and 32 reproduce within 1/16\u0022), but ONE A is printed for spans 31-32 and one for 33-34 although their grades differ (vertical curves), so A cannot hold for both spans of a pair. Beams built from the framing plan: layout CL bearings (bent line \u002B- 1\u0027-2\u0022, 3\u0027-2\u0022 at bent 29, 1\u0027-4\u0022 at bent 35) \u002B the 9\u0022 / 11\u0022 end distances along the beam; the check reports A - model.",
                   "UNRESOLVED (p.428): girder end details (end bevel, embedded plates B-1, formed holes, top raking) - drawn on the girder sheets, not modeled. Square ends, plain outline."
                 ],
                 "SpanBeams": null,
@@ -19941,10 +19941,10 @@
                     "Width": 1.3716,
                     "ThicknessBack": 0.046037499999999995,
                     "ThicknessAhead": 0.03175,
-                    "BearingFromBack": 0.3048,
+                    "BearingFromBack": 0.17779999999999999,
                     "Source": "p.443",
-                    "BearingAt": 0.3048,
-                    "ThicknessAtBearing": 0.037356487341772146
+                    "BearingAt": 0.17779999999999999,
+                    "ThicknessAtBearing": 0.04097357594936708
                   }
                 },
                 "EndBearing": {
@@ -19959,10 +19959,10 @@
                     "Width": 1.3716,
                     "ThicknessBack": 0.0508,
                     "ThicknessAhead": 0.03175,
-                    "BearingFromBack": 0.19685,
+                    "BearingFromBack": 0.32384999999999997,
                     "Source": "p.443",
-                    "BearingAt": 0.19685,
-                    "ThicknessAtBearing": 0.0433246835443038
+                    "BearingAt": 0.32384999999999997,
+                    "ThicknessAtBearing": 0.03850189873417722
                   }
                 },
                 "CamberTable": [
@@ -20909,7 +20909,7 @@
                 "Source": "p.429 S4-37",
                 "Unresolved": [
                   "UNRESOLVED (p.438): FIB-96 bottom flange corner chamfer - the 3/4\u0022 chamfers at the bottom corners are drawn (vector drawing 0.73\u0022) but not dimensioned. 3/4\u0022 chamfer as drawn.",
-                  "UNRESOLVED (p.428-431, p.422-424): girder length \u0027A\u0027 vs bearing-to-bearing \u002B end distances - A (e.g. spans 31-32 160\u0027-1 7/8\u0022) exceeds b-b \u002B the 9\u0022 end distances (158\u0027-6\u0022 \u002B 1\u0027-6\u0022 = 160\u0027-0\u0022) by 1 1/8\u0022 to 1 7/8\u0022; the sheets do not say how A is measured. Beams built from the framing plan: layout CL bearings (bent line \u002B- 1\u0027-2\u0022 / 3\u0027-2\u0022) \u002B the 9\u0022 / 11\u0022 end distances; the check reports A - model.",
+                  "UNRESOLVED (p.428-431, p.422-424): girder length \u0027A\u0027 vs bearing-to-bearing \u002B end distances - A is the length along the sloped girder (b-b \u002B end distances x the grade factor: spans 30 and 32 reproduce within 1/16\u0022), but ONE A is printed for spans 31-32 and one for 33-34 although their grades differ (vertical curves), so A cannot hold for both spans of a pair. Beams built from the framing plan: layout CL bearings (bent line \u002B- 1\u0027-2\u0022, 3\u0027-2\u0022 at bent 29, 1\u0027-4\u0022 at bent 35) \u002B the 9\u0022 / 11\u0022 end distances along the beam; the check reports A - model.",
                   "UNRESOLVED (p.428): girder end details (end bevel, embedded plates B-1, formed holes, top raking) - drawn on the girder sheets, not modeled. Square ends, plain outline."
                 ],
                 "SpanBeams": null,
@@ -20925,10 +20925,10 @@
                     "Width": 1.3716,
                     "ThicknessBack": 0.046037499999999995,
                     "ThicknessAhead": 0.03175,
-                    "BearingFromBack": 0.3048,
+                    "BearingFromBack": 0.17779999999999999,
                     "Source": "p.443",
-                    "BearingAt": 0.3048,
-                    "ThicknessAtBearing": 0.037356487341772146
+                    "BearingAt": 0.17779999999999999,
+                    "ThicknessAtBearing": 0.04097357594936708
                   }
                 },
                 "EndBearing": {
@@ -20943,10 +20943,10 @@
                     "Width": 1.3716,
                     "ThicknessBack": 0.0508,
                     "ThicknessAhead": 0.03175,
-                    "BearingFromBack": 0.19685,
+                    "BearingFromBack": 0.32384999999999997,
                     "Source": "p.443",
-                    "BearingAt": 0.19685,
-                    "ThicknessAtBearing": 0.0433246835443038
+                    "BearingAt": 0.32384999999999997,
+                    "ThicknessAtBearing": 0.03850189873417722
                   }
                 },
                 "CamberTable": [
@@ -21893,7 +21893,7 @@
                 "Source": "p.429 S4-37",
                 "Unresolved": [
                   "UNRESOLVED (p.438): FIB-96 bottom flange corner chamfer - the 3/4\u0022 chamfers at the bottom corners are drawn (vector drawing 0.73\u0022) but not dimensioned. 3/4\u0022 chamfer as drawn.",
-                  "UNRESOLVED (p.428-431, p.422-424): girder length \u0027A\u0027 vs bearing-to-bearing \u002B end distances - A (e.g. spans 31-32 160\u0027-1 7/8\u0022) exceeds b-b \u002B the 9\u0022 end distances (158\u0027-6\u0022 \u002B 1\u0027-6\u0022 = 160\u0027-0\u0022) by 1 1/8\u0022 to 1 7/8\u0022; the sheets do not say how A is measured. Beams built from the framing plan: layout CL bearings (bent line \u002B- 1\u0027-2\u0022 / 3\u0027-2\u0022) \u002B the 9\u0022 / 11\u0022 end distances; the check reports A - model.",
+                  "UNRESOLVED (p.428-431, p.422-424): girder length \u0027A\u0027 vs bearing-to-bearing \u002B end distances - A is the length along the sloped girder (b-b \u002B end distances x the grade factor: spans 30 and 32 reproduce within 1/16\u0022), but ONE A is printed for spans 31-32 and one for 33-34 although their grades differ (vertical curves), so A cannot hold for both spans of a pair. Beams built from the framing plan: layout CL bearings (bent line \u002B- 1\u0027-2\u0022, 3\u0027-2\u0022 at bent 29, 1\u0027-4\u0022 at bent 35) \u002B the 9\u0022 / 11\u0022 end distances along the beam; the check reports A - model.",
                   "UNRESOLVED (p.428): girder end details (end bevel, embedded plates B-1, formed holes, top raking) - drawn on the girder sheets, not modeled. Square ends, plain outline."
                 ],
                 "SpanBeams": null,
@@ -21909,10 +21909,10 @@
                     "Width": 1.3716,
                     "ThicknessBack": 0.046037499999999995,
                     "ThicknessAhead": 0.03175,
-                    "BearingFromBack": 0.3048,
+                    "BearingFromBack": 0.17779999999999999,
                     "Source": "p.443",
-                    "BearingAt": 0.3048,
-                    "ThicknessAtBearing": 0.037356487341772146
+                    "BearingAt": 0.17779999999999999,
+                    "ThicknessAtBearing": 0.04097357594936708
                   }
                 },
                 "EndBearing": {
@@ -21927,10 +21927,10 @@
                     "Width": 1.3716,
                     "ThicknessBack": 0.0508,
                     "ThicknessAhead": 0.03175,
-                    "BearingFromBack": 0.19685,
+                    "BearingFromBack": 0.32384999999999997,
                     "Source": "p.443",
-                    "BearingAt": 0.19685,
-                    "ThicknessAtBearing": 0.0433246835443038
+                    "BearingAt": 0.32384999999999997,
+                    "ThicknessAtBearing": 0.03850189873417722
                   }
                 },
                 "CamberTable": [
@@ -22877,7 +22877,7 @@
                 "Source": "p.429 S4-37",
                 "Unresolved": [
                   "UNRESOLVED (p.438): FIB-96 bottom flange corner chamfer - the 3/4\u0022 chamfers at the bottom corners are drawn (vector drawing 0.73\u0022) but not dimensioned. 3/4\u0022 chamfer as drawn.",
-                  "UNRESOLVED (p.428-431, p.422-424): girder length \u0027A\u0027 vs bearing-to-bearing \u002B end distances - A (e.g. spans 31-32 160\u0027-1 7/8\u0022) exceeds b-b \u002B the 9\u0022 end distances (158\u0027-6\u0022 \u002B 1\u0027-6\u0022 = 160\u0027-0\u0022) by 1 1/8\u0022 to 1 7/8\u0022; the sheets do not say how A is measured. Beams built from the framing plan: layout CL bearings (bent line \u002B- 1\u0027-2\u0022 / 3\u0027-2\u0022) \u002B the 9\u0022 / 11\u0022 end distances; the check reports A - model.",
+                  "UNRESOLVED (p.428-431, p.422-424): girder length \u0027A\u0027 vs bearing-to-bearing \u002B end distances - A is the length along the sloped girder (b-b \u002B end distances x the grade factor: spans 30 and 32 reproduce within 1/16\u0022), but ONE A is printed for spans 31-32 and one for 33-34 although their grades differ (vertical curves), so A cannot hold for both spans of a pair. Beams built from the framing plan: layout CL bearings (bent line \u002B- 1\u0027-2\u0022, 3\u0027-2\u0022 at bent 29, 1\u0027-4\u0022 at bent 35) \u002B the 9\u0022 / 11\u0022 end distances along the beam; the check reports A - model.",
                   "UNRESOLVED (p.428): girder end details (end bevel, embedded plates B-1, formed holes, top raking) - drawn on the girder sheets, not modeled. Square ends, plain outline."
                 ],
                 "SpanBeams": null,
@@ -22893,10 +22893,10 @@
                     "Width": 1.3716,
                     "ThicknessBack": 0.046037499999999995,
                     "ThicknessAhead": 0.03175,
-                    "BearingFromBack": 0.3048,
+                    "BearingFromBack": 0.17779999999999999,
                     "Source": "p.443",
-                    "BearingAt": 0.3048,
-                    "ThicknessAtBearing": 0.037356487341772146
+                    "BearingAt": 0.17779999999999999,
+                    "ThicknessAtBearing": 0.04097357594936708
                   }
                 },
                 "EndBearing": {
@@ -22911,10 +22911,10 @@
                     "Width": 1.3716,
                     "ThicknessBack": 0.0508,
                     "ThicknessAhead": 0.03175,
-                    "BearingFromBack": 0.19685,
+                    "BearingFromBack": 0.32384999999999997,
                     "Source": "p.443",
-                    "BearingAt": 0.19685,
-                    "ThicknessAtBearing": 0.0433246835443038
+                    "BearingAt": 0.32384999999999997,
+                    "ThicknessAtBearing": 0.03850189873417722
                   }
                 },
                 "CamberTable": [
@@ -23861,7 +23861,7 @@
                 "Source": "p.430 S4-38",
                 "Unresolved": [
                   "UNRESOLVED (p.438): FIB-96 bottom flange corner chamfer - the 3/4\u0022 chamfers at the bottom corners are drawn (vector drawing 0.73\u0022) but not dimensioned. 3/4\u0022 chamfer as drawn.",
-                  "UNRESOLVED (p.428-431, p.422-424): girder length \u0027A\u0027 vs bearing-to-bearing \u002B end distances - A (e.g. spans 31-32 160\u0027-1 7/8\u0022) exceeds b-b \u002B the 9\u0022 end distances (158\u0027-6\u0022 \u002B 1\u0027-6\u0022 = 160\u0027-0\u0022) by 1 1/8\u0022 to 1 7/8\u0022; the sheets do not say how A is measured. Beams built from the framing plan: layout CL bearings (bent line \u002B- 1\u0027-2\u0022 / 3\u0027-2\u0022) \u002B the 9\u0022 / 11\u0022 end distances; the check reports A - model.",
+                  "UNRESOLVED (p.428-431, p.422-424): girder length \u0027A\u0027 vs bearing-to-bearing \u002B end distances - A is the length along the sloped girder (b-b \u002B end distances x the grade factor: spans 30 and 32 reproduce within 1/16\u0022), but ONE A is printed for spans 31-32 and one for 33-34 although their grades differ (vertical curves), so A cannot hold for both spans of a pair. Beams built from the framing plan: layout CL bearings (bent line \u002B- 1\u0027-2\u0022, 3\u0027-2\u0022 at bent 29, 1\u0027-4\u0022 at bent 35) \u002B the 9\u0022 / 11\u0022 end distances along the beam; the check reports A - model.",
                   "UNRESOLVED (p.428): girder end details (end bevel, embedded plates B-1, formed holes, top raking) - drawn on the girder sheets, not modeled. Square ends, plain outline."
                 ],
                 "SpanBeams": null,
@@ -23877,10 +23877,10 @@
                     "Width": 1.3716,
                     "ThicknessBack": 0.044449999999999996,
                     "ThicknessAhead": 0.03175,
-                    "BearingFromBack": 0.3048,
+                    "BearingFromBack": 0.17779999999999999,
                     "Source": "p.443",
-                    "BearingAt": 0.3048,
-                    "ThicknessAtBearing": 0.036733544303797466
+                    "BearingAt": 0.17779999999999999,
+                    "ThicknessAtBearing": 0.03994873417721519
                   }
                 },
                 "EndBearing": {
@@ -23895,10 +23895,10 @@
                     "Width": 1.3716,
                     "ThicknessBack": 0.0492125,
                     "ThicknessAhead": 0.03175,
-                    "BearingFromBack": 0.23495,
+                    "BearingFromBack": 0.31115,
                     "Source": "p.440",
-                    "BearingAt": 0.23495,
-                    "ThicknessAtBearing": 0.0412358024691358
+                    "BearingAt": 0.31115,
+                    "ThicknessAtBearing": 0.03864876543209877
                   }
                 },
                 "EndBearingToEnd": 0.2794,
@@ -24846,7 +24846,7 @@
                 "Source": "p.430 S4-38",
                 "Unresolved": [
                   "UNRESOLVED (p.438): FIB-96 bottom flange corner chamfer - the 3/4\u0022 chamfers at the bottom corners are drawn (vector drawing 0.73\u0022) but not dimensioned. 3/4\u0022 chamfer as drawn.",
-                  "UNRESOLVED (p.428-431, p.422-424): girder length \u0027A\u0027 vs bearing-to-bearing \u002B end distances - A (e.g. spans 31-32 160\u0027-1 7/8\u0022) exceeds b-b \u002B the 9\u0022 end distances (158\u0027-6\u0022 \u002B 1\u0027-6\u0022 = 160\u0027-0\u0022) by 1 1/8\u0022 to 1 7/8\u0022; the sheets do not say how A is measured. Beams built from the framing plan: layout CL bearings (bent line \u002B- 1\u0027-2\u0022 / 3\u0027-2\u0022) \u002B the 9\u0022 / 11\u0022 end distances; the check reports A - model.",
+                  "UNRESOLVED (p.428-431, p.422-424): girder length \u0027A\u0027 vs bearing-to-bearing \u002B end distances - A is the length along the sloped girder (b-b \u002B end distances x the grade factor: spans 30 and 32 reproduce within 1/16\u0022), but ONE A is printed for spans 31-32 and one for 33-34 although their grades differ (vertical curves), so A cannot hold for both spans of a pair. Beams built from the framing plan: layout CL bearings (bent line \u002B- 1\u0027-2\u0022, 3\u0027-2\u0022 at bent 29, 1\u0027-4\u0022 at bent 35) \u002B the 9\u0022 / 11\u0022 end distances along the beam; the check reports A - model.",
                   "UNRESOLVED (p.428): girder end details (end bevel, embedded plates B-1, formed holes, top raking) - drawn on the girder sheets, not modeled. Square ends, plain outline."
                 ],
                 "SpanBeams": null,
@@ -24862,10 +24862,10 @@
                     "Width": 1.3716,
                     "ThicknessBack": 0.044449999999999996,
                     "ThicknessAhead": 0.03175,
-                    "BearingFromBack": 0.3048,
+                    "BearingFromBack": 0.17779999999999999,
                     "Source": "p.443",
-                    "BearingAt": 0.3048,
-                    "ThicknessAtBearing": 0.036733544303797466
+                    "BearingAt": 0.17779999999999999,
+                    "ThicknessAtBearing": 0.03994873417721519
                   }
                 },
                 "EndBearing": {
@@ -24880,10 +24880,10 @@
                     "Width": 1.3716,
                     "ThicknessBack": 0.0492125,
                     "ThicknessAhead": 0.03175,
-                    "BearingFromBack": 0.23495,
+                    "BearingFromBack": 0.31115,
                     "Source": "p.440",
-                    "BearingAt": 0.23495,
-                    "ThicknessAtBearing": 0.0412358024691358
+                    "BearingAt": 0.31115,
+                    "ThicknessAtBearing": 0.03864876543209877
                   }
                 },
                 "EndBearingToEnd": 0.2794,
@@ -25831,7 +25831,7 @@
                 "Source": "p.431 S4-39",
                 "Unresolved": [
                   "UNRESOLVED (p.438): FIB-96 bottom flange corner chamfer - the 3/4\u0022 chamfers at the bottom corners are drawn (vector drawing 0.73\u0022) but not dimensioned. 3/4\u0022 chamfer as drawn.",
-                  "UNRESOLVED (p.428-431, p.422-424): girder length \u0027A\u0027 vs bearing-to-bearing \u002B end distances - A (e.g. spans 31-32 160\u0027-1 7/8\u0022) exceeds b-b \u002B the 9\u0022 end distances (158\u0027-6\u0022 \u002B 1\u0027-6\u0022 = 160\u0027-0\u0022) by 1 1/8\u0022 to 1 7/8\u0022; the sheets do not say how A is measured. Beams built from the framing plan: layout CL bearings (bent line \u002B- 1\u0027-2\u0022 / 3\u0027-2\u0022) \u002B the 9\u0022 / 11\u0022 end distances; the check reports A - model.",
+                  "UNRESOLVED (p.428-431, p.422-424): girder length \u0027A\u0027 vs bearing-to-bearing \u002B end distances - A is the length along the sloped girder (b-b \u002B end distances x the grade factor: spans 30 and 32 reproduce within 1/16\u0022), but ONE A is printed for spans 31-32 and one for 33-34 although their grades differ (vertical curves), so A cannot hold for both spans of a pair. Beams built from the framing plan: layout CL bearings (bent line \u002B- 1\u0027-2\u0022, 3\u0027-2\u0022 at bent 29, 1\u0027-4\u0022 at bent 35) \u002B the 9\u0022 / 11\u0022 end distances along the beam; the check reports A - model.",
                   "UNRESOLVED (p.428): girder end details (end bevel, embedded plates B-1, formed holes, top raking) - drawn on the girder sheets, not modeled. Square ends, plain outline."
                 ],
                 "SpanBeams": null,
@@ -25847,10 +25847,10 @@
                     "Width": 1.3716,
                     "ThicknessBack": 0.044449999999999996,
                     "ThicknessAhead": 0.03175,
-                    "BearingFromBack": 0.3048,
+                    "BearingFromBack": 0.17779999999999999,
                     "Source": "p.443",
-                    "BearingAt": 0.3048,
-                    "ThicknessAtBearing": 0.036733544303797466
+                    "BearingAt": 0.17779999999999999,
+                    "ThicknessAtBearing": 0.03994873417721519
                   }
                 },
                 "EndBearing": {
@@ -25865,10 +25865,10 @@
                     "Width": 1.3716,
                     "ThicknessBack": 0.0492125,
                     "ThicknessAhead": 0.03175,
-                    "BearingFromBack": 0.23495,
+                    "BearingFromBack": 0.31115,
                     "Source": "p.440",
-                    "BearingAt": 0.23495,
-                    "ThicknessAtBearing": 0.0412358024691358
+                    "BearingAt": 0.31115,
+                    "ThicknessAtBearing": 0.03864876543209877
                   }
                 },
                 "EndBearingToEnd": 0.2794,
@@ -26816,7 +26816,7 @@
                 "Source": "p.431 S4-39",
                 "Unresolved": [
                   "UNRESOLVED (p.438): FIB-96 bottom flange corner chamfer - the 3/4\u0022 chamfers at the bottom corners are drawn (vector drawing 0.73\u0022) but not dimensioned. 3/4\u0022 chamfer as drawn.",
-                  "UNRESOLVED (p.428-431, p.422-424): girder length \u0027A\u0027 vs bearing-to-bearing \u002B end distances - A (e.g. spans 31-32 160\u0027-1 7/8\u0022) exceeds b-b \u002B the 9\u0022 end distances (158\u0027-6\u0022 \u002B 1\u0027-6\u0022 = 160\u0027-0\u0022) by 1 1/8\u0022 to 1 7/8\u0022; the sheets do not say how A is measured. Beams built from the framing plan: layout CL bearings (bent line \u002B- 1\u0027-2\u0022 / 3\u0027-2\u0022) \u002B the 9\u0022 / 11\u0022 end distances; the check reports A - model.",
+                  "UNRESOLVED (p.428-431, p.422-424): girder length \u0027A\u0027 vs bearing-to-bearing \u002B end distances - A is the length along the sloped girder (b-b \u002B end distances x the grade factor: spans 30 and 32 reproduce within 1/16\u0022), but ONE A is printed for spans 31-32 and one for 33-34 although their grades differ (vertical curves), so A cannot hold for both spans of a pair. Beams built from the framing plan: layout CL bearings (bent line \u002B- 1\u0027-2\u0022, 3\u0027-2\u0022 at bent 29, 1\u0027-4\u0022 at bent 35) \u002B the 9\u0022 / 11\u0022 end distances along the beam; the check reports A - model.",
                   "UNRESOLVED (p.428): girder end details (end bevel, embedded plates B-1, formed holes, top raking) - drawn on the girder sheets, not modeled. Square ends, plain outline."
                 ],
                 "SpanBeams": null,
@@ -26832,10 +26832,10 @@
                     "Width": 1.3716,
                     "ThicknessBack": 0.044449999999999996,
                     "ThicknessAhead": 0.03175,
-                    "BearingFromBack": 0.3048,
+                    "BearingFromBack": 0.17779999999999999,
                     "Source": "p.443",
-                    "BearingAt": 0.3048,
-                    "ThicknessAtBearing": 0.036733544303797466
+                    "BearingAt": 0.17779999999999999,
+                    "ThicknessAtBearing": 0.03994873417721519
                   }
                 },
                 "EndBearing": {
@@ -26850,10 +26850,10 @@
                     "Width": 1.3716,
                     "ThicknessBack": 0.0492125,
                     "ThicknessAhead": 0.03175,
-                    "BearingFromBack": 0.23495,
+                    "BearingFromBack": 0.31115,
                     "Source": "p.440",
-                    "BearingAt": 0.23495,
-                    "ThicknessAtBearing": 0.0412358024691358
+                    "BearingAt": 0.31115,
+                    "ThicknessAtBearing": 0.03864876543209877
                   }
                 },
                 "EndBearingToEnd": 0.2794,
@@ -27003,10 +27003,10 @@
               "Width": 1.3716,
               "ThicknessBack": 0.0508,
               "ThicknessAhead": 0.03175,
-              "BearingFromBack": 0.3048,
+              "BearingFromBack": 0.2032,
               "Source": "p.440",
-              "BearingAt": 0.3048,
-              "ThicknessAtBearing": 0.040042352941176466
+              "BearingAt": 0.2032,
+              "ThicknessAtBearing": 0.04362823529411765
             }
           },
           "EndBearing": {

@@ -81,12 +81,13 @@ public static class PrestressedGenerator
         foreach (var d in used.Where(d => d.CamberTable is { Count: > 0 }))
         {
             var tab = d.CamberTable!;
-            int ok = tab.Count(p => Math.Abs(p.FinalCamber - (p.Camber - p.Deflection)) <= In(1.0 / 32) + 1e-9);
+            // tolerance: half the printed 1/16" step + the rounding of the two printed 0.001 ft values
+            int ok = tab.Count(p => Math.Abs(p.FinalCamber - (p.Camber - p.Deflection)) <= In(1.0 / 32) + Ft(0.001) + 1e-9);
             var peak = tab.OrderByDescending(p => p.Camber).First();
             string beamList = string.Join(", ", model.Beams.Where(b => ReferenceEquals(b.Definition, d)).Select(b => b.Mark));
             model.Diagnostics.Add(new Diagnostic(DiagnosticSeverity.Info,
                 $"Camber table {(d.Designation != "" ? d.Designation : TxGirderCatalog.Get(d).Name)} ({d.CamberSource ?? d.Source}; {beamList}): {tab.Count} points, girder-alone camber up to " +
-                $"{u.FormatLength(peak.Camber, LengthKind.Short)} at {peak.Fraction:0.00} L; final = camber - SDL deflection within 1/32\" in {ok} of {tab.Count} cells. " +
+                $"{u.FormatLength(peak.Camber, LengthKind.Short)} at {peak.Fraction:0.00} L; final = camber - SDL deflection to the printed precision in {ok} of {tab.Count} cells. " +
                 "The beams are modeled in their final (uncambered) shape."));
         }
         var soles = model.Pads.Where(p => p.SolePlate != null).ToList();
