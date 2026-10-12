@@ -715,7 +715,26 @@ public sealed class ArchDeckRebar
     public double CurbStirrupWidth { get; set; } = In(6);
     public double CurbStirrupHeight { get; set; } = In(9);
     public double CurbTopCover { get; set; } = In(2);
+    /// <summary>OPTIONAL 135-deg hook tail of each end of the closed curb stirrup (out-to-out, p.154 BAR S1 "4 1/2\" (TYP)"); 0 = closed loop without tails.</summary>
+    public double CurbStirrupHook { get; set; }
     public string CurbLongMark { get; set; } = "D4";
+    /// <summary>OPTIONAL number of transverse rows (A / B) equally spaced between the end covers (the bill count); 0 = as many as <see cref="TransSpacing"/> allows.</summary>
+    public int TransCount { get; set; }
+    /// <summary>OPTIONAL curb stirrups per curb, equally spaced (the bill count / curbs); 0 = by <see cref="TransSpacing"/>.</summary>
+    public int CurbStirrupCount { get; set; }
+    /// <summary>Top transverse bars per row: 1 = one straight bar centred on CL NHT (default); 2 = two bars lapped at CL NHT, each hooked down at its deck edge
+    /// with a return leg lapping the bottom transverse bar (p.152 "hook top bar with 2'-8 lap to bottom bar"): drop leg at <see cref="TopTransHookOffset"/> inside the
+    /// CL of the tie, return <see cref="TopTransHookReturn"/> long on top of the bottom bar, top run = listed length - drop - return (the centre lap results).</summary>
+    public int TopTransPerRow { get; set; } = 1;
+    public double TopTransHookOffset { get; set; } = In(7.5);
+    public double TopTransHookReturn { get; set; } = Ft(2) + In(8);
+    /// <summary>OPTIONAL edge bars (D3, p.152 / 154): one per tie per panel between floorbeam lines, centred in the panel, straight <see cref="EdgeBarLength"/>
+    /// (out-to-out) with <see cref="EdgeBarHook"/> up legs and returns at both ends, <see cref="EdgeBarOffset"/> inside the CL of the tie at the bottom bar level.
+    /// "" = none.</summary>
+    public string EdgeBarMark { get; set; } = "";
+    public double EdgeBarLength { get; set; }
+    public double EdgeBarHook { get; set; } = In(5);
+    public double EdgeBarOffset { get; set; } = In(6);
     public string Unresolved { get; set; } = "";
     /// <summary>Plan bar list (check): mark, count, length.</summary>
     public List<ArchPoint> PlanList { get; set; } = new();

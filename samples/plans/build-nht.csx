@@ -283,7 +283,7 @@ foreach (var (uname, sups, firstSpan) in units)
     bridges[uname] = br;
 }
 G("RAIL (PED) low 4'-3 / high 9'-10 posts (p.84, 89) and the 10\" curbs (height not dimensioned, p.109): no pedestrian rail / curb profile in BarrierProfiles -> no rail or curb modeled.");
-G("Deck reinforcing (bars A, C, CS, D, G, H, J, M, OA, P, T, UP; p.109-117 bar tables, not transcribed - U13) not modeled; PCP panels not modeled separately (8 1/2\" slab solid).");
+G("Deck reinforcing: A, T, OA, D, C, CS placed by rebar-nht-approach.csx (p.109-117); P (PCP), G / H / J / M (IGTS) and UP are UNRESOLVED (standards not in the set). PCP panels not modeled separately (8 1/2\" slab solid); thickened slab ends (IGTS) not modeled.");
 G("Expansion joints SEJ-B(MOD) 4\" + BS-EJCP (p.84-88, 91): standard not in the set; deck ends modeled at the joint line, no blockout / device.");
 U("p.84-88, 109-117", "deck gap at the SEJ-B(MOD) joints (Abut 1, P4, P7, P10, P11, P13, Abut 16)", "the SEJ-B(MOD) standard is not in the set, the sheets show only the joint line",
   "Each deck ends AT the joint line (P4 / P7 / P13: CL pier; P10 / P11: 9 1/4\" from CL pier; abutments: face of backwall).");
@@ -381,7 +381,7 @@ foreach (var row in pierRows)
     sd.PedestalSideAngleAheadDeg = thA; sd.PedestalSizeAlongAhead = Ft(3) / Math.Cos(thA * Math.PI / 180);
     subOf[name].Substructure = sd;
 }
-G("Approach pier cap reinforcing / column / shaft bars (p.97-100 bar tables) not entered: substructure reinforcement off. Mow strips / riprap (p.97-100) and anti-graffiti coating not modeled.");
+G("Approach pier reinforcing (caps, columns, 48\" shafts) placed by rebar-nht-sub.csx (p.97-100 bar tables). Mow strips / riprap (p.97-100) and anti-graffiti coating not modeled.");
 U("p.97, 99", "column corner chamfers / cap edge chamfers of the approach piers", "chamfer sizes are not dimensioned on the sheets", "Square corners modeled.");
 
 // ================================================================ 5b. abutments 1 and 16 (p.95, 96)
@@ -422,7 +422,7 @@ void Abut(string name, double sLeft, double sRight, double elA, double elC, doub
 Abut("Abutment 1", 7.292, 7.291, 524.699, 521.637, 519.153, 488.153, 1, "p.95");
 Abut("Abutment 16", 7.279, 7.284, 519.744, 516.682, 514.185, 492.185, 15, "p.96");
 G("Abutment 16 left cap end is skewed 5 19'17\" to the retaining wall (p.96 plan, 0.163' over the cap front); the parametric abutment cap end is square to the support line.");
-G("Abutment reinforcing (A, H, S, U, V bars, p.95/96 tables) and the 1/2\" preformed bituminous fiber at the wall faces not modeled; wingwalls are retaining walls by others (MSE, p.47-69).");
+G("Abutment reinforcing (A, H, S, U, V bars, p.95/96 tables) placed by rebar-nht-sub.csx; 36\" shaft cages UNRESOLVED (FD standard). The 1/2\" preformed bituminous fiber at the wall faces not modeled; wingwalls are retaining walls by others (MSE, p.47-69).");
 
 // ================================================================ 5. arch piers 10 & 11 (p.101-107; hammerhead)
 // Cap (p.102 plan / elevation): 24'-0 (12'-0 + 12'-0 about CL pier & drilled shaft) x 6'-0 (3'-0 + 3'-0 about CL pier), 6'-0 deep at the
@@ -483,7 +483,7 @@ p10.Substructure = ArchPier(true, 534.779, 534.726, 533.219, 527.219, 509.150, 4
 p11.Substructure = ArchPier(false, 531.546, 531.494, 529.896, 523.896, 509.110, 480.110, SideAngle("Pier 11", 11));
 Print($"Approach seat side angles (girder chords): Pier 10 {SideAngle("Pier 10", 9):0.000} deg from the pier normal (plan ** 73 28'39\" / 73 20'28\" -> {90 - 73.41:0.000}), Pier 11 {SideAngle("Pier 11", 11):0.000} (plan 76 09'10\" / 76 31'36\" -> {90 - 76.34:0.000})");
 G("Arch pier cap: top 1/4\"/ft drain slope (p.102) not modeled (the cap profile is extruded level across N); cap edge chamfers and the column corner chamfers (p.102/103, size not dimensioned) not modeled.");
-G("Arch pier reinforcing (bar-lists.csv, p.103-104) not entered: substructure reinforcement off for Piers 10 / 11.");
+G("Arch pier reinforcing (bar-lists.csv, p.101-104) placed by rebar-nht-sub.csx.");
 G("T80SS(MOD) traffic barrier on the arch piers (p.105-106, 78 LF) not modeled.");
 // B1-B3 (SUMMARY section 8): the p.102 pedestal tops are the plan values; the p.119 tie WP chain does not reconcile -> reported, not fixed.
 {
@@ -508,6 +508,7 @@ G("T80SS(MOD) traffic barrier on the arch piers (p.105-106, 78 LF) not modeled."
 }
 
 { var rj = await SBM.Api.ScriptHost.RunFileAsync(@"samples\plans\rail-joints-nht.csx", Doc, Args); Print(rj.Output.TrimEnd()); if (!rj.Success) Print("ERROR in rail-joints-nht.csx: " + rj.Error); }   // curbs, RAIL (PED), SEJ-B(MOD) joints, mow strips
+foreach (var rs in new[] { "rebar-nht-sub.csx", "rebar-nht-approach.csx" }) { var rr = await SBM.Api.ScriptHost.RunFileAsync(Path.Combine("samples", "plans", rs), Doc, Array.Empty<string>()); Print(rr.Output.TrimEnd()); if (!rr.Success) Print($"ERROR in {rs}: {rr.Error}"); }   // reinforcing (substructure + approach decks)
 // ================================================================ 6. regenerate, report, save
 var rep = Doc.Regenerate();
 foreach (var e in rep.Errors) Print("ERROR " + e);

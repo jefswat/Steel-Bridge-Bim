@@ -48,3 +48,95 @@ Arch piers 10 & 11,V2,ST,28,#11,"22'-10""",3394,3397,OK,PDF p.104 / sheet 155,RA
 Arch piers 10 & 11,V3,ST,28,#11,"19'-7""",2911,2913,OK,PDF p.104 / sheet 155,RASTER,Pier 11 only (28-V3 pier 11)
 Arch piers 10 & 11,TOTAL P10,,,,,8937,,sum of all rows = 17130 = 8937 + 8193 (DERIVED OK),PDF p.104 / sheet 155,RASTER,for contractor information only
 Arch piers 10 & 11,TOTAL P11,,,,,8193,,see TOTAL P10,PDF p.104 / sheet 155,RASTER,for contractor information only
+Abutment 1,A,ST,10,#11,"13'-7""",722,722,OK,PDF p.95 / sheet 146,RASTER,
+Abutment 1,H,ST,8,#6,"14'-2""",171,170,OK,PDF p.95 / sheet 146,RASTER,
+Abutment 1,S,BT,13,#5,"11'-2""",152,151,OK,PDF p.95 / sheet 146,RASTER,
+Abutment 1,U,BT,4,#6,"8'-0""",49,48,OK,PDF p.95 / sheet 146,RASTER,
+Abutment 1,V,BT,16,#5,"10'-11""",183,182,OK,PDF p.95 / sheet 146,RASTER,
+Abutment 1,TOTAL,,,,,1277,,sum of rows 1277 (DERIVED OK),PDF p.95 / sheet 146,RASTER,reinforcing steel for contractor information only
+Abutment 16,A,ST,10,#11,"13'-7""",722,722,OK,PDF p.96 / sheet 147,RASTER,
+Abutment 16,H,ST,8,#6,"14'-2""",171,170,OK,PDF p.96 / sheet 147,RASTER,
+Abutment 16,S,BT,13,#5,"11'-2""",152,151,OK,PDF p.96 / sheet 147,RASTER,
+Abutment 16,U1,BT,2,#6,"8'-0""",25,24,OK,PDF p.96 / sheet 147,RASTER,
+Abutment 16,U2,BT,2,#6,"8'-0""",25,24,OK,PDF p.96 / sheet 147,RASTER,
+Abutment 16,V,BT,16,#5,"10'-11""",183,182,OK,PDF p.96 / sheet 147,RASTER,
+Abutment 16,TOTAL,,,,,1278,,sum of rows 1278 (DERIVED OK),PDF p.96 / sheet 147,RASTER,reinforcing steel for contractor information only
+"Pier cap type 1 (P2-5, 8, 9, 12, 13)",A,ST,12,#11,"14'-7""",930,930,OK,PDF p.98 / sheet 149,RASTER,per pier cap
+"Pier cap type 1 (P2-5, 8, 9, 12, 13)",B,BT,4,#11,"14'-9""",314,313,OK,PDF p.98 / sheet 149,RASTER,per pier cap
+"Pier cap type 1 (P2-5, 8, 9, 12, 13)",D,ST,4,#9,"1'-8""",23,23,OK,PDF p.98 / sheet 149,RASTER,"per pier cap; D omitted at piers 4 and 13 (note 3, -23 lb); S2 = 2 series of 16, length = average"
+"Pier cap type 1 (P2-5, 8, 9, 12, 13)",S1,BT,4,#5,"11'-3""",47,47,OK,PDF p.98 / sheet 149,RASTER,per pier cap
+"Pier cap type 1 (P2-5, 8, 9, 12, 13)",S2,BT,32,#5,"10'-3""",343,342,OK,PDF p.98 / sheet 149,RASTER,"per pier cap; D omitted at piers 4 and 13 (note 3, -23 lb); S2 = 2 series of 16, length = average"
+"Pier cap type 1 (P2-5, 8, 9, 12, 13)",T1,ST,2,#5,"13'-3""",28,28,OK,PDF p.98 / sheet 149,RASTER,per pier cap
+"Pier cap type 1 (P2-5, 8, 9, 12, 13)",T2,ST,2,#5,"7'-4""",16,15,OK,PDF p.98 / sheet 149,RASTER,per pier cap
+"Pier cap type 1 (P2-5, 8, 9, 12, 13)",U,BT,9,#5,"4'-1""",39,38,OK,PDF p.98 / sheet 149,RASTER,per pier cap
+"Pier cap type 1 (P2-5, 8, 9, 12, 13)",TOTAL,,,,,1740,,sum of rows 1740 (DERIVED OK),PDF p.98 / sheet 149,RASTER,per pier cap
+"Pier cap type 2 (P6, 7, 14, 15)",A,BT,12,#11,"16'-7""",1058,1057,OK,PDF p.100 / sheet 151,RASTER,per pier cap
+"Pier cap type 2 (P6, 7, 14, 15)",B,BT,4,#11,"14'-10""",316,315,OK,PDF p.100 / sheet 151,RASTER,per pier cap
+"Pier cap type 2 (P6, 7, 14, 15)",D,ST,4,#9,"1'-8""",23,23,OK,PDF p.100 / sheet 151,RASTER,"per pier cap; D omitted at pier 7 (note 3, -23 lb); S2 length = average"
+"Pier cap type 2 (P6, 7, 14, 15)",S1,BT,8,#5,"13'-3""",111,111,OK,PDF p.100 / sheet 151,RASTER,per pier cap
+"Pier cap type 2 (P6, 7, 14, 15)",S2,BT,19,#5,"11'-3""",223,223,OK,PDF p.100 / sheet 151,RASTER,"per pier cap; D omitted at pier 7 (note 3, -23 lb); S2 length = average"
+"Pier cap type 2 (P6, 7, 14, 15)",T1,ST,2,#5,"14'-1""",30,29,OK,PDF p.100 / sheet 151,RASTER,per pier cap
+"Pier cap type 2 (P6, 7, 14, 15)",T2,ST,2,#5,"11'-10""",25,25,OK,PDF p.100 / sheet 151,RASTER,per pier cap
+"Pier cap type 2 (P6, 7, 14, 15)",T3,ST,2,#5,"9'-6""",20,20,OK,PDF p.100 / sheet 151,RASTER,per pier cap
+"Pier cap type 2 (P6, 7, 14, 15)",T4,ST,2,#5,"7'-3""",16,15,OK,PDF p.100 / sheet 151,RASTER,per pier cap
+"Pier cap type 2 (P6, 7, 14, 15)",U,BT,9,#5,"4'-1""",39,38,OK,PDF p.100 / sheet 151,RASTER,per pier cap
+"Pier cap type 2 (P6, 7, 14, 15)",TOTAL,,,,,1861,,sum of rows 1861 (DERIVED OK),PDF p.100 / sheet 151,RASTER,per pier cap
+Pier 2 column,V,ST,20,#9,"9'-1""",618,618,OK,PDF p.98 / sheet 149,RASTER,table of variable quantities
+Pier 2 column,Z,BT,7,#4,"11'-0""",52,51,OK,PDF p.98 / sheet 149,RASTER,"note 5: piers 2-5, 8, 13 #4 at 12"" spa; piers 9 & 12 double #5 at 3"" spa"
+Pier 2 column,TOTAL,,,,,670,,V + Z = 670 (DERIVED OK),PDF p.98 / sheet 149,RASTER,column reinforcing steel
+Pier 3 column,V,ST,20,#9,"10'-1""",686,686,OK,PDF p.98 / sheet 149,RASTER,table of variable quantities
+Pier 3 column,Z,BT,8,#4,"11'-0""",59,59,OK,PDF p.98 / sheet 149,RASTER,"note 5: piers 2-5, 8, 13 #4 at 12"" spa; piers 9 & 12 double #5 at 3"" spa"
+Pier 3 column,TOTAL,,,,,745,,V + Z = 745 (DERIVED OK),PDF p.98 / sheet 149,RASTER,column reinforcing steel
+Pier 4 column,V,ST,20,#9,"12'-1""",822,822,OK,PDF p.98 / sheet 149,RASTER,table of variable quantities
+Pier 4 column,Z,BT,10,#4,"11'-0""",74,73,OK,PDF p.98 / sheet 149,RASTER,"note 5: piers 2-5, 8, 13 #4 at 12"" spa; piers 9 & 12 double #5 at 3"" spa"
+Pier 4 column,TOTAL,,,,,896,,V + Z = 896 (DERIVED OK),PDF p.98 / sheet 149,RASTER,column reinforcing steel
+Pier 5 column,V,ST,20,#9,"14'-1""",958,958,OK,PDF p.98 / sheet 149,RASTER,table of variable quantities
+Pier 5 column,Z,BT,12,#4,"11'-0""",89,88,OK,PDF p.98 / sheet 149,RASTER,"note 5: piers 2-5, 8, 13 #4 at 12"" spa; piers 9 & 12 double #5 at 3"" spa"
+Pier 5 column,TOTAL,,,,,1047,,V + Z = 1047 (DERIVED OK),PDF p.98 / sheet 149,RASTER,column reinforcing steel
+Pier 8 column,V,ST,20,#9,"20'-1""",1366,1366,OK,PDF p.98 / sheet 149,RASTER,table of variable quantities
+Pier 8 column,Z,BT,18,#4,"11'-0""",133,132,OK,PDF p.98 / sheet 149,RASTER,"note 5: piers 2-5, 8, 13 #4 at 12"" spa; piers 9 & 12 double #5 at 3"" spa"
+Pier 8 column,TOTAL,,,,,1499,,V + Z = 1499 (DERIVED OK),PDF p.98 / sheet 149,RASTER,column reinforcing steel
+Pier 9 column,V,ST,20,#9,"21'-1""",1434,1434,OK,PDF p.98 / sheet 149,RASTER,table of variable quantities
+Pier 9 column,Z,BT,148,#5,"11'-0""",1699,1698,OK,PDF p.98 / sheet 149,RASTER,"note 5: piers 2-5, 8, 13 #4 at 12"" spa; piers 9 & 12 double #5 at 3"" spa"
+Pier 9 column,TOTAL,,,,,3133,,V + Z = 3133 (DERIVED OK),PDF p.98 / sheet 149,RASTER,column reinforcing steel
+Pier 12 column,V,ST,20,#9,"19'-1""",1298,1298,OK,PDF p.98 / sheet 149,RASTER,table of variable quantities
+Pier 12 column,Z,BT,132,#5,"11'-0""",1515,1514,OK,PDF p.98 / sheet 149,RASTER,"note 5: piers 2-5, 8, 13 #4 at 12"" spa; piers 9 & 12 double #5 at 3"" spa"
+Pier 12 column,TOTAL,,,,,2813,,V + Z = 2813 (DERIVED OK),PDF p.98 / sheet 149,RASTER,column reinforcing steel
+Pier 13 column,V,ST,20,#9,"16'-1""",1094,1094,OK,PDF p.98 / sheet 149,RASTER,table of variable quantities
+Pier 13 column,Z,BT,14,#4,"11'-0""",103,103,OK,PDF p.98 / sheet 149,RASTER,"note 5: piers 2-5, 8, 13 #4 at 12"" spa; piers 9 & 12 double #5 at 3"" spa"
+Pier 13 column,TOTAL,,,,,1197,,V + Z = 1197 (DERIVED OK),PDF p.98 / sheet 149,RASTER,column reinforcing steel
+Pier 6 column,V1,BT,12,#11,"19'-3""",1228,1227,OK,PDF p.100 / sheet 151,RASTER,"table of variable quantities; bar V1 = (H - 2"") + 2'-2"" + 5'-3"" leg"
+Pier 6 column,V2,ST,16,#11,"13'-10""",1176,1176,OK,PDF p.100 / sheet 151,RASTER,table of variable quantities
+Pier 6 column,Z,BT,12,#4,"13'-0""",105,104,OK,PDF p.100 / sheet 151,RASTER,"#4 - Z bars, length 13'-0"""
+Pier 6 column,TOTAL,,,,,2509,,V1 + V2 + Z = 2509 (DERIVED OK),PDF p.100 / sheet 151,RASTER,column reinforcing steel
+Pier 7 column,V1,BT,12,#11,"21'-3""",1355,1355,OK,PDF p.100 / sheet 151,RASTER,"table of variable quantities; bar V1 = (H - 2"") + 2'-2"" + 5'-3"" leg"
+Pier 7 column,V2,ST,16,#11,"15'-10""",1346,1346,OK,PDF p.100 / sheet 151,RASTER,table of variable quantities
+Pier 7 column,Z,BT,14,#4,"13'-0""",122,122,OK,PDF p.100 / sheet 151,RASTER,"#4 - Z bars, length 13'-0"""
+Pier 7 column,TOTAL,,,,,2823,,V1 + V2 + Z = 2823 (DERIVED OK),PDF p.100 / sheet 151,RASTER,column reinforcing steel
+Pier 14 column,V1,BT,12,#11,"18'-3""",1164,1164,OK,PDF p.100 / sheet 151,RASTER,"table of variable quantities; bar V1 = (H - 2"") + 2'-2"" + 5'-3"" leg"
+Pier 14 column,V2,ST,16,#11,"12'-10""",1091,1091,OK,PDF p.100 / sheet 151,RASTER,table of variable quantities
+Pier 14 column,Z,BT,11,#4,"13'-0""",96,96,OK,PDF p.100 / sheet 151,RASTER,"#4 - Z bars, length 13'-0"""
+Pier 14 column,TOTAL,,,,,2351,,V1 + V2 + Z = 2351 (DERIVED OK),PDF p.100 / sheet 151,RASTER,column reinforcing steel
+Pier 15 column,V1,BT,12,#11,"16'-3""",1037,1036,OK,PDF p.100 / sheet 151,RASTER,"table of variable quantities; bar V1 = (H - 2"") + 2'-2"" + 5'-3"" leg"
+Pier 15 column,V2,ST,16,#11,"10'-10""",921,921,OK,PDF p.100 / sheet 151,RASTER,table of variable quantities
+Pier 15 column,Z,BT,9,#4,"13'-0""",79,78,OK,PDF p.100 / sheet 151,RASTER,"#4 - Z bars, length 13'-0"""
+Pier 15 column,TOTAL,,,,,2037,,V1 + V2 + Z = 2037 (DERIVED OK),PDF p.100 / sheet 151,RASTER,column reinforcing steel
+Approach deck Unit 1 (spans 1-3),SPAN 1,,,,751 SF,1728,1727,OK,PDF p.109 / sheet 160,RASTER,note 2: weight = approximate factor 2.3 lb/SF x slab SF (no bar list)
+Approach deck Unit 1 (spans 1-3),SPAN 2,,,,470 SF,1081,1081,OK,PDF p.109 / sheet 160,RASTER,note 2: weight = approximate factor 2.3 lb/SF x slab SF (no bar list)
+Approach deck Unit 1 (spans 1-3),SPAN 3,,,,470 SF,1081,1081,OK,PDF p.109 / sheet 160,RASTER,note 2: weight = approximate factor 2.3 lb/SF x slab SF (no bar list)
+Approach deck Unit 1 (spans 1-3),TOTAL,,,,,3890,,,PDF p.109 / sheet 160,RASTER,approximate (2.3 lb/SF)
+Approach deck Unit 2 (spans 4-6),SPAN 4,,,,470 SF,1081,1081,OK,PDF p.111 / sheet 162,RASTER,note 2: weight = approximate factor 2.3 lb/SF x slab SF (no bar list)
+Approach deck Unit 2 (spans 4-6),SPAN 5,,,,470 SF,1081,1081,OK,PDF p.111 / sheet 162,RASTER,note 2: weight = approximate factor 2.3 lb/SF x slab SF (no bar list)
+Approach deck Unit 2 (spans 4-6),SPAN 6,,,,580 SF,1334,1334,OK,PDF p.111 / sheet 162,RASTER,note 2: weight = approximate factor 2.3 lb/SF x slab SF (no bar list)
+Approach deck Unit 2 (spans 4-6),TOTAL,,,,,3496,,,PDF p.111 / sheet 162,RASTER,approximate (2.3 lb/SF)
+Approach deck Unit 3 (spans 7-9),SPAN 7,,,,934 SF,2149,2148,OK,PDF p.113 / sheet 164,RASTER,note 2: weight = approximate factor 2.3 lb/SF x slab SF (no bar list)
+Approach deck Unit 3 (spans 7-9),SPAN 8,,,,392 SF,902,902,OK,PDF p.113 / sheet 164,RASTER,note 2: weight = approximate factor 2.3 lb/SF x slab SF (no bar list)
+Approach deck Unit 3 (spans 7-9),SPAN 9,,,,1228 SF,2825,2824,OK,PDF p.113 / sheet 164,RASTER,note 2: weight = approximate factor 2.3 lb/SF x slab SF (no bar list)
+Approach deck Unit 3 (spans 7-9),TOTAL,,,,,5876,,,PDF p.113 / sheet 164,RASTER,approximate (2.3 lb/SF)
+Approach deck Unit 4 (spans 11-12),SPAN 11,,,,1042 SF,2397,2397,OK,PDF p.115 / sheet 166,RASTER,note 2: weight = approximate factor 2.3 lb/SF x slab SF (no bar list)
+Approach deck Unit 4 (spans 11-12),SPAN 12,,,,878 SF,2020,2019,OK,PDF p.115 / sheet 166,RASTER,note 2: weight = approximate factor 2.3 lb/SF x slab SF (no bar list)
+Approach deck Unit 4 (spans 11-12),TOTAL,,,,,4417,,,PDF p.115 / sheet 166,RASTER,approximate (2.3 lb/SF)
+Approach deck Unit 5 (spans 13-15),SPAN 13,,,,878 SF,2020,2019,OK,PDF p.117 / sheet 168,RASTER,note 2: weight = approximate factor 2.3 lb/SF x slab SF (no bar list)
+Approach deck Unit 5 (spans 13-15),SPAN 14,,,,878 SF,2020,2019,OK,PDF p.117 / sheet 168,RASTER,note 2: weight = approximate factor 2.3 lb/SF x slab SF (no bar list)
+Approach deck Unit 5 (spans 13-15),SPAN 15,,,,878 SF,2020,2019,OK,PDF p.117 / sheet 168,RASTER,note 2: weight = approximate factor 2.3 lb/SF x slab SF (no bar list)
+Approach deck Unit 5 (spans 13-15),TOTAL,,,,,6060,,,PDF p.117 / sheet 168,RASTER,approximate (2.3 lb/SF)

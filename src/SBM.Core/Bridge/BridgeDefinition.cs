@@ -471,10 +471,14 @@ public sealed class DeckReinforcementDefinition
     public double MarkLengthTolerance { get; set; } = In(2);
     /// <summary>OPTIONAL plan-driven layout (zones + the plan bar list); null = the generic layout above. Sizes/covers above still apply to it.</summary>
     public DeckPlanReinforcement? Plan { get; set; }
+    /// <summary>OPTIONAL explicit plan bars (<see cref="PlanBarSet"/>, project plan X / Y and elevation): when present the generic layout does not run (a
+    /// <see cref="Plan"/> layout still does); the sets are placed and cover-checked against the deck concrete.</summary>
+    public List<PlanBarSet> PlanBarSets { get; set; } = new();
     public DeckReinforcementDefinition Clone()
     {
         var c = (DeckReinforcementDefinition)MemberwiseClone();
         c.Plan = Plan?.Clone();
+        c.PlanBarSets = PlanBarSets.Select(b => b.Clone()).ToList();
         return c;
     }
 }

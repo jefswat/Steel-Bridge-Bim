@@ -322,11 +322,16 @@ public sealed class SubstructureReinforcementDefinition
     /// <summary>As-designed cap and pedestal reinforcing (the plan bar list); when present it replaces the generic cap bars and stirrups.</summary>
     public List<PlanBarGroup> CapBars { get; set; } = new();
 
+    /// <summary>OPTIONAL explicit plan bars (<see cref="PlanBarSet"/>, unit frame S / N / elevation): when present they are the unit's complete reinforcing and the
+    /// generic cap / column / shaft / footing generators (and <see cref="CapBars"/>) do not run for the unit.</summary>
+    public List<PlanBarSet> PlanBarSets { get; set; } = new();
+
     public SubstructureReinforcementDefinition Clone()
     {
         var c = (SubstructureReinforcementDefinition)MemberwiseClone();
         c.ColumnChamferBarPositions = ColumnChamferBarPositions?.ToList();
         c.CapBars = CapBars.Select(b => b.Clone()).ToList();
+        c.PlanBarSets = PlanBarSets.Select(b => b.Clone()).ToList();
         return c;
     }
 }
