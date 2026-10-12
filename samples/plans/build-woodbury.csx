@@ -153,9 +153,8 @@ br.Deck.Haunch = In(1);
 br.Deck.OverhangThickness = In(8.75);
 br.Deck.StayInPlaceForms = false;
 br.Deck.Reinforcement.Enabled = false;   // deck bars: later step (bar lists in bar-lists.csv, bend dims U9)
-br.Deck.Barrier.Type = BarrierType.None; // Iowa aesthetic barrier east side only: profile not transcribed (U10)
+br.Deck.Barrier.Type = BarrierType.None; // set by barrier-woodbury.csx below (Iowa aesthetic barrier, east side only, p.38)
 br.Deck.Barrier.Left = false;
-unresolved.Add("U10 (PDF p.38): Iowa aesthetic barrier (east side, 3'-8 x 1'-7) profile - the sheet's profile dimensions have not all been transcribed into the plan data yet; no barrier modeled.");
 
 // ---------------------------------------------------------------- beams (beam layout p.21 / DS 19)
 // 5 beam lines D, E, F, G, H (west to east; A-C are stage 2). Iowa standard BTD beams (user rule: standard beams at the standard
@@ -290,6 +289,12 @@ unresolved.Add("Beam ends at the piers: square to the beam or parallel to the pi
     var dr = await SBM.Api.ScriptHost.RunFileAsync(@"samples\plans\diaphragms-woodbury.csx", Doc, Args);
     Print(dr.Output.TrimEnd());
     if (!dr.Success) Print("ERROR in diaphragms-woodbury.csx: " + dr.Error);
+}
+// ---------------------------------------------------------------- Iowa aesthetic barrier rail, east side, with the pier bump-outs (barrier-woodbury.csx)
+{
+    var rr = await SBM.Api.ScriptHost.RunFileAsync(@"samples\plans\barrier-woodbury.csx", Doc, Args);
+    Print(rr.Output.TrimEnd());
+    if (!rr.Success) Print("ERROR in barrier-woodbury.csx: " + rr.Error);
 }
 // ---------------------------------------------------------------- substructure: piers 1 / 2 + integral abutments (substructure-woodbury.csx, run from the repo root)
 {

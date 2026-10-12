@@ -92,6 +92,13 @@ public sealed class ConcreteModel
     /// <summary>Steel embedded in or clashing with the deck end blocks (filled by <c>DeckEndBlockCheck</c> once the steel exists).</summary>
     public List<DeckEndClash> EndBlockClashes { get; } = new();
     public List<(string Name, Mesh Mesh)> Barriers { get; } = new();
+    /// <summary>Closed solids a barrier mesh is made of (custom barriers with zones: one per section length) - IFC items; absent = the mesh is one solid.</summary>
+    public Dictionary<string, List<Mesh>> BarrierPieces { get; } = new();
+    /// <summary>Deck slab widenings under barrier zones (plan "deck bump-outs"), part of the deck slab.</summary>
+    public List<(string Name, Mesh Mesh)> DeckBumps { get; } = new();
+    public double DeckBumpVolume => DeckBumps.Sum(b => Math.Abs(b.Mesh.Volume()));
+    /// <summary>Faces carrying a surface tag (custom barrier sections), for the surface treatments.</summary>
+    public List<TaggedSurface> TaggedSurfaces { get; } = new();
     public List<BarMark> Marks { get; } = new();
     public List<BarPlacement> Bars { get; } = new();
     public List<string> Notes { get; } = new();
@@ -491,6 +498,16 @@ public sealed partial class ConcreteGenerator
 
     private void BuildBarriers()
     {
+        if (Deck.Barrier.Type == BarrierType.Custom)
+        {
+            foreach (var (side, on) in new[] { (-1, Deck.Barrier.Left), (1, Deck.Barrier.Right) })
+                if (on)
+                {
+                    try { BuildCustomBarrier(side, side < 0 ? LeftAtD : RightAtD); }
+                    catch (ArgumentException ex) { Warn($"Custom barrier not built - {ex.Message}"); }
+                }
+            return;
+        }
         var prof = BarrierProfiles.For(Deck.Barrier);
         if (prof == null) return;
         foreach (var (side, on) in new[] { (-1, Deck.Barrier.Left), (1, Deck.Barrier.Right) })
