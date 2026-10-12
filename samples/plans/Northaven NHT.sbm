@@ -183,12 +183,29 @@
           "GirderFixities": null,
           "Bearings": null,
           "Substructure": {
-            "Enabled": false,
-            "CapWidth": 1.2192,
-            "CapDepth": 1.2192,
+            "Enabled": true,
+            "CapWidth": 1.0668000000000002,
+            "CapDepth": 0.762,
             "CapEndOverhang": 0.762,
             "CapOffset": 0,
-            "CapProfile": [],
+            "CapProfile": [
+              {
+                "S": -2.2226016,
+                "Elevation": 158.9949576
+              },
+              {
+                "S": 2.2222968,
+                "Elevation": 158.9949576
+              },
+              {
+                "S": 2.2222968,
+                "Elevation": 158.2329576
+              },
+              {
+                "S": -2.2226016,
+                "Elevation": 158.2329576
+              }
+            ],
             "CapProfileAhead": [],
             "CapBlocks": [],
             "Aesthetics": null,
@@ -196,20 +213,19 @@
             "CapSlope": "NaN",
             "CrownOffset": "NaN",
             "BottomShape": "ParallelToTop",
-            "MinPedestalHeight": 0.07619999999999999,
+            "MinPedestalHeight": 0,
             "PedestalProjection": 0.07619999999999999,
             "MaxPedestalHeight": 0.45720000000000005,
-            "PedestalSizeAlong": 0,
-            "PedestalSizeAcross": 0,
+            "PedestalSizeAlong": 0.914400000036612,
+            "PedestalSizeAcross": 0.5334,
             "PedestalShared": false,
             "PedestalSizeAcrossAhead": 0,
-            "PedestalRowJoint": "NaN",
-            "PedestalSideAngleDeg": 0,
-            "ColumnCount": 3,
-            "ColumnSpacings": [
-              4.572,
-              4.572
-            ],
+            "PedestalRowJoint": 0,
+            "PedestalSideAngleDeg": 0.0005127207604836508,
+            "PedestalSizeAlongAhead": 0.914400000036612,
+            "PedestalSideAngleAheadDeg": 0.0005127207604836508,
+            "ColumnCount": 0,
+            "ColumnSpacings": [],
             "FirstColumnOffset": "NaN",
             "ColumnShape": "Round",
             "ColumnDiameter": 0.9144000000000001,
@@ -227,8 +243,8 @@
             "Foundation": "DrilledShaft",
             "FoundationTopElevation": "NaN",
             "GroundCover": 0.3048,
-            "ShaftDiameter": 1.0668,
-            "ShaftLength": 12.192,
+            "ShaftDiameter": 0.9144000000000001,
+            "ShaftLength": 9.443923199999972,
             "FootingLength": 3.048,
             "FootingWidth": 3.048,
             "FootingThickness": 0.9144000000000001,
@@ -242,15 +258,15 @@
             "PileLength": 15.24,
             "PileEmbedment": 0.30479999999999996,
             "Footings": [],
-            "BearingToCapFront": 0.45720000000000005,
+            "BearingToCapFront": 0.5334,
             "BackwallThickness": 0.3048,
-            "BackwallGap": 0.0254,
-            "BackwallTopBelowGrade": 0,
-            "AbutmentFoundationCount": 4,
-            "AbutmentFoundationSpacing": 3.6576000000000004,
+            "BackwallGap": 0,
+            "BackwallTopBelowGrade": 0.14572407310419067,
+            "AbutmentFoundationCount": 2,
+            "AbutmentFoundationSpacing": 2.7432000000000003,
             "Abutment": null,
             "Reinforcement": {
-              "Enabled": true,
+              "Enabled": false,
               "ConcreteStrengthKsi": 3.6,
               "SteelYieldKsi": 60,
               "EpoxyCoated": false,
@@ -337,12 +353,37 @@
           "GirderFixities": null,
           "Bearings": null,
           "Substructure": {
-            "Enabled": false,
-            "CapWidth": 1.2192,
-            "CapDepth": 1.2192,
+            "Enabled": true,
+            "CapWidth": 1.0668000000000002,
+            "CapDepth": 0.7620000000000005,
             "CapEndOverhang": 0.762,
             "CapOffset": 0,
-            "CapProfile": [],
+            "CapProfile": [
+              {
+                "S": -2.286,
+                "Elevation": 159.63107520000003
+              },
+              {
+                "S": 2.286,
+                "Elevation": 159.63107520000003
+              },
+              {
+                "S": 2.286,
+                "Elevation": 159.17387520000003
+              },
+              {
+                "S": 0.45720000000000005,
+                "Elevation": 158.86907520000003
+              },
+              {
+                "S": -0.45720000000000005,
+                "Elevation": 158.86907520000003
+              },
+              {
+                "S": -2.286,
+                "Elevation": 159.17387520000003
+              }
+            ],
             "CapProfileAhead": [],
             "CapBlocks": [],
             "Aesthetics": null,
@@ -350,22 +391,21 @@
             "CapSlope": "NaN",
             "CrownOffset": "NaN",
             "BottomShape": "ParallelToTop",
-            "MinPedestalHeight": 0.07619999999999999,
+            "MinPedestalHeight": 0,
             "PedestalProjection": 0.07619999999999999,
             "MaxPedestalHeight": 0.45720000000000005,
-            "PedestalSizeAlong": 0,
-            "PedestalSizeAcross": 0,
+            "PedestalSizeAlong": 0.9178043942059548,
+            "PedestalSizeAcross": 0.5334,
             "PedestalShared": false,
             "PedestalSizeAcrossAhead": 0,
-            "PedestalRowJoint": "NaN",
-            "PedestalSideAngleDeg": 0,
-            "ColumnCount": 3,
-            "ColumnSpacings": [
-              4.572,
-              4.572
-            ],
-            "FirstColumnOffset": "NaN",
-            "ColumnShape": "Round",
+            "PedestalRowJoint": 0,
+            "PedestalSideAngleDeg": -4.936473613949882,
+            "PedestalSizeAlongAhead": 0.9437385459365877,
+            "PedestalSideAngleAheadDeg": 14.323944879522497,
+            "ColumnCount": 1,
+            "ColumnSpacings": [],
+            "FirstColumnOffset": 0,
+            "ColumnShape": "Rectangular",
             "ColumnDiameter": 0.9144000000000001,
             "ColumnWidth": 0.9144000000000001,
             "ColumnDepth": 0.9144000000000001,
@@ -379,10 +419,10 @@
             "ColumnFlareChamferS": 0,
             "ColumnFlareChamferN": 0,
             "Foundation": "DrilledShaft",
-            "FoundationTopElevation": "NaN",
+            "FoundationTopElevation": 156.73547520000002,
             "GroundCover": 0.3048,
-            "ShaftDiameter": 1.0668,
-            "ShaftLength": 12.192,
+            "ShaftDiameter": 1.2192,
+            "ShaftLength": 6.705600000000032,
             "FootingLength": 3.048,
             "FootingWidth": 3.048,
             "FootingThickness": 0.9144000000000001,
@@ -404,7 +444,7 @@
             "AbutmentFoundationSpacing": 3.6576000000000004,
             "Abutment": null,
             "Reinforcement": {
-              "Enabled": true,
+              "Enabled": false,
               "ConcreteStrengthKsi": 3.6,
               "SteelYieldKsi": 60,
               "EpoxyCoated": false,
@@ -491,12 +531,37 @@
           "GirderFixities": null,
           "Bearings": null,
           "Substructure": {
-            "Enabled": false,
-            "CapWidth": 1.2192,
-            "CapDepth": 1.2192,
+            "Enabled": true,
+            "CapWidth": 1.0668000000000002,
+            "CapDepth": 0.7620000000000005,
             "CapEndOverhang": 0.762,
             "CapOffset": 0,
-            "CapProfile": [],
+            "CapProfile": [
+              {
+                "S": -2.286,
+                "Elevation": 160.03402080000004
+              },
+              {
+                "S": 2.286,
+                "Elevation": 160.03402080000004
+              },
+              {
+                "S": 2.286,
+                "Elevation": 159.57682080000004
+              },
+              {
+                "S": 0.45720000000000005,
+                "Elevation": 159.27202080000004
+              },
+              {
+                "S": -0.45720000000000005,
+                "Elevation": 159.27202080000004
+              },
+              {
+                "S": -2.286,
+                "Elevation": 159.57682080000004
+              }
+            ],
             "CapProfileAhead": [],
             "CapBlocks": [],
             "Aesthetics": null,
@@ -504,22 +569,21 @@
             "CapSlope": "NaN",
             "CrownOffset": "NaN",
             "BottomShape": "ParallelToTop",
-            "MinPedestalHeight": 0.07619999999999999,
+            "MinPedestalHeight": 0,
             "PedestalProjection": 0.07619999999999999,
             "MaxPedestalHeight": 0.45720000000000005,
-            "PedestalSizeAlong": 0,
-            "PedestalSizeAcross": 0,
+            "PedestalSizeAlong": 0.943738545926057,
+            "PedestalSizeAcross": 0.5334,
             "PedestalShared": false,
             "PedestalSizeAcrossAhead": 0,
-            "PedestalRowJoint": "NaN",
-            "PedestalSideAngleDeg": 0,
-            "ColumnCount": 3,
-            "ColumnSpacings": [
-              4.572,
-              4.572
-            ],
-            "FirstColumnOffset": "NaN",
-            "ColumnShape": "Round",
+            "PedestalRowJoint": 0,
+            "PedestalSideAngleDeg": -14.323944877018658,
+            "PedestalSizeAlongAhead": 0.9437385459339748,
+            "PedestalSideAngleAheadDeg": 14.32394487890123,
+            "ColumnCount": 1,
+            "ColumnSpacings": [],
+            "FirstColumnOffset": 0,
+            "ColumnShape": "Rectangular",
             "ColumnDiameter": 0.9144000000000001,
             "ColumnWidth": 0.9144000000000001,
             "ColumnDepth": 0.9144000000000001,
@@ -533,10 +597,10 @@
             "ColumnFlareChamferS": 0,
             "ColumnFlareChamferN": 0,
             "Foundation": "DrilledShaft",
-            "FoundationTopElevation": "NaN",
+            "FoundationTopElevation": 156.83362080000003,
             "GroundCover": 0.3048,
-            "ShaftDiameter": 1.0668,
-            "ShaftLength": 12.192,
+            "ShaftDiameter": 1.2192,
+            "ShaftLength": 6.705600000000032,
             "FootingLength": 3.048,
             "FootingWidth": 3.048,
             "FootingThickness": 0.9144000000000001,
@@ -558,7 +622,7 @@
             "AbutmentFoundationSpacing": 3.6576000000000004,
             "Abutment": null,
             "Reinforcement": {
-              "Enabled": true,
+              "Enabled": false,
               "ConcreteStrengthKsi": 3.6,
               "SteelYieldKsi": 60,
               "EpoxyCoated": false,
@@ -645,12 +709,37 @@
           "GirderFixities": null,
           "Bearings": null,
           "Substructure": {
-            "Enabled": false,
-            "CapWidth": 1.2192,
-            "CapDepth": 1.2192,
+            "Enabled": true,
+            "CapWidth": 1.0668000000000002,
+            "CapDepth": 0.7620000000000005,
             "CapEndOverhang": 0.762,
             "CapOffset": 0,
-            "CapProfile": [],
+            "CapProfile": [
+              {
+                "S": -2.286,
+                "Elevation": 160.4366616
+              },
+              {
+                "S": 2.286,
+                "Elevation": 160.4366616
+              },
+              {
+                "S": 2.286,
+                "Elevation": 159.9794616
+              },
+              {
+                "S": 0.45720000000000005,
+                "Elevation": 159.6746616
+              },
+              {
+                "S": -0.45720000000000005,
+                "Elevation": 159.6746616
+              },
+              {
+                "S": -2.286,
+                "Elevation": 159.9794616
+              }
+            ],
             "CapProfileAhead": [],
             "CapBlocks": [],
             "Aesthetics": null,
@@ -658,22 +747,21 @@
             "CapSlope": "NaN",
             "CrownOffset": "NaN",
             "BottomShape": "ParallelToTop",
-            "MinPedestalHeight": 0.07619999999999999,
+            "MinPedestalHeight": 0,
             "PedestalProjection": 0.07619999999999999,
             "MaxPedestalHeight": 0.45720000000000005,
-            "PedestalSizeAlong": 0,
-            "PedestalSizeAcross": 0,
+            "PedestalSizeAlong": 0.94373854592867,
+            "PedestalSizeAcross": 0.5334,
             "PedestalShared": false,
             "PedestalSizeAcrossAhead": 0,
-            "PedestalRowJoint": "NaN",
-            "PedestalSideAngleDeg": 0,
-            "ColumnCount": 3,
-            "ColumnSpacings": [
-              4.572,
-              4.572
-            ],
-            "FirstColumnOffset": "NaN",
-            "ColumnShape": "Round",
+            "PedestalRowJoint": 0,
+            "PedestalSideAngleDeg": -14.323944877639931,
+            "PedestalSizeAlongAhead": 0.9437385459271925,
+            "PedestalSideAngleAheadDeg": 14.323944877288639,
+            "ColumnCount": 1,
+            "ColumnSpacings": [],
+            "FirstColumnOffset": 0,
+            "ColumnShape": "Rectangular",
             "ColumnDiameter": 0.9144000000000001,
             "ColumnWidth": 0.9144000000000001,
             "ColumnDepth": 0.9144000000000001,
@@ -687,10 +775,10 @@
             "ColumnFlareChamferS": 0,
             "ColumnFlareChamferN": 0,
             "Foundation": "DrilledShaft",
-            "FoundationTopElevation": "NaN",
+            "FoundationTopElevation": 156.6266616,
             "GroundCover": 0.3048,
-            "ShaftDiameter": 1.0668,
-            "ShaftLength": 12.192,
+            "ShaftDiameter": 1.2192,
+            "ShaftLength": 6.400800000000004,
             "FootingLength": 3.048,
             "FootingWidth": 3.048,
             "FootingThickness": 0.9144000000000001,
@@ -712,7 +800,7 @@
             "AbutmentFoundationSpacing": 3.6576000000000004,
             "Abutment": null,
             "Reinforcement": {
-              "Enabled": true,
+              "Enabled": false,
               "ConcreteStrengthKsi": 3.6,
               "SteelYieldKsi": 60,
               "EpoxyCoated": false,
@@ -1474,12 +1562,37 @@
           "GirderFixities": null,
           "Bearings": null,
           "Substructure": {
-            "Enabled": false,
-            "CapWidth": 1.2192,
-            "CapDepth": 1.2192,
+            "Enabled": true,
+            "CapWidth": 1.0668000000000002,
+            "CapDepth": 0.7620000000000005,
             "CapEndOverhang": 0.762,
             "CapOffset": 0,
-            "CapProfile": [],
+            "CapProfile": [
+              {
+                "S": -2.286,
+                "Elevation": 160.8396072
+              },
+              {
+                "S": 2.286,
+                "Elevation": 160.8396072
+              },
+              {
+                "S": 2.286,
+                "Elevation": 160.3824072
+              },
+              {
+                "S": 0.45720000000000005,
+                "Elevation": 160.0776072
+              },
+              {
+                "S": -0.45720000000000005,
+                "Elevation": 160.0776072
+              },
+              {
+                "S": -2.286,
+                "Elevation": 160.3824072
+              }
+            ],
             "CapProfileAhead": [],
             "CapBlocks": [],
             "Aesthetics": null,
@@ -1487,22 +1600,21 @@
             "CapSlope": "NaN",
             "CrownOffset": "NaN",
             "BottomShape": "ParallelToTop",
-            "MinPedestalHeight": 0.07619999999999999,
+            "MinPedestalHeight": 0,
             "PedestalProjection": 0.07619999999999999,
             "MaxPedestalHeight": 0.45720000000000005,
-            "PedestalSizeAlong": 0,
-            "PedestalSizeAcross": 0,
+            "PedestalSizeAlong": 0.9437385459354525,
+            "PedestalSizeAcross": 0.5334,
             "PedestalShared": false,
             "PedestalSizeAcrossAhead": 0,
-            "PedestalRowJoint": "NaN",
-            "PedestalSideAngleDeg": 0,
-            "ColumnCount": 3,
-            "ColumnSpacings": [
-              4.572,
-              4.572
-            ],
-            "FirstColumnOffset": "NaN",
-            "ColumnShape": "Round",
+            "PedestalRowJoint": 0,
+            "PedestalSideAngleDeg": -14.323944879252576,
+            "PedestalSizeAlongAhead": 0.9437385459279863,
+            "PedestalSideAngleAheadDeg": 14.323944877477397,
+            "ColumnCount": 1,
+            "ColumnSpacings": [],
+            "FirstColumnOffset": 0,
+            "ColumnShape": "Rectangular",
             "ColumnDiameter": 0.9144000000000001,
             "ColumnWidth": 0.9144000000000001,
             "ColumnDepth": 0.9144000000000001,
@@ -1516,10 +1628,10 @@
             "ColumnFlareChamferS": 0,
             "ColumnFlareChamferN": 0,
             "Foundation": "DrilledShaft",
-            "FoundationTopElevation": "NaN",
+            "FoundationTopElevation": 156.4200072,
             "GroundCover": 0.3048,
-            "ShaftDiameter": 1.0668,
-            "ShaftLength": 12.192,
+            "ShaftDiameter": 1.2192,
+            "ShaftLength": 6.095999999999975,
             "FootingLength": 3.048,
             "FootingWidth": 3.048,
             "FootingThickness": 0.9144000000000001,
@@ -1541,7 +1653,7 @@
             "AbutmentFoundationSpacing": 3.6576000000000004,
             "Abutment": null,
             "Reinforcement": {
-              "Enabled": true,
+              "Enabled": false,
               "ConcreteStrengthKsi": 3.6,
               "SteelYieldKsi": 60,
               "EpoxyCoated": false,
@@ -1628,12 +1740,33 @@
           "GirderFixities": null,
           "Bearings": null,
           "Substructure": {
-            "Enabled": false,
-            "CapWidth": 1.2192,
-            "CapDepth": 1.2192,
+            "Enabled": true,
+            "CapWidth": 1.0668000000000002,
+            "CapDepth": 1.0668000000000006,
             "CapEndOverhang": 0.762,
             "CapOffset": 0,
-            "CapProfile": [],
+            "CapProfile": [
+              {
+                "S": -2.286,
+                "Elevation": 161.24224800000002
+              },
+              {
+                "S": 2.286,
+                "Elevation": 161.24224800000002
+              },
+              {
+                "S": 2.286,
+                "Elevation": 160.17544800000002
+              },
+              {
+                "S": 0.5431536,
+                "Elevation": 160.17544800000002
+              },
+              {
+                "S": -2.286,
+                "Elevation": 160.78504800000002
+              }
+            ],
             "CapProfileAhead": [],
             "CapBlocks": [],
             "Aesthetics": null,
@@ -1641,24 +1774,23 @@
             "CapSlope": "NaN",
             "CrownOffset": "NaN",
             "BottomShape": "ParallelToTop",
-            "MinPedestalHeight": 0.07619999999999999,
+            "MinPedestalHeight": 0,
             "PedestalProjection": 0.07619999999999999,
             "MaxPedestalHeight": 0.45720000000000005,
-            "PedestalSizeAlong": 0,
-            "PedestalSizeAcross": 0,
+            "PedestalSizeAlong": 0.9437385459346583,
+            "PedestalSizeAcross": 0.5334,
             "PedestalShared": false,
             "PedestalSizeAcrossAhead": 0,
-            "PedestalRowJoint": "NaN",
-            "PedestalSideAngleDeg": 0,
-            "ColumnCount": 3,
-            "ColumnSpacings": [
-              4.572,
-              4.572
-            ],
-            "FirstColumnOffset": "NaN",
-            "ColumnShape": "Round",
+            "PedestalRowJoint": 0,
+            "PedestalSideAngleDeg": -14.323944879063763,
+            "PedestalSizeAlongAhead": 0.9381674456801888,
+            "PedestalSideAngleAheadDeg": 12.924384174026832,
+            "ColumnCount": 1,
+            "ColumnSpacings": [],
+            "FirstColumnOffset": 1.1527536,
+            "ColumnShape": "Rectangular",
             "ColumnDiameter": 0.9144000000000001,
-            "ColumnWidth": 0.9144000000000001,
+            "ColumnWidth": 1.2192,
             "ColumnDepth": 0.9144000000000001,
             "ColumnChamferS": 0,
             "ColumnChamferN": 0,
@@ -1670,10 +1802,10 @@
             "ColumnFlareChamferS": 0,
             "ColumnFlareChamferN": 0,
             "Foundation": "DrilledShaft",
-            "FoundationTopElevation": "NaN",
+            "FoundationTopElevation": 156.51784800000001,
             "GroundCover": 0.3048,
-            "ShaftDiameter": 1.0668,
-            "ShaftLength": 12.192,
+            "ShaftDiameter": 1.2192,
+            "ShaftLength": 6.400800000000004,
             "FootingLength": 3.048,
             "FootingWidth": 3.048,
             "FootingThickness": 0.9144000000000001,
@@ -1695,7 +1827,7 @@
             "AbutmentFoundationSpacing": 3.6576000000000004,
             "Abutment": null,
             "Reinforcement": {
-              "Enabled": true,
+              "Enabled": false,
               "ConcreteStrengthKsi": 3.6,
               "SteelYieldKsi": 60,
               "EpoxyCoated": false,
@@ -1782,12 +1914,33 @@
           "GirderFixities": null,
           "Bearings": null,
           "Substructure": {
-            "Enabled": false,
-            "CapWidth": 1.2192,
-            "CapDepth": 1.2192,
+            "Enabled": true,
+            "CapWidth": 1.0668000000000002,
+            "CapDepth": 1.0668000000000006,
             "CapEndOverhang": 0.762,
             "CapOffset": 0,
-            "CapProfile": [],
+            "CapProfile": [
+              {
+                "S": -2.286,
+                "Elevation": 161.73724320000002
+              },
+              {
+                "S": 2.286,
+                "Elevation": 161.73724320000002
+              },
+              {
+                "S": 2.286,
+                "Elevation": 160.67044320000002
+              },
+              {
+                "S": 0.5431536,
+                "Elevation": 160.67044320000002
+              },
+              {
+                "S": -2.286,
+                "Elevation": 161.28004320000002
+              }
+            ],
             "CapProfileAhead": [],
             "CapBlocks": [],
             "Aesthetics": null,
@@ -1795,24 +1948,23 @@
             "CapSlope": "NaN",
             "CrownOffset": "NaN",
             "BottomShape": "ParallelToTop",
-            "MinPedestalHeight": 0.07619999999999999,
+            "MinPedestalHeight": 0,
             "PedestalProjection": 0.07619999999999999,
             "MaxPedestalHeight": 0.45720000000000005,
-            "PedestalSizeAlong": 0,
-            "PedestalSizeAcross": 0,
+            "PedestalSizeAlong": 0.9167626791686607,
+            "PedestalSizeAcross": 0.5334,
             "PedestalShared": false,
             "PedestalSizeAcrossAhead": 0,
-            "PedestalRowJoint": "NaN",
-            "PedestalSideAngleDeg": 0,
-            "ColumnCount": 3,
-            "ColumnSpacings": [
-              4.572,
-              4.572
-            ],
-            "FirstColumnOffset": "NaN",
-            "ColumnShape": "Round",
+            "PedestalRowJoint": 0,
+            "PedestalSideAngleDeg": -4.114384353986997,
+            "PedestalSizeAlongAhead": 0.9159030677736286,
+            "PedestalSideAngleAheadDeg": 3.282929568820888,
+            "ColumnCount": 1,
+            "ColumnSpacings": [],
+            "FirstColumnOffset": 1.1527536,
+            "ColumnShape": "Rectangular",
             "ColumnDiameter": 0.9144000000000001,
-            "ColumnWidth": 0.9144000000000001,
+            "ColumnWidth": 1.2192,
             "ColumnDepth": 0.9144000000000001,
             "ColumnChamferS": 0,
             "ColumnChamferN": 0,
@@ -1824,10 +1976,10 @@
             "ColumnFlareChamferS": 0,
             "ColumnFlareChamferN": 0,
             "Foundation": "DrilledShaft",
-            "FoundationTopElevation": "NaN",
+            "FoundationTopElevation": 156.40324320000002,
             "GroundCover": 0.3048,
-            "ShaftDiameter": 1.0668,
-            "ShaftLength": 12.192,
+            "ShaftDiameter": 1.2192,
+            "ShaftLength": 5.181600000000003,
             "FootingLength": 3.048,
             "FootingWidth": 3.048,
             "FootingThickness": 0.9144000000000001,
@@ -1849,7 +2001,7 @@
             "AbutmentFoundationSpacing": 3.6576000000000004,
             "Abutment": null,
             "Reinforcement": {
-              "Enabled": true,
+              "Enabled": false,
               "ConcreteStrengthKsi": 3.6,
               "SteelYieldKsi": 60,
               "EpoxyCoated": false,
@@ -2610,12 +2762,37 @@
           "GirderFixities": null,
           "Bearings": null,
           "Substructure": {
-            "Enabled": false,
-            "CapWidth": 1.2192,
-            "CapDepth": 1.2192,
+            "Enabled": true,
+            "CapWidth": 1.0668000000000002,
+            "CapDepth": 0.7620000000000005,
             "CapEndOverhang": 0.762,
             "CapOffset": 0,
-            "CapProfile": [],
+            "CapProfile": [
+              {
+                "S": -2.286,
+                "Elevation": 162.41816640000002
+              },
+              {
+                "S": 2.286,
+                "Elevation": 162.41816640000002
+              },
+              {
+                "S": 2.286,
+                "Elevation": 161.96096640000002
+              },
+              {
+                "S": 0.45720000000000005,
+                "Elevation": 161.65616640000002
+              },
+              {
+                "S": -0.45720000000000005,
+                "Elevation": 161.65616640000002
+              },
+              {
+                "S": -2.286,
+                "Elevation": 161.96096640000002
+              }
+            ],
             "CapProfileAhead": [],
             "CapBlocks": [],
             "Aesthetics": null,
@@ -2623,22 +2800,21 @@
             "CapSlope": "NaN",
             "CrownOffset": "NaN",
             "BottomShape": "ParallelToTop",
-            "MinPedestalHeight": 0.07619999999999999,
+            "MinPedestalHeight": 0,
             "PedestalProjection": 0.07619999999999999,
             "MaxPedestalHeight": 0.45720000000000005,
-            "PedestalSizeAlong": 0,
-            "PedestalSizeAcross": 0,
+            "PedestalSizeAlong": 0.9190142312334572,
+            "PedestalSizeAcross": 0.5334,
             "PedestalShared": false,
             "PedestalSizeAcrossAhead": 0,
-            "PedestalRowJoint": "NaN",
-            "PedestalSideAngleDeg": 0,
-            "ColumnCount": 3,
-            "ColumnSpacings": [
-              4.572,
-              4.572
-            ],
-            "FirstColumnOffset": "NaN",
-            "ColumnShape": "Round",
+            "PedestalRowJoint": 0,
+            "PedestalSideAngleDeg": -5.74391583059054,
+            "PedestalSizeAlongAhead": 0.9166164165209849,
+            "PedestalSideAngleAheadDeg": 3.9852636197633062,
+            "ColumnCount": 1,
+            "ColumnSpacings": [],
+            "FirstColumnOffset": 0,
+            "ColumnShape": "Rectangular",
             "ColumnDiameter": 0.9144000000000001,
             "ColumnWidth": 0.9144000000000001,
             "ColumnDepth": 0.9144000000000001,
@@ -2652,10 +2828,10 @@
             "ColumnFlareChamferS": 0,
             "ColumnFlareChamferN": 0,
             "Foundation": "DrilledShaft",
-            "FoundationTopElevation": "NaN",
+            "FoundationTopElevation": 156.16976640000001,
             "GroundCover": 0.3048,
-            "ShaftDiameter": 1.0668,
-            "ShaftLength": 12.192,
+            "ShaftDiameter": 1.2192,
+            "ShaftLength": 4.876800000000003,
             "FootingLength": 3.048,
             "FootingWidth": 3.048,
             "FootingThickness": 0.9144000000000001,
@@ -2677,7 +2853,7 @@
             "AbutmentFoundationSpacing": 3.6576000000000004,
             "Abutment": null,
             "Reinforcement": {
-              "Enabled": true,
+              "Enabled": false,
               "ConcreteStrengthKsi": 3.6,
               "SteelYieldKsi": 60,
               "EpoxyCoated": false,
@@ -2764,12 +2940,37 @@
           "GirderFixities": null,
           "Bearings": null,
           "Substructure": {
-            "Enabled": false,
-            "CapWidth": 1.2192,
-            "CapDepth": 1.2192,
+            "Enabled": true,
+            "CapWidth": 1.0668000000000002,
+            "CapDepth": 0.7620000000000005,
             "CapEndOverhang": 0.762,
             "CapOffset": 0,
-            "CapProfile": [],
+            "CapProfile": [
+              {
+                "S": -2.286,
+                "Elevation": 162.57513840000001
+              },
+              {
+                "S": 2.286,
+                "Elevation": 162.57513840000001
+              },
+              {
+                "S": 2.286,
+                "Elevation": 162.1179384
+              },
+              {
+                "S": 0.45720000000000005,
+                "Elevation": 161.8131384
+              },
+              {
+                "S": -0.45720000000000005,
+                "Elevation": 161.8131384
+              },
+              {
+                "S": -2.286,
+                "Elevation": 162.1179384
+              }
+            ],
             "CapProfileAhead": [],
             "CapBlocks": [],
             "Aesthetics": null,
@@ -2777,22 +2978,21 @@
             "CapSlope": "NaN",
             "CrownOffset": "NaN",
             "BottomShape": "ParallelToTop",
-            "MinPedestalHeight": 0.07619999999999999,
+            "MinPedestalHeight": 0,
             "PedestalProjection": 0.07619999999999999,
             "MaxPedestalHeight": 0.45720000000000005,
-            "PedestalSizeAlong": 0,
-            "PedestalSizeAcross": 0,
+            "PedestalSizeAlong": 0.9148239144326735,
+            "PedestalSizeAcross": 0.5334,
             "PedestalShared": false,
             "PedestalSizeAcrossAhead": 0,
-            "PedestalRowJoint": "NaN",
-            "PedestalSideAngleDeg": 0,
-            "ColumnCount": 3,
-            "ColumnSpacings": [
-              4.572,
-              4.572
-            ],
-            "FirstColumnOffset": "NaN",
-            "ColumnShape": "Round",
+            "PedestalRowJoint": 0,
+            "PedestalSideAngleDeg": -1.7443143315449565,
+            "PedestalSizeAlongAhead": 0.9171415897264612,
+            "PedestalSideAngleAheadDeg": 4.431277147310249,
+            "ColumnCount": 1,
+            "ColumnSpacings": [],
+            "FirstColumnOffset": 0,
+            "ColumnShape": "Rectangular",
             "ColumnDiameter": 0.9144000000000001,
             "ColumnWidth": 0.9144000000000001,
             "ColumnDepth": 0.9144000000000001,
@@ -2806,10 +3006,10 @@
             "ColumnFlareChamferS": 0,
             "ColumnFlareChamferN": 0,
             "Foundation": "DrilledShaft",
-            "FoundationTopElevation": "NaN",
+            "FoundationTopElevation": 156.0219384,
             "GroundCover": 0.3048,
-            "ShaftDiameter": 1.0668,
-            "ShaftLength": 12.192,
+            "ShaftDiameter": 1.2192,
+            "ShaftLength": 4.876800000000003,
             "FootingLength": 3.048,
             "FootingWidth": 3.048,
             "FootingThickness": 0.9144000000000001,
@@ -2831,7 +3031,7 @@
             "AbutmentFoundationSpacing": 3.6576000000000004,
             "Abutment": null,
             "Reinforcement": {
-              "Enabled": true,
+              "Enabled": false,
               "ConcreteStrengthKsi": 3.6,
               "SteelYieldKsi": 60,
               "EpoxyCoated": false,
@@ -3056,12 +3256,13 @@
             "MinPedestalHeight": 0,
             "PedestalProjection": 0.07619999999999999,
             "MaxPedestalHeight": 0.45720000000000005,
-            "PedestalSizeAlong": 0.9541210504607329,
+            "PedestalSizeAlong": 0.9541131952943718,
             "PedestalSizeAcross": 0.9144000000000001,
             "PedestalShared": false,
             "PedestalSizeAcrossAhead": 0,
             "PedestalRowJoint": 0,
-            "PedestalSideAngleDeg": 16.590694444444424,
+            "PedestalSideAngleDeg": 16.589111101043308,
+            "PedestalSideAngleAheadDeg": 16.589111101043308,
             "ColumnCount": 1,
             "ColumnSpacings": [],
             "FirstColumnOffset": -0.17779999999999999,
@@ -3850,12 +4051,13 @@
             "MinPedestalHeight": 0,
             "PedestalProjection": 0.07619999999999999,
             "MaxPedestalHeight": 0.45720000000000005,
-            "PedestalSizeAlong": 0.9410185130495069,
+            "PedestalSizeAlong": 0.9410163458856919,
             "PedestalSizeAcross": 0.9144000000000001,
             "PedestalShared": false,
             "PedestalSizeAcrossAhead": 0,
             "PedestalRowJoint": 0,
-            "PedestalSideAngleDeg": 13.660277777777779,
+            "PedestalSideAngleDeg": 13.65973484126252,
+            "PedestalSideAngleAheadDeg": 13.65973484126252,
             "ColumnCount": 1,
             "ColumnSpacings": [],
             "FirstColumnOffset": 0.17779999999999999,
@@ -3985,12 +4187,37 @@
           "GirderFixities": null,
           "Bearings": null,
           "Substructure": {
-            "Enabled": false,
-            "CapWidth": 1.2192,
-            "CapDepth": 1.2192,
+            "Enabled": true,
+            "CapWidth": 1.0668000000000002,
+            "CapDepth": 0.7620000000000005,
             "CapEndOverhang": 0.762,
             "CapOffset": 0,
-            "CapProfile": [],
+            "CapProfile": [
+              {
+                "S": -2.286,
+                "Elevation": 160.8213192
+              },
+              {
+                "S": 2.286,
+                "Elevation": 160.8213192
+              },
+              {
+                "S": 2.286,
+                "Elevation": 160.3641192
+              },
+              {
+                "S": 0.45720000000000005,
+                "Elevation": 160.0593192
+              },
+              {
+                "S": -0.45720000000000005,
+                "Elevation": 160.0593192
+              },
+              {
+                "S": -2.286,
+                "Elevation": 160.3641192
+              }
+            ],
             "CapProfileAhead": [],
             "CapBlocks": [],
             "Aesthetics": null,
@@ -3998,22 +4225,21 @@
             "CapSlope": "NaN",
             "CrownOffset": "NaN",
             "BottomShape": "ParallelToTop",
-            "MinPedestalHeight": 0.07619999999999999,
+            "MinPedestalHeight": 0,
             "PedestalProjection": 0.07619999999999999,
             "MaxPedestalHeight": 0.45720000000000005,
-            "PedestalSizeAlong": 0,
-            "PedestalSizeAcross": 0,
+            "PedestalSizeAlong": 0.9217224368627045,
+            "PedestalSizeAcross": 0.5334,
             "PedestalShared": false,
             "PedestalSizeAcrossAhead": 0,
-            "PedestalRowJoint": "NaN",
-            "PedestalSideAngleDeg": 0,
-            "ColumnCount": 3,
-            "ColumnSpacings": [
-              4.572,
-              4.572
-            ],
-            "FirstColumnOffset": "NaN",
-            "ColumnShape": "Round",
+            "PedestalRowJoint": 0,
+            "PedestalSideAngleDeg": 7.226920907790209,
+            "PedestalSizeAlongAhead": 0.9192445477537496,
+            "PedestalSideAngleAheadDeg": -5.884907444290107,
+            "ColumnCount": 1,
+            "ColumnSpacings": [],
+            "FirstColumnOffset": 0,
+            "ColumnShape": "Rectangular",
             "ColumnDiameter": 0.9144000000000001,
             "ColumnWidth": 0.9144000000000001,
             "ColumnDepth": 0.9144000000000001,
@@ -4027,10 +4253,10 @@
             "ColumnFlareChamferS": 0,
             "ColumnFlareChamferN": 0,
             "Foundation": "DrilledShaft",
-            "FoundationTopElevation": "NaN",
+            "FoundationTopElevation": 154.8777192,
             "GroundCover": 0.3048,
-            "ShaftDiameter": 1.0668,
-            "ShaftLength": 12.192,
+            "ShaftDiameter": 1.2192,
+            "ShaftLength": 8.229599999999976,
             "FootingLength": 3.048,
             "FootingWidth": 3.048,
             "FootingThickness": 0.9144000000000001,
@@ -4052,7 +4278,7 @@
             "AbutmentFoundationSpacing": 3.6576000000000004,
             "Abutment": null,
             "Reinforcement": {
-              "Enabled": true,
+              "Enabled": false,
               "ConcreteStrengthKsi": 3.6,
               "SteelYieldKsi": 60,
               "EpoxyCoated": false,
@@ -4139,12 +4365,37 @@
           "GirderFixities": null,
           "Bearings": null,
           "Substructure": {
-            "Enabled": false,
-            "CapWidth": 1.2192,
-            "CapDepth": 1.2192,
+            "Enabled": true,
+            "CapWidth": 1.0668000000000002,
+            "CapDepth": 0.7620000000000005,
             "CapEndOverhang": 0.762,
             "CapOffset": 0,
-            "CapProfile": [],
+            "CapProfile": [
+              {
+                "S": -2.286,
+                "Elevation": 159.9870816
+              },
+              {
+                "S": 2.286,
+                "Elevation": 159.9870816
+              },
+              {
+                "S": 2.286,
+                "Elevation": 159.5298816
+              },
+              {
+                "S": 0.45720000000000005,
+                "Elevation": 159.2250816
+              },
+              {
+                "S": -0.45720000000000005,
+                "Elevation": 159.2250816
+              },
+              {
+                "S": -2.286,
+                "Elevation": 159.5298816
+              }
+            ],
             "CapProfileAhead": [],
             "CapBlocks": [],
             "Aesthetics": null,
@@ -4152,22 +4403,21 @@
             "CapSlope": "NaN",
             "CrownOffset": "NaN",
             "BottomShape": "ParallelToTop",
-            "MinPedestalHeight": 0.07619999999999999,
+            "MinPedestalHeight": 0,
             "PedestalProjection": 0.07619999999999999,
             "MaxPedestalHeight": 0.45720000000000005,
-            "PedestalSizeAlong": 0,
-            "PedestalSizeAcross": 0,
+            "PedestalSizeAlong": 0.9144466209710389,
+            "PedestalSizeAcross": 0.5334,
             "PedestalShared": false,
             "PedestalSizeAcrossAhead": 0,
-            "PedestalRowJoint": "NaN",
-            "PedestalSideAngleDeg": 0,
-            "ColumnCount": 3,
-            "ColumnSpacings": [
-              4.572,
-              4.572
-            ],
-            "FirstColumnOffset": "NaN",
-            "ColumnShape": "Round",
+            "PedestalRowJoint": 0,
+            "PedestalSideAngleDeg": 0.5785633952876655,
+            "PedestalSizeAlongAhead": 0.9144000000000001,
+            "PedestalSideAngleAheadDeg": 1.183346987071102E-09,
+            "ColumnCount": 1,
+            "ColumnSpacings": [],
+            "FirstColumnOffset": 0,
+            "ColumnShape": "Rectangular",
             "ColumnDiameter": 0.9144000000000001,
             "ColumnWidth": 0.9144000000000001,
             "ColumnDepth": 0.9144000000000001,
@@ -4181,10 +4431,10 @@
             "ColumnFlareChamferS": 0,
             "ColumnFlareChamferN": 0,
             "Foundation": "DrilledShaft",
-            "FoundationTopElevation": "NaN",
+            "FoundationTopElevation": 154.9578816,
             "GroundCover": 0.3048,
-            "ShaftDiameter": 1.0668,
-            "ShaftLength": 12.192,
+            "ShaftDiameter": 1.2192,
+            "ShaftLength": 8.229600000000005,
             "FootingLength": 3.048,
             "FootingWidth": 3.048,
             "FootingThickness": 0.9144000000000001,
@@ -4206,7 +4456,7 @@
             "AbutmentFoundationSpacing": 3.6576000000000004,
             "Abutment": null,
             "Reinforcement": {
-              "Enabled": true,
+              "Enabled": false,
               "ConcreteStrengthKsi": 3.6,
               "SteelYieldKsi": 60,
               "EpoxyCoated": false,
@@ -4893,12 +5143,33 @@
           "GirderFixities": null,
           "Bearings": null,
           "Substructure": {
-            "Enabled": false,
-            "CapWidth": 1.2192,
-            "CapDepth": 1.2192,
+            "Enabled": true,
+            "CapWidth": 1.0668000000000002,
+            "CapDepth": 1.0668000000000006,
             "CapEndOverhang": 0.762,
             "CapOffset": 0,
-            "CapProfile": [],
+            "CapProfile": [
+              {
+                "S": -2.286,
+                "Elevation": 159.15040560000003
+              },
+              {
+                "S": 2.286,
+                "Elevation": 159.15040560000003
+              },
+              {
+                "S": 2.286,
+                "Elevation": 158.08360560000003
+              },
+              {
+                "S": 0.5431536,
+                "Elevation": 158.08360560000003
+              },
+              {
+                "S": -2.286,
+                "Elevation": 158.69320560000003
+              }
+            ],
             "CapProfileAhead": [],
             "CapBlocks": [],
             "Aesthetics": null,
@@ -4906,24 +5177,23 @@
             "CapSlope": "NaN",
             "CrownOffset": "NaN",
             "BottomShape": "ParallelToTop",
-            "MinPedestalHeight": 0.07619999999999999,
+            "MinPedestalHeight": 0,
             "PedestalProjection": 0.07619999999999999,
             "MaxPedestalHeight": 0.45720000000000005,
-            "PedestalSizeAlong": 0,
-            "PedestalSizeAcross": 0,
+            "PedestalSizeAlong": 0.9144000000000001,
+            "PedestalSizeAcross": 0.5334,
             "PedestalShared": false,
             "PedestalSizeAcrossAhead": 0,
-            "PedestalRowJoint": "NaN",
-            "PedestalSideAngleDeg": 0,
-            "ColumnCount": 3,
-            "ColumnSpacings": [
-              4.572,
-              4.572
-            ],
-            "FirstColumnOffset": "NaN",
-            "ColumnShape": "Round",
+            "PedestalRowJoint": 0,
+            "PedestalSideAngleDeg": 1.183346987071102E-09,
+            "PedestalSizeAlongAhead": 0.9145841745269236,
+            "PedestalSideAngleAheadDeg": 1.149867657970134,
+            "ColumnCount": 1,
+            "ColumnSpacings": [],
+            "FirstColumnOffset": 1.1527536,
+            "ColumnShape": "Rectangular",
             "ColumnDiameter": 0.9144000000000001,
-            "ColumnWidth": 0.9144000000000001,
+            "ColumnWidth": 1.2192,
             "ColumnDepth": 0.9144000000000001,
             "ColumnChamferS": 0,
             "ColumnChamferN": 0,
@@ -4935,10 +5205,10 @@
             "ColumnFlareChamferS": 0,
             "ColumnFlareChamferN": 0,
             "Foundation": "DrilledShaft",
-            "FoundationTopElevation": "NaN",
+            "FoundationTopElevation": 154.7308056,
             "GroundCover": 0.3048,
-            "ShaftDiameter": 1.0668,
-            "ShaftLength": 12.192,
+            "ShaftDiameter": 1.2192,
+            "ShaftLength": 4.876800000000003,
             "FootingLength": 3.048,
             "FootingWidth": 3.048,
             "FootingThickness": 0.9144000000000001,
@@ -4960,7 +5230,7 @@
             "AbutmentFoundationSpacing": 3.6576000000000004,
             "Abutment": null,
             "Reinforcement": {
-              "Enabled": true,
+              "Enabled": false,
               "ConcreteStrengthKsi": 3.6,
               "SteelYieldKsi": 60,
               "EpoxyCoated": false,
@@ -5047,12 +5317,33 @@
           "GirderFixities": null,
           "Bearings": null,
           "Substructure": {
-            "Enabled": false,
-            "CapWidth": 1.2192,
-            "CapDepth": 1.2192,
+            "Enabled": true,
+            "CapWidth": 1.0668000000000002,
+            "CapDepth": 1.0668000000000006,
             "CapEndOverhang": 0.762,
             "CapOffset": 0,
-            "CapProfile": [],
+            "CapProfile": [
+              {
+                "S": -2.286,
+                "Elevation": 158.31312
+              },
+              {
+                "S": 2.286,
+                "Elevation": 158.31312
+              },
+              {
+                "S": 2.286,
+                "Elevation": 157.24632
+              },
+              {
+                "S": 0.5431536,
+                "Elevation": 157.24632
+              },
+              {
+                "S": -2.286,
+                "Elevation": 157.85592
+              }
+            ],
             "CapProfileAhead": [],
             "CapBlocks": [],
             "Aesthetics": null,
@@ -5060,24 +5351,23 @@
             "CapSlope": "NaN",
             "CrownOffset": "NaN",
             "BottomShape": "ParallelToTop",
-            "MinPedestalHeight": 0.07619999999999999,
+            "MinPedestalHeight": 0,
             "PedestalProjection": 0.07619999999999999,
             "MaxPedestalHeight": 0.45720000000000005,
-            "PedestalSizeAlong": 0,
-            "PedestalSizeAcross": 0,
+            "PedestalSizeAlong": 0.917789526981545,
+            "PedestalSizeAcross": 0.5334,
             "PedestalShared": false,
             "PedestalSizeAcrossAhead": 0,
-            "PedestalRowJoint": "NaN",
-            "PedestalSideAngleDeg": 0,
-            "ColumnCount": 3,
-            "ColumnSpacings": [
-              4.572,
-              4.572
-            ],
-            "FirstColumnOffset": "NaN",
-            "ColumnShape": "Round",
+            "PedestalRowJoint": 0,
+            "PedestalSideAngleDeg": -4.925716121264688,
+            "PedestalSizeAlongAhead": 0.9158350783053533,
+            "PedestalSideAngleAheadDeg": 3.2079199275668593,
+            "ColumnCount": 1,
+            "ColumnSpacings": [],
+            "FirstColumnOffset": 1.1527536,
+            "ColumnShape": "Rectangular",
             "ColumnDiameter": 0.9144000000000001,
-            "ColumnWidth": 0.9144000000000001,
+            "ColumnWidth": 1.2192,
             "ColumnDepth": 0.9144000000000001,
             "ColumnChamferS": 0,
             "ColumnChamferN": 0,
@@ -5089,10 +5379,10 @@
             "ColumnFlareChamferS": 0,
             "ColumnFlareChamferN": 0,
             "Foundation": "DrilledShaft",
-            "FoundationTopElevation": "NaN",
+            "FoundationTopElevation": 154.50312,
             "GroundCover": 0.3048,
-            "ShaftDiameter": 1.0668,
-            "ShaftLength": 12.192,
+            "ShaftDiameter": 1.2192,
+            "ShaftLength": 4.572000000000003,
             "FootingLength": 3.048,
             "FootingWidth": 3.048,
             "FootingThickness": 0.9144000000000001,
@@ -5114,7 +5404,7 @@
             "AbutmentFoundationSpacing": 3.6576000000000004,
             "Abutment": null,
             "Reinforcement": {
-              "Enabled": true,
+              "Enabled": false,
               "ConcreteStrengthKsi": 3.6,
               "SteelYieldKsi": 60,
               "EpoxyCoated": false,
@@ -5201,12 +5491,29 @@
           "GirderFixities": null,
           "Bearings": null,
           "Substructure": {
-            "Enabled": false,
-            "CapWidth": 1.2192,
-            "CapDepth": 1.2192,
+            "Enabled": true,
+            "CapWidth": 1.0668000000000002,
+            "CapDepth": 0.762,
             "CapEndOverhang": 0.762,
             "CapOffset": 0,
-            "CapProfile": [],
+            "CapProfile": [
+              {
+                "S": -2.2186392,
+                "Elevation": 157.4846736
+              },
+              {
+                "S": 2.2201632,
+                "Elevation": 157.4846736
+              },
+              {
+                "S": 2.2201632,
+                "Elevation": 156.7226736
+              },
+              {
+                "S": -2.2186392,
+                "Elevation": 156.7226736
+              }
+            ],
             "CapProfileAhead": [],
             "CapBlocks": [],
             "Aesthetics": null,
@@ -5214,20 +5521,19 @@
             "CapSlope": "NaN",
             "CrownOffset": "NaN",
             "BottomShape": "ParallelToTop",
-            "MinPedestalHeight": 0.07619999999999999,
+            "MinPedestalHeight": 0,
             "PedestalProjection": 0.07619999999999999,
             "MaxPedestalHeight": 0.45720000000000005,
-            "PedestalSizeAlong": 0,
-            "PedestalSizeAcross": 0,
+            "PedestalSizeAlong": 0.9166406961389825,
+            "PedestalSizeAcross": 0.5334,
             "PedestalShared": false,
             "PedestalSizeAcrossAhead": 0,
-            "PedestalRowJoint": "NaN",
-            "PedestalSideAngleDeg": 0,
-            "ColumnCount": 3,
-            "ColumnSpacings": [
-              4.572,
-              4.572
-            ],
+            "PedestalRowJoint": 0,
+            "PedestalSideAngleDeg": 4.006988108624367,
+            "PedestalSizeAlongAhead": 0.9166406961389825,
+            "PedestalSideAngleAheadDeg": 4.006988108624367,
+            "ColumnCount": 0,
+            "ColumnSpacings": [],
             "FirstColumnOffset": "NaN",
             "ColumnShape": "Round",
             "ColumnDiameter": 0.9144000000000001,
@@ -5245,8 +5551,8 @@
             "Foundation": "DrilledShaft",
             "FoundationTopElevation": "NaN",
             "GroundCover": 0.3048,
-            "ShaftDiameter": 1.0668,
-            "ShaftLength": 12.192,
+            "ShaftDiameter": 0.9144000000000001,
+            "ShaftLength": 6.704685600000005,
             "FootingLength": 3.048,
             "FootingWidth": 3.048,
             "FootingThickness": 0.9144000000000001,
@@ -5260,15 +5566,15 @@
             "PileLength": 15.24,
             "PileEmbedment": 0.30479999999999996,
             "Footings": [],
-            "BearingToCapFront": 0.45720000000000005,
+            "BearingToCapFront": 0.5334,
             "BackwallThickness": 0.3048,
-            "BackwallGap": 0.0254,
-            "BackwallTopBelowGrade": 0,
-            "AbutmentFoundationCount": 4,
-            "AbutmentFoundationSpacing": 3.6576000000000004,
+            "BackwallGap": 0,
+            "BackwallTopBelowGrade": 0.14481121377670547,
+            "AbutmentFoundationCount": 2,
+            "AbutmentFoundationSpacing": 2.7432000000000003,
             "Abutment": null,
             "Reinforcement": {
-              "Enabled": true,
+              "Enabled": false,
               "ConcreteStrengthKsi": 3.6,
               "SteelYieldKsi": 60,
               "EpoxyCoated": false,

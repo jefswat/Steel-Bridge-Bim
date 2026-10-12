@@ -274,6 +274,141 @@ U("p.84-88, 109-117", "deck gap at the SEJ-B(MOD) joints (Abut 1, P4, P7, P10, P
   "Each deck ends AT the joint line (P4 / P7 / P13: CL pier; P10 / P11: 9 1/4\" from CL pier; abutments: face of backwall).");
 G("Prestressed camber / dead-load deflections (p.109-117 tables A / B, Z at CL span): beams straight, haunch 2\" constant along the beam (plan Z at midspan is a check value).");
 
+// ---------------------------------------------------------------- support frames and girder chords (script geometry = the generator's)
+// Support frame: A = CL NHT point, d = along the line (left -> right), n = normal (up-station). Girder points on the line = A + d x offset.
+(Vec2 a, Vec2 d, Vec2 n) Frame(string sup)
+{
+    var s = supData.First(x => x.name == sup);
+    double sta = Sta(s.sta), sk = skew[sup] * Math.PI / 180;
+    var t = Vec2.FromAngle(al.AngleAt(sta));
+    var r = t.Right;
+    return (al.PointAt(sta, 0), r * Math.Cos(sk) + t * Math.Sin(sk), -r * Math.Sin(sk) + t * Math.Cos(sk));
+}
+(string b, string e) SpanSupports(int planSpan)
+{
+    foreach (var (_, sups, first) in units)
+        if (planSpan >= first && planSpan < first + sups.Length - 1) return (sups[planSpan - first], sups[planSpan - first + 1]);
+    throw new ArgumentException($"span {planSpan}");
+}
+// Girder chord (unit, ahead) of girder g (0 / 1) of a plan span, from the PIER REPORT points on the two support lines.
+Vec2 Chord(int planSpan, int g)
+{
+    var l = layouts.First(x => x.span == planSpan);
+    var (sb, se) = SpanSupports(planSpan);
+    var fb = Frame(sb); var fe = Frame(se);
+    var p0 = fb.a + fb.d * (-Ft(l.l0) + g * Ft(l.s0));
+    var p1 = fe.a + fe.d * (-Ft(l.l1) + g * Ft(l.s1));
+    return (p1 - p0).Normalized();
+}
+// Side angle (deg from the support normal, + = S grows with N) of the parallelogram seats under the girders of a span at one support
+// (mean of the two girders) and the plan girder angle (pier-line to girder) for the record.
+double SideAngle(string sup, int planSpan)
+{
+    var f = Frame(sup);
+    return Enumerable.Range(0, 2).Select(g => { var c = Chord(planSpan, g); return Math.Atan2(Vec2.Dot(c, f.d), Vec2.Dot(c, f.n)) * 180 / Math.PI; }).Average();
+}
+
+// ================================================================ 5a. approach piers 2-9, 12-15 (p.97-100)
+// Cap 15'-0 (7'-6 + 7'-6 about CL pier) x 3'-6 (1'-9 + 1'-9), top LEVEL at EL. A = EL. B (cap ends), soffit EL. C at the column.
+// Piers 2-5, 8, 9, 12, 13 (p.97): column 3'-0 x 3'-0 on CL pier; cap 1'-6 deep at the ends, soffit straight to the column faces (2'-6 at the column).
+// Piers 6, 7, 14, 15 (p.99): column 4'-0 (along the cap) x 3'-0, CL 3.782' RIGHT of CL pier sta (p.94 "3.782 RT", p.99 plan 3.782 / 3.718); cap
+// 1'-6 deep at the left end, soffit straight to the left column face, then level 3'-6 deep to the right end (p.99 elevation).
+// Bearing seats (p.97/99 plan, p.98/100 BEARING SEAT DETAIL): "LEVEL 3'-0 FOR BEARING SEAT" = 1'-6 + 1'-6 square to the girder, from CL pier to
+// the cap face (1'-9), sides parallel to the girders -> plan pedestal per seat (parallelogram), top = the bearing seat; 1 1/2" min at CL brg.
+// Drilled shafts 48" (p.98 / p.100 tables): top = EL. D, tip as printed.
+var tips = new Dictionary<string, double>
+{
+    ["Pier 2"] = 492.224, ["Pier 3"] = 492.546, ["Pier 4"] = 492.867, ["Pier 5"] = 493.189, ["Pier 6"] = 492.510, ["Pier 7"] = 496.134,
+    ["Pier 8"] = 496.368, ["Pier 9"] = 495.883, ["Pier 12"] = 481.129, ["Pier 13"] = 481.392, ["Pier 14"] = 491.647, ["Pier 15"] = 491.900,
+};
+string DataDir()
+{
+    for (var dd = new DirectoryInfo(Environment.CurrentDirectory); dd != null; dd = dd.Parent)
+    {
+        var p = Path.Combine(dd.FullName, "docs", "plan-data", "nht-0047-07-228");
+        if (Directory.Exists(p)) return p;
+    }
+    throw new DirectoryNotFoundException("docs/plan-data/nht-0047-07-228 not found above the current directory - run from the repo.");
+}
+var pierRows = File.ReadAllLines(Path.Combine(DataDir(), "approach-piers.csv")).Skip(1).Where(x => x.Trim() != "").Select(x => x.Split(',')).ToList();
+var wide = new HashSet<string> { "Pier 6", "Pier 7", "Pier 14", "Pier 15" };
+foreach (var row in pierRows)
+{
+    string name = row[0];
+    double elA = double.Parse(row[8]), elB = double.Parse(row[9]), elC = double.Parse(row[10]), elD = double.Parse(row[11]);
+    if (Math.Abs(elA - elB) > 0.0005) R($"{name}: EL. A {elA:0.000} <> EL. B {elB:0.000} (p.97/99) - cap modeled level at EL. A");
+    bool w = wide.Contains(name);
+    double zA = El(elA), zC = El(elC);
+    var sd = new SubstructureDefinition
+    {
+        CapWidth = F(3, 6), CapDepth = zA - zC, CapOffset = 0,
+        ColumnCount = 1, ColumnSpacings = new(), FirstColumnOffset = w ? Ft(3.782) : 0,
+        ColumnShape = ColumnShape.Rectangular, ColumnWidth = w ? Ft(4) : Ft(3), ColumnDepth = Ft(3),
+        Foundation = FoundationType.DrilledShaft, ShaftDiameter = Ft(4), FoundationTopElevation = El(elD), ShaftLength = El(elD) - El(tips[name]),
+        PedestalSizeAcross = F(1, 9), PedestalRowJoint = 0, MinPedestalHeight = 0,
+    };
+    sd.Reinforcement.Enabled = false;
+    if (w)
+    {
+        if (Math.Abs((zA - zC) - F(3, 6)) > In(1.0 / 16)) R($"{name}: EL. A - EL. C = {Fe(zA - zC)} vs 3'-6 (p.99)");
+        sd.CapProfile = new() { new(-Ft(7.5), zA), new(Ft(7.5), zA), new(Ft(7.5), zC), new(Ft(3.782) - Ft(2), zC), new(-Ft(7.5), zA - F(1, 6)) };
+    }
+    else
+    {
+        if (Math.Abs((zA - zC) - F(2, 6)) > In(1.0 / 16)) R($"{name}: EL. A - EL. C = {Fe(zA - zC)} vs 2'-6 (p.97)");
+        sd.CapProfile = new() { new(-Ft(7.5), zA), new(Ft(7.5), zA), new(Ft(7.5), zA - F(1, 6)), new(Ft(1.5), zC), new(-Ft(1.5), zC), new(-Ft(7.5), zA - F(1, 6)) };
+    }
+    // seat parallelograms per row: back row = the span ending here, ahead row = the span starting here
+    int back = layouts.Select(x => x.span).FirstOrDefault(sp => SpanSupports(sp).e == name);
+    int ahead = layouts.Select(x => x.span).FirstOrDefault(sp => SpanSupports(sp).b == name);
+    double thB = back > 0 ? SideAngle(name, back) : SideAngle(name, ahead), thA = ahead > 0 ? SideAngle(name, ahead) : thB;
+    sd.PedestalSideAngleDeg = thB; sd.PedestalSizeAlong = Ft(3) / Math.Cos(thB * Math.PI / 180);
+    sd.PedestalSideAngleAheadDeg = thA; sd.PedestalSizeAlongAhead = Ft(3) / Math.Cos(thA * Math.PI / 180);
+    subOf[name].Substructure = sd;
+}
+G("Approach pier cap reinforcing / column / shaft bars (p.97-100 bar tables) not entered: substructure reinforcement off. Mow strips / riprap (p.97-100) and anti-graffiti coating not modeled.");
+U("p.97, 99", "column corner chamfers / cap edge chamfers of the approach piers", "chamfer sizes are not dimensioned on the sheets", "Square corners modeled.");
+
+// ================================================================ 5b. abutments 1 and 16 (p.95, 96)
+// Support line = face of backwall = CL cap = CL drilled shafts (p.95/96 plan). Cap 3'-6 (1'-9 + 1'-9) x 2'-6, top LEVEL at EL. C = EL. D; backwall
+// 1'-0 behind the face of backwall, top EL. A / B at the backwall ends; 2 x 36" drilled shafts 9'-0 apart, 4'-6 each side of CL NHT; seats as at the
+// piers ("level 3'-0" square to the girder, from the face of backwall to the cap front face, p.95 / 96 plan). CL brg 1'-0 from the face of backwall.
+// Abut 1: cap 14.583 = 7.291 (right) + 7.292 (left), EL A/B 524.699, C/D 521.637, shafts top 519.153 tip 488.153 (31 ft).
+// Abut 16: cap 14.563 = 7.279 (left) + 7.284 (right), EL A/B 519.744, C/D 516.682, shafts top 514.185 tip 492.185 (22 ft).
+void Abut(string name, double sLeft, double sRight, double elA, double elC, double shaftTop, double shaftTip, int planSpan, string pages)
+{
+    var sup = subOf[name];
+    bool first = name == "Abutment 1";
+    double zC = El(elC), zBot = zC - F(2, 6);
+    var sd = new SubstructureDefinition
+    {
+        CapWidth = F(3, 6), CapDepth = F(2, 6), BearingToCapFront = F(1, 9), BackwallThickness = Ft(1), BackwallGap = 0,
+        ColumnCount = 0, ColumnSpacings = new(), Foundation = FoundationType.DrilledShaft, ShaftDiameter = Ft(3),
+        AbutmentFoundationCount = 2, AbutmentFoundationSpacing = Ft(9), ShaftLength = zBot - El(shaftTip),
+        PedestalSizeAcross = F(1, 9), PedestalRowJoint = 0, MinPedestalHeight = 0,
+    };
+    sd.Reinforcement.Enabled = false;
+    sd.CapProfile = new() { new(-Ft(sLeft), zC), new(Ft(sRight), zC), new(Ft(sRight), zBot), new(-Ft(sLeft), zBot) };
+    double th = SideAngle(name, planSpan);
+    sd.PedestalSideAngleDeg = th; sd.PedestalSideAngleAheadDeg = th;
+    sd.PedestalSizeAlong = Ft(3) / Math.Cos(th * Math.PI / 180); sd.PedestalSizeAlongAhead = sd.PedestalSizeAlong;
+    // Backwall top: the generator follows finished grade minus BackwallTopBelowGrade; the value is DERIVED so the top reproduces EL. A at the backwall
+    // end (mid-thickness of the backwall, right end).
+    var f = Frame(name);
+    double nMid = (first ? -1 : 1) * Ft(0.5);
+    var pEnd = f.a + f.d * Ft(sRight) + f.n * nMid;
+    var so = al.Inverse(pEnd);
+    double below = al.ElevationAt(so.Station, so.Offset) - El(elA);
+    sd.BackwallTopBelowGrade = below;
+    R($"{name}: backwall top = finished grade - {below / In(1):0.00}\" (DERIVED from EL. A {elA:0.000}, {pages}); section A-A notes 3\" from finished grade.");
+    R($"{name}: shaft top {shaftTop:0.000} (plan) vs cap bottom {Fe(zBot)} = EL. C - 2'-6 ({(El(shaftTop) - zBot) / Ft(1):+0.000;-0.000} ft); shafts modeled from the cap bottom to the plan tip {shaftTip:0.000}.");
+    sup.Substructure = sd;
+}
+Abut("Abutment 1", 7.292, 7.291, 524.699, 521.637, 519.153, 488.153, 1, "p.95");
+Abut("Abutment 16", 7.279, 7.284, 519.744, 516.682, 514.185, 492.185, 15, "p.96");
+G("Abutment 16 left cap end is skewed 5 19'17\" to the retaining wall (p.96 plan, 0.163' over the cap front); the parametric abutment cap end is square to the support line.");
+G("Abutment reinforcing (A, H, S, U, V bars, p.95/96 tables) and the 1/2\" preformed bituminous fiber at the wall faces not modeled; wingwalls are retaining walls by others (MSE, p.47-69).");
+
 // ================================================================ 5. arch piers 10 & 11 (p.101-107; hammerhead)
 // Cap (p.102 plan / elevation): 24'-0 (12'-0 + 12'-0 about CL pier & drilled shaft) x 6'-0 (3'-0 + 3'-0 about CL pier), 6'-0 deep at the
 // column (2'-9 + 3'-3), 2'-9 at the ends, soffit straight from the end to the column face (9'-9 cantilevers), column 4'-6 square on a 6'-6 shaft.
@@ -283,7 +418,7 @@ G("Prestressed camber / dead-load deflections (p.109-117 tables A / B, Z at CL s
 // Orientation (DERIVED from p.102 + p.91): the p.102 plan is drawn with the arch side DOWN; for Pier 10 (arch ahead) page-right = LEFT, for
 // Pier 11 (arch back) page-right = RIGHT (shaft 0'-7" page-right = P10 LT / P11 RT as p.94; approach seats EL. D = G1 (left) at P10, EL. B = G1 at P11
 // as p.91). So EL. A (page-left pedestal, 9'-10 from the shaft) is the SOUTH (right) arch bearing at Pier 10 and the NORTH (left) one at Pier 11.
-SubstructureDefinition ArchPier(bool p10, double elA, double elE, double elC, double elF, double shaftTop, double shaftTip, double girderAngleDeg)
+SubstructureDefinition ArchPier(bool p10, double elA, double elE, double elC, double elF, double shaftTop, double shaftTip, double sideDeg)
 {
     double sS = (p10 ? -1 : 1) * In(7);                 // shaft / column CL along the pier line from CL NHT
     double zC = El(elC), zF = El(elF);
@@ -296,8 +431,8 @@ SubstructureDefinition ArchPier(bool p10, double elA, double elE, double elC, do
         Foundation = FoundationType.DrilledShaft, ShaftDiameter = F(6, 6), FoundationTopElevation = El(shaftTop), ShaftLength = El(shaftTop) - El(shaftTip),
         // approach-span seats (p.102 "approach span pedestal (typ.)"): 1'-6 + 1'-6 measured square to the girder, from CL pier to the cap face
         // (3'-0 across), sides parallel to the girders (** angle table = the girder angles of p.112 / 114).
-        PedestalSideAngleDeg = 90 - girderAngleDeg,
-        PedestalSizeAlong = Ft(3) / Math.Sin(girderAngleDeg * Math.PI / 180),
+        PedestalSideAngleDeg = sideDeg, PedestalSideAngleAheadDeg = sideDeg,
+        PedestalSizeAlong = Ft(3) / Math.Cos(sideDeg * Math.PI / 180),
         PedestalSizeAcross = Ft(3), PedestalRowJoint = 0, MinPedestalHeight = 0,
     };
     sd.Reinforcement.Enabled = false;
@@ -329,8 +464,9 @@ SubstructureDefinition ArchPier(bool p10, double elA, double elE, double elC, do
 // Shaft table (p.101): P10 top 509.150 tip 492.150 (17.0 ft); P11 top 509.110 tip 480.110 (29.0 ft). Girder angles at the approach brg: p.112 P10 73 28'39" /
 // 73 20'28" (mean 73.41), p.114 P11 76 09'10" / 76 31'36" (mean 76.34).
 var p10 = subOf["Pier 10"]; var p11 = subOf["Pier 11"];
-p10.Substructure = ArchPier(true, 534.779, 534.726, 533.219, 527.219, 509.150, 492.150, (73 + 28 / 60.0 + 39 / 3600.0 + 73 + 20 / 60.0 + 28 / 3600.0) / 2);
-p11.Substructure = ArchPier(false, 531.546, 531.494, 529.896, 523.896, 509.110, 480.110, (76 + 9 / 60.0 + 10 / 3600.0 + 76 + 31 / 60.0 + 36 / 3600.0) / 2);
+p10.Substructure = ArchPier(true, 534.779, 534.726, 533.219, 527.219, 509.150, 492.150, SideAngle("Pier 10", 9));
+p11.Substructure = ArchPier(false, 531.546, 531.494, 529.896, 523.896, 509.110, 480.110, SideAngle("Pier 11", 11));
+Print($"Approach seat side angles (girder chords): Pier 10 {SideAngle("Pier 10", 9):0.000} deg from the pier normal (plan ** 73 28'39\" / 73 20'28\" -> {90 - 73.41:0.000}), Pier 11 {SideAngle("Pier 11", 11):0.000} (plan 76 09'10\" / 76 31'36\" -> {90 - 76.34:0.000})");
 G("Arch pier cap: top 1/4\"/ft drain slope (p.102) not modeled (the cap profile is extruded level across N); cap edge chamfers and the column corner chamfers (p.102/103, size not dimensioned) not modeled.");
 G("Arch pier reinforcing (bar-lists.csv, p.103-104) not entered: substructure reinforcement off for Piers 10 / 11.");
 G("T80SS(MOD) traffic barrier on the arch piers (p.105-106, 78 LF) not modeled.");
