@@ -120,8 +120,12 @@ internal sealed class IfcReferenceViewGeometry
     }
 
     /// <summary>A recorded extrusion as an IfcPolygonalFaceSet (returns its id).</summary>
-    public int Prism(ExtrudedSolid e) =>
-        Prism(e.Frame, e.Outline, e.Holes.Select(h => HolePolygon(h, e.Outline)).ToList(), e.Extrusion, null, null);
+    public int Prism(ExtrudedSolid e)
+    {
+        // True-arc outlines (plates with radiused edges) are tessellated to the chord tolerance like the prestressed profiles.
+        IReadOnlyList<Vec2> o = e.ExactOutline is { } xo ? xo.Tessellate(_tol) : e.Outline;
+        return Prism(e.Frame, o, e.Holes.Select(h => HolePolygon(h, o)).ToList(), e.Extrusion, null, null);
+    }
 
     /// <summary>
     /// Prestressed beam with an exact profile: the polygonized profile in <see cref="BeamBody.Frame"/> (mirrored when the

@@ -273,7 +273,63 @@ for (int n = 1; n <= 10; n++)
         BottomL1 = In(D(sp["bot_L1_in"])), BottomL2 = In(D(sp["bot_L2_in"])), BottomL3 = In(D(sp["bot_L3_in"])), BottomAngleDeg = D(sp["bot_angle_deg"]),
         Thickness = In(0.5), Unresolved = ulWhy });
 }
-arch.BracingOrientationUnresolved = U("p.129-140", "upper lateral bracing member ends at the rib panel points U / U'", "the gusset connections at the 22 rib panel points (bent 7/8\" top / bottom gussets, 7/8\" connection plates, 1\" stiffeners, per-point dimensions on 12 sheets) are not modeled and the U points lie 0.685 ft off the rib WP plane (U6)", "Members run work point to work point; web vertical per the p.128 typical section.");
+arch.BracingOrientationUnresolved = U("p.129-140", "upper lateral bracing member ends at the rib panel points U / U'", "a member end without a gusset connection is not detailed", "Member runs to the work point; web vertical per the p.128 typical section.");
+// Gusset connections at the 22 rib panel points (p.129-140; p.129 = p.130, one sheet per U(n) / U(n)' pair drawn for U(n)', U(n) = the 180 deg
+// rotation): geometry read from the VECTOR linework (tools/nht_bracing_plates.py -> upper-lateral-bracing-plates.csv, 0.1 pt = 0.022"):
+// gusset flat patterns with true arcs (R 2" corners / copes, R 9 3/4 - 2'-0 between the legs), bend lines, 15/16" holes, the dashed W8x28 under
+// each leg (web centre line + end); VIEW A-A connection plates (outline + holes) and 1" stiffeners relative to the WP. Printed: 7/8" gussets and
+// connection plates, 1" stiffeners with 1 1/2" clips, 1" clear of the flange tips (B-B), CL rib to WP 8 1/4" (B-B), gusset 1" inside the plate edge (D-D).
+{
+    var rows = Csv("upper-lateral-bracing-plates.csv");
+    ArchPlateDrawing Drawing(IEnumerable<Dictionary<string, string>> rs) => new ArchPlateDrawing
+    {
+        Outline = rs.Where(r => r["kind"] == "V").OrderBy(r => int.Parse(r["seq"])).Select(r => new ArchOutlinePoint(In(D(r["x_in"])), In(D(r["y_in"])), In(D(r["r_in"])), r["a"] == "1")).ToList(),
+        Holes = rs.Where(r => r["kind"] == "H").Select(r => new ArchPoint("H" + r["seq"], In(D(r["x_in"])), In(D(r["y_in"])), 0)).ToList(),
+    };
+    ArchGussetPlate Gusset(List<Dictionary<string, string>> rs)
+    {
+        var bend = rs.Where(r => r["kind"] == "BEND").OrderBy(r => r["seq"]).Select(r => new ArchPoint("B" + r["seq"], In(D(r["x_in"])), In(D(r["y_in"])), 0)).ToList();
+        return new ArchGussetPlate
+        {
+            Plate = Drawing(rs), BendA = bend.Count == 2 ? bend[0] : null, BendB = bend.Count == 2 ? bend[1] : null,
+            Legs = rs.Where(r => r["kind"] == "BRACE").Select(r => new ArchGussetLeg { EndX = In(D(r["x_in"])), EndY = In(D(r["y_in"])), DirX = D(r["a"]), DirY = D(r["b"]) }).ToList(),
+        };
+    }
+    string stWhy = U("p.129-140 VIEW A-A / B-B", "rib stiffener position along the rib and radial extent", "the 1\" stiffeners are drawn dashed in VIEW A-A without dimensions (B-B gives only the 1 1/2\" clips and 1\" clear of the flange tips)", "Position and radial extent taken from the vector linework of A-A (to scale, 0.022\").");
+    string endWhy = U("p.129-140", "bracing member end at the gusset", "the W8x28 end is drawn dashed under the gussets without a dimension", "End taken from the vector linework of the gusset views (to scale).");
+    // VIEW A-A printed angles of the connection plate bolt lines to the rib axis (per sheet; 04 39'13" on every two-brace sheet).
+    double Dms(int d, int m, int sec) => d + m / 60.0 + sec / 3600.0;
+    var aaAngles = new Dictionary<int, double[]>
+    {
+        [1] = new[] { Dms(4, 39, 13) }, [2] = new[] { Dms(3, 5, 16), Dms(4, 39, 13) }, [3] = new[] { Dms(3, 26, 50), Dms(4, 39, 13) },
+        [4] = new[] { Dms(3, 53, 49), Dms(4, 39, 13) }, [5] = new[] { Dms(4, 20, 23), Dms(4, 39, 13) }, [6] = new[] { Dms(4, 37, 12), Dms(4, 39, 13) },
+        [7] = new[] { Dms(4, 36, 26), Dms(4, 39, 13) }, [8] = new[] { Dms(4, 18, 30), Dms(4, 39, 13) }, [9] = new[] { Dms(3, 51, 45), Dms(4, 39, 13) },
+        [10] = new[] { Dms(3, 25, 46), Dms(4, 39, 13) }, [11] = new[] { Dms(3, 6, 20) },
+    };
+    // CONFLICT (sheet titles vs the p.128 table): the connection drawn on the sheet titled "U(n) and U(n)' details" fits the members at the table
+    // points U(12-n) / U(12-n)', not U(n): e.g. the single-brace sheet "U1" has the brace at 24.6 deg to the welded edge, but at the table point U1
+    // the brace (to UL1) makes at least 36.2 deg with the rib flange plane (impossible), while at U11' (to UL1) the fit is 0.01 deg; on every sheet the
+    // drawn brace angles fit U(12-n) within 0.4 deg and U(n) not at all. Each sheet is modeled at the points its geometry fits.
+    arch.Unresolved.Add("CONFLICT (p.129-140 sheet titles vs p.128 table): the bracing connection drawn on the sheet 'U(n) and U(n)' details' fits the table points U(12-n) / U(12-n)' (drawn gusset angles within 0.4 deg; at U(n) they are geometrically impossible, e.g. sheet U1: 24.6 deg vs >= 36.2 deg at U1). Each sheet is modeled at U(12-n) / U(12-n)'; U6 is its own mirror.");
+    for (int n = 1; n <= 11; n++)
+    {
+        var det = rows.Where(r => r["detail"] == $"U{n}").ToList();
+        if (det.Count == 0) { Print($"WARNING bracing detail U{n} missing in the CSV"); continue; }
+        string page = det[0]["source"];
+        double webY = det.Where(r => r["plate"] == "AA" && r["kind"] == "WEB").Select(r => In(D(r["y_in"]))).DefaultIfEmpty(double.NaN).First();
+        int k = 12 - n;
+        foreach (var (pt, rib) in new[] { ($"U{k}'", "North rib"), ($"U{k}", "South rib") })
+            arch.BracingConnections.Add(new ArchBracingConnection
+            {
+                Name = pt, Point = pt, Rib = rib, Source = $"{page} sheet 'U{n} and U{n}' details'", CheckWeldAnglesDeg = aaAngles[n].ToList(),
+                TopGusset = Gusset(det.Where(r => r["plate"] == "G-TOP").ToList()), BottomGusset = Gusset(det.Where(r => r["plate"] == "G-BOT").ToList()),
+                TopConnectionPlate = Drawing(det.Where(r => r["plate"] == "CP-TOP")), BottomConnectionPlate = Drawing(det.Where(r => r["plate"] == "CP-BOT")),
+                Stiffeners = { Drawing(det.Where(r => r["plate"] == "ST-TOP")), Drawing(det.Where(r => r["plate"] == "ST-BOT")) },
+                WebAxisY = webY, CheckWpFromRibCl = In(8.25), CheckGussetFromPlateEdge = In(1),
+                StiffenerUnresolved = stWhy, BraceEndUnresolved = endWhy,
+            });
+    }
+}
 
 // ---------------------------------------------------------------- knuckles (p.123-126)
 // v2 detail (p.123-126, re-read at 300-500 dpi): end flange 2" x 32" x 21'-2 (1'-1 1/2 outside the end line), end web 1" (1'-0 1/8 at the chord), 4 PT
@@ -378,7 +434,9 @@ arch.Unresolved.AddRange(new[]
     U("p.102", "which arch pedestal is EL A / EL E", "the view direction of the pier elevation is not stated on the sheet", "EL A = south at Pier 10 / north at Pier 11, as derived from p.102 + p.91 by the approach model."),
     U("p.94, 102, 119", "CL1 / CL2 relative to the piers (U3)", "no combination of the layout offsets reproduces the plan chord 200'-11 11/16", "CL1/CL2 = 7\" along the pier + 4 13/16\" toward the span; the local geometry is kept and the difference reported."),
     U("p.119-150", "camber / no-load geometry (U4)", "not given", "Final geometry modeled."),
-    U("p.128", "upper bracing panel points vs the rib WP (U6, bracing part)", "the U points lie 0.685 ft off the rib WP plane; the offset rule is not stated", "Bracing points are taken from the table as printed."),
+    // U6 (bracing part) RESOLVED by the p.129-140 sections: the U point is the WP on the outer face of the 7/8" connection plate (B-B: 8 1/4" from CL rib,
+    // A-A: 3/4 - 1 1/4" radially off the web CL); checked per point by the generator (CHECK rows "WP to the connection plate face").
+    U("p.152, 143", "tie girder web shear studs", "the typical arch deck section (p.152) shows a horizontal 7/8\" x 7\" stud on the inside face of each tie web and the tie quantity (p.143 note 1) includes shear studs, but no spacing / count is given on any sheet", "Not modeled (the tie quantity check is short by them)."),
     "CONFLICT (p.147 vs p.148, p.120): the p.147 table labels H(n) 'arch rib working point' and HC(n) 'arch rib cable anchor point', but HC(n) lies on the rib working line (R 126'-0 through the RS points, within 0.0004') and H(n) lies 10\" inside it on the cable axis, P1 off the arch plane - exactly the p.148 fin plate pin (P2 sin B = 10\", P1). Modeled: rib pin = H(n), strand and sockets pin to pin; the p.147 cable length (TC to HC) is checked to HC(n) (U6 resolved for the hangers).",
     U("p.107, 93", "sole plate weld target (U8)", "the bearing note and the erection sequence name different plates", "Not modeled (welds)."),
     U("p.119, 124", "WP position in the tie / steel underside at the bearings (U10)", "the WP is at the bottom of the tie flange (p.119) but drawn inside the 2\" end flange (p.124) and the plate below it is not dimensioned", "End flange from 1 1/8\" below to 7/8\" above the WP (tie flange + 1 1/8\" fill = 2\"), steel underside 1\" lower."),

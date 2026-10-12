@@ -730,6 +730,16 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   (SheetSet arch branch), flagged steel parts on viewport layer `3D-UNRESOLVED-STEEL`. New PartCategory (appended): FinPlate, CableConnector (UHMW, 940
   kg/m3, not in SteelMass), ArchConnectionPlate, ArchStiffener, PtStrand, PtAnchorage. Remaining GAPs: bracing U-point gussets (p.129-140), railing details (the RAIL (PED)(HIGH) run on the curbs is an envelope, rail-joints-nht.csx),
   duct, D3 bars, camber. Tests `ArchTests`, `ArchV2Tests`. Knuckle visual check without a snapshot: `temp`-style dump of part triangles + a small
+  kg/m3, not in SteelMass), ArchConnectionPlate, ArchStiffener, PtStrand, PtAnchorage. v3 (design note section 8): bracing gusset connections at the
+  22 rib panel points (`ArchBracingConnection` / `ArchGussetPlate` / `ArchPlateDrawing`, partial `ArchGeneratorBracing.cs`): gusset flat patterns with
+  TRUE arcs split at the bend line, each leg placed by its brace (welded edge on the connection plate face), braces ROLLED from the gusset geometry
+  (`_braceWeb`, mean of both ends) with skewed ends at the drawn flange ends, A-A connection plates / rib stiffeners, bolts; data from the VECTOR
+  linework (`tools/nht_bracing_plates.py` + generic `tools/pdfvec.py`: plan PDFs without text layer still have vector strokes - prefer them to raster
+  scaling) -> `upper-lateral-bracing-plates.csv`; sheet 'U(n)' fits points U(12-n) (CONFLICT). Weight checks group by the plan quantity notes + pay
+  items. Remaining GAPs: railing, duct, D3 bars, camber, tie web studs (no spacing).
+- True-arc plate outlines (generic): `Solids/ArcPolygon` (points + signed minor-arc radii per edge, exact area, tessellation, Sub / Map / Reversed),
+  `PlateBuilder.AddPlanarArc` (mesh from the tessellation, `ExtrudedSolid.ExactOutline` keeps the arcs) -> IFC Parametric IfcIndexedPolyCurve with
+  IfcArcIndex, ReferenceView tessellated to its chord tolerance. Tests `ArchBracingConnectionTests`. Tests `ArchTests`, `ArchV2Tests`. Knuckle visual check without a snapshot: `temp`-style dump of part triangles + a small
   pymupdf painter's renderer (no matplotlib in the sandbox).
 - Precast PT SEGMENTAL box girder (OPTIONAL `BridgeDefinition.Segmental` = `Bridge/SegmentalDefinition.cs`, omitted from the .sbm when null; design note
   `docs/plan-data/bonner-b2500/segmental-unit5/SEGMENTAL-DESIGN.md`): own bridge with `Girders.Count = 0` (support lines only, like the arch; supports =

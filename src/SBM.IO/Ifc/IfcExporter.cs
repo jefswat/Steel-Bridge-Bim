@@ -244,17 +244,40 @@ public static class IfcExporter
         {
             var f = e.Frame;
             var sb = new StringBuilder("(");
-            for (int i = 0; i < e.Outline.Length; i++)
+            int curve;
+            if (e.ExactOutline is { } xo)
             {
-                if (i > 0) sb.Append(',');
-                sb.Append('(').Append(C(e.Outline[i].X * scale)).Append(',').Append(C(e.Outline[i].Y * scale)).Append(')');
+                // True arcs: vertices + arc mid points, IfcLineIndex / IfcArcIndex segments.
+                var pts2 = new List<Vec2>();
+                int AddPt(Vec2 p) { pts2.Add(p); return pts2.Count; }
+                var idx = new StringBuilder("(");
+                int first = AddPt(xo.Points[0]), cur = first;
+                for (int i = 0; i < xo.Count; i++)
+                {
+                    int end = i == xo.Count - 1 ? first : AddPt(xo.Points[i + 1]);
+                    if (i > 0) idx.Append(',');
+                    if (xo.IsArc(i)) idx.Append("IFCARCINDEX((").Append(cur).Append(',').Append(AddPt(xo.Mid(i))).Append(',').Append(end).Append("))");
+                    else idx.Append("IFCLINEINDEX((").Append(cur).Append(',').Append(end).Append("))");
+                    cur = end;
+                }
+                idx.Append(')');
+                int pl2 = w.Add("IFCCARTESIANPOINTLIST2D", "(" + string.Join(",", pts2.Select(p => $"({C(p.X * scale)},{C(p.Y * scale)})")) + "),$");
+                curve = w.Add("IFCINDEXEDPOLYCURVE", $"{Ref(pl2)},{idx},.F.");
             }
-            sb.Append("),$");
-            int pts = w.Add("IFCCARTESIANPOINTLIST2D", sb.ToString());
-            sb.Clear().Append(Ref(pts)).Append(",(IFCLINEINDEX((");
-            for (int i = 1; i <= e.Outline.Length; i++) sb.Append(i).Append(',');
-            sb.Append("1))),.F.");
-            int curve = w.Add("IFCINDEXEDPOLYCURVE", sb.ToString());
+            else
+            {
+                for (int i = 0; i < e.Outline.Length; i++)
+                {
+                    if (i > 0) sb.Append(',');
+                    sb.Append('(').Append(C(e.Outline[i].X * scale)).Append(',').Append(C(e.Outline[i].Y * scale)).Append(')');
+                }
+                sb.Append("),$");
+                int pts = w.Add("IFCCARTESIANPOINTLIST2D", sb.ToString());
+                sb.Clear().Append(Ref(pts)).Append(",(IFCLINEINDEX((");
+                for (int i = 1; i <= e.Outline.Length; i++) sb.Append(i).Append(',');
+                sb.Append("1))),.F.");
+                curve = w.Add("IFCINDEXEDPOLYCURVE", sb.ToString());
+            }
             int profile;
             if (e.Holes.Length == 0) profile = w.Add("IFCARBITRARYCLOSEDPROFILEDEF", $".AREA.,$,{Ref(curve)}");
             else

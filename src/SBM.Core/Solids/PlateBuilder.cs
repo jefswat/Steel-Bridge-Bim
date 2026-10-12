@@ -146,6 +146,23 @@ public static class PlateBuilder
         return pts.ToArray();
     }
 
+    /// <summary>Default chord tolerance of tessellated plate arcs (1/64 in).</summary>
+    public const double ArcSagitta = 0.0254 / 64;
+
+    /// <summary>
+    /// Planar plate whose outline has TRUE arcs (<see cref="ArcPolygon"/>, frame x-y), thickness along z from z0 to z1, round holes. The mesh uses the
+    /// tessellated outline (chords within <paramref name="maxSagitta"/>); the recorded exact extrusion keeps the arcs (IFC IfcArcIndex).
+    /// </summary>
+    public static void AddPlanarArc(Mesh mesh, ArcPolygon outline, IReadOnlyList<Hole> holes, Frame3 f, double z0, double z1, double maxSagitta = ArcSagitta)
+    {
+        var o = outline.CounterClockwise();
+        var poly = o.Tessellate(maxSagitta);
+        int triStart = mesh.TriangleCount;
+        AddPrismCore(mesh, poly, holes, (u, w, t) => f.ToWorld(u, w, t), _ => z0, _ => z1, null);
+        var fr = new Frame3(f.ToWorld(0, 0, z0), f.X, f.Y, f.Z);
+        mesh.Describe(new ExtrudedSolid { Frame = fr, Outline = poly.ToArray(), Holes = holes.ToArray(), Extrusion = f.Z * (z1 - z0), ExactOutline = o }, triStart);
+    }
+
     /// <summary>Planar plate in a frame: outline in (x, y), thickness along z from z0 to z1.</summary>
     public static void AddPlanar(Mesh mesh, IReadOnlyList<Vec2> outline, IReadOnlyList<Hole> holes, Frame3 f, double z0, double z1) =>
         AddPrism(mesh, outline, holes, (u, w, t) => f.ToWorld(u, w, t), _ => z0, _ => z1);
