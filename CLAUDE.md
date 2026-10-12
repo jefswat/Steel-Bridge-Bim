@@ -252,6 +252,23 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
     profile carry `PrestressedBeam.Body` -> IFC IfcArbitraryClosedProfileDef over IfcIndexedPolyCurve (IfcArcIndex) extruded
     and clipped by the end planes; debond sheathing = IfcTendonConduit (key `IfcKeys.PsSheath`) + Pset SBM_Debonding.
     Demo: `samples/plans/prestressed-shapes-demo.csx`; tests `PrestressedStandardTests`.
+    Beam mild reinforcing (OPTIONAL `PrestressedBeamDefinition.Reinforcement` = `Bridge/BeamReinforcementDefinition.cs`, JSON omitted when null = no
+    beam bars, output unchanged): `BeamBarSet` = mark / size / coating, CENTERLINE path with sharp corners in beam coordinates (A along the beam from
+    the station TOWARD MIDSPAN, X right of CL, Y above the bottom; centerline = out-to-out face - db/2) + `BendRadius`, `Mirror` (pairs), `Copies`
+    (lines / levels), `Stations` from the end of beam (`Ends` Both = mirrored from each end, a station landing on the other end's station = once;
+    StartOnly), `StationAtBar` (longitudinal bars: clear to the end face at the bar's own x), `AlongOffset` (bar tied against another at the same
+    dimensioned station), `PrintedDims`, `ListedLength` (scheduled length; 0 = developed), `Unresolved` (set NOT placed, raised as the warning);
+    definition-level `Unresolved` / `Notes` (Info) / `BarList` (counts per beam, checked) / `ListedWeightLb`. `Prestressed/PrestressedBeamRebar.Place`
+    (called from `PrestressedGenerator.BuildBeam`): transverse bars square to the beam in plan, station measured along the CL from the end face at
+    each point's height (bars parallel to that end face in elevation: plumb abutment ends vertical, square pier ends square); bars crossing a
+    SKEWED end face are reported (UNRESOLVED: the standards draw square ends), never moved. Output `PrestressedBeam.Bars` (BarPlacement Group "Beam",
+    Unit "{designation} beams") + `PrestressedModel.BarMarks` (`MarkOf`, `RebarMass`) + Info rows (bar list per beam, lb per beam vs printed).
+    Consumers: IFC IfcReinforcingBar aggregated into the girder assembly (key `IfcKeys.PsBar`, STIRRUP / HAIRPIN = LIGATURE), database rows under
+    the girder assembly, viewport layer `3D-REBAR-BEAM` (tiles, RebarPick -> near-view LOD), bar schedule window, material rows "Reinforcing (beams)".
+    Standard data `Prestressed/StandardBeamRebar.cs`: `IowaBtd(designation, IowaBtdEdition)` BTD55 / BTD60 / BTD105, editions Issue2004Rev2009 (as
+    printed in Woodbury p.27-30, used there) and Reissue2024 (Iowa Beams.pdf p.98 / 100 / 101 / 110; end-zone chain and 5a1 lengths differ);
+    `MnDot30Mh(chain, g505, g508, ...)` (Fig. 5-397.501(B) shapes, the spacing chain is a designer input). Scripts `samples/plans/beam-rebar-*.csx`
+    (called by the build scripts); checks in check-woodbury / check-br02069 ("Beam rebar" rows); tests `BeamRebarTests`.
   - `Diaphragms/PsSteelDiaphragmDetailer` (T4; hooked up by T6: `BridgeDefinition.PsSteelDiaphragms` -> `RegenerationCache.SteelDiaphragms`
     after the prestressed beams -> `PrestressedModel.SteelDiaphragms` (holes, bay fits, diagnostics into the prestressed diagnostics) AND the
     bridge's `SteelModel` (= diaphragm parts / bolts / assemblies only, so viewport, IFC IfcMember/IfcPlate/IfcMechanicalFastener, database,
