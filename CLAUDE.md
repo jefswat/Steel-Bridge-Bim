@@ -594,6 +594,33 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   properties; isolate with the layer toggles), IFC Pset `SBM_Status` {Status, Reason, Basis}, database props `status/reason/assumed` + view `v_unresolved` (with QC status), one warning per reason.
   Plan dimension that governs over a derived one (piped drains 22-25: tube 1'-8 from CL girder A) is modeled and the disagreement raised as `CONFLICT (plan vs model)`.
 - Plan-set test models: `samples/plans/*.csx` (Iowa DOT Designs 116/316); data in C:\SBMData (not in OneDrive).
+- Northaven Trail (TxDOT CSJ 0047-07-228, `samples/plans/build-nht.csx` -> `Northaven NHT.sbm`, check `check-nht.csx`, data
+  `docs/plan-data/nht-0047-07-228/`): alignment "CL NHT (TRAILCLNEW)" built element by element from PT 102 = 20+49.30 (the PI table's touching
+  reverse / compound curves overlap after coordinate rounding; curve 102's back tangent passes 5 ft from span 8, so it is left out), plan X/Y as a
+  local grid in feet. Five Tx28 approach units = five bridges ("NHT Unit 1" .. "NHT Unit 5", Structure "US 75 Ped.
+  Underpass at Northaven Trail ..."), Piers 4 / 7 / 13 shared (`SharedPier`). Span layouts from the PIER REPORTs: offsets along the CL pier line
+  + `GirderSpanEnd.BearingOffset` (1'-0 along the girder at piers, normal at abutments, 1'-9 1/4 normal at Piers 10 / 11).
+  **Arch interface (span 10 = GAP between Pier 10 and Pier 11, no girders):** Pier 10 = LAST support of "NHT Unit 3", Pier 11 = FIRST
+  support of "NHT Unit 4"; support line = CL pier (station 24+17.92 / 26+19.60, skew +19.578 deg from the radial). Their
+  `SubstructureDefinition.CapBlocks` hold the arch pedestals as `CapBlockKind.Pedestal` blocks ("arch bearing south" / "arch bearing north",
+  3'-4 x 1'-7 at 63 deg, plan tops EL. A / E p.102, `SeatS/SeatN` = CL bearing); after regeneration the substructure unit publishes them as
+  `SubstructureUnit.FixedSeats` (Name, S, N, Z): world point = `unit.World(S, N, Z)` with
+  `unit = Doc.Model("NHT Unit 3").Substructure.Units.First(u => u.Name == "Pier 10")` (Pier 11 likewise in Unit 4). Pier frame: S along
+  the pier line from the CL NHT point (right +), N normal (up-station +). CL arch bearing line = N +6 7/8" at Pier 10, -6 7/8" at Pier 11; the deck
+  ends 9 1/4" from CL pier on the approach side (`DeckEndOffset` = -9 1/4"). B1-B3 (pedestal tops vs tie WP chain) are raised as generator warnings
+  from `CapBlockDefinition.Reported`.
+- Fixed-elevation pedestals (OPTIONAL, general): `CapBlockKind.Pedestal` on an as-designed cap = a pedestal whose top is a plan elevation, not a
+  seat of this bridge (e.g. an arch / other-structure bearing); `CapBlockDefinition.SeatS/SeatN` (null = outline average), `Reported` (plan
+  differences -> warnings). Results: `SubstructureUnit.FixedSeats`. Solid kind Pedestal (IFC IfcColumn 'PEDESTAL').
+- Bearing offset from the layout line (OPTIONAL, `GirderSpanEnd.BearingOffset` + `BearingMeasure` AlongGirder | NormalToSupport, default 0 =
+  old behaviour): girder positions are given on the support line (PGSuper / TxDOT "girder spacing at CL pier"), the CL bearing / layout point is
+  moved this far into the span along each girder's chord (`FramingGenerator.SetupSpanLayouts`). With an offset the prestressed beam end is
+  `BearingToEnd` beyond the CL bearing (along the CL, or normal to the support for NormalToSupport) = TxDOT IGND / IGEB length C-C brg + 2 x 9"
+  (`PrestressedGenerator.BuildBeam`). Note `PrestressedBeam.Length` / `BearingSpan` are PLAN (horizontal) lengths.
+- Per-row plan pedestals (OPTIONAL `SubstructureDefinition.PedestalSizeAlongAhead` / `PedestalSideAngleAheadDeg`, null = the common values):
+  seats up-station of the CL pier (N > CapMidN) take their own along size / parallelogram angle (TxDOT "level 3'-0 seat" square to girders
+  meeting the pier at different angles each side). Foreign seats of a shared pier keep their own girder numbering (`Girder` >= 1000).
+- NHT model check: `check-nht.csx` 414 PASS / 4 FAIL (2026-10-11; the 4 = arch pier cap / column CY vs the p.102 quantity table, +-0.3 CY).
 
 ## Conventions (bridge engineering)
 - Offsets right-positive (Civil 3D). Skew from the radial line; positive = right end of support line up-station.

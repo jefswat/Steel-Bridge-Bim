@@ -311,6 +311,10 @@ public sealed partial class SubstructureGenerator
         if (!planPed && (sd.PedestalSizeAcrossAhead > 0 || !double.IsNaN(sd.PedestalRowJoint)))
             Warn($"{sl.Name}: PedestalSizeAcrossAhead / PedestalRowJoint need the plan pedestal size (PedestalSizeAlong / PedestalSizeAcross); ignored.");
         double AcrossOf(Seat x) => rows && sd.PedestalSizeAcrossAhead > 0 && x.N > unit.CapMidN ? sd.PedestalSizeAcrossAhead : sd.PedestalSizeAcross;
+        // OPTIONAL own along size / side angle of the ahead row (seats +N of the CL pier), e.g. parallelogram seats square to girders that meet the pier at other angles
+        bool aheadRow(Seat x) => x.N > unit.CapMidN;
+        double AlongOf(Seat x) => planPed && sd.PedestalSizeAlongAhead is double aa && aheadRow(x) ? aa : sd.PedestalSizeAlong;
+        double ShearOf(Seat x) => !planPed ? 0 : Math.Tan((sd.PedestalSideAngleAheadDeg is double ad && aheadRow(x) ? ad : sd.PedestalSideAngleDeg) * Math.PI / 180);
         var groups = new List<List<Seat>>();
         if (planPed && sd.PedestalShared)
         {
@@ -329,7 +333,8 @@ public sealed partial class SubstructureGenerator
             {
                 sMid = grp.Average(q => (q.Footprint.Min(f => f.X) + q.Footprint.Max(f => f.X)) / 2);
                 nMid = grp.Average(q => (q.Footprint.Min(f => f.Y) + q.Footprint.Max(f => f.Y)) / 2);
-                ps0 = sMid - sd.PedestalSizeAlong / 2; ps1 = sMid + sd.PedestalSizeAlong / 2;
+                double along = AlongOf(grp[0]); shear = ShearOf(grp[0]);
+                ps0 = sMid - along / 2; ps1 = sMid + along / 2;
                 double across = AcrossOf(grp[0]);
                 pn0 = nMid - across / 2; pn1 = nMid + across / 2;
                 if (rows && !double.IsNaN(sd.PedestalRowJoint))
@@ -371,14 +376,14 @@ public sealed partial class SubstructureGenerator
             unit.PedestalBlocks.Add(block);
             if (block.Height < In(0.125)) continue;
             var mesh = new Mesh();
-            double sh = planPed ? shear : 0, nmF = nMid;
+            double sh = planPed ? ShearOf(grp[0]) : 0, nmF = nMid;
             var foot = new[] { new Vec2(ps0, pn0), new Vec2(ps1, pn0), new Vec2(ps1, pn1), new Vec2(ps0, pn1) }.Select(q => new Vec2(q.X + sh * (q.Y - nmF), q.Y)).ToArray();
             var bottom = foot.Select(q => unit.World(q.X, q.Y, planPed && grp.Count > 1 ? unit.CapTopAt(q.X, q.Y) : unit.CapTopAt(q.X, grp[0].N))).ToArray();
             var topR = foot.Select(q => unit.World(q.X, q.Y, zTop)).ToArray();
             MeshBuilder.AddLoft(mesh, foot, new[] { bottom, topR });
             string side = !planPed && seats.Count(o => o.Girder == grp[0].Girder) > 1 ? (grp[0].N < 0 ? " back" : " ahead") : "";
             unit.Solids.Add(new SubSolid(SubElementKind.Pedestal, $"{sl.Name} pedestal {whoP}{side}",
-                $"Pedestal {Sh(ps1 - ps0)} x {Sh(pn1 - pn0)}{(planPed ? " (plan size)" : "")}{(sh != 0 ? $", parallelogram, sides {sd.PedestalSideAngleDeg:0.###} deg from the cap normal" : "")}, {Sh(block.Height)} high at CL bearing{(grp.Count > 1 ? $", {grp.Count} seats" : "")}", mesh));
+                $"Pedestal {Sh(ps1 - ps0)} x {Sh(pn1 - pn0)}{(planPed ? " (plan size)" : "")}{(sh != 0 ? $", parallelogram, sides {Math.Atan(sh) * 180 / Math.PI:0.###} deg from the cap normal" : "")}, {Sh(block.Height)} high at CL bearing{(grp.Count > 1 ? $", {grp.Count} seats" : "")}", mesh));
         }
         if (planPed)
             for (int i = 0; i < unit.PedestalBlocks.Count; i++)
@@ -721,8 +726,14 @@ public sealed partial class SubstructureGenerator
         var mesh = new Mesh();
         MeshBuilder.AddLoft(mesh, outline, new[] { bot, top });
         double hMax = outline.Max(q => Top(q.X) - Bot(q.X, q.Y));
-        unit.Solids.Add(new SubSolid(cb.Kind == CapBlockKind.Maskwall ? SubElementKind.Maskwall : SubElementKind.Cap, $"{name} {what}",
-            $"{(cb.Kind == CapBlockKind.Maskwall ? "Maskwall" : "Cap block")} '{what}' on the cap {(cb.Base == CapBlockBase.CapTop ? "top" : "soffit")}, top {El(outline.Min(q => Top(q.X)))} .. {El(outline.Max(q => Top(q.X)))}, up to {Sh(hMax)} high{(cb.Source != "" ? $" ({cb.Source})" : "")}", mesh));
+        foreach (var r in cb.Reported ?? new()) Warn($"{name}: {what}: {r}");
+        if (cb.Kind == CapBlockKind.Pedestal)
+        {
+            double ss = cb.SeatS ?? outline.Average(q => q.X), sn = cb.SeatN ?? outline.Average(q => q.Y);
+            unit.FixedSeats.Add(new FixedSeatInfo(what, ss, sn, Top(ss)));
+        }
+        unit.Solids.Add(new SubSolid(cb.Kind == CapBlockKind.Maskwall ? SubElementKind.Maskwall : cb.Kind == CapBlockKind.Pedestal ? SubElementKind.Pedestal : SubElementKind.Cap, $"{name} {what}",
+            $"{(cb.Kind == CapBlockKind.Maskwall ? "Maskwall" : cb.Kind == CapBlockKind.Pedestal ? "Fixed-elevation pedestal" : "Cap block")} '{what}' on the cap {(cb.Base == CapBlockBase.CapTop ? "top" : "soffit")}, top {El(outline.Min(q => Top(q.X)))} .. {El(outline.Max(q => Top(q.X)))}, up to {Sh(hMax)} high{(cb.Source != "" ? $" ({cb.Source})" : "")}", mesh));
     }
 
     private static Vec2[] ColumnSection(SubstructureDefinition sd)

@@ -131,6 +131,16 @@ public static class PrestressedGenerator
         // Per-span layout: the layout's bearing points are the CL bearings (e.g. Woodbury "1'-0 from CL pier along the beam").
         if (c.LayoutBegin is { } lb0) brgA = Vec2.Dot(lb0.XY - pa, t);
         if (c.LayoutEnd is { } lb1) brgB = Vec2.Dot(lb1.XY - pa, t);
+        // Span-layout bearing offsets (GirderSpanEnd.BearingOffset, the layout line is the CL pier / face of backwall): the beam ends
+        // BearingToEnd beyond its CL bearing (TxDOT IGND / IGEB girder length = C-C bearing + 2 x 9"), along the girder CL when the
+        // offset is measured along the girder, normal to the support line when it is measured normal to it.
+        if (def.Girders.SpanLayoutOf(j) is { } spl)
+        {
+            if (c.LayoutBegin != null && spl.Begin.BearingOffset > 0)
+                endA = brgA - (spl.Begin.BearingMeasure == BearingOffsetMeasure.NormalToSupport ? pd.BearingToEnd / Cos(supA) : pd.BearingToEnd);
+            if (c.LayoutEnd != null && spl.End.BearingOffset > 0)
+                endB = brgB + (spl.End.BearingMeasure == BearingOffsetMeasure.NormalToSupport ? pd.BearingToEnd / Cos(supB) : pd.BearingToEnd);
+        }
         double fkA = squareA ? 0 : kA, fkB = squareB ? 0 : kB;
         string typeName = pd.Designation != "" ? pd.Designation : shape.Name;
 

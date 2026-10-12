@@ -1,4 +1,4 @@
-﻿using SBM.Core.Bridge;
+using SBM.Core.Bridge;
 using SBM.Core.Concrete;
 using SBM.Core.Framing;
 using SBM.Core.Geometry;
@@ -34,6 +34,10 @@ public sealed record PedestalInfo(int Girder, double S, double N, double LengthS
     public string Label { get; init; } = "";
     public string Tag => Label != "" ? Label : $"G{Girder + 1}";
 }
+
+/// <summary>A bearing seat with a FIXED plan elevation on a <see cref="CapBlockKind.Pedestal"/> cap block (not a seat of this bridge's superstructure):
+/// name of the block, seat point (S, N) in cap coordinates and the block top Z there. World point: <see cref="SubstructureUnit.World"/>.</summary>
+public sealed record FixedSeatInfo(string Name, double S, double N, double Z);
 
 /// <summary>Column (pier) in cap coordinates; top is where it meets the cap bottom at its center.</summary>
 public sealed record ColumnInfo(int Index, double S, double N, double TopZ, double BottomZ, ColumnShape Shape, double SizeS, double SizeN);
@@ -105,6 +109,8 @@ public sealed class SubstructureUnit
     public List<PedestalInfo> Pedestals { get; } = new();
     /// <summary>The pedestal solids: one per block (= <see cref="Pedestals"/> unless a plan pedestal carries several seats). The pedestal bars are placed per block.</summary>
     public List<PedestalInfo> PedestalBlocks { get; } = new();
+    /// <summary>Seats on fixed-elevation pedestal cap blocks (<see cref="CapBlockKind.Pedestal"/>), e.g. the arch bearings on an arch pier.</summary>
+    public List<FixedSeatInfo> FixedSeats { get; } = new();
     public List<ColumnInfo> Columns { get; } = new();
     public List<FoundationInfo> Foundations { get; } = new();
     /// <summary>Abutment backwall: front/back faces (N) and top profile (S, Z); bottom is the cap top.</summary>

@@ -178,7 +178,7 @@ to have stripped them. PDF bookmarks differ from the sheets ("162.77' ... UNIT",
 | U10 | WP vertical position in the tie (bottom of flange p.119 vs inside the 2 in end flange p.124) | p.119, 124 | not dimensioned |
 | U11 | Arch pier angle table (** 73 20'28" / 76 09'10", *** 73 28'39" / 76 31'36") | p.102 | reference lines of the ** / *** angles not identified |
 | U12 | Horizontal datum / projection / scale factor | p.17-19 | survey sheets 1-2 not in set |
-| U13 | Not transcribed (scope): approach PIER / GIRDER REPORTs (p.108-116), other unit depth / deflection tables, abutment 16, arch deck bar bends (p.154), PT details (p.155), knuckle stud layout (p.126), bracing connections (p.129-142), arch pier barrier (p.105-106), force tables (p.121-122) | listed | legible at 300-400 dpi; time |
+| U13 | (2026-10-11: the PIER / GIRDER REPORTs p.108-116, IGND table p.118, section depths X/Y p.109/113/115, approach / arch pier shaft tables p.98/100/101 and abutment 16 p.96 are now transcribed in `samples/plans/build-nht.csx` / `check-nht.csx`.) Not transcribed (scope): approach PIER / GIRDER REPORTs (p.108-116), other unit depth / deflection tables, abutment 16, arch deck bar bends (p.154), PT details (p.155), knuckle stud layout (p.126), bracing connections (p.129-142), arch pier barrier (p.105-106), force tables (p.121-122) | listed | legible at 300-400 dpi; time |
 
 ## Model mapping
 | section | model inputs | notes / GAPs |
