@@ -16,7 +16,7 @@ public enum PartCategory
 }
 
 public enum AssemblyKind { GirderFieldSection, CrossFrame, Bearing, FieldSplice, LateralBracing, InspectionCable, InspectionWalkway,
-    ArchRib, ArchTie, ArchHanger, ArchFloorbeam, ArchBracing, ArchKnuckle, ArchDeckForm }
+    ArchRib, ArchTie, ArchHanger, ArchFloorbeam, ArchBracing, ArchKnuckle, ArchDeckForm, ArchSplice }
 
 /// <summary>Member role, used for IFC predefined types and reports.</summary>
 public enum MemberRole { None, TopChord, BottomChord, Diagonal, Diaphragm, Lateral }

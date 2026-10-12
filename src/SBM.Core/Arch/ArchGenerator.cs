@@ -232,10 +232,11 @@ public static class ArchGenerator
                 acc += e.Length;
             }
             stations.Add(acc);
-            Mesh Plate(double n0, double n1, double z0, double z1)
+            Mesh Plate(double n0, double n1, double z0, double z1, double sa, double sb)
             {
                 var sec = new[] { new Vec2(n0, z0), new Vec2(n1, z0), new Vec2(n1, z1), new Vec2(n0, z1) };
-                var rings = stations.Select(s =>
+                var st = stations.Where(x => x > sa + 1e-6 && x < sb - 1e-6).Prepend(sa).Append(sb).ToList();
+                var rings = st.Select(s =>
                 {
                     var (p, ang) = geo.At(s);
                     var nl = Vec2.FromAngle(ang).Left;
@@ -245,10 +246,140 @@ public static class ArchGenerator
                 MeshBuilder.AddLoft(m, sec, rings);
                 return m;
             }
-            AddPart($"{asm}-F", PartCategory.TiePlate, asm, $"PL {L(t.FlangeThickness)} x {L(t.FlangeWidth)} tie flange",
-                Plate(-t.FlangeWidth / 2, t.FlangeWidth / 2, 0, t.FlangeThickness), t.Material, geo.Length);
-            AddPart($"{asm}-W", PartCategory.TiePlate, asm, $"PL {L(t.WebThickness)} x {L(t.WebHeight)} tie web",
-                Plate(-t.WebThickness / 2, t.WebThickness / 2, t.FlangeThickness, t.FlangeThickness + t.WebHeight), t.Material, geo.Length);
+            // Pieces between the field splices (gap at each), splice plates + bolts at each splice.
+            var cuts = t.SpliceAt.Select(x => x.Distance).Where(x => x > 0 && x < geo.Length).OrderBy(x => x).ToList();
+            var bounds = new List<double> { 0 };
+            bounds.AddRange(cuts);
+            bounds.Add(geo.Length);
+            for (int k = 0; k + 1 < bounds.Count; k++)
+            {
+                double sa = bounds[k] + (k > 0 ? t.SpliceGap / 2 : 0), sb = bounds[k + 1] - (k + 2 < bounds.Count ? t.SpliceGap / 2 : 0);
+                string pm = cuts.Count == 0 ? asm : $"{asm}-{k + 1}";
+                string seg = cuts.Count == 0 ? "" : $", segment {k + 1}";
+                AddPart($"{pm}-F", PartCategory.TiePlate, asm, $"PL {L(t.FlangeThickness)} x {L(t.FlangeWidth)} tie flange{seg}",
+                    Plate(-t.FlangeWidth / 2, t.FlangeWidth / 2, 0, t.FlangeThickness, sa, sb), t.Material, sb - sa);
+                AddPart($"{pm}-W", PartCategory.TiePlate, asm, $"PL {L(t.WebThickness)} x {L(t.WebHeight)} tie web{seg}",
+                    Plate(-t.WebThickness / 2, t.WebThickness / 2, t.FlangeThickness, t.FlangeThickness + t.WebHeight, sa, sb), t.Material, sb - sa);
+            }
+            if (t.SpliceDetail is { } sd)
+            {
+                var asu = t.SpliceUnresolved.Length > 0 ? Assumption.Unresolved(t.SpliceUnresolved, "splices at the framing plan positions (mid panel)") : null;
+                if (asu != null) Warn(t.SpliceUnresolved);
+                if (!double.IsNaN(sd.CheckFlangePlateLength)) Check($"{t.Name}: splice flange plate length (edges + bolt spacing vs printed)", sd.CheckFlangePlateLength, sd.FlangePlateLength, Tol, L);
+                if (!double.IsNaN(sd.CheckWebPlateLength)) Check($"{t.Name}: splice web plate length (edges + bolt spacing vs printed)", sd.CheckWebPlateLength, sd.WebPlateLength, Tol, L);
+                foreach (var sp in t.SpliceAt.Where(x => x.Distance > 0 && x.Distance < geo.Length))
+                {
+                    double s0 = sp.Distance;
+                    Vec3 Fm(double u, double w, double z) { var (p, a) = geo.At(s0 + u); return W((p + Vec2.FromAngle(a).Left * w).WithZ(z)); }
+                    var g = new SpliceGeo(Fm, new() { (0.0, -1, t.FlangeThickness) }, (u, v, tt) => Fm(u, tt, v), t.WebThickness, t.FlangeThickness + t.WebHeight, t.FlangeThickness);
+                    string sm = $"{asm}-{sp.Name}".ToUpperInvariant().Replace(' ', '-').Replace("(", "").Replace(")", "").Replace("'", "P");
+                    AddAssembly(sm, AssemblyKind.ArchSplice, $"{t.Name} field splice {sp.Name}: {sd.Name}");
+                    BuildSplice(sd, g, sm, asu);
+                }
+            }
+        }
+
+        // ------------------------------------------------------------------ field splices (rib / tie)
+
+        /// <summary>Splice geometry of a member at a joint: flange map (u along the member from the joint, w across the flange, t normal to it),
+        /// flanges (outside face t, outward sign, thickness), web map (u, v along the web depth, t across the web), web thickness and its two ends (v).</summary>
+        private sealed record SpliceGeo(Func<double, double, double, Vec3> FlangeMap, List<(double Face, int Out, double Tf)> Flanges,
+            Func<double, double, double, Vec3> WebMap, double Tw, double WebPlusEnd, double WebMinusEnd);
+
+        private static List<Vec2> ClippedRect(double u0, double u1, double w0, double w1, double c)
+        {
+            if (c <= 0) return new() { new(u0, w0), new(u1, w0), new(u1, w1), new(u0, w1) };
+            return new() { new(u0 + c, w0), new(u1 - c, w0), new(u1, w0 + c), new(u1, w1 - c), new(u1 - c, w1), new(u0 + c, w1), new(u0, w1 - c), new(u0, w0 + c) };
+        }
+
+        private static Frame3 BoltFrame(Func<double, double, double, Vec3> map, double u, double w, double tHead, double dir)
+        {
+            var o = map(u, w, tHead);
+            var z = (map(u, w, tHead + dir * 1e-3) - o).Normalized();
+            var x = (map(u + 1e-3, w, tHead) - o).Normalized();
+            var y = Vec3.Cross(z, x).Normalized();
+            x = Vec3.Cross(y, z).Normalized();
+            return new Frame3(o, x, y, z);
+        }
+
+        /// <summary>Splice plates (with holes) and bolts of one joint (see <see cref="ArchSpliceDefinition"/>); returns the bolt count.</summary>
+        private int BuildSplice(ArchSpliceDefinition d, SpliceGeo g, string asm, Assumption? asu)
+        {
+            var bolt = Model.Steel.Bolt;
+            double hd = bolt.HoleDiameter;
+            int nb = 0, np = 0;
+            void Bolt(Func<double, double, double, Vec3> map, double u, double w, double tHead, double dir, double grip)
+            {
+                Model.Steel.Bolts.Add(new BoltInstance { Frame = BoltFrame(map, u, w, tHead, dir), Grip = grip, Length = bolt.LengthForGrip(grip), Assembly = asm });
+                nb++;
+            }
+            void Plate(string what, List<Vec2> outline, List<Hole> holes, Func<double, double, double, Vec3> map, double t0, double t1, double len)
+            {
+                var m = new Mesh();
+                double lo = Math.Min(t0, t1), hi = Math.Max(t0, t1);
+                PlateBuilder.AddPrism(m, outline, holes, map, _ => lo, _ => hi);
+                np++;
+                Model.Steel.Parts.Add(new SteelPart { Mark = $"{asm}-P{np}", Category = PartCategory.SplicePlate, Assembly = asm, Description = what, Mesh = m,
+                    Material = d.Material, Length = len, Assumption = asu });
+            }
+            // Columns (u from the joint) used by a row, both sides.
+            IEnumerable<double> Us(ArchBoltRow r, double first, double pitch, int count)
+            {
+                for (int k = r.FirstColumn; k < count; k += Math.Max(1, r.ColumnStep))
+                {
+                    double u = first + k * pitch;
+                    yield return -u; yield return u;
+                }
+            }
+            // Flanges: outside plate (centred), inside plates each side of the web (outer edge flush with the outside plate edge).
+            double lf = d.FlangePlateLength / 2, wo = d.FlangeOuterWidth / 2;
+            if (d.FlangeBoltColumns > 0 && d.FlangeOuterWidth > 0)
+                foreach (var (face, outw, tf) in g.Flanges)
+                {
+                    var holesOuter = new List<Hole>();
+                    var holesIn = new[] { new List<Hole>(), new List<Hole>() };
+                    double grip = d.FlangeOuterThickness + tf + d.FlangeInnerThickness;
+                    foreach (var r in d.FlangeRows)
+                        foreach (int side in new[] { 1, -1 })
+                        {
+                            double w = side * (wo - r.Gage);
+                            foreach (var u in Us(r, d.FlangeBoltFirst, d.FlangeBoltPitch, d.FlangeBoltColumns))
+                            {
+                                holesOuter.Add(new Hole(new Vec2(u, w), hd));
+                                holesIn[side > 0 ? 0 : 1].Add(new Hole(new Vec2(u, w), hd));
+                                Bolt(g.FlangeMap, u, w, face + outw * d.FlangeOuterThickness, -outw, grip);
+                            }
+                        }
+                    Plate($"PL {L(d.FlangeOuterThickness)} x {L(d.FlangeOuterWidth)} x {L(2 * lf)} outside flange splice plate", ClippedRect(-lf, lf, -wo, wo, d.FlangeClip), holesOuter,
+                        g.FlangeMap, face, face + outw * d.FlangeOuterThickness, 2 * lf);
+                    if (d.FlangeInnerWidth > 0)
+                        for (int side = 0; side < 2; side++)
+                        {
+                            double w0 = side == 0 ? wo - d.FlangeInnerWidth : -wo, w1 = side == 0 ? wo : -wo + d.FlangeInnerWidth;
+                            double ti = face - outw * tf;
+                            Plate($"PL {L(d.FlangeInnerThickness)} x {L(d.FlangeInnerWidth)} x {L(2 * lf)} inside flange splice plate", ClippedRect(-lf, lf, w0, w1, 0), holesIn[side],
+                                g.FlangeMap, ti, ti - outw * d.FlangeInnerThickness, 2 * lf);
+                        }
+                }
+            // Web plates (both faces).
+            if (d.WebBoltColumns > 0 && d.WebPlateWidth > 0)
+            {
+                double lw = d.WebPlateLength / 2;
+                double vTop = double.IsNaN(d.WebPlateEdgeFromWebEnd) ? (g.WebPlusEnd + g.WebMinusEnd) / 2 + d.WebPlateWidth / 2 : g.WebPlusEnd - d.WebPlateEdgeFromWebEnd;
+                var holes = new List<Hole>();
+                double grip = 2 * d.WebPlateThickness + g.Tw;
+                foreach (var r in d.WebRows)
+                    foreach (var u in Us(r, d.WebBoltFirst, d.WebBoltPitch, d.WebBoltColumns))
+                    {
+                        holes.Add(new Hole(new Vec2(u, vTop - r.Gage), hd));
+                        Bolt(g.WebMap, u, vTop - r.Gage, g.Tw / 2 + d.WebPlateThickness, -1, grip);
+                    }
+                foreach (int side in new[] { 1, -1 })
+                    Plate($"PL {L(d.WebPlateThickness)} x {L(d.WebPlateWidth)} x {L(2 * lw)} web splice plate{(d.WebPlateNote.Length > 0 ? " (" + d.WebPlateNote + ")" : "")}",
+                        ClippedRect(-lw, lw, vTop - d.WebPlateWidth, vTop, d.WebClip), holes, g.WebMap, side * g.Tw / 2, side * (g.Tw / 2 + d.WebPlateThickness), 2 * lw);
+            }
+            Model.SpliceBolts[asm] = nb;
+            return nb;
         }
 
         // ------------------------------------------------------------------ ribs
@@ -329,6 +460,21 @@ public static class ArchGenerator
                 }
                 else AddPart($"{asm}-{k + (hasStubs ? 0 : 1)}", PartCategory.ArchRib, asm, $"{w.Name} rib segment", m, r.Material, len, w.WeightPerFootLb);
             }
+            if (r.SpliceDetail is { } sd)
+                foreach (var sn in r.Splices)
+                {
+                    if (P(sn) is not { } sp) continue;
+                    double thc = Theta(sp);
+                    Vec3 Dir(double th) => c * Math.Cos(th) + up * Math.Sin(th);
+                    // u = arc length along the WP circle from the joint (toward the chord end), w / t radial, binormal.
+                    Vec3 Fm(double u, double wr, double tb) => W(center + Dir(thc - u / r.Radius) * (r.Radius + wr) + binormal * tb);
+                    Vec3 Wm(double u, double vb, double tr) => W(center + Dir(thc - u / r.Radius) * (r.Radius + tr) + binormal * vb);
+                    double h2 = w.Depth / 2;
+                    var g = new SpliceGeo(Fm, new() { (h2, 1, w.FlangeThickness), (-h2, -1, w.FlangeThickness) }, Wm, w.WebThickness, h2 - w.FlangeThickness, -h2 + w.FlangeThickness);
+                    string sm = $"{asm}-{sn}".ToUpperInvariant().Replace("'", "P");
+                    AddAssembly(sm, AssemblyKind.ArchSplice, $"{r.Name} field splice {sn}: {sd.Name}");
+                    BuildSplice(sd, g, sm, null);
+                }
         }
 
         // ------------------------------------------------------------------ hangers

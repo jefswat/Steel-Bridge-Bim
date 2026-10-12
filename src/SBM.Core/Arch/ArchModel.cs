@@ -18,6 +18,8 @@ public sealed class ArchModel
     /// <summary>Bearing names in seat order (BearingSeat.Girder = index).</summary>
     public List<string> BearingNames { get; } = new();
     public List<ArchCheck> Checks { get; } = new();
+    /// <summary>Bolt count per splice assembly (rib RS / tie TS splices).</summary>
+    public Dictionary<string, int> SpliceBolts { get; } = new();
     /// <summary>Rib circle per rib: centre (local), plane basis (chord c, in-plane up u), radius, rise, arc length.</summary>
     public List<ArchRibResult> Ribs { get; } = new();
     public List<ArchTieResult> Ties { get; } = new();

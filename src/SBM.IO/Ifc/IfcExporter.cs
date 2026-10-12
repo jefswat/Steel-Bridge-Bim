@@ -955,7 +955,7 @@ public static class IfcExporter
                     AssemblyKind.GirderFieldSection => (".FACTORY.", ".GIRDER.", "$"),
                     AssemblyKind.CrossFrame => (".SITE.", ".CROSS_BRACING.", "$"),
                     AssemblyKind.LateralBracing => (".SITE.", ".CROSS_BRACING.", "$"),
-                    AssemblyKind.FieldSplice => (".SITE.", ".USERDEFINED.", "'FIELD_SPLICE'"),
+                    AssemblyKind.FieldSplice or AssemblyKind.ArchSplice => (".SITE.", ".USERDEFINED.", "'FIELD_SPLICE'"),
                     AssemblyKind.InspectionCable or AssemblyKind.InspectionWalkway => (".SITE.", ".ACCESSORY_ASSEMBLY.", "$"),
                     AssemblyKind.ArchRib => (".FACTORY.", ".ARCH.", "$"),
                     AssemblyKind.ArchTie or AssemblyKind.ArchFloorbeam => (".FACTORY.", ".GIRDER.", "$"),

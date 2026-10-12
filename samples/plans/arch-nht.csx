@@ -132,7 +132,7 @@ foreach (var r in Csv("upper-lateral-bracing-points.csv")) Pt(r["point"], D(r["X
 double l0 = FI(1, 7.9375), s1 = FI(5, 10), s2 = FI(6, 1.75), l3 = FI(8, 4.1875);
 ArchTieDefinition Tie(string name, string start, string end, string prime)
 {
-    var t = new ArchTieDefinition { Name = name, Start = start, End = end, Splices = { "TS (U5)" } };
+    var t = new ArchTieDefinition { Name = name, Start = start, End = end };
     t.Elements.Add(new ArchTieElement { Kind = ArchTieElementKind.Line, Length = l0 });
     t.Elements.Add(new ArchTieElement { Kind = ArchTieElementKind.ArcRight, Radius = FI(342, 4), Length = 16 * s1 });
     t.Elements.Add(new ArchTieElement { Kind = ArchTieElementKind.ArcLeft, Radius = FI(360, 8), Length = 16 * s2 });
@@ -142,13 +142,44 @@ ArchTieDefinition Tie(string name, string start, string end, string prime)
 }
 arch.Ties.Add(Tie("South tie", "T0", "T34", ""));
 arch.Ties.Add(Tie("North tie", "T0'", "T34'", "'"));   // 180 deg rotation of the south tie (p.119 note 8)
+// Tie field splices (p.144 detail; positions p.143 framing plan TS(1)-TS(4), drawn at mid panel, not dimensioned -> U5 flag).
+double PanelDist(int k) => k == 0 ? 0 : k <= 17 ? l0 + (k - 1) * s1 : l0 + 16 * s1 + (k - 17) * s2;
+var tieSplice = new ArchSpliceDefinition
+{
+    Name = "p.144: web 2 - 9\" x 3/4\" bent PL (top flush with top of web), flange 5/8\" x 1'-2 bottom + 2 - 6\" x 5/8\" top PL, 1'-6 1/2 long, 7/8\" bolts in 15/16\" holes",
+    FlangeOuterWidth = FI(1, 2), FlangeOuterThickness = In(0.625), FlangeInnerWidth = In(6), FlangeInnerThickness = In(0.625),
+    FlangeBoltFirst = In(1.75), FlangeBoltPitch = In(3), FlangeBoltColumns = 3, FlangeEndEdge = In(1.5), FlangeRows = { new ArchBoltRow(In(1.5)), new ArchBoltRow(In(4.5)) },
+    WebPlateWidth = In(9), WebPlateThickness = In(0.75), WebPlateEdgeFromWebEnd = 0, WebPlateNote = "BENT to the tie curve",
+    WebBoltFirst = In(1.75), WebBoltPitch = In(3), WebBoltColumns = 3, WebEndEdge = In(1.5), WebRows = { new ArchBoltRow(In(1.5)), new ArchBoltRow(In(4.5)), new ArchBoltRow(In(7.5)) },
+    Material = "ASTM A709 Gr. 50-F1 (FCM)", CheckFlangePlateLength = FI(1, 6.5), CheckWebPlateLength = FI(1, 6.5),
+};
+string tsWhy = U("p.143, 120, 93", "tie girder field splice positions (U5)", "the framing plan shows TS(1)-TS(4) per tie (5 segments = erection 'tie segments 1-5', p.93) without dimensions, the north tie splices are not the 180 deg rotation of the south ones (S TS(1) T7-T8, N TS(1) T6'-T7'), and the p.120 elevation / table show only TS1-TS3 (T9-T10, T17-T18, T25-T26)", "Splices built per the framing plan at mid panel (the p.120 table TS points are the arc mid-panel points); the p.120 set is reported only.");
+foreach (var (t, pairs) in new[] { (arch.Ties[0], new[] { 7, 14, 22, 28 }), (arch.Ties[1], new[] { 6, 12, 20, 27 }) })
+{
+    for (int i = 0; i < 4; i++) t.SpliceAt.Add(new ArchPanelPoint($"TS({i + 1})", (PanelDist(pairs[i]) + PanelDist(pairs[i] + 1)) / 2));
+    t.SpliceDetail = tieSplice; t.SpliceUnresolved = tsWhy;
+}
 
 // ---------------------------------------------------------------- ribs (p.119, p.127)
 string stubWhy = U("p.123-124", "knuckle arch stub below RS1 / above RS5", "the stub is built up from 1\" arch flange plates, an end web and stiffeners whose outlines are only partly dimensioned", "Modeled as the W14x132 envelope down to the end flange top.");
+// Rib splice (p.127, "RS1 and RS6 [= RS5] similar" -> all five): flanges 14 1/2 x 5/8 outside + 2 - 5 5/8 x 5/8 inside (flush with the outside plate
+// edge, Section A-A), rows 1 3/4 and 4 1/4 from the plate edge, staggered columns at 2" from 2" (6 per side); web 2 - 10 x 3/4 CURVED, 5 rows @ 1 3/4,
+// staggered columns at 2" from 2" (4 per side); 1 3/4 end edges, 1 3/4 x 1 3/4 clips.
+var ribSplice = new ArchSpliceDefinition
+{
+    Name = "p.127: flanges 14 1/2\" x 5/8\" outside + 2 - 5 5/8\" x 5/8\" inside PL, web 2 - 10\" x 3/4\" curved PL, 7/8\" A325 bolts",
+    FlangeOuterWidth = In(14.5), FlangeOuterThickness = In(0.625), FlangeInnerWidth = In(5.625), FlangeInnerThickness = In(0.625),
+    FlangeBoltFirst = In(2), FlangeBoltPitch = In(2), FlangeBoltColumns = 6, FlangeEndEdge = In(1.75), FlangeClip = In(1.75),
+    FlangeRows = { new ArchBoltRow(In(1.75), 0, 2), new ArchBoltRow(In(4.25), 1, 2) },
+    WebPlateWidth = In(10), WebPlateThickness = In(0.75), WebPlateNote = "CURVED to the rib", WebClip = In(1.75),
+    WebBoltFirst = In(2), WebBoltPitch = In(2), WebBoltColumns = 4, WebEndEdge = In(1.75),
+    WebRows = { new ArchBoltRow(In(1.5), 0, 2), new ArchBoltRow(In(3.25), 1, 2), new ArchBoltRow(In(5), 0, 2), new ArchBoltRow(In(6.75), 1, 2), new ArchBoltRow(In(8.5), 0, 2) },
+    Material = "ASTM A709 Gr. 50-T1",
+};
 arch.Ribs.Add(new ArchRibDefinition { Name = "South rib", ChordStart = "T0", ChordEnd = "T34", Radius = F(126), Rise = F(50), InclinationDegrees = 5,
-    Splices = { "RS1", "RS2", "RS3", "RS4", "RS5" }, StubBottomZ = In(0.875), StubUnresolved = stubWhy });
+    Splices = { "RS1", "RS2", "RS3", "RS4", "RS5" }, StubBottomZ = In(0.875), StubUnresolved = stubWhy, SpliceDetail = ribSplice });
 arch.Ribs.Add(new ArchRibDefinition { Name = "North rib", ChordStart = "T0'", ChordEnd = "T34'", Radius = F(126), Rise = F(50), InclinationDegrees = -5,
-    Splices = { "RS1'", "RS2'", "RS3'", "RS4'", "RS5'" }, StubBottomZ = In(0.875), StubUnresolved = stubWhy });
+    Splices = { "RS1'", "RS2'", "RS3'", "RS4'", "RS5'" }, StubBottomZ = In(0.875), StubUnresolved = stubWhy, SpliceDetail = ribSplice });
 
 // ---------------------------------------------------------------- hangers (p.147 CSV; north = (-X, -Y, Z)); sockets p.148 tables; strand WireCo Table 1 p.10
 foreach (var r in Csv("cable-hanger-coordinates.csv"))
@@ -239,7 +270,6 @@ arch.Unresolved.AddRange(new[]
     U("p.102", "which arch pedestal is EL A / EL E", "the view direction of the pier elevation is not stated on the sheet", "EL A = south at Pier 10 / north at Pier 11, as derived from p.102 + p.91 by the approach model."),
     U("p.94, 102, 119", "CL1 / CL2 relative to the piers (U3)", "no combination of the layout offsets reproduces the plan chord 200'-11 11/16", "CL1/CL2 = 7\" along the pier + 4 13/16\" toward the span; the local geometry is kept and the difference reported."),
     U("p.119-150", "camber / no-load geometry (U4)", "not given", "Final geometry modeled."),
-    U("p.120, 143, 93", "tie girder field splices (U5)", "the TS1-TS3 table, TS(1)-TS(4) on the framing plan and the 5 erection segments disagree", "Ties are continuous (no splice plates)."),
     U("p.147, 128", "hanger anchor offsets from the rib WP (U6)", "H points lie 0.81-0.84 ft inside the rib WP circle and U points 0.685 ft off its plane; the offset rule is not stated", "Hanger and bracing points are taken from the tables as printed."),
     U("p.107, 93", "sole plate weld target (U8)", "the bearing note and the erection sequence name different plates", "Not modeled (welds)."),
     U("p.119, 124", "WP position in the tie / steel underside at the bearings (U10)", "the WP is at the bottom of the tie flange (p.119) but drawn inside the 2\" end flange (p.124) and the plate below it is not dimensioned", "End flange from 1 1/8\" below to 7/8\" above the WP (tie flange + 1 1/8\" fill = 2\"), steel underside 1\" lower."),

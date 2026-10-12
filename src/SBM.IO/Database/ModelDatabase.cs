@@ -568,6 +568,7 @@ public static class ModelDatabase
                     case AssemblyKind.ArchBracing: parent = ArchGroup(); cat = "upper lateral bracing"; break;
                     case AssemblyKind.ArchKnuckle: parent = ArchGroup(); cat = "knuckle"; break;
                     case AssemblyKind.ArchDeckForm: parent = ArchGroup(); cat = "deck form"; break;
+                    case AssemblyKind.ArchSplice: parent = ArchGroup(); cat = "arch field splice"; sub = asm.Description.Contains("tie") ? "tie splice" : "rib splice"; break;
                     case AssemblyKind.GirderFieldSection:
                         parent = GirderGroup(asm.Girder); cat = "girder field section";
                         {

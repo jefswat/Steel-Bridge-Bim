@@ -102,6 +102,58 @@ public sealed class ArchRibDefinition
     public double StubBottomZ { get; set; } = double.NaN;
     /// <summary>The knuckle stub below the end splices is a built-up plate assembly on the plans; text = UNRESOLVED reason (empty = not flagged).</summary>
     public string StubUnresolved { get; set; } = "";
+    /// <summary>Bolted field splice detail at every splice point (OPTIONAL, null = pieces only, no plates / bolts).</summary>
+    public ArchSpliceDefinition? SpliceDetail { get; set; }
+}
+
+/// <summary>One bolt row of a splice pattern: gage from the reference plate edge, the first column it uses and the column step (2 = staggered).</summary>
+public sealed class ArchBoltRow
+{
+    public double Gage { get; set; }
+    public int FirstColumn { get; set; }
+    public int ColumnStep { get; set; } = 1;
+    public ArchBoltRow() { }
+    public ArchBoltRow(double gage, int first = 0, int step = 1) { Gage = gage; FirstColumn = first; ColumnStep = step; }
+}
+
+/// <summary>
+/// Bolted field splice of an arch member (rib W shape bent about its weak axis, or tie T), symmetric about the joint: per flange an outside
+/// plate (centred on the web) and two inside plates (one each side of the web, their outer edge flush with the outside plate edge); two web plates
+/// (both faces). Bolt columns from the joint CL (first, pitch, count per side); rows by gage: flange rows from the OUTSIDE plate edge (mirrored to
+/// both sides of the web), web rows from the web plate edge on the + side (rib: +binormal, tie: top). Plate lengths = 2 x (first + (count - 1) pitch + end edge).
+/// Bolts: the model bolt (7/8" A325), holes = bolt + 1/16". Corner clips 45 deg (0 = square).
+/// </summary>
+public sealed class ArchSpliceDefinition
+{
+    public string Name { get; set; } = "";
+    public double FlangeOuterWidth { get; set; }
+    public double FlangeOuterThickness { get; set; }
+    public double FlangeInnerWidth { get; set; }
+    public double FlangeInnerThickness { get; set; }
+    public double FlangeBoltFirst { get; set; }
+    public double FlangeBoltPitch { get; set; }
+    public int FlangeBoltColumns { get; set; }
+    public double FlangeEndEdge { get; set; }
+    public List<ArchBoltRow> FlangeRows { get; set; } = new();
+    public double FlangeClip { get; set; }
+    public double WebPlateWidth { get; set; }
+    public double WebPlateThickness { get; set; }
+    /// <summary>Web plate position: distance of its + edge below the web's + end (tie: top of web; NaN = centred on the web depth).</summary>
+    public double WebPlateEdgeFromWebEnd { get; set; } = double.NaN;
+    public double WebBoltFirst { get; set; }
+    public double WebBoltPitch { get; set; }
+    public int WebBoltColumns { get; set; }
+    public double WebEndEdge { get; set; }
+    public List<ArchBoltRow> WebRows { get; set; } = new();
+    public double WebClip { get; set; }
+    /// <summary>Web plates bent to the member curvature (rib: "CURVED", tie: "BENT").</summary>
+    public string WebPlateNote { get; set; } = "";
+    public string Material { get; set; } = "ASTM A709 Gr. 50";
+    /// <summary>Plan length of the flange / web plates (check; NaN = none).</summary>
+    public double CheckFlangePlateLength { get; set; } = double.NaN;
+    public double CheckWebPlateLength { get; set; } = double.NaN;
+    [System.Text.Json.Serialization.JsonIgnore] public double FlangePlateLength => 2 * (FlangeBoltFirst + (FlangeBoltColumns - 1) * FlangeBoltPitch + FlangeEndEdge);
+    [System.Text.Json.Serialization.JsonIgnore] public double WebPlateLength => 2 * (WebBoltFirst + (WebBoltColumns - 1) * WebBoltPitch + WebEndEdge);
 }
 
 public enum ArchTieElementKind { Line, ArcLeft, ArcRight }
@@ -128,8 +180,15 @@ public sealed class ArchTieDefinition
     public double FlangeThickness { get; set; } = In(0.875);
     public double FlangeWidth { get; set; } = In(14);
     public string Material { get; set; } = "ASTM A709 Gr. 50-F1 (FCM)";
-    /// <summary>Field splices (data; positions UNRESOLVED on the plans, see <see cref="ArchDefinition.Unresolved"/>).</summary>
+    /// <summary>Field splices (data names, v1; kept for old files).</summary>
     public List<string> Splices { get; set; } = new();
+    /// <summary>Field splice positions (name, distance along the chain): the tie is cut into pieces there with <see cref="SpliceGap"/>; with
+    /// <see cref="SpliceDetail"/> the splice plates and bolts are built.</summary>
+    public List<ArchPanelPoint> SpliceAt { get; set; } = new();
+    public double SpliceGap { get; set; } = In(0.5);
+    public ArchSpliceDefinition? SpliceDetail { get; set; }
+    /// <summary>UNRESOLVED reason for the splice positions (empty = plan dimensioned): flags the splice parts.</summary>
+    public string SpliceUnresolved { get; set; } = "";
 }
 
 public sealed class ArchPanelPoint
