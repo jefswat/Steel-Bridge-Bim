@@ -82,11 +82,16 @@ public static partial class ArchGenerator
                 if (braces.Count == 0) { Warn($"Arch: bracing connection {c.Name}: no bracing member ends at {c.Point}."); continue; }
 
                 var endBy = new Dictionary<string, List<(double Lam, bool Top)>>();
+                var gmaps = new List<(ArchGussetPlate G, bool Top, List<(ArchGussetLeg Leg, LegMap Map)> Maps)>();
                 foreach (var (g, top) in new[] { (c.TopGusset, true), (c.BottomGusset, false) })
                 {
                     if (g == null || g.Plate.Outline.Count < 3) continue;
-                    var maps = MapGusset(c, g, top, braces, w, nb, tan, faceP, src);
-                    if (maps == null) continue;
+                    var mg = MapGusset(c, g, top, braces, w, nb, tan, faceP, src);
+                    if (mg != null) gmaps.Add((g, top, mg));
+                }
+                if (gmaps.Any(x => x.Maps.Count == 2 && x.G.BendA != null && x.G.BendB != null)) gmaps = OneBentPlate(c, gmaps, wp, w, nb, faceP, src);
+                foreach (var (g, top, maps) in gmaps)
+                {
                     foreach (var (leg, mp) in maps)
                     {
                         var bk = braces.First(x => x.Name == mp.Brace);
@@ -226,6 +231,140 @@ public static partial class ArchGenerator
                 Info($"Arch bracing {c.Name} {side} gusset: {mp.Brace} rolled {roll:F2} deg from web-vertical (gusset plane through the brace and its welded edge).");
             }
             return best;
+        }
+
+        private static Vec3 Rot(Vec3 v, Vec3 k, double ang) => v * Math.Cos(ang) + Vec3.Cross(k, v) * Math.Sin(ang) + k * (Vec3.Dot(k, v) * (1 - Math.Cos(ang)));
+
+        /// <summary>
+        /// Each gusset is ONE bent plate (p.129-140 "in plane of plate" flat pattern with a bend line; isometric views). The per-leg placement
+        /// (drawn brace axis on the member axis, welded edge on the connection plate face) left the two legs' bend lines apart (v3: 5/16" - 6 13/16").
+        /// Here the roll of each brace at the point (shared by the top and bottom gusset: both flanges are parallel) and the slide of every leg along
+        /// its brace are solved together (least squares: the two legs' bend line ends meet, every welded edge on the connection plate face); the
+        /// small rest is closed by turning each leg rigidly onto the mean bend line, so the legs meet exactly. Residuals are CHECKS.
+        /// </summary>
+        private List<(ArchGussetPlate G, bool Top, List<(ArchGussetLeg Leg, LegMap Map)> Maps)> OneBentPlate(ArchBracingConnection c,
+            List<(ArchGussetPlate G, bool Top, List<(ArchGussetLeg Leg, LegMap Map)> Maps)> gm, Vec3 wp, WideFlangeSize w, Vec3 nb, Vec3 faceP, string src)
+        {
+            var names = gm.SelectMany(x => x.Maps.Select(m => m.Map.Brace)).Distinct().ToList();
+            var web0 = names.ToDictionary(n => n, n => gm.SelectMany(x => x.Maps).First(m => m.Map.Brace == n).Map.Web);
+            var legs = gm.SelectMany((x, gi) => x.Maps.Select((m, li) => (gi, li))).ToList();
+            LegMap Make(LegMap o, bool top, double phi, double delta)
+            {
+                double s = top ? 1 : -1;
+                var web = Rot(o.Web, o.D, phi).Normalized();
+                double vs = Vec3.Dot(o.V, Vec3.Cross(o.D, o.Web)) >= 0 ? 1 : -1;
+                var qo = wp + o.Web * (s * w.Depth / 2); var q = wp + web * (s * w.Depth / 2);
+                double tt = Vec3.Dot(o.P0 - qo, o.D) + delta;
+                return o with { P0 = q + o.D * tt, V = Vec3.Cross(o.D, web).Normalized() * vs, M = web * s, Web = web };
+            }
+            List<List<LegMap>> Build(double[] x)
+            {
+                var r = new List<List<LegMap>>();
+                int k = names.Count;
+                for (int gi = 0; gi < gm.Count; gi++)
+                {
+                    var l = new List<LegMap>();
+                    for (int li = 0; li < gm[gi].Maps.Count; li++)
+                    {
+                        var o = gm[gi].Maps[li].Map;
+                        // roll measured from the brace's first (top) web: the bottom map may start from its own web
+                        double phi0 = Math.Atan2(Vec3.Dot(Vec3.Cross(o.Web, web0[o.Brace]), o.D), Vec3.Dot(o.Web, web0[o.Brace]));
+                        l.Add(Make(o, gm[gi].Top, phi0 + x[names.IndexOf(o.Brace)], x[k + legs.IndexOf((gi, li))]));
+                    }
+                    r.Add(l);
+                }
+                return r;
+            }
+            double Gap(ArchGussetPlate g, List<LegMap> m)
+            {
+                if (m.Count != 2 || g.BendA == null || g.BendB == null) return 0;
+                var ba = new Vec2(g.BendA.X, g.BendA.Y); var bb = new Vec2(g.BendB.X, g.BendB.Y);
+                return Math.Max((m[0].Map(ba) - m[1].Map(ba)).Length, (m[0].Map(bb) - m[1].Map(bb)).Length);
+            }
+            double Weld(LegMap m) => Math.Max(Math.Abs(Vec3.Dot(m.Map(m.Weld1) - faceP, nb)), Math.Abs(Vec3.Dot(m.Map(m.Weld2) - faceP, nb)));
+            double F(double[] x)
+            {
+                var b = Build(x); double f = 0;
+                for (int gi = 0; gi < gm.Count; gi++)
+                {
+                    var g = gm[gi].G; var m = b[gi];
+                    if (m.Count == 2 && g.BendA != null && g.BendB != null)
+                    {
+                        var ba = new Vec2(g.BendA.X, g.BendA.Y); var bb = new Vec2(g.BendB.X, g.BendB.Y);
+                        var d1 = m[0].Map(ba) - m[1].Map(ba); var d2 = m[0].Map(bb) - m[1].Map(bb);
+                        f += Vec3.Dot(d1, d1) + Vec3.Dot(d2, d2);
+                    }
+                    foreach (var lm in m)
+                    {
+                        double a = Vec3.Dot(lm.Map(lm.Weld1) - faceP, nb), bw = Vec3.Dot(lm.Map(lm.Weld2) - faceP, nb);
+                        f += a * a + bw * bw;
+                    }
+                }
+                return f;
+            }
+            int n = names.Count + legs.Count;
+            var steps = Enumerable.Range(0, n).Select(i => i < names.Count ? Numerics.DegToRad(3) : In(1)).ToArray();
+            var best = NelderMead(F, new double[n], steps, 6000);
+            var built = Build(best);
+            var res = new List<(ArchGussetPlate, bool, List<(ArchGussetLeg, LegMap)>)>();
+            for (int gi = 0; gi < gm.Count; gi++)
+            {
+                var (g, top, maps) = gm[gi];
+                string side = top ? "top" : "bottom";
+                var m = built[gi];
+                double gap0 = Gap(g, maps.Select(x => x.Map).ToList()), gap1 = Gap(g, m);
+                if (m.Count == 2 && g.BendA != null && g.BendB != null)
+                {
+                    var ba = new Vec2(g.BendA.X, g.BendA.Y); var bb = new Vec2(g.BendB.X, g.BendB.Y);
+                    var a = (m[0].Map(ba) + m[1].Map(ba)) * 0.5; var bm = (m[0].Map(bb) + m[1].Map(bb)) * 0.5;
+                    var u = (bm - a).Normalized();
+                    for (int li = 0; li < 2; li++)
+                    {
+                        var o = m[li]; var ai = o.Map(ba); var ui = (o.Map(bb) - ai).Normalized();
+                        var ax = Vec3.Cross(ui, u); double sn = ax.Length, ang = Math.Atan2(sn, Vec3.Dot(ui, u));
+                        Vec3 R(Vec3 v) => sn < 1e-12 ? v : Rot(v, ax * (1 / sn), ang);
+                        m[li] = o with { P0 = a + R(o.P0 - ai), D = R(o.D), V = R(o.V), M = R(o.M) };
+                        Check($"bracing {c.Name} {side} gusset ({o.Brace}): leg turned onto the common bend line", 0, ang * 180 / Math.PI, 0.5, x => $"{x:F3} deg",
+                            $"{src}: one bent plate; the leg leaves its brace flange plane by this angle (bend lines of the two legs {L(gap1)} apart before)");
+                    }
+                    Check($"bracing {c.Name} {side} gusset: bend line of the two legs (one bent plate)", 0, Gap(g, m), In(1.0 / 16), L,
+                        $"{src}: v3 placed each leg alone ({L(gap0)} apart); braces rolled + legs slid together ({L(gap1)}), then closed");
+                }
+                foreach (var lm in m)
+                    Check($"bracing {c.Name} {side} gusset ({lm.Brace}): welded edge off the connection plate face", 0, Weld(lm), In(1.0 / 8), L,
+                        $"{src}: one bent plate on both braces vs the VIEW A-A connection plate face");
+                res.Add((g, top, maps.Select((x, li) => (x.Leg, m[li])).ToList()));
+            }
+            foreach (var nm in names)
+                Info($"Arch bracing {c.Name}: {nm} roll changed {best[names.IndexOf(nm)] * 180 / Math.PI:F2} deg to make the gussets one bent plate each.");
+            return res;
+        }
+
+        /// <summary>Plain Nelder-Mead minimiser (small problems).</summary>
+        private static double[] NelderMead(Func<double[], double> f, double[] x0, double[] step, int maxIter)
+        {
+            int n = x0.Length;
+            var p = new double[n + 1][]; var fv = new double[n + 1];
+            for (int i = 0; i <= n; i++) { p[i] = (double[])x0.Clone(); if (i > 0) p[i][i - 1] += step[i - 1]; fv[i] = f(p[i]); }
+            for (int it = 0; it < maxIter; it++)
+            {
+                var idx = Enumerable.Range(0, n + 1).OrderBy(i => fv[i]).ToArray();
+                p = idx.Select(i => p[i]).ToArray(); fv = idx.Select(i => fv[i]).ToArray();
+                if (Math.Abs(fv[n] - fv[0]) < 1e-18) break;
+                var c = new double[n];
+                for (int i = 0; i < n; i++) for (int j = 0; j < n; j++) c[j] += p[i][j] / n;
+                double[] At(double t) => Enumerable.Range(0, n).Select(j => c[j] + t * (p[n][j] - c[j])).ToArray();
+                var xr = At(-1); double fr = f(xr);
+                if (fr < fv[0]) { var xe = At(-2); double fe = f(xe); if (fe < fr) { p[n] = xe; fv[n] = fe; } else { p[n] = xr; fv[n] = fr; } }
+                else if (fr < fv[n - 1]) { p[n] = xr; fv[n] = fr; }
+                else
+                {
+                    var xc = fr < fv[n] ? At(-0.5) : At(0.5); double fc = f(xc);
+                    if (fc < Math.Min(fr, fv[n])) { p[n] = xc; fv[n] = fc; }
+                    else for (int i = 1; i <= n; i++) { p[i] = Enumerable.Range(0, n).Select(j => p[0][j] + 0.5 * (p[i][j] - p[0][j])).ToArray(); fv[i] = f(p[i]); }
+                }
+            }
+            return p[Enumerable.Range(0, n + 1).OrderBy(i => fv[i]).First()];
         }
 
         private static Vec3 VerticalWeb(Vec3 d) => (new Vec3(0, 0, 1) - d * d.Z).Normalized();
