@@ -52,7 +52,7 @@ foreach (var b in Doc.Project.Bridges)
         double bo = ej?.BlockoutDepth ?? F(1, 2);
         var vals = f.Bearings.Where(br => br.Support == j).Select(br => (br.DeckElevation - bo) - (br.TopOfSteel.Z - dd.FlangeDrop)).ToList();
         if (vals.Count == 0) continue;
-        // the same from the generated top flange plates: highest flange vertex within 0'-6 (plan) of each girder end on this line
+        // the same from the generated top flange plates: highest flange vertex within 1'-1 (plan) of each girder end on this line
         var meshVals = new List<double>();
         foreach (var br in f.Bearings.Where(br => br.Support == j))
         {
@@ -60,7 +60,7 @@ foreach (var b in Doc.Project.Bridges)
             var bp = new SBM.Core.Geometry.Vec2(br.TopOfSteel.X, br.TopOfSteel.Y);
             var endPt = (g.StartEnd.XY - bp).Length < (g.EndEnd.XY - bp).Length ? g.StartEnd : g.EndEnd;
             var zs = st.Parts.Where(p => p.Category == SBM.Core.Steel.PartCategory.FlangePlate && p.Mark.StartsWith(g.Name + "-") && p.Mark.Contains("-TF"))
-                .SelectMany(p => p.Mesh.Positions).Where(q => (q.XY - endPt.XY).Length < 0.15).Select(q => q.Z).ToList();
+                .SelectMany(p => p.Mesh.Positions).Where(q => (q.XY - endPt.XY).Length < 0.35).Select(q => q.Z).ToList();
             if (zs.Count > 0) meshVals.Add((br.DeckElevation - bo) - zs.Max());
         }
         Print($"  {b.Name} {sd.Name}: lowered top of flange below the blockout bottom by {vals.Min() / 0.0254:F2}\" to {vals.Max() / 0.0254:F2}\" ({vals.Count} bearings; without the dap {(vals.Min() - dd.FlangeDrop) / 0.0254:F2}\" to {(vals.Max() - dd.FlangeDrop) / 0.0254:F2}\")"

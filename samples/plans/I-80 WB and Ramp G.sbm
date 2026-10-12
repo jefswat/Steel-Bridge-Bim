@@ -1737,6 +1737,7 @@
             "CapOffset": 0,
             "CapProfile": [],
             "CapProfileAhead": [],
+            "CapBlocks": [],
             "Aesthetics": null,
             "TopShape": "Sloped",
             "CapSlope": "NaN",
@@ -1750,6 +1751,7 @@
             "PedestalShared": false,
             "PedestalSizeAcrossAhead": 0,
             "PedestalRowJoint": "NaN",
+            "PedestalSideAngleDeg": 0,
             "ColumnCount": 0,
             "ColumnSpacings": [],
             "FirstColumnOffset": "NaN",
@@ -1759,6 +1761,8 @@
             "ColumnDepth": 0.9144000000000001,
             "ColumnChamferS": 0,
             "ColumnChamferN": 0,
+            "ColumnProjectionS": 0,
+            "ColumnProjectionWidth": 0,
             "ColumnFlareElevation": "NaN",
             "ColumnFlareWidth": 0,
             "ColumnFlareDepth": 0,
@@ -1968,7 +1972,8 @@
                       "Footing": 2,
                       "Pile": 2
                     }
-                  ]
+                  ],
+                  "BottomOnFootings": true
                 },
                 {
                   "Name": "F",
@@ -2022,7 +2027,8 @@
                       "Footing": 2,
                       "Pile": 2
                     }
-                  ]
+                  ],
+                  "BottomOnFootings": true
                 }
               ],
               "Rebar": {
@@ -2588,7 +2594,19 @@
             "Active": true,
             "TypeName": "Modular"
           },
-          "DeckEndPoints": null
+          "DeckEndPoints": null,
+          "GirderEndDap": {
+            "FlangeDrop": 0.1905,
+            "DropRun": 0.1905,
+            "LowFlatFromBearing": 0.3556,
+            "BendRadius": 0.15239999999999998,
+            "CopeInset": 0,
+            "CopeEdge": 0.254,
+            "CopeRun": 0.15239999999999998,
+            "CopeRadius": 0.15239999999999998,
+            "Girders": null,
+            "Source": "I-80 PDF 106 Detail A"
+          }
         },
         {
           "Name": "Pier 1WB",
@@ -2677,6 +2695,7 @@
               }
             ],
             "CapProfileAhead": [],
+            "CapBlocks": [],
             "Aesthetics": {
               "Face": "Ahead",
               "StepSetback": 0.15239999999999998,
@@ -2770,6 +2789,7 @@
             "PedestalShared": false,
             "PedestalSizeAcrossAhead": 0,
             "PedestalRowJoint": "NaN",
+            "PedestalSideAngleDeg": 0,
             "ColumnCount": 3,
             "ColumnSpacings": [
               9.906,
@@ -2782,6 +2802,8 @@
             "ColumnDepth": 1.3716000000000002,
             "ColumnChamferS": 0.7112,
             "ColumnChamferN": 0.381,
+            "ColumnProjectionS": 0,
+            "ColumnProjectionWidth": 0,
             "ColumnFlareElevation": "NaN",
             "ColumnFlareWidth": 0,
             "ColumnFlareDepth": 0,
@@ -4676,6 +4698,7 @@
               }
             ],
             "CapProfileAhead": [],
+            "CapBlocks": [],
             "Aesthetics": {
               "Face": "Ahead",
               "StepSetback": 0.15239999999999998,
@@ -4769,6 +4792,7 @@
             "PedestalShared": false,
             "PedestalSizeAcrossAhead": 0,
             "PedestalRowJoint": "NaN",
+            "PedestalSideAngleDeg": 0,
             "ColumnCount": 3,
             "ColumnSpacings": [
               9.4488,
@@ -4781,6 +4805,8 @@
             "ColumnDepth": 1.3716000000000002,
             "ColumnChamferS": 0.7112,
             "ColumnChamferN": 0.381,
+            "ColumnProjectionS": 0,
+            "ColumnProjectionWidth": 0,
             "ColumnFlareElevation": "NaN",
             "ColumnFlareWidth": 0,
             "ColumnFlareDepth": 0,
@@ -6675,6 +6701,7 @@
               }
             ],
             "CapProfileAhead": [],
+            "CapBlocks": [],
             "Aesthetics": {
               "Face": "Ahead",
               "StepSetback": 0.15239999999999998,
@@ -6768,6 +6795,7 @@
             "PedestalShared": false,
             "PedestalSizeAcrossAhead": 0,
             "PedestalRowJoint": "NaN",
+            "PedestalSideAngleDeg": 0,
             "ColumnCount": 3,
             "ColumnSpacings": [
               9.4488,
@@ -6780,6 +6808,8 @@
             "ColumnDepth": 1.3716000000000002,
             "ColumnChamferS": 0.7112,
             "ColumnChamferN": 0.381,
+            "ColumnProjectionS": 0,
+            "ColumnProjectionWidth": 0,
             "ColumnFlareElevation": "NaN",
             "ColumnFlareWidth": 0,
             "ColumnFlareDepth": 0,
@@ -8410,6 +8440,7 @@
               }
             ],
             "CapProfileAhead": [],
+            "CapBlocks": [],
             "Aesthetics": {
               "Face": "Ahead",
               "StepSetback": 0.15239999999999998,
@@ -8503,6 +8534,7 @@
             "PedestalShared": false,
             "PedestalSizeAcrossAhead": 0,
             "PedestalRowJoint": "NaN",
+            "PedestalSideAngleDeg": 0,
             "ColumnCount": 2,
             "ColumnSpacings": [
               11.5824
@@ -8514,6 +8546,8 @@
             "ColumnDepth": 1.3716000000000002,
             "ColumnChamferS": 0.7112,
             "ColumnChamferN": 0.381,
+            "ColumnProjectionS": 0,
+            "ColumnProjectionWidth": 0,
             "ColumnFlareElevation": 300.301152,
             "ColumnFlareWidth": 2.7432000000000003,
             "ColumnFlareDepth": 1.6764000000000001,
@@ -10126,6 +10160,7 @@
               }
             ],
             "CapProfileAhead": [],
+            "CapBlocks": [],
             "Aesthetics": {
               "Face": "Ahead",
               "StepSetback": 0.15239999999999998,
@@ -10219,6 +10254,7 @@
             "PedestalShared": true,
             "PedestalSizeAcrossAhead": 0,
             "PedestalRowJoint": "NaN",
+            "PedestalSideAngleDeg": 0,
             "ColumnCount": 2,
             "ColumnSpacings": [
               11.5824
@@ -10230,6 +10266,8 @@
             "ColumnDepth": 1.3716000000000002,
             "ColumnChamferS": 0.7112,
             "ColumnChamferN": 0.381,
+            "ColumnProjectionS": 0,
+            "ColumnProjectionWidth": 0,
             "ColumnFlareElevation": 300.63033600000006,
             "ColumnFlareWidth": 2.7432000000000003,
             "ColumnFlareDepth": 1.6764000000000001,
@@ -11700,7 +11738,19 @@
             "Active": true,
             "TypeName": "Modular"
           },
-          "DeckEndPoints": null
+          "DeckEndPoints": null,
+          "GirderEndDap": {
+            "FlangeDrop": 0.1905,
+            "DropRun": 0.1905,
+            "LowFlatFromBearing": 0.3556,
+            "BendRadius": 0.15239999999999998,
+            "CopeInset": 0.15239999999999998,
+            "CopeEdge": 0.254,
+            "CopeRun": 0.15239999999999998,
+            "CopeRadius": 0.15239999999999998,
+            "Girders": null,
+            "Source": "I-80 PDF 106 Detail B"
+          }
         }
       ],
       "AuxiliarySupports": [],
@@ -21186,6 +21236,7 @@
             "CapOffset": 0,
             "CapProfile": [],
             "CapProfileAhead": [],
+            "CapBlocks": [],
             "Aesthetics": null,
             "TopShape": "Sloped",
             "CapSlope": "NaN",
@@ -21199,6 +21250,7 @@
             "PedestalShared": true,
             "PedestalSizeAcrossAhead": 0,
             "PedestalRowJoint": "NaN",
+            "PedestalSideAngleDeg": 0,
             "ColumnCount": 3,
             "ColumnSpacings": [
               4.572,
@@ -21211,6 +21263,8 @@
             "ColumnDepth": 0.9144000000000001,
             "ColumnChamferS": 0,
             "ColumnChamferN": 0,
+            "ColumnProjectionS": 0,
+            "ColumnProjectionWidth": 0,
             "ColumnFlareElevation": "NaN",
             "ColumnFlareWidth": 0,
             "ColumnFlareDepth": 0,
@@ -21348,7 +21402,19 @@
               "Station": 231375.74197200002,
               "Offset": 40.9701999997786
             }
-          ]
+          ],
+          "GirderEndDap": {
+            "FlangeDrop": 0.1905,
+            "DropRun": 0.1905,
+            "LowFlatFromBearing": 0.3556,
+            "BendRadius": 0.15239999999999998,
+            "CopeInset": 0.15239999999999998,
+            "CopeEdge": 0.254,
+            "CopeRun": 0.15239999999999998,
+            "CopeRadius": 0.15239999999999998,
+            "Girders": null,
+            "Source": "I-80 PDF 106 Detail B"
+          }
         },
         {
           "Name": "Pier 6WB",
@@ -21442,6 +21508,7 @@
               }
             ],
             "CapProfileAhead": [],
+            "CapBlocks": [],
             "Aesthetics": {
               "Face": "Ahead",
               "StepSetback": 0.15239999999999998,
@@ -21535,6 +21602,7 @@
             "PedestalShared": false,
             "PedestalSizeAcrossAhead": 0,
             "PedestalRowJoint": "NaN",
+            "PedestalSideAngleDeg": 0,
             "ColumnCount": 4,
             "ColumnSpacings": [
               8.33118984,
@@ -21548,6 +21616,8 @@
             "ColumnDepth": 1.3716000000000002,
             "ColumnChamferS": 0.7112,
             "ColumnChamferN": 0.381,
+            "ColumnProjectionS": 0,
+            "ColumnProjectionWidth": 0,
             "ColumnFlareElevation": 300.61814400000003,
             "ColumnFlareWidth": 2.7432000000000003,
             "ColumnFlareDepth": 1.6764000000000001,
@@ -23867,6 +23937,7 @@
               }
             ],
             "CapProfileAhead": [],
+            "CapBlocks": [],
             "Aesthetics": {
               "Face": "Ahead",
               "StepSetback": 0.15239999999999998,
@@ -23960,6 +24031,7 @@
             "PedestalShared": false,
             "PedestalSizeAcrossAhead": 0,
             "PedestalRowJoint": "NaN",
+            "PedestalSideAngleDeg": 0,
             "ColumnCount": 3,
             "ColumnSpacings": [
               10.515600000000001,
@@ -23972,6 +24044,8 @@
             "ColumnDepth": 1.3716000000000002,
             "ColumnChamferS": 0.7112,
             "ColumnChamferN": 0.381,
+            "ColumnProjectionS": 0,
+            "ColumnProjectionWidth": 0,
             "ColumnFlareElevation": 301.422816,
             "ColumnFlareWidth": 2.7432000000000003,
             "ColumnFlareDepth": 1.6764000000000001,
@@ -26002,6 +26076,7 @@
               }
             ],
             "CapProfileAhead": [],
+            "CapBlocks": [],
             "Aesthetics": {
               "Face": "Ahead",
               "StepSetback": 0.15239999999999998,
@@ -26095,6 +26170,7 @@
             "PedestalShared": false,
             "PedestalSizeAcrossAhead": 0,
             "PedestalRowJoint": "NaN",
+            "PedestalSideAngleDeg": 0,
             "ColumnCount": 4,
             "ColumnSpacings": [
               9.144,
@@ -26108,6 +26184,8 @@
             "ColumnDepth": 1.3716000000000002,
             "ColumnChamferS": 0.7112,
             "ColumnChamferN": 0.381,
+            "ColumnProjectionS": 0,
+            "ColumnProjectionWidth": 0,
             "ColumnFlareElevation": 303.07178400000004,
             "ColumnFlareWidth": 2.7432000000000003,
             "ColumnFlareDepth": 1.6764000000000001,
@@ -28336,6 +28414,7 @@
               }
             ],
             "CapProfileAhead": [],
+            "CapBlocks": [],
             "Aesthetics": {
               "Face": "Ahead",
               "StepSetback": 0.15239999999999998,
@@ -28429,6 +28508,7 @@
             "PedestalShared": false,
             "PedestalSizeAcrossAhead": 0,
             "PedestalRowJoint": "NaN",
+            "PedestalSideAngleDeg": 0,
             "ColumnCount": 3,
             "ColumnSpacings": [
               11.125200000000001,
@@ -28441,6 +28521,8 @@
             "ColumnDepth": 1.3716000000000002,
             "ColumnChamferS": 0.7112,
             "ColumnChamferN": 0.381,
+            "ColumnProjectionS": 0,
+            "ColumnProjectionWidth": 0,
             "ColumnFlareElevation": 302.69688,
             "ColumnFlareWidth": 2.7432000000000003,
             "ColumnFlareDepth": 1.6764000000000001,
@@ -30103,6 +30185,7 @@
               }
             ],
             "CapProfileAhead": [],
+            "CapBlocks": [],
             "Aesthetics": {
               "Face": "Ahead",
               "StepSetback": 0.15239999999999998,
@@ -30196,6 +30279,7 @@
             "PedestalShared": false,
             "PedestalSizeAcrossAhead": 0,
             "PedestalRowJoint": "NaN",
+            "PedestalSideAngleDeg": 0,
             "ColumnCount": 3,
             "ColumnSpacings": [
               9.906,
@@ -30208,6 +30292,8 @@
             "ColumnDepth": 1.3716000000000002,
             "ColumnChamferS": 0.7112,
             "ColumnChamferN": 0.381,
+            "ColumnProjectionS": 0,
+            "ColumnProjectionWidth": 0,
             "ColumnFlareElevation": 302.136048,
             "ColumnFlareWidth": 2.7432000000000003,
             "ColumnFlareDepth": 1.6764000000000001,
@@ -31895,6 +31981,7 @@
                 "Elevation": 306.76426264873623
               }
             ],
+            "CapBlocks": [],
             "Aesthetics": {
               "Face": "Ahead",
               "StepSetback": 0.15239999999999998,
@@ -31988,6 +32075,7 @@
             "PedestalShared": false,
             "PedestalSizeAcrossAhead": 1.143,
             "PedestalRowJoint": 0.0254,
+            "PedestalSideAngleDeg": 0,
             "ColumnCount": 3,
             "ColumnSpacings": [
               12.3444,
@@ -32000,6 +32088,8 @@
             "ColumnDepth": 1.3716000000000002,
             "ColumnChamferS": 0.7112,
             "ColumnChamferN": 0.381,
+            "ColumnProjectionS": 0,
+            "ColumnProjectionWidth": 0,
             "ColumnFlareElevation": 301.907448,
             "ColumnFlareWidth": 2.7432000000000003,
             "ColumnFlareDepth": 1.6764000000000001,
@@ -34253,7 +34343,19 @@
             "Active": true,
             "TypeName": "Modular"
           },
-          "DeckEndPoints": null
+          "DeckEndPoints": null,
+          "GirderEndDap": {
+            "FlangeDrop": 0.1905,
+            "DropRun": 0.1905,
+            "LowFlatFromBearing": 0.3556,
+            "BendRadius": 0.15239999999999998,
+            "CopeInset": 0.15239999999999998,
+            "CopeEdge": 0.254,
+            "CopeRun": 0.15239999999999998,
+            "CopeRadius": 0.15239999999999998,
+            "Girders": null,
+            "Source": "I-80 PDF 106 Detail B"
+          }
         }
       ],
       "AuxiliarySupports": [
@@ -34328,6 +34430,7 @@
                 "Elevation": 306.55260000000004
               }
             ],
+            "CapBlocks": [],
             "Aesthetics": {
               "Face": "Back",
               "StepSetback": 0.15239999999999998,
@@ -34421,6 +34524,7 @@
             "PedestalShared": false,
             "PedestalSizeAcrossAhead": 0,
             "PedestalRowJoint": "NaN",
+            "PedestalSideAngleDeg": 0,
             "ColumnCount": 1,
             "ColumnSpacings": [],
             "FirstColumnOffset": -16.19840796142519,
@@ -34430,6 +34534,8 @@
             "ColumnDepth": 1.9812,
             "ColumnChamferS": 1.016,
             "ColumnChamferN": 0.5334,
+            "ColumnProjectionS": 0,
+            "ColumnProjectionWidth": 0,
             "ColumnFlareElevation": "NaN",
             "ColumnFlareWidth": 0,
             "ColumnFlareDepth": 0,
@@ -35529,7 +35635,19 @@
             }
           },
           "ExpansionJoint": null,
-          "DeckEndPoints": null
+          "DeckEndPoints": null,
+          "GirderEndDap": {
+            "FlangeDrop": 0.1905,
+            "DropRun": 0.1905,
+            "LowFlatFromBearing": 0.3556,
+            "BendRadius": 0.15239999999999998,
+            "CopeInset": 0.15239999999999998,
+            "CopeEdge": 0.254,
+            "CopeRun": 0.15239999999999998,
+            "CopeRadius": 0.15239999999999998,
+            "Girders": null,
+            "Source": "I-80 PDF 106 Detail B"
+          }
         }
       ],
       "Girders": {
@@ -51243,9 +51361,9 @@
       },
       "Misc": {
         "Unresolved": [
+          "[cushion] End posts: start of the end block from the CL pier (scaled about 2\u0027-1 on Ramp A), wedge direction, plan width at the pier end (two 1\u0027-5 rails \u002B gap) and the skewed Ramp G plan are not dimensioned; the I.M. 455 crash cushion has no geometry in the plans.",
           "[sign] Unit 2 sign truss: truss CL parallel to the pier at STA 7595\u002B82.22 (pier \u002B 5\u0027-10); sheets 171A/172A give the post lines 2\u0027-2 and 9\u0027-6 ahead of the CL pier (plan sheet 110 \u00222\u0027-2 (TYP.)\u0022); the sheet title-block station 7595\u002B67.24 is the bridge reference, not a sign location.",
-          "[sign] Exit sign bases: station not printed (sheets 104 / 108 show only a tick on the north girder; scaled about 50\u0027-0 back of CL bearing Pier 5WB and about 60\u0027 back of Pier 11WB): not placed.",
-          "[cushion] End posts: start of the end block from the CL pier (scaled about 2\u0027-1 on Ramp A), wedge direction, plan width at the pier end (two 1\u0027-5 rails \u002B gap) and the skewed Ramp G plan are not dimensioned; the I.M. 455 crash cushion has no geometry in the plans."
+          "[sign] Exit sign bases: station not printed (sheets 104 / 108 show only a tick on the north girder; scaled about 50\u0027-0 back of CL bearing Pier 5WB and about 60\u0027 back of Pier 11WB): not placed."
         ],
         "Collectors": [],
         "PierDrains": [],
@@ -51261,28 +51379,40 @@
                 "AheadOfSupport": 0.6604,
                 "TopOfBaseElevation": 312.825384,
                 "Height": 2.5908,
-                "BottomFlangeWidth": 0.5588
+                "BottomFlangeWidth": 0.5588,
+                "PostOutboard": 1.9050000000000002,
+                "AngleToGirderDegrees": 92.86722222222221,
+                "StubHeight": 0.40005
               },
               {
                 "Girder": 0,
                 "AheadOfSupport": 2.8956000000000004,
                 "TopOfBaseElevation": 312.825384,
                 "Height": 2.5908,
-                "BottomFlangeWidth": 0.5588
+                "BottomFlangeWidth": 0.5588,
+                "PostOutboard": 2.0177125,
+                "AngleToGirderDegrees": 92.86722222222221,
+                "StubHeight": 0.396875
               },
               {
                 "Girder": 10,
                 "AheadOfSupport": 0.6604,
                 "TopOfBaseElevation": 313.434984,
                 "Height": 2.5908,
-                "BottomFlangeWidth": 0.5588
+                "BottomFlangeWidth": 0.5588,
+                "PostOutboard": 1.8732500000000003,
+                "AngleToGirderDegrees": 90,
+                "StubHeight": 0.314325
               },
               {
                 "Girder": 10,
                 "AheadOfSupport": 2.8956000000000004,
                 "TopOfBaseElevation": 313.434984,
                 "Height": 2.5908,
-                "BottomFlangeWidth": 0.5588
+                "BottomFlangeWidth": 0.5588,
+                "PostOutboard": 1.8732500000000003,
+                "AngleToGirderDegrees": 90,
+                "StubHeight": 0.3048
               }
             ],
             "TrussSpan": 30.48,
@@ -51302,6 +51432,8 @@
             "BasePlateThickness": 0.0508,
             "PostOuterDiameter": 0.35559999999999997,
             "PostWall": 0.0127,
+            "EndBeyondPost": 0.6858,
+            "BracketTopFlangeWidth": 0.6604,
             "Girder": 0,
             "BackFromBearing": null,
             "BlockAlong": 0.6096,
@@ -51376,6 +51508,8 @@
             "BasePlateThickness": 0.0508,
             "PostOuterDiameter": 0.35559999999999997,
             "PostWall": 0.0127,
+            "EndBeyondPost": 0.6858,
+            "BracketTopFlangeWidth": 0.6604,
             "Girder": 0,
             "BackFromBearing": null,
             "BlockAlong": 0.6096,
@@ -51450,6 +51584,8 @@
             "BasePlateThickness": 0.0508,
             "PostOuterDiameter": 0.35559999999999997,
             "PostWall": 0.0127,
+            "EndBeyondPost": 0.6858,
+            "BracketTopFlangeWidth": 0.6604,
             "Girder": 0,
             "BackFromBearing": null,
             "BlockAlong": 0.6096,
@@ -51955,6 +52091,7 @@
             "CapOffset": 0,
             "CapProfile": [],
             "CapProfileAhead": [],
+            "CapBlocks": [],
             "Aesthetics": null,
             "TopShape": "Sloped",
             "CapSlope": "NaN",
@@ -51968,6 +52105,7 @@
             "PedestalShared": false,
             "PedestalSizeAcrossAhead": 1.143,
             "PedestalRowJoint": 0.0254,
+            "PedestalSideAngleDeg": 0,
             "ColumnCount": 3,
             "ColumnSpacings": [
               4.572,
@@ -51980,6 +52118,8 @@
             "ColumnDepth": 0.9144000000000001,
             "ColumnChamferS": 0,
             "ColumnChamferN": 0,
+            "ColumnProjectionS": 0,
+            "ColumnProjectionWidth": 0,
             "ColumnFlareElevation": "NaN",
             "ColumnFlareWidth": 0,
             "ColumnFlareDepth": 0,
@@ -52100,7 +52240,19 @@
             "Active": true,
             "TypeName": "Modular"
           },
-          "DeckEndPoints": null
+          "DeckEndPoints": null,
+          "GirderEndDap": {
+            "FlangeDrop": 0.1905,
+            "DropRun": 0.1905,
+            "LowFlatFromBearing": 0.3556,
+            "BendRadius": 0.15239999999999998,
+            "CopeInset": 0.15239999999999998,
+            "CopeEdge": 0.254,
+            "CopeRun": 0.15239999999999998,
+            "CopeRadius": 0.15239999999999998,
+            "Girders": null,
+            "Source": "I-80 PDF 106 Detail B"
+          }
         },
         {
           "Name": "Pier 12WB",
@@ -52193,6 +52345,7 @@
               }
             ],
             "CapProfileAhead": [],
+            "CapBlocks": [],
             "Aesthetics": {
               "Face": "Ahead",
               "StepSetback": 0.15239999999999998,
@@ -52286,6 +52439,7 @@
             "PedestalShared": false,
             "PedestalSizeAcrossAhead": 0,
             "PedestalRowJoint": "NaN",
+            "PedestalSideAngleDeg": 0,
             "ColumnCount": 4,
             "ColumnSpacings": [
               8.8392,
@@ -52299,6 +52453,8 @@
             "ColumnDepth": 1.3716000000000002,
             "ColumnChamferS": 0.7112,
             "ColumnChamferN": 0.381,
+            "ColumnProjectionS": 0,
+            "ColumnProjectionWidth": 0,
             "ColumnFlareElevation": 302.108616,
             "ColumnFlareWidth": 2.7432000000000003,
             "ColumnFlareDepth": 1.6764000000000001,
@@ -54430,6 +54586,7 @@
               }
             ],
             "CapProfileAhead": [],
+            "CapBlocks": [],
             "Aesthetics": {
               "Face": "Ahead",
               "StepSetback": 0.15239999999999998,
@@ -54523,6 +54680,7 @@
             "PedestalShared": false,
             "PedestalSizeAcrossAhead": 0,
             "PedestalRowJoint": "NaN",
+            "PedestalSideAngleDeg": 0,
             "ColumnCount": 3,
             "ColumnSpacings": [
               10.3632,
@@ -54535,6 +54693,8 @@
             "ColumnDepth": 1.3716000000000002,
             "ColumnChamferS": 0.7112,
             "ColumnChamferN": 0.381,
+            "ColumnProjectionS": 0,
+            "ColumnProjectionWidth": 0,
             "ColumnFlareElevation": 301.41672,
             "ColumnFlareWidth": 2.7432000000000003,
             "ColumnFlareDepth": 1.6764000000000001,
@@ -56430,6 +56590,7 @@
               }
             ],
             "CapProfileAhead": [],
+            "CapBlocks": [],
             "Aesthetics": {
               "Face": "Ahead",
               "StepSetback": 0.15239999999999998,
@@ -56523,6 +56684,7 @@
             "PedestalShared": false,
             "PedestalSizeAcrossAhead": 0,
             "PedestalRowJoint": "NaN",
+            "PedestalSideAngleDeg": 0,
             "ColumnCount": 3,
             "ColumnSpacings": [
               8.9916,
@@ -56535,6 +56697,8 @@
             "ColumnDepth": 1.3716000000000002,
             "ColumnChamferS": 0.7112,
             "ColumnChamferN": 0.381,
+            "ColumnProjectionS": 0,
+            "ColumnProjectionWidth": 0,
             "ColumnFlareElevation": 301.502064,
             "ColumnFlareWidth": 2.7432000000000003,
             "ColumnFlareDepth": 1.6764000000000001,
@@ -58136,6 +58300,7 @@
               }
             ],
             "CapProfileAhead": [],
+            "CapBlocks": [],
             "Aesthetics": {
               "Face": "Ahead",
               "StepSetback": 0.15239999999999998,
@@ -58229,6 +58394,7 @@
             "PedestalShared": false,
             "PedestalSizeAcrossAhead": 0,
             "PedestalRowJoint": "NaN",
+            "PedestalSideAngleDeg": 0,
             "ColumnCount": 3,
             "ColumnSpacings": [
               8.6868,
@@ -58241,6 +58407,8 @@
             "ColumnDepth": 1.3716000000000002,
             "ColumnChamferS": 0.7112,
             "ColumnChamferN": 0.381,
+            "ColumnProjectionS": 0,
+            "ColumnProjectionWidth": 0,
             "ColumnFlareElevation": "NaN",
             "ColumnFlareWidth": 0,
             "ColumnFlareDepth": 0,
@@ -59817,6 +59985,7 @@
             "CapOffset": 0,
             "CapProfile": [],
             "CapProfileAhead": [],
+            "CapBlocks": [],
             "Aesthetics": null,
             "TopShape": "Sloped",
             "CapSlope": "NaN",
@@ -59830,6 +59999,7 @@
             "PedestalShared": false,
             "PedestalSizeAcrossAhead": 0,
             "PedestalRowJoint": "NaN",
+            "PedestalSideAngleDeg": 0,
             "ColumnCount": 0,
             "ColumnSpacings": [],
             "FirstColumnOffset": "NaN",
@@ -59839,6 +60009,8 @@
             "ColumnDepth": 0.9144000000000001,
             "ColumnChamferS": 0,
             "ColumnChamferN": 0,
+            "ColumnProjectionS": 0,
+            "ColumnProjectionWidth": 0,
             "ColumnFlareElevation": "NaN",
             "ColumnFlareWidth": 0,
             "ColumnFlareDepth": 0,
@@ -60050,7 +60222,8 @@
                       "Footing": 2,
                       "Pile": 2
                     }
-                  ]
+                  ],
+                  "BottomOnFootings": true
                 },
                 {
                   "Name": "J",
@@ -60104,7 +60277,8 @@
                       "Footing": 2,
                       "Pile": 2
                     }
-                  ]
+                  ],
+                  "BottomOnFootings": true
                 }
               ],
               "Rebar": {
@@ -60595,7 +60769,19 @@
             "Active": true,
             "TypeName": "Modular"
           },
-          "DeckEndPoints": null
+          "DeckEndPoints": null,
+          "GirderEndDap": {
+            "FlangeDrop": 0.1905,
+            "DropRun": 0.1905,
+            "LowFlatFromBearing": 0.3556,
+            "BendRadius": 0.15239999999999998,
+            "CopeInset": 0,
+            "CopeEdge": 0.254,
+            "CopeRun": 0.15239999999999998,
+            "CopeRadius": 0.15239999999999998,
+            "Girders": null,
+            "Source": "I-80 PDF 106 Detail A"
+          }
         }
       ],
       "AuxiliarySupports": [],
@@ -75040,8 +75226,8 @@
       "Misc": {
         "Unresolved": [
           "[sign] Unit 3 sign truss: the two brackets on girder A (north, top of base 1020.32) are NOT placed - the plan dimension 12\u0027-10 7/8 (I-80 PDF 117) starts from a vertical reference line whose meaning is unresolved; girder A section D-D (PDF 181) was revised (5\u0027-4 5/8, 5\u0027-9 1/2; angles 93d19\u002739\u0022 / 93d00\u002730\u0022, struck values illegible).",
-          "[sign] Sign supports: vertical dimensions \u0022elevation line to level line\u0022 (1\u0027-3 3/4 etc., PDF 178/180), anchor bolt lengths, the HSS 14.000x0.500 post height and the sign truss size / elevation are not in the plans.",
-          "[light] I-80 lighting: East Abutment pole base (10\u0027-0 max from the end of the superstructure), the power conduit side, underdeck junction boxes / stub-outs (7583\u002B40.50, 7588\u002B69.64, 7582\u002B45.00 12\u0027-3 LT, 7582\u002B70.00 57\u0027-11 LT), pier-top Type 2 boxes and expansion fittings are schematic or not dimensioned: not modeled; pole base rebar for the abutment base is scheduled only."
+          "[sign] Sign supports: anchor bolt lengths, the post stub plate lengths, the HSS 14.000x0.500 post height and the sign truss size / elevation are not in the plans.",
+          "[light] (I-80 PDF 233-236) I-80 lighting: East Abutment pole base (10\u0027-0 max from the end of the superstructure), the power conduit side, underdeck junction boxes / stub-outs (7583\u002B40.50, 7588\u002B69.64, 7582\u002B45.00 12\u0027-3 LT, 7582\u002B70.00 57\u0027-11 LT), pier-top Type 2 boxes and expansion fittings are schematic or not dimensioned: not modeled; pole base rebar for the abutment base is scheduled only."
         ],
         "Collectors": [],
         "PierDrains": [],
@@ -75057,14 +75243,20 @@
                 "AheadOfSupport": 0.6096,
                 "TopOfBaseElevation": 312.212736,
                 "Height": 1.9304000000000001,
-                "BottomFlangeWidth": 0.6604
+                "BottomFlangeWidth": 0.6604,
+                "PostOutboard": 1.533525,
+                "AngleToGirderDegrees": 89.82444444444444,
+                "StubHeight": 0.31115000000000004
               },
               {
                 "Girder": 9,
                 "AheadOfSupport": 2.8448,
                 "TopOfBaseElevation": 312.212736,
                 "Height": 1.9304000000000001,
-                "BottomFlangeWidth": 0.6604
+                "BottomFlangeWidth": 0.6604,
+                "PostOutboard": 1.53035,
+                "AngleToGirderDegrees": 90,
+                "StubHeight": 0.32385
               }
             ],
             "TrussSpan": 27.432000000000002,
@@ -75084,6 +75276,8 @@
             "BasePlateThickness": 0.0508,
             "PostOuterDiameter": 0.35559999999999997,
             "PostWall": 0.0127,
+            "EndBeyondPost": 0.6858,
+            "BracketTopFlangeWidth": 0.6604,
             "Girder": 0,
             "BackFromBearing": null,
             "BlockAlong": 0.6096,
@@ -75186,8 +75380,11 @@
               "BlockOut": 0.762,
               "TopAboveLedge": 0.127,
               "HeightAtBarrier": 0.8001,
-              "HeightAtOuterEdge": 0.2794,
-              "SoffitRadius": 0.9144000000000001
+              "HeightAtOuterEdge": 0.5206999999999999,
+              "SoffitRadius": 0.9144000000000001,
+              "BottomAtSlabSoffit": true,
+              "SoffitRise": 0.2794,
+              "SoffitRun": 0.6032500000000001
             },
             {
               "Bars": [
@@ -75281,8 +75478,11 @@
               "BlockOut": 0.762,
               "TopAboveLedge": 0.127,
               "HeightAtBarrier": 0.8001,
-              "HeightAtOuterEdge": 0.2794,
-              "SoffitRadius": 0.9144000000000001
+              "HeightAtOuterEdge": 0.5206999999999999,
+              "SoffitRadius": 0.9144000000000001,
+              "BottomAtSlabSoffit": true,
+              "SoffitRise": 0.2794,
+              "SoffitRun": 0.6032500000000001
             },
             {
               "Bars": [
@@ -75376,8 +75576,11 @@
               "BlockOut": 0.762,
               "TopAboveLedge": 0.127,
               "HeightAtBarrier": 0.8001,
-              "HeightAtOuterEdge": 0.2794,
-              "SoffitRadius": 0.9144000000000001
+              "HeightAtOuterEdge": 0.5206999999999999,
+              "SoffitRadius": 0.9144000000000001,
+              "BottomAtSlabSoffit": true,
+              "SoffitRise": 0.2794,
+              "SoffitRun": 0.6032500000000001
             },
             {
               "Bars": [
@@ -75471,8 +75674,11 @@
               "BlockOut": 0.762,
               "TopAboveLedge": 0.127,
               "HeightAtBarrier": 0.8001,
-              "HeightAtOuterEdge": 0.2794,
-              "SoffitRadius": 0.9144000000000001
+              "HeightAtOuterEdge": 0.5206999999999999,
+              "SoffitRadius": 0.9144000000000001,
+              "BottomAtSlabSoffit": true,
+              "SoffitRise": 0.2794,
+              "SoffitRun": 0.6032500000000001
             }
           ],
           "JunctionBoxes": [
@@ -75618,6 +75824,7 @@
             "CapOffset": 0,
             "CapProfile": [],
             "CapProfileAhead": [],
+            "CapBlocks": [],
             "Aesthetics": null,
             "TopShape": "Sloped",
             "CapSlope": "NaN",
@@ -75631,6 +75838,7 @@
             "PedestalShared": false,
             "PedestalSizeAcrossAhead": 0,
             "PedestalRowJoint": "NaN",
+            "PedestalSideAngleDeg": 0,
             "ColumnCount": 0,
             "ColumnSpacings": [],
             "FirstColumnOffset": "NaN",
@@ -75640,6 +75848,8 @@
             "ColumnDepth": 0.9144000000000001,
             "ColumnChamferS": 0,
             "ColumnChamferN": 0,
+            "ColumnProjectionS": 0,
+            "ColumnProjectionWidth": 0,
             "ColumnFlareElevation": "NaN",
             "ColumnFlareWidth": 0,
             "ColumnFlareDepth": 0,
@@ -75829,7 +76039,8 @@
                       "Footing": 2,
                       "Pile": 2
                     }
-                  ]
+                  ],
+                  "BottomOnFootings": true
                 },
                 {
                   "Name": "D",
@@ -75883,7 +76094,8 @@
                       "Footing": 2,
                       "Pile": 2
                     }
-                  ]
+                  ],
+                  "BottomOnFootings": true
                 }
               ],
               "Rebar": {
@@ -76471,6 +76683,7 @@
               }
             ],
             "CapProfileAhead": [],
+            "CapBlocks": [],
             "Aesthetics": {
               "Face": "Ahead",
               "StepSetback": 0.15239999999999998,
@@ -76564,6 +76777,7 @@
             "PedestalShared": false,
             "PedestalSizeAcrossAhead": 0,
             "PedestalRowJoint": "NaN",
+            "PedestalSideAngleDeg": 0,
             "ColumnCount": 1,
             "ColumnSpacings": [],
             "FirstColumnOffset": 3.048,
@@ -76573,6 +76787,8 @@
             "ColumnDepth": 1.9812,
             "ColumnChamferS": 1.016,
             "ColumnChamferN": 0.5334,
+            "ColumnProjectionS": 0,
+            "ColumnProjectionWidth": 0,
             "ColumnFlareElevation": "NaN",
             "ColumnFlareWidth": 0,
             "ColumnFlareDepth": 0,
@@ -77717,6 +77933,7 @@
               }
             ],
             "CapProfileAhead": [],
+            "CapBlocks": [],
             "Aesthetics": {
               "Face": "Ahead",
               "StepSetback": 0.15239999999999998,
@@ -77810,6 +78027,7 @@
             "PedestalShared": false,
             "PedestalSizeAcrossAhead": 0,
             "PedestalRowJoint": "NaN",
+            "PedestalSideAngleDeg": 0,
             "ColumnCount": 1,
             "ColumnSpacings": [],
             "FirstColumnOffset": 3.048,
@@ -77819,6 +78037,8 @@
             "ColumnDepth": 1.9812,
             "ColumnChamferS": 1.016,
             "ColumnChamferN": 0.5334,
+            "ColumnProjectionS": 0,
+            "ColumnProjectionWidth": 0,
             "ColumnFlareElevation": 298.53940800000004,
             "ColumnFlareWidth": 3.3528000000000002,
             "ColumnFlareDepth": 2.286,
@@ -79027,6 +79247,7 @@
               }
             ],
             "CapProfileAhead": [],
+            "CapBlocks": [],
             "Aesthetics": {
               "Face": "Ahead",
               "StepSetback": 0.15239999999999998,
@@ -79120,6 +79341,7 @@
             "PedestalShared": false,
             "PedestalSizeAcrossAhead": 0,
             "PedestalRowJoint": "NaN",
+            "PedestalSideAngleDeg": 0,
             "ColumnCount": 1,
             "ColumnSpacings": [],
             "FirstColumnOffset": 3.048,
@@ -79129,6 +79351,8 @@
             "ColumnDepth": 1.9812,
             "ColumnChamferS": 1.016,
             "ColumnChamferN": 0.5334,
+            "ColumnProjectionS": 0,
+            "ColumnProjectionWidth": 0,
             "ColumnFlareElevation": 299.136816,
             "ColumnFlareWidth": 3.3528000000000002,
             "ColumnFlareDepth": 2.286,
@@ -80329,6 +80553,7 @@
               }
             ],
             "CapProfileAhead": [],
+            "CapBlocks": [],
             "Aesthetics": {
               "Face": "Ahead",
               "StepSetback": 0.15239999999999998,
@@ -80422,6 +80647,7 @@
             "PedestalShared": false,
             "PedestalSizeAcrossAhead": 0,
             "PedestalRowJoint": "NaN",
+            "PedestalSideAngleDeg": 0,
             "ColumnCount": 1,
             "ColumnSpacings": [],
             "FirstColumnOffset": 3.048,
@@ -80431,6 +80657,8 @@
             "ColumnDepth": 1.9812,
             "ColumnChamferS": 1.016,
             "ColumnChamferN": 0.5334,
+            "ColumnProjectionS": 0,
+            "ColumnProjectionWidth": 0,
             "ColumnFlareElevation": 300.234096,
             "ColumnFlareWidth": 3.3528000000000002,
             "ColumnFlareDepth": 2.286,
@@ -81643,6 +81871,7 @@
               }
             ],
             "CapProfileAhead": [],
+            "CapBlocks": [],
             "Aesthetics": {
               "Face": "Ahead",
               "StepSetback": 0.15239999999999998,
@@ -81736,6 +81965,7 @@
             "PedestalShared": true,
             "PedestalSizeAcrossAhead": 0,
             "PedestalRowJoint": "NaN",
+            "PedestalSideAngleDeg": 0,
             "ColumnCount": 1,
             "ColumnSpacings": [],
             "FirstColumnOffset": 3.047278104364632,
@@ -81745,6 +81975,8 @@
             "ColumnDepth": 1.9812,
             "ColumnChamferS": 1.016,
             "ColumnChamferN": 0.5334,
+            "ColumnProjectionS": 0,
+            "ColumnProjectionWidth": 0,
             "ColumnFlareElevation": 302.065944,
             "ColumnFlareWidth": 3.3528000000000002,
             "ColumnFlareDepth": 2.286,
@@ -82872,7 +83104,19 @@
             "Active": true,
             "TypeName": "Modular"
           },
-          "DeckEndPoints": null
+          "DeckEndPoints": null,
+          "GirderEndDap": {
+            "FlangeDrop": 0.1905,
+            "DropRun": 0.1905,
+            "LowFlatFromBearing": 0.3556,
+            "BendRadius": 0.15239999999999998,
+            "CopeInset": 0.15239999999999998,
+            "CopeEdge": 0.254,
+            "CopeRun": 0.15239999999999998,
+            "CopeRadius": 0.15239999999999998,
+            "Girders": null,
+            "Source": "Ramp G PDF 93 Detail A"
+          }
         }
       ],
       "AuxiliarySupports": [],
@@ -88850,6 +89094,7 @@
             "CapOffset": 0,
             "CapProfile": [],
             "CapProfileAhead": [],
+            "CapBlocks": [],
             "Aesthetics": null,
             "TopShape": "Sloped",
             "CapSlope": "NaN",
@@ -88863,6 +89108,7 @@
             "PedestalShared": true,
             "PedestalSizeAcrossAhead": 0,
             "PedestalRowJoint": "NaN",
+            "PedestalSideAngleDeg": 0,
             "ColumnCount": 3,
             "ColumnSpacings": [
               4.572,
@@ -88875,6 +89121,8 @@
             "ColumnDepth": 0.9144000000000001,
             "ColumnChamferS": 0,
             "ColumnChamferN": 0,
+            "ColumnProjectionS": 0,
+            "ColumnProjectionWidth": 0,
             "ColumnFlareElevation": "NaN",
             "ColumnFlareWidth": 0,
             "ColumnFlareDepth": 0,
@@ -88995,7 +89243,19 @@
             "Active": true,
             "TypeName": "Modular"
           },
-          "DeckEndPoints": null
+          "DeckEndPoints": null,
+          "GirderEndDap": {
+            "FlangeDrop": 0.1905,
+            "DropRun": 0.1905,
+            "LowFlatFromBearing": 0.3556,
+            "BendRadius": 0.15239999999999998,
+            "CopeInset": 0.15239999999999998,
+            "CopeEdge": 0.254,
+            "CopeRun": 0.15239999999999998,
+            "CopeRadius": 0.15239999999999998,
+            "Girders": null,
+            "Source": "Ramp G PDF 93 Detail A"
+          }
         },
         {
           "Name": "Pier 6G",
@@ -89082,6 +89342,7 @@
               }
             ],
             "CapProfileAhead": [],
+            "CapBlocks": [],
             "Aesthetics": {
               "Face": "Ahead",
               "StepSetback": 0.15239999999999998,
@@ -89175,6 +89436,7 @@
             "PedestalShared": false,
             "PedestalSizeAcrossAhead": 0,
             "PedestalRowJoint": "NaN",
+            "PedestalSideAngleDeg": 0,
             "ColumnCount": 1,
             "ColumnSpacings": [],
             "FirstColumnOffset": 3.048,
@@ -89184,6 +89446,8 @@
             "ColumnDepth": 1.9812,
             "ColumnChamferS": 1.016,
             "ColumnChamferN": 0.5334,
+            "ColumnProjectionS": 0,
+            "ColumnProjectionWidth": 0,
             "ColumnFlareElevation": 303.14493600000003,
             "ColumnFlareWidth": 3.3528000000000002,
             "ColumnFlareDepth": 2.286,
@@ -90396,6 +90660,7 @@
               }
             ],
             "CapProfileAhead": [],
+            "CapBlocks": [],
             "Aesthetics": {
               "Face": "Ahead",
               "StepSetback": 0.15239999999999998,
@@ -90489,6 +90754,7 @@
             "PedestalShared": false,
             "PedestalSizeAcrossAhead": 0,
             "PedestalRowJoint": "NaN",
+            "PedestalSideAngleDeg": 0,
             "ColumnCount": 1,
             "ColumnSpacings": [],
             "FirstColumnOffset": 3.048,
@@ -90498,6 +90764,8 @@
             "ColumnDepth": 1.9812,
             "ColumnChamferS": 1.016,
             "ColumnChamferN": 0.5334,
+            "ColumnProjectionS": 0,
+            "ColumnProjectionWidth": 0,
             "ColumnFlareElevation": 305.674776,
             "ColumnFlareWidth": 3.3528000000000002,
             "ColumnFlareDepth": 2.286,
@@ -91866,6 +92134,7 @@
               }
             ],
             "CapProfileAhead": [],
+            "CapBlocks": [],
             "Aesthetics": {
               "Face": "Ahead",
               "StepSetback": 0.15239999999999998,
@@ -91959,6 +92228,7 @@
             "PedestalShared": false,
             "PedestalSizeAcrossAhead": 0,
             "PedestalRowJoint": "NaN",
+            "PedestalSideAngleDeg": 0,
             "ColumnCount": 1,
             "ColumnSpacings": [],
             "FirstColumnOffset": 3.048,
@@ -91968,6 +92238,8 @@
             "ColumnDepth": 1.9812,
             "ColumnChamferS": 1.016,
             "ColumnChamferN": 0.5334,
+            "ColumnProjectionS": 0,
+            "ColumnProjectionWidth": 0,
             "ColumnFlareElevation": 303.27295200000003,
             "ColumnFlareWidth": 3.3528000000000002,
             "ColumnFlareDepth": 2.286,
@@ -93288,6 +93560,7 @@
               }
             ],
             "CapProfileAhead": [],
+            "CapBlocks": [],
             "Aesthetics": {
               "Face": "Ahead",
               "StepSetback": 0.15239999999999998,
@@ -93381,6 +93654,7 @@
             "PedestalShared": false,
             "PedestalSizeAcrossAhead": 0,
             "PedestalRowJoint": "NaN",
+            "PedestalSideAngleDeg": 0,
             "ColumnCount": 1,
             "ColumnSpacings": [],
             "FirstColumnOffset": 3.047278104363529,
@@ -93390,6 +93664,8 @@
             "ColumnDepth": 1.9812,
             "ColumnChamferS": 1.016,
             "ColumnChamferN": 0.5334,
+            "ColumnProjectionS": 0,
+            "ColumnProjectionWidth": 0,
             "ColumnFlareElevation": 303.23028000000005,
             "ColumnFlareWidth": 3.3528000000000002,
             "ColumnFlareDepth": 2.286,
@@ -94560,7 +94836,19 @@
             "Active": true,
             "TypeName": "Modular"
           },
-          "DeckEndPoints": null
+          "DeckEndPoints": null,
+          "GirderEndDap": {
+            "FlangeDrop": 0.1905,
+            "DropRun": 0.1905,
+            "LowFlatFromBearing": 0.3556,
+            "BendRadius": 0.15239999999999998,
+            "CopeInset": 0.15239999999999998,
+            "CopeEdge": 0.254,
+            "CopeRun": 0.15239999999999998,
+            "CopeRadius": 0.15239999999999998,
+            "Girders": null,
+            "Source": "Ramp G PDF 93 Detail A"
+          }
         }
       ],
       "AuxiliarySupports": [],
@@ -99719,7 +100007,7 @@
       },
       "Misc": {
         "Unresolved": [
-          "[light] Ramp G lighting: which of the two junction boxes at Pier 8G is power / ITS is not printed; underdeck boxes and stub-outs (67474\u002B90.40, 67475\u002B53.29, 67477\u002B44.79, 67486\u002B92.70, 67487\u002B45.83) and expansion fittings are schematic: not modeled."
+          "[light] (Ramp G PDF 168-170) Ramp G lighting: which of the two junction boxes at Pier 8G is power / ITS is not printed; underdeck boxes and stub-outs (67474\u002B90.40, 67475\u002B53.29, 67477\u002B44.79, 67486\u002B92.70, 67487\u002B45.83) and expansion fittings are schematic: not modeled."
         ],
         "Collectors": [],
         "PierDrains": [
@@ -99853,8 +100141,11 @@
               "BlockOut": 0.762,
               "TopAboveLedge": 0.127,
               "HeightAtBarrier": 0.8001,
-              "HeightAtOuterEdge": 0.2794,
-              "SoffitRadius": 0.9144000000000001
+              "HeightAtOuterEdge": 0.5206999999999999,
+              "SoffitRadius": 0.9144000000000001,
+              "BottomAtSlabSoffit": true,
+              "SoffitRise": 0.2794,
+              "SoffitRun": 0.6032500000000001
             }
           ],
           "JunctionBoxes": [
@@ -99970,6 +100261,7 @@
             "CapOffset": 0,
             "CapProfile": [],
             "CapProfileAhead": [],
+            "CapBlocks": [],
             "Aesthetics": null,
             "TopShape": "Sloped",
             "CapSlope": "NaN",
@@ -99983,6 +100275,7 @@
             "PedestalShared": false,
             "PedestalSizeAcrossAhead": 0,
             "PedestalRowJoint": "NaN",
+            "PedestalSideAngleDeg": 0,
             "ColumnCount": 3,
             "ColumnSpacings": [
               4.572,
@@ -99995,6 +100288,8 @@
             "ColumnDepth": 0.9144000000000001,
             "ColumnChamferS": 0,
             "ColumnChamferN": 0,
+            "ColumnProjectionS": 0,
+            "ColumnProjectionWidth": 0,
             "ColumnFlareElevation": "NaN",
             "ColumnFlareWidth": 0,
             "ColumnFlareDepth": 0,
@@ -100115,7 +100410,19 @@
             "Active": true,
             "TypeName": "Modular"
           },
-          "DeckEndPoints": null
+          "DeckEndPoints": null,
+          "GirderEndDap": {
+            "FlangeDrop": 0.1905,
+            "DropRun": 0.1905,
+            "LowFlatFromBearing": 0.3556,
+            "BendRadius": 0.15239999999999998,
+            "CopeInset": 0.15239999999999998,
+            "CopeEdge": 0.254,
+            "CopeRun": 0.15239999999999998,
+            "CopeRadius": 0.15239999999999998,
+            "Girders": null,
+            "Source": "Ramp G PDF 93 Detail A"
+          }
         },
         {
           "Name": "Pier 10G",
@@ -100202,6 +100509,7 @@
               }
             ],
             "CapProfileAhead": [],
+            "CapBlocks": [],
             "Aesthetics": {
               "Face": "Ahead",
               "StepSetback": 0.15239999999999998,
@@ -100295,6 +100603,7 @@
             "PedestalShared": false,
             "PedestalSizeAcrossAhead": 0,
             "PedestalRowJoint": "NaN",
+            "PedestalSideAngleDeg": 0,
             "ColumnCount": 1,
             "ColumnSpacings": [],
             "FirstColumnOffset": 3.048,
@@ -100304,6 +100613,8 @@
             "ColumnDepth": 1.9812,
             "ColumnChamferS": 1.016,
             "ColumnChamferN": 0.5334,
+            "ColumnProjectionS": 0,
+            "ColumnProjectionWidth": 0,
             "ColumnFlareElevation": 302.913288,
             "ColumnFlareWidth": 3.3528000000000002,
             "ColumnFlareDepth": 2.286,
@@ -101624,6 +101935,7 @@
               }
             ],
             "CapProfileAhead": [],
+            "CapBlocks": [],
             "Aesthetics": {
               "Face": "Ahead",
               "StepSetback": 0.15239999999999998,
@@ -101717,6 +102029,7 @@
             "PedestalShared": false,
             "PedestalSizeAcrossAhead": 0,
             "PedestalRowJoint": "NaN",
+            "PedestalSideAngleDeg": 0,
             "ColumnCount": 1,
             "ColumnSpacings": [],
             "FirstColumnOffset": 3.048,
@@ -101726,6 +102039,8 @@
             "ColumnDepth": 1.9812,
             "ColumnChamferS": 1.016,
             "ColumnChamferN": 0.5334,
+            "ColumnProjectionS": 0,
+            "ColumnProjectionWidth": 0,
             "ColumnFlareElevation": 303.4284,
             "ColumnFlareWidth": 3.3528000000000002,
             "ColumnFlareDepth": 2.286,
@@ -103068,6 +103383,7 @@
               }
             ],
             "CapProfileAhead": [],
+            "CapBlocks": [],
             "Aesthetics": {
               "Face": "Ahead",
               "StepSetback": 0.15239999999999998,
@@ -103161,6 +103477,7 @@
             "PedestalShared": false,
             "PedestalSizeAcrossAhead": 0,
             "PedestalRowJoint": "NaN",
+            "PedestalSideAngleDeg": 0,
             "ColumnCount": 1,
             "ColumnSpacings": [],
             "FirstColumnOffset": 3.048,
@@ -103170,6 +103487,8 @@
             "ColumnDepth": 1.9812,
             "ColumnChamferS": 1.016,
             "ColumnChamferN": 0.5334,
+            "ColumnProjectionS": 0,
+            "ColumnProjectionWidth": 0,
             "ColumnFlareElevation": 302.45913600000006,
             "ColumnFlareWidth": 3.3528000000000002,
             "ColumnFlareDepth": 2.286,
@@ -104512,6 +104831,7 @@
               }
             ],
             "CapProfileAhead": [],
+            "CapBlocks": [],
             "Aesthetics": {
               "Face": "Ahead",
               "StepSetback": 0.15239999999999998,
@@ -104605,6 +104925,7 @@
             "PedestalShared": false,
             "PedestalSizeAcrossAhead": 0,
             "PedestalRowJoint": "NaN",
+            "PedestalSideAngleDeg": 0,
             "ColumnCount": 1,
             "ColumnSpacings": [],
             "FirstColumnOffset": 3.048,
@@ -104614,6 +104935,8 @@
             "ColumnDepth": 1.9812,
             "ColumnChamferS": 1.016,
             "ColumnChamferN": 0.5334,
+            "ColumnProjectionS": 0,
+            "ColumnProjectionWidth": 0,
             "ColumnFlareElevation": 302.081184,
             "ColumnFlareWidth": 3.3528000000000002,
             "ColumnFlareDepth": 2.286,
@@ -105826,6 +106149,7 @@
               }
             ],
             "CapProfileAhead": [],
+            "CapBlocks": [],
             "Aesthetics": {
               "Face": "Ahead",
               "StepSetback": 0.15239999999999998,
@@ -105919,6 +106243,7 @@
             "PedestalShared": true,
             "PedestalSizeAcrossAhead": 0,
             "PedestalRowJoint": "NaN",
+            "PedestalSideAngleDeg": 0,
             "ColumnCount": 1,
             "ColumnSpacings": [],
             "FirstColumnOffset": 3.0472781043631616,
@@ -105928,6 +106253,8 @@
             "ColumnDepth": 1.9812,
             "ColumnChamferS": 1.016,
             "ColumnChamferN": 0.5334,
+            "ColumnProjectionS": 0,
+            "ColumnProjectionWidth": 0,
             "ColumnFlareElevation": 301.41672,
             "ColumnFlareWidth": 3.3528000000000002,
             "ColumnFlareDepth": 2.286,
@@ -107039,7 +107366,19 @@
             "Active": true,
             "TypeName": "Modular"
           },
-          "DeckEndPoints": null
+          "DeckEndPoints": null,
+          "GirderEndDap": {
+            "FlangeDrop": 0.1905,
+            "DropRun": 0.1905,
+            "LowFlatFromBearing": 0.3556,
+            "BendRadius": 0.15239999999999998,
+            "CopeInset": 0.15239999999999998,
+            "CopeEdge": 0.254,
+            "CopeRun": 0.15239999999999998,
+            "CopeRadius": 0.15239999999999998,
+            "Girders": null,
+            "Source": "Ramp G PDF 93 Detail A"
+          }
         }
       ],
       "AuxiliarySupports": [],
@@ -113845,6 +114184,7 @@
             "CapOffset": 0,
             "CapProfile": [],
             "CapProfileAhead": [],
+            "CapBlocks": [],
             "Aesthetics": null,
             "TopShape": "Sloped",
             "CapSlope": "NaN",
@@ -113858,6 +114198,7 @@
             "PedestalShared": true,
             "PedestalSizeAcrossAhead": 0,
             "PedestalRowJoint": "NaN",
+            "PedestalSideAngleDeg": 0,
             "ColumnCount": 3,
             "ColumnSpacings": [
               4.572,
@@ -113870,6 +114211,8 @@
             "ColumnDepth": 0.9144000000000001,
             "ColumnChamferS": 0,
             "ColumnChamferN": 0,
+            "ColumnProjectionS": 0,
+            "ColumnProjectionWidth": 0,
             "ColumnFlareElevation": "NaN",
             "ColumnFlareWidth": 0,
             "ColumnFlareDepth": 0,
@@ -113990,7 +114333,19 @@
             "Active": true,
             "TypeName": "Modular"
           },
-          "DeckEndPoints": null
+          "DeckEndPoints": null,
+          "GirderEndDap": {
+            "FlangeDrop": 0.1905,
+            "DropRun": 0.1905,
+            "LowFlatFromBearing": 0.3556,
+            "BendRadius": 0.15239999999999998,
+            "CopeInset": 0.15239999999999998,
+            "CopeEdge": 0.254,
+            "CopeRun": 0.15239999999999998,
+            "CopeRadius": 0.15239999999999998,
+            "Girders": null,
+            "Source": "Ramp G PDF 93 Detail A"
+          }
         },
         {
           "Name": "Pier 15G",
@@ -114077,6 +114432,7 @@
               }
             ],
             "CapProfileAhead": [],
+            "CapBlocks": [],
             "Aesthetics": {
               "Face": "Ahead",
               "StepSetback": 0.15239999999999998,
@@ -114170,6 +114526,7 @@
             "PedestalShared": false,
             "PedestalSizeAcrossAhead": 0,
             "PedestalRowJoint": "NaN",
+            "PedestalSideAngleDeg": 0,
             "ColumnCount": 1,
             "ColumnSpacings": [],
             "FirstColumnOffset": 3.048,
@@ -114179,6 +114536,8 @@
             "ColumnDepth": 1.9812,
             "ColumnChamferS": 1.016,
             "ColumnChamferN": 0.5334,
+            "ColumnProjectionS": 0,
+            "ColumnProjectionWidth": 0,
             "ColumnFlareElevation": 301.803816,
             "ColumnFlareWidth": 3.3528000000000002,
             "ColumnFlareDepth": 2.286,
@@ -115379,6 +115738,7 @@
               }
             ],
             "CapProfileAhead": [],
+            "CapBlocks": [],
             "Aesthetics": {
               "Face": "Ahead",
               "StepSetback": 0.15239999999999998,
@@ -115472,6 +115832,7 @@
             "PedestalShared": false,
             "PedestalSizeAcrossAhead": 0,
             "PedestalRowJoint": "NaN",
+            "PedestalSideAngleDeg": 0,
             "ColumnCount": 2,
             "ColumnSpacings": [
               11.5824
@@ -115483,6 +115844,8 @@
             "ColumnDepth": 1.3716000000000002,
             "ColumnChamferS": 0.7112,
             "ColumnChamferN": 0.381,
+            "ColumnProjectionS": 0,
+            "ColumnProjectionWidth": 0,
             "ColumnFlareElevation": "NaN",
             "ColumnFlareWidth": 0,
             "ColumnFlareDepth": 0,
@@ -117009,6 +117372,7 @@
               }
             ],
             "CapProfileAhead": [],
+            "CapBlocks": [],
             "Aesthetics": {
               "Face": "Ahead",
               "StepSetback": 0.15239999999999998,
@@ -117102,6 +117466,7 @@
             "PedestalShared": false,
             "PedestalSizeAcrossAhead": 0,
             "PedestalRowJoint": "NaN",
+            "PedestalSideAngleDeg": 0,
             "ColumnCount": 2,
             "ColumnSpacings": [
               8.5344
@@ -117113,6 +117478,8 @@
             "ColumnDepth": 1.3716000000000002,
             "ColumnChamferS": 0.7112,
             "ColumnChamferN": 0.381,
+            "ColumnProjectionS": 0,
+            "ColumnProjectionWidth": 0,
             "ColumnFlareElevation": "NaN",
             "ColumnFlareWidth": 0,
             "ColumnFlareDepth": 0,
@@ -118633,6 +119000,7 @@
               }
             ],
             "CapProfileAhead": [],
+            "CapBlocks": [],
             "Aesthetics": {
               "Face": "Ahead",
               "StepSetback": 0.15239999999999998,
@@ -118726,6 +119094,7 @@
             "PedestalShared": false,
             "PedestalSizeAcrossAhead": 0,
             "PedestalRowJoint": "NaN",
+            "PedestalSideAngleDeg": 0,
             "ColumnCount": 1,
             "ColumnSpacings": [],
             "FirstColumnOffset": 3.048,
@@ -118735,6 +119104,8 @@
             "ColumnDepth": 1.9812,
             "ColumnChamferS": 1.016,
             "ColumnChamferN": 0.5334,
+            "ColumnProjectionS": 0,
+            "ColumnProjectionWidth": 0,
             "ColumnFlareElevation": "NaN",
             "ColumnFlareWidth": 0,
             "ColumnFlareDepth": 0,
@@ -119992,6 +120363,7 @@
                 "Elevation": 306.05073714745697
               }
             ],
+            "CapBlocks": [],
             "Aesthetics": {
               "Face": "Ahead",
               "StepSetback": 0.15239999999999998,
@@ -120085,6 +120457,7 @@
             "PedestalShared": false,
             "PedestalSizeAcrossAhead": 0,
             "PedestalRowJoint": "NaN",
+            "PedestalSideAngleDeg": 0,
             "ColumnCount": 1,
             "ColumnSpacings": [],
             "FirstColumnOffset": 3.9430257339991694,
@@ -120094,6 +120467,8 @@
             "ColumnDepth": 1.9812,
             "ColumnChamferS": 1.016,
             "ColumnChamferN": 0.5334,
+            "ColumnProjectionS": 0,
+            "ColumnProjectionWidth": 0,
             "ColumnFlareElevation": "NaN",
             "ColumnFlareWidth": 0,
             "ColumnFlareDepth": 0,
@@ -121176,7 +121551,19 @@
               "Station": 2057495.9937120003,
               "Offset": 8.641079999788762
             }
-          ]
+          ],
+          "GirderEndDap": {
+            "FlangeDrop": 0.1905,
+            "DropRun": 0.1905,
+            "LowFlatFromBearing": 0.3556,
+            "BendRadius": 0.15239999999999998,
+            "CopeInset": 0.15239999999999998,
+            "CopeEdge": 0.254,
+            "CopeRun": 0.15239999999999998,
+            "CopeRadius": 0.15239999999999998,
+            "Girders": null,
+            "Source": "Ramp G PDF 93 Detail A"
+          }
         }
       ],
       "AuxiliarySupports": [],

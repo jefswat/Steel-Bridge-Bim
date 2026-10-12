@@ -43,6 +43,22 @@ Use this to start the next session. Architecture notes are in `CLAUDE.md`. The u
 
 ## 0a. State at the end of 2026-10-10 (evening) — START HERE
 
+- **2026-10-11 (branch fix-i80-items): four user items on the sample model, all re-run** (`abutments-i80.csx`, `abutments-ramp-g.csx`, new `girder-end-daps.csx`,
+  `signs-i80.csx`, `lighting.csx`; run order: after the joint / misc scripts):
+  1. Light pole bases too low: the "5" over the block in Section D-D (I-80 PDF 235, Ramp G PDF 169) is the anchor-bolt projection, not a ledge height. Block now cast against
+     the slab edge with its bottom flush with the slab soffit (drawn, not dimensioned: flagged), 2'-7 1/2 high -> top 23 1/2" above the deck-edge top (was 5"); outer face
+     1'-8 1/2 (was 11"), R 3'-0 soffit arc 11" over 1'-11 3/4 bulging into the block (was reversed). Plan chain 1'-11 3/4 + 4 1/4 = 2'-4 vs 2'-6 projection reported.
+  2. Wingwall / counterfort gap: the wall bottom was one sloped line that passed up to ~1'-1 above the wing footing tops; the plan wing elevations (I-80 PDF 87 / 91, Ramp G PDF 82)
+     bring the wall down onto each wing footing with vertical steps at the footing ends (`WingwallDefinition.BottomOnFootings`). All three abutments, both wings.
+     Wing + counterfort quantity now = plan: West 38.7 / 38.8, East 31.6 / 31.6, South 30.2 / 30.2 CY (was 38.3 / 31.2 / 29.8).
+  3. Girder end daps at the expansion joints (`SupportDefinition.GirderEndDap`): I-80 Detail A (abutments) / Detail B (+ 6" web cope; Piers 5WB, 6A, 11WB) PDF 106; Ramp G
+     Detail A (= I-80 B) PDF 93 at Piers 5G, 9G, 14G, 19G; South Abutment none. Top flange now 3.6"-4.9" below the 1'-2 joint blockout (was 2.9"-3.6" INTO it).
+  4. Sign truss brackets inboard of the barrier: they are plate-girder cantilevers OUTBOARD of the exterior girder (Sections C-C / D-D PDF 178, 181; View J-J PDF 178 / 180):
+     posts now 3'-0 3/4 to 3'-6 9/16 (Unit 2) / 1'-11 1/4 (Unit 3) outside the deck edge (were 3'-1 inside). Reported: bracket top flange top from "top of base - J-J stub"
+     is 4.3"-4.5" above the girder top of steel at the W.P. (plan elevations vs model girder; not adjusted).
+  Snapshots: the GPU ran out of memory in the sandbox / the free `--camera` did not take; checks are numeric (scripts) + tests `FixI80ItemsTests`.
+  Open: `GirderResult.StartExtension` is negative for girders re-based on an auxiliary support (Pier 6A) - the dap reads the bearing stiffener instead.
+
 - **2026-10-11 (re-run, branch i80-rerun): the committed model now includes today's merges.** Re-run on
   `samples\plans\I-80 WB and Ramp G.sbm`: `column-rebar.csx` (6e3 hairpin pairs, 11G/12G 6e4 hoop pairs), the 11WB / 9G
   fields of the pedestal blocks of `piers-i80.csx` / `piers-ramp-g.csx` only (11WB 60 x 47 / ahead 45, joint 1"; 9G 60 x 36, not
