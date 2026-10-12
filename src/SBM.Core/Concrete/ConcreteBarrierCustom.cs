@@ -23,7 +23,7 @@ public sealed partial class ConcreteGenerator
     {
         var b = Deck.Barrier;
         if (b.Profile is not { Count: >= 3 }) { Warn("Custom barrier: no Profile (at least 3 points) - not built."); return; }
-        string name = side < 0 ? "Left barrier" : "Right barrier";
+        string name = (side < 0 ? "Left " : "Right ") + (b.IsCurb ? "curb" : "barrier");
         string label = b.ProfileName ?? "custom barrier";
         var baseX = BarrierProfiles.Expand(b.Profile);
         bool perp = b.PerpendicularToDeck;

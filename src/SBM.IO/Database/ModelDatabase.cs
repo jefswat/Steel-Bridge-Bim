@@ -538,7 +538,7 @@ public static class ModelDatabase
         {
             var asmInfo = new Dictionary<string, AsmInfo>();
             var girderGroup = new Dictionary<int, string>();
-            string cfGroup = "", lbGroup = "", inspGroup = "", archGroup = "";
+            string cfGroup = "", lbGroup = "", inspGroup = "", archGroup = "", railGroup = "";
             string ArchGroup() => archGroup.Length > 0 ? archGroup : (archGroup = Group($"{bk}/group/arch", superId, "Tied arch", "tied arch"));
             string GirderGroup(int g)
             {
@@ -598,6 +598,10 @@ public static class ModelDatabase
                         cat = asm.Kind == AssemblyKind.InspectionCable ? "inspection cable" : "inspection walkway";
                         sub = asm.Kind == AssemblyKind.InspectionCable ? "wire rope cable" : asm.Description.Contains("Type B") ? "Type B walkway" : "Type A walkway";
                         break;
+                    case AssemblyKind.Railing:
+                        parent = railGroup.Length > 0 ? railGroup : (railGroup = Group($"{bk}/group/railings", superId, "Pedestrian railings", "railing group"));
+                        cat = "pedestrian railing"; sub = asm.ObjectType ?? "";
+                        break;
                     case AssemblyKind.LateralBracing:
                         parent = lbGroup.Length > 0 ? lbGroup : (lbGroup = Group($"{bk}/group/lateral", superId, "Lateral bracing", "lateral bracing group"));
                         cat = "lateral bracing";
@@ -625,7 +629,7 @@ public static class ModelDatabase
                         }
                         break;
                 }
-                var r = New(gid, parent, "assembly", cat, "IFCELEMENTASSEMBLY", asm.Mark);
+                var r = New(gid, parent, "assembly", cat, asm.Kind == AssemblyKind.Railing ? "IFCRAILING" : "IFCELEMENTASSEMBLY", asm.Mark);
                 r.Mark = asm.Mark; r.Girder = girder; r.Support = support; r.Subtype = sub; r.Props = props.ToString();
                 _w.Add(r);
                 asmInfo[asm.Mark] = new AsmInfo(gid, support, girder, sub);
@@ -662,8 +666,10 @@ public static class ModelDatabase
                     r.Box = part.Mesh.Bounds();
                     StationOf(r, r.Box);
                 }
-                r.Props = new Json().Add("description", part.Description).Add("assembly", part.Assembly)
-                    .Add("role", part.Role == MemberRole.None ? null : part.Role.ToString()).Add("lb_per_ft", part.NominalWeightLbPerFt, 3).ToString();
+                var pjs = new Json().Add("description", part.Description).Add("assembly", part.Assembly)
+                    .Add("role", part.Role == MemberRole.None ? null : part.Role.ToString()).Add("lb_per_ft", part.NominalWeightLbPerFt, 3);
+                if (part.Assumption is { } pas && SteelModel.IsRailing(part.Category)) pjs.Add("status", pas.Status).Add("reason", pas.Reason).Add("assumed", pas.Basis);
+                r.Props = pjs.ToString();
                 _w.Add(r);
             }
 
@@ -731,14 +737,17 @@ public static class ModelDatabase
             PartCategory.KnucklePlate => "knuckle plate", PartCategory.FormDeck => "steel deck form",
             PartCategory.FinPlate => "cable fin plate", PartCategory.CableConnector => "cable connector", PartCategory.ArchConnectionPlate => "connection plate",
             PartCategory.ArchStiffener => "stiffener", PartCategory.PtStrand => "PT strand", PartCategory.PtAnchorage => "PT anchorage",
-            PartCategory.RolledTee => "tee", PartCategory.AccessDoor => "access door", _ => c.ToString(),
+            PartCategory.RolledTee => "tee", PartCategory.AccessDoor => "access door",
+            PartCategory.RailPost => "railing post", PartCategory.RailHandrail => "handrail", PartCategory.RailMember => "rail member",
+            PartCategory.RailBasePlate => "post base plate", PartCategory.RailEnvelope => "railing envelope", _ => c.ToString(),
         };
 
         private static string IfcClassOf(SteelPart p) => p.Category switch
         {
             PartCategory.Angle or PartCategory.Channel or PartCategory.InspectionBracket or PartCategory.InspectionCable
                 or PartCategory.WalkwayStringer or PartCategory.WalkwayPost or PartCategory.RolledTee
-                or PartCategory.ArchRib or PartCategory.Hanger or PartCategory.ArchBracing => "IFCMEMBER",
+                or PartCategory.ArchRib or PartCategory.Hanger or PartCategory.ArchBracing or PartCategory.RailPost or PartCategory.RailMember => "IFCMEMBER",
+            PartCategory.RailHandrail or PartCategory.RailEnvelope => "IFCRAILING",
             PartCategory.HangerSocket or PartCategory.CableConnector => "IFCMECHANICALFASTENER",
             PartCategory.PtStrand => "IFCTENDON",
             PartCategory.PtAnchorage => "IFCTENDONANCHOR",
@@ -790,7 +799,8 @@ public static class ModelDatabase
             string BarrierRebar() => barrierRebar.Length > 0 ? barrierRebar : barrierRebar = Group($"{bk}/grp/barrier-rebar", BarrierGroup(), $"{who} barrier reinforcing", "barrier reinforcing");
             foreach (var (name, mesh) in c.Barriers)
             {
-                var r = New(Id(IfcKeys.Barrier(bk, name)), BarrierGroup(), "element", "barrier", "IFCRAILING", name);
+                bool curb = def.Deck.Barrier.IsCurb;
+                var r = New(Id(IfcKeys.Barrier(bk, name)), BarrierGroup(), "element", curb ? "curb" : "barrier", curb ? "IFCKERB" : "IFCRAILING", name);
                 r.Material = concMat; r.Volume = Math.Abs(mesh.Volume()); r.Mass = r.Volume * 2400; r.Box = mesh.Bounds();
                 StationOf(r, r.Box);
                 r.Subtype = def.Deck.Barrier.Type.ToString();
@@ -802,17 +812,24 @@ public static class ModelDatabase
                 string jk = IfcKeys.Joint(bk, jn++);
                 string type = jr.Definition.TypeName;
                 string jg = Group(jk + "/grp", deckPartId, $"Expansion joint at {jr.Support} ({(jr.AtBegin ? "begin" : "end")} of {who})", "joint", jr.Support, type);
-                var r = New(Id(IfcKeys.JointBlockout(jk)), jg, "element", "joint blockout", "IFCBUILDINGELEMENTPART", jr.BlockoutName);
-                r.Support = jr.Support; r.Subtype = type; r.Material = concMat; r.Volume = jr.BlockoutVolume; r.Mass = r.Volume * 2400;
-                r.Box = jr.Blockout.Bounds(); StationOf(r, r.Box);
-                r.Props = new Json().Add("end", jr.AtBegin ? "begin" : "end").Add("joint_index", jn - 1).ToString();
-                _w.Add(r);
+                if (!jr.Blockout.IsEmpty)
+                {
+                    var r = New(Id(IfcKeys.JointBlockout(jk)), jg, "element", "joint blockout", "IFCBUILDINGELEMENTPART", jr.BlockoutName);
+                    r.Support = jr.Support; r.Subtype = type; r.Material = concMat; r.Volume = jr.BlockoutVolume; r.Mass = r.Volume * 2400;
+                    r.Box = jr.Blockout.Bounds(); StationOf(r, r.Box);
+                    r.Props = new Json().Add("end", jr.AtBegin ? "begin" : "end").Add("joint_index", jn - 1).ToString();
+                    _w.Add(r);
+                }
                 if (jr.Body != null)
                 {
                     var d = New(Id(IfcKeys.JointDevice(jk)), jg, "element", "expansion joint device", "IFCDISCRETEACCESSORY", jr.DeviceName);
                     d.Support = jr.Support; d.Subtype = type; d.Material = "Steel (placeholder)"; d.Box = jr.Body.Bounds(); d.Length = jr.Length;
                     StationOf(d, d.Box);
-                    d.Props = new Json().Add("end", jr.AtBegin ? "begin" : "end").Add("placeholder", true).ToString();
+                    var dj = new Json().Add("end", jr.AtBegin ? "begin" : "end").Add("placeholder", true);
+                    if (jr.Definition.Designation is { Length: > 0 } des) dj.Add("designation", des);
+                    if (jr.Definition.PlanLength is double jpl) dj.Add("plan_length_m", jpl);
+                    if (jr.Assumption is { } jas) dj.Add("status", jas.Status).Add("reason", jas.Reason).Add("assumed", jas.Basis);
+                    d.Props = dj.ToString();
                     _w.Add(d);
                 }
             }
@@ -921,6 +938,7 @@ public static class ModelDatabase
                         SubElementKind.Column => ("column", "IFCCOLUMN"),
                         SubElementKind.DrilledShaft => ("drilled shaft", "IFCPILE"),
                         SubElementKind.Pile => ("pile", "IFCPILE"),
+                        SubElementKind.MowStrip => ("mow strip", "IFCSLAB"),
                         _ => ("footing", "IFCFOOTING"),
                     };
                     var r = New(Id(IfcKeys.SubSolid(uk, k++)), ParentOfSolid(so), "element", cat, cls, so.Name);
@@ -929,7 +947,9 @@ public static class ModelDatabase
                     r.Material = so.IsConcrete ? concMat : "ASTM A572 Gr. 50 (HP piling)";
                     r.Volume = Math.Abs(so.Mesh.Volume()); r.Mass = r.Volume * (so.IsConcrete ? 2400 : 7850);
                     r.Box = so.Mesh.Bounds(); StationOf(r, r.Box);
-                    r.Props = new Json().Add("description", so.Description).ToString();
+                    var sj = new Json().Add("description", so.Description);
+                    if (so.Assumption is { } sas) sj.Add("status", sas.Status).Add("reason", sas.Reason).Add("assumed", sas.Basis);
+                    r.Props = sj.ToString();
                     _w.Add(r);
                 }
 

@@ -7,11 +7,13 @@ using SBM.Core.Alignments;
 
 namespace SBM.Core.Substructure;
 
-public enum SubElementKind { Cap, Pedestal, Backwall, Column, DrilledShaft, Footing, Pile, DeckDrain, DrainPipe, SplashBasin, Coupler, Wingwall, Counterfort, Maskwall, WingFooting, PileCasing }
+public enum SubElementKind { Cap, Pedestal, Backwall, Column, DrilledShaft, Footing, Pile, DeckDrain, DrainPipe, SplashBasin, Coupler, Wingwall, Counterfort, Maskwall, WingFooting, PileCasing, MowStrip }
 
 /// <summary>A solid of the substructure with its quantity data.</summary>
 public sealed record SubSolid(SubElementKind Kind, string Name, string Description, Mesh Mesh, bool IsConcrete = true)
 {
+    /// <summary>Geometry the plans do not fix (OPTIONAL; IFC Pset SBM_Status, database status).</summary>
+    public Assumption? Assumption { get; init; }
     /// <summary>CIP pipe pile: steel shell wall thickness of the concrete-filled pipe (0 = not a pipe pile; NaN = pipe pile, shell not given).
     /// The mesh is the outside diameter; IFC writes one IfcPile COMPOSITE with the shell as a property.</summary>
     public double ShellThickness { get; init; }

@@ -113,6 +113,22 @@ RW(EM), RW(MSE), PAZD, PB, PCO (p.37-78).
 | Joints | SEJ-B(MOD) 107 LF, BS-EJCP 1,382 lb | p.91 | RASTER |
 | Paint / coating | system III-B, FS 17925; anti-graffiti 3,175 SF | p.83, 91 | RASTER |
 
+### 6a. Railing, curbs, joints, mow strips - read 2026-10-12 (branch nht-rail-joints; model `samples/plans/rail-joints-nht.csx`)
+| item | value | PDF p. | tag | model |
+|---|---|---|---|---|
+| Railing material / weight | posts and hardware stainless steel AISI 316; design dead load HIGH rail 100 PLF, LOW 50 PLF | p.83 | RASTER | envelope mass = 50 / 100 PLF |
+| Rail limits | LOW 20+49.30 - 23+38.74; HIGH 23+38.74 - 29+10.87 (incl. arch, p.90) | p.89, 90 | RASTER | radial line at 23+38.74 |
+| Rail LF | LOW 307.93 LT / 270.95 RT, HIGH 571.28 LT / 572.97 RT, measured on the face of rail = curb line 7'-0 from CL NHT (289.44 + 7.00 x 2.6411 rad = 307.93) | p.84-88 | RASTER / DERIVED | 307.928 / 270.952 / 571.284 / 572.976 |
+| Rail pay items | 5110 LOW 579.0 (215.8 + 194.0 + 169.2), HIGH 1,144.2 (152.9 + 336.0 / 156.4 + 91.7 + 407.2) | p.91 | RASTER | 578.88 (p.91 is 0.12 more than p.84-88) / 1,144.26 |
+| Post heights | LOW 4'-3, HIGH 9'-10 above the trail at the curb line; handrail 3'-0 | p.89 | RASTER | dimensioned values held |
+| Post / handrail shapes | not dimensioned; from the p.89 page vectors (1.5 pt/in): LOW outline 6" at the base to 4 5/16" at the top, outer face 2" inside the deck edge, inner 2" outside the curb line; HIGH same to 69" above the curb, then curved inward (two cubic Beziers per face) to the tip 1'-1" inside the curb line; handrail pipe 1.87" OD | p.89 | VECTOR (scaled) | flagged envelope + handrail |
+| Post spacing, base plates, anchors, rails, fencing | "the number and spacing of pedestrian railing posts is diagrammatic only"; details on the 'Pedestrian railing details' / RAIL (PED) sheets | p.84 note 2, p.89, 90 | RASTER | UNRESOLVED (sheets not in the set) |
+| Curb | 10" x 4", curb line 7'-0 from CL NHT, exposed edges 3/4" chamfer | p.89, 113, 83 | RASTER | custom barrier IsCurb, 13.35 CY |
+| SEJ-B(MOD) 4" + BS-EJCP | 7 joints (Abut 1, P4, P7, P10, P11, P13, Abut 16); CL SEJ 9 1/4" from CL pier at P10 / P11; 107 LF (75 + 32); BS-EJCP 194 lb per joint, 206 at P10 / P11 | p.84-88, 91, 113 | RASTER | 4 in placeholders on the CL SEJ, 111.57 LF at the full deck width; opening / armor / blockout / IGTS end UNRESOLVED |
+| Mow strips | 4" reinforced concrete (#3 @ 18"), "2'-0 max, each face of column", at existing ground, 1'-0 min over the shaft top; 6.1 CY | p.97, 99, 91 | RASTER | 2'-0 at 12 piers = 6.12 CY; top EL. D + 1'-0 flagged |
+| Abutment riprap | "riprap, see retaining wall sheets" | p.85 | RASTER | not modeled (wall sheets) |
+| T80SS(MOD) at Piers 10 / 11 | 4'-6 high, 9'-1 + 4'-6 + 7'-11 straight + 7'-6 transition + taper, 2'-4 footings, on existing US 75 pavement; 78 LF | p.105-106 | RASTER | UNRESOLVED (T80SS section not in the set, pavement elevation not given) |
+
 ## 7. Checks data (CSV)
 - `quantities.csv`: arch steel reconciles with the sheet tables (Gr 50-T1 120,100 = 61,000 + 59,100; Gr 50-F1 37,000 = 33,200 + 3,800; Gr 50 31,300 = 21,600 + 9,700).
 - `cable-hanger-coordinates.csv`, `upper-lateral-bracing-points.csv`, `cable-fin-plates-arch-rib.csv`: arch geometry.
@@ -178,6 +194,10 @@ to have stripped them. PDF bookmarks differ from the sheets ("162.77' ... UNIT",
 | U10 | WP vertical position in the tie (bottom of flange p.119 vs inside the 2 in end flange p.124) | p.119, 124 | not dimensioned |
 | U11 | Arch pier angle table (** 73 20'28" / 76 09'10", *** 73 28'39" / 76 31'36") | p.102 | reference lines of the ** / *** angles not identified |
 | U12 | Horizontal datum / projection / scale factor - RESOLVED 2026-10-11 | p.17-19 | survey sheets 1-2 not in set; user GPS of the approximate arch-span centre 32.901380, -96.769012 -> EPSG:2276 X 2499728.33, Y 7015245.07 -> x SAF 1.000136 (TxDOT Dallas County) = 2500068.29, 7016199.14 vs model arch centre 2500079.15, 7016198.76 (10.9 / 0.4 ft = approximate GPS) => plan X/Y are TxDOT surface coordinates, NAD83 Texas North Central, SAF 1.000136. Model unchanged; `Doc.Project.Georeference` (build-nht.csx) writes IfcProjectedCRS EPSG:2276 + IfcMapConversion.Scale 1/1.000136. U1 (pedestal / bearing ELEVATIONS) is vertical and stays open. |
+| U14 | Railing posts / spacing / base plates / anchors / fencing; low-high transition (2026-10-12) | p.84 note 2, 85, 89, 90 | 'Pedestrian railing details' / RAIL (PED) sheets not in the set, post spacing "diagrammatic only" - modeled as flagged envelopes of the p.89 section + handrail |
+| U15 | SEJ-B(MOD) opening / armor / blockout, BS-EJCP plate, IGTS thickened slab end (2026-10-12) | p.84-88, 91, 113 | standards not in the set - 4 in placeholder on the CL SEJ, deck ends kept at the CL SEJ |
+| U16 | Mow strip top (existing ground) and width (2'-0 max) (2026-10-12) | p.97, 99 | ground not given - 2'-0 (reproduces 6.1 CY), top EL. D + 1'-0 (minimum), flagged |
+| U17 | T80SS(MOD) barrier at Piers 10 / 11 (2026-10-12) | p.105-106 | T80SS section not in the set, US 75 pavement elevation / lanes not given - not modeled |
 | U13 | (2026-10-11: the PIER / GIRDER REPORTs p.108-116, IGND table p.118, section depths X/Y p.109/113/115, approach / arch pier shaft tables p.98/100/101 and abutment 16 p.96 are now transcribed in `samples/plans/build-nht.csx` / `check-nht.csx`.) Not transcribed (scope): approach PIER / GIRDER REPORTs (p.108-116), other unit depth / deflection tables, abutment 16, arch deck bar bends (p.154), PT details (p.155), knuckle stud layout (p.126), bracing connections (p.129-142), arch pier barrier (p.105-106), force tables (p.121-122) | listed | legible at 300-400 dpi; time |
 
 ## Model mapping

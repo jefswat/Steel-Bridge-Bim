@@ -184,6 +184,7 @@ public static class SceneBuilder
         ("3D-ARCH-BRACING", 80, 200, 110, new[] { PartCategory.ArchBracing }),
         ("3D-ARCH-KNUCKLES", 235, 185, 70, new[] { PartCategory.KnucklePlate }),
         ("3D-ARCH-FORM-DECK", 175, 180, 190, new[] { PartCategory.FormDeck }),
+        ("3D-PED-RAILING", 200, 205, 215, new[] { PartCategory.RailPost, PartCategory.RailHandrail, PartCategory.RailMember, PartCategory.RailBasePlate, PartCategory.RailEnvelope }),
     };
 
     /// <summary>Detail layers are split into square tiles (m) so the viewport can draw only tiles near the view.</summary>
@@ -499,6 +500,8 @@ public static class SceneBuilder
                 || (x.Kind == SBM.Core.Substructure.SubElementKind.Pile && x.IsConcrete), 0.6f),
             () => Layer("3D-SUB-PILE", 120, 130, 150, x => x.Kind == SBM.Core.Substructure.SubElementKind.Pile && !x.IsConcrete),
             () => Layer("3D-SUB-COUPLER", 214, 140, 60, x => x.Kind == SBM.Core.Substructure.SubElementKind.Coupler),
+            () => Layer("3D-SUB-MOW-STRIP", 170, 165, 150, x => x.Kind == SBM.Core.Substructure.SubElementKind.MowStrip && x.Assumption == null),
+            () => Layer("3D-UNRESOLVED-SUB", 255, 110, 40, x => x.Kind == SBM.Core.Substructure.SubElementKind.MowStrip && x.Assumption != null, 0.8f),
             () => Layer("3D-DRAINAGE", 90, 170, 200, x => x.Kind is SBM.Core.Substructure.SubElementKind.DeckDrain or SBM.Core.Substructure.SubElementKind.DrainPipe),
             () => Layer("3D-SPLASH-BASIN", 140, 120, 90, x => x.Kind == SBM.Core.Substructure.SubElementKind.SplashBasin),
             // Optional misc items: Ramp G drainage, sign supports, end posts, lighting (items by others as translucent placeholders).

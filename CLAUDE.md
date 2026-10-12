@@ -728,7 +728,7 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   built), bearings along a plan axis (`LongAxisAngleDeg`), PT solids (`ArchPtSystem`, partial `ArchGeneratorDeck.cs`, PartCategory PtStrand / PtAnchorage
   -> IfcTendon / IfcTendonAnchor), deck bars (`ArchDeckRebar` -> `ConcreteModel.Marks/Bars`, `FlutesOnBarGrid`), 2D `Drawing/Views/ArchViews.cs`
   (SheetSet arch branch), flagged steel parts on viewport layer `3D-UNRESOLVED-STEEL`. New PartCategory (appended): FinPlate, CableConnector (UHMW, 940
-  kg/m3, not in SteelMass), ArchConnectionPlate, ArchStiffener, PtStrand, PtAnchorage. Remaining GAPs: bracing U-point gussets (p.129-140), railing,
+  kg/m3, not in SteelMass), ArchConnectionPlate, ArchStiffener, PtStrand, PtAnchorage. Remaining GAPs: bracing U-point gussets (p.129-140), railing details (the RAIL (PED)(HIGH) run on the curbs is an envelope, rail-joints-nht.csx),
   duct, D3 bars, camber. Tests `ArchTests`, `ArchV2Tests`. Knuckle visual check without a snapshot: `temp`-style dump of part triangles + a small
   pymupdf painter's renderer (no matplotlib in the sandbox).
 - Precast PT SEGMENTAL box girder (OPTIONAL `BridgeDefinition.Segmental` = `Bridge/SegmentalDefinition.cs`, omitted from the .sbm when null; design note
@@ -759,6 +759,36 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   datum / projection / zone, map unit, `GridScale` (map / project distance, e.g. 1 / TxDOT SAF) -> IFC IfcProjectedCRS + IfcMapConversion Scale with the
   base point converted to grid units; the model is never moved. NHT: EPSG:2276 x Dallas County SAF 1.000136 (U12 resolved from a user GPS check).
 - NHT model check: `check-nht.csx` 414 PASS / 4 FAIL (2026-10-11; the 4 = arch pier cap / column CY vs the p.102 quantity table, +-0.3 CY).
+  2026-10-12 (branch nht-rail-joints): + section 6 (railing LF by type / side, curb volume, SEJ LF, mow strip CY): 422 PASS / 8 FAIL after build-nht + arch-nht;
+  the 4 new FAILs are reported plan differences (p.91 low rail 579.0 vs the p.84-88 layout 578.88 LF; SEJ LF 111.57 at the full deck width vs 75 + 32 = 107).
+- Pedestrian railing (OPTIONAL `BridgeDefinition.Railings` = list of `Bridge/PedestrianRailingDefinition.cs`, null = none, omitted from the .sbm): generic run
+  along a REFERENCE LINE at a constant alignment offset (outward = side of the offset), limits = radial lines at Begin/EndStation, else the deck end lines,
+  else the first / last support line + Begin/EndLimitOffset (arch: no deck result); base = highest top of the bridge's concrete under the line at `BaseProbe`
+  (`Railing/TopSurface`: deck, haunches incl. arch curbs, barriers / curbs, deck bumps; ends searched a few cm inward on skewed ends; no concrete = warning,
+  run not built). Components: `Envelope` (section swept continuously = placeholder of a railing whose post / fence details are missing, mass from
+  `EnvelopeMassPerLength`), `Post` (side outline polygon extruded `Thickness` along the rail, plumb, n = ceil((L - 2e)/s) + 1 equally spaced) + `BasePlate`
+  + anchor bolts (`BoltInstance` Anchor), `Members` (pipe / bar handrail and rails, `MassPerLength` override), `Unresolved` / per-component `Unresolved` +
+  `Basis` (-> `SteelPart.Assumption`, layer 3D-UNRESOLVED-STEEL, IFC SBM_Status, DB status props). Generator `Railing/PedestrianRailingGenerator.cs`
+  (`RailingModel`: runs with length along the reference line, posts, mass), run in `RegenerationCache` phase 1 after steel / prestressed / arch for every
+  bridge kind; parts merged into the bridge's `SteelModel` (created for prestressed bridges without one) + `SteelModel.Railings`. New `PartCategory`
+  (appended) RailPost, RailHandrail, RailMember, RailBasePlate, RailEnvelope (excluded from `SteelMass`: `SteelModel.IsRailing`), `AssemblyKind.Railing`,
+  `SteelAssembly.PredefinedType/ObjectType`, `SteelPart.Density`. IFC: one IfcRailing per run (GUARDRAIL / HANDRAIL / FENCE / BALUSTRADE, ObjectType = type
+  name) aggregating IfcMember POST / MEMBER, IfcRailing HANDRAIL, IfcPlate BASE_PLATE, IfcRailing 'RAILING_ENVELOPE', anchor IfcMechanicalFastener.
+  Database: group "Pedestrian railings" > assemblies "pedestrian railing". Viewport layer 3D-PED-RAILING; quantity table rows by type (LF). Tests `PedestrianRailingTests`.
+- Curbs: custom barrier with `BarrierDefinition.IsCurb` (OPTIONAL) -> solids "Left/Right curb", IFC IfcKerb (USERDEFINED, ObjectType = ProfileName), DB category "curb".
+- Sealed joints without blockout (OPTIONAL `ExpansionJointDefinition` fields): `ExpansionJointType.Sealed` (appended), `BlockoutWidth` 0 = no blockout (deck not
+  cut back, no blockout element in IFC / DB), `BodyCentered` (device envelope +-GapAt50F/2 about the deck-end line, for plans that dimension the slab to the
+  CL joint), `Designation`, `PlanLength` (check), `Unresolved` / `Basis` (-> `ExpansionJointResult.Assumption`, IFC SBM_Status, DB status).
+- Mow strips (OPTIONAL `SubstructureDefinition.MowStrip` = `Bridge/MowStripDefinition.cs`): ring Width beyond each face of a rectangular column, Thickness,
+  top = TopElevation or foundation top + TopAboveFoundation; `SubElementKind.MowStrip` (appended) -> IFC IfcSlab 'MOW_STRIP', DB "mow strip", layer
+  3D-SUB-MOW-STRIP (flagged: 3D-UNRESOLVED-SUB); `SubSolid.Assumption` (OPTIONAL, IFC SBM_Status / DB status).
+- NHT railing / curbs / joints / mow strips: `samples/plans/rail-joints-nht.csx` (hooked at the end of build-nht.csx before its regeneration and in arch-nht.csx
+  before its final regeneration; works on whatever NHT bridges exist). Curbs 10" x 4" with 3/4" chamfers (p.89, 113, 83). RAIL (PED) LOW / HIGH on the curb
+  line (7'-0 from CL NHT = the p.84-88 "face of rail", LF reproduced to 0.006 ft per side), sections from the p.89 page VECTORS (1.5 pt/in) as flagged
+  envelopes (posts / spacing / plates / anchors UNRESOLVED: railing detail sheets not in the set, p.84 note 2 "diagrammatic"), mass = p.83 design dead load
+  50 / 100 PLF, handrail top 3'-0 (dimensioned, pipe scaled). SEJ-B(MOD) at 7 joints: 4 in placeholder centred on the CL SEJ, no blockout (standards not in
+  set). Mow strips 2'-0 x 4" at the 12 approach piers (6.12 CY vs 6.1, top EL. D + 1'-0 flagged). T80SS(MOD) arch pier barrier NOT modeled (UNRESOLVED).
+  The older GAP lines in build-nht.csx about rail / curb / joints / mow strips are superseded by this script's output.
 
 ## Conventions (bridge engineering)
 - Offsets right-positive (Civil 3D). Skew from the radial line; positive = right end of support line up-station.

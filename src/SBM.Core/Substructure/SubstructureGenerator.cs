@@ -467,6 +467,7 @@ public sealed partial class SubstructureGenerator
                     + (sec.Length == 12 ? $" + {Sh(sd.ColumnProjectionS)} x {Sh(sd.ColumnProjectionWidth)} projections on both S faces" : "");
                 unit.Solids.Add(new SubSolid(SubElementKind.Column, $"{sl.Name} column {k + 1}", $"Column {size}, {L(topZ - fTop)} high", cm));
                 AddFoundation(unit, sd, cs, nc, fTop, groundZ, k + 1);
+                if (sd.MowStrip is { } ms) BuildMowStrip(unit, sl.Name, sd, ms, cs, nc, fTop, k + 1);
                 k++;
             }
         }
@@ -483,6 +484,41 @@ public sealed partial class SubstructureGenerator
             }
         }
         return unit;
+    }
+
+    // ================================================================== mow strip around a column (OPTIONAL)
+
+    /// <summary>Closed ring solid around a rectangular column: <see cref="MowStripDefinition.Width"/> beyond each face, flat top.</summary>
+    private void BuildMowStrip(SubstructureUnit unit, string name, SubstructureDefinition sd, MowStripDefinition ms, double cs, double nc, double fTop, int col)
+    {
+        if (sd.ColumnShape != ColumnShape.Rectangular) { Warn($"{name}: mow strip needs a rectangular column; not built."); return; }
+        if (ms.Width <= 0 || ms.Thickness <= 0) { Warn($"{name}: mow strip width / thickness not given; not built."); return; }
+        double? top = ms.TopElevation ?? (ms.TopAboveFoundation is double above ? fTop + above : null);
+        if (top == null) { Warn($"{name}: mow strip top elevation not given; not built."); return; }
+        double hw = sd.ColumnWidth / 2, hd = sd.ColumnDepth / 2, w = ms.Width;
+        Vec2[] inner = { new(-hw, -hd), new(hw, -hd), new(hw, hd), new(-hw, hd) };
+        Vec2[] outer = { new(-hw - w, -hd - w), new(hw + w, -hd - w), new(hw + w, hd + w), new(-hw - w, hd + w) };
+        double z1 = top.Value, z0 = z1 - ms.Thickness;
+        var m = new Mesh();
+        Vec3 V(Vec2 q, double z) => unit.World(cs + q.X, nc + q.Y, z);
+        // vertices: outer top 0-3, inner top 4-7, outer bottom 8-11, inner bottom 12-15 (S x N frame is right-handed: S right, N up-station)
+        foreach (var q in outer) m.Add(V(q, z1));
+        foreach (var q in inner) m.Add(V(q, z1));
+        foreach (var q in outer) m.Add(V(q, z0));
+        foreach (var q in inner) m.Add(V(q, z0));
+        for (int i = 0; i < 4; i++)
+        {
+            int j = (i + 1) % 4;
+            m.Tri(i, j, 4 + j); m.Tri(i, 4 + j, 4 + i);                 // top ring
+            m.Tri(8 + i, 12 + j, 8 + j); m.Tri(8 + i, 12 + i, 12 + j);  // bottom ring
+            m.Tri(i, 8 + i, 8 + j); m.Tri(i, 8 + j, j);                 // outer wall
+            m.Tri(4 + i, 4 + j, 12 + j); m.Tri(4 + i, 12 + j, 12 + i);  // inner wall
+        }
+        if (m.Volume() < 0) for (int t = 0; t < m.Indices.Count; t += 3) (m.Indices[t + 1], m.Indices[t + 2]) = (m.Indices[t + 2], m.Indices[t + 1]);
+        unit.Solids.Add(new SubSolid(SubElementKind.MowStrip, $"{name} mow strip {col}",
+            $"Mow strip {Sh(ms.Width)} wide each face of the column, {Sh(ms.Thickness)} thick, top {El(z1)}{(ms.Source.Length > 0 ? $" ({ms.Source})" : "")}", m)
+        { Assumption = ms.Unresolved is { Length: > 0 } why ? Assumption.Unresolved(why, ms.Basis ?? "as modeled") : null });
+        if (ms.Unresolved is { Length: > 0 } wy && col == 1) Warn($"{name}: {wy}");
     }
 
     // ================================================================== cap section step (aesthetic relief curve)

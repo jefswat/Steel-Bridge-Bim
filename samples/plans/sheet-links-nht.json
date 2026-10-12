@@ -247,12 +247,20 @@
       "target": [ { "level": "assembly", "category": "hanger", "bridge_group": "Arch span 10" }, { "level": "element", "category": "cable fin plate" } ] },
     { "id": "arch-deck", "sheets": "^ARCH SPAN DECK", "basis": "Arch deck plan / section / pour sequence / bars / PT; 3\" x 8\" 12 ga steel deck forms, curbs",
       "target": [ { "level": "part", "category": "deck", "bridge_group": "Arch span 10" }, { "level": "assembly", "category": "deck form", "bridge_group": "Arch span 10" } ] },
+    { "id": "ped-railing", "sheets": "^(TYPICAL SECTIONS APPROACH SPANS|TYPICAL SECTIONS ARCH SPAN|BRIDGE LAYOUT|BRIDGE GENERAL NOTES|BRIDGE SUMMARY OF QUANTITIES)", "basis": "RAIL (PED)(LOW) 4'-3 / (HIGH) 9'-10 posts on the curbs, handrail 3'-0, limits and LF (p.84-89), AISI 316, 50 / 100 PLF (p.83), 579.0 / 1,144.2 LF (p.91); railing detail sheets not in the set",
+      "target": [ { "level": "assembly", "category": "pedestrian railing" }, { "level": "assembly", "category": "pedestrian railing", "bridge_group": "Arch span 10" } ] },
+    { "id": "curbs", "sheets": "^(TYPICAL SECTIONS APPROACH SPANS|107\\.88' PRESTR|97\\.00' PRESTR|162\\.92' PRESTR|122\\.45' PRESTR|168\\.00' PRESTR)", "basis": "10\" x 4\" curbs at the deck edges (p.89 typical sections, p.109-117 typical transverse sections)",
+      "target": [ { "level": "element", "category": "curb" } ] },
+    { "id": "sej-joints", "sheets": "^(BRIDGE LAYOUT|BRIDGE SUMMARY OF QUANTITIES|107\\.88' PRESTR|97\\.00' PRESTR|162\\.92' PRESTR|122\\.45' PRESTR|168\\.00' PRESTR)", "basis": "SEJ-B(MOD)(4\") + BS-EJCP at Abut 1, P4, P7, P10, P11, P13, Abut 16 (p.84-88), 107 LF / 1,382 lb (p.91), CL SEJ 9 1/4\" from CL Pier 10 / 11 (p.113, 115); standards not in the set",
+      "target": [ { "level": "group", "category": "joint" } ] },
+    { "id": "mow-strips", "sheets": "^(PIERS 2-5, 8, 9, 12 & 13 DETAILS|PIERS 6 & 7, 14 & 15 DETAILS|BRIDGE SUMMARY OF QUANTITIES)", "basis": "Mow strip detail: 4\" reinforced concrete, 2'-0 max each face of column (p.97, 99); riprap (mow strip)(4 in) 6.1 CY (p.91)",
+      "target": [ { "level": "element", "category": "mow strip" } ] },
     { "id": "ignd", "sheets": "^PRESTRESSED CONCRETE I-GIRDER DESIGNS", "basis": "IGND design table: strands, depressed strands, f'ci / f'c per span",
       "target": [ { "level": "assembly", "category": "prestressed girder" } ] }
   ],
 
   "hints": [
-    { "sheets": "TRAFFIC BARRIER", "suggests": "T80SS(MOD) traffic barrier on the arch piers: not modeled (GAP)." },
+    { "sheets": "TRAFFIC BARRIER", "suggests": "T80SS(MOD) traffic barrier on the arch piers: not modeled - UNRESOLVED (p.105-106: T80SS standard not in the set, existing US 75 pavement elevation not given)." },
     { "sheets": "^(PROJECT LAYOUT|PROPOSED TYPICAL|SUMMARY OF QUANTITIES|PLAN & PROFILE|GRADING|PARKING|RETAINING|AESTHETIC|DRAINAGE|NORTHAVEN TRAIL PHASE|CITY OF DALLAS|TRAIL|SIDEWALK|CONC TRAFFIC|SPECIAL CONCRETE|TXDOT STD)", "suggests": "Roadway / walls / drainage / utility sheets: no bridge model elements." }
   ]
 }

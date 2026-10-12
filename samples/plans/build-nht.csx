@@ -507,6 +507,7 @@ G("T80SS(MOD) traffic barrier on the arch piers (p.105-106, 78 LF) not modeled."
       "The p.102 pedestal tops are modeled; differences reported per pedestal.");
 }
 
+{ var rj = await SBM.Api.ScriptHost.RunFileAsync(@"samples\plans\rail-joints-nht.csx", Doc, Args); Print(rj.Output.TrimEnd()); if (!rj.Success) Print("ERROR in rail-joints-nht.csx: " + rj.Error); }   // curbs, RAIL (PED), SEJ-B(MOD) joints, mow strips
 // ================================================================ 6. regenerate, report, save
 var rep = Doc.Regenerate();
 foreach (var e in rep.Errors) Print("ERROR " + e);

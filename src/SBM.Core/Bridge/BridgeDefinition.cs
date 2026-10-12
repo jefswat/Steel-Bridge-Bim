@@ -518,6 +518,10 @@ public sealed class BarrierDefinition
     /// <summary>Plan length of the barrier along the toe (gutter) line (bid length), for the check; null = none.</summary>
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
     public double? PlanLength { get; set; }
+    /// <summary>The custom section is a CURB (low concrete curb along the deck edge, e.g. under a pedestrian railing), not a traffic barrier:
+    /// IFC IfcKerb instead of IfcRailing GUARDRAIL, database category "curb". OPTIONAL, omitted from the .sbm when false.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    public bool IsCurb { get; set; }
 
     public BarrierDefinition Clone()
     {
@@ -1187,6 +1191,10 @@ public sealed class BridgeDefinition
     /// (<see cref="SurfaceTreatmentDefinition"/>); null = none.</summary>
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
     public List<SurfaceTreatmentDefinition>? SurfaceTreatments { get; set; }
+    /// <summary>OPTIONAL pedestrian / bicycle railing runs (posts, rails, base plates, anchor bolts or a placeholder envelope) along reference lines
+    /// (<see cref="PedestrianRailingDefinition"/>); null = none. Built by <c>Railing.PedestrianRailingGenerator</c> into the bridge's steel model.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public List<PedestrianRailingDefinition>? Railings { get; set; }
 
     /// <summary>A typical two-span continuous layout starting at the given station.</summary>
     public static BridgeDefinition CreateDefault(double beginStation, string alignmentName)
@@ -1283,5 +1291,6 @@ public sealed class BridgeDefinition
         Arch = Arch?.Clone(),
         Segmental = Segmental?.Clone(),
         SurfaceTreatments = SurfaceTreatments?.Select(t => t.Clone()).ToList(),
+        Railings = Railings?.Select(r => r.Clone()).ToList(),
     };
 }
