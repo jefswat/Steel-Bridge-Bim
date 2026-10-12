@@ -721,8 +721,14 @@ public sealed partial class SubstructureGenerator
         var mesh = new Mesh();
         MeshBuilder.AddLoft(mesh, outline, new[] { bot, top });
         double hMax = outline.Max(q => Top(q.X) - Bot(q.X, q.Y));
-        unit.Solids.Add(new SubSolid(cb.Kind == CapBlockKind.Maskwall ? SubElementKind.Maskwall : SubElementKind.Cap, $"{name} {what}",
-            $"{(cb.Kind == CapBlockKind.Maskwall ? "Maskwall" : "Cap block")} '{what}' on the cap {(cb.Base == CapBlockBase.CapTop ? "top" : "soffit")}, top {El(outline.Min(q => Top(q.X)))} .. {El(outline.Max(q => Top(q.X)))}, up to {Sh(hMax)} high{(cb.Source != "" ? $" ({cb.Source})" : "")}", mesh));
+        foreach (var r in cb.Reported ?? new()) Warn($"{name}: {what}: {r}");
+        if (cb.Kind == CapBlockKind.Pedestal)
+        {
+            double ss = cb.SeatS ?? outline.Average(q => q.X), sn = cb.SeatN ?? outline.Average(q => q.Y);
+            unit.FixedSeats.Add(new FixedSeatInfo(what, ss, sn, Top(ss)));
+        }
+        unit.Solids.Add(new SubSolid(cb.Kind == CapBlockKind.Maskwall ? SubElementKind.Maskwall : cb.Kind == CapBlockKind.Pedestal ? SubElementKind.Pedestal : SubElementKind.Cap, $"{name} {what}",
+            $"{(cb.Kind == CapBlockKind.Maskwall ? "Maskwall" : cb.Kind == CapBlockKind.Pedestal ? "Fixed-elevation pedestal" : "Cap block")} '{what}' on the cap {(cb.Base == CapBlockBase.CapTop ? "top" : "soffit")}, top {El(outline.Min(q => Top(q.X)))} .. {El(outline.Max(q => Top(q.X)))}, up to {Sh(hMax)} high{(cb.Source != "" ? $" ({cb.Source})" : "")}", mesh));
     }
 
     private static Vec2[] ColumnSection(SubstructureDefinition sd)

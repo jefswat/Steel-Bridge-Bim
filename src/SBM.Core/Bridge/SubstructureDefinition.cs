@@ -124,7 +124,10 @@ public sealed class CapProfilePoint
     public CapProfilePoint(double s, double elevation) { S = s; Elevation = elevation; }
 }
 
-public enum CapBlockKind { Cap, Maskwall }
+/// <summary>Cap = concrete added to the cap; Maskwall; Pedestal = a bearing pedestal whose TOP is a fixed plan elevation (not driven by the
+/// superstructure seats, e.g. the arch-span pedestals of an arch pier built by a separate model): its seat point is published on
+/// <c>SubstructureUnit.FixedSeats</c> for whatever is built on it.</summary>
+public enum CapBlockKind { Cap, Maskwall, Pedestal }
 public enum CapBlockBase { CapTop, CapBottom }
 
 /// <summary>
@@ -143,9 +146,20 @@ public sealed class CapBlockDefinition
     public double TopSlopeS { get; set; }
     /// <summary>Plan reference (page / detail) for the description.</summary>
     public string Source { get; set; } = "";
+    /// <summary>OPTIONAL, <see cref="CapBlockKind.Pedestal"/>: the bearing (seat) point on the block top in cap coordinates (e.g. CL bearing x
+    /// CL bearing line); null = the outline vertex average.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public double? SeatS { get; set; }
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public double? SeatN { get; set; }
+    /// <summary>OPTIONAL plan differences about this block (e.g. the top does not reconcile with the bearing stack); each is raised as a
+    /// generator warning, nothing is adjusted.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public List<string>? Reported { get; set; }
     public CapBlockDefinition Clone() => new()
     {
         Name = Name, Kind = Kind, Outline = Outline.Select(p => p.Clone()).ToList(), Base = Base, TopElevation = TopElevation, TopRefS = TopRefS, TopSlopeS = TopSlopeS, Source = Source,
+        SeatS = SeatS, SeatN = SeatN, Reported = Reported?.ToList(),
     };
 }
 
