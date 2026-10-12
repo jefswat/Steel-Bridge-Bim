@@ -176,6 +176,8 @@ public partial class MainWindow : Window
                         return;
                     }
                     if (_lodBusy && ++lodWaits < 120) { t2.Interval = TimeSpan.FromMilliseconds(500); return; } // let the near-view rebar finish
+                    // terrain / references (loaded after the scene) and a scene rebuilt by the memory manager
+                    if ((_vm.Project.References.Count > 0 && _vm.ReferenceLoads == 0 || _vm.IsBusy) && ++lodWaits < 240) { t2.Interval = TimeSpan.FromMilliseconds(500); return; }
                     t2.Stop();
                     if (args.Contains("--noterrain")) SetTerrainVisible(false); // terrain may have finished loading after the first call
                     // --pickafter fx,fy / --hideafter fx,fy: like --pick / --hide but once the near-view rebar is in place.

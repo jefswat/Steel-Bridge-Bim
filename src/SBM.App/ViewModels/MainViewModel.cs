@@ -733,6 +733,8 @@ public sealed partial class MainViewModel : ObservableObject
     private List<string> _refLayers = new();
     public event Action<List<ReferenceRender>>? ReferencesReady;
     private List<ReferenceRender> _lastRenders = new();
+    /// <summary>Completed reference loads (snapshot runs wait for the first one).</summary>
+    public int ReferenceLoads { get; private set; }
     /// <summary>The reference renders last handed to the viewport.</summary>
     public IReadOnlyList<ReferenceRender> ReferenceRenders => _lastRenders;
     public IReadOnlyList<(string name, bool planOnly, bool threeDOnly)> ReferenceLayerModes { get; private set; } = Array.Empty<(string, bool, bool)>();
@@ -908,6 +910,7 @@ public sealed partial class MainViewModel : ObservableObject
         if (Scene != null) RebuildLayers(Scene);
         RebuildExplorer();
         RebuildReports();
+        ReferenceLoads++;
         ReferencesReady?.Invoke(renders);
         if (defs.Count > 0) StatusText = $"Loaded {renders.Count} reference model(s), {renders.Sum(r => r.Triangles):N0} triangles in {sw.ElapsedMilliseconds} ms";
     }

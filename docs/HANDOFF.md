@@ -41,6 +41,74 @@ Use this to start the next session. Architecture notes are in `CLAUDE.md`. The u
     PDF 85 Superstructure Notes = 15/16" holes, 7/8" bolts. Helpers: `tools\words_near.py` (locate words), `tools\notes_probe.py` (note blocks).
   - Temp files (scripts, rasters, snapshots, test models) go in `temp\` (user preference).
 
+## 0-vram. Viewport GPU memory manager + Ramp G split assessment (2026-10-11, branch viewport-vram)
+
+### Viewport memory (done)
+Measured on I-80 WB + Ramp G with the 1 m DEM and the ortho image (estimates use HelixToolkit's buffer layouts; DXGI = measured):
+
+| | before | after (full detail) | at a 900 MB budget |
+|---|---|---|---|
+| GPU buffers, estimated | 8,068 MB, 78.5 M tri | 5,475 MB, 71.2 M tri | ~610 MB planned, 460 MB resident |
+| of which steel / rebar / terrain+contours+image | 4,088 / 3,330 / 416 MB | 3,327 / 1,573 / 416 MB | plates without holes, far tiles released |
+| DXGI local usage at the snapshot | 5,534 MB (terrain not loaded yet) | 6,912 MB (terrain + 2nd scene build) | 325 MB |
+| snapshot of the full model | OK, 54 s | OK, 63 s | OK, 72 s (+10 s scene rebuild without holes) |
+
+Findings: terrain is NOT the problem (~0.4 GB). Bolt holes are: ~324 k holes x (16-sided wall + faces around it) are ~90 % of the steel
+triangles (splice plates alone 1.7 GB). Rebar was a capped prism per segment. Changes: shared vertices for flat-shaded faces (steel -19 %),
+one mitred loft per bar (rebar -53 %), and the degradation ladder (Memory menu / status bar), each level includes the ones before:
+terrain clipped 400 m around the bridges + image 2048 px -> terrain every 2nd / 3rd point -> bolts/studs/welds/rebar only within 120 m
+(far tiles REMOVED from the viewport so their buffers are freed; HelixToolkit only creates buffers when a model is first drawn, so
+hidden-but-attached tiles filled the GPU as the user orbited) -> steel plates without bolt holes (5.1 -> 2.0 GB) -> detail within
+60 m -> bridges (units) farther than 150 m from the line of sight keep primary members only -> terrain every 8th point -> detail within
+30 m -> terrain off -> detail off. GPU out-of-memory render errors and DXGI usage over the budget step one level further; running out
+of RAM while building the scene rebuilds it without detail layers. Still open: the second regeneration after terrain loads (ground
+version) builds the scene twice and DXGI shows the old buffers for a while; CPU working set is still ~13 GB peak (meshes are kept on
+the CPU for picking / section cuts / snaps); rebar as lines far away and a merged outer-shell LOD were not needed for the budget.
+
+### Splitting Ramp G into its own model, and referencing it back at a chosen LOD (assessment, not implemented)
+How the two are coupled today (one .sbm, 7 "bridges" = I-80 WB Units 1-3 + Ramp G Units 1-4, 2 alignments):
+- **Shared supports.** Every unit-to-unit pier is a `SharedPier` pair inside one road (5WB, 11WB, 5G, 9G, 14G). The only I-80 / Ramp G
+  coupling is **"Pier 11WB & 19G"**: I-80 Units 2/3 (Pier 11WB, `PierCenterOffset` +-0.508) and Ramp G Unit 4 (Pier 19G) are side-by-side
+  as-designed caps on one line. `RegenerationCache` phase 2 makes each support with a CapProfile an owner of its own cap and passes
+  the other bridges' seats (`ForeignSeats`) so seats beyond a cap are reported ("14 bearing seats on the shared line are beyond this
+  cap"). The elevation check also reads the other bridges' units (`SbmDocument.BearingElevations` -> `others`).
+- **Alignments**: separate (I-80 WB, Ramp G), no cross-reference; the Ramp G deck edge / kink scripts use only Ramp G.
+- **Terrain**: one reference (DEM + ortho) used by both; foundation tops / drains read it (`GroundVersion`).
+- **Database / sheets**: `sheet-links-i80-rampg.json` has `models: ["I-80 WB and Ramp G.sbm"]` and rules for both roads; group keys
+  derive from the project name.
+- **IFC**: GlobalIds are hashes of keys that start with the PROJECT name (`IfcKeys.Project(key)`, key = project.Name) + bridge name;
+  the base point is the first bridge's deck center. One IfcProject/IfcSite holds both alignments.
+- **Scripts**: `piers-ramp-g.csx`, `cross-frames-ramp-g.csx`, `joints-ramp-g.csx`, `deck-rebar-ramp-g.csx`, ... already address the Ramp G
+  bridges by name; the I-80 ones likewise; a few shared ones (`deck-end-kinks.csx`, `girder-end-daps.csx`, `lighting.csx`, `end-posts.csx`,
+  `camber-*.csx`) touch both.
+
+Estimate:
+1. **Split the .sbm into two projects** - small, ~0.5-1 day. A `sbm split` / script: copy the project, keep the Ramp G alignment + 4
+   bridges + the terrain reference in one file and the I-80 ones in the other (pure JSON surgery on the DTOs). Work items: (a) Pier
+   11WB & 19G - each file still models its own cap, but the seats of the other road are gone, so the "seats beyond this cap" report and
+   the elevation-chain `others` comparison at that line disappear (no geometry change, a checking loss) unless (2) feeds them back;
+   (b) a sheet-links file per model (or `models` listing both names) - the rules already separate by bridge name; (c) IFC: keep the
+   original key (add an optional `IfcKey` project field, default = name) so GlobalIds of the existing elements do not change - the
+   database keys use the same patterns (`GlobalIds_AreTheIfcGlobalIds` test); (d) base point: give both files the same explicit base
+   point (new optional project field) so separate IFC exports overlay in local coordinates too (MapConversion is right either way);
+   (e) split the mixed scripts or make them skip missing bridges (most already look bridges up by name).
+2. **Linked model reference** (a .sbm referenced into another project, read-only, at a chosen LOD) - medium, ~3-5 days. New
+   `ReferenceKind.Model` on `ReferenceModelDefinition` (path to the .sbm, LOD = primary members only / steel without holes / full,
+   visible, offsets 0). Load = `SbmDocument.Open` + `RegenerationCache.Regenerate` on a background thread (cached by file time + a
+   hash of the project JSON), then `SceneBuilder` per bridge with the LOD switches that exist now (plates without holes, no detail
+   layers, primary-layer filter = `VramPlanner.PrimaryLayers`), drawn in the reference layer group (`REF-<name>`), pickable read-only
+   (properties show the source file), snappable, never exported, not in quantities. Its framings could also be handed to the host's
+   phase-2 substructure as `ForeignSeats` (shared-line checks at Pier 11WB & 19G keep working) - that needs the linked model's bridge
+   names / SharedPier ids to match (they do today).
+Risks: **shared supports** - the shared pier line must not be modeled twice with different inputs (today each cap is owned by one file,
+which works; a non-designed shared pier, i.e. without CapProfile, would be built by BOTH files - add a warning); **georeference** - both
+files must share units, foot definition (international) and coordinate system; nothing in the file says so (add a check on load);
+**IFC export** - separate exports change GlobalIds unless the key is kept (see 1c); a federated export of a linked model is out of
+scope (export each file); **database** - one companion db per file; cross-model sheet links (the plans number both roads in one
+set) and `v_element_sheets` must accept that the other road's elements are absent; **regeneration time** - a linked I-80 model costs
+~25-40 s once per change of the referenced file (cache it on disk if that hurts); **memory** - a linked model at full LOD costs the
+same GPU memory as today; primary LOD costs ~15 % of it (bridge breakdown in the VRAM log).
+
 ## 0a. State at the end of 2026-10-10 (evening) — START HERE
 
 - **2026-10-11 (branch fix-i80-items): four user items on the sample model, all re-run** (`abutments-i80.csx`, `abutments-ramp-g.csx`, new `girder-end-daps.csx`,
