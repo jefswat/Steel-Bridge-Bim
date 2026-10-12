@@ -87,7 +87,11 @@ public sealed partial class SteelModelGenerator
             g._model.Nurbs = new NurbsReport { Tolerance = g._fitTol };
         }
         var sw = Stopwatch.StartNew();
-        if (!framing.HasErrors && framing.Girders.Count > 0) g.Run();
+        if (!framing.HasErrors && framing.Girders.Count > 0)
+        {
+            if (framing.Definition.Girders.IsTub) g.RunTub();   // OPTIONAL tub girders (TubGirderGenerator.cs); the I-girder path below is unchanged
+            else g.Run();
+        }
         g._model.Assemblies.AddRange(g._assemblies.OrderBy(a => a.Kind).ThenBy(a => a.Mark, MarkComparer.Instance));
         g._model.CrossFrameDetails.AddRange(g._cfDetails.OrderBy(c => c.Mark, MarkComparer.Instance));
         g._model.Parts.AddRange(g._parts.OrderBy(p => p.Assembly, MarkComparer.Instance).ThenBy(p => p.Mark, MarkComparer.Instance));

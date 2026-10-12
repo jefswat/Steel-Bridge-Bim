@@ -383,6 +383,10 @@ public sealed class GirderLayoutDefinition
     public GirderKind Kind { get; set; } = GirderKind.SteelPlate;
     public PrestressedBeamDefinition Prestressed { get; set; } = new();
     [System.Text.Json.Serialization.JsonIgnore] public bool IsPrestressed => Kind == GirderKind.TxDotPrestressed;
+    /// <summary>OPTIONAL steel tub (box) girders (<see cref="TubGirderDefinition"/>); null = steel I-girders. Omitted from the .sbm when null.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public TubGirderDefinition? Tub { get; set; }
+    [System.Text.Json.Serialization.JsonIgnore] public bool IsTub => Tub != null && Kind == GirderKind.SteelPlate;
 
     public IReadOnlyList<double> UniformOffsets()
     {
@@ -408,6 +412,7 @@ public sealed class GirderLayoutDefinition
         Camber = Camber.Select(t => t.Clone()).ToList(),
         Beginnings = Beginnings.Select(t => t.Clone()).ToList(),
         CrossGirder = CrossGirder.Clone(),
+        Tub = Tub?.Clone(),
     };
 }
 

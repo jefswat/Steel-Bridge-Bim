@@ -435,6 +435,7 @@ public sealed partial class ConcreteGenerator
 
     private void BuildHaunches()
     {
+        if (_def.Girders.IsTub) { BuildTubHaunches(); return; }   // OPTIONAL tub girders: one haunch over each top flange (ConcreteTubHaunch.cs)
         var mesh = new Mesh();
         foreach (var g in _f.Girders)
         {

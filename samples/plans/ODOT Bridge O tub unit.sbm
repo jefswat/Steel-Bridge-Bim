@@ -1,0 +1,2652 @@
+{
+  "Version": 1,
+  "Name": "ODOT Bridge O tub unit",
+  "UnitSystem": "US",
+  "Foot": "International",
+  "Alignments": [
+    {
+      "Name": "CL Ramp 44F",
+      "Description": "CL Ramp 44F = profile grade line (Bridge O, curve no. 9 arc; PC/PT not printed U1; local grid U2)",
+      "StartStation": 9184.757856000002,
+      "StationEquations": [],
+      "Elements": [
+        {
+          "X": 644223.7053243511,
+          "Y": 58864.065110949006,
+          "Angle": 1.172211998748295,
+          "Length": 167.4967439999998,
+          "K0": 0.0037220097053934035,
+          "K1": 0.0037220097053934035
+        }
+      ],
+      "PiDefinition": null,
+      "Profile": {
+        "Vpis": [
+          {
+            "Station": 9184.757856000002,
+            "Elevation": 346.2262836192,
+            "LengthIn": 0,
+            "LengthOut": 0
+          },
+          {
+            "Station": 9226.296,
+            "Elevation": 345.00921600000004,
+            "LengthIn": 30.48,
+            "LengthOut": 30.48
+          },
+          {
+            "Station": 9352.2546,
+            "Elevation": 344.2912519800001,
+            "LengthIn": 0,
+            "LengthOut": 0
+          }
+        ],
+        "IsEmpty": false
+      },
+      "CrossSlope": {
+        "Rows": [
+          {
+            "Station": 9184.757856000002,
+            "LeftSlope": -0.06,
+            "RightSlope": 0.06,
+            "LeftBreak": 0,
+            "LeftOuterSlope": "NaN",
+            "RightBreak": 0,
+            "RightOuterSlope": "NaN",
+            "LeftMoreBreaks": null,
+            "RightMoreBreaks": null
+          }
+        ],
+        "PivotOffset": 0
+      }
+    }
+  ],
+  "Bridges": [
+    {
+      "Name": "Bridge O spans 14-16 (steel tub unit)",
+      "AlignmentName": "CL Ramp 44F",
+      "Structure": "Bridge O (Ramp 44F over I-44 \u0026 Ramps 44N, 44M2)",
+      "Supports": [
+        {
+          "Name": "Pier 13",
+          "Type": "Pier",
+          "Station": 9191.181105735868,
+          "SkewDegrees": 21.348184572959344,
+          "DeckEndOffset": 0.3048,
+          "GirderEndExtension": 0.2460625,
+          "SharedPier": "",
+          "PierCenterOffset": 0,
+          "Fixity": "GuidedExpansion",
+          "ResolvedFixity": "GuidedExpansion",
+          "GirderFixities": null,
+          "Bearings": null,
+          "Substructure": {
+            "Enabled": false,
+            "CapWidth": 1.2192,
+            "CapDepth": 1.2192,
+            "CapEndOverhang": 0.762,
+            "CapOffset": 0,
+            "CapProfile": [],
+            "CapProfileAhead": [],
+            "CapBlocks": [],
+            "Aesthetics": null,
+            "TopShape": "Sloped",
+            "CapSlope": "NaN",
+            "CrownOffset": "NaN",
+            "BottomShape": "ParallelToTop",
+            "MinPedestalHeight": 0.07619999999999999,
+            "PedestalProjection": 0.07619999999999999,
+            "MaxPedestalHeight": 0.45720000000000005,
+            "PedestalSizeAlong": 0,
+            "PedestalSizeAcross": 0,
+            "PedestalShared": false,
+            "PedestalSizeAcrossAhead": 0,
+            "PedestalRowJoint": "NaN",
+            "PedestalSideAngleDeg": 0,
+            "ColumnCount": 3,
+            "ColumnSpacings": [
+              4.572,
+              4.572
+            ],
+            "FirstColumnOffset": "NaN",
+            "ColumnShape": "Round",
+            "ColumnDiameter": 0.9144000000000001,
+            "ColumnWidth": 0.9144000000000001,
+            "ColumnDepth": 0.9144000000000001,
+            "ColumnChamferS": 0,
+            "ColumnChamferN": 0,
+            "ColumnProjectionS": 0,
+            "ColumnProjectionWidth": 0,
+            "ColumnFlareElevation": "NaN",
+            "ColumnFlareWidth": 0,
+            "ColumnFlareDepth": 0,
+            "ColumnFlareChamferS": 0,
+            "ColumnFlareChamferN": 0,
+            "Foundation": "DrilledShaft",
+            "FoundationTopElevation": "NaN",
+            "GroundCover": 0.3048,
+            "ShaftDiameter": 1.0668,
+            "ShaftLength": 12.192,
+            "FootingLength": 3.048,
+            "FootingWidth": 3.048,
+            "FootingThickness": 0.9144000000000001,
+            "PileType": "SteelHP",
+            "PileSection": "HP14x73",
+            "PileSize": 0.4572,
+            "PileShellThickness": "NaN",
+            "PileRows": 3,
+            "PileColumns": 3,
+            "PileSpacing": 0.9144000000000001,
+            "PileLength": 15.24,
+            "PileEmbedment": 0.30479999999999996,
+            "Footings": [],
+            "BearingToCapFront": 0.45720000000000005,
+            "BackwallThickness": 0.3048,
+            "BackwallGap": 0.0254,
+            "BackwallTopBelowGrade": 0,
+            "AbutmentFoundationCount": 4,
+            "AbutmentFoundationSpacing": 3.6576000000000004,
+            "Abutment": null,
+            "Reinforcement": {
+              "Enabled": true,
+              "ConcreteStrengthKsi": 3.6,
+              "SteelYieldKsi": 60,
+              "EpoxyCoated": false,
+              "CapCover": 0.0508,
+              "ColumnCover": 0.0635,
+              "ShaftCover": 0.07619999999999999,
+              "FootingCover": 0.07619999999999999,
+              "FootingSideClear": 0.0508,
+              "FootingTopClear": 0.07619999999999999,
+              "PileTopClear": 0.0254,
+              "CapTopBarCount": 7,
+              "CapTopBarSize": "#11",
+              "CapBottomBarCount": 7,
+              "CapBottomBarSize": "#11",
+              "CapSideBarsPerFace": 2,
+              "CapSideBarSize": "#5",
+              "CapStirrupSize": "#5",
+              "CapStirrupSpacing": 0.15239999999999998,
+              "ColumnBarCount": 12,
+              "ColumnBarSize": "#9",
+              "ColumnSpiralSize": "#4",
+              "ColumnSpiralPitch": 0.15239999999999998,
+              "ColumnFaceBarsS": 0,
+              "ColumnFaceSpacingS": 0,
+              "ColumnFaceBarsN": 0,
+              "ColumnFaceSpacingN": 0,
+              "ColumnChamferBars": 0,
+              "ColumnChamferSpacing": 0,
+              "ColumnChamferBarPositions": null,
+              "ColumnHoopOverlap": 0,
+              "ColumnCrosstieSize": "",
+              "ColumnCrosstieBar": 0,
+              "FlareBarSize": "",
+              "FlareFaceBarsS": 0,
+              "FlareFaceSpacingS": 0,
+              "FlareFaceBarsN": 0,
+              "FlareFaceSpacingN": 0,
+              "FlareChamferBars": 0,
+              "FlareCover": 0.08889999999999999,
+              "FlareTieSize": "#6",
+              "FlareTieSpacing": 0.30479999999999996,
+              "FlareTieStyle": "ClosedTie",
+              "FlareTieOverlap": 0,
+              "FlareTieSpaces": 0,
+              "ColumnSplice": "Continuous",
+              "DowelHookLength": 0,
+              "DowelPin": 0,
+              "DowelBottomAboveFooting": 0.4064,
+              "ColumnLapLength": 0,
+              "CouplerLow": 0,
+              "CouplerHigh": 0,
+              "CouplerLength": 0,
+              "CouplerDiameter": 0,
+              "ColumnSplicePattern": "",
+              "ColumnTerminatingBarLength": 0,
+              "ColumnBarEmbedInCap": 0,
+              "ColumnMidLapStart": 0,
+              "ShaftBarCount": 12,
+              "ShaftBarSize": "#9",
+              "ShaftSpiralSize": "#4",
+              "ShaftSpiralPitch": 0.15239999999999998,
+              "FootingBarSize": "#8",
+              "FootingBarSpacing": 0.30479999999999996,
+              "BackwallBarSize": "#5",
+              "BackwallBarSpacing": 0.30479999999999996,
+              "MaxBarLength": 18.288,
+              "CapBars": []
+            }
+          },
+          "ExpansionJoint": null,
+          "DeckEndPoints": null
+        },
+        {
+          "Name": "Pier 14",
+          "Type": "Pier",
+          "Station": 9233.306400000001,
+          "SkewDegrees": 0,
+          "DeckEndOffset": 0.3048,
+          "GirderEndExtension": 0,
+          "SharedPier": "",
+          "PierCenterOffset": 0,
+          "Fixity": "Fixed",
+          "ResolvedFixity": "Fixed",
+          "GirderFixities": null,
+          "Bearings": null,
+          "Substructure": {
+            "Enabled": false,
+            "CapWidth": 1.2192,
+            "CapDepth": 1.2192,
+            "CapEndOverhang": 0.762,
+            "CapOffset": 0,
+            "CapProfile": [],
+            "CapProfileAhead": [],
+            "CapBlocks": [],
+            "Aesthetics": null,
+            "TopShape": "Sloped",
+            "CapSlope": "NaN",
+            "CrownOffset": "NaN",
+            "BottomShape": "ParallelToTop",
+            "MinPedestalHeight": 0.07619999999999999,
+            "PedestalProjection": 0.07619999999999999,
+            "MaxPedestalHeight": 0.45720000000000005,
+            "PedestalSizeAlong": 0,
+            "PedestalSizeAcross": 0,
+            "PedestalShared": false,
+            "PedestalSizeAcrossAhead": 0,
+            "PedestalRowJoint": "NaN",
+            "PedestalSideAngleDeg": 0,
+            "ColumnCount": 3,
+            "ColumnSpacings": [
+              4.572,
+              4.572
+            ],
+            "FirstColumnOffset": "NaN",
+            "ColumnShape": "Round",
+            "ColumnDiameter": 0.9144000000000001,
+            "ColumnWidth": 0.9144000000000001,
+            "ColumnDepth": 0.9144000000000001,
+            "ColumnChamferS": 0,
+            "ColumnChamferN": 0,
+            "ColumnProjectionS": 0,
+            "ColumnProjectionWidth": 0,
+            "ColumnFlareElevation": "NaN",
+            "ColumnFlareWidth": 0,
+            "ColumnFlareDepth": 0,
+            "ColumnFlareChamferS": 0,
+            "ColumnFlareChamferN": 0,
+            "Foundation": "DrilledShaft",
+            "FoundationTopElevation": "NaN",
+            "GroundCover": 0.3048,
+            "ShaftDiameter": 1.0668,
+            "ShaftLength": 12.192,
+            "FootingLength": 3.048,
+            "FootingWidth": 3.048,
+            "FootingThickness": 0.9144000000000001,
+            "PileType": "SteelHP",
+            "PileSection": "HP14x73",
+            "PileSize": 0.4572,
+            "PileShellThickness": "NaN",
+            "PileRows": 3,
+            "PileColumns": 3,
+            "PileSpacing": 0.9144000000000001,
+            "PileLength": 15.24,
+            "PileEmbedment": 0.30479999999999996,
+            "Footings": [],
+            "BearingToCapFront": 0.45720000000000005,
+            "BackwallThickness": 0.3048,
+            "BackwallGap": 0.0254,
+            "BackwallTopBelowGrade": 0,
+            "AbutmentFoundationCount": 4,
+            "AbutmentFoundationSpacing": 3.6576000000000004,
+            "Abutment": null,
+            "Reinforcement": {
+              "Enabled": true,
+              "ConcreteStrengthKsi": 3.6,
+              "SteelYieldKsi": 60,
+              "EpoxyCoated": false,
+              "CapCover": 0.0508,
+              "ColumnCover": 0.0635,
+              "ShaftCover": 0.07619999999999999,
+              "FootingCover": 0.07619999999999999,
+              "FootingSideClear": 0.0508,
+              "FootingTopClear": 0.07619999999999999,
+              "PileTopClear": 0.0254,
+              "CapTopBarCount": 7,
+              "CapTopBarSize": "#11",
+              "CapBottomBarCount": 7,
+              "CapBottomBarSize": "#11",
+              "CapSideBarsPerFace": 2,
+              "CapSideBarSize": "#5",
+              "CapStirrupSize": "#5",
+              "CapStirrupSpacing": 0.15239999999999998,
+              "ColumnBarCount": 12,
+              "ColumnBarSize": "#9",
+              "ColumnSpiralSize": "#4",
+              "ColumnSpiralPitch": 0.15239999999999998,
+              "ColumnFaceBarsS": 0,
+              "ColumnFaceSpacingS": 0,
+              "ColumnFaceBarsN": 0,
+              "ColumnFaceSpacingN": 0,
+              "ColumnChamferBars": 0,
+              "ColumnChamferSpacing": 0,
+              "ColumnChamferBarPositions": null,
+              "ColumnHoopOverlap": 0,
+              "ColumnCrosstieSize": "",
+              "ColumnCrosstieBar": 0,
+              "FlareBarSize": "",
+              "FlareFaceBarsS": 0,
+              "FlareFaceSpacingS": 0,
+              "FlareFaceBarsN": 0,
+              "FlareFaceSpacingN": 0,
+              "FlareChamferBars": 0,
+              "FlareCover": 0.08889999999999999,
+              "FlareTieSize": "#6",
+              "FlareTieSpacing": 0.30479999999999996,
+              "FlareTieStyle": "ClosedTie",
+              "FlareTieOverlap": 0,
+              "FlareTieSpaces": 0,
+              "ColumnSplice": "Continuous",
+              "DowelHookLength": 0,
+              "DowelPin": 0,
+              "DowelBottomAboveFooting": 0.4064,
+              "ColumnLapLength": 0,
+              "CouplerLow": 0,
+              "CouplerHigh": 0,
+              "CouplerLength": 0,
+              "CouplerDiameter": 0,
+              "ColumnSplicePattern": "",
+              "ColumnTerminatingBarLength": 0,
+              "ColumnBarEmbedInCap": 0,
+              "ColumnMidLapStart": 0,
+              "ShaftBarCount": 12,
+              "ShaftBarSize": "#9",
+              "ShaftSpiralSize": "#4",
+              "ShaftSpiralPitch": 0.15239999999999998,
+              "FootingBarSize": "#8",
+              "FootingBarSpacing": 0.30479999999999996,
+              "BackwallBarSize": "#5",
+              "BackwallBarSpacing": 0.30479999999999996,
+              "MaxBarLength": 18.288,
+              "CapBars": []
+            }
+          },
+          "ExpansionJoint": null,
+          "DeckEndPoints": null
+        },
+        {
+          "Name": "Pier 15",
+          "Type": "Pier",
+          "Station": 9282.379200000001,
+          "SkewDegrees": 0,
+          "DeckEndOffset": 0.3048,
+          "GirderEndExtension": 0,
+          "SharedPier": "",
+          "PierCenterOffset": 0,
+          "Fixity": "GuidedExpansion",
+          "ResolvedFixity": "GuidedExpansion",
+          "GirderFixities": null,
+          "Bearings": null,
+          "Substructure": {
+            "Enabled": false,
+            "CapWidth": 1.2192,
+            "CapDepth": 1.2192,
+            "CapEndOverhang": 0.762,
+            "CapOffset": 0,
+            "CapProfile": [],
+            "CapProfileAhead": [],
+            "CapBlocks": [],
+            "Aesthetics": null,
+            "TopShape": "Sloped",
+            "CapSlope": "NaN",
+            "CrownOffset": "NaN",
+            "BottomShape": "ParallelToTop",
+            "MinPedestalHeight": 0.07619999999999999,
+            "PedestalProjection": 0.07619999999999999,
+            "MaxPedestalHeight": 0.45720000000000005,
+            "PedestalSizeAlong": 0,
+            "PedestalSizeAcross": 0,
+            "PedestalShared": false,
+            "PedestalSizeAcrossAhead": 0,
+            "PedestalRowJoint": "NaN",
+            "PedestalSideAngleDeg": 0,
+            "ColumnCount": 3,
+            "ColumnSpacings": [
+              4.572,
+              4.572
+            ],
+            "FirstColumnOffset": "NaN",
+            "ColumnShape": "Round",
+            "ColumnDiameter": 0.9144000000000001,
+            "ColumnWidth": 0.9144000000000001,
+            "ColumnDepth": 0.9144000000000001,
+            "ColumnChamferS": 0,
+            "ColumnChamferN": 0,
+            "ColumnProjectionS": 0,
+            "ColumnProjectionWidth": 0,
+            "ColumnFlareElevation": "NaN",
+            "ColumnFlareWidth": 0,
+            "ColumnFlareDepth": 0,
+            "ColumnFlareChamferS": 0,
+            "ColumnFlareChamferN": 0,
+            "Foundation": "DrilledShaft",
+            "FoundationTopElevation": "NaN",
+            "GroundCover": 0.3048,
+            "ShaftDiameter": 1.0668,
+            "ShaftLength": 12.192,
+            "FootingLength": 3.048,
+            "FootingWidth": 3.048,
+            "FootingThickness": 0.9144000000000001,
+            "PileType": "SteelHP",
+            "PileSection": "HP14x73",
+            "PileSize": 0.4572,
+            "PileShellThickness": "NaN",
+            "PileRows": 3,
+            "PileColumns": 3,
+            "PileSpacing": 0.9144000000000001,
+            "PileLength": 15.24,
+            "PileEmbedment": 0.30479999999999996,
+            "Footings": [],
+            "BearingToCapFront": 0.45720000000000005,
+            "BackwallThickness": 0.3048,
+            "BackwallGap": 0.0254,
+            "BackwallTopBelowGrade": 0,
+            "AbutmentFoundationCount": 4,
+            "AbutmentFoundationSpacing": 3.6576000000000004,
+            "Abutment": null,
+            "Reinforcement": {
+              "Enabled": true,
+              "ConcreteStrengthKsi": 3.6,
+              "SteelYieldKsi": 60,
+              "EpoxyCoated": false,
+              "CapCover": 0.0508,
+              "ColumnCover": 0.0635,
+              "ShaftCover": 0.07619999999999999,
+              "FootingCover": 0.07619999999999999,
+              "FootingSideClear": 0.0508,
+              "FootingTopClear": 0.07619999999999999,
+              "PileTopClear": 0.0254,
+              "CapTopBarCount": 7,
+              "CapTopBarSize": "#11",
+              "CapBottomBarCount": 7,
+              "CapBottomBarSize": "#11",
+              "CapSideBarsPerFace": 2,
+              "CapSideBarSize": "#5",
+              "CapStirrupSize": "#5",
+              "CapStirrupSpacing": 0.15239999999999998,
+              "ColumnBarCount": 12,
+              "ColumnBarSize": "#9",
+              "ColumnSpiralSize": "#4",
+              "ColumnSpiralPitch": 0.15239999999999998,
+              "ColumnFaceBarsS": 0,
+              "ColumnFaceSpacingS": 0,
+              "ColumnFaceBarsN": 0,
+              "ColumnFaceSpacingN": 0,
+              "ColumnChamferBars": 0,
+              "ColumnChamferSpacing": 0,
+              "ColumnChamferBarPositions": null,
+              "ColumnHoopOverlap": 0,
+              "ColumnCrosstieSize": "",
+              "ColumnCrosstieBar": 0,
+              "FlareBarSize": "",
+              "FlareFaceBarsS": 0,
+              "FlareFaceSpacingS": 0,
+              "FlareFaceBarsN": 0,
+              "FlareFaceSpacingN": 0,
+              "FlareChamferBars": 0,
+              "FlareCover": 0.08889999999999999,
+              "FlareTieSize": "#6",
+              "FlareTieSpacing": 0.30479999999999996,
+              "FlareTieStyle": "ClosedTie",
+              "FlareTieOverlap": 0,
+              "FlareTieSpaces": 0,
+              "ColumnSplice": "Continuous",
+              "DowelHookLength": 0,
+              "DowelPin": 0,
+              "DowelBottomAboveFooting": 0.4064,
+              "ColumnLapLength": 0,
+              "CouplerLow": 0,
+              "CouplerHigh": 0,
+              "CouplerLength": 0,
+              "CouplerDiameter": 0,
+              "ColumnSplicePattern": "",
+              "ColumnTerminatingBarLength": 0,
+              "ColumnBarEmbedInCap": 0,
+              "ColumnMidLapStart": 0,
+              "ShaftBarCount": 12,
+              "ShaftBarSize": "#9",
+              "ShaftSpiralSize": "#4",
+              "ShaftSpiralPitch": 0.15239999999999998,
+              "FootingBarSize": "#8",
+              "FootingBarSpacing": 0.30479999999999996,
+              "BackwallBarSize": "#5",
+              "BackwallBarSpacing": 0.30479999999999996,
+              "MaxBarLength": 18.288,
+              "CapBars": []
+            }
+          },
+          "ExpansionJoint": null,
+          "DeckEndPoints": null
+        },
+        {
+          "Name": "Pier 16",
+          "Type": "Pier",
+          "Station": 9331.147200000001,
+          "SkewDegrees": 0,
+          "DeckEndOffset": 0.3048,
+          "GirderEndExtension": 0.2286,
+          "SharedPier": "",
+          "PierCenterOffset": 0,
+          "Fixity": "GuidedExpansion",
+          "ResolvedFixity": "GuidedExpansion",
+          "GirderFixities": null,
+          "Bearings": null,
+          "Substructure": {
+            "Enabled": false,
+            "CapWidth": 1.2192,
+            "CapDepth": 1.2192,
+            "CapEndOverhang": 0.762,
+            "CapOffset": 0,
+            "CapProfile": [],
+            "CapProfileAhead": [],
+            "CapBlocks": [],
+            "Aesthetics": null,
+            "TopShape": "Sloped",
+            "CapSlope": "NaN",
+            "CrownOffset": "NaN",
+            "BottomShape": "ParallelToTop",
+            "MinPedestalHeight": 0.07619999999999999,
+            "PedestalProjection": 0.07619999999999999,
+            "MaxPedestalHeight": 0.45720000000000005,
+            "PedestalSizeAlong": 0,
+            "PedestalSizeAcross": 0,
+            "PedestalShared": false,
+            "PedestalSizeAcrossAhead": 0,
+            "PedestalRowJoint": "NaN",
+            "PedestalSideAngleDeg": 0,
+            "ColumnCount": 3,
+            "ColumnSpacings": [
+              4.572,
+              4.572
+            ],
+            "FirstColumnOffset": "NaN",
+            "ColumnShape": "Round",
+            "ColumnDiameter": 0.9144000000000001,
+            "ColumnWidth": 0.9144000000000001,
+            "ColumnDepth": 0.9144000000000001,
+            "ColumnChamferS": 0,
+            "ColumnChamferN": 0,
+            "ColumnProjectionS": 0,
+            "ColumnProjectionWidth": 0,
+            "ColumnFlareElevation": "NaN",
+            "ColumnFlareWidth": 0,
+            "ColumnFlareDepth": 0,
+            "ColumnFlareChamferS": 0,
+            "ColumnFlareChamferN": 0,
+            "Foundation": "DrilledShaft",
+            "FoundationTopElevation": "NaN",
+            "GroundCover": 0.3048,
+            "ShaftDiameter": 1.0668,
+            "ShaftLength": 12.192,
+            "FootingLength": 3.048,
+            "FootingWidth": 3.048,
+            "FootingThickness": 0.9144000000000001,
+            "PileType": "SteelHP",
+            "PileSection": "HP14x73",
+            "PileSize": 0.4572,
+            "PileShellThickness": "NaN",
+            "PileRows": 3,
+            "PileColumns": 3,
+            "PileSpacing": 0.9144000000000001,
+            "PileLength": 15.24,
+            "PileEmbedment": 0.30479999999999996,
+            "Footings": [],
+            "BearingToCapFront": 0.45720000000000005,
+            "BackwallThickness": 0.3048,
+            "BackwallGap": 0.0254,
+            "BackwallTopBelowGrade": 0,
+            "AbutmentFoundationCount": 4,
+            "AbutmentFoundationSpacing": 3.6576000000000004,
+            "Abutment": null,
+            "Reinforcement": {
+              "Enabled": true,
+              "ConcreteStrengthKsi": 3.6,
+              "SteelYieldKsi": 60,
+              "EpoxyCoated": false,
+              "CapCover": 0.0508,
+              "ColumnCover": 0.0635,
+              "ShaftCover": 0.07619999999999999,
+              "FootingCover": 0.07619999999999999,
+              "FootingSideClear": 0.0508,
+              "FootingTopClear": 0.07619999999999999,
+              "PileTopClear": 0.0254,
+              "CapTopBarCount": 7,
+              "CapTopBarSize": "#11",
+              "CapBottomBarCount": 7,
+              "CapBottomBarSize": "#11",
+              "CapSideBarsPerFace": 2,
+              "CapSideBarSize": "#5",
+              "CapStirrupSize": "#5",
+              "CapStirrupSpacing": 0.15239999999999998,
+              "ColumnBarCount": 12,
+              "ColumnBarSize": "#9",
+              "ColumnSpiralSize": "#4",
+              "ColumnSpiralPitch": 0.15239999999999998,
+              "ColumnFaceBarsS": 0,
+              "ColumnFaceSpacingS": 0,
+              "ColumnFaceBarsN": 0,
+              "ColumnFaceSpacingN": 0,
+              "ColumnChamferBars": 0,
+              "ColumnChamferSpacing": 0,
+              "ColumnChamferBarPositions": null,
+              "ColumnHoopOverlap": 0,
+              "ColumnCrosstieSize": "",
+              "ColumnCrosstieBar": 0,
+              "FlareBarSize": "",
+              "FlareFaceBarsS": 0,
+              "FlareFaceSpacingS": 0,
+              "FlareFaceBarsN": 0,
+              "FlareFaceSpacingN": 0,
+              "FlareChamferBars": 0,
+              "FlareCover": 0.08889999999999999,
+              "FlareTieSize": "#6",
+              "FlareTieSpacing": 0.30479999999999996,
+              "FlareTieStyle": "ClosedTie",
+              "FlareTieOverlap": 0,
+              "FlareTieSpaces": 0,
+              "ColumnSplice": "Continuous",
+              "DowelHookLength": 0,
+              "DowelPin": 0,
+              "DowelBottomAboveFooting": 0.4064,
+              "ColumnLapLength": 0,
+              "CouplerLow": 0,
+              "CouplerHigh": 0,
+              "CouplerLength": 0,
+              "CouplerDiameter": 0,
+              "ColumnSplicePattern": "",
+              "ColumnTerminatingBarLength": 0,
+              "ColumnBarEmbedInCap": 0,
+              "ColumnMidLapStart": 0,
+              "ShaftBarCount": 12,
+              "ShaftBarSize": "#9",
+              "ShaftSpiralSize": "#4",
+              "ShaftSpiralPitch": 0.15239999999999998,
+              "FootingBarSize": "#8",
+              "FootingBarSpacing": 0.30479999999999996,
+              "BackwallBarSize": "#5",
+              "BackwallBarSpacing": 0.30479999999999996,
+              "MaxBarLength": 18.288,
+              "CapBars": []
+            }
+          },
+          "ExpansionJoint": null,
+          "DeckEndPoints": null
+        }
+      ],
+      "AuxiliarySupports": [],
+      "Girders": {
+        "PlanGeometry": [],
+        "Camber": [
+          {
+            "Girder": 0,
+            "DatumPoint": 0,
+            "Keys": [
+              {
+                "Number": 1,
+                "Support": 0,
+                "Splice": 0,
+                "GirderEnd": false
+              },
+              {
+                "Number": 11,
+                "Support": 1,
+                "Splice": 0,
+                "GirderEnd": false
+              },
+              {
+                "Number": 21,
+                "Support": 2,
+                "Splice": 0,
+                "GirderEnd": false
+              },
+              {
+                "Number": 31,
+                "Support": 3,
+                "Splice": 0,
+                "GirderEnd": false
+              }
+            ],
+            "Points": [
+              {
+                "Number": 1,
+                "Camber": 0,
+                "SteelDeflection": 0,
+                "SlabDeflection": 0
+              },
+              {
+                "Number": 2,
+                "Camber": 0.038607999999999996,
+                "SteelDeflection": 0.010667999999999999,
+                "SlabDeflection": 0.02794
+              },
+              {
+                "Number": 3,
+                "Camber": 0.07213599999999999,
+                "SteelDeflection": 0.019812,
+                "SlabDeflection": 0.05206999999999999
+              },
+              {
+                "Number": 4,
+                "Camber": 0.09601199999999999,
+                "SteelDeflection": 0.026416,
+                "SlabDeflection": 0.06985
+              },
+              {
+                "Number": 5,
+                "Camber": 0.108712,
+                "SteelDeflection": 0.029717999999999998,
+                "SlabDeflection": 0.078994
+              },
+              {
+                "Number": 6,
+                "Camber": 0.10845799999999998,
+                "SteelDeflection": 0.029209999999999996,
+                "SlabDeflection": 0.079248
+              },
+              {
+                "Number": 7,
+                "Camber": 0.095758,
+                "SteelDeflection": 0.0254,
+                "SlabDeflection": 0.070358
+              },
+              {
+                "Number": 8,
+                "Camber": 0.073406,
+                "SteelDeflection": 0.019303999999999998,
+                "SlabDeflection": 0.054102
+              },
+              {
+                "Number": 9,
+                "Camber": 0.045466,
+                "SteelDeflection": 0.011684,
+                "SlabDeflection": 0.033782
+              },
+              {
+                "Number": 10,
+                "Camber": 0.019049999999999997,
+                "SteelDeflection": 0.0048259999999999996,
+                "SlabDeflection": 0.014224
+              },
+              {
+                "Number": 11,
+                "Camber": 0,
+                "SteelDeflection": 0,
+                "SlabDeflection": 0
+              },
+              {
+                "Number": 12,
+                "Camber": -0.00508,
+                "SteelDeflection": -0.000508,
+                "SlabDeflection": -0.0048259999999999996
+              },
+              {
+                "Number": 13,
+                "Camber": -0.000508,
+                "SteelDeflection": 0.002032,
+                "SlabDeflection": -0.00254
+              },
+              {
+                "Number": 14,
+                "Camber": 0.007112,
+                "SteelDeflection": 0.005333999999999999,
+                "SlabDeflection": 0.001778
+              },
+              {
+                "Number": 15,
+                "Camber": 0.012954,
+                "SteelDeflection": 0.007619999999999999,
+                "SlabDeflection": 0.00508
+              },
+              {
+                "Number": 16,
+                "Camber": 0.013208,
+                "SteelDeflection": 0.007873999999999999,
+                "SlabDeflection": 0.005333999999999999
+              },
+              {
+                "Number": 17,
+                "Camber": 0.007873999999999999,
+                "SteelDeflection": 0.006096,
+                "SlabDeflection": 0.001778
+              },
+              {
+                "Number": 18,
+                "Camber": -0.001016,
+                "SteelDeflection": 0.00254,
+                "SlabDeflection": -0.003556
+              },
+              {
+                "Number": 19,
+                "Camber": -0.009398,
+                "SteelDeflection": -0.001016,
+                "SlabDeflection": -0.008636
+              },
+              {
+                "Number": 20,
+                "Camber": -0.011176,
+                "SteelDeflection": -0.00254,
+                "SlabDeflection": -0.008636
+              },
+              {
+                "Number": 21,
+                "Camber": 0,
+                "SteelDeflection": 0,
+                "SlabDeflection": 0
+              },
+              {
+                "Number": 22,
+                "Camber": 0.028955999999999996,
+                "SteelDeflection": 0.007873999999999999,
+                "SlabDeflection": 0.020828
+              },
+              {
+                "Number": 23,
+                "Camber": 0.068326,
+                "SteelDeflection": 0.019049999999999997,
+                "SlabDeflection": 0.04927599999999999
+              },
+              {
+                "Number": 24,
+                "Camber": 0.109982,
+                "SteelDeflection": 0.030987999999999998,
+                "SlabDeflection": 0.07874
+              },
+              {
+                "Number": 25,
+                "Camber": 0.143256,
+                "SteelDeflection": 0.041148000000000004,
+                "SlabDeflection": 0.10210799999999999
+              },
+              {
+                "Number": 26,
+                "Camber": 0.16230599999999998,
+                "SteelDeflection": 0.04699,
+                "SlabDeflection": 0.115316
+              },
+              {
+                "Number": 27,
+                "Camber": 0.163322,
+                "SteelDeflection": 0.047751999999999996,
+                "SlabDeflection": 0.11556999999999999
+              },
+              {
+                "Number": 28,
+                "Camber": 0.145288,
+                "SteelDeflection": 0.042671999999999995,
+                "SlabDeflection": 0.102616
+              },
+              {
+                "Number": 29,
+                "Camber": 0.10922,
+                "SteelDeflection": 0.032258,
+                "SlabDeflection": 0.07721599999999999
+              },
+              {
+                "Number": 30,
+                "Camber": 0.058927999999999994,
+                "SteelDeflection": 0.017525999999999996,
+                "SlabDeflection": 0.041656
+              },
+              {
+                "Number": 31,
+                "Camber": 0,
+                "SteelDeflection": 0,
+                "SlabDeflection": 0
+              }
+            ]
+          },
+          {
+            "Girder": 1,
+            "DatumPoint": 0,
+            "Keys": [
+              {
+                "Number": 1,
+                "Support": 0,
+                "Splice": 0,
+                "GirderEnd": false
+              },
+              {
+                "Number": 11,
+                "Support": 1,
+                "Splice": 0,
+                "GirderEnd": false
+              },
+              {
+                "Number": 21,
+                "Support": 2,
+                "Splice": 0,
+                "GirderEnd": false
+              },
+              {
+                "Number": 31,
+                "Support": 3,
+                "Splice": 0,
+                "GirderEnd": false
+              }
+            ],
+            "Points": [
+              {
+                "Number": 1,
+                "Camber": 0,
+                "SteelDeflection": 0,
+                "SlabDeflection": 0
+              },
+              {
+                "Number": 2,
+                "Camber": 0.038862,
+                "SteelDeflection": 0.010667999999999999,
+                "SlabDeflection": 0.028194
+              },
+              {
+                "Number": 3,
+                "Camber": 0.07239,
+                "SteelDeflection": 0.019558,
+                "SlabDeflection": 0.05257799999999999
+              },
+              {
+                "Number": 4,
+                "Camber": 0.09626599999999999,
+                "SteelDeflection": 0.025908,
+                "SlabDeflection": 0.070358
+              },
+              {
+                "Number": 5,
+                "Camber": 0.108204,
+                "SteelDeflection": 0.028955999999999996,
+                "SlabDeflection": 0.079248
+              },
+              {
+                "Number": 6,
+                "Camber": 0.10718799999999999,
+                "SteelDeflection": 0.028194,
+                "SlabDeflection": 0.078994
+              },
+              {
+                "Number": 7,
+                "Camber": 0.094234,
+                "SteelDeflection": 0.024384,
+                "SlabDeflection": 0.06985
+              },
+              {
+                "Number": 8,
+                "Camber": 0.07213599999999999,
+                "SteelDeflection": 0.018288,
+                "SlabDeflection": 0.053593999999999996
+              },
+              {
+                "Number": 9,
+                "Camber": 0.044704,
+                "SteelDeflection": 0.011176,
+                "SlabDeflection": 0.033528
+              },
+              {
+                "Number": 10,
+                "Camber": 0.018796,
+                "SteelDeflection": 0.004572,
+                "SlabDeflection": 0.014224
+              },
+              {
+                "Number": 11,
+                "Camber": 0,
+                "SteelDeflection": 0,
+                "SlabDeflection": 0
+              },
+              {
+                "Number": 12,
+                "Camber": -0.005333999999999999,
+                "SteelDeflection": -0.000254,
+                "SlabDeflection": -0.00508
+              },
+              {
+                "Number": 13,
+                "Camber": -0.000762,
+                "SteelDeflection": 0.002286,
+                "SlabDeflection": -0.003048
+              },
+              {
+                "Number": 14,
+                "Camber": 0.007365999999999999,
+                "SteelDeflection": 0.005842,
+                "SlabDeflection": 0.001524
+              },
+              {
+                "Number": 15,
+                "Camber": 0.0127,
+                "SteelDeflection": 0.008128,
+                "SlabDeflection": 0.004572
+              },
+              {
+                "Number": 16,
+                "Camber": 0.0127,
+                "SteelDeflection": 0.008382,
+                "SlabDeflection": 0.004318
+              },
+              {
+                "Number": 17,
+                "Camber": 0.00635,
+                "SteelDeflection": 0.006096,
+                "SlabDeflection": 0.000254
+              },
+              {
+                "Number": 18,
+                "Camber": -0.003302,
+                "SteelDeflection": 0.002286,
+                "SlabDeflection": -0.005842
+              },
+              {
+                "Number": 19,
+                "Camber": -0.012445999999999999,
+                "SteelDeflection": -0.001524,
+                "SlabDeflection": -0.010922
+              },
+              {
+                "Number": 20,
+                "Camber": -0.013716,
+                "SteelDeflection": -0.003048,
+                "SlabDeflection": -0.010667999999999999
+              },
+              {
+                "Number": 21,
+                "Camber": 0,
+                "SteelDeflection": 0,
+                "SlabDeflection": 0
+              },
+              {
+                "Number": 22,
+                "Camber": 0.033528,
+                "SteelDeflection": 0.009144,
+                "SlabDeflection": 0.024384
+              },
+              {
+                "Number": 23,
+                "Camber": 0.07950199999999999,
+                "SteelDeflection": 0.022098,
+                "SlabDeflection": 0.05740399999999999
+              },
+              {
+                "Number": 24,
+                "Camber": 0.12750799999999998,
+                "SteelDeflection": 0.036067999999999996,
+                "SlabDeflection": 0.091694
+              },
+              {
+                "Number": 25,
+                "Camber": 0.16637,
+                "SteelDeflection": 0.047498,
+                "SlabDeflection": 0.11887199999999999
+              },
+              {
+                "Number": 26,
+                "Camber": 0.188468,
+                "SteelDeflection": 0.054356,
+                "SlabDeflection": 0.134112
+              },
+              {
+                "Number": 27,
+                "Camber": 0.18948399999999999,
+                "SteelDeflection": 0.05511799999999999,
+                "SlabDeflection": 0.134112
+              },
+              {
+                "Number": 28,
+                "Camber": 0.168148,
+                "SteelDeflection": 0.04927599999999999,
+                "SlabDeflection": 0.11887199999999999
+              },
+              {
+                "Number": 29,
+                "Camber": 0.126238,
+                "SteelDeflection": 0.037084,
+                "SlabDeflection": 0.089154
+              },
+              {
+                "Number": 30,
+                "Camber": 0.06807200000000001,
+                "SteelDeflection": 0.020066,
+                "SlabDeflection": 0.04800599999999999
+              },
+              {
+                "Number": 31,
+                "Camber": 0,
+                "SteelDeflection": 0,
+                "SlabDeflection": 0
+              }
+            ]
+          }
+        ],
+        "Terminations": [],
+        "Beginnings": [],
+        "CrossGirder": {
+          "WebDepth": 1.524,
+          "WebThickness": 0.015875,
+          "FlangeWidth": 0.381,
+          "FlangeThickness": 0.015875,
+          "EndGap": 0.019049999999999997,
+          "TopBelowDiscontinuousWebTop": null,
+          "AngleLeg": 0.127,
+          "AngleThickness": 0.0127,
+          "AngleLength": 0,
+          "EndAngleLength": 0,
+          "AngleBoltPitch": 0,
+          "AngleBoltEndDistance": 0.0508,
+          "AngleBoltGage": 0.07619999999999999,
+          "BoltDiameter": 0,
+          "StiffenerWidth": 0,
+          "StiffenerThickness": 0,
+          "StiffenerFromOpening": 0.15239999999999998,
+          "OpeningWidth": 0,
+          "OpeningHeight": 0,
+          "OpeningRadius": 0.15239999999999998,
+          "OpeningPlateFromTop": 0,
+          "OpeningPlateWidth": 0,
+          "OpeningPlateThickness": 0,
+          "OpeningPlateToOpening": 0.0127,
+          "OpeningPlateEndClear": 0.07619999999999999,
+          "WebFlangeWeld": 0,
+          "StiffenerWeld": 0
+        },
+        "Count": 2,
+        "Spacings": [
+          5.3848
+        ],
+        "FirstGirderOffset": -4.064,
+        "OffsetsAtSupports": null,
+        "SpanLayouts": null,
+        "PlanLayout": "CurvedParallel",
+        "Section": {
+          "TopFlange": {
+            "Width": 0.5334,
+            "Thickness": 0.03175
+          },
+          "WebDepth": 1.27,
+          "WebThickness": 0.015875,
+          "BottomFlange": {
+            "Width": 1.9558,
+            "Thickness": 0.03175
+          },
+          "PlateChanges": [],
+          "Layouts": [
+            {
+              "Girders": [
+                0
+              ],
+              "Runs": [
+                {
+                  "Plate": "TopFlange",
+                  "EndSplice": 0,
+                  "EndSupport": 1,
+                  "EndOffset": -4.613275,
+                  "Width": 0.5334,
+                  "Thickness": 0.03175
+                },
+                {
+                  "Plate": "TopFlange",
+                  "EndSplice": 0,
+                  "EndSupport": 1,
+                  "EndOffset": 4.2656125000000005,
+                  "Width": 0.5334,
+                  "Thickness": 0.047625
+                },
+                {
+                  "Plate": "TopFlange",
+                  "EndSplice": 3,
+                  "EndSupport": -1,
+                  "EndOffset": 0,
+                  "Width": 0.5334,
+                  "Thickness": 0.03175
+                },
+                {
+                  "Plate": "TopFlange",
+                  "EndSplice": 0,
+                  "EndSupport": 2,
+                  "EndOffset": -4.2751375,
+                  "Width": 0.5334,
+                  "Thickness": 0.034925
+                },
+                {
+                  "Plate": "TopFlange",
+                  "EndSplice": 0,
+                  "EndSupport": 2,
+                  "EndOffset": 4.4942125,
+                  "Width": 0.5334,
+                  "Thickness": 0.05715
+                },
+                {
+                  "Plate": "TopFlange",
+                  "EndSplice": 0,
+                  "EndSupport": -1,
+                  "EndOffset": 0,
+                  "Width": 0.5334,
+                  "Thickness": 0.034925
+                },
+                {
+                  "Plate": "BottomFlange",
+                  "EndSplice": 0,
+                  "EndSupport": 1,
+                  "EndOffset": -4.613275,
+                  "Width": 1.9558,
+                  "Thickness": 0.03175
+                },
+                {
+                  "Plate": "BottomFlange",
+                  "EndSplice": 0,
+                  "EndSupport": 1,
+                  "EndOffset": 4.2656125000000005,
+                  "Width": 1.9558,
+                  "Thickness": 0.047625
+                },
+                {
+                  "Plate": "BottomFlange",
+                  "EndSplice": 0,
+                  "EndSupport": 2,
+                  "EndOffset": -4.2751375,
+                  "Width": 1.9558,
+                  "Thickness": 0.034925
+                },
+                {
+                  "Plate": "BottomFlange",
+                  "EndSplice": 0,
+                  "EndSupport": 2,
+                  "EndOffset": 4.4942125,
+                  "Width": 1.9558,
+                  "Thickness": 0.05715
+                },
+                {
+                  "Plate": "BottomFlange",
+                  "EndSplice": 0,
+                  "EndSupport": -1,
+                  "EndOffset": 0,
+                  "Width": 1.9558,
+                  "Thickness": 0.034925
+                },
+                {
+                  "Plate": "Web",
+                  "EndSplice": 0,
+                  "EndSupport": 2,
+                  "EndOffset": -4.2751375,
+                  "Width": 0,
+                  "Thickness": 0.015875
+                },
+                {
+                  "Plate": "Web",
+                  "EndSplice": 0,
+                  "EndSupport": 2,
+                  "EndOffset": 4.4942125,
+                  "Width": 0,
+                  "Thickness": 0.019049999999999997
+                },
+                {
+                  "Plate": "Web",
+                  "EndSplice": 0,
+                  "EndSupport": -1,
+                  "EndOffset": 0,
+                  "Width": 0,
+                  "Thickness": 0.015875
+                }
+              ]
+            },
+            {
+              "Girders": [
+                1
+              ],
+              "Runs": [
+                {
+                  "Plate": "TopFlange",
+                  "EndSplice": 0,
+                  "EndSupport": 1,
+                  "EndOffset": -4.695825,
+                  "Width": 0.5334,
+                  "Thickness": 0.03175
+                },
+                {
+                  "Plate": "TopFlange",
+                  "EndSplice": 0,
+                  "EndSupport": 1,
+                  "EndOffset": 4.3576875,
+                  "Width": 0.5334,
+                  "Thickness": 0.047625
+                },
+                {
+                  "Plate": "TopFlange",
+                  "EndSplice": 3,
+                  "EndSupport": -1,
+                  "EndOffset": 0,
+                  "Width": 0.5334,
+                  "Thickness": 0.03175
+                },
+                {
+                  "Plate": "TopFlange",
+                  "EndSplice": 0,
+                  "EndSupport": 2,
+                  "EndOffset": -4.3576875,
+                  "Width": 0.5334,
+                  "Thickness": 0.034925
+                },
+                {
+                  "Plate": "TopFlange",
+                  "EndSplice": 0,
+                  "EndSupport": 2,
+                  "EndOffset": 4.6101,
+                  "Width": 0.5334,
+                  "Thickness": 0.05715
+                },
+                {
+                  "Plate": "TopFlange",
+                  "EndSplice": 0,
+                  "EndSupport": -1,
+                  "EndOffset": 0,
+                  "Width": 0.5334,
+                  "Thickness": 0.034925
+                },
+                {
+                  "Plate": "BottomFlange",
+                  "EndSplice": 0,
+                  "EndSupport": 1,
+                  "EndOffset": -4.695825,
+                  "Width": 1.9558,
+                  "Thickness": 0.03175
+                },
+                {
+                  "Plate": "BottomFlange",
+                  "EndSplice": 0,
+                  "EndSupport": 1,
+                  "EndOffset": 4.3576875,
+                  "Width": 1.9558,
+                  "Thickness": 0.047625
+                },
+                {
+                  "Plate": "BottomFlange",
+                  "EndSplice": 0,
+                  "EndSupport": 2,
+                  "EndOffset": -4.3576875,
+                  "Width": 1.9558,
+                  "Thickness": 0.034925
+                },
+                {
+                  "Plate": "BottomFlange",
+                  "EndSplice": 0,
+                  "EndSupport": 2,
+                  "EndOffset": 4.6101,
+                  "Width": 1.9558,
+                  "Thickness": 0.05715
+                },
+                {
+                  "Plate": "BottomFlange",
+                  "EndSplice": 0,
+                  "EndSupport": -1,
+                  "EndOffset": 0,
+                  "Width": 1.9558,
+                  "Thickness": 0.034925
+                },
+                {
+                  "Plate": "Web",
+                  "EndSplice": 0,
+                  "EndSupport": 2,
+                  "EndOffset": -4.3576875,
+                  "Width": 0,
+                  "Thickness": 0.015875
+                },
+                {
+                  "Plate": "Web",
+                  "EndSplice": 0,
+                  "EndSupport": 2,
+                  "EndOffset": 4.6101,
+                  "Width": 0,
+                  "Thickness": 0.019049999999999997
+                },
+                {
+                  "Plate": "Web",
+                  "EndSplice": 0,
+                  "EndSupport": -1,
+                  "EndOffset": 0,
+                  "Width": 0,
+                  "Thickness": 0.015875
+                }
+              ]
+            }
+          ]
+        },
+        "Kind": "SteelPlate",
+        "Prestressed": {
+          "Type": "Tx54",
+          "CustomSection": null,
+          "StrandCount": 40,
+          "StrandDiameter": 0.015239999999999998,
+          "StrandStrength": 270,
+          "DepressedStrands": 0,
+          "DepressedTopAtEnd": 0,
+          "StrandLayout": null,
+          "HarpPointFraction": 0,
+          "ConcreteStrength": 8.5,
+          "ReleaseStrength": 6,
+          "EndGapAtBent": 0.07619999999999999,
+          "BearingToEnd": 0.2286,
+          "InteriorEnds": "Square",
+          "PadLength": 0,
+          "PadWidth": 0.5334,
+          "PadThickness": 0.06985,
+          "PierPadOrientation": "SquareToBeam",
+          "Standard": null,
+          "Designation": "",
+          "StandardBearingLength": 0,
+          "StandardOverallLength": 0,
+          "Placement": null,
+          "PlacementBasis": "",
+          "HoldDownFromMidspan": 0,
+          "HarpedColumns": null,
+          "HarpedTopBelowTopAtEnd": 0,
+          "HarpedEndSpacing": 0.0508,
+          "SheathThickness": 0.0015875,
+          "Source": "",
+          "Unresolved": null,
+          "SpanBeams": null
+        },
+        "Tub": {
+          "TopWebSpacing": 2.4384,
+          "WebSlope": 0.25,
+          "RotateWithDeck": true,
+          "PlanWebSlopeLength": 1.3096875000000001,
+          "Panels": [
+            {
+              "Girder": 0,
+              "Span": 0,
+              "Length": "NaN",
+              "Spaces": 14
+            },
+            {
+              "Girder": 1,
+              "Span": 0,
+              "Length": 4.1576625,
+              "Spaces": 2
+            },
+            {
+              "Girder": 1,
+              "Span": 0,
+              "Length": "NaN",
+              "Spaces": 12
+            },
+            {
+              "Girder": 0,
+              "Span": 1,
+              "Length": "NaN",
+              "Spaces": 17
+            },
+            {
+              "Girder": 0,
+              "Span": 2,
+              "Length": "NaN",
+              "Spaces": 16
+            },
+            {
+              "Girder": 1,
+              "Span": 1,
+              "Length": "NaN",
+              "Spaces": 17
+            },
+            {
+              "Girder": 1,
+              "Span": 2,
+              "Length": "NaN",
+              "Spaces": 16
+            }
+          ],
+          "Internal": {
+            "CrossFrameEvery": 2,
+            "Diagonal": "L5x5x5/8",
+            "TopStrut": "WT6x29",
+            "StrutBelowWebTop": 0.0254,
+            "GussetThickness": 0.019049999999999997,
+            "Stiffener": {
+              "Width": 0.254,
+              "Thickness": 0.019049999999999997
+            },
+            "StiffenerBottomGap": 0.038099999999999995,
+            "TabWidth": 0.254,
+            "TabHeight": 0.30479999999999996,
+            "TabThickness": 0.019049999999999997,
+            "DiagonalBolts": 3,
+            "BoltPitch": 0.07619999999999999,
+            "Unresolved": [
+              "UNRESOLVED (p.282): internal cross frame centre gusset outline - Detail C shows the gusset PL 3/4 but dimensions only the bolt spacing. Gusset drawn 1\u0027-10 x 1\u0027-2 below the strut.",
+              "UNRESOLVED (p.282): diagonal work points - Detail B1 / C give bolt spacings but not the work lines. Diagonals run from the web CL at the top of the bottom flange to the top working point, 3 bolts at each end."
+            ]
+          },
+          "Lateral": {
+            "Enabled": true,
+            "Member": "WT9x38",
+            "WorkPointFromPanelPoint": 0.2032,
+            "WorkPointFromSupport": {
+              "0": 0.30479999999999996
+            },
+            "BoltsPerLine": 3,
+            "BoltPitch": 0.07619999999999999,
+            "BoltGage": 0.1031875
+          },
+          "External": {
+            "Points": [
+              {
+                "Span": 0,
+                "Point": 4
+              },
+              {
+                "Span": 0,
+                "Point": 10
+              },
+              {
+                "Span": 1,
+                "Point": 6
+              },
+              {
+                "Span": 1,
+                "Point": 12
+              },
+              {
+                "Span": 2,
+                "Point": 6
+              },
+              {
+                "Span": 2,
+                "Point": 10
+              }
+            ],
+            "ReferenceGirder": 0,
+            "WebThickness": 0.015875,
+            "WebDepth": 0.9652000000000001,
+            "WebTopBelowWebTop": 0.15239999999999998,
+            "Flange": {
+              "Width": 0.30479999999999996,
+              "Thickness": 0.019049999999999997
+            },
+            "Angle": "L8x8x3/4",
+            "AngleLength": 0.8128,
+            "GirderLegBolts": 8,
+            "DiaphragmLegBolts": 9,
+            "BoltPitch": 0.08889999999999999,
+            "EndClearance": 0.0127
+          },
+          "SupportDiaphragms": [
+            {
+              "Support": 0,
+              "InteriorWebThickness": 0.019049999999999997,
+              "InteriorTopFlange": {
+                "Width": 0.30479999999999996,
+                "Thickness": 0.0254
+              },
+              "ExteriorWebThickness": 0.019049999999999997,
+              "ExteriorFlange": {
+                "Width": 0.30479999999999996,
+                "Thickness": 0.0254
+              },
+              "BearingStiffener": {
+                "Width": 0.2032,
+                "Thickness": 0.0254
+              },
+              "BearingStiffenerSpacing": 0.4572,
+              "AccessOpeningWidth": 0,
+              "AccessOpeningHeight": 0,
+              "AccessOpeningRadius": 0,
+              "AccessOpeningBottom": 0,
+              "Connection": "BentPlates",
+              "ConnectionShape": "L8x8x1/2",
+              "ConnectionLength": 0.9017,
+              "GirderLegBolts": 9,
+              "DiaphragmLegBolts": 10,
+              "BoltPitch": 0.08889999999999999,
+              "Unresolved": [
+                "UNRESOLVED (p.284): exterior diaphragm height 2\u0027-11 1/2\u0022 and its position - the dimension does not reconcile with the 4\u0027-2\u0022 tub depth on the sheet. Exterior diaphragm built full depth (top flange at the top-of-web line, bottom flange on the bottom-flange top).",
+                "UNRESOLVED (p.283-284): top / bottom connection plates PL 1 x 12 - lengths and bolt patterns only partly dimensioned. Not built."
+              ]
+            },
+            {
+              "Support": 1,
+              "InteriorWebThickness": 0.038099999999999995,
+              "InteriorTopFlange": {
+                "Width": 0.30479999999999996,
+                "Thickness": 0.038099999999999995
+              },
+              "ExteriorWebThickness": 0.019049999999999997,
+              "ExteriorFlange": {
+                "Width": 0.30479999999999996,
+                "Thickness": 0.0254
+              },
+              "BearingStiffener": {
+                "Width": 0.2032,
+                "Thickness": 0.03175
+              },
+              "BearingStiffenerSpacing": 0.6096,
+              "AccessOpeningWidth": 0.4572,
+              "AccessOpeningHeight": 0.8128,
+              "AccessOpeningRadius": 0.2032,
+              "AccessOpeningBottom": 0.2794,
+              "Connection": "Angles",
+              "ConnectionShape": "L8x8x1/2",
+              "ConnectionLength": 1.0795,
+              "GirderLegBolts": 11,
+              "DiaphragmLegBolts": 12,
+              "BoltPitch": 0.08889999999999999,
+              "Unresolved": [
+                "UNRESOLVED (p.287-288): top / bottom connection plates PL 1 x 12 - lengths and bolt patterns only partly dimensioned. Not built."
+              ]
+            },
+            {
+              "Support": 2,
+              "InteriorWebThickness": 0.038099999999999995,
+              "InteriorTopFlange": {
+                "Width": 0.30479999999999996,
+                "Thickness": 0.038099999999999995
+              },
+              "ExteriorWebThickness": 0.019049999999999997,
+              "ExteriorFlange": {
+                "Width": 0.30479999999999996,
+                "Thickness": 0.0254
+              },
+              "BearingStiffener": {
+                "Width": 0.2032,
+                "Thickness": 0.03175
+              },
+              "BearingStiffenerSpacing": 0.6096,
+              "AccessOpeningWidth": 0.4572,
+              "AccessOpeningHeight": 0.8128,
+              "AccessOpeningRadius": 0.2032,
+              "AccessOpeningBottom": 0.2794,
+              "Connection": "Angles",
+              "ConnectionShape": "L8x8x1/2",
+              "ConnectionLength": 1.0795,
+              "GirderLegBolts": 11,
+              "DiaphragmLegBolts": 12,
+              "BoltPitch": 0.08889999999999999,
+              "Unresolved": [
+                "UNRESOLVED (p.287-288): top / bottom connection plates PL 1 x 12 - lengths and bolt patterns only partly dimensioned. Not built."
+              ]
+            },
+            {
+              "Support": 3,
+              "InteriorWebThickness": 0.019049999999999997,
+              "InteriorTopFlange": {
+                "Width": 0.30479999999999996,
+                "Thickness": 0.0254
+              },
+              "ExteriorWebThickness": 0.019049999999999997,
+              "ExteriorFlange": {
+                "Width": 0.30479999999999996,
+                "Thickness": 0.0254
+              },
+              "BearingStiffener": {
+                "Width": 0.2032,
+                "Thickness": 0.0254
+              },
+              "BearingStiffenerSpacing": 0.4572,
+              "AccessOpeningWidth": 0,
+              "AccessOpeningHeight": 0,
+              "AccessOpeningRadius": 0,
+              "AccessOpeningBottom": 0,
+              "Connection": "Angles",
+              "ConnectionShape": "L8x8x1/2",
+              "ConnectionLength": 0.9017,
+              "GirderLegBolts": 9,
+              "DiaphragmLegBolts": 10,
+              "BoltPitch": 0.08889999999999999,
+              "Unresolved": [
+                "UNRESOLVED (p.285-286): top / bottom connection plates PL 1 x 12 - lengths and bolt patterns only partly dimensioned. Not built."
+              ]
+            }
+          ],
+          "Splice": {
+            "BoltDiameter": 0.0254,
+            "TopOuterThickness": 0.019049999999999997,
+            "TopInnerThickness": 0.019049999999999997,
+            "TopInnerWidth": 0.2413,
+            "TopPlateLength": 0.9779,
+            "TopLines": [
+              -0.21589999999999998,
+              -0.07619999999999999,
+              0.07619999999999999,
+              0.21589999999999998
+            ],
+            "TopRowsPerSide": 6,
+            "TopPitch": 0.07619999999999999,
+            "WebPlateThickness": 0.015875,
+            "WebPlateWidth": 0.5715,
+            "WebPlateHeight": 1.0795,
+            "WebColumnsPerSide": 3,
+            "WebColumnPitch": 0.08889999999999999,
+            "WebRows": 12,
+            "WebRowPitch": 0.08889999999999999,
+            "BottomPlateWidth": 1.6129,
+            "BottomPlateLength": 0.9270999999999999,
+            "BottomColumns": 18,
+            "BottomColumnPitch": 0.08889999999999999,
+            "BottomRowsPerSide": 5,
+            "BottomRowPitch": 0.08889999999999999,
+            "FirstFromJoint": 0.05715,
+            "Splices": [
+              {
+                "Number": 1,
+                "BottomPlateThickness": 0.019049999999999997,
+                "FillerThickness": 0,
+                "FillerWidth": 0,
+                "FillerLength": 0
+              },
+              {
+                "Number": 2,
+                "BottomPlateThickness": 0.022224999999999998,
+                "FillerThickness": 0,
+                "FillerWidth": 0,
+                "FillerLength": 0
+              },
+              {
+                "Number": 3,
+                "BottomPlateThickness": 0.022224999999999998,
+                "FillerThickness": 0.003175,
+                "FillerWidth": 0.5334,
+                "FillerLength": 0.485775
+              },
+              {
+                "Number": 4,
+                "BottomPlateThickness": 0.022224999999999998,
+                "FillerThickness": 0,
+                "FillerWidth": 0,
+                "FillerLength": 0
+              }
+            ]
+          },
+          "Bearings": [
+            {
+              "Support": 0,
+              "Mark": "P13 (G1)",
+              "PadLength": 0.3302,
+              "PadWidth": 0.5588,
+              "PadHeight": 0.09525,
+              "InteriorLayers": 5,
+              "InteriorLayer": 0.0127,
+              "Laminates": 6,
+              "ExteriorLayer": 0.00635,
+              "PlateThickness": 0.0635,
+              "PlateWidth": 0.5841999999999999,
+              "PlateLength": 0.35559999999999997,
+              "PlanTransverseSlope": 0.0452,
+              "PlanLongitudinalSlope": -0.0492,
+              "PlanH": 1.778,
+              "PlanHorizontalOffset": 0.07619999999999999,
+              "AnchorDiameter": 0.0508,
+              "AnchorAcross": 0.5461,
+              "AnchorRows": [
+                0.2286
+              ],
+              "AnchorEmbedment": 0.381
+            },
+            {
+              "Support": 1,
+              "Mark": "P14 (F1)",
+              "PadLength": 0.508,
+              "PadWidth": 0.762,
+              "PadHeight": 0.09525,
+              "InteriorLayers": 5,
+              "InteriorLayer": 0.0127,
+              "Laminates": 6,
+              "ExteriorLayer": 0.00635,
+              "PlateThickness": 0.0635,
+              "PlateWidth": 0.7874,
+              "PlateLength": 0.5334,
+              "PlanTransverseSlope": 0.06,
+              "PlanLongitudinalSlope": -0.0148,
+              "PlanH": 1.7938749999999999,
+              "PlanHorizontalOffset": 0.07619999999999999,
+              "AnchorDiameter": 0.0508,
+              "AnchorAcross": 0.5461,
+              "AnchorRows": [
+                -0.2286,
+                0.2286
+              ],
+              "AnchorEmbedment": 0.381
+            },
+            {
+              "Support": 2,
+              "Mark": "P15 (G2)",
+              "PadLength": 0.5588,
+              "PadWidth": 0.762,
+              "PadHeight": 0.09525,
+              "InteriorLayers": 5,
+              "InteriorLayer": 0.0127,
+              "Laminates": 6,
+              "ExteriorLayer": 0.00635,
+              "PlateThickness": 0.0635,
+              "PlateWidth": 0.7874,
+              "PlateLength": 0.5841999999999999,
+              "PlanTransverseSlope": 0.06,
+              "PlanLongitudinalSlope": -0.005699999999999999,
+              "PlanH": 1.8034,
+              "PlanHorizontalOffset": 0.07619999999999999,
+              "AnchorDiameter": 0.0508,
+              "AnchorAcross": 0.5461,
+              "AnchorRows": [
+                -0.2286,
+                0.2286
+              ],
+              "AnchorEmbedment": 0.381
+            },
+            {
+              "Support": 3,
+              "Mark": "P16 (G1)",
+              "PadLength": 0.381,
+              "PadWidth": 0.5841999999999999,
+              "PadHeight": 0.127,
+              "InteriorLayers": 7,
+              "InteriorLayer": 0.0127,
+              "Laminates": 8,
+              "ExteriorLayer": 0.00635,
+              "PlateThickness": 0.0635,
+              "PlateWidth": 0.6095999999999999,
+              "PlateLength": 0.4064,
+              "PlanTransverseSlope": 0.06,
+              "PlanLongitudinalSlope": -0.005699999999999999,
+              "PlanH": 1.812925,
+              "PlanHorizontalOffset": 0.07619999999999999,
+              "AnchorDiameter": 0.0508,
+              "AnchorAcross": 0.5461,
+              "AnchorRows": [
+                -0.2286
+              ],
+              "AnchorEmbedment": 0.381
+            }
+          ],
+          "Hatches": [
+            {
+              "Girder": 0,
+              "At": {
+                "Support": 0,
+                "Splice": 0,
+                "Offset": 1.2954
+              },
+              "HoleWidth": 0.4572,
+              "HoleLength": 0.8382,
+              "DoorThickness": 0.009524999999999999,
+              "DoorWidth": 0.6095999999999999,
+              "DoorLength": 0.9144
+            },
+            {
+              "Girder": 0,
+              "At": {
+                "Support": 3,
+                "Splice": 0,
+                "Offset": -1.2954
+              },
+              "HoleWidth": 0.4572,
+              "HoleLength": 0.8382,
+              "DoorThickness": 0.009524999999999999,
+              "DoorWidth": 0.6095999999999999,
+              "DoorLength": 0.9144
+            },
+            {
+              "Girder": 1,
+              "At": {
+                "Support": 0,
+                "Splice": 0,
+                "Offset": 1.2954
+              },
+              "HoleWidth": 0.4572,
+              "HoleLength": 0.8382,
+              "DoorThickness": 0.009524999999999999,
+              "DoorWidth": 0.6095999999999999,
+              "DoorLength": 0.9144
+            },
+            {
+              "Girder": 1,
+              "At": {
+                "Support": 3,
+                "Splice": 0,
+                "Offset": -1.2954
+              },
+              "HoleWidth": 0.4572,
+              "HoleLength": 0.8382,
+              "DoorThickness": 0.009524999999999999,
+              "DoorWidth": 0.6095999999999999,
+              "DoorLength": 0.9144
+            }
+          ],
+          "StudZones": [
+            {
+              "Girder": 0,
+              "From": {
+                "Support": 0,
+                "Splice": 0,
+                "Offset": 0.3048
+              },
+              "To": {
+                "Support": -1,
+                "Splice": 1,
+                "Offset": -0.5588
+              },
+              "Spaces": 124,
+              "MaxPitch": 0.254
+            },
+            {
+              "Girder": 0,
+              "From": {
+                "Support": -1,
+                "Splice": 1,
+                "Offset": 0.5588
+              },
+              "To": {
+                "Support": 1,
+                "Splice": 0,
+                "Offset": -0.2032
+              },
+              "Spaces": 40,
+              "MaxPitch": 0.254
+            },
+            {
+              "Girder": 0,
+              "From": {
+                "Support": 1,
+                "Splice": 0,
+                "Offset": 0.2032
+              },
+              "To": {
+                "Support": -1,
+                "Splice": 2,
+                "Offset": -0.5588
+              },
+              "Spaces": 48,
+              "MaxPitch": 0.254
+            },
+            {
+              "Girder": 0,
+              "From": {
+                "Support": -1,
+                "Splice": 2,
+                "Offset": 0.5588
+              },
+              "To": {
+                "Support": -1,
+                "Splice": 3,
+                "Offset": -0.5588
+              },
+              "Spaces": 62,
+              "MaxPitch": 0.30479999999999996
+            },
+            {
+              "Girder": 0,
+              "From": {
+                "Support": -1,
+                "Splice": 3,
+                "Offset": 0.5588
+              },
+              "To": {
+                "Support": 2,
+                "Splice": 0,
+                "Offset": -0.2032
+              },
+              "Spaces": 59,
+              "MaxPitch": 0.254
+            },
+            {
+              "Girder": 0,
+              "From": {
+                "Support": 2,
+                "Splice": 0,
+                "Offset": 0.2032
+              },
+              "To": {
+                "Support": -1,
+                "Splice": 4,
+                "Offset": -0.5588
+              },
+              "Spaces": 39,
+              "MaxPitch": 0.254
+            },
+            {
+              "Girder": 0,
+              "From": {
+                "Support": -1,
+                "Splice": 4,
+                "Offset": 0.5588
+              },
+              "To": {
+                "Support": 3,
+                "Splice": 0,
+                "Offset": -0.2032
+              },
+              "Spaces": 162,
+              "MaxPitch": 0.2286
+            },
+            {
+              "Girder": 1,
+              "From": {
+                "Support": 0,
+                "Splice": 0,
+                "Offset": 0.3048
+              },
+              "To": {
+                "Support": -1,
+                "Splice": 1,
+                "Offset": -0.5588
+              },
+              "Spaces": 148,
+              "MaxPitch": 0.2032
+            },
+            {
+              "Girder": 1,
+              "From": {
+                "Support": -1,
+                "Splice": 1,
+                "Offset": 0.5588
+              },
+              "To": {
+                "Support": 1,
+                "Splice": 0,
+                "Offset": -0.2032
+              },
+              "Spaces": 45,
+              "MaxPitch": 0.2286
+            },
+            {
+              "Girder": 1,
+              "From": {
+                "Support": 1,
+                "Splice": 0,
+                "Offset": 0.2032
+              },
+              "To": {
+                "Support": -1,
+                "Splice": 2,
+                "Offset": -0.5588
+              },
+              "Spaces": 54,
+              "MaxPitch": 0.2286
+            },
+            {
+              "Girder": 1,
+              "From": {
+                "Support": -1,
+                "Splice": 2,
+                "Offset": 0.5588
+              },
+              "To": {
+                "Support": -1,
+                "Splice": 3,
+                "Offset": -0.5588
+              },
+              "Spaces": 76,
+              "MaxPitch": 0.254
+            },
+            {
+              "Girder": 1,
+              "From": {
+                "Support": -1,
+                "Splice": 3,
+                "Offset": 0.5588
+              },
+              "To": {
+                "Support": 2,
+                "Splice": 0,
+                "Offset": -0.2032
+              },
+              "Spaces": 67,
+              "MaxPitch": 0.2286
+            },
+            {
+              "Girder": 1,
+              "From": {
+                "Support": 2,
+                "Splice": 0,
+                "Offset": 0.2032
+              },
+              "To": {
+                "Support": -1,
+                "Splice": 4,
+                "Offset": -0.5588
+              },
+              "Spaces": 44,
+              "MaxPitch": 0.2286
+            },
+            {
+              "Girder": 1,
+              "From": {
+                "Support": -1,
+                "Splice": 4,
+                "Offset": 0.5588
+              },
+              "To": {
+                "Support": 3,
+                "Splice": 0,
+                "Offset": -0.2032
+              },
+              "Spaces": 186,
+              "MaxPitch": 0.2032
+            }
+          ],
+          "StudOffsets": [
+            -0.17779999999999999,
+            0,
+            0.17779999999999999
+          ],
+          "StudDiameter": 0.022224999999999998,
+          "StudLength": 0.17779999999999999,
+          "TensionZones": [
+            {
+              "Girder": 0,
+              "From": {
+                "Support": 0,
+                "Splice": 0,
+                "Offset": 0
+              },
+              "To": {
+                "Support": 0,
+                "Splice": 0,
+                "Offset": 26.15565
+              },
+              "Flanges": "Bottom"
+            },
+            {
+              "Girder": 0,
+              "From": {
+                "Support": 0,
+                "Splice": 0,
+                "Offset": 26.15565
+              },
+              "To": {
+                "Support": -1,
+                "Splice": 1,
+                "Offset": 6.2103
+              },
+              "Flanges": "Both"
+            },
+            {
+              "Girder": 0,
+              "From": {
+                "Support": -1,
+                "Splice": 1,
+                "Offset": 6.2103
+              },
+              "To": {
+                "Support": -1,
+                "Splice": 2,
+                "Offset": -5.691187500000001
+              },
+              "Flanges": "Top"
+            },
+            {
+              "Girder": 0,
+              "From": {
+                "Support": -1,
+                "Splice": 2,
+                "Offset": -5.691187500000001
+              },
+              "To": {
+                "Support": -1,
+                "Splice": 3,
+                "Offset": 8.531225
+              },
+              "Flanges": "Both"
+            },
+            {
+              "Girder": 0,
+              "From": {
+                "Support": -1,
+                "Splice": 3,
+                "Offset": 8.531225
+              },
+              "To": {
+                "Support": -1,
+                "Splice": 4,
+                "Offset": -2.9479875000000004
+              },
+              "Flanges": "Top"
+            },
+            {
+              "Girder": 0,
+              "From": {
+                "Support": -1,
+                "Splice": 4,
+                "Offset": -2.9479875000000004
+              },
+              "To": {
+                "Support": -1,
+                "Splice": 4,
+                "Offset": 6.0579
+              },
+              "Flanges": "Both"
+            },
+            {
+              "Girder": 0,
+              "From": {
+                "Support": -1,
+                "Splice": 4,
+                "Offset": 6.0579
+              },
+              "To": {
+                "Support": 3,
+                "Splice": 0,
+                "Offset": 0
+              },
+              "Flanges": "Bottom"
+            },
+            {
+              "Girder": 1,
+              "From": {
+                "Support": 0,
+                "Splice": 0,
+                "Offset": 0
+              },
+              "To": {
+                "Support": 0,
+                "Splice": 0,
+                "Offset": 24.5491
+              },
+              "Flanges": "Bottom"
+            },
+            {
+              "Girder": 1,
+              "From": {
+                "Support": 0,
+                "Splice": 0,
+                "Offset": 24.5491
+              },
+              "To": {
+                "Support": -1,
+                "Splice": 1,
+                "Offset": 5.5753
+              },
+              "Flanges": "Both"
+            },
+            {
+              "Girder": 1,
+              "From": {
+                "Support": -1,
+                "Splice": 1,
+                "Offset": 5.5753
+              },
+              "To": {
+                "Support": -1,
+                "Splice": 2,
+                "Offset": -5.807075
+              },
+              "Flanges": "Top"
+            },
+            {
+              "Girder": 1,
+              "From": {
+                "Support": -1,
+                "Splice": 2,
+                "Offset": -5.807075
+              },
+              "To": {
+                "Support": -1,
+                "Splice": 3,
+                "Offset": 8.70585
+              },
+              "Flanges": "Both"
+            },
+            {
+              "Girder": 1,
+              "From": {
+                "Support": -1,
+                "Splice": 3,
+                "Offset": 8.70585
+              },
+              "To": {
+                "Support": -1,
+                "Splice": 4,
+                "Offset": -3.0083125
+              },
+              "Flanges": "Top"
+            },
+            {
+              "Girder": 1,
+              "From": {
+                "Support": -1,
+                "Splice": 4,
+                "Offset": -3.0083125
+              },
+              "To": {
+                "Support": -1,
+                "Splice": 4,
+                "Offset": 6.17855
+              },
+              "Flanges": "Both"
+            },
+            {
+              "Girder": 1,
+              "From": {
+                "Support": -1,
+                "Splice": 4,
+                "Offset": 6.17855
+              },
+              "To": {
+                "Support": 3,
+                "Splice": 0,
+                "Offset": 0
+              },
+              "Flanges": "Bottom"
+            }
+          ],
+          "DeckPours": [
+            {
+              "Section": 1,
+              "FromStation": 9190.853856000002,
+              "ToStation": 9222.6384,
+              "Note": "span 14 to 35\u0027-0 before CL pier 14; joints parallel to CL pier, 48 h lapse"
+            },
+            {
+              "Section": 3,
+              "FromStation": 9222.6384,
+              "ToStation": 9243.974400000001,
+              "Note": "35\u0027-0 \u002B 35\u0027-0 at pier 14; joints parallel to CL pier, 48 h lapse"
+            },
+            {
+              "Section": 2,
+              "FromStation": 9243.974400000001,
+              "ToStation": 9268.6632,
+              "Note": "span 15; joints parallel to CL pier, 48 h lapse"
+            },
+            {
+              "Section": 3,
+              "FromStation": 9268.6632,
+              "ToStation": 9293.0472,
+              "Note": "45\u0027-0 \u002B 35\u0027-0 at pier 15; joints parallel to CL pier, 48 h lapse"
+            },
+            {
+              "Section": 1,
+              "FromStation": 9293.0472,
+              "ToStation": 9331.452000000001,
+              "Note": "span 16 (continues into span 17, not modeled); joints parallel to CL pier, 48 h lapse"
+            }
+          ],
+          "PlanSteelWeightLb": "NaN",
+          "Unresolved": [
+            "UNRESOLVED (p.148, p.254, p.259): pier 13 working point coordinates - the N / E printed for pier 13 on Bridge N (p.148, Ramp 44E STA 301\u002B09.58) lie about 171 ft from the pier 14 working point, not 139.28 ft along an R 881.47 arc, and Bridge O\u0027s staking sheet (p.259) gives no pier-13 coordinates. Pier 13 is located by station (301\u002B53.72 Ramp 44F) on the arc through piers 14 / 16; the p.148 coordinates are reported only.",
+            "UNRESOLVED (p.254, p.270): superelevation transition - the deck sections show 6 % only; no superelevation diagram is in the volume. 6 % used over the whole unit.",
+            "UNRESOLVED (p.273): pier 13 angles 69 deg 02\u002738\u0022 (G1) / 69 deg 18\u002754\u0022 (G2) - a straight bearing line crossing the concentric girders 18\u0027-11 13/16 apart meets them about 27\u0027 apart in angle, the plan angles differ by 16\u0027; with the elevation-sheet spans the angles come out about 44\u0027 (G1) and 33\u0027 (G2) smaller. The line is set by the girder spans 141\u0027-4\u0022 / 137\u0027-2 5/16\u0022 (which also give the plan\u0027s 18\u0027-11 13/16\u0022 along CL brg and CL pier at 301\u002B53.72); angles reported.",
+            "UNRESOLVED (p.273): deck ends at piers 13 and 16 - the unit\u0027s slab continues into Bridge N (pier 13) and span 17 (pier 16); the joint / continuity details there are outside this unit. The modeled deck stops at CL pier 13 and CL pier 16 (DeckEndOffset 1\u0027-0 from CL brg) - a model boundary, not a joint.",
+            "UNRESOLVED (p.270): F-shaped parapet FSHP-42 section (top width, face breaks) - the standard drawing FSHP-42 is not in the volume. Program F-shape with 42\u0022 height and 1\u0027-6 base; other dimensions = program defaults.",
+            "UNRESOLVED (p.254-297): structural steel plan quantity - no estimate of quantities / steel weight for the tub unit was found in the volume. Steel weight is reported without a plan comparison.",
+            "UNRESOLVED (p.278-279): thickness transitions at shop splices - the girder elevations show square steps; no taper detail is given. Plates change square at the dimensioned points (no 1:2.5 taper modeled).",
+            "UNRESOLVED (p.281): web splice plate position on the web - the section dimensions 6 1/2\u0022 \u002B 3\u0027-6 1/2\u0022 \u002B 6 1/2\u0022 (4\u0027-7 1/2\u0022) exceed the 4\u0027-3 9/16\u0022 web length on the slope. Web splice plates centred on the web.",
+            "UNRESOLVED (p.281): bottom splice plate edge dimension 8 3/4\u0022 - (77\u0022 - 63 1/2\u0022) / 2 = 6 3/4\u0022, not 8 3/4\u0022. Plates centred on the tub CL.",
+            "UNRESOLVED (p.273): which panel points carry internal cross frames - the framing plan distinguishes solid / dashed lines graphically only. Even panel points (solid lines) = K frame \u002B top strut, odd = top strut, as drawn.",
+            "UNRESOLVED (p.289): lateral bracing end bolts - Detail A shows 6 holes per member end with 1 3/4\u0022 / 3\u0022 / 4 1/16\u0022 dimensions. 2 lines x 3 bolts @ 3\u0022 near each end modeled; bolts off the flange are dropped.",
+            "UNRESOLVED (p.292): anchor bolt rows at the end piers 13 / 16 - the expansion-pier plan (G1) shows one row 9\u0022 from the CL brg; the row side at each end is not labeled. Row placed 9\u0022 from the CL brg on the span side.",
+            "UNRESOLVED (p.273): access hatch position reference - 4\u0027-3\u0022 is dimensioned from the CL hatch to the CL brg line drawn at the girder; the side (span) is from the drawing. Hatches 4\u0027-3\u0022 into spans 14 and 16 on the tub CL.",
+            "UNRESOLVED (p.278-279): first stud at pier 13 - the row label reads \u0022STUD SPA ~ 1\u0027-0\u0022\u0022 with an unreadable leader. First stud row 1\u0027-0 from the CL brg (gives 9.97\u0022 / 7.96\u0022 spacing, within the 10\u0022 / 8\u0022 max).",
+            "UNRESOLVED (p.279): G2 top tension zone over pier 14 - it is dimensioned 39\u0027-2 7/8\u0022 but FS1 \u002B 18\u0027-3 1/2\u0022 to FS2 - 19\u0027-0 5/8\u0022 is 41\u0027-8 3/4\u0022 (79\u0027-0 7/8\u0022 between the splices). Zone taken between the two BOTH zones (41\u0027-8 3/4\u0022)."
+          ]
+        }
+      },
+      "Deck": {
+        "EdgeStrip": null,
+        "LeftEdgeOffset": -6.2484,
+        "RightEdgeOffset": 3.5052000000000003,
+        "LeftEdgeTable": null,
+        "RightEdgeTable": null,
+        "Thickness": 0.2032,
+        "Haunch": 0.1143,
+        "OverhangThickness": 0.2032,
+        "StayInPlaceForms": true,
+        "SipFormDepth": 0.0508,
+        "Barrier": {
+          "Type": "FShape",
+          "Reinforcement": false,
+          "EpoxyCoated": true,
+          "StirrupSpacing": 0.15239999999999998,
+          "Height": 1.0668,
+          "BaseWidth": 0.4572,
+          "TopWidth": 0.15239999999999998,
+          "Left": true,
+          "Right": true
+        },
+        "Reinforcement": {
+          "Enabled": false,
+          "ConcreteStrengthKsi": 4,
+          "SteelYieldKsi": 60,
+          "EpoxyCoated": true,
+          "TopCover": 0.0635,
+          "BottomCover": 0.03175,
+          "SideCover": 0.0508,
+          "TransverseOrientation": "Auto",
+          "SkewLimitDegrees": 15,
+          "TopTransverseSize": "#5",
+          "TopTransverseSpacing": 0.15239999999999998,
+          "BottomTransverseSize": "#5",
+          "BottomTransverseSpacing": 0.15239999999999998,
+          "TopLongitudinalSize": "#4",
+          "TopLongitudinalSpacing": 0.2286,
+          "BottomLongitudinalSize": "#5",
+          "BottomLongitudinalSpacing": 0.2286,
+          "MaxBarLength": 18.288,
+          "LapOverride": 0,
+          "NegativeMomentSteel": true,
+          "NegativeMomentSize": "#5",
+          "NegativeRegionFraction": 0.25,
+          "RequiredSteelRatio": 0.01,
+          "MarkLengthTolerance": 0.0508,
+          "Plan": null
+        }
+      },
+      "CrossFrames": {
+        "IntermediateType": "Auto",
+        "SupportType": "Auto",
+        "Orientation": "Auto",
+        "Arrangement": "Auto",
+        "MaxSpacing": 7.62,
+        "MaxBayWidth": 0,
+        "MinDistanceFromBearing": 0.9144000000000001,
+        "MinDistanceFromSplice": 0.9144000000000001,
+        "MoveClearOfSplices": false,
+        "SkewLimitDegrees": 20,
+        "KFrameAspectRatio": 1.5,
+        "ChordAngle": "L4x4x3/8",
+        "DiagonalAngle": "L4x4x3/8",
+        "SupportChordAngle": "L5x5x3/8",
+        "SupportDiagonalAngle": "L4x4x3/8",
+        "DiaphragmChannel": "C15x33.9",
+        "TopWorkPointOffset": 0.15239999999999998,
+        "BottomWorkPointOffset": 0.15239999999999998,
+        "GussetThickness": 0.0127,
+        "MemberClearance": 0.0254,
+        "WeldLap": 0.15239999999999998,
+        "MemberWeldSize": 0.00635,
+        "Styles": [],
+        "IntermediateStyle": "",
+        "SupportStyles": {},
+        "SupportBayStyles": {},
+        "SupportStyle": "",
+        "Lines": [],
+        "Links": []
+      },
+      "Stiffeners": {
+        "BearingStiffener": {
+          "Width": 0.17779999999999999,
+          "Thickness": 0.022224999999999998
+        },
+        "ConnectionPlate": {
+          "Width": 0.17779999999999999,
+          "Thickness": 0.0127
+        },
+        "IntermediateMaxSpacing": 0,
+        "IntermediateStiffener": {
+          "Width": 0.15239999999999998,
+          "Thickness": 0.0127
+        },
+        "IntermediateSide": "Interior",
+        "CornerClip": 0.038099999999999995,
+        "IntermediateBottomGap": 0.0508,
+        "WeldSize": 0.00635,
+        "FlangeToWebWeld": 0.0079375
+      },
+      "FieldSplices": [
+        {
+          "Station": 0,
+          "Girders": [
+            {
+              "Girder": 0,
+              "Support": 0,
+              "Offset": 32.254825000000004
+            },
+            {
+              "Girder": 1,
+              "Support": 0,
+              "Offset": 30.772100000000002
+            }
+          ],
+          "Detail": null,
+          "Number": 1
+        },
+        {
+          "Station": 0,
+          "Girders": [
+            {
+              "Girder": 0,
+              "Support": 1,
+              "Offset": 12.798425
+            },
+            {
+              "Girder": 1,
+              "Support": 1,
+              "Offset": 13.058775
+            }
+          ],
+          "Detail": null,
+          "Number": 2
+        },
+        {
+          "Station": 0,
+          "Girders": [
+            {
+              "Girder": 0,
+              "Support": 1,
+              "Offset": 32.680274999999995
+            },
+            {
+              "Girder": 1,
+              "Support": 2,
+              "Offset": -15.97025
+            }
+          ],
+          "Detail": null,
+          "Number": 3
+        },
+        {
+          "Station": 0,
+          "Girders": [
+            {
+              "Girder": 0,
+              "Support": 2,
+              "Offset": 10.4409875
+            },
+            {
+              "Girder": 1,
+              "Support": 2,
+              "Offset": 10.652125000000002
+            }
+          ],
+          "Detail": null,
+          "Number": 4
+        }
+      ],
+      "Bolts": {
+        "Grade": "A325 Type 3",
+        "Diameter": 0.0254,
+        "BoltsPerConnection": 3,
+        "Pitch": 0.07619999999999999,
+        "EdgeDistance": 0.038099999999999995
+      },
+      "Bearings": {
+        "Type": "Elastomeric",
+        "DiscDiameter": 0.30479999999999996,
+        "DiscHeight": 0.044449999999999996,
+        "UpperPlateLength": 0.4572,
+        "UpperPlateWidth": 0.4572,
+        "UpperPlateThickness": 0.038099999999999995,
+        "ExpansionPlateExtension": 0.15239999999999998,
+        "PtfeThickness": 0.003175,
+        "MasonryPlateLength": 0.5588,
+        "MasonryPlateWidth": 0.762,
+        "MasonryPlateThickness": 0.044449999999999996,
+        "MasonryPadThickness": 0,
+        "GenericHeight": 0.2286,
+        "GenericBodyLength": 0.4064,
+        "GenericBodyWidth": 0.4064,
+        "AnchorSpacingAlong": 0,
+        "AnchorSpacingAcross": 0,
+        "AnchorEdgeDistanceFixed": 0,
+        "SolePlateLength": 0.4064,
+        "ShearPinDiameter": 0.07619999999999999,
+        "GuideBarWidth": 0.038099999999999995,
+        "GuideBarHeight": 0.0635,
+        "AnchorBoltCount": 4,
+        "AnchorBoltDiameter": 0.03175,
+        "AnchorBoltGrade": "F1554 Gr. 36",
+        "AnchorBoltEmbedment": 0.4572,
+        "AnchorHoleOversize": 0.0127,
+        "AnchorEdgeDistance": 0.0635,
+        "PadLength": 0.35559999999999997,
+        "PadWidth": 0.508,
+        "PadHeight": 0.08889999999999999,
+        "SolePlateMinThickness": 0.038099999999999995,
+        "SolePlateProjection": 0.0254
+      },
+      "FieldSpliceGap": 0.00635,
+      "SpliceDetail": {
+        "FlangeOuterPlateThickness": 0.015875,
+        "FlangeInnerPlateThickness": 0.015875,
+        "WebPlateThickness": 0.011112499999999999,
+        "FlangeBoltLinesPerSide": 2,
+        "TopFlangeBoltRows": 3,
+        "BottomFlangeBoltRows": 4,
+        "WebBoltColumns": 2,
+        "FlangeGage": 0.07619999999999999,
+        "FirstLineFromWeb": 0.044449999999999996,
+        "WebPlateFlangeClearance": 0.03175,
+        "InnerPlateWebClearance": 0.0127,
+        "BoltDiameter": 0,
+        "FirstBoltFromJoint": 0,
+        "PlateEndDistance": 0,
+        "Top": null,
+        "Bottom": null,
+        "Web": null
+      },
+      "Studs": {
+        "Enabled": true,
+        "Diameter": 0.022224999999999998,
+        "RowsAcross": 3,
+        "TransverseSpacing": 0.1143,
+        "Pitch": 0.30479999999999996,
+        "Penetration": 0.0508,
+        "MinCover": 0.0508,
+        "HeadDiameter": 0.034925,
+        "HeadHeight": 0.009524999999999999,
+        "LengthIncrement": 0.0127,
+        "Clearance": 0.038099999999999995
+      },
+      "LateralBracing": {
+        "Enabled": false,
+        "Flange": "Bottom",
+        "Bays": [
+          1
+        ],
+        "Spans": [],
+        "Pattern": "Warren",
+        "Angle": "L5x5x3/8",
+        "GussetThickness": 0.0127,
+        "BoltsPerConnection": 4
+      },
+      "Drains": [],
+      "InspectionAccess": null,
+      "Misc": null,
+      "PsSteelDiaphragms": null
+    }
+  ],
+  "References": []
+}

@@ -76,8 +76,12 @@ public sealed class FramingGenerator
         {
             // Prestressed concrete girders have no cross frames, stiffeners or field splices.
             LocateSplices();
-            BuildCrossFrames();
-            BuildStiffeners();
+            if (!_def.Girders.IsTub)
+            {
+                // Tub girders: bracing, diaphragms and stiffeners are laid out by the tub generator (Steel/TubGirder*.cs).
+                BuildCrossFrames();
+                BuildStiffeners();
+            }
             BuildSplices();
             BuildPlateRuns();
         }

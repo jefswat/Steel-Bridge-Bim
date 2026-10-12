@@ -1,0 +1,131 @@
+{
+  // Plan sheet links of the ODOT Bridge O steel tub unit model (Vol 2 Phase 2B, job piece 09033(11); Bridge 'O' = Ramp 44F over I-44 &
+  // Ramps 44N / 44M2, spans 14-16 = 2 steel tub girders; build-odot-o-tub.csx). Format: see sheet-links-i80-rampg.json (header) and
+  // docs/API.md "Companion database". Sheet index: docs/plan-data/vol2-sheet-index.csv and vol2-o-steel-tub-unit-spans14-16/INDEX.md, titles read
+  // from the title blocks (PDF pages 254-300 = Bridge O sheets O-1 .. O-43, BD-1, PS-1/2; p.148 / p.180 = Bridge N sheets with the pier 13 data).
+  // Scope (user): superstructure of spans 14-16 only - substructure, abutment, span 17 (U54 beams), approach slab, slope wall, drains are NOT
+  // modeled; their sheets have no rule and show as unused sheets.
+  // Hierarchy in this model: unit > superstructure > girder (G1, G2) > girder field section G#-n | field splice FS#-G# | bearing B#-G# (B1 = pier 13,
+  //   B2 = pier 14, B3 = pier 15, B4 = pier 16) | cross frame (G#-K s.n internal K frame + top strut, G#-T s.n top strut, XD# external diaphragm,
+  //   G#-SD# interior support diaphragm, XSD#-1 exterior support diaphragm; # = support 1-4 = piers 13-16) | lateral bracing G#-LAT s;
+  //   unit > deck > deck slab, barrier group > barrier.
+
+  "models": [ "ODOT Bridge O tub unit.sbm" ],
+  "planFolders": [ "plans", "C:/SBMData" ],
+
+  "planSets": [
+    { "id": "vol2-phase2b", "pdf": "Vol 2_Phase 2B Bridge Combined*.pdf", "bridgeGroup": "Bridge O spans 14-16 (steel tub unit)",
+      "sheets": [
+        { "p": 148, "s": "N-16", "t": "SUBSTRUCTURE LAYOUT (BRIDGE N, SHEET 2 OF 2)" },
+        { "p": 180, "s": "N-48", "t": "PIER NO. 13 EAST DETAILS (BRIDGE N, SHEET 1 OF 2)" },
+        { "p": 254, "s": "O-1", "t": "GENERAL PLAN AND ELEVATION" },
+        { "p": 255, "s": "O-1A", "t": "SUMMARY OF PAY QUANTITIES" },
+        { "p": 256, "s": "O-2", "t": "FOUNDATION REPORT (SHEET 1 OF 3)" },
+        { "p": 257, "s": "O-3", "t": "FOUNDATION REPORT (SHEET 2 OF 3)" },
+        { "p": 258, "s": "O-4", "t": "FOUNDATION REPORT (SHEET 3 OF 3)" },
+        { "p": 259, "s": "O-5", "t": "STAKING LAYOUT" },
+        { "p": 260, "s": "O-6", "t": "ABUTMENT NO. 1 DETAILS (SHEET 1 OF 2)" },
+        { "p": 261, "s": "O-7", "t": "ABUTMENT NO. 1 DETAILS (SHEET 2 OF 2)" },
+        { "p": 262, "s": "O-8", "t": "PIER NO. 14 DETAILS (SHEET 1 OF 2)" },
+        { "p": 263, "s": "O-9", "t": "PIER NO. 14 DETAILS (SHEET 2 OF 2)" },
+        { "p": 264, "s": "O-10", "t": "PIER NO. 15 DETAILS (SHEET 1 OF 2)" },
+        { "p": 265, "s": "O-11", "t": "PIER NO. 15 DETAILS (SHEET 2 OF 2)" },
+        { "p": 266, "s": "O-12", "t": "PIER NO. 16 DETAILS (SHEET 1 OF 2)" },
+        { "p": 267, "s": "O-13", "t": "PIER NO. 16 DETAILS (SHEET 2 OF 2)" },
+        { "p": 268, "s": "O-14", "t": "TYPICAL PIER DETAILS" },
+        { "p": 269, "s": "O-15", "t": "UNDERDRAIN ASSEMBLY SUBSTRUCTURE EXCAVATION AND PIPE" },
+        { "p": 270, "s": "O-16", "t": "SUPERSTRUCTURE DETAILS (SHEET 1 OF 3)" },
+        { "p": 271, "s": "O-17", "t": "SUPERSTRUCTURE DETAILS (SHEET 2 OF 3)" },
+        { "p": 272, "s": "O-18", "t": "SUPERSTRUCTURE DETAILS (SHEET 3 OF 3)" },
+        { "p": 273, "s": "O-19", "t": "FRAMING PLAN" },
+        { "p": 274, "s": "O-20", "t": "U54 CONCRETE BEAM DETAILS (SHEET 1 OF 3)" },
+        { "p": 275, "s": "O-21", "t": "U54 CONCRETE BEAM DETAILS (SHEET 2 OF 3)" },
+        { "p": 276, "s": "O-22", "t": "U54 CONCRETE BEAM DETAILS (SHEET 3 OF 3)" },
+        { "p": 277, "s": "O-23", "t": "U54 CONCRETE BEAM ELEVATIONS" },
+        { "p": 278, "s": "O-24", "t": "STEEL GIRDER ELEVATION (SPANS NO. 14-16 - GIRDER NO. 1)" },
+        { "p": 279, "s": "O-25", "t": "STEEL GIRDER ELEVATION (SPANS NO. 14-16 - GIRDER NO. 2)" },
+        { "p": 280, "s": "O-26", "t": "STEEL GIRDER DEAD LOAD DEFLECTIONS" },
+        { "p": 281, "s": "O-27", "t": "FIELD SPLICE DETAILS" },
+        { "p": 282, "s": "O-28", "t": "INTERMEDIATE CROSS FRAME DETAILS" },
+        { "p": 283, "s": "O-29", "t": "PIER NO. 13 END DIAPHRAGM DETAILS (SHEET 1 OF 2)" },
+        { "p": 284, "s": "O-30", "t": "PIER NO. 13 END DIAPHRAGM DETAILS (SHEET 2 OF 2)" },
+        { "p": 285, "s": "O-31", "t": "PIER NO. 16 END DIAPHRAGM DETAILS (SHEET 1 OF 2)" },
+        { "p": 286, "s": "O-32", "t": "PIER NO. 16 END DIAPHRAGM DETAILS (SHEET 2 OF 2)" },
+        { "p": 287, "s": "O-33", "t": "PIERS NO. 14 & 15 PIER DIAPHRAGM DETAILS (SHEET 1 OF 2)" },
+        { "p": 288, "s": "O-34", "t": "PIERS NO. 14 & 15 PIER DIAPHRAGM DETAILS (SHEET 2 OF 2)" },
+        { "p": 289, "s": "O-35", "t": "LATERAL BRACING DETAIL" },
+        { "p": 290, "s": "O-36", "t": "STEEL GIRDER MISCELLANEOUS DETAILS" },
+        { "p": 291, "s": "O-37", "t": "54\" CONCRETE U-BEAMS BEARING DETAILS" },
+        { "p": 292, "s": "O-38", "t": "STEEL GIRDER BEARING DETAILS" },
+        { "p": 293, "s": "O-39", "t": "STEEL GIRDER BEARING ASSEMBLY SCHEDULES" },
+        { "p": 294, "s": "O-40", "t": "BEARING ASSEMBLY SCHEDULE" },
+        { "p": 295, "s": "O-41", "t": "APPROACH SLAB DETAILS" },
+        { "p": 296, "s": "O-42", "t": "SLOPE WALL DETAILS" },
+        { "p": 297, "s": "O-43", "t": "FORM LINER DETAILS" },
+        { "p": 298, "s": "BD-1", "t": "DETAIL OF BRIDGE DRAINS" },
+        { "p": 299, "s": "PS-1", "t": "PEACE SHIELD DETAILS (SHEET 1 OF 2)" },
+        { "p": 300, "s": "PS-2", "t": "PEACE SHIELD DETAILS (SHEET 2 OF 2)" }
+      ] }
+  ],
+
+  "administrative": [],
+
+  "rules": [
+    { "id": "general-plan", "sheets": "^GENERAL PLAN AND ELEVATION", "role": "general",
+      "basis": "Curve no. 9 (R 881.47 LT), profile (PVI 302+70, VC 200'), spans 139'-3 3/8 / 161'-0 / 161'-0, station equations, design data",
+      "target": [ { "level": "alignment", "bridge_group": "CL Ramp 44F" }, { "level": "unit" } ] },
+    { "id": "staking", "sheets": "^STAKING LAYOUT", "role": "general", "basis": "Working points (N / E) of piers 14-16 and abutment 1: the arc centre of curve no. 9",
+      "target": [ { "level": "alignment", "bridge_group": "CL Ramp 44F" }, { "level": "unit" } ] },
+    { "id": "pier13-wp", "sheets": "^SUBSTRUCTURE LAYOUT \\(BRIDGE N", "role": "general", "basis": "Pier 13 working point (Ramp 44E STA 301+09.58 = 44F 301+53.72); its N / E is not on the 44F arc (UNRESOLVED)",
+      "target": [ { "level": "alignment", "bridge_group": "CL Ramp 44F" } ] },
+    { "id": "pedestals-13", "sheets": "^PIER NO\\. 13 EAST DETAILS", "basis": "Pedestal elevations 4 / 5 (G2 / G1 seats at pier 13), checked against the bearing seats",
+      "target": [ { "level": "assembly", "category": "bearing", "name": "B1-%" } ] },
+    { "id": "pedestals-14", "sheets": "^PIER NO\\. 14 DETAILS", "pages": [ 262 ], "basis": "Pedestal elevations (G1 / G2 seats), anchor bolt layout",
+      "target": [ { "level": "assembly", "category": "bearing", "name": "B2-%" } ] },
+    { "id": "pedestals-15", "sheets": "^PIER NO\\. 15 DETAILS", "pages": [ 264 ], "basis": "Pedestal elevations (G1 / G2 seats), anchor bolt layout",
+      "target": [ { "level": "assembly", "category": "bearing", "name": "B3-%" } ] },
+    { "id": "pedestals-16", "sheets": "^PIER NO\\. 16 DETAILS", "pages": [ 266 ], "basis": "Pedestal elevations 1 / 2 (span 16 seats), anchor bolt layout",
+      "target": [ { "level": "assembly", "category": "bearing", "name": "B4-%" } ] },
+
+    { "id": "typical-section", "sheets": "^SUPERSTRUCTURE DETAILS", "pages": [ 270 ], "basis": "Typical section: 8 in. slab, 32'-0 deck, 6 % cross slope, tub spacing, F-shaped parapets",
+      "target": [ { "level": "part", "category": [ "superstructure", "deck" ] }, { "level": "group", "category": "barrier group" } ] },
+    { "id": "deck-reinforcing", "sheets": "^SUPERSTRUCTURE DETAILS", "pages": [ 271 ], "basis": "Deck reinforcing, bar list, 'H' (top of slab to bottom of bearing) at the supports",
+      "target": [ { "level": "part", "category": "deck" }, { "level": "assembly", "category": "bearing" } ] },
+    { "id": "pour-sequence", "sheets": "^SUPERSTRUCTURE DETAILS", "pages": [ 272 ], "basis": "Slab pour sequence (sections 1 / 3 / 2 / 3 / 1; data only, the slab is not split)",
+      "target": [ { "level": "element", "category": "deck slab" } ] },
+    { "id": "framing-plan", "sheets": "^FRAMING PLAN", "basis": "Girder radii, bearing lines, bracing panel strings, external diaphragms, field splices, access hatches",
+      "target": [ { "level": "group", "category": [ "girder", "cross frame group", "lateral bracing group" ] } ] },
+    { "id": "girder-1", "sheets": "^STEEL GIRDER ELEVATION \\(SPANS NO\\. 14-16 - GIRDER NO\\. 1\\)", "basis": "Girder 1 plates, splices, tension zones, studs",
+      "target": [ { "level": "group", "category": "girder", "girder": "G1" } ] },
+    { "id": "girder-2", "sheets": "^STEEL GIRDER ELEVATION \\(SPANS NO\\. 14-16 - GIRDER NO\\. 2\\)", "basis": "Girder 2 plates, splices, tension zones, studs",
+      "target": [ { "level": "group", "category": "girder", "girder": "G2" } ] },
+    { "id": "deflections", "sheets": "^STEEL GIRDER DEAD LOAD DEFLECTIONS", "basis": "Dead load deflections at the tenth points and splices (camber input)",
+      "target": [ { "level": "group", "category": "girder" } ] },
+    { "id": "field-splices", "sheets": "^FIELD SPLICE DETAILS", "basis": "Top / web / bottom splice plates, fillers, 1 in. A325 bolts",
+      "target": [ { "level": "assembly", "category": "field splice" } ] },
+    { "id": "intermediate-bracing", "sheets": "^INTERMEDIATE CROSS FRAME DETAILS", "basis": "Internal K frames, WT6x29 top struts, transverse stiffeners, external intermediate diaphragms",
+      "target": [ { "level": "assembly", "category": "cross frame", "name": [ "G%-K%", "G%-T%", "XD%" ] } ] },
+    { "id": "end-diaphragm-13", "sheets": "^PIER NO\\. 13 END DIAPHRAGM DETAILS", "basis": "Pier 13 interior / exterior end diaphragms, bearing stiffeners, bent plates",
+      "target": [ { "level": "assembly", "category": "cross frame", "name": [ "G%-SD1", "XSD1-%" ] } ] },
+    { "id": "end-diaphragm-16", "sheets": "^PIER NO\\. 16 END DIAPHRAGM DETAILS", "basis": "Pier 16 interior / exterior end diaphragms, bearing stiffeners",
+      "target": [ { "level": "assembly", "category": "cross frame", "name": [ "G%-SD4", "XSD4-%" ] } ] },
+    { "id": "pier-diaphragms", "sheets": "^PIERS NO\\. 14 & 15 PIER DIAPHRAGM DETAILS", "basis": "Piers 14 / 15 interior diaphragms (access opening), exterior diaphragms, bearing stiffeners",
+      "target": [ { "level": "assembly", "category": "cross frame", "name": [ "G%-SD2", "G%-SD3", "XSD2-%", "XSD3-%" ] } ] },
+    { "id": "lateral-bracing", "sheets": "^LATERAL BRACING DETAIL", "basis": "WT9x38 top lateral bracing, work points, end bolts",
+      "target": [ { "level": "assembly", "category": "lateral bracing" } ] },
+    { "id": "misc", "sheets": "^STEEL GIRDER MISCELLANEOUS DETAILS", "basis": "Access doors, studs (3 - 7/8 x 7), drain holes, rodent screens, drip plates",
+      "target": [ { "level": "assembly", "category": "girder field section" } ] },
+    { "id": "bearings", "sheets": "^STEEL GIRDER BEARING (DETAILS|ASSEMBLY SCHEDULES)", "basis": "Laminated pads, beveled plates (bevels M / N), anchor bolts",
+      "target": [ { "level": "assembly", "category": "bearing" } ] },
+    { "id": "parapet", "sheets": "^SUPERSTRUCTURE DETAILS", "pages": [ 270, 271 ], "basis": "42 in. F-shaped parapet (std FSHP-42, not in the volume)",
+      "target": [ { "level": "element", "category": "barrier" } ] }
+  ],
+
+  "hints": [
+    { "sheets": "PIER NO\\. 1[3-6]", "suggests": "Substructure is out of scope (user): only the pedestal elevations are used, to check the bearing seats." },
+    { "sheets": "U54|U-BEAM|BEARING ASSEMBLY SCHEDULE$", "suggests": "Span 17 (U54 concrete beams) is not modeled." },
+    { "sheets": "^SUMMARY OF PAY QUANTITIES", "suggests": "Drilled shaft / pile foundation summary only (no pay quantities printed, so no plan steel weight to check); substructure is out of scope." },
+    { "sheets": "FOUNDATION REPORT|TYPICAL PIER DETAILS", "suggests": "Foundations / peace shield pedestals: substructure is out of scope (user)." },
+    { "sheets": "ABUTMENT|APPROACH SLAB|SLOPE WALL|DRAINS|PEACE SHIELD|FORM LINER|UNDERDRAIN", "suggests": "Not modeled (superstructure of spans 14-16 only)." }
+  ]
+}
