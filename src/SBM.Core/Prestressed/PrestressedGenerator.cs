@@ -77,6 +77,26 @@ public static class PrestressedGenerator
             foreach (var r in d.Unresolved ?? new List<string>())
                 if (seen.Add(r))
                     model.Diagnostics.Add(new Diagnostic(DiagnosticSeverity.Warning, $"UNRESOLVED (prestressed {(d.Designation != "" ? d.Designation : TxGirderCatalog.Get(d).Name)}): {r}"));
+        // Plan camber tables (recorded, not applied to the geometry): final = camber - SDL deflection, to the printed 1/16".
+        foreach (var d in used.Where(d => d.CamberTable is { Count: > 0 }))
+        {
+            var tab = d.CamberTable!;
+            int ok = tab.Count(p => Math.Abs(p.FinalCamber - (p.Camber - p.Deflection)) <= In(1.0 / 32) + 1e-9);
+            var peak = tab.OrderByDescending(p => p.Camber).First();
+            string beamList = string.Join(", ", model.Beams.Where(b => ReferenceEquals(b.Definition, d)).Select(b => b.Mark));
+            model.Diagnostics.Add(new Diagnostic(DiagnosticSeverity.Info,
+                $"Camber table {(d.Designation != "" ? d.Designation : TxGirderCatalog.Get(d).Name)} ({d.CamberSource ?? d.Source}; {beamList}): {tab.Count} points, girder-alone camber up to " +
+                $"{u.FormatLength(peak.Camber, LengthKind.Short)} at {peak.Fraction:0.00} L; final = camber - SDL deflection within 1/32\" in {ok} of {tab.Count} cells. " +
+                "The beams are modeled in their final (uncambered) shape."));
+        }
+        var soles = model.Pads.Where(p => p.SolePlate != null).ToList();
+        if (soles.Count > 0)
+        {
+            var worst = soles.OrderByDescending(p => Math.Abs(p.SolePlate!.TaperMinusSlope)).First();
+            model.Diagnostics.Add(new Diagnostic(DiagnosticSeverity.Info,
+                $"Sole plates: {soles.Count} tapered plates; plan taper vs the modeled beam slope (no camber / end rotation) differs by up to " +
+                $"{worst.SolePlate!.TaperMinusSlope * 100:0.00}% ({worst.SolePlate.Mark}); the stack uses each plate's thickness at the CL bearing."));
+        }
         if (model.Beams.Any(b => b.Strands.Any(s => s.Debonded)))
             model.Diagnostics.Add(new Diagnostic(DiagnosticSeverity.Warning,
                 UnresolvedFlag.Text(used.FirstOrDefault(d => d.Source != "")?.Source is { } src ? src : "beam sheet (debonding table)", "prestressed debond sheathing product / size",
@@ -201,9 +221,9 @@ public static class PrestressedGenerator
         if (def.Girders.SpanLayoutOf(j) is { } spl)
         {
             if (c.LayoutBegin != null && spl.Begin.BearingOffset > 0)
-                endA = brgA - (spl.Begin.BearingMeasure == BearingOffsetMeasure.NormalToSupport ? pd.BearingToEnd / Cos(supA) : pd.BearingToEnd);
+                endA = brgA - (spl.Begin.BearingMeasure == BearingOffsetMeasure.NormalToSupport ? pd.BearingToEndAt(false) / Cos(supA) : pd.BearingToEndAt(false));
             if (c.LayoutEnd != null && spl.End.BearingOffset > 0)
-                endB = brgB + (spl.End.BearingMeasure == BearingOffsetMeasure.NormalToSupport ? pd.BearingToEnd / Cos(supB) : pd.BearingToEnd);
+                endB = brgB + (spl.End.BearingMeasure == BearingOffsetMeasure.NormalToSupport ? pd.BearingToEndAt(true) / Cos(supB) : pd.BearingToEndAt(true));
         }
         double fkA = squareA ? 0 : kA, fkB = squareB ? 0 : kB;
         string typeName = pd.Designation != "" ? pd.Designation : shape.Name;
@@ -290,8 +310,10 @@ public static class PrestressedGenerator
         double holdFromEnd = pd.HoldDownFromMidspan > 0 ? Math.Max(0, len / 2 - pd.HoldDownFromMidspan / kSlope) : Math.Max(0, len / 2 - hold);
         var layout = new List<(Vec2 p, double yEnd, bool harped, double xEnd)>();
         var debond = new List<(double s, double e, string sym)>();
+        var own = new List<(double dia, string? label)>();
         if (StrandPatterns.Resolve(pd, D) is { } sl) // explicit (possibly empty = no strands), grid-column harping applied
         {
+            own.AddRange(sl.Select(q => (q.Diameter, q.Label)));
             layout.AddRange(sl.Select(q =>
             {
                 double xe = double.IsNaN(q.XEnd) ? q.X : q.XEnd;
@@ -324,12 +346,13 @@ public static class PrestressedGenerator
         {
             var (p, yEnd, harped, xEnd) = layout[n];
             var (dbS, dbE, sym) = n < debond.Count ? debond[n] : (0.0, 0.0, "");
+            var (dia, label) = n < own.Count ? own[n] : (0.0, null);
             if (!harped)
             {
                 strands.Add(new StrandInstance
                 {
                     Points = new[] { P(SA(p.X, p.Y), p.X, p.Y), P(SB(p.X, p.Y), p.X, p.Y) }, Section = p, EndHeight = p.Y,
-                    DebondStart = dbS, DebondEnd = dbE, DebondSymbol = sym,
+                    DebondStart = dbS, DebondEnd = dbE, DebondSymbol = sym, Diameter = dia, Label = label,
                 });
                 continue;
             }
@@ -337,7 +360,7 @@ public static class PrestressedGenerator
             strands.Add(new StrandInstance
             {
                 Points = new[] { P(SA(xEnd, yEnd), xEnd, yEnd), P(h0, p.X, p.Y), P(h1, p.X, p.Y), P(SB(xEnd, yEnd), xEnd, yEnd) },
-                Section = p, Depressed = true, EndHeight = yEnd, DebondStart = dbS, DebondEnd = dbE, DebondSymbol = sym,
+                Section = p, Depressed = true, EndHeight = yEnd, DebondStart = dbS, DebondEnd = dbE, DebondSymbol = sym, Diameter = dia, Label = label,
             });
         }
 
@@ -401,17 +424,22 @@ public static class PrestressedGenerator
         var padList = new List<PrestressedPad>();
         var seatList = new List<BearingSeat>();
         var padType = shape.IsTx ? shape.Type : shape.DepthIn > 58 ? TxGirderType.Tx62 : TxGirderType.Tx54;
-        if (shape.IsStateStandard && pd.PadLength <= 0)
+        if (shape.IsStateStandard && pd.PadLength <= 0 && (pd.StartBearing == null || pd.EndBearing == null))
             warn.Enqueue(UnresolvedFlag.Text(pd.Source != "" ? pd.Source : "bearing sheet", $"prestressed {typeName} bearing pad size", "no pad size was entered for this beam (PadLength = 0), so the plan pad is unknown to the model", "The TxDOT IGEB pad table is used as a placeholder."));
         foreach (var (sNom, sup, end, abut, k, fk, eCl) in new[] { (brgA, supA, 0, abutA, kA, fkA, endA), (brgB, supB, 1, abutB, kB, fkB, endB) })
         {
             double skew = def.Supports[sup.Index].SkewDegrees;
-            var (pl, pw, clipA, clipB, round) = pd.PadLength > 0 ? (pd.PadLength, pd.PadWidth, 0.0, 0.0, false) : TxGirderCatalog.IgebPad(padType, abut, skew);
+            var bd = end == 0 ? pd.StartBearing : pd.EndBearing;
+            var (pl, pw, clipA, clipB, round) = bd != null ? (bd.Length, bd.Width, 0.0, 0.0, false)
+                : pd.PadLength > 0 ? (pd.PadLength, pd.PadWidth, 0.0, 0.0, false) : TxGirderCatalog.IgebPad(padType, abut, skew);
+            double padT = bd?.Thickness ?? pd.PadThickness;
             double sgn = end == 0 ? 1 : -1;
             double reach = (round ? pl / 2 : pl / 2) + In(1) + (round ? pl / 2 : pw / 2) * Math.Abs(fk);
             double sPad = abut ? sNom : end == 0 ? Math.Max(sNom, eCl + reach) : Math.Min(sNom, eCl - reach);
             var cBot = P(sPad, 0, 0);
-            double z1 = cBot.Z, z0 = z1 - pd.PadThickness;
+            var sp = bd?.SolePlate;
+            double tSole = sp?.ThicknessAtBearing ?? 0;
+            double z1 = cBot.Z - tSole, z0 = z1 - padT;
             // Plan outline in (u along the girder, x right of CL); clips on the corner nearest the skewed end face and its diagonal.
             var poly = new List<Vec2>();
             string desc;
@@ -453,13 +481,37 @@ public static class PrestressedGenerator
             var fr = new Frame3(new Vec3(cBot.X, cBot.Y, 0), new Vec3(ax.X, ax.Y, 0), new Vec3(ax.Right.X, ax.Right.Y, 0), new Vec3(0, 0, 1));
             var pm = new Mesh();
             MeshBuilder.AddExtrusion(pm, poly, fr, z0, z1);
+            string padMark = $"{mark}-{(end == 0 ? "B" : "E")}";
+            PrestressedSolePlate? sole = null;
+            if (sp != null)
+            {
+                // Tapered sole plate: level bottom on the pad, top = plane through the printed end thicknesses, CL bearing at BearingAt from
+                // the back-station end (u = 0 at the CL bearing, + = ahead station = along the beam axis t).
+                double u0 = -sp.BearingAt, u1 = sp.Length - sp.BearingAt;
+                var sec = new[] { new Vec2(u0, 0), new Vec2(u1, 0), new Vec2(u1, sp.ThicknessAhead), new Vec2(u0, sp.ThicknessBack) };
+                var ux = new Vec3(t.X, t.Y, 0); var xx = new Vec3(right.X, right.Y, 0);
+                Vec3 W(Vec2 q, double x) => new Vec3(cBot.X, cBot.Y, z1) + ux * q.X + xx * x + new Vec3(0, 0, q.Y);
+                var sm = new Mesh();
+                MeshBuilder.AddLoft(sm, sec, new[] { sec.Select(q => W(q, -sp.Width / 2)).ToArray(), sec.Select(q => W(q, sp.Width / 2)).ToArray() });
+                double taper = sp.Length > 0 ? (sp.ThicknessBack - sp.ThicknessAhead) / sp.Length : 0;
+                sole = new PrestressedSolePlate
+                {
+                    Mark = sp.Mark != "" ? $"{padMark} {sp.Mark}" : padMark + " sole plate", Mesh = sm, Length = sp.Length, Width = sp.Width,
+                    ThicknessBack = sp.ThicknessBack, ThicknessAhead = sp.ThicknessAhead, ThicknessAtBearing = tSole, TaperMinusSlope = taper + slope,
+                    Description = $"Sole plate {(sp.Mark != "" ? sp.Mark + " " : "")}{u.FormatLength(sp.Length, LengthKind.Short)} x {u.FormatLength(sp.Width, LengthKind.Short)}, " +
+                                  $"{u.FormatLength(sp.ThicknessBack, LengthKind.Short)} to {u.FormatLength(sp.ThicknessAhead, LengthKind.Short)}, {u.FormatLength(tSole, LengthKind.Short)} at CL bearing" +
+                                  (sp.Source != "" ? $" ({sp.Source})" : ""),
+                };
+            }
             padList.Add(new PrestressedPad
             {
-                Mark = $"{mark}-{(end == 0 ? "B" : "E")}", Support = sup.Name, Girder = i, Span = j, Mesh = pm,
-                Center = cBot.XY.WithZ((z0 + z1) / 2), Length = pl, Width = round ? pl : pw, Thickness = pd.PadThickness,
-                Description = $"Elastomeric {desc} x {u.FormatLength(pd.PadThickness, LengthKind.Short)}" + (pd.PadLength > 0 ? "" : " (IGEB)") +
-                              (parallel ? ", parallel to the support" : ""),
-                OffNominal = Math.Abs(sPad - sNom),
+                Mark = padMark, Support = sup.Name, Girder = i, Span = j, Mesh = pm,
+                Center = cBot.XY.WithZ((z0 + z1) / 2), Length = pl, Width = round ? pl : pw, Thickness = padT,
+                Description = bd != null
+                    ? $"{(bd.Mark != "" ? bd.Mark + " " : "")}elastomeric {desc} x {u.FormatLength(padT, LengthKind.Short)}{(bd.Description != "" ? ", " + bd.Description : "")}"
+                    : $"Elastomeric {desc} x {u.FormatLength(pd.PadThickness, LengthKind.Short)}" + (pd.PadLength > 0 ? "" : " (IGEB)") +
+                      (parallel ? ", parallel to the support" : ""),
+                OffNominal = Math.Abs(sPad - sNom), BearingMark = bd?.Mark ?? "", SolePlate = sole,
             });
             var so = a.Inverse(cBot.XY);
             seatList.Add(new BearingSeat(sup.Name, i, so.Station, z0, 0, "Elastomeric", "", cBot.XY, ax, pl, round ? pl : pw));

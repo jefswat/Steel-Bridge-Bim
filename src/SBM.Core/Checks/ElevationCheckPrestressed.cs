@@ -111,7 +111,13 @@ public static partial class ElevationCheck
                            (beam.TopEnd - beam.TopStart).XY.Length;
             if (Math.Abs(model - top) > 0.0005) { ch.Mismatch = true; ch.Checks.Add($"3D beam top {E(model)} differs by {Sh(model - top)}"); }
             else ch.Checks.Add($"Top of beam matches the 3D beam ({E(model)}).");
-            double z = ch.Final - pad.Thickness;
+            double z = ch.Final;
+            if (pad.SolePlate is { } sole)
+            {
+                z -= sole.ThicknessAtBearing;
+                ch.Steps.Add(new CalcStep("− Sole plate", $"{sole.Description} (tapered, bottom level)", -sole.ThicknessAtBearing, z, "Top of bearing"));
+            }
+            z -= pad.Thickness;
             ch.Steps.Add(new CalcStep("− Elastomeric pad", $"{pad.Description} (pad top level at the beam bottom)", -pad.Thickness, z, "Bottom of bearing = bearing seat"));
             if (pad.OffNominal > 1e-4)
                 ch.Checks.Add($"Pad moved {Sh(pad.OffNominal)} off the nominal CL bearing to stay on the square girder end.");

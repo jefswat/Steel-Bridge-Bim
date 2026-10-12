@@ -30,7 +30,68 @@ public sealed class StrandPoint
     public double DebondEnd { get; set; }
     /// <summary>Plan symbol of the debond group ("A", "B", ...), for schedules.</summary>
     public string DebondSymbol { get; set; } = "";
+    /// <summary>OPTIONAL own strand diameter (e.g. 1/2" "slack" top strands among 0.6" strands); 0 = the definition's <see cref="PrestressedBeamDefinition.StrandDiameter"/>.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    public double Diameter { get; set; }
+    /// <summary>OPTIONAL plan description of this strand ("slack strand, tensioned to 10,000 lb max"); null = none.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public string? Label { get; set; }
     public StrandPoint Clone() => (StrandPoint)MemberwiseClone();
+}
+
+/// <summary>
+/// OPTIONAL plan bearing at one end of a prestressed beam (overrides the definition's PadLength / PadWidth / PadThickness at that end):
+/// a laminated elastomeric bearing (plan mark, size along the beam x across, total height) and an optional steel sole plate between the
+/// pad and the beam (NCDOT "P" plates, tapered to the girder slope).
+/// </summary>
+public sealed class PrestressedBearingDefinition
+{
+    /// <summary>Plan mark of the elastomeric bearing ("E2").</summary>
+    public string Mark { get; set; } = "";
+    /// <summary>Pad dimension along the beam.</summary>
+    public double Length { get; set; }
+    /// <summary>Pad dimension across the beam.</summary>
+    public double Width { get; set; }
+    /// <summary>Total height of the bearing (elastomer + laminates + covers, as printed).</summary>
+    public double Thickness { get; set; }
+    public string Description { get; set; } = "";
+    /// <summary>OPTIONAL sole plate between the bearing and the beam; null = the pad bears on the beam.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public SolePlateDefinition? SolePlate { get; set; }
+    public PrestressedBearingDefinition Clone() { var c = (PrestressedBearingDefinition)MemberwiseClone(); c.SolePlate = SolePlate?.Clone(); return c; }
+}
+
+/// <summary>
+/// Tapered steel sole plate (plan "P" plate): plan length along the beam x width across it, thickness at the back-station end and at the
+/// ahead-station end (the plans' "2" tapering to 1 1/4""), and where the CL bearing lies on it (distance from the BACK-station end). Bottom
+/// level on the bearing, top a plane through the two printed end thicknesses; the stack uses its thickness at the CL bearing.
+/// </summary>
+public sealed class SolePlateDefinition
+{
+    public string Mark { get; set; } = "";
+    public double Length { get; set; }
+    public double Width { get; set; }
+    /// <summary>Thickness at the back-station end of the plate.</summary>
+    public double ThicknessBack { get; set; }
+    /// <summary>Thickness at the ahead-station end of the plate.</summary>
+    public double ThicknessAhead { get; set; }
+    /// <summary>CL bearing measured from the back-station end of the plate (NaN = centred).</summary>
+    public double BearingFromBack { get; set; } = double.NaN;
+    public string Source { get; set; } = "";
+    public double BearingAt => double.IsNaN(BearingFromBack) ? Length / 2 : BearingFromBack;
+    /// <summary>Thickness at the CL bearing (linear taper).</summary>
+    public double ThicknessAtBearing => Length > 0 ? ThicknessBack + (ThicknessAhead - ThicknessBack) * BearingAt / Length : ThicknessBack;
+    public SolePlateDefinition Clone() => (SolePlateDefinition)MemberwiseClone();
+}
+
+/// <summary>One row of a plan camber / dead-load deflection table (fraction of the span, girder-alone camber, deflection due to
+/// superimposed dead load, final camber as printed).</summary>
+public sealed class PrestressedCamberPoint
+{
+    public double Fraction { get; set; }
+    public double Camber { get; set; }
+    public double Deflection { get; set; }
+    public double FinalCamber { get; set; }
 }
 
 /// <summary>How a standard-length beam sits between layout bearings whose distance differs from its standard CL-CL bearing length.</summary>
@@ -148,6 +209,32 @@ public sealed class PrestressedBeamDefinition
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
     public BeamReinforcementDefinition? Reinforcement { get; set; }
 
+    /// <summary>OPTIONAL plan bearings at the start (lower station) / end of the beam: pad size and sole plate per end (e.g. NCDOT E1 / E2 / E3
+    /// + "P" plates that differ per bent and side). Null = <see cref="PadLength"/> / <see cref="PadWidth"/> / <see cref="PadThickness"/>.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public PrestressedBearingDefinition? StartBearing { get; set; }
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public PrestressedBearingDefinition? EndBearing { get; set; }
+    /// <summary>OPTIONAL CL bearing to end of beam at the start / end when the two ends differ (span-layout bearing offsets only); 0 = <see cref="BearingToEnd"/>.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    public double StartBearingToEnd { get; set; }
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    public double EndBearingToEnd { get; set; }
+    /// <summary>OPTIONAL plan camber / dead-load deflection table of this beam (recorded and checked; the model keeps the final, uncambered
+    /// shape). Null = none.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public List<PrestressedCamberPoint>? CamberTable { get; set; }
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public string? CamberSource { get; set; }
+    /// <summary>OPTIONAL printed girder data for the checks: end-to-end length (plan "A") and concrete volume per girder (m³); 0 = not given.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    public double PlanLength { get; set; }
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    public double PlanConcreteVolume { get; set; }
+
+    /// <summary>CL bearing to end of beam at one end.</summary>
+    public double BearingToEndAt(bool atEnd) => (atEnd ? EndBearingToEnd : StartBearingToEnd) is > 0 and var v ? v : BearingToEnd;
+
     /// <summary>The definition that applies to a span and beam line (last matching <see cref="SpanBeams"/> entry, else this).</summary>
     public PrestressedBeamDefinition For(int span, int girder)
     {
@@ -169,6 +256,9 @@ public sealed class PrestressedBeamDefinition
         c.Unresolved = Unresolved?.ToList();
         c.SpanBeams = SpanBeams?.Select(s => s.Clone()).ToList();
         c.Reinforcement = Reinforcement?.Clone();
+        c.StartBearing = StartBearing?.Clone();
+        c.EndBearing = EndBearing?.Clone();
+        c.CamberTable = CamberTable?.Select(p => new PrestressedCamberPoint { Fraction = p.Fraction, Camber = p.Camber, Deflection = p.Deflection, FinalCamber = p.FinalCamber }).ToList();
         return c;
     }
 

@@ -84,6 +84,7 @@ public sealed partial class SubstructureGenerator
     {
         var sl = _f.SupportLine(j);
         var def = _f.Definition;
+        foreach (var un in sd.Unresolved ?? new List<string>()) Warn($"{sl.Name}: {un}");
         var a = _f.Alignment;
         var t = Vec2.FromAngle(a.AngleAt(sl.Station));
         var d = sl.Direction;
@@ -833,6 +834,12 @@ public sealed partial class SubstructureGenerator
                     var m = new Mesh();
                     var frame = Frame(unit, s, n);
                     var fd = underCap ? null : sd.Footings.FirstOrDefault(x => x.Column == index);
+                    if (fd is { OnFootingOf: > 0 })
+                    {
+                        // combined footing: built once with the column that carries it
+                        Note($"{where}: stands on the combined footing of column {fd.OnFootingOf}.");
+                        break;
+                    }
                     string shapeNote = "";
                     if (fd is { Outline.Count: >= 3 })
                     {

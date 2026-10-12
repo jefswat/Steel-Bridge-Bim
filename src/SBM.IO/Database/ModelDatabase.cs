@@ -1192,6 +1192,15 @@ public static class ModelDatabase
                 r.Mark = p.Mark; r.Support = p.Support; r.Girder = $"G{p.Girder + 1}"; r.Box = p.Mesh.Bounds(); StationOf(r, r.Box);
                 r.Props = new Json().Add("description", p.Description).ToString();
                 _w.Add(r);
+                if (p.SolePlate is { } sp)
+                {
+                    var q = New(Id(IfcKeys.PsSolePlate(bk, p.Mark)), superId, "element", "sole plate", "IFCPLATE", sp.Mark);
+                    q.Tag = sp;
+                    q.Mark = sp.Mark; q.Support = p.Support; q.Girder = r.Girder; q.Box = sp.Mesh.Bounds(); StationOf(q, q.Box);
+                    q.Material = "Steel"; q.Volume = sp.Volume; q.Mass = sp.Mass; q.Length = sp.Length;
+                    q.Props = new Json().Add("description", sp.Description).Add("thickness_at_bearing", sp.ThicknessAtBearing).ToString();
+                    _w.Add(q);
+                }
             }
         }
     }

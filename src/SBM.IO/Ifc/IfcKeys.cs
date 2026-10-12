@@ -42,6 +42,8 @@ public static class IfcKeys
     /// <summary>Mild reinforcing bar n (placement order) of a prestressed beam.</summary>
     public static string PsBar(string bk, string mark, int n) => $"{bk}/ps/{mark}/bar/{n}";
     public static string PsPad(string bk, string mark) => $"{bk}/ps/pad/{mark}";
+    /// <summary>Steel sole plate on the pad with this pad mark.</summary>
+    public static string PsSolePlate(string bk, string padMark) => $"{bk}/ps/pad/{padMark}/sole";
     public static string Diaphragm(string bk, string support) => $"{bk}/diaphragm/{support}";
     public static string DiaphragmAccessory(string bk, string support, int n) => $"{bk}/diaphragm/{support}/acc/{n}";
     /// <summary>Surface treatment region (IfcCovering), by its unique name "{treatment} - {region}".</summary>

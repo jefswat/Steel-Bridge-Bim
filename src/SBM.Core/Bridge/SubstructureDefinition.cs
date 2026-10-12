@@ -83,8 +83,13 @@ public sealed class FootingDefinition
     public List<int> UpliftPiles { get; set; } = new();
     /// <summary>Uplift anchor V-bars per circled pile (the plans: 3, at 4 in. along the web).</summary>
     public int UpliftBarsPerPile { get; set; } = 3;
+    /// <summary>OPTIONAL combined footing: this column stands on the footing of column n (1-based) - no footing / piles of its own
+    /// (that footing's outline and piles are given relative to column n). 0 = own footing (default).</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    public int OnFootingOf { get; set; }
     public FootingDefinition Clone() => new()
     {
+        OnFootingOf = OnFootingOf,
         Bars = Bars.Select(b => b.Clone()).ToList(), UpliftPiles = UpliftPiles.ToList(), UpliftBarsPerPile = UpliftBarsPerPile,
         Column = Column, PileLength = PileLength, BatterRatio = BatterRatio, PileWeb = PileWeb,
         Outline = Outline.Select(p => p.Clone()).ToList(), Piles = Piles.Select(p => p.Clone()).ToList(),
@@ -478,6 +483,11 @@ public sealed class SubstructureDefinition
 
     public SubstructureReinforcementDefinition Reinforcement { get; set; } = new();
 
+    /// <summary>OPTIONAL plan items of this support's substructure that are open or approximated (each with the PDF page and the reason, built with
+    /// <c>UnresolvedFlag.Text</c>); each is raised as a generator warning. Null = none.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public List<string>? Unresolved { get; set; }
+
     public static SubstructureDefinition Default(SupportType type) => type == SupportType.Pier
         ? new SubstructureDefinition()
         : new SubstructureDefinition
@@ -529,6 +539,7 @@ public sealed class SubstructureDefinition
         c.CapBlocks = CapBlocks.Select(b => b.Clone()).ToList();
         c.Aesthetics = Aesthetics?.Clone();
         c.Abutment = Abutment?.Clone();
+        c.Unresolved = Unresolved?.ToList();
         return c;
     }
 }

@@ -15,7 +15,7 @@ namespace SBM.Core.Prestressed;
 /// </summary>
 public static class StandardBeamCatalog
 {
-    private static readonly Lazy<TxGirderShape[]> Shapes = new(() => new[] { IowaBtd(), MnDot30Mh() });
+    private static readonly Lazy<TxGirderShape[]> Shapes = new(() => new[] { IowaBtd(), MnDot30Mh(), FlFib96() });
 
     /// <summary>The non-Tx standard shapes.</summary>
     public static IReadOnlyList<TxGirderShape> StateShapes => Shapes.Value;
@@ -36,7 +36,7 @@ public static class StandardBeamCatalog
     private static string Normalize(string s)
     {
         var u = s.ToUpperInvariant().Replace(" ", "").Replace("-", "");
-        foreach (var (a, b) in new[] { ("IOWA", "IA"), ("MNDOT", "MN"), ("MINNESOTA", "MN"), ("TXDOT", "TX"), ("TEXAS", "TX") })
+        foreach (var (a, b) in new[] { ("IOWA", "IA"), ("MNDOT", "MN"), ("MINNESOTA", "MN"), ("TXDOT", "TX"), ("TEXAS", "TX"), ("FDOT", "FL"), ("FLORIDA", "FL") })
             if (u.StartsWith(a)) u = b + u[a.Length..];
         return u;
     }
@@ -90,6 +90,34 @@ public static class StandardBeamCatalog
         });
         var dims = PrecastIBeamDims.Inches("30MH", 5, 1.625, 0, 0, 5.4375, 5.5, h, 6.5, 6.5, 0, 13.75, 0, 0, 16.25, 0.75);
         return Make("MN", "MH", dims, corners, "MnDOT Fig. 5-397.501 (mod.) / Br02069 PDF p.16", null, null, null);
+    }
+
+    /// <summary>
+    /// 96" Florida I-Beam (FIB-96) as DIMENSIONED on NCDOT B-2500 (Bonner Bridge) PDF p.438, sheet S4-46 "GIRDER OUTSIDE DIMENSIONS"
+    /// (the plans cite no FDOT index; title "96" PRESTRESSED CONCRETE MODIFIED BULB TEE"): depth 8'-0; top flange 4'-0 wide,
+    /// 3 1/2 edge, underside sloping 1 1/2 over 1'-5 from the tip, then a 3 1/2 x 3 1/2 chamfer into the 7" web (sharp corners: the
+    /// chamfer IS the outline, ending 3 1/2 + 1 1/2 + 3 1/2 below the top); web straight 6'-1 down to the sharp intersection with the
+    /// bottom flange slope (7 1/2 rise over 1'-3 1/2 from the web face to the 3'-2 wide flange edge, 7" vertical edge), R = 1'-3 fillet
+    /// between web and slope. The bottom corners carry a 3/4" chamfer DRAWN but not dimensioned (scaled from the vector drawing:
+    /// 0.73"). Vector geometry of p.438 reproduces every point within 0.01" (tangent points of the R 1'-3 at y 23.90" / (11.97", 10.40")).
+    /// Section properties are not printed; computed A = 1,226.6 in² (8.52 ft²) - the 49.9 CY quantity of the 158'-3 1/2 span 30
+    /// girder implies 8.51 ft².
+    /// </summary>
+    private static TxGirderShape FlFib96()
+    {
+        double h = 96, bt = 24, bb = 19, w = 3.5;
+        var corners = Symmetric(new[]
+        {
+            ProfileCorner.Chamfer(bb, 0, 0.75),
+            ProfileCorner.Sharp(bb, 7),
+            ProfileCorner.Fillet(w, 14.5, 15),
+            ProfileCorner.Sharp(w, h - 8.5),
+            ProfileCorner.Sharp(w + 3.5, h - 5),
+            ProfileCorner.Sharp(bt, h - 3.5),
+            ProfileCorner.Sharp(bt, h),
+        });
+        var dims = PrecastIBeamDims.Inches("FIB-96", 3.5, 1.5, 3.5, 0, 7.5, 7, h, 7, 7, 0, 17, 3.5, 0, 15.5, 0.75);
+        return Make("FL", "FIB", dims, corners, "NCDOT B-2500 PDF p.438 (S4-46) girder outside dimensions; no FDOT index cited", null, null, null);
     }
 
     /// <summary>Right half (bottom to top, inches) mirrored into a counter-clockwise outline.</summary>

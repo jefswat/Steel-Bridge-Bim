@@ -388,7 +388,7 @@ public static class SceneBuilder
                         foreach (var s in b.Strands)
                         {
                             var t = new Mesh();
-                            AddTube(t, s.Points, b.StrandDiameter / 2);
+                            AddTube(t, s.Points, s.DiameterIn(b.StrandDiameter) / 2);
                             tubes.Add(t);
                             tags.Add(new PsStrandPick(m, b, s));
                         }
@@ -402,6 +402,14 @@ public static class SceneBuilder
                 if (pads.Count == 0) return null;
                 var g = FlatShaded(pads.Select(p => p.Mesh), o, pads.Select(p => (object)new PsPadPick(p)).ToList());
                 return new SolidLayer { Name = "3D-BEARING-ELASTOMER", R = 40, G = 40, B = 45, Parts = new() { (g, null) }, Triangles = g.Indices!.Count / 3 };
+            },
+            () =>
+            {
+                // Tapered steel sole plates on the pads (optional, PrestressedBearingDefinition.SolePlate).
+                var soles = models.SelectMany(m => m.Pads).Where(p => p.SolePlate != null).ToList();
+                if (soles.Count == 0) return null;
+                var g = FlatShaded(soles.Select(p => p.SolePlate!.Mesh), o, soles.Select(p => (object)new PsPadPick(p)).ToList());
+                return new SolidLayer { Name = "3D-BEARING-SOLE-PLATES", R = 140, G = 145, B = 155, Parts = new() { (g, null) }, Triangles = g.Indices!.Count / 3 };
             },
             () =>
             {
