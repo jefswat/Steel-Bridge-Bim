@@ -50,7 +50,20 @@ public sealed partial class SubstructureGenerator
     private void PlanSetBars(SubstructureModel m, SubstructureUnit unit)
     {
         var r = unit.Definition.Reinforcement;
-        var hosts = unit.Solids.Where(s => s.IsConcrete).Select(s => s.Mesh).ToList();
+        // drilled shafts are 32-gons inscribed in the circle: for the cover test their faces are moved out radially to the mid-sagitta (+-0.12% of the
+        // radius, 3/32" on a 78" shaft) so the polygon error stays inside the 1/8" tolerance either way
+        double k32 = (1 + 1 / Math.Cos(Math.PI / 32)) / 2;
+        var hosts = unit.Solids.Where(s => s.IsConcrete).Select(s =>
+        {
+            if (s.Kind != SubElementKind.DrilledShaft || unit.Foundations.Count == 0) return s.Mesh;
+            var c3 = s.Mesh.Positions.Aggregate(Vec3.Zero, (a, p) => a + p) * (1.0 / s.Mesh.Positions.Count);
+            var f = unit.Foundations.OrderBy(x => (unit.Plan(x.S, x.N) - c3.XY).Length).First();
+            var axis = unit.Plan(f.S, f.N);
+            var mm = new Mesh();
+            foreach (var p in s.Mesh.Positions) { var d = p.XY - axis; mm.Add((axis + d * k32).WithZ(p.Z)); }
+            for (int i = 0; i < s.Mesh.Indices.Count; i += 3) mm.Tri(s.Mesh.Indices[i], s.Mesh.Indices[i + 1], s.Mesh.Indices[i + 2]);
+            return mm;
+        }).ToList();
         var res = PlanBarSetBuilder.Build(r.PlanBarSets, p => unit.World(p.X, p.Y, p.Z), unit.Name, "Sub", hosts, r.EpoxyCoated);
         foreach (var v in res.Violations)
         {
