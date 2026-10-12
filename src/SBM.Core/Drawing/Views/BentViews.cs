@@ -96,9 +96,30 @@ public static class BentViews
                     $"{p.Tag} SEAT {d.Elev(p.SeatZ)}, PED {d.Short(p.Height)}");
         }
 
-        // ---- cap (and backwall)
-        var capPoly = unit.CapOutline.Count >= 3 ? unit.CapOutline : unit.CapTop.Concat(Enumerable.Reverse(unit.CapBottom)).ToList();
-        d.Poly(SheetLayers.Concrete, capPoly, true);
+        // ---- cap (and backwall); a capless pier (OPTIONAL NoCap) shows the integral steel cap above its bearings instead
+        if (!unit.NoCap)
+        {
+            var capPoly = unit.CapOutline.Count >= 3 ? unit.CapOutline : unit.CapTop.Concat(Enumerable.Reverse(unit.CapBottom)).ToList();
+            d.Poly(SheetLayers.Concrete, capPoly, true);
+        }
+        else if (def.SupportAt(sl.Index).IntegralSteelCap is { BearingOffsets.Count: >= 2 } ic && ic.BearingTopElevations.Count == ic.BearingOffsets.Count)
+        {
+            double sb0 = ic.BearingOffsets[0], sb1 = ic.BearingOffsets[^1], z0 = ic.BearingTopElevations[0], m = (ic.BearingTopElevations[^1] - z0) / (sb1 - sb0);
+            double kk = Math.Sqrt(1 + m * m), dep = (ic.BottomFlange.Thickness + ic.WebDepth + ic.TopFlange.Thickness) * kk;
+            double e0 = sb0 - ic.EndOverhang, e1 = sb1 + ic.EndOverhang;
+            double Zb(double s) => z0 + m * (s - sb0);
+            d.Poly(SheetLayers.Steel, new[] { new Vec2(e0, Zb(e0)), new Vec2(e1, Zb(e1)), new Vec2(e1, Zb(e1) + dep), new Vec2(e0, Zb(e0) + dep) }, true);
+            foreach (double c in new[] { ic.BottomFlange.Thickness * kk, (ic.BottomFlange.Thickness + ic.WebDepth) * kk })
+                d.Line(SheetLayers.Steel, new Vec2(e0, Zb(e0) + c), new Vec2(e1, Zb(e1) + c));
+            for (int i = 0; i < ic.BearingOffsets.Count; i++)
+            {
+                var pd = unit.Pedestals.OrderBy(p => Math.Abs(p.S - ic.BearingOffsets[i])).FirstOrDefault();
+                if (pd != null) d.Rect(SheetLayers.Bearing, ic.BearingOffsets[i] - In(14), pd.SeatZ, ic.BearingOffsets[i] + In(14), ic.BearingTopElevations[i]);
+            }
+            double sm = (e0 + e1) / 2;
+            d.Leader(new Vec2(sm, Zb(sm) + dep * 0.5), new Vec2(sm + d.Paper(0.4), Zb(sm) - d.Paper(0.5)),
+                $"INTEGRAL STEEL PIER CAP {ic.Mark} (TWIN I), {d.Len(e1 - e0)}, SLOPE {m * 100:0.00} %");
+        }
         if (unit.CapOutlineAhead.Count >= 3) d.Poly(SheetLayers.ConcreteHidden, unit.CapOutlineAhead, true);   // stepped ahead half
         foreach (var rl in unit.ReliefLines) d.Poly(SheetLayers.Concrete, rl);                                   // texture band lines
         if (unit.Backwall is { } bw2)
@@ -232,15 +253,21 @@ public static class BentViews
         var brgS = unit.Pedestals.Select(p => p.S).OrderBy(x => x).ToList();
         if (brgS.Count > 1)
             d.DimChain(brgS.Select(s => new Vec2(s, yDims)).ToList(), 0);
-        d.Dim(new Vec2(unit.CapS0, zLow - d.Paper(0.6)), new Vec2(unit.CapS1, zLow - d.Paper(0.6)), 0, $"{d.Len(unit.CapS1 - unit.CapS0)} CAP (ALONG SKEW)");
+        if (!unit.NoCap) d.Dim(new Vec2(unit.CapS0, zLow - d.Paper(0.6)), new Vec2(unit.CapS1, zLow - d.Paper(0.6)), 0, $"{d.Len(unit.CapS1 - unit.CapS0)} CAP (ALONG SKEW)");
         if (unit.Columns.Count > 1)
             d.DimChain(unit.Columns.Select(c => new Vec2(c.S, zLow - d.Paper(0.3))).ToList(), 0);
         // Top corners (not the beak tips of an as-designed cap) and, for those caps, the soffit low point.
-        var topLine = unit.CapTopLine();
-        d.ElevationTag(topLine[0], $"TOP OF CAP EL {d.Elev(topLine[0].Y)}", right: false);
-        d.ElevationTag(topLine[^1], $"TOP OF CAP EL {d.Elev(topLine[^1].Y)}", right: true);
-        var bot = unit.CapOutline.Count >= 3 ? unit.CapBottom.MinBy(p => p.Y) : unit.CapBottom[0];
-        d.ElevationTag(bot, $"BOTT. OF CAP EL {d.Elev(bot.Y)}", right: false);
+        if (unit.NoCap)
+            foreach (var c in unit.Columns)
+                d.ElevationTag(new Vec2(c.S - c.SizeS / 2, c.TopZ), $"TOP OF COLUMN EL {d.Elev(c.TopZ)}", right: false);
+        else
+        {
+            var topLine = unit.CapTopLine();
+            d.ElevationTag(topLine[0], $"TOP OF CAP EL {d.Elev(topLine[0].Y)}", right: false);
+            d.ElevationTag(topLine[^1], $"TOP OF CAP EL {d.Elev(topLine[^1].Y)}", right: true);
+            var bot = unit.CapOutline.Count >= 3 ? unit.CapBottom.MinBy(p => p.Y) : unit.CapBottom[0];
+            d.ElevationTag(bot, $"BOTT. OF CAP EL {d.Elev(bot.Y)}", right: false);
+        }
         foreach (var c in unit.Columns.Take(1))
             d.ElevationTag(new Vec2(c.S - c.SizeS / 2, c.BottomZ), $"TOP OF {(sd.Foundation == FoundationType.DrilledShaft ? "SHAFT" : "FOOTING")} EL {d.Elev(c.BottomZ)}", right: false);
         foreach (var fd in unit.Foundations.Take(1))
@@ -315,6 +342,29 @@ public static class BentViews
     {
         var sd = unit.Definition;
         var r = sd.Reinforcement;
+        if (unit.NoCap)
+        {
+            // Capless pier: Section A-A is a plan section through the column (turned) with the pedestal outline above it.
+            var colA = unit.Columns.OrderBy(c => c.S).FirstOrDefault();
+            if (colA == null) return;
+            var outl = SubstructureGenerator.ColumnSectionOutline(sd);
+            double xc = xLeft + outl.Max(q => Math.Abs(q.X)) + d.Paper(0.2);
+            d.CutConcrete(outl.Select(q => new Vec2(xc + q.X, q.Y)).ToList(), 0.06);
+            var pd = unit.Pedestals.OrderBy(p => Math.Abs(p.S - colA.S)).FirstOrDefault();
+            if (pd != null)
+            {
+                double rr = sd.ColumnRotationDeg * Math.PI / 180, cr = Math.Cos(rr), sr = Math.Sin(rr);
+                var pedPoly = new[] { (-1, -1), (1, -1), (1, 1), (-1, 1) }.Select(t => new Vec2(t.Item1 * pd.LengthS / 2, t.Item2 * pd.WidthN / 2))
+                    .Select(q => new Vec2(xc + (pd.S - colA.S) + q.X * cr - q.Y * sr, (pd.N - colA.N) + q.X * sr + q.Y * cr)).ToList();
+                d.Poly(SheetLayers.ConcreteHidden, pedPoly, true);
+            }
+            double ext = outl.Max(q => Math.Abs(q.Y));
+            d.Line(SheetLayers.Center, new Vec2(xc - ext - d.Paper(0.2), 0), new Vec2(xc + ext + d.Paper(0.2), 0));
+            d.Text("CL PIER", new Vec2(xc + ext + d.Paper(0.25), 0), d.SmallTextH, 0, TextAlign.Left);
+            d.Title("SECTION A–A", $"Plan section through column 1 (no concrete cap){(sd.ColumnRotationDeg != 0 ? $", column turned {sd.ColumnRotationDeg:0.###} deg" : "")}; pedestal hidden\nScale {DrawingOptions.ScaleText(d.Scale, ctx.Units)}",
+                new Vec2(xc, -ext - d.Paper(0.6)));
+            return;
+        }
         double sCut = unit.Columns.Count > 0 ? unit.Columns[unit.Columns.Count / 2].S : (unit.CapS0 + unit.CapS1) / 2;
         double zt = unit.CapTopAt(sCut), zb = unit.CapBottomAt(sCut);
         double x0 = xLeft, w = unit.CapN1 - unit.CapN0;

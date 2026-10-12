@@ -787,6 +787,9 @@ public sealed partial class SubstructureGenerator
             $"{(cb.Kind == CapBlockKind.Maskwall ? "Maskwall" : cb.Kind == CapBlockKind.Pedestal ? "Fixed-elevation pedestal" : "Cap block")} '{what}' on the cap {(cb.Base == CapBlockBase.CapTop ? "top" : "soffit")}, top {El(outline.Min(q => Top(q.X)))} .. {El(outline.Max(q => Top(q.X)))}, up to {Sh(hMax)} high{(cb.Source != "" ? $" ({cb.Source})" : "")}", mesh));
     }
 
+    /// <summary>Column section outline in (S, N) about the column centre as built (projections, chamfers, OPTIONAL turn), for the drawings.</summary>
+    public static Vec2[] ColumnSectionOutline(SubstructureDefinition sd) => ColumnSection(sd);
+
     private static Vec2[] ColumnSection(SubstructureDefinition sd)
     {
         var sec = ColumnSectionCore(sd);

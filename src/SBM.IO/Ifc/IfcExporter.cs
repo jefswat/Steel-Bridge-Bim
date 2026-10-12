@@ -1392,7 +1392,7 @@ public static class IfcExporter
             var props = f0.Fields().Select(x => Prop($"{S(x.Name)},$,IFCTEXT({S(x.Value)}),$")).ToList();
             if (props.Count == 0) continue;
             int first = grp.First().id;
-            int ps = w.Add("IFCPROPERTYSET", $"{Guid(key + "/fabattr/" + first)},$,'SBM_FabricationAttributes',$,({Refs(props)})");
+            int ps = w.Add("IFCPROPERTYSET", $"{Guid(key + "/fabattr/" + first)},$,'SBM_FabricationAttributes',$,{Refs(props)}");
             w.Add("IFCRELDEFINESBYPROPERTIES", $"{Guid(key + "/relfabattr/" + first)},$,$,$,{Refs(grp.Select(t => t.id))},{Ref(ps)}");
         }
         foreach (var (id, a) in miscStatus)
