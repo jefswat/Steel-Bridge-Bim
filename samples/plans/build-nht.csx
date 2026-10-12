@@ -161,6 +161,10 @@ PrestressedBeamDefinition Tx28(int n, int dep, double toEnd, double fci, double 
     Type = TxGirderType.Tx28, StrandCount = n, StrandDiameter = In(0.6), StrandStrength = 270,
     DepressedStrands = dep, DepressedTopAtEnd = In(toEnd), ReleaseStrength = fci, ConcreteStrength = fc,
     Designation = $"Tx28 ({n} strands)", Source = $"IGND p.118 / sh 169, spans {spans}",
+    // Bearings: TxDOT IGEB (Aug 2017, C:\SBM\dist\SteelBridgeModeler\IG-IGEB-17.pdf) Table of Bearing Pad Dimensions, Tx28-Tx54, girder end skew
+    // 0-21 deg (every approach end here: 0-16.6 deg): 8" x 21" pad, no clips, at abutments and conventional interior bents. Pad thickness (layer
+    // count "N" of the G-1-"N" mark) is a bearing-layout item not in the set; the program's IGEB default 2 3/4" reproduces every p.91 seat (check-nht).
+    PadLength = In(8), PadWidth = In(21),
 };
 // Plan span numbers -> beam: 1-6: 8 strands; 7: 14 (2 depressed, 6.5" at end); 8: 10; 9: 28 (4 depressed, 24.5"); 11: 20 (4 depressed, 22.5"); 12-15: 12.
 PrestressedBeamDefinition BeamFor(int planSpan) => planSpan switch
@@ -172,6 +176,7 @@ PrestressedBeamDefinition BeamFor(int planSpan) => planSpan switch
     11 => Tx28(20, 4, 22.5, 4.1, 5.4, "11"),
     _ => Tx28(12, 0, 0, 4.3, 5.0, "12-15"),
 };
+G("IGEB girder conflict details (IG-IGEB-17 sheet 1; plan notes \"GIRDER CONFLICTS AT PIERS NO. 2-4\" p.108, \"... AT ALL LOCATIONS\" p.110, 112): girder ends skewed on the bisector between the girders to keep 3\" clear; only square / parallel-to-bent ends exist -> ends modeled SQUARE to the girder at 9\" beyond the CL bearing (plan lengths); girder end corners may overlap at the piers.");
 G("IGND strand eccentricities (e at CL 10.48 / end 10.48 .. 6.28 in, p.118) are check values; the strands are placed by the IGND fill rule (TxGirderCatalog), not compared yet.");
 
 // Girder layout per span = the framing plans' PIER REPORT (p.108, 110, 112, 114, 116; U13 transcribed here): "distance between station line and
