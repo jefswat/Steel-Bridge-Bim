@@ -107,6 +107,10 @@ public enum DiaphragmRiserRule
     /// <summary>The substructure top is a LEVEL BLOCK per step (<see cref="ConcreteDiaphragmDefinition.StepBlocks"/>: length along the line
     /// centred on the beam line, sides at an angle) with the sloped cap top between the blocks (Woodbury pier caps p.9).</summary>
     Blocks,
+    /// <summary>The bottom is the BOTTOM OF THE BEAMS (semi-integral end diaphragm on bearings, MnDOT Br. 02069 p.21 A-A / B-B, p.11 Detail A): level under
+    /// each beam's bottom flange at that beam's bottom at the CL bearing, straight between the bottom-flange edges of adjacent beams, level at the fascia
+    /// beam's bottom beyond the outer flange edges. No <see cref="ConcreteDiaphragmDefinition.BottomSteps"/> (they are computed from the beams).</summary>
+    BeamBottoms,
 }
 
 /// <summary>Level step blocks under the diaphragm (<see cref="DiaphragmRiserRule.Blocks"/>): one block per bottom step, centred on the step's

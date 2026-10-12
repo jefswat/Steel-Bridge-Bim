@@ -106,6 +106,27 @@ public sealed partial class SubstructureGenerator
         double xStepF = ad.BearingToStepFront;
         double D = ad.FootingDepth, W = ad.WashHeight, K = ad.BackwallBaseAboveFootingBottom;
         double Nx(double x) => sg * x;
+        // ---- OPTIONAL MnDOT stem (back ledge + seat in front of the riser on the backwall front-face line)
+        var stem = ad.Stem;
+        Func<double, double>? ledgeZ = null;
+        Func<double, double, double>? seatZ = null;
+        double xSF = double.NaN;
+        if (stem != null)
+        {
+            var lp = PolyPts(stem.LedgeTop); var sbp = PolyPts(stem.SeatBackTop); var sfp = PolyPts(stem.SeatFrontTop);
+            var miss = new List<string>();
+            if (double.IsNaN(stem.FrontToBearing)) miss.Add("front face position");
+            if (lp.Count == 0) miss.Add("ledge top");
+            if (sbp.Count == 0) miss.Add("seat elevation at the riser");
+            if (sfp.Count == 0) miss.Add("seat elevation at the front face");
+            if (miss.Count > 0) throw new InvalidOperationException($"the abutment stem needs: {string.Join(", ", miss)} (not given - stem not built)");
+            xSF = stem.FrontToBearing;
+            if (xSF <= xBwF + 1e-4 || xSF > xFF + 1e-6) throw new InvalidOperationException($"the stem front face ({Sh(xSF)} from CL brg) must lie between the riser ({Sh(xBwF)}) and the footing front ({Sh(xFF)})");
+            ledgeZ = s => SubstructureUnit.Interp(lp, s);
+            double xr = xBwF, xf = xSF;
+            seatZ = (s, x) => SubstructureUnit.Interp(sbp, s) + (SubstructureUnit.Interp(sfp, s) - SubstructureUnit.Interp(sbp, s)) * (x - xr) / (xf - xr);
+        }
+        double StepBase(double s, double x) => seatZ != null ? seatZ(s, x) : FB(s) + D + W;
         double cjD = ad.LedgeBelowTop + ad.CorbelVertical + ad.CorbelTaperRise + ad.JointBelowTaper;
         double nMid = Nx((xFB + xFF) / 2);
 
@@ -197,6 +218,7 @@ public sealed partial class SubstructureGenerator
             Def = ad, Sigma = sg, XFootBack = xFB, XBwBack = xBwB, XBwFront = xBwF, XStepFront = xStepF, XFootFront = xFF,
             FootingBottom = FB, BackwallTop = Crown, LeftEndS = n => leftEnd(n), RightEndS = n => rightEnd(n),
             BwLeftS = n => bwL(n), BwRightS = n => bwR(n), JointDepth = cjD,
+            XStemFront = xSF, LedgeTop = ledgeZ, SeatAt = seatZ,
         };
         unit.Abutment = geo;
         // plan outline of the footing from the same end planes (notches) and corner pieces: back face -> right end -> front face -> left end
@@ -257,22 +279,55 @@ public sealed partial class SubstructureGenerator
             SV[] V(List<(double x, double h)> poly) => WithKinks(poly, kinks).Select(p => new SV(Nx(p.x), s => FB(s) + p.h)).ToArray();
             var fb = fbPts.Select(p => p.X).ToList();
             bool leftZone = Math.Abs(bwL(nMid) - leftEnd(nMid)) > 1e-4, rightZone = Math.Abs(bwR(nMid) - rightEnd(nMid)) > 1e-4;
-            if (leftZone) AddSlab(footMesh, unit, V(plain), footL, bwL, fb);
-            AddSlab(footMesh, unit, V(keyed), leftZone ? bwL : footL, rightZone ? bwR : footR, fb);
-            if (rightZone) AddSlab(footMesh, unit, V(plain), bwR, footR, fb);
+            if (stem != null)
+                AddSlab(footMesh, unit, V(new List<(double x, double h)> { (xFB, 0), (xFF, 0), (xFF, D), (xFB, D) }), footL, footR, fb);   // plain block under the stem
+            else
+            {
+                if (leftZone) AddSlab(footMesh, unit, V(plain), footL, bwL, fb);
+                AddSlab(footMesh, unit, V(keyed), leftZone ? bwL : footL, rightZone ? bwR : footR, fb);
+                if (rightZone) AddSlab(footMesh, unit, V(plain), bwR, footR, fb);
+            }
             foreach (var (front, _, poly) in addOns)
             {
                 double zb = poly.Average(q => FB(q.X));
                 if (poly.Max(q => FB(q.X)) - poly.Min(q => FB(q.X)) > In(0.125))
                     Warn($"{name}: footing outline corner piece spans a sloping footing bottom; built level at the mean bottom {El(zb)}.");
-                MeshBuilder.AddExtrusion(footMesh, poly, Frame(unit, 0, 0), zb, zb + D + (front ? W : 0));
+                MeshBuilder.AddExtrusion(footMesh, poly, Frame(unit, 0, 0), zb, zb + D + (front && stem == null ? W : 0));
             }
         }
         unit.Solids.Add(new SubSolid(SubElementKind.Footing, $"{name} footing",
-            $"Abutment footing {L(s1Mid - s0Mid)} long (along the line), {Sh(ad.FootingWidth)} wide x {Sh(D)} deep (+{Sh(W)} wash in front of the backwall), ends parallel to the alignment{(ad.FootingNotches.Count > 0 ? " with the plan's end notches" : "")}, as designed", footMesh));
+            $"Abutment footing {L(s1Mid - s0Mid)} long (along the line), {Sh(ad.FootingWidth)} wide x {Sh(D)} deep{(stem != null ? " (plain block under the stem)" : $" (+{Sh(W)} wash in front of the backwall)")}, ends parallel to the alignment{(ad.FootingNotches.Count > 0 ? " with the plan's end notches" : "")}, as designed", footMesh));
 
         // ---- backwall: lower pour, upper pour with the corbel, device pour above the ledge
         var bw = new List<double>(topPts.Select(p => p.X)).Concat(fbPts.Select(p => p.X)).ToList();
+        if (stem != null)
+        {
+            // MnDOT stem: back ledge (under the end diaphragm / infill wall) + seat in front of the riser, footing end line to end line
+            var sb = stem.LedgeTop.Concat(stem.SeatBackTop).Concat(stem.SeatFrontTop).Select(p => p.S).Concat(fbPts.Select(p => p.X)).ToList();
+            var sm = new Mesh();
+            AddSlab(sm, unit, new[]
+            {
+                new SV(Nx(xBwB), s => FB(s) + D), new SV(Nx(xSF), s => FB(s) + D), new SV(Nx(xSF), s => seatZ!(s, xSF)), new SV(Nx(xBwF), s => seatZ!(s, xBwF)),
+                new SV(Nx(xBwF), s => ledgeZ!(s)), new SV(Nx(xBwB), s => ledgeZ!(s)),
+            }, leftEnd, rightEnd, sb);
+            double sc = (s0Mid + s1Mid) / 2;
+            unit.Solids.Add(new SubSolid(SubElementKind.Backwall, $"{name} stem",
+                $"Abutment stem {Sh(xSF - xBwB)} wide on the footing: back ledge {Sh(xBwF - xBwB)} (top {El(ledgeZ!(sc))}), seat {Sh(xSF - xBwF)} ({El(seatZ!(sc, xBwF))} at the riser to {El(seatZ!(sc, xSF))} at the front face), {Sh(xFF - xSF)} footing toe in front{(stem.Source != "" ? " (" + stem.Source + ")" : "")}", sm));
+            // infill wall on the ledge: one plain wall, no corbel / pours
+            if (bwR(Nx(xBwB)) > bwL(Nx(xBwB)) + 1e-4)
+            {
+                var iw = new Mesh();
+                AddSlab(iw, unit, new[]
+                {
+                    new SV(Nx(xBwF), s => ledgeZ!(s)), new SV(Nx(xBwB), s => ledgeZ!(s)), new SV(Nx(xBwB), s => Crown(s)), new SV(Nx(xBwF), s => Crown(s)),
+                }, bwL, bwR, bw.Concat(sb));
+                unit.Solids.Add(new SubSolid(SubElementKind.Backwall, $"{name} backwall (infill wall)",
+                    $"Infill wall {Sh(ad.BackwallThickness)} thick on the stem back ledge, {L(bwR(Nx(xBwB)) - bwL(Nx(xBwB)))} along the line, top {El(Crown(sc))}; no corbel", iw));
+            }
+            geo.CorbelLeftS = n => bwL(n); geo.CorbelRightS = n => bwR(n);
+            geo.StringStartS = double.IsNaN(ad.Rebar.BackwallStringStartOffset) ? bwL(Nx(xBwB)) : SolveS(ad.Rebar.BackwallStringStartOffset, Nx(xBwB));
+        }
+        else
         {
             var lower = new Mesh();
             AddSlab(lower, unit, new[]
@@ -338,9 +393,12 @@ public sealed partial class SubstructureGenerator
             double ei = left ? eo + mk.Thickness : eo - mk.Thickness;
             Plane pa = EndPlane(left ? eo : ei), pb = EndPlane(left ? ei : eo);
             double sEnd = left ? leftEnd(nMid) : rightEnd(nMid);
-            double zBase = FB(sEnd) + D + W, zt = zBase + mk.Height;
+            double zBase = mk.BottomElevation ?? FB(sEnd) + D + W, zt = zBase + mk.Height;
             double xMB = EndX(mk.End, false), xMF = EndX(mk.End, true);
             var mm = new Mesh();
+            if (mk.BottomElevation is double zb0)
+                AddSlab(mm, unit, new[] { new SV(Nx(xMB), _ => zb0), new SV(Nx(xMF), _ => zb0), new SV(Nx(xMF), _ => zt), new SV(Nx(xMB), _ => zt) }, pa, pb, Array.Empty<double>());
+            else
             AddSlab(mm, unit, new[]
             {
                 new SV(Nx(xMB), s => FB(s) + D), new SV(Nx(xBwF), s => FB(s) + D), new SV(Nx(xBwF), s => FB(s) + D + W), new SV(Nx(xMF), s => FB(s) + D + W),
@@ -348,7 +406,7 @@ public sealed partial class SubstructureGenerator
             }, pa, pb, fbPts.Select(p => p.X));
             double width = Math.Abs(SolveS(left ? eo : ei, Nx(xMF)) - SolveS(left ? eo : ei, Nx(xMB)));
             unit.Solids.Add(new SubSolid(SubElementKind.Maskwall, $"{name} maskwall {(left ? "left" : "right")}",
-                $"End panel {Sh(mk.Thickness)} thick, {Sh(mk.Height)} above the footing top (top {El(zt)}), spanning the end line ({Sh(width)} along the wall face), {Sh(mk.Setback)} from the footing end line", mm));
+                $"End panel {Sh(mk.Thickness)} thick, {Sh(mk.Height)} above {(mk.BottomElevation != null ? $"its level bottom {El(zBase)}" : "the footing top")} (top {El(zt)}), spanning the end line ({Sh(width)} along the wall face), {Sh(mk.Setback)} from the footing end line", mm));
             geo.Masks.Add(new MaskInfo(mk.End, eo, ei, zt, zBase) { EndsAt = e => EndsOf(mk.End, e) });
         }
 
@@ -360,18 +418,18 @@ public sealed partial class SubstructureGenerator
             double s0 = seat.S - ad.StepLength / 2, s1 = seat.S + ad.StepLength / 2, top = sdef.TopElevation;
             if (Math.Abs(top - seat.Z) > In(0.125))
                 Warn($"{name}: beam step G{seat.Girder + 1} top {El(top)} (plan) differs from the bearing seat {El(seat.Z)} by {Sh(Math.Abs(top - seat.Z))} - the step follows the plan; check the bearing stack.");
-            double baseMax = Math.Max(FB(s0), FB(s1)) + D + W;
-            if (top <= Math.Min(FB(s0), FB(s1)) + D + W + 1e-4) { Warn($"{name}: beam step G{seat.Girder + 1} top {El(top)} is not above the seat base ({El(baseMax)}); no step built."); continue; }
+            double baseMax = Math.Max(StepBase(s0, xStepF), StepBase(s1, xStepF));
+            if (top <= Math.Min(StepBase(s0, xStepF), StepBase(s1, xStepF)) + 1e-4) { Warn($"{name}: beam step G{seat.Girder + 1} top {El(top)} is not above the seat base ({El(baseMax)}); no step built."); continue; }
             var sm = new Mesh();
             AddSlab(sm, unit, new[]
             {
-                new SV(Nx(xBwF), s => FB(s) + D + W), new SV(Nx(xStepF), s => FB(s) + D + W), new SV(Nx(xStepF), _ => top), new SV(Nx(xBwF), _ => top),
+                new SV(Nx(xBwF), s => StepBase(s, xBwF)), new SV(Nx(xStepF), s => StepBase(s, xStepF)), new SV(Nx(xStepF), _ => top), new SV(Nx(xBwF), _ => top),
             }, ConstPlane(s0), ConstPlane(s1), fbPts.Select(p => p.X));
-            double hMid = top - (FB(seat.S) + D + W);
+            double hMid = top - geo.SeatBaseZ(seat.S);
             unit.Solids.Add(new SubSolid(SubElementKind.Pedestal, $"{name} beam step G{seat.Girder + 1}",
                 $"Beam step {Sh(ad.StepLength)} x {Sh(xStepF - xBwF)}, top {El(top)}, {Sh(hMid)} above the wash at the girder", sm));
-            geo.Steps.Add(new AbutmentStepInfo(seat.Girder, seat.S, s0, s1, top, FB(seat.S) + D + W, Math.Min(Nx(xBwF), Nx(xStepF)), Math.Max(Nx(xBwF), Nx(xStepF))));
-            { var pi = new PedestalInfo(seat.Girder, seat.S, Nx((xBwF + xStepF) / 2), ad.StepLength, xStepF - xBwF, FB(seat.S) + D + W, top); unit.Pedestals.Add(pi); unit.PedestalBlocks.Add(pi); }
+            geo.Steps.Add(new AbutmentStepInfo(seat.Girder, seat.S, s0, s1, top, geo.SeatBaseZ(seat.S), Math.Min(Nx(xBwF), Nx(xStepF)), Math.Max(Nx(xBwF), Nx(xStepF))));
+            { var pi = new PedestalInfo(seat.Girder, seat.S, Nx((xBwF + xStepF) / 2), ad.StepLength, xStepF - xBwF, geo.SeatBaseZ(seat.S), top); unit.Pedestals.Add(pi); unit.PedestalBlocks.Add(pi); }
         }
 
         // ---- standalone pedestals (no bearing of this bridge, e.g. for a future beam line): same section as the beam steps
@@ -380,19 +438,19 @@ public sealed partial class SubstructureGenerator
             double len = double.IsNaN(pd.Length) ? ad.StepLength : pd.Length;
             double s0 = pd.S - len / 2, s1 = pd.S + len / 2, top = pd.TopElevation;
             string tag = pd.Label != "" ? pd.Label : $"P{k + 1}";
-            if (top <= Math.Min(FB(s0), FB(s1)) + D + W + 1e-4) { Warn($"{name}: pedestal {tag} at S {L(pd.S)} top {El(top)} is not above the seat base; not built."); continue; }
+            if (top <= Math.Min(StepBase(s0, xStepF), StepBase(s1, xStepF)) + 1e-4) { Warn($"{name}: pedestal {tag} at S {L(pd.S)} top {El(top)} is not above the seat base; not built."); continue; }
             if (geo.Steps.FirstOrDefault(st => st.S0 < s1 - 1e-6 && s0 < st.S1 - 1e-6) is { } hit)
                 Warn($"{name}: pedestal {tag} at S {L(pd.S)} overlaps the beam step {hit.Tag}; both are built - check the plan positions.");
             var sm = new Mesh();
             AddSlab(sm, unit, new[]
             {
-                new SV(Nx(xBwF), s => FB(s) + D + W), new SV(Nx(xStepF), s => FB(s) + D + W), new SV(Nx(xStepF), _ => top), new SV(Nx(xBwF), _ => top),
+                new SV(Nx(xBwF), s => StepBase(s, xBwF)), new SV(Nx(xStepF), s => StepBase(s, xStepF)), new SV(Nx(xStepF), _ => top), new SV(Nx(xBwF), _ => top),
             }, ConstPlane(s0), ConstPlane(s1), fbPts.Select(p => p.X));
-            double hMid = top - (FB(pd.S) + D + W);
+            double hMid = top - geo.SeatBaseZ(pd.S);
             unit.Solids.Add(new SubSolid(SubElementKind.Pedestal, $"{name} pedestal {tag} S {L(pd.S)}",
                 $"Pedestal without a bearing ({(pd.Label != "" ? pd.Label.ToLowerInvariant() : "standalone")}) {Sh(len)} x {Sh(xStepF - xBwF)}, top {El(top)}, {Sh(hMid)} above the wash", sm));
-            geo.Steps.Add(new AbutmentStepInfo(-1, pd.S, s0, s1, top, FB(pd.S) + D + W, Math.Min(Nx(xBwF), Nx(xStepF)), Math.Max(Nx(xBwF), Nx(xStepF))) { Label = tag });
-            var pi = new PedestalInfo(-1, pd.S, Nx((xBwF + xStepF) / 2), len, xStepF - xBwF, FB(pd.S) + D + W, top) { Label = tag };
+            geo.Steps.Add(new AbutmentStepInfo(-1, pd.S, s0, s1, top, geo.SeatBaseZ(pd.S), Math.Min(Nx(xBwF), Nx(xStepF)), Math.Max(Nx(xBwF), Nx(xStepF))) { Label = tag });
+            var pi = new PedestalInfo(-1, pd.S, Nx((xBwF + xStepF) / 2), len, xStepF - xBwF, geo.SeatBaseZ(pd.S), top) { Label = tag };
             unit.Pedestals.Add(pi); unit.PedestalBlocks.Add(pi);
         }
 

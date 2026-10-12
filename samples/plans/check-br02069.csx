@@ -79,7 +79,7 @@ foreach (var r in Csv("working-points.csv"))
     {
         int g = GirderAt(off), j = SupportOf(sta);
         var bs = ps.BearingSeats.First(s => s.Support == b.Supports[j].Name && s.Girder == g);
-        Row("Bridge seat (W.P.)", $"{pt} G{g + 1} {b.Supports[j].Name}", seat, bs.SeatElevation / ft, "model seat = bottom of bearing" + (j == 1 ? "; GAP one pad thickness (3 1/4\") for both beam ends, N plan L = 6 1/2\"" : ""));
+        Row("Bridge seat (W.P.)", $"{pt} G{g + 1} {b.Supports[j].Name}", seat, bs.SeatElevation / ft, "model seat = bottom of bearing (" + (j == 1 ? "E1 L 6 1/2\")" : "F1 L 3 1/4\")"));
     }
 }
 
@@ -110,7 +110,7 @@ foreach (var r in Csv("seat-elevations.csv"))
     Row("Pedestal size", $"{side} G{g + 1} along abutment (ft)", side == "S" ? 56.0 / 12 : 42.0 / 12, ped?.LengthS / ft, side == "S" ? "p5 4'-8\"" : "p10 3'-6\"");
     var bs = ps.BearingSeats.First(s => s.Support == sname && s.Girder == g);
     Row("Bearing seats", $"{side} G{g + 1} off {off:+0.00;-0.00} model seat", plan, bs.SeatElevation / ft,
-        j == 1 ? "GAP: one pad thickness 3 1/4\" for both beam ends (N plan L 6 1/2\")" : "PG - 2%|off| - 9 - 4 1/4 - 30 - 3 1/4\"");
+        j == 1 ? "PG - 2%|off| - 9 - 4 1/4 - 30 - 6 1/2\" (E1)" : "PG - 2%|off| - 9 - 4 1/4 - 30 - 3 1/4\" (F1)");
 }
 
 // ---------------------------------------------------------------- span, beam, deck
@@ -174,6 +174,95 @@ foreach (var beam in ps.Beams.Where(x => x.Girder == 0 || x.Girder == 6))
         double lb = beam.Bars.Sum(x => { var m = ps.MarkOf(x); return m.Length * m.Size.MassPerLength; }) * 2.2046226218;
         Row("Beam rebar", $"{beam.Mark} reinforcing per beam (lb)", null, lb, "no bar bill on p16 (paid with the beam); centerline lengths", 0, "F0");
     }
+}
+
+// ---------------------------------------------------------------- semi-integral abutment: p.21 SECTION A-A (between beams) / B-B (at beams), p.11 A-A / Detail A / C-C
+// Vertical probes through the generated solids at (offset, x from CL brg toward the span): bottom / top of the diaphragm, polystyrene, stem, infill
+// and mask wall vs the plan chain. Plan values: back face 2'-6" behind CL brg (1'-3" + 3" + 1'-0"), front face 6" ahead, paving bracket 8" x 1'-4",
+// back part on the ledge + 1" (1" Type A), 3" Type B to the 3" x 3" chamfer, front part bottom = bottom of the beams, 1'-0" x 1'-0" fillet; stem
+// ledge = footing top 920.75 + 1'-7 1/4" S / 1'-4 3/4" N (p.11 note 3), seat at the riser = ledge + 1'-0", seat front 923.27 / 923.06, front face
+// 1'-6" ahead; infill wall only WL +17'-7" .. +36'-0" (top 927.73 / 927.80); mask wall beside the footing W end, 917.75 .. 930.61 / 930.67.
+{
+    var model = Doc.Model(BrName);
+    var cdm = model.Prestressed!.ConcreteDiaphragms!;
+    List<double> Hits(IEnumerable<SBM.Core.Solids.Mesh> meshes, Vec2 q)
+    {
+        var zs = new List<double>();
+        foreach (var m in meshes)
+            for (int t = 0; t + 2 < m.Indices.Count; t += 3)
+            {
+                var a = m.Positions[m.Indices[t]]; var bq = m.Positions[m.Indices[t + 1]]; var c = m.Positions[m.Indices[t + 2]];
+                double d = (bq.Y - c.Y) * (a.X - c.X) + (c.X - bq.X) * (a.Y - c.Y);
+                if (Math.Abs(d) < 1e-12) continue;
+                double l1 = ((bq.Y - c.Y) * (q.X - c.X) + (c.X - bq.X) * (q.Y - c.Y)) / d, l2 = ((c.Y - a.Y) * (q.X - c.X) + (a.X - c.X) * (q.Y - c.Y)) / d, l3 = 1 - l1 - l2;
+                if (l1 < -1e-9 || l2 < -1e-9 || l3 < -1e-9) continue;
+                zs.Add(l1 * a.Z + l2 * bq.Z + l3 * c.Z);
+            }
+        return zs.OrderBy(z => z).ToList();
+    }
+    double FtIn2(double f, double i = 0) => f + i / 12.0;
+    var seatRows2 = Csv("seat-elevations.csv");
+    foreach (int j in new[] { 0, 1 })
+    {
+        string side = j == 0 ? "S" : "N";
+        var sup = b.Supports[j];
+        var unit = sub.Units.First(u => u.Name == sup.Name);
+        var dia = cdm.Diaphragms.First(d => d.SupportIndex == j);
+        double ledge = 920.75 + (j == 0 ? 19.25 : 16.75) / 12, seatFront = j == 0 ? 923.27 : 923.06, Lb = (j == 0 ? 3.25 : 6.5) / 12;
+        double infillTop = j == 0 ? 927.73 : 927.80, maskTop = j == 0 ? 930.61 : 930.67;
+        Vec2 Pt(double off, double xIn) => al.PointAt(sup.Station + (j == 0 ? 1 : -1) * In(xIn), Ft(off));
+        double DeckTop(double off, double xIn) { var q = Pt(off, xIn); var so = al.Inverse(q); return b.Deck.FinishedElevation(al, so.Station, so.Offset) / ft; }
+        double PlanSeat(double off) => double.Parse(seatRows2.First(r => r[0] == side && Math.Abs(double.Parse(r[3]) - off) < 1e-6)[5]);
+        double BeamBot(double off) => PlanSeat(off) + Lb;
+        double? Bot(IEnumerable<SBM.Core.Solids.Mesh> m, double off, double xIn) { var h = Hits(m, Pt(off, xIn)); return h.Count > 0 ? h[0] / ft : null; }
+        double? Top(IEnumerable<SBM.Core.Solids.Mesh> m, double off, double xIn) { var h = Hits(m, Pt(off, xIn)); return h.Count > 0 ? h[^1] / ft : null; }
+        var dm = new[] { dia.Mesh };
+        var poly3 = cdm.Accessories.Where(a => a.Support == sup.Name && a.Material.StartsWith("3\"")).Select(a => a.Mesh).ToList();
+        var poly1 = cdm.Accessories.Where(a => a.Support == sup.Name && a.Material.Contains("Type A")).Select(a => a.Mesh).ToList();
+        var stem = unit.Solids.Where(x => x.Name.EndsWith(" stem")).Select(x => x.Mesh).ToList();
+        var foot = unit.Solids.Where(x => x.Kind == SBM.Core.Substructure.SubElementKind.Footing).Select(x => x.Mesh).ToList();
+        var infill = unit.Solids.Where(x => x.Name.Contains("infill")).Select(x => x.Mesh).ToList();
+        var mask = unit.Solids.Where(x => x.Kind == SBM.Core.Substructure.SubElementKind.Maskwall).Select(x => x.Mesh).ToList();
+        string G = "Section A-A (p21)";
+        double o = -18;   // A-A: between G1 (-21) and G2 (-15); beam bottom line at mid-bay = mean of the two beam bottoms (plan seat + L)
+        double bbMid = (BeamBot(-21) + BeamBot(-15)) / 2;
+        Row(G, $"{side} diaphragm back face x (ft)", -2.50, dia.Parts.Min(p => p.XMin) / ft, "1'-3\" + 3\" + 1'-0\" behind CL brg");
+        Row(G, $"{side} diaphragm fillet end x (ft)", 1.50, dia.Parts.Max(p => p.XMax) / ft, "front face 6\" + 1'-0\" fillet");
+        Row(G, $"{side} back part bottom at x -29\" (ledge + 1\")", ledge + 1.0 / 12, Bot(dm, o, -29), "1\" Type A polystyrene on the ledge");
+        Row(G, $"{side} paving bracket top at x -29\" (deck top - 1'-4\")", DeckTop(o, -29) - FtIn2(1, 4), Top(dm, o, -29), "8\" x 1'-4\" notch");
+        Row(G, $"{side} top at x -20\" (deck soffit)", DeckTop(o, -20) - 0.75, Top(dm, o, -20), "slab 9\" stays in the deck");
+        Row(G, $"{side} chamfer at x -13 1/2\" (beam bottom - 1 1/2\")", bbMid - 1.5 / 12, Bot(dm, o, -13.5), "3\" x 3\" chamfer (p11 Detail A)");
+        Row(G, $"{side} front part bottom at x -6\" (beam bottom line)", bbMid, Bot(dm, o, -6), "A-A: bottom = bottom of beams");
+        Row(G, $"{side} front part bottom at x +5 1/2\" (beam bottom line)", bbMid, Bot(dm, o, 5.5), "front face 6\" ahead of CL brg");
+        Row(G, $"{side} fillet bottom at x +6 1/2\" (soffit - 11 1/2\")", DeckTop(o, 6.5) - 0.75 - 11.5 / 12, Bot(dm, o, 6.5), "1'-0\" x 1'-0\" fillet");
+        Row(G, $"{side} fillet bottom at x +17\" (soffit - 1\")", DeckTop(o, 17) - 0.75 - 1.0 / 12, Bot(dm, o, 17), "1'-0\" x 1'-0\" fillet");
+        Row(G, $"{side} B-B at G2: bottom at x -10\" (beam bottom)", BeamBot(-15), Bot(dm, -15, -10), "B-B: beam end 7 1/2\" behind CL brg inside the diaphragm");
+        Row(G, $"{side} 3\" polystyrene bottom at x -13 1/2\" (ledge)", ledge, Bot(poly3, o, -13.5), "p11 Detail A");
+        Row(G, $"{side} 3\" polystyrene top at x -13 1/2\" (chamfer start)", bbMid - 3.0 / 12, Top(poly3, o, -13.5), "p11 Detail A");
+        Row(G, $"{side} 1\" polystyrene at x -25\" (top = ledge + 1\")", ledge + 1.0 / 12, Top(poly1, o, -25), "p11 Detail A");
+        Row(G, $"{side} stem ledge at x -20\"", ledge, Top(stem, o, -20), "p11 note 3");
+        Row(G, $"{side} stem seat at x -11 7/8\" (riser, ledge + 1'-0\")", ledge + 1 - (1.0 / 8) / 30 * (ledge + 1 - seatFront), Top(stem, o, -11.875), "p11 A-A 1'-0\"");
+        Row(G, $"{side} stem seat at x +17 7/8\" (front face)", seatFront + (1.0 / 8) / 30 * (ledge + 1 - seatFront), Top(stem, o, 17.875), "p5 / p10 seat front, 1\" slope");
+        Row(G, $"{side} footing top in front of the stem x +2'-0\"", 920.75, Top(foot, o, 24), "p11 A-A: 1'-3\" toe at the footing top (was built up to the seat)");
+        Row(G, $"{side} footing top behind the stem x -2'-9\"", 920.75, Top(foot, o, -33), "p11 A-A: 9\" back toe");
+        Row(G, $"{side} no infill wall under the superstructure (o +17.5)", 0, infill.Sum(m => Hits(new[] { m }, Pt(17.5, -20)).Count), "p11 Detail C: infill W end +17'-7\"", 0, "F0");
+        Row(G, $"{side} infill wall top at o +25 (E 18'-5\")", infillTop, Top(infill, 25, -20), "p5 / p10");
+        Row(G, $"{side} infill wall bottom at o +25 (on the ledge)", ledge, Bot(infill, 25, -20), "p11 B-B");
+        Row(G, $"{side} mask wall bottom at o -24.3 (beside the footing)", 917.75, Bot(mask, -24.3, 0), "p11 C-C");
+        Row(G, $"{side} mask wall top at o -24.3", maskTop, Top(mask, -24.3, 0), "p11 C-C");
+        Row(G, $"{side} no mask wall inside the footing end (o -23.5)", 0, mask.Sum(m => Hits(new[] { m }, Pt(-23.5, 0)).Count), "inner face on the footing W end line -23'-7\"", 0, "F0");
+        // bearing between the pedestal top and the beam bottom at G2 (F1 L 3 1/4" S, E1 L 6 1/2" N)
+        var pedG2 = unit.Pedestals.First(p => p.Girder == 1);
+        var bmG2 = ps.Beams.First(x => x.Girder == 1);
+        var brg = j == 0 ? bmG2.BearingStart : bmG2.BearingEnd;
+        Row(G, $"{side} G2 beam bottom - pedestal top (in)", Lb * 12, (brg.Z - bmG2.Shape.Depth - pedG2.SeatZ) / In(1), j == 0 ? "F1 L 3 1/4\" (p31)" : "E1 L 6 1/2\" (p31)", 1.0 / 16, "F4");
+        // concrete quantities (p4 / p9 SUMMARY OF QUANTITIES, structural concrete 3B52) - footing, stem, infill, mask wall, pedestals
+        double cy = unit.Solids.Where(x => x.IsConcrete && x.Kind != SBM.Core.Substructure.SubElementKind.Pile).Sum(x => Math.Abs(x.Mesh.Volume())) / 0.764554857984;
+        Row("Concrete (CY)", $"{side} abutment structural concrete", j == 0 ? 71 : 69, cy, $"{(j == 0 ? "p4" : "p9")} 3B52 (nearest CY); footing + stem + infill + mask + pedestals", 0.5, "F1");
+        Row("Concrete (CY)", $"{side} end diaphragm (superstructure, no separate plan item)", null, dia.Volume / 0.764554857984, "back part + front part", 0, "F2");
+    }
+    double tot = sub.Units.Sum(u => u.Solids.Where(x => x.IsConcrete && x.Kind != SBM.Core.Substructure.SubElementKind.Pile).Sum(x => Math.Abs(x.Mesh.Volume()))) / 0.764554857984;
+    Row("Concrete (CY)", "bridge structural concrete (abutments)", 140, tot, "p2 SOQ 140 CY = 71 + 69", 1.0, "F1");
 }
 
 // ---------------------------------------------------------------- table

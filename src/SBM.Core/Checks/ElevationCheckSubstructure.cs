@@ -175,7 +175,7 @@ public static partial class ElevationCheck
         if (unit.Abutment is { } ag)
         {
             double baseZ = ag.SeatBaseZ(s);
-            how = $"as-designed abutment: footing bottom {E(ag.FootingBottom(s))} + footing depth {Sh(ag.Def.FootingDepth)} + wash {Sh(ag.Def.WashHeight)} (step base)";
+            how = ag.SeatAt != null ? $"as-designed abutment stem: seat at the CL bearing between the riser and the stem front face (AbutmentDefinition.Stem; step base)" : $"as-designed abutment: footing bottom {E(ag.FootingBottom(s))} + footing depth {Sh(ag.Def.FootingDepth)} + wash {Sh(ag.Def.WashHeight)} (step base)";
             capTop = baseZ;
         }
         double h = z - capTop;
@@ -204,7 +204,7 @@ public static partial class ElevationCheck
         if (unit.Abutment is { } ab)
         {
             capBot = ab.FootingBottom(s);
-            howB = $"footing depth {Sh(ab.Def.FootingDepth)} + wash {Sh(ab.Def.WashHeight)} (AbutmentDefinition)";
+            howB = ab.SeatAt != null ? $"stem seat to footing bottom (footing depth {Sh(ab.Def.FootingDepth)} + stem; AbutmentDefinition.Stem)" : $"footing depth {Sh(ab.Def.FootingDepth)} + wash {Sh(ab.Def.WashHeight)} (AbutmentDefinition)";
         }
         else (capBot, howB) = SoffitFromInputs(unit, s, u);
         ch.Steps.Add(new CalcStep(unit.Abutment != null ? "− Wash + footing depth" : "− Cap depth", $"{Sh(capTop - capBot)} under the bearing; {howB}",

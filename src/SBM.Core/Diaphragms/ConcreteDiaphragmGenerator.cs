@@ -72,7 +72,15 @@ public static class ConcreteDiaphragmGenerator
             while (k < Bounds.Count && s > RiserAt(k, x)) k++;
             return k;
         }
-        public double BottomOn(int piece, double s) { var p = Pieces[Math.Min(piece, Pieces.Count - 1)]; return p.Z0 + p.Slope * (s - p.SRef); }
+        public double BottomOn(int piece, double s, double x = 0)
+        {
+            int i = Math.Min(piece, Pieces.Count - 1);
+            var p = Pieces[i];
+            double z = p.Z0 + p.Slope * (s - p.SRef);
+            return i < PieceZPerX.Count ? z + PieceZPerX[i] * x : z;
+        }
+        /// <summary>OPTIONAL per piece: change of the bottom per unit x (BeamBottoms rule: the beam bottoms follow the beam slope across the diaphragm).</summary>
+        public List<double> PieceZPerX = new();
         public Vec2 W(double s, double x) => O + DS * s + N * (Xs * x);
         public double X(Vec2 p) => Xs * Vec2.Dot(p - O, N);
         public double S(Vec2 p) => Vec2.Dot(p - O, DS);
@@ -85,7 +93,7 @@ public static class ConcreteDiaphragmGenerator
         public double BottomAt(double s, double x = 0)
         {
             if (Steps.Count == 0 || Pieces.Count == 0) throw new InvalidOperationException("a section point uses the Bottom reference but no BottomSteps are given");
-            return BottomOn(PieceAt(s, x), s);
+            return BottomOn(PieceAt(s, x), s, x);
         }
         public double Z(DiaphragmZRef r, double dz, double s, double x) => r switch
         {
@@ -315,6 +323,44 @@ public static class ConcreteDiaphragmGenerator
             be.Square = b.Definition?.InteriorEnds == InteriorGirderEnds.Square && sup.Type != SupportType.Abutment;
             ends.Add(be);
         }
+        if (dd.Risers == DiaphragmRiserRule.BeamBottoms)
+        {
+            // bottom = bottom of the beams: level over each bottom flange (beam bottom at the CL bearing), straight between adjacent flange edges
+            if (dd.BottomSteps.Count > 0) Warn("BottomSteps are ignored with the BeamBottoms riser rule (the bottom follows the beams).");
+            k.Steps.Clear(); k.Pieces.Clear(); k.Bounds.Clear(); k.PieceZPerX.Clear();
+            var bb = new List<(double S, double Z, double L0, double P0, double L1, double P1, double A)>();
+            foreach (var e in ends)
+            {
+                // beam bottom on the slice x = 0 (CL bearing line) and its change per unit x (beam slope); a hair (0.001 mm) below the beam so the
+                // open beam void always crosses the part bottom on the same edge (exact coincidence would flip with round-off)
+                var m0 = e.Map(k, 0, 0, 0);
+                double sb = m0.S, zb = m0.Z - 1e-6, za = e.Map(k, 1, 0, 0).Z - m0.Z;
+                // flange edges on the slices x = 0 and x = 1 m: S = S0 + PerX * x
+                double sa0 = e.Map(k, 0, -e.Hb, 0).S, sa1 = e.Map(k, 1, -e.Hb, 0).S, sc0 = e.Map(k, 0, e.Hb, 0).S, sc1 = e.Map(k, 1, e.Hb, 0).S;
+                if (sa0 > sc0) { (sa0, sc0) = (sc0, sa0); (sa1, sc1) = (sc1, sa1); }
+                bb.Add((sb, zb, sa0, sa1 - sa0, sc0, sc1 - sc0, za));
+            }
+            bb.Sort((a, b) => a.S.CompareTo(b.S));
+            if (bb.Count == 0) throw new InvalidOperationException("the BeamBottoms rule needs beams at this support");
+            for (int i = 0; i < bb.Count; i++)
+            {
+                var b = bb[i];
+                k.Steps.Add((b.S, b.Z));
+                if (i == 0) { k.Pieces.Add((b.Z, 0, b.S)); k.PieceZPerX.Add(b.A); }       // beyond the outer flange edge: level at the fascia beam bottom
+                else
+                {
+                    var p = bb[i - 1];
+                    if (b.L0 <= p.L1 + 1e-4) throw new InvalidOperationException($"bottom flanges of adjacent beams overlap at S {L(b.S)}");
+                    double slope = (b.Z - p.Z) / (b.L0 - p.L1);
+                    k.Pieces.Add((p.Z, slope, p.L1)); k.PieceZPerX.Add((p.A + b.A) / 2);   // between the flange edges
+                }
+                k.Bounds.Add((b.L0, b.P0));
+                k.Pieces.Add((b.Z, 0, b.S)); k.PieceZPerX.Add(b.A);                       // under the beam's bottom flange
+                k.Bounds.Add((b.L1, b.P1));
+            }
+            k.Pieces.Add((bb[^1].Z, 0, bb[^1].S)); k.PieceZPerX.Add(bb[^1].A);
+            Info($"bottom = bottom of the beams: {bb.Count} beam bottoms at the CL bearing {string.Join(" / ", bb.Select(b => (b.Z / Ft(1)).ToString("0.000")))} ft, straight between the bottom-flange edges, level beyond the fascia beams.");
+        }
         double maxLean = ends.Count == 0 ? 0 : ends.Max(e => sup.Type == SupportType.Abutment ? 0 : Math.Abs(e.Beam.Slope) * e.D * Math.Abs(Vec2.Dot(e.T, nrm)));
         if (maxLean > In(1.0 / 32))
             Info($"beam end faces lean up to {L(maxLean)} over the beam depth (square to the axis in elevation); the beam voids end plumb at the top CL end point.");
@@ -519,6 +565,13 @@ public static class ConcreteDiaphragmGenerator
         cuts = cuts.Distinct().OrderBy(x => x).ToList();
         var merged = new List<double>();
         foreach (var c in cuts) if (merged.Count == 0 || c - merged[^1] > 1e-6) merged.Add(c);
+        var added = new HashSet<double>();
+        if (openBelow && beams.Count > 0)
+        {
+            var before = merged.ToHashSet();
+            merged = OpenBelowEvents(k, merged, lower, beams);
+            added = merged.Where(c => !before.Contains(c)).ToHashSet();
+        }
         var usedBeams = new HashSet<BeamEnd>();
         var fasciaBeams = beams;   // the part's beams (present anywhere in it) define a fascia end
         for (int i = 0; i + 1 < merged.Count; i++)
@@ -530,7 +583,8 @@ public static class ConcreteDiaphragmGenerator
             var present = beams.Where(b => b.VoidAt(k, xm, openBelow) != null).ToList();
             foreach (var b in present) usedBeams.Add(b);
             // square beam ends: evaluate the end slices a hair inside the slab so the clip line never sits on an outline vertex
-            double eps = present.Any(b => b.Square) ? Math.Min(1e-5, (xb - xa) / 4) : 0;
+            // (also at the vertex-crossing events of open-below parts: there the part bottom passes exactly through a beam outline vertex)
+            double eps = present.Any(b => b.Square) || added.Contains(xa) || added.Contains(xb) ? Math.Min(1e-5, (xb - xa) / 4) : 0;
             if (openBelow && present.Count > 0)
             {
                 // beams open below (bearing zone is not concrete): the slice splits into panels between the beams
@@ -543,9 +597,45 @@ public static class ConcreteDiaphragmGenerator
             var plan = SlicePlan(k, xm, lo, up, left, right, present, fasciaBeams);
             var r0 = Slice(k, xa + eps, lo, up, left, right, present, fasciaBeams, plan);
             var r1 = Slice(k, xb - eps, lo, up, left, right, present, fasciaBeams, plan);
+            if (r0.Count != r1.Count && eps == 0)
+            {
+                // a wedge slab (e.g. a fillet whose bottom meets the top at one end) degenerates at that end: evaluate a hair inside and extrapolate
+                eps = Math.Min(1e-5, (xb - xa) / 4);
+                r0 = Slice(k, xa + eps, lo, up, left, right, present, fasciaBeams, plan);
+                r1 = Slice(k, xb - eps, lo, up, left, right, present, fasciaBeams, plan);
+            }
             LoftSlab(k, mesh, r0, r1, xa, xb, eps);
         }
         return usedBeams.ToList();
+    }
+
+    /// <summary>Open-below parts: extra slab cuts where a sloped part bottom (e.g. a fillet under the slab) passes a vertex of a beam outline, so the
+    /// panels between the beams keep one topology inside every slab (the beam side chain is clipped at the part bottom).</summary>
+    private static List<double> OpenBelowEvents(Frame k, List<double> cuts, List<Edge> lower, List<BeamEnd> beams)
+    {
+        var add = new List<double>();
+        for (int i = 0; i + 1 < cuts.Count; i++)
+        {
+            double xa = cuts[i], xb = cuts[i + 1], xm = (xa + xb) / 2;
+            if (xb - xa < 1e-4) continue;
+            var lo = lower.FirstOrDefault(e => e.X0 <= xm && e.X1 >= xm);
+            if (lo == null || lo.Ref == DiaphragmZRef.Bottom) continue;   // stepped / beam-bottom bottoms: the panels already follow the beams
+            foreach (var b in beams.Where(b => b.VoidAt(k, xm, true) != null))
+                foreach (var v in b.VoidOpen.Where(q => Math.Abs(q.Y) < Big / 2).Distinct())
+                {
+                    double F(double x) { var m = b.Map(k, x, v.X, v.Y); return m.Z - RefZ(k, lo, m.S, x); }
+                    double x0 = xa + 1e-6, x1 = xb - 1e-6, f0 = F(x0), f1 = F(x1);
+                    if (Math.Sign(f0) == Math.Sign(f1) || f0 == 0 || f1 == 0) continue;
+                    for (int it = 0; it < 60; it++) { double xc = (x0 + x1) / 2, fc = F(xc); if (Math.Sign(fc) == Math.Sign(f0)) { x0 = xc; f0 = fc; } else x1 = xc; }
+                    double xe = (x0 + x1) / 2;
+                    if (xe > xa + 1e-4 && xe < xb - 1e-4) add.Add(xe);
+                }
+        }
+        if (add.Count == 0) return cuts;                                 // nothing crosses: the cuts are unchanged
+        var res = new List<double>(cuts);
+        foreach (var e in add.OrderBy(x => x))
+            if (res.All(c => Math.Abs(c - e) > 1e-4)) res.Add(e);
+        return res.OrderBy(x => x).ToList();
     }
 
     /// <summary>Lofts one slab between its two end slices (inset by eps for square beam ends, extrapolated back to the faces).</summary>
@@ -588,7 +678,8 @@ public static class ConcreteDiaphragmGenerator
         double sta = k.Al.Inverse(k.W((sl + sr) / 2, x)).Station;
         var kinkS = k.KinkOffsets(sta).Select(o => k.SAtOffset(o, x)).Where(s => s > sl + 1e-4 && s < sr - 1e-4).ToList();
         bool Smooth(DiaphragmZRef r) => r is DiaphragmZRef.DeckTop or DiaphragmZRef.Soffit;
-        var topK = Smooth(up.Ref) ? kinkS.ToList() : new List<double>();
+        // a top edge on the stepped / beam-bottom Bottom reference breaks at the risers (piece boundaries)
+        var topK = Smooth(up.Ref) ? kinkS.ToList() : up.Ref == DiaphragmZRef.Bottom ? k.RisersAt(x).Where(s => s > sl + 1e-4 && s < sr - 1e-4).ToList() : new List<double>();
         var botK = Smooth(lo.Ref) ? kinkS.ToList() : new List<double>();
         // top segments between events (right end, voids, left end) and kinks
         var ev = TopEvents(k, x, sl, sr, present, order, topK);
@@ -656,11 +747,11 @@ public static class ConcreteDiaphragmGenerator
         {
             double a = bev[i], b = bev[i + 1];
             int pc = k.Pieces.Count > 0 ? k.PieceAt((a + b) / 2, x) : 0;
-            double zA = lo.Ref == DiaphragmZRef.Bottom ? k.BottomOn(pc, a) + lo.DzAt(x) : Low(a);
+            double zA = lo.Ref == DiaphragmZRef.Bottom ? k.BottomOn(pc, a, x) + lo.DzAt(x) : Low(a);
             poly.Add((a, zA));
             int m = plan.BottomSamples[i];
             for (int q = 1; q <= m; q++) { double s = a + (b - a) * q / (m + 1); poly.Add((s, Low(s))); }
-            if (lo.Ref == DiaphragmZRef.Bottom) poly.Add((b, k.BottomOn(pc, b) + lo.DzAt(x)));   // bottom piece (level step or sloped top) to the riser / end
+            if (lo.Ref == DiaphragmZRef.Bottom) poly.Add((b, k.BottomOn(pc, b, x) + lo.DzAt(x)));   // bottom piece (level step or sloped top) to the riser / end
         }
         if (lo.Ref != DiaphragmZRef.Bottom) poly.Add((sr, Low(sr)));
 
@@ -740,8 +831,8 @@ public static class ConcreteDiaphragmGenerator
                 if (lo.Ref == DiaphragmZRef.Bottom)
                 {
                     int pc = k.PieceAt((s0 + s1) / 2, x);
-                    poly.Add((s0, k.BottomOn(pc, s0) + lo.DzAt(x)));
-                    poly.Add((s1, k.BottomOn(pc, s1) + lo.DzAt(x)));
+                    poly.Add((s0, k.BottomOn(pc, s0, x) + lo.DzAt(x)));
+                    poly.Add((s1, k.BottomOn(pc, s1, x) + lo.DzAt(x)));
                 }
                 else
                 {
@@ -1033,8 +1124,8 @@ public static class ConcreteDiaphragmGenerator
                 var quad = new List<Vec2> { new(SA(x0), x0), new(SB(x0), x0), new(SB(x1), x1), new(SA(x1), x1) };
                 if (MeshBuilder.SignedArea(quad) < 0) quad.Reverse();
                 if (Math.Abs(MeshBuilder.SignedArea(quad)) < 1e-8) continue;
-                var bot = quad.Select(q => k.W(q.X, q.Y).WithZ(k.BottomOn(pc, q.X) + zLo)).ToArray();
-                var top = quad.Select(q => k.W(q.X, q.Y).WithZ(k.BottomOn(pc, q.X) + zHi)).ToArray();
+                var bot = quad.Select(q => k.W(q.X, q.Y).WithZ(k.BottomOn(pc, q.X, q.Y) + zLo)).ToArray();
+                var top = quad.Select(q => k.W(q.X, q.Y).WithZ(k.BottomOn(pc, q.X, q.Y) + zHi)).ToArray();
                 Loft(mesh, quad, new[] { bot, top });
             }
         }

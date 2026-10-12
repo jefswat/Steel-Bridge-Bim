@@ -240,8 +240,16 @@ public sealed class AbutmentGeometry
     public double StringStartS { get; set; } = double.NaN;
     public double N(double x) => Sigma * x;
     public double FootingTopZ(double s) => FootingBottom(s) + Def.FootingDepth;
-    public double SeatBaseZ(double s) => FootingBottom(s) + Def.FootingDepth + Def.WashHeight;
-    public double BackwallBaseZ(double s) => FootingBottom(s) + Def.BackwallBaseAboveFootingBottom;
+    /// <summary>Pedestal / beam step base under the CL bearing: the wash, or with a stem (<see cref="AbutmentDefinition.Stem"/>) the seat at x = 0.</summary>
+    public double SeatBaseZ(double s) => SeatAt != null ? SeatAt(s, 0) : FootingBottom(s) + Def.FootingDepth + Def.WashHeight;
+    public double BackwallBaseZ(double s) => LedgeTop != null ? LedgeTop(s) : FootingBottom(s) + Def.BackwallBaseAboveFootingBottom;
+    // ---- MnDOT stem (AbutmentDefinition.Stem; null otherwise)
+    /// <summary>Stem front face x (NaN = no stem).</summary>
+    public double XStemFront { get; set; } = double.NaN;
+    /// <summary>Back ledge top at S.</summary>
+    public Func<double, double>? LedgeTop { get; set; }
+    /// <summary>Seat elevation at (S, x) between the riser (backwall front-face line) and the stem front face.</summary>
+    public Func<double, double, double>? SeatAt { get; set; }
     public List<AbutmentStepInfo> Steps { get; } = new();
     public List<WingInfo> Wings { get; } = new();
     public List<MaskInfo> Masks { get; } = new();

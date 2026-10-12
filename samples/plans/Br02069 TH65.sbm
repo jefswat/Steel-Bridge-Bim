@@ -165,7 +165,7 @@
               "Kind": "Stub",
               "LeftEndOffset": -7.188200000000001,
               "RightEndOffset": 10.972800000000001,
-              "BackwallLeftOffset": "NaN",
+              "BackwallLeftOffset": 5.359400000000001,
               "BackwallRightOffset": "NaN",
               "CorbelLeftOffset": "NaN",
               "CorbelRightOffset": "NaN",
@@ -176,8 +176,30 @@
               "BearingToFootingFront": 0.8382000000000001,
               "PlanFootingWidth": 1.8288000000000002,
               "FootingDepth": 0.9144000000000001,
-              "WashHeight": 0.7680959999999577,
-              "BackwallBaseAboveFootingBottom": 1.4020800000000122,
+              "WashHeight": 0.0254,
+              "BackwallBaseAboveFootingBottom": 1.1684,
+              "Stem": {
+                "FrontToBearing": 0.4572,
+                "LedgeTop": [
+                  {
+                    "S": 0,
+                    "Elevation": 281.13355
+                  }
+                ],
+                "SeatBackTop": [
+                  {
+                    "S": 0,
+                    "Elevation": 281.43835
+                  }
+                ],
+                "SeatFrontTop": [
+                  {
+                    "S": 0,
+                    "Elevation": 281.412696
+                  }
+                ],
+                "Source": "p11 A-A, notes 3 / 5; p21 A-A"
+              },
               "FootingBottom": [
                 {
                   "S": 0,
@@ -250,8 +272,9 @@
                 {
                   "End": "Left",
                   "Thickness": 0.4445,
-                  "Height": 2.2372320000000627,
-                  "Setback": 0
+                  "Height": 3.9197280000000205,
+                  "Setback": -0.4445,
+                  "BottomElevation": 279.7302
                 }
               ],
               "FootingNotches": [],
@@ -394,7 +417,7 @@
           "Diaphragm": {
             "Kind": "SemiIntegralEnd",
             "Name": "South Abutment end diaphragm",
-            "Source": "p.20, p.21, p.11 Detail A / C; ledge S 922.35 DERIVED (sec. 4)",
+            "Source": "p.20, p.21, p.11 Detail A / C; ledge S = footing top 920.75 \u002B 1\u0027-7 1/4 (p.11 note 3) = 922.354",
             "Material": "Structural concrete (cast with the deck; superstructure quantities)",
             "Parts": [
               {
@@ -403,12 +426,12 @@
                   {
                     "X": -0.762,
                     "Ref": "Elevation",
-                    "Dz": 281.15768
+                    "Dz": 281.15895
                   },
                   {
                     "X": -0.381,
                     "Ref": "Elevation",
-                    "Dz": 281.15768
+                    "Dz": 281.15895
                   },
                   {
                     "X": -0.381,
@@ -437,10 +460,41 @@
               },
               {
                 "Name": "front part",
-                "Section": [],
+                "Section": [
+                  {
+                    "X": -0.381,
+                    "Ref": "Bottom",
+                    "Dz": -0.07619999999999999
+                  },
+                  {
+                    "X": -0.3048,
+                    "Ref": "Bottom",
+                    "Dz": 0
+                  },
+                  {
+                    "X": 0.15239999999999998,
+                    "Ref": "Bottom",
+                    "Dz": 0
+                  },
+                  {
+                    "X": 0.15239999999999998,
+                    "Ref": "Soffit",
+                    "Dz": -0.3048
+                  },
+                  {
+                    "X": 0.4572,
+                    "Ref": "Soffit",
+                    "Dz": 0
+                  },
+                  {
+                    "X": -0.381,
+                    "Ref": "Soffit",
+                    "Dz": 0
+                  }
+                ],
                 "Left": null,
                 "Right": null,
-                "Unresolved": "bottom of the front (span-side) part between the beams not dimensioned on p.21 (A-A / B-B give only the \u0027VARIES\u0027 back part and the 1\u0027-0 x 1\u0027-0 front fillet); MnDOT B814 (concrete end diaphragm) is the PARAPET-abutment detail - Fig. 5-397.560 sends integral / semi-integral abutments to the superstructure details - so no standard dimensions it (user decision 14: leave UNRESOLVED). Beam embedment (7 1/2\u0022 ends, 1 1/2\u0022 web holes) lies in this part (p.21)"
+                "Unresolved": ""
               }
             ],
             "Left": {
@@ -456,7 +510,7 @@
               "Source": "E end: 1\u0022 Type B polystyrene to the infill wall W end (\u002B17\u0027-7), p.11 Detail C"
             },
             "BottomSteps": [],
-            "Risers": "Unresolved",
+            "Risers": "BeamBottoms",
             "RiserS": [],
             "RiserSource": "",
             "Fillers": [
@@ -492,22 +546,22 @@
                   {
                     "X": -0.762,
                     "Ref": "Elevation",
-                    "Dz": 281.13228000000004
+                    "Dz": 281.13355
                   },
                   {
                     "X": -0.381,
                     "Ref": "Elevation",
-                    "Dz": 281.13228000000004
+                    "Dz": 281.13355
                   },
                   {
                     "X": -0.381,
                     "Ref": "Elevation",
-                    "Dz": 281.15768
+                    "Dz": 281.15895
                   },
                   {
                     "X": -0.762,
                     "Ref": "Elevation",
-                    "Dz": 281.15768
+                    "Dz": 281.15895
                   }
                 ],
                 "X0": 0,
@@ -524,27 +578,27 @@
                   {
                     "X": -0.381,
                     "Ref": "Elevation",
-                    "Dz": 281.13228000000004
+                    "Dz": 281.13355
                   },
                   {
                     "X": -0.3048,
                     "Ref": "Elevation",
-                    "Dz": 281.13228000000004
+                    "Dz": 281.13355
                   },
                   {
                     "X": -0.3048,
-                    "Ref": "Elevation",
-                    "Dz": 281.43708000000004
+                    "Ref": "Bottom",
+                    "Dz": -0.07619999999999999
                   },
                   {
                     "X": -0.381,
-                    "Ref": "Elevation",
-                    "Dz": 281.43708000000004
+                    "Ref": "Bottom",
+                    "Dz": -0.07619999999999999
                   }
                 ],
                 "X0": 0,
                 "X1": 0,
-                "Source": "p.11 Detail A, p.21 (the 3\u0022 of the 1\u0027-3 \u002B 3\u0022 \u002B 1\u0027-0 chain)"
+                "Source": "p.11 Detail A, p.21 (the 3\u0022 of the 1\u0027-3 \u002B 3\u0022 \u002B 1\u0027-0 chain; ledge up to the 3\u0022 x 3\u0022 chamfer)"
               }
             ],
             "Keyways": [],
@@ -562,7 +616,7 @@
                 "Source": "Fig. 5-397.560 30MH: C 3 1/2"
               }
             ],
-            "OpenBelowBeams": false,
+            "OpenBelowBeams": true,
             "PlanBearingGap": "NaN",
             "Unresolved": [
               "1\u0022 backer rod at the back face and 1/2\u0022 x 7\u0022 bituminous felt on the paving bracket (p.21, p.11 Detail A) not modeled (no solids requested)",
@@ -652,7 +706,7 @@
               "Kind": "Stub",
               "LeftEndOffset": -7.188200000000001,
               "RightEndOffset": 10.972800000000001,
-              "BackwallLeftOffset": "NaN",
+              "BackwallLeftOffset": 5.359400000000001,
               "BackwallRightOffset": "NaN",
               "CorbelLeftOffset": "NaN",
               "CorbelRightOffset": "NaN",
@@ -663,8 +717,30 @@
               "BearingToFootingFront": 0.8382000000000001,
               "PlanFootingWidth": 1.8288000000000002,
               "FootingDepth": 0.9144000000000001,
-              "WashHeight": 0.7040879999999565,
-              "BackwallBaseAboveFootingBottom": 1.3411199999999894,
+              "WashHeight": 0.0254,
+              "BackwallBaseAboveFootingBottom": 1.1684,
+              "Stem": {
+                "FrontToBearing": 0.4572,
+                "LedgeTop": [
+                  {
+                    "S": 0,
+                    "Elevation": 281.07005000000004
+                  }
+                ],
+                "SeatBackTop": [
+                  {
+                    "S": 0,
+                    "Elevation": 281.37485000000004
+                  }
+                ],
+                "SeatFrontTop": [
+                  {
+                    "S": 0,
+                    "Elevation": 281.348688
+                  }
+                ],
+                "Source": "p11 A-A, notes 3 / 5; p21 A-A"
+              },
               "FootingBottom": [
                 {
                   "S": 0,
@@ -737,8 +813,9 @@
                 {
                   "End": "Left",
                   "Thickness": 0.4445,
-                  "Height": 2.319528000000048,
-                  "Setback": 0
+                  "Height": 3.9380160000000046,
+                  "Setback": -0.4445,
+                  "BottomElevation": 279.7302
                 }
               ],
               "FootingNotches": [],
@@ -881,7 +958,7 @@
           "Diaphragm": {
             "Kind": "SemiIntegralEnd",
             "Name": "North Abutment end diaphragm",
-            "Source": "p.20, p.21, p.11 Detail A / C; ledge N 922.15 DERIVED (sec. 4)",
+            "Source": "p.20, p.21, p.11 Detail A / C; ledge N = footing top 920.75 \u002B 1\u0027-4 3/4 (p.11 note 3) = 922.146",
             "Material": "Structural concrete (cast with the deck; superstructure quantities)",
             "Parts": [
               {
@@ -890,12 +967,12 @@
                   {
                     "X": -0.762,
                     "Ref": "Elevation",
-                    "Dz": 281.09672
+                    "Dz": 281.09545
                   },
                   {
                     "X": -0.381,
                     "Ref": "Elevation",
-                    "Dz": 281.09672
+                    "Dz": 281.09545
                   },
                   {
                     "X": -0.381,
@@ -924,10 +1001,41 @@
               },
               {
                 "Name": "front part",
-                "Section": [],
+                "Section": [
+                  {
+                    "X": -0.381,
+                    "Ref": "Bottom",
+                    "Dz": -0.07619999999999999
+                  },
+                  {
+                    "X": -0.3048,
+                    "Ref": "Bottom",
+                    "Dz": 0
+                  },
+                  {
+                    "X": 0.15239999999999998,
+                    "Ref": "Bottom",
+                    "Dz": 0
+                  },
+                  {
+                    "X": 0.15239999999999998,
+                    "Ref": "Soffit",
+                    "Dz": -0.3048
+                  },
+                  {
+                    "X": 0.4572,
+                    "Ref": "Soffit",
+                    "Dz": 0
+                  },
+                  {
+                    "X": -0.381,
+                    "Ref": "Soffit",
+                    "Dz": 0
+                  }
+                ],
                 "Left": null,
                 "Right": null,
-                "Unresolved": "bottom of the front (span-side) part between the beams not dimensioned on p.21 (A-A / B-B give only the \u0027VARIES\u0027 back part and the 1\u0027-0 x 1\u0027-0 front fillet); MnDOT B814 (concrete end diaphragm) is the PARAPET-abutment detail - Fig. 5-397.560 sends integral / semi-integral abutments to the superstructure details - so no standard dimensions it (user decision 14: leave UNRESOLVED). Beam embedment (7 1/2\u0022 ends, 1 1/2\u0022 web holes) lies in this part (p.21)"
+                "Unresolved": ""
               }
             ],
             "Left": {
@@ -943,7 +1051,7 @@
               "Source": "E end: 1\u0022 Type B polystyrene to the infill wall W end (\u002B17\u0027-7), p.11 Detail C"
             },
             "BottomSteps": [],
-            "Risers": "Unresolved",
+            "Risers": "BeamBottoms",
             "RiserS": [],
             "RiserSource": "",
             "Fillers": [
@@ -979,22 +1087,22 @@
                   {
                     "X": -0.762,
                     "Ref": "Elevation",
-                    "Dz": 281.07132
+                    "Dz": 281.07005000000004
                   },
                   {
                     "X": -0.381,
                     "Ref": "Elevation",
-                    "Dz": 281.07132
+                    "Dz": 281.07005000000004
                   },
                   {
                     "X": -0.381,
                     "Ref": "Elevation",
-                    "Dz": 281.09672
+                    "Dz": 281.09545
                   },
                   {
                     "X": -0.762,
                     "Ref": "Elevation",
-                    "Dz": 281.09672
+                    "Dz": 281.09545
                   }
                 ],
                 "X0": 0,
@@ -1011,27 +1119,27 @@
                   {
                     "X": -0.381,
                     "Ref": "Elevation",
-                    "Dz": 281.07132
+                    "Dz": 281.07005000000004
                   },
                   {
                     "X": -0.3048,
                     "Ref": "Elevation",
-                    "Dz": 281.07132
+                    "Dz": 281.07005000000004
                   },
                   {
                     "X": -0.3048,
-                    "Ref": "Elevation",
-                    "Dz": 281.37612
+                    "Ref": "Bottom",
+                    "Dz": -0.07619999999999999
                   },
                   {
                     "X": -0.381,
-                    "Ref": "Elevation",
-                    "Dz": 281.37612
+                    "Ref": "Bottom",
+                    "Dz": -0.07619999999999999
                   }
                 ],
                 "X0": 0,
                 "X1": 0,
-                "Source": "p.11 Detail A, p.21 (the 3\u0022 of the 1\u0027-3 \u002B 3\u0022 \u002B 1\u0027-0 chain)"
+                "Source": "p.11 Detail A, p.21 (the 3\u0022 of the 1\u0027-3 \u002B 3\u0022 \u002B 1\u0027-0 chain; ledge up to the 3\u0022 x 3\u0022 chamfer)"
               }
             ],
             "Keyways": [],
@@ -1049,7 +1157,7 @@
                 "Source": "Fig. 5-397.560 30MH: C 3 1/2"
               }
             ],
-            "OpenBelowBeams": false,
+            "OpenBelowBeams": true,
             "PlanBearingGap": "NaN",
             "Unresolved": [
               "1\u0022 backer rod at the back face and 1/2\u0022 x 7\u0022 bituminous felt on the paving bracket (p.21, p.11 Detail A) not modeled (no solids requested)",
@@ -1984,6 +2092,20 @@
             "BarList": null,
             "ListedWeightLb": 0,
             "ListedWeightSource": ""
+          },
+          "StartBearing": {
+            "Mark": "F1",
+            "Length": 0.30479999999999996,
+            "Width": 0.762,
+            "Thickness": 0.08255,
+            "Description": "MnDOT B310 curved-plate bearing, fixed, L 3 1/4\u0022 (p31)"
+          },
+          "EndBearing": {
+            "Mark": "E1",
+            "Length": 0.30479999999999996,
+            "Width": 0.762,
+            "Thickness": 0.1651,
+            "Description": "MnDOT B311 curved-plate bearing, expansion, L 6 1/2\u0022 (p31)"
           }
         }
       },

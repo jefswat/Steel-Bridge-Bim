@@ -264,4 +264,68 @@ public class AbutmentTests
         }
         finally { File.Delete(path); }
     }
+
+    /// <summary>MnDOT stem (AbutmentDefinition.Stem, Br. 02069 p11 A-A): plain footing, stem with back ledge + sloped seat, infill wall only between the
+    /// backwall offsets on the ledge, pedestals on the seat, mask wall beside the footing down to its bottom; volumes are exact prisms.</summary>
+    [Fact]
+    public void MnDotStem_PlainFootingStemLedgeSeat_InfillOnLedge_MaskBesideFooting()
+    {
+        var (doc, ad) = Setup();
+        ad.Wings.Clear();
+        double zf = ad.FootingBottom[0].Elevation, D = Ft(3);
+        ad.FootingDepth = D;
+        ad.BackwallFrontToBearing = Ft(1); ad.BackwallThickness = Ft(1.5); ad.FootingBackToBackwallBack = In(9); ad.BearingToFootingFront = Ft(2.75);
+        ad.PlanFootingWidth = Ft(6); ad.BearingToStepFront = Ft(1) + In(4);
+        double ledge = zf + D + In(19.25), seatBack = ledge + Ft(1), seatFront = seatBack - In(1);
+        ad.Stem = new AbutmentStemDefinition { FrontToBearing = Ft(1.5) };
+        ad.Stem.LedgeTop.Add(new CapProfilePoint(0, ledge)); ad.Stem.SeatBackTop.Add(new CapProfilePoint(0, seatBack)); ad.Stem.SeatFrontTop.Add(new CapProfilePoint(0, seatFront));
+        ad.BackwallLeftOffset = ad.RightEndOffset - Ft(6);            // infill only in the last 6 ft
+        ad.Steps.Clear();
+        var u0 = doc.Substructure().Units.First(u => u.SupportIndex == 0);
+        foreach (var p in u0.Pedestals) ad.Steps.Add(new AbutmentStepDefinition(p.Girder + 1, seatBack + In(6)));
+        ad.Masks.Add(new MaskwallDefinition { End = AbutmentEnd.Left, Thickness = In(17.5), Setback = -In(17.5), BottomElevation = zf, Height = Ft(12) });
+        var sd = doc.Bridge().Supports[0].ResolvedSubstructure.Clone();
+        sd.Abutment = ad; sd.PileSection = "HP14x73";
+        doc.Bridge().Supports[0].Substructure = sd;
+        doc.Regenerate();
+        var u = doc.Substructure().Units.First(x => x.SupportIndex == 0);
+        var g = u.Abutment!;
+        double len = u.CapS1 - u.CapS0;                                   // footing ends are alignment-offset lines; the sample line is square enough
+        var foot = u.Solids.Single(s => s.Kind == SubElementKind.Footing);
+        Assert.InRange(Math.Abs(foot.Mesh.Volume()) / (len * Ft(6) * D), 0.995, 1.005);   // plain block: no wash / keyed zone
+        var stem = u.Solids.Single(s => s.Name.EndsWith(" stem"));
+        double area = Ft(1.5) * (ledge - zf - D) + Ft(2.5) * ((seatBack + seatFront) / 2 - zf - D);
+        Assert.InRange(Math.Abs(stem.Mesh.Volume()) / (len * area), 0.995, 1.005);
+        var infill = u.Solids.Single(s => s.Name.Contains("infill"));
+        var ib = infill.Mesh.Bounds();
+        Assert.Equal(ledge, ib.Min.Z, 6);
+        Assert.InRange(ib.Max.Z, ad.BackwallTop.Max(p => p.Elevation) - In(0.25), ad.BackwallTop.Max(p => p.Elevation) + 1e-6);
+        Assert.Equal(ledge, g.BackwallBaseZ(0), 9);
+        Assert.Equal(seatBack - In(1) * 12 / 30, g.SeatBaseZ(0), 9);           // seat at the CL bearing (12" ahead of the riser on a 30" seat)
+        foreach (var p in u.Pedestals) Assert.Equal(g.SeatBaseZ(p.S), p.CapTopZ, 9);
+        var mask = u.Solids.Single(s => s.Kind == SubElementKind.Maskwall);
+        Assert.Equal(zf, mask.Mesh.Bounds().Min.Z, 6);
+        Assert.Equal(zf + Ft(12), mask.Mesh.Bounds().Max.Z, 6);
+        Assert.InRange(Math.Abs(mask.Mesh.Volume()) / (In(17.5) * Ft(6) * Ft(12)), 0.99, 1.06);   // skewed sample support: offset-line sides
+        // the stem definition round-trips and is omitted from the file when null
+        var jo = new System.Text.Json.JsonSerializerOptions { NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.AllowNamedFloatingPointLiterals };
+        var json = System.Text.Json.JsonSerializer.Serialize(ad, jo);
+        Assert.Contains("\"Stem\"", json);
+        Assert.DoesNotContain("\"Stem\"", System.Text.Json.JsonSerializer.Serialize(new AbutmentDefinition(), jo));
+        Assert.DoesNotContain("BottomElevation", System.Text.Json.JsonSerializer.Serialize(new MaskwallDefinition(), jo));
+        Assert.Equal(ad.Stem.FrontToBearing, ad.Clone().Stem!.FrontToBearing, 12);
+    }
+
+    [Fact]
+    public void MnDotStem_MissingInput_IsReportedNotGuessed()
+    {
+        var (doc, ad) = Setup();
+        ad.Stem = new AbutmentStemDefinition { FrontToBearing = Ft(1.5) };   // no ledge / seat elevations
+        var sd = doc.Bridge().Supports[0].ResolvedSubstructure.Clone();
+        sd.Abutment = ad; sd.PileSection = "HP14x73";
+        doc.Bridge().Supports[0].Substructure = sd;
+        doc.Regenerate();
+        Assert.Contains(doc.Substructure().Diagnostics, d => d.Message.Contains("stem needs") && d.Message.Contains("ledge top"));
+        Assert.Null(doc.Substructure().Units.FirstOrDefault(x => x.SupportIndex == 0)?.Abutment);
+    }
 }

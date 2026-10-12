@@ -8,24 +8,25 @@ using SBM.Core.Bridge;
 var br = Doc.Project.Bridges.First(b => b.Name == "Br02069 TH65 SB");
 DiaphragmSectionPoint P(double x, DiaphragmZRef r, double dz = 0) => new(x, r, dz);
 double F(double ft, double inch = 0) => Ft(ft) + In(inch);
-const DiaphragmZRef Sof = DiaphragmZRef.Soffit, Top = DiaphragmZRef.DeckTop, El = DiaphragmZRef.Elevation;
+const DiaphragmZRef Sof = DiaphragmZRef.Soffit, Top = DiaphragmZRef.DeckTop, El = DiaphragmZRef.Elevation, Bot = DiaphragmZRef.Bottom;
 
-// Section normal to the CL brg, x + toward the span (p.21 A-A / B-B, p.20 plan, p.11 Detail A):
-//   back face = abutment back face 2'-6 behind CL brg (1'-3 + 3" + 1'-0); CL end diaphragm 1'-0 behind CL brg; front face 6" ahead (3'-0 thick);
-//   back part 1'-3 (x -2'-6 .. -1'-3) on the back ledge on 1" Type A polystyrene (bottom = ledge + 1"); 3" Type B polystyrene against
-//   the seat riser (x -1'-3 .. -1'-0, ledge to ledge + 1'-0 = seat back edge, p.11 A-A "ledge -> seat 1'-0");
-//   paving bracket at the back-face top: 8" wide (x -2'-6 .. -1'-10 = end of slab 1'-10 from CL brg), top 1'-4 below the deck top;
-//   behind the slab end the part top is the deck soffit (slab 9" stays in the deck).
-// FRONT part (x -1'-3 .. +6" with the 1'-0 x 1'-0 front fillet under the slab, beams embedded): its BOTTOM between the beams is not dimensioned.
-const string FrontWhy =
-    "bottom of the front (span-side) part between the beams not dimensioned on p.21 (A-A / B-B give only the 'VARIES' back part and the " +
-    "1'-0 x 1'-0 front fillet); MnDOT B814 (concrete end diaphragm) is the PARAPET-abutment detail - Fig. 5-397.560 sends integral / semi-integral " +
-    "abutments to the superstructure details - so no standard dimensions it (user decision 14: leave UNRESOLVED). Beam embedment (7 1/2\" ends, " +
-    "1 1/2\" web holes) lies in this part";
+// Section normal to the CL brg, x + toward the span (p.21 SECTION A-A between beams / B-B at beams, p.11 A-A + Detail A, p.20 plan):
+//   back face = abutment back face 2'-6 behind CL brg (chain 1'-3 + 3" + 1'-0); CL end diaphragm 1'-0 behind CL brg (1'-6 + 1'-6); front face 6" ahead (3'-0 thick);
+//   back part x -2'-6 .. -1'-3: on the back ledge on 1" Type A polystyrene (bottom = ledge + 1"); paving bracket at the back-face top 8" wide
+//     (x -2'-6 .. -1'-10 = end of slab 1'-10 from CL brg), top 1'-4 below the deck top; behind the slab end the part top is the deck soffit.
+//   3" Type B polystyrene between the diaphragm face x -1'-3 and the stem seat riser x -1'-0, from the ledge up to the 3" x 3" chamfer (p.11 Detail A).
+//   front part x -1'-3 .. +6": bottom = BOTTOM OF THE BEAMS - p.21 A-A draws the diaphragm bottom between the beams as the continuation of the beam-bottom
+//     line (vector linework: the diaphragm bottom and the beam bottom beyond are one line, 3'-6 below the deck top in the schematic = 9" slab + 3" + 30" beam),
+//     B-B the same at the beams; p.11 A-A draws it 3" (the bearing) above the pedestal top; 3" x 3" chamfer at the back-bottom corner (p.11 Detail A);
+//     front face 6" ahead of CL brg with the 1'-0 x 1'-0 fillet under the slab (A-A vertical 1'-0, B-B horizontal 1'-0; S405E). Closes user decision 14.
+//   Bottom between the beams: straight between the bottom-flange edges (DiaphragmRiserRule.BeamBottoms); beyond the fascia beams level at the fascia
+//   beam bottom (0'-10 1/2 each end; the plans draw no break there).
 ConcreteDiaphragmDefinition End(string name, double ledge, string pages) => new()
 {
     Kind = ConcreteDiaphragmKind.SemiIntegralEnd, Name = name, Source = pages,
     Material = "Structural concrete (cast with the deck; superstructure quantities)",
+    Risers = DiaphragmRiserRule.BeamBottoms,
+    OpenBelowBeams = true,          // the beams sit on bearings: under the beam bottoms is the bearing zone, not diaphragm concrete
     Parts =
     {
         new DiaphragmPart
@@ -37,7 +38,14 @@ ConcreteDiaphragmDefinition End(string name, double ledge, string pages) => new(
                 P(-F(1, 10), Top, -F(1, 4)), P(-F(2, 6), Top, -F(1, 4)),
             },
         },
-        new DiaphragmPart { Name = "front part", Unresolved = FrontWhy + " (p.21)" },
+        new DiaphragmPart
+        {
+            Name = "front part",
+            Section =
+            {
+                P(-F(1, 3), Bot, -In(3)), P(-F(1, 0), Bot), P(In(6), Bot), P(In(6), Sof, -F(1, 0)), P(F(1, 6), Sof), P(-F(1, 3), Sof),
+            },
+        },
     },
     // 41'-0 = deck edges (U2 closed: mask-wall inner face -23'-7 / infill-wall W end +17'-7 less 1" polystyrene each end; p.3, p.5, p.11 Detail C)
     Left = DiaphragmEnd.AtOffset(-F(23, 6), "W end: 1\" polystyrene to the mask wall inner face (-23'-7), p.3 / p.11"),
@@ -59,8 +67,8 @@ ConcreteDiaphragmDefinition End(string name, double ledge, string pages) => new(
         },
         new DiaphragmFillerDefinition
         {
-            Name = "polystyrene at seat riser", Material = "3\" Type B polystyrene", Kind = DiaphragmFillerKind.Section, Thickness = In(3), Source = "p.11 Detail A, p.21 (the 3\" of the 1'-3 + 3\" + 1'-0 chain)",
-            Section = { P(-F(1, 3), El, Ft(ledge)), P(-F(1, 0), El, Ft(ledge)), P(-F(1, 0), El, Ft(ledge) + Ft(1)), P(-F(1, 3), El, Ft(ledge) + Ft(1)) },
+            Name = "polystyrene at seat riser", Material = "3\" Type B polystyrene", Kind = DiaphragmFillerKind.Section, Thickness = In(3), Source = "p.11 Detail A, p.21 (the 3\" of the 1'-3 + 3\" + 1'-0 chain; ledge up to the 3\" x 3\" chamfer)",
+            Section = { P(-F(1, 3), El, Ft(ledge)), P(-F(1, 0), El, Ft(ledge)), P(-F(1, 0), Bot, -In(3)), P(-F(1, 3), Bot, -In(3)) },
         },
     },
     Unresolved =
@@ -69,7 +77,7 @@ ConcreteDiaphragmDefinition End(string name, double ledge, string pages) => new(
         "end diaphragm reinforcing S405E..S617S (p.20 / p.21 bill) not placed (schedule only)",
     },
 };
-br.Supports[0].Diaphragm = End("South Abutment end diaphragm", 922.35, "p.20, p.21, p.11 Detail A / C; ledge S 922.35 DERIVED (sec. 4)");
-br.Supports[1].Diaphragm = End("North Abutment end diaphragm", 922.15, "p.20, p.21, p.11 Detail A / C; ledge N 922.15 DERIVED (sec. 4)");
+br.Supports[0].Diaphragm = End("South Abutment end diaphragm", 920.75 + 19.25 / 12, "p.20, p.21, p.11 Detail A / C; ledge S = footing top 920.75 + 1'-7 1/4 (p.11 note 3) = 922.354");
+br.Supports[1].Diaphragm = End("North Abutment end diaphragm", 920.75 + 16.75 / 12, "p.20, p.21, p.11 Detail A / C; ledge N = footing top 920.75 + 1'-4 3/4 (p.11 note 3) = 922.146");
 br.Supports[0].Diaphragm!.Unresolved.Add("3\" dia. PVC sleeve (lighting conduit) through the S diaphragm 1'-0+/- from WL, 2'-0 below the top (p.20 note 1): position '+/-' - not modeled");
 Print("Br02069 end diaphragms set: South / North Abutment");

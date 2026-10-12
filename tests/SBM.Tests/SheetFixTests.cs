@@ -44,7 +44,8 @@ public class SheetFixTests
         Assert.DoesNotContain("TxDOT", notes);
         Assert.DoesNotContain("Class H", notes);
         Assert.Contains("f'c = 9.5 ksi, f'ci = 8.0 ksi", notes);
-        Assert.Contains("Elastomeric 12\" x 30\" x 3 1/4\"", notes);   // pads from the model, not the definition default
+        Assert.Contains("B310 curved-plate bearing, fixed, L 3 1/4\"", notes);       // bearings from the model (per beam end), not the definition default
+        Assert.Contains("B311 curved-plate bearing, expansion, L 6 1/2\"", notes);
 
         var (_, wb) = Model("Woodbury I-29 NB over Floyd.sbm");
         string s = PsText.Strengths(wb.Prestressed!);

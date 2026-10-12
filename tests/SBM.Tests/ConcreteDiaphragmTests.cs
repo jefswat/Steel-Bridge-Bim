@@ -262,6 +262,77 @@ public class ConcreteDiaphragmTests
         Assert.NotSame(clone.Diaphragm, doc.Bridge().Supports[0].Diaphragm);
     }
 
+    /// <summary>Vertical-line hits of a mesh at a plan point (sorted z).</summary>
+    private static List<double> Hits(Mesh m, Vec2 q)
+    {
+        var zs = new List<double>();
+        for (int t = 0; t + 2 < m.Indices.Count; t += 3)
+        {
+            var a = m.Positions[m.Indices[t]]; var b = m.Positions[m.Indices[t + 1]]; var c = m.Positions[m.Indices[t + 2]];
+            double d = (b.Y - c.Y) * (a.X - c.X) + (c.X - b.X) * (a.Y - c.Y);
+            if (Math.Abs(d) < 1e-12) continue;
+            double l1 = ((b.Y - c.Y) * (q.X - c.X) + (c.X - b.X) * (q.Y - c.Y)) / d, l2 = ((c.Y - a.Y) * (q.X - c.X) + (a.X - c.X) * (q.Y - c.Y)) / d, l3 = 1 - l1 - l2;
+            if (l1 < -1e-9 || l2 < -1e-9 || l3 < -1e-9) continue;
+            zs.Add(l1 * a.Z + l2 * b.Z + l3 * c.Z);
+        }
+        return zs.OrderBy(z => z).ToList();
+    }
+
+    /// <summary>Semi-integral end diaphragm on bearings (MnDOT Br. 02069 p.21 A-A / B-B): DiaphragmRiserRule.BeamBottoms = the bottom is the bottom of the
+    /// beams (level under each bottom flange, straight between adjacent flange edges), chamfer + fillet edges, open below the beams; a filler whose TOP is on
+    /// the Bottom reference follows the pieces between the beams; sloped part bottoms crossing the beam outline (fillet) are built.</summary>
+    [Fact]
+    public void SemiIntegral_BeamBottomsRule_BottomFollowsTheBeams_ChamferFilletAndFillerBuilt()
+    {
+        var doc = Flat();
+        doc.Alignment("CL").CrossSlope = new CrossSlopeTable { PivotOffset = 0, Rows = { new CrossSlopeRow(0, -0.02, -0.02) } };
+        doc.Regenerate();
+        var ps0 = doc.Prestressed();
+        double Bb(int g) => ps0.Beams.First(x => x.Girder == g && x.Span == 0).BearingStart.Z - ps0.Shape.Depth;
+        double b0 = Bb(0), b1 = Bb(1), b2 = Bb(2);
+        Assert.True(b1 - b0 > Ft(0.1));                       // crown: the middle beam is higher
+        const DiaphragmZRef Bot = DiaphragmZRef.Bottom, Sof = DiaphragmZRef.Soffit, El = DiaphragmZRef.Elevation;
+        double zLow = b0 - Ft(2);
+        doc.Bridge().Supports[0].Diaphragm = new ConcreteDiaphragmDefinition
+        {
+            Kind = ConcreteDiaphragmKind.SemiIntegralEnd, Name = "si", Risers = DiaphragmRiserRule.BeamBottoms, OpenBelowBeams = true,
+            Parts =
+            {
+                new DiaphragmPart { Name = "back", Section = { P(-Ft(2), El, zLow), P(-Ft(1.25), El, zLow), P(-Ft(1.25), Sof), P(-Ft(2), Sof) } },
+                new DiaphragmPart { Name = "front", Section = { P(-Ft(1.25), Bot, -In(3)), P(-Ft(1), Bot), P(Ft(0.5), Bot), P(Ft(0.5), Sof, -Ft(1)), P(Ft(1.5), Sof), P(-Ft(1.25), Sof) } },
+            },
+            Left = DiaphragmEnd.AtOffset(-Ft(9)), Right = DiaphragmEnd.AtOffset(Ft(9)),
+            Fillers =
+            {
+                new DiaphragmFillerDefinition { Name = "3in", Material = "3\" Type B polystyrene", Kind = DiaphragmFillerKind.Section, Thickness = In(3),
+                    Section = { P(-Ft(1.25), El, zLow), P(-Ft(1), El, zLow), P(-Ft(1), Bot, -In(3)), P(-Ft(1.25), Bot, -In(3)) } },
+            },
+        };
+        doc.Regenerate();
+        var cd = doc.Prestressed().ConcreteDiaphragms!;
+        Assert.DoesNotContain(cd.Diagnostics, x => x.Message.Contains("not built"));
+        var d = Assert.Single(cd.Diaphragms);
+        Assert.Equal(2, d.Parts.Count);
+        foreach (var pc in d.Pieces) Assert.True(Math.Abs(pc.Volume()) > 0);
+        Assert.Equal(d.Volume, d.Pieces.Sum(p => Math.Abs(p.Volume())), 6);
+        var al = doc.Alignment("CL");
+        double sta = doc.Bridge().Supports[0].Station;
+        Vec2 Pt(double off, double x) => al.PointAt(sta + x, off);
+        // mid-bay between G1 (-6) and G2 (0) the bottom is the straight line between the flange edges (here the mean of the two beam bottoms)
+        Assert.Equal((b0 + b1) / 2, Hits(d.Mesh, Pt(-Ft(3), 0))[0], 4);
+        // behind the beam end (8") at the beam CL: level under the flange at that beam's bottom
+        Assert.Equal(b1, Hits(d.Mesh, Pt(0, -Ft(0.9)))[0], 4);
+        Assert.Equal(b0, Hits(d.Mesh, Pt(-Ft(8.5), 0))[0], 4);                // beyond the fascia flange edge: level at the fascia bottom
+        // chamfer 3" x 3": half way across it the bottom is 1 1/2" below the beam-bottom line
+        Assert.Equal((b0 + b1) / 2 - In(1.5), Hits(d.Mesh, Pt(-Ft(3), -Ft(1.125)))[0], 4);
+        // fillet: 6" ahead of the front face the bottom is 6" below the soffit
+        Assert.Equal(Hits(d.Mesh, Pt(-Ft(3), Ft(1)))[^1] - In(6), Hits(d.Mesh, Pt(-Ft(3), Ft(1)))[0], 4);
+        // the filler's top (Bottom reference) follows the pieces: mid-bay = mean - 3"
+        var f = Assert.Single(cd.Accessories);
+        Assert.Equal((b0 + b1) / 2 - In(3), Hits(f.Mesh, Pt(-Ft(3), -Ft(1.125)))[^1], 4);
+        Assert.Equal(zLow, Hits(f.Mesh, Pt(-Ft(3), -Ft(1.125)))[0], 6);
+    }
+
     [Fact]
     public void SteelSample_IsUnchanged_NoDiaphragmsInFileModelOrIfc()
     {
