@@ -184,13 +184,26 @@ public sealed partial class ConcreteGenerator
     private void BuildPlanBarSets()
     {
         var hosts = new List<Mesh>();
-        if (_m.Deck != null) hosts.Add(_m.Deck);
+        // the slab itself is tested exactly (its mesh is a chorded loft: on a tight curve the chord sagitta at the edges exceeds the 1/8" tolerance)
+        (double, Vec3) Slab(Vec3 p)
+        {
+            var iv = _a.Inverse(p.XY);
+            double d = iv.Distance, o = iv.Offset, top = Top(d, o), bot = top - Deck.Thickness;
+            double best = o - LeftAtD(d); var n = new Vec3(0, 0, 0);
+            void Take(double v, Vec3 nn) { if (v < best) { best = v; n = nn; } }
+            Take(RightAtD(d) - o, new Vec3(0, 0, 0));
+            Take(DR.FromBegin(p.XY), new Vec3(0, 0, 0));
+            Take(DR.FromEnd(p.XY), new Vec3(0, 0, 0));
+            Take(top - p.Z, new Vec3(0, 0, 1));
+            Take(p.Z - bot, new Vec3(0, 0, -1));
+            return (best, n);
+        }
         if (_m.Haunches != null) hosts.Add(_m.Haunches);
         hosts.AddRange(_m.DeckBumps.Select(b => b.Mesh));
         hosts.AddRange(_m.Barriers.Select(b => b.Mesh));
         hosts.AddRange(_m.Joints.Select(j => j.Blockout));
         hosts.AddRange(_m.Joints.Where(j => j.EndBlock != null).Select(j => j.EndBlock!.Mesh));
-        var res = PlanBarSetBuilder.Build(Deck.Reinforcement.PlanBarSets, p => p, "", "Deck", hosts, Deck.Reinforcement.EpoxyCoated);
+        var res = PlanBarSetBuilder.Build(Deck.Reinforcement.PlanBarSets, p => p, "", "Deck", hosts, Deck.Reinforcement.EpoxyCoated, new Func<Vec3, (double, Vec3)>[] { Slab });
         foreach (var w in res.Warnings) Warn(w);
         lock (_m)
         {

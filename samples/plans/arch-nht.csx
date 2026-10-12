@@ -330,7 +330,12 @@ deck.Rebar = new ArchDeckRebar
 {
     TopTransLength = FI(13, 10), BottomTransLength = FI(18, 2), TransSpacing = In(8), LongCount = 27, LongSpacing = In(8), LongBarLength = Ft(40), LongLap = FI(2, 8),
     TopCover = In(2.5), BottomClear = In(1.75), EndCover = In(2), CurbStirrupWidth = In(6), CurbStirrupHeight = In(9), CurbTopCover = In(2),
-    Unresolved = U("p.151 / 152 / 154", "arch deck bar layout details", "the lap positions of the 40'-0 D1 / D2 / D4 bars (type BT, bent to the knuckle stud grid on p.151) are not dimensioned, the bill lists 606 A1 (two per 8\" space) while the section shows one, and the D3 edge bars are not located", "Lines lapped 2'-8 from the west end with a shorter last bar, one A1 per 8\" space, D3 not modeled; bill differences are CHECK rows."),
+    // rebar fix (2026-10-12): p.152 shows TWO A1 per row - lapped 2'-8" min at CL NHT, each hooked down at its tie with a return lapping B1 ("hook top bar with
+    // 2'-8" lap to bottom bar") = 2 x 303 = 606; rows = the bill's 303 (A1 / B1, S1 2 x 303); D3 (68 = 2 ties x 34 floorbeam panels, BAR D3 5'-9" + 5" hooks)
+    // in section at the tie web under the studs at the bottom bar level (6" from CL tie SCALED). Hook drop leg 7 1/2" inside CL tie SCALED (clears the 7" studs).
+    TransCount = 303, CurbStirrupCount = 303, CurbStirrupHook = In(4.5),TopTransPerRow = 2, TopTransHookOffset = In(7.5), TopTransHookReturn = FI(2, 8),
+    EdgeBarMark = "D3", EdgeBarLength = FI(5, 9), EdgeBarHook = In(5), EdgeBarOffset = In(6),
+    Unresolved = U("p.151 / 152 / 154", "arch deck bar layout details", "the lap positions of the 40'-0 D1 / D2 / D4 bars (type BT, bent to the knuckle stud grid on p.151) are not dimensioned, the A1 hook position and the D3 position are drawn, not dimensioned, and 303 rows (bill) over the deck length exceed the 8\" maximum spacing slightly", "Lines lapped 2'-8 from the west end with a shorter last bar; A1 hook 7 1/2\" and D3 6\" inside CL tie (SCALED); the bill row count is modeled; bill differences are CHECK rows."),
     PlanList = { new ArchPoint("A1", 606, FI(13, 10), 0), new ArchPoint("B1", 303, FI(18, 2), 0), new ArchPoint("D1", 162, Ft(40), 0), new ArchPoint("D2", 162, Ft(40), 0),
         new ArchPoint("D3", 68, FI(7, 5), 0), new ArchPoint("D4", 48, Ft(40), 0), new ArchPoint("S1", 606, FI(3, 3), 0), new ArchPoint("S2", 32, FI(2, 9), 0) },
 };

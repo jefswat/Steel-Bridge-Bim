@@ -629,6 +629,8 @@ public sealed class ArchDeckRebar
     public double CurbStirrupWidth { get; set; } = In(6);
     public double CurbStirrupHeight { get; set; } = In(9);
     public double CurbTopCover { get; set; } = In(2);
+    /// <summary>OPTIONAL 135-deg hook tail of each end of the closed curb stirrup (out-to-out, p.154 BAR S1 "4 1/2\" (TYP)"); 0 = closed loop without tails.</summary>
+    public double CurbStirrupHook { get; set; }
     public string CurbLongMark { get; set; } = "D4";
     /// <summary>OPTIONAL number of transverse rows (A / B) equally spaced between the end covers (the bill count); 0 = as many as <see cref="TransSpacing"/> allows.</summary>
     public int TransCount { get; set; }

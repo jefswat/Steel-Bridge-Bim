@@ -250,6 +250,102 @@ Chk("drill shaft (78 in) LF", Lf(6.5), 46, 1, "LF");
 Chk("prestr conc girder (Tx28) LF", txLf, 1304.25, 0.5, "LF");
 Chk("reinf conc slab (HPC), approach SF", area / (ft * ft), 10319, 10, "SF");
 
+// ---------------------------------------------------------------- 6. reinforcing (bar-lists.csv: p.95-104 tables, approach unit sheets p.109-117, arch deck p.154)
+// Counts must match the plan tables exactly; weights: the scheduled weight (count x listed length x A615 unit weight) vs the printed weight within 3 lb or 1 %
+// (the plan rounds); bars of variable geometry (S2: plan length = average) within 3 %. Elements without a plan bar list (shaft cages, approach decks: 2.3 lb/SF
+// estimate) are INFO rows. Cover violations are listed (bars are never moved).
+Print("== reinforcing (bar tables)");
+double LbOf(double kg) => kg / 0.45359237;
+void Info(string s) => Print("INFO  " + s);
+var elementRows = new List<(string element, double model, double plan, string basis)>();
+var subUnits = unitNames.SelectMany(u => Doc.Model(u).Substructure!.Units.Where(x => x.Definition.Enabled && x.Definition.Reinforcement.PlanBarSets.Count > 0).Select(x => (b: u, x))).ToList();
+var archBill = new Dictionary<string, (int n, double w)>();
+foreach (var (bname, su) in subUnits)
+{
+    var sm = Doc.Model(bname).Substructure!;
+    double mTab = 0, pTab = 0, mAll = 0;
+    bool arch = su.Name is "Pier 10" or "Pier 11";
+    foreach (var set in su.Definition.Reinforcement.PlanBarSets)
+    {
+        var mk = sm.Marks.FirstOrDefault(x => x.Unit == su.Name && x.Mark == set.Mark);
+        if (mk == null) { if (set.PlanCount > 0) { fail++; fails.Add($"{su.Name} {set.Mark} not modeled"); Print($"FAIL  {su.Name} {set.Mark}: not modeled"); } continue; }
+        double w = LbOf(mk.TotalMass);
+        mAll += w;
+        if (arch) { if (set.PlanCount != null) { archBill.TryGetValue(set.Mark, out var a); archBill[set.Mark] = (a.n + mk.Count, a.w + w); } continue; }
+        if (set.PlanCount is int pc && set.PlanWeightLb is double pw)
+        {
+            mTab += w; pTab += pw;
+            bool cOk = mk.Count == pc; if (cOk) pass++; else { fail++; fails.Add($"{su.Name} {set.Mark} count"); }
+            double tol = set.ListedLength > 0 ? Math.Max(3, 0.01 * pw) : 0.03 * pw + 3;
+            bool wOk = Math.Abs(w - pw) <= tol; if (wOk) pass++; else { fail++; fails.Add($"{su.Name} {set.Mark} weight"); }
+            Print($"{(cOk && wOk ? "PASS" : "FAIL")}  {su.Name} {set.Mark} ({set.Size}): count {mk.Count} plan {pc}; weight {w:0} lb plan {pw:0} ({Math.Round(w - pw):+0;-0;0}){(set.ListedLength <= 0 ? " [geometric lengths]" : "")}");
+        }
+        else Info($"{su.Name} {set.Mark} ({set.Size}, {set.Element}): {mk.Count} bars, {w:0} lb - not tabulated in the plans");
+    }
+    if (!arch)
+    {
+        elementRows.Add(($"{su.Name} (tabulated marks)", mTab, pTab, "plan bar tables"));
+        if (mAll - mTab > 0.5) elementRows.Add(($"{su.Name} shaft steel (not tabulated)", mAll - mTab, double.NaN, "FD / FV / spiral, no plan weight"));
+    }
+}
+// arch piers: the p.104 bill is for both piers (V2 = Pier 10, V3 = Pier 11)
+var archRows = Csv("bar-lists.csv").Where(r => r[0] == "Arch piers 10 & 11").ToList();
+foreach (var r in archRows.Where(r => !r[1].StartsWith("TOTAL")))
+{
+    string mk = r[1]; int pn = int.Parse(r[3]); double pw = double.Parse(r[6]);
+    archBill.TryGetValue(mk, out var a);
+    bool cOk = a.n == pn; if (cOk) pass++; else { fail++; fails.Add($"Arch piers {mk} count"); }
+    bool wOk = Math.Abs(a.w - pw) <= Math.Max(3, 0.01 * pw) + 2; if (wOk) pass++; else { fail++; fails.Add($"Arch piers {mk} weight"); }
+    Print($"{(cOk && wOk ? "PASS" : "FAIL")}  Arch piers 10 + 11 {mk}: count {a.n} plan {pn}; weight {a.w:0} lb plan {pw:0} ({Math.Round(a.w - pw):+0;-0;0})");
+}
+foreach (var name in new[] { "Pier 10", "Pier 11" })
+{
+    var (bn, su) = subUnits.First(x => x.x.Name == name);
+    var sm = Doc.Model(bn).Substructure!;
+    var bill = su.Definition.Reinforcement.PlanBarSets.Where(s => s.PlanCount > 0).Select(s => s.Mark).ToHashSet();
+    double mb = sm.Marks.Where(m => m.Unit == name && bill.Contains(m.Mark)).Sum(m => LbOf(m.TotalMass));
+    double other = sm.Marks.Where(m => m.Unit == name && !bill.Contains(m.Mark)).Sum(m => LbOf(m.TotalMass));
+    foreach (var m in sm.Marks.Where(m => m.Unit == name && !bill.Contains(m.Mark))) Info($"{name} {m.Mark}: {m.Count} bars, {LbOf(m.TotalMass):0} lb - not in the p.104 bill ({m.Location})");
+    double plan = double.Parse(archRows.First(r => r[1] == $"TOTAL P{name[5..]}")[6]);
+    elementRows.Add(($"{name} (p.104 bill marks)", mb, plan, "p.104 'reinforcing steel pier n'"));
+    elementRows.Add(($"{name} shaft steel + H1 (not in the bill)", other, double.NaN, "28 #11 + #7 hoops + V1 dowels; H1 schedule-only"));
+}
+// approach decks (2.3 lb/SF estimate) and arch deck (p.154 bill)
+for (int k = 0; k < unitNames.Length; k++)
+{
+    var c = Doc.Model(unitNames[k]).Concrete!;
+    double w = c.Marks.Sum(m => LbOf(m.TotalMass));
+    var row = Csv("bar-lists.csv").First(r => r[0].StartsWith($"Approach deck Unit {k + 1}") && r[1] == "TOTAL");
+    double plan = double.Parse(row[6]);
+    Info($"{unitNames[k]} deck: {string.Join(", ", c.Marks.Select(m => $"{m.Mark} {m.Count} ({LbOf(m.TotalMass):0} lb)"))} = {w:0} lb vs plan estimate {plan:0} lb (2.3 lb/SF; P, G/H/J/M{(k == 2 ? ", UP" : "")} not modeled - UNRESOLVED)");
+    elementRows.Add(($"{unitNames[k]} approach deck", w, plan, "plan = 2.3 lb/SF estimate (note 2), no bar list"));
+}
+if (Doc.Project.Bridges.Any(b => b.Name == "Arch span 10"))
+{
+    var c = Doc.Model("Arch span 10").Concrete!;
+    var bill = new (string m, int n, double w)[] { ("A1", 606, 8752), ("B1", 303, 5746), ("D1", 162, 5637), ("D2", 162, 5637), ("D3", 68, 527), ("D4", 48, 1670), ("S1", 606, 1316), ("S2", 32, 92) };
+    double mt = 0;
+    foreach (var (m, n, w) in bill)
+    {
+        var mk = c.Marks.FirstOrDefault(x => x.Mark == m);
+        double mw = mk == null ? 0 : LbOf(mk.TotalMass); mt += mw;
+        bool ok = mk != null && mk.Count == n; if (ok) pass++; else { fail++; fails.Add($"Arch deck {m} count"); }
+        Print($"{(ok ? "PASS" : "FAIL")}  Arch deck {m}: count {mk?.Count ?? 0} plan {n}; weight {mw:0} lb plan {w:0} ({Math.Round(mw - w):+0;-0;0})");
+    }
+    elementRows.Add(("Arch deck (span 10)", mt, 29377, "p.154 bill of reinforcing steel"));
+}
+Print("\n== reinforcing weight by element (lb): model vs plan");
+foreach (var (e, mw, pw, basis) in elementRows)
+    Print($"  {e,-46} model {mw,8:0}  plan {(double.IsNaN(pw) ? "      -" : pw.ToString("0").PadLeft(7))}  {(double.IsNaN(pw) ? "" : $"({mw - pw:+0;-0}, {(mw - pw) / Math.Max(1, pw) * 100:+0.0;-0.0} %)")}  {basis}");
+// cover report
+Print("\n== clear cover (plan bars, never moved): violations beyond 1/8\"");
+foreach (var (bname, su) in subUnits)
+    foreach (var g in su.CoverViolations.GroupBy(v => v.Kind))
+        Info($"{su.Name} {g.Key}: {g.Count()} bar(s), worst {g.Max(v => v.Excess) / In(1):0.00}\" at the {g.MaxBy(v => v.Excess)!.Face}");
+foreach (var u in unitNames.Concat(Doc.Project.Bridges.Where(b => b.Name == "Arch span 10").Select(b => b.Name)))
+    foreach (var g in Doc.Model(u).Concrete!.CoverViolations.GroupBy(v => v.Mark))
+        Info($"{u} deck {g.Key}: {g.Count()} bar(s), worst {g.Max(v => v.Excess) / In(1):0.00}\" ({string.Join(", ", g.GroupBy(v => v.Face).Select(f => $"{f.Key} {f.Count()}"))})");
+
 Print($"\nTOTAL: {pass} PASS, {fail} FAIL");
 foreach (var x in fails) Print("  failed: " + x);
 var diags = unitNames.SelectMany(u => (Doc.Model(u).Substructure?.Diagnostics.AsEnumerable() ?? Enumerable.Empty<SBM.Core.Framing.Diagnostic>()).Select(d => $"{u}: {d.Severity}: {d.Message}")).Where(s => !s.Contains(": Info:")).ToList();

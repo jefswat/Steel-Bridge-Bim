@@ -76,7 +76,8 @@ List<Vec3> Tie(Vec3 c, Vec3 a, Vec3 b, double ha, double hb, double t)
     Vec3 Cn(double x, double y) => c + a * (x * ha) + b * (y * hb);
     var k = Cn(1, 1);
     var d = (a + b) * (-1 / Math.Sqrt(2));
-    return new List<Vec3> { k + d * t, k, Cn(-1, 1), Cn(-1, -1), Cn(1, -1), k, k + d * t + a * I(0.01) };
+    var nrm = Vec3.Cross(a, b) * I(0.625);           // the second hook lies beside the first (one bar diameter), the bar does not retrace itself
+    return new List<Vec3> { k + d * t, k, Cn(-1, 1), Cn(-1, -1), Cn(1, -1), k + nrm * 0.5, k + d * t + nrm };
 }
 Vec3 eS = V(1, 0, 0), eN = V(0, 1, 0), eZ = V(0, 0, 1);
 // set the unit's reinforcing
@@ -253,7 +254,7 @@ foreach (var name in new[] { "Pier 2", "Pier 3", "Pier 4", "Pier 5", "Pier 6", "
         bool dbl = rz.size == "#5";
         double dZ = dbl ? I(0.625) : I(0.5), dV = I(1.128);
         double c = colCov + dZ + dV / 2;
-        var Vb = NewSet("V", "#9", $"{name} column verticals V (20, 6 per face)", "column", rv.len, "p.97-98", colCov);
+        var Vb = NewSet("V", "#9", $"{name} column 1 verticals V (20, 6 per face)", "column", rv.len, "p.97-98", colCov);
         Vb.PlanCount = rv.no; Vb.PlanWeightLb = rv.w; Vb.CoverBottom = I(2);
         var pos = new List<(double s, double n)>();
         double half = col.SizeS / 2 - c, sp = 2 * half / 5;
@@ -261,7 +262,7 @@ foreach (var name in new[] { "Pier 2", "Pier 3", "Pier 4", "Pier 5", "Pier 6", "
         foreach (var (ps, pn) in pos) Vb.Add(new[] { V(col.S + ps, col.N + pn, zD + I(2)), V(col.S + ps, col.N + pn, zD + I(2) + rv.len) });
         if (sp > I(5.5) + I(1.0 / 16)) Vb.Note = $"6 bars per face 3\" clear to the ties: {sp / I(1):0.000}\" c-c vs \"5 SPA AT 5 1/2\" MAX\" (p.97) - modeled with the 3\" clear cover";
         sets.Add(Vb);
-        var Z = NewSet("Z", rz.size, $"{name} column ties Z ({(dbl ? "double #5 at 3\"" : "#4 at 12\"")})", "column", rz.len, "p.97-98", colCov, "TIE");
+        var Z = NewSet("Z", rz.size, $"{name} column 1 ties Z ({(dbl ? "double #5 at 3\"" : "#4 at 12\"")})", "column", rz.len, "p.97-98", colCov, "TIE");
         Z.PlanCount = rz.no; Z.PlanWeightLb = rz.w;
         int lev = dbl ? rz.no / 2 : rz.no;
         double pitch = dbl ? I(3) : I(12);
@@ -275,7 +276,7 @@ foreach (var name in new[] { "Pier 2", "Pier 3", "Pier 4", "Pier 5", "Pier 6", "
         Z.Note = $"{lev} levels from 3\" below EL. C at {pitch / I(1):0}\"" + (dbl ? ", two #5 ties bundled per level (\"double #5 at 3\" spa\")" : "");
         sets.Add(Z);
         // FD dowels: 5 per face at 5 1/2" (section B-B), next to the column verticals, 6'-0 + 6'-0
-        var FD = NewSet("FD", "#9", $"{name} shaft dowels FD (20)", "drilled shaft", F(12), "p.98", colCov);
+        var FD = NewSet("FD", "#9", $"{name} footing 1 (drilled shaft) dowels FD (20)", "drilled shaft", F(12), "p.98", colCov);
         FD.Note = "5 per face at 5 1/2\" (section B-B \"4 SPA AT 5 1/2\" MAX\"), inside the column bar line by one bar diameter (lap in contact), 6'-0 below and 6'-0 above the top of shaft; length 12'-0 = 6'-0 + 6'-0 (not tabulated: shaft steel)";
         double hf = half - dV;
         for (int k = 0; k < 5; k++)
@@ -297,7 +298,7 @@ foreach (var name in new[] { "Pier 2", "Pier 3", "Pier 4", "Pier 5", "Pier 6", "
         double x7 = hs, x6 = hs - I(6), x1 = -hs + I(4.5), sp = (x6 - x1) / 5;
         var xs = new List<double> { -hs, x1 }; for (int k = 1; k <= 4; k++) xs.Add(x1 + k * sp); xs.Add(x6); xs.Add(x7);
         double nsp = 2 * hn / 5;
-        var V1 = NewSet("V1", "#11", $"{name} column bars V1 (2 rows of 6 at the deep end, hooked 5'-3\" into the cap)", "column", r1.len, "p.99-100", colCov, "L", 0, F(5, 3));
+        var V1 = NewSet("V1", "#11", $"{name} column 1 bars V1 (2 rows of 6 at the deep end, hooked 5'-3\" into the cap)", "column", r1.len, "p.99-100", colCov, "L", 0, F(5, 3));
         V1.PlanCount = r1.no; V1.PlanWeightLb = r1.w; V1.CoverBottom = I(2);
         V1.Note = $"(H - 2\") + 2'-2\" vertical + 5'-3\" leg toward the cantilever (BAR V1); the inner row's leg runs one bar diameter under the outer row's (not dimensioned); 5 spaces of {sp / I(1):0.00}\" vs \"5 SPA AT 5 1/2\" MAX\" (4 1/2\" + 5 x 5 1/2\" + 6\" do not close on the 3\" clear corner bars)";
         for (int row = 0; row < 2; row++)
@@ -311,20 +312,20 @@ foreach (var name in new[] { "Pier 2", "Pier 3", "Pier 4", "Pier 5", "Pier 6", "
             }
         }
         sets.Add(V1);
-        var V2 = NewSet("V2", "#11", $"{name} column bars V2 (16)", "column", r2.len, "p.99-100", colCov);
+        var V2 = NewSet("V2", "#11", $"{name} column 1 bars V2 (16)", "column", r2.len, "p.99-100", colCov);
         V2.PlanCount = r2.no; V2.PlanWeightLb = r2.w; V2.CoverBottom = I(2);
         var p2 = new List<(double, double)>();
         for (int k = 0; k <= 5; k++) { p2.Add((xs[k], -hn)); p2.Add((xs[k], hn)); }
         for (int k = 1; k <= 4; k++) p2.Add((-hs, -hn + k * nsp));
         foreach (var (ps, pn) in p2) V2.Add(new[] { V(col.S + ps, col.N + pn, zD + I(2)), V(col.S + ps, col.N + pn, zD + I(2) + r2.len) });
         sets.Add(V2);
-        var Z = NewSet("Z", "#4", $"{name} column ties Z (#4 at 12\")", "column", rz.len, "p.99-100", colCov, "TIE");
+        var Z = NewSet("Z", "#4", $"{name} column 1 ties Z (#4 at 12\")", "column", rz.len, "p.99-100", colCov, "TIE");
         Z.PlanCount = rz.no; Z.PlanWeightLb = rz.w;
         for (int k = 0; k < rz.no; k++)
             Z.Add(Tie(V(col.S, col.N, zC - I(3) - dZ / 2 - k * I(12)), eS, eN, col.SizeS / 2 - colCov - dZ / 2, col.SizeN / 2 - colCov - dZ / 2, I(6)));
         sets.Add(Z);
         // FD (section A-A p.100: 6 top, 6 bottom, 2 left, 10 right = 24) inside the column bars by one bar diameter
-        var FD = NewSet("FD", "#11", $"{name} shaft dowels FD (24)", "drilled shaft", F(12), "p.100", colCov);
+        var FD = NewSet("FD", "#11", $"{name} footing 1 (drilled shaft) dowels FD (24)", "drilled shaft", F(12), "p.100", colCov);
         FD.Note = "24 = 6 top + 6 bottom (with the column bars x1..x6), 2 left (+-2 3/4\"), 2 rows of 5 at 5 1/2\" inside the V1 rows (section A-A / B-B p.100), one bar diameter inside the column bars, 6'-0 + 6'-0 (not tabulated: shaft steel); the right group lies outside the 48\" shaft cage - see the cover report";
         var pf = new List<(double, double)>();
         for (int k = 1; k <= 6; k++) { pf.Add((xs[k], -hn + dV)); pf.Add((xs[k], hn - dV)); }
@@ -342,7 +343,7 @@ void ShaftCage(List<PlanBarSet> sets, string name, FoundationInfo f, double zTop
 {
     double R = f.SizeS / 2, cov = I(3), dSp = I(0.5);
     double zTip = f.BottomZ;
-    var FV = NewSet("FV", fvSize, $"{name} drilled shaft verticals FV ({nFv})", "drilled shaft", 0, src, cov);
+    var FV = NewSet("FV", fvSize, $"{name} footing 1 (drilled shaft) verticals FV ({nFv})", "drilled shaft", 0, src, cov);
     FV.Note = $"{nFv} equally spaced, 3\" clear to the spiral, one on the +N axis (section); 2\" below the top of shaft to 3\" above the tip - the bottom end is not dimensioned (FD standard not in the set), the typical 3\" clear is used";
     double rv = R - cov - dSp - dFv / 2;
     for (int k = 0; k < nFv; k++)
@@ -352,7 +353,7 @@ void ShaftCage(List<PlanBarSet> sets, string name, FoundationInfo f, double zTop
     }
     FV.CoverTop = I(2);
     sets.Add(FV);
-    var SP = NewSet("SP", "#4", $"{name} drilled shaft spiral (#4, {(double.IsNaN(upperPitch) ? "9\" pitch" : "6\" pitch over the top 6'-0, 9\" below")})", "drilled shaft", 0, src, cov, "SPIRAL");
+    var SP = NewSet("SP", "#4", $"{name} footing 1 (drilled shaft) spiral (#4, {(double.IsNaN(upperPitch) ? "9\" pitch" : "6\" pitch over the top 6'-0, 9\" below")})", "drilled shaft", 0, src, cov, "SPIRAL");
     SP.Spirals.Add(new PlanSpiral { X = f.S, Y = f.N, Radius = R - cov - dSp / 2, TopZ = zTop - I(3) - dSp / 2, BottomZ = zTip + F(1) + dSp / 2, Pitch = pitch, FlatTurns = 1.5,
         UpperPitch = double.IsNaN(upperPitch) ? 0 : upperPitch, UpperZoneBottomZ = double.IsNaN(upperPitch) ? double.NaN : zTop - F(6) });
     SP.Note = "3\" below the top of shaft to 1'-0 above the tip (elevation), 1 1/2 flat turns top and bottom";
@@ -553,9 +554,9 @@ foreach (var (name, src, csvU) in new[] { ("Abutment 1", "p.95", "Abutment 1"), 
         foreach (var x in new[] { "T4", "T3", "T2", "T1" }) sets.Add(tSets[x]);
         // pedestals (arch bearings)
         var e1 = Half("E1"); var e2 = Half("E2"); var e3 = Half("E3");
-        var E1 = NewSet("E1", "#5", $"{name} arch pedestal bars E1 (inverted U across)", "pedestal", e1.len, "p.103-104", cov, "U", F(3, 2), F(1, 0.75), F(3, 2));
-        var E2 = NewSet("E2", "#5", $"{name} arch pedestal hoops E2", "pedestal", e2.len, "p.103-104", cov, "TIE");
-        var E3 = NewSet("E3", "#5", $"{name} arch pedestal bars E3 (inverted U along)", "pedestal", e3.len, "p.103-104", cov, "U", F(3, 2), F(2, 8), F(3, 2));
+        var E1 = NewSet("E1", "#5", $"{name} cap arch pedestal bars E1 (inverted U across)", "pedestal", e1.len, "p.103-104", cov, "U", F(3, 2), F(1, 0.75), F(3, 2));
+        var E2 = NewSet("E2", "#5", $"{name} cap arch pedestal hoops E2", "pedestal", e2.len, "p.103-104", cov, "TIE");
+        var E3 = NewSet("E3", "#5", $"{name} cap arch pedestal bars E3 (inverted U along)", "pedestal", e3.len, "p.103-104", cov, "U", F(3, 2), F(2, 8), F(3, 2));
         E1.PlanCount = e1.no; E1.PlanWeightLb = e1.w; E2.PlanCount = e2.no; E2.PlanWeightLb = e2.w; E3.PlanCount = e3.no; E3.PlanWeightLb = e3.w;
         foreach (var cb in sd.CapBlocks.Where(b => b.Kind == CapBlockKind.Pedestal))
         {
@@ -581,14 +582,14 @@ foreach (var (name, src, csvU) in new[] { ("Abutment 1", "p.95", "Abutment 1"), 
         E3.Note = "3 across the 1'-7\" axis (\"E3 2 EQ. SPA.\"), one bar diameter under the E1 bends";
         sets.Add(E1); sets.Add(E2); sets.Add(E3);
         // H1 (drawn, not in the bill)
-        var H1 = NewSet("H1", "#5", $"{name} pedestal hairpins H1 (drawn on p.103 / 104, not in the bill)", "pedestal", F(7, 6), "p.103-104", cov, "HAIRPIN");
+        var H1 = NewSet("H1", "#5", $"{name} cap pedestal hairpins H1 (drawn on p.103 / 104, not in the bill)", "pedestal", F(7, 6), "p.103-104", cov, "HAIRPIN");
         H1.Unplaced = 6; H1.PlanCount = 0; H1.PlanWeightLb = 0;
         H1.Unresolved = UnresolvedFlag.Text("p.103-104", $"{name} pedestal bars H1", "BARS H1 (3'-6\" x 1'-0 3/4\" hairpin, 3 per pedestal in section C-C, enclosed end around two anchor bolts, 2'-6\" min past the farthest bolt) are drawn but not in the p.104 bill and their plan positions depend on the anchor bolt layout (bearing sheet 1 of 2, not in the set)",
             "Counted as 6 schedule-only bars per pier, developed length 7'-6\" DERIVED from the bend diagram; not in the plan weight.");
         sets.Add(H1);
         // column bars (8 x 8 perimeter grid) + ties
         var hv = Half(vMark); var rvv = Row(capT, vMark);
-        var Vc = NewSet(vMark, "#11", $"{name} column bars {vMark} (headed at the top)", "column", rvv.len, "p.103-104", I(3));
+        var Vc = NewSet(vMark, "#11", $"{name} column 1 bars {vMark} (headed at the top)", "column", rvv.len, "p.103-104", I(3));
         Vc.PlanCount = rvv.no; Vc.PlanWeightLb = rvv.w;
         double cIn = I(3) + dS + d11 / 2, hc = col.SizeS / 2 - cIn, gsp = 2 * hc / 7;
         var grid = new List<(double, double)>();
@@ -600,10 +601,10 @@ foreach (var (name, src, csvU) in new[] { ("Abutment 1", "p.95", "Abutment 1"), 
         var s1 = Half("S1"); var s2 = Half("S2"); var s3 = Half("S3"); var s4 = Half("S4");
         int nLev = s1.no;           // bill S1 per pier (36 / 30 DERIVED: 66 split by the column heights)
         nLev = pierNo == 10 ? 36 : 30;
-        var S1c = NewSet("S1", "#5", $"{name} column hoops S1", "column", s1.len, "p.103-104", I(3), "TIE");
-        var S2c = NewSet("S2", "#5", $"{name} column ties S2", "column", s2.len, "p.103-104", I(3), "TIE");
-        var S3c = NewSet("S3", "#5", $"{name} column ties S3", "column", s3.len, "p.103-104", I(3), "TIE");
-        var S4c = NewSet("S4", "#5", $"{name} column ties S4", "column", s4.len, "p.103-104", I(3), "TIE");
+        var S1c = NewSet("S1", "#5", $"{name} column 1 hoops S1", "column", s1.len, "p.103-104", I(3), "TIE");
+        var S2c = NewSet("S2", "#5", $"{name} column 1 ties S2", "column", s2.len, "p.103-104", I(3), "TIE");
+        var S3c = NewSet("S3", "#5", $"{name} column 1 ties S3", "column", s3.len, "p.103-104", I(3), "TIE");
+        var S4c = NewSet("S4", "#5", $"{name} column 1 ties S4", "column", s4.len, "p.103-104", I(3), "TIE");
         // marks S1-S4 also exist in the cap? no: cap stirrups are S5-S36
         S1c.PlanCount = nLev; S3c.PlanCount = nLev; S2c.PlanCount = nLev / 2; S4c.PlanCount = nLev / 2;
         double wpc = Row(capT, "S1").w / 66;
@@ -633,12 +634,12 @@ foreach (var (name, src, csvU) in new[] { ("Abutment 1", "p.95", "Abutment 1"), 
         sets.Add(S1c); sets.Add(S2c); sets.Add(S3c); sets.Add(S4c);
         // shaft: 28 #11 + #7 hoops, V1 dowels
         double R = f.SizeS / 2;
-        var SV = NewSet("SV", "#11", $"{name} drilled shaft bars (28 #11)", "drilled shaft", 0, "p.101", I(3));
+        var SV = NewSet("SV", "#11", $"{name} footing 1 (drilled shaft) bars (28 #11)", "drilled shaft", 0, "p.101", I(3));
         SV.Note = "28 equally spaced on the 3\" clear cage, one on the pier line (section B-B); 3\" below the top of shaft to 1'-0 above the tip (elevation); not in the bill (shaft item)";
         double rs = R - I(3) - d7 - d11 / 2;
         for (int k = 0; k < 28; k++) { double a = 2 * Math.PI * k / 28; SV.Add(new[] { V(f.S + rs * Math.Cos(a), f.N + rs * Math.Sin(a), f.TopZ - I(3)), V(f.S + rs * Math.Cos(a), f.N + rs * Math.Sin(a), f.BottomZ + F(1)) }); }
         sets.Add(SV);
-        var HP = NewSet("HP", "#7", $"{name} drilled shaft hoops (#7 at 6\" max, 4'-3\" lap)", "drilled shaft", 0, "p.101", I(3), "HOOP");
+        var HP = NewSet("HP", "#7", $"{name} footing 1 (drilled shaft) hoops (#7 at 6\" max, 4'-3\" lap)", "drilled shaft", 0, "p.101", I(3), "HOOP");
         double rh = R - I(3) - d7 / 2, zh0 = f.TopZ - I(3) - d7 / 2, zh1 = f.BottomZ + F(1);
         int nh = (int)Math.Ceiling((zh0 - zh1) / I(6)) + 1;
         double lapA = I(51) / rh;
@@ -646,11 +647,11 @@ foreach (var (name, src, csvU) in new[] { ("Abutment 1", "p.95", "Abutment 1"), 
         {
             double z = zh0 - (zh0 - zh1) * k / (nh - 1), a0 = 0.6 * k;
             int np = 48;
-            HP.Add(Enumerable.Range(0, np + 1).Select(j => { double a = a0 + (2 * Math.PI + lapA) * j / np; return V(f.S + rh * Math.Cos(a), f.N + rh * Math.Sin(a), z); }));
+            HP.Add(Enumerable.Range(0, np + 1).Select(j => { double a = a0 + (2 * Math.PI + lapA) * j / np; double r = rh - d7 * Math.Clamp((a - a0 - (2 * Math.PI - lapA)) / lapA, 0, 1); return V(f.S + r * Math.Cos(a), f.N + r * Math.Sin(a), z); }));   // the lapped end runs inside the start (in contact), no self-overlap
         }
         HP.Note = $"{nh} hoops equally spaced ({(zh0 - zh1) / (nh - 1) / I(1):0.00}\") from 3\" below the top of shaft to 1'-0 above the tip, 4'-3\" lap (section B-B), laps staggered; not in the bill";
         sets.Add(HP);
-        var V1 = NewSet("V1", "#11", $"{name} shaft dowels V1 (28, to match the column bars)", "drilled shaft", F(11, 4), "p.101", I(3));
+        var V1 = NewSet("V1", "#11", $"{name} footing 1 (drilled shaft) dowels V1 (28, to match the column bars)", "drilled shaft", F(11, 4), "p.101", I(3));
         V1.Note = "28 inside the column bar grid by one bar diameter (\"V1 BARS SPA. TO MATCH COLUMN BARS\", lap in contact), 5'-8\" above and 5'-8\" below the top of shaft; length 11'-4\" DERIVED (not in the bill: incidental to the shaft)";
         foreach (var (ps, pn) in grid)
         {

@@ -200,7 +200,16 @@ public static partial class ArchGenerator
                     int ns = rb.CurbStirrupCount > 1 ? rb.CurbStirrupCount : (int)Math.Floor((st1 - st0) / rb.TransSpacing) + 1;
                     double csp = rb.CurbStirrupCount > 1 ? (st1 - st0) / (ns - 1) : rb.TransSpacing;
                     double a0 = st0 + ((st1 - st0) - (ns - 1) * csp) / 2;
-                    for (int i = 0; i < ns; i++) sBars.Add(Loop(a0 + i * csp));
+                    for (int i = 0; i < ns; i++)
+                    {
+                        var lp = Loop(a0 + i * csp);
+                        if (rb.CurbStirrupHook <= 0) { sBars.Add(lp); continue; }
+                        // 135-deg hook tails at the top inner corner (p.154 BAR S1: 4 1/2" typ)
+                        var dg = ((lp[1] - lp[0]) * (1 / (lp[1] - lp[0]).Length) + new Vec3(0, 0, -1)) * (rb.CurbStirrupHook / Math.Sqrt(2));
+                        var acr = (lp[1] - lp[0]) * (1 / (lp[1] - lp[0]).Length);
+                        var beside = new Vec3(-acr.Y, acr.X, 0) * st.Diameter;          // the second hook lies beside the first (the bar does not retrace itself)
+                        sBars.Add(new[] { lp[0] + dg }.Concat(lp.Take(lp.Length - 1)).Append(lp[0] + beside * 0.5).Append(lp[0] + dg + beside).ToArray());
+                    }
                     // Corner bars inside the stirrup corners, lapped like the deck bars.
                     foreach (var (u, zz) in new[] { (-1, 0), (1, 0), (-1, 1), (1, 1) })
                     {
@@ -216,7 +225,7 @@ public static partial class ArchGenerator
                         cBars.AddRange(SplitBars(line, rb.LongBarLength, rb.LongLap));
                     }
                 }
-                var sShape = new BarShape { Code = "STR", Description = "Closed curb stirrup",
+                var sShape = new BarShape { Code = "TIE", Description = "Closed curb stirrup", FixedLength = 2 * (rb.CurbStirrupWidth + rb.CurbStirrupHeight) + 2 * rb.CurbStirrupHook,
                     Centerline = new[] { new Vec2(0, 0), new Vec2(rb.CurbStirrupWidth, 0), new Vec2(rb.CurbStirrupWidth, rb.CurbStirrupHeight), new Vec2(0, rb.CurbStirrupHeight), new Vec2(0, 0) } };
                 AddBars(rb.CurbStirrupMark, st, "Arch curb stirrups (p.152)", sBars, sShape);
                 AddBars(rb.CurbLongMark, sz, "Arch curb longitudinal (p.152)", cBars);

@@ -63,7 +63,13 @@ public sealed class RebarCover
         }
     }
 
-    public bool HasHosts => _hosts.Count > 0;
+    private readonly List<Func<Vec3, (double sd, Vec3 n)>> _analytic = new();
+
+    /// <summary>Adds an exact host given by its signed distance (positive inside = distance to the nearest face, negative outside) and the outward normal of
+    /// that face - for solids whose tessellation would distort the test (a deck slab on a tight curve: chord sagitta at the edges).</summary>
+    public void AddAnalytic(Func<Vec3, (double sd, Vec3 n)> sdf) => _analytic.Add(sdf);
+
+    public bool HasHosts => _hosts.Count > 0 || _analytic.Count > 0;
 
     private static Vec3[] BuildDirs()
     {
@@ -106,6 +112,7 @@ public sealed class RebarCover
     private bool InUnion(Vec3 p)
     {
         foreach (var h in _hosts) if (Inside(h, p)) return true;
+        foreach (var a in _analytic) if (a(p).sd > 0) return true;
         return false;
     }
 
@@ -144,6 +151,12 @@ public sealed class RebarCover
             var (d, n) = Distance(h, p, _reach);
             if (ins) { if (d > bestIn) { bestIn = d; nIn = n; } }
             else nearOut = Math.Min(nearOut, d);
+        }
+        foreach (var a in _analytic)
+        {
+            var (sd, n) = a(p);
+            if (sd > 0) { if (sd > bestIn) { bestIn = sd; nIn = n; } }
+            else nearOut = Math.Min(nearOut, -sd);
         }
         string Face(Vec3 n) => n.Z < -0.7 ? "bottom face" : n.Z > 0.7 ? "top face" : "side face";
         double Req(Vec3 n) => radius + (n.Z < -0.7 && !double.IsNaN(coverBottom) ? coverBottom : n.Z > 0.7 && !double.IsNaN(coverTop) ? coverTop : cover);

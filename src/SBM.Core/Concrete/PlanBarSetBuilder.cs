@@ -27,10 +27,12 @@ public sealed class PlanBarSetResult
 /// </summary>
 public static class PlanBarSetBuilder
 {
-    public static PlanBarSetResult Build(IEnumerable<PlanBarSet> sets, Func<Vec3, Vec3> toWorld, string unit, string group, IReadOnlyList<Mesh> hosts, bool epoxy = false)
+    public static PlanBarSetResult Build(IEnumerable<PlanBarSet> sets, Func<Vec3, Vec3> toWorld, string unit, string group, IReadOnlyList<Mesh> hosts, bool epoxy = false,
+        IEnumerable<Func<Vec3, (double sd, Vec3 n)>>? analytic = null)
     {
         var res = new PlanBarSetResult();
         var cover = new RebarCover(hosts);
+        if (analytic != null) foreach (var a in analytic) cover.AddAnalytic(a);
         var seen = new HashSet<string>();
         foreach (var set in sets)
         {
@@ -39,6 +41,13 @@ public static class PlanBarSetBuilder
             var bars = set.Bars.Select(b => PlanBarSet.Decode(b).Select(toWorld).ToArray()).Where(b => b.Length >= 2).ToList();
             foreach (var sp in set.Spirals) bars.Add(sp.Points().Select(toWorld).ToArray());
             double Dev(Vec3[] b) { double l = 0; for (int i = 1; i < b.Length; i++) l += (b[i] - b[i - 1]).Length; return l; }
+            if (bars.Count + set.Unplaced == 0)
+            {
+                // a plan mark the sheets name but do not detail (e.g. bars of a standard not in the set): no schedule row, only the flag / note
+                if (set.Unresolved != "") res.Warnings.Add(set.Unresolved);
+                if (set.Note != "") res.Notes.Add($"{(unit == "" ? "" : unit + " ")}{set.Mark}: {set.Note}");
+                continue;
+            }
             var lens = bars.Select(Dev).ToList();
             BarShape shape;
             List<double>? varying = null;
