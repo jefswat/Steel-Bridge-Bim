@@ -93,9 +93,8 @@ double SkewOf(double sta, Vec2 lineDir)
 }
 double skew10 = sup10?.SkewDegrees ?? SkewOf(sta10, dir10), skew11 = sup11?.SkewDegrees ?? SkewOf(sta11, dir11);
 Print($"pier skews: P10 {skew10:F4} deg, P11 {skew11:F4} deg (plan 19 deg 34'41\" = 19.5781 to the radial)");
-string id10 = sup10?.SharedPier is { Length: > 0 } s10 ? s10 : "Pier 10", id11 = sup11?.SharedPier is { Length: > 0 } s11 ? s11 : "Pier 11";
-if (sup10 != null && sup10.SharedPier == "") sup10.SharedPier = id10;
-if (sup11 != null && sup11.SharedPier == "") sup11.SharedPier = id11;
+// The arch bridge does NOT share the piers (no SharedPier link): the pier caps and the arch pedestals belong to the approach units (fixed-elevation
+// CapBlocks "arch bearing south / north"); the bearings read their tops from SubstructureUnit.FixedSeats (approach mode) or p.102 (test mode).
 
 // ---------------------------------------------------------------- local frame (p.119)
 // CL1 / CL2: on the T lines (4 13/16 from CL pier toward the span, p.119), 7" LT (P10) / RT (P11) of the CL NHT pier point along the pier (p.119
@@ -219,10 +218,10 @@ deck.Tendons.AddRange(ptPaths.Values);
 // (paths filled after regeneration from the generated tie panel points - see below)
 
 // ---------------------------------------------------------------- bearings (p.102, p.107, p.124)
-// CL brg 2" from the T point toward the span (p.124); pedestal tops p.102 EL A (left) / EL E (right) of the pier elevation (view assumed looking up-station:
-// left = north); underside of steel = end flange bottom (1 1/8" below the WP) - 1" plate below it (p.124, not dimensioned, U10).
+// CL brg 2" from the T point toward the span (p.124); pedestal tops p.102: EL A = SOUTH at Pier 10 / NORTH at Pier 11 (orientation derived by the
+// approach model from p.102 + p.91, build-nht.csx); in approach mode the tops are read from the pier units' FixedSeats instead. Underside of steel = end flange bottom (1 1/8" below the WP) - 1" plate below it (p.124, not dimensioned, U10).
 void Brg(string name, string support, string tpt, double seatFt) => arch.Bearings.Add(new ArchBearingDefinition { Name = name, Support = support, Point = "BRG-" + name, SeatElevation = F(seatFt), SteelUndersideZ = -In(1.125) - In(1) });
-Brg("NW", "Pier 10", "T34'", 534.779); Brg("SW", "Pier 10", "T0", 534.726); Brg("NE", "Pier 11", "T0'", 531.546); Brg("SE", "Pier 11", "T34", 531.494);
+Brg("NW", "Pier 10", "T34'", 534.726); Brg("SW", "Pier 10", "T0", 534.779); Brg("NE", "Pier 11", "T0'", 531.546); Brg("SE", "Pier 11", "T34", 531.494);
 foreach (var (bn, tn) in new[] { ("NW", "T34'"), ("SW", "T0"), ("NE", "T0'"), ("SE", "T34") })
 {
     var t = arch.Point(tn)!;
@@ -237,7 +236,7 @@ foreach (var (bn, tn) in new[] { ("NW", "T34'"), ("SW", "T0"), ("NE", "T0'"), ("
 arch.Unresolved.AddRange(new[]
 {
     U("p.102, 107, 119, 124", "arch pedestal / bearing elevations (B1-B3)", "the plan pedestal tops do not reconcile with the WP elevations + bearing stack (0.13-0.20 ft; EL A vs E 0.053 ft)", "Bearings are built up from the plan pedestal tops; the chain difference is a CHECK row."),
-    U("p.102", "which arch pedestal is EL A / EL E", "the view direction of the pier elevation is not stated", "EL A = north (looking up-station)."),
+    U("p.102", "which arch pedestal is EL A / EL E", "the view direction of the pier elevation is not stated on the sheet", "EL A = south at Pier 10 / north at Pier 11, as derived from p.102 + p.91 by the approach model."),
     U("p.94, 102, 119", "CL1 / CL2 relative to the piers (U3)", "no combination of the layout offsets reproduces the plan chord 200'-11 11/16", "CL1/CL2 = 7\" along the pier + 4 13/16\" toward the span; the local geometry is kept and the difference reported."),
     U("p.119-150", "camber / no-load geometry (U4)", "not given", "Final geometry modeled."),
     U("p.120, 143, 93", "tie girder field splices (U5)", "the TS1-TS3 table, TS(1)-TS(4) on the framing plan and the 5 erection segments disagree", "Ties are continuous (no splice plates)."),
@@ -254,8 +253,8 @@ var br = new BridgeDefinition
     Name = "Arch span 10", AlignmentName = al.Name, Structure = approach10?.Structure ?? "Northaven Trail",
     Supports =
     {
-        new SupportDefinition { Name = "Pier 10", Type = SupportType.Pier, Station = sta10, SkewDegrees = skew10, SharedPier = id10 },
-        new SupportDefinition { Name = "Pier 11", Type = SupportType.Pier, Station = sta11, SkewDegrees = skew11, SharedPier = id11 },
+        new SupportDefinition { Name = "Pier 10", Type = SupportType.Pier, Station = sta10, SkewDegrees = skew10, Substructure = new SubstructureDefinition { Enabled = false } },
+        new SupportDefinition { Name = "Pier 11", Type = SupportType.Pier, Station = sta11, SkewDegrees = skew11, Substructure = new SubstructureDefinition { Enabled = false } },
     },
     Arch = arch,
 };
@@ -277,6 +276,21 @@ for (int n = 1; n <= 33; n++)
     void Add(string tn, Vec3 p) => ptPaths[tn].Path.Add(new ArchPoint($"FB{n}", p.X, p.Y, z));
     Add("PT-N1", At(len - fb.PtDimA)); Add("PT-N2", At(len - fb.PtDimA - FI(1, 4)));
     Add("PT-S1", At(fb.PtDimB)); Add("PT-S2", At(fb.PtDimB + FI(1, 4)));
+}
+
+// Approach mode: bearing seats = the approach model's fixed-elevation arch pedestals (nearest FixedSeat of the pier unit in plan).
+if (!testModel)
+{
+    foreach (var (bname, uname, pier) in new[] { ("NW", approach10!.Name, "Pier 10"), ("SW", approach10.Name, "Pier 10"), ("NE", approach11!.Name, "Pier 11"), ("SE", approach11.Name, "Pier 11") })
+    {
+        var unit = Doc.Model(uname).Substructure?.Units.FirstOrDefault(u => u.Name == pier);
+        var bdef = arch.Bearings.First(b => b.Name == bname);
+        var bres = am.Bearings.FirstOrDefault(b => b.Name == bname);
+        if (unit == null || unit.FixedSeats.Count == 0 || bres == null) { Print($"WARNING bearing {bname}: no FixedSeats on {pier} of {uname} - p.102 value kept"); continue; }
+        var best = unit.FixedSeats.Select(fs => (fs, w: unit.World(fs.S, fs.N, fs.Z))).OrderBy(x => (x.w.XY - bres.Center.XY).Length).First();
+        bdef.SeatElevation = best.fs.Z;
+        Print($"bearing {bname}: seat '{best.fs.Name}' of {pier} top {best.fs.Z / 0.3048:F3}'; CL bearing (arch geometry) to the pedestal seat point {(best.w.XY - bres.Center.XY).Length / 0.0254:F2}\" in plan");
+    }
 }
 
 var rep = Doc.Regenerate();

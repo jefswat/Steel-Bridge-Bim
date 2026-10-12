@@ -6162,6 +6162,4301 @@
       "InspectionAccess": null,
       "Misc": null,
       "PsSteelDiaphragms": null
+    },
+    {
+      "Name": "Arch span 10",
+      "AlignmentName": "CL NHT (TRAILCLNEW)",
+      "Structure": "US 75 Ped. Underpass at Northaven Trail (CSJ 0047-07-228)",
+      "Supports": [
+        {
+          "Name": "Pier 10",
+          "Type": "Pier",
+          "Station": 736.982016,
+          "SkewDegrees": 19.578055555555554,
+          "DeckEndOffset": 0.45720000000000005,
+          "GirderEndExtension": 0.2286,
+          "SharedPier": "",
+          "PierCenterOffset": 0,
+          "Fixity": "Auto",
+          "ResolvedFixity": "Fixed",
+          "GirderFixities": null,
+          "Bearings": null,
+          "Substructure": {
+            "Enabled": false,
+            "CapWidth": 1.2192,
+            "CapDepth": 1.2192,
+            "CapEndOverhang": 0.762,
+            "CapOffset": 0,
+            "CapProfile": [],
+            "CapProfileAhead": [],
+            "CapBlocks": [],
+            "Aesthetics": null,
+            "TopShape": "Sloped",
+            "CapSlope": "NaN",
+            "CrownOffset": "NaN",
+            "BottomShape": "ParallelToTop",
+            "MinPedestalHeight": 0.07619999999999999,
+            "PedestalProjection": 0.07619999999999999,
+            "MaxPedestalHeight": 0.45720000000000005,
+            "PedestalSizeAlong": 0,
+            "PedestalSizeAcross": 0,
+            "PedestalShared": false,
+            "PedestalSizeAcrossAhead": 0,
+            "PedestalRowJoint": "NaN",
+            "PedestalSideAngleDeg": 0,
+            "ColumnCount": 3,
+            "ColumnSpacings": [
+              4.572,
+              4.572
+            ],
+            "FirstColumnOffset": "NaN",
+            "ColumnShape": "Round",
+            "ColumnDiameter": 0.9144000000000001,
+            "ColumnWidth": 0.9144000000000001,
+            "ColumnDepth": 0.9144000000000001,
+            "ColumnChamferS": 0,
+            "ColumnChamferN": 0,
+            "ColumnProjectionS": 0,
+            "ColumnProjectionWidth": 0,
+            "ColumnFlareElevation": "NaN",
+            "ColumnFlareWidth": 0,
+            "ColumnFlareDepth": 0,
+            "ColumnFlareChamferS": 0,
+            "ColumnFlareChamferN": 0,
+            "Foundation": "DrilledShaft",
+            "FoundationTopElevation": "NaN",
+            "GroundCover": 0.3048,
+            "ShaftDiameter": 1.0668,
+            "ShaftLength": 12.192,
+            "FootingLength": 3.048,
+            "FootingWidth": 3.048,
+            "FootingThickness": 0.9144000000000001,
+            "PileType": "SteelHP",
+            "PileSection": "HP14x73",
+            "PileSize": 0.4572,
+            "PileShellThickness": "NaN",
+            "PileRows": 3,
+            "PileColumns": 3,
+            "PileSpacing": 0.9144000000000001,
+            "PileLength": 15.24,
+            "PileEmbedment": 0.30479999999999996,
+            "Footings": [],
+            "BearingToCapFront": 0.45720000000000005,
+            "BackwallThickness": 0.3048,
+            "BackwallGap": 0.0254,
+            "BackwallTopBelowGrade": 0,
+            "AbutmentFoundationCount": 4,
+            "AbutmentFoundationSpacing": 3.6576000000000004,
+            "Abutment": null,
+            "Reinforcement": {
+              "Enabled": true,
+              "ConcreteStrengthKsi": 3.6,
+              "SteelYieldKsi": 60,
+              "EpoxyCoated": false,
+              "CapCover": 0.0508,
+              "ColumnCover": 0.0635,
+              "ShaftCover": 0.07619999999999999,
+              "FootingCover": 0.07619999999999999,
+              "FootingSideClear": 0.0508,
+              "FootingTopClear": 0.07619999999999999,
+              "PileTopClear": 0.0254,
+              "CapTopBarCount": 7,
+              "CapTopBarSize": "#11",
+              "CapBottomBarCount": 7,
+              "CapBottomBarSize": "#11",
+              "CapSideBarsPerFace": 2,
+              "CapSideBarSize": "#5",
+              "CapStirrupSize": "#5",
+              "CapStirrupSpacing": 0.15239999999999998,
+              "ColumnBarCount": 12,
+              "ColumnBarSize": "#9",
+              "ColumnSpiralSize": "#4",
+              "ColumnSpiralPitch": 0.15239999999999998,
+              "ColumnFaceBarsS": 0,
+              "ColumnFaceSpacingS": 0,
+              "ColumnFaceBarsN": 0,
+              "ColumnFaceSpacingN": 0,
+              "ColumnChamferBars": 0,
+              "ColumnChamferSpacing": 0,
+              "ColumnChamferBarPositions": null,
+              "ColumnHoopOverlap": 0,
+              "ColumnCrosstieSize": "",
+              "ColumnCrosstieBar": 0,
+              "FlareBarSize": "",
+              "FlareFaceBarsS": 0,
+              "FlareFaceSpacingS": 0,
+              "FlareFaceBarsN": 0,
+              "FlareFaceSpacingN": 0,
+              "FlareChamferBars": 0,
+              "FlareCover": 0.08889999999999999,
+              "FlareTieSize": "#6",
+              "FlareTieSpacing": 0.30479999999999996,
+              "FlareTieStyle": "ClosedTie",
+              "FlareTieOverlap": 0,
+              "FlareTieSpaces": 0,
+              "ColumnSplice": "Continuous",
+              "DowelHookLength": 0,
+              "DowelPin": 0,
+              "DowelBottomAboveFooting": 0.4064,
+              "ColumnLapLength": 0,
+              "CouplerLow": 0,
+              "CouplerHigh": 0,
+              "CouplerLength": 0,
+              "CouplerDiameter": 0,
+              "ColumnSplicePattern": "",
+              "ColumnTerminatingBarLength": 0,
+              "ColumnBarEmbedInCap": 0,
+              "ColumnMidLapStart": 0,
+              "ShaftBarCount": 12,
+              "ShaftBarSize": "#9",
+              "ShaftSpiralSize": "#4",
+              "ShaftSpiralPitch": 0.15239999999999998,
+              "FootingBarSize": "#8",
+              "FootingBarSpacing": 0.30479999999999996,
+              "BackwallBarSize": "#5",
+              "BackwallBarSpacing": 0.30479999999999996,
+              "MaxBarLength": 18.288,
+              "CapBars": []
+            }
+          },
+          "ExpansionJoint": null,
+          "DeckEndPoints": null
+        },
+        {
+          "Name": "Pier 11",
+          "Type": "Pier",
+          "Station": 798.45408,
+          "SkewDegrees": 19.578055555555554,
+          "DeckEndOffset": 0.45720000000000005,
+          "GirderEndExtension": 0.2286,
+          "SharedPier": "",
+          "PierCenterOffset": 0,
+          "Fixity": "Auto",
+          "ResolvedFixity": "Fixed",
+          "GirderFixities": null,
+          "Bearings": null,
+          "Substructure": {
+            "Enabled": false,
+            "CapWidth": 1.2192,
+            "CapDepth": 1.2192,
+            "CapEndOverhang": 0.762,
+            "CapOffset": 0,
+            "CapProfile": [],
+            "CapProfileAhead": [],
+            "CapBlocks": [],
+            "Aesthetics": null,
+            "TopShape": "Sloped",
+            "CapSlope": "NaN",
+            "CrownOffset": "NaN",
+            "BottomShape": "ParallelToTop",
+            "MinPedestalHeight": 0.07619999999999999,
+            "PedestalProjection": 0.07619999999999999,
+            "MaxPedestalHeight": 0.45720000000000005,
+            "PedestalSizeAlong": 0,
+            "PedestalSizeAcross": 0,
+            "PedestalShared": false,
+            "PedestalSizeAcrossAhead": 0,
+            "PedestalRowJoint": "NaN",
+            "PedestalSideAngleDeg": 0,
+            "ColumnCount": 3,
+            "ColumnSpacings": [
+              4.572,
+              4.572
+            ],
+            "FirstColumnOffset": "NaN",
+            "ColumnShape": "Round",
+            "ColumnDiameter": 0.9144000000000001,
+            "ColumnWidth": 0.9144000000000001,
+            "ColumnDepth": 0.9144000000000001,
+            "ColumnChamferS": 0,
+            "ColumnChamferN": 0,
+            "ColumnProjectionS": 0,
+            "ColumnProjectionWidth": 0,
+            "ColumnFlareElevation": "NaN",
+            "ColumnFlareWidth": 0,
+            "ColumnFlareDepth": 0,
+            "ColumnFlareChamferS": 0,
+            "ColumnFlareChamferN": 0,
+            "Foundation": "DrilledShaft",
+            "FoundationTopElevation": "NaN",
+            "GroundCover": 0.3048,
+            "ShaftDiameter": 1.0668,
+            "ShaftLength": 12.192,
+            "FootingLength": 3.048,
+            "FootingWidth": 3.048,
+            "FootingThickness": 0.9144000000000001,
+            "PileType": "SteelHP",
+            "PileSection": "HP14x73",
+            "PileSize": 0.4572,
+            "PileShellThickness": "NaN",
+            "PileRows": 3,
+            "PileColumns": 3,
+            "PileSpacing": 0.9144000000000001,
+            "PileLength": 15.24,
+            "PileEmbedment": 0.30479999999999996,
+            "Footings": [],
+            "BearingToCapFront": 0.45720000000000005,
+            "BackwallThickness": 0.3048,
+            "BackwallGap": 0.0254,
+            "BackwallTopBelowGrade": 0,
+            "AbutmentFoundationCount": 4,
+            "AbutmentFoundationSpacing": 3.6576000000000004,
+            "Abutment": null,
+            "Reinforcement": {
+              "Enabled": true,
+              "ConcreteStrengthKsi": 3.6,
+              "SteelYieldKsi": 60,
+              "EpoxyCoated": false,
+              "CapCover": 0.0508,
+              "ColumnCover": 0.0635,
+              "ShaftCover": 0.07619999999999999,
+              "FootingCover": 0.07619999999999999,
+              "FootingSideClear": 0.0508,
+              "FootingTopClear": 0.07619999999999999,
+              "PileTopClear": 0.0254,
+              "CapTopBarCount": 7,
+              "CapTopBarSize": "#11",
+              "CapBottomBarCount": 7,
+              "CapBottomBarSize": "#11",
+              "CapSideBarsPerFace": 2,
+              "CapSideBarSize": "#5",
+              "CapStirrupSize": "#5",
+              "CapStirrupSpacing": 0.15239999999999998,
+              "ColumnBarCount": 12,
+              "ColumnBarSize": "#9",
+              "ColumnSpiralSize": "#4",
+              "ColumnSpiralPitch": 0.15239999999999998,
+              "ColumnFaceBarsS": 0,
+              "ColumnFaceSpacingS": 0,
+              "ColumnFaceBarsN": 0,
+              "ColumnFaceSpacingN": 0,
+              "ColumnChamferBars": 0,
+              "ColumnChamferSpacing": 0,
+              "ColumnChamferBarPositions": null,
+              "ColumnHoopOverlap": 0,
+              "ColumnCrosstieSize": "",
+              "ColumnCrosstieBar": 0,
+              "FlareBarSize": "",
+              "FlareFaceBarsS": 0,
+              "FlareFaceSpacingS": 0,
+              "FlareFaceBarsN": 0,
+              "FlareFaceSpacingN": 0,
+              "FlareChamferBars": 0,
+              "FlareCover": 0.08889999999999999,
+              "FlareTieSize": "#6",
+              "FlareTieSpacing": 0.30479999999999996,
+              "FlareTieStyle": "ClosedTie",
+              "FlareTieOverlap": 0,
+              "FlareTieSpaces": 0,
+              "ColumnSplice": "Continuous",
+              "DowelHookLength": 0,
+              "DowelPin": 0,
+              "DowelBottomAboveFooting": 0.4064,
+              "ColumnLapLength": 0,
+              "CouplerLow": 0,
+              "CouplerHigh": 0,
+              "CouplerLength": 0,
+              "CouplerDiameter": 0,
+              "ColumnSplicePattern": "",
+              "ColumnTerminatingBarLength": 0,
+              "ColumnBarEmbedInCap": 0,
+              "ColumnMidLapStart": 0,
+              "ShaftBarCount": 12,
+              "ShaftBarSize": "#9",
+              "ShaftSpiralSize": "#4",
+              "ShaftSpiralPitch": 0.15239999999999998,
+              "FootingBarSize": "#8",
+              "FootingBarSpacing": 0.30479999999999996,
+              "BackwallBarSize": "#5",
+              "BackwallBarSpacing": 0.30479999999999996,
+              "MaxBarLength": 18.288,
+              "CapBars": []
+            }
+          },
+          "ExpansionJoint": null,
+          "DeckEndPoints": null
+        }
+      ],
+      "AuxiliarySupports": [],
+      "Girders": {
+        "PlanGeometry": [],
+        "Camber": [],
+        "Terminations": [],
+        "Beginnings": [],
+        "CrossGirder": {
+          "WebDepth": 1.524,
+          "WebThickness": 0.015875,
+          "FlangeWidth": 0.381,
+          "FlangeThickness": 0.015875,
+          "EndGap": 0.019049999999999997,
+          "TopBelowDiscontinuousWebTop": null,
+          "AngleLeg": 0.127,
+          "AngleThickness": 0.0127,
+          "AngleLength": 0,
+          "EndAngleLength": 0,
+          "AngleBoltPitch": 0,
+          "AngleBoltEndDistance": 0.0508,
+          "AngleBoltGage": 0.07619999999999999,
+          "BoltDiameter": 0,
+          "StiffenerWidth": 0,
+          "StiffenerThickness": 0,
+          "StiffenerFromOpening": 0.15239999999999998,
+          "OpeningWidth": 0,
+          "OpeningHeight": 0,
+          "OpeningRadius": 0.15239999999999998,
+          "OpeningPlateFromTop": 0,
+          "OpeningPlateWidth": 0,
+          "OpeningPlateThickness": 0,
+          "OpeningPlateToOpening": 0.0127,
+          "OpeningPlateEndClear": 0.07619999999999999,
+          "WebFlangeWeld": 0,
+          "StiffenerWeld": 0
+        },
+        "Count": 0,
+        "Spacings": [
+          2.7432000000000003,
+          2.7432000000000003,
+          2.7432000000000003,
+          2.7432000000000003
+        ],
+        "FirstGirderOffset": -5.486400000000001,
+        "OffsetsAtSupports": null,
+        "SpanLayouts": null,
+        "PlanLayout": "CurvedParallel",
+        "Section": {
+          "TopFlange": {
+            "Width": 0.4064,
+            "Thickness": 0.0254
+          },
+          "WebDepth": 1.3716,
+          "WebThickness": 0.0127,
+          "BottomFlange": {
+            "Width": 0.4572,
+            "Thickness": 0.03175
+          },
+          "PlateChanges": [],
+          "Layouts": []
+        },
+        "Kind": "SteelPlate",
+        "Prestressed": {
+          "Type": "Tx54",
+          "CustomSection": null,
+          "StrandCount": 40,
+          "StrandDiameter": 0.015239999999999998,
+          "StrandStrength": 270,
+          "DepressedStrands": 0,
+          "DepressedTopAtEnd": 0,
+          "StrandLayout": null,
+          "HarpPointFraction": 0,
+          "ConcreteStrength": 8.5,
+          "ReleaseStrength": 6,
+          "EndGapAtBent": 0.07619999999999999,
+          "BearingToEnd": 0.2286,
+          "InteriorEnds": "Square",
+          "PadLength": 0,
+          "PadWidth": 0.5334,
+          "PadThickness": 0.06985,
+          "PierPadOrientation": "SquareToBeam",
+          "Standard": null,
+          "Designation": "",
+          "StandardBearingLength": 0,
+          "StandardOverallLength": 0,
+          "Placement": null,
+          "PlacementBasis": "",
+          "HoldDownFromMidspan": 0,
+          "HarpedColumns": null,
+          "HarpedTopBelowTopAtEnd": 0,
+          "HarpedEndSpacing": 0.0508,
+          "SheathThickness": 0.0015875,
+          "Source": "",
+          "Unresolved": null,
+          "SpanBeams": null
+        }
+      },
+      "Deck": {
+        "EdgeStrip": null,
+        "LeftEdgeOffset": -6.5532,
+        "RightEdgeOffset": 6.5532,
+        "LeftEdgeTable": null,
+        "RightEdgeTable": null,
+        "Thickness": 0.21589999999999998,
+        "Haunch": 0.07619999999999999,
+        "OverhangThickness": 0.2286,
+        "StayInPlaceForms": true,
+        "SipFormDepth": 0.0508,
+        "Barrier": {
+          "Type": "TxDotSstr",
+          "Reinforcement": true,
+          "EpoxyCoated": true,
+          "StirrupSpacing": 0.15239999999999998,
+          "Height": 0.8128,
+          "BaseWidth": 0.4064,
+          "TopWidth": 0.15239999999999998,
+          "Left": true,
+          "Right": true
+        },
+        "Reinforcement": {
+          "Enabled": true,
+          "ConcreteStrengthKsi": 4,
+          "SteelYieldKsi": 60,
+          "EpoxyCoated": true,
+          "TopCover": 0.0635,
+          "BottomCover": 0.03175,
+          "SideCover": 0.0508,
+          "TransverseOrientation": "Auto",
+          "SkewLimitDegrees": 15,
+          "TopTransverseSize": "#5",
+          "TopTransverseSpacing": 0.15239999999999998,
+          "BottomTransverseSize": "#5",
+          "BottomTransverseSpacing": 0.15239999999999998,
+          "TopLongitudinalSize": "#4",
+          "TopLongitudinalSpacing": 0.2286,
+          "BottomLongitudinalSize": "#5",
+          "BottomLongitudinalSpacing": 0.2286,
+          "MaxBarLength": 18.288,
+          "LapOverride": 0,
+          "NegativeMomentSteel": true,
+          "NegativeMomentSize": "#5",
+          "NegativeRegionFraction": 0.25,
+          "RequiredSteelRatio": 0.01,
+          "MarkLengthTolerance": 0.0508,
+          "Plan": null
+        }
+      },
+      "CrossFrames": {
+        "IntermediateType": "Auto",
+        "SupportType": "Auto",
+        "Orientation": "Auto",
+        "Arrangement": "Auto",
+        "MaxSpacing": 7.62,
+        "MaxBayWidth": 0,
+        "MinDistanceFromBearing": 0.9144000000000001,
+        "MinDistanceFromSplice": 0.9144000000000001,
+        "MoveClearOfSplices": false,
+        "SkewLimitDegrees": 20,
+        "KFrameAspectRatio": 1.5,
+        "ChordAngle": "L4x4x3/8",
+        "DiagonalAngle": "L4x4x3/8",
+        "SupportChordAngle": "L5x5x3/8",
+        "SupportDiagonalAngle": "L4x4x3/8",
+        "DiaphragmChannel": "C15x33.9",
+        "TopWorkPointOffset": 0.15239999999999998,
+        "BottomWorkPointOffset": 0.15239999999999998,
+        "GussetThickness": 0.0127,
+        "MemberClearance": 0.0254,
+        "WeldLap": 0.15239999999999998,
+        "MemberWeldSize": 0.00635,
+        "Styles": [],
+        "IntermediateStyle": "",
+        "SupportStyles": {},
+        "SupportBayStyles": {},
+        "SupportStyle": "",
+        "Lines": [],
+        "Links": []
+      },
+      "Stiffeners": {
+        "BearingStiffener": {
+          "Width": 0.17779999999999999,
+          "Thickness": 0.022224999999999998
+        },
+        "ConnectionPlate": {
+          "Width": 0.17779999999999999,
+          "Thickness": 0.0127
+        },
+        "IntermediateMaxSpacing": 0,
+        "IntermediateStiffener": {
+          "Width": 0.15239999999999998,
+          "Thickness": 0.0127
+        },
+        "IntermediateSide": "Interior",
+        "CornerClip": 0.038099999999999995,
+        "IntermediateBottomGap": 0.0508,
+        "WeldSize": 0.00635,
+        "FlangeToWebWeld": 0.0079375
+      },
+      "FieldSplices": [],
+      "Bolts": {
+        "Grade": "A325",
+        "Diameter": 0.022224999999999998,
+        "BoltsPerConnection": 3,
+        "Pitch": 0.07619999999999999,
+        "EdgeDistance": 0.038099999999999995
+      },
+      "Bearings": {
+        "Type": "Elastomeric",
+        "DiscDiameter": 0.30479999999999996,
+        "DiscHeight": 0.044449999999999996,
+        "UpperPlateLength": 0.4572,
+        "UpperPlateWidth": 0.4572,
+        "UpperPlateThickness": 0.038099999999999995,
+        "ExpansionPlateExtension": 0.15239999999999998,
+        "PtfeThickness": 0.003175,
+        "MasonryPlateLength": 0.5588,
+        "MasonryPlateWidth": 0.762,
+        "MasonryPlateThickness": 0.044449999999999996,
+        "MasonryPadThickness": 0,
+        "GenericHeight": 0.2286,
+        "GenericBodyLength": 0.4064,
+        "GenericBodyWidth": 0.4064,
+        "AnchorSpacingAlong": 0,
+        "AnchorSpacingAcross": 0,
+        "AnchorEdgeDistanceFixed": 0,
+        "SolePlateLength": 0.4064,
+        "ShearPinDiameter": 0.07619999999999999,
+        "GuideBarWidth": 0.038099999999999995,
+        "GuideBarHeight": 0.0635,
+        "AnchorBoltCount": 4,
+        "AnchorBoltDiameter": 0.03175,
+        "AnchorBoltGrade": "F1554 Gr. 36",
+        "AnchorBoltEmbedment": 0.4572,
+        "AnchorHoleOversize": 0.0127,
+        "AnchorEdgeDistance": 0.0635,
+        "PadLength": 0.35559999999999997,
+        "PadWidth": 0.508,
+        "PadHeight": 0.08889999999999999,
+        "SolePlateMinThickness": 0.038099999999999995,
+        "SolePlateProjection": 0.0254
+      },
+      "FieldSpliceGap": 0.009524999999999999,
+      "SpliceDetail": {
+        "FlangeOuterPlateThickness": 0.015875,
+        "FlangeInnerPlateThickness": 0.015875,
+        "WebPlateThickness": 0.011112499999999999,
+        "FlangeBoltLinesPerSide": 2,
+        "TopFlangeBoltRows": 3,
+        "BottomFlangeBoltRows": 4,
+        "WebBoltColumns": 2,
+        "FlangeGage": 0.07619999999999999,
+        "FirstLineFromWeb": 0.044449999999999996,
+        "WebPlateFlangeClearance": 0.03175,
+        "InnerPlateWebClearance": 0.0127,
+        "BoltDiameter": 0,
+        "FirstBoltFromJoint": 0,
+        "PlateEndDistance": 0,
+        "Top": null,
+        "Bottom": null,
+        "Web": null
+      },
+      "Studs": {
+        "Enabled": true,
+        "Diameter": 0.022224999999999998,
+        "RowsAcross": 3,
+        "TransverseSpacing": 0.1143,
+        "Pitch": 0.30479999999999996,
+        "Penetration": 0.0508,
+        "MinCover": 0.0508,
+        "HeadDiameter": 0.034925,
+        "HeadHeight": 0.009524999999999999,
+        "LengthIncrement": 0.0127,
+        "Clearance": 0.038099999999999995
+      },
+      "LateralBracing": {
+        "Enabled": false,
+        "Flange": "Bottom",
+        "Bays": [
+          1
+        ],
+        "Spans": [],
+        "Pattern": "Warren",
+        "Angle": "L5x5x3/8",
+        "GussetThickness": 0.0127,
+        "BoltsPerConnection": 4
+      },
+      "Drains": [],
+      "InspectionAccess": null,
+      "Misc": null,
+      "PsSteelDiaphragms": null,
+      "Arch": {
+        "Source": "TxDOT CSJ 0047-07-228",
+        "Frame": {
+          "Wp1Station": 737.0375087189815,
+          "Wp1Offset": -0.2084944439431728,
+          "Wp1LocalX": -30.6324,
+          "Wp2Station": 798.3985872809674,
+          "Wp2Offset": 0.20849444422471294,
+          "Wp2LocalX": 30.6324,
+          "OriginElevation": 162.799776,
+          "TiltDegrees": 1.039,
+          "TiltAxisSupport": "Pier 10",
+          "CheckWp1Elevation": 163.293552,
+          "CheckWp2Elevation": 162.302952
+        },
+        "Points": [
+          {
+            "Name": "L0",
+            "X": 0,
+            "Y": 0,
+            "Z": 0
+          },
+          {
+            "Name": "CL1",
+            "X": -30.6324,
+            "Y": 0,
+            "Z": 0
+          },
+          {
+            "Name": "CL2",
+            "X": 30.6324,
+            "Y": 0,
+            "Z": 0
+          },
+          {
+            "Name": "T34\u0027",
+            "X": -32.004000000000005,
+            "Y": 2.6389584,
+            "Z": 0
+          },
+          {
+            "Name": "T0",
+            "X": -29.260800000000003,
+            "Y": -2.6389584,
+            "Z": 0
+          },
+          {
+            "Name": "T0\u0027",
+            "X": 29.260800000000003,
+            "Y": 2.6389584,
+            "Z": 0
+          },
+          {
+            "Name": "T34",
+            "X": 32.004000000000005,
+            "Y": -2.6389584,
+            "Z": 0
+          },
+          {
+            "Name": "RS1",
+            "X": -28.510077600000002,
+            "Y": -2.5551383999999997,
+            "Z": 0.957072
+          },
+          {
+            "Name": "RS1\u0027",
+            "X": 28.510077600000002,
+            "Y": 2.5551383999999997,
+            "Z": 0.957072
+          },
+          {
+            "Name": "RS2",
+            "X": -14.6825208,
+            "Y": -1.616964,
+            "Z": 11.6793264
+          },
+          {
+            "Name": "RS2\u0027",
+            "X": 14.6825208,
+            "Y": 1.616964,
+            "Z": 11.6793264
+          },
+          {
+            "Name": "RS3",
+            "X": 2.389632,
+            "Y": -1.3118592000000002,
+            "Z": 15.168981600000002
+          },
+          {
+            "Name": "RS3\u0027",
+            "X": -2.389632,
+            "Y": 1.3118592000000002,
+            "Z": 15.168981600000002
+          },
+          {
+            "Name": "RS4",
+            "X": 17.702479200000003,
+            "Y": -1.6282416,
+            "Z": 11.551310400000002
+          },
+          {
+            "Name": "RS4\u0027",
+            "X": -17.702479200000003,
+            "Y": 1.6282416,
+            "Z": 11.551310400000002
+          },
+          {
+            "Name": "RS5",
+            "X": 31.253277600000004,
+            "Y": -2.5551383999999997,
+            "Z": 0.957072
+          },
+          {
+            "Name": "RS5\u0027",
+            "X": -31.253277600000004,
+            "Y": 2.5551383999999997,
+            "Z": 0.957072
+          },
+          {
+            "Name": "U1",
+            "X": -26.5172952,
+            "Y": -2.1470112,
+            "Z": 3.2363664
+          },
+          {
+            "Name": "U2",
+            "X": -21.875191200000003,
+            "Y": -1.7839944,
+            "Z": 7.382865600000001
+          },
+          {
+            "Name": "U3",
+            "X": -16.6213536,
+            "Y": -1.4913864000000001,
+            "Z": 10.7271312
+          },
+          {
+            "Name": "U4",
+            "X": -10.893552000000001,
+            "Y": -1.2768072000000001,
+            "Z": 13.1807712
+          },
+          {
+            "Name": "U5",
+            "X": -4.8426624,
+            "Y": -1.1457432,
+            "Z": 14.679472800000001
+          },
+          {
+            "Name": "U6",
+            "X": 1.3716000000000002,
+            "Y": -1.1015472,
+            "Z": 15.183307200000002
+          },
+          {
+            "Name": "U7",
+            "X": 7.585862400000001,
+            "Y": -1.1457432,
+            "Z": 14.679472800000001
+          },
+          {
+            "Name": "U8",
+            "X": 13.636752000000001,
+            "Y": -1.2768072000000001,
+            "Z": 13.1807712
+          },
+          {
+            "Name": "U9",
+            "X": 19.3645536,
+            "Y": -1.4913864000000001,
+            "Z": 10.7271312
+          },
+          {
+            "Name": "U10",
+            "X": 24.6183912,
+            "Y": -1.7839944,
+            "Z": 7.382865600000001
+          },
+          {
+            "Name": "U11",
+            "X": 29.2604952,
+            "Y": -2.1470112,
+            "Z": 3.2363664
+          },
+          {
+            "Name": "U1\u0027",
+            "X": 26.5172952,
+            "Y": 2.1470112,
+            "Z": 3.2363664
+          },
+          {
+            "Name": "U2\u0027",
+            "X": 21.875191200000003,
+            "Y": 1.7839944,
+            "Z": 7.382865600000001
+          },
+          {
+            "Name": "U3\u0027",
+            "X": 16.6213536,
+            "Y": 1.4913864000000001,
+            "Z": 10.7271312
+          },
+          {
+            "Name": "U4\u0027",
+            "X": 10.893552000000001,
+            "Y": 1.2768072000000001,
+            "Z": 13.1807712
+          },
+          {
+            "Name": "U5\u0027",
+            "X": 4.8426624,
+            "Y": 1.1457432,
+            "Z": 14.679472800000001
+          },
+          {
+            "Name": "U6\u0027",
+            "X": -1.3716000000000002,
+            "Y": 1.1015472,
+            "Z": 15.183307200000002
+          },
+          {
+            "Name": "U7\u0027",
+            "X": -7.585862400000001,
+            "Y": 1.1457432,
+            "Z": 14.679472800000001
+          },
+          {
+            "Name": "U8\u0027",
+            "X": -13.636752000000001,
+            "Y": 1.2768072000000001,
+            "Z": 13.1807712
+          },
+          {
+            "Name": "U9\u0027",
+            "X": -19.3645536,
+            "Y": 1.4913864000000001,
+            "Z": 10.7271312
+          },
+          {
+            "Name": "U10\u0027",
+            "X": -24.6183912,
+            "Y": 1.7839944,
+            "Z": 7.382865600000001
+          },
+          {
+            "Name": "U11\u0027",
+            "X": -29.2604952,
+            "Y": 2.1470112,
+            "Z": 3.2363664
+          },
+          {
+            "Name": "UL1",
+            "X": -25.472136,
+            "Y": 0.016764,
+            "Z": 5.518708800000001
+          },
+          {
+            "Name": "UL2",
+            "X": -20.4920088,
+            "Y": 0.020726400000000002,
+            "Z": 9.2253816
+          },
+          {
+            "Name": "UL3",
+            "X": -14.987930400000002,
+            "Y": 0.0234696,
+            "Z": 12.07008
+          },
+          {
+            "Name": "UL4",
+            "X": -9.1208352,
+            "Y": 0.021640799999999998,
+            "Z": 13.9839192
+          },
+          {
+            "Name": "UL5",
+            "X": -3.0586680000000004,
+            "Y": 0.0094488,
+            "Z": 14.938552800000002
+          },
+          {
+            "Name": "UL6",
+            "X": 3.0586680000000004,
+            "Y": -0.0094488,
+            "Z": 14.938552800000002
+          },
+          {
+            "Name": "UL7",
+            "X": 9.1208352,
+            "Y": -0.021640799999999998,
+            "Z": 13.9839192
+          },
+          {
+            "Name": "UL8",
+            "X": 14.987930400000002,
+            "Y": -0.0234696,
+            "Z": 12.07008
+          },
+          {
+            "Name": "UL9",
+            "X": 20.4920088,
+            "Y": -0.020726400000000002,
+            "Z": 9.2253816
+          },
+          {
+            "Name": "UL10",
+            "X": 25.472136,
+            "Y": -0.016764,
+            "Z": 5.518708800000001
+          },
+          {
+            "Name": "BRG-NW",
+            "X": -31.95892478441035,
+            "Y": 2.6623862667305893,
+            "Z": 0
+          },
+          {
+            "Name": "BRG-SW",
+            "X": -29.215724784410348,
+            "Y": -2.6155305332694105,
+            "Z": 0
+          },
+          {
+            "Name": "BRG-NE",
+            "X": 29.215724784410348,
+            "Y": 2.6155305332694105,
+            "Z": 0
+          },
+          {
+            "Name": "BRG-SE",
+            "X": 31.95892478441035,
+            "Y": -2.6623862667305893,
+            "Z": 0
+          }
+        ],
+        "Ribs": [
+          {
+            "Name": "South rib",
+            "ChordStart": "T0",
+            "ChordEnd": "T34",
+            "Radius": 38.4048,
+            "Rise": 15.24,
+            "InclinationDegrees": 5,
+            "Section": "W14x132",
+            "Material": "ASTM A709 Gr. 50-T1",
+            "Splices": [
+              "RS1",
+              "RS2",
+              "RS3",
+              "RS4",
+              "RS5"
+            ],
+            "SpliceGap": 0.0127,
+            "StubBottomZ": 0.022224999999999998,
+            "StubUnresolved": "UNRESOLVED (p.123-124): knuckle arch stub below RS1 / above RS5 - the stub is built up from 1\u0022 arch flange plates, an end web and stiffeners whose outlines are only partly dimensioned. Modeled as the W14x132 envelope down to the end flange top."
+          },
+          {
+            "Name": "North rib",
+            "ChordStart": "T0\u0027",
+            "ChordEnd": "T34\u0027",
+            "Radius": 38.4048,
+            "Rise": 15.24,
+            "InclinationDegrees": -5,
+            "Section": "W14x132",
+            "Material": "ASTM A709 Gr. 50-T1",
+            "Splices": [
+              "RS1\u0027",
+              "RS2\u0027",
+              "RS3\u0027",
+              "RS4\u0027",
+              "RS5\u0027"
+            ],
+            "SpliceGap": 0.0127,
+            "StubBottomZ": 0.022224999999999998,
+            "StubUnresolved": "UNRESOLVED (p.123-124): knuckle arch stub below RS1 / above RS5 - the stub is built up from 1\u0022 arch flange plates, an end web and stiffeners whose outlines are only partly dimensioned. Modeled as the W14x132 envelope down to the end flange top."
+          }
+        ],
+        "Ties": [
+          {
+            "Name": "South tie",
+            "Start": "T0",
+            "End": "T34",
+            "Elements": [
+              {
+                "Kind": "Line",
+                "Length": 0.5064125,
+                "Radius": 0
+              },
+              {
+                "Kind": "ArcRight",
+                "Length": 28.448,
+                "Radius": 104.34320000000001
+              },
+              {
+                "Kind": "ArcLeft",
+                "Length": 29.972000000000005,
+                "Radius": 109.9312
+              },
+              {
+                "Kind": "Line",
+                "Length": 2.5447625,
+                "Radius": 0
+              }
+            ],
+            "PanelPoints": [
+              {
+                "Name": "T1",
+                "Distance": 0.5064125
+              },
+              {
+                "Name": "T2",
+                "Distance": 2.2844125
+              },
+              {
+                "Name": "T3",
+                "Distance": 4.0624125
+              },
+              {
+                "Name": "T4",
+                "Distance": 5.840412499999999
+              },
+              {
+                "Name": "T5",
+                "Distance": 7.6184125
+              },
+              {
+                "Name": "T6",
+                "Distance": 9.3964125
+              },
+              {
+                "Name": "T7",
+                "Distance": 11.174412499999999
+              },
+              {
+                "Name": "T8",
+                "Distance": 12.9524125
+              },
+              {
+                "Name": "T9",
+                "Distance": 14.7304125
+              },
+              {
+                "Name": "T10",
+                "Distance": 16.5084125
+              },
+              {
+                "Name": "T11",
+                "Distance": 18.2864125
+              },
+              {
+                "Name": "T12",
+                "Distance": 20.0644125
+              },
+              {
+                "Name": "T13",
+                "Distance": 21.8424125
+              },
+              {
+                "Name": "T14",
+                "Distance": 23.6204125
+              },
+              {
+                "Name": "T15",
+                "Distance": 25.3984125
+              },
+              {
+                "Name": "T16",
+                "Distance": 27.1764125
+              },
+              {
+                "Name": "T17",
+                "Distance": 28.9544125
+              },
+              {
+                "Name": "T18",
+                "Distance": 30.8276625
+              },
+              {
+                "Name": "T19",
+                "Distance": 32.7009125
+              },
+              {
+                "Name": "T20",
+                "Distance": 34.5741625
+              },
+              {
+                "Name": "T21",
+                "Distance": 36.4474125
+              },
+              {
+                "Name": "T22",
+                "Distance": 38.3206625
+              },
+              {
+                "Name": "T23",
+                "Distance": 40.1939125
+              },
+              {
+                "Name": "T24",
+                "Distance": 42.0671625
+              },
+              {
+                "Name": "T25",
+                "Distance": 43.9404125
+              },
+              {
+                "Name": "T26",
+                "Distance": 45.81366250000001
+              },
+              {
+                "Name": "T27",
+                "Distance": 47.686912500000005
+              },
+              {
+                "Name": "T28",
+                "Distance": 49.560162500000004
+              },
+              {
+                "Name": "T29",
+                "Distance": 51.4334125
+              },
+              {
+                "Name": "T30",
+                "Distance": 53.3066625
+              },
+              {
+                "Name": "T31",
+                "Distance": 55.1799125
+              },
+              {
+                "Name": "T32",
+                "Distance": 57.053162500000006
+              },
+              {
+                "Name": "T33",
+                "Distance": 58.926412500000005
+              }
+            ],
+            "WebThickness": 0.022224999999999998,
+            "WebHeight": 0.2794,
+            "FlangeThickness": 0.022224999999999998,
+            "FlangeWidth": 0.35559999999999997,
+            "Material": "ASTM A709 Gr. 50-F1 (FCM)",
+            "Splices": [
+              "TS (U5)"
+            ]
+          },
+          {
+            "Name": "North tie",
+            "Start": "T0\u0027",
+            "End": "T34\u0027",
+            "Elements": [
+              {
+                "Kind": "Line",
+                "Length": 0.5064125,
+                "Radius": 0
+              },
+              {
+                "Kind": "ArcRight",
+                "Length": 28.448,
+                "Radius": 104.34320000000001
+              },
+              {
+                "Kind": "ArcLeft",
+                "Length": 29.972000000000005,
+                "Radius": 109.9312
+              },
+              {
+                "Kind": "Line",
+                "Length": 2.5447625,
+                "Radius": 0
+              }
+            ],
+            "PanelPoints": [
+              {
+                "Name": "T1\u0027",
+                "Distance": 0.5064125
+              },
+              {
+                "Name": "T2\u0027",
+                "Distance": 2.2844125
+              },
+              {
+                "Name": "T3\u0027",
+                "Distance": 4.0624125
+              },
+              {
+                "Name": "T4\u0027",
+                "Distance": 5.840412499999999
+              },
+              {
+                "Name": "T5\u0027",
+                "Distance": 7.6184125
+              },
+              {
+                "Name": "T6\u0027",
+                "Distance": 9.3964125
+              },
+              {
+                "Name": "T7\u0027",
+                "Distance": 11.174412499999999
+              },
+              {
+                "Name": "T8\u0027",
+                "Distance": 12.9524125
+              },
+              {
+                "Name": "T9\u0027",
+                "Distance": 14.7304125
+              },
+              {
+                "Name": "T10\u0027",
+                "Distance": 16.5084125
+              },
+              {
+                "Name": "T11\u0027",
+                "Distance": 18.2864125
+              },
+              {
+                "Name": "T12\u0027",
+                "Distance": 20.0644125
+              },
+              {
+                "Name": "T13\u0027",
+                "Distance": 21.8424125
+              },
+              {
+                "Name": "T14\u0027",
+                "Distance": 23.6204125
+              },
+              {
+                "Name": "T15\u0027",
+                "Distance": 25.3984125
+              },
+              {
+                "Name": "T16\u0027",
+                "Distance": 27.1764125
+              },
+              {
+                "Name": "T17\u0027",
+                "Distance": 28.9544125
+              },
+              {
+                "Name": "T18\u0027",
+                "Distance": 30.8276625
+              },
+              {
+                "Name": "T19\u0027",
+                "Distance": 32.7009125
+              },
+              {
+                "Name": "T20\u0027",
+                "Distance": 34.5741625
+              },
+              {
+                "Name": "T21\u0027",
+                "Distance": 36.4474125
+              },
+              {
+                "Name": "T22\u0027",
+                "Distance": 38.3206625
+              },
+              {
+                "Name": "T23\u0027",
+                "Distance": 40.1939125
+              },
+              {
+                "Name": "T24\u0027",
+                "Distance": 42.0671625
+              },
+              {
+                "Name": "T25\u0027",
+                "Distance": 43.9404125
+              },
+              {
+                "Name": "T26\u0027",
+                "Distance": 45.81366250000001
+              },
+              {
+                "Name": "T27\u0027",
+                "Distance": 47.686912500000005
+              },
+              {
+                "Name": "T28\u0027",
+                "Distance": 49.560162500000004
+              },
+              {
+                "Name": "T29\u0027",
+                "Distance": 51.4334125
+              },
+              {
+                "Name": "T30\u0027",
+                "Distance": 53.3066625
+              },
+              {
+                "Name": "T31\u0027",
+                "Distance": 55.1799125
+              },
+              {
+                "Name": "T32\u0027",
+                "Distance": 57.053162500000006
+              },
+              {
+                "Name": "T33\u0027",
+                "Distance": 58.926412500000005
+              }
+            ],
+            "WebThickness": 0.022224999999999998,
+            "WebHeight": 0.2794,
+            "FlangeThickness": 0.022224999999999998,
+            "FlangeWidth": 0.35559999999999997,
+            "Material": "ASTM A709 Gr. 50-F1 (FCM)",
+            "Splices": [
+              "TS (U5)"
+            ]
+          }
+        ],
+        "Hangers": [
+          {
+            "Name": "C1-S",
+            "Rib": "South rib",
+            "Tie": "South tie",
+            "TieAnchor": {
+              "Name": "TC2",
+              "X": -26.937919200000003,
+              "Y": -2.3722584,
+              "Z": 0.4062984
+            },
+            "RibAnchor": {
+              "Name": "HC2",
+              "X": -25.908304800000003,
+              "Y": -2.3018496,
+              "Z": 3.8529768
+            },
+            "PlanLength": 3.5978592000000003
+          },
+          {
+            "Name": "C1-N",
+            "Rib": "North rib",
+            "Tie": "North tie",
+            "TieAnchor": {
+              "Name": "TC2\u0027",
+              "X": 26.937919200000003,
+              "Y": 2.3722584,
+              "Z": 0.4062984
+            },
+            "RibAnchor": {
+              "Name": "HC2\u0027",
+              "X": 25.908304800000003,
+              "Y": 2.3018496,
+              "Z": 3.8529768
+            },
+            "PlanLength": 3.5978592000000003
+          },
+          {
+            "Name": "C2-S",
+            "Rib": "South rib",
+            "Tie": "South tie",
+            "TieAnchor": {
+              "Name": "TC3",
+              "X": -25.277064000000003,
+              "Y": -2.199132,
+              "Z": 0.4062984
+            },
+            "RibAnchor": {
+              "Name": "HC1",
+              "X": -26.830020000000005,
+              "Y": -2.3856696,
+              "Z": 2.8937712
+            },
+            "PlanLength": 2.9382720000000004
+          },
+          {
+            "Name": "C2-N",
+            "Rib": "North rib",
+            "Tie": "North tie",
+            "TieAnchor": {
+              "Name": "TC3\u0027",
+              "X": 25.277064000000003,
+              "Y": 2.199132,
+              "Z": 0.4062984
+            },
+            "RibAnchor": {
+              "Name": "HC1\u0027",
+              "X": 26.830020000000005,
+              "Y": 2.3856696,
+              "Z": 2.8937712
+            },
+            "PlanLength": 2.9382720000000004
+          },
+          {
+            "Name": "C3-S",
+            "Rib": "South rib",
+            "Tie": "South tie",
+            "TieAnchor": {
+              "Name": "TC4",
+              "X": -23.3985816,
+              "Y": -2.0348448,
+              "Z": 0.4062984
+            },
+            "RibAnchor": {
+              "Name": "HC5",
+              "X": -21.3021672,
+              "Y": -1.9562064000000001,
+              "Z": 7.8031848
+            },
+            "PlanLength": 7.688580000000001
+          },
+          {
+            "Name": "C3-N",
+            "Rib": "North rib",
+            "Tie": "North tie",
+            "TieAnchor": {
+              "Name": "TC4\u0027",
+              "X": 23.3985816,
+              "Y": 2.0348448,
+              "Z": 0.4062984
+            },
+            "RibAnchor": {
+              "Name": "HC5\u0027",
+              "X": 21.3021672,
+              "Y": 1.9562064000000001,
+              "Z": 7.8031848
+            },
+            "PlanLength": 7.688580000000001
+          },
+          {
+            "Name": "C4-S",
+            "Rib": "South rib",
+            "Tie": "South tie",
+            "TieAnchor": {
+              "Name": "TC5",
+              "X": -21.7328496,
+              "Y": -1.9190208000000002,
+              "Z": 0.4062984
+            },
+            "RibAnchor": {
+              "Name": "HC3",
+              "X": -24.420576000000004,
+              "Y": -2.177796,
+              "Z": 5.270601600000001
+            },
+            "PlanLength": 5.563514400000001
+          },
+          {
+            "Name": "C4-N",
+            "Rib": "North rib",
+            "Tie": "North tie",
+            "TieAnchor": {
+              "Name": "TC5\u0027",
+              "X": 21.7328496,
+              "Y": 1.9190208000000002,
+              "Z": 0.4062984
+            },
+            "RibAnchor": {
+              "Name": "HC3\u0027",
+              "X": 24.420576000000004,
+              "Y": 2.177796,
+              "Z": 5.270601600000001
+            },
+            "PlanLength": 5.563514400000001
+          },
+          {
+            "Name": "C5-S",
+            "Rib": "South rib",
+            "Tie": "South tie",
+            "TieAnchor": {
+              "Name": "TC6",
+              "X": -19.8497952,
+              "Y": -1.8178272000000002,
+              "Z": 0.4062984
+            },
+            "RibAnchor": {
+              "Name": "HC7",
+              "X": -17.0849544,
+              "Y": -1.7224248,
+              "Z": 10.4747568
+            },
+            "PlanLength": 10.4415336
+          },
+          {
+            "Name": "C5-N",
+            "Rib": "North rib",
+            "Tie": "North tie",
+            "TieAnchor": {
+              "Name": "TC6\u0027",
+              "X": 19.8497952,
+              "Y": 1.8178272000000002,
+              "Z": 0.4062984
+            },
+            "RibAnchor": {
+              "Name": "HC7\u0027",
+              "X": 17.0849544,
+              "Y": 1.7224248,
+              "Z": 10.4747568
+            },
+            "PlanLength": 10.4415336
+          },
+          {
+            "Name": "C6-S",
+            "Rib": "South rib",
+            "Tie": "South tie",
+            "TieAnchor": {
+              "Name": "TC7",
+              "X": -18.1810152,
+              "Y": -1.7599152,
+              "Z": 0.4062984
+            },
+            "RibAnchor": {
+              "Name": "HC4",
+              "X": -22.214738399999998,
+              "Y": -2.016252,
+              "Z": 7.1170800000000005
+            },
+            "PlanLength": 7.8339696000000005
+          },
+          {
+            "Name": "C6-N",
+            "Rib": "North rib",
+            "Tie": "North tie",
+            "TieAnchor": {
+              "Name": "TC7\u0027",
+              "X": 18.1810152,
+              "Y": 1.7599152,
+              "Z": 0.4062984
+            },
+            "RibAnchor": {
+              "Name": "HC4\u0027",
+              "X": 22.214738399999998,
+              "Y": 2.016252,
+              "Z": 7.1170800000000005
+            },
+            "PlanLength": 7.8339696000000005
+          },
+          {
+            "Name": "C7-S",
+            "Rib": "South rib",
+            "Tie": "South tie",
+            "TieAnchor": {
+              "Name": "TC8",
+              "X": -16.2958272,
+              "Y": -1.7209008000000001,
+              "Z": 0.4062984
+            },
+            "RibAnchor": {
+              "Name": "HC10",
+              "X": -12.336475199999999,
+              "Y": -1.5310104,
+              "Z": 12.6623064
+            },
+            "PlanLength": 12.8811528
+          },
+          {
+            "Name": "C7-N",
+            "Rib": "North rib",
+            "Tie": "North tie",
+            "TieAnchor": {
+              "Name": "TC8\u0027",
+              "X": 16.2958272,
+              "Y": 1.7209008000000001,
+              "Z": 0.4062984
+            },
+            "RibAnchor": {
+              "Name": "HC10\u0027",
+              "X": 12.336475199999999,
+              "Y": 1.5310104,
+              "Z": 12.6623064
+            },
+            "PlanLength": 12.8811528
+          },
+          {
+            "Name": "C8-S",
+            "Rib": "South rib",
+            "Tie": "South tie",
+            "TieAnchor": {
+              "Name": "TC9",
+              "X": -14.6261328,
+              "Y": -1.7209008000000001,
+              "Z": 0.4062984
+            },
+            "RibAnchor": {
+              "Name": "HC6",
+              "X": -19.1402208,
+              "Y": -1.8278856,
+              "Z": 9.2686632
+            },
+            "PlanLength": 9.9462336
+          },
+          {
+            "Name": "C8-N",
+            "Rib": "North rib",
+            "Tie": "North tie",
+            "TieAnchor": {
+              "Name": "TC9\u0027",
+              "X": 14.6261328,
+              "Y": 1.7209008000000001,
+              "Z": 0.4062984
+            },
+            "RibAnchor": {
+              "Name": "HC6\u0027",
+              "X": 19.1402208,
+              "Y": 1.8278856,
+              "Z": 9.2686632
+            },
+            "PlanLength": 9.9462336
+          },
+          {
+            "Name": "C9-S",
+            "Rib": "South rib",
+            "Tie": "South tie",
+            "TieAnchor": {
+              "Name": "TC10",
+              "X": -12.740639999999999,
+              "Y": -1.74498,
+              "Z": 0.4062984
+            },
+            "RibAnchor": {
+              "Name": "HC12",
+              "X": -8.066532,
+              "Y": -1.4133575999999999,
+              "Z": 14.009217600000001
+            },
+            "PlanLength": 14.3871696
+          },
+          {
+            "Name": "C9-N",
+            "Rib": "North rib",
+            "Tie": "North tie",
+            "TieAnchor": {
+              "Name": "TC10\u0027",
+              "X": 12.740639999999999,
+              "Y": 1.74498,
+              "Z": 0.4062984
+            },
+            "RibAnchor": {
+              "Name": "HC12\u0027",
+              "X": 8.066532,
+              "Y": 1.4133575999999999,
+              "Z": 14.009217600000001
+            },
+            "PlanLength": 14.3871696
+          },
+          {
+            "Name": "C10-S",
+            "Rib": "South rib",
+            "Tie": "South tie",
+            "TieAnchor": {
+              "Name": "TC11",
+              "X": -11.071860000000001,
+              "Y": -1.8028920000000002,
+              "Z": 0.4062984
+            },
+            "RibAnchor": {
+              "Name": "HC8",
+              "X": -16.204692,
+              "Y": -1.6815816000000001,
+              "Z": 10.940796
+            },
+            "PlanLength": 11.7189504
+          },
+          {
+            "Name": "C10-N",
+            "Rib": "North rib",
+            "Tie": "North tie",
+            "TieAnchor": {
+              "Name": "TC11\u0027",
+              "X": 11.071860000000001,
+              "Y": 1.8028920000000002,
+              "Z": 0.4062984
+            },
+            "RibAnchor": {
+              "Name": "HC8\u0027",
+              "X": 16.204692,
+              "Y": 1.6815816000000001,
+              "Z": 10.940796
+            },
+            "PlanLength": 11.7189504
+          },
+          {
+            "Name": "C11-S",
+            "Rib": "South rib",
+            "Tie": "South tie",
+            "TieAnchor": {
+              "Name": "TC12",
+              "X": -9.1878912,
+              "Y": -1.8891504000000001,
+              "Z": 0.4062984
+            },
+            "RibAnchor": {
+              "Name": "HC14",
+              "X": -3.9191184000000003,
+              "Y": -1.3426440000000002,
+              "Z": 14.8175472
+            },
+            "PlanLength": 15.353995200000002
+          },
+          {
+            "Name": "C11-N",
+            "Rib": "North rib",
+            "Tie": "North tie",
+            "TieAnchor": {
+              "Name": "TC12\u0027",
+              "X": 9.1878912,
+              "Y": 1.8891504000000001,
+              "Z": 0.4062984
+            },
+            "RibAnchor": {
+              "Name": "HC14\u0027",
+              "X": 3.9191184000000003,
+              "Y": 1.3426440000000002,
+              "Z": 14.8175472
+            },
+            "PlanLength": 15.353995200000002
+          },
+          {
+            "Name": "C12-S",
+            "Rib": "South rib",
+            "Tie": "South tie",
+            "TieAnchor": {
+              "Name": "TC13",
+              "X": -7.5221592,
+              "Y": -2.0055840000000003,
+              "Z": 0.4062984
+            },
+            "RibAnchor": {
+              "Name": "HC9",
+              "X": -13.077139200000001,
+              "Y": -1.5566136000000002,
+              "Z": 12.371527200000001
+            },
+            "PlanLength": 13.199364000000001
+          },
+          {
+            "Name": "C12-N",
+            "Rib": "North rib",
+            "Tie": "North tie",
+            "TieAnchor": {
+              "Name": "TC13\u0027",
+              "X": 7.5221592,
+              "Y": 2.0055840000000003,
+              "Z": 0.4062984
+            },
+            "RibAnchor": {
+              "Name": "HC9\u0027",
+              "X": 13.077139200000001,
+              "Y": 1.5566136000000002,
+              "Z": 12.371527200000001
+            },
+            "PlanLength": 13.199364000000001
+          },
+          {
+            "Name": "C13-S",
+            "Rib": "South rib",
+            "Tie": "South tie",
+            "TieAnchor": {
+              "Name": "TC14",
+              "X": -5.6421528,
+              "Y": -2.1537168,
+              "Z": 0.40599360000000007
+            },
+            "RibAnchor": {
+              "Name": "HC16",
+              "X": 0.1085088,
+              "Y": -1.3124688,
+              "Z": 15.161666400000001
+            },
+            "PlanLength": 15.8590488
+          },
+          {
+            "Name": "C13-N",
+            "Rib": "North rib",
+            "Tie": "North tie",
+            "TieAnchor": {
+              "Name": "TC14\u0027",
+              "X": 5.6421528,
+              "Y": 2.1537168,
+              "Z": 0.40599360000000007
+            },
+            "RibAnchor": {
+              "Name": "HC16\u0027",
+              "X": -0.1085088,
+              "Y": 1.3124688,
+              "Z": 15.161666400000001
+            },
+            "PlanLength": 15.8590488
+          },
+          {
+            "Name": "C14-S",
+            "Rib": "South rib",
+            "Tie": "South tie",
+            "TieAnchor": {
+              "Name": "TC15",
+              "X": -3.9816024000000003,
+              "Y": -2.328672,
+              "Z": 0.4062984
+            },
+            "RibAnchor": {
+              "Name": "HC11",
+              "X": -9.759696000000002,
+              "Y": -1.4542008,
+              "Z": 13.5401304
+            },
+            "PlanLength": 14.3752824
+          },
+          {
+            "Name": "C14-N",
+            "Rib": "North rib",
+            "Tie": "North tie",
+            "TieAnchor": {
+              "Name": "TC15\u0027",
+              "X": 3.9816024000000003,
+              "Y": 2.328672,
+              "Z": 0.4062984
+            },
+            "RibAnchor": {
+              "Name": "HC11\u0027",
+              "X": 9.759696000000002,
+              "Y": 1.4542008,
+              "Z": 13.5401304
+            },
+            "PlanLength": 14.3752824
+          },
+          {
+            "Name": "C15-S",
+            "Rib": "South rib",
+            "Tie": "South tie",
+            "TieAnchor": {
+              "Name": "TC16",
+              "X": -2.1073872,
+              "Y": -2.5383744,
+              "Z": 0.405384
+            },
+            "RibAnchor": {
+              "Name": "HC18",
+              "X": 4.0148256,
+              "Y": -1.3185647999999999,
+              "Z": 15.091867200000001
+            },
+            "PlanLength": 15.958108800000002
+          },
+          {
+            "Name": "C15-N",
+            "Rib": "North rib",
+            "Tie": "North tie",
+            "TieAnchor": {
+              "Name": "TC16\u0027",
+              "X": 2.1073872,
+              "Y": 2.5383744,
+              "Z": 0.405384
+            },
+            "RibAnchor": {
+              "Name": "HC18\u0027",
+              "X": -4.0148256,
+              "Y": 1.3185647999999999,
+              "Z": 15.091867200000001
+            },
+            "PlanLength": 15.958108800000002
+          },
+          {
+            "Name": "C16-S",
+            "Rib": "South rib",
+            "Tie": "South tie",
+            "TieAnchor": {
+              "Name": "TC17",
+              "X": -0.45384720000000006,
+              "Y": -2.7718512,
+              "Z": 0.4062984
+            },
+            "RibAnchor": {
+              "Name": "HC13",
+              "X": -6.252362400000001,
+              "Y": -1.3770864,
+              "Z": 14.4210024
+            },
+            "PlanLength": 15.230856000000001
+          },
+          {
+            "Name": "C16-N",
+            "Rib": "North rib",
+            "Tie": "North tie",
+            "TieAnchor": {
+              "Name": "TC17\u0027",
+              "X": 0.45384720000000006,
+              "Y": 2.7718512,
+              "Z": 0.4062984
+            },
+            "RibAnchor": {
+              "Name": "HC13\u0027",
+              "X": 6.252362400000001,
+              "Y": 1.3770864,
+              "Z": 14.4210024
+            },
+            "PlanLength": 15.230856000000001
+          },
+          {
+            "Name": "C17-S",
+            "Rib": "South rib",
+            "Tie": "South tie",
+            "TieAnchor": {
+              "Name": "TC18",
+              "X": 1.5111984,
+              "Y": -3.0245304,
+              "Z": 0.40477440000000003
+            },
+            "RibAnchor": {
+              "Name": "HC20",
+              "X": 7.9415640000000005,
+              "Y": -1.3600176,
+              "Z": 14.6185128
+            },
+            "PlanLength": 15.6889704
+          },
+          {
+            "Name": "C17-N",
+            "Rib": "North rib",
+            "Tie": "North tie",
+            "TieAnchor": {
+              "Name": "TC18\u0027",
+              "X": -1.5111984,
+              "Y": 3.0245304,
+              "Z": 0.40477440000000003
+            },
+            "RibAnchor": {
+              "Name": "HC20\u0027",
+              "X": -7.9415640000000005,
+              "Y": 1.3600176,
+              "Z": 14.6185128
+            },
+            "PlanLength": 15.6889704
+          },
+          {
+            "Name": "C18-S",
+            "Rib": "South rib",
+            "Tie": "South tie",
+            "TieAnchor": {
+              "Name": "TC19",
+              "X": 3.2634936000000003,
+              "Y": -3.2400240000000005,
+              "Z": 0.40599360000000007
+            },
+            "RibAnchor": {
+              "Name": "HC15",
+              "X": -2.4426672,
+              "Y": -1.3270992000000001,
+              "Z": 14.993416800000002
+            },
+            "PlanLength": 15.7801056
+          },
+          {
+            "Name": "C18-N",
+            "Rib": "North rib",
+            "Tie": "North tie",
+            "TieAnchor": {
+              "Name": "TC19\u0027",
+              "X": -3.2634936000000003,
+              "Y": 3.2400240000000005,
+              "Z": 0.40599360000000007
+            },
+            "RibAnchor": {
+              "Name": "HC15\u0027",
+              "X": 2.4426672,
+              "Y": 1.3270992000000001,
+              "Z": 14.993416800000002
+            },
+            "PlanLength": 15.7801056
+          },
+          {
+            "Name": "C19-S",
+            "Rib": "South rib",
+            "Tie": "South tie",
+            "TieAnchor": {
+              "Name": "TC20",
+              "X": 5.235854400000001,
+              "Y": -3.4286952000000004,
+              "Z": 0.4044696
+            },
+            "RibAnchor": {
+              "Name": "HC22",
+              "X": 11.4220752,
+              "Y": -1.4273784,
+              "Z": 13.8491976
+            },
+            "PlanLength": 14.9342856
+          },
+          {
+            "Name": "C19-N",
+            "Rib": "North rib",
+            "Tie": "North tie",
+            "TieAnchor": {
+              "Name": "TC20\u0027",
+              "X": -5.235854400000001,
+              "Y": 3.4286952000000004,
+              "Z": 0.4044696
+            },
+            "RibAnchor": {
+              "Name": "HC22\u0027",
+              "X": -11.4220752,
+              "Y": 1.4273784,
+              "Z": 13.8491976
+            },
+            "PlanLength": 14.9342856
+          },
+          {
+            "Name": "C20-S",
+            "Rib": "South rib",
+            "Tie": "South tie",
+            "TieAnchor": {
+              "Name": "TC21",
+              "X": 6.9945504000000005,
+              "Y": -3.5820096000000006,
+              "Z": 0.4056888
+            },
+            "RibAnchor": {
+              "Name": "HC17",
+              "X": 1.7897856,
+              "Y": -1.3109448000000001,
+              "Z": 15.180259200000002
+            },
+            "PlanLength": 15.828264
+          },
+          {
+            "Name": "C20-N",
+            "Rib": "North rib",
+            "Tie": "North tie",
+            "TieAnchor": {
+              "Name": "TC21\u0027",
+              "X": -6.9945504000000005,
+              "Y": 3.5820096000000006,
+              "Z": 0.4056888
+            },
+            "RibAnchor": {
+              "Name": "HC17\u0027",
+              "X": -1.7897856,
+              "Y": 1.3109448000000001,
+              "Z": 15.180259200000002
+            },
+            "PlanLength": 15.828264
+          },
+          {
+            "Name": "C21-S",
+            "Rib": "South rib",
+            "Tie": "South tie",
+            "TieAnchor": {
+              "Name": "TC22",
+              "X": 8.971788,
+              "Y": -3.7057584,
+              "Z": 0.40416480000000005
+            },
+            "RibAnchor": {
+              "Name": "HC24",
+              "X": 15.080894400000002,
+              "Y": -1.5310104,
+              "Z": 12.662001600000002
+            },
+            "PlanLength": 13.867180800000002
+          },
+          {
+            "Name": "C21-N",
+            "Rib": "North rib",
+            "Tie": "North tie",
+            "TieAnchor": {
+              "Name": "TC22\u0027",
+              "X": -8.971788,
+              "Y": 3.7057584,
+              "Z": 0.40416480000000005
+            },
+            "RibAnchor": {
+              "Name": "HC24\u0027",
+              "X": -15.080894400000002,
+              "Y": 1.5310104,
+              "Z": 12.662001600000002
+            },
+            "PlanLength": 13.867180800000002
+          },
+          {
+            "Name": "C22-S",
+            "Rib": "South rib",
+            "Tie": "South tie",
+            "TieAnchor": {
+              "Name": "TC23",
+              "X": 10.734751200000002,
+              "Y": -3.7978080000000003,
+              "Z": 0.40507920000000003
+            },
+            "RibAnchor": {
+              "Name": "HC19",
+              "X": 5.5528464,
+              "Y": -1.3304520000000002,
+              "Z": 14.955012
+            },
+            "PlanLength": 15.640812
+          },
+          {
+            "Name": "C22-N",
+            "Rib": "North rib",
+            "Tie": "North tie",
+            "TieAnchor": {
+              "Name": "TC23\u0027",
+              "X": -10.734751200000002,
+              "Y": 3.7978080000000003,
+              "Z": 0.40507920000000003
+            },
+            "RibAnchor": {
+              "Name": "HC19\u0027",
+              "X": -5.5528464,
+              "Y": 1.3304520000000002,
+              "Z": 14.955012
+            },
+            "PlanLength": 15.640812
+          },
+          {
+            "Name": "C23-S",
+            "Rib": "South rib",
+            "Tie": "South tie",
+            "TieAnchor": {
+              "Name": "TC24",
+              "X": 12.715036800000002,
+              "Y": -3.8560248,
+              "Z": 0.40416480000000005
+            },
+            "RibAnchor": {
+              "Name": "HC25",
+              "X": 18.1069488,
+              "Y": -1.6450056000000002,
+              "Z": 11.358981600000002
+            },
+            "PlanLength": 12.408408000000001
+          },
+          {
+            "Name": "C23-N",
+            "Rib": "North rib",
+            "Tie": "North tie",
+            "TieAnchor": {
+              "Name": "TC24\u0027",
+              "X": -12.715036800000002,
+              "Y": 3.8560248,
+              "Z": 0.40416480000000005
+            },
+            "RibAnchor": {
+              "Name": "HC25\u0027",
+              "X": -18.1069488,
+              "Y": 1.6450056000000002,
+              "Z": 11.358981600000002
+            },
+            "PlanLength": 12.408408000000001
+          },
+          {
+            "Name": "C24-S",
+            "Rib": "South rib",
+            "Tie": "South tie",
+            "TieAnchor": {
+              "Name": "TC25",
+              "X": 14.4801336,
+              "Y": -3.8865048,
+              "Z": 0.40477440000000003
+            },
+            "RibAnchor": {
+              "Name": "HC21",
+              "X": 9.7450656,
+              "Y": -1.3911072,
+              "Z": 14.262201600000001
+            },
+            "PlanLength": 14.855037600000001
+          },
+          {
+            "Name": "C24-N",
+            "Rib": "North rib",
+            "Tie": "North tie",
+            "TieAnchor": {
+              "Name": "TC25\u0027",
+              "X": -14.4801336,
+              "Y": 3.8865048,
+              "Z": 0.40477440000000003
+            },
+            "RibAnchor": {
+              "Name": "HC21\u0027",
+              "X": -9.7450656,
+              "Y": 1.3911072,
+              "Z": 14.262201600000001
+            },
+            "PlanLength": 14.855037600000001
+          },
+          {
+            "Name": "C25-S",
+            "Rib": "South rib",
+            "Tie": "South tie",
+            "TieAnchor": {
+              "Name": "TC26",
+              "X": 16.4613336,
+              "Y": -3.8791896,
+              "Z": 0.40416480000000005
+            },
+            "RibAnchor": {
+              "Name": "HC27",
+              "X": 21.1750656,
+              "Y": -1.7897856,
+              "Z": 9.7039176
+            },
+            "PlanLength": 10.633557600000001
+          },
+          {
+            "Name": "C25-N",
+            "Rib": "North rib",
+            "Tie": "North tie",
+            "TieAnchor": {
+              "Name": "TC26\u0027",
+              "X": -16.4613336,
+              "Y": 3.8791896,
+              "Z": 0.40416480000000005
+            },
+            "RibAnchor": {
+              "Name": "HC27\u0027",
+              "X": -21.1750656,
+              "Y": 1.7897856,
+              "Z": 9.7039176
+            },
+            "PlanLength": 10.633557600000001
+          },
+          {
+            "Name": "C26-S",
+            "Rib": "South rib",
+            "Tie": "South tie",
+            "TieAnchor": {
+              "Name": "TC27",
+              "X": 18.2264304,
+              "Y": -3.8481,
+              "Z": 0.4044696
+            },
+            "RibAnchor": {
+              "Name": "HC23",
+              "X": 14.080845600000002,
+              "Y": -1.4993112,
+              "Z": 13.0268472
+            },
+            "PlanLength": 13.491667200000002
+          },
+          {
+            "Name": "C26-N",
+            "Rib": "North rib",
+            "Tie": "North tie",
+            "TieAnchor": {
+              "Name": "TC27\u0027",
+              "X": -18.2264304,
+              "Y": 3.8481,
+              "Z": 0.4044696
+            },
+            "RibAnchor": {
+              "Name": "HC23\u0027",
+              "X": -14.080845600000002,
+              "Y": 1.4993112,
+              "Z": 13.0268472
+            },
+            "PlanLength": 13.491667200000002
+          },
+          {
+            "Name": "C27-S",
+            "Rib": "South rib",
+            "Tie": "South tie",
+            "TieAnchor": {
+              "Name": "TC28",
+              "X": 20.206106400000003,
+              "Y": -3.7746432000000003,
+              "Z": 0.40386
+            },
+            "RibAnchor": {
+              "Name": "HC29",
+              "X": 24.057559200000004,
+              "Y": -1.9571208000000002,
+              "Z": 7.7943456
+            },
+            "PlanLength": 8.529523200000002
+          },
+          {
+            "Name": "C27-N",
+            "Rib": "North rib",
+            "Tie": "North tie",
+            "TieAnchor": {
+              "Name": "TC28\u0027",
+              "X": -20.206106400000003,
+              "Y": 3.7746432000000003,
+              "Z": 0.40386
+            },
+            "RibAnchor": {
+              "Name": "HC29\u0027",
+              "X": -24.057559200000004,
+              "Y": 1.9571208000000002,
+              "Z": 7.7943456
+            },
+            "PlanLength": 8.529523200000002
+          },
+          {
+            "Name": "C28-S",
+            "Rib": "South rib",
+            "Tie": "South tie",
+            "TieAnchor": {
+              "Name": "TC29",
+              "X": 21.9690696,
+              "Y": -3.6828984000000005,
+              "Z": 0.40416480000000005
+            },
+            "RibAnchor": {
+              "Name": "HC26",
+              "X": 18.5848752,
+              "Y": -1.665732,
+              "Z": 11.1242856
+            },
+            "PlanLength": 11.4211608
+          },
+          {
+            "Name": "C28-N",
+            "Rib": "North rib",
+            "Tie": "North tie",
+            "TieAnchor": {
+              "Name": "TC29\u0027",
+              "X": -21.9690696,
+              "Y": 3.6828984000000005,
+              "Z": 0.40416480000000005
+            },
+            "RibAnchor": {
+              "Name": "HC26\u0027",
+              "X": -18.5848752,
+              "Y": 1.665732,
+              "Z": 11.1242856
+            },
+            "PlanLength": 11.4211608
+          },
+          {
+            "Name": "C29-S",
+            "Rib": "South rib",
+            "Tie": "South tie",
+            "TieAnchor": {
+              "Name": "TC30",
+              "X": 23.945088000000002,
+              "Y": -3.5426904,
+              "Z": 0.40386
+            },
+            "RibAnchor": {
+              "Name": "HC30",
+              "X": 26.7480288,
+              "Y": -2.1454872,
+              "Z": 5.6406288
+            },
+            "PlanLength": 6.1017912
+          },
+          {
+            "Name": "C29-N",
+            "Rib": "North rib",
+            "Tie": "North tie",
+            "TieAnchor": {
+              "Name": "TC30\u0027",
+              "X": -23.945088000000002,
+              "Y": 3.5426904,
+              "Z": 0.40386
+            },
+            "RibAnchor": {
+              "Name": "HC30\u0027",
+              "X": -26.7480288,
+              "Y": 2.1454872,
+              "Z": 5.6406288
+            },
+            "PlanLength": 6.1017912
+          },
+          {
+            "Name": "C30-S",
+            "Rib": "South rib",
+            "Tie": "South tie",
+            "TieAnchor": {
+              "Name": "TC31",
+              "X": 25.703784000000002,
+              "Y": -3.3902904,
+              "Z": 0.40416480000000005
+            },
+            "RibAnchor": {
+              "Name": "HC28",
+              "X": 23.1093264,
+              "Y": -1.8982944,
+              "Z": 8.464296000000001
+            },
+            "PlanLength": 8.5977984
+          },
+          {
+            "Name": "C30-N",
+            "Rib": "North rib",
+            "Tie": "North tie",
+            "TieAnchor": {
+              "Name": "TC31\u0027",
+              "X": -25.703784000000002,
+              "Y": 3.3902904,
+              "Z": 0.40416480000000005
+            },
+            "RibAnchor": {
+              "Name": "HC28\u0027",
+              "X": -23.1093264,
+              "Y": 1.8982944,
+              "Z": 8.464296000000001
+            },
+            "PlanLength": 8.5977984
+          },
+          {
+            "Name": "C31-S",
+            "Rib": "South rib",
+            "Tie": "South tie",
+            "TieAnchor": {
+              "Name": "TC32",
+              "X": 27.6740112,
+              "Y": -3.1833312000000005,
+              "Z": 0.40386
+            },
+            "RibAnchor": {
+              "Name": "HC32",
+              "X": 29.3229792,
+              "Y": -2.3625048000000004,
+              "Z": 3.160776
+            },
+            "PlanLength": 3.3156144000000003
+          },
+          {
+            "Name": "C31-N",
+            "Rib": "North rib",
+            "Tie": "North tie",
+            "TieAnchor": {
+              "Name": "TC32\u0027",
+              "X": -27.6740112,
+              "Y": 3.1833312000000005,
+              "Z": 0.40386
+            },
+            "RibAnchor": {
+              "Name": "HC32\u0027",
+              "X": -29.3229792,
+              "Y": 2.3625048000000004,
+              "Z": 3.160776
+            },
+            "PlanLength": 3.3156144000000003
+          },
+          {
+            "Name": "C32-S",
+            "Rib": "South rib",
+            "Tie": "South tie",
+            "TieAnchor": {
+              "Name": "TC33",
+              "X": 29.4266112,
+              "Y": -2.9708856,
+              "Z": 0.40386
+            },
+            "RibAnchor": {
+              "Name": "HC31",
+              "X": 28.3506672,
+              "Y": -2.2756368,
+              "Z": 4.151985600000001
+            },
+            "PlanLength": 3.960876
+          },
+          {
+            "Name": "C32-N",
+            "Rib": "North rib",
+            "Tie": "North tie",
+            "TieAnchor": {
+              "Name": "TC33\u0027",
+              "X": -29.4266112,
+              "Y": 2.9708856,
+              "Z": 0.40386
+            },
+            "RibAnchor": {
+              "Name": "HC31\u0027",
+              "X": -28.3506672,
+              "Y": 2.2756368,
+              "Z": 4.151985600000001
+            },
+            "PlanLength": 3.960876
+          }
+        ],
+        "HangerSystem": {
+          "StrandDiameter": 0.0254,
+          "StrandWeightLbPerFt": 2.1,
+          "StrandDescription": "galvanized structural strand (WireCo / Bethlehem Table 1 p.10: 0.600 sq in, 2.10 lb/ft, E 24,000 ksi prestretched)",
+          "StrandMaterial": "ASTM A586 zinc-coated structural strand",
+          "RibSocket": {
+            "Name": "Open strand socket (at arch rib)",
+            "A": 0.10312399999999998,
+            "B": 0.07010399999999999,
+            "G": 0.087122,
+            "L": 0.199898,
+            "W": 0.41097199999999995,
+            "PinDiameter": 0.035001199999999996,
+            "ShankDiameter": 0.0329946,
+            "Material": "Socket (forged / cast steel, by supplier)",
+            "Basis": "plan p.148 OPEN STRAND SOCKET DIMENSIONS (envelope: jaw block A x B to L, shank Db to W, pin dL x G)"
+          },
+          "TieSocket": {
+            "Name": "Adjustable open strand socket with turnbuckle (at tie girder)",
+            "A": 0.10312399999999998,
+            "B": 0.07010399999999999,
+            "G": 0.087122,
+            "L": 0.199898,
+            "W": 0.8740139999999998,
+            "PinDiameter": 0.035001199999999996,
+            "ShankDiameter": 0.0329946,
+            "Material": "Socket (forged / cast steel, by supplier)",
+            "Basis": "plan p.148 ADJUSTABLE OPEN STRAND SOCKET DIMENSIONS (turnbuckle body drawn at the shank diameter - its outline is not dimensioned)"
+          }
+        },
+        "Floorbeams": [
+          {
+            "Name": "FB1",
+            "TieA": "South tie",
+            "PanelA": "T1",
+            "TieB": "North tie",
+            "PanelB": "T33\u0027",
+            "WebThickness": 0.0254,
+            "FlangeThickness": 0.022224999999999998,
+            "FlangeWidth": 0.30479999999999996,
+            "DepthAtEnds": 0.225425,
+            "DepthAtCrown": 0.25082499999999996,
+            "CrownAtAlignment": true,
+            "EndGap": 0.0127,
+            "Material": "ASTM A709 Gr. 50-T1",
+            "PtDimA": 1.8772632,
+            "PtDimB": 1.4798040000000001
+          },
+          {
+            "Name": "FB2",
+            "TieA": "South tie",
+            "PanelA": "T2",
+            "TieB": "North tie",
+            "PanelB": "T32\u0027",
+            "WebThickness": 0.0254,
+            "FlangeThickness": 0.022224999999999998,
+            "FlangeWidth": 0.30479999999999996,
+            "DepthAtEnds": 0.225425,
+            "DepthAtCrown": 0.25082499999999996,
+            "CrownAtAlignment": true,
+            "EndGap": 0.0127,
+            "Material": "ASTM A709 Gr. 50-T1",
+            "PtDimA": 2.1009864,
+            "PtDimB": 1.2606528000000001
+          },
+          {
+            "Name": "FB3",
+            "TieA": "South tie",
+            "PanelA": "T3",
+            "TieB": "North tie",
+            "PanelB": "T31\u0027",
+            "WebThickness": 0.0254,
+            "FlangeThickness": 0.022224999999999998,
+            "FlangeWidth": 0.30479999999999996,
+            "DepthAtEnds": 0.225425,
+            "DepthAtCrown": 0.25082499999999996,
+            "CrownAtAlignment": true,
+            "EndGap": 0.0127,
+            "Material": "ASTM A709 Gr. 50-T1",
+            "PtDimA": 2.2927056,
+            "PtDimB": 1.072896
+          },
+          {
+            "Name": "FB4",
+            "TieA": "South tie",
+            "PanelA": "T4",
+            "TieB": "North tie",
+            "PanelB": "T30\u0027",
+            "WebThickness": 0.0254,
+            "FlangeThickness": 0.022224999999999998,
+            "FlangeWidth": 0.30479999999999996,
+            "DepthAtEnds": 0.225425,
+            "DepthAtCrown": 0.25082499999999996,
+            "CrownAtAlignment": true,
+            "EndGap": 0.0127,
+            "Material": "ASTM A709 Gr. 50-T1",
+            "PtDimA": 2.4524208,
+            "PtDimB": 0.9314688000000001
+          },
+          {
+            "Name": "FB5",
+            "TieA": "South tie",
+            "PanelA": "T5",
+            "TieB": "North tie",
+            "PanelB": "T29\u0027",
+            "WebThickness": 0.0254,
+            "FlangeThickness": 0.022224999999999998,
+            "FlangeWidth": 0.30479999999999996,
+            "DepthAtEnds": 0.225425,
+            "DepthAtCrown": 0.25082499999999996,
+            "CrownAtAlignment": true,
+            "EndGap": 0.0127,
+            "Material": "ASTM A709 Gr. 50-T1",
+            "PtDimA": 2.5807416,
+            "PtDimB": 0.7909560000000001
+          },
+          {
+            "Name": "FB6",
+            "TieA": "South tie",
+            "PanelA": "T6",
+            "TieB": "North tie",
+            "PanelB": "T28\u0027",
+            "WebThickness": 0.0254,
+            "FlangeThickness": 0.022224999999999998,
+            "FlangeWidth": 0.30479999999999996,
+            "DepthAtEnds": 0.225425,
+            "DepthAtCrown": 0.25082499999999996,
+            "CrownAtAlignment": true,
+            "EndGap": 0.0127,
+            "Material": "ASTM A709 Gr. 50-T1",
+            "PtDimA": 2.6773632000000003,
+            "PtDimB": 0.6961632
+          },
+          {
+            "Name": "FB7",
+            "TieA": "South tie",
+            "PanelA": "T7",
+            "TieB": "North tie",
+            "PanelB": "T27\u0027",
+            "WebThickness": 0.0254,
+            "FlangeThickness": 0.022224999999999998,
+            "FlangeWidth": 0.30479999999999996,
+            "DepthAtEnds": 0.225425,
+            "DepthAtCrown": 0.25082499999999996,
+            "CrownAtAlignment": true,
+            "EndGap": 0.0127,
+            "Material": "ASTM A709 Gr. 50-T1",
+            "PtDimA": 2.7428952000000004,
+            "PtDimB": 0.6321552
+          },
+          {
+            "Name": "FB8",
+            "TieA": "South tie",
+            "PanelA": "T8",
+            "TieB": "North tie",
+            "PanelB": "T26\u0027",
+            "WebThickness": 0.0254,
+            "FlangeThickness": 0.022224999999999998,
+            "FlangeWidth": 0.30479999999999996,
+            "DepthAtEnds": 0.225425,
+            "DepthAtCrown": 0.25082499999999996,
+            "CrownAtAlignment": true,
+            "EndGap": 0.0127,
+            "Material": "ASTM A709 Gr. 50-T1",
+            "PtDimA": 2.7773376,
+            "PtDimB": 0.5983224
+          },
+          {
+            "Name": "FB9",
+            "TieA": "South tie",
+            "PanelA": "T9",
+            "TieB": "North tie",
+            "PanelB": "T25\u0027",
+            "WebThickness": 0.0254,
+            "FlangeThickness": 0.022224999999999998,
+            "FlangeWidth": 0.30479999999999996,
+            "DepthAtEnds": 0.225425,
+            "DepthAtCrown": 0.25082499999999996,
+            "CrownAtAlignment": true,
+            "EndGap": 0.0127,
+            "Material": "ASTM A709 Gr. 50-T1",
+            "PtDimA": 2.7803856000000002,
+            "PtDimB": 0.5952744000000001
+          },
+          {
+            "Name": "FB10",
+            "TieA": "South tie",
+            "PanelA": "T10",
+            "TieB": "North tie",
+            "PanelB": "T24\u0027",
+            "WebThickness": 0.0254,
+            "FlangeThickness": 0.022224999999999998,
+            "FlangeWidth": 0.30479999999999996,
+            "DepthAtEnds": 0.225425,
+            "DepthAtCrown": 0.25082499999999996,
+            "CrownAtAlignment": true,
+            "EndGap": 0.0127,
+            "Material": "ASTM A709 Gr. 50-T1",
+            "PtDimA": 2.752344,
+            "PtDimB": 0.6227064000000001
+          },
+          {
+            "Name": "FB11",
+            "TieA": "South tie",
+            "PanelA": "T11",
+            "TieB": "North tie",
+            "PanelB": "T23\u0027",
+            "WebThickness": 0.0254,
+            "FlangeThickness": 0.022224999999999998,
+            "FlangeWidth": 0.30479999999999996,
+            "DepthAtEnds": 0.225425,
+            "DepthAtCrown": 0.25082499999999996,
+            "CrownAtAlignment": true,
+            "EndGap": 0.0127,
+            "Material": "ASTM A709 Gr. 50-T1",
+            "PtDimA": 2.6935176,
+            "PtDimB": 0.6806184000000001
+          },
+          {
+            "Name": "FB12",
+            "TieA": "South tie",
+            "PanelA": "T12",
+            "TieB": "North tie",
+            "PanelB": "T22\u0027",
+            "WebThickness": 0.0254,
+            "FlangeThickness": 0.022224999999999998,
+            "FlangeWidth": 0.30479999999999996,
+            "DepthAtEnds": 0.225425,
+            "DepthAtCrown": 0.25082499999999996,
+            "CrownAtAlignment": true,
+            "EndGap": 0.0127,
+            "Material": "ASTM A709 Gr. 50-T1",
+            "PtDimA": 2.602992,
+            "PtDimB": 0.7690104000000001
+          },
+          {
+            "Name": "FB13",
+            "TieA": "South tie",
+            "PanelA": "T13",
+            "TieB": "North tie",
+            "PanelB": "T21\u0027",
+            "WebThickness": 0.0254,
+            "FlangeThickness": 0.022224999999999998,
+            "FlangeWidth": 0.30479999999999996,
+            "DepthAtEnds": 0.225425,
+            "DepthAtCrown": 0.25082499999999996,
+            "CrownAtAlignment": true,
+            "EndGap": 0.0127,
+            "Material": "ASTM A709 Gr. 50-T1",
+            "PtDimA": 2.4813768,
+            "PtDimB": 0.8881872000000001
+          },
+          {
+            "Name": "FB14",
+            "TieA": "South tie",
+            "PanelA": "T14",
+            "TieB": "North tie",
+            "PanelB": "T20\u0027",
+            "WebThickness": 0.0254,
+            "FlangeThickness": 0.022224999999999998,
+            "FlangeWidth": 0.30479999999999996,
+            "DepthAtEnds": 0.225425,
+            "DepthAtCrown": 0.25082499999999996,
+            "CrownAtAlignment": true,
+            "EndGap": 0.0127,
+            "Material": "ASTM A709 Gr. 50-T1",
+            "PtDimA": 2.3280624,
+            "PtDimB": 1.0381488
+          },
+          {
+            "Name": "FB15",
+            "TieA": "South tie",
+            "PanelA": "T15",
+            "TieB": "North tie",
+            "PanelB": "T19\u0027",
+            "WebThickness": 0.0254,
+            "FlangeThickness": 0.022224999999999998,
+            "FlangeWidth": 0.30479999999999996,
+            "DepthAtEnds": 0.225425,
+            "DepthAtCrown": 0.25082499999999996,
+            "CrownAtAlignment": true,
+            "EndGap": 0.0127,
+            "Material": "ASTM A709 Gr. 50-T1",
+            "PtDimA": 2.1430488,
+            "PtDimB": 1.2195048000000002
+          },
+          {
+            "Name": "FB16",
+            "TieA": "South tie",
+            "PanelA": "T16",
+            "TieB": "North tie",
+            "PanelB": "T18\u0027",
+            "WebThickness": 0.0254,
+            "FlangeThickness": 0.022224999999999998,
+            "FlangeWidth": 0.30479999999999996,
+            "DepthAtEnds": 0.225425,
+            "DepthAtCrown": 0.25082499999999996,
+            "CrownAtAlignment": true,
+            "EndGap": 0.0127,
+            "Material": "ASTM A709 Gr. 50-T1",
+            "PtDimA": 1.9260312000000002,
+            "PtDimB": 1.4322552
+          },
+          {
+            "Name": "FB17",
+            "TieA": "South tie",
+            "PanelA": "T17",
+            "TieB": "North tie",
+            "PanelB": "T17\u0027",
+            "WebThickness": 0.0254,
+            "FlangeThickness": 0.022224999999999998,
+            "FlangeWidth": 0.30479999999999996,
+            "DepthAtEnds": 0.225425,
+            "DepthAtCrown": 0.25082499999999996,
+            "CrownAtAlignment": true,
+            "EndGap": 0.0127,
+            "Material": "ASTM A709 Gr. 50-T1",
+            "PtDimA": 1.6764000000000001,
+            "PtDimB": 1.6764000000000001
+          },
+          {
+            "Name": "FB18",
+            "TieA": "South tie",
+            "PanelA": "T18",
+            "TieB": "North tie",
+            "PanelB": "T16\u0027",
+            "WebThickness": 0.0254,
+            "FlangeThickness": 0.022224999999999998,
+            "FlangeWidth": 0.30479999999999996,
+            "DepthAtEnds": 0.225425,
+            "DepthAtCrown": 0.25082499999999996,
+            "CrownAtAlignment": true,
+            "EndGap": 0.0127,
+            "Material": "ASTM A709 Gr. 50-T1",
+            "PtDimA": 1.4322552,
+            "PtDimB": 1.9260312000000002
+          },
+          {
+            "Name": "FB19",
+            "TieA": "South tie",
+            "PanelA": "T19",
+            "TieB": "North tie",
+            "PanelB": "T15\u0027",
+            "WebThickness": 0.0254,
+            "FlangeThickness": 0.022224999999999998,
+            "FlangeWidth": 0.30479999999999996,
+            "DepthAtEnds": 0.225425,
+            "DepthAtCrown": 0.25082499999999996,
+            "CrownAtAlignment": true,
+            "EndGap": 0.0127,
+            "Material": "ASTM A709 Gr. 50-T1",
+            "PtDimA": 1.2195048000000002,
+            "PtDimB": 2.1430488
+          },
+          {
+            "Name": "FB20",
+            "TieA": "South tie",
+            "PanelA": "T20",
+            "TieB": "North tie",
+            "PanelB": "T14\u0027",
+            "WebThickness": 0.0254,
+            "FlangeThickness": 0.022224999999999998,
+            "FlangeWidth": 0.30479999999999996,
+            "DepthAtEnds": 0.225425,
+            "DepthAtCrown": 0.25082499999999996,
+            "CrownAtAlignment": true,
+            "EndGap": 0.0127,
+            "Material": "ASTM A709 Gr. 50-T1",
+            "PtDimA": 1.0381488,
+            "PtDimB": 2.3280624
+          },
+          {
+            "Name": "FB21",
+            "TieA": "South tie",
+            "PanelA": "T21",
+            "TieB": "North tie",
+            "PanelB": "T13\u0027",
+            "WebThickness": 0.0254,
+            "FlangeThickness": 0.022224999999999998,
+            "FlangeWidth": 0.30479999999999996,
+            "DepthAtEnds": 0.225425,
+            "DepthAtCrown": 0.25082499999999996,
+            "CrownAtAlignment": true,
+            "EndGap": 0.0127,
+            "Material": "ASTM A709 Gr. 50-T1",
+            "PtDimA": 0.8881872000000001,
+            "PtDimB": 2.4813768
+          },
+          {
+            "Name": "FB22",
+            "TieA": "South tie",
+            "PanelA": "T22",
+            "TieB": "North tie",
+            "PanelB": "T12\u0027",
+            "WebThickness": 0.0254,
+            "FlangeThickness": 0.022224999999999998,
+            "FlangeWidth": 0.30479999999999996,
+            "DepthAtEnds": 0.225425,
+            "DepthAtCrown": 0.25082499999999996,
+            "CrownAtAlignment": true,
+            "EndGap": 0.0127,
+            "Material": "ASTM A709 Gr. 50-T1",
+            "PtDimA": 0.7690104000000001,
+            "PtDimB": 2.602992
+          },
+          {
+            "Name": "FB23",
+            "TieA": "South tie",
+            "PanelA": "T23",
+            "TieB": "North tie",
+            "PanelB": "T11\u0027",
+            "WebThickness": 0.0254,
+            "FlangeThickness": 0.022224999999999998,
+            "FlangeWidth": 0.30479999999999996,
+            "DepthAtEnds": 0.225425,
+            "DepthAtCrown": 0.25082499999999996,
+            "CrownAtAlignment": true,
+            "EndGap": 0.0127,
+            "Material": "ASTM A709 Gr. 50-T1",
+            "PtDimA": 0.6806184000000001,
+            "PtDimB": 2.6935176
+          },
+          {
+            "Name": "FB24",
+            "TieA": "South tie",
+            "PanelA": "T24",
+            "TieB": "North tie",
+            "PanelB": "T10\u0027",
+            "WebThickness": 0.0254,
+            "FlangeThickness": 0.022224999999999998,
+            "FlangeWidth": 0.30479999999999996,
+            "DepthAtEnds": 0.225425,
+            "DepthAtCrown": 0.25082499999999996,
+            "CrownAtAlignment": true,
+            "EndGap": 0.0127,
+            "Material": "ASTM A709 Gr. 50-T1",
+            "PtDimA": 0.6227064000000001,
+            "PtDimB": 2.752344
+          },
+          {
+            "Name": "FB25",
+            "TieA": "South tie",
+            "PanelA": "T25",
+            "TieB": "North tie",
+            "PanelB": "T9\u0027",
+            "WebThickness": 0.0254,
+            "FlangeThickness": 0.022224999999999998,
+            "FlangeWidth": 0.30479999999999996,
+            "DepthAtEnds": 0.225425,
+            "DepthAtCrown": 0.25082499999999996,
+            "CrownAtAlignment": true,
+            "EndGap": 0.0127,
+            "Material": "ASTM A709 Gr. 50-T1",
+            "PtDimA": 0.5952744000000001,
+            "PtDimB": 2.7803856000000002
+          },
+          {
+            "Name": "FB26",
+            "TieA": "South tie",
+            "PanelA": "T26",
+            "TieB": "North tie",
+            "PanelB": "T8\u0027",
+            "WebThickness": 0.0254,
+            "FlangeThickness": 0.022224999999999998,
+            "FlangeWidth": 0.30479999999999996,
+            "DepthAtEnds": 0.225425,
+            "DepthAtCrown": 0.25082499999999996,
+            "CrownAtAlignment": true,
+            "EndGap": 0.0127,
+            "Material": "ASTM A709 Gr. 50-T1",
+            "PtDimA": 0.5983224,
+            "PtDimB": 2.7773376
+          },
+          {
+            "Name": "FB27",
+            "TieA": "South tie",
+            "PanelA": "T27",
+            "TieB": "North tie",
+            "PanelB": "T7\u0027",
+            "WebThickness": 0.0254,
+            "FlangeThickness": 0.022224999999999998,
+            "FlangeWidth": 0.30479999999999996,
+            "DepthAtEnds": 0.225425,
+            "DepthAtCrown": 0.25082499999999996,
+            "CrownAtAlignment": true,
+            "EndGap": 0.0127,
+            "Material": "ASTM A709 Gr. 50-T1",
+            "PtDimA": 0.6321552,
+            "PtDimB": 2.7428952000000004
+          },
+          {
+            "Name": "FB28",
+            "TieA": "South tie",
+            "PanelA": "T28",
+            "TieB": "North tie",
+            "PanelB": "T6\u0027",
+            "WebThickness": 0.0254,
+            "FlangeThickness": 0.022224999999999998,
+            "FlangeWidth": 0.30479999999999996,
+            "DepthAtEnds": 0.225425,
+            "DepthAtCrown": 0.25082499999999996,
+            "CrownAtAlignment": true,
+            "EndGap": 0.0127,
+            "Material": "ASTM A709 Gr. 50-T1",
+            "PtDimA": 0.6961632,
+            "PtDimB": 2.6773632000000003
+          },
+          {
+            "Name": "FB29",
+            "TieA": "South tie",
+            "PanelA": "T29",
+            "TieB": "North tie",
+            "PanelB": "T5\u0027",
+            "WebThickness": 0.0254,
+            "FlangeThickness": 0.022224999999999998,
+            "FlangeWidth": 0.30479999999999996,
+            "DepthAtEnds": 0.225425,
+            "DepthAtCrown": 0.25082499999999996,
+            "CrownAtAlignment": true,
+            "EndGap": 0.0127,
+            "Material": "ASTM A709 Gr. 50-T1",
+            "PtDimA": 0.7909560000000001,
+            "PtDimB": 2.5807416
+          },
+          {
+            "Name": "FB30",
+            "TieA": "South tie",
+            "PanelA": "T30",
+            "TieB": "North tie",
+            "PanelB": "T4\u0027",
+            "WebThickness": 0.0254,
+            "FlangeThickness": 0.022224999999999998,
+            "FlangeWidth": 0.30479999999999996,
+            "DepthAtEnds": 0.225425,
+            "DepthAtCrown": 0.25082499999999996,
+            "CrownAtAlignment": true,
+            "EndGap": 0.0127,
+            "Material": "ASTM A709 Gr. 50-T1",
+            "PtDimA": 0.9314688000000001,
+            "PtDimB": 2.4524208
+          },
+          {
+            "Name": "FB31",
+            "TieA": "South tie",
+            "PanelA": "T31",
+            "TieB": "North tie",
+            "PanelB": "T3\u0027",
+            "WebThickness": 0.0254,
+            "FlangeThickness": 0.022224999999999998,
+            "FlangeWidth": 0.30479999999999996,
+            "DepthAtEnds": 0.225425,
+            "DepthAtCrown": 0.25082499999999996,
+            "CrownAtAlignment": true,
+            "EndGap": 0.0127,
+            "Material": "ASTM A709 Gr. 50-T1",
+            "PtDimA": 1.072896,
+            "PtDimB": 2.2927056
+          },
+          {
+            "Name": "FB32",
+            "TieA": "South tie",
+            "PanelA": "T32",
+            "TieB": "North tie",
+            "PanelB": "T2\u0027",
+            "WebThickness": 0.0254,
+            "FlangeThickness": 0.022224999999999998,
+            "FlangeWidth": 0.30479999999999996,
+            "DepthAtEnds": 0.225425,
+            "DepthAtCrown": 0.25082499999999996,
+            "CrownAtAlignment": true,
+            "EndGap": 0.0127,
+            "Material": "ASTM A709 Gr. 50-T1",
+            "PtDimA": 1.2606528000000001,
+            "PtDimB": 2.1009864
+          },
+          {
+            "Name": "FB33",
+            "TieA": "South tie",
+            "PanelA": "T33",
+            "TieB": "North tie",
+            "PanelB": "T1\u0027",
+            "WebThickness": 0.0254,
+            "FlangeThickness": 0.022224999999999998,
+            "FlangeWidth": 0.30479999999999996,
+            "DepthAtEnds": 0.225425,
+            "DepthAtCrown": 0.25082499999999996,
+            "CrownAtAlignment": true,
+            "EndGap": 0.0127,
+            "Material": "ASTM A709 Gr. 50-T1",
+            "PtDimA": 1.4798040000000001,
+            "PtDimB": 1.8772632
+          }
+        ],
+        "Bracing": [
+          {
+            "Name": "BR1A",
+            "From": "U1",
+            "To": "UL1"
+          },
+          {
+            "Name": "BR1B",
+            "From": "UL1",
+            "To": "U10\u0027"
+          },
+          {
+            "Name": "BR1C",
+            "From": "U2",
+            "To": "UL1"
+          },
+          {
+            "Name": "BR1D",
+            "From": "UL1",
+            "To": "U11\u0027"
+          },
+          {
+            "Name": "BR2A",
+            "From": "U2",
+            "To": "UL2"
+          },
+          {
+            "Name": "BR2B",
+            "From": "UL2",
+            "To": "U9\u0027"
+          },
+          {
+            "Name": "BR2C",
+            "From": "U3",
+            "To": "UL2"
+          },
+          {
+            "Name": "BR2D",
+            "From": "UL2",
+            "To": "U10\u0027"
+          },
+          {
+            "Name": "BR3A",
+            "From": "U3",
+            "To": "UL3"
+          },
+          {
+            "Name": "BR3B",
+            "From": "UL3",
+            "To": "U8\u0027"
+          },
+          {
+            "Name": "BR3C",
+            "From": "U4",
+            "To": "UL3"
+          },
+          {
+            "Name": "BR3D",
+            "From": "UL3",
+            "To": "U9\u0027"
+          },
+          {
+            "Name": "BR4A",
+            "From": "U4",
+            "To": "UL4"
+          },
+          {
+            "Name": "BR4B",
+            "From": "UL4",
+            "To": "U7\u0027"
+          },
+          {
+            "Name": "BR4C",
+            "From": "U5",
+            "To": "UL4"
+          },
+          {
+            "Name": "BR4D",
+            "From": "UL4",
+            "To": "U8\u0027"
+          },
+          {
+            "Name": "BR5A",
+            "From": "U5",
+            "To": "UL5"
+          },
+          {
+            "Name": "BR5B",
+            "From": "UL5",
+            "To": "U6\u0027"
+          },
+          {
+            "Name": "BR5C",
+            "From": "U6",
+            "To": "UL5"
+          },
+          {
+            "Name": "BR5D",
+            "From": "UL5",
+            "To": "U7\u0027"
+          },
+          {
+            "Name": "BR6A",
+            "From": "U6",
+            "To": "UL6"
+          },
+          {
+            "Name": "BR6B",
+            "From": "UL6",
+            "To": "U5\u0027"
+          },
+          {
+            "Name": "BR6C",
+            "From": "U7",
+            "To": "UL6"
+          },
+          {
+            "Name": "BR6D",
+            "From": "UL6",
+            "To": "U6\u0027"
+          },
+          {
+            "Name": "BR7A",
+            "From": "U7",
+            "To": "UL7"
+          },
+          {
+            "Name": "BR7B",
+            "From": "UL7",
+            "To": "U4\u0027"
+          },
+          {
+            "Name": "BR7C",
+            "From": "U8",
+            "To": "UL7"
+          },
+          {
+            "Name": "BR7D",
+            "From": "UL7",
+            "To": "U5\u0027"
+          },
+          {
+            "Name": "BR8A",
+            "From": "U8",
+            "To": "UL8"
+          },
+          {
+            "Name": "BR8B",
+            "From": "UL8",
+            "To": "U3\u0027"
+          },
+          {
+            "Name": "BR8C",
+            "From": "U9",
+            "To": "UL8"
+          },
+          {
+            "Name": "BR8D",
+            "From": "UL8",
+            "To": "U4\u0027"
+          },
+          {
+            "Name": "BR9A",
+            "From": "U9",
+            "To": "UL9"
+          },
+          {
+            "Name": "BR9B",
+            "From": "UL9",
+            "To": "U2\u0027"
+          },
+          {
+            "Name": "BR9C",
+            "From": "U10",
+            "To": "UL9"
+          },
+          {
+            "Name": "BR9D",
+            "From": "UL9",
+            "To": "U3\u0027"
+          },
+          {
+            "Name": "BR10A",
+            "From": "U10",
+            "To": "UL10"
+          },
+          {
+            "Name": "BR10B",
+            "From": "UL10",
+            "To": "U1\u0027"
+          },
+          {
+            "Name": "BR10C",
+            "From": "U11",
+            "To": "UL10"
+          },
+          {
+            "Name": "BR10D",
+            "From": "UL10",
+            "To": "U2\u0027"
+          }
+        ],
+        "BracingSection": "W8x28",
+        "BracingMaterial": "ASTM A709 Gr. 50",
+        "BracingOrientationUnresolved": "UNRESOLVED (p.128-142): W8x28 upper lateral bracing web orientation and member ends - the bracing details (p.129-142) are not transcribed and the U points lie 0.685 ft off the rib WP plane (U6). Web set in the plane of the member and the local Z axis, members work point to work point.",
+        "Knuckles": [
+          {
+            "Name": "West",
+            "EndFrom": "T34\u0027",
+            "EndTo": "T0",
+            "EndLength": 6.4516,
+            "DeckPlate": [
+              "T34\u0027",
+              "T33\u0027",
+              "T1",
+              "T0"
+            ],
+            "EndFlangeThickness": 0.0508,
+            "EndFlangeWidth": 0.8128,
+            "EndFlangeBottomZ": -0.028575,
+            "EndWebOffset": 0.3429,
+            "EndWebThickness": 0.0254,
+            "EndWebHeightAtChord": 0.307975,
+            "EndWebHeightAtEnds": "NaN",
+            "EndWebScaledHeightAtEnds": 0.254,
+            "EndWebUnresolved": "UNRESOLVED (p.126): knuckle end web height at its ends - only the height at the CL1-CL2 chord (1\u0027-0 1/8) is dimensioned. End height 10\u0022 scaled from Section A-A.",
+            "DeckPlateThickness": 0.0254,
+            "DeckPlateTopZ": 0.022224999999999998,
+            "DeckPlateUnresolved": "UNRESOLVED (p.123-124): knuckle 1\u0022 deck plate elevation - the plate is shown in plan only. Top flush with the end flange top (7/8\u0022 above the tie WP).",
+            "Material": "ASTM A709 Gr. 50",
+            "PtAnchors": []
+          },
+          {
+            "Name": "East",
+            "EndFrom": "T34",
+            "EndTo": "T0\u0027",
+            "EndLength": 6.4516,
+            "DeckPlate": [
+              "T34",
+              "T33",
+              "T1\u0027",
+              "T0\u0027"
+            ],
+            "EndFlangeThickness": 0.0508,
+            "EndFlangeWidth": 0.8128,
+            "EndFlangeBottomZ": -0.028575,
+            "EndWebOffset": 0.3429,
+            "EndWebThickness": 0.0254,
+            "EndWebHeightAtChord": 0.307975,
+            "EndWebHeightAtEnds": "NaN",
+            "EndWebScaledHeightAtEnds": 0.254,
+            "EndWebUnresolved": "UNRESOLVED (p.126): knuckle end web height at its ends - only the height at the CL1-CL2 chord (1\u0027-0 1/8) is dimensioned. End height 10\u0022 scaled from Section A-A.",
+            "DeckPlateThickness": 0.0254,
+            "DeckPlateTopZ": 0.022224999999999998,
+            "DeckPlateUnresolved": "UNRESOLVED (p.123-124): knuckle 1\u0022 deck plate elevation - the plate is shown in plan only. Top flush with the end flange top (7/8\u0022 above the tie WP).",
+            "Material": "ASTM A709 Gr. 50",
+            "PtAnchors": []
+          }
+        ],
+        "Deck": {
+          "RightTie": "South tie",
+          "LeftTie": "North tie",
+          "EndKnuckles": [
+            "West",
+            "East"
+          ],
+          "TopAtFinishedGrade": true,
+          "FormBottomZ": 0.022224999999999998,
+          "FormDepth": 0.07619999999999999,
+          "FormPitch": 0.2032,
+          "FormTopFlat": 0.14604999999999999,
+          "FormFluteBottom": 0.03302,
+          "FormThickness": 0.0026568399999999997,
+          "FormDescription": "3\u0022 x 8\u0022 12 ga galvanized steel deck form (Gr 33, G165), L.B. Foster 3\u0022 bridge decking",
+          "FormUnresolved": "UNRESOLVED (L.B. Foster brochure p.6): steel deck form flute widths - the brochure drawing is not dimensioned (3\u0022 deep, 8\u0022 pitch, 24\u0022 cover only). Top flat 5 3/4\u0022 and flute bottom 1 5/16\u0022 scaled from the drawing.",
+          "ConcreteStrengthKsi": 5,
+          "Curbs": [
+            {
+              "Name": "Curb LT",
+              "InnerOffset": -2.1336,
+              "Width": 0.254,
+              "Height": 0.1016
+            },
+            {
+              "Name": "Curb RT",
+              "InnerOffset": 2.1336,
+              "Width": 0.254,
+              "Height": 0.1016
+            }
+          ],
+          "Tendons": [
+            {
+              "Name": "PT-N1",
+              "Path": [
+                {
+                  "Name": "FB1",
+                  "X": -29.237166944059204,
+                  "Y": 1.106134755361424,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB2",
+                  "X": -27.38434292952218,
+                  "Y": 1.1061355456924784,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB3",
+                  "X": -25.538625053936286,
+                  "Y": 1.1060294771696078,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB4",
+                  "X": -23.698933123620634,
+                  "Y": 1.1060968931865056,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB5",
+                  "X": -21.864141810006775,
+                  "Y": 1.1059635026014027,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB6",
+                  "X": -20.033201130091538,
+                  "Y": 1.106119976436014,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB7",
+                  "X": -18.20501060368607,
+                  "Y": 1.106098206104367,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB8",
+                  "X": -16.378513789623433,
+                  "Y": 1.1059927851762041,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB9",
+                  "X": -14.552649909994333,
+                  "Y": 1.1061579887387833,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB10",
+                  "X": -12.726351283188237,
+                  "Y": 1.1062931956779447,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB11",
+                  "X": -10.898571589742682,
+                  "Y": 1.1060527796504163,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB12",
+                  "X": -9.068216349490728,
+                  "Y": 1.1062641666370072,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB13",
+                  "X": -7.234246727914765,
+                  "Y": 1.1061864224009026,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB14",
+                  "X": -5.395557787161888,
+                  "Y": 1.1062501067517219,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB15",
+                  "X": -3.551075860883602,
+                  "Y": 1.1062308446875702,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB16",
+                  "X": -1.6996964831003925,
+                  "Y": 1.1061609653431694,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB17",
+                  "X": 0.15973995179487688,
+                  "Y": 1.1063262306960602,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB18",
+                  "X": 1.980723651787375,
+                  "Y": 1.106143351384735,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB19",
+                  "X": 3.7938879659285956,
+                  "Y": 1.1062707975719914,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB20",
+                  "X": 5.600285833757992,
+                  "Y": 1.1063970712900693,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB21",
+                  "X": 7.40097909093416,
+                  "Y": 1.1062557863503564,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB22",
+                  "X": 9.197072524736235,
+                  "Y": 1.1062344558269235,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB23",
+                  "X": 10.989610462666544,
+                  "Y": 1.1061590834583246,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB24",
+                  "X": 12.77964924793152,
+                  "Y": 1.106204980177937,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB25",
+                  "X": 14.568225605401711,
+                  "Y": 1.1062876903204582,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB26",
+                  "X": 16.35637819009423,
+                  "Y": 1.1063669999221113,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB27",
+                  "X": 18.14515447307555,
+                  "Y": 1.1061422823977778,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB28",
+                  "X": 19.93558159947976,
+                  "Y": 1.1062714354493641,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB29",
+                  "X": 21.728717537982767,
+                  "Y": 1.1062380159239202,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB30",
+                  "X": 23.526777165898167,
+                  "Y": 1.0912902697224798,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB31",
+                  "X": 25.327304324215003,
+                  "Y": 1.1062793184948014,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB32",
+                  "X": 27.134904100288377,
+                  "Y": 1.1061575171664977,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB33",
+                  "X": 28.949470461297476,
+                  "Y": 1.1060892844036951,
+                  "Z": 0.17779999999999999
+                }
+              ],
+              "Description": "Longitudinal PT tendon (A416 Gr 270 LR, grouted); strand count p.155 not transcribed - data only"
+            },
+            {
+              "Name": "PT-N2",
+              "Path": [
+                {
+                  "Name": "FB1",
+                  "X": -29.18475656196115,
+                  "Y": 0.703128413167736,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB2",
+                  "X": -27.338809334380706,
+                  "Y": 0.7022944238221416,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB3",
+                  "X": -25.499981438293286,
+                  "Y": 0.701470914078878,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB4",
+                  "X": -23.667190677965976,
+                  "Y": 0.7009384338846405,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB5",
+                  "X": -21.839309719591665,
+                  "Y": 0.700322864492231,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB6",
+                  "X": -20.015286572324666,
+                  "Y": 0.700115015111626,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB7",
+                  "X": -18.19401874611325,
+                  "Y": 0.6998468811008676,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB8",
+                  "X": -16.374447788491235,
+                  "Y": 0.6996131257014797,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB9",
+                  "X": -14.555510909398032,
+                  "Y": 0.6997680593822455,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB10",
+                  "X": -12.736138414804277,
+                  "Y": 0.700011062112204,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB11",
+                  "X": -10.915281973145651,
+                  "Y": 0.6999964743348532,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB12",
+                  "X": -9.091845093054662,
+                  "Y": 0.7005516545331898,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB13",
+                  "X": -7.264786930298449,
+                  "Y": 0.7009355667098089,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB14",
+                  "X": -5.4330005393776695,
+                  "Y": 0.7015786346827015,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB15",
+                  "X": -3.595410248949012,
+                  "Y": 0.7022563132689843,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB16",
+                  "X": -1.7509095912717543,
+                  "Y": 0.7030007272846173,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB17",
+                  "X": 0.10166303720788628,
+                  "Y": 0.7040974003120914,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB18",
+                  "X": 1.9295105436160918,
+                  "Y": 0.702983113326173,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB19",
+                  "X": 3.7495535778635043,
+                  "Y": 0.7022962661533705,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB20",
+                  "X": 5.562843081542933,
+                  "Y": 0.7017255992209828,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB21",
+                  "X": 7.370438888551771,
+                  "Y": 0.7010049306591659,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB22",
+                  "X": 9.17344378117433,
+                  "Y": 0.7005219437229888,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB23",
+                  "X": 10.9729000792665,
+                  "Y": 0.7001027781426421,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB24",
+                  "X": 12.769862116319466,
+                  "Y": 0.6999228466121012,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB25",
+                  "X": 14.565364606003229,
+                  "Y": 0.6998977609638843,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB26",
+                  "X": 16.36044419123303,
+                  "Y": 0.699987340447453,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB27",
+                  "X": 18.156146330656515,
+                  "Y": 0.6998909573944991,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB28",
+                  "X": 19.95349615725648,
+                  "Y": 0.7002664741254119,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB29",
+                  "X": 21.75354962840958,
+                  "Y": 0.7005973778154653,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB30",
+                  "X": 23.55851961156654,
+                  "Y": 0.6861318104216894,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB31",
+                  "X": 25.365947939873884,
+                  "Y": 0.7017207554055891,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB32",
+                  "X": 27.180437695448042,
+                  "Y": 0.7023163952982117,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB33",
+                  "X": 29.001880843416167,
+                  "Y": 0.7030829422126907,
+                  "Z": 0.17779999999999999
+                }
+              ],
+              "Description": "Longitudinal PT tendon (A416 Gr 270 LR, grouted); strand count p.155 not transcribed - data only"
+            },
+            {
+              "Name": "PT-S2",
+              "Path": [
+                {
+                  "Name": "FB1",
+                  "X": -29.001880843322752,
+                  "Y": -0.7030829421820466,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB2",
+                  "X": -27.18043769538359,
+                  "Y": -0.7023163952076776,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB3",
+                  "X": -25.3659479398329,
+                  "Y": -0.7017207552539078,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB4",
+                  "X": -23.558519611543804,
+                  "Y": -0.6861318102078373,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB5",
+                  "X": -21.753549628402016,
+                  "Y": -0.7005973775388035,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB6",
+                  "X": -19.953496157260105,
+                  "Y": -0.700266473785377,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB7",
+                  "X": -18.15614633066832,
+                  "Y": -0.6998909569907283,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB8",
+                  "X": -16.360444191250558,
+                  "Y": -0.6999873399796963,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB9",
+                  "X": -14.565364606024339,
+                  "Y": -0.6998977604319823,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB10",
+                  "X": -12.769862116342315,
+                  "Y": -0.6999228460159663,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB11",
+                  "X": -10.972900079289557,
+                  "Y": -0.7001027774822357,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB12",
+                  "X": -9.17344378119618,
+                  "Y": -0.7005219429982845,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB13",
+                  "X": -7.3704388885711065,
+                  "Y": -0.7010049298701713,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB14",
+                  "X": -5.562843081558414,
+                  "Y": -0.7017255983677506,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB15",
+                  "X": -3.749553577873843,
+                  "Y": -0.7022962652359659,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB16",
+                  "X": -1.9295105436198043,
+                  "Y": -0.7029831123447294,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB17",
+                  "X": -0.10166303720332814,
+                  "Y": -0.7040973992667827,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB18",
+                  "X": 1.7509095912849812,
+                  "Y": -0.7030007261720148,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB19",
+                  "X": 3.5954102489686246,
+                  "Y": -0.7022563120888505,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB20",
+                  "X": 5.433000539401235,
+                  "Y": -0.7015786334348197,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB21",
+                  "X": 7.264786930323311,
+                  "Y": -0.7009355653940803,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB22",
+                  "X": 9.091845093078216,
+                  "Y": -0.7005516531495912,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB23",
+                  "X": 10.915281973165248,
+                  "Y": -0.6999964728834387,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB24",
+                  "X": 12.736138414817406,
+                  "Y": -0.7000110605931624,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB25",
+                  "X": 14.55551090940231,
+                  "Y": -0.6997680577958292,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB26",
+                  "X": 16.37444778848457,
+                  "Y": -0.6996131240480219,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB27",
+                  "X": 18.194018746093914,
+                  "Y": -0.6998468793807664,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB28",
+                  "X": 20.015286572291256,
+                  "Y": -0.7001150133253162,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB29",
+                  "X": 21.83930971954337,
+                  "Y": -0.7003228626401428,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB30",
+                  "X": 23.66719067790248,
+                  "Y": -0.7009384319671677,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB31",
+                  "X": 25.499981438214952,
+                  "Y": -0.7014709120963283,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB32",
+                  "X": 27.33880933428858,
+                  "Y": -0.7022944217746927,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB33",
+                  "X": 29.184756561857068,
+                  "Y": -0.7031284110553693,
+                  "Z": 0.17779999999999999
+                }
+              ],
+              "Description": "Longitudinal PT tendon (A416 Gr 270 LR, grouted); strand count p.155 not transcribed - data only"
+            },
+            {
+              "Name": "PT-S1",
+              "Path": [
+                {
+                  "Name": "FB1",
+                  "X": -28.9494704612247,
+                  "Y": -1.1060892843757348,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB2",
+                  "X": -27.134904100242114,
+                  "Y": -1.1061575170780145,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB3",
+                  "X": -25.3273043241899,
+                  "Y": -1.1062793183446378,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB4",
+                  "X": -23.52677716588915,
+                  "Y": -1.0912902695097024,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB5",
+                  "X": -21.72871753798691,
+                  "Y": -1.106238015647975,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB6",
+                  "X": -19.935581599493233,
+                  "Y": -1.1062714351097644,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB7",
+                  "X": -18.145154473095502,
+                  "Y": -1.1061422819942277,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB8",
+                  "X": -16.35637819011836,
+                  "Y": -1.1063669994544205,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB9",
+                  "X": -14.568225605428037,
+                  "Y": -1.1062876897885205,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB10",
+                  "X": -12.779649247958357,
+                  "Y": -1.106204979581707,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB11",
+                  "X": -10.989610462692527,
+                  "Y": -1.1061590827977987,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB12",
+                  "X": -9.197072524760115,
+                  "Y": -1.1062344551021015,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB13",
+                  "X": -7.400979090954791,
+                  "Y": -1.106255785561265,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB14",
+                  "X": -5.600285833774196,
+                  "Y": -1.1063970704367705,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB15",
+                  "X": -3.7938879659392524,
+                  "Y": -1.1062707966545513,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB16",
+                  "X": -1.980723651791166,
+                  "Y": -1.1061433504032814,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB17",
+                  "X": -0.15973995179031875,
+                  "Y": -1.1063262296507512,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB18",
+                  "X": 1.6996964831136983,
+                  "Y": -1.1061609642305767,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB19",
+                  "X": 3.5510758609035333,
+                  "Y": -1.1062308435074706,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB20",
+                  "X": 5.395557787186176,
+                  "Y": -1.1062501055039067,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB21",
+                  "X": 7.2342467279409215,
+                  "Y": -1.1061864210852717,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB22",
+                  "X": 9.06821634951631,
+                  "Y": -1.1062641652535263,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB23",
+                  "X": 10.898571589765202,
+                  "Y": -1.106052778199122,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB24",
+                  "X": 12.726351283205352,
+                  "Y": -1.1062931941589995,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB25",
+                  "X": 14.552649910003828,
+                  "Y": -1.1061579871524043,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB26",
+                  "X": 16.37851378962337,
+                  "Y": -1.1059927835226802,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB27",
+                  "X": 18.205010603674875,
+                  "Y": -1.1060982043840455,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB28",
+                  "X": 20.033201130067976,
+                  "Y": -1.1061199746492694,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB29",
+                  "X": 21.864141809970185,
+                  "Y": -1.1059635007485977,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB30",
+                  "X": 23.69893312357085,
+                  "Y": -1.1060968912679585,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB31",
+                  "X": 25.538625053873833,
+                  "Y": -1.1060294751855415,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB32",
+                  "X": 27.384342929448245,
+                  "Y": -1.1061355436429787,
+                  "Z": 0.17779999999999999
+                },
+                {
+                  "Name": "FB33",
+                  "X": 29.237166943975758,
+                  "Y": -1.1061347532463734,
+                  "Z": 0.17779999999999999
+                }
+              ],
+              "Description": "Longitudinal PT tendon (A416 Gr 270 LR, grouted); strand count p.155 not transcribed - data only"
+            }
+          ]
+        },
+        "Bearings": [
+          {
+            "Name": "NW",
+            "Support": "Pier 10",
+            "Point": "BRG-NW",
+            "SeatElevation": 162.98448480000002,
+            "SteelUndersideZ": -0.053974999999999995,
+            "Fixity": "Partially fixed",
+            "PadThickness": 0.003175,
+            "MasonryLength": 0.9652000000000001,
+            "MasonryWidth": 0.4318,
+            "MasonryThickness": 0.0508,
+            "SoleLength": 0.4064,
+            "SoleWidth": 0.381,
+            "LowerSoleThickness": 0.07619999999999999,
+            "ElastomerLength": 0.381,
+            "ElastomerWidth": 0.381,
+            "ElastomerHeight": 0.09207499999999999,
+            "UpperSoleA": 0.079375,
+            "UpperSoleB": 0.07619999999999999,
+            "UpperSoleC": 0.07302499999999999,
+            "AnchorDiameter": 0.038099999999999995,
+            "AnchorEmbedment": 0.45720000000000005,
+            "AnchorAlong": 0.3302,
+            "AnchorAcross": 0.1397,
+            "PinDiameter": 0.07619999999999999
+          },
+          {
+            "Name": "SW",
+            "Support": "Pier 10",
+            "Point": "BRG-SW",
+            "SeatElevation": 163.0006392,
+            "SteelUndersideZ": -0.053974999999999995,
+            "Fixity": "Partially fixed",
+            "PadThickness": 0.003175,
+            "MasonryLength": 0.9652000000000001,
+            "MasonryWidth": 0.4318,
+            "MasonryThickness": 0.0508,
+            "SoleLength": 0.4064,
+            "SoleWidth": 0.381,
+            "LowerSoleThickness": 0.07619999999999999,
+            "ElastomerLength": 0.381,
+            "ElastomerWidth": 0.381,
+            "ElastomerHeight": 0.09207499999999999,
+            "UpperSoleA": 0.079375,
+            "UpperSoleB": 0.07619999999999999,
+            "UpperSoleC": 0.07302499999999999,
+            "AnchorDiameter": 0.038099999999999995,
+            "AnchorEmbedment": 0.45720000000000005,
+            "AnchorAlong": 0.3302,
+            "AnchorAcross": 0.1397,
+            "PinDiameter": 0.07619999999999999
+          },
+          {
+            "Name": "NE",
+            "Support": "Pier 11",
+            "Point": "BRG-NE",
+            "SeatElevation": 162.01522080000004,
+            "SteelUndersideZ": -0.053974999999999995,
+            "Fixity": "Partially fixed",
+            "PadThickness": 0.003175,
+            "MasonryLength": 0.9652000000000001,
+            "MasonryWidth": 0.4318,
+            "MasonryThickness": 0.0508,
+            "SoleLength": 0.4064,
+            "SoleWidth": 0.381,
+            "LowerSoleThickness": 0.07619999999999999,
+            "ElastomerLength": 0.381,
+            "ElastomerWidth": 0.381,
+            "ElastomerHeight": 0.09207499999999999,
+            "UpperSoleA": 0.079375,
+            "UpperSoleB": 0.07619999999999999,
+            "UpperSoleC": 0.07302499999999999,
+            "AnchorDiameter": 0.038099999999999995,
+            "AnchorEmbedment": 0.45720000000000005,
+            "AnchorAlong": 0.3302,
+            "AnchorAcross": 0.1397,
+            "PinDiameter": 0.07619999999999999
+          },
+          {
+            "Name": "SE",
+            "Support": "Pier 11",
+            "Point": "BRG-SE",
+            "SeatElevation": 161.9993712,
+            "SteelUndersideZ": -0.053974999999999995,
+            "Fixity": "Partially fixed",
+            "PadThickness": 0.003175,
+            "MasonryLength": 0.9652000000000001,
+            "MasonryWidth": 0.4318,
+            "MasonryThickness": 0.0508,
+            "SoleLength": 0.4064,
+            "SoleWidth": 0.381,
+            "LowerSoleThickness": 0.07619999999999999,
+            "ElastomerLength": 0.381,
+            "ElastomerWidth": 0.381,
+            "ElastomerHeight": 0.09207499999999999,
+            "UpperSoleA": 0.079375,
+            "UpperSoleB": 0.07619999999999999,
+            "UpperSoleC": 0.07302499999999999,
+            "AnchorDiameter": 0.038099999999999995,
+            "AnchorEmbedment": 0.45720000000000005,
+            "AnchorAlong": 0.3302,
+            "AnchorAcross": 0.1397,
+            "PinDiameter": 0.07619999999999999
+          }
+        ],
+        "Unresolved": [
+          "UNRESOLVED (p.102, 107, 119, 124): arch pedestal / bearing elevations (B1-B3) - the plan pedestal tops do not reconcile with the WP elevations \u002B bearing stack (0.13-0.20 ft; EL A vs E 0.053 ft). Bearings are built up from the plan pedestal tops; the chain difference is a CHECK row.",
+          "UNRESOLVED (p.102): which arch pedestal is EL A / EL E - the view direction of the pier elevation is not stated on the sheet. EL A = south at Pier 10 / north at Pier 11, as derived from p.102 \u002B p.91 by the approach model.",
+          "UNRESOLVED (p.94, 102, 119): CL1 / CL2 relative to the piers (U3) - no combination of the layout offsets reproduces the plan chord 200\u0027-11 11/16. CL1/CL2 = 7\u0022 along the pier \u002B 4 13/16\u0022 toward the span; the local geometry is kept and the difference reported.",
+          "UNRESOLVED (p.119-150): camber / no-load geometry (U4) - not given. Final geometry modeled.",
+          "UNRESOLVED (p.120, 143, 93): tie girder field splices (U5) - the TS1-TS3 table, TS(1)-TS(4) on the framing plan and the 5 erection segments disagree. Ties are continuous (no splice plates).",
+          "UNRESOLVED (p.147, 128): hanger anchor offsets from the rib WP (U6) - H points lie 0.81-0.84 ft inside the rib WP circle and U points 0.685 ft off its plane; the offset rule is not stated. Hanger and bracing points are taken from the tables as printed.",
+          "UNRESOLVED (p.107, 93): sole plate weld target (U8) - the bearing note and the erection sequence name different plates. Not modeled (welds).",
+          "UNRESOLVED (p.119, 124): WP position in the tie / steel underside at the bearings (U10) - the WP is at the bottom of the tie flange (p.119) but drawn inside the 2\u0022 end flange (p.124) and the plate below it is not dimensioned. End flange from 1 1/8\u0022 below to 7/8\u0022 above the WP (tie flange \u002B 1 1/8\u0022 fill = 2\u0022), steel underside 1\u0022 lower.",
+          "UNRESOLVED (p.148): hanger sockets vs the supplied WireCo catalog - the plan sockets (pin 1.378\u0022, W 16.18\u0022 / 34.41\u0022) are not the catalog\u0027s 1\u0022 open strand socket (Table 6 p.20: pin 2 1/4\u0022, A 12\u0022). Sockets modeled at the plan table dimensions; the catalog row is reported by check-arch-nht.csx."
+        ]
+      }
     }
   ],
   "References": []
