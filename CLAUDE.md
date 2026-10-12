@@ -13,6 +13,8 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   the GPU viewport (`out_view.png`) and every editor tab, then exits. Normal screen capture of WPF shows blank in this
   environment â€” use `--snapshot`.
 - Session log: `%LOCALAPPDATA%\SteelBridgeModeler\session.log` (messages + exceptions).
+- Close-up of any point: `--camera E,N,Z,dx,dy,dz,width[,dist]` (re-applied after the 3D switch's animated zoom, so it now takes), `--winsize W,H`
+  (bigger window / viewport), `--off REF-` (hide reference models). Flagged-layer parts are NOT hidden by default.
 
 - Release: `dotnet publish src/SBM.App -c Release -r win-x64 --self-contained false -p:PublishReadyToRun=true -o dist/SteelBridgeModeler`
   and the same for `src/SBM.Cli` (same output folder â†’ `sbm.exe` beside the app).
@@ -679,7 +681,10 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   UNRESOLVED WARNING TEXT (user rule): every flag names the plan page AND a short plain reason why it is open - build new ones with
   `UnresolvedFlag.Text(pages, item, why, then)` (SBM.Core/Assumption.cs) -> "UNRESOLVED (p.17): CMP casing bottom - it is the bottom of the EPS fill, which is in the
   road plans, not this set. ..."; generic generators use the definition's `Source` for the page when they have one. Diagnostics have no structured reason field.
-  UNRESOLVED FLAG (general, reusable): `SBM.Core/Assumption.cs` `Assumption{Status="UNRESOLVED", Reason (what the plans lack + PDF page), Basis (what was assumed)}` on the element
+  UNRESOLVED DIMENSION vs EXISTENCE (user rule 2026-10-12): `Assumption.DimensionOnly` (`Assumption.UnresolvedDimension(...)`) = the plans clearly show the
+  part, only a dimension / position is open -> the steel part stays on its NORMAL viewport layer with the status flag (pick props, IFC SBM_Status); plain
+  `Assumption.Unresolved` = the part itself may not exist -> 3D-UNRESOLVED-STEEL. Applied to all tied arch parts; other generators unchanged.
+UNRESOLVED FLAG (general, reusable): `SBM.Core/Assumption.cs` `Assumption{Status="UNRESOLVED", Reason (what the plans lack + PDF page), Basis (what was assumed)}` on the element
   (`MiscElement.Assumption`; set with `Flag(name, reason, basis)`). Consumers: viewport layer `3D-UNRESOLVED` (all flagged elements, orange, removed from their normal layers; reason in the pick
   properties; isolate with the layer toggles), IFC Pset `SBM_Status` {Status, Reason, Basis}, database props `status/reason/assumed` + view `v_unresolved` (with QC status), one warning per reason.
   Plan dimension that governs over a derived one (piped drains 22-25: tube 1'-8 from CL girder A) is modeled and the disagreement raised as `CONFLICT (plan vs model)`.
@@ -753,6 +758,11 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   linework (`tools/nht_bracing_plates.py` + generic `tools/pdfvec.py`: plan PDFs without text layer still have vector strokes - prefer them to raster
   scaling) -> `upper-lateral-bracing-plates.csv`; sheet 'U(n)' fits points U(12-n) (CONFLICT). Weight checks group by the plan quantity notes + pay
   items. Remaining GAPs: railing, duct, D3 bars, camber, tie web studs (no spacing).
+  v4 (design note section 9, user review): gussets are ONE bent plate (`OneBentPlate`: brace rolls + leg slides solved together by a small
+  Nelder-Mead, legs closed on the common bend line; CHECKS for the leg tilt / welded edge gap); knuckle splice + fill plates from the p.124 plan outline
+  (`ArchKnuckleDetail.Splice*`, acute end corner cut, end flange bolt rows), end flange ends cut parallel to the chords; bearings hung from the steel
+  (`ArchBearingDefinition.HangFromSteel`, upper sole top in the steel plane, pedestal kept = CONFLICT per p.107 note 8); cable connectors on their own
+  layer 3D-ARCH-CABLE-CONNECTORS.
 - True-arc plate outlines (generic): `Solids/ArcPolygon` (points + signed minor-arc radii per edge, exact area, tessellation, Sub / Map / Reversed),
   `PlateBuilder.AddPlanarArc` (mesh from the tessellation, `ExtrudedSolid.ExactOutline` keeps the arcs) -> IFC Parametric IfcIndexedPolyCurve with
   IfcArcIndex, ReferenceView tessellated to its chord tolerance. Tests `ArchBracingConnectionTests`. Tests `ArchTests`, `ArchV2Tests`. Knuckle visual check without a snapshot: `temp`-style dump of part triangles + a small
