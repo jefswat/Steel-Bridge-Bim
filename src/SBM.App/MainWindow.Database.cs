@@ -246,6 +246,8 @@ public partial class MainWindow
     {
         if (_db == null || _dbTags == null) return;
         var ids = new HashSet<string>(_db.Descendants(gid, 60000));
+        ids.Add(gid);
+        var tags = new List<object>();
         var pos = new Vector3Collection();
         var nrm = new Vector3Collection();
         var idx = new IntCollection();
@@ -258,6 +260,7 @@ public partial class MainWindow
             {
                 var raw = RawModelObject(table.Tags[i]);
                 if (raw == null || _dbTags.Lookup(raw) is not { } g || !ids.Contains(g)) continue;
+                tags.Add(table.Tags[i]);
                 int t0 = table.TriStart[i], t1 = i + 1 < table.TriStart.Count ? table.TriStart[i + 1] : full.Indices!.Count / 3;
                 for (int t = t0; t < t1; t++)
                     for (int k = 0; k < 3; k++)
@@ -270,10 +273,18 @@ public partial class MainWindow
                 tris += t1 - t0;
             }
         }
+        // Instanced objects (bolts, studs, bars) are not drawn in the highlight but belong to the group (isolate).
+        foreach (var kv in SceneBuilder.InstanceTags)
+            foreach (var t in kv.Value)
+                if (RawModelObject(t) is { } raw && _dbTags.Lookup(raw) is { } g && ids.Contains(g)) tags.Add(t);
         ClearHighlight();
-        if (tris == 0) return;
+        _selectedTag = null;
+        _selectedModel = null;
+        _groupSel = null;
+        if (tris == 0 && tags.Count == 0) return;
         var geo = new MeshGeometry3D { Positions = pos, Normals = nrm, Indices = idx };
         geo.UpdateBounds();
-        ShowHighlight(geo);
+        if (tris > 0) ShowHighlight(geo);
+        _groupSel = (_db.Get(gid) is { } info ? (info.Name.Length > 0 ? info.Name : info.Category) : gid, tags.Distinct().ToList(), geo);
     }
 }

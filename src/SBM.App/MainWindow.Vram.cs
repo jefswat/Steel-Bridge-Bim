@@ -288,7 +288,7 @@ public partial class MainWindow
             {
                 SetResident(m, true);
                 string layer = _modelLayer.GetValueOrDefault(m, "");
-                m.Visibility = !_planMode && _vm.IsLayerVisible(layer) ? Visibility.Visible : Visibility.Collapsed;
+                m.Visibility = LayerModeOk(layer) && _vm.IsLayerVisible(layer) ? Visibility.Visible : Visibility.Collapsed;
             }
         }
         _farBridges = far;
