@@ -39,6 +39,8 @@ public static class IfcKeys
     public static string PsStrand(string bk, string mark, int n) => $"{bk}/ps/{mark}/strand/{n}";
     /// <summary>Debond sheathing of strand n at the start (end 0) or end (end 1) of the beam.</summary>
     public static string PsSheath(string bk, string mark, int n, int end) => $"{bk}/ps/{mark}/strand/{n}/sheath/{end}";
+    /// <summary>Mild reinforcing bar n (placement order) of a prestressed beam.</summary>
+    public static string PsBar(string bk, string mark, int n) => $"{bk}/ps/{mark}/bar/{n}";
     public static string PsPad(string bk, string mark) => $"{bk}/ps/pad/{mark}";
     public static string Diaphragm(string bk, string support) => $"{bk}/diaphragm/{support}";
     public static string DiaphragmAccessory(string bk, string support, int n) => $"{bk}/diaphragm/{support}/acc/{n}";

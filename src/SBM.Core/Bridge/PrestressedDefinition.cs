@@ -143,6 +143,10 @@ public sealed class PrestressedBeamDefinition
     public List<string>? Unresolved { get; set; }
     /// <summary>Different beams per span / beam line (base definition = this one). Null = this beam everywhere.</summary>
     public List<PrestressedSpanBeam>? SpanBeams { get; set; }
+    /// <summary>Mild reinforcing of the beam (stirrups, end-zone bars, longitudinal bars) from the beam standard / plan sheet
+    /// (OPTIONAL; null = no beam bars, output unchanged). <c>StandardBeamRebar</c> builds it per designation.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public BeamReinforcementDefinition? Reinforcement { get; set; }
 
     /// <summary>The definition that applies to a span and beam line (last matching <see cref="SpanBeams"/> entry, else this).</summary>
     public PrestressedBeamDefinition For(int span, int girder)
@@ -164,6 +168,7 @@ public sealed class PrestressedBeamDefinition
         c.HarpedColumns = HarpedColumns?.ToList();
         c.Unresolved = Unresolved?.ToList();
         c.SpanBeams = SpanBeams?.Select(s => s.Clone()).ToList();
+        c.Reinforcement = Reinforcement?.Clone();
         return c;
     }
 

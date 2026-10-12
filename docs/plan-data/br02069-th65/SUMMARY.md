@@ -162,7 +162,7 @@ SOQ p2: barrier 273 LF; struct. conc. 140 CY (71+69 ok); bars 19200/19970/250; s
 | U8 | pile tip elevations | p4, p9 | UNRESOLVED |
 | U9 | mask / infill wall E end and corners | p3, p5, p10, p11 | closed: infill wall only in the E 18'-5"; mask wall W only; mask wall along-bridge ends DERIVED from footing lines (not dimensioned directly) |
 | U10 | camber shape | p16 | UNRESOLVED |
-| U11 | beam bars: extent of the G402E-paired G303E zone; G806E bar length; which end positions take G505E vs G508E | p16 | UNRESOLVED (not dimensioned, no bill) |
+| U11 | beam bars: extent of the G402E-paired G303E zone; G806E bar length; which end positions take G505E vs G508E | p16, Fig. 5-397.501(B) | PARTLY CLOSED: G505E at the first station, G508E at the other four of the 2 1/2" group (standard figure: that group is the splitting reinforcement, G402E "spg. except as noted"); G303E-with-G402E extent and G806E length stay UNRESOLVED (not placed) |
 | U12 | pedestal heights (only tops given) | p5, p10, p6 | DERIVED from seat-elevations.csv minus seat; no direct dimension |
 
 ## Model mapping

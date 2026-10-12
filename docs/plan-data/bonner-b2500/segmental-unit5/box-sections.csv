@@ -1,0 +1,13 @@
+section_no,x_from_bent_CL_ft (joint at 5'+14'(j-1)),H_structure_depth_plan,H_in,H_ft,half_bottom_slab_W2_plan,W2_in,W2_from_1:4_web_slope_in (143.5-(H-26)/4),W2_slope_minus_plan_in,T_bottom_slab_thk_plan,T_in,H_parabola_fit_in (108+(120/154^2... )*(159-x)^2),fit_minus_plan_in,"gross_concrete_area_ft2 (DERIVED polygon, no fillets/diaphragms)",pdf_page,sheet,tag
+1,5,"19'-0""",228,19.0,"7'-9""",93,93.0,0.0,"2'-0""",24,228.0,0.0,126.139,268,S3-20,TEXT (RASTER-confirmed table 220 dpi); derived columns DERIVED
+2,19,"17'-3 1/8""",207.125,17.2604,"8'-2 1/4""",98.25,98.219,-0.031,"1'-9 1/4""",21.25,207.174,0.049,119.757,268,S3-20,TEXT (RASTER-confirmed table 220 dpi); derived columns DERIVED
+3,33,"15'-8 3/8""",188.375,15.6979,"8'-6 7/8""",102.875,102.906,0.031,"1'-6 3/8""",18.375,188.331,-0.044,113.196,268,S3-20,TEXT (RASTER-confirmed table 220 dpi); derived columns DERIVED
+4,47,"14'-3 1/2""",171.5,14.2917,"8'-11 1/8""",107.125,107.125,0.0,"1'-3 5/8""",15.625,171.471,-0.029,106.782,268,S3-20,TEXT (RASTER-confirmed table 220 dpi); derived columns DERIVED
+5,61,"13'-0 5/8""",156.625,13.0521,"9'-2 7/8""",110.875,110.844,-0.031,"1'-0 3/4""",12.75,156.595,-0.03,100.271,268,S3-20,TEXT (RASTER-confirmed table 220 dpi); derived columns DERIVED
+6,75,"11'-11 3/4""",143.75,11.9792,"9'-6""",114,114.062,0.062,"10""",10,143.702,-0.048,94.056,268,S3-20,TEXT (RASTER-confirmed table 220 dpi); derived columns DERIVED
+7,89,"11'-0 3/4""",132.75,11.0625,"9'-8 7/8""",116.875,116.812,-0.062,"10""",10,132.793,0.043,91.917,268,S3-20,TEXT (RASTER-confirmed table 220 dpi); derived columns DERIVED
+8,103,"10'-3 7/8""",123.875,10.3229,"9'-11""",119,119.031,0.031,"10""",10,123.868,-0.007,90.191,268,S3-20,TEXT (RASTER-confirmed table 220 dpi); derived columns DERIVED
+9,117,"9'-8 7/8""",116.875,9.7396,"10'-0 3/4""",120.75,120.781,0.031,"10""",10,116.926,0.051,88.83,268,S3-20,TEXT (RASTER-confirmed table 220 dpi); derived columns DERIVED
+10,131,"9'-4""",112,9.3333,"10'-2""",122,122.0,0.0,"10""",10,111.967,-0.033,87.882,268,S3-20,TEXT (RASTER-confirmed table 220 dpi); derived columns DERIVED
+11,145,"9'-1""",109,9.0833,"10'-2 3/4""",122.75,122.75,0.0,"10""",10,108.992,-0.008,87.299,268,S3-20,TEXT (RASTER-confirmed table 220 dpi); derived columns DERIVED
+12,159,"9'-0""",108,9.0,"10'-3""",123,123.0,0.0,"10""",10,108.0,0.0,87.104,268,S3-20,TEXT (RASTER-confirmed table 220 dpi); derived columns DERIVED

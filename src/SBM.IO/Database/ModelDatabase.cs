@@ -1094,6 +1094,11 @@ public static class ModelDatabase
                         _w.Add(h);
                     }
                 }
+                if (b.Bars.Count > 0)
+                {
+                    string unit = b.Bars[0].Unit;
+                    Bars(b.Bars, ps.BarMarks.Where(m => m.Unit == unit), (bar, m) => aid, i => IfcKeys.PsBar(bk, b.Mark, i), b.Definition?.Reinforcement?.SteelYieldKsi ?? 60, "");
+                }
             }
             foreach (var p in ps.Pads)
             {

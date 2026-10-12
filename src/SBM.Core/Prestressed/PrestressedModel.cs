@@ -73,6 +73,11 @@ public sealed class PrestressedBeam
     public double SkewStart { get; init; }
     public double SkewEnd { get; init; }
     public List<StrandInstance> Strands { get; } = new();
+    /// <summary>Mild reinforcing bars of this beam (<see cref="PrestressedBeamDefinition.Reinforcement"/>); marks in
+    /// <see cref="PrestressedModel.BarMarks"/> by (<see cref="Concrete.BarPlacement.Unit"/>, Mark). Empty = none.</summary>
+    public List<Concrete.BarPlacement> Bars { get; } = new();
+    /// <summary>Beam bars crossing an end face, per mark: (count, largest distance outside, m) - skewed ends.</summary>
+    public Dictionary<string, (int Count, double Max)> BarsOutsideEnd { get; } = new();
     public double StrandDiameter { get; init; }
     /// <summary>Distance from each girder end to the hold-down points (depressed strands only).</summary>
     public double HoldDownFromEnd { get; init; }
@@ -127,6 +132,12 @@ public sealed class PrestressedModel
     public List<PrestressedPad> Pads { get; } = new();
     public List<BearingSeat> BearingSeats { get; } = new();
     public List<Diagnostic> Diagnostics { get; } = new();
+    /// <summary>Beam reinforcing marks, one per (unit = "{designation} beams", mark); counts = all beams of the bridge. Empty = none.</summary>
+    public List<Concrete.BarMark> BarMarks { get; } = new();
+    /// <summary>Total mass of the beam reinforcing (kg), scheduled lengths.</summary>
+    public double RebarMass => BarMarks.Sum(m => m.TotalMass);
+    /// <summary>Mark of a beam bar.</summary>
+    public Concrete.BarMark MarkOf(Concrete.BarPlacement b) => BarMarks.First(m => m.Unit == b.Unit && m.Mark == b.Mark);
     public TimeSpan GenerationTime { get; set; }
     /// <summary>Concrete end / pier diaphragms (<see cref="Bridge.SupportDefinition.Diaphragm"/>), set by RegenerationCache phase 2
     /// (after the substructure); null = none.</summary>

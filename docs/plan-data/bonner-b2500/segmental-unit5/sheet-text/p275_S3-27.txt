@@ -1,0 +1,59 @@
+# PDF p.275 sheet S3-27: END SEGMENT REINFORCEMENT
+# decoded text layer, rows grouped by y (top to bottom), cells separated by ' | '. Fractions decoded from font glyphs (calibrated on raster). Drawing geometry is NOT in this text.
+48: SYMM. ABOUT { GIRDER
+75: 8" | #6E5 | #6E3 | 9" | #6E4 | 3 SPA. @ 1'-0" | 8-#4E7 @ 1'-0" (TOP & BOT.) | 3"
+107: 9" 6 1/2" | 21-#4E6 @ 1'-0"  (TOP & BOT.) | 1-#4E37
+123:  | (TOP & BOT.)
+140: 1-#4E38
+143: SPAN FACE
+147: #5E33 (BOT.)
+153: #4E46 | (TOP & BOT.)
+157: 1-#4E6
+456: #5A9
+471: & #5S1
+576: #5E35
+592: (TOP
+607: & BOT.)
+622: #5E48 | #5E34
+667: ANCHOR FACE
+692: 1-#5E2 & 1-#4E45
+713: #4E45 @ 1'-0"
+772: 9 1/2" | #5E2 @ 6" | #5E36 @ 6"
+819: HALF PLAN - TOP SLAB | HALF PLAN - BOTTOM SLAB
+853: PLAN
+858: 8'-8"
+883: 6'-6" | 2'-2"
+909: 6-#5S1 (E.F.) & 12-#5A9 (SPA. AS SHOWN) | 4-#6S2 (E.F.) & 4-#5A9 @ 6"
+928: 8'-8" | NOTES
+935: 6" | 1'-7" | 6" | 1'-6" | 6" | 1'-7" | 1'-6" | 4"
+954: 6'-6" | 2'-2"
+960: 3" | #5E1 (TOP) | #5E1 | 7" | 1. FOR NOTES, SEE SHEET 1 OF 4.
+979: PAIRED  | 3" | 10-#5E1 @ 8" (TOP) | 6-#5E1 | 6"
+986: 2. ADJUST #4E45 TO AVOID MODULAR
+995: (TOP & | PAIRED
+999: BLOCKOUT ASSEMBLY.
+1011: BOT.) | @ 9" (TOP
+1014: #4E6 | #6E5 | #4E6 | #6E5
+1029: & BOT.)
+1123: #4E45 | #4E45
+1155: PROJECT NO. B-2500 (PHASE I)
+1191: DARE | COUNTY
+1227: STATION: | 102+67.76  -L-
+1247: #5E2 | #5E2
+1267: SHEET 3 OF 4
+1281: #5E39
+1291: #5E39
+1298: STATE OF NORTH CAROLINA
+1309: 3" | 6-#5E23 (BOT.) | #5E39 | 4 1/2" | DEPARTMENT OF TRANSPORTATION
+1322: 6-#5E24 @ 8" (BOT.) | 4-#5E39
+1327: (SPA. W/#5E24) | RALEIGH
+1340: @ 9"
+1348: C A
+1364: S S
+1382: END SEGMENT
+1409: REINFORCEMENT
+1440: ELEVATION A-A | SECTION B-B | I C
+1483: REVISIONS
+1492: NO.
+1520: DRAWN BY : | DATE :
+1532: P. WALKER | 8/27/12 | 2 | 4

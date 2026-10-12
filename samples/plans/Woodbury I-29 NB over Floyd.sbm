@@ -4344,7 +4344,734 @@
                 "SheathThickness": 0.0015875,
                 "Source": "Iowa DOT standard BTD beam BTD105: Woodbury Design 817 p.27 (DS 25) beam data, Woodbury p.30 (DS 28) strand pattern",
                 "Unresolved": null,
-                "SpanBeams": null
+                "SpanBeams": null,
+                "Reinforcement": {
+                  "Source": "Iowa DOT std 4742 BTD105 \u002B 4730 (issued 05-04, rev. 08-09, as printed in the plans): Woodbury Design 817 PDF p.30 (DS 28), Woodbury Design 817 PDF p.27 (DS 25)",
+                  "SteelYieldKsi": 60,
+                  "Bars": [
+                    {
+                      "Mark": "5b1",
+                      "Size": "#5",
+                      "Epoxy": true,
+                      "Coating": "",
+                      "ShapeCode": "HAIRPIN",
+                      "Description": "web hairpin with 6 in feet, projects 5 in above the beam",
+                      "Path": [
+                        {
+                          "A": 0.1444625,
+                          "X": -0.041275,
+                          "Y": 0.0587375
+                        },
+                        {
+                          "A": 0,
+                          "X": -0.041275,
+                          "Y": 0.0587375
+                        },
+                        {
+                          "A": 0,
+                          "X": -0.041275,
+                          "Y": 1.4906625
+                        },
+                        {
+                          "A": 0,
+                          "X": 0.041275,
+                          "Y": 1.4906625
+                        },
+                        {
+                          "A": 0,
+                          "X": 0.041275,
+                          "Y": 0.0587375
+                        },
+                        {
+                          "A": 0.1444625,
+                          "X": 0.041275,
+                          "Y": 0.0587375
+                        }
+                      ],
+                      "BendRadius": 0.041275,
+                      "Mirror": false,
+                      "Copies": null,
+                      "Stations": [
+                        1.4986,
+                        1.7271999999999998,
+                        1.9558,
+                        2.1844,
+                        2.413,
+                        2.6416,
+                        2.8702,
+                        3.0987999999999998,
+                        3.3274,
+                        3.556,
+                        3.8608,
+                        4.1655999999999995,
+                        4.4704,
+                        4.7752,
+                        5.08,
+                        5.384799999999999,
+                        5.7658,
+                        6.1468,
+                        6.5278,
+                        6.908799999999999,
+                        7.2898,
+                        7.6708,
+                        8.0518,
+                        8.4328,
+                        8.889999999999999,
+                        9.347199999999999,
+                        9.8044,
+                        10.2616,
+                        10.7188,
+                        11.176,
+                        11.633199999999999,
+                        12.090399999999999,
+                        12.5476,
+                        13.0048,
+                        13.462,
+                        13.9192,
+                        14.3764,
+                        14.833599999999999,
+                        15.290799999999999,
+                        15.748,
+                        16.205199999999998
+                      ],
+                      "Ends": "Both",
+                      "StationAtBar": false,
+                      "AlongOffset": 0,
+                      "PrintedDims": [
+                        0.15239999999999998,
+                        1.4478,
+                        0.098425,
+                        1.4478,
+                        0.15239999999999998
+                      ],
+                      "ListedLength": 3.2512,
+                      "Location": "web stirrup (5b1, 4c1, 4d1 chain)",
+                      "Unresolved": ""
+                    },
+                    {
+                      "Mark": "6b3",
+                      "Size": "#6",
+                      "Epoxy": true,
+                      "Coating": "",
+                      "ShapeCode": "Z",
+                      "Description": "end-zone bar (pair), 6 in top leg / 6 in foot",
+                      "Path": [
+                        {
+                          "A": 0,
+                          "X": 0.09525,
+                          "Y": 1.489075
+                        },
+                        {
+                          "A": 0,
+                          "X": -0.047625,
+                          "Y": 1.489075
+                        },
+                        {
+                          "A": 0,
+                          "X": -0.047625,
+                          "Y": 0.07302499999999999
+                        },
+                        {
+                          "A": 0,
+                          "X": -0.1905,
+                          "Y": 0.07302499999999999
+                        }
+                      ],
+                      "BendRadius": 0.066675,
+                      "Mirror": true,
+                      "Copies": null,
+                      "Stations": [
+                        0.10794999999999999,
+                        0.2667,
+                        0.4445,
+                        0.6858,
+                        0.8382,
+                        0.9905999999999999,
+                        1.143,
+                        1.2953999999999999
+                      ],
+                      "Ends": "Both",
+                      "StationAtBar": false,
+                      "AlongOffset": 0,
+                      "PrintedDims": [
+                        0.15239999999999998,
+                        1.4351,
+                        0.15239999999999998
+                      ],
+                      "ListedLength": 1.7526,
+                      "Location": "end zone, pairs (2-6b3)",
+                      "Unresolved": ""
+                    },
+                    {
+                      "Mark": "6b4",
+                      "Size": "#6",
+                      "Epoxy": false,
+                      "Coating": "",
+                      "ShapeCode": "U",
+                      "Description": "end-zone U (pair), 6 in legs",
+                      "Path": [
+                        {
+                          "A": 0,
+                          "X": 0.09525,
+                          "Y": 1.304925
+                        },
+                        {
+                          "A": 0,
+                          "X": -0.047625,
+                          "Y": 1.304925
+                        },
+                        {
+                          "A": 0,
+                          "X": -0.047625,
+                          "Y": 0.079375
+                        },
+                        {
+                          "A": 0,
+                          "X": 0.09525,
+                          "Y": 0.079375
+                        }
+                      ],
+                      "BendRadius": 0.066675,
+                      "Mirror": true,
+                      "Copies": null,
+                      "Stations": [
+                        0.038099999999999995,
+                        0.17779999999999999,
+                        0.35559999999999997,
+                        0.5334
+                      ],
+                      "Ends": "Both",
+                      "StationAtBar": false,
+                      "AlongOffset": 0,
+                      "PrintedDims": [
+                        0.15239999999999998,
+                        1.2446,
+                        0.15239999999999998
+                      ],
+                      "ListedLength": 1.5493999999999999,
+                      "Location": "end zone, pairs (2-6b4)",
+                      "Unresolved": ""
+                    },
+                    {
+                      "Mark": "4c1",
+                      "Size": "#4",
+                      "Epoxy": false,
+                      "Coating": "",
+                      "ShapeCode": "STR",
+                      "Description": "top flange transverse",
+                      "Path": [
+                        {
+                          "A": 0,
+                          "X": -0.3937,
+                          "Y": 1.3208
+                        },
+                        {
+                          "A": 0,
+                          "X": 0.3937,
+                          "Y": 1.3208
+                        }
+                      ],
+                      "BendRadius": 0,
+                      "Mirror": false,
+                      "Copies": null,
+                      "Stations": [
+                        0.038099999999999995,
+                        0.10794999999999999,
+                        0.2667,
+                        0.4445,
+                        0.6858,
+                        0.8382,
+                        0.9905999999999999,
+                        1.143,
+                        1.2953999999999999,
+                        1.4986,
+                        1.7271999999999998,
+                        1.9558,
+                        2.1844,
+                        2.413,
+                        2.6416,
+                        2.8702,
+                        3.0987999999999998,
+                        3.3274,
+                        3.556,
+                        3.8608,
+                        4.1655999999999995,
+                        4.4704,
+                        4.7752,
+                        5.08,
+                        5.384799999999999,
+                        5.7658,
+                        6.1468,
+                        6.5278,
+                        6.908799999999999,
+                        7.2898,
+                        7.6708,
+                        8.0518,
+                        8.4328,
+                        8.6614,
+                        8.889999999999999,
+                        9.118599999999999,
+                        9.347199999999999,
+                        9.5758,
+                        9.8044,
+                        10.033,
+                        10.2616,
+                        10.4902,
+                        10.7188,
+                        10.9474,
+                        11.176,
+                        11.4046,
+                        11.633199999999999,
+                        11.861799999999999,
+                        12.090399999999999,
+                        12.318999999999999,
+                        12.5476,
+                        12.7762,
+                        13.0048,
+                        13.2334,
+                        13.462,
+                        13.6906,
+                        13.9192,
+                        14.1478,
+                        14.3764,
+                        14.604999999999999,
+                        14.833599999999999,
+                        15.062199999999999,
+                        15.290799999999999,
+                        15.5194,
+                        15.748,
+                        15.9766,
+                        16.205199999999998
+                      ],
+                      "Ends": "Both",
+                      "StationAtBar": false,
+                      "AlongOffset": 0.0142875,
+                      "PrintedDims": [
+                        0.7874
+                      ],
+                      "ListedLength": 0.7874,
+                      "Location": "top flange transverse",
+                      "Unresolved": ""
+                    },
+                    {
+                      "Mark": "4d1",
+                      "Size": "#4",
+                      "Epoxy": false,
+                      "Coating": "",
+                      "ShapeCode": "STIRRUP",
+                      "Description": "bottom flange stirrup",
+                      "Path": [
+                        {
+                          "A": 0,
+                          "X": -0.05715,
+                          "Y": 0.447675
+                        },
+                        {
+                          "A": 0,
+                          "X": -0.05715,
+                          "Y": 0.2911899082410492
+                        },
+                        {
+                          "A": 0,
+                          "X": -0.3429,
+                          "Y": 0.16101490824104916
+                        },
+                        {
+                          "A": 0,
+                          "X": -0.3429,
+                          "Y": 0.03175
+                        },
+                        {
+                          "A": 0,
+                          "X": 0.3429,
+                          "Y": 0.03175
+                        },
+                        {
+                          "A": 0,
+                          "X": 0.3429,
+                          "Y": 0.1610149082410492
+                        },
+                        {
+                          "A": 0,
+                          "X": 0.05715,
+                          "Y": 0.2911899082410492
+                        },
+                        {
+                          "A": 0,
+                          "X": 0.05715,
+                          "Y": 0.447675
+                        }
+                      ],
+                      "BendRadius": 0.03175,
+                      "Mirror": false,
+                      "Copies": null,
+                      "Stations": [
+                        0.038099999999999995,
+                        0.10794999999999999,
+                        0.2667,
+                        0.4445,
+                        0.5334,
+                        0.6858,
+                        0.8382,
+                        0.9905999999999999,
+                        1.143,
+                        1.2953999999999999,
+                        1.4986,
+                        1.7271999999999998,
+                        1.9558,
+                        2.1844,
+                        2.413,
+                        2.6416,
+                        2.8702,
+                        3.0987999999999998,
+                        3.3274,
+                        3.556,
+                        3.8608,
+                        4.1655999999999995,
+                        4.4704,
+                        4.7752,
+                        5.08,
+                        5.384799999999999,
+                        5.7658,
+                        6.1468,
+                        6.5278,
+                        6.908799999999999,
+                        7.2898,
+                        7.6708,
+                        8.0518,
+                        8.4328,
+                        8.889999999999999,
+                        9.347199999999999,
+                        9.8044,
+                        10.2616,
+                        10.7188,
+                        11.176,
+                        11.633199999999999,
+                        12.090399999999999,
+                        12.5476,
+                        13.0048,
+                        13.462,
+                        13.9192,
+                        14.3764,
+                        14.833599999999999,
+                        15.290799999999999,
+                        15.748,
+                        16.205199999999998
+                      ],
+                      "Ends": "Both",
+                      "StationAtBar": false,
+                      "AlongOffset": 0.0142875,
+                      "PrintedDims": [
+                        0.15239999999999998,
+                        0.3302,
+                        0.1397,
+                        0.6985,
+                        0.1397,
+                        0.3302,
+                        0.15239999999999998
+                      ],
+                      "ListedLength": 1.9558,
+                      "Location": "bottom flange confinement",
+                      "Unresolved": ""
+                    },
+                    {
+                      "Mark": "4e1",
+                      "Size": "#4",
+                      "Epoxy": false,
+                      "Coating": "",
+                      "ShapeCode": "U",
+                      "Description": "bottom flange U (legs down)",
+                      "Path": [
+                        {
+                          "A": 0,
+                          "X": -0.3429,
+                          "Y": 0.04572
+                        },
+                        {
+                          "A": 0,
+                          "X": -0.3429,
+                          "Y": 0.16637
+                        },
+                        {
+                          "A": 0,
+                          "X": 0.3429,
+                          "Y": 0.16637
+                        },
+                        {
+                          "A": 0,
+                          "X": 0.3429,
+                          "Y": 0.04572
+                        }
+                      ],
+                      "BendRadius": 0.03175,
+                      "Mirror": false,
+                      "Copies": null,
+                      "Stations": [
+                        0.038099999999999995,
+                        0.10794999999999999,
+                        0.2667,
+                        0.4445,
+                        0.5334,
+                        0.6858,
+                        0.8382,
+                        0.9905999999999999,
+                        1.143,
+                        1.2953999999999999,
+                        1.4986,
+                        1.7271999999999998,
+                        1.9558
+                      ],
+                      "Ends": "Both",
+                      "StationAtBar": false,
+                      "AlongOffset": -0.0142875,
+                      "PrintedDims": [
+                        0.127,
+                        0.6985,
+                        0.127
+                      ],
+                      "ListedLength": 0.9652,
+                      "Location": "end zone bottom flange",
+                      "Unresolved": ""
+                    },
+                    {
+                      "Mark": "4h1",
+                      "Size": "#4",
+                      "Epoxy": false,
+                      "Coating": "",
+                      "ShapeCode": "HAIRPIN",
+                      "Description": "horizontal web hairpin at the end (3 levels)",
+                      "Path": [
+                        {
+                          "A": 1.21285,
+                          "X": -0.03175,
+                          "Y": 0.35559999999999997
+                        },
+                        {
+                          "A": 0.0254,
+                          "X": -0.03175,
+                          "Y": 0.35559999999999997
+                        },
+                        {
+                          "A": 0.0254,
+                          "X": 0.03175,
+                          "Y": 0.35559999999999997
+                        },
+                        {
+                          "A": 1.21285,
+                          "X": 0.03175,
+                          "Y": 0.35559999999999997
+                        }
+                      ],
+                      "BendRadius": 0.03175,
+                      "Mirror": false,
+                      "Copies": [
+                        {
+                          "X": 0,
+                          "Y": 0
+                        },
+                        {
+                          "X": 0,
+                          "Y": 0.15239999999999998
+                        },
+                        {
+                          "X": 0,
+                          "Y": 0.30479999999999996
+                        }
+                      ],
+                      "Stations": [
+                        0
+                      ],
+                      "Ends": "Both",
+                      "StationAtBar": false,
+                      "AlongOffset": 0,
+                      "PrintedDims": [
+                        1.1938,
+                        0.07619999999999999,
+                        1.1938
+                      ],
+                      "ListedLength": 2.4383999999999997,
+                      "Location": "beam ends, web (4h1 bars)",
+                      "Unresolved": ""
+                    },
+                    {
+                      "Mark": "5a1",
+                      "Size": "#5",
+                      "Epoxy": false,
+                      "Coating": "",
+                      "ShapeCode": "STR",
+                      "Description": "top flange longitudinal",
+                      "Path": [
+                        {
+                          "A": 0,
+                          "X": 0,
+                          "Y": 1.3350875
+                        },
+                        {
+                          "A": 10.7442,
+                          "X": 0,
+                          "Y": 1.3350875
+                        }
+                      ],
+                      "BendRadius": 0,
+                      "Mirror": false,
+                      "Copies": [
+                        {
+                          "X": -0.381,
+                          "Y": 0
+                        },
+                        {
+                          "X": -0.23653749999999998,
+                          "Y": 0
+                        },
+                        {
+                          "X": -0.0682625,
+                          "Y": 0
+                        },
+                        {
+                          "X": 0.0682625,
+                          "Y": 0
+                        },
+                        {
+                          "X": 0.23653749999999998,
+                          "Y": 0
+                        },
+                        {
+                          "X": 0.381,
+                          "Y": 0
+                        }
+                      ],
+                      "Stations": [
+                        0.038099999999999995
+                      ],
+                      "Ends": "Both",
+                      "StationAtBar": true,
+                      "AlongOffset": 0,
+                      "PrintedDims": [
+                        10.7442
+                      ],
+                      "ListedLength": 10.7442,
+                      "Location": "top flange longitudinal, 6 lines",
+                      "Unresolved": ""
+                    },
+                    {
+                      "Mark": "5a2",
+                      "Size": "#5",
+                      "Epoxy": false,
+                      "Coating": "",
+                      "ShapeCode": "STR",
+                      "Description": "top flange longitudinal, centre",
+                      "Path": [
+                        {
+                          "A": 0,
+                          "X": 0,
+                          "Y": 1.3350875
+                        },
+                        {
+                          "A": 12.192,
+                          "X": 0,
+                          "Y": 1.3350875
+                        }
+                      ],
+                      "BendRadius": 0,
+                      "Mirror": false,
+                      "Copies": [
+                        {
+                          "X": -0.381,
+                          "Y": 0
+                        },
+                        {
+                          "X": -0.23653749999999998,
+                          "Y": 0
+                        },
+                        {
+                          "X": -0.0682625,
+                          "Y": 0
+                        },
+                        {
+                          "X": 0.0682625,
+                          "Y": 0
+                        },
+                        {
+                          "X": 0.23653749999999998,
+                          "Y": 0
+                        },
+                        {
+                          "X": 0.381,
+                          "Y": 0
+                        }
+                      ],
+                      "Stations": [
+                        10.1092
+                      ],
+                      "Ends": "StartOnly",
+                      "StationAtBar": true,
+                      "AlongOffset": 0,
+                      "PrintedDims": [
+                        12.192
+                      ],
+                      "ListedLength": 12.192,
+                      "Location": "top flange longitudinal, 6 lines, centred on midspan",
+                      "Unresolved": ""
+                    }
+                  ],
+                  "Unresolved": [
+                    "UNRESOLVED (Woodbury Design 817 PDF p.30 (DS 28)): 5a1 lateral positions of the four inner top flange lines - Section A-A dimensions only the outer lines (2 in from the flange edges); the inner lines are drawn but not dimensioned. Modeled at the positions scaled from the to-scale CAD section: 2 11/16 and 9 5/16 in each side of the CL.",
+                    "UNRESOLVED (Woodbury Design 817 PDF p.30 (DS 28)): heights of 4d1 / 4e1 / 6b4 / 6b3 / 4c1 in the section - std 4742 Sections A-A / B-B / C-C (Woodbury Design 817 PDF p.30 (DS 28)) give only the projections (5 in), 1 5/16 in / 1 in clear to the web faces, 2 in to the top flange bars and the 4h1 levels; the bottom flange bars are drawn, not dimensioned. Modeled: 4d1 1 in clear to the bottom, 4e1 resting on the 6 in strand row, 6b4 top just under 4c1 (4\u0027-1 o-o down), 6b3 from 5 in above the beam (4\u0027-8 1/2 o-o), 4c1 centre 2 in below the top (as drawn)."
+                  ],
+                  "Notes": [
+                    "BTD105 5b1 / 4h1 (U9b): shapes as drawn on the 4730 Bent Bar Detail (5b1 legs 4\u0027-9 o-o, 3 7/8 wide, D = 2 5/8, 6 in feet; 4h1 legs 3\u0027-11, 3 in wide); the drawn out-to-out dimensions do not add up to the bar list lengths 10\u0027-8 / 8\u0027-0 (bend allowances not stated) - scheduled at the bar list length.",
+                    "BTD105 bar stations: chains of the 4742 elevation (Woodbury Design 817 PDF p.30 (DS 28)); which bar sits on which station read from the to-scale CAD elevation and matching the 4730 bar list counts per beam."
+                  ],
+                  "BarList": [
+                    {
+                      "Mark": "5a1",
+                      "Count": 12,
+                      "Length": 10.7442
+                    },
+                    {
+                      "Mark": "5a2",
+                      "Count": 6,
+                      "Length": 12.192
+                    },
+                    {
+                      "Mark": "5b1",
+                      "Count": 81,
+                      "Length": 3.2512
+                    },
+                    {
+                      "Mark": "6b3",
+                      "Count": 32,
+                      "Length": 1.7526
+                    },
+                    {
+                      "Mark": "6b4",
+                      "Count": 16,
+                      "Length": 1.5493999999999999
+                    },
+                    {
+                      "Mark": "4c1",
+                      "Count": 133,
+                      "Length": 0.7874
+                    },
+                    {
+                      "Mark": "4d1",
+                      "Count": 101,
+                      "Length": 1.9558
+                    },
+                    {
+                      "Mark": "4e1",
+                      "Count": 26,
+                      "Length": 0.9652
+                    },
+                    {
+                      "Mark": "4h1",
+                      "Count": 6,
+                      "Length": 2.4383999999999997
+                    }
+                  ],
+                  "ListedWeightLb": 2741,
+                  "ListedWeightSource": "4730 BTD Beam Data, Woodbury Design 817 PDF p.27 (DS 25)"
+                }
               }
             },
             {
@@ -4528,10 +5255,1194 @@
                 "SheathThickness": 0.0015875,
                 "Source": "Iowa DOT standard BTD beam BTD60: Woodbury Design 817 p.27 (DS 25) beam data, Woodbury p.29 (DS 27) strand pattern",
                 "Unresolved": null,
-                "SpanBeams": null
+                "SpanBeams": null,
+                "Reinforcement": {
+                  "Source": "Iowa DOT std 4733 BTD60 \u002B 4730 (issued 05-04, rev. 08-09, as printed in the plans): Woodbury Design 817 PDF p.29 (DS 27), Woodbury Design 817 PDF p.27 (DS 25)",
+                  "SteelYieldKsi": 60,
+                  "Bars": [
+                    {
+                      "Mark": "5b1",
+                      "Size": "#5",
+                      "Epoxy": true,
+                      "Coating": "",
+                      "ShapeCode": "HAIRPIN",
+                      "Description": "web hairpin with 6 in feet, projects 5 in above the beam",
+                      "Path": [
+                        {
+                          "A": 0.1444625,
+                          "X": -0.041275,
+                          "Y": 0.0587375
+                        },
+                        {
+                          "A": 0,
+                          "X": -0.041275,
+                          "Y": 0.0587375
+                        },
+                        {
+                          "A": 0,
+                          "X": -0.041275,
+                          "Y": 1.4906625
+                        },
+                        {
+                          "A": 0,
+                          "X": 0.041275,
+                          "Y": 1.4906625
+                        },
+                        {
+                          "A": 0,
+                          "X": 0.041275,
+                          "Y": 0.0587375
+                        },
+                        {
+                          "A": 0.1444625,
+                          "X": 0.041275,
+                          "Y": 0.0587375
+                        }
+                      ],
+                      "BendRadius": 0.041275,
+                      "Mirror": false,
+                      "Copies": null,
+                      "Stations": [
+                        1.4986,
+                        1.7271999999999998,
+                        1.9558,
+                        2.1844,
+                        2.413,
+                        2.6416,
+                        2.9463999999999997,
+                        3.2512,
+                        3.6321999999999997,
+                        4.013199999999999,
+                        4.3942,
+                        4.7752,
+                        5.2324,
+                        5.6895999999999995,
+                        6.1468,
+                        6.604,
+                        7.0611999999999995,
+                        7.5184,
+                        7.9756,
+                        8.4328,
+                        8.889999999999999,
+                        9.347199999999999
+                      ],
+                      "Ends": "Both",
+                      "StationAtBar": false,
+                      "AlongOffset": 0,
+                      "PrintedDims": [
+                        0.15239999999999998,
+                        1.4478,
+                        0.098425,
+                        1.4478,
+                        0.15239999999999998
+                      ],
+                      "ListedLength": 3.2512,
+                      "Location": "web stirrup (5b1, 4c1, 4d1 chain)",
+                      "Unresolved": ""
+                    },
+                    {
+                      "Mark": "6b3",
+                      "Size": "#6",
+                      "Epoxy": true,
+                      "Coating": "",
+                      "ShapeCode": "Z",
+                      "Description": "end-zone bar (pair), 6 in top leg / 6 in foot",
+                      "Path": [
+                        {
+                          "A": 0,
+                          "X": 0.09525,
+                          "Y": 1.489075
+                        },
+                        {
+                          "A": 0,
+                          "X": -0.047625,
+                          "Y": 1.489075
+                        },
+                        {
+                          "A": 0,
+                          "X": -0.047625,
+                          "Y": 0.07302499999999999
+                        },
+                        {
+                          "A": 0,
+                          "X": -0.1905,
+                          "Y": 0.07302499999999999
+                        }
+                      ],
+                      "BendRadius": 0.066675,
+                      "Mirror": true,
+                      "Copies": null,
+                      "Stations": [
+                        0.15239999999999998,
+                        0.381,
+                        0.5334,
+                        0.6858,
+                        0.8382,
+                        0.9905999999999999,
+                        1.143,
+                        1.2953999999999999
+                      ],
+                      "Ends": "Both",
+                      "StationAtBar": false,
+                      "AlongOffset": 0,
+                      "PrintedDims": [
+                        0.15239999999999998,
+                        1.4351,
+                        0.15239999999999998
+                      ],
+                      "ListedLength": 1.7526,
+                      "Location": "end zone, pairs (2-6b3)",
+                      "Unresolved": ""
+                    },
+                    {
+                      "Mark": "6b4",
+                      "Size": "#6",
+                      "Epoxy": false,
+                      "Coating": "",
+                      "ShapeCode": "U",
+                      "Description": "end-zone U (pair), 6 in legs",
+                      "Path": [
+                        {
+                          "A": 0,
+                          "X": 0.09525,
+                          "Y": 1.304925
+                        },
+                        {
+                          "A": 0,
+                          "X": -0.047625,
+                          "Y": 1.304925
+                        },
+                        {
+                          "A": 0,
+                          "X": -0.047625,
+                          "Y": 0.079375
+                        },
+                        {
+                          "A": 0,
+                          "X": 0.09525,
+                          "Y": 0.079375
+                        }
+                      ],
+                      "BendRadius": 0.066675,
+                      "Mirror": true,
+                      "Copies": null,
+                      "Stations": [
+                        0.038099999999999995,
+                        0.2667
+                      ],
+                      "Ends": "Both",
+                      "StationAtBar": false,
+                      "AlongOffset": 0,
+                      "PrintedDims": [
+                        0.15239999999999998,
+                        1.2446,
+                        0.15239999999999998
+                      ],
+                      "ListedLength": 1.5493999999999999,
+                      "Location": "end zone, pairs (2-6b4)",
+                      "Unresolved": ""
+                    },
+                    {
+                      "Mark": "4c1",
+                      "Size": "#4",
+                      "Epoxy": false,
+                      "Coating": "",
+                      "ShapeCode": "STR",
+                      "Description": "top flange transverse",
+                      "Path": [
+                        {
+                          "A": 0,
+                          "X": -0.3937,
+                          "Y": 1.3208
+                        },
+                        {
+                          "A": 0,
+                          "X": 0.3937,
+                          "Y": 1.3208
+                        }
+                      ],
+                      "BendRadius": 0,
+                      "Mirror": false,
+                      "Copies": null,
+                      "Stations": [
+                        0.038099999999999995,
+                        0.15239999999999998,
+                        0.381,
+                        0.5334,
+                        0.6858,
+                        0.8382,
+                        0.9905999999999999,
+                        1.143,
+                        1.2953999999999999,
+                        1.4986,
+                        1.7271999999999998,
+                        1.9558,
+                        2.1844,
+                        2.413,
+                        2.6416,
+                        2.9463999999999997,
+                        3.2512,
+                        3.6321999999999997,
+                        4.013199999999999,
+                        4.3942,
+                        4.7752,
+                        5.0038,
+                        5.2324,
+                        5.460999999999999,
+                        5.6895999999999995,
+                        5.9182,
+                        6.1468,
+                        6.3754,
+                        6.604,
+                        6.832599999999999,
+                        7.0611999999999995,
+                        7.2898,
+                        7.5184,
+                        7.747,
+                        7.9756,
+                        8.2042,
+                        8.4328,
+                        8.6614,
+                        8.889999999999999,
+                        9.118599999999999,
+                        9.347199999999999
+                      ],
+                      "Ends": "Both",
+                      "StationAtBar": false,
+                      "AlongOffset": 0.0142875,
+                      "PrintedDims": [
+                        0.7874
+                      ],
+                      "ListedLength": 0.7874,
+                      "Location": "top flange transverse",
+                      "Unresolved": ""
+                    },
+                    {
+                      "Mark": "4d1",
+                      "Size": "#4",
+                      "Epoxy": false,
+                      "Coating": "",
+                      "ShapeCode": "STIRRUP",
+                      "Description": "bottom flange stirrup",
+                      "Path": [
+                        {
+                          "A": 0,
+                          "X": -0.05715,
+                          "Y": 0.447675
+                        },
+                        {
+                          "A": 0,
+                          "X": -0.05715,
+                          "Y": 0.2911899082410492
+                        },
+                        {
+                          "A": 0,
+                          "X": -0.3429,
+                          "Y": 0.16101490824104916
+                        },
+                        {
+                          "A": 0,
+                          "X": -0.3429,
+                          "Y": 0.03175
+                        },
+                        {
+                          "A": 0,
+                          "X": 0.3429,
+                          "Y": 0.03175
+                        },
+                        {
+                          "A": 0,
+                          "X": 0.3429,
+                          "Y": 0.1610149082410492
+                        },
+                        {
+                          "A": 0,
+                          "X": 0.05715,
+                          "Y": 0.2911899082410492
+                        },
+                        {
+                          "A": 0,
+                          "X": 0.05715,
+                          "Y": 0.447675
+                        }
+                      ],
+                      "BendRadius": 0.03175,
+                      "Mirror": false,
+                      "Copies": null,
+                      "Stations": [
+                        0.038099999999999995,
+                        0.15239999999999998,
+                        0.2667,
+                        0.381,
+                        0.5334,
+                        0.6858,
+                        0.8382,
+                        0.9905999999999999,
+                        1.143,
+                        1.2953999999999999,
+                        1.4986,
+                        1.7271999999999998,
+                        1.9558,
+                        2.1844,
+                        2.413,
+                        2.6416,
+                        2.9463999999999997,
+                        3.2512,
+                        3.6321999999999997,
+                        4.013199999999999,
+                        4.3942,
+                        4.7752,
+                        5.2324,
+                        5.6895999999999995,
+                        6.1468,
+                        6.604,
+                        7.0611999999999995,
+                        7.5184,
+                        7.9756,
+                        8.4328,
+                        8.889999999999999,
+                        9.347199999999999
+                      ],
+                      "Ends": "Both",
+                      "StationAtBar": false,
+                      "AlongOffset": 0.0142875,
+                      "PrintedDims": [
+                        0.15239999999999998,
+                        0.3302,
+                        0.1397,
+                        0.6985,
+                        0.1397,
+                        0.3302,
+                        0.15239999999999998
+                      ],
+                      "ListedLength": 1.9558,
+                      "Location": "bottom flange confinement",
+                      "Unresolved": ""
+                    },
+                    {
+                      "Mark": "4e1",
+                      "Size": "#4",
+                      "Epoxy": false,
+                      "Coating": "",
+                      "ShapeCode": "U",
+                      "Description": "bottom flange U (legs down)",
+                      "Path": [
+                        {
+                          "A": 0,
+                          "X": -0.3429,
+                          "Y": 0.04572
+                        },
+                        {
+                          "A": 0,
+                          "X": -0.3429,
+                          "Y": 0.16637
+                        },
+                        {
+                          "A": 0,
+                          "X": 0.3429,
+                          "Y": 0.16637
+                        },
+                        {
+                          "A": 0,
+                          "X": 0.3429,
+                          "Y": 0.04572
+                        }
+                      ],
+                      "BendRadius": 0.03175,
+                      "Mirror": false,
+                      "Copies": null,
+                      "Stations": [
+                        0.038099999999999995,
+                        0.15239999999999998,
+                        0.2667,
+                        0.381,
+                        0.5334,
+                        0.6858,
+                        0.8382,
+                        0.9905999999999999,
+                        1.143,
+                        1.2953999999999999,
+                        1.4986,
+                        1.7271999999999998,
+                        1.9558
+                      ],
+                      "Ends": "Both",
+                      "StationAtBar": false,
+                      "AlongOffset": -0.0142875,
+                      "PrintedDims": [
+                        0.127,
+                        0.6985,
+                        0.127
+                      ],
+                      "ListedLength": 0.9652,
+                      "Location": "end zone bottom flange",
+                      "Unresolved": ""
+                    },
+                    {
+                      "Mark": "4h1",
+                      "Size": "#4",
+                      "Epoxy": false,
+                      "Coating": "",
+                      "ShapeCode": "HAIRPIN",
+                      "Description": "horizontal web hairpin at the end (3 levels)",
+                      "Path": [
+                        {
+                          "A": 1.21285,
+                          "X": -0.03175,
+                          "Y": 0.35559999999999997
+                        },
+                        {
+                          "A": 0.0254,
+                          "X": -0.03175,
+                          "Y": 0.35559999999999997
+                        },
+                        {
+                          "A": 0.0254,
+                          "X": 0.03175,
+                          "Y": 0.35559999999999997
+                        },
+                        {
+                          "A": 1.21285,
+                          "X": 0.03175,
+                          "Y": 0.35559999999999997
+                        }
+                      ],
+                      "BendRadius": 0.03175,
+                      "Mirror": false,
+                      "Copies": [
+                        {
+                          "X": 0,
+                          "Y": 0
+                        },
+                        {
+                          "X": 0,
+                          "Y": 0.15239999999999998
+                        },
+                        {
+                          "X": 0,
+                          "Y": 0.30479999999999996
+                        }
+                      ],
+                      "Stations": [
+                        0
+                      ],
+                      "Ends": "Both",
+                      "StationAtBar": false,
+                      "AlongOffset": 0,
+                      "PrintedDims": [
+                        1.1938,
+                        0.07619999999999999,
+                        1.1938
+                      ],
+                      "ListedLength": 2.4383999999999997,
+                      "Location": "beam ends, web (4h1 bars)",
+                      "Unresolved": ""
+                    },
+                    {
+                      "Mark": "5a1",
+                      "Size": "#5",
+                      "Epoxy": false,
+                      "Coating": "",
+                      "ShapeCode": "STR",
+                      "Description": "top flange longitudinal",
+                      "Path": [
+                        {
+                          "A": 0,
+                          "X": 0,
+                          "Y": 1.3350875
+                        },
+                        {
+                          "A": 9.652,
+                          "X": 0,
+                          "Y": 1.3350875
+                        }
+                      ],
+                      "BendRadius": 0,
+                      "Mirror": false,
+                      "Copies": [
+                        {
+                          "X": -0.381,
+                          "Y": 0
+                        },
+                        {
+                          "X": -0.23653749999999998,
+                          "Y": 0
+                        },
+                        {
+                          "X": -0.0682625,
+                          "Y": 0
+                        },
+                        {
+                          "X": 0.0682625,
+                          "Y": 0
+                        },
+                        {
+                          "X": 0.23653749999999998,
+                          "Y": 0
+                        },
+                        {
+                          "X": 0.381,
+                          "Y": 0
+                        }
+                      ],
+                      "Stations": [
+                        0.038099999999999995
+                      ],
+                      "Ends": "Both",
+                      "StationAtBar": true,
+                      "AlongOffset": 0,
+                      "PrintedDims": [
+                        9.652
+                      ],
+                      "ListedLength": 9.652,
+                      "Location": "top flange longitudinal, 6 lines",
+                      "Unresolved": ""
+                    }
+                  ],
+                  "Unresolved": [
+                    "UNRESOLVED (Woodbury Design 817 PDF p.29 (DS 27)): 5a1 lateral positions of the four inner top flange lines - Section A-A dimensions only the outer lines (2 in from the flange edges); the inner lines are drawn but not dimensioned. Modeled at the positions scaled from the to-scale CAD section: 2 11/16 and 9 5/16 in each side of the CL.",
+                    "UNRESOLVED (Woodbury Design 817 PDF p.29 (DS 27)): heights of 4d1 / 4e1 / 6b4 / 6b3 / 4c1 in the section - std 4733 Sections A-A / B-B / C-C (Woodbury Design 817 PDF p.29 (DS 27)) give only the projections (5 in), 1 5/16 in / 1 in clear to the web faces, 2 in to the top flange bars and the 4h1 levels; the bottom flange bars are drawn, not dimensioned. Modeled: 4d1 1 in clear to the bottom, 4e1 resting on the 6 in strand row, 6b4 top just under 4c1 (4\u0027-1 o-o down), 6b3 from 5 in above the beam (4\u0027-8 1/2 o-o), 4c1 centre 2 in below the top (as drawn)."
+                  ],
+                  "Notes": [
+                    "BTD60 5b1 / 4h1 (U9b): shapes as drawn on the 4730 Bent Bar Detail (5b1 legs 4\u0027-9 o-o, 3 7/8 wide, D = 2 5/8, 6 in feet; 4h1 legs 3\u0027-11, 3 in wide); the drawn out-to-out dimensions do not add up to the bar list lengths 10\u0027-8 / 8\u0027-0 (bend allowances not stated) - scheduled at the bar list length.",
+                    "BTD60 bar stations: chains of the 4733 elevation (Woodbury Design 817 PDF p.29 (DS 27)); which bar sits on which station read from the to-scale CAD elevation and matching the 4730 bar list counts per beam."
+                  ],
+                  "BarList": [
+                    {
+                      "Mark": "5a1",
+                      "Count": 12,
+                      "Length": 9.652
+                    },
+                    {
+                      "Mark": "5b1",
+                      "Count": 43,
+                      "Length": 3.2512
+                    },
+                    {
+                      "Mark": "6b3",
+                      "Count": 32,
+                      "Length": 1.7526
+                    },
+                    {
+                      "Mark": "6b4",
+                      "Count": 8,
+                      "Length": 1.5493999999999999
+                    },
+                    {
+                      "Mark": "4c1",
+                      "Count": 81,
+                      "Length": 0.7874
+                    },
+                    {
+                      "Mark": "4d1",
+                      "Count": 63,
+                      "Length": 1.9558
+                    },
+                    {
+                      "Mark": "4e1",
+                      "Count": 26,
+                      "Length": 0.9652
+                    },
+                    {
+                      "Mark": "4h1",
+                      "Count": 6,
+                      "Length": 2.4383999999999997
+                    }
+                  ],
+                  "ListedWeightLb": 1709,
+                  "ListedWeightSource": "4730 BTD Beam Data, Woodbury Design 817 PDF p.27 (DS 25)"
+                }
               }
             }
-          ]
+          ],
+          "Reinforcement": {
+            "Source": "Iowa DOT std 4732 BTD55 \u002B 4730 (issued 05-04, rev. 08-09, as printed in the plans): Woodbury Design 817 PDF p.28 (DS 26), Woodbury Design 817 PDF p.27 (DS 25)",
+            "SteelYieldKsi": 60,
+            "Bars": [
+              {
+                "Mark": "5b1",
+                "Size": "#5",
+                "Epoxy": true,
+                "Coating": "",
+                "ShapeCode": "HAIRPIN",
+                "Description": "web hairpin with 6 in feet, projects 5 in above the beam",
+                "Path": [
+                  {
+                    "A": 0.1444625,
+                    "X": -0.041275,
+                    "Y": 0.0587375
+                  },
+                  {
+                    "A": 0,
+                    "X": -0.041275,
+                    "Y": 0.0587375
+                  },
+                  {
+                    "A": 0,
+                    "X": -0.041275,
+                    "Y": 1.4906625
+                  },
+                  {
+                    "A": 0,
+                    "X": 0.041275,
+                    "Y": 1.4906625
+                  },
+                  {
+                    "A": 0,
+                    "X": 0.041275,
+                    "Y": 0.0587375
+                  },
+                  {
+                    "A": 0.1444625,
+                    "X": 0.041275,
+                    "Y": 0.0587375
+                  }
+                ],
+                "BendRadius": 0.041275,
+                "Mirror": false,
+                "Copies": null,
+                "Stations": [
+                  1.4986,
+                  1.7271999999999998,
+                  1.9558,
+                  2.1844,
+                  2.4892,
+                  2.794,
+                  3.0987999999999998,
+                  3.4036,
+                  3.7845999999999997,
+                  4.1655999999999995,
+                  4.5466,
+                  4.9276,
+                  5.384799999999999,
+                  5.842,
+                  6.2992,
+                  6.756399999999999,
+                  7.2136,
+                  7.6708,
+                  8.128,
+                  8.5852
+                ],
+                "Ends": "Both",
+                "StationAtBar": false,
+                "AlongOffset": 0,
+                "PrintedDims": [
+                  0.15239999999999998,
+                  1.4478,
+                  0.098425,
+                  1.4478,
+                  0.15239999999999998
+                ],
+                "ListedLength": 3.2512,
+                "Location": "web stirrup (5b1, 4c1, 4d1 chain)",
+                "Unresolved": ""
+              },
+              {
+                "Mark": "6b3",
+                "Size": "#6",
+                "Epoxy": true,
+                "Coating": "",
+                "ShapeCode": "Z",
+                "Description": "end-zone bar (pair), 6 in top leg / 6 in foot",
+                "Path": [
+                  {
+                    "A": 0,
+                    "X": 0.09525,
+                    "Y": 1.489075
+                  },
+                  {
+                    "A": 0,
+                    "X": -0.047625,
+                    "Y": 1.489075
+                  },
+                  {
+                    "A": 0,
+                    "X": -0.047625,
+                    "Y": 0.07302499999999999
+                  },
+                  {
+                    "A": 0,
+                    "X": -0.1905,
+                    "Y": 0.07302499999999999
+                  }
+                ],
+                "BendRadius": 0.066675,
+                "Mirror": true,
+                "Copies": null,
+                "Stations": [
+                  0.15239999999999998,
+                  0.381,
+                  0.5334,
+                  0.6858,
+                  0.8382,
+                  0.9905999999999999,
+                  1.143,
+                  1.2953999999999999
+                ],
+                "Ends": "Both",
+                "StationAtBar": false,
+                "AlongOffset": 0,
+                "PrintedDims": [
+                  0.15239999999999998,
+                  1.4351,
+                  0.15239999999999998
+                ],
+                "ListedLength": 1.7526,
+                "Location": "end zone, pairs (2-6b3)",
+                "Unresolved": ""
+              },
+              {
+                "Mark": "6b4",
+                "Size": "#6",
+                "Epoxy": false,
+                "Coating": "",
+                "ShapeCode": "U",
+                "Description": "end-zone U (pair), 6 in legs",
+                "Path": [
+                  {
+                    "A": 0,
+                    "X": 0.09525,
+                    "Y": 1.304925
+                  },
+                  {
+                    "A": 0,
+                    "X": -0.047625,
+                    "Y": 1.304925
+                  },
+                  {
+                    "A": 0,
+                    "X": -0.047625,
+                    "Y": 0.079375
+                  },
+                  {
+                    "A": 0,
+                    "X": 0.09525,
+                    "Y": 0.079375
+                  }
+                ],
+                "BendRadius": 0.066675,
+                "Mirror": true,
+                "Copies": null,
+                "Stations": [
+                  0.038099999999999995,
+                  0.2667
+                ],
+                "Ends": "Both",
+                "StationAtBar": false,
+                "AlongOffset": 0,
+                "PrintedDims": [
+                  0.15239999999999998,
+                  1.2446,
+                  0.15239999999999998
+                ],
+                "ListedLength": 1.5493999999999999,
+                "Location": "end zone, pairs (2-6b4)",
+                "Unresolved": ""
+              },
+              {
+                "Mark": "4c1",
+                "Size": "#4",
+                "Epoxy": false,
+                "Coating": "",
+                "ShapeCode": "STR",
+                "Description": "top flange transverse",
+                "Path": [
+                  {
+                    "A": 0,
+                    "X": -0.3937,
+                    "Y": 1.3208
+                  },
+                  {
+                    "A": 0,
+                    "X": 0.3937,
+                    "Y": 1.3208
+                  }
+                ],
+                "BendRadius": 0,
+                "Mirror": false,
+                "Copies": null,
+                "Stations": [
+                  0.038099999999999995,
+                  0.15239999999999998,
+                  0.381,
+                  0.5334,
+                  0.6858,
+                  0.8382,
+                  0.9905999999999999,
+                  1.143,
+                  1.2953999999999999,
+                  1.4986,
+                  1.7271999999999998,
+                  1.9558,
+                  2.1844,
+                  2.4892,
+                  2.794,
+                  3.0987999999999998,
+                  3.4036,
+                  3.7845999999999997,
+                  4.1655999999999995,
+                  4.5466,
+                  4.9276,
+                  5.1562,
+                  5.384799999999999,
+                  5.6133999999999995,
+                  5.842,
+                  6.0706,
+                  6.2992,
+                  6.5278,
+                  6.756399999999999,
+                  6.984999999999999,
+                  7.2136,
+                  7.4422,
+                  7.6708,
+                  7.8994,
+                  8.128,
+                  8.3566,
+                  8.5852
+                ],
+                "Ends": "Both",
+                "StationAtBar": false,
+                "AlongOffset": 0.0142875,
+                "PrintedDims": [
+                  0.7874
+                ],
+                "ListedLength": 0.7874,
+                "Location": "top flange transverse",
+                "Unresolved": ""
+              },
+              {
+                "Mark": "4d1",
+                "Size": "#4",
+                "Epoxy": false,
+                "Coating": "",
+                "ShapeCode": "STIRRUP",
+                "Description": "bottom flange stirrup",
+                "Path": [
+                  {
+                    "A": 0,
+                    "X": -0.05715,
+                    "Y": 0.447675
+                  },
+                  {
+                    "A": 0,
+                    "X": -0.05715,
+                    "Y": 0.2911899082410492
+                  },
+                  {
+                    "A": 0,
+                    "X": -0.3429,
+                    "Y": 0.16101490824104916
+                  },
+                  {
+                    "A": 0,
+                    "X": -0.3429,
+                    "Y": 0.03175
+                  },
+                  {
+                    "A": 0,
+                    "X": 0.3429,
+                    "Y": 0.03175
+                  },
+                  {
+                    "A": 0,
+                    "X": 0.3429,
+                    "Y": 0.1610149082410492
+                  },
+                  {
+                    "A": 0,
+                    "X": 0.05715,
+                    "Y": 0.2911899082410492
+                  },
+                  {
+                    "A": 0,
+                    "X": 0.05715,
+                    "Y": 0.447675
+                  }
+                ],
+                "BendRadius": 0.03175,
+                "Mirror": false,
+                "Copies": null,
+                "Stations": [
+                  0.038099999999999995,
+                  0.15239999999999998,
+                  0.2667,
+                  0.381,
+                  0.5334,
+                  0.6858,
+                  0.8382,
+                  0.9905999999999999,
+                  1.143,
+                  1.2953999999999999,
+                  1.4986,
+                  1.7271999999999998,
+                  1.9558,
+                  2.1844,
+                  2.4892,
+                  2.794,
+                  3.0987999999999998,
+                  3.4036,
+                  3.7845999999999997,
+                  4.1655999999999995,
+                  4.5466,
+                  4.9276,
+                  5.384799999999999,
+                  5.842,
+                  6.2992,
+                  6.756399999999999,
+                  7.2136,
+                  7.6708,
+                  8.128,
+                  8.5852
+                ],
+                "Ends": "Both",
+                "StationAtBar": false,
+                "AlongOffset": 0.0142875,
+                "PrintedDims": [
+                  0.15239999999999998,
+                  0.3302,
+                  0.1397,
+                  0.6985,
+                  0.1397,
+                  0.3302,
+                  0.15239999999999998
+                ],
+                "ListedLength": 1.9558,
+                "Location": "bottom flange confinement",
+                "Unresolved": ""
+              },
+              {
+                "Mark": "4e1",
+                "Size": "#4",
+                "Epoxy": false,
+                "Coating": "",
+                "ShapeCode": "U",
+                "Description": "bottom flange U (legs down)",
+                "Path": [
+                  {
+                    "A": 0,
+                    "X": -0.3429,
+                    "Y": 0.04572
+                  },
+                  {
+                    "A": 0,
+                    "X": -0.3429,
+                    "Y": 0.16637
+                  },
+                  {
+                    "A": 0,
+                    "X": 0.3429,
+                    "Y": 0.16637
+                  },
+                  {
+                    "A": 0,
+                    "X": 0.3429,
+                    "Y": 0.04572
+                  }
+                ],
+                "BendRadius": 0.03175,
+                "Mirror": false,
+                "Copies": null,
+                "Stations": [
+                  0.038099999999999995,
+                  0.15239999999999998,
+                  0.2667,
+                  0.381,
+                  0.5334,
+                  0.6858,
+                  0.8382,
+                  0.9905999999999999,
+                  1.143,
+                  1.2953999999999999,
+                  1.4986,
+                  1.7271999999999998,
+                  1.9558
+                ],
+                "Ends": "Both",
+                "StationAtBar": false,
+                "AlongOffset": -0.0142875,
+                "PrintedDims": [
+                  0.127,
+                  0.6985,
+                  0.127
+                ],
+                "ListedLength": 0.9652,
+                "Location": "end zone bottom flange",
+                "Unresolved": ""
+              },
+              {
+                "Mark": "4h1",
+                "Size": "#4",
+                "Epoxy": false,
+                "Coating": "",
+                "ShapeCode": "HAIRPIN",
+                "Description": "horizontal web hairpin at the end (3 levels)",
+                "Path": [
+                  {
+                    "A": 1.21285,
+                    "X": -0.03175,
+                    "Y": 0.35559999999999997
+                  },
+                  {
+                    "A": 0.0254,
+                    "X": -0.03175,
+                    "Y": 0.35559999999999997
+                  },
+                  {
+                    "A": 0.0254,
+                    "X": 0.03175,
+                    "Y": 0.35559999999999997
+                  },
+                  {
+                    "A": 1.21285,
+                    "X": 0.03175,
+                    "Y": 0.35559999999999997
+                  }
+                ],
+                "BendRadius": 0.03175,
+                "Mirror": false,
+                "Copies": [
+                  {
+                    "X": 0,
+                    "Y": 0
+                  },
+                  {
+                    "X": 0,
+                    "Y": 0.15239999999999998
+                  },
+                  {
+                    "X": 0,
+                    "Y": 0.30479999999999996
+                  }
+                ],
+                "Stations": [
+                  0
+                ],
+                "Ends": "Both",
+                "StationAtBar": false,
+                "AlongOffset": 0,
+                "PrintedDims": [
+                  1.1938,
+                  0.07619999999999999,
+                  1.1938
+                ],
+                "ListedLength": 2.4383999999999997,
+                "Location": "beam ends, web (4h1 bars)",
+                "Unresolved": ""
+              },
+              {
+                "Mark": "5a1",
+                "Size": "#5",
+                "Epoxy": false,
+                "Coating": "",
+                "ShapeCode": "STR",
+                "Description": "top flange longitudinal",
+                "Path": [
+                  {
+                    "A": 0,
+                    "X": 0,
+                    "Y": 1.3350875
+                  },
+                  {
+                    "A": 8.889999999999999,
+                    "X": 0,
+                    "Y": 1.3350875
+                  }
+                ],
+                "BendRadius": 0,
+                "Mirror": false,
+                "Copies": [
+                  {
+                    "X": -0.381,
+                    "Y": 0
+                  },
+                  {
+                    "X": -0.23653749999999998,
+                    "Y": 0
+                  },
+                  {
+                    "X": -0.0682625,
+                    "Y": 0
+                  },
+                  {
+                    "X": 0.0682625,
+                    "Y": 0
+                  },
+                  {
+                    "X": 0.23653749999999998,
+                    "Y": 0
+                  },
+                  {
+                    "X": 0.381,
+                    "Y": 0
+                  }
+                ],
+                "Stations": [
+                  0.038099999999999995
+                ],
+                "Ends": "Both",
+                "StationAtBar": true,
+                "AlongOffset": 0,
+                "PrintedDims": [
+                  8.889999999999999
+                ],
+                "ListedLength": 8.889999999999999,
+                "Location": "top flange longitudinal, 6 lines",
+                "Unresolved": ""
+              }
+            ],
+            "Unresolved": [
+              "UNRESOLVED (Woodbury Design 817 PDF p.28 (DS 26)): 5a1 lateral positions of the four inner top flange lines - Section A-A dimensions only the outer lines (2 in from the flange edges); the inner lines are drawn but not dimensioned. Modeled at the positions scaled from the to-scale CAD section: 2 11/16 and 9 5/16 in each side of the CL.",
+              "UNRESOLVED (Woodbury Design 817 PDF p.28 (DS 26)): heights of 4d1 / 4e1 / 6b4 / 6b3 / 4c1 in the section - std 4732 Sections A-A / B-B / C-C (Woodbury Design 817 PDF p.28 (DS 26)) give only the projections (5 in), 1 5/16 in / 1 in clear to the web faces, 2 in to the top flange bars and the 4h1 levels; the bottom flange bars are drawn, not dimensioned. Modeled: 4d1 1 in clear to the bottom, 4e1 resting on the 6 in strand row, 6b4 top just under 4c1 (4\u0027-1 o-o down), 6b3 from 5 in above the beam (4\u0027-8 1/2 o-o), 4c1 centre 2 in below the top (as drawn)."
+            ],
+            "Notes": [
+              "BTD55 5b1 / 4h1 (U9b): shapes as drawn on the 4730 Bent Bar Detail (5b1 legs 4\u0027-9 o-o, 3 7/8 wide, D = 2 5/8, 6 in feet; 4h1 legs 3\u0027-11, 3 in wide); the drawn out-to-out dimensions do not add up to the bar list lengths 10\u0027-8 / 8\u0027-0 (bend allowances not stated) - scheduled at the bar list length.",
+              "BTD55 bar stations: chains of the 4732 elevation (Woodbury Design 817 PDF p.28 (DS 26)); which bar sits on which station read from the to-scale CAD elevation and matching the 4730 bar list counts per beam."
+            ],
+            "BarList": [
+              {
+                "Mark": "5a1",
+                "Count": 12,
+                "Length": 8.889999999999999
+              },
+              {
+                "Mark": "5b1",
+                "Count": 39,
+                "Length": 3.2512
+              },
+              {
+                "Mark": "6b3",
+                "Count": 32,
+                "Length": 1.7526
+              },
+              {
+                "Mark": "6b4",
+                "Count": 8,
+                "Length": 1.5493999999999999
+              },
+              {
+                "Mark": "4c1",
+                "Count": 73,
+                "Length": 0.7874
+              },
+              {
+                "Mark": "4d1",
+                "Count": 59,
+                "Length": 1.9558
+              },
+              {
+                "Mark": "4e1",
+                "Count": 26,
+                "Length": 0.9652
+              },
+              {
+                "Mark": "4h1",
+                "Count": 6,
+                "Length": 2.4383999999999997
+              }
+            ],
+            "ListedWeightLb": 1602,
+            "ListedWeightSource": "4730 BTD Beam Data, Woodbury Design 817 PDF p.27 (DS 25)"
+          }
         }
       },
       "Deck": {

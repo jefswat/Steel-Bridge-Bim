@@ -996,8 +996,9 @@ public sealed partial class MainViewModel : ObservableObject
         if (bridge == null) { Warn("No reinforcement to schedule. Create a bridge first."); return; }
         ConcreteModels.TryGetValue(bridge, out var cm);
         SubstructureModels.TryGetValue(bridge, out var sm);
-        if ((cm?.Marks.Count ?? 0) + (sm?.Marks.Count ?? 0) == 0) { Warn($"{bridge.Name} has no reinforcement (enable deck, rail or substructure reinforcing)."); return; }
-        new BarScheduleWindow(bridge.Name, cm, sm, Units) { Owner = Application.Current.MainWindow }.Show();
+        PrestressedModels.TryGetValue(bridge, out var pm);
+        if ((cm?.Marks.Count ?? 0) + (sm?.Marks.Count ?? 0) + (pm?.BarMarks.Count ?? 0) == 0) { Warn($"{bridge.Name} has no reinforcement (enable deck, rail, substructure or beam reinforcing)."); return; }
+        new BarScheduleWindow(bridge.Name, cm, sm, Units, pm) { Owner = Application.Current.MainWindow }.Show();
     }
 
     [RelayCommand]
@@ -1538,6 +1539,11 @@ public sealed partial class MainViewModel : ObservableObject
                         u.FormatLength(grp.Sum(x => x.Length)), $"{grp.Sum(x => x.Mass) / massUnit:N0} {mu}"));
                 MaterialRows.Add(new MaterialRow(b.Name, "Prestressing strand", $"{su} dia, {psm.Definition.StrandStrength:0} ksi low-relaxation",
                     psm.Beams.Sum(x => x.Strands.Count), u.FormatLength(psm.StrandLength), ""));
+                foreach (var g in psm.BarMarks.GroupBy(m => (m.Unit, m.Size.Name, m.Epoxy)))
+                    MaterialRows.Add(new MaterialRow(b.Name, "Reinforcing (beams)", $"{g.Key.Unit}: {g.Key.Name}{(g.Key.Epoxy ? ", epoxy" : "")} ({string.Join(", ", g.Select(m => m.Mark))})",
+                        g.Sum(m => m.Count), u.FormatLength(g.Sum(m => m.TotalLength)), $"{g.Sum(m => m.TotalMass) / massUnit:N0} {mu}"));
+                if (psm.BarMarks.Count > 0)
+                    MaterialRows.Add(new MaterialRow(b.Name, "TOTAL BEAM REINFORCING", "", psm.BarMarks.Sum(m => m.Count), "", $"{psm.RebarMass / massUnit:N0} {mu}"));
                 foreach (var grp in psm.Pads.GroupBy(x => (x.Length, x.Width, x.Thickness)))
                     MaterialRows.Add(new MaterialRow(b.Name, "Bearing pad",
                         $"Elastomeric {u.FormatLength(grp.Key.Length, LengthKind.Short)} x {u.FormatLength(grp.Key.Width, LengthKind.Short)} x {u.FormatLength(grp.Key.Thickness, LengthKind.Short)}",

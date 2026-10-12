@@ -472,7 +472,7 @@ public static class IfcExporter
                 int rep = w.Add("IFCSHAPEREPRESENTATION", $"{Ref(body)},'Body','AdvancedSweptSolid',({Ref(disk)})");
                 int pds = w.Add("IFCPRODUCTDEFINITIONSHAPE", $"$,$,({Ref(rep)})");
                 // Ties, hairpins, hoops, crossties, spirals and stirrups confine / tie the main bars: LIGATURE.
-                string role = mk.Shape.Code is "TIE" or "HAIRPIN" or "HOOP" or "CROSSTIE" or "SPIRAL" or "SSTR-S" ? ".LIGATURE." : mk.Shape.Code == "SSTR-U" ? ".ANCHORING." : ".MAIN.";
+                string role = mk.Shape.Code is "TIE" or "HAIRPIN" or "HOOP" or "CROSSTIE" or "SPIRAL" or "SSTR-S" or "STIRRUP" ? ".LIGATURE." : mk.Shape.Code == "SSTR-U" ? ".ANCHORING." : ".MAIN.";
                 string tag = string.IsNullOrEmpty(mk.Unit) ? mk.Mark : $"{mk.Unit} {mk.Mark}";
                 int id = w.Add("IFCREINFORCINGBAR",
                     $"{Guid(barKey(n++))},$,{S("Bar " + mk.Mark)},{S($"{mk.Size.Name} {mk.Location}")},$,{Ref(pl)},{Ref(pds)},{S(tag)},$," +
@@ -834,6 +834,9 @@ public static class IfcExporter
                         kids.Add(cid);
                     }
                 }
+                // Mild reinforcing of the beam (optional): IfcReinforcingBar aggregated into the girder assembly.
+                if (b.Bars.Count > 0)
+                    ExportBars(b.Bars.Select(x => (x, ps.MarkOf(x))), i => IfcKeys.PsBar(bk, b.Mark, i), kids, pl, bpd.Reinforcement?.SteelYieldKsi ?? 60);
                 w.Add("IFCRELAGGREGATES", $"{Guid(k + "/rel")},$,$,$,{Ref(asm)},{Refs(kids)}");
                 result.ElementCount += kids.Count;
             }

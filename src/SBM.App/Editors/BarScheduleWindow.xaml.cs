@@ -23,7 +23,7 @@ public partial class BarScheduleWindow : Window
     private readonly ConcreteModel? _deck;
     private readonly SubstructureModel? _sub;
 
-    public BarScheduleWindow(string bridgeName, ConcreteModel? deck, SubstructureModel? sub, UnitSystem units)
+    public BarScheduleWindow(string bridgeName, ConcreteModel? deck, SubstructureModel? sub, UnitSystem units, SBM.Core.Prestressed.PrestressedModel? beams = null)
     {
         InitializeComponent();
         _u = units;
@@ -36,7 +36,7 @@ public partial class BarScheduleWindow : Window
         string wName = units.IsUS ? "lb" : "kg";
         string Dim(BarMark m, string letter) =>
             m.Shape.Code == "STR" ? "" : m.Shape.Dimensions.FirstOrDefault(d => d.Letter == letter) is { } d ? units.FormatLength(d.Value, LengthKind.Short) : "";
-        var marks = (deck?.Marks ?? new List<BarMark>()).Concat(sub?.Marks ?? new List<BarMark>());
+        var marks = (deck?.Marks ?? new List<BarMark>()).Concat(sub?.Marks ?? new List<BarMark>()).Concat(beams?.BarMarks ?? new List<BarMark>());
         _rows = marks.Select(m => new BarRow(m, string.IsNullOrEmpty(m.Unit) ? Superstructure : m.Unit, m.Mark, m.Size.Name, m.Count,
             m.Varies ? $"{units.FormatLength(m.MinLength)} – {units.FormatLength(m.Length)}" : units.FormatLength(m.Length),
             m.Shape.Code switch { "STR" => "Straight", "TIE" => "Tie / stirrup", "SPIRAL" => "Spiral", "BENT" => "Bent", _ => m.Shape.Code },

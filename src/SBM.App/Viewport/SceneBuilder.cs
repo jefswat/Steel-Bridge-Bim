@@ -354,6 +354,32 @@ public static class SceneBuilder
                 var g = FlatShaded(pads.Select(p => p.Mesh), o, pads.Select(p => (object)new PsPadPick(p)).ToList());
                 return new SolidLayer { Name = "3D-BEARING-ELASTOMER", R = 40, G = 40, B = 45, Parts = new() { (g, null) }, Triangles = g.Indices!.Count / 3 };
             },
+            () =>
+            {
+                // Beam mild reinforcing (optional): tubes tiled like the substructure bars, RebarPick tags (near-view LOD picks them up).
+                if (SkipDetail) return null;
+                var byTile = new Dictionary<(long, long), (List<Mesh> tubes, List<object> tags)>();
+                bool epoxy = false;
+                foreach (var m in models)
+                {
+                    var marks = m.BarMarks.ToDictionary(k => (k.Unit, k.Mark));
+                    foreach (var b in m.Beams.SelectMany(x => x.Bars))
+                    {
+                        var mk = marks[(b.Unit, b.Mark)];
+                        epoxy |= mk.Epoxy;
+                        var t = new Mesh();
+                        AddTube(t, b.Points, mk.Size.Diameter / 2);
+                        var key = Tile(b.Points[b.Points.Length / 2]);
+                        if (!byTile.TryGetValue(key, out var e)) byTile[key] = e = (new(), new());
+                        e.tubes.Add(t);
+                        e.tags.Add(new RebarPick(b, mk));
+                    }
+                }
+                if (byTile.Count == 0) return null;
+                var gs = byTile.Values.Select(e => FlatShaded(e.tubes, o, e.tags)).ToList();
+                return new SolidLayer { Name = "3D-REBAR-BEAM", R = (byte)(epoxy ? 70 : 150), G = (byte)(epoxy ? 170 : 80), B = (byte)(epoxy ? 80 : 50),
+                    Parts = gs.Select(g => (g, (List<Matrix4x4>?)null)).ToList(), Triangles = gs.Sum(g => g.Indices!.Count / 3) };
+            },
             () => DiaphragmLayer(models, o, "3D-DIAPHRAGMS", 188, 186, 176, flagged: false, accessories: false, 0.6f),
             () => DiaphragmLayer(models, o, "3D-DIAPHRAGM-FILLERS", 235, 232, 200, flagged: false, accessories: true, 1f),
             () => DiaphragmLayer(models, o, "3D-UNRESOLVED-DIAPHRAGMS", 255, 110, 40, flagged: true, accessories: null, 0.6f),
