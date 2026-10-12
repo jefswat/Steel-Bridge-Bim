@@ -78,7 +78,7 @@ public sealed partial class ConcreteGenerator
             else
             {
                 var flag = ar.Unresolved is { Length: > 0 } aw ? Assumption.Unresolved(aw, ar.Basis ?? "as modeled") : null;
-                if (ar.Unresolved is { Length: > 0 } aw2) Warn($"{where}: {aw2}");
+                if (ar.Unresolved is { Length: > 0 } aw2 && aw2 != j.Unresolved) Warn($"{where}: {aw2}");
                 var cols = Cols(o0, o1);
                 double t = ar.PlateThickness, dp = ar.PlateDepth;
                 // near plate section (x, drop): joint face at x = 0, back at x = t; retainer bar on the joint face at the bottom
@@ -111,8 +111,11 @@ public sealed partial class ConcreteGenerator
                             double s = n == 1 ? len / 2 : ar.StudEndDistance + inner * i / (n - 1);
                             double o = OffsetAt(cols, X(0), s);
                             var a = JP(o, X(t), ar.StudDrop);
-                            var dirH = (JP(o, X(t + 0.1), ar.StudDrop) - a);
-                            dirH = new Vec3(dirH.X, dirH.Y, 0).Normalized();
+                            // horizontal, perpendicular to the joint line in plan (the plate's normal), away from the opening
+                            var ld = JP(o + 0.05, X(t), ar.StudDrop) - JP(o - 0.05, X(t), ar.StudDrop);
+                            var dirH = new Vec3(-ld.Y, ld.X, 0).Normalized();
+                            var away = JP(o, X(t + 0.1), ar.StudDrop) - a;
+                            if (dirH.X * away.X + dirH.Y * away.Y < 0) dirH = dirH * -1;
                             var b = a + dirH * (ar.StudLength - (ar.StudBentLength > 0 ? 0 : ar.StudHeadHeight));
                             var m = new Mesh();
                             Cyl(m, a, b, ar.StudDiameter / 2);
@@ -148,7 +151,7 @@ public sealed partial class ConcreteGenerator
             else
             {
                 var flag = cp.Unresolved is { Length: > 0 } cw ? Assumption.Unresolved(cw, cp.Basis ?? "as modeled") : null;
-                if (cp.Unresolved is { Length: > 0 } cw2) Warn($"{where}: {cw2}");
+                if (cp.Unresolved is { Length: > 0 } cw2 && cw2 != j.Unresolved) Warn($"{where}: {cw2}");
                 double c0 = OffsetAt(cols0, xc, cp.EndClearance), c1 = OffsetAt(cols0, xc, full - cp.EndClearance);
                 var cols = Cols(c0, c1);
                 double t = cp.Thickness, cr = cp.Crown;

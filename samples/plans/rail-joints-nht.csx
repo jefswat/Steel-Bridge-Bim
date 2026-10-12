@@ -86,7 +86,14 @@ RailMemberDefinition Handrail(double rIn) => new()
     Unresolved = "UNRESOLVED (p.89): handrail pipe size, wall and bracket - drawn only; the 'Pedestrian railing details' sheets are not in the set",
     Basis = "pipe OD 1.87\" and position scaled from the p.89 vectors; top 3'-0 above the trail (dimensioned); mass inside the plan design dead load of the envelope",
 };
-string why = "the 'Pedestrian railing details' / RAIL (PED) sheets that size the posts, rails, fencing, base plates and anchors are not in this reduced set (p.89, p.90 refer to them), and p.84 note 2 says the number and spacing of the posts is diagrammatic only";
+// TxDOT standard check (2026-10-12, C:\SBM\dist\standards): the Northaven RAIL (PED)(LOW) / (HIGH) is NOT a TxDOT standard rail type. RL-PR11 / PR22 are 3'-6 high
+// galvanized A36 plate posts (PL 3/4 / PL 5/8) carrying 5-6 HSS rails (PR22 on a 1'-1 parapet), RL-PR3 is 4'-0 concrete pilasters with HSS + square bars on a
+// 6" curb, RL-PR3-HD is the 3'-0 handrail for PR3 pilasters, RL-CLF-RO is an 8 ft chain link fence on HSS 3.500 posts on a concrete rail. The p.89 sections
+// draw a tapered stainless (p.83 note 8, AISI 316) post 4'-3 / 9'-10 above the trail on a 10" x 4" curb, curved inward 1'-1 at the HIGH top, with a single
+// bracket handrail and no HSS rails; the pay item is 5110 (a special specification item, p.91) 'RAIL (PED)(LOW / HIGH)', not Item 450 'RAIL (TY PRxx)'; the
+// p.83 design dead loads 50 / 100 PLF differ from PR11's 30 plf. The only TxDOT pedestrian rail standard in the plan set is PR11(MOD) (p.65-66, sheets 116-117,
+// retaining walls, 3'-6). So the post / fence / anchor details stay on the missing project sheets.
+string why = "the project 'Pedestrian railing details' / RAIL (PED) sheets that size the posts, rails, fencing, base plates and anchors are not in this reduced set (p.89, p.90 refer to them), p.84 note 2 says the number and spacing of the posts is diagrammatic only, and the railing is not a TxDOT standard type (RL-PR3 / PR11 / PR22 / PR3-HD / CLF-RO 2019 checked: 3'-6 / 4'-0 galvanized plate-post or pilaster rails and an 8 ft chain link fence vs the p.89 4'-3 / 9'-10 tapered stainless posts, Item 5110 special pay item)";
 string unrPosts = U("p.84 note 2, p.89, p.90", "railing posts, post spacing, base plates, anchor bolts, rails and fencing", why,
     "Posts / base plates / anchors not modeled; each run is a continuous envelope of the p.89 post section (flagged) plus the 3'-0 handrail.");
 string unrTrans = U("p.85, p.89", "low-to-high railing transition at STA 23+38.74", "the transition detail is on the missing railing sheets; p.89 gives only the section limits",
@@ -136,29 +143,92 @@ foreach (var b in nht.Where(x => x.Railings != null)) foreach (var r in b.Railin
 if (units.FirstOrDefault()?.Railings?.FirstOrDefault() is { } r0) { r0.Unresolved.Add(unrPosts); }
 if (units.FirstOrDefault(b => b.Name == "NHT Unit 3")?.Railings?.FirstOrDefault(r => r.Name == "High LT") is { } r3) r3.Unresolved.Add(unrTrans);
 
-// ================================================================ 3. expansion joints SEJ-B(MOD) 4" + BS-EJCP cover plate (p.84-88, 91, 113)
-// 7 joints; each physical joint is set on ONE unit (the device is one element): Abut 1 (Unit 1 begin), P4 / P7 / P10 / P13 (end of Units 1 / 2 / 3 / 4),
-// P11 (Unit 4 begin), Abut 16 (Unit 5 end). The slab is dimensioned to the CL SEJ (p.109-117), so the deck ends stay there.
-string unrJoint = U("p.84-88, 91, 113", "SEJ-B(MOD) joint opening, armor and blockout, BS-EJCP cover plate, IGTS thickened slab end",
-    "the SEJ-B(MOD), BS-EJCP and IGTS standards are not in the set; the sheets give only the joint line (CL SEJ; 9 1/4\" from CL pier at Piers 10 / 11), the 4 in size of the pay item and the BS-EJCP weight per joint (p.91)",
-    "Deck ends kept at the CL SEJ (plan slab dimensions); each joint is a 4 in wide placeholder centred on the CL SEJ through the slab depth, full deck width, no blockout or thickened end.");
-ExpansionJointDefinition Sej(bool body = true) => new()
+// ================================================================ 3. expansion joints SEJ-B(MOD) 4" + BS-EJCP cover plate + IGTS thickened slab ends
+// Plans (p.84-88, 91, 109-117): SEJ-B(MOD)(4") and BS-EJCP at Abut 1, P4, P7, P10, P11, P13, Abut 16; slabs dimensioned to the CL SEJ (P10 / P11: 9 1/4"
+// from CL pier, p.113 note 7); "see IGTS" for the thickened slab ends (p.113 note 3 and plan labels at every joint). Standards (C:\SBM\dist\standards, NOT in the
+// plan set; the 2024 revisions POST-DATE the 09/2020 plans): TxDOT MS-SEJ-B (10-2024), MS-BS-EJCP (10-2024), IG-IGTS (08-2017, rev. 11-24 "flipped top mat").
+//  SEJ-B joint section: armor PL 1/2 x 4 (top flush with the slab), Bar 1/2 x 1/4 seal retainer at the plate bottom (1/4 above it, projecting 1/4 into the
+//    opening), 5/8" stud anchors at 6" C.C. max (first 3" from the plate end, end view) 1 1/2" below the top, 4" +- horizontal then 4" +- inclined (bend
+//    18.4 deg, measured on the standard's vectors); opening at 70 F per the manufacturer table: D.S. Brown V-400 2 1/4", R.J. Watson SF-400 2 1/2", SSI SSS-400
+//    2 1/2", Watson Bowman Acme SPS-400 2" -> 2 1/2" modeled (the standard's drawn joint section is the R.J. Watson seal). "At sidewalk": armor ends at the toe
+//    of the sidewalk (here the curb toe, 10" from the slab edge) and the seal turns up the curb face ("for curbs trim seal 1/2" below top surface").
+//  BS-EJCP: 1/4" slip resistant plate 1'-4 wide centred on the joint, bent 1/4" at the CL, 3/8" x 2 1/2" flat head sleeve anchors in two staggered rows 1 1/2"
+//    and 4 1/2" from the plate edge on one side, 3" from the ends, "Eq Spa at 6" Max"; ends 1" (rail) - 2" (sidewalk) max from the curb: 1" modeled (p.91
+//    194 lb = 14 plf x 13.83 ft between the curb toes less 1" each end; 206 lb at the 19.58 deg skewed P10 / P11 joints).
+//  IGTS: thickened slab end between the girders, 4'-0 from the CL joint (face of backwall at the abutments) square to it, "slab thickness plus 2" min" deep =
+//    the plan X = 10 1/2" at CL brg (8 1/2" slab + 2" haunch), 45 deg chamfer to the slab soffit, sides at the girder top flange edges (Tx28 3'-0).
+// Deck ends: the slab faces are the armor faces, opening / 2 each side of the CL SEJ at the piers; at the abutments the far face is the face of backwall
+// (SEJ-B "joints at abutments") so the bridge slab ends one opening short of the support line.
+double open70 = In(2.5);
+const string sejStd = "TxDOT MS-SEJ-B (10-2024)", ejcpStd = "TxDOT MS-BS-EJCP (10-2024)", igtsStd = "TxDOT IG-IGTS (08-2017 rev. 11-24)";
+string verNote = "standard version post-dates the plans (09/2020): the 2024 revision in hand is used";
+string unrSej = U("p.84-88, 91, 113", "SEJ-B(MOD) modification and joint seal manufacturer",
+    $"the plans call for SEJ-B(MOD); the (MOD) sheet / note is not in the set, and the SEJ-B standard gives the 70 F opening per manufacturer (2\" to 2 1/2\"); {verNote}",
+    "SEJ-B (10-2024) armor PL 1/2 x 4 + Bar 1/2 x 1/4 + 5/8\" studs at 6\" max between the curb toes, 2 1/2\" opening (R.J. Watson SF-400, the standard's drawn section); seal = envelope in the opening, its upturns at the curbs not modeled.");
+string unrSkew = U("p.113, 115 (P10 / P11)", "SEJ-B armor at the 19.58 deg skewed P10 / P11 joints",
+    "SEJ-B 'skews over 15 deg' terminates the armor at a square slab breakback 2'-0 from each slab edge, but the p.113 / 115 deck plans draw a straight skewed slab end at P10 / P11 (part of the unknown (MOD)?)",
+    "Straight skewed slab end as drawn; armor along the skewed joint between the curb toes like the other joints.");
+string unrEjcp = U("p.91", "BS-EJCP cover plate version", $"{verNote}; the clear distance to the curb is a maximum (1\" at a rail, 2\" at a sidewalk)",
+    "1/4\" x 1'-4 plate from 1\" inside each curb toe (reproduces the p.91 194 / 206 lb at the standard's 14 plf estimate); 1\" x 1\" corner clips and edge bevels not modeled.");
+string unrIgts = U("p.109-117 (plan notes 'see IGTS')", "IGTS thickened slab end", $"{verNote} (rev. 11-24 'flipped top mat' changes the bars, not the concrete outline); bars G / H / J / M not placed (R3: the bar arrangement of the plans' 2017 version cannot be told from the revised sheet)",
+    "Thickened slab end per IGTS 'partial plan for slabs without breakback' / section A-A between the girder top flanges.");
+var txTop = SBM.Core.Prestressed.TxGirderCatalog.Get(TxGirderType.Tx28).TopWidth;
+double BaseDeckEnd(string sup) => sup is "Pier 10" or "Pier 11" ? -In(9.25) : 0;   // build-nht.csx: CL SEJ (abutments: face of backwall)
+JointArmorDefinition Armor() => new()
 {
-    Type = ExpansionJointType.Sealed, Designation = "SEJ-B(MOD) sealed expansion joint (4 in) + BS-EJCP cover plate", GapAt50F = In(4), BodyCentered = true,
-    BlockoutWidth = 0, BlockoutDepth = In(8.5), SetDown = 0, EdgeInset = 0, Body = body,
-    Unresolved = unrJoint, Basis = "4 in (pay item size) wide envelope centred on the CL SEJ, top of slab to the slab soffit, between the deck edges",
+    Standard = sejStd, PlateThickness = In(0.5), PlateDepth = In(4), BarProjection = In(0.25), BarHeight = In(0.5), BarAboveBottom = In(0.25),
+    EdgeInsetLeft = In(10), EdgeInsetRight = In(10), FarPlate = true,
+    StudDiameter = In(0.625), StudDrop = In(1.5), StudLength = In(4), StudBentLength = In(4), StudBendDegrees = 18.4, StudHeadDiameter = In(1.25), StudHeadHeight = In(0.3125),
+    StudSpacing = In(6), StudEndDistance = In(3), Material = "ASTM A36 (SEJ-B), galvanized",
+    Unresolved = unrSej, Basis = "SEJ-B (10-2024) joint section; studs: the top stud anchor (bent) of the joint section, legs 4\" +- each, bend scaled 18.4 deg",
 };
+JointCoverPlateDefinition Cover() => new()
+{
+    Standard = ejcpStd, Thickness = In(0.25), Width = Ft(1) + In(4), Crown = In(0.25), EdgeInsetLeft = In(10), EdgeInsetRight = In(10), EndClearance = In(1),
+    AnchorDiameter = In(0.375), AnchorLength = In(2.5), AnchorRows = new() { In(1.5), In(4.5) }, AnchorSpacing = In(6), AnchorEndDistance = In(3),
+    Material = "Slip resistant steel plate (BS-EJCP), hot-dip galvanized", Unresolved = unrEjcp, Basis = "BS-EJCP (10-2024) plan / section A-A / bending diagram",
+};
+// IGTS block between the girder top flanges at a deck end (offsets along the support line from the span layout x cos(skew) = alignment offsets)
+DeckEndBlockDefinition Igts(BridgeDefinition b, bool begin, bool abut)
+{
+    var lay = begin ? b.Girders.SpanLayouts.First(l => l.Span == 0).Begin : b.Girders.SpanLayouts.First(l => l.Span == b.Supports.Count - 2).End;
+    var sup = begin ? b.Supports[0] : b.Supports[^1];
+    double cs = Math.Cos(sup.SkewDegrees * Math.PI / 180);
+    double g1 = lay.Offsets[0], g2 = g1 + lay.Spacings[0];
+    return new DeckEndBlockDefinition
+    {
+        Depth = In(8.5 + 2), FlatLength = Ft(4) - (abut ? open70 : open70 / 2), ChamferRun = In(2),
+        LeftOffset = (g1 + txTop / 2) * cs, RightOffset = (g2 - txTop / 2) * cs,
+        Source = igtsStd, Unresolved = unrIgts, Basis = "4'-0 from the CL joint / face of backwall, 10 1/2\" deep (slab + 2\"), 45 deg chamfer, between the Tx28 top flanges",
+    };
+}
+ExpansionJointDefinition Sej(BridgeDefinition b, bool begin, bool owner)
+{
+    var sup = begin ? b.Supports[0] : b.Supports[^1];
+    bool abut = sup.Type == SupportType.Abutment;
+    return new ExpansionJointDefinition
+    {
+        Type = ExpansionJointType.Sealed, GapAt50F = open70, BodyCentered = false, BlockoutWidth = 0, BlockoutDepth = In(4), SetDown = In(1), EdgeInset = null, Body = owner,
+        Designation = owner ? "SEJ-B(MOD) 4 in sealed expansion joint + BS-EJCP cover plate" : null,
+        Armor = owner ? Armor() : null, CoverPlate = owner ? Cover() : null, EndBlock = Igts(b, begin, abut),
+        Unresolved = owner ? unrSej : null,
+        Basis = owner ? "strip seal envelope in the 2 1/2\" opening between the armor faces, 1\" below the top of slab to the armor bottom, between the curb toes" : null,
+    };
+}
 foreach (var b in units)
 {
     foreach (var s in b.Supports) s.ExpansionJoint = null;
     var first = b.Supports[0]; var last = b.Supports[^1];
+    // slab ends at the armor faces
+    foreach (var s in new[] { first, last })
+        s.DeckEndOffset = BaseDeckEnd(s.Name) - (s.Type == SupportType.Abutment ? open70 : open70 / 2);
     switch (b.Name)
     {
-        case "NHT Unit 1": first.ExpansionJoint = Sej(); last.ExpansionJoint = Sej(); break;     // Abut 1, P4
-        case "NHT Unit 2": last.ExpansionJoint = Sej(); break;                                   // P7
-        case "NHT Unit 3": last.ExpansionJoint = Sej(); break;                                   // P10 (9 1/4" off CL pier)
-        case "NHT Unit 4": first.ExpansionJoint = Sej(); last.ExpansionJoint = Sej(); break;     // P11, P13
-        case "NHT Unit 5": last.ExpansionJoint = Sej(); break;                                   // Abut 16
+        case "NHT Unit 1": first.ExpansionJoint = Sej(b, true, true); last.ExpansionJoint = Sej(b, false, true); break;     // Abut 1, P4
+        case "NHT Unit 2": first.ExpansionJoint = Sej(b, true, false); last.ExpansionJoint = Sej(b, false, true); break;    // (P4), P7
+        case "NHT Unit 3": first.ExpansionJoint = Sej(b, true, false); last.ExpansionJoint = Sej(b, false, true); break;    // (P7), P10 (arch beyond)
+        case "NHT Unit 4": first.ExpansionJoint = Sej(b, true, true); last.ExpansionJoint = Sej(b, false, true); break;     // P11 (arch beyond), P13
+        case "NHT Unit 5": first.ExpansionJoint = Sej(b, true, false); last.ExpansionJoint = Sej(b, false, true); break;    // (P13), Abut 16
     }
 }
 
@@ -182,8 +252,57 @@ foreach (var b in units)
 Print($"Mow strips set on {mowSet} approach piers (plan: 12).");
 U("p.85, p.95, p.96", "riprap at the abutments", "p.85 points to the retaining wall sheets ('riprap, see retaining wall sheets'); the bridge sheets show no mow strip at Abutments 1 / 16", "No mow strip at the abutments.");
 
-// ================================================================ 5. arch pier traffic barrier T80SS(MOD) (p.105-106) - not built
-U("p.105, 106", "T80SS(MOD) traffic barrier at Piers 10 / 11 (78 LF)", "the T80SS standard section is not in the set and the barrier stands on the existing US 75 pavement, whose elevation and lane geometry are not given (the sheets dimension it only relative to the column: 4'-6 high, 9'-1 + 4'-6 + 7'-11 = 21'-6 straight plus 7'-6 transitions, 2'-4 footings)",
-    "Not modeled.");
+// ================================================================ 5. arch pier traffic barrier T80SS(MOD) (p.105-106; TxDOT RL-T80SS 09-2019)
+// p.105 section D-D (3/16" = 1'-0, VECTORS 1.125 pt/in): barrier 4'-6 high (dimensioned) on replacement concrete pavement 2'-4 wide (dimensioned), 1'-1 deep
+// (p.106 section A-A), pavement top 2'-9 above the drilled shaft top (dimensioned), barriers both sides of the 4'-6 column, back faces 9 1/2" from the column
+// faces (SCALED), traffic faces outward. The drawn MOD section = the T80SS 'on bridge slab' section (RL-T80SS sheet 2, vectors 3 pt/in: 1'-5 base below the
+// back step, 1" top chamfers, 1/2" x 2" reveals, traffic face 0.1905 batter) with the 19 1/2" lower back face lengthened by 1'-0 (D-D: step 31 1/2" above
+// the base, base 1'-7 5/16" = 17" + 12 x 0.1905, top flat 7"; all within the scaled plan precision). p.106 elevation: 9'-1 + 4'-6 (column) + 7'-11 = 21'-6 at
+// 4'-6, 15'-0 taper at 1:10 to the existing 3'-0 barrier (south, p.105 plan), 1'-8 at the north end under the UHMW transition wedge (11'-8 - 10'-0),
+// = 38'-2 per side = the p.105 "38'-2 limits of cutting and restoring pavement".
+var pier10 = units.SelectMany(b => b.Supports).FirstOrDefault(s => s.Name == "Pier 10" && s.Substructure is { Enabled: true });
+string unrBar = U("p.105, 106", "T80SS(MOD) barrier base / existing pavement and taper section",
+    "the barrier stands on the existing US 75 pavement, whose profile / cross slope are not given (only section D-D's 2'-9 from the pavement top to the shaft top); the 'Traffic rail T80SS(MOD)' sheet (p.105 note 6) is not in the set, so the section at the 1:10 taper / north end is not drawn; the p.105 plan draws the column centred in the 21'-6 (8'-6 + 4'-6 + 8'-6 scaled) while the p.106 elevation dimensions 9'-1 / 7'-11",
+    "Level base at shaft top + 2'-9; MOD section = RL-T80SS bridge-slab section + 1'-0 lower back face (D-D vectors); the dimensioned 9'-1 on the taper (south) side; taper = the section shortened from the base (top shape kept); back faces 9 1/2\" (scaled) from the column faces.");
+string unrP11 = U("p.91, 105, 106", "T80SS(MOD) barrier at Pier 11", "the 'arch piers 10 and 11 traffic barrier details' draw and dimension Pier 10 only; p.91 lists 78 LF for 'Piers 10 & 11' = 2 x 39 LF, about the two 38'-2 Pier 10 barriers",
+    "Barriers modeled at Pier 10 only (2 x 38'-2 = 76.33 LF vs 78 LF reported).");
+U("p.106", "T80SS(MOD) reinforcing (bill R / RH / H1 / S1 / U, 1,823 lb one side)", "the bar arrangement is on the missing 'Traffic rail T80SS(MOD)' sheet; the p.106 bill (for contractor's information) does not fit the RL-T80SS spacing (40 S1 at 6\" max cover 20 ft of the 38'-2 barrier) - positions would be guesses",
+    "Bars not placed; the bill is a check value only.");
+U("p.105, 106", "T80SS(MOD) UHMW-PE transition wedge (north end)", "it is anchored on the existing concrete back-up wall whose height and outline are not given",
+    "Not modeled; the barrier ends 1'-8 north of the construction joint.");
+if (pier10 != null)
+{
+    double sTop = 639.08, xBack = 492.81;
+    double Fi(double ft, double inch) => Ft(ft) + In(inch);
+    RailPoint T(double x, double y) => new(In((x - xBack) / 3), In((sTop - y) / 3 + 12));
+    var prof = new List<RailPoint>
+    {
+        new(In(1.5), 0),                                   // base, lower back face (standard x 497.31)
+        T(497.31, 580.59), T(492.81, 576.09),              // back step
+        T(492.81, 559.59), T(494.31, 558.09), T(494.31, 552.08), T(492.81, 550.58),   // reveal 1
+        T(492.81, 538.58), T(494.31, 537.08), T(494.31, 531.08), T(492.81, 529.58),   // reveal 2
+        T(492.81, 516.08), T(495.81, 513.08), T(516.81, 513.08), T(520.37, 516.03),   // top with 1" chamfers
+        new(In((543.81 - xBack) / 3 + 12 * (543.81 - 520.37) / (639.08 - 516.03)), 0),  // toe: the traffic face continued 1'-0 down
+    };
+    double colHalf = Ft(2.25), sS = -In(7), gapBack = In(9.5);
+    double sNorth = sS - colHalf - Fi(7, 11), sSouth = sS + colHalf + Fi(9, 1);
+    double[] ss = { sNorth - Fi(1, 8), sNorth, sSouth, sSouth + Ft(15) };
+    double[] hh = { Fi(4, 6) - Fi(1, 8) / 10, Fi(4, 6), Fi(4, 6), Ft(3) };
+    pier10.Substructure!.GroundBarriers = new();
+    foreach (int side in new[] { 1, -1 })      // +1 = east (up-station, +N) barrier
+    {
+        double n = side * (colHalf + gapBack);
+        pier10.Substructure.GroundBarriers.Add(new GroundBarrierDefinition
+        {
+            Name = side > 0 ? "T80SS(MOD) barrier east" : "T80SS(MOD) barrier west", TypeName = "T80SS(MOD)",
+            Profile = prof, FullHeight = Fi(4, 6), StretchAt = 0,
+            Path = ss.Select((x, i) => new GroundBarrierVertex(x, n, hh[i])).ToList(), TrafficSide = side > 0 ? -1 : 1,
+            BaseAboveFoundation = Fi(2, 9), PavementR0 = -In(1.25), PavementWidth = Fi(2, 4), PavementThickness = Fi(1, 1),
+            PlanLength = Fi(38, 2), Source = "p.105-106, RL-T80SS (09-2019) sheet 2", Unresolved = unrBar,
+            Basis = "level base at shaft top + 2'-9 (D-D); RL-T80SS bridge-slab section + 1'-0 (D-D vectors); 9'-1 south / 7'-11 north of the column (p.106)",
+        });
+    }
+}
+else Print("rail-joints-nht: Pier 10 substructure not found - T80SS(MOD) not set");
 
 foreach (var t in unresolved) Print("UNRESOLVED " + t);

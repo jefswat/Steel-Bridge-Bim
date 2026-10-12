@@ -283,10 +283,8 @@ foreach (var (uname, sups, firstSpan) in units)
     bridges[uname] = br;
 }
 G("RAIL (PED) low 4'-3 / high 9'-10 posts (p.84, 89) and the 10\" curbs (height not dimensioned, p.109): no pedestrian rail / curb profile in BarrierProfiles -> no rail or curb modeled.");
-G("Deck reinforcing: A, T, OA, D, C, CS placed by rebar-nht-approach.csx (p.109-117); P (PCP), G / H / J / M (IGTS) and UP are UNRESOLVED (standards not in the set). PCP panels not modeled separately (8 1/2\" slab solid); thickened slab ends (IGTS) not modeled.");
-G("Expansion joints SEJ-B(MOD) 4\" + BS-EJCP (p.84-88, 91): standard not in the set; deck ends modeled at the joint line, no blockout / device.");
-U("p.84-88, 109-117", "deck gap at the SEJ-B(MOD) joints (Abut 1, P4, P7, P10, P11, P13, Abut 16)", "the SEJ-B(MOD) standard is not in the set, the sheets show only the joint line",
-  "Each deck ends AT the joint line (P4 / P7 / P13: CL pier; P10 / P11: 9 1/4\" from CL pier; abutments: face of backwall).");
+G("Deck reinforcing: A, T, OA, D, C, CS placed by rebar-nht-approach.csx (p.109-117); P (PCP) and UP are UNRESOLVED (standard not in the set / not shown); G / H / J / M: IGTS in hand is the 11-24 revision (top mat flipped), not placed. PCP panels not modeled separately (8 1/2\" slab solid); thickened slab ends: rail-joints-nht.csx (IGTS).");
+G("Expansion joints SEJ-B(MOD) 4\" + BS-EJCP + IGTS thickened slab ends (p.84-88, 91, 109-117): set by rail-joints-nht.csx from the TxDOT standards (2024 revisions, post-dating the plans); it moves the deck ends from the joint lines below to the armor faces (2 1/2\" opening).");
 G("Prestressed camber / dead-load deflections (p.109-117 tables A / B, Z at CL span): beams straight, haunch 2\" constant along the beam (plan Z at midspan is a check value).");
 
 // ---------------------------------------------------------------- support frames and girder chords (script geometry = the generator's)
@@ -484,7 +482,7 @@ p11.Substructure = ArchPier(false, 531.546, 531.494, 529.896, 523.896, 509.110, 
 Print($"Approach seat side angles (girder chords): Pier 10 {SideAngle("Pier 10", 9):0.000} deg from the pier normal (plan ** 73 28'39\" / 73 20'28\" -> {90 - 73.41:0.000}), Pier 11 {SideAngle("Pier 11", 11):0.000} (plan 76 09'10\" / 76 31'36\" -> {90 - 76.34:0.000})");
 G("Arch pier cap: top 1/4\"/ft drain slope (p.102) not modeled (the cap profile is extruded level across N); cap edge chamfers and the column corner chamfers (p.102/103, size not dimensioned) not modeled.");
 G("Arch pier reinforcing (bar-lists.csv, p.101-104) placed by rebar-nht-sub.csx.");
-G("T80SS(MOD) traffic barrier on the arch piers (p.105-106, 78 LF) not modeled.");
+G("T80SS(MOD) traffic barrier at Pier 10 (p.105-106): set by rail-joints-nht.csx (RL-T80SS section + 1'-0, flagged base / taper; Pier 11 not drawn).");
 // B1-B3 (SUMMARY section 8): the p.102 pedestal tops are the plan values; the p.119 tie WP chain does not reconcile -> reported, not fixed.
 {
     double stack = In(2) + In(11.75);                     // ~2" steel below the WP (p.124, UNVERIFIED) + bearing H 11.75" (p.107)
