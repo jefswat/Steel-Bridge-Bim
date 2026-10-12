@@ -490,6 +490,10 @@ public sealed class ArchBearingDefinition
     /// <summary>Local Z of the underside of the steel above the bearing (chain check).</summary>
     public double SteelUndersideZ { get; set; } = double.NaN;
     public string Fixity { get; set; } = "Partially fixed";
+    /// <summary>Long axis of the masonry / sole plates in plan: angle (deg) from the support line +S (right) toward +N (up-station), as the plan
+    /// pedestal (NaN = normal to the support line).</summary>
+    public double LongAxisAngleDeg { get; set; } = double.NaN;
+    public string LongAxisSource { get; set; } = "";
     public double PadThickness { get; set; } = In(0.125);
     public double MasonryLength { get; set; } = Ft(3) + In(2);
     public double MasonryWidth { get; set; } = Ft(1) + In(5);

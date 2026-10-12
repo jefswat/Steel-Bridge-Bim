@@ -106,6 +106,21 @@ Row("south tie chords FB1-FB17 (arc 5'-10 on R 342'-4)", "5.833' arc", $"{ToFt(s
 Print("== bearings (p.102 pedestal tops, p.107 stack 11 3/4\", p.119 WP chain)");
 foreach (var b in am.Bearings)
     Print($"     {b.Name} @ {b.Support}: pedestal {ToFt(b.SeatElevation):F3}', top of stack {ToFt(b.TopOfStack):F3}', steel underside (WP chain) {ToFt(b.SteelUnderside):F3}', gap {ToIn(b.SteelUnderside - b.TopOfStack):F2}\"");
+// Bearing plan orientation vs the approach model's arch pedestals (p.102: long axis 63 deg to the pier line).
+foreach (var seat in am.Steel.BearingSeats)
+{
+    var appr = Doc.Project.Bridges.FirstOrDefault(b => b.Arch == null && b.Supports.Any(s => s.Name == seat.Support && s.Substructure.CapBlocks.Count > 0));
+    var unit = appr == null ? null : Doc.Model(appr.Name).Substructure?.Units.FirstOrDefault(u => u.Name == seat.Support);
+    var sd = appr?.Supports.First(s => s.Name == seat.Support).Substructure;
+    if (unit == null || sd == null || seat.Axis is not { } ax || seat.Location is not { } loc) continue;
+    var blk = sd.CapBlocks.Where(c => c.Kind == SBM.Core.Bridge.CapBlockKind.Pedestal && c.Outline.Count == 4)
+        .OrderBy(c => (unit.World(c.Outline.Average(q => q.S), c.Outline.Average(q => q.N), 0).XY - loc).Length).FirstOrDefault();
+    if (blk == null) continue;
+    var p0 = unit.World(blk.Outline[0].S, blk.Outline[0].N, 0).XY; var p1 = unit.World(blk.Outline[1].S, blk.Outline[1].N, 0).XY;
+    var pa = (p1 - p0).Normalized();
+    double dAng = Math.Acos(Math.Min(1, Math.Abs(Vec2.Dot(pa, ax.Normalized())))) * 180 / Math.PI;
+    Row($"bearing {am.BearingNames[seat.Girder]} plan axis vs pedestal '{blk.Name}' long axis", "parallel (p.102 63 deg / p.107)", $"{dAng:F3} deg", dAng < 0.01);
+}
 
 // ---- deck
 Print("== deck (p.91 / p.151: 3,698 SF)");

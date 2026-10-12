@@ -124,8 +124,28 @@ public static class IfcExporter
         int ctx = w.Add("IFCGEOMETRICREPRESENTATIONCONTEXT", $"$,'Model',3,1.0E-5,{Ref(axis)},{Ref(north)}");
         int body = w.Add("IFCGEOMETRICREPRESENTATIONSUBCONTEXT", $"'Body','Model',*,*,*,*,{Ref(ctx)},$,.MODEL_VIEW.,$");
         int axisCtx = w.Add("IFCGEOMETRICREPRESENTATIONSUBCONTEXT", $"'Axis','Model',*,*,*,*,{Ref(ctx)},$,.MODEL_VIEW.,$");
-        int crs = w.Add("IFCPROJECTEDCRS", $"'Project grid','Grid coordinates of the source alignment',$,$,$,$,{Ref(lenUnit)}");
-        w.Add("IFCMAPCONVERSION", $"{Ref(ctx)},{Ref(crs)},{R(basePt.X * scale)},{R(basePt.Y * scale)},{R(basePt.Z * scale)},1.0,0.0,1.0");
+        if (project.Georeference is { } geo)
+        {
+            // Project X / Y = map grid / GridScale (e.g. TxDOT surface coordinates); eastings / northings = the base point in grid units.
+            int mapUnit = lenUnit;
+            double toMap = 1;
+            if (geo.MapUnitUsSurveyFoot)
+            {
+                int dim2 = w.Add("IFCDIMENSIONALEXPONENTS", "1,0,0,0,0,0,0");
+                int mwu2 = w.Add("IFCMEASUREWITHUNIT", $"IFCLENGTHMEASURE({R(1200.0 / 3937.0)}),{Ref(metre)}");
+                mapUnit = w.Add("IFCCONVERSIONBASEDUNIT", $"{Ref(dim2)},.LENGTHUNIT.,'US SURVEY FOOT',{Ref(mwu2)}");
+                toMap = (u.IsUS ? u.FootInMeters : 1.0) / (1200.0 / 3937.0);
+            }
+            string Opt(string s) => string.IsNullOrEmpty(s) ? "$" : S(s);
+            int crs = w.Add("IFCPROJECTEDCRS", $"{S(geo.CrsName)},{Opt(geo.Description)},{Opt(geo.GeodeticDatum)},$,{Opt(geo.MapProjection)},{Opt(geo.MapZone)},{Ref(mapUnit)}");
+            double g = geo.GridScale > 0 ? geo.GridScale : 1;
+            w.Add("IFCMAPCONVERSION", $"{Ref(ctx)},{Ref(crs)},{R(basePt.X * scale * g * toMap)},{R(basePt.Y * scale * g * toMap)},{R(basePt.Z * scale * toMap)},1.0,0.0,{R(g * toMap)}");
+        }
+        else
+        {
+            int crs = w.Add("IFCPROJECTEDCRS", $"'Project grid','Grid coordinates of the source alignment',$,$,$,$,{Ref(lenUnit)}");
+            w.Add("IFCMAPCONVERSION", $"{Ref(ctx)},{Ref(crs)},{R(basePt.X * scale)},{R(basePt.Y * scale)},{R(basePt.Z * scale)},1.0,0.0,1.0");
+        }
 
         int proj = w.Add("IFCPROJECT", $"{Guid(IfcKeys.Project(key))},$,{S(project.Name)},$,$,$,$,({Ref(ctx)}),{Ref(units)}");
         int sitePl = w.Add("IFCLOCALPLACEMENT", $"$,{Ref(axis)}");

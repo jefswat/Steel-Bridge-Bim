@@ -38,7 +38,7 @@ RW(EM), RW(MSE), PAZD, PB, PCO (p.37-78).
 | item | value | unit | PDF p. / sheet | tag | note |
 |---|---|---|---|---|---|
 | Alignment | chain TRAILCLNEW = CL NHT; bridge stationing on it | - | p.18-19 / sh 69-70 | RASTER | `horizontal-alignment.csv` |
-| Coordinates | state-plane-like X ~2,500,000 / Y ~7,016,000 ft; only survey control sheet 3 of 3 in the set | ft | p.17-19 | RASTER | datum / zone / scale factor not in set -> U12 |
+| Coordinates | state-plane-like X ~2,500,000 / Y ~7,016,000 ft; only survey control sheet 3 of 3 in the set | ft | p.17-19 | RASTER | datum not in the set; RESOLVED 2026-10-11 (U12): TxDOT SURFACE coordinates, NAD83 Texas North Central (EPSG:2276, ftUS) x Dallas County SAF 1.000136 (user GPS check, see U12) |
 | Curves on the bridge | 102 (R 60 RT, PT 20+49.30 = begin bridge), 103 (R 60 RT, 20+92.01-22+35.03), 104 (R 250 RT, 22+74.36-23+59.77), 105 (R 385 RT, 24+00.44-25+18.73), 106 (R 385 LT, 25+18.73-26+47.89), 107 (R 250 LT, 26+47.89-27+15.09), 108 (R 200 RT, 28+33.68-28+72.73), 109 (R 200 LT, 28+90.27-29+29.31) | - | p.18-19 | RASTER | DERIVED: every R (PC/PT to CC) and every L (from stations) reconcile within 0.01 ft |
 | Reverse curve at the arch | PRC 25+18.73 (curve 105 RT -> 106 LT) = arch local origin station | - | p.18-19, 119 | RASTER | |
 | Vertical profile | TRAILNEW: VPI 7 20+00.00 523.10; VPI 8 23+40.01 538.08 L 140 (g +4.41 / -1.61, VPC 22+70.01 535.00, VPT 24+10.01 536.96); VPI 9 26+50.01 533.10 L 50 (g -1.61 / -4.90, VPC 26+25.01 533.50, VPT 26+75.01 531.88); VPI 10 32+25.01 504.92 L 100 | ft | p.20 / sh 71 | RASTER | |
@@ -177,7 +177,7 @@ to have stripped them. PDF bookmarks differ from the sheets ("162.77' ... UNIT",
 | U9 | Stale text: "CL PIER 7 / 8, bent 7", "RS6", deck quantity "span 7" for the arch | p.119, 127, 123, 151 | numbering inconsistent with layout |
 | U10 | WP vertical position in the tie (bottom of flange p.119 vs inside the 2 in end flange p.124) | p.119, 124 | not dimensioned |
 | U11 | Arch pier angle table (** 73 20'28" / 76 09'10", *** 73 28'39" / 76 31'36") | p.102 | reference lines of the ** / *** angles not identified |
-| U12 | Horizontal datum / projection / scale factor | p.17-19 | survey sheets 1-2 not in set |
+| U12 | Horizontal datum / projection / scale factor - RESOLVED 2026-10-11 | p.17-19 | survey sheets 1-2 not in set; user GPS of the approximate arch-span centre 32.901380, -96.769012 -> EPSG:2276 X 2499728.33, Y 7015245.07 -> x SAF 1.000136 (TxDOT Dallas County) = 2500068.29, 7016199.14 vs model arch centre 2500079.15, 7016198.76 (10.9 / 0.4 ft = approximate GPS) => plan X/Y are TxDOT surface coordinates, NAD83 Texas North Central, SAF 1.000136. Model unchanged; `Doc.Project.Georeference` (build-nht.csx) writes IfcProjectedCRS EPSG:2276 + IfcMapConversion.Scale 1/1.000136. U1 (pedestal / bearing ELEVATIONS) is vertical and stays open. |
 | U13 | (2026-10-11: the PIER / GIRDER REPORTs p.108-116, IGND table p.118, section depths X/Y p.109/113/115, approach / arch pier shaft tables p.98/100/101 and abutment 16 p.96 are now transcribed in `samples/plans/build-nht.csx` / `check-nht.csx`.) Not transcribed (scope): approach PIER / GIRDER REPORTs (p.108-116), other unit depth / deflection tables, abutment 16, arch deck bar bends (p.154), PT details (p.155), knuckle stud layout (p.126), bracing connections (p.129-142), arch pier barrier (p.105-106), force tables (p.121-122) | listed | legible at 300-400 dpi; time |
 
 ## Model mapping

@@ -1234,9 +1234,16 @@ public static class ArchGenerator
             double zu = double.IsNaN(br.SteelUndersideZ) ? 0 : br.SteelUndersideZ;
             var top = W(lp.XY.WithZ(zu));
             var c2 = top.XY;
-            // Long direction normal to the support line, pointing up-structure (+X).
-            var along = sl.Direction.Left;
+            // Long direction: the plan pedestal / bearing axis (angle from the support line +S toward +N) or normal to the support line; pointing up-structure (+X).
+            var sDir = sl.Direction; var nDir = sDir.Left;
+            var along = double.IsNaN(br.LongAxisAngleDeg) ? nDir
+                : sDir * Math.Cos(br.LongAxisAngleDeg * Math.PI / 180) + nDir * Math.Sin(br.LongAxisAngleDeg * Math.PI / 180);
             if (Vec2.Dot(along, _fr.X.XY) < 0) along = -along;
+            if (!double.IsNaN(br.LongAxisAngleDeg))
+            {
+                double toChord = Math.Acos(Math.Clamp(Math.Abs(Vec2.Dot(along.Normalized(), _fr.X.XY.Normalized())), 0, 1)) * 180 / Math.PI;
+                Info($"Arch bearing {br.Name}: plates and anchor bolts along {br.LongAxisAngleDeg:0.###} deg to the {sl.Name} line ({br.LongAxisSource}); {toChord:F2} deg off the arch chord in plan.");
+            }
             var across = along.Left;
             var f0 = new Frame3(c2.WithZ(br.SeatElevation), along.WithZ(0), across.WithZ(0), new Vec3(0, 0, 1));
             string asm = $"BRG-{br.Name}";

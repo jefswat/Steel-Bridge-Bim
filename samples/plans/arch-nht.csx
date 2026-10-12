@@ -296,7 +296,10 @@ deck.Tendons.AddRange(ptPaths.Values);
 // ---------------------------------------------------------------- bearings (p.102, p.107, p.124)
 // CL brg 2" from the T point toward the span (p.124); pedestal tops p.102: EL A = SOUTH at Pier 10 / NORTH at Pier 11 (orientation derived by the
 // approach model from p.102 + p.91, build-nht.csx); in approach mode the tops are read from the pier units' FixedSeats instead. Underside of steel = end flange bottom (1 1/8" below the WP) - 1" plate below it (p.124, not dimensioned, U10).
-void Brg(string name, string support, string tpt, double seatFt) => arch.Bearings.Add(new ArchBearingDefinition { Name = name, Support = support, Point = "BRG-" + name, SeatElevation = F(seatFt), SteelUndersideZ = -In(1.125) - In(1) });
+// Plan orientation: the masonry plate (3'-2 x 1'-5) sits in the 3'-4 x 1'-7 arch pedestal whose long axis is 63 deg to the pier line (p.102 plan, TYP;
+// both piers, in the pier frame S right / N up-station as the approach model's pedestals) -> the bearing plates and anchor bolts follow it.
+void Brg(string name, string support, string tpt, double seatFt) => arch.Bearings.Add(new ArchBearingDefinition { Name = name, Support = support, Point = "BRG-" + name, SeatElevation = F(seatFt), SteelUndersideZ = -In(1.125) - In(1),
+    LongAxisAngleDeg = 63, LongAxisSource = "p.102 pier plan: arch span pedestal 63 deg (TYP) to the CL pier; p.107 bearing plan inside it" });
 Brg("NW", "Pier 10", "T34'", 534.726); Brg("SW", "Pier 10", "T0", 534.779); Brg("NE", "Pier 11", "T0'", 531.546); Brg("SE", "Pier 11", "T34", 531.494);
 foreach (var (bn, tn) in new[] { ("NW", "T34'"), ("SW", "T0"), ("NE", "T0'"), ("SE", "T34") })
 {
