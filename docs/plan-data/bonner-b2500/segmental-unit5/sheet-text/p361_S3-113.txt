@@ -1,0 +1,29 @@
+# PDF p.361 sheet S3-113: SUBSTRUCTURE PRECAST BENT CAP DETAILS - BENTS 19 - 22
+# decoded text layer, rows grouped by y (top to bottom), cells separated by ' | '. Fractions decoded from font glyphs (calibrated on raster). Drawing geometry is NOT in this text.
+133: 18'-0" | 13'-0"
+170: 9'-0" | 9'-0" | 6'-6" | 6'-6"
+204: { CAP | BENT CONTROL LINE
+222: #4U4 BAR | #4U5 BAR
+284: #6U12 BAR (TYP.) | #6U12 BAR (TYP.)
+512: 3" | 11" | 5 SPA. AT 10" | 1'-10" | 6" 1'-0" 1'-0"6" | 1'-10" | 5 SPA. AT 10" | 11" | 3" | 3" | 11" 1'-2" 1'-1" | 1'-7" | 10" 8" 10" | 1'-7" | 1'-1" 1'-2" 11" | 3"
+539: 19-#6U12 SIDE FACE REINF. | 12-#6U12 SIDE FACE REINF.
+566: 8'-8" | 8'-8" | 6'-2" | 6'-2"
+591: 17'-4" | 12'-4"
+648: FRONT OR BACK VIEW | LEFT OR RIGHT SIDE VIEW
+1150: PROJECT NO. B-2500 (PHASE I)
+1186: DARE | COUNTY
+1222: STATION: | 102+67.76  -L-
+1261: SHEET 3 OF 4
+1293: STATE OF NORTH CAROLINA
+1306: DEPARTMENT OF TRANSPORTATION
+1324: RALEIGH
+1342: C A
+1349: SUBSTRUCTURE
+1358: S S
+1376: PRECAST BENT
+1403: CAP DETAILS
+1435: I C
+1478: REVISIONS
+1486: NO.
+1515: DRAWN BY : | DATE :
+1526: R. EATON | 08/22/12 | 2 | 4
