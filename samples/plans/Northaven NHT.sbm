@@ -336,7 +336,24 @@
               "CapBars": []
             }
           },
-          "ExpansionJoint": null,
+          "ExpansionJoint": {
+            "Type": "Sealed",
+            "GapAt50F": 0.1016,
+            "BlockoutWidth": 0,
+            "BlockoutDepth": 0.21589999999999998,
+            "SetDown": 0,
+            "DeckEndOffset": null,
+            "SealCount": null,
+            "Body": true,
+            "EdgeInset": 0,
+            "EndBlock": null,
+            "Designation": "SEJ-B(MOD) sealed expansion joint (4 in) \u002B BS-EJCP cover plate",
+            "BodyCentered": true,
+            "Unresolved": "UNRESOLVED (p.84-88, 91, 113): SEJ-B(MOD) joint opening, armor and blockout, BS-EJCP cover plate, IGTS thickened slab end - the SEJ-B(MOD), BS-EJCP and IGTS standards are not in the set; the sheets give only the joint line (CL SEJ; 9 1/4\u0022 from CL pier at Piers 10 / 11), the 4 in size of the pay item and the BS-EJCP weight per joint (p.91). Deck ends kept at the CL SEJ (plan slab dimensions); each joint is a 4 in wide placeholder centred on the CL SEJ through the slab depth, full deck width, no blockout or thickened end.",
+            "Basis": "4 in (pay item size) wide envelope centred on the CL SEJ, top of slab to the slab soffit, between the deck edges",
+            "Active": true,
+            "TypeName": "Sealed"
+          },
           "DeckEndPoints": null
         },
         {
@@ -386,6 +403,14 @@
             ],
             "CapProfileAhead": [],
             "CapBlocks": [],
+            "MowStrip": {
+              "Width": 0.6096,
+              "Thickness": 0.1016,
+              "TopAboveFoundation": 0.3048,
+              "Source": "p.97 / 99 mow strip detail, p.91 6.1 CY",
+              "Unresolved": "UNRESOLVED (p.97, 99): mow strip top elevation and width - the existing ground at the piers is not given (the details show the strip at existing ground, at least 1\u0027-0 above the top of shaft) and the width \u0027varies, 2\u0027-0 max\u0027. Strips 2\u0027-0 wide on each column face (reproduces the 6.1 CY quantity), top at EL. D \u002B 1\u0027-0 (the minimum cover), flagged.",
+              "Basis": "2\u0027-0 each face (p.91 quantity reproduced), top = top of drilled shaft \u002B 1\u0027-0 (minimum)"
+            },
             "Aesthetics": null,
             "TopShape": "Sloped",
             "CapSlope": "NaN",
@@ -564,6 +589,14 @@
             ],
             "CapProfileAhead": [],
             "CapBlocks": [],
+            "MowStrip": {
+              "Width": 0.6096,
+              "Thickness": 0.1016,
+              "TopAboveFoundation": 0.3048,
+              "Source": "p.97 / 99 mow strip detail, p.91 6.1 CY",
+              "Unresolved": "UNRESOLVED (p.97, 99): mow strip top elevation and width - the existing ground at the piers is not given (the details show the strip at existing ground, at least 1\u0027-0 above the top of shaft) and the width \u0027varies, 2\u0027-0 max\u0027. Strips 2\u0027-0 wide on each column face (reproduces the 6.1 CY quantity), top at EL. D \u002B 1\u0027-0 (the minimum cover), flagged.",
+              "Basis": "2\u0027-0 each face (p.91 quantity reproduced), top = top of drilled shaft \u002B 1\u0027-0 (minimum)"
+            },
             "Aesthetics": null,
             "TopShape": "Sloped",
             "CapSlope": "NaN",
@@ -742,6 +775,14 @@
             ],
             "CapProfileAhead": [],
             "CapBlocks": [],
+            "MowStrip": {
+              "Width": 0.6096,
+              "Thickness": 0.1016,
+              "TopAboveFoundation": 0.3048,
+              "Source": "p.97 / 99 mow strip detail, p.91 6.1 CY",
+              "Unresolved": "UNRESOLVED (p.97, 99): mow strip top elevation and width - the existing ground at the piers is not given (the details show the strip at existing ground, at least 1\u0027-0 above the top of shaft) and the width \u0027varies, 2\u0027-0 max\u0027. Strips 2\u0027-0 wide on each column face (reproduces the 6.1 CY quantity), top at EL. D \u002B 1\u0027-0 (the minimum cover), flagged.",
+              "Basis": "2\u0027-0 each face (p.91 quantity reproduced), top = top of drilled shaft \u002B 1\u0027-0 (minimum)"
+            },
             "Aesthetics": null,
             "TopShape": "Sloped",
             "CapSlope": "NaN",
@@ -870,7 +911,24 @@
               "CapBars": []
             }
           },
-          "ExpansionJoint": null,
+          "ExpansionJoint": {
+            "Type": "Sealed",
+            "GapAt50F": 0.1016,
+            "BlockoutWidth": 0,
+            "BlockoutDepth": 0.21589999999999998,
+            "SetDown": 0,
+            "DeckEndOffset": null,
+            "SealCount": null,
+            "Body": true,
+            "EdgeInset": 0,
+            "EndBlock": null,
+            "Designation": "SEJ-B(MOD) sealed expansion joint (4 in) \u002B BS-EJCP cover plate",
+            "BodyCentered": true,
+            "Unresolved": "UNRESOLVED (p.84-88, 91, 113): SEJ-B(MOD) joint opening, armor and blockout, BS-EJCP cover plate, IGTS thickened slab end - the SEJ-B(MOD), BS-EJCP and IGTS standards are not in the set; the sheets give only the joint line (CL SEJ; 9 1/4\u0022 from CL pier at Piers 10 / 11), the 4 in size of the pay item and the BS-EJCP weight per joint (p.91). Deck ends kept at the CL SEJ (plan slab dimensions); each joint is a 4 in wide placeholder centred on the CL SEJ through the slab depth, full deck width, no blockout or thickened end.",
+            "Basis": "4 in (pay item size) wide envelope centred on the CL SEJ, top of slab to the slab soffit, between the deck edges",
+            "Active": true,
+            "TypeName": "Sealed"
+          },
           "DeckEndPoints": null
         }
       ],
@@ -1207,15 +1265,38 @@
         "StayInPlaceForms": false,
         "SipFormDepth": 0.0508,
         "Barrier": {
-          "Type": "None",
-          "Reinforcement": true,
+          "Type": "Custom",
+          "Reinforcement": false,
           "EpoxyCoated": true,
           "StirrupSpacing": 0.15239999999999998,
           "Height": 0.8128,
           "BaseWidth": 0.4064,
           "TopWidth": 0.15239999999999998,
-          "Left": false,
-          "Right": false
+          "Left": true,
+          "Right": true,
+          "Profile": [
+            {
+              "R": 0.254,
+              "H": 0
+            },
+            {
+              "R": 0.254,
+              "H": 0.10413999999999998,
+              "Chamfer": 0.019049999999999997
+            },
+            {
+              "R": 0,
+              "H": 0.1016,
+              "Chamfer": 0.019049999999999997
+            },
+            {
+              "R": 0,
+              "H": 0
+            }
+          ],
+          "ProfileName": "Curb 10\u0022 x 4\u0022 (p.89, p.113)",
+          "Source": "p.89 typical approach sections (10\u0022 curb, 4\u0022 typ.), p.113 typical transverse section (10\u0022 curb), p.83 note 3 (3/4\u0022 chamfers)",
+          "IsCurb": true
         },
         "Reinforcement": {
           "Enabled": false,
@@ -1387,7 +1468,107 @@
       "Drains": [],
       "InspectionAccess": null,
       "Misc": null,
-      "PsSteelDiaphragms": null
+      "PsSteelDiaphragms": null,
+      "Railings": [
+        {
+          "Name": "Low LT",
+          "TypeName": "RAIL (PED)(LOW)",
+          "Kind": "Guardrail",
+          "Offset": -2.1336,
+          "BaseProbe": 0.127,
+          "Material": "Stainless steel AISI 316 (p.83)",
+          "Density": 7980,
+          "SampleStep": 0.3048,
+          "Envelope": [
+            {
+              "R": 0.0508,
+              "H": 0
+            },
+            {
+              "R": 0.2032,
+              "H": 0
+            },
+            {
+              "R": 0.2032,
+              "H": 1.1938
+            },
+            {
+              "R": 0.09313333333333333,
+              "H": 1.1938
+            }
+          ],
+          "EnvelopeMassPerLength": 74.408197,
+          "EnvelopeUnresolved": "UNRESOLVED (p.84, 89, 90): railing posts / fencing - the \u0027Pedestrian railing details\u0027 / RAIL (PED) sheets that size the posts, rails, fencing, base plates and anchors are not in this reduced set (p.89, p.90 refer to them), and p.84 note 2 says the number and spacing of the posts is diagrammatic only",
+          "EnvelopeBasis": "p.89 LOW post outline swept continuously (scaled; 4\u0027-3 dimensioned); mass = p.83 design dead load 50 PLF",
+          "Members": [
+            {
+              "Name": "HR",
+              "Kind": "Handrail",
+              "Diameter": 0.047498,
+              "Center": {
+                "R": 0.01693333333333333,
+                "H": 0.789051
+              },
+              "Description": "Handrail pipe, 1.87\u0022 OD scaled (p.89)",
+              "MassPerLength": 0,
+              "Unresolved": "UNRESOLVED (p.89): handrail pipe size, wall and bracket - drawn only; the \u0027Pedestrian railing details\u0027 sheets are not in the set",
+              "Basis": "pipe OD 1.87\u0022 and position scaled from the p.89 vectors; top 3\u0027-0 above the trail (dimensioned); mass inside the plan design dead load of the envelope"
+            }
+          ],
+          "Source": "p.83, 84-88, 89, 90, 91",
+          "Unresolved": [
+            "UNRESOLVED (p.84 note 2, p.89, p.90): railing posts, post spacing, base plates, anchor bolts, rails and fencing - the \u0027Pedestrian railing details\u0027 / RAIL (PED) sheets that size the posts, rails, fencing, base plates and anchors are not in this reduced set (p.89, p.90 refer to them), and p.84 note 2 says the number and spacing of the posts is diagrammatic only. Posts / base plates / anchors not modeled; each run is a continuous envelope of the p.89 post section (flagged) plus the 3\u0027-0 handrail."
+          ]
+        },
+        {
+          "Name": "Low RT",
+          "TypeName": "RAIL (PED)(LOW)",
+          "Kind": "Guardrail",
+          "Offset": 2.1336,
+          "BaseProbe": 0.127,
+          "Material": "Stainless steel AISI 316 (p.83)",
+          "Density": 7980,
+          "SampleStep": 0.3048,
+          "Envelope": [
+            {
+              "R": 0.0508,
+              "H": 0
+            },
+            {
+              "R": 0.2032,
+              "H": 0
+            },
+            {
+              "R": 0.2032,
+              "H": 1.1938
+            },
+            {
+              "R": 0.09313333333333333,
+              "H": 1.1938
+            }
+          ],
+          "EnvelopeMassPerLength": 74.408197,
+          "EnvelopeUnresolved": "UNRESOLVED (p.84, 89, 90): railing posts / fencing - the \u0027Pedestrian railing details\u0027 / RAIL (PED) sheets that size the posts, rails, fencing, base plates and anchors are not in this reduced set (p.89, p.90 refer to them), and p.84 note 2 says the number and spacing of the posts is diagrammatic only",
+          "EnvelopeBasis": "p.89 LOW post outline swept continuously (scaled; 4\u0027-3 dimensioned); mass = p.83 design dead load 50 PLF",
+          "Members": [
+            {
+              "Name": "HR",
+              "Kind": "Handrail",
+              "Diameter": 0.047498,
+              "Center": {
+                "R": 0.01693333333333333,
+                "H": 0.789051
+              },
+              "Description": "Handrail pipe, 1.87\u0022 OD scaled (p.89)",
+              "MassPerLength": 0,
+              "Unresolved": "UNRESOLVED (p.89): handrail pipe size, wall and bracket - drawn only; the \u0027Pedestrian railing details\u0027 sheets are not in the set",
+              "Basis": "pipe OD 1.87\u0022 and position scaled from the p.89 vectors; top 3\u0027-0 above the trail (dimensioned); mass inside the plan design dead load of the envelope"
+            }
+          ],
+          "Source": "p.83, 84-88, 89, 90, 91",
+          "Unresolved": []
+        }
+      ]
     },
     {
       "Name": "NHT Unit 2",
@@ -1595,6 +1776,14 @@
             ],
             "CapProfileAhead": [],
             "CapBlocks": [],
+            "MowStrip": {
+              "Width": 0.6096,
+              "Thickness": 0.1016,
+              "TopAboveFoundation": 0.3048,
+              "Source": "p.97 / 99 mow strip detail, p.91 6.1 CY",
+              "Unresolved": "UNRESOLVED (p.97, 99): mow strip top elevation and width - the existing ground at the piers is not given (the details show the strip at existing ground, at least 1\u0027-0 above the top of shaft) and the width \u0027varies, 2\u0027-0 max\u0027. Strips 2\u0027-0 wide on each column face (reproduces the 6.1 CY quantity), top at EL. D \u002B 1\u0027-0 (the minimum cover), flagged.",
+              "Basis": "2\u0027-0 each face (p.91 quantity reproduced), top = top of drilled shaft \u002B 1\u0027-0 (minimum)"
+            },
             "Aesthetics": null,
             "TopShape": "Sloped",
             "CapSlope": "NaN",
@@ -1769,6 +1958,14 @@
             ],
             "CapProfileAhead": [],
             "CapBlocks": [],
+            "MowStrip": {
+              "Width": 0.6096,
+              "Thickness": 0.1016,
+              "TopAboveFoundation": 0.3048,
+              "Source": "p.97 / 99 mow strip detail, p.91 6.1 CY",
+              "Unresolved": "UNRESOLVED (p.97, 99): mow strip top elevation and width - the existing ground at the piers is not given (the details show the strip at existing ground, at least 1\u0027-0 above the top of shaft) and the width \u0027varies, 2\u0027-0 max\u0027. Strips 2\u0027-0 wide on each column face (reproduces the 6.1 CY quantity), top at EL. D \u002B 1\u0027-0 (the minimum cover), flagged.",
+              "Basis": "2\u0027-0 each face (p.91 quantity reproduced), top = top of drilled shaft \u002B 1\u0027-0 (minimum)"
+            },
             "Aesthetics": null,
             "TopShape": "Sloped",
             "CapSlope": "NaN",
@@ -1943,6 +2140,14 @@
             ],
             "CapProfileAhead": [],
             "CapBlocks": [],
+            "MowStrip": {
+              "Width": 0.6096,
+              "Thickness": 0.1016,
+              "TopAboveFoundation": 0.3048,
+              "Source": "p.97 / 99 mow strip detail, p.91 6.1 CY",
+              "Unresolved": "UNRESOLVED (p.97, 99): mow strip top elevation and width - the existing ground at the piers is not given (the details show the strip at existing ground, at least 1\u0027-0 above the top of shaft) and the width \u0027varies, 2\u0027-0 max\u0027. Strips 2\u0027-0 wide on each column face (reproduces the 6.1 CY quantity), top at EL. D \u002B 1\u0027-0 (the minimum cover), flagged.",
+              "Basis": "2\u0027-0 each face (p.91 quantity reproduced), top = top of drilled shaft \u002B 1\u0027-0 (minimum)"
+            },
             "Aesthetics": null,
             "TopShape": "Sloped",
             "CapSlope": "NaN",
@@ -2071,7 +2276,24 @@
               "CapBars": []
             }
           },
-          "ExpansionJoint": null,
+          "ExpansionJoint": {
+            "Type": "Sealed",
+            "GapAt50F": 0.1016,
+            "BlockoutWidth": 0,
+            "BlockoutDepth": 0.21589999999999998,
+            "SetDown": 0,
+            "DeckEndOffset": null,
+            "SealCount": null,
+            "Body": true,
+            "EdgeInset": 0,
+            "EndBlock": null,
+            "Designation": "SEJ-B(MOD) sealed expansion joint (4 in) \u002B BS-EJCP cover plate",
+            "BodyCentered": true,
+            "Unresolved": "UNRESOLVED (p.84-88, 91, 113): SEJ-B(MOD) joint opening, armor and blockout, BS-EJCP cover plate, IGTS thickened slab end - the SEJ-B(MOD), BS-EJCP and IGTS standards are not in the set; the sheets give only the joint line (CL SEJ; 9 1/4\u0022 from CL pier at Piers 10 / 11), the 4 in size of the pay item and the BS-EJCP weight per joint (p.91). Deck ends kept at the CL SEJ (plan slab dimensions); each joint is a 4 in wide placeholder centred on the CL SEJ through the slab depth, full deck width, no blockout or thickened end.",
+            "Basis": "4 in (pay item size) wide envelope centred on the CL SEJ, top of slab to the slab soffit, between the deck edges",
+            "Active": true,
+            "TypeName": "Sealed"
+          },
           "DeckEndPoints": null
         }
       ],
@@ -2407,15 +2629,38 @@
         "StayInPlaceForms": false,
         "SipFormDepth": 0.0508,
         "Barrier": {
-          "Type": "None",
-          "Reinforcement": true,
+          "Type": "Custom",
+          "Reinforcement": false,
           "EpoxyCoated": true,
           "StirrupSpacing": 0.15239999999999998,
           "Height": 0.8128,
           "BaseWidth": 0.4064,
           "TopWidth": 0.15239999999999998,
-          "Left": false,
-          "Right": false
+          "Left": true,
+          "Right": true,
+          "Profile": [
+            {
+              "R": 0.254,
+              "H": 0
+            },
+            {
+              "R": 0.254,
+              "H": 0.10413999999999998,
+              "Chamfer": 0.019049999999999997
+            },
+            {
+              "R": 0,
+              "H": 0.1016,
+              "Chamfer": 0.019049999999999997
+            },
+            {
+              "R": 0,
+              "H": 0
+            }
+          ],
+          "ProfileName": "Curb 10\u0022 x 4\u0022 (p.89, p.113)",
+          "Source": "p.89 typical approach sections (10\u0022 curb, 4\u0022 typ.), p.113 typical transverse section (10\u0022 curb), p.83 note 3 (3/4\u0022 chamfers)",
+          "IsCurb": true
         },
         "Reinforcement": {
           "Enabled": false,
@@ -2587,7 +2832,105 @@
       "Drains": [],
       "InspectionAccess": null,
       "Misc": null,
-      "PsSteelDiaphragms": null
+      "PsSteelDiaphragms": null,
+      "Railings": [
+        {
+          "Name": "Low LT",
+          "TypeName": "RAIL (PED)(LOW)",
+          "Kind": "Guardrail",
+          "Offset": -2.1336,
+          "BaseProbe": 0.127,
+          "Material": "Stainless steel AISI 316 (p.83)",
+          "Density": 7980,
+          "SampleStep": 0.3048,
+          "Envelope": [
+            {
+              "R": 0.0508,
+              "H": 0
+            },
+            {
+              "R": 0.2032,
+              "H": 0
+            },
+            {
+              "R": 0.2032,
+              "H": 1.1938
+            },
+            {
+              "R": 0.09313333333333333,
+              "H": 1.1938
+            }
+          ],
+          "EnvelopeMassPerLength": 74.408197,
+          "EnvelopeUnresolved": "UNRESOLVED (p.84, 89, 90): railing posts / fencing - the \u0027Pedestrian railing details\u0027 / RAIL (PED) sheets that size the posts, rails, fencing, base plates and anchors are not in this reduced set (p.89, p.90 refer to them), and p.84 note 2 says the number and spacing of the posts is diagrammatic only",
+          "EnvelopeBasis": "p.89 LOW post outline swept continuously (scaled; 4\u0027-3 dimensioned); mass = p.83 design dead load 50 PLF",
+          "Members": [
+            {
+              "Name": "HR",
+              "Kind": "Handrail",
+              "Diameter": 0.047498,
+              "Center": {
+                "R": 0.01693333333333333,
+                "H": 0.789051
+              },
+              "Description": "Handrail pipe, 1.87\u0022 OD scaled (p.89)",
+              "MassPerLength": 0,
+              "Unresolved": "UNRESOLVED (p.89): handrail pipe size, wall and bracket - drawn only; the \u0027Pedestrian railing details\u0027 sheets are not in the set",
+              "Basis": "pipe OD 1.87\u0022 and position scaled from the p.89 vectors; top 3\u0027-0 above the trail (dimensioned); mass inside the plan design dead load of the envelope"
+            }
+          ],
+          "Source": "p.83, 84-88, 89, 90, 91",
+          "Unresolved": []
+        },
+        {
+          "Name": "Low RT",
+          "TypeName": "RAIL (PED)(LOW)",
+          "Kind": "Guardrail",
+          "Offset": 2.1336,
+          "BaseProbe": 0.127,
+          "Material": "Stainless steel AISI 316 (p.83)",
+          "Density": 7980,
+          "SampleStep": 0.3048,
+          "Envelope": [
+            {
+              "R": 0.0508,
+              "H": 0
+            },
+            {
+              "R": 0.2032,
+              "H": 0
+            },
+            {
+              "R": 0.2032,
+              "H": 1.1938
+            },
+            {
+              "R": 0.09313333333333333,
+              "H": 1.1938
+            }
+          ],
+          "EnvelopeMassPerLength": 74.408197,
+          "EnvelopeUnresolved": "UNRESOLVED (p.84, 89, 90): railing posts / fencing - the \u0027Pedestrian railing details\u0027 / RAIL (PED) sheets that size the posts, rails, fencing, base plates and anchors are not in this reduced set (p.89, p.90 refer to them), and p.84 note 2 says the number and spacing of the posts is diagrammatic only",
+          "EnvelopeBasis": "p.89 LOW post outline swept continuously (scaled; 4\u0027-3 dimensioned); mass = p.83 design dead load 50 PLF",
+          "Members": [
+            {
+              "Name": "HR",
+              "Kind": "Handrail",
+              "Diameter": 0.047498,
+              "Center": {
+                "R": 0.01693333333333333,
+                "H": 0.789051
+              },
+              "Description": "Handrail pipe, 1.87\u0022 OD scaled (p.89)",
+              "MassPerLength": 0,
+              "Unresolved": "UNRESOLVED (p.89): handrail pipe size, wall and bracket - drawn only; the \u0027Pedestrian railing details\u0027 sheets are not in the set",
+              "Basis": "pipe OD 1.87\u0022 and position scaled from the p.89 vectors; top 3\u0027-0 above the trail (dimensioned); mass inside the plan design dead load of the envelope"
+            }
+          ],
+          "Source": "p.83, 84-88, 89, 90, 91",
+          "Unresolved": []
+        }
+      ]
     },
     {
       "Name": "NHT Unit 3",
@@ -2795,6 +3138,14 @@
             ],
             "CapProfileAhead": [],
             "CapBlocks": [],
+            "MowStrip": {
+              "Width": 0.6096,
+              "Thickness": 0.1016,
+              "TopAboveFoundation": 0.3048,
+              "Source": "p.97 / 99 mow strip detail, p.91 6.1 CY",
+              "Unresolved": "UNRESOLVED (p.97, 99): mow strip top elevation and width - the existing ground at the piers is not given (the details show the strip at existing ground, at least 1\u0027-0 above the top of shaft) and the width \u0027varies, 2\u0027-0 max\u0027. Strips 2\u0027-0 wide on each column face (reproduces the 6.1 CY quantity), top at EL. D \u002B 1\u0027-0 (the minimum cover), flagged.",
+              "Basis": "2\u0027-0 each face (p.91 quantity reproduced), top = top of drilled shaft \u002B 1\u0027-0 (minimum)"
+            },
             "Aesthetics": null,
             "TopShape": "Sloped",
             "CapSlope": "NaN",
@@ -2973,6 +3324,14 @@
             ],
             "CapProfileAhead": [],
             "CapBlocks": [],
+            "MowStrip": {
+              "Width": 0.6096,
+              "Thickness": 0.1016,
+              "TopAboveFoundation": 0.3048,
+              "Source": "p.97 / 99 mow strip detail, p.91 6.1 CY",
+              "Unresolved": "UNRESOLVED (p.97, 99): mow strip top elevation and width - the existing ground at the piers is not given (the details show the strip at existing ground, at least 1\u0027-0 above the top of shaft) and the width \u0027varies, 2\u0027-0 max\u0027. Strips 2\u0027-0 wide on each column face (reproduces the 6.1 CY quantity), top at EL. D \u002B 1\u0027-0 (the minimum cover), flagged.",
+              "Basis": "2\u0027-0 each face (p.91 quantity reproduced), top = top of drilled shaft \u002B 1\u0027-0 (minimum)"
+            },
             "Aesthetics": null,
             "TopShape": "Sloped",
             "CapSlope": "NaN",
@@ -3375,7 +3734,24 @@
               "CapBars": []
             }
           },
-          "ExpansionJoint": null,
+          "ExpansionJoint": {
+            "Type": "Sealed",
+            "GapAt50F": 0.1016,
+            "BlockoutWidth": 0,
+            "BlockoutDepth": 0.21589999999999998,
+            "SetDown": 0,
+            "DeckEndOffset": null,
+            "SealCount": null,
+            "Body": true,
+            "EdgeInset": 0,
+            "EndBlock": null,
+            "Designation": "SEJ-B(MOD) sealed expansion joint (4 in) \u002B BS-EJCP cover plate",
+            "BodyCentered": true,
+            "Unresolved": "UNRESOLVED (p.84-88, 91, 113): SEJ-B(MOD) joint opening, armor and blockout, BS-EJCP cover plate, IGTS thickened slab end - the SEJ-B(MOD), BS-EJCP and IGTS standards are not in the set; the sheets give only the joint line (CL SEJ; 9 1/4\u0022 from CL pier at Piers 10 / 11), the 4 in size of the pay item and the BS-EJCP weight per joint (p.91). Deck ends kept at the CL SEJ (plan slab dimensions); each joint is a 4 in wide placeholder centred on the CL SEJ through the slab depth, full deck width, no blockout or thickened end.",
+            "Basis": "4 in (pay item size) wide envelope centred on the CL SEJ, top of slab to the slab soffit, between the deck edges",
+            "Active": true,
+            "TypeName": "Sealed"
+          },
           "DeckEndPoints": null
         }
       ],
@@ -3712,15 +4088,38 @@
         "StayInPlaceForms": false,
         "SipFormDepth": 0.0508,
         "Barrier": {
-          "Type": "None",
-          "Reinforcement": true,
+          "Type": "Custom",
+          "Reinforcement": false,
           "EpoxyCoated": true,
           "StirrupSpacing": 0.15239999999999998,
           "Height": 0.8128,
           "BaseWidth": 0.4064,
           "TopWidth": 0.15239999999999998,
-          "Left": false,
-          "Right": false
+          "Left": true,
+          "Right": true,
+          "Profile": [
+            {
+              "R": 0.254,
+              "H": 0
+            },
+            {
+              "R": 0.254,
+              "H": 0.10413999999999998,
+              "Chamfer": 0.019049999999999997
+            },
+            {
+              "R": 0,
+              "H": 0.1016,
+              "Chamfer": 0.019049999999999997
+            },
+            {
+              "R": 0,
+              "H": 0
+            }
+          ],
+          "ProfileName": "Curb 10\u0022 x 4\u0022 (p.89, p.113)",
+          "Source": "p.89 typical approach sections (10\u0022 curb, 4\u0022 typ.), p.113 typical transverse section (10\u0022 curb), p.83 note 3 (3/4\u0022 chamfers)",
+          "IsCurb": true
         },
         "Reinforcement": {
           "Enabled": false,
@@ -3892,7 +4291,463 @@
       "Drains": [],
       "InspectionAccess": null,
       "Misc": null,
-      "PsSteelDiaphragms": null
+      "PsSteelDiaphragms": null,
+      "Railings": [
+        {
+          "Name": "Low LT",
+          "TypeName": "RAIL (PED)(LOW)",
+          "Kind": "Guardrail",
+          "Offset": -2.1336,
+          "EndStation": 712.847952,
+          "BaseProbe": 0.127,
+          "Material": "Stainless steel AISI 316 (p.83)",
+          "Density": 7980,
+          "SampleStep": 0.3048,
+          "Envelope": [
+            {
+              "R": 0.0508,
+              "H": 0
+            },
+            {
+              "R": 0.2032,
+              "H": 0
+            },
+            {
+              "R": 0.2032,
+              "H": 1.1938
+            },
+            {
+              "R": 0.09313333333333333,
+              "H": 1.1938
+            }
+          ],
+          "EnvelopeMassPerLength": 74.408197,
+          "EnvelopeUnresolved": "UNRESOLVED (p.84, 89, 90): railing posts / fencing - the \u0027Pedestrian railing details\u0027 / RAIL (PED) sheets that size the posts, rails, fencing, base plates and anchors are not in this reduced set (p.89, p.90 refer to them), and p.84 note 2 says the number and spacing of the posts is diagrammatic only",
+          "EnvelopeBasis": "p.89 LOW post outline swept continuously (scaled; 4\u0027-3 dimensioned); mass = p.83 design dead load 50 PLF",
+          "Members": [
+            {
+              "Name": "HR",
+              "Kind": "Handrail",
+              "Diameter": 0.047498,
+              "Center": {
+                "R": 0.01693333333333333,
+                "H": 0.789051
+              },
+              "Description": "Handrail pipe, 1.87\u0022 OD scaled (p.89)",
+              "MassPerLength": 0,
+              "Unresolved": "UNRESOLVED (p.89): handrail pipe size, wall and bracket - drawn only; the \u0027Pedestrian railing details\u0027 sheets are not in the set",
+              "Basis": "pipe OD 1.87\u0022 and position scaled from the p.89 vectors; top 3\u0027-0 above the trail (dimensioned); mass inside the plan design dead load of the envelope"
+            }
+          ],
+          "Source": "p.83, 84-88, 89, 90, 91",
+          "Unresolved": []
+        },
+        {
+          "Name": "High LT",
+          "TypeName": "RAIL (PED)(HIGH)",
+          "Kind": "Guardrail",
+          "Offset": -2.1336,
+          "BeginStation": 712.847952,
+          "BaseProbe": 0.127,
+          "Material": "Stainless steel AISI 316 (p.83)",
+          "Density": 7980,
+          "SampleStep": 0.3048,
+          "Envelope": [
+            {
+              "R": 0.0508,
+              "H": 0
+            },
+            {
+              "R": 0.2032,
+              "H": 0
+            },
+            {
+              "R": 0.2032,
+              "H": 1.7525999999999995
+            },
+            {
+              "R": 0.20098080729166937,
+              "H": 1.8337708593750002
+            },
+            {
+              "R": 0.19433645833333332,
+              "H": 1.914604374999999
+            },
+            {
+              "R": 0.18328679687499883,
+              "H": 1.9949219531249998
+            },
+            {
+              "R": 0.16785166666666512,
+              "H": 2.074544999999999
+            },
+            {
+              "R": 0.14805091145833332,
+              "H": 2.1532949218749997
+            },
+            {
+              "R": 0.12390437499999885,
+              "H": 2.2309931249999995
+            },
+            {
+              "R": 0.09543190104166667,
+              "H": 2.307461015625
+            },
+            {
+              "R": 0.06265333333333217,
+              "H": 2.38252
+            },
+            {
+              "R": 0.026326041666666664,
+              "H": 2.4556839062499995
+            },
+            {
+              "R": -0.01397000000000077,
+              "H": 2.5265062499999997
+            },
+            {
+              "R": -0.05807604166666667,
+              "H": 2.5948679687499996
+            },
+            {
+              "R": -0.10583333333333525,
+              "H": 2.6606499999999995
+            },
+            {
+              "R": -0.15708312500000116,
+              "H": 2.72373328125
+            },
+            {
+              "R": -0.21166666666666667,
+              "H": 2.7839987499999994
+            },
+            {
+              "R": -0.2694252083333341,
+              "H": 2.8413273437499997
+            },
+            {
+              "R": -0.3302,
+              "H": 2.8955999999999995
+            },
+            {
+              "R": -0.3589866666666674,
+              "H": 2.8600399999999992
+            },
+            {
+              "R": -0.30265356770833257,
+              "H": 2.806485026041666
+            },
+            {
+              "R": -0.24931687500000266,
+              "H": 2.7500527083333326
+            },
+            {
+              "R": -0.19911549479166665,
+              "H": 2.6908819531249994
+            },
+            {
+              "R": -0.15218833333333448,
+              "H": 2.6291116666666663
+            },
+            {
+              "R": -0.10867429687500076,
+              "H": 2.564880755208333
+            },
+            {
+              "R": -0.0687122916666659,
+              "H": 2.4983281249999996
+            },
+            {
+              "R": -0.032441223958334105,
+              "H": 2.429592682291666
+            },
+            {
+              "R": 0,
+              "H": 2.358813333333333
+            },
+            {
+              "R": 0.028485703124999612,
+              "H": 2.2863009635416667
+            },
+            {
+              "R": 0.05294312499999962,
+              "H": 2.2124193749999996
+            },
+            {
+              "R": 0.07331273437499847,
+              "H": 2.1373868489583328
+            },
+            {
+              "R": 0.08953499999999846,
+              "H": 2.0614216666666656
+            },
+            {
+              "R": 0.101550390625,
+              "H": 1.9847421093749997
+            },
+            {
+              "R": 0.10929937499999769,
+              "H": 1.9075664583333332
+            },
+            {
+              "R": 0.11272242187499769,
+              "H": 1.830112994791666
+            },
+            {
+              "R": 0.11175999999999844,
+              "H": 1.7525999999999995
+            }
+          ],
+          "EnvelopeMassPerLength": 148.816394,
+          "EnvelopeUnresolved": "UNRESOLVED (p.84, 89, 90): railing posts / fencing - the \u0027Pedestrian railing details\u0027 / RAIL (PED) sheets that size the posts, rails, fencing, base plates and anchors are not in this reduced set (p.89, p.90 refer to them), and p.84 note 2 says the number and spacing of the posts is diagrammatic only",
+          "EnvelopeBasis": "p.89 HIGH post outline swept continuously (scaled; 9\u0027-10 dimensioned); mass = p.83 design dead load 100 PLF",
+          "Members": [
+            {
+              "Name": "HR",
+              "Kind": "Handrail",
+              "Diameter": 0.047498,
+              "Center": {
+                "R": 0.01608666666666551,
+                "H": 0.789051
+              },
+              "Description": "Handrail pipe, 1.87\u0022 OD scaled (p.89)",
+              "MassPerLength": 0,
+              "Unresolved": "UNRESOLVED (p.89): handrail pipe size, wall and bracket - drawn only; the \u0027Pedestrian railing details\u0027 sheets are not in the set",
+              "Basis": "pipe OD 1.87\u0022 and position scaled from the p.89 vectors; top 3\u0027-0 above the trail (dimensioned); mass inside the plan design dead load of the envelope"
+            }
+          ],
+          "Source": "p.83, 84-88, 89, 90, 91",
+          "Unresolved": [
+            "UNRESOLVED (p.85, p.89): low-to-high railing transition at STA 23\u002B38.74 - the transition detail is on the missing railing sheets; p.89 gives only the section limits. The low run ends and the high run begins at the radial line at 23\u002B38.74."
+          ]
+        },
+        {
+          "Name": "Low RT",
+          "TypeName": "RAIL (PED)(LOW)",
+          "Kind": "Guardrail",
+          "Offset": 2.1336,
+          "EndStation": 712.847952,
+          "BaseProbe": 0.127,
+          "Material": "Stainless steel AISI 316 (p.83)",
+          "Density": 7980,
+          "SampleStep": 0.3048,
+          "Envelope": [
+            {
+              "R": 0.0508,
+              "H": 0
+            },
+            {
+              "R": 0.2032,
+              "H": 0
+            },
+            {
+              "R": 0.2032,
+              "H": 1.1938
+            },
+            {
+              "R": 0.09313333333333333,
+              "H": 1.1938
+            }
+          ],
+          "EnvelopeMassPerLength": 74.408197,
+          "EnvelopeUnresolved": "UNRESOLVED (p.84, 89, 90): railing posts / fencing - the \u0027Pedestrian railing details\u0027 / RAIL (PED) sheets that size the posts, rails, fencing, base plates and anchors are not in this reduced set (p.89, p.90 refer to them), and p.84 note 2 says the number and spacing of the posts is diagrammatic only",
+          "EnvelopeBasis": "p.89 LOW post outline swept continuously (scaled; 4\u0027-3 dimensioned); mass = p.83 design dead load 50 PLF",
+          "Members": [
+            {
+              "Name": "HR",
+              "Kind": "Handrail",
+              "Diameter": 0.047498,
+              "Center": {
+                "R": 0.01693333333333333,
+                "H": 0.789051
+              },
+              "Description": "Handrail pipe, 1.87\u0022 OD scaled (p.89)",
+              "MassPerLength": 0,
+              "Unresolved": "UNRESOLVED (p.89): handrail pipe size, wall and bracket - drawn only; the \u0027Pedestrian railing details\u0027 sheets are not in the set",
+              "Basis": "pipe OD 1.87\u0022 and position scaled from the p.89 vectors; top 3\u0027-0 above the trail (dimensioned); mass inside the plan design dead load of the envelope"
+            }
+          ],
+          "Source": "p.83, 84-88, 89, 90, 91",
+          "Unresolved": []
+        },
+        {
+          "Name": "High RT",
+          "TypeName": "RAIL (PED)(HIGH)",
+          "Kind": "Guardrail",
+          "Offset": 2.1336,
+          "BeginStation": 712.847952,
+          "BaseProbe": 0.127,
+          "Material": "Stainless steel AISI 316 (p.83)",
+          "Density": 7980,
+          "SampleStep": 0.3048,
+          "Envelope": [
+            {
+              "R": 0.0508,
+              "H": 0
+            },
+            {
+              "R": 0.2032,
+              "H": 0
+            },
+            {
+              "R": 0.2032,
+              "H": 1.7525999999999995
+            },
+            {
+              "R": 0.20098080729166937,
+              "H": 1.8337708593750002
+            },
+            {
+              "R": 0.19433645833333332,
+              "H": 1.914604374999999
+            },
+            {
+              "R": 0.18328679687499883,
+              "H": 1.9949219531249998
+            },
+            {
+              "R": 0.16785166666666512,
+              "H": 2.074544999999999
+            },
+            {
+              "R": 0.14805091145833332,
+              "H": 2.1532949218749997
+            },
+            {
+              "R": 0.12390437499999885,
+              "H": 2.2309931249999995
+            },
+            {
+              "R": 0.09543190104166667,
+              "H": 2.307461015625
+            },
+            {
+              "R": 0.06265333333333217,
+              "H": 2.38252
+            },
+            {
+              "R": 0.026326041666666664,
+              "H": 2.4556839062499995
+            },
+            {
+              "R": -0.01397000000000077,
+              "H": 2.5265062499999997
+            },
+            {
+              "R": -0.05807604166666667,
+              "H": 2.5948679687499996
+            },
+            {
+              "R": -0.10583333333333525,
+              "H": 2.6606499999999995
+            },
+            {
+              "R": -0.15708312500000116,
+              "H": 2.72373328125
+            },
+            {
+              "R": -0.21166666666666667,
+              "H": 2.7839987499999994
+            },
+            {
+              "R": -0.2694252083333341,
+              "H": 2.8413273437499997
+            },
+            {
+              "R": -0.3302,
+              "H": 2.8955999999999995
+            },
+            {
+              "R": -0.3589866666666674,
+              "H": 2.8600399999999992
+            },
+            {
+              "R": -0.30265356770833257,
+              "H": 2.806485026041666
+            },
+            {
+              "R": -0.24931687500000266,
+              "H": 2.7500527083333326
+            },
+            {
+              "R": -0.19911549479166665,
+              "H": 2.6908819531249994
+            },
+            {
+              "R": -0.15218833333333448,
+              "H": 2.6291116666666663
+            },
+            {
+              "R": -0.10867429687500076,
+              "H": 2.564880755208333
+            },
+            {
+              "R": -0.0687122916666659,
+              "H": 2.4983281249999996
+            },
+            {
+              "R": -0.032441223958334105,
+              "H": 2.429592682291666
+            },
+            {
+              "R": 0,
+              "H": 2.358813333333333
+            },
+            {
+              "R": 0.028485703124999612,
+              "H": 2.2863009635416667
+            },
+            {
+              "R": 0.05294312499999962,
+              "H": 2.2124193749999996
+            },
+            {
+              "R": 0.07331273437499847,
+              "H": 2.1373868489583328
+            },
+            {
+              "R": 0.08953499999999846,
+              "H": 2.0614216666666656
+            },
+            {
+              "R": 0.101550390625,
+              "H": 1.9847421093749997
+            },
+            {
+              "R": 0.10929937499999769,
+              "H": 1.9075664583333332
+            },
+            {
+              "R": 0.11272242187499769,
+              "H": 1.830112994791666
+            },
+            {
+              "R": 0.11175999999999844,
+              "H": 1.7525999999999995
+            }
+          ],
+          "EnvelopeMassPerLength": 148.816394,
+          "EnvelopeUnresolved": "UNRESOLVED (p.84, 89, 90): railing posts / fencing - the \u0027Pedestrian railing details\u0027 / RAIL (PED) sheets that size the posts, rails, fencing, base plates and anchors are not in this reduced set (p.89, p.90 refer to them), and p.84 note 2 says the number and spacing of the posts is diagrammatic only",
+          "EnvelopeBasis": "p.89 HIGH post outline swept continuously (scaled; 9\u0027-10 dimensioned); mass = p.83 design dead load 100 PLF",
+          "Members": [
+            {
+              "Name": "HR",
+              "Kind": "Handrail",
+              "Diameter": 0.047498,
+              "Center": {
+                "R": 0.01608666666666551,
+                "H": 0.789051
+              },
+              "Description": "Handrail pipe, 1.87\u0022 OD scaled (p.89)",
+              "MassPerLength": 0,
+              "Unresolved": "UNRESOLVED (p.89): handrail pipe size, wall and bracket - drawn only; the \u0027Pedestrian railing details\u0027 sheets are not in the set",
+              "Basis": "pipe OD 1.87\u0022 and position scaled from the p.89 vectors; top 3\u0027-0 above the trail (dimensioned); mass inside the plan design dead load of the envelope"
+            }
+          ],
+          "Source": "p.83, 84-88, 89, 90, 91",
+          "Unresolved": []
+        }
+      ]
     },
     {
       "Name": "NHT Unit 4",
@@ -4170,7 +5025,24 @@
               "CapBars": []
             }
           },
-          "ExpansionJoint": null,
+          "ExpansionJoint": {
+            "Type": "Sealed",
+            "GapAt50F": 0.1016,
+            "BlockoutWidth": 0,
+            "BlockoutDepth": 0.21589999999999998,
+            "SetDown": 0,
+            "DeckEndOffset": null,
+            "SealCount": null,
+            "Body": true,
+            "EdgeInset": 0,
+            "EndBlock": null,
+            "Designation": "SEJ-B(MOD) sealed expansion joint (4 in) \u002B BS-EJCP cover plate",
+            "BodyCentered": true,
+            "Unresolved": "UNRESOLVED (p.84-88, 91, 113): SEJ-B(MOD) joint opening, armor and blockout, BS-EJCP cover plate, IGTS thickened slab end - the SEJ-B(MOD), BS-EJCP and IGTS standards are not in the set; the sheets give only the joint line (CL SEJ; 9 1/4\u0022 from CL pier at Piers 10 / 11), the 4 in size of the pay item and the BS-EJCP weight per joint (p.91). Deck ends kept at the CL SEJ (plan slab dimensions); each joint is a 4 in wide placeholder centred on the CL SEJ through the slab depth, full deck width, no blockout or thickened end.",
+            "Basis": "4 in (pay item size) wide envelope centred on the CL SEJ, top of slab to the slab soffit, between the deck edges",
+            "Active": true,
+            "TypeName": "Sealed"
+          },
           "DeckEndPoints": null
         },
         {
@@ -4220,6 +5092,14 @@
             ],
             "CapProfileAhead": [],
             "CapBlocks": [],
+            "MowStrip": {
+              "Width": 0.6096,
+              "Thickness": 0.1016,
+              "TopAboveFoundation": 0.3048,
+              "Source": "p.97 / 99 mow strip detail, p.91 6.1 CY",
+              "Unresolved": "UNRESOLVED (p.97, 99): mow strip top elevation and width - the existing ground at the piers is not given (the details show the strip at existing ground, at least 1\u0027-0 above the top of shaft) and the width \u0027varies, 2\u0027-0 max\u0027. Strips 2\u0027-0 wide on each column face (reproduces the 6.1 CY quantity), top at EL. D \u002B 1\u0027-0 (the minimum cover), flagged.",
+              "Basis": "2\u0027-0 each face (p.91 quantity reproduced), top = top of drilled shaft \u002B 1\u0027-0 (minimum)"
+            },
             "Aesthetics": null,
             "TopShape": "Sloped",
             "CapSlope": "NaN",
@@ -4398,6 +5278,14 @@
             ],
             "CapProfileAhead": [],
             "CapBlocks": [],
+            "MowStrip": {
+              "Width": 0.6096,
+              "Thickness": 0.1016,
+              "TopAboveFoundation": 0.3048,
+              "Source": "p.97 / 99 mow strip detail, p.91 6.1 CY",
+              "Unresolved": "UNRESOLVED (p.97, 99): mow strip top elevation and width - the existing ground at the piers is not given (the details show the strip at existing ground, at least 1\u0027-0 above the top of shaft) and the width \u0027varies, 2\u0027-0 max\u0027. Strips 2\u0027-0 wide on each column face (reproduces the 6.1 CY quantity), top at EL. D \u002B 1\u0027-0 (the minimum cover), flagged.",
+              "Basis": "2\u0027-0 each face (p.91 quantity reproduced), top = top of drilled shaft \u002B 1\u0027-0 (minimum)"
+            },
             "Aesthetics": null,
             "TopShape": "Sloped",
             "CapSlope": "NaN",
@@ -4526,7 +5414,24 @@
               "CapBars": []
             }
           },
-          "ExpansionJoint": null,
+          "ExpansionJoint": {
+            "Type": "Sealed",
+            "GapAt50F": 0.1016,
+            "BlockoutWidth": 0,
+            "BlockoutDepth": 0.21589999999999998,
+            "SetDown": 0,
+            "DeckEndOffset": null,
+            "SealCount": null,
+            "Body": true,
+            "EdgeInset": 0,
+            "EndBlock": null,
+            "Designation": "SEJ-B(MOD) sealed expansion joint (4 in) \u002B BS-EJCP cover plate",
+            "BodyCentered": true,
+            "Unresolved": "UNRESOLVED (p.84-88, 91, 113): SEJ-B(MOD) joint opening, armor and blockout, BS-EJCP cover plate, IGTS thickened slab end - the SEJ-B(MOD), BS-EJCP and IGTS standards are not in the set; the sheets give only the joint line (CL SEJ; 9 1/4\u0022 from CL pier at Piers 10 / 11), the 4 in size of the pay item and the BS-EJCP weight per joint (p.91). Deck ends kept at the CL SEJ (plan slab dimensions); each joint is a 4 in wide placeholder centred on the CL SEJ through the slab depth, full deck width, no blockout or thickened end.",
+            "Basis": "4 in (pay item size) wide envelope centred on the CL SEJ, top of slab to the slab soffit, between the deck edges",
+            "Active": true,
+            "TypeName": "Sealed"
+          },
           "DeckEndPoints": null
         }
       ],
@@ -4788,15 +5693,38 @@
         "StayInPlaceForms": false,
         "SipFormDepth": 0.0508,
         "Barrier": {
-          "Type": "None",
-          "Reinforcement": true,
+          "Type": "Custom",
+          "Reinforcement": false,
           "EpoxyCoated": true,
           "StirrupSpacing": 0.15239999999999998,
           "Height": 0.8128,
           "BaseWidth": 0.4064,
           "TopWidth": 0.15239999999999998,
-          "Left": false,
-          "Right": false
+          "Left": true,
+          "Right": true,
+          "Profile": [
+            {
+              "R": 0.254,
+              "H": 0
+            },
+            {
+              "R": 0.254,
+              "H": 0.10413999999999998,
+              "Chamfer": 0.019049999999999997
+            },
+            {
+              "R": 0,
+              "H": 0.1016,
+              "Chamfer": 0.019049999999999997
+            },
+            {
+              "R": 0,
+              "H": 0
+            }
+          ],
+          "ProfileName": "Curb 10\u0022 x 4\u0022 (p.89, p.113)",
+          "Source": "p.89 typical approach sections (10\u0022 curb, 4\u0022 typ.), p.113 typical transverse section (10\u0022 curb), p.83 note 3 (3/4\u0022 chamfers)",
+          "IsCurb": true
         },
         "Reinforcement": {
           "Enabled": false,
@@ -4968,7 +5896,361 @@
       "Drains": [],
       "InspectionAccess": null,
       "Misc": null,
-      "PsSteelDiaphragms": null
+      "PsSteelDiaphragms": null,
+      "Railings": [
+        {
+          "Name": "High LT",
+          "TypeName": "RAIL (PED)(HIGH)",
+          "Kind": "Guardrail",
+          "Offset": -2.1336,
+          "BaseProbe": 0.127,
+          "Material": "Stainless steel AISI 316 (p.83)",
+          "Density": 7980,
+          "SampleStep": 0.3048,
+          "Envelope": [
+            {
+              "R": 0.0508,
+              "H": 0
+            },
+            {
+              "R": 0.2032,
+              "H": 0
+            },
+            {
+              "R": 0.2032,
+              "H": 1.7525999999999995
+            },
+            {
+              "R": 0.20098080729166937,
+              "H": 1.8337708593750002
+            },
+            {
+              "R": 0.19433645833333332,
+              "H": 1.914604374999999
+            },
+            {
+              "R": 0.18328679687499883,
+              "H": 1.9949219531249998
+            },
+            {
+              "R": 0.16785166666666512,
+              "H": 2.074544999999999
+            },
+            {
+              "R": 0.14805091145833332,
+              "H": 2.1532949218749997
+            },
+            {
+              "R": 0.12390437499999885,
+              "H": 2.2309931249999995
+            },
+            {
+              "R": 0.09543190104166667,
+              "H": 2.307461015625
+            },
+            {
+              "R": 0.06265333333333217,
+              "H": 2.38252
+            },
+            {
+              "R": 0.026326041666666664,
+              "H": 2.4556839062499995
+            },
+            {
+              "R": -0.01397000000000077,
+              "H": 2.5265062499999997
+            },
+            {
+              "R": -0.05807604166666667,
+              "H": 2.5948679687499996
+            },
+            {
+              "R": -0.10583333333333525,
+              "H": 2.6606499999999995
+            },
+            {
+              "R": -0.15708312500000116,
+              "H": 2.72373328125
+            },
+            {
+              "R": -0.21166666666666667,
+              "H": 2.7839987499999994
+            },
+            {
+              "R": -0.2694252083333341,
+              "H": 2.8413273437499997
+            },
+            {
+              "R": -0.3302,
+              "H": 2.8955999999999995
+            },
+            {
+              "R": -0.3589866666666674,
+              "H": 2.8600399999999992
+            },
+            {
+              "R": -0.30265356770833257,
+              "H": 2.806485026041666
+            },
+            {
+              "R": -0.24931687500000266,
+              "H": 2.7500527083333326
+            },
+            {
+              "R": -0.19911549479166665,
+              "H": 2.6908819531249994
+            },
+            {
+              "R": -0.15218833333333448,
+              "H": 2.6291116666666663
+            },
+            {
+              "R": -0.10867429687500076,
+              "H": 2.564880755208333
+            },
+            {
+              "R": -0.0687122916666659,
+              "H": 2.4983281249999996
+            },
+            {
+              "R": -0.032441223958334105,
+              "H": 2.429592682291666
+            },
+            {
+              "R": 0,
+              "H": 2.358813333333333
+            },
+            {
+              "R": 0.028485703124999612,
+              "H": 2.2863009635416667
+            },
+            {
+              "R": 0.05294312499999962,
+              "H": 2.2124193749999996
+            },
+            {
+              "R": 0.07331273437499847,
+              "H": 2.1373868489583328
+            },
+            {
+              "R": 0.08953499999999846,
+              "H": 2.0614216666666656
+            },
+            {
+              "R": 0.101550390625,
+              "H": 1.9847421093749997
+            },
+            {
+              "R": 0.10929937499999769,
+              "H": 1.9075664583333332
+            },
+            {
+              "R": 0.11272242187499769,
+              "H": 1.830112994791666
+            },
+            {
+              "R": 0.11175999999999844,
+              "H": 1.7525999999999995
+            }
+          ],
+          "EnvelopeMassPerLength": 148.816394,
+          "EnvelopeUnresolved": "UNRESOLVED (p.84, 89, 90): railing posts / fencing - the \u0027Pedestrian railing details\u0027 / RAIL (PED) sheets that size the posts, rails, fencing, base plates and anchors are not in this reduced set (p.89, p.90 refer to them), and p.84 note 2 says the number and spacing of the posts is diagrammatic only",
+          "EnvelopeBasis": "p.89 HIGH post outline swept continuously (scaled; 9\u0027-10 dimensioned); mass = p.83 design dead load 100 PLF",
+          "Members": [
+            {
+              "Name": "HR",
+              "Kind": "Handrail",
+              "Diameter": 0.047498,
+              "Center": {
+                "R": 0.01608666666666551,
+                "H": 0.789051
+              },
+              "Description": "Handrail pipe, 1.87\u0022 OD scaled (p.89)",
+              "MassPerLength": 0,
+              "Unresolved": "UNRESOLVED (p.89): handrail pipe size, wall and bracket - drawn only; the \u0027Pedestrian railing details\u0027 sheets are not in the set",
+              "Basis": "pipe OD 1.87\u0022 and position scaled from the p.89 vectors; top 3\u0027-0 above the trail (dimensioned); mass inside the plan design dead load of the envelope"
+            }
+          ],
+          "Source": "p.83, 84-88, 89, 90, 91",
+          "Unresolved": []
+        },
+        {
+          "Name": "High RT",
+          "TypeName": "RAIL (PED)(HIGH)",
+          "Kind": "Guardrail",
+          "Offset": 2.1336,
+          "BaseProbe": 0.127,
+          "Material": "Stainless steel AISI 316 (p.83)",
+          "Density": 7980,
+          "SampleStep": 0.3048,
+          "Envelope": [
+            {
+              "R": 0.0508,
+              "H": 0
+            },
+            {
+              "R": 0.2032,
+              "H": 0
+            },
+            {
+              "R": 0.2032,
+              "H": 1.7525999999999995
+            },
+            {
+              "R": 0.20098080729166937,
+              "H": 1.8337708593750002
+            },
+            {
+              "R": 0.19433645833333332,
+              "H": 1.914604374999999
+            },
+            {
+              "R": 0.18328679687499883,
+              "H": 1.9949219531249998
+            },
+            {
+              "R": 0.16785166666666512,
+              "H": 2.074544999999999
+            },
+            {
+              "R": 0.14805091145833332,
+              "H": 2.1532949218749997
+            },
+            {
+              "R": 0.12390437499999885,
+              "H": 2.2309931249999995
+            },
+            {
+              "R": 0.09543190104166667,
+              "H": 2.307461015625
+            },
+            {
+              "R": 0.06265333333333217,
+              "H": 2.38252
+            },
+            {
+              "R": 0.026326041666666664,
+              "H": 2.4556839062499995
+            },
+            {
+              "R": -0.01397000000000077,
+              "H": 2.5265062499999997
+            },
+            {
+              "R": -0.05807604166666667,
+              "H": 2.5948679687499996
+            },
+            {
+              "R": -0.10583333333333525,
+              "H": 2.6606499999999995
+            },
+            {
+              "R": -0.15708312500000116,
+              "H": 2.72373328125
+            },
+            {
+              "R": -0.21166666666666667,
+              "H": 2.7839987499999994
+            },
+            {
+              "R": -0.2694252083333341,
+              "H": 2.8413273437499997
+            },
+            {
+              "R": -0.3302,
+              "H": 2.8955999999999995
+            },
+            {
+              "R": -0.3589866666666674,
+              "H": 2.8600399999999992
+            },
+            {
+              "R": -0.30265356770833257,
+              "H": 2.806485026041666
+            },
+            {
+              "R": -0.24931687500000266,
+              "H": 2.7500527083333326
+            },
+            {
+              "R": -0.19911549479166665,
+              "H": 2.6908819531249994
+            },
+            {
+              "R": -0.15218833333333448,
+              "H": 2.6291116666666663
+            },
+            {
+              "R": -0.10867429687500076,
+              "H": 2.564880755208333
+            },
+            {
+              "R": -0.0687122916666659,
+              "H": 2.4983281249999996
+            },
+            {
+              "R": -0.032441223958334105,
+              "H": 2.429592682291666
+            },
+            {
+              "R": 0,
+              "H": 2.358813333333333
+            },
+            {
+              "R": 0.028485703124999612,
+              "H": 2.2863009635416667
+            },
+            {
+              "R": 0.05294312499999962,
+              "H": 2.2124193749999996
+            },
+            {
+              "R": 0.07331273437499847,
+              "H": 2.1373868489583328
+            },
+            {
+              "R": 0.08953499999999846,
+              "H": 2.0614216666666656
+            },
+            {
+              "R": 0.101550390625,
+              "H": 1.9847421093749997
+            },
+            {
+              "R": 0.10929937499999769,
+              "H": 1.9075664583333332
+            },
+            {
+              "R": 0.11272242187499769,
+              "H": 1.830112994791666
+            },
+            {
+              "R": 0.11175999999999844,
+              "H": 1.7525999999999995
+            }
+          ],
+          "EnvelopeMassPerLength": 148.816394,
+          "EnvelopeUnresolved": "UNRESOLVED (p.84, 89, 90): railing posts / fencing - the \u0027Pedestrian railing details\u0027 / RAIL (PED) sheets that size the posts, rails, fencing, base plates and anchors are not in this reduced set (p.89, p.90 refer to them), and p.84 note 2 says the number and spacing of the posts is diagrammatic only",
+          "EnvelopeBasis": "p.89 HIGH post outline swept continuously (scaled; 9\u0027-10 dimensioned); mass = p.83 design dead load 100 PLF",
+          "Members": [
+            {
+              "Name": "HR",
+              "Kind": "Handrail",
+              "Diameter": 0.047498,
+              "Center": {
+                "R": 0.01608666666666551,
+                "H": 0.789051
+              },
+              "Description": "Handrail pipe, 1.87\u0022 OD scaled (p.89)",
+              "MassPerLength": 0,
+              "Unresolved": "UNRESOLVED (p.89): handrail pipe size, wall and bracket - drawn only; the \u0027Pedestrian railing details\u0027 sheets are not in the set",
+              "Basis": "pipe OD 1.87\u0022 and position scaled from the p.89 vectors; top 3\u0027-0 above the trail (dimensioned); mass inside the plan design dead load of the envelope"
+            }
+          ],
+          "Source": "p.83, 84-88, 89, 90, 91",
+          "Unresolved": []
+        }
+      ]
     },
     {
       "Name": "NHT Unit 5",
@@ -5172,6 +6454,14 @@
             ],
             "CapProfileAhead": [],
             "CapBlocks": [],
+            "MowStrip": {
+              "Width": 0.6096,
+              "Thickness": 0.1016,
+              "TopAboveFoundation": 0.3048,
+              "Source": "p.97 / 99 mow strip detail, p.91 6.1 CY",
+              "Unresolved": "UNRESOLVED (p.97, 99): mow strip top elevation and width - the existing ground at the piers is not given (the details show the strip at existing ground, at least 1\u0027-0 above the top of shaft) and the width \u0027varies, 2\u0027-0 max\u0027. Strips 2\u0027-0 wide on each column face (reproduces the 6.1 CY quantity), top at EL. D \u002B 1\u0027-0 (the minimum cover), flagged.",
+              "Basis": "2\u0027-0 each face (p.91 quantity reproduced), top = top of drilled shaft \u002B 1\u0027-0 (minimum)"
+            },
             "Aesthetics": null,
             "TopShape": "Sloped",
             "CapSlope": "NaN",
@@ -5346,6 +6636,14 @@
             ],
             "CapProfileAhead": [],
             "CapBlocks": [],
+            "MowStrip": {
+              "Width": 0.6096,
+              "Thickness": 0.1016,
+              "TopAboveFoundation": 0.3048,
+              "Source": "p.97 / 99 mow strip detail, p.91 6.1 CY",
+              "Unresolved": "UNRESOLVED (p.97, 99): mow strip top elevation and width - the existing ground at the piers is not given (the details show the strip at existing ground, at least 1\u0027-0 above the top of shaft) and the width \u0027varies, 2\u0027-0 max\u0027. Strips 2\u0027-0 wide on each column face (reproduces the 6.1 CY quantity), top at EL. D \u002B 1\u0027-0 (the minimum cover), flagged.",
+              "Basis": "2\u0027-0 each face (p.91 quantity reproduced), top = top of drilled shaft \u002B 1\u0027-0 (minimum)"
+            },
             "Aesthetics": null,
             "TopShape": "Sloped",
             "CapSlope": "NaN",
@@ -5644,7 +6942,24 @@
               "CapBars": []
             }
           },
-          "ExpansionJoint": null,
+          "ExpansionJoint": {
+            "Type": "Sealed",
+            "GapAt50F": 0.1016,
+            "BlockoutWidth": 0,
+            "BlockoutDepth": 0.21589999999999998,
+            "SetDown": 0,
+            "DeckEndOffset": null,
+            "SealCount": null,
+            "Body": true,
+            "EdgeInset": 0,
+            "EndBlock": null,
+            "Designation": "SEJ-B(MOD) sealed expansion joint (4 in) \u002B BS-EJCP cover plate",
+            "BodyCentered": true,
+            "Unresolved": "UNRESOLVED (p.84-88, 91, 113): SEJ-B(MOD) joint opening, armor and blockout, BS-EJCP cover plate, IGTS thickened slab end - the SEJ-B(MOD), BS-EJCP and IGTS standards are not in the set; the sheets give only the joint line (CL SEJ; 9 1/4\u0022 from CL pier at Piers 10 / 11), the 4 in size of the pay item and the BS-EJCP weight per joint (p.91). Deck ends kept at the CL SEJ (plan slab dimensions); each joint is a 4 in wide placeholder centred on the CL SEJ through the slab depth, full deck width, no blockout or thickened end.",
+            "Basis": "4 in (pay item size) wide envelope centred on the CL SEJ, top of slab to the slab soffit, between the deck edges",
+            "Active": true,
+            "TypeName": "Sealed"
+          },
           "DeckEndPoints": null
         }
       ],
@@ -5981,15 +7296,38 @@
         "StayInPlaceForms": false,
         "SipFormDepth": 0.0508,
         "Barrier": {
-          "Type": "None",
-          "Reinforcement": true,
+          "Type": "Custom",
+          "Reinforcement": false,
           "EpoxyCoated": true,
           "StirrupSpacing": 0.15239999999999998,
           "Height": 0.8128,
           "BaseWidth": 0.4064,
           "TopWidth": 0.15239999999999998,
-          "Left": false,
-          "Right": false
+          "Left": true,
+          "Right": true,
+          "Profile": [
+            {
+              "R": 0.254,
+              "H": 0
+            },
+            {
+              "R": 0.254,
+              "H": 0.10413999999999998,
+              "Chamfer": 0.019049999999999997
+            },
+            {
+              "R": 0,
+              "H": 0.1016,
+              "Chamfer": 0.019049999999999997
+            },
+            {
+              "R": 0,
+              "H": 0
+            }
+          ],
+          "ProfileName": "Curb 10\u0022 x 4\u0022 (p.89, p.113)",
+          "Source": "p.89 typical approach sections (10\u0022 curb, 4\u0022 typ.), p.113 typical transverse section (10\u0022 curb), p.83 note 3 (3/4\u0022 chamfers)",
+          "IsCurb": true
         },
         "Reinforcement": {
           "Enabled": false,
@@ -6161,7 +7499,361 @@
       "Drains": [],
       "InspectionAccess": null,
       "Misc": null,
-      "PsSteelDiaphragms": null
+      "PsSteelDiaphragms": null,
+      "Railings": [
+        {
+          "Name": "High LT",
+          "TypeName": "RAIL (PED)(HIGH)",
+          "Kind": "Guardrail",
+          "Offset": -2.1336,
+          "BaseProbe": 0.127,
+          "Material": "Stainless steel AISI 316 (p.83)",
+          "Density": 7980,
+          "SampleStep": 0.3048,
+          "Envelope": [
+            {
+              "R": 0.0508,
+              "H": 0
+            },
+            {
+              "R": 0.2032,
+              "H": 0
+            },
+            {
+              "R": 0.2032,
+              "H": 1.7525999999999995
+            },
+            {
+              "R": 0.20098080729166937,
+              "H": 1.8337708593750002
+            },
+            {
+              "R": 0.19433645833333332,
+              "H": 1.914604374999999
+            },
+            {
+              "R": 0.18328679687499883,
+              "H": 1.9949219531249998
+            },
+            {
+              "R": 0.16785166666666512,
+              "H": 2.074544999999999
+            },
+            {
+              "R": 0.14805091145833332,
+              "H": 2.1532949218749997
+            },
+            {
+              "R": 0.12390437499999885,
+              "H": 2.2309931249999995
+            },
+            {
+              "R": 0.09543190104166667,
+              "H": 2.307461015625
+            },
+            {
+              "R": 0.06265333333333217,
+              "H": 2.38252
+            },
+            {
+              "R": 0.026326041666666664,
+              "H": 2.4556839062499995
+            },
+            {
+              "R": -0.01397000000000077,
+              "H": 2.5265062499999997
+            },
+            {
+              "R": -0.05807604166666667,
+              "H": 2.5948679687499996
+            },
+            {
+              "R": -0.10583333333333525,
+              "H": 2.6606499999999995
+            },
+            {
+              "R": -0.15708312500000116,
+              "H": 2.72373328125
+            },
+            {
+              "R": -0.21166666666666667,
+              "H": 2.7839987499999994
+            },
+            {
+              "R": -0.2694252083333341,
+              "H": 2.8413273437499997
+            },
+            {
+              "R": -0.3302,
+              "H": 2.8955999999999995
+            },
+            {
+              "R": -0.3589866666666674,
+              "H": 2.8600399999999992
+            },
+            {
+              "R": -0.30265356770833257,
+              "H": 2.806485026041666
+            },
+            {
+              "R": -0.24931687500000266,
+              "H": 2.7500527083333326
+            },
+            {
+              "R": -0.19911549479166665,
+              "H": 2.6908819531249994
+            },
+            {
+              "R": -0.15218833333333448,
+              "H": 2.6291116666666663
+            },
+            {
+              "R": -0.10867429687500076,
+              "H": 2.564880755208333
+            },
+            {
+              "R": -0.0687122916666659,
+              "H": 2.4983281249999996
+            },
+            {
+              "R": -0.032441223958334105,
+              "H": 2.429592682291666
+            },
+            {
+              "R": 0,
+              "H": 2.358813333333333
+            },
+            {
+              "R": 0.028485703124999612,
+              "H": 2.2863009635416667
+            },
+            {
+              "R": 0.05294312499999962,
+              "H": 2.2124193749999996
+            },
+            {
+              "R": 0.07331273437499847,
+              "H": 2.1373868489583328
+            },
+            {
+              "R": 0.08953499999999846,
+              "H": 2.0614216666666656
+            },
+            {
+              "R": 0.101550390625,
+              "H": 1.9847421093749997
+            },
+            {
+              "R": 0.10929937499999769,
+              "H": 1.9075664583333332
+            },
+            {
+              "R": 0.11272242187499769,
+              "H": 1.830112994791666
+            },
+            {
+              "R": 0.11175999999999844,
+              "H": 1.7525999999999995
+            }
+          ],
+          "EnvelopeMassPerLength": 148.816394,
+          "EnvelopeUnresolved": "UNRESOLVED (p.84, 89, 90): railing posts / fencing - the \u0027Pedestrian railing details\u0027 / RAIL (PED) sheets that size the posts, rails, fencing, base plates and anchors are not in this reduced set (p.89, p.90 refer to them), and p.84 note 2 says the number and spacing of the posts is diagrammatic only",
+          "EnvelopeBasis": "p.89 HIGH post outline swept continuously (scaled; 9\u0027-10 dimensioned); mass = p.83 design dead load 100 PLF",
+          "Members": [
+            {
+              "Name": "HR",
+              "Kind": "Handrail",
+              "Diameter": 0.047498,
+              "Center": {
+                "R": 0.01608666666666551,
+                "H": 0.789051
+              },
+              "Description": "Handrail pipe, 1.87\u0022 OD scaled (p.89)",
+              "MassPerLength": 0,
+              "Unresolved": "UNRESOLVED (p.89): handrail pipe size, wall and bracket - drawn only; the \u0027Pedestrian railing details\u0027 sheets are not in the set",
+              "Basis": "pipe OD 1.87\u0022 and position scaled from the p.89 vectors; top 3\u0027-0 above the trail (dimensioned); mass inside the plan design dead load of the envelope"
+            }
+          ],
+          "Source": "p.83, 84-88, 89, 90, 91",
+          "Unresolved": []
+        },
+        {
+          "Name": "High RT",
+          "TypeName": "RAIL (PED)(HIGH)",
+          "Kind": "Guardrail",
+          "Offset": 2.1336,
+          "BaseProbe": 0.127,
+          "Material": "Stainless steel AISI 316 (p.83)",
+          "Density": 7980,
+          "SampleStep": 0.3048,
+          "Envelope": [
+            {
+              "R": 0.0508,
+              "H": 0
+            },
+            {
+              "R": 0.2032,
+              "H": 0
+            },
+            {
+              "R": 0.2032,
+              "H": 1.7525999999999995
+            },
+            {
+              "R": 0.20098080729166937,
+              "H": 1.8337708593750002
+            },
+            {
+              "R": 0.19433645833333332,
+              "H": 1.914604374999999
+            },
+            {
+              "R": 0.18328679687499883,
+              "H": 1.9949219531249998
+            },
+            {
+              "R": 0.16785166666666512,
+              "H": 2.074544999999999
+            },
+            {
+              "R": 0.14805091145833332,
+              "H": 2.1532949218749997
+            },
+            {
+              "R": 0.12390437499999885,
+              "H": 2.2309931249999995
+            },
+            {
+              "R": 0.09543190104166667,
+              "H": 2.307461015625
+            },
+            {
+              "R": 0.06265333333333217,
+              "H": 2.38252
+            },
+            {
+              "R": 0.026326041666666664,
+              "H": 2.4556839062499995
+            },
+            {
+              "R": -0.01397000000000077,
+              "H": 2.5265062499999997
+            },
+            {
+              "R": -0.05807604166666667,
+              "H": 2.5948679687499996
+            },
+            {
+              "R": -0.10583333333333525,
+              "H": 2.6606499999999995
+            },
+            {
+              "R": -0.15708312500000116,
+              "H": 2.72373328125
+            },
+            {
+              "R": -0.21166666666666667,
+              "H": 2.7839987499999994
+            },
+            {
+              "R": -0.2694252083333341,
+              "H": 2.8413273437499997
+            },
+            {
+              "R": -0.3302,
+              "H": 2.8955999999999995
+            },
+            {
+              "R": -0.3589866666666674,
+              "H": 2.8600399999999992
+            },
+            {
+              "R": -0.30265356770833257,
+              "H": 2.806485026041666
+            },
+            {
+              "R": -0.24931687500000266,
+              "H": 2.7500527083333326
+            },
+            {
+              "R": -0.19911549479166665,
+              "H": 2.6908819531249994
+            },
+            {
+              "R": -0.15218833333333448,
+              "H": 2.6291116666666663
+            },
+            {
+              "R": -0.10867429687500076,
+              "H": 2.564880755208333
+            },
+            {
+              "R": -0.0687122916666659,
+              "H": 2.4983281249999996
+            },
+            {
+              "R": -0.032441223958334105,
+              "H": 2.429592682291666
+            },
+            {
+              "R": 0,
+              "H": 2.358813333333333
+            },
+            {
+              "R": 0.028485703124999612,
+              "H": 2.2863009635416667
+            },
+            {
+              "R": 0.05294312499999962,
+              "H": 2.2124193749999996
+            },
+            {
+              "R": 0.07331273437499847,
+              "H": 2.1373868489583328
+            },
+            {
+              "R": 0.08953499999999846,
+              "H": 2.0614216666666656
+            },
+            {
+              "R": 0.101550390625,
+              "H": 1.9847421093749997
+            },
+            {
+              "R": 0.10929937499999769,
+              "H": 1.9075664583333332
+            },
+            {
+              "R": 0.11272242187499769,
+              "H": 1.830112994791666
+            },
+            {
+              "R": 0.11175999999999844,
+              "H": 1.7525999999999995
+            }
+          ],
+          "EnvelopeMassPerLength": 148.816394,
+          "EnvelopeUnresolved": "UNRESOLVED (p.84, 89, 90): railing posts / fencing - the \u0027Pedestrian railing details\u0027 / RAIL (PED) sheets that size the posts, rails, fencing, base plates and anchors are not in this reduced set (p.89, p.90 refer to them), and p.84 note 2 says the number and spacing of the posts is diagrammatic only",
+          "EnvelopeBasis": "p.89 HIGH post outline swept continuously (scaled; 9\u0027-10 dimensioned); mass = p.83 design dead load 100 PLF",
+          "Members": [
+            {
+              "Name": "HR",
+              "Kind": "Handrail",
+              "Diameter": 0.047498,
+              "Center": {
+                "R": 0.01608666666666551,
+                "H": 0.789051
+              },
+              "Description": "Handrail pipe, 1.87\u0022 OD scaled (p.89)",
+              "MassPerLength": 0,
+              "Unresolved": "UNRESOLVED (p.89): handrail pipe size, wall and bracket - drawn only; the \u0027Pedestrian railing details\u0027 sheets are not in the set",
+              "Basis": "pipe OD 1.87\u0022 and position scaled from the p.89 vectors; top 3\u0027-0 above the trail (dimensioned); mass inside the plan design dead load of the envelope"
+            }
+          ],
+          "Source": "p.83, 84-88, 89, 90, 91",
+          "Unresolved": []
+        }
+      ]
     },
     {
       "Name": "Arch span 10",
@@ -13191,7 +14883,365 @@
           "UNRESOLVED (p.119, 124): WP position in the tie / steel underside at the bearings (U10) - the WP is at the bottom of the tie flange (p.119) but drawn inside the 2\u0022 end flange (p.124) and the plate below it is not dimensioned. End flange from 1 1/8\u0022 below to 7/8\u0022 above the WP (tie flange \u002B 1 1/8\u0022 fill = 2\u0022), steel underside 1\u0022 lower.",
           "UNRESOLVED (p.148): hanger sockets vs the supplied WireCo catalog - the plan sockets (pin 1.378\u0022, W 16.18\u0022 / 34.41\u0022) are not the catalog\u0027s 1\u0022 open strand socket (Table 6 p.20: pin 2 1/4\u0022, A 12\u0022). Sockets modeled at the plan table dimensions; the catalog row is reported by check-arch-nht.csx."
         ]
-      }
+      },
+      "Railings": [
+        {
+          "Name": "High LT",
+          "TypeName": "RAIL (PED)(HIGH)",
+          "Kind": "Guardrail",
+          "Offset": -2.1336,
+          "BeginLimitOffset": 0.23495,
+          "EndLimitOffset": 0.23495,
+          "BaseProbe": 0.127,
+          "Material": "Stainless steel AISI 316 (p.83)",
+          "Density": 7980,
+          "SampleStep": 0.3048,
+          "Envelope": [
+            {
+              "R": 0.0508,
+              "H": 0
+            },
+            {
+              "R": 0.2032,
+              "H": 0
+            },
+            {
+              "R": 0.2032,
+              "H": 1.7525999999999995
+            },
+            {
+              "R": 0.20098080729166937,
+              "H": 1.8337708593750002
+            },
+            {
+              "R": 0.19433645833333332,
+              "H": 1.914604374999999
+            },
+            {
+              "R": 0.18328679687499883,
+              "H": 1.9949219531249998
+            },
+            {
+              "R": 0.16785166666666512,
+              "H": 2.074544999999999
+            },
+            {
+              "R": 0.14805091145833332,
+              "H": 2.1532949218749997
+            },
+            {
+              "R": 0.12390437499999885,
+              "H": 2.2309931249999995
+            },
+            {
+              "R": 0.09543190104166667,
+              "H": 2.307461015625
+            },
+            {
+              "R": 0.06265333333333217,
+              "H": 2.38252
+            },
+            {
+              "R": 0.026326041666666664,
+              "H": 2.4556839062499995
+            },
+            {
+              "R": -0.01397000000000077,
+              "H": 2.5265062499999997
+            },
+            {
+              "R": -0.05807604166666667,
+              "H": 2.5948679687499996
+            },
+            {
+              "R": -0.10583333333333525,
+              "H": 2.6606499999999995
+            },
+            {
+              "R": -0.15708312500000116,
+              "H": 2.72373328125
+            },
+            {
+              "R": -0.21166666666666667,
+              "H": 2.7839987499999994
+            },
+            {
+              "R": -0.2694252083333341,
+              "H": 2.8413273437499997
+            },
+            {
+              "R": -0.3302,
+              "H": 2.8955999999999995
+            },
+            {
+              "R": -0.3589866666666674,
+              "H": 2.8600399999999992
+            },
+            {
+              "R": -0.30265356770833257,
+              "H": 2.806485026041666
+            },
+            {
+              "R": -0.24931687500000266,
+              "H": 2.7500527083333326
+            },
+            {
+              "R": -0.19911549479166665,
+              "H": 2.6908819531249994
+            },
+            {
+              "R": -0.15218833333333448,
+              "H": 2.6291116666666663
+            },
+            {
+              "R": -0.10867429687500076,
+              "H": 2.564880755208333
+            },
+            {
+              "R": -0.0687122916666659,
+              "H": 2.4983281249999996
+            },
+            {
+              "R": -0.032441223958334105,
+              "H": 2.429592682291666
+            },
+            {
+              "R": 0,
+              "H": 2.358813333333333
+            },
+            {
+              "R": 0.028485703124999612,
+              "H": 2.2863009635416667
+            },
+            {
+              "R": 0.05294312499999962,
+              "H": 2.2124193749999996
+            },
+            {
+              "R": 0.07331273437499847,
+              "H": 2.1373868489583328
+            },
+            {
+              "R": 0.08953499999999846,
+              "H": 2.0614216666666656
+            },
+            {
+              "R": 0.101550390625,
+              "H": 1.9847421093749997
+            },
+            {
+              "R": 0.10929937499999769,
+              "H": 1.9075664583333332
+            },
+            {
+              "R": 0.11272242187499769,
+              "H": 1.830112994791666
+            },
+            {
+              "R": 0.11175999999999844,
+              "H": 1.7525999999999995
+            }
+          ],
+          "EnvelopeMassPerLength": 148.816394,
+          "EnvelopeUnresolved": "UNRESOLVED (p.84, 89, 90): railing posts / fencing - the \u0027Pedestrian railing details\u0027 / RAIL (PED) sheets that size the posts, rails, fencing, base plates and anchors are not in this reduced set (p.89, p.90 refer to them), and p.84 note 2 says the number and spacing of the posts is diagrammatic only",
+          "EnvelopeBasis": "p.89 HIGH post outline swept continuously (scaled; 9\u0027-10 dimensioned); mass = p.83 design dead load 100 PLF",
+          "Members": [
+            {
+              "Name": "HR",
+              "Kind": "Handrail",
+              "Diameter": 0.047498,
+              "Center": {
+                "R": 0.01608666666666551,
+                "H": 0.789051
+              },
+              "Description": "Handrail pipe, 1.87\u0022 OD scaled (p.89)",
+              "MassPerLength": 0,
+              "Unresolved": "UNRESOLVED (p.89): handrail pipe size, wall and bracket - drawn only; the \u0027Pedestrian railing details\u0027 sheets are not in the set",
+              "Basis": "pipe OD 1.87\u0022 and position scaled from the p.89 vectors; top 3\u0027-0 above the trail (dimensioned); mass inside the plan design dead load of the envelope"
+            }
+          ],
+          "Source": "p.83, 84-88, 89, 90, 91",
+          "Unresolved": []
+        },
+        {
+          "Name": "High RT",
+          "TypeName": "RAIL (PED)(HIGH)",
+          "Kind": "Guardrail",
+          "Offset": 2.1336,
+          "BeginLimitOffset": 0.23495,
+          "EndLimitOffset": 0.23495,
+          "BaseProbe": 0.127,
+          "Material": "Stainless steel AISI 316 (p.83)",
+          "Density": 7980,
+          "SampleStep": 0.3048,
+          "Envelope": [
+            {
+              "R": 0.0508,
+              "H": 0
+            },
+            {
+              "R": 0.2032,
+              "H": 0
+            },
+            {
+              "R": 0.2032,
+              "H": 1.7525999999999995
+            },
+            {
+              "R": 0.20098080729166937,
+              "H": 1.8337708593750002
+            },
+            {
+              "R": 0.19433645833333332,
+              "H": 1.914604374999999
+            },
+            {
+              "R": 0.18328679687499883,
+              "H": 1.9949219531249998
+            },
+            {
+              "R": 0.16785166666666512,
+              "H": 2.074544999999999
+            },
+            {
+              "R": 0.14805091145833332,
+              "H": 2.1532949218749997
+            },
+            {
+              "R": 0.12390437499999885,
+              "H": 2.2309931249999995
+            },
+            {
+              "R": 0.09543190104166667,
+              "H": 2.307461015625
+            },
+            {
+              "R": 0.06265333333333217,
+              "H": 2.38252
+            },
+            {
+              "R": 0.026326041666666664,
+              "H": 2.4556839062499995
+            },
+            {
+              "R": -0.01397000000000077,
+              "H": 2.5265062499999997
+            },
+            {
+              "R": -0.05807604166666667,
+              "H": 2.5948679687499996
+            },
+            {
+              "R": -0.10583333333333525,
+              "H": 2.6606499999999995
+            },
+            {
+              "R": -0.15708312500000116,
+              "H": 2.72373328125
+            },
+            {
+              "R": -0.21166666666666667,
+              "H": 2.7839987499999994
+            },
+            {
+              "R": -0.2694252083333341,
+              "H": 2.8413273437499997
+            },
+            {
+              "R": -0.3302,
+              "H": 2.8955999999999995
+            },
+            {
+              "R": -0.3589866666666674,
+              "H": 2.8600399999999992
+            },
+            {
+              "R": -0.30265356770833257,
+              "H": 2.806485026041666
+            },
+            {
+              "R": -0.24931687500000266,
+              "H": 2.7500527083333326
+            },
+            {
+              "R": -0.19911549479166665,
+              "H": 2.6908819531249994
+            },
+            {
+              "R": -0.15218833333333448,
+              "H": 2.6291116666666663
+            },
+            {
+              "R": -0.10867429687500076,
+              "H": 2.564880755208333
+            },
+            {
+              "R": -0.0687122916666659,
+              "H": 2.4983281249999996
+            },
+            {
+              "R": -0.032441223958334105,
+              "H": 2.429592682291666
+            },
+            {
+              "R": 0,
+              "H": 2.358813333333333
+            },
+            {
+              "R": 0.028485703124999612,
+              "H": 2.2863009635416667
+            },
+            {
+              "R": 0.05294312499999962,
+              "H": 2.2124193749999996
+            },
+            {
+              "R": 0.07331273437499847,
+              "H": 2.1373868489583328
+            },
+            {
+              "R": 0.08953499999999846,
+              "H": 2.0614216666666656
+            },
+            {
+              "R": 0.101550390625,
+              "H": 1.9847421093749997
+            },
+            {
+              "R": 0.10929937499999769,
+              "H": 1.9075664583333332
+            },
+            {
+              "R": 0.11272242187499769,
+              "H": 1.830112994791666
+            },
+            {
+              "R": 0.11175999999999844,
+              "H": 1.7525999999999995
+            }
+          ],
+          "EnvelopeMassPerLength": 148.816394,
+          "EnvelopeUnresolved": "UNRESOLVED (p.84, 89, 90): railing posts / fencing - the \u0027Pedestrian railing details\u0027 / RAIL (PED) sheets that size the posts, rails, fencing, base plates and anchors are not in this reduced set (p.89, p.90 refer to them), and p.84 note 2 says the number and spacing of the posts is diagrammatic only",
+          "EnvelopeBasis": "p.89 HIGH post outline swept continuously (scaled; 9\u0027-10 dimensioned); mass = p.83 design dead load 100 PLF",
+          "Members": [
+            {
+              "Name": "HR",
+              "Kind": "Handrail",
+              "Diameter": 0.047498,
+              "Center": {
+                "R": 0.01608666666666551,
+                "H": 0.789051
+              },
+              "Description": "Handrail pipe, 1.87\u0022 OD scaled (p.89)",
+              "MassPerLength": 0,
+              "Unresolved": "UNRESOLVED (p.89): handrail pipe size, wall and bracket - drawn only; the \u0027Pedestrian railing details\u0027 sheets are not in the set",
+              "Basis": "pipe OD 1.87\u0022 and position scaled from the p.89 vectors; top 3\u0027-0 above the trail (dimensioned); mass inside the plan design dead load of the envelope"
+            }
+          ],
+          "Source": "p.83, 84-88, 89, 90, 91",
+          "Unresolved": []
+        }
+      ]
     }
   ],
   "References": [],
