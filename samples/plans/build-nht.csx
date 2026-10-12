@@ -36,7 +36,17 @@ string Fe(double m) => (m / Ft(1)).ToString("0.000");
 
 // ================================================================ 1. alignment TRAILCLNEW = CL NHT (p.18-19 / sh 69-70)
 // Curves 102 (R 60 RT) .. 109 (R 200 LT), no spirals, no station equations. PI coordinates as printed (X east, Y north, ft).
-// HORIZONTAL DATUM (U12): survey control sheets 1-2 of 3 are not in the set -> plan X / Y used as a LOCAL GRID in (international) feet.
+// HORIZONTAL DATUM (U12 - resolved 2026-10-11 from a user GPS check): the plan X / Y are TxDOT SURFACE coordinates, NAD83 Texas North Central
+// (EPSG:2276, US survey ft) x the Dallas County surface adjustment factor 1.000136. Evidence: GPS 32.901380, -96.769012 (approximate centre of the arch
+// span) -> EPSG:2276 X 2499728.33, Y 7015245.07 -> x 1.000136 = 2500068.29, 7016199.14, within 10.9 ft (X) / 0.4 ft (Y) of the model arch centre
+// (2500079.15, 7016198.76); the residual is the approximate GPS point. The plan numbers are used as printed (ft); Doc.Project.Georeference carries
+// the CRS and the grid scale 1 / 1.000136 for IFC (IfcProjectedCRS EPSG:2276 + IfcMapConversion.Scale); the model is not moved.
+Doc.Project.Georeference = new SBM.Core.Project.GeoreferenceDefinition
+{
+    CrsName = "EPSG:2276", Description = "NAD83 / Texas North Central (ftUS); project X/Y = TxDOT surface coordinates (Dallas County SAF 1.000136), plan numbers used as ft",
+    GeodeticDatum = "NAD83", MapProjection = "Lambert Conformal Conic", MapZone = "Texas North Central (4202)", MapUnitUsSurveyFoot = false, GridScale = 1 / 1.000136,
+    Basis = "User GPS check 2026-10-11: 32.901380, -96.769012 -> EPSG:2276 2499728.33 / 7015245.07, x 1.000136 = 2500068.29 / 7016199.14 vs model arch centre 2500079.15 / 7016198.76",
+};
 const string AlName = "CL NHT (TRAILCLNEW)";
 Doc.Project.Alignments.RemoveAll(a => a.Name == AlName);
 // The PI table cannot be used as is: curves 105/106 (PRC) and 106/107 (PCC) touch (T + T = PI distance), and the 0.01 ft rounding of the
@@ -67,8 +77,8 @@ Arc(200, Dms(11, 11, 6.14), false);                 // 109  PC 28+90.27  PT 29+2
 Tan(100);
 var al = new Alignment(elems) { Name = AlName, StartStation = Sta("20+49.30") };
 Doc.Project.Alignments.Add(al);
-al.Description = "CL NHT = TRAILCLNEW (CSJ 0047-07-228 p.18-19); plan X/Y as a local grid in ft (datum not in the set, U12)";
-U("p.17-19", "horizontal datum / projection / scale factor (U12)", "survey control sheets 1-2 of 3 are not in the set", "Plan X / Y used as a local grid in feet.");
+al.Description = "CL NHT = TRAILCLNEW (CSJ 0047-07-228 p.18-19); plan X/Y = TxDOT surface coordinates, NAD83 Texas North Central, SAF 1.000136 (U12 resolved)";
+R("U12 RESOLVED (user GPS check, 2026-10-11): plan X / Y = TxDOT surface coordinates, NAD83 Texas North Central (EPSG:2276) x Dallas County SAF 1.000136; GPS 32.901380, -96.769012 -> 2500068.29 / 7016199.14 surface vs model arch centre 2500079.15 / 7016198.76 (10.9 / 0.4 ft, approximate GPS). Georeference set (IFC grid scale 1 / 1.000136); model not moved.");
 {
     (string name, string sta)[] keys = { ("PT 102 (begin bridge)", "20+49.30"), ("PC 103", "20+92.01"), ("PT 103", "22+35.03"), ("PC 104", "22+74.36"), ("PT 104", "23+59.77"),
         ("PC 105", "24+00.44"), ("PRC 105/106", "25+18.73"), ("PCC 106/107", "26+47.89"), ("PT 107", "27+15.09"), ("PC 108", "28+33.68"), ("PT 108", "28+72.73"),

@@ -537,7 +537,8 @@ public static class ModelDatabase
         {
             var asmInfo = new Dictionary<string, AsmInfo>();
             var girderGroup = new Dictionary<int, string>();
-            string cfGroup = "", lbGroup = "", inspGroup = "";
+            string cfGroup = "", lbGroup = "", inspGroup = "", archGroup = "";
+            string ArchGroup() => archGroup.Length > 0 ? archGroup : (archGroup = Group($"{bk}/group/arch", superId, "Tied arch", "tied arch"));
             string GirderGroup(int g)
             {
                 if (girderGroup.TryGetValue(g, out var id)) return id;
@@ -555,6 +556,19 @@ public static class ModelDatabase
                 var props = new Json().Add("description", asm.Description);
                 switch (asm.Kind)
                 {
+                    // Tied arch (Arch/ArchGenerator): all assemblies under the "Tied arch" group; bearings name their pier in the description.
+                    case AssemblyKind.Bearing when steel.Arch != null:
+                        parent = ArchGroup(); cat = "bearing"; sub = "arch bearing";
+                        { var mm = Regex.Match(asm.Description, @" at (.+)$"); if (mm.Success) support = mm.Groups[1].Value; }
+                        break;
+                    case AssemblyKind.ArchRib: parent = ArchGroup(); cat = "arch rib"; break;
+                    case AssemblyKind.ArchTie: parent = ArchGroup(); cat = "tie girder"; break;
+                    case AssemblyKind.ArchHanger: parent = ArchGroup(); cat = "hanger"; break;
+                    case AssemblyKind.ArchFloorbeam: parent = ArchGroup(); cat = "floorbeam"; break;
+                    case AssemblyKind.ArchBracing: parent = ArchGroup(); cat = "upper lateral bracing"; break;
+                    case AssemblyKind.ArchKnuckle: parent = ArchGroup(); cat = "knuckle"; break;
+                    case AssemblyKind.ArchDeckForm: parent = ArchGroup(); cat = "deck form"; break;
+                    case AssemblyKind.ArchSplice: parent = ArchGroup(); cat = "arch field splice"; sub = asm.Description.Contains("tie") ? "tie splice" : "rib splice"; break;
                     case AssemblyKind.GirderFieldSection:
                         parent = GirderGroup(asm.Girder); cat = "girder field section";
                         {
@@ -710,13 +724,23 @@ public static class ModelDatabase
             PartCategory.Ptfe => "PTFE surface",
             PartCategory.InspectionBracket => "cable bracket", PartCategory.InspectionCable => "wire rope", PartCategory.Grating => "grating",
             PartCategory.WalkwayStringer => "walkway stringer", PartCategory.WalkwayPost => "walkway post", PartCategory.WalkwayRail => "walkway rail",
-            PartCategory.WalkwayPlate => "walkway plate", PartCategory.RolledTee => "tee", PartCategory.AccessDoor => "access door", _ => c.ToString(),
+            PartCategory.WalkwayPlate => "walkway plate",
+            PartCategory.ArchRib => "arch rib", PartCategory.TiePlate => "tie girder plate", PartCategory.FloorbeamPlate => "floorbeam plate",
+            PartCategory.Hanger => "hanger strand", PartCategory.HangerSocket => "hanger socket", PartCategory.ArchBracing => "upper lateral bracing",
+            PartCategory.KnucklePlate => "knuckle plate", PartCategory.FormDeck => "steel deck form",
+            PartCategory.FinPlate => "cable fin plate", PartCategory.CableConnector => "cable connector", PartCategory.ArchConnectionPlate => "connection plate",
+            PartCategory.ArchStiffener => "stiffener", PartCategory.PtStrand => "PT strand", PartCategory.PtAnchorage => "PT anchorage",
+            PartCategory.RolledTee => "tee", PartCategory.AccessDoor => "access door", _ => c.ToString(),
         };
 
         private static string IfcClassOf(SteelPart p) => p.Category switch
         {
             PartCategory.Angle or PartCategory.Channel or PartCategory.InspectionBracket or PartCategory.InspectionCable
-                or PartCategory.WalkwayStringer or PartCategory.WalkwayPost or PartCategory.RolledTee => "IFCMEMBER",
+                or PartCategory.WalkwayStringer or PartCategory.WalkwayPost or PartCategory.RolledTee
+                or PartCategory.ArchRib or PartCategory.Hanger or PartCategory.ArchBracing => "IFCMEMBER",
+            PartCategory.HangerSocket or PartCategory.CableConnector => "IFCMECHANICALFASTENER",
+            PartCategory.PtStrand => "IFCTENDON",
+            PartCategory.PtAnchorage => "IFCTENDONANCHOR",
             PartCategory.WalkwayRail => "IFCRAILING",
             PartCategory.BearingPad or PartCategory.BearingDisc => "IFCBEARING",
             PartCategory.ShearPin => "IFCMECHANICALFASTENER",

@@ -124,8 +124,28 @@ public static class IfcExporter
         int ctx = w.Add("IFCGEOMETRICREPRESENTATIONCONTEXT", $"$,'Model',3,1.0E-5,{Ref(axis)},{Ref(north)}");
         int body = w.Add("IFCGEOMETRICREPRESENTATIONSUBCONTEXT", $"'Body','Model',*,*,*,*,{Ref(ctx)},$,.MODEL_VIEW.,$");
         int axisCtx = w.Add("IFCGEOMETRICREPRESENTATIONSUBCONTEXT", $"'Axis','Model',*,*,*,*,{Ref(ctx)},$,.MODEL_VIEW.,$");
-        int crs = w.Add("IFCPROJECTEDCRS", $"'Project grid','Grid coordinates of the source alignment',$,$,$,$,{Ref(lenUnit)}");
-        w.Add("IFCMAPCONVERSION", $"{Ref(ctx)},{Ref(crs)},{R(basePt.X * scale)},{R(basePt.Y * scale)},{R(basePt.Z * scale)},1.0,0.0,1.0");
+        if (project.Georeference is { } geo)
+        {
+            // Project X / Y = map grid / GridScale (e.g. TxDOT surface coordinates); eastings / northings = the base point in grid units.
+            int mapUnit = lenUnit;
+            double toMap = 1;
+            if (geo.MapUnitUsSurveyFoot)
+            {
+                int dim2 = w.Add("IFCDIMENSIONALEXPONENTS", "1,0,0,0,0,0,0");
+                int mwu2 = w.Add("IFCMEASUREWITHUNIT", $"IFCLENGTHMEASURE({R(1200.0 / 3937.0)}),{Ref(metre)}");
+                mapUnit = w.Add("IFCCONVERSIONBASEDUNIT", $"{Ref(dim2)},.LENGTHUNIT.,'US SURVEY FOOT',{Ref(mwu2)}");
+                toMap = (u.IsUS ? u.FootInMeters : 1.0) / (1200.0 / 3937.0);
+            }
+            string Opt(string s) => string.IsNullOrEmpty(s) ? "$" : S(s);
+            int crs = w.Add("IFCPROJECTEDCRS", $"{S(geo.CrsName)},{Opt(geo.Description)},{Opt(geo.GeodeticDatum)},$,{Opt(geo.MapProjection)},{Opt(geo.MapZone)},{Ref(mapUnit)}");
+            double g = geo.GridScale > 0 ? geo.GridScale : 1;
+            w.Add("IFCMAPCONVERSION", $"{Ref(ctx)},{Ref(crs)},{R(basePt.X * scale * g * toMap)},{R(basePt.Y * scale * g * toMap)},{R(basePt.Z * scale * toMap)},1.0,0.0,{R(g * toMap)}");
+        }
+        else
+        {
+            int crs = w.Add("IFCPROJECTEDCRS", $"'Project grid','Grid coordinates of the source alignment',$,$,$,$,{Ref(lenUnit)}");
+            w.Add("IFCMAPCONVERSION", $"{Ref(ctx)},{Ref(crs)},{R(basePt.X * scale)},{R(basePt.Y * scale)},{R(basePt.Z * scale)},1.0,0.0,1.0");
+        }
 
         int proj = w.Add("IFCPROJECT", $"{Guid(IfcKeys.Project(key))},$,{S(project.Name)},$,$,$,$,({Ref(ctx)}),{Ref(units)}");
         int sitePl = w.Add("IFCLOCALPLACEMENT", $"$,{Ref(axis)}");
@@ -149,6 +169,11 @@ public static class IfcExporter
                 PartCategory.BearingPad => (0.15, 0.15, 0.15),
                 PartCategory.InspectionBracket => (0.55, 0.75, 0.9),
                 PartCategory.InspectionCable => (0.8, 0.8, 0.85),
+                PartCategory.ArchRib or PartCategory.TiePlate or PartCategory.FloorbeamPlate or PartCategory.KnucklePlate => (0.30, 0.55, 0.80),
+                PartCategory.Hanger => (0.82, 0.82, 0.86),
+                PartCategory.HangerSocket => (0.55, 0.55, 0.6),
+                PartCategory.ArchBracing => (0.35, 0.85, 0.45),
+                PartCategory.FormDeck => (0.7, 0.72, 0.75),
                 PartCategory.Grating => (0.6, 0.62, 0.66),
                 PartCategory.WalkwayStringer or PartCategory.WalkwayPost or PartCategory.WalkwayRail or PartCategory.WalkwayPlate => (0.45, 0.7, 0.5),
                 _ => (0.95, 0.3, 0.2),
@@ -650,7 +675,7 @@ public static class IfcExporter
             var contained = new List<int>();
             int concreteStyle = RgbStyle("Concrete", 0.72, 0.72, 0.69);
             int jointStyle = RgbStyle("Expansion joint (generic)", 0.9, 0.55, 0.15);
-            string concreteMat = $"Concrete, f'c = {def.Deck.Reinforcement.ConcreteStrengthKsi:0.#} ksi";
+            string concreteMat = $"Concrete, f'c = {(def.Arch?.Deck?.ConcreteStrengthKsi ?? def.Deck.Reinforcement.ConcreteStrengthKsi):0.#} ksi";
             if (c.Deck != null)
             {
                 var items = new List<int> { FaceSet(c.Deck, concreteStyle) };
@@ -658,7 +683,7 @@ public static class IfcExporter
                 foreach (var (_, db) in c.DeckBumps) if (!db.IsEmpty) items.Add(FaceSet(db, concreteStyle));   // deck widenings under barrier zones
                 int rep = w.Add("IFCSHAPEREPRESENTATION", $"{Ref(body)},'Body','Tessellation',{Refs(items)}");
                 int pds = w.Add("IFCPRODUCTDEFINITIONSHAPE", $"$,$,({Ref(rep)})");
-                int slab = deckSlab = w.Add("IFCSLAB", $"{Guid(IfcKeys.DeckSlab(bk))},$,'Deck slab',{S($"{u.FormatLength(def.Deck.Thickness, LengthKind.Short)} cast-in-place deck with haunches")},'BRIDGE_DECK',{Ref(pl)},{Ref(pds)},'DECK',.USERDEFINED.");
+                int slab = deckSlab = w.Add("IFCSLAB", $"{Guid(IfcKeys.DeckSlab(bk))},$,'Deck slab',{S(def.Arch != null ? "Cast-in-place deck on corrugated steel deck forms, with curbs" : $"{u.FormatLength(def.Deck.Thickness, LengthKind.Short)} cast-in-place deck with haunches")},'BRIDGE_DECK',{Ref(pl)},{Ref(pds)},'DECK',.USERDEFINED.");
                 contained.Add(slab);
                 AddMaterial(concreteMat, slab);
                 psetTargets.Add((slab, "DECK", "Deck slab", 0, (c.DeckVolume + c.HaunchVolume + c.DeckBumpVolume) * 2400));
@@ -950,8 +975,14 @@ public static class IfcExporter
                     AssemblyKind.GirderFieldSection => (".FACTORY.", ".GIRDER.", "$"),
                     AssemblyKind.CrossFrame => (".SITE.", ".CROSS_BRACING.", "$"),
                     AssemblyKind.LateralBracing => (".SITE.", ".CROSS_BRACING.", "$"),
-                    AssemblyKind.FieldSplice => (".SITE.", ".USERDEFINED.", "'FIELD_SPLICE'"),
+                    AssemblyKind.FieldSplice or AssemblyKind.ArchSplice => (".SITE.", ".USERDEFINED.", "'FIELD_SPLICE'"),
                     AssemblyKind.InspectionCable or AssemblyKind.InspectionWalkway => (".SITE.", ".ACCESSORY_ASSEMBLY.", "$"),
+                    AssemblyKind.ArchRib => (".FACTORY.", ".ARCH.", "$"),
+                    AssemblyKind.ArchTie or AssemblyKind.ArchFloorbeam => (".FACTORY.", ".GIRDER.", "$"),
+                    AssemblyKind.ArchHanger => (".SITE.", ".SUSPENSIONASSEMBLY.", "$"),
+                    AssemblyKind.ArchBracing => (".SITE.", ".CROSS_BRACING.", "$"),
+                    AssemblyKind.ArchKnuckle => (".FACTORY.", ".USERDEFINED.", "'KNUCKLE'"),
+                    AssemblyKind.ArchDeckForm => (".SITE.", ".USERDEFINED.", "'DECK_FORM'"),
                     _ => (".SITE.", ".USERDEFINED.", "'BEARING'"),
                 };
                 asmIds[asm.Mark] = w.Add("IFCELEMENTASSEMBLY",
@@ -996,8 +1027,24 @@ public static class IfcExporter
                     PartCategory.WalkwayPost => w.Add("IFCMEMBER", $"{common},$,{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.POST."),
                     PartCategory.WalkwayRail => w.Add("IFCRAILING", $"{common},$,{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.HANDRAIL."),
                     PartCategory.WalkwayPlate => w.Add("IFCPLATE", $"{common},'WALKWAY_PLATE',{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.USERDEFINED."),
+                    // Tied arch: rib IfcMember ARCH_SEGMENT, tie / floorbeam plates IfcPlate, hanger strand IfcMember SUSPENDER (IFC 4.3), sockets
+                    // IfcMechanicalFastener 'CABLE_SOCKET', bracing BRACE, knuckle plates 'KNUCKLE_PLATE', form deck IfcPlate SHEET.
+                    PartCategory.ArchRib => w.Add("IFCMEMBER", $"{common},$,{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.ARCH_SEGMENT."),
+                    PartCategory.TiePlate or PartCategory.FloorbeamPlate => w.Add("IFCPLATE", $"{common},$,{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},{(part.Mark.EndsWith("-F") ? ".FLANGE_PLATE." : ".WEB_PLATE.")}"),
+                    PartCategory.Hanger => w.Add("IFCMEMBER", $"{common},$,{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.SUSPENDER."),
+                    PartCategory.HangerSocket => w.Add("IFCMECHANICALFASTENER", $"{common},'CABLE_SOCKET',{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},$,$,.USERDEFINED."),
+                    PartCategory.ArchBracing => w.Add("IFCMEMBER", $"{common},$,{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.BRACE."),
+                    PartCategory.KnucklePlate => w.Add("IFCPLATE", $"{common},'KNUCKLE_PLATE',{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.USERDEFINED."),
+                    PartCategory.FormDeck => w.Add("IFCPLATE", $"{common},$,{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.SHEET."),
+                    PartCategory.FinPlate => w.Add("IFCPLATE", $"{common},'CABLE_FIN_PLATE',{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.USERDEFINED."),
+                    PartCategory.CableConnector => w.Add("IFCMECHANICALFASTENER", $"{common},'CABLE_CONNECTOR',{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},$,$,.USERDEFINED."),
+                    PartCategory.ArchConnectionPlate => w.Add("IFCPLATE", $"{common},$,{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.SPLICE_PLATE."),
+                    PartCategory.ArchStiffener => w.Add("IFCPLATE", $"{common},$,{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.STIFFENER_PLATE."),
+                    PartCategory.PtStrand => w.Add("IFCTENDON", $"{common},$,{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},$,.STRAND.,{R(steel.Arch?.PtStrandDiameter * scale ?? 0)},{R(steel.Arch?.PtStrandArea * scale * scale ?? 0)},$,$,$,$,$"),
+                    PartCategory.PtAnchorage => w.Add("IFCTENDONANCHOR", $"{common},'PT_FLAT_ANCHORAGE',{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},$,.USERDEFINED."),
                     _ => w.Add("IFCFASTENER", $"{common},$,{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.WELD."),
                 };
+                if (part.Assumption != null) miscStatus.Add((id, part.Assumption));
                 if (children.TryGetValue(part.Assembly, out var list)) list.Add(id);
                 if (!materials.TryGetValue(part.Material, out var ml)) materials[part.Material] = ml = new List<int>();
                 ml.Add(id);

@@ -78,7 +78,14 @@ public sealed class RegenerationCache
             SteelModel? st = null;
             Concrete.ConcreteModel? cm = null;
             Prestressed.PrestressedModel? ps = null;
-            if (includeSteel && !f.HasErrors && b.Girders.IsPrestressed)
+            if (includeSteel && !f.HasErrors && b.Arch != null)
+            {
+                // Steel tied arch: its own generator; steel parts + seats in a SteelModel, the slab / curbs in a ConcreteModel.
+                var am = SBM.Core.Arch.ArchGenerator.Generate(f, project.Units);
+                st = am.Steel;
+                cm = am.Concrete;
+            }
+            else if (includeSteel && !f.HasErrors && b.Girders.IsPrestressed)
             {
                 // Prestressed concrete girders instead of steel.
                 var tp = Task.Run(() => Prestressed.PrestressedGenerator.Generate(f, project.Units));
@@ -130,7 +137,8 @@ public sealed class RegenerationCache
             Substructure.SubstructureModel? sub = null;
             bool found;
             lock (_lock) found = _sub.TryGetValue(subKey, out sub);
-            if (!found && includeSteel && !pt.f.HasErrors && (pt.s != null || pt.ps != null))
+            // A tied-arch bridge builds no substructure: its bearings reach the approach units' piers as foreign seats.
+            if (!found && includeSteel && !pt.f.HasErrors && (pt.s != null || pt.ps != null) && b.Arch == null)
             {
                 var seats = (IReadOnlyList<BearingSeat>?)pt.ps?.BearingSeats ?? pt.s!.BearingSeats;
                 var foreign = new Dictionary<int, List<(string, BearingSeat)>>();
@@ -203,6 +211,13 @@ public sealed class RegenerationCache
             yield break;
         }
         if (s == null) yield break;
+        if (s.Arch != null)
+        {
+            // Tied arch: seats carry their plan location and axis.
+            foreach (var seat in s.BearingSeats.Where(x => x.Support == sl.Name && x.Location != null))
+                yield return ($"{b.Name} {(s.Arch.BearingNames.ElementAtOrDefault(seat.Girder) ?? "B" + (seat.Girder + 1))}", seat);
+            yield break;
+        }
         foreach (var seat in s.BearingSeats)
         {
             var br = sl.Bearings.ElementAtOrDefault(seat.Girder);

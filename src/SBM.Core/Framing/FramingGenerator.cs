@@ -61,6 +61,7 @@ public sealed class FramingGenerator
         foreach (var e in _def.Validate()) Error(e);
         if (_align.Elements.Count == 0) Error("The alignment has no horizontal geometry.");
         if (!_diag.IsEmpty && _diag.Any(d => d.Severity == DiagnosticSeverity.Error)) return;
+        if (_def.Arch != null && NG == 0) { RunArchSupportsOnly(); return; }
 
         SetupSupports();
         SetupSpanLayouts();
@@ -89,6 +90,21 @@ public sealed class FramingGenerator
         {
             _result.Camber = CamberBlocking.Compute(_def, _align, _result);
             foreach (var w in _result.Camber.Warnings) Warn(w);
+        }
+    }
+
+    /// <summary>Tied-arch bridge (no girders): support lines only (the arch generator places the bearings on them).</summary>
+    private void RunArchSupportsOnly()
+    {
+        SetupSupports();
+        for (int j = 0; j < NS; j++)
+        {
+            var sup = _def.Supports[j];
+            _result.Supports.Add(new SupportLineResult
+            {
+                Index = j, Name = sup.Name, Type = sup.Type, Station = sup.Station, SkewDegrees = sup.SkewDegrees,
+                AlignmentPoint = _align.PointAtDistance(_dSup[j]), Direction = _supDir[j], Bearings = Array.Empty<BearingResult?>(),
+            });
         }
     }
 
