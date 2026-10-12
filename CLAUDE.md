@@ -402,7 +402,7 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
     (exact), 4 ms traversal budget, feature-edge checks deferred to ranking. Index is debounced (one build per scene burst; prebuilt once at startup).
   - Viewport GPU memory (`MainWindow.Vram.cs`, inventory `Viewport/SceneInventory.cs`, pure planner `SBM.Core/Geometry/VramBudget.cs`, tests `VramAndExactSnapTests`):
     every model's buffers are estimated with HelixToolkit layouts (mesh vertex 52 B, line vertex 32 B, index 4 B, instance 64 B) and compared
-    with the budget (Memory menu / `%LOCALAPPDATA%\SteelBridgeModeleriewport-memory.json`; 0 = 80 % of the DXGI budget beyond the startup
+    with the budget (Memory menu / `%LOCALAPPDATA%\SteelBridgeModeler\viewport-memory.json`; 0 = 80 % of the DXGI budget beyond the startup
     usage, `QueryVideoMemoryInfo` via `EffectsManager.Device`). `VramPlanner.Ladder` order (user's): terrain clip 400 m + image 2048 px ->
     terrain stride 2 / 3 -> detail tiles within 120 m RESIDENT (far tiles removed from `View.Items` = buffers freed; Helix creates buffers on
     first draw, so hidden-but-attached tiles still filled the GPU as the user orbited) -> steel plates without bolt holes (`MeshLod.WithoutHoles`,
