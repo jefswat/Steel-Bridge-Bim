@@ -195,14 +195,19 @@ foreach (var r in Csv("cable-hanger-coordinates.csv"))
     arch.Hangers.Add(new ArchHangerDefinition { Name = c + "-N", Rib = "North rib", Tie = "North tie", TieAnchor = new ArchPoint(r["TC"] + "'", -F(tx), -F(ty), F(tz)), RibAnchor = new ArchPoint(r["H"] + "'", -F(px), -F(py), F(pz)),
         RibWorkPoint = new ArchPoint(r["HC"] + "'", -F(hx), -F(hy), F(hz)), PlanLength = len });
 }
+// v5: socket jaws straddle the fin plate (pin normal to the fin, axis on the cable); E / F from the p.148 table, slot width not tabulated.
+string socketSlotWhy = U("p.148", "open strand socket jaw slot width", "the socket tables give A, B, E, F, G, L, W, dL, Db but no clear opening between the jaws; the N.T.S. plan view points B at the jaw inner faces, but B 2.76\" inside G 3.43\" (pin with heads) would leave no jaw, so B is read as the jaw outer width",
+    "slot 1\" = 7/8\" fin plate + 1/8\", jaws (B - slot) / 2 = 7/8\" thick; jaw back end F, slot bottom E, body to L, shank to W");
 arch.HangerSystem = new ArchHangerSystem
 {
     StrandDiameter = In(1.0), StrandWeightLbPerFt = 2.10,
     StrandDescription = "galvanized structural strand (WireCo / Bethlehem Table 1 p.10: 0.600 sq in, 2.10 lb/ft, E 24,000 ksi prestretched)",
     StrandMaterial = "ASTM A586 zinc-coated structural strand",
     RibSocket = new ArchSocketDefinition { Name = "Open strand socket (at arch rib)", A = In(4.06), B = In(2.76), G = In(3.43), L = In(7.87), W = In(16.18), PinDiameter = In(1.378), ShankDiameter = In(1.299),
+        E = In(2.60), F = In(2.36), SlotWidth = In(1.0), Unresolved = socketSlotWhy,
         Basis = "plan p.148 OPEN STRAND SOCKET DIMENSIONS (envelope: jaw block A x B to L, shank Db to W, pin dL x G)" },
     TieSocket = new ArchSocketDefinition { Name = "Adjustable open strand socket with turnbuckle (at tie girder)", A = In(4.06), B = In(2.76), G = In(3.43), L = In(7.87), W = In(34.41), PinDiameter = In(1.378), ShankDiameter = In(1.299),
+        E = In(2.60), F = In(2.36), SlotWidth = In(1.0), Unresolved = socketSlotWhy,
         Basis = "plan p.148 ADJUSTABLE OPEN STRAND SOCKET DIMENSIONS (turnbuckle body drawn at the shank diameter - its outline is not dimensioned)" },
 };
 
@@ -225,6 +230,11 @@ arch.Fins = new ArchFinSettings
     TieThickness = In(0.875), TieWidth = In(8), TiePinFromEdge = In(1.875), TieDepthBelowBend = In(7), TieBendAboveWeb = In(0.5), TiePinAboveBend = In(4),
     TieFarEdgeAboveBend = In(0.5), TiePinRadius = In(2.25), TieHoleEdge = In(1.5), TieHoleRows = { In(2), In(5.5) },
     Material = "ASTM A709 Gr. 50-F1 (FCM)",
+    // v5 (p.148): 5/16" fillet both sides (elevation symbol) along each flange, length D per cable (Section A-A "weld length D (typ. in plane of plate)",
+    // stops 1/4" +- 1/8"; D = P3 - 1/2" in all 32 rows). p.149 tie fin plate: no weld symbol (bolted) - none modeled.
+    RibWeldSize = In(0.3125), RibWeldSetback = 0,
+    RibWeldUnresolved = U("p.148", "rib fin plate weld start", "D = P3 - 1/2\" implies the weld covers the P3 edge less 1/4\" at each end, but the top corner clip (scaled 1\", not dimensioned) shortens the flange contact edge",
+        "weld D from the end of the scaled 1\" clip toward the pin; it runs up to 1/2\" past the straight edge (CHECK rows)"),
 };
 // Connectors at the crossings circled on the p.150 elevation (N.T.S.; 4 per end, same pairs on the mirror arch): C1xC2, C3xC4, C5xC6, C3xC6, C27xC28, C29xC30, C31xC32, C27xC30.
 foreach (var sfx in new[] { "S", "N" })

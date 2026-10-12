@@ -99,6 +99,7 @@ public static partial class ArchGenerator
             foreach (var k in _d.Knuckles) { if (k.Detail is { } kd) BuildKnuckleV2(k, kd); else BuildKnuckle(k); }
             if (_d.Deck != null) BuildDeck(_d.Deck);
             for (int i = 0; i < _d.Bearings.Count; i++) BuildBearing(_d.Bearings[i], i);
+            if (_d.Welds.Count > 0) BuildWeldRules();
         }
 
         private Vec3? P(string name)
@@ -525,21 +526,21 @@ public static partial class ArchGenerator
                 // Fin plate planes: the cable and the member tangent.
                 Vec3 tieTan = _fr.X;
                 if (_ties.TryGetValue(h.Tie, out var tg)) { var (_, ang) = tg.At(tg.Nearest(tc.XY)); tieTan = Wd(Vec2.FromAngle(ang).WithZ(0)); }
-                Vec3 ribTan = _fr.X;
+                // Rib: the fin plate lies between the rib flanges, i.e. it contains the rib binormal (normal to the arch plane) and the cable, so the
+                // socket pin (normal to the fin) is normal to both. (v1-v4 used the rib TANGENT here: the pin came out parallel to the fin plate.)
+                Vec3 ribFinDir = _fr.X;
                 if (_ribs.FirstOrDefault(r => string.Equals(r.Name, h.Rib, StringComparison.OrdinalIgnoreCase)) is { } rr)
-                {
-                    var d = hc - rr.Center;
-                    double th = Math.Atan2(Vec3.Dot(d, rr.Up), Vec3.Dot(d, rr.ChordDir));
-                    ribTan = Wd(rr.ChordDir * -Math.Sin(th) + rr.Up * Math.Cos(th));
-                }
-                if (hs.TieSocket is { } ts) Socket(ts, asm, "TS", wt, dir, tieTan);
-                if (hs.RibSocket is { } rs) Socket(rs, asm, "RS", wr, -dir, ribTan);
+                    ribFinDir = Wd(Vec3.Cross(rr.ChordDir, rr.Up).Normalized());
+                Vec3? ribFinN = null, tieFinN = null;
                 if (_d.Fins is { } fs)
                 {
                     if (h.RibFin is { } rf && _ribs.FirstOrDefault(r => string.Equals(r.Name, h.Rib, StringComparison.OrdinalIgnoreCase)) is { } rres)
-                        RibFinPlate(h, rf, fs, rres);
-                    if (h.TieFin is { } tf && _ties.TryGetValue(h.Tie, out var tgeo)) TieFinPlate(h, tf, fs, tgeo);
+                        ribFinN = RibFinPlate(h, rf, fs, rres);
+                    if (h.TieFin is { } tf && _ties.TryGetValue(h.Tie, out var tgeo)) tieFinN = TieFinPlate(h, tf, fs, tgeo);
                 }
+                // Socket jaws straddle the fin plate: pin = the fin plate normal when the fin is built, else normal to the cable and the member's fin direction.
+                if (hs.TieSocket is { } ts) Socket(ts, asm, "TS", wt, dir, tieFinN is { } tn ? Wd(tn) : Vec3.Cross(dir, tieTan), $"hanger {h.Name} tie socket");
+                if (hs.RibSocket is { } rs) Socket(rs, asm, "RS", wr, -dir, ribFinN is { } rn ? Wd(rn) : Vec3.Cross(-dir, ribFinDir), $"hanger {h.Name} rib socket");
             }
             BuildConnectors();
         }
@@ -550,10 +551,10 @@ public static partial class ArchGenerator
 
         /// <summary>Rib fin plate: plane = rib binormal x the cable projected on the arch plane; between the flange inner faces; top P4 below the rib
         /// CL (web plane), straight sides P3, then tangent to R around the pin (HC); 1.378" pin hole. Plan P1 / P2 / B are checked against the model.</summary>
-        private void RibFinPlate(ArchHangerDefinition h, ArchRibFin rf, ArchFinSettings fs, ArchRibResult rib)
+        private Vec3? RibFinPlate(ArchHangerDefinition h, ArchRibFin rf, ArchFinSettings fs, ArchRibResult rib)
         {
             var w = SteelCatalog.FindWideFlange(_d.Ribs.FirstOrDefault(r => r.Name == rib.Name)?.Section ?? "W14x132");
-            if (w == null) return;
+            if (w == null) return null;
             var hc = h.RibAnchor.Vec; var tc = h.TieAnchor.Vec;
             var bn = Vec3.Cross(rib.ChordDir, rib.Up).Normalized();
             var dc = (tc - hc).Normalized();
@@ -564,7 +565,7 @@ public static partial class ArchGenerator
             double bq = Vec3.Dot(d0, e), cq = Vec3.Dot(d0, d0) - Vec3.Dot(d0, bn) * Vec3.Dot(d0, bn) - rib.Radius * rib.Radius;
             // |d0 - bn(d0.bn) + e y|^2 = R^2 (in-plane distance; e is in the arch plane)
             double disc = bq * bq - cq;
-            if (disc < 0) { Warn($"Arch: fin plate {h.Name} - the cable does not reach the rib web along the fin; not built."); return; }
+            if (disc < 0) { Warn($"Arch: fin plate {h.Name} - the cable does not reach the rib web along the fin; not built."); return null; }
             double yWeb = -bq + Math.Sqrt(disc);
             if (yWeb < 0) yWeb = -bq - Math.Sqrt(disc);
             double p1 = Vec3.Dot(d0, bn);
@@ -600,14 +601,16 @@ public static partial class ArchGenerator
             AddPart($"{RibAsm(h.Rib)}-FIN-{h.Name}", PartCategory.FinPlate, RibAsm(h.Rib),
                 $"PL {L(fs.RibThickness)} cable fin plate at rib, {h.Name} (P2 {L(yWeb)}, P3 {L(rf.P3)}, P4 {L(rf.P4)}{(double.IsNaN(rf.WeldLength) ? "" : $", weld D {L(rf.WeldLength)}")})",
                 m, fs.Material, yWeb - rf.P4 + r, 0, asu);
+            if (fs.RibWeldSize > 0 && !double.IsNaN(rf.WeldLength)) RibFinWelds(h, rf, fs, hc, bn, e, nf, xl, xr, yTop, clip, w);
+            return nf;
         }
 
         /// <summary>Tie fin plate: lower part on the outside face of the tie web, centred on the floorbeam (panel point), bolted through the web; bend
         /// line along the tie above the web; upper part turned about it to contain the pin (TC). Plan angle A / orientation / pin height are checked.</summary>
-        private void TieFinPlate(ArchHangerDefinition h, ArchTieFin tf, ArchFinSettings fs, TieGeo tg)
+        private Vec3? TieFinPlate(ArchHangerDefinition h, ArchTieFin tf, ArchFinSettings fs, TieGeo tg)
         {
             var pp = tg.Def.PanelPoints.FirstOrDefault(p => string.Equals(p.Name, tf.Panel, StringComparison.OrdinalIgnoreCase));
-            if (pp == null) { Warn($"Arch: fin plate {h.Name} - panel point '{tf.Panel}' is not on {tg.Def.Name}; not built."); return; }
+            if (pp == null) { Warn($"Arch: fin plate {h.Name} - panel point '{tf.Panel}' is not on {tg.Def.Name}; not built."); return null; }
             var tc = h.TieAnchor.Vec;
             var (p2, ang) = tg.At(pp.Distance);
             var t2 = Vec2.FromAngle(ang); var nl = t2.Left;
@@ -686,6 +689,8 @@ public static partial class ArchGenerator
             double grip = fs.TieThickness + def.WebThickness;
             foreach (var hl in holes)
                 Model.Steel.Bolts.Add(new BoltInstance { Frame = BoltFrame(LowerMap, hl.Center.X, hl.Center.Y, fs.TieThickness / 2, -1), Grip = grip, Length = Model.Steel.Bolt.LengthForGrip(grip), Assembly = asm });
+            TieFinWelds(h, fs, tg, asm, p2, t2, nl * side, off, zb, hw, t3, v3, nUp);
+            return nUp;
         }
 
         // ------------------------------------------------------------------ cable connectors (p.150)
@@ -743,19 +748,48 @@ public static partial class ArchGenerator
             }
         }
 
-        private void Socket(ArchSocketDefinition s, string asm, string tag, Vec3 pin, Vec3 toCable, Vec3 memberTangent)
+        /// <summary>Open strand socket at a pin: socket axis along the cable (<paramref name="toCable"/>), pin along <paramref name="pinAxis"/> (the fin plate
+        /// normal, made exactly normal to the cable; the angle it had to turn is checked), jaws straddling the fin plate. Without the jaw detail (E / F /
+        /// SlotWidth = 0) the v1 solid jaw block is built.</summary>
+        private void Socket(ArchSocketDefinition s, string asm, string tag, Vec3 pin, Vec3 toCable, Vec3 pinAxis, string name)
         {
-            var nrm = Vec3.Cross(toCable, memberTangent);
-            if (nrm.Length < 1e-6) nrm = Vec3.Cross(toCable, _fr.Z);
+            var ax = toCable.Normalized();
+            var nrm = pinAxis - ax * Vec3.Dot(pinAxis, ax);
+            if (nrm.Length < 1e-6) nrm = Vec3.Cross(ax, _fr.Z);
             nrm = nrm.Normalized();
-            var a = Vec3.Cross(nrm, toCable).Normalized();
+            if (pinAxis.Length > 1e-9)
+            {
+                double tilt = Math.Asin(Math.Clamp(Math.Abs(Vec3.Dot(pinAxis.Normalized(), ax)), 0, 1)) * 180 / Math.PI;
+                Model.Checks.Add(new ArchCheck($"{name}: cable vs the fin plate plane (pin normal to the fin, socket axis on the cable)", "0.000 deg", $"{tilt:F3} deg", tilt, tilt <= 2.0,
+                    "the socket turns on its pin in the fin plane only; a cable out of the fin plane is a plan difference (p.147 TC / HC vs the p.148 / 149 fin geometry)"));
+            }
+            var a = Vec3.Cross(nrm, ax).Normalized();     // across the cable in the fin plane (head width A)
             var m = new Mesh();
-            // Jaw body: A wide (fin plane) x B across the pin, from behind the pin (A / 2) to L along the cable.
-            var rect = new[] { new Vec2(-s.A / 2, -s.B / 2), new Vec2(s.A / 2, -s.B / 2), new Vec2(s.A / 2, s.B / 2), new Vec2(-s.A / 2, s.B / 2) };
-            RolledBuilder.AddExtrusion(m, rect, pin, a, nrm, toCable, -s.A / 2, s.L);
-            if (s.W > s.L) RolledBuilder.AddTube(m, new[] { pin + toCable * s.L, pin + toCable * s.W }, s.ShankDiameter / 2, 16);
+            if (s.E > 0 && s.F > 0 && s.SlotWidth > 0 && s.SlotWidth < s.B)
+            {
+                // Jaw outline in (along the cable x, across in the fin plane y): rounded back (half ellipse F x A/2), straight sides to the slot bottom E,
+                // then the body tapering to B wide at L (the drawn outline is N.T.S.; A, E, F, L are the plan table values).
+                var jaw = new List<Vec2>();
+                for (int i = 0; i <= 12; i++) { double th = Math.PI / 2 + Math.PI * i / 12; jaw.Add(new Vec2(s.F * Math.Cos(th), -s.A / 2 * Math.Sin(th))); }
+                jaw.Add(new Vec2(s.E, s.A / 2)); jaw.Add(new Vec2(s.E, -s.A / 2));
+                if (MeshBuilder.SignedArea(jaw) < 0) jaw.Reverse();
+                var body = new List<Vec2> { new(s.E, -s.A / 2), new(s.L, -s.B / 2), new(s.L, s.B / 2), new(s.E, s.A / 2) };
+                if (MeshBuilder.SignedArea(body) < 0) body.Reverse();
+                var f = new Frame3(pin, ax, a, nrm);
+                MeshBuilder.AddExtrusion(m, jaw, f, s.SlotWidth / 2, s.B / 2);      // jaw on +pin side
+                MeshBuilder.AddExtrusion(m, jaw, f, -s.B / 2, -s.SlotWidth / 2);    // jaw on -pin side
+                MeshBuilder.AddExtrusion(m, body, f, -s.B / 2, s.B / 2);            // body behind the slot
+            }
+            else
+            {
+                // v1 envelope: jaw block A wide (fin plane) x B across the pin, from behind the pin (A / 2) to L along the cable.
+                var rect = new[] { new Vec2(-s.A / 2, -s.B / 2), new Vec2(s.A / 2, -s.B / 2), new Vec2(s.A / 2, s.B / 2), new Vec2(-s.A / 2, s.B / 2) };
+                RolledBuilder.AddExtrusion(m, rect, pin, a, nrm, ax, -s.A / 2, s.L);
+            }
+            if (s.W > s.L) RolledBuilder.AddTube(m, new[] { pin + ax * s.L, pin + ax * s.W }, s.ShankDiameter / 2, 16);
             RolledBuilder.AddTube(m, new[] { pin - nrm * (s.G / 2), pin + nrm * (s.G / 2) }, s.PinDiameter / 2, 16);
-            AddPart($"{asm}-{tag}", PartCategory.HangerSocket, asm, s.Name, m, s.Material, s.W);
+            var asu = s.Unresolved.Length > 0 ? Assumption.UnresolvedDimension(s.Unresolved, $"jaw slot {L(s.SlotWidth)} clear, jaws {L((s.B - s.SlotWidth) / 2)} thick") : null;
+            AddPart($"{asm}-{tag}", PartCategory.HangerSocket, asm, s.Name, m, s.Material, s.W, 0, asu);
         }
 
         // ------------------------------------------------------------------ floorbeams
