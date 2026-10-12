@@ -216,6 +216,20 @@ var res = doc.ExportIfc("Br12-abv.ifc", IfcGeometryMode.ReferenceView);   // AbV
 marks (plan marks 7a1, 6b1, ...), the per-mark comparison with the plan bar list and the containment check ("Deck rebar containment check ..."). `samples/plans/report-deck-rebar.csx` prints the comparison,
 `check-deck-rebar.csx` the containment check. Plain numbers in paths follow the field's display unit (`StartDistance`, `Length` in ft; `Spacing`, `LeftMargin`, `TransverseBeginClear` in inches).
 
+## Custom barriers and surface treatments (form liner, thin brick)
+
+`Bridges[i].Deck.Barrier.Type = BarrierType.Custom` takes the section point by point (`Profile`: `BarrierProfilePoint(R inward from the deck edge, H above the deck,
+radius, chamfer, tag)`), optionally `PerpendicularToDeck`, `BeginExtension` / `EndExtension` (square ends beyond the deck ends, along the toe line), `Zones`
+(`BarrierZone`: another section over a length centred where a support's CL crosses the deck edge, e.g. a bump-out, with an optional `DeckWidening`) and
+`PlanLength` (checked). Example: `samples/plans/barrier-woodbury.csx`.
+
+`Bridges[i].SurfaceTreatments` (list of `SurfaceTreatmentDefinition`) describes form liner texture / integral thin brick / rustication: kind, pattern, products,
+relief depth, orientation, plan quantity (m2) and `Regions` (`SurfaceRegion`: host Barrier by section tag, Substructure solids of a support by element kind, or the
+Diaphragm; facing direction, S range, lower / upper limit lines (`SurfaceLevel.Level(z)`, `Along((S, z), ...)`, `BelowDeck(d)`) and excluded bands). After
+`Regenerate`, `Doc.Model(bridge).Substructure.SurfaceTreatments.Items` give each region's area and relief-layer mesh, `.Totals` the area per treatment, and
+`.Diagnostics` the comparison with the plan quantity. IFC: one `IfcCovering` per region with Pset `SBM_SurfaceTreatment`; database: group "surface treatment" >
+elements "thin brick" / "form liner". Example: `samples/plans/surface-treatments-woodbury.csx`.
+
 ## Exact curved geometry (NURBS)
 
 Project setting `Geometry` (saved in the .sbm only when changed; app ribbon "Units & geometry" > "Exact curves"):
