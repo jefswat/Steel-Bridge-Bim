@@ -51,6 +51,13 @@ public static class TableViews
                     for (int k = 0; k < cols.Length; k++)
                     {
                         string v = k < part[i].Length ? part[i][k] : "";
+                        // Cut to the column (Helvetica width estimate) so a long cell never runs into the next column.
+                        double maxH = (cols[k].Width - 0.08) / 0.075;
+                        if (LabelPlacer.WidthInHeights(v) > maxH)
+                        {
+                            while (v.Length > 1 && LabelPlacer.WidthInHeights(v + "...") > maxH) v = v[..^1];
+                            v += "...";
+                        }
                         d.Text(v, new Vec2(x + d.Paper(0.05), ry - rh / 2), d.Paper(0.075), 0, TextAlign.Left);
                         x += d.Paper(cols[k].Width);
                     }

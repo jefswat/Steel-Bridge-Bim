@@ -125,6 +125,19 @@ public static class SheetSet
             specs.Add(new SheetSpec($"Girder elevations {names}", "Plate sizes, splices, stiffeners and cross-frame locations", panels));
         }
 
+        // Dapped girder ends (two supports per sheet).
+        var daps = MiscViews.DapSupports(ctx);
+        for (int i = 0; i < daps.Count; i += 2)
+        {
+            var panels = new List<Panel>();
+            for (int k = 0; k < 2 && i + k < daps.Count; k++)
+            {
+                string sup = daps[i + k];
+                panels.Add(new Panel(new ViewSpec($"Dap {sup}", s => MiscViews.DapDetail(WithScale(ctx, s), sup), ScaleFamily.Architectural), 0, H / 2 * (1 - k), W, H / 2 * (2 - k)));
+            }
+            specs.Add(new SheetSpec("Girder end dap details", "Dapped girder ends from the model (lowered top flange, cope tabs)", panels));
+        }
+
         // Steel details.
         specs.Add(new SheetSpec("Steel details", "Cross frames and stiffeners", new[]
         {
@@ -217,6 +230,15 @@ public static class SheetSet
                             new Panel(new ViewSpec(unit.Name + " section A-A", s => BentViews.CapSectionView(WithScale(ctx, s), unit), ScaleFamily.Architectural), W * 0.68, 0, W, H),
                         }
                         : new[] { Full(new ViewSpec(unit.Name, s => BentViews.Bent(WithScale(ctx, s), unit), ScaleFamily.Architectural)) }));
+
+        // Drains, sign supports, crash cushions, lighting: location plan + schedule.
+        if (MiscViews.Any(ctx))
+        {
+            specs.Add(new SheetSpec("Miscellaneous items plan", "Drains, sign supports, crash cushions and lighting from the model",
+                new[] { Full(new ViewSpec("Misc items plan", s => MiscViews.LocationPlan(WithScale(ctx, s)), ScaleFamily.Engineering)) }));
+            foreach (var (title, view) in MiscViews.Schedule(ctx, W, H))
+                specs.Add(new SheetSpec("Miscellaneous items schedule", "Every item with its location and description", new[] { Full(new ViewSpec(title, _ => view, ScaleFamily.Architectural, PaperSpace: true)) }));
+        }
 
         foreach (var (title, view) in TableViews.Quantities(ctx, W, H))
             specs.Add(new SheetSpec("Estimated quantities", "Steel, concrete and reinforcing from the generated model", new[] { Full(new ViewSpec(title, _ => view, ScaleFamily.Architectural, PaperSpace: true)) }));

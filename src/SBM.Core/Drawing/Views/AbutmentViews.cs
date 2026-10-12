@@ -60,6 +60,20 @@ public static class AbutmentViews
             d.Poly(SheetLayers.Concrete, new[] { new Vec2(Xs(sm), mk.BaseZ), new Vec2(Xs(sm), mk.TopZ), new Vec2(Xs(sIn), mk.TopZ), new Vec2(Xs(sIn), mk.BaseZ) });
             d.ElevationTag(new Vec2(Xs(sm), mk.TopZ), $"MASKWALL TOP EL {d.Elev(mk.TopZ)}", right: mir * (mk.End == AbutmentEnd.Left ? -1 : 1) > 0);
         }
+        // Wingwalls, wing footings and counterforts as seen from the rear (outline of each generated solid projected on the elevation).
+        bool wingLabel = false;
+        foreach (var w in unit.Solids.Where(x => x.Kind is SubElementKind.Wingwall or SubElementKind.WingFooting or SubElementKind.Counterfort))
+        {
+            var hull = Solids.MeshBuilder.ConvexHull(w.Mesh.Positions.Select(p => new Vec2(Xs(Vec2.Dot(p.XY - unit.Origin, unit.D)), p.Z)));
+            if (hull.Count < 3) continue;
+            d.Poly(w.Kind == SubElementKind.Wingwall ? SheetLayers.Concrete : SheetLayers.ConcreteHidden, hull, true);
+            if (!wingLabel && w.Kind == SubElementKind.Wingwall)
+            {
+                var top = hull.OrderByDescending(q => q.Y).First();
+                d.Leader(top, top + new Vec2(d.Paper(0.3), d.Paper(0.35)), "WINGWALL (SEE PILING AND WING LAYOUT)");
+                wingLabel = true;
+            }
+        }
         if (g.Extension is { } ex)
             d.Poly(SheetLayers.Concrete, new[] { new Vec2(Xs(ex.S0), g.FootingBottom(ex.S0)), new Vec2(Xs(ex.S0), ex.TopZ), new Vec2(Xs(ex.S1), ex.TopZ), new Vec2(Xs(ex.S1), g.FootingBottom(ex.S1)) });
         foreach (var (ps, _) in g.PileXY.GroupBy(p => p.S).Select(x => (x.Key, 0)))
@@ -175,8 +189,8 @@ public static class AbutmentViews
                     var wv = new Vec2(p.WebS, p.WebN); var fv = new Vec2(wv.Y, -wv.X);        // web (depth) and flange directions
                     dP.Poly(SheetLayers.Steel, new[] { (-a, -b), (a, -b), (a, b), (-a, b) }.Select(q => Pl(p.S + fv.X * q.Item1 + wv.X * q.Item2, p.N + fv.Y * q.Item1 + wv.Y * q.Item2)), true);
                 }
-                // Locate the extra (wing) pile from the nearest main pile: along the line and across it.
-                if (g.PileXY.Count > 0)
+                // Locate a single extra (wing) pile from the nearest main pile: along the line and across it (wing pile groups are on the wing layout).
+                if (g.PileXY.Count > 0 && unit.Foundations.Skip(1).Sum(x => x.Piles.Count) <= 2)
                 {
                     var (ms, mn) = g.PileXY.OrderBy(q => Math.Abs(q.S - p.S)).First();
                     var pa = Pl(ms, mn); var pb = Pl(p.S, mn); var pc = Pl(p.S, p.N);
