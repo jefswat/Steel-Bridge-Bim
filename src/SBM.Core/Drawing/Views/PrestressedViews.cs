@@ -752,7 +752,8 @@ public static class PrestressedViews
             {
                 var pts = segs.SelectMany(q => new[] { q.A, q.B }).ToList();
                 double xa = pts.Min(q => q.X), xb = pts.Max(q => q.X), ya = pts.Min(q => q.Y), yb = pts.Max(q => q.Y);
-                d.Dim(new Vec2(xa, ya), new Vec2(xb, ya), -0.45, u.FormatLength(xb - xa, LengthKind.Short));
+                double below = (ya - dwg.Extents().MinY) / d.Paper(1) + 0.3;
+                d.Dim(new Vec2(xa, ya), new Vec2(xb, ya), -below, u.FormatLength(xb - xa, LengthKind.Short) + " DIAPHRAGM");
                 d.ElevationTag(new Vec2(xb, yb), $"TOP OF DIAPHRAGM EL {d.Elev(yb)}");
                 d.ElevationTag(new Vec2(xb, ya), $"BOTTOM EL {d.Elev(ya)}");
             }

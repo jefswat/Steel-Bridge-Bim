@@ -189,8 +189,20 @@ public static class SheetSet
         // Bents and abutments.
         if (ctx.Substructure != null)
             foreach (var unit in ctx.Substructure.Units)
-                if (unit.Abutment != null)
-                    specs.Add(new SheetSpec($"{unit.Name} abutment", "Rear elevation, section, piling and wing layout", new[]
+                if (unit.Abutment is { Def.Kind: AbutmentKind.Integral } || (unit.Abutment != null && ctx.Prestressed is { Beams.Count: > 0 }))
+                {
+                    // Integral / prestressed-beam abutments: true sections of the model (cap or footing, steps, diaphragm, beams, deck).
+                    int si = unit.SupportIndex, g = Math.Min(1, f.Girders.Count - 1);
+                    string kind = unit.Abutment.Def.Kind == AbutmentKind.Integral ? "Integral abutment" : "Abutment";
+                    specs.Add(new SheetSpec(AbutTitle(unit.Name), $"{kind}: section along the CL bearing, section at a beam, piling layout", new[]
+                    {
+                        new Panel(new ViewSpec(unit.Name + " along CL brg", s => SupportSectionViews.AlongSupport(WithScale(ctx, s), unit, 0, "A-A"), ScaleFamily.Architectural), 0, H * 0.48, W, H),
+                        new Panel(new ViewSpec(unit.Name + " piling", s => AbutmentViews.Abutment(WithScale(ctx, s), unit, 2), ScaleFamily.Architectural), 0, 0, W * 0.6, H * 0.48),
+                        new Panel(new ViewSpec(unit.Name + " section at beam", s => PrestressedViews.SupportSection(WithScale(ctx, s), si, g, false, "B-B"), ScaleFamily.Architectural), W * 0.6, 0, W, H * 0.48),
+                    }));
+                }
+                else if (unit.Abutment != null)
+                    specs.Add(new SheetSpec(AbutTitle(unit.Name), "Rear elevation, section, piling and wing layout", new[]
                     {
                         new Panel(new ViewSpec(unit.Name + " rear elevation", s => AbutmentViews.Abutment(WithScale(ctx, s), unit, 0), ScaleFamily.Architectural), 0, H * 0.55, W, H),
                         new Panel(new ViewSpec(unit.Name + " piling", s => AbutmentViews.Abutment(WithScale(ctx, s), unit, 2), ScaleFamily.Architectural), 0, 0, W * 0.68, H * 0.55),
@@ -208,6 +220,9 @@ public static class SheetSet
             specs.Add(new SheetSpec(title.Replace("BAR LIST — ", "Bar list "), "Bar list and bending diagrams", new[] { Full(new ViewSpec(title, _ => view, ScaleFamily.Architectural, PaperSpace: true)) }));
         return specs;
     }
+
+    /// <summary>"S. Abut. abutment" -> "S. Abut." + " abutment" only when the name does not say it already.</summary>
+    private static string AbutTitle(string name) => name.Contains("abut", StringComparison.OrdinalIgnoreCase) ? name : name + " abutment";
 
     /// <summary>Stations (middle of the span) of the first span with each distinct number of girders.</summary>
     public static List<(double station, int count)> TypicalStations(BridgeFraming f)

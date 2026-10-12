@@ -77,7 +77,17 @@ public static class AbutmentViews
         if (g.Steps.Count > 1)
             d.DimChain(g.Steps.OrderBy(x => x.S).Select(x => new Vec2(Xs(x.S), zLow - d.Paper(0.3))).ToList(), 0);
         d.Dim(new Vec2(Xs(s0), zLow - d.Paper(0.9)), new Vec2(Xs(s1), zLow - d.Paper(0.9)), 0, $"{d.Len(s1 - s0)} FOOTING (ALONG SKEW)");
-        d.Text("BEAM STEP TOPS: " + string.Join("  ", g.Steps.OrderBy(x => x.S).Select(x => $"{x.Tag} {d.Elev(x.TopZ)}")), new Vec2(Xs(s0), zLow - d.Paper(1.35)), d.SmallTextH, 0, TextAlign.Left);
+        // Beam step tops, a few per line so the list stays within the view; integral caps: the step top at each beam line.
+        var stepList = g.Steps.OrderBy(x => x.S).Select(x => $"{x.Tag} {d.Elev(x.TopZ)}").ToList();
+        if (stepList.Count == 0 && g.StepTop != null)
+            for (int gi = 0; gi < ctx.Framing.Supports[unit.SupportIndex].Bearings.Length; gi++)
+                if (ctx.Framing.Supports[unit.SupportIndex].Bearings[gi] is { } br)
+                {
+                    double sb = Vec2.Dot(ctx.Framing.Alignment.PointAt(br.Station, br.Offset) - unit.Origin, unit.D);
+                    stepList.Add($"G{gi + 1} {d.Elev(g.StepTop(sb))}");
+                }
+        for (int i = 0; i < stepList.Count; i += 5)
+            d.Text((i == 0 ? "BEAM STEP TOPS: " : "                ") + string.Join("  ", stepList.Skip(i).Take(5)), new Vec2(Xs(s0), zLow - d.Paper(1.35 + 0.17 * (i / 5))), d.SmallTextH, 0, TextAlign.Left);
         d.Line(SheetLayers.Center, new Vec2(0, zLow - d.Paper(1.1)), new Vec2(0, tops.Max(p => p.Y) + d.Paper(0.4)));
         d.Text("CL ALIGNMENT", new Vec2(0, tops.Max(p => p.Y) + d.Paper(0.55)), d.TextH, 0, TextAlign.Center);
         var box = dwg.Extents();
@@ -123,9 +133,9 @@ public static class AbutmentViews
         dS.Dim(new Vec2(X(xF), zb), new Vec2(X(xF), zb + D), -0.4, dS.Short(D));
         dS.ElevationTag(new Vec2(X(xF), zb + D + W), $"WASH EL {dS.Elev(zb + D + W)}", right: true);
         dS.ElevationTag(new Vec2(X(g.XBwFront), cj), $"C.J. EL {dS.Elev(cj)}", right: true);
-        string tallName = tall == null ? "-" : $"G{tall.Girder + 1}";
-        dS.Text($"{tallName} STEP TOP EL {(tall == null ? "-" : dS.Elev(tall.TopZ))}", new Vec2(X(g.XStepFront) + dS.Paper(0.15), tall?.TopZ ?? zt), dS.SmallTextH, 0, TextAlign.Left);
-        dS.Title("SECTION THROUGH ABUTMENT", $"Normal to the support line at {tallName}; span side to the right · Scale {DrawingOptions.ScaleText(dS.Scale, u)}",
+        string tallName = tall == null ? "" : tall.Tag;
+        if (tall != null) dS.Text($"{tallName} STEP TOP EL {dS.Elev(tall.TopZ)}", new Vec2(X(g.XStepFront) + dS.Paper(0.15), tall.TopZ), dS.SmallTextH, 0, TextAlign.Left);
+        dS.Title("SECTION THROUGH ABUTMENT", $"Normal to the support line{(tall != null ? $" at {tallName} (tallest beam step)" : $" at STA {u.FormatStation(unit.Station)}")}; span side to the right · Scale {DrawingOptions.ScaleText(dS.Scale, u)}",
             new Vec2(X((xB + xF) / 2), zb - dS.Paper(2.0)));
 
         // ================= piling / wing layout plan (S along the line, N across it, true plan shape)
@@ -164,6 +174,14 @@ public static class AbutmentViews
                 {
                     var wv = new Vec2(p.WebS, p.WebN); var fv = new Vec2(wv.Y, -wv.X);        // web (depth) and flange directions
                     dP.Poly(SheetLayers.Steel, new[] { (-a, -b), (a, -b), (a, b), (-a, b) }.Select(q => Pl(p.S + fv.X * q.Item1 + wv.X * q.Item2, p.N + fv.Y * q.Item1 + wv.Y * q.Item2)), true);
+                }
+                // Locate the extra (wing) pile from the nearest main pile: along the line and across it.
+                if (g.PileXY.Count > 0)
+                {
+                    var (ms, mn) = g.PileXY.OrderBy(q => Math.Abs(q.S - p.S)).First();
+                    var pa = Pl(ms, mn); var pb = Pl(p.S, mn); var pc = Pl(p.S, p.N);
+                    if (Vec2.Distance(pa, pb) > In(1)) dP.Dim(pa, pb, -0.45, dP.Short(Math.Abs(p.S - ms)));
+                    if (Vec2.Distance(pb, pc) > In(1)) dP.Dim(pb, pc, 0.35, dP.Short(Math.Abs(p.N - mn)));
                 }
             }
         var box3 = dwgP.Extents();
