@@ -49,15 +49,55 @@ public static class SheetSet
             goto Substructure;
         }
 
-        // Prestressed girders: one sheet (sections + elevation + schedule) instead of the steel girder and detail sheets.
-        if (ctx.Prestressed is { Beams.Count: > 0 })
+        // Prestressed beams: beam layout, one detail sheet per beam type, schedule + notes, steel and concrete diaphragms
+        // (instead of the steel girder and detail sheets).
+        if (ctx.Prestressed is { Beams.Count: > 0 } ps)
         {
-            specs.Add(new SheetSpec("Prestressed girder details", $"TxDOT {ctx.Prestressed.Shape.Name} (IGD / IGND)", new[]
+            foreach (var (first, last) in FramingViews.SpanGroups(f, 330 * ctx.Units.LongUnit))
             {
-                new Panel(new ViewSpec("Girder sections", s => PrestressedViews.Sections(WithScale(ctx, s)), ScaleFamily.Architectural), 0, H * 0.45, W * 0.45, H),
-                new Panel(new ViewSpec("Girder elevation", s => PrestressedViews.Elevation(WithScale(ctx, s)), ScaleFamily.Engineering), W * 0.45, H * 0.45, W, H),
-                new Panel(new ViewSpec("Girder schedule", _ => PrestressedViews.Schedule(ctx), ScaleFamily.Architectural, PaperSpace: true), 0, 0, W, H * 0.45),
-            }));
+                int a0 = first, a1 = last;
+                string spans = a0 + 1 == a1 ? $"span {a1}" : $"spans {a0 + 1}-{a1}";
+                specs.Add(new SheetSpec($"Beam layout {spans}", "Beams, marks, CL bearing lines, spacing and diaphragms",
+                    new[] { Full(new ViewSpec("Beam layout", s => PrestressedViews.BeamLayout(WithScale(ctx, s), a0, a1), ScaleFamily.Engineering)) }));
+            }
+            foreach (var (type, _, beams) in PsText.Types(ps))
+            {
+                string t = type;
+                specs.Add(new SheetSpec($"Prestressed beam {t}", $"{PsText.TypeName(beams[0].Shape, t)}: sections, elevation, strands, debonding, data", new[]
+                {
+                    new Panel(new ViewSpec("Beam sections", s => PrestressedViews.Sections(WithScale(ctx, s), t), ScaleFamily.Architectural), 0, H * 0.5, W * 0.42, H),
+                    new Panel(new ViewSpec("Beam elevation", s => PrestressedViews.Elevation(WithScale(ctx, s), t), ScaleFamily.Engineering), W * 0.42, H * 0.5, W, H),
+                    new Panel(new ViewSpec("Beam data", _ => PrestressedViews.DataTables(ctx, t), ScaleFamily.Architectural, PaperSpace: true), 0, 0, W, H * 0.5),
+                }));
+            }
+            specs.Add(new SheetSpec("Prestressed beam schedule", $"{PsText.Agency(ps.Shape)} prestressed beams: schedule and notes from the model".Trim(),
+                new[] { Full(new ViewSpec("Beam schedule", _ => PrestressedViews.Schedule(ctx), ScaleFamily.Architectural, PaperSpace: true)) }));
+            if (ps.SteelDiaphragms is { Bays.Count: > 0 } sdm)
+            {
+                var members = sdm.Bays.Select(b => b.Bay.Member).Distinct().ToList();
+                var panels = new List<Panel>();
+                for (int k = 0; k < members.Count && k < 2; k++)
+                {
+                    string mem = members[k];
+                    double xa = members.Count > 1 ? W / 2 * k : 0, xb = members.Count > 1 ? W / 2 * (k + 1) : W;
+                    panels.Add(new Panel(new ViewSpec($"Diaphragm {mem}", s => PrestressedViews.SteelDiaphragmDetail(WithScale(ctx, s), mem), ScaleFamily.Architectural), xa, H * 0.45, xb, H));
+                }
+                panels.Add(new Panel(new ViewSpec("Diaphragm tables", _ => PrestressedViews.SteelDiaphragmTables(ctx), ScaleFamily.Architectural, PaperSpace: true), 0, 0, W, H * 0.45));
+                specs.Add(new SheetSpec("Steel intermediate diaphragms", "Typical diaphragms, bays and cast holes from the model", panels));
+            }
+            if (ps.ConcreteDiaphragms is { Diaphragms.Count: > 0 } cdm)
+                foreach (var cd in cdm.Diaphragms)
+                {
+                    int si = cd.SupportIndex;
+                    var c1 = cd;
+                    int g = Math.Min(1, f.Girders.Count - 1);
+                    specs.Add(new SheetSpec($"{cd.Support} diaphragm", $"{cd.Name}: sections from the model", new[]
+                    {
+                        new Panel(new ViewSpec("Section A-A", s => PrestressedViews.SupportSection(WithScale(ctx, s), si, g, false, "A-A"), ScaleFamily.Architectural), 0, H * 0.3, W * 0.5, H),
+                        new Panel(new ViewSpec("Section B-B", s => PrestressedViews.SupportSection(WithScale(ctx, s), si, 0, true, "B-B"), ScaleFamily.Architectural), W * 0.5, H * 0.3, W, H),
+                        new Panel(new ViewSpec("Diaphragm data", _ => PrestressedViews.ConcreteDiaphragmTable(ctx, new[] { c1 }), ScaleFamily.Architectural, PaperSpace: true), 0, 0, W, H * 0.3),
+                    }));
+                }
             goto Substructure;
         }
 
