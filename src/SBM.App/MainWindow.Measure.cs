@@ -475,7 +475,35 @@ public partial class MainWindow
         string what = Describe(h.Tag);
         if (what.Length == 0) what = h.Text;
         if (what.Length == 0) what = h.Layer;
-        return what.Length > 0 && h.Kind != SnapKind.Domain ? $"{KindName(h.Kind)} - {what}" : h.Kind == SnapKind.Domain ? $"{what}" : KindName(h.Kind);
+        string s = what.Length > 0 && h.Kind != SnapKind.Domain ? $"{KindName(h.Kind)} - {what}" : h.Kind == SnapKind.Domain ? $"{what}" : KindName(h.Kind);
+        if (h.ExactWorld != null) s += $" (exact, {_vm.Units.FormatLength(h.ExactShift, LengthKind.Short)} off the mesh)";
+        return s;
+    }
+
+    /// <summary>The exact (NURBS) definition of a picked object's mesh, or null.</summary>
+    private static IReadOnlyList<SBM.Core.Solids.NurbsSolid>? NurbsOf(object? tag) => tag switch
+    {
+        SBM.Core.Steel.SteelPart p => p.Mesh.Nurbs,
+        NamedPick { Source: { } m } => m.Nurbs,
+        SubPick sp => sp.Solid.Mesh.Nurbs,
+        _ => null,
+    };
+
+    /// <summary>
+    /// Exact snaps (project setting Geometry.ExactCurvedGeometry ON): a surface hit on a part with a NURBS definition is moved onto the
+    /// exact face (ray / surface intersection from the mesh hit). OFF, or a part without NURBS: the mesh snap is kept as it is.
+    /// </summary>
+    private void RefineExact(SnapHit hit, ViewRay ray)
+    {
+        if (hit.Kind != SnapKind.Surface || _scene == null) return;
+        var o = _scene.Origin;
+        var origin = new Vec3(ray.Origin.X + o.X, ray.Origin.Y + o.Y, ray.Origin.Z + o.Z);
+        var r = SBM.Core.Geometry.Nurbs.NurbsSnap.TryRefine(_vm.Project.Geometry.ExactCurvedGeometry, NurbsOf(hit.Tag), origin,
+            new Vec3(ray.Dir.X, ray.Dir.Y, ray.Dir.Z), ToWorld(hit.P));
+        if (r == null) return;
+        hit.ExactWorld = r.Point;
+        hit.ExactShift = r.Shift;
+        hit.P = ToLocal(r.Point);
     }
 
     // ================================================================== query
@@ -506,7 +534,7 @@ public partial class MainWindow
             hit = _snapIndex.Find(req, MakeEnv(), out var st);
             stats = st;
         }
-        if (hit != null) return hit;
+        if (hit != null) { RefineExact(hit, ray); return hit; }
         // Nothing under the pixel: a free point on the horizontal plane through the view target (3D) or the ground / grade (plan).
         if (View.Camera is not OrthographicCamera cam) return null;
         float zPlane = (float)(cam.Position + cam.LookDirection).Z;
@@ -558,7 +586,7 @@ public partial class MainWindow
         if (!MeasureActive || _scene == null) return;
         if (_snapIndex == null) { EnsureSnapIndex(); StatusText(_snapBuild is { IsCompleted: false } ? "Building the snap index..." : _vm.StatusText); }
         _msHover = SnapAt(pt, out _msStats);
-        _msHoverWorld = _msHover != null ? ToWorld(_msHover.P) : null;
+        _msHoverWorld = _msHover != null ? _msHover.ExactWorld ?? ToWorld(_msHover.P) : null;
         if (_msHoverWorld is { } w) _vm.CursorText = CursorLine(w, _msHover);
         UpdateMeasurePanel();
         RedrawMeasureOverlay();
@@ -579,7 +607,7 @@ public partial class MainWindow
         _msLastMouse = pt;
         var hit = SnapAt(pt, out _msStats);
         if (hit == null) return;
-        var w = ToWorld(hit.P);
+        var w = hit.ExactWorld ?? ToWorld(hit.P);
         switch (_msTool)
         {
             case MeasureTool.Query:

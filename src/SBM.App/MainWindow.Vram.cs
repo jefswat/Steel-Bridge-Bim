@@ -175,7 +175,7 @@ public partial class MainWindow
         {
             var log = new System.Text.StringBuilder();
             log.Append($"VRAM plan ({why}): budget {Mb(_vramBudget)}" + (q != null ? $" (DXGI {q.Adapter}: budget {Mb(q.Budget)}, usage {Mb(q.Usage)}, baseline {Mb(Math.Max(0, _vramBaseline))})" : " (DXGI not available)"));
-            log.Append($"; current buffers {Mb(inv.Total)} in {inv.Items.Count:N0} buffers, {inv.Items.Sum(x => x.Triangles):N0} triangles");
+            log.Append($"; current buffers {Mb(inv.Total)} (full detail {Mb(inv.FullTotal)}) in {inv.Items.Count:N0} buffers, {inv.Items.Sum(x => x.Triangles):N0} triangles");
             foreach (var (g, bytes, tris, n) in inv.ByGroup()) log.Append($"\n    {g,-13} {Mb(bytes),9}  {tris,13:N0} tri  {n,6:N0} buffers");
             foreach (var b in inv.Items.Where(x => x.Bridge >= 0).GroupBy(x => x.Bridge).OrderBy(x => x.Key))
                 log.Append($"\n    bridge {(b.Key < inv.BridgeNames.Count ? inv.BridgeNames[b.Key] : b.Key.ToString())}: {Mb(b.Sum(x => x.Bytes))} (detail {Mb(b.Where(x => x.Detail).Sum(x => x.Bytes))}, primary {Mb(b.Where(x => VramPlanner.PrimaryLayers.Contains(x.Layer)).Sum(x => x.Bytes))})");
@@ -198,6 +198,13 @@ public partial class MainWindow
         {
             _vramTerrainReload = true;
             _ = _vm.SetTerrainDisplay(td);
+        }
+        // (d) steel plates without bolt holes: the scene is rebuilt from the cached models (no regeneration)
+        if (level.PlatesWithoutHoles != SceneBuilder.PlatesWithoutHoles)
+        {
+            SceneBuilder.PlatesWithoutHoles = level.PlatesWithoutHoles;
+            ViewModels.MainViewModel.Log($"VRAM: rebuilding the 3D scene with steel plates {(level.PlatesWithoutHoles ? "without" : "with")} bolt holes");
+            _ = _vm.RegenerateAsync(false);
         }
         // (b) detail residency and radius
         _detailRadius = level.DetailResidency ? (_detailRadiusUser > 0 ? Math.Min(_detailRadiusUser, level.DetailRadius) : level.DetailRadius) : _detailRadiusUser;

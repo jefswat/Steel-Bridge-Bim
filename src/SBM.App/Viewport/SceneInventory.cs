@@ -53,8 +53,14 @@ public static class SceneInventory
                     var b = mesh.Bound;
                     center = new Vec2((b.Minimum.X + b.Maximum.X) / 2 + o.X, (b.Minimum.Y + b.Maximum.Y) / 2 + o.Y);
                 }
-                inv.Items.Add(new VramItem(s.Name, group, mesh.Positions?.Count ?? 0, mesh.Indices?.Count ?? 0, inst?.Count ?? 0,
-                    Bridge: s.BridgeOf(i), Detail: detail, Center: center));
+                var item = new VramItem(s.Name, group, mesh.Positions?.Count ?? 0, mesh.Indices?.Count ?? 0, inst?.Count ?? 0,
+                    Bridge: s.BridgeOf(i), Detail: detail, Center: center);
+                if (s.PartHoleTriangles is { } ht && i < ht.Count && ht[i].withHoles > 0)
+                {
+                    double built = SceneBuilder.PlatesWithoutHoles ? ht[i].withoutHoles : ht[i].withHoles;
+                    item = item with { WithHolesFactor = ht[i].withHoles / Math.Max(1, built), WithoutHolesFactor = ht[i].withoutHoles / Math.Max(1, built) };
+                }
+                inv.Items.Add(item);
             }
         }
         foreach (var r in refs)

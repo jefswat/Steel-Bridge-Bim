@@ -13,6 +13,10 @@ public sealed record VramItem(string Layer, VramGroup Group, long Vertices, long
 {
     public const int MeshVertexBytes = 52, TexCoordBytes = 8, LineVertexBytes = 32, IndexBytes = 4, InstanceBytes = 64, GlyphBytes = 4 * 96;
     public long Bytes => Vertices * VertexBytes + Indices * IndexBytes + Instances * InstanceBytes + ExtraBytes;
+    /// <summary>Steel plates: buffer size with bolt holes / without them, relative to the buffer as built (1 = no holes to drop).</summary>
+    public double WithHolesFactor { get; init; } = 1;
+    public double WithoutHolesFactor { get; init; } = 1;
+    public long BytesFor(bool platesWithoutHoles) => (long)(Bytes * (platesWithoutHoles ? WithoutHolesFactor : WithHolesFactor));
     /// <summary>Triangles drawn (instanced meshes count once per instance).</summary>
     public long Triangles => VertexBytes == LineVertexBytes ? 0 : Indices / 3 * Math.Max(1, Instances);
 
@@ -68,6 +72,8 @@ public sealed class VramInventory
     public List<string> BridgeNames { get; } = new();
 
     public long Total => Items.Sum(i => i.Bytes);
+    /// <summary>Total as built at full detail (steel with bolt holes).</summary>
+    public long FullTotal => Items.Sum(i => i.BytesFor(false));
 
     /// <summary>Bytes per group, largest first.</summary>
     public IEnumerable<(VramGroup group, long bytes, long triangles, int buffers)> ByGroup() =>
@@ -115,6 +121,8 @@ public sealed record VramLevel
     /// <summary>Detail tiles beyond <see cref="DetailRadius"/> are released from the GPU (not only hidden).</summary>
     public bool DetailResidency { get; init; }
     public double DetailRadius { get; init; }
+    /// <summary>Steel plates drawn without bolt holes (the bolts drawn in them hide the difference); needs a scene rebuild.</summary>
+    public bool PlatesWithoutHoles { get; init; }
     /// <summary>Far bridges show primary members only (deck, barriers, girders, caps, columns, foundations).</summary>
     public bool FarBridgeLod { get; init; }
     /// <summary>Detail layers (bolts, studs, welds, rebar) are not drawn at all.</summary>
@@ -171,6 +179,8 @@ public static class VramPlanner
         if (hasDetail)
         {
             Add(cur with { DetailResidency = true, DetailRadius = r1 }, $"bolts / studs / welds / rebar only within {r1:0} m of the view");
+            if (inv.Items.Any(it => it.WithoutHolesFactor < it.WithHolesFactor * 0.98))
+                Add(cur with { PlatesWithoutHoles = true }, "steel plates drawn without bolt holes (bolts still drawn)");
             double r2 = Math.Max(s.MinDetailRadius, r1 / 2);
             if (r2 < r1) Add(cur with { DetailRadius = r2 }, $"bolts / studs / welds / rebar only within {r2:0} m");
         }
@@ -217,7 +227,7 @@ public static class VramPlanner
             if (it.Detail && l.DropDetail) continue;
             if (farBridges.Contains(it.Bridge) && !PrimaryLayers.Contains(it.Layer)) continue;
             if (it.Detail && l.DetailResidency) continue; // modelled below
-            total += it.Bytes;
+            total += it.BytesFor(l.PlatesWithoutHoles);
         }
         if (l.DetailResidency && !l.DropDetail)
             total += ResidentDetail(inv.Items.Where(i => i.Detail && !farBridges.Contains(i.Bridge)), l.DetailRadius);

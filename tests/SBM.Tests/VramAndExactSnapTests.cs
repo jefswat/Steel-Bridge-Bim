@@ -221,4 +221,48 @@ public class VramAndExactSnapTests
         // far from the solid: nothing
         Assert.Null(NurbsSnap.Refine(new[] { solid }, o, d, hit + new Vec3(0, 0, 1)));
     }
+
+    // ------------------------------------------------------------------ display simplifications
+
+    [Fact]
+    public void PlateWithoutHoles_SameOutlineFarFewerTriangles()
+    {
+        var m = new Mesh();
+        var outline = new[] { new Vec2(0, 0), new Vec2(0.6, 0), new Vec2(0.6, 0.4), new Vec2(0, 0.4) };
+        var holes = Enumerable.Range(0, 12).Select(i => new Hole(new Vec2(0.1 + 0.1 * (i % 5), 0.1 + 0.1 * (i / 5)), 0.024)).ToArray();
+        PlateBuilder.AddPlanar(m, outline, holes, Frame3.World, 0, 0.02);
+        Assert.True(MeshLod.HasDrawableHoles(m));
+        var lod = MeshLod.WithoutHoles(m);
+        Assert.Equal(12, lod.TriangleCount);
+        Assert.Equal(MeshLod.HoleFreeTriangles(m), lod.TriangleCount);
+        Assert.True(m.TriangleCount > 30 * lod.TriangleCount);
+        Assert.Equal(0.6 * 0.4 * 0.02, Math.Abs(lod.Volume()), 9);
+        Assert.Same(lod, MeshLod.WithoutHoles(m));                 // cached
+        var plain = new Mesh();
+        PlateBuilder.AddPlanar(plain, outline, Array.Empty<Hole>(), Frame3.World, 0, 0.02);
+        Assert.Same(plain, MeshLod.WithoutHoles(plain));           // nothing to drop
+    }
+
+    [Fact]
+    public void MitredTube_OneLoftPerBar_VolumeIsSectionTimesLength()
+    {
+        double r = 0.0125;
+        var area = 6 * 0.5 * r * r * Math.Sin(Math.PI / 3);        // hexagon
+        // L bar with a 90 degree bend and a 45 degree kink
+        var pts = new[] { new Vec3(0, 0, 0), new Vec3(2, 0, 0), new Vec3(2, 1, 0), new Vec3(2, 2, 1) };
+        double len = 2 + 1 + Math.Sqrt(2);
+        var m = new Mesh();
+        TubeBuilder.AddMitredTube(m, pts, r);
+        Assert.Equal(area * len, Math.Abs(m.Volume()), 9);
+        Assert.Equal(3 * 12 + 2 * 4, m.TriangleCount);              // sides + 2 caps, no interior caps
+        // ring at the 90 degree bend lies in the bisector plane, radius r / cos 45 in that plane
+        var bend = new Vec3(2, 0, 0);
+        var n = new Vec3(1, 1, 0).Normalized();
+        var ring = m.Positions.Skip(6).Take(6).ToList();
+        Assert.All(ring, q => Assert.True(Math.Abs(Vec3.Dot(q - bend, n)) < 1e-12));
+        // a hairpin return (180 deg) is split into two lofts
+        var hp = new Mesh();
+        TubeBuilder.AddMitredTube(hp, new[] { new Vec3(0, 0, 0), new Vec3(1, 0, 0), new Vec3(0, 0.001, 0) }, r);
+        Assert.Equal(2 * (12 + 8), hp.TriangleCount);
+    }
 }

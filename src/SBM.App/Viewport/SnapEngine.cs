@@ -95,6 +95,10 @@ public sealed class SnapHit
     public float Depth;
     public float ScreenDistance;
     public bool OnObject;
+    /// <summary>Set when the point was refined onto the part's exact NURBS face (world coordinates, full precision).</summary>
+    public SBM.Core.Geometry.Vec3? ExactWorld;
+    /// <summary>Distance the refinement moved the point from the mesh (m).</summary>
+    public double ExactShift;
 }
 
 public sealed class SnapStats

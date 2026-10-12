@@ -34,7 +34,11 @@ public sealed record SubPick(SBM.Core.Substructure.SubstructureUnit Unit, SBM.Co
 public sealed record PsBeamPick(SBM.Core.Prestressed.PrestressedModel Model, SBM.Core.Prestressed.PrestressedBeam Beam);
 public sealed record PsStrandPick(SBM.Core.Prestressed.PrestressedModel Model, SBM.Core.Prestressed.PrestressedBeam Beam, SBM.Core.Prestressed.StrandInstance Strand);
 public sealed record PsPadPick(SBM.Core.Prestressed.PrestressedPad Pad);
-public sealed record NamedPick(string Kind, string Name, IReadOnlyList<(string, string)> Properties);
+public sealed record NamedPick(string Kind, string Name, IReadOnlyList<(string, string)> Properties)
+{
+    /// <summary>The source mesh (exact measure snaps read its NURBS).</summary>
+    public Mesh? Source { get; init; }
+}
 
 /// <summary>GPU-ready geometry for one drawing layer (one draw call for lines, one for text).</summary>
 public sealed class LayerGeometry
@@ -58,6 +62,8 @@ public sealed class SolidLayer
     internal void AddTriangles(int n) => Triangles += n;
     /// <summary>Bridge index of each part (same order as <see cref="Parts"/>); null = not per bridge (-1). Used by the far-bridge LOD.</summary>
     public List<int>? PartBridges { get; set; }
+    /// <summary>Per part: source triangles with bolt holes and without them (steel plates; null = no holes to drop).</summary>
+    public List<(long withHoles, long withoutHoles)>? PartHoleTriangles { get; set; }
     public int BridgeOf(int part) => PartBridges is { } b && part < b.Count ? b[part] : -1;
 }
 
@@ -116,6 +122,11 @@ public sealed class SceneData
                 Solids.Add(mine);
             }
             mine.PartBridges ??= Enumerable.Repeat(-1, mine.Parts.Count).ToList();
+            if (l.PartHoleTriangles != null || mine.PartHoleTriangles != null)
+            {
+                mine.PartHoleTriangles ??= Enumerable.Range(0, mine.Parts.Count).Select(k => ((long)(mine.Parts[k].mesh.Indices!.Count / 3), (long)(mine.Parts[k].mesh.Indices!.Count / 3))).ToList();
+                mine.PartHoleTriangles.AddRange(l.PartHoleTriangles ?? l.Parts.Select(x => ((long)(x.mesh.Indices!.Count / 3), (long)(x.mesh.Indices!.Count / 3))).ToList());
+            }
             mine.Parts.AddRange(l.Parts);
             mine.PartBridges.AddRange(Enumerable.Repeat(bridge, l.Parts.Count));
             mine.AddTriangles(l.Triangles);
@@ -195,8 +206,12 @@ public static class SceneBuilder
                         Triangles = tiles.Sum(m2 => m2.Indices!.Count / 3) };
                     return;
                 }
-                var mesh = FlatShaded(parts.Select(p => p.Mesh), o, parts);
-                layers[i] = new SolidLayer { Name = name, R = r, G = g, B = b, Parts = new() { (mesh, null) }, Triangles = mesh.Indices!.Count / 3 };
+                bool noHoles = PlatesWithoutHoles;
+                var mesh = FlatShaded(parts.Select(p => noHoles ? MeshLod.WithoutHoles(p.Mesh) : p.Mesh), o, parts);
+                // Triangle counts with / without holes (the memory planner scales the buffer by them).
+                long full = parts.Sum(p => (long)p.Mesh.TriangleCount), free = parts.Sum(p => (long)MeshLod.HoleFreeTriangles(p.Mesh));
+                layers[i] = new SolidLayer { Name = name, R = r, G = g, B = b, Parts = new() { (mesh, null) }, Triangles = mesh.Indices!.Count / 3,
+                    PartHoleTriangles = new() { (full, free) } };
                 return;
             }
             // Fasteners: one mesh per distinct size, drawn with GPU instancing.
@@ -244,8 +259,8 @@ public static class SceneBuilder
             {
                 var items = models.SelectMany(m => new (Mesh?, object)[]
                 {
-                    (m.Deck, new NamedPick("Deck", "Deck slab", new[] { ("Volume", $"{m.DeckVolume / 0.764554857984:N1} CY") })),
-                    (m.Haunches, new NamedPick("Deck", "Haunches", new[] { ("Volume", $"{m.HaunchVolume / 0.764554857984:N1} CY") })),
+                    (m.Deck, new NamedPick("Deck", "Deck slab", new[] { ("Volume", $"{m.DeckVolume / 0.764554857984:N1} CY") }) { Source = m.Deck }),
+                    (m.Haunches, new NamedPick("Deck", "Haunches", new[] { ("Volume", $"{m.HaunchVolume / 0.764554857984:N1} CY") }) { Source = m.Haunches }),
                 }).Where(x => x.Item1 is { IsEmpty: false }).ToList();
                 if (items.Count == 0) return null;
                 var g = FlatShaded(items.Select(x => x.Item1!), o, items.Select(x => x.Item2).ToList());
@@ -256,7 +271,7 @@ public static class SceneBuilder
                 var items = models.SelectMany(m => m.Barriers).Where(b => !b.Mesh.IsEmpty).ToList();
                 if (items.Count == 0) return null;
                 var g = FlatShaded(items.Select(b => b.Mesh), o,
-                    items.Select(b => (object)new NamedPick("Barrier", b.Name, new[] { ("Volume", $"{Math.Abs(b.Mesh.Volume()) / 0.764554857984:N1} CY") })).ToList());
+                    items.Select(b => (object)new NamedPick("Barrier", b.Name, new[] { ("Volume", $"{Math.Abs(b.Mesh.Volume()) / 0.764554857984:N1} CY") }) { Source = b.Mesh }).ToList());
                 return new SolidLayer { Name = "3D-BARRIER", R = 190, G = 190, B = 182, Parts = new() { (g, null) }, Triangles = g.Indices!.Count / 3, Opacity = 0.5f };
             },
             () =>
@@ -475,22 +490,11 @@ public static class SceneBuilder
         return new SolidLayer { Name = name, R = (byte)(epoxy ? 70 : 150), G = (byte)(epoxy ? 170 : 80), B = (byte)(epoxy ? 80 : 50), Parts = parts, Triangles = tris };
     }
 
-    /// <summary>Hexagonal tube along a polyline (one prism per segment; joints overlap slightly, which is invisible at bar scale).</summary>
-    private static void AddTube(Mesh mesh, IReadOnlyList<Vec3> pts, double r, int sides = 6)
-    {
-        var sec = Enumerable.Range(0, sides).Select(i => Vec2.FromAngle(2 * Math.PI * i / sides) * r).ToArray();
-        for (int i = 0; i + 1 < pts.Count; i++)
-        {
-            var a = pts[i];
-            var b = pts[i + 1];
-            var axis = b - a;
-            if (axis.Length < 1e-6) continue;
-            var x = Vec3.Cross(Math.Abs(axis.Normalized().Z) < 0.9 ? new Vec3(0, 0, 1) : new Vec3(1, 0, 0), axis).Normalized();
-            var y = Vec3.Cross(axis.Normalized(), x);
-            Vec3[] Ring(Vec3 c) => sec.Select(q => c + x * q.X + y * q.Y).ToArray();
-            MeshBuilder.AddLoft(mesh, sec, new[] { Ring(a), Ring(b) });
-        }
-    }
+    /// <summary>Hexagonal tube along a polyline: one mitred loft per bar (no interior caps; see <see cref="TubeBuilder"/>).</summary>
+    private static void AddTube(Mesh mesh, IReadOnlyList<Vec3> pts, double r, int sides = 6) => TubeBuilder.AddMitredTube(mesh, pts, r, sides);
+
+    /// <summary>Steel plates are drawn without their bolt holes (viewport memory level; the bolts fill the holes).</summary>
+    public static bool PlatesWithoutHoles;
 
     private static Matrix4x4 ToMatrix(Frame3 f, Vec3 o) => new(
         (float)f.X.X, (float)f.X.Y, (float)f.X.Z, 0,
