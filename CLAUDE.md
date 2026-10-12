@@ -643,8 +643,20 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   in `sheet-links-nht.json` (selectors need `"bridge_group": "Arch span 10"` - the arch bridge name has no "Unit n"). Viewport layers 3D-ARCH-*.
   NHT data: `samples/plans/arch-nht.csx` (run after build-nht.csx; finds Pier 10 / 11 in the approach bridges, reads the pier units' `FixedSeats` for the
   seat tops; without an approach model builds a test alignment + 2 supports), `check-arch-nht.csx` (hangers / ribs / ties / floorbeams / bearings / deck /
-  weights vs plan tables / WireCo catalog). Not yet (v2): splice plates + bolts, fin plates, cable connectors, floorbeam connections / studs / PT slots,
-  knuckle detail plates, PT tendon solids, deck rebar, 2D sheets. Tests `ArchTests`.
+  weights vs plan tables / WireCo catalog). v2 (design note section 7; all OPTIONAL inputs): field splices (`ArchSpliceDefinition` on ribs / ties, bolt rows
+  with staggered columns, `ArchModel.SpliceBolts`, AssemblyKind.ArchSplice, tie cut at `SpliceAt` + gap), fin plates (`ArchFinSettings`, `ArchRibFin` /
+  `ArchTieFin`; tie fin = 2 solids), `RibWorkPoint` (p.147 HC on the rib working line; `RibAnchor` = the pin), cable connectors, floorbeam connections /
+  studs / PT slots (`ArchFloorbeamConnection`, `PtSlotLength`, `StudsPerFace`), bracing crossings (`Via`, `TrimStartAt/EndAt`, `ArchBraceCrossing`),
+  knuckle v2 (`ArchKnuckleDetail` + `Corners`, partial `ArchGeneratorKnuckle.cs`; tie field pieces trimmed at the joint = end flange edge; the W stub is not
+  built), bearings along a plan axis (`LongAxisAngleDeg`), PT solids (`ArchPtSystem`, partial `ArchGeneratorDeck.cs`, PartCategory PtStrand / PtAnchorage
+  -> IfcTendon / IfcTendonAnchor), deck bars (`ArchDeckRebar` -> `ConcreteModel.Marks/Bars`, `FlutesOnBarGrid`), 2D `Drawing/Views/ArchViews.cs`
+  (SheetSet arch branch), flagged steel parts on viewport layer `3D-UNRESOLVED-STEEL`. New PartCategory (appended): FinPlate, CableConnector (UHMW, 940
+  kg/m3, not in SteelMass), ArchConnectionPlate, ArchStiffener, PtStrand, PtAnchorage. Remaining GAPs: bracing U-point gussets (p.129-140), railing,
+  duct, D3 bars, camber. Tests `ArchTests`, `ArchV2Tests`. Knuckle visual check without a snapshot: `temp`-style dump of part triangles + a small
+  pymupdf painter's renderer (no matplotlib in the sandbox).
+- Project georeference (OPTIONAL `BridgeProject.Georeference` = `Project/GeoreferenceDefinition.cs`, null = local grid, omitted from the .sbm): CRS name,
+  datum / projection / zone, map unit, `GridScale` (map / project distance, e.g. 1 / TxDOT SAF) -> IFC IfcProjectedCRS + IfcMapConversion Scale with the
+  base point converted to grid units; the model is never moved. NHT: EPSG:2276 x Dallas County SAF 1.000136 (U12 resolved from a user GPS check).
 - NHT model check: `check-nht.csx` 414 PASS / 4 FAIL (2026-10-11; the 4 = arch pier cap / column CY vs the p.102 quantity table, +-0.3 CY).
 
 ## Conventions (bridge engineering)

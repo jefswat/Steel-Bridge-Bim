@@ -11112,209 +11112,501 @@
         ],
         "Bracing": [
           {
-            "Name": "BR1A",
+            "Name": "BR1X",
             "From": "U1",
-            "To": "UL1"
-          },
-          {
-            "Name": "BR1B",
-            "From": "UL1",
-            "To": "U10\u0027"
+            "To": "U10\u0027",
+            "Via": "UL1",
+            "TrimStartAt": "",
+            "TrimEndAt": "",
+            "TrimGap": 0.0127
           },
           {
             "Name": "BR1C",
             "From": "U2",
-            "To": "UL1"
+            "To": "UL1",
+            "Via": "",
+            "TrimStartAt": "",
+            "TrimEndAt": "BR1X",
+            "TrimGap": 0.0127
           },
           {
             "Name": "BR1D",
             "From": "UL1",
-            "To": "U11\u0027"
+            "To": "U11\u0027",
+            "Via": "",
+            "TrimStartAt": "BR1X",
+            "TrimEndAt": "",
+            "TrimGap": 0.0127
           },
           {
-            "Name": "BR2A",
+            "Name": "BR2X",
             "From": "U2",
-            "To": "UL2"
-          },
-          {
-            "Name": "BR2B",
-            "From": "UL2",
-            "To": "U9\u0027"
+            "To": "U9\u0027",
+            "Via": "UL2",
+            "TrimStartAt": "",
+            "TrimEndAt": "",
+            "TrimGap": 0.0127
           },
           {
             "Name": "BR2C",
             "From": "U3",
-            "To": "UL2"
+            "To": "UL2",
+            "Via": "",
+            "TrimStartAt": "",
+            "TrimEndAt": "BR2X",
+            "TrimGap": 0.0127
           },
           {
             "Name": "BR2D",
             "From": "UL2",
-            "To": "U10\u0027"
+            "To": "U10\u0027",
+            "Via": "",
+            "TrimStartAt": "BR2X",
+            "TrimEndAt": "",
+            "TrimGap": 0.0127
           },
           {
-            "Name": "BR3A",
+            "Name": "BR3X",
             "From": "U3",
-            "To": "UL3"
-          },
-          {
-            "Name": "BR3B",
-            "From": "UL3",
-            "To": "U8\u0027"
+            "To": "U8\u0027",
+            "Via": "UL3",
+            "TrimStartAt": "",
+            "TrimEndAt": "",
+            "TrimGap": 0.0127
           },
           {
             "Name": "BR3C",
             "From": "U4",
-            "To": "UL3"
+            "To": "UL3",
+            "Via": "",
+            "TrimStartAt": "",
+            "TrimEndAt": "BR3X",
+            "TrimGap": 0.0127
           },
           {
             "Name": "BR3D",
             "From": "UL3",
-            "To": "U9\u0027"
+            "To": "U9\u0027",
+            "Via": "",
+            "TrimStartAt": "BR3X",
+            "TrimEndAt": "",
+            "TrimGap": 0.0127
           },
           {
-            "Name": "BR4A",
+            "Name": "BR4X",
             "From": "U4",
-            "To": "UL4"
-          },
-          {
-            "Name": "BR4B",
-            "From": "UL4",
-            "To": "U7\u0027"
+            "To": "U7\u0027",
+            "Via": "UL4",
+            "TrimStartAt": "",
+            "TrimEndAt": "",
+            "TrimGap": 0.0127
           },
           {
             "Name": "BR4C",
             "From": "U5",
-            "To": "UL4"
+            "To": "UL4",
+            "Via": "",
+            "TrimStartAt": "",
+            "TrimEndAt": "BR4X",
+            "TrimGap": 0.0127
           },
           {
             "Name": "BR4D",
             "From": "UL4",
-            "To": "U8\u0027"
+            "To": "U8\u0027",
+            "Via": "",
+            "TrimStartAt": "BR4X",
+            "TrimEndAt": "",
+            "TrimGap": 0.0127
           },
           {
-            "Name": "BR5A",
+            "Name": "BR5X",
             "From": "U5",
-            "To": "UL5"
-          },
-          {
-            "Name": "BR5B",
-            "From": "UL5",
-            "To": "U6\u0027"
+            "To": "U6\u0027",
+            "Via": "UL5",
+            "TrimStartAt": "",
+            "TrimEndAt": "",
+            "TrimGap": 0.0127
           },
           {
             "Name": "BR5C",
             "From": "U6",
-            "To": "UL5"
+            "To": "UL5",
+            "Via": "",
+            "TrimStartAt": "",
+            "TrimEndAt": "BR5X",
+            "TrimGap": 0.0127
           },
           {
             "Name": "BR5D",
             "From": "UL5",
-            "To": "U7\u0027"
+            "To": "U7\u0027",
+            "Via": "",
+            "TrimStartAt": "BR5X",
+            "TrimEndAt": "",
+            "TrimGap": 0.0127
           },
           {
-            "Name": "BR6A",
+            "Name": "BR6X",
             "From": "U6",
-            "To": "UL6"
-          },
-          {
-            "Name": "BR6B",
-            "From": "UL6",
-            "To": "U5\u0027"
+            "To": "U5\u0027",
+            "Via": "UL6",
+            "TrimStartAt": "",
+            "TrimEndAt": "",
+            "TrimGap": 0.0127
           },
           {
             "Name": "BR6C",
             "From": "U7",
-            "To": "UL6"
+            "To": "UL6",
+            "Via": "",
+            "TrimStartAt": "",
+            "TrimEndAt": "BR6X",
+            "TrimGap": 0.0127
           },
           {
             "Name": "BR6D",
             "From": "UL6",
-            "To": "U6\u0027"
+            "To": "U6\u0027",
+            "Via": "",
+            "TrimStartAt": "BR6X",
+            "TrimEndAt": "",
+            "TrimGap": 0.0127
           },
           {
-            "Name": "BR7A",
+            "Name": "BR7X",
             "From": "U7",
-            "To": "UL7"
-          },
-          {
-            "Name": "BR7B",
-            "From": "UL7",
-            "To": "U4\u0027"
+            "To": "U4\u0027",
+            "Via": "UL7",
+            "TrimStartAt": "",
+            "TrimEndAt": "",
+            "TrimGap": 0.0127
           },
           {
             "Name": "BR7C",
             "From": "U8",
-            "To": "UL7"
+            "To": "UL7",
+            "Via": "",
+            "TrimStartAt": "",
+            "TrimEndAt": "BR7X",
+            "TrimGap": 0.0127
           },
           {
             "Name": "BR7D",
             "From": "UL7",
-            "To": "U5\u0027"
+            "To": "U5\u0027",
+            "Via": "",
+            "TrimStartAt": "BR7X",
+            "TrimEndAt": "",
+            "TrimGap": 0.0127
           },
           {
-            "Name": "BR8A",
+            "Name": "BR8X",
             "From": "U8",
-            "To": "UL8"
-          },
-          {
-            "Name": "BR8B",
-            "From": "UL8",
-            "To": "U3\u0027"
+            "To": "U3\u0027",
+            "Via": "UL8",
+            "TrimStartAt": "",
+            "TrimEndAt": "",
+            "TrimGap": 0.0127
           },
           {
             "Name": "BR8C",
             "From": "U9",
-            "To": "UL8"
+            "To": "UL8",
+            "Via": "",
+            "TrimStartAt": "",
+            "TrimEndAt": "BR8X",
+            "TrimGap": 0.0127
           },
           {
             "Name": "BR8D",
             "From": "UL8",
-            "To": "U4\u0027"
+            "To": "U4\u0027",
+            "Via": "",
+            "TrimStartAt": "BR8X",
+            "TrimEndAt": "",
+            "TrimGap": 0.0127
           },
           {
-            "Name": "BR9A",
+            "Name": "BR9X",
             "From": "U9",
-            "To": "UL9"
-          },
-          {
-            "Name": "BR9B",
-            "From": "UL9",
-            "To": "U2\u0027"
+            "To": "U2\u0027",
+            "Via": "UL9",
+            "TrimStartAt": "",
+            "TrimEndAt": "",
+            "TrimGap": 0.0127
           },
           {
             "Name": "BR9C",
             "From": "U10",
-            "To": "UL9"
+            "To": "UL9",
+            "Via": "",
+            "TrimStartAt": "",
+            "TrimEndAt": "BR9X",
+            "TrimGap": 0.0127
           },
           {
             "Name": "BR9D",
             "From": "UL9",
-            "To": "U3\u0027"
+            "To": "U3\u0027",
+            "Via": "",
+            "TrimStartAt": "BR9X",
+            "TrimEndAt": "",
+            "TrimGap": 0.0127
           },
           {
-            "Name": "BR10A",
+            "Name": "BR10X",
             "From": "U10",
-            "To": "UL10"
-          },
-          {
-            "Name": "BR10B",
-            "From": "UL10",
-            "To": "U1\u0027"
+            "To": "U1\u0027",
+            "Via": "UL10",
+            "TrimStartAt": "",
+            "TrimEndAt": "",
+            "TrimGap": 0.0127
           },
           {
             "Name": "BR10C",
             "From": "U11",
-            "To": "UL10"
+            "To": "UL10",
+            "Via": "",
+            "TrimStartAt": "",
+            "TrimEndAt": "BR10X",
+            "TrimGap": 0.0127
           },
           {
             "Name": "BR10D",
             "From": "UL10",
-            "To": "U2\u0027"
+            "To": "U2\u0027",
+            "Via": "",
+            "TrimStartAt": "BR10X",
+            "TrimEndAt": "",
+            "TrimGap": 0.0127
+          }
+        ],
+        "BracingCrossings": [
+          {
+            "Name": "UL1",
+            "Point": "UL1",
+            "Continuous": "BR1X",
+            "PieceA": "BR1C",
+            "PieceB": "BR1D",
+            "TopL1": 0.219075,
+            "TopL2": 0.1984375,
+            "TopL3": 0.16827499999999998,
+            "TopAngleDeg": 74.29694,
+            "BottomL1": 0.21113749999999998,
+            "BottomL2": 0.20002499999999998,
+            "BottomL3": 0.1603375,
+            "BottomAngleDeg": 73.06167,
+            "Width": 0.17779999999999999,
+            "Thickness": 0.0127,
+            "Edge": 0.038099999999999995,
+            "Pitch": 0.07619999999999999,
+            "Gage": 0.1016,
+            "EdgeToContinuousFlange": 0.044449999999999996,
+            "Unresolved": "UNRESOLVED (p.141 / 142): bracing crossing splice plate thickness - the top / bottom splice plates are dimensioned in plan only (7\u0022 wide, lengths, bolts) without a thickness. 1/2\u0022."
+          },
+          {
+            "Name": "UL2",
+            "Point": "UL2",
+            "Continuous": "BR2X",
+            "PieceA": "BR2C",
+            "PieceB": "BR2D",
+            "TopL1": 0.24764999999999998,
+            "TopL2": 0.20955,
+            "TopL3": 0.1666875,
+            "TopAngleDeg": 65.99972,
+            "BottomL1": 0.2413,
+            "BottomL2": 0.212725,
+            "BottomL3": 0.15875,
+            "BottomAngleDeg": 64.55361,
+            "Width": 0.17779999999999999,
+            "Thickness": 0.0127,
+            "Edge": 0.038099999999999995,
+            "Pitch": 0.07619999999999999,
+            "Gage": 0.1016,
+            "EdgeToContinuousFlange": 0.044449999999999996,
+            "Unresolved": "UNRESOLVED (p.141 / 142): bracing crossing splice plate thickness - the top / bottom splice plates are dimensioned in plan only (7\u0022 wide, lengths, bolts) without a thickness. 1/2\u0022."
+          },
+          {
+            "Name": "UL3",
+            "Point": "UL3",
+            "Continuous": "BR3X",
+            "PieceA": "BR3C",
+            "PieceB": "BR3D",
+            "TopL1": 0.27781249999999996,
+            "TopL2": 0.225425,
+            "TopL3": 0.1635125,
+            "TopAngleDeg": 57.95361,
+            "BottomL1": 0.27305,
+            "BottomL2": 0.2286,
+            "BottomL3": 0.15875,
+            "BottomAngleDeg": 56.74944,
+            "Width": 0.17779999999999999,
+            "Thickness": 0.0127,
+            "Edge": 0.038099999999999995,
+            "Pitch": 0.07619999999999999,
+            "Gage": 0.1016,
+            "EdgeToContinuousFlange": 0.044449999999999996,
+            "Unresolved": "UNRESOLVED (p.141 / 142): bracing crossing splice plate thickness - the top / bottom splice plates are dimensioned in plan only (7\u0022 wide, lengths, bolts) without a thickness. 1/2\u0022."
+          },
+          {
+            "Name": "UL4",
+            "Point": "UL4",
+            "Continuous": "BR4X",
+            "PieceA": "BR4C",
+            "PieceB": "BR4D",
+            "TopL1": 0.3063875,
+            "TopL2": 0.2460625,
+            "TopL3": 0.16192499999999999,
+            "TopAngleDeg": 51.08,
+            "BottomL1": 0.30479999999999996,
+            "BottomL2": 0.24764999999999998,
+            "BottomL3": 0.15875,
+            "BottomAngleDeg": 50.47194,
+            "Width": 0.17779999999999999,
+            "Thickness": 0.0127,
+            "Edge": 0.038099999999999995,
+            "Pitch": 0.07619999999999999,
+            "Gage": 0.1016,
+            "EdgeToContinuousFlange": 0.044449999999999996,
+            "Unresolved": "UNRESOLVED (p.141 / 142): bracing crossing splice plate thickness - the top / bottom splice plates are dimensioned in plan only (7\u0022 wide, lengths, bolts) without a thickness. 1/2\u0022."
+          },
+          {
+            "Name": "UL5",
+            "Point": "UL5",
+            "Continuous": "BR5X",
+            "PieceA": "BR5C",
+            "PieceB": "BR5D",
+            "TopL1": 0.3254375,
+            "TopL2": 0.2619375,
+            "TopL3": 0.1603375,
+            "TopAngleDeg": 46.95806,
+            "BottomL1": 0.3254375,
+            "BottomL2": 0.2619375,
+            "BottomL3": 0.15875,
+            "BottomAngleDeg": 46.88528,
+            "Width": 0.17779999999999999,
+            "Thickness": 0.0127,
+            "Edge": 0.038099999999999995,
+            "Pitch": 0.07619999999999999,
+            "Gage": 0.1016,
+            "EdgeToContinuousFlange": 0.044449999999999996,
+            "Unresolved": "UNRESOLVED (p.141 / 142): bracing crossing splice plate thickness - the top / bottom splice plates are dimensioned in plan only (7\u0022 wide, lengths, bolts) without a thickness. 1/2\u0022."
+          },
+          {
+            "Name": "UL6",
+            "Point": "UL6",
+            "Continuous": "BR6X",
+            "PieceA": "BR6C",
+            "PieceB": "BR6D",
+            "TopL1": 0.3254375,
+            "TopL2": 0.2619375,
+            "TopL3": 0.1603375,
+            "TopAngleDeg": 47.06194,
+            "BottomL1": 0.3254375,
+            "BottomL2": 0.2619375,
+            "BottomL3": 0.15875,
+            "BottomAngleDeg": 46.96111,
+            "Width": 0.17779999999999999,
+            "Thickness": 0.0127,
+            "Edge": 0.038099999999999995,
+            "Pitch": 0.07619999999999999,
+            "Gage": 0.1016,
+            "EdgeToContinuousFlange": 0.044449999999999996,
+            "Unresolved": "UNRESOLVED (p.141 / 142): bracing crossing splice plate thickness - the top / bottom splice plates are dimensioned in plan only (7\u0022 wide, lengths, bolts) without a thickness. 1/2\u0022."
+          },
+          {
+            "Name": "UL7",
+            "Point": "UL7",
+            "Continuous": "BR7X",
+            "PieceA": "BR7C",
+            "PieceB": "BR7D",
+            "TopL1": 0.3063875,
+            "TopL2": 0.2460625,
+            "TopL3": 0.16192499999999999,
+            "TopAngleDeg": 51.3175,
+            "BottomL1": 0.3032125,
+            "BottomL2": 0.24764999999999998,
+            "BottomL3": 0.15875,
+            "BottomAngleDeg": 50.64806,
+            "Width": 0.17779999999999999,
+            "Thickness": 0.0127,
+            "Edge": 0.038099999999999995,
+            "Pitch": 0.07619999999999999,
+            "Gage": 0.1016,
+            "EdgeToContinuousFlange": 0.044449999999999996,
+            "Unresolved": "UNRESOLVED (p.141 / 142): bracing crossing splice plate thickness - the top / bottom splice plates are dimensioned in plan only (7\u0022 wide, lengths, bolts) without a thickness. 1/2\u0022."
+          },
+          {
+            "Name": "UL8",
+            "Point": "UL8",
+            "Continuous": "BR8X",
+            "PieceA": "BR8C",
+            "PieceB": "BR8D",
+            "TopL1": 0.27781249999999996,
+            "TopL2": 0.225425,
+            "TopL3": 0.1635125,
+            "TopAngleDeg": 58.19694,
+            "BottomL1": 0.2714625,
+            "BottomL2": 0.2286,
+            "BottomL3": 0.15875,
+            "BottomAngleDeg": 56.93111,
+            "Width": 0.17779999999999999,
+            "Thickness": 0.0127,
+            "Edge": 0.038099999999999995,
+            "Pitch": 0.07619999999999999,
+            "Gage": 0.1016,
+            "EdgeToContinuousFlange": 0.044449999999999996,
+            "Unresolved": "UNRESOLVED (p.141 / 142): bracing crossing splice plate thickness - the top / bottom splice plates are dimensioned in plan only (7\u0022 wide, lengths, bolts) without a thickness. 1/2\u0022."
+          },
+          {
+            "Name": "UL9",
+            "Point": "UL9",
+            "Continuous": "BR9X",
+            "PieceA": "BR9C",
+            "PieceB": "BR9D",
+            "TopL1": 0.24764999999999998,
+            "TopL2": 0.20955,
+            "TopL3": 0.1666875,
+            "TopAngleDeg": 66.17528,
+            "BottomL1": 0.2397125,
+            "BottomL2": 0.21113749999999998,
+            "BottomL3": 0.15875,
+            "BottomAngleDeg": 64.68278,
+            "Width": 0.17779999999999999,
+            "Thickness": 0.0127,
+            "Edge": 0.038099999999999995,
+            "Pitch": 0.07619999999999999,
+            "Gage": 0.1016,
+            "EdgeToContinuousFlange": 0.044449999999999996,
+            "Unresolved": "UNRESOLVED (p.141 / 142): bracing crossing splice plate thickness - the top / bottom splice plates are dimensioned in plan only (7\u0022 wide, lengths, bolts) without a thickness. 1/2\u0022."
+          },
+          {
+            "Name": "UL10",
+            "Point": "UL10",
+            "Continuous": "BR10X",
+            "PieceA": "BR10C",
+            "PieceB": "BR10D",
+            "TopL1": 0.219075,
+            "TopL2": 0.1984375,
+            "TopL3": 0.16827499999999998,
+            "TopAngleDeg": 74.39278,
+            "BottomL1": 0.21113749999999998,
+            "BottomL2": 0.20002499999999998,
+            "BottomL3": 0.15875,
+            "BottomAngleDeg": 73.12889,
+            "Width": 0.17779999999999999,
+            "Thickness": 0.0127,
+            "Edge": 0.038099999999999995,
+            "Pitch": 0.07619999999999999,
+            "Gage": 0.1016,
+            "EdgeToContinuousFlange": 0.044449999999999996,
+            "Unresolved": "UNRESOLVED (p.141 / 142): bracing crossing splice plate thickness - the top / bottom splice plates are dimensioned in plan only (7\u0022 wide, lengths, bolts) without a thickness. 1/2\u0022."
           }
         ],
         "BracingSection": "W8x28",
         "BracingMaterial": "ASTM A709 Gr. 50",
-        "BracingOrientationUnresolved": "UNRESOLVED (p.128-142): W8x28 upper lateral bracing web orientation and member ends - the bracing details (p.129-142) are not transcribed and the U points lie 0.685 ft off the rib WP plane (U6). Web set in the plane of the member and the local Z axis, members work point to work point.",
+        "BracingOrientationUnresolved": "UNRESOLVED (p.129-140): upper lateral bracing member ends at the rib panel points U / U\u0027 - the gusset connections at the 22 rib panel points (bent 7/8\u0022 top / bottom gussets, 7/8\u0022 connection plates, 1\u0022 stiffeners, per-point dimensions on 12 sheets) are not modeled and the U points lie 0.685 ft off the rib WP plane (U6). Members run work point to work point; web vertical per the p.128 typical section.",
         "Knuckles": [
           {
             "Name": "West",
@@ -11837,11 +12129,11 @@
           "FormBottomZ": 0.022224999999999998,
           "FormDepth": 0.07619999999999999,
           "FormPitch": 0.2032,
-          "FormTopFlat": 0.14604999999999999,
-          "FormFluteBottom": 0.03302,
+          "FormTopFlat": 0.038099999999999995,
+          "FormFluteBottom": 0.136525,
           "FormThickness": 0.0026568399999999997,
           "FormDescription": "3\u0022 x 8\u0022 12 ga galvanized steel deck form (Gr 33, G165), L.B. Foster 3\u0022 bridge decking",
-          "FormUnresolved": "UNRESOLVED (L.B. Foster brochure p.6): steel deck form flute widths - the brochure drawing is not dimensioned (3\u0022 deep, 8\u0022 pitch, 24\u0022 cover only). Top flat 5 3/4\u0022 and flute bottom 1 5/16\u0022 scaled from the drawing.",
+          "FormUnresolved": "",
           "ConcreteStrengthKsi": 5,
           "Curbs": [
             {
@@ -12674,7 +12966,105 @@
               ],
               "Description": "Longitudinal PT tendon (A416 Gr 270 LR, grouted); strand count p.155 not transcribed - data only"
             }
-          ]
+          ],
+          "PtSystem": {
+            "StrandsPerTendon": 4,
+            "StrandDiameter": 0.015239999999999998,
+            "StrandArea": 0.00013999972,
+            "JackingForceKips": 170,
+            "StrandSpacing": 0.0492125,
+            "AnchorLength": 0.2667,
+            "AnchorWidth": 0.3302,
+            "AnchorHeight": 0.1016,
+            "Unresolved": "UNRESOLVED (p.155): PT strand arrangement and anchorage envelope - the flat duct, the strand spacing in it and the anchorage casting are drawn (Section A-A / B-B) but not dimensioned. Strands side by side at 1 15/16\u0022, anchorage 13\u0022 x 4\u0022 x 10 1/2\u0022 (scaled); duct not modeled.",
+            "StrandMaterial": "ASTM A416 Gr. 270 low-relaxation strand",
+            "AnchorMaterial": "PT flat anchorage (DYWIDAG, by supplier)",
+            "ZoneBarsAt": [
+              0.30479999999999996,
+              0.4064,
+              0.8763,
+              0.9779
+            ],
+            "ZoneBarWidth": 0.23495,
+            "ZoneBarHeight": 0.15239999999999998,
+            "ZoneBarMark": "S2",
+            "ZoneBarSize": "#5"
+          },
+          "Rebar": {
+            "TopTransMark": "A1",
+            "TopTransLength": 4.2164,
+            "BottomTransMark": "B1",
+            "BottomTransLength": 5.5372,
+            "TransSpacing": 0.2032,
+            "TopLongMark": "D1",
+            "BottomLongMark": "D2",
+            "LongCount": 27,
+            "LongSpacing": 0.2032,
+            "LongBarLength": 12.192,
+            "LongLap": 0.8128,
+            "Size": "#5",
+            "TopCover": 0.0635,
+            "BottomClear": 0.044449999999999996,
+            "EndCover": 0.0508,
+            "CurbStirrupMark": "S1",
+            "CurbStirrupSize": "#4",
+            "CurbStirrupWidth": 0.15239999999999998,
+            "CurbStirrupHeight": 0.2286,
+            "CurbTopCover": 0.0508,
+            "CurbLongMark": "D4",
+            "Unresolved": "UNRESOLVED (p.151 / 152 / 154): arch deck bar layout details - the lap positions of the 40\u0027-0 D1 / D2 / D4 bars (type BT, bent to the knuckle stud grid on p.151) are not dimensioned, the bill lists 606 A1 (two per 8\u0022 space) while the section shows one, and the D3 edge bars are not located. Lines lapped 2\u0027-8 from the west end with a shorter last bar, one A1 per 8\u0022 space, D3 not modeled; bill differences are CHECK rows.",
+            "PlanList": [
+              {
+                "Name": "A1",
+                "X": 606,
+                "Y": 4.2164,
+                "Z": 0
+              },
+              {
+                "Name": "B1",
+                "X": 303,
+                "Y": 5.5372,
+                "Z": 0
+              },
+              {
+                "Name": "D1",
+                "X": 162,
+                "Y": 12.192,
+                "Z": 0
+              },
+              {
+                "Name": "D2",
+                "X": 162,
+                "Y": 12.192,
+                "Z": 0
+              },
+              {
+                "Name": "D3",
+                "X": 68,
+                "Y": 2.2606,
+                "Z": 0
+              },
+              {
+                "Name": "D4",
+                "X": 48,
+                "Y": 12.192,
+                "Z": 0
+              },
+              {
+                "Name": "S1",
+                "X": 606,
+                "Y": 0.9906000000000001,
+                "Z": 0
+              },
+              {
+                "Name": "S2",
+                "X": 32,
+                "Y": 0.8382000000000001,
+                "Z": 0
+              }
+            ]
+          },
+          "FlutesOnBarGrid": true
         },
         "Bearings": [
           {

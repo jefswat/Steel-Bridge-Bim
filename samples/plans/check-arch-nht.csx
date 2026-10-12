@@ -199,7 +199,7 @@ Print($"     steel deck form {form:N0} lb from the solid (12 ga 0.1046\") vs 7.4
 // ---- hanger strand / sockets vs the WireCo catalog (user-supplied)
 Print("== hangers vs WireCo structural cable catalog (WWstrucCAT)");
 Row("strand 1\" (Table 1 p.10)", "plan 1.0 in (24.4 mm printed - 1.0 in = 25.4 mm)", "catalog 1\": 2.10 lb/ft, 0.600 sq in, min. breaking 61.0 / 59.2 / 57.9 tons (Class A / B / C), E 24,000 ksi prestretched", true,
-    "coating class not selected on the plans (galvanized only) -> breaking force UNRESOLVED between the classes; model weight 2.10 lb/ft");
+    "p.83 cable hanger note 1: ASTM A586 Grade 2 with CLASS A coating throughout -> catalog min. breaking 61.0 tons (Class A); model weight 2.10 lb/ft");
 var hs = br.Arch.HangerSystem;
 Row("open strand socket at rib (p.148 vs Table 6 p.20, 15/16-1\")", $"pin {ToIn(hs.RibSocket!.PinDiameter):F3}\", A {ToIn(hs.RibSocket.A):F2}\", L {ToIn(hs.RibSocket.L):F2}\", W {ToIn(hs.RibSocket.W):F2}\"",
     "catalog: pin D 2 1/4\" x 4 3/4\", A 12\", J 5 5/8\", M 4\", N 2 3/8\", O 2 1/4\", P 4\"", false,

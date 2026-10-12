@@ -170,8 +170,8 @@ to have stripped them. PDF bookmarks differ from the sheets ("162.77' ... UNIT",
 | U2 | Pier 12 station | p.94 vs p.87, 97 | foundation schedule 26+86.67 vs layout / pier table 26+86.87 (27+42.87 - 56.00 supports 26+86.87) |
 | U3 | Arch chord CL1 / CL2 relative to piers | p.94, 102, 119 | plan chord 200.974 needs CL1/CL2 1.7 in RIGHT of the CL NHT pier points; shafts are 7 in LT (P10) / RT (P11); p.102 bearings put CL1 15/16 in from the shaft; no combination reproduces 200.974 |
 | U4 | Arch camber / no-load geometry | p.119-150 | not given |
-| U5 | Tie girder splices | p.120, 143, 93 | TS1-TS3 table vs TS(1)-TS(4) plan vs 5 erection segments |
-| U6 | Rib WP vs hanger H points (0.81-0.84 ft radial, +-0.16 lateral) and bracing U points (0.685 ft off plane) | p.147, 128 | offset rule not stated |
+| U5 | Tie girder splices | p.120, 143, 93, 150 | TS1-TS3 table + p.120 / p.150 elevations vs TS(1)-TS(4) framing plan + 5 erection segments; v2 builds the framing-plan set at mid panel (flagged), north set not the rotation of the south set |
+| U6 | Rib WP vs hanger H points and bracing U points (0.685 ft off plane) | p.147, 128 | hangers RESOLVED (v2): H(n) is the rib fin plate pin (P2 along the cable from HC(n), P1 off the arch plane = p.148 table, all 64 to 1/16"), HC(n) lies on the rib working line - the p.147 column labels are reversed (CONFLICT reported); bracing U points still open |
 | U7 | Arch bearing labels / sheet 1 of 2 / fixity naming (B4, B5) | p.107, 91, 102 | sheet missing |
 | U8 | Sole plate weld target (B6) | p.107, 93 | conflicting notes |
 | U9 | Stale text: "CL PIER 7 / 8, bent 7", "RS6", deck quantity "span 7" for the arch | p.119, 127, 123, 151 | numbering inconsistent with layout |

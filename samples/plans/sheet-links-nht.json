@@ -244,7 +244,7 @@
     { "id": "arch-floorbeams", "sheets": "^TYPICAL FLOORBEAM", "basis": "Floorbeam section, crown, PT openings (schedule A / B), connections",
       "target": [ { "level": "assembly", "category": "floorbeam", "bridge_group": "Arch span 10" } ] },
     { "id": "arch-hangers", "sheets": "^CABLE (HANGER|CONNECTOR)", "basis": "Hanger geometry table, sockets (open / adjustable), fin plates, cable connectors",
-      "target": [ { "level": "assembly", "category": "hanger", "bridge_group": "Arch span 10" } ] },
+      "target": [ { "level": "assembly", "category": "hanger", "bridge_group": "Arch span 10" }, { "level": "element", "category": "cable fin plate" } ] },
     { "id": "arch-deck", "sheets": "^ARCH SPAN DECK", "basis": "Arch deck plan / section / pour sequence / bars / PT; 3\" x 8\" 12 ga steel deck forms, curbs",
       "target": [ { "level": "part", "category": "deck", "bridge_group": "Arch span 10" }, { "level": "assembly", "category": "deck form", "bridge_group": "Arch span 10" } ] },
     { "id": "ignd", "sheets": "^PRESTRESSED CONCRETE I-GIRDER DESIGNS", "basis": "IGND design table: strands, depressed strands, f'ci / f'c per span",
