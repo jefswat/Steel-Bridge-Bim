@@ -265,6 +265,203 @@ foreach (var beam in ps.Beams.Where(x => x.Girder == 0 || x.Girder == 6))
     Row("Concrete (CY)", "bridge structural concrete (abutments)", 140, tot, "p2 SOQ 140 CY = 71 + 69", 1.0, "F1");
 }
 
+// ---------------------------------------------------------------- reinforcement vs the plan bills (bar-lists.csv: p8, p14, p21, p24) and cover (report only)
+// Every bill line: model count and weight (count x listed length x unit weight) vs the printed count / weight; totals by coating vs the summaries of
+// quantities (p4 S abut. 7200 epoxy / 480 Cr-epoxy lb, p9 N 6950 / 390, p18 superstructure 5050 / 19100 / 250, p2 bridge 19200 / 19970 / 250).
+// Cover: every placed bar sampled (vertices, segment midpoints, every 0.25 m); clear cover = distance to the nearest EXTERIOR face of the host concrete
+// (substructure unit solids incl. piles / deck + haunch + barriers + diaphragms + beams; faces between two host solids are interfaces) - db/2; points
+// outside every host solid are counted. Report only: nothing is moved.
+{
+    var model = Doc.Model(BrName);
+    var cm = model.Concrete!;
+    var lines = new List<string[]>();
+    foreach (var ln in File.ReadAllLines(Path.Combine(dir, "bar-lists.csv")).Skip(1))
+    {
+        if (ln.Trim().Length == 0) continue;
+        var cc = new List<string>(); var sbq = new System.Text.StringBuilder(); bool qq = false;
+        foreach (char ch in ln) { if (ch == '"') qq = !qq; else if (ch == ',' && !qq) { cc.Add(sbq.ToString()); sbq.Clear(); } else sbq.Append(ch); }
+        cc.Add(sbq.ToString());
+        lines.Add(cc.ToArray());
+    }
+    var marks = new List<(string unit, SBM.Core.Concrete.BarMark m)>();
+    marks.AddRange(sub.Marks.Select(m => (m.Unit, m)));
+    marks.AddRange(cm.Marks.Select(m => ("", m)));
+    const double LbKg = 2.2046226218;
+    var byCoat = new Dictionary<string, double>();
+    foreach (var r in lines)
+    {
+        string unit = r[0] == "South abutment" ? "South Abutment" : r[0] == "North abutment" ? "North Abutment" : "";
+        var hit = marks.FirstOrDefault(x => x.m.Mark == r[1] && (x.unit == unit || unit == "" && x.unit == ""));
+        double lenFt = double.Parse(r[6], System.Globalization.CultureInfo.InvariantCulture), lbPrinted = double.Parse(r[8], System.Globalization.CultureInfo.InvariantCulture);
+        int cnt = int.Parse(r[4]);
+        string src = r[9];
+        bool sched = hit.m != null && hit.m.Location.Contains("schedule only");
+        Row("Rebar bill", $"{r[1]} count ({r[7]})", cnt, hit.m?.Count, src + (sched ? " - schedule only (not placed)" : hit.m == null ? " - NOT IN THE MODEL" : ""), 0, "F0");
+        double? lb = hit.m == null ? null : hit.m.Count * Ft(lenFt) * hit.m.Size.MassPerLength * LbKg;
+        Row("Rebar bill", $"{r[1]} weight (lb)", lbPrinted, lb, "count x listed length x unit weight", 0.5, "F1");
+        string coat = r[3].StartsWith("chromium") ? "Cr-epoxy" : r[3].StartsWith("stainless") ? "stainless" : "epoxy";
+        string key = (unit == "" ? "super" : unit) + "|" + coat;
+        byCoat[key] = byCoat.GetValueOrDefault(key) + (lb ?? 0);
+    }
+    foreach (var (key, planLb) in new[] { ("South Abutment|epoxy", 7200.0), ("South Abutment|Cr-epoxy", 480), ("North Abutment|epoxy", 6950), ("North Abutment|Cr-epoxy", 390),
+        ("super|epoxy", 5050), ("super|Cr-epoxy", 19100), ("super|stainless", 250) })
+        Row("Rebar totals (lb)", key.Replace("|", " "), planLb, byCoat.GetValueOrDefault(key), "summaries of quantities p4 / p9 / p18 (printed to the nearest 10 / 50 lb)", planLb >= 1000 ? 50 : 10, "F0");
+    Row("Rebar totals (lb)", "bridge epoxy", 19200, byCoat.Where(k => k.Key.EndsWith("|epoxy")).Sum(k => k.Value), "p2 SOQ", 50, "F0");
+    Row("Rebar totals (lb)", "bridge Cr-epoxy", 19970, byCoat.Where(k => k.Key.EndsWith("|Cr-epoxy")).Sum(k => k.Value), "p2 SOQ", 50, "F0");
+    Row("Rebar totals (lb)", "bridge stainless", 250, byCoat.Where(k => k.Key.EndsWith("|stainless")).Sum(k => k.Value), "p2 SOQ", 10, "F0");
+
+    // ---- cover: host meshes, exterior faces, sampled bars
+    var cd = model.Prestressed!.ConcreteDiaphragms!;
+    var superHosts = new List<SBM.Core.Solids.Mesh>();
+    if (cm.Deck != null) superHosts.Add(cm.Deck);
+    if (cm.Haunches != null) superHosts.Add(cm.Haunches);
+    superHosts.AddRange(cm.Barriers.Select(b => b.Mesh));
+    superHosts.AddRange(cd.Diaphragms.Select(d => d.Mesh));
+    superHosts.AddRange(ps.Beams.Select(b => b.Mesh));
+    var hostSets = new List<(string unit, List<SBM.Core.Solids.Mesh> meshes)> { ("", superHosts) };
+    foreach (var u in sub.Units) hostSets.Add((u.Name, u.Solids.Select(s => s.Mesh).ToList()));
+    var pbars = b.PlanBars!;
+    double Need(string unit, string mark)
+    {
+        var st = pbars.Sets.FirstOrDefault(s => s.Mark == mark);
+        if (st != null && st.Cover > 0) return st.Cover;
+        if (mark is "S401M" or "S402M" or "S404M") return In(1);    // deck bottom 1" clr (p19); the longitudinal lines of both mats share the marks
+        if (mark == "S403M") return In(2);                            // deck top 3" clr, ends 2" clr to the deck edges (p19 Detail A)
+        return In(2);
+    }
+    foreach (var (unit, meshes) in hostSets)
+    {
+        var tri = new List<(Vec3 a, Vec3 b, Vec3 c, int m)>();
+        for (int mi = 0; mi < meshes.Count; mi++)
+        {
+            var m = meshes[mi];
+            for (int t = 0; t + 2 < m.Indices.Count; t += 3) tri.Add((m.Positions[m.Indices[t]], m.Positions[m.Indices[t + 1]], m.Positions[m.Indices[t + 2]], mi));
+        }
+        const double C = 0.3;
+        (int, int) K2(double x, double y) => ((int)Math.Floor(x / C), (int)Math.Floor(y / C));
+        var col = new Dictionary<(int, int), List<int>>();
+        for (int i = 0; i < tri.Count; i++)
+        {
+            var (a, bb, c, _) = tri[i];
+            var lo = K2(Math.Min(a.X, Math.Min(bb.X, c.X)), Math.Min(a.Y, Math.Min(bb.Y, c.Y))); var hi = K2(Math.Max(a.X, Math.Max(bb.X, c.X)), Math.Max(a.Y, Math.Max(bb.Y, c.Y)));
+            for (int ix = lo.Item1; ix <= hi.Item1; ix++) for (int iy = lo.Item2; iy <= hi.Item2; iy++) { if (!col.TryGetValue((ix, iy), out var l)) col[(ix, iy)] = l = new(); l.Add(i); }
+        }
+        // inside test: vertical ray parity per mesh (tiny skew of the ray avoids edge hits)
+        bool Inside(Vec3 p, int skip = -1)
+        {
+            if (!col.TryGetValue(K2(p.X, p.Y), out var l)) return false;
+            var parity = new Dictionary<int, int>();
+            foreach (int i in l)
+            {
+                var (a, bb, c, mi) = tri[i];
+                if (mi == skip) continue;
+                double qx = p.X + 1.234e-7, qy = p.Y + 2.345e-7;
+                double d = (bb.Y - c.Y) * (a.X - c.X) + (c.X - bb.X) * (a.Y - c.Y);
+                if (Math.Abs(d) < 1e-14) continue;
+                double l1 = ((bb.Y - c.Y) * (qx - c.X) + (c.X - bb.X) * (qy - c.Y)) / d, l2 = ((c.Y - a.Y) * (qx - c.X) + (a.X - c.X) * (qy - c.Y)) / d, l3 = 1 - l1 - l2;
+                if (l1 < 0 || l2 < 0 || l3 < 0) continue;
+                if (l1 * a.Z + l2 * bb.Z + l3 * c.Z > p.Z) parity[mi] = parity.GetValueOrDefault(mi) + 1;
+            }
+            return parity.Values.Any(v => v % 2 == 1);
+        }
+        const double G = 0.15;
+        (int, int, int) K3(Vec3 p) => ((int)Math.Floor(p.X / G), (int)Math.Floor(p.Y / G), (int)Math.Floor(p.Z / G));
+        var grid = new Dictionary<(int, int, int), List<int>>();
+        for (int i = 0; i < tri.Count; i++)
+        {
+            var (a, bb, c, _) = tri[i];
+            var lo = K3(new Vec3(Math.Min(a.X, Math.Min(bb.X, c.X)), Math.Min(a.Y, Math.Min(bb.Y, c.Y)), Math.Min(a.Z, Math.Min(bb.Z, c.Z))));
+            var hi = K3(new Vec3(Math.Max(a.X, Math.Max(bb.X, c.X)), Math.Max(a.Y, Math.Max(bb.Y, c.Y)), Math.Max(a.Z, Math.Max(bb.Z, c.Z))));
+            for (int ix = lo.Item1; ix <= hi.Item1; ix++) for (int iy = lo.Item2; iy <= hi.Item2; iy++) for (int iz = lo.Item3; iz <= hi.Item3; iz++)
+            { if (!grid.TryGetValue((ix, iy, iz), out var l)) grid[(ix, iy, iz)] = l = new(); l.Add(i); }
+        }
+        static Vec3 Closest(Vec3 p, Vec3 a, Vec3 b, Vec3 c)
+        {
+            var ab = b - a; var ac = c - a; var ap = p - a;
+            double d1 = Vec3.Dot(ab, ap), d2 = Vec3.Dot(ac, ap);
+            if (d1 <= 0 && d2 <= 0) return a;
+            var bp = p - b; double d3 = Vec3.Dot(ab, bp), d4 = Vec3.Dot(ac, bp);
+            if (d3 >= 0 && d4 <= d3) return b;
+            double vc = d1 * d4 - d3 * d2;
+            if (vc <= 0 && d1 >= 0 && d3 <= 0) return a + ab * (d1 / (d1 - d3));
+            var cp = p - c; double d5 = Vec3.Dot(ab, cp), d6 = Vec3.Dot(ac, cp);
+            if (d6 >= 0 && d5 <= d6) return c;
+            double vb = d5 * d2 - d1 * d6;
+            if (vb <= 0 && d2 >= 0 && d6 <= 0) return a + ac * (d2 / (d2 - d6));
+            double va = d3 * d6 - d5 * d4;
+            if (va <= 0 && d4 - d3 >= 0 && d5 - d6 >= 0) return b + (c - b) * ((d4 - d3) / ((d4 - d3) + (d5 - d6)));
+            double den = 1 / (va + vb + vc);
+            return a + ab * (vb * den) + ac * (vc * den);
+        }
+        // distance to the nearest EXTERIOR surface point: a face point is exterior when one side of it (5 mm off) is outside every host solid
+        // (judged at the nearest point itself, so a face partly covered by another solid - stem seat under a pedestal - counts only where it is open)
+        double Dist(Vec3 p)
+        {
+            var k = K3(p);
+            var cand = new List<(double d, Vec3 q, Vec3 n)>();
+            var seen = new HashSet<int>();
+            for (int dx = -1; dx <= 1; dx++) for (int dy = -1; dy <= 1; dy++) for (int dz = -1; dz <= 1; dz++)
+                if (grid.TryGetValue((k.Item1 + dx, k.Item2 + dy, k.Item3 + dz), out var l))
+                    foreach (int i in l)
+                    {
+                        if (!seen.Add(i)) continue;
+                        var (a, bb, c, _) = tri[i];
+                        var nn = Vec3.Cross(bb - a, c - a);
+                        if (nn.Length < 1e-12) continue;
+                        var q = Closest(p, a, bb, c);
+                        cand.Add(((q - p).Length, q, nn.Normalized()));
+                    }
+            foreach (var (d, q, nn) in cand.OrderBy(x => x.d))
+                if (!Inside(q + nn * 0.005) || !Inside(q - nn * 0.005)) return d;
+            return double.PositiveInfinity;
+        }
+        string Where(Vec3? q)
+        {
+            if (q == null) return "-";
+            var so = al.Inverse(q.Value.XY);
+            return $"sta {so.Station / ft:F2} off {so.Offset / ft:+0.00;-0.00} el {q.Value.Z / ft:F2}";
+        }
+        var bars = unit == "" ? cm.Bars.Where(x => x.Unit == "").ToList() : sub.Bars.Where(x => x.Unit == unit).ToList();
+        foreach (var g in bars.GroupBy(x => x.Mark).OrderBy(x => x.Key, StringComparer.Ordinal))
+        {
+            var mk = marks.First(x => x.m.Mark == g.Key && x.unit == unit).m;
+            double r = mk.Size.Diameter / 2, minClr = double.PositiveInfinity; int outside = 0, n = 0;
+            Vec3? worst = null, worstOut = null;
+            foreach (var bar in g)
+            {
+                var pts = new List<Vec3>();
+                for (int i = 0; i < bar.Points.Length; i++)
+                {
+                    pts.Add(bar.Points[i]);
+                    if (i + 1 < bar.Points.Length)
+                    {
+                        var a = bar.Points[i]; var c = bar.Points[i + 1]; int k = Math.Max(1, (int)Math.Ceiling((c - a).Length / 0.25));
+                        for (int q = 1; q < k; q++) pts.Add(a + (c - a) * ((double)q / k));
+                    }
+                }
+                for (int pi = 0; pi < pts.Count; pi++)
+                {
+                    var p = pts[pi];
+                    n++;
+                    if (!Inside(p)) { outside++; if (worstOut == null) worstOut = p; continue; }
+                    // clear cover: to the bar surface; at the bar's end points the end clearance is measured to the end of the bar
+                    bool endPt = pi == 0 || pi == pts.Count - 1;
+                    double cl = Dist(p) - (endPt ? 0 : r);
+                    if (cl < minClr) { minClr = cl; worst = p; }
+                }
+            }
+            double need = Need(unit, g.Key);
+            string where = unit == "" ? "super" : unit.Split(' ')[0];
+            // one-sided: PASS when the minimum clear cover is not less than the required cover - 1/16" and no sample point lies outside the concrete
+            bool ok = outside == 0 && !double.IsInfinity(minClr) && minClr >= need - In(1.0 / 16);
+            if (ok) pass++; else fail++;
+            rows.Add(("Rebar cover (in)", $"{where} {g.Key} min clear ({g.Count()} bars; {outside}/{n} points outside)", (need / In(1)).ToString("F3"),
+                double.IsInfinity(minClr) ? "-" : (minClr / In(1)).ToString("F3"), double.IsInfinity(minClr) ? "-" : ((minClr - need) / In(1)).ToString("+0.000;-0.000;0.000"),
+                ok ? "PASS" : "FAIL", (outside > 0 ? "REPORT: points outside the modeled concrete" : "report only - bars are not moved") + (ok ? "" : $" at {Where(worstOut ?? worst)}")));
+        }
+    }
+}
+
 // ---------------------------------------------------------------- table
 int w1 = rows.Max(r => r.item.Length);
 Print($"{"Group",-20} {"Item".PadRight(w1)} {"Plan",12} {"Model",12} {"Diff",8}  Status  Note");

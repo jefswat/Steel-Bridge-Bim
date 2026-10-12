@@ -776,7 +776,7 @@ public static class ModelDatabase
                 _w.Add(r);
             }
             // Groups at the granularity the plans use: one deck-reinforcing group per unit, one barrier group (concrete + its bars) per unit.
-            string deckRebar = "", barrierGroup = "", barrierRebar = "";
+            string deckRebar = "", barrierGroup = "", barrierRebar = "", diaphragmRebar = "";
             // the group carries the unit's deck bar schedule (every mark, also the schedule-only rows of a plan bar list that have no 3D bar)
             string DeckRebarProps()
             {
@@ -797,6 +797,8 @@ public static class ModelDatabase
             string DeckRebar() => deckRebar.Length > 0 ? deckRebar : deckRebar = Group($"{bk}/grp/deck-rebar", deckPartId, $"{who} deck reinforcing", "deck reinforcing", props: DeckRebarProps());
             string BarrierGroup() => barrierGroup.Length > 0 ? barrierGroup : barrierGroup = Group($"{bk}/grp/barriers", deckPartId, $"{who} barriers", "barrier group");
             string BarrierRebar() => barrierRebar.Length > 0 ? barrierRebar : barrierRebar = Group($"{bk}/grp/barrier-rebar", BarrierGroup(), $"{who} barrier reinforcing", "barrier reinforcing");
+            // concrete end / pier diaphragm plan bars (PlanBarSet bars with Group "Diaphragm"); only bridges that have them get the group
+            string DiaphragmRebar() => diaphragmRebar.Length > 0 ? diaphragmRebar : diaphragmRebar = Group($"{bk}/grp/diaphragm-rebar", deckPartId, $"{who} diaphragm reinforcing", "diaphragm reinforcing");
             foreach (var (name, mesh) in c.Barriers)
             {
                 bool curb = def.Deck.Barrier.IsCurb;
@@ -833,7 +835,7 @@ public static class ModelDatabase
                     _w.Add(d);
                 }
             }
-            Bars(c.Bars, c.Marks, (bar, m) => bar.Group == "Rail" ? BarrierRebar() : DeckRebar(), i => IfcKeys.DeckBar(bk, i), def.Deck.Reinforcement.SteelYieldKsi, "");
+            Bars(c.Bars, c.Marks, (bar, m) => bar.Group == "Rail" ? BarrierRebar() : bar.Group == "Diaphragm" ? DiaphragmRebar() : DeckRebar(), i => IfcKeys.DeckBar(bk, i), def.Deck.Reinforcement.SteelYieldKsi, "");
             return slabId;
         }
 
