@@ -105,6 +105,8 @@ public sealed class ConcreteModel
     public List<TaggedSurface> TaggedSurfaces { get; } = new();
     public List<BarMark> Marks { get; } = new();
     public List<BarPlacement> Bars { get; } = new();
+    /// <summary>Cover violations of explicit plan bars (<see cref="Bridge.PlanBarSet"/>), bars kept as placed.</summary>
+    public List<PlanBarCoverViolation> CoverViolations { get; } = new();
     public List<string> Notes { get; } = new();
     public List<Diagnostic> Diagnostics { get; } = new();
     /// <summary>Exact-geometry option: what was built as NURBS (null when the option is off).</summary>
@@ -170,16 +172,53 @@ public sealed partial class ConcreteGenerator
         Parallel.ForEach(tasks, t => t());
         var bars = new ConcurrentBag<(string series, RebarSize size, BarShape shape, string loc, bool epoxy, BarPlacement placement)>();
         var rebarTasks = new List<Action>();
-        if (Deck.Reinforcement.Enabled) rebarTasks.Add(Deck.Reinforcement.Plan != null ? BuildPlanDeckRebar : () => BuildDeckRebar(bars));
+        if (Deck.Reinforcement.Enabled)
+        {
+            if (Deck.Reinforcement.Plan != null) rebarTasks.Add(BuildPlanDeckRebar);
+            else if (Deck.Reinforcement.PlanBarSets.Count == 0) rebarTasks.Add(() => BuildDeckRebar(bars));
+            if (Deck.Reinforcement.PlanBarSets.Count > 0) rebarTasks.Add(BuildPlanBarSets);
+        }
         if (Deck.Barrier.Type == BarrierType.TxDotSstr && Deck.Barrier.Reinforcement) rebarTasks.Add(() => BuildSstrRebar(bars));
         Parallel.ForEach(rebarTasks, t => t());
         AssignMarks(bars);
-        if (_def.PlanBars != null)
+    }
+
+    /// <summary>Explicit plan bar sets of the deck (<see cref="PlanBarSet"/>, project coordinates): marks + bars, clear cover against the deck concrete
+    /// (slab, haunches, bump-outs, barriers / curbs, joint blockouts) -> warnings and <see cref="ConcreteModel.CoverViolations"/>.</summary>
+    private void BuildPlanBarSets()
+    {
+        var hosts = new List<Mesh>();
+        // the slab itself is tested exactly (its mesh is a chorded loft: on a tight curve the chord sagitta at the edges exceeds the 1/8" tolerance)
+        (double, Vec3) Slab(Vec3 p)
         {
-            // plan bars of the superstructure (end diaphragms, barriers, ...) placed as the plans dimension them
-            var pr = PlanBarPlacer.Place(_f, true, -1, "");
-            _m.Marks.AddRange(pr.Marks); _m.Bars.AddRange(pr.Bars);
-            foreach (var d in pr.Diagnostics) _diag.Enqueue(d);
+            var iv = _a.Inverse(p.XY);
+            double d = iv.Distance, o = iv.Offset, top = Top(d, o), bot = top - Deck.Thickness;
+            double best = o - LeftAtD(d); var n = new Vec3(0, 0, 0);
+            void Take(double v, Vec3 nn) { if (v < best) { best = v; n = nn; } }
+            Take(RightAtD(d) - o, new Vec3(0, 0, 0));
+            Take(DR.FromBegin(p.XY), new Vec3(0, 0, 0));
+            Take(DR.FromEnd(p.XY), new Vec3(0, 0, 0));
+            Take(top - p.Z, new Vec3(0, 0, 1));
+            Take(p.Z - bot, new Vec3(0, 0, -1));
+            return (best, n);
+        }
+        if (_m.Haunches != null) hosts.Add(_m.Haunches);
+        hosts.AddRange(_m.DeckBumps.Select(b => b.Mesh));
+        hosts.AddRange(_m.Barriers.Select(b => b.Mesh));
+        hosts.AddRange(_m.Joints.Select(j => j.Blockout));
+        hosts.AddRange(_m.Joints.Where(j => j.EndBlock != null).Select(j => j.EndBlock!.Mesh));
+        var res = PlanBarSetBuilder.Build(Deck.Reinforcement.PlanBarSets, p => p, "", "Deck", hosts, Deck.Reinforcement.EpoxyCoated, new Func<Vec3, (double, Vec3)>[] { Slab });
+        foreach (var w in res.Warnings) Warn(w);
+        // barrier / diaphragm sets: their bars keep the element's group (database: barrier reinforcing / diaphragm reinforcing)
+        var elem = Deck.Reinforcement.PlanBarSets.GroupBy(x => x.Mark).ToDictionary(g => g.Key, g => g.First().Element);
+        string GroupOf(string mark) => elem.TryGetValue(mark, out var e) ? e switch { "barrier" => "Rail", "diaphragm" => "Diaphragm", _ => "Deck" } : "Deck";
+        var bars = res.Bars.Select(b => GroupOf(b.Mark) == b.Group ? b : new BarPlacement { Mark = b.Mark, Points = b.Points, Frame = b.Frame, Group = GroupOf(b.Mark), Unit = b.Unit }).ToList();
+        lock (_m)
+        {
+            _m.Marks.AddRange(res.Marks);
+            _m.Bars.AddRange(bars);
+            _m.Notes.AddRange(res.Notes);
+            _m.CoverViolations.AddRange(res.Violations);
         }
     }
 

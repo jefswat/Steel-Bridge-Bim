@@ -139,7 +139,7 @@ Bridge sheets: PDF p.83-155 (sheets 134-205). Roadway / walls / drainage / utili
 | `upper-lateral-bracing-points.csv` | U1-U11, U1'-U11', UL1-UL10 local coordinates + rib-circle check | p.128 |
 | `upper-lateral-bracing-plates.csv` | gusset flat patterns (true arcs, bend lines, holes, braces under them), A-A connection plates and stiffeners per detail sheet U1-U11, from the VECTOR linework (`tools/nht_bracing_plates.py`) | p.129-140 |
 | `floorbeam-schedule.csv` | FB1-FB33 PT opening dims A/B | p.145 |
-| `bar-lists.csv` | arch piers 10 & 11 bar list with weight checks | p.104 |
+| `bar-lists.csv` | every plan bar table with weight checks: arch piers 10 & 11 (p.104), abutments 1 / 16 (p.95 / 96), approach pier caps type 1 / 2 and the column bars / ties per pier (p.98 / 100), approach deck 2.3 lb/SF estimates per span (p.109-117) | p.95-117 |
 | `quantities.csv` | bridge summary of estimated quantities (both CSJs) with cross-checks to sheet quantity tables | p.91 |
 
 Working cache (not committed): `temp/nht/` in the worktree (text cache `txt/pNNN.txt`, `notes.md`, scripts `r.py` render clip,

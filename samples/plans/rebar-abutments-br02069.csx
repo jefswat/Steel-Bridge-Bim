@@ -1,5 +1,5 @@
 // MnDOT Br. 02069 - ABUTMENT reinforcing (South p6 / p7 / p8 = A marks, North p12 / p13 / p14 = B marks) placed as the plan sheets dimension it, as
-// PlanBarSet data (BridgeDefinition.PlanBars, support frame: W = S along the abutment = alignment offset (skew 0), U = x from CL brg toward the span,
+// plan bar specs emitted as the abutments' explicit PlanBarSets (support frame: W = S along the abutment = alignment offset (skew 0), U = x from CL brg toward the span,
 // Z absolute). Called by build-br02069.csx before regeneration (re-runnable: replaces the abutment sets / bill lines).
 //   sbm run samples\plans\rebar-abutments-br02069.csx "samples\plans\Br02069 TH65.sbm"
 // Bill of reinforcement: docs/plan-data/br02069-th65/bar-lists.csv (p8 / p14); bend diagrams bend-diagrams.csv ("ALL BENT BAR DIMENSIONS ARE GIVEN
@@ -38,10 +38,84 @@
 //        2 levels of 2 lapped U's, at 4" under the top and 4" above the seat, only at pedestals 9" or taller (note 1: G4 / G5 at both abutments).
 using System.IO;
 using SBM.Core.Bridge;
+// ================================================================ plan bar specs -> PlanBarSet (common block, same in rebar-abutments / -diaphragms /
+// -barrier-br02069.csx). A spec is one bar shape in the frame of a support line (W = S along the line from the alignment point = alignment offset at
+// skew 0, U = x from the CL brg toward the span) or of the alignment (W = station, U = offset), copied at Positions (shifts along W); z absolute or from
+// the finished deck top at the bar point. Emit groups the specs by mark into the program's PlanBarSet (explicit polylines): substructure sets in the
+// unit frame (S, N = +-U, elevation) of the abutment, superstructure sets in project X / Y / Z on the deck; bill counts / weights as PlanCount /
+// PlanWeightLb; bill lines without a spec stay in the schedule (Unplaced) with the reason.
+enum PlanBarZRef { Elevation, DeckTop }
+enum PlanBarFrame { Support, Alignment }
+sealed class PlanBarPoint
+{
+    public double W, U, Dz; public PlanBarZRef Ref;
+    public PlanBarPoint(double w, double u, PlanBarZRef r, double dz) { W = w; U = u; Ref = r; Dz = dz; }
+}
+sealed class BarSpec
+{
+    public string Name = "", Mark = "", Size = "#5", Coating = "epoxy", Location = "", Source = "", Shape = "", Unresolved = "";
+    public PlanBarFrame Frame; public int Support; public bool Superstructure;
+    public List<PlanBarPoint> Path = new(); public List<double> Positions = new(); public double ListedLength, Cover; public List<double> Dims = new();
+    public int UnplacedCount;
+}
+sealed class PlanBarListLine { public bool Superstructure; public int Support; public string Mark = "", Size = "", Coating = "", Location = ""; public int Count; public double Length, WeightLb; }
+sealed class PlanBarsDefinition { public List<BarSpec> Sets = new(); public List<PlanBarListLine> BarList = new(); public List<string> Unresolved = new(); }
+
+void EmitPlanBars(BridgeDefinition bd, Alignment al0, PlanBarsDefinition pd, string element, bool super, bool checkCover)
+{
+    Vec3 World(BarSpec s, PlanBarPoint p, double shift)
+    {
+        double w = p.W + shift;
+        Vec2 q;
+        if (s.Frame == PlanBarFrame.Alignment) q = al0.PointAt(w, p.U);
+        else
+        {
+            var sup = bd.Supports[s.Support];
+            double xs = s.Support == bd.Supports.Count - 1 ? -1 : 1;                        // abutments: U toward the span (skew 0: along the tangent)
+            q = al0.PointAt(sup.Station + xs * p.U, w);
+        }
+        double z = p.Dz;
+        if (p.Ref == PlanBarZRef.DeckTop) { var so = al0.Inverse(q); z += bd.Deck.FinishedElevation(al0, so.Station, so.Offset); }
+        return q.WithZ(z);
+    }
+    string Code(string sh) => sh.StartsWith("Straight") ? "STR" : sh.StartsWith("U") ? "U" : sh.StartsWith("L") ? "L" : sh.StartsWith("Closed") ? "HOOP" : "BENT";
+    string Coat(string c) => c.Trim().ToLowerInvariant() is "epoxy" or "plain" or "" ? "" : c;
+    var marks = pd.Sets.Select(s => s.Mark).Concat(pd.BarList.Select(l => l.Mark)).Distinct().ToList();
+    foreach (var grp in marks.GroupBy(m => m))
+    {
+        string mk = grp.Key;
+        var specs = pd.Sets.Where(s => s.Mark == mk).ToList();
+        var line = pd.BarList.FirstOrDefault(l => l.Mark == mk);
+        var first = specs.FirstOrDefault();
+        var set = new PlanBarSet
+        {
+            Mark = mk, Size = first?.Size ?? line!.Size, Location = first?.Location ?? line!.Location, Element = element, Coating = Coat(first?.Coating ?? line!.Coating),
+            Shape = first != null ? Code(first.Shape) : "STR", Dims = first?.Dims.ToArray() ?? Array.Empty<double>(), ListedLength = first?.ListedLength ?? line!.Length,
+            Cover = first != null && first.Cover > 0 ? first.Cover : In(2), CheckCover = checkCover, PlanCount = line?.Count, PlanWeightLb = line?.WeightLb,
+            Source = first?.Source ?? "", Note = string.Join("; ", specs.Select(s => s.Name).Distinct().Take(6)),
+        };
+        int sup = first?.Support ?? line!.Support;
+        double sg = sup == bd.Supports.Count - 1 ? -1 : 1;
+        foreach (var s in specs)
+        {
+            if (s.Unresolved != "") { set.Unplaced += s.UnplacedCount; set.Unresolved = $"UNRESOLVED ({s.Source}): {mk} {s.Name}: {s.Unresolved}"; continue; }
+            foreach (double sh in s.Positions.Count > 0 ? s.Positions : new List<double> { 0 })
+                set.Add(super ? s.Path.Select(p => World(s, p, sh)) : s.Path.Select(p => new Vec3(p.W + sh, sg * p.U, p.Dz)));
+        }
+        if (first == null)
+        {
+            set.Unplaced = line!.Count;
+            set.Unresolved = pd.Unresolved.FirstOrDefault(u => u.Contains(mk)) ?? $"UNRESOLVED: {mk} has no placement data";
+        }
+        if (super) bd.Deck.Reinforcement.PlanBarSets.Add(set);
+        else bd.Supports[sup].Substructure!.Reinforcement.PlanBarSets.Add(set);
+    }
+}
+// ================================================================ end of the common block
+
 
 var br = Doc.Project.Bridges.First(b => b.Name == "Br02069 TH65 SB");
-br.PlanBars ??= new PlanBarsDefinition();
-var pbd = br.PlanBars;
+var pbd = new PlanBarsDefinition();
 pbd.Sets.RemoveAll(s => !s.Superstructure);
 pbd.BarList.RemoveAll(l => !l.Superstructure);
 
@@ -91,9 +165,9 @@ foreach (int j in new[] { 0, 1 })
     double Listed(string mark) => Ft(double.Parse(bill.First(r => r[1] == mark)[6], System.Globalization.CultureInfo.InvariantCulture));
     string Coat(string mark) => bill.First(r => r[1] == mark)[3];
     string Loc(string mark) => bill.First(r => r[1] == mark)[7];
-    PlanBarSet Set(string mark, string name, IEnumerable<PlanBarPoint> path, IEnumerable<double>? posFt = null, string shape = "", params double[] dimsIn)
+    BarSpec Set(string mark, string name, IEnumerable<PlanBarPoint> path, IEnumerable<double>? posFt = null, string shape = "", params double[] dimsIn)
     {
-        var s = new PlanBarSet
+        var s = new BarSpec
         {
             Name = name, Mark = mark, Size = "#" + mark.Substring(1, 1), Coating = Coat(mark), Location = Loc(mark), Source = pg, Frame = PlanBarFrame.Support, Support = j,
             Superstructure = false, ListedLength = Listed(mark), Shape = shape, Cover = mark.Contains("701") || mark.Contains("502") ? I(3) : I(2),
@@ -269,3 +343,10 @@ foreach (int j in new[] { 0, 1 })
     }
 }
 Print($"Br02069 abutment plan bars: {pbd.Sets.Count(s => !s.Superstructure)} sets, {pbd.BarList.Count(l => !l.Superstructure)} bill lines");
+// ---- into the abutments' explicit plan bar sets (unit frame); the plan sets replace the (Iowa) abutment bar generator
+foreach (int j in new[] { 0, 1 })
+{
+    var rr = br.Supports[j].Substructure!.Reinforcement;
+    rr.Enabled = true; rr.EpoxyCoated = true; rr.PlanBarSets.Clear();
+}
+EmitPlanBars(br, Doc.Project.Alignments.First(a => a.Name == br.AlignmentName), pbd, "abutment", false, true);

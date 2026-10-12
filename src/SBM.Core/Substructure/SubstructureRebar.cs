@@ -24,6 +24,7 @@ public sealed partial class SubstructureGenerator
             var r = unit.Definition.Reinforcement;
             if (!r.Enabled) continue;
             var bars = new List<RawBar>();
+            if (r.PlanBarSets.Count > 0) { PlanSetBars(m, unit); continue; }
             if (unit.Abutment != null) { AbutmentBars(m, unit); continue; }
             if (r.CapBars.Count > 0) CapPlanBars(unit, bars); else CapBars(unit, bars);
             if (unit.Backwall != null) BackwallBars(unit, bars);
@@ -42,6 +43,40 @@ public sealed partial class SubstructureGenerator
             perUnit.Add((unit, bars));
         }
         foreach (var (unit, bars) in perUnit) AssignMarks(m, unit, bars);
+    }
+
+    /// <summary>Explicit plan bars (<see cref="PlanBarSet"/>) of a unit: marks + bars in the unit frame, clear cover against the unit's concrete solids
+    /// (cap, pedestals, cap blocks, columns, shafts, footings, backwall - their union) -> <see cref="SubstructureUnit.CoverViolations"/> + warnings.</summary>
+    private void PlanSetBars(SubstructureModel m, SubstructureUnit unit)
+    {
+        var r = unit.Definition.Reinforcement;
+        // drilled shafts are 32-gons inscribed in the circle: for the cover test their faces are moved out radially to the mid-sagitta (+-0.12% of the
+        // radius, 3/32" on a 78" shaft) so the polygon error stays inside the 1/8" tolerance either way
+        double k32 = (1 + 1 / Math.Cos(Math.PI / 32)) / 2;
+        var hosts = unit.Solids.Where(s => s.IsConcrete).Select(s =>
+        {
+            if (s.Kind != SubElementKind.DrilledShaft || unit.Foundations.Count == 0) return s.Mesh;
+            var c3 = s.Mesh.Positions.Aggregate(Vec3.Zero, (a, p) => a + p) * (1.0 / s.Mesh.Positions.Count);
+            var f = unit.Foundations.OrderBy(x => (unit.Plan(x.S, x.N) - c3.XY).Length).First();
+            var axis = unit.Plan(f.S, f.N);
+            var mm = new Mesh();
+            foreach (var p in s.Mesh.Positions) { var d = p.XY - axis; mm.Add((axis + d * k32).WithZ(p.Z)); }
+            for (int i = 0; i < s.Mesh.Indices.Count; i += 3) mm.Tri(s.Mesh.Indices[i], s.Mesh.Indices[i + 1], s.Mesh.Indices[i + 2]);
+            return mm;
+        }).ToList();
+        var res = PlanBarSetBuilder.Build(r.PlanBarSets, p => unit.World(p.X, p.Y, p.Z), unit.Name, "Sub", hosts, r.EpoxyCoated);
+        foreach (var v in res.Violations)
+        {
+            double s = Vec2.Dot(v.At.XY - unit.Origin, unit.D), n = Vec2.Dot(v.At.XY - unit.Origin, unit.N);
+            unit.CoverViolations.Add(new CoverViolation($"{v.Location} #{v.Bar + 1}", v.Mark, v.Excess, v.Face, s, n, v.At.Z));
+        }
+        foreach (var w in res.Warnings) Warn(w);
+        lock (m)
+        {
+            m.Marks.AddRange(res.Marks);
+            m.Bars.AddRange(res.Bars);
+            m.Notes.AddRange(res.Notes);
+        }
     }
 
     private double Lap(RebarSize size, SubstructureReinforcementDefinition r, double cover, double spacing) =>

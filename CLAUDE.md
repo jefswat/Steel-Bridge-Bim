@@ -154,6 +154,19 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
     `PlanBarGroup.End` also picks the end of CapEnd groups (5WB 5a15 shape `A15` left, 5a14 right). Check: pedestal blocks are host concrete for pedestal bars, hairpins need 3 1/2" CL.
     to both full-width faces (`HairpinFaceClear`, sections A-A/B-B), per-bar records `SubstructureUnit.CoverViolations` (`samples/plans/check-sub-cover.csx`); textured-face cover for
     other bars UNRESOLVED (2" kept). State and remaining warnings: `docs/plan-data/cap-cover-containment.md`.
+  - Explicit PLAN BAR SETS (OPTIONAL, generic; `Bridge/PlanBarSet.cs`): one plan mark per set = bars given as centerline polylines computed by a plan-data script
+    from the sheet dimensions (`Bars` = one string per bar "x,y,z x,y,z ..." in meters, `PlanBarSet.Encode/Decode/Add`; `Spirals` = `PlanSpiral` generated helices with
+    1 1/2 flat turns and an optional upper pitch zone), printed bend diagram (`Shape`, `Dims`), `ListedLength` (scheduled length; 0 = geometry, varying lengths),
+    `Unplaced` (schedule-only bars, location "... not modeled - UNRESOLVED"), `Unresolved` / `Note`, plan check values `PlanCount` / `PlanWeightLb`, covers `Cover` /
+    `CoverBottom` / `CoverTop`, `CheckCover`. On a substructure unit (`SubstructureReinforcementDefinition.PlanBarSets`, unit frame S / N / elevation) they REPLACE the
+    generic cap / column / shaft / footing generators (`SubstructureGenerator.PlanSetBars`); on a deck (`DeckReinforcementDefinition.PlanBarSets`, project X / Y / Z)
+    the generic layout does not run (a `DeckPlanReinforcement` still does; `ConcreteGenerator.BuildPlanBarSets`). `Concrete/PlanBarSetBuilder.cs` -> `BarMark`s (plan
+    mark, unit) + `BarPlacement`s; clear cover by `Concrete/RebarCover.cs` (generic: ball of cover + bar radius must lie in the UNION of closed host meshes - shared faces
+    cap / column / shaft / pedestal are not free faces; vertical-ray parity + XY grid index; face orientation picks bottom / top cover; `AddAnalytic` = exact signed-
+    distance hosts, used for the deck slab because the chorded loft's edge sagitta on tight curves exceeds 1/8"; drilled shaft 32-gons moved to the mid-sagitta)
+    -> `SubstructureUnit.CoverViolations` / `ConcreteModel.CoverViolations` (`PlanBarCoverViolation`) + one warning per mark; bars never moved. Database grouping
+    follows the location text (" cap " -> cap group, "column n" -> column group, "footing n" -> footing group (drilled shafts), "backwall"). Tests `PlanBarSetTests`.
+    NHT data: `samples/plans/rebar-nht-sub.csx`, `rebar-nht-approach.csx` (see the Northaven entry).
   - As-designed abutment (OPTIONAL `SubstructureDefinition.Abutment`, `AbutmentDefinition.cs`; null = parametric abutment): `SubstructureAbutment.cs`
     (`AddSlab` = prism between two vertical planes with per-vertex elevation functions; end lines are alignment offsets, so S depends on N),
     `SubstructureAbutmentRebar.cs` (only proven placements in 3D, rest of the plan bar list = schedule-only marks, mismatches = warnings),
@@ -724,6 +737,9 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   with staggered columns, `ArchModel.SpliceBolts`, AssemblyKind.ArchSplice, tie cut at `SpliceAt` + gap), fin plates (`ArchFinSettings`, `ArchRibFin` /
   `ArchTieFin`; tie fin = 2 solids), `RibWorkPoint` (p.147 HC on the rib working line; `RibAnchor` = the pin), cable connectors, floorbeam connections /
   studs / PT slots (`ArchFloorbeamConnection`, `PtSlotLength`, `StudsPerFace`), bracing crossings (`Via`, `TrimStartAt/EndAt`, `ArchBraceCrossing`),
+  deck bar bill options (`ArchDeckRebar.TransCount` / `CurbStirrupCount` = bill row counts, `CurbStirrupHook`, `TopTransPerRow = 2` = two top bars per row lapped at
+  CL NHT and hooked down at the ties with a return on the bottom bar (`TopTransHookOffset` / `TopTransHookReturn`, top run = listed - drop - return, centre lap = a
+  CHECK row), `EdgeBarMark` D3 = one hooked edge bar per tie per floorbeam panel at the bottom bar level),
   knuckle v2 (`ArchKnuckleDetail` + `Corners`, partial `ArchGeneratorKnuckle.cs`; tie field pieces trimmed at the joint = end flange edge; the W stub is not
   built), bearings along a plan axis (`LongAxisAngleDeg`), PT solids (`ArchPtSystem`, partial `ArchGeneratorDeck.cs`, PartCategory PtStrand / PtAnchorage
   -> IfcTendon / IfcTendonAnchor), deck bars (`ArchDeckRebar` -> `ConcreteModel.Marks/Bars`, `FlutesOnBarGrid`), 2D `Drawing/Views/ArchViews.cs`
@@ -740,6 +756,8 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
 - True-arc plate outlines (generic): `Solids/ArcPolygon` (points + signed minor-arc radii per edge, exact area, tessellation, Sub / Map / Reversed),
   `PlateBuilder.AddPlanarArc` (mesh from the tessellation, `ExtrudedSolid.ExactOutline` keeps the arcs) -> IFC Parametric IfcIndexedPolyCurve with
   IfcArcIndex, ReferenceView tessellated to its chord tolerance. Tests `ArchBracingConnectionTests`. Tests `ArchTests`, `ArchV2Tests`. Knuckle visual check without a snapshot: `temp`-style dump of part triangles + a small
+  kg/m3, not in SteelMass), ArchConnectionPlate, ArchStiffener, PtStrand, PtAnchorage. Remaining GAPs: bracing U-point gussets (p.129-140), railing,
+  duct, camber (D3 bars done 2026-10-12). Tests `ArchTests`, `ArchV2Tests`. Knuckle visual check without a snapshot: `temp`-style dump of part triangles + a small
   pymupdf painter's renderer (no matplotlib in the sandbox).
 - Precast PT SEGMENTAL box girder (OPTIONAL `BridgeDefinition.Segmental` = `Bridge/SegmentalDefinition.cs`, omitted from the .sbm when null; design note
   `docs/plan-data/bonner-b2500/segmental-unit5/SEGMENTAL-DESIGN.md`): own bridge with `Girders.Count = 0` (support lines only, like the arch; supports =
@@ -799,6 +817,15 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   50 / 100 PLF, handrail top 3'-0 (dimensioned, pipe scaled). SEJ-B(MOD) at 7 joints: 4 in placeholder centred on the CL SEJ, no blockout (standards not in
   set). Mow strips 2'-0 x 4" at the 12 approach piers (6.12 CY vs 6.1, top EL. D + 1'-0 flagged). T80SS(MOD) arch pier barrier NOT modeled (UNRESOLVED).
   The older GAP lines in build-nht.csx about rail / curb / joints / mow strips are superseded by this script's output.
+- NHT model check: `check-nht.csx` 796 PASS / 4 FAIL (2026-10-12; the 4 = arch pier cap / column CY vs the p.102 quantity table, +-0.3 CY; section 6 = reinforcing:
+  every tabulated mark count / weight, weights by element model vs plan, cover violations).
+- NHT REINFORCING (2026-10-12; `build-nht.csx` one-line hook runs `rebar-nht-sub.csx` + `rebar-nht-approach.csx`, both re-runnable on a built model with an output
+  path argument; data `docs/plan-data/nht-0047-07-228/bar-lists.csv` = every plan bar table + the 2.3 lb/SF deck estimates; SUMMARY.md section 5): explicit
+  `PlanBarSet`s placed from the sheet dimensions - abutments 1 / 16 (A, H, S, U / U1 / U2, V, p.95/96; 36" shaft cages UNRESOLVED: FD standard not in the set),
+  approach piers (cap A / B / S1 / S2 / T / U / D dowels, columns V / V1 / V2 / Z, 48" shafts FD / FV / #4 spiral, p.97-100), arch piers 10 / 11 (cap A1 / M /
+  S5-S36 / T1-T4, pedestals E1-E3, column V2 / V3 + S1-S4, shafts 28 #11 + #7 hoops + V1 dowels, p.101-104; H1 and 12 T1 schedule-only UNRESOLVED), approach
+  decks (A / T / OA / D / C / CS; P (PCP), G/H/J/M (IGTS), UP UNRESOLVED; CS / C need the curbs). Arch deck: 606 A1 (two hooked per row), 303 B1, 68 D3,
+  606 S1 per the p.154 bill (`arch-nht.csx`). Positions that are only drawn are SCALED and say so in the set notes.
 
 ## Conventions (bridge engineering)
 - Offsets right-positive (Civil 3D). Skew from the radial line; positive = right end of support line up-station.

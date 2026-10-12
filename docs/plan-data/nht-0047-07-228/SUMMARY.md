@@ -103,8 +103,24 @@ RW(EM), RW(MSE), PAZD, PB, PCO (p.37-78).
 ## 5. Reinforcing
 | item | value | PDF p. | tag | note |
 |---|---|---|---|---|
-| Arch piers 10 & 11 | `bar-lists.csv` (47 marks; 12 rows differ 3-13 lb from no x length x unit weight; totals reconcile) | p.104 | RASTER | bend A table S5-S36 |
-| Approach / abutments / arch deck | small per-sheet bar tables; arch deck bar bends p.154 | p.95-100, 109-117, 154 | - | not transcribed -> U13 |
+| Arch piers 10 & 11 | `bar-lists.csv` (47 marks; 12 rows differ 3-13 lb from no x length x unit weight; totals reconcile) | p.104 | RASTER | bend A table S5-S36; one bill for both piers (V2 = P10, V3 = P11); H1 drawn (B-B / C-C) but not billed |
+| Abutments 1 / 16 | A 10 #11 13'-7, H 8 #6 14'-2, S 13 #5 11'-2, U 4 (abut 16: U1 2 + U2 2) #6 8'-0, V 16 #5 10'-11 = 1,277 / 1,278 lb | p.95, 96 | RASTER | `bar-lists.csv`; 36" shaft cages in the FD standard (not in the set) |
+| Approach pier caps | type 1 (P2-5, 8, 9, 12, 13) 1,740 lb, type 2 (P6, 7, 14, 15) 1,861 lb per cap; D dowels omitted at P4, P13 / P7 | p.98, 100 | RASTER | `bar-lists.csv` |
+| Approach pier columns | V (20 #9) / V1 (12 #11, L) + V2 (16 #11), Z ties per pier (table of variable quantities) | p.98, 100 | RASTER | `bar-lists.csv`; shaft FD / FV / spiral not tabulated |
+| Approach decks | bar table A C CS D G H J M OA P T (+ UP p.113), no bar list: weight = 2.3 lb/SF x SF (3,890 / 3,496 / 5,876 / 4,417 / 6,060 lb) | p.109-117 | RASTER | G H J M = IGTS, P = PCP standards (not in set) |
+| Arch deck | bill p.154: A1 606, B1 303, D1 162, D2 162, D3 68, D4 48, S1 606, S2 32 = 29,377 lb | p.152, 154 | RASTER | two A1 per row (p.152 section) |
+
+**Model (2026-10-12, `rebar-nht-sub.csx`, `rebar-nht-approach.csx`, `arch-nht.csx`; `check-nht.csx` section 6).** Every tabulated count is modeled; scheduled weights
+(count x listed length) vs the tables, lb (model / plan): abutment 1 1,274 / 1,277, abutment 16 1,274 / 1,278; approach piers (cap + column) P2 2,399 / 2,410,
+P3 2,474 / 2,485, P4 2,602 / 2,613, P5 2,776 / 2,787, P6 4,358 / 4,370, P7 4,651 / 4,661, P8 3,228 / 3,239, P9 4,862 / 4,873, P12 4,542 / 4,553, P13 2,904 / 2,914,
+P14 4,201 / 4,212, P15 3,886 / 3,898 (S2 = the geometric variable lengths, -7 lb per cap vs the plan average); arch pier 10 8,900 / 8,937, pier 11 8,158 / 8,193
+(bill rows differ 3-13 lb from no x length x unit weight, see above); arch deck 30,427 / 29,377 (D1 / D2 / D4 +468 / +468 / +136: the bill weights are
+below 40'-0 x count; the model's last bar of each line is shorter - pre-existing layout). Not tabulated: approach shaft steel 1.9-4.0 k lb per pier, arch pier
+shafts 5.6 / 8.5 k lb. Approach decks (A T OA D C CS only) 5,901 / 5,324 / 8,534 / 6,446 / 8,789 lb vs the 2.3 lb/SF estimate 3,890 / 3,496 / 5,876 / 4,417 /
+6,060 lb (+45-52 %, before P / G / H / J / M / UP): the estimate factor is low for this deck (OA #5 at every 9" space of both overhangs and the curb steel alone
+are 1.5 lb/SF). Clear cover (bars never moved): violations only at type 2 pier FD dowels in the 48" shaft (2 per pier, 1.05-1.16": the right FD group drawn
+next to the column bars lies outside the shaft cage), arch pier end stirrups S5 / S21 (0.17", scaled stirrup top) and the lowest T4 at the 2'-9" cap ends
+(0.92": three T4 levels at the scaled spacing do not fit the end depth), and the curb bars CS / C of all approach units (the curbs are not modeled in this model).
 
 ## 6. Misc
 | item | value | PDF p. | tag |
@@ -207,6 +223,18 @@ to have stripped them. PDF bookmarks differ from the sheets ("162.77' ... UNIT",
 | U14 | Upper lateral bracing detail sheet titles vs the p.128 table | p.129-140, 128 | CONFLICT (v3): the connection drawn on the sheet 'U(n) and U(n)' details' fits the table points U(12-n) / U(12-n)' - the drawn brace-to-welded-edge angles reproduce there within 0.4 deg and the A-A plate angles within 0.9 deg, while at U(n) they are geometrically impossible (e.g. sheet U1: 24.6 deg, but the brace at U1 makes >= 36.2 deg with the rib flange plane). Modeled at U(12-n); U6 is its own pair. Also: p.129 = p.130 (duplicate) |
 | U15 | Arch steel quantity tables vs the drawn pieces | p.123, 127, 128, 143, 148, 91 | the pay items reconcile with the model (Gr 50 +2.6 %, Gr 50-T1 -3.3 %, Gr 50-F1 -4.6 %) but the sheet tables split them differently: rib +8.7 % (the table is about the bare W14x132 RS1-RS5, 59,272 lb), floor system -15 % (every p.143-146 piece modeled; with the END FLOORBEAMS = knuckle end flange + end web, p.124 note 1 / p.143 legend EFB, it would be +2.6 % but then Gr 50 -32 %), bracing -21 % (all p.128-142 pieces modeled), knuckle +55 % (the two 2" x 32" end flanges alone 9,219 lb). Reported, not adjusted |
 | U16 | Tie girder web shear studs | p.152, 143 | the deck section shows a 7/8" x 7" stud on the inside face of each tie web, the tie quantity includes shear studs, no spacing / count given - not modeled |
+
+**Reinforcing UNRESOLVED (2026-10-12)**
+| id | item | PDF p. | reason |
+|---|---|---|---|
+| R1 | Abutment 1 / 16 drilled shaft cages (2 x 36" each) | p.95, 96 | the sheets refer to the common foundation details standard FD, not in the set - no shaft bars modeled |
+| R2 | Approach shaft FV bottom ends | p.98, 100 | drawn to the tip, not dimensioned (FD standard) - 3" clear used |
+| R3 | Approach deck bars P, G / H / J / M, UP | p.109-117 (UP p.113) | P "SEE PCP", G H J M "SEE IGTS" (standards not in the set); UP listed in the p.113 table but not shown; the thickened slab ends are not modeled either |
+| R4 | Arch pier T1 | p.103-104 | bill 16 for both piers, the elevation / section show one per face per pier (4); 12 counted as schedule-only bars |
+| R5 | Arch pier H1 pedestal hairpins | p.103-104 | drawn (section B-B / C-C, 3 per pedestal around the anchor bolts) but not in the bill; bolt layout on bearing sheet 1 of 2 (not in set) - schedule-only, length DERIVED |
+| R6 | Arch pier column ties S2 / S3 / S4 arrangement | p.104 | section D-D draws two of each, the bill gives one S3 per 6" level and one S2 or S4 alternately - per-level pairing modeled as noted |
+| R7 | Arch deck A1 hook / D3 position, 303 rows vs 8" max | p.151, 152, 154 | hook and D3 drawn, not dimensioned (scaled 7 1/2" / 6" inside CL tie); 303 rows (bill) are 8.08" apart over the deck |
+| R8 | Positions SCALED from the sheets (side bar levels, arch pier stirrup top 6", OA start 11 1/4") | p.97-104, 113 | drawn, not dimensioned - each set's note says so |
 
 ## Model mapping
 | section | model inputs | notes / GAPs |

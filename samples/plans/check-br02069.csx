@@ -320,10 +320,10 @@ foreach (var beam in ps.Beams.Where(x => x.Girder == 0 || x.Girder == 6))
     superHosts.AddRange(ps.Beams.Select(b => b.Mesh));
     var hostSets = new List<(string unit, List<SBM.Core.Solids.Mesh> meshes)> { ("", superHosts) };
     foreach (var u in sub.Units) hostSets.Add((u.Name, u.Solids.Select(s => s.Mesh).ToList()));
-    var pbars = b.PlanBars!;
+    var allSets = b.Deck.Reinforcement.PlanBarSets.Select(s => ("", s)).Concat(b.Supports.Where(s => s.Substructure != null).SelectMany(s => s.Substructure!.Reinforcement.PlanBarSets.Select(x => (s.Name, x)))).ToList();
     double Need(string unit, string mark)
     {
-        var st = pbars.Sets.FirstOrDefault(s => s.Mark == mark);
+        var st = allSets.FirstOrDefault(s => s.Item1 == unit && s.Item2.Mark == mark).Item2;
         if (st != null && st.Cover > 0) return st.Cover;
         if (mark is "S401M" or "S402M" or "S404M") return In(1);    // deck bottom 1" clr (p19); the longitudinal lines of both mats share the marks
         if (mark == "S403M") return In(2);                            // deck top 3" clr, ends 2" clr to the deck edges (p19 Detail A)

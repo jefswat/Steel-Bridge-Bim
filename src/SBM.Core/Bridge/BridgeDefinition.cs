@@ -471,10 +471,14 @@ public sealed class DeckReinforcementDefinition
     public double MarkLengthTolerance { get; set; } = In(2);
     /// <summary>OPTIONAL plan-driven layout (zones + the plan bar list); null = the generic layout above. Sizes/covers above still apply to it.</summary>
     public DeckPlanReinforcement? Plan { get; set; }
+    /// <summary>OPTIONAL explicit plan bars (<see cref="PlanBarSet"/>, project plan X / Y and elevation): when present the generic layout does not run (a
+    /// <see cref="Plan"/> layout still does); the sets are placed and cover-checked against the deck concrete.</summary>
+    public List<PlanBarSet> PlanBarSets { get; set; } = new();
     public DeckReinforcementDefinition Clone()
     {
         var c = (DeckReinforcementDefinition)MemberwiseClone();
         c.Plan = Plan?.Clone();
+        c.PlanBarSets = PlanBarSets.Select(b => b.Clone()).ToList();
         return c;
     }
 }
@@ -1191,10 +1195,6 @@ public sealed class BridgeDefinition
     /// (<see cref="SurfaceTreatmentDefinition"/>); null = none.</summary>
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
     public List<SurfaceTreatmentDefinition>? SurfaceTreatments { get; set; }
-    /// <summary>OPTIONAL plan bars placed as the plan sheets dimension them (abutment / pedestal / wall / diaphragm / barrier bars,
-    /// <see cref="PlanBarsDefinition"/>); null = none, omitted from the .sbm.</summary>
-    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
-    public PlanBarsDefinition? PlanBars { get; set; }
     /// <summary>OPTIONAL pedestrian / bicycle railing runs (posts, rails, base plates, anchor bolts or a placeholder envelope) along reference lines
     /// (<see cref="PedestrianRailingDefinition"/>); null = none. Built by <c>Railing.PedestrianRailingGenerator</c> into the bridge's steel model.</summary>
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
@@ -1295,7 +1295,6 @@ public sealed class BridgeDefinition
         Arch = Arch?.Clone(),
         Segmental = Segmental?.Clone(),
         SurfaceTreatments = SurfaceTreatments?.Select(t => t.Clone()).ToList(),
-        PlanBars = PlanBars?.Clone(),
         Railings = Railings?.Select(r => r.Clone()).ToList(),
     };
 }

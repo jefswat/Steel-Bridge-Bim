@@ -1,107 +1,137 @@
+using System.Globalization;
+using System.Text;
+using SBM.Core.Geometry;
+using static SBM.Core.Units.UnitSystem;
+
 namespace SBM.Core.Bridge;
 
-/// <summary>Coordinate frame of a <see cref="PlanBarSet"/>.</summary>
-public enum PlanBarFrame
-{
-    /// <summary>Along a support line: W = distance along the line from the alignment point (+ right, as the substructure S), U = normal to the line
-    /// (abutments: + toward the span; piers: + ahead station), as the concrete diaphragm sections.</summary>
-    Support,
-    /// <summary>Along the alignment: W = station, U = offset (+ right).</summary>
-    Alignment,
-}
-
-/// <summary>Elevation reference of a <see cref="PlanBarPoint"/>.</summary>
-public enum PlanBarZRef
-{
-    /// <summary>Absolute elevation (<see cref="PlanBarPoint.Dz"/> is the elevation).</summary>
-    Elevation,
-    /// <summary>Finished deck surface (<see cref="DeckDefinition.FinishedElevation"/>) at the bar point's plan position + Dz.</summary>
-    DeckTop,
-}
-
-/// <summary>A centerline vertex of a plan bar in the set's frame (sharp corners; the plan's bend diagrams are out to out, the caller puts the centerline db/2 inside).</summary>
-public sealed class PlanBarPoint
-{
-    public double W { get; set; }
-    public double U { get; set; }
-    public double Dz { get; set; }
-    public PlanBarZRef Ref { get; set; }
-    public PlanBarPoint() { }
-    public PlanBarPoint(double w, double u, PlanBarZRef r, double dz) { W = w; U = u; Ref = r; Dz = dz; }
-    public PlanBarPoint Clone() => (PlanBarPoint)MemberwiseClone();
-}
-
 /// <summary>
-/// OPTIONAL plan-driven bars of one mark placed as the plan sheets dimension them (generic: abutment footings / stems / pedestals / walls, concrete
-/// diaphragms, barriers): one centerline <see cref="Path"/> in the frame of a support line or of the alignment, copied at the <see cref="Positions"/>
-/// (shifts along W; empty = one bar). Nothing is invented: a set whose position the plans do not give carries <see cref="Unresolved"/> (page + reason)
-/// and is NOT placed - its <see cref="UnplacedCount"/> bars stay in the schedule at the listed length.
+/// OPTIONAL explicit plan reinforcing: one mark of a plan bar table placed as the plan draws it, with every bar given as a centerline
+/// polyline computed by a plan-data script from the sheet's dimensions (spacings, covers, bend diagrams). Generic: on a substructure unit
+/// (<see cref="SubstructureReinforcementDefinition.PlanBarSets"/>, coordinates = the unit frame S along the support line, N normal,
+/// Z = elevation) or on a deck (<see cref="DeckReinforcementDefinition.PlanBarSets"/>, coordinates = project plan X / Y and elevation Z).
+/// When a unit / deck has sets, the generic generator does not run for it: the sets ARE the plan's bars. Counts and listed lengths are the
+/// plan's; bars are never moved for cover - the generic clear-cover check (<c>Concrete.PlanBarSetBuilder</c>) reports violations.
 /// </summary>
 public sealed class PlanBarSet
 {
-    public string Name { get; set; } = "";
+    /// <summary>Plan mark ("A", "S2", "V1"); unique within the unit / deck.</summary>
     public string Mark { get; set; } = "";
-    /// <summary>Bar size "#3" .. "#18".</summary>
     public string Size { get; set; } = "#5";
-    /// <summary>Coating / material as listed ("epoxy", "chromium-epoxy (4% Cr)", "stainless", "plain").</summary>
-    public string Coating { get; set; } = "epoxy";
+    /// <summary>Where the bars are ("Pier 2 cap stirrups"), shown in the schedule / properties.</summary>
     public string Location { get; set; } = "";
-    public string Source { get; set; } = "";
-    public PlanBarFrame Frame { get; set; }
-    /// <summary>Support index (<see cref="PlanBarFrame.Support"/> frame; also the substructure unit of a non-superstructure set).</summary>
-    public int Support { get; set; }
-    /// <summary>True = superstructure bar (deck / diaphragm / barrier: the bridge's concrete model); false = the substructure unit of <see cref="Support"/>.</summary>
-    public bool Superstructure { get; set; }
-    public List<PlanBarPoint> Path { get; set; } = new();
-    /// <summary>W shifts of the copies (empty = one bar at 0).</summary>
-    public List<double> Positions { get; set; } = new();
-    /// <summary>Bar-list length (scheduled); 0 = the developed centerline length.</summary>
+    /// <summary>Element the bars belong to for reports ("cap", "column", "drilled shaft", "deck", "curb"...).</summary>
+    public string Element { get; set; } = "";
+    /// <summary>Coating ("galvanized", "epoxy"); "" = uncoated.</summary>
+    public string Coating { get; set; } = "";
+    /// <summary>Plan bend-diagram code ("STR", "U", "L", "HOOP", "TIE", "HAIRPIN", "SPIRAL", "BENT") and its printed out-to-out dimensions (meters, letter order A, B, ...).</summary>
+    public string Shape { get; set; } = "STR";
+    public double[] Dims { get; set; } = Array.Empty<double>();
+    /// <summary>Listed (scheduled) length from the plan bar table, meters; 0 = the geometry's developed length (bars with different lengths get a varying mark).</summary>
     public double ListedLength { get; set; }
-    /// <summary>Printed out-to-out dimensions of the bend diagram (schedule).</summary>
-    public List<double> Dims { get; set; } = new();
-    /// <summary>Shape description for the schedule ("U", "L", "closed stirrup" ...).</summary>
-    public string Shape { get; set; } = "";
-    /// <summary>Non-empty: the set is not placed (what the plans lack + page); <see cref="UnplacedCount"/> bars stay in the schedule.</summary>
+    /// <summary>Clear cover the plan requires for these bars (meters) to every concrete face; <see cref="CoverBottom"/> / <see cref="CoverTop"/> override it at faces looking down / up.</summary>
+    public double Cover { get; set; } = In(2);
+    public double CoverBottom { get; set; } = double.NaN;
+    public double CoverTop { get; set; } = double.NaN;
+    /// <summary>false = no cover check (bars that leave the concrete by design, e.g. bearing dowels projecting above the seat).</summary>
+    public bool CheckCover { get; set; } = true;
+    /// <summary>Bar centerlines: one string per bar, points "x,y,z" separated by spaces (meters, 4 decimals). See <see cref="Encode"/>.</summary>
+    public List<string> Bars { get; set; } = new();
+    /// <summary>Spirals (generated): one per entry.</summary>
+    public List<PlanSpiral> Spirals { get; set; } = new();
+    /// <summary>Bars of the plan table that are not placed (location not shown on the sheets): counted in the mark, no 3D bar, reason in <see cref="Unresolved"/>.</summary>
+    public int Unplaced { get; set; }
+    /// <summary>"UNRESOLVED (p.x): ..." text for anything about this mark the plans do not settle (raised as a warning); "" = none.</summary>
     public string Unresolved { get; set; } = "";
-    public int UnplacedCount { get; set; }
-    /// <summary>Required clear cover (cover check report; 0 = no check).</summary>
-    public double Cover { get; set; }
+    /// <summary>Plan basis / notes (Info): how the positions were read ("scaled", "per Section A-A").</summary>
+    public string Note { get; set; } = "";
+    /// <summary>Plan table values for the check (count, weight lb); null = not tabulated.</summary>
+    public int? PlanCount { get; set; }
+    public double? PlanWeightLb { get; set; }
+    /// <summary>Plan page / sheet.</summary>
+    public string Source { get; set; } = "";
+
     public PlanBarSet Clone()
     {
         var c = (PlanBarSet)MemberwiseClone();
-        c.Path = Path.Select(p => p.Clone()).ToList();
-        c.Positions = Positions.ToList();
-        c.Dims = Dims.ToList();
+        c.Dims = Dims.ToArray();
+        c.Bars = Bars.ToList();
+        c.Spirals = Spirals.Select(s => s.Clone()).ToList();
         return c;
     }
-}
 
-/// <summary>One line of a plan bill of reinforcement (count, length and weight as printed) the placed sets are compared with.</summary>
-public sealed class PlanBarListLine
-{
-    /// <summary>"" = superstructure; otherwise the support index of the substructure unit.</summary>
-    public bool Superstructure { get; set; }
-    public int Support { get; set; }
-    public string Mark { get; set; } = "";
-    public string Size { get; set; } = "#5";
-    public string Coating { get; set; } = "";
-    public string Location { get; set; } = "";
-    public int Count { get; set; }
-    public double Length { get; set; }
-    public double WeightLb { get; set; }
-    public PlanBarListLine Clone() => (PlanBarListLine)MemberwiseClone();
-}
-
-/// <summary>OPTIONAL plan bars of a bridge (<see cref="BridgeDefinition.PlanBars"/>): placed sets + the plan bills they are checked against. Bill lines
-/// with no placed set stay in the schedule (count / length as printed, no 3D bar) and are reported.</summary>
-public sealed class PlanBarsDefinition
-{
-    public List<PlanBarSet> Sets { get; set; } = new();
-    public List<PlanBarListLine> BarList { get; set; } = new();
-    /// <summary>Plan items not dimensioned (page + reason), raised as UNRESOLVED warnings.</summary>
-    public List<string> Unresolved { get; set; } = new();
-    public PlanBarsDefinition Clone() => new()
+    /// <summary>Encodes a polyline as the <see cref="Bars"/> string (meters, 4 decimals = 0.1 mm).</summary>
+    public static string Encode(IEnumerable<Vec3> pts)
     {
-        Sets = Sets.Select(s => s.Clone()).ToList(), BarList = BarList.Select(l => l.Clone()).ToList(), Unresolved = Unresolved.ToList(),
-    };
+        var sb = new StringBuilder();
+        foreach (var p in pts)
+        {
+            if (sb.Length > 0) sb.Append(' ');
+            sb.Append(p.X.ToString("0.####", CultureInfo.InvariantCulture)).Append(',')
+              .Append(p.Y.ToString("0.####", CultureInfo.InvariantCulture)).Append(',')
+              .Append(p.Z.ToString("0.####", CultureInfo.InvariantCulture));
+        }
+        return sb.ToString();
+    }
+
+    public static Vec3[] Decode(string s) =>
+        s.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(t =>
+        {
+            var v = t.Split(',');
+            return new Vec3(double.Parse(v[0], CultureInfo.InvariantCulture), double.Parse(v[1], CultureInfo.InvariantCulture), double.Parse(v[2], CultureInfo.InvariantCulture));
+        }).ToArray();
+
+    public void Add(IEnumerable<Vec3> pts) => Bars.Add(Encode(pts));
+
+    public int PlacedCount => Bars.Count + Spirals.Count;
+}
+
+/// <summary>
+/// A circular spiral (drilled shaft / column cage): centre (in the set's coordinates), centerline radius, from <see cref="TopZ"/> down to
+/// <see cref="BottomZ"/> at <see cref="Pitch"/>, with <see cref="FlatTurns"/> flat (level) turns at each end (TxDOT "one and a half flat turns
+/// top and bottom"). Optional second pitch zone: <see cref="UpperPitch"/> from the top down to <see cref="UpperZoneBottomZ"/>.
+/// </summary>
+public sealed class PlanSpiral
+{
+    public double X { get; set; }
+    public double Y { get; set; }
+    public double Radius { get; set; }
+    public double TopZ { get; set; }
+    public double BottomZ { get; set; }
+    public double Pitch { get; set; } = In(6);
+    public double FlatTurns { get; set; } = 1.5;
+    public double UpperPitch { get; set; }
+    public double UpperZoneBottomZ { get; set; } = double.NaN;
+    /// <summary>Bar diameter: the flat end turns climb one bar diameter per turn (they rest on each other), m.</summary>
+    public double BarDiameter { get; set; } = In(0.5);
+    public PlanSpiral Clone() => (PlanSpiral)MemberwiseClone();
+
+    /// <summary>Centerline points (about 24 per turn), top to bottom.</summary>
+    public List<Vec3> Points()
+    {
+        var pts = new List<Vec3>();
+        const int perTurn = 24;
+        double ang = 0, z = TopZ;
+        void Turn(double turns, double pitch)
+        {
+            int n = Math.Max(1, (int)Math.Round(turns * perTurn));
+            double dA = turns * 2 * Math.PI / n, dZ = turns * pitch / n;
+            for (int i = 0; i < n; i++)
+            {
+                ang += dA; z -= dZ;
+                pts.Add(new Vec3(X + Radius * Math.Cos(ang), Y + Radius * Math.Sin(ang), z));
+            }
+        }
+        pts.Add(new Vec3(X + Radius, Y, z));
+        Turn(FlatTurns, BarDiameter);
+        double total = TopZ - BottomZ - 2 * FlatTurns * BarDiameter;
+        if (UpperPitch > 0 && !double.IsNaN(UpperZoneBottomZ) && UpperZoneBottomZ > BottomZ && UpperZoneBottomZ < TopZ)
+        {
+            Turn((TopZ - FlatTurns * BarDiameter - UpperZoneBottomZ) / UpperPitch, UpperPitch);
+            Turn((UpperZoneBottomZ - BottomZ - FlatTurns * BarDiameter) / Pitch, Pitch);
+        }
+        else Turn(total / Pitch, Pitch);
+        Turn(FlatTurns, BarDiameter);
+        return pts;
+    }
 }

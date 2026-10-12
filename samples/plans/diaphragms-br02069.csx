@@ -74,7 +74,6 @@ ConcreteDiaphragmDefinition End(string name, double ledge, string pages) => new(
     Unresolved =
     {
         "1\" backer rod at the back face and 1/2\" x 7\" bituminous felt on the paving bracket (p.21, p.11 Detail A) not modeled (no solids requested)",
-        "end diaphragm reinforcing S405E..S617S (p.20 / p.21 bill) not placed (schedule only)",
     },
 };
 br.Supports[0].Diaphragm = End("South Abutment end diaphragm", 920.75 + 19.25 / 12, "p.20, p.21, p.11 Detail A / C; ledge S = footing top 920.75 + 1'-7 1/4 (p.11 note 3) = 922.354");

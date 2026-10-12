@@ -193,6 +193,8 @@
       "target": [ { "level": "part", "category": "pier", "support": [ "Pier 6", "Pier 7", "Pier 14", "Pier 15" ] } ] },
     { "id": "arch-pier-shafts", "sheets": "^DRILLED SHAFT DETAILS ARCH PIERS", "basis": "Arch pier 6'-6 drilled shafts: tops, tips, reinforcement",
       "target": [ { "level": "element", "category": "drilled shaft", "support": [ "Pier 10", "Pier 11" ] } ] },
+    { "id": "arch-pier-shaft-bars", "sheets": "^DRILLED SHAFT DETAILS ARCH PIERS", "basis": "Arch pier shaft cage: 28 #11, #7 hoops at 6\" max (4'-3\" lap), V1 dowels to match the column bars (rebar-nht-sub.csx)",
+      "target": [ { "level": "group", "category": "footing group", "support": [ "Pier 10", "Pier 11" ] } ] },
     { "id": "arch-piers", "sheets": "^ARCH PIERS 10 AND 11 (ELEVATIONS AND SECTIONS|REINFORCEMENT|DETAILS)", "basis": "Hammerhead arch piers: cap, column, arch and approach pedestals, elevation table, bar list",
       "target": [ { "level": "part", "category": "pier", "support": [ "Pier 10", "Pier 11" ] } ] },
     { "id": "arch-bearings", "sheets": "^ELASTOMERIC BEARINGS ARCH SPAN", "basis": "Arch bearings (sheet 2 of 2): bearing height / masonry plate on the arch pedestals",
