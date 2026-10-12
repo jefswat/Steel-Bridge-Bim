@@ -43,8 +43,34 @@ public sealed class MaskwallDefinition
     /// <summary>Height above the footing top (wash level) at the panel; the top is level.</summary>
     public double Height { get; set; }
     /// <summary>Distance from the footing end line to the outer face of the panel. Plans (West/East p85/p89, South p80): the panel is the OUTERMOST 10" of the
-    /// wall zone, outer face flush with the footing end line = 0.</summary>
+    /// wall zone, outer face flush with the footing end line = 0. Negative = the panel stands OUTSIDE the footing end line (MnDOT Br. 02069 p5 / p11:
+    /// mask wall inner face on the footing end line, Setback = -Thickness).</summary>
     public double Setback { get; set; }
+    /// <summary>OPTIONAL level bottom of the panel (absolute elevation; null = on the footing top / wash as before). MnDOT Br. 02069 p11 C-C: the mask wall
+    /// stands beside the footing down to the footing bottom EL 917.75; the panel is then a plain rectangle across the footing width.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public double? BottomElevation { get; set; }
+}
+
+/// <summary>
+/// OPTIONAL MnDOT-type abutment stem on the footing (Br. 02069 p11 A-A, semi-integral abutment p21): a wall from the backwall BACK face line to
+/// <see cref="FrontToBearing"/> ahead of the CL bearing, with a BACK LEDGE (the top between the back face and the seat riser, under the end diaphragm /
+/// infill wall) and a SEAT in front of the riser (riser on the backwall front-face line; the seat runs straight from <see cref="SeatBackTop"/> at the
+/// riser to <see cref="SeatFrontTop"/> at the front face, e.g. the 1" slope). With a stem the footing is a plain block (no wash, no keyed backwall),
+/// the backwall stands on the ledge as ONE plain wall (no corbel / pours: the MnDOT infill wall) and the pedestals stand on the seat.
+/// Elevations are (S along the line, elevation) points, 1 point = level. Every value is a plan value; a missing one = the stem is not built (warning).
+/// </summary>
+public sealed class AbutmentStemDefinition
+{
+    /// <summary>Stem front face ahead of the CL bearing (Br. 02069 1'-6"); NaN = not given.</summary>
+    public double FrontToBearing { get; set; } = double.NaN;
+    /// <summary>Back ledge top (under the end diaphragm / infill wall).</summary>
+    public List<CapProfilePoint> LedgeTop { get; set; } = new();
+    /// <summary>Seat at the riser (= backwall front-face line).</summary>
+    public List<CapProfilePoint> SeatBackTop { get; set; } = new();
+    /// <summary>Seat at the stem front face.</summary>
+    public List<CapProfilePoint> SeatFrontTop { get; set; } = new();
+    public string Source { get; set; } = "";
 }
 
 /// <summary>Backwall extension at one end: backwall-thickness wall BEYOND the footing end line, from the footing-bottom line up to a level top, ending in a cap
@@ -302,6 +328,9 @@ public sealed class AbutmentDefinition
     public double WashHeight { get; set; } = In(1);
     /// <summary>Bottom of the backwall above the footing bottom (3'-10, keyed into the footing).</summary>
     public double BackwallBaseAboveFootingBottom { get; set; } = Ft(3) + In(10);
+    /// <summary>OPTIONAL MnDOT stem with back ledge and seat (Stub kind only; null = the footing / wash / keyed backwall section above).</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public AbutmentStemDefinition? Stem { get; set; }
     // ---- elevations (S from the alignment point, absolute elevation); 1 point = level
     public List<CapProfilePoint> FootingBottom { get; set; } = new();
     /// <summary>Top of backwall (crown line): follows these points linearly (breaks allowed).</summary>

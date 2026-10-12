@@ -115,7 +115,7 @@ U("p16", "camber shape along the beam (U10)", "the sheet prints single camber / 
 G("Prestressed camber / variable stool: the beams are straight, stool 4 1/4\" constant (plan value at CL brg only); camber 7 3/8\" erection, residual 2 1/8\"/2 1/4\" (p16, U10) not modeled. Needs: prestressed camber in the haunch (GirderLayoutDefinition.Camber for prestressed).");
 // Deck reinforcing: the plan bar list (S401M-S404M..., p18/p19/p21) is not entered; the generic generator would invent bars -> off.
 b.Deck.Reinforcement.Enabled = false;
-G("Deck reinforcing: generic deck bars switched off; plan bars S401M-S404M etc. (p18, p19, p21; U4 line counts) need a DeckPlanReinforcement for this deck (data entry, no new feature).");
+// Deck reinforcing S401M..S404M: plan deck bars (DeckReinforcementDefinition.Plan) set by rebar-deck-br02069.csx (below); 84 + 84 + 137 + 137 = plan bill p21.
 
 // Barriers (p1, p2, p24): MnDOT Concrete Barrier 36" Type S, 1'-6" wide at the base, both edges.
 // GAP: only TxDOT SSTR / F-shape / single-slope profiles exist; Type S is modeled as the generic single slope (vertical back face,
@@ -124,9 +124,8 @@ G("Deck reinforcing: generic deck bars switched off; plan bars S401M-S404M etc. 
 b.Deck.Barrier.Type = BarrierType.SingleSlope;
 b.Deck.Barrier.Height = In(36);
 b.Deck.Barrier.BaseWidth = In(18);
-b.Deck.Barrier.Reinforcement = false;            // R-bars (p24 bill) not modeled; SSTR bars would be invented
-G($"Barrier: MnDOT Type S 36\" profile not in BarrierProfiles - modeled as SingleSlope 36\" x 1'-6\" base, top width = program default {b.Deck.Barrier.TopWidth / In(1):0.##}\" (not read, p24); barrier bars R501M..R612M (p24) not modeled. Needs: MnDOT Type S barrier profile + plan barrier bars.");
-U("p24, Fig. 5-397.138(A)", "barrier Type S top width / traffic-face breaks", "the standard figure's dimensions have not been transcribed into the plan data yet", "Program default top width kept.");
+b.Deck.Barrier.Reinforcement = false;            // SSTR generic bars off; the plan R-bars are plan bar sets (rebar-barrier-br02069.csx)
+G("Barrier: MnDOT Type S 36\" profile not in BarrierProfiles - modeled as SingleSlope 36\" x 1'-6\" base x 11\" top (p24 Section A-A 7\" + 11\"; rebar-barrier-br02069.csx); the 2\" coping recess / 10\" back projection are not modeled. Barrier bars on the deck placed (R501M, R505M, R411M, R413M, R612M, R614M); approach-panel barrier bars schedule only. Needs: MnDOT Type S barrier profile.");
 
 // ================================================================ 3. prestressed beams (p16 30MH-101, Beam B1)
 // MnDOT 30MH from the standard catalog (StandardBeamCatalog "MN 30MH", Fig. 5-397.501 mod. / p16): H 30", top flange 2'-10",
@@ -160,16 +159,17 @@ b.Girders.Prestressed = new PrestressedBeamDefinition
     StrandStrength = 300,                  // Gr 300 low relaxation (p16)
     ConcreteStrength = 9.5, ReleaseStrength = 8.0,   // f'c 9.5, f'ci 8.0 ksi (p16)
     BearingToEnd = In(7.5),                // 7 1/2" end of beam to CL brg (p16); 100'-6" o-o = 99'-3" + 2 x 7 1/2"
-    // GAP: no curved-plate bearing assemblies (B310 / B311, p31). The bearing is a pad of the plan pad plan size 12" x 30" with the
-    //      thickness = the plan bearing height L at the SOUTH abutment (3 1/4" = 1/2" pad + 1 1/4" curved plate + 1 1/2" brg plate).
-    //      PrestressedBeamDefinition.PadThickness is ONE value for both ends of a beam (PrestressedGenerator uses pd.PadThickness at
-    //      both supports; SpanBeams select per span / beam line, not per end; SupportDefinition.Bearings is the steel
-    //      BearingDefinition and is not read for prestressed beams) -> the NORTH bearing L = 6 1/2" (E1) cannot be entered and the
-    //      N bearing seats are 3 1/4" high (check).
+    // Bearings (p31): PadLength / PadWidth / PadThickness = fallback only; the per-END bearings below govern.
     PadLength = In(12), PadWidth = In(30), PadThickness = In(3.25),
+    // Per beam END (p31, p15): S = start = F1 fixed (B310), N = end = E1 expansion (B311); height = plan bearing height L (p3 seat chain
+    // 9 + 4 1/4 + 30 + L): F1 1/2" pad + 1 1/4" curved plate + 1 1/2" bearing plate = 3 1/4"; E1 3 3/4" pad + 1 1/4" + 1 1/2" = 6 1/2".
+    // The bearing is modeled as one block 12" x 30" of height L (curved-plate assembly geometry: GAP). Sole plate B303 is cast flush with the
+    // beam bottom (p30 "cast with beam"; not in the L chain) - not modeled (GAP 4).
+    StartBearing = new PrestressedBearingDefinition { Mark = "F1", Length = In(12), Width = In(30), Thickness = In(3.25), Description = "MnDOT B310 curved-plate bearing, fixed, L 3 1/4\" (p31)" },
+    EndBearing = new PrestressedBearingDefinition { Mark = "E1", Length = In(12), Width = In(30), Thickness = In(6.5), Description = "MnDOT B311 curved-plate bearing, expansion, L 6 1/2\" (p31)" },
 };
 Print($"Strands: {strands.Count} (plan 44), debonded {strands.Count(s => s.DebondStart > 0)} (plan 14)");
-G("Bearings: MnDOT curved-plate bearings F1 (B310, fixed, L 3 1/4\") / E1 (B311, expansion, L 6 1/2\") (p31) - only a plain pad (12\" x 30\") whose thickness PrestressedBeamDefinition.PadThickness applies to BOTH ends of the beam; 3 1/4\" used, so the North seats are 3 1/4\" too high. Needs: a per-support (per beam end) prestressed bearing height, e.g. PadThickness per support / PrestressedGenerator reading a per-support value, or a curved-plate bearing assembly.");
+G("Bearings: MnDOT curved-plate bearings F1 (B310) / E1 (B311) (p31) modeled as one 12\" x 30\" block of the plan bearing height L (3 1/4\" S, 6 1/2\" N, PrestressedBeamDefinition.StartBearing / EndBearing); the pad / curved plate / bearing plate / pintles are not separate parts. Needs: a curved-plate bearing assembly.");
 G("Sole plate B303 (p16, p30; dims U6) not modeled. Needs: sole plate for prestressed beams.");
 // Concrete end diaphragms (p15, p17, p20, p21; U2 closed): SupportDefinition.Diaphragm, set by diaphragms-br02069.csx (below); front-part bottom UNRESOLVED (p.21).
 // GAP 10 closed: beam bars G301E / G303E / G402E / G505E / G508E placed by beam-rebar-br02069.csx (PrestressedBeamDefinition.Reinforcement);
@@ -181,29 +181,28 @@ G("Sole plate B303 (p16, p30; dims U6) not modeled. Needs: sole plate for prestr
 // (footing -> ledge 1'-7 1/4" / 1'-4 3/4"); seat front S 923.27 / N 923.06 (p5, p10), seat slopes 1" to the front; infill wall 1'-6"
 // on the back ledge, top S 927.73 / N 927.80; pedestals 2'-4" along the beam on the seat (1'-0" behind + 1'-4" ahead of CL brg,
 // flush with the seat back edge, 2" short of the seat front face; S Type A p6, N Type C p12).
-// Mapping onto the Iowa-type AbutmentDefinition (backwall + footing + beam steps):
-//   backwall           = infill wall on the back ledge, 1'-6" thick, front face 1'-0" behind CL brg;
-//   footing keyed zone = stem back ledge: BackwallBaseAboveFootingBottom = ledge - footing bottom;
-//   wash               = stem / seat in front of the infill wall: FootingDepth + WashHeight = seat front - footing bottom;
-//   beam steps         = pedestals, 2'-4" (CL brg -1'-0" .. +1'-4") x plan size along the abutment.
-// GAP: the wash runs to the FOOTING front, so the 1'-3" front toe is built up to the seat (plan: footing top 920.75 in front of the
-//      stem face at +1'-6"); the 1" seat slope is level at the seat-front elevation.
-// GAP: the generator always builds a corbel / paving notch and three backwall pours; the MnDOT infill wall has none -> the corbel is
-//      set to zero size (CorbelProjection/Vertical/Taper = 0) and the pour joints are only solid splits.
-G("Abutment stem: AbutmentDefinition has no stem face set back from the footing front - the 1'-3\" front toe is built to the seat elevation (p11 A-A); seat 1\" slope (p11) built level at the seat-front elevation. Needs: MnDOT stem/seat/ledge section for AbutmentDefinition.");
-G("Abutment infill wall: AbutmentDefinition always builds a corbel and three backwall pours (Iowa); set to zero size here. Needs: optional corbel / plain wall.");
+// Mapping onto AbutmentDefinition with the MnDOT STEM (AbutmentDefinition.Stem, semi-integral abutment p11 A-A / p21 A-A):
+//   footing            = plain 59'-7" x 6'-0" x 3'-0" block (back face 3'-3" behind CL brg, front 2'-9" ahead);
+//   stem               = back face 2'-6" behind CL brg (= backwall back face), front face 1'-6" ahead; back ledge 1'-6" (x -2'-6" .. -1'-0") at
+//                        footing top + 1'-7 1/4" S / 1'-4 3/4" N (p11 note 3); seat riser on the backwall front-face line (1'-0" behind CL brg),
+//                        seat at the riser = ledge + 1'-0" (p11 A-A), at the front face = the printed seat front 923.27 / 923.06 (1" slope, p11);
+//   backwall           = infill wall 1'-6" on the back ledge, ONLY in the E 18'-5" (WL +17'-7" .. +36'-0", p5 / p10 / p11 Detail C), one plain wall;
+//                        under the superstructure the end diaphragm sits on the ledge (diaphragms-br02069.csx);
+//   beam steps         = pedestals on the seat, 2'-4" (CL brg -1'-0" .. +1'-4") x plan size along the abutment;
+//   mask wall          = W end only, 1'-5 1/2" BESIDE the footing (inner face on the footing W end line WL -23'-7", p5 / p3), from the footing
+//                        bottom 917.75 to the printed top (p11 C-C: 12'-10 3/8" S / 12'-11" N).
+G("Mask wall details (p11 C-C / D-D): the 5\" x 5\" toe notch with 2\" Type B polystyrene, the 2\" x 1'-1\" coping and the 4\" step of the outer 7\" at the back end are not modeled (plain 1'-5 1/2\" x 6'-0\" panel; net about +0.07 CY). Needs: maskwall section details.");
+G("Stem construction-joint keyway 2\" x 12\" on the footing top (p11 A-A note 5) not modeled (volume-neutral).");
 G("Test piles: one test pile per abutment longer (S 105 vs 95 ft, N 100 vs 90 ft, back row, p4/p9) - one PileLength per abutment; contract lengths used. Needs: per-pile length.");
-G("Abutment reinforcing (bar-lists.csv A/B series, p6-p8, p12-p14; bend diagrams U3) not entered; the Iowa abutment rebar generator would invent placements -> substructure reinforcement off. Needs: plan bar data for a MnDOT abutment.");
+// Abutment reinforcing A / B series (p6-p8, p12-p14): plan bar sets, rebar-abutments-br02069.csx (below); the Iowa abutment rebar generator stays off.
 // U9 closed (SUMMARY sec. 4): mask wall at the W end only (p5 / p10, no mask wall at the E end, which ends flush at +36'-0" with keyways for the widening);
 //    the infill wall is only in the E 18'-5" (+17'-7" .. +36'-0"); under the superstructure the end diaphragm sits on the back ledge.
-G("Abutment infill wall extent: the plans have it only in the E 18'-5\" (WL +17'-7\" .. +36'-0\", p5 / p10 / p11 Detail C); the AbutmentDefinition backwall runs from the W mask wall to +36'-0\". Needs: backwall end offsets / end diaphragm on the ledge (p20, p21).");
 U("p4, p9", "pile tip elevations (U8)", "the pile notes give only estimated lengths (95 / 90 ft, test piles 105 / 100 ft), no tip elevations", "Piles hang the contract length from the head.");
-// U2 closed (SUMMARY sec. 3); the end diaphragm is modeled by diaphragms-br02069.csx (front-part bottom UNRESOLVED, below).
+// U2 closed (SUMMARY sec. 3); the end diaphragm (back + front part, polystyrene) is modeled by diaphragms-br02069.csx; decision 14 closed by p.21 A-A / p.11 Detail A.
 U("p8, p14, p21, p24", "bend dimensions of 22 bent marks and the barrier loop lengths (U3)", "one leg or hook of those marks is not dimensioned on the sheet, the barrier loops R505M / R517E / R506E / R507E / R518E do not add up to the listed length, and no sheet shows pin diameters", "No bars of these marks are modeled (reinforcement GAPs).");
-U("p21", "bottom of the end diaphragm FRONT part between the beams", "p.21 A-A / B-B dimension only the back part (VARIES) and the 1'-0 x 1'-0 front fillet; B814 is the parapet-abutment detail (Fig. 5-397.560 refers semi-integral abutments to the superstructure details)", "Front part not built; back part, paving bracket and polystyrene modeled (diaphragms-br02069.csx).");
 
 var seatRows = Csv("seat-elevations.csv");
-void SetAbutment(SupportDefinition sup, string side, double ledge, double seatFront, double infillTop, double maskTop, double pedAlong, double pileLen, string pages)
+void SetAbutment(SupportDefinition sup, string side, double ledgeAboveFooting, double seatFront, double infillTop, double maskTop, double pedAlong, double pileLen, string pages)
 {
     var ad = new AbutmentDefinition
     {
@@ -212,11 +211,13 @@ void SetAbutment(SupportDefinition sup, string side, double ledge, double seatFr
         PlanFootingWidth = Ft(6),
         BackwallThickness = F(1, 6), BackwallFrontToBearing = Ft(1), FootingBackToBackwallBack = In(9), BearingToFootingFront = F(2, 9),
         FootingDepth = Ft(3),
-        BackwallBaseAboveFootingBottom = Ft(ledge) - Ft(917.75),       // back ledge
-        WashHeight = Ft(seatFront) - Ft(917.75) - Ft(3),               // seat front above the footing top
+        // MnDOT stem (p11 A-A): front face 1'-6" ahead of CL brg; back ledge = footing top + 1'-7 1/4" S / 1'-4 3/4" N (note 3); seat at the riser
+        // = ledge + 1'-0"; seat front as printed (p5 / p10) -> 1" slope (p11). Riser = backwall front-face line 1'-0" behind CL brg.
+        Stem = new AbutmentStemDefinition { FrontToBearing = F(1, 6), Source = "p11 A-A, notes 3 / 5; p21 A-A" },
         BearingToStepFront = F(1, 4),                                  // pedestal 2'-4" along the beam (CL brg -1'-0" .. +1'-4", 2" short of the seat front; p6 / p12, U7)
         StepLength = pedAlong,
-        // zero-size corbel (see GAP above); the device-pour split = the top 1'-6" of the infill wall, joint 1'-6" + 0
+        BackwallLeftOffset = F(17, 7),                                 // infill wall only in the E 18'-5": W end at WL +17'-7" (p5 / p10 / p11 Detail C)
+        // the stem builds the infill wall as one plain wall (no corbel / pours); the corbel inputs are not used
         CorbelProjection = 0, CorbelVertical = 0, CorbelTaperRise = 0, LedgeBelowTop = F(1, 6), JointBelowTaper = 0,
         PileBackRowToBearing = F(1, 9), PileFrontRowToBearing = F(1, 3),  // 2 rows: 1'-9" behind, 1'-3" ahead of CL brg (p4, p9, p11)
         PileTopAboveFootingBottom = Ft(1),                              // 1'-0" embedment
@@ -224,8 +225,14 @@ void SetAbutment(SupportDefinition sup, string side, double ledge, double seatFr
     };
     ad.FootingBottom.Add(new CapProfilePoint(0, Ft(917.75)));
     ad.BackwallTop.Add(new CapProfilePoint(0, Ft(infillTop)));
-    // West mask wall 1'-5 1/2" (p11), top as printed; Height is measured from the seat (wash) level of the model.
-    ad.Masks.Add(new MaskwallDefinition { End = AbutmentEnd.Left, Thickness = In(17.5), Height = Ft(maskTop) - Ft(seatFront), Setback = 0 });
+    double ledge = Ft(917.75) + Ft(3) + ledgeAboveFooting;
+    ad.Stem!.LedgeTop.Add(new CapProfilePoint(0, ledge));
+    ad.Stem.SeatBackTop.Add(new CapProfilePoint(0, ledge + Ft(1)));
+    ad.Stem.SeatFrontTop.Add(new CapProfilePoint(0, Ft(seatFront)));
+    Print($"{sup.Name}: ledge {ledge / Ft(1):F3}, seat at riser {(ledge + Ft(1)) / Ft(1):F3}, seat front {seatFront:F2} (slope {(ledge + Ft(1) - Ft(seatFront)) / In(1):F2}\", plan 1\")");
+    // West mask wall 1'-5 1/2" (p11 C-C) BESIDE the footing: inner face on the footing W end line (Setback = -thickness), bottom = footing bottom
+    // 917.75, top as printed (height 12'-10 3/8" S / 12'-11" N, p11).
+    ad.Masks.Add(new MaskwallDefinition { End = AbutmentEnd.Left, Thickness = In(17.5), Setback = -In(17.5), BottomElevation = Ft(917.75), Height = Ft(maskTop) - Ft(917.75) });
     // Piles: 7 per row @ 9'-5", 1'-6" from the W end (1'-7" E) (p4, p9). Skew 0 on a tangent: S along the line = alignment offset.
     for (int k = 0; k < 7; k++) ad.PileStations.Add(-F(23, 7) + F(1, 6) + k * F(9, 5));
     // Pedestals for the FUTURE beam lines (+21, +27, +33; S Type B p5 note 6 / p6, N Type D p10 note 6 / p12) are BUILT NOW - only the beams are
@@ -250,11 +257,11 @@ void SetAbutment(SupportDefinition sup, string side, double ledge, double seatFr
     sd.BackwallGap = Ft(1) - F(1, 10);                               // deck end 1'-10" vs infill face 1'-0": end diaphragm zone (no gap) -> report only
     sup.Substructure = sd;
 }
-// S: ledge 922.35, seat front 923.27, infill 927.73, mask top 930.61, pedestals 4'-8" along the abutment, piles 95 ft (13 + test 105)
-SetAbutment(b.Supports[0], "S", 922.35, 923.27, 927.73, 930.61, F(4, 8), 95, "p4, p5, p11");
-// N: ledge 922.15, seat front 923.06, infill 927.80, mask top 930.67, pedestals 3'-6", piles 90 ft (13 + test 100)
-SetAbutment(b.Supports[1], "N", 922.15, 923.06, 927.80, 930.67, F(3, 6), 90, "p9, p10, p11");
-G("Deck end 1'-10\" from CL brg is 10\" BEYOND the infill wall face (1'-0\" behind CL brg): the slab end sits over the end diaphragm (semi-integral, p18 / p20 / p21); the end diaphragm back part (diaphragms-br02069.csx) is under the slab end, the backwall (infill) still runs the full length (GAP above).");
+// S: ledge = footing top + 1'-7 1/4" (922.354), seat front 923.27, infill 927.73, mask top 930.61, pedestals 4'-8" along the abutment, piles 95 ft (13 + test 105)
+SetAbutment(b.Supports[0], "S", In(19.25), 923.27, 927.73, 930.61, F(4, 8), 95, "p4, p5, p11");
+// N: ledge = footing top + 1'-4 3/4" (922.146), seat front 923.06, infill 927.80, mask top 930.67, pedestals 3'-6", piles 90 ft (13 + test 100)
+SetAbutment(b.Supports[1], "N", In(16.75), 923.06, 927.80, 930.67, F(3, 6), 90, "p9, p10, p11");
+// Deck end 1'-10" from CL brg = 10" behind the riser line (1'-0" behind CL brg): the slab end sits on the end diaphragm back part / paving bracket (semi-integral, p18 / p20 / p21).
 
 Doc.Project.Bridges.Add(b);
 
@@ -263,6 +270,22 @@ Doc.Project.Bridges.Add(b);
     var dr = await SBM.Api.ScriptHost.RunFileAsync(@"samples\plans\diaphragms-br02069.csx", Doc, Args);
     Print(dr.Output.TrimEnd());
     if (!dr.Success) Print("ERROR in diaphragms-br02069.csx: " + dr.Error);
+}
+
+// ---------------------------------------------------------------- abutment reinforcing (plan bars, rebar-abutments-br02069.csx)
+{
+    var ar = await SBM.Api.ScriptHost.RunFileAsync(@"samples\plans\rebar-abutments-br02069.csx", Doc, Args);
+    Print(ar.Output.TrimEnd());
+    if (!ar.Success) Print("ERROR in rebar-abutments-br02069.csx: " + ar.Error);
+    var dk = await SBM.Api.ScriptHost.RunFileAsync(@"samples\plans\rebar-deck-br02069.csx", Doc, Args);
+    Print(dk.Output.TrimEnd());
+    if (!dk.Success) Print("ERROR in rebar-deck-br02069.csx: " + dk.Error);
+    var dr2 = await SBM.Api.ScriptHost.RunFileAsync(@"samples\plans\rebar-diaphragms-br02069.csx", Doc, Args);
+    Print(dr2.Output.TrimEnd());
+    if (!dr2.Success) Print("ERROR in rebar-diaphragms-br02069.csx: " + dr2.Error);
+    var bb2 = await SBM.Api.ScriptHost.RunFileAsync(@"samples\plans\rebar-barrier-br02069.csx", Doc, Args);
+    Print(bb2.Output.TrimEnd());
+    if (!bb2.Success) Print("ERROR in rebar-barrier-br02069.csx: " + bb2.Error);
 }
 
 // ---------------------------------------------------------------- beam mild reinforcing from the beam standard (beam-rebar-br02069.csx)

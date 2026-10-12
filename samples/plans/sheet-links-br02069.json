@@ -5,7 +5,8 @@
   // split tool's title-block reader (Iowa DOT blocks) does not read the MnDOT / HDR title box.
   // Hierarchy in this model: unit > superstructure > prestressed girder (assembly: beam, strands, debond sheathing) | bearing pad;
   //   unit > deck > deck slab, barrier group > barrier; unit > substructure > abutment > cap group (pedestals / beam steps) |
-  //   backwall group | footing group (footing, piles) | maskwall group. Concrete end diaphragms and all rebar are not in the database yet.
+  //   backwall group | footing group (footing, piles) | maskwall group; plan bars: abutment bars under the abutment, deck reinforcing / diaphragm
+  //   reinforcing under the deck, barrier reinforcing under the barrier group. Concrete end diaphragms (solids) are not in the database yet.
 
   "models": [ "Br02069 TH65.sbm" ],
   "planFolders": [ "plans", "C:/SBMData" ],
@@ -80,6 +81,10 @@
       "target": [ { "level": "assembly", "category": "prestressed girder" } ] },
     { "id": "superstructure", "sheets": "^SUPERSTRUCTURE DETAILS", "basis": "Deck, end diaphragms, deck reinforcing and bar list",
       "target": [ { "level": "part", "category": "deck" } ] },
+    { "id": "diaphragm-rebar", "sheets": "^SUPERSTRUCTURE DETAILS [34]", "basis": "End diaphragm reinforcing: plan / elevation (sheet 20), sections A-A / B-B and bill (sheet 21)",
+      "target": [ { "level": "group", "category": "diaphragm reinforcing" } ] },
+    { "id": "abutment-section-semi-integral", "sheets": "^SUPERSTRUCTURE DETAILS 4", "basis": "Section A-A / B-B: semi-integral end diaphragm on the abutment stem (back ledge, seat, polystyrene)",
+      "target": [ { "level": "part", "category": "abutment" } ] },
 
     { "id": "barrier", "sheets": "^(BARRIER LAYOUT|CONCRETE BARRIER|MISCELLANEOUS CONCRETE BARRIER|BRIDGE DETAILS 4)", "basis": "Concrete barrier: layout, profile, reinforcing",
       "target": [ { "level": "group", "category": "barrier group" } ] },

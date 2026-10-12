@@ -214,10 +214,14 @@ public sealed partial class ConcreteGenerator
         hosts.AddRange(_m.Joints.Where(j => j.EndBlock != null).Select(j => j.EndBlock!.Mesh));
         var res = PlanBarSetBuilder.Build(Deck.Reinforcement.PlanBarSets, p => p, "", "Deck", hosts, Deck.Reinforcement.EpoxyCoated, new Func<Vec3, (double, Vec3)>[] { Slab });
         foreach (var w in res.Warnings) Warn(w);
+        // barrier / diaphragm sets: their bars keep the element's group (database: barrier reinforcing / diaphragm reinforcing)
+        var elem = Deck.Reinforcement.PlanBarSets.GroupBy(x => x.Mark).ToDictionary(g => g.Key, g => g.First().Element);
+        string GroupOf(string mark) => elem.TryGetValue(mark, out var e) ? e switch { "barrier" => "Rail", "diaphragm" => "Diaphragm", _ => "Deck" } : "Deck";
+        var bars = res.Bars.Select(b => GroupOf(b.Mark) == b.Group ? b : new BarPlacement { Mark = b.Mark, Points = b.Points, Frame = b.Frame, Group = GroupOf(b.Mark), Unit = b.Unit }).ToList();
         lock (_m)
         {
             _m.Marks.AddRange(res.Marks);
-            _m.Bars.AddRange(res.Bars);
+            _m.Bars.AddRange(bars);
             _m.Notes.AddRange(res.Notes);
             _m.CoverViolations.AddRange(res.Violations);
         }

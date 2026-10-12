@@ -118,6 +118,37 @@ public static class AbutmentViews
         double X(double x) => xLeft + (x - g.XFootBack);
         double zb = g.FootingBottom(sC), zt = g.BackwallTop(sC);
         double K = ad.BackwallBaseAboveFootingBottom, xF = g.XFootFront, xB = g.XFootBack;
+        if (g.SeatAt != null && g.LedgeTop != null)
+        {
+            // MnDOT stem: plain footing, stem with back ledge + seat, infill wall on the ledge only where it is built
+            double xs = g.XStemFront, zl = g.LedgeTop(sC);
+            dS.CutConcrete(new List<Vec2> { new(X(xB), zb), new(X(xF), zb), new(X(xF), zb + D), new(X(xB), zb + D) }, 0.06);
+            dS.CutConcrete(new List<Vec2> { new(X(g.XBwBack), zb + D), new(X(xs), zb + D), new(X(xs), g.SeatAt(sC, xs)), new(X(g.XBwFront), g.SeatAt(sC, g.XBwFront)), new(X(g.XBwFront), zl), new(X(g.XBwBack), zl) }, 0.06);
+            bool infill = sC > g.BwLeftS(g.N(g.XBwBack)) && sC < g.BwRightS(g.N(g.XBwBack));
+            var iw = new List<Vec2> { new(X(g.XBwBack), zl), new(X(g.XBwFront), zl), new(X(g.XBwFront), zt), new(X(g.XBwBack), zt) };
+            if (infill) dS.CutConcrete(iw, 0.06); else dS.Poly(SheetLayers.ConcreteHidden, iw, true);
+            dS.ElevationTag(new Vec2(X(g.XBwBack), zl), $"LEDGE EL {dS.Elev(zl)}", right: false);
+            dS.ElevationTag(new Vec2(X(xs), g.SeatAt(sC, xs)), $"SEAT EL {dS.Elev(g.SeatAt(sC, xs))}", right: true);
+            if (tall != null)
+                dS.CutConcrete(new List<Vec2> { new(X(g.XBwFront), g.SeatAt(sC, g.XBwFront)), new(X(g.XStepFront), g.SeatAt(sC, g.XStepFront)), new(X(g.XStepFront), tall.TopZ), new(X(g.XBwFront), tall.TopZ) }, 0.06);
+            foreach (double xr in ad.PileRows)
+            {
+                double top = zb + ad.PileTopAboveFootingBottom;
+                dS.Poly(SheetLayers.SteelHidden, new[] { new Vec2(X(xr) - In(6), top), new Vec2(X(xr) - In(6), zb - Ft(2)) });
+                dS.Poly(SheetLayers.SteelHidden, new[] { new Vec2(X(xr) + In(6), top), new Vec2(X(xr) + In(6), zb - Ft(2)) });
+            }
+            dS.Line(SheetLayers.Center, new Vec2(X(0), zb - Ft(2.5)), new Vec2(X(0), zt + dS.Paper(0.3)));
+            dS.Text("CL BRG", new Vec2(X(0), zt + dS.Paper(0.45)), dS.TextH, 0, TextAlign.Center);
+            double yD0 = zb - dS.Paper(0.5);
+            dS.DimChain(new[] { xB, g.XBwBack, g.XBwFront, 0.0, xs, xF }.Select(x => new Vec2(X(x), yD0)).ToList(), 0);
+            dS.Dim(new Vec2(X(xB), zb), new Vec2(X(xF), zb), -0.75, dS.Short(ad.FootingWidth));
+            dS.Dim(new Vec2(X(xF), zb), new Vec2(X(xF), zb + D), -0.4, dS.Short(D));
+            if (tall != null) dS.Text($"{tall.Tag} STEP TOP EL {dS.Elev(tall.TopZ)}", new Vec2(X(g.XStepFront) + dS.Paper(0.15), tall.TopZ), dS.SmallTextH, 0, TextAlign.Left);
+            dS.Title("SECTION THROUGH ABUTMENT", $"Normal to the line{(tall != null ? $" at {tall.Tag} (tallest step)" : "")}; stem with back ledge and seat; span side right · Scale {DrawingOptions.ScaleText(dS.Scale, u)}",
+                new Vec2(X((xB + xF) / 2), zb - dS.Paper(2.0)));
+        }
+        else
+        {
         dS.CutConcrete(new List<Vec2>
         {
             new(X(xB), zb), new(X(xF), zb), new(X(xF), zb + D + W), new(X(g.XBwFront), zb + D + W), new(X(g.XBwFront), zb + K), new(X(g.XBwBack), zb + K), new(X(g.XBwBack), zb + D), new(X(xB), zb + D),
@@ -151,6 +182,7 @@ public static class AbutmentViews
         if (tall != null) dS.Text($"{tallName} STEP TOP EL {dS.Elev(tall.TopZ)}", new Vec2(X(g.XStepFront) + dS.Paper(0.15), tall.TopZ), dS.SmallTextH, 0, TextAlign.Left);
         dS.Title("SECTION THROUGH ABUTMENT", $"Normal to the line{(tall != null ? $" at {tallName} (tallest step)" : "")}; span side right · Scale {DrawingOptions.ScaleText(dS.Scale, u)}",
             new Vec2(X((xB + xF) / 2), zb - dS.Paper(2.0)));
+        }
 
         // ================= piling / wing layout plan (S along the line, N across it, true plan shape)
         var dwgP = new PlanDrawing();

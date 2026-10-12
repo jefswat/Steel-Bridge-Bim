@@ -215,7 +215,8 @@ public sealed partial class ConcreteGenerator
             var dir = tangent.Right;
             if (z.AngleDegrees != 0) dir = dir.Rotate(z.AngleDegrees * Math.PI / 180);
             var a = _a.PointAtDistance(d);
-            if (!LineAcrossVar(a, dir, x => LeftAtD(x) + cover, x => RightAtD(x) - cover, d, out var p0, out var p1) || !ClipToEnds(ref p0, ref p1, clearB, clearE))
+            double side = z.SideClear > 0 ? z.SideClear : cover;
+            if (!LineAcrossVar(a, dir, x => LeftAtD(x) + side, x => RightAtD(x) - side, d, out var p0, out var p1) || !ClipToEnds(ref p0, ref p1, clearB, clearE))
             { Interlocked.Increment(ref missed); return; }
             // reference point must lie on the line (the line is anchored at the reference edge point by construction when AngleDegrees = 0)
             double L = Vec2.Distance(p0, p1);
@@ -420,7 +421,12 @@ public sealed partial class ConcreteGenerator
             if (pts.Count < 2 || cum[^1] < Ft(2)) { Interlocked.Increment(ref bad); return; }
             var P = pts.ToArray(); var C = cum.ToArray();
             double Lt = C[^1];
-            void Emit(double a, double b, string mark, double nominal) => sink.Add(new PlanBar(mark, size, loc, nominal, b - a, SubPolyline2D(P, C, a, b)));
+            bool fromEnd = z0.AlternateEnds && t.Segs[0].k % 2 == 1;    // staggered: odd lines laid from the end of the track
+            void Emit(double a, double b, string mark, double nominal)
+            {
+                if (fromEnd) (a, b) = (Lt - b, Lt - a);
+                sink.Add(new PlanBar(mark, size, loc, nominal, b - a, SubPolyline2D(P, C, a, b)));
+            }
             if (Lt <= z0.StockLength + 1e-6)
             {
                 bool stock = Math.Abs(Lt - z0.StockLength) <= In(1);

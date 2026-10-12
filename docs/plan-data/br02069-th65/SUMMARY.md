@@ -74,7 +74,7 @@ Bridge: single simple span 99'-3" CL-CL brg, 0 deg skew, seven MnDOT 30MH preten
 | End diaphragms | concrete, both abutments, semi-integral (p17 "integral & semi-integral abutment") | - | p15, p17, p20, p21 | TEXT | detail rows below |
 | End diaph. thickness | 3'-0" (plan: 1'-6" back face -> CL end diaph + 1'-6" -> front face) | - | p20 plan, p21 A-A/B-B | TEXT | |
 | End diaph. stations across | back face = back face of abutment; CL brg 2'-6" from back face (1'-3" + 3" + 1'-0"); front face of diaph 6" ahead of CL brg; front face of abut 1'-6" ahead of CL brg | - | p21 A-A/B-B, p20 plan (10"+1'-0"+6"+1'-0" stack) | TEXT | 1'-3"+3"+1'-0"+1'-6" = 4'-0" stem ok; 2'-6"+6" = 3'-0" ok |
-| End diaph. bottom | rear 1'-3" sits on the abutment back ledge on 1" Type A polystyrene; 3" Type B polystyrene against the seat riser (the 3" in the dim chain); 1" backer rod at back face | - | p21 A-A, p11 Detail A | TEXT | bottom elevation = back ledge + 1" (S 922.35 / N 922.15 DERIVED, sec. 4) |
+| End diaph. bottom | back part (x -2'-6" .. -1'-3") on the back ledge on 1" Type A polystyrene (bottom = ledge + 1"); FRONT part (x -1'-3" .. +6") bottom = BOTTOM OF THE BEAMS: p21 A-A (between beams) draws the diaphragm bottom as the continuation of the beam-bottom line (vector: one line), B-B the same at the beams, p11 A-A draws it 3" (the bearing) above the pedestal top; 3" x 3" chamfer at the back-bottom corner (p11 Detail A); 3" Type B polystyrene between the face x -1'-3" and the seat riser x -1'-0" from the ledge up to the chamfer; 1" backer rod at the back face | - | p21 A-A / B-B, p11 A-A + Detail A | TEXT + vector | ledge = footing top + 1'-7 1/4" S (922.354) / 1'-4 3/4" N (922.146), p11 note 3 |
 | End diaph. depth | "VARIES" (top of deck to bottom); back face: 1'-4" paving-bracket notch, then S609E B.F. 2 eq. sps + 2 eq. sps + 4" | - | p21 A-A/B-B | TEXT | total not dimensioned; follows deck profile |
 | Paving bracket | 8" wide x 1'-4" deep notch at back face top; 1/2" x 7" bit. felt; 4" (note 1: to approach panel dowel bar); 5 1/2" deck end to first S615M; 4 1/2" clr S617S; sawcut joint (note 4) | - | p21, p20 plan (8" paving bracket) | RASTER | 5 1/2, 4 1/2 confirmed on clip |
 | Front fillet | between beams, front face of diaph meets slab underside with a 1'-0" (vert, A-A) x 1'-0" (horiz, B-B) 45 deg fillet; S405E 2 bars | - | p21 A-A, B-B | TEXT | slab 9" above fillet |
@@ -153,7 +153,7 @@ SOQ p2: barrier 273 LF; struct. conc. 140 CY (71+69 ok); bars 19200/19970/250; s
 | id | open item | pages | status |
 |---|---|---|---|
 | U1 | horizontal datum not stated | p34, p36, p37 | UNRESOLVED |
-| U2 | end diaphragm geometry | p17, p20, p21, p11, p3, p5 | closed (sec. 3); length 41'-0" DERIVED from mask wall / infill wall faces - no direct dimension |
+| U2 | end diaphragm geometry | p17, p20, p21, p11, p3, p5 | closed (sec. 3); length 41'-0" DERIVED from mask wall / infill wall faces - no direct dimension; front-part bottom (user decision 14) closed by p21 A-A / B-B + p11 A-A / Detail A: bottom of the beams, 3" x 3" chamfer (sec. 8) |
 | U3 | bend dimensions | p8, p14, p21, p24 | closed for 25 marks (bend-diagrams.csv); still UNRESOLVED: 22 marks with one leg / hook not dimensioned on the sheet (A/B 504E, 505E, 514E, 420E, 423E, 502E hooks, 503E hooks; S615M, S616M, S617S; R501M-R504E foot; R408E 2:12 leg); barrier loops R505M/R517E/R506E/R507E/R518E do not reconcile with the true-length sum (std barrier sheet length convention not stated, p24); pin diameters not shown on any sheet |
 | U4 | deck line counts 55/29 vs spacing | p19 | closed: 1 extra line 7" (bot) / 3 1/2" (top) from each deck edge |
 | U5 | 17'-9 7/8", 9'-4 1/4" raster | p1, p22 | closed (RASTER) |
@@ -176,3 +176,28 @@ SOQ p2: barrier 273 LF; struct. conc. 140 CY (71+69 ok); bars 19200/19970/250; s
 | 7 | ElevationCheck chain (p3), span 99.25, seats, bar weights | |
 
 Program gaps: (1) no MnDOT shapes in TxGirderCatalog / TxGirderType; 30MH needs Custom dims or PGSuper, straight-taper outline can't do 6" R fillets, fit to 1/16" unchecked; (2) no debonding in StrandPoint, PgSuperImport models full length (14/44 strands); (3) TxDOT-specific IGND / IGEB / naming; (4) no curved-plate bearing assemblies (pad only); (5) no concrete end diaphragm / semi-integral abutment; (6) PileType has no round CIP pipe pile; (7) no standalone future pedestals or per-abutment pedestal sizes; (8) AbutmentDefinition (Iowa) vs ledge/infill/mask-wall abutment not verified; (9) only TxDOT SSTR barrier profile; (10) prestressed camber not modeled in the haunch.
+
+## 8. Semi-integral abutment - p21 SECTION A-A / B-B (read 2026-10-12, vector linework, 3 pt per inch)
+x from the CL brg (+ toward the span), z from the deck top in the schematic (deck 9", haunch drawn 3", beam 30").
+| item | value | source |
+|---|---|---|
+| Back face of abutment AND diaphragm | x -2'-6" (chain 1'-3" + 3" + 1'-0") | A-A / B-B dims |
+| CL end diaphragm / front face of diaphragm | -1'-0" / +6" (1'-6" + 1'-6", 6") | dims |
+| Front face of abutment (stem) | +1'-6" | dim |
+| Back part | x -2'-6" .. -1'-3", bottom = ledge + 1" (1" Type A polystyrene), top = deck soffit; paving bracket 8" (x -2'-6" .. -1'-10" = slab end) with its top 1'-4" under the deck top, 1/2" x 7" bit. felt | dims |
+| Seat riser / 3" Type B polystyrene | riser at x -1'-0" (= seat back edge, ledge + 1'-0"); polystyrene x -1'-3" .. -1'-0" from the ledge to the chamfer | dims, Detail A |
+| Front part bottom | bottom of the beams (one line with the beam bottom beyond), 3" x 3" chamfer at x -1'-3" | vector, Detail A |
+| Front fillet | 1'-0" (vertical, A-A) x 1'-0" (horizontal, B-B) under the slab at the front face | dims |
+| Beams | end 7 1/2" behind CL brg inside the diaphragm; drawn bottom 3" above the pedestal top (bearing) | p17 table, vector |
+| Pedestal | x -1'-0" .. +1'-4" on the seat (2" short of the front face), top >= 2" above the seat back edge (p11 A-A "2" MIN.") | dims |
+| Seat | 1'-0" above the ledge at the riser, 1" slope down to the front face (seat front 923.27 S / 923.06 N) | p11 A-A, p5 / p10 |
+| Stem / footing | stem 4'-0" (back ledge 1'-6" + seat 2'-6") on the 6'-0" x 3'-0" footing, 9" back toe / 1'-3" front toe at the footing top 920.75, 2" x 12" keyway | p11 A-A |
+| Infill / mask wall | infill wall 1'-6" on the back ledge only WL +17'-7" .. +36'-0" (1" Type B polystyrene to the diaphragm end, Detail C); W mask wall beside the footing end (inner face -23'-7"), 917.75 .. 930.61 / 930.67 | p5 / p10 / p11 |
+| Approach panel | rests on the paving bracket; S617S (stainless) ties the diaphragm into it; 5 1/2" from the deck end to the first S615M, 4 1/2" clr S617S | A-A |
+| Expansion | semi-integral: diaphragm + beams move on the curved-plate bearings (F1 fixed S, E1 expansion N); polystyrene on the ledge / at the riser / at the ends, backer rod at the back face | A-A, p31 |
+
+## 9. Reinforcing placed (2026-10-12) - see MODEL.md
+All 93 bill marks are in the model: abutments A / B (58, `rebar-abutments-br02069.csx`), deck S401M-S404M (`rebar-deck-br02069.csx`, DeckPlanReinforcement),
+end diaphragm S405E-S617S (`rebar-diaphragms-br02069.csx`), barrier on the deck R501M / R505M / R411M / R413M / R612M / R614M (`rebar-barrier-br02069.csx`);
+approach-panel barrier bars (12 marks) scheduled only (no approach panel in the model). Counts = bills, weights within 0.5 lb per mark, coating totals = SOQ.
+
