@@ -73,6 +73,7 @@ public partial class MainWindow
             View.Items.Remove(ov);
             _fullMeshes.Remove(ov);
             _detailBounds.Remove(ov);
+            _evicted.Remove(ov);
             foreach (var list in _layerModels.Values) list.Remove(ov);
         }
         _lodOverlays.Clear();

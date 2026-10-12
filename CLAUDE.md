@@ -83,7 +83,7 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
     CUT (inset) kinked-end vertices; panels at kink stations, clamped to skewed ends + per-panel columns where a kink line meets an end;
     haunch per girder split at per-span-layout jogs; barriers). The mesh is tessellated FROM the NURBS (`Mesh.Nurbs`, `NurbsTriangles`,
     `HasExactNurbs`, `ExactVolume()`); every consumer (viewport, drawings, checks, IFC, quantities) still reads the mesh. Opt-ins: `SteelPart.ExactVolume`,
-    `NurbsQuantities.Rows` / `SbmDocument.ExactQuantities`, `sbm nurbs` (timings off/on, fallbacks, exact vs mesh volumes, csv). Not wired yet:
+    `NurbsQuantities.Rows` / `SbmDocument.ExactQuantities`, `sbm nurbs` (timings off/on, fallbacks, exact vs mesh volumes, csv). Measure snaps refine onto the NURBS (see App). Not wired yet:
     drawings section cuts, view-dependent viewport tessellation, welds / stiffeners / deck end blocks / joint shelves (stay meshes).
     Cost (2026-10-11): I-80 + Ramp G full regen 27 s OFF -> 41 s ON; Woodbury 0.2 -> 1.1 s cold. Tests `NurbsTests`.
   - `Solids/PlateBuilder.cs` â€” plates WITH HOLES: polygon+holes triangulation (horizontal bridge to the +x ray hit â€”
@@ -400,6 +400,25 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
     after each scene rebuild; ranked candidates + occlusion test), pure helpers `SBM.Core/Geometry/SnapMath.cs`, `PointQuery.cs`.
     Query cost control: best-first BVH traversal, search radius shrinks to (K-th best score + max bonus) px once K=10 candidates are known
     (exact), 4 ms traversal budget, feature-edge checks deferred to ranking. Index is debounced (one build per scene burst; prebuilt once at startup).
+  - Viewport GPU memory (`MainWindow.Vram.cs`, inventory `Viewport/SceneInventory.cs`, pure planner `SBM.Core/Geometry/VramBudget.cs`, tests `VramAndExactSnapTests`):
+    every model's buffers are estimated with HelixToolkit layouts (mesh vertex 52 B, line vertex 32 B, index 4 B, instance 64 B) and compared
+    with the budget (Memory menu / `%LOCALAPPDATA%\SteelBridgeModeler\viewport-memory.json`; 0 = 80 % of the DXGI budget beyond the startup
+    usage, `QueryVideoMemoryInfo` via `EffectsManager.Device`). `VramPlanner.Ladder` order (user's): terrain clip 400 m + image 2048 px ->
+    terrain stride 2 / 3 -> detail tiles within 120 m RESIDENT (far tiles removed from `View.Items` = buffers freed; Helix creates buffers on
+    first draw, so hidden-but-attached tiles still filled the GPU as the user orbited) -> steel plates without bolt holes (`MeshLod.WithoutHoles`,
+    from the ExtrudedSolid recipes; scene rebuilt from the cache) -> 60 m -> far bridges (units, > 150 m from the line of sight) primary
+    layers only (`VramPlanner.PrimaryLayers`) -> terrain stride 8 + 1024 px -> 30 m -> terrain off -> detail off. Terrain is planned BEFORE
+    its buffers are built (`MainViewModel.PlanTerrainDisplay`, `TerrainDisplayOptions`, `ElevationGrid.ToMesh(stride, clip)`). Render OOM
+    (`View.RenderExceptionOccurred`) and DXGI usage > 95 % of the budget (checked on camera settle) step one level; managed OOM while building
+    the scene rebuilds without detail (`SceneBuilder.SkipDetail`). Solid layers are built per bridge and merged (`SolidLayer.PartBridges`).
+    Flat-shaded meshes share vertices of coplanar neighbours (`SceneBuilder.ShareVertices`); bars are one mitred loft each (`TubeBuilder`).
+    Log lines `VRAM plan` (breakdown by group / bridge / ladder), `VRAM usage` (DXGI). Snapshot options `--vram MB`, `--vramlevel N`,
+    `--novramreduce`, `--noshare`; snapshots now wait for the reference load. I-80 + Ramp G: 8.1 GB before -> 5.5 GB full detail, 2.0 GB
+    without holes (numbers in docs/HANDOFF.md section 0-vram).
+  - Exact measure snaps: with `Geometry.ExactCurvedGeometry` ON, a Surface snap on a part whose mesh has NURBS (SteelPart, deck / haunch /
+    barrier `NamedPick.Source`, SubPick) is refined onto the exact face (`NurbsSnap.TryRefine`: coarse sample + closest point, then Newton
+    ray / surface; planar faces ray / plane; holes rejected); `SnapHit.ExactWorld` is used by the measure and the readout says
+    "(exact, x off the mesh)". OFF = today's mesh snap unchanged.
   - Near-view rebar LOD (`MainWindow.RebarLod.cs`, `Viewport/SmoothRebar.cs`): zoomed in (width < 60 ft) and settled, bars within 20 ft of the view-center ray become smooth
     lofted tubes (parallel transport, bends <= 10 deg/step, 10 sides) in an overlay model per rebar layer; the same bars are skipped in the light tile/instanced models via
     `_lodSkip` (flows through ApplyToModel / HiddenRanges). Settings in static `RebarLod`; snapshot `--nolod --lodradius --lodwidth --width --noterrain --framebench --pickafter --hideafter`.

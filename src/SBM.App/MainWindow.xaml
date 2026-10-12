@@ -364,6 +364,9 @@
                     <ToggleButton x:Name="CompassViewButton" Content="Views ▾" Style="{StaticResource ModeToggle}" Click="OnCompassViews"
                                   ToolTip="3D views from N, NE, E, SE, S, SW, W, NW at a set look-down angle; detail drawing distance"/>
                     <Border Width="10"/>
+                    <ToggleButton x:Name="VramMenuButton" Content="Memory ▾" Style="{StaticResource ModeToggle}" Click="OnVramMenu"
+                                  ToolTip="Graphics memory: budget, what is simplified when the GPU memory runs short (terrain, far detail, far bridges), detail level"/>
+                    <Border Width="10"/>
                     <RadioButton Content="Extents" GroupName="ZoomCmds" Style="{StaticResource ModeToggle}" Click="OnZoomExtentsButton" ToolTip="Zoom extents"/>
                     <RadioButton Content="Window" GroupName="ZoomCmds" Style="{StaticResource ModeToggle}" Click="OnZoomWindowButton" ToolTip="Zoom window: drag a rectangle"/>
                 </StackPanel>
@@ -607,6 +610,8 @@
         <Border Grid.Row="2" Background="#FF007ACC" Padding="8,3">
             <DockPanel>
                 <TextBlock DockPanel.Dock="Right" Text="{Binding StatusText}" Foreground="White" Margin="16,0,0,0"/>
+                <TextBlock DockPanel.Dock="Right" Text="{Binding VramText}" Foreground="#FFE8F0FF" Margin="16,0,0,0" MaxWidth="560" TextTrimming="CharacterEllipsis"
+                           ToolTip="{Binding VramText}"/>
                 <TextBlock Text="{Binding CursorText}" Foreground="White" FontFamily="Consolas" TextTrimming="CharacterEllipsis"/>
             </DockPanel>
         </Border>
