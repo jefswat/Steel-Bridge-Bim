@@ -89,60 +89,83 @@ public readonly record struct SectionFrame(Vec3 Origin, Vec3 Lat, Vec3 Up, Vec3 
     public Vec3 At(Vec2 p) => Origin + Lat * p.X - Up * p.Y;
 }
 
-/// <summary>Closed lofts through placed sections (hollow box, or the solid outline).</summary>
+/// <summary>Closed lofts through placed sections. Every ring has the outer outline; the void is present on a contiguous run of rings that
+/// includes the first or the last ring (hollow box, solid outline, or a hollow part closed by a solid diaphragm = ONE closed shell).</summary>
 public static class SegmentalLoft
 {
     public static Mesh Build(IReadOnlyList<(SectionFrame f, List<Vec2> outer, List<Vec2>? voidRing)> rings, int outerCl, int voidCl)
     {
         var m = new Mesh();
         int no = rings[0].outer.Count;
-        bool hollow = rings[0].voidRing != null;
-        int nv = hollow ? rings[0].voidRing!.Count : 0;
-        int per = no + nv;
-        foreach (var (f, o, v) in rings)
+        var baseIdx = new int[rings.Count];
+        var voidIdx = new int[rings.Count];
+        for (int k = 0; k < rings.Count; k++)
         {
+            var (f, o, v) = rings[k];
+            baseIdx[k] = m.Positions.Count;
             foreach (var p in o) m.Add(f.At(p));
-            if (hollow) foreach (var p in v!) m.Add(f.At(p));
+            voidIdx[k] = -1;
+            if (v != null) { voidIdx[k] = m.Positions.Count; foreach (var p in v) m.Add(f.At(p)); }
         }
+        int nv = rings.FirstOrDefault(r => r.voidRing != null).voidRing?.Count ?? 0;
+        // Orientation: rings CCW in section (x, y-down) = normal along the sweep (+T); outer faces (e x T) outward, void faces reversed.
         for (int k = 0; k + 1 < rings.Count; k++)
         {
-            int a0 = k * per, b0 = (k + 1) * per;
+            int a0 = baseIdx[k], b0 = baseIdx[k + 1];
             for (int i = 0; i < no; i++)
             {
                 int i1 = (i + 1) % no;
                 m.Tri(a0 + i, a0 + i1, b0 + i1); m.Tri(a0 + i, b0 + i1, b0 + i);
             }
-            for (int i = 0; i < nv; i++)
+            if (voidIdx[k] >= 0 && voidIdx[k + 1] >= 0)
             {
-                int i1 = (i + 1) % nv;
-                int p00 = a0 + no + i, p01 = a0 + no + i1, p10 = b0 + no + i, p11 = b0 + no + i1;
-                m.Tri(p00, p11, p01); m.Tri(p00, p10, p11);
+                int va = voidIdx[k], vb = voidIdx[k + 1];
+                for (int i = 0; i < nv; i++)
+                {
+                    int i1 = (i + 1) % nv;
+                    m.Tri(va + i, vb + i1, va + i1); m.Tri(va + i, vb + i, vb + i1);
+                }
             }
         }
-        // caps: two half polygons (right: CL top -> right side -> CL bottom [-> void up to its top CL]; left likewise)
-        var halves = new List<List<int>>();
-        var right = Enumerable.Range(0, outerCl + 1).ToList();
-        var left = Enumerable.Range(outerCl, no - outerCl).Append(0).ToList();
-        if (hollow)
+        // end caps (start faces -T, end faces +T): two half polygons each, so the hollow cap is two simple C-shaped polygons
+        void Cap(int k, bool start)
         {
-            for (int j = voidCl; j >= 0; j--) right.Add(no + j);
-            // left: outer from the soffit CL round to the top CL, then the void from its top CL round the left side to its bottom CL
-            left = Enumerable.Range(outerCl, no - outerCl).Append(0).ToList();
-            left.Add(no + 0);
-            for (int j = nv - 1; j >= voidCl; j--) left.Add(no + j);
-        }
-        halves.Add(right);
-        halves.Add(left);
-        var sec0 = rings[0].outer.Concat(rings[0].voidRing ?? new List<Vec2>()).ToList();
-        int last = (rings.Count - 1) * per;
-        foreach (var h in halves)
-        {
-            var poly = h.Select(i => sec0[i]).ToList();
-            // section coordinates have y DOWN: flip y so the triangulation's CCW is the geometric CCW of (x, -y)... handled by the volume check below
-            foreach (var (a, b, c) in MeshBuilder.Triangulate(poly))
+            var (_, o, v) = rings[k];
+            var halves = new List<List<int>>();
+            var right = Enumerable.Range(0, outerCl + 1).ToList();
+            var left = Enumerable.Range(outerCl, no - outerCl).Append(0).ToList();
+            if (v != null)
             {
-                m.Tri(h[a], h[c], h[b]);
-                m.Tri(last + h[a], last + h[b], last + h[c]);
+                for (int j = voidCl; j >= 0; j--) right.Add(no + j);
+                left.Add(no + 0);
+                for (int j = nv - 1; j >= voidCl; j--) left.Add(no + j);
+            }
+            halves.Add(right); halves.Add(left);
+            var sec = o.Concat(v ?? new List<Vec2>()).ToList();
+            int b = baseIdx[k];
+            int Map(int i) => i < no ? b + i : voidIdx[k] + (i - no);
+            foreach (var h in halves)
+                foreach (var (a, bb, c) in MeshBuilder.Triangulate(h.Select(i => sec[i]).ToList()))
+                {
+                    if (start) m.Tri(Map(h[a]), Map(h[c]), Map(h[bb]));
+                    else m.Tri(Map(h[a]), Map(h[bb]), Map(h[c]));
+                }
+        }
+        Cap(0, true);
+        Cap(rings.Count - 1, false);
+        // void closed by a solid zone: cap the void where it ends (facing into the void)
+        for (int k = 0; k + 1 < rings.Count; k++)
+        {
+            bool here = voidIdx[k] >= 0, next = voidIdx[k + 1] >= 0;
+            if (here == next) continue;
+            int kv = here ? k : k + 1;                    // ring holding the void at the transition
+            bool voidBefore = here;                      // void on the -T side of the transition ring
+            var v = rings[kv].voidRing!;
+            foreach (var (a, b, c) in MeshBuilder.Triangulate(v))
+            {
+                // the concrete face points into the void: -T when the void lies before (like a start cap), +T otherwise
+                if (voidBefore) m.Tri(voidIdx[kv] + a, voidIdx[kv] + c, voidIdx[kv] + b);
+                else m.Tri(voidIdx[kv] + a, voidIdx[kv] + b, voidIdx[kv] + c);
             }
         }
         if (m.Volume() < 0)

@@ -212,30 +212,21 @@ public sealed class SegmentalGenerator
         foreach (var (r, d, _) in _segs)
         {
             var stas = RingStations(r, d);
-            var pieces = new List<Mesh>();
-            int i0 = 0;
-            while (i0 < stas.Count - 1)
+            // interval states (hollow / solid diaphragm); a ring carries the void when it bounds a hollow interval -> ONE closed shell
+            var hollowIv = Enumerable.Range(0, stas.Count - 1).Select(i => SectionIn(d, r, (stas[i] + stas[i + 1]) / 2).hollow).ToArray();
+            var rings = new List<(SectionFrame, List<Vec2>, List<Vec2>?)>();
+            for (int k = 0; k < stas.Count; k++)
             {
-                // one piece = consecutive rings with the same hollow / solid state (state of the interval)
-                bool hollow = SectionIn(d, r, (stas[i0] + stas[i0 + 1]) / 2).hollow;
-                int i1 = i0 + 1;
-                while (i1 < stas.Count - 1 && SectionIn(d, r, (stas[i1] + stas[i1 + 1]) / 2).hollow == hollow) i1++;
-                var rings = new List<(SectionFrame, List<Vec2>, List<Vec2>?)>();
-                for (int k = i0; k <= i1; k++)
-                {
-                    double sta = stas[k];
-                    var (h, t, _) = SectionIn(d, r, sta);
-                    double u = (sta - r.Station0) / (r.Station1 - r.Station0);
-                    var fr = Frame(sta) with { Origin = Vec3.Lerp(r.Top0, r.Top1, u) };
-                    if (k == 0) fr = Frame(r.Station0);
-                    if (k == stas.Count - 1) fr = Frame(r.Station1);
-                    rings.Add((fr, SegmentalSection.Outer(_d.Box, h), hollow ? SegmentalSection.Void(_d.Box, h, t) : null));
-                }
-                pieces.Add(SegmentalLoft.Build(rings, SegmentalSection.OuterCl, SegmentalSection.VoidBottomCl(_d.Box)));
-                i0 = i1;
+                double sta = stas[k];
+                var (h, t, _) = SectionIn(d, r, sta);
+                double u = (sta - r.Station0) / (r.Station1 - r.Station0);
+                var fr = Frame(sta) with { Origin = Vec3.Lerp(r.Top0, r.Top1, u) };
+                if (k == 0) fr = Frame(r.Station0);
+                if (k == stas.Count - 1) fr = Frame(r.Station1);
+                bool hasVoid = (k > 0 && hollowIv[k - 1]) || (k < stas.Count - 1 && hollowIv[k]);
+                rings.Add((fr, SegmentalSection.Outer(_d.Box, h), hasVoid ? SegmentalSection.Void(_d.Box, h, t) : null));
             }
-            foreach (var p in pieces) r.Mesh.Append(p);
-            if (pieces.Count > 1) r.Pieces.AddRange(pieces);
+            r.Mesh.Append(SegmentalLoft.Build(rings, SegmentalSection.OuterCl, SegmentalSection.VoidBottomCl(_d.Box)));
             if (d.Type == SegmentType.End)
                 r.Assumption = Assumption.Unresolved($"end segment interior (end diaphragm, vermin screen opening, expansion joint blockout, 2'-2\" top slab step) is not modeled - not all of it is dimensioned (p.271)",
                     "solid outer envelope of the 9'-0\" box over the segment length");
@@ -303,7 +294,32 @@ public sealed class SegmentalGenerator
             if (r.Station0 > s0 + 1e-6 && r.Station0 < s1 - 1e-6) stas.Add(r.Station0);
             if (r.Station1 > s0 + 1e-6 && r.Station1 < s1 - 1e-6) stas.Add(r.Station1);
         }
-        return stas.Distinct().OrderBy(s => s).Select(s => Duct(s, x, depth, above)).ToList();
+        return Simplify(stas.Distinct().OrderBy(s => s).Select(s => Duct(s, x, depth, above)).ToList(), PathTolerance);
+    }
+
+    /// <summary>Duct paths: joint points closer than this to the straight run through their neighbours are dropped (Douglas-Peucker).</summary>
+    public const double PathTolerance = 0.002;
+
+    public static List<Vec3> Simplify(List<Vec3> pts, double tol)
+    {
+        if (pts.Count < 3) return pts;
+        var keep = new bool[pts.Count];
+        keep[0] = keep[^1] = true;
+        void Dp(int a, int b)
+        {
+            if (b - a < 2) return;
+            var ab = pts[b] - pts[a];
+            double len = ab.Length;
+            int best = -1; double dmax = 0;
+            for (int i = a + 1; i < b; i++)
+            {
+                double dd = len < 1e-12 ? (pts[i] - pts[a]).Length : Vec3.Cross(pts[i] - pts[a], ab).Length / len;
+                if (dd > dmax) { dmax = dd; best = i; }
+            }
+            if (dmax > tol) { keep[best] = true; Dp(a, best); Dp(best, b); }
+        }
+        Dp(0, pts.Count - 1);
+        return pts.Where((_, i) => keep[i]).ToList();
     }
 
     private void BuildTendons()
