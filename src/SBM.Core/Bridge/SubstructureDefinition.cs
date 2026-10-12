@@ -491,6 +491,22 @@ public sealed class SubstructureDefinition
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
     public List<string>? Unresolved { get; set; }
 
+    /// <summary>OPTIONAL pier WITHOUT a concrete cap (e.g. columns under an integral steel cap): each column carries one bearing seat on a pedestal of
+    /// <see cref="CaplessPedestalHeight"/> (plan size <see cref="PedestalSizeAlong"/> x <see cref="PedestalSizeAcross"/>, turned with the column),
+    /// column top = seat - pedestal height; columns at <see cref="ColumnOffsets"/>; footings / piles per column as usual. Piers only.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    public bool NoCap { get; set; }
+    /// <summary>Capless pier: pedestal height between the column top and the bearing seat (required; null = UNRESOLVED, no pedestal, column to the seat).</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public double? CaplessPedestalHeight { get; set; }
+    /// <summary>Capless pier: plan column heights (foundation top to column top) per column, for the check only; null = none.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public List<double>? PlanColumnHeights { get; set; }
+    /// <summary>OPTIONAL plan rotation of rectangular columns (and capless pedestals) in degrees, positive = the column's S axis turned so its right end
+    /// moves up-station (as a skew); 0 = square to the support line.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    public double ColumnRotationDeg { get; set; }
+
     public static SubstructureDefinition Default(SupportType type) => type == SupportType.Pier
         ? new SubstructureDefinition()
         : new SubstructureDefinition
@@ -544,6 +560,7 @@ public sealed class SubstructureDefinition
         c.Aesthetics = Aesthetics?.Clone();
         c.Abutment = Abutment?.Clone();
         c.Unresolved = Unresolved?.ToList();
+        c.PlanColumnHeights = PlanColumnHeights?.ToList();
         return c;
     }
 }

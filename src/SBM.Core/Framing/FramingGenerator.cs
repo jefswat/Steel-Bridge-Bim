@@ -977,6 +977,7 @@ public sealed class FramingGenerator
         // Support cross frames along each support line.
         for (int j = 0; j < NS; j++)
         {
+            if (_def.Supports[j].IntegralSteelCap != null) continue;   // OPTIONAL integral steel cap: the girders frame into the cap, no support frames
             int span = Math.Min(j, NSpan - 1);
             var active = Enumerable.Range(0, NG).Where(g => _result.Supports[j].Bearings[g] != null).ToList();
             for (int q = 0; q + 1 < active.Count; q++)
@@ -1350,16 +1351,36 @@ public sealed class FramingGenerator
             for (int j = 0; j < NS; j++)
             {
                 if (BeginS(i) > 0 && _result.Supports[j].Bearings[i] == null) continue;   // before a begun girder's start
+                var supDef = _def.Supports[j];
+                if (supDef.IntegralSteelCap != null) continue;   // OPTIONAL integral steel cap: the girders end on end plates, no bearing stiffeners
                 int span = Math.Min(j, NSpan - 1);
                 double u = j == NS - 1 ? 1 : 0;
                 var c = _curves[i][span];
                 var t = c.TangentAt(u);
+                var plate = supDef.BearingStiffener ?? sd.BearingStiffener;
+                double sBrg = GirderDistance(i, span, u);
                 list.Add(new StiffenerResult
                 {
                     Girder = i, Kind = StiffenerKind.Bearing, Location = Point3(c, u), GirderTangent = t,
                     Direction = TowardRight(_supDir[j], t),
-                    Side = StiffenerSide.Both, Plate = sd.BearingStiffener, GirderDistance = GirderDistance(i, span, u),
+                    Side = StiffenerSide.Both, Plate = plate, GirderDistance = sBrg,
                 });
+                // OPTIONAL jacking stiffeners: plumb pairs of the bearing stiffener plate at given distances along the girder from the CL bearing.
+                if (supDef.JackingStiffenerOffsets is { } jso)
+                    foreach (double off in jso)
+                    {
+                        double sj = sBrg + off;
+                        var (spj, uj) = LocateOnGirder(i, sj);
+                        var cj = _curves[i][spj];
+                        if (Math.Abs(GirderDistance(i, spj, uj) - sj) > 1e-4) { Warn($"G{i + 1}: jacking stiffener {off / 0.3048:0.###} ft from the CL bearing at {supDef.Name} is beyond the girder's spans; not built."); continue; }
+                        var tj = cj.TangentAt(uj);
+                        list.Add(new StiffenerResult
+                        {
+                            Girder = i, Kind = StiffenerKind.Bearing, Location = Point3(cj, uj), GirderTangent = tj,
+                            Direction = TowardRight(_supDir[j], tj),
+                            Side = StiffenerSide.Both, Plate = plate, GirderDistance = sj,
+                        });
+                    }
             }
 
             // Connection stiffeners at intermediate cross frames, in the cross-frame plane (skewed with the frame).

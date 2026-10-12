@@ -371,6 +371,7 @@ public static class IfcExporter
         var miscPlaceholders = new List<(int id, string location, string basis)>();
         // Elements modeled on an assumption the plans do not fix: Pset SBM_Status (Status, Reason, Basis).
         var miscStatus = new List<(int id, SBM.Core.Assumption a)>();
+        var fabAttrs = new List<(int id, SBM.Core.Bridge.FabricationAttributes f)>();
         // Debonded strands: Pset SBM_Debonding (tendon id, its key, lengths from the start / end of the beam, plan symbol).
         var debondPsets = new List<(int id, string key, double start, double end, string symbol)>();
         var pipePiles = new List<(int id, string key, double diameter, double shell)>();   // CIP pipe piles -> SBM_PipePile
@@ -1138,6 +1139,8 @@ public static class IfcExporter
                     AssemblyKind.ArchBracing => (".SITE.", ".CROSS_BRACING.", "$"),
                     AssemblyKind.ArchKnuckle => (".FACTORY.", ".USERDEFINED.", "'KNUCKLE'"),
                     AssemblyKind.ArchDeckForm => (".SITE.", ".USERDEFINED.", "'DECK_FORM'"),
+                    AssemblyKind.PierCap => (".FACTORY.", ".GIRDER.", "'INTEGRAL_STEEL_PIER_CAP'"),
+                    AssemblyKind.PierCapConnection => (".FACTORY.", ".USERDEFINED.", "'PIER_CAP_GIRDER_CONNECTION'"),
                     _ => (".SITE.", ".USERDEFINED.", "'BEARING'"),
                 };
                 if (asm.Kind == AssemblyKind.Railing)
@@ -1211,9 +1214,18 @@ public static class IfcExporter
                     PartCategory.RailBasePlate => w.Add("IFCPLATE", $"{common},$,{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.BASE_PLATE."),
                     PartCategory.RailEnvelope => w.Add("IFCRAILING", $"{common},'RAILING_ENVELOPE',{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.USERDEFINED."),
                     PartCategory.PtAnchorage => w.Add("IFCTENDONANCHOR", $"{common},'PT_FLAT_ANCHORAGE',{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},$,.USERDEFINED."),
+                    PartCategory.EndPlate => w.Add("IFCPLATE", $"{common},'END_PLATE',{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.USERDEFINED."),
+                    PartCategory.ConnectorPlate => w.Add("IFCPLATE", $"{common},'CONNECTOR_PLATE',{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.USERDEFINED."),
+                    PartCategory.DiaphragmPlate => w.Add("IFCPLATE", $"{common},'CONNECTION_DIAPHRAGM_PLATE',{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.USERDEFINED."),
+                    PartCategory.ContinuityPlate => w.Add("IFCPLATE", $"{common},'MILL_TO_BEAR_PLATE',{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.USERDEFINED."),
+                    PartCategory.CoverPlate => w.Add("IFCPLATE", $"{common},$,{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.COVER_PLATE."),
+                    PartCategory.HandholeCover => w.Add("IFCPLATE", $"{common},'HANDHOLE_COVER',{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.USERDEFINED."),
+                    PartCategory.HandholeBacking => w.Add("IFCPLATE", $"{common},'HANDHOLE_BACKING_PLATE',{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.USERDEFINED."),
+                    PartCategory.MeshScreen => w.Add("IFCPLATE", $"{common},'WIRE_MESH_SCREEN',{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.USERDEFINED."),
                     _ => w.Add("IFCFASTENER", $"{common},$,{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.WELD."),
                 };
                 if (part.Assumption != null) miscStatus.Add((id, part.Assumption));
+                if (part.Fabrication is { IsEmpty: false } fab) fabAttrs.Add((id, fab));
                 if (children.TryGetValue(part.Assembly, out var list)) list.Add(id);
                 if (!materials.TryGetValue(part.Material, out var ml)) materials[part.Material] = ml = new List<int>();
                 ml.Add(id);
@@ -1225,7 +1237,7 @@ public static class IfcExporter
             // product shape pointing at the type's shared mapped representation.
             var types = new Dictionary<(int, long, long, long), (int type, int rep, List<int> occ)>();
             int boltNo = 0;
-            var fasteners = steel.Bolts.Select(b => (kind: b.Kind == BoltKind.Anchor ? 1 : 0, frame: b.Frame, grip: b.Grip, len: b.Length, asm: b.Assembly, bolt: (BoltInstance?)b))
+            var fasteners = steel.Bolts.Select(b => (kind: b.Kind == BoltKind.Anchor ? 1 : b.Material != null ? 3 : 0, frame: b.Frame, grip: b.Grip, len: b.Length, asm: b.Assembly, bolt: (BoltInstance?)b))
                 .Concat(steel.Studs.Select(s => (kind: 2, frame: s.Frame, grip: 0.0, len: s.Length, asm: s.Assembly, bolt: (BoltInstance?)null)))
                 .ToList();
             foreach (var (kind, frame, grip, length, asmMark, boltRef) in fasteners)
@@ -1235,10 +1247,11 @@ public static class IfcExporter
                 {
                     1 => ("Anchor bolt", boltRef!.Diameter, ".ANCHORBOLT.", "ASTM F1554"),
                     2 => ("Shear stud", steel.StudDiameter, ".STUDSHEARCONNECTOR.", "ASTM A108 (AWS D1.5 Type B)"),
+                    3 => ("Bolt", boltRef!.Diameter, ".BOLT.", boltRef.Material!),
                     _ => ("Bolt", boltRef is { Diameter: > 0 } ? boltRef.Diameter : steel.Bolt.Diameter, ".BOLT.", (steel.BoltGrade.StartsWith("ASTM") ? steel.BoltGrade : $"ASTM F3125 Gr. {steel.BoltGrade}")),
                 };
                 var k2 = (kind, (long)Math.Round(bolt.Grip * 1e5), (long)Math.Round(bolt.Length * 1e5),
-                    kind == 1 ? (long)Math.Round(boltRef!.Diameter * 1e5 + boltRef.Embedment * 1e9) : kind == 0 ? (long)Math.Round(dia * 1e5) : 0L);
+                    kind == 1 ? (long)Math.Round(boltRef!.Diameter * 1e5 + boltRef.Embedment * 1e9) : kind is 0 or 3 ? (long)Math.Round(dia * 1e5) : 0L);
                 if (!types.TryGetValue(k2, out var ty))
                 {
                     var mesh = kind switch
@@ -1267,7 +1280,7 @@ public static class IfcExporter
                     w.Add("IFCSTYLEDITEM", $"{Ref(fsId)},({Ref(Style(PartCategory.Weld))}),$");
                     int rep = w.Add("IFCSHAPEREPRESENTATION", $"{Ref(body)},'Body','Tessellation',({Ref(fsId)})");
                     int map = w.Add("IFCREPRESENTATIONMAP", $"{Ref(axis)},{Ref(rep)}");
-                    string desc = $"{u.FormatLength(dia, LengthKind.Short)} {(kind == 0 ? steel.BoltGrade + " bolt" : kind == 1 ? "anchor bolt" : "headed stud")} x {u.FormatLength(bolt.Length, LengthKind.Short)}";
+                    string desc = $"{u.FormatLength(dia, LengthKind.Short)} {(kind == 0 ? steel.BoltGrade + " bolt" : kind == 3 ? boltRef!.Material + " bolt" : kind == 1 ? "anchor bolt" : "headed stud")} x {u.FormatLength(bolt.Length, LengthKind.Short)}";
                     int type = w.Add("IFCMECHANICALFASTENERTYPE",
                         $"{Guid($"{bk}/fastenertype/{k2}")},$,{S(desc)},{S($"{desc}, grip {u.FormatLength(bolt.Grip, LengthKind.Short)}")},$,$,({Ref(map)}),$,{S(name)},{ptype},{R(dia * scale)},{R(bolt.Length * scale)}");
                     // Occurrences share one mapped shape (identity transform); their placement does the move.
@@ -1372,6 +1385,16 @@ public static class IfcExporter
             w.Add("IFCRELDEFINESBYPROPERTIES", $"{Guid(pk + "/relpipepile")},$,$,$,({Ref(id)}),{Ref(ps)}");
         }
 
+        // OPTIONAL plan fabrication attributes (SteelPart.Fabrication): one Pset per distinct attribute set, shared by its parts.
+        foreach (var grp in fabAttrs.GroupBy(t => string.Join("|", t.f.Fields().Select(x => x.Name + "=" + x.Value))))
+        {
+            var f0 = grp.First().f;
+            var props = f0.Fields().Select(x => Prop($"{S(x.Name)},$,IFCTEXT({S(x.Value)}),$")).ToList();
+            if (props.Count == 0) continue;
+            int first = grp.First().id;
+            int ps = w.Add("IFCPROPERTYSET", $"{Guid(key + "/fabattr/" + first)},$,'SBM_FabricationAttributes',$,({Refs(props)})");
+            w.Add("IFCRELDEFINESBYPROPERTIES", $"{Guid(key + "/relfabattr/" + first)},$,$,$,{Refs(grp.Select(t => t.id))},{Ref(ps)}");
+        }
         foreach (var (id, a) in miscStatus)
         {
             int q1 = w.Add("IFCPROPERTYSINGLEVALUE", $"'Status',$,IFCLABEL({S(a.Status)}),$");

@@ -292,8 +292,12 @@ public static partial class ElevationCheck
         if (prestressed != null) return PrestressedBearings(f, prestressed, u, sub, o);
         var list = new List<ElevationChain>();
         foreach (var sl in f.Supports.Concat(f.AuxSupports))
+        {
+            // OPTIONAL integral steel cap: the girders frame into the cap (no girder bearings on that line; the cap bearings are not girder chains).
+            if (f.Definition.SupportAt(sl.Index).IntegralSteelCap != null) continue;
             for (int i = 0; i < sl.Bearings.Length; i++)
                 if (sl.Bearings[i] != null) list.Add(Bearing(f, steel, sl.Index, i, u, sub, o));
+        }
         return list;
     }
 

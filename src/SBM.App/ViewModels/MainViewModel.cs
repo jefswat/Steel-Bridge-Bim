@@ -145,6 +145,9 @@ public sealed partial class MainViewModel : ObservableObject
                 R("Material", p.Material);
                 if (p.Length > 0) R("Length", L(p.Length));
                 if (p.Category != PartCategory.Weld) R("Weight", W(p.Mass));
+                if (p.Assumption is { } pa) { R("Status", pa.Status); R("Reason", pa.Reason); R("Assumed", pa.Basis); }
+                if (p.Fabrication is { IsEmpty: false } fab)
+                    foreach (var (fn, fv) in fab.Fields()) R("Fabrication: " + fn, fv);
                 var b = p.Mesh.Bounds();
                 R("Top elevation", E(b.Max.Z));
                 R("Bottom elevation", E(b.Min.Z));

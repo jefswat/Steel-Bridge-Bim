@@ -185,6 +185,9 @@ public static class SceneBuilder
         ("3D-ARCH-KNUCKLES", 235, 185, 70, new[] { PartCategory.KnucklePlate }),
         ("3D-ARCH-FORM-DECK", 175, 180, 190, new[] { PartCategory.FormDeck }),
         ("3D-PED-RAILING", 200, 205, 215, new[] { PartCategory.RailPost, PartCategory.RailHandrail, PartCategory.RailMember, PartCategory.RailBasePlate, PartCategory.RailEnvelope }),
+        ("3D-PIER-CAP-PLATES", 95, 150, 215, new[] { PartCategory.EndPlate, PartCategory.ConnectorPlate, PartCategory.DiaphragmPlate, PartCategory.ContinuityPlate, PartCategory.CoverPlate }),
+        ("3D-PIER-CAP-HANDHOLES", 225, 170, 90, new[] { PartCategory.HandholeCover, PartCategory.HandholeBacking }),
+        ("3D-PIER-CAP-SCREENS", 190, 190, 195, new[] { PartCategory.MeshScreen }),
     };
 
     /// <summary>Detail layers are split into square tiles (m) so the viewport can draw only tiles near the view.</summary>
