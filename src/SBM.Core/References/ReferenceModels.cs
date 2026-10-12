@@ -136,7 +136,10 @@ public sealed class TerrainModel
     }
 
     /// <summary>Contour segments at the given interval (marching triangles, parallel). Every <paramref name="majorEvery"/>th is major.</summary>
-    public (List<(Vec3 a, Vec3 b)> minor, List<(Vec3 a, Vec3 b)> major) Contours(double interval, int majorEvery = 5)
+    public (List<(Vec3 a, Vec3 b)> minor, List<(Vec3 a, Vec3 b)> major) Contours(double interval, int majorEvery = 5) => ContoursOf(_mesh, interval, majorEvery);
+
+    /// <summary>Contour segments of any triangle mesh (e.g. a reduced display mesh).</summary>
+    public static (List<(Vec3 a, Vec3 b)> minor, List<(Vec3 a, Vec3 b)> major) ContoursOf(Mesh _mesh, double interval, int majorEvery = 5)
     {
         var minor = new System.Collections.Concurrent.ConcurrentBag<List<(Vec3, Vec3)>>();
         var major = new System.Collections.Concurrent.ConcurrentBag<List<(Vec3, Vec3)>>();
@@ -170,5 +173,32 @@ public sealed class TerrainModel
             major.Add(ma);
         });
         return (minor.SelectMany(x => x).ToList(), major.SelectMany(x => x).ToList());
+    }
+}
+
+/// <summary>Reduced display meshes for terrain (the viewport memory manager): elevations keep using the full surface.</summary>
+public static class TerrainDisplay
+{
+    /// <summary>Display mesh of a terrain at a stride (raster DEMs; TINs keep their triangles) clipped to a plan box (empty = no clip).</summary>
+    public static Mesh Build(ReferenceGeometry geo, int stride, Box2 clip)
+    {
+        if (geo.Grid is { } g) return g.ToMesh(Math.Max(1, stride), clip.IsEmpty ? null : clip);
+        return clip.IsEmpty ? geo.Mesh : Clip(geo.Mesh, clip);
+    }
+
+    /// <summary>Triangles with at least one vertex inside the plan box (vertices renumbered).</summary>
+    public static Mesh Clip(Mesh m, Box2 box)
+    {
+        var r = new Mesh();
+        var map = new int[m.Positions.Count];
+        Array.Fill(map, -1);
+        for (int t = 0; t + 2 < m.Indices.Count; t += 3)
+        {
+            int a = m.Indices[t], b = m.Indices[t + 1], c = m.Indices[t + 2];
+            if (!box.Contains(m.Positions[a].XY) && !box.Contains(m.Positions[b].XY) && !box.Contains(m.Positions[c].XY)) continue;
+            int V(int i) => map[i] >= 0 ? map[i] : map[i] = r.Add(m.Positions[i]);
+            r.Tri(V(a), V(b), V(c));
+        }
+        return r;
     }
 }

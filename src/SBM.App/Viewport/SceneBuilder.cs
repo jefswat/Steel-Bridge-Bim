@@ -34,7 +34,11 @@ public sealed record SubPick(SBM.Core.Substructure.SubstructureUnit Unit, SBM.Co
 public sealed record PsBeamPick(SBM.Core.Prestressed.PrestressedModel Model, SBM.Core.Prestressed.PrestressedBeam Beam);
 public sealed record PsStrandPick(SBM.Core.Prestressed.PrestressedModel Model, SBM.Core.Prestressed.PrestressedBeam Beam, SBM.Core.Prestressed.StrandInstance Strand);
 public sealed record PsPadPick(SBM.Core.Prestressed.PrestressedPad Pad);
-public sealed record NamedPick(string Kind, string Name, IReadOnlyList<(string, string)> Properties);
+public sealed record NamedPick(string Kind, string Name, IReadOnlyList<(string, string)> Properties)
+{
+    /// <summary>The source mesh (exact measure snaps read its NURBS).</summary>
+    public Mesh? Source { get; init; }
+}
 
 /// <summary>GPU-ready geometry for one drawing layer (one draw call for lines, one for text).</summary>
 public sealed class LayerGeometry
@@ -53,8 +57,14 @@ public sealed class SolidLayer
     public required byte G { get; init; }
     public required byte B { get; init; }
     public required List<(MeshGeometry3D mesh, List<Matrix4x4>? instances)> Parts { get; init; }
-    public int Triangles { get; init; }
+    public int Triangles { get; set; }
     public float Opacity { get; init; } = 1f;
+    internal void AddTriangles(int n) => Triangles += n;
+    /// <summary>Bridge index of each part (same order as <see cref="Parts"/>); null = not per bridge (-1). Used by the far-bridge LOD.</summary>
+    public List<int>? PartBridges { get; set; }
+    /// <summary>Per part: source triangles with bolt holes and without them (steel plates; null = no holes to drop).</summary>
+    public List<(long withHoles, long withoutHoles)>? PartHoleTriangles { get; set; }
+    public int BridgeOf(int part) => PartBridges is { } b && part < b.Count ? b[part] : -1;
 }
 
 public sealed class ReferenceRender
@@ -66,6 +76,17 @@ public sealed class ReferenceRender
     public LineGeometry3D? MajorContours { get; init; }
     /// <summary>Draped image (with texture coordinates on <see cref="Mesh"/>), or null.</summary>
     public string? ImageFile { get; init; }
+    /// <summary>Image size (px) of <see cref="ImageFile"/>; the viewport may load it reduced (<see cref="ImageMaxPixels"/>).</summary>
+    public int ImageWidth { get; init; }
+    public int ImageHeight { get; init; }
+    public int ImageMaxPixels { get; init; }
+    /// <summary>Terrain raster behind the mesh (null for TINs / references) and the stride / clip the display mesh was made with.</summary>
+    public SBM.Core.References.ElevationGrid? Grid { get; init; }
+    public int Stride { get; init; } = 1;
+    /// <summary>Stride of the mesh made at load (the full display mesh).</summary>
+    public int LoadedStride { get; init; } = 1;
+    /// <summary>Plan box the display mesh was clipped to (empty = not clipped).</summary>
+    public Box2 ClipBox { get; init; } = Box2.Empty;
     public string ImageNote { get; init; } = "";
     public int Triangles { get; init; }
     public string LayerName => "REF-" + Definition.Name.ToUpperInvariant();
@@ -81,6 +102,36 @@ public sealed class SceneData
     public required Box2 Extents { get; init; }
     /// <summary>Region to frame on zoom-extents (the bridges when present, otherwise everything).</summary>
     public Box2 FocusExtents { get; set; }
+    /// <summary>Bridge names (index = <see cref="SolidLayer.PartBridges"/>).</summary>
+    public List<string> BridgeNames { get; } = new();
+    /// <summary>Detail layers (bolts, studs, welds, rebar) were not built (low memory).</summary>
+    public bool DetailSkipped { get; set; }
+
+    /// <summary>
+    /// Adds the solid layers of one bridge (built into <paramref name="part"/>) to this scene: layers with the same name are merged part by
+    /// part, each part remembering its bridge.
+    /// </summary>
+    public void MergeBridge(SceneData part, int bridge)
+    {
+        foreach (var l in part.Solids)
+        {
+            var mine = Solids.FirstOrDefault(x => x.Name == l.Name);
+            if (mine == null)
+            {
+                mine = new SolidLayer { Name = l.Name, R = l.R, G = l.G, B = l.B, Opacity = l.Opacity, Parts = new(), PartBridges = new() };
+                Solids.Add(mine);
+            }
+            mine.PartBridges ??= Enumerable.Repeat(-1, mine.Parts.Count).ToList();
+            if (l.PartHoleTriangles != null || mine.PartHoleTriangles != null)
+            {
+                mine.PartHoleTriangles ??= Enumerable.Range(0, mine.Parts.Count).Select(k => ((long)(mine.Parts[k].mesh.Indices!.Count / 3), (long)(mine.Parts[k].mesh.Indices!.Count / 3))).ToList();
+                mine.PartHoleTriangles.AddRange(l.PartHoleTriangles ?? l.Parts.Select(x => ((long)(x.mesh.Indices!.Count / 3), (long)(x.mesh.Indices!.Count / 3))).ToList());
+            }
+            mine.Parts.AddRange(l.Parts);
+            mine.PartBridges.AddRange(Enumerable.Repeat(bridge, l.Parts.Count));
+            mine.AddTriangles(l.Triangles);
+        }
+    }
 }
 
 /// <summary>
@@ -155,17 +206,23 @@ public static class SceneBuilder
                 if (parts.Count == 0) return;
                 if (name == "3D-WELDS")
                 {
+                    if (SkipDetail) return;
                     // Detail layer: one mesh per tile.
                     var tiles = parts.GroupBy(p => Tile(Center(p.Mesh))).Select(gr => FlatShaded(gr.Select(p => p.Mesh), o, gr.ToList())).ToList();
                     layers[i] = new SolidLayer { Name = name, R = r, G = g, B = b, Parts = tiles.Select(m2 => (m2, (List<Matrix4x4>?)null)).ToList(),
                         Triangles = tiles.Sum(m2 => m2.Indices!.Count / 3) };
                     return;
                 }
-                var mesh = FlatShaded(parts.Select(p => p.Mesh), o, parts);
-                layers[i] = new SolidLayer { Name = name, R = r, G = g, B = b, Parts = new() { (mesh, null) }, Triangles = mesh.Indices!.Count / 3 };
+                bool noHoles = PlatesWithoutHoles;
+                var mesh = FlatShaded(parts.Select(p => noHoles ? MeshLod.WithoutHoles(p.Mesh) : p.Mesh), o, parts);
+                // Triangle counts with / without holes (the memory planner scales the buffer by them).
+                long full = parts.Sum(p => (long)p.Mesh.TriangleCount), free = parts.Sum(p => (long)MeshLod.HoleFreeTriangles(p.Mesh));
+                layers[i] = new SolidLayer { Name = name, R = r, G = g, B = b, Parts = new() { (mesh, null) }, Triangles = mesh.Indices!.Count / 3,
+                    PartHoleTriangles = new() { (full, free) } };
                 return;
             }
             // Fasteners: one mesh per distinct size, drawn with GPU instancing.
+            if (SkipDetail) return;
             int kind = i - SolidLayerDefs.Length;
             var list = new List<(MeshGeometry3D, List<Matrix4x4>?)>();
             int tris = 0;
@@ -209,9 +266,9 @@ public static class SceneBuilder
             {
                 var items = models.SelectMany(m => new (Mesh?, object)[]
                 {
-                    (m.Deck, new NamedPick("Deck", "Deck slab", new[] { ("Volume", $"{m.DeckVolume / 0.764554857984:N1} CY") })),
-                    (m.Haunches, new NamedPick("Deck", "Haunches", new[] { ("Volume", $"{m.HaunchVolume / 0.764554857984:N1} CY") })),
-                }).Where(x => x.Item1 is { IsEmpty: false }).ToList();
+                    (m.Deck, new NamedPick("Deck", "Deck slab", new[] { ("Volume", $"{m.DeckVolume / 0.764554857984:N1} CY") }) { Source = m.Deck }),
+                    (m.Haunches, new NamedPick("Deck", "Haunches", new[] { ("Volume", $"{m.HaunchVolume / 0.764554857984:N1} CY") }) { Source = m.Haunches }),
+                }.Concat(m.DeckBumps.Select(db => ((Mesh?)db.Mesh, (object)new NamedPick("Deck", db.Name, new[] { ("Volume", $"{Math.Abs(db.Mesh.Volume()) / 0.764554857984:N2} CY") }))))).Where(x => x.Item1 is { IsEmpty: false }).ToList();
                 if (items.Count == 0) return null;
                 var g = FlatShaded(items.Select(x => x.Item1!), o, items.Select(x => x.Item2).ToList());
                 return new SolidLayer { Name = "3D-DECK", R = 180, G = 180, B = 172, Parts = new() { (g, null) }, Triangles = g.Indices!.Count / 3, Opacity = 0.35f };
@@ -221,7 +278,7 @@ public static class SceneBuilder
                 var items = models.SelectMany(m => m.Barriers).Where(b => !b.Mesh.IsEmpty).ToList();
                 if (items.Count == 0) return null;
                 var g = FlatShaded(items.Select(b => b.Mesh), o,
-                    items.Select(b => (object)new NamedPick("Barrier", b.Name, new[] { ("Volume", $"{Math.Abs(b.Mesh.Volume()) / 0.764554857984:N1} CY") })).ToList());
+                    items.Select(b => (object)new NamedPick("Barrier", b.Name, new[] { ("Volume", $"{Math.Abs(b.Mesh.Volume()) / 0.764554857984:N1} CY") }) { Source = b.Mesh }).ToList());
                 return new SolidLayer { Name = "3D-BARRIER", R = 190, G = 190, B = 182, Parts = new() { (g, null) }, Triangles = g.Indices!.Count / 3, Opacity = 0.5f };
             },
             () =>
@@ -356,8 +413,12 @@ public static class SceneBuilder
             () => MiscLayer(models, o, "3D-LIGHTING", 230, 215, 90, e => e.Assumption == null && e.Group == SBM.Core.Misc.MiscGroup.Lighting && !e.Placeholder),
             () => MiscLayer(models, o, "3D-UNRESOLVED", 255, 110, 40, e => e.Assumption != null),
             () => MiscLayer(models, o, "3D-PLACEHOLDER", 200, 80, 200, e => e.Placeholder && e.Assumption == null, 0.55f),
+            // Architectural surface treatments: relief layers of the textured / thin-brick regions (flagged regions keep their layer; reason in the pick)
+            () => SurfaceLayer(models, o, "3D-THIN-BRICK", 150, 70, 45, k => k == SBM.Core.Bridge.SurfaceTreatmentKind.ThinBrick),
+            () => SurfaceLayer(models, o, "3D-FORM-LINER", 175, 150, 120, k => k != SBM.Core.Bridge.SurfaceTreatmentKind.ThinBrick),
             () =>
             {
+                if (SkipDetail) return null;
                 var byTile = new Dictionary<(long, long), (List<Mesh> tubes, List<object> tags)>();
                 foreach (var m in models)
                 {
@@ -384,6 +445,17 @@ public static class SceneBuilder
         scene.Solids.AddRange(results.OfType<SolidLayer>());
     }
 
+    private static SolidLayer? SurfaceLayer(IReadOnlyList<SBM.Core.Substructure.SubstructureModel> models, Vec3 o, string name, byte r, byte g, byte b,
+        Func<SBM.Core.Bridge.SurfaceTreatmentKind, bool> pick)
+    {
+        var sel = models.Where(m => m.SurfaceTreatments != null).SelectMany(m => m.SurfaceTreatments!.Items).Where(e => !e.Mesh.IsEmpty && pick(e.Treatment.Kind)).ToList();
+        if (sel.Count == 0) return null;
+        var geo = FlatShaded(sel.Select(e => e.Mesh), o, sel.Select(e => (object)new NamedPick("Surface treatment", e.Name,
+            new[] { ("Info", e.Description), ("Area", $"{e.Area / 0.09290304:N1} SF"), ("Pattern", e.Treatment.Pattern), ("Orientation", e.Treatment.Orientation),
+                    ("UNRESOLVED", e.Assumption?.Reason ?? ""), ("Assumed", e.Assumption?.Basis ?? "") }.Where(x => x.Item2 != "").ToList())).ToList());
+        return new SolidLayer { Name = name, R = r, G = g, B = b, Parts = new() { (geo, null) }, Triangles = geo.Indices!.Count / 3 };
+    }
+
     private static SolidLayer? MiscLayer(IReadOnlyList<SBM.Core.Substructure.SubstructureModel> models, Vec3 o, string name, byte r, byte g, byte b,
         Func<SBM.Core.Misc.MiscElement, bool> pick, float opacity = 1f)
     {
@@ -396,6 +468,7 @@ public static class SceneBuilder
 
     private static SolidLayer? RebarLayer(IReadOnlyList<SBM.Core.Concrete.ConcreteModel> models, Vec3 o, string group, string name)
     {
+        if (SkipDetail) return null;
         var parts = new List<(MeshGeometry3D, List<Matrix4x4>?)>();
         int tris = 0;
         var byTile = new Dictionary<(long, long), (List<Mesh> tubes, List<object> tags)>();
@@ -438,22 +511,11 @@ public static class SceneBuilder
         return new SolidLayer { Name = name, R = (byte)(epoxy ? 70 : 150), G = (byte)(epoxy ? 170 : 80), B = (byte)(epoxy ? 80 : 50), Parts = parts, Triangles = tris };
     }
 
-    /// <summary>Hexagonal tube along a polyline (one prism per segment; joints overlap slightly, which is invisible at bar scale).</summary>
-    private static void AddTube(Mesh mesh, IReadOnlyList<Vec3> pts, double r, int sides = 6)
-    {
-        var sec = Enumerable.Range(0, sides).Select(i => Vec2.FromAngle(2 * Math.PI * i / sides) * r).ToArray();
-        for (int i = 0; i + 1 < pts.Count; i++)
-        {
-            var a = pts[i];
-            var b = pts[i + 1];
-            var axis = b - a;
-            if (axis.Length < 1e-6) continue;
-            var x = Vec3.Cross(Math.Abs(axis.Normalized().Z) < 0.9 ? new Vec3(0, 0, 1) : new Vec3(1, 0, 0), axis).Normalized();
-            var y = Vec3.Cross(axis.Normalized(), x);
-            Vec3[] Ring(Vec3 c) => sec.Select(q => c + x * q.X + y * q.Y).ToArray();
-            MeshBuilder.AddLoft(mesh, sec, new[] { Ring(a), Ring(b) });
-        }
-    }
+    /// <summary>Hexagonal tube along a polyline: one mitred loft per bar (no interior caps; see <see cref="TubeBuilder"/>).</summary>
+    private static void AddTube(Mesh mesh, IReadOnlyList<Vec3> pts, double r, int sides = 6) => TubeBuilder.AddMitredTube(mesh, pts, r, sides);
+
+    /// <summary>Steel plates are drawn without their bolt holes (viewport memory level; the bolts fill the holes).</summary>
+    public static bool PlatesWithoutHoles;
 
     private static Matrix4x4 ToMatrix(Frame3 f, Vec3 o) => new(
         (float)f.X.X, (float)f.X.Y, (float)f.X.Z, 0,
@@ -466,12 +528,13 @@ public static class SceneBuilder
     /// for large TINs) and batched lines. Contours are generated for terrain in parallel.
     /// </summary>
     public static ReferenceRender BuildReference(SBM.Core.References.ReferenceModelDefinition def, SBM.Core.References.ReferenceGeometry geo,
-        SBM.Core.References.TerrainModel? terrain, Vec3 o, double contourInterval)
+        SBM.Core.References.TerrainModel? terrain, Vec3 o, double contourInterval, Mesh? display = null, int stride = 1, int loadedStride = 1, Box2? clip = null, int imageMaxPixels = 0)
     {
         MeshGeometry3D? mesh = null;
         string? imageFile = null;
         string imageNote = "";
-        var m = geo.Mesh;
+        int imgW = 0, imgH = 0;
+        var m = display ?? geo.Mesh;
         if (!m.IsEmpty)
         {
             var pos = new Vector3Collection(m.Positions.Count);
@@ -494,6 +557,7 @@ public static class SceneBuilder
             {
                 var wf = wfo.Value;
                 var (w, h) = ImageSize(def.ImagePath);
+                (imgW, imgH) = (w, h);
                 double left = wf.c - wf.a / 2, top = wf.f - wf.e / 2;
                 var tc = new Vector2Collection(m.Positions.Count);
                 foreach (var p in m.Positions) tc.Add(new Vector2((float)((p.X - left) / (wf.a * w)), (float)((p.Y - top) / (wf.e * h))));
@@ -523,12 +587,13 @@ public static class SceneBuilder
         LineGeometry3D? minor = null, major = null;
         if (terrain != null && contourInterval > 0)
         {
-            var (mi, ma) = terrain.Contours(contourInterval);
+            var (mi, ma) = display == null ? terrain.Contours(contourInterval) : SBM.Core.References.TerrainModel.ContoursOf(display, contourInterval);
             minor = Lines(mi);
             major = Lines(ma);
         }
         return new ReferenceRender { Definition = def, Mesh = mesh, Lines = lines, MinorContours = minor, MajorContours = major,
-            Triangles = m.TriangleCount, ImageFile = imageFile, ImageNote = imageNote };
+            Triangles = m.TriangleCount, ImageFile = imageFile, ImageNote = imageNote, ImageWidth = imgW, ImageHeight = imgH, ImageMaxPixels = imageMaxPixels,
+            Grid = geo.Grid, Stride = stride, LoadedStride = loadedStride, ClipBox = clip ?? Box2.Empty };
     }
 
     /// <summary>World file beside an image (.jgw/.pgw/.tfw/.wld or ext + "w"): pixel size x (a), y (e, negative), center of the UL pixel (c, f).</summary>
@@ -547,6 +612,13 @@ public static class SceneBuilder
             if (v.Length >= 6) return (v[0], v[3], v[4], v[5]);
         }
         return null;
+    }
+
+    /// <summary>Size of a georeferenced image (0, 0 when there is none or it cannot be read).</summary>
+    public static (int w, int h) ImageSizeOrZero(string? path)
+    {
+        try { return string.IsNullOrWhiteSpace(path) || !File.Exists(path) || WorldFile(path) == null ? (0, 0) : ImageSize(path); }
+        catch (Exception) { return (0, 0); }
     }
 
     private static (int w, int h) ImageSize(string path)
@@ -581,16 +653,32 @@ public static class SceneBuilder
         return g;
     }
 
+    /// <summary>
+    /// Flat-shaded meshes share a vertex between neighbouring triangles of one source mesh that lie in the same plane (the two
+    /// triangles of a quad, fans of a cap): a GPU vertex is 52 bytes (HelixToolkit DefaultVertex), so a plate side drawn as a quad
+    /// needs 4 vertices instead of 6. Looked up in a small window of the last emitted vertices (no hashing). Off = one vertex per
+    /// triangle corner (the old layout; snapshot option --noshare to compare).
+    /// </summary>
+    public static bool ShareVertices = true;
+
+    /// <summary>Detail layers (bolts, studs, anchor bolts, welds, rebar) are not built (set after an out-of-memory error).</summary>
+    public static bool SkipDetail;
+
     private static MeshGeometry3D FlatShaded(IEnumerable<Mesh> meshes, Vec3 o)
     {
         int tri = 0;
         var list = meshes.ToList();
         foreach (var m in list) tri += m.TriangleCount;
-        var pos = new Vector3Collection(tri * 3);
-        var nrm = new Vector3Collection(tri * 3);
+        bool share = ShareVertices;
+        var pos = new Vector3Collection(share ? tri * 2 + 16 : tri * 3);
+        var nrm = new Vector3Collection(share ? tri * 2 + 16 : tri * 3);
         var idx = new IntCollection(tri * 3);
+        const int W = 16;
+        Span<int> ringSrc = stackalloc int[W];
+        Span<int> ringOut = stackalloc int[W];
         foreach (var m in list)
         {
+            int ringN = 0, ringAt = 0;
             for (int i = 0; i < m.Indices.Count; i += 3)
             {
                 var a = V(m.Positions[m.Indices[i]], o);
@@ -598,10 +686,32 @@ public static class SceneBuilder
                 var c = V(m.Positions[m.Indices[i + 2]], o);
                 var n = Vector3.Cross(b - a, c - a);
                 n = n.LengthSquared() > 0 ? Vector3.Normalize(n) : Vector3.UnitZ;
-                int k = pos.Count;
-                pos.Add(a); pos.Add(b); pos.Add(c);
-                nrm.Add(n); nrm.Add(n); nrm.Add(n);
-                idx.Add(k); idx.Add(k + 1); idx.Add(k + 2);
+                if (!share)
+                {
+                    int k = pos.Count;
+                    pos.Add(a); pos.Add(b); pos.Add(c);
+                    nrm.Add(n); nrm.Add(n); nrm.Add(n);
+                    idx.Add(k); idx.Add(k + 1); idx.Add(k + 2);
+                    continue;
+                }
+                for (int corner = 0; corner < 3; corner++)
+                {
+                    int src = m.Indices[i + corner];
+                    int found = -1;
+                    for (int r = 0; r < ringN; r++)
+                        if (ringSrc[r] == src && Vector3.Dot(nrm[ringOut[r]], n) > 0.999999f) { found = ringOut[r]; break; }
+                    if (found < 0)
+                    {
+                        found = pos.Count;
+                        pos.Add(corner == 0 ? a : corner == 1 ? b : c);
+                        nrm.Add(n);
+                        ringSrc[ringAt] = src;
+                        ringOut[ringAt] = found;
+                        ringAt = (ringAt + 1) % W;
+                        if (ringN < W) ringN++;
+                    }
+                    idx.Add(found);
+                }
             }
         }
         var g = new MeshGeometry3D { Positions = pos, Normals = nrm, Indices = idx };

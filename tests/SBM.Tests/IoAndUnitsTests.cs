@@ -61,6 +61,9 @@ public class IoAndUnitsTests
     {
         Assert.Equal("12'-6 1/2\"", Us.FormatLength((12 + 6.5 / 12) * 0.3048));
         Assert.Equal("7/8\"", Us.FormatLength(0.875 * 0.0254, LengthKind.Short));
+        // Feet-inches keep the zero inches before a fraction, as the plans print (not 8'-5/16").
+        Assert.Equal("8'-0 5/16\"", Us.FormatLength((8 + 5.0 / 16 / 12) * 0.3048));
+        Assert.Equal("10'-0\"", Us.FormatLength(10 * 0.3048));
     }
 
     [Fact]

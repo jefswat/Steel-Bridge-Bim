@@ -52,21 +52,34 @@ public sealed class ElevationGrid
     /// <summary>Display stride so the mesh has at most <paramref name="maxVertices"/> vertices.</summary>
     public int StrideFor(long maxVertices) => Math.Max(1, (int)Math.Ceiling(Math.Sqrt((double)Cells / Math.Max(1, maxVertices))));
 
-    /// <summary>Triangle mesh of every <paramref name="stride"/>-th node (cells with missing corners are skipped).</summary>
-    public Mesh ToMesh(int stride)
+    /// <summary>Triangle mesh of every <paramref name="stride"/>-th node (cells with missing corners are skipped), optionally only the
+    /// nodes inside the plan box <paramref name="clip"/> (plus one node around it so the clipped edge is covered).</summary>
+    public Mesh ToMesh(int stride, Box2? clip = null)
     {
         int nx = (Nx - 1) / stride + 1, ny = (Ny - 1) / stride + 1;
+        int i0 = 0, i1 = nx - 1, j0 = 0, j1 = ny - 1;
+        if (clip is { IsEmpty: false } cb)
+        {
+            double step = Cell * stride;
+            i0 = Math.Clamp((int)Math.Floor((cb.MinX - X0) / step), 0, nx - 1);
+            i1 = Math.Clamp((int)Math.Ceiling((cb.MaxX - X0) / step), 0, nx - 1);
+            j0 = Math.Clamp((int)Math.Floor((cb.MinY - Y0) / step), 0, ny - 1);
+            j1 = Math.Clamp((int)Math.Ceiling((cb.MaxY - Y0) / step), 0, ny - 1);
+            if (cb.MaxX < X0 || cb.MinX > XMax || cb.MaxY < Y0 || cb.MinY > YMax) return new Mesh();
+        }
+        int mx = i1 - i0 + 1, my = j1 - j0 + 1;
         var mesh = new Mesh();
-        mesh.Positions.Capacity = nx * ny;
-        var id = new int[nx * ny];
-        for (int jj = 0; jj < ny; jj++)
-            for (int ii = 0; ii < nx; ii++)
+        mesh.Positions.Capacity = mx * my;
+        var id = new int[mx * my];
+        for (int jj = 0; jj < my; jj++)
+            for (int ii = 0; ii < mx; ii++)
             {
-                int i = ii * stride, j = jj * stride;
+                int i = (ii + i0) * stride, j = (jj + j0) * stride;
                 float z = At(i, j);
-                id[jj * nx + ii] = float.IsNaN(z) ? -1 : mesh.Add(new Vec3(X0 + i * Cell, Y0 + j * Cell, z + ZOffset));
+                id[jj * mx + ii] = float.IsNaN(z) ? -1 : mesh.Add(new Vec3(X0 + i * Cell, Y0 + j * Cell, z + ZOffset));
             }
-        mesh.Indices.Capacity = (nx - 1) * (ny - 1) * 6;
+        mesh.Indices.Capacity = (mx - 1) * (my - 1) * 6;
+        nx = mx; ny = my;
         for (int jj = 0; jj + 1 < ny; jj++)
             for (int ii = 0; ii + 1 < nx; ii++)
             {

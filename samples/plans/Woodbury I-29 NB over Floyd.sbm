@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Name": "Untitled",
+  "Name": "Woodbury I-29 NB over Floyd",
   "UnitSystem": "US",
   "Foot": "International",
   "Alignments": [
@@ -261,12 +261,17 @@
               "Extension": null,
               "CapBackToBearing": 0.45720000000000005,
               "CapFrontToBearing": 0.45720000000000005,
-              "StepBoundaryS": [],
+              "StepBoundaryS": [
+                9.851366731297624,
+                12.337046031832578,
+                14.822725331267652,
+                17.308404631802603
+              ],
               "StepRisersAtMidBay": false,
               "StepToSeat": 0.07619999999999999,
               "PlanCapDepthLeft": 1.1557000000000002,
               "PlanCapDepthRight": 1.1303,
-              "PlanCapVolume": 13.838442929510402,
+              "PlanCapVolume": "NaN",
               "WingExtension": {
                 "End": "Right",
                 "GutterOffset": 19.2024,
@@ -461,6 +466,24 @@
                     "X": -0.45720000000000005,
                     "Ref": "Soffit",
                     "Dz": 0
+                  }
+                ],
+                "Left": null,
+                "Right": {
+                  "Kind": "Offset",
+                  "Offset": 19.685000000000002,
+                  "Distance": 0,
+                  "Source": "east: wing outer face, 1\u0027-7 outside the gutter line (p.15 / p.16 A-A: 9 1/2 \u002B 1\u0027-7 = 2\u0027-4 1/2 from CL beam H) - U18"
+                },
+                "Unresolved": ""
+              },
+              {
+                "Name": "paving notch bracket",
+                "Section": [
+                  {
+                    "X": -0.45720000000000005,
+                    "Ref": "DeckTop",
+                    "Dz": -1.0922
                   },
                   {
                     "X": -0.45720000000000005,
@@ -481,11 +504,6 @@
                     "X": -0.8382000000000001,
                     "Ref": "DeckTop",
                     "Dz": -0.7111999999999999
-                  },
-                  {
-                    "X": -0.45720000000000005,
-                    "Ref": "DeckTop",
-                    "Dz": -1.0922
                   }
                 ],
                 "Left": null,
@@ -527,9 +545,14 @@
                 "Elevation": 340.860888
               }
             ],
-            "Risers": "Unresolved",
-            "RiserS": [],
-            "RiserSource": "the cap top steps one level per beam line, but the riser position between the beams is not dimensioned (p.17 ABUTMENT STEP DIAGRAM / p.9 pier steps; std 2087-BTCD p.13 step diagram draws the risers between the beams without a dimension) - user question Q3 open",
+            "Risers": "Explicit",
+            "RiserS": [
+              9.851366731297624,
+              12.337046031832578,
+              14.822725331267652,
+              17.308404631802603
+            ],
+            "RiserSource": "",
             "Fillers": [],
             "Keyways": [
               {
@@ -1765,9 +1788,24 @@
                 "Elevation": 341.089488
               }
             ],
-            "Risers": "Unresolved",
+            "Risers": "Blocks",
             "RiserS": [],
-            "RiserSource": "the cap top steps one level per beam line, but the riser position between the beams is not dimensioned (p.17 ABUTMENT STEP DIAGRAM / p.9 pier steps; std 2087-BTCD p.13 step diagram draws the risers between the beams without a dimension) - user question Q3 open",
+            "RiserSource": "",
+            "StepBlocks": {
+              "Length": 1.1176000000000001,
+              "SideAngleDeg": -11.5,
+              "Between": [
+                {
+                  "S": 7.416505529196501,
+                  "Elevation": 340.5378
+                },
+                {
+                  "S": 20.259380529196502,
+                  "Elevation": 340.99804800000004
+                }
+              ],
+              "Source": "p.9 cap plan: step blocks 1\u0027-10 \u002B 1\u0027-10 at 78 deg 30\u0027 to CL pier, cap top J-K between them"
+            },
             "Fillers": [
               {
                 "Name": "filler around bearings",
@@ -1809,8 +1847,7 @@
             "OpenBelowBeams": true,
             "PlanBearingGap": 0.0254,
             "Unresolved": [
-              "1\u0022 preformed filler on the faces of the steps and the sides / ends of the keyways (p.20 part plan): step faces follow the unresolved risers, keyway bevel undimensioned - not modeled",
-              "bearing pads: p.20 part plan draws the 9 x 2\u0027-4 1/2 pads with the long side PARALLEL to the CL pier; the model pads are square to the beam (prestressed generator) - the filler is cut around the model pads",
+              "1\u0022 preformed filler on the faces of the steps and the sides / ends of the keyways (p.20 part plan): the filler on the step faces is not built (thin-layer kind for vertical faces not available), keyway bevel undimensioned - not modeled",
               "pier diaphragm reinforcing (5d13-5d18, 5e1/5e2/5e6/5e7, p.26) not placed (schedule only)",
               "junction boxes in the pier diaphragm (lighting, p.35-37) not modeled"
             ]
@@ -3028,9 +3065,24 @@
                 "Elevation": 341.321136
               }
             ],
-            "Risers": "Unresolved",
+            "Risers": "Blocks",
             "RiserS": [],
-            "RiserSource": "the cap top steps one level per beam line, but the riser position between the beams is not dimensioned (p.17 ABUTMENT STEP DIAGRAM / p.9 pier steps; std 2087-BTCD p.13 step diagram draws the risers between the beams without a dimension) - user question Q3 open",
+            "RiserSource": "",
+            "StepBlocks": {
+              "Length": 1.1176000000000001,
+              "SideAngleDeg": -11.5,
+              "Between": [
+                {
+                  "S": 7.417028425677335,
+                  "Elevation": 340.58961600000004
+                },
+                {
+                  "S": 20.259903425677336,
+                  "Elevation": 341.235792
+                }
+              ],
+              "Source": "p.9 cap plan: step blocks 1\u0027-10 \u002B 1\u0027-10 at 78 deg 30\u0027 to CL pier, cap top J-K between them"
+            },
             "Fillers": [
               {
                 "Name": "filler around bearings",
@@ -3072,8 +3124,7 @@
             "OpenBelowBeams": true,
             "PlanBearingGap": 0.0254,
             "Unresolved": [
-              "1\u0022 preformed filler on the faces of the steps and the sides / ends of the keyways (p.20 part plan): step faces follow the unresolved risers, keyway bevel undimensioned - not modeled",
-              "bearing pads: p.20 part plan draws the 9 x 2\u0027-4 1/2 pads with the long side PARALLEL to the CL pier; the model pads are square to the beam (prestressed generator) - the filler is cut around the model pads",
+              "1\u0022 preformed filler on the faces of the steps and the sides / ends of the keyways (p.20 part plan): the filler on the step faces is not built (thin-layer kind for vertical faces not available), keyway bevel undimensioned - not modeled",
               "pier diaphragm reinforcing (5d13-5d18, 5e1/5e2/5e6/5e7, p.26) not placed (schedule only)",
               "junction boxes in the pier diaphragm (lighting, p.35-37) not modeled"
             ]
@@ -3222,12 +3273,17 @@
               "Extension": null,
               "CapBackToBearing": 0.45720000000000005,
               "CapFrontToBearing": 0.45720000000000005,
-              "StepBoundaryS": [],
+              "StepBoundaryS": [
+                9.851419662911548,
+                12.3374518693451,
+                14.823484075778653,
+                17.30951628355909
+              ],
               "StepRisersAtMidBay": false,
               "StepToSeat": 0.07619999999999999,
               "PlanCapDepthLeft": 1.2128500000000002,
               "PlanCapDepthRight": 1.1811000000000003,
-              "PlanCapVolume": 14.908819730688,
+              "PlanCapVolume": "NaN",
               "WingExtension": {
                 "End": "Right",
                 "GutterOffset": 19.2024,
@@ -3422,6 +3478,24 @@
                     "X": -0.45720000000000005,
                     "Ref": "Soffit",
                     "Dz": 0
+                  }
+                ],
+                "Left": null,
+                "Right": {
+                  "Kind": "Offset",
+                  "Offset": 19.685000000000002,
+                  "Distance": 0,
+                  "Source": "east: wing outer face, 1\u0027-7 outside the gutter line (p.15 / p.16 A-A: 9 1/2 \u002B 1\u0027-7 = 2\u0027-4 1/2 from CL beam H) - U18"
+                },
+                "Unresolved": ""
+              },
+              {
+                "Name": "paving notch bracket",
+                "Section": [
+                  {
+                    "X": -0.45720000000000005,
+                    "Ref": "DeckTop",
+                    "Dz": -1.0922
                   },
                   {
                     "X": -0.45720000000000005,
@@ -3442,11 +3516,6 @@
                     "X": -0.8382000000000001,
                     "Ref": "DeckTop",
                     "Dz": -0.7111999999999999
-                  },
-                  {
-                    "X": -0.45720000000000005,
-                    "Ref": "DeckTop",
-                    "Dz": -1.0922
                   }
                 ],
                 "Left": null,
@@ -3488,9 +3557,14 @@
                 "Elevation": 341.226648
               }
             ],
-            "Risers": "Unresolved",
-            "RiserS": [],
-            "RiserSource": "the cap top steps one level per beam line, but the riser position between the beams is not dimensioned (p.17 ABUTMENT STEP DIAGRAM / p.9 pier steps; std 2087-BTCD p.13 step diagram draws the risers between the beams without a dimension) - user question Q3 open",
+            "Risers": "Explicit",
+            "RiserS": [
+              9.851419662911548,
+              12.3374518693451,
+              14.823484075778653,
+              17.30951628355909
+            ],
+            "RiserSource": "",
             "Fillers": [],
             "Keyways": [
               {
@@ -4472,15 +4546,460 @@
         "StayInPlaceForms": false,
         "SipFormDepth": 0.0508,
         "Barrier": {
-          "Type": "None",
-          "Reinforcement": true,
+          "Type": "Custom",
+          "Reinforcement": false,
           "EpoxyCoated": true,
           "StirrupSpacing": 0.15239999999999998,
           "Height": 0.8128,
           "BaseWidth": 0.4064,
           "TopWidth": 0.15239999999999998,
           "Left": false,
-          "Right": true
+          "Right": true,
+          "Profile": [
+            {
+              "R": 0.4826,
+              "H": 0
+            },
+            {
+              "R": 0.4826,
+              "H": 0.07619999999999999,
+              "Radius": 0.038099999999999995
+            },
+            {
+              "R": 0.35559999999999997,
+              "H": 0.254,
+              "Radius": 0.254
+            },
+            {
+              "R": 0.2667,
+              "H": 1.1176,
+              "Chamfer": 0.009524999999999999
+            },
+            {
+              "R": 0.0127,
+              "H": 1.108075,
+              "Chamfer": 0.009524999999999999
+            },
+            {
+              "R": 0.0127,
+              "H": 0.9620249999999999
+            },
+            {
+              "R": 0.0508,
+              "H": 0.9525,
+              "Tag": "liner"
+            },
+            {
+              "R": 0.0508,
+              "H": 0.8128
+            },
+            {
+              "R": 0.0127,
+              "H": 0.803275
+            },
+            {
+              "R": 0.0127,
+              "H": 0.657225
+            },
+            {
+              "R": 0.0508,
+              "H": 0.6476999999999999,
+              "Tag": "liner"
+            },
+            {
+              "R": 0.0508,
+              "H": 0.508
+            },
+            {
+              "R": 0.0127,
+              "H": 0.498475
+            },
+            {
+              "R": 0.0127,
+              "H": 0.352425
+            },
+            {
+              "R": 0.0508,
+              "H": 0.3429,
+              "Tag": "liner"
+            },
+            {
+              "R": 0.0508,
+              "H": 0
+            }
+          ],
+          "ProfileName": "Iowa aesthetic barrier rail (Design 817 DS 36)",
+          "PerpendicularToDeck": true,
+          "BeginExtension": 1.5081250000000002,
+          "EndExtension": 1.5176500000000002,
+          "Zones": [
+            {
+              "Name": "bump-out Pier 1 strip returns",
+              "Support": "Pier 1",
+              "Station": "NaN",
+              "Length": 1.778,
+              "Profile": [
+                {
+                  "R": 0.4826,
+                  "H": 0
+                },
+                {
+                  "R": 0.4826,
+                  "H": 0.07619999999999999,
+                  "Radius": 0.038099999999999995
+                },
+                {
+                  "R": 0.35559999999999997,
+                  "H": 0.254,
+                  "Radius": 0.254
+                },
+                {
+                  "R": 0.2667,
+                  "H": 1.1176,
+                  "Chamfer": 0.009524999999999999
+                },
+                {
+                  "R": -0.254,
+                  "H": 1.09855,
+                  "Chamfer": 0.009524999999999999
+                },
+                {
+                  "R": -0.254,
+                  "H": 0.9620249999999999
+                },
+                {
+                  "R": -0.15239999999999998,
+                  "H": 0.9525
+                },
+                {
+                  "R": 0.0508,
+                  "H": 0.9525,
+                  "Tag": "liner"
+                },
+                {
+                  "R": 0.0508,
+                  "H": 0.8128
+                },
+                {
+                  "R": -0.15239999999999998,
+                  "H": 0.8128
+                },
+                {
+                  "R": -0.254,
+                  "H": 0.803275
+                },
+                {
+                  "R": -0.254,
+                  "H": 0.657225
+                },
+                {
+                  "R": -0.15239999999999998,
+                  "H": 0.6476999999999999
+                },
+                {
+                  "R": 0.0508,
+                  "H": 0.6476999999999999,
+                  "Tag": "liner"
+                },
+                {
+                  "R": 0.0508,
+                  "H": 0.508
+                },
+                {
+                  "R": -0.15239999999999998,
+                  "H": 0.508
+                },
+                {
+                  "R": -0.254,
+                  "H": 0.498475
+                },
+                {
+                  "R": -0.254,
+                  "H": 0.352425
+                },
+                {
+                  "R": -0.15239999999999998,
+                  "H": 0.3429
+                },
+                {
+                  "R": 0.0508,
+                  "H": 0.3429,
+                  "Tag": "liner"
+                },
+                {
+                  "R": 0.0508,
+                  "H": 0
+                }
+              ],
+              "Source": "p.38 Part Section G-G: strips 2\u0027-5 from the gutter (10 1/2 deeper than 1\u0027-6 1/2), 2\u0027-11 \u002B 2\u0027-11 = 5\u0027-10 centred on CL bump-out"
+            },
+            {
+              "Name": "bump-out Pier 1",
+              "Support": "Pier 1",
+              "Station": "NaN",
+              "Length": 1.412875,
+              "Profile": [
+                {
+                  "R": 0.4826,
+                  "H": 0
+                },
+                {
+                  "R": 0.4826,
+                  "H": 0.07619999999999999,
+                  "Radius": 0.038099999999999995
+                },
+                {
+                  "R": 0.35559999999999997,
+                  "H": 0.254,
+                  "Radius": 0.254
+                },
+                {
+                  "R": 0.2667,
+                  "H": 1.1176,
+                  "Chamfer": 0.009524999999999999
+                },
+                {
+                  "R": -0.254,
+                  "H": 1.09855,
+                  "Chamfer": 0.009524999999999999
+                },
+                {
+                  "R": -0.254,
+                  "H": 0.9620249999999999
+                },
+                {
+                  "R": -0.15239999999999998,
+                  "H": 0.9525,
+                  "Tag": "brick"
+                },
+                {
+                  "R": -0.15239999999999998,
+                  "H": 0.8128
+                },
+                {
+                  "R": -0.254,
+                  "H": 0.803275
+                },
+                {
+                  "R": -0.254,
+                  "H": 0.657225
+                },
+                {
+                  "R": -0.15239999999999998,
+                  "H": 0.6476999999999999,
+                  "Tag": "brick"
+                },
+                {
+                  "R": -0.15239999999999998,
+                  "H": 0.508
+                },
+                {
+                  "R": -0.254,
+                  "H": 0.498475
+                },
+                {
+                  "R": -0.254,
+                  "H": 0.352425
+                },
+                {
+                  "R": -0.15239999999999998,
+                  "H": 0.3429,
+                  "Tag": "brick"
+                },
+                {
+                  "R": -0.15239999999999998,
+                  "H": 0
+                }
+              ],
+              "DeckWidening": 0.381,
+              "DeckWideningLength": 1.5748,
+              "Source": "p.38 Part Sections D-D / H-H: brick face 2\u0027-1 from the gutter (8 deeper than 1\u0027-5), 2\u0027-3 13/16 \u002B 2\u0027-3 13/16 = 4\u0027-7 5/8; p.22 Detail C deck 1\u0027-3 x 5\u0027-2 (2\u0027-7 \u002B 2\u0027-7)"
+            },
+            {
+              "Name": "bump-out Pier 2 strip returns",
+              "Support": "Pier 2",
+              "Station": "NaN",
+              "Length": 1.778,
+              "Profile": [
+                {
+                  "R": 0.4826,
+                  "H": 0
+                },
+                {
+                  "R": 0.4826,
+                  "H": 0.07619999999999999,
+                  "Radius": 0.038099999999999995
+                },
+                {
+                  "R": 0.35559999999999997,
+                  "H": 0.254,
+                  "Radius": 0.254
+                },
+                {
+                  "R": 0.2667,
+                  "H": 1.1176,
+                  "Chamfer": 0.009524999999999999
+                },
+                {
+                  "R": -0.254,
+                  "H": 1.09855,
+                  "Chamfer": 0.009524999999999999
+                },
+                {
+                  "R": -0.254,
+                  "H": 0.9620249999999999
+                },
+                {
+                  "R": -0.15239999999999998,
+                  "H": 0.9525
+                },
+                {
+                  "R": 0.0508,
+                  "H": 0.9525,
+                  "Tag": "liner"
+                },
+                {
+                  "R": 0.0508,
+                  "H": 0.8128
+                },
+                {
+                  "R": -0.15239999999999998,
+                  "H": 0.8128
+                },
+                {
+                  "R": -0.254,
+                  "H": 0.803275
+                },
+                {
+                  "R": -0.254,
+                  "H": 0.657225
+                },
+                {
+                  "R": -0.15239999999999998,
+                  "H": 0.6476999999999999
+                },
+                {
+                  "R": 0.0508,
+                  "H": 0.6476999999999999,
+                  "Tag": "liner"
+                },
+                {
+                  "R": 0.0508,
+                  "H": 0.508
+                },
+                {
+                  "R": -0.15239999999999998,
+                  "H": 0.508
+                },
+                {
+                  "R": -0.254,
+                  "H": 0.498475
+                },
+                {
+                  "R": -0.254,
+                  "H": 0.352425
+                },
+                {
+                  "R": -0.15239999999999998,
+                  "H": 0.3429
+                },
+                {
+                  "R": 0.0508,
+                  "H": 0.3429,
+                  "Tag": "liner"
+                },
+                {
+                  "R": 0.0508,
+                  "H": 0
+                }
+              ],
+              "Source": "p.38 Part Section G-G: strips 2\u0027-5 from the gutter (10 1/2 deeper than 1\u0027-6 1/2), 2\u0027-11 \u002B 2\u0027-11 = 5\u0027-10 centred on CL bump-out"
+            },
+            {
+              "Name": "bump-out Pier 2",
+              "Support": "Pier 2",
+              "Station": "NaN",
+              "Length": 1.412875,
+              "Profile": [
+                {
+                  "R": 0.4826,
+                  "H": 0
+                },
+                {
+                  "R": 0.4826,
+                  "H": 0.07619999999999999,
+                  "Radius": 0.038099999999999995
+                },
+                {
+                  "R": 0.35559999999999997,
+                  "H": 0.254,
+                  "Radius": 0.254
+                },
+                {
+                  "R": 0.2667,
+                  "H": 1.1176,
+                  "Chamfer": 0.009524999999999999
+                },
+                {
+                  "R": -0.254,
+                  "H": 1.09855,
+                  "Chamfer": 0.009524999999999999
+                },
+                {
+                  "R": -0.254,
+                  "H": 0.9620249999999999
+                },
+                {
+                  "R": -0.15239999999999998,
+                  "H": 0.9525,
+                  "Tag": "brick"
+                },
+                {
+                  "R": -0.15239999999999998,
+                  "H": 0.8128
+                },
+                {
+                  "R": -0.254,
+                  "H": 0.803275
+                },
+                {
+                  "R": -0.254,
+                  "H": 0.657225
+                },
+                {
+                  "R": -0.15239999999999998,
+                  "H": 0.6476999999999999,
+                  "Tag": "brick"
+                },
+                {
+                  "R": -0.15239999999999998,
+                  "H": 0.508
+                },
+                {
+                  "R": -0.254,
+                  "H": 0.498475
+                },
+                {
+                  "R": -0.254,
+                  "H": 0.352425
+                },
+                {
+                  "R": -0.15239999999999998,
+                  "H": 0.3429,
+                  "Tag": "brick"
+                },
+                {
+                  "R": -0.15239999999999998,
+                  "H": 0
+                }
+              ],
+              "DeckWidening": 0.381,
+              "DeckWideningLength": 1.5748,
+              "Source": "p.38 Part Sections D-D / H-H: brick face 2\u0027-1 from the gutter (8 deeper than 1\u0027-5), 2\u0027-3 13/16 \u002B 2\u0027-3 13/16 = 4\u0027-7 5/8; p.22 Detail C deck 1\u0027-3 x 5\u0027-2 (2\u0027-7 \u002B 2\u0027-7)"
+            }
+          ],
+          "Source": "p.38 / DS 36 Part Sections C-C, F-F, D-D, G-G, H-H, Elevation; p.19 / DS 17 orientation; p.22 / DS 20 Detail C",
+          "PlanLength": 72.170925
         },
         "Reinforcement": {
           "Enabled": false,
@@ -4985,7 +5504,1459 @@
         "PlanSteelWeightLb": 4258,
         "Material": "Structural steel (A709 grade not given, p.5), galvanized",
         "BoltGrade": "ASTM A449 (web bolts) / H.S. (member bolts)"
-      }
+      },
+      "SurfaceTreatments": [
+        {
+          "Name": "Form liner (barrier)",
+          "Kind": "FormLiner",
+          "Pattern": "realistic smooth-faced brick wall, brick 2 1/4 x 7 5/8, running bond, horizontal joints horizontal in the final work",
+          "Products": "Fitzgerald Formliners (pattern 16941); Customrock International (12016); Architectural Polymers (101); others by sample to the Iowa DOT Office of Bridges and Structures",
+          "Relief": 0.00635,
+          "Orientation": "parallel to grade",
+          "PlanQuantity": "NaN",
+          "QuantityItem": "included in \u0027Structural Concrete (High Performance)\u0027 / barrier rail (p.44 notes) - no separate quantity",
+          "Source": "p.44 / DS 42 textured concrete notes; p.38 / DS 36",
+          "Regions": [
+            {
+              "Name": "barrier back face recesses",
+              "Host": "Barrier",
+              "Support": "",
+              "Tag": "liner",
+              "Elements": [],
+              "NameContains": "",
+              "FacingS": 0,
+              "FacingN": 0,
+              "MaxAngleDeg": 30,
+              "FacingOffsetSide": 0,
+              "SMin": "NaN",
+              "SMax": "NaN",
+              "Exclude": [],
+              "Source": "p.38 C-C, F-F, H-H; p.44 elevations",
+              "Unresolved": "",
+              "Basis": ""
+            }
+          ],
+          "Unresolved": []
+        },
+        {
+          "Name": "Form liner (abutments)",
+          "Kind": "FormLiner",
+          "Pattern": "realistic smooth-faced brick wall, brick 2 1/4 x 7 5/8, running bond, horizontal joints horizontal in the final work",
+          "Products": "Fitzgerald Formliners (pattern 16941); Customrock International (12016); Architectural Polymers (101); others by sample to the Iowa DOT Office of Bridges and Structures",
+          "Relief": 0.00635,
+          "Orientation": "level",
+          "PlanQuantity": "NaN",
+          "QuantityItem": "included in \u0027Structural Concrete (High Performance)\u0027 / barrier rail (p.44 notes) - no separate quantity",
+          "Source": "p.44 / DS 42; p.15 / p.16 note; p.6 berm table; p.40 section A-A",
+          "Regions": [
+            {
+              "Name": "S. Abut. front face, pile cap",
+              "Host": "Substructure",
+              "Support": "S. Abut.",
+              "Tag": "",
+              "Elements": [
+                "Footing"
+              ],
+              "NameContains": "pile cap",
+              "FacingS": 0,
+              "FacingN": 1,
+              "MaxAngleDeg": 30,
+              "FacingOffsetSide": 0,
+              "SMin": 19.343233932337558,
+              "SMax": "NaN",
+              "Lower": {
+                "Ref": "Elevation",
+                "Points": [
+                  {
+                    "S": 8.360704231272862,
+                    "Elevation": 339.73922400000004
+                  },
+                  {
+                    "S": 20.926533036205683,
+                    "Elevation": 340.05926400000004
+                  }
+                ],
+                "Offset": 0
+              },
+              "Upper": {
+                "Ref": "DeckTop",
+                "Points": [],
+                "Offset": -0.22225
+              },
+              "Exclude": [],
+              "Source": "p.44 typical section at abutment; 1\u0027-0 MIN. below the top of berm (p.44): taken at the 1\u0027-0 minimum",
+              "Unresolved": "",
+              "Basis": ""
+            },
+            {
+              "Name": "S. Abut. front face, diaphragm",
+              "Host": "Diaphragm",
+              "Support": "S. Abut.",
+              "Tag": "",
+              "Elements": [],
+              "NameContains": "",
+              "FacingS": 0,
+              "FacingN": 1,
+              "MaxAngleDeg": 30,
+              "FacingOffsetSide": 0,
+              "SMin": 19.343233932337558,
+              "SMax": "NaN",
+              "Lower": {
+                "Ref": "Elevation",
+                "Points": [
+                  {
+                    "S": 8.360704231272862,
+                    "Elevation": 339.73922400000004
+                  },
+                  {
+                    "S": 20.926533036205683,
+                    "Elevation": 340.05926400000004
+                  }
+                ],
+                "Offset": 0
+              },
+              "Upper": {
+                "Ref": "DeckTop",
+                "Points": [],
+                "Offset": -0.22225
+              },
+              "Exclude": [],
+              "Source": "p.44 typical section at abutment (from the face of the beam H web)",
+              "Unresolved": "",
+              "Basis": ""
+            },
+            {
+              "Name": "S. Abut. east face, wing extension \u002B pile cap end",
+              "Host": "Substructure",
+              "Support": "S. Abut.",
+              "Tag": "",
+              "Elements": [
+                "Wingwall",
+                "WingFooting",
+                "Footing"
+              ],
+              "NameContains": "",
+              "FacingS": 0,
+              "FacingN": 0,
+              "MaxAngleDeg": 30,
+              "FacingOffsetSide": 1,
+              "SMin": "NaN",
+              "SMax": "NaN",
+              "Lower": {
+                "Ref": "Elevation",
+                "Points": [
+                  {
+                    "S": 0,
+                    "Elevation": 340.0356303578118
+                  }
+                ],
+                "Offset": 0
+              },
+              "Upper": {
+                "Ref": "DeckTop",
+                "Points": [],
+                "Offset": -0.22225
+              },
+              "Exclude": [],
+              "Source": "p.44 south abutment, east barrier (north similar); 1\u0027-0 MIN. below the top of berm (p.44): taken at the 1\u0027-0 minimum",
+              "Unresolved": "",
+              "Basis": ""
+            },
+            {
+              "Name": "S. Abut. east face, diaphragm end",
+              "Host": "Diaphragm",
+              "Support": "S. Abut.",
+              "Tag": "",
+              "Elements": [],
+              "NameContains": "",
+              "FacingS": 0,
+              "FacingN": 0,
+              "MaxAngleDeg": 30,
+              "FacingOffsetSide": 1,
+              "SMin": "NaN",
+              "SMax": "NaN",
+              "Lower": {
+                "Ref": "Elevation",
+                "Points": [
+                  {
+                    "S": 0,
+                    "Elevation": 340.0356303578118
+                  }
+                ],
+                "Offset": 0
+              },
+              "Upper": {
+                "Ref": "DeckTop",
+                "Points": [],
+                "Offset": -0.22225
+              },
+              "Exclude": [],
+              "Source": "p.44 south abutment, east barrier",
+              "Unresolved": "",
+              "Basis": ""
+            },
+            {
+              "Name": "N. Abut. front face, pile cap",
+              "Host": "Substructure",
+              "Support": "N. Abut.",
+              "Tag": "",
+              "Elements": [
+                "Footing"
+              ],
+              "NameContains": "pile cap",
+              "FacingS": 0,
+              "FacingN": -1,
+              "MaxAngleDeg": 30,
+              "FacingOffsetSide": 0,
+              "SMin": 19.34469849006652,
+              "SMax": "NaN",
+              "Lower": {
+                "Ref": "Elevation",
+                "Points": [
+                  {
+                    "S": 8.50363216360954,
+                    "Elevation": 339.83676
+                  },
+                  {
+                    "S": 21.272048644063663,
+                    "Elevation": 340.46160000000003
+                  }
+                ],
+                "Offset": 0
+              },
+              "Upper": {
+                "Ref": "DeckTop",
+                "Points": [],
+                "Offset": -0.22225
+              },
+              "Exclude": [],
+              "Source": "p.44 typical section at abutment; 1\u0027-0 MIN. below the top of berm (p.44): taken at the 1\u0027-0 minimum",
+              "Unresolved": "",
+              "Basis": ""
+            },
+            {
+              "Name": "N. Abut. front face, diaphragm",
+              "Host": "Diaphragm",
+              "Support": "N. Abut.",
+              "Tag": "",
+              "Elements": [],
+              "NameContains": "",
+              "FacingS": 0,
+              "FacingN": -1,
+              "MaxAngleDeg": 30,
+              "FacingOffsetSide": 0,
+              "SMin": 19.34469849006652,
+              "SMax": "NaN",
+              "Lower": {
+                "Ref": "Elevation",
+                "Points": [
+                  {
+                    "S": 8.50363216360954,
+                    "Elevation": 339.83676
+                  },
+                  {
+                    "S": 21.272048644063663,
+                    "Elevation": 340.46160000000003
+                  }
+                ],
+                "Offset": 0
+              },
+              "Upper": {
+                "Ref": "DeckTop",
+                "Points": [],
+                "Offset": -0.22225
+              },
+              "Exclude": [],
+              "Source": "p.44 typical section at abutment (from the face of the beam H web)",
+              "Unresolved": "",
+              "Basis": ""
+            },
+            {
+              "Name": "N. Abut. east face, wing extension \u002B pile cap end",
+              "Host": "Substructure",
+              "Support": "N. Abut.",
+              "Tag": "",
+              "Elements": [
+                "Wingwall",
+                "WingFooting",
+                "Footing"
+              ],
+              "NameContains": "",
+              "FacingS": 0,
+              "FacingN": 0,
+              "MaxAngleDeg": 30,
+              "FacingOffsetSide": 1,
+              "SMin": "NaN",
+              "SMax": "NaN",
+              "Lower": {
+                "Ref": "Elevation",
+                "Points": [
+                  {
+                    "S": 0,
+                    "Elevation": 340.4154581271563
+                  }
+                ],
+                "Offset": 0
+              },
+              "Upper": {
+                "Ref": "DeckTop",
+                "Points": [],
+                "Offset": -0.22225
+              },
+              "Exclude": [],
+              "Source": "p.44 south abutment, east barrier (north similar); 1\u0027-0 MIN. below the top of berm (p.44): taken at the 1\u0027-0 minimum",
+              "Unresolved": "",
+              "Basis": ""
+            },
+            {
+              "Name": "N. Abut. east face, diaphragm end",
+              "Host": "Diaphragm",
+              "Support": "N. Abut.",
+              "Tag": "",
+              "Elements": [],
+              "NameContains": "",
+              "FacingS": 0,
+              "FacingN": 0,
+              "MaxAngleDeg": 30,
+              "FacingOffsetSide": 1,
+              "SMin": "NaN",
+              "SMax": "NaN",
+              "Lower": {
+                "Ref": "Elevation",
+                "Points": [
+                  {
+                    "S": 0,
+                    "Elevation": 340.4154581271563
+                  }
+                ],
+                "Offset": 0
+              },
+              "Upper": {
+                "Ref": "DeckTop",
+                "Points": [],
+                "Offset": -0.22225
+              },
+              "Exclude": [],
+              "Source": "p.44 south abutment, east barrier",
+              "Unresolved": "",
+              "Basis": ""
+            }
+          ],
+          "Unresolved": [
+            "(p.44) the liner on the wing END faces and behind the MSE wall is not dimensioned (elevation only) - not modeled."
+          ]
+        },
+        {
+          "Name": "Integral thin veneer brick",
+          "Kind": "ThinBrick",
+          "Pattern": "modular size brick, running bond, 2 1/4 x 7 5/8, mixture of dark brown tones (up to two color lots), velour texture",
+          "Products": "per the special provisions for integral thin veneer brick for structural concrete (p.13 notes)",
+          "Relief": 0.009524999999999999,
+          "Orientation": "level on the columns, parallel to the cap slope on the cap faces, parallel to grade on the barrier",
+          "PlanQuantity": 197.32605696000002,
+          "QuantityItem": "2599-9999014 Integral thin veneer brick for structural concrete, 2,124 SF (p.3)",
+          "Source": "p.13 / DS 11, p.14 / DS 12; p.38 / DS 36 D-D, H-H",
+          "Regions": [
+            {
+              "Name": "Pier 1 column 2",
+              "Host": "Substructure",
+              "Support": "Pier 1",
+              "Tag": "",
+              "Elements": [
+                "Column"
+              ],
+              "NameContains": "",
+              "FacingS": 0,
+              "FacingN": 0,
+              "MaxAngleDeg": 30,
+              "FacingOffsetSide": 0,
+              "SMin": 7.1069430291965014,
+              "SMax": 9.545343029196502,
+              "Lower": {
+                "Ref": "Elevation",
+                "Points": [
+                  {
+                    "S": 0,
+                    "Elevation": 335.58480000000003
+                  }
+                ],
+                "Offset": 0
+              },
+              "Upper": {
+                "Ref": "Elevation",
+                "Points": [
+                  {
+                    "S": 0,
+                    "Elevation": 338.96383135253456
+                  }
+                ],
+                "Offset": 0
+              },
+              "Exclude": [
+                {
+                  "Lower": {
+                    "Ref": "Elevation",
+                    "Points": [
+                      {
+                        "S": 0,
+                        "Elevation": 335.73085000000003
+                      }
+                    ],
+                    "Offset": 0
+                  },
+                  "Upper": {
+                    "Ref": "Elevation",
+                    "Points": [
+                      {
+                        "S": 0,
+                        "Elevation": 335.788
+                      }
+                    ],
+                    "Offset": 0
+                  },
+                  "Source": "p.13 Detail B"
+                },
+                {
+                  "Lower": {
+                    "Ref": "Elevation",
+                    "Points": [
+                      {
+                        "S": 0,
+                        "Elevation": 335.93405
+                      }
+                    ],
+                    "Offset": 0
+                  },
+                  "Upper": {
+                    "Ref": "Elevation",
+                    "Points": [
+                      {
+                        "S": 0,
+                        "Elevation": 335.99120000000005
+                      }
+                    ],
+                    "Offset": 0
+                  },
+                  "Source": "p.13 Detail B"
+                },
+                {
+                  "Lower": {
+                    "Ref": "Elevation",
+                    "Points": [
+                      {
+                        "S": 0,
+                        "Elevation": 338.7606313525346
+                      }
+                    ],
+                    "Offset": 0
+                  },
+                  "Upper": {
+                    "Ref": "Elevation",
+                    "Points": [
+                      {
+                        "S": 0,
+                        "Elevation": 338.81778135253455
+                      }
+                    ],
+                    "Offset": 0
+                  },
+                  "Source": "p.13 Detail A"
+                }
+              ],
+              "Source": "p.13 elevation, Details A / B, Section B-B (wraps all sides)",
+              "Unresolved": "p.13 Detail A: the gap below the cap soffit (2 MIN. / 4 1/2 MAX.) cannot hold with level courses here (soffit rise 2.57\u0022 over the column)",
+              "Basis": "top course 2\u0022 below the soffit low point (the minimum governs)"
+            },
+            {
+              "Name": "Pier 1 column 3",
+              "Host": "Substructure",
+              "Support": "Pier 1",
+              "Tag": "",
+              "Elements": [
+                "Column"
+              ],
+              "NameContains": "",
+              "FacingS": 0,
+              "FacingN": 0,
+              "MaxAngleDeg": 30,
+              "FacingOffsetSide": 0,
+              "SMin": 12.618743029196501,
+              "SMax": 15.057143029196503,
+              "Lower": {
+                "Ref": "Elevation",
+                "Points": [
+                  {
+                    "S": 0,
+                    "Elevation": 335.58480000000003
+                  }
+                ],
+                "Offset": 0
+              },
+              "Upper": {
+                "Ref": "Elevation",
+                "Points": [
+                  {
+                    "S": 0,
+                    "Elevation": 339.1619513525346
+                  }
+                ],
+                "Offset": 0
+              },
+              "Exclude": [
+                {
+                  "Lower": {
+                    "Ref": "Elevation",
+                    "Points": [
+                      {
+                        "S": 0,
+                        "Elevation": 335.73085000000003
+                      }
+                    ],
+                    "Offset": 0
+                  },
+                  "Upper": {
+                    "Ref": "Elevation",
+                    "Points": [
+                      {
+                        "S": 0,
+                        "Elevation": 335.788
+                      }
+                    ],
+                    "Offset": 0
+                  },
+                  "Source": "p.13 Detail B"
+                },
+                {
+                  "Lower": {
+                    "Ref": "Elevation",
+                    "Points": [
+                      {
+                        "S": 0,
+                        "Elevation": 335.93405
+                      }
+                    ],
+                    "Offset": 0
+                  },
+                  "Upper": {
+                    "Ref": "Elevation",
+                    "Points": [
+                      {
+                        "S": 0,
+                        "Elevation": 335.99120000000005
+                      }
+                    ],
+                    "Offset": 0
+                  },
+                  "Source": "p.13 Detail B"
+                },
+                {
+                  "Lower": {
+                    "Ref": "Elevation",
+                    "Points": [
+                      {
+                        "S": 0,
+                        "Elevation": 338.9587513525346
+                      }
+                    ],
+                    "Offset": 0
+                  },
+                  "Upper": {
+                    "Ref": "Elevation",
+                    "Points": [
+                      {
+                        "S": 0,
+                        "Elevation": 339.01590135253457
+                      }
+                    ],
+                    "Offset": 0
+                  },
+                  "Source": "p.13 Detail A"
+                }
+              ],
+              "Source": "p.13 elevation, Details A / B, Section B-B (wraps all sides)",
+              "Unresolved": "",
+              "Basis": "top course 2\u0022 below the soffit low point (the minimum governs)"
+            },
+            {
+              "Name": "Pier 1 column 4",
+              "Host": "Substructure",
+              "Support": "Pier 1",
+              "Tag": "",
+              "Elements": [
+                "Column"
+              ],
+              "NameContains": "",
+              "FacingS": 0,
+              "FacingN": 0,
+              "MaxAngleDeg": 30,
+              "FacingOffsetSide": 0,
+              "SMin": 18.130543029196502,
+              "SMax": 20.568943029196504,
+              "Lower": {
+                "Ref": "Elevation",
+                "Points": [
+                  {
+                    "S": 0,
+                    "Elevation": 335.58480000000003
+                  }
+                ],
+                "Offset": 0
+              },
+              "Upper": {
+                "Ref": "Elevation",
+                "Points": [
+                  {
+                    "S": 0,
+                    "Elevation": 339.3575263778802
+                  }
+                ],
+                "Offset": 0
+              },
+              "Exclude": [
+                {
+                  "Lower": {
+                    "Ref": "Elevation",
+                    "Points": [
+                      {
+                        "S": 0,
+                        "Elevation": 335.73085000000003
+                      }
+                    ],
+                    "Offset": 0
+                  },
+                  "Upper": {
+                    "Ref": "Elevation",
+                    "Points": [
+                      {
+                        "S": 0,
+                        "Elevation": 335.788
+                      }
+                    ],
+                    "Offset": 0
+                  },
+                  "Source": "p.13 Detail B"
+                },
+                {
+                  "Lower": {
+                    "Ref": "Elevation",
+                    "Points": [
+                      {
+                        "S": 0,
+                        "Elevation": 335.93405
+                      }
+                    ],
+                    "Offset": 0
+                  },
+                  "Upper": {
+                    "Ref": "Elevation",
+                    "Points": [
+                      {
+                        "S": 0,
+                        "Elevation": 335.99120000000005
+                      }
+                    ],
+                    "Offset": 0
+                  },
+                  "Source": "p.13 Detail B"
+                },
+                {
+                  "Lower": {
+                    "Ref": "Elevation",
+                    "Points": [
+                      {
+                        "S": 0,
+                        "Elevation": 339.15432637788024
+                      }
+                    ],
+                    "Offset": 0
+                  },
+                  "Upper": {
+                    "Ref": "Elevation",
+                    "Points": [
+                      {
+                        "S": 0,
+                        "Elevation": 339.2114763778802
+                      }
+                    ],
+                    "Offset": 0
+                  },
+                  "Source": "p.13 Detail A"
+                }
+              ],
+              "Source": "p.13 elevation, Details A / B, Section B-B (wraps all sides)",
+              "Unresolved": "",
+              "Basis": "top course 2\u0022 below the soffit low point (the minimum governs)"
+            },
+            {
+              "Name": "Pier 1 cap faces",
+              "Host": "Substructure",
+              "Support": "Pier 1",
+              "Tag": "",
+              "Elements": [
+                "Cap"
+              ],
+              "NameContains": "",
+              "FacingS": 0,
+              "FacingN": 1,
+              "MaxAngleDeg": 30,
+              "FacingOffsetSide": 0,
+              "SMin": 7.4190455291965005,
+              "SMax": "NaN",
+              "Lower": {
+                "Ref": "Elevation",
+                "Points": [
+                  {
+                    "S": 7.416505529196501,
+                    "Elevation": 339.01463135253454
+                  },
+                  {
+                    "S": 8.326143029196501,
+                    "Elevation": 339.047328
+                  },
+                  {
+                    "S": 13.837943029196502,
+                    "Elevation": 339.245448
+                  },
+                  {
+                    "S": 19.349743029196503,
+                    "Elevation": 339.44052000000005
+                  },
+                  {
+                    "S": 20.259380529196502,
+                    "Elevation": 339.4727136221199
+                  }
+                ],
+                "Offset": 0.2143125
+              },
+              "Upper": {
+                "Ref": "Elevation",
+                "Points": [
+                  {
+                    "S": 7.416505529196501,
+                    "Elevation": 340.5378
+                  },
+                  {
+                    "S": 20.259380529196502,
+                    "Elevation": 340.99804800000004
+                  }
+                ],
+                "Offset": -0.2143125
+              },
+              "Exclude": [],
+              "Source": "p.13 elevation, Detail A (8 7/16 \u002B 3\u0027-7 1/8 \u002B 8 7/16)",
+              "Unresolved": "",
+              "Basis": ""
+            },
+            {
+              "Name": "Pier 1 cap back face",
+              "Host": "Substructure",
+              "Support": "Pier 1",
+              "Tag": "",
+              "Elements": [
+                "Cap"
+              ],
+              "NameContains": "",
+              "FacingS": 0,
+              "FacingN": -1,
+              "MaxAngleDeg": 30,
+              "FacingOffsetSide": 0,
+              "SMin": 7.4190455291965005,
+              "SMax": "NaN",
+              "Lower": {
+                "Ref": "Elevation",
+                "Points": [
+                  {
+                    "S": 7.416505529196501,
+                    "Elevation": 339.01463135253454
+                  },
+                  {
+                    "S": 8.326143029196501,
+                    "Elevation": 339.047328
+                  },
+                  {
+                    "S": 13.837943029196502,
+                    "Elevation": 339.245448
+                  },
+                  {
+                    "S": 19.349743029196503,
+                    "Elevation": 339.44052000000005
+                  },
+                  {
+                    "S": 20.259380529196502,
+                    "Elevation": 339.4727136221199
+                  }
+                ],
+                "Offset": 0.2143125
+              },
+              "Upper": {
+                "Ref": "Elevation",
+                "Points": [
+                  {
+                    "S": 7.416505529196501,
+                    "Elevation": 340.5378
+                  },
+                  {
+                    "S": 20.259380529196502,
+                    "Elevation": 340.99804800000004
+                  }
+                ],
+                "Offset": -0.2143125
+              },
+              "Exclude": [],
+              "Source": "p.13 Detail A note: brick and feature bands wrap all sides of the columns and cap",
+              "Unresolved": "",
+              "Basis": ""
+            },
+            {
+              "Name": "Pier 1 east end (cap end, reveal, maskwall)",
+              "Host": "Substructure",
+              "Support": "Pier 1",
+              "Tag": "",
+              "Elements": [
+                "Cap",
+                "Maskwall"
+              ],
+              "NameContains": "",
+              "FacingS": 1,
+              "FacingN": 0,
+              "MaxAngleDeg": 30,
+              "FacingOffsetSide": 0,
+              "SMin": "NaN",
+              "SMax": "NaN",
+              "Lower": {
+                "Ref": "Elevation",
+                "Points": [
+                  {
+                    "S": 0,
+                    "Elevation": 339.6870261221199
+                  }
+                ],
+                "Offset": 0
+              },
+              "Upper": {
+                "Ref": "Elevation",
+                "Points": [
+                  {
+                    "S": 0,
+                    "Elevation": 342.3823480000001
+                  }
+                ],
+                "Offset": 0
+              },
+              "Exclude": [
+                {
+                  "Lower": {
+                    "Ref": "Elevation",
+                    "Points": [
+                      {
+                        "S": 0,
+                        "Elevation": 341.14409800000004
+                      }
+                    ],
+                    "Offset": 0
+                  },
+                  "Upper": {
+                    "Ref": "Elevation",
+                    "Points": [
+                      {
+                        "S": 0,
+                        "Elevation": 341.201248
+                      }
+                    ],
+                    "Offset": 0
+                  },
+                  "Source": "p.14 Detail E"
+                },
+                {
+                  "Lower": {
+                    "Ref": "Elevation",
+                    "Points": [
+                      {
+                        "S": 0,
+                        "Elevation": 342.1791480000001
+                      }
+                    ],
+                    "Offset": 0
+                  },
+                  "Upper": {
+                    "Ref": "Elevation",
+                    "Points": [
+                      {
+                        "S": 0,
+                        "Elevation": 342.2362980000001
+                      }
+                    ],
+                    "Offset": 0
+                  },
+                  "Source": "p.14 Detail E"
+                }
+              ],
+              "Source": "p.13 View A-A, p.14 Detail E",
+              "Unresolved": "p.13 View A-A / p.14 Detail E: the band layout on the cap end below K is drawn without a full dimension chain",
+              "Basis": "brick from the cap bottom band (8 7/16) to 3\u0022 below the low edge of the maskwall top, Detail E bands only"
+            },
+            {
+              "Name": "Pier 2 column 2",
+              "Host": "Substructure",
+              "Support": "Pier 2",
+              "Tag": "",
+              "Elements": [
+                "Column"
+              ],
+              "NameContains": "",
+              "FacingS": 0,
+              "FacingN": 0,
+              "MaxAngleDeg": 30,
+              "FacingOffsetSide": 0,
+              "SMin": 7.107465925677336,
+              "SMax": 9.545865925677337,
+              "Lower": {
+                "Ref": "Elevation",
+                "Points": [
+                  {
+                    "S": 0,
+                    "Elevation": 335.58480000000003
+                  }
+                ],
+                "Offset": 0
+              },
+              "Upper": {
+                "Ref": "Elevation",
+                "Points": [
+                  {
+                    "S": 0,
+                    "Elevation": 339.0147606935484
+                  }
+                ],
+                "Offset": 0
+              },
+              "Exclude": [
+                {
+                  "Lower": {
+                    "Ref": "Elevation",
+                    "Points": [
+                      {
+                        "S": 0,
+                        "Elevation": 335.73085000000003
+                      }
+                    ],
+                    "Offset": 0
+                  },
+                  "Upper": {
+                    "Ref": "Elevation",
+                    "Points": [
+                      {
+                        "S": 0,
+                        "Elevation": 335.788
+                      }
+                    ],
+                    "Offset": 0
+                  },
+                  "Source": "p.13 Detail B"
+                },
+                {
+                  "Lower": {
+                    "Ref": "Elevation",
+                    "Points": [
+                      {
+                        "S": 0,
+                        "Elevation": 335.93405
+                      }
+                    ],
+                    "Offset": 0
+                  },
+                  "Upper": {
+                    "Ref": "Elevation",
+                    "Points": [
+                      {
+                        "S": 0,
+                        "Elevation": 335.99120000000005
+                      }
+                    ],
+                    "Offset": 0
+                  },
+                  "Source": "p.13 Detail B"
+                },
+                {
+                  "Lower": {
+                    "Ref": "Elevation",
+                    "Points": [
+                      {
+                        "S": 0,
+                        "Elevation": 338.8115606935484
+                      }
+                    ],
+                    "Offset": 0
+                  },
+                  "Upper": {
+                    "Ref": "Elevation",
+                    "Points": [
+                      {
+                        "S": 0,
+                        "Elevation": 338.8687106935484
+                      }
+                    ],
+                    "Offset": 0
+                  },
+                  "Source": "p.13 Detail A"
+                }
+              ],
+              "Source": "p.13 elevation, Details A / B, Section B-B (wraps all sides)",
+              "Unresolved": "p.13 Detail A: the gap below the cap soffit (2 MIN. / 4 1/2 MAX.) cannot hold with level courses here (soffit rise 3.60\u0022 over the column)",
+              "Basis": "top course 2\u0022 below the soffit low point (the minimum governs)"
+            },
+            {
+              "Name": "Pier 2 column 3",
+              "Host": "Substructure",
+              "Support": "Pier 2",
+              "Tag": "",
+              "Elements": [
+                "Column"
+              ],
+              "NameContains": "",
+              "FacingS": 0,
+              "FacingN": 0,
+              "MaxAngleDeg": 30,
+              "FacingOffsetSide": 0,
+              "SMin": 12.619265925677336,
+              "SMax": 15.057665925677338,
+              "Lower": {
+                "Ref": "Elevation",
+                "Points": [
+                  {
+                    "S": 0,
+                    "Elevation": 335.58480000000003
+                  }
+                ],
+                "Offset": 0
+              },
+              "Upper": {
+                "Ref": "Elevation",
+                "Points": [
+                  {
+                    "S": 0,
+                    "Elevation": 339.2921286935484
+                  }
+                ],
+                "Offset": 0
+              },
+              "Exclude": [
+                {
+                  "Lower": {
+                    "Ref": "Elevation",
+                    "Points": [
+                      {
+                        "S": 0,
+                        "Elevation": 335.73085000000003
+                      }
+                    ],
+                    "Offset": 0
+                  },
+                  "Upper": {
+                    "Ref": "Elevation",
+                    "Points": [
+                      {
+                        "S": 0,
+                        "Elevation": 335.788
+                      }
+                    ],
+                    "Offset": 0
+                  },
+                  "Source": "p.13 Detail B"
+                },
+                {
+                  "Lower": {
+                    "Ref": "Elevation",
+                    "Points": [
+                      {
+                        "S": 0,
+                        "Elevation": 335.93405
+                      }
+                    ],
+                    "Offset": 0
+                  },
+                  "Upper": {
+                    "Ref": "Elevation",
+                    "Points": [
+                      {
+                        "S": 0,
+                        "Elevation": 335.99120000000005
+                      }
+                    ],
+                    "Offset": 0
+                  },
+                  "Source": "p.13 Detail B"
+                },
+                {
+                  "Lower": {
+                    "Ref": "Elevation",
+                    "Points": [
+                      {
+                        "S": 0,
+                        "Elevation": 339.08892869354844
+                      }
+                    ],
+                    "Offset": 0
+                  },
+                  "Upper": {
+                    "Ref": "Elevation",
+                    "Points": [
+                      {
+                        "S": 0,
+                        "Elevation": 339.1460786935484
+                      }
+                    ],
+                    "Offset": 0
+                  },
+                  "Source": "p.13 Detail A"
+                }
+              ],
+              "Source": "p.13 elevation, Details A / B, Section B-B (wraps all sides)",
+              "Unresolved": "p.13 Detail A: the gap below the cap soffit (2 MIN. / 4 1/2 MAX.) cannot hold with level courses here (soffit rise 3.60\u0022 over the column)",
+              "Basis": "top course 2\u0022 below the soffit low point (the minimum governs)"
+            },
+            {
+              "Name": "Pier 2 column 4",
+              "Host": "Substructure",
+              "Support": "Pier 2",
+              "Tag": "",
+              "Elements": [
+                "Column"
+              ],
+              "NameContains": "",
+              "FacingS": 0,
+              "FacingN": 0,
+              "MaxAngleDeg": 30,
+              "FacingOffsetSide": 0,
+              "SMin": 18.131065925677337,
+              "SMax": 20.56946592567734,
+              "Lower": {
+                "Ref": "Elevation",
+                "Points": [
+                  {
+                    "S": 0,
+                    "Elevation": 335.58480000000003
+                  }
+                ],
+                "Offset": 0
+              },
+              "Upper": {
+                "Ref": "Elevation",
+                "Points": [
+                  {
+                    "S": 0,
+                    "Elevation": 339.56949669354844
+                  }
+                ],
+                "Offset": 0
+              },
+              "Exclude": [
+                {
+                  "Lower": {
+                    "Ref": "Elevation",
+                    "Points": [
+                      {
+                        "S": 0,
+                        "Elevation": 335.73085000000003
+                      }
+                    ],
+                    "Offset": 0
+                  },
+                  "Upper": {
+                    "Ref": "Elevation",
+                    "Points": [
+                      {
+                        "S": 0,
+                        "Elevation": 335.788
+                      }
+                    ],
+                    "Offset": 0
+                  },
+                  "Source": "p.13 Detail B"
+                },
+                {
+                  "Lower": {
+                    "Ref": "Elevation",
+                    "Points": [
+                      {
+                        "S": 0,
+                        "Elevation": 335.93405
+                      }
+                    ],
+                    "Offset": 0
+                  },
+                  "Upper": {
+                    "Ref": "Elevation",
+                    "Points": [
+                      {
+                        "S": 0,
+                        "Elevation": 335.99120000000005
+                      }
+                    ],
+                    "Offset": 0
+                  },
+                  "Source": "p.13 Detail B"
+                },
+                {
+                  "Lower": {
+                    "Ref": "Elevation",
+                    "Points": [
+                      {
+                        "S": 0,
+                        "Elevation": 339.36629669354846
+                      }
+                    ],
+                    "Offset": 0
+                  },
+                  "Upper": {
+                    "Ref": "Elevation",
+                    "Points": [
+                      {
+                        "S": 0,
+                        "Elevation": 339.42344669354844
+                      }
+                    ],
+                    "Offset": 0
+                  },
+                  "Source": "p.13 Detail A"
+                }
+              ],
+              "Source": "p.13 elevation, Details A / B, Section B-B (wraps all sides)",
+              "Unresolved": "p.13 Detail A: the gap below the cap soffit (2 MIN. / 4 1/2 MAX.) cannot hold with level courses here (soffit rise 3.60\u0022 over the column)",
+              "Basis": "top course 2\u0022 below the soffit low point (the minimum governs)"
+            },
+            {
+              "Name": "Pier 2 cap faces",
+              "Host": "Substructure",
+              "Support": "Pier 2",
+              "Tag": "",
+              "Elements": [
+                "Cap"
+              ],
+              "NameContains": "",
+              "FacingS": 0,
+              "FacingN": 1,
+              "MaxAngleDeg": 30,
+              "FacingOffsetSide": 0,
+              "SMin": 7.419568425677335,
+              "SMax": "NaN",
+              "Lower": {
+                "Ref": "Elevation",
+                "Points": [
+                  {
+                    "S": 7.417028425677335,
+                    "Elevation": 339.0655606935484
+                  },
+                  {
+                    "S": 8.326665925677336,
+                    "Elevation": 339.111336
+                  },
+                  {
+                    "S": 13.838465925677337,
+                    "Elevation": 339.388704
+                  },
+                  {
+                    "S": 19.350265925677338,
+                    "Elevation": 339.66607200000004
+                  },
+                  {
+                    "S": 20.259903425677336,
+                    "Elevation": 339.71184730645166
+                  }
+                ],
+                "Offset": 0.2143125
+              },
+              "Upper": {
+                "Ref": "Elevation",
+                "Points": [
+                  {
+                    "S": 7.417028425677335,
+                    "Elevation": 340.58961600000004
+                  },
+                  {
+                    "S": 20.259903425677336,
+                    "Elevation": 341.235792
+                  }
+                ],
+                "Offset": -0.2143125
+              },
+              "Exclude": [],
+              "Source": "p.13 elevation, Detail A (8 7/16 \u002B 3\u0027-7 1/8 \u002B 8 7/16)",
+              "Unresolved": "",
+              "Basis": ""
+            },
+            {
+              "Name": "Pier 2 cap back face",
+              "Host": "Substructure",
+              "Support": "Pier 2",
+              "Tag": "",
+              "Elements": [
+                "Cap"
+              ],
+              "NameContains": "",
+              "FacingS": 0,
+              "FacingN": -1,
+              "MaxAngleDeg": 30,
+              "FacingOffsetSide": 0,
+              "SMin": 7.419568425677335,
+              "SMax": "NaN",
+              "Lower": {
+                "Ref": "Elevation",
+                "Points": [
+                  {
+                    "S": 7.417028425677335,
+                    "Elevation": 339.0655606935484
+                  },
+                  {
+                    "S": 8.326665925677336,
+                    "Elevation": 339.111336
+                  },
+                  {
+                    "S": 13.838465925677337,
+                    "Elevation": 339.388704
+                  },
+                  {
+                    "S": 19.350265925677338,
+                    "Elevation": 339.66607200000004
+                  },
+                  {
+                    "S": 20.259903425677336,
+                    "Elevation": 339.71184730645166
+                  }
+                ],
+                "Offset": 0.2143125
+              },
+              "Upper": {
+                "Ref": "Elevation",
+                "Points": [
+                  {
+                    "S": 7.417028425677335,
+                    "Elevation": 340.58961600000004
+                  },
+                  {
+                    "S": 20.259903425677336,
+                    "Elevation": 341.235792
+                  }
+                ],
+                "Offset": -0.2143125
+              },
+              "Exclude": [],
+              "Source": "p.13 Detail A note: brick and feature bands wrap all sides of the columns and cap",
+              "Unresolved": "",
+              "Basis": ""
+            },
+            {
+              "Name": "Pier 2 east end (cap end, reveal, maskwall)",
+              "Host": "Substructure",
+              "Support": "Pier 2",
+              "Tag": "",
+              "Elements": [
+                "Cap",
+                "Maskwall"
+              ],
+              "NameContains": "",
+              "FacingS": 1,
+              "FacingN": 0,
+              "MaxAngleDeg": 30,
+              "FacingOffsetSide": 0,
+              "SMin": "NaN",
+              "SMax": "NaN",
+              "Lower": {
+                "Ref": "Elevation",
+                "Points": [
+                  {
+                    "S": 0,
+                    "Elevation": 339.92615980645166
+                  }
+                ],
+                "Offset": 0
+              },
+              "Upper": {
+                "Ref": "Elevation",
+                "Points": [
+                  {
+                    "S": 0,
+                    "Elevation": 342.64549200000005
+                  }
+                ],
+                "Offset": 0
+              },
+              "Exclude": [
+                {
+                  "Lower": {
+                    "Ref": "Elevation",
+                    "Points": [
+                      {
+                        "S": 0,
+                        "Elevation": 341.381842
+                      }
+                    ],
+                    "Offset": 0
+                  },
+                  "Upper": {
+                    "Ref": "Elevation",
+                    "Points": [
+                      {
+                        "S": 0,
+                        "Elevation": 341.438992
+                      }
+                    ],
+                    "Offset": 0
+                  },
+                  "Source": "p.14 Detail E"
+                },
+                {
+                  "Lower": {
+                    "Ref": "Elevation",
+                    "Points": [
+                      {
+                        "S": 0,
+                        "Elevation": 342.44229200000007
+                      }
+                    ],
+                    "Offset": 0
+                  },
+                  "Upper": {
+                    "Ref": "Elevation",
+                    "Points": [
+                      {
+                        "S": 0,
+                        "Elevation": 342.49944200000004
+                      }
+                    ],
+                    "Offset": 0
+                  },
+                  "Source": "p.14 Detail E"
+                }
+              ],
+              "Source": "p.13 View A-A, p.14 Detail E",
+              "Unresolved": "p.13 View A-A / p.14 Detail E: the band layout on the cap end below K is drawn without a full dimension chain",
+              "Basis": "brick from the cap bottom band (8 7/16) to 3\u0022 below the low edge of the maskwall top, Detail E bands only"
+            },
+            {
+              "Name": "barrier bump-outs (piers 1 and 2)",
+              "Host": "Barrier",
+              "Support": "",
+              "Tag": "brick",
+              "Elements": [],
+              "NameContains": "",
+              "FacingS": 0,
+              "FacingN": 0,
+              "MaxAngleDeg": 30,
+              "FacingOffsetSide": 0,
+              "SMin": "NaN",
+              "SMax": "NaN",
+              "Exclude": [],
+              "Source": "p.38 Part Sections D-D / H-H (faces and 3 13/16 returns)",
+              "Unresolved": "",
+              "Basis": ""
+            }
+          ],
+          "Unresolved": [
+            "(p.13-14) maskwall long-side faces and the column / cap stage-joint end (Detail C, brick continued into stage 2) are not modeled as brick."
+          ]
+        }
+      ]
     }
   ],
   "References": [

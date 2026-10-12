@@ -31,6 +31,16 @@ public enum SpanOffsetOrigin
     WorkPoint,
 }
 
+/// <summary>How <see cref="GirderSpanEnd.BearingOffset"/> is measured.</summary>
+public enum BearingOffsetMeasure
+{
+    /// <summary>Along each girder's own chord (horizontal) - TxDOT IGEB / PGSuper "CL bent to CL bearing 1'-0 measured along the girder".</summary>
+    AlongGirder,
+    /// <summary>Normal to the support line (the bearing line is parallel to the support line), e.g. a CL bearing 1'-0 from the face of
+    /// an abutment backwall or 1'-9 1/4 from a CL pier; each girder moves bearing / cos(girder to support-line normal) along its chord.</summary>
+    NormalToSupport,
+}
+
 /// <summary>
 /// One end (begin or end support) of a <see cref="GirderSpanLayout"/>: the line on which the girder positions are given and the
 /// positions on it. The line is the support line (CL bearing / CL pier) moved parallel to itself by <see cref="LineShift"/>,
@@ -59,6 +69,13 @@ public sealed class GirderSpanEnd
     /// <summary>Optional, prestressed beams: haunch (top of beam to bottom of deck) per girder at this end's girder point (the plans'
     /// deck thickness at the beam minus the slab); null = <see cref="DeckDefinition.Haunch"/>.</summary>
     public List<double>? Haunches { get; set; }
+    /// <summary>OPTIONAL (0 = none, the default): the girder positions above are on the layout line (e.g. the CL pier, the plans' PIER REPORT
+    /// "girder spacing at CL pier"), and the girder's CL BEARING / layout point is this far from it INTO THE SPAN along the girder chord
+    /// (measured per <see cref="BearingMeasure"/>). The chord line is unchanged; the beam, seat and haunch use the moved point.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    public double BearingOffset { get; set; }
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    public BearingOffsetMeasure BearingMeasure { get; set; } = BearingOffsetMeasure.AlongGirder;
 
     /// <summary>The girder positions resolved from <see cref="Offsets"/> + <see cref="Spacings"/> (count = available values).</summary>
     public List<double> Resolved()
@@ -72,7 +89,7 @@ public sealed class GirderSpanEnd
     public GirderSpanEnd Clone() => new()
     {
         LineShift = LineShift, ShiftMeasure = ShiftMeasure, OffsetOrigin = OffsetOrigin, Measure = Measure, ReferenceOffset = ReferenceOffset, Offsets = Offsets.ToList(),
-        Spacings = Spacings?.ToList(), Haunches = Haunches?.ToList(),
+        Spacings = Spacings?.ToList(), Haunches = Haunches?.ToList(), BearingOffset = BearingOffset, BearingMeasure = BearingMeasure,
     };
 }
 
@@ -116,6 +133,7 @@ public sealed class GirderSpanLayout
             if (offs.Count < need) yield return $"{n} {name}: {need} girder offset(s) required, {offs.Count} given.";
             else if (PerpendicularSpacings == null && offs.Take(girderCount).Zip(offs.Skip(1).Take(girderCount - 1)).Any(p => p.Second <= p.First))
                 yield return $"{n} {name}: girder offsets must increase from left to right.";
+            if (e.BearingOffset < 0) yield return $"{n} {name}: the bearing offset must not be negative (it is measured into the span).";
             if (e.Haunches is { } h)
             {
                 if (!prestressed) yield return $"{n} {name}: haunches per girder apply to prestressed beams only.";

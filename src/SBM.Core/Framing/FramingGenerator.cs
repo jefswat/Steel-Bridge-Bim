@@ -315,6 +315,22 @@ public sealed class FramingGenerator
                 var (lp0, lp1) = ends[i];
                 var c = lp1 - lp0;
                 if (c.Length < 0.01) { Error($"{where}: girder {i + 1} has no length."); return; }
+                // Optional bearing offset into the span from the layout line (along the chord, or normal to the support line).
+                if (lay.Begin.BearingOffset != 0 || lay.End.BearingOffset != 0)
+                {
+                    var u = c.Normalized();
+                    double Along(GirderSpanEnd e, int k)
+                    {
+                        if (e.BearingOffset == 0) return 0;
+                        if (e.BearingMeasure == BearingOffsetMeasure.AlongGirder) return e.BearingOffset;
+                        double cos = Math.Abs(Vec2.Dot(u, UpStationNormal(k)));
+                        return cos > 1e-6 ? e.BearingOffset / cos : e.BearingOffset;
+                    }
+                    lp0 += u * Along(lay.Begin, j);
+                    lp1 -= u * Along(lay.End, j + 1);
+                    c = lp1 - lp0;
+                    if (c.Length < 0.01 || Vec2.Dot(c, u) <= 0) { Error($"{where}: girder {i + 1}: the bearing offsets leave no beam length."); return; }
+                }
                 if (!Numerics.IntersectLines(lp0, c, a, _supDir[j], out double t0, out _) ||
                     !Numerics.IntersectLines(lp0, c, z, _supDir[j + 1], out double t1, out _))
                 {

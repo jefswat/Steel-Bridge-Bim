@@ -1,0 +1,14 @@
+item,value,source,tag
+Girder lines,"9 (G1..G9) plate girders, 8 @ 8'-11 3/4"" = 71'-10"" (normal to girders)","PDF p.33, p.31",RASTER
+Web,"3/4"" x 48"" all lengths",PDF p.34,RASTER
+Span 1 top flange,"1"" x 18"" x 94'-0 3/4"" (A) then 1 1/8"" x 24"" x 80'-0"" (B, over pier, 40' each side)",PDF p.34,RASTER
+Span 1 bottom flange,"1 1/4"" x 24"" x A; 2"" x 24"" x B",PDF p.34,RASTER
+Span 2 flanges,top 1 1/8x24 x B / 1x18 x C(89'-7 13/16); bottom 2x24 x B / 1 1/4x24 x C,PDF p.34,RASTER
+Field splices,"one per span, 40'-0 from CL pier each side; bolted (7/8 dia A325, 15/16 holes); welded splice alternative detail","PDF p.35, p.33",RASTER
+Splice plates,"top 5/8x18x3'-6 1/2; inside top 2 PL 5/8x8 1/4x3'-6 1/2; web 2 PL 1/2x19 1/2x3'-7; bot 7/8x24x3'-9 1/2; inside bot 2 PL 7/8x11 1/4x3'-9 1/2; fillers 7/8x18x1'-9 (top), 3/4x24x1'-10 1/2 (bot)",PDF p.35,RASTER
+Bearing stiffeners,3/4x8 1/2x4'-0 at abutments; 1 1/2x11 1/2x4'-0 at pier (one face each side of web),PDF p.34,RASTER
+Cross-frame stiffeners,3/4x8 1/2x4'-0 (omit at outside face of exterior girders),"PDF p.34, p.36",RASTER
+Shear connectors,"3-7/8"" dia x 5"" studs per row; 3"" edge, 2 EQ spa; span 1: 17@10""=14'-2"", 77@12""=77'-0"", 25@12""=25'-0"", 6@24""=12'-0""; span 2: 6@24""=12'-0"", 25@12""=25'-0"", 71@12""=71'-0"", 19@10""=15'-10""; none at splices",PDF p.34,RASTER
+End of girder,"7"" beyond CL bearing (both ends)",PDF p.34,RASTER
+Steel,"M270 Gr 50W; total 896,460 lb (superstructure) + 45 lb abutment","PDF p.12, p.31",TEXT
+Drip plate,"3/8"" plate on outside of exterior girders at abut 1, abut 2 and up-grade side of pier 1; 6'-6"" from support",PDF p.34,RASTER

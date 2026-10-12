@@ -43,6 +43,7 @@ public partial class MainWindow
     private DispatcherTimer? _navTimer;
     /// <summary>Detail tiles farther than this (m) from the line of sight through the view center are not drawn; 0 = draw all.</summary>
     private double _detailRadius = 120;
+    private DateTime _lastVramCheck;
 
     /// <summary>The active mouse bindings (a table, so other presets can be added).</summary>
     private readonly IReadOnlyList<NavBinding> _navBindings = NavPresets.Cad;
@@ -65,6 +66,7 @@ public partial class MainWindow
             _navigating = false;
             ApplyDetailVisibility();
             UpdateRebarLod();
+            if ((DateTime.UtcNow - _lastVramCheck).TotalSeconds > 2) { _lastVramCheck = DateTime.UtcNow; CheckVramUsage(); }
         };
         View.CameraChanged += (_, _) => { OnCameraMoved(); UpdatePivotMarker(); };
         View.PreviewMouseWheel += OnViewportWheel;
@@ -158,16 +160,32 @@ public partial class MainWindow
         }
         float radius = (float)_detailRadius;
         var layerOnCache = new Dictionary<string, bool>();
+        // Viewport memory manager: tiles out of reach are RELEASED from the GPU (removed from the viewport) instead of only hidden;
+        // detail of far (simplified) bridges and all detail at the last level go the same way. Residency changes only when the
+        // camera has settled (all detail is hidden while it moves anyway).
+        bool residency = _vramLevel is { DetailResidency: true } || _vramLevel is { DropDetail: true };
+        bool drop = _vramLevel is { DropDetail: true };
+        if (!_navigating) ApplyFarBridgeLod(o, inv);
         foreach (var (m, (layer, lo, hi)) in _detailBounds)
         {
             if (!layerOnCache.TryGetValue(layer, out bool lon)) layerOnCache[layer] = lon = !_planMode && _vm.IsLayerVisible(layer);
-            bool near = _detailRadius <= 0 || o is not { } oo || SnapMath.LineHitsBox(oo, inv!.Value, lo, hi, radius);            m.Visibility = lon && !_navigating && near ? Visibility.Visible : Visibility.Collapsed;
+            bool near = _detailRadius <= 0 || o is not { } oo || SnapMath.LineHitsBox(oo, inv!.Value, lo, hi, radius);
+            bool farBridge = _farBridges.Count > 0 && _modelBridge.TryGetValue(m, out int mb) && _farBridges.Contains(mb);
+            bool show = lon && near && !drop && !farBridge;
+            if (!_navigating)
+            {
+                if (residency || farBridge) SetResident(m, show);
+                else SetResident(m, true);
+            }
+            m.Visibility = show && !_navigating ? Visibility.Visible : Visibility.Collapsed;
         }
     }
 
     /// <summary>Snapshot diagnostics: per detail layer, tiles drawn / total (DETAIL: lines in the session log).</summary>
     private void LogDetailVisibility()
     {
+        if (_farBridges.Count > 0 || _evicted.Count > 0)
+            ViewModels.MainViewModel.Log($"DETAIL: far (simplified) bridges: {string.Join(", ", _farBridges.Select(b => _scene != null && b < _scene.BridgeNames.Count ? _scene.BridgeNames[b] : b.ToString()))}; {_evicted.Count} models released from the GPU");
         ViewModels.MainViewModel.Log($"DETAIL: {_cameraEvents} camera events, {_cameraMoves} real view changes, navigating: {_navigating}, nav timer running: {_navTimer?.IsEnabled}");
         foreach (var g in _detailBounds.GroupBy(kv => kv.Value.layer))
         {
@@ -178,7 +196,7 @@ public partial class MainWindow
                 var t = cam.Position + cam.LookDirection;
                 old = g.Count(kv => { var c = (kv.Value.min + kv.Value.max) / 2; return new Vector2(c.X - (float)t.X, c.Y - (float)t.Y).Length() <= _detailRadius; });
             }
-            ViewModels.MainViewModel.Log($"DETAIL {g.Key}: {g.Count(kv => kv.Key.Visibility == Visibility.Visible)} of {g.Count()} tiles drawn (layer on: {_vm.IsLayerVisible(g.Key)}, radius {_detailRadius} m; old target-point rule would draw {old})");
+            ViewModels.MainViewModel.Log($"DETAIL {g.Key}: {g.Count(kv => kv.Key.Visibility == Visibility.Visible)} of {g.Count()} tiles drawn, {g.Count(kv => _evicted.Contains(kv.Key))} released from the GPU (layer on: {_vm.IsLayerVisible(g.Key)}, radius {_detailRadius} m; old target-point rule would draw {old})");
         }
     }
 

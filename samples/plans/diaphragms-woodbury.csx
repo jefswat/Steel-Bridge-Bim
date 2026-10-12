@@ -19,8 +19,11 @@ double[] pier2 = { 1118.21, 1118.62, 1119.03, 1119.43, 1119.82 };
 double[] nAbut = { 1117.89, 1118.29, 1118.70, 1119.10, 1119.51 };
 List<DiaphragmStep> Steps(double[] z) => z.Select((e, i) => new DiaphragmStep(i + 1, Ft(e))).ToList();
 
-const string RiserWhy = "the cap top steps one level per beam line, but the riser position between the beams is not dimensioned (p.17 ABUTMENT STEP DIAGRAM / p.9 pier steps; " +
-                        "std 2087-BTCD p.13 step diagram draws the risers between the beams without a dimension) - user question Q3 open";
+// Bottoms (user decision 11, 2026-10-11): abutments = the pile cap steps with the risers 1'-9 past the LOWER beam's CL along the CL brg (p.15 / p.16
+// rear elevations; supported by the plan 'abutment footing' 18.1 / 19.5 CY) -> Explicit RiserS; piers = the p.9 step blocks (3'-8 along CL pier centred
+// on the beam line, sides 78 deg 30' to CL pier) on the sloped J-K cap top -> Blocks. Both are filled in by substructure-woodbury.csx (it has the framing
+// and the cap data), which build-woodbury.csx runs right after this script; run standalone, the diaphragms stay at these placeholders until then.
+const string RiserWhy = "set by substructure-woodbury.csx (decision 11 risers / p.9 step blocks) - run it after this script";
 const string KeyBevel = "keyway 'formed by beveled 2x8' (p.15 B-B / p.20; std 2087-BTCD p.13): the bevel is drawn but not dimensioned";
 
 // ---------------------------------------------------------------- integral abutment diaphragm (p.15 B-B, p.16, p.20; std 2087-BTCD p.13 Part Section B-B)
@@ -29,20 +32,31 @@ const string KeyBevel = "keyway 'formed by beveled 2x8' (p.15 B-B / p.20; std 20
 // (1'-6 1/4 along CL NB = 1'-6 normal). Paving notch / bracket on the back face (std B-B, same dims on p.15): 1'-1 constant depth from
 // the top of deck to the bracket top, bracket 1'-3 behind the back face, 1'-3 vertical face, then 45 deg (1'-3 x 1'-3) back to the face;
 // 1" chamfer at the outer top corner.
-List<DiaphragmSectionPoint> AbutSection() => new()
+// U18 (closed 2026-10-11): section A-A (p.15 / p.16) dimensions the abutment east end 9 1/2 (CL beam H to the gutter line) + 1'-7 (gutter line to the
+// wing outer face) = 2'-4 1/2: the 3'-0 diaphragm over the cap runs to the wing OUTER face (the rear elevation draws the same 1'-7 over the cap end).
+// The paving-notch bracket behind the back face stops at the gutter line (outboard of it, behind the back face, is the wing extension wall).
+List<DiaphragmSectionPoint> AbutMain() => new() { P(-Ft(1.5), Bot), P(Ft(1.5), Bot), P(Ft(1.5), Sof), P(-Ft(1.5), Sof) };
+List<DiaphragmSectionPoint> AbutBracket() => new()
 {
-    P(-Ft(1.5), Bot), P(Ft(1.5), Bot), P(Ft(1.5), Sof), P(-Ft(1.5), Sof),
+    P(-Ft(1.5), Top, -In(13 + 15 + 15)),                 // 45 deg from the face (1'-3 x 1'-3)
     P(-Ft(1.5), Top, -In(13)),
     P(-Ft(1.5) - In(15) + In(1), Top, -In(13)),          // 1" chamfer
     P(-Ft(1.5) - In(15), Top, -In(14)),
     P(-Ft(1.5) - In(15), Top, -In(13 + 15)),             // 1'-1 + 1'-3
-    P(-Ft(1.5), Top, -In(13 + 15 + 15)),                 // 45 deg back to the face (1'-3 x 1'-3)
 };
 ConcreteDiaphragmDefinition Abut(string name, double[] seats, DiaphragmEnd left, string pages) => new()
 {
     Kind = ConcreteDiaphragmKind.IntegralEnd, Name = name, Source = pages + "; std 2087-BTCD p.13 B-B",
     Material = "Structural concrete (deck mix, cast with the deck)",
-    Parts = { new DiaphragmPart { Name = "abutment diaphragm", Section = AbutSection() } },
+    Parts =
+    {
+        new DiaphragmPart
+        {
+            Name = "abutment diaphragm", Section = AbutMain(),
+            Right = DiaphragmEnd.AtOffset(gutter + Len("1'-7\""), "east: wing outer face, 1'-7 outside the gutter line (p.15 / p.16 A-A: 9 1/2 + 1'-7 = 2'-4 1/2 from CL beam H) - U18"),
+        },
+        new DiaphragmPart { Name = "paving notch bracket", Section = AbutBracket() },
+    },
     Left = left,
     Right = DiaphragmEnd.AtOffset(gutter, "east: into the wing extension wall, inner face = gutter line (p.15 A-A, p.17)"),
     BottomSteps = Steps(seats), Risers = DiaphragmRiserRule.Unresolved, RiserSource = RiserWhy,
@@ -114,8 +128,7 @@ ConcreteDiaphragmDefinition Pier(string name, double[] seats) => new()
     },
     Unresolved =
     {
-        "1\" preformed filler on the faces of the steps and the sides / ends of the keyways (p.20 part plan): step faces follow the unresolved risers, keyway bevel undimensioned - not modeled",
-        "bearing pads: p.20 part plan draws the 9 x 2'-4 1/2 pads with the long side PARALLEL to the CL pier; the model pads are square to the beam (prestressed generator) - the filler is cut around the model pads",
+        "1\" preformed filler on the faces of the steps and the sides / ends of the keyways (p.20 part plan): the filler on the step faces is not built (thin-layer kind for vertical faces not available), keyway bevel undimensioned - not modeled",
         "pier diaphragm reinforcing (5d13-5d18, 5e1/5e2/5e6/5e7, p.26) not placed (schedule only)",
         "junction boxes in the pier diaphragm (lighting, p.35-37) not modeled",
     },

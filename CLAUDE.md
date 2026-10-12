@@ -83,7 +83,7 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
     CUT (inset) kinked-end vertices; panels at kink stations, clamped to skewed ends + per-panel columns where a kink line meets an end;
     haunch per girder split at per-span-layout jogs; barriers). The mesh is tessellated FROM the NURBS (`Mesh.Nurbs`, `NurbsTriangles`,
     `HasExactNurbs`, `ExactVolume()`); every consumer (viewport, drawings, checks, IFC, quantities) still reads the mesh. Opt-ins: `SteelPart.ExactVolume`,
-    `NurbsQuantities.Rows` / `SbmDocument.ExactQuantities`, `sbm nurbs` (timings off/on, fallbacks, exact vs mesh volumes, csv). Not wired yet:
+    `NurbsQuantities.Rows` / `SbmDocument.ExactQuantities`, `sbm nurbs` (timings off/on, fallbacks, exact vs mesh volumes, csv). Measure snaps refine onto the NURBS (see App). Not wired yet:
     drawings section cuts, view-dependent viewport tessellation, welds / stiffeners / deck end blocks / joint shelves (stay meshes).
     Cost (2026-10-11): I-80 + Ramp G full regen 27 s OFF -> 41 s ON; Woodbury 0.2 -> 1.1 s cold. Tests `NurbsTests`.
   - `Solids/PlateBuilder.cs` â€” plates WITH HOLES: polygon+holes triangulation (horizontal bridge to the +x ray hit â€”
@@ -164,7 +164,8 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
     `AbutmentDefinition.PileRowOffsets` (x of each pile row from CL brg; empty = the two legacy rows `PileRows`). `Kind` = Stub (default, all of the above) |
     Integral (Iowa integral pile cap, Woodbury p.15-17; `SubstructureAbutmentIntegral.cs`, concrete-bridge design feature A / T1): cap faces `CapBack/FrontToBearing`
     (required), stepped top = one level step per girder (`Steps`) with vertical risers at `StepBoundaryS` or `StepRisersAtMidBay` (only when confirmed - user question Q3;
-    neither = UNRESOLVED, no cap solid), bottom = `FootingBottom`; no backwall / corbel / step blocks (diaphragm = feature C); checks `PlanCapDepthLeft/Right`
+    neither = UNRESOLVED, no cap solid; Woodbury: user decision 11 = 1'-9 past the lower beam's CL, set by substructure-woodbury.csx, which also gives the
+    abutment / pier diaphragms their bottoms), bottom = `FootingBottom`; no backwall / corbel / step blocks (diaphragm = feature C); checks `PlanCapDepthLeft/Right`
     (p.17 step diagram), `PlanCapVolume`, `StepToSeat`; `WingExtensionDefinition` (wall outboard of the gutter line + level footing from the cap back face, every
     missing elevation / position UNRESOLVED), `PileCasingDefinition` (CMP from the concrete bottom to `BottomElevation`; NaN = UNRESOLVED, `AbutmentGeometry.Casings`
     schedule records only; solid = `SubElementKind.PileCasing`, IFC mapping pending T3), `PileSpiralDefinition` (schedule-only mark, one per pile). Integral rebar:
@@ -174,7 +175,19 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
     adds full-width strips above each layer line (`Layers` = BandChains, lowest line first; plans: fan arcs R5, R4, R3, 2" each, drafted 7 deg) as a
     separate Cap-kind SubSolid ("... cap section step"); lines go to `SubstructureUnit.ReliefLines` (bent elevation view). `CapBandBuilder` builds the
     tangent-arc S-curve from the plan tables (`FromTable`) or the explicit figures (`FromLongArc`). Cap bars are NOT adapted (warning). Data:
-    `samples/plans/pier-aesthetics.csx`, reading in `docs/plan-data/pier-cap-aesthetics.md` (Confirmed section). Stepped top (6A): `BandFromLowerTop` measures both faces' lines from the lower half's top. Texture itself / Detail A are not modeled.
+    `samples/plans/pier-aesthetics.csx`, reading in `docs/plan-data/pier-cap-aesthetics.md` (Confirmed section). Stepped top (6A): `BandFromLowerTop` measures both faces' lines from the lower half's top. Texture itself / Detail A are not modeled (see Surface treatments below for the generic texture / thin-brick regions).
+  - Surface treatments (OPTIONAL `BridgeDefinition.SurfaceTreatments` = `Bridge/SurfaceTreatment.cs`, null = none; generic for form liner texture, integral thin
+    brick / terra cotta, rustication): `SurfaceTreatmentDefinition` (Kind, Pattern, Products, Relief depth, Orientation, PlanQuantity m2 + QuantityItem, Source,
+    Unresolved) with `SurfaceRegion`s: Host Barrier (custom-barrier faces with a surface `Tag`) | Substructure (unit solids by `Elements` kinds / `NameContains`) |
+    Diaphragm; near-vertical, EXPOSED faces (centroid + 5 mm not inside another solid of the support, the beams or the haunches - ray parity), optional facing
+    (`FacingS/N` in the unit frame or `FacingOffsetSide` = outboard right/left), S range, `Lower`/`Upper` limit lines (`SurfaceLevel`: level, (S, z) polyline
+    along the support line, or `DeckTop` + offset = parallel to grade) and `Exclude` bands. `Surface/SurfaceTreatmentGenerator` (RegenerationCache phase 2,
+    after the diaphragms; result on `SubstructureModel.SurfaceTreatments` so every consumer has it): per region the AREA (clipped faces) and a RELIEF LAYER
+    (closed prism per face piece, offset outward by Relief); totals vs PlanQuantity as Info. Viewport layers 3D-THIN-BRICK / 3D-FORM-LINER; IFC one IfcCovering
+    per region (thin brick CLADDING, form liner USERDEFINED 'FORM_LINER_TEXTURE', key `IfcKeys.SurfaceTreatment`) + Pset SBM_SurfaceTreatment (kind, pattern,
+    products, orientation, host, Area, TreatmentTotalArea, PlanQuantity, ReliefDepth, source; area unit = m2) + SBM_Status when flagged; database group per
+    treatment (category "surface treatment", plan vs model in props) > elements "thin brick" / "form liner". The texture pattern itself is not modeled.
+    Data: `samples/plans/surface-treatments-woodbury.csx`. Tests `SurfaceTreatmentTests`.
   - `Drawing/Views/` â€” 2D views as `PlanDrawing`s (Z = 0) via `Drafter` (paper-inch sizes Ã— scale; dims with ticks,
     leaders, hatch, elevation tags, AWS weld symbols; ALL text is vertically middle-aligned â€” DxfWriter writes 72/73
     accordingly; "\n" in text = multi-line). Keep annotation text short/multi-line: paper-sized text does not shrink
@@ -263,7 +276,9 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
     split from the deck at the soffit; exact, no booleans: x-SLABS at every section vertex / beam-end event, each slice a simple polygon in (S, z)
     with a NOTCH per beam (outline + haunch to the soffit; skewed ends at the top-CL end x, SQUARE ends = outline clipped where the face meets the
     slice, events at every outline vertex, slices inset 1e-5 m and extrapolated) or, open below, PANELS between the beams; every slab = closed loft
-    (`Pieces`, one IFC face set each). IFC: IfcBeam .DIAPHRAGM. ('END_DIAPHRAGM' / 'PIER_DIAPHRAGM'), keyways IfcBuildingElementPart 'SHEAR_KEY'
+    (`Pieces`, one IFC face set each). Bottom = `Frame.Pieces` (z linear in S) with boundaries (risers) `Bounds` that may move with x (S + PerX x); rule
+    `DiaphragmRiserRule.Blocks` + `StepBlocks` (block length centred on the beam line, side angle, `Between` = substructure top (S, z) between the blocks,
+    Woodbury pier caps p.9) besides Explicit / MidBay / Unresolved. IFC: IfcBeam .DIAPHRAGM. ('END_DIAPHRAGM' / 'PIER_DIAPHRAGM'), keyways IfcBuildingElementPart 'SHEAR_KEY'
     aggregated into it, fillers IfcBuildingElementPart 'JOINT_FILLER'; Assumption -> SBM_Status. Viewport layers 3D-DIAPHRAGMS / -FILLERS /
     3D-UNRESOLVED-DIAPHRAGMS, material rows. Data: `samples/plans/diaphragms-woodbury.csx`, `diaphragms-br02069.csx` (run by the build scripts),
     report `check-diaphragms.csx`. Tests `ConcreteDiaphragmTests`. Not yet: 2D sheet views, database groups, diaphragm rebar.
@@ -293,7 +308,12 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
     keep BearingDetailer, ElevationCheck and BearingViews in step; steel `BearingSeat`s carry the footprint.
   - `Concrete/` â€” `ConcreteGenerator` (deck slab grid solid between skewed end lines following finished grade,
     haunch sweeps, barrier sweeps, deck mats, 1% negative-moment bars, TxDOT SSTR Bars S/U/R), `BarrierProfiles`
-    (SSTR per RL-SSTR Sept 2019 â€” 3/4" back-face step is an assumption), `Rebar.cs` (A615 sizes, AASHTO 5.10.8 Class B
+    (SSTR per RL-SSTR Sept 2019 â€” 3/4" back-face step is an assumption; `Expand` = custom section with fillets / chamfers / edge tags),
+    custom barriers `BarrierType.Custom` (`Bridge/BarrierCustom.cs`, `Concrete/ConcreteBarrierCustom.cs`; all inputs OPTIONAL and omitted from the .sbm when unused):
+    `Profile` (`BarrierProfilePoint` R inward from the deck edge / H, Radius, Chamfer, surface Tag of the next edge), `PerpendicularToDeck`, `Begin/EndExtension`
+    (square ends beyond the deck ends, along the toe line), `Zones` (`BarrierZone`: own section centred where a support CL crosses the deck edge, shortest zone wins,
+    optional `DeckWidening` -> `ConcreteModel.DeckBumps`, part of the deck slab), `PlanLength` check. Output: one mesh per barrier + `BarrierPieces` (closed solid per
+    section length, IFC items) + `TaggedSurfaces` (tagged faces incl. zone "returns") for the surface treatments. Woodbury: `samples/plans/barrier-woodbury.csx`. `Rebar.cs` (A615 sizes, AASHTO 5.10.8 Class B
     laps, `BarShape` centerlines + bend-diagram dims, `BarMark` incl. "varies" marks). Mark rules: â‰¥4 identical =
     own mark; straight bars within `MarkLengthTolerance` snap to the cluster's SHORTEST length; odd closures grouped
     into "varies" marks (â‰¤3 ft range). Negative-moment bars are one length centered on the pier. Equal-piece splits
@@ -400,6 +420,25 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
     after each scene rebuild; ranked candidates + occlusion test), pure helpers `SBM.Core/Geometry/SnapMath.cs`, `PointQuery.cs`.
     Query cost control: best-first BVH traversal, search radius shrinks to (K-th best score + max bonus) px once K=10 candidates are known
     (exact), 4 ms traversal budget, feature-edge checks deferred to ranking. Index is debounced (one build per scene burst; prebuilt once at startup).
+  - Viewport GPU memory (`MainWindow.Vram.cs`, inventory `Viewport/SceneInventory.cs`, pure planner `SBM.Core/Geometry/VramBudget.cs`, tests `VramAndExactSnapTests`):
+    every model's buffers are estimated with HelixToolkit layouts (mesh vertex 52 B, line vertex 32 B, index 4 B, instance 64 B) and compared
+    with the budget (Memory menu / `%LOCALAPPDATA%\SteelBridgeModeler\viewport-memory.json`; 0 = 80 % of the DXGI budget beyond the startup
+    usage, `QueryVideoMemoryInfo` via `EffectsManager.Device`). `VramPlanner.Ladder` order (user's): terrain clip 400 m + image 2048 px ->
+    terrain stride 2 / 3 -> detail tiles within 120 m RESIDENT (far tiles removed from `View.Items` = buffers freed; Helix creates buffers on
+    first draw, so hidden-but-attached tiles still filled the GPU as the user orbited) -> steel plates without bolt holes (`MeshLod.WithoutHoles`,
+    from the ExtrudedSolid recipes; scene rebuilt from the cache) -> 60 m -> far bridges (units, > 150 m from the line of sight) primary
+    layers only (`VramPlanner.PrimaryLayers`) -> terrain stride 8 + 1024 px -> 30 m -> terrain off -> detail off. Terrain is planned BEFORE
+    its buffers are built (`MainViewModel.PlanTerrainDisplay`, `TerrainDisplayOptions`, `ElevationGrid.ToMesh(stride, clip)`). Render OOM
+    (`View.RenderExceptionOccurred`) and DXGI usage > 95 % of the budget (checked on camera settle) step one level; managed OOM while building
+    the scene rebuilds without detail (`SceneBuilder.SkipDetail`). Solid layers are built per bridge and merged (`SolidLayer.PartBridges`).
+    Flat-shaded meshes share vertices of coplanar neighbours (`SceneBuilder.ShareVertices`); bars are one mitred loft each (`TubeBuilder`).
+    Log lines `VRAM plan` (breakdown by group / bridge / ladder), `VRAM usage` (DXGI). Snapshot options `--vram MB`, `--vramlevel N`,
+    `--novramreduce`, `--noshare`; snapshots now wait for the reference load. I-80 + Ramp G: 8.1 GB before -> 5.5 GB full detail, 2.0 GB
+    without holes (numbers in docs/HANDOFF.md section 0-vram).
+  - Exact measure snaps: with `Geometry.ExactCurvedGeometry` ON, a Surface snap on a part whose mesh has NURBS (SteelPart, deck / haunch /
+    barrier `NamedPick.Source`, SubPick) is refined onto the exact face (`NurbsSnap.TryRefine`: coarse sample + closest point, then Newton
+    ray / surface; planar faces ray / plane; holes rejected); `SnapHit.ExactWorld` is used by the measure and the readout says
+    "(exact, x off the mesh)". OFF = today's mesh snap unchanged.
   - Near-view rebar LOD (`MainWindow.RebarLod.cs`, `Viewport/SmoothRebar.cs`): zoomed in (width < 60 ft) and settled, bars within 20 ft of the view-center ray become smooth
     lofted tubes (parallel transport, bends <= 10 deg/step, 10 sides) in an overlay model per rebar layer; the same bars are skipped in the light tile/instanced models via
     `_lodSkip` (flows through ApplyToModel / HiddenRanges). Settings in static `RebarLod`; snapshot `--nolod --lodradius --lodwidth --width --noterrain --framebench --pickafter --hideafter`.
@@ -555,6 +594,33 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   properties; isolate with the layer toggles), IFC Pset `SBM_Status` {Status, Reason, Basis}, database props `status/reason/assumed` + view `v_unresolved` (with QC status), one warning per reason.
   Plan dimension that governs over a derived one (piped drains 22-25: tube 1'-8 from CL girder A) is modeled and the disagreement raised as `CONFLICT (plan vs model)`.
 - Plan-set test models: `samples/plans/*.csx` (Iowa DOT Designs 116/316); data in C:\SBMData (not in OneDrive).
+- Northaven Trail (TxDOT CSJ 0047-07-228, `samples/plans/build-nht.csx` -> `Northaven NHT.sbm`, check `check-nht.csx`, data
+  `docs/plan-data/nht-0047-07-228/`): alignment "CL NHT (TRAILCLNEW)" built element by element from PT 102 = 20+49.30 (the PI table's touching
+  reverse / compound curves overlap after coordinate rounding; curve 102's back tangent passes 5 ft from span 8, so it is left out), plan X/Y as a
+  local grid in feet. Five Tx28 approach units = five bridges ("NHT Unit 1" .. "NHT Unit 5", Structure "US 75 Ped.
+  Underpass at Northaven Trail ..."), Piers 4 / 7 / 13 shared (`SharedPier`). Span layouts from the PIER REPORTs: offsets along the CL pier line
+  + `GirderSpanEnd.BearingOffset` (1'-0 along the girder at piers, normal at abutments, 1'-9 1/4 normal at Piers 10 / 11).
+  **Arch interface (span 10 = GAP between Pier 10 and Pier 11, no girders):** Pier 10 = LAST support of "NHT Unit 3", Pier 11 = FIRST
+  support of "NHT Unit 4"; support line = CL pier (station 24+17.92 / 26+19.60, skew +19.578 deg from the radial). Their
+  `SubstructureDefinition.CapBlocks` hold the arch pedestals as `CapBlockKind.Pedestal` blocks ("arch bearing south" / "arch bearing north",
+  3'-4 x 1'-7 at 63 deg, plan tops EL. A / E p.102, `SeatS/SeatN` = CL bearing); after regeneration the substructure unit publishes them as
+  `SubstructureUnit.FixedSeats` (Name, S, N, Z): world point = `unit.World(S, N, Z)` with
+  `unit = Doc.Model("NHT Unit 3").Substructure.Units.First(u => u.Name == "Pier 10")` (Pier 11 likewise in Unit 4). Pier frame: S along
+  the pier line from the CL NHT point (right +), N normal (up-station +). CL arch bearing line = N +6 7/8" at Pier 10, -6 7/8" at Pier 11; the deck
+  ends 9 1/4" from CL pier on the approach side (`DeckEndOffset` = -9 1/4"). B1-B3 (pedestal tops vs tie WP chain) are raised as generator warnings
+  from `CapBlockDefinition.Reported`.
+- Fixed-elevation pedestals (OPTIONAL, general): `CapBlockKind.Pedestal` on an as-designed cap = a pedestal whose top is a plan elevation, not a
+  seat of this bridge (e.g. an arch / other-structure bearing); `CapBlockDefinition.SeatS/SeatN` (null = outline average), `Reported` (plan
+  differences -> warnings). Results: `SubstructureUnit.FixedSeats`. Solid kind Pedestal (IFC IfcColumn 'PEDESTAL').
+- Bearing offset from the layout line (OPTIONAL, `GirderSpanEnd.BearingOffset` + `BearingMeasure` AlongGirder | NormalToSupport, default 0 =
+  old behaviour): girder positions are given on the support line (PGSuper / TxDOT "girder spacing at CL pier"), the CL bearing / layout point is
+  moved this far into the span along each girder's chord (`FramingGenerator.SetupSpanLayouts`). With an offset the prestressed beam end is
+  `BearingToEnd` beyond the CL bearing (along the CL, or normal to the support for NormalToSupport) = TxDOT IGND / IGEB length C-C brg + 2 x 9"
+  (`PrestressedGenerator.BuildBeam`). Note `PrestressedBeam.Length` / `BearingSpan` are PLAN (horizontal) lengths.
+- Per-row plan pedestals (OPTIONAL `SubstructureDefinition.PedestalSizeAlongAhead` / `PedestalSideAngleAheadDeg`, null = the common values):
+  seats up-station of the CL pier (N > CapMidN) take their own along size / parallelogram angle (TxDOT "level 3'-0 seat" square to girders
+  meeting the pier at different angles each side). Foreign seats of a shared pier keep their own girder numbering (`Girder` >= 1000).
+- NHT model check: `check-nht.csx` 414 PASS / 4 FAIL (2026-10-11; the 4 = arch pier cap / column CY vs the p.102 quantity table, +-0.3 CY).
 
 ## Conventions (bridge engineering)
 - Offsets right-positive (Civil 3D). Skew from the radial line; positive = right end of support line up-station.

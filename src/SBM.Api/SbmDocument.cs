@@ -207,7 +207,8 @@ public sealed class SbmDocument
         {
             foreach (var d in m.Framing.Diagnostics.Concat(m.Steel?.Diagnostics ?? Enumerable.Empty<Diagnostic>())
                          .Concat(m.Prestressed?.Diagnostics ?? Enumerable.Empty<Diagnostic>())
-                         .Concat((m.Prestressed?.ConcreteDiaphragms?.Diagnostics ?? Enumerable.Empty<Diagnostic>()).Where(x => x.Severity != DiagnosticSeverity.Info)))
+                         .Concat((m.Prestressed?.ConcreteDiaphragms?.Diagnostics ?? Enumerable.Empty<Diagnostic>()).Where(x => x.Severity != DiagnosticSeverity.Info))
+                         .Concat((m.Substructure?.SurfaceTreatments?.Diagnostics ?? Enumerable.Empty<Diagnostic>()).Where(x => x.Severity != DiagnosticSeverity.Info)))
                 (d.Severity == DiagnosticSeverity.Error ? err : warn).Add($"{m.Definition.Name}: {d.Message}");
         }
         var ok = _models.OfType<BridgeModel>().ToList();
