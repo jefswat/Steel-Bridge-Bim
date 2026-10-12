@@ -49,8 +49,7 @@ public partial class MainWindow : Window
         InitDatabase();
         View.PreviewMouseLeftButtonDown += OnViewportMouseDown;
         View.PreviewMouseLeftButtonUp += OnViewportMouseUp;
-        View.PreviewMouseRightButtonDown += OnViewportRightDown;
-        View.PreviewMouseRightButtonUp += OnViewportRightUp;
+        // Right button down / up go through MainWindow.Navigation (OnNavDown / OnNavUp): right-drag orbits, a right click opens the menu.
         PreviewKeyDown += (_, e) =>
         {
             if (e.Key == Key.S && Keyboard.Modifiers == (ModifierKeys.Control | ModifierKeys.Shift)) { OnToggleSection(this, new RoutedEventArgs()); e.Handled = true; }
@@ -157,6 +156,8 @@ public partial class MainWindow : Window
                         ViewModels.MainViewModel.Log("PICK: " + string.Join(" | ", _vm.SelectedProperties.Select(r => $"{r.Name}={r.Value}")));
                     }, System.Windows.Threading.DispatcherPriority.ApplicationIdle);
                 }
+                int obi = Array.IndexOf(args, "--orbit");
+                if (obi >= 0 && obi + 1 < args.Length) SnapshotOrbit(args[obi + 1]);
                 UpdateRebarLod();
                 RunMeasureSnapshot(args);
                 int lodWaits = 0;
@@ -186,6 +187,7 @@ public partial class MainWindow : Window
                         ViewModels.MainViewModel.Log("PICKAFTER: " + string.Join(" | ", _vm.SelectedProperties.Select(r => $"{r.Name}={r.Value}")) + $" (smooth bars {_lodSkip.Count})");
                         if (opt == "--hideafter" && _selectedTag != null) { HideElement(_selectedTag, _selectedTitle); ViewModels.MainViewModel.Log($"HIDEAFTER: {_hiddenList.Count} hidden: {string.Join(", ", _hiddenList.Select(h => h.label))}"); }
                     }
+                    LogDetailVisibility();
                     SaveSnapshot(path);
                     SnapshotEditors(path);
                     _vm.IsDirty = false;
@@ -641,6 +643,7 @@ public partial class MainWindow : Window
 
     private void ZoomExtents()
     {
+        _pivot = null;
         if (_scene == null || _scene.Extents.IsEmpty) { View.ZoomExtents(0); return; }
         if (_planMode)
         {
@@ -801,7 +804,7 @@ public partial class MainWindow : Window
         var row2 = new System.Windows.Controls.StackPanel { Orientation = System.Windows.Controls.Orientation.Horizontal };
         row2.Children.Add(new System.Windows.Controls.TextBlock { Text = "Bolts / studs / rebar drawn within (0 = all)", VerticalAlignment = VerticalAlignment.Center });
         row2.Children.Add(rbox);
-        menu.Items.Add(new System.Windows.Controls.MenuItem { Header = row2, StaysOpenOnClick = true, ToolTip = "Horizontal distance from the view center. Detail is hidden while the view moves." });
+        menu.Items.Add(new System.Windows.Controls.MenuItem { Header = row2, StaysOpenOnClick = true, ToolTip = "Distance from the line of sight through the view center. Detail is hidden while the view moves." });
         menu.IsOpen = true;
     }
 

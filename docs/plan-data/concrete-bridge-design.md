@@ -182,6 +182,11 @@ as read) - NaN = UNRESOLVED; `PlanPileCount` > positioned piles = UNRESOLVED (WA
 no solid, records with unknown length; with a bottom, a 24-gon envelope solid (casing + fill) per pile. Spiral length uses the
 printed diameter as the helix diameter. Integral rebar: nothing placed in 3D; the plan bar list is schedule-only.
 
+Woodbury applied 2026-10-11 (`samples/plans/substructure-woodbury.csx`): both abutments Integral with the p.17 steps, bottoms, piles
+(7 on CL brg + wing pile 5'-0 from CL brg along the wing on its axis 1" outside the gutter = WA-1 closed), wing extension (footing top = step H,
+DERIVED; wall top C at the back face / B at the wing end = WA-3 DERIVED positions), casings (WA-2 open), spiral. Q3 / decision 11 still OPEN:
+no printed riser dimension; rear elevations draw 1'-9 past the lower beam, the step diagram 3'-4; the plan cap quantities (cap + wing footing)
+solve to 22.6" +-6.7" (S) / 19.9" +-3.3" (N) with one offset for all risers - see SUMMARY U13. The cap solid stays unbuilt until decided.
 Still open / waiting: Q3 (riser position), Q5 / WA-2 (casing bottom), WA-1 (wing pile position), WA-3 (A/B/C positions), WA-4 (north
 abutment p.16), wing footing top elevation; Woodbury script `samples/plans/abutments-woodbury.csx` not written (needs WA-1/3/4).
 T3: IFC mapping of `PileCasing` (currently falls to the IfcFooting default; only built once a casing bottom is entered) and the

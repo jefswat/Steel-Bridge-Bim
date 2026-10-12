@@ -124,6 +124,31 @@ public sealed class CapProfilePoint
     public CapProfilePoint(double s, double elevation) { S = s; Elevation = elevation; }
 }
 
+public enum CapBlockKind { Cap, Maskwall }
+public enum CapBlockBase { CapTop, CapBottom }
+
+/// <summary>
+/// A vertical prism added to an as-designed cap: plan outline in cap coordinates (S along the support line from the alignment point, N normal to it, + up-station),
+/// bottom on the cap top or the cap soffit (at each outline vertex), top = the plane TopElevation + TopSlopeS * (S - TopRefS) (level across N).
+/// Woodbury piers (p.9 elevation, p.11 section C-C): the maskwall at the east cap end and the 4" reveal projection of the cap end face.
+/// </summary>
+public sealed class CapBlockDefinition
+{
+    public string Name { get; set; } = "";
+    public CapBlockKind Kind { get; set; } = CapBlockKind.Cap;
+    public List<FootingPoint> Outline { get; set; } = new();
+    public CapBlockBase Base { get; set; } = CapBlockBase.CapTop;
+    public double TopElevation { get; set; } = double.NaN;
+    public double TopRefS { get; set; }
+    public double TopSlopeS { get; set; }
+    /// <summary>Plan reference (page / detail) for the description.</summary>
+    public string Source { get; set; } = "";
+    public CapBlockDefinition Clone() => new()
+    {
+        Name = Name, Kind = Kind, Outline = Outline.Select(p => p.Clone()).ToList(), Base = Base, TopElevation = TopElevation, TopRefS = TopRefS, TopSlopeS = TopSlopeS, Source = Source,
+    };
+}
+
 public enum FoundationType
 {
     /// <summary>Drilled shafts (one per column; under abutment caps, the shafts frame directly into the cap).</summary>
@@ -316,6 +341,8 @@ public sealed class SubstructureDefinition
     /// <summary>Optional as-designed profile of the up-station half of the cap width (e.g. a stepped top where the ahead
     /// unit's girders are shallower). Empty = the whole width uses <see cref="CapProfile"/>.</summary>
     public List<CapProfilePoint> CapProfileAhead { get; set; } = new();
+    /// <summary>Optional plan prisms added to an as-designed cap (end maskwall, end reveal projection; Woodbury p.9 / p.11 section C-C), see <see cref="CapBlockDefinition"/>.</summary>
+    public List<CapBlockDefinition> CapBlocks { get; set; } = new();
     /// <summary>Optional architectural texture band on one face of an as-designed cap (see <see cref="CapAestheticsDefinition"/>).</summary>
     public CapAestheticsDefinition? Aesthetics { get; set; }
     public CapTopShape TopShape { get; set; } = CapTopShape.Sloped;
@@ -345,6 +372,10 @@ public sealed class SubstructureDefinition
     /// <summary>The two rows abut on the line N = CL pier + this value (+ toward ahead; Pier 11WB: 1"): back blocks span [joint - across, joint], ahead blocks
     /// [joint, joint + across ahead], instead of being centred on their seats. NaN = centred on the seats. Needs the plan size, not with <see cref="PedestalShared"/>.</summary>
     public double PedestalRowJoint { get; set; } = double.NaN;
+    /// <summary>Plan pedestal blocks drawn as PARALLELOGRAMS (Woodbury cap steps, p.9: sides at 78 deg 30' to the CL pier): angle (degrees) of the block's
+    /// side faces from the cap normal (N axis) in plan, positive = the side moves toward +S as N increases. <see cref="PedestalSizeAlong"/> is then measured
+    /// along the cap at every N (the plan's "1'-10 + 1'-10" along the face). 0 = rectangular blocks. Needs the plan size.</summary>
+    public double PedestalSideAngleDeg { get; set; }
 
     // ---------------- Columns (piers)
     public int ColumnCount { get; set; } = 3;
@@ -361,6 +392,10 @@ public sealed class SubstructureDefinition
     /// <summary>Rectangular columns: corner chamfer along the cap (S) and across it (N); 0 = square corners.</summary>
     public double ColumnChamferS { get; set; }
     public double ColumnChamferN { get; set; }
+    /// <summary>Rectangular columns: architectural projection (reveal) on BOTH faces normal to the cap (the S faces): depth beyond the face and its width along N,
+    /// centred (Woodbury p.11 section B-B: 4" x 2'-11 5/8 on a 5'-3 5/8 x 4'-3 5/8 column, 5'-11 5/8 overall). 0 = none. Not with chamfers.</summary>
+    public double ColumnProjectionS { get; set; }
+    public double ColumnProjectionWidth { get; set; }
     /// <summary>Optional flared base: below this elevation the column has the flare section (NaN = no flare).</summary>
     public double ColumnFlareElevation { get; set; } = double.NaN;
     public double ColumnFlareWidth { get; set; }
@@ -471,6 +506,7 @@ public sealed class SubstructureDefinition
         c.CapProfile = CapProfile.Select(p => new CapProfilePoint(p.S, p.Elevation)).ToList();
         c.CapProfileAhead = CapProfileAhead.Select(p => new CapProfilePoint(p.S, p.Elevation)).ToList();
         c.Footings = Footings.Select(f => f.Clone()).ToList();
+        c.CapBlocks = CapBlocks.Select(b => b.Clone()).ToList();
         c.Aesthetics = Aesthetics?.Clone();
         c.Abutment = Abutment?.Clone();
         return c;

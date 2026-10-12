@@ -3,9 +3,10 @@
   // Format: see sheet-links-i80-rampg.json (header) and docs/API.md "Companion database". Sheet index and families:
   // docs/plan-data/woodbury-i29-floyd/INDEX.md (PDF page p = design sheet p-2 for pages 3-44).
   // Hierarchy in this model: unit > superstructure > prestressed girder (assembly: beam + strands) | cross frame group > cross frame
-  //   (steel diaphragm: channel, gussets, fillers, bolts) | bearing pad; unit > deck > deck slab. The substructure of this model is
-  //   disabled (Substructure.Enabled = false) and the concrete diaphragms are not in the database yet, so the pier / abutment rules
-  //   below link the bearing pads at that support and are ready for the pier / abutment parts when they are generated.
+  //   (steel diaphragm: channel, gussets, fillers, bolts) | bearing pad; unit > deck > deck slab; unit > substructure > pier | abutment
+  //   (cap, pedestal step blocks, maskwall, columns, footings, piles; integral abutment: piles, wing extension wall / footing; built by
+  //   substructure-woodbury.csx since 2026-10-11 - the abutment pile caps are not built while their step risers are UNRESOLVED).
+  //   The concrete diaphragms are not in the database yet.
 
   "models": [ "Woodbury I-29 NB over Floyd.sbm" ],
   "planFolders": [ "plans", "C:/SBMData" ],
@@ -78,6 +79,11 @@
 
     { "id": "pier-details", "sheets": "^PIER DETAILS", "basis": "Pier caps, columns, footings, piles and reinforcing (bar lists p.12)",
       "target": [ { "level": "part", "category": "pier" }, { "level": "element", "category": "bearing pad", "support": "Pier%" } ] },
+    { "id": "pier-cap", "sheets": "^PIER DETAILS", "pages": [ 9, 10, 11 ], "basis": "Pier cap plan / elevation / sections A-A, C-C: cap, step blocks, maskwall, columns (B-B)",
+      "target": [ { "level": "element", "category": [ "pier cap", "pedestal", "maskwall", "column" ], "support": "Pier%" },
+                  { "level": "group", "category": "maskwall group", "support": "Pier%" } ] },
+    { "id": "pier-foundation", "sheets": "^PIER DETAILS", "pages": [ 9, 11, 12 ], "basis": "Footings, pile layout (batter, Detail 1 uplift anchors), pile notes",
+      "target": [ { "level": "group", "category": "footing group", "support": "Pier%" }, { "level": "element", "category": [ "footing", "pile" ], "support": "Pier%" } ] },
     { "id": "pier-aesthetics", "sheets": "^PIER AESTHETIC DETAILS", "basis": "Pier treatment (thin veneer brick)",
       "target": [ { "level": "group", "category": [ "cap group", "column group" ], "support": "Pier%" } ] },
     { "id": "south-abutment", "sheets": "^SOUTH ABUTMENT DETAILS", "basis": "South (integral) abutment: cap, piles, end diaphragm, beam seats",
@@ -85,7 +91,14 @@
     { "id": "north-abutment", "sheets": "^NORTH ABUTMENT DETAILS", "basis": "North (integral) abutment: cap, piles, end diaphragm, beam seats",
       "target": [ { "level": "part", "category": "abutment", "support": "N%Abut%" }, { "level": "element", "category": "bearing pad", "support": "N%Abut%" } ] },
     { "id": "abutment-piles", "sheets": "^ABUTMENT PILE PLAN", "basis": "Abutment pile plan, step diagram and seat elevations",
-      "target": [ { "level": "part", "category": "abutment" }, { "level": "element", "category": "bearing pad", "support": "%Abut%" } ] },
+      "target": [ { "level": "part", "category": "abutment" }, { "level": "element", "category": "bearing pad", "support": "%Abut%" },
+                  { "level": "element", "category": [ "pile", "wing footing" ], "support": "%Abut%" }, { "level": "group", "category": "footing group", "support": "%Abut%" } ] },
+    { "id": "abutment-wing-s", "sheets": "^SOUTH ABUTMENT DETAILS", "basis": "South wing extension (section A-A, rear elevation)",
+      "target": [ { "level": "group", "category": "wingwall group", "support": "S%Abut%" }, { "level": "element", "category": [ "wingwall", "wing footing" ], "support": "S%Abut%" } ] },
+    { "id": "abutment-wing-n", "sheets": "^NORTH ABUTMENT DETAILS", "basis": "North wing extension (section A-A, rear elevation)",
+      "target": [ { "level": "group", "category": "wingwall group", "support": "N%Abut%" }, { "level": "element", "category": [ "wingwall", "wing footing" ], "support": "N%Abut%" } ] },
+    { "id": "abutment-wing-top", "sheets": "^LONGITUDINAL SECTION", "basis": "Table of wingwall elevations A / B / C",
+      "target": [ { "level": "element", "category": "wingwall", "support": "%Abut%" } ] },
 
     { "id": "typical-section", "sheets": "^SUPERSTRUCTURE DETAILS", "pages": [ 18, 19 ], "basis": "Typical section: deck, haunch, beam spacing, barrier",
       "target": [ { "level": "part", "category": "deck" }, { "level": "assembly", "category": "prestressed girder" } ] },
@@ -120,8 +133,8 @@
   ],
 
   "hints": [
-    { "sheets": "PIER DETAILS|PIER AESTHETIC", "suggests": "Piers: the model's substructure is disabled (Substructure.Enabled = false); only the bearing pads at the piers link here." },
-    { "sheets": "ABUTMENT DETAILS", "suggests": "Abutments: the model's substructure is disabled; only the bearing pads link here." },
+    { "sheets": "PIER AESTHETIC", "suggests": "Thin veneer brick (pier aesthetics) is not modeled; the sheet links to the cap / column groups." },
+    { "sheets": "ABUTMENT DETAILS", "suggests": "Integral abutments: the stepped pile cap is NOT built (step riser positions UNRESOLVED, SUMMARY U13); piles, wing extension and casings (schedule) are." },
     { "sheets": "LIGHTING", "suggests": "Lighting (poles, conduit, junction boxes) is not in this model." },
     { "sheets": "BARRIER RAIL", "suggests": "Barrier: not generated in this model (Deck.Barrier.Type = None)." },
     { "sheets": "SLOPE PROTECTION", "suggests": "Slope protection under the bridge: no earthwork / slope-protection elements." },

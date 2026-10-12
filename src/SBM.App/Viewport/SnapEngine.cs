@@ -450,6 +450,104 @@ public sealed class SnapIndex
         return result;
     }
 
+    /// <summary>
+    /// Nearest visible surface along a ray (scene-local origin + unit direction): an exact front-to-back BVH ray cast with
+    /// no pixel tolerance and no time budget (boxes farther than the best hit are skipped, so it stays fast). Used for the
+    /// orbit pivot, which must be the surface the user actually points at.
+    /// </summary>
+    public SnapHit? RayCast(Vector3 origin, Vector3 dir, SnapEnvironment env)
+    {
+        if (_root < 0) return null;
+        var cx = new Ctx
+        {
+            Req = new SnapRequest { Origin = origin, Dir = dir, ViewRight = default, ViewUp = default, PixelSize = 1e-6f, Modes = SnapModes.None },
+            Env = env, SrcVis = new byte[_sources.Count], LineVis = new byte[_lines.Count],
+        };
+        Cast(_root, cx, SnapMath.Reciprocal(dir));
+        if (cx.SurfaceT == float.MaxValue) return null;
+        return new SnapHit { P = cx.SurfaceP, Kind = SnapKind.Surface, Tag = cx.SurfaceTag, Layer = cx.SurfaceSrc?.Layer ?? "", Text = cx.SurfaceSrc?.Label ?? "", Depth = cx.SurfaceT, OnObject = true };
+    }
+
+    /// <summary>Entry distance of a line into a box (slab test; false = missed).</summary>
+    private static bool RayBox(Vector3 o, Vector3 inv, Vector3 min, Vector3 max, out float tEnter)
+    {
+        float t0 = float.NegativeInfinity, t1 = float.PositiveInfinity;
+        for (int k = 0; k < 3; k++)
+        {
+            float a = (min[k] - o[k]) * inv[k], b = (max[k] - o[k]) * inv[k];
+            if (float.IsNaN(a) || float.IsNaN(b)) { if (o[k] < min[k] || o[k] > max[k]) { tEnter = 0; return false; } continue; }
+            if (a > b) (a, b) = (b, a);
+            if (a > t0) t0 = a;
+            if (b < t1) t1 = b;
+        }
+        tEnter = t0;
+        return t1 >= t0;
+    }
+
+    private void Cast(int ni, Ctx cx, Vector3 inv)
+    {
+        ref readonly var n = ref _nodes[ni];
+        if (!RayBox(cx.Req.Origin, inv, n.Min, n.Max, out float t) || t > cx.SurfaceT) return;
+        if (n.Left < 0)
+        {
+            var lf = _leaves[n.Right];
+            if (lf.Kind == LeafKind.Segments || !SrcVisible(lf.Src!, cx)) return;
+            if (lf.Kind == LeafKind.Tris) CastTris(lf, cx);
+            else CastInstances(lf, cx);
+            return;
+        }
+        int a = n.Left, b = n.Right;
+        bool ha = RayBox(cx.Req.Origin, inv, _nodes[a].Min, _nodes[a].Max, out float ta);
+        bool hb = RayBox(cx.Req.Origin, inv, _nodes[b].Min, _nodes[b].Max, out float tb);
+        if (hb && (!ha || tb < ta)) { (a, b) = (b, a); }
+        Cast(a, cx, inv);
+        Cast(b, cx, inv);
+    }
+
+    private static void CastTris(Leaf lf, Ctx cx)
+    {
+        var s = lf.Src!;
+        var pos = s.Mesh.Positions!;
+        var ind = s.Mesh.Indices!;
+        var o = cx.Req.Origin;
+        var d = cx.Req.Dir;
+        for (int t = lf.I0; t < lf.I1; t++)
+        {
+            if (!SnapMath.RayTriangle(o, d, pos[ind[3 * t]], pos[ind[3 * t + 1]], pos[ind[3 * t + 2]], out float th) || th >= cx.SurfaceT || th < 0) continue;
+            var hp = o + d * th;
+            if (!cx.Env.Kept(hp)) continue;
+            var tag = TagOf(s, t);
+            if (tag != null && cx.Env.IsHidden(tag)) continue;
+            cx.SurfaceT = th; cx.SurfaceP = hp; cx.SurfaceTag = tag; cx.SurfaceSrc = s;
+        }
+    }
+
+    private static void CastInstances(Leaf lf, Ctx cx)
+    {
+        var s = lf.Src!;
+        var pos = s.Mesh.Positions!;
+        var ind = s.Mesh.Indices!;
+        var o = cx.Req.Origin;
+        var d = cx.Req.Dir;
+        for (int i = lf.I0; i < lf.I1; i++)
+        {
+            var m = s.Instances![i];
+            if (SnapMath.DistanceToRaySq(m.Translation, o, d, out _) > s.LocalRadius * s.LocalRadius) continue;
+            var tag = s.InstanceTags != null && i < s.InstanceTags.Count ? s.InstanceTags[i] : null;
+            if (tag != null && cx.Env.IsHidden(tag)) continue;
+            if (!Matrix4x4.Invert(m, out var inv)) continue;
+            var lo = Vector3.Transform(o, inv);
+            var ld = Vector3.TransformNormal(d, inv);
+            for (int t = 0; t < ind.Count / 3; t++)
+            {
+                if (!SnapMath.RayTriangle(lo, ld, pos[ind[3 * t]], pos[ind[3 * t + 1]], pos[ind[3 * t + 2]], out float th) || th >= cx.SurfaceT || th < 0) continue;
+                var hp = o + d * th;
+                if (!cx.Env.Kept(hp)) continue;
+                cx.SurfaceT = th; cx.SurfaceP = hp; cx.SurfaceTag = tag; cx.SurfaceSrc = s;
+            }
+        }
+    }
+
     private void Visit(int ni, Ctx cx)
     {
         if (cx.Stop) return;
