@@ -150,7 +150,7 @@ public sealed partial class SteelModelGenerator
 
         foreach (var p in t.DeckPours.OrderBy(p => p.FromStation))
             Info($"Deck pour section {p.Section}: {_u.FormatStation(p.FromStation)} to {_u.FormatStation(p.ToStation)} ({Ft2(p.ToStation - p.FromStation)} along the alignment){(p.Note != "" ? ", " + p.Note : "")} (data only; the slab solid is not split).");
-        foreach (var u in t.Unresolved.Concat(t.Internal.Unresolved)) Warn("UNRESOLVED " + u);
+        foreach (var u in t.Unresolved.Concat(t.Internal.Unresolved)) Warn(u.StartsWith("UNRESOLVED") ? u : "UNRESOLVED " + u);
         Info($"Tub bracing: {_tr.InternalCrossFrames} internal cross frames, {_tr.TopStruts} top struts (incl. those of the cross frames), {_tr.LateralMembers} top lateral members, "
              + $"{_tr.ExternalDiaphragms} external intermediate diaphragms, {_tr.SupportDiaphragms} support diaphragm lines, {_tr.Stiffeners} transverse stiffeners, "
              + $"{_tr.Studs} studs, {_tr.Hatches} access hatches, {_tr.SpliceBolts} field splice bolts.");
@@ -762,7 +762,7 @@ public sealed partial class SteelModelGenerator
         var line = _f.SupportLine(j);
         var dir = line.Direction;
         double D = Sec.WebDepth, T = t.TopWebSpacing / 2;
-        foreach (var u in sd.Unresolved) Warn($"UNRESOLVED {line.Name} diaphragm: {u}");
+        foreach (var u in sd.Unresolved) Warn($"{line.Name} diaphragm: " + (u.StartsWith("UNRESOLVED") ? u : "UNRESOLVED " + u));
         foreach (var g in _f.Girders)
         {
             int gi = g.Index;

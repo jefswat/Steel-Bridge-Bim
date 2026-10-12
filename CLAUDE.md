@@ -306,6 +306,13 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
     given). Per-support bearing override `SupportDefinition.Bearings` (`BridgeDefinition.BearingsAt(j)`) and per-girder
     fixity `GirderFixities` (`FixityOf(g)`). Shared helpers on `BearingDefinition` (SoleAtCl, GenericBodyHeight, Footprint)
     keep BearingDetailer, ElevationCheck and BearingViews in step; steel `BearingSeat`s carry the footprint.
+  - Steel TUB girders (OPTIONAL, WIP proof of concept; `GirderLayoutDefinition.Tub` = `Bridge/TubGirderDefinition.cs`, null = I-girders, omitted from the .sbm):
+    `Steel/TubSection.cs` (section math in the ROTATED section about the top working point = girder path; `TubFrame`, `AtInPlane` for skewed support planes),
+    `Steel/TubGirderGenerator.cs` (partial SteelModelGenerator, `RunTub` replaces `Run` when `IsTub`: plates from `Section.Layouts` (top flange width = one
+    flange), splices, panel points (`TubPanelSegment`), stiffeners, internal K frames + WT top struts, WT top laterals, external / support diaphragms,
+    pad + beveled-plate bearings + seats, hatches, studs, tension zones), report `SteelModel.Tub` (`TubGirderReport`), haunches `Concrete/ConcreteTubHaunch.cs`.
+    FramingGenerator skips cross frames / stiffeners for tubs. New part categories `RolledTee` (IfcMember) / `AccessDoor` (IfcPlate) appended.
+    Plan data: `samples/plans/build-odot-o-tub.csx` (ODOT Bridge O spans 14-16; NOT yet run - see follow-ups), no tub tests / check script yet.
   - `Concrete/` â€” `ConcreteGenerator` (deck slab grid solid between skewed end lines following finished grade,
     haunch sweeps, barrier sweeps, deck mats, 1% negative-moment bars, TxDOT SSTR Bars S/U/R), `BarrierProfiles`
     (SSTR per RL-SSTR Sept 2019 â€” 3/4" back-face step is an assumption; `Expand` = custom section with fillets / chamfers / edge tags),
