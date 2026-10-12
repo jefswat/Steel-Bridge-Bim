@@ -257,15 +257,23 @@ arch.FloorbeamConnection = new ArchFloorbeamConnection
 
 // ---------------------------------------------------------------- upper lateral bracing (p.128): UL(n) is on the straight U(n)-U'(11-n); the other pair of
 // members U(n+1)-UL(n)-U'(12-n) kinks at UL(n) (0.1-0.5 ft off a straight line in the table) -> members end at the table points.
+// p.141 / 142: at each crossing UL(n) one member is continuous (U(n)-UL(n)-U'(11-n), straight in the table) and the other is spliced over it with top and
+// bottom plates (7" wide, L1 / L2 / L3, 12 bolts each); the spliced pieces stop 1/2" off the continuous flange tips (L2 sin(angle) = bf + 1").
+var ulSplices = Csv("upper-lateral-bracing-splices.csv").ToDictionary(r => r["crossing"]);
+string ulWhy = U("p.141 / 142", "bracing crossing splice plate thickness", "the top / bottom splice plates are dimensioned in plan only (7\" wide, lengths, bolts) without a thickness", "1/2\".");
 for (int n = 1; n <= 10; n++)
 {
     string ul = $"UL{n}";
-    arch.Bracing.Add(new ArchBraceDefinition { Name = $"BR{n}A", From = $"U{n}", To = ul });
-    arch.Bracing.Add(new ArchBraceDefinition { Name = $"BR{n}B", From = ul, To = $"U{11 - n}'" });
-    arch.Bracing.Add(new ArchBraceDefinition { Name = $"BR{n}C", From = $"U{n + 1}", To = ul });
-    arch.Bracing.Add(new ArchBraceDefinition { Name = $"BR{n}D", From = ul, To = $"U{12 - n}'" });
+    arch.Bracing.Add(new ArchBraceDefinition { Name = $"BR{n}X", From = $"U{n}", To = $"U{11 - n}'", Via = ul });
+    arch.Bracing.Add(new ArchBraceDefinition { Name = $"BR{n}C", From = $"U{n + 1}", To = ul, TrimEndAt = $"BR{n}X" });
+    arch.Bracing.Add(new ArchBraceDefinition { Name = $"BR{n}D", From = ul, To = $"U{12 - n}'", TrimStartAt = $"BR{n}X" });
+    var sp = ulSplices[ul];
+    arch.BracingCrossings.Add(new ArchBraceCrossing { Name = ul, Point = ul, Continuous = $"BR{n}X", PieceA = $"BR{n}C", PieceB = $"BR{n}D",
+        TopL1 = In(D(sp["top_L1_in"])), TopL2 = In(D(sp["top_L2_in"])), TopL3 = In(D(sp["top_L3_in"])), TopAngleDeg = D(sp["top_angle_deg"]),
+        BottomL1 = In(D(sp["bot_L1_in"])), BottomL2 = In(D(sp["bot_L2_in"])), BottomL3 = In(D(sp["bot_L3_in"])), BottomAngleDeg = D(sp["bot_angle_deg"]),
+        Thickness = In(0.5), Unresolved = ulWhy });
 }
-arch.BracingOrientationUnresolved = U("p.128-142", "W8x28 upper lateral bracing web orientation and member ends", "the bracing details (p.129-142) are not transcribed and the U points lie 0.685 ft off the rib WP plane (U6)", "Web set in the plane of the member and the local Z axis, members work point to work point.");
+arch.BracingOrientationUnresolved = U("p.129-140", "upper lateral bracing member ends at the rib panel points U / U'", "the gusset connections at the 22 rib panel points (bent 7/8\" top / bottom gussets, 7/8\" connection plates, 1\" stiffeners, per-point dimensions on 12 sheets) are not modeled and the U points lie 0.685 ft off the rib WP plane (U6)", "Members run work point to work point; web vertical per the p.128 typical section.");
 
 // ---------------------------------------------------------------- knuckles (p.123-126)
 // v2 detail (p.123-126, re-read at 300-500 dpi): end flange 2" x 32" x 21'-2 (1'-1 1/2 outside the end line), end web 1" (1'-0 1/8 at the chord), 4 PT

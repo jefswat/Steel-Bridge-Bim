@@ -920,10 +920,30 @@ public static partial class ArchGenerator
             var sec = SteelCatalog.WideFlangePolygon(w, -w.WebThickness / 2);
             AddAssembly("UPPER-BRACING", AssemblyKind.ArchBracing, $"Upper lateral bracing {w.Name}");
             var asu = _d.BracingOrientationUnresolved.Length > 0 ? Assumption.Unresolved(_d.BracingOrientationUnresolved, "web in the plane of the member and the local Z axis, work point to work point") : null;
+            // Member axes (world) first: crossing trims need the continuous members.
+            var axes = new Dictionary<string, (Vec3 a, Vec3 b)>(StringComparer.OrdinalIgnoreCase);
+            foreach (var br in _d.Bracing)
+                if (P(br.From) is { } pa && P(br.To) is { } pb) axes[br.Name] = (W(pa), W(pb));
+            double Trim(Vec3 ax, string other, double gap)
+            {
+                if (!axes.TryGetValue(other, out var o)) return 0;
+                var od = (o.b - o.a).Normalized();
+                double s = Vec3.Cross(ax, od).Length;
+                return s < 1e-6 ? 0 : (w.FlangeWidth / 2 + gap) / s;
+            }
             foreach (var br in _d.Bracing)
             {
                 if (P(br.From) is not { } a || P(br.To) is not { } b) continue;
                 var wa = W(a); var wb = W(b);
+                if (br.Via.Length > 0 && P(br.Via) is { } via)
+                {
+                    var wv = W(via); var dd = (wb - wa).Normalized();
+                    double off = (wv - wa - dd * Vec3.Dot(wv - wa, dd)).Length;
+                    Check($"bracing {br.Name}: {br.Via} on the straight member {br.From}-{br.To}", 0, off, In(0.25), L, "p.128 table (continuous member through the crossing, p.141 / 142)");
+                }
+                var ax0 = (wb - wa).Normalized();
+                if (br.TrimStartAt.Length > 0) wa += ax0 * Trim(ax0, br.TrimStartAt, br.TrimGap);
+                if (br.TrimEndAt.Length > 0) wb -= ax0 * Trim(ax0, br.TrimEndAt, br.TrimGap);
                 var ax = (wb - wa).Normalized();
                 var m = (_fr.Z - ax * Vec3.Dot(ax, _fr.Z)).Normalized();
                 var v = Vec3.Cross(ax, m).Normalized();
@@ -931,6 +951,63 @@ public static partial class ArchGenerator
                 RolledBuilder.AddExtrusion(mesh, sec, wa, m, v, ax, 0, (wb - wa).Length);
                 AddPart(br.Name, PartCategory.ArchBracing, "UPPER-BRACING", $"{w.Name} {br.From}-{br.To}", mesh, _d.BracingMaterial, (wb - wa).Length, w.WeightPerFootLb, asu);
             }
+            foreach (var cr in _d.BracingCrossings) BraceCrossing(cr, w, axes);
+        }
+
+        /// <summary>Crossing splice plates (top / bottom) along the spliced member over the continuous one, holes and bolts (p.141 / 142).</summary>
+        private void BraceCrossing(ArchBraceCrossing cr, WideFlangeSize w, Dictionary<string, (Vec3 a, Vec3 b)> axes)
+        {
+            if (!axes.TryGetValue(cr.Continuous, out var co) || !axes.TryGetValue(cr.PieceA, out var pa) || !axes.TryGetValue(cr.PieceB, out var pb) || P(cr.Point) is not { } cp) return;
+            var c0 = W(cp);
+            var sd = ((pa.b - pa.a).Normalized() + (pb.b - pb.a).Normalized()).Normalized();   // spliced member direction (mean of the two pieces)
+            var m = (_fr.Z - sd * Vec3.Dot(sd, _fr.Z)).Normalized();
+            var v = Vec3.Cross(sd, m).Normalized();
+            var cd = (co.b - co.a).Normalized();
+            var c2 = new Vec2(Vec3.Dot(cd, sd), Vec3.Dot(cd, v)).Normalized();
+            double angModel = Math.Acos(Math.Min(1, Math.Abs(c2.X))) * 180 / Math.PI;   // acute angle between the members in the plate plane
+            var mc = (_fr.Z - cd * Vec3.Dot(cd, _fr.Z)).Normalized(); var vc = Vec3.Cross(cd, mc).Normalized();
+            var s2 = new Vec2(Vec3.Dot(sd, cd), Vec3.Dot(sd, vc)).Normalized();
+            double angCont = Math.Acos(Math.Min(1, Math.Abs(s2.X))) * 180 / Math.PI;
+            double ang3d = Math.Acos(Math.Min(1, Math.Abs(Vec3.Dot(sd, cd)))) * 180 / Math.PI;
+            string asm = $"UPPER-BRACING";
+            var hd = Model.Steel.Bolt.HoleDiameter;
+            var asu = cr.Unresolved.Length > 0 ? Assumption.Unresolved(cr.Unresolved, $"PL {L(cr.Thickness)}") : null;
+            int nb = 0;
+            foreach (var (top, l1, l2, l3, angPlan) in new[] { (true, cr.TopL1, cr.TopL2, cr.TopL3, cr.TopAngleDeg), (false, cr.BottomL1, cr.BottomL2, cr.BottomL3, cr.BottomAngleDeg) })
+            {
+                double lt = l1 + l2 + l3, hw = cr.Width / 2;
+                if (!double.IsNaN(angPlan)) Check($"bracing crossing {cr.Name} {(top ? "top" : "bottom")}: angle between the members (in space)", angPlan, ang3d, 0.75,
+                    x => $"{x:F3} deg", $"p.141 / 142 vs the p.128 points: {angModel:F3} deg in the spliced member flange plane, {angCont:F3} deg in the continuous member flange plane (U6: U points off the rib plane)");
+                Check($"bracing crossing {cr.Name} {(top ? "top" : "bottom")}: crossing zone L2 x sin(angle)", w.FlangeWidth + 2 * In(0.5), l2 * Math.Sin(angPlan * Math.PI / 180), In(0.0625), L, "plan L2 = flange width + 1/2\" gap each side across the continuous member");
+                double z0 = top ? w.Depth / 2 : -w.Depth / 2 - cr.Thickness, z1 = top ? w.Depth / 2 + cr.Thickness : -w.Depth / 2;
+                var holes = new List<Hole>();
+                foreach (double y in new[] { -cr.Gage / 2, cr.Gage / 2 })
+                {
+                    foreach (double x in new[] { lt / 2 - cr.Edge, lt / 2 - cr.Edge - cr.Pitch }) { holes.Add(new Hole(new Vec2(x, y), hd)); holes.Add(new Hole(new Vec2(-x, y), hd)); }
+                    // On the continuous flange: EdgeToContinuousFlange (perpendicular) inside its flange tips, along this row.
+                    foreach (double dp in new[] { -(w.FlangeWidth / 2 - cr.EdgeToContinuousFlange), w.FlangeWidth / 2 - cr.EdgeToContinuousFlange })
+                    {
+                        // perpendicular distance from the continuous axis (through the origin along c2): p.X * (-c2.Y) + p.Y * c2.X = dp
+                        if (Math.Abs(c2.Y) < 1e-6) continue;
+                        double x = (dp - y * c2.X) / -c2.Y;
+                        holes.Add(new Hole(new Vec2(x, y), hd));
+                    }
+                }
+                var mesh = new Mesh();
+                var fr = new Frame3(c0, sd, v, m);
+                PlateBuilder.AddPlanar(mesh, Ccw(ClippedRect(-lt / 2, lt / 2, -hw, hw, 0)), holes, fr, z0, z1);
+                Model.Steel.Parts.Add(new SteelPart { Mark = $"BR-{cr.Name}-{(top ? "T" : "B")}", Category = PartCategory.ArchConnectionPlate, Assembly = asm,
+                    Description = $"PL {L(cr.Thickness)} x {L(cr.Width)} x {L(lt)} {(top ? "top" : "bottom")} splice plate at {cr.Name} (p.141 / 142)", Mesh = mesh, Material = _d.BracingMaterial, Length = lt, Assumption = asu });
+                double grip = cr.Thickness + w.FlangeThickness;
+                foreach (var h in holes)
+                {
+                    var o = fr.ToWorld(h.Center.X, h.Center.Y, top ? z1 : z0);
+                    var zd = top ? -m : m;
+                    Model.Steel.Bolts.Add(new BoltInstance { Frame = new Frame3(o, sd, Vec3.Cross(zd, sd).Normalized(), zd), Grip = grip, Length = Model.Steel.Bolt.LengthForGrip(grip), Assembly = asm });
+                    nb++;
+                }
+            }
+            Model.SpliceBolts[$"UPPER-BRACING-{cr.Name}"] = nb;
         }
 
         // ------------------------------------------------------------------ knuckles

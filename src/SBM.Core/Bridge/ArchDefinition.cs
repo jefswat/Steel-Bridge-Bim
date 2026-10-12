@@ -22,6 +22,8 @@ public sealed class ArchDefinition
     public ArchHangerSystem HangerSystem { get; set; } = new();
     public List<ArchFloorbeamDefinition> Floorbeams { get; set; } = new();
     public List<ArchBraceDefinition> Bracing { get; set; } = new();
+    /// <summary>Crossing splices of the bracing (OPTIONAL).</summary>
+    public List<ArchBraceCrossing> BracingCrossings { get; set; } = new();
     /// <summary>AISC section of the bracing members (exact name, e.g. "W8x28").</summary>
     public string BracingSection { get; set; } = "W8x28";
     public string BracingMaterial { get; set; } = "ASTM A709 Gr. 50";
@@ -401,6 +403,39 @@ public sealed class ArchBraceDefinition
     public string Name { get; set; } = "";
     public string From { get; set; } = "";
     public string To { get; set; } = "";
+    /// <summary>Point the (continuous) member passes through (check, OPTIONAL).</summary>
+    public string Via { get; set; } = "";
+    /// <summary>Continuous member this one is cut short of at its start / end (crossing splice): trimmed to the gap off that member's flange tips.</summary>
+    public string TrimStartAt { get; set; } = "";
+    public string TrimEndAt { get; set; } = "";
+    public double TrimGap { get; set; } = In(0.5);
+}
+
+/// <summary>Bracing crossing splice (p.141 / 142): top and bottom plates along the spliced member over the continuous one. Lengths L1 / L2 / L3 along
+/// the plate edge (L2 = crossing zone), plan crossing angles (check), plate width, thickness, bolt pattern (edge, pitch, gage, edge to the continuous flange).</summary>
+public sealed class ArchBraceCrossing
+{
+    public string Name { get; set; } = "";
+    public string Point { get; set; } = "";
+    public string Continuous { get; set; } = "";
+    /// <summary>The two spliced pieces (first ends at the crossing, second starts there).</summary>
+    public string PieceA { get; set; } = "";
+    public string PieceB { get; set; } = "";
+    public double TopL1 { get; set; }
+    public double TopL2 { get; set; }
+    public double TopL3 { get; set; }
+    public double TopAngleDeg { get; set; } = double.NaN;
+    public double BottomL1 { get; set; }
+    public double BottomL2 { get; set; }
+    public double BottomL3 { get; set; }
+    public double BottomAngleDeg { get; set; } = double.NaN;
+    public double Width { get; set; } = In(7);
+    public double Thickness { get; set; } = In(0.5);
+    public double Edge { get; set; } = In(1.5);
+    public double Pitch { get; set; } = In(3);
+    public double Gage { get; set; } = In(4);
+    public double EdgeToContinuousFlange { get; set; } = In(1.75);
+    public string Unresolved { get; set; } = "";
 }
 
 /// <summary>Knuckle / end floorbeam (simplified): end flange plate under the end line, end web on it, deck plate between the end line and the first
