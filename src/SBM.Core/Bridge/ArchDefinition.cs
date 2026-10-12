@@ -28,6 +28,13 @@ public sealed class ArchDefinition
     /// <summary>Plan item the bracing web orientation is not given by (UNRESOLVED text; empty = given).</summary>
     public string BracingOrientationUnresolved { get; set; } = "";
     public List<ArchKnuckleDefinition> Knuckles { get; set; } = new();
+    /// <summary>Fin plate geometry (OPTIONAL; null = no fin plates even when hangers carry fin data).</summary>
+    public ArchFinSettings? Fins { get; set; }
+    /// <summary>Cable connectors at hanger crossings (pairs of hanger names) and their detail (OPTIONAL).</summary>
+    public List<ArchCableConnector> CableConnectors { get; set; } = new();
+    public ArchCableConnectorDetail? CableConnectorDetail { get; set; }
+    /// <summary>Floorbeam-to-tie connection detail at both floorbeam ends (OPTIONAL, null = none).</summary>
+    public ArchFloorbeamConnection? FloorbeamConnection { get; set; }
     public ArchDeckDefinition? Deck { get; set; }
     public List<ArchBearingDefinition> Bearings { get; set; } = new();
     /// <summary>Plan items that are open (each an UNRESOLVED warning, text built with <c>UnresolvedFlag.Text</c>).</summary>
@@ -208,8 +215,114 @@ public sealed class ArchHangerDefinition
     public string Tie { get; set; } = "";
     public ArchPoint TieAnchor { get; set; } = new();
     public ArchPoint RibAnchor { get; set; } = new();
-    /// <summary>Plan pin-to-pin length (check; NaN = none).</summary>
+    /// <summary>Plan length (check; NaN = none): pin to pin, or tie pin to <see cref="RibWorkPoint"/> when that is given.</summary>
     public double PlanLength { get; set; } = double.NaN;
+    /// <summary>Cable axis point on the rib working line (OPTIONAL; p.147 lists it beside the rib pin; data + length check).</summary>
+    public ArchPoint? RibWorkPoint { get; set; }
+    /// <summary>Cable fin plate at the rib (OPTIONAL, plan table per cable; geometry settings in <see cref="ArchHangerSystem.Fins"/>).</summary>
+    public ArchRibFin? RibFin { get; set; }
+    /// <summary>Cable fin plate at the tie (OPTIONAL).</summary>
+    public ArchTieFin? TieFin { get; set; }
+}
+
+/// <summary>Rib fin plate data of one cable (plan "cable fin plate at arch rib dimensions"): angle B (deg, check), P1 pin offset from the arch
+/// plane (check), P2 pin to the rib CL along the fin (check), P3 straight side length, P4 rib CL to the plate top, weld length D (data).</summary>
+public sealed class ArchRibFin
+{
+    public double AngleB { get; set; } = double.NaN;
+    public double P1 { get; set; } = double.NaN;
+    public double P2 { get; set; } = double.NaN;
+    public double P3 { get; set; }
+    public double P4 { get; set; }
+    public double WeldLength { get; set; } = double.NaN;
+}
+
+/// <summary>Tie fin plate data of one cable (plan "cable fin plate at tie girder data"): panel point the plate is centred on, bend angle A (deg,
+/// check), orientation LEFT / RIGHT (check).</summary>
+public sealed class ArchTieFin
+{
+    public string Panel { get; set; } = "";
+    public double AngleA { get; set; } = double.NaN;
+    public string Orient { get; set; } = "";
+}
+
+/// <summary>Fin plate geometry common to all cables. Rib fin: plate between the rib flanges (inner faces), top P4 below the rib CL, straight
+/// sides P3, then tangent to a radius around the pin; corner clips at the top. Tie fin: bent plate bolted to the outside face of the tie web,
+/// lower part centred on the floorbeam CL (width, height below the bend line, bolt rows / columns), bend line above the top of the tie web,
+/// upper part turned about the bend line into the cable plane, pin radius; the pin is the cable anchor point (TC / HC of the hanger).</summary>
+public sealed class ArchFinSettings
+{
+    public double RibThickness { get; set; } = In(0.875);
+    public double RibTopClip { get; set; } = In(1);
+    public double RibPinRadius { get; set; } = In(2.25);
+    /// <summary>UNRESOLVED reason for the rib fin plates (thickness / clip not dimensioned); empty = not flagged.</summary>
+    public string RibUnresolved { get; set; } = "";
+    public double PinHole { get; set; } = In(1.378);
+    public double TieThickness { get; set; } = In(0.875);
+    public double TieWidth { get; set; } = In(8);
+    public double TiePinFromEdge { get; set; } = In(1.875);
+    public double TieDepthBelowBend { get; set; } = In(7);
+    public double TieBendAboveWeb { get; set; } = In(0.5);
+    /// <summary>Plan pin distance above the bend line in the plate plane (check).</summary>
+    public double TiePinAboveBend { get; set; } = In(4);
+    /// <summary>Far edge rises this far above the bend line before the slope to the pin radius.</summary>
+    public double TieFarEdgeAboveBend { get; set; } = In(0.5);
+    public double TiePinRadius { get; set; } = In(2.25);
+    public double TieHoleEdge { get; set; } = In(1.5);
+    /// <summary>Bolt rows below the bend line.</summary>
+    public List<double> TieHoleRows { get; set; } = new() { In(2), In(5.5) };
+    public string Material { get; set; } = "ASTM A709 Gr. 50-F1 (FCM)";
+}
+
+/// <summary>Cable connector at a hanger crossing (plan p.150): UHMW-PE pendant plate between the two cables with a sleeve bracket over each.</summary>
+public sealed class ArchCableConnector
+{
+    public string Name { get; set; } = "";
+    public string CableA { get; set; } = "";
+    public string CableB { get; set; } = "";
+}
+
+/// <summary>Cable connector detail: pendant plate (hexagon length x straight side, thickness), sleeve brackets (length along the cable, outer radius,
+/// wall / tab thickness, tab width each side).</summary>
+public sealed class ArchCableConnectorDetail
+{
+    public double PendantLength { get; set; } = In(3.125);
+    public double PendantSide { get; set; } = In(1.5);
+    public double PendantThickness { get; set; } = In(0.1875);
+    public double PendantEdgeAngleDeg { get; set; } = 23.25;
+    public double BracketLength { get; set; } = In(2);
+    public double BracketOuterRadius { get; set; } = In(11.0 / 16);
+    public double BracketThickness { get; set; } = In(0.25);
+    public double BracketTab { get; set; } = In(0.375);
+    public string Material { get; set; } = "UHMW-PE (ultra high molecular weight polyethylene)";
+    public double DensityKgM3 { get; set; } = 940;
+    public string Basis { get; set; } = "";
+}
+
+/// <summary>Floorbeam-to-tie connection (plan p.146): a stiffener in the floorbeam web plane welded to the tie web and flange, two web
+/// connection plates (stiffener to floorbeam web) and flange connection plates (tie flange to floorbeam flange) on top (and below), bolted.</summary>
+public sealed class ArchFloorbeamConnection
+{
+    public double StiffenerThickness { get; set; } = In(1);
+    /// <summary>Full-height flat at the tie web before the slope.</summary>
+    public double StiffenerTopFlat { get; set; } = In(1);
+    /// <summary>Height above the tie flange at the flange edge.</summary>
+    public double StiffenerOuterHeight { get; set; } = In(8);
+    public double StiffenerClip { get; set; } = In(1);
+    public double PlateThickness { get; set; } = In(0.625);
+    public double PlateLength { get; set; } = In(12.5);
+    public double WebPlateHeight { get; set; } = In(7);
+    public double BoltFirst { get; set; } = In(1.625);
+    public double BoltPitch { get; set; } = In(1.625);
+    public int BoltColumns { get; set; } = 3;
+    /// <summary>Web plate rows: gage from the plate top.</summary>
+    public List<ArchBoltRow> WebRows { get; set; } = new();
+    public double FlangePlateWidth { get; set; } = In(4.9375);
+    /// <summary>Flange plate rows: gage from the floorbeam flange edge.</summary>
+    public List<ArchBoltRow> FlangeRows { get; set; } = new();
+    public bool BottomFlangePlates { get; set; } = true;
+    public string BottomUnresolved { get; set; } = "";
+    public string Material { get; set; } = "ASTM A709 Gr. 50-T1";
 }
 
 /// <summary>Strand and sockets of all hangers (plan p.148 tables + catalog data).</summary>
@@ -262,9 +375,24 @@ public sealed class ArchFloorbeamDefinition
     /// <summary>Clear gap between the floorbeam end and the tie flange edge (along the floorbeam).</summary>
     public double EndGap { get; set; } = In(0.5);
     public string Material { get; set; } = "ASTM A709 Gr. 50-T1";
-    /// <summary>PT openings (data): distance from the CL of tie A / tie B to the outer opening of each pair, pair spacing.</summary>
+    /// <summary>PT openings: distance from the CL of tie B (PtDimA, schedule "A") / tie A (PtDimB, "B") to the outer opening of each pair (NaN = none).</summary>
     public double PtDimA { get; set; } = double.NaN;
     public double PtDimB { get; set; } = double.NaN;
+    /// <summary>PT slots cut in the web (obround length x height, centre height above the flange bottom, pair spacing; 0 length = data only).</summary>
+    public double PtSlotLength { get; set; }
+    public double PtSlotHeight { get; set; } = In(2.25);
+    public double PtSlotZ { get; set; } = In(7);
+    public double PtPairSpacing { get; set; } = Ft(1) + In(4);
+    /// <summary>Horizontal shear studs on each web face (0 = none): count per face, height above the flange bottom, min / max spacing, length.</summary>
+    public int StudsPerFace { get; set; }
+    public double StudZ { get; set; } = In(7);
+    public double StudMinSpacing { get; set; } = In(3.5);
+    public double StudMaxSpacing { get; set; } = In(6);
+    public double StudLength { get; set; } = double.NaN;
+    public string StudUnresolved { get; set; } = "";
+    /// <summary>Holes through the web (s from tie A, z above the flange bottom; e.g. deck bar passages), diameter.</summary>
+    public List<ArchPoint> WebHoles { get; set; } = new();
+    public double WebHoleDiameter { get; set; } = In(15.0 / 16);
 }
 
 /// <summary>Bracing member between two named points.</summary>

@@ -53,7 +53,12 @@ public sealed record ArchRibResult(string Name, Vec3 Center, Vec3 ChordDir, Vec3
 
 public sealed record ArchTieResult(string Name, double StartAngle, double Length, double ClosureMiss, List<(string Name, Vec3 Local)> PanelPoints);
 
-public sealed record ArchHangerResult(string Name, Vec3 TieAnchorWorld, Vec3 RibAnchorWorld, double Length, double PlanLength);
+public sealed record ArchHangerResult(string Name, Vec3 TieAnchorWorld, Vec3 RibAnchorWorld, double Length, double PlanLength)
+{
+    /// <summary>Cable axis at the rib working line (p.147 HC column) when given; the plan length is measured to it.</summary>
+    public Vec3? RibWorkPointWorld { get; init; }
+    public double PlanBasisLength { get; init; } = double.NaN;
+}
 
 public sealed record ArchFloorbeamResult(string Name, Vec3 EndA, Vec3 EndB, double Length, double CrownFromA);
 

@@ -1014,6 +1014,10 @@ public static class IfcExporter
                     PartCategory.ArchBracing => w.Add("IFCMEMBER", $"{common},$,{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.BRACE."),
                     PartCategory.KnucklePlate => w.Add("IFCPLATE", $"{common},'KNUCKLE_PLATE',{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.USERDEFINED."),
                     PartCategory.FormDeck => w.Add("IFCPLATE", $"{common},$,{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.SHEET."),
+                    PartCategory.FinPlate => w.Add("IFCPLATE", $"{common},'CABLE_FIN_PLATE',{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.USERDEFINED."),
+                    PartCategory.CableConnector => w.Add("IFCMECHANICALFASTENER", $"{common},'CABLE_CONNECTOR',{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},$,$,.USERDEFINED."),
+                    PartCategory.ArchConnectionPlate => w.Add("IFCPLATE", $"{common},$,{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.SPLICE_PLATE."),
+                    PartCategory.ArchStiffener => w.Add("IFCPLATE", $"{common},$,{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.STIFFENER_PLATE."),
                     _ => w.Add("IFCFASTENER", $"{common},$,{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.WELD."),
                 };
                 if (part.Assumption != null) miscStatus.Add((id, part.Assumption));

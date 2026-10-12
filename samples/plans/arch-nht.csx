@@ -185,10 +185,15 @@ arch.Ribs.Add(new ArchRibDefinition { Name = "North rib", ChordStart = "T0'", Ch
 foreach (var r in Csv("cable-hanger-coordinates.csv"))
 {
     string c = r["cable"];
+    // Rib pin = the p.147 "H(n) X2, Y2, Z2" point (10" inside the rib working line on the cable axis, P1 off the arch plane = p.148 fin plate P1 / P2);
+    // the "HC(n) X2', Y2', Z2'" point lies ON the working line (R 126'-0) and the p.147 cable length is TC to it - labels vs geometry: CONFLICT reported.
     double tx = D(r["X1p_ft"]), ty = D(r["Y1p_ft"]), tz = D(r["Z1p_ft"]), hx = D(r["X2p_ft"]), hy = D(r["Y2p_ft"]), hz = D(r["Z2p_ft"]);
+    double px = D(r["X2_ft"]), py = D(r["Y2_ft"]), pz = D(r["Z2_ft"]);
     double len = F(D(r["cable_length_TC_HC_ft"]));
-    arch.Hangers.Add(new ArchHangerDefinition { Name = c + "-S", Rib = "South rib", Tie = "South tie", TieAnchor = new ArchPoint(r["TC"], F(tx), F(ty), F(tz)), RibAnchor = new ArchPoint(r["HC"], F(hx), F(hy), F(hz)), PlanLength = len });
-    arch.Hangers.Add(new ArchHangerDefinition { Name = c + "-N", Rib = "North rib", Tie = "North tie", TieAnchor = new ArchPoint(r["TC"] + "'", -F(tx), -F(ty), F(tz)), RibAnchor = new ArchPoint(r["HC"] + "'", -F(hx), -F(hy), F(hz)), PlanLength = len });
+    arch.Hangers.Add(new ArchHangerDefinition { Name = c + "-S", Rib = "South rib", Tie = "South tie", TieAnchor = new ArchPoint(r["TC"], F(tx), F(ty), F(tz)), RibAnchor = new ArchPoint(r["H"], F(px), F(py), F(pz)),
+        RibWorkPoint = new ArchPoint(r["HC"], F(hx), F(hy), F(hz)), PlanLength = len });
+    arch.Hangers.Add(new ArchHangerDefinition { Name = c + "-N", Rib = "North rib", Tie = "North tie", TieAnchor = new ArchPoint(r["TC"] + "'", -F(tx), -F(ty), F(tz)), RibAnchor = new ArchPoint(r["H"] + "'", -F(px), -F(py), F(pz)),
+        RibWorkPoint = new ArchPoint(r["HC"] + "'", -F(hx), -F(hy), F(hz)), PlanLength = len });
 }
 arch.HangerSystem = new ArchHangerSystem
 {
@@ -201,14 +206,54 @@ arch.HangerSystem = new ArchHangerSystem
         Basis = "plan p.148 ADJUSTABLE OPEN STRAND SOCKET DIMENSIONS (turnbuckle body drawn at the shank diameter - its outline is not dimensioned)" },
 };
 
+// ---------------------------------------------------------------- cable fin plates (p.148 rib table, p.149 tie table + details, p.146 Section C-C), connectors (p.150)
+var ribFins = Csv("cable-fin-plates-arch-rib.csv").ToDictionary(r => r["cable"]);
+var tieFins = Csv("cable-fin-plates-tie-girder.csv").ToDictionary(r => r["cable"]);
+foreach (var h in arch.Hangers)
+{
+    string c = h.Name.Split('-')[0];
+    bool north = h.Name.EndsWith("-N");
+    if (ribFins.TryGetValue(c, out var rf))
+        h.RibFin = new ArchRibFin { AngleB = D(rf["angle_B_deg"]), P1 = In(D(rf["P1_in"])) * (north ? -1 : 1), P2 = In(D(rf["P2_in"])), P3 = In(D(rf["P3_in"])), P4 = In(D(rf["P4_in"])), WeldLength = In(D(rf["weld_D_in"])) };
+    if (tieFins.TryGetValue(c, out var tf))
+        h.TieFin = new ArchTieFin { Panel = tf["T_n"] + (north ? "'" : ""), AngleA = D(tf["angle_A_deg"]), Orient = tf["orient"] };
+}
+arch.Fins = new ArchFinSettings
+{
+    RibThickness = In(0.875), RibTopClip = In(1), RibPinRadius = In(2.25), PinHole = In(1.378),
+    RibUnresolved = U("p.148", "rib cable fin plate thickness and top corner clips", "the rib fin plate table and Section A-A give P1-P4, angle B and weld D but no plate thickness, and the top clips are not dimensioned", "7/8\" (= the tie fin plate p.149, same open socket and 1.378\" pin) and 1\" x 1\" clips scaled from Section A-A."),
+    TieThickness = In(0.875), TieWidth = In(8), TiePinFromEdge = In(1.875), TieDepthBelowBend = In(7), TieBendAboveWeb = In(0.5), TiePinAboveBend = In(4),
+    TieFarEdgeAboveBend = In(0.5), TiePinRadius = In(2.25), TieHoleEdge = In(1.5), TieHoleRows = { In(2), In(5.5) },
+    Material = "ASTM A709 Gr. 50-F1 (FCM)",
+};
+// Connectors at the crossings circled on the p.150 elevation (N.T.S.; 4 per end, same pairs on the mirror arch): C1xC2, C3xC4, C5xC6, C3xC6, C27xC28, C29xC30, C31xC32, C27xC30.
+foreach (var sfx in new[] { "S", "N" })
+    foreach (var (a, b) in new[] { ("C1", "C2"), ("C3", "C4"), ("C5", "C6"), ("C3", "C6"), ("C27", "C28"), ("C29", "C30"), ("C31", "C32"), ("C27", "C30") })
+        arch.CableConnectors.Add(new ArchCableConnector { Name = $"{a}x{b}-{sfx}", CableA = $"{a}-{sfx}", CableB = $"{b}-{sfx}" });
+arch.CableConnectorDetail = new ArchCableConnectorDetail { Basis = "p.150 pendant plate 3 1/8 x 3/16, sleeve brackets R 11/16 x 1/4 x 2\" (N.T.S. details, UHMW-PE)" };
+
 // ---------------------------------------------------------------- floorbeams (p.143, p.145, p.146): FBn = south Tn - north T(34-n)'
 var sched = Csv("floorbeam-schedule.csv").ToDictionary(r => r["floorbeam"], r => r);
+string studWhy = U("p.145", "floorbeam shear stud length", "Section A-A shows the 7/8\" horizontal studs at 7\" above the flange bottom (32 per face, 3 1/2 - 6\" spacing) without a length", "6 7/8\" (7\" nominal stud as welded) scaled from Section A-A.");
 for (int n = 1; n <= 33; n++)
     arch.Floorbeams.Add(new ArchFloorbeamDefinition
     {
         Name = $"FB{n}", TieA = "South tie", PanelA = $"T{n}", TieB = "North tie", PanelB = $"T{34 - n}'",
         PtDimA = F(D(sched[$"FB{n}"]["dim_A_ft"])), PtDimB = F(D(sched[$"FB{n}"]["dim_B_ft"])),
+        PtSlotLength = In(5.5), PtSlotHeight = In(2.25), PtSlotZ = In(7), PtPairSpacing = FI(1, 4),
+        StudsPerFace = 32, StudZ = In(7), StudMinSpacing = In(3.5), StudMaxSpacing = In(6), StudLength = In(6.875), StudUnresolved = studWhy,
     });
+// Floorbeam connection (p.146): 1" stiffener (1" flat, 8" at the flange edge, 1 x 1 clip), 2 - 5/8 x 7 x 1'-0 1/2 web plates (rows 1 3/8, 3 1/2, 5 5/8 below the
+// top, staggered columns 1 5/8 / 3 1/4 / 4 7/8 from the joint), 5/8 x 4 15/16 x 1'-0 1/2 flange plates each side (rows 1 3/8 and 3 9/16 from the flange edge).
+arch.FloorbeamConnection = new ArchFloorbeamConnection
+{
+    StiffenerThickness = In(1), StiffenerTopFlat = In(1), StiffenerOuterHeight = In(8), StiffenerClip = In(1),
+    PlateThickness = In(0.625), PlateLength = FI(1, 0.5), WebPlateHeight = In(7), BoltFirst = In(1.625), BoltPitch = In(1.625), BoltColumns = 3,
+    WebRows = { new ArchBoltRow(In(1.375), 0, 2), new ArchBoltRow(In(3.5), 1, 2), new ArchBoltRow(In(5.625), 0, 2) },
+    FlangePlateWidth = In(4.9375), FlangeRows = { new ArchBoltRow(In(1.375), 0, 2), new ArchBoltRow(In(3.5625), 1, 2) },
+    BottomFlangePlates = true,
+    BottomUnresolved = U("p.146", "floorbeam flange connection plates below the flange", "Detail 1 shows a 5/8\" plate under the flange but Section B-B shows only the top plates in plan", "Bottom plates = the top plates mirrored (2 per end)."),
+};
 
 // ---------------------------------------------------------------- upper lateral bracing (p.128): UL(n) is on the straight U(n)-U'(11-n); the other pair of
 // members U(n+1)-UL(n)-U'(12-n) kinks at UL(n) (0.1-0.5 ft off a straight line in the table) -> members end at the table points.
@@ -270,7 +315,8 @@ arch.Unresolved.AddRange(new[]
     U("p.102", "which arch pedestal is EL A / EL E", "the view direction of the pier elevation is not stated on the sheet", "EL A = south at Pier 10 / north at Pier 11, as derived from p.102 + p.91 by the approach model."),
     U("p.94, 102, 119", "CL1 / CL2 relative to the piers (U3)", "no combination of the layout offsets reproduces the plan chord 200'-11 11/16", "CL1/CL2 = 7\" along the pier + 4 13/16\" toward the span; the local geometry is kept and the difference reported."),
     U("p.119-150", "camber / no-load geometry (U4)", "not given", "Final geometry modeled."),
-    U("p.147, 128", "hanger anchor offsets from the rib WP (U6)", "H points lie 0.81-0.84 ft inside the rib WP circle and U points 0.685 ft off its plane; the offset rule is not stated", "Hanger and bracing points are taken from the tables as printed."),
+    U("p.128", "upper bracing panel points vs the rib WP (U6, bracing part)", "the U points lie 0.685 ft off the rib WP plane; the offset rule is not stated", "Bracing points are taken from the table as printed."),
+    "CONFLICT (p.147 vs p.148, p.120): the p.147 table labels H(n) 'arch rib working point' and HC(n) 'arch rib cable anchor point', but HC(n) lies on the rib working line (R 126'-0 through the RS points, within 0.0004') and H(n) lies 10\" inside it on the cable axis, P1 off the arch plane - exactly the p.148 fin plate pin (P2 sin B = 10\", P1). Modeled: rib pin = H(n), strand and sockets pin to pin; the p.147 cable length (TC to HC) is checked to HC(n) (U6 resolved for the hangers).",
     U("p.107, 93", "sole plate weld target (U8)", "the bearing note and the erection sequence name different plates", "Not modeled (welds)."),
     U("p.119, 124", "WP position in the tie / steel underside at the bearings (U10)", "the WP is at the bottom of the tie flange (p.119) but drawn inside the 2\" end flange (p.124) and the plate below it is not dimensioned", "End flange from 1 1/8\" below to 7/8\" above the WP (tie flange + 1 1/8\" fill = 2\"), steel underside 1\" lower."),
     U("p.148", "hanger sockets vs the supplied WireCo catalog", "the plan sockets (pin 1.378\", W 16.18\" / 34.41\") are not the catalog's 1\" open strand socket (Table 6 p.20: pin 2 1/4\", A 12\")", "Sockets modeled at the plan table dimensions; the catalog row is reported by check-arch-nht.csx."),

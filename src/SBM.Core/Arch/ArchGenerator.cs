@@ -80,7 +80,7 @@ public static class ArchGenerator
 
         public void Run()
         {
-            var steel = new SteelModel { Bolt = new BoltGeometry(In(0.875)), BoltGrade = "A325" };
+            var steel = new SteelModel { Bolt = new BoltGeometry(In(0.875)), BoltGrade = "A325", StudDiameter = In(0.875), StudHeadDiameter = In(1.375), StudHeadHeight = In(0.375) };
             var cm = new Concrete.ConcreteModel();
             var axis = _f.Supports.FirstOrDefault(s => string.Equals(s.Name, _d.Frame.TiltAxisSupport, StringComparison.OrdinalIgnoreCase))?.Direction;
             var frame = BuildFrame(_d.Frame, _al, axis, out string err);
@@ -489,8 +489,20 @@ public static class ArchGenerator
                 double len = (hc - tc).Length;
                 var wt = W(tc);
                 var wr = W(hc);
-                Model.Hangers.Add(new ArchHangerResult(h.Name, wt, wr, len, h.PlanLength));
-                if (!double.IsNaN(h.PlanLength)) Check($"hanger {h.Name}: pin-to-pin length", h.PlanLength, len, Tol, L);
+                // Plan length: to the rib working-line point when given (p.147 "cable length TC-HC"), else pin to pin.
+                var wp = h.RibWorkPoint?.Vec;
+                double lenPlan = wp is { } q ? (q - tc).Length : len;
+                Model.Hangers.Add(new ArchHangerResult(h.Name, wt, wr, len, h.PlanLength) { RibWorkPointWorld = wp is { } q2 ? W(q2) : null, PlanBasisLength = lenPlan });
+                if (!double.IsNaN(h.PlanLength))
+                    Check(wp == null ? $"hanger {h.Name}: pin-to-pin length" : $"hanger {h.Name}: length tie pin to the rib working-line point (p.147 column)", h.PlanLength, lenPlan, Tol, L,
+                        wp == null ? "" : $"pin to pin {L(len)}");
+                if (wp is { } w2)
+                {
+                    // The rib pin lies on the cable line (TC -> working-line point).
+                    var ax = (w2 - tc).Normalized();
+                    double off = (hc - tc - ax * Vec3.Dot(hc - tc, ax)).Length;
+                    if (off > Tol) Warn($"Arch CHECK hanger {h.Name}: rib pin {L(off)} off the line tie pin - rib working-line point.");
+                }
                 var dir = (wr - wt).Normalized();
                 string asm = $"HANGER-{h.Name}";
                 AddAssembly(asm, AssemblyKind.ArchHanger, $"Hanger {h.Name}: {L(hs.StrandDiameter)} structural strand, {h.Rib}");
@@ -516,6 +528,203 @@ public static class ArchGenerator
                 }
                 if (hs.TieSocket is { } ts) Socket(ts, asm, "TS", wt, dir, tieTan);
                 if (hs.RibSocket is { } rs) Socket(rs, asm, "RS", wr, -dir, ribTan);
+                if (_d.Fins is { } fs)
+                {
+                    if (h.RibFin is { } rf && _ribs.FirstOrDefault(r => string.Equals(r.Name, h.Rib, StringComparison.OrdinalIgnoreCase)) is { } rres)
+                        RibFinPlate(h, rf, fs, rres);
+                    if (h.TieFin is { } tf && _ties.TryGetValue(h.Tie, out var tgeo)) TieFinPlate(h, tf, fs, tgeo);
+                }
+            }
+            BuildConnectors();
+        }
+
+        // ------------------------------------------------------------------ cable fin plates (rib p.148, tie p.149)
+
+        private string RibAsm(string ribName) => ribName.ToUpperInvariant().Replace(' ', '-');
+
+        /// <summary>Rib fin plate: plane = rib binormal x the cable projected on the arch plane; between the flange inner faces; top P4 below the rib
+        /// CL (web plane), straight sides P3, then tangent to R around the pin (HC); 1.378" pin hole. Plan P1 / P2 / B are checked against the model.</summary>
+        private void RibFinPlate(ArchHangerDefinition h, ArchRibFin rf, ArchFinSettings fs, ArchRibResult rib)
+        {
+            var w = SteelCatalog.FindWideFlange(_d.Ribs.FirstOrDefault(r => r.Name == rib.Name)?.Section ?? "W14x132");
+            if (w == null) return;
+            var hc = h.RibAnchor.Vec; var tc = h.TieAnchor.Vec;
+            var bn = Vec3.Cross(rib.ChordDir, rib.Up).Normalized();
+            var dc = (tc - hc).Normalized();
+            var e = -(dc - bn * Vec3.Dot(dc, bn)).Normalized();          // in the arch plane, from the pin toward the rib
+            var nf = Vec3.Cross(bn, e).Normalized();
+            // Distance pin -> rib web (WP circle) along e.
+            var d0 = hc - rib.Center;
+            double bq = Vec3.Dot(d0, e), cq = Vec3.Dot(d0, d0) - Vec3.Dot(d0, bn) * Vec3.Dot(d0, bn) - rib.Radius * rib.Radius;
+            // |d0 - bn(d0.bn) + e y|^2 = R^2 (in-plane distance; e is in the arch plane)
+            double disc = bq * bq - cq;
+            if (disc < 0) { Warn($"Arch: fin plate {h.Name} - the cable does not reach the rib web along the fin; not built."); return; }
+            double yWeb = -bq + Math.Sqrt(disc);
+            if (yWeb < 0) yWeb = -bq - Math.Sqrt(disc);
+            double p1 = Vec3.Dot(d0, bn);
+            var hitP = hc + e * yWeb;
+            var rad = (hitP - rib.Center - bn * Vec3.Dot(hitP - rib.Center, bn)).Normalized();
+            var tan = Vec3.Cross(bn, rad).Normalized();
+            if (Vec3.Dot(tan, rib.ChordDir) < 0) tan = -tan;                 // rib tangent toward the chord end (p.148 angle B)
+            double bModel = Math.Acos(Math.Clamp(Vec3.Dot(tan, -e), -1, 1)) * 180 / Math.PI;
+            double perp = yWeb * Math.Abs(Vec3.Dot(e, rad));
+            string nm = $"fin plate {h.Name} at rib";
+            if (!double.IsNaN(rf.AngleB)) Check($"{nm}: angle B (rib tangent to the cable)", rf.AngleB, bModel, 0.05, v => $"{v:F3} deg", "p.148 table vs the p.147 HC / TC points and the rib circle");
+            if (!double.IsNaN(rf.P1)) Check($"{nm}: |P1| (pin off the arch plane)", Math.Abs(rf.P1), Math.Abs(p1), Tol, L);
+            if (!double.IsNaN(rf.P2)) Check($"{nm}: P2 (pin to the rib working line along the fin)", rf.P2, yWeb, Tol, L, $"pin {L(perp)} normal to the rib working line");
+            double c = w.Depth / 2 - w.FlangeThickness;
+            double yTop = yWeb - rf.P4, ySb = yTop - rf.P3, r = fs.RibPinRadius, clip = fs.RibTopClip;
+            // Outline in (x across from the pin = binormal, y toward the rib from the pin).
+            double xl = -c - p1, xr = c - p1;
+            (double a, double b) Tang(double qx, double qy, bool right)
+            {
+                double phi = Math.Atan2(qy, qx), dd = Math.Sqrt(qx * qx + qy * qy), al = dd > r ? Math.Acos(r / dd) : 0;
+                return right ? (phi - al, 0) : (phi + al, 0);
+            }
+            var outl = new List<Vec2> { new(xl, yTop - clip), new(xl + clip, yTop), new(xr - clip, yTop), new(xr, yTop - clip), new(xr, ySb) };
+            double ta = Tang(xr, ySb, true).a, tb = Tang(xl, ySb, false).a;
+            while (tb > ta) tb -= 2 * Math.PI;
+            int ns = 16;
+            for (int i = 0; i <= ns; i++) { double th = ta + (tb - ta) * i / ns; outl.Add(new Vec2(r * Math.Cos(th), r * Math.Sin(th))); }
+            outl.Add(new Vec2(xl, ySb));
+            if (MeshBuilder.SignedArea(outl) < 0) outl.Reverse();
+            var m = new Mesh();
+            PlateBuilder.AddPrism(m, outl, new[] { new Hole(Vec2.Zero, fs.PinHole) }, (u, v, t) => W(hc + bn * u + e * v + nf * t), _ => -fs.RibThickness / 2, _ => fs.RibThickness / 2);
+            var asu = fs.RibUnresolved.Length > 0 ? Assumption.Unresolved(fs.RibUnresolved, $"PL {L(fs.RibThickness)}, top clips {L(clip)}") : null;
+            AddPart($"{RibAsm(h.Rib)}-FIN-{h.Name}", PartCategory.FinPlate, RibAsm(h.Rib),
+                $"PL {L(fs.RibThickness)} cable fin plate at rib, {h.Name} (P2 {L(yWeb)}, P3 {L(rf.P3)}, P4 {L(rf.P4)}{(double.IsNaN(rf.WeldLength) ? "" : $", weld D {L(rf.WeldLength)}")})",
+                m, fs.Material, yWeb - rf.P4 + r, 0, asu);
+        }
+
+        /// <summary>Tie fin plate: lower part on the outside face of the tie web, centred on the floorbeam (panel point), bolted through the web; bend
+        /// line along the tie above the web; upper part turned about it to contain the pin (TC). Plan angle A / orientation / pin height are checked.</summary>
+        private void TieFinPlate(ArchHangerDefinition h, ArchTieFin tf, ArchFinSettings fs, TieGeo tg)
+        {
+            var pp = tg.Def.PanelPoints.FirstOrDefault(p => string.Equals(p.Name, tf.Panel, StringComparison.OrdinalIgnoreCase));
+            if (pp == null) { Warn($"Arch: fin plate {h.Name} - panel point '{tf.Panel}' is not on {tg.Def.Name}; not built."); return; }
+            var tc = h.TieAnchor.Vec;
+            var (p2, ang) = tg.At(pp.Distance);
+            var t2 = Vec2.FromAngle(ang); var nl = t2.Left;
+            // Outside face (p.146 / p.149: the fin is on the outside of the tie web, the floorbeam inside): away from the other tie.
+            var other = _ties.Values.FirstOrDefault(o => o != tg);
+            Vec2 inward = other != null ? other.At(other.Nearest(p2)).p - p2 : -p2;
+            int side = Vec2.Dot(inward, nl) > 0 ? -1 : 1;
+            double latTc = Vec2.Dot(tc.XY - p2, nl * side);                      // + = outside
+            var def = tg.Def;
+            double off = def.WebThickness / 2 + fs.TieThickness / 2;
+            double zb = def.FlangeThickness + def.WebHeight + fs.TieBendAboveWeb;
+            var t3 = t2.WithZ(0); var n3 = (nl * side).WithZ(0);
+            var bend0 = (p2 + nl * side * off).WithZ(zb);                        // bend line point at the panel point
+            var q = tc - bend0;
+            double sPin = Vec3.Dot(q, t3);
+            var qn = q - t3 * sPin;
+            double vPin = qn.Length;
+            var v3 = qn.Normalized();
+            double aModel = Math.Acos(Math.Clamp(Vec3.Dot(v3, -n3), -1, 1)) * 180 / Math.PI;   // from the horizontal toward the tie CL
+            int sg = sPin >= 0 ? 1 : -1;
+            var cable = (h.RibAnchor.Vec - tc).Normalized();
+            var cp = (cable - t3 * Vec3.Dot(cable, t3)).Normalized();
+            double aCable = Math.Acos(Math.Clamp(Vec3.Dot(cp, -n3), -1, 1)) * 180 / Math.PI;
+            string nm = $"fin plate {h.Name} at tie";
+            if (!double.IsNaN(tf.AngleA)) Check($"{nm}: angle A (cable lean across the tie)", tf.AngleA, aCable, 0.05, v => $"{v:F3} deg",
+                $"p.149 table vs the cable TC -> rib pin; the plate bend -> TC is {aModel:F3} deg (built: the plate bends at the plan line and reaches the pin)");
+            Check($"{nm}: pin above the bend line in the plate plane", fs.TiePinAboveBend, vPin, Tol, L, "p.149 4\" vs TC Z (p.147) - tie WP - 11 7/8 - 1/2 (U10)");
+            Check($"{nm}: pin off the floorbeam CL along the tie", fs.TieWidth / 2 - fs.TiePinFromEdge, Math.Abs(sPin), Tol, L, "p.149 6 1/8 / 1 7/8 on the 8\" plate centred on the floorbeam (p.146)");
+            string orientModel = sg > 0 ? "RIGHT" : "LEFT";
+            bool towardCable = (Vec3.Dot(cable, t3) >= 0) == (sg > 0);
+            if (tf.Orient.Length > 0)
+            {
+                bool ok = string.Equals(orientModel, tf.Orient, StringComparison.OrdinalIgnoreCase) && towardCable;
+                Model.Checks.Add(new ArchCheck($"{nm}: orientation", tf.Orient, $"{orientModel} (pin on the up-chain side = RIGHT){(towardCable ? "" : ", pin AWAY from the cable lean")}", 0, ok, "p.149 table vs TC relative to the panel point"));
+                if (!ok) Warn($"Arch CHECK {nm}: orientation plan {tf.Orient}, model {orientModel}.");
+            }
+            double latPlan = off + (fs.TiePinAboveBend * Math.Cos(tf.AngleA * Math.PI / 180) * -1);
+            if (!double.IsNaN(tf.AngleA)) Check($"{nm}: pin (TC) off the tie CL, + outside", latPlan, latTc, Tol, L, $"p.149: 7/8\" + 4\" x cos(A) toward the tie CL; TC Z {L(tc.Z)}");
+            // Lower part (plane parallel to the web), (u along the tie from the panel point, z).
+            double hw = fs.TieWidth / 2;
+            var lower = new List<Vec2> { new(-hw, zb - fs.TieDepthBelowBend), new(hw, zb - fs.TieDepthBelowBend), new(hw, zb), new(-hw, zb) };
+            var holes = new List<Hole>();
+            double hx = hw - fs.TieHoleEdge;
+            foreach (var rz in fs.TieHoleRows) foreach (var sx in new[] { -hx, hx }) holes.Add(new Hole(new Vec2(sx, zb - rz), Model.Steel.Bolt.HoleDiameter));
+            Vec3 LowerMap(double u, double z, double t) => W((p2 + t2 * u + nl * side * (off + t)).WithZ(z));
+            var m = new Mesh();
+            PlateBuilder.AddPrism(m, lower, holes, LowerMap, _ => -fs.TieThickness / 2, _ => fs.TieThickness / 2);
+            // Upper part (u along the tie, v up the plate from the bend line), CCW for sg = +1, mirrored otherwise.
+            double r = fs.TiePinRadius, sp = Math.Abs(sPin);
+            var up = new List<Vec2> { new(-hw, 0), new(hw, 0) };
+            double dxr = hw - sp;
+            double ta = Math.Abs(dxr) < r ? Math.Acos(dxr / r) : 0;
+            up.Add(new Vec2(hw, vPin + r * Math.Sin(ta)));
+            var F = new Vec2(-hw, fs.TieFarEdgeAboveBend) - new Vec2(sp, vPin);
+            double phi = Math.Atan2(F.Y, F.X); if (phi < 0) phi += 2 * Math.PI;
+            double tb = phi - (F.Length > r ? Math.Acos(r / F.Length) : 0);
+            for (int i = 1; i <= 14; i++) { double th = ta + (tb - ta) * i / 14; up.Add(new Vec2(sp + r * Math.Cos(th), vPin + r * Math.Sin(th))); }
+            up.Add(new Vec2(-hw, fs.TieFarEdgeAboveBend));
+            if (sg < 0) { up = up.Select(qq => new Vec2(-qq.X, qq.Y)).Reverse().ToList(); }
+            var nUp = Vec3.Cross(t3, v3).Normalized();
+            Vec3 UpperMap(double u, double v, double t) => W(bend0 + t3 * u + v3 * v + nUp * t);
+            PlateBuilder.AddPrism(m, up, new[] { new Hole(new Vec2(sPin, vPin), fs.PinHole) }, UpperMap, _ => -fs.TieThickness / 2, _ => fs.TieThickness / 2);
+            string asm = def.Name.ToUpperInvariant().Replace(' ', '-');
+            AddPart($"{asm}-FIN-{h.Name}", PartCategory.FinPlate, asm, $"PL {L(fs.TieThickness)} bent cable fin plate at tie, {h.Name} at {tf.Panel} (A {aModel:F2} deg)", m, fs.Material,
+                fs.TieDepthBelowBend + vPin + r);
+            // Bolts through the fin and the tie web (head on the fin).
+            double grip = fs.TieThickness + def.WebThickness;
+            foreach (var hl in holes)
+                Model.Steel.Bolts.Add(new BoltInstance { Frame = BoltFrame(LowerMap, hl.Center.X, hl.Center.Y, fs.TieThickness / 2, -1), Grip = grip, Length = Model.Steel.Bolt.LengthForGrip(grip), Assembly = asm });
+        }
+
+        // ------------------------------------------------------------------ cable connectors (p.150)
+
+        private void BuildConnectors()
+        {
+            if (_d.CableConnectorDetail is not { } cd || _d.CableConnectors.Count == 0) return;
+            var byName = _d.Hangers.ToDictionary(x => x.Name, StringComparer.OrdinalIgnoreCase);
+            foreach (var cc in _d.CableConnectors)
+            {
+                if (!byName.TryGetValue(cc.CableA, out var ha) || !byName.TryGetValue(cc.CableB, out var hb)) { Warn($"Arch: cable connector {cc.Name} - hanger not found."); continue; }
+                Vec3 a0 = ha.TieAnchor.Vec, a1 = ha.RibAnchor.Vec, b0 = hb.TieAnchor.Vec, b1 = hb.RibAnchor.Vec;
+                var u = a1 - a0; var v = b1 - b0; var w0 = a0 - b0;
+                double A = Vec3.Dot(u, u), B = Vec3.Dot(u, v), C = Vec3.Dot(v, v), D = Vec3.Dot(u, w0), E = Vec3.Dot(v, w0), den = A * C - B * B;
+                if (Math.Abs(den) < 1e-12) continue;
+                double s = (B * E - C * D) / den, t = (A * E - B * D) / den;
+                if (s <= 0 || s >= 1 || t <= 0 || t >= 1) { Warn($"Arch: cable connector {cc.Name} - {cc.CableA} and {cc.CableB} do not cross between their anchors; not built."); continue; }
+                var pa = a0 + u * s; var pb = b0 + v * t;
+                double sep = (pa - pb).Length;
+                var ua = u.Normalized(); var ub = v.Normalized();
+                var nrm = Vec3.Cross(ua, ub).Normalized();
+                if (Vec3.Dot(pa - pb, nrm) < 0) nrm = -nrm;                    // from cable B toward cable A
+                var mid = (pa + pb) * 0.5;
+                double need = cd.PendantThickness + 2 * (ha == hb ? 0 : _d.HangerSystem.StrandDiameter / 2);
+                Check($"cable connector {cc.Name} ({cc.CableA} x {cc.CableB}): clear distance between the strand axes", need, sep, Tol, L,
+                    "p.150 pendant plate between two 1\" strands needs this; the p.147 TC / HC lines are closer - the connector clamps the cables (deflection not modeled)");
+                string asm = $"CONNECTOR-{cc.Name}";
+                AddAssembly(asm, AssemblyKind.ArchHanger, $"Cable connector {cc.Name}: {cc.CableA} x {cc.CableB} (p.150, UHMW-PE)");
+                var m = new Mesh();
+                // Pendant plate: hexagon in the plane normal to nrm, long axis along the bisector of the two cables.
+                var ax = (ua + (Vec3.Dot(ua, ub) >= 0 ? ub : -ub)).Normalized();
+                var ay = Vec3.Cross(nrm, ax).Normalized();
+                double hl = cd.PendantLength / 2, hs = cd.PendantSide / 2, apex = hs + hl * Math.Tan(cd.PendantEdgeAngleDeg * Math.PI / 180);
+                var hex = new List<Vec2> { new(-hl, -hs), new(0, -apex), new(hl, -hs), new(hl, hs), new(0, apex), new(-hl, hs) };
+                var fr = new Frame3(W(mid), Wd(ax), Wd(ay), Wd(nrm));
+                PlateBuilder.AddPlanar(m, hex, Array.Empty<Hole>(), fr, -cd.PendantThickness / 2, cd.PendantThickness / 2);
+                // Sleeve brackets: half ring (outer R, wall t) around each strand axis, open toward the pendant, with a tab each side on the pendant face.
+                foreach (var (pc, ud, sgn) in new[] { (pa, ua, 1.0), (pb, ub, -1.0) })
+                {
+                    double ro = cd.BracketOuterRadius, ri = ro - cd.BracketThickness;
+                    var ring = new List<Vec2>();
+                    for (int i = 0; i <= 12; i++) { double th = Math.PI * i / 12; ring.Add(new Vec2(ro * Math.Cos(th), ro * Math.Sin(th))); }
+                    for (int i = 12; i >= 0; i--) { double th = Math.PI * i / 12; ring.Add(new Vec2(ri * Math.Cos(th), ri * Math.Sin(th))); }
+                    if (MeshBuilder.SignedArea(ring) < 0) ring.Reverse();
+                    var across = Vec3.Cross(ud, nrm).Normalized();
+                    var f2 = new Frame3(W(pc), Wd(across), Wd(nrm * sgn), Wd(ud));
+                    MeshBuilder.AddExtrusion(m, ring, f2, -cd.BracketLength / 2, cd.BracketLength / 2);
+                    var face = mid + nrm * (sgn * cd.PendantThickness / 2);
+                    var f3 = new Frame3(W(face + ud * Vec3.Dot(pc - face, ud) + across * Vec3.Dot(pc - face, across)), Wd(across), Wd(nrm * sgn), Wd(ud));
+                    foreach (double sx in new[] { -1.0, 1.0 })
+                        MeshBuilder.AddBox(m, f3, sx > 0 ? ro : -ro - cd.BracketTab, sx > 0 ? ro + cd.BracketTab : -ro, 0, cd.BracketThickness, -cd.BracketLength / 2, cd.BracketLength / 2);
+                }
+                Model.Steel.Parts.Add(new SteelPart { Mark = $"{asm}-1", Category = PartCategory.CableConnector, Assembly = asm, Description = $"Cable connector (pendant plate + 2 sleeve brackets) {cc.CableA} x {cc.CableB}",
+                    Mesh = m, Material = cd.Material, Length = cd.PendantLength });
             }
         }
 
@@ -574,8 +783,127 @@ public static class ArchGenerator
             {
                 new Vec2(s0, fb.FlangeThickness), new Vec2(s1, fb.FlangeThickness), new Vec2(s1, fb.DepthAtEnds), new Vec2(sc, fb.DepthAtCrown), new Vec2(s0, fb.DepthAtEnds),
             };
-            RolledBuilder.AddExtrusion(web, poly, org, ex, _fr.Z, en, -fb.WebThickness / 2, fb.WebThickness / 2);
-            AddPart($"{asm}-W", PartCategory.FloorbeamPlate, asm, $"PL {L(fb.WebThickness)} floorbeam web {L(fb.DepthAtEnds)} - {L(fb.DepthAtCrown)} deep", web, fb.Material, s1 - s0);
+            // PT slots (obround) and web holes; slot pairs: outer opening at PtDimB from tie A / PtDimA from tie B, the pair PtPairSpacing apart.
+            var slotCs = new List<double>();
+            if (fb.PtSlotLength > 0)
+            {
+                if (!double.IsNaN(fb.PtDimB)) { slotCs.Add(fb.PtDimB); slotCs.Add(fb.PtDimB + fb.PtPairSpacing); }
+                if (!double.IsNaN(fb.PtDimA)) { slotCs.Add(len - fb.PtDimA); slotCs.Add(len - fb.PtDimA - fb.PtPairSpacing); }
+            }
+            var openings = slotCs.Select(x => PlateBuilder.RoundedRectangle(new Vec2(x, fb.PtSlotZ), fb.PtSlotLength, fb.PtSlotHeight, fb.PtSlotHeight / 2 - 1e-6, 8)).ToList();
+            var webHoles = fb.WebHoles.Where(hh => hh.X > s0 && hh.X < s1).Select(hh => new Hole(new Vec2(hh.X, hh.Z), fb.WebHoleDiameter)).ToList();
+            var wf = new Frame3(org, ex, _fr.Z, en);
+            if (openings.Count > 0) PlateBuilder.AddPlanarWithOpenings(web, poly, webHoles, openings, wf, -fb.WebThickness / 2, fb.WebThickness / 2);
+            else PlateBuilder.AddPlanar(web, poly, webHoles, wf, -fb.WebThickness / 2, fb.WebThickness / 2);
+            string slotNote = slotCs.Count > 0 ? $", {slotCs.Count} PT slots {L(fb.PtSlotHeight)} x {L(fb.PtSlotLength)}" : "";
+            AddPart($"{asm}-W", PartCategory.FloorbeamPlate, asm, $"PL {L(fb.WebThickness)} floorbeam web {L(fb.DepthAtEnds)} - {L(fb.DepthAtCrown)} deep{slotNote}", web, fb.Material, s1 - s0);
+            if (_d.FloorbeamConnection is { } fc)
+            {
+                FloorbeamEnd(fb, fc, ta.Def, asm, wf, len, false);
+                FloorbeamEnd(fb, fc, tb.Def, asm, wf, len, true);
+            }
+            // Horizontal studs on both web faces at StudZ, 32 per face over the clear web (connection plates and PT slots excluded).
+            if (fb.StudsPerFace > 0 && !double.IsNaN(fb.StudLength))
+            {
+                double plateEnd = _d.FloorbeamConnection is { } fc2 ? flangeA + fb.EndGap / 2 + fc2.PlateLength / 2 : s0;
+                double plateEndB = _d.FloorbeamConnection is { } fc3 ? len - (flangeB + fb.EndGap / 2 + fc3.PlateLength / 2) : s1;
+                double clear = fb.StudMinSpacing / 2;
+                var zones = new List<(double a, double b)> { (plateEnd + clear, plateEndB - clear) };
+                foreach (var x in slotCs.OrderBy(x => x))
+                {
+                    double ea = x - fb.PtSlotLength / 2 - clear, eb = x + fb.PtSlotLength / 2 + clear;
+                    zones = zones.SelectMany(z => z.b <= ea || z.a >= eb ? new[] { z } : new[] { (a: z.a, b: ea), (a: eb, b: z.b) }).Where(z => z.b - z.a > -1e-9).ToList();
+                }
+                double total = zones.Sum(z => z.b - z.a);
+                // Distribute: n_i studs in zone i (n_i - 1 spaces), counts by length (largest remainder), at least 1 per zone that fits.
+                int n = fb.StudsPerFace;
+                var counts = zones.Select(_ => 1).ToList();
+                while (counts.Sum() > n) { int i = counts.IndexOf(counts.Max()); counts[i]--; }
+                while (counts.Sum() < n) { int i = Enumerable.Range(0, zones.Count).OrderByDescending(k => counts[k] == 1 ? 1e9 + (zones[k].b - zones[k].a) : (zones[k].b - zones[k].a) / (counts[k] - 1)).First(); counts[i]++; }
+                var xs = new List<double>();
+                for (int k = 0; k < zones.Count; k++)
+                {
+                    var (za, zb2) = zones[k];
+                    if (counts[k] == 1) xs.Add((za + zb2) / 2);
+                    else for (int i = 0; i < counts[k]; i++) xs.Add(za + (zb2 - za) * i / (counts[k] - 1));
+                }
+                xs.Sort();
+                var gaps = xs.Zip(xs.Skip(1), (a, b) => b - a).ToList();
+                double minG = gaps.Count > 0 ? gaps.Min() : 0, maxIn = 0;
+                for (int k = 0; k < zones.Count; k++) if (counts[k] > 1) maxIn = Math.Max(maxIn, (zones[k].b - zones[k].a) / (counts[k] - 1));
+                if (minG < fb.StudMinSpacing - 1e-6 || maxIn > fb.StudMaxSpacing + 1e-6)
+                    Warn($"Arch CHECK {fb.Name}: stud spacing {L(minG)} min / {L(maxIn)} max outside the plan {L(fb.StudMinSpacing)} - {L(fb.StudMaxSpacing)} (p.145 note 3: adjust at openings).");
+                var studAsu = fb.StudUnresolved.Length > 0 ? fb.StudUnresolved : "";
+                foreach (double x in xs)
+                    foreach (int sd2 in new[] { 1, -1 })
+                    {
+                        var o = wf.ToWorld(x, fb.StudZ, sd2 * fb.WebThickness / 2);
+                        var zdir = wf.Z * sd2;
+                        var xdir = wf.X;
+                        Model.Steel.Studs.Add(new StudInstance { Frame = new Frame3(o, xdir, Vec3.Cross(zdir, xdir).Normalized(), zdir), Length = fb.StudLength, Assembly = asm });
+                    }
+                if (studAsu.Length > 0) Warn(studAsu);
+            }
+        }
+
+        /// <summary>Floorbeam end at one tie (p.146): stiffener in the floorbeam web plane (tie web to the tie flange edge), web connection plates both
+        /// faces (stiffener to floorbeam web), flange connection plates top (and bottom) each side of the web, 7/8" bolts.</summary>
+        private void FloorbeamEnd(ArchFloorbeamDefinition fb, ArchFloorbeamConnection fc, ArchTieDefinition tie, string asm, Frame3 wf, double len, bool atB)
+        {
+            // s measured from the tie CL toward the span; map to the floorbeam frame (s from tie A).
+            double S(double s) => atB ? len - s : s;
+            double half = tie.FlangeWidth / 2, joint = half + fb.EndGap / 2;
+            double zf = tie.FlangeThickness, zw = tie.FlangeThickness + tie.WebHeight, sw = tie.WebThickness / 2;
+            string end = atB ? "B" : "A";
+            var bolt = Model.Steel.Bolt;
+            double hd = bolt.HoleDiameter;
+            Vec2 P(double s, double z) => new(S(s), z);
+            List<Vec2> Ccw(List<Vec2> l) { if (MeshBuilder.SignedArea(l) < 0) l.Reverse(); return l; }
+            // Stiffener.
+            var st = Ccw(new List<Vec2> { P(sw, zf + fc.StiffenerClip), P(sw + fc.StiffenerClip, zf), P(half, zf), P(half, zf + fc.StiffenerOuterHeight), P(sw + fc.StiffenerTopFlat, zw), P(sw, zw) });
+            var ms = new Mesh();
+            PlateBuilder.AddPlanar(ms, st, Array.Empty<Hole>(), wf, -fc.StiffenerThickness / 2, fc.StiffenerThickness / 2);
+            // Web connection plates (both faces), holes.
+            double pl = fc.PlateLength / 2, ztop = fb.DepthAtEnds, zbot = ztop - fc.WebPlateHeight;
+            var holes = new List<Hole>();
+            foreach (var r in fc.WebRows)
+                for (int k = r.FirstColumn; k < fc.BoltColumns; k += Math.Max(1, r.ColumnStep))
+                    foreach (int sg in new[] { -1, 1 }) holes.Add(new Hole(P(joint + sg * (fc.BoltFirst + k * fc.BoltPitch), ztop - r.Gage), hd));
+            var wp = Ccw(new List<Vec2> { P(joint - pl, zbot), P(joint + pl, zbot), P(joint + pl, ztop), P(joint - pl, ztop) });
+            double tw = Math.Max(fb.WebThickness, fc.StiffenerThickness);
+            var mw = new Mesh();
+            foreach (int sd in new[] { 1, -1 })
+                PlateBuilder.AddPlanar(mw, wp, holes, wf, sd > 0 ? tw / 2 : -tw / 2 - fc.PlateThickness, sd > 0 ? tw / 2 + fc.PlateThickness : -tw / 2);
+            double gw = 2 * fc.PlateThickness + tw;
+            foreach (var h in holes)
+                Model.Steel.Bolts.Add(new BoltInstance { Frame = BoltFrame((u, v, t) => wf.ToWorld(u, v, t), h.Center.X, h.Center.Y, tw / 2 + fc.PlateThickness, -1), Grip = gw, Length = bolt.LengthForGrip(gw), Assembly = asm });
+            // Flange connection plates: each side of the web, outer edge flush with the floorbeam flange edge; top and bottom.
+            var ff = new Frame3(wf.Origin, wf.X, wf.Z, wf.Y);   // (s, lateral, up)
+            double fe = fb.FlangeWidth / 2;
+            var mf = new Mesh();
+            var mfb = new Mesh();
+            int nfb = 0;
+            foreach (int sd in new[] { 1, -1 })
+            {
+                var fh = new List<Hole>();
+                foreach (var r in fc.FlangeRows)
+                    for (int k = r.FirstColumn; k < fc.BoltColumns; k += Math.Max(1, r.ColumnStep))
+                        foreach (int sg in new[] { -1, 1 }) fh.Add(new Hole(new Vec2(S(joint + sg * (fc.BoltFirst + k * fc.BoltPitch)), sd * (fe - r.Gage)), hd));
+                double w0 = sd > 0 ? fe - fc.FlangePlateWidth : -fe, w1 = sd > 0 ? fe : -fe + fc.FlangePlateWidth;
+                var fp = Ccw(new List<Vec2> { new(S(joint - pl), w0), new(S(joint + pl), w0), new(S(joint + pl), w1), new(S(joint - pl), w1) });
+                const double up = 1;
+                PlateBuilder.AddPlanar(mf, fp, fh, ff, up > 0 ? zf : -zf - fc.PlateThickness, up > 0 ? zf + fc.PlateThickness : -zf);
+                if (fc.BottomFlangePlates) { PlateBuilder.AddPlanar(mfb, fp, fh, ff, up > 0 ? -fc.PlateThickness : 0, up > 0 ? 0 : fc.PlateThickness); nfb++; }
+                double gf = fc.PlateThickness + zf + (fc.BottomFlangePlates ? fc.PlateThickness : 0);
+                foreach (var h in fh)
+                    Model.Steel.Bolts.Add(new BoltInstance { Frame = BoltFrame((u, v, t) => ff.ToWorld(u, v, t), h.Center.X, h.Center.Y, up * (zf + fc.PlateThickness), -up), Grip = gf, Length = bolt.LengthForGrip(gf), Assembly = asm });
+            }
+            AddPart($"{asm}-ST{end}", PartCategory.ArchStiffener, asm, $"PL {L(fc.StiffenerThickness)} connection stiffener at {tie.Name} (p.146)", ms, fc.Material, half - sw);
+            AddPart($"{asm}-WP{end}", PartCategory.ArchConnectionPlate, asm, $"2 - PL {L(fc.PlateThickness)} x {L(fc.WebPlateHeight)} x {L(fc.PlateLength)} web connection plates (p.146)", mw, fc.Material, fc.PlateLength);
+            AddPart($"{asm}-FP{end}", PartCategory.ArchConnectionPlate, asm, $"2 - PL {L(fc.PlateThickness)} x {L(fc.FlangePlateWidth)} x {L(fc.PlateLength)} top flange connection plates (p.146)", mf, fc.Material, fc.PlateLength);
+            if (nfb > 0)
+                AddPart($"{asm}-FB{end}", PartCategory.ArchConnectionPlate, asm, $"2 - PL {L(fc.PlateThickness)} x {L(fc.FlangePlateWidth)} x {L(fc.PlateLength)} bottom flange connection plates (p.146)", mfb, fc.Material, fc.PlateLength,
+                    0, fc.BottomUnresolved.Length > 0 ? Assumption.Unresolved(fc.BottomUnresolved, "bottom plates = the top plates mirrored") : null);
         }
 
         // ------------------------------------------------------------------ upper lateral bracing

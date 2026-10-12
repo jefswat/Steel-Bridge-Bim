@@ -42,7 +42,7 @@ Print("== hangers (p.147 cable lengths, +-1/16\")");
 double maxH = 0;
 foreach (var h in am.Hangers)
 {
-    double d = (h.RibAnchorWorld - h.TieAnchorWorld).Length - h.PlanLength;
+    double d = (h.RibWorkPointWorld is { } wpw ? (wpw - h.TieAnchorWorld).Length : (h.RibAnchorWorld - h.TieAnchorWorld).Length) - h.PlanLength;
     maxH = Math.Max(maxH, Math.Abs(d));
     if (Math.Abs(d) > Tol) Row($"hanger {h.Name}", $"{ToFt(h.PlanLength):F3}'", $"{ToFt(h.PlanLength + d):F3}'", false);
 }
