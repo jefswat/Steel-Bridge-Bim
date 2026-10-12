@@ -319,14 +319,15 @@ public static class ArchGenerator
                 var m = new Mesh();
                 MeshBuilder.AddLoft(m, sec, rings);
                 double len = r.Radius * Math.Abs(ta - tb);
-                bool stub = cuts.Count > 0 && (k == 0 || k == bounds.Count - 2);
+                bool hasStubs = !double.IsNaN(r.StubBottomZ) && cuts.Count >= 2;
+                bool stub = hasStubs && (k == 0 || k == bounds.Count - 2);
                 if (stub)
                 {
                     string km = $"{asm}-STUB{(k == 0 ? 1 : 2)}";
                     var asu = r.StubUnresolved.Length > 0 ? Assumption.Unresolved(r.StubUnresolved, $"{w.Name} envelope from the knuckle to the end splice") : null;
                     AddPart(km, PartCategory.KnucklePlate, asm, $"Knuckle arch stub ({w.Name} envelope)", m, "ASTM A709 Gr. 50", len, 0, asu);
                 }
-                else AddPart($"{asm}-{k + (cuts.Count > 0 ? 0 : 1)}", PartCategory.ArchRib, asm, $"{w.Name} rib segment", m, r.Material, len, w.WeightPerFootLb);
+                else AddPart($"{asm}-{k + (hasStubs ? 0 : 1)}", PartCategory.ArchRib, asm, $"{w.Name} rib segment", m, r.Material, len, w.WeightPerFootLb);
             }
         }
 
