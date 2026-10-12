@@ -361,7 +361,7 @@ public static partial class ArchGenerator
             // Stiffeners: A-A gives the position along the rib (thickness) and the radial extent; across the rib they run between the flange
             // inner faces (B-B) with clips at the web-flange corners.
             double hIn = rw.Depth / 2 - rw.FlangeThickness;   // CL to flange inner face
-            var asu = c.StiffenerUnresolved.Length > 0 ? Assumption.Unresolved(c.StiffenerUnresolved, "A-A position / radial extent (vector), flange to flange, B-B clips") : null;
+            var asu = c.StiffenerUnresolved.Length > 0 ? Assumption.UnresolvedDimension(c.StiffenerUnresolved, "A-A position / radial extent (vector), flange to flange, B-B clips") : null;
             int k = 0;
             foreach (var st in c.Stiffeners)
             {

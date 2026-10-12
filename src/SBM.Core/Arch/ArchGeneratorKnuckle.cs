@@ -87,7 +87,7 @@ public static partial class ArchGenerator
                 var web = new Mesh();
                 if (ops.Count > 0) PlateBuilder.AddPlanarWithOpenings(web, poly, Array.Empty<Hole>(), ops, wf, o0, o0 + k.EndWebThickness);
                 else PlateBuilder.AddPlanar(web, poly, Array.Empty<Hole>(), wf, o0, o0 + k.EndWebThickness);
-                var asu = double.IsNaN(k.EndWebHeightAtEnds) && k.EndWebUnresolved.Length > 0 ? Assumption.Unresolved(k.EndWebUnresolved, $"end height {L(hEnd)} scaled") : null;
+                var asu = double.IsNaN(k.EndWebHeightAtEnds) && k.EndWebUnresolved.Length > 0 ? Assumption.UnresolvedDimension(k.EndWebUnresolved, $"end height {L(hEnd)} scaled") : null;
                 AddPart($"{asm}-EW", PartCategory.KnucklePlate, asm, $"PL {L(k.EndWebThickness)} x {L(k.EndLength)} end web{(ops.Count > 0 ? $", {ops.Count} PT openings {L(k.EndWebOpeningLength)} x {L(k.EndWebOpeningHeight)}" : "")} (p.126)",
                     web, k.Material, k.EndLength, 0, asu);
                 foreach (double x in k.EndWebStudsAt)
@@ -226,7 +226,7 @@ public static partial class ArchGenerator
                 var poly = Ccw(new List<Vec2> { new(Sb(-hwW), -hwW), new(sCut, -hwW), new(sCut, hwW), new(Sb(hwW), hwW) });
                 var m = new Mesh();
                 PlateBuilder.AddPrism(m, poly, Array.Empty<Hole>(), (s, wv, t) => W(T + tan * s + bn * wv + nW * t), _ => -kd.StubWebThickness / 2, _ => kd.StubWebThickness / 2);
-                var asu = kd.StubWebUnresolved.Length > 0 ? Assumption.Unresolved(kd.StubWebUnresolved, $"PL {L(kd.StubWebThickness)}") : null;
+                var asu = kd.StubWebUnresolved.Length > 0 ? Assumption.UnresolvedDimension(kd.StubWebUnresolved, $"PL {L(kd.StubWebThickness)}") : null;
                 AddPart($"{cm}-SW", PartCategory.KnucklePlate, asm, $"PL {L(kd.StubWebThickness)} arch stub web at {c.Point}, milled to bear (p.124 A-A)", m, mat, sCut, 0, asu);
                 // Arch stiffener: normal to the rib at ArchStiffenerAlongRib, intrados side, web face to the flange tip.
                 var nI = -(cIn * n2.X + up * n2.Y).Normalized();
@@ -234,7 +234,7 @@ public static partial class ArchGenerator
                 var ms = new Mesh();
                 var o = T + tan * kd.ArchStiffenerAlongRib;
                 PlateBuilder.AddPrism(ms, sp, Array.Empty<Hole>(), (wv, r, t) => W(o + bn * wv + nI * r + tan * t), _ => -kd.ArchStiffenerThickness / 2, _ => kd.ArchStiffenerThickness / 2);
-                var asu2 = kd.ArchStiffenerUnresolved.Length > 0 ? Assumption.Unresolved(kd.ArchStiffenerUnresolved, "web face to the flange tip, intrados side") : null;
+                var asu2 = kd.ArchStiffenerUnresolved.Length > 0 ? Assumption.UnresolvedDimension(kd.ArchStiffenerUnresolved, "web face to the flange tip, intrados side") : null;
                 AddPart($"{cm}-AS", PartCategory.KnucklePlate, asm, $"PL {L(kd.ArchStiffenerThickness)} arch stiffener at {c.Point} ({L(kd.ArchStiffenerAlongRib)} along the rib, p.124 A-A)", ms, mat, 2 * hwW, 0, asu2);
                 // Vertical stiffener: normal to the chord, StiffenerFromSpringing outward of the springing, between the flange plates.
                 var ov = T - cIn * kd.StiffenerFromSpringing;
@@ -289,7 +289,7 @@ public static partial class ArchGenerator
             {
                 // Fill under the tie flange (tie side of the joint) and the 1" plate under the end flange that splices it to the tie, bearing / jack plates.
                 double hwF = tdef.FlangeWidth / 2;
-                var asu = kd.SpliceUnresolved.Length > 0 ? Assumption.Unresolved(kd.SpliceUnresolved, $"splice plate from the end web to {L(kd.SplicePlateLength / 2)} past the joint, {L(tdef.FlangeWidth)} wide; bolts not modeled") : null;
+                var asu = kd.SpliceUnresolved.Length > 0 ? Assumption.UnresolvedDimension(kd.SpliceUnresolved, $"splice plate from the end web to {L(kd.SplicePlateLength / 2)} past the joint, {L(tdef.FlangeWidth)} wide; bolts not modeled") : null;
                 var mf = new Mesh();
                 PlateBuilder.AddPrism(mf, Ccw(ClippedRect(sj + g2, sj + kd.SplicePlateLength / 2, -hwF, hwF, 0)), Array.Empty<Hole>(), (s, lat, z) => TieMap(s, z, lat), _ => -kd.FillThickness, _ => 0);
                 AddPart($"{cm}-FI", PartCategory.KnucklePlate, asm, $"PL {L(kd.FillThickness)} fill under the tie flange at {c.Point} (p.124 A-A)", mf, mat, kd.SplicePlateLength / 2, 0, asu);
@@ -300,7 +300,7 @@ public static partial class ArchGenerator
                     _ => k.EndFlangeBottomZ - kd.SplicePlateThickness, _ => k.EndFlangeBottomZ);
                 AddPart($"{cm}-SP", PartCategory.KnucklePlate, asm, $"PL {L(kd.SplicePlateThickness)} splice / bearing plate under the end flange at {c.Point} (p.124 A-A)", ms, mat, sj + kd.SplicePlateLength / 2 - sStart, 0, asu);
                 // Jack cheese plates (CL bearing BearingFromSpringing into the span; jacks +- JackFromBearing along the chord).
-                var asuC = kd.CheeseUnresolved.Length > 0 ? Assumption.Unresolved(kd.CheeseUnresolved, $"{L(kd.CheeseLength)} x {L(kd.CheeseWidth)} scaled") : null;
+                var asuC = kd.CheeseUnresolved.Length > 0 ? Assumption.UnresolvedDimension(kd.CheeseUnresolved, $"{L(kd.CheeseLength)} x {L(kd.CheeseWidth)} scaled") : null;
                 var mc = new Mesh();
                 foreach (int sg in new[] { -1, 1 })
                 {

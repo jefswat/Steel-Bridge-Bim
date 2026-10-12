@@ -304,7 +304,7 @@ public static partial class ArchGenerator
         private void BuildPt(ArchDeckDefinition dk, ArchPtSystem pt)
         {
             Model.PtStrandDiameter = pt.StrandDiameter; Model.PtStrandArea = pt.StrandArea;
-            var asu = pt.Unresolved.Length > 0 ? Assumption.Unresolved(pt.Unresolved, $"strand spacing {L(pt.StrandSpacing)}, anchorage {L(pt.AnchorWidth)} x {L(pt.AnchorHeight)} x {L(pt.AnchorLength)}") : null;
+            var asu = pt.Unresolved.Length > 0 ? Assumption.UnresolvedDimension(pt.Unresolved, $"strand spacing {L(pt.StrandSpacing)}, anchorage {L(pt.AnchorWidth)} x {L(pt.AnchorHeight)} x {L(pt.AnchorLength)}") : null;
             if (asu != null) Warn(pt.Unresolved);
             var zs = new List<Vec3[]>();
             foreach (var t in dk.Tendons)

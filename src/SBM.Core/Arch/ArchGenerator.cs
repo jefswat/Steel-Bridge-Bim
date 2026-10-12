@@ -459,7 +459,7 @@ public static partial class ArchGenerator
                 if (stub)
                 {
                     string km = $"{asm}-STUB{(k == 0 ? 1 : 2)}";
-                    var asu = r.StubUnresolved.Length > 0 ? Assumption.Unresolved(r.StubUnresolved, $"{w.Name} envelope from the knuckle to the end splice") : null;
+                    var asu = r.StubUnresolved.Length > 0 ? Assumption.UnresolvedDimension(r.StubUnresolved, $"{w.Name} envelope from the knuckle to the end splice") : null;
                     AddPart(km, PartCategory.KnucklePlate, asm, $"Knuckle arch stub ({w.Name} envelope)", m, "ASTM A709 Gr. 50", len, 0, asu);
                 }
                 else AddPart($"{asm}-{k + (hasStubs ? 0 : 1)}", PartCategory.ArchRib, asm, $"{w.Name} rib segment", m, r.Material, len, w.WeightPerFootLb);
@@ -596,7 +596,7 @@ public static partial class ArchGenerator
             if (MeshBuilder.SignedArea(outl) < 0) outl.Reverse();
             var m = new Mesh();
             PlateBuilder.AddPrism(m, outl, new[] { new Hole(Vec2.Zero, fs.PinHole) }, (u, v, t) => W(hc + bn * u + e * v + nf * t), _ => -fs.RibThickness / 2, _ => fs.RibThickness / 2);
-            var asu = fs.RibUnresolved.Length > 0 ? Assumption.Unresolved(fs.RibUnresolved, $"PL {L(fs.RibThickness)}, top clips {L(clip)}") : null;
+            var asu = fs.RibUnresolved.Length > 0 ? Assumption.UnresolvedDimension(fs.RibUnresolved, $"PL {L(fs.RibThickness)}, top clips {L(clip)}") : null;
             AddPart($"{RibAsm(h.Rib)}-FIN-{h.Name}", PartCategory.FinPlate, RibAsm(h.Rib),
                 $"PL {L(fs.RibThickness)} cable fin plate at rib, {h.Name} (P2 {L(yWeb)}, P3 {L(rf.P3)}, P4 {L(rf.P4)}{(double.IsNaN(rf.WeldLength) ? "" : $", weld D {L(rf.WeldLength)}")})",
                 m, fs.Material, yWeb - rf.P4 + r, 0, asu);
@@ -930,7 +930,7 @@ public static partial class ArchGenerator
             if (w == null) { Warn($"Arch: bracing section '{_d.BracingSection}' is not in the AISC catalog - bracing not built."); return; }
             var sec = SteelCatalog.WideFlangePolygon(w, -w.WebThickness / 2);
             AddAssembly("UPPER-BRACING", AssemblyKind.ArchBracing, $"Upper lateral bracing {w.Name}");
-            var asu = _d.BracingOrientationUnresolved.Length > 0 ? Assumption.Unresolved(_d.BracingOrientationUnresolved, "web in the plane of the member and the local Z axis, work point to work point") : null;
+            var asu = _d.BracingOrientationUnresolved.Length > 0 ? Assumption.UnresolvedDimension(_d.BracingOrientationUnresolved, "web in the plane of the member and the local Z axis, work point to work point") : null;
             // Member axes (world) first: crossing trims need the continuous members.
             var axes = new Dictionary<string, (Vec3 a, Vec3 b)>(StringComparer.OrdinalIgnoreCase);
             foreach (var br in _d.Bracing)
@@ -1019,7 +1019,7 @@ public static partial class ArchGenerator
             double ang3d = Math.Acos(Math.Min(1, Math.Abs(Vec3.Dot(sd, cd)))) * 180 / Math.PI;
             string asm = $"UPPER-BRACING";
             var hd = Model.Steel.Bolt.HoleDiameter;
-            var asu = cr.Unresolved.Length > 0 ? Assumption.Unresolved(cr.Unresolved, $"PL {L(cr.Thickness)}") : null;
+            var asu = cr.Unresolved.Length > 0 ? Assumption.UnresolvedDimension(cr.Unresolved, $"PL {L(cr.Thickness)}") : null;
             int nb = 0;
             foreach (var (top, l1, l2, l3, angPlan) in new[] { (true, cr.TopL1, cr.TopL2, cr.TopL3, cr.TopAngleDeg), (false, cr.BottomL1, cr.BottomL2, cr.BottomL3, cr.BottomAngleDeg) })
             {
@@ -1091,7 +1091,7 @@ public static partial class ArchGenerator
                 var web = new Mesh();
                 RolledBuilder.AddExtrusion(web, new[] { new Vec2(-half, zt), new Vec2(half, zt), new Vec2(half, zt + hEnd), new Vec2(0, zt + k.EndWebHeightAtChord), new Vec2(-half, zt + hEnd) },
                     org, et, _fr.Z, en, o0, o0 + k.EndWebThickness);
-                var asu = double.IsNaN(k.EndWebHeightAtEnds) && k.EndWebUnresolved.Length > 0 ? Assumption.Unresolved(k.EndWebUnresolved, $"end height {L(hEnd)} scaled") : null;
+                var asu = double.IsNaN(k.EndWebHeightAtEnds) && k.EndWebUnresolved.Length > 0 ? Assumption.UnresolvedDimension(k.EndWebUnresolved, $"end height {L(hEnd)} scaled") : null;
                 AddPart($"{asm}-EW", PartCategory.KnucklePlate, asm, $"PL {L(k.EndWebThickness)} end web", web, k.Material, k.EndLength, 0, asu);
             }
             else Warn(k.EndWebUnresolved.Length > 0 ? k.EndWebUnresolved : $"Arch: knuckle {k.Name} end web height at the ends not given - end web not built.");
@@ -1109,7 +1109,7 @@ public static partial class ArchGenerator
                 if (MeshBuilder.SignedArea(outline) < 0) outline.Reverse();
                 var dp = new Mesh();
                 MeshBuilder.AddExtrusion(dp, outline, _fr, k.DeckPlateTopZ - k.DeckPlateThickness, k.DeckPlateTopZ);
-                var asu = k.DeckPlateUnresolved.Length > 0 ? Assumption.Unresolved(k.DeckPlateUnresolved, $"top at local Z {L(k.DeckPlateTopZ)}") : null;
+                var asu = k.DeckPlateUnresolved.Length > 0 ? Assumption.UnresolvedDimension(k.DeckPlateUnresolved, $"top at local Z {L(k.DeckPlateTopZ)}") : null;
                 AddPart($"{asm}-DP", PartCategory.KnucklePlate, asm, $"PL {L(k.DeckPlateThickness)} deck plate", dp, k.Material, 0, 0, asu);
             }
             foreach (var pt in k.PtAnchors) Model.Tendons.Add(($"{k.Name} PT anchor {pt.Name}", new List<Vec3> { W(pt.Vec) }, "PT anchorage (data)"));
@@ -1279,7 +1279,7 @@ public static partial class ArchGenerator
             Model.Concrete.Deck = slab;
             Model.SlabEnds = ends;
             AddAssembly("FORM-DECK", AssemblyKind.ArchDeckForm, "Corrugated steel deck form spanning the floorbeams");
-            var fasu = dk.FormUnresolved.Length > 0 ? Assumption.Unresolved(dk.FormUnresolved, $"pitch {L(dk.FormPitch)}, top flat {L(dk.FormTopFlat)}, flute bottom {L(dk.FormFluteBottom)}") : null;
+            var fasu = dk.FormUnresolved.Length > 0 ? Assumption.UnresolvedDimension(dk.FormUnresolved, $"pitch {L(dk.FormPitch)}, top flat {L(dk.FormTopFlat)}, flute bottom {L(dk.FormFluteBottom)}") : null;
             AddPart("FORM-DECK", PartCategory.FormDeck, "FORM-DECK", dk.FormDescription.Length > 0 ? dk.FormDescription : $"{L(dk.FormDepth)} x {L(dk.FormPitch)} steel deck form", sheet,
                 "ASTM A653 Gr. 33, G165 galvanized", 0, 0, fasu);
             BuildCurbs(dk, ka, kb);
