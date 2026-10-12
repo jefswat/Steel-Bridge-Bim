@@ -232,6 +232,14 @@ public sealed class SbmDocument
         return _models[i] ?? throw new InvalidOperationException($"Bridge '{b.Name}' could not be generated (missing alignment?).");
     }
 
+    /// <summary>Steel solid-vs-solid interference per bridge (<see cref="SBM.Core.Checks.SteelClashCheck"/>); all bridges when no name is given.</summary>
+    public List<SBM.Core.Checks.ClashReport> Clashes(string? bridgeName = null, SBM.Core.Checks.ClashOptions? options = null)
+    {
+        var o = options ?? new SBM.Core.Checks.ClashOptions();
+        var names = bridgeName != null ? new[] { Bridge(bridgeName).Name } : Project.Bridges.Select(b => b.Name).ToArray();
+        return names.Select(n => SBM.Core.Checks.SteelClashCheck.Run(Model(n), o, Units)).ToList();
+    }
+
     public BridgeFraming Framing(string? bridgeName = null) => Model(bridgeName).Framing;
     public SteelModel Steel(string? bridgeName = null) => Model(bridgeName).Steel ?? throw new InvalidOperationException("3D steel was not generated (framing errors).");
     public SBM.Core.Substructure.SubstructureModel Substructure(string? bridgeName = null) => Model(bridgeName).Substructure ?? throw new InvalidOperationException("Substructure was not generated (framing errors).");

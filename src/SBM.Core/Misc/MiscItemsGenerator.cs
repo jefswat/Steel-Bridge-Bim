@@ -152,8 +152,9 @@ public sealed partial class MiscItemsGenerator
         /// <summary>CL elevation at a station (interpolated along the path).</summary>
         public double ZAt(double sta)
         {
+            bool desc = Stations.Length > 1 && Stations[^1] < Stations[0];
             for (int i = 1; i < Pts.Count; i++)
-                if (sta <= Stations[i] || i == Pts.Count - 1)
+                if ((desc ? sta >= Stations[i] : sta <= Stations[i]) || i == Pts.Count - 1)
                 {
                     double t = Stations[i] != Stations[i - 1] ? (sta - Stations[i - 1]) / (Stations[i] - Stations[i - 1]) : 0;
                     return Pts[i - 1].Z + (Pts[i].Z - Pts[i - 1].Z) * t;
@@ -172,7 +173,39 @@ public sealed partial class MiscItemsGenerator
         {
             k++;
             if (dr.Trench != null) BuildTrenchDrain(dr, k);
+            else if (!string.IsNullOrEmpty(dr.Collector)) BuildCollectorDrainTube(dr, k);
         }
+    }
+
+    /// <summary>Simple inlet piped to a plan collector: vertical drain tube from the inlet bottom (6" below the slab, as the inlet) down to the
+    /// collector CL at the drain station (I-80 PDF 219 / 220 collection pipe elevations). The inlet itself is the substructure's simple inlet.</summary>
+    private void BuildCollectorDrainTube(DeckDrainDefinition dr, int k)
+    {
+        string who = $"Drain {k} ({dr.Type}) STA {_u.FormatStation(dr.Station)} {(dr.Left ? "LT" : "RT")}";
+        if (!_collectors.TryGetValue(dr.Collector!, out var coll)) { Warn($"{who}: collector '{dr.Collector}' not found; drain tube not built."); return; }
+        var (toe, _, _) = Concrete.BarrierProfiles.PlanLines(_deck.Barrier);
+        double off = dr.Left ? _deck.LeftAt(dr.Station) + toe + dr.FromGutter : _deck.RightAt(dr.Station) - toe - dr.FromGutter;
+        var p = _a.PointAt(dr.Station, off);
+        double zTop = Ztop(dr.Station, off), zBot = zTop - _deck.Thickness - In(6);
+        double zc = coll.ZAt(dr.Station);
+        // collector plan point at the drain station
+        Vec2 cxy = coll.Pts[0].XY;
+        bool desc = coll.Stations.Length > 1 && coll.Stations[^1] < coll.Stations[0];
+        for (int i = 1; i < coll.Pts.Count; i++)
+            if (desc ? dr.Station >= coll.Stations[i] : dr.Station <= coll.Stations[i])
+            {
+                double t = coll.Stations[i] != coll.Stations[i - 1] ? (dr.Station - coll.Stations[i - 1]) / (coll.Stations[i] - coll.Stations[i - 1]) : 0;
+                cxy = Vec2.Lerp(coll.Pts[i - 1].XY, coll.Pts[i].XY, Math.Clamp(t, 0, 1)); break;
+            }
+        double dd = (cxy - p).Length;
+        if (dd > In(1)) Warn($"{who}: CHECK - the inlet (from the gutter line) is {Sh(dd)} in plan from the collector line {coll.Name}; the drain tube is modeled at the inlet, straight down to the collector level.");
+        var (od, wall) = MiscMesh.PipeSch40(dr.PipeDiameter);
+        string asm = $"{who} tube";
+        Asm(MiscGroup.Drainage, asm, $"Drain tube of {who} to {coll.Name}", "deck drain");
+        if (zBot <= zc) { Warn($"{who}: the collector at the drain ({L(zc)}) is above the inlet bottom ({L(zBot)}); tube not built."); return; }
+        Add(MiscGroup.Drainage, MiscKind.DrainTube, asm, asm, $"{Sh(dr.PipeDiameter)} Sch 40 drain tube, inlet to the top of {coll.Name} ({L(zBot - zc)})",
+            MiscMesh.Tube(p.WithZ(zBot), p.WithZ(zc + coll.Od / 2), od / 2, od / 2 - wall), "ASTM A53 Gr B, galvanized");
+        Record(asm, "tube", p.WithZ(zBot), p.WithZ(zc + coll.Od / 2), od / 2, dr.Station);
     }
 
     private void BuildCollector(DrainCollectorDefinition c)
@@ -184,14 +217,18 @@ public sealed partial class MiscItemsGenerator
         int j = SupportIndex(c.EndSupport);
         if (j < 0) { Warn($"{name}: end support '{c.EndSupport}' not found."); return; }
         var sl = _f.SupportLine(j);
-        double endSta = sl.Bearings.ElementAtOrDefault(c.ReferenceGirder)?.Station ?? sl.Station;
+        double endSta = c.EndStation ?? (sl.Bearings.ElementAtOrDefault(c.ReferenceGirder)?.Station ?? sl.Station);
         double s0 = c.StartStation;
-        if (endSta <= s0) { Warn($"{name}: end support is not ahead of the start station."); return; }
+        bool reverse = endSta < s0;                                       // runs down-station toward its end
+        bool leftSide = _a.Inverse(GirderAt(g, s0).Item1.XY).Offset < 0;
+        var (toeB, _, _) = Concrete.BarrierProfiles.PlanLines(_deck.Barrier);
+        if (Math.Abs(endSta - s0) < 0.3) { Warn($"{name}: end and start stations coincide."); return; }
+        if (reverse && c.EndStation == null) { Warn($"{name}: end support is not ahead of the start station."); return; }
         // a pier drain fed by this collector: the collector ends over the pier collection box inlet, 9" (at 50 F) off the cap face
         // (Ramp G PDF 155 section C-C, PDF 154 partial plan), not at the bearing line
         var feed = _def.Misc?.PierDrains.FirstOrDefault(p => string.Equals(p.Collector, name, StringComparison.OrdinalIgnoreCase) && SupportIndex(p.Support) == j);
         var fu = feed == null ? null : _sub.Units.FirstOrDefault(u => u.SupportIndex == j);
-        if (feed != null && fu != null)
+        if (feed != null && fu != null && c.EndStation == null)
         {
             double side = feed.CapBoxFace == CapFaceSide.Back ? -1 : 1;
             double nT = (side < 0 ? fu.CapN0 : fu.CapN1) + side * feed.CapBoxInletFromFace;
@@ -211,12 +248,19 @@ public sealed partial class MiscItemsGenerator
         var (od, wall) = MiscMesh.PipeSch40(c.NominalDiameter);
 
         // stations: every ~3 m plus the knots and couplers
+        double sLo = Math.Min(s0, endSta), sHi = Math.Max(s0, endSta);
         var stas = new SortedSet<double> { s0, endSta };
-        for (double s = s0; s < endSta; s += 3) stas.Add(s);
-        foreach (var p in c.Points) if (p.Station > s0 && p.Station < endSta) stas.Add(p.Station);
-        foreach (var cs in c.CouplerStations) if (cs > s0 && cs < endSta) stas.Add(cs);
+        for (double s = sLo; s < sHi; s += 3) stas.Add(s);
+        foreach (var p in c.Points) if (p.Station > sLo && p.Station < sHi) stas.Add(p.Station);
+        foreach (var cs in c.CouplerStations) if (cs > sLo && cs < sHi) stas.Add(cs);
         var list = stas.ToList();
-        Vec2 Plan(double sta) { var (w, t, _) = GirderAt(g, sta); return w.XY + t.Right * c.OffsetFromGirder; }
+        if (reverse) list.Reverse();                                      // flow order: start -> end
+        Vec2 Plan(double sta)
+        {
+            if (c.FromBarrierToe is double ft)
+                return _a.PointAt(sta, leftSide ? _deck.LeftAt(sta) + toeB + ft : _deck.RightAt(sta) - toeB - ft);
+            var (w, t, _) = GirderAt(g, sta); return w.XY + t.Right * c.OffsetFromGirder;
+        }
 
         // elevation knots: deck top at the pipe plan position minus the plan's distance to the CL pipe
         var knots = new List<(double sta, double z, double dist)>();
@@ -227,7 +271,7 @@ public sealed partial class MiscItemsGenerator
             if (i > 0) acc += (Plan(list[i]) - Plan(list[i - 1])).Length;
             cum[list[i]] = acc;
         }
-        foreach (var p in c.Points.OrderBy(p => p.Station))
+        foreach (var p in (reverse ? c.Points.OrderByDescending(p => p.Station) : c.Points.OrderBy(p => p.Station)))
         {
             var pp = Plan(p.Station);
             double off = _a.Inverse(pp).Offset;
@@ -246,9 +290,9 @@ public sealed partial class MiscItemsGenerator
         {
             double d = cum.TryGetValue(sta, out var cd) ? cd : 0;
             double d0 = cum[knots[0].sta];
-            if (sta <= knots[0].sta) return knots[0].z + (d0 - d) * c.Slope;
+            if (d <= d0) return knots[0].z + (d0 - d) * c.Slope;
             for (int i = 1; i < knots.Count; i++)
-                if (sta <= knots[i].sta)
+                if (d <= cum[knots[i].sta])
                 {
                     double a0 = cum[knots[i - 1].sta], a1 = cum[knots[i].sta];
                     double t = a1 > a0 ? (d - a0) / (a1 - a0) : 0;
@@ -263,13 +307,12 @@ public sealed partial class MiscItemsGenerator
 
         string asm = name;
         Asm(MiscGroup.Drainage, asm, $"{Sh(c.NominalDiameter)} deck drain collection pipe, {L(path.Length)}, {c.Slope * 100:F2}%", "drain collector");
-        var mesh = new Mesh();
-        for (int i = 1; i < pts.Count; i++) mesh.Append(MiscMesh.Tube(pts[i - 1], pts[i], od / 2, od / 2 - wall));
+        var mesh = MiscMesh.Pipe(pts, od / 2, od / 2 - wall);              // chords with mitred joints (no kinks)
         Add(MiscGroup.Drainage, MiscKind.DrainPipe, asm, name + " pipe",
-            $"{Sh(c.NominalDiameter)} dia ASTM A53 Gr B Sch 40 pipe (OD {od / 0.0254:F3}\", wall {wall / 0.0254:F3}\"), {L(path.Length)} on the curve parallel to girder {g.Name}, {Sh(c.OffsetFromGirder)} right of its CL; plan chords (fabricator may use linear segments between couplers)",
+            $"{Sh(c.NominalDiameter)} dia ASTM A53 Gr B Sch 40 pipe (OD {od / 0.0254:F3}\", wall {wall / 0.0254:F3}\"), {L(path.Length)} " + (c.FromBarrierToe is double fbt ? $"parallel to the {(leftSide ? "left" : "right")} deck edge, {Sh(fbt)} inboard of the barrier toe" : $"on the curve parallel to girder {g.Name}, {Sh(c.OffsetFromGirder)} right of its CL") + "; plan chords (fabricator may use linear segments between couplers)",
             mesh, "ASTM A53 Gr B, galvanized");
         // flexible couplers (about 6" wide)
-        foreach (var cs in c.CouplerStations.Where(x => x > s0 && x < endSta))
+        foreach (var cs in c.CouplerStations.Where(x => x > sLo && x < sHi))
         {
             var pa = Plan(cs - In(3) / 1.0 * 0).WithZ(ZAtSta(cs));
             var (w, t, _) = GirderAt(g, cs);

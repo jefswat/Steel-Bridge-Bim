@@ -18,7 +18,6 @@ namespace SBM.Core.Steel;
 public sealed partial class SteelModelGenerator
 {
     private const string BracketMaterial = "ASTM A709 Gr. 50W";
-    private const string WalkwayMaterial = "ASTM A709 Gr. 50, galvanized";
 
     private void BuildInspectionAccess()
     {
@@ -26,6 +25,13 @@ public sealed partial class SteelModelGenerator
         if (ia is not { Enabled: true } || _def.Girders.IsPrestressed) return;
         int n = 0;
         foreach (var c in ia.Cables) BuildInspectionCable(ia, c, ++n);
+    }
+
+    /// <summary>Walkways run after the connections phase (they read the generated cross frames / cross girders).</summary>
+    private void BuildInspectionWalkways()
+    {
+        var ia = _def.InspectionAccess;
+        if (ia is not { Enabled: true } || _def.Girders.IsPrestressed) return;
         BuildWalkways(ia);
     }
 
@@ -67,12 +73,34 @@ public sealed partial class SteelModelGenerator
         // End anchorages, intermediate supports (equal sections not longer than the maximum), brackets at cross-frame stiffeners.
         var stiff = _f.Stiffeners.Where(st => st.Girder == gi && st.Kind == StiffenerKind.ConnectionPlate).Select(st => st.GirderDistance)
             .Where(s => s > s0 && s < s1).OrderBy(s => s).ToList();
+        double side0 = c.LeftFace ? -1 : 1;
+        var facePlates = new List<(double lo, double hi, string what)>();
+        foreach (var st in _f.Stiffeners.Where(st => st.Girder == gi && st.GirderDistance > s0 - 1 && st.GirderDistance < s1 + 1))
+        {
+            if (c.LeftFace ? st.Side is not (StiffenerSide.Both or StiffenerSide.Left) : st.Side is not (StiffenerSide.Both or StiffenerSide.Right)) continue;
+            var (_, tt, _) = _f.Girders[gi].Path.At(st.GirderDistance);
+            double along = Vec2.Dot(st.Direction, tt) * side0, tw0 = _web[gi].Thickness(st.GirderDistance);
+            double reach = tw0 / 2 + st.Plate.Width + Inch(1);
+            double e0 = 0, e1 = along * reach;
+            facePlates.Add((st.GirderDistance + Math.Min(e0, e1) - st.Plate.Thickness, st.GirderDistance + Math.Max(e0, e1) + st.Plate.Thickness,
+                $"{st.Kind} stiffener at {In(st.GirderDistance)}"));
+        }
+        double anchorHalf = ia.AnchorBracketLength / 2;
+        bool FreeForAnchor(double sx) => facePlates.All(f => f.hi <= sx - anchorHalf || f.lo >= sx + anchorHalf);
         int sections = Math.Max(1, (int)Math.Ceiling(length / ia.MaxAnchorSpacing - 1e-9));
         var anchors = new List<double> { s0 };
         for (int k = 1; k < sections; k++)
         {
             double target = s0 + length * k / sections;
             double near = stiff.Count > 0 ? stiff.MinBy(s => Math.Abs(s - target)) : target;
+            if (ia.StiffenerRopeHole != null && stiff.Count > 1)
+            {
+                // as designed (cable sheet "TYPICAL CABLE ELEVATION"): an intermediate support is at 1/2 the stiffener spacing,
+                // midway between the two cross frame stiffeners around the target
+                // (the nearest such midpoint that is clear of stiffeners on the cable face, e.g. not on a pier's bearing stiffeners)
+                var mids = Enumerable.Range(0, stiff.Count - 1).Select(j => (stiff[j] + stiff[j + 1]) / 2).OrderBy(q => Math.Abs(q - target)).ToList();
+                near = mids.FirstOrDefault(FreeForAnchor, mids[0]);
+            }
             anchors.Add(Math.Abs(near - target) <= 0.25 * length / sections ? near : target);
         }
         anchors.Add(s1);
@@ -85,11 +113,32 @@ public sealed partial class SteelModelGenerator
         items.Sort((a, b) => a.s.CompareTo(b.s));
 
         double side = c.LeftFace ? -1 : 1;
+        // Stiffener plates on the cable face, as intervals along the girder (skewed plates sweep along it). As designed (cable sheet:
+        // support brackets at cross frame stiffeners on the OTHER side of the web, Section C-C: the rope passes stiffeners on its own face
+        // through a hole), a support bracket is not placed where a plate on the cable face takes its place; an anchorage there is reported.
+        if (ia.StiffenerRopeHole != null)
+        {
+            var keep = new List<(double s, bool anchor)>();
+            foreach (var it in items)
+            {
+                double half = it.anchor ? ia.AnchorBracketLength / 2 : (SteelCatalog.FindTee(ia.SupportBracket)?.FlangeWidth ?? Inch(6)) / 2;
+                var hit = facePlates.FirstOrDefault(f => f.hi > it.s - half && f.lo < it.s + half);
+                if (hit.what == null) { keep.Add(it); continue; }
+                if (!it.anchor) continue;   // the rope passes this stiffener through its hole
+                bool atEnd = Math.Abs(it.s - s0) < 1e-6 || Math.Abs(it.s - s1) < 1e-6;
+                Warn(UnresolvedFlag.Text(ia.Source ?? "inspection cable details", $"G{gi + 1} inspection cable {mark}: {(atEnd ? "end" : "intermediate")} anchorage at {In(it.s)} along the girder",
+                    atEnd ? $"it overlaps the {hit.what} on the cable face; the cable sheet places the end anchorage 8\" from the CL bearing with the bearing stiffeners \"not shown for clarity\""
+                          : $"it overlaps the {hit.what} on the cable face and no stiffener midpoint near the 200'-0 section limit is clear",
+                    "anchorage kept"));
+                keep.Add(it);
+            }
+            items = keep;
+        }
         double D = Sec.WebDepth, zRope = -(D - ia.RopeHeightAboveWebBottom);
         var bg = new BoltGeometry(ia.BracketBoltDiameter);
         double hd = bg.HoleDiameter;
         var path = _f.Girders[gi].Path;
-        var rope = new List<Vec3>();
+        var rope = new List<(double s, Vec3 p, Vec3 tan, bool anchor, double len)>();
         int bn = 0;
         foreach (var (s, anchor) in items)
         {
@@ -145,14 +194,67 @@ public sealed partial class SteelModelGenerator
                 Description = $"{tee.Name} x {In(L)} cable {(anchor ? "anchorage / support" : "support bracket")}, {bolts.Count} - {In(bg.Diameter)} bolts",
                 Material = BracketMaterial, NominalWeightLbPerFt = tee.WeightPerFootLb,
             });
-            rope.Add(Wd(0, ropeB, 0));
+            rope.Add((s, Wd(0, ropeB, 0), tan, anchor, L));
+        }
+        // Rope holes in the girder stiffeners the rope passes on this face (cable sheet Section C-C).
+        if (ia.StiffenerRopeHole is double rh)
+        {
+            var bySupport = new List<(double s, double d)>();
+            if (ia.StiffenerRopeHoleAtSupports != null)
+                for (int j = 0; j < _f.Supports.Count; j++)
+                    if (ia.StiffenerRopeHoleAtSupports.TryGetValue(_def.SupportAt(j).Name, out double dj)) bySupport.Add((BearingPathDistance(gi, j), dj));
+            double off = side * (_web[gi].Thickness(s0) / 2 + ia.RopeOffsetFromWeb);
+            foreach (var st in _f.Stiffeners.Where(st => st.Girder == gi && st.GirderDistance > s0 && st.GirderDistance < s1))
+            {
+                if (c.LeftFace ? st.Side is not (StiffenerSide.Both or StiffenerSide.Left) : st.Side is not (StiffenerSide.Both or StiffenerSide.Right)) continue;
+                double dia = rh;
+                foreach (var (sb2, d2) in bySupport) if (Math.Abs(st.GirderDistance - sb2) < UnitsFt(3)) dia = d2;
+                // rope line point in the (possibly skewed) stiffener plane
+                double sx = st.GirderDistance;
+                Vec2 R(double ss) { var (pp, tt, _) = path.At(ss); return pp.XY + tt.Right * off; }
+                double F(double ss) => Vec2.Cross(R(ss) - st.Location.XY, st.Direction);
+                for (int it = 0; it < 4; it++)
+                {
+                    double h = 1e-3, f0 = F(sx), df = (F(sx + h) - f0) / h;
+                    if (Math.Abs(df) < 1e-9) break;
+                    sx -= f0 / df;
+                }
+                var rp = R(sx);
+                var hp = new Vec3(rp.X, rp.Y, path.At(sx).point.Z + zRope);
+                AddStiffenerHole(gi, st.GirderDistance, hp, dia);
+                // the rope passes through the hole: a point of the rope line (unless a bracket / anchorage is right there)
+                if (rope.All(q => Math.Abs(q.s - sx) > Inch(6))) { var (_, tt, _) = path.At(sx); rope.Add((sx, hp, new Vec3(tt.X, tt.Y, 0), false, 0)); }
+            }
+            rope.Sort((p1, p2) => p1.s.CompareTo(p2.s));
         }
         if (rope.Count >= 2)
         {
             var rm = new Mesh();
-            RolledBuilder.AddTube(rm, rope, ia.RopeDiameter / 2, 8);
             double rl = 0;
-            for (int i = 1; i < rope.Count; i++) rl += (rope[i] - rope[i - 1]).Length;
+            if (ia.RopeEndsAtAnchorStem == true)
+            {
+                // one rope piece per section between anchorages, from stem end to stem end (shackle / turnbuckle hardware not modeled)
+                var piece = new List<Vec3>();
+                for (int i = 0; i < rope.Count; i++)
+                {
+                    var r = rope[i];
+                    if (r.anchor && piece.Count > 0)
+                    {
+                        piece.Add(r.p - r.tan * (r.len / 2));
+                        RolledBuilder.AddTube(rm, piece, ia.RopeDiameter / 2, 8);
+                        for (int q = 1; q < piece.Count; q++) rl += (piece[q] - piece[q - 1]).Length;
+                        piece = new List<Vec3>();
+                    }
+                    if (r.anchor) { if (i < rope.Count - 1) piece.Add(r.p + r.tan * (r.len / 2)); }
+                    else piece.Add(r.p);
+                }
+            }
+            else
+            {
+                var pts = rope.Select(r => r.p).ToList();
+                RolledBuilder.AddTube(rm, pts, ia.RopeDiameter / 2, 8);
+                for (int i = 1; i < pts.Count; i++) rl += (pts[i] - pts[i - 1]).Length;
+            }
             _parts.Add(new SteelPart
             {
                 Mark = $"{mark}-R", Category = PartCategory.InspectionCable, Assembly = mark, Mesh = rm, Length = rl,
@@ -164,207 +266,4 @@ public sealed partial class SteelModelGenerator
 
     private static double UnitsFt(double ft) => Units.UnitSystem.Ft(ft);
 
-    // ================================================================== walkways
-
-    private void BuildWalkways(InspectionAccessDefinition ia)
-    {
-        if (ia.DefaultWalkway == WalkwayType.None && ia.Walkways.Count == 0) return;
-        double D = Sec.WebDepth;
-        // Supports of a walkway: the middle of each cross frame line between the girders, at the grating level.
-        Vec3 Mid(Vec3 l, Vec3 r) => (l + r) * 0.5 + Up * (-D + ia.GratingAboveWebBottom);
-        var jobs = new List<Action>();
-        var pairs = _f.CrossFrames.GroupBy(cf => (cf.Bay, cf.RightGirder)).OrderBy(g => g.Key.Bay).ThenBy(g => g.Key.RightGirder).ToList();
-        foreach (var grp in pairs)
-        {
-            var def = ia.Walkways.FirstOrDefault(w => w.Bay == grp.Key.Bay && (w.RightGirder < 0 || w.RightGirder == grp.Key.RightGirder));
-            var type = def?.Type ?? ia.DefaultWalkway;
-            if (type == WalkwayType.None) continue;
-            var frames = grp.OrderBy(cf => cf.LeftGlobalDistance).ToList();
-            int i0 = Math.Clamp(def?.FirstLine ?? 0, 0, frames.Count - 1);
-            int i1 = def == null || def.LastLine < 0 ? frames.Count - 1 : Math.Min(def.LastLine, frames.Count - 1);
-            string bayName = $"{(char)('A' + grp.Key.Bay)}{(char)('A' + grp.Key.RightGirder)}";
-            for (int k = i0; k < i1; k++)
-            {
-                var a = Mid(frames[k].Left, frames[k].Right);
-                var b = Mid(frames[k + 1].Left, frames[k + 1].Right);
-                string m = $"IW-{bayName}-{k + 1}";
-                int left = grp.Key.Bay, right = grp.Key.RightGirder;
-                jobs.Add(() => BuildWalkwaySegment(ia, type, a, b, ia.WalkwayEndClearance, ia.WalkwayEndClearance, m, left, right));
-            }
-        }
-        // Bays interrupted by a cross girder: the walkway ends 1" clear of the cross girder web (design sheet 167 detail) on the near
-        // side (between each continuing girder and the discontinuous girder, through the web openings) and starts again on the far
-        // side between the continuing girders. The grating is 2 1/2" above the bottom of the cross girder web there (sheet 165 note).
-        foreach (var x in _f.CrossGirders)
-        {
-            var xgp = _def.Girders.CrossGirder;
-            double clearXg = xgp.WebThickness / 2 + Inch(1);
-            var (dz, tc) = CrossGirderShift(x);
-            Vec3 OnXg(double frac)
-            {
-                var q = Vec3.Lerp(x.Left, x.Right, frac);
-                return new Vec3(q.X, q.Y, q.Z + dz - xgp.FlangeThickness * 2 - xgp.WebDepth + ia.GratingAboveWebBottom + xgp.FlangeThickness);
-            }
-            var pts = new (int l, int r, Vec3 point, bool near)[]
-            {
-                (x.LeftGirder, x.Girder, OnXg(tc / 2), true),
-                (x.Girder, x.RightGirder, OnXg((tc + 1) / 2), true),
-                (x.LeftGirder, x.RightGirder, OnXg(0.5), false),
-            };
-            foreach (var (l, r, point, near) in pts)
-            {
-                var grp = pairs.FirstOrDefault(g => g.Key.Bay == l && g.Key.RightGirder == r);
-                if (grp == null) continue;
-                var def = ia.Walkways.FirstOrDefault(w => w.Bay == l && (w.RightGirder < 0 || w.RightGirder == r));
-                var type = def?.Type ?? ia.DefaultWalkway;
-                if (type == WalkwayType.None) continue;
-                var frames = grp.OrderBy(cf => cf.LeftGlobalDistance).ToList();
-                // distance on the bay's LEFT girder where the cross girder is (the discontinuous girder's end for the (disc, right) bay)
-                double sRef = l == x.Girder ? _f.Girders[x.Girder].Length : x.LeftGirderDistance;
-                var fr = near ? frames.LastOrDefault(cf => cf.LeftGlobalDistance < sRef) : frames.FirstOrDefault(cf => cf.LeftGlobalDistance > sRef);
-                if (fr == null) continue;
-                var a = near ? Mid(fr.Left, fr.Right) : point;
-                var b = near ? point : Mid(fr.Left, fr.Right);
-                string m = $"IW-{(char)('A' + l)}{(char)('A' + r)}-X{x.Girder + 1}{(near ? "n" : "f")}";
-                int ll = l, rr2 = r;
-                jobs.Add(() => BuildWalkwaySegment(ia, type, a, b, near ? ia.WalkwayEndClearance : clearXg, near ? clearXg : ia.WalkwayEndClearance, m, ll, rr2));
-            }
-        }
-        Parallel.ForEach(jobs, j => j());
-    }
-
-    private void BuildWalkwaySegment(InspectionAccessDefinition ia, WalkwayType type, Vec3 A, Vec3 B, double clearA, double clearB, string mark, int leftGirder, int rightGirder)
-    {
-        var sec = type == WalkwayType.A ? ia.TypeA : ia.TypeB;
-        var dir = B - A;
-        double L0 = dir.Length;
-        double Ls = L0 - clearA - clearB;
-        if (L0 < 1e-3 || Ls < UnitsFt(2)) return;
-        var axis = dir * (1.0 / L0);
-        var yh = new Vec3(-axis.Y, axis.X, 0).Normalized();                  // left of travel, horizontal (grating is level across)
-        var zz = Vec3.Cross(axis, yh);                                       // up, tilted with the grade
-        var o = A + axis * clearA;
-        var fr = new Frame3(o, axis, yh, zz);
-        double W = sec.ClearWidth, tg = sec.GratingThickness;
-        bool typeA = type == WalkwayType.A;
-
-        var stringer = typeA ? (Ls > sec.StringerSpanLimit ? sec.LongStringer : sec.Stringer) : sec.Stringer;
-        var chan = typeA ? SteelCatalog.FindChannel(stringer) : null;
-        var ang = typeA ? null : SteelCatalog.FindAngle(stringer);
-        var postA = SteelCatalog.FindAngle(sec.PostAngle);
-        var railA = SteelCatalog.FindAngle(sec.TopRailAngle);
-        if ((typeA && chan == null) || (!typeA && ang == null) || postA == null || railA == null)
-        {
-            Warn($"{mark}: walkway section '{stringer}' / '{sec.PostAngle}' / '{sec.TopRailAngle}' not found in the AISC catalog; walkway skipped.");
-            return;
-        }
-        string asm = mark;
-        _assemblies.Add(new SteelAssembly { Mark = asm, Kind = AssemblyKind.InspectionWalkway, Girder = leftGirder,
-            Description = $"Inspection walkway Type {type}, bay G{leftGirder + 1}–G{rightGirder + 1}, {In(Ls)} long" });
-
-        double zStrBot = typeA ? -tg - chan!.Depth : -tg - ang!.Thickness;
-        double diaT = typeA ? sec.DiaphragmPlateThickness : 0;
-        var diaAngle = typeA ? null : SteelCatalog.FindAngle(sec.DiaphragmAngle);
-        double zDiaTop = zStrBot;
-        double zDiaBot = typeA ? zDiaTop - diaT : zDiaTop - (diaAngle?.LegA ?? Inch(3.5));
-        double yOutDia = W / 2 + postA.LegA;
-
-        // grating (solid slab; nominal weight for the mass)
-        var gm = new Mesh();
-        MeshBuilder.AddBox(gm, fr, 0, Ls, -W / 2, W / 2, -tg, 0);
-        _parts.Add(new SteelPart { Mark = $"{asm}-GR", Category = PartCategory.Grating, Assembly = asm, Mesh = gm, Length = Ls,
-            Description = $"Welded grating {In(tg)} deep x {In(W)} wide", Material = "Galvanized welded steel grating",
-            NominalWeightLbPerFt = sec.GratingWeightLbPerSqFt * (W / 0.3048) });
-
-        // stringers
-        for (int i = 0; i < 2; i++)
-        {
-            double s = i == 0 ? -1 : 1;
-            var m = new Mesh();
-            if (typeA)
-            {
-                var poly = SteelCatalog.ChannelPolygon(chan!, s * W / 2, -(int)s);
-                RolledBuilder.AddExtrusion(m, poly, o + zz * (-tg - chan!.Depth / 2), zz, yh, axis, 0, Ls);
-            }
-            else
-            {
-                var poly = SteelCatalog.AnglePolygon(ang!, zStrBot, 1, s * W / 2, -(int)s);
-                RolledBuilder.AddExtrusion(m, poly, o, zz, yh, axis, 0, Ls);
-            }
-            _parts.Add(new SteelPart { Mark = $"{asm}-S{i + 1}", Category = PartCategory.WalkwayStringer, Assembly = asm, Mesh = m, Length = Ls,
-                Description = typeA ? chan!.Name : ang!.Name, Material = WalkwayMaterial,
-                NominalWeightLbPerFt = typeA ? chan!.WeightPerFootLb : ang!.WeightPerFootLb, Role = MemberRole.Diaphragm });
-        }
-
-        // posts, diaphragms
-        int nSp = Math.Max(1, (int)Math.Ceiling(Ls / sec.MaxPostSpacing - 1e-9));
-        double tPost = postA.Thickness, tRail = railA.Thickness;
-        double zTop = sec.TopRailHeight;
-        var diaPos = new List<double>();
-        for (int k = 0; k <= nSp; k++) diaPos.Add(k * Ls / nSp);
-        if (typeA && sec.MidDiaphragmsOnLongSpans && Ls > sec.StringerSpanLimit)
-            for (int k = 0; k < nSp; k++) diaPos.Add((k + 0.5) * Ls / nSp);
-        diaPos.Sort();
-        int dn = 0;
-        foreach (double u in diaPos)
-        {
-            var m = new Mesh();
-            if (typeA)
-            {
-                double hw = sec.DiaphragmPlateWidth / 2;
-                double ud = Math.Clamp(u - hw, 0, Math.Max(0, Ls - 2 * hw));
-                MeshBuilder.AddBox(m, fr, ud, ud + 2 * hw, -yOutDia, yOutDia, zDiaBot, zDiaTop);
-                _parts.Add(new SteelPart { Mark = $"{asm}-D{++dn}", Category = PartCategory.WalkwayPlate, Assembly = asm, Mesh = m, Length = 2 * yOutDia,
-                    Description = $"PL {In(sec.DiaphragmPlateThickness)} x {In(sec.DiaphragmPlateWidth)} diaphragm x {In(2 * yOutDia)}", Material = WalkwayMaterial });
-            }
-            else
-            {
-                double ua = Math.Clamp(u - diaAngle!.LegA / 2, 0, Math.Max(0, Ls - diaAngle.LegA));
-                RolledBuilder.AddAngle(m, o + axis * ua + yh * (-yOutDia) + zz * zDiaTop, yh, axis, -zz, 2 * yOutDia, diaAngle.LegA, diaAngle.LegB,
-                    diaAngle.Thickness, 0, Array.Empty<Hole>(), Array.Empty<Hole>());
-                _parts.Add(new SteelPart { Mark = $"{asm}-D{++dn}", Category = PartCategory.Angle, Assembly = asm, Mesh = m, Length = 2 * yOutDia, Role = MemberRole.Diaphragm,
-                    Description = $"{diaAngle.Name} diaphragm x {In(2 * yOutDia)}", Material = WalkwayMaterial, NominalWeightLbPerFt = diaAngle.WeightPerFootLb });
-            }
-        }
-        // rail posts: L3x3x5/16, legs inward-of-the-rail face: y-leg across (3"), x-leg along the walkway (3"), foot on the diaphragm
-        double zPostBot = zDiaTop, zPostTop = zTop - tRail;
-        var postPoly = new[] { new Vec2(0, 0), new Vec2(postA.LegA, 0), new Vec2(postA.LegA, tPost), new Vec2(tPost, tPost), new Vec2(tPost, postA.LegB), new Vec2(0, postA.LegB) };
-        int pn = 0;
-        for (int k = 0; k <= nSp; k++)
-        {
-            double u = k * Ls / nSp;
-            double dirU = k * 2 <= nSp ? 1 : -1;
-            for (int i = 0; i < 2; i++)
-            {
-                double s = i == 0 ? -1 : 1;
-                var m = new Mesh();
-                RolledBuilder.AddExtrusion(m, postPoly, o + axis * (u - dirU * tPost / 2) + yh * (s * W / 2), axis * dirU, yh * s, zz, zPostBot, zPostTop);
-                _parts.Add(new SteelPart { Mark = $"{asm}-P{++pn}", Category = PartCategory.WalkwayPost, Assembly = asm, Mesh = m, Length = zPostTop - zPostBot,
-                    Description = $"{postA.Name} rail post x {In(zPostTop - zPostBot)}", Material = WalkwayMaterial, NominalWeightLbPerFt = postA.WeightPerFootLb });
-            }
-        }
-        // top rails (angle: horizontal leg over the post, vertical leg down the inside), intermediate rails, toe boards
-        var railPoly = new[] { new Vec2(0, zTop), new Vec2(railA.LegA, zTop), new Vec2(railA.LegA, zTop - tRail), new Vec2(tRail, zTop - tRail),
-            new Vec2(tRail, zTop - railA.LegB), new Vec2(0, zTop - railA.LegB) };
-        for (int i = 0; i < 2; i++)
-        {
-            double s = i == 0 ? -1 : 1;
-            var m = new Mesh();
-            RolledBuilder.AddExtrusion(m, railPoly, o + yh * (s * W / 2), yh * s, zz, axis, 0, Ls);
-            _parts.Add(new SteelPart { Mark = $"{asm}-TR{i + 1}", Category = PartCategory.WalkwayRail, Assembly = asm, Mesh = m, Length = Ls,
-                Description = $"{railA.Name} top rail", Material = WalkwayMaterial, NominalWeightLbPerFt = railA.WeightPerFootLb });
-            var im = new Mesh();
-            double vi0 = s > 0 ? W / 2 - sec.RailPlateThickness : -W / 2, vi1 = s > 0 ? W / 2 : -W / 2 + sec.RailPlateThickness;
-            MeshBuilder.AddBox(im, fr, 0, Ls, vi0, vi1, sec.IntermediateRailHeight - sec.RailPlateWidth / 2, sec.IntermediateRailHeight + sec.RailPlateWidth / 2);
-            _parts.Add(new SteelPart { Mark = $"{asm}-IR{i + 1}", Category = PartCategory.WalkwayRail, Assembly = asm, Mesh = im, Length = Ls,
-                Description = $"PL {In(sec.RailPlateThickness)} x {In(sec.RailPlateWidth)} intermediate rail", Material = WalkwayMaterial });
-            if (sec.ToeBoard)
-            {
-                var tb = new Mesh();
-                MeshBuilder.AddBox(tb, fr, 0, Ls, vi0, vi1, sec.ToeBoardClearance, sec.ToeBoardClearance + sec.RailPlateWidth);
-                _parts.Add(new SteelPart { Mark = $"{asm}-TB{i + 1}", Category = PartCategory.WalkwayPlate, Assembly = asm, Mesh = tb, Length = Ls,
-                    Description = $"PL {In(sec.RailPlateThickness)} x {In(sec.RailPlateWidth)} toe board", Material = WalkwayMaterial });
-            }
-        }
-    }
 }

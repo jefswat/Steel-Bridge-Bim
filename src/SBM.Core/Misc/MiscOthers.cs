@@ -160,10 +160,16 @@ public sealed partial class MiscItemsGenerator
         double gWeb = g.PlateAt(GirderPlate.Web, sPost)?.Thickness ?? In(0.75);
         double xWeb = -outb + gWeb / 2 / sinA;                     // bracket web starts at the girder web face
         double xTopF = -outb + (tf?.Width ?? 0) / 2 / sinA, xBotF = -outb + (bfl?.Width ?? 0) / 2 / sinA;   // flanges start at the girder flange edges
+        if (s.GirderFlangeGap is double fg)
+        {
+            // Detail A: bracket flanges end 1/4" from the girder flange edges, the bracket web 1/4" from the stiffener at the flange edge
+            xTopF += fg / sinA; xBotF += fg / sinA;
+            xWeb = Math.Max(xTopF, xBotF);
+        }
         double x1 = s.EndBeyondPost;
         Mesh Box(double x0, double x1_, double y0, double y1, double z0, double z1) { var m = new Mesh(); MeshBuilder.AddBox(m, frame, x0, x1_, y0, y1, z0, z1); return m; }
         Asm(MiscGroup.SignSupport, asm, $"Sign truss support bracket at {s.Support}: cantilever from girder {g.Name}, CL post {Sh(outb)} outboard of CL girder at {b.AngleToGirderDegrees:0.###} deg, {Sh(b.Height)} web, top of base {zTop / 0.3048:F2}", "sign support");
-        Add(MiscGroup.SignSupport, MiscKind.SignPlate, asm, asm + " bracket web", $"PL {Sh(wt)} bracket web {Sh(b.Height)} deep, girder web face to {Sh(x1)} beyond the CL post", Box(xWeb, x1, -wt / 2, wt / 2, zW0, zW1), PlansSteel);
+        Add(MiscGroup.SignSupport, MiscKind.SignPlate, asm, asm + " bracket web", $"PL {Sh(wt)} bracket web {Sh(b.Height)} deep, {(s.GirderFlangeGap != null ? "girder flange edge" : "girder web face")} to {Sh(x1)} beyond the CL post", Box(xWeb, x1, -wt / 2, wt / 2, zW0, zW1), PlansSteel);
         Add(MiscGroup.SignSupport, MiscKind.SignPlate, asm, asm + " bracket top flange", $"PL {Sh(tp)} x {Sh(s.BracketTopFlangeWidth)} bracket top flange (level; plans: follows the girder slope)", Box(xTopF, x1, -s.BracketTopFlangeWidth / 2, s.BracketTopFlangeWidth / 2, zW1, zTF), PlansSteel);
         Add(MiscGroup.SignSupport, MiscKind.SignPlate, asm, asm + " bracket bottom flange", $"PL {Sh(bf)} x {Sh(b.BottomFlangeWidth)} bracket bottom flange (level)", Box(xBotF, x1, -b.BottomFlangeWidth / 2, b.BottomFlangeWidth / 2, zB, zW0), PlansSteel);
         if (stub > tp + 1e-4)

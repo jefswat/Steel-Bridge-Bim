@@ -678,6 +678,10 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   connections, bent-plate posts at skewed frames; grating = one solid slab (mass from nominal weight). Data: `samples/plans/inspection-i80.csx`,
   `inspection-ramp-g.csx`. BoltInstance.Diameter is honored per instance (viewport, IFC fastener types, material list).
   Snapshot: `--closeup MARK@Bridge name` also selects one bridge for steel assemblies (walkway marks repeat in every bridge).
+- Clash check (`SBM.Core/Checks/SteelClashCheck.cs`, `SbmDocument.Clashes`, `sbm clash`): steel parts (+ optional bolts / welds), misc items, simple drains and
+  substructure concrete (concrete only vs drains / misc); depth > 1/16" = clash. Walkways as designed (`InspectionAccessDefinition.SupportOnFrames`, built AFTER the
+  connections phase from the generated frames, `Steel/InspectionWalkwayDetailer.cs`), cross girder `Level` / discontinuous girder cope inputs, drain pipes one mitred
+  piece (`MiscMesh.Pipe`), pier drains `NoTrough` / `ColumnNumber` / jog / fittings. Status: docs/plan-data/cutoff-diaphragms-and-inspection.md (end).
 - Misc items (OPTIONAL, `BridgeDefinition.Misc` = `MiscItemsDefinition` + `DeckDrainDefinition.Trench`; null = none; `Bridge/MiscItemsDefinition.cs`, generator `SBM.Core/Misc/`
   `MiscItemsGenerator` (+ `MiscPierDrains`, `MiscOthers`, `MiscMesh`), result `MiscModel` hung on `SubstructureModel.Misc` and built in `RegenerationCache` after the substructure):
   Ramp G deck drainage (trench inlets positioned FROM THE GUTTER LINE = deck edge - EdgeStrip width, tube, grate, splash basin, 12" span collector at the printed

@@ -48,6 +48,72 @@ public static class MiscMesh
         return m;
     }
 
+    /// <summary>
+    /// Hollow pipe along a polyline with MITRED joints (the plans' drain pipe bends: "as an alternate to mitred joints, the contractor may
+    /// fabricate joints by cutting standard elbows", Ramp G PDF 158 / I-80 drainage notes): one closed shell, the section frame carried
+    /// along by parallel transport, each joint ring in the bisector plane of the two segments (no gaps / overlaps = no kinks at the joints).
+    /// Points closer than 1 mm and collinear interior points are dropped.
+    /// </summary>
+    public static Mesh Pipe(IReadOnlyList<Vec3> points, double rOut, double rIn, int n = 24)
+    {
+        var m = new Mesh();
+        var pts = new List<Vec3>();
+        foreach (var q in points) if (pts.Count == 0 || (q - pts[^1]).Length > 1e-3) pts.Add(q);
+        for (int i = pts.Count - 2; i >= 1; i--)
+        {
+            var d0 = (pts[i] - pts[i - 1]).Normalized(); var d1 = (pts[i + 1] - pts[i]).Normalized();
+            if (Vec3.Dot(d0, d1) > 1 - 1e-10) pts.RemoveAt(i);
+        }
+        if (pts.Count < 2) return m;
+        int N = pts.Count;
+        var dirs = Enumerable.Range(0, N - 1).Select(i => (pts[i + 1] - pts[i]).Normalized()).ToArray();
+        var (u, v) = Perp(dirs[0]);
+        var outer = new int[N, n]; var inner = new int[N, n];
+        for (int i = 0; i < N; i++)
+        {
+            Vec3 din = dirs[Math.Max(0, i - 1)], dout = dirs[Math.Min(N - 2, i)];
+            var mit = (i == 0 || i == N - 1) ? (i == 0 ? dout : din) : (din + dout).Normalized();
+            for (int k = 0; k < n; k++)
+            {
+                double t = 2 * Math.PI * k / n;
+                var off = u * Math.Cos(t) + v * Math.Sin(t);
+                foreach (var (r, arr) in new[] { (rOut, outer), (rIn, inner) })
+                {
+                    var q = pts[i] + off * r;
+                    double den = Vec3.Dot(din, mit);
+                    if (i > 0 && i < N - 1 && Math.Abs(den) > 1e-9) q -= din * (Vec3.Dot(q - pts[i], mit) / den);
+                    arr[i, k] = m.Add(q);
+                }
+            }
+            if (i > 0 && i < N - 1)
+            {
+                // parallel transport of the section frame from din to dout
+                var ax = Vec3.Cross(din, dout);
+                double sn = ax.Length, cs = Vec3.Dot(din, dout);
+                if (sn > 1e-12)
+                {
+                    var k = ax * (1 / sn);
+                    Vec3 Rot(Vec3 w) => w * cs + Vec3.Cross(k, w) * sn + k * (Vec3.Dot(k, w) * (1 - cs));
+                    u = Rot(u); v = Rot(v);
+                }
+            }
+        }
+        for (int i = 0; i + 1 < N; i++)
+            for (int k = 0; k < n; k++)
+            {
+                int j = (k + 1) % n;
+                m.Tri(outer[i, k], outer[i, j], outer[i + 1, j]); m.Tri(outer[i, k], outer[i + 1, j], outer[i + 1, k]);
+                m.Tri(inner[i, k], inner[i + 1, j], inner[i, j]); m.Tri(inner[i, k], inner[i + 1, k], inner[i + 1, j]);
+            }
+        for (int k = 0; k < n; k++)
+        {
+            int j = (k + 1) % n;
+            m.Tri(outer[0, k], inner[0, j], outer[0, j]); m.Tri(outer[0, k], inner[0, k], inner[0, j]);
+            m.Tri(outer[N - 1, k], outer[N - 1, j], inner[N - 1, j]); m.Tri(outer[N - 1, k], inner[N - 1, j], inner[N - 1, k]);
+        }
+        return m;
+    }
+
     /// <summary>Solid cylinder between two axis points.</summary>
     public static Mesh Cylinder(Vec3 a, Vec3 b, double r, int n = 24)
     {

@@ -2572,7 +2572,8 @@
               "BackwallBarSize": "#5",
               "BackwallBarSpacing": 0.30479999999999996,
               "MaxBarLength": 18.288,
-              "CapBars": []
+              "CapBars": [],
+              "PlanBarSets": []
             }
           },
           "ExpansionJoint": {
@@ -4605,7 +4606,8 @@
                   "PedestalRow": "",
                   "EdgeDistance": 0
                 }
-              ]
+              ],
+              "PlanBarSets": []
             }
           },
           "ExpansionJoint": null,
@@ -6608,7 +6610,8 @@
                   "PedestalRow": "",
                   "EdgeDistance": 0
                 }
-              ]
+              ],
+              "PlanBarSets": []
             }
           },
           "ExpansionJoint": null,
@@ -8347,7 +8350,8 @@
                   "PedestalRow": "",
                   "EdgeDistance": 0
                 }
-              ]
+              ],
+              "PlanBarSets": []
             }
           },
           "ExpansionJoint": null,
@@ -10067,7 +10071,8 @@
                   "PedestalRow": "",
                   "EdgeDistance": 0
                 }
-              ]
+              ],
+              "PlanBarSets": []
             }
           },
           "ExpansionJoint": null,
@@ -11716,7 +11721,8 @@
                   "PedestalRow": "",
                   "EdgeDistance": 0
                 }
-              ]
+              ],
+              "PlanBarSets": []
             }
           },
           "ExpansionJoint": {
@@ -18872,7 +18878,8 @@
               "I-80 WB Unit 1 end dam diaphragm bars 5d / 4d at West Abutment (section B-B) and Pier 5WB (section C-C), PDF 185: positions along the joint not dimensioned (bar counts per bay and \u0027@ 1\u0027-0\u0027 only; no distance from the girder lines, \u00272 bars at equal spacing outside exterior girders\u0027 without the outer reference) - schedule only.",
               "I-80 WB Unit 1 end dam longitudinal bars 5e at West Abutment (section B-B) and Pier 5WB (section C-C), PDF 185: section positions drawn as dots, only partly dimensioned (hoop corners, \u0027EQ. SPA.\u0027 groups) - schedule only."
             ]
-          }
+          },
+          "PlanBarSets": []
         }
       },
       "CrossFrames": {
@@ -21121,7 +21128,11 @@
           "RailPlateThickness": 0.009524999999999999,
           "ToeBoard": true,
           "ToeBoardClearance": 0.0127,
-          "MaxPostSpacing": 2.5908
+          "MaxPostSpacing": 2.5908,
+          "GratingWidth": 0.6095999999999999,
+          "TopRailInside": true,
+          "GratingAboveCrossGirderWebBottom": 0.30479999999999996,
+          "RailEndFromCrossGirderWeb": 0.762
         },
         "TypeB": {
           "ClearWidth": 0.6604,
@@ -21142,10 +21153,34 @@
           "RailPlateThickness": 0.009524999999999999,
           "ToeBoard": false,
           "ToeBoardClearance": 0.0127,
-          "MaxPostSpacing": 2.5908
+          "MaxPostSpacing": 2.5908,
+          "GratingWidth": 0.6095999999999999,
+          "TopRailInside": true,
+          "GratingAboveCrossGirderWebBottom": 0.0635,
+          "RailEndFromCrossGirderWeb": 0.762,
+          "EndDiaphragmClearOfCrossGirderFlange": 0.038099999999999995
         },
         "GratingAboveWebBottom": 0.0635,
-        "WalkwayEndClearance": 0.1016
+        "WalkwayEndClearance": 0.1016,
+        "SupportOnFrames": true,
+        "StringerEndFromFrame": 0.038099999999999995,
+        "GratingGapAtFrame": 0.0127,
+        "RailClearOfFrame": 0.038099999999999995,
+        "StringerEndFromWeb": 0.038099999999999995,
+        "GratingClearOfWeb": 0.0254,
+        "GratingAboveDiaphragmFlange": {
+          "7": 0.4064,
+          "8": 0.15239999999999998
+        },
+        "Source": "I-80 PDF 167-174",
+        "StiffenerRopeHole": 0.022224999999999998,
+        "StiffenerRopeHoleAtSupports": {
+          "Pier 12WB": 0.038099999999999995,
+          "Pier 13WB": 0.038099999999999995,
+          "Pier 14WB": 0.038099999999999995,
+          "Pier 15WB": 0.038099999999999995
+        },
+        "RopeEndsAtAnchorStem": true
       },
       "Misc": {
         "Unresolved": [],
@@ -21371,7 +21406,8 @@
               "BackwallBarSize": "#5",
               "BackwallBarSpacing": 0.30479999999999996,
               "MaxBarLength": 18.288,
-              "CapBars": []
+              "CapBars": [],
+              "PlanBarSets": []
             }
           },
           "ExpansionJoint": {
@@ -23847,7 +23883,8 @@
                   "PedestalRow": "",
                   "EdgeDistance": 0
                 }
-              ]
+              ],
+              "PlanBarSets": []
             }
           },
           "ExpansionJoint": null,
@@ -25986,7 +26023,8 @@
                   "PedestalRow": "",
                   "EdgeDistance": 0
                 }
-              ]
+              ],
+              "PlanBarSets": []
             }
           },
           "ExpansionJoint": null,
@@ -28324,7 +28362,8 @@
                   "PedestalRow": "",
                   "EdgeDistance": 0
                 }
-              ]
+              ],
+              "PlanBarSets": []
             }
           },
           "ExpansionJoint": null,
@@ -30095,7 +30134,8 @@
                   "PedestalRow": "",
                   "EdgeDistance": 0
                 }
-              ]
+              ],
+              "PlanBarSets": []
             }
           },
           "ExpansionJoint": null,
@@ -31866,7 +31906,8 @@
                   "PedestalRow": "",
                   "EdgeDistance": 0
                 }
-              ]
+              ],
+              "PlanBarSets": []
             }
           },
           "ExpansionJoint": null,
@@ -34329,7 +34370,8 @@
                   "PedestalRow": "",
                   "EdgeDistance": 0
                 }
-              ]
+              ],
+              "PlanBarSets": []
             }
           },
           "ExpansionJoint": {
@@ -35639,7 +35681,8 @@
                   "PedestalRow": "",
                   "EdgeDistance": 0
                 }
-              ]
+              ],
+              "PlanBarSets": []
             }
           },
           "ExpansionJoint": null,
@@ -44981,6 +45024,11 @@
           "FlangeThickness": 0.015875,
           "EndGap": 0.019049999999999997,
           "TopBelowDiscontinuousWebTop": 0.2794,
+          "Level": true,
+          "DiscontinuousEndGap": 0.0127,
+          "DiscontinuousCopeLength": 0.2286,
+          "DiscontinuousTabInset": 0.15239999999999998,
+          "DiscontinuousCopeRadius": 0.15239999999999998,
           "AngleLeg": 0.127,
           "AngleThickness": 0.0127,
           "AngleLength": 1.6256,
@@ -48776,7 +48824,8 @@
               "I-80 WB Unit 2 end dam diaphragm bars 5d / 4d at Piers 5WB / 6A (kinked end) and 11WB, PDF 190 (note: 10 bars between girders A-D and F-K, 8 between D-F, 2 outside at 5WB / 6A; 10 between girders and 2 outside at 11WB): positions along the joint not dimensioned (bar counts per bay and \u0027@ 1\u0027-0\u0027 only; no distance from the girder lines, \u00272 bars at equal spacing outside exterior girders\u0027 without the outer reference) - schedule only.",
               "I-80 WB Unit 2 end dam longitudinal bars 5e at Piers 5WB / 6A (kinked end) and 11WB, PDF 190 (note: 10 bars between girders A-D and F-K, 8 between D-F, 2 outside at 5WB / 6A; 10 between girders and 2 outside at 11WB): section positions drawn as dots, only partly dimensioned (hoop corners, \u0027EQ. SPA.\u0027 groups) - schedule only."
             ]
-          }
+          },
+          "PlanBarSets": []
         }
       },
       "CrossFrames": {
@@ -51213,7 +51262,7 @@
         {
           "Station": 231719.91449152763,
           "Left": true,
-          "FromGutter": 0.2286,
+          "FromGutter": 1.0411680756650998,
           "Type": "Type B",
           "Outlet": "PipedToPier",
           "SplashBasin": false,
@@ -51221,12 +51270,13 @@
           "InletWidth": 0.30479999999999996,
           "PipeDiameter": 0.2032,
           "DropBelowGirders": 0.3048,
-          "Trench": null
+          "Trench": null,
+          "Collector": "I-80 span 11WB collection pipe"
         },
         {
           "Station": 231722.9103199276,
           "Left": true,
-          "FromGutter": 0.2286,
+          "FromGutter": 1.0410715349401976,
           "Type": "Type B",
           "Outlet": "PipedToPier",
           "SplashBasin": false,
@@ -51234,12 +51284,13 @@
           "InletWidth": 0.30479999999999996,
           "PipeDiameter": 0.2032,
           "DropBelowGirders": 0.3048,
-          "Trench": null
+          "Trench": null,
+          "Collector": "I-80 span 11WB collection pipe"
         },
         {
           "Station": 231725.9061483276,
           "Left": true,
-          "FromGutter": 0.2286,
+          "FromGutter": 1.0409751738327913,
           "Type": "Type B",
           "Outlet": "PipedToPier",
           "SplashBasin": false,
@@ -51247,12 +51298,13 @@
           "InletWidth": 0.30479999999999996,
           "PipeDiameter": 0.2032,
           "DropBelowGirders": 0.3048,
-          "Trench": null
+          "Trench": null,
+          "Collector": "I-80 span 11WB collection pipe"
         },
         {
           "Station": 231728.90197672762,
           "Left": true,
-          "FromGutter": 0.2286,
+          "FromGutter": 1.040878996351493,
           "Type": "Type B",
           "Outlet": "PipedToPier",
           "SplashBasin": false,
@@ -51260,12 +51312,13 @@
           "InletWidth": 0.30479999999999996,
           "PipeDiameter": 0.2032,
           "DropBelowGirders": 0.3048,
-          "Trench": null
+          "Trench": null,
+          "Collector": "I-80 span 11WB collection pipe"
         },
         {
           "Station": 231731.8978051276,
           "Left": true,
-          "FromGutter": 0.2286,
+          "FromGutter": 1.0407830039366637,
           "Type": "Type B",
           "Outlet": "PipedToPier",
           "SplashBasin": false,
@@ -51273,12 +51326,13 @@
           "InletWidth": 0.30479999999999996,
           "PipeDiameter": 0.2032,
           "DropBelowGirders": 0.3048,
-          "Trench": null
+          "Trench": null,
+          "Collector": "I-80 span 11WB collection pipe"
         },
         {
           "Station": 231734.89363352762,
           "Left": true,
-          "FromGutter": 0.2286,
+          "FromGutter": 1.0406871944916176,
           "Type": "Type B",
           "Outlet": "PipedToPier",
           "SplashBasin": false,
@@ -51286,12 +51340,13 @@
           "InletWidth": 0.30479999999999996,
           "PipeDiameter": 0.2032,
           "DropBelowGirders": 0.3048,
-          "Trench": null
+          "Trench": null,
+          "Collector": "I-80 span 11WB collection pipe"
         },
         {
           "Station": 231737.8894619276,
           "Left": true,
-          "FromGutter": 0.2286,
+          "FromGutter": 1.0405915755854895,
           "Type": "Type B",
           "Outlet": "PipedToPier",
           "SplashBasin": false,
@@ -51299,7 +51354,8 @@
           "InletWidth": 0.30479999999999996,
           "PipeDiameter": 0.2032,
           "DropBelowGirders": 0.3048,
-          "Trench": null
+          "Trench": null,
+          "Collector": "I-80 span 11WB collection pipe"
         }
       ],
       "InspectionAccess": {
@@ -51354,7 +51410,11 @@
           "RailPlateThickness": 0.009524999999999999,
           "ToeBoard": true,
           "ToeBoardClearance": 0.0127,
-          "MaxPostSpacing": 2.5908
+          "MaxPostSpacing": 2.5908,
+          "GratingWidth": 0.6095999999999999,
+          "TopRailInside": true,
+          "GratingAboveCrossGirderWebBottom": 0.30479999999999996,
+          "RailEndFromCrossGirderWeb": 0.762
         },
         "TypeB": {
           "ClearWidth": 0.6604,
@@ -51375,10 +51435,34 @@
           "RailPlateThickness": 0.009524999999999999,
           "ToeBoard": false,
           "ToeBoardClearance": 0.0127,
-          "MaxPostSpacing": 2.5908
+          "MaxPostSpacing": 2.5908,
+          "GratingWidth": 0.6095999999999999,
+          "TopRailInside": true,
+          "GratingAboveCrossGirderWebBottom": 0.0635,
+          "RailEndFromCrossGirderWeb": 0.762,
+          "EndDiaphragmClearOfCrossGirderFlange": 0.038099999999999995
         },
         "GratingAboveWebBottom": 0.0635,
-        "WalkwayEndClearance": 0.1016
+        "WalkwayEndClearance": 0.1016,
+        "SupportOnFrames": true,
+        "StringerEndFromFrame": 0.038099999999999995,
+        "GratingGapAtFrame": 0.0127,
+        "RailClearOfFrame": 0.038099999999999995,
+        "StringerEndFromWeb": 0.038099999999999995,
+        "GratingClearOfWeb": 0.0254,
+        "GratingAboveDiaphragmFlange": {
+          "7": 0.4064,
+          "8": 0.15239999999999998
+        },
+        "Source": "I-80 PDF 167-174",
+        "StiffenerRopeHole": 0.022224999999999998,
+        "StiffenerRopeHoleAtSupports": {
+          "Pier 12WB": 0.038099999999999995,
+          "Pier 13WB": 0.038099999999999995,
+          "Pier 14WB": 0.038099999999999995,
+          "Pier 15WB": 0.038099999999999995
+        },
+        "RopeEndsAtAnchorStem": true
       },
       "Misc": {
         "Unresolved": [
@@ -51386,8 +51470,107 @@
           "[sign] Unit 2 sign truss: truss CL parallel to the pier at STA 7595\u002B82.22 (pier \u002B 5\u0027-10); sheets 171A/172A give the post lines 2\u0027-2 and 9\u0027-6 ahead of the CL pier (plan sheet 110 \u00222\u0027-2 (TYP.)\u0022); the sheet title-block station 7595\u002B67.24 is the bridge reference, not a sign location.",
           "[sign] Exit sign bases: station not printed (sheets 104 / 108 show only a tick on the north girder; scaled about 50\u0027-0 back of CL bearing Pier 5WB and about 60\u0027 back of Pier 11WB): not placed."
         ],
-        "Collectors": [],
-        "PierDrains": [],
+        "Collectors": [
+          {
+            "Name": "I-80 span 11WB collection pipe",
+            "NominalDiameter": 0.30479999999999996,
+            "ReferenceGirder": 0,
+            "OffsetFromGirder": 0.508,
+            "Slope": 0.0723,
+            "StartStation": 231719.91449152763,
+            "EndSupport": "Pier 11WB",
+            "Points": [
+              {
+                "Station": 231719.91449152763,
+                "DeckTopToCl": 0.8382000000000001,
+                "Note": "drain 7602\u002B44.00"
+              },
+              {
+                "Station": 231722.9103199276,
+                "DeckTopToCl": 1.03505,
+                "Note": "drain 7602\u002B54.00"
+              },
+              {
+                "Station": 231725.9061483276,
+                "DeckTopToCl": 1.2319,
+                "Note": "drain 7602\u002B64.00"
+              },
+              {
+                "Station": 231728.90197672762,
+                "DeckTopToCl": 1.42875,
+                "Note": "drain 7602\u002B74.00"
+              },
+              {
+                "Station": 231731.8978051276,
+                "DeckTopToCl": 1.6256,
+                "Note": "drain 7602\u002B84.00"
+              },
+              {
+                "Station": 231734.89363352762,
+                "DeckTopToCl": 1.82245,
+                "Note": "drain 7602\u002B94.00"
+              },
+              {
+                "Station": 231737.8894619276,
+                "DeckTopToCl": 2.0193000000000003,
+                "Note": "drain 7603\u002B04.00"
+              }
+            ],
+            "HangerSpacing": 1.524,
+            "CouplerStations": [
+              231721.69111992762,
+              231724.6869483276,
+              231727.68277672763,
+              231730.6786051276,
+              231733.67443352763,
+              231736.67026192762
+            ]
+          }
+        ],
+        "PierDrains": [
+          {
+            "Support": "Pier 11WB",
+            "CollectRight": false,
+            "TroughSlope": 0.05,
+            "BoxFromGutter": 1.2192,
+            "BoxLength": 0.6604,
+            "BoxWidth": 0.3048,
+            "BoxHighEndHeight": 0.4064,
+            "BoxBottomSlope": 0.07619999999999999,
+            "PrintedTroughDrop": null,
+            "PipeNominalDiameter": 0.2032,
+            "Pipe1Slope": 0.08333333333333333,
+            "CapBoxFromColumn": -2.6384250000000002,
+            "CapBoxFace": "Back",
+            "CapBoxAlongFace": 0.5588,
+            "CapBoxOutTop": 0.6096,
+            "CapBoxOutBottom": 0.4064,
+            "CapBoxInletFromFace": 0.3048,
+            "CapBoxOutletClear": 0.038099999999999995,
+            "CapBoxInletEmbed": 0.1016,
+            "CapBoxDepth": 0.762,
+            "CapBoxTaperHeight": 0.381,
+            "CapBoxBelowTop": null,
+            "CapPipeSlope": 0.08,
+            "CapPipeNominalDiameter": 0.30479999999999996,
+            "SupportSpacing": 1.2192,
+            "Outlet": "Pavement",
+            "MattressSize": 1.2192,
+            "MattressThickness": 0.3048,
+            "OutletAboveMattress": 0.3048,
+            "OutletLegLength": 0.3048,
+            "PavementElevation": 299.0088,
+            "Collector": "I-80 span 11WB collection pipe",
+            "ColumnNumber": 1,
+            "JogOffset": 0.381,
+            "JogRise": 0.6604,
+            "JogBelowCap": 0.038099999999999995,
+            "JogSupportAbove": 0.3048,
+            "JogSupportBelow": 0.21589999999999998,
+            "FlangeDiameter": 0.4572,
+            "Fittings": true
+          }
+        ],
         "SignSupports": [
           {
             "Bars": [],
@@ -51438,6 +51621,7 @@
             ],
             "TrussSpan": 30.48,
             "WebThickness": 0.019049999999999997,
+            "GirderFlangeGap": 0.00635,
             "TopPlateThickness": 0.047625,
             "TopPlateWidth": 0.7111999999999999,
             "TopPlateLength": 0.7112,
@@ -52239,7 +52423,8 @@
               "BackwallBarSize": "#5",
               "BackwallBarSpacing": 0.30479999999999996,
               "MaxBarLength": 18.288,
-              "CapBars": []
+              "CapBars": [],
+              "PlanBarSets": []
             }
           },
           "ExpansionJoint": {
@@ -54510,7 +54695,8 @@
                   "PedestalRow": "",
                   "EdgeDistance": 0
                 }
-              ]
+              ],
+              "PlanBarSets": []
             }
           },
           "ExpansionJoint": null,
@@ -56514,7 +56700,8 @@
                   "PedestalRow": "",
                   "EdgeDistance": 0
                 }
-              ]
+              ],
+              "PlanBarSets": []
             }
           },
           "ExpansionJoint": null,
@@ -58224,7 +58411,8 @@
                   "PedestalRow": "",
                   "EdgeDistance": 0
                 }
-              ]
+              ],
+              "PlanBarSets": []
             }
           },
           "ExpansionJoint": null,
@@ -59934,7 +60122,8 @@
                   "PedestalRow": "",
                   "EdgeDistance": 0
                 }
-              ]
+              ],
+              "PlanBarSets": []
             }
           },
           "ExpansionJoint": null,
@@ -60768,7 +60957,8 @@
               "BackwallBarSize": "#5",
               "BackwallBarSpacing": 0.30479999999999996,
               "MaxBarLength": 18.288,
-              "CapBars": []
+              "CapBars": [],
+              "PlanBarSets": []
             }
           },
           "ExpansionJoint": {
@@ -67304,6 +67494,11 @@
           "FlangeThickness": 0.022224999999999998,
           "EndGap": 0.019049999999999997,
           "TopBelowDiscontinuousWebTop": 0.2032,
+          "Level": true,
+          "DiscontinuousEndGap": 0.0127,
+          "DiscontinuousCopeLength": 0.2286,
+          "DiscontinuousTabInset": 0.0635,
+          "DiscontinuousCopeRadius": 0.15239999999999998,
           "AngleLeg": 0.127,
           "AngleThickness": 0.0127,
           "AngleLength": 1.3208,
@@ -73266,7 +73461,8 @@
               "I-80 WB Unit 3 end dam diaphragm bars 5d / 4d at Pier 11WB (12 bars A-B, 11 B-D, 10 D-J, 2 outside) and the East Abutment (5 bars A-D, 10 D-J, 2 outside), PDF 195: positions along the joint not dimensioned (bar counts per bay and \u0027@ 1\u0027-0\u0027 only; no distance from the girder lines, \u00272 bars at equal spacing outside exterior girders\u0027 without the outer reference) - schedule only.",
               "I-80 WB Unit 3 end dam longitudinal bars 5e at Pier 11WB (12 bars A-B, 11 B-D, 10 D-J, 2 outside) and the East Abutment (5 bars A-D, 10 D-J, 2 outside), PDF 195: section positions drawn as dots, only partly dimensioned (hoop corners, \u0027EQ. SPA.\u0027 groups) - schedule only."
             ]
-          }
+          },
+          "PlanBarSets": []
         }
       },
       "CrossFrames": {
@@ -75011,7 +75207,7 @@
         {
           "Station": 231762.69192525125,
           "Left": true,
-          "FromGutter": 0.2286,
+          "FromGutter": 1.158875,
           "Type": "Type A",
           "Outlet": "PipedToPier",
           "SplashBasin": false,
@@ -75019,12 +75215,13 @@
           "InletWidth": 0.30479999999999996,
           "PipeDiameter": 0.2032,
           "DropBelowGirders": 0.3048,
-          "Trench": null
+          "Trench": null,
+          "Collector": "I-80 Pier 12WB collection pipe (back)"
         },
         {
           "Station": 231788.71968239042,
           "Left": true,
-          "FromGutter": 0.2286,
+          "FromGutter": 1.158875,
           "Type": "Type A",
           "Outlet": "PipedToPier",
           "SplashBasin": false,
@@ -75032,12 +75229,13 @@
           "InletWidth": 0.30479999999999996,
           "PipeDiameter": 0.2032,
           "DropBelowGirders": 0.3048,
-          "Trench": null
+          "Trench": null,
+          "Collector": "I-80 Pier 12WB collection pipe (back)"
         },
         {
           "Station": 231804.63352285122,
           "Left": true,
-          "FromGutter": 0.2286,
+          "FromGutter": 1.158875,
           "Type": "Type A",
           "Outlet": "PipedToPier",
           "SplashBasin": false,
@@ -75045,7 +75243,8 @@
           "InletWidth": 0.30479999999999996,
           "PipeDiameter": 0.2032,
           "DropBelowGirders": 0.3048,
-          "Trench": null
+          "Trench": null,
+          "Collector": "I-80 Pier 12WB collection pipe (ahead)"
         },
         {
           "Station": 231835.08312270883,
@@ -75230,7 +75429,11 @@
           "RailPlateThickness": 0.009524999999999999,
           "ToeBoard": true,
           "ToeBoardClearance": 0.0127,
-          "MaxPostSpacing": 2.5908
+          "MaxPostSpacing": 2.5908,
+          "GratingWidth": 0.6095999999999999,
+          "TopRailInside": true,
+          "GratingAboveCrossGirderWebBottom": 0.30479999999999996,
+          "RailEndFromCrossGirderWeb": 0.762
         },
         "TypeB": {
           "ClearWidth": 0.6604,
@@ -75251,19 +75454,135 @@
           "RailPlateThickness": 0.009524999999999999,
           "ToeBoard": false,
           "ToeBoardClearance": 0.0127,
-          "MaxPostSpacing": 2.5908
+          "MaxPostSpacing": 2.5908,
+          "GratingWidth": 0.6095999999999999,
+          "TopRailInside": true,
+          "GratingAboveCrossGirderWebBottom": 0.0635,
+          "RailEndFromCrossGirderWeb": 0.762,
+          "EndDiaphragmClearOfCrossGirderFlange": 0.038099999999999995
         },
         "GratingAboveWebBottom": 0.0635,
-        "WalkwayEndClearance": 0.1016
+        "WalkwayEndClearance": 0.1016,
+        "SupportOnFrames": true,
+        "StringerEndFromFrame": 0.038099999999999995,
+        "GratingGapAtFrame": 0.0127,
+        "RailClearOfFrame": 0.038099999999999995,
+        "StringerEndFromWeb": 0.038099999999999995,
+        "GratingClearOfWeb": 0.0254,
+        "GratingAboveDiaphragmFlange": {
+          "7": 0.4064,
+          "8": 0.15239999999999998
+        },
+        "Source": "I-80 PDF 167-174",
+        "StiffenerRopeHole": 0.022224999999999998,
+        "StiffenerRopeHoleAtSupports": {
+          "Pier 12WB": 0.038099999999999995,
+          "Pier 13WB": 0.038099999999999995,
+          "Pier 14WB": 0.038099999999999995,
+          "Pier 15WB": 0.038099999999999995
+        },
+        "RopeEndsAtAnchorStem": true
       },
       "Misc": {
         "Unresolved": [
-          "[sign] Unit 3 sign truss: the two brackets on girder A (north, top of base 1020.32) are NOT placed - the plan dimension 12\u0027-10 7/8 (I-80 PDF 117) starts from a vertical reference line whose meaning is unresolved; girder A section D-D (PDF 181) was revised (5\u0027-4 5/8, 5\u0027-9 1/2; angles 93d19\u002739\u0022 / 93d00\u002730\u0022, struck values illegible).",
+          "[light] (I-80 PDF 233-236) I-80 lighting: East Abutment pole base (10\u0027-0 max from the end of the superstructure), the power conduit side, underdeck junction boxes / stub-outs (7583\u002B40.50, 7588\u002B69.64, 7582\u002B45.00 12\u0027-3 LT, 7582\u002B70.00 57\u0027-11 LT), pier-top Type 2 boxes and expansion fittings are schematic or not dimensioned: not modeled; pole base rebar for the abutment base is scheduled only.",
+          "[sign] CHECK (I-80 PDF 117): girder A sign post lines placed 29\u0027-0 13/16 / 36\u0027-4 15/16 ahead of A\u0027s CL bearing at Pier 13WB (16\u0027-1 15/16 \u002B 12\u0027-10 7/8 \u002B 7\u0027-4 1/8 along girder A); the model\u0027s radial line at the CL pier / roadway point is 16\u0027-0 1/16 from that bearing, 1 7/8\u0022 less than the plan\u0027s 16\u0027-1 15/16 - the plan and the model\u0027s pier / girder geometry differ there, the bearing-based chain is used.",
           "[sign] Sign supports: anchor bolt lengths, the post stub plate lengths, the HSS 14.000x0.500 post height and the sign truss size / elevation are not in the plans.",
-          "[light] (I-80 PDF 233-236) I-80 lighting: East Abutment pole base (10\u0027-0 max from the end of the superstructure), the power conduit side, underdeck junction boxes / stub-outs (7583\u002B40.50, 7588\u002B69.64, 7582\u002B45.00 12\u0027-3 LT, 7582\u002B70.00 57\u0027-11 LT), pier-top Type 2 boxes and expansion fittings are schematic or not dimensioned: not modeled; pole base rebar for the abutment base is scheduled only."
+          "[drain] UNRESOLVED (I-80 PDF 217): Pier 12WB pier pipe outlet - the elevation shows a ground line and the outlet detail (Piers 11WB and 12WB) ends the 12\u0022 pipe 1\u0022 above the pavement, but no pavement elevation is printed at 12WB; the pipe ends 1\u0022 above the terrain.",
+          "[drain] UNRESOLVED (I-80 PDF 220): couplers / L3x3x3/8 supports of the 8\u0022 collection pipes near Pier 12WB are dimensioned from cross frames that carry no station (4\u0027-0); not modeled."
         ],
-        "Collectors": [],
-        "PierDrains": [],
+        "Collectors": [
+          {
+            "Name": "I-80 Pier 12WB collection pipe (back)",
+            "NominalDiameter": 0.2032,
+            "ReferenceGirder": 0,
+            "OffsetFromGirder": 0.508,
+            "Slope": 0.018,
+            "StartStation": 231762.69192525125,
+            "EndSupport": "Pier 12WB",
+            "Points": [
+              {
+                "Station": 231762.69192525125,
+                "DeckTopToCl": 0.762,
+                "Note": "drain 7603\u002B86.79"
+              },
+              {
+                "Station": 231788.71968239042,
+                "DeckTopToCl": 1.177925,
+                "Note": "drain 7604\u002B73.67"
+              }
+            ],
+            "HangerSpacing": 1.524,
+            "CouplerStations": [],
+            "FromBarrierToe": 1.158875,
+            "EndStation": 231788.71968239042
+          },
+          {
+            "Name": "I-80 Pier 12WB collection pipe (ahead)",
+            "NominalDiameter": 0.2032,
+            "ReferenceGirder": 0,
+            "OffsetFromGirder": 0.508,
+            "Slope": 0.0245,
+            "StartStation": 231804.63352285122,
+            "EndSupport": "Pier 12WB",
+            "Points": [
+              {
+                "Station": 231804.63352285122,
+                "DeckTopToCl": 0.762,
+                "Note": "drain 7605\u002B26.79"
+              },
+              {
+                "Station": 231788.71968239042,
+                "DeckTopToCl": 1.1684,
+                "Note": "drain 7604\u002B73.67"
+              }
+            ],
+            "HangerSpacing": 1.524,
+            "CouplerStations": [],
+            "FromBarrierToe": 1.158875,
+            "EndStation": 231788.71968239042
+          }
+        ],
+        "PierDrains": [
+          {
+            "Support": "Pier 12WB",
+            "CollectRight": true,
+            "TroughSlope": 0.059,
+            "BoxFromGutter": 1.0668,
+            "BoxLength": 0.6604,
+            "BoxWidth": 0.3048,
+            "BoxHighEndHeight": 0.4064,
+            "BoxBottomSlope": 0.07619999999999999,
+            "PrintedTroughDrop": null,
+            "PipeNominalDiameter": 0.2032,
+            "Pipe1Slope": 0.08333333333333333,
+            "CapBoxFromColumn": -1.406525,
+            "CapBoxFace": "Ahead",
+            "CapBoxAlongFace": 0.5588,
+            "CapBoxOutTop": 0.6096,
+            "CapBoxOutBottom": 0.4064,
+            "CapBoxInletFromFace": 0.3048,
+            "CapBoxOutletClear": 0.038099999999999995,
+            "CapBoxInletEmbed": 0.1016,
+            "CapBoxDepth": 0.762,
+            "CapBoxTaperHeight": 0.381,
+            "CapBoxBelowTop": null,
+            "CapPipeSlope": 0.08,
+            "CapPipeNominalDiameter": 0.30479999999999996,
+            "SupportSpacing": 1.2192,
+            "Outlet": "Pavement",
+            "MattressSize": 1.2192,
+            "MattressThickness": 0.3048,
+            "OutletAboveMattress": 0.3048,
+            "OutletLegLength": 0.3048,
+            "PavementElevation": null,
+            "Collector": "I-80 Pier 12WB collection pipe (back);I-80 Pier 12WB collection pipe (ahead)",
+            "NoTrough": true,
+            "ColumnNumber": 1,
+            "FlangeDiameter": 0.4572,
+            "Fittings": true
+          }
+        ],
         "SignSupports": [
           {
             "Bars": [],
@@ -75271,6 +75590,26 @@
             "Kind": "OverheadTrussBracket",
             "Support": "Pier 13WB",
             "Brackets": [
+              {
+                "Girder": 0,
+                "AheadOfSupport": 8.8598375,
+                "TopOfBaseElevation": 310.993536,
+                "Height": 1.9304000000000001,
+                "BottomFlangeWidth": 0.6604,
+                "PostOutboard": 1.641475,
+                "AngleToGirderDegrees": 93.3275,
+                "StubHeight": 0.523875
+              },
+              {
+                "Girder": 0,
+                "AheadOfSupport": 11.0982125,
+                "TopOfBaseElevation": 310.993536,
+                "Height": 1.9304000000000001,
+                "BottomFlangeWidth": 0.6604,
+                "PostOutboard": 1.7653,
+                "AngleToGirderDegrees": 93.00833333333334,
+                "StubHeight": 0.52705
+              },
               {
                 "Girder": 9,
                 "AheadOfSupport": 0.6096,
@@ -75294,6 +75633,7 @@
             ],
             "TrussSpan": 27.432000000000002,
             "WebThickness": 0.019049999999999997,
+            "GirderFlangeGap": 0.00635,
             "TopPlateThickness": 0.047625,
             "TopPlateWidth": 0.7111999999999999,
             "TopPlateLength": 0.7112,
@@ -76590,7 +76930,8 @@
               "BackwallBarSize": "#5",
               "BackwallBarSpacing": 0.30479999999999996,
               "MaxBarLength": 18.288,
-              "CapBars": []
+              "CapBars": [],
+              "PlanBarSets": []
             }
           },
           "ExpansionJoint": {
@@ -77875,7 +78216,8 @@
                   "PedestalRow": "",
                   "EdgeDistance": 0
                 }
-              ]
+              ],
+              "PlanBarSets": []
             }
           },
           "ExpansionJoint": null,
@@ -79189,7 +79531,8 @@
                   "PedestalRow": "",
                   "EdgeDistance": 0
                 }
-              ]
+              ],
+              "PlanBarSets": []
             }
           },
           "ExpansionJoint": null,
@@ -80495,7 +80838,8 @@
                   "PedestalRow": "",
                   "EdgeDistance": 0
                 }
-              ]
+              ],
+              "PlanBarSets": []
             }
           },
           "ExpansionJoint": null,
@@ -81813,7 +82157,8 @@
                   "PedestalRow": "",
                   "EdgeDistance": 0
                 }
-              ]
+              ],
+              "PlanBarSets": []
             }
           },
           "ExpansionJoint": null,
@@ -83115,7 +83460,8 @@
                   "PedestalRow": "",
                   "EdgeDistance": 0
                 }
-              ]
+              ],
+              "PlanBarSets": []
             }
           },
           "ExpansionJoint": {
@@ -87170,7 +87516,8 @@
               "Ramp G Unit 1 end dam bars 4d6 / 4d7 under the barriers (section C-C, PDF 138): \u00274-4d6 EQ. SPA.\u0027 without the extent along the joint, 4d7 position not dimensioned; the reduced end block under the barrier (1\u0027-3 at the bottom) is not modeled - schedule only.",
               "Ramp G Unit 1 South Abutment 5d1 hoops (section A-A, PDF 137, 36 bars \u0027parallel to longit. 6b1 bars\u0027): spacing along the joint not dimensioned - schedule only."
             ]
-          }
+          },
+          "PlanBarSets": []
         }
       },
       "CrossFrames": {
@@ -88994,10 +89341,24 @@
           "RailPlateThickness": 0.009524999999999999,
           "ToeBoard": false,
           "ToeBoardClearance": 0.0127,
-          "MaxPostSpacing": 2.5908
+          "MaxPostSpacing": 2.5908,
+          "GratingWidth": 0.6095999999999999,
+          "TopRailInside": true
         },
         "GratingAboveWebBottom": 0.0635,
-        "WalkwayEndClearance": 0.1016
+        "WalkwayEndClearance": 0.1016,
+        "SupportOnFrames": true,
+        "StringerEndFromFrame": 0.038099999999999995,
+        "GratingGapAtFrame": 0.0127,
+        "RailClearOfFrame": 0.038099999999999995,
+        "StringerEndFromWeb": 0.038099999999999995,
+        "GratingClearOfWeb": 0.0254,
+        "GratingAboveDiaphragmFlange": {
+          "5": 0.17779999999999999
+        },
+        "Source": "Ramp G PDF 134-136",
+        "StiffenerRopeHole": 0.022224999999999998,
+        "RopeEndsAtAnchorStem": true
       },
       "Misc": {
         "Unresolved": [],
@@ -89034,7 +89395,9 @@
             "OutletAboveMattress": 0.3048,
             "OutletLegLength": 0.3048,
             "PavementElevation": null,
-            "Collector": ""
+            "Collector": "",
+            "FlangeDiameter": 0.3556,
+            "Fittings": true
           }
         ],
         "SignSupports": [],
@@ -89260,7 +89623,8 @@
               "BackwallBarSize": "#5",
               "BackwallBarSpacing": 0.30479999999999996,
               "MaxBarLength": 18.288,
-              "CapBars": []
+              "CapBars": [],
+              "PlanBarSets": []
             }
           },
           "ExpansionJoint": {
@@ -90608,7 +90972,8 @@
                   "PedestalRow": "",
                   "EdgeDistance": 0
                 }
-              ]
+              ],
+              "PlanBarSets": []
             }
           },
           "ExpansionJoint": null,
@@ -92082,7 +92447,8 @@
                   "PedestalRow": "",
                   "EdgeDistance": 0
                 }
-              ]
+              ],
+              "PlanBarSets": []
             }
           },
           "ExpansionJoint": null,
@@ -93508,7 +93874,8 @@
                   "PedestalRow": "",
                   "EdgeDistance": 0
                 }
-              ]
+              ],
+              "PlanBarSets": []
             }
           },
           "ExpansionJoint": null,
@@ -94853,7 +95220,8 @@
                   "PedestalRow": "BACK",
                   "EdgeDistance": 0.127
                 }
-              ]
+              ],
+              "PlanBarSets": []
             }
           },
           "ExpansionJoint": {
@@ -98362,7 +98730,8 @@
               "Ramp G Unit 2 end dam longitudinal bars 5e* at both expansion piers (section B-B, PDF 137): the bars along the joint are drawn as dots in the sections but only those at hoop corners follow from dimensions (the other 5d3-hoop bars, the 5e4 / 5e8 bars in the blockout) - schedule only.",
               "Ramp G Unit 2 end dam bars 4d6 / 4d7 under the barriers (section C-C, PDF 138): \u00274-4d6 EQ. SPA.\u0027 without the extent along the joint, 4d7 position not dimensioned; the reduced end block under the barrier (1\u0027-3 at the bottom) is not modeled - schedule only."
             ]
-          }
+          },
+          "PlanBarSets": []
         }
       },
       "CrossFrames": {
@@ -100045,10 +100414,24 @@
           "RailPlateThickness": 0.009524999999999999,
           "ToeBoard": false,
           "ToeBoardClearance": 0.0127,
-          "MaxPostSpacing": 2.5908
+          "MaxPostSpacing": 2.5908,
+          "GratingWidth": 0.6095999999999999,
+          "TopRailInside": true
         },
         "GratingAboveWebBottom": 0.0635,
-        "WalkwayEndClearance": 0.1016
+        "WalkwayEndClearance": 0.1016,
+        "SupportOnFrames": true,
+        "StringerEndFromFrame": 0.038099999999999995,
+        "GratingGapAtFrame": 0.0127,
+        "RailClearOfFrame": 0.038099999999999995,
+        "StringerEndFromWeb": 0.038099999999999995,
+        "GratingClearOfWeb": 0.0254,
+        "GratingAboveDiaphragmFlange": {
+          "5": 0.17779999999999999
+        },
+        "Source": "Ramp G PDF 134-136",
+        "StiffenerRopeHole": 0.022224999999999998,
+        "RopeEndsAtAnchorStem": true
       },
       "Misc": {
         "Unresolved": [
@@ -100087,7 +100470,9 @@
             "OutletAboveMattress": 0.3048,
             "OutletLegLength": 0.3048,
             "PavementElevation": null,
-            "Collector": ""
+            "Collector": "",
+            "FlangeDiameter": 0.3556,
+            "Fittings": true
           }
         ],
         "SignSupports": [],
@@ -100433,7 +100818,8 @@
               "BackwallBarSize": "#5",
               "BackwallBarSpacing": 0.30479999999999996,
               "MaxBarLength": 18.288,
-              "CapBars": []
+              "CapBars": [],
+              "PlanBarSets": []
             }
           },
           "ExpansionJoint": {
@@ -101889,7 +102275,8 @@
                   "PedestalRow": "",
                   "EdgeDistance": 0
                 }
-              ]
+              ],
+              "PlanBarSets": []
             }
           },
           "ExpansionJoint": null,
@@ -103337,7 +103724,8 @@
                   "PedestalRow": "",
                   "EdgeDistance": 0
                 }
-              ]
+              ],
+              "PlanBarSets": []
             }
           },
           "ExpansionJoint": null,
@@ -104785,7 +105173,8 @@
                   "PedestalRow": "",
                   "EdgeDistance": 0
                 }
-              ]
+              ],
+              "PlanBarSets": []
             }
           },
           "ExpansionJoint": null,
@@ -106103,7 +106492,8 @@
                   "PedestalRow": "",
                   "EdgeDistance": 0
                 }
-              ]
+              ],
+              "PlanBarSets": []
             }
           },
           "ExpansionJoint": null,
@@ -107389,7 +107779,8 @@
                   "PedestalRow": "",
                   "EdgeDistance": 0
                 }
-              ]
+              ],
+              "PlanBarSets": []
             }
           },
           "ExpansionJoint": {
@@ -111986,7 +112377,8 @@
               "Ramp G Unit 3 end dam longitudinal bars 5e* at both expansion piers (section B-B, PDF 137): the bars along the joint are drawn as dots in the sections but only those at hoop corners follow from dimensions (the other 5d3-hoop bars, the 5e4 / 5e8 bars in the blockout) - schedule only.",
               "Ramp G Unit 3 end dam bars 4d6 / 4d7 under the barriers (section C-C, PDF 138): \u00274-4d6 EQ. SPA.\u0027 without the extent along the joint, 4d7 position not dimensioned; the reduced end block under the barrier (1\u0027-3 at the bottom) is not modeled - schedule only."
             ]
-          }
+          },
+          "PlanBarSets": []
         }
       },
       "CrossFrames": {
@@ -114096,10 +114488,24 @@
           "RailPlateThickness": 0.009524999999999999,
           "ToeBoard": false,
           "ToeBoardClearance": 0.0127,
-          "MaxPostSpacing": 2.5908
+          "MaxPostSpacing": 2.5908,
+          "GratingWidth": 0.6095999999999999,
+          "TopRailInside": true
         },
         "GratingAboveWebBottom": 0.0635,
-        "WalkwayEndClearance": 0.1016
+        "WalkwayEndClearance": 0.1016,
+        "SupportOnFrames": true,
+        "StringerEndFromFrame": 0.038099999999999995,
+        "GratingGapAtFrame": 0.0127,
+        "RailClearOfFrame": 0.038099999999999995,
+        "StringerEndFromWeb": 0.038099999999999995,
+        "GratingClearOfWeb": 0.0254,
+        "GratingAboveDiaphragmFlange": {
+          "5": 0.17779999999999999
+        },
+        "Source": "Ramp G PDF 134-136",
+        "StiffenerRopeHole": 0.022224999999999998,
+        "RopeEndsAtAnchorStem": true
       },
       "Misc": {
         "Unresolved": [],
@@ -114136,7 +114542,9 @@
             "OutletAboveMattress": 0.3048,
             "OutletLegLength": 0.3048,
             "PavementElevation": null,
-            "Collector": ""
+            "Collector": "",
+            "FlangeDiameter": 0.3556,
+            "Fittings": true
           }
         ],
         "SignSupports": [],
@@ -114362,7 +114770,8 @@
               "BackwallBarSize": "#5",
               "BackwallBarSpacing": 0.30479999999999996,
               "MaxBarLength": 18.288,
-              "CapBars": []
+              "CapBars": [],
+              "PlanBarSets": []
             }
           },
           "ExpansionJoint": {
@@ -115698,7 +116107,8 @@
                   "PedestalRow": "",
                   "EdgeDistance": 0
                 }
-              ]
+              ],
+              "PlanBarSets": []
             }
           },
           "ExpansionJoint": null,
@@ -117332,7 +117742,8 @@
                   "PedestalRow": "",
                   "EdgeDistance": 0
                 }
-              ]
+              ],
+              "PlanBarSets": []
             }
           },
           "ExpansionJoint": null,
@@ -118960,7 +119371,8 @@
                   "PedestalRow": "",
                   "EdgeDistance": 0
                 }
-              ]
+              ],
+              "PlanBarSets": []
             }
           },
           "ExpansionJoint": null,
@@ -120298,7 +120710,8 @@
                   "PedestalRow": "",
                   "EdgeDistance": 0
                 }
-              ]
+              ],
+              "PlanBarSets": []
             }
           },
           "ExpansionJoint": null,
@@ -121563,7 +121976,8 @@
                   "PedestalRow": "",
                   "EdgeDistance": 0
                 }
-              ]
+              ],
+              "PlanBarSets": []
             }
           },
           "ExpansionJoint": {
@@ -126100,7 +126514,8 @@
               "Ramp G Unit 4 end dam longitudinal bars 5e* at Piers 14G and 19G (sections B-B PDF 137, E-E PDF 140): the bars along the joint are drawn as dots in the sections but only those at hoop corners follow from dimensions (the other 5d3-hoop bars, the 5e4 / 5e8 bars in the blockout) - schedule only.",
               "Ramp G Unit 4 end dam bars 4d6 / 4d7 under the barriers (section C-C, PDF 138): \u00274-4d6 EQ. SPA.\u0027 without the extent along the joint, 4d7 position not dimensioned; the reduced end block under the barrier (1\u0027-3 at the bottom) is not modeled - schedule only."
             ]
-          }
+          },
+          "PlanBarSets": []
         }
       },
       "CrossFrames": {
@@ -127788,10 +128203,24 @@
           "RailPlateThickness": 0.009524999999999999,
           "ToeBoard": false,
           "ToeBoardClearance": 0.0127,
-          "MaxPostSpacing": 2.5908
+          "MaxPostSpacing": 2.5908,
+          "GratingWidth": 0.6095999999999999,
+          "TopRailInside": true
         },
         "GratingAboveWebBottom": 0.0635,
-        "WalkwayEndClearance": 0.1016
+        "WalkwayEndClearance": 0.1016,
+        "SupportOnFrames": true,
+        "StringerEndFromFrame": 0.038099999999999995,
+        "GratingGapAtFrame": 0.0127,
+        "RailClearOfFrame": 0.038099999999999995,
+        "StringerEndFromWeb": 0.038099999999999995,
+        "GratingClearOfWeb": 0.0254,
+        "GratingAboveDiaphragmFlange": {
+          "5": 0.17779999999999999
+        },
+        "Source": "Ramp G PDF 134-136",
+        "StiffenerRopeHole": 0.022224999999999998,
+        "RopeEndsAtAnchorStem": true
       },
       "Misc": {
         "Unresolved": [],
@@ -127866,7 +128295,9 @@
             "OutletAboveMattress": 0.3048,
             "OutletLegLength": 0.3048,
             "PavementElevation": 299.0088,
-            "Collector": "Span 19G collection pipe"
+            "Collector": "Span 19G collection pipe",
+            "FlangeDiameter": 0.4572,
+            "Fittings": true
           }
         ],
         "SignSupports": [],

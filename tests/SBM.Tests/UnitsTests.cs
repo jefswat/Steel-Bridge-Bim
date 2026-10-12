@@ -122,6 +122,6 @@ public class UnitsTests
         Assert.Empty(doc.Regenerate().Errors);
         var d = doc.Substructure().Drainage;
         Assert.Equal(2, d.Count(x => x.Kind == SBM.Core.Substructure.SubElementKind.DeckDrain));
-        Assert.Equal(4, d.Count(x => x.Kind == SBM.Core.Substructure.SubElementKind.DrainPipe));
+        Assert.Equal(3, d.Count(x => x.Kind == SBM.Core.Substructure.SubElementKind.DrainPipe));   // downspout; drop + collector (one mitred pipe); pier downspout
     }
 }

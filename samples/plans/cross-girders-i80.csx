@@ -1,7 +1,9 @@
 // Cross girders under the discontinuous girders of WB I-80 Units 2 and 3 as designed: cross girder details, design sheet 121
 // (PDF page 125 of the Design 116 plans). Re-runnable; run after build-i80-wb.csx and girders-i80.csx.
 //  * Web / flanges: Unit 2 PL 9/16 x 80 web, PL 5/8 x 15 flanges; Unit 3 PL 3/4 x 60 web, PL 7/8 x 12 flanges. Flange-web fillet
-//    welds 5/16, stiffener welds 1/4 (callouts). Both flanges LEVEL (the model keeps the chord between the two continuing girders).
+//    welds 5/16, stiffener welds 1/4 (callouts). Both flanges LEVEL, web plumb (elevations "LEVEL"; CrossGirderSection.Level). The
+//    earlier model kept the sloped chord between the continuing girders with the web square to it: on the cross slope the web leaned
+//    up to 2 3/8" through the continuing girder webs into the back-side cross frame stiffener (clash check, 2026-10-12).
 //  * Vertical position (elevation views): top of the top flange is 11" (Unit 2) / 8" (Unit 3) BELOW the top of web (bottom of the
 //    top flange) of the discontinuous girder (verified on a 600 dpi raster: the rotated "11" is two strokes, the next dimension is 8").
 //  * Connection angles L5x5x1/2, 10 spaces @ 6 + 2" ends = 5'-4" long (Unit 2); 8 @ 6 + 2" ends = 4'-4" (Unit 3), centred in the web
@@ -13,6 +15,7 @@
 //    the opening edge; vertical stiffeners PL 5/8 x 7 1/2 (Unit 2) / PL 1/2 x 6 (Unit 3) near side, 6" (CL to opening edge) each side.
 //  * Plan angle between each discontinuous girder and its cross girder from the orientation plan (clockwise from the girder's
 //    ahead tangent to the cross girder, left to right), see GirderTermination.CrossGirderAngleDegrees.
+//  * Discontinuous girder end coped to a web tab (see Common); the earlier model ran its flanges / web through the cross girder flanges.
 // UNCERTAIN / assumptions: bolt diameter is not printed on sheet 121 -> 1" in 1 1/16" holes as all I-80 structural bolts
 //    (sheet 118 notes); edge plate length (stops 3" short of the angle toes, scaled from the elevation); the stiffener at the
 //    exterior girder edge (PL 1/2 x 6 1/2) and the 7/8" wire rope hole belong to the girder stiffener and are not modeled here.
@@ -28,6 +31,11 @@ void Common(CrossGirderSection x, bool unit2)
     x.WebDepth = I(unit2 ? 80 : 60); x.WebThickness = I(unit2 ? 0.5625 : 0.75);
     x.FlangeWidth = I(unit2 ? 15 : 12); x.FlangeThickness = I(unit2 ? 0.625 : 0.875);
     x.TopBelowDiscontinuousWebTop = I(unit2 ? 11 : 8);
+    x.Level = true;
+    // Discontinuous girder end (Sections A-A Unit 2 / E-E Unit 3): web tab 1/2" from the cross girder web face, flanges and full-depth
+    // web stop 9" from the tab end, tab top 6" (Unit 2) / 2 1/2" (Unit 3) below the top of the cross girder (= 1'-5 / 10 1/2 below the
+    // top of web with the 11" / 8" drop), tab bottom the same above the bottom of the cross girder, cope corners R = 6" (TYP.).
+    x.DiscontinuousEndGap = I(0.5); x.DiscontinuousCopeLength = I(9); x.DiscontinuousTabInset = I(unit2 ? 6 : 2.5); x.DiscontinuousCopeRadius = I(6);
     x.AngleLeg = I(5); x.AngleThickness = I(0.5);
     x.AngleLength = I(unit2 ? 64 : 52); x.EndAngleLength = I(unit2 ? 64 : 52);
     x.AngleBoltPitch = I(6); x.AngleBoltEndDistance = I(2); x.AngleBoltGage = I(3); x.BoltDiameter = I(1);

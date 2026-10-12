@@ -79,13 +79,16 @@ u4.Misc!.Collectors.Add(new DrainCollectorDefinition
 PierDrainDefinition Pier(bool right, double slope, double boxFromGutter, double capBoxFromColumn) => new()
 {
     CollectRight = right, TroughSlope = slope, BoxFromGutter = boxFromGutter, PrintedTroughDrop = F(1, 8), CapBoxFromColumn = capBoxFromColumn,
+    // 2026-10-12: drain pipe flange (flange table PDF 158: 8" pipe "B" 1'-2), cleanouts at the bends and the 3/4" support rods; pipes are one
+    // piece with mitred joints (drainage notes PDF 158) instead of separate straight pieces
+    FlangeDiameter = F(1, 2), Fittings = true,
 };
 foreach (var (u, name) in new[] { (units[0], "Pier 5G"), (units[1], "Pier 9G"), (units[2], "Pier 14G") })
 {
     var p = Pier(true, 0.059, F(3, 6), Ft(12.5)); p.Support = name; u.Misc!.PierDrains.Add(p);
 }
 var p19 = Pier(false, 0.049, F(4, 0), -F(18, 3.875));
-p19.Support = "Pier 19G"; p19.CapPipeNominalDiameter = In(12); p19.SupportSpacing = Ft(4); p19.Outlet = PierDrainOutlet.Pavement; p19.PavementElevation = Ft(981); p19.Collector = Coll;
+p19.Support = "Pier 19G"; p19.CapPipeNominalDiameter = In(12); p19.FlangeDiameter = F(1, 6); p19.SupportSpacing = Ft(4); p19.Outlet = PierDrainOutlet.Pavement; p19.PavementElevation = Ft(981); p19.Collector = Coll;
 u4.Misc!.PierDrains.Add(p19);
 
 var res = Doc.Regenerate();

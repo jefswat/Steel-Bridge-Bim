@@ -39,7 +39,12 @@ public static class Program
                                                             Exact curved geometry (NURBS) report: regenerates with the project
                                                             setting Geometry.ExactCurvedGeometry off and on, prints timings, what
                                                             became NURBS (fallbacks), fit deviation and exact vs mesh volumes
-          sbm elevations <file.sbm> [bridge]                Step-by-step elevations, grade to bearing seat, at every bearing
+          sbm clash <file.sbm> [--bridge NAME] [--csv out.csv] [--tol LEN] [--bolts] [--welds] [--no-misc] [--no-concrete]
+                                                            Steel solid-vs-solid interference (part meshes; contact within the
+                                                            tolerance, default 1/16", is not a clash): counts by category pair +
+                                                            each pair with station / offset / nearest girder. --bridge = name filter;
+                                                            drains / misc items are also tested against the pier concrete
+          sbm elevations <file.sbm> [bridge]              Step-by-step elevations, grade to bearing seat, at every bearing
           sbm blocking <file.sbm> [bridge] [--all]          Camber / blocking per girder (key points; --all = every plan point)
           sbm drawings <file.sbm> <folder|file.zip> [bridge] [--zip]
                                                             2D DXF models: layout plan + elevation, plan, sections, bents, bar bending
@@ -354,6 +359,24 @@ public static class Program
                 }
                 case "nurbs":
                     return NurbsCommand(args);
+                case "clash":
+                {
+                    Need(args, 2);
+                    string? Opt(string name) { int i = Array.IndexOf(args, name); return i > 0 && i + 1 < args.Length ? args[i + 1] : null; }
+                    var doc = SbmDocument.Open(args[1]);
+                    var o = new SBM.Core.Checks.ClashOptions { Bolts = args.Contains("--bolts"), Welds = args.Contains("--welds"), Misc = !args.Contains("--no-misc"), Concrete = !args.Contains("--no-concrete") };
+                    if (Opt("--tol") is { } tl) o.Tolerance = doc.Units.TryParseLength(tl, SBM.Core.Units.LengthKind.Short, out double tv) ? tv : throw new ArgumentException($"Can't read length '{tl}'.");
+                    var names = doc.Project.Bridges.Select(b => b.Name)
+                        .Where(n => Opt("--bridge") is not { } bf || n.Contains(bf, StringComparison.OrdinalIgnoreCase)).ToList();
+                    if (names.Count == 0) throw new ArgumentException($"No bridge matches '{Opt("--bridge")}'.");
+                    var sw = Stopwatch.StartNew();
+                    doc.Regenerate();
+                    var reps = names.Select(n => doc.Clashes(n, o)).SelectMany(r => r).ToList();
+                    Console.Write(SBM.Core.Checks.SteelClashCheck.ToText(reps, doc.Units));
+                    Console.WriteLine($"{reps.Sum(r => r.Clashes.Count)} clashes in {reps.Count} bridge(s), tolerance {doc.Units.FormatLength(o.Tolerance, SBM.Core.Units.LengthKind.Short)}, {sw.Elapsed.TotalSeconds:F0} s");
+                    if (Opt("--csv") is { } csv) { SBM.Core.Checks.SteelClashCheck.WriteCsv(csv, reps, doc.Units); Console.WriteLine($"  -> {csv}"); }
+                    return reps.Any(r => r.Clashes.Count > 0) ? 2 : 0;
+                }
                 case "bench":
                 {
                     Need(args, 2);
