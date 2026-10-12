@@ -168,7 +168,7 @@ public sealed class SegmentalPier
     public double CapTop { get; set; } = double.NaN;
     public double CapHeight { get; set; } = double.NaN;
     /// <summary>Cap plan outline (S, N); empty = not resolved (no cap solid).</summary>
-    public List<Geometry.Vec2> CapOutline { get; set; } = new();
+    public List<PlanPoint> CapOutline { get; set; } = new();
     /// <summary>Tapered lower part of the cap: inset of the bottom outline per side and height of the taper (0 = prismatic).</summary>
     public double CapTaperInset { get; set; }
     public double CapTaperHeight { get; set; }
@@ -177,7 +177,7 @@ public sealed class SegmentalPier
     public double ColumnN { get; set; } = double.NaN;
     public double ColumnBaseTop { get; set; } = double.NaN;
     /// <summary>Footing outline (S, N) and elevations.</summary>
-    public List<Geometry.Vec2> FootingOutline { get; set; } = new();
+    public List<PlanPoint> FootingOutline { get; set; } = new();
     public double FootingTop { get; set; } = double.NaN;
     public double FootingBottom { get; set; } = double.NaN;
     public int PileCount { get; set; }
@@ -185,10 +185,20 @@ public sealed class SegmentalPier
     public List<string> Unresolved { get; set; } = new();
     public SegmentalPier Clone() => new()
     {
-        CapTop = CapTop, CapHeight = CapHeight, CapOutline = CapOutline.ToList(), CapTaperInset = CapTaperInset, CapTaperHeight = CapTaperHeight,
-        ColumnS = ColumnS, ColumnN = ColumnN, ColumnBaseTop = ColumnBaseTop, FootingOutline = FootingOutline.ToList(), FootingTop = FootingTop,
+        CapTop = CapTop, CapHeight = CapHeight, CapOutline = CapOutline.Select(p => new PlanPoint(p.S, p.N)).ToList(), CapTaperInset = CapTaperInset, CapTaperHeight = CapTaperHeight,
+        ColumnS = ColumnS, ColumnN = ColumnN, ColumnBaseTop = ColumnBaseTop, FootingOutline = FootingOutline.Select(p => new PlanPoint(p.S, p.N)).ToList(), FootingTop = FootingTop,
         FootingBottom = FootingBottom, PileCount = PileCount, Unresolved = Unresolved.ToList(),
     };
+}
+
+/// <summary>Plan point in a bent frame (S along the bent line right +, N along the alignment up-station +).</summary>
+public sealed class PlanPoint
+{
+    public double S { get; set; }
+    public double N { get; set; }
+    public PlanPoint() { }
+    public PlanPoint(double s, double n) { S = s; N = n; }
+    public Geometry.Vec2 ToVec2() => new(S, N);
 }
 
 public sealed class SegmentalBent

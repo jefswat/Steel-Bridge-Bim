@@ -474,7 +474,7 @@ public sealed class SegmentalGenerator
             if (p.FootingOutline.Count >= 3 && !double.IsNaN(p.FootingTop) && !double.IsNaN(p.FootingBottom))
             {
                 var m = new Mesh();
-                var ol = p.FootingOutline.ToList();
+                var ol = p.FootingOutline.Select(v => v.ToVec2()).ToList();
                 if (MeshBuilder.SignedArea(ol) < 0) ol.Reverse();
                 MeshBuilder.AddExtrusion(m, ol, fr, p.FootingBottom, p.FootingTop);
                 unit.Solids.Add(new SubSolid(SubElementKind.Footing, $"{b.Name} footing", $"CIP footing on {p.PileCount} 36\" sq PS piles (piles not modeled)", m));
@@ -492,7 +492,7 @@ public sealed class SegmentalGenerator
             if (p.CapOutline.Count >= 3 && !double.IsNaN(p.CapTop) && !double.IsNaN(p.CapHeight))
             {
                 var m = new Mesh();
-                var ol = p.CapOutline.ToList();
+                var ol = p.CapOutline.Select(v => v.ToVec2()).ToList();
                 if (MeshBuilder.SignedArea(ol) < 0) ol.Reverse();
                 if (p.CapTaperHeight > 0 && p.CapTaperInset > 0)
                 {

@@ -208,7 +208,8 @@ public sealed class SbmDocument
             foreach (var d in m.Framing.Diagnostics.Concat(m.Steel?.Diagnostics ?? Enumerable.Empty<Diagnostic>())
                          .Concat(m.Prestressed?.Diagnostics ?? Enumerable.Empty<Diagnostic>())
                          .Concat((m.Prestressed?.ConcreteDiaphragms?.Diagnostics ?? Enumerable.Empty<Diagnostic>()).Where(x => x.Severity != DiagnosticSeverity.Info))
-                         .Concat((m.Substructure?.SurfaceTreatments?.Diagnostics ?? Enumerable.Empty<Diagnostic>()).Where(x => x.Severity != DiagnosticSeverity.Info)))
+                         .Concat((m.Substructure?.SurfaceTreatments?.Diagnostics ?? Enumerable.Empty<Diagnostic>()).Where(x => x.Severity != DiagnosticSeverity.Info))
+                         .Concat((m.Concrete?.Segmental?.Diagnostics ?? Enumerable.Empty<Diagnostic>()).Where(x => x.Severity != DiagnosticSeverity.Info)))
                 (d.Severity == DiagnosticSeverity.Error ? err : warn).Add($"{m.Definition.Name}: {d.Message}");
         }
         var ok = _models.OfType<BridgeModel>().ToList();
@@ -239,6 +240,9 @@ public sealed class SbmDocument
     /// <summary>Concrete end / pier diaphragms of a prestressed bridge (SupportDefinition.Diaphragm), with their diagnostics (incl. Info rows).</summary>
     public SBM.Core.Diaphragms.ConcreteDiaphragmModel Diaphragms(string? bridgeName = null) =>
         Prestressed(bridgeName).ConcreteDiaphragms ?? throw new InvalidOperationException("This bridge has no concrete diaphragms (no SupportDefinition.Diaphragm).");
+    /// <summary>Precast segmental box of a bridge with <c>BridgeDefinition.Segmental</c> (segments, tendons, bearings, bents, checks, diagnostics incl. Info).</summary>
+    public SBM.Core.Segmental.SegmentalModel Segmental(string? bridgeName = null) =>
+        Model(bridgeName).Concrete?.Segmental ?? throw new InvalidOperationException("This bridge has no segmental box (or framing errors).");
     public SBM.Core.Concrete.ConcreteModel Concrete(string? bridgeName = null) => Model(bridgeName).Concrete ?? throw new InvalidOperationException("Concrete was not generated (framing errors).");
 
     /// <summary>Hand-checkable elevation chains (profile grade → deck → haunch → web → flange → sole plate → bearing seat) for every bearing.</summary>
@@ -304,7 +308,7 @@ public sealed class SbmDocument
     public IfcExportResult ExportIfc(string path, IfcGeometryMode geometry = IfcGeometryMode.Parametric, double chordTolerance = 0)
     {
         Regenerate();
-        var data = _models.OfType<BridgeModel>().Where(m => m.Steel != null || m.Prestressed != null).Select(m => new IfcBridgeData(m.Framing, m.Steel, m.Concrete, m.Substructure, m.Prestressed)).ToList();
+        var data = _models.OfType<BridgeModel>().Where(m => m.Steel != null || m.Prestressed != null || m.Concrete?.Segmental != null).Select(m => new IfcBridgeData(m.Framing, m.Steel, m.Concrete, m.Substructure, m.Prestressed)).ToList();
         return IfcExporter.Export(path, Project, data, new IfcExportOptions(geometry, chordTolerance));
     }
 
