@@ -1,0 +1,875 @@
+// Plan sheet links of the Bonner Bridge (NCDOT B-2500) Unit 6 FIB model (build-bonner-unit6.csx). Format: see sheet-links-i80-rampg.json
+// (header) and docs/API.md "Companion database". Sheet index: docs/plan-data/bonner-b2500/sheet-index.csv (S4-01..S4-97 = PDF pages 393-490, all
+// current; only the Unit 6 sheets have rules). Hierarchy: unit > superstructure > prestressed girder assemblies G{g}-S{k} (k = span - 29), bearing
+// pads and sole plates; unit > substructure > pier (Bent 30..35; bent 29 is in the Unit 5 model). Sheets without a rule (LRFR, parapets, rail,
+// joint seals, Units 7-8) cover items that are not modeled or other units.
+{
+  "models": [
+    "Bonner Unit 6 FIB.sbm"
+  ],
+  "planFolders": [
+    "plans",
+    "C:/SBMData"
+  ],
+  "planSets": [
+    {
+      "id": "b2500-s4",
+      "pdf": "B-2500 Bonner - Revision 3 Combined Plan Set*.pdf",
+      "bridgeGroup": "Bonner",
+      "sheets": [
+        {
+          "p": 393,
+          "s": "S4-01",
+          "t": "GENERAL DRAWING INDEX OF SHEETS - NORTH TRANSITION"
+        },
+        {
+          "p": 394,
+          "s": "S4-02",
+          "t": "GENERAL DRAWING INDEX OF SHEETS - NORTH TRANSITION"
+        },
+        {
+          "p": 395,
+          "s": "S4-03",
+          "t": "GENERAL DRAWING FOUNDATION LAYOUT UNIT 6"
+        },
+        {
+          "p": 396,
+          "s": "S4-04",
+          "t": "GENERAL DRAWING FOUNDATION LAYOUT UNIT 7"
+        },
+        {
+          "p": 397,
+          "s": "S4-05",
+          "t": "GENERAL DRAWING FOUNDATION LAYOUT UNIT 8"
+        },
+        {
+          "p": 398,
+          "s": "S4-06",
+          "t": "PILE DATA UNITS 6, 7 AND 8 (1 OF 3)"
+        },
+        {
+          "p": 399,
+          "s": "S4-07",
+          "t": "PILE DATA UNITS 6, 7 AND 8 (2 OF 3)"
+        },
+        {
+          "p": 400,
+          "s": "S4-08",
+          "t": "PILE DATA UNITS 6, 7 AND 8 (3 OF 3)"
+        },
+        {
+          "p": 401,
+          "s": "S4-09",
+          "t": "GENERAL DRAWING LRFR SUMMARY UNIT 6 SPANS 30-35"
+        },
+        {
+          "p": 402,
+          "s": "S4-10",
+          "t": "GENERAL DRAWING LRFR SUMMARY UNIT 7 SPANS 36-40"
+        },
+        {
+          "p": 403,
+          "s": "S4-11",
+          "t": "GENERAL DRAWING LRFR SUMMARY UNIT 8 SPANS 41-45"
+        },
+        {
+          "p": 404,
+          "s": "S4-12",
+          "t": "SUPERSTRUCTURE TYPICAL SECTION"
+        },
+        {
+          "p": 405,
+          "s": "S4-13",
+          "t": "SUPERSTRUCTURE TYPICAL SECTION"
+        },
+        {
+          "p": 406,
+          "s": "S4-14",
+          "t": "SUPERSTRUCTURE TYPICAL SECTION"
+        },
+        {
+          "p": 407,
+          "s": "S4-15",
+          "t": "SUPERSTRUCTURE TYPICAL SECTION DETAILS"
+        },
+        {
+          "p": 408,
+          "s": "S4-16",
+          "t": "SUPERSTRUCTURE TYPICAL SECTION DETAILS"
+        },
+        {
+          "p": 409,
+          "s": "S4-17",
+          "t": "SUPERSTRUCTURE PLAN OF SPANS UNIT 6"
+        },
+        {
+          "p": 410,
+          "s": "S4-18",
+          "t": "SUPERSTRUCTURE PLAN OF SPANS UNIT 6"
+        },
+        {
+          "p": 411,
+          "s": "S4-19",
+          "t": "SUPERSTRUCTURE PLAN OF SPANS UNIT 6"
+        },
+        {
+          "p": 412,
+          "s": "S4-20",
+          "t": "SUPERSTRUCTURE PLAN OF SPANS UNIT 6"
+        },
+        {
+          "p": 413,
+          "s": "S4-21",
+          "t": "SUPERSTRUCTURE PLAN OF SPANS UNIT 6"
+        },
+        {
+          "p": 414,
+          "s": "S4-22",
+          "t": "SUPERSTRUCTURE PLAN OF SPANS UNIT 6"
+        },
+        {
+          "p": 415,
+          "s": "S4-23",
+          "t": "SUPERSTRUCTURE PLAN OF SPANS DETAILS UNIT 6"
+        },
+        {
+          "p": 416,
+          "s": "S4-24",
+          "t": "SUPERSTRUCTURE PLAN OF SPANS UNIT 7 OR 8"
+        },
+        {
+          "p": 417,
+          "s": "S4-25",
+          "t": "SUPERSTRUCTURE PLAN OF SPANS UNIT 7 OR 8"
+        },
+        {
+          "p": 418,
+          "s": "S4-26",
+          "t": "SUPERSTRUCTURE PLAN OF SPANS UNIT 7 OR 8"
+        },
+        {
+          "p": 419,
+          "s": "S4-27",
+          "t": "SUPERSTRUCTURE PLAN OF SPANS UNIT 7 OR 8"
+        },
+        {
+          "p": 420,
+          "s": "S4-28",
+          "t": "SUPERSTRUCTURE PLAN OF SPANS UNIT 7 OR 8"
+        },
+        {
+          "p": 421,
+          "s": "S4-29",
+          "t": "SUPERSTRUCTURE PLAN OF SPAN DETAILS UNIT 7 OR 8"
+        },
+        {
+          "p": 422,
+          "s": "S4-30",
+          "t": "SUPERSTRUCTURE FRAMING PLAN UNIT 6"
+        },
+        {
+          "p": 423,
+          "s": "S4-31",
+          "t": "SUPERSTRUCTURE FRAMING PLAN UNIT 6"
+        },
+        {
+          "p": 424,
+          "s": "S4-32",
+          "t": "SUPERSTRUCTURE FRAMING PLAN UNIT 6"
+        },
+        {
+          "p": 425,
+          "s": "S4-33",
+          "t": "SUPERSTRUCTURE FRAMING PLAN UNIT 7 OR 8"
+        },
+        {
+          "p": 426,
+          "s": "S4-34",
+          "t": "SUPERSTRUCTURE FRAMING PLAN UNIT 7 OR 8"
+        },
+        {
+          "p": 427,
+          "s": "S4-35",
+          "t": "SUPERSTRUCTURE FRAMING PLAN UNIT 7 OR 8"
+        },
+        {
+          "p": 428,
+          "s": "S4-36",
+          "t": "SUPERSTRUCTURE SPAN 30 96\" PRESTRESSED CONCRETE MODIFIED BULB TEE CONTINUOUS FOR LIVE LOAD"
+        },
+        {
+          "p": 429,
+          "s": "S4-37",
+          "t": "SUPERSTRUCTURE SPANS 31 - 34 96\" PRESTRESSED CONCRETE MODIFIED BULB TEE CONTINUOUS FOR LIVE LOAD"
+        },
+        {
+          "p": 430,
+          "s": "S4-38",
+          "t": "SUPERSTRUCTURE SPAN 35 (GIRDERS 1 & 2) 96\" PRESTRESSED CONCRETE MODIFIED BULB TEE CONTINUOUS FOR LIVE LOAD"
+        },
+        {
+          "p": 431,
+          "s": "S4-39",
+          "t": "SUPERSTRUCTURE SPAN 35 (GIRDERS 3 & 4) 96\" PRESTRESSED CONCRETE MODIFIED BULB TEE CONTINUOUS FOR LIVE LOAD"
+        },
+        {
+          "p": 432,
+          "s": "S4-40",
+          "t": "SUPERSTRUCTURE SPAN 36 96\" PRESTRESSED CONCRETE MODIFIED BULB TEE CONTINUOUS FOR LIVE LOAD"
+        },
+        {
+          "p": 433,
+          "s": "S4-41",
+          "t": "SUPERSTRUCTURE SPANS 37 - 39 96\" PRESTRESSED CONCRETE MODIFIED BULB TEE CONTINUOUS FOR LIVE LOAD"
+        },
+        {
+          "p": 434,
+          "s": "S4-42",
+          "t": "SUPERSTRUCTURE SPAN 40 96\" PRESTRESSED CONCRETE MODIFIED BULB TEE CONTINUOUS FOR LIVE LOAD"
+        },
+        {
+          "p": 435,
+          "s": "S4-43",
+          "t": "SUPERSTRUCTURE SPAN 41 96\" PRESTRESSED CONCRETE MODIFIED BULB TEE CONTINUOUS FOR LIVE LOAD"
+        },
+        {
+          "p": 436,
+          "s": "S4-44",
+          "t": "SUPERSTRUCTURE SPANS 42 - 44 96\" PRESTRESSED CONCRETE MODIFIED BULB TEE CONTINUOUS FOR LIVE LOAD"
+        },
+        {
+          "p": 437,
+          "s": "S4-45",
+          "t": "SUPERSTRUCTURE SPAN 45 96\" PRESTRESSED CONCRETE MODIFIED BULB TEE CONTINUOUS FOR LIVE LOAD"
+        },
+        {
+          "p": 438,
+          "s": "S4-46",
+          "t": "SUPERSTRUCTURE SPANS 30 - 45 96\" PRESTRESSED CONCRETE MODIFIED BULB TEE CONTINUOUS FOR LIVE LOAD DETAILS"
+        },
+        {
+          "p": 439,
+          "s": "S4-47",
+          "t": "SUPERSTRUCTURE SPANS 30 - 45 96\" PRESTRESSED CONCRETE MODIFIED BULB TEE CONTINUOUS FOR LIVE LOAD DETAILS"
+        },
+        {
+          "p": 440,
+          "s": "S4-48",
+          "t": "SUPERSTRUCTURE ELASTOMERIC BEARING DETAILS"
+        },
+        {
+          "p": 441,
+          "s": "S4-49",
+          "t": "SUPERSTRUCTURE ELASTOMERIC BEARING DETAILS"
+        },
+        {
+          "p": 442,
+          "s": "S4-50",
+          "t": "SUPERSTRUCTURE ELASTOMERIC BEARING DETAILS"
+        },
+        {
+          "p": 443,
+          "s": "S4-51",
+          "t": "SUPERSTRUCTURE ELASTOMERIC BEARING DETAILS"
+        },
+        {
+          "p": 444,
+          "s": "S4-52",
+          "t": "SUPERSTRUCTURE ELASTOMERIC BEARING DETAILS"
+        },
+        {
+          "p": 445,
+          "s": "S4-52A",
+          "t": "SUPERSTRUCTURE MISCELLANEOUS DETAILS"
+        },
+        {
+          "p": 446,
+          "s": "S4-53",
+          "t": "SUPERSTRUCTRE PRESTRESSED CONCRETE GIRDER CONTINUOUS FOR LIVE LOAD DETAILS"
+        },
+        {
+          "p": 447,
+          "s": "S4-54",
+          "t": "SUPERSTRUCTRE PRESTRESSED CONCRETE GIRDER CONTINUOUS FOR LIVE LOAD DETAILS"
+        },
+        {
+          "p": 448,
+          "s": "S4-55",
+          "t": "SUPERSTRUCTURE CONCRETE PARAPET PLAN UNIT 6"
+        },
+        {
+          "p": 449,
+          "s": "S4-56",
+          "t": "SUPERSTRUCTURE CONCRETE PARAPET PLAN UNIT 7 OR 8"
+        },
+        {
+          "p": 450,
+          "s": "S4-57",
+          "t": "CONCRETE PARAPET AND END POST DETAILS"
+        },
+        {
+          "p": 451,
+          "s": "S4-58",
+          "t": "CONCRETE PARAPET AND END POST DETAILS"
+        },
+        {
+          "p": 452,
+          "s": "S4-59",
+          "t": "RAIL POST SPACING FOR 2 BAR METAL RAIL UNIT 6"
+        },
+        {
+          "p": 453,
+          "s": "S4-60",
+          "t": "RAIL POST SPACING FOR 2 BAR METAL RAIL UNITS 7 OR 8"
+        },
+        {
+          "p": 454,
+          "s": "S4-61",
+          "t": "EXPANSION JOINT SEAL DETAILS FOR CONCRETE PARAPET"
+        },
+        {
+          "p": 455,
+          "s": "S4-62",
+          "t": "SUPERSTRUCTURE BILL OF MATERIAL UNITS 6 AND 7"
+        },
+        {
+          "p": 456,
+          "s": "S4-63",
+          "t": "SUPERSTRUCTURE BILL OF MATERIAL UNIT 8"
+        },
+        {
+          "p": 457,
+          "s": "S4-64",
+          "t": "DECK SLAB POURING SEQUENCE"
+        },
+        {
+          "p": 458,
+          "s": "S4-65",
+          "t": "SUBSTRUCTURE BENTS 30 & 31"
+        },
+        {
+          "p": 459,
+          "s": "S4-66",
+          "t": "SUBSTRUCTURE BENTS 30 & 31"
+        },
+        {
+          "p": 460,
+          "s": "S4-67",
+          "t": "SUBSTRUCTURE BENTS 30 & 31"
+        },
+        {
+          "p": 461,
+          "s": "S4-68",
+          "t": "SUBSTRUCTURE BENT 32"
+        },
+        {
+          "p": 462,
+          "s": "S4-69",
+          "t": "SUBSTRUCTURE BENT 32"
+        },
+        {
+          "p": 463,
+          "s": "S4-70",
+          "t": "SUBSTRUCTURE BENT 32"
+        },
+        {
+          "p": 464,
+          "s": "S4-71",
+          "t": "SUBSTRUCTURE BENTS 33 & 35"
+        },
+        {
+          "p": 465,
+          "s": "S4-72",
+          "t": "SUBSTRUCTURE BENTS 33 & 35"
+        },
+        {
+          "p": 466,
+          "s": "S4-73",
+          "t": "SUBSTRUCTURE BENTS 33 & 35"
+        },
+        {
+          "p": 467,
+          "s": "S4-74",
+          "t": "SUBSTRUCTURE BENT 34"
+        },
+        {
+          "p": 468,
+          "s": "S4-75",
+          "t": "SUBSTRUCTURE BENT 34"
+        },
+        {
+          "p": 469,
+          "s": "S4-76",
+          "t": "SUBSTRUCTURE BENT 34"
+        },
+        {
+          "p": 470,
+          "s": "S4-77",
+          "t": "SUBSTRUCTURE BENTS 36, 37 & 39-42"
+        },
+        {
+          "p": 471,
+          "s": "S4-78",
+          "t": "SUBSTRUCTURE BENTS 36, 37 & 39-42"
+        },
+        {
+          "p": 472,
+          "s": "S4-79",
+          "t": "SUBSTRUCTURE BENTS 36, 37 & 39-42"
+        },
+        {
+          "p": 473,
+          "s": "S4-80",
+          "t": "SUBSTRUCTURE BENTS 38 & 43"
+        },
+        {
+          "p": 474,
+          "s": "S4-81",
+          "t": "SUBSTRUCTURE BENTS 38 & 43"
+        },
+        {
+          "p": 475,
+          "s": "S4-82",
+          "t": "SUBSTRUCTURE BENTS 38 & 43"
+        },
+        {
+          "p": 476,
+          "s": "S4-83",
+          "t": "SUBSTRUCTURE BENT 44"
+        },
+        {
+          "p": 477,
+          "s": "S4-84",
+          "t": "SUBSTRUCTURE PRECAST COLUMN SEGMENT DETAILS BENTS 30 - 32"
+        },
+        {
+          "p": 478,
+          "s": "S4-85",
+          "t": "SUBSTRUCTURE PRECAST COLUMN SEGMENT DETAILS BENTS 30 - 32"
+        },
+        {
+          "p": 479,
+          "s": "S4-86",
+          "t": "SUBSTRUCTURE PRECAST COLUMN SEGMENT DETAILS BENTS 33 -37 & 39-42"
+        },
+        {
+          "p": 480,
+          "s": "S4-87",
+          "t": "SUBSTRUCTURE PRECAST COLUMN SEGMENT DETAILS BENTS 33 -37 & 39-42"
+        },
+        {
+          "p": 481,
+          "s": "S4-88",
+          "t": "SUBSTRUCTURE PRECAST BENT CAP DETAILS BENTS 30 - 32"
+        },
+        {
+          "p": 482,
+          "s": "S4-89",
+          "t": "SUBSTRUCTURE PRECAST BENT CAP DETAILS BENTS 30 - 32"
+        },
+        {
+          "p": 483,
+          "s": "S4-90",
+          "t": "SUBSTRUCTURE PRECAST BENT CAP DETAILS BENTS 30 - 32"
+        },
+        {
+          "p": 484,
+          "s": "S4-91",
+          "t": "SUBSTRUCTURE PRECAST BENT CAP DETAILS BENTS 33 - 43"
+        },
+        {
+          "p": 485,
+          "s": "S4-92",
+          "t": "SUBSTRUCTURE PRECAST BENT CAP DETAILS BENTS 33 - 43"
+        },
+        {
+          "p": 486,
+          "s": "S4-93",
+          "t": "SUBSTRUCTURE PRECAST BENT CAP DETAILS BENTS 33 - 43"
+        },
+        {
+          "p": 487,
+          "s": "S4-94",
+          "t": "SUBSTRUCTURE PRECAST BENT CAP DETAILS BENT 44"
+        },
+        {
+          "p": 488,
+          "s": "S4-95",
+          "t": "SUBSTRUCTURE PRECAST BENT CAP DETAILS BENT 44"
+        },
+        {
+          "p": 489,
+          "s": "S4-96",
+          "t": "SUBSTRUCTURE POST-TENSIONING DETAILS"
+        },
+        {
+          "p": 490,
+          "s": "S4-97",
+          "t": "SUBSTRUCTURE POST-TENSIONING DETAILS"
+        }
+      ]
+    }
+  ],
+  "rules": [
+    {
+      "id": "general",
+      "sheets": "^GENERAL DRAWING INDEX OF SHEETS - NORTH TRANSITION",
+      "role": "general",
+      "basis": "Unit 6-14 sheet index and general notes",
+      "target": [
+        {
+          "level": "unit"
+        }
+      ]
+    },
+    {
+      "id": "foundation-layout",
+      "sheets": "^GENERAL DRAWING FOUNDATION LAYOUT UNIT 6",
+      "role": "general",
+      "basis": "Bent stations 29-35, foundation designations, fixity, footing tops",
+      "target": [
+        {
+          "level": "alignment",
+          "bridge_group": "-L- (NC 12)"
+        },
+        {
+          "level": "unit"
+        },
+        {
+          "level": "element",
+          "category": [
+            "footing",
+            "pile"
+          ],
+          "support": "Bent%"
+        }
+      ]
+    },
+    {
+      "id": "pile-data",
+      "sheets": "^PILE DATA UNITS 6",
+      "pages": [
+        398,
+        399
+      ],
+      "basis": "36 in sq PS piles: count, factored axial load, pile tip no higher than (installed tips blank)",
+      "target": [
+        {
+          "level": "element",
+          "category": "pile",
+          "support": "Bent%"
+        }
+      ]
+    },
+    {
+      "id": "typical-section",
+      "sheets": "^SUPERSTRUCTURE TYPICAL SECTION$",
+      "pages": [
+        404
+      ],
+      "basis": "Deck 42'-7, 9 in slab, 4 girders @ 11'-6, build-up at CL bearings, cross slope",
+      "target": [
+        {
+          "level": "part",
+          "category": "deck"
+        },
+        {
+          "level": "assembly",
+          "category": "prestressed girder"
+        }
+      ]
+    },
+    {
+      "id": "plan-of-spans",
+      "sheets": "^SUPERSTRUCTURE PLAN OF SPANS (DETAILS )?UNIT 6",
+      "basis": "Deck plan, deck reinforcing (not placed), joints, diaphragms (not modeled)",
+      "target": [
+        {
+          "level": "part",
+          "category": "deck"
+        }
+      ]
+    },
+    {
+      "id": "framing-plan",
+      "sheets": "^SUPERSTRUCTURE FRAMING PLAN UNIT 6",
+      "basis": "Girder layout, CL bearing offsets 1'-2 / 3'-2 / 1'-4, bearing-to-bearing, bearing and sole plate marks",
+      "target": [
+        {
+          "level": "assembly",
+          "category": "prestressed girder"
+        },
+        {
+          "level": "element",
+          "category": [
+            "bearing pad",
+            "sole plate"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "girder-span30",
+      "sheets": "^SUPERSTRUCTURE SPAN 30 96",
+      "basis": "Span 30 girders: length A, strands, mild steel (not placed), concrete 49.9 CY",
+      "target": [
+        {
+          "level": "assembly",
+          "category": "prestressed girder",
+          "mark": "%-S1"
+        }
+      ]
+    },
+    {
+      "id": "girder-span31-34",
+      "sheets": "^SUPERSTRUCTURE SPANS 31 - 34 96",
+      "basis": "Spans 31-34 girders",
+      "target": [
+        {
+          "level": "assembly",
+          "category": "prestressed girder",
+          "mark": [
+            "%-S2",
+            "%-S3",
+            "%-S4",
+            "%-S5"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "girder-span35-g12",
+      "sheets": "^SUPERSTRUCTURE SPAN 35 \\(GIRDERS 1 & 2\\)",
+      "basis": "Span 35 girders 1 and 2",
+      "target": [
+        {
+          "level": "assembly",
+          "category": "prestressed girder",
+          "mark": [
+            "G1-S6",
+            "G2-S6"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "girder-span35-g34",
+      "sheets": "^SUPERSTRUCTURE SPAN 35 \\(GIRDERS 3 & 4\\)",
+      "basis": "Span 35 girders 3 and 4",
+      "target": [
+        {
+          "level": "assembly",
+          "category": "prestressed girder",
+          "mark": [
+            "G3-S6",
+            "G4-S6"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "girder-details",
+      "sheets": "^SUPERSTRUCTURE SPANS 30 - 45 96",
+      "basis": "FIB-96 outside dimensions (p438), strand layouts, debonding legend, embedded plates (p439)",
+      "target": [
+        {
+          "level": "assembly",
+          "category": "prestressed girder"
+        }
+      ]
+    },
+    {
+      "id": "camber",
+      "sheets": "^SUPERSTRUCTRE PRESTRESSED CONCRETE GIRDER CONTINUOUS FOR LIVE LOAD DETAILS",
+      "pages": [
+        446
+      ],
+      "basis": "Camber and dead load deflection tables (spans 30-35)",
+      "target": [
+        {
+          "level": "assembly",
+          "category": "prestressed girder"
+        }
+      ]
+    },
+    {
+      "id": "bearings",
+      "sheets": "^SUPERSTRUCTURE ELASTOMERIC BEARING DETAILS",
+      "basis": "Elastomeric bearings E1 / E2 / E3, sole plates P, anchor bolts",
+      "target": [
+        {
+          "level": "element",
+          "category": [
+            "bearing pad",
+            "sole plate"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "bill-of-material",
+      "sheets": "^SUPERSTRUCTURE BILL OF MATERIAL UNITS 6 AND 7",
+      "role": "general",
+      "basis": "Unit 6 superstructure bar list and quantities (deck bars not placed)",
+      "target": [
+        {
+          "level": "part",
+          "category": "deck"
+        }
+      ]
+    },
+    {
+      "id": "pour-sequence",
+      "sheets": "^DECK SLAB POURING SEQUENCE",
+      "role": "general",
+      "basis": "Deck pours and closures (not modeled)",
+      "target": [
+        {
+          "level": "part",
+          "category": "deck"
+        }
+      ]
+    },
+    {
+      "id": "bents-30-31",
+      "sheets": "^SUBSTRUCTURE BENTS 30 & 31",
+      "basis": "Bents 30 / 31: side view, footing plan, piles, column PT, quantities",
+      "target": [
+        {
+          "level": "part",
+          "category": "pier",
+          "support": "Bent 30"
+        },
+        {
+          "level": "part",
+          "category": "pier",
+          "support": "Bent 31"
+        }
+      ]
+    },
+    {
+      "id": "bent-32",
+      "sheets": "^SUBSTRUCTURE BENT 32$",
+      "basis": "Bent 32: footing plan, piles, column PT",
+      "target": [
+        {
+          "level": "part",
+          "category": "pier",
+          "support": "Bent 32"
+        }
+      ]
+    },
+    {
+      "id": "bents-33-35",
+      "sheets": "^SUBSTRUCTURE BENTS 33 & 35",
+      "basis": "Bents 33 / 35: footing plan, piles, column PT",
+      "target": [
+        {
+          "level": "part",
+          "category": "pier",
+          "support": "Bent 33"
+        },
+        {
+          "level": "part",
+          "category": "pier",
+          "support": "Bent 35"
+        }
+      ]
+    },
+    {
+      "id": "bent-34",
+      "sheets": "^SUBSTRUCTURE BENT 34$",
+      "basis": "Bent 34: footing plan, piles, column PT",
+      "target": [
+        {
+          "level": "part",
+          "category": "pier",
+          "support": "Bent 34"
+        }
+      ]
+    },
+    {
+      "id": "columns-30-32",
+      "sheets": "^SUBSTRUCTURE PRECAST COLUMN SEGMENT DETAILS BENTS 30 - 32",
+      "basis": "Precast column segments (modeled as solid columns)",
+      "target": [
+        {
+          "level": "element",
+          "category": "column",
+          "support": [
+            "Bent 30",
+            "Bent 31",
+            "Bent 32"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "columns-33-35",
+      "sheets": "^SUBSTRUCTURE PRECAST COLUMN SEGMENT DETAILS BENTS 33",
+      "basis": "Precast column segments (modeled as solid columns)",
+      "target": [
+        {
+          "level": "element",
+          "category": "column",
+          "support": [
+            "Bent 33",
+            "Bent 34",
+            "Bent 35"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "caps-30-32",
+      "sheets": "^SUBSTRUCTURE PRECAST BENT CAP DETAILS BENTS 30 - 32",
+      "basis": "Precast cap 42'-0 x 6'-6 x 5'-6, CIP pedestals, pedestal / cap elevations (p483)",
+      "target": [
+        {
+          "level": "element",
+          "category": [
+            "pier cap",
+            "pedestal"
+          ],
+          "support": [
+            "Bent 30",
+            "Bent 31",
+            "Bent 32"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "caps-33-35",
+      "sheets": "^SUBSTRUCTURE PRECAST BENT CAP DETAILS BENTS 33 - 43",
+      "basis": "Precast cap, CIP pedestals, pedestal / cap elevations (p486)",
+      "target": [
+        {
+          "level": "element",
+          "category": [
+            "pier cap",
+            "pedestal"
+          ],
+          "support": [
+            "Bent 33",
+            "Bent 34",
+            "Bent 35"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "post-tensioning",
+      "sheets": "^SUBSTRUCTURE POST-TENSIONING DETAILS",
+      "role": "general",
+      "basis": "Column PT bars (not modeled)",
+      "target": [
+        {
+          "level": "element",
+          "category": "column",
+          "support": "Bent%"
+        }
+      ]
+    }
+  ]
+}

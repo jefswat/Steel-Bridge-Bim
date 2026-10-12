@@ -796,7 +796,10 @@ public static class IfcExporter
                 int pds = b.Body != null && b.Shape.Profile != null
                     ? rv != null ? RvShape(new List<int> { rv.ClippedBeam(b.Body, b.Shape.Profile) }, beamStyle) : ProfileBody(b, beamStyle)
                     : Body(b.Mesh, beamStyle);
-                string desc = $"{b.TypeName}, {b.Strands.Count} - {bStrandSize} strands ({b.Strands.Count(x => x.Depressed)} depressed" +
+                int ownDiaStrands = b.Strands.Count(x => x.Diameter > 0 && Math.Abs(x.Diameter - bpd.StrandDiameter) > 1e-9);
+                string desc = $"{b.TypeName}, {b.Strands.Count - ownDiaStrands} - {bStrandSize} strands" +
+                              (ownDiaStrands > 0 ? $" + {string.Join(" + ", b.Strands.Where(x => x.Diameter > 0 && Math.Abs(x.Diameter - bpd.StrandDiameter) > 1e-9).GroupBy(x => x.Diameter).Select(g => $"{g.Count()} - {SBM.Core.Prestressed.TxGirderCatalog.StrandSize(g.Key, u)}"))}" : "") +
+                              $" ({b.Strands.Count(x => x.Depressed)} depressed" +
                               (b.Strands.Any(x => x.Debonded) ? $", {b.Strands.Count(x => x.Debonded)} debonded" : "") + $"), L = {u.FormatLength(b.Length)}";
                 int beam = w.Add("IFCBEAM", $"{Guid(IfcKeys.PsBeam(bk, b.Mark))},$,{S(b.Mark)},{S(desc)},$,{Ref(pl)},{Ref(pds)},{S(b.Mark)},.GIRDER_SEGMENT.");
                 AddMaterial(b.Definition == null ? concreteMat : bConcrete, beam);
