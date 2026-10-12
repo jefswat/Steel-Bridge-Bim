@@ -478,6 +478,61 @@ else
     }
 }
 
+// ---------------------------------------------------------------- beam mild reinforcing (Iowa std 4730 / 4732 / 4733 / 4742 as printed on p.27-30)
+// Bar list per beam p.27 (bar-lists.csv "BTDxx beam (per beam)"), reinforcing weight per beam p.27 BTD Beam Data (1602 / 1709 / 2741 lb),
+// 4c1 stations along the beam = the elevation chains (p.28-30) + 9/16" (drawn against 5b1 / 6b3), both halves.
+{
+    var psm = Doc.Model(BrName).Prestressed;
+    string[] SplitCsv(string l)
+    {
+        var f = new List<string>(); var cur = new System.Text.StringBuilder(); bool q = false;
+        for (int i = 0; i < l.Length; i++)
+        {
+            char ch = l[i];
+            if (ch == '"') { if (q && i + 1 < l.Length && l[i + 1] == '"') { cur.Append('"'); i++; } else q = !q; }
+            else if (ch == ',' && !q) { f.Add(cur.ToString().Trim()); cur.Clear(); }
+            else cur.Append(ch);
+        }
+        f.Add(cur.ToString().Trim());
+        return f.ToArray();
+    }
+    var csvRows = File.ReadAllLines(Path.Combine(dir, "bar-lists.csv")).Skip(1).Select(SplitCsv).Where(r => r[0].Contains("beam (per beam)")).ToList();
+    var printed = new Dictionary<string, double> { ["BTD55"] = 1602, ["BTD60"] = 1709, ["BTD105"] = 2741 };
+    var c1Half = new Dictionary<string, List<double>>
+    {
+        ["BTD55"] = new[] { 1.5, 6, 15, 21, 27, 33, 39, 45, 51 }.Concat(SBM.Core.Prestressed.PrestressedBeamRebar.Chain(59, (3, 9), (4, 12), (4, 15), (8, 18))).Concat(SBM.Core.Prestressed.PrestressedBeamRebar.Chain(203, (7, 18))).ToList(),
+        ["BTD60"] = new[] { 1.5, 6, 15, 21, 27, 33, 39, 45, 51 }.Concat(SBM.Core.Prestressed.PrestressedBeamRebar.Chain(59, (5, 9), (2, 12), (4, 15), (10, 18))).Concat(SBM.Core.Prestressed.PrestressedBeamRebar.Chain(197, (9, 18))).ToList(),
+        ["BTD105"] = new[] { 1.5, 4.25, 10.5, 17.5, 27, 33, 39, 45, 51 }.Concat(SBM.Core.Prestressed.PrestressedBeamRebar.Chain(59, (9, 9), (6, 12), (8, 15), (17, 18))).Concat(SBM.Core.Prestressed.PrestressedBeamRebar.Chain(341, (16, 18))).ToList(),
+    };
+    Row("Beam rebar (p.27-30)", "beams with reinforcing", 15, psm?.Beams.Count(x => x.Bars.Count > 0) ?? 0, "5 x BTD55, 5 x BTD105, 5 x BTD60", 0, "F0");
+    if (psm != null)
+        foreach (var grp in psm.Beams.GroupBy(x => x.Designation))
+        {
+            var beam = grp.First();
+            string unit = $"{grp.Key} beams";
+            foreach (var r in csvRows.Where(r => r[0].StartsWith(grp.Key + " ")))
+            {
+                string mk = r[2];
+                int n = int.Parse(r[5]);
+                var counts = grp.Select(x => x.Bars.Count(y => y.Mark == mk)).Distinct().ToList();
+                Row("Beam rebar (p.27-30)", $"{grp.Key} {mk} bars per beam", n, counts.Count == 1 ? counts[0] : -1, "p.27 bar list", 0, "F0");
+                var m = psm.BarMarks.FirstOrDefault(x => x.Unit == unit && x.Mark == mk);
+                Row("Beam rebar (p.27-30)", $"{grp.Key} {mk} length (in)", Len(r[6]) / In(1), m == null ? double.NaN : m.Length / In(1), "p.27 bar list", 1.0 / 16, "F3");
+            }
+            double lb = beam.Bars.Sum(x => { var m = psm.MarkOf(x); return m.Length * m.Size.MassPerLength; }) * 2.2046226218;
+            Row("Beam rebar (p.27-30)", $"{grp.Key} reinforcing per beam (lb)", printed[grp.Key], lb, "p.27 BTD Beam Data", 0.5, "F0");
+            // 4c1 stations (3D, along the beam from the start end at the top CL)
+            var ax = (beam.TopEnd - beam.TopStart).Normalized();
+            double L = (beam.TopEnd - beam.TopStart).Length / In(1);
+            var exp = c1Half[grp.Key].Select(v => v + 0.5625).ToList();
+            exp = exp.Concat(c1Half[grp.Key].Where(v => Math.Abs(L - v - v) > 1.0 / 16).Select(v => L - v - 0.5625)).OrderBy(v => v).ToList();
+            var mod = beam.Bars.Where(y => y.Mark == "4c1").Select(y => Vec3.Dot((y.Points[0] + y.Points[^1]) * 0.5 - beam.TopStart, ax) / In(1)).OrderBy(v => v).ToList();
+            Row("Beam rebar (p.27-30)", $"{grp.Key} {beam.Mark} 4c1 stations", exp.Count, mod.Count, "p.28-30 chains", 0, "F0");
+            if (mod.Count == exp.Count)
+                Row("Beam rebar (p.27-30)", $"{grp.Key} {beam.Mark} 4c1 worst station difference (in)", 0, exp.Zip(mod, (e, x) => x - e).OrderByDescending(Math.Abs).First(), "chain vs model, 1/16\"", 1.0 / 16, "F4");
+        }
+}
+
 // ---------------------------------------------------------------- terrain (3DEP lidar 2020, 1 m, NAVD88) vs plan ground - INFO (placement is APPROXIMATE, U1)
 {
     var pts = new (string what, string sta, double off, double elev)[]

@@ -82,8 +82,72 @@ public static class PrestressedGenerator
                 UnresolvedFlag.Text(used.FirstOrDefault(d => d.Source != "")?.Source is { } src ? src : "beam sheet (debonding table)", "prestressed debond sheathing product / size",
                     "the plans give the debonded lengths only, the sheathing is not specified or dimensioned",
                     $"The sheathing is drawn {u.FormatLength(used.FirstOrDefault()?.SheathThickness ?? In(1.0 / 16), LengthKind.Short)} thick around the strand (display only, IfcTendonConduit).")));
+        BuildBarMarks(model, u);
         model.GenerationTime = sw.Elapsed;
         return model;
+    }
+
+    /// <summary>Schedule unit of the beam bars of a definition: "{designation} beams".</summary>
+    public static string BarUnit(PrestressedBeamDefinition pd, TxGirderShape shape) => $"{(pd.Designation != "" ? pd.Designation : shape.Name)} beams";
+
+    /// <summary>Beam bar marks (one per unit + mark, counts over all beams) and the checks: UNRESOLVED items, bars crossing an end face,
+    /// bar list counts per beam, weight per beam vs the printed weight.</summary>
+    private static void BuildBarMarks(PrestressedModel model, UnitSystem u)
+    {
+        const double Lb = 2.2046226218;
+        var groups = model.Beams.Where(b => b.Definition?.Reinforcement != null).GroupBy(b => BarUnit(b.Definition!, b.Shape)).ToList();
+        var seen = new HashSet<string>();
+        foreach (var g in groups)
+        {
+            string unit = g.Key;
+            var rd = g.First().Definition!.Reinforcement!;
+            foreach (var set in rd.Bars.Where(x => x.Unresolved.Length == 0 && x.Path.Count > 0))
+            {
+                if (model.BarMarks.Any(m => m.Unit == unit && m.Mark == set.Mark)) continue;
+                int count = g.Sum(b => b.Bars.Count(x => x.Mark == set.Mark));
+                model.BarMarks.Add(new Concrete.BarMark
+                {
+                    Mark = set.Mark, Size = Concrete.RebarCatalog.Size(set.Size), Shape = PrestressedBeamRebar.Shape(set), Unit = unit,
+                    Location = set.Location != "" ? set.Location : set.Description, Epoxy = set.Epoxy, Coating = set.Coating, Count = count,
+                });
+            }
+            foreach (var r in rd.Unresolved.Concat(rd.Bars.Where(x => x.Unresolved.Length > 0).Select(x => x.Unresolved)))
+                if (seen.Add(r)) model.Diagnostics.Add(new Diagnostic(DiagnosticSeverity.Warning, r.StartsWith("UNRESOLVED") ? $"{r} [{unit}]" : $"UNRESOLVED (beam reinforcing {unit}): {r}"));
+            foreach (var note in rd.Notes)
+                if (seen.Add(note)) model.Diagnostics.Add(new Diagnostic(DiagnosticSeverity.Info, $"Beam reinforcing {unit}: {note}"));
+            // bars crossing an end face (skewed ends; the standards draw square ends)
+            var outside = g.SelectMany(b => b.BarsOutsideEnd.Select(kv => (b, mark: kv.Key, kv.Value.Count, kv.Value.Max))).GroupBy(x => x.mark).ToList();
+            foreach (var o in outside)
+                model.Diagnostics.Add(new Diagnostic(DiagnosticSeverity.Warning, UnresolvedFlag.Text(rd.Source,
+                    $"{unit} bar {o.Key} at a skewed beam end",
+                    $"{o.Sum(x => x.Count)} bar(s) in {o.Count()} beam(s) ({string.Join(", ", o.Select(x => x.b.Mark).Distinct())}) reach up to " +
+                    $"{u.FormatLength(o.Max(x => x.Max), LengthKind.Short)} beyond the skewed end face; the standard sheet dimensions the bar stations from a square beam end and does not say how they are set out at a skewed end",
+                    "Modeled square to the beam at the dimensioned stations measured along the beam CL (not moved).")));
+            // bar list per beam
+            if (rd.BarList is { Count: > 0 } list)
+            {
+                var bad = new List<string>();
+                foreach (var b in g)
+                    foreach (var row in list)
+                    {
+                        int n = b.Bars.Count(x => x.Mark == row.Mark);
+                        if (n != row.Count) bad.Add($"{b.Mark} {row.Mark} {n} placed / {row.Count} listed");
+                    }
+                foreach (var m in model.BarMarks.Where(m => m.Unit == unit))
+                    if (list.FirstOrDefault(r => r.Mark == m.Mark) is { } row && row.Length > 0 && Math.Abs(m.Length - row.Length) > In(1.0 / 16))
+                        bad.Add($"{m.Mark} length {u.FormatLength(m.Length)} vs listed {u.FormatLength(row.Length)}");
+                foreach (var m in model.BarMarks.Where(m => m.Unit == unit && list.All(r => r.Mark != m.Mark))) bad.Add($"{m.Mark} not in the bar list");
+                if (bad.Count > 0)
+                    model.Diagnostics.Add(new Diagnostic(DiagnosticSeverity.Warning, $"CHECK (beam bar list, {rd.Source}): {unit}: {string.Join("; ", bad.Distinct().Take(20))}{(bad.Count > 20 ? $" ... ({bad.Count} rows)" : "")}."));
+                else
+                    model.Diagnostics.Add(new Diagnostic(DiagnosticSeverity.Info, $"Beam bar list {unit}: every beam has the listed count of every mark ({list.Count} marks, {list.Sum(r => r.Count)} bars per beam)."));
+            }
+            // weight per beam (scheduled lengths)
+            var first = g.First();
+            double perBeam = first.Bars.Sum(x => { var m = model.MarkOf(x); return m.Length * m.Size.MassPerLength; }) * Lb;
+            string listed = rd.ListedWeightLb > 0 ? $"; printed {rd.ListedWeightLb:N0} lb ({rd.ListedWeightSource}), difference {perBeam - rd.ListedWeightLb:+0;-0;0} lb" : "; no printed weight";
+            model.Diagnostics.Add(new Diagnostic(DiagnosticSeverity.Info, $"Beam reinforcing {unit}: {first.Bars.Count} bars, {perBeam:N0} lb per beam ({g.Count()} beams){listed}."));
+        }
     }
 
     private static (PrestressedBeam, List<PrestressedPad>, List<BearingSeat>) BuildBeam(BridgeFraming f, UnitSystem u, TxGirderShape baseShape,
@@ -324,6 +388,13 @@ public static class PrestressedGenerator
             IsStandardLength = standardLength, Assumption = assumption, Body = body,
         };
         beam.Strands.AddRange(strands);
+        // ---- mild reinforcing (OPTIONAL): stirrups / end-zone / longitudinal bars of the standard, along the beam as built
+        if (pd.Reinforcement is { } rd)
+        {
+            var placed = PrestressedBeamRebar.Place(rd, BarUnit(pd, shape), new PrestressedBeamRebar.BeamFrame(P, SA, SB, kSlope, D));
+            beam.Bars.AddRange(placed.Bars);
+            foreach (var kv in placed.OutsideEnd) beam.BarsOutsideEnd[kv.Key] = kv.Value;
+        }
 
         // ---- pads and seats: IGEB table sizes (or the input size), square to the girder, level. The pad sits on the
         // nominal CL bearing unless that would put it within 1" of the girder end.

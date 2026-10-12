@@ -27,6 +27,8 @@ sbm run "samples\plans\check-br02069.csx" "samples\plans\Br02069 TH65.sbm"
 | Beams | `Standard = "MN 30MH"` (StandardBeamCatalog: exact outline with 6" R web fillets, 1" R / 2" R flange corners, 3/4" chamfer), Designation 30MH-101, spans the layout bearings (no standard length; Placement left unset); 44 x 0.6" Gr 300 straight strands from strands-30MH-B1.csv with debonding at each end via StrandPoint.DebondStart/End/Symbol: A 4 @ 9'-0", B 6 @ 13'-0", C 4 @ 17'-0" (14 of 44); f'c 9.5 / f'ci 8.0, 7 1/2" end to CL brg -> 100'-6" o-o; pad 12" x 30" x 3 1/4" | p16, p31 |
 | Abutments | AbutmentDefinition per abutment: footing 59'-7" (-23.58..+36.00) x 6'-0" x 3'-0", bottom 917.75; infill wall 1'-6" (as backwall, front 1'-0" behind CL brg, top 927.73 S / 927.80 N); back ledge 922.35 / 922.15 (keyed zone); seat front 923.27 / 923.06 (wash); pedestals (beam steps) 2'-4" along the beam (1'-0" behind + 1'-4" ahead of CL brg, 2" short of the seat front; U7, p6 / p12) x 4'-8" S / 3'-6" N, tops from seat-elevations.csv; 3 more pedestals for the future beam lines +21 / +27 / +33 BUILT NOW (`AbutmentDefinition.StandalonePedestals`, label FUTURE BEAM, same size, tops 923.76 / 923.64 / 923.52 S, 923.55 / 923.43 / 923.31 N; see "Future pedestals" below); west mask wall 1'-5 1/2" to 930.61 / 930.67; 14 piles 12" C-I-P concrete-filled pipe, 1/4" shell (`PileType.CipPipe`, round; 2 rows x 7 @ 9'-5", 1'-6" from W end, rows 1'-9" behind / 1'-3" ahead of CL brg, 1'-0" embed, 95 / 90 ft) | p4, p5, p6, p8, p9, p10, p12, p14, p11 |
 
+Beam reinforcing (2026-10-12, beam-rebar-br02069.csx): check-br02069.csx SUMMARY 221 PASS, 9 FAIL, 4 N/A (new group "Beam rebar" 14 pass, 4 N/A = G806E not placed + lb per beam without a bill; the 9 FAIL are the bearing-height GAP rows as before).
+
 Check after the diaphragm work (2026-10-11, merged with main 606c00f): `check-br02069.csx` SUMMARY 207 PASS, 9 FAIL, 0 N/A (unchanged by the
 diaphragms; the 9 FAIL are the bearing-height GAP rows). Diaphragm report: `sbm run samples\plans\check-diaphragms.csx "samples\plans\Br02069 TH65.sbm"`.
 
@@ -321,7 +323,7 @@ Stool                G7-S1 stool at CL brg N (in)                      4.2500   
 | 7 | Barrier Type S 36" (p24) | SingleSlope 36" x 1'-6" base, top width = program default 6" (not read) | MnDOT Type S profile |
 | 8 | Barrier bars R501M..R612M (p24) | barrier reinforcement off | plan barrier bars |
 | 9 | Deck bars S401M..S404M (p18, p19, p21; U4) | deck reinforcement off (generic bars would be invented) | data entry into DeckPlanReinforcement (feature exists) |
-| 10 | Beam mild steel G301E..G806E, stirrups, optional top strands (p16) | not modeled | prestressed beam reinforcing |
+| ~~10~~ | Beam mild steel G301E..G806E, stirrups, optional top strands (p16) | MOSTLY CLOSED: `PrestressedBeamDefinition.Reinforcement` (beam-rebar-br02069.csx, `StandardBeamRebar.MnDot30Mh`): 120 stirrup stations per beam (2" + 4 @ 2 1/2" + 9 @ 4" + 19 @ 9" + 27 @ 14" from each end), G505E pair at the first, G508E pairs at the other four stations of the 2 1/2" group, G402E hairpins at the other 110, G301E at all 120, 2-G303E with G505E / G508E (20); 270 bars, 666 lb per beam (centerline lengths; no bill), 4,661 lb for 7 beams. NOT placed (UNRESOLVED, p16): 4-G806E (no length / end distance), 2-G303E with G402E (zone extent). Optional 2 x 1/2" top strands not modeled (contractor's option). | G806E length, G303E/G402E zone from the designer |
 | 11 | Abutment stem with front face 1'-3" behind the footing front, seat 1" slope (p11 A-A) | wash (seat level) runs to the footing front -> front toe built to the seat; seat level at the seat-front elevation | MnDOT stem / seat / back-ledge section in AbutmentDefinition |
 | 12 | Infill wall without corbel (p11) | Iowa corbel set to zero size; three backwall pours remain as solid splits | optional corbel / plain wall |
 | 12a | Infill wall only in the E 18'-5" (+17'-7" .. +36'-0", p5 / p10 / p11 Detail C) | backwall runs from the W mask wall to +36'-0" | backwall end offsets + end diaphragm on the back ledge (GAP 6) |
@@ -336,7 +338,11 @@ Stool                G7-S1 stool at CL brg N (in)                      4.2500   
   R518E do not add up to the listed length; no sheet shows pin diameters (bars are not modeled anyway - GAPs 8-10, 16). The other 25 marks are closed.
 - U8 (p4, p9): pile tip elevations - the pile notes give only estimated lengths, no tips; piles hang the contract length from the head.
 - U10 (p16): camber shape - the sheet prints single camber / deflection values, no camber curve.
-- U11 (p16): beam bars - extent of the G402E-paired G303E zone, G806E length, which end positions take G505E vs G508E are not dimensioned (no bill).
+- U11 (p16): beam bars - still open: extent of the G402E-paired G303E zone (the dimension line runs into the break of the half elevation without an
+  end tick, count or length; Fig. 5-397.501(B) draws the same open line) and the G806E length (no bill, the bars' ends are not dimensioned; only a
+  permissible splice 5'-1 min. lap) - neither is placed. CLOSED by the standard figure: which end stations take G505E vs G508E - Fig. 5-397.501(B)
+  labels the first group "2 1/2" MIN. SPG. FOR SPLITTING REINF." and G402E "SPG. EXCEPT AS NOTED", the p16 leaders put 2-G505E at the first
+  station and 2-G508E / 2-G303E (SP. W/ G508E) over the rest of that group -> G505E at 2", G508E at 4 1/2", 7", 9 1/2", 12", G402E from 16".
 - U12 (p5, p10, p6): pedestal heights - only the tops are printed; heights are tops minus the seat (DERIVED).
 - p16: debond sheathing product / size - the plans give the debonded lengths only (generator warning; drawn 1/16" thick, display only).
 - p24, Fig. 5-397.138(A): barrier Type S top width / face breaks - the standard figure's dimensions are not transcribed yet.

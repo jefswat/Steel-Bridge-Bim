@@ -153,6 +153,29 @@ foreach (var beam in ps.Beams.Where(x => x.Girder == 0 || x.Girder == 6))
         Row("Stool", $"{beam.Mark} stool at CL brg {end} (in)", 4.25, stool, "p3 4 1/4\"; tolerance 1/16\"", 1.0 / 16, "F4");
     }
 
+// Beam mild reinforcing (p16, Fig. 5-397.501 mod. + Fig. 5-397.501(B)): stirrup stations per half 2" + 4 sps @ 2 1/2" + 9 @ 4" + 19 @ 9" + 27 @ 14"
+// (+ 6" to CL span) = 60 per half; G505E pairs at the first station, G508E pairs at the other four of the 2 1/2" group, G402E elsewhere,
+// G301E at every station (+1/2" against the stirrup), 2-G303E with G505E / G508E. No bar bill (p16): weight printed as N/A.
+{
+    var chain = SBM.Core.Prestressed.PrestressedBeamRebar.Chain(2, (4, 2.5), (9, 4), (19, 9), (27, 14));
+    Row("Beam rebar", "stirrup stations per half (p16 chain)", 60, chain.Count, "2 + 4@2 1/2 + 9@4 + 19@9 + 27@14", 0, "F0");
+    Row("Beam rebar", "chain + 6\" to CL span = half beam (in)", 603, chain[^1] + 6, "100'-6\" / 2", 0, "F3");
+    foreach (var beam in ps.Beams.Where(x => x.Girder == 0 || x.Girder == 6))
+    {
+        foreach (var (mk, n) in new[] { ("G402E", 110), ("G505E", 4), ("G508E", 16), ("G301E", 120), ("G303E", 20) })
+            Row("Beam rebar", $"{beam.Mark} {mk} bars", n, beam.Bars.Count(x => x.Mark == mk), mk == "G303E" ? "with G505E / G508E only (G402E zone UNRESOLVED)" : "p16", 0, "F0");
+        Row("Beam rebar", $"{beam.Mark} G806E bars", null, beam.Bars.Count(x => x.Mark == "G806E"), "UNRESOLVED: no length / end distance (p16)", 0, "F0");
+        var ax = (beam.TopEnd - beam.TopStart).Normalized();
+        double L = (beam.TopEnd - beam.TopStart).Length / In(1);
+        var exp = chain.Select(v => v + 0.5).Concat(chain.Select(v => L - v - 0.5)).OrderBy(v => v).ToList();
+        var mod = beam.Bars.Where(x => x.Mark == "G301E").Select(x => Vec3.Dot((x.Points[0] + x.Points[^1]) * 0.5 - beam.TopStart, ax) / In(1)).OrderBy(v => v).ToList();
+        if (mod.Count == exp.Count)
+            Row("Beam rebar", $"{beam.Mark} G301E worst station difference vs chain (in)", 0, exp.Zip(mod, (e, x) => x - e).OrderByDescending(Math.Abs).First(), "1/16\"", 1.0 / 16, "F4");
+        double lb = beam.Bars.Sum(x => { var m = ps.MarkOf(x); return m.Length * m.Size.MassPerLength; }) * 2.2046226218;
+        Row("Beam rebar", $"{beam.Mark} reinforcing per beam (lb)", null, lb, "no bar bill on p16 (paid with the beam); centerline lengths", 0, "F0");
+    }
+}
+
 // ---------------------------------------------------------------- table
 int w1 = rows.Max(r => r.item.Length);
 Print($"{"Group",-20} {"Item".PadRight(w1)} {"Plan",12} {"Model",12} {"Diff",8}  Status  Note");

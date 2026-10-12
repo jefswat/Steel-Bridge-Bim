@@ -309,6 +309,12 @@ unresolved.Add("Beam ends at the piers: square to the beam or parallel to the pi
     if (!tr.Success) Print("ERROR in surface-treatments-woodbury.csx: " + tr.Error);
 }
 
+// ---------------------------------------------------------------- beam mild reinforcing from the beam standard (beam-rebar-woodbury.csx)
+{
+    var br2 = await SBM.Api.ScriptHost.RunFileAsync(@"samples\plans\beam-rebar-woodbury.csx", Doc, Args);
+    Print(br2.Output.TrimEnd());
+    if (!br2.Success) Print("ERROR in beam-rebar-woodbury.csx: " + br2.Error);
+}
 // Existing ground (user-approved): USGS 3DEP 2020 lidar 1 m DEM, NAD83 UTM 14N, metres, NAVD88 metres (= the plan datum, no vertical shift).
 Doc.Project.References.RemoveAll(x => x.Name == "3DEP lidar 1 m (Sioux City I-29)");
 Doc.Project.References.Add(new SBM.Core.References.ReferenceModelDefinition

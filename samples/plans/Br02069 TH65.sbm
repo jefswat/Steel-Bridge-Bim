@@ -105,6 +105,7 @@
             "CapOffset": 0,
             "CapProfile": [],
             "CapProfileAhead": [],
+            "CapBlocks": [],
             "Aesthetics": null,
             "TopShape": "Sloped",
             "CapSlope": "NaN",
@@ -118,6 +119,7 @@
             "PedestalShared": false,
             "PedestalSizeAcrossAhead": 0,
             "PedestalRowJoint": "NaN",
+            "PedestalSideAngleDeg": 0,
             "ColumnCount": 0,
             "ColumnSpacings": [],
             "FirstColumnOffset": "NaN",
@@ -127,6 +129,8 @@
             "ColumnDepth": 0.9144000000000001,
             "ColumnChamferS": 0,
             "ColumnChamferN": 0,
+            "ColumnProjectionS": 0,
+            "ColumnProjectionWidth": 0,
             "ColumnFlareElevation": "NaN",
             "ColumnFlareWidth": 0,
             "ColumnFlareDepth": 0,
@@ -588,6 +592,7 @@
             "CapOffset": 0,
             "CapProfile": [],
             "CapProfileAhead": [],
+            "CapBlocks": [],
             "Aesthetics": null,
             "TopShape": "Sloped",
             "CapSlope": "NaN",
@@ -601,6 +606,7 @@
             "PedestalShared": false,
             "PedestalSizeAcrossAhead": 0,
             "PedestalRowJoint": "NaN",
+            "PedestalSideAngleDeg": 0,
             "ColumnCount": 0,
             "ColumnSpacings": [],
             "FirstColumnOffset": "NaN",
@@ -610,6 +616,8 @@
             "ColumnDepth": 0.9144000000000001,
             "ColumnChamferS": 0,
             "ColumnChamferN": 0,
+            "ColumnProjectionS": 0,
+            "ColumnProjectionWidth": 0,
             "ColumnFlareElevation": "NaN",
             "ColumnFlareWidth": 0,
             "ColumnFlareDepth": 0,
@@ -1586,7 +1594,397 @@
           "SheathThickness": 0.0015875,
           "Source": "MnDOT Br. 02069 p16 (30MH-101, Beam B1)",
           "Unresolved": null,
-          "SpanBeams": null
+          "SpanBeams": null,
+          "Reinforcement": {
+            "Source": "MnDOT Br. 02069 p16 (30MH-101, Fig. 5-397.501 mod.) \u002B Fig. 5-397.501(B)",
+            "SteelYieldKsi": 60,
+            "Bars": [
+              {
+                "Mark": "G402E",
+                "Size": "#4",
+                "Epoxy": true,
+                "Coating": "",
+                "ShapeCode": "HAIRPIN",
+                "Description": "web hairpin 2\u0027-10 x 4 in o-o, projects 7 in above the beam",
+                "Path": [
+                  {
+                    "A": 0,
+                    "X": -0.044449999999999996,
+                    "Y": 0.07619999999999999
+                  },
+                  {
+                    "A": 0,
+                    "X": -0.044449999999999996,
+                    "Y": 0.93345
+                  },
+                  {
+                    "A": 0,
+                    "X": 0.044449999999999996,
+                    "Y": 0.93345
+                  },
+                  {
+                    "A": 0,
+                    "X": 0.044449999999999996,
+                    "Y": 0.07619999999999999
+                  }
+                ],
+                "BendRadius": 0.044449999999999996,
+                "Mirror": false,
+                "Copies": null,
+                "Stations": [
+                  0.4064,
+                  0.508,
+                  0.6095999999999999,
+                  0.7111999999999999,
+                  0.8128,
+                  0.9144,
+                  1.016,
+                  1.1176,
+                  1.2191999999999998,
+                  1.4478,
+                  1.6764,
+                  1.905,
+                  2.1336,
+                  2.3622,
+                  2.5907999999999998,
+                  2.8194,
+                  3.048,
+                  3.2765999999999997,
+                  3.5052,
+                  3.7338,
+                  3.9623999999999997,
+                  4.191,
+                  4.4196,
+                  4.6482,
+                  4.876799999999999,
+                  5.1053999999999995,
+                  5.334,
+                  5.5626,
+                  5.9182,
+                  6.2738,
+                  6.6293999999999995,
+                  6.984999999999999,
+                  7.340599999999999,
+                  7.696199999999999,
+                  8.0518,
+                  8.407399999999999,
+                  8.763,
+                  9.118599999999999,
+                  9.4742,
+                  9.829799999999999,
+                  10.1854,
+                  10.541,
+                  10.8966,
+                  11.2522,
+                  11.6078,
+                  11.9634,
+                  12.318999999999999,
+                  12.6746,
+                  13.030199999999999,
+                  13.3858,
+                  13.741399999999999,
+                  14.097,
+                  14.452599999999999,
+                  14.8082,
+                  15.1638
+                ],
+                "Ends": "Both",
+                "StationAtBar": false,
+                "AlongOffset": 0,
+                "PrintedDims": [
+                  0.8635999999999999,
+                  0.1016
+                ],
+                "ListedLength": 0,
+                "Location": "web stirrup (G402E spacing)",
+                "Unresolved": ""
+              },
+              {
+                "Mark": "G505E",
+                "Size": "#5",
+                "Epoxy": true,
+                "Coating": "",
+                "ShapeCode": "C",
+                "Description": "end bar (pair): 2\u0027-1 vertical, 3\u0027-6 top flange leg, 1\u0027-0 bottom leg",
+                "Path": [
+                  {
+                    "A": 1.0588625,
+                    "X": -0.0428625,
+                    "Y": 0.7032625
+                  },
+                  {
+                    "A": 0,
+                    "X": -0.0428625,
+                    "Y": 0.7032625
+                  },
+                  {
+                    "A": 0,
+                    "X": -0.0428625,
+                    "Y": 0.08413749999999999
+                  },
+                  {
+                    "A": 0.2968625,
+                    "X": -0.0428625,
+                    "Y": 0.08413749999999999
+                  }
+                ],
+                "BendRadius": 0,
+                "Mirror": true,
+                "Copies": null,
+                "Stations": [
+                  0.0508
+                ],
+                "Ends": "Both",
+                "StationAtBar": false,
+                "AlongOffset": 0,
+                "PrintedDims": [
+                  1.0668,
+                  0.635,
+                  0.30479999999999996
+                ],
+                "ListedLength": 0,
+                "Location": "beam end, splitting reinforcement (2-G505E)",
+                "Unresolved": ""
+              },
+              {
+                "Mark": "G508E",
+                "Size": "#5",
+                "Epoxy": true,
+                "Coating": "",
+                "ShapeCode": "L",
+                "Description": "end bar (pair): 2\u0027-10 vertical, 1\u0027-0 top leg, projects 7 in",
+                "Path": [
+                  {
+                    "A": 0,
+                    "X": -0.0428625,
+                    "Y": 0.07619999999999999
+                  },
+                  {
+                    "A": 0,
+                    "X": -0.0428625,
+                    "Y": 0.9318624999999999
+                  },
+                  {
+                    "A": 0,
+                    "X": 0.254,
+                    "Y": 0.9318624999999999
+                  }
+                ],
+                "BendRadius": 0,
+                "Mirror": true,
+                "Copies": null,
+                "Stations": [
+                  0.1143,
+                  0.17779999999999999,
+                  0.2413,
+                  0.30479999999999996
+                ],
+                "Ends": "Both",
+                "StationAtBar": false,
+                "AlongOffset": 0,
+                "PrintedDims": [
+                  0.8635999999999999,
+                  0.30479999999999996
+                ],
+                "ListedLength": 0,
+                "Location": "beam end, splitting reinforcement (2-G508E)",
+                "Unresolved": ""
+              },
+              {
+                "Mark": "G301E",
+                "Size": "#3",
+                "Epoxy": true,
+                "Coating": "",
+                "ShapeCode": "STR",
+                "Description": "top flange transverse 2\u0027-6",
+                "Path": [
+                  {
+                    "A": 0,
+                    "X": -0.381,
+                    "Y": 0.7191375
+                  },
+                  {
+                    "A": 0,
+                    "X": 0.381,
+                    "Y": 0.7191375
+                  }
+                ],
+                "BendRadius": 0,
+                "Mirror": false,
+                "Copies": null,
+                "Stations": [
+                  0.0508,
+                  0.1143,
+                  0.17779999999999999,
+                  0.2413,
+                  0.30479999999999996,
+                  0.4064,
+                  0.508,
+                  0.6095999999999999,
+                  0.7111999999999999,
+                  0.8128,
+                  0.9144,
+                  1.016,
+                  1.1176,
+                  1.2191999999999998,
+                  1.4478,
+                  1.6764,
+                  1.905,
+                  2.1336,
+                  2.3622,
+                  2.5907999999999998,
+                  2.8194,
+                  3.048,
+                  3.2765999999999997,
+                  3.5052,
+                  3.7338,
+                  3.9623999999999997,
+                  4.191,
+                  4.4196,
+                  4.6482,
+                  4.876799999999999,
+                  5.1053999999999995,
+                  5.334,
+                  5.5626,
+                  5.9182,
+                  6.2738,
+                  6.6293999999999995,
+                  6.984999999999999,
+                  7.340599999999999,
+                  7.696199999999999,
+                  8.0518,
+                  8.407399999999999,
+                  8.763,
+                  9.118599999999999,
+                  9.4742,
+                  9.829799999999999,
+                  10.1854,
+                  10.541,
+                  10.8966,
+                  11.2522,
+                  11.6078,
+                  11.9634,
+                  12.318999999999999,
+                  12.6746,
+                  13.030199999999999,
+                  13.3858,
+                  13.741399999999999,
+                  14.097,
+                  14.452599999999999,
+                  14.8082,
+                  15.1638
+                ],
+                "Ends": "Both",
+                "StationAtBar": false,
+                "AlongOffset": 0.0127,
+                "PrintedDims": [
+                  0.762
+                ],
+                "ListedLength": 0,
+                "Location": "top flange transverse (with every stirrup)",
+                "Unresolved": ""
+              },
+              {
+                "Mark": "G303E",
+                "Size": "#3",
+                "Epoxy": true,
+                "Coating": "",
+                "ShapeCode": "BENT",
+                "Description": "bottom flange bar (pair): 2\u0027-11 \u002B 3 1/2 \u002B 1\u0027-10 @ 4:12",
+                "Path": [
+                  {
+                    "A": 0,
+                    "X": 0.42227499999999996,
+                    "Y": 0.0333375
+                  },
+                  {
+                    "A": 0,
+                    "X": -0.4619625,
+                    "Y": 0.0333375
+                  },
+                  {
+                    "A": 0,
+                    "X": -0.4619625,
+                    "Y": 0.11404238421448268
+                  },
+                  {
+                    "A": 0,
+                    "X": 0.06490526168628227,
+                    "Y": 0.28966497144324344
+                  }
+                ],
+                "BendRadius": 0,
+                "Mirror": true,
+                "Copies": null,
+                "Stations": [
+                  0.0508,
+                  0.1143,
+                  0.17779999999999999,
+                  0.2413,
+                  0.30479999999999996
+                ],
+                "Ends": "Both",
+                "StationAtBar": false,
+                "AlongOffset": 0.0127,
+                "PrintedDims": [
+                  0.889,
+                  0.08889999999999999,
+                  0.5588
+                ],
+                "ListedLength": 0,
+                "Location": "bottom flange (2-G303E with G505E / G508E)",
+                "Unresolved": ""
+              },
+              {
+                "Mark": "G303E",
+                "Size": "#3",
+                "Epoxy": true,
+                "Coating": "",
+                "ShapeCode": "BENT",
+                "Description": "",
+                "Path": [],
+                "BendRadius": 0,
+                "Mirror": false,
+                "Copies": null,
+                "Stations": [],
+                "Ends": "Both",
+                "StationAtBar": false,
+                "AlongOffset": 0,
+                "PrintedDims": [],
+                "ListedLength": 0,
+                "Location": "bottom flange (2-G303E with G402E)",
+                "Unresolved": "UNRESOLVED (Br02069 p16): 2-G303E spaced with G402E (bottom flange bars) - extent of the zone - the dimension line runs into the break of the half elevation with no end tick, count or length, and Fig. 5-397.501(B) draws the same open line. Not placed (G303E are placed only with G505E / G508E)."
+              },
+              {
+                "Mark": "G806E",
+                "Size": "#8",
+                "Epoxy": true,
+                "Coating": "",
+                "ShapeCode": "STR",
+                "Description": "",
+                "Path": [],
+                "BendRadius": 0,
+                "Mirror": false,
+                "Copies": null,
+                "Stations": [],
+                "Ends": "Both",
+                "StationAtBar": false,
+                "AlongOffset": 0,
+                "PrintedDims": [],
+                "ListedLength": 0,
+                "Location": "top flange longitudinal 3 1/2 \u002B 3 @ 9 \u002B 3 1/2",
+                "Unresolved": "UNRESOLVED (Br02069 p16): 4-G806E top flange longitudinal bars - bar length / end distance - the sheet has no bar bill and the elevation does not dimension where the bars stop (only a permissible splice, 5\u0027-1 min. lap). Not placed (positions across the flange are known: 3 1/2 \u002B 3 @ 9 \u002B 3 1/2)."
+              }
+            ],
+            "Unresolved": [],
+            "Notes": [
+              "30MH G505E / G508E stations (U11, Br02069 p16): leaders 2-G505E (first station) and 2-G508E \u002B 2-G303E (SP. W/ G508E) over the rest of the first group; Fig. 5-397.501(B) marks that group \u00272 1/2\u0022 MIN. SPG. FOR SPLITTING REINF.\u0027 and G402E \u0027SPG. EXCEPT AS NOTED\u0027 - so G505E at the first, G508E at the other 4 stations of the 2 1/2\u0022 group, G402E from the next group on.",
+              "30MH bar lengths: no bar bill (beam bars are paid with the beam, Br02069 p16); scheduled at the centerline length; pins not shown (G402E bent about its 4 in o-o width, others sharp). Optional 2 x 1/2 in top strands (contractor\u0027s option) not modeled."
+            ],
+            "BarList": null,
+            "ListedWeightLb": 0,
+            "ListedWeightSource": ""
+          }
         }
       },
       "Deck": {
