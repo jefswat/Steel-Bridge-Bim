@@ -87,7 +87,7 @@ public static class TableViews
         var rows = new List<string[]>();
         foreach (var sl in f.Supports.Concat(f.AuxSupports))
         {
-            var r = new List<string> { sl.Name.ToUpperInvariant(), u.FormatStation(sl.Station), sl.SkewDegrees == 0 ? "0" : $"{UnitSystem.FormatAngleDms(Math.Abs(sl.SkewDegrees) * Math.PI / 180, false)} {(sl.SkewDegrees > 0 ? "RT" : "LT")}" };
+            var r = new List<string> { sl.Name.ToUpperInvariant(), u.FormatStation(sl.Station), sl.SkewDegrees == 0 ? "0 DEG (SQUARE)" : $"{UnitSystem.FormatAngleDms(Math.Abs(sl.SkewDegrees) * Math.PI / 180, false)} {(sl.SkewDegrees > 0 ? "RT" : "LT")}" };
             for (int i = 0; i + 1 < ng; i++)
             {
                 var b0 = i < sl.Bearings.Length ? sl.Bearings[i] : null; var b1 = sl.Bearings[i + 1];

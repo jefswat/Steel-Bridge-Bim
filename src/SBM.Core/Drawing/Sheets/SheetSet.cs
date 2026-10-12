@@ -60,6 +60,9 @@ public static class SheetSet
                 specs.Add(new SheetSpec($"Beam layout {spans}", "Beams, marks, CL bearing lines, spacing and diaphragms",
                     new[] { Full(new ViewSpec("Beam layout", s => PrestressedViews.BeamLayout(WithScale(ctx, s), a0, a1), ScaleFamily.Engineering)) }));
             }
+            if (f.Deck != null)
+                specs.Add(new SheetSpec("Deck plan", "Deck outline, widths, support lines and deck data from the model",
+                    new[] { Full(new ViewSpec("Deck plan", s => DeckViews.DeckPlan(WithScale(ctx, s)), ScaleFamily.Engineering)) }));
             foreach (var (type, _, beams) in PsText.Types(ps))
             {
                 string t = type;

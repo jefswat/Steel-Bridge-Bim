@@ -68,6 +68,39 @@ public class SheetFixTests
     }
 
     [Fact]
+    public void PlanGirderNames_AreUsedOnTheSheets_AndOmittedFromTheFileWhenUnset()
+    {
+        var doc = SbmDocument.Sample();
+        var m = doc.Model();
+        var ctx = new ViewContext(m.Framing, m.Steel, m.Concrete, m.Substructure, null, doc.Units, DrawingOptions.For(doc.Units));
+        Assert.Equal("G2", ctx.GirderName(1));
+        var attr = typeof(SBM.Core.Bridge.GirderLayoutDefinition).GetProperty("PlanNames")!.GetCustomAttributes(typeof(System.Text.Json.Serialization.JsonIgnoreAttribute), false)
+            .Cast<System.Text.Json.Serialization.JsonIgnoreAttribute>().Single();
+        Assert.Equal(System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull, attr.Condition);   // shipped models without names are unchanged
+        doc.Bridge().Girders.PlanNames = new() { "A", "B", "C", "D", "E" };
+        Assert.Equal("B", ctx.GirderName(1));
+        Assert.Equal("GIRDER B", ctx.GirderTitle(1));
+        var sec = SectionViews.TypicalSection(ctx);
+        var texts = sec.Drawing.Layers.SelectMany(l => l.Texts).Select(t => t.Text).ToList();
+        Assert.Contains("E", texts);
+        Assert.DoesNotContain("G5", texts);
+        Assert.Equal(new[] { "A", "B", "C", "D", "E" }, doc.Bridge().Girders.Clone().PlanNames);
+    }
+
+    [Fact]
+    public void BeamBars_AreReadGenerically_OnTheBeamSheets()
+    {
+        var (_, wb) = Model("Woodbury I-29 NB over Floyd.sbm");
+        var marks = PsBars.Marks(wb.Prestressed!);
+        if (marks.Count == 0) return;   // model without beam reinforcing: the sheets say NOT IN THE MODEL
+        var view = PrestressedViews.DataTables(wb, "BTD105");
+        var texts = view.Drawing.Layers.SelectMany(l => l.Texts).Select(t => t.Text).ToList();
+        Assert.Contains(texts, t => t.StartsWith("BEAM REINFORCING - BTD105"));
+        Assert.Contains(PsBars.MarksOf(wb.Prestressed!, "BTD105")[0].Mark, texts);
+        Assert.NotEmpty(PsBars.Bars(wb.Prestressed!.Beams.First(b => b.TypeName == "BTD105")));
+    }
+
+    [Fact]
     public void TxGirders_KeepTheTxDotNotes()
     {
         var doc = SbmDocument.Sample();
@@ -107,9 +140,11 @@ public class SheetFixTests
         Assert.Contains(w, r => r.Item == "BEAMS, PRETENSIONED PRESTRESSED CONCRETE, BTD105" && r.Value == 5);
         Assert.Contains(w, r => r.Item == "STRUCTURAL STEEL - STEEL INTERMEDIATE DIAPHRAGMS");
         Assert.DoesNotContain(w, r => r.Item == "STRUCTURAL STEEL - CROSS FRAMES AND CROSS GIRDERS");
-        // The modeled reinforcing is the pier bars; the groups the model lacks are listed, so the plan total can be reconciled.
-        var epoxy = w.Single(r => r.Item == "REINFORCING STEEL, EPOXY COATED - TOTAL (MODELED BARS)");
-        Assert.Equal(wb.Substructure!.RebarMass * 2.20462, epoxy.Value, 0);
+        // The coating totals add up to every modeled bar (piers, pile spirals, beam bars when modeled); the groups the model lacks are
+        // listed, so the plan total can be reconciled.
+        double modeled = (wb.Substructure!.RebarMass + PsBars.Marks(wb.Prestressed!).Sum(m => m.TotalMass) + (wb.Concrete?.Marks.Sum(m => m.TotalMass) ?? 0)) * 2.20462;
+        Assert.Equal(modeled, w.Where(r => r.Item.EndsWith("- TOTAL (MODELED BARS)")).Sum(r => r.Value), 0);
+        Assert.Contains(w, r => r.Item.StartsWith("REINFORCING STEEL, EPOXY COATED - PIER 1"));
         Assert.Contains(w, r => r.Item == "REINFORCING STEEL - DECK AND BARRIER" && double.IsNaN(r.Value));
         Assert.Contains(w, r => r.Item.StartsWith("REINFORCING STEEL - S. ABUT.") && double.IsNaN(r.Value));
         Assert.Contains(w, r => r.Item == "PILES, HP12X84" && Math.Abs(r.Value - 11440) < 1);
