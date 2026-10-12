@@ -11,6 +11,8 @@ public enum PartCategory
     SplicePlate, BearingPlate, MasonryPlate, BearingDisc, ShearPin, GuideBar, Ptfe,
     // Inspection access (cables on WT brackets, walkways).
     InspectionBracket, InspectionCable, Grating, WalkwayStringer, WalkwayPost, WalkwayRail, WalkwayPlate,
+    // Tub girders (appended; OPTIONAL feature): rolled tees (top struts, top lateral bracing), bottom flange access doors.
+    RolledTee, AccessDoor,
 }
 
 public enum AssemblyKind { GirderFieldSection, CrossFrame, Bearing, FieldSplice, LateralBracing, InspectionCable, InspectionWalkway }
@@ -132,6 +134,8 @@ public sealed class SteelModel
     public TimeSpan GenerationTime { get; set; }
     /// <summary>Exact-geometry option: what was built as NURBS (null when the option is off).</summary>
     public NurbsReport? Nurbs { get; set; }
+    /// <summary>Tub girder bridges: what the tub generator built and measured (null for I-girders).</summary>
+    public TubGirderReport? Tub { get; set; }
 
     public double SteelMass => Parts.Where(p => p.Category is not (PartCategory.BearingPad or PartCategory.Weld or PartCategory.BearingDisc or PartCategory.Ptfe)).Sum(p => p.Mass);
 

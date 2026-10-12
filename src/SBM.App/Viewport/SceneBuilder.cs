@@ -164,9 +164,9 @@ public static class SceneBuilder
 
     public static readonly (string name, byte r, byte g, byte b, PartCategory[] cats)[] SolidLayerDefs =
     {
-        ("3D-GIRDER-PLATES", 70, 130, 200, new[] { PartCategory.FlangePlate, PartCategory.WebPlate }),
+        ("3D-GIRDER-PLATES", 70, 130, 200, new[] { PartCategory.FlangePlate, PartCategory.WebPlate, PartCategory.AccessDoor }),
         ("3D-STIFFENERS", 200, 110, 210, new[] { PartCategory.BearingStiffener, PartCategory.ConnectionStiffener, PartCategory.IntermediateStiffener }),
-        ("3D-CROSSFRAME-MEMBERS", 80, 200, 110, new[] { PartCategory.Angle, PartCategory.Channel }),
+        ("3D-CROSSFRAME-MEMBERS", 80, 200, 110, new[] { PartCategory.Angle, PartCategory.Channel, PartCategory.RolledTee }),
         ("3D-GUSSETS", 235, 185, 70, new[] { PartCategory.Gusset, PartCategory.FillerPlate }),
         ("3D-SPLICE-PLATES", 120, 210, 230, new[] { PartCategory.SplicePlate }),
         ("3D-BEARINGS", 150, 150, 155, new[] { PartCategory.SolePlate, PartCategory.BearingPlate, PartCategory.MasonryPlate, PartCategory.GuideBar, PartCategory.ShearPin }),

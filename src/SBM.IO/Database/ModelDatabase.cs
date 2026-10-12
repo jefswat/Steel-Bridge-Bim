@@ -710,13 +710,13 @@ public static class ModelDatabase
             PartCategory.Ptfe => "PTFE surface",
             PartCategory.InspectionBracket => "cable bracket", PartCategory.InspectionCable => "wire rope", PartCategory.Grating => "grating",
             PartCategory.WalkwayStringer => "walkway stringer", PartCategory.WalkwayPost => "walkway post", PartCategory.WalkwayRail => "walkway rail",
-            PartCategory.WalkwayPlate => "walkway plate", _ => c.ToString(),
+            PartCategory.WalkwayPlate => "walkway plate", PartCategory.RolledTee => "tee", PartCategory.AccessDoor => "access door", _ => c.ToString(),
         };
 
         private static string IfcClassOf(SteelPart p) => p.Category switch
         {
             PartCategory.Angle or PartCategory.Channel or PartCategory.InspectionBracket or PartCategory.InspectionCable
-                or PartCategory.WalkwayStringer or PartCategory.WalkwayPost => "IFCMEMBER",
+                or PartCategory.WalkwayStringer or PartCategory.WalkwayPost or PartCategory.RolledTee => "IFCMEMBER",
             PartCategory.WalkwayRail => "IFCRAILING",
             PartCategory.BearingPad or PartCategory.BearingDisc => "IFCBEARING",
             PartCategory.ShearPin => "IFCMECHANICALFASTENER",

@@ -125,6 +125,11 @@ public static class PlateBuilder
         Frame3 f, double z0, double z1) =>
         AddPrismCore(mesh, outline, holes, (u, w, t) => f.ToWorld(u, w, t), _ => z0, _ => z1, null, openings);
 
+    /// <summary>Prism through a general map with round holes and polygonal openings (e.g. an access hatch in a curved tub flange).</summary>
+    public static void AddMappedWithOpenings(Mesh mesh, IReadOnlyList<Vec2> outline, IReadOnlyList<Hole> holes, IReadOnlyList<Vec2[]> openings,
+        Func<double, double, double, Vec3> map, double z0, double z1) =>
+        AddPrismCore(mesh, outline, holes, map, _ => z0, _ => z1, null, openings);
+
     /// <summary>Rounded rectangle (corner radius r) centred at c, counter-clockwise, as an opening outline.</summary>
     public static Vec2[] RoundedRectangle(Vec2 c, double width, double height, double r, int segmentsPerCorner = 8)
     {
