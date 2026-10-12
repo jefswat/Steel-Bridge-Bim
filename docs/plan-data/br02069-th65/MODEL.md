@@ -363,6 +363,12 @@ Stool                G7-S1 stool at CL brg N (in)                      4.2500   
 - U12 (p5, p10, p6): pedestal heights - only the tops are printed; heights are tops minus the seat (DERIVED).
 - p16: debond sheathing product / size - the plans give the debonded lengths only (generator warning; drawn 1/16" thick, display only).
 - p24, Fig. 5-397.138(A): barrier Type S top width / face breaks - the standard figure's dimensions are not transcribed yet.
+- DERIVED (not dimensioned, read from the drawing / counts; reported, not UNRESOLVED): end-diaphragm bottom beyond the fascia flange edges held level at the
+  fascia beam bottom (10 1/2" each end); A503E base on the bottom footing bars; seat ties pulled up to 3" clr at the seat FRONT; B.F. joint gap 1" each side
+  (from the bill lengths); stem-to-mask-wall ties A504E / A514E alongside the bars they are "spaced with"; mask wall lug bars A419E / A420E / A422E / A423E
+  (positions from C-C / D-D); end-diaphragm S615M / S616M kinks and S617S hook, S609E row "8 7/8 above the beam bottom", barrier bar coordinates (vector of
+  p21 / p24 A-A); barrier longitudinal level assignment (#4 upper, #6 lower) and S -> N order; barrier dowel / loop spacing 101 equal spaces (from the count);
+  end-diaphragm end sets 6" from the diaphragm ends (vector: they continue the 1'-0" spacing).
 - Beam Placement on the span: not set (the beam spans the layout bearings; no standard length is entered, so no placement is decided) - not a plan gap.
 
 Closed by the extraction (SUMMARY.md, no longer open): U2 end diaphragm geometry (modeling it is GAP 6), U3 for 25 marks, U4 deck line counts,
