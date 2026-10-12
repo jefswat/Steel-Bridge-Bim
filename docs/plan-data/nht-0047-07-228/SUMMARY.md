@@ -66,7 +66,7 @@ RW(EM), RW(MSE), PAZD, PB, PCO (p.37-78).
 | Rib geometry | circular arc R 126'-0, chord 201'-0, rise 50'-0 in the arch plane, central angle 105 deg 48'13" | - | p.119 | RASTER | DERIVED chord 200.996, rise 49.999 from R + angle (OK 0.01); arc length 232.68 ft |
 | Rib inclination | S and N ribs inclined 5 deg inward about their chords; 17'-3 13/16 c-c at the base | - | p.119 | RASTER | |
 | Rib splices | RS1 (-93.537, -8.383, 3.140), RS2 (-48.171, -5.305, 38.318), RS3 (7.840, -4.304, 49.767), RS4 (58.079, -5.342, 37.898), RS5 (102.537, -8.383, 3.140) (south rib, local ft) | ft | p.120 | RASTER | DERIVED: R about (x +4.5, 76 ft below the chord in the inclined plane) = 126.001-126.002, 0.000 off the 5 deg plane; S rib springs at x -96 / +105, centre x +4.5 |
-| Rib section | W14x132, web in the arch plane (bent about Y-Y, induction bent), WP at web centre; GR 50-T1 | - | p.83, 119, 127 | RASTER | |
+| Rib section | W14x132, FLANGES in the arch plane / web normal to it ("H" orientation in the p.119 / p.127 sections; bent about Y-Y, induction bent), WP at web centre; GR 50-T1 | - | p.83, 119, 127 | RASTER | |
 | Rib splice | 14 1/2 x 5/8 outside + 5 5/8 x 5/8 inside flange plates, 2 - 10 x 3/4 CURVED web plates, 1/2 gap, 7/8 A325 SC | - | p.127 | RASTER | note "RS1 and RS6" (no RS6) -> U9 |
 | Upper lateral bracing | W8x28 X-bracing, panel points U1-U11 / U1'-U11', crossings UL1-UL10; 21,600 lb | - | p.128-142 | RASTER | `upper-lateral-bracing-points.csv`; DERIVED U points 0.685 ft off the rib WP plane, R 126.07-126.08 -> U6 |
 | Tie girder | built-up T: 7/8 x 11 web + 7/8 x 1'-2 bottom flange (11 7/8), WP at bottom of flange on web CL; GR 50-F1 FRACTURE CRITICAL | - | p.119, 121, 143 | RASTER | |
@@ -192,7 +192,7 @@ to have stripped them. PDF bookmarks differ from the sheets ("162.77' ... UNIT",
 
 **Tied arch - what SBM lacks (program work), in build order:**
 1. Local structure frame - origin (station / offset / elevation), X azimuth along the chord, tilt (1.039 deg about a pier-parallel line); all arch members input in local coordinates.
-2. Arch rib generator - circular (later parabolic) rib from chord + radius / rise, inclination about the chord (5 deg), splice positions; W-shape swept on a 3D arc with the web in the arch plane (weak-axis bend); curved splice plates. No curved-in-elevation member exists today.
+2. Arch rib generator - circular (later parabolic) rib from chord + radius / rise, inclination about the chord (5 deg), splice positions; W-shape swept on a 3D arc with the flanges in the arch plane and the web normal to it (weak-axis bend); curved splice plates. No curved-in-elevation member exists today.
 3. Tie girder generator - built-up T swept along its own plan curve (R 342'-4 / 360'-8 + straights) in the tilted plane, splices, fin plates, FCM tags. The girder generator is alignment-offset driven; the ties are not offsets of CL NHT.
 4. Hangers (cables) - straight cables between table anchor points (crossed network), sockets / turnbuckles, rib and tie fin plates, cable connectors at crossings. New element type (IFC IfcTendon / IfcMember CABLE).
 5. Floor system - floorbeams between the ties at panel points (radial, crowned, variable depth, PT slots, studs) and skewed end floorbeams; the cross-frame generator only frames between alignment-driven girders.
