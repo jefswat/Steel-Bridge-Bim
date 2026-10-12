@@ -49,7 +49,7 @@ typical sections S1-06..14, S2-10..19, S3-14; precast bent caps/columns S1-59..6
 | Bearing data, top of bearing, seat elevations | S1-38..40 etc. | not read |
 | Bent, cap, column, footing, pile data and bar lists | S1-56..73, S2-74..104, S3-86..136, S4/S5 | not read |
 | Quantities / bills of material | S1-53/54, S2-71/72 etc. | not read |
-| Segmental box unit 5 (segments, PT, erection) | p249-392 | not read; SBM has no feature for it |
+| Segmental box unit 5 (segments, PT, erection) | p249-392 | extracted in segmental-unit5/SUMMARY.md (open items listed there); SBM has no feature for it |
 | Coordinates N/E | p21-34 | not read |
 | Cross slope direction | p4 | arrows not decipherable on the 110 dpi clip |
 | Fixity / foundation designation / top of footing per bent | p3-16 | read on 50-72 dpi strips, not confirmed at 300 dpi; pile bents have no footing elevation |

@@ -1,0 +1,56 @@
+# PDF p.261 sheet S3-13: LRFR SUMMARY NAVIGATION UNIT SPANS 19-29
+# decoded text layer, rows grouped by y (top to bottom), cells separated by ' | '. Fractions decoded from font glyphs (calibrated on raster). Drawing geometry is NOT in this text.
+68: LOAD AND RESISTANCE FACTOR RATING (LRFR) SUMMARY FOR POST-TENSIONED CONCRETE BOX GIRDER BRIDGES
+106: STRENGTH I LIMIT STATE | SERVICE LIMIT STATE
+137: MOMENT | SHEAR | SERVICE I | SERVICE III
+294: SNSH | 13.500 | 4.38 | 59.130 | 1.40 | - | 6.62 | SPAN 19 BENT 18 | 97.00 | - | 7.48 | SPAN 22 BENT 21 331.00 | N/A | N/A | N/A | N/A | N/A | N/A | 0.80 | - | 4.38 | SPAN 22 BENT 21 131.00 | -
+321: SNGARBS2 | 20.000 | 3.68 | 73.600 | 1.40 | - | 5.55 | SPAN 19 BENT 18 | 97.00 | - | 6.34 | SPAN 24 BENT 23 | 61.00 | N/A | N/A | N/A | N/A | N/A | N/A | 0.80 | - | 3.68 | SPAN 22 BENT 21 131.00 | -
+348: SNAGRIS2 | 22.000 | 3.53 | 77.660 | 1.40 | - | 5.30 | SPAN 19 BENT 18 | 97.00 | - | 6.00 | SPAN 20 BENT 19 303.00 | N/A | N/A | N/A | N/A | N/A | N/A | 0.80 | - | 3.53 | SPAN 22 BENT 21 131.00 | -
+375: SNCOTTS3 | 27.250 |  | 3.03 | 82.568 | 1.40 | - | 4.53 | SPAN 19 BENT 18 | 97.00 | - | 5.27 | SPAN 20 BENT 19 303.00 | N/A | N/A | N/A | N/A | N/A | N/A | 0.80 | - | 3.03 | SPAN 22 BENT 21 131.00 | -
+402: SNAGGRS4 | 34.925 |  | 2.63 | 91.853 | 1.40 | - | 3.92 | SPAN 19 BENT 18 | 97.00 | - | 4.52 | SPAN 21 BENT 20 289.00 | N/A | N/A | N/A | N/A | N/A | N/A | 0.80 | - | 2.63 | SPAN 22 BENT 21 131.00 | -
+429: SNS5A | 35.550 |  | 2.60 | 92.430 | 1.40 | - | 3.87 | SPAN 19 BENT 18 | 97.00 | - | 4.48 | SPAN 21 BENT 20 289.00 | N/A | N/A | N/A | N/A | N/A | N/A | 0.80 | - | 2.60 | SPAN 22 BENT 21 131.00 | -
+456: SNS6A | 39.950 |  | 2.42 | 96.679 | 1.40 | - | 3.59 | SPAN 19 BENT 18 | 97.00 | - | 4.01 | SPAN 20 BENT 19 289.00 | N/A | N/A | N/A | N/A | N/A | N/A | 0.80 | - | 2.42 | SPAN 22 BENT 21 131.00 | -
+483: SNS7B | 42.000 |  | 1.66 | 69.720 | 1.40 | - | 2.55 | SPAN 19 BENT 18 | 97.00 | - | 2.42 | SPAN 20 BENT 19 103.00 | N/A | N/A | N/A | N/A | N/A | N/A | 0.80 | - | 1.66 | SPAN 22 BENT 21 131.00 | -
+510: SNSH | 13.500 |  | 2.81 | 37.935 | 1.40 | FEM | 4.49 | N/A | 1 | N/A | N/A | N/A | N/A | N/A | N/A | 1.00 | FEM | 2.81 | N/A | 1 | N/A | N/A | N/A | N/A | N/A | N/A | N/A | - -
+537: SNGARBS2 | 20.000 |  | 2.41 | 48.200 | 1.40 | FEM | 3.84 | N/A | 1 | N/A | N/A | N/A | N/A | N/A | N/A | 1.00 | FEM | 2.41 | N/A | 1 | N/A | N/A | N/A | N/A | N/A | N/A | N/A | - -
+564: SNAGRIS2 | 22.000 |  | 3.35 | 73.700 | 1.40 | FEM | 5.33 | N/A | 1 | N/A | N/A | N/A | N/A | N/A | N/A | 1.00 | FEM | 3.35 | N/A | 1 | N/A | N/A | N/A | N/A | N/A | N/A | N/A | - -
+591: SNCOTTS3 | 27.250 |  | 1.55 | 42.238 | 1.40 | FEM | 2.47 | N/A | 1 | N/A | N/A | N/A | N/A | N/A | N/A | 1.00 | FEM | 1.55 | N/A | 1 | N/A | N/A | N/A | N/A | N/A | N/A | N/A | - -
+618: SNAGGRS4 | 34.925 |  | 1.68 | 58.674 | 1.40 | FEM | 2.68 | N/A | 1 | N/A | N/A | N/A | N/A | N/A | N/A | 1.00 | FEM | 1.68 | N/A | 1 | N/A | N/A | N/A | N/A | N/A | N/A | N/A | - -
+645: SNS5A | 35.550 |  | 1.48 | 52.614 | 1.40 | FEM | 2.36 | N/A | 1 | N/A | N/A | N/A | N/A | N/A | N/A | 1.00 | FEM | 1.48 | N/A | 1 | N/A | N/A | N/A | N/A | N/A | N/A | N/A | - -
+672: SNS6A | 39.950 |  | 1.35 | 53.933 | 1.40 | FEM | 2.16 | N/A | 1 | N/A | N/A | N/A | N/A | N/A | N/A | 1.00 | FEM | 1.35 | N/A | 1 | N/A | N/A | N/A | N/A | N/A | N/A | N/A | - -
+699: LEGAL | SNS7B | 42.000 | 3 | 1.34 | 56.280 | 1.40 | FEM | 2.15 | N/A | 1 | N/A | N/A | N/A | N/A | N/A | N/A | 1.00 | FEM | 1.34 | N/A | 1 | N/A | N/A | N/A | N/A | N/A | N/A | N/A | - -
+712: LOAD
+726: RATING | TNAGRIT3 | 33.000 |  | 2.76 | 91.080 | 1.40 | - | 4.12 | SPAN 19 BENT 18 | 97.00 | - | 4.72 | SPAN 20 BENT 19 303.00 | N/A | N/A | N/A | N/A | N/A | N/A | 0.80 | - | 2.76 | SPAN 22 BENT 21 131.00 | -
+753: TNT4A | 33.075 |  | 2.75 | 90.956 | 1.40 | - | 4.10 | SPAN 19 BENT 18 | 97.00 | - | 4.70 | SPAN 20 BENT 19 303.00 | N/A | N/A | N/A | N/A | N/A | N/A | 0.80 | - | 2.75 | SPAN 22 BENT 21 131.00 | -
+780: TNT6A | 41.600 |  | 2.37 | 98.592 | 1.40 | - | 3.53 | SPAN 19 BENT 18 | 97.00 | - | 3.93 | SPAN 20 BENT 19 289.00 | N/A | N/A | N/A | N/A | N/A | N/A | 0.80 | - | 2.37 | SPAN 22 BENT 21 131.00 | -
+807: TNT7A | 42.000 |  | 2.37 | 99.540 | 1.40 | - | 3.53 | SPAN 19 BENT 18 | 97.00 | - | 3.90 | SPAN 20 BENT 19 289.00 | N/A | N/A | N/A | N/A | N/A | N/A | 0.80 | - | 2.37 | SPAN 22 BENT 21 131.00 | -
+834: TNT7B | 42.000 |  | 2.38 | 99.960 | 1.40 | - | 3.55 | SPAN 19 BENT 18 | 97.00 | - | 3.87 | SPAN 20 BENT 19 289.00 | N/A | N/A | N/A | N/A | N/A | N/A | 0.80 | - | 2.38 | SPAN 22 BENT 21 131.00 | -
+861: TNAGRIT4 | 43.000 |  | 2.33 | 100.190 | 1.40 | - | 3.47 | SPAN 19 BENT 18 | 97.00 | - | 3.80 | SPAN 20 BENT 19 289.00 | N/A | N/A | N/A | N/A | N/A | N/A | 0.80 | - | 2.33 | SPAN 22 BENT 21 131.00 | -
+888: TNAGT5A | 45.000 |  | 2.25 | 101.250 | 1.40 | - | 3.35 | SPAN 19 BENT 18 | 97.00 | - | 3.69 | SPAN 20 BENT 19 289.00 | N/A | N/A | N/A | N/A | N/A | N/A | 0.80 | - | 2.25 | SPAN 22 BENT 21 131.00 | -
+915: TNAGT5B | 45.000 |  | 2.25 | 101.250 | 1.40 | - | 3.34 | SPAN 19 BENT 18 | 97.00 | - | 3.67 | SPAN 20 BENT 19 289.00 | N/A | N/A | N/A | N/A | N/A | N/A | 0.80 | - | 2.25 | SPAN 22 BENT 21 131.00 | -
+942: TNAGRIT3 | 33.000 |  | 2.03 | 66.990 | 1.40 | FEM | 3.23 | N/A | 1 | N/A | N/A | N/A | N/A | N/A | N/A | 1.00 | FEM | 2.03 | N/A | 1 | N/A | N/A | N/A | N/A | N/A | N/A | N/A | -
+969: TNT4A | 33.075 |  | 1.71 | 56.558 | 1.40 | FEM | 2.73 | N/A | 1 | N/A | N/A | N/A | N/A | N/A | N/A | 1.00 | FEM | 1.71 | N/A | 1 | N/A | N/A | N/A | N/A | N/A | N/A | N/A | -
+996: TNT6A | 41.600 |  | 1.58 | 65.728 | 1.40 | FEM | 2.53 | N/A | 1 | N/A | N/A | N/A | N/A | N/A | N/A | 1.00 | FEM | 1.58 | N/A | 1 | N/A | N/A | N/A | N/A | N/A | N/A | N/A | -
+1023: TNT7A | 42.000 |  | 1.54 | 64.680 | 1.40 | FEM | 2.46 | N/A | 1 | N/A | N/A | N/A | N/A | N/A | N/A | 1.00 | FEM | 1.54 | N/A | 1 | N/A | N/A | N/A | N/A | N/A | N/A | N/A | -
+1050: TNT7B | 42.000 |  | 2.33 | 97.860 | 1.40 | FEM | 3.70 | N/A | 1 | N/A | N/A | N/A | N/A | N/A | N/A | 1.00 | FEM | 2.33 | N/A | 1 | N/A | N/A | N/A | N/A | N/A | N/A | N/A | -
+1077: TNAGRIT4 | 43.000 |  | 1.69 | 72.670 | 1.40 | FEM | 2.70 | N/A | 1 | N/A | N/A | N/A | N/A | N/A | N/A | 1.00 | FEM | 1.69 | N/A | 1 | N/A | N/A | N/A | N/A | N/A | N/A | N/A | -
+1104: TNAGT5A | 45.000 |  | 1.67 | 75.150 | 1.40 | FEM | 2.66 | N/A | 1 | N/A | N/A | N/A | N/A | N/A | N/A | 1.00 | FEM | 1.67 | N/A | 1 | N/A | N/A | N/A | N/A | N/A | N/A | N/A | -
+1131: TNAGT5B | 45.000 |  | 1.60 | 72.000 | 1.40 | FEM | 2.56 | N/A | 1 | N/A | N/A | N/A | N/A | N/A | N/A | 1.00 | FEM | 1.60 | N/A | 1 | N/A | N/A | N/A | N/A | N/A | N/A | N/A | -
+1161: PROJECT NO. B-2500 (PHASE I)
+1197: DARE | COUNTY
+1228: NOTE
+1233: STATION: | 102+67.76  -L-
+1257: FOR NOTES AND OTHER DETAILS, SEE SHEET 1 OF 2.
+1272: SHEET 2 OF 2
+1304: STATE OF NORTH CAROLINA
+1317: DEPARTMENT OF TRANSPORTATION
+1336: RALEIGH
+1353: C A
+1370: S S
+1374: LRFR SUMMARY
+1401: NAVIGATION UNIT
+1446: I C
+1489: REVISIONS
+1497: NO.
+1526: DRAWN BY : | DATE :
+1538: P. WALKER | 9/17/12 | 2 | 4

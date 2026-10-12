@@ -1,0 +1,59 @@
+# PDF p.373 sheet S3-125: SUBSTRUCTURE PRECAST BENT CAP DETAILS - BENT 29
+# decoded text layer, rows grouped by y (top to bottom), cells separated by ' | '. Fractions decoded from font glyphs (calibrated on raster). Drawing geometry is NOT in this text.
+305: 43'-6"
+335: 21'-9" | 21'-9"
+366: 17 PAIRS #6S1 AND #6S2 STIRRUPS | 10-#6S1 AND #6S2 | 17 PAIRS #6S1 AND #6S2 STIRRUPS
+382: 1'-0" | STIRRUPS | 
+399: 6" | 1'-10" | 4 SPA. | 9" 9" | 6 SPA. | 2'-0" |  |  | 11" 9" 9" 9" 3 SPA. 9" 11" 11" 11" 11" 11" 2'-0" | 6 SPA. | 9" 10" | 3 SPA. | 10" 1'-6" | 6"
+417:  | AT 1'-0" |   | AT 11 1/2" |  |  |  |  |    | AT 8"  |  |  |  |  |  |  | AT 1'-0"  |  |  | AT 1'-0" |  | 
+435: { CAP
+460: C | F | A | B
+481: (SH       ) S3-127 | (SH       ) S3-126 | (SH       ) S3-127 | (SH       ) S3-127
+558: #6B4 BAR
+571: (SH       ) S3-127 | 14'-0" LONG (TYP.)
+577: #6B3 BAR
+590: D | D | 19'-0" LONG
+602: D | D
+608: (SH       ) S3-127
+721: #6B6 BAR 8'-0" LONG (TYP.) | #6B5 BAR
+734: 4'-0" LONG (TYP.)
+747: BENT 29
+751: CONDUIT *
+760: CONTROL
+773: LINE
+800: PT DUCT (TYP.)
+829: E | C | E
+834: (SH       ) S3-126
+840: 6'-4 1/2"
+933: 7'-3" | 7'-3"
+942: F | 2-#6U18 BARS
+949:  | A |  | B
+985: 10'-3" | 3 SPA. 1'-7 1/2" | 10" 10" 1'-1" | 4 SPA. | 1'-1" 10" 10" | 1'-7 1/2" | 3 SPA. | 10'-3"
+1002:  | AT 1'-0" | AT 11 1/2" | AT 1'-0" | 
+1018: 1'-0" 9 1/2" | 9 1/2" | 1'-0"
+1037: 5" | 23-#6U12 OR U13 BOTTOM BARS | 5"
+1076: 11'-6" | 11'-6"
+1097: * = CONDUIT FOR BOX GIRDER LIGHTING SYSTEM
+1110: GROUNDING CONDUCTOR (SEE NOTE 6 ON SHEET
+1117: 23'-0"
+1123: 1 OF 5). COORDINATE POSITION OF CONDUIT
+1136: IN PRECAST BENT CAP WITH POSITION OF
+1149: CONDUIT IN PRECAST COLUMN SEGMENTS. | B-2500 (PHASE I)
+1155: PROJECT NO.
+1183: PLAN OF BOTTOM REINFORCING STEEL
+1188: DARE | COUNTY
+1224: STATION: | 102+67.76  -L-
+1264: SHEET 3 OF 5
+1296: STATE OF NORTH CAROLINA
+1309: DEPARTMENT OF TRANSPORTATION
+1327: RALEIGH
+1345: C A
+1352: SUBSTRUCTURE
+1361: S S
+1379: PRECAST BENT
+1406: CAP DETAILS
+1438: I C
+1481: REVISIONS
+1489: NO.
+1518: DRAWN BY : | DATE :
+1529: R. EATON | 8/24/12 | 2 | 4

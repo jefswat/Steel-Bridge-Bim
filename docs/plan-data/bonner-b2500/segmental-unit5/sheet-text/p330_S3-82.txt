@@ -1,0 +1,42 @@
+# PDF p.330 sheet S3-82: RAIL POST SPACING FOR UNIT 5
+# decoded text layer, rows grouped by y (top to bottom), cells separated by ' | '. Fractions decoded from font glyphs (calibrated on raster). Drawing geometry is NOT in this text.
+296: 350'-6 3/4" ARC/TAN. ALONG EDGE OF DECK
+320: 25'-3 3/8" | 10 SPA @ 30'-0" = 300'-0" | 25'-3 3/8"
+344: 4 SPA. @ | 51 SPA. @ 6'-0" = 306'-0" | 4 SPA. @ | 1'-7 3/8"
+349: 1'-7 3/8"
+360: 5'-2" = 20'-8" | 5'-2" = 20'-8"
+389: {  1/2" EXP. JT.
+402: MATL. (TYP.)
+505: 1'-2" CONCRETE PARAPET
+516: GUTTER LINE | BENT 23
+524: SPAN 23
+532: CONTROL LINE
+541: PT STA. 70+69.43 -L-
+563: W.P. #23 | -L-
+609: W.P. #24
+635: BENT 22
+648: CONTROL LINE
+657: GUTTER LINE
+667: 1'-2" CONCRETE PARAPET
+788: 3 SPA. @ | 51 SPA. @ 6'-0" = 306'-0" | 3 SPA. @ | 2'-11 5/8"
+794: 2'-11 5/8"
+804: 6'-3" = 18'-9" | 6'-3" = 18'-9"
+836: 24'-8 5/8" | 10 SPA @ 30'-0" = 300'-0" | 24'-8 5/8"
+860: 349'-5 1/4" ARC/TAN. ALONG EDGE OF DECK
+1014: PARTIAL PLAN OF RAIL POST SPACING
+1147: PROJECT NO. B-2500 (PHASE I)
+1183: DARE | COUNTY
+1219: STATION: | 102+67.76  -L-
+1258: SHEET 3 OF 4
+1290: STATE OF NORTH CAROLINA
+1303: DEPARTMENT OF TRANSPORTATION
+1322: RALEIGH
+1339: C A
+1356: S S
+1360: RAIL POST SPACING
+1387: FOR 2 BAR METAL RAIL
+1414: I N | UNIT 5
+1475: REVISIONS
+1483: NO.
+1512: DRAWN BY : | DATE :
+1524: K.  TURNER | 08/12 | 2 | 4
