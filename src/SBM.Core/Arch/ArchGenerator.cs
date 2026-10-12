@@ -135,7 +135,7 @@ public static partial class ArchGenerator
             double diff = model - plan;
             bool ok = Math.Abs(diff) <= tol;
             Model.Checks.Add(new ArchCheck(item, fmt(plan), fmt(model), diff, ok, note));
-            if (!ok) Warn($"Arch CHECK {item}: plan {fmt(plan)}, model {fmt(model)} (difference {L(diff)}){(note == "" ? "" : " - " + note)}.");
+            if (!ok) Warn($"Arch CHECK {item}: plan {fmt(plan)}, model {fmt(model)} (difference {fmt(diff)}){(note == "" ? "" : " - " + note)}.");
         }
 
         // ------------------------------------------------------------------ frame
@@ -942,10 +942,15 @@ public static partial class ArchGenerator
                 double s = Vec3.Cross(ax, od).Length;
                 return s < 1e-6 ? 0 : (w.FlangeWidth / 2 + gap) / s;
             }
+            var axesLocal = new Dictionary<string, (Vec3 a, Vec3 b)>(StringComparer.OrdinalIgnoreCase);
+            foreach (var br in _d.Bracing)
+                if (P(br.From) is { } pa && P(br.To) is { } pb) axesLocal[br.Name] = (pa, pb);
+            if (_d.BracingConnections.Count > 0) PlanBracingConnections(w, axesLocal);
             foreach (var br in _d.Bracing)
             {
                 if (P(br.From) is not { } a || P(br.To) is not { } b) continue;
                 var wa = W(a); var wb = W(b);
+                bool endA = _braceEnds.TryGetValue((br.Name, true), out var ea), endB = _braceEnds.TryGetValue((br.Name, false), out var eb);
                 if (br.Via.Length > 0 && P(br.Via) is { } via)
                 {
                     var wv = W(via); var dd = (wb - wa).Normalized();
@@ -955,14 +960,44 @@ public static partial class ArchGenerator
                 var ax0 = (wb - wa).Normalized();
                 if (br.TrimStartAt.Length > 0) wa += ax0 * Trim(ax0, br.TrimStartAt, br.TrimGap);
                 if (br.TrimEndAt.Length > 0) wb -= ax0 * Trim(ax0, br.TrimEndAt, br.TrimGap);
+                // gusset connections: the member ends where the brace is drawn under the gusset (p.129-140)
+                // gusset connections: each flange ends where the brace is drawn under its gusset (p.129-140) -> skewed end planes
                 var ax = (wb - wa).Normalized();
-                var m = (_fr.Z - ax * Vec3.Dot(ax, _fr.Z)).Normalized();
+                double kA = 0, kB = 0;
+                if (endA) { wa = W(P(br.From)!.Value) + ax * ((ea.Top + ea.Bottom) / 2); kA = (ea.Top - ea.Bottom) / w.Depth; }
+                if (endB) { wb = W(P(br.To)!.Value) - ax * ((eb.Top + eb.Bottom) / 2); kB = -(eb.Top - eb.Bottom) / w.Depth; }
+                ax = (wb - wa).Normalized();
+                var m = MemberWeb(br.Name, ax);
+                _memberWeb[br.Name] = m;
                 var v = Vec3.Cross(ax, m).Normalized();
                 var mesh = new Mesh();
-                RolledBuilder.AddExtrusion(mesh, sec, wa, m, v, ax, 0, (wb - wa).Length);
-                AddPart(br.Name, PartCategory.ArchBracing, "UPPER-BRACING", $"{w.Name} {br.From}-{br.To}", mesh, _d.BracingMaterial, (wb - wa).Length, w.WeightPerFootLb, asu);
+                double len = (wb - wa).Length;
+                var ringA = sec.Select(q => wa + m * q.X + v * q.Y + ax * (kA * q.X)).ToArray();
+                var ringB = sec.Select(q => wa + m * q.X + v * q.Y + ax * (len + kB * q.X)).ToArray();
+                MeshBuilder.AddLoft(mesh, sec, new[] { ringA, ringB });
+                bool atU = _d.BracingConnections.Any(cc => cc.Point.Equals(br.From, StringComparison.OrdinalIgnoreCase) || cc.Point.Equals(br.To, StringComparison.OrdinalIgnoreCase));
+                AddPart(br.Name, PartCategory.ArchBracing, "UPPER-BRACING", $"{w.Name} {br.From}-{br.To}", mesh, _d.BracingMaterial, len, w.WeightPerFootLb,
+                    atU && (endA || endB) ? null : asu);
             }
             foreach (var cr in _d.BracingCrossings) BraceCrossing(cr, w, axes);
+            foreach (var a in _connectionParts) a();
+        }
+
+        private readonly Dictionary<string, Vec3> _memberWeb = new(StringComparer.OrdinalIgnoreCase);
+
+        /// <summary>Web direction (world) of a bracing member: from its gusset connections (p.129-140, members rolled so the gussets follow the
+        /// rib; mean of both ends, the difference is a CHECK), else web along the local Z axis (p.128 typical section).</summary>
+        private Vec3 MemberWeb(string name, Vec3 ax)
+        {
+            Vec3 Perp(Vec3 x) { var r = (x - ax * Vec3.Dot(x, ax)).Normalized(); return Vec3.Dot(r, _fr.Z) < 0 ? -r : r; }
+            var ends = new List<Vec3>();
+            foreach (bool f in new[] { true, false })
+                if (_braceWeb.TryGetValue((name, f), out var wl)) ends.Add(Perp(Wd(wl)));
+            if (ends.Count == 0) return Perp(_fr.Z);
+            if (ends.Count == 2)
+                Check($"bracing {name}: roll at its two gusset ends", 0, Math.Acos(Math.Min(1, Vec3.Dot(ends[0], ends[1]))) * 180 / Math.PI, 0.5, x => $"{x:F3} deg",
+                    "p.129-140: web normal to (brace, gusset welded edge) at each end; a straight W shape has one roll - the mean is modeled");
+            return Perp(ends.Aggregate(Vec3.Zero, (a, b) => a + b));
         }
 
         /// <summary>Crossing splice plates (top / bottom) along the spliced member over the continuous one, holes and bolts (p.141 / 142).</summary>
@@ -971,12 +1006,14 @@ public static partial class ArchGenerator
             if (!axes.TryGetValue(cr.Continuous, out var co) || !axes.TryGetValue(cr.PieceA, out var pa) || !axes.TryGetValue(cr.PieceB, out var pb) || P(cr.Point) is not { } cp) return;
             var c0 = W(cp);
             var sd = ((pa.b - pa.a).Normalized() + (pb.b - pb.a).Normalized()).Normalized();   // spliced member direction (mean of the two pieces)
-            var m = (_fr.Z - sd * Vec3.Dot(sd, _fr.Z)).Normalized();
+            var mPieces = _memberWeb.TryGetValue(cr.PieceA, out var ma) && _memberWeb.TryGetValue(cr.PieceB, out var mb2) ? ma + mb2 : _fr.Z;
+            var m = (mPieces - sd * Vec3.Dot(sd, mPieces)).Normalized();
             var v = Vec3.Cross(sd, m).Normalized();
             var cd = (co.b - co.a).Normalized();
             var c2 = new Vec2(Vec3.Dot(cd, sd), Vec3.Dot(cd, v)).Normalized();
             double angModel = Math.Acos(Math.Min(1, Math.Abs(c2.X))) * 180 / Math.PI;   // acute angle between the members in the plate plane
-            var mc = (_fr.Z - cd * Vec3.Dot(cd, _fr.Z)).Normalized(); var vc = Vec3.Cross(cd, mc).Normalized();
+            var mcs = _memberWeb.TryGetValue(cr.Continuous, out var mco) ? mco : _fr.Z;
+            var mc = (mcs - cd * Vec3.Dot(cd, mcs)).Normalized(); var vc = Vec3.Cross(cd, mc).Normalized();
             var s2 = new Vec2(Vec3.Dot(sd, cd), Vec3.Dot(sd, vc)).Normalized();
             double angCont = Math.Acos(Math.Min(1, Math.Abs(s2.X))) * 180 / Math.PI;
             double ang3d = Math.Acos(Math.Min(1, Math.Abs(Vec3.Dot(sd, cd)))) * 180 / Math.PI;

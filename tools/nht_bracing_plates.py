@@ -226,7 +226,7 @@ def signed_r(s):
     a, b, c, r, m = s[1], s[2], s[3], s[4], s[5]
     # orientation of (a, m, b) in pdf (y down) coordinates; y flip reverses it
     cr = (m[0] - a[0]) * (b[1] - a[1]) - (m[1] - a[1]) * (b[0] - a[0])
-    return r / PT_IN * (1 if cr > 0 else -1)
+    return r / PT_IN * (-1 if cr > 0 else 1)
 
 
 def area(loop):
@@ -355,16 +355,16 @@ def collinear(a, b, c, tol=0.12):
     return abs((b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0])) / max(1e-9, math.dist(a, c)) < tol
 
 
-def clean(loop, rmax_in=200.0):
+def clean(loop, rmax_in=200.0, keep=()):
     """Arcs flatter than rmax -> lines; merge collinear lines and pieces of the same circle."""
     out = []
     for s in loop:
         if s[0] == 'A' and s[4] / PT_IN > rmax_in: s = ('L', s[1], s[2])
         if out:
             p = out[-1]
-            if p[0] == 'L' and s[0] == 'L' and collinear(p[1], p[2], s[2]):
+            if p[0] == 'L' and s[0] == 'L' and collinear(p[1], p[2], s[2]) and not any(math.dist(s[1], k) < 0.2 for k in keep):
                 out[-1] = ('L', p[1], s[2]); continue
-            if p[0] == 'A' and s[0] == 'A' and abs(p[4] - s[4]) / p[4] < 0.05 and math.dist(p[3], s[3]) < 0.05 * p[4] and (signed_r(p) > 0) == (signed_r(s) > 0):
+            if p[0] == 'A' and s[0] == 'A' and abs(p[4] - s[4]) < 0.5 and math.dist(p[3], s[3]) < 0.5 and (signed_r(p) > 0) == (signed_r(s) > 0)                     and not any(math.dist(s[1], k) < 0.2 for k in keep):
                 c3 = v.circle3(p[1], p[2], s[2])
                 if c3: out[-1] = ('A', p[1], s[2], c3[0], c3[1], p[2]); continue
         out.append(s)
@@ -387,8 +387,8 @@ def run(root):
         if len(G) != 2:
             print(f'U{det} p.{page}: {len(G)} gussets found'); continue
         for name, g in zip(('G-TOP', 'G-BOT'), G):
-            loop = clean(g['loop'])
-            if area(loop) < 0: loop = [rev(s) for s in reversed(loop)]
+            loop = clean(g['loop'], keep=(g['chord'][1], g['chord'][2]) if g['chord'] else ())
+            if area(loop) > 0: loop = [rev(s) for s in reversed(loop)]     # counter-clockwise once y is flipped
             ymin = min(s[1][1] for s in loop)
             if g['chord']:
                 top = min((g['chord'][1], g['chord'][2]), key=lambda q: q[1])
@@ -401,6 +401,16 @@ def run(root):
             for i, s in enumerate(loop):
                 x, y = X(s[1])
                 rows.append((f'U{det}', name, 'V', i, x, y, signed_r(s) if s[0] == 'A' else 0.0, 1 if i in weld else 0, 0, f'p.{page}'))
+                if s[0] == 'A':   # self-check: the arc rebuilt from (start, end, signed radius) passes through the drawn mid point
+                    pa, pb, rr = X(s[1]), X(s[2]), signed_r(s)
+                    mx, my = (pa[0] + pb[0]) / 2, (pa[1] + pb[1]) / 2
+                    ch = math.dist(pa, pb); hh = math.sqrt(max(0, rr * rr - ch * ch / 4))
+                    lx, ly = -(pb[1] - pa[1]) / ch, (pb[0] - pa[0]) / ch
+                    cx, cy = mx + lx * (hh if rr > 0 else -hh), my + ly * (hh if rr > 0 else -hh)
+                    q = X(s[5])
+                    dm = abs(math.dist((cx, cy), q) - abs(rr))
+                    side = ((pb[0] - pa[0]) * (q[1] - pa[1]) - (pb[1] - pa[1]) * (q[0] - pa[0])) * rr   # minor arc point: right of the chord for CCW
+                    if dm > 0.06 or side > 0: print(f'U{det} {name} arc {i}: drawn arc point {dm:.3f} in off the rebuilt arc (side {side:.3f})')
             for i, (c, r) in enumerate(sorted(g['holes'])):
                 x, y = X(c); rows.append((f'U{det}', name, 'H', i, x, y, 2 * r / PT_IN, 0, 0, f'p.{page}'))
             if g['chord']:
@@ -428,7 +438,7 @@ def run(root):
             rows.append((f'U{det}', 'AA', 'EDGE', k, 0.0, AX((wp[0], A['yat'](e, wp[0])))[1], 0.0, 0, 0, f'p.{page}'))
         for name, c in zip(('CP-TOP', 'CP-BOT'), cps):
             lp = c['loop']
-            if area(lp) < 0: lp = [rev(s) for s in reversed(lp)]
+            if area(lp) > 0: lp = [rev(s) for s in reversed(lp)]
             for i, s in enumerate(lp):
                 x, y = AX(s[1]); rows.append((f'U{det}', name, 'V', i, x, y, 0.0, 0, 0, f'p.{page}'))
             for i, (cc, r) in enumerate(sorted(c['holes'])):

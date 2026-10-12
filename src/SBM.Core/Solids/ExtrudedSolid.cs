@@ -15,6 +15,9 @@ public sealed class ExtrudedSolid
     public required Vec2[] Outline { get; init; }
     public required Hole[] Holes { get; init; }
     public required Vec3 Extrusion { get; init; }
+    /// <summary>Exact outline with true arcs (OPTIONAL, same frame as <see cref="Outline"/>, counter-clockwise); <see cref="Outline"/> is then its
+    /// tessellation. IFC writes it as an IfcIndexedPolyCurve with IfcArcIndex segments.</summary>
+    public ArcPolygon? ExactOutline { get; init; }
 
     /// <summary>Fit tolerance (m): points may be off the profile plane / off the common sweep by this much.</summary>
     public const double Tolerance = 5e-4;

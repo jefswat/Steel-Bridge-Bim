@@ -27,6 +27,8 @@ public sealed class ArchDefinition
     /// <summary>AISC section of the bracing members (exact name, e.g. "W8x28").</summary>
     public string BracingSection { get; set; } = "W8x28";
     public string BracingMaterial { get; set; } = "ASTM A709 Gr. 50";
+    /// <summary>Gusset connections of the bracing at the rib panel points (OPTIONAL, p.129-140): members end at the drawn brace ends.</summary>
+    public List<ArchBracingConnection> BracingConnections { get; set; } = new();
     /// <summary>Plan item the bracing web orientation is not given by (UNRESOLVED text; empty = given).</summary>
     public string BracingOrientationUnresolved { get; set; } = "";
     public List<ArchKnuckleDefinition> Knuckles { get; set; } = new();
@@ -436,6 +438,90 @@ public sealed class ArchBraceCrossing
     public double Gage { get; set; } = In(4);
     public double EdgeToContinuousFlange { get; set; } = In(1.75);
     public string Unresolved { get; set; } = "";
+}
+
+/// <summary>Outline vertex of a drawn plate (plate drawing coordinates, m). <see cref="Radius"/> describes the edge to the NEXT vertex: 0 = straight,
+/// otherwise a true circular (minor) arc, + counter-clockwise / - clockwise. <see cref="Weld"/> marks the edge welded to the connection plate.</summary>
+public sealed class ArchOutlinePoint
+{
+    public double X { get; set; }
+    public double Y { get; set; }
+    public double Radius { get; set; }
+    public bool Weld { get; set; }
+    public ArchOutlinePoint() { }
+    public ArchOutlinePoint(double x, double y, double radius = 0, bool weld = false) { X = x; Y = y; Radius = radius; Weld = weld; }
+}
+
+/// <summary>A plate as drawn in one view (outline with arcs, round holes), in that view's 2D coordinates (m).</summary>
+public sealed class ArchPlateDrawing
+{
+    public List<ArchOutlinePoint> Outline { get; set; } = new();
+    /// <summary>Hole centres (X, Y); diameter = the bolt hole of the model.</summary>
+    public List<ArchPoint> Holes { get; set; } = new();
+}
+
+/// <summary>Brace drawn under a gusset (dashed W shape in the plate view): a point of the brace web centre line at the brace END, and the
+/// unit direction of the centre line from the end INTO the brace (drawing coordinates).</summary>
+public sealed class ArchGussetLeg
+{
+    public double EndX { get; set; }
+    public double EndY { get; set; }
+    public double DirX { get; set; }
+    public double DirY { get; set; }
+}
+
+/// <summary>Gusset plate of a bracing connection in its own plane ("in plane of plate" view, flat pattern): outline with true arcs, holes, the
+/// bend line (OPTIONAL: two outline vertices; the plate is bent there, each side lies on its own brace flange) and the braces drawn under it.</summary>
+public sealed class ArchGussetPlate
+{
+    public ArchPlateDrawing Plate { get; set; } = new();
+    public ArchPoint? BendA { get; set; }
+    public ArchPoint? BendB { get; set; }
+    public List<ArchGussetLeg> Legs { get; set; } = new();
+}
+
+/// <summary>
+/// Upper lateral bracing connection at a rib panel point (plan p.129-140; one sheet per U(n) / U(n)' pair, drawn for U(n)', U(n) = the 180 deg
+/// rotation about local Z). Top and bottom 7/8" GUSSETS lie on the outside faces of the brace flanges (one leg per brace, bent at the bend line
+/// when two braces meet) and are welded to 7/8" CONNECTION PLATES bolted to the outside face of the rib flange facing the bracing; 1" STIFFENERS
+/// between the rib flanges behind them. Placement: each gusset leg is placed by its brace (drawn brace centre line on the brace axis, the
+/// welded edge on the connection plate face; the contact face on the brace flange); the connection plates and stiffeners by VIEW A-A
+/// (origin = the WP, x along the rib, y radial outward, seen from the bracing). Every plan-vs-plan difference is a CHECK, never adjusted.
+/// </summary>
+public sealed class ArchBracingConnection
+{
+    public string Name { get; set; } = "";
+    /// <summary>Work point (named point, e.g. "U5'").</summary>
+    public string Point { get; set; } = "";
+    public string Rib { get; set; } = "";
+    /// <summary>Plan reference (sheet / page) printed in checks.</summary>
+    public string Source { get; set; } = "";
+    public ArchGussetPlate? TopGusset { get; set; }
+    public ArchGussetPlate? BottomGusset { get; set; }
+    /// <summary>VIEW A-A plates (origin WP, x along the rib, y radial outward, m).</summary>
+    public ArchPlateDrawing? TopConnectionPlate { get; set; }
+    public ArchPlateDrawing? BottomConnectionPlate { get; set; }
+    /// <summary>VIEW A-A stiffener rectangles (x along the rib = thickness, y radial = width), m.</summary>
+    public List<ArchPlateDrawing> Stiffeners { get; set; } = new();
+    /// <summary>VIEW A-A: radial position of the rib web centre line relative to the WP (check; NaN = not given).</summary>
+    public double WebAxisY { get; set; } = double.NaN;
+    /// <summary>Plan: CL rib to the WP across the rib (B-B 8 1/4", check; NaN = not given).</summary>
+    public double CheckWpFromRibCl { get; set; } = double.NaN;
+    /// <summary>Plan: VIEW A-A angles of the welded edges / bolt lines to the rib axis (deg, checks).</summary>
+    public List<double> CheckWeldAnglesDeg { get; set; } = new();
+    /// <summary>Plan: gusset edge 1" inside the connection plate edge (D-D / H-H, check; NaN = not given).</summary>
+    public double CheckGussetFromPlateEdge { get; set; } = double.NaN;
+    public double GussetThickness { get; set; } = In(0.875);
+    public double ConnectionPlateThickness { get; set; } = In(0.875);
+    public double StiffenerThickness { get; set; } = In(1);
+    /// <summary>Stiffener corner clips at the web-flange junctions (B-B 1 1/2").</summary>
+    public double StiffenerClip { get; set; } = In(1.5);
+    public string Material { get; set; } = "ASTM A709 Gr. 50";
+    /// <summary>Stiffeners are rib plates (p.127 quantity note: rib incl. stiffener plates).</summary>
+    public string StiffenerMaterial { get; set; } = "ASTM A709 Gr. 50-T1";
+    /// <summary>Items of this connection that are not dimensioned (UNRESOLVED texts; the parts they affect are flagged).</summary>
+    public string BraceEndUnresolved { get; set; } = "";
+    public string StiffenerUnresolved { get; set; } = "";
 }
 
 /// <summary>Knuckle / end floorbeam (simplified): end flange plate under the end line, end web on it, deck plate between the end line and the first
