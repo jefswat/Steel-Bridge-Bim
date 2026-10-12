@@ -74,9 +74,33 @@ public static partial class ArchGenerator
             double half = k.EndLength / 2, o0 = -k.EndWebOffset, zef = k.EndFlangeBottomZ + k.EndFlangeThickness;
             // End flange.
             var fl = new Mesh();
+            var cuts = !double.IsNaN(kd.SpliceHalfWidth) && k.Corners.Count == 2 ? k.Corners.Select(CornerChord).ToList() : null;
+            if (cuts != null && cuts.All(x => x != null))
+            {
+                // p.124 partial plan: the end flange's outer ends are cut PARALLEL TO THE CHORD, flush with the splice plate side (+SpliceHalfWidth outward
+                // of the T point), not square to the end line.
+                var pts = new List<Vec2>();
+                double cnA = 0;
+                foreach (var (dn, first) in new[] { (o0, true), (o0 + k.EndFlangeWidth, false) })
+                    foreach (var cc in first ? cuts : Enumerable.Reverse(cuts))
+                    {
+                        var (t0, c2, o2) = cc!.Value;
+                        var q = t0 + o2 * kd.SpliceHalfWidth;                 // a point of the cut line (parallel to c2)
+                        double cn = Vec2.Dot(c2, el.n); cnA = cn;
+                        pts.Add(q + c2 * ((dn - Vec2.Dot(q - el.a, el.n)) / cn));
+                    }
+                var poly = Ccw(pts);
+                PlateBuilder.AddPrism(fl, poly, Array.Empty<Hole>(), (x, y, z) => W(new Vec3(x, y, z)), _ => k.EndFlangeBottomZ, _ => zef);
+                double lenW = Vec2.Distance(pts[0], pts[1]), lenE = Vec2.Distance(pts[2], pts[3]);
+                AddPart($"{asm}-EF", PartCategory.KnucklePlate, asm, $"PL {L(k.EndFlangeThickness)} x {L(k.EndFlangeWidth)} end flange, {L(lenW)} at the end web / {L(lenE)} at the edge, ends cut parallel to the chords {L(kd.SpliceHalfWidth)} outside the T points (p.124 plan)", fl, k.Material, Math.Max(lenW, lenE));
+                Info($"Arch knuckle {k.Name}: end flange ends parallel to the chords (p.124 plan, flush with the splice plate sides) instead of {L(k.EndLength)} square to the end line.");
+            }
+            else
+            {
             RolledBuilder.AddExtrusion(fl, new[] { new Vec2(o0, k.EndFlangeBottomZ), new Vec2(o0 + k.EndFlangeWidth, k.EndFlangeBottomZ), new Vec2(o0 + k.EndFlangeWidth, zef), new Vec2(o0, zef) },
                 org, en, _fr.Z, et, -half, half);
             AddPart($"{asm}-EF", PartCategory.KnucklePlate, asm, $"PL {L(k.EndFlangeThickness)} x {L(k.EndFlangeWidth)} x {L(k.EndLength)} end flange (p.124)", fl, k.Material, k.EndLength);
+            }
             // End web with PT openings (obround) and studs on the inside face.
             double hEnd = !double.IsNaN(k.EndWebHeightAtEnds) ? k.EndWebHeightAtEnds : k.EndWebScaledHeightAtEnds;
             if (!double.IsNaN(hEnd))
@@ -290,6 +314,10 @@ public static partial class ArchGenerator
                 // Fill under the tie flange (tie side of the joint) and the 1" plate under the end flange that splices it to the tie, bearing / jack plates.
                 double hwF = tdef.FlangeWidth / 2;
                 var asu = kd.SpliceUnresolved.Length > 0 ? Assumption.UnresolvedDimension(kd.SpliceUnresolved, $"splice plate from the end web to {L(kd.SplicePlateLength / 2)} past the joint, {L(tdef.FlangeWidth)} wide; bolts not modeled") : null;
+                if (!double.IsNaN(kd.SpliceHalfWidth) && !double.IsNaN(kd.SpliceBeyondJoint))
+                    SpliceFromPlan(k, kd, c, el, T, cIn, cm, asm, mat, g2, asu);
+                else
+                {
                 var mf = new Mesh();
                 PlateBuilder.AddPrism(mf, Ccw(ClippedRect(sj + g2, sj + kd.SplicePlateLength / 2, -hwF, hwF, 0)), Array.Empty<Hole>(), (s, lat, z) => TieMap(s, z, lat), _ => -kd.FillThickness, _ => 0);
                 AddPart($"{cm}-FI", PartCategory.KnucklePlate, asm, $"PL {L(kd.FillThickness)} fill under the tie flange at {c.Point} (p.124 A-A)", mf, mat, kd.SplicePlateLength / 2, 0, asu);
@@ -299,6 +327,7 @@ public static partial class ArchGenerator
                 PlateBuilder.AddPrism(ms, Ccw(ClippedRect(sStart, sj + kd.SplicePlateLength / 2, -hwF, hwF, 0)), Array.Empty<Hole>(), (s, lat, z) => TieMap(s, z, lat),
                     _ => k.EndFlangeBottomZ - kd.SplicePlateThickness, _ => k.EndFlangeBottomZ);
                 AddPart($"{cm}-SP", PartCategory.KnucklePlate, asm, $"PL {L(kd.SplicePlateThickness)} splice / bearing plate under the end flange at {c.Point} (p.124 A-A)", ms, mat, sj + kd.SplicePlateLength / 2 - sStart, 0, asu);
+                }
                 // Jack cheese plates (CL bearing BearingFromSpringing into the span; jacks +- JackFromBearing along the chord).
                 var asuC = kd.CheeseUnresolved.Length > 0 ? Assumption.UnresolvedDimension(kd.CheeseUnresolved, $"{L(kd.CheeseLength)} x {L(kd.CheeseWidth)} scaled") : null;
                 var mc = new Mesh();
@@ -310,6 +339,79 @@ public static partial class ArchGenerator
                 }
                 AddPart($"{cm}-CH", PartCategory.KnucklePlate, asm, $"2 - PL {L(kd.CheeseThickness)} jack cheese plates at {c.Point} (jacks {L(kd.JackFromBearing)} each side of CL bearing, p.124 A-A)", mc, mat, kd.CheeseLength, 0, asuC);
             }
+        }
+            /// <summary>
+        /// The 1" splice plate under the end flange (and the 1 1/8" fill under the tie flange) as drawn in plan (p.124 partial plan, dashed
+        /// "1\" SPLICE PL AND FILL PL", vector): from the end web outside face to an edge parallel to the joint (end flange edge) SpliceBeyondJoint past
+        /// it, +- SpliceHalfWidth about the chord through the T point, the acute end corner cut. The fill = the same outline past the joint.
+        /// This is the plate the knuckle bears on: the bearing's upper sole plate is under it (p.107 Section A-A).
+        /// </summary>
+        /// <summary>Corner T point (local plan), the tie chord direction from it toward the other end of the same tie, and the outward normal.</summary>
+        private (Vec2 T, Vec2 C, Vec2 O)? CornerChord(ArchKnuckleCorner c)
+        {
+            if (P(c.Point) is not { } t || !_ties.TryGetValue(c.Tie, out var tg)) return null;
+            string other = string.Equals(tg.Def.Start, c.Point, StringComparison.OrdinalIgnoreCase) ? tg.Def.End : tg.Def.Start;
+            if (P(other) is not { } t2) return null;
+            var c2 = (t2.XY - t.XY).Normalized();
+            var o2 = c2.Left; if (o2.Y * t.Y < 0) o2 = -o2;
+            return (t.XY, c2, o2);
+        }
+
+        private void SpliceFromPlan(ArchKnuckleDefinition k, ArchKnuckleDetail kd, ArchKnuckleCorner c, (Vec2 a, Vec2 b, Vec2 t, Vec2 n, Vec2 ctr) el, Vec3 T,
+            Vec3 cIn, string cm, string asm, string mat, double g2, Assumption? asu)
+        {
+            if (CornerChord(c) is not { } cc) return;
+            var (t0, c2, o2) = cc;                                                // T, chord T -> other end of the tie (p.124 "CL T0'-T34' CHORD"), outward
+            double edge = k.EndFlangeWidth - k.EndWebOffset;
+            double cn = Vec2.Dot(c2, el.n);
+            if (Math.Abs(cn) < 0.2) { Warn($"Arch: knuckle {k.Name} corner {c.Point}: chord nearly parallel to the end line - splice plate not built."); return; }
+            double U(double dn, double v) => (dn - Vec2.Dot(t0 + o2 * v - el.a, el.n)) / cn;    // u along the chord where the line Dn = dn meets lateral v
+            Vec2 P(double u, double v) => t0 + c2 * u + o2 * v;
+            double hw = kd.SpliceHalfWidth, dWeb = -k.EndWebOffset, dEnd = edge + kd.SpliceBeyondJoint;
+            var A = P(U(dWeb, hw), hw); var B = P(U(dEnd, hw), hw); var C = P(U(dEnd, -hw), -hw); var D = P(U(dWeb, -hw), -hw);
+            bool acuteOut = U(dEnd, hw) > U(dEnd, -hw);
+            var poly = new List<Vec2> { A };
+            if (acuteOut && kd.SpliceChamferSide > 0) { poly.Add(B - c2 * kd.SpliceChamferSide); poly.Add(B + (C - B).Normalized() * kd.SpliceChamferEnd); } else poly.Add(B);
+            if (!acuteOut && kd.SpliceChamferSide > 0) { poly.Add(C + (B - C).Normalized() * kd.SpliceChamferEnd); poly.Add(C - c2 * kd.SpliceChamferSide); } else poly.Add(C);
+            poly.Add(D);
+            poly = Ccw(poly);
+            // bolt rows (end flange to splice) along the chord
+            var holes = new List<Hole>();
+            var bolt = Model.Steel.Bolt;
+            if (kd.SpliceBoltCount > 0)
+                foreach (double v in new[] { kd.SpliceBoltRowOffset, -kd.SpliceBoltRowOffset })
+                    for (int i = 0; i < kd.SpliceBoltCount; i++)
+                        holes.Add(new Hole(P(U(dWeb, v) + kd.SpliceBoltFirst + i * kd.SpliceBoltPitch, v), bolt.HoleDiameter));
+            Vec3 Map(double x, double y, double z) => W(new Vec3(x, y, z));
+            var ms = new Mesh();
+            PlateBuilder.AddPrism(ms, poly, holes, Map, _ => k.EndFlangeBottomZ - kd.SplicePlateThickness, _ => k.EndFlangeBottomZ);
+            double len = Math.Max(Vec2.Distance(A, B), Vec2.Distance(D, C));
+            AddPart($"{cm}-SP", PartCategory.KnucklePlate, asm, $"PL {L(kd.SplicePlateThickness)} x {L(2 * hw)} splice / bearing plate under the end flange at {c.Point}, end web to {L(kd.SpliceBeyondJoint)} past the joint, acute corner cut {L(kd.SpliceChamferSide)} x {L(kd.SpliceChamferEnd)}, {holes.Count} holes (p.124 plan + A-A / B-B)", ms, mat, len, 0, asu);
+            double grip = k.EndFlangeThickness + kd.SplicePlateThickness;
+            foreach (var h in holes)
+                Model.Steel.Bolts.Add(new BoltInstance { Frame = BoltFrame(Map, h.Center.X, h.Center.Y, k.EndFlangeBottomZ + k.EndFlangeThickness, -1), Grip = grip, Length = bolt.LengthForGrip(grip), Assembly = asm });
+            // fill: the outline past the joint (Dn >= edge + gap / 2)
+            var fill = ClipHalf(poly, p => Vec2.Dot(p - el.a, el.n) - (edge + g2));
+            if (fill.Count >= 3)
+            {
+                var mf = new Mesh();
+                PlateBuilder.AddPrism(mf, Ccw(fill), Array.Empty<Hole>(), Map, _ => -kd.FillThickness, _ => 0);
+                AddPart($"{cm}-FI", PartCategory.KnucklePlate, asm, $"PL {L(kd.FillThickness)} fill under the tie flange at {c.Point}, splice outline past the joint (p.124 plan + A-A)", mf, mat, kd.SpliceBeyondJoint, 0, asu);
+            }
+        }
+
+        /// <summary>Part of a convex / simple polygon where f(p) >= 0 (Sutherland-Hodgman, one half-plane).</summary>
+        private static List<Vec2> ClipHalf(List<Vec2> poly, Func<Vec2, double> f)
+        {
+            var r = new List<Vec2>();
+            for (int i = 0; i < poly.Count; i++)
+            {
+                var a = poly[i]; var b = poly[(i + 1) % poly.Count];
+                double fa = f(a), fb = f(b);
+                if (fa >= 0) r.Add(a);
+                if ((fa >= 0) != (fb >= 0)) r.Add(a + (b - a) * (fa / (fa - fb)));
+            }
+            return r;
         }
     }
 }
