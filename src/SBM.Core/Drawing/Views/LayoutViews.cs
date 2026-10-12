@@ -126,7 +126,7 @@ public static class LayoutViews
             bool lastOne = gi == f.Girders.Count - 1;
             if (!room && !lastOne) continue;
             if (!room && lastOne) continue;
-            d.Text(g.Name, p0 + new Vec2(-d.Paper(0.12), 0) * (developed ? 1 : 0), d.SmallTextH, Rot(staBegin), TextAlign.Right);
+            d.Text(ctx.GirderName(g.Index), p0 + new Vec2(-d.Paper(0.12), 0) * (developed ? 1 : 0), d.SmallTextH, Rot(staBegin), TextAlign.Right);
             lastLabel = p0;
         }
 
@@ -287,9 +287,9 @@ public static class LayoutViews
                 d.Text(tag, new Vec2(sta, pt.Z - sec.WebDepth - d.Paper(0.12)), d.SmallTextH * 0.85, Math.PI / 2, TextAlign.Right);
                 spNotes.Add($"{tag} STA {u.FormatStation(sp.Location.XY == default ? sta : a.Inverse(sp.Location.XY).Station)}");
             }
-            if (spNotes.Count > 0) spliceNote = $"FIELD SPLICES ({g.Name}): " + string.Join(", ", spNotes);
+            if (spNotes.Count > 0) spliceNote = $"FIELD SPLICES ({ctx.GirderName(g.Index)}): " + string.Join(", ", spNotes);
             d.Leader(new Vec2(tf[tf.Count / 4].X, (tf[tf.Count / 4].Y + bfB[bfB.Count / 4].Y) / 2),
-                new Vec2(tf[tf.Count / 4].X + d.Paper(0.4), bfB[bfB.Count / 4].Y - d.Paper(0.45)), $"{g.Name} (BEYOND)");
+                new Vec2(tf[tf.Count / 4].X + d.Paper(0.4), bfB[bfB.Count / 4].Y - d.Paper(0.45)), $"{ctx.GirderName(g.Index)} (BEYOND)");
         }
 
         // ---- supports: CL lines, bearings at the shown girder, substructure

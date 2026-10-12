@@ -98,7 +98,7 @@ public static class AbutmentViews
                 if (ctx.Framing.Supports[unit.SupportIndex].Bearings[gi] is { } br)
                 {
                     double sb = Vec2.Dot(ctx.Framing.Alignment.PointAt(br.Station, br.Offset) - unit.Origin, unit.D);
-                    stepList.Add($"G{gi + 1} {d.Elev(g.StepTop(sb))}");
+                    stepList.Add($"{ctx.GirderName(gi)} {d.Elev(g.StepTop(sb))}");
                 }
         for (int i = 0; i < stepList.Count; i += 5)
             d.Text((i == 0 ? "BEAM STEP TOPS: " : "                ") + string.Join("  ", stepList.Skip(i).Take(5)), new Vec2(Xs(s0), zLow - d.Paper(1.35 + 0.17 * (i / 5))), d.SmallTextH, 0, TextAlign.Left);

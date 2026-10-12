@@ -48,7 +48,18 @@ public sealed record ViewContext(
     Func<Vec2, double?>? Ground,
     UnitSystem Units,
     DrawingOptions Options,
-    Prestressed.PrestressedModel? Prestressed = null);
+    Prestressed.PrestressedModel? Prestressed = null)
+{
+    /// <summary>Sheet name of a girder: its plan name (<see cref="Bridge.GirderLayoutDefinition.PlanNames"/>) when the model has one, else "G1"...</summary>
+    public string GirderName(int girder)
+    {
+        var names = Framing.Definition.Girders.PlanNames;
+        return names != null && girder >= 0 && girder < names.Count && !string.IsNullOrWhiteSpace(names[girder]) ? names[girder] : $"G{girder + 1}";
+    }
+
+    /// <summary>"GIRDER A" with plan names, else "G1" (titles).</summary>
+    public string GirderTitle(int girder) => Framing.Definition.Girders.PlanNames != null ? $"GIRDER {GirderName(girder)}" : GirderName(girder);
+}
 
 /// <summary>One 2D model (view) ready for DXF: drawing in meters, its scale, and whether it is in paper units.</summary>
 public sealed record SheetView(string Name, string FileStem, PlanDrawing Drawing, double Scale, string Description, bool PaperSpace = false);

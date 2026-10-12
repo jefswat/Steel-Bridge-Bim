@@ -136,7 +136,7 @@ public static class GirderViews
         }
         brgS.Sort((x, y) => x.s.CompareTo(y.s));
         for (int i = 1; i < brgS.Count; i++)
-            d.Dim(new Vec2(brgS[i - 1].s, -d.Paper(0.75 + botShift)), new Vec2(brgS[i].s, -d.Paper(0.75 + botShift)), 0, $"{d.Len(brgS[i].s - brgS[i - 1].s)} ALONG {g.Name}");
+            d.Dim(new Vec2(brgS[i - 1].s, -d.Paper(0.75 + botShift)), new Vec2(brgS[i].s, -d.Paper(0.75 + botShift)), 0, $"{d.Len(brgS[i].s - brgS[i - 1].s)} ALONG {ctx.GirderName(gi)}");
 
         // ---- field splices and field sections (with weights from the 3D model)
         var splices = f.Splices.Where(x => x.Girder == gi).Select(x => x.GirderDistance).OrderBy(x => x).ToList();
@@ -162,12 +162,12 @@ public static class GirderViews
             }
             d.Dim(new Vec2(bounds[i - 1], -d.Paper(1.05 + botShift)), new Vec2(bounds[i], -d.Paper(1.05 + botShift)), 0, label);
         }
-        d.Dim(new Vec2(0, H + d.Paper(1.25 + topShift)), new Vec2(L, H + d.Paper(1.25 + topShift)), 0, $"{d.Len(L)} {g.Name} (END TO END, ALONG WEB CL)");
+        d.Dim(new Vec2(0, H + d.Paper(1.25 + topShift)), new Vec2(L, H + d.Paper(1.25 + topShift)), 0, $"{d.Len(L)} {ctx.GirderName(gi)} (END TO END, ALONG WEB CL)");
 
         var box = dwg.Extents();
-        d.Title($"{g.Name} ELEVATION", "Developed along the web CL; depth not to scale. Plate changes at radial lines; stiffeners: solid = bearing, dashed = connection / intermediate.",
+        d.Title($"{ctx.GirderTitle(gi)} ELEVATION" + (ctx.GirderName(gi) != g.Name ? $" ({g.Name})" : ""), "Developed along the web CL; depth not to scale. Plate changes at radial lines; stiffeners: solid = bearing, dashed = connection / intermediate.",
             new Vec2(L / 2, box.MinY - d.Paper(0.3)));
-        return new SheetView($"{g.Name} elevation", $"Girder {g.Name}", dwg, d.Scale, $"{g.Name}: plate sizes and lengths, field sections, bearings, stiffeners, cross frames.");
+        return new SheetView($"{ctx.GirderName(gi)} elevation", $"Girder {g.Name}", dwg, d.Scale, $"{ctx.GirderName(gi)}: plate sizes and lengths, field sections, bearings, stiffeners, cross frames.");
     }
 
     /// <summary>Distance along the girder where it crosses a station (radial line), or null outside the girder.</summary>

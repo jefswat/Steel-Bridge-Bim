@@ -95,7 +95,7 @@ public static class SupportSectionViews
             var seat = seats.Where(x => x.Girder == gi).OrderBy(x => x.Location is { } loc ? Vec2.Distance(loc, w) : 0).FirstOrDefault();
             double z = unit.Abutment?.StepTop?.Invoke(sb) ?? seat?.SeatElevation ?? double.NaN;
             if (double.IsNaN(z)) continue;
-            d.Text($"G{gi + 1}\n{(unit.Abutment?.StepTop != null ? "STEP" : "SEAT")} {d.Elev(z)}", new Vec2(X(sb), zCapBot - d.Paper(0.12)), d.SmallTextH * 0.85, 0, TextAlign.Center);
+            d.Text($"{ctx.GirderName(gi)}\n{(unit.Abutment?.StepTop != null ? "STEP" : "SEAT")} {d.Elev(z)}", new Vec2(X(sb), zCapBot - d.Paper(0.12)), d.SmallTextH * 0.85, 0, TextAlign.Center);
         }
         if (unit.CapBottom.Count > 0)
         {

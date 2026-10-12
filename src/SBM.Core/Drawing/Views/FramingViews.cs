@@ -81,8 +81,8 @@ public static class FramingViews
             ClipPoly(d, SheetLayers.Steel, pts, x0, x1);
             var inside = pts.Where(p => p.X >= x0 && p.X <= x1).ToList();
             if (inside.Count == 0) continue;
-            d.Text(g.Name, inside[0] + new Vec2(-d.Paper(0.1), 0), d.SmallTextH, 0, TextAlign.Right);
-            d.Text(g.Name, inside[^1] + new Vec2(d.Paper(0.1), 0), d.SmallTextH, 0, TextAlign.Left);
+            d.Text(ctx.GirderName(g.Index), inside[0] + new Vec2(-d.Paper(0.1), 0), d.SmallTextH, 0, TextAlign.Right);
+            d.Text(ctx.GirderName(g.Index), inside[^1] + new Vec2(d.Paper(0.1), 0), d.SmallTextH, 0, TextAlign.Left);
         }
 
         // Support lines and bearings.

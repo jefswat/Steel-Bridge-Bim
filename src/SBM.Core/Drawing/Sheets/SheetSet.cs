@@ -118,7 +118,7 @@ public static class SheetSet
             for (int k = 0; k < 2 && i + k < girders.Count; k++)
             {
                 var g = girders[i + k];
-                panels.Add(new Panel(new ViewSpec($"{g.Name} elevation", s => GirderViews.Elevation(WithScale(ctx, s), g.Index), ScaleFamily.Engineering),
+                panels.Add(new Panel(new ViewSpec($"{ctx.GirderName(g.Index)} elevation", s => GirderViews.Elevation(WithScale(ctx, s), g.Index), ScaleFamily.Engineering),
                     0, H / 2 * (1 - k), W, H / 2 * (2 - k)));
             }
             string names = string.Join(" and ", panels.Select(p => p.View.Name.Split(' ')[0]));

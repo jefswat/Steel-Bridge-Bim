@@ -465,7 +465,8 @@ public static class PrestressedViews
             d.Line(SheetLayers.Center, Dev(b.TopStart.XY), Dev(b.TopEnd.XY));
             var mid = Dev((b.TopStart.XY + b.TopEnd.XY) / 2);
             var dir = Dev(b.TopEnd.XY) - Dev(b.TopStart.XY);
-            d.TextAlong($"{b.Mark} {b.TypeName}", mid + new Vec2(-dir.Normalized().X * d.Paper(0.5), 0) + dir.Normalized().Left * d.Paper(0.06), dir, d.SmallTextH);
+            string mark = ctx.Framing.Definition.Girders.PlanNames != null ? $"{ctx.GirderName(b.Girder)}-S{b.Span + 1} ({b.Mark})" : b.Mark;
+            d.TextAlong($"{mark} {b.TypeName}", mid + new Vec2(-dir.Normalized().X * d.Paper(0.5), 0) + dir.Normalized().Left * d.Paper(0.06), dir, d.SmallTextH);
         }
 
         // Support lines: CL brg (back / ahead) with the beam spacing; CL pier from the substructure.

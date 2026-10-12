@@ -74,7 +74,7 @@ public static class SectionViews
                         d.Circle(SheetLayers.Rebar, new Vec2(o + st.Section.X, zb + st.Section.Y), Math.Max(bm.StrandDiameter / 2, d.Paper(0.012)), filled: true);
                 }
                 else d.CutConcrete(shape.Outline().Select(q => new Vec2(o + q.X, zb + q.Y)).ToList(), 0.1);
-                d.Text(g.Name, new Vec2(o, zb - d.Paper(0.25)), d.TextH, 0, TextAlign.Center);
+                d.Text(ctx.GirderName(g.Index), new Vec2(o, zb - d.Paper(0.25)), d.TextH, 0, TextAlign.Center);
                 continue;
             }
             // Plate girder cut (I shape).
@@ -87,7 +87,7 @@ public static class SectionViews
                 new(o - tw, z), new(o - tf.Width / 2, z),
             };
             d.Poly(SheetLayers.Steel, ishape, true);
-            d.Text(g.Name, new Vec2(o, z - sec.WebDepth - bf.Thickness - d.Paper(0.25)), d.TextH, 0, TextAlign.Center);
+            d.Text(ctx.GirderName(g.Index), new Vec2(o, z - sec.WebDepth - bf.Thickness - d.Paper(0.25)), d.TextH, 0, TextAlign.Center);
         }
 
         // ---- cross frames beyond (the first intermediate frame up-station in each bay)

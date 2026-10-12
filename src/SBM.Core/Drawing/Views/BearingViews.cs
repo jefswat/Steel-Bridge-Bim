@@ -231,7 +231,7 @@ public static class BearingViews
         d.Line(SheetLayers.SteelHidden, new Vec2(-half, -bf.Width / 2), new Vec2(half, -bf.Width / 2));
         d.Line(SheetLayers.SteelHidden, new Vec2(-half, bf.Width / 2), new Vec2(half, bf.Width / 2));
         d.Line(SheetLayers.Center, new Vec2(-half, 0), new Vec2(half, 0));
-        d.Text($"CL {ctx.Framing.Girders[b.Girder].Name}", new Vec2(half + d.Paper(0.08), 0), d.SmallTextH, 0, TextAlign.Left);
+        d.Text($"CL {ctx.GirderName(b.Girder)}", new Vec2(half + d.Paper(0.08), 0), d.SmallTextH, 0, TextAlign.Left);
         var brgA = Cap(sB - ext * 0.8, Vec2.Dot(b.Center - unit.Origin, unit.N));
         var brgB = Cap(sB + ext * 0.8, Vec2.Dot(b.Center - unit.Origin, unit.N));
         d.Line(SheetLayers.Center, brgA, brgB);
@@ -391,7 +391,7 @@ public static class BearingViews
         string pad = bd.MasonryPadThickness > 0 ? ", masonry pad" : "";
         string stack = generic ? $"Sole plate, bearing by manufacturer (assumed height {d.Short(bd.GenericHeight)}), masonry plate{pad}"
             : disc ? (fix != BearingFixity.Fixed ? "Sole plate, upper bearing plate, PTFE, disc, masonry plate" : "Sole plate, upper bearing plate, disc, masonry plate") + pad : "Sole plate, elastomeric pad";
-        d.Title($"SECTION ALONG {ctx.Framing.Girders[b.Girder].Name} AT {unit.Name.ToUpperInvariant()}", $"{stack} ({fix})", new Vec2(0, box.MinY - d.Paper(0.3)));
+        d.Title($"SECTION ALONG {ctx.GirderName(b.Girder)} AT {unit.Name.ToUpperInvariant()}", $"{stack} ({fix})", new Vec2(0, box.MinY - d.Paper(0.3)));
         return new SheetView("Bearing section", "Bearing Section", dwg, d.Scale, "");
     }
 

@@ -97,7 +97,7 @@ public static class TableViews
         }
         var cols = new List<Col> { new("SUPPORT", 1.5), new("STATION (CL)", 1.4), new("SKEW", 1.4) };
         double w = Math.Min(1.15, (areaW - 4.4) / Math.Max(1, ng - 1));
-        for (int i = 0; i + 1 < ng; i++) cols.Add(new Col($"G{i + 1}-G{i + 2}", w));
+        for (int i = 0; i + 1 < ng; i++) cols.Add(new Col($"{ctx.GirderName(i)}-{ctx.GirderName(i + 1)}", w));
         var notes = new[] { "SPACING = DISTANCE BETWEEN ADJACENT CL BEARINGS ALONG THE SUPPORT LINE (PLAN, FROM THE MODEL). A DASH = A GIRDER OF THE PAIR HAS NO BEARING AT THAT SUPPORT.",
                             "SKEW: ANGLE OF THE SUPPORT LINE FROM THE RADIAL (NORMAL TO THE CL ALIGNMENT); RT = RIGHT END UP-STATION." };
         return Paged(ctx, "GIRDER SPACING AT THE SUPPORT LINES", cols.ToArray(), rows, notes, areaW, areaH, "Girder spacing");
@@ -114,7 +114,7 @@ public static class TableViews
         if (ctx.Framing.Camber == null) return new();
         foreach (var g in ctx.Framing.Camber.Girders.OrderBy(g => g.Girder))
             foreach (var p in g.Points)
-                rows.Add(new[] { g.Name, p.Number.ToString(), p.Label.Length > 0 ? p.Label : p.Kind, u.FormatStation(p.Station), Dec(u, p.Camber), Dec(u, p.SteelDeflection), Dec(u, p.SlabDeflection),
+                rows.Add(new[] { ctx.GirderName(g.Girder), p.Number.ToString(), p.Label.Length > 0 ? p.Label : p.Kind, u.FormatStation(p.Station), Dec(u, p.Camber), Dec(u, p.SteelDeflection), Dec(u, p.SlabDeflection),
                     u.FormatLength(p.HaunchElevation, LengthKind.Coordinate), double.IsNaN(p.Blocking) ? "-" : Dec(u, p.Blocking) });
         if (rows.Count == 0) return new();
         var cols = new[] { new Col("GIR.", 0.5), new Col("PT", 0.45), new Col("LOCATION", 0.85), new Col("STATION", 0.95), new Col("CAMBER", 0.65), new Col("STEEL DEFL", 0.75), new Col("SLAB+BARR", 0.75),
@@ -373,7 +373,7 @@ public static class TableViews
             }
             rows.Add(new[]
             {
-                sl.Name.ToUpperInvariant() + (ahead ? " (AHEAD)" : sl.AheadBearings != null ? " (BACK)" : ""), $"G{gi + 1}", type, fix == "" ? "NOT MODELED" : fix,
+                sl.Name.ToUpperInvariant() + (ahead ? " (AHEAD)" : sl.AheadBearings != null ? " (BACK)" : ""), ctx.GirderName(gi), type, fix == "" ? "NOT MODELED" : fix,
                 u.FormatStation(br.Station), Off(u, br.Offset), u.FormatLength(br.BottomOfSteelElevation, LengthKind.Coordinate),
                 seat != null ? u.FormatLength(seat.SeatElevation, LengthKind.Coordinate) : "-",
                 seat != null ? u.FormatLength(br.BottomOfSteelElevation - seat.SeatElevation, LengthKind.Short) : "-",
@@ -430,7 +430,7 @@ public static class TableViews
         }
         rows.Add(new[] { $"CL BRG {f.Supports[^1].Name.ToUpperInvariant()}   STA {u.FormatStation(f.Supports[^1].Station)}" }
             .Concat(f.Girders.Select(g => g.Spans.Count >= nSpans ? Val(g, nSpans - 1, 1.0) : "-")).ToArray());
-        var cols = new[] { new Col("LOCATION (ALONG EACH GIRDER)", 2.9) }.Concat(f.Girders.Select(g => new Col(g.Name, Math.Min(1.1, (areaW - 3.0) / ng)))).ToArray();
+        var cols = new[] { new Col("LOCATION (ALONG EACH GIRDER)", 2.9) }.Concat(f.Girders.Select(g => new Col(ctx.GirderName(g.Index), Math.Min(1.1, (areaW - 3.0) / ng)))).ToArray();
         string title = slab ? "TOP OF SLAB ELEVATIONS AT GIRDER LINES" : "TOP OF WEB ELEVATIONS (FINAL SHAPE)";
         var notes = slab
             ? new[] { "TOP OF SLAB = FINISHED GRADE AT THE GIRDER WEB CENTERLINE (CROSS SLOPE, SUPERELEVATION AND ANY LEVEL EDGE STRIP APPLIED), FROM THE MODEL.",

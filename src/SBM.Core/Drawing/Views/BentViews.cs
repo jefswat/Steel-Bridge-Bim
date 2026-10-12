@@ -62,7 +62,7 @@ public static class BentViews
             }, true);
             // Haunch between the flange and the slab.
             d.CutConcrete(new List<Vec2> { new(s - ht, z + tf.Thickness), new(s + ht, z + tf.Thickness), new(s + ht, Grade(s + ht) - def.Deck.Thickness), new(s - ht, Grade(s - ht) - def.Deck.Thickness) }, 0.06);
-            d.Text($"G{br.Girder + 1}", new Vec2(s, Grade(s) + d.Paper(0.75)), d.TextH, 0, TextAlign.Center);
+            d.Text(ctx.GirderName(br.Girder), new Vec2(s, Grade(s) + d.Paper(0.75)), d.TextH, 0, TextAlign.Center);
         }
 
         // ---- pedestals and bearings

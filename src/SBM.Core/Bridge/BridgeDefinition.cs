@@ -387,6 +387,10 @@ public sealed class GirderLayoutDefinition
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
     public TubGirderDefinition? Tub { get; set; }
     [System.Text.Json.Serialization.JsonIgnore] public bool IsTub => Tub != null && Kind == GirderKind.SteelPlate;
+    /// <summary>OPTIONAL plan names of the girders / beam lines, left to right (I-80 Unit 2 "A".."K", Woodbury beam lines "D".."H");
+    /// used by the sheets only. Null or a missing / empty entry = "G1", "G2", ... Omitted from the .sbm when null.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public List<string>? PlanNames { get; set; }
 
     public IReadOnlyList<double> UniformOffsets()
     {
@@ -413,6 +417,7 @@ public sealed class GirderLayoutDefinition
         Beginnings = Beginnings.Select(t => t.Clone()).ToList(),
         CrossGirder = CrossGirder.Clone(),
         Tub = Tub?.Clone(),
+        PlanNames = PlanNames?.ToList(),
     };
 }
 
