@@ -20,6 +20,8 @@ public sealed class ArchDefinition
     public List<ArchTieDefinition> Ties { get; set; } = new();
     public List<ArchHangerDefinition> Hangers { get; set; } = new();
     public ArchHangerSystem HangerSystem { get; set; } = new();
+    /// <summary>OPTIONAL weld rules (plan fillet weld symbols on full-contact T-joints), applied after every member is built.</summary>
+    public List<ArchWeldRule> Welds { get; set; } = new();
     public List<ArchFloorbeamDefinition> Floorbeams { get; set; } = new();
     public List<ArchBraceDefinition> Bracing { get; set; } = new();
     /// <summary>Crossing splices of the bracing (OPTIONAL).</summary>
@@ -276,6 +278,35 @@ public sealed class ArchFinSettings
     /// <summary>Bolt rows below the bend line.</summary>
     public List<double> TieHoleRows { get; set; } = new() { In(2), In(5.5) };
     public string Material { get; set; } = "ASTM A709 Gr. 50-F1 (FCM)";
+    /// <summary>OPTIONAL rib fin plate welds (p.148): fillet leg (0 = welds not modeled), both faces of the plate along each flange inner face, length
+    /// = the table "weld length D" per cable, starting <see cref="RibWeldSetback"/> below the end of the top clip.</summary>
+    public double RibWeldSize { get; set; }
+    public double RibWeldSetback { get; set; }
+    /// <summary>UNRESOLVED reason for the weld position (page + why); empty = not flagged.</summary>
+    public string RibWeldUnresolved { get; set; } = "";
+    public string WeldMaterial { get; set; } = "E70XX (AWS D1.5)";
+}
+
+/// <summary>
+/// OPTIONAL fillet weld rule (plan weld symbol on a T-joint whose extent is the full contact, no length dimensioned): every part whose mark matches
+/// <see cref="Parts"/> (the attached plate: its edge face is welded) gets a fillet of <see cref="Size"/> along each line where its edge face sits on a
+/// part matching <see cref="Onto"/> (<c>Steel.WeldFinder.TJoint</c>; both sides of the attached plate unless <see cref="OneSide"/>). Built as weld parts
+/// (PartCategory.Weld). <see cref="Unresolved"/> (page + why) flags the welds as a dimension only (the weld exists on the plans).
+/// </summary>
+public sealed class ArchWeldRule
+{
+    public string Name { get; set; } = "";
+    /// <summary>Regular expression on the attached part marks.</summary>
+    public string Parts { get; set; } = "";
+    /// <summary>Regular expression on the marks of the parts it is welded to.</summary>
+    public string Onto { get; set; } = "";
+    public double Size { get; set; }
+    public bool OneSide { get; set; }
+    /// <summary>Contact distance tolerance (gap between the edge face and the face it is welded to).</summary>
+    public double Tolerance { get; set; } = In(1.0 / 32);
+    public string Source { get; set; } = "";
+    public string Unresolved { get; set; } = "";
+    public string Material { get; set; } = "E70XX (AWS D1.5)";
 }
 
 /// <summary>Cable connector at a hanger crossing (plan p.150): UHMW-PE pendant plate between the two cables with a sleeve bracket over each.</summary>
@@ -355,6 +386,14 @@ public sealed class ArchSocketDefinition
     public double W { get; set; }
     public double PinDiameter { get; set; }
     public double ShankDiameter { get; set; }
+    /// <summary>OPTIONAL open-jaw detail (all 0 = the v1-v4 solid jaw block): E = pin centre to the bottom of the jaw slot (toward the cable), F = pin
+    /// centre to the back end of the jaws, SlotWidth = clear opening between the two jaws (the fin plate sits in it, the pin crosses both jaws and the
+    /// plate). With it the socket is built as two jaws straddling the fin plate (pin normal to the plate), the body to L and the shank to W.</summary>
+    public double E { get; set; }
+    public double F { get; set; }
+    public double SlotWidth { get; set; }
+    /// <summary>UNRESOLVED reason (page + why) for a jaw dimension the plans do not give; the socket keeps its layer, flagged as a dimension.</summary>
+    public string Unresolved { get; set; } = "";
     public string Material { get; set; } = "Socket (forged / cast steel, by supplier)";
     /// <summary>Envelope basis note (pset / report).</summary>
     public string Basis { get; set; } = "";
@@ -696,6 +735,16 @@ public sealed class ArchPtSystem
     public string Unresolved { get; set; } = "";
     public string StrandMaterial { get; set; } = "ASTM A416 Gr. 270 low-relaxation strand";
     public string AnchorMaterial { get; set; } = "PT flat anchorage (DYWIDAG, by supplier)";
+    /// <summary>OPTIONAL flat duct (0 width = no duct, v1-v4): outside width x height (obround), wall, from the anchorage end (AnchorLength from the end
+    /// web) along the tendon to the other anchorage; strands inside side by side at <see cref="DuctStrandSpacing"/> (converging from
+    /// <see cref="StrandSpacing"/> at the anchor over the anchorage length).</summary>
+    public double DuctWidth { get; set; }
+    public double DuctHeight { get; set; }
+    public double DuctWall { get; set; }
+    public double DuctStrandSpacing { get; set; }
+    public string DuctMaterial { get; set; } = "Corrugated polyethylene / polypropylene PT duct";
+    /// <summary>UNRESOLVED reason (page + why) for the duct size; the duct stays on its layer, flagged as a dimension.</summary>
+    public string DuctUnresolved { get; set; } = "";
     /// <summary>Anchorage zone bars (S2): distances from the end web inside face along the tendon, outline width x height around the tendon.</summary>
     public List<double> ZoneBarsAt { get; set; } = new();
     public double ZoneBarWidth { get; set; } = In(9.25);

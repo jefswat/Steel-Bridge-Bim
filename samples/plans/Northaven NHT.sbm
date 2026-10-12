@@ -28086,6 +28086,10 @@
             "W": 0.41097199999999995,
             "PinDiameter": 0.035001199999999996,
             "ShankDiameter": 0.0329946,
+            "E": 0.06604,
+            "F": 0.059944,
+            "SlotWidth": 0.0254,
+            "Unresolved": "UNRESOLVED (p.148): open strand socket jaw slot width - the socket tables give A, B, E, F, G, L, W, dL, Db but no clear opening between the jaws; the N.T.S. plan view points B at the jaw inner faces, but B 2.76\u0022 inside G 3.43\u0022 (pin with heads) would leave no jaw, so B is read as the jaw outer width. slot 1\u0022 = 7/8\u0022 fin plate \u002B 1/8\u0022, jaws (B - slot) / 2 = 7/8\u0022 thick; jaw back end F, slot bottom E, body to L, shank to W",
             "Material": "Socket (forged / cast steel, by supplier)",
             "Basis": "plan p.148 OPEN STRAND SOCKET DIMENSIONS (envelope: jaw block A x B to L, shank Db to W, pin dL x G)"
           },
@@ -28098,10 +28102,15 @@
             "W": 0.8740139999999998,
             "PinDiameter": 0.035001199999999996,
             "ShankDiameter": 0.0329946,
+            "E": 0.06604,
+            "F": 0.059944,
+            "SlotWidth": 0.0254,
+            "Unresolved": "UNRESOLVED (p.148): open strand socket jaw slot width - the socket tables give A, B, E, F, G, L, W, dL, Db but no clear opening between the jaws; the N.T.S. plan view points B at the jaw inner faces, but B 2.76\u0022 inside G 3.43\u0022 (pin with heads) would leave no jaw, so B is read as the jaw outer width. slot 1\u0022 = 7/8\u0022 fin plate \u002B 1/8\u0022, jaws (B - slot) / 2 = 7/8\u0022 thick; jaw back end F, slot bottom E, body to L, shank to W",
             "Material": "Socket (forged / cast steel, by supplier)",
             "Basis": "plan p.148 ADJUSTABLE OPEN STRAND SOCKET DIMENSIONS (turnbuckle body drawn at the shank diameter - its outline is not dimensioned)"
           }
         },
+        "Welds": [],
         "Floorbeams": [
           {
             "Name": "FB1",
@@ -42403,7 +42412,11 @@
             0.0508,
             0.1397
           ],
-          "Material": "ASTM A709 Gr. 50-F1 (FCM)"
+          "Material": "ASTM A709 Gr. 50-F1 (FCM)",
+          "RibWeldSize": 0.0079375,
+          "RibWeldSetback": 0,
+          "RibWeldUnresolved": "UNRESOLVED (p.148): rib fin plate weld start - D = P3 - 1/2\u0022 implies the weld covers the P3 edge less 1/4\u0022 at each end, but the top corner clip (scaled 1\u0022, not dimensioned) shortens the flange contact edge. weld D from the end of the scaled 1\u0022 clip toward the pin; it runs up to 1/2\u0022 past the straight edge (CHECK rows)",
+          "WeldMaterial": "E70XX (AWS D1.5)"
         },
         "CableConnectors": [
           {
@@ -43406,6 +43419,12 @@
             "Unresolved": "UNRESOLVED (p.155): PT strand arrangement and anchorage envelope - the flat duct, the strand spacing in it and the anchorage casting are drawn (Section A-A / B-B) but not dimensioned. Strands side by side at 1 15/16\u0022, anchorage 13\u0022 x 4\u0022 x 10 1/2\u0022 (scaled); duct not modeled.",
             "StrandMaterial": "ASTM A416 Gr. 270 low-relaxation strand",
             "AnchorMaterial": "PT flat anchorage (DYWIDAG, by supplier)",
+            "DuctWidth": 0,
+            "DuctHeight": 0,
+            "DuctWall": 0,
+            "DuctStrandSpacing": 0,
+            "DuctMaterial": "Corrugated polyethylene / polypropylene PT duct",
+            "DuctUnresolved": "",
             "ZoneBarsAt": [
               0.30479999999999996,
               0.4064,
