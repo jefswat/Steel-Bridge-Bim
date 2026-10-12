@@ -1191,6 +1191,10 @@ public sealed class BridgeDefinition
     /// (<see cref="SurfaceTreatmentDefinition"/>); null = none.</summary>
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
     public List<SurfaceTreatmentDefinition>? SurfaceTreatments { get; set; }
+    /// <summary>OPTIONAL plan bars placed as the plan sheets dimension them (abutment / pedestal / wall / diaphragm / barrier bars,
+    /// <see cref="PlanBarsDefinition"/>); null = none, omitted from the .sbm.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public PlanBarsDefinition? PlanBars { get; set; }
     /// <summary>OPTIONAL pedestrian / bicycle railing runs (posts, rails, base plates, anchor bolts or a placeholder envelope) along reference lines
     /// (<see cref="PedestrianRailingDefinition"/>); null = none. Built by <c>Railing.PedestrianRailingGenerator</c> into the bridge's steel model.</summary>
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
@@ -1291,6 +1295,7 @@ public sealed class BridgeDefinition
         Arch = Arch?.Clone(),
         Segmental = Segmental?.Clone(),
         SurfaceTreatments = SurfaceTreatments?.Select(t => t.Clone()).ToList(),
+        PlanBars = PlanBars?.Clone(),
         Railings = Railings?.Select(r => r.Clone()).ToList(),
     };
 }

@@ -64,6 +64,14 @@ public sealed partial class SubstructureGenerator
         m.Units.AddRange(units2.OfType<SubstructureUnit>());
         g.CheckPileClearances();
         g.BuildRebar(m);
+        if (framing.Definition.PlanBars != null)
+            foreach (var u in m.Units)
+            {
+                // plan bars of this unit (abutment footing / stem / pedestals / walls) placed as the plans dimension them
+                var pr = SBM.Core.Concrete.PlanBarPlacer.Place(framing, false, u.SupportIndex, u.Name);
+                m.Marks.AddRange(pr.Marks); m.Bars.AddRange(pr.Bars);
+                foreach (var d in pr.Diagnostics) g._diag.Enqueue(d);
+            }
         g.BuildDrainage(m);
         m.Diagnostics.AddRange(g._diag);
         m.Notes.AddRange(g._notes.OrderBy(n => n));

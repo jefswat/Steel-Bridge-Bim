@@ -174,6 +174,13 @@ public sealed partial class ConcreteGenerator
         if (Deck.Barrier.Type == BarrierType.TxDotSstr && Deck.Barrier.Reinforcement) rebarTasks.Add(() => BuildSstrRebar(bars));
         Parallel.ForEach(rebarTasks, t => t());
         AssignMarks(bars);
+        if (_def.PlanBars != null)
+        {
+            // plan bars of the superstructure (end diaphragms, barriers, ...) placed as the plans dimension them
+            var pr = PlanBarPlacer.Place(_f, true, -1, "");
+            _m.Marks.AddRange(pr.Marks); _m.Bars.AddRange(pr.Bars);
+            foreach (var d in pr.Diagnostics) _diag.Enqueue(d);
+        }
     }
 
     // ================================================================== surfaces & end lines
