@@ -213,6 +213,17 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
     tables in paper inches: bearing data, girder spacing, top of slab / top of web, cross slope, camber and blocking, estimated quantities; `Paged(..., blocks)`).
     Notes and callouts that quote numbers MUST come from the model: cross frame bolt notes from `CrossFrameDetail2D.Bolts` (`SteelDetailViews.BoltGroups`), steel notes from `Steel.Parts[].Material`.
     Plan comparison: `tools/detail_inventory.py` -> `docs/plan-data/detail-inventory.md`; `sbm compare-sheets` / `sbm qc-sheet` -> `tools/compare_sheets.py` (PyMuPDF; qc rows keyed `gen:<bridge>:<S-n>`).
+  - Sheets (2026-10-12, branch sheet-fixes; status in `docs/plan-data/sheets-vs-plans.md` section 17): `LabelPlacer.Resolve(dwg, frame)` keeps movable labels inside
+    the panel at the chosen scale (SheetComposer) or a bend-diagram cell (BarSheet); layers S-TITLE / S-GRID / S-NOTES (`SheetLayers.Notes`, placed note blocks) are fixed.
+    `MeshSection` = plane cut of meshes (segments, x / y clip, closed loops for hatch) -> true sections of the model: `SupportSectionViews.AlongSupport` (abutments of
+    prestressed / integral bridges: cap or footing with steps, diaphragm, beams, pads, deck, barriers, piles) and `PrestressedViews.SupportSection` (normal to a
+    support at a beam / mid-bay; concrete diaphragm and abutment sheets), steel diaphragm detail (beams cut, parts / bolts projected). Prestressed set: beam layout,
+    deck plan (`DeckViews`), one sheet per beam type (`Sections/Elevation(ctx, type)`, `DataTables`), schedule + notes, steel / concrete diaphragm sheets. Agency text
+    in `PsText` (Iowa DOT / MnDOT / TxDOT from `TxGirderShape.State`; strengths per type; pads from the model). Beam bars read by reflection (`PsBars`: `BarMarks`,
+    `Bars`). `TableViews.QuantityRows` = plan-style groups (pile fill under PILING, structural concrete per unit, rebar by coating, NOT MODELED rows). Pier Section A-A
+    is its own view (`BentViews.CapSectionView`, legend = bars cut). Pile plans at the bottom of the footing (`PierViews.PileAt`), tips plumb / battered
+    (`PierViews.TipText`). `MiscViews`: dap details, misc items plan + schedule. Optional `GirderLayoutDefinition.PlanNames` -> `ViewContext.GirderName` (sheets only).
+    DXF zip: `SheetExport.WriteAll/WriteSheets` (folder or .zip), `SbmDocument.ExportSheetsDxf`, `sbm sheets ... --dxf <folder|zip> [--models]`, `sbm drawings ... --zip`, app button.
   - App 3D: `MainWindow.Viewport3D.cs` â€” camera depth range follows the scene (`KeepCameraInRange` on CameraChanged; do
     not hand-set Near/Far elsewhere); section cut = CPU clipping of all solids/lines/text (Helix
     `CrossSectionMeshGeometryModel3D` was tried: transparent models stop rendering when it is in the scene â€” don't use
