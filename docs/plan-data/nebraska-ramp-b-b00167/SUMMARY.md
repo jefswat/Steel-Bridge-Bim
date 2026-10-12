@@ -203,3 +203,39 @@ GAPs:
 | U7 | Pier 1 column section and cap width breakdown, maskwall | p.9-11 | text layer jumbled; sections not rasterized in this pass |
 | U8 | Start point of the cap top cover plate dimension 4'-5 / 6'-2 (detail B) | p.31 | the dimension chain runs into the cap end and its origin is not legible |
 | U9 | N abutment thermal movement angle 84 deg 37'26" | p.42 | DERIVED from the alignment (line from CL pier 1 x CL to CL N abut brg x CL; abutment radial) gives 84 deg 37'52", 26" off; the other two angles reconcile |
+
+## Model (2026-10-12, branch nebraska-st)
+
+`samples/plans/build-nebraska-st.csx` (sbm new + run) -> `samples/plans/Nebraska St Ramp B.sbm`; check `samples/plans/check-nebraska-st.csx`;
+sheet links `samples/plans/sheet-links-nebraska-st.json`; IFC `C:\SBM\dist\ifc\Nebraska St Ramp B.ifczip` (0 schema / 0 EXPRESS issues);
+sheets DXF `C:\SBM\dist\ifc\Nebraska St Ramp B sheets DXF.zip` (31 sheets).
+
+Check result: 475 rows, 445 PASS, 9 FAIL (all reported differences, below), 21 INFO. PASS: spans, 12 girder span lengths (1/16"), 24 splice
+locations, plate schedule + thick-plate extents, 32 blocking values, 268 girder line haunch elevations, top of deck (girder lines at the 67 points,
+CL / edges / gutters at the bearings), bearing TOB / seats (incl. pier 2 cap bearings 1110.38 / 1111.98), pier 1 / abutment seats, 14 bearings,
+pier 2 column heights, structural steel 911,658 lb vs 926,401 (-1.6 %), rebar by coating 235,830 / 11,659 / 7,676 lb (bar-list sums; bars not placed),
+pier 1 139.5 / pier 2 130.9 CY within 3 %.
+Reported differences (FAIL rows): camber input vs camber from the no-load shape at pier 2 for C / D (-0.13 / -0.10 in; inside the 3 % -> 5 %
+superelevation transition 2476+39.57 - 2476+95.97 - the plan web cut apparently follows only the profile); cap slope 3.404 % (TOB chord) vs printed
+3.39 %; "4 1/4 (AT CL CAP)" vs model 4 3/8 - 4 7/16 (interpretation of the dimension open); piles 12,620 vs 13,090 LF (3 wing-extension piles not
+modeled). INFO: abutment concrete short (wing extensions / maskwalls not modeled), deck 438.6 vs 460.2 CY (plan sections include the abutment
+diaphragms and the cap haunch concrete, not modeled), thin brick 1,492 vs 1,626 SF, barrier 157.0 vs 159.0 CY.
+Cap camber vs girder dead-load deflection at pier 2 (G4): A 0.27 / 0.26, B 0.40 / 0.36, C 0.41 / 0.33, D 0.31 / 0.24 in (cap camber / girder
+steel + slab deflection) - B..D outside the cap tolerance window (-0, +1/16..3/16), reported as CHECK warnings.
+
+### GAP status
+- G1 integral steel cap: MODELED (generic `IntegralSteelCap`: twin I members, end / connector / diaphragm / mill-to-bear plates, top splice over the
+  cap with tapered fills, handholes, cover plates, stiffeners, studs, mesh screens). G2 cap bearings off the girder lines: MODELED. G3 capless pier
+  with turned columns: MODELED (`NoCap`, `ColumnRotationDeg`). G4 deflecting support: camber chord includes pier 2; cap camber compared (reported).
+  G5 fabrication attributes: MODELED (`BridgeDefinition.Fabrication` rules from fabrication-notes.csv; IFC Pset SBM_FabricationAttributes).
+  G6 tapered fills: MODELED (beveled washers as a note). G7 handholes: MODELED.
+- Open: G8 pier 1 sections partly (column with 4" projections, end walls modeled; notches / terra cotta blockouts not), G9 bend diagrams (no bars in
+  3D), G10 drains / lighting / terra cotta panels / wing extensions / abutment diaphragms / cap haunch concrete, G11 moment table; girder stud
+  groups, cap web-flange and end-plate welds (U2 / U3, no size).
+
+### UNRESOLVED (model)
+U1 placement APPROXIMATE (p.6). U2 / U3 weld sizes (p.30 / p.31) - no weld solids. U4 / U6 read at 300-400 dpi as PL 3/4 = girder connection
+diaphragm plate between 1/2 connector plates, bolts end plate + cap web + connector plate (confirm). U5 bearing components (vendor) - GENERIC
+bearings, pier 2 sole plate = 28" disc body, the bottom cover plate start follows it (p.31 note *). U8 top cover plate start (p.31). New: end plate
+flare / bottom chamfer vertices scaled from Section E-E (p.30); girder web cope depth (p.30); first intermediate stiffener 9'-6 at the abutments
+(p.27); abutment front pile batter, steps (p.18 / p.22); pier 2 column centres across the line (p.12); texture depth (p.66).

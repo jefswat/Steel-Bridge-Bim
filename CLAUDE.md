@@ -800,6 +800,35 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   set). Mow strips 2'-0 x 4" at the 12 approach piers (6.12 CY vs 6.1, top EL. D + 1'-0 flagged). T80SS(MOD) arch pier barrier NOT modeled (UNRESOLVED).
   The older GAP lines in build-nht.csx about rail / curb / joints / mow strips are superseded by this script's output.
 
+- Integral steel pier cap (OPTIONAL `SupportDefinition.IntegralSteelCap` = `Bridge/IntegralSteelCapDefinition.cs`, null = none, omitted from the .sbm; detailer
+  `Steel/IntegralCapDetailer.cs`, partial SteelModelGenerator): twin (or single) I-girder cap transverse to the bridge on its own bearings at `BearingOffsets` (S along the
+  support line) with `BearingTopElevations` (= cap underside; missing = UNRESOLVED, no cap, girders not cut). FINAL shape: straight chord of the TOBs, webs plumb, flanges square
+  to the webs (cap frame `CapGeom`: x along the sloped axis, y = N, z normal); `Camber` (+ tolerances) recorded and compared with the girders' dead load deflection at the cap point
+  (plan camber tables; key Support = cap support) -> Info / "CHECK (camber, deflecting support ...)" warning (the girder camber chord runs through the deflecting support).
+  Girders are CUT in phase 1 (`SetupIntegralCaps` -> `_capCuts`, `FieldSections` treats the cap as a joint of width 2 x (web offset + tw/2 + end plate)); `BuildGirder`
+  stops the top flange `TopFlangeEndBeyondCapFlange` outside the cap flange edge and copes the web under the cap flange (`CopeDepth`); no girder bearings, bearing stiffeners
+  (FramingGenerator) or support cross frames on that line; ElevationCheck skips girder chains there. `CapGirderConnection`: end plate (girder assembly, part EndPlate) on the
+  outer web face + ConnectorPlate inside, bolts through all three (holes in the cap web), DiaphragmPlate in the girder web plane, ContinuityPlate (mill to bear) at the bottom
+  flange level, top splice over the cap (outer + 2 inner plates, flange-level filler, TAPERED fills = two-direction prisms between the inside plates and the cap flange, bolts
+  over the cap through the cap flange; girder-side holes registered), studs on the splice plate; `Handholes` (elliptical web openings, bolted cover + backing plates),
+  `CoverPlates` (from / to the CL bearing, `FromSoleEdge` = modeled sole plate edge + offset), bearing / jacking stiffeners (plumb, clips, top no-weld length), studs,
+  `EndScreens` (L angles + mesh panel with wire-mass density, stainless bolts via `BoltInstance.Material`). Cap bearings: `BuildCapBearing` (sole tapered to the cap slope,
+  Generic / Disc stack) -> `BearingSeat` Girder 2000+k, `Label`, Location / Axis (substructure takes them as seats). Report `SteelModel.IntegralCaps` (`IntegralCapReport`).
+  New `PartCategory` (appended): EndPlate, ConnectorPlate, DiaphragmPlate, ContinuityPlate, CoverPlate, HandholeCover, HandholeBacking, MeshScreen; `AssemblyKind` PierCap,
+  PierCapConnection. IFC: assemblies GIRDER 'INTEGRAL_STEEL_PIER_CAP' / USERDEFINED 'PIER_CAP_GIRDER_CONNECTION', IfcPlate USERDEFINED / COVER_PLATE; database group
+  "integral steel cap group"; viewport layers 3D-PIER-CAP-PLATES / -HANDHOLES / -SCREENS. Tests `IntegralSteelCapTests`.
+- Capless pier (OPTIONAL `SubstructureDefinition.NoCap`, `CaplessPedestalHeight`, `PlanColumnHeights`; generic `ColumnRotationDeg` turns rectangular columns, + = right end
+  up-station): `SubstructureGenerator.BuildCapless` - per column the nearest seat, pedestal (plan size, turned) from column top = seat - pedestal height, column, foundation;
+  `SubstructureUnit.NoCap`, CapTop / CapBottom = column tops; rebar not placed; BentViews draw the integral steel cap outline and a plan Section A-A of the turned column.
+- Per-support girder stiffeners (OPTIONAL): `SupportDefinition.BearingStiffener` (plate) and `JackingStiffenerOffsets` (plumb pairs at distances from the CL bearing).
+- Fabrication attributes (OPTIONAL `BridgeDefinition.Fabrication` = `FabricationRule` list, Bridge/FabricationDefinition.cs): selectors (category / assembly kind / mark /
+  assembly description / description regex, girders) -> `SteelPart.Fabrication` (`FabricationAttributes`: Toughness, ContactFinish, NDT, coating exterior / interior,
+  ShopAssembly, Tolerance, Camber, Weld, plan note ids) and optional `Material` override; applied at the end of steel generation. App pick properties, IFC Pset
+  `SBM_FabricationAttributes` (one per distinct set), database props `fab_*`. Absent = no output change (IFC of the other sample bridges byte-identical, 2026-10-12).
+- Nebraska St. Ramp B (Iowa DOT Design 1617, "911"; PDF "B00167 - Nebraska Ramp B - Design 116.pdf"): `samples/plans/build-nebraska-st.csx` (sbm new + run) ->
+  `Nebraska St Ramp B.sbm`, check `check-nebraska-st.csx`, links `sheet-links-nebraska-st.json`, data `docs/plan-data/nebraska-ramp-b-b00167/`. Placement APPROXIMATE in UTM 14N
+  (GPS = CL at STA 2475+52.56, p.27/p.29 north arrows true az 296.262 minus convergence), 3DEP terrain. Pier 2 = integral cap + capless turned columns.
+
 ## Conventions (bridge engineering)
 - Offsets right-positive (Civil 3D). Skew from the radial line; positive = right end of support line up-station.
 - Girder offsets are measured normal to the alignment; flared layouts via `OffsetsAtSupports` (linear between supports).
