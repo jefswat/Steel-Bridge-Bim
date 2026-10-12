@@ -827,6 +827,17 @@ public static class ModelDatabase
                     r.Props = new Json().Add("end", jr.AtBegin ? "begin" : "end").Add("joint_index", jn - 1).ToString();
                     _w.Add(r);
                 }
+                if (jr.EndBlock is { } eb && !eb.Mesh.IsEmpty && eb.Definition.Source is { Length: > 0 })
+                {
+                    // OPTIONAL thickened slab end with a source (e.g. TxDOT IGTS); same GlobalId key as the IFC IfcBuildingElementPart
+                    var r = New(Id(jk + "/endblock"), jg, "element", "thickened slab end", "IFCBUILDINGELEMENTPART", eb.Name);
+                    r.Support = jr.Support; r.Subtype = eb.Definition.Source; r.Material = concMat; r.Volume = eb.Volume; r.Mass = r.Volume * 2400;
+                    r.Box = eb.Mesh.Bounds(); StationOf(r, r.Box);
+                    var ej = new Json().Add("end", jr.AtBegin ? "begin" : "end");
+                    if (eb.Assumption is { } eas) ej.Add("status", eas.Status).Add("reason", eas.Reason).Add("assumed", eas.Basis);
+                    r.Props = ej.ToString();
+                    _w.Add(r);
+                }
                 if (jr.Body != null)
                 {
                     var d = New(Id(IfcKeys.JointDevice(jk)), jg, "element", "expansion joint device", "IFCDISCRETEACCESSORY", jr.DeviceName);

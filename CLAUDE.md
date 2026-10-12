@@ -810,12 +810,46 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
 - Mow strips (OPTIONAL `SubstructureDefinition.MowStrip` = `Bridge/MowStripDefinition.cs`): ring Width beyond each face of a rectangular column, Thickness,
   top = TopElevation or foundation top + TopAboveFoundation; `SubElementKind.MowStrip` (appended) -> IFC IfcSlab 'MOW_STRIP', DB "mow strip", layer
   3D-SUB-MOW-STRIP (flagged: 3D-UNRESOLVED-SUB); `SubSolid.Assumption` (OPTIONAL, IFC SBM_Status / DB status).
+- Joint hardware (OPTIONAL, generic; `ExpansionJointDefinition.Armor` = `JointArmorDefinition`, `.CoverPlate` = `JointCoverPlateDefinition`, both omitted from the
+  .sbm when null; built only on the joint with `Body`): armor plates on BOTH faces of the opening (near = this deck-end face, far = `GapAt50F` beyond; `FarPlate`)
+  = vertical PL `PlateThickness` x `PlateDepth` flush with the top of slab + seal retainer bar (`BarProjection` / `BarHeight` / `BarAboveBottom`) between the deck
+  edge offsets moved in by `EdgeInsetLeft/Right` (normal to the alignment, e.g. the curb toes); headed stud anchors behind each plate (`StudDrop`, horizontal leg
+  `StudLength` perpendicular to the joint in plan, optional bent leg `StudBentLength` at `StudBendDegrees`, head) at `StudSpacing` max, `StudEndDistance` from the
+  plate ends (n = ceil((L - 2e)/s) + 1); cover plate = `Thickness` x `Width` centred on the opening, bent `Crown` at its CL, lying on the top of slab, ends
+  `EndClearance` inside the insets (along the joint), anchors in staggered `AnchorRows` from the deck-side edge at `AnchorSpacing` max (`AnchorEndDistance`).
+  Geometry in the joint frame (x = normal distance from the deck-end face via `EndD`, drop below finished grade, columns = offsets), `Concrete/ConcreteJointHardware.cs`
+  -> `ExpansionJointResult.Hardware` / `HardwareAssembly`, merged into the bridge's steel model by `RegenerationCache` (created for prestressed bridges).
+  New `PartCategory` (appended) JointArmor, JointStud, JointCoverPlate, JointAnchor (`SteelModel.IsJointHardware`, excluded from `SteelMass`), `AssemblyKind.ExpansionJoint`
+  (appended). IFC: IfcElementAssembly 'EXPANSION_JOINT' > IfcPlate 'JOINT_ARMOR_PLATE' / 'JOINT_COVER_PLATE', IfcMechanicalFastener STUDSHEARCONNECTOR / ANCHORBOLT;
+  DB group "Expansion joint hardware" > assemblies "expansion joint hardware" (parts: joint armor plate / joint stud anchor / joint cover plate / cover plate anchor);
+  viewport layer 3D-JOINT-HARDWARE. `DeviceName` says "seal envelope; armor modeled" when armored. Tests `JointHardwareTests`.
+- Deck end block lateral limits (OPTIONAL `DeckEndBlockDefinition.LeftOffset / RightOffset`, alignment offsets; null = deck edge), e.g. a TxDOT IGTS thickened slab end
+  between the girder top flanges; `Source` (name "Thickened slab end (source), support", IFC description, DB element "thickened slab end" under the joint group with the
+  IFC GlobalId key `jk + "/endblock"`) and `Unresolved` / `Basis` (IFC SBM_Status). A joint definition with `Body = false` can carry just an end block (the other
+  unit's side of a pier joint).
+- Ground traffic barriers on a pier (OPTIONAL `SubstructureDefinition.GroundBarriers` = list of `Bridge/GroundBarrierDefinition.cs`, omitted when null): section `Profile`
+  (`RailPoint` R from the BACK face toward traffic, H above the base; `FullHeight`) swept along `Path` (`GroundBarrierVertex` S / N in the pier frame + Height, linear;
+  back face at the base; `TrafficSide` +1 = right of the path direction), lower vertices: points above `StretchAt` move down (the top shape is kept); base at
+  `BaseElevation` or foundation top + `BaseAboveFoundation`; optional replacement pavement strip (`PavementR0/Width/Thickness`) along the whole path; `PlanLength`
+  (note). `SubElementKind.TrafficBarrier` / `PavementStrip` (appended) -> IFC IfcRailing GUARDRAIL / IfcPavement RIGID, DB "traffic barrier" / "replacement pavement",
+  layer 3D-SUB-TRAFFIC-BARRIER (flagged: 3D-UNRESOLVED-SUB). Built with the first column (`SubstructureGenerator.BuildGroundBarrier`). Test in `JointHardwareTests`.
+- NHT TxDOT standards (2026-10-12, branch nht-txdot-std; standards read-only in `C:\SBM\dist\standards`, NOT in the plan set; SUMMARY.md section 6b):
+  RAIL (PED)(LOW / HIGH) is NOT a TxDOT standard type (RL-PR3 / PR11 / PR22 / PR3-HD / CLF-RO 2019 checked: 3'-6 / 4'-0 galvanized plate-post / pilaster rails,
+  8 ft chain link vs the p.89 4'-3 / 9'-10 tapered stainless posts, Item 5110 special pay item; PR11(MOD) p.65-66 is the retaining-wall rail) -> railing envelopes
+  unchanged, U14 open. Joints (rail-joints-nht.csx section 3): SEJ-B (10-2024) armor PL 1/2 x 4 + Bar 1/2 x 1/4 + 5/8" bent studs at 6" between the curb toes,
+  opening 2 1/2" (R.J. Watson; manufacturer UNRESOLVED), slabs end at the armor faces (`DeckEndOffset` = plan joint line - 1 1/4", abutments - 2 1/2"); BS-EJCP
+  (10-2024) 1/4" x 1'-4 plates 1" inside the curb toes (14 plf x L reproduces p.91 194 / 206 lb); IGTS (rev. 11-24) thickened ends at all 10 unit ends between the
+  Tx28 top flanges, 10 1/2" deep, 4'-0 from the CL joint (bars G/H/J/M not placed). Joint LF 107 = (14'-0 or 14.857 + 2 x 3 1/2" curb upturns) rounded up per
+  joint; the SEJ-B 2'-0 skew termination is not the explanation. Arch slab ends 3/8" / 1/8" past the CL SEJ = inside the opening (CONFLICT, arch unchanged).
+  T80SS(MOD) at Pier 10 (section 5): RL-T80SS bridge-slab section + 1'-0 lower back face (= the p.105 D-D vectors), 9'-1 / 4'-6 / 7'-11 + 15'-0 1:10 taper +
+  1'-8, base shaft top + 2'-9 (flagged), pavement 2'-4 x 1'-1; Pier 11 not drawn (76.33 vs 78 LF); bars / UHMW wedge UNRESOLVED.
+  Check: the approach slab lengths / SF and rail LF are compared to the CL SEJ (cut-back strips added back in check-nht.csx).
 - NHT railing / curbs / joints / mow strips: `samples/plans/rail-joints-nht.csx` (hooked at the end of build-nht.csx before its regeneration and in arch-nht.csx
   before its final regeneration; works on whatever NHT bridges exist). Curbs 10" x 4" with 3/4" chamfers (p.89, 113, 83). RAIL (PED) LOW / HIGH on the curb
   line (7'-0 from CL NHT = the p.84-88 "face of rail", LF reproduced to 0.006 ft per side), sections from the p.89 page VECTORS (1.5 pt/in) as flagged
   envelopes (posts / spacing / plates / anchors UNRESOLVED: railing detail sheets not in the set, p.84 note 2 "diagrammatic"), mass = p.83 design dead load
-  50 / 100 PLF, handrail top 3'-0 (dimensioned, pipe scaled). SEJ-B(MOD) at 7 joints: 4 in placeholder centred on the CL SEJ, no blockout (standards not in
-  set). Mow strips 2'-0 x 4" at the 12 approach piers (6.12 CY vs 6.1, top EL. D + 1'-0 flagged). T80SS(MOD) arch pier barrier NOT modeled (UNRESOLVED).
+  50 / 100 PLF, handrail top 3'-0 (dimensioned, pipe scaled). SEJ-B(MOD) / BS-EJCP / IGTS and T80SS(MOD): see "NHT TxDOT standards" above (the 4 in
+  placeholder of 2026-10-12 morning is replaced). Mow strips 2'-0 x 4" at the 12 approach piers (6.12 CY vs 6.1, top EL. D + 1'-0 flagged).
   The older GAP lines in build-nht.csx about rail / curb / joints / mow strips are superseded by this script's output.
 - NHT model check: `check-nht.csx` 796 PASS / 4 FAIL (2026-10-12; the 4 = arch pier cap / column CY vs the p.102 quantity table, +-0.3 CY; section 6 = reinforcing:
   every tabulated mark count / weight, weights by element model vs plan, cover violations).

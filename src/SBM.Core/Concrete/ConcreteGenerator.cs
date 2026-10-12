@@ -29,7 +29,7 @@ public sealed class ExpansionJointResult
     public List<SBM.Core.Steel.SteelPart> Hardware { get; init; } = new();
     public double BlockoutVolume => Math.Abs(Blockout.Volume());
     public double BodyVolume => Body == null ? 0 : Math.Abs(Body.Volume());
-    public string DeviceName => Definition.Designation is { Length: > 0 } dn ? $"{dn} (placeholder), {Support}"
+    public string DeviceName => Definition.Designation is { Length: > 0 } dn ? (Definition.Armor != null ? $"{dn} (seal envelope; armor modeled), {Support}" : $"{dn} (placeholder), {Support}")
         : Definition.Type == ExpansionJointType.StripSeal
         ? "Generic strip seal expansion joint (manufacturer-designed placeholder)"
         : Definition.Type == ExpansionJointType.Sealed ? "Generic sealed expansion joint (placeholder)"
