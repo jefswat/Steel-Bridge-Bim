@@ -1,0 +1,5 @@
+span,from_station,to_station,printed_length_ftin,printed_ft,station_diff_ft,diff_ft,superstructure,note,source,tag
+1,301+53.72,302+93.00,139'-3 3/8,139.2812,139.28,-0.001,"2-50"" steel tub girders",numbered span 14 (continues N numbering); Ramp 44F stationing,PDF p.254 / O-1,RASTER (printed) / DERIVED (station difference)
+2,302+93.00,304+54.00,161'-0,161.0000,161.00,0.000,"2-50"" steel tub girders",span 15,PDF p.254 / O-1,RASTER (printed) / DERIVED (station difference)
+3,304+54.00,306+15.00,161'-0,161.0000,161.00,0.000,"2-50"" steel tub girders",span 16,PDF p.254 / O-1,RASTER (printed) / DERIVED (station difference)
+4,306+15.00,306+74.00,59'-0,59.0000,59.00,0.000,"2-54"" concrete U beams",span 17,PDF p.254 / O-1,RASTER (printed) / DERIVED (station difference)

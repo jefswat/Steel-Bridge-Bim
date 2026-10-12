@@ -1,0 +1,35 @@
+item,unit,abutment,pier,superstructure,approach,slopewall,total_printed,row_sum_check,source,tag
+Substructure excavation common,CY,180,1635,,,,1815,ok,PDF p.51 / K-6 (summary table is a raster image; 110-300 dpi reads; superstructure sub-table p.89 / K-44),RASTER
+CLSM backfill,CY,132.9,,,,,132.9,ok,PDF p.51 / K-6 (summary table is a raster image; 110-300 dpi reads; superstructure sub-table p.89 / K-44),RASTER
+Prestressed concrete beams,LF,,,2737.9,,,2737.9,ok,PDF p.51 / K-6 (summary table is a raster image; 110-300 dpi reads; superstructure sub-table p.89 / K-44),RASTER
+Approach slab,SY,,,,212.7,,212.7,ok,PDF p.51 / K-6 (summary table is a raster image; 110-300 dpi reads; superstructure sub-table p.89 / K-44),RASTER
+Saw-cut grooving,SY,,,6304.9,192.7,,6497.6,ok,PDF p.51 / K-6 (summary table is a raster image; 110-300 dpi reads; superstructure sub-table p.89 / K-44),RASTER
+Sealed expansion joint,LF,,,233.00,,,233.00,ok,PDF p.51 / K-6 (summary table is a raster image; 110-300 dpi reads; superstructure sub-table p.89 / K-44),RASTER
+42 in F-shaped parapet,LF,,,3913.5,119.5,,4033.0,ok,PDF p.51 / K-6 (summary table is a raster image; 110-300 dpi reads; superstructure sub-table p.89 / K-44),RASTER
+Structural steel,LB,,,1954310,,,1954310,ok,PDF p.51 / K-6 (summary table is a raster image; 110-300 dpi reads; superstructure sub-table p.89 / K-44),RASTER
+Stainless steel fixed bearing assembly,EA,,,54,,,54,ok,PDF p.51 / K-6 (summary table is a raster image; 110-300 dpi reads; superstructure sub-table p.89 / K-44),RASTER
+Stainless steel expansion bearing assembly,EA,,,42,,,42,ok,PDF p.51 / K-6 (summary table is a raster image; 110-300 dpi reads; superstructure sub-table p.89 / K-44),RASTER
+Class AA concrete,CY,,23.8,1791.5,,,1815.3,ok,PDF p.51 / K-6 (summary table is a raster image; 110-300 dpi reads; superstructure sub-table p.89 / K-44),RASTER
+Class A concrete,CY,100.3,2760.9,,,,2861.2,ok,PDF p.51 / K-6 (summary table is a raster image; 110-300 dpi reads; superstructure sub-table p.89 / K-44),RASTER
+Slope wall (5 in),SY,,,,,130,130,ok,PDF p.51 / K-6 (summary table is a raster image; 110-300 dpi reads; superstructure sub-table p.89 / K-44),RASTER
+(SP) graffiti treatment,SF,255,12205,10084,,917,23461,ok,PDF p.51 / K-6 (summary table is a raster image; 110-300 dpi reads; superstructure sub-table p.89 / K-44),RASTER
+Epoxy coated reinforcing steel,LB,16750,620630,465980,,,1103360,ok,PDF p.51 / K-6 (summary table is a raster image; 110-300 dpi reads; superstructure sub-table p.89 / K-44),RASTER
+Piles furnished HP10x42,LF,206,,,,,206,ok,PDF p.51 / K-6 (summary table is a raster image; 110-300 dpi reads; superstructure sub-table p.89 / K-44),RASTER
+Piles furnished HP12x53,LF,468,,,,,468,ok,PDF p.51 / K-6 (summary table is a raster image; 110-300 dpi reads; superstructure sub-table p.89 / K-44),RASTER
+Piles driven HP10x42,LF,206,,,,,206,ok,PDF p.51 / K-6 (summary table is a raster image; 110-300 dpi reads; superstructure sub-table p.89 / K-44),RASTER
+Piles driven HP12x53,LF,468,,,,,468,ok,PDF p.51 / K-6 (summary table is a raster image; 110-300 dpi reads; superstructure sub-table p.89 / K-44),RASTER
+Metal pile shoes,EA,9,,,,,9,ok,PDF p.51 / K-6 (summary table is a raster image; 110-300 dpi reads; superstructure sub-table p.89 / K-44),RASTER
+(PL) pilot holes,LF,175,,,,,175,ok,PDF p.51 / K-6 (summary table is a raster image; 110-300 dpi reads; superstructure sub-table p.89 / K-44),RASTER
+Pile splice H-pile (non-biddable),EA,1,,,,,1,ok,PDF p.51 / K-6 (summary table is a raster image; 110-300 dpi reads; superstructure sub-table p.89 / K-44),RASTER
+Water repellent (visually inspected),SY,97,4945,1909,,60,7011,ok,PDF p.51 / K-6 (summary table is a raster image; 110-300 dpi reads; superstructure sub-table p.89 / K-44),RASTER
+Drilled shafts 60 in diameter,LF,195,331,,,,526,ok,PDF p.51 / K-6 (summary table is a raster image; 110-300 dpi reads; superstructure sub-table p.89 / K-44),RASTER
+Drilled shafts 72 in diameter,LF,,1014,,,,1014,ok,PDF p.51 / K-6 (summary table is a raster image; 110-300 dpi reads; superstructure sub-table p.89 / K-44),RASTER
+Drilled shafts 96 in diameter,LF,,59,,,,59,ok,PDF p.51 / K-6 (summary table is a raster image; 110-300 dpi reads; superstructure sub-table p.89 / K-44),RASTER
+Crosshole sonic logging,EA,1,8,,,,9,ok,PDF p.51 / K-6 (summary table is a raster image; 110-300 dpi reads; superstructure sub-table p.89 / K-44),RASTER
+Sealer crack preparation,LF,,,480,,,480,ok,PDF p.51 / K-6 (summary table is a raster image; 110-300 dpi reads; superstructure sub-table p.89 / K-44),RASTER
+Sealer resin,GAL,,,12.5,,,12.5,ok,PDF p.51 / K-6 (summary table is a raster image; 110-300 dpi reads; superstructure sub-table p.89 / K-44),RASTER
+Ornamental medallion,EA,,34,,,,34,ok,PDF p.51 / K-6 (summary table is a raster image; 110-300 dpi reads; superstructure sub-table p.89 / K-44),RASTER
+(PL) installation of bridge items,EA,,,7,,,7,ok,PDF p.51 / K-6 (summary table is a raster image; 110-300 dpi reads; superstructure sub-table p.89 / K-44),RASTER
+6 in perforated pipe underdrain round,LF,66,,,,43,109,ok,PDF p.51 / K-6 (summary table is a raster image; 110-300 dpi reads; superstructure sub-table p.89 / K-44),RASTER
+6 in non-perf pipe underdrain round,LF,63,,,,33,96,ok,PDF p.51 / K-6 (summary table is a raster image; 110-300 dpi reads; superstructure sub-table p.89 / K-44),RASTER
+2 in pipe railing,LF,,,,,28,28,ok,PDF p.51 / K-6 (summary table is a raster image; 110-300 dpi reads; superstructure sub-table p.89 / K-44),RASTER

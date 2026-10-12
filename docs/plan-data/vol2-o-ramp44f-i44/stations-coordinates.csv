@@ -1,0 +1,7 @@
+point,station,profile_elev_ft,N_ft,E_ft,source,tag
+Pier 13 (shared with N pier 13; Ramp 44F station),301+53.72,1135.33,193142.24 (N p.148),2113535.71 (N p.148),"PDF p.254 / O-1 (elev, stations); p.259 / O-5 (N,E)","TEXT (stations / N,E); elevations RASTER (profile at CL)"
+Pier 14,302+93.00,1132.14,193275.14,2113643.09,"PDF p.254 / O-1 (elev, stations); p.259 / O-5 (N,E)","TEXT (stations / N,E); elevations RASTER (profile at CL)"
+Pier 15,304+54.00,1130.87,193434.63,2113663.38,"PDF p.254 / O-1 (elev, stations); p.259 / O-5 (N,E)","TEXT (stations / N,E); elevations RASTER (profile at CL)"
+Pier 16,306+15.00,1129.96,193595.16,2113654.37,"PDF p.254 / O-1 (elev, stations); p.259 / O-5 (N,E)","TEXT (stations / N,E); elevations RASTER (profile at CL)"
+Abut 2 end bridge,306+74.00,1129.62,,,"PDF p.254 / O-1 (elev, stations); p.259 / O-5 (N,E)","TEXT (stations / N,E); elevations RASTER (profile at CL)"
+Abut 2 F.F. backwall WP,306+73.25,,193652.45,2113643.91,"PDF p.254 / O-1 (elev, stations); p.259 / O-5 (N,E)","TEXT (stations / N,E); elevations RASTER (profile at CL)"
