@@ -309,12 +309,61 @@ public static class SceneBuilder
                     items.Select(x => (object)new NamedPick("Expansion joint", x.Item2, new[] { ("Info", x.Item3) })).ToList());
                 return new SolidLayer { Name = "3D-JOINTS", R = 230, G = 140, B = 40, Parts = new() { (g, null) }, Triangles = g.Indices!.Count / 3, Opacity = 0.85f };
             },
+            () => SegmentLayer(models, o, flagged: false),
+            () => SegmentLayer(models, o, flagged: true),
+            () =>
+            {
+                // Segmental box tendons (straight duct runs, equal-area bundle tubes).
+                var tubes = new List<Mesh>();
+                var tags = new List<object>();
+                foreach (var sm in models.Select(m => m.Segmental).OfType<SBM.Core.Segmental.SegmentalModel>())
+                    foreach (var t in sm.Tendons)
+                    {
+                        var tube = new Mesh();
+                        AddTube(tube, t.Points.ToArray(), Math.Sqrt(t.Strands * sm.Definition.StrandArea / Math.PI));
+                        tubes.Add(tube);
+                        var props = new List<(string, string)> { ("Group", t.Group.ToString()), ("Strands", t.Strands.ToString()), ("Plan length", $"{t.PlanLength / 0.3048:N2} ft"),
+                            ("Model length", $"{t.Length / 0.3048:N2} ft"), ("Jacking force", $"{t.JackingForceKip:N0} kip"), ("Stressing end", t.StressingEnd), ("Anchors", t.Anchors) };
+                        if (t.Assumption != null) { props.Add(("Status", t.Assumption.Status)); props.Add(("Reason", t.Assumption.Reason)); props.Add(("Assumed", t.Assumption.Basis)); }
+                        tags.Add(new NamedPick("Tendon", t.Name, props));
+                    }
+                if (tubes.Count == 0) return null;
+                var g = FlatShaded(tubes, o, tags);
+                return new SolidLayer { Name = "3D-PT-TENDONS", R = 70, G = 110, B = 190, Parts = new() { (g, null) }, Triangles = g.Indices!.Count / 3 };
+            },
+            () =>
+            {
+                var items = models.Select(m => m.Segmental).OfType<SBM.Core.Segmental.SegmentalModel>().SelectMany(sm => sm.Bearings).Where(b => b.Mesh is { IsEmpty: false }).ToList();
+                if (items.Count == 0) return null;
+                var g = FlatShaded(items.Select(b => b.Mesh!), o, items.Select(b => (object)new NamedPick("Bearing", b.Name, new[] { ("Info", b.Description), ("Soffit EL", $"{b.SoffitZ / 0.3048:N3} ft") })).ToList());
+                return new SolidLayer { Name = "3D-SEGMENTAL-BEARINGS", R = 140, G = 140, B = 150, Parts = new() { (g, null) }, Triangles = g.Indices!.Count / 3 };
+            },
             () => RebarLayer(models, o, "Deck", "3D-REBAR-DECK"),
             () => RebarLayer(models, o, "Rail", "3D-REBAR-RAIL"),
         };
         var results = new SolidLayer?[jobs.Length];
         Parallel.For(0, jobs.Length, i => results[i] = jobs[i]());
         scene.Solids.AddRange(results.OfType<SolidLayer>());
+    }
+
+    /// <summary>Precast segmental box segments (see-through so the tendons show); segments modeled on an UNRESOLVED item in their own orange layer.</summary>
+    private static SolidLayer? SegmentLayer(IReadOnlyList<SBM.Core.Concrete.ConcreteModel> models, Vec3 o, bool flagged)
+    {
+        const double cy = 0.764554857984;
+        var items = new List<(Mesh mesh, object tag)>();
+        foreach (var sm in models.Select(m => m.Segmental).OfType<SBM.Core.Segmental.SegmentalModel>())
+            foreach (var s in sm.Segments.Where(s => (s.Assumption != null) == flagged && !s.Mesh.IsEmpty))
+            {
+                var props = new List<(string, string)> { ("Type", s.Type.ToString()), ("Span", s.Span), ("Cantilever", s.Bent), ("Depth", $"{s.Depth0 / 0.3048:N3} / {s.Depth1 / 0.3048:N3} ft"),
+                    ("Chord length", $"{s.ChordLength / 0.3048:N3} ft"), ("Volume", $"{s.Volume / cy:N2} CY"), ("Info", s.Description) };
+                if (s.Assumption != null) { props.Add(("Status", s.Assumption.Status)); props.Add(("Reason", s.Assumption.Reason)); props.Add(("Assumed", s.Assumption.Basis)); }
+                items.Add((s.Mesh, new NamedPick("Segment", s.Name, props)));
+            }
+        if (items.Count == 0) return null;
+        var geo = FlatShaded(items.Select(x => x.mesh), o, items.Select(x => x.tag).ToList());
+        return flagged
+            ? new SolidLayer { Name = "3D-UNRESOLVED-SEGMENTS", R = 255, G = 110, B = 40, Parts = new() { (geo, null) }, Triangles = geo.Indices!.Count / 3, Opacity = 0.6f }
+            : new SolidLayer { Name = "3D-SEGMENTS", R = 205, G = 200, B = 186, Parts = new() { (geo, null) }, Triangles = geo.Indices!.Count / 3, Opacity = 0.55f };
     }
 
     /// <summary>TxDOT prestressed girders (see-through concrete so the strands show), strands as tubes, elastomeric pads.</summary>
