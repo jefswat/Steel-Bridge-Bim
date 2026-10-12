@@ -207,7 +207,18 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
     triangles back via `_triMap`. Hide/unhide: `_hidden` (tags) filters merged meshes by pick-table ranges and
     instanced meshes by `_visibleInstances`, through the same ClipMesh/ApplySection path as the section cut; `RemapHidden`
     re-matches hidden tags after regeneration via `HideKey`. Right-click (no drag) = context menu. Sheets mode: `MainWindow.Sheets.cs`. Snapshot options: `--section STA[,skew]`,
-    `--pick fx,fy` (logs PICK: properties), `--sheets`.
+    `--pick fx,fy` (logs PICK: properties), `--sheets`, `--orbit fx,fy,dx,dy` (simulated orbit drag; logs ORBIT: pivot, leaves the marker), DETAIL: log lines = detail tiles drawn.
+  - Navigation (`MainWindow.Navigation.cs`, math in `SBM.Core/Geometry/ViewNav.cs`, tests `ViewNavTests`): Tekla / CAD style, all camera moves are ours
+    (`UseDefaultGestures="False"`, Helix InputBindings cleared, Preview handlers mark events handled). Bindings = table `NavPresets.Cad`
+    (another preset = another table): middle-drag pan (grabbed point stays under the cursor) - Ctrl/Shift + middle-drag orbit - right-drag orbit
+    (right CLICK = context menu; the orbit starts after 4 px) - double-click middle = zoom extents - wheel = zoom 15 %/notch about the cursor (min width 2 cm).
+    Orbit = turntable (yaw about Z, pitch clamped to +-89 deg, no roll, no inertia). Pivot (`ChoosePivot`): selection centroid when "Pivot: selection" is on,
+    else the exact BVH ray cast `SnapIndex.RayCast` (front-to-back, no time budget; the snap `Find` is budgeted and can return a far surface) under the
+    cursor -> under the screen center -> previous pivot if on screen -> view target; never a plane point. Marker = WPF overlay `PivotOverlay` (always on top).
+    Help: "Mouse ?" button (text from `NavPresets.Describe`). The camera is orthographic only (`DollyToward` / `NearPlaneFor` are there for a perspective one).
+  - Detail tiles (`_detailBounds`): culled by distance from the view-center LINE OF SIGHT (`_detailRadius`, 120 m), never from `Position + LookDirection`
+    (that point is at the depth of the scene center because `KeepCameraInRange` parks the eye outside the scene: in oblique views it was hundreds of
+    meters from what is on screen, so close-up rebar, e.g. Ramp G Pier 7G, vanished). `OnCameraMoved` ignores no-op camera events.
   - `Prestressed/` â€” `TxGirderCatalog` (Tx28â€“Tx70 as PGSuper/WBFL precast I-beam dims `PrecastIBeamDims`; `TxGirderShape`
     outline = WBFL PrecastBeam polygon; IGND grid; IGEB pad table), `PrestressedGenerator` (one straight beam per span Ã—
     girder between the framing's support-line points; IGD/IGEB ends; strands; pads; `BearingSeat`s with Location so the
