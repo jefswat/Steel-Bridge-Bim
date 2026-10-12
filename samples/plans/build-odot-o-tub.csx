@@ -43,34 +43,34 @@ var wp = new (string name, double sta, double n, double e)[]
     ("Abut 1 F.F. backwall", Sta("306+73.25"), 193652.45, 2113643.91),
 };
 Vec2 P(int i) => new(Ft(wp[i].e), Ft(wp[i].n));
-// Circle through P13, P15, P16 (local grid X = E, Y = N; datum not printed, U2), checked against the plan radius and the other points.
-Vec2 Circ(Vec2 a, Vec2 b, Vec2 c)
-{
-    double d = 2 * (a.X * (b.Y - c.Y) + b.X * (c.Y - a.Y) + c.X * (a.Y - b.Y));
-    double a2 = a.LengthSquared, b2 = b.LengthSquared, c2 = c.LengthSquared;
-    return new Vec2((a2 * (b.Y - c.Y) + b2 * (c.Y - a.Y) + c2 * (a.Y - b.Y)) / d, (a2 * (c.X - b.X) + b2 * (a.X - c.X) + c2 * (b.X - a.X)) / d);
-}
-var ctr = Circ(P(0), P(2), P(3));
-double Rfit = (P(0) - ctr).Length;
-Print($"Curve 9 fitted through the working points of piers 13 / 15 / 16: R {Rfit / Ft(1):F3} ft (plan 881.47)");
-for (int i = 0; i < wp.Length; i++) Print($"  {wp[i].name}: radius {(P(i) - ctr).Length / Ft(1):F3} ft");
+// Centre: the plan radius R 881.47 through the pier 14 and pier 16 working points (p.259, both on Bridge O's own staking sheet; local grid X = E,
+// Y = N; datum not printed, U2), centre on the LEFT of travel; pier 15 and the abutment-1 point are checks. The pier-13 N / E (p.148) is Bridge N's
+// working point on Ramp 44E and does NOT lie on this arc (reported below, not used).
 double R = Ft(881.47);
-U("p.254", "PC / PT stations of curve no. 9 (U1)", "the general plan prints R, T, delta, D and L but no PC / PT station and the volume has no alignment sheet",
-  "The alignment is the arc R 881.47 LT through the plan working points (centre fitted through piers 13 / 15 / 16), from 20 ft before pier 13 to the abutment-1 working point.");
-U("p.259", "coordinate zone / datum (U2)", "the staking sheet gives N / E without naming the system", "Plan N / E used as a local grid in feet.");
+Vec2 ctr;
+{
+    Vec2 a = P(1), c = P(3), m = (a + c) * 0.5, chord = c - a;
+    double h = Math.Sqrt(R * R - chord.LengthSquared / 4);
+    ctr = m + chord.Normalized().Left * h;   // LEFT curve: centre to the left of the direction of travel (pier 14 -> pier 16)
+}
+Print($"Curve 9 centre from R 881.47 through the pier 14 / pier 16 working points (p.259); radius of the other points:");
+for (int i = 0; i < wp.Length; i++) Print($"  {wp[i].name}: radius {(P(i) - ctr).Length / Ft(1):F3} ft (difference {((P(i) - ctr).Length - R) / Ft(1):+0.000;-0.000} ft)");
+U("p.148, p.254, p.259", "pier 13 working point coordinates", "the N / E printed for pier 13 on Bridge N (p.148, Ramp 44E STA 301+09.58) lie about 171 ft from the pier 14 working point, not 139.28 ft along an R 881.47 arc, and Bridge O's staking sheet (p.259) gives no pier-13 coordinates",
+  "Pier 13 is located by station (301+53.72 Ramp 44F) on the arc through piers 14 / 16; the p.148 coordinates are reported only.");
 // Arc: start 20 ft before the pier-13 working point (girder G1 begins about 5 ft before it on the skewed pier-13 line, the deck edge 8 ft).
-double angP13 = Math.Atan2(P(0).Y - ctr.Y, P(0).X - ctr.X);
 // LEFT curve: travel is counter-clockwise about the centre; tangent = radial rotated +90 deg.
+double angP14 = Math.Atan2(P(1).Y - ctr.Y, P(1).X - ctr.X);
 double lead = Ft(20), arcLen = (wp[4].sta - wp[0].sta) + lead + Ft(10);
-double ang0 = angP13 - lead / R;
+double ang0 = angP14 - (wp[1].sta - wp[0].sta + lead) / R;
 var start = ctr + Vec2.FromAngle(ang0) * R;
 const string AlName = "CL Ramp 44F";
 Doc.Project.Alignments.RemoveAll(a => a.Name == AlName);
 var al = new Alignment { Name = AlName, Description = "CL Ramp 44F = profile grade line (Bridge O, curve no. 9 arc; PC/PT not printed U1; local grid U2)" };
 al.SetElements(new[] { new HorizontalElement(start, ang0 + Math.PI / 2, arcLen, 1 / R, 1 / R) });
-// Station equation at pier 13 (p.254): 301+09.58 Ramp 44E = 301+53.72 Ramp 44F. Before it the stations are Ramp 44E.
-al.StartStation = Sta("301+09.58") - lead;
-al.StationEquations = new List<StationEquation> { new() { Distance = lead, StationBack = Sta("301+09.58"), StationAhead = Sta("301+53.72") } };
+// Station equation at pier 13 (p.254): 301+09.58 Ramp 44E = 301+53.72 Ramp 44F - Ramp 44F begins there (Ramp 44E is another alignment, like the
+// 44N / 44M2 relations below), so it is data only. The 20 ft lead-in (model only, for the skewed pier-13 girder ends) carries 44F stations back of 301+53.72.
+al.StartStation = Sta("301+53.72") - lead;
+Print("Station equation (p.254): 301+09.58 Ramp 44E = 301+53.72 Ramp 44F (begin of Ramp 44F; relation to another alignment, data only).");
 Doc.Project.Alignments.Add(al);
 for (int i = 0; i < wp.Length; i++)
 {
@@ -82,16 +82,13 @@ for (int i = 0; i < wp.Length; i++)
 Print("Other ramps (p.254): 304+77.01 Ramp 44F = 303+77.56 Ramp 44N; 305+52.42 Ramp 44F = 304+00.30 Ramp 44M2 (relations to other alignments; 44F stationing continuous).");
 
 // Profile (p.254): PVC 301+70.00 el 1134.85, PVI 302+70.00 el 1131.92, PVT 303+70.00 el 1131.35, VC 200', -2.93 % / -0.57 %.
-// The profile is evaluated by STATION; the 20 ft lead-in carries Ramp 44E stations (< 301+09.58), so the back tangent is entered twice: on 44E
-// stations up to the equation and on 44F stations from it (same physical grade line; the 44E / 44F station gap is never evaluated).
-double zEq = 1131.92 + 0.0293 * (302.70 - 301.5372) * 100;   // back tangent at 301+53.72 44F (DERIVED from the PVI and the -2.93 % grade)
+// The back tangent (-2.93 %) is extended over the 20 ft lead-in (model only; the deck and girders begin at pier 13).
+double zEq = 1131.92 + 0.0293 * (302.70 - 301.5372) * 100;   // back tangent at 301+53.72 (DERIVED from the PVI and the -2.93 % grade)
 al.Profile = new VerticalProfile
 {
     Vpis =
     {
         new Vpi(al.StartStation, Ft(zEq + 0.0293 * lead / Ft(1))),
-        new Vpi(Sta("301+09.58"), Ft(zEq)),
-        new Vpi(Sta("301+53.72"), Ft(zEq)),
         new Vpi(Sta("302+70.00"), Ft(1131.92), Ft(200)),
         new Vpi(Sta("306+83.25"), Ft(1131.92 - 0.0057 * (306.8325 - 302.70) * 100)),
     },
@@ -112,42 +109,44 @@ SupportDefinition Sup(string name, double sta, double skew, double endExt, Beari
     Name = name, Type = SupportType.Pier, Station = sta, SkewDegrees = skew, GirderEndExtension = endExt, Fixity = fix, DeckEndOffset = Ft(1),
     Substructure = new SubstructureDefinition { Enabled = false },   // SUPERSTRUCTURE ONLY (user scope): no piers / footings
 };
-// Pier 13 (p.273 O-19): end diaphragm lines 69 deg 02'38" to G1 and 69 deg 18'54" to G2; CL brg 1'-0 15/16 (G1) / 1'-0 7/8 (G2) from CL pier along
-// the girders = 1'-0 normal to the pier (12 15/16 x sin 69.04 = 12.08", 12 7/8 x sin 69.31 = 12.04"). Skew solved so G1 meets the line at 69 deg 02'38".
-double skew13 = 0;
+// Pier 13 (p.273 O-19, p.278 O-24, p.279 O-25, p.283 O-29). The CL bearing line is fixed by the two girder spans on the elevation sheets:
+// G1 CL brg pier 13 to CL brg pier 14 141'-4", G2 137'-2 5/16" (= framing plan 123'-6 5/8 + 13'-7 11/16), measured along the girder arcs from the radial
+// pier-14 line. Checks of that line (printed): length along CL brg between the girders 18'-11 13/16 (p.283), CL pier 13 1'-0 behind it at
+// 301+53.72 (p.254), and the angles to the girders 69 deg 02'38" (G1) / 69 deg 18'54" (G2) printed on p.273.
+double skew13, sta13;
 {
-    double targetG1 = 69 + 2 / 60.0 + 38 / 3600.0, offG1 = -F(13, 4);
-    double AngleAt(double skewDeg, double off)
-    {
-        double sta = Sta("301+53.72");
-        double d0 = al.StationToDistance(sta);
-        var a = al.PointAtDistance(d0);
-        double th = al.EvaluateAtDistance(d0).angle;
-        var dir = Vec2.FromAngle(th).Right.Rotate(-skewDeg * Math.PI / 180);   // radial (left -> right) rotated so the right end moves ahead
-        // girder G at offset 'off': circle radius R - off... intersect line a + dir*u with circle |p - ctr| = R + (-off) for a LEFT curve
-        double rg = R + (-off) * -1;   // left offset (negative) -> smaller radius
-        rg = R + off;
-        // solve |a + dir u - ctr| = rg
-        var w = a - ctr; double B2 = 2 * Vec2.Dot(w, dir), C = w.LengthSquared - rg * rg;
-        double disc = B2 * B2 - 4 * C; double u1 = (-B2 + Math.Sqrt(disc)) / 2, u2 = (-B2 - Math.Sqrt(disc)) / 2;
-        double u = Math.Abs(u1) < Math.Abs(u2) ? u1 : u2;
-        var p = a + dir * u;
-        var tan = (p - ctr).Normalized().Left;   // CCW travel
-        return Math.Acos(Math.Abs(Vec2.Dot(tan, dir))) * 180 / Math.PI;
-    }
-    double lo = 0, hi = 40;
-    for (int it = 0; it < 80; it++) { double m = (lo + hi) / 2; if (AngleAt(m, offG1) > targetG1) lo = m; else hi = m; }
-    skew13 = (lo + hi) / 2;
-    double g2 = AngleAt(skew13, F(4, 4));
-    Print($"Pier 13 skew {skew13:F4} deg: G1 angle {AngleAt(skew13, offG1):F4} deg (plan 69.0439), G2 angle {g2:F4} deg (plan {69 + 18 / 60.0 + 54 / 3600.0:F4}, difference {(g2 - (69 + 18 / 60.0 + 54 / 3600.0)) * 3600:+0;-0}\")");
+    double sta14 = Sta("302+93.00");
+    double angP14_ = Math.Atan2(P(1).Y - ctr.Y, P(1).X - ctr.X);
+    double r1 = R - F(13, 4), r2 = R + F(4, 4);
+    double a1 = angP14_ - F(141, 4) / r1, a2 = angP14_ - Fr(137, 2, 5, 16) / r2;
+    var p1 = ctr + Vec2.FromAngle(a1) * r1;
+    var p2 = ctr + Vec2.FromAngle(a2) * r2;
+    var u = (p2 - p1).Normalized();
+    // crossing of the CL bearing line with CL Ramp 44F (radius R)
+    var w = p1 - ctr; double B2 = 2 * Vec2.Dot(w, u), C = w.LengthSquared - R * R, disc = Math.Sqrt(B2 * B2 - 4 * C);
+    double t1 = (-B2 + disc) / 2, t2 = (-B2 - disc) / 2, tq = Math.Abs(t1) < Math.Abs(t2) ? t1 : t2;
+    var q = p1 + u * tq;
+    double aq = Math.Atan2(q.Y - ctr.Y, q.X - ctr.X);
+    sta13 = sta14 - (angP14_ - aq) * R;
+    var radial = (q - ctr).Normalized();   // left -> right across the LEFT curve
+    skew13 = Math.Atan2(radial.X * u.Y - radial.Y * u.X, Vec2.Dot(radial, u)) * 180 / Math.PI;   // program convention: + = right end ahead
+    double Ang(Vec2 p) => Math.Acos(Math.Abs(Vec2.Dot((p - ctr).Normalized().Left, u))) * 180 / Math.PI;
+    string Dms(double d) { int dd = (int)d; double m = (d - dd) * 60; int mm = (int)m; return $"{dd} deg {mm:00}'{(m - mm) * 60:00.0}\""; }
+    double pier13 = sta13 - Ft(1) / Math.Cos(skew13 * Math.PI / 180);
+    Print($"Pier 13 CL brg from the girder spans: station {Doc.Units.FormatStation(sta13)}, skew {skew13:F4} deg; length along CL brg G1-G2 {(p2 - p1).Length / Ft(1):F4} ft (plan 18'-11 13/16 = {18 + 11.8125 / 12:F4}); "
+        + $"CL pier 1'-0 behind at {Doc.Units.FormatStation(pier13)} (plan 301+53.72, difference {(pier13 - Sta("301+53.72")) / In(1):+0.00;-0.00}\")");
+    double g1 = Ang(p1), g2 = Ang(p2), pg1 = 69 + 2 / 60.0 + 38 / 3600.0, pg2 = 69 + 18 / 60.0 + 54 / 3600.0;
+    Print($"  angle to G1 {Dms(g1)} (plan 69 deg 02'38\", difference {(g1 - pg1) * 60:+0.0;-0.0}'), to G2 {Dms(g2)} (plan 69 deg 18'54\", difference {(g2 - pg2) * 60:+0.0;-0.0}')");
+    U("p.273", "pier 13 angles 69 deg 02'38\" (G1) / 69 deg 18'54\" (G2)", "a straight bearing line crossing the concentric girders 18'-11 13/16 apart meets them about 27' apart in angle, the plan angles differ by 16'; with the elevation-sheet spans the angles come out about 44' (G1) and 33' (G2) smaller",
+      "The line is set by the girder spans 141'-4\" / 137'-2 5/16\" (which also give the plan's 18'-11 13/16\" along CL brg and CL pier at 301+53.72); angles reported.");
 }
-double sta13 = Sta("301+53.72") + Ft(1) / Math.Cos(skew13 * Math.PI / 180);   // CL brg 1'-0 normal to CL pier 13, ahead
+
 // Bearing marks (p.293 O-39): P13 / P16 G1 (guided expansion), P14 F1 (fixed), P15 G2 (guided expansion).
 b.Supports.Add(Sup("Pier 13", sta13, skew13, Fr(0, 9, 11, 16), BearingFixity.GuidedExpansion));
 b.Supports.Add(Sup("Pier 14", Sta("302+93.00"), 0, 0, BearingFixity.Fixed));
 b.Supports.Add(Sup("Pier 15", Sta("304+54.00"), 0, 0, BearingFixity.GuidedExpansion));
 b.Supports.Add(Sup("Pier 16", Sta("306+14.00"), 0, In(9), BearingFixity.GuidedExpansion));   // CL brg 1'-0 back of CL pier 16 (p.273), girder end 9" (p.278)
-Print($"Pier 13 CL brg station {Doc.Units.FormatStation(sta13)} (CL pier 301+53.72 + 1'-0 / cos skew); Pier 16 CL brg 306+14.00 (CL pier 306+15.00 - 1'-0).");
+Print($"Pier 13 CL brg station {Doc.Units.FormatStation(sta13)} (from the girder spans); Pier 16 CL brg 306+14.00 (CL pier 306+15.00 - 1'-0).");
 U("p.273", "deck ends at piers 13 and 16", "the unit's slab continues into Bridge N (pier 13) and span 17 (pier 16); the joint / continuity details there are outside this unit",
   "The modeled deck stops at CL pier 13 and CL pier 16 (DeckEndOffset 1'-0 from CL brg) - a model boundary, not a joint.");
 

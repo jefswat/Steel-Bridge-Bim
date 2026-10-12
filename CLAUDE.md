@@ -32,7 +32,7 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   orchestration; `IfcKeys` = the key patterns behind the IFC GlobalIds, shared with `IfcExporter` — never change a pattern). Compact layout `el` +
   `strings` + `props`, readable VIEW `elements`; groups (no IFC entity) at the plans' granularity; links on groups/assemblies, children inherit
   (`v_element_sheets`). `tools/plan_split.py` splits plan PDFs. App: `MainWindow.Database.cs` + `SBM.App/Database/` (panel, preview window, `PdfOpener` = open at page).
-  Sheet links need no PDF split: rules files `samples/plans/sheet-links-{i80-rampg,woodbury,br02069}.json` carry each plan set's sheet index
+  Sheet links need no PDF split: rules files `samples/plans/sheet-links-{i80-rampg,woodbury,br02069,nht,odot-o}.json` carry each plan set's sheet index
   (`sheets: [{p,s,t}]`) and `models` (which .sbm they belong to; `CompanionDatabase.FindLinksFile` picks by it) + `planFolders` (PDF lookup ->
   `sheets.pdf_path`). Every build applies them; `CompanionDatabase.Relink` / `sbm db --relink` re-applies to an existing db; the app relinks on
   load when links are missing or the rules file is newer. A new bridge needs its own `sheet-links-<name>.json` with an index (tests check every rule matches a sheet).
@@ -311,8 +311,19 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
     `Steel/TubGirderGenerator.cs` (partial SteelModelGenerator, `RunTub` replaces `Run` when `IsTub`: plates from `Section.Layouts` (top flange width = one
     flange), splices, panel points (`TubPanelSegment`), stiffeners, internal K frames + WT top struts, WT top laterals, external / support diaphragms,
     pad + beveled-plate bearings + seats, hatches, studs, tension zones), report `SteelModel.Tub` (`TubGirderReport`), haunches `Concrete/ConcreteTubHaunch.cs`.
-    FramingGenerator skips cross frames / stiffeners for tubs. New part categories `RolledTee` (IfcMember) / `AccessDoor` (IfcPlate) appended.
-    Plan data: `samples/plans/build-odot-o-tub.csx` (ODOT Bridge O spans 14-16; NOT yet run - see follow-ups), no tub tests / check script yet.
+    FramingGenerator skips cross frames / stiffeners for tubs. New part categories `RolledTee` (IfcMember; WT top struts = role TopChord -> .CHORD.,
+    top laterals .BRACE.) / `AccessDoor` (IfcPlate 'ACCESS_DOOR') appended AFTER main's arch categories (enum order). Support diaphragm top flanges carry
+    2 studs @ 1'-0 (p.283) - girder studs are the parts whose assembly is not XSD*. Path distances (`BearingS`, `SpliceS`, plate runs) are PLAN arc lengths
+    at the top working point (the plans' girder dimensions match horizontal, not along-grade, lengths).
+    Model: `samples/plans/ODOT Bridge O tub unit.sbm` = `sbm new` + `build-odot-o-tub.csx` (superstructure only, user scope). Alignment = R 881.47 arc through
+    the pier 14 / 16 working points (p.259; pier 13's N/E on p.148 is a Ramp 44E point off the arc - UNRESOLVED), 44F stationing back from 301+53.72 (the
+    44E = 44F equation is data only: a station-gap profile broke IfcGradientCurve continuity). Pier 13 bearing line from the two girder spans
+    141'-4 / 137'-2 5/16 (reproduces 18'-11 13/16 along CL brg and CL pier 301+53.72; the p.273 angles 69 deg 02'38"/18'54" do not fit - UNRESOLVED).
+    Check `samples/plans/check-odot-o-tub.csx` (74 OK / 38 DIFF, all reported: plan rounding 1/16-1/12" at pier 16 / G2 span 15, H +3/32" from the
+    rotated tub (plan H = vertical stack sum), bearing offset 3 1/16-3 1/8 vs 3", pedestal seats pier 14 +0.02 ft / pier 16 +0.17 ft, G2 top tension zone
+    UNRESOLVED). Tests `TubGirderTests`; links `sheet-links-odot-o.json` (49-page index). IFC: 0 schema / EXPRESS issues; validator "open" connection
+    angles = multi-item SweptSolid bodies (each item closed), top strut volume ratio 0.84 = nominal weight x length of a coped WT. I-girder IFCs
+    byte-identical to main (Sample, I-80 + Ramp G, Br02069, Woodbury, Northaven; FILE_NAME timestamp only).
   - `Concrete/` â€” `ConcreteGenerator` (deck slab grid solid between skewed end lines following finished grade,
     haunch sweeps, barrier sweeps, deck mats, 1% negative-moment bars, TxDOT SSTR Bars S/U/R), `BarrierProfiles`
     (SSTR per RL-SSTR Sept 2019 â€” 3/4" back-face step is an assumption; `Expand` = custom section with fillets / chamfers / edge tags),
