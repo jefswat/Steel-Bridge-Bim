@@ -137,6 +137,7 @@ Bridge sheets: PDF p.83-155 (sheets 134-205). Roadway / walls / drainage / utili
 | `cable-hanger-coordinates.csv` | 32 cables: tie point T, rib point H, anchor points TC/HC (local X,Y,Z), lengths (all reconcile) | p.147 |
 | `cable-fin-plates-arch-rib.csv` | fin plate dims per cable (angle B, P1-P4, weld D) with internal checks | p.148 |
 | `upper-lateral-bracing-points.csv` | U1-U11, U1'-U11', UL1-UL10 local coordinates + rib-circle check | p.128 |
+| `upper-lateral-bracing-plates.csv` | gusset flat patterns (true arcs, bend lines, holes, braces under them), A-A connection plates and stiffeners per detail sheet U1-U11, from the VECTOR linework (`tools/nht_bracing_plates.py`) | p.129-140 |
 | `floorbeam-schedule.csv` | FB1-FB33 PT opening dims A/B | p.145 |
 | `bar-lists.csv` | arch piers 10 & 11 bar list with weight checks | p.104 |
 | `quantities.csv` | bridge summary of estimated quantities (both CSJs) with cross-checks to sheet quantity tables | p.91 |
