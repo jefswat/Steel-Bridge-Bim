@@ -75,7 +75,8 @@ public sealed class GirderEndDap
     public double Angle(double s)
     {
         const double h = 1e-5;
-        return Math.Atan(Math.Abs(Drop(s + h) - Drop(s - h)) / (2 * h));
+        double x = X(s), xa = Math.Max(x - h, 0), xb = x + h;   // one-sided at the girder end (Drop is 0 beyond it)
+        return Math.Atan(Math.Abs(Drop(S(xb)) - Drop(S(xa))) / (xb - xa));
     }
 
     /// <summary>Tab depth from the web edge at path distance s inside the cope zone (x in [0, CopeInset]).</summary>
