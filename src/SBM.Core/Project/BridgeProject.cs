@@ -20,6 +20,9 @@ public sealed class BridgeProject
     public List<References.ReferenceModelDefinition> References { get; set; } = new();
     /// <summary>Geometry options (exact NURBS for curved parts; default off).</summary>
     public GeometrySettings Geometry { get; set; } = new();
+    /// <summary>Georeference of the project X / Y (OPTIONAL, null = local grid, IFC map conversion scale 1): map CRS, grid scale (map = local x scale,
+    /// e.g. 1 / surface adjustment factor for TxDOT surface coordinates).</summary>
+    public GeoreferenceDefinition? Georeference { get; set; }
 
     /// <summary>Resolves a reference path (relative paths are relative to the project file's folder).</summary>
     public static string ResolvePath(string path, string? projectFile) =>
@@ -66,6 +69,8 @@ public sealed class BridgeProject
         public List<References.ReferenceModelDefinition>? References { get; set; } = new();
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
         public GeometrySettings? Geometry { get; set; }
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+        public GeoreferenceDefinition? Georeference { get; set; }
 
         public static ProjectDto From(BridgeProject p) => new()
         {
@@ -76,6 +81,7 @@ public sealed class BridgeProject
             Bridges = p.Bridges,
             References = p.References,
             Geometry = p.Geometry.IsDefault ? null : p.Geometry,
+            Georeference = p.Georeference,
         };
 
         public BridgeProject ToProject() => new()
@@ -86,6 +92,7 @@ public sealed class BridgeProject
             Bridges = Bridges,
             References = References ?? new(),
             Geometry = Geometry ?? new(),
+            Georeference = Georeference,
         };
     }
 

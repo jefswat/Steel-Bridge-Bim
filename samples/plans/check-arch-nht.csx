@@ -42,7 +42,7 @@ Print("== hangers (p.147 cable lengths, +-1/16\")");
 double maxH = 0;
 foreach (var h in am.Hangers)
 {
-    double d = (h.RibAnchorWorld - h.TieAnchorWorld).Length - h.PlanLength;
+    double d = (h.RibWorkPointWorld is { } wpw ? (wpw - h.TieAnchorWorld).Length : (h.RibAnchorWorld - h.TieAnchorWorld).Length) - h.PlanLength;
     maxH = Math.Max(maxH, Math.Abs(d));
     if (Math.Abs(d) > Tol) Row($"hanger {h.Name}", $"{ToFt(h.PlanLength):F3}'", $"{ToFt(h.PlanLength + d):F3}'", false);
 }
@@ -106,6 +106,21 @@ Row("south tie chords FB1-FB17 (arc 5'-10 on R 342'-4)", "5.833' arc", $"{ToFt(s
 Print("== bearings (p.102 pedestal tops, p.107 stack 11 3/4\", p.119 WP chain)");
 foreach (var b in am.Bearings)
     Print($"     {b.Name} @ {b.Support}: pedestal {ToFt(b.SeatElevation):F3}', top of stack {ToFt(b.TopOfStack):F3}', steel underside (WP chain) {ToFt(b.SteelUnderside):F3}', gap {ToIn(b.SteelUnderside - b.TopOfStack):F2}\"");
+// Bearing plan orientation vs the approach model's arch pedestals (p.102: long axis 63 deg to the pier line).
+foreach (var seat in am.Steel.BearingSeats)
+{
+    var appr = Doc.Project.Bridges.FirstOrDefault(b => b.Arch == null && b.Supports.Any(s => s.Name == seat.Support && s.Substructure.CapBlocks.Count > 0));
+    var unit = appr == null ? null : Doc.Model(appr.Name).Substructure?.Units.FirstOrDefault(u => u.Name == seat.Support);
+    var sd = appr?.Supports.First(s => s.Name == seat.Support).Substructure;
+    if (unit == null || sd == null || seat.Axis is not { } ax || seat.Location is not { } loc) continue;
+    var blk = sd.CapBlocks.Where(c => c.Kind == SBM.Core.Bridge.CapBlockKind.Pedestal && c.Outline.Count == 4)
+        .OrderBy(c => (unit.World(c.Outline.Average(q => q.S), c.Outline.Average(q => q.N), 0).XY - loc).Length).FirstOrDefault();
+    if (blk == null) continue;
+    var p0 = unit.World(blk.Outline[0].S, blk.Outline[0].N, 0).XY; var p1 = unit.World(blk.Outline[1].S, blk.Outline[1].N, 0).XY;
+    var pa = (p1 - p0).Normalized();
+    double dAng = Math.Acos(Math.Min(1, Math.Abs(Vec2.Dot(pa, ax.Normalized())))) * 180 / Math.PI;
+    Row($"bearing {am.BearingNames[seat.Girder]} plan axis vs pedestal '{blk.Name}' long axis", "parallel (p.102 63 deg / p.107)", $"{dAng:F3} deg", dAng < 0.01);
+}
 
 // ---- deck
 Print("== deck (p.91 / p.151: 3,698 SF)");
@@ -114,27 +129,77 @@ Row("arch deck area (top surface, end web to end web)", "3,698 SF", $"{sf:N0} SF
 double cy = (Math.Abs(am.Slab?.Volume() ?? 0) + Math.Abs(am.SlabEnds?.Volume() ?? 0)) / 0.764554857984;
 Print($"     slab {cy:N1} CY (incl. concrete in the form flutes; steel inside the slab not deducted), curbs {Math.Abs(am.Curbs?.Volume() ?? 0) / 0.764554857984:N1} CY");
 
-// ---- steel quantities vs the plan tables
+// ---- field splices (p.127 rib RS1-RS5: 68 bolts each = flanges 2 x 2 x 12 + web 2 x 10; p.144 tie: 42 each = flange 2 x 12 + web 2 x 9)
+Print("== field splices (p.127, p.144)");
+foreach (var (prefix, plan, what) in new[] { ("RIB-RS", 68, "rib splice"), ("TIE-TS", 42, "tie splice") })
+{
+    var sp = am.SpliceBolts.Where(k => k.Key.Contains(prefix)).ToList();
+    Row($"{what}s: count / bolts per splice", prefix == "RIB-RS" ? "10 (RS1-RS5 x 2 ribs) / 68" : "8 (TS(1)-TS(4) x 2 ties, framing plan p.143; U5) / 42",
+        $"{sp.Count} / {string.Join(",", sp.Select(k => k.Value).Distinct())}", sp.Count == (prefix == "RIB-RS" ? 10 : 8) && sp.All(k => k.Value == plan));
+}
+// p.120 TS1-TS3 table (arc mid-panel T9-T10, T17-T18, T25-T26) vs the framing-plan splices built (U5): reported.
+{
+    var st = br.Arch.Ties[0];
+    string Between(double d) { var pp = st.PanelPoints.OrderBy(p => p.Distance).ToList(); var a = pp.LastOrDefault(p => p.Distance < d); var b = pp.FirstOrDefault(p => p.Distance > d); return $"{a?.Name ?? "T0"}-{b?.Name ?? "T34"}"; }
+    foreach (var (n, x, y, a, b) in new[] { ("TS1", -44.892, -5.614, "T9", "T10"), ("TS2", 1.736, -9.498, "T17", "T18"), ("TS3", 50.757, -12.756, "T25", "T26") })
+    {
+        var mid = (south[a] + south[b]) * 0.5;
+        Row($"p.120 table {n} ({x:F3}, {y:F3})", $"between {a}-{b} (arc mid panel; chord mid {ToFt(mid.X):F3}, {ToFt(mid.Y):F3})",
+            $"south tie splices built (p.143): {string.Join(", ", st.SpliceAt.Select(s => s.Name + " " + Between(s.Distance)))}", false, "U5 - p.120 set reported, the p.143 / p.93 set (5 segments) is built");
+    }
+}
+
+// ---- steel quantities vs the plan tables (groups as the plan quantity notes: members + splice plates + connection material + fasteners)
 Print("== steel weights (model) vs plan quantity tables");
-double Lb(Func<SteelPart, bool> f) => am.Steel.Parts.Where(f).Sum(p => p.Mass) * 2.20462262;
-void Q(string item, double plan, double model, string note) => Row(item, $"{plan:N0} lb", $"{model:N0} lb ({(model - plan) / plan * 100:+0.0;-0.0}%)", Math.Abs(model - plan) / plan < 0.10, note);
-Q("arch rib Gr 50-T1 (p.127)", 59100, Lb(p => p.Category == PartCategory.ArchRib), "plan incl. splice plates, stiffeners, fasteners; model = W14x132 x arc length between the end splices");
-Q("tie girders Gr 50-F1 (p.143)", 33200, Lb(p => p.Category == PartCategory.TiePlate), "plan incl. splice plates, studs, fasteners");
-Q("floor system Gr 50-T1 (p.143)", 61000, Lb(p => p.Category == PartCategory.FloorbeamPlate), "plan incl. END PLATES, studs, stiffeners, connection plates, fasteners; model = floorbeam plates only");
-Q("upper lateral bracing Gr 50 (p.128)", 21600, Lb(p => p.Category == PartCategory.ArchBracing), "plan incl. gussets / connections; model = W8x28 work point to work point");
-Q("knuckles Gr 50 (p.123)", 9700, Lb(p => p.Category == PartCategory.KnucklePlate), "model = end flange + end web + deck plate + W14x132 stub envelopes (simplified)");
+var asmOf = am.Steel.Assemblies.ToDictionary(a => a.Mark, a => a);
+double boltLb(BoltInstance b) => Math.Abs(SteelModel.BoltMesh(b.Diameter > 0 ? new BoltGeometry(b.Diameter) : am.Steel.Bolt, b.Grip, b.Length, 8).Volume()) * SteelCatalog.Density * 2.20462262;
+string GroupOfAsm(string mark)
+{
+    if (mark.Contains("-RIB")) return "rib";
+    if (mark.Contains("-TIE")) return "tie";
+    if (mark.StartsWith("FB") || mark.EndsWith("-EP")) return "floor";   // knuckle END PLATES (p.126) are in the floor system quantity (p.143 note 2)
+    if (mark.StartsWith("UPPER-BRACING") || mark.StartsWith("BR")) return "bracing";
+    if (mark.StartsWith("KNUCKLE")) return "knuckle";
+    if (mark.StartsWith("FIN")) return "fin";
+    return "other";
+}
+string GroupOf(SteelPart p) => p.Assembly.EndsWith("-EP") ? "floor" : p.Category switch
+{
+    PartCategory.ArchRib => "rib",
+    PartCategory.KnucklePlate => "knuckle",
+    PartCategory.Hanger or PartCategory.HangerSocket or PartCategory.FormDeck or PartCategory.BearingPad or PartCategory.SolePlate or PartCategory.MasonryPlate or PartCategory.ShearPin => "other",
+    _ when p.Description.Contains("fin plate", StringComparison.OrdinalIgnoreCase) => "fin",
+    _ => GroupOfAsm(p.Assembly),
+};
+var gParts = am.Steel.Parts.GroupBy(GroupOf).ToDictionary(g => g.Key, g => g.Sum(p => p.Mass) * 2.20462262);
+var gBolts = am.Steel.Bolts.Where(b => b.Kind == BoltKind.Structural).GroupBy(b => GroupOfAsm(b.Assembly)).ToDictionary(g => g.Key, g => (n: g.Count(), lb: g.Sum(boltLb)));
+var gStuds = am.Steel.Studs.GroupBy(s => GroupOfAsm(s.Assembly)).ToDictionary(g => g.Key, g => (n: g.Count(), lb: g.Sum(s => Math.Abs(am.Steel.StudMesh(s.Length, 8).Volume()) * SteelCatalog.Density * 2.20462262)));
+double Grp(string g) => gParts.GetValueOrDefault(g) + (gBolts.TryGetValue(g, out var b) ? b.lb : 0) + (gStuds.TryGetValue(g, out var s) ? s.lb : 0);
+void Q(string item, string g, double plan, double before, string note)
+{
+    double model = Grp(g);
+    string extra = $"plates/members {gParts.GetValueOrDefault(g):N0}" + (gBolts.TryGetValue(g, out var b) ? $" + {b.n} bolts {b.lb:N0}" : "") + (gStuds.TryGetValue(g, out var s) ? $" + {s.n} studs {s.lb:N0}" : "");
+    Row(item, $"{plan:N0} lb", $"{model:N0} lb ({(model - plan) / plan * 100:+0.0;-0.0}%; v1 {before:N0} lb, gap closed {(Math.Abs(before - plan) - Math.Abs(model - plan)):N0} lb) = {extra}", Math.Abs(model - plan) / plan < 0.10, note);
+}
+Q("arch rib Gr 50-T1 (p.127)", "rib", 59100, 59272, "plan incl. splice plates, stiffener plates, fasteners");
+Q("tie girders Gr 50-F1 (p.143)", "tie", 33200, 30024, "plan incl. splice plates, shear studs, fasteners");
+Q("floor system Gr 50-T1 (p.143)", "floor", 61000, 36449, "plan incl. floorbeams, END PLATES, studs, stiffeners, connection plates, fasteners");
+Q("upper lateral bracing Gr 50 (p.128)", "bracing", 21600, 13038, "plan incl. gussets / connections");
+Q("knuckles Gr 50 (p.123)", "knuckle", 9700, 21923, "v2 plates per p.124-126 (end plates moved to the floor system per p.143 note 2); CONFLICT kept: the two 2\" x 32\" x 21'-2 end flanges alone weigh 9,219 lb");
+if (gParts.ContainsKey("other")) Print($"     not in the Gr 50 / 50-T1 / 50-F1 groups (hangers, sockets, form deck, bearings): {gParts["other"]:N0} lb");
 foreach (var g in am.Steel.Parts.Where(p => p.Category == PartCategory.KnucklePlate).GroupBy(p => p.Description))
     Print($"     knuckle: {g.Count()} x {g.Key} = {g.Sum(p => p.Mass) * 2.20462262:N0} lb");
-Row("cable fin plates Gr 50-F1 (p.148)", "3,800 lb", "not modeled (v2)", false, "GAP");
+if (gParts.ContainsKey("fin")) Q("cable fin plates Gr 50-F1 (p.148)", "fin", 3800, 0, "rib + tie fin plates");
+else Row("cable fin plates Gr 50-F1 (p.148)", "3,800 lb", "not modeled", false, "GAP");
 double strand = am.Steel.Parts.Where(p => p.Category == PartCategory.Hanger).Sum(p => p.Length) / 0.3048;
 Print($"     hanger strand {strand:N1} ft visible between sockets x 2.10 lb/ft = {strand * 2.10:N0} lb; pin-to-pin total {am.Hangers.Sum(h => h.PlanLength) / 0.3048:N1} ft (pay item 'cable hangers' 1 LS)");
-double form = Lb(p => p.Category == PartCategory.FormDeck);
+double form = am.Steel.Parts.Where(p => p.Category == PartCategory.FormDeck).Sum(p => p.Mass) * 2.20462262;
 Print($"     steel deck form {form:N0} lb from the solid (12 ga 0.1046\") vs 7.4 psf x {sf:N0} SF = {7.4 * sf:N0} lb (p.152 weight)");
 
 // ---- hanger strand / sockets vs the WireCo catalog (user-supplied)
 Print("== hangers vs WireCo structural cable catalog (WWstrucCAT)");
 Row("strand 1\" (Table 1 p.10)", "plan 1.0 in (24.4 mm printed - 1.0 in = 25.4 mm)", "catalog 1\": 2.10 lb/ft, 0.600 sq in, min. breaking 61.0 / 59.2 / 57.9 tons (Class A / B / C), E 24,000 ksi prestretched", true,
-    "coating class not selected on the plans (galvanized only) -> breaking force UNRESOLVED between the classes; model weight 2.10 lb/ft");
+    "p.83 cable hanger note 1: ASTM A586 Grade 2 with CLASS A coating throughout -> catalog min. breaking 61.0 tons (Class A); model weight 2.10 lb/ft");
 var hs = br.Arch.HangerSystem;
 Row("open strand socket at rib (p.148 vs Table 6 p.20, 15/16-1\")", $"pin {ToIn(hs.RibSocket!.PinDiameter):F3}\", A {ToIn(hs.RibSocket.A):F2}\", L {ToIn(hs.RibSocket.L):F2}\", W {ToIn(hs.RibSocket.W):F2}\"",
     "catalog: pin D 2 1/4\" x 4 3/4\", A 12\", J 5 5/8\", M 4\", N 2 3/8\", O 2 1/4\", P 4\"", false,

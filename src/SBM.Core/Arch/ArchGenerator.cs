@@ -15,7 +15,7 @@ namespace SBM.Core.Arch;
 /// floorbeams, upper bracing, knuckles (simplified), deck slab on a corrugated form deck, curbs, bearings on the pier seats. Plan values are
 /// built as given; every difference between plan values is reported (<see cref="ArchModel.Checks"/> / warnings), never adjusted.
 /// </summary>
-public static class ArchGenerator
+public static partial class ArchGenerator
 {
     public static ArchModel Generate(BridgeFraming framing, UnitSystem units)
     {
@@ -47,7 +47,7 @@ public static class ArchGenerator
         return new Frame3(origin.WithZ(fr.OriginElevation), x, y, z);
     }
 
-    private sealed class Gen
+    private sealed partial class Gen
     {
         private readonly BridgeFraming _f;
         private readonly BridgeDefinition _b;
@@ -80,7 +80,7 @@ public static class ArchGenerator
 
         public void Run()
         {
-            var steel = new SteelModel { Bolt = new BoltGeometry(In(0.875)), BoltGrade = "A325" };
+            var steel = new SteelModel { Bolt = new BoltGeometry(In(0.875)), BoltGrade = "A325", StudDiameter = In(0.875), StudHeadDiameter = In(1.375), StudHeadHeight = In(0.375) };
             var cm = new Concrete.ConcreteModel();
             var axis = _f.Supports.FirstOrDefault(s => string.Equals(s.Name, _d.Frame.TiltAxisSupport, StringComparison.OrdinalIgnoreCase))?.Direction;
             var frame = BuildFrame(_d.Frame, _al, axis, out string err);
@@ -96,7 +96,7 @@ public static class ArchGenerator
             BuildHangers();
             foreach (var fb in _d.Floorbeams) BuildFloorbeam(fb);
             BuildBracing();
-            foreach (var k in _d.Knuckles) BuildKnuckle(k);
+            foreach (var k in _d.Knuckles) { if (k.Detail is { } kd) BuildKnuckleV2(k, kd); else BuildKnuckle(k); }
             if (_d.Deck != null) BuildDeck(_d.Deck);
             for (int i = 0; i < _d.Bearings.Count; i++) BuildBearing(_d.Bearings[i], i);
         }
@@ -232,10 +232,11 @@ public static class ArchGenerator
                 acc += e.Length;
             }
             stations.Add(acc);
-            Mesh Plate(double n0, double n1, double z0, double z1)
+            Mesh Plate(double n0, double n1, double z0, double z1, double sa, double sb)
             {
                 var sec = new[] { new Vec2(n0, z0), new Vec2(n1, z0), new Vec2(n1, z1), new Vec2(n0, z1) };
-                var rings = stations.Select(s =>
+                var st = stations.Where(x => x > sa + 1e-6 && x < sb - 1e-6).Prepend(sa).Append(sb).ToList();
+                var rings = st.Select(s =>
                 {
                     var (p, ang) = geo.At(s);
                     var nl = Vec2.FromAngle(ang).Left;
@@ -245,10 +246,143 @@ public static class ArchGenerator
                 MeshBuilder.AddLoft(m, sec, rings);
                 return m;
             }
-            AddPart($"{asm}-F", PartCategory.TiePlate, asm, $"PL {L(t.FlangeThickness)} x {L(t.FlangeWidth)} tie flange",
-                Plate(-t.FlangeWidth / 2, t.FlangeWidth / 2, 0, t.FlangeThickness), t.Material, geo.Length);
-            AddPart($"{asm}-W", PartCategory.TiePlate, asm, $"PL {L(t.WebThickness)} x {L(t.WebHeight)} tie web",
-                Plate(-t.WebThickness / 2, t.WebThickness / 2, t.FlangeThickness, t.FlangeThickness + t.WebHeight), t.Material, geo.Length);
+            // Pieces between the field splices (gap at each), splice plates + bolts at each splice.
+            var cuts = t.SpliceAt.Select(x => x.Distance).Where(x => x > 0 && x < geo.Length).OrderBy(x => x).ToList();
+            // v2 knuckles: the tie field pieces start / end at the knuckle joints (end flange inner edge + half the joint gap).
+            double trimA = KnuckleJoint(t, geo, true) is { } ja ? ja + (_d.Knuckles.FirstOrDefault(kk => kk.Detail != null)?.Detail?.JointGap ?? 0) / 2 : 0;
+            double trimB = KnuckleJoint(t, geo, false) is { } jb ? geo.Length - jb - (_d.Knuckles.FirstOrDefault(kk => kk.Detail != null)?.Detail?.JointGap ?? 0) / 2 : geo.Length;
+            var bounds = new List<double> { trimA };
+            bounds.AddRange(cuts);
+            bounds.Add(trimB);
+            for (int k = 0; k + 1 < bounds.Count; k++)
+            {
+                double sa = bounds[k] + (k > 0 ? t.SpliceGap / 2 : 0), sb = bounds[k + 1] - (k + 2 < bounds.Count ? t.SpliceGap / 2 : 0);
+                string pm = cuts.Count == 0 ? asm : $"{asm}-{k + 1}";
+                string seg = cuts.Count == 0 ? "" : $", segment {k + 1}";
+                AddPart($"{pm}-F", PartCategory.TiePlate, asm, $"PL {L(t.FlangeThickness)} x {L(t.FlangeWidth)} tie flange{seg}",
+                    Plate(-t.FlangeWidth / 2, t.FlangeWidth / 2, 0, t.FlangeThickness, sa, sb), t.Material, sb - sa);
+                AddPart($"{pm}-W", PartCategory.TiePlate, asm, $"PL {L(t.WebThickness)} x {L(t.WebHeight)} tie web{seg}",
+                    Plate(-t.WebThickness / 2, t.WebThickness / 2, t.FlangeThickness, t.FlangeThickness + t.WebHeight, sa, sb), t.Material, sb - sa);
+            }
+            if (t.SpliceDetail is { } sd)
+            {
+                var asu = t.SpliceUnresolved.Length > 0 ? Assumption.Unresolved(t.SpliceUnresolved, "splices at the framing plan positions (mid panel)") : null;
+                if (asu != null) Warn(t.SpliceUnresolved);
+                if (!double.IsNaN(sd.CheckFlangePlateLength)) Check($"{t.Name}: splice flange plate length (edges + bolt spacing vs printed)", sd.CheckFlangePlateLength, sd.FlangePlateLength, Tol, L);
+                if (!double.IsNaN(sd.CheckWebPlateLength)) Check($"{t.Name}: splice web plate length (edges + bolt spacing vs printed)", sd.CheckWebPlateLength, sd.WebPlateLength, Tol, L);
+                foreach (var sp in t.SpliceAt.Where(x => x.Distance > 0 && x.Distance < geo.Length))
+                {
+                    double s0 = sp.Distance;
+                    Vec3 Fm(double u, double w, double z) { var (p, a) = geo.At(s0 + u); return W((p + Vec2.FromAngle(a).Left * w).WithZ(z)); }
+                    var g = new SpliceGeo(Fm, new() { (0.0, -1, t.FlangeThickness) }, (u, v, tt) => Fm(u, tt, v), t.WebThickness, t.FlangeThickness + t.WebHeight, t.FlangeThickness);
+                    string sm = $"{asm}-{sp.Name}".ToUpperInvariant().Replace(' ', '-').Replace("(", "").Replace(")", "").Replace("'", "P");
+                    AddAssembly(sm, AssemblyKind.ArchSplice, $"{t.Name} field splice {sp.Name}: {sd.Name}");
+                    BuildSplice(sd, g, sm, asu);
+                }
+            }
+        }
+
+        // ------------------------------------------------------------------ field splices (rib / tie)
+
+        /// <summary>Splice geometry of a member at a joint: flange map (u along the member from the joint, w across the flange, t normal to it),
+        /// flanges (outside face t, outward sign, thickness), web map (u, v along the web depth, t across the web), web thickness and its two ends (v).</summary>
+        private sealed record SpliceGeo(Func<double, double, double, Vec3> FlangeMap, List<(double Face, int Out, double Tf)> Flanges,
+            Func<double, double, double, Vec3> WebMap, double Tw, double WebPlusEnd, double WebMinusEnd);
+
+        private static List<Vec2> ClippedRect(double u0, double u1, double w0, double w1, double c)
+        {
+            if (c <= 0) return new() { new(u0, w0), new(u1, w0), new(u1, w1), new(u0, w1) };
+            return new() { new(u0 + c, w0), new(u1 - c, w0), new(u1, w0 + c), new(u1, w1 - c), new(u1 - c, w1), new(u0 + c, w1), new(u0, w1 - c), new(u0, w0 + c) };
+        }
+
+        private static Frame3 BoltFrame(Func<double, double, double, Vec3> map, double u, double w, double tHead, double dir)
+        {
+            var o = map(u, w, tHead);
+            var z = (map(u, w, tHead + dir * 1e-3) - o).Normalized();
+            var x = (map(u + 1e-3, w, tHead) - o).Normalized();
+            var y = Vec3.Cross(z, x).Normalized();
+            x = Vec3.Cross(y, z).Normalized();
+            return new Frame3(o, x, y, z);
+        }
+
+        /// <summary>Splice plates (with holes) and bolts of one joint (see <see cref="ArchSpliceDefinition"/>); returns the bolt count.</summary>
+        private int BuildSplice(ArchSpliceDefinition d, SpliceGeo g, string asm, Assumption? asu)
+        {
+            var bolt = Model.Steel.Bolt;
+            double hd = bolt.HoleDiameter;
+            int nb = 0, np = 0;
+            void Bolt(Func<double, double, double, Vec3> map, double u, double w, double tHead, double dir, double grip)
+            {
+                Model.Steel.Bolts.Add(new BoltInstance { Frame = BoltFrame(map, u, w, tHead, dir), Grip = grip, Length = bolt.LengthForGrip(grip), Assembly = asm });
+                nb++;
+            }
+            void Plate(string what, List<Vec2> outline, List<Hole> holes, Func<double, double, double, Vec3> map, double t0, double t1, double len)
+            {
+                var m = new Mesh();
+                double lo = Math.Min(t0, t1), hi = Math.Max(t0, t1);
+                PlateBuilder.AddPrism(m, outline, holes, map, _ => lo, _ => hi);
+                np++;
+                Model.Steel.Parts.Add(new SteelPart { Mark = $"{asm}-P{np}", Category = PartCategory.SplicePlate, Assembly = asm, Description = what, Mesh = m,
+                    Material = d.Material, Length = len, Assumption = asu });
+            }
+            // Columns (u from the joint) used by a row, both sides.
+            IEnumerable<double> Us(ArchBoltRow r, double first, double pitch, int count)
+            {
+                for (int k = r.FirstColumn; k < count; k += Math.Max(1, r.ColumnStep))
+                {
+                    double u = first + k * pitch;
+                    yield return -u; yield return u;
+                }
+            }
+            // Flanges: outside plate (centred), inside plates each side of the web (outer edge flush with the outside plate edge).
+            double lf = d.FlangePlateLength / 2, wo = d.FlangeOuterWidth / 2;
+            if (d.FlangeBoltColumns > 0 && d.FlangeOuterWidth > 0)
+                foreach (var (face, outw, tf) in g.Flanges)
+                {
+                    var holesOuter = new List<Hole>();
+                    var holesIn = new[] { new List<Hole>(), new List<Hole>() };
+                    double grip = d.FlangeOuterThickness + tf + d.FlangeInnerThickness;
+                    foreach (var r in d.FlangeRows)
+                        foreach (int side in new[] { 1, -1 })
+                        {
+                            double w = side * (wo - r.Gage);
+                            foreach (var u in Us(r, d.FlangeBoltFirst, d.FlangeBoltPitch, d.FlangeBoltColumns))
+                            {
+                                holesOuter.Add(new Hole(new Vec2(u, w), hd));
+                                holesIn[side > 0 ? 0 : 1].Add(new Hole(new Vec2(u, w), hd));
+                                Bolt(g.FlangeMap, u, w, face + outw * d.FlangeOuterThickness, -outw, grip);
+                            }
+                        }
+                    Plate($"PL {L(d.FlangeOuterThickness)} x {L(d.FlangeOuterWidth)} x {L(2 * lf)} outside flange splice plate", ClippedRect(-lf, lf, -wo, wo, d.FlangeClip), holesOuter,
+                        g.FlangeMap, face, face + outw * d.FlangeOuterThickness, 2 * lf);
+                    if (d.FlangeInnerWidth > 0)
+                        for (int side = 0; side < 2; side++)
+                        {
+                            double w0 = side == 0 ? wo - d.FlangeInnerWidth : -wo, w1 = side == 0 ? wo : -wo + d.FlangeInnerWidth;
+                            double ti = face - outw * tf;
+                            Plate($"PL {L(d.FlangeInnerThickness)} x {L(d.FlangeInnerWidth)} x {L(2 * lf)} inside flange splice plate", ClippedRect(-lf, lf, w0, w1, 0), holesIn[side],
+                                g.FlangeMap, ti, ti - outw * d.FlangeInnerThickness, 2 * lf);
+                        }
+                }
+            // Web plates (both faces).
+            if (d.WebBoltColumns > 0 && d.WebPlateWidth > 0)
+            {
+                double lw = d.WebPlateLength / 2;
+                double vTop = double.IsNaN(d.WebPlateEdgeFromWebEnd) ? (g.WebPlusEnd + g.WebMinusEnd) / 2 + d.WebPlateWidth / 2 : g.WebPlusEnd - d.WebPlateEdgeFromWebEnd;
+                var holes = new List<Hole>();
+                double grip = 2 * d.WebPlateThickness + g.Tw;
+                foreach (var r in d.WebRows)
+                    foreach (var u in Us(r, d.WebBoltFirst, d.WebBoltPitch, d.WebBoltColumns))
+                    {
+                        holes.Add(new Hole(new Vec2(u, vTop - r.Gage), hd));
+                        Bolt(g.WebMap, u, vTop - r.Gage, g.Tw / 2 + d.WebPlateThickness, -1, grip);
+                    }
+                foreach (int side in new[] { 1, -1 })
+                    Plate($"PL {L(d.WebPlateThickness)} x {L(d.WebPlateWidth)} x {L(2 * lw)} web splice plate{(d.WebPlateNote.Length > 0 ? " (" + d.WebPlateNote + ")" : "")}",
+                        ClippedRect(-lw, lw, vTop - d.WebPlateWidth, vTop, d.WebClip), holes, g.WebMap, side * g.Tw / 2, side * (g.Tw / 2 + d.WebPlateThickness), 2 * lw);
+            }
+            Model.SpliceBolts[asm] = nb;
+            return nb;
         }
 
         // ------------------------------------------------------------------ ribs
@@ -321,6 +455,7 @@ public static class ArchGenerator
                 double len = r.Radius * Math.Abs(ta - tb);
                 bool hasStubs = !double.IsNaN(r.StubBottomZ) && cuts.Count >= 2;
                 bool stub = hasStubs && (k == 0 || k == bounds.Count - 2);
+                if (stub && _d.Knuckles.Any(kk => kk.Detail != null && kk.Corners.Any(cc => string.Equals(cc.Rib, r.Name, StringComparison.OrdinalIgnoreCase)))) continue;   // v2 knuckle builds the stub
                 if (stub)
                 {
                     string km = $"{asm}-STUB{(k == 0 ? 1 : 2)}";
@@ -329,6 +464,23 @@ public static class ArchGenerator
                 }
                 else AddPart($"{asm}-{k + (hasStubs ? 0 : 1)}", PartCategory.ArchRib, asm, $"{w.Name} rib segment", m, r.Material, len, w.WeightPerFootLb);
             }
+            if (r.SpliceDetail is { } sd)
+                foreach (var sn in r.Splices)
+                {
+                    if (P(sn) is not { } sp) continue;
+                    double thc = Theta(sp);
+                    Vec3 Dir(double th) => c * Math.Cos(th) + up * Math.Sin(th);
+                    // Splice plates are flat in the plane tangent to the rib at the joint (19 1/2" / 27 1/2" long on R 126'-0: <= 1/16" off the curve).
+                    // u along the tangent from the joint (toward the chord end), w / t radial, binormal.
+                    var radC = Dir(thc); var tanC = c * Math.Sin(thc) - up * Math.Cos(thc);
+                    Vec3 Fm(double u, double wr, double tb) => W(center + radC * (r.Radius + wr) + tanC * u + binormal * tb);
+                    Vec3 Wm(double u, double vb, double tr) => W(center + radC * (r.Radius + tr) + tanC * u + binormal * vb);
+                    double h2 = w.Depth / 2;
+                    var g = new SpliceGeo(Fm, new() { (h2, 1, w.FlangeThickness), (-h2, -1, w.FlangeThickness) }, Wm, w.WebThickness, h2 - w.FlangeThickness, -h2 + w.FlangeThickness);
+                    string sm = $"{asm}-{sn}".ToUpperInvariant().Replace("'", "P");
+                    AddAssembly(sm, AssemblyKind.ArchSplice, $"{r.Name} field splice {sn}: {sd.Name}");
+                    BuildSplice(sd, g, sm, null);
+                }
         }
 
         // ------------------------------------------------------------------ hangers
@@ -343,8 +495,20 @@ public static class ArchGenerator
                 double len = (hc - tc).Length;
                 var wt = W(tc);
                 var wr = W(hc);
-                Model.Hangers.Add(new ArchHangerResult(h.Name, wt, wr, len, h.PlanLength));
-                if (!double.IsNaN(h.PlanLength)) Check($"hanger {h.Name}: pin-to-pin length", h.PlanLength, len, Tol, L);
+                // Plan length: to the rib working-line point when given (p.147 "cable length TC-HC"), else pin to pin.
+                var wp = h.RibWorkPoint?.Vec;
+                double lenPlan = wp is { } q ? (q - tc).Length : len;
+                Model.Hangers.Add(new ArchHangerResult(h.Name, wt, wr, len, h.PlanLength) { RibWorkPointWorld = wp is { } q2 ? W(q2) : null, PlanBasisLength = lenPlan });
+                if (!double.IsNaN(h.PlanLength))
+                    Check(wp == null ? $"hanger {h.Name}: pin-to-pin length" : $"hanger {h.Name}: length tie pin to the rib working-line point (p.147 column)", h.PlanLength, lenPlan, Tol, L,
+                        wp == null ? "" : $"pin to pin {L(len)}");
+                if (wp is { } w2)
+                {
+                    // The rib pin lies on the cable line (TC -> working-line point).
+                    var ax = (w2 - tc).Normalized();
+                    double off = (hc - tc - ax * Vec3.Dot(hc - tc, ax)).Length;
+                    if (off > Tol) Warn($"Arch CHECK hanger {h.Name}: rib pin {L(off)} off the line tie pin - rib working-line point.");
+                }
                 var dir = (wr - wt).Normalized();
                 string asm = $"HANGER-{h.Name}";
                 AddAssembly(asm, AssemblyKind.ArchHanger, $"Hanger {h.Name}: {L(hs.StrandDiameter)} structural strand, {h.Rib}");
@@ -370,6 +534,212 @@ public static class ArchGenerator
                 }
                 if (hs.TieSocket is { } ts) Socket(ts, asm, "TS", wt, dir, tieTan);
                 if (hs.RibSocket is { } rs) Socket(rs, asm, "RS", wr, -dir, ribTan);
+                if (_d.Fins is { } fs)
+                {
+                    if (h.RibFin is { } rf && _ribs.FirstOrDefault(r => string.Equals(r.Name, h.Rib, StringComparison.OrdinalIgnoreCase)) is { } rres)
+                        RibFinPlate(h, rf, fs, rres);
+                    if (h.TieFin is { } tf && _ties.TryGetValue(h.Tie, out var tgeo)) TieFinPlate(h, tf, fs, tgeo);
+                }
+            }
+            BuildConnectors();
+        }
+
+        // ------------------------------------------------------------------ cable fin plates (rib p.148, tie p.149)
+
+        private string RibAsm(string ribName) => ribName.ToUpperInvariant().Replace(' ', '-');
+
+        /// <summary>Rib fin plate: plane = rib binormal x the cable projected on the arch plane; between the flange inner faces; top P4 below the rib
+        /// CL (web plane), straight sides P3, then tangent to R around the pin (HC); 1.378" pin hole. Plan P1 / P2 / B are checked against the model.</summary>
+        private void RibFinPlate(ArchHangerDefinition h, ArchRibFin rf, ArchFinSettings fs, ArchRibResult rib)
+        {
+            var w = SteelCatalog.FindWideFlange(_d.Ribs.FirstOrDefault(r => r.Name == rib.Name)?.Section ?? "W14x132");
+            if (w == null) return;
+            var hc = h.RibAnchor.Vec; var tc = h.TieAnchor.Vec;
+            var bn = Vec3.Cross(rib.ChordDir, rib.Up).Normalized();
+            var dc = (tc - hc).Normalized();
+            var e = -(dc - bn * Vec3.Dot(dc, bn)).Normalized();          // in the arch plane, from the pin toward the rib
+            var nf = Vec3.Cross(bn, e).Normalized();
+            // Distance pin -> rib web (WP circle) along e.
+            var d0 = hc - rib.Center;
+            double bq = Vec3.Dot(d0, e), cq = Vec3.Dot(d0, d0) - Vec3.Dot(d0, bn) * Vec3.Dot(d0, bn) - rib.Radius * rib.Radius;
+            // |d0 - bn(d0.bn) + e y|^2 = R^2 (in-plane distance; e is in the arch plane)
+            double disc = bq * bq - cq;
+            if (disc < 0) { Warn($"Arch: fin plate {h.Name} - the cable does not reach the rib web along the fin; not built."); return; }
+            double yWeb = -bq + Math.Sqrt(disc);
+            if (yWeb < 0) yWeb = -bq - Math.Sqrt(disc);
+            double p1 = Vec3.Dot(d0, bn);
+            var hitP = hc + e * yWeb;
+            var rad = (hitP - rib.Center - bn * Vec3.Dot(hitP - rib.Center, bn)).Normalized();
+            var tan = Vec3.Cross(bn, rad).Normalized();
+            if (Vec3.Dot(tan, rib.ChordDir) < 0) tan = -tan;                 // rib tangent toward the chord end (p.148 angle B)
+            double bModel = Math.Acos(Math.Clamp(Vec3.Dot(tan, -e), -1, 1)) * 180 / Math.PI;
+            double perp = yWeb * Math.Abs(Vec3.Dot(e, rad));
+            string nm = $"fin plate {h.Name} at rib";
+            if (!double.IsNaN(rf.AngleB)) Check($"{nm}: angle B (rib tangent to the cable)", rf.AngleB, bModel, 0.05, v => $"{v:F3} deg", "p.148 table vs the p.147 HC / TC points and the rib circle");
+            if (!double.IsNaN(rf.P1)) Check($"{nm}: |P1| (pin off the arch plane)", Math.Abs(rf.P1), Math.Abs(p1), Tol, L);
+            if (!double.IsNaN(rf.P2)) Check($"{nm}: P2 (pin to the rib working line along the fin)", rf.P2, yWeb, Tol, L, $"pin {L(perp)} normal to the rib working line");
+            double c = w.Depth / 2 - w.FlangeThickness;
+            double yTop = yWeb - rf.P4, ySb = yTop - rf.P3, r = fs.RibPinRadius, clip = fs.RibTopClip;
+            // Outline in (x across from the pin = binormal, y toward the rib from the pin).
+            double xl = -c - p1, xr = c - p1;
+            (double a, double b) Tang(double qx, double qy, bool right)
+            {
+                double phi = Math.Atan2(qy, qx), dd = Math.Sqrt(qx * qx + qy * qy), al = dd > r ? Math.Acos(r / dd) : 0;
+                return right ? (phi - al, 0) : (phi + al, 0);
+            }
+            var outl = new List<Vec2> { new(xl, yTop - clip), new(xl + clip, yTop), new(xr - clip, yTop), new(xr, yTop - clip), new(xr, ySb) };
+            double ta = Tang(xr, ySb, true).a, tb = Tang(xl, ySb, false).a;
+            while (tb > ta) tb -= 2 * Math.PI;
+            int ns = 16;
+            for (int i = 0; i <= ns; i++) { double th = ta + (tb - ta) * i / ns; outl.Add(new Vec2(r * Math.Cos(th), r * Math.Sin(th))); }
+            outl.Add(new Vec2(xl, ySb));
+            if (MeshBuilder.SignedArea(outl) < 0) outl.Reverse();
+            var m = new Mesh();
+            PlateBuilder.AddPrism(m, outl, new[] { new Hole(Vec2.Zero, fs.PinHole) }, (u, v, t) => W(hc + bn * u + e * v + nf * t), _ => -fs.RibThickness / 2, _ => fs.RibThickness / 2);
+            var asu = fs.RibUnresolved.Length > 0 ? Assumption.Unresolved(fs.RibUnresolved, $"PL {L(fs.RibThickness)}, top clips {L(clip)}") : null;
+            AddPart($"{RibAsm(h.Rib)}-FIN-{h.Name}", PartCategory.FinPlate, RibAsm(h.Rib),
+                $"PL {L(fs.RibThickness)} cable fin plate at rib, {h.Name} (P2 {L(yWeb)}, P3 {L(rf.P3)}, P4 {L(rf.P4)}{(double.IsNaN(rf.WeldLength) ? "" : $", weld D {L(rf.WeldLength)}")})",
+                m, fs.Material, yWeb - rf.P4 + r, 0, asu);
+        }
+
+        /// <summary>Tie fin plate: lower part on the outside face of the tie web, centred on the floorbeam (panel point), bolted through the web; bend
+        /// line along the tie above the web; upper part turned about it to contain the pin (TC). Plan angle A / orientation / pin height are checked.</summary>
+        private void TieFinPlate(ArchHangerDefinition h, ArchTieFin tf, ArchFinSettings fs, TieGeo tg)
+        {
+            var pp = tg.Def.PanelPoints.FirstOrDefault(p => string.Equals(p.Name, tf.Panel, StringComparison.OrdinalIgnoreCase));
+            if (pp == null) { Warn($"Arch: fin plate {h.Name} - panel point '{tf.Panel}' is not on {tg.Def.Name}; not built."); return; }
+            var tc = h.TieAnchor.Vec;
+            var (p2, ang) = tg.At(pp.Distance);
+            var t2 = Vec2.FromAngle(ang); var nl = t2.Left;
+            // Outside face (p.146 / p.149: the fin is on the outside of the tie web, the floorbeam inside): away from the other tie.
+            var other = _ties.Values.FirstOrDefault(o => o != tg);
+            Vec2 inward = other != null ? other.At(other.Nearest(p2)).p - p2 : -p2;
+            int side = Vec2.Dot(inward, nl) > 0 ? -1 : 1;
+            double latTc = Vec2.Dot(tc.XY - p2, nl * side);                      // + = outside
+            var def = tg.Def;
+            double off = def.WebThickness / 2 + fs.TieThickness / 2;
+            double zb = def.FlangeThickness + def.WebHeight + fs.TieBendAboveWeb;
+            var t3 = t2.WithZ(0); var n3 = (nl * side).WithZ(0);
+            var bend0 = (p2 + nl * side * off).WithZ(zb);                        // bend line point at the panel point
+            var q = tc - bend0;
+            double sPin = Vec3.Dot(q, t3);
+            var qn = q - t3 * sPin;
+            double vPin = qn.Length;
+            var v3 = qn.Normalized();
+            double aModel = Math.Acos(Math.Clamp(Vec3.Dot(v3, -n3), -1, 1)) * 180 / Math.PI;   // from the horizontal toward the tie CL
+            int sg = sPin >= 0 ? 1 : -1;
+            var cable = (h.RibAnchor.Vec - tc).Normalized();
+            var cp = (cable - t3 * Vec3.Dot(cable, t3)).Normalized();
+            double aCable = Math.Acos(Math.Clamp(Vec3.Dot(cp, -n3), -1, 1)) * 180 / Math.PI;
+            string nm = $"fin plate {h.Name} at tie";
+            if (!double.IsNaN(tf.AngleA)) Check($"{nm}: angle A (cable lean across the tie)", tf.AngleA, aCable, 0.05, v => $"{v:F3} deg",
+                $"p.149 table vs the cable TC -> rib pin; the plate bend -> TC is {aModel:F3} deg (built: the plate bends at the plan line and reaches the pin)");
+            Check($"{nm}: pin above the bend line in the plate plane", fs.TiePinAboveBend, vPin, Tol, L, "p.149 4\" vs TC Z (p.147) - tie WP - 11 7/8 - 1/2 (U10)");
+            Check($"{nm}: pin off the floorbeam CL along the tie", fs.TieWidth / 2 - fs.TiePinFromEdge, Math.Abs(sPin), Tol, L, "p.149 6 1/8 / 1 7/8 on the 8\" plate centred on the floorbeam (p.146)");
+            string orientModel = sg > 0 ? "RIGHT" : "LEFT";
+            bool towardCable = (Vec3.Dot(cable, t3) >= 0) == (sg > 0);
+            if (tf.Orient.Length > 0)
+            {
+                bool ok = string.Equals(orientModel, tf.Orient, StringComparison.OrdinalIgnoreCase) && towardCable;
+                Model.Checks.Add(new ArchCheck($"{nm}: orientation", tf.Orient, $"{orientModel} (pin on the up-chain side = RIGHT){(towardCable ? "" : ", pin AWAY from the cable lean")}", 0, ok, "p.149 table vs TC relative to the panel point"));
+                if (!ok) Warn($"Arch CHECK {nm}: orientation plan {tf.Orient}, model {orientModel}.");
+            }
+            double latPlan = off + (fs.TiePinAboveBend * Math.Cos(tf.AngleA * Math.PI / 180) * -1);
+            if (!double.IsNaN(tf.AngleA)) Check($"{nm}: pin (TC) off the tie CL, + outside", latPlan, latTc, Tol, L, $"p.149: 7/8\" + 4\" x cos(A) toward the tie CL; TC Z {L(tc.Z)}");
+            // Lower part (plane parallel to the web), (u along the tie from the panel point, z).
+            double hw = fs.TieWidth / 2;
+            var lower = new List<Vec2> { new(-hw, zb - fs.TieDepthBelowBend), new(hw, zb - fs.TieDepthBelowBend), new(hw, zb), new(-hw, zb) };
+            var holes = new List<Hole>();
+            double hx = hw - fs.TieHoleEdge;
+            foreach (var rz in fs.TieHoleRows) foreach (var sx in new[] { -hx, hx }) holes.Add(new Hole(new Vec2(sx, zb - rz), Model.Steel.Bolt.HoleDiameter));
+            Vec3 LowerMap(double u, double z, double t) => W((p2 + t2 * u + nl * side * (off + t)).WithZ(z));
+            var m = new Mesh();
+            {
+                // Right-handed map (an exact IFC extrusion): mirror u when (u, z, t) is left-handed.
+                var o = LowerMap(0, 0, 0);
+                double hand = Vec3.Dot(Vec3.Cross(LowerMap(1, 0, 0) - o, LowerMap(0, 1, 0) - o), LowerMap(0, 0, 1) - o);
+                if (hand >= 0) PlateBuilder.AddPrism(m, lower, holes, LowerMap, _ => -fs.TieThickness / 2, _ => fs.TieThickness / 2);
+                else PlateBuilder.AddPrism(m, Ccw(lower.Select(q => new Vec2(-q.X, q.Y)).ToList()), holes.Select(hh => new Hole(new Vec2(-hh.Center.X, hh.Center.Y), hh.Diameter)).ToList(),
+                    (u, z, t) => LowerMap(-u, z, t), _ => -fs.TieThickness / 2, _ => fs.TieThickness / 2);
+            }
+            // Upper part (u along the tie, v up the plate from the bend line), CCW for sg = +1, mirrored otherwise.
+            double r = fs.TiePinRadius, sp = Math.Abs(sPin);
+            var up = new List<Vec2> { new(-hw, 0), new(hw, 0) };
+            double dxr = hw - sp;
+            double ta = Math.Abs(dxr) < r ? Math.Acos(dxr / r) : 0;
+            up.Add(new Vec2(hw, vPin + r * Math.Sin(ta)));
+            var F = new Vec2(-hw, fs.TieFarEdgeAboveBend) - new Vec2(sp, vPin);
+            double phi = Math.Atan2(F.Y, F.X); if (phi < 0) phi += 2 * Math.PI;
+            double tb = phi - (F.Length > r ? Math.Acos(r / F.Length) : 0);
+            for (int i = 1; i <= 14; i++) { double th = ta + (tb - ta) * i / 14; up.Add(new Vec2(sp + r * Math.Cos(th), vPin + r * Math.Sin(th))); }
+            up.Add(new Vec2(-hw, fs.TieFarEdgeAboveBend));
+            if (sg < 0) { up = up.Select(qq => new Vec2(-qq.X, qq.Y)).Reverse().ToList(); }
+            var nUp = Vec3.Cross(t3, v3).Normalized();
+            Vec3 UpperMap(double u, double v, double t) => W(bend0 + t3 * u + v3 * v + nUp * t);
+            var mu = new Mesh();
+            PlateBuilder.AddPrism(mu, up, new[] { new Hole(new Vec2(sPin, vPin), fs.PinHole) }, UpperMap, _ => -fs.TieThickness / 2, _ => fs.TieThickness / 2);
+            string asm = def.Name.ToUpperInvariant().Replace(' ', '-');
+            // Bent plate as two solids (legs below / above the bend line) so each IFC body is closed.
+            AddPart($"{asm}-FIN-{h.Name}", PartCategory.FinPlate, asm, $"PL {L(fs.TieThickness)} bent cable fin plate at tie, {h.Name} at {tf.Panel}, lower leg (bolted)", m, fs.Material, fs.TieDepthBelowBend);
+            AddPart($"{asm}-FIN-{h.Name}-U", PartCategory.FinPlate, asm, $"PL {L(fs.TieThickness)} bent cable fin plate at tie, {h.Name} at {tf.Panel}, upper leg (A {aModel:F2} deg, pin)", mu, fs.Material, vPin + r);
+            // Bolts through the fin and the tie web (head on the fin).
+            double grip = fs.TieThickness + def.WebThickness;
+            foreach (var hl in holes)
+                Model.Steel.Bolts.Add(new BoltInstance { Frame = BoltFrame(LowerMap, hl.Center.X, hl.Center.Y, fs.TieThickness / 2, -1), Grip = grip, Length = Model.Steel.Bolt.LengthForGrip(grip), Assembly = asm });
+        }
+
+        // ------------------------------------------------------------------ cable connectors (p.150)
+
+        private void BuildConnectors()
+        {
+            if (_d.CableConnectorDetail is not { } cd || _d.CableConnectors.Count == 0) return;
+            var byName = _d.Hangers.ToDictionary(x => x.Name, StringComparer.OrdinalIgnoreCase);
+            foreach (var cc in _d.CableConnectors)
+            {
+                if (!byName.TryGetValue(cc.CableA, out var ha) || !byName.TryGetValue(cc.CableB, out var hb)) { Warn($"Arch: cable connector {cc.Name} - hanger not found."); continue; }
+                Vec3 a0 = ha.TieAnchor.Vec, a1 = ha.RibAnchor.Vec, b0 = hb.TieAnchor.Vec, b1 = hb.RibAnchor.Vec;
+                var u = a1 - a0; var v = b1 - b0; var w0 = a0 - b0;
+                double A = Vec3.Dot(u, u), B = Vec3.Dot(u, v), C = Vec3.Dot(v, v), D = Vec3.Dot(u, w0), E = Vec3.Dot(v, w0), den = A * C - B * B;
+                if (Math.Abs(den) < 1e-12) continue;
+                double s = (B * E - C * D) / den, t = (A * E - B * D) / den;
+                if (s <= 0 || s >= 1 || t <= 0 || t >= 1) { Warn($"Arch: cable connector {cc.Name} - {cc.CableA} and {cc.CableB} do not cross between their anchors; not built."); continue; }
+                var pa = a0 + u * s; var pb = b0 + v * t;
+                double sep = (pa - pb).Length;
+                var ua = u.Normalized(); var ub = v.Normalized();
+                var nrm = Vec3.Cross(ua, ub).Normalized();
+                if (Vec3.Dot(pa - pb, nrm) < 0) nrm = -nrm;                    // from cable B toward cable A
+                var mid = (pa + pb) * 0.5;
+                double need = cd.PendantThickness + 2 * (ha == hb ? 0 : _d.HangerSystem.StrandDiameter / 2);
+                Check($"cable connector {cc.Name} ({cc.CableA} x {cc.CableB}): clear distance between the strand axes", need, sep, Tol, L,
+                    "p.150 pendant plate between two 1\" strands needs this; the p.147 TC / HC lines are closer - the connector clamps the cables (deflection not modeled)");
+                string asm = $"CONNECTOR-{cc.Name}";
+                AddAssembly(asm, AssemblyKind.ArchHanger, $"Cable connector {cc.Name}: {cc.CableA} x {cc.CableB} (p.150, UHMW-PE)");
+                var m = new Mesh();
+                // Pendant plate: hexagon in the plane normal to nrm, long axis along the bisector of the two cables.
+                var ax = (ua + (Vec3.Dot(ua, ub) >= 0 ? ub : -ub)).Normalized();
+                var ay = Vec3.Cross(nrm, ax).Normalized();
+                double hl = cd.PendantLength / 2, hs = cd.PendantSide / 2, apex = hs + hl * Math.Tan(cd.PendantEdgeAngleDeg * Math.PI / 180);
+                var hex = new List<Vec2> { new(-hl, -hs), new(0, -apex), new(hl, -hs), new(hl, hs), new(0, apex), new(-hl, hs) };
+                var fr = new Frame3(W(mid), Wd(ax), Wd(ay), Wd(nrm));
+                PlateBuilder.AddPlanar(m, hex, Array.Empty<Hole>(), fr, -cd.PendantThickness / 2, cd.PendantThickness / 2);
+                // Sleeve brackets: half ring (outer R, wall t) around each strand axis, open toward the pendant, with a tab each side on the pendant face.
+                foreach (var (pc, ud, sgn) in new[] { (pa, ua, 1.0), (pb, ub, -1.0) })
+                {
+                    double ro = cd.BracketOuterRadius, ri = ro - cd.BracketThickness;
+                    var ring = new List<Vec2>();
+                    for (int i = 0; i <= 12; i++) { double th = Math.PI * i / 12; ring.Add(new Vec2(ro * Math.Cos(th), ro * Math.Sin(th))); }
+                    for (int i = 12; i >= 0; i--) { double th = Math.PI * i / 12; ring.Add(new Vec2(ri * Math.Cos(th), ri * Math.Sin(th))); }
+                    if (MeshBuilder.SignedArea(ring) < 0) ring.Reverse();
+                    var across = Vec3.Cross(ud, nrm).Normalized();
+                    var f2 = new Frame3(W(pc), Wd(across), Wd(nrm * sgn), Wd(ud));
+                    MeshBuilder.AddExtrusion(m, ring, f2, -cd.BracketLength / 2, cd.BracketLength / 2);
+                    var face = mid + nrm * (sgn * cd.PendantThickness / 2);
+                    var f3 = new Frame3(W(face + ud * Vec3.Dot(pc - face, ud) + across * Vec3.Dot(pc - face, across)), Wd(across), Wd(nrm * sgn), Wd(ud));
+                    foreach (double sx in new[] { -1.0, 1.0 })
+                        MeshBuilder.AddBox(m, f3, sx > 0 ? ro : -ro - cd.BracketTab, sx > 0 ? ro + cd.BracketTab : -ro, 0, cd.BracketThickness, -cd.BracketLength / 2, cd.BracketLength / 2);
+                }
+                Model.Steel.Parts.Add(new SteelPart { Mark = $"{asm}-1", Category = PartCategory.CableConnector, Assembly = asm, Description = $"Cable connector (pendant plate + 2 sleeve brackets) {cc.CableA} x {cc.CableB}",
+                    Mesh = m, Material = cd.Material, Length = cd.PendantLength });
             }
         }
 
@@ -428,8 +798,127 @@ public static class ArchGenerator
             {
                 new Vec2(s0, fb.FlangeThickness), new Vec2(s1, fb.FlangeThickness), new Vec2(s1, fb.DepthAtEnds), new Vec2(sc, fb.DepthAtCrown), new Vec2(s0, fb.DepthAtEnds),
             };
-            RolledBuilder.AddExtrusion(web, poly, org, ex, _fr.Z, en, -fb.WebThickness / 2, fb.WebThickness / 2);
-            AddPart($"{asm}-W", PartCategory.FloorbeamPlate, asm, $"PL {L(fb.WebThickness)} floorbeam web {L(fb.DepthAtEnds)} - {L(fb.DepthAtCrown)} deep", web, fb.Material, s1 - s0);
+            // PT slots (obround) and web holes; slot pairs: outer opening at PtDimB from tie A / PtDimA from tie B, the pair PtPairSpacing apart.
+            var slotCs = new List<double>();
+            if (fb.PtSlotLength > 0)
+            {
+                if (!double.IsNaN(fb.PtDimB)) { slotCs.Add(fb.PtDimB); slotCs.Add(fb.PtDimB + fb.PtPairSpacing); }
+                if (!double.IsNaN(fb.PtDimA)) { slotCs.Add(len - fb.PtDimA); slotCs.Add(len - fb.PtDimA - fb.PtPairSpacing); }
+            }
+            var openings = slotCs.Select(x => PlateBuilder.RoundedRectangle(new Vec2(x, fb.PtSlotZ), fb.PtSlotLength, fb.PtSlotHeight, fb.PtSlotHeight * 0.45, 8)).ToList();
+            var webHoles = fb.WebHoles.Where(hh => hh.X > s0 && hh.X < s1).Select(hh => new Hole(new Vec2(hh.X, hh.Z), fb.WebHoleDiameter)).ToList();
+            var wf = new Frame3(org, ex, _fr.Z, en);
+            if (openings.Count > 0) PlateBuilder.AddPlanarWithOpenings(web, poly, webHoles, openings, wf, -fb.WebThickness / 2, fb.WebThickness / 2);
+            else PlateBuilder.AddPlanar(web, poly, webHoles, wf, -fb.WebThickness / 2, fb.WebThickness / 2);
+            string slotNote = slotCs.Count > 0 ? $", {slotCs.Count} PT slots {L(fb.PtSlotHeight)} x {L(fb.PtSlotLength)}" : "";
+            AddPart($"{asm}-W", PartCategory.FloorbeamPlate, asm, $"PL {L(fb.WebThickness)} floorbeam web {L(fb.DepthAtEnds)} - {L(fb.DepthAtCrown)} deep{slotNote}", web, fb.Material, s1 - s0);
+            if (_d.FloorbeamConnection is { } fc)
+            {
+                FloorbeamEnd(fb, fc, ta.Def, asm, wf, len, false);
+                FloorbeamEnd(fb, fc, tb.Def, asm, wf, len, true);
+            }
+            // Horizontal studs on both web faces at StudZ, 32 per face over the clear web (connection plates and PT slots excluded).
+            if (fb.StudsPerFace > 0 && !double.IsNaN(fb.StudLength))
+            {
+                double plateEnd = _d.FloorbeamConnection is { } fc2 ? flangeA + fb.EndGap / 2 + fc2.PlateLength / 2 : s0;
+                double plateEndB = _d.FloorbeamConnection is { } fc3 ? len - (flangeB + fb.EndGap / 2 + fc3.PlateLength / 2) : s1;
+                double clear = fb.StudMinSpacing / 2;
+                var zones = new List<(double a, double b)> { (plateEnd + clear, plateEndB - clear) };
+                foreach (var x in slotCs.OrderBy(x => x))
+                {
+                    double ea = x - fb.PtSlotLength / 2 - clear, eb = x + fb.PtSlotLength / 2 + clear;
+                    zones = zones.SelectMany(z => z.b <= ea || z.a >= eb ? new[] { z } : new[] { (a: z.a, b: ea), (a: eb, b: z.b) }).Where(z => z.b - z.a > -1e-9).ToList();
+                }
+                double total = zones.Sum(z => z.b - z.a);
+                // Distribute: n_i studs in zone i (n_i - 1 spaces), counts by length (largest remainder), at least 1 per zone that fits.
+                int n = fb.StudsPerFace;
+                var counts = zones.Select(_ => 1).ToList();
+                while (counts.Sum() > n) { int i = counts.IndexOf(counts.Max()); counts[i]--; }
+                while (counts.Sum() < n) { int i = Enumerable.Range(0, zones.Count).OrderByDescending(k => counts[k] == 1 ? 1e9 + (zones[k].b - zones[k].a) : (zones[k].b - zones[k].a) / (counts[k] - 1)).First(); counts[i]++; }
+                var xs = new List<double>();
+                for (int k = 0; k < zones.Count; k++)
+                {
+                    var (za, zb2) = zones[k];
+                    if (counts[k] == 1) xs.Add((za + zb2) / 2);
+                    else for (int i = 0; i < counts[k]; i++) xs.Add(za + (zb2 - za) * i / (counts[k] - 1));
+                }
+                xs.Sort();
+                var gaps = xs.Zip(xs.Skip(1), (a, b) => b - a).ToList();
+                double minG = gaps.Count > 0 ? gaps.Min() : 0, maxIn = 0;
+                for (int k = 0; k < zones.Count; k++) if (counts[k] > 1) maxIn = Math.Max(maxIn, (zones[k].b - zones[k].a) / (counts[k] - 1));
+                if (minG < fb.StudMinSpacing - 1e-6 || maxIn > fb.StudMaxSpacing + 1e-6)
+                    Warn($"Arch CHECK {fb.Name}: stud spacing {L(minG)} min / {L(maxIn)} max outside the plan {L(fb.StudMinSpacing)} - {L(fb.StudMaxSpacing)} (p.145 note 3: adjust at openings).");
+                var studAsu = fb.StudUnresolved.Length > 0 ? fb.StudUnresolved : "";
+                foreach (double x in xs)
+                    foreach (int sd2 in new[] { 1, -1 })
+                    {
+                        var o = wf.ToWorld(x, fb.StudZ, sd2 * fb.WebThickness / 2);
+                        var zdir = wf.Z * sd2;
+                        var xdir = wf.X;
+                        Model.Steel.Studs.Add(new StudInstance { Frame = new Frame3(o, xdir, Vec3.Cross(zdir, xdir).Normalized(), zdir), Length = fb.StudLength, Assembly = asm });
+                    }
+                if (studAsu.Length > 0) Warn(studAsu);
+            }
+        }
+
+        /// <summary>Floorbeam end at one tie (p.146): stiffener in the floorbeam web plane (tie web to the tie flange edge), web connection plates both
+        /// faces (stiffener to floorbeam web), flange connection plates top (and bottom) each side of the web, 7/8" bolts.</summary>
+        private void FloorbeamEnd(ArchFloorbeamDefinition fb, ArchFloorbeamConnection fc, ArchTieDefinition tie, string asm, Frame3 wf, double len, bool atB)
+        {
+            // s measured from the tie CL toward the span; map to the floorbeam frame (s from tie A).
+            double S(double s) => atB ? len - s : s;
+            double half = tie.FlangeWidth / 2, joint = half + fb.EndGap / 2;
+            double zf = tie.FlangeThickness, zw = tie.FlangeThickness + tie.WebHeight, sw = tie.WebThickness / 2;
+            string end = atB ? "B" : "A";
+            var bolt = Model.Steel.Bolt;
+            double hd = bolt.HoleDiameter;
+            Vec2 P(double s, double z) => new(S(s), z);
+            List<Vec2> Ccw(List<Vec2> l) { if (MeshBuilder.SignedArea(l) < 0) l.Reverse(); return l; }
+            // Stiffener.
+            var st = Ccw(new List<Vec2> { P(sw, zf + fc.StiffenerClip), P(sw + fc.StiffenerClip, zf), P(half, zf), P(half, zf + fc.StiffenerOuterHeight), P(sw + fc.StiffenerTopFlat, zw), P(sw, zw) });
+            var ms = new Mesh();
+            PlateBuilder.AddPlanar(ms, st, Array.Empty<Hole>(), wf, -fc.StiffenerThickness / 2, fc.StiffenerThickness / 2);
+            // Web connection plates (both faces), holes.
+            double pl = fc.PlateLength / 2, ztop = fb.DepthAtEnds, zbot = ztop - fc.WebPlateHeight;
+            var holes = new List<Hole>();
+            foreach (var r in fc.WebRows)
+                for (int k = r.FirstColumn; k < fc.BoltColumns; k += Math.Max(1, r.ColumnStep))
+                    foreach (int sg in new[] { -1, 1 }) holes.Add(new Hole(P(joint + sg * (fc.BoltFirst + k * fc.BoltPitch), ztop - r.Gage), hd));
+            var wp = Ccw(new List<Vec2> { P(joint - pl, zbot), P(joint + pl, zbot), P(joint + pl, ztop), P(joint - pl, ztop) });
+            double tw = Math.Max(fb.WebThickness, fc.StiffenerThickness);
+            var mw = new Mesh();
+            foreach (int sd in new[] { 1, -1 })
+                PlateBuilder.AddPlanar(mw, wp, holes, wf, sd > 0 ? tw / 2 : -tw / 2 - fc.PlateThickness, sd > 0 ? tw / 2 + fc.PlateThickness : -tw / 2);
+            double gw = 2 * fc.PlateThickness + tw;
+            foreach (var h in holes)
+                Model.Steel.Bolts.Add(new BoltInstance { Frame = BoltFrame((u, v, t) => wf.ToWorld(u, v, t), h.Center.X, h.Center.Y, tw / 2 + fc.PlateThickness, -1), Grip = gw, Length = bolt.LengthForGrip(gw), Assembly = asm });
+            // Flange connection plates: each side of the web, outer edge flush with the floorbeam flange edge; top and bottom.
+            var ff = new Frame3(wf.Origin, wf.X, wf.Z, wf.Y);   // (s, lateral, up)
+            double fe = fb.FlangeWidth / 2;
+            var mf = new Mesh();
+            var mfb = new Mesh();
+            int nfb = 0;
+            foreach (int sd in new[] { 1, -1 })
+            {
+                var fh = new List<Hole>();
+                foreach (var r in fc.FlangeRows)
+                    for (int k = r.FirstColumn; k < fc.BoltColumns; k += Math.Max(1, r.ColumnStep))
+                        foreach (int sg in new[] { -1, 1 }) fh.Add(new Hole(new Vec2(S(joint + sg * (fc.BoltFirst + k * fc.BoltPitch)), sd * (fe - r.Gage)), hd));
+                double w0 = sd > 0 ? fe - fc.FlangePlateWidth : -fe, w1 = sd > 0 ? fe : -fe + fc.FlangePlateWidth;
+                var fp = Ccw(new List<Vec2> { new(S(joint - pl), w0), new(S(joint + pl), w0), new(S(joint + pl), w1), new(S(joint - pl), w1) });
+                const double up = 1;
+                PlateBuilder.AddPlanar(mf, fp, fh, ff, up > 0 ? zf : -zf - fc.PlateThickness, up > 0 ? zf + fc.PlateThickness : -zf);
+                if (fc.BottomFlangePlates) { PlateBuilder.AddPlanar(mfb, fp, fh, ff, up > 0 ? -fc.PlateThickness : 0, up > 0 ? 0 : fc.PlateThickness); nfb++; }
+                double gf = fc.PlateThickness + zf + (fc.BottomFlangePlates ? fc.PlateThickness : 0);
+                foreach (var h in fh)
+                    Model.Steel.Bolts.Add(new BoltInstance { Frame = BoltFrame((u, v, t) => ff.ToWorld(u, v, t), h.Center.X, h.Center.Y, up * (zf + fc.PlateThickness), -up), Grip = gf, Length = bolt.LengthForGrip(gf), Assembly = asm });
+            }
+            AddPart($"{asm}-ST{end}", PartCategory.ArchStiffener, asm, $"PL {L(fc.StiffenerThickness)} connection stiffener at {tie.Name} (p.146)", ms, fc.Material, half - sw);
+            AddPart($"{asm}-WP{end}", PartCategory.ArchConnectionPlate, asm, $"2 - PL {L(fc.PlateThickness)} x {L(fc.WebPlateHeight)} x {L(fc.PlateLength)} web connection plates (p.146)", mw, fc.Material, fc.PlateLength);
+            AddPart($"{asm}-FP{end}", PartCategory.ArchConnectionPlate, asm, $"2 - PL {L(fc.PlateThickness)} x {L(fc.FlangePlateWidth)} x {L(fc.PlateLength)} top flange connection plates (p.146)", mf, fc.Material, fc.PlateLength);
+            if (nfb > 0)
+                AddPart($"{asm}-FB{end}", PartCategory.ArchConnectionPlate, asm, $"2 - PL {L(fc.PlateThickness)} x {L(fc.FlangePlateWidth)} x {L(fc.PlateLength)} bottom flange connection plates (p.146)", mfb, fc.Material, fc.PlateLength,
+                    0, fc.BottomUnresolved.Length > 0 ? Assumption.Unresolved(fc.BottomUnresolved, "bottom plates = the top plates mirrored") : null);
         }
 
         // ------------------------------------------------------------------ upper lateral bracing
@@ -442,10 +931,30 @@ public static class ArchGenerator
             var sec = SteelCatalog.WideFlangePolygon(w, -w.WebThickness / 2);
             AddAssembly("UPPER-BRACING", AssemblyKind.ArchBracing, $"Upper lateral bracing {w.Name}");
             var asu = _d.BracingOrientationUnresolved.Length > 0 ? Assumption.Unresolved(_d.BracingOrientationUnresolved, "web in the plane of the member and the local Z axis, work point to work point") : null;
+            // Member axes (world) first: crossing trims need the continuous members.
+            var axes = new Dictionary<string, (Vec3 a, Vec3 b)>(StringComparer.OrdinalIgnoreCase);
+            foreach (var br in _d.Bracing)
+                if (P(br.From) is { } pa && P(br.To) is { } pb) axes[br.Name] = (W(pa), W(pb));
+            double Trim(Vec3 ax, string other, double gap)
+            {
+                if (!axes.TryGetValue(other, out var o)) return 0;
+                var od = (o.b - o.a).Normalized();
+                double s = Vec3.Cross(ax, od).Length;
+                return s < 1e-6 ? 0 : (w.FlangeWidth / 2 + gap) / s;
+            }
             foreach (var br in _d.Bracing)
             {
                 if (P(br.From) is not { } a || P(br.To) is not { } b) continue;
                 var wa = W(a); var wb = W(b);
+                if (br.Via.Length > 0 && P(br.Via) is { } via)
+                {
+                    var wv = W(via); var dd = (wb - wa).Normalized();
+                    double off = (wv - wa - dd * Vec3.Dot(wv - wa, dd)).Length;
+                    Check($"bracing {br.Name}: {br.Via} on the straight member {br.From}-{br.To}", 0, off, In(0.25), L, "p.128 table (continuous member through the crossing, p.141 / 142)");
+                }
+                var ax0 = (wb - wa).Normalized();
+                if (br.TrimStartAt.Length > 0) wa += ax0 * Trim(ax0, br.TrimStartAt, br.TrimGap);
+                if (br.TrimEndAt.Length > 0) wb -= ax0 * Trim(ax0, br.TrimEndAt, br.TrimGap);
                 var ax = (wb - wa).Normalized();
                 var m = (_fr.Z - ax * Vec3.Dot(ax, _fr.Z)).Normalized();
                 var v = Vec3.Cross(ax, m).Normalized();
@@ -453,6 +962,63 @@ public static class ArchGenerator
                 RolledBuilder.AddExtrusion(mesh, sec, wa, m, v, ax, 0, (wb - wa).Length);
                 AddPart(br.Name, PartCategory.ArchBracing, "UPPER-BRACING", $"{w.Name} {br.From}-{br.To}", mesh, _d.BracingMaterial, (wb - wa).Length, w.WeightPerFootLb, asu);
             }
+            foreach (var cr in _d.BracingCrossings) BraceCrossing(cr, w, axes);
+        }
+
+        /// <summary>Crossing splice plates (top / bottom) along the spliced member over the continuous one, holes and bolts (p.141 / 142).</summary>
+        private void BraceCrossing(ArchBraceCrossing cr, WideFlangeSize w, Dictionary<string, (Vec3 a, Vec3 b)> axes)
+        {
+            if (!axes.TryGetValue(cr.Continuous, out var co) || !axes.TryGetValue(cr.PieceA, out var pa) || !axes.TryGetValue(cr.PieceB, out var pb) || P(cr.Point) is not { } cp) return;
+            var c0 = W(cp);
+            var sd = ((pa.b - pa.a).Normalized() + (pb.b - pb.a).Normalized()).Normalized();   // spliced member direction (mean of the two pieces)
+            var m = (_fr.Z - sd * Vec3.Dot(sd, _fr.Z)).Normalized();
+            var v = Vec3.Cross(sd, m).Normalized();
+            var cd = (co.b - co.a).Normalized();
+            var c2 = new Vec2(Vec3.Dot(cd, sd), Vec3.Dot(cd, v)).Normalized();
+            double angModel = Math.Acos(Math.Min(1, Math.Abs(c2.X))) * 180 / Math.PI;   // acute angle between the members in the plate plane
+            var mc = (_fr.Z - cd * Vec3.Dot(cd, _fr.Z)).Normalized(); var vc = Vec3.Cross(cd, mc).Normalized();
+            var s2 = new Vec2(Vec3.Dot(sd, cd), Vec3.Dot(sd, vc)).Normalized();
+            double angCont = Math.Acos(Math.Min(1, Math.Abs(s2.X))) * 180 / Math.PI;
+            double ang3d = Math.Acos(Math.Min(1, Math.Abs(Vec3.Dot(sd, cd)))) * 180 / Math.PI;
+            string asm = $"UPPER-BRACING";
+            var hd = Model.Steel.Bolt.HoleDiameter;
+            var asu = cr.Unresolved.Length > 0 ? Assumption.Unresolved(cr.Unresolved, $"PL {L(cr.Thickness)}") : null;
+            int nb = 0;
+            foreach (var (top, l1, l2, l3, angPlan) in new[] { (true, cr.TopL1, cr.TopL2, cr.TopL3, cr.TopAngleDeg), (false, cr.BottomL1, cr.BottomL2, cr.BottomL3, cr.BottomAngleDeg) })
+            {
+                double lt = l1 + l2 + l3, hw = cr.Width / 2;
+                if (!double.IsNaN(angPlan)) Check($"bracing crossing {cr.Name} {(top ? "top" : "bottom")}: angle between the members (in space)", angPlan, ang3d, 0.75,
+                    x => $"{x:F3} deg", $"p.141 / 142 vs the p.128 points: {angModel:F3} deg in the spliced member flange plane, {angCont:F3} deg in the continuous member flange plane (U6: U points off the rib plane)");
+                Check($"bracing crossing {cr.Name} {(top ? "top" : "bottom")}: crossing zone L2 x sin(angle)", w.FlangeWidth + 2 * In(0.5), l2 * Math.Sin(angPlan * Math.PI / 180), In(0.0625), L, "plan L2 = flange width + 1/2\" gap each side across the continuous member");
+                double z0 = top ? w.Depth / 2 : -w.Depth / 2 - cr.Thickness, z1 = top ? w.Depth / 2 + cr.Thickness : -w.Depth / 2;
+                var holes = new List<Hole>();
+                foreach (double y in new[] { -cr.Gage / 2, cr.Gage / 2 })
+                {
+                    foreach (double x in new[] { lt / 2 - cr.Edge, lt / 2 - cr.Edge - cr.Pitch }) { holes.Add(new Hole(new Vec2(x, y), hd)); holes.Add(new Hole(new Vec2(-x, y), hd)); }
+                    // On the continuous flange: EdgeToContinuousFlange (perpendicular) inside its flange tips, along this row.
+                    foreach (double dp in new[] { -(w.FlangeWidth / 2 - cr.EdgeToContinuousFlange), w.FlangeWidth / 2 - cr.EdgeToContinuousFlange })
+                    {
+                        // perpendicular distance from the continuous axis (through the origin along c2): p.X * (-c2.Y) + p.Y * c2.X = dp
+                        if (Math.Abs(c2.Y) < 1e-6) continue;
+                        double x = (dp - y * c2.X) / -c2.Y;
+                        holes.Add(new Hole(new Vec2(x, y), hd));
+                    }
+                }
+                var mesh = new Mesh();
+                var fr = new Frame3(c0, sd, v, m);
+                PlateBuilder.AddPlanar(mesh, Ccw(ClippedRect(-lt / 2, lt / 2, -hw, hw, 0)), holes, fr, z0, z1);
+                Model.Steel.Parts.Add(new SteelPart { Mark = $"BR-{cr.Name}-{(top ? "T" : "B")}", Category = PartCategory.ArchConnectionPlate, Assembly = asm,
+                    Description = $"PL {L(cr.Thickness)} x {L(cr.Width)} x {L(lt)} {(top ? "top" : "bottom")} splice plate at {cr.Name} (p.141 / 142)", Mesh = mesh, Material = _d.BracingMaterial, Length = lt, Assumption = asu });
+                double grip = cr.Thickness + w.FlangeThickness;
+                foreach (var h in holes)
+                {
+                    var o = fr.ToWorld(h.Center.X, h.Center.Y, top ? z1 : z0);
+                    var zd = top ? -m : m;
+                    Model.Steel.Bolts.Add(new BoltInstance { Frame = new Frame3(o, sd, Vec3.Cross(zd, sd).Normalized(), zd), Grip = grip, Length = Model.Steel.Bolt.LengthForGrip(grip), Assembly = asm });
+                    nb++;
+                }
+            }
+            Model.SpliceBolts[$"UPPER-BRACING-{cr.Name}"] = nb;
         }
 
         // ------------------------------------------------------------------ knuckles
@@ -554,13 +1120,26 @@ public static class ArchGenerator
             var prof = new List<(double u, bool top)>();
             double flute = dk.FormPitch - dk.FormTopFlat;
             double inset = (flute - dk.FormFluteBottom) / 2;
-            for (double u0 = 0; u0 + dk.FormPitch <= w0 + 1e-9; u0 += dk.FormPitch)
+            if (dk.FlutesOnBarGrid && dk.Rebar is { } rbg)
             {
-                prof.Add((u0 + dk.FormTopFlat, true));
-                prof.Add((u0 + dk.FormTopFlat + inset, false));
-                prof.Add((u0 + dk.FormTopFlat + inset + dk.FormFluteBottom, false));
-                prof.Add((u0 + dk.FormPitch, true));
+                // A corrugation under every longitudinal bottom bar ("#5 bar in each corrugation"): flute centres on the bar grid about the structure CL.
+                int kmax = (int)Math.Ceiling(w0 / 2 / rbg.LongSpacing) + 1;
+                for (int k = -kmax; k <= kmax; k++)
+                {
+                    double c = w0 / 2 + k * rbg.LongSpacing;
+                    double o0 = c - flute / 2, o1 = c + flute / 2;
+                    if (o0 <= 1e-6 || o1 >= w0 - 1e-6) continue;
+                    prof.Add((o0, true)); prof.Add((c - dk.FormFluteBottom / 2, false)); prof.Add((c + dk.FormFluteBottom / 2, false)); prof.Add((o1, true));
+                }
             }
+            else
+                for (double u0 = 0; u0 + dk.FormPitch <= w0 + 1e-9; u0 += dk.FormPitch)
+                {
+                    prof.Add((u0 + dk.FormTopFlat, true));
+                    prof.Add((u0 + dk.FormTopFlat + inset, false));
+                    prof.Add((u0 + dk.FormTopFlat + inset + dk.FormFluteBottom, false));
+                    prof.Add((u0 + dk.FormPitch, true));
+                }
             prof.RemoveAll(p => p.u >= w0 - 1e-6);
             double zTop = dk.FormBottomZ + dk.FormDepth;
 
@@ -667,11 +1246,15 @@ public static class ArchGenerator
             AddPart("FORM-DECK", PartCategory.FormDeck, "FORM-DECK", dk.FormDescription.Length > 0 ? dk.FormDescription : $"{L(dk.FormDepth)} x {L(dk.FormPitch)} steel deck form", sheet,
                 "ASTM A653 Gr. 33, G165 galvanized", 0, 0, fasu);
             BuildCurbs(dk, ka, kb);
+            _deck = (ts, tn, knots.Select(k => (k.s, k.n)).ToList(), ka, kb);
             // Second body of the deck IfcSlab (ConcreteModel.Haunches = the extra deck items): knuckle-zone slab and curbs.
             var extra = new Mesh();
             foreach (var mm in new[] { Model.SlabEnds, Model.Curbs }) if (mm != null) Append(extra, mm);
             Model.Concrete.Haunches = extra;
             foreach (var t in dk.Tendons) Model.Tendons.Add((t.Name, t.Path.Select(p => W(p.Vec)).ToList(), t.Description));
+            if (dk.Rebar is { } rb) BuildDeckRebar(dk, rb);
+            if (dk.PtSystem is { } pt) BuildPt(dk, pt);
+            if (dk.Rebar is { } rb2) CheckBarList(rb2);
         }
 
         private void BuildCurbs(ArchDeckDefinition dk, ArchKnuckleDefinition? ka, ArchKnuckleDefinition? kb)
@@ -760,9 +1343,16 @@ public static class ArchGenerator
             double zu = double.IsNaN(br.SteelUndersideZ) ? 0 : br.SteelUndersideZ;
             var top = W(lp.XY.WithZ(zu));
             var c2 = top.XY;
-            // Long direction normal to the support line, pointing up-structure (+X).
-            var along = sl.Direction.Left;
+            // Long direction: the plan pedestal / bearing axis (angle from the support line +S toward +N) or normal to the support line; pointing up-structure (+X).
+            var sDir = sl.Direction; var nDir = sDir.Left;
+            var along = double.IsNaN(br.LongAxisAngleDeg) ? nDir
+                : sDir * Math.Cos(br.LongAxisAngleDeg * Math.PI / 180) + nDir * Math.Sin(br.LongAxisAngleDeg * Math.PI / 180);
             if (Vec2.Dot(along, _fr.X.XY) < 0) along = -along;
+            if (!double.IsNaN(br.LongAxisAngleDeg))
+            {
+                double toChord = Math.Acos(Math.Clamp(Math.Abs(Vec2.Dot(along.Normalized(), _fr.X.XY.Normalized())), 0, 1)) * 180 / Math.PI;
+                Info($"Arch bearing {br.Name}: plates and anchor bolts along {br.LongAxisAngleDeg:0.###} deg to the {sl.Name} line ({br.LongAxisSource}); {toChord:F2} deg off the arch chord in plan.");
+            }
             var across = along.Left;
             var f0 = new Frame3(c2.WithZ(br.SeatElevation), along.WithZ(0), across.WithZ(0), new Vec3(0, 0, 1));
             string asm = $"BRG-{br.Name}";

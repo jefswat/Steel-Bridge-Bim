@@ -17,7 +17,7 @@ public class ArchTests
 {
     private const double Tol = 0.0254 / 16;
 
-    private static (BridgeProject p, BridgeDefinition b) Model(double tiltDeg = 1.039)
+    internal static (BridgeProject p, BridgeDefinition b) Model(double tiltDeg = 1.039)
     {
         var al = new Alignment { Name = "A", StartStation = 0 };
         al.SetElements(new[] { new HorizontalElement(new Vec2(0, 0), 0, Ft(600), 0, 0) });
@@ -78,7 +78,7 @@ public class ArchTests
         return (p, b);
     }
 
-    private static (BridgeFraming f, ArchModel m) Generate(BridgeProject p)
+    internal static (BridgeFraming f, ArchModel m) Generate(BridgeProject p)
     {
         var f = FramingGenerator.Generate(p.Bridges[0], p.Alignments[0]);
         Assert.False(f.HasErrors, string.Join("; ", f.Diagnostics.Select(d => d.Message)));

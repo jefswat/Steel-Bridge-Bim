@@ -18,6 +18,11 @@ public sealed class ArchModel
     /// <summary>Bearing names in seat order (BearingSeat.Girder = index).</summary>
     public List<string> BearingNames { get; } = new();
     public List<ArchCheck> Checks { get; } = new();
+    /// <summary>Bolt count per splice assembly (rib RS / tie TS splices).</summary>
+    public Dictionary<string, int> SpliceBolts { get; } = new();
+    /// <summary>PT strand size (IFC IfcTendon) when tendon solids are built.</summary>
+    public double PtStrandDiameter { get; set; }
+    public double PtStrandArea { get; set; }
     /// <summary>Rib circle per rib: centre (local), plane basis (chord c, in-plane up u), radius, rise, arc length.</summary>
     public List<ArchRibResult> Ribs { get; } = new();
     public List<ArchTieResult> Ties { get; } = new();
@@ -51,7 +56,12 @@ public sealed record ArchRibResult(string Name, Vec3 Center, Vec3 ChordDir, Vec3
 
 public sealed record ArchTieResult(string Name, double StartAngle, double Length, double ClosureMiss, List<(string Name, Vec3 Local)> PanelPoints);
 
-public sealed record ArchHangerResult(string Name, Vec3 TieAnchorWorld, Vec3 RibAnchorWorld, double Length, double PlanLength);
+public sealed record ArchHangerResult(string Name, Vec3 TieAnchorWorld, Vec3 RibAnchorWorld, double Length, double PlanLength)
+{
+    /// <summary>Cable axis at the rib working line (p.147 HC column) when given; the plan length is measured to it.</summary>
+    public Vec3? RibWorkPointWorld { get; init; }
+    public double PlanBasisLength { get; init; } = double.NaN;
+}
 
 public sealed record ArchFloorbeamResult(string Name, Vec3 EndA, Vec3 EndB, double Length, double CrownFromA);
 

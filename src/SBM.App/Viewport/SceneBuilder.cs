@@ -177,7 +177,10 @@ public static class SceneBuilder
         ("3D-ARCH-RIBS", 70, 130, 200, new[] { PartCategory.ArchRib }),
         ("3D-ARCH-TIES", 60, 110, 190, new[] { PartCategory.TiePlate }),
         ("3D-ARCH-FLOORBEAMS", 90, 150, 210, new[] { PartCategory.FloorbeamPlate }),
-        ("3D-ARCH-HANGERS", 215, 215, 225, new[] { PartCategory.Hanger, PartCategory.HangerSocket }),
+        ("3D-ARCH-HANGERS", 215, 215, 225, new[] { PartCategory.Hanger, PartCategory.HangerSocket, PartCategory.CableConnector }),
+        ("3D-ARCH-FIN-PLATES", 235, 150, 70, new[] { PartCategory.FinPlate }),
+        ("3D-ARCH-CONNECTIONS", 120, 210, 230, new[] { PartCategory.ArchConnectionPlate, PartCategory.ArchStiffener }),
+        ("3D-ARCH-PT", 230, 120, 40, new[] { PartCategory.PtStrand, PartCategory.PtAnchorage }),
         ("3D-ARCH-BRACING", 80, 200, 110, new[] { PartCategory.ArchBracing }),
         ("3D-ARCH-KNUCKLES", 235, 185, 70, new[] { PartCategory.KnucklePlate }),
         ("3D-ARCH-FORM-DECK", 175, 180, 190, new[] { PartCategory.FormDeck }),
@@ -191,18 +194,29 @@ public static class SceneBuilder
     public const string BoltLayer = "3D-BOLTS";
     public const string StudLayer = "3D-STUDS";
     public const string AnchorLayer = "3D-ANCHOR-BOLTS";
+    /// <summary>Flagged (UNRESOLVED) steel parts, e.g. tied arch details the plans do not dimension.</summary>
+    public const string UnresolvedSteelLayer = "3D-UNRESOLVED-STEEL";
 
     /// <summary>Adds shaded solids for steel models (built in parallel per layer). Bolts become GPU instances of one mesh per length.</summary>
     public static void AddSolids(SceneData scene, IReadOnlyList<SteelModel> models)
     {
         var o = scene.Origin;
-        var layers = new SolidLayer?[SolidLayerDefs.Length + 3];
+        var layers = new SolidLayer?[SolidLayerDefs.Length + 4];
         Parallel.For(0, layers.Length, i =>
         {
+            if (i == SolidLayerDefs.Length + 3)
+            {
+                // Steel parts whose geometry the plans do not fix (SteelPart.Assumption): their own orange layer, removed from the normal layers.
+                var flagged = models.SelectMany(m => m.Parts).Where(p => p.Assumption != null && !p.Mesh.IsEmpty).ToList();
+                if (flagged.Count == 0) return;
+                var fm = FlatShaded(flagged.Select(p => p.Mesh), o, flagged);
+                layers[i] = new SolidLayer { Name = UnresolvedSteelLayer, R = 255, G = 110, B = 40, Parts = new() { (fm, null) }, Triangles = fm.Indices!.Count / 3 };
+                return;
+            }
             if (i < SolidLayerDefs.Length)
             {
                 var (name, r, g, b, cats) = SolidLayerDefs[i];
-                var parts = models.SelectMany(m => m.Parts).Where(p => cats.Contains(p.Category)).ToList();
+                var parts = models.SelectMany(m => m.Parts).Where(p => cats.Contains(p.Category) && p.Assumption == null).ToList();
                 if (parts.Count == 0) return;
                 if (name == "3D-WELDS")
                 {
