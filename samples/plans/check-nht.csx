@@ -80,14 +80,24 @@ double Cross(Vec2 p, Vec2 dir)
     return s;
 }
 double[] unitLen = { 107.88, 97.00, 162.92, 122.45, 168.00 };
-double area = 0;
+double area = 0, areaPhys = 0;
+// Deck ends: the slabs end at the SEJ-B armor faces (rail-joints-nht.csx: opening / 2 short of the CL SEJ at the piers, one opening short of the face of backwall at
+// the abutments); the plans dimension and pay the slabs to the CL SEJ / face of backwall. Cut = (plan joint line) - (modeled deck end), normal to the support line.
+double PlanDeckEnd(string sup) => sup is "Pier 10" or "Pier 11" ? -In(9.25) : 0;
+double CutAt(SupportDefinition s) => PlanDeckEnd(s.Name) - s.DeckEndOffset;
 for (int u = 0; u < 5; u++)
 {
     var f = Doc.Framing(unitNames[u]);
-    double s0 = Cross(f.Deck!.BeginLinePoint, f.Deck.BeginLineDirection), s1 = Cross(f.Deck.EndLinePoint, f.Deck.EndLineDirection);
+    var bd = Doc.Bridge(unitNames[u]);
+    double cb = CutAt(bd.Supports[0]), ce = CutAt(bd.Supports[^1]);
+    double s0 = Cross(f.Deck!.BeginLinePoint - f.Deck.BeginLineDirection.Left * cb, f.Deck.BeginLineDirection),
+           s1 = Cross(f.Deck.EndLinePoint + f.Deck.EndLineDirection.Left * ce, f.Deck.EndLineDirection);
     Chk($"{unitNames[u]} deck length along CL NHT (SEJ to SEJ)", (s1 - s0) / ft, unitLen[u], 0.01);
-    area += f.Deck.Area;
+    double w = bd.Deck.RightEdgeOffset - bd.Deck.LeftEdgeOffset;
+    areaPhys += f.Deck.Area;
+    area += f.Deck.Area + cb * w / Math.Cos(bd.Supports[0].SkewDegrees * Math.PI / 180) + ce * w / Math.Cos(bd.Supports[^1].SkewDegrees * Math.PI / 180);
 }
+Print($"INFO  approach slabs end at the SEJ-B armor faces: physical slab area {areaPhys / (ft * ft):0.0} SF; the plan lengths / SF are to the CL SEJ (+ the cut-back strips)");
 
 // ---------------------------------------------------------------- 3. girder angles (PIER REPORTs) and girder lengths (GIRDER REPORTs)
 Print("== girder layout (PIER / GIRDER REPORTs p.108, 110, 112, 114, 116)");
@@ -250,12 +260,26 @@ Chk("drill shaft (78 in) LF", Lf(6.5), 46, 1, "LF");
 Chk("prestr conc girder (Tx28) LF", txLf, 1304.25, 0.5, "LF");
 Chk("reinf conc slab (HPC), approach SF", area / (ft * ft), 10319, 10, "SF");
 
-// ---------------------------------------------------------------- 6. railing, curbs, joints, mow strips (rail-joints-nht.csx; p.84-91, 97, 99, 113)
-Print("== RAIL (PED), curbs, SEJ-B(MOD) joints, mow strips");
+// ---------------------------------------------------------------- 6. railing, curbs, joints, mow strips, T80SS(MOD) (rail-joints-nht.csx; p.84-91, 97, 99, 105-106, 113)
+Print("== RAIL (PED), curbs, SEJ-B(MOD) joints + BS-EJCP + IGTS, mow strips, T80SS(MOD)");
 var allNht = Doc.Project.Bridges.Where(b => b.Structure == Doc.Bridge(unitNames[0]).Structure).Select(b => b.Name).ToList();
 bool archBuilt = allNht.Any(n => Doc.Bridge(n).Arch != null);
 var runs = allNht.SelectMany(n => Doc.Model(n).Steel?.Railings?.Runs.AsEnumerable() ?? Enumerable.Empty<SBM.Core.Railing.RailingRun>()).ToList();
-double RailLf(string type, int side) => runs.Where(r => r.TypeName == type && Math.Sign(r.Offset) == side).Sum(r => r.Length) / ft;
+// The approach runs stop at the slab ends (armor faces); the plan "length of rail" runs to the CL SEJ / face of backwall: the cut-back strips are added back
+// (cut / cos(skew) along the curb line) for the comparison. The arch runs are limited at the CL SEJ already.
+double GapLf(string bridge, SBM.Core.Railing.RailingRun r)
+{
+    var bd = Doc.Bridge(bridge);
+    if (bd.Arch != null || bd.Railings == null) return 0;
+    var def = bd.Railings.First(x => x.Name == r.Name);
+    double g = 0;
+    if (def.BeginStation == null) g += CutAt(bd.Supports[0]) / Math.Cos(bd.Supports[0].SkewDegrees * Math.PI / 180);
+    if (def.EndStation == null) g += CutAt(bd.Supports[^1]) / Math.Cos(bd.Supports[^1].SkewDegrees * Math.PI / 180);
+    return g;
+}
+var runsB = allNht.SelectMany(n => (Doc.Model(n).Steel?.Railings?.Runs.AsEnumerable() ?? Enumerable.Empty<SBM.Core.Railing.RailingRun>()).Select(r => (n, r))).ToList();
+double RailLf(string type, int side) => runsB.Where(x => x.r.TypeName == type && Math.Sign(x.r.Offset) == side).Sum(x => x.r.Length + GapLf(x.n, x.r)) / ft;
+double RailLfPhys(string type) => runs.Where(r => r.TypeName == type).Sum(r => r.Length) / ft;
 // p.84-88 "overall length of rail" (face of rail = curb line, 7'-0 from CL NHT)
 Chk("RAIL (PED)(LOW) LT LF (p.84-88)", RailLf("RAIL (PED)(LOW)", -1), 307.93, 0.01, "LF");
 Chk("RAIL (PED)(LOW) RT LF (p.84-88)", RailLf("RAIL (PED)(LOW)", 1), 270.95, 0.01, "LF");
@@ -267,28 +291,98 @@ if (archBuilt)
 }
 else Print("INFO  RAIL (PED)(HIGH): the arch span is not in this model (run arch-nht.csx) - high rail LF not compared");
 Chk("5110 RAIL (PED)(LOW) LF (p.91)", RailLf("RAIL (PED)(LOW)", -1) + RailLf("RAIL (PED)(LOW)", 1), 579.0, 0.1, "LF");
+Print($"INFO  railing modeled on the curbs (gaps at the joints not counted): LOW {RailLfPhys("RAIL (PED)(LOW)"):0.00} LF, HIGH {RailLfPhys("RAIL (PED)(HIGH)"):0.00} LF");
 // p.91 splits the pay quantities per unit (low 215.8 + 194.0 + 169.2 = 579.0, 0.12 LF more than the p.84-88 layout lengths; high 152.9 + 336.0 / 156.4 + 91.7 + 407.2)
-double UnitLf(string unit, string type) => (Doc.Model(unit).Steel?.Railings?.Runs.Where(r => r.TypeName == type).Sum(r => r.Length) ?? 0) / ft;
+double UnitLf(string unit, string type) => runsB.Where(x => x.n == unit && x.r.TypeName == type).Sum(x => x.r.Length + GapLf(x.n, x.r)) / ft;
 Print($"INFO  p.91 per unit, LOW: Unit 1 model {UnitLf("NHT Unit 1", "RAIL (PED)(LOW)"):0.00} / plan 215.8, Unit 2 {UnitLf("NHT Unit 2", "RAIL (PED)(LOW)"):0.00} / 194.0, Unit 3 {UnitLf("NHT Unit 3", "RAIL (PED)(LOW)"):0.00} / 169.2");
 Print($"INFO  p.91 per unit, HIGH: Unit 3 model {UnitLf("NHT Unit 3", "RAIL (PED)(HIGH)"):0.00} / plan 156.4, Unit 4 {UnitLf("NHT Unit 4", "RAIL (PED)(HIGH)"):0.00} / 152.9 + 91.7 = 244.6, Unit 5 {UnitLf("NHT Unit 5", "RAIL (PED)(HIGH)"):0.00} / 336.0"
     + (archBuilt ? $", arch {allNht.Where(n => Doc.Bridge(n).Arch != null).Sum(n => UnitLf(n, "RAIL (PED)(HIGH)")):0.00} / 407.2" : ""));
-Print($"INFO  railing runs: {runs.Count}, posts modeled {runs.Sum(r => r.Posts)} (posts / spacing UNRESOLVED, p.84 note 2), mass {runs.Sum(r => r.Mass) * 2.20462:N0} lb (p.83 design dead load 50 / 100 PLF)");
-// curbs: 10" x 4" with two 3/4" chamfers = 39.44 in2; both sides together run 2 x the CL NHT length of the approach decks (curvature terms cancel)
+Print($"INFO  RAIL (PED) type: not a TxDOT standard (RL-PR3 / PR11 / PR22 / PR3-HD / CLF-RO checked, see rail-joints-nht.csx); runs {runs.Count}, posts modeled {runs.Sum(r => r.Posts)} (posts / spacing UNRESOLVED U14, p.84 note 2), mass {runs.Sum(r => r.Mass) * 2.20462:N0} lb (p.83 design dead load 50 / 100 PLF)");
+// curbs: 10" x 4" with two 3/4" chamfers = 39.44 in2; both sides together run 2 x the CL NHT length of the approach decks (curvature terms cancel) less the cut-back strips
 double curbV = unitNames.Sum(n => Doc.Model(n).Concrete?.Barriers.Where(x => x.Name.EndsWith("curb")).Sum(x => Math.Abs(x.Mesh.Volume())) ?? 0) / Math.Pow(ft, 3);
 double curbA = (10 * 4 - 2 * 0.5 * 0.75 * 0.75) / 144.0;
-Chk("approach curb volume (10\" x 4\", 3/4\" chamfers, both sides; p.89, 113) CY", curbV / 27, curbA * 2 * (861.57 - 203.32) / 27, 0.05, "CY");
+double cutLen = unitNames.Sum(n => { var bd = Doc.Bridge(n); return CutAt(bd.Supports[0]) / Math.Cos(bd.Supports[0].SkewDegrees * Math.PI / 180) + CutAt(bd.Supports[^1]) / Math.Cos(bd.Supports[^1].SkewDegrees * Math.PI / 180); }) / ft;
+Chk("approach curb volume (10\" x 4\", 3/4\" chamfers, both sides, to the slab ends; p.89, 113) CY", curbV / 27, curbA * 2 * (861.57 - 203.32 - cutLen) / 27, 0.05, "CY");
+
 // joints: p.91 0454 SEALED EXPANSION JOINT (4 IN)(SEJ-B)(MOD) 75 LF (CSJ 0918: Abut 1, P4, P7, P13, Abut 16) + 32 LF (CSJ 0047: P10, P11) = 107 LF
+// = 15 LF per radial joint, 16 at the 19.58 deg skewed P10 / P11. Model: the seal / armor between the curb toes (14'-0 trail, / cos(skew) at P10 / P11).
+// SEJ-B "at sidewalk" / seal upturn detail: the seal turns up the 4" curb faces and is trimmed 1/2" below the curb top -> + 2 x 3 1/2" per joint; the plan LF
+// is that length rounded UP to the foot per joint (14.58 -> 15, 15.44 -> 16): reproduced here (DERIVED; the 2'-0 skew termination of SEJ-B does not apply to it).
 var joints = unitNames.SelectMany(n => Doc.Model(n).Concrete?.Joints.AsEnumerable() ?? Enumerable.Empty<SBM.Core.Concrete.ExpansionJointResult>()).ToList();
-Chk("SEJ-B(MOD) joints modeled (7 locations, p.84-88)", joints.Count, 7, 0, "EA");
-double jArch = joints.Where(j => j.Support is "Pier 10" or "Pier 11").Sum(j => j.Length) / ft, jAll = joints.Sum(j => j.Length) / ft;
-Chk("SEJ-B(MOD) LF CSJ 0918 (5 joints, p.91)", jAll - jArch, 75, 0.1, "LF");
-Chk("SEJ-B(MOD) LF CSJ 0047 (P10 + P11, p.91)", jArch, 32, 0.1, "LF");
+var devices = joints.Where(j => j.Body != null).ToList();
+Chk("SEJ-B(MOD) joints modeled (7 locations, p.84-88)", devices.Count, 7, 0, "EA");
+Chk("IGTS thickened slab ends (10 approach deck ends = every unit end, p.109-117 'see IGTS')", joints.Count(j => j.EndBlock != null), 10, 0, "EA");
+double upturn = 2 * In(4 - 0.5);
+double jArchM = devices.Where(j => j.Support is "Pier 10" or "Pier 11").Sum(j => j.Length) / ft, jAllM = devices.Sum(j => j.Length) / ft;
+Print($"INFO  SEJ-B armor / seal between the curb toes: CSJ 0918 {jAllM - jArchM:0.00} LF, CSJ 0047 {jArchM:0.00} LF, total {jAllM:0.00} LF (the earlier 111.57 LF was the full 15'-8 deck width)");
+double PayLf(SBM.Core.Concrete.ExpansionJointResult j) => Math.Ceiling((j.Length + upturn) / ft - 1e-6);
+foreach (var j in devices) Print($"INFO  {j.Support}: seal {j.Length / ft:0.000} + upturns {upturn / ft:0.000} = {(j.Length + upturn) / ft:0.000} ft -> {PayLf(j):0} LF");
+double jArch = devices.Where(j => j.Support is "Pier 10" or "Pier 11").Sum(PayLf), jAll = devices.Sum(PayLf);
+Chk("SEJ-B(MOD) LF CSJ 0918 (5 joints, p.91; seal incl. curb upturns, per joint rounded up)", jAll - jArch, 75, 0.1, "LF");
+Chk("SEJ-B(MOD) LF CSJ 0047 (P10 + P11, p.91; idem)", jArch, 32, 0.1, "LF");
 Chk("0454 SEJ-B(MOD) LF total (p.91)", jAll, 107, 0.1, "LF");
-Print("INFO  BS-EJCP cover plates (p.91: 194 lb per joint, 206 at P10 / P11, 1,382 lb) not modeled - standard not in the set (UNRESOLVED)");
+// arch side of the P10 / P11 joints: the far armor plate is cast into the arch deck end; where does the arch slab (knuckle end web face) end?
+if (archBuilt)
+{
+    var archName = allNht.First(n => Doc.Bridge(n).Arch != null);
+    var acm = Doc.Model(archName).Concrete;
+    var ats = new SBM.Core.Railing.TopSurface(new[] { acm?.Deck, acm?.Haunches }.Where(m => m != null).Select(m => m!));
+    foreach (var (pier, dir) in new[] { ("Pier 10", 1), ("Pier 11", -1) })
+    {
+        var sup = Doc.Project.Bridges.SelectMany(b => b.Supports).First(x => x.Name == pier);
+        double sk = sup.SkewDegrees * Math.PI / 180;
+        var tg = Vec2.FromAngle(al.AngleAt(sup.Station)); var rg = tg.Right;
+        var nrm = -rg * Math.Sin(sk) + tg * Math.Cos(sk);
+        var sej = al.PointAt(sup.Station, 0) - nrm * dir * In(9.25);
+        double first = double.NaN;
+        for (double x = -In(3); x <= In(24); x += In(1.0 / 32)) if (ats.At(sej + nrm * dir * x) is double) { first = x; break; }
+        Print($"INFO  {pier}: the arch slab begins {first / In(1):0.00}\" from the CL SEJ at CL NHT; the SEJ-B 2 1/2\" opening puts the arch-side armor face at 1.25\" -> the arch deck overlaps the opening by {(In(1.25) - first) / In(1):0.00}\" (arch model unchanged, CONFLICT reported)");
+    }
+}
+// armor / studs / cover plates (SEJ-B, BS-EJCP 10-2024: post-date the plans)
+var hw = devices.SelectMany(j => j.Hardware.Select(p => (j, p))).ToList();
+foreach (var j in devices)
+{
+    int studs = j.Hardware.Count(p => p.Category == SBM.Core.Steel.PartCategory.JointStud);
+    double arm = j.Hardware.Where(p => p.Category == SBM.Core.Steel.PartCategory.JointArmor).Sum(p => p.Length) / ft;
+    // SEJ-B: studs at 6" max, first 3" from each plate end -> n = ceil((L - 6") / 6") + 1 per plate
+    int expect = j.Hardware.Where(p => p.Category == SBM.Core.Steel.PartCategory.JointArmor).Sum(p => (int)Math.Ceiling((p.Length - In(6)) / In(6) - 1e-9) + 1);
+    Chk($"SEJ-B stud anchors at {j.Support} (5/8\" at 6\" max on both armor plates)", studs, expect, 0, "EA");
+    Print($"INFO  {j.Support}: armor 2 x PL 1/2 x 4 = {arm:0.000} ft, {LbOf(j.Hardware.Where(p => p.Category == SBM.Core.Steel.PartCategory.JointArmor).Sum(p => p.Mass)):0} lb");
+}
+// BS-EJCP: p.91 note: Abut 1 194, P4 194, P7 194, P10 206, P11 206, P13 194, Abut 16 194 = 1,382 lb (STR STEEL (MISC NON-BRIDGE)); the standard: "estimated
+// weight of one sidewalk expansion joint cover plate is 14 plf". Plate length checked at 14 plf (1 lb); the modeled steel (1/4" x 1'-4 = 13.61 plf) reported.
+var ejcpPlan = new Dictionary<string, double> { ["Abutment 1"] = 194, ["Pier 4"] = 194, ["Pier 7"] = 194, ["Pier 10"] = 206, ["Pier 11"] = 206, ["Pier 13"] = 194, ["Abutment 16"] = 194 };
+double cpModel = 0, cpAt14 = 0;
+foreach (var j in devices)
+{
+    var cp = j.Hardware.FirstOrDefault(p => p.Category == SBM.Core.Steel.PartCategory.JointCoverPlate);
+    if (cp == null) { fail++; fails.Add($"BS-EJCP at {j.Support}"); Print($"FAIL  BS-EJCP at {j.Support}: not modeled"); continue; }
+    double at14 = 14 * cp.Length / ft, mlb = LbOf(cp.Mass);
+    cpModel += mlb; cpAt14 += at14;
+    Chk($"BS-EJCP at {j.Support}: plate length x 14 plf (p.91 note)", at14, ejcpPlan[j.Support], 1.0, "lb");
+    Print($"INFO  BS-EJCP at {j.Support}: {cp.Length / ft:0.000} ft, modeled steel {mlb:0.0} lb, {j.Hardware.Count(p => p.Category == SBM.Core.Steel.PartCategory.JointAnchor)} sleeve anchors 3/8\" x 2 1/2\"");
+}
+Chk("BS-EJCP total at 14 plf (p.91 STR STEEL (MISC NON-BRIDGE) 1,382 lb)", cpAt14, 1382, 3, "lb");
+Print($"INFO  BS-EJCP modeled steel {cpModel:0} lb (1/4\" x 1'-4 = 13.61 plf) vs the p.91 1,382 lb at the standard's 14 plf estimate ({cpModel - 1382:+0;-0} lb)");
+foreach (var j in joints.Where(x => x.EndBlock != null))
+    Print($"INFO  IGTS thickened slab end at {j.Support} ({(j.AtBegin ? "begin" : "end")}): {j.EndBlock!.Volume / Math.Pow(ft, 3):0.00} CF");
+Print($"INFO  IGTS thickened slab ends total {joints.Where(x => x.EndBlock != null).Sum(x => x.EndBlock!.Volume) / Math.Pow(ft * 3, 3):0.000} CY (IGTS 'quantity adjustments' are not in the p.91 slab SF)");
 // mow strips: p.91 0432 RIPRAP (MOW STRIP)(4 IN) 6.1 CY
 double mow = unitNames.SelectMany(n => Doc.Model(n).Substructure?.Units.AsEnumerable() ?? Enumerable.Empty<SubstructureUnit>())
     .SelectMany(un => un.Solids).Where(s => s.Kind == SubElementKind.MowStrip).Sum(s => Math.Abs(s.Mesh.Volume())) / Math.Pow(ft * 3, 3);
 Chk("0432 riprap (mow strip)(4 in) CY (p.91)", mow, 6.1, 0.05, "CY");
+// T80SS(MOD): p.91 0450 6091 RAIL (TY T80SS)(MOD) 78.0 LF (Piers 10 & 11); p.105 38'-2 limits of cutting per side; p.106 4'-6 high, 9'-1 + 4'-6 + 7'-11
+var t80 = unitNames.SelectMany(n => Doc.Model(n).Substructure?.Units.AsEnumerable() ?? Enumerable.Empty<SubstructureUnit>())
+    .SelectMany(un => un.Solids.Select(s => (un, s))).Where(x => x.s.Kind == SubElementKind.TrafficBarrier).ToList();
+var t80Def = unitNames.SelectMany(n => Doc.Bridge(n).Supports).Where(s => s.Substructure?.GroundBarriers != null).SelectMany(s => s.Substructure!.GroundBarriers!).ToList();
+double t80Lf = t80Def.Sum(g => Enumerable.Range(1, g.Path.Count - 1).Sum(i => Math.Sqrt(Math.Pow(g.Path[i].S - g.Path[i - 1].S, 2) + Math.Pow(g.Path[i].N - g.Path[i - 1].N, 2)))) / ft;
+Chk("T80SS(MOD) barriers modeled (Pier 10 east / west, p.105)", t80.Count, 2, 0, "EA");
+Chk("T80SS(MOD) length per barrier = p.105 38'-2 limits of cutting", t80Lf / Math.Max(1, t80Def.Count), 38 + 2 / 12.0, 0.01, "LF");
+Chk("0450 RAIL (TY T80SS)(MOD) LF (p.91, Piers 10 & 11)", t80Lf, 78.0, 0.1, "LF");
+foreach (var g in t80Def) Chk($"{g.Name}: height of the straight part (p.106 4'-6)", g.Path.Max(v => v.Height) / ft, 4.5, In(1.0 / 16) / ft);
+foreach (var (un, s) in t80) Print($"INFO  {s.Name}: {Math.Abs(s.Mesh.Volume()) / Math.Pow(ft * 3, 3):0.00} CY, base {s.Mesh.Bounds().Min.Z / ft:0.000} (shaft top + 2'-9, flagged)");
+Print($"INFO  replacement pavement under the barriers: {unitNames.SelectMany(n => Doc.Model(n).Substructure?.Units.AsEnumerable() ?? Enumerable.Empty<SubstructureUnit>()).SelectMany(un => un.Solids).Where(s => s.Kind == SubElementKind.PavementStrip).Sum(s => Math.Abs(s.Mesh.Volume())) / Math.Pow(ft * 3, 3):0.00} CY; T80SS(MOD) bill (p.106, one side, contractor's information) R 682 + RH 151 + H1 170 + S1 699 + U 120 = 1,823 lb - bars not placed (UNRESOLVED)");
 // ---------------------------------------------------------------- 6. reinforcing (bar-lists.csv: p.95-104 tables, approach unit sheets p.109-117, arch deck p.154)
 // Counts must match the plan tables exactly; weights: the scheduled weight (count x listed length x A615 unit weight) vs the printed weight within 3 lb or 1 %
 // (the plan rounds); bars of variable geometry (S2: plan length = average) within 3 %. Elements without a plan bar list (shaft cages, approach decks: 2.3 lb/SF

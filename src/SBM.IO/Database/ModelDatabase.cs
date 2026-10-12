@@ -538,7 +538,7 @@ public static class ModelDatabase
         {
             var asmInfo = new Dictionary<string, AsmInfo>();
             var girderGroup = new Dictionary<int, string>();
-            string cfGroup = "", lbGroup = "", inspGroup = "", archGroup = "", railGroup = "";
+            string cfGroup = "", lbGroup = "", inspGroup = "", archGroup = "", railGroup = "", jointHwGroup = "";
             // OPTIONAL integral steel pier caps: one group per cap (support from the report), holding the cap, its connections and its bearings
             var capGroups = new Dictionary<string, (string Id, string Support)>();
             (string Id, string Support) CapGroup(string capMark)
@@ -622,6 +622,11 @@ public static class ModelDatabase
                         parent = railGroup.Length > 0 ? railGroup : (railGroup = Group($"{bk}/group/railings", superId, "Pedestrian railings", "railing group"));
                         cat = "pedestrian railing"; sub = asm.ObjectType ?? "";
                         break;
+                    case AssemblyKind.ExpansionJoint:
+                        parent = jointHwGroup.Length > 0 ? jointHwGroup : (jointHwGroup = Group($"{bk}/group/joint-hardware", superId, "Expansion joint hardware", "joint hardware group"));
+                        cat = "expansion joint hardware"; sub = asm.ObjectType ?? "";
+                        { var mm = Regex.Match(asm.Description, @" at (.+)$"); if (mm.Success) support = mm.Groups[1].Value; }
+                        break;
                     case AssemblyKind.LateralBracing:
                         parent = lbGroup.Length > 0 ? lbGroup : (lbGroup = Group($"{bk}/group/lateral", superId, "Lateral bracing", "lateral bracing group"));
                         cat = "lateral bracing";
@@ -688,7 +693,7 @@ public static class ModelDatabase
                 }
                 var pjs = new Json().Add("description", part.Description).Add("assembly", part.Assembly)
                     .Add("role", part.Role == MemberRole.None ? null : part.Role.ToString()).Add("lb_per_ft", part.NominalWeightLbPerFt, 3);
-                if (part.Assumption is { } pas && (SteelModel.IsRailing(part.Category) || IsCapPart(part))) pjs.Add("status", pas.Status).Add("reason", pas.Reason).Add("assumed", pas.Basis);
+                if (part.Assumption is { } pas && (SteelModel.IsRailing(part.Category) || IsCapPart(part) || SteelModel.IsJointHardware(part.Category))) pjs.Add("status", pas.Status).Add("reason", pas.Reason).Add("assumed", pas.Basis);
                 if (part.Fabrication is { IsEmpty: false } fab) foreach (var (fn, fv) in fab.Fields()) pjs.Add("fab_" + fn.ToLowerInvariant(), fv);
                 r.Props = pjs.ToString();
                 _w.Add(r);
@@ -763,7 +768,9 @@ public static class ModelDatabase
             PartCategory.RailBasePlate => "post base plate", PartCategory.RailEnvelope => "railing envelope",
             PartCategory.EndPlate => "end plate", PartCategory.ConnectorPlate => "connector plate", PartCategory.DiaphragmPlate => "connection diaphragm plate",
             PartCategory.ContinuityPlate => "mill-to-bear plate", PartCategory.CoverPlate => "cover plate", PartCategory.HandholeCover => "handhole cover",
-            PartCategory.HandholeBacking => "handhole backing plate", PartCategory.MeshScreen => "wire mesh screen", _ => c.ToString(),
+            PartCategory.HandholeBacking => "handhole backing plate", PartCategory.MeshScreen => "wire mesh screen",
+            PartCategory.JointArmor => "joint armor plate", PartCategory.JointStud => "joint stud anchor", PartCategory.JointCoverPlate => "joint cover plate",
+            PartCategory.JointAnchor => "cover plate anchor", _ => c.ToString(),
         };
 
         private static bool IsCapPart(SteelPart p) => p.Category is PartCategory.EndPlate or PartCategory.ConnectorPlate or PartCategory.DiaphragmPlate
@@ -780,7 +787,7 @@ public static class ModelDatabase
             PartCategory.PtAnchorage => "IFCTENDONANCHOR",
             PartCategory.WalkwayRail => "IFCRAILING",
             PartCategory.BearingPad or PartCategory.BearingDisc => "IFCBEARING",
-            PartCategory.ShearPin => "IFCMECHANICALFASTENER",
+            PartCategory.ShearPin or PartCategory.JointStud or PartCategory.JointAnchor => "IFCMECHANICALFASTENER",
             PartCategory.Weld => "IFCFASTENER",
             _ => "IFCPLATE",
         };
@@ -845,6 +852,17 @@ public static class ModelDatabase
                     r.Support = jr.Support; r.Subtype = type; r.Material = concMat; r.Volume = jr.BlockoutVolume; r.Mass = r.Volume * 2400;
                     r.Box = jr.Blockout.Bounds(); StationOf(r, r.Box);
                     r.Props = new Json().Add("end", jr.AtBegin ? "begin" : "end").Add("joint_index", jn - 1).ToString();
+                    _w.Add(r);
+                }
+                if (jr.EndBlock is { } eb && !eb.Mesh.IsEmpty && eb.Definition.Source is { Length: > 0 })
+                {
+                    // OPTIONAL thickened slab end with a source (e.g. TxDOT IGTS); same GlobalId key as the IFC IfcBuildingElementPart
+                    var r = New(Id(jk + "/endblock"), jg, "element", "thickened slab end", "IFCBUILDINGELEMENTPART", eb.Name);
+                    r.Support = jr.Support; r.Subtype = eb.Definition.Source; r.Material = concMat; r.Volume = eb.Volume; r.Mass = r.Volume * 2400;
+                    r.Box = eb.Mesh.Bounds(); StationOf(r, r.Box);
+                    var ej = new Json().Add("end", jr.AtBegin ? "begin" : "end");
+                    if (eb.Assumption is { } eas) ej.Add("status", eas.Status).Add("reason", eas.Reason).Add("assumed", eas.Basis);
+                    r.Props = ej.ToString();
                     _w.Add(r);
                 }
                 if (jr.Body != null)
@@ -966,6 +984,8 @@ public static class ModelDatabase
                         SubElementKind.DrilledShaft => ("drilled shaft", "IFCPILE"),
                         SubElementKind.Pile => ("pile", "IFCPILE"),
                         SubElementKind.MowStrip => ("mow strip", "IFCSLAB"),
+                        SubElementKind.TrafficBarrier => ("traffic barrier", "IFCRAILING"),
+                        SubElementKind.PavementStrip => ("replacement pavement", "IFCPAVEMENT"),
                         _ => ("footing", "IFCFOOTING"),
                     };
                     var r = New(Id(IfcKeys.SubSolid(uk, k++)), ParentOfSolid(so), "element", cat, cls, so.Name);

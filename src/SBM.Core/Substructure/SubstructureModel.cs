@@ -7,7 +7,7 @@ using SBM.Core.Alignments;
 
 namespace SBM.Core.Substructure;
 
-public enum SubElementKind { Cap, Pedestal, Backwall, Column, DrilledShaft, Footing, Pile, DeckDrain, DrainPipe, SplashBasin, Coupler, Wingwall, Counterfort, Maskwall, WingFooting, PileCasing, MowStrip }
+public enum SubElementKind { Cap, Pedestal, Backwall, Column, DrilledShaft, Footing, Pile, DeckDrain, DrainPipe, SplashBasin, Coupler, Wingwall, Counterfort, Maskwall, WingFooting, PileCasing, MowStrip, TrafficBarrier, PavementStrip }
 
 /// <summary>A solid of the substructure with its quantity data.</summary>
 public sealed record SubSolid(SubElementKind Kind, string Name, string Description, Mesh Mesh, bool IsConcrete = true)

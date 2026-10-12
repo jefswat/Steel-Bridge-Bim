@@ -253,8 +253,12 @@
       "target": [ { "level": "assembly", "category": "pedestrian railing" }, { "level": "assembly", "category": "pedestrian railing", "bridge_group": "Arch span 10" } ] },
     { "id": "curbs", "sheets": "^(TYPICAL SECTIONS APPROACH SPANS|107\\.88' PRESTR|97\\.00' PRESTR|162\\.92' PRESTR|122\\.45' PRESTR|168\\.00' PRESTR)", "basis": "10\" x 4\" curbs at the deck edges (p.89 typical sections, p.109-117 typical transverse sections)",
       "target": [ { "level": "element", "category": "curb" } ] },
-    { "id": "sej-joints", "sheets": "^(BRIDGE LAYOUT|BRIDGE SUMMARY OF QUANTITIES|107\\.88' PRESTR|97\\.00' PRESTR|162\\.92' PRESTR|122\\.45' PRESTR|168\\.00' PRESTR)", "basis": "SEJ-B(MOD)(4\") + BS-EJCP at Abut 1, P4, P7, P10, P11, P13, Abut 16 (p.84-88), 107 LF / 1,382 lb (p.91), CL SEJ 9 1/4\" from CL Pier 10 / 11 (p.113, 115); standards not in the set",
-      "target": [ { "level": "group", "category": "joint" } ] },
+    { "id": "sej-joints", "sheets": "^(BRIDGE LAYOUT|BRIDGE SUMMARY OF QUANTITIES|107\\.88' PRESTR|97\\.00' PRESTR|162\\.92' PRESTR|122\\.45' PRESTR|168\\.00' PRESTR)", "basis": "SEJ-B(MOD)(4\") + BS-EJCP at Abut 1, P4, P7, P10, P11, P13, Abut 16 (p.84-88), 107 LF / 1,382 lb (p.91), CL SEJ 9 1/4\" from CL Pier 10 / 11 (p.113, 115); armor / studs / cover plates from TxDOT MS-SEJ-B / MS-BS-EJCP (10-2024, post-date the plans; not in the set)",
+      "target": [ { "level": "group", "category": "joint" }, { "level": "assembly", "category": "expansion joint hardware" } ] },
+    { "id": "igts-slab-ends", "sheets": "^(107\\.88' PRESTR|97\\.00' PRESTR|162\\.92' PRESTR|122\\.45' PRESTR|168\\.00' PRESTR)", "basis": "Thickened slab ends 'see IGTS' at every unit end (p.109-117 plan labels / note 3); geometry from TxDOT IG-IGTS (rev. 11-24, post-dates the plans; standard not in the set)",
+      "target": [ { "level": "element", "category": "thickened slab end" } ] },
+    { "id": "t80ss-barrier", "sheets": "^(ARCH PIERS 10 AND 11 TRAFFIC BARRIER DETAILS|BRIDGE SUMMARY OF QUANTITIES)", "basis": "T80SS(MOD) traffic barrier at Pier 10: 4'-6 high, 9'-1 + 4'-6 + 7'-11 + 15'-0 taper + 1'-8, replacement pavement 2'-4 x 1'-1 (p.105-106), 78 LF (p.91); section from TxDOT RL-T80SS (09-2019) + 1'-0 (flagged)",
+      "target": [ { "level": "element", "category": "traffic barrier" }, { "level": "element", "category": "replacement pavement" } ] },
     { "id": "mow-strips", "sheets": "^(PIERS 2-5, 8, 9, 12 & 13 DETAILS|PIERS 6 & 7, 14 & 15 DETAILS|BRIDGE SUMMARY OF QUANTITIES)", "basis": "Mow strip detail: 4\" reinforced concrete, 2'-0 max each face of column (p.97, 99); riprap (mow strip)(4 in) 6.1 CY (p.91)",
       "target": [ { "level": "element", "category": "mow strip" } ] },
     { "id": "ignd", "sheets": "^PRESTRESSED CONCRETE I-GIRDER DESIGNS", "basis": "IGND design table: strands, depressed strands, f'ci / f'c per span",
@@ -262,7 +266,6 @@
   ],
 
   "hints": [
-    { "sheets": "TRAFFIC BARRIER", "suggests": "T80SS(MOD) traffic barrier on the arch piers: not modeled - UNRESOLVED (p.105-106: T80SS standard not in the set, existing US 75 pavement elevation not given)." },
     { "sheets": "^(PROJECT LAYOUT|PROPOSED TYPICAL|SUMMARY OF QUANTITIES|PLAN & PROFILE|GRADING|PARKING|RETAINING|AESTHETIC|DRAINAGE|NORTHAVEN TRAIL PHASE|CITY OF DALLAS|TRAIL|SIDEWALK|CONC TRAFFIC|SPECIAL CONCRETE|TXDOT STD)", "suggests": "Roadway / walls / drainage / utility sheets: no bridge model elements." }
   ]
 }

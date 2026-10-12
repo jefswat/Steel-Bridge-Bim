@@ -24,9 +24,12 @@ public sealed class ExpansionJointResult
     public double Length { get; init; }
     /// <summary>Thickened deck end under the blockout (null = not modeled).</summary>
     public DeckEndBlockResult? EndBlock { get; init; }
+    /// <summary>OPTIONAL joint hardware (armor, studs, cover plate, anchors) and its assembly; merged into the bridge's steel model by the regeneration.</summary>
+    public SBM.Core.Steel.SteelAssembly? HardwareAssembly { get; init; }
+    public List<SBM.Core.Steel.SteelPart> Hardware { get; init; } = new();
     public double BlockoutVolume => Math.Abs(Blockout.Volume());
     public double BodyVolume => Body == null ? 0 : Math.Abs(Body.Volume());
-    public string DeviceName => Definition.Designation is { Length: > 0 } dn ? $"{dn} (placeholder), {Support}"
+    public string DeviceName => Definition.Designation is { Length: > 0 } dn ? (Definition.Armor != null ? $"{dn} (seal envelope; armor modeled), {Support}" : $"{dn} (placeholder), {Support}")
         : Definition.Type == ExpansionJointType.StripSeal
         ? "Generic strip seal expansion joint (manufacturer-designed placeholder)"
         : Definition.Type == ExpansionJointType.Sealed ? "Generic sealed expansion joint (placeholder)"
@@ -60,7 +63,9 @@ public sealed class DeckEndBlockResult
     /// <summary>Drop of a point below the finished top of slab, and whether it lies between the deck edges.</summary>
     public required Func<Vec3, (double drop, bool onDeck)> DeckAt { get; init; }
     public double Volume => Math.Abs(Mesh.Volume());
-    public string Name => $"Deck end block (end dam diaphragm), {Support}";
+    public string Name => Definition.Source is { Length: > 0 } src ? $"Thickened slab end ({src}), {Support}" : $"Deck end block (end dam diaphragm), {Support}";
+    /// <summary>OPTIONAL UNRESOLVED flag of the definition (IFC SBM_Status).</summary>
+    public Assumption? Assumption => Definition.Unresolved is { Length: > 0 } why ? Assumption.Unresolved(why, Definition.Basis ?? "as modeled") : null;
 
     public double SoffitDropAt(double x)
     {
@@ -690,7 +695,11 @@ public sealed partial class ConcreteGenerator
         outline.Insert(0, new Vec2(0, bt));
         if (bt > slab + 1e-6) { outline.Add(new Vec2(d, slab)); outline.Add(new Vec2(d, bt)); }
         var section = outline.Select(q => new Vec2(q.X, -q.Y)).ToList();
-        var cols = JointColumns(0, 0);
+        // OPTIONAL lateral limits (e.g. between the girder top flanges): insets from the deck edges
+        double bli = eb.LeftOffset is double lo ? Math.Max(0, lo - Deck.LeftEdgeOffset) : 0, bri = eb.RightOffset is double ro ? Math.Max(0, Deck.RightEdgeOffset - ro) : 0;
+        if (eb.LeftOffset != null && eb.RightOffset != null && eb.RightOffset <= eb.LeftOffset) { Warn($"{where}: right limit is not right of the left limit; no end block built."); return null; }
+        if (eb.Unresolved is { Length: > 0 } ebw) Warn($"{where}: {ebw}");
+        var cols = JointColumns(bli, bri);
         var rings = new List<Vec3[]>(cols.Count);
         foreach (var c in cols)
         {
@@ -756,10 +765,11 @@ public sealed partial class ConcreteGenerator
                 for (int k = 1; k < pts.Count; k++) length += (pts[k] - pts[k - 1]).Length;
             }
             if (j.Unresolved is { Length: > 0 } jw) Warn($"Expansion joint at {sup.Name}: {jw}");
+            var (hwAsm, hw) = BuildJointHardware(begin, sup, j);
             if (j.PlanLength is double jpl)
                 lock (_m.Diagnostics) _m.Diagnostics.Add(new(Math.Abs(length - jpl) <= 0.003048 ? DiagnosticSeverity.Info : DiagnosticSeverity.Warning,
                     $"Expansion joint at {sup.Name}: length along the joint {_u.FormatLength(length)} vs plan {_u.FormatLength(jpl)}."));
-            res.Add(new ExpansionJointResult { Support = sup.Name, AtBegin = begin, Definition = j, Blockout = blockout, Body = body, Length = length, EndBlock = block });
+            res.Add(new ExpansionJointResult { Support = sup.Name, AtBegin = begin, Definition = j, Blockout = blockout, Body = body, Length = length, EndBlock = block, HardwareAssembly = hwAsm, Hardware = hw });
         }
         if (res.Count == 0) return;
         lock (_m.Joints) _m.Joints.AddRange(res);

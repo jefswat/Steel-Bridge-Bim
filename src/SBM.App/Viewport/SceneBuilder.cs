@@ -188,6 +188,7 @@ public static class SceneBuilder
         ("3D-PIER-CAP-PLATES", 95, 150, 215, new[] { PartCategory.EndPlate, PartCategory.ConnectorPlate, PartCategory.DiaphragmPlate, PartCategory.ContinuityPlate, PartCategory.CoverPlate }),
         ("3D-PIER-CAP-HANDHOLES", 225, 170, 90, new[] { PartCategory.HandholeCover, PartCategory.HandholeBacking }),
         ("3D-PIER-CAP-SCREENS", 190, 190, 195, new[] { PartCategory.MeshScreen }),
+        ("3D-JOINT-HARDWARE", 150, 155, 165, new[] { PartCategory.JointArmor, PartCategory.JointStud, PartCategory.JointCoverPlate, PartCategory.JointAnchor }),
     };
 
     /// <summary>Detail layers are split into square tiles (m) so the viewport can draw only tiles near the view.</summary>
@@ -504,7 +505,8 @@ public static class SceneBuilder
             () => Layer("3D-SUB-PILE", 120, 130, 150, x => x.Kind == SBM.Core.Substructure.SubElementKind.Pile && !x.IsConcrete),
             () => Layer("3D-SUB-COUPLER", 214, 140, 60, x => x.Kind == SBM.Core.Substructure.SubElementKind.Coupler),
             () => Layer("3D-SUB-MOW-STRIP", 170, 165, 150, x => x.Kind == SBM.Core.Substructure.SubElementKind.MowStrip && x.Assumption == null),
-            () => Layer("3D-UNRESOLVED-SUB", 255, 110, 40, x => x.Kind == SBM.Core.Substructure.SubElementKind.MowStrip && x.Assumption != null, 0.8f),
+            () => Layer("3D-SUB-TRAFFIC-BARRIER", 200, 196, 186, x => x.Kind is SBM.Core.Substructure.SubElementKind.TrafficBarrier or SBM.Core.Substructure.SubElementKind.PavementStrip && x.Assumption == null),
+            () => Layer("3D-UNRESOLVED-SUB", 255, 110, 40, x => x.Kind is SBM.Core.Substructure.SubElementKind.MowStrip or SBM.Core.Substructure.SubElementKind.TrafficBarrier or SBM.Core.Substructure.SubElementKind.PavementStrip && x.Assumption != null, 0.8f),
             () => Layer("3D-DRAINAGE", 90, 170, 200, x => x.Kind is SBM.Core.Substructure.SubElementKind.DeckDrain or SBM.Core.Substructure.SubElementKind.DrainPipe),
             () => Layer("3D-SPLASH-BASIN", 140, 120, 90, x => x.Kind == SBM.Core.Substructure.SubElementKind.SplashBasin),
             // Optional misc items: Ramp G drainage, sign supports, end posts, lighting (items by others as translucent placeholders).

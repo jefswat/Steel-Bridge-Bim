@@ -184,6 +184,8 @@ public static class IfcExporter
                 PartCategory.Grating => (0.6, 0.62, 0.66),
                 PartCategory.WalkwayStringer or PartCategory.WalkwayPost or PartCategory.WalkwayRail or PartCategory.WalkwayPlate => (0.45, 0.7, 0.5),
                 PartCategory.RailPost or PartCategory.RailHandrail or PartCategory.RailMember or PartCategory.RailBasePlate or PartCategory.RailEnvelope => (0.78, 0.80, 0.84),
+                PartCategory.JointArmor or PartCategory.JointCoverPlate => (0.50, 0.52, 0.56),
+                PartCategory.JointStud or PartCategory.JointAnchor => (0.62, 0.62, 0.62),
                 _ => (0.95, 0.3, 0.2),
             };
             int rgb = w.Add("IFCCOLOURRGB", $"$,{R(r)},{R(g)},{R(b)}");
@@ -680,6 +682,8 @@ public static class IfcExporter
                         // Generic mechanical splice coupler between column bars and footing dowels (IFC4X3 PredefinedType COUPLER).
                         SBM.Core.Substructure.SubElementKind.Coupler => w.Add("IFCMECHANICALFASTENER", $"{common},'REBAR_COUPLER',{Ref(pl)},{Ref(pds)},$,$,$,.COUPLER."),
                         SBM.Core.Substructure.SubElementKind.MowStrip => w.Add("IFCSLAB", $"{common},'MOW_STRIP',{Ref(pl)},{Ref(pds)},$,.USERDEFINED."),
+                        SBM.Core.Substructure.SubElementKind.TrafficBarrier => w.Add("IFCRAILING", $"{common},$,{Ref(pl)},{Ref(pds)},$,.GUARDRAIL."),
+                        SBM.Core.Substructure.SubElementKind.PavementStrip => w.Add("IFCPAVEMENT", $"{common},$,{Ref(pl)},{Ref(pds)},$,.RIGID."),
                         _ => w.Add("IFCFOOTING", $"{common},$,{Ref(pl)},{Ref(pds)},$,{footingType}"),
                     };
                     contained.Add(id);
@@ -771,9 +775,12 @@ public static class IfcExporter
                 if (jr.EndBlock is { } eb && !eb.Mesh.IsEmpty)
                 {
                     int epds = Body(eb.Mesh, concreteStyle);
-                    string edesc = $"End dam diaphragm: {u.FormatLength(eb.Definition.Depth, LengthKind.Short)} deep at the deck end; girder ends are embedded in it";
+                    string edesc = eb.Definition.Source is { Length: > 0 } esrc
+                        ? $"Thickened slab end ({esrc}): {u.FormatLength(eb.Definition.Depth, LengthKind.Short)} below the top of slab at the deck end"
+                        : $"End dam diaphragm: {u.FormatLength(eb.Definition.Depth, LengthKind.Short)} deep at the deck end; girder ends are embedded in it";
                     int ep = w.Add("IFCBUILDINGELEMENTPART", $"{Guid(jk + "/endblock")},$,{S(eb.Name)},{S(edesc)},'DECK_END_BLOCK',{Ref(pl)},{Ref(epds)},$,.USERDEFINED.");
                     blockParts.Add(ep);
+                    if (eb.Assumption != null) miscStatus.Add((ep, eb.Assumption));
                     AddMaterial(concreteMat, ep);
                     psetTargets.Add((ep, "ENDBLOCK", eb.Name, 0, eb.Volume * 2400));
                     result.ElementCount++;
@@ -1141,6 +1148,7 @@ public static class IfcExporter
                     AssemblyKind.ArchDeckForm => (".SITE.", ".USERDEFINED.", "'DECK_FORM'"),
                     AssemblyKind.PierCap => (".FACTORY.", ".GIRDER.", "'INTEGRAL_STEEL_PIER_CAP'"),
                     AssemblyKind.PierCapConnection => (".FACTORY.", ".USERDEFINED.", "'PIER_CAP_GIRDER_CONNECTION'"),
+                    AssemblyKind.ExpansionJoint => (".SITE.", ".USERDEFINED.", "'EXPANSION_JOINT'"),
                     _ => (".SITE.", ".USERDEFINED.", "'BEARING'"),
                 };
                 if (asm.Kind == AssemblyKind.Railing)
@@ -1213,6 +1221,11 @@ public static class IfcExporter
                     PartCategory.RailMember => w.Add("IFCMEMBER", $"{common},$,{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.MEMBER."),
                     PartCategory.RailBasePlate => w.Add("IFCPLATE", $"{common},$,{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.BASE_PLATE."),
                     PartCategory.RailEnvelope => w.Add("IFCRAILING", $"{common},'RAILING_ENVELOPE',{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.USERDEFINED."),
+                    // Expansion joint hardware (OPTIONAL armor / cover plates): plates, stud anchors, cover plate sleeve anchors.
+                    PartCategory.JointArmor => w.Add("IFCPLATE", $"{common},'JOINT_ARMOR_PLATE',{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.USERDEFINED."),
+                    PartCategory.JointCoverPlate => w.Add("IFCPLATE", $"{common},'JOINT_COVER_PLATE',{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.USERDEFINED."),
+                    PartCategory.JointStud => w.Add("IFCMECHANICALFASTENER", $"{common},$,{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},$,$,.STUDSHEARCONNECTOR."),
+                    PartCategory.JointAnchor => w.Add("IFCMECHANICALFASTENER", $"{common},$,{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},$,$,.ANCHORBOLT."),
                     PartCategory.PtAnchorage => w.Add("IFCTENDONANCHOR", $"{common},'PT_FLAT_ANCHORAGE',{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},$,.USERDEFINED."),
                     PartCategory.EndPlate => w.Add("IFCPLATE", $"{common},'END_PLATE',{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.USERDEFINED."),
                     PartCategory.ConnectorPlate => w.Add("IFCPLATE", $"{common},'CONNECTOR_PLATE',{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.USERDEFINED."),
