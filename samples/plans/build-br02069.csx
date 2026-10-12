@@ -125,7 +125,7 @@ b.Deck.Barrier.Type = BarrierType.SingleSlope;
 b.Deck.Barrier.Height = In(36);
 b.Deck.Barrier.BaseWidth = In(18);
 b.Deck.Barrier.Reinforcement = false;            // R-bars (p24 bill) not modeled; SSTR bars would be invented
-G($"Barrier: MnDOT Type S 36\" profile not in BarrierProfiles - modeled as SingleSlope 36\" x 1'-6\" base, top width = program default {b.Deck.Barrier.TopWidth / In(1):0.##}\" (not read, p24); barrier bars R501M..R612M (p24) not modeled. Needs: MnDOT Type S barrier profile + plan barrier bars.");
+G("Barrier: MnDOT Type S 36\" profile not in BarrierProfiles - modeled as SingleSlope 36\" x 1'-6\" base x 11\" top (p24 Section A-A 7\" + 11\"; rebar-barrier-br02069.csx); the 2\" coping recess / 10\" back projection are not modeled. Barrier bars on the deck placed (R501M, R505M, R411M, R413M, R612M, R614M); approach-panel barrier bars schedule only. Needs: MnDOT Type S barrier profile.");
 U("p24, Fig. 5-397.138(A)", "barrier Type S top width / traffic-face breaks", "the standard figure's dimensions have not been transcribed into the plan data yet", "Program default top width kept.");
 
 // ================================================================ 3. prestressed beams (p16 30MH-101, Beam B1)
@@ -284,6 +284,9 @@ Doc.Project.Bridges.Add(b);
     var dr2 = await SBM.Api.ScriptHost.RunFileAsync(@"samples\plans\rebar-diaphragms-br02069.csx", Doc, Args);
     Print(dr2.Output.TrimEnd());
     if (!dr2.Success) Print("ERROR in rebar-diaphragms-br02069.csx: " + dr2.Error);
+    var bb2 = await SBM.Api.ScriptHost.RunFileAsync(@"samples\plans\rebar-barrier-br02069.csx", Doc, Args);
+    Print(bb2.Output.TrimEnd());
+    if (!bb2.Success) Print("ERROR in rebar-barrier-br02069.csx: " + bb2.Error);
 }
 
 // ---------------------------------------------------------------- beam mild reinforcing from the beam standard (beam-rebar-br02069.csx)
