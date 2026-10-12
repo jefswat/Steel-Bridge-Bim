@@ -537,7 +537,8 @@ public static class ModelDatabase
         {
             var asmInfo = new Dictionary<string, AsmInfo>();
             var girderGroup = new Dictionary<int, string>();
-            string cfGroup = "", lbGroup = "", inspGroup = "";
+            string cfGroup = "", lbGroup = "", inspGroup = "", archGroup = "";
+            string ArchGroup() => archGroup.Length > 0 ? archGroup : (archGroup = Group($"{bk}/group/arch", superId, "Tied arch", "tied arch"));
             string GirderGroup(int g)
             {
                 if (girderGroup.TryGetValue(g, out var id)) return id;
@@ -555,6 +556,18 @@ public static class ModelDatabase
                 var props = new Json().Add("description", asm.Description);
                 switch (asm.Kind)
                 {
+                    // Tied arch (Arch/ArchGenerator): all assemblies under the "Tied arch" group; bearings name their pier in the description.
+                    case AssemblyKind.Bearing when steel.Arch != null:
+                        parent = ArchGroup(); cat = "bearing"; sub = "arch bearing";
+                        { var mm = Regex.Match(asm.Description, @" at (.+)$"); if (mm.Success) support = mm.Groups[1].Value; }
+                        break;
+                    case AssemblyKind.ArchRib: parent = ArchGroup(); cat = "arch rib"; break;
+                    case AssemblyKind.ArchTie: parent = ArchGroup(); cat = "tie girder"; break;
+                    case AssemblyKind.ArchHanger: parent = ArchGroup(); cat = "hanger"; break;
+                    case AssemblyKind.ArchFloorbeam: parent = ArchGroup(); cat = "floorbeam"; break;
+                    case AssemblyKind.ArchBracing: parent = ArchGroup(); cat = "upper lateral bracing"; break;
+                    case AssemblyKind.ArchKnuckle: parent = ArchGroup(); cat = "knuckle"; break;
+                    case AssemblyKind.ArchDeckForm: parent = ArchGroup(); cat = "deck form"; break;
                     case AssemblyKind.GirderFieldSection:
                         parent = GirderGroup(asm.Girder); cat = "girder field section";
                         {
