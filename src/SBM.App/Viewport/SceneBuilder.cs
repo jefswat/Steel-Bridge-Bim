@@ -194,18 +194,29 @@ public static class SceneBuilder
     public const string BoltLayer = "3D-BOLTS";
     public const string StudLayer = "3D-STUDS";
     public const string AnchorLayer = "3D-ANCHOR-BOLTS";
+    /// <summary>Flagged (UNRESOLVED) steel parts, e.g. tied arch details the plans do not dimension.</summary>
+    public const string UnresolvedSteelLayer = "3D-UNRESOLVED-STEEL";
 
     /// <summary>Adds shaded solids for steel models (built in parallel per layer). Bolts become GPU instances of one mesh per length.</summary>
     public static void AddSolids(SceneData scene, IReadOnlyList<SteelModel> models)
     {
         var o = scene.Origin;
-        var layers = new SolidLayer?[SolidLayerDefs.Length + 3];
+        var layers = new SolidLayer?[SolidLayerDefs.Length + 4];
         Parallel.For(0, layers.Length, i =>
         {
+            if (i == SolidLayerDefs.Length + 3)
+            {
+                // Steel parts whose geometry the plans do not fix (SteelPart.Assumption): their own orange layer, removed from the normal layers.
+                var flagged = models.SelectMany(m => m.Parts).Where(p => p.Assumption != null && !p.Mesh.IsEmpty).ToList();
+                if (flagged.Count == 0) return;
+                var fm = FlatShaded(flagged.Select(p => p.Mesh), o, flagged);
+                layers[i] = new SolidLayer { Name = UnresolvedSteelLayer, R = 255, G = 110, B = 40, Parts = new() { (fm, null) }, Triangles = fm.Indices!.Count / 3 };
+                return;
+            }
             if (i < SolidLayerDefs.Length)
             {
                 var (name, r, g, b, cats) = SolidLayerDefs[i];
-                var parts = models.SelectMany(m => m.Parts).Where(p => cats.Contains(p.Category)).ToList();
+                var parts = models.SelectMany(m => m.Parts).Where(p => cats.Contains(p.Category) && p.Assumption == null).ToList();
                 if (parts.Count == 0) return;
                 if (name == "3D-WELDS")
                 {

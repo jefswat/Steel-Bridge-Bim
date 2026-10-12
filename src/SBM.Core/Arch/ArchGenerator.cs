@@ -654,7 +654,14 @@ public static partial class ArchGenerator
             foreach (var rz in fs.TieHoleRows) foreach (var sx in new[] { -hx, hx }) holes.Add(new Hole(new Vec2(sx, zb - rz), Model.Steel.Bolt.HoleDiameter));
             Vec3 LowerMap(double u, double z, double t) => W((p2 + t2 * u + nl * side * (off + t)).WithZ(z));
             var m = new Mesh();
-            PlateBuilder.AddPrism(m, lower, holes, LowerMap, _ => -fs.TieThickness / 2, _ => fs.TieThickness / 2);
+            {
+                // Right-handed map (an exact IFC extrusion): mirror u when (u, z, t) is left-handed.
+                var o = LowerMap(0, 0, 0);
+                double hand = Vec3.Dot(Vec3.Cross(LowerMap(1, 0, 0) - o, LowerMap(0, 1, 0) - o), LowerMap(0, 0, 1) - o);
+                if (hand >= 0) PlateBuilder.AddPrism(m, lower, holes, LowerMap, _ => -fs.TieThickness / 2, _ => fs.TieThickness / 2);
+                else PlateBuilder.AddPrism(m, Ccw(lower.Select(q => new Vec2(-q.X, q.Y)).ToList()), holes.Select(hh => new Hole(new Vec2(-hh.Center.X, hh.Center.Y), hh.Diameter)).ToList(),
+                    (u, z, t) => LowerMap(-u, z, t), _ => -fs.TieThickness / 2, _ => fs.TieThickness / 2);
+            }
             // Upper part (u along the tie, v up the plate from the bend line), CCW for sg = +1, mirrored otherwise.
             double r = fs.TiePinRadius, sp = Math.Abs(sPin);
             var up = new List<Vec2> { new(-hw, 0), new(hw, 0) };
@@ -798,7 +805,7 @@ public static partial class ArchGenerator
                 if (!double.IsNaN(fb.PtDimB)) { slotCs.Add(fb.PtDimB); slotCs.Add(fb.PtDimB + fb.PtPairSpacing); }
                 if (!double.IsNaN(fb.PtDimA)) { slotCs.Add(len - fb.PtDimA); slotCs.Add(len - fb.PtDimA - fb.PtPairSpacing); }
             }
-            var openings = slotCs.Select(x => PlateBuilder.RoundedRectangle(new Vec2(x, fb.PtSlotZ), fb.PtSlotLength, fb.PtSlotHeight, fb.PtSlotHeight / 2 - 1e-6, 8)).ToList();
+            var openings = slotCs.Select(x => PlateBuilder.RoundedRectangle(new Vec2(x, fb.PtSlotZ), fb.PtSlotLength, fb.PtSlotHeight, fb.PtSlotHeight * 0.45, 8)).ToList();
             var webHoles = fb.WebHoles.Where(hh => hh.X > s0 && hh.X < s1).Select(hh => new Hole(new Vec2(hh.X, hh.Z), fb.WebHoleDiameter)).ToList();
             var wf = new Frame3(org, ex, _fr.Z, en);
             if (openings.Count > 0) PlateBuilder.AddPlanarWithOpenings(web, poly, webHoles, openings, wf, -fb.WebThickness / 2, fb.WebThickness / 2);

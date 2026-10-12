@@ -82,7 +82,7 @@ public static partial class ArchGenerator
             if (!double.IsNaN(hEnd))
             {
                 var poly = Ccw(new List<Vec2> { new(-half, zef), new(half, zef), new(half, zef + hEnd), new(0, zef + k.EndWebHeightAtChord), new(-half, zef + hEnd) });
-                var ops = k.EndWebOpeningsAt.Select(x => PlateBuilder.RoundedRectangle(new Vec2(x, zef + k.EndWebOpeningZ), k.EndWebOpeningLength, k.EndWebOpeningHeight, k.EndWebOpeningHeight / 2 - 1e-6, 8)).ToList();
+                var ops = k.EndWebOpeningsAt.Select(x => PlateBuilder.RoundedRectangle(new Vec2(x, zef + k.EndWebOpeningZ), k.EndWebOpeningLength, k.EndWebOpeningHeight, k.EndWebOpeningHeight * 0.45, 8)).ToList();
                 var wf = new Frame3(org, et, _fr.Z, en);
                 var web = new Mesh();
                 if (ops.Count > 0) PlateBuilder.AddPlanarWithOpenings(web, poly, Array.Empty<Hole>(), ops, wf, o0, o0 + k.EndWebThickness);

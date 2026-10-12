@@ -39,6 +39,16 @@ public static class SheetSet
                     new[] { Full(new ViewSpec("Typical section", s => SectionViews.TypicalSection(WithScale(ctx2, s)), ScaleFamily.Architectural)) }));
             }
 
+        // Tied arch: elevation and framing plan sheets instead of the girder sheets.
+        if (ctx.Steel?.Arch != null)
+        {
+            specs.Add(new SheetSpec("Arch elevation", "Rib, tie, hangers, rib / tie splices (local structure coordinates)",
+                new[] { Full(new ViewSpec("Arch elevation", s => ArchViews.Elevation(WithScale(ctx, s)), ScaleFamily.Engineering)) }));
+            specs.Add(new SheetSpec("Arch framing plan", "Ties, floorbeams, ribs and upper bracing (local plan)",
+                new[] { Full(new ViewSpec("Arch framing plan", s => ArchViews.FramingPlan(WithScale(ctx, s)), ScaleFamily.Engineering)) }));
+            goto Substructure;
+        }
+
         // Prestressed girders: one sheet (sections + elevation + schedule) instead of the steel girder and detail sheets.
         if (ctx.Prestressed is { Beams.Count: > 0 })
         {
