@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Name": "Nebraska St Ramp B",
+  "Name": "neb",
   "UnitSystem": "US",
   "Foot": "International",
   "Alignments": [
@@ -482,7 +482,8 @@
               "BackwallBarSize": "#5",
               "BackwallBarSpacing": 0.30479999999999996,
               "MaxBarLength": 18.288,
-              "CapBars": []
+              "CapBars": [],
+              "PlanBarSets": []
             },
             "Unresolved": [
               "UNRESOLVED (p.18, p.22): S. Abut. wing extensions, maskwall, backwall extension and their footing / pile - the wing extension sections were not read in this pass. Not modeled (1 pile of the 13 missing).",
@@ -1066,7 +1067,8 @@
               "BackwallBarSize": "#5",
               "BackwallBarSpacing": 0.30479999999999996,
               "MaxBarLength": 18.288,
-              "CapBars": []
+              "CapBars": [],
+              "PlanBarSets": []
             },
             "Unresolved": [
               "UNRESOLVED (p.9): 8\u0022 corner notches of the 4\u0022 cap end zones and the 1/2\u0022 top slope of the end walls - minor shapes. The cap runs full width to its ends; end walls level.",
@@ -1613,7 +1615,8 @@
               "BackwallBarSize": "#5",
               "BackwallBarSpacing": 0.30479999999999996,
               "MaxBarLength": 18.288,
-              "CapBars": []
+              "CapBars": [],
+              "PlanBarSets": []
             },
             "Unresolved": [
               "UNRESOLVED (p.13): 4\u0022 pilaster on one N face of the pier 2 columns and the terra cotta blockout - decorative; widths read only partly. Not modeled.",
@@ -2656,7 +2659,85 @@
               "UNRESOLVED (p.30): girder web cope under the cap top flange - only the 2\u0022 radius is drawn; the cope depth / clearance is not dimensioned. Cope to the underside of the cap top flange, no clearance, square corner.",
               "UNRESOLVED (p.30): \u00274 1/4 (AT CL CAP)\u0027 in Section E-E - the dimension\u0027s lower end reads as the top of the cap top flange, its upper end is not identifiable. Compared as top of cap flange to top of girder flange (reported).",
               "UNRESOLVED (p.30-31): identity of \u0027PL 3/4\u0027 / \u00271/2 connector PL\u0027 (U4 / U6) - read at 300-400 dpi as: 3/4 girder connection diaphragm plate in the girder web plane between 1/2 connector plates on the inner web faces, bolts end plate \u002B web \u002B connector plate. Modeled that way; confirm."
-            ]
+            ],
+            "Haunch": {
+              "Source": "p.25 Section A-A / Section near Pier No. 2; p.29 plan; p.43 Detail D; p.45",
+              "Width": 0,
+              "Stirrups": [
+                {
+                  "Mark": "5d2",
+                  "Size": "#5",
+                  "Location": "INTEGRAL STEEL PIER CAP HAUNCH",
+                  "Coating": "",
+                  "BottomWidth": 0.9144,
+                  "LegHeight": 0.2032,
+                  "HookLength": 0.15239999999999998,
+                  "ClearAboveSteel": 0.0508,
+                  "Cover": 0.0508,
+                  "ListedLength": 1.6256,
+                  "PlanCount": 38,
+                  "PlanWeightLb": 211,
+                  "Source": "p.25 Section A-A, p.45 (5d2 bend diagram)"
+                }
+              ],
+              "Bars": [
+                {
+                  "Mark": "5e5",
+                  "Size": "#5",
+                  "Location": "INTEGRAL STEEL PIER CAP HAUNCH LONGIT.",
+                  "Coating": "",
+                  "Bay": "Interior",
+                  "Positions": [
+                    {
+                      "X": -0.4264129802270046,
+                      "Z": 0.08158701977299533
+                    },
+                    {
+                      "X": 0,
+                      "Z": 0.0746125
+                    },
+                    {
+                      "X": 0.4264129802270046,
+                      "Z": 0.08158701977299533
+                    }
+                  ],
+                  "ListedLength": 1.6256,
+                  "Cover": 0.0508,
+                  "PlanCount": 9,
+                  "PlanWeightLb": 50,
+                  "Source": "p.25 Section A-A / Section near Pier No. 2 (3-5e5 TYP.), p.45"
+                },
+                {
+                  "Mark": "5e6",
+                  "Size": "#5",
+                  "Location": "INTEGRAL STEEL PIER CAP HAUNCH LONGIT.",
+                  "Coating": "",
+                  "Bay": "Exterior",
+                  "Positions": [
+                    {
+                      "X": -0.4264129802270046,
+                      "Z": 0.08158701977299533
+                    },
+                    {
+                      "X": 0,
+                      "Z": 0.0746125
+                    },
+                    {
+                      "X": 0.4264129802270046,
+                      "Z": 0.08158701977299533
+                    }
+                  ],
+                  "ListedLength": 0.7366,
+                  "Cover": 0.0508,
+                  "PlanCount": 6,
+                  "PlanWeightLb": 15,
+                  "Source": "p.25 Section A-A / Section near Pier No. 2 (3-5e6 TYP.), p.45"
+                }
+              ],
+              "Unresolved": [
+                "UNRESOLVED (p.25): position of the 5e5 / 5e6 corner bars inside the 5d2 - Section A-A draws them in the bottom corners without a dimension. Nested in the 2 1/2\u0022 pin bends of the 5d2 (from the p.45 bend diagram)."
+              ]
+            }
           }
         },
         {
@@ -2972,7 +3053,8 @@
               "BackwallBarSize": "#5",
               "BackwallBarSpacing": 0.30479999999999996,
               "MaxBarLength": 18.288,
-              "CapBars": []
+              "CapBars": [],
+              "PlanBarSets": []
             },
             "Unresolved": [
               "UNRESOLVED (p.20, p.22): N. Abut. wing extensions, maskwall, backwall extension and their footing / piles - the wing extension sections were not read in this pass. Not modeled (2 piles of the 14 missing).",
@@ -5661,7 +5743,8 @@
           "NegativeRegionFraction": 0.25,
           "RequiredSteelRatio": 0.01,
           "MarkLengthTolerance": 0.0508,
-          "Plan": null
+          "Plan": null,
+          "PlanBarSets": []
         }
       },
       "CrossFrames": {

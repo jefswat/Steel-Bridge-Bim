@@ -60,7 +60,7 @@ public partial class BarScheduleWindow : Window
         string vu = _u.IsUS ? "CY" : "m³";
         string concrete = "";
         if (unit is All or Superstructure && _deck != null)
-            concrete += $"deck {_deck.DeckVolume / cy:N1} {vu}, haunches {_deck.HaunchVolume / cy:N1} {vu}, barriers {_deck.BarrierVolume / cy:N1} {vu}";
+            concrete += $"deck {_deck.DeckVolume / cy:N1} {vu}, haunches {_deck.HaunchVolume / cy:N1} {vu}{(_deck.CapHaunches.Count > 0 ? $", cap haunch {_deck.CapHaunchVolume / cy:N2} {vu}" : "")}, barriers {_deck.BarrierVolume / cy:N1} {vu}";
         if (_sub != null && unit != Superstructure)
         {
             double v = _sub.Units.Where(x => unit == All || x.Name == unit).SelectMany(x => x.Solids).Where(s => s.IsConcrete).Sum(s => Math.Abs(s.Mesh.Volume()));

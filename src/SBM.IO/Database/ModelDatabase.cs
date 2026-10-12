@@ -809,6 +809,18 @@ public static class ModelDatabase
                 r.Props = new Json().Add("thickness_m", def.Deck.Thickness).Add("deck_volume_m3", c.DeckVolume).Add("haunch_volume_m3", c.HaunchVolume).ToString();
                 _w.Add(r);
             }
+            // concrete haunches over integral steel pier caps (same GlobalId key as the IFC IfcBuildingElementPart)
+            foreach (var ch in c.CapHaunches.Where(x => !x.Mesh.IsEmpty))
+            {
+                var r = New(Id(IfcKeys.CapHaunch(bk, ch.Support)), deckPartId, "element", "pier cap haunch", "IFCBUILDINGELEMENTPART", ch.Name);
+                r.Support = ch.Support; r.Subtype = ch.CapMark; r.Material = concMat; r.Volume = ch.Volume; r.Mass = r.Volume * 2400;
+                r.Box = ch.Mesh.Bounds(); StationOf(r, r.Box);
+                var hj = new Json().Add("width_m", ch.Width).Add("length_m", ch.S1 - ch.S0).Add("min_depth_m", ch.MinDepth).Add("max_depth_m", ch.MaxDepth)
+                    .Add("pieces", ch.Pieces.Count).Add("source", ch.Source);
+                foreach (var (bay, dep) in ch.BayDepths) hj.Add("depth_cl_" + bay.ToLowerInvariant().Replace(' ', '_'), dep);
+                r.Props = hj.ToString();
+                _w.Add(r);
+            }
             // Groups at the granularity the plans use: one deck-reinforcing group per unit, one barrier group (concrete + its bars) per unit.
             string deckRebar = "", barrierGroup = "", barrierRebar = "", diaphragmRebar = "";
             // the group carries the unit's deck bar schedule (every mark, also the schedule-only rows of a plan bar list that have no 3D bar)

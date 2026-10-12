@@ -799,6 +799,22 @@ public static class IfcExporter
                     result.ElementCount++;
                 }
             }
+            // Concrete haunches over integral steel pier caps: cast with the deck, an IfcBuildingElementPart aggregated into the deck slab
+            // (one closed face set per piece between the deck edges, girder haunches, cover plate ends and cross-slope breaks).
+            foreach (var ch in c.CapHaunches)
+            {
+                if (ch.Mesh.IsEmpty) continue;
+                meshParts++;
+                var hitems = (ch.Pieces.Count > 0 ? ch.Pieces : new List<SBM.Core.Solids.Mesh> { ch.Mesh }).Select(pc => FaceSet(pc, concreteStyle)).ToList();
+                int hrep = w.Add("IFCSHAPEREPRESENTATION", $"{Ref(body)},'Body','Tessellation',{Refs(hitems)}");
+                int hpds = w.Add("IFCPRODUCTDEFINITIONSHAPE", $"$,$,({Ref(hrep)})");
+                string hdesc = $"Concrete haunch over the integral steel pier cap {ch.CapMark}: {u.FormatLength(ch.Width, LengthKind.Short)} wide, cap steel to deck soffit between the deck edges ({ch.Source})";
+                int hp = w.Add("IFCBUILDINGELEMENTPART", $"{Guid(IfcKeys.CapHaunch(bk, ch.Support))},$,{S(ch.Name)},{S(hdesc)},'PIER_CAP_HAUNCH',{Ref(pl)},{Ref(hpds)},$,.USERDEFINED.");
+                blockParts.Add(hp);
+                AddMaterial(concreteMat, hp);
+                psetTargets.Add((hp, "CAPHAUNCH", ch.Name, 0, ch.Volume * 2400));
+                result.ElementCount++;
+            }
             if (blockParts.Count > 0 && deckSlab > 0)
                 w.Add("IFCRELAGGREGATES", $"{Guid(bk + "/rel/blockouts")},$,$,$,{Ref(deckSlab)},{Refs(blockParts)}");
             else contained.AddRange(blockParts);

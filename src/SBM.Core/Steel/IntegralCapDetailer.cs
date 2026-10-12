@@ -53,40 +53,9 @@ public sealed class IntegralCapGirderReport
 /// </summary>
 public sealed partial class SteelModelGenerator
 {
-    /// <summary>Geometry of one cap in its own frame: x along the sloped axis from the first CL bearing (bottom of bottom flange), y = N (normal to
-    /// the support line, up-station +), z normal to the axis (up).</summary>
-    private sealed class CapGeom
+    /// <summary>Geometry of one cap (<see cref="IntegralCapFrame"/>, shared with the concrete cap haunch) plus the girders framing into it.</summary>
+    private sealed class CapGeom : IntegralCapFrame
     {
-        public required int Support { get; init; }
-        public required string SupName { get; init; }
-        public required IntegralSteelCapDefinition D { get; init; }
-        public required Vec2 O { get; init; }
-        public required Vec2 Dir { get; init; }
-        public required Vec2 Nrm { get; init; }
-        public required double M { get; init; }
-        public required List<double> Sb { get; init; }
-        public required List<double> Tob { get; init; }
-        public double K => Math.Sqrt(1 + M * M);
-        public double SE0 => Sb[0] - D.EndOverhang;
-        public double SE1 => Sb[^1] + D.EndOverhang;
-        public Vec3 Origin => new(O.X + Dir.X * Sb[0], O.Y + Dir.Y * Sb[0], Tob[0]);
-        public Vec3 X => new Vec3(Dir.X, Dir.Y, M) * (1 / K);
-        public Vec3 Y => new(Nrm.X, Nrm.Y, 0);
-        public Vec3 Z => new Vec3(-M * Dir.X, -M * Dir.Y, 1) * (1 / K);
-        public Frame3 Fs => new(Origin, X, Y, Z);
-        public double Xc(double s) => (s - Sb[0]) * K;
-        public double ZTow => D.BottomFlange.Thickness + D.WebDepth;
-        public double ZTop => ZTow + D.TopFlange.Thickness;
-        public Vec2 Plan(double s, double n) => O + Dir * s + Nrm * n;
-        public double S(Vec2 p) => Vec2.Dot(p - O, Dir);
-        public double N(Vec2 p) => Vec2.Dot(p - O, Nrm);
-        /// <summary>Elevation of the cap surface at local z = c at the horizontal plan position s.</summary>
-        public double SurfaceZ(double s, double c) => Tob[0] + M * (s - Sb[0]) + c * K;
-        public (double x, double y, double z) Local(Vec3 w) { var v = w - Origin; return (Vec3.Dot(v, X), Vec3.Dot(v, Y), Vec3.Dot(v, Z)); }
-        /// <summary>Web CL of member m (twin: -WO, +WO; single: 0).</summary>
-        public double WebN(int m) => D.Members >= 2 ? (m == 0 ? -D.WebOffset : D.WebOffset) : 0;
-        public int MemberCount => D.Members >= 2 ? 2 : 1;
-        public string Mark => D.Mark;
         public List<(int G, double SC, double Sg)> Girders { get; } = new();
     }
 
@@ -111,14 +80,11 @@ public sealed partial class SteelModelGenerator
                     "The cap is not built and the girders are not cut there."));
                 continue;
             }
-            var t = Vec2.FromAngle(_f.Alignment.AngleAt(sl.Station));
-            var d = sl.Direction.Normalized();
-            var n = d.Left;
-            if (Vec2.Dot(n, t) < 0) n = -n;
+            var (o, d, n) = IntegralCapFrame.Axes(_f, j);
             var sb = cd.BearingOffsets.ToList();
             var tob = cd.BearingTopElevations.ToList();
             double m = (tob[^1] - tob[0]) / (sb[^1] - sb[0]);
-            var cap = new CapGeom { Support = j, SupName = sl.Name, D = cd, O = sl.AlignmentPoint, Dir = d, Nrm = n, M = m, Sb = sb, Tob = tob };
+            var cap = new CapGeom { Support = j, SupName = sl.Name, D = cd, O = o, Dir = d, Nrm = n, M = m, Sb = sb, Tob = tob };
             for (int k = 1; k + 1 < sb.Count; k++)
             {
                 double zc = tob[0] + m * (sb[k] - sb[0]);
@@ -514,9 +480,7 @@ public sealed partial class SteelModelGenerator
             int k = Math.Clamp(cp.Bearing, 0, cap.Sb.Count - 1);
             int sgn = k == cap.Sb.Count - 1 && cap.Sb.Count > 1 ? -1 : 1;
             double sb = cap.Sb[k];
-            double from = cp.FromSoleEdge ? soleHalf + cp.From : cp.From;
-            double sA = sb + sgn * from, sB = sb + sgn * cp.To;
-            double s0 = Math.Min(sA, sB), s1 = Math.Max(sA, sB);
+            var (s0, s1) = cap.CoverRange(cp, soleHalf);
             if (cp.Top) topCovers.Add((s0, s1));
             double xa = cap.Xc(s0), xb = cap.Xc(s1);
             var holes = cp.BoltColumns.SelectMany(c => cp.BoltRows.Select(r => new Hole(new Vec2(cap.Xc(sb + sgn * c), r), hole))).ToList();

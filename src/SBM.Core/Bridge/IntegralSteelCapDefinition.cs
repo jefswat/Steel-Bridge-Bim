@@ -88,6 +88,11 @@ public sealed class IntegralSteelCapDefinition
     /// <summary>Plan items not modeled / not dimensioned (raised as warnings, nothing invented).</summary>
     public List<string> Unresolved { get; set; } = new();
 
+    /// <summary>OPTIONAL concrete haunch between the cap top (flanges / top cover plates) and the deck soffit (<see cref="CapHaunchDefinition"/>,
+    /// built by the concrete generator, part of the deck placement); null = none (omitted from the .sbm).</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public CapHaunchDefinition? Haunch { get; set; }
+
     public IntegralSteelCapDefinition Clone()
     {
         var c = (IntegralSteelCapDefinition)MemberwiseClone();
@@ -107,8 +112,95 @@ public sealed class IntegralSteelCapDefinition
         c.CoverPlateStudRows = CoverPlateStudRows.ToList();
         c.EndScreens = EndScreens?.Clone();
         c.Unresolved = Unresolved.ToList();
+        c.Haunch = Haunch?.Clone();
         return c;
     }
+}
+
+/// <summary>
+/// OPTIONAL concrete haunch over an integral steel pier cap (Iowa Design 1617 p.25 Section A-A): cast with the deck, it fills the space between the
+/// top of the cap steel (top flanges, or the top cover plates where they are) and the deck soffit. Generic rules (the concrete generator,
+/// ConcreteCapHaunch.cs): across the cap it is <see cref="Width"/> wide centred on the CL cap with plumb sides; along the cap it runs between the deck
+/// edges (to the outer face of a deck widening under a barrier zone at this support when the widening covers the haunch); over the girder top flanges the
+/// GIRDER haunches own the concrete, so the cap haunch stops at their sides (no volume counted twice); its top is the deck soffit (profile, cross slope,
+/// crown), its bottom the cap steel. Reinforcing: U stirrups midway between the cap stud lines (<see cref="Stirrups"/>) and longitudinal bars per bay
+/// (<see cref="Bars"/>), placed as plan bar sets (marks, counts and listed lengths = the plan's; clear cover checked, never moved).
+/// </summary>
+public sealed class CapHaunchDefinition
+{
+    /// <summary>Plan reference (e.g. "p.25 Section A-A").</summary>
+    public string Source { get; set; } = "";
+    /// <summary>Width across the cap (N, centred on the CL cap); 0 = out-to-out of the top flanges (sides flush with the flange edges).</summary>
+    public double Width { get; set; }
+    public List<CapHaunchStirrups> Stirrups { get; set; } = new();
+    public List<CapHaunchBars> Bars { get; set; } = new();
+    /// <summary>Plan items about the haunch the plans do not settle (raised as warnings).</summary>
+    public List<string> Unresolved { get; set; } = new();
+
+    public CapHaunchDefinition Clone()
+    {
+        var c = (CapHaunchDefinition)MemberwiseClone();
+        c.Stirrups = Stirrups.Select(x => x.Clone()).ToList();
+        c.Bars = Bars.Select(x => x.Clone()).ToList();
+        c.Unresolved = Unresolved.ToList();
+        return c;
+    }
+}
+
+/// <summary>
+/// U stirrups of a cap haunch, one in the plane normal to the cap axis MIDWAY BETWEEN consecutive cap stud lines (plans "place between shear studs")
+/// wherever that point lies in the cap haunch (not under a girder haunch, between the deck edges). Shape (plan bend diagram, out-to-out): bottom
+/// <see cref="BottomWidth"/> centred on the CL cap, legs <see cref="LegHeight"/> up (bottom face to the top of the hook), hooks <see cref="HookLength"/>
+/// outward at the top (from the inner face of the leg); bottom <see cref="ClearAboveSteel"/> clear above the cap steel under it.
+/// </summary>
+public sealed class CapHaunchStirrups
+{
+    public string Mark { get; set; } = "";
+    public string Size { get; set; } = "#5";
+    public string Location { get; set; } = "";
+    /// <summary>Coating ("" = the deck's).</summary>
+    public string Coating { get; set; } = "";
+    public double BottomWidth { get; set; }
+    public double LegHeight { get; set; }
+    public double HookLength { get; set; }
+    public double ClearAboveSteel { get; set; } = In(2);
+    /// <summary>Plan clear cover to the concrete faces (checked).</summary>
+    public double Cover { get; set; } = In(2);
+    public double ListedLength { get; set; }
+    public int? PlanCount { get; set; }
+    public double? PlanWeightLb { get; set; }
+    public string Source { get; set; } = "";
+    public CapHaunchStirrups Clone() => (CapHaunchStirrups)MemberwiseClone();
+}
+
+/// <summary>Which stretch of a cap haunch a longitudinal bar set fills.</summary>
+public enum CapHaunchBay
+{
+    /// <summary>Between two girder haunches.</summary>
+    Interior,
+    /// <summary>Between an exterior girder haunch and the deck edge.</summary>
+    Exterior,
+}
+
+/// <summary>
+/// Straight bars along the cap in a cap haunch: in every <see cref="Bay"/> one bar per entry of <see cref="Positions"/> (X = N of the bar centre from
+/// the CL cap, Z = bar centre above the cap steel at the bay's middle, square to the flanges), parallel to the cap axis, <see cref="ListedLength"/>
+/// long, centred in the bay's clear length (the end clearances are reported).
+/// </summary>
+public sealed class CapHaunchBars
+{
+    public string Mark { get; set; } = "";
+    public string Size { get; set; } = "#5";
+    public string Location { get; set; } = "";
+    public string Coating { get; set; } = "";
+    public CapHaunchBay Bay { get; set; }
+    public List<CapPoint> Positions { get; set; } = new();
+    public double ListedLength { get; set; }
+    public double Cover { get; set; } = In(2);
+    public int? PlanCount { get; set; }
+    public double? PlanWeightLb { get; set; }
+    public string Source { get; set; } = "";
+    public CapHaunchBars Clone() { var c = (CapHaunchBars)MemberwiseClone(); c.Positions = Positions.Select(x => x.Clone()).ToList(); return c; }
 }
 
 /// <summary>Camber ordinate of the cap at a distance from the first CL bearing (horizontal, along the cap), with its fabrication tolerance.</summary>
