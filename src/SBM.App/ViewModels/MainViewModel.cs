@@ -18,6 +18,7 @@ using SBM.Core.References;
 using SBM.IO.References;
 using SBM.Core.Units;
 using SBM.Core.Steel;
+using SBM.Core.Solids;
 using SBM.IO.Dxf;
 using SBM.IO.Ifc;
 using SBM.IO.LandXml;
@@ -87,6 +88,8 @@ public sealed partial class MainViewModel : ObservableObject
     [ObservableProperty] private string _cursorText = "";
     [ObservableProperty] private string _unitsText = "US (ft)";
     [ObservableProperty] private string _exactGeometryText = "Exact curves: Off";
+    /// <summary>Viewport memory line in the status bar (estimate / budget and what was reduced).</summary>
+    [ObservableProperty] private string _vramText = "";
     [ObservableProperty] private bool _isBusy;
     [ObservableProperty] private ExplorerNode? _selectedNode;
     [ObservableProperty] private string _windowTitle = "Steel Bridge Modeler";
@@ -729,6 +732,9 @@ public sealed partial class MainViewModel : ObservableObject
     private List<TerrainModel> _terrains = new();
     private List<string> _refLayers = new();
     public event Action<List<ReferenceRender>>? ReferencesReady;
+    private List<ReferenceRender> _lastRenders = new();
+    /// <summary>The reference renders last handed to the viewport.</summary>
+    public IReadOnlyList<ReferenceRender> ReferenceRenders => _lastRenders;
     public IReadOnlyList<(string name, bool planOnly, bool threeDOnly)> ReferenceLayerModes { get; private set; } = Array.Empty<(string, bool, bool)>();
 
     [RelayCommand]
@@ -775,6 +781,22 @@ public sealed partial class MainViewModel : ObservableObject
         await LoadReferencesAsync();
     }
 
+    /// <summary>How terrain is drawn (set by the viewport memory manager): stride relative to the full DEM, clip margin (m) around the
+    /// bridges (0 = whole surface), draped image limit (px, 0 = full), or not drawn at all. Elevations always use the full surface.</summary>
+    public sealed record TerrainDisplayOptions(int Stride = 1, double ClipMargin = 0, int ImageMaxPixels = 0, bool Off = false);
+    private TerrainDisplayOptions _terrainDisplay = new();
+    /// <summary>Set by the viewport: given the terrain rasters about to be drawn, how to draw them (null = keep the current mode).</summary>
+    public Func<IReadOnlyList<VramTerrain>, TerrainDisplayOptions?>? PlanTerrainDisplay { get; set; }
+    public TerrainDisplayOptions TerrainDisplayMode => _terrainDisplay;
+
+    /// <summary>Changes the terrain display (reloads the reference renders from the cached geometry when it differs).</summary>
+    public Task SetTerrainDisplay(TerrainDisplayOptions o)
+    {
+        if (o == _terrainDisplay) return Task.CompletedTask;
+        _terrainDisplay = o;
+        return _project.References.Any(r => r.Kind == ReferenceKind.Terrain) ? LoadReferencesAsync() : Task.CompletedTask;
+    }
+
     /// <summary>Loads (or reuses) all reference models in parallel and builds their GPU buffers off the UI thread.</summary>
     public async Task LoadReferencesAsync()
     {
@@ -784,12 +806,14 @@ public sealed partial class MainViewModel : ObservableObject
         var sw = Stopwatch.StartNew();
         if (defs.Count > 0) StatusText = $"Loading {defs.Count} reference model(s)…";
         var origin = _origin ?? Vec3.Zero;
-        var loaded = await Task.Run(() => defs.AsParallel().AsOrdered().Select(def =>
+        var bridgeBox = Scene?.FocusExtents ?? Box2.Empty;
+        // Phase 1: read (or reuse) the geometry.
+        var geos = await Task.Run(() => defs.AsParallel().AsOrdered().Select(def =>
         {
             string full = BridgeProject.ResolvePath(def.Path, projectFile);
             try
             {
-                if (!File.Exists(full)) return (def, (ReferenceRender?)null, (TerrainModel?)null, $"{def.Name}: file not found ({full}).");
+                if (!File.Exists(full)) return (def, (ReferenceGeometry?)null, (TerrainModel?)null, $"{def.Name}: file not found ({full}).");
                 var mtime = File.GetLastWriteTimeUtc(full);
                 string key = $"{full}|{def.Format}|{def.UnitScale}|{def.OffsetX}|{def.OffsetY}|{def.OffsetZ}|{def.Kind}|{units.LongUnit}";
                 ReferenceGeometry geo;
@@ -797,20 +821,64 @@ public sealed partial class MainViewModel : ObservableObject
                 string msg = "";
                 lock (_refCache)
                 {
-                    if (_refCache.TryGetValue(def.Name, out var c) && c.mtime == mtime && c.key == key) { geo = c.geo; terrain = c.terrain; goto build; }
+                    if (_refCache.TryGetValue(def.Name, out var c) && c.mtime == mtime && c.key == key) return (def, (ReferenceGeometry?)c.geo, c.terrain, msg);
                 }
                 geo = ReferenceReaders.Load(def, full, units.LongUnit);
                 terrain = def.Kind == ReferenceKind.Terrain && !geo.Mesh.IsEmpty ? (geo.Grid is { } grd ? new TerrainModel(grd, geo.Mesh) : new TerrainModel(geo.Mesh)) : null;
                 msg = $"{def.Name}: " + string.Join(" ", geo.Messages);
                 lock (_refCache) _refCache[def.Name] = (mtime, key, geo, terrain);
-            build:
-                double ci = def.ContourInterval > 0 ? def.ContourInterval : (units.IsUS ? UnitSystem.Ft(2) : 0.5);
-                var render = SceneBuilder.BuildReference(def, geo, terrain, origin, ci);
-                return (def, (ReferenceRender?)render, terrain, msg);
+                return (def, (ReferenceGeometry?)geo, terrain, msg);
             }
-            catch (Exception ex) when (ex is IOException or InvalidDataException or FormatException or System.Xml.XmlException or UnauthorizedAccessException)
+            catch (Exception ex) when (ex is IOException or InvalidDataException or FormatException or System.Xml.XmlException or UnauthorizedAccessException or OutOfMemoryException)
             {
                 return (def, null, null, $"{def.Name}: could not load — {ex.Message}");
+            }
+        }).ToList());
+
+        // The viewport memory manager decides how terrain is drawn BEFORE its GPU buffers are made (a full terrain that does not fit
+        // is never built). Rasters only; the decision uses the grid size and image size.
+        var td = _terrainDisplay;
+        if (PlanTerrainDisplay != null)
+        {
+            var infos = geos.Where(g => g.Item2?.Grid != null && g.def.Kind == ReferenceKind.Terrain).Select(g =>
+            {
+                var grid = g.Item2!.Grid!;
+                int ls = grid.StrideFor(g.def.DisplayMaxVertices > 0 ? g.def.DisplayMaxVertices : 4_000_000);
+                var (iw, ih) = SceneBuilder.ImageSizeOrZero(g.def.ImagePath);
+                return new VramTerrain("REF-" + g.def.Name.ToUpperInvariant(), grid.Nx, grid.Ny, grid.X0, grid.Y0, grid.Cell, ls, iw, ih);
+            }).ToList();
+            if (infos.Count > 0 && PlanTerrainDisplay(infos) is { } planned) td = _terrainDisplay = planned;
+        }
+
+        // Phase 2: GPU-ready buffers.
+        var loaded = await Task.Run(() => geos.AsParallel().AsOrdered().Select(x =>
+        {
+            var (def, geo0, terrain, msg) = x;
+            if (geo0 == null) return (def, (ReferenceRender?)null, terrain, msg);
+            var geo = geo0;
+            {
+                double ci = def.ContourInterval > 0 ? def.ContourInterval : (units.IsUS ? UnitSystem.Ft(2) : 0.5);
+                int loadedStride = geo.Grid?.StrideFor(def.DisplayMaxVertices > 0 ? def.DisplayMaxVertices : 4_000_000) ?? 1;
+                if (def.Kind == ReferenceKind.Terrain && td.Off) return (def, (ReferenceRender?)null, terrain, $"{def.Name}: not drawn (viewport memory).");
+                Mesh? display = null;
+                int stride = loadedStride;
+                var clip = Box2.Empty;
+                if (def.Kind == ReferenceKind.Terrain && (td.Stride > loadedStride || td.ClipMargin > 0))
+                {
+                    stride = Math.Max(td.Stride, loadedStride);
+                    if (td.ClipMargin > 0 && !bridgeBox.IsEmpty) clip = bridgeBox.Inflate(td.ClipMargin);
+                    display = TerrainDisplay.Build(geo, stride, clip);
+                }
+                try
+                {
+                    var render = SceneBuilder.BuildReference(def, geo, terrain, origin, ci, display, stride, loadedStride, clip, def.Kind == ReferenceKind.Terrain ? td.ImageMaxPixels : 0);
+                    return (def, (ReferenceRender?)render, terrain, msg);
+                }
+                catch (OutOfMemoryException)
+                {
+                    GC.Collect();
+                    return (def, (ReferenceRender?)null, terrain, $"{def.Name}: could not draw it - out of memory (elevations still use it).");
+                }
             }
         }).ToList());
 
@@ -827,6 +895,7 @@ public sealed partial class MainViewModel : ObservableObject
         }
         var renders = loaded.Where(x => x.Item2 != null).Select(x => x.Item2!).ToList();
         foreach (var (_, _, _, msg) in loaded) if (!string.IsNullOrEmpty(msg)) (msg.Contains("could not") || msg.Contains("not found") ? (Action<string>)Warn : Info)(msg);
+        _lastRenders = renders;
         var modes = new List<(string, bool, bool)>();
         foreach (var r in renders)
         {
@@ -915,6 +984,25 @@ public sealed partial class MainViewModel : ObservableObject
 
     private PlanDrawing? _lastDrawing;
 
+    /// <summary>Shaded solids of every bridge (bridges in parallel), merged layer by layer; each part keeps its bridge index (far-bridge LOD).</summary>
+    private static void AddSolidsPerBridge(SceneData sc, IReadOnlyList<BridgeModel?> models)
+    {
+        var parts = new SceneData?[models.Count];
+        Parallel.For(0, models.Count, i =>
+        {
+            var m = models[i];
+            if (m == null) return;
+            var part = new SceneData { Layers = new(), Origin = sc.Origin, Extents = sc.Extents };
+            if (m.Steel != null) SceneBuilder.AddSolids(part, new[] { m.Steel });
+            if (m.Concrete != null) SceneBuilder.AddConcrete(part, new[] { m.Concrete });
+            if (m.Substructure != null) SceneBuilder.AddSubstructure(part, new[] { m.Substructure });
+            if (m.Prestressed != null) SceneBuilder.AddPrestressed(part, new[] { m.Prestressed });
+            parts[i] = part;
+        });
+        for (int i = 0; i < parts.Length; i++)
+            if (parts[i] is { } p) sc.MergeBridge(p, i);
+    }
+
     public async Task RegenerateAsync(bool zoom)
     {
         int version = Interlocked.Increment(ref _regenVersion);
@@ -939,10 +1027,18 @@ public sealed partial class MainViewModel : ObservableObject
                 foreach (var sub in subs) SubstructurePlanBuilder.Add(merged, sub);
                 // A stable origin keeps reference models (built separately) aligned with the bridge.
                 var sc = SceneBuilder.Build(merged, origin);
-                SceneBuilder.AddSolids(sc, steel.OfType<SteelModel>().ToList());
-                SceneBuilder.AddConcrete(sc, concrete);
-                SceneBuilder.AddSubstructure(sc, subs);
-                SceneBuilder.AddPrestressed(sc, models.Select(m => m?.Prestressed).OfType<SBM.Core.Prestressed.PrestressedModel>().ToList());
+                sc.BridgeNames.AddRange(bridges.Select(b => b.Name));
+                try { AddSolidsPerBridge(sc, models); }
+                catch (OutOfMemoryException)
+                {
+                    // Not enough (CPU) memory for every GPU buffer: drop the detail layers and try once more.
+                    sc.Solids.Clear();
+                    GC.Collect(2, GCCollectionMode.Forced, true, true);
+                    SceneBuilder.SkipDetail = true;
+                    Log("Out of memory building the 3D view: rebuilding without bolts, studs, welds and rebar.");
+                    AddSolidsPerBridge(sc, models);
+                }
+                sc.DetailSkipped = SceneBuilder.SkipDetail;
                 return (results, models, merged, sc);
             });
             if (version != _regenVersion) return; // superseded
@@ -1010,6 +1106,8 @@ public sealed partial class MainViewModel : ObservableObject
                   $"{scene.Solids.Sum(s => s.Triangles):N0} triangles"
                 : $"Regenerated in {sw.ElapsedMilliseconds} ms — {frames} cross frames, {stiff} stiffeners, {parts:N0} parts, {bolts:N0} bolts, " +
                   $"{tons:N1} {(Units.IsUS ? "tons" : "t")} steel, {scene.Solids.Sum(s => s.Triangles):N0} triangles";
+            if (scene.DetailSkipped) StatusText += " - bolts, studs, welds and rebar not drawn (out of memory)";
+            Log("REGEN: " + StatusText);
         }
         catch (Exception ex)
         {

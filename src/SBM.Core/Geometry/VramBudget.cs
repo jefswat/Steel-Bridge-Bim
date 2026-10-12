@@ -23,22 +23,29 @@ public sealed record VramItem(string Layer, VramGroup Group, long Vertices, long
 /// <summary>Terrain cost model: a raster DEM drawn every <c>stride</c>-th node, optionally clipped to a plan box.</summary>
 public sealed record VramTerrain(string Layer, long Nx, long Ny, double X0, double Y0, double Cell, int LoadedStride, long ImageWidth, long ImageHeight)
 {
+    /// <summary>Contour lines (plan view) of the full display mesh; they scale with 1 / stride and the clipped area.</summary>
+    public long ContourBytes { get; init; }
+
     public Box2 Extent => new() { MinX = X0, MinY = Y0, MaxX = X0 + (Nx - 1) * Cell, MaxY = Y0 + (Ny - 1) * Cell };
 
-    /// <summary>Bytes of the display mesh at a stride, clipped to <paramref name="clip"/> (empty = whole grid), with texture coordinates when draped.</summary>
+    /// <summary>Share of the grid's area inside <paramref name="clip"/> (1 when empty).</summary>
+    public double ClipFraction(Box2 clip)
+    {
+        if (clip.IsEmpty) return 1;
+        var e = Extent;
+        double w = Math.Max(0, Math.Min(e.MaxX, clip.MaxX) - Math.Max(e.MinX, clip.MinX));
+        double h = Math.Max(0, Math.Min(e.MaxY, clip.MaxY) - Math.Max(e.MinY, clip.MinY));
+        return e.Width * e.Height > 0 ? w * h / (e.Width * e.Height) : 1;
+    }
+
+    /// <summary>Bytes of the display mesh at a stride, clipped to <paramref name="clip"/> (empty = whole grid), with texture coordinates when draped,
+    /// plus its contour lines.</summary>
     public long MeshBytes(int stride, Box2 clip)
     {
-        double f = 1;
-        if (!clip.IsEmpty)
-        {
-            var e = Extent;
-            double w = Math.Max(0, Math.Min(e.MaxX, clip.MaxX) - Math.Max(e.MinX, clip.MinX));
-            double h = Math.Max(0, Math.Min(e.MaxY, clip.MaxY) - Math.Max(e.MinY, clip.MinY));
-            f = e.Width * e.Height > 0 ? w * h / (e.Width * e.Height) : 1;
-        }
+        double f = ClipFraction(clip);
         double nodes = (double)((Nx - 1) / stride + 1) * ((Ny - 1) / stride + 1) * f;
         int vb = VramItem.MeshVertexBytes + (ImageWidth > 0 ? VramItem.TexCoordBytes : 0);
-        return (long)(nodes * vb + nodes * 2 * 3 * VramItem.IndexBytes);
+        return (long)(nodes * vb + nodes * 2 * 3 * VramItem.IndexBytes + ContourBytes * f * LoadedStride / Math.Max(1, stride));
     }
 
     /// <summary>Draped image bytes when its longer side is limited to <paramref name="maxPixels"/> (0 = full size).</summary>
@@ -202,10 +209,10 @@ public static class VramPlanner
             var sizes = inv.Items.Where(i => i.Bridge >= 0).GroupBy(i => i.Bridge).Select(g => (g.Key, g.Sum(i => i.Bytes))).OrderByDescending(x => x.Item2).ToList();
             foreach (var (b, _) in sizes.Skip(1)) farBridges.Add(b);
         }
-        var terrainLayers = inv.Terrains.Select(t => t.Layer).ToHashSet();
+        var terrainLayers = inv.Terrains.SelectMany(t => new[] { t.Layer, t.Layer + "-CONTOURS" }).ToHashSet();
         foreach (var it in inv.Items)
         {
-            if (it.Group is VramGroup.Terrain or VramGroup.TerrainImage && terrainLayers.Contains(it.Layer)) continue; // modelled below
+            if (it.Group is VramGroup.Terrain or VramGroup.TerrainImage or VramGroup.Contours && terrainLayers.Contains(it.Layer)) continue; // modelled below
             if (it.Group == VramGroup.Contours && l.TerrainStride == 0) continue;
             if (it.Detail && l.DropDetail) continue;
             if (farBridges.Contains(it.Bridge) && !PrimaryLayers.Contains(it.Layer)) continue;

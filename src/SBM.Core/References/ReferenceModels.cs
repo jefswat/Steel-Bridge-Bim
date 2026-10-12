@@ -136,7 +136,10 @@ public sealed class TerrainModel
     }
 
     /// <summary>Contour segments at the given interval (marching triangles, parallel). Every <paramref name="majorEvery"/>th is major.</summary>
-    public (List<(Vec3 a, Vec3 b)> minor, List<(Vec3 a, Vec3 b)> major) Contours(double interval, int majorEvery = 5)
+    public (List<(Vec3 a, Vec3 b)> minor, List<(Vec3 a, Vec3 b)> major) Contours(double interval, int majorEvery = 5) => ContoursOf(_mesh, interval, majorEvery);
+
+    /// <summary>Contour segments of any triangle mesh (e.g. a reduced display mesh).</summary>
+    public static (List<(Vec3 a, Vec3 b)> minor, List<(Vec3 a, Vec3 b)> major) ContoursOf(Mesh _mesh, double interval, int majorEvery = 5)
     {
         var minor = new System.Collections.Concurrent.ConcurrentBag<List<(Vec3, Vec3)>>();
         var major = new System.Collections.Concurrent.ConcurrentBag<List<(Vec3, Vec3)>>();

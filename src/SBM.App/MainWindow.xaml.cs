@@ -70,6 +70,7 @@ public partial class MainWindow : Window
             if (file != null) _vm.OpenPath(file);
             else _vm.LoadSampleCommand.Execute(null);
         };
+        InitVram();
         SetupSnapshot();
         // Remote control for SbmApp / "sbm app …" (not in snapshot runs).
         if (!Environment.GetCommandLineArgs().Contains("--snapshot")) StartRemote();
@@ -188,6 +189,7 @@ public partial class MainWindow : Window
                         if (opt == "--hideafter" && _selectedTag != null) { HideElement(_selectedTag, _selectedTitle); ViewModels.MainViewModel.Log($"HIDEAFTER: {_hiddenList.Count} hidden: {string.Join(", ", _hiddenList.Select(h => h.label))}"); }
                     }
                     LogDetailVisibility();
+                    LogVideoMemory("snapshot");
                     SaveSnapshot(path);
                     SnapshotEditors(path);
                     _vm.IsDirty = false;
@@ -631,7 +633,10 @@ public partial class MainWindow : Window
             _layerModels[solid.Name] = models;
         }
         RegisterDetailModels();
+        RegisterVramModels(scene);
         ApplyLayerVisibility();
+        PlanVram("scene");
+        LogFirstFrame("scene");
         if (_sectionOn) InitSectionInputs();
         if (_sectionOn || _hidden.Count > 0) ApplySection();
 
@@ -701,7 +706,7 @@ public partial class MainWindow : Window
                     // Draped photo: unlit-looking (bright ambient, white diffuse) so the imagery keeps its colors.
                     mat.DiffuseColor = new HelixToolkit.Maths.Color4(1f, 1f, 1f, a);
                     mat.AmbientColor = new HelixToolkit.Maths.Color4(0.55f, 0.55f, 0.55f, 1f);
-                    mat.DiffuseMap = new HelixToolkit.SharpDX.TextureModel(new System.IO.MemoryStream(System.IO.File.ReadAllBytes(r.ImageFile)), true);
+                    mat.DiffuseMap = new HelixToolkit.SharpDX.TextureModel(TerrainImageStream(r.ImageFile, r.ImageMaxPixels, r.ImageWidth, r.ImageHeight), true);
                 }
                 var rm = NewSolidModel(r.Mesh, mat, a < 0.999, null);
                 rm.CullMode = SharpDX.Direct3D11.CullMode.None;
@@ -725,6 +730,27 @@ public partial class MainWindow : Window
         if (_sectionOn) ApplySection();
         KeepCameraInRange();
         InvalidateSnapIndex();
+        bool own = _vramTerrainReload;
+        _vramTerrainReload = false;
+        PlanVram(own ? "terrain reload" : "references");
+        LogFirstFrame("references");
+    }
+
+    /// <summary>Logs when the first frames after a scene / reference change were rendered (GPU upload included) and the DXGI usage then.</summary>
+    private void LogFirstFrame(string what)
+    {
+        var sw = System.Diagnostics.Stopwatch.StartNew();
+        int frames = 0;
+        EventHandler? h = null;
+        h = (_, _) =>
+        {
+            // The viewport renders on the frame after the models were attached; wait a few frames.
+            if (++frames < 3) return;
+            System.Windows.Media.CompositionTarget.Rendering -= h;
+            ViewModels.MainViewModel.Log($"VRAM: first frames after the {what} change in {sw.ElapsedMilliseconds} ms");
+            LogVideoMemory($"after {what}");
+        };
+        System.Windows.Media.CompositionTarget.Rendering += h;
     }
 
     private void ApplyLayerVisibility()
@@ -795,9 +821,10 @@ public partial class MainWindow : Window
         var rbox = new System.Windows.Controls.TextBox { Text = _detailRadius > 0 ? _vm.Units.FormatLength(_detailRadius) : "0", Width = 70, Margin = new Thickness(6, 0, 0, 0) };
         void SetRadius()
         {
-            if (rbox.Text.Trim() == "0") _detailRadius = 0;
-            else if (_vm.Units.TryParseLength(rbox.Text, SBM.Core.Units.LengthKind.Long, out double v) && v >= 0) _detailRadius = v;
-            ApplyDetailVisibility();
+            if (rbox.Text.Trim() == "0") _detailRadiusUser = 0;
+            else if (_vm.Units.TryParseLength(rbox.Text, SBM.Core.Units.LengthKind.Long, out double v) && v >= 0) _detailRadiusUser = v;
+            if (_vramLevel != null) ApplyVramLevel(_vramLevel);
+            else { _detailRadius = _detailRadiusUser; ApplyDetailVisibility(); }
         }
         rbox.LostFocus += (_, _) => SetRadius();
         rbox.KeyDown += (_, ke) => { if (ke.Key == Key.Enter) { SetRadius(); menu.IsOpen = false; } };
