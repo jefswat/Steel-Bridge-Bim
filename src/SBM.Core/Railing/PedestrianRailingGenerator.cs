@@ -64,7 +64,7 @@ public static class PedestrianRailingGenerator
             string name = d.Name.Length > 0 ? d.Name : $"Railing {k}";
             string asm = "RAIL-" + new string(name.Select(c => char.IsLetterOrDigit(c) ? char.ToUpperInvariant(c) : '-').ToArray()).Trim('-');
             while (!used.Add(asm)) asm += "-" + k;
-            string where = $"{f.Definition.Name}: railing {name}";
+            string where = $"railing {name}";
             foreach (var t in d.Unresolved) res.Diagnostics.Add(new(DiagnosticSeverity.Warning, $"{where}: {t}"));
             try { BuildRun(f, d, name, asm, where, top, u, res); }
             catch (Exception e) { res.Diagnostics.Add(new(DiagnosticSeverity.Warning, $"{where}: not built - {e.Message}")); }
@@ -185,6 +185,8 @@ public static class PedestrianRailingGenerator
                 Mark = $"{asm}-{(mem.Name.Length > 0 ? mem.Name : (mem.Kind == RailMemberKind.Handrail ? "HR" : "R") + mk)}",
                 Category = mem.Kind == RailMemberKind.Handrail ? PartCategory.RailHandrail : PartCategory.RailMember, Assembly = asm, Mesh = m,
                 Length = ms1 - ms0, Material = d.Material, Density = d.Density, Description = mem.Description.Length > 0 ? mem.Description : mem.Kind.ToString(),
+                // explicit mass per length (0 = carried by the envelope: a vanishing nominal weight keeps Mass at zero)
+                NominalWeightLbPerFt = mem.MassPerLength is double mpl ? Math.Max(mpl, 1e-12) / 1.48816394 : 0,
                 Assumption = Flag(mem.Unresolved, mem.Basis),
             };
             res.Parts.Add(part); mass += part.Mass;
@@ -291,6 +293,9 @@ public static class PedestrianRailingGenerator
         for (int i = 0; i < 20 && g(lo) > 0; i++) lo -= 20;
         for (int i = 0; i < 20 && g(hi) < 0; i++) hi += 20;
         lo = Math.Max(lo, 0); hi = Math.Min(hi, a.Length);
+        // a limit at the very start / end of the alignment (deck end = alignment begin): accept it within 0.1 mm
+        if (g(lo) > 0 && g(lo) < 1e-4) return lo;
+        if (g(hi) < 0 && g(hi) > -1e-4) return hi;
         if (g(lo) > 0 || g(hi) < 0) throw new InvalidOperationException($"the {(begin ? "begin" : "end")} limit line does not cross the reference line on the alignment");
         for (int i = 0; i < 80; i++)
         {

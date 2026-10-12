@@ -432,6 +432,7 @@ if (!testModel)
     }
 }
 
+if (!testModel) { var rj = await SBM.Api.ScriptHost.RunFileAsync(@"samples\plans\rail-joints-nht.csx", Doc, Args); Print(rj.Output.TrimEnd()); if (!rj.Success) Print("ERROR in rail-joints-nht.csx: " + rj.Error); }   // RAIL (PED)(HIGH) on the arch curbs
 var rep = Doc.Regenerate();
 foreach (var e in rep.Errors) Print("ERROR " + e);
 foreach (var w in rep.Warnings.Where(w => w.StartsWith(br.Name))) Print("warning " + w);

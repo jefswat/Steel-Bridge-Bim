@@ -78,6 +78,10 @@ public sealed class RailMemberDefinition
     /// <summary>Distance the member stops short of each run end (0 = full length).</summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public double EndSetback { get; set; }
+    /// <summary>Mass per length (kg/m), e.g. a pipe whose wall is not modeled, or 0 when the member's weight is carried by the run's envelope mass;
+    /// null = volume x density.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public double? MassPerLength { get; set; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? Unresolved { get; set; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
