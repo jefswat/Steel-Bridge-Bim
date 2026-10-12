@@ -3287,6 +3287,12 @@
             "Path": [
               {
                 "W": 0,
+                "U": -0.8302625,
+                "Dz": 280.5604625,
+                "Ref": "Elevation"
+              },
+              {
+                "W": 0,
                 "U": -0.9064625,
                 "Dz": 280.5604625,
                 "Ref": "Elevation"
@@ -3311,7 +3317,7 @@
               },
               {
                 "W": 0,
-                "U": -0.9064625,
+                "U": -0.8112125,
                 "Dz": 280.5604625,
                 "Ref": "Elevation"
               }
@@ -3380,12 +3386,13 @@
             ],
             "ListedLength": 4.7244,
             "Dims": [
+              0.07619999999999999,
               0.5334,
               1.6764,
               0.5334,
-              1.6764
+              1.5811499999999998
             ],
-            "Shape": "Closed stirrup (135-deg hooks not dimensioned)",
+            "Shape": "Closed stirrup (135-deg hooks not dimensioned; drawn closed with a 3\u0022 start / end on the top leg)",
             "Unresolved": "",
             "UnplacedCount": 0,
             "Cover": 0.07619999999999999
@@ -12515,6 +12522,12 @@
             "Path": [
               {
                 "W": 0,
+                "U": -0.8302625,
+                "Dz": 280.5604625,
+                "Ref": "Elevation"
+              },
+              {
+                "W": 0,
                 "U": -0.9064625,
                 "Dz": 280.5604625,
                 "Ref": "Elevation"
@@ -12539,7 +12552,7 @@
               },
               {
                 "W": 0,
-                "U": -0.9064625,
+                "U": -0.8112125,
                 "Dz": 280.5604625,
                 "Ref": "Elevation"
               }
@@ -12608,12 +12621,13 @@
             ],
             "ListedLength": 4.7244,
             "Dims": [
+              0.07619999999999999,
               0.5334,
               1.6764,
               0.5334,
-              1.6764
+              1.5811499999999998
             ],
-            "Shape": "Closed stirrup (135-deg hooks not dimensioned)",
+            "Shape": "Closed stirrup (135-deg hooks not dimensioned; drawn closed with a 3\u0022 start / end on the top leg)",
             "Unresolved": "",
             "UnplacedCount": 0,
             "Cover": 0.07619999999999999

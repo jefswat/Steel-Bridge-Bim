@@ -128,7 +128,7 @@ foreach (int j in new[] { 0, 1 })
     // ---- x02 closed stirrup, x03 U
     {
         double u0 = xFB + 3 + r5, u1 = xFF - 3 - r5, zb = 12 + r5, zt = 33 - r5;
-        Set(P + "502E", "footing stirrups", new[] { Pt(0, u0, z(zt)), Pt(0, u0, z(zb)), Pt(0, u1, z(zb)), Pt(0, u1, z(zt)), Pt(0, u0, z(zt)) }, st, "Closed stirrup (135-deg hooks not dimensioned)", 21, 66, 21, 66);
+        Set(P + "502E", "footing stirrups", new[] { Pt(0, u0 + 3, z(zt)), Pt(0, u0, z(zt)), Pt(0, u0, z(zb)), Pt(0, u1, z(zb)), Pt(0, u1, z(zt)), Pt(0, u0 + 3.75, z(zt)) }, st, "Closed stirrup (135-deg hooks not dimensioned; drawn closed with a 3\" start / end on the top leg)", 3, 21, 66, 21, 62.25);
         double leg = S ? 39 : 36, baseBot = zBot + r7;               // base on the bottom x01 row
         double ua = xSB + 2 + r5, ub = xSF - 2 - r5;
         Set(P + "503E", "footing / stem U", new[] { Pt(0, ua, z(baseBot + leg - r5)), Pt(0, ua, z(baseBot + r5)), Pt(0, ub, z(baseBot + r5)), Pt(0, ub, z(baseBot + leg - r5)) }, st,
