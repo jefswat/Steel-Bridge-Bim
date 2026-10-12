@@ -125,6 +125,8 @@ public sealed partial class SteelModelGenerator
             _holes[g.Index] = new GirderHoles();
             _studExclusions[g.Index] = new ConcurrentBag<(double, double)>();
             _daps[g.Index] = GirderEndDap.For(_def, _f, g, Warn);
+            if (_def.Girders.CrossGirder.DiscontinuousCopeLength is double cl && _f.CrossGirders.Any(x => x.Girder == g.Index))
+                _studExclusions[g.Index].Add((g.Length - cl, g.Length + 1));   // no top flange over the cope
         }
         foreach (var grp in _daps.Values.SelectMany(l => l).GroupBy(d => (d.SupportName, d.HasCope)))
         {
@@ -142,6 +144,7 @@ public sealed partial class SteelModelGenerator
         foreach (var x in _f.CrossGirders) { var xx = x; conn.Add(() => BuildCrossGirder(xx)); }   // registers bolt holes in girder webs
         foreach (var cp in _caps) { var cc = cp; conn.Add(() => BuildIntegralCap(cc)); }   // registers top flange holes and stud exclusions
         Parallel.ForEach(conn, a => a());
+        BuildInspectionWalkways();   // after the connections: the walkways bear on the generated cross frames / cross girders
 
         // Phase 3: members.
         var members = new List<Action>();
@@ -349,6 +352,21 @@ public sealed partial class SteelModelGenerator
 
     // ================================================================== girders
 
+    /// <summary>Discontinuous girder end cope at its cross girder (OPTIONAL CrossGirderSection.DiscontinuousCopeLength): s where the flanges stop,
+    /// tab top / bottom (girder z: 0 = top of web, down negative) and the cope radius; null = none.</summary>
+    private (double sc, double zt, double zb, double r)? XgCope(GirderResult g)
+    {
+        var xg = _def.Girders.CrossGirder;
+        if (xg.DiscontinuousCopeLength is not double len || !_f.CrossGirders.Any(x => x.Girder == g.Index)) return null;
+        if (xg.TopBelowDiscontinuousWebTop is not double off || xg.DiscontinuousTabInset is not double ins)
+        {
+            Warn($"{g.Name}: discontinuous girder cope needs CrossGirderSection.TopBelowDiscontinuousWebTop and DiscontinuousTabInset; not modeled.");
+            return null;
+        }
+        double zt = -off - ins, zb = -off - 2 * xg.FlangeThickness - xg.WebDepth + ins;
+        return (g.Length - len, zt, zb, xg.DiscontinuousCopeRadius ?? 0);
+    }
+
     private void BuildGirder(GirderResult g)
     {
         var path = g.Path;
@@ -382,6 +400,13 @@ public sealed partial class SteelModelGenerator
             var capE = CapCutsOf(g.Index).FirstOrDefault(c => Math.Abs(c.SC - c.Half - s1) < 1e-6);
             var capS = CapCutsOf(g.Index).FirstOrDefault(c => Math.Abs(c.SC + c.Half - s0) < 1e-6);
             double tf0 = capS != null ? Math.Max(s0, capS.SC + capS.TopEnd) : s0, tf1 = capE != null ? Math.Min(s1, capE.SC - capE.TopEnd) : s1;
+            // OPTIONAL discontinuous girder end at a cross girder: flanges stop at the cope, a web tab carries the end angles (sheet 121 A-A / E-E)
+            var xgCope = XgCope(g);
+            double bf1 = s1;
+            if (xgCope is { } xc0 && s1 > xc0.sc)
+            {
+                tf1 = Math.Min(tf1, Math.Max(s0, xc0.sc)); bf1 = Math.Max(s0, xc0.sc);
+            }
             var copes = new List<(double a, double b, double depth)>();
             if (capE != null && tf1 < s1 - 1e-6) copes.Add((tf1, s1, CopeDepth(path, capE)));
             if (capS != null && tf0 > s0 + 1e-6) copes.Add((s0, tf0, CopeDepth(path, capS)));
@@ -399,12 +424,16 @@ public sealed partial class SteelModelGenerator
                     Length = b - a, Description = Pl(seg.Width, seg.Thickness) });
             }
             n = 1;
-            foreach (var (a, b, seg) in web.PiecesWithin(s0, s1))
+            foreach (var (a, bFull, seg) in web.PiecesWithin(s0, s1))
             {
                 var mesh = new Mesh();
-                var hs = webHoles.Where(h => h.Center.X > a && h.Center.X < b).ToList();
                 double tw = seg.Thickness;
-                if (daps.Count == 0 && copes.Count == 0)
+                // discontinuous girder end at a cross girder: the web is full depth to the cope, then a coped tab (built after the main piece)
+                double b = xgCope is { } xq && bFull > xq.sc + 1e-6 ? Math.Max(a, xq.sc) : bFull;
+                var hsAll = webHoles.Where(h => h.Center.X > a && h.Center.X < bFull).ToList();
+                var hs = hsAll.Where(h => h.Center.X < b).ToList();
+                if (b - a < 1e-6) { }   // the whole piece is the tab
+                else if (daps.Count == 0 && copes.Count == 0)
                     LongPlate(mesh, path, a, b, path.S, Array.Empty<double>(), _ => -d, _ => 0, _ => -tw / 2, _ => tw / 2, hs, webMap, true, "girder web");
                 else if (daps.Count == 0)
                 {
@@ -440,11 +469,19 @@ public sealed partial class SteelModelGenerator
                         LongPlate(mesh, path, p0, p1, webBreaks, Array.Empty<double>(), _ => -d, s => -d + dp!.CopeDepth(s), _ => -tw / 2, _ => tw / 2, none, webMap, true, "girder web");
                     }
                 }
+                if (xgCope is { } xc && bFull > b + 1e-6)
+                {
+                    double R = xc.r, c0 = xc.sc;
+                    double Arc(double ss) { double q = Math.Clamp(ss - c0 - R, -R, 0); return R - Math.Sqrt(Math.Max(0, R * R - q * q)); }
+                    var arcS = Enumerable.Range(0, 9).Select(i => c0 + R * i / 8.0).Where(x => x > b && x < bFull).ToList();
+                    LongPlate(mesh, path, b, bFull, path.S.Concat(arcS).ToList(), arcS, ss => xc.zb - Arc(ss), ss => xc.zt + Arc(ss), _ => -tw / 2, _ => tw / 2,
+                        hsAll.Where(h => h.Center.X > b).ToList(), webMap, true, "girder web");
+                }
                 _parts.Add(new SteelPart { Mark = $"{mark}-W{n++}", Category = PartCategory.WebPlate, Assembly = mark, Mesh = mesh,
-                    Length = b - a, Description = Pl(d, tw) });
+                    Length = bFull - a, Description = Pl(d, tw) });
             }
             n = 1;
-            foreach (var (a, b, seg) in bot.PiecesWithin(s0, s1))
+            foreach (var (a, b, seg) in bot.PiecesWithin(s0, bf1))
             {
                 var mesh = new Mesh();
                 var hs = botHoles.Where(h => h.Center.X > a && h.Center.X < b).ToList();
@@ -461,7 +498,8 @@ public sealed partial class SteelModelGenerator
                 double dz = zs == 0 ? -aw : aw;
                 bool topWeld = zs == 0;
                 if (topWeld && tf1 <= tf0 + 1e-6) continue;
-                SweepAlongGirder(welds, path, topWeld ? tf0 : s0, topWeld ? tf1 : s1, topWeld ? dapS : Array.Empty<double>(), s =>
+                if (!topWeld && bf1 <= s0 + 1e-6) continue;
+                SweepAlongGirder(welds, path, topWeld ? tf0 : s0, topWeld ? tf1 : bf1, topWeld ? dapS : Array.Empty<double>(), s =>
                 {
                     double tw = web.Thickness(s) / 2;
                     double z = topWeld ? -drop(s) : -d;

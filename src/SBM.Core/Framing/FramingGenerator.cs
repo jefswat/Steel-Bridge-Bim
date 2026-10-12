@@ -716,7 +716,7 @@ public sealed class FramingGenerator
             if (sCl >= g.Length - 0.1) { Warn($"G{t.Girder + 1} termination is beyond the girder end; ignored."); continue; }
             var (pCl, tan, _) = g.Path.At(sCl);
             _endD[t.Girder] = _align.Inverse(pCl.XY).Distance;
-            _endS[t.Girder] = sCl - xg.WebThickness / 2 - xg.EndGap;
+            _endS[t.Girder] = sCl - xg.WebThickness / 2 - (xg.DiscontinuousEndGap ?? xg.EndGap);
         }
         // Truncate girders (path, lines, length) and drop bearings past the end.
         for (int i = 0; i < NG; i++)

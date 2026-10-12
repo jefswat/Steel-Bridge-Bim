@@ -15,6 +15,12 @@ foreach (var b in Doc.Project.Bridges.Where(b => b.Name.StartsWith("Ramp G Unit 
 {
     bool first = b.Name.EndsWith("1");
     var ia = new InspectionAccessDefinition { DefaultWalkway = WalkwayType.B };
+    // As designed (2026-10-12, clash check): same scheme as I-80 (inspection-i80.csx); Ramp G sheets PDF 135 (typical section, Type 5
+    // diaphragm: top of grating 7" over the top of its bottom flange) and PDF 136 (Sections C-C at the bottom struts), cable PDF 134 C-C.
+    ia.SupportOnFrames = true; ia.Source = "Ramp G PDF 134-136";
+    ia.GratingAboveDiaphragmFlange = new() { ["5"] = In(7) };
+    ia.TypeB.GratingWidth = In(24); ia.TypeB.TopRailInside = true;
+    ia.StiffenerRopeHole = In(0.875); ia.RopeEndsAtAnchorStem = true;
     ia.Cables.Add(new InspectionCableDefinition { Girder = 0, LeftFace = true, BeginSupport = 0, BeginOffset = first ? Ft(74 + 5 / 12.0) : In(8), EndSupport = -1, EndOffset = -In(8) });
     ia.Cables.Add(new InspectionCableDefinition { Girder = b.Girders.Count - 1, LeftFace = false, BeginSupport = 0, BeginOffset = first ? Ft(74 + 5 / 12.0) : In(8), EndSupport = -1, EndOffset = -In(8) });
     if (first)

@@ -795,6 +795,10 @@ public sealed partial class SubstructureGenerator
                     m.Drainage.Add(new SubSolid(SubElementKind.SplashBasin, name + " splash basin", "Splash basin 10'-0 x 10'-0, erosion stone 2'-0 deep on engineering fabric", basin, IsConcrete: false));
                 }
             }
+            else if (dr.Collector != null)
+            {
+                // piped to a plan collector (Misc collectors): the drain tube is built with the collector
+            }
             else
             {
                 // Collector: along the girders 1'-0 below the bottom flange to the nearest pier, then down to the ground.
@@ -805,8 +809,9 @@ public sealed partial class SubstructureGenerator
                 var q = a.PointAt(pier.Station, edge);
                 double gz = GroundAt(q);
                 double zDown = double.IsNaN(gz) ? zRun - Ft(20) : gz;
-                m.Drainage.Add(new SubSolid(SubElementKind.DrainPipe, name + " drop", $"{Sh(dr.PipeDiameter)} drop pipe", Pipe(p.WithZ(zSlabBot - In(6)), p.WithZ(zRun), r), IsConcrete: false));
-                m.Drainage.Add(new SubSolid(SubElementKind.DrainPipe, name + " collector", $"{Sh(dr.PipeDiameter)} collector pipe to {pier.Name}, {L((q - p).Length)}", Pipe(p.WithZ(zRun), q.WithZ(zRun), r), IsConcrete: false));
+                // drop + collector as one pipe with a mitred bend (separate straight pieces showed a kink at the joint)
+                m.Drainage.Add(new SubSolid(SubElementKind.DrainPipe, name + " drop and collector", $"{Sh(dr.PipeDiameter)} drop pipe and collector pipe to {pier.Name}, {L((q - p).Length)}",
+                    Misc.MiscMesh.Pipe(new[] { p.WithZ(zSlabBot - In(6)), p.WithZ(zRun), q.WithZ(zRun) }, r, r * 0.9), IsConcrete: false));
                 m.Drainage.Add(new SubSolid(SubElementKind.DrainPipe, name + " pier downspout", $"{Sh(Math.Max(dr.PipeDiameter, In(12)))} pier downspout at {pier.Name}", Pipe(q.WithZ(zRun), q.WithZ(zDown), Math.Max(r, In(6))), IsConcrete: false));
             }
         }

@@ -1,7 +1,7 @@
 // I-80 WB sign supports (Design 116, design sheets 171A-176 = PDF 176, 178, 180-183): data in docs/plan-data/misc-items-data.md (b), misc/sign-bracket-dims.csv.
 //  * Overhead truss brackets: Unit 2 at Pier 7WB (girders A and K, bracket height 8'-6, bottom flange 22", top of base 1026.33 N / 1028.33 S),
 //    Unit 3 at Pier 13WB (girders A and J, 6'-4, 26", 1020.32 N / 1024.32 S). Post lines 7'-4 apart; ahead of CL pier: Unit 2 2'-2 and 9'-6;
-//    Unit 3 girder J 2'-0 and 9'-4. Girder A is the NORTH girder = index 0 (verified from the model coordinates); K / J = the last girder.
+//    Unit 3 girder J 2'-0 and 9'-4, girder A 29'-0 13/16 and 36'-4 15/16 ahead of A's CL bearing (PDF 117 chain, see below). Girder A is the NORTH girder = index 0 (verified from the model coordinates); K / J = the last girder.
 //  * Bracket steel = modeled plates / stiffeners / 8 x 1 1/2" anchor bolts; base plate (2'-2 dia x 2") = placeholder (by others). Not modeled / unresolved
 //    items are listed in Misc.Unresolved and raised as warnings.
 //  * Exit sign bases (2, Ramp A gore at Pier 5WB and Ramp G gore at Pier 11WB, Unit 2): the plans show only a tick on the north girder for the station:
@@ -26,6 +26,7 @@ double Dms(int d, int m, int s) => d + m / 60.0 + s / 3600.0;
 u2.Misc!.SignSupports.Add(new SignSupportDefinition
 {
     Name = "Sign truss Unit 2 (Pier 7WB)", Kind = SignSupportKind.OverheadTrussBracket, Support = "Pier 7WB", TrussSpan = Ft(100),
+    GirderFlangeGap = In(0.25),   // Detail A (PDF 178 / 180): bracket flanges / web 1/4" GAP at the girder flange edges, spliced to them and the stiffener
     Brackets =
     {
         // girder A (north): D-D 6'-3 (W) / C-C 6'-7 7/16 (E), 92d52'02" (TYP.); J-J stub 1'-3 3/4 (W) / 1'-3 5/8 (E)
@@ -39,14 +40,23 @@ u2.Misc.Unresolved.Add("[sign] Unit 2 sign truss: truss CL parallel to the pier 
 u3.Misc!.SignSupports.Add(new SignSupportDefinition
 {
     Name = "Sign truss Unit 3 (Pier 13WB)", Kind = SignSupportKind.OverheadTrussBracket, Support = "Pier 13WB", TrussSpan = Ft(90),
+    GirderFlangeGap = In(0.25),
     Brackets =
     {
-        // girder J (south, last girder): 2'-0 and 9'-4 ahead of the pier. Girder A (north): the 12'-10 7/8 dimension starts from a reference line whose meaning is UNRESOLVED -> not placed.
+        // girder A (north, 2026-10-12): structural steel layout Unit 3 (PDF 117) "cross frame spacing along girder A": bearing stiffener (CL bearing
+        // Pier 13WB) 16'-1 15/16, then 12'-10 7/8 and 7'-4 1/8 to the two sign post stiffeners -> post lines 29'-0 13/16 and 36'-4 15/16 ahead of
+        // A's CL bearing. The intermediate line is the radial line through the CL Pier 13WB point on the CL WB approach roadway (the span
+        // dimension "measured along CL WB approach roadway" ends there; the model puts it 16'-0 1/16 from A's bearing, 1 7/8" short - CHECK
+        // reported). Cross-check: location plan (PDF 180) CL sign truss STA 7607+12.18 (I-80) = WB 7606+96.11; posts on A straddle WB 7606+96.03,
+        // posts on J 7606+96.15. Revised Section D-D girder A (PDF 181): 5'-4 5/8 at 93d19'39" (W), 5'-9 1/2 at 93d00'30" (E); View J-J (PDF 180)
+        // stub 1'-8 5/8 (W) / 1'-8 3/4 (E); top of base ELEV. 1020.32 (north side); web 6'-4, bottom flange 26" as girder J.
+        Br(0, F(29, 0.8125), 1020.32, F(6, 4), In(26), F(5, 4.625), Dms(93, 19, 39), F(1, 8.625)), Br(0, F(36, 4.9375), 1020.32, F(6, 4), In(26), F(5, 9.5), Dms(93, 0, 30), F(1, 8.75)),
+        // girder J (south, last girder): 2'-0 and 9'-4 ahead of the pier.
         // girder J: revised Section D-D (PDF 181) 5'-0 3/8 at 89d49'28" (W) / 5'-0 1/4 at 90d (E); View J-J (PDF 180) stub 1'-0 1/4 (W) / 1'-0 3/4 (E)
         Br(u3.Girders.Count - 1, F(2, 0), 1024.32, F(6, 4), In(26), F(5, 0.375), Dms(89, 49, 28), F(1, 0.25)), Br(u3.Girders.Count - 1, F(9, 4), 1024.32, F(6, 4), In(26), F(5, 0.25), 90, F(1, 0.75)),
     },
 });
-u3.Misc.Unresolved.Add("[sign] Unit 3 sign truss: the two brackets on girder A (north, top of base 1020.32) are NOT placed - the plan dimension 12'-10 7/8 (I-80 PDF 117) starts from a vertical reference line whose meaning is unresolved; girder A section D-D (PDF 181) was revised (5'-4 5/8, 5'-9 1/2; angles 93d19'39\" / 93d00'30\", struck values illegible).");
+u3.Misc.Unresolved.Add("[sign] CHECK (I-80 PDF 117): girder A sign post lines placed 29'-0 13/16 / 36'-4 15/16 ahead of A's CL bearing at Pier 13WB (16'-1 15/16 + 12'-10 7/8 + 7'-4 1/8 along girder A); the model's radial line at the CL pier / roadway point is 16'-0 1/16 from that bearing, 1 7/8\" less than the plan's 16'-1 15/16 - the plan and the model's pier / girder geometry differ there, the bearing-based chain is used.");
 u3.Misc.Unresolved.Add("[sign] Sign supports: anchor bolt lengths, the post stub plate lengths, the HSS 14.000x0.500 post height and the sign truss size / elevation are not in the plans.");
 
 // exit sign bases (Unit 2: Ramp A gore at Pier 5WB, Ramp G gore at Pier 11WB), bars per base

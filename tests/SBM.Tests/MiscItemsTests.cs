@@ -127,13 +127,16 @@ public class MiscItemsTests
                 Assert.True(e.Mesh.Positions.Max(N) <= unit.CapN0 + 1e-6, $"{pier} {name} reaches into the cap");
             }
             // the 8% run is parallel to the cap face: one N for the whole pier pipe (no diagonal in plan)
-            var pp = misc.Elements.Single(x => x.Name == $"Pier drain {pier} pier pipe").Mesh.Positions;
+            // (the 45 deg outlet leg at the bottom is part of the same mitred pipe now: measured above it)
+            var pAll = misc.Elements.Single(x => x.Name == $"Pier drain {pier} pier pipe").Mesh.Positions;
+            double zLow = pAll.Min(q => q.Z) + 1.0;
+            var pp = pAll.Where(q => q.Z > zLow).ToList();
             var (od, _) = MiscMesh.PipeSch40(pier == "Pier 19G" ? In(12) : In(8));
             Assert.InRange(pp.Max(N) - pp.Min(N), od - 0.005, od + 0.002);
             Assert.DoesNotContain(misc.Clearances, c => c.Drain == $"Pier drain {pier}" && c.Clearance <= 0);
         }
         // Pier 19G: the span collector ends over the box inlet (printed 18'-3 7/8 from CL column and 9" off the cap face meet the collector line)
-        Assert.Contains(doc.Substructure("Ramp G Unit 4").Misc!.Diagnostics, d => d.Message.Contains("span collector ends over the box inlet"));
+        Assert.Contains(doc.Substructure("Ramp G Unit 4").Misc!.Diagnostics, d => d.Message.Contains("ends over the box inlet"));
     }
 
     [Fact]

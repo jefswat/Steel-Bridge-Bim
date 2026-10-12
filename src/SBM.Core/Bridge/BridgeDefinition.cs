@@ -279,6 +279,26 @@ public sealed class CrossGirderSection
     /// girder at its end (I-80: 11" in Unit 2, 8" in Unit 3, design sheet 121).
     /// </summary>
     public double? TopBelowDiscontinuousWebTop { get; set; }
+    /// <summary>OPTIONAL (null = legacy): true = both flanges LEVEL and the web plumb (I-80 design sheet 121 elevations: "LEVEL"), at the
+    /// elevation set at the discontinuous girder (<see cref="TopBelowDiscontinuousWebTop"/>, else the chord there). Legacy = the cross
+    /// girder follows the sloped chord between the continuing girders and its web is square to that chord (it then leans into the
+    /// girder webs on a cross slope).</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public bool? Level { get; set; }
+    /// <summary>OPTIONAL discontinuous girder end detail (I-80 sheet 121 Sections A-A / E-E): the girder end (web tab) this far from the cross
+    /// girder web face (1/2"); null = <see cref="EndGap"/>.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public double? DiscontinuousEndGap { get; set; }
+    /// <summary>OPTIONAL: the discontinuous girder's flanges and full-depth web stop this far from its end; between, only a web TAB remains
+    /// (coped top and bottom) that carries the end connection angles (9"). null = no cope (flanges run to the end).</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public double? DiscontinuousCopeLength { get; set; }
+    /// <summary>Tab top below the top of the cross girder top flange = tab bottom above the bottom of its bottom flange (6" Unit 2, 2 1/2" Unit 3).</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public double? DiscontinuousTabInset { get; set; }
+    /// <summary>Cope corner radius (R = 6").</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public double? DiscontinuousCopeRadius { get; set; }
     /// <summary>Connection angle leg and thickness (L5x5x1/2).</summary>
     public double AngleLeg { get; set; } = In(5);
     public double AngleThickness { get; set; } = In(0.5);
@@ -1160,6 +1180,10 @@ public sealed class DeckDrainDefinition
     public double DropBelowGirders { get; set; } = Ft(1);
     /// <summary>Trench-type inlet as designed on the plans (null = the simple legacy inlet above).</summary>
     public DrainTrenchDefinition? Trench { get; set; }
+    /// <summary>OPTIONAL (simple inlets): name of the Misc drain collector this piped drain feeds; the generic collector / pier downspout is then
+    /// not built (the misc items build the drain tube down to that collector).</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public string? Collector { get; set; }
     public DeckDrainDefinition Clone() { var c = (DeckDrainDefinition)MemberwiseClone(); c.Trench = Trench?.Clone(); return c; }
 }
 

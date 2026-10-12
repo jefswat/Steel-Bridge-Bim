@@ -188,3 +188,36 @@ are shop-detail level; model as simplified solids (grating plate, 2 stringers, 3
 - Bolt diameter and edge/gage on the XG angles (not printed).
 - Unit 2 termination E distance, Unit 3 values (not re-read), B to 1/16".
 - Cable bracket 1 3/4" vs 1 3/16" hole; whether toe boards exist on Type B / Ramp G.
+
+## Status 2026-10-12 (branch i80-clashes): clash check and fixes
+
+Tool: `sbm clash <model> [--bridge NAME] [--csv out] [--tol LEN] [--bolts] [--welds] [--no-misc] [--no-concrete]` (`SBM.Core/Checks/SteelClashCheck.cs`,
+`SbmDocument.Clashes`): part meshes, box broad phase, edge-in-solid narrow phase (depth = distance to the other surface, contact <= 1/16" ignored),
+grouped by category pair with station / offset / nearest girder; drains / misc items are also tested against pier concrete. Tests `SteelClashCheckTests`.
+Baseline (sample model before): 23,628 clashes, 21,000+ of them inside / around the walkways (I-80 U1 4180, U2 5097, U3 5777, Ramp G 2058 / 1873 / 2469 / 2174).
+
+Fixed from the plans:
+- Cross girder (sheet 121 = PDF 125): flanges LEVEL / web plumb (`CrossGirderSection.Level`; the sloped-chord web leaned up to 2 3/8" through the
+  continuing girder web into the back-side cross frame stiffener and gusset); discontinuous girder end coped to a web tab (Sections A-A / E-E: tab 1/2"
+  from the XG web, flanges stop 9" from the tab end, tab 6" / 2 1/2" inside the XG flanges, R 6"); connection angles follow the girder webs at the plan
+  skew (orientation plan).
+- Walkways (I-80 PDF 169-174, Ramp G PDF 135-136, `InspectionAccessDefinition.SupportOnFrames`): stringers bear on the cross frame bottom strut and end
+  1 1/2" beyond it (G-G / C-C), grating 2'-0 wide, gratings 1" apart over the strut, top rail on the post tops with its leg inside, rails / posts / toe
+  boards 1 1/2" clear of frame members, plate diaphragms 7 / 8 (I-80) 1'-4 / 6", Type 5 (Ramp G) 7" grating over the bottom flange, cross girder ends:
+  grating 1" clear, stringers 1 1/2", rails 2'-6 from the web, grating 1'-0 (A) / 2 1/2" (B) over the XG web bottom, Type B end diaphragm beside the
+  XG flange; far-side walkway on the discontinuous girder line.
+- Inspection cables (PDF 167 / Ramp G 134): 7/8" (1 1/2" at Piers 12WB-15WB) rope holes in the stiffeners on the cable face with the rope passing
+  through them, support brackets only where the stiffener is on the other side of the web, intermediate supports midway between stiffeners, rope ends
+  at the anchorage stems.
+- Sign supports: Unit 3 girder A brackets placed (PDF 117 chain 16'-1 15/16 + 12'-10 7/8 + 7'-4 1/8 from A's CL bearing, PDF 181 revised D-D,
+  PDF 180 J-J); bracket flanges / web start 1/4" from the girder flange edges (Detail A, PDF 178 / 180).
+- Drains: all pipes one piece with mitred joints (drainage notes Ramp G PDF 158); I-80 span 11WB 12" collector, collectors near Pier 12WB, pier
+  collection boxes and pier pipes at Piers 11WB / 12WB (PDF 216-220, Section C-C jog at 11WB), flanges / cleanouts / support rods (`drains-i80.csx`).
+
+Remaining / UNRESOLVED (with pages):
+- End anchorages 8" from the CL bearing overlap skewed bearing stiffeners (PDF 167: stiffeners "not shown for clarity"); 7/8" rope holes in bearing
+  stiffeners skewed 33-56 deg cannot pass the 1/2" rope through the 7/8" plate (PDF 167 Section C-C: hole too small for the skew) - plan conflicts, reported.
+- Walkway / XG: grating cantilever over the strut follows the walkway grade (bent-plate seat not modeled), 1/16-5/64" at a few joints.
+- Not in this pass: cross frame details at skewed supports (gusset vs web, bearing vs connection stiffener, bottom chord vs web), Ramp G connection
+  stiffener vs gusset (1/16-1/4"), I-80 Piers 5WB / 6A joint drainage systems (PDF 216), collectors near 12WB cross frame couplers / supports (PDF 220),
+  12WB outlet pavement elevation (PDF 217), pier collection box top range (PDF 216 / Ramp G 157).

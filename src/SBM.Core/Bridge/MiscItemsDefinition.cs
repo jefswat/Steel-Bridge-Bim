@@ -68,6 +68,15 @@ public sealed class DrainCollectorDefinition
     public double HangerSpacing { get; set; } = Ft(5);
     /// <summary>Flexible coupler stations (plans: 4'-0 upstream of drains 23, 24 and 2'-0 upstream of drain 25).</summary>
     public List<double> CouplerStations { get; set; } = new();
+    /// <summary>OPTIONAL: the pipe runs parallel to the deck edge (I-80 PDF 220: "follows a radius ... which parallels the curvature of the north
+    /// gutter line") this far inboard of the barrier toe on the reference girder's side, instead of <see cref="OffsetFromGirder"/>.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public double? FromBarrierToe { get; set; }
+    /// <summary>OPTIONAL: the pipe ends (turns down into the pier collection box of <see cref="EndSupport"/>) at this station instead of at the
+    /// box inlet line / bearing line (I-80 Pier 12WB: both collectors meet at the drain STA 7604+73.67 over the box). The run may go
+    /// up-station (start behind the end) or down-station (start ahead of the end).</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public double? EndStation { get; set; }
     public DrainCollectorDefinition Clone()
     {
         var c = (DrainCollectorDefinition)MemberwiseClone();
@@ -117,6 +126,9 @@ public sealed class PierDrainDefinition
     /// <summary>Depth the inlet pipe enters the box below its top (PDF 157 box elevation / view A-A: 4").</summary>
     public double CapBoxInletEmbed { get; set; } = In(4);
     public double CapBoxDepth { get; set; } = Ft(2);
+    /// <summary>Height of the tapered lower part of the box's outer wall (Ramp G 1'-0 = default when null; I-80 PDF 216: 1'-3).</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public double? CapBoxTaperHeight { get; set; }
     /// <summary>Box top below the cap top (plans: 1/4" min / 1" max; section A-A: 1" at CL box): null = UNRESOLVED (generator raises and uses the 1/4" minimum).</summary>
     public double? CapBoxBelowTop { get; set; }
     public double CapPipeSlope { get; set; } = 0.08;
@@ -129,8 +141,36 @@ public sealed class PierDrainDefinition
     public double OutletLegLength { get; set; } = Ft(1);
     /// <summary>Pavement elevation under the pipe end (Pier 19G: 981 ft); the pipe ends 1" above it.</summary>
     public double? PavementElevation { get; set; }
-    /// <summary>Span collector that ends in the cap box (Pier 19G).</summary>
+    /// <summary>Span collector that ends in the cap box (Pier 19G); several = names separated by ';' (I-80 Pier 12WB: one from each side).</summary>
     public string Collector { get; set; } = "";
+
+    // ---- OPTIONAL as-designed details (null = legacy; JSON omitted when null)
+    /// <summary>true = no deck-joint trough at this pier (no trough, trough box, pipe 1; the support need not carry a joint): only the
+    /// collector(s), the pier collection box and the pier pipe (I-80 Pier 12WB).</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public bool? NoTrough { get; set; }
+    /// <summary>Column the box / pier pipe dimensions refer to: 1 = the leftmost (most negative S) ... ("CL COLUMN NO. 1"); null = the column nearest the support line point.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public int? ColumnNumber { get; set; }
+    /// <summary>Offset of the vertical run toward the column below the cap (I-80 PDF 217 Section C-C, Piers 5WB / 11WB): the pipe leaves the
+    /// cap-face plane <see cref="JogBelowCap"/> below the cap bottom and moves <see cref="JogOffset"/> (1'-3) toward the column over
+    /// <see cref="JogRise"/> (2'-2), mitred; supports 1'-0 above the jog and 8 1/2" below it (<see cref="JogSupportAbove"/> / <see cref="JogSupportBelow"/>).</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public double? JogOffset { get; set; }
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public double? JogRise { get; set; }
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public double? JogBelowCap { get; set; }
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public double? JogSupportAbove { get; set; }
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public double? JogSupportBelow { get; set; }
+    /// <summary>Drain pipe flange outside diameter (flange table: 8" pipe "B" 1'-2, 12" pipe 1'-6; 2 x 1/2" plates + 1/2" gasket); null = not modeled.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public double? FlangeDiameter { get; set; }
+    /// <summary>true = 4" raised brass cleanouts at the bends of the pier pipe (elevations "CLEANOUT"), 3/4" support rods from the clamps to the concrete.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public bool? Fittings { get; set; }
     public PierDrainDefinition Clone() => (PierDrainDefinition)MemberwiseClone();
 }
 
@@ -188,6 +228,11 @@ public sealed class SignSupportDefinition
     public double TrussSpan { get; set; }
     // Bracket plate sizes (plans: I-80 PDF 178/182).
     public double WebThickness { get; set; } = In(0.75);
+    /// <summary>OPTIONAL (I-80 PDF 180 Detail A): gap between the girder flange edges and the bracket flange ends / web end; the bracket web and
+    /// flanges start at the girder FLANGE edges (web spliced to the girder stiffener, flanges spliced to the girder flanges). null = legacy
+    /// (web from the girder web face, through the overhang of the girder flanges).</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public double? GirderFlangeGap { get; set; }
     public double TopPlateThickness { get; set; } = In(1.875);
     public double TopPlateWidth { get; set; } = In(28);
     public double TopPlateLength { get; set; } = Ft(2) + In(4);

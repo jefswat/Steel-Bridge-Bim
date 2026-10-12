@@ -21,6 +21,18 @@ public sealed partial class SteelModelGenerator
         return (x.Center.Z - off - chordZ, frac);
     }
 
+    /// <summary>Top of the cross girder top flange at the left and right continuing girder web CLs: the top-of-web chord shifted by
+    /// <see cref="CrossGirderShift"/> (legacy, sloped) or, with <c>CrossGirderSection.Level</c>, both at the elevation at the discontinuous girder.</summary>
+    private (Vec3 a, Vec3 b) CrossGirderChord(CrossGirderResult x)
+    {
+        var (dz, frac) = CrossGirderShift(x);
+        var a = new Vec3(x.Left.X, x.Left.Y, x.Left.Z + dz);
+        var b = new Vec3(x.Right.X, x.Right.Y, x.Right.Z + dz);
+        if (_def.Girders.CrossGirder.Level != true) return (a, b);
+        double z = a.Z + (b.Z - a.Z) * frac;
+        return (new Vec3(a.X, a.Y, z), new Vec3(b.X, b.Y, z));
+    }
+
     /// <summary>
     /// Built-up cross girder between the two continuing girders, connected to their webs with pairs of angles (L5x5x1/2);
     /// the discontinuous girder frames into its web with angles. Runs in the CONNECTIONS phase: the angle bolts register
@@ -39,16 +51,11 @@ public sealed partial class SteelModelGenerator
             Description = $"Cross girder G{x.LeftGirder + 1}–G{x.RightGirder + 1} carrying discontinuous G{x.Girder + 1}" });
         double twL = _web[x.LeftGirder].Thickness(x.LeftGirderDistance), twR = _web[x.RightGirder].Thickness(x.RightGirderDistance);
         double gap = xg.EndGap;
-        var a = x.Left; var b = x.Right;
+        var (a, b) = CrossGirderChord(x);                                     // top of the top flange at the two continuing girder CLs
         double Ltot = (b - a).Length;
         var dirPlan = (b.XY - a.XY).Normalized();
         double tcFrac = Vec2.Dot(x.Center.XY - a.XY, dirPlan) / Math.Max(1e-9, (b.XY - a.XY).Length);
         double xd = tcFrac * Ltot;                                            // discontinuous girder CL along the cross girder
-        {
-            // Top of the top flange = top of web of the discontinuous girder at its end − off; the girder keeps the chord slope.
-            var (dz, _) = CrossGirderShift(x);
-            a = new Vec3(a.X, a.Y, a.Z + dz); b = new Vec3(b.X, b.Y, b.Z + dz);
-        }
         var f = Frame3.FromXZ(a, b - a, Up);
         double D = xg.WebDepth, tw = xg.WebThickness, bf = xg.FlangeWidth, tf = xg.FlangeThickness;
         double x0 = twL / 2 + gap, x1 = Ltot - twR / 2 - gap;
@@ -89,13 +96,38 @@ public sealed partial class SteelModelGenerator
             _holes[girder].Web.Add(new Hole(new Vec2(s, z), hd));
         }
 
+        // Girder web faces in the cross girder's plan frame: the connection angle leg on a girder web lies IN that web (the plan angle between
+        // the girder and the cross girder is 85-90 deg, orientation plan sheet 121): heel = where the girder web face meets the cross girder
+        // web face, girder leg along the girder, cross girder leg along the cross girder (the angle is opened / closed to the skew).
+        var ex = new Vec2(f.X.X, f.X.Y).Normalized(); var ey = new Vec2(f.Y.X, f.Y.Y).Normalized();
+        var a2 = a.XY;
+        (Vec2 c, Vec2 t) Local(Vec2 p, Vec2 tw2) => (new Vec2(Vec2.Dot(p - a2, ex), Vec2.Dot(p - a2, ey)), new Vec2(Vec2.Dot(tw2, ex), Vec2.Dot(tw2, ey)).Normalized());
+        // heel x on the cross girder face y = ySide, girder-web leg direction (local, toward the angle's side), face normal (local, toward the angle)
+        (double xHeel, Vec2 legB, Vec2 nFace) Heel(Vec2 cl, Vec2 tl, double twg, double towardX, double ySide)
+        {
+            var nl = new Vec2(-tl.Y, tl.X);
+            if (nl.X * towardX < 0) nl = -nl;
+            var fp = cl + nl * (twg / 2);
+            double u = Math.Abs(tl.Y) < 1e-9 ? 0 : (ySide - fp.Y) / tl.Y;
+            var lb = tl * Math.Sign(tl.Y * ySide == 0 ? 1 : tl.Y * ySide);
+            return (fp.X + tl.X * u, lb, nl);
+        }
+        Vec3 L3(Vec2 d) => (f.X * d.X + f.Y * d.Y);
+
         // ---- connection angles at the two continuing girders (near and far faces of the cross girder web)
         int an = 0;
-        foreach (var (xw, sgn, girder, sRef, twg) in new[] { (twL / 2, 1.0, x.LeftGirder, x.LeftGirderDistance, twL), (Ltot - twR / 2, -1.0, x.RightGirder, x.RightGirderDistance, twR) })
+        foreach (var (sgn, girder, sRef, twg) in new[] { (1.0, x.LeftGirder, x.LeftGirderDistance, twL), (-1.0, x.RightGirder, x.RightGirderDistance, twR) })
+        {
+            var (pg, tg, _) = _f.Girders[girder].Path.At(sRef);
+            var (cl, tl) = Local(pg.XY, tg);
+            cl = new Vec2(cl.X, cl.Y);
             foreach (double side in new[] { -1.0, 1.0 })
             {
+                var (xw, lb, nl) = Heel(cl, tl, twg, sgn, side * tw / 2);
+                var dirB = L3(lb); var nW = L3(nl);
                 var m = new Mesh();
                 var holesA = new List<Hole>(); var holesB = new List<Hole>();
+                var heel0 = W(xw, side * tw / 2, 0);
                 foreach (double z in rowsC)
                 {
                     holesA.Add(new Hole(new Vec2(z - zLowC, xg.AngleBoltGage), hd));
@@ -110,14 +142,15 @@ public sealed partial class SteelModelGenerator
                     }
                     // Bolt through this angle's girder-web leg and the girder web (head on the angle).
                     double gripB = ta + twg;
-                    var pb = W(xw, side * (tw / 2 + xg.AngleBoltGage), z);
-                    _bolts.Add(new BoltInstance { Frame = Frame3.FromXZ(W(xw + sgn * ta, side * (tw / 2 + xg.AngleBoltGage), z), f.Y, -f.X * sgn), Grip = gripB,
+                    var pb = heel0 + dirB * xg.AngleBoltGage + f.Z * z;
+                    _bolts.Add(new BoltInstance { Frame = Frame3.FromXZ(pb + nW * ta, dirB, -nW), Grip = gripB,
                         Length = bg.LengthForGrip(gripB), Assembly = mark, Diameter = bg.Diameter });
                     GirderWebHole(girder, sRef, pb);
                 }
-                RolledBuilder.AddAngle(m, W(xw, side * tw / 2, zLowC), f.Z, f.X * sgn, f.Y * side, angleLen, leg, leg, ta, rootR, holesA, holesB);
+                RolledBuilder.AddAngle(m, W(xw, side * tw / 2, zLowC), f.Z, f.X * sgn, dirB, angleLen, leg, leg, ta, rootR, holesA, holesB);
                 angleParts.Add(($"A{++an}", m, $"{angleName} x {In(angleLen)}", angleLen, MemberRole.Diaphragm));
             }
+        }
 
         // ---- discontinuous girder end: angles on both sides of its web, bolted to the near face of the cross girder web
         var g = _f.Girders[x.Girder];
@@ -128,11 +161,16 @@ public sealed partial class SteelModelGenerator
             double zLowE = zWebBot + (D - endLen) / 2;
             var rowsE = Rows(zLowE, endLen);
             var pathG = g.Path;
+            var (pe, te, _) = pathG.At(g.Length);
+            var (ce, tle) = Local(pe.XY, te);
+            var heels = new Dictionary<double, (double xh, Vec2 lb, Vec2 nl)>();
+            foreach (double sgn in new[] { -1.0, 1.0 }) heels[sgn] = Heel(ce, tle, twg0, sgn, -tw / 2);
             foreach (double sgn in new[] { -1.0, 1.0 })
             {
                 var m = new Mesh();
                 var holesA = new List<Hole>(); var holesB = new List<Hole>();
-                double xh = xd + sgn * twg0 / 2;
+                var (xh, lb, nl) = heels[sgn];
+                var dirB = L3(lb); var nW = L3(nl);
                 foreach (double z in rowsE)
                 {
                     holesA.Add(new Hole(new Vec2(z - zLowE, xg.AngleBoltGage), hd));
@@ -146,13 +184,13 @@ public sealed partial class SteelModelGenerator
                     if (sgn > 0)
                     {
                         double gripB = 2 * ta + twg0;
-                        double yb = -(tw / 2 + xg.AngleBoltGage);
-                        _bolts.Add(new BoltInstance { Frame = Frame3.FromXZ(W(xd + twg0 / 2 + ta, yb, z), f.Y, -f.X), Grip = gripB,
+                        var pb = W(xh, -tw / 2, z) + dirB * xg.AngleBoltGage;
+                        _bolts.Add(new BoltInstance { Frame = Frame3.FromXZ(pb + nW * ta, dirB, -nW), Grip = gripB,
                             Length = bg.LengthForGrip(gripB), Assembly = mark, Diameter = bg.Diameter });
-                        GirderWebHole(x.Girder, g.Length, W(xd, yb, z));
+                        GirderWebHole(x.Girder, g.Length, pb - nW * (twg0 / 2));
                     }
                 }
-                RolledBuilder.AddAngle(m, W(xh, -tw / 2, zLowE), f.Z, f.X * sgn, -f.Y, endLen, leg, leg, ta, rootR, holesA, holesB);
+                RolledBuilder.AddAngle(m, W(xh, -tw / 2, zLowE), f.Z, f.X * sgn, dirB, endLen, leg, leg, ta, rootR, holesA, holesB);
                 angleParts.Add(($"E{(sgn > 0 ? 2 : 1)}", m, $"{angleName} x {In(endLen)} (end)", endLen, MemberRole.Diaphragm));
             }
         }
