@@ -153,6 +153,7 @@ u1.Supports.AddRange(new[]
 var s5 = u1.Supports[^1];
 s5.SharedPier = "Pier 5WB"; s5.PierCenterOffset = Ft(1.5); s5.Fixity = BearingFixity.Expansion;
 u1.Girders.Count = 6;
+u1.Girders.PlanNames = new() { "A", "B", "C", "D", "E", "F" };   // plan girder letters (sheets only)
 u1.Girders.Spacings = Enumerable.Repeat(Ft(11 + 5 / 12.0), 5).ToList();
 u1.Girders.FirstGirderOffset = In(3.5) - 2 * Ft(11 + 5 / 12.0);   // girder C 3 1/2" right of the WB CL
 u1.Deck.LeftEdgeOffset = -Ft(25 + 7 / 12.0); u1.Deck.RightEdgeOffset = Ft(37 + 7 / 12.0);
@@ -221,6 +222,7 @@ List<double> SpreadBetween(double a, double f, int[] lastSup, int j)
     return pos.ToList();
 }
 u2.Girders.Count = 11;
+u2.Girders.PlanNames = new() { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K" };
 u2.Girders.OffsetsAtSupports = Enumerable.Range(0, aU2.Length)
     .Select(j => SpreadBetween(aU2[j], fk[0], lastSupportU2, j).Concat(fk).Select(Ft).ToList()).ToList();
 u2.Girders.Spacings = Enumerable.Repeat(Ft(11.5), 10).ToList();
@@ -283,6 +285,7 @@ var dj = new[] { -34.5, -23, -11.5, 0, 11.5, 23, 34.5 };
 double s11 = u3.Supports[0].Station, sE = u3.Supports[^1].Station;
 var lastSupportU3 = new[] { 5, 1, 2 };        // A; B ends past Pier 12WB; C ends past Pier 13WB (sheet 115)
 u3.Girders.Count = 10;
+u3.Girders.PlanNames = new() { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J" };
 u3.Girders.OffsetsAtSupports = u3.Supports.Select((sp, j) =>
 {
     double a = -73.1 + (-40.5 + 73.1) * (sp.Station - s11) / (sE - s11);

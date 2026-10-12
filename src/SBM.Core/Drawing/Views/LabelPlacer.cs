@@ -58,13 +58,15 @@ public static class LabelPlacer
     }
 
     /// <summary>Resolves overprinted labels in place; returns how many texts were moved.</summary>
-    public static int Resolve(PlanDrawing dwg)
+    /// <param name="frame">Optional area the movable texts must stay in (e.g. the sheet panel at the view's scale, or a bending
+    /// diagram cell): a text outside it is moved in, and no candidate position may leave it.</param>
+    public static int Resolve(PlanDrawing dwg, Box2? frame = null)
     {
         var layers = dwg.Layers.ToList();
         var boxes = new List<Box>();
         for (int li = 0; li < layers.Count; li++)
         {
-            bool fix = layers[li].Style.Name is "S-TITLE" or "S-GRID";
+            bool fix = layers[li].Style.Name is "S-TITLE" or "S-GRID" or "S-NOTES";
             for (int ti = 0; ti < layers[li].Texts.Count; ti++)
                 if (layers[li].Texts[ti].Text.Length > 0) boxes.Add(Make(li, ti, layers[li].Texts[ti], fix));
         }
@@ -87,11 +89,17 @@ public static class LabelPlacer
             return hit;
         }
         foreach (var b in boxes.Where(b => b.Fixed)) Add(b);
+        bool Inside(Box b)
+        {
+            if (frame is not { } f) return true;
+            double ex = Math.Abs(b.U.X) * b.Hw + Math.Abs(b.V.X) * b.Hh, ey = Math.Abs(b.U.Y) * b.Hw + Math.Abs(b.V.Y) * b.Hh;
+            return b.C.X - ex >= f.MinX - 1e-9 && b.C.X + ex <= f.MaxX + 1e-9 && b.C.Y - ey >= f.MinY - 1e-9 && b.C.Y + ey <= f.MaxY + 1e-9;
+        }
 
         int moved = 0;
         foreach (var b in boxes.Where(b => !b.Fixed).OrderBy(b => layers[b.LayerIx].Style.Name == "S-DIMS" ? 0 : 1))
         {
-            if (!Hits(b)) { Add(b); continue; }
+            if (!Hits(b) && Inside(b)) { Add(b); continue; }
             if (Environment.GetEnvironmentVariable("SBM_LABELDEBUG") != null)
             {
                 string other = "";
@@ -101,7 +109,9 @@ public static class LabelPlacer
             double step = b.Height * 1.25;
             var cands = new List<(double dx, double dy, double cost)>();
             double w = b.Hw * 2;
-            foreach (double fx in new[] { 0, 0.25, -0.25, 0.5, -0.5, 0.75, -0.75, 1.0, -1.0 })
+            var fxs = new List<double> { 0, 0.25, -0.25, 0.5, -0.5, 0.75, -0.75, 1.0, -1.0 };
+            if (frame != null && !Inside(b)) fxs.AddRange(new[] { 1.5, -1.5, 2.0, -2.0, 3.0, -3.0 });
+            foreach (double fx in fxs)
                 for (int k = -8; k <= 8; k++)
                 {
                     if (fx == 0 && k == 0) continue;
@@ -113,7 +123,7 @@ public static class LabelPlacer
             foreach (var (dx, dy, _) in cands.OrderBy(c => c.cost))
             {
                 var trial = new Box { LayerIx = b.LayerIx, TextIx = b.TextIx, U = b.U, V = b.V, Hw = b.Hw, Hh = b.Hh, Height = b.Height, Anchor = b.Anchor, C = orig.C + b.U * dx + b.V * dy };
-                if (!Hits(trial)) { best = trial; break; }
+                if (Inside(trial) && !Hits(trial)) { best = trial; break; }
             }
             if (best == null) { Add(b); continue; }
             var lyr = layers[b.LayerIx];

@@ -17,6 +17,8 @@ public static class SheetLayers
     public static readonly LayerStyle Center = new("S-CENTER", 255, 120, 120, 1, LineStyle.Center);
     public static readonly LayerStyle Dims = new("S-DIMS", 0, 200, 120, 3, LineStyle.Continuous, 0.5);
     public static readonly LayerStyle Text = new("S-TEXT", 240, 240, 240, 7);
+    /// <summary>Placed note blocks (lists, wrapped notes): the label placer keeps them fixed and moves other labels around them.</summary>
+    public static readonly LayerStyle Notes = new("S-NOTES", 240, 240, 240, 7);
     public static readonly LayerStyle Title = new("S-TITLE", 255, 255, 255, 7, LineStyle.Continuous, 2);
     public static readonly LayerStyle Grid = new("S-GRID", 90, 90, 90, 9, LineStyle.Continuous, 0.25);
     public static readonly LayerStyle Ground = new("S-GROUND", 190, 150, 90, 42, LineStyle.Dashed);

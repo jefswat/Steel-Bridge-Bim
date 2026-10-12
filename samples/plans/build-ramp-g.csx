@@ -142,6 +142,7 @@ BridgeDefinition Unit(string name, double webIn, double haunchIn, (string name, 
     b.Deck.LeftEdgeOffset = -Ft(7 + 7 / 12.0); b.Deck.RightEdgeOffset = Ft(27 + 7 / 12.0);
     b.Deck.Barrier.Type = BarrierType.FShape; b.Deck.Barrier.Height = In(44);
     b.Girders.Count = 4;
+    b.Girders.PlanNames = new() { "A", "B", "C", "D" };   // plan girder letters (sheets only)
     b.Girders.Spacings = Enumerable.Repeat(Ft(9 + 8 / 12.0), 3).ToList();
     b.Girders.FirstGirderOffset = -Ft(4.5);
     b.Girders.Section.WebDepth = In(webIn); b.Girders.Section.WebThickness = In(0.625);

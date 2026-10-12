@@ -49,15 +49,58 @@ public static class SheetSet
             goto Substructure;
         }
 
-        // Prestressed girders: one sheet (sections + elevation + schedule) instead of the steel girder and detail sheets.
-        if (ctx.Prestressed is { Beams.Count: > 0 })
+        // Prestressed beams: beam layout, one detail sheet per beam type, schedule + notes, steel and concrete diaphragms
+        // (instead of the steel girder and detail sheets).
+        if (ctx.Prestressed is { Beams.Count: > 0 } ps)
         {
-            specs.Add(new SheetSpec("Prestressed girder details", $"TxDOT {ctx.Prestressed.Shape.Name} (IGD / IGND)", new[]
+            foreach (var (first, last) in FramingViews.SpanGroups(f, 330 * ctx.Units.LongUnit))
             {
-                new Panel(new ViewSpec("Girder sections", s => PrestressedViews.Sections(WithScale(ctx, s)), ScaleFamily.Architectural), 0, H * 0.45, W * 0.45, H),
-                new Panel(new ViewSpec("Girder elevation", s => PrestressedViews.Elevation(WithScale(ctx, s)), ScaleFamily.Engineering), W * 0.45, H * 0.45, W, H),
-                new Panel(new ViewSpec("Girder schedule", _ => PrestressedViews.Schedule(ctx), ScaleFamily.Architectural, PaperSpace: true), 0, 0, W, H * 0.45),
-            }));
+                int a0 = first, a1 = last;
+                string spans = a0 + 1 == a1 ? $"span {a1}" : $"spans {a0 + 1}-{a1}";
+                specs.Add(new SheetSpec($"Beam layout {spans}", "Beams, marks, CL bearing lines, spacing and diaphragms",
+                    new[] { Full(new ViewSpec("Beam layout", s => PrestressedViews.BeamLayout(WithScale(ctx, s), a0, a1), ScaleFamily.Engineering)) }));
+            }
+            if (f.Deck != null)
+                specs.Add(new SheetSpec("Deck plan", "Deck outline, widths, support lines and deck data from the model",
+                    new[] { Full(new ViewSpec("Deck plan", s => DeckViews.DeckPlan(WithScale(ctx, s)), ScaleFamily.Engineering)) }));
+            foreach (var (type, _, beams) in PsText.Types(ps))
+            {
+                string t = type;
+                specs.Add(new SheetSpec($"Prestressed beam {t}", $"{PsText.TypeName(beams[0].Shape, t)}: sections, elevation, strands, debonding, data", new[]
+                {
+                    new Panel(new ViewSpec("Beam sections", s => PrestressedViews.Sections(WithScale(ctx, s), t), ScaleFamily.Architectural), 0, H * 0.5, W * 0.42, H),
+                    new Panel(new ViewSpec("Beam elevation", s => PrestressedViews.Elevation(WithScale(ctx, s), t), ScaleFamily.Engineering), W * 0.42, H * 0.5, W, H),
+                    new Panel(new ViewSpec("Beam data", _ => PrestressedViews.DataTables(ctx, t), ScaleFamily.Architectural, PaperSpace: true), 0, 0, W, H * 0.5),
+                }));
+            }
+            specs.Add(new SheetSpec("Prestressed beam schedule", $"{PsText.Agency(ps.Shape)} prestressed beams: schedule and notes from the model".Trim(),
+                new[] { Full(new ViewSpec("Beam schedule", _ => PrestressedViews.Schedule(ctx), ScaleFamily.Architectural, PaperSpace: true)) }));
+            if (ps.SteelDiaphragms is { Bays.Count: > 0 } sdm)
+            {
+                var members = sdm.Bays.Select(b => b.Bay.Member).Distinct().ToList();
+                var panels = new List<Panel>();
+                for (int k = 0; k < members.Count && k < 2; k++)
+                {
+                    string mem = members[k];
+                    double xa = members.Count > 1 ? W / 2 * k : 0, xb = members.Count > 1 ? W / 2 * (k + 1) : W;
+                    panels.Add(new Panel(new ViewSpec($"Diaphragm {mem}", s => PrestressedViews.SteelDiaphragmDetail(WithScale(ctx, s), mem), ScaleFamily.Architectural), xa, H * 0.45, xb, H));
+                }
+                panels.Add(new Panel(new ViewSpec("Diaphragm tables", _ => PrestressedViews.SteelDiaphragmTables(ctx), ScaleFamily.Architectural, PaperSpace: true), 0, 0, W, H * 0.45));
+                specs.Add(new SheetSpec("Steel intermediate diaphragms", "Typical diaphragms, bays and cast holes from the model", panels));
+            }
+            if (ps.ConcreteDiaphragms is { Diaphragms.Count: > 0 } cdm)
+                foreach (var cd in cdm.Diaphragms)
+                {
+                    int si = cd.SupportIndex;
+                    var c1 = cd;
+                    int g = Math.Min(1, f.Girders.Count - 1);
+                    specs.Add(new SheetSpec($"{cd.Support} diaphragm", $"{cd.Name}: sections from the model", new[]
+                    {
+                        new Panel(new ViewSpec("Section A-A", s => PrestressedViews.SupportSection(WithScale(ctx, s), si, g, false, "A-A"), ScaleFamily.Architectural), 0, H * 0.3, W * 0.5, H),
+                        new Panel(new ViewSpec("Section B-B", s => PrestressedViews.SupportSection(WithScale(ctx, s), si, 0, true, "B-B"), ScaleFamily.Architectural), W * 0.5, H * 0.3, W, H),
+                        new Panel(new ViewSpec("Diaphragm data", _ => PrestressedViews.ConcreteDiaphragmTable(ctx, new[] { c1 }), ScaleFamily.Architectural, PaperSpace: true), 0, 0, W, H * 0.3),
+                    }));
+                }
             goto Substructure;
         }
 
@@ -78,11 +121,24 @@ public static class SheetSet
             for (int k = 0; k < 2 && i + k < girders.Count; k++)
             {
                 var g = girders[i + k];
-                panels.Add(new Panel(new ViewSpec($"{g.Name} elevation", s => GirderViews.Elevation(WithScale(ctx, s), g.Index), ScaleFamily.Engineering),
+                panels.Add(new Panel(new ViewSpec($"{ctx.GirderName(g.Index)} elevation", s => GirderViews.Elevation(WithScale(ctx, s), g.Index), ScaleFamily.Engineering),
                     0, H / 2 * (1 - k), W, H / 2 * (2 - k)));
             }
             string names = string.Join(" and ", panels.Select(p => p.View.Name.Split(' ')[0]));
             specs.Add(new SheetSpec($"Girder elevations {names}", "Plate sizes, splices, stiffeners and cross-frame locations", panels));
+        }
+
+        // Dapped girder ends (two supports per sheet).
+        var daps = MiscViews.DapSupports(ctx);
+        for (int i = 0; i < daps.Count; i += 2)
+        {
+            var panels = new List<Panel>();
+            for (int k = 0; k < 2 && i + k < daps.Count; k++)
+            {
+                string sup = daps[i + k];
+                panels.Add(new Panel(new ViewSpec($"Dap {sup}", s => MiscViews.DapDetail(WithScale(ctx, s), sup), ScaleFamily.Architectural), 0, H / 2 * (1 - k), W, H / 2 * (2 - k)));
+            }
+            specs.Add(new SheetSpec("Girder end dap details", "Dapped girder ends from the model (lowered top flange, cope tabs)", panels));
         }
 
         // Steel details.
@@ -149,8 +205,20 @@ public static class SheetSet
         // Bents and abutments.
         if (ctx.Substructure != null)
             foreach (var unit in ctx.Substructure.Units)
-                if (unit.Abutment != null)
-                    specs.Add(new SheetSpec($"{unit.Name} abutment", "Rear elevation, section, piling and wing layout", new[]
+                if (unit.Abutment is { Def.Kind: AbutmentKind.Integral } || (unit.Abutment != null && ctx.Prestressed is { Beams.Count: > 0 }))
+                {
+                    // Integral / prestressed-beam abutments: true sections of the model (cap or footing, steps, diaphragm, beams, deck).
+                    int si = unit.SupportIndex, g = Math.Min(1, f.Girders.Count - 1);
+                    string kind = unit.Abutment.Def.Kind == AbutmentKind.Integral ? "Integral abutment" : "Abutment";
+                    specs.Add(new SheetSpec(AbutTitle(unit.Name), $"{kind}: section along the CL bearing, section at a beam, piling layout", new[]
+                    {
+                        new Panel(new ViewSpec(unit.Name + " along CL brg", s => SupportSectionViews.AlongSupport(WithScale(ctx, s), unit, 0, "A-A"), ScaleFamily.Architectural), 0, H * 0.48, W, H),
+                        new Panel(new ViewSpec(unit.Name + " piling", s => AbutmentViews.Abutment(WithScale(ctx, s), unit, 2), ScaleFamily.Architectural), 0, 0, W * 0.6, H * 0.48),
+                        new Panel(new ViewSpec(unit.Name + " section at beam", s => PrestressedViews.SupportSection(WithScale(ctx, s), si, g, false, "B-B"), ScaleFamily.Architectural), W * 0.6, 0, W, H * 0.48),
+                    }));
+                }
+                else if (unit.Abutment != null)
+                    specs.Add(new SheetSpec(AbutTitle(unit.Name), "Rear elevation, section, piling and wing layout", new[]
                     {
                         new Panel(new ViewSpec(unit.Name + " rear elevation", s => AbutmentViews.Abutment(WithScale(ctx, s), unit, 0), ScaleFamily.Architectural), 0, H * 0.55, W, H),
                         new Panel(new ViewSpec(unit.Name + " piling", s => AbutmentViews.Abutment(WithScale(ctx, s), unit, 2), ScaleFamily.Architectural), 0, 0, W * 0.68, H * 0.55),
@@ -158,7 +226,22 @@ public static class SheetSet
                     }));
                 else
                 specs.Add(new SheetSpec($"{unit.Name} {(unit.Type == SupportType.Pier ? "bent" : "abutment")}", "Elevation and cap section",
-                    new[] { Full(new ViewSpec(unit.Name, s => BentViews.Bent(WithScale(ctx, s), unit), ScaleFamily.Architectural)) }));
+                    unit.Type == SupportType.Pier
+                        ? new[]
+                        {
+                            new Panel(new ViewSpec(unit.Name, s => BentViews.Bent(WithScale(ctx, s), unit, withSection: false), ScaleFamily.Architectural), 0, 0, W * 0.74, H),
+                            new Panel(new ViewSpec(unit.Name + " section A-A", s => BentViews.CapSectionView(WithScale(ctx, s), unit), ScaleFamily.Architectural), W * 0.74, 0, W, H),
+                        }
+                        : new[] { Full(new ViewSpec(unit.Name, s => BentViews.Bent(WithScale(ctx, s), unit), ScaleFamily.Architectural)) }));
+
+        // Drains, sign supports, crash cushions, lighting: location plan + schedule.
+        if (MiscViews.Any(ctx))
+        {
+            specs.Add(new SheetSpec("Miscellaneous items plan", "Drains, sign supports, crash cushions and lighting from the model",
+                new[] { Full(new ViewSpec("Misc items plan", s => MiscViews.LocationPlan(WithScale(ctx, s)), ScaleFamily.Engineering)) }));
+            foreach (var (title, view) in MiscViews.Schedule(ctx, W, H))
+                specs.Add(new SheetSpec("Miscellaneous items schedule", "Every item with its location and description", new[] { Full(new ViewSpec(title, _ => view, ScaleFamily.Architectural, PaperSpace: true)) }));
+        }
 
         foreach (var (title, view) in TableViews.Quantities(ctx, W, H))
             specs.Add(new SheetSpec("Estimated quantities", "Steel, concrete and reinforcing from the generated model", new[] { Full(new ViewSpec(title, _ => view, ScaleFamily.Architectural, PaperSpace: true)) }));
@@ -168,6 +251,9 @@ public static class SheetSet
             specs.Add(new SheetSpec(title.Replace("BAR LIST — ", "Bar list "), "Bar list and bending diagrams", new[] { Full(new ViewSpec(title, _ => view, ScaleFamily.Architectural, PaperSpace: true)) }));
         return specs;
     }
+
+    /// <summary>"S. Abut. abutment" -> "S. Abut." + " abutment" only when the name does not say it already.</summary>
+    private static string AbutTitle(string name) => name.Contains("abut", StringComparison.OrdinalIgnoreCase) ? name : name + " abutment";
 
     /// <summary>Stations (middle of the span) of the first span with each distinct number of girders.</summary>
     public static List<(double station, int count)> TypicalStations(BridgeFraming f)

@@ -27,7 +27,7 @@ public static class LayoutViews
         // Elevation first (true elevations), then the developed plan above it.
         var elevBox = DrawElevation(d, ctx, staBegin, staEnd);
         // Plan Y = base − offset: the right deck edge (lowest in the plan) stays above the elevation.
-        double planBase = elevBox.MaxY + d.Paper(0.9) + Math.Max(0, f.Definition.Deck.MaxRight) + d.Paper(0.6);
+        double planBase = elevBox.MaxY + d.Paper(0.55) + Math.Max(0, f.Definition.Deck.MaxRight) + d.Paper(0.6);
         Vec2 Map(Vec2 p)
         {
             var so = a.Inverse(p);
@@ -114,12 +114,20 @@ public static class LayoutViews
             foreach (var bl in f.Deck.BarrierLines) d.Poly(SheetLayers.Barrier, M(bl.Select(p => p.XY)));
         }
 
-        // Girders (hidden under the deck) with labels at the begin end.
-        foreach (var g in f.Girders)
+        // Girders (hidden under the deck) with labels at the begin end; at small scales only girders far enough from the last
+        // labelled one (and always the first / last) are named, so the names never overprint.
+        Vec2? lastLabel = null;
+        for (int gi = 0; gi < f.Girders.Count; gi++)
         {
+            var g = f.Girders[gi];
             d.Poly(SheetLayers.SteelHidden, M(g.WebLine.Select(p => p.XY)));
             var p0 = map(g.WebLine[0].XY);
-            d.Text(g.Name, p0 + new Vec2(-d.Paper(0.12), 0) * (developed ? 1 : 0), d.SmallTextH, Rot(staBegin), TextAlign.Right);
+            bool room = lastLabel is not { } q || Vec2.Distance(q, p0) > d.SmallTextH * 1.45;
+            bool lastOne = gi == f.Girders.Count - 1;
+            if (!room && !lastOne) continue;
+            if (!room && lastOne) continue;
+            d.Text(ctx.GirderName(g.Index), p0 + new Vec2(-d.Paper(0.12), 0) * (developed ? 1 : 0), d.SmallTextH, Rot(staBegin), TextAlign.Right);
+            lastLabel = p0;
         }
 
         // Alignment with station ticks.
@@ -241,6 +249,7 @@ public static class LayoutViews
         }
 
         // ---- girder beyond: the nearest girder at or left of the CL
+        string? spliceNote = null;
         var g = NearestLeftGirder(f);
         var sec = def.Girders.Section;
         if (g != null)
@@ -265,18 +274,22 @@ public static class LayoutViews
                 double z = pt.Z;
                 d.Line(SheetLayers.Steel, new Vec2(sta, z), new Vec2(sta, z - sec.WebDepth + (st.Kind == StiffenerKind.Intermediate ? def.Stiffeners.IntermediateBottomGap : 0)));
             }
-            // Field splices.
+            // Field splices: numbered tags under the girder (FS1, FS2, ...) and one note with their stations (no leader per splice).
             int spIx = 0;
+            var spNotes = new List<string>();
             foreach (var sp in f.Splices.Where(s => s.Girder == g.Index).OrderBy(s => s.GirderDistance))
             {
                 var (pt, _, sta) = path.At(sp.GirderDistance);
                 var sd = def.SpliceDetail;
                 double half = (sd.WebBoltColumns - 1) * def.Bolts.Pitch + def.Bolts.EdgeDistance + def.FieldSpliceGap / 2;
                 d.Rect(SheetLayers.Steel, sta - half, pt.Z - sec.WebDepth + sd.WebPlateFlangeClearance, sta + half, pt.Z - sd.WebPlateFlangeClearance);
-                d.Leader(new Vec2(sta, pt.Z - sec.WebDepth / 2), new Vec2(sta + d.Paper(0.35), pt.Z - sec.WebDepth - d.Paper(0.3 + 0.2 * (spIx++ % 4))), $"FIELD SPLICE  STA {u.FormatStation(sp.Location.XY == default ? sta : a.Inverse(sp.Location.XY).Station)}");
+                string tag = $"FS{++spIx}";
+                d.Text(tag, new Vec2(sta, pt.Z - sec.WebDepth - d.Paper(0.12)), d.SmallTextH * 0.85, Math.PI / 2, TextAlign.Right);
+                spNotes.Add($"{tag} STA {u.FormatStation(sp.Location.XY == default ? sta : a.Inverse(sp.Location.XY).Station)}");
             }
+            if (spNotes.Count > 0) spliceNote = $"FIELD SPLICES ({ctx.GirderName(g.Index)}): " + string.Join(", ", spNotes);
             d.Leader(new Vec2(tf[tf.Count / 4].X, (tf[tf.Count / 4].Y + bfB[bfB.Count / 4].Y) / 2),
-                new Vec2(tf[tf.Count / 4].X + d.Paper(0.4), bfB[bfB.Count / 4].Y - d.Paper(0.45)), $"{g.Name} (BEYOND)");
+                new Vec2(tf[tf.Count / 4].X + d.Paper(0.4), bfB[bfB.Count / 4].Y - d.Paper(0.45)), $"{ctx.GirderName(g.Index)} (BEYOND)");
         }
 
         // ---- supports: CL lines, bearings at the shown girder, substructure
@@ -327,8 +340,13 @@ public static class LayoutViews
             }
         }
 
-        // ---- elevation grid at the left and right ends
+        // ---- elevation grid at the left and right ends (label step chosen so the numbers never overprint at small scales)
         double step = u.IsUS ? Ft(10) : 2;
+        foreach (double st in u.IsUS ? new[] { Ft(10), Ft(20), Ft(50), Ft(100) } : new[] { 2.0, 5, 10, 20, 50 })
+        {
+            step = st;
+            if (st >= d.SmallTextH * 1.6) break;
+        }
         // Grid over the structure and ground only (labels above it are placed afterwards).
         double gz0 = Math.Floor(box.MinY / step) * step, gz1 = Math.Ceiling(Math.Max(box.MaxY, geoTop) / step) * step;
         double xl = box.MinX - d.Paper(0.6), xr = box.MaxX + d.Paper(0.6);
@@ -343,6 +361,17 @@ public static class LayoutViews
         }
         box.Add(new Vec2(xl - d.Paper(0.6), gz0));
         box.Add(new Vec2(xr + d.Paper(0.6), Math.Max(gz1, labelTop)));
+
+        // ---- field splice stations (tags FS1.. on the girder), wrapped under the elevation
+        if (spliceNote != null)
+        {
+            double width = Math.Max(4, (staEnd - staBegin) / d.Paper(1));
+            var lines = PrestressedViews.Wrap(spliceNote, width, 0.075);
+            double y0 = box.MinY - d.Paper(0.15);
+            for (int i = 0; i < lines.Count; i++)
+                d.Text(lines[i], new Vec2(staBegin, y0 - i * d.SmallTextH * 1.55), d.SmallTextH, 0, TextAlign.Left, SheetLayers.Notes);
+            box.Add(new Vec2(box.MinX, y0 - lines.Count * d.SmallTextH * 1.55));
+        }
 
         // ---- grade labels
         d.Leader(new Vec2(top[n / 6].X, top[n / 6].Y), new Vec2(top[n / 6].X - d.Paper(0.25), top[n / 6].Y + d.Paper(0.45)),
@@ -419,7 +448,7 @@ public static class LayoutViews
             string what = fnd.Type switch
             {
                 FoundationType.DrilledShaft => $"{d.Short(fnd.SizeS)} DIA DRILLED SHAFT, TIP EL {d.Elev(fnd.BottomZ)}",
-                FoundationType.PileCap when fnd.Piles.Count > 0 => $"PILES, TIP EL {d.Elev(fnd.Piles[0].TipZ)}",
+                FoundationType.PileCap when fnd.Piles.Count > 0 => $"PILES, {PierViews.TipText(fnd.Piles, d).Replace(", ", "\n")}",
                 FoundationType.SpreadFooting => $"SPREAD FOOTING, BOTTOM EL {d.Elev(fnd.BottomZ)}",
                 _ => "",
             };

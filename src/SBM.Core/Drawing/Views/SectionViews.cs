@@ -68,13 +68,13 @@ public static class SectionViews
                 double zb = z - shape.Depth;
                 if (ctx.Prestressed?.Beams.FirstOrDefault(b => b.Girder == g.Index && b.Span == ViewGeometry.SpanAt(f, sta)) is { } bm)
                 {
-                    var outline = shape.Outline().Select(q => new Vec2(o + q.X, zb + q.Y)).ToList();
+                    var outline = bm.Shape.Outline().Select(q => new Vec2(o + q.X, zb + q.Y)).ToList();
                     d.CutConcrete(outline, 0.1);
                     foreach (var st in bm.Strands)
                         d.Circle(SheetLayers.Rebar, new Vec2(o + st.Section.X, zb + st.Section.Y), Math.Max(bm.StrandDiameter / 2, d.Paper(0.012)), filled: true);
                 }
                 else d.CutConcrete(shape.Outline().Select(q => new Vec2(o + q.X, zb + q.Y)).ToList(), 0.1);
-                d.Text(g.Name, new Vec2(o, zb - d.Paper(0.25)), d.TextH, 0, TextAlign.Center);
+                d.Text(ctx.GirderName(g.Index), new Vec2(o, zb - d.Paper(0.25)), d.TextH, 0, TextAlign.Center);
                 continue;
             }
             // Plate girder cut (I shape).
@@ -87,7 +87,7 @@ public static class SectionViews
                 new(o - tw, z), new(o - tf.Width / 2, z),
             };
             d.Poly(SheetLayers.Steel, ishape, true);
-            d.Text(g.Name, new Vec2(o, z - sec.WebDepth - bf.Thickness - d.Paper(0.25)), d.TextH, 0, TextAlign.Center);
+            d.Text(ctx.GirderName(g.Index), new Vec2(o, z - sec.WebDepth - bf.Thickness - d.Paper(0.25)), d.TextH, 0, TextAlign.Center);
         }
 
         // ---- cross frames beyond (the first intermediate frame up-station in each bay)
@@ -158,6 +158,9 @@ public static class SectionViews
 
         // ---- barriers (cut)
         var prof = BarrierProfiles.For(deck.Barrier);
+        // Roadway (gutter line to gutter line): the traffic face of each barrier at the deck, else the deck edge.
+        double rwL = l, rwR = r;
+        bool labelled = false;
         if (prof != null)
             foreach (var (side, on) in new[] { (-1, deck.Barrier.Left), (1, deck.Barrier.Right) })
             {
@@ -166,9 +169,15 @@ public static class SectionViews
                 double zEdge = Top(edge);
                 var poly = prof.Select(q => new Vec2(edge - side * q.X, q.Y < 1e-9 ? Top(edge - side * q.X) : zEdge + q.Y)).ToList();
                 d.CutConcrete(poly, 0.06);
-                if (side < 0)
-                    d.Leader(poly[3], poly[3] + new Vec2(-d.Paper(0.4), d.Paper(0.35)),
-                        deck.Barrier.Type == BarrierType.TxDotSstr ? "TYPE SSTR RAIL (RL-SSTR)" : $"{ChoiceName(deck.Barrier.Type)} BARRIER");
+                double toe = prof.Where(q => q.Y < In(0.5)).Select(q => q.X).DefaultIfEmpty(0).Max();
+                if (side < 0) rwL = l + toe; else rwR = r - toe;
+                if (!labelled)
+                {
+                    // Leader from the top of the barrier, outward.
+                    var top = poly.OrderByDescending(q => q.Y).ThenBy(q => side * q.X).First();
+                    d.Leader(top, top + new Vec2(side * d.Paper(0.4), d.Paper(0.35)), BarrierName(deck.Barrier));
+                    labelled = true;
+                }
             }
 
         // ---- reinforcing (transverse bars as lines, longitudinal as dots)
@@ -243,9 +252,9 @@ public static class SectionViews
                    : $"{u.FormatLength(deck.Haunch, LengthKind.Short)} HAUNCH AT CL GIRDER (TOP OF WEB TO BOTT. OF SLAB)");
             if (ps)
             {
-                var pd = def.Girders.Prestressed;
+                var bm = ctx.Prestressed?.Beams.FirstOrDefault(b => b.Girder == g0.Index && b.Span == ViewGeometry.SpanAt(f, sta));
                 d.Leader(new Vec2(o0 + shape.WebWidth / 2, z0 - shape.Depth / 2), new Vec2(o0 + d.Paper(0.5), zBotMin - d.Paper(1.0)),
-                    $"TxDOT {shape.Name} (IGD)\n{pd.StrandCount} - {Prestressed.TxGirderCatalog.StrandSize(pd.StrandDiameter, u)} STRANDS ({pd.DepressedStrands} DEPRESSED)");
+                    bm != null ? PsText.BeamCallout(bm, u) : PsText.BeamCallout(shape, def.Girders.Prestressed, u));
             }
             else
             d.Leader(new Vec2(o0 + sec.WebThickness / 2, z0 - sec.WebDepth / 2), new Vec2(o0 + d.Paper(0.6), z0 - sec.WebDepth / 2 - d.Paper(0.2)),
@@ -254,15 +263,43 @@ public static class SectionViews
 
         // ---- CL / PGL, cross slopes
         double zc = Top(0);
-        d.Line(SheetLayers.Center, new Vec2(0, zBotMin - d.Paper(1.0)), new Vec2(0, zTopMax + d.Paper(1.1)));
-        d.Text(a.Name.StartsWith("CL", StringComparison.OrdinalIgnoreCase) ? a.Name.ToUpperInvariant() : "CL " + a.Name.ToUpperInvariant(),
-            new Vec2(0, zTopMax + d.Paper(1.25)), d.TextH, 0, TextAlign.Center);
-        if (Math.Abs(piv) > 1e-6)
+        string clName = a.Name.StartsWith("CL", StringComparison.OrdinalIgnoreCase) ? a.Name.ToUpperInvariant() : "CL " + a.Name.ToUpperInvariant();
+        // A CL far outside the deck (staged / offset deck) is not drawn at its true place: a note at the deck edge gives the offset.
+        double far = Math.Max(Ft(10), (r - l) * 0.25);
+        bool clFar = l - 0 > far || 0 - r > far;
+        if (!clFar)
+        {
+            d.Line(SheetLayers.Center, new Vec2(0, zBotMin - d.Paper(1.0)), new Vec2(0, zTopMax + d.Paper(1.1)));
+            d.Text(clName, new Vec2(0, zTopMax + d.Paper(1.25)), d.TextH, 0, TextAlign.Center);
+        }
+        if (Math.Abs(piv) > 1e-6 && piv >= l && piv <= r)
             d.Line(SheetLayers.Grade, new Vec2(piv, zBotMin - d.Paper(0.3)), new Vec2(piv, zTopMax + d.Paper(0.8)));
         var (sl, sr) = a.CrossSlope.SlopesAt(sta);
-        CrossSlopeArrow(d, (l + Math.Min(piv, 0)) / 2 + (l - 0) * 0.15, Top, sl, true);
-        CrossSlopeArrow(d, (r + Math.Max(piv, 0)) / 2 - (r - 0) * 0.15, Top, sr, false);
-        d.ElevationTag(new Vec2(piv, Top(piv)), $"PGL EL {d.Elev(Top(piv))}");
+        // Cross slope arrows on the deck: one per side of the crown that the deck covers, centred on that part of the roadway.
+        double pc = Math.Clamp(piv, rwL, rwR);
+        if (pc - rwL > d.Paper(1.2)) CrossSlopeArrow(d, (rwL + pc) / 2, Top, sl, true);
+        if (rwR - pc > d.Paper(1.2)) CrossSlopeArrow(d, (pc + rwR) / 2, Top, sr, false);
+        if (!clFar) d.ElevationTag(new Vec2(piv, Top(piv)), $"PGL EL {d.Elev(Top(piv))}");
+        // CL outside the deck (staged / offset deck): dimension (near) or note (far) from the CL to the nearer deck edge.
+        if (0 < l || 0 > r)
+        {
+            double ed = 0 < l ? l : r, yo = zBotMin - d.Paper(1.0);
+            string side = 0 < l ? "LEFT" : "RIGHT";
+            if (!clFar) d.Dim(new Vec2(0, yo), new Vec2(ed, yo), 0, $"{u.FormatLength(Math.Abs(ed))} {clName} TO {side} EDGE OF DECK");
+            else
+            {
+                var at = new Vec2(ed, Top(ed) - t);
+                d.Leader(at, at + new Vec2((0 < l ? -1 : 1) * d.Paper(0.5), -d.Paper(0.9)),
+                    $"{side} EDGE OF DECK {u.FormatLength(Math.Abs(ed))} {(0 < l ? "RIGHT" : "LEFT")} OF {clName}\nPGL ({clName}) EL {d.Elev(Top(piv))}");
+            }
+        }
+        if (prof != null && rwR - rwL > d.Paper(1))
+        {
+            double yr = yDim + d.Paper(0.7);
+            d.Line(SheetLayers.Dims, new Vec2(rwL, Top(rwL) + d.Paper(0.05)), new Vec2(rwL, yr));
+            d.Line(SheetLayers.Dims, new Vec2(rwR, Top(rwR) + d.Paper(0.05)), new Vec2(rwR, yr));
+            d.Dim(new Vec2(rwL, yr), new Vec2(rwR, yr), 0, $"{u.FormatLength(rwR - rwL)} ROADWAY");
+        }
 
         var box = dwg.Extents();
         d.Title($"TYPICAL SECTION AT STA {u.FormatStation(sta)}", $"Looking up-station · Scale {DrawingOptions.ScaleText(d.Scale, u)}",
@@ -294,6 +331,13 @@ public static class SectionViews
         ResolvedCrossFrameType.KFrame => "K-FRAME",
         ResolvedCrossFrameType.InvertedKFrame => "INVERTED K-FRAME",
         _ => "DIAPHRAGM",
+    };
+
+    private static string BarrierName(BarrierDefinition b) => b.Type switch
+    {
+        BarrierType.TxDotSstr => "TYPE SSTR RAIL (RL-SSTR)",
+        BarrierType.Custom when !string.IsNullOrWhiteSpace(b.ProfileName) => b.ProfileName!.ToUpperInvariant(),
+        _ => $"{ChoiceName(b.Type)} BARRIER",
     };
 
     private static string ChoiceName(BarrierType t) => t switch { BarrierType.FShape => "F-SHAPE", BarrierType.SingleSlope => "SINGLE SLOPE", _ => t.ToString().ToUpperInvariant() };

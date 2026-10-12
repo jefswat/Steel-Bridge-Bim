@@ -102,6 +102,24 @@ public partial class MainWindow
         SheetStatus.Text = $"Wrote {_sheets.Count} sheet DXF files to {dlg.FolderName}";
     }
 
+    /// <summary>One .zip with every sheet as a paper-space DXF, optionally with the full-size 2D model DXFs ("models/").</summary>
+    private void OnExportSheetsDxfZip(object sender, RoutedEventArgs e)
+    {
+        if (_sheets.Count == 0) return;
+        var dlg = new SaveFileDialog { Filter = "ZIP archive (*.zip)|*.zip", FileName = $"{BridgeFileName} Sheets DXF.zip", Title = "Sheet DXF files (paper inches) as one zip" };
+        if (dlg.ShowDialog() != true) return;
+        var ask = MessageBox.Show(this, "Also include the full-size 2D model DXFs (layout, sections, bents, bar bending) in a 'models' folder of the zip?",
+            "Export sheets DXF (zip)", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
+        if (ask == MessageBoxResult.Cancel) return;
+        try
+        {
+            var models = ask == MessageBoxResult.Yes ? _vm.BuildDrawings()?.views : null;
+            var files = SheetExport.WriteSheets(dlg.FileName, BridgeFileName, _sheets, _vm.Units, models);
+            SheetStatus.Text = $"Wrote {files.Count} DXF files ({_sheets.Count} sheets{(models != null ? $", {models.Count} 2D models" : "")}) to {dlg.FileName}";
+        }
+        catch (IOException ex) { SheetStatus.Text = $"Could not write the zip: {ex.Message}"; }
+    }
+
     private void OnExport2DModels(object sender, RoutedEventArgs e)
     {
         if (_vm.BuildDrawings() is not { } r) return;

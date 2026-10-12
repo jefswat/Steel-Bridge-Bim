@@ -84,7 +84,14 @@ public static class SheetComposer
                     if (ratio < bestRatio - 0.02) { bestRatio = ratio; view = v; scale = s; }
                 }
             }
-            if (!panel.View.PaperSpace && !view!.PaperSpace) LabelPlacer.Resolve(view.Drawing);
+            if (!panel.View.PaperSpace && !view!.PaperSpace)
+            {
+                // Labels stay inside the panel at the chosen scale (centred on the view), so none runs off the border.
+                var e0 = view.Drawing.Extents();
+                double fw = Math.Max(e0.Width, w * In * scale), fh = Math.Max(e0.Height, h * In * scale);
+                double cx = (e0.MinX + e0.MaxX) / 2, cy = (e0.MinY + e0.MaxY) / 2;
+                LabelPlacer.Resolve(view.Drawing, e0.IsEmpty ? null : new Box2 { MinX = cx - fw / 2, MaxX = cx + fw / 2, MinY = cy - fh / 2, MaxY = cy + fh / 2 });
+            }
             var ext = view!.Drawing.Extents();
             if (ext.IsEmpty) continue;
             double k = 1 / scale; // model meters → paper meters

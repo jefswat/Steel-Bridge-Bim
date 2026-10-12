@@ -492,6 +492,7 @@
                                 <Button Content="Zoom Extents" Margin="0,0,6,0" Click="OnSheetZoom"/>
                                 <Button Content="Export PDF…" Margin="0,0,6,0" Click="OnExportPdf" ToolTip="All sheets as one 11x17 vector PDF"/>
                                 <Button Content="Export Sheets DXF…" Margin="0,0,6,0" Click="OnExportSheetsDxf" ToolTip="Each sheet as a DXF in paper inches (1:1), border and title block included"/>
+                                <Button Content="Export sheets DXF (zip)…" Margin="0,0,6,0" Click="OnExportSheetsDxfZip" ToolTip="One .zip with every sheet as a paper-space DXF (inches, border and title block); optionally the full-size 2D model DXFs in a 'models' folder"/>
                                 <Button Content="Export 2D Models DXF…" Click="OnExport2DModels" ToolTip="Each view full size in feet (meters) as a 2D DXF model, for referencing into MicroStation sheets"/>
                             </StackPanel>
                             <TextBlock x:Name="SheetStatus" VerticalAlignment="Center" Foreground="#FFDDDDDD" TextTrimming="CharacterEllipsis"/>

@@ -16,7 +16,8 @@ namespace SBM.Core.Drawing.Views;
 /// </summary>
 public static class BentViews
 {
-    public static SheetView Bent(ViewContext ctx, SubstructureUnit unit)
+    /// <param name="withSection">Draw Section A-A beside the elevation (DXF set); the sheets draw it as its own view (<see cref="CapSectionView"/>).</param>
+    public static SheetView Bent(ViewContext ctx, SubstructureUnit unit, bool withSection = true)
     {
         if (unit.Abutment != null) return AbutmentViews.Abutment(ctx, unit);
         var f = ctx.Framing;
@@ -61,7 +62,7 @@ public static class BentViews
             }, true);
             // Haunch between the flange and the slab.
             d.CutConcrete(new List<Vec2> { new(s - ht, z + tf.Thickness), new(s + ht, z + tf.Thickness), new(s + ht, Grade(s + ht) - def.Deck.Thickness), new(s - ht, Grade(s - ht) - def.Deck.Thickness) }, 0.06);
-            d.Text($"G{br.Girder + 1}", new Vec2(s, Grade(s) + d.Paper(0.75)), d.TextH, 0, TextAlign.Center);
+            d.Text(ctx.GirderName(br.Girder), new Vec2(s, Grade(s) + d.Paper(0.75)), d.TextH, 0, TextAlign.Center);
         }
 
         // ---- pedestals and bearings
@@ -168,6 +169,7 @@ public static class BentViews
         {
             double nMid = (unit.CapN0 + unit.CapN1) / 2;
             var labelled = new HashSet<string>();
+            var barLabels = new List<(Vec2 target, string text)>();
             var centers = unit.Columns.Select(c => c.S).Concat(unit.Foundations.Select(x => x.S)).Distinct().ToList();
             double Center(double s) => centers.Count == 0 ? s : centers.OrderBy(c => Math.Abs(c - s)).First();
             // Column / shaft verticals: only the two silhouette bars of each member.
@@ -207,8 +209,19 @@ public static class BentViews
                 if (marks.TryGetValue(b.Mark, out var mk) && labelled.Add(b.Mark[..1]) && !vertical)
                 {
                     var mid = pts[pts.Count / 2];
-                    d.Leader(new Vec2(mid.s, mid.z), new Vec2(mid.s + d.Paper(0.4), mid.z + d.Paper(0.25) * (labelled.Count % 3 - 1)),
-                        $"BARS {mk.Mark} ({mk.Size.Name})");
+                    barLabels.Add((new Vec2(mid.s, mid.z), $"BARS {mk.Mark} ({mk.Size.Name})"));
+                }
+            }
+            // Bar labels in one column right of the bent, ordered by height, each with a leader (no overprinting on the cap).
+            if (barLabels.Count > 0)
+            {
+                double right = Math.Max(unit.CapS1, unit.Foundations.Select(x => x.S + x.SizeS / 2).DefaultIfEmpty(unit.CapS1).Max());
+                double colX = right + d.Paper(0.9), step = d.TextH * 1.75, yPrev = double.PositiveInfinity;
+                foreach (var (target, text) in barLabels.OrderByDescending(x => x.target.Y))
+                {
+                    double y = Math.Min(target.Y, yPrev - step);
+                    d.Leader(target, new Vec2(colX, y), text);
+                    yPrev = y;
                 }
             }
         }
@@ -235,19 +248,30 @@ public static class BentViews
             int nBat = fd.Piles.Count(q => q.IsBattered);
             string batterNote = nBat > 0 ? "\n" + nBat + " BATTERED (SEE PLAN)" : "";
             string tip = fd.Type == FoundationType.DrilledShaft ? $"{d.Short(fd.SizeS)} DIA SHAFT, {d.Len(fd.TopZ - fd.BottomZ)} LONG, TIP EL {d.Elev(fd.BottomZ)}"
-                : fd.Piles.Count > 0 ? $"{fd.Piles.Count} PILES {sd.PileLabel(d.Short)}, TIP EL {d.Elev(fd.Piles[0].TipZ)}{batterNote}"
+                : fd.Piles.Count > 0 ? $"{fd.Piles.Count} PILES {sd.PileLabel(d.Short)}, {PierViews.TipText(fd.Piles, d)}{batterNote}"
                 : $"FOOTING {d.Len(fd.SizeS)} x {d.Len(fd.SizeN)} x {d.Short(sd.FootingThickness)}";
             double tz = cutZ.TryGetValue(fd.S, out double zc0) ? zc0 : fd.Piles.Count > 0 ? fd.Piles[0].TipZ : fd.BottomZ;
-            d.Leader(new Vec2(fd.S, tz + d.Paper(0.1)), new Vec2(fd.S + d.Paper(0.5), tz - d.Paper(0.3)), tip);
+            // Below the cap / column dimension rows (zLow - 0.3 / - 0.6 in): the note does not run into them.
+            d.Leader(new Vec2(fd.S, tz + d.Paper(0.1)), new Vec2(fd.S + d.Paper(0.5), Math.Min(tz - d.Paper(0.3), zLow - d.Paper(1.0))), tip);
         }
         if (unit.Columns.FirstOrDefault() is { } col)
             d.Leader(new Vec2(col.S + col.SizeS / 2, (col.TopZ + col.BottomZ) / 2), new Vec2(col.S + col.SizeS / 2 + d.Paper(0.5), (col.TopZ + col.BottomZ) / 2 + d.Paper(0.3)),
                 col.Shape == ColumnShape.Round ? $"{d.Short(col.SizeS)} DIA COLUMN (TYP)" : $"{d.Short(col.SizeS)} x {d.Short(col.SizeN)} COLUMN (TYP)");
 
-        // ---- CL alignment and notes
-        d.Line(SheetLayers.Center, new Vec2(0, zLow - d.Paper(0.9)), new Vec2(0, yDims + d.Paper(0.5)));
-        d.Text(a.Name.StartsWith("CL", StringComparison.OrdinalIgnoreCase) ? a.Name.ToUpperInvariant() : "CL " + a.Name.ToUpperInvariant(),
-            new Vec2(0, yDims + d.Paper(0.65)), d.TextH, 0, TextAlign.Center);
+        // ---- CL alignment and notes (a CL far outside the cap is given as a note instead of a line far from the bent)
+        string clName = a.Name.StartsWith("CL", StringComparison.OrdinalIgnoreCase) ? a.Name.ToUpperInvariant() : "CL " + a.Name.ToUpperInvariant();
+        double clFar = Math.Max(Ft(10), (unit.CapS1 - unit.CapS0) * 0.25);
+        if (unit.CapS0 - 0 > clFar || 0 - unit.CapS1 > clFar)
+        {
+            double se = unit.CapS0 > 0 ? unit.CapS0 : unit.CapS1;
+            d.Text($"{clName}: {d.Len(Math.Abs(se))} {(se > 0 ? "LEFT" : "RIGHT")} OF THE {(se > 0 ? "LEFT" : "RIGHT")} END OF THE CAP (ALONG THE SUPPORT LINE)",
+                new Vec2((unit.CapS0 + unit.CapS1) / 2, yDims + d.Paper(0.65)), d.TextH, 0, TextAlign.Center);
+        }
+        else
+        {
+            d.Line(SheetLayers.Center, new Vec2(0, zLow - d.Paper(0.9)), new Vec2(0, yDims + d.Paper(0.5)));
+            d.Text(clName, new Vec2(0, yDims + d.Paper(0.65)), d.TextH, 0, TextAlign.Center);
+        }
         // Abutments are viewed from the span toward the backwall: the begin abutment looks down-station (mirrored).
         bool mirror = unit.Type == SupportType.Abutment && unit.SupportIndex == 0;
         if (mirror) dwg.MirrorX();
@@ -260,7 +284,7 @@ public static class BentViews
         d.Text($"PEDESTALS: {d.Short(unit.Pedestals.Min(p => p.Height))} TO {d.Short(unit.Pedestals.Max(p => p.Height))} HIGH AT CL BEARING", new Vec2(unit.CapS0, box.MinY - d.Paper(1.4)), d.TextH, 0, TextAlign.Left);
 
         // ---- Section A-A through the cap (to the right)
-        CapSection(d, ctx, unit, box.MaxX + d.Paper(2.0), marks);
+        if (withSection) CapSection(d, ctx, unit, box.MaxX + d.Paper(2.0), marks);
         // Many bearings: the seat elevations are listed in a table beside the section instead of a leader per bearing.
         if (unit.Pedestals.Count > 2)
         {
@@ -275,6 +299,16 @@ public static class BentViews
     }
 
     private static double deckTopMax(List<Vec2> top) => top.Max(p => p.Y);
+
+    /// <summary>Section A-A through the cap as its own view (own scale), with the bars cut from the placed cap bars.</summary>
+    public static SheetView CapSectionView(ViewContext ctx, SubstructureUnit unit)
+    {
+        var dwg = new PlanDrawing();
+        var d = new Drafter(dwg, ctx.Units, ctx.Options.BentScale);
+        var marks = ctx.Substructure?.Marks.Where(m => m.Unit == unit.Name).GroupBy(m => m.Mark).ToDictionary(g => g.Key, g => g.First()) ?? new();
+        CapSection(d, ctx, unit, 0, marks);
+        return new SheetView($"{unit.Name} section A-A", unit.Name.Replace(" ", "") + "-A-A", dwg, d.Scale, "Section A-A through the cap with the placed cap bars.");
+    }
 
     /// <summary>Section through the cap at a column (or the middle): X = across the cap (up-station to the right), Y = elevation.</summary>
     private static void CapSection(Drafter d, ViewContext ctx, SubstructureUnit unit, double xLeft, Dictionary<string, BarMark> marks)
@@ -306,13 +340,19 @@ public static class BentViews
             d.Poly(SheetLayers.Concrete, new[] { new Vec2(X(col.N - h) - d.Paper(0.1), zEnd), new Vec2(X(col.N), zEnd + d.Paper(0.06)), new Vec2(X(col.N), zEnd - d.Paper(0.06)), new Vec2(X(col.N + h) + d.Paper(0.1), zEnd) });
         }
         // Reinforcing in section: the nearest stirrup as drawn, longitudinal bars as dots.
+        double legendBottom = double.PositiveInfinity;
         if (ctx.Options.IncludeRebar && ctx.Substructure != null && r.Enabled)
         {
             var bars = ctx.Substructure.Bars.Where(b => b.Unit == unit.Name).ToList();
-            var stir = bars.Where(b => marks.TryGetValue(b.Mark, out var m) && m.Shape.Code == "TIE" && b.Mark.StartsWith('S'))
-                .OrderBy(b => Math.Abs(Vec2.Dot(b.Points[0].XY - unit.Origin, unit.D) - sCut)).FirstOrDefault();
-            if (stir != null)
+            // Transverse cap bars (stirrups / hoops / ties, marks S..): per mark the placed bar nearest to the cut, as placed.
+            var stirMarks = new List<string>();
+            foreach (var g in bars.Where(b => b.Mark.StartsWith('S') && marks.ContainsKey(b.Mark)).GroupBy(b => b.Mark))
+            {
+                var stir = g.OrderBy(b => Math.Abs(b.Points.Average(p => Vec2.Dot(p.XY - unit.Origin, unit.D)) - sCut)).First();
+                if (Math.Abs(stir.Points.Average(p => Vec2.Dot(p.XY - unit.Origin, unit.D)) - sCut) > Ft(3)) continue;
                 d.Poly(SheetLayers.Rebar, stir.Points.Select(p => new Vec2(X(Vec2.Dot(p.XY - unit.Origin, unit.N)), p.Z)));
+                stirMarks.Add(g.Key);
+            }
             // Backwall bars in section (both faces): verticals as lines, horizontals as dots.
             foreach (var b in bars.Where(b => b.Mark[0] is 'W'))
             {
@@ -320,9 +360,10 @@ public static class BentViews
                 if (Math.Abs(sb - sCut) > r.BackwallBarSpacing / 2) continue;
                 d.Poly(SheetLayers.Rebar, b.Points.Select(p => new Vec2(X(Vec2.Dot(p.XY - unit.Origin, unit.N)), p.Z)));
             }
+            // Longitudinal bars crossing the cut (interpolated at sCut), counted per mark: the legend is what is drawn.
+            var cut = new Dictionary<string, int>();
             foreach (var b in bars.Where(b => b.Mark[0] is 'A' or 'B' or 'C' or 'H'))
             {
-                // Longitudinal bars crossing the cut: interpolate at sCut.
                 var pts = b.Points;
                 for (int i = 1; i < pts.Length; i++)
                 {
@@ -331,27 +372,34 @@ public static class BentViews
                     var q = Vec3.Lerp(pts[i - 1], pts[i], (sCut - sa) / (sb - sa));
                     double rad = Math.Max(d.Paper(0.012), marks[b.Mark].Size.Diameter / 2);
                     d.Circle(SheetLayers.Rebar, new Vec2(X(Vec2.Dot(q.XY - unit.Origin, unit.N)), q.Z), rad, true);
+                    cut[b.Mark] = cut.GetValueOrDefault(b.Mark) + 1;
                     break;
                 }
             }
             var label = new List<string>();
-            foreach (var key in new[] { "A", "B", "C", "S" })
-                if (marks.Values.Where(m => m.Mark.StartsWith(key)).OrderByDescending(m => m.Count).FirstOrDefault() is { } m)
-                    label.Add(key switch
-                    {
-                        "A" => $"BARS {m.Mark}: {r.CapTopBarCount} {m.Size.Name} TOP",
-                        "B" => $"BARS {m.Mark}: {r.CapBottomBarCount} {m.Size.Name} BOTTOM",
-                        "C" => $"BARS {m.Mark}: {r.CapSideBarsPerFace} {m.Size.Name} EACH FACE",
-                        _ => $"BARS {m.Mark}: {m.Size.Name} STIRRUPS @ {d.Short(r.CapStirrupSpacing)} MAX",
-                    });
+            foreach (var (mk, n) in cut.OrderBy(k => k.Key, StringComparer.OrdinalIgnoreCase))
+                label.Add($"{n} {marks[mk].Size.Name} BARS {mk}{PlanMark(marks[mk], unit.Name)}");
+            foreach (var mk in stirMarks.OrderBy(k => k, StringComparer.OrdinalIgnoreCase))
+                label.Add($"{marks[mk].Size.Name} BARS {mk}{PlanMark(marks[mk], unit.Name)}");
+            if (label.Count == 0) label.Add("NO CAP BARS CROSS THIS SECTION IN THE MODEL");
             for (int i = 0; i < label.Count; i++)
-                d.Text(label[i], new Vec2(X(unit.CapN1) + d.Paper(0.3), zt - d.Paper(0.15) - i * d.TextH * 1.6), d.TextH, 0, TextAlign.Left);
+                d.Text(label[i], new Vec2(X(unit.CapN0), zb - d.Paper(1.35) - i * d.TextH * 1.6), d.TextH, 0, TextAlign.Left);   // legend under the section (narrow panel)
+            legendBottom = zb - d.Paper(1.35) - label.Count * d.TextH * 1.6;
         }
         d.Dim(new Vec2(X(unit.CapN0), zb), new Vec2(X(unit.CapN1), zb), -0.35, d.Short(w));
         d.Dim(new Vec2(X(unit.CapN0), zb), new Vec2(X(unit.CapN0), zt), 0.35, d.Short(zt - zb));
-        string at = Math.Abs(sCut) < In(1) ? "at the CL alignment" : $"{d.Len(Math.Abs(sCut))} {(sCut < 0 ? "left" : "right")} of the CL alignment";
-        d.Title("SECTION A–A", $"Through the cap {at} · Scale {DrawingOptions.ScaleText(d.Scale, ctx.Units)}",
-            new Vec2(X((unit.CapN0 + unit.CapN1) / 2), zb - d.Paper(1.6)));
+        int colIx = unit.Columns.OrderBy(c => c.S).ToList().FindIndex(c => Math.Abs(c.S - sCut) < 1e-6);
+        string at = colIx >= 0 ? $"at column {colIx + 1}" : Math.Abs(sCut) < In(1) ? "at the CL alignment" : $"{d.Len(Math.Abs(sCut))} {(sCut < 0 ? "left" : "right")} of CL";
+        d.Title("SECTION A–A", $"Through the cap {at}\nScale {DrawingOptions.ScaleText(d.Scale, ctx.Units)}",
+            new Vec2(X((unit.CapN0 + unit.CapN1) / 2), Math.Min(zb - d.Paper(1.6), legendBottom - d.Paper(0.4))));
+    }
+
+    /// <summary>The plan mark / location of a bar mark without the unit name, e.g. " (CAP 11A1 TOP)"; "" when the location is empty.</summary>
+    private static string PlanMark(BarMark m, string unitName)
+    {
+        string loc = m.Location.Split(',')[0].Trim();
+        if (loc.StartsWith(unitName, StringComparison.OrdinalIgnoreCase)) loc = loc[unitName.Length..].Trim();
+        return loc.Length > 0 ? $" ({loc.ToUpperInvariant()})" : "";
     }
 
     /// <summary>Vertical member; below the ground line it is hidden.</summary>
