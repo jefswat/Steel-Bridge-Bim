@@ -1,0 +1,16 @@
+vertex,description,"x_from_girder_CL_in (outward, symmetric about CL)",y_below_deck_top_in (measured normal to top surface),printed_dimension_or_rule,tag,pdf_page,sheet
+O1,outer top left tip,-255.5,0,"42'-7"" out-to-out /2 = 21'-3 1/2""",TEXT/RASTER,268,S3-20 (interior section / section at bent)
+O2,outer top right tip,+255.5,0,same,TEXT/RASTER,268,S3-20 (interior section / section at bent)
+O3,wing tip bottom,+255.5,10,"10"" tip thickness",RASTER + VECTOR,268,S3-20 (interior section / section at bent)
+O4,wing underside break,+206.5 (=255.5-49),10,"4'-1"" flat from tip",RASTER + VECTOR,268,S3-20 (interior section / section at bent)
+O5,wing underside at web (top of web outer face),"+143.5 (=255.5-9'-4"")","26 (=2'-2"")","5'-3"" slope run; 2'-2"" thickness at web; 9'-4"" tip to web",RASTER + VECTOR,268,S3-20 (interior section / section at bent)
+O6,outer web face at soffit,+W2 = 143.5-(H-26)/4,H,"web outer face slope 4 vertical : 1 horizontal (note on S3-20 drawing '4 over 1'); W2 matches the table within 1/16""","DERIVED, matches TEXT table (max dev 0.062"")",268,S3-20 (interior section / section at bent)
+O7,soffit centre,0,H,H from section table,TEXT,268,S3-20 (interior section / section at bent)
+I1,void top slab underside at CL,0,9,"9"" top slab at CL",RASTER + VECTOR,268,S3-20 (interior section / section at bent)
+I2,top slab underside break,"+61 (=5'-1"")",9,"5'-1""",RASTER + VECTOR,268,S3-20 (interior section / section at bent)
+I3,"top haunch / inner web corner (before R=1'-0"" fillet)","+127 (=5'-1""+5'-6"")","26 (=2'-2"")","5'-6"" and 2'-2"" (same 2'-2"" as wing thickness at web)","RASTER + VECTOR (haunch slope solved from tangent points; intersects inner web face at 127.0"", 26.05"")",268,S3-20 (interior section / section at bent)
+I4,inner web face top of bottom-slab haunch,+(127-(yh-26)/4) with yh=H-T-6,H-T-6,"web thickness 1'-4"" normal to web (=16.49"" horizontal at 4:1)",VECTOR + DERIVED,268,S3-20 (interior section / section at bent)
+I5,bottom slab haunch toe,"x(I4)-29.5 (=2'-5 1/2"")",H-T,"haunch 6"" rise over 2'-5 1/2""",RASTER + VECTOR,268,S3-20 (interior section / section at bent)
+I6,bottom slab top at CL,0,H-T,T from section table,TEXT,268,S3-20 (interior section / section at bent)
+FILLET,"R=1'-0"" fillet at I3 (inner web / top slab corner)",,,"R = 1'-0"" printed",RASTER,268,S3-20
+NOTE,"H = depth normal to top surface, per section table; deck top is the cross-sloped surface; top 'parapet' 2'-6"" each side added later (S3-14).",,,,,262,S3-14
