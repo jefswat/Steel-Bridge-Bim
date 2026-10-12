@@ -71,6 +71,10 @@ public sealed class SegmentalBearingResult
     public string Description { get; init; } = "";
 }
 
+/// <summary>Box geometry at a bent control line: WP (top of box on the CL, on the profile grade), box depth there, the box soffit CL point
+/// (WP - Up x H), the soffit on the vertical through the WP, and the soffit CL offsets from the vertical (plan DIM "A" along -L-, DIM "B" across).</summary>
+public sealed record SegmentalBentRow(string Bent, double Station, Vec3 Wp, double Depth, Vec3 SoffitCl, double SoffitZAtWp, double DimA, double DimB, double CrossSlope, double Grade);
+
 /// <summary>Plan-vs-model check row (also for the check script).</summary>
 public sealed record SegmentalCheck(string Item, double Model, double Plan, double Difference, string Note);
 
@@ -82,6 +86,7 @@ public sealed class SegmentalModel
     public List<SegmentalBearingResult> Bearings { get; } = new();
     public Substructure.SubstructureModel? Substructure { get; set; }
     public List<SegmentalCheck> Checks { get; } = new();
+    public List<SegmentalBentRow> BentRows { get; } = new();
     public List<Diagnostic> Diagnostics { get; } = new();
     public double ConcreteVolume => Segments.Sum(s => s.Volume);
     /// <summary>Strand weight (lb) from the model lengths x strands x the plan weight per foot.</summary>

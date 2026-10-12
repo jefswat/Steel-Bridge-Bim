@@ -527,6 +527,20 @@ public sealed class SegmentalGenerator
 
     private void Report()
     {
+        foreach (var s in _f.Supports)
+        {
+            // (end bents 18 / 29: the WP lies in the joint gap beyond the end segment; the box there = the constant end section on -L-)
+            var f = FrameOnChord(s.Station);
+            var (h, _, _) = SectionAt(s.Station);
+            var soffit = f.Origin - f.Up * h;
+            var (p, ang) = _a.EvaluateAtDistance(_a.StationToDistance(s.Station));
+            var tan = Vec2.FromAngle(ang);
+            double zAtWp = SoffitZ(s.Station, f.Origin.XY);
+            var dxy = soffit.XY - f.Origin.XY;
+            _m.BentRows.Add(new SegmentalBentRow(s.Name, s.Station, f.Origin, h, soffit, zAtWp, Vec2.Dot(dxy, tan), Vec2.Dot(dxy, tan.Right), CrossSlope(s.Station),
+                _a.Profile.IsEmpty ? 0 : _a.Profile.GradeAt(s.Station)));
+            _ = p;
+        }
         // chord offset: mid-ordinate between each segment chord and the alignment at mid-segment (plan)
         double worst = 0; string worstName = "";
         double chordDiff = 0; string chordName = "";
