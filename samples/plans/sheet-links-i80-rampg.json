@@ -445,8 +445,8 @@
   "administrative": [ "^$", "^TITLE SHEET", "^REVISED:?$", "^REVISION SHEET", "RICHARD T\\. HORTON" ],
 
   "rules": [
-    { "id": "general-notes", "sheets": "^(ESTIMATED QUANTITIES|SUMMARY OF ITEMIZED QUANTITIES|GENERAL NOTES)\\b", "role": "general",
-      "basis": "General notes, estimated and itemized quantities", "target": [ { "level": "unit" } ] },
+    { "id": "general-notes", "sheets": "^GENERAL NOTES\\b", "role": "general",
+      "basis": "General notes: weathering-steel bolts A325 Type III, structural steel notes (PDF 6); the quantity sheets were not used", "target": [ { "level": "unit" } ] },
     { "id": "situation", "sheets": "^SITUATION PLAN", "role": "general", "basis": "Situation plan: location, alignment and ties",
       "target": [ { "level": "alignment" }, { "level": "unit" } ] },
     { "id": "superstructure-notes", "sheets": "^SUPERSTRUCTURE DETAILS", "role": "general", "basis": "Superstructure notes (bolt sizes, details common to all units)",
@@ -465,12 +465,8 @@
 
     { "id": "typical-section", "sheets": "^TYPICAL CROSS SECTIONS? - UNIT (?<u>\\d+)", "basis": "Typical section: deck, haunch, barrier, girder spacing",
       "target": [ { "level": "part", "category": "deck", "unit": "Unit {u}" }, { "level": "group", "category": "girder", "unit": "Unit {u}" } ] },
-    { "id": "longitudinal-section", "sheets": "^LONGITUDINAL SECTION - UNIT (?<u>\\d+)", "basis": "Longitudinal section: spans, deck, girders",
-      "target": [ { "level": "part", "category": "deck", "unit": "Unit {u}" }, { "level": "group", "category": "girder", "unit": "Unit {u}" } ] },
     { "id": "steel-layout", "sheets": "^(STRUCTURAL STEEL LAYOUT|STRUCTUAL STEEL LAYOUT|FRAMING PLAN) - UNIT (?<u>\\d+)", "basis": "Steel layout / framing plan: girders, cross frames, splices, bearings",
       "target": [ { "level": "part", "category": "superstructure", "unit": "Unit {u}" } ] },
-    { "id": "reactions", "sheets": "^MOMENT & REACTION TABLE - UNIT (?<u>\\d+)", "role": "general", "basis": "Design moments and bearing reactions of the unit",
-      "target": [ { "level": "group", "category": "girder", "unit": "Unit {u}" }, { "level": "assembly", "category": "bearing", "unit": "Unit {u}" } ] },
     { "id": "girder-data", "sheets": "^(GIRDER DATA|GIRDER ELEVATION) - UNIT (?<u>\\d+)", "basis": "Girder data / elevation: plate sizes, splice and stiffener locations",
       "target": [ { "level": "group", "category": "girder", "unit": "Unit {u}" } ] },
     { "id": "welding", "sheets": "^WELDING DETAILS", "basis": "Welding details",
@@ -485,8 +481,10 @@
       "target": [ { "level": "assembly", "category": [ "inspection cable", "inspection walkway" ] } ] },
     { "id": "inspection-cable", "sheets": "^INSPECTION CABLE DETAILS", "basis": "Inspection cable details: wire rope, WT brackets and anchorages",
       "target": [ { "level": "assembly", "category": "inspection cable" } ] },
-    { "id": "inspection-walkway", "sheets": "^INSPECTION WALKWAY DETAILS", "basis": "Inspection walkway details: stringers, grating, rails and posts",
-      "target": [ { "level": "assembly", "category": "inspection walkway" } ] },
+    { "id": "inspection-walkway", "sheets": "^INSPECTION WALKWAY DETAILS", "basis": "Inspection walkway details (Type B: Unit 3 and Ramp G): stringers, grating, rails and posts; Section T-T (PDF 173) is Type B only",
+      "target": [ { "level": "assembly", "category": "inspection walkway", "subtype": "Type B walkway" } ] },
+    { "id": "inspection-walkway-a", "sheets": "^INSPECTION WALKWAY DETAILS", "pages": [ 169, 170, 171, 172, 174 ], "basis": "Inspection walkway details (Type A: Units 1 and 2): typical sections and diaphragm Types 7 / 8 (PDF 169, 174), Sections G-G (170), A-A / K-K (171), R-R (172)",
+      "target": [ { "level": "assembly", "category": "inspection walkway", "subtype": "Type A walkway" } ] },
     { "id": "field-splice", "sheets": "^FIELD SPLICE DETAILS", "basis": "Field splice schedule and details",
       "target": [ { "level": "assembly", "category": "field splice" } ] },
     { "id": "haunch", "sheets": "^FIELD HAUNCH DATA - UNIT (?<u>\\d+)", "basis": "Field haunch data: girder line haunch elevations at every numbered point (compared with the model by check-blocking.csx) and the haunch / cross slope allowances",
@@ -521,18 +519,16 @@
     { "id": "lighting", "sheets": "^LIGHTING DETAILS", "basis": "Lighting: pole bases (anchor bolts, block, reinforcing), junction boxes, conduit in the barrier (poles and luminaires not in the contract)",
       "target": [ { "level": "assembly", "category": [ "pole base", "junction box", "conduit" ] } ] },
     { "id": "barrier-unit", "sheets": "^BARRIER RAIL DETAILS - UNIT (?<u>\\d+)", "basis": "Barrier rail of the unit (concrete and its reinforcing)",
-      "target": [ { "level": "group", "category": "barrier group", "unit": "Unit {u}" } ] },
-    { "id": "barrier-aesthetics", "sheets": "^BARRIER RAIL AESTHETIC DETAILS", "role": "general", "basis": "Barrier rail surface treatment (form liner / recess; not modeled)",
-      "target": [ { "level": "group", "category": "barrier group" } ] },
-    { "id": "barrier-all", "sheets": "^BARRIER RAIL DETAILS$", "basis": "Barrier rail details",
-      "target": [ { "level": "group", "category": "barrier group" } ] }
+      "target": [ { "level": "group", "category": "barrier group", "unit": "Unit {u}" } ] }
   ],
 
   "hints": [
     { "sheets": "BNSF SHORING", "suggests": "Temporary works: shoring next to the railroad. No temporary / construction-stage elements in the model." },
     { "sheets": "SIGN SUPPORT|EXIT SIGN", "suggests": "Sign structures: sign supports, brackets, bases and foundations on the bridge (I-80). No sign support element is linked to this sheet." },
+    { "sheets": "ESTIMATED QUANTITIES|SUMMARY OF ITEMIZED", "suggests": "Bid quantities: not used to build or check any element (the model computes its own quantities)." },
     { "sheets": "MOMENT & REACTION", "suggests": "Design reactions and moments: load data for bearings and girders. No load/reaction properties on bearings or girders yet." },
     { "sheets": "CRASH CUSHION", "suggests": "Crash cushion / end post at barrier ends (Ramp A, Ramp G). Not modeled." },
+    { "sheets": "LONGITUDINAL SECTION", "suggests": "Longitudinal section (joint / bearing settings at 10 / 50 / 90 F): not used; supports come from the steel layouts and staking." },
     { "sheets": "BARRIER RAIL AESTHETIC", "suggests": "Barrier rail surface treatment (form liner, recess). Barrier is the plain SSTR profile." },
     { "sheets": "LIGHTING", "suggests": "Bridge lighting: poles, bases, conduit and junction boxes. Not modeled." },
     { "sheets": "MACADAM|SLOPE PROTECTION", "suggests": "Slope protection under the bridge at the abutments (macadam stone). No slope-protection / earthwork elements." },

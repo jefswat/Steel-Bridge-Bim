@@ -90,8 +90,8 @@
   "administrative": [ "^TITLE SHEET", "^PACKAGING OVERVIEW" ],
 
   "rules": [
-    { "id": "general-notes", "sheets": "^(ESTIMATED QUANTITIES|SUMMARY OF ITEMIZED QUANTITIES|GENERAL NOTES)", "role": "general",
-      "basis": "General notes (weathering steel, HPS 70W at the cap, jacking, painting girder A), estimated and itemized quantities", "target": [ { "level": "unit" } ] },
+    { "id": "general-notes", "sheets": "^(ESTIMATED QUANTITIES|GENERAL NOTES)", "role": "general",
+      "basis": "General notes (weathering steel, HPS 70W at the cap, jacking, painting girder A) and estimated quantities (the itemized summary, sheet 2, was not used)", "target": [ { "level": "unit" } ] },
     { "id": "situation", "sheets": "^SITUATION PLAN", "role": "general", "basis": "Situation plan: curve data, profile, superelevation, berm table, GPS location",
       "target": [ { "level": "alignment", "bridge_group": "CL Nebraska St. Ramp B" }, { "level": "unit" } ] },
     { "id": "staking", "sheets": "^STAKING DIAGRAM", "role": "general", "basis": "Staking diagram: support lines to the chord between abutments, footing positions",
@@ -100,15 +100,13 @@
     { "id": "pier-1", "sheets": "^PIER NO\\. 1 DETAILS", "basis": "Pier 1: cap, pedestals, end walls, columns, footings, piles and reinforcing",
       "target": [ { "level": "part", "category": "pier", "support": "Pier 1" } ] },
     { "id": "pier-2", "sheets": "^PIER NO\\. 2 DETAILS", "basis": "Pier 2: two turned columns, pedestals under the cap bearings, footings, piles (no concrete cap)",
-      "target": [ { "level": "part", "category": "pier", "support": "Pier 2" }, { "level": "group", "category": "integral steel cap group" } ] },
+      "target": [ { "level": "part", "category": "pier", "support": "Pier 2" } ] },
     { "id": "pier-notes", "sheets": "^PIER DETAILS \\(NOTES", "basis": "Pier notes, footing and pile notes, uplift anchors, bar lists",
       "target": [ { "level": "element", "category": [ "footing", "pile" ], "support": "Pier%" } ] },
     { "id": "pier-1-aesthetics", "sheets": "^PIER NO\\. 1 AESTHETIC DETAILS", "basis": "Integral thin veneer brick on the pier 1 columns and cap (Details A / B, mockup)",
       "target": [ { "level": "element", "category": "thin brick", "support": "Pier 1" }, { "level": "group", "category": "surface treatment", "name": "%thin veneer brick%" } ] },
     { "id": "pier-2-aesthetics", "sheets": "^PIER NO\\. 2 AESTHETIC DETAILS", "basis": "Integral thin veneer brick on the pier 2 columns",
       "target": [ { "level": "element", "category": "thin brick", "support": "Pier 2" } ] },
-    { "id": "terra-cotta", "sheets": "^TERRA COTTA DETAILS", "basis": "Terra cotta panels in the pier blockouts (LS item; not modeled)",
-      "target": [ { "level": "element", "category": "column", "support": "Pier%" } ] },
 
     { "id": "south-abutment", "sheets": "^SOUTH ABUTMENT DETAILS", "basis": "South stub abutment: footing, backwall, steps, piles",
       "target": [ { "level": "part", "category": "abutment", "support": "S%Abut%" } ] },
@@ -139,8 +137,6 @@
       "target": [ { "level": "assembly", "category": "cross frame" } ] },
     { "id": "field-splice", "sheets": "^FIELD SPLICE DETAILS", "basis": "Field splice schedule and details",
       "target": [ { "level": "assembly", "category": "field splice" } ] },
-    { "id": "reactions", "sheets": "^MOMENT & REACTION TABLE", "role": "general", "basis": "Design moments and bearing reactions",
-      "target": [ { "level": "group", "category": "girder" }, { "level": "assembly", "category": "bearing" } ] },
     { "id": "camber-blocking", "sheets": "^CAMBER AND BLOCKING", "basis": "Camber, deflection ordinates (incl. the deflecting pier 2) and blocking per girder",
       "target": [ { "level": "group", "category": "girder" } ] },
     { "id": "haunch", "sheets": "^FIELD HAUNCH DATA", "basis": "Girder line haunch elevations and allowances",
@@ -168,6 +164,7 @@
     { "sheets": "BACKFILL", "suggests": "EPS abutment backfill: not modeled." },
     { "sheets": "SLOPE PROTECTION", "suggests": "Concrete slope protection: not modeled." },
     { "sheets": "SOIL PROFILE", "suggests": "Soil borings: no geotechnical elements." },
-    { "sheets": "TERRA COTTA", "suggests": "Terra cotta panels (LS item): not modeled; the pier blockouts are not cut." }
+    { "sheets": "TERRA COTTA", "suggests": "Terra cotta panels (LS item): not modeled; the pier blockouts are not cut." },
+    { "sheets": "MOMENT & REACTION", "suggests": "Design moments and bearing reactions (table not transcribed, G11): no load / reaction properties on girders or bearings." }
   ]
 }

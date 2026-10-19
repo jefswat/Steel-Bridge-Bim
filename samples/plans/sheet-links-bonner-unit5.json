@@ -743,36 +743,10 @@
   "administrative": [],
   "rules": [
     {
-      "id": "general",
-      "sheets": "^GENERAL DRAWING INDEX OF SHEETS - NAVIGATION UNIT",
-      "role": "general",
-      "basis": "Unit 5 sheet index, general notes for the navigation unit",
-      "target": [
-        {
-          "level": "unit"
-        }
-      ]
-    },
-    {
       "id": "foundation-layout",
       "sheets": "^GENERAL DRAWING FOUNDATION LAYOUT - UNIT 5",
       "role": "general",
-      "basis": "Bent stations, footing plans (51'-0 x 36'-0, octagon 58'-6 at bents 23 / 24), pile layout and batter, curve 2 data",
-      "target": [
-        {
-          "level": "alignment",
-          "bridge_group": "-L- (NC 12)"
-        },
-        {
-          "level": "element",
-          "category": "footing"
-        }
-      ]
-    },
-    {
-      "id": "pile-data",
-      "sheets": "^PILE DATA UNIT 5",
-      "basis": "36 in sq PS pile data (piles not modeled: counts on the footings)",
+      "basis": "Bent stations, footing plans (51'-0 x 36'-0, octagon 58'-6 at bents 23 / 24), pile counts and batter (piers.csv, p251-253)",
       "target": [
         {
           "level": "element",
@@ -839,20 +813,9 @@
       ]
     },
     {
-      "id": "typical-reinforcement",
-      "sheets": "^TYPICAL SEGMENT REINFORCEMENT",
-      "basis": "Typical segment bars (not modeled)",
-      "target": [
-        {
-          "level": "part",
-          "category": "typical segment"
-        }
-      ]
-    },
-    {
       "id": "end-segment",
-      "sheets": "^END SEGMENT (DIMENSIONS|POST-TENSIONING DETAILS|REINFORCEMENT)",
-      "basis": "End segment 8'-8: diaphragm, blockout, E1-E4, vertical bars",
+      "sheets": "^END SEGMENT DIMENSIONS",
+      "basis": "End segment 8'-8 x 9'-0, 110 ton (p271); reinforcement / PT sheets not modeled",
       "target": [
         {
           "level": "part",
@@ -862,8 +825,8 @@
     },
     {
       "id": "bent-segment",
-      "sheets": "^BENT SEGMENT (DIMENSIONS|POST-TENSIONING DETAILS|REINFORCEMENT)",
-      "basis": "Split bent segment: 19'-3 at the CL, diaphragm, F1 / F2, PT bars",
+      "sheets": "^BENT SEGMENT DIMENSIONS",
+      "basis": "Split bent segment 19'-3 at the CL, 5'-0 halves, 100 ton (p277); reinforcement / PT sheets not modeled",
       "target": [
         {
           "level": "part",
@@ -885,7 +848,7 @@
     {
       "id": "transverse-pt",
       "sheets": "^TRANSVERSE POST-TENSIONING DETAILS",
-      "basis": "Transverse tendons 4 x 0.6, 41'-7, quantities 121,624 lb",
+      "basis": "Transverse tendons 4 x 0.6, 41'-7, counts per segment type and quantities 121,624 lb (p282, check script S3-34)",
       "target": [
         {
           "level": "element",
@@ -894,23 +857,36 @@
       ]
     },
     {
-      "id": "shear-keys",
+      "id": "transverse-pt-end",
+      "sheets": "^END SEGMENT POST-TENSIONING DETAILS",
+      "basis": "End segment transverse tendons E1-E4 (4 x 0.6, 41'-7, 45.5 kip; check-bonner-unit5 section 5, S3-24)",
+      "target": [
+        {
+          "level": "element",
+          "category": "transverse tendon",
+          "name": "%-ES E%"
+        }
+      ]
+    },
+    {
+      "id": "transverse-pt-bent",
+      "sheets": "^BENT SEGMENT POST-TENSIONING DETAILS",
+      "basis": "Bent segment transverse tendons F1 / F2 (check-bonner-unit5 section 5, S3-30; number of bent segments UNRESOLVED p278)",
+      "target": [
+        {
+          "level": "element",
+          "category": "transverse tendon",
+          "name": [
+            "%-DB F%",
+            "%-UB F%"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "duct-grid",
       "sheets": "^BULKHEAD AND SHEAR KEY DETAILS",
-      "basis": "Duct grid rows A / B / C, web keys (keys not modeled)",
-      "target": [
-        {
-          "level": "part",
-          "category": [
-            "typical segment",
-            "bent segment"
-          ]
-        }
-      ]
-    },
-    {
-      "id": "long-pt",
-      "sheets": "^LONGITUDINAL POST-TENSIONING (NOTES|LAYOUT|GEOMETRY DETAILS|SCHEDULE)",
-      "basis": "Cantilever T1-T14, bottom B1-B7, closure C1-C2: layout, anchor segments, schedule",
+      "basis": "Duct grid rows A / B / C of the bulkhead (S3-35, p283) used for the tendon duct offsets and depths; shear / alignment keys not modeled",
       "target": [
         {
           "level": "element",
@@ -923,9 +899,9 @@
       ]
     },
     {
-      "id": "pt-details",
-      "sheets": "^POST-TENSIONING DETAILS$",
-      "basis": "Anchorage / duct details",
+      "id": "long-pt-schedule",
+      "sheets": "^LONGITUDINAL POST-TENSIONING SCHEDULE",
+      "basis": "Cantilever T1-T14, bottom B1-B7, closure C1-C2: strands, lengths, jacking (pt-tendon-schedule.csv, S3-57 / S3-58)",
       "target": [
         {
           "level": "element",
@@ -938,34 +914,20 @@
       ]
     },
     {
-      "id": "anchor-blocks",
-      "sheets": "^(BOTTOM SLAB ANCHOR BLOCK|TOP SLAB ANCHOR BLOCK|DEVIATION BLOCK)",
-      "basis": "Anchor / deviation blocks (not modeled)",
+      "id": "long-pt-layout",
+      "sheets": "^LONGITUDINAL POST-TENSIONING LAYOUT",
+      "basis": "Cantilever tendon anchor segments read from the T-label positions (cantilever-tendon-anchors.csv, p285-296); B / C layouts are drawn without anchor stations (not used)",
       "target": [
         {
           "level": "element",
-          "category": [
-            "bottom continuity tendon",
-            "closure tendon"
-          ]
-        }
-      ]
-    },
-    {
-      "id": "erection",
-      "sheets": "^(CONSTRUCTION SEQUENCE|ERECTION PROCEDURE)",
-      "basis": "Balanced cantilever sequence (contractor information)",
-      "target": [
-        {
-          "level": "assembly",
-          "category": "segmental cantilever"
+          "category": "cantilever tendon"
         }
       ]
     },
     {
       "id": "bearings",
-      "sheets": "^BEARING (DETAILS|REPLACEMENT DETAILS)",
-      "basis": "Disc bearings: types I / II / III, assumed heights, masonry plate max sizes",
+      "sheets": "^BEARING DETAILS",
+      "basis": "Disc bearings: types I / II / III (p317), masonry plate maxima (p318), design data and assumed heights (p319)",
       "target": [
         {
           "level": "element",
@@ -974,20 +936,9 @@
       ]
     },
     {
-      "id": "expansion-joint",
-      "sheets": "^MODULAR EXPANSION JOINT SEAL DETAILS",
-      "basis": "Joint at bents 18 / 29 (devices not modeled)",
-      "target": [
-        {
-          "level": "part",
-          "category": "end segment"
-        }
-      ]
-    },
-    {
       "id": "bents-18-29",
-      "sheets": "^SUBSTRUCTURE (BENTS 18 & 29|PRECAST BENT CAP DETAILS - BENT (18|29)|PRECAST COLUMN SEGMENT DETAILS BENTS 18 & 29)",
-      "basis": "End bents: T-shaped cap, column segments, footing, pedestal tops",
+      "sheets": "^SUBSTRUCTURE BENTS 18 & 29",
+      "basis": "End bents: footing, column base, top of bent / footing elevations (S3-86 p334) and bill of material (p336)",
       "target": [
         {
           "level": "part",
@@ -997,6 +948,31 @@
             "Bent 29"
           ]
         }
+      ],
+      "pages": [
+        334,
+        336
+      ]
+    },
+    {
+      "id": "caps-columns-18-29",
+      "sheets": "^(SUBSTRUCTURE PRECAST BENT CAP DETAILS - BENT (18|29)|SUBSTRUCTURE PRECAST COLUMN SEGMENT DETAILS BENTS 18 & 29)",
+      "basis": "End bents: T-shaped cap (p354 bent 18, p371 bent 29), bearing lines 8'-3 each side, precast column segments (p376-377)",
+      "target": [
+        {
+          "level": "part",
+          "category": "pier",
+          "support": [
+            "Bent 18",
+            "Bent 29"
+          ]
+        }
+      ],
+      "pages": [
+        354,
+        371,
+        376,
+        377
       ]
     },
     {
@@ -1011,6 +987,10 @@
             "Bent 19"
           ]
         }
+      ],
+      "pages": [
+        337,
+        339
       ]
     },
     {
@@ -1027,6 +1007,10 @@
             "Bent 22"
           ]
         }
+      ],
+      "pages": [
+        340,
+        342
       ]
     },
     {
@@ -1042,6 +1026,10 @@
             "Bent 24"
           ]
         }
+      ],
+      "pages": [
+        343,
+        347
       ]
     },
     {
@@ -1056,6 +1044,10 @@
             "Bent 25"
           ]
         }
+      ],
+      "pages": [
+        348,
+        350
       ]
     },
     {
@@ -1072,6 +1064,10 @@
             "Bent 28"
           ]
         }
+      ],
+      "pages": [
+        351,
+        353
       ]
     },
     {
@@ -1089,6 +1085,9 @@
             "Bent 22"
           ]
         }
+      ],
+      "pages": [
+        359
       ]
     },
     {
@@ -1104,6 +1103,9 @@
             "Bent 24"
           ]
         }
+      ],
+      "pages": [
+        363
       ]
     },
     {
@@ -1121,6 +1123,9 @@
             "Bent 28"
           ]
         }
+      ],
+      "pages": [
+        367
       ]
     },
     {
