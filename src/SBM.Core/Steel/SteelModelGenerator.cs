@@ -613,7 +613,12 @@ public sealed partial class SteelModelGenerator
             StiffenerKind.ConnectionPlate => (PartCategory.ConnectionStiffener, "CS", "Connection stiffener"),
             _ => (PartCategory.IntermediateStiffener, "IS", "Intermediate stiffener"),
         };
-        double flangeW = Math.Min(_top[s.Girder].Width(s.GirderDistance), _bot[s.Girder].Width(s.GirderDistance));
+        double topW = _top[s.Girder].Width(s.GirderDistance), botW = _bot[s.Girder].Width(s.GirderDistance);
+        // ClipToTopFlange: the plate may be wider than the top flange (clipped below), so only the bottom flange limits it
+        double flangeW = sd.ClipToTopFlange ? botW : Math.Min(topW, botW);
+        // plate-frame x of the top flange edge (the plate runs along u, the flange edge is flangeW/2 from the web centre line across the girder)
+        double xe = topW / 2 / Math.Max(sin, 0.2);
+        bool clipTop = sd.ClipToTopFlange && xf + c < xe - 1e-4 && xf + w > xe + 1e-4;
         if ((xf + w) * sin > flangeW / 2 + 1e-4)
             Warn($"{g.Name}: {label.ToLowerInvariant()} at {_u.FormatStation(sta)} projects beyond the flange edge (skewed {Numerics.RadToDeg(s.SkewAngle):F1}°).");
 
@@ -627,7 +632,10 @@ public sealed partial class SteelModelGenerator
         {
             if (side == 1 && s.Side is not (StiffenerSide.Both or StiffenerSide.Right)) continue;
             if (side == -1 && s.Side is not (StiffenerSide.Both or StiffenerSide.Left)) continue;
-            var poly = new List<Vec2> { new(xf, -c), new(xf + c, 0), new(xf + w, 0), new(xf + w, -h) };
+            var poly = new List<Vec2> { new(xf, -c), new(xf + c, 0) };
+            if (clipTop) { poly.Add(new Vec2(xe, 0)); poly.Add(new Vec2(xf + w, -(xf + w - xe))); }   // 45 deg back to the top flange edge (p.32 Sect. A-A)
+            else poly.Add(new Vec2(xf + w, 0));
+            poly.Add(new Vec2(xf + w, -h));
             if (weldBottom) { poly.Add(new Vec2(xf + c, -h)); poly.Add(new Vec2(xf, -h + c)); }
             else poly.Add(new Vec2(xf, -h));
             var pts = poly.Select(q => new Vec2(q.X * side, q.Y)).ToList();
@@ -644,13 +652,13 @@ public sealed partial class SteelModelGenerator
                 var webLeg = Vec3.Dot(tang3, nrm) >= 0 ? tang3 : -tang3;
                 var off = nrm * (tp / 2);
                 welds.AddWeld(frame.ToWorld(side * xf, -c, 0) + off, frame.ToWorld(side * xf, weldBottom ? -h + c : -h, 0) + off, webLeg, along, a);
-                welds.AddWeld(frame.ToWorld(side * (xf + c), 0, 0) + off, frame.ToWorld(side * (xf + w), 0, 0) + off, -frame.Y, nrm, a);
+                welds.AddWeld(frame.ToWorld(side * (xf + c), 0, 0) + off, frame.ToWorld(side * (clipTop ? xe : xf + w), 0, 0) + off, -frame.Y, nrm, a);
                 if (weldBottom)
                     welds.AddWeld(frame.ToWorld(side * (xf + c), -h, 0) + off, frame.ToWorld(side * (xf + w), -h, 0) + off, frame.Y, nrm, a);
             }
         }
         if (mesh.IsEmpty) return;
-        string desc = Pl(w, tp) + (s.SkewAngle > Numerics.DegToRad(0.5) ? $", skewed {Numerics.RadToDeg(s.SkewAngle):F1}°" : "")
+        string desc = Pl(w, tp) + (clipTop ? $" (outer top corner clipped to the {In(topW)} top flange)" : "") + (s.SkewAngle > Numerics.DegToRad(0.5) ? $", skewed {Numerics.RadToDeg(s.SkewAngle):F1}°" : "")
                       + (s.Side == StiffenerSide.Both ? " (pair)" : "");
         _parts.Add(new SteelPart { Mark = $"{mark}-{code}{n}", Category = cat, Assembly = mark, Description = desc, Mesh = mesh, Length = h });
         _parts.Add(new SteelPart
