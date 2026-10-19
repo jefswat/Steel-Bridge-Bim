@@ -10037,14 +10037,15 @@
                   }
                 ],
                 "Base": "CapTop",
-                "TopElevation": 163.0006392,
+                "TopElevation": 162.93926947784325,
                 "TopRefS": 0,
                 "TopSlopeS": 0,
                 "Source": "p.102 / sh 153 EL. A",
                 "SeatS": 2.8194000000000004,
                 "SeatN": 0.174625,
                 "Reported": [
-                  "B1-B3 (p.102, 107, 119, 124): plan pedestal top 534.779 vs tie WP 535.74 - 2\u0022 steel - 11.75\u0022 bearing = 534.594 (\u002B0.185 ft); the plan top is modeled (p.107 note 8: pedestal elevations to be adjusted to the fabricated bearing)."
+                  "B1-B3 (p.102, 107, 119, 124): plan pedestal top 534.779 vs tie WP 535.74 - 2\u0022 steel - 11.75\u0022 bearing = 534.594 (\u002B0.185 ft); the plan top is modeled (p.107 note 8: pedestal elevations to be adjusted to the fabricated bearing).",
+                  "CONFLICT (p.102 vs p.107): arch pedestal \u0027arch bearing south\u0027 of Pier 10: top modeled at EL 534.578\u0027 = bottom of the arch bearing SW (pad on the conc. brg. surface, stack 11 3/4\u0022 hung from the steel, p.107 Section A-A / table H) instead of the p.102 EL 534.779\u0027 (2.42\u0022 lower) - p.107 note 8 / p.102 note 1: the contractor adjusts the pedestal elevations to the fabricated bearing."
                 ]
               },
               {
@@ -10085,14 +10086,15 @@
                   }
                 ],
                 "Base": "CapTop",
-                "TopElevation": 162.98448480000002,
+                "TopElevation": 162.93925348303222,
                 "TopRefS": 0,
                 "TopSlopeS": 0,
                 "Source": "p.102 / sh 153 EL. E",
                 "SeatS": -3.1273750000000002,
                 "SeatN": 0.174625,
                 "Reported": [
-                  "B1-B3 (p.102, 107, 119, 124): plan pedestal top 534.726 vs tie WP 535.74 - 2\u0022 steel - 11.75\u0022 bearing = 534.594 (\u002B0.132 ft); the plan top is modeled (p.107 note 8: pedestal elevations to be adjusted to the fabricated bearing)."
+                  "B1-B3 (p.102, 107, 119, 124): plan pedestal top 534.726 vs tie WP 535.74 - 2\u0022 steel - 11.75\u0022 bearing = 534.594 (\u002B0.132 ft); the plan top is modeled (p.107 note 8: pedestal elevations to be adjusted to the fabricated bearing).",
+                  "CONFLICT (p.102 vs p.107): arch pedestal \u0027arch bearing north\u0027 of Pier 10: top modeled at EL 534.578\u0027 = bottom of the arch bearing NW (pad on the conc. brg. surface, stack 11 3/4\u0022 hung from the steel, p.107 Section A-A / table H) instead of the p.102 EL 534.726\u0027 (1.78\u0022 lower) - p.107 note 8 / p.102 note 1: the contractor adjusts the pedestal elevations to the fabricated bearing."
                 ]
               }
             ],
@@ -11469,18 +11471,18 @@
                   "CoverTop": "NaN",
                   "CheckCover": true,
                   "Bars": [
-                    "2.7656,-0.2701,161.9719 2.7656,-0.2701,162.9292 2.4912,-0.1303,162.9292 2.4912,-0.1303,161.9719",
-                    "2.842,-0.1202,161.9719 2.842,-0.1202,162.9292 2.5676,0.0196,162.9292 2.5676,0.0196,161.9719",
-                    "2.9184,0.0297,161.9719 2.9184,0.0297,162.9292 2.644,0.1696,162.9292 2.644,0.1696,161.9719",
-                    "2.9948,0.1797,161.9719 2.9948,0.1797,162.9292 2.7204,0.3195,162.9292 2.7204,0.3195,161.9719",
-                    "3.0712,0.3296,161.9719 3.0712,0.3296,162.9292 2.7968,0.4694,162.9292 2.7968,0.4694,161.9719",
-                    "3.1476,0.4796,161.9719 3.1476,0.4796,162.9292 2.8732,0.6194,162.9292 2.8732,0.6194,161.9719",
-                    "-3.1812,-0.2701,161.9558 -3.1812,-0.2701,162.913 -3.4556,-0.1303,162.913 -3.4556,-0.1303,161.9558",
-                    "-3.1048,-0.1202,161.9558 -3.1048,-0.1202,162.913 -3.3792,0.0196,162.913 -3.3792,0.0196,161.9558",
-                    "-3.0284,0.0297,161.9558 -3.0284,0.0297,162.913 -3.3028,0.1696,162.913 -3.3028,0.1696,161.9558",
-                    "-2.952,0.1797,161.9558 -2.952,0.1797,162.913 -3.2264,0.3195,162.913 -3.2264,0.3195,161.9558",
-                    "-2.8756,0.3296,161.9558 -2.8756,0.3296,162.913 -3.15,0.4694,162.913 -3.15,0.4694,161.9558",
-                    "-2.7992,0.4796,161.9558 -2.7992,0.4796,162.913 -3.0736,0.6194,162.913 -3.0736,0.6194,161.9558"
+                    "2.7656,-0.2701,161.9106 2.7656,-0.2701,162.8678 2.4912,-0.1303,162.8678 2.4912,-0.1303,161.9106",
+                    "2.842,-0.1202,161.9106 2.842,-0.1202,162.8678 2.5676,0.0196,162.8678 2.5676,0.0196,161.9106",
+                    "2.9184,0.0297,161.9106 2.9184,0.0297,162.8678 2.644,0.1696,162.8678 2.644,0.1696,161.9106",
+                    "2.9948,0.1797,161.9106 2.9948,0.1797,162.8678 2.7204,0.3195,162.8678 2.7204,0.3195,161.9106",
+                    "3.0712,0.3296,161.9106 3.0712,0.3296,162.8678 2.7968,0.4694,162.8678 2.7968,0.4694,161.9106",
+                    "3.1476,0.4796,161.9106 3.1476,0.4796,162.8678 2.8732,0.6194,162.8678 2.8732,0.6194,161.9106",
+                    "-3.1812,-0.2701,161.9106 -3.1812,-0.2701,162.8678 -3.4556,-0.1303,162.8678 -3.4556,-0.1303,161.9106",
+                    "-3.1048,-0.1202,161.9106 -3.1048,-0.1202,162.8678 -3.3792,0.0196,162.8678 -3.3792,0.0196,161.9106",
+                    "-3.0284,0.0297,161.9106 -3.0284,0.0297,162.8678 -3.3028,0.1696,162.8678 -3.3028,0.1696,161.9106",
+                    "-2.952,0.1797,161.9106 -2.952,0.1797,162.8678 -3.2264,0.3195,162.8678 -3.2264,0.3195,161.9106",
+                    "-2.8756,0.3296,161.9106 -2.8756,0.3296,162.8678 -3.15,0.4694,162.8678 -3.15,0.4694,161.9106",
+                    "-2.7992,0.4796,161.9106 -2.7992,0.4796,162.8678 -3.0736,0.6194,162.8678 -3.0736,0.6194,161.9106"
                   ],
                   "Spirals": [],
                   "Unplaced": 0,
@@ -11505,11 +11507,11 @@
                   "CoverTop": "NaN",
                   "CheckCover": true,
                   "Bars": [
-                    "2.8976,0.5441,162.9292 2.8662,0.6407,162.9292 2.4699,-0.1372,162.9292 2.7726,-0.2915,162.9292 3.1689,0.4865,162.9292 2.8662,0.6407,162.9371 2.8976,0.5441,162.9451",
-                    "2.8976,0.5441,162.7629 2.8662,0.6407,162.7629 2.4699,-0.1372,162.7629 2.7726,-0.2915,162.7629 3.1689,0.4865,162.7629 2.8662,0.6407,162.7708 2.8976,0.5441,162.7788",
+                    "2.8976,0.5441,162.8678 2.8662,0.6407,162.8678 2.4699,-0.1372,162.8678 2.7726,-0.2915,162.8678 3.1689,0.4865,162.8678 2.8662,0.6407,162.8758 2.8976,0.5441,162.8837",
+                    "2.8976,0.5441,162.7322 2.8662,0.6407,162.7322 2.4699,-0.1372,162.7322 2.7726,-0.2915,162.7322 3.1689,0.4865,162.7322 2.8662,0.6407,162.7401 2.8976,0.5441,162.7481",
                     "2.8976,0.5441,162.5966 2.8662,0.6407,162.5966 2.4699,-0.1372,162.5966 2.7726,-0.2915,162.5966 3.1689,0.4865,162.5966 2.8662,0.6407,162.6045 2.8976,0.5441,162.6125",
-                    "-3.0491,0.5441,162.913 -3.0805,0.6407,162.913 -3.4769,-0.1372,162.913 -3.1742,-0.2915,162.913 -2.7778,0.4865,162.913 -3.0805,0.6407,162.921 -3.0491,0.5441,162.9289",
-                    "-3.0491,0.5441,162.7548 -3.0805,0.6407,162.7548 -3.4769,-0.1372,162.7548 -3.1742,-0.2915,162.7548 -2.7778,0.4865,162.7548 -3.0805,0.6407,162.7628 -3.0491,0.5441,162.7707",
+                    "-3.0491,0.5441,162.8678 -3.0805,0.6407,162.8678 -3.4769,-0.1372,162.8678 -3.1742,-0.2915,162.8678 -2.7778,0.4865,162.8678 -3.0805,0.6407,162.8758 -3.0491,0.5441,162.8837",
+                    "-3.0491,0.5441,162.7322 -3.0805,0.6407,162.7322 -3.4769,-0.1372,162.7322 -3.1742,-0.2915,162.7322 -2.7778,0.4865,162.7322 -3.0805,0.6407,162.7401 -3.0491,0.5441,162.7481",
                     "-3.0491,0.5441,162.5966 -3.0805,0.6407,162.5966 -3.4769,-0.1372,162.5966 -3.1742,-0.2915,162.5966 -2.7778,0.4865,162.5966 -3.0805,0.6407,162.6045 -3.0491,0.5441,162.6125"
                   ],
                   "Spirals": [],
@@ -11539,12 +11541,12 @@
                   "CoverTop": "NaN",
                   "CheckCover": true,
                   "Bars": [
-                    "2.7757,-0.2503,161.9561 2.7757,-0.2503,162.9133 3.1375,0.4597,162.9133 3.1375,0.4597,161.9561",
-                    "2.6385,-0.1804,161.9561 2.6385,-0.1804,162.9133 3.0003,0.5297,162.9133 3.0003,0.5297,161.9561",
-                    "2.5013,-0.1105,161.9561 2.5013,-0.1105,162.9133 2.8631,0.5996,162.9133 2.8631,0.5996,161.9561",
-                    "-3.1711,-0.2503,161.9399 -3.1711,-0.2503,162.8972 -2.8093,0.4597,162.8972 -2.8093,0.4597,161.9399",
-                    "-3.3083,-0.1804,161.9399 -3.3083,-0.1804,162.8972 -2.9465,0.5297,162.8972 -2.9465,0.5297,161.9399",
-                    "-3.4455,-0.1105,161.9399 -3.4455,-0.1105,162.8972 -3.0837,0.5996,162.8972 -3.0837,0.5996,161.9399"
+                    "2.7757,-0.2503,161.8947 2.7757,-0.2503,162.852 3.1375,0.4597,162.852 3.1375,0.4597,161.8947",
+                    "2.6385,-0.1804,161.8947 2.6385,-0.1804,162.852 3.0003,0.5297,162.852 3.0003,0.5297,161.8947",
+                    "2.5013,-0.1105,161.8947 2.5013,-0.1105,162.852 2.8631,0.5996,162.852 2.8631,0.5996,161.8947",
+                    "-3.1711,-0.2503,161.8947 -3.1711,-0.2503,162.8519 -2.8093,0.4597,162.8519 -2.8093,0.4597,161.8947",
+                    "-3.3083,-0.1804,161.8947 -3.3083,-0.1804,162.8519 -2.9465,0.5297,162.8519 -2.9465,0.5297,161.8947",
+                    "-3.4455,-0.1105,161.8947 -3.4455,-0.1105,162.8519 -3.0837,0.5996,162.8519 -3.0837,0.5996,161.8947"
                   ],
                   "Spirals": [],
                   "Unplaced": 0,
@@ -14801,14 +14803,15 @@
                   }
                 ],
                 "Base": "CapTop",
-                "TopElevation": 161.9993712,
+                "TopElevation": 161.95546626566906,
                 "TopRefS": 0,
                 "TopSlopeS": 0,
                 "Source": "p.102 / sh 153 EL. E",
                 "SeatS": 3.1273750000000002,
                 "SeatN": -0.174625,
                 "Reported": [
-                  "B1-B3 (p.102, 107, 119, 124): plan pedestal top 531.494 vs tie WP 532.49 - 2\u0022 steel - 11.75\u0022 bearing = 531.344 (\u002B0.150 ft); the plan top is modeled (p.107 note 8: pedestal elevations to be adjusted to the fabricated bearing)."
+                  "B1-B3 (p.102, 107, 119, 124): plan pedestal top 531.494 vs tie WP 532.49 - 2\u0022 steel - 11.75\u0022 bearing = 531.344 (\u002B0.150 ft); the plan top is modeled (p.107 note 8: pedestal elevations to be adjusted to the fabricated bearing).",
+                  "CONFLICT (p.102 vs p.107): arch pedestal \u0027arch bearing south\u0027 of Pier 11: top modeled at EL 531.350\u0027 = bottom of the arch bearing SE (pad on the conc. brg. surface, stack 11 3/4\u0022 hung from the steel, p.107 Section A-A / table H) instead of the p.102 EL 531.494\u0027 (1.73\u0022 lower) - p.107 note 8 / p.102 note 1: the contractor adjusts the pedestal elevations to the fabricated bearing."
                 ]
               },
               {
@@ -14849,14 +14852,15 @@
                   }
                 ],
                 "Base": "CapTop",
-                "TopElevation": 162.01522080000004,
+                "TopElevation": 161.95545027085802,
                 "TopRefS": 0,
                 "TopSlopeS": 0,
                 "Source": "p.102 / sh 153 EL. A",
                 "SeatS": -2.8194000000000004,
                 "SeatN": -0.174625,
                 "Reported": [
-                  "B1-B3 (p.102, 107, 119, 124): plan pedestal top 531.546 vs tie WP 532.49 - 2\u0022 steel - 11.75\u0022 bearing = 531.344 (\u002B0.202 ft); the plan top is modeled (p.107 note 8: pedestal elevations to be adjusted to the fabricated bearing)."
+                  "B1-B3 (p.102, 107, 119, 124): plan pedestal top 531.546 vs tie WP 532.49 - 2\u0022 steel - 11.75\u0022 bearing = 531.344 (\u002B0.202 ft); the plan top is modeled (p.107 note 8: pedestal elevations to be adjusted to the fabricated bearing).",
+                  "CONFLICT (p.102 vs p.107): arch pedestal \u0027arch bearing north\u0027 of Pier 11: top modeled at EL 531.350\u0027 = bottom of the arch bearing NE (pad on the conc. brg. surface, stack 11 3/4\u0022 hung from the steel, p.107 Section A-A / table H) instead of the p.102 EL 531.546\u0027 (2.35\u0022 lower) - p.107 note 8 / p.102 note 1: the contractor adjusts the pedestal elevations to the fabricated bearing."
                 ]
               }
             ],
@@ -16025,18 +16029,18 @@
                   "CoverTop": "NaN",
                   "CheckCover": true,
                   "Bars": [
-                    "3.0736,-0.6194,160.9707 3.0736,-0.6194,161.9279 2.7992,-0.4796,161.9279 2.7992,-0.4796,160.9707",
-                    "3.15,-0.4694,160.9707 3.15,-0.4694,161.9279 2.8756,-0.3296,161.9279 2.8756,-0.3296,160.9707",
-                    "3.2264,-0.3195,160.9707 3.2264,-0.3195,161.9279 2.952,-0.1797,161.9279 2.952,-0.1797,160.9707",
-                    "3.3028,-0.1696,160.9707 3.3028,-0.1696,161.9279 3.0284,-0.0297,161.9279 3.0284,-0.0297,160.9707",
-                    "3.3792,-0.0196,160.9707 3.3792,-0.0196,161.9279 3.1048,0.1202,161.9279 3.1048,0.1202,160.9707",
-                    "3.4556,0.1303,160.9707 3.4556,0.1303,161.9279 3.1812,0.2701,161.9279 3.1812,0.2701,160.9707",
-                    "-2.8732,-0.6194,160.9865 -2.8732,-0.6194,161.9438 -3.1476,-0.4796,161.9438 -3.1476,-0.4796,160.9865",
-                    "-2.7968,-0.4694,160.9865 -2.7968,-0.4694,161.9438 -3.0712,-0.3296,161.9438 -3.0712,-0.3296,160.9865",
-                    "-2.7204,-0.3195,160.9865 -2.7204,-0.3195,161.9438 -2.9948,-0.1797,161.9438 -2.9948,-0.1797,160.9865",
-                    "-2.644,-0.1696,160.9865 -2.644,-0.1696,161.9438 -2.9184,-0.0297,161.9438 -2.9184,-0.0297,160.9865",
-                    "-2.5676,-0.0196,160.9865 -2.5676,-0.0196,161.9438 -2.842,0.1202,161.9438 -2.842,0.1202,160.9865",
-                    "-2.4912,0.1303,160.9865 -2.4912,0.1303,161.9438 -2.7656,0.2701,161.9438 -2.7656,0.2701,160.9865"
+                    "3.0736,-0.6194,160.9268 3.0736,-0.6194,161.884 2.7992,-0.4796,161.884 2.7992,-0.4796,160.9268",
+                    "3.15,-0.4694,160.9268 3.15,-0.4694,161.884 2.8756,-0.3296,161.884 2.8756,-0.3296,160.9268",
+                    "3.2264,-0.3195,160.9268 3.2264,-0.3195,161.884 2.952,-0.1797,161.884 2.952,-0.1797,160.9268",
+                    "3.3028,-0.1696,160.9268 3.3028,-0.1696,161.884 3.0284,-0.0297,161.884 3.0284,-0.0297,160.9268",
+                    "3.3792,-0.0196,160.9268 3.3792,-0.0196,161.884 3.1048,0.1202,161.884 3.1048,0.1202,160.9268",
+                    "3.4556,0.1303,160.9268 3.4556,0.1303,161.884 3.1812,0.2701,161.884 3.1812,0.2701,160.9268",
+                    "-2.8732,-0.6194,160.9268 -2.8732,-0.6194,161.884 -3.1476,-0.4796,161.884 -3.1476,-0.4796,160.9268",
+                    "-2.7968,-0.4694,160.9268 -2.7968,-0.4694,161.884 -3.0712,-0.3296,161.884 -3.0712,-0.3296,160.9268",
+                    "-2.7204,-0.3195,160.9268 -2.7204,-0.3195,161.884 -2.9948,-0.1797,161.884 -2.9948,-0.1797,160.9268",
+                    "-2.644,-0.1696,160.9268 -2.644,-0.1696,161.884 -2.9184,-0.0297,161.884 -2.9184,-0.0297,160.9268",
+                    "-2.5676,-0.0196,160.9268 -2.5676,-0.0196,161.884 -2.842,0.1202,161.884 -2.842,0.1202,160.9268",
+                    "-2.4912,0.1303,160.9268 -2.4912,0.1303,161.884 -2.7656,0.2701,161.884 -2.7656,0.2701,160.9268"
                   ],
                   "Spirals": [],
                   "Unplaced": 0,
@@ -16061,11 +16065,11 @@
                   "CoverTop": "NaN",
                   "CheckCover": true,
                   "Bars": [
-                    "3.2056,0.1948,161.9279 3.1742,0.2915,161.9279 2.7778,-0.4865,161.9279 3.0805,-0.6407,161.9279 3.4769,0.1372,161.9279 3.1742,0.2915,161.9359 3.2056,0.1948,161.9438",
-                    "3.2056,0.1948,161.7558 3.1742,0.2915,161.7558 2.7778,-0.4865,161.7558 3.0805,-0.6407,161.7558 3.4769,0.1372,161.7558 3.1742,0.2915,161.7638 3.2056,0.1948,161.7717",
+                    "3.2056,0.1948,161.884 3.1742,0.2915,161.884 2.7778,-0.4865,161.884 3.0805,-0.6407,161.884 3.4769,0.1372,161.884 3.1742,0.2915,161.892 3.2056,0.1948,161.8999",
+                    "3.2056,0.1948,161.7339 3.1742,0.2915,161.7339 2.7778,-0.4865,161.7339 3.0805,-0.6407,161.7339 3.4769,0.1372,161.7339 3.1742,0.2915,161.7418 3.2056,0.1948,161.7498",
                     "3.2056,0.1948,161.5837 3.1742,0.2915,161.5837 2.7778,-0.4865,161.5837 3.0805,-0.6407,161.5837 3.4769,0.1372,161.5837 3.1742,0.2915,161.5917 3.2056,0.1948,161.5996",
-                    "-2.7412,0.1948,161.9438 -2.7726,0.2915,161.9438 -3.1689,-0.4865,161.9438 -2.8662,-0.6407,161.9438 -2.4699,0.1372,161.9438 -2.7726,0.2915,161.9517 -2.7412,0.1948,161.9597",
-                    "-2.7412,0.1948,161.7638 -2.7726,0.2915,161.7638 -3.1689,-0.4865,161.7638 -2.8662,-0.6407,161.7638 -2.4699,0.1372,161.7638 -2.7726,0.2915,161.7717 -2.7412,0.1948,161.7796",
+                    "-2.7412,0.1948,161.884 -2.7726,0.2915,161.884 -3.1689,-0.4865,161.884 -2.8662,-0.6407,161.884 -2.4699,0.1372,161.884 -2.7726,0.2915,161.892 -2.7412,0.1948,161.8999",
+                    "-2.7412,0.1948,161.7339 -2.7726,0.2915,161.7339 -3.1689,-0.4865,161.7339 -2.8662,-0.6407,161.7339 -2.4699,0.1372,161.7339 -2.7726,0.2915,161.7418 -2.7412,0.1948,161.7498",
                     "-2.7412,0.1948,161.5837 -2.7726,0.2915,161.5837 -3.1689,-0.4865,161.5837 -2.8662,-0.6407,161.5837 -2.4699,0.1372,161.5837 -2.7726,0.2915,161.5917 -2.7412,0.1948,161.5996"
                   ],
                   "Spirals": [],
@@ -16095,12 +16099,12 @@
                   "CoverTop": "NaN",
                   "CheckCover": true,
                   "Bars": [
-                    "3.0837,-0.5996,160.9548 3.0837,-0.5996,161.9121 3.4455,0.1105,161.9121 3.4455,0.1105,160.9548",
-                    "2.9465,-0.5297,160.9548 2.9465,-0.5297,161.9121 3.3083,0.1804,161.9121 3.3083,0.1804,160.9548",
-                    "2.8093,-0.4597,160.9548 2.8093,-0.4597,161.9121 3.1711,0.2503,161.9121 3.1711,0.2503,160.9548",
-                    "-2.8631,-0.5996,160.9706 -2.8631,-0.5996,161.9279 -2.5013,0.1105,161.9279 -2.5013,0.1105,160.9706",
-                    "-3.0003,-0.5297,160.9706 -3.0003,-0.5297,161.9279 -2.6385,0.1804,161.9279 -2.6385,0.1804,160.9706",
-                    "-3.1375,-0.4597,160.9706 -3.1375,-0.4597,161.9279 -2.7757,0.2503,161.9279 -2.7757,0.2503,160.9706"
+                    "3.0837,-0.5996,160.9109 3.0837,-0.5996,161.8682 3.4455,0.1105,161.8682 3.4455,0.1105,160.9109",
+                    "2.9465,-0.5297,160.9109 2.9465,-0.5297,161.8682 3.3083,0.1804,161.8682 3.3083,0.1804,160.9109",
+                    "2.8093,-0.4597,160.9109 2.8093,-0.4597,161.8682 3.1711,0.2503,161.8682 3.1711,0.2503,160.9109",
+                    "-2.8631,-0.5996,160.9109 -2.8631,-0.5996,161.8681 -2.5013,0.1105,161.8681 -2.5013,0.1105,160.9109",
+                    "-3.0003,-0.5297,160.9109 -3.0003,-0.5297,161.8681 -2.6385,0.1804,161.8681 -2.6385,0.1804,160.9109",
+                    "-3.1375,-0.4597,160.9109 -3.1375,-0.4597,161.8681 -2.7757,0.2503,161.8681 -2.7757,0.2503,160.9109"
                   ],
                   "Spirals": [],
                   "Unplaced": 0,
@@ -42964,6 +42968,8 @@
             "EndFlangeBottomZ": -0.028575,
             "EndWebOffset": 0.3429,
             "EndWebThickness": 0.0254,
+            "EndWebInset": 0.0127,
+            "EndWebEndUnresolved": "UNRESOLVED (p.124 / 125): knuckle end web end positions - the end web ends are drawn (square cuts) but not dimensioned. Scaled from the vector linework: 9 1/4\u0022 (acute corners T34\u0027 / T34) and 8 5/16\u0022 (obtuse corners T0 / T0\u0027) outside the tie chord, mid-thickness.",
             "EndWebHeightAtChord": 0.307975,
             "EndWebHeightAtEnds": "NaN",
             "EndWebScaledHeightAtEnds": 0.26034999999999997,
@@ -42987,6 +42993,7 @@
               "ArchStiffenerThickness": 0.0254,
               "ArchStiffenerUnresolved": "UNRESOLVED (p.124 / 125 Section A-A): knuckle arch stiffener extent - the 1\u0022 arch stiffener is shown on the intrados side only, its width is not dimensioned. From the stub web face to the flange tip (7 3/8 from the rib CL).",
               "JointGap": 0.0127,
+              "TieCutParallelToEndWeb": true,
               "GussetThickness": 0.0127,
               "GussetHeight": 0.2286,
               "GussetTopBelowWeb": 0.0127,
@@ -43027,7 +43034,8 @@
                 "Tie": "North tie",
                 "Splice": "RS5\u0027",
                 "OutsideLegHeight": 0.2524125,
-                "InsideLegHeight": 0.2587625
+                "InsideLegHeight": 0.2587625,
+                "EndWebEndBeyondChord": 0.23495
               },
               {
                 "Point": "T0",
@@ -43035,7 +43043,8 @@
                 "Tie": "South tie",
                 "Splice": "RS1",
                 "OutsideLegHeight": 0.2667,
-                "InsideLegHeight": 0.2667
+                "InsideLegHeight": 0.2667,
+                "EndWebEndBeyondChord": 0.21113749999999998
               }
             ],
             "EndWebOpeningsAt": [
@@ -43145,6 +43154,8 @@
             "EndFlangeBottomZ": -0.028575,
             "EndWebOffset": 0.3429,
             "EndWebThickness": 0.0254,
+            "EndWebInset": 0.0127,
+            "EndWebEndUnresolved": "UNRESOLVED (p.124 / 125): knuckle end web end positions - the end web ends are drawn (square cuts) but not dimensioned. Scaled from the vector linework: 9 1/4\u0022 (acute corners T34\u0027 / T34) and 8 5/16\u0022 (obtuse corners T0 / T0\u0027) outside the tie chord, mid-thickness.",
             "EndWebHeightAtChord": 0.307975,
             "EndWebHeightAtEnds": "NaN",
             "EndWebScaledHeightAtEnds": 0.26034999999999997,
@@ -43168,6 +43179,7 @@
               "ArchStiffenerThickness": 0.0254,
               "ArchStiffenerUnresolved": "UNRESOLVED (p.124 / 125 Section A-A): knuckle arch stiffener extent - the 1\u0022 arch stiffener is shown on the intrados side only, its width is not dimensioned. From the stub web face to the flange tip (7 3/8 from the rib CL).",
               "JointGap": 0.0127,
+              "TieCutParallelToEndWeb": true,
               "GussetThickness": 0.0127,
               "GussetHeight": 0.2286,
               "GussetTopBelowWeb": 0.0127,
@@ -43208,7 +43220,8 @@
                 "Tie": "South tie",
                 "Splice": "RS5",
                 "OutsideLegHeight": 0.2524125,
-                "InsideLegHeight": 0.2587625
+                "InsideLegHeight": 0.2587625,
+                "EndWebEndBeyondChord": 0.23495
               },
               {
                 "Point": "T0\u0027",
@@ -43216,7 +43229,8 @@
                 "Tie": "North tie",
                 "Splice": "RS1\u0027",
                 "OutsideLegHeight": 0.2667,
-                "InsideLegHeight": 0.2667
+                "InsideLegHeight": 0.2667,
+                "EndWebEndBeyondChord": 0.21113749999999998
               }
             ],
             "EndWebOpeningsAt": [
@@ -44442,7 +44456,9 @@
               }
             ]
           },
-          "FlutesOnBarGrid": true
+          "FlutesOnBarGrid": true,
+          "KnuckleZonesFromSteel": true,
+          "KnuckleZoneUnresolved": "UNRESOLVED (p.124 / 125 / 151): deck concrete at the knuckle rib corners - the pocket between the outside and inside arch flange plate legs (open at the top, below the deck surface) is neither shown filled nor formed; p.151 ends the deck bars at the inside arch flange plate. Deck concrete stops at the deck-side face of the inside arch flange plate (vertical, from the end web to where the plate\u0027s intrados edge passes the slab top) and at the end web inside face; the pocket is not filled; curbs cut back to the same face."
         },
         "Bearings": [
           {
@@ -44453,6 +44469,7 @@
             "SteelUndersideZ": -0.053974999999999995,
             "Fixity": "Partially fixed",
             "HangFromSteel": true,
+            "PedestalAdjusted": true,
             "LongAxisAngleDeg": 63,
             "LongAxisSource": "p.102 pier plan: arch span pedestal 63 deg (TYP) to the CL pier; p.107 bearing plan inside it",
             "PadThickness": 0.003175,
@@ -44482,6 +44499,7 @@
             "SteelUndersideZ": -0.053974999999999995,
             "Fixity": "Partially fixed",
             "HangFromSteel": true,
+            "PedestalAdjusted": true,
             "LongAxisAngleDeg": 63,
             "LongAxisSource": "p.102 pier plan: arch span pedestal 63 deg (TYP) to the CL pier; p.107 bearing plan inside it",
             "PadThickness": 0.003175,
@@ -44511,6 +44529,7 @@
             "SteelUndersideZ": -0.053974999999999995,
             "Fixity": "Partially fixed",
             "HangFromSteel": true,
+            "PedestalAdjusted": true,
             "LongAxisAngleDeg": 63,
             "LongAxisSource": "p.102 pier plan: arch span pedestal 63 deg (TYP) to the CL pier; p.107 bearing plan inside it",
             "PadThickness": 0.003175,
@@ -44540,6 +44559,7 @@
             "SteelUndersideZ": -0.053974999999999995,
             "Fixity": "Partially fixed",
             "HangFromSteel": true,
+            "PedestalAdjusted": true,
             "LongAxisAngleDeg": 63,
             "LongAxisSource": "p.102 pier plan: arch span pedestal 63 deg (TYP) to the CL pier; p.107 bearing plan inside it",
             "PadThickness": 0.003175,
@@ -44564,7 +44584,7 @@
         ],
         "Unresolved": [
           "CONFLICT (p.129-140 sheet titles vs p.128 table): the bracing connection drawn on the sheet \u0027U(n) and U(n)\u0027 details\u0027 fits the table points U(12-n) / U(12-n)\u0027 (drawn gusset angles within 0.4 deg; at U(n) they are geometrically impossible, e.g. sheet U1: 24.6 deg vs \u003E= 36.2 deg at U1). Each sheet is modeled at U(12-n) / U(12-n)\u0027; U6 is its own mirror.",
-          "UNRESOLVED (p.102, 107, 119, 124): arch pedestal / bearing elevations (B1-B3) - the plan pedestal tops do not reconcile with the WP elevations \u002B bearing stack (0.13-0.20 ft; EL A vs E 0.053 ft). Bearings are built up from the plan pedestal tops; the chain difference is a CHECK row.",
+          "UNRESOLVED (p.102, 107, 119, 124): arch pedestal / bearing elevations (B1-B3) - the plan pedestal tops do not reconcile with the WP elevations \u002B bearing stack (0.13-0.20 ft; EL A vs E 0.053 ft). Bearings hang from the steel (p.107 Section A-A); the approach-unit pedestal tops are modeled at the stack bottom per p.107 note 8 / p.102 note 1 (contractor adjusts the pedestals); the p.102 differences are CHECK rows.",
           "UNRESOLVED (p.102): which arch pedestal is EL A / EL E - the view direction of the pier elevation is not stated on the sheet. EL A = south at Pier 10 / north at Pier 11, as derived from p.102 \u002B p.91 by the approach model.",
           "UNRESOLVED (p.94, 102, 119): CL1 / CL2 relative to the piers (U3) - no combination of the layout offsets reproduces the plan chord 200\u0027-11 11/16. CL1/CL2 = 7\u0022 along the pier \u002B 4 13/16\u0022 toward the span; the local geometry is kept and the difference reported.",
           "UNRESOLVED (p.119-150): camber / no-load geometry (U4) - not given. Final geometry modeled.",

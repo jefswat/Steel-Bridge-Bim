@@ -233,15 +233,22 @@ public static partial class ArchGenerator
                 acc += e.Length;
             }
             stations.Add(acc);
-            Mesh Plate(double n0, double n1, double z0, double z1, double sa, double sb)
+            // cutA / cutB (OPTIONAL): station of the end as a function of the lateral offset (skewed end cut, v7 knuckle joint parallel to the end web).
+            Mesh Plate(double n0, double n1, double z0, double z1, double sa, double sb, Func<double, double>? cutA = null, Func<double, double>? cutB = null)
             {
                 var sec = new[] { new Vec2(n0, z0), new Vec2(n1, z0), new Vec2(n1, z1), new Vec2(n0, z1) };
-                var st = stations.Where(x => x > sa + 1e-6 && x < sb - 1e-6).Prepend(sa).Append(sb).ToList();
-                var rings = st.Select(s =>
+                double saMax = cutA == null ? sa : Math.Max(cutA(n0), cutA(n1)), sbMin = cutB == null ? sb : Math.Min(cutB(n0), cutB(n1));
+                var st = stations.Where(x => x > saMax + 1e-6 && x < sbMin - 1e-6).Prepend(sa).Append(sb).ToList();
+                var rings = st.Select((s, i) =>
                 {
-                    var (p, ang) = geo.At(s);
-                    var nl = Vec2.FromAngle(ang).Left;
-                    return sec.Select(q => W((p + nl * q.X).WithZ(q.Y))).ToArray();
+                    var cut = i == 0 ? cutA : i == st.Count - 1 ? cutB : null;
+                    return sec.Select(q =>
+                    {
+                        double sq = cut?.Invoke(q.X) ?? s;
+                        var (p, ang) = geo.At(sq);
+                        var nl = Vec2.FromAngle(ang).Left;
+                        return W((p + nl * q.X).WithZ(q.Y));
+                    }).ToArray();
                 }).ToList();
                 var m = new Mesh();
                 MeshBuilder.AddLoft(m, sec, rings);
@@ -252,6 +259,18 @@ public static partial class ArchGenerator
             // v2 knuckles: the tie field pieces start / end at the knuckle joints (end flange inner edge + half the joint gap).
             double trimA = KnuckleJoint(t, geo, true) is { } ja ? ja + (_d.Knuckles.FirstOrDefault(kk => kk.Detail != null)?.Detail?.JointGap ?? 0) / 2 : 0;
             double trimB = KnuckleJoint(t, geo, false) is { } jb ? geo.Length - jb - (_d.Knuckles.FirstOrDefault(kk => kk.Detail != null)?.Detail?.JointGap ?? 0) / 2 : geo.Length;
+            // v7 (p.124 / 125, review Q3): the tie flange and web end in a VERTICAL cut parallel to the end web (skewed ~20 deg in plan), the joint gap
+            // measured normal to it from the end flange inner edge.
+            Func<double, double>? cutA = null, cutB = null;
+            foreach (bool atS in new[] { true, false })
+            {
+                if (KnuckleAt(t, atS) is not { Detail.TieCutParallelToEndWeb: true } kk) continue;
+                double dn = kk.EndFlangeWidth - kk.EndWebOffset + kk.Detail!.JointGap;
+                var g = geo;
+                if (TieCutS(g, atS, 0, dn, kk) is not { } j0) continue;
+                if (atS) { trimA = j0; double ta = trimA; cutA = lat => TieCutS(g, true, lat, dn, kk) ?? ta; }
+                else { trimB = geo.Length - j0; double tb = trimB; cutB = lat => geo.Length - (TieCutS(g, false, lat, dn, kk) ?? geo.Length - tb); }
+            }
             var bounds = new List<double> { trimA };
             bounds.AddRange(cuts);
             bounds.Add(trimB);
@@ -260,10 +279,12 @@ public static partial class ArchGenerator
                 double sa = bounds[k] + (k > 0 ? t.SpliceGap / 2 : 0), sb = bounds[k + 1] - (k + 2 < bounds.Count ? t.SpliceGap / 2 : 0);
                 string pm = cuts.Count == 0 ? asm : $"{asm}-{k + 1}";
                 string seg = cuts.Count == 0 ? "" : $", segment {k + 1}";
-                AddPart($"{pm}-F", PartCategory.TiePlate, asm, $"PL {L(t.FlangeThickness)} x {L(t.FlangeWidth)} tie flange{seg}",
-                    Plate(-t.FlangeWidth / 2, t.FlangeWidth / 2, 0, t.FlangeThickness, sa, sb), t.Material, sb - sa);
-                AddPart($"{pm}-W", PartCategory.TiePlate, asm, $"PL {L(t.WebThickness)} x {L(t.WebHeight)} tie web{seg}",
-                    Plate(-t.WebThickness / 2, t.WebThickness / 2, t.FlangeThickness, t.FlangeThickness + t.WebHeight, sa, sb), t.Material, sb - sa);
+                var ca = k == 0 ? cutA : null; var cb = k + 2 == bounds.Count ? cutB : null;
+                string skew = ca != null || cb != null ? ", knuckle end cut parallel to the end web (p.124 / 125)" : "";
+                AddPart($"{pm}-F", PartCategory.TiePlate, asm, $"PL {L(t.FlangeThickness)} x {L(t.FlangeWidth)} tie flange{seg}{skew}",
+                    Plate(-t.FlangeWidth / 2, t.FlangeWidth / 2, 0, t.FlangeThickness, sa, sb, ca, cb), t.Material, sb - sa);
+                AddPart($"{pm}-W", PartCategory.TiePlate, asm, $"PL {L(t.WebThickness)} x {L(t.WebHeight)} tie web{seg}{skew}",
+                    Plate(-t.WebThickness / 2, t.WebThickness / 2, t.FlangeThickness, t.FlangeThickness + t.WebHeight, sa, sb, ca, cb), t.Material, sb - sa);
             }
             if (t.SpliceDetail is { } sd)
             {
@@ -1305,9 +1326,15 @@ public static partial class ArchGenerator
                     MeshBuilder.AddLoft(sheet, ssec, srings);
                 }
             }
-            Zone(0, 1, false, ext0, 0);
+            // v7 (KnuckleZonesFromSteel): the knuckle zones end at the end web inside face and keep out of the knuckle steel (rib corners).
+            bool zoneA = dk.KnuckleZonesFromSteel && ka?.Detail != null, zoneB = dk.KnuckleZonesFromSteel && kb?.Detail != null;
+            double zbEnds = (ka ?? kb)?.DeckPlateTopZ ?? zTop;
+            if (zoneA) area += KnuckleZoneSlab(ends, ts, tn, (knots[0].s, knots[0].n), (knots[1].s, knots[1].n), true, ka!, zbEnds, topN);
+            else Zone(0, 1, false, ext0, 0);
             Zone(1, knots.Count - 2, true, 0, 0);
-            Zone(knots.Count - 2, knots.Count - 1, false, 0, ext1);
+            if (zoneB) area += KnuckleZoneSlab(ends, ts, tn, (knots[^1].s, knots[^1].n), (knots[^2].s, knots[^2].n), false, kb!, zbEnds, topN);
+            else Zone(knots.Count - 2, knots.Count - 1, false, 0, ext1);
+            if ((zoneA || zoneB) && dk.KnuckleZoneUnresolved.Length > 0) Warn(dk.KnuckleZoneUnresolved);
             Model.Slab = slab;
             Model.SlabArea = area;
             Model.Concrete.Deck = slab;
@@ -1341,9 +1368,57 @@ public static partial class ArchGenerator
                 var lp = p.XY - n * off;
                 return (W(lp.WithZ(0)).XY, (W((lp + t).WithZ(0)) - W(lp.WithZ(0))).XY.Normalized());
             }
-            var e0 = EndLine(a0, a1, ka.EndWebOffset);
-            var e1 = EndLine(b0, b1, kb.EndWebOffset);
+            bool v7 = dk.KnuckleZonesFromSteel && ka.Detail != null && kb.Detail != null;
+            var e0 = EndLine(a0, a1, v7 ? -ka.EndWebInsideDn() : ka.EndWebOffset);
+            var e1 = EndLine(b0, b1, v7 ? -kb.EndWebInsideDn() : kb.EndWebOffset);
             var curbs = new Mesh();
+            if (v7)
+            {
+                // v7: each curb edge ends on the end web inside face (skewed end), the outer edge kept inside the knuckle-zone outline (rib corners).
+                var fr = Model.Frame;
+                Vec2 Loc(Vec2 w, double zw) { var d = w.WithZ(zw) - fr.Origin; return new Vec2(Vec3.Dot(d, fr.X), Vec3.Dot(d, fr.Y)); }
+                int cut = 0;
+                foreach (var c in dk.Curbs)
+                {
+                    double outer = c.InnerOffset + Math.Sign(c.InnerOffset) * c.Width;
+                    double i0 = CrossStation(c.InnerOffset, e0), i1 = CrossStation(c.InnerOffset, e1), o0 = CrossStation(outer, e0), o1 = CrossStation(outer, e1);
+                    if (new[] { i0, i1, o0, o1 }.Any(double.IsNaN)) { Warn($"Arch: curb {c.Name} does not cross the deck end lines - not built."); continue; }
+                    // parameters: dense (1") over the first / last 4 ft, 0.5 m between
+                    double len = Math.Max(i1 - i0, o1 - o0);
+                    var tp = new List<double>();
+                    double dense = Math.Min(Ft(4), len / 3) / len;
+                    for (double t = 0; t < dense; t += In(1) / len) tp.Add(t);
+                    int nm = Math.Max(2, (int)Math.Ceiling(len * (1 - 2 * dense) / 0.5));
+                    for (int i = 0; i < nm; i++) tp.Add(dense + (1 - 2 * dense) * i / nm);
+                    for (double t = 1 - dense; t < 1; t += In(1) / len) tp.Add(t);
+                    tp.Add(1);
+                    var rings = new List<Vec3[]>();
+                    Vec2[]? sec = null;
+                    foreach (double t in tp)
+                    {
+                        double si = i0 + (i1 - i0) * t, so = o0 + (o1 - o0) * t;
+                        var pi = _al.PointAt(si, c.InnerOffset); var po = _al.PointAt(so, outer);
+                        // outer edge inside the knuckle-zone outline (bar outline = slab outline at the knuckles)
+                        double zw = _b.Deck.FinishedElevation(_al, si, c.InnerOffset);
+                        var li = Loc(pi, zw); var lo = Loc(po, zw);
+                        if (ZoneClear(lo) < 0 && ZoneClear(li) > 0)
+                        {
+                            double lo_ = 0, hi_ = 1;
+                            for (int it = 0; it < 40; it++) { double m = (lo_ + hi_) / 2; if (ZoneClear(Vec2.Lerp(li, lo, m)) > 0) lo_ = m; else hi_ = m; }
+                            po = Vec2.Lerp(pi, po, lo_); cut++;
+                        }
+                        var soO = _al.Inverse(po);
+                        double gi = _b.Deck.FinishedElevation(_al, si, c.InnerOffset), go = _b.Deck.FinishedElevation(_al, soO.Station, soO.Offset);
+                        double top = gi + c.Height;
+                        rings.Add(new[] { pi.WithZ(gi), po.WithZ(go), po.WithZ(top), pi.WithZ(top) });
+                        sec ??= new[] { new Vec2(c.InnerOffset, gi), new Vec2(outer, go), new Vec2(outer, top), new Vec2(c.InnerOffset, top) };
+                    }
+                    MeshBuilder.AddLoft(curbs, sec!, rings);
+                }
+                Model.Curbs = curbs;
+                Info($"Arch curbs: ends on the knuckle end web inside faces (skewed){(cut > 0 ? $"; outer edge cut back to the inside arch flange plates at {cut} sections (rib corners)" : "")}.");
+                return;
+            }
             foreach (var c in dk.Curbs)
             {
                 double outer = c.InnerOffset + Math.Sign(c.InnerOffset) * c.Width;
@@ -1483,15 +1558,17 @@ public static partial class ArchGenerator
             if (br.HangFromSteel)
             {
                 Check($"bearing {br.Name}: plan pedestal top (p.102) vs the bottom of the {L(zTop)} bearing stack hung from the steel (model)", br.SeatElevation, seat, Tol,
-                    v => $"{ToFt(v):F3}'", "the upper sole plate bears on the knuckle splice plate (p.107 Section A-A, p.124 A-A); p.107 note 8: the contractor adjusts the pedestal elevations to the fabricated bearing - B1-B3, the pedestal concrete is NOT changed");
+                    v => $"{ToFt(v):F3}'", "the upper sole plate bears on the knuckle splice plate (p.107 Section A-A, p.124 A-A); p.107 note 8: the contractor adjusts the pedestal elevations to the fabricated bearing - B1-B3, " + (br.PedestalAdjusted ? "the pedestal concrete is modeled at the stack bottom (CONFLICT, p.102 value superseded)" : "the pedestal concrete is NOT changed"));
                 if (Math.Abs(seat - br.SeatElevation) > Tol)
-                    Warn($"Arch CONFLICT bearing {br.Name}: the bearing stack under the steel ends {L(Math.Abs(seat - br.SeatElevation))} {(seat < br.SeatElevation ? "BELOW" : "ABOVE")} the p.102 pedestal top EL {ToFt(br.SeatElevation):F3}' (p.107 note 8: pedestal to be adjusted; the plan pedestal is kept, the pad / masonry plate overlap it).");
+                    Warn(br.PedestalAdjusted
+                        ? $"Arch CONFLICT bearing {br.Name}: the bearing stack under the steel ends {L(Math.Abs(seat - br.SeatElevation))} {(seat < br.SeatElevation ? "BELOW" : "ABOVE")} the p.102 pedestal top EL {ToFt(br.SeatElevation):F3}'; the pedestal concrete is modeled at the stack bottom EL {ToFt(seat):F3}' (= conc. brg. surface under the 1/8\" pad, p.107 Section A-A) per p.107 note 8 / p.102 note 1 (contractor adjusts the pedestal elevations to the fabricated bearing)."
+                        : $"Arch CONFLICT bearing {br.Name}: the bearing stack under the steel ends {L(Math.Abs(seat - br.SeatElevation))} {(seat < br.SeatElevation ? "BELOW" : "ABOVE")} the p.102 pedestal top EL {ToFt(br.SeatElevation):F3}' (p.107 note 8: pedestal to be adjusted; the plan pedestal is kept, the pad / masonry plate overlap it).");
             }
             else
                 Check($"bearing {br.Name}: underside of steel from the WP chain (plan) vs top of the {L(zTop)} bearing stack on the plan pedestal (model)", top.Z, stackTop, Tol,
                     v => $"{ToFt(v):F3}'", "pedestal tops are the plan values (p.102); the WP chain is p.119 / p.124 - B1-B3, reported only");
             var so = _al.Inverse(c2);
-            Model.Steel.BearingSeats.Add(new BearingSeat(sl.Name, Model.BearingNames.Count - 1, so.Station, br.SeatElevation, br.UpperSoleA,
+            Model.Steel.BearingSeats.Add(new BearingSeat(sl.Name, Model.BearingNames.Count - 1, so.Station, br.HangFromSteel && br.PedestalAdjusted ? seat : br.SeatElevation, br.UpperSoleA,
                 "Elastomeric (arch)", br.Fixity, c2, along, br.MasonryLength, br.MasonryWidth));
         }
     }

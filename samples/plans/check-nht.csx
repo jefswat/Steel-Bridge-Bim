@@ -240,8 +240,20 @@ foreach (var (name, elA, elE, elC, elF, top, tip) in new[] { ("Pier 10", 534.779
     bool p10 = name == "Pier 10";
     var south = su.FixedSeats.First(x => x.Name == "arch bearing south");
     var north = su.FixedSeats.First(x => x.Name == "arch bearing north");
-    Chk($"{name} arch seat south (EL. {(p10 ? "A" : "E")})", south.Z / ft, p10 ? elA : elE, 0.001);
-    Chk($"{name} arch seat north (EL. {(p10 ? "E" : "A")})", north.Z / ft, p10 ? elE : elA, 0.001);
+    // v7 (arch-nht.csx): the arch pedestal tops are modeled at the bottom of the bearing stack hung from the steel (p.107 note 8 / p.102 note 1: the contractor
+    // adjusts the pedestal elevations) - then the p.102 EL is a CONFLICT row (not counted) and the seat is checked against the arch bearing seat (stack bottom).
+    var supDef = Doc.Project.Bridges.SelectMany(b => b.Supports).First(x => x.Name == name && x.Substructure.CapBlocks.Any(cb => cb.Kind == CapBlockKind.Pedestal));
+    var archSeats = Doc.Project.Bridges.Where(b => b.Arch != null).SelectMany(b => Doc.Steel(b.Name).BearingSeats).Where(bs => bs.Support == name).ToList();
+    foreach (var (seat, nm, el) in new[] { (south, $"{name} arch seat south (EL. {(p10 ? "A" : "E")})", p10 ? elA : elE), (north, $"{name} arch seat north (EL. {(p10 ? "E" : "A")})", p10 ? elE : elA) })
+    {
+        var cbk = supDef.Substructure.CapBlocks.First(cb => cb.Name == seat.Name);
+        bool adjusted = cbk.Reported?.Any(r => r.Contains("p.107 note 8")) == true;
+        if (!adjusted) { Chk(nm, seat.Z / ft, el, 0.001); continue; }
+        var w = su.World(seat.S, seat.N, seat.Z);
+        var bs = archSeats.Where(x => x.Location != null).OrderBy(x => (x.Location!.Value - w.XY).Length).FirstOrDefault();
+        Print($"CONFLICT  {nm}: model {seat.Z / ft:0.000} plan p.102 {el:0.000} ({seat.Z / ft - el:+0.000;-0.000} ft) - pedestal adjusted to the bearing (p.107 note 8 / p.102 note 1), not counted");
+        if (bs != null) Chk($"{nm} = bottom of the arch bearing stack (conc. brg. surface, p.107 Section A-A)", seat.Z / ft, bs.SeatElevation / ft, 0.001);
+    }
     Chk($"{name} CL arch brg from CL pier (6 7/8\")", Math.Abs(south.N) / In(1), 6.875, 1 / 16.0, "in");
     Chk($"{name} arch bearings 9'-10 + 9'-8 1/8 = 19'-6 1/8 apart", Math.Abs(south.S - north.S) / ft, 19 + 6.125 / 12, 1 / 16.0 / 12);
     double cap = su.Solids.Where(s => s.Kind is SubElementKind.Cap or SubElementKind.Pedestal).Sum(s => Math.Abs(s.Mesh.Volume())) / Math.Pow(ft * 3, 3);

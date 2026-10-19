@@ -162,6 +162,40 @@ public class ArchV2Tests
     }
 
     [Fact]
+    public void KnuckleV7_SkewTieCut_EndWebInset_ZoneSlabAtEndWebInsideFace()
+    {
+        var (p, b) = ArchTests.Model();
+        var a = b.Arch!;
+        var k = a.Knuckles.First(q => q.Name == "West");
+        k.Detail = new ArchKnuckleDetail { TieCutParallelToEndWeb = true };
+        k.EndWebInset = In(0.5);
+        k.Corners.Add(new ArchKnuckleCorner { Point = "T0", Rib = "South rib", Tie = "South tie", Splice = "RS1", OutsideLegHeight = In(10.5), InsideLegHeight = In(10.5), EndWebEndBeyondChord = In(8.3125) });
+        a.Deck!.KnuckleZonesFromSteel = true;
+        var (_, m) = ArchTests.Generate(p);
+        var pa = a.Point(k.EndFrom)!.Vec.XY; var pb = a.Point(k.EndTo)!.Vec.XY;
+        var t = (pb - pa).Normalized(); var n = t.Left; if (Vec2.Dot(n, -pa) < 0) n = -n;
+        double Dn(Vec3 w) => Vec2.Dot(m.Local(w).XY - pa, n);
+        double edge = k.EndFlangeWidth - k.EndWebOffset, gap = k.Detail.JointGap;
+        // Tie flange / web of the first south tie piece: the end face is the vertical plane parallel to the end web, the gap normal to it.
+        foreach (var mk in new[] { "SOUTH-TIE-F", "SOUTH-TIE-W" })
+        {
+            var part = m.Steel.Parts.First(q => q.Mark == mk);
+            Assert.Equal(edge + gap, part.Mesh.Positions.Min(Dn), 6);
+            Assert.True(part.Mesh.Positions.Count(q => Math.Abs(Dn(q) - (edge + gap)) < 1e-6) >= 4);
+        }
+        // Knuckle tie web ends at the end flange edge (same plane).
+        var tw = m.Steel.Parts.First(q => q.Mark.EndsWith("-TW") && q.Assembly == "KNUCKLE-WEST");
+        Assert.Equal(edge, tw.Mesh.Positions.Max(Dn), 6);
+        // End web outside face 1/2" inside the end flange edge.
+        var ew = m.Steel.Parts.First(q => q.Mark == "KNUCKLE-WEST-EW");
+        Assert.Equal(k.EndWebOutsideDn(), ew.Mesh.Positions.Min(Dn), 6);
+        // Knuckle-zone slab starts at the end web inside face (not under / through the end web).
+        Assert.NotNull(m.SlabEnds);
+        var west = m.SlabEnds!.Positions.Where(q => m.Local(q).X < 0).ToList();
+        Assert.Equal(k.EndWebInsideDn(), west.Min(Dn), 6);
+    }
+
+    [Fact]
     public void Pt_DeckRebar_Ifc()
     {
         var (p, b) = ArchTests.Model();

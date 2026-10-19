@@ -849,7 +849,7 @@ UNRESOLVED FLAG (general, reusable): `SBM.Core/Assumption.cs` `Assumption{Status
   v4 (design note section 9, user review): gussets are ONE bent plate (`OneBentPlate`: brace rolls + leg slides solved together by a small
   Nelder-Mead, legs closed on the common bend line; CHECKS for the leg tilt / welded edge gap); knuckle splice + fill plates from the p.124 plan outline
   (`ArchKnuckleDetail.Splice*`, acute end corner cut, end flange bolt rows), end flange ends cut parallel to the chords; bearings hung from the steel
-  (`ArchBearingDefinition.HangFromSteel`, upper sole top in the steel plane, pedestal kept = CONFLICT per p.107 note 8); cable connectors on their own
+  (`ArchBearingDefinition.HangFromSteel`, upper sole top in the steel plane; v7: pedestal lowered to the stack bottom = CONFLICT per p.107 note 8); cable connectors on their own
   layer 3D-ARCH-CABLE-CONNECTORS.
   v5 / v6 WELDS (design note sections 10 / 11): every weld symbol on the steel sheets is a 5/16" fillet (no CJP / field / all-around). PartCategory.Weld parts
   (viewport layer 3D-WELDS = a DETAIL layer: tiled, hidden while the camera moves, drawn ~1/4 s after it stops, only near the view line; IFC IfcFastener WELD;
@@ -871,6 +871,21 @@ UNRESOLVED FLAG (general, reusable): `SBM.Core/Assumption.cs` `Assumption{Status
   connection plate face (gusset plane to plate face 58 - 90 deg, the plan prints the supplement 90 - 122; a square edge left a 1/16" - 5/8" wedge gap at 80
   gusset legs; Info line per leg; the gusset is then a faceted solid in IFC). Checks (v6): check-arch-nht 1064 OK / 508 DIFF (+22 weld rows: EW overhangs the end flange 4.2" at one end per knuckle, gusset edge overhang
   6 7/16" in total, FB33-STB has no contact on its +X face), check-nht 827 / 6 (unchanged), tests 476.
+  v7 KNUCKLE AT THE BEARINGS (design note section 12, user screenshots 2026-10-19; all OPTIONAL, defaults = v6): `ArchKnuckleDetail.TieCutParallelToEndWeb`
+  (tie flange + web end in a VERTICAL cut parallel to the end web, JointGap normal to it from the end flange edge; knuckle tie web ends at the edge;
+  `TieCutS` / `KnuckleAt` in ArchGeneratorKnuckle.cs, BuildTie `Plate(..., cutA, cutB)` = per-lateral end stations), `ArchKnuckleDefinition.EndWebInset`
+  (end web outside face 1/2" inside the end flange edge; use `EndWebOutsideDn()` / `EndWebInsideDn()` everywhere, never -EndWebOffset + thickness),
+  `ArchKnuckleCorner.EndWebEndBeyondChord` (end web ends square to the web at the plan position per corner, flagged via `EndWebEndUnresolved`), arch
+  flange plate ends cut in the end web inside face plane per vertex (always), `ArchDeckDefinition.KnuckleZonesFromSteel` (new partial
+  ArchGeneratorKnuckleZone.cs: `RibBox` recorded per corner = deck-side face of the inside arch flange plate + its intrados edge; knuckle-zone slab =
+  ring loft between `ZoneSide` boundaries from the end web INSIDE face to the floorbeam knot, cut back to the rib box; curbs end skewed on the end web
+  inside face and are clipped to the zone outline; bars use `ZoneClear` / `ClearRun` on the zone outline: D1 / D2 knuckle runs stop EndCover short of any
+  steel, A1 hooks / B1 ends keep 1/8" off the steel, S1 / D4 ranges start where both stirrup legs are EndCover clear, D3 in a knuckle panel shorter than the
+  bar = counted, not placed (`AddBars(..., unplaced)` -> "(n of m not modeled - UNRESOLVED)")), `ArchBearingDefinition.PedestalAdjusted` (warning text +
+  BearingSeat at the stack bottom; arch-nht.csx lowers the approach units' arch pedestal CapBlocks to the stack bottom with a CONFLICT `Reported` text and
+  re-runs rebar-nht-sub.csx; check-nht prints those seats as CONFLICT rows and checks them against the arch BearingSeat). Checks (v7): check-arch-nht 1077 OK
+  / 507 DIFF (same code on the v6 model: 1076 / 508; the stated v6 baseline 1064 / 508 predates later main commits), check-nht 827 PASS / 6 FAIL + 4 CONFLICT,
+  tests 498, Woodbury IFC identical (FILE_NAME only), NHT IFC 0 issues.
 - True-arc plate outlines (generic): `Solids/ArcPolygon` (points + signed minor-arc radii per edge, exact area, tessellation, Sub / Map / Reversed),
   `PlateBuilder.AddPlanarArc` (mesh from the tessellation, `ExtrudedSolid.ExactOutline` keeps the arcs) -> IFC Parametric IfcIndexedPolyCurve with
   IfcArcIndex, ReferenceView tessellated to its chord tolerance. Tests `ArchBracingConnectionTests`. Tests `ArchTests`, `ArchV2Tests`. Knuckle visual check without a snapshot: `temp`-style dump of part triangles + a small
@@ -975,7 +990,7 @@ UNRESOLVED FLAG (general, reusable): `SBM.Core/Assumption.cs` `Assumption{Status
   T80SS(MOD) at Pier 10 (section 5): RL-T80SS bridge-slab section + 1'-0 lower back face (= the p.105 D-D vectors), 9'-1 / 4'-6 / 7'-11 + 15'-0 1:10 taper +
   1'-8, base shaft top + 2'-9 (flagged), pavement 2'-4 x 1'-1; Pier 11 not drawn (76.33 vs 78 LF); bars / UHMW wedge UNRESOLVED.
   Check: the approach slab lengths / SF and rail LF are compared to the CL SEJ (cut-back strips added back in check-nht.csx).
-  check-nht.csx after build-nht + arch-nht: 827 PASS / 6 FAIL (4 arch pier CY +-0.3, p.91 low rail 579.0 vs 578.88 layout, T80SS 76.33 vs 78 LF);
+  check-nht.csx after build-nht + arch-nht: 827 PASS / 6 FAIL (4 arch pier CY +-0.3, p.91 low rail 579.0 vs 578.88 layout, T80SS 76.33 vs 78 LF) + 4 CONFLICT rows (v7: arch pedestal tops at the bearing stack bottom vs p.102, p.107 note 8);
   IFC: validate_ifc 0 schema / EXPRESS issues, new products mesh closed (BS-EJCP sleeve anchors 1.03 volume ratio = tiny Pset mass rounding).
 - NHT railing / curbs / joints / mow strips: `samples/plans/rail-joints-nht.csx` (hooked at the end of build-nht.csx before its regeneration and in arch-nht.csx
   before its final regeneration; works on whatever NHT bridges exist). Curbs 10" x 4" with 3/4" chamfers (p.89, 113, 83). RAIL (PED) LOW / HIGH on the curb
