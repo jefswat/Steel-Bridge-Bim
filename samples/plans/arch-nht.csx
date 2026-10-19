@@ -363,6 +363,10 @@ var kDetail = new ArchKnuckleDetail
     SpliceBoltRowOffset = In(9.5), SpliceBoltFirst = In(2.8125), SpliceBoltCount = 8, SpliceBoltPitch = In(4.375),
     SpliceUnresolved = U("p.124 / 125", "knuckle splice / fill plate outline", "the 1\" splice plate and 1 1/8\" fill plate are drawn dashed in the partial plans but only the bolt pitch is printed; the splice-to-tie flange bolts along the joint (3 SPA @ 3) are not dimensioned to the tie",
         "Outline 1'-10 wide, end web to 11 3/4\" past the joint, acute corner cut 13 1/4 x 9 13/16 (VECTOR linework p.124, to scale); end flange bolt rows modeled, splice-to-tie bolts not modeled."),
+    // v7 (user review 2026-10-19, plan answer Q3): tie flange + web end in a VERTICAL cut parallel to the end web (p.124 / 125 partial plans: tie flange end
+    // at 117.47 deg, end web 117.45-117.49 deg, tie CL 7.42 deg -> 20.05 deg off square), 1/2" gap normal to it from the end flange inner edge; the
+    // knuckle tie web ends at the end flange edge (Section A-A: end flange and knuckle web end on one line, tie 1/2" further).
+    TieCutParallelToEndWeb = true,
     CheeseUnresolved = U("p.124 / 125 Section A-A", "knuckle jack cheese plates", "the 1\" cheese plates at the jacks (1'-1 each side of CL bearing) are drawn ~10 1/4\" long but not dimensioned in plan", "10 1/4\" x 10 1/4\" centred on the jacks."),
 };
 var studRows = new List<ArchPoint>();
@@ -370,9 +374,15 @@ for (int i = -3; i <= 5; i++) studRows.Add(new ArchPoint($"R{i + 4}", In(23.875)
 string dsWhy = U("p.126", "knuckle end plate stud positions", "the rows are 10 5/8\" apart (dimensioned) but the first row offset and the column lines (6 @ 8 3/8, 5 @ 7 1/2, 4 @ 8 3/4 along the FB1 line, plus pairs at the tendons) are not reproduced", "Rows from 5 3/8\" inside the end flange edge (scaled), 9 1/2\" along the rows (scaled), 3\" clear of the plate edges.");
 double[] openings = { -In(49.5), -In(31.5), In(31.5), In(49.5) };
 double[] webStuds = { -97.25, -87.75, -78.25, -68.75, -59.25, -16.25, -6.75, 2.75, 12.25, 21.75, 64.75, 74.25, 83.75, 93.25, 102.75 };
+// v7 end web (p.124 / 125 partial plans, VECTOR 6 pt = 1"): the end flange outer edge is the line 1'-1 1/2 outside the T line (13.52"), the end web outside face
+// 1/2" inside it (2.99 pt), inside face 1 1/2" (8.94 pt); the end web ends are cut SQUARE to the web (27.6 deg on the sheet = 90.0 to the web): NW (T34', acute)
+// mid-thickness 9.26" outside the T0'-T34' chord (1" inside the end flange corner clip), SW (T0, obtuse) 8.33" outside the chord (0.8" past the outside arch
+// flange plate); SE = NW, NE = SW (p.123 rotational symmetry). Not dimensioned -> scaled, flagged.
+string ewEndWhy = U("p.124 / 125", "knuckle end web end positions", "the end web ends are drawn (square cuts) but not dimensioned", "Scaled from the vector linework: 9 1/4\" (acute corners T34' / T34) and 8 5/16\" (obtuse corners T0 / T0') outside the tie chord, mid-thickness.");
 ArchKnuckleDefinition Knuckle(string name, string from, string to, string[] deck, ArchKnuckleCorner[] corners)
 {
     var k = new ArchKnuckleDefinition { Name = name, EndFrom = from, EndTo = to, DeckPlate = deck.ToList(), EndWebScaledHeightAtEnds = In(10.25), EndWebUnresolved = ewWhy,
+        EndWebInset = In(0.5), EndWebEndUnresolved = ewEndWhy,
         DeckPlateTopZ = In(0.875) + In(1), Detail = kDetail, EndWebOpeningsAt = openings.ToList(), EndWebStudsAt = webStuds.Select(In).ToList(),
         DeckPlateEdgeFromTieCL = In(1), DeckPlateEdgeFromFloorbeamCL = In(1), DeckPlateOverEndFlange = In(3),
         DeckStudRows = studRows, DeckStudSpacing = In(9.5), DeckStudEdge = In(3), DeckStudUnresolved = dsWhy };
@@ -381,13 +391,13 @@ ArchKnuckleDefinition Knuckle(string name, string from, string to, string[] deck
 }
 arch.Knuckles.Add(Knuckle("West", "T34'", "T0", new[] { "T34'", "T33'", "T1", "T0" }, new[]
 {
-    new ArchKnuckleCorner { Point = "T34'", Rib = "North rib", Tie = "North tie", Splice = "RS5'", OutsideLegHeight = In(9.9375), InsideLegHeight = In(10.1875) },
-    new ArchKnuckleCorner { Point = "T0", Rib = "South rib", Tie = "South tie", Splice = "RS1", OutsideLegHeight = In(10.5), InsideLegHeight = In(10.5) },
+    new ArchKnuckleCorner { Point = "T34'", Rib = "North rib", Tie = "North tie", Splice = "RS5'", OutsideLegHeight = In(9.9375), InsideLegHeight = In(10.1875), EndWebEndBeyondChord = In(9.25) },
+    new ArchKnuckleCorner { Point = "T0", Rib = "South rib", Tie = "South tie", Splice = "RS1", OutsideLegHeight = In(10.5), InsideLegHeight = In(10.5), EndWebEndBeyondChord = In(8.3125) },
 }));
 arch.Knuckles.Add(Knuckle("East", "T34", "T0'", new[] { "T34", "T33", "T1'", "T0'" }, new[]
 {
-    new ArchKnuckleCorner { Point = "T34", Rib = "South rib", Tie = "South tie", Splice = "RS5", OutsideLegHeight = In(9.9375), InsideLegHeight = In(10.1875) },
-    new ArchKnuckleCorner { Point = "T0'", Rib = "North rib", Tie = "North tie", Splice = "RS1'", OutsideLegHeight = In(10.5), InsideLegHeight = In(10.5) },
+    new ArchKnuckleCorner { Point = "T34", Rib = "South rib", Tie = "South tie", Splice = "RS5", OutsideLegHeight = In(9.9375), InsideLegHeight = In(10.1875), EndWebEndBeyondChord = In(9.25) },
+    new ArchKnuckleCorner { Point = "T0'", Rib = "North rib", Tie = "North tie", Splice = "RS1'", OutsideLegHeight = In(10.5), InsideLegHeight = In(10.5), EndWebEndBeyondChord = In(8.3125) },
 }));
 
 // ---------------------------------------------------------------- deck (p.151-152, L.B. Foster 3" bridge decking), curbs, PT (data)
@@ -397,6 +407,11 @@ var deck = new ArchDeckDefinition
     FormThickness = In(0.1046), FormDescription = "3\" x 8\" 12 ga galvanized steel deck form (Gr 33, G165), L.B. Foster 3\" bridge decking",
     // p.152 "corrugated steel deck panel": 3" deep, 8" pitch, 2'-0 cover; pans 5 3/8 wide at the bottom, ribs 2 5/8 at the base / 1 1/2 at the top.
     FormTopFlat = In(1.5), FormFluteBottom = In(5.375), FlutesOnBarGrid = true,
+    // v7 (user review 2026-10-19): knuckle-zone slab, curbs and deck bars stop at the end web INSIDE face and at the knuckle steel (p.151 WEST KNUCKLE REINF.:
+    // the bars end at the inside arch flange plate at the rib corners).
+    KnuckleZonesFromSteel = true,
+    KnuckleZoneUnresolved = U("p.124 / 125 / 151", "deck concrete at the knuckle rib corners", "the pocket between the outside and inside arch flange plate legs (open at the top, below the deck surface) is neither shown filled nor formed; p.151 ends the deck bars at the inside arch flange plate",
+        "Deck concrete stops at the deck-side face of the inside arch flange plate (vertical, from the end web to where the plate's intrados edge passes the slab top) and at the end web inside face; the pocket is not filled; curbs cut back to the same face."),
     ConcreteStrengthKsi = 5,
 };
 // Deck bars (p.152 section, p.154 bill): A1 #5 13'-10 top transverse @ 8 between the curbs, B1 #5 18'-2 bottom transverse @ 8, 27 - D1 (top) / D2 (bottom, one
@@ -438,7 +453,9 @@ deck.Tendons.AddRange(ptPaths.Values);
 // approach model from p.102 + p.91, build-nht.csx); in approach mode the tops are read from the pier units' FixedSeats instead. Underside of steel = end flange bottom (1 1/8" below the WP) - 1" plate below it (p.124, not dimensioned, U10).
 // Plan orientation: the masonry plate (3'-2 x 1'-5) sits in the 3'-4 x 1'-7 arch pedestal whose long axis is 63 deg to the pier line (p.102 plan, TYP;
 // both piers, in the pier frame S right / N up-station as the approach model's pedestals) -> the bearing plates and anchor bolts follow it.
-void Brg(string name, string support, string tpt, double seatFt) => arch.Bearings.Add(new ArchBearingDefinition { Name = name, Support = support, Point = "BRG-" + name, SeatElevation = F(seatFt), SteelUndersideZ = -In(1.125) - In(1), HangFromSteel = true,
+// v7 (user review 2026-10-19): the pedestal concrete is modeled at the bottom of the hung stack (conc. brg. surface under the 1/8" pad) - p.107 note 8 / p.102
+// note 1: the contractor adjusts the pedestal elevations to the fabricated bearing; the p.102 EL stays the plan value of the CHECK (CONFLICT reported).
+void Brg(string name, string support, string tpt, double seatFt) => arch.Bearings.Add(new ArchBearingDefinition { Name = name, Support = support, Point = "BRG-" + name, SeatElevation = F(seatFt), SteelUndersideZ = -In(1.125) - In(1), HangFromSteel = true, PedestalAdjusted = true,
     LongAxisAngleDeg = 63, LongAxisSource = "p.102 pier plan: arch span pedestal 63 deg (TYP) to the CL pier; p.107 bearing plan inside it" });
 Brg("NW", "Pier 10", "T34'", 534.726); Brg("SW", "Pier 10", "T0", 534.779); Brg("NE", "Pier 11", "T0'", 531.546); Brg("SE", "Pier 11", "T34", 531.494);
 foreach (var (bn, tn) in new[] { ("NW", "T34'"), ("SW", "T0"), ("NE", "T0'"), ("SE", "T34") })
@@ -454,7 +471,7 @@ foreach (var (bn, tn) in new[] { ("NW", "T34'"), ("SW", "T0"), ("NE", "T0'"), ("
 // ---------------------------------------------------------------- open plan items (each raised as a warning)
 arch.Unresolved.AddRange(new[]
 {
-    U("p.102, 107, 119, 124", "arch pedestal / bearing elevations (B1-B3)", "the plan pedestal tops do not reconcile with the WP elevations + bearing stack (0.13-0.20 ft; EL A vs E 0.053 ft)", "Bearings are built up from the plan pedestal tops; the chain difference is a CHECK row."),
+    U("p.102, 107, 119, 124", "arch pedestal / bearing elevations (B1-B3)", "the plan pedestal tops do not reconcile with the WP elevations + bearing stack (0.13-0.20 ft; EL A vs E 0.053 ft)", "Bearings hang from the steel (p.107 Section A-A); the approach-unit pedestal tops are modeled at the stack bottom per p.107 note 8 / p.102 note 1 (contractor adjusts the pedestals); the p.102 differences are CHECK rows."),
     U("p.102", "which arch pedestal is EL A / EL E", "the view direction of the pier elevation is not stated on the sheet", "EL A = south at Pier 10 / north at Pier 11, as derived from p.102 + p.91 by the approach model."),
     U("p.94, 102, 119", "CL1 / CL2 relative to the piers (U3)", "no combination of the layout offsets reproduces the plan chord 200'-11 11/16", "CL1/CL2 = 7\" along the pier + 4 13/16\" toward the span; the local geometry is kept and the difference reported."),
     U("p.119-150", "camber / no-load geometry (U4)", "not given", "Final geometry modeled."),
@@ -552,12 +569,24 @@ if (!testModel)
         var bres = am.Bearings.FirstOrDefault(b => b.Name == bname);
         if (unit == null || unit.FixedSeats.Count == 0 || bres == null) { Print($"WARNING bearing {bname}: no FixedSeats on {pier} of {uname} - p.102 value kept"); continue; }
         var best = unit.FixedSeats.Select(fs => (fs, w: unit.World(fs.S, fs.N, fs.Z))).OrderBy(x => (x.w.XY - bres.Center.XY).Length).First();
-        bdef.SeatElevation = best.fs.Z;
-        Print($"bearing {bname}: seat '{best.fs.Name}' of {pier} top {best.fs.Z / 0.3048:F3}'; CL bearing (arch geometry) to the pedestal seat point {(best.w.XY - bres.Center.XY).Length / 0.0254:F2}\" in plan");
+        // v7: the plan value stays the p.102 EL of Brg() (the approach pedestal top is lowered below - re-runs must not read the adjusted top as the plan)
+        Print($"bearing {bname}: seat '{best.fs.Name}' of {pier} (model top {best.fs.Z / 0.3048:F3}', p.102 {bdef.SeatElevation / 0.3048:F3}'); CL bearing (arch geometry) to the pedestal seat point {(best.w.XY - bres.Center.XY).Length / 0.0254:F2}\" in plan");
+        // pedestal top = bottom of the stack hung from the steel (pad bottom = "conc. brg. surface", p.107 Section A-A), p.107 note 8 / p.102 note 1
+        double stack = bdef.PadThickness + bdef.MasonryThickness + bdef.LowerSoleThickness + bdef.ElastomerHeight + bdef.UpperSoleB;
+        double seatAdj = bres.SteelUnderside - stack;
+        var bdefU = Doc.Project.Bridges.First(b => b.Name == uname);
+        var cbk = bdefU.Supports.First(s => s.Name == pier).Substructure.CapBlocks.FirstOrDefault(cb => cb.Kind == CapBlockKind.Pedestal && cb.Name == best.fs.Name);
+        if (cbk == null) { Print($"WARNING bearing {bname}: pedestal block '{best.fs.Name}' not found - pedestal not adjusted"); continue; }
+        cbk.TopElevation = seatAdj;
+        (cbk.Reported ??= new()).RemoveAll(r => r.StartsWith("CONFLICT (p.102 vs p.107)"));
+        cbk.Reported.Add($"CONFLICT (p.102 vs p.107): arch pedestal '{cbk.Name}' of {pier}: top modeled at EL {seatAdj / 0.3048:F3}' = bottom of the arch bearing {bname} (pad on the conc. brg. surface, stack 11 3/4\" hung from the steel, p.107 Section A-A / table H) instead of the p.102 EL {bdef.SeatElevation / 0.3048:F3}' ({(bdef.SeatElevation - seatAdj) / 0.0254:F2}\" lower) - p.107 note 8 / p.102 note 1: the contractor adjusts the pedestal elevations to the fabricated bearing.");
+        Print($"bearing {bname}: {pier} pedestal '{cbk.Name}' top {bdef.SeatElevation / 0.3048:F3}' (p.102) -> {seatAdj / 0.3048:F3}' (stack bottom, {(bdef.SeatElevation - seatAdj) / 0.0254:F2}\" lower)");
     }
 }
 
 if (!testModel) { var rj = await SBM.Api.ScriptHost.RunFileAsync(@"samples\plans\rail-joints-nht.csx", Doc, Args); Print(rj.Output.TrimEnd()); if (!rj.Success) Print("ERROR in rail-joints-nht.csx: " + rj.Error); }   // RAIL (PED)(HIGH) on the arch curbs
+// v7: the arch pedestal bars (E1-E3, rebar-nht-sub.csx) are placed from the pedestal top - re-run it after the pedestal adjustment above.
+if (!testModel) { var rr = await SBM.Api.ScriptHost.RunFileAsync(Path.Combine("samples", "plans", "rebar-nht-sub.csx"), Doc, Array.Empty<string>()); if (!rr.Success) Print("ERROR in rebar-nht-sub.csx: " + rr.Error); else Print("rebar-nht-sub.csx re-run (arch pedestal bars from the adjusted pedestal tops)"); }
 var rep = Doc.Regenerate();
 foreach (var e in rep.Errors) Print("ERROR " + e);
 foreach (var w in rep.Warnings.Where(w => w.StartsWith(br.Name))) Print("warning " + w);

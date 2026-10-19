@@ -592,6 +592,14 @@ public sealed class ArchKnuckleDefinition
     /// <summary>Outside face of the end web (= outer edge of the end flange) measured outward from the end line, normal to it (p.124: 1'-1 1/2).</summary>
     public double EndWebOffset { get; set; } = Ft(1) + In(1.5);
     public double EndWebThickness { get; set; } = In(1);
+    /// <summary>OPTIONAL (0 = the end web outside face is flush with the end flange outer edge): the end web outside face this far inside the end flange
+    /// outer edge (p.124 / 125 partial plans, vector: 1/2").</summary>
+    public double EndWebInset { get; set; }
+    /// <summary>Distance of the end web outside / inside face from the end line, measured toward the span (negative = outside the end line).</summary>
+    public double EndWebOutsideDn() => -EndWebOffset + EndWebInset;
+    public double EndWebInsideDn() => -EndWebOffset + EndWebInset + EndWebThickness;
+    /// <summary>OPTIONAL UNRESOLVED text for the end web end positions (<see cref="ArchKnuckleCorner.EndWebEndBeyondChord"/>) when they are scaled.</summary>
+    public string EndWebEndUnresolved { get; set; } = "";
     public double EndWebHeightAtChord { get; set; } = Ft(1) + In(0.125);
     /// <summary>End web height at its ends (NaN = not dimensioned: then <see cref="EndWebScaledHeightAtEnds"/> is used, flagged).</summary>
     public double EndWebHeightAtEnds { get; set; } = double.NaN;
@@ -641,6 +649,10 @@ public sealed class ArchKnuckleCorner
     /// <summary>Horizontal leg height of the outside / inside arch flange plate (in the plane of the plate).</summary>
     public double OutsideLegHeight { get; set; }
     public double InsideLegHeight { get; set; }
+    /// <summary>OPTIONAL end of the end web at this corner (NaN = the end web is <see cref="ArchKnuckleDefinition.EndLength"/> long, centred on the chord
+    /// crossing): the end is cut square to the web, its mid-thickness point this far outside the tie chord through the corner point, measured normal to
+    /// that chord (p.124 / 125 partial plans).</summary>
+    public double EndWebEndBeyondChord { get; set; } = double.NaN;
 }
 
 /// <summary>Knuckle corner detail (p.124 / p.125): bent 1" arch flange plates (rib flange width, R6 bends, 1" clip) from the end web to the first rib
@@ -661,6 +673,10 @@ public sealed class ArchKnuckleDetail
     public double ArchStiffenerThickness { get; set; } = In(1);
     public string ArchStiffenerUnresolved { get; set; } = "";
     public double JointGap { get; set; } = In(0.5);
+    /// <summary>OPTIONAL (false = v2: square cut across the tie, the gap centred on the end flange edge along the tie CL): the tie flange and web end in a
+    /// VERTICAL cut parallel to the end web (skewed in plan), <see cref="JointGap"/> measured normal to it from the end flange inner edge; the knuckle tie
+    /// web ends at the end flange edge (p.124 / 125 partial plans and Section A-A).</summary>
+    public bool TieCutParallelToEndWeb { get; set; }
     public double GussetThickness { get; set; } = In(0.5);
     public double GussetHeight { get; set; } = In(9);
     public double GussetTopBelowWeb { get; set; } = In(0.5);
@@ -728,6 +744,13 @@ public sealed class ArchDeckDefinition
     /// <summary>Corrugations (flute centres) on the longitudinal bottom bar grid (true: a flute at every <see cref="ArchDeckRebar.LongSpacing"/> from the
     /// structure CL, "#5 bar in each corrugation"); false = profile from the south tie web face (v1).</summary>
     public bool FlutesOnBarGrid { get; set; }
+    /// <summary>OPTIONAL (false = v1-v6: knuckle-zone slab between the tie CL points, end ring moved out normal to the end line by EndWebOffset; curbs and
+    /// bars to the end lines): the knuckle-zone slab, the curbs and the deck bars stop at the end web INSIDE face and at the knuckle steel - the tie web
+    /// inside faces and, at each rib corner, the inside face of the inside arch flange plate from the end web to where the plate's intrados edge passes
+    /// the slab top (p.151 WEST KNUCKLE REINF.: the bars end at that plate). Bars keep <see cref="ArchDeckRebar.EndCover"/> to these faces.</summary>
+    public bool KnuckleZonesFromSteel { get; set; }
+    /// <summary>UNRESOLVED text raised with <see cref="KnuckleZonesFromSteel"/> (e.g. whether the rib-box pocket is filled).</summary>
+    public string KnuckleZoneUnresolved { get; set; } = "";
 }
 
 /// <summary>Longitudinal PT (p.155): strands per tendon (flat duct), strand size, jacking force, strand spacing in the duct, anchorage envelope at the
@@ -845,6 +868,10 @@ public sealed class ArchBearingDefinition
     /// (SteelUndersideZ at the bearing centre): the beveled upper sole plate bears on the steel with its top in the plane of the steel underside, the
     /// rest below it level; the plan pedestal top is then checked (p.107 note 8: the pedestal elevations are adjusted to the fabricated bearing).</summary>
     public bool HangFromSteel { get; set; }
+    /// <summary>OPTIONAL (with <see cref="HangFromSteel"/>): the pedestal concrete under this bearing is modeled at the bottom of the stack (the "conc. brg.
+    /// surface") instead of the plan top (p.107 note 8 / p.102 note 1: the contractor adjusts the pedestal elevations to the fabricated bearing). The pedestal
+    /// itself belongs to another model (set by the caller); here it only changes the warning text and the bearing seat elevation (= stack bottom).</summary>
+    public bool PedestalAdjusted { get; set; }
     /// <summary>Long axis of the masonry / sole plates in plan: angle (deg) from the support line +S (right) toward +N (up-station), as the plan
     /// pedestal (NaN = normal to the support line).</summary>
     public double LongAxisAngleDeg { get; set; } = double.NaN;

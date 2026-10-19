@@ -35,7 +35,7 @@ public static partial class ArchGenerator
             hw.Insert(0, hw[0]); hw.Add(hw[^1]);
             _deckHalfWidth = hw;
             // Extend to the end web inside faces.
-            double ext0 = dd.ka is { } k0 ? k0.EndWebOffset - k0.EndWebThickness : 0, ext1 = dd.kb is { } k1 ? k1.EndWebOffset - k1.EndWebThickness : 0;
+            double ext0 = dd.ka is { } k0 ? -k0.EndWebInsideDn() : 0, ext1 = dd.kb is { } k1 ? -k1.EndWebInsideDn() : 0;
             var t0 = (m[1] - m[0]).Normalized(); var t1 = (m[^1] - m[^2]).Normalized();
             m.Insert(0, m[0] - t0 * ext0); e.Insert(0, e[0]);
             m.Add(m[^1] + t1 * ext1); e.Add(e[^1]);
@@ -66,14 +66,15 @@ public static partial class ArchGenerator
             return (Vec2.Lerp(dl.m[i - 1], dl.m[i], t), (dl.e[i - 1] + (dl.e[i] - dl.e[i - 1]) * t).Normalized());
         }
 
-        private void AddBars(string mark, RebarSize size, string location, List<Vec3[]> bars, BarShape? shape = null)
+        private void AddBars(string mark, RebarSize size, string location, List<Vec3[]> bars, BarShape? shape = null, int unplaced = 0)
         {
             if (bars.Count == 0) return;
+            if (unplaced > 0) location += $" ({unplaced} of {bars.Count + unplaced} not modeled - UNRESOLVED)";
             var lens = bars.Select(b => Enumerable.Range(1, b.Length - 1).Sum(i => (b[i] - b[i - 1]).Length)).ToList();
             bool same = lens.Max() - lens.Min() < In(0.5);
             Model.Concrete.Marks.Add(new BarMark
             {
-                Mark = mark, Size = size, Shape = shape ?? BarShape.Straight(lens.Max()), Location = location, Count = bars.Count,
+                Mark = mark, Size = size, Shape = shape ?? BarShape.Straight(lens.Max()), Location = location, Count = bars.Count + unplaced,
                 VaryingLengths = same || shape != null ? null : lens,
             });
             foreach (var b in bars) Model.Concrete.Bars.Add(new BarPlacement { Mark = mark, Points = b, Group = "Deck" });
@@ -91,6 +92,13 @@ public static partial class ArchGenerator
             Vec3 Top(Vec2 p, double below) => W(p.WithZ(GradeZ(p.X, p.Y) - below));
             // Transverse bars.
             var aBars = new List<Vec3[]>(); var bBars = new List<Vec3[]>();
+            // v7 (KnuckleZonesFromSteel): rows in the knuckle zones keep out of the knuckle steel (rib corners, tie webs) - 1/8" clear of the steel.
+            bool v7 = dk.KnuckleZonesFromSteel && _zoneBarPolys.Count > 0;
+            int nKn = _deck?.knots.Count ?? 0;
+            double sZoneA = v7 && _deck?.ka?.Detail != null && nKn >= 3 ? dl.S[1 + 8] : double.NegativeInfinity;
+            double sZoneB = v7 && _deck?.kb?.Detail != null && nKn >= 3 ? dl.S[1 + 8 * (nKn - 2)] : double.PositiveInfinity;
+            double rowClear = dA / 2 + In(0.125);
+            int rowsCut = 0;
             int nT = rb.TransCount > 1 ? rb.TransCount : (int)Math.Floor((Lt - 2 * rb.EndCover) / rb.TransSpacing) + 1;
             double sp = rb.TransCount > 1 ? (Lt - 2 * rb.EndCover) / (nT - 1) : rb.TransSpacing;
             double s0 = (Lt - (nT - 1) * sp) / 2;
@@ -102,7 +110,14 @@ public static partial class ArchGenerator
                 double sRow = s0 + i * sp;
                 var (m, e) = AtS(dl, sRow);
                 // B: centred on the structure CL.
-                bBars.Add(new[] { W((m - e * rb.BottomTransLength / 2).WithZ(zB)), W((m + e * rb.BottomTransLength / 2).WithZ(zB)) });
+                double limL = double.PositiveInfinity, limR = double.PositiveInfinity;
+                if (sRow < sZoneA || sRow > sZoneB)
+                {
+                    limR = ClearRun(m, e, Ft(12), rowClear); limL = ClearRun(m, -e, Ft(12), rowClear);
+                }
+                double bL = Math.Min(rb.BottomTransLength / 2, limL), bR = Math.Min(rb.BottomTransLength / 2, limR);
+                if (bL < rb.BottomTransLength / 2 - 1e-9 || bR < rb.BottomTransLength / 2 - 1e-9) rowsCut++;
+                bBars.Add(new[] { W((m - e * bL).WithZ(zB)), W((m + e * bR).WithZ(zB)) });
                 // A: centred where the ring crosses CL NHT, following the crown (3 points per foot).
                 double Off(double y) => _al.Inverse(W((m + e * y).WithZ(0)).XY).Offset;
                 double lo = -rb.BottomTransLength / 2, hi = rb.BottomTransLength / 2, flo = Off(lo);
@@ -117,6 +132,8 @@ public static partial class ArchGenerator
                     foreach (int side in new[] { -1, 1 })
                     {
                         double yHook = side * (hw - rb.TopTransHookOffset);
+                        double lim = side > 0 ? limR : limL;
+                        if (Math.Abs(yHook) > lim) yHook = side * lim;   // v7: hook leg moved in, clear of the knuckle steel
                         var top0 = Top(m + e * yHook, rb.TopCover + dA / 2);
                         var bot0 = W((m + e * yHook).WithZ(zRet));
                         double drop = (top0 - bot0).Length;
@@ -166,6 +183,9 @@ public static partial class ArchGenerator
                 var f = face + nIn * rb.EndCover;
                 double den = Vec2.Cross(x, fe);
                 double tau = Math.Abs(den) < 1e-9 ? 0 : Vec2.Cross(f - p, fe) / den;
+                // v7: straight until the end web inside face or the knuckle steel (tie web / rib corner) minus the end cover
+                if (v7) tau = ClearRun(p, x, tau + Ft(1), rb.EndCover);
+                if (tau < In(0.5)) return new List<Vec2> { p };
                 int np = Math.Max(1, (int)Math.Ceiling(tau / Ft(1)));
                 var run = Enumerable.Range(0, np + 1).Select(k => p + x * (tau * k / np)).ToList();
                 if (atStart) run.Reverse();
@@ -208,11 +228,30 @@ public static partial class ArchGenerator
                 var st = RebarCatalog.Size(rb.CurbStirrupSize);
                 var sBars = new List<Vec3[]>(); var cBars = new List<Vec3[]>();
                 var mA = AtS(dl, rb.EndCover).m; var mB = AtS(dl, Lt - rb.EndCover).m;
+                int curbFit = 0;
                 foreach (var c in dk.Curbs)
                 {
                     double oc = c.InnerOffset + Math.Sign(c.InnerOffset) * c.Width / 2;
                     double st0 = _al.Inverse(W(mA.WithZ(0)).XY).Station, st1 = _al.Inverse(W(mB.WithZ(0)).XY).Station;
                     if (st1 < st0) (st0, st1) = (st1, st0);
+                    if (v7 && dd.ka.Detail != null && dd.kb.Detail != null && EndFaceWorld(dd.ka, dd.ka.EndWebInsideDn()) is { } fA && EndFaceWorld(dd.kb, dd.kb.EndWebInsideDn()) is { } fB)
+                    {
+                        // v7: from the skewed end web inside faces, both stirrup legs EndCover clear of the end web and the knuckle steel (rib corners).
+                        double w2 = rb.CurbStirrupWidth / 2;
+                        double c0 = Math.Max(CrossStation(oc - w2, fA), CrossStation(oc + w2, fA)), c1 = Math.Min(CrossStation(oc - w2, fB), CrossStation(oc + w2, fB));
+                        if (c1 < c0) (c0, c1) = (Math.Max(CrossStation(oc - w2, fB), CrossStation(oc + w2, fB)), Math.Min(CrossStation(oc - w2, fA), CrossStation(oc + w2, fA)));
+                        bool Fits(double sta)
+                        {
+                            double zw = _b.Deck.FinishedElevation(_al, sta, oc);
+                            return ZoneClear(LocalXY(_al.PointAt(sta, oc - w2), zw)) >= rb.EndCover && ZoneClear(LocalXY(_al.PointAt(sta, oc + w2), zw)) >= rb.EndCover;
+                        }
+                        if (!double.IsNaN(c0) && !double.IsNaN(c1))
+                        {
+                            while (c0 < c1 && !Fits(c0)) c0 += In(0.25);
+                            while (c1 > c0 && !Fits(c1)) c1 -= In(0.25);
+                            st0 = c0; st1 = c1; curbFit++;
+                        }
+                    }
                     double hw = rb.CurbStirrupWidth / 2 - st.Diameter / 2, hh = rb.CurbStirrupHeight - st.Diameter;
                     Vec3[] Loop(double sta)
                     {
@@ -261,6 +300,8 @@ public static partial class ArchGenerator
             {
                 var dBars = new List<Vec3[]>();
                 double zE = zD2, h = rb.EdgeBarHook;
+                int d3Unplaced = 0, d3Shifted = 0;
+                var d3Where = new List<string>();
                 for (int k = 0; k + 1 < d3.knots.Count; k++)
                     foreach (var (tie, other, s0k, s1k) in new[] { (d3.ts, d3.tn, d3.knots[k].s, d3.knots[k + 1].s), (d3.tn, d3.ts, d3.knots[k].n, d3.knots[k + 1].n) })
                     {
@@ -272,6 +313,23 @@ public static partial class ArchGenerator
                         var c = pc + inward * rb.EdgeBarOffset;
                         // the bar follows the tie chord between the hook ends (panels are 5'-10 to 6'-1 3/4 on R 342'-4 / 360'-8: the sagitta is 1/64")
                         double half = rb.EdgeBarLength / 2 - dA / 2;
+                        bool kz = v7 && ((k == 0 && sZoneA > double.NegativeInfinity) || (k + 2 == d3.knots.Count && sZoneB < double.PositiveInfinity));
+                        if (kz)
+                        {
+                            // v7, knuckle panel: the bar stays between its floorbeam (CL) and EndCover clear of the end web / knuckle steel; shifted from the
+                            // panel centre toward the floorbeam when needed; not placed when the panel is shorter than the bar (obtuse corners T0 / T0').
+                            double sEnd = k == 0 ? s0k : s1k, sFbk = k == 0 ? s1k : s0k;
+                            var dirEnd = Vec2.Dot(tie.At(sEnd).p - pc, t) >= 0 ? t : -t;
+                            double limEnd = ClearRun(c, dirEnd, Ft(10), rb.EndCover) - dA / 2;
+                            double dFb = Math.Abs(Vec2.Dot(tie.At(sFbk).p - pc, t)) - dA / 2;
+                            double hb = rb.EdgeBarLength / 2;
+                            double lo = hb - dFb, hi = limEnd - hb;
+                            string at = $"{tie.Def.Name} {(k == 0 ? "start" : "end")} panel ({L(Math.Abs(Vec2.Dot(tie.At(sFbk).p - tie.At(sEnd).p, t)))})";
+                            if (lo > hi + 1e-9) { d3Unplaced++; d3Where.Add(at + ": not placed"); continue; }
+                            double dl3 = Math.Clamp(0, lo, hi);
+                            if (Math.Abs(dl3) > 1e-6) { d3Shifted++; d3Where.Add(at + $": shifted {L(Math.Abs(dl3))} toward the floorbeam"); }
+                            c += dirEnd * dl3;
+                        }
                         Vec3 P(double u, double z) => W((c + t * u).WithZ(z));
                         double ri = half + dA / 2 - h;  // return end: the hook's out-to-out return measured from the outside of the up leg
                         dBars.Add(new[] { P(-ri, zE + h - dA), P(-half, zE + h - dA), P(-half, zE), P(half, zE), P(half, zE + h - dA), P(ri, zE + h - dA) });
@@ -281,8 +339,13 @@ public static partial class ArchGenerator
                     Code = "U2H", Description = "Edge bar, up-hooks with returns at both ends (p.154 BAR D3)", FixedLength = rb.EdgeBarLength + 4 * rb.EdgeBarHook,
                     Centerline = new[] { new Vec2(h, h), new Vec2(0, h), new Vec2(0, 0), new Vec2(rb.EdgeBarLength, 0), new Vec2(rb.EdgeBarLength, h), new Vec2(rb.EdgeBarLength - h, h) },
                 };
-                AddBars(rb.EdgeBarMark, sz, "Arch deck edge bars along the tie webs, one per tie per floorbeam panel (p.152 / 154)", dBars, dShape);
+                AddBars(rb.EdgeBarMark, sz, "Arch deck edge bars along the tie webs, one per tie per floorbeam panel (p.152 / 154)", dBars, dShape, d3Unplaced);
+                if (d3Unplaced > 0)
+                    Warn(UnresolvedFlag.Text("p.151 / 152 / 154", $"{d3Unplaced} D3 edge bars in the knuckle panels", "the bill has one D3 per tie per floorbeam panel (68) but the knuckle panel at each obtuse corner is shorter than the 5'-9 bar between the floorbeam and the end web / rib corner, and p.151 does not show the D3 there",
+                        "Counted in the bill, not placed (" + string.Join("; ", d3Where.Where(w => w.EndsWith("not placed"))) + ")."));
+                if (d3Shifted > 0) Info($"Arch deck D3: {string.Join("; ", d3Where.Where(w => !w.EndsWith("not placed")))} (end cover {L(rb.EndCover)} to the knuckle steel / end web).");
             }
+            if (rowsCut > 0) Info($"Arch deck: {rowsCut} transverse rows in the knuckle zones shortened / A1 hooks moved in to stay {L(rowClear - dA / 2)} clear of the knuckle steel (rib corners).");
             if (rb.Unresolved.Length > 0) Warn(rb.Unresolved);
         }
 
@@ -352,7 +415,7 @@ public static partial class ArchGenerator
                         double zef = k.EndFlangeBottomZ + k.EndFlangeThickness;
                         foreach (double x in k.EndWebOpeningsAt)
                         {
-                            var q = (el.ctr + el.t * x + el.n * (-k.EndWebOffset + k.EndWebThickness)).WithZ(zef + k.EndWebOpeningZ);
+                            var q = (el.ctr + el.t * x + el.n * k.EndWebInsideDn()).WithZ(zef + k.EndWebOpeningZ);
                             double d = (q - near).Length;
                             if (d < bd) { bd = d; best = (q, el.t, k.EndWebOpeningsAt); }
                         }
