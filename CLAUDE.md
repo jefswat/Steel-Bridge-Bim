@@ -782,6 +782,24 @@ UNRESOLVED FLAG (general, reusable): `SBM.Core/Assumption.cs` `Assumption{Status
   (`ArchKnuckleDetail.Splice*`, acute end corner cut, end flange bolt rows), end flange ends cut parallel to the chords; bearings hung from the steel
   (`ArchBearingDefinition.HangFromSteel`, upper sole top in the steel plane, pedestal kept = CONFLICT per p.107 note 8); cable connectors on their own
   layer 3D-ARCH-CABLE-CONNECTORS.
+  v5 / v6 WELDS (design note sections 10 / 11): every weld symbol on the steel sheets is a 5/16" fillet (no CJP / field / all-around). PartCategory.Weld parts
+  (viewport layer 3D-WELDS = a DETAIL layer: tiled, hidden while the camera moves, drawn ~1/4 s after it stops, only near the view line; IFC IfcFastener WELD;
+  5/16" beads are ~2 px at overview zoom - look at them at <= 1.5 m wide). Rib fin plates (p.148): `ArchFinSettings.RibWeldSize`, 4 x D per cable
+  (`RibFinWelds`; the weld stays at the plan D, runs past the flange contact on ~15 % of the length = CHECK rows). Tie fin plate (p.146 / 149): bolted, NO weld
+  symbol on the plans -> none (`TieFinWelds` is the explicit "none" hook). Everything else is data-driven: `ArchDefinition.Welds` = `ArchWeldRule` (Parts / Onto
+  regex on part marks, `$1` capture groups pair a plate with its own base plate, Size, OneSide + `SideToward` "span" | "+x" | "-x" for single-sided symbols
+  whose side the plan does not say (flagged `Unresolved`), Tolerance, AngleTolDeg, Source) -> `ArchGenerator.BuildWeldRules` -> `Steel/WeldFinder.TJoint`: the
+  attached plate's perimeter edges whose edge face sits on the other part (opposite normal within AngleTolDeg, edge within Tolerance, inside a triangle) get a
+  bead along the stretches really on it (sampled + bisected); `out overhang` = plate edge length hanging past the joint -> CHECK row per rule, rules that find no
+  contact list the marks. NHT rules in `arch-nht.csx` ("v6 welds" block): knuckle end web / arch flange plates / stub web / arch stiffener / vertical stiffener
+  (p.124 / 125, 5/16" both sides, mill to bear), bracing gusset to connection plate and rib stiffener to rib (p.129-140, both sides), tie web-to-flange
+  (p.143, one side), floorbeam web-to-flange (p.145), floorbeam connection stiffener (p.146); 286 weld parts. Bolted joints (knuckle splice / fill / cheese /
+  tie-joint gussets, rib / tie splices, floorbeam connection plates, tie fin plates) get none. Knuckle plates are now MILL TO BEAR: arch flange plates, stub
+  web and vertical stiffener bottoms lie in the end flange top plane (they were cut square to the leaning plate: +-0.044" / +-0.30" wedge gaps, the
+  stiffener also sank 0.75" into the flange and was inside out). `ArchBracingConnection.MitreWeldedEdge` (NHT: on) cuts each gusset's welded edge to the 7/8"
+  connection plate face (gusset plane to plate face 58 - 90 deg, the plan prints the supplement 90 - 122; a square edge left a 1/16" - 5/8" wedge gap at 80
+  gusset legs; Info line per leg; the gusset is then a faceted solid in IFC). Checks (v6): check-arch-nht 1064 OK / 508 DIFF (+22 weld rows: EW overhangs the end flange 4.2" at one end per knuckle, gusset edge overhang
+  6 7/16" in total, FB33-STB has no contact on its +X face), check-nht 827 / 6 (unchanged), tests 476.
 - True-arc plate outlines (generic): `Solids/ArcPolygon` (points + signed minor-arc radii per edge, exact area, tessellation, Sub / Map / Reversed),
   `PlateBuilder.AddPlanarArc` (mesh from the tessellation, `ExtrudedSolid.ExactOutline` keeps the arcs) -> IFC Parametric IfcIndexedPolyCurve with
   IfcArcIndex, ReferenceView tessellated to its chord tolerance. Tests `ArchBracingConnectionTests`. Tests `ArchTests`, `ArchV2Tests`. Knuckle visual check without a snapshot: `temp`-style dump of part triangles + a small

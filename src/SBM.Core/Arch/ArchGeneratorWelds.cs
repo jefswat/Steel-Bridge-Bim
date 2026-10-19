@@ -53,7 +53,8 @@ public static partial class ArchGenerator
         }
 
         /// <summary>Weld rules (<see cref="ArchDefinition.Welds"/>): T-joint fillets found on the built parts (world coordinates). One weld part per attached
-        /// part and rule; a rule that finds no contact is reported (the plan symbol has no modeled joint).</summary>
+        /// part and rule; a rule that finds no contact is reported (the plan symbol has no modeled joint). Welds run only along the stretches where the
+        /// attached plate edge really lies on the other part; the length of edges that overhang it is reported (CHECK).</summary>
         private void BuildWeldRules()
         {
             var parts = Model.Steel.Parts.Where(p => p.Category != PartCategory.Weld && !p.Mesh.IsEmpty).ToList();
@@ -63,38 +64,64 @@ public static partial class ArchGenerator
                 if (r.Size <= 0 || r.Parts.Length == 0 || r.Onto.Length == 0) continue;
                 var rxB = new System.Text.RegularExpressions.Regex(r.Parts); var rxA = new System.Text.RegularExpressions.Regex(r.Onto);
                 var bs = parts.Where(p => rxB.IsMatch(p.Mark)).ToList();
-                var As = parts.Where(p => rxA.IsMatch(p.Mark)).ToList();
+                var asAll = r.Onto.Contains('$') ? parts : parts.Where(p => rxA.IsMatch(p.Mark)).ToList();
                 var asu = r.Unresolved.Length > 0 ? Assumption.UnresolvedDimension(r.Unresolved, $"{L(r.Size)} fillet along the full contact") : null;
-                int built = 0, missing = 0; double total = 0;
+                Func<Vec3, Vec3, bool>? keep = SideRule(r);
+                int built = 0, missing = 0; double total = 0, overhang = 0; var noContact = new List<string>();
                 foreach (var b in bs)
                 {
+                    // "$1" ... in Onto = the capture groups of Parts on this attached part's mark (e.g. the gusset's own connection plate).
+                    var As = r.Onto.Contains('$') ? asAll.Where(a => System.Text.RegularExpressions.Regex.IsMatch(a.Mark, rxB.Match(b.Mark).Result(r.Onto))).ToList() : asAll;
                     var bb = bounds[b];
                     var m = new Mesh(); double len = 0;
                     foreach (var a in As)
                     {
                         if (ReferenceEquals(a, b) || !Touch(bb, bounds[a], r.Tolerance + In(0.25))) continue;
-                        len += WeldFinder.AddBeads(m, WeldFinder.TJoint(a.Mesh, b.Mesh, r.Tolerance, 3, !r.OneSide), r.Size);
+                        var beads = WeldFinder.TJoint(a.Mesh, b.Mesh, r.Tolerance, out double oh, r.AngleTolDeg, !r.OneSide, keep);
+                        len += WeldFinder.AddBeads(m, beads, r.Size);
+                        overhang += oh;
                     }
-                    if (m.IsEmpty) { missing++; continue; }
+                    if (m.IsEmpty) { missing++; noContact.Add(b.Mark); continue; }
                     built++; total += len;
                     Model.Steel.Parts.Add(new SteelPart
                     {
                         Mark = $"{b.Mark}-W{(r.Name.Length > 0 ? "-" + r.Name : "")}", Category = PartCategory.Weld, Assembly = b.Assembly, Mesh = m, Length = len,
                         Material = r.Material, Assumption = asu,
-                        Description = $"{L(r.Size)} fillet{(r.OneSide ? "" : ", both sides")}, {b.Description.Split(',')[0]} to {r.Name} ({r.Source})",
+                        Description = $"{L(r.Size)} fillet{(r.OneSide ? ", one side" : ", both sides")}, {b.Description.Split(',')[0]} to {r.Name} ({r.Source})",
                     });
                 }
                 if (asu != null && built > 0) Warn(asu.Reason);
-                Info($"Arch welds {r.Name}: {built} parts welded ({L(total)} of {L(r.Size)} fillet roots){(missing > 0 ? $", {missing} matching parts without a contact" : "")} [{r.Source}].");
-                Model.Checks.Add(new ArchCheck($"welds {r.Name} ({r.Source}): attached parts with a full-contact joint", $"{bs.Count}", $"{built}", missing, missing == 0,
-                    missing == 0 ? "" : "parts matching the rule whose edge face does not sit on a matching part (gap > tolerance or not touching) - no weld built there"));
+                Info($"Arch welds {r.Name}: {built} parts welded ({L(total)} of {L(r.Size)} fillet roots){(missing > 0 ? $", {missing} matching parts without a contact ({string.Join(", ", noContact.Take(6))}{(noContact.Count > 6 ? ", ..." : "")})" : "")}{(overhang > Tol ? $", {L(overhang)} of plate edge overhanging the joint (not welded)" : "")} [{r.Source}].");
+                Model.Checks.Add(new ArchCheck($"welds {r.Name} ({r.Source}): attached parts with a joint on the other part", $"{bs.Count}", $"{built}", missing, missing == 0,
+                    missing == 0 ? "" : $"parts matching the rule whose edge face does not sit on a matching part (gap > tolerance or not touching) - no weld built there: {string.Join(", ", noContact.Take(6))}{(noContact.Count > 6 ? ", ..." : "")}"));
+                Model.Checks.Add(new ArchCheck($"welds {r.Name} ({r.Source}): plate edge overhanging the joint (not welded)", "0", L(overhang), overhang, overhang <= Tol,
+                    overhang <= Tol ? "" : "length of the attached plate's edges that lie on the other part over part of their length only (the remainder hangs past it: plan contact vs the modeled extents)"));
             }
+        }
+
+        /// <summary>Single-sided weld symbol: which side of the attached plate is welded (<see cref="ArchWeldRule.SideToward"/>): "span" = the side facing
+        /// the structure centre line (local Y = 0), "+x" / "-x" = the side facing along the local X axis. Null = both sides (or no hint).</summary>
+        private Func<Vec3, Vec3, bool>? SideRule(ArchWeldRule r)
+        {
+            if (!r.OneSide || r.SideToward.Length == 0) return null;
+            var fr = _fr;
+            if (r.SideToward == "+x") return (_, n) => Vec3.Dot(n, fr.X) > 0;
+            if (r.SideToward == "-x") return (_, n) => Vec3.Dot(n, fr.X) < 0;
+            if (r.SideToward == "span")
+                return (p, n) =>
+                {
+                    double y = Vec3.Dot(p - fr.Origin, fr.Y);                // local Y of the weld; the span centre line is Y = 0
+                    return Vec3.Dot(n, fr.Y) * (y > 0 ? -1 : 1) > 0;
+                };
+            return null;
         }
 
         private static bool Touch(Box3 a, Box3 b, double tol) =>
             a.Max.X + tol >= b.Min.X && b.Max.X + tol >= a.Min.X && a.Max.Y + tol >= b.Min.Y && b.Max.Y + tol >= a.Min.Y && a.Max.Z + tol >= b.Min.Z && b.Max.Z + tol >= a.Min.Z;
 
-        /// <summary>Tie fin plate welds (p.149): none - the plate is bolted to the tie web (4 bolts) and bent; nothing is welded on the plan.</summary>
+        /// <summary>Tie fin plate welds (p.146 Detail 1 / Section C-C / p.149): none. The plate is a 7/8" bent plate bolted to the tie web (4 bolts, 4" x 4" gages) at the
+        /// floorbeam CL and none of the three sheets carries a weld symbol on it (the only symbols on p.146 are the stiffener detail, p.149 has none). Kept as the
+        /// explicit "no weld on the plans" hook so nobody adds one without a plan symbol.</summary>
         private void TieFinWelds(ArchHangerDefinition h, ArchFinSettings fs, TieGeo tg, string asm, Vec2 p2, Vec2 t2, Vec2 outward, double off, double zb, double hw,
             Vec3 t3, Vec3 v3, Vec3 nUp)
         {

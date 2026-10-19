@@ -5,10 +5,11 @@ namespace SBM.Core.Steel;
 
 /// <summary>
 /// Generic T-joint fillet weld lines between two plate solids (meshes in the same coordinates): where an EDGE FACE of plate B lies on a face of part A
-/// (normals opposite within <c>angleTolDeg</c>, every vertex of the B face within <c>distTol</c> of the A plane and inside an A triangle), the weld
-/// roots are the boundary edges of that contact region that run along B's two large plate faces (one bead per side of B = "both sides"); the bead
-/// legs run along A's face away from B and along B's face away from A. Used where the plans give a weld symbol on a joint whose extent is "full
-/// contact" (no length dimensioned). Pure geometry: nothing is moved; edges that only partly sit on A are skipped.
+/// (normals opposite within <c>angleTolDeg</c>, the edge within <c>distTol</c> of the A plane and inside an A triangle), the weld
+/// roots are the perimeter edges of B's plate faces whose edge face sits on A (one bead per side of B = "both sides"), only along the stretches that
+/// really lie on A; the bead legs run along A's face away from B and along B's face away from A. Used where the plans give a weld symbol on a joint
+/// whose extent is "full contact" (no length dimensioned). Pure geometry: nothing is moved; the length of edges that are only partly on A is returned
+/// (overhang).
 /// </summary>
 public static class WeldFinder
 {
@@ -32,8 +33,16 @@ public static class WeldFinder
 
     /// <summary>Weld beads of plate <paramref name="b"/> onto part <paramref name="a"/>; <paramref name="bothSides"/> false = only the side whose B face
     /// normal is closest to <paramref name="side"/> (when given).</summary>
-    public static List<Bead> TJoint(Mesh a, Mesh b, double distTol, double angleTolDeg = 3, bool bothSides = true, Vec3? side = null)
+    public static List<Bead> TJoint(Mesh a, Mesh b, double distTol, double angleTolDeg = 3, bool bothSides = true, Vec3? side = null) =>
+        TJoint(a, b, distTol, out _, angleTolDeg, bothSides, side is { } sd ? (_, ns) => Vec3.Dot(ns, sd) > 0 : null);
+
+    /// <summary>As <see cref="TJoint(Mesh, Mesh, double, double, bool, Vec3?)"/>; <paramref name="overhang"/> = total length of the plate edges that sit
+    /// on A over part of their length only (the part off A, where the plate edge face overhangs A or does not touch it). <paramref name="keep"/>
+    /// (used when <paramref name="bothSides"/> is false) decides per edge, from its start point and the outward normal of the B plate face on that
+    /// side, whether that side is welded (a single-sided weld symbol).</summary>
+    public static List<Bead> TJoint(Mesh a, Mesh b, double distTol, out double overhang, double angleTolDeg = 3, bool bothSides = true, Func<Vec3, Vec3, bool>? keep = null)
     {
+        overhang = 0;
         var res = new List<Bead>();
         var ta = Tris(a); var tb = Tris(b);
         if (ta.Count == 0 || tb.Count == 0) return res;
@@ -62,52 +71,90 @@ public static class WeldFinder
             }
             return false;
         }
-        // Contact triangles of B.
-        var contact = new List<int>();
+
+        // Vertex ids (positions merged within 20 um) and the triangles on each edge.
+        var cell = new Dictionary<(long, long, long), List<int>>();
+        var verts = new List<Vec3>();
+        const double Cell = 1e-4, Merge = 2e-5;
+        int Id(Vec3 p)
+        {
+            long cx = (long)Math.Floor(p.X / Cell), cy = (long)Math.Floor(p.Y / Cell), cz = (long)Math.Floor(p.Z / Cell);
+            for (long x = cx - 1; x <= cx + 1; x++)
+                for (long y = cy - 1; y <= cy + 1; y++)
+                    for (long z = cz - 1; z <= cz + 1; z++)
+                        if (cell.TryGetValue((x, y, z), out var l))
+                            foreach (int i in l) if ((verts[i] - p).Length <= Merge) return i;
+            verts.Add(p);
+            if (!cell.TryGetValue((cx, cy, cz), out var own)) cell[(cx, cy, cz)] = own = new List<int>();
+            own.Add(verts.Count - 1);
+            return verts.Count - 1;
+        }
+        var edges = new Dictionary<(int, int), List<int>>();
         for (int i = 0; i < tb.Count; i++)
         {
-            var t = tb[i];
-            if (Math.Abs(Vec3.Dot(t.N, nPlate)) > 0.5) continue;             // a plate face, not an edge face
-            if (OnA((t.A + t.B + t.C) * (1.0 / 3), t.N) && OnA(t.A, t.N) && OnA(t.B, t.N) && OnA(t.C, t.N)) contact.Add(i);
-        }
-        if (contact.Count == 0) return res;
-        // Edge use counts among the contact triangles (position keys) and the B triangles touching each edge.
-        static (long, long, long) K(Vec3 p) => ((long)Math.Round(p.X * 1e6), (long)Math.Round(p.Y * 1e6), (long)Math.Round(p.Z * 1e6));
-        static ((long, long, long), (long, long, long)) E(Vec3 p, Vec3 q) { var a = K(p); var b = K(q); return a.CompareTo(b) <= 0 ? (a, b) : (b, a); }
-        var cset = new HashSet<int>(contact);
-        var use = new Dictionary<((long, long, long), (long, long, long)), (int count, Vec3 p, Vec3 q, int tri)>();
-        foreach (int i in contact)
-        {
-            var t = tb[i];
-            foreach (var (p, q) in new[] { (t.A, t.B), (t.B, t.C), (t.C, t.A) })
+            int ia = Id(tb[i].A), ib = Id(tb[i].B), ic = Id(tb[i].C);
+            foreach (var (u, v) in new[] { (ia, ib), (ib, ic), (ic, ia) })
             {
-                var key = E(p, q);
-                use[key] = use.TryGetValue(key, out var u) ? (u.count + 1, u.p, u.q, u.tri) : (1, p, q, i);
+                if (u == v) continue;
+                var key = u < v ? (u, v) : (v, u);
+                if (!edges.TryGetValue(key, out var l)) edges[key] = l = new List<int>();
+                l.Add(i);
             }
         }
-        var other = new Dictionary<((long, long, long), (long, long, long)), Vec3>();
-        for (int i = 0; i < tb.Count; i++)
+        // Perimeter edges of the plate: between a plate-face triangle (normal +-nPlate) and an edge-face triangle. The weld root is that edge where the
+        // edge face sits on A (opposite normal, within the distance tolerance, inside an A triangle); only the stretches on A are welded.
+        foreach (var ((u, v), tris) in edges)
         {
-            if (cset.Contains(i)) continue;
-            var t = tb[i];
-            foreach (var (p, q) in new[] { (t.A, t.B), (t.B, t.C), (t.C, t.A) })
+            if (tris.Count != 2) continue;
+            int ip = -1, ie = -1;
+            foreach (int ti in tris)
             {
-                var key = E(p, q);
-                if (use.ContainsKey(key)) other[key] = t.N;
+                double dn = Math.Abs(Vec3.Dot(tb[ti].N, nPlate));
+                if (dn > 0.97) ip = ip < 0 ? ti : -2;
+                else ie = ie < 0 ? ti : -2;                                  // any other face = an edge face (cut square or oblique to the plate)
             }
-        }
-        foreach (var (key, u) in use)
-        {
-            if (u.count != 1 || !other.TryGetValue(key, out var ns)) continue;
-            if (Math.Abs(Vec3.Dot(ns, nPlate)) < 0.97) continue;             // along a plate face only (not the plate ends)
-            if (!bothSides && side is { } sd && Vec3.Dot(ns, sd) <= 0) continue;
-            var nb = tb[u.tri].N;                                             // B contact face normal, pointing into A
+            if (ip < 0 || ie < 0) continue;
+            var nb = tb[ie].N;                                               // B edge face normal, pointing into A
+            var ns = tb[ip].N;                                               // B plate face normal (outward)
+            var p0 = verts[u]; var q0 = verts[v];
+            if (!bothSides && keep != null && !keep((p0 + q0) * 0.5, ns)) continue;
+            double len = (q0 - p0).Length; if (len < 1e-5) continue;
+            // Stretches on A: coarse samples (1/4" or finer), boundaries refined by bisection.
+            int n = Math.Clamp((int)Math.Ceiling(len / 0.00635), 2, 400);
+            var on = new bool[n + 1];
+            for (int i = 0; i <= n; i++) on[i] = OnA(p0 + (q0 - p0) * ((double)i / n), nb);
+            if (!on.Any(x => x)) continue;
+            double Bisect(bool onAtLo, double s0, double s1)
+            {
+                for (int k = 0; k < 12; k++)
+                {
+                    double m = (s0 + s1) / 2;
+                    if (OnA(p0 + (q0 - p0) * m, nb) == onAtLo) s0 = m; else s1 = m;
+                }
+                return onAtLo ? s0 : s1;
+            }
+            var runs = new List<(double, double)>();
+            for (int i = 0; i <= n; i++)
+            {
+                if (!on[i]) continue;
+                int j = i; while (j + 1 <= n && on[j + 1]) j++;
+                double s0 = (double)i / n, s1 = (double)j / n;
+                if (i > 0) s0 = Bisect(false, (double)(i - 1) / n, s0);
+                if (j < n) s1 = Bisect(true, s1, (double)(j + 1) / n);
+                runs.Add((s0, s1)); i = j;
+            }
             var na = -nb;
-            var ed = (u.q - u.p); double len = ed.Length; if (len < 1e-5) continue;
-            ed *= 1 / len;
+            var ed = (q0 - p0) * (1 / len);
             var legA = ns - na * Vec3.Dot(ns, na); if (legA.Length < 1e-6) continue; legA = legA.Normalized();
             var legB = Vec3.Cross(ed, ns).Normalized(); if (Vec3.Dot(legB, na) < 0) legB = -legB;
-            res.Add(new Bead(u.p, u.q, legA, legB));
+            double covered = 0;
+            foreach (var (s0, s1) in runs)
+            {
+                if ((s1 - s0) * len < 1e-4) continue;
+                res.Add(new Bead(p0 + (q0 - p0) * s0, p0 + (q0 - p0) * s1, legA, legB));
+                covered += (s1 - s0) * len;
+            }
+            if (len - covered > distTol) overhang += len - covered;
         }
         return res;
     }

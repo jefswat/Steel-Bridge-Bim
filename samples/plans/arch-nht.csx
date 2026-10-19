@@ -336,6 +336,7 @@ arch.BracingOrientationUnresolved = U("p.129-140", "upper lateral bracing member
                 TopConnectionPlate = Drawing(det.Where(r => r["plate"] == "CP-TOP")), BottomConnectionPlate = Drawing(det.Where(r => r["plate"] == "CP-BOT")),
                 Stiffeners = { Drawing(det.Where(r => r["plate"] == "ST-TOP")), Drawing(det.Where(r => r["plate"] == "ST-BOT")) },
                 WebAxisY = webY, CheckWpFromRibCl = In(8.25), CheckGussetFromPlateEdge = In(1),
+                MitreWeldedEdge = true,   // v6: the welded edge is cut to the connection plate face (gusset / plate angle printed on the sheets), 5/16" fillets both sides
                 StiffenerUnresolved = stWhy, BraceEndUnresolved = endWhy,
             });
     }
@@ -465,6 +466,49 @@ arch.Unresolved.AddRange(new[]
     U("p.119, 124", "WP position in the tie / steel underside at the bearings (U10)", "the WP is at the bottom of the tie flange (p.119) but drawn inside the 2\" end flange (p.124) and the plate below it is not dimensioned", "End flange from 1 1/8\" below to 7/8\" above the WP (tie flange + 1 1/8\" fill = 2\"), steel underside 1\" lower."),
     U("p.148", "hanger sockets vs the supplied WireCo catalog", "the plan sockets (pin 1.378\", W 16.18\" / 34.41\") are not the catalog's 1\" open strand socket (Table 6 p.20: pin 2 1/4\", A 12\")", "Sockets modeled at the plan table dimensions; the catalog row is reported by check-arch-nht.csx."),
 });
+
+// ---------------------------------------------------------------- v6 welds (plan weld inventory: every steel-sheet symbol is a 5/16" fillet; no CJP / field / all-around)
+// Data-driven T-joint fillets (ArchWeldRule -> Steel/WeldFinder): the attached plate's edge face sits on the other part (the plate edges are cut / mitred to bear
+// where the plans say so), the fillet runs along the real contact (no length printed = continuous). Bolted joints (splice / fill / cheese / gusset plates at the tie
+// joints, rib and tie splices, floorbeam connection plates, tie fin plates p.146 / 149) have no weld symbol and get none.
+{
+    const string Sz = "5/16";
+    double w516 = In(0.3125);
+    string knS = "p.124 / 125 Sections A-A, B-B, plan";
+    string leaderWhy = "the upper A-A symbol is one 5/16\" fillet-both-sides leader with 5 arrowheads at the stub web / arch flange plate / arch stiffener joints and the individual targets cannot be told apart";
+    arch.Welds.AddRange(new[]
+    {
+        // Knuckle (p.124 NW / p.125 SW, same details): all joints MILL TO BEAR + 5/16" both sides.
+        new ArchWeldRule { Name = "knuckle end web to end flange", Parts = @"^KNUCKLE-[A-Z]+-EW$", Onto = @"^KNUCKLE-[A-Z]+-EF$", Size = w516, Source = "p.124 A-A + plan" },
+        new ArchWeldRule { Name = "knuckle arch flange plate to end flange", Parts = @"^KNUCKLE-[A-Z]+-T\d+P?-AF[OI]$", Onto = @"^KNUCKLE-[A-Z]+-EF$", Size = w516, Source = "p.124 B-B / A-A (mill to bear)" },
+        new ArchWeldRule { Name = "knuckle stub web to end flange", Parts = @"^KNUCKLE-[A-Z]+-T\d+P?-SW$", Onto = @"^KNUCKLE-[A-Z]+-EF$", Size = w516, Source = "p.124 A-A (mill to bear)",
+            Unresolved = U("p.124 / 125 A-A", "stub web weld targets", leaderWhy, "5/16\" fillet both sides of the stub web along its edge on the end flange and on the arch flange plates.") },
+        new ArchWeldRule { Name = "knuckle stub web to arch flange plates", Parts = @"^KNUCKLE-[A-Z]+-T\d+P?-SW$", Onto = @"^KNUCKLE-[A-Z]+-T\d+P?-AF[OI]$", Size = w516, Source = "p.124 A-A (mill to bear)",
+            Unresolved = U("p.124 / 125 A-A", "stub web weld targets", leaderWhy, "5/16\" fillet both sides of the stub web along its edges on the arch flange plates.") },
+        new ArchWeldRule { Name = "knuckle arch stiffener to flange plates and stub web", Parts = @"^KNUCKLE-[A-Z]+-T\d+P?-AS$", Onto = @"^KNUCKLE-[A-Z]+-T\d+P?-(AF[OI]|SW)$", Size = w516, Source = "p.124 A-A",
+            Unresolved = U("p.124 / 125 A-A", "arch stiffener weld targets", leaderWhy, "5/16\" fillet both sides along every edge that sits on a flange plate or the stub web.") },
+        new ArchWeldRule { Name = "knuckle stiffener to end flange and arch flange plates", Parts = @"^KNUCKLE-[A-Z]+-T\d+P?-ST$", Onto = @"^KNUCKLE-[A-Z]+-(EF|T\d+P?-AF[OI])$", Size = w516, Source = "p.124 A-A / B-B" },
+    });
+    // Bracing (p.129-140): gusset butt-welded to the 7/8" connection plate, 5/16" both sides TYP (views D-D, E-E, I-I, J-J); rib stiffeners 5/16" both sides TYP (B-B).
+    arch.Welds.AddRange(new[]
+    {
+        new ArchWeldRule { Name = "bracing gusset to connection plate", Parts = @"^(UPPER-BRACING-U\d+P?)-G([TB])$", Onto = @"^$1-CP$2$", Size = w516, Tolerance = In(1.0 / 16),
+            Source = "p.129-140 D-D / E-E / I-I / J-J" },
+        new ArchWeldRule { Name = "bracing rib stiffener to rib", Parts = @"^UPPER-BRACING-U\d+P?-ST\d$", Onto = @"^(NORTH|SOUTH)-RIB-\d$", Size = w516, Tolerance = In(1.0 / 16), AngleTolDeg = 6,
+            Source = "p.129-140 B-B" },
+    });
+    // Tie girder web to flange (p.143 typical tie girder section) and floorbeam web to flange (p.145 Section A-A): ONE 5/16" symbol (single fillet, the arrow side), the
+    // typical sections are not tied to a side of the span / of the station.
+    arch.Welds.AddRange(new[]
+    {
+        new ArchWeldRule { Name = "tie girder web to flange", Parts = @"^(NORTH|SOUTH)-TIE-\d+-W$", Onto = @"^(NORTH|SOUTH)-TIE-\d+-F$", Size = w516, OneSide = true, SideToward = "span", Tolerance = In(1.0 / 16), Source = "p.143 typical tie girder section",
+            Unresolved = U("p.143", "tie girder web-to-flange weld side", "the typical tie girder section shows one 5/16\" fillet symbol (arrow side only) and is not oriented to the span", "5/16\" fillet on the span-centre side of the web, continuous.") },
+        new ArchWeldRule { Name = "floorbeam web to flange", Parts = @"^FB\d+-W$", Onto = @"^FB\d+-F$", Size = w516, OneSide = true, SideToward = "+x", Tolerance = In(1.0 / 16), Source = "p.145 Section A-A",
+            Unresolved = U("p.145", "floorbeam web-to-flange weld side", "Section A-A shows one 5/16\" fillet symbol (arrow side only); the section is looked at along the floorbeam but its station direction is not tied to the local X axis", "5/16\" fillet on the +X (up-station per the framing plan numbering) face of the web, continuous.") },
+        new ArchWeldRule { Name = "floorbeam connection stiffener to tie web and flange", Parts = @"^FB\d+-ST[AB]$", Onto = @"^(NORTH|SOUTH)-TIE-\d+-[WF]$", Size = w516, OneSide = true, SideToward = "+x", Tolerance = In(1.0 / 16), Source = "p.146 stiffener detail",
+            Unresolved = U("p.146", "floorbeam connection stiffener weld side", "the stiffener detail shows one 5/16\" symbol with two arrowheads (web and flange) and does not say which face of the stiffener plate is welded", "5/16\" fillet on the +X face of the stiffener along its web edge and its flange edge.") },
+    });
+}
 
 // ---------------------------------------------------------------- the arch bridge
 Doc.Project.Bridges.RemoveAll(b => b.Arch != null && b.Name == "Arch span 10");

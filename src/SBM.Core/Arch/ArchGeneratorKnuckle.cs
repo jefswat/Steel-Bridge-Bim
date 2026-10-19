@@ -238,7 +238,11 @@ public static partial class ArchGenerator
                 poly = Fillet(poly, 2, kd.BendRadius);
                 poly = Ccw(poly);
                 var m = new Mesh();
-                PlateBuilder.AddPrism(m, poly, Array.Empty<Hole>(), (u, v, t) => W(o3 + bn * t + cIn * u + up * v), _ => -tp / 2, _ => tp / 2);
+                // Mill to bear (p.124 A-A / B-B): the bottom end of the plate lies in the end flange top plane (the plate leans with the rib, so a cut square
+                // to the plate would leave a wedge gap against the flat flange).
+                double vBot = vb;
+                PlateBuilder.AddPrism(m, poly, Array.Empty<Hole>(), (u, v, t) =>
+                    W(o3 + bn * t + cIn * u + up * (Math.Abs(v - vBot) < 1e-9 ? (zef - o3.Z - cIn.Z * u - bn.Z * t) / up.Z : v)), _ => -tp / 2, _ => tp / 2);
                 AddPart($"{cm}-AF{(outside ? "O" : "I")}", PartCategory.KnucklePlate, asm,
                     $"PL {L(tp)} {(outside ? "outside" : "inside")} arch flange plate, bent (leg {L(h)}, R {L(kd.BendRadius)}) at {c.Point} (p.124/125)", m, mat, sCut + Math.Abs(uEnd));
             }
@@ -249,7 +253,9 @@ public static partial class ArchGenerator
                 double Sb(double wv) => (zef - T.Z - wv * bn.Z) / tan.Z;
                 var poly = Ccw(new List<Vec2> { new(Sb(-hwW), -hwW), new(sCut, -hwW), new(sCut, hwW), new(Sb(hwW), hwW) });
                 var m = new Mesh();
-                PlateBuilder.AddPrism(m, poly, Array.Empty<Hole>(), (s, wv, t) => W(T + tan * s + bn * wv + nW * t), _ => -kd.StubWebThickness / 2, _ => kd.StubWebThickness / 2);
+                // Mill to bear on the end flange top: the bottom end is cut in that (horizontal) plane, not square to the web.
+                PlateBuilder.AddPrism(m, poly, Array.Empty<Hole>(), (s, wv, t) =>
+                    W(T + tan * (Math.Abs(s - sCut) > 1e-9 ? (zef - T.Z - bn.Z * wv - nW.Z * t) / tan.Z : s) + bn * wv + nW * t), _ => -kd.StubWebThickness / 2, _ => kd.StubWebThickness / 2);
                 var asu = kd.StubWebUnresolved.Length > 0 ? Assumption.UnresolvedDimension(kd.StubWebUnresolved, $"PL {L(kd.StubWebThickness)}") : null;
                 AddPart($"{cm}-SW", PartCategory.KnucklePlate, asm, $"PL {L(kd.StubWebThickness)} arch stub web at {c.Point}, milled to bear (p.124 A-A)", m, mat, sCut, 0, asu);
                 // Arch stiffener: normal to the rib at ArchStiffenerAlongRib, intrados side, web face to the flange tip.
@@ -265,7 +271,10 @@ public static partial class ArchGenerator
                 double vb0 = (zef - ov.Z) / up.Z;
                 var vp = Ccw(new List<Vec2> { new(-hwW, vb0), new(hwW, vb0), new(hwW, vb0 + kd.StiffenerHeight / up.Z), new(-hwW, vb0 + kd.StiffenerHeight / up.Z) });
                 var mv = new Mesh();
-                PlateBuilder.AddPrism(mv, vp, Array.Empty<Hole>(), (wv, v, t) => W(ov + bn * wv + up * v + cIn * t), _ => -kd.StiffenerThickness / 2, _ => kd.StiffenerThickness / 2);
+                double hand = Vec3.Dot(Vec3.Cross(bn, up), cIn) >= 0 ? 1 : -1;   // the (wv, v, t) map must be right-handed or the plate comes out inside out
+                // Bottom on the end flange top and top level, both horizontal (the plate leans with the rib plane).
+                PlateBuilder.AddPrism(mv, vp, Array.Empty<Hole>(), (wv, v, t) =>
+                    W(ov + bn * wv + cIn * (hand * t) + up * ((zef + (v > vb0 + 1e-9 ? kd.StiffenerHeight : 0) - ov.Z - bn.Z * wv - cIn.Z * hand * t) / up.Z)), _ => -kd.StiffenerThickness / 2, _ => kd.StiffenerThickness / 2);
                 AddPart($"{cm}-ST", PartCategory.KnucklePlate, asm, $"PL {L(kd.StiffenerThickness)} stiffener at {c.Point} ({L(kd.StiffenerFromSpringing)} outside the springing, {L(kd.StiffenerHeight)} high, p.124 B-B)", mv, mat, 2 * hwW);
             }
             // ---- tie joint: tie web stub (knuckle side), gussets + bolts, fill + splice under the tie flange, cheese plates at the jacks
