@@ -33,3 +33,7 @@ samples/plans/*.log
 
 # Asset folders of companion databases (photos, documents, calcs referenced by <model>.sqlite; user data, back them up with the database)
 *_assets/
+
+# QC pilot: program copies and model inputs (regenerable); results and reports are kept
+qc/bin/
+qc/*/inputs/
