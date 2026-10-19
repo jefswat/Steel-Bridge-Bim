@@ -38,6 +38,7 @@ public partial class MainWindow
         DbPanel.CreateRequested += () => _ = BuildDatabaseAsync(false);
         DbPanel.ImportPagesRequested += () => _ = BuildDatabaseAsync(true);
         DbPanel.NavigateRequested += gid => { ShowDbElement(gid); HighlightDbGroup(gid); };
+        DbPanel.OpenSheetRequested += (gid, s) => { if (_db != null) Database.PlanSheetWindow.ShowElement(this, _db, gid, DbLabel(gid), s); };
         RefreshDbStatus();
     }
 
@@ -73,7 +74,7 @@ public partial class MainWindow
     /// </summary>
     private async Task RelinkIfNeededAsync()
     {
-        if (_db == null || _dbBusy || DbPath is not { } path || CompanionDatabase.FindLinksFile(_vm.FilePath) is not { } links) return;
+        if (_db == null || _dbBusy || DbPath is not { } path || CompanionDatabase.FindLinksFile(_vm.FilePath, _vm.Project.Bridges.Select(b => b.Name)) is not { } links) return;
         string key = path + "|" + links + "|" + File.GetLastWriteTimeUtc(links).Ticks;
         if (_dbRelinked == key) return;
         bool applied = DateTime.TryParse(_db.Meta("links_applied_at"), null, System.Globalization.DateTimeStyles.RoundtripKind, out var at);
@@ -87,9 +88,10 @@ public partial class MainWindow
         RefreshDbStatus();
         string name = _vm.Project.Name;
         string? model = _vm.FilePath;
+        var opts = Opts(model, links);
         try
         {
-            var res = await Task.Run(() => CompanionDatabase.Relink(path, name, new DatabaseOptions { ModelFile = model, LinksFile = links, Log = m => ViewModels.MainViewModel.Log("DB: " + m) }));
+            var res = await Task.Run(() => CompanionDatabase.Relink(path, name, opts));
             ViewModels.MainViewModel.Log($"DB: plan sheet links from {Path.GetFileName(links)}: {res.Sheets} sheets, {res.Links?.Links ?? 0} links in {res.Elapsed.TotalSeconds:F1} s");
             if (res.Coverage.Length > 0) ViewModels.MainViewModel.Log("DB: " + res.Coverage);
         }
@@ -98,6 +100,13 @@ public partial class MainWindow
         OpenDb();
         RefreshDbStatus();
         if (_dbShown != null) ShowDbElement(_dbShown);
+    }
+
+    private DatabaseOptions Opts(string? model, string? links)
+    {
+        var o = new DatabaseOptions { ModelFile = model, LinksFile = links, Log = m => ViewModels.MainViewModel.Log("DB: " + m) };
+        o.BridgeNames.AddRange(_vm.Project.Bridges.Select(b => b.Name));
+        return o;
     }
 
     private void OpenDb()
@@ -133,7 +142,7 @@ public partial class MainWindow
     {
         if (_dbBusy || DbPath is not { } path) return;
         string? folder = null;
-        string? links = CompanionDatabase.FindLinksFile(_vm.FilePath);
+        string? links = CompanionDatabase.FindLinksFile(_vm.FilePath, _vm.Project.Bridges.Select(b => b.Name));
         if (pages)
         {
             if (links == null) { MessageBox.Show(this, "No sheet-links*.json (plan sets and link rules) naming this model beside it.", "Plan pages", MessageBoxButton.OK, MessageBoxImage.Information); return; }
@@ -215,6 +224,10 @@ public partial class MainWindow
                 }
                 if (gid == null) { _dbShown = null; DbPanel.ShowMessage("This object is not in the database (rebuild it after model changes)."); return; }
                 ShowDbElement(gid);
+                // G1: a click in the 3D view opens the element's plan sheets in the app (unless the user closed the sheet window).
+                if (!Database.PlanSheetWindow.IsOpen && !Database.PlanSheetWindow.ClosedByUser && _db!.LinkCount > 0
+                    && !Environment.GetCommandLineArgs().Contains("--snapshot") || Environment.GetCommandLineArgs().Contains("--sheetwindow"))
+                    Database.PlanSheetWindow.ShowElement(this, _db!, gid, DbLabel(gid));
             }
             catch (Exception ex) { DbPanel.ShowMessage("Database error: " + ex.Message); }
         }
@@ -226,6 +239,8 @@ public partial class MainWindow
             task.ContinueWith(_ => Dispatcher.BeginInvoke(Resolve), TaskScheduler.Default);
         }
     }
+
+    private string DbLabel(string gid) => _db?.Get(gid) is { } e ? (e.Name.Length > 0 ? e.Name : e.Category) : gid;
 
     private void DbOnCleared()
     {
@@ -239,6 +254,7 @@ public partial class MainWindow
         _dbShown = gid;
         DbPanel.ShowElement(_db, gid);
         ViewModels.MainViewModel.Log("DB: " + DbPanel.LastSummary);
+        Database.PlanSheetWindow.Follow(_db, gid, DbLabel(gid));
     }
 
     /// <summary>Highlights, in the viewport, the mesh objects (plates, caps, columns, ...) below a hierarchy item. Bolts, studs and bars are instanced and not drawn in the highlight.</summary>

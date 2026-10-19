@@ -38,7 +38,7 @@ public partial class MainWindow : Window
         SetPlanMode(true);
 
         _vm.SceneReady += OnSceneReady;
-        _vm.ProjectOpened += () => { if (_iso.Active) ExitIsolate(); };
+        _vm.ProjectOpened += () => { if (_iso.Active) ExitIsolate(); Database.PlanSheetWindow.CloseIfOpen(); };
         _vm.ZoomExtentsRequested += ZoomExtents;
         _vm.ViewModeRequested += SetPlanMode;
         _vm.LayerVisibilityChanged += (_, _) => { if (!_layerBatch) ApplyLayerVisibility(); };
@@ -187,7 +187,7 @@ public partial class MainWindow : Window
                 bool frameBenchDone = false;
                 var t2 = new System.Windows.Threading.DispatcherTimer { Interval = TimeSpan.FromSeconds(threeD ? 1.5 : args.Any(x => x is "--measure" or "--query" or "--snapbench") ? 1.5 : 0.1) };
                 bool cameraAgain = false;
-                t2.Tick += (_, _) =>
+                t2.Tick += async (_, _) =>
                 {
                     int fbi = Array.IndexOf(args, "--framebench");
                     if (!_lodBusy && fbi >= 0 && !frameBenchDone)
@@ -224,6 +224,13 @@ public partial class MainWindow : Window
                     SaveSnapshot(path);
                     SnapshotEditors(path);
                     SnapshotRecentDialog(path);
+                    if (args.Contains("--sheetwindow"))
+                    {
+                        // the plan sheet window opened by the pick: give the PDF viewer time to load, then capture it (_sheet.png)
+                        await Task.Delay(8000);
+                        string sheetPng = System.IO.Path.ChangeExtension(path, null) + "_sheet.png";
+                        ViewModels.MainViewModel.Log($"SHEETWIN: {Database.PlanSheetWindow.LastShown}, capture {(await Database.PlanSheetWindow.CaptureAsync(sheetPng) ? sheetPng : "not available")}");
+                    }
                     _vm.IsDirty = false;
                     Close();
                 };
