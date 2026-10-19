@@ -91,6 +91,7 @@ public sealed partial class SteelModelGenerator
         }
 
         var weld = new Mesh();
+        double weldLen = 0;
         int mn = 1;
         foreach (var (pa, pb) in members)
         {
@@ -165,8 +166,8 @@ public sealed partial class SteelModelGenerator
                         sr.Add(new Vec2(pp.S + Vec2.Dot(w, tan), Vec2.Dot(w, tan.Right)));
                     }
                 double toe = heel + angle.LegA;
-                weld.AddWeld(wp1 + a * s0 + q * heel, wp1 + a * s1 + q * heel, -q, nl * o, ws);
-                weld.AddWeld(wp1 + a * s0 + q * toe, wp1 + a * s1 + q * toe, q, nl * o, ws);
+                weldLen += weld.AddHeld(wp1 + a * s0 + q * heel, wp1 + a * s1 + q * heel, -q, nl * o, ws, HoldBack(ws), HoldBack(ws));   // short of the angle end / gusset edge
+                weldLen += weld.AddHeld(wp1 + a * s0 + q * toe, wp1 + a * s1 + q * toe, q, nl * o, ws, HoldBack(ws), HoldBack(ws));
             }
         }
 
@@ -225,7 +226,7 @@ public sealed partial class SteelModelGenerator
             }
         }
         _parts.Add(new SteelPart { Mark = $"{mark}-W", Category = PartCategory.Weld, Assembly = mark, Mesh = weld, Material = "E70XX",
-            Length = members.Count * 4 * lap, Description = $"Fillet weld {In(ws)}, lateral angles to gussets" });
+            Length = weldLen, Description = $"Fillet weld {In(ws)}, lateral angles to gussets{HoldNote(ws)}", Assumption = WeldFlag(ws) });
     }
 
     private StiffenerResult? StiffenerAt(int girder, double s) =>

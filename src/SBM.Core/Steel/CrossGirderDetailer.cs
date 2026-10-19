@@ -212,7 +212,7 @@ public sealed partial class SteelModelGenerator
         // ---- web opening beside the discontinuous girder (one each side), its edge plates and the flanking stiffeners
         var openings = new List<Vec2[]>();
         var extra = new List<(string code, Mesh mesh, string desc, double len, PartCategory cat)>();
-        var welds = new Mesh(); bool anyWeld = false;
+        var welds = new Mesh(); bool anyWeld = false; double weldLen = 0;
         bool hasOpening = xg.OpeningWidth > 0 && xg.OpeningHeight > 0;
         if (hasOpening)
         {
@@ -256,7 +256,8 @@ public sealed partial class SteelModelGenerator
                         if (xg.StiffenerWeld > 0)
                         {
                             foreach (double e in new[] { -1.0, 1.0 })
-                                welds.AddWeld(W(xs + e * th / 2, -tw / 2, zWebTop), W(xs + e * th / 2, -tw / 2, zWebBot), f.X * e, -f.Y, xg.StiffenerWeld);
+                                weldLen += welds.AddHeld(W(xs + e * th / 2, -tw / 2, zWebTop), W(xs + e * th / 2, -tw / 2, zWebBot), f.X * e, -f.Y, xg.StiffenerWeld,
+                                    HoldBack(xg.StiffenerWeld), HoldBack(xg.StiffenerWeld));   // short of the flanges (plate corners)
                             anyWeld = true;
                         }
                     }
@@ -281,14 +282,16 @@ public sealed partial class SteelModelGenerator
         {
             foreach (double sd in new[] { -1.0, 1.0 })
             {
-                welds.AddWeld(W(x0, sd * tw / 2, -tf), W(x1, sd * tw / 2, -tf), f.Y * sd, -f.Z, xg.WebFlangeWeld);
-                welds.AddWeld(W(x0, sd * tw / 2, zWebBot), W(x1, sd * tw / 2, zWebBot), f.Y * sd, f.Z, xg.WebFlangeWeld);
+                double hw = HoldBack(xg.WebFlangeWeld);           // short of the plate ends
+                weldLen += welds.AddHeld(W(x0, sd * tw / 2, -tf), W(x1, sd * tw / 2, -tf), f.Y * sd, -f.Z, xg.WebFlangeWeld, hw, hw);
+                weldLen += welds.AddHeld(W(x0, sd * tw / 2, zWebBot), W(x1, sd * tw / 2, zWebBot), f.Y * sd, f.Z, xg.WebFlangeWeld, hw, hw);
             }
             anyWeld = true;
         }
         if (anyWeld)
-            _parts.Add(new SteelPart { Mark = $"{mark}-WLD", Category = PartCategory.Weld, Assembly = mark, Mesh = welds, Material = "E70XX", Length = len,
-                Description = $"Fillet weld {In(Math.Max(xg.WebFlangeWeld, xg.StiffenerWeld))}, cross girder" });
+            _parts.Add(new SteelPart { Mark = $"{mark}-WLD", Category = PartCategory.Weld, Assembly = mark, Mesh = welds, Material = "E70XX", Length = weldLen,
+                Description = $"Fillet weld {In(Math.Max(xg.WebFlangeWeld, xg.StiffenerWeld))}, cross girder{HoldNote(Math.Max(xg.WebFlangeWeld, xg.StiffenerWeld))}",
+                Assumption = WeldFlag(Math.Max(xg.WebFlangeWeld, xg.StiffenerWeld)) });
         foreach (var (code, m, desc, l, role) in angleParts)
             _parts.Add(new SteelPart { Mark = $"{mark}-{code}", Category = PartCategory.Angle, Assembly = mark, Mesh = m, Length = l, Description = desc, Role = role,
                 NominalWeightLbPerFt = angleSec?.WeightPerFootLb ?? 0 });

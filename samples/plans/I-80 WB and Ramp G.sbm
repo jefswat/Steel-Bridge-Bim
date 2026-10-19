@@ -21205,7 +21205,15 @@
           ]
         }
       },
-      "PsSteelDiaphragms": null
+      "PsSteelDiaphragms": null,
+      "Welds": {
+        "HoldBack": 0.00635,
+        "Source": "p.120 std. 1021W Detail A",
+        "Unresolved": "",
+        "StiffenerWebEndFactor": 5,
+        "StiffenerWebEndMin": 0.05715,
+        "StiffenerWebEndSource": "p.120 std. 1021W Sections C-C / D-D: X = 5T, 2 1/4\u0022 min from the toe of the flange-to-web weld"
+      }
     },
     {
       "Name": "I-80 WB Unit 2",
@@ -52223,7 +52231,15 @@
           ]
         }
       },
-      "PsSteelDiaphragms": null
+      "PsSteelDiaphragms": null,
+      "Welds": {
+        "HoldBack": 0.00635,
+        "Source": "p.120 std. 1021W Detail A",
+        "Unresolved": "",
+        "StiffenerWebEndFactor": 5,
+        "StiffenerWebEndMin": 0.05715,
+        "StiffenerWebEndSource": "p.120 std. 1021W Sections C-C / D-D: X = 5T, 2 1/4\u0022 min from the toe of the flange-to-web weld"
+      }
     },
     {
       "Name": "I-80 WB Unit 3",
@@ -76130,7 +76146,15 @@
           ]
         }
       },
-      "PsSteelDiaphragms": null
+      "PsSteelDiaphragms": null,
+      "Welds": {
+        "HoldBack": 0.00635,
+        "Source": "p.120 std. 1021W Detail A",
+        "Unresolved": "",
+        "StiffenerWebEndFactor": 5,
+        "StiffenerWebEndMin": 0.05715,
+        "StiffenerWebEndSource": "p.120 std. 1021W Sections C-C / D-D: X = 5T, 2 1/4\u0022 min from the toe of the flange-to-web weld"
+      }
     },
     {
       "Name": "Ramp G Unit 1",
@@ -89429,7 +89453,15 @@
           ]
         }
       },
-      "PsSteelDiaphragms": null
+      "PsSteelDiaphragms": null,
+      "Welds": {
+        "HoldBack": 0.00635,
+        "Source": "p.103 std. 1021W Detail A",
+        "Unresolved": "",
+        "StiffenerWebEndFactor": 5,
+        "StiffenerWebEndMin": 0.05715,
+        "StiffenerWebEndSource": "p.103 std. 1021W Sections C-C / D-D: X = 5T, 2 1/4\u0022 min from the toe of the flange-to-web weld"
+      }
     },
     {
       "Name": "Ramp G Unit 2",
@@ -100624,7 +100656,15 @@
           ]
         }
       },
-      "PsSteelDiaphragms": null
+      "PsSteelDiaphragms": null,
+      "Welds": {
+        "HoldBack": 0.00635,
+        "Source": "p.103 std. 1021W Detail A",
+        "Unresolved": "",
+        "StiffenerWebEndFactor": 5,
+        "StiffenerWebEndMin": 0.05715,
+        "StiffenerWebEndSource": "p.103 std. 1021W Sections C-C / D-D: X = 5T, 2 1/4\u0022 min from the toe of the flange-to-web weld"
+      }
     },
     {
       "Name": "Ramp G Unit 3",
@@ -114576,7 +114616,15 @@
           ]
         }
       },
-      "PsSteelDiaphragms": null
+      "PsSteelDiaphragms": null,
+      "Welds": {
+        "HoldBack": 0.00635,
+        "Source": "p.103 std. 1021W Detail A",
+        "Unresolved": "",
+        "StiffenerWebEndFactor": 5,
+        "StiffenerWebEndMin": 0.05715,
+        "StiffenerWebEndSource": "p.103 std. 1021W Sections C-C / D-D: X = 5T, 2 1/4\u0022 min from the toe of the flange-to-web weld"
+      }
     },
     {
       "Name": "Ramp G Unit 4",
@@ -128329,7 +128377,15 @@
           ]
         }
       },
-      "PsSteelDiaphragms": null
+      "PsSteelDiaphragms": null,
+      "Welds": {
+        "HoldBack": 0.00635,
+        "Source": "p.103 std. 1021W Detail A",
+        "Unresolved": "",
+        "StiffenerWebEndFactor": 5,
+        "StiffenerWebEndMin": 0.05715,
+        "StiffenerWebEndSource": "p.103 std. 1021W Sections C-C / D-D: X = 5T, 2 1/4\u0022 min from the toe of the flange-to-web weld"
+      }
     }
   ],
   "References": [
