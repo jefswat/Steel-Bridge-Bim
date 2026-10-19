@@ -298,10 +298,16 @@ public sealed class ArchWeldRule
     public string Name { get; set; } = "";
     /// <summary>Regular expression on the attached part marks.</summary>
     public string Parts { get; set; } = "";
-    /// <summary>Regular expression on the marks of the parts it is welded to.</summary>
+    /// <summary>Regular expression on the marks of the parts it is welded to; "$1" ... = the capture groups of <see cref="Parts"/> on the attached part's mark.</summary>
     public string Onto { get; set; } = "";
     public double Size { get; set; }
     public bool OneSide { get; set; }
+    /// <summary>For a single-sided symbol (<see cref="OneSide"/>) whose arrow side the plan does not identify: "span" = the side of the attached plate facing
+    /// the structure centre line, "+x" / "-x" = facing along the local X axis; empty = both faces are tried (only useful with a plate that has one face on it).
+    /// Pair it with <see cref="Unresolved"/> so the choice is flagged.</summary>
+    public string SideToward { get; set; } = "";
+    /// <summary>Largest angle (degrees) between the attached plate's edge face and the face it sits on.</summary>
+    public double AngleTolDeg { get; set; } = 3;
     /// <summary>Contact distance tolerance (gap between the edge face and the face it is welded to).</summary>
     public double Tolerance { get; set; } = In(1.0 / 32);
     public string Source { get; set; } = "";
@@ -551,6 +557,10 @@ public sealed class ArchBracingConnection
     /// <summary>Plan: gusset edge 1" inside the connection plate edge (D-D / H-H, check; NaN = not given).</summary>
     public double CheckGussetFromPlateEdge { get; set; } = double.NaN;
     public double GussetThickness { get; set; } = In(0.875);
+    /// <summary>Cut each gusset's welded edge to the connection plate face (a bevel of the angle between the gusset plane and the plate face, printed on the
+    /// sheets e.g. 111 deg 13'43"), so the edge bears over the full thickness for the 5/16" fillets (views D-D / E-E / I-I / J-J). False = the edge is
+    /// square to the gusset (a wedge gap up to ~1/2" at the weld). The bevelled gusset is a faceted solid in IFC (no exact arcs).</summary>
+    public bool MitreWeldedEdge { get; set; }
     public double ConnectionPlateThickness { get; set; } = In(0.875);
     public double StiffenerThickness { get; set; } = In(1);
     /// <summary>Stiffener corner clips at the web-flange junctions (B-B 1 1/2").</summary>
