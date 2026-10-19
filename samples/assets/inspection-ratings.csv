@@ -1,0 +1,9 @@
+inspection_date,inspection_kind,structure_number,inspector,component,rating,element_ref,notes
+2024-05-14,routine,SAMPLE-001,J. Doe,deck,7,,
+2024-05-14,routine,SAMPLE-001,J. Doe,superstructure,7,,
+2024-05-14,routine,SAMPLE-001,J. Doe,substructure,8,,
+2024-05-14,routine,SAMPLE-001,J. Doe,channel,N,,
+2026-05-20,routine,SAMPLE-001,A. Smith,deck,7,,
+2026-05-20,routine,SAMPLE-001,A. Smith,superstructure,6,,Corrosion at G1 bearing
+2026-05-20,routine,SAMPLE-001,A. Smith,substructure,7,,
+2026-05-20,routine,SAMPLE-001,A. Smith,channel,N,,

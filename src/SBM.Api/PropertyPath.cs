@@ -161,6 +161,21 @@ public static partial class PropertyPath
         return Format(prop.GetValue(owner), path, u);
     }
 
+    /// <summary>Converts text to the value <see cref="SetValue"/> would store at the path (same unit rules), WITHOUT setting it: used to
+    /// compare calc values with the model (<see cref="CalcSync"/>).</summary>
+    public static object? Parse(object root, string path, string text, UnitSystem u)
+    {
+        var (owner, last) = Owner(root, path);
+        if (last.Index != null)
+        {
+            if (owner is not IList list) throw new ArgumentException("Indexing a value that is not a list.");
+            var elemType = list.GetType().IsGenericType ? list.GetType().GetGenericArguments()[0] : typeof(object);
+            return Convert(text, elemType, "", u);
+        }
+        var prop = Prop(owner, last.Name!);
+        return Convert(text, prop.PropertyType, prop.Name, u);
+    }
+
     /// <summary>Appends an item (JSON or text) to a list at the path.</summary>
     public static int Add(object root, string path, string text, UnitSystem u)
     {

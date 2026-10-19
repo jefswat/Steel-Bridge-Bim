@@ -260,6 +260,11 @@
                             </Button>
                         </StackPanel>
                     </HeaderedContentControl>
+                    <HeaderedContentControl Header="Asset" Style="{StaticResource RibbonGroup}">
+                        <Button Style="{StaticResource RibbonButton}" Click="OnShowCalcs" ToolTip="Calcs: calc packages in the companion database, their summary pages, the extracted values vs the model, apply selected values (logged)">
+                            <StackPanel><TextBlock Style="{StaticResource RibbonIcon}" Text="&#xE8EF;"/><TextBlock Style="{StaticResource RibbonLabel}" Text="Calcs"/></StackPanel>
+                        </Button>
+                    </HeaderedContentControl>
                 </StackPanel>
             </TabItem>
 

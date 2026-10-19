@@ -43,6 +43,19 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   (the rules are copied there by the App / Cli csproj) and the repo's `samples/plans`, matched by `models` (file name) then by plan set `bridgeGroup` = a bridge name
   (`DatabaseOptions.BridgeNames`); a generic rules file is never taken from the library. Every build applies them; `CompanionDatabase.Relink` / `sbm db --relink` re-applies to an existing db; the app relinks on
   load when links are missing or the rules file is newer. A new bridge needs its own `sheet-links-<name>.json` with an index (tests check every rule matches a sheet).
+  Asset management (G9, `AssetSchema` / `AssetStore` / `ModelDb.Assets.cs` / `InspectionCsv`, `SBM.Api/CalcSync`, CLI `sbm asset` in `SBM.Cli/AssetCommand.cs`,
+  docs/API.md "Asset management"): tables asset_files / asset_links / inspections / element_condition (AASHTO CS1-CS4 + defects) / component_ratings
+  (NBI 0-9, N) / findings / calcs / calc_values / calc_applied, version `meta.asset_schema_version` (created on Open = migration). NEVER touched by
+  `ModelDatabase.Write` (keep it that way: a rebuild must only rewrite el / strings / props / element_sheet); keyed by GlobalId; orphans kept and
+  reported (`v_asset_orphans`), never deleted; asset views reference the table `el`, never the view `elements`. Files are NOT in the database: copied
+  into `<db name>_assets\{photos,documents,calcs,thumbnails}` named by SHA-256 prefix; `location` relative to that folder + `location_kind` file|url
+  (permalinks later), resolved only through `AssetStore.Resolve`. Thumbnails / PDF text: `tools/asset_tool.py` (PyMuPDF, python -I); photos added in
+  the app get WPF thumbnails (`SBM.App/Database/AssetImages`). Calc values JSON `sbm-calc-values/1` -> `CalcSync.Diff` (inputs via `PropertyPath.Parse`,
+  results via `resultPath` on `BridgeModel` or a db element field) -> `Apply` only selected differing inputs, each logged in calc_applied. App: panel
+  sections in `ElementDbPanel.Assets.cs` (photos, inspection, findings + Add finding via `FormDialog`, calcs vs the live model through
+  `SbmDocument.Attach(project, path, models)` = no regeneration), `CalcsWindow` (Review > Asset > Calcs; WebView2 PDF at the summary page, diff grid,
+  Apply selected… with confirmation -> checkpoint, set, log, regenerate, save); snapshot `--calcswindow` -> `_calcs.png` / `_calcs_pdf.png`.
+  The .sqlite and `*_assets/` are git-ignored but are USER DATA now (no longer only regenerable output).
   Agents reviewing plans: query instead of reading PDFs: `sbm db <model.sbm> --sheets-for <mark|name> [--json]` (pages to read per PDF) and `--find-sheet <title|no.>` (read-only, existing db, no regeneration).
   Keep `ModelDatabase.Builder` numbering in step with `IfcExporter` (test `GlobalIds_AreTheIfcGlobalIds`). CLI `sbm db`, docs in docs/API.md.
 - `src/SBM.Cli` — `sbm.exe` command line over SBM.Api (new/info/get/set/add/remove/import-landxml/regen/export/run/bench/

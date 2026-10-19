@@ -30,3 +30,6 @@ samples/plans/*.log
 *.sqlite-journal
 **/plans/*/p[0-9][0-9][0-9].*
 **/plans/*/sheets.json
+
+# Asset folders of companion databases (photos, documents, calcs referenced by <model>.sqlite; user data, back them up with the database)
+*_assets/

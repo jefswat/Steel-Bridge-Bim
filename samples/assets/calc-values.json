@@ -1,0 +1,16 @@
+{
+  "schema": "sbm-calc-values/1",
+  "extractedBy": "example (by hand)",
+  "values": [
+    { "key": "web-depth", "name": "Girder web depth", "propertyPath": "Bridges[0].Girders.Section.WebDepth", "value": 60, "unit": "in",
+      "element": "G1", "page": 1, "quote": "Web plate: 60 in x 1/2 in (web depth 60 in)" },
+    { "key": "web-thk", "name": "Girder web thickness", "propertyPath": "Bridges[0].Girders.Section.WebThickness", "value": "1/2\"",
+      "page": 1, "quote": "Web plate: 60 in x 1/2 in" },
+    { "key": "skew-pier1", "name": "Pier 1 skew", "propertyPath": "Bridges[0].Supports[1].SkewDegrees", "value": 20,
+      "page": 2, "quote": "Bearing skew 20 deg" },
+    { "key": "steel-weight", "name": "Structural steel weight", "resultPath": "Steel.SteelMass", "bridge": "Sample Bridge", "value": 312.4, "unit": "kip",
+      "tol": "2%", "page": 1, "quote": "Total structural steel weight = 312.4 kip" },
+    { "key": "abut1-cap-volume", "name": "Abutment 1 cap concrete", "element": "Abut 1 cap", "field": "volume_m3", "value": 19.2, "unit": "cy",
+      "page": 2, "quote": "Abut 1 cap: 19.2 CY" }
+  ]
+}

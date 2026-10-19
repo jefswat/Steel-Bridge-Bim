@@ -10,10 +10,11 @@ namespace SBM.App.Database;
 
 /// <summary>
 /// Properties-side panel with the database record of the selected element: GlobalId, clickable hierarchy chain, category / mark /
-/// quantities, the plan sheets it is based on (open the single-page PDF, preview, set the QC status and note).
+/// quantities, asset records (photos / documents, inspection history, findings, calcs: ElementDbPanel.Assets.cs), the plan sheets it is based on
+/// (open the single-page PDF, preview, set the QC status and note).
 /// Built in code so it follows the app's dark theme resources.
 /// </summary>
-public sealed class ElementDbPanel : UserControl
+public sealed partial class ElementDbPanel : UserControl
 {
     public event Action? CreateRequested;
     public event Action? ImportPagesRequested;
@@ -169,6 +170,8 @@ public sealed class ElementDbPanel : UserControl
             if (kids > ch.Count) kp.Children.Add(new TextBlock { Text = "…", Foreground = Muted });
             _body.Children.Add(kp);
         }
+
+        ShowAssets(db, globalId, sum);
 
         var sheets = db.Sheets(globalId);
         _body.Children.Add(Header($"Based on plan sheets ({sheets.Count})"));

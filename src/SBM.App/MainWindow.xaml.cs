@@ -231,6 +231,13 @@ public partial class MainWindow : Window
                         string sheetPng = System.IO.Path.ChangeExtension(path, null) + "_sheet.png";
                         ViewModels.MainViewModel.Log($"SHEETWIN: {Database.PlanSheetWindow.LastShown}, capture {(await Database.PlanSheetWindow.CaptureAsync(sheetPng) ? sheetPng : "not available")}");
                     }
+                    if (args.Contains("--calcswindow"))
+                    {
+                        // G9: the Calcs window (first calc), captured as _calcs.png (+ _calcs_pdf.png = the summary page in the PDF viewer)
+                        ShowCalcsWindow(0);
+                        await Task.Delay(8000);
+                        ViewModels.MainViewModel.Log($"CALCSWIN: {Database.CalcsWindow.LastSummary}; capture {await Database.CalcsWindow.CaptureAsync(System.IO.Path.ChangeExtension(path, null) + "_calcs")}");
+                    }
                     _vm.IsDirty = false;
                     Close();
                 };
@@ -585,6 +592,7 @@ public partial class MainWindow : Window
 
     private static void SaveElement(FrameworkElement root, string path)
     {
+        root.UpdateLayout(); // content added in the same tick (e.g. the database panel after --pickafter) is measured first
         var rtb = new System.Windows.Media.Imaging.RenderTargetBitmap((int)root.ActualWidth, (int)root.ActualHeight, 96, 96, PixelFormats.Pbgra32);
         rtb.Render(root);
         SavePng(rtb, path);

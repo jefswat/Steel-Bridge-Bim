@@ -97,6 +97,10 @@ public sealed class SbmDocument
     /// <summary>Wraps an existing in-memory project (used by the desktop app's script runner).</summary>
     public static SbmDocument Attach(BridgeProject project, string? path = null) => new(project, path);
 
+    /// <summary>Wraps an in-memory project together with its already generated results (one per bridge, in project order), so result
+    /// queries (<see cref="Model"/>) do not regenerate. Used by the app's calc comparison.</summary>
+    public static SbmDocument Attach(BridgeProject project, string? path, IReadOnlyList<BridgeModel?> models) => new(project, path) { _models = models.ToList() };
+
     public void Save(string? path = null)
     {
         path ??= FilePath ?? throw new InvalidOperationException("No file path; pass one to Save.");
