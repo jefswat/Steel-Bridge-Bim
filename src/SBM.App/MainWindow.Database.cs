@@ -39,7 +39,55 @@ public partial class MainWindow
         DbPanel.ImportPagesRequested += () => _ = BuildDatabaseAsync(true);
         DbPanel.NavigateRequested += gid => { ShowDbElement(gid); HighlightDbGroup(gid); };
         DbPanel.OpenSheetRequested += (gid, s) => { if (_db != null) Database.PlanSheetWindow.ShowElement(this, _db, gid, DbLabel(gid), s); };
+        // G9 asset management: calc values vs the live model, the picked 3D point for findings, the Calcs window
+        DbPanel.CalcDiff = (v, title) =>
+            v.ResultPath.Length > 0 && !_vm.Project.Bridges.All(_vm.Framings.ContainsKey)
+                ? new SBM.Api.CalcDiffRow { Value = v, CalcTitle = title, Status = "error", CalcText = v.ValueText, Message = "results not generated (regenerate the model)" } // never regenerate here
+                : SBM.Api.CalcSync.DiffOne(CalcDoc(), _db, v, title);
+        DbPanel.PickedPoint = () => _dbPickWorld is { } w ? (w.X, w.Y, w.Z) : null;
+        DbPanel.OpenCalcsRequested += id => ShowCalcsWindow(id);
         RefreshDbStatus();
+    }
+
+    private Vec3? _dbPickWorld;
+
+    /// <summary>The live model with its current results (no regeneration) for calc comparisons.</summary>
+    private SBM.Api.SbmDocument CalcDoc()
+    {
+        var models = _vm.Project.Bridges.Select(b => _vm.Framings.TryGetValue(b, out var f)
+            ? new SBM.Core.Project.BridgeModel(b, f, _vm.SteelModels.GetValueOrDefault(b), true, _vm.ConcreteModels.GetValueOrDefault(b),
+                _vm.SubstructureModels.GetValueOrDefault(b), _vm.PrestressedModels.GetValueOrDefault(b))
+            : null).ToList();
+        return SBM.Api.SbmDocument.Attach(_vm.Project, _vm.FilePath, models);
+    }
+
+    private void OnShowCalcs(object sender, RoutedEventArgs e) => ShowCalcsWindow(0);
+
+    private void ShowCalcsWindow(long calcId)
+    {
+        if (_db == null)
+        {
+            MessageBox.Show(this, DbPath == null ? "Save the model first: calcs live in its companion database." : "Create the database first (Properties panel, Database).", "Calcs",
+                MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+        Database.CalcsWindow.ShowCalcs(this, new Database.CalcsWindow.Host { Db = () => _db, Doc = CalcDoc, ApplyAsync = ApplyCalcValuesAsync }, calcId);
+    }
+
+    /// <summary>Applies confirmed calc values to the live model: undo checkpoint, PropertyPath set + log per value, regenerate, save.</summary>
+    private async Task<SBM.Api.CalcApplyResult> ApplyCalcValuesAsync(IReadOnlyList<long> ids)
+    {
+        if (_db == null) throw new InvalidOperationException("No database.");
+        _vm.Checkpoint();
+        var res = SBM.Api.CalcSync.Apply(SBM.Api.SbmDocument.Attach(_vm.Project, _vm.FilePath), _db, ids, null, save: false);
+        foreach (var (row, o, n) in res.Applied) ViewModels.MainViewModel.Log($"CALC APPLY: {row.Value.PropertyPath}: {o} -> {n} (calc #{row.Value.CalcId} p.{row.Value.Page})");
+        if (res.Applied.Count > 0)
+        {
+            await _vm.RegenerateAsync(false);
+            if (_vm.FilePath != null) { _vm.SaveToPath(null); res.SavedTo = _vm.FilePath; }
+        }
+        if (_dbShown != null && _db != null) ShowDbElement(_dbShown);
+        return res;
     }
 
     private List<IfcBridgeData> DbSnapshotData() =>
@@ -201,6 +249,7 @@ public partial class MainWindow
 
     private void DbOnPicked(object tag, System.Numerics.Vector3 hitLocal)
     {
+        _dbPickWorld = _scene != null ? new Vec3(hitLocal.X, hitLocal.Y, hitLocal.Z) + _scene.Origin : null;
         if (_db == null) { _dbShown = null; DbPanel.ShowMessage(DbPath == null ? "Save the model to use the database." : "No database for this model yet: Create database."); return; }
         var task = _dbTagTask;
         if (task == null) { DbPanel.ShowMessage("Indexing the model…"); return; }

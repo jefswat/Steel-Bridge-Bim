@@ -77,6 +77,8 @@ sbm sheets     "C:\Jobs\Br12\Br12.sbm" "Br12 Sheets.pdf" "Br12 Unit 2" --dxf "Br
 sbm compare-sheets "C:\Jobs\Br12\Br12.sbm" "Br12 Unit 2" --plans "C:\Jobs\Br12\plans" --db Br12.sqlite --out compare.pdf
                                                  # each generated sheet side by side (vector) with the matching plan page + checklist/QC strip; needs Python + PyMuPDF
 sbm qc-sheet   Br12.sqlite "Br12 Unit 2:S-17" design-116:43 ok|issue|unchecked "note"   # store the check result in the companion database (qc table)
+sbm asset      "C:\Jobs\Br12\Br12.sbm" photo add IMG_0412.jpg --element CAP2   # asset management: photos, documents, inspections, findings, calcs
+                                                 # (see "Asset management" below; "sbm asset <model> help" lists the commands)
 sbm drawings   "C:\Jobs\Br12\Br12.sbm" "C:\Jobs\Br12\dxf"   # 2D DXF models: layout, plan, typical section, bents, bar bending
 sbm drawings   "C:\Jobs\Br12\Br12.sbm" "C:\Jobs\Br12\dxf" --zip   # same views as one zip (dxf.zip); a target ending in .zip does the same
 sbm elevations "C:\Jobs\Br12\Br12.sbm"          # grade → deck → haunch → web → flange → sole plate → seat, every bearing
@@ -315,3 +317,106 @@ inherited from a group / assembly ("via ..."), as "Sheet <n> · <title>", plan s
 (the split single page if present, else the whole plan PDF at that page through Acrobat / Reader `/A page=N`, SumatraPDF `-page N` or Edge
 `#page=N`), Preview (after Import plan pages…) and QC. When a model's database has no links, or its rules file changed since the links were
 made, the app relinks it in the background when the model loads (log line `DB: plan sheet links from ...`).
+
+## Asset management (`sbm asset`, G9)
+
+The companion database is also the long-term asset record of the bridge: photos, documents, inspections (history by date), findings and calc
+packages, all keyed by element GlobalId. **A rebuild (`sbm db`, Create / Rebuild database) never touches these tables** (it rewrites only the
+element registry and links); a record whose element no longer exists in the model is an *orphan*: kept and listed by `sbm asset <m> status` and
+the view `v_asset_orphans`, never deleted. Back up the `.sqlite` together with the assets folder: they are user data, not regenerable output
+(both are git-ignored in this repository).
+
+**Files live beside the database, not in it.** `photo add`, `doc add` and `calc add` COPY the file into `<model>_assets\` (beside the database;
+subfolders `photos`, `documents`, `calcs`, `thumbnails`) named by content hash (`photos/2baa1e6bb845a623.jpg` = first 16 hex digits of the
+SHA-256 + extension), so renaming or moving the original never breaks a link and the same file added twice is stored once. Table `asset_files`
+keeps `location` (path RELATIVE to the assets folder, forward slashes: the model, database and assets folder move together) + `location_kind`
+(`file` now, `url` for permalinks later; one resolver, `AssetStore.Resolve` / `ModelDb.ResolveAsset`), the original `file_name`, `media_type`,
+`size_bytes`, `sha256`, `thumb_location`, `taken_at` (EXIF date of a JPEG unless `--taken`), `added_at`, `added_by`, `author`, `caption`, `note`.
+`status` reports missing or changed files (size; `--verify` also checks the SHA-256); nothing is ever deleted. `meta.assets_folder` (relative to the
+database folder or absolute) redirects the folder. Limits: none in the database (it holds metadata only); file sizes are those of the file system.
+Thumbnails: PNG, longest side 320 px, made by `tools/asset_tool.py` (PyMuPDF: images, and the first summary page of a calc PDF) or, for photos
+added in the app, by WPF. `asset_links(file_id, target_kind, target)` links a file to any number of `element` (GlobalId), `inspection`, `finding`
+and `calc` ids.
+
+Commands (`sbm asset <model.sbm> [--db file.sqlite] <command>`; the database must exist; REF = GlobalId, mark or name of an element; `--by NAME`
+records who, default the Windows user; `sbm asset <m> help` lists everything):
+```
+sbm asset "Br.sbm" status [--verify]
+sbm asset "Br.sbm" photo add IMG_0412.jpg IMG_0413.jpg --element CAP2 --caption "Pack rust at handhole 3" --author "A. Smith" [--taken 2026-05-20] [--inspection 2] [--finding 1]
+sbm asset "Br.sbm" photo list [--element CAP2]          # doc add / doc list: the same for documents
+sbm asset "Br.sbm" link 4 --element G3 [--unlink]
+sbm asset "Br.sbm" inspection import samples/assets/inspection-elements.csv     # element-level layout
+sbm asset "Br.sbm" inspection import samples/assets/inspection-ratings.csv      # ratings layout
+sbm asset "Br.sbm" inspection add --date 2026-05-20 --kind routine --structure 7731 --inspector "A. Smith"
+sbm asset "Br.sbm" inspection rate 2 deck 7 [--element REF]
+sbm asset "Br.sbm" inspection list
+sbm asset "Br.sbm" inspection export history.csv        # history.csv + history_ratings.csv + history_findings.csv
+sbm asset "Br.sbm" finding add --element CAP2-W1 --desc "Section loss at handhole 3" --defect 1000 --severity high --location "lower edge"
+          [--point E,N,Z | --station 24+76.3 --offset -12ft] --action "Clean, measure, paint" --due 2026-09-30 --inspection 2 --photo IMG_0412.jpg
+sbm asset "Br.sbm" finding list [--element CAP2] [--open]
+sbm asset "Br.sbm" finding set 1 --status repaired --note "painted 2026-08"
+sbm asset "Br.sbm" calc add CAP2-design.pdf --summary 1-2 --title "Pier 2 steel cap" --rev B --date 2017-03-01 --element CAP2
+sbm asset "Br.sbm" calc values 1 values.json
+sbm asset "Br.sbm" calc diff [1] [--json] [--csv diff.csv]
+sbm asset "Br.sbm" calc apply 1 --ids 2,5 | --all
+sbm asset "Br.sbm" calc log [1]
+```
+
+**Inspections.** `inspections` (one per date + kind + structure number: routine, in-depth, fracture critical, underwater, special, damage, initial),
+`element_condition` (AASHTO MBEI / SNBI element-level: element number + name, parent element number for protective systems / wearing surfaces,
+defect number + name (empty = the element total row), unit, total quantity, CS1-CS4 quantities, note, `global_id` + the `element_ref` text it was
+mapped from), `component_ratings` (NBI / SNBI 0-9 or N per component: deck, superstructure, substructure, culvert, channel, ...; `global_id` ''
+= whole structure), `findings` (description, defect type, severity low / medium / high / critical, location text + optional model point E,N,Z (m,
+project coordinates) and station / offset (m), recommended action, follow-up status open / monitor / scheduled / repaired / closed, due date,
+closed_at, created / updated by + at). Views `v_condition_history`, `v_open_findings`.
+
+CSV import (UTF-8, header row, names case-insensitive, any order, extra columns ignored; the layout is detected from the header; rows are grouped
+into inspections by date + kind + structure number, created when missing; importing the same file again replaces the same rows; `element_ref` =
+GlobalId, mark or name of the model element - rows that match nothing are kept unmapped and reported; element totals whose CS1-CS4 do not add up
+to the total quantity are reported; * = required):
+- element-level: `inspection_date`*, `inspection_kind`, `structure_number`, `inspector`, `element_ref`, `element_number`*, `element_name`,
+  `parent_element_number`, `defect_number`, `defect_name`, `unit`, `total_qty`, `cs1`, `cs2`, `cs3`, `cs4`, `notes`
+- ratings: `inspection_date`*, `inspection_kind`, `structure_number`, `inspector`, `component`*, `rating`*, `element_ref`, `notes`
+
+Examples: `samples/assets/inspection-elements.csv`, `samples/assets/inspection-ratings.csv` (for the sample project). `inspection export` writes
+the history in the same layouts (+ `global_id`, `element_model_name`), plus the findings with their photo locations.
+
+**Calcs.** `calc add` copies the calc PDF to `calcs/`, records its SUMMARY pages (the 1-2 pages with the final design conclusions) and their text
+(PyMuPDF, `tools/asset_tool.py pdftext`; table `calcs`). The values on the summary pages are extracted into a JSON file (in this phase by a Claude
+agent reading the summary text / pages, or by hand) and loaded with `calc values` (replacing the previous extraction of that calc). Schema
+`sbm-calc-values/1` (example `samples/assets/calc-values.json`):
+```json
+{ "schema": "sbm-calc-values/1", "extractedBy": "agent or person",
+  "values": [
+    { "name": "Web depth", "propertyPath": "Bridges[0].Girders.Section.WebDepth", "value": 60, "unit": "in", "element": "G1", "page": 1, "quote": "Web plate: 60 in x 1/2 in" },
+    { "name": "Steel weight", "resultPath": "Steel.SteelMass", "bridge": "Sample Bridge", "value": 312.4, "unit": "kip", "tol": "2%", "page": 1, "quote": "..." },
+    { "name": "Cap concrete", "element": "Abut 1 cap", "field": "volume_m3", "value": 19.2, "unit": "cy", "page": 2, "quote": "..." } ] }
+```
+Each value has exactly ONE target: `propertyPath` (a model INPUT, read and set with the same unit rules as `sbm get / set`: compared and can be
+applied), `resultPath` (a path on the bridge's generated `BridgeModel`, e.g. `Steel.SteelMass`; SI internally) or `field` of an element (`element` =
+GlobalId / mark / name resolved on import, or `globalId`, or `mark`; `mass_kg`, `length_m`, `volume_m3`, `material` or a key of the element's
+database properties). `value` is a number (+ `unit`) or text ("W36x135", "1/2\"" - compared as text when it is not a number for the target).
+Result units: in ft mm cm m, lb kip ton (US) t kg kN, in2 ft2 sf m2, ft3 cf cy yd3 m3, psi ksi MPa, kip-ft kN-m, deg. `tol`: "1/16\"" (input),
+"0.5 kip" (result) or "1%"; default 0.1 % (inputs) / 0.5 % (results). `page` = calc PDF page, `quote` = the source line. Table `calc_values`.
+
+`calc diff` compares every value with the model (reads only): `match`, `differs`, `missing` (path / element not found), `error` (value not readable).
+`calc apply <calc> --ids ...` (or `--all` = every differing input of the calc) sets ONLY selected, differing inputs (results are never applied: change
+the inputs that produce them), records every change in `calc_applied` (calc id + title, value id, property path, old -> new as displayed, page,
+quote, applied_by, applied_at, model file) and saves the .sbm. Nothing is applied by a diff or an import. API: `SBM.Api.CalcSync` (`ParseValues`,
+`ImportValues`, `Diff`, `DiffOne`, `Apply`), `PropertyPath.Parse` (text -> the value a set would store, without setting it).
+
+**API** (`SBM.IO.Database.ModelDb`): `AddFile`, `AddUrl`, `Link` / `Unlink`, `Files`, `FilesForElement`, `ResolveAsset`, `CheckFiles`, `Orphans`,
+`AssetCounts`, `FindElement`; `AddInspection`, `UpsertCondition`, `Condition`, `ConditionFor` (an element's rows or its nearest ancestor's),
+`SetRating`, `Ratings`, `RatingsFor`; `AddFinding`, `UpdateFinding`, `Findings`; `AddCalc`, `Calcs`, `CalcsForElement`, `ReplaceCalcValues`,
+`CalcValues`, `RecordApplied`, `AppliedLog`, `ElementField`. `InspectionCsv.Import` / `ExportHistory`. Schema: `AssetSchema` (version in
+`meta.asset_schema_version`, currently 1; `meta.schema_version` 3); existing databases get the tables when first opened.
+
+**In the app** the database panel (Properties side) shows for the selected element: Photos and documents (thumbnails of the element's and its
+parents' photos, click = full size; documents open with their program; Add photo… / Add document… copy files into the assets folder), Inspection
+(latest NBI / SNBI ratings with a ▼ when lower than at the previous inspection, the latest element-level CS1-CS4 quantities with defects -
+recorded on the element or its nearest parent, e.g. the girder line - older inspections in one line each, findings of the element and its parts
+with follow-up status + note (Save), Add finding… with severity, location, the picked 3D point and photos) and Calcs (calcs linked to the element
+or its parents and their values vs the live model). Review > Asset > **Calcs** opens the project's calc packages: the stored PDF at its summary
+pages (embedded Edge viewer), Add calc…, Import values…, the values-vs-model table, Summary text, Applied changes, and **Apply selected…**: a
+confirmation lists every change (path: model -> calc, page); then each is logged, the model regenerates and is saved (Undo restores the inputs;
+the log keeps the record). Snapshot `--calcswindow` captures the window (`_calcs.png`; the PDF viewer `_calcs_pdf.png`).
