@@ -56,7 +56,7 @@ public sealed class SheetLink
 }
 
 /// <summary>Read access to the companion database for the app and API (element details, hierarchy chain, sheets, QC).</summary>
-public sealed class ModelDb : IDisposable
+public sealed partial class ModelDb : IDisposable
 {
     private readonly SqliteConnection _cn;
     public string Path { get; }

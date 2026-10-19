@@ -8,7 +8,7 @@ namespace SBM.Cli;
 /// sbm — command-line access to Steel Bridge Modeler projects (for batch work, Python/Excel automation, CI).
 /// Exit code 0 = success, 1 = usage/input error, 2 = model has errors.
 /// </summary>
-public static class Program
+public static partial class Program
 {
     private const string Usage = """
         sbm — Steel Bridge Modeler command line
@@ -36,6 +36,10 @@ public static class Program
                                                             (mark / name / category match) or sheets by title / sheet no. (^regex ok)
                                                             Companion SQLite database: every element (IFC GlobalIds + hierarchy),
                                                             plan sheets (--pages splits the plan PDFs), element -> sheet links, QC
+          sbm asset <file.sbm> <command> ...                Asset management in the companion database: photos, documents,
+                                                            inspections (element-level CS1-CS4, NBI/SNBI ratings, CSV import /
+                                                            export), findings, calcs (summary pages, values, diff, apply).
+                                                            "sbm asset <file.sbm> help" lists the commands
           sbm run <script.csx> [file.sbm] [-- args...]      Run a C# script (globals: Doc, Print, Ft, In, Sta, Len)
           sbm bench <file.sbm> [n]                          Time cold/warm regeneration
           sbm nurbs <file.sbm> [--bridge NAME] [--chord LEN] [--tol LEN] [--csv out.csv]
@@ -310,6 +314,10 @@ public static class Program
                     if (r.Links != null) foreach (var w in r.Links.Warnings) Console.WriteLine("  warning: " + w);
                     return 0;
                 }
+                case "asset":
+                case "assets":
+                    Need(args, 2);
+                    return AssetCommand(args);
                 case "run":
                 {
                     Need(args, 2);
@@ -466,7 +474,7 @@ public static class Program
                     return 1;
             }
         }
-        catch (Exception ex) when (ex is ArgumentException or IOException or InvalidOperationException or FormatException or System.Text.Json.JsonException or SbmAppException or TimeoutException)
+        catch (Exception ex) when (ex is ArgumentException or IOException or InvalidOperationException or FormatException or System.Text.Json.JsonException or SbmAppException or TimeoutException or Microsoft.Data.Sqlite.SqliteException)
         {
             Console.Error.WriteLine("Error: " + ex.Message);
             return 1;

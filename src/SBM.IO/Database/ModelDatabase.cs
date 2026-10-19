@@ -43,11 +43,12 @@ public sealed class DatabaseBuildResult
 /// and pier / abutment → cap, column, pedestal, footing, pile, rebar. Virtual groups (bridge group, girder, cross frames,
 /// lateral bracing) have no IFC entity (<c>in_ifc</c> = 0) but deterministic ids too.
 /// Plan sheets (<c>sheets</c>), links (<c>element_sheet</c>) and QC records (<c>qc</c>) live in the same file; a rebuild replaces
-/// the element and link tables but keeps <c>sheets</c> and <c>qc</c> (GlobalIds are stable across rebuilds).
+/// the element and link tables but keeps <c>sheets</c> and <c>qc</c> (GlobalIds are stable across rebuilds). The asset management tables
+/// (<see cref="AssetSchema"/>: photos / documents / calcs by reference, inspections, findings, calc values) are never touched by a rebuild either.
 /// </summary>
 public static class ModelDatabase
 {
-    public const int SchemaVersion = 2;
+    public const int SchemaVersion = 3; // 3 = asset management tables (AssetSchema, G9)
 
     private static readonly Regex UnitName = new(@"^(?<g>.*?)\s+Unit\s+(?<n>\d+)\s*$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
     private static readonly Regex CfName = new(@"^(?<type>.*?)\s+G(?<a>\d+)[–-]G(?<b>\d+)(?:, span (?<span>\d+))?", RegexOptions.Compiled);
@@ -144,6 +145,7 @@ public static class ModelDatabase
         Exec(cn, SchemaSql);
         if (Scalar<int>(cn, "SELECT COUNT(*) FROM pragma_table_info('sheets') WHERE name='note'") == 0) Exec(cn, "ALTER TABLE sheets ADD COLUMN note TEXT");
         if (Scalar<int>(cn, "SELECT COUNT(*) FROM pragma_table_info('sheets') WHERE name='pdf_path'") == 0) Exec(cn, "ALTER TABLE sheets ADD COLUMN pdf_path TEXT");
+        AssetSchema.Ensure(cn);
         return cn;
     }
 
@@ -178,7 +180,7 @@ public static class ModelDatabase
             while (r.Read()) bytes[r.GetString(0)] = r.GetDouble(1);
         }
         catch (SqliteException) { }
-        foreach (var t in new[] { "el", "strings", "props", "element_sheet", "sheets", "qc" })
+        foreach (var t in new[] { "el", "strings", "props", "element_sheet", "sheets", "qc" }.Concat(AssetSchema.Tables))
             list.Add((t, bytes.GetValueOrDefault(t, double.NaN), Scalar<long>(cn, $"SELECT COUNT(*) FROM {t}")));
         return (total, list);
     }

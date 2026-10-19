@@ -1,0 +1,10 @@
+inspection_date,inspection_kind,structure_number,inspector,element_ref,element_number,element_name,parent_element_number,defect_number,defect_name,unit,total_qty,cs1,cs2,cs3,cs4,notes
+2024-05-14,routine,SAMPLE-001,J. Doe,G1,107,Steel Open Girder/Beam,,,,LF,265,250,15,0,0,
+2024-05-14,routine,SAMPLE-001,J. Doe,G1,107,Steel Open Girder/Beam,,1000,Corrosion,LF,15,0,15,0,0,Light rust at the bearing ends
+2024-05-14,routine,SAMPLE-001,J. Doe,G1,515,Steel Protective Coating,107,,,SF,1590,1400,190,0,0,
+2024-05-14,routine,SAMPLE-001,J. Doe,G1,515,Steel Protective Coating,107,3440,Effectiveness,SF,190,0,190,0,0,
+2024-05-14,routine,SAMPLE-001,J. Doe,,12,Reinforced Concrete Deck,,,,SF,10800,10500,300,0,0,
+2026-05-20,routine,SAMPLE-001,A. Smith,G1,107,Steel Open Girder/Beam,,,,LF,265,230,30,5,0,
+2026-05-20,routine,SAMPLE-001,A. Smith,G1,107,Steel Open Girder/Beam,,1000,Corrosion,LF,35,0,30,5,0,Section loss at G1 Abut 1 bearing stiffener
+2026-05-20,routine,SAMPLE-001,A. Smith,G1,515,Steel Protective Coating,107,,,SF,1590,1200,350,40,0,
+2026-05-20,routine,SAMPLE-001,A. Smith,,12,Reinforced Concrete Deck,,,,SF,10800,10200,560,40,0,
