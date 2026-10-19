@@ -62,6 +62,23 @@ The checker uses the program read-only, through the CLI. All of the following pr
 - Each item becomes a row with its page and view. Rows the model does not cover are "not modeled" (with a reason), not silently skipped.
 - Coverage = checked + n.a. over all items, per sheet and per bridge.
 
+### 4.1a Two directions: sheet by sheet, then element by element
+The check runs in both directions, because each catches errors the other cannot.
+
+1. **Sheet by sheet (primary): finds omissions and wrong values.**
+   - Every checkable item on every sheet (4.1) is checked against the model. Each result records the element(s) it checked.
+   - Coverage is complete when every item is pass / fail / n.a. / conflict.
+2. **Element by element (reconciliation): finds things the plans do not support.**
+   - Every element in the database must be backed by passed checks covering its size, position and marks or bars.
+   - It is a query over `qc_checks`: elements with no covering check go on an **unverified** list. Examples: invented defaults, duplicated parts, bars where the plans show none, a mislabeled element.
+   - An element's claimed source sheets (sheet links) that none of its checks used are also findings: either the link is wrong or the check is missing.
+3. **Whole-model passes** that belong to no single sheet or element:
+   - elevation chains, coordinates and alignment (4.2)
+   - bar list and quantity totals
+   - clash detection (7)
+
+A bridge is complete when pass 1 has no open items, pass 2's unverified list is empty (or every entry is accepted by the user), and the whole-model passes are clean.
+
 ### 4.2 Overall geometry (alignment, elevations, northing / easting)
 Computed independently from the IFC with IfcOpenShell geometry (`ifcopenshell.geom`, `tools/check_ifc_alignment.py` extended):
 
