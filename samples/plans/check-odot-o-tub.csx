@@ -186,7 +186,7 @@ Info($"transverse stiffeners {tr.Stiffeners} (no plan count), studs {tr.Studs}")
 int[] studSpaces = { 124 + 40 + 48 + 62 + 59 + 39 + 162, 148 + 45 + 54 + 76 + 67 + 44 + 186 };
 int studsPlan = studSpaces.Sum(s => s + 7) * 3 * 2;
 int girderStuds = st.Studs.Count(x => !x.Assembly.StartsWith("XSD"));
-Row("girder shear studs (3 per row per top flange, p.278 / p.279 spacing rows)", $"{studsPlan}", $"{girderStuds}", girderStuds == studsPlan, "7 zones per girder: rows = spaces + 1");
+Row("girder shear studs (3 per row per top flange, p.278 / p.279 spacing rows)", $"{studsPlan}", $"{girderStuds}", girderStuds == studsPlan, "7 zones per girder: rows = spaces + 1; the model omits the studs that fall under the pier 13 top connection plates (skewed 4'-3\" plate over the square stud rows, generator warning lists them)");
 Info($"support diaphragm top flange studs (p.283 / p.285 / p.287: 2 - 7/8\" x 7\" @ 1'-0 max, 6\" from the ends): {tr.Studs - girderStuds}");
 // external diaphragm: frames radial?
 foreach (var pp in tr.PanelPoints.GroupBy(p => (p.Span, p.Point)).Where(x => x.Count() == 2))

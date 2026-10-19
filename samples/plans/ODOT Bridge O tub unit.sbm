@@ -215,7 +215,8 @@
               "BackwallBarSize": "#5",
               "BackwallBarSpacing": 0.30479999999999996,
               "MaxBarLength": 18.288,
-              "CapBars": []
+              "CapBars": [],
+              "PlanBarSets": []
             }
           },
           "ExpansionJoint": null,
@@ -369,7 +370,8 @@
               "BackwallBarSize": "#5",
               "BackwallBarSpacing": 0.30479999999999996,
               "MaxBarLength": 18.288,
-              "CapBars": []
+              "CapBars": [],
+              "PlanBarSets": []
             }
           },
           "ExpansionJoint": null,
@@ -523,7 +525,8 @@
               "BackwallBarSize": "#5",
               "BackwallBarSpacing": 0.30479999999999996,
               "MaxBarLength": 18.288,
-              "CapBars": []
+              "CapBars": [],
+              "PlanBarSets": []
             }
           },
           "ExpansionJoint": null,
@@ -677,7 +680,8 @@
               "BackwallBarSize": "#5",
               "BackwallBarSpacing": 0.30479999999999996,
               "MaxBarLength": 18.288,
-              "CapBars": []
+              "CapBars": [],
+              "PlanBarSets": []
             }
           },
           "ExpansionJoint": null,
@@ -1529,9 +1533,17 @@
             "WorkPointFromSupport": {
               "0": 0.30479999999999996
             },
-            "BoltsPerLine": 3,
+            "EndSetback": 0.07302499999999999,
+            "EndSetbackFlag": "UNRESOLVED (p.289): top lateral WT end setback (WT end edge to the W.P. line) - end setback not dimensioned; scaled. Scaled 2 7/8\u0022 across the girder (about 4 3/16\u0022 along the WT) from the W.P. line, end edge parallel to the girder axis.",
             "BoltPitch": 0.07619999999999999,
-            "BoltGage": 0.1031875
+            "BoltGages": [
+              0.044449999999999996,
+              0.044449999999999996,
+              0.1031875,
+              0.044449999999999996,
+              0.044449999999999996
+            ],
+            "FirstBoltFromEndEdge": 0.044449999999999996
           },
           "External": {
             "Points": [
@@ -1603,9 +1615,70 @@
               "GirderLegBolts": 9,
               "DiaphragmLegBolts": 10,
               "BoltPitch": 0.08889999999999999,
+              "TopConnection": {
+                "Thickness": 0.0254,
+                "Width": 0.30479999999999996,
+                "RowGage": 0.17779999999999999,
+                "InteriorStart": -0.381,
+                "InteriorEnd": 0.9144,
+                "InteriorHoles": [
+                  -0.3302,
+                  -0.2413,
+                  -0.15239999999999998,
+                  -0.0635,
+                  0.0508,
+                  0.1905,
+                  0.3429,
+                  0.4826,
+                  0.5969,
+                  0.6858,
+                  0.7746999999999999,
+                  0.8635999999999999
+                ],
+                "ExteriorStart": -0.2032,
+                "ExteriorEnd": 0.2413,
+                "ExteriorHoles": [
+                  -0.15239999999999998,
+                  -0.0635,
+                  0.0508,
+                  0.1905
+                ]
+              },
+              "BottomConnection": {
+                "Thickness": 0.0254,
+                "Length": 0.6604,
+                "GirderEndWidth": 0.4064,
+                "DiaphragmEndWidth": 0.30479999999999996,
+                "InsetFromFlangeEdge": 0.2032,
+                "TaperStart": 0.2794,
+                "GirderHoleColumns": [
+                  0.0508,
+                  0.1397
+                ],
+                "GirderHoleRows": [
+                  -0.15239999999999998,
+                  -0.0635,
+                  0.0635,
+                  0.15239999999999998
+                ],
+                "DiaphragmHoleColumns": [
+                  0.3429,
+                  0.43179999999999996,
+                  0.5206999999999999,
+                  0.6095999999999999
+                ],
+                "DiaphragmHoleRows": [
+                  -0.08889999999999999,
+                  0.08889999999999999
+                ],
+                "TaperFlag": "UNRESOLVED (p.284, p.286, p.288): BOTT. CONNECTION PL taper length - the plan shows the plate narrowing from 1\u0027-4\u0022 at the girder end to 1\u0027-0\u0022 at the diaphragm end without a taper length. Full 1\u0027-4\u0022 width over the first 11\u0022 (scaled), then linear to 1\u0027-0\u0022 at the end."
+              },
+              "StrutPlate": null,
+              "FlangeEndGap": 0.0127,
+              "CornerClipLength": 0.07619999999999999,
+              "CornerClipHeight": 0.038099999999999995,
               "Unresolved": [
-                "UNRESOLVED (p.284): exterior diaphragm height 2\u0027-11 1/2\u0022 and its position - the dimension does not reconcile with the 4\u0027-2\u0022 tub depth on the sheet. Exterior diaphragm built full depth (top flange at the top-of-web line, bottom flange on the bottom-flange top).",
-                "UNRESOLVED (p.283-284): top / bottom connection plates PL 1 x 12 - lengths and bolt patterns only partly dimensioned. Not built."
+                "UNRESOLVED (p.284): exterior support diaphragm web height and position between its flanges - the 2\u0027-11 1/2\u0022 on the sheet is the length of the bent PL (9 spa @ 3 1/2\u0022 \u002B 2 x 2\u0022), not a diaphragm height. Built from the top of the girder top flange to the underside of the girder bottom flange (flanges flush with the girder flanges), notched around the girder flanges."
               ]
             },
             {
@@ -1635,8 +1708,75 @@
               "GirderLegBolts": 11,
               "DiaphragmLegBolts": 12,
               "BoltPitch": 0.08889999999999999,
+              "TopConnection": {
+                "Thickness": 0.0254,
+                "Width": 0.30479999999999996,
+                "RowGage": 0.17779999999999999,
+                "InteriorStart": -0.381,
+                "InteriorEnd": 0.9144,
+                "InteriorHoles": [
+                  -0.3302,
+                  -0.2413,
+                  -0.15239999999999998,
+                  -0.0635,
+                  0.0508,
+                  0.1905,
+                  0.3429,
+                  0.4826,
+                  0.5969,
+                  0.6858,
+                  0.7746999999999999,
+                  0.8635999999999999
+                ],
+                "ExteriorStart": -0.2032,
+                "ExteriorEnd": 0.2413,
+                "ExteriorHoles": [
+                  -0.15239999999999998,
+                  -0.0635,
+                  0.0508,
+                  0.1905
+                ]
+              },
+              "BottomConnection": {
+                "Thickness": 0.0254,
+                "Length": 0.6604,
+                "GirderEndWidth": 0.4064,
+                "DiaphragmEndWidth": 0.30479999999999996,
+                "InsetFromFlangeEdge": 0.2032,
+                "TaperStart": 0.2794,
+                "GirderHoleColumns": [
+                  0.0508,
+                  0.1397
+                ],
+                "GirderHoleRows": [
+                  -0.15239999999999998,
+                  -0.0635,
+                  0.0635,
+                  0.15239999999999998
+                ],
+                "DiaphragmHoleColumns": [
+                  0.3429,
+                  0.43179999999999996,
+                  0.5206999999999999,
+                  0.6095999999999999
+                ],
+                "DiaphragmHoleRows": [
+                  -0.08889999999999999,
+                  0.08889999999999999
+                ],
+                "TaperFlag": "UNRESOLVED (p.284, p.286, p.288): BOTT. CONNECTION PL taper length - the plan shows the plate narrowing from 1\u0027-4\u0022 at the girder end to 1\u0027-0\u0022 at the diaphragm end without a taper length. Full 1\u0027-4\u0022 width over the first 11\u0022 (scaled), then linear to 1\u0027-0\u0022 at the end."
+              },
+              "StrutPlate": {
+                "Thickness": 0.03175,
+                "Width": 0.2032,
+                "Clip": 0.0254,
+                "Flag": "UNRESOLVED (p.287): STRUT PL under the access opening (Section A-A): thickness and width - Section A-A draws the plate between the bearing stiffeners with 1\u0022 x 1\u0022 clips but gives no thickness or width. PL 1 1/4 x 8 (the bearing stiffener size) on each face of the interior web."
+              },
+              "FlangeEndGap": 0.0127,
+              "CornerClipLength": 0.08889999999999999,
+              "CornerClipHeight": 0.038099999999999995,
               "Unresolved": [
-                "UNRESOLVED (p.287-288): top / bottom connection plates PL 1 x 12 - lengths and bolt patterns only partly dimensioned. Not built."
+                "UNRESOLVED (p.287-288): exterior support diaphragm web height and position between its flanges - the exterior web is drawn between its flanges without a height. Built from the top of the girder top flange to the underside of the girder bottom flange (flanges flush with the girder flanges), notched around the girder flanges."
               ]
             },
             {
@@ -1666,8 +1806,75 @@
               "GirderLegBolts": 11,
               "DiaphragmLegBolts": 12,
               "BoltPitch": 0.08889999999999999,
+              "TopConnection": {
+                "Thickness": 0.0254,
+                "Width": 0.30479999999999996,
+                "RowGage": 0.17779999999999999,
+                "InteriorStart": -0.381,
+                "InteriorEnd": 0.9144,
+                "InteriorHoles": [
+                  -0.3302,
+                  -0.2413,
+                  -0.15239999999999998,
+                  -0.0635,
+                  0.0508,
+                  0.1905,
+                  0.3429,
+                  0.4826,
+                  0.5969,
+                  0.6858,
+                  0.7746999999999999,
+                  0.8635999999999999
+                ],
+                "ExteriorStart": -0.2032,
+                "ExteriorEnd": 0.2413,
+                "ExteriorHoles": [
+                  -0.15239999999999998,
+                  -0.0635,
+                  0.0508,
+                  0.1905
+                ]
+              },
+              "BottomConnection": {
+                "Thickness": 0.0254,
+                "Length": 0.6604,
+                "GirderEndWidth": 0.4064,
+                "DiaphragmEndWidth": 0.30479999999999996,
+                "InsetFromFlangeEdge": 0.2032,
+                "TaperStart": 0.2794,
+                "GirderHoleColumns": [
+                  0.0508,
+                  0.1397
+                ],
+                "GirderHoleRows": [
+                  -0.15239999999999998,
+                  -0.0635,
+                  0.0635,
+                  0.15239999999999998
+                ],
+                "DiaphragmHoleColumns": [
+                  0.3429,
+                  0.43179999999999996,
+                  0.5206999999999999,
+                  0.6095999999999999
+                ],
+                "DiaphragmHoleRows": [
+                  -0.08889999999999999,
+                  0.08889999999999999
+                ],
+                "TaperFlag": "UNRESOLVED (p.284, p.286, p.288): BOTT. CONNECTION PL taper length - the plan shows the plate narrowing from 1\u0027-4\u0022 at the girder end to 1\u0027-0\u0022 at the diaphragm end without a taper length. Full 1\u0027-4\u0022 width over the first 11\u0022 (scaled), then linear to 1\u0027-0\u0022 at the end."
+              },
+              "StrutPlate": {
+                "Thickness": 0.03175,
+                "Width": 0.2032,
+                "Clip": 0.0254,
+                "Flag": "UNRESOLVED (p.287): STRUT PL under the access opening (Section A-A): thickness and width - Section A-A draws the plate between the bearing stiffeners with 1\u0022 x 1\u0022 clips but gives no thickness or width. PL 1 1/4 x 8 (the bearing stiffener size) on each face of the interior web."
+              },
+              "FlangeEndGap": 0.0127,
+              "CornerClipLength": 0.08889999999999999,
+              "CornerClipHeight": 0.038099999999999995,
               "Unresolved": [
-                "UNRESOLVED (p.287-288): top / bottom connection plates PL 1 x 12 - lengths and bolt patterns only partly dimensioned. Not built."
+                "UNRESOLVED (p.287-288): exterior support diaphragm web height and position between its flanges - the exterior web is drawn between its flanges without a height. Built from the top of the girder top flange to the underside of the girder bottom flange (flanges flush with the girder flanges), notched around the girder flanges."
               ]
             },
             {
@@ -1697,8 +1904,70 @@
               "GirderLegBolts": 9,
               "DiaphragmLegBolts": 10,
               "BoltPitch": 0.08889999999999999,
+              "TopConnection": {
+                "Thickness": 0.0254,
+                "Width": 0.30479999999999996,
+                "RowGage": 0.17779999999999999,
+                "InteriorStart": -0.381,
+                "InteriorEnd": 0.9144,
+                "InteriorHoles": [
+                  -0.3302,
+                  -0.2413,
+                  -0.15239999999999998,
+                  -0.0635,
+                  0.0508,
+                  0.1905,
+                  0.3429,
+                  0.4826,
+                  0.5969,
+                  0.6858,
+                  0.7746999999999999,
+                  0.8635999999999999
+                ],
+                "ExteriorStart": -0.2032,
+                "ExteriorEnd": 0.2413,
+                "ExteriorHoles": [
+                  -0.15239999999999998,
+                  -0.0635,
+                  0.0508,
+                  0.1905
+                ]
+              },
+              "BottomConnection": {
+                "Thickness": 0.0254,
+                "Length": 0.6604,
+                "GirderEndWidth": 0.4064,
+                "DiaphragmEndWidth": 0.30479999999999996,
+                "InsetFromFlangeEdge": 0.2032,
+                "TaperStart": 0.2794,
+                "GirderHoleColumns": [
+                  0.0508,
+                  0.1397
+                ],
+                "GirderHoleRows": [
+                  -0.15239999999999998,
+                  -0.0635,
+                  0.0635,
+                  0.15239999999999998
+                ],
+                "DiaphragmHoleColumns": [
+                  0.3429,
+                  0.43179999999999996,
+                  0.5206999999999999,
+                  0.6095999999999999
+                ],
+                "DiaphragmHoleRows": [
+                  -0.08889999999999999,
+                  0.08889999999999999
+                ],
+                "TaperFlag": "UNRESOLVED (p.284, p.286, p.288): BOTT. CONNECTION PL taper length - the plan shows the plate narrowing from 1\u0027-4\u0022 at the girder end to 1\u0027-0\u0022 at the diaphragm end without a taper length. Full 1\u0027-4\u0022 width over the first 11\u0022 (scaled), then linear to 1\u0027-0\u0022 at the end."
+              },
+              "StrutPlate": null,
+              "FlangeEndGap": 0.0127,
+              "CornerClipLength": 0.07619999999999999,
+              "CornerClipHeight": 0.038099999999999995,
               "Unresolved": [
-                "UNRESOLVED (p.285-286): top / bottom connection plates PL 1 x 12 - lengths and bolt patterns only partly dimensioned. Not built."
+                "UNRESOLVED (p.285-286): exterior support diaphragm web height and position between its flanges - the exterior web is drawn between its flanges without a height. Built from the top of the girder top flange to the underside of the girder bottom flange (flanges flush with the girder flanges), notched around the girder flanges."
               ]
             }
           ],
@@ -2332,6 +2601,9 @@
               "Flanges": "Bottom"
             }
           ],
+          "FilletWeld": 0.0079375,
+          "SkewedEnds": true,
+          "SkewedEndMinDegrees": 0.5,
           "DeckPours": [
             {
               "Section": 1,
@@ -2376,7 +2648,7 @@
             "UNRESOLVED (p.281): web splice plate position on the web - the section dimensions 6 1/2\u0022 \u002B 3\u0027-6 1/2\u0022 \u002B 6 1/2\u0022 (4\u0027-7 1/2\u0022) exceed the 4\u0027-3 9/16\u0022 web length on the slope. Web splice plates centred on the web.",
             "UNRESOLVED (p.281): bottom splice plate edge dimension 8 3/4\u0022 - (77\u0022 - 63 1/2\u0022) / 2 = 6 3/4\u0022, not 8 3/4\u0022. Plates centred on the tub CL.",
             "UNRESOLVED (p.273): which panel points carry internal cross frames - the framing plan distinguishes solid / dashed lines graphically only. Even panel points (solid lines) = K frame \u002B top strut, odd = top strut, as drawn.",
-            "UNRESOLVED (p.289): lateral bracing end bolts - Detail A shows 6 holes per member end with 1 3/4\u0022 / 3\u0022 / 4 1/16\u0022 dimensions. 2 lines x 3 bolts @ 3\u0022 near each end modeled; bolts off the flange are dropped.",
+            "UNRESOLVED (p.289): lateral WT flange level against the girder top flange - Detail A is a plan view only; no section shows the WT flange against the top flange. WT flange modeled directly under the girder top flange (bolted to it, no gusset - none is drawn).",
             "UNRESOLVED (p.292): anchor bolt rows at the end piers 13 / 16 - the expansion-pier plan (G1) shows one row 9\u0022 from the CL brg; the row side at each end is not labeled. Row placed 9\u0022 from the CL brg on the span side.",
             "UNRESOLVED (p.273): access hatch position reference - 4\u0027-3\u0022 is dimensioned from the CL hatch to the CL brg line drawn at the girder; the side (span) is from the drawing. Hatches 4\u0027-3\u0022 into spans 14 and 16 on the tub CL.",
             "UNRESOLVED (p.278-279): first stud at pier 13 - the row label reads \u0022STUD SPA ~ 1\u0027-0\u0022\u0022 with an unreadable leader. First stud row 1\u0027-0 from the CL brg (gives 9.97\u0022 / 7.96\u0022 spacing, within the 10\u0022 / 8\u0022 max).",
@@ -2431,7 +2703,8 @@
           "NegativeRegionFraction": 0.25,
           "RequiredSteelRatio": 0.01,
           "MarkLengthTolerance": 0.0508,
-          "Plan": null
+          "Plan": null,
+          "PlanBarSets": []
         }
       },
       "CrossFrames": {
@@ -2645,7 +2918,362 @@
       "Drains": [],
       "InspectionAccess": null,
       "Misc": null,
-      "PsSteelDiaphragms": null
+      "PsSteelDiaphragms": null,
+      "Fabrication": [
+        {
+          "Note": "OT1",
+          "Source": "p.278 note 3, p.282-288 note 2",
+          "Categories": [
+            "FlangePlate",
+            "WebPlate",
+            "BearingStiffener",
+            "ConnectionStiffener",
+            "Gusset",
+            "FillerPlate",
+            "Angle",
+            "SplicePlate",
+            "ConnectorPlate",
+            "DiaphragmPlate",
+            "RolledTee",
+            "AccessDoor"
+          ],
+          "AssemblyKinds": null,
+          "MarkPattern": null,
+          "AssemblyPattern": null,
+          "DescriptionPattern": null,
+          "Girders": null,
+          "Set": {
+            "Toughness": null,
+            "ContactFinish": null,
+            "Ndt": null,
+            "CoatingExterior": null,
+            "CoatingInterior": null,
+            "ShopAssembly": null,
+            "Tolerance": null,
+            "Camber": null,
+            "Weld": null,
+            "Notes": [
+              "weathering steel"
+            ],
+            "IsEmpty": false
+          },
+          "Material": "AASHTO M270 Gr. 50W"
+        },
+        {
+          "Note": "OT2",
+          "Source": "p.278 note 3, p.282-288 note 2",
+          "Categories": [
+            "FlangePlate",
+            "WebPlate",
+            "BearingStiffener",
+            "ConnectionStiffener",
+            "Gusset",
+            "FillerPlate",
+            "Angle",
+            "SplicePlate",
+            "ConnectorPlate",
+            "DiaphragmPlate",
+            "RolledTee",
+            "AccessDoor"
+          ],
+          "AssemblyKinds": null,
+          "MarkPattern": null,
+          "AssemblyPattern": null,
+          "DescriptionPattern": null,
+          "Girders": null,
+          "Set": {
+            "Toughness": "Charpy V-notch Zone 2, non-fracture critical (unless noted otherwise)",
+            "ContactFinish": null,
+            "Ndt": null,
+            "CoatingExterior": null,
+            "CoatingInterior": null,
+            "ShopAssembly": null,
+            "Tolerance": null,
+            "Camber": null,
+            "Weld": null,
+            "Notes": [],
+            "IsEmpty": false
+          },
+          "Material": null
+        },
+        {
+          "Note": "OT3",
+          "Source": "p.278 note 6",
+          "Categories": [
+            "FlangePlate"
+          ],
+          "AssemblyKinds": null,
+          "MarkPattern": "-BF\\d\u002B$",
+          "AssemblyPattern": null,
+          "DescriptionPattern": "tension flange",
+          "Girders": null,
+          "Set": {
+            "Toughness": "Fracture critical member (bottom tension flange): CVN requirements for fracture critical members, Zone 2; fabricated per the AASHTO/AWS D1.5 fracture control plan",
+            "ContactFinish": null,
+            "Ndt": null,
+            "CoatingExterior": null,
+            "CoatingInterior": null,
+            "ShopAssembly": null,
+            "Tolerance": null,
+            "Camber": null,
+            "Weld": null,
+            "Notes": [],
+            "IsEmpty": false
+          },
+          "Material": null
+        },
+        {
+          "Note": "OT4",
+          "Source": "p.278 note 6",
+          "Categories": [
+            "WebPlate"
+          ],
+          "AssemblyKinds": [
+            "GirderFieldSection"
+          ],
+          "MarkPattern": null,
+          "AssemblyPattern": null,
+          "DescriptionPattern": null,
+          "Girders": null,
+          "Set": {
+            "Toughness": "Fracture critical member (tub webs): CVN requirements for fracture critical members, Zone 2; fabricated per the AASHTO/AWS D1.5 fracture control plan",
+            "ContactFinish": null,
+            "Ndt": null,
+            "CoatingExterior": null,
+            "CoatingInterior": null,
+            "ShopAssembly": null,
+            "Tolerance": null,
+            "Camber": null,
+            "Weld": null,
+            "Notes": [],
+            "IsEmpty": false
+          },
+          "Material": null
+        },
+        {
+          "Note": "OT5",
+          "Source": "p.270 note 2, p.278 note 4",
+          "Categories": [
+            "FlangePlate"
+          ],
+          "AssemblyKinds": null,
+          "MarkPattern": "-TF[LR]\\d\u002B$",
+          "AssemblyPattern": null,
+          "DescriptionPattern": null,
+          "Girders": null,
+          "Set": {
+            "Toughness": null,
+            "ContactFinish": null,
+            "Ndt": null,
+            "CoatingExterior": null,
+            "CoatingInterior": null,
+            "ShopAssembly": "Shear connectors (studs) welded on the compression flange only; omitted at the field splices",
+            "Tolerance": null,
+            "Camber": null,
+            "Weld": null,
+            "Notes": [],
+            "IsEmpty": false
+          },
+          "Material": null
+        },
+        {
+          "Note": "OT6",
+          "Source": "p.273 note 5",
+          "Categories": [
+            "ConnectionStiffener",
+            "Gusset"
+          ],
+          "AssemblyKinds": null,
+          "MarkPattern": null,
+          "AssemblyPattern": null,
+          "DescriptionPattern": null,
+          "Girders": null,
+          "Set": {
+            "Toughness": null,
+            "ContactFinish": null,
+            "Ndt": null,
+            "CoatingExterior": null,
+            "CoatingInterior": null,
+            "ShopAssembly": null,
+            "Tolerance": null,
+            "Camber": null,
+            "Weld": "Transverse stiffeners and connection plates welded to both flanges",
+            "Notes": [],
+            "IsEmpty": false
+          },
+          "Material": null
+        },
+        {
+          "Note": "OT7",
+          "Source": "p.282-288 notes 3, 5; p.270 note 3",
+          "Categories": [
+            "FlangePlate",
+            "WebPlate",
+            "ConnectionStiffener",
+            "BearingStiffener",
+            "DiaphragmPlate",
+            "Gusset"
+          ],
+          "AssemblyKinds": null,
+          "MarkPattern": null,
+          "AssemblyPattern": null,
+          "DescriptionPattern": null,
+          "Girders": null,
+          "Set": {
+            "Toughness": null,
+            "ContactFinish": null,
+            "Ndt": null,
+            "CoatingExterior": null,
+            "CoatingInterior": "Interior surfaces of the tub: light colored paint (white polyamide cured epoxy) for future inspection, not intended as corrosion protection",
+            "ShopAssembly": null,
+            "Tolerance": null,
+            "Camber": null,
+            "Weld": null,
+            "Notes": [],
+            "IsEmpty": false
+          },
+          "Material": null
+        },
+        {
+          "Note": "OT8",
+          "Source": "p.282-288 note 3",
+          "Categories": [
+            "SplicePlate",
+            "FillerPlate",
+            "ConnectorPlate",
+            "Angle",
+            "RolledTee"
+          ],
+          "AssemblyKinds": null,
+          "MarkPattern": null,
+          "AssemblyPattern": null,
+          "DescriptionPattern": null,
+          "Girders": null,
+          "Set": {
+            "Toughness": null,
+            "ContactFinish": "Faying surfaces of bolted connections cleaned of rust / foreign matter (ODOT 506.04.F), blast cleaned SSPC-SP10 (near white) before assembly, protected from paint",
+            "Ndt": null,
+            "CoatingExterior": null,
+            "CoatingInterior": null,
+            "ShopAssembly": null,
+            "Tolerance": null,
+            "Camber": null,
+            "Weld": null,
+            "Notes": [],
+            "IsEmpty": false
+          },
+          "Material": null
+        },
+        {
+          "Note": "OT9",
+          "Source": "p.283-288 elevations (bearing stiffener note)",
+          "Categories": [
+            "BearingStiffener"
+          ],
+          "AssemblyKinds": null,
+          "MarkPattern": null,
+          "AssemblyPattern": null,
+          "DescriptionPattern": null,
+          "Girders": null,
+          "Set": {
+            "Toughness": null,
+            "ContactFinish": "Finish to bear on the bottom flange (before welding), tight fit at the top flange; placed normal to the bottom flange",
+            "Ndt": null,
+            "CoatingExterior": null,
+            "CoatingInterior": null,
+            "ShopAssembly": null,
+            "Tolerance": null,
+            "Camber": null,
+            "Weld": "Weld to the bottom flange (5/16 fillet both sides), not to the top flange",
+            "Notes": [],
+            "IsEmpty": false
+          },
+          "Material": null
+        },
+        {
+          "Note": "OT10",
+          "Source": "p.278 note 5",
+          "Categories": [
+            "WebPlate",
+            "FlangePlate"
+          ],
+          "AssemblyKinds": null,
+          "MarkPattern": "-SD\\d\u002B-(W|TF)$|^XSD",
+          "AssemblyPattern": null,
+          "DescriptionPattern": null,
+          "Girders": null,
+          "Set": {
+            "Toughness": null,
+            "ContactFinish": null,
+            "Ndt": null,
+            "CoatingExterior": null,
+            "CoatingInterior": null,
+            "ShopAssembly": null,
+            "Tolerance": "Girder ends and end diaphragm web plates plumb after total dead load; end diaphragm flange plates parallel to the girder flanges",
+            "Camber": null,
+            "Weld": null,
+            "Notes": [],
+            "IsEmpty": false
+          },
+          "Material": null
+        },
+        {
+          "Note": "OT11",
+          "Source": "p.282 note 4, p.283-288 note 4",
+          "Categories": [
+            "SplicePlate",
+            "FillerPlate",
+            "ConnectorPlate",
+            "Angle",
+            "RolledTee"
+          ],
+          "AssemblyKinds": null,
+          "MarkPattern": null,
+          "AssemblyPattern": null,
+          "DescriptionPattern": null,
+          "Girders": null,
+          "Set": {
+            "Toughness": null,
+            "ContactFinish": null,
+            "Ndt": null,
+            "CoatingExterior": null,
+            "CoatingInterior": null,
+            "ShopAssembly": "1\u0022 dia A325 type 3 bolts with direct tension indicators (ODOT 506 / 724.02.D), holes 1 1/16\u0022; calibrated wrench method not allowed",
+            "Tolerance": null,
+            "Camber": null,
+            "Weld": null,
+            "Notes": [],
+            "IsEmpty": false
+          },
+          "Material": null
+        },
+        {
+          "Note": "OT12",
+          "Source": "p.282 note 6, p.283-288 note 6",
+          "Categories": [
+            "Weld"
+          ],
+          "AssemblyKinds": null,
+          "MarkPattern": null,
+          "AssemblyPattern": null,
+          "DescriptionPattern": null,
+          "Girders": null,
+          "Set": {
+            "Toughness": null,
+            "ContactFinish": null,
+            "Ndt": null,
+            "CoatingExterior": null,
+            "CoatingInterior": null,
+            "ShopAssembly": null,
+            "Tolerance": null,
+            "Camber": null,
+            "Weld": "Fillet weld 5/16 both sides TYP.; AWS minimum sizes unless noted; terminated 3/8 (\u002B/- 1/8) from edges of angles or stiffener plates",
+            "Notes": [],
+            "IsEmpty": false
+          },
+          "Material": null
+        }
+      ]
     }
   ],
   "References": []

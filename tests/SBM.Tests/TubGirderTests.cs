@@ -145,6 +145,93 @@ public class TubGirderTests
     }
 
     [Fact]
+    public void Laterals_EndSetbackIsAnInput_SixBoltsPerEndAndFlagged()
+    {
+        var (_, _, m0) = Model(b => b.Girders.Tub!.Lateral.EndSetback = In(4));
+        var (_, _, m1) = Model(b => { var l = b.Girders.Tub!.Lateral; l.EndSetback = In(2.875); l.EndSetbackFlag = "UNRESOLVED (p.289): top lateral WT end setback - end setback not dimensioned; scaled."; });
+        var a = m0.Parts.First(p => p.Mark.Contains("-LAT1-L1"));
+        var b1 = m1.Parts.First(p => p.Mark == a.Mark);
+        Assert.True(b1.Length > a.Length + In(1), "a smaller setback gives a longer member");   // 2 x (4 - 2 7/8) across the girder, a little more along the WT
+        // 6 bolts per member end (Detail A), all registered as holes in the girder top flange
+        string asm = a.Assembly;
+        int members = m1.Parts.Count(p => p.Assembly == asm && p.Category == PartCategory.RolledTee);
+        Assert.Equal(members * 12, m1.Bolts.Count(x => x.Assembly == asm));
+        Assert.Null(a.Assumption);
+        Assert.NotNull(b1.Assumption);
+        Assert.True(b1.Assumption!.DimensionOnly);
+        Assert.Contains("p.289", b1.Assumption.Reason);
+        Assert.All(m1.Parts, p => Assert.True(p.Mesh.Volume() > 0, $"{p.Mark} volume {p.Mesh.Volume()}"));
+    }
+
+    private static (BridgeProject p, BridgeFraming f, SteelModel m) ModelWithConnections(Action<BridgeDefinition>? tweak = null) => Model(b =>
+    {
+        var t = b.Girders.Tub!;
+        var sd = t.SupportDiaphragms[0];
+        sd.TopConnection = new TubTopConnectionDefinition();
+        sd.BottomConnection = new TubBottomConnectionDefinition();
+        sd.CornerClipLength = In(3.5); sd.CornerClipHeight = In(1.5);
+        sd.StrutPlate = new TubStrutPlateDefinition { Thickness = In(1.25), Width = In(8), Flag = "UNRESOLVED (p.287): strut plate - thickness and width not given." };
+        sd.BearingStiffenerSpacing = Ft(2);
+        sd.InteriorTopFlange = new PlateSize(In(12), In(1.5));
+        t.FilletWeld = In(5.0 / 16);
+        tweak?.Invoke(b);
+    });
+
+    [Fact]
+    public void SupportDiaphragm_ConnectionPlatesWeldsAndFlush()
+    {
+        var (_, _, m) = ModelWithConnections();
+        // per girder: interior-flange plate (24 holes) + exterior-flange plate (8), bottom connection plate on the side of the exterior diaphragm (16)
+        var tcp = m.Parts.Where(p => p.Mark.Contains("-SD2-TCP")).ToList();
+        Assert.Equal(4, tcp.Count);
+        Assert.Equal(2, tcp.Count(p => p.Description.Contains("24 holes")));
+        Assert.Equal(2, tcp.Count(p => p.Description.Contains("8 holes")));
+        Assert.All(tcp, p => Assert.Equal(PartCategory.ConnectorPlate, p.Category));
+        Assert.NotNull(tcp.First(p => p.Description.Contains("exterior flange")).Assumption);          // flange edge along the plate: not dimensioned
+        var bcp = m.Parts.Where(p => p.Mark.Contains("-SD2-BCP")).ToList();
+        Assert.Equal(2, bcp.Count);
+        Assert.All(bcp, p => Assert.Contains("16 holes", p.Description));
+        
+        Assert.Equal(4, m.Parts.Count(p => p.Mark.Contains("-SD2-ST") && p.Category == PartCategory.DiaphragmPlate));
+        // bolts of the plates: (24 + 8 + 16) per girder
+        Assert.Equal(2 * 48, m.Bolts.Count(x => x.Assembly.EndsWith("-SD2") && x.Assembly.StartsWith("G")));
+        // diaphragm flanges flush with the girder flanges: the interior top flange top = top of the girder top flange (same level as the plate seat)
+        var tf = m.Parts.First(p => p.Mark == "G1-SD2-TF");
+        var topPlate = m.Parts.First(p => p.Mark == "G1-SD2-TCPR");
+        Assert.Equal(topPlate.Mesh.Bounds().Min.Z, tf.Mesh.Bounds().Max.Z, 1);   // top plate sits on the flange (rotated tub: within the cross slope over 6")
+        // welds: web to flanges per field section, stiffeners, diaphragm webs
+        Assert.Contains(m.Parts, p => p.Category == PartCategory.Weld && p.Description.Contains("flange to web"));
+        Assert.Contains(m.Parts, p => p.Category == PartCategory.Weld && p.Description.Contains("transverse stiffener to web"));
+        Assert.Contains(m.Parts, p => p.Category == PartCategory.Weld && p.Description.Contains("bearing stiffener to diaphragm web"));
+        Assert.Contains(m.Parts, p => p.Category == PartCategory.Weld && p.Description.Contains("external diaphragm web to top flange"));
+        Assert.All(m.Parts.Where(p => p.Category == PartCategory.Weld), p => Assert.True(p.Volume > 0 && p.Length > 0, p.Mark));
+        // welds are not steel quantity (as for the I-girders)
+        Assert.Equal(m.Parts.Where(p => p.Category != PartCategory.Weld).Sum(p => p.Mass), m.SteelMass, 3);
+        Assert.All(m.Parts, p => Assert.True(p.Mesh.Volume() > 0, $"{p.Mark} volume {p.Mesh.Volume()}"));
+    }
+
+    [Fact]
+    public void SkewedSupport_EndsTheGirderPlatesOnTheSupportLine()
+    {
+        var (_, f, m) = Model(b => b.Supports[0].SkewDegrees = 20);
+        var line = f.SupportLine(0);
+        var nrm = new Vec2(-line.Direction.Y, line.Direction.X);
+        foreach (int gi in new[] { 0, 1 })
+        {
+            // end plane: parallel to the support line through the girder CL end - the plate's end vertices all lie at one distance from the support line
+            var tfl = m.Parts.First(p => p.Mark == $"G{gi + 1}-1-TFL1");
+            var d = tfl.Mesh.Positions.Distinct().Select(v => Vec2.Dot(v.XY - line.AlignmentPoint, nrm)).ToList();
+            double lo = d.Min();
+            Assert.True(d.Count(x => Math.Abs(x - lo) < In(0.25)) >= 4, $"G{gi + 1}: end vertices of the top flange on the skewed end plane");
+            // a square end (SkewedEnds off) has only its two vertices per flange edge at one distance
+            var square = Model(b => { b.Supports[0].SkewDegrees = 20; b.Girders.Tub!.SkewedEnds = false; }).m.Parts.First(p => p.Mark == tfl.Mark);
+            var ds = square.Mesh.Positions.Distinct().Select(v => Vec2.Dot(v.XY - line.AlignmentPoint, nrm)).ToList();
+            Assert.True(ds.Count(x => Math.Abs(x - ds.Min()) < In(0.25)) < 4);
+        }
+        Assert.All(m.Parts, p => Assert.True(p.Mesh.Volume() > 0, $"{p.Mark} volume {p.Mesh.Volume()}"));
+    }
+
+    [Fact]
     public void IGirderBridges_AreUnchanged()
     {
         var p = SampleProject.Create();

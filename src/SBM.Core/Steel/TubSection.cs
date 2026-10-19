@@ -51,13 +51,13 @@ public static class TubSection
 }
 
 /// <summary>Section frame of a tub at one girder distance: origin = top working point, rotated lateral / up axes, horizontal tangent.</summary>
-public readonly record struct TubFrame(Vec3 Origin, Vec3 Lateral, Vec3 Up, Vec3 Ahead, Vec2 PlanRight, Vec2 PlanAhead, double Cos, double Sin)
+public readonly record struct TubFrame(Vec3 Origin, Vec3 Lateral, Vec3 Up, Vec3 Ahead, Vec2 PlanRight, Vec2 PlanAhead, double Cos, double Sin, double Grade = 0)
 {
-    public static TubFrame Create(Vec3 wp, Vec2 tangent, double slope)
+    public static TubFrame Create(Vec3 wp, Vec2 tangent, double slope, double grade = 0)
     {
         double th = Math.Atan(slope), c = Math.Cos(th), s = Math.Sin(th);
         var r = tangent.Right;
-        return new TubFrame(wp, new Vec3(r.X * c, r.Y * c, s), new Vec3(-r.X * s, -r.Y * s, c), new Vec3(tangent.X, tangent.Y, 0), r, tangent, c, s);
+        return new TubFrame(wp, new Vec3(r.X * c, r.Y * c, s), new Vec3(-r.X * s, -r.Y * s, c), new Vec3(tangent.X, tangent.Y, 0), r, tangent, c, s, grade);
     }
 
     /// <summary>World point of section point (x, y), z along the (horizontal) girder tangent.</summary>
@@ -65,13 +65,13 @@ public readonly record struct TubFrame(Vec3 Origin, Vec3 Lateral, Vec3 Up, Vec3 
     public Vec3 At(Vec2 q, double z = 0) => At(q.X, q.Y, z);
 
     /// <summary>Section point (x, y) moved along the girder into the vertical plane through the working point with plan direction
-    /// <paramref name="dir"/> (a skewed support line).</summary>
+    /// <paramref name="dir"/> (a skewed support line); <see cref="Grade"/> (OPTIONAL, 0 = level) adds the rise of the girder over the shift.</summary>
     public Vec3 AtInPlane(double x, double y, Vec2 dir)
     {
         double h = x * Cos - y * Sin;
         double dr = Vec2.Dot(dir, PlanRight);
         double k = Math.Abs(dr) < 1e-9 ? 0 : Vec2.Dot(dir, PlanAhead) / dr;
-        return At(x, y, h * k);
+        return At(x, y, h * k) + new Vec3(0, 0, Grade * h * k);   // the girder rises / falls with its grade over the skew shift
     }
 
     /// <summary>Right-handed plate frame in the section plane: X = lateral, Y = up, Z = back (âˆ’ahead).</summary>

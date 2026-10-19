@@ -171,10 +171,13 @@ public static class PlateBuilder
     /// Long plate along a girder: u = distance s, w = transverse coordinate. The outline is w ∈ [w0(s), w1(s)] for
     /// s ∈ [s0, s1]; thickness t ∈ [t0(s), t1(s)]. Built in strips at <paramref name="breaks"/> (path samples and
     /// taper points), skipping breaks that would cut a hole.
+    /// OPTIONAL <paramref name="cutA"/> / <paramref name="cutB"/> (w → s): the first / last end of the plate is cut along that line instead of at constant s
+    /// (a skewed end); <paramref name="s0"/> / <paramref name="s1"/> must then lie at or beyond the extreme of the cut line, the end strip is kept longer
+    /// than the shift, and the plate is not described as exact extrusions.
     /// </summary>
     public static void AddLongPlate(Mesh mesh, double s0, double s1, IEnumerable<double> breaks,
         Func<double, double> w0, Func<double, double> w1, Func<double, double> t0, Func<double, double> t1,
-        IReadOnlyList<Hole> holes, Func<double, double, double, Vec3> map)
+        IReadOnlyList<Hole> holes, Func<double, double, double, Vec3> map, Func<double, double>? cutA = null, Func<double, double>? cutB = null)
     {
         // Cut between hole columns as well, so each strip has one column of holes; then cut between hole rows so each
         // cell holds at most one hole. Triangulation stays linear in the number of holes.
@@ -183,6 +186,12 @@ public static class PlateBuilder
         var cuts = breaks.Concat(colCuts).Where(b => b > s0 + 1e-6 && b < s1 - 1e-6)
             .Where(b => !holes.Any(h => Math.Abs(b - h.Center.X) < h.Diameter / 2 + 1e-3))
             .Append(s0).Append(s1).Distinct().OrderBy(x => x).ToList();
+        if (cutA != null || cutB != null)
+        {
+            double spanA = cutA == null ? 0 : Math.Max(cutA(w0(s0)), cutA(w1(s0))) - s0 + 1e-3;
+            double spanB = cutB == null ? 0 : s1 - Math.Min(cutB(w0(s1)), cutB(w1(s1))) + 1e-3;
+            cuts = cuts.Where(c => c <= s0 + 1e-9 || c >= s1 - 1e-9 || (c > s0 + spanA && c < s1 - spanB)).ToList();
+        }
         var stripTri = new List<int>();
         for (int k = 0; k + 1 < cuts.Count; k++)
         {
@@ -194,6 +203,8 @@ public static class PlateBuilder
             Func<Vec2, double> T0 = q => ta0 + (tb0 - ta0) * (q.X - a) / L;
             Func<Vec2, double> T1 = q => ta1 + (tb1 - ta1) * (q.X - a) / L;
             bool endA = a <= s0 + 1e-9, endB = b >= s1 - 1e-9;
+            double SA(double w) => endA && cutA != null ? cutA(w) : a;
+            double SB(double w) => endB && cutB != null ? cutB(w) : b;
 
             var rows = hs.Select(h => h.Center.Y).Distinct().OrderBy(x => x).ToList();
             double wLo = Math.Max(w0(a), w0(b)), wHi = Math.Min(w1(a), w1(b));
@@ -201,7 +212,7 @@ public static class PlateBuilder
                 .Where(c => c > wLo + 1e-6 && c < wHi - 1e-6 && !hs.Any(h => Math.Abs(c - h.Center.Y) < h.Diameter / 2 + 1e-3)).ToList();
             if (wCuts.Count == 0)
             {
-                var outline = new[] { new Vec2(a, w0(a)), new Vec2(b, w0(b)), new Vec2(b, w1(b)), new Vec2(a, w1(a)) };
+                var outline = new[] { new Vec2(SA(w0(a)), w0(a)), new Vec2(SB(w0(b)), w0(b)), new Vec2(SB(w1(b)), w1(b)), new Vec2(SA(w1(a)), w1(a)) };
                 AddPrismCore(mesh, outline, hs, map, T0, T1, new[] { true, endB, true, endA });
                 continue;
             }
@@ -215,15 +226,15 @@ public static class PlateBuilder
                 double lo = bounds[c], hi = bounds[c + 1];
                 var outline = new[]
                 {
-                    new Vec2(a, first ? w0(a) : lo), new Vec2(b, first ? w0(b) : lo),
-                    new Vec2(b, last ? w1(b) : hi), new Vec2(a, last ? w1(a) : hi),
+                    new Vec2(SA(first ? w0(a) : lo), first ? w0(a) : lo), new Vec2(SB(first ? w0(b) : lo), first ? w0(b) : lo),
+                    new Vec2(SB(last ? w1(b) : hi), last ? w1(b) : hi), new Vec2(SA(last ? w1(a) : hi), last ? w1(a) : hi),
                 };
                 var cellHoles = hs.Where(h => (first || h.Center.Y > lo) && (last || h.Center.Y < hi)).ToList();
                 AddPrismCore(mesh, outline, cellHoles, map, T0, T1, new[] { first, endB, last, endA });
             }
         }
         stripTri.Add(mesh.TriangleCount);
-        DescribeLongPlate(mesh, cuts, stripTri, w0, w1, t0, t1, holes, map);
+        if (cutA == null && cutB == null) DescribeLongPlate(mesh, cuts, stripTri, w0, w1, t0, t1, holes, map);
     }
 
     /// <summary>
