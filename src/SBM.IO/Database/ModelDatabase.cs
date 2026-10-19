@@ -698,7 +698,7 @@ public static class ModelDatabase
                 }
                 var pjs = new Json().Add("description", part.Description).Add("assembly", part.Assembly)
                     .Add("role", part.Role == MemberRole.None ? null : part.Role.ToString()).Add("lb_per_ft", part.NominalWeightLbPerFt, 3);
-                if (part.Assumption is { } pas && (SteelModel.IsRailing(part.Category) || IsCapPart(part) || SteelModel.IsJointHardware(part.Category))) pjs.Add("status", pas.Status).Add("reason", pas.Reason).Add("assumed", pas.Basis);
+                if (part.Assumption is { } pas && (SteelModel.IsRailing(part.Category) || IsCapPart(part) || SteelModel.IsJointHardware(part.Category) || pas.DimensionOnly)) pjs.Add("status", pas.Status).Add("reason", pas.Reason).Add("assumed", pas.Basis);
                 if (part.Fabrication is { IsEmpty: false } fab) foreach (var (fn, fv) in fab.Fields()) pjs.Add("fab_" + fn.ToLowerInvariant(), fv);
                 r.Props = pjs.ToString();
                 _w.Add(r);

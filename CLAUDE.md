@@ -413,6 +413,24 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
     `Steel/TubGirderGenerator.cs` (partial SteelModelGenerator, `RunTub` replaces `Run` when `IsTub`: plates from `Section.Layouts` (top flange width = one
     flange), splices, panel points (`TubPanelSegment`), stiffeners, internal K frames + WT top struts, WT top laterals, external / support diaphragms,
     pad + beveled-plate bearings + seats, hatches, studs, tension zones), report `SteelModel.Tub` (`TubGirderReport`), haunches `Concrete/ConcreteTubHaunch.cs`.
+    Handoff items 5 / 7a-7g (2026-10-19; all inputs OPTIONAL / additive): (5) top laterals `TubLateralBracingDefinition.EndSetback` (transverse distance WP line -> WT end edge, was a
+    hard-coded 4"; Bridge O 2 7/8" scaled p.289 with `EndSetbackFlag` = `UnresolvedFlag` text -> `Assumption.UnresolvedDimension` on the members, they stay on their layer), WT flange cut
+    parallel to the girder axis, Detail A pattern = 6 x 1" A325 per end (`BoltPitch` 3", `BoltGages` 1 3/4 / 1 3/4 / 4 1/16 / 1 3/4 / 1 3/4 across the WT flange, `FirstBoltFromEndEdge`
+    1 3/4"; `TubLateralPattern`), holes registered in the girder top flange AND the WT flange, none dropped. `Steel/TubSupportConnections.cs` (`TubSupportDiaphragm` moved there):
+    (7b/7e/7f) `TubSupportDiaphragmDefinition.TopConnection` (PL 1 x 12, 4'-3" over the interior flange = both diaphragm flanges, 1'-5 1/2" over the exterior flange; hole offsets from the
+    girder flange inner edge, rows 7" apart on lines parallel to the girder = skewed at pier 13) / `BottomConnection` (PL 1 x 2'-2", 1'-4" -> 1'-0" tapered, 8 + 8 holes, lies beneath the
+    tub bottom flange and the exterior diaphragm bottom flange) / `StrutPlate` (Section A-A, thickness + width flagged) / `CornerClipLength/Height` (interior web bottom corners);
+    holes registered in the girder flange, the interior diaphragm flange (`TubDiaphragmExtras`) and the exterior diaphragm flange; with plates the diaphragm flanges are FLUSH with the
+    girder flange face the plate lies on and end `FlangeEndGap` (1/2") short of the girder flange edges, the exterior web is notched around the girder flanges (`TubSupportFit`), the interior
+    web + bearing stiffeners follow; `TubFrame.Grade` (new, optional) lifts `AtInPlane` by the girder grade over the skew shift; studs under a plate are omitted (listed in a warning).
+    (7d) `TubGirderDefinition.FilletWeld` (5/16"): `Steel/TubWelds.cs` = web-to-flange sweeps per field section (`G1-1-FW`, like the I-girder `-FW`) + T-joint rules
+    (`WeldFinder.TJoint`, new optional `tJunctions` = collinear-neighbour + box containment for plates built analytically) as `PartCategory.Weld` parts `<plate>-W<rule>` (stiffeners to web / top
+    flange, K frame tabs / gussets, interior diaphragm webs, bearing stiffeners, strut plates, external diaphragm webs): viewport, IFC (IFCFASTENER .WELD) and DB like the I-girder welds,
+    not in `SteelMass`. (7a) `TubGirderDefinition.SkewedEnds` (default on, `SkewedEndMinDegrees` 0.5): girder plates end on the support line's vertical plane through the girder CL end
+    (`TubLongPlate`, `PlateBuilder.AddLongPlate` optional `cutA` / `cutB`; such plates have no exact-extrusion description). (7g) `BridgeDefinition.Fabrication` rules `OT1-OT12` in the
+    build script (M270 Gr 50W, CVN Zone 2 / fracture critical bottom tension flange + webs, faying surfaces, interior coating, bearing stiffener finish, plumb ends, weld notes) -> part
+    material / `SBM_FabricationAttributes` like the Nebraska I-girder rules; DB status now also stored for `DimensionOnly` flags. NOT built (reported by the generator / check): tab -> web
+    welds (no contact), stiffener top clip 1 1/2 x 3 (p.282), the 2" radius at the exterior web notches, exterior web corner clips, weld stops 3/8 from edges.
     FramingGenerator skips cross frames / stiffeners for tubs. New part categories `RolledTee` (IfcMember; WT top struts = role TopChord -> .CHORD.,
     top laterals .BRACE.) / `AccessDoor` (IfcPlate 'ACCESS_DOOR') appended AFTER main's arch categories (enum order). Support diaphragm top flanges carry
     2 studs @ 1'-0 (p.283) - girder studs are the parts whose assembly is not XSD*. Path distances (`BearingS`, `SpliceS`, plate runs) are PLAN arc lengths
@@ -421,7 +439,7 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
     the pier 14 / 16 working points (p.259; pier 13's N/E on p.148 is a Ramp 44E point off the arc - UNRESOLVED), 44F stationing back from 301+53.72 (the
     44E = 44F equation is data only: a station-gap profile broke IfcGradientCurve continuity). Pier 13 bearing line from the two girder spans
     141'-4 / 137'-2 5/16 (reproduces 18'-11 13/16 along CL brg and CL pier 301+53.72; the p.273 angles 69 deg 02'38"/18'54" do not fit - UNRESOLVED).
-    Check `samples/plans/check-odot-o-tub.csx` (74 OK / 38 DIFF, all reported: plan rounding 1/16-1/12" at pier 16 / G2 span 15, H +3/32" from the
+    Check `samples/plans/check-odot-o-tub.csx` (73 OK / 39 DIFF, all reported; the new one = 6 studs under the pier 13 top connection plates: plan rounding 1/16-1/12" at pier 16 / G2 span 15, H +3/32" from the
     rotated tub (plan H = vertical stack sum), bearing offset 3 1/16-3 1/8 vs 3", pedestal seats pier 14 +0.02 ft / pier 16 +0.17 ft, G2 top tension zone
     UNRESOLVED). Tests `TubGirderTests`; links `sheet-links-odot-o.json` (49-page index). IFC: 0 schema / EXPRESS issues; validator "open" connection
     angles = multi-item SweptSolid bodies (each item closed), top strut volume ratio 0.84 = nominal weight x length of a coped WT. I-girder IFCs
