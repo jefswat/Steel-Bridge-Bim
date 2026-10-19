@@ -281,7 +281,22 @@ public class DatabaseTests : IDisposable
         throw new FileNotFoundException("repository root not found");
     }
 
+    [Fact]
+    public void ModelOutsideThePlansFolder_FindsTheShippedRules_ByFileName_ThenByBridgeName()
+    {
+        // A model saved / copied to a folder without sheet-links*.json (e.g. Documents) still gets its plan sheet links.
+        string shipped = RepoFile(Path.Combine("samples", "plans", "sheet-links-nebraska-st.json"));
+        Assert.Contains(CompanionDatabase.LibraryFolders(), f => string.Equals(f, Path.GetDirectoryName(shipped), StringComparison.OrdinalIgnoreCase));
+        Assert.Equal(shipped, CompanionDatabase.FindLinksFile(Path.Combine(_dir, "Nebraska St Ramp B.sbm")));
+        Assert.Equal(shipped, CompanionDatabase.FindLinksFile(Path.Combine(_dir, "my copy.sbm"), new[] { "Nebraska St. Ramp B" }));
+        Assert.Null(CompanionDatabase.FindLinksFile(Path.Combine(_dir, "my copy.sbm"), new[] { "Some other bridge" }));
+        // Rules beside the model still win over the library.
+        File.WriteAllText(Path.Combine(_dir, "sheet-links-local.json"), """{ "models": [ "Nebraska St Ramp B.sbm" ], "planSets": [], "rules": [] }""");
+        Assert.Equal(Path.Combine(_dir, "sheet-links-local.json"), CompanionDatabase.FindLinksFile(Path.Combine(_dir, "Nebraska St Ramp B.sbm")));
+    }
+
     [Theory]
+    [InlineData("sheet-links-nebraska-st.json", "Nebraska St Ramp B.sbm", 71)]
     [InlineData("sheet-links-i80-rampg.json", "I-80 WB and Ramp G.sbm", 414)]
     [InlineData("sheet-links-woodbury.json", "Woodbury I-29 NB over Floyd.sbm", 48)]
     [InlineData("sheet-links-br02069.json", "Br02069 TH65.sbm", 39)]

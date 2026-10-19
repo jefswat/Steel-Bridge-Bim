@@ -223,6 +223,7 @@ public static class Program
                         UnusedReport = Opt("--unused"), Log = m => Console.WriteLine("  " + m),
                     };
                     if (Opt("--plans") is { } pl) o.PlanFolders.AddRange(pl.Split(','));
+                    o.BridgeNames.AddRange(doc.Project.Bridges.Select(b => b.Name));
                     string? outPath = args.Length > 2 && !args[2].StartsWith("--") ? args[2] : null;
                     if (args.Contains("--relink"))
                     {
