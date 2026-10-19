@@ -1,0 +1,77 @@
+category_pair,group_a,group_b,count,max_depth_in,example,disposition,reason
+Bolt x Weld,G#-K#-G-WGS,G#-K#-B#,210,0.0781,G1-K1.2-G-WGS x G1-K1.2-B3393 @ 301+70.05,intended,bolt head/nut touching fillet weld solids near connection; weld solids idealized (program limit)
+ConnectionStiffener x Weld,G#-#-FW,G#-#-TS#L,88,0.1516,G1-1-FW x G1-1-TS1.1L @ 301+59.78,intended,weld-to-weld / weld-to-part contact at fillet toes within 1/16-3/16 (idealized weld solids)
+Angle x Bolt,G#-K#-D#,G#-K#-B#,84,0.2344,G1-K1.2-D1 x G1-K1.2-B3398 @ 301+69.93,intended,bolt shank through plate/angle/tee without modeled hole (holes not cut) - program limit
+Bolt x RolledTee,G#-K#-TS,G#-K#-B#,84,0.2038,G1-K1.2-TS x G1-K1.2-B3393 @ 301+70.06,intended,bolt shank through plate/angle/tee without modeled hole (holes not cut) - program limit
+Bolt x RolledTee,G#-LAT#-L#,G#-LAT#-B#,60,0.109,G1-LAT1-L1 x G1-LAT1-B4013 @ 301+49.28,intended,bolt shank through plate/angle/tee without modeled hole (holes not cut) - program limit
+ConnectionStiffener x Weld,G#-#-FW,G#-#-TS#R,54,0.1516,G1-1-FW x G1-1-TS1.3R @ 301+80.25,intended,weld-to-weld / weld-to-part contact at fillet toes within 1/16-3/16 (idealized weld solids)
+Angle x Weld,G#-K#-D#,G#-K#-G-WGS,42,0.1563,G1-K1.2-D1 x G1-K1.2-G-WGS @ 301+69.95,intended,weld-to-weld / weld-to-part contact at fillet toes within 1/16-3/16 (idealized weld solids)
+Angle x Weld,G#-K#-G-WGS,G#-K#-D#,42,0.1563,G1-K1.2-G-WGS x G1-K1.2-D2 @ 301+69.95,intended,weld-to-weld / weld-to-part contact at fillet toes within 1/16-3/16 (idealized weld solids)
+Bolt x Weld,G#-K#-B#,G#-K#-G-WGS,42,0.0781,G1-K1.2-B3392 x G1-K1.2-G-WGS @ 301+70.05,intended,bolt head/nut touching fillet weld solids near connection; weld solids idealized (program limit)
+RolledTee x Weld,G#-K#-TS,G#-K#-G-WGS,42,0.1563,G1-K1.2-TS x G1-K1.2-G-WGS @ 301+70.04,intended,weld-to-weld / weld-to-part contact at fillet toes within 1/16-3/16 (idealized weld solids)
+Angle x Bolt,XSD#-#-CR#,XSD#-#-B#,38,0.2397,XSD1-1-CR1 x XSD1-1-B6507 @ 301+55.04,intended,bolt shank through plate/angle/tee without modeled hole (holes not cut) - program limit
+Angle x Bolt,XSD#-#-CL#,XSD#-#-B#,32,0.2447,XSD1-1-CL2 x XSD1-1-B6520 @ 301+50.62,intended,bolt shank through plate/angle/tee without modeled hole (holes not cut) - program limit
+BearingStiffener x Weld,G#-SD#-W-WIT,G#-SD#-BS#,32,0.1182,G1-SD1-W-WIT x G1-SD1-BS1 @ 301+49.15,intended,weld-to-weld / weld-to-part contact at fillet toes within 1/16-3/16 (idealized weld solids)
+BearingStiffener x Weld,G#-SD#-W-WIB,G#-SD#-BS#,32,0.1125,G1-SD1-W-WIB x G1-SD1-BS2 @ 301+49.33,intended,weld-to-weld / weld-to-part contact at fillet toes within 1/16-3/16 (idealized weld solids)
+Bolt x Weld,G#-#-FW,G#-SD#-B#,32,0.166,G1-1-FW x G1-SD1-B4422 @ 301+50.21,intended,bolt head/nut touching fillet weld solids near connection; weld solids idealized (program limit)
+FlangePlate x RolledTee,G#-#-TFL#,G#-LAT#-L#,27,0.4441,G1-1-TFL1 x G1-LAT1-L1 @ 301+50.36,model error,WT9x38 lateral stem/flange penetrates girder top flange up to 7/16 (O-35 Detail A: lateral bolted below the flange)
+AnchorBolt x FlangePlate,G#-#-BF#,B#-G#-B#,24,1.125,G1-1-BF1 x B1-G1-B2 @ 301+49.45,intended,bolt shank through plate/angle/tee without modeled hole (holes not cut) - program limit
+Weld x Weld,G#-#-FW,G#-#-TS#L-WSF,24,0.0813,G1-1-FW x G1-1-TS1.3L-WSF @ 301+80.29,intended,weld-to-weld / weld-to-part contact at fillet toes within 1/16-3/16 (idealized weld solids)
+Weld x Weld,G#-#-FW,G#-#-TS#R-WSF,24,0.0812,G1-1-FW x G1-1-TS1.3R-WSF @ 301+80.29,intended,weld-to-weld / weld-to-part contact at fillet toes within 1/16-3/16 (idealized weld solids)
+Weld x Weld,G#-#-FW,G#-#-TS#L-WSW,24,0.0811,G2-1-FW x G2-1-TS1.2L-WSW @ 301+70.01,intended,weld-to-weld / weld-to-part contact at fillet toes within 1/16-3/16 (idealized weld solids)
+Weld x Weld,G#-#-FW,G#-#-TS#R-WSW,24,0.0811,G2-1-FW x G2-1-TS1.2R-WSW @ 301+70.01,intended,weld-to-weld / weld-to-part contact at fillet toes within 1/16-3/16 (idealized weld solids)
+Bolt x WebPlate,G#-#-WL#,XSD#-#-B#,18,0.2908,G2-1-WL1 x XSD1-1-B6497 @ 301+54.56,intended,bolt shank through plate/angle/tee without modeled hole (holes not cut) - program limit
+FlangePlate x WebPlate,G#-#-WL#,G#-#-BF#,18,0.091,G1-1-WL1 x G1-1-BF1 @ 301+53.32,intended,"welded web-to-flange joint; sloped web end square-cut so its corner enters the flange by up to 0.09 in (idealization, program limit)"
+Bolt x WebPlate,G#-#-WR#,G#-SD#-B#,16,0.3957,G1-1-WR1 x G1-SD1-B4422 @ 301+50.19,intended,bolt shank through plate/angle/tee without modeled hole (holes not cut) - program limit
+Bolt x WebPlate,G#-#-WL#,G#-SD#-B#,16,0.3991,G2-1-WL1 x G2-SD1-B5824 @ 301+54.95,intended,bolt shank through plate/angle/tee without modeled hole (holes not cut) - program limit
+Bolt x WebPlate,G#-#-WR#,XD#-B#,16,0.0819,G1-1-WR1 x XD1-B6214 @ 301+90.09,intended,bolt shank through plate/angle/tee without modeled hole (holes not cut) - program limit
+Bolt x WebPlate,G#-#-WL#,XD#-B#,16,0.0923,G2-1-WL1 x XD1-B6196 @ 301+90.14,intended,bolt shank through plate/angle/tee without modeled hole (holes not cut) - program limit
+FlangePlate x RolledTee,G#-#-TFR#,G#-LAT#-L#,16,0.1111,G1-1-TFR1 x G1-LAT1-L2 @ 301+61.72,model error,WT9x38 lateral stem/flange penetrates girder top flange up to 7/16 (O-35 Detail A: lateral bolted below the flange)
+FlangePlate x WebPlate,G#-#-BF#,G#-#-WR#,16,0.0909,G1-1-BF1 x G1-1-WR1 @ 301+54.93,intended,"welded web-to-flange joint; sloped web end square-cut so its corner enters the flange by up to 0.09 in (idealization, program limit)"
+Weld x Weld,G#-SD#-W-WIT,G#-SD#-BS#-WBW,16,0.0741,G1-SD1-W-WIT x G1-SD1-BS1-WBW @ 301+49.13,intended,weld-to-weld / weld-to-part contact at fillet toes within 1/16-3/16 (idealized weld solids)
+Weld x Weld,G#-SD#-W-WIB,G#-SD#-BS#-WBW,16,0.0773,G1-SD1-W-WIB x G1-SD1-BS2-WBW @ 301+49.31,intended,weld-to-weld / weld-to-part contact at fillet toes within 1/16-3/16 (idealized weld solids)
+Weld x Weld,G#-SD#-W-WIB,G#-SD#-BS#-WBB,16,0.0773,G1-SD1-W-WIB x G1-SD1-BS1-WBB @ 301+49.23,intended,weld-to-weld / weld-to-part contact at fillet toes within 1/16-3/16 (idealized weld solids)
+FlangePlate x WebPlate,G#-#-TFL#,G#-#-WL#,14,0.0911,G1-1-TFL1 x G1-1-WL1 @ 301+61.87,intended,"welded web-to-flange joint; sloped web end square-cut so its corner enters the flange by up to 0.09 in (idealization, program limit)"
+FlangePlate x WebPlate,G#-#-TFR#,G#-#-WR#,14,0.0911,G1-1-TFR1 x G1-1-WR1 @ 301+66.82,intended,"welded web-to-flange joint; sloped web end square-cut so its corner enters the flange by up to 0.09 in (idealization, program limit)"
+Bolt x WebPlate,XSD#-#-W,XSD#-#-B#,13,0.375,XSD1-1-W x XSD1-1-B6527 @ 301+50.95,intended,bolt shank through plate/angle/tee without modeled hole (holes not cut) - program limit
+Bolt x FlangePlate,G#-SD#-TF,G#-SD#-B#,10,0.0938,G1-SD1-TF x G1-SD1-B4458 @ 301+48.17,intended,bolt shank through plate/angle/tee without modeled hole (holes not cut) - program limit
+Bolt x WebPlate,G#-#-WR#,XSD#-#-B#,9,0.2201,G1-1-WR1 x XSD1-1-B6517 @ 301+50.70,intended,bolt shank through plate/angle/tee without modeled hole (holes not cut) - program limit
+FlangePlate x RolledTee,G#-LAT#-L#,G#-#-TFR#,9,0.2565,G1-LAT1-L1 x G1-1-TFR1 @ 301+59.11,model error,WT9x38 lateral stem/flange penetrates girder top flange up to 7/16 (O-35 Detail A: lateral bolted below the flange)
+Bolt x FlangePlate,XSD#-#-BF,G#-SD#-B#,8,0.111,XSD1-1-BF x G1-SD1-B4417 @ 301+51.38,intended,bolt shank through plate/angle/tee without modeled hole (holes not cut) - program limit
+WebPlate x Weld,G#-#-FW,G#-SD#-W,8,0.1559,G1-1-FW x G1-SD1-W @ 301+47.89,intended,weld-to-weld / weld-to-part contact at fillet toes within 1/16-3/16 (idealized weld solids)
+Bolt x FlangePlate,XSD#-#-TF,G#-SD#-B#,7,0.1122,XSD1-1-TF x G1-SD1-B4432 @ 301+51.34,intended,bolt shank through plate/angle/tee without modeled hole (holes not cut) - program limit
+Angle x Bolt,XSD#-#-B#,XSD#-#-CL#,6,0.2245,XSD1-1-B6517 x XSD1-1-CL2 @ 301+50.62,intended,bolt shank through plate/angle/tee without modeled hole (holes not cut) - program limit
+Bolt x RolledTee,G#-SD#-B#,G#-LAT#-L#,6,0.4398,G1-SD2-B4499 x G1-LAT2-L1 @ 302+93.30,intended,bolt shank through plate/angle/tee without modeled hole (holes not cut) - program limit
+BearingStiffener x FlangePlate,G#-#-BF#,G#-SD#-BS#,4,0.1868,G1-1-BF1 x G1-SD1-BS1 @ 301+48.64,model error,bearing stiffener penetrates BF up to 3/16 at skewed P13 (should finish to bear)
+Bolt x RolledTee,G#-LAT#-L#,G#-SD#-B#,4,0.3747,G1-LAT1-L14 x G1-SD2-B4500 @ 302+92.70,intended,bolt shank through plate/angle/tee without modeled hole (holes not cut) - program limit
+FlangePlate x WebPlate,G#-#-WL#,G#-#-TFL#,4,0.0763,G1-2-WL1 x G1-2-TFL2 @ 302+80.63,intended,"welded web-to-flange joint; sloped web end square-cut so its corner enters the flange by up to 0.09 in (idealization, program limit)"
+FlangePlate x WebPlate,G#-#-WR#,G#-#-TFR#,4,0.0761,G1-2-WR1 x G1-2-TFR2 @ 302+85.58,intended,"welded web-to-flange joint; sloped web end square-cut so its corner enters the flange by up to 0.09 in (idealization, program limit)"
+FlangePlate x Weld,G#-#-BF#,G#-SD#-BS#-WBB,4,0.1868,G1-1-BF1 x G1-SD1-BS1-WBB @ 301+48.66,intended,weld-to-weld / weld-to-part contact at fillet toes within 1/16-3/16 (idealized weld solids)
+Angle x WebPlate,XSD#-#-W,XSD#-#-CL#,2,0.375,XSD1-1-W x XSD1-1-CL2 @ 301+50.99,model error,bent plate / angle penetrates web up to 3/8 at P13 skew
+Angle x WebPlate,XSD#-#-W,XSD#-#-CR#,2,0.375,XSD1-1-W x XSD1-1-CR2 @ 301+54.93,model error,bent plate / angle penetrates web up to 3/8 at P13 skew
+Bolt x FlangePlate,G#-SD#-B#,G#-SD#-TF,2,0.0916,G1-SD1-B4456 x G1-SD1-TF @ 301+48.05,intended,bolt shank through plate/angle/tee without modeled hole (holes not cut) - program limit
+ConnectorPlate x FlangePlate,G#-SD#-TCPL,G#-SD#-TF,2,0.1297,G1-SD1-TCPL x G1-SD1-TF @ 301+48.87,model error,connection plate overlaps diaphragm/girder flange up to 3/16 (bolted lap should touch only)
+ConnectorPlate x FlangePlate,G#-SD#-TF,G#-SD#-TCPR,2,0.1078,G1-SD1-TF x G1-SD1-TCPR @ 301+50.73,model error,connection plate overlaps diaphragm/girder flange up to 3/16 (bolted lap should touch only)
+ConnectorPlate x FlangePlate,G#-SD#-BCPR,XSD#-#-BF,2,0.1992,G1-SD1-BCPR x XSD1-1-BF @ 301+50.45,model error,connection plate overlaps diaphragm/girder flange up to 3/16 (bolted lap should touch only)
+ConnectorPlate x FlangePlate,G#-SD#-TCPR,XSD#-#-TF,2,0.1566,G1-SD1-TCPR x XSD1-1-TF @ 301+52.21,model error,connection plate overlaps diaphragm/girder flange up to 3/16 (bolted lap should touch only)
+ConnectorPlate x FlangePlate,XSD#-#-TF,G#-SD#-TCPL,2,0.1411,XSD1-1-TF x G2-SD1-TCPL @ 301+54.57,model error,connection plate overlaps diaphragm/girder flange up to 3/16 (bolted lap should touch only)
+ConnectorPlate x FlangePlate,XSD#-#-BF,G#-SD#-BCPL,2,0.1893,XSD1-1-BF x G2-SD1-BCPL @ 301+54.58,model error,connection plate overlaps diaphragm/girder flange up to 3/16 (bolted lap should touch only)
+FlangePlate x FlangePlate,G#-#-TFL#,G#-SD#-TF,2,0.5244,G1-1-TFL1 x G1-SD1-TF @ 301+48.54,model error,support diaphragm top flange overlaps girder top flange (up to 5/8) at skewed P13/P16 ends
+FlangePlate x FlangePlate,G#-SD#-TF,G#-#-TFR#,2,0.6172,G1-SD1-TF x G1-1-TFR1 @ 301+50.26,model error,support diaphragm top flange overlaps girder top flange (up to 5/8) at skewed P13/P16 ends
+FlangePlate x WebPlate,G#-#-WR#,G#-#-BF#,2,0.0758,G1-2-WR1 x G1-2-BF3 @ 303+35.15,intended,"welded web-to-flange joint; sloped web end square-cut so its corner enters the flange by up to 0.09 in (idealization, program limit)"
+WebPlate x WebPlate,G#-#-WL#,G#-SD#-W,2,0.1323,G1-1-WL1 x G1-SD1-W @ 301+48.17,model error,support diaphragm web penetrates girder web up to 3/16 at P13 skew
+WebPlate x WebPlate,G#-SD#-W,G#-#-WR#,2,0.1827,G1-SD1-W x G1-1-WR1 @ 301+50.91,model error,support diaphragm web penetrates girder web up to 3/16 at P13 skew
+Angle x WebPlate,G#-#-WR#,XSD#-#-CL#,1,0.3125,G1-1-WR1 x XSD1-1-CL1 @ 301+51.23,model error,bent plate / angle penetrates web up to 3/8 at P13 skew
+Angle x WebPlate,XSD#-#-CR#,G#-#-WL#,1,0.3125,XSD1-1-CR2 x G2-1-WL1 @ 301+54.81,model error,bent plate / angle penetrates web up to 3/8 at P13 skew
+Angle x WebPlate,G#-#-WR#,XD#-CL#,1,0.0697,G1-1-WR1 x XD1-CL1 @ 301+91.20,model error,bent plate / angle penetrates web up to 3/8 at P13 skew
+Bolt x FlangePlate,G#-SD#-B#,XSD#-#-TF,1,0.1127,G1-SD1-B4434 x XSD1-1-TF @ 301+51.22,intended,bolt shank through plate/angle/tee without modeled hole (holes not cut) - program limit
+Bolt x FlangePlate,G#-#-TFL#,G#-LAT#-B#,1,0.5177,G2-1-TFL1 x G2-LAT1-B5393 @ 301+68.32,intended,bolt shank through plate/angle/tee without modeled hole (holes not cut) - program limit
+Bolt x FlangePlate,G#-#-TFR#,G#-LAT#-B#,1,0.2772,G2-1-TFR1 x G2-LAT1-B5405 @ 301+61.50,intended,bolt shank through plate/angle/tee without modeled hole (holes not cut) - program limit
+Bolt x WebPlate,G#-SD#-W,XSD#-#-B#,1,0.0797,G2-SD1-W x XSD1-1-B6508 @ 301+55.35,intended,bolt shank through plate/angle/tee without modeled hole (holes not cut) - program limit
+Bolt x WebPlate,XSD#-#-W,G#-SD#-B#,1,0.1272,XSD1-1-W x G2-SD1-B5823 @ 301+55.28,intended,bolt shank through plate/angle/tee without modeled hole (holes not cut) - program limit
+FlangePlate x FlangePlate,G#-#-BF#,XSD#-#-BF,1,0.6187,G1-1-BF1 x XSD1-1-BF @ 301+51.29,model error,flange overlap
+FlangePlate x FlangePlate,G#-#-TFR#,XSD#-#-TF,1,0.4194,G1-1-TFR1 x XSD1-1-TF @ 301+51.94,model error,support diaphragm top flange overlaps girder top flange (up to 5/8) at skewed P13/P16 ends
+FlangePlate x FlangePlate,XSD#-#-TF,G#-#-TFL#,1,0.5908,XSD1-1-TF x G2-1-TFL1 @ 301+54.10,model error,support diaphragm top flange overlaps girder top flange (up to 5/8) at skewed P13/P16 ends
+FlangePlate x FlangePlate,XSD#-#-BF,G#-#-BF#,1,0.6027,XSD1-1-BF x G2-1-BF1 @ 301+54.99,model error,flange overlap
+FlangePlate x Weld,XSD#-#-W-WXB,G#-#-BF#,1,0.1084,XSD1-1-W-WXB x G2-1-BF1 @ 301+55.19,intended,weld-to-weld / weld-to-part contact at fillet toes within 1/16-3/16 (idealized weld solids)
+WebPlate x Weld,XSD#-#-W,G#-#-FW,1,0.0698,XSD1-1-W x G2-1-FW @ 301+55.30,intended,weld-to-weld / weld-to-part contact at fillet toes within 1/16-3/16 (idealized weld solids)

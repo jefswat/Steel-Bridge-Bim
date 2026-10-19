@@ -1,0 +1,9 @@
+page,sheet,view,item,value,quoted_source_text
+270,O-16,Typical deck section,width,"32'-0: 1'-6, 4'-0 shoulder, 15'-0 lane, 10'-0 shoulder, 1'-6",32'-0 / 29'-0 CLR. RDY. / 15'-0 LANE / 10'-0 SHOULDER
+270,O-16,Typical deck section,slab / slope,"8 in slab, slope 6%",8 SLAB / SLOPE 6%
+270,O-16,Typical deck section,girder spacing,17'-8; 4'-4 PGL to CL steel tub,17'-8 / 4'-4 HORIZ. DIMENSION CL STEEL TUB GIRDERS
+270,O-16,Typical haunch detail (conflicting),haunch,"slab 1'-8 1/4, haunch 1 7/16",1'-8 1/4 SLAB / 1 7/16 HAUNCH
+270,O-16,Note,haunch definition,"haunch at CL bearing, bottom of slab to top of web","HAUNCH HEIGHT SHOWN IS AT CENTERLINE BEARING ONLY, MEASURED FROM BOTTOM OF DECK SLAB TO TOP OF GIRDER WEB"
+271,O-17,H dimension table,H,P13 5'-10; P14 5'-10 5/8; P15 5'-11; P16 (span 16) 5'-11 3/8,PIER NO. 13 SPAN 14 - ALL GIRDERS 5'-10 / PIER NO. 14 ALL GIRDERS 5'-10 5/8 / PIER NO. 15 ALL GIRDERS 5'-11 / PIER NO. 16 SPAN 16 - ALL GIRDERS 5'-11 3/8
+271,O-17,Longitudinal section,haunch / joint / brg,4 1/2 haunch; 2 joint (note 1); 1'-0 CL pier to CL brg,4 1/2 HAUNCH / 2 SEE NOTE 1 / 1'-0 CL BRG.
+273,O-19,Typical tub girder section,haunch / slab,"4 1/2 haunch, 8 slab",4 1/2 HAUNCH / 8 SLAB
