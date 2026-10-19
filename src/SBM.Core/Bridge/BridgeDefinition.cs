@@ -1250,6 +1250,11 @@ public sealed class BridgeDefinition
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
     public List<FabricationRule>? Fabrication { get; set; }
 
+    /// <summary>OPTIONAL weld termination (hold-back from plate edges / clips / end of contact, <see cref="WeldTerminationDefinition"/>); null = AWS D1.5
+    /// practice (hold-back = weld size, min 1/4"), flagged UNRESOLVED on the weld parts. Omitted from the .sbm when null.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public WeldTerminationDefinition? Welds { get; set; }
+
     /// <summary>A typical two-span continuous layout starting at the given station.</summary>
     public static BridgeDefinition CreateDefault(double beginStation, string alignmentName)
     {
@@ -1347,5 +1352,6 @@ public sealed class BridgeDefinition
         SurfaceTreatments = SurfaceTreatments?.Select(t => t.Clone()).ToList(),
         Railings = Railings?.Select(r => r.Clone()).ToList(),
         Fabrication = Fabrication?.Select(r => r.Clone()).ToList(),
+        Welds = Welds?.Clone(),
     };
 }

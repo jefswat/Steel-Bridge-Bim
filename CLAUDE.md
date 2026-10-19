@@ -731,6 +731,22 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   connections, bent-plate posts at skewed frames; grating = one solid slab (mass from nominal weight). Data: `samples/plans/inspection-i80.csx`,
   `inspection-ramp-g.csx`. BoltInstance.Diameter is honored per instance (viewport, IFC fastener types, material list).
   Snapshot: `--closeup MARK@Bridge name` also selects one bridge for steel assemblies (walkway marks repeat in every bridge).
+- Weld termination / hold-back (2026-10-19, handoff 6e, user "fin welds go past the flanges and don't respect hold backs"): ONE rule for every fillet
+  weld generator, `Steel/WeldTermination.cs`: beads stop a hold-back short of free plate edges / corners, corner clips / copes and the end of contact; solids
+  end square. Value: OPTIONAL `BridgeDefinition.Welds` = `Bridge/WeldTerminationDefinition` (`HoldBack`, `Source`, `Unresolved`, Iowa
+  `StiffenerWebEndFactor` / `StiffenerWebEndMin` = stiffener-to-web weld ends X = 5T min 2 1/4" past the toe of the flange-to-web weld) + per-rule overrides
+  `ArchWeldRule.HoldBack(Source)`, `ArchFinSettings.RibWeldHoldBack(Source)`; null = AWS D1.5 practice (weld size, min 1/4") and every weld part carries an
+  UNRESOLVED dimension `Assumption` (+ one warning). Analytic welds use `Mesh.AddHeld(p0, p1, legs, size, h0, h1)` (I-girder stiffeners / connection plates /
+  bearing stiffeners in `SteelModelGenerator.BuildStiffener`, flange-to-web `-FW` held back from the field-section plate ends, cross frame and lateral lap
+  welds, sole plate welds, cross girder `-WLD`, tub web-to-flange sweeps at field-section ends only); mesh-found welds (`WeldFinder.TJoint`: arch rules, tub
+  T-joint rules) go through `WeldTermination.Terminate` (beads chained end to end with the same legs and < 30 deg turn, every run trimmed at both ends, closed
+  loops kept, runs < 2 hold-backs dropped). Weld part `Length` = the modeled root length now (was nominal), description ends ", held back X (source)".
+  Plan values (`samples/plans/weld-holdbacks.csx`, re-runnable on the models): I-80 / Ramp G / Nebraska St = Iowa std. 1021W Detail A 1/4" (PDF p.120 /
+  p.103 / p.32) + X = 5T min 2 1/4"; ODOT Bridge O = 3/8" (p.273 note 7, p.282-288 note 6); NHT rib fin = 1/4" (p.148), other NHT welds and the Sample =
+  default (flagged). Not applied: `IntegralCapDetailer` (Nebraska cap welds, being edited elsewhere). Drawings: `SteelDetailViews.Stiffeners` draws the
+  beads held back, dimensions the hold-back at the plate edge and notes the hold-back / web weld end / plan source (UNRESOLVED text when defaulted).
+  Tests `WeldTerminationTests`. Found: the ODOT tub rule GS (cross frame gusset to WT top strut) only ever found bolt-hole walls (0.2" chords) - no T-joint
+  in the model; those 42 bogus weld parts vanish now.
 - Clash check (`SBM.Core/Checks/SteelClashCheck.cs`, `SbmDocument.Clashes`, `sbm clash`): steel parts (+ optional bolts / welds), misc items, simple drains and
   substructure concrete (concrete only vs drains / misc); depth > 1/16" = clash. Walkways as designed (`InspectionAccessDefinition.SupportOnFrames`, built AFTER the
   connections phase from the generated frames, `Steel/InspectionWalkwayDetailer.cs`), cross girder `Level` / discontinuous girder cope inputs, drain pipes one mitred
@@ -838,7 +854,9 @@ UNRESOLVED FLAG (general, reusable): `SBM.Core/Assumption.cs` `Assumption{Status
   v5 / v6 WELDS (design note sections 10 / 11): every weld symbol on the steel sheets is a 5/16" fillet (no CJP / field / all-around). PartCategory.Weld parts
   (viewport layer 3D-WELDS = a DETAIL layer: tiled, hidden while the camera moves, drawn ~1/4 s after it stops, only near the view line; IFC IfcFastener WELD;
   5/16" beads are ~2 px at overview zoom - look at them at <= 1.5 m wide). Rib fin plates (p.148): `ArchFinSettings.RibWeldSize`, 4 x D per cable
-  (`RibFinWelds`; the weld stays at the plan D, runs past the flange contact on ~15 % of the length = CHECK rows). Tie fin plate (p.146 / 149): bolted, NO weld
+  (`RibFinWelds`, 2026-10-19: beads ONLY on the fin edge's contact with the rib flanges, found by `WeldFinder.TJoint` fin onto the rib segments, from
+  `RibWeldHoldBack` (p.148 1/4" +- 1/8") below the end of the top clip, length D but stopped 1/4" before the flange tip; D longer than that = CHECK row
+  "weld length D vs the flange contact less 2 hold-backs", all 64 fins: 1,990" -> 1,562"). Tie fin plate (p.146 / 149): bolted, NO weld
   symbol on the plans -> none (`TieFinWelds` is the explicit "none" hook). Everything else is data-driven: `ArchDefinition.Welds` = `ArchWeldRule` (Parts / Onto
   regex on part marks, `$1` capture groups pair a plate with its own base plate, Size, OneSide + `SideToward` "span" | "+x" | "-x" for single-sided symbols
   whose side the plan does not say (flagged `Unresolved`), Tolerance, AngleTolDeg, Source) -> `ArchGenerator.BuildWeldRules` -> `Steel/WeldFinder.TJoint`: the

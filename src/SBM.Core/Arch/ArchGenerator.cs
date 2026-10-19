@@ -601,7 +601,7 @@ public static partial class ArchGenerator
             AddPart($"{RibAsm(h.Rib)}-FIN-{h.Name}", PartCategory.FinPlate, RibAsm(h.Rib),
                 $"PL {L(fs.RibThickness)} cable fin plate at rib, {h.Name} (P2 {L(yWeb)}, P3 {L(rf.P3)}, P4 {L(rf.P4)}{(double.IsNaN(rf.WeldLength) ? "" : $", weld D {L(rf.WeldLength)}")})",
                 m, fs.Material, yWeb - rf.P4 + r, 0, asu);
-            if (fs.RibWeldSize > 0 && !double.IsNaN(rf.WeldLength)) RibFinWelds(h, rf, fs, hc, bn, e, nf, xl, xr, yTop, clip, w);
+            if (fs.RibWeldSize > 0 && !double.IsNaN(rf.WeldLength)) RibFinWelds(h, rf, fs, hc, bn, e, nf, xl, xr, yTop, clip, w, m);
             return nf;
         }
 

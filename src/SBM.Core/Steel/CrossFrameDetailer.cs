@@ -294,7 +294,7 @@ public sealed partial class SteelModelGenerator
             l.AddRange(pts);
         }
         double lap = def.WeldLap, ws = def.MemberWeldSize, margin = ws + Inch(0.25);
-        int weldRuns = 0;
+        double weldLen = 0, cfHb = HoldBack(ws);          // lap welds stop short of the angle end and of the gusset edge
         foreach (var m in members)
         {
             if (m.T1 <= m.T0) continue;
@@ -359,9 +359,8 @@ public sealed partial class SteelModelGenerator
                 var mDir = plane.Dir(m.M);
                 foreach (var (vb, oo) in m.Pair ? new[] { (vF, 1), (vB, -1) } : new[] { (vBase, o) })
                 {
-                    weldMesh.AddWeld(plane.W(m.At(t0, m.LapLo), vb), plane.W(m.At(t1, m.LapLo), vb), mDir * -1, plane.N * oo, ws);
-                    weldMesh.AddWeld(plane.W(m.At(t0, m.MHi), vb), plane.W(m.At(t1, m.MHi), vb), mDir, plane.N * oo, ws);
-                    weldRuns += 2;
+                    weldLen += weldMesh.AddHeld(plane.W(m.At(t0, m.LapLo), vb), plane.W(m.At(t1, m.LapLo), vb), mDir * -1, plane.N * oo, ws, cfHb, cfHb);
+                    weldLen += weldMesh.AddHeld(plane.W(m.At(t0, m.MHi), vb), plane.W(m.At(t1, m.MHi), vb), mDir, plane.N * oo, ws, cfHb, cfHb);
                 }
             }
         }
@@ -474,7 +473,7 @@ public sealed partial class SteelModelGenerator
         }
 
         _parts.Add(new SteelPart { Mark = $"{mark}-W", Category = PartCategory.Weld, Assembly = mark, Mesh = weldMesh, Material = "E70XX",
-            Length = weldRuns * lap, Description = $"Fillet weld {In(ws)}, members to gussets" });
+            Length = weldLen, Description = $"Fillet weld {In(ws)}, members to gussets{HoldNote(ws)}", Assumption = WeldFlag(ws) });
     }
 
     /// <summary>

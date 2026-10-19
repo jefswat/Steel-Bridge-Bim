@@ -232,9 +232,11 @@ arch.Fins = new ArchFinSettings
     Material = "ASTM A709 Gr. 50-F1 (FCM)",
     // v5 (p.148): 5/16" fillet both sides (elevation symbol) along each flange, length D per cable (Section A-A "weld length D (typ. in plane of plate)",
     // stops 1/4" +- 1/8"; D = P3 - 1/2" in all 32 rows). p.149 tie fin plate: no weld symbol (bolted) - none modeled.
-    RibWeldSize = In(0.3125), RibWeldSetback = 0,
+    // 2026-10-19 (user "fin welds go past the flanges and don't respect hold backs"): the 1/4" is the hold-back at both ends of the flange contact;
+    // the weld lies on the contact only (WeldTermination / RibFinWelds), D longer than the contact less 2 x 1/4" is a CHECK row.
+    RibWeldSize = In(0.3125), RibWeldSetback = 0, RibWeldHoldBack = In(0.25), RibWeldHoldBackSource = "p.148 Section A-A: 1/4 +- 1/8",
     RibWeldUnresolved = U("p.148", "rib fin plate weld start", "D = P3 - 1/2\" implies the weld covers the P3 edge less 1/4\" at each end, but the top corner clip (scaled 1\", not dimensioned) shortens the flange contact edge",
-        "weld D from the end of the scaled 1\" clip toward the pin; it runs up to 1/2\" past the straight edge (CHECK rows)"),
+        "weld from 1/4\" below the end of the scaled 1\" clip toward the pin, length D but on the flange contact only (CHECK rows)"),
 };
 // Connectors at the crossings circled on the p.150 elevation (N.T.S.; 4 per end, same pairs on the mirror arch): C1xC2, C3xC4, C5xC6, C3xC6, C27xC28, C29xC30, C31xC32, C27xC30.
 foreach (var sfx in new[] { "S", "N" })

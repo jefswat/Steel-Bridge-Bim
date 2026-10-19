@@ -28854,7 +28854,9 @@
             "Tolerance": 0.00079375,
             "Source": "p.124 A-A \u002B plan",
             "Unresolved": "",
-            "Material": "E70XX (AWS D1.5)"
+            "Material": "E70XX (AWS D1.5)",
+            "HoldBack": "NaN",
+            "HoldBackSource": ""
           },
           {
             "Name": "knuckle arch flange plate to end flange",
@@ -28867,7 +28869,9 @@
             "Tolerance": 0.00079375,
             "Source": "p.124 B-B / A-A (mill to bear)",
             "Unresolved": "",
-            "Material": "E70XX (AWS D1.5)"
+            "Material": "E70XX (AWS D1.5)",
+            "HoldBack": "NaN",
+            "HoldBackSource": ""
           },
           {
             "Name": "knuckle stub web to end flange",
@@ -28880,7 +28884,9 @@
             "Tolerance": 0.00079375,
             "Source": "p.124 A-A (mill to bear)",
             "Unresolved": "UNRESOLVED (p.124 / 125 A-A): stub web weld targets - the upper A-A symbol is one 5/16\u0022 fillet-both-sides leader with 5 arrowheads at the stub web / arch flange plate / arch stiffener joints and the individual targets cannot be told apart. 5/16\u0022 fillet both sides of the stub web along its edge on the end flange and on the arch flange plates.",
-            "Material": "E70XX (AWS D1.5)"
+            "Material": "E70XX (AWS D1.5)",
+            "HoldBack": "NaN",
+            "HoldBackSource": ""
           },
           {
             "Name": "knuckle stub web to arch flange plates",
@@ -28893,7 +28899,9 @@
             "Tolerance": 0.00079375,
             "Source": "p.124 A-A (mill to bear)",
             "Unresolved": "UNRESOLVED (p.124 / 125 A-A): stub web weld targets - the upper A-A symbol is one 5/16\u0022 fillet-both-sides leader with 5 arrowheads at the stub web / arch flange plate / arch stiffener joints and the individual targets cannot be told apart. 5/16\u0022 fillet both sides of the stub web along its edges on the arch flange plates.",
-            "Material": "E70XX (AWS D1.5)"
+            "Material": "E70XX (AWS D1.5)",
+            "HoldBack": "NaN",
+            "HoldBackSource": ""
           },
           {
             "Name": "knuckle arch stiffener to flange plates and stub web",
@@ -28906,7 +28914,9 @@
             "Tolerance": 0.00079375,
             "Source": "p.124 A-A",
             "Unresolved": "UNRESOLVED (p.124 / 125 A-A): arch stiffener weld targets - the upper A-A symbol is one 5/16\u0022 fillet-both-sides leader with 5 arrowheads at the stub web / arch flange plate / arch stiffener joints and the individual targets cannot be told apart. 5/16\u0022 fillet both sides along every edge that sits on a flange plate or the stub web.",
-            "Material": "E70XX (AWS D1.5)"
+            "Material": "E70XX (AWS D1.5)",
+            "HoldBack": "NaN",
+            "HoldBackSource": ""
           },
           {
             "Name": "knuckle stiffener to end flange and arch flange plates",
@@ -28919,7 +28929,9 @@
             "Tolerance": 0.00079375,
             "Source": "p.124 A-A / B-B",
             "Unresolved": "",
-            "Material": "E70XX (AWS D1.5)"
+            "Material": "E70XX (AWS D1.5)",
+            "HoldBack": "NaN",
+            "HoldBackSource": ""
           },
           {
             "Name": "bracing gusset to connection plate",
@@ -28932,7 +28944,9 @@
             "Tolerance": 0.0015875,
             "Source": "p.129-140 D-D / E-E / I-I / J-J",
             "Unresolved": "",
-            "Material": "E70XX (AWS D1.5)"
+            "Material": "E70XX (AWS D1.5)",
+            "HoldBack": "NaN",
+            "HoldBackSource": ""
           },
           {
             "Name": "bracing rib stiffener to rib",
@@ -28945,7 +28959,9 @@
             "Tolerance": 0.0015875,
             "Source": "p.129-140 B-B",
             "Unresolved": "",
-            "Material": "E70XX (AWS D1.5)"
+            "Material": "E70XX (AWS D1.5)",
+            "HoldBack": "NaN",
+            "HoldBackSource": ""
           },
           {
             "Name": "tie girder web to flange",
@@ -28958,7 +28974,9 @@
             "Tolerance": 0.0015875,
             "Source": "p.143 typical tie girder section",
             "Unresolved": "UNRESOLVED (p.143): tie girder web-to-flange weld side - the typical tie girder section shows one 5/16\u0022 fillet symbol (arrow side only) and is not oriented to the span. 5/16\u0022 fillet on the span-centre side of the web, continuous.",
-            "Material": "E70XX (AWS D1.5)"
+            "Material": "E70XX (AWS D1.5)",
+            "HoldBack": "NaN",
+            "HoldBackSource": ""
           },
           {
             "Name": "floorbeam web to flange",
@@ -28971,7 +28989,9 @@
             "Tolerance": 0.0015875,
             "Source": "p.145 Section A-A",
             "Unresolved": "UNRESOLVED (p.145): floorbeam web-to-flange weld side - Section A-A shows one 5/16\u0022 fillet symbol (arrow side only); the section is looked at along the floorbeam but its station direction is not tied to the local X axis. 5/16\u0022 fillet on the \u002BX (up-station per the framing plan numbering) face of the web, continuous.",
-            "Material": "E70XX (AWS D1.5)"
+            "Material": "E70XX (AWS D1.5)",
+            "HoldBack": "NaN",
+            "HoldBackSource": ""
           },
           {
             "Name": "floorbeam connection stiffener to tie web and flange",
@@ -28984,7 +29004,9 @@
             "Tolerance": 0.0015875,
             "Source": "p.146 stiffener detail",
             "Unresolved": "UNRESOLVED (p.146): floorbeam connection stiffener weld side - the stiffener detail shows one 5/16\u0022 symbol with two arrowheads (web and flange) and does not say which face of the stiffener plate is welded. 5/16\u0022 fillet on the \u002BX face of the stiffener along its web edge and its flange edge.",
-            "Material": "E70XX (AWS D1.5)"
+            "Material": "E70XX (AWS D1.5)",
+            "HoldBack": "NaN",
+            "HoldBackSource": ""
           }
         ],
         "Floorbeams": [
@@ -43313,7 +43335,9 @@
           "Material": "ASTM A709 Gr. 50-F1 (FCM)",
           "RibWeldSize": 0.0079375,
           "RibWeldSetback": 0,
-          "RibWeldUnresolved": "UNRESOLVED (p.148): rib fin plate weld start - D = P3 - 1/2\u0022 implies the weld covers the P3 edge less 1/4\u0022 at each end, but the top corner clip (scaled 1\u0022, not dimensioned) shortens the flange contact edge. weld D from the end of the scaled 1\u0022 clip toward the pin; it runs up to 1/2\u0022 past the straight edge (CHECK rows)",
+          "RibWeldHoldBack": 0.00635,
+          "RibWeldHoldBackSource": "p.148 Section A-A: 1/4 \u002B- 1/8",
+          "RibWeldUnresolved": "UNRESOLVED (p.148): rib fin plate weld start - D = P3 - 1/2\u0022 implies the weld covers the P3 edge less 1/4\u0022 at each end, but the top corner clip (scaled 1\u0022, not dimensioned) shortens the flange contact edge. weld from 1/4\u0022 below the end of the scaled 1\u0022 clip toward the pin, length D but on the flange contact only (CHECK rows)",
           "WeldMaterial": "E70XX (AWS D1.5)"
         },
         "CableConnectors": [

@@ -278,10 +278,16 @@ public sealed class ArchFinSettings
     /// <summary>Bolt rows below the bend line.</summary>
     public List<double> TieHoleRows { get; set; } = new() { In(2), In(5.5) };
     public string Material { get; set; } = "ASTM A709 Gr. 50-F1 (FCM)";
-    /// <summary>OPTIONAL rib fin plate welds (p.148): fillet leg (0 = welds not modeled), both faces of the plate along each flange inner face, length
-    /// = the table "weld length D" per cable, starting <see cref="RibWeldSetback"/> below the end of the top clip.</summary>
+    /// <summary>OPTIONAL rib fin plate welds (p.148): fillet leg (0 = welds not modeled), both faces of the plate along each flange inner face, only where
+    /// the plate edge sits on the flange (contact found on the meshes): from the hold-back below the top of the contact (end of the top clip) plus
+    /// <see cref="RibWeldSetback"/>, length = the table "weld length D" per cable, never past the hold-back above the end of the contact (flange tip /
+    /// end of the straight side); a D longer than that is a CHECK row (plan vs model).</summary>
     public double RibWeldSize { get; set; }
     public double RibWeldSetback { get; set; }
+    /// <summary>OPTIONAL hold-back of the rib fin welds from both ends of the flange contact (p.148 Section A-A: 1/4" +- 1/8" at each end of D); NaN = the
+    /// bridge's <c>BridgeDefinition.Welds</c> / AWS default.</summary>
+    public double RibWeldHoldBack { get; set; } = double.NaN;
+    public string RibWeldHoldBackSource { get; set; } = "";
     /// <summary>UNRESOLVED reason for the weld position (page + why); empty = not flagged.</summary>
     public string RibWeldUnresolved { get; set; } = "";
     public string WeldMaterial { get; set; } = "E70XX (AWS D1.5)";
@@ -313,6 +319,10 @@ public sealed class ArchWeldRule
     public string Source { get; set; } = "";
     public string Unresolved { get; set; } = "";
     public string Material { get; set; } = "E70XX (AWS D1.5)";
+    /// <summary>OPTIONAL hold-back of this rule's beads from plate corners, clips and the end of contact (<c>Steel.WeldTermination</c>); NaN = the bridge's
+    /// <c>BridgeDefinition.Welds</c> value or the AWS default (weld size, min 1/4", flagged UNRESOLVED).</summary>
+    public double HoldBack { get; set; } = double.NaN;
+    public string HoldBackSource { get; set; } = "";
 }
 
 /// <summary>Cable connector at a hanger crossing (plan p.150): UHMW-PE pendant plate between the two cables with a sleeve bracket over each.</summary>

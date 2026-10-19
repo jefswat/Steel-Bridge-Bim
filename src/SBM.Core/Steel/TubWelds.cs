@@ -15,7 +15,7 @@ namespace SBM.Core.Steel;
 public sealed partial class SteelModelGenerator
 {
     /// <summary>Fillet beads along one web to flange joint (web side <paramref name="side"/>, outer / inner face, at the top or bottom flange) of a web run a..b.</summary>
-    private double TubWebWeld(Mesh m, GirderResult g, double a, double b, int side, double tw, bool top, bool outer, double aw)
+    private double TubWebWeld(Mesh m, GirderResult g, double a, double b, int side, double tw, bool top, bool outer, double aw, bool holdA = true, bool holdB = true)
     {
         var t = TubDef;
         int gi = g.Index;
@@ -24,7 +24,10 @@ public sealed partial class SteelModelGenerator
         double sa = a, sb = b;
         if (a <= 1e-6 && TubEndSkew(gi, 0) is { } kA) { var fA = TF(gi, a); sa = a + (xr * fA.Cos - y * fA.Sin) * kA; }
         if (b >= g.Length - 1e-6 && TubEndSkew(gi, g.Spans.Count) is { } kB) { var fB = TF(gi, b); sb = b + (xr * fB.Cos - y * fB.Sin) * kB; }
-        if (sb <= sa + 1e-6) return 0;
+        double hb = HoldBack(aw);                                   // held back from the plate ends (field section / girder ends); web shop splices run through
+        if (holdA) sa += hb;
+        if (holdB) sb -= hb;
+        if (sb <= sa + WeldTermination.MinBead) return 0;
         var ss = g.Path.SamplesBetween(sa, sb).Concat(new[] { sa, sb }).Where(s => s >= sa - 1e-9 && s <= sb + 1e-9).Distinct().OrderBy(s => s).ToList();
         double len = 0;
         for (int i = 0; i + 1 < ss.Count; i++)
@@ -53,12 +56,12 @@ public sealed partial class SteelModelGenerator
             foreach (var (a, b, _, tw) in pieces)
                 foreach (bool top in new[] { true, false })
                     foreach (bool outer in new[] { true, false })
-                        len += TubWebWeld(wm, g, a, b, side, tw, top, outer, aw);
+                        len += TubWebWeld(wm, g, a, b, side, tw, top, outer, aw, a <= s0 + 1e-6, b >= s1 - 1e-6);
         if (wm.IsEmpty) return;
         _parts.Add(new SteelPart
         {
             Mark = $"{mark}-FW", Category = PartCategory.Weld, Assembly = mark, Mesh = wm, Length = len, Material = "E70XX",
-            Description = $"Fillet weld {In(aw)}, flange to web, both sides",
+            Description = $"Fillet weld {In(aw)}, flange to web, both sides{HoldNote(aw)}", Assumption = WeldFlag(aw),
         });
     }
 
@@ -118,14 +121,15 @@ public sealed partial class SteelModelGenerator
                 foreach (var a in asList)
                 {
                     if (ReferenceEquals(a, b) || (r.SameAssembly && a.Assembly != b.Assembly) || !BoxesTouch(bb, bounds[a], tol + Inch(0.25))) continue;
-                    len += WeldFinder.AddBeads(m, WeldFinder.TJoint(oriented[a], oriented[b], tol, 6, true, null, true), aw);
+                    // runs end the hold-back short of the plate corners, clips and the end of contact
+                    len += WeldFinder.AddBeads(m, WeldTermination.Terminate(WeldFinder.TJoint(oriented[a], oriented[b], tol, 6, true, null, true), HoldBack(aw)), aw);
                 }
                 if (m.IsEmpty) continue;
                 built++; total += len;
                 added.Add(new SteelPart
                 {
                     Mark = $"{b.Mark}-W{r.Name}", Category = PartCategory.Weld, Assembly = b.Assembly, Mesh = m, Length = len, Material = "E70XX",
-                    Description = $"Fillet weld {In(aw)}, {r.Where}, both sides",
+                    Description = $"Fillet weld {In(aw)}, {r.Where}, both sides{HoldNote(aw)}", Assumption = WeldFlag(aw),
                 });
             }
             Info($"Tub welds {r.Name} ({r.Where}): {built} of {bs.Count} plates welded ({Ft2(total)} of {In(aw)} fillet roots).");

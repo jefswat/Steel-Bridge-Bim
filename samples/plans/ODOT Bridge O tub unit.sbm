@@ -3273,7 +3273,15 @@
           },
           "Material": null
         }
-      ]
+      ],
+      "Welds": {
+        "HoldBack": 0.009524999999999999,
+        "Source": "p.273 note 7, p.282 note 6: 3/8 (\u002B/- 1/8) from edges",
+        "Unresolved": "",
+        "StiffenerWebEndFactor": 0,
+        "StiffenerWebEndMin": 0,
+        "StiffenerWebEndSource": ""
+      }
     }
   ],
   "References": []
