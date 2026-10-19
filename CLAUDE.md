@@ -43,6 +43,7 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   (the rules are copied there by the App / Cli csproj) and the repo's `samples/plans`, matched by `models` (file name) then by plan set `bridgeGroup` = a bridge name
   (`DatabaseOptions.BridgeNames`); a generic rules file is never taken from the library. Every build applies them; `CompanionDatabase.Relink` / `sbm db --relink` re-applies to an existing db; the app relinks on
   load when links are missing or the rules file is newer. A new bridge needs its own `sheet-links-<name>.json` with an index (tests check every rule matches a sheet).
+  Agents reviewing plans: query instead of reading PDFs: `sbm db <model.sbm> --sheets-for <mark|name> [--json]` (pages to read per PDF) and `--find-sheet <title|no.>` (read-only, existing db, no regeneration).
   Keep `ModelDatabase.Builder` numbering in step with `IfcExporter` (test `GlobalIds_AreTheIfcGlobalIds`). CLI `sbm db`, docs in docs/API.md.
 - `src/SBM.Cli` — `sbm.exe` command line over SBM.Api (new/info/get/set/add/remove/import-landxml/regen/export/run/bench/
   elevations/drawings/sheets/nurbs).
