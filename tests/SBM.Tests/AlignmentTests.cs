@@ -110,6 +110,27 @@ public class AlignmentTests
     }
 
     [Fact]
+    public void Inverse_PointSquareToAnElementJunction_IsFoundOnTheJunction()
+    {
+        // Nebraska St: a barrier line point square to the alignment at the PT was missed by the root search of both elements and fell back to
+        // "distance 0, offset = distance to the start" (8 m high). Tangent - arc - tangent at UTM-size coordinates, points exactly at the junctions.
+        var o = new Vec2(713900.0, 4707200.0);
+        var t1 = HorizontalElement.Line(o, o + new Vec2(-60, 25));
+        var arc = new HorizontalElement(t1.EndPoint, t1.EndAngle, 47.3, 1 / 381.0, 1 / 381.0);
+        var t2 = new HorizontalElement(arc.EndPoint, arc.EndAngle, 80, 0, 0);
+        var a = new Alignment(new[] { t1, arc, t2 });
+        foreach (double dj in new[] { t1.Length, t1.Length + arc.Length })
+            for (int k = -200; k <= 200; k++)
+            {
+                double off = k * 0.0317;
+                var so = a.Inverse(a.PointAtDistance(dj, off));
+                Assert.True(so.OnAlignment, $"junction {dj}, offset {off}");
+                Assert.Equal(dj, so.Distance, 6);
+                Assert.Equal(off, so.Offset, 6);
+            }
+    }
+
+    [Fact]
     public void Inverse_BeyondEnds_UsesExtendedTangents()
     {
         var a = SampleProject.CreateAlignment();
