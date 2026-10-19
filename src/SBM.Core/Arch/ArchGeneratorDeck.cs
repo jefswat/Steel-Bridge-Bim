@@ -149,18 +149,43 @@ public static partial class ArchGenerator
             // Longitudinal lines: grid about the structure CL, split into bars with laps from the west end.
             var d1 = new List<Vec3[]>(); var d2 = new List<Vec3[]>();
             double sA = rb.EndCover, sB = Lt - rb.EndCover;
+            // Knuckle zones (p.151 WEST KNUCKLE REINF., "BEND LONG. REINF. TO STUD GRID"): beyond the first / last floorbeam the lines run STRAIGHT,
+            // parallel to the CL1-CL2 chord (local X), to the end web inside face less the end cover, and bend at the floorbeam line (true bend radius:
+            // RebarBends). Between the floorbeams they keep the grid (m + e y, on the corrugations). Without knuckles: the grid over the full length.
+            int nKnots = _deck?.knots.Count ?? 0;
+            bool knuckleA = _deck?.ka != null && nKnots >= 3, knuckleB = _deck?.kb != null && nKnots >= 3;
+            double sFbA = knuckleA ? dl.S[1 + 8] : sA, sFbB = knuckleB ? dl.S[1 + 8 * (nKnots - 2)] : sB;
+            // Straight knuckle run from the floorbeam point p toward the end at sample index 'end' (0 or ^1): to the end-cover line of the end web face.
+            List<Vec2> KnuckleRun(Vec2 p, bool atStart)
+            {
+                var face = atStart ? dl.m[0] : dl.m[^1];
+                var fe = atStart ? dl.e[0] : dl.e[^1];
+                var x = new Vec2(1, 0);
+                if (Vec2.Dot(face - p, x) < 0) x = -x;
+                var nIn = fe.Left; if (Vec2.Dot(nIn, p - face) < 0) nIn = -nIn;
+                var f = face + nIn * rb.EndCover;
+                double den = Vec2.Cross(x, fe);
+                double tau = Math.Abs(den) < 1e-9 ? 0 : Vec2.Cross(f - p, fe) / den;
+                int np = Math.Max(1, (int)Math.Ceiling(tau / Ft(1)));
+                var run = Enumerable.Range(0, np + 1).Select(k => p + x * (tau * k / np)).ToList();
+                if (atStart) run.Reverse();
+                return run;
+            }
             foreach (int j in Enumerable.Range(0, rb.LongCount))
             {
                 double y = (j - (rb.LongCount - 1) / 2.0) * rb.LongSpacing;
-                int np = Math.Max(2, (int)Math.Ceiling((sB - sA) / Ft(1)));
-                var top = new List<Vec3>(); var bot = new List<Vec3>();
+                var plan = new List<Vec2>();
+                double l0 = knuckleA ? sFbA : sA, l1 = knuckleB ? sFbB : sB;
+                if (knuckleA) { var (m, e) = AtS(dl, sFbA); plan.AddRange(KnuckleRun(m + e * y, true).SkipLast(1)); }
+                int np = Math.Max(2, (int)Math.Ceiling((l1 - l0) / Ft(1)));
                 for (int k = 0; k <= np; k++)
                 {
-                    var (m, e) = AtS(dl, sA + (sB - sA) * k / np);
-                    var p = m + e * y;
-                    top.Add(Top(p, rb.TopCover + dA + dA / 2));
-                    bot.Add(W(p.WithZ(zD2)));
+                    var (m, e) = AtS(dl, l0 + (l1 - l0) * k / np);
+                    plan.Add(m + e * y);
                 }
+                if (knuckleB) { var (m, e) = AtS(dl, sFbB); plan.AddRange(KnuckleRun(m + e * y, false).Skip(1)); }
+                var top = plan.Select(p => Top(p, rb.TopCover + dA + dA / 2)).ToList();
+                var bot = plan.Select(p => W(p.WithZ(zD2))).ToList();
                 d1.AddRange(SplitBars(top, rb.LongBarLength, rb.LongLap));
                 d2.AddRange(SplitBars(bot, rb.LongBarLength, rb.LongLap));
             }
@@ -304,17 +329,23 @@ public static partial class ArchGenerator
         private void BuildPt(ArchDeckDefinition dk, ArchPtSystem pt)
         {
             Model.PtStrandDiameter = pt.StrandDiameter; Model.PtStrandArea = pt.StrandArea;
-            var asu = pt.Unresolved.Length > 0 ? Assumption.UnresolvedDimension(pt.Unresolved, $"strand spacing {L(pt.StrandSpacing)}, anchorage {L(pt.AnchorWidth)} x {L(pt.AnchorHeight)} x {L(pt.AnchorLength)}") : null;
-            if (asu != null) Warn(pt.Unresolved);
+            // Curve radius of the tendon path (user review 9d: no kinks): not given by the plans -> flagged on every strand (dimension only).
+            string radiusFlag = UnresolvedFlag.Text("p.155 / 145", "PT tendon curve radius", "the anchorage plan and Section A-A draw the tendons straight, parallel to the "
+                + "CL1-CL2 chord in the knuckle, and the floorbeam slots fix their points, but no radius is given where the path changes direction",
+                "Each change of direction is a tangent circular arc using the full half-legs (largest radius that fits): a smooth path without kinks.");
+            string basis = $"strand spacing {L(pt.StrandSpacing)}, anchorage {L(pt.AnchorWidth)} x {L(pt.AnchorHeight)} x {L(pt.AnchorLength)}; tangent arcs of the largest radius that fits at every change of direction";
+            var asu = Assumption.UnresolvedDimension(pt.Unresolved.Length > 0 ? pt.Unresolved + " " + radiusFlag : radiusFlag, basis);
+            if (pt.Unresolved.Length > 0) Warn(pt.Unresolved);
+            var ptSmooth = new List<(string name, int bends, double dev, double minR)>();
             var zs = new List<Vec3[]>();
             foreach (var t in dk.Tendons)
             {
                 if (t.Path.Count < 2) continue;
                 var path = t.Path.Select(p => p.Vec).ToList();
                 // Ends: the nearest end web PT opening of the nearest knuckle (inside face of the end web).
-                Vec3? Opening(Vec3 near)
+                (Vec3 q, Vec2 face, List<double> at)? Opening(Vec3 near)
                 {
-                    Vec3? best = null; double bd = double.MaxValue;
+                    (Vec3, Vec2, List<double>)? best = null; double bd = double.MaxValue;
                     foreach (var k in _d.Knuckles)
                     {
                         if (EndLine(k) is not { } el) continue;
@@ -323,13 +354,41 @@ public static partial class ArchGenerator
                         {
                             var q = (el.ctr + el.t * x + el.n * (-k.EndWebOffset + k.EndWebThickness)).WithZ(zef + k.EndWebOpeningZ);
                             double d = (q - near).Length;
-                            if (d < bd) { bd = d; best = q; }
+                            if (d < bd) { bd = d; best = (q, el.t, k.EndWebOpeningsAt); }
                         }
                     }
                     return bd < Ft(25) ? best : null;
                 }
-                if (Opening(path[0]) is { } o0) path.Insert(0, o0);
-                if (Opening(path[^1]) is { } o1) path.Add(o1);
+                // Knuckle run (p.155 anchorage plan): STRAIGHT from the last floorbeam slot, parallel to the CL1-CL2 chord (local X), to the end web inside
+                // face; the end web opening position (data) is compared, not used, so the tendon does not turn inside the last bay.
+                Vec3 KnuckleEnd(Vec3 near, Vec3 q, Vec2 face, List<double> at, string end)
+                {
+                    var x = new Vec2(1, 0);
+                    if (Vec2.Dot(q.XY - near.XY, x) < 0) x = -x;
+                    double den = Vec2.Cross(x, face);
+                    if (Math.Abs(den) < 1e-6 || Math.Abs(face.Y) < 1e-6) return q;
+                    double tau = Vec2.Cross(q.XY - near.XY, face) / den;
+                    var e = (near.XY + x * tau).WithZ(q.Z);
+                    // where the run meets the end web inside face, measured along the face from the chord crossing, vs the nearest printed opening
+                    // (p.155 / knuckle sheet: 2'-7 1/2 and 4'-1 1/2 from the chord)
+                    var c0 = q.XY - face * (q.Y / face.Y);
+                    double dist = Math.Abs(Vec2.Dot(e.XY - c0, face));
+                    double off = at.Count == 0 ? 0 : at.Min(a => Math.Abs(dist - Math.Abs(a)));
+                    Model.Checks.Add(new ArchCheck($"PT {t.Name} {end}: straight knuckle run parallel to the CL1-CL2 chord (p.155) meets the end web at the printed opening",
+                        $"{L(at.Count == 0 ? 0 : at.OrderBy(a => Math.Abs(dist - Math.Abs(a))).First())} from the chord", $"{L(dist)}", off, off <= In(1),
+                        "along the end web inside face from the chord crossing"));
+                    return e;
+                }
+                if (Opening(path[0]) is { } o0) path.Insert(0, KnuckleEnd(path[0], o0.q, o0.face, o0.at, "start"));
+                if (Opening(path[^1]) is { } o1) path.Add(KnuckleEnd(path[^1], o1.q, o1.face, o1.at, "end"));
+                // No kinks (user review 9d): a strand cannot turn at a point. The plans give the slot / opening points and draw the tendons straight in
+                // the knuckle, but no curve radius -> every change of direction becomes a tangent circular arc using the full half-legs (largest radius
+                // that fits), so the path is tangent-continuous end to end; the offset from each given point is reported.
+                path = RebarBends.Round(path, Ft(100000), out var ptSt, fitRadius: true).ToList();
+                if (ptSt.Bends > 0)
+                {
+                    ptSmooth.Add((t.Name, ptSt.Bends, ptSt.MaxDeviation, ptSt.MinRadius));
+                }
                 string asm = $"PT-{t.Name}";
                 AddAssembly(asm, AssemblyKind.ArchDeckForm, $"Longitudinal PT tendon {t.Name}: {pt.StrandsPerTendon} - {L(pt.StrandDiameter)} strands, {pt.JackingForceKips:0} kips jacking (p.155)");
                 for (int i = 0; i < pt.StrandsPerTendon; i++)
@@ -362,6 +421,13 @@ public static partial class ArchGenerator
                         zs.Add(new[] { Q(-hw, -hh), Q(hw, -hh), Q(hw, hh), Q(-hw, hh), Q(-hw, -hh) });
                     }
                 }
+            }
+            if (ptSmooth.Count > 0)
+            {
+                Warn($"{radiusFlag} Smallest radius {L(ptSmooth.Min(x => x.minR))}, largest offset from a slot / opening point {L(ptSmooth.Max(x => x.dev))}.");
+                foreach (var (name, nb, dev, minR) in ptSmooth)
+                    Model.Checks.Add(new ArchCheck($"PT {name}: smooth path through the floorbeam slots / end web openings (no kinks; radius UNRESOLVED p.155)", "through the points",
+                        $"{nb} arcs, min R {L(minR)}, max offset {L(dev)}", dev, dev <= In(0.25), "offset of the arc from the slot / opening point; slots 5 1/2\" x 2 1/4\" (p.145)"));
             }
             if (zs.Count > 0)
             {

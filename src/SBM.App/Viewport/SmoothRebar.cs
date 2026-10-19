@@ -45,7 +45,11 @@ public static class SmoothRebar
             double theta = Math.Acos(cos);
             if (theta <= maxTurn || theta > 175 * Math.PI / 180) { o.Add(b); continue; }
             double half = Math.Tan(theta / 2);
-            double d = Math.Min(bendRadius * half, Math.Min(0.5 * la, 0.5 * lb));
+            // Bends arrive as true arcs (RebarBends, pin / 2 + db / 2) sampled every <= 15 deg: subdivide on the circle through the samples
+            // (circumradius); only corners left sharp fall back to the nominal radius.
+            double circum = (c - a).Length / (2 * Math.Sin(theta));
+            double rad = circum <= 10 * barDiameter ? circum : bendRadius;
+            double d = Math.Min(rad * half, Math.Min(0.5 * la, 0.5 * lb));
             if (d < 1e-6) { o.Add(b); continue; }
             double r = d / half;
             var start = b - u * d;
