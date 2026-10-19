@@ -251,7 +251,8 @@ public class DatabaseTests : IDisposable
             Assert.Equal(3, sp.PdfPage);
             Assert.Equal("6", sp.DesignSheet);
             Assert.True(sp.Inherited);
-            Assert.Contains(sheets, s => s.Title == "SUMMARY OF QUANTITIES" && s.Role == "general");   // backticks normalized
+            // only the sheets used to model it: the nearest linked level (the splice), no general sheets passed down from the unit
+            Assert.DoesNotContain(sheets, s => s.Title == "SUMMARY OF QUANTITIES");
             Assert.Null(mdb.PdfTarget(sp));   // no PDF anywhere yet
         }
 
@@ -293,10 +294,10 @@ public class DatabaseTests : IDisposable
         var el = res.Elements[0];
         Assert.Contains(" > ", el.Path);
         Assert.Contains(el.Sheets, s => s.Title == "FIELD SPLICE DETAILS" && s.PdfPage == 3 && !s.Inherited);
-        Assert.Contains(el.Sheets, s => s.Title == "SUMMARY OF QUANTITIES" && s.Inherited);
+        Assert.DoesNotContain(el.Sheets, s => s.Title == "SUMMARY OF QUANTITIES");   // general sheets stay on the unit
         var pages = Assert.Single(res.Pages);
         Assert.Equal(Path.Combine(_dir, "pdfs", "plan set.pdf"), pages.Key);
-        Assert.Equal(new[] { 3, 4 }, pages.Value);
+        Assert.Equal(new[] { 3 }, pages.Value);   // only the sheet used to model it (the general p.4 stays on the unit)
 
         // exact mark wins over substring matching; no match gives an empty result
         string mark = mdb.Get(el.GlobalId)!.Mark;

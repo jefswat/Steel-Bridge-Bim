@@ -173,7 +173,9 @@ public sealed partial class ModelDb : IDisposable
         return c.ExecuteScalar() as string;
     }
 
-    /// <summary>Sheets the element is based on: links on the element and on each ancestor, with the QC record for this element.</summary>
+    /// <summary>Sheets the element is based on (only those used to model it): its own links, else the links of its NEAREST linked ancestor;
+    /// general sheets (quantities, notes, situation plans) only on the element they are linked to. With the QC record for this element.
+    /// Same rule as the view <c>v_element_sheets</c>.</summary>
     public List<SheetLink> Sheets(string globalId)
     {
         var chain = Chain(globalId);
@@ -193,9 +195,12 @@ public sealed partial class ModelDb : IDisposable
             c.Parameters.AddWithValue("$g", globalId);
             c.Parameters.AddWithValue("$a", chain[i].GlobalId);
             using var r = c.ExecuteReader();
+            bool own = i == chain.Count - 1, found = false;
             while (r.Read())
             {
                 string id = r.GetString(0);
+                if (!own && S(r, 7) == "general") continue;
+                if (S(r, 7) != "general") found = true;
                 if (!seen.Add(id)) continue;
                 list.Add(new SheetLink
                 {
@@ -204,6 +209,7 @@ public sealed partial class ModelDb : IDisposable
                     LinkRootName = chain[i].Name, LinkRootId = chain[i].GlobalId, Inherited = i != chain.Count - 1,
                 });
             }
+            if (found) break; // nearest linked level only
         }
         return list;
     }

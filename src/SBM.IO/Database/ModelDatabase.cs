@@ -106,7 +106,10 @@ public static class ModelDatabase
           WITH RECURSIVE d(id, sheet_id, role, basis, link_root) AS (
             SELECT e.id, l.sheet_id, l.role, l.basis, l.global_id FROM element_sheet l JOIN el e ON e.global_id = l.global_id
             UNION ALL
-            SELECT c.id, d.sheet_id, d.role, d.basis, d.link_root FROM d JOIN el c ON c.parent_id = d.id)
+            -- Only the sheets used to model an element (user, 2026-10-19): a child inherits the links of its NEAREST linked ancestor (none when it
+            -- has links of its own) and general sheets (quantities, notes, situation plans) stay on the element they are linked to.
+            SELECT c.id, d.sheet_id, d.role, d.basis, d.link_root FROM d JOIN el c ON c.parent_id = d.id
+            WHERE d.role <> 'general' AND NOT EXISTS (SELECT 1 FROM element_sheet l2 WHERE l2.global_id = c.global_id AND l2.role <> 'general'))
           SELECT e.global_id, d.sheet_id, d.role, d.basis, d.link_root FROM d JOIN el e ON e.id = d.id;
         DROP VIEW IF EXISTS v_element_path;
         CREATE VIEW v_element_path AS

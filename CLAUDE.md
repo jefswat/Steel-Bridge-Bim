@@ -33,7 +33,8 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
 - Companion database: `SBM.IO/Database` (`ModelDatabase` writer + schema, `PlanSheets` sheets/link rules/reports, `ModelDb` reader, `CompanionDatabase`
   orchestration; `IfcKeys` = the key patterns behind the IFC GlobalIds, shared with `IfcExporter` — never change a pattern). Compact layout `el` +
   `strings` + `props`, readable VIEW `elements`; groups (no IFC entity) at the plans' granularity; links on groups/assemblies, children inherit
-  (`v_element_sheets`). `tools/plan_split.py` splits plan PDFs. App: `MainWindow.Database.cs` + `SBM.App/Database/` (panel, preview window, `PdfOpener` = open at page in an external viewer,
+  (`v_element_sheets`) ONLY from their NEAREST linked ancestor (none when they have links of their own) and never general-role sheets (quantities, notes,
+  situation plans stay on the element they are linked to) - user rule 2026-10-19: an element references only the sheets used to model it; `ModelDb.Sheets` mirrors it. `tools/plan_split.py` splits plan PDFs. App: `MainWindow.Database.cs` + `SBM.App/Database/` (panel, preview window, `PdfOpener` = open at page in an external viewer,
   `PlanSheetWindow` = the element's linked sheets INSIDE the app: one modeless window (movable to a second monitor, closable), sheet list + the plan PDF in
   WebView2 (Edge PDF viewer, `#page=N`; package Microsoft.Web.WebView2, user data in %LOCALAPPDATA%\SteelBridgeModeler\WebView2), opened by a 3D pick when the
   database has links unless the user closed it, follows the selection; panel "Show sheet"; snapshot `--sheetwindow` (with `--pickafter`) logs SHEETWIN: and writes `_sheet.png`).
