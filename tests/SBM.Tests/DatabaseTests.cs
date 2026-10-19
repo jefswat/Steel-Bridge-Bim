@@ -274,6 +274,47 @@ public class DatabaseTests : IDisposable
         }
     }
 
+    [Fact]
+    public void SheetsFor_AndFindSheets_QueryAnExistingDatabase()
+    {
+        var doc = SbmDocument.Sample();
+        string model = Path.Combine(_dir, "m.sbm");
+        File.WriteAllText(Path.Combine(_dir, "sheet-links-m.json"), IndexRules);
+        Directory.CreateDirectory(Path.Combine(_dir, "pdfs"));
+        File.WriteAllText(Path.Combine(_dir, "pdfs", "plan set.pdf"), "%PDF-1.4");
+        string db = Path.Combine(_dir, "m.sqlite");
+        doc.ExportDatabase(db, new DatabaseOptions { ModelFile = model });
+        using var mdb = new ModelDb(db);
+
+        // by category (substring): a field splice, its path, direct + inherited sheets, one de-duplicated page list
+        var res = mdb.SheetsFor("field splice", 5);
+        Assert.True(res.TotalMatches >= res.Elements.Count);
+        Assert.True(res.Elements.Count is > 0 and <= 5);
+        var el = res.Elements[0];
+        Assert.Contains(" > ", el.Path);
+        Assert.Contains(el.Sheets, s => s.Title == "FIELD SPLICE DETAILS" && s.PdfPage == 3 && !s.Inherited);
+        Assert.Contains(el.Sheets, s => s.Title == "SUMMARY OF QUANTITIES" && s.Inherited);
+        var pages = Assert.Single(res.Pages);
+        Assert.Equal(Path.Combine(_dir, "pdfs", "plan set.pdf"), pages.Key);
+        Assert.Equal(new[] { 3, 4 }, pages.Value);
+
+        // exact mark wins over substring matching; no match gives an empty result
+        string mark = mdb.Get(el.GlobalId)!.Mark;
+        if (mark.Length > 0) Assert.All(mdb.SheetsFor(mark).Elements, e => Assert.Equal(mark, e.Mark, ignoreCase: true));
+        Assert.Equal(0, mdb.SheetsFor("no such thing zzz").TotalMatches);
+        Assert.True(mdb.SheetsFor("%splice%").TotalMatches > 0);
+
+        // sheets by title / number / regex
+        var f = mdb.FindSheets("splice details");
+        Assert.Equal(new[] { 2, 3 }, f.Select(s => s.PdfPage));
+        Assert.Equal(f.Count, f.Count(s => s.PdfPath.EndsWith("plan set.pdf")));
+        Assert.True(f.Single(s => s.PdfPage == 3).LinkedElements > 0);
+        Assert.Equal(0, f.Single(s => s.PdfPage == 2).LinkedElements);
+        Assert.Equal(3, Assert.Single(mdb.FindSheets("6")).PdfPage);
+        Assert.Equal(new[] { 1, 4 }, mdb.FindSheets("^(TITLE|SUMMARY)").Select(s => s.PdfPage));
+        Assert.Empty(mdb.FindSheets("nothing"));
+    }
+
     private static string RepoFile(string rel)
     {
         for (var d = new DirectoryInfo(AppContext.BaseDirectory); d != null; d = d.Parent)

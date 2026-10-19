@@ -301,6 +301,15 @@ themselves to PDF pages (`"pages": [24]`) when sheets share a title. The plan PD
 subfolders, `%SBM_PLANS%` (;-separated) and the program folder; a missing PDF only disables Open PDF. `--relink` re-applies the sheet index and
 rules to an existing database in about a second (no regeneration; QC kept). Without a rules file the build prints that no plan sheet links were made.
 
+**Querying (read-only, for plan review / fix agents).** Instead of reading whole plan PDFs, ask the database which pages matter. These options query
+an EXISTING database (default `<model>.sqlite`, or `--db <file>`); they never open or regenerate the model, so they return at once.
+- `sbm db <model.sbm> --sheets-for <text>`: elements whose mark, name, category or group name matches (exact mark first, else case-insensitive
+  substring, or a `%` wildcard pattern). Up to 20 are shown (the rest are counted); each prints its hierarchy path and its sheets (direct + inherited):
+  plan set, PDF page, design sheet no., title, role, `pdf_path`; then a de-duplicated `Pages to read:` list per PDF (`C:\SBMData\x.pdf: 29,30,31`).
+- `sbm db <model.sbm> --find-sheet <text>`: sheets whose title or sheet no. contains the text (case-insensitive; a text starting with `^` is a regex);
+  prints plan set, page, sheet no., title, `pdf_path` and the number of elements linked directly to the sheet.
+- `--json` prints the same as JSON (`pagesToRead` maps each PDF to its comma-separated pages). API: `ModelDb.SheetsFor`, `ModelDb.FindSheets`.
+
 In the app the Properties side shows the record of the selected element: hierarchy links and every plan sheet it is based on, its own or
 inherited from a group / assembly ("via ..."), as "Sheet <n> · <title>", plan set, design sheet, PDF page, role and basis, with **Open PDF**
 (the split single page if present, else the whole plan PDF at that page through Acrobat / Reader `/A page=N`, SumatraPDF `-page N` or Edge
