@@ -194,13 +194,81 @@ public static class BarSheet
             dd.Dim(a, b, 0.17 * side, $"{dim.Letter} = {u.FormatLength(dim.Value, LengthKind.Short)}");
         }
         var notes = new List<string>();
-        // Bend radius: inside radius = pin / 2 (in the note line, not a leader that would leave the cell).
-        if (shape.Bends.Count > 0 && shape.PinDiameter > 0) notes.Add($"R = {u.FormatLength(shape.PinDiameter / 2, LengthKind.Short)} INSIDE");
+        // Pin diameter at EVERY bend (user review 6m; plan convention "D = PIN DIAMETER"): the shape's pin (printed / generator) or the standard
+        // minimum the 3D bar is bent with (RebarBends.PinFor), labelled on the outside of each bend.
+        var bendsAt = shape.Code == "SPIRAL" ? new List<(Vec2 at, Vec2 outward)>() : BendPoints(pts, RebarBends.CenterRadius(m));
+        if (bendsAt.Count > 0)
+        {
+            string dTxt = $"D = {u.FormatLength(RebarBends.PinFor(m), LengthKind.Short)}";
+            foreach (var (at, outward) in bendsAt)
+                d.Text(dTxt, M(at) + outward * P(0.09), P(0.045), 0, TextAlign.Center);
+            notes.Add("D = PIN DIAMETER" + (shape.PinDiameter > 0 ? "" : " (STD. MIN.)"));
+        }
         foreach (var dim in shape.Dimensions.Where(q => Vec2.Distance(q.From, q.To) < 1e-9))
             notes.Add($"{dim.Letter} = {u.FormatLength(dim.Value, LengthKind.Short)}");
         if (shape.Code == "SPIRAL") notes.Insert(0, "H = HEIGHT, P = PITCH");
         if (shape.Code == "TIE") notes.Insert(0, "135° HOOKS, " + shape.Description.Split(',').Last().Trim().ToUpperInvariant());
-        if (shape.PinDiameter > 0 && !(shape.Bends.Count > 0)) notes.Add($"PIN {u.FormatLength(shape.PinDiameter, LengthKind.Short)}");
+        if (shape.PinDiameter > 0 && bendsAt.Count == 0 && shape.Code != "SPIRAL") notes.Add($"PIN {u.FormatLength(shape.PinDiameter, LengthKind.Short)}");
         if (notes.Count > 0) d.Text(string.Join("  ", notes), o + new Vec2(P(0.05), -P(cellH - 0.08)), P(0.045), 0, TextAlign.Left);
+    }
+
+    /// <summary>
+    /// The bends of a diagram centerline: a sharp corner (one vertex) or a sampled arc (consecutive turning vertices less than ~0.6 bend radius apart,
+    /// same sense) counts once when it turns more than 10 deg. Returns the middle point of each bend and the unit direction away from its center
+    /// (where the pin label goes). A closed outline (first = last point) includes the closing corner.
+    /// </summary>
+    public static List<(Vec2 at, Vec2 outward)> BendPoints(IReadOnlyList<Vec2> input, double radius)
+    {
+        var p = new List<Vec2>();
+        foreach (var q in input) if (p.Count == 0 || Vec2.Distance(q, p[^1]) > 1e-7) p.Add(q);
+        var res = new List<(Vec2, Vec2)>();
+        int n = p.Count;
+        if (n < 3) return res;
+        bool closed = n >= 4 && Vec2.Distance(p[0], p[^1]) < 1e-6;
+        if (closed) { p.RemoveAt(n - 1); n--; }
+        var turn = new double[n];
+        for (int i = 0; i < n; i++)
+        {
+            if (!closed && (i == 0 || i == n - 1)) continue;
+            var a = p[(i - 1 + n) % n]; var b = p[i]; var c = p[(i + 1) % n];
+            var u = (b - a).Normalized(); var v = (c - b).Normalized();
+            turn[i] = Math.Atan2(Vec2.Cross(u, v), Vec2.Dot(u, v));
+        }
+        double minTurn = 0.5 * Math.PI / 180, gap = 0.6 * radius;
+        var used = new bool[n];
+        int start = 0;
+        if (closed)
+        {
+            // start the scan after a straight vertex so no bend is split across the wrap
+            int s0 = Array.FindIndex(turn, x => Math.Abs(x) < minTurn);
+            start = s0 < 0 ? 0 : s0;
+        }
+        for (int kk = 0; kk < n; kk++)
+        {
+            int i = (start + kk) % n;
+            if (used[i] || Math.Abs(turn[i]) < minTurn) continue;
+            var run = new List<int> { i };
+            used[i] = true;
+            int j = i;
+            while (true)
+            {
+                int nx = (j + 1) % n;
+                if (!closed && nx >= n - 1) break;
+                if (used[nx] || Math.Abs(turn[nx]) < minTurn || Math.Sign(turn[nx]) != Math.Sign(turn[i]) || Vec2.Distance(p[j], p[nx]) > gap) break;
+                run.Add(nx); used[nx] = true; j = nx;
+            }
+            double total = run.Sum(k => turn[k]);
+            if (Math.Abs(total) < 10 * Math.PI / 180) continue;
+            int first = run[0], last = run[^1];
+            Vec2 at = run.Count % 2 == 1 ? p[run[run.Count / 2]] : (p[run[run.Count / 2 - 1]] + p[run[run.Count / 2]]) * 0.5;
+            // outward = away from the turn center: the travel direction at the middle rotated away from the turning side
+            var dIn = (p[first] - p[(first - 1 + n) % n]).Normalized();
+            var dOut = (p[(last + 1) % n] - p[last]).Normalized();
+            var mid = (dIn + dOut);
+            mid = mid.Length > 1e-9 ? mid.Normalized() : dIn;
+            var outward = total > 0 ? -mid.Left : mid.Left;
+            res.Add((at, outward));
+        }
+        return res;
     }
 }

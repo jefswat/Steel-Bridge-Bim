@@ -154,11 +154,12 @@ public class PlanBarSetTests
         Assert.Equal(2 * panels, marks["D3"].Count);
         if (marks.TryGetValue("S1", out var s1)) Assert.Equal(2 * (In(6) + In(9)) + 2 * In(4.5), s1.Length, 9);
         Assert.Contains(m.Checks, c => c.Item.Contains("two hooked bars per row"));
-        // every A1 bar: hooked end on the bottom bar level, developed length within 1" of the listed length
+        // every A1 bar: hooked end on the bottom bar level, developed length near the listed length (out-to-out sum; the true bends
+        // (RebarBends, pin / 2 + db / 2) make the 3D centerline up to ~1" shorter)
         foreach (var bar in m.Concrete.Bars.Where(x => x.Mark == "A1").Take(20))
         {
             double l = 0; for (int i = 1; i < bar.Points.Length; i++) l += (bar.Points[i] - bar.Points[i - 1]).Length;
-            Assert.InRange(l, Ft(13) + In(9), Ft(13) + In(11));
+            Assert.InRange(l, Ft(13) + In(8), Ft(13) + In(11));
             Assert.True(bar.Points[^1].Z < bar.Points[0].Z - In(3));
         }
     }

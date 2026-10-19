@@ -437,6 +437,21 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
     own mark; straight bars within `MarkLengthTolerance` snap to the cluster's SHORTEST length; odd closures grouped
     into "varies" marks (â‰¤3 ft range). Negative-moment bars are one length centered on the pier. Equal-piece splits
     except staggered longitudinals (stock 60 ft + closure).
+  - TRUE BEND RADII (user rule 2026-10-13, review 6f: "no kinks anywhere"): `Concrete/RebarBends.cs`. Generators may place bars with SHARP corners (plan bend
+    diagrams, script polylines, hooks as one vertex); `RebarBends.Apply(marks, bars)` replaces every corner with a tangent circular arc of centerline radius
+    pin / 2 + db / 2 (<= 15 deg per segment, >= 3 segments so `ArcFit` recovers it -> IfcArcIndex). It runs in ONE place: `RegenerationCache` right after each
+    bridge's concrete / prestressed models (`RoundBends`, before DeckRebarCheck and the cache) and substructure model; `BarPlacement.Points` is then the bent
+    bar for every consumer (`BendsRounded` = done once; tests that call generators directly see the sharp bars). Pin = `BarShape.PinDiameter` (printed /
+    generator) else `RebarBends.StandardPin` = AASHTO LRFD 5.10.2.3 (ties / stirrups / hoops #3-#5 4 db; else 6 / 8 / 10 db) - no state table that differs is
+    known (Iowa / MnDOT / TxDOT / NCDOT / ODOT plans bend per AASHTO / CRSI). Left alone: SPIRAL marks, already-sampled curves (turn <= 25 deg with a similar
+    neighbour turn within 0.3 m: generators' own `BarShape.Rounded` bends, circular hoops, helices), invisible turns (< 0.05 mm from the arc), reversals > 175 deg;
+    legs shorter than the tangent get the largest radius that fits (counted). Points closer than 0.1 mm are merged. Scheduled lengths (marks) are unchanged
+    (out-to-out sums); the 3D developed length is shorter by the bend deductions (expected). In-generator cover / containment checks still see the sharp
+    corner (conservative: the arc lies inside it). Info diagnostic "Rebar bends: ..." per model. `Round(..., fitRadius: true)` = smooth path through given
+    points (largest radius that fits, half end legs straight) - used for the arch PT tendons. Viewport `SmoothRebar.Densify` subdivides on the arc's
+    circumradius. Bar sheets (`BarSheet.BendPoints`) print "D = <pin>" at EVERY bend of a diagram + "D = PIN DIAMETER" (review 6m). Cost (I-80 + Ramp G,
+    2026-10-19): regen 31-34 s -> 33-34 s, IFC 351.2 -> 361.5 MB (+2.9 %), IfcArcIndex 14,801 -> 31,889. Known: I-80 U2 6b1 / U3 6b2 deck longitudinals
+    have a ~2.8" lateral crank where plan zones meet (generator) - now two reduced-radius bends. Tests `RebarBendsTests`.
   - `Steel/` â€” `Sections.cs` (AISC angle/channel catalog, bolt dims + length rounding), `SteelModel` (parts,
     assemblies, bolt instances, bearing seats), `SteelModelGenerator` (girder plates swept along `GirderPath`, plate
     changes with 1:2.5 width tapers, field-section split at splices, flange-web welds, stiffeners in their skewed
@@ -565,7 +580,7 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
     barrier `NamedPick.Source`, SubPick) is refined onto the exact face (`NurbsSnap.TryRefine`: coarse sample + closest point, then Newton
     ray / surface; planar faces ray / plane; holes rejected); `SnapHit.ExactWorld` is used by the measure and the readout says
     "(exact, x off the mesh)". OFF = today's mesh snap unchanged.
-  - Near-view rebar LOD (`MainWindow.RebarLod.cs`, `Viewport/SmoothRebar.cs`): zoomed in (width < 60 ft) and settled, bars within 20 ft of the view-center ray become smooth
+  - Near-view rebar LOD (`MainWindow.RebarLod.cs`, `Viewport/SmoothRebar.cs`; bends already true arcs from `RebarBends`): zoomed in (width < 60 ft) and settled, bars within 20 ft of the view-center ray become smooth
     lofted tubes (parallel transport, bends <= 10 deg/step, 10 sides) in an overlay model per rebar layer; the same bars are skipped in the light tile/instanced models via
     `_lodSkip` (flows through ApplyToModel / HiddenRanges). Settings in static `RebarLod`; snapshot `--nolod --lodradius --lodwidth --width --noterrain --framebench --pickafter --hideafter`.
 - Units/shared piers: `SupportDefinition.SharedPier` + `PierCenterOffset`; `RegenerationCache` is two-phase (superstructure
@@ -805,7 +820,12 @@ UNRESOLVED FLAG (general, reusable): `SBM.Core/Assumption.cs` `Assumption{Status
   `PlateBuilder.AddPlanarArc` (mesh from the tessellation, `ExtrudedSolid.ExactOutline` keeps the arcs) -> IFC Parametric IfcIndexedPolyCurve with
   IfcArcIndex, ReferenceView tessellated to its chord tolerance. Tests `ArchBracingConnectionTests`. Tests `ArchTests`, `ArchV2Tests`. Knuckle visual check without a snapshot: `temp`-style dump of part triangles + a small
   kg/m3, not in SteelMass), ArchConnectionPlate, ArchStiffener, PtStrand, PtAnchorage. Remaining GAPs: bracing U-point gussets (p.129-140), railing,
-  duct, camber (D3 bars done 2026-10-12). Tests `ArchTests`, `ArchV2Tests`. Knuckle visual check without a snapshot: `temp`-style dump of part triangles + a small
+  duct, camber (D3 bars done 2026-10-12). Tests `ArchTests`, `ArchV2Tests`.
+  Kinks fixed 2026-10-19 (review 1.3 / 9d): deck D1 / D2 lines in the knuckle zones run STRAIGHT parallel to the CL1-CL2 chord (local X) from the first / last
+  floorbeam point to the end web inside face less EndCover and bend there (p.151 "BEND LONG. REINF. TO STUD GRID"; grid m + e y between the floorbeams);
+  PT tendons: knuckle run straight along local X from the last slot to the end web inside face (the old "nearest end web opening" picked the far side
+  opening for N2 / S2 = the last-bay kink; CHECK vs the printed openings 2'-7 1/2 / 4'-1 1/2 along the face: 31 3/16 / 49 1/16), whole path smoothed with
+  `RebarBends.Round(fitRadius)`, curve radius UNRESOLVED (p.155 / 145, flagged on every strand + CHECK rows "smooth path": min R ~472 ft, offset 3/16"). Knuckle visual check without a snapshot: `temp`-style dump of part triangles + a small
   pymupdf painter's renderer (no matplotlib in the sandbox).
 - Precast PT SEGMENTAL box girder (OPTIONAL `BridgeDefinition.Segmental` = `Bridge/SegmentalDefinition.cs`, omitted from the .sbm when null; design note
   `docs/plan-data/bonner-b2500/segmental-unit5/SEGMENTAL-DESIGN.md`): own bridge with `Girders.Count = 0` (support lines only, like the arch; supports =
