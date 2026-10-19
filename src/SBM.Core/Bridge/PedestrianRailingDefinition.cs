@@ -34,11 +34,50 @@ public sealed class RailPostDefinition
     public double Spacing { get; set; }
     /// <summary>First / last post from the run ends, along the reference line.</summary>
     public double EndDistance { get; set; }
+    /// <summary>OPTIONAL post layout on the ALIGNMENT stations (the plan elevations lay the posts out along the centerline): posts on the radial lines at
+    /// <c>GridStation + k x Spacing</c> (k any integer, <see cref="Spacing"/> measured along the alignment), those inside the run only (the run ends
+    /// included); <see cref="EndDistance"/> is then ignored. null = equal spacing from the run ends.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public double? GridStation { get; set; }
     /// <summary>Size text, e.g. "PL 3/4 tapered post".</summary>
     public string Description { get; set; } = "";
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public RailBasePlateDefinition? BasePlate { get; set; }
     /// <summary>Not dimensioned on the plans: reason with page (the posts are built and flagged UNRESOLVED with <see cref="Basis"/>).</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? Unresolved { get; set; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? Basis { get; set; }
+}
+
+/// <summary>
+/// Fence fabric (chain link / mesh) panels between the posts (OPTIONAL <see cref="PedestrianRailingDefinition.Fabric"/>): a thin sheet following
+/// <see cref="Path"/> (a polyline in the section plane, bottom to top, e.g. the post's outer face), moved <see cref="OffsetFromPost"/> to its right-hand
+/// side (outward for a path drawn upward with R outward), clipped to <see cref="BottomH"/>..<see cref="TopH"/> and <see cref="Thickness"/> thick; one panel
+/// per bay (between consecutive posts, the end bays to the run ends), kept <see cref="PostClearance"/> clear of each post's side faces (half the post
+/// thickness + clearance from its centre). Mass = <see cref="MassPerArea"/> x panel area (the part density is MassPerArea / Thickness).
+/// </summary>
+public sealed class RailFabricDefinition
+{
+    public string Description { get; set; } = "";
+    /// <summary>Section line of the fabric face the panel follows (R outward, H above the railing base), bottom to top.</summary>
+    public List<RailPoint> Path { get; set; } = new();
+    /// <summary>Distance of the panel's mid-plane from <see cref="Path"/> (right-hand side of the upward path = outward).</summary>
+    public double OffsetFromPost { get; set; }
+    /// <summary>Lowest height of the fabric above the base.</summary>
+    public double BottomH { get; set; }
+    /// <summary>Highest height (null = the end of <see cref="Path"/>).</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public double? TopH { get; set; }
+    /// <summary>Panel thickness (two wire diameters for a woven fabric).</summary>
+    public double Thickness { get; set; }
+    /// <summary>Nominal mass per area of the fabric (kg/m2).</summary>
+    public double MassPerArea { get; set; }
+    /// <summary>Gap between the fabric edge and the post face (along the rail).</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public double PostClearance { get; set; }
+    /// <summary>Material text (IFC / DB).</summary>
+    public string Material { get; set; } = "";
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? Unresolved { get; set; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
@@ -140,6 +179,14 @@ public sealed class PedestrianRailingDefinition
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public RailPostDefinition? Post { get; set; }
     public List<RailMemberDefinition> Members { get; set; } = new();
+    /// <summary>See-through fence fabric between the posts (null = none).</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public RailFabricDefinition? Fabric { get; set; }
+
+    /// <summary>OPTIONAL: the plans show the posts / handrail / fence (only sizes or the fabric type are open): their UNRESOLVED flags are
+    /// <c>Assumption.DimensionOnly</c> (the parts stay on their normal viewport layers). The envelope flag stays a plain UNRESOLVED.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public bool FlagsDimensionOnly { get; set; }
 
     /// <summary>Plan length of the run along the reference line, for the check (null = none).</summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]

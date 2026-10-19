@@ -770,7 +770,7 @@ public static class ModelDatabase
             PartCategory.ArchStiffener => "stiffener", PartCategory.PtStrand => "PT strand", PartCategory.PtAnchorage => "PT anchorage",
             PartCategory.RolledTee => "tee", PartCategory.AccessDoor => "access door",
             PartCategory.RailPost => "railing post", PartCategory.RailHandrail => "handrail", PartCategory.RailMember => "rail member",
-            PartCategory.RailBasePlate => "post base plate", PartCategory.RailEnvelope => "railing envelope",
+            PartCategory.RailBasePlate => "post base plate", PartCategory.RailEnvelope => "railing envelope", PartCategory.RailFabric => "railing fence fabric",
             PartCategory.EndPlate => "end plate", PartCategory.ConnectorPlate => "connector plate", PartCategory.DiaphragmPlate => "connection diaphragm plate",
             PartCategory.ContinuityPlate => "mill-to-bear plate", PartCategory.CoverPlate => "cover plate", PartCategory.HandholeCover => "handhole cover",
             PartCategory.HandholeBacking => "handhole backing plate", PartCategory.MeshScreen => "wire mesh screen",

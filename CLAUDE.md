@@ -908,6 +908,14 @@ UNRESOLVED FLAG (general, reusable): `SBM.Core/Assumption.cs` `Assumption{Status
   `SteelAssembly.PredefinedType/ObjectType`, `SteelPart.Density`. IFC: one IfcRailing per run (GUARDRAIL / HANDRAIL / FENCE / BALUSTRADE, ObjectType = type
   name) aggregating IfcMember POST / MEMBER, IfcRailing HANDRAIL, IfcPlate BASE_PLATE, IfcRailing 'RAILING_ENVELOPE', anchor IfcMechanicalFastener.
   Database: group "Pedestrian railings" > assemblies "pedestrian railing". Viewport layer 3D-PED-RAILING; quantity table rows by type (LF). Tests `PedestrianRailingTests`.
+  FENCE FABRIC + post grid (2026-10-19): `PedestrianRailingDefinition.Fabric` (`RailFabricDefinition`: `Path` = section polyline bottom to top, e.g. the post's outer face,
+  `OffsetFromPost` to its right-hand = outward side, `BottomH` / `TopH` height range, `Thickness`, `MassPerArea`, `PostClearance`, `Unresolved` / `Basis`) -> one thin
+  panel (`PartCategory.RailFabric`, appended; density = MassPerArea / Thickness, so Mass = area x MassPerArea) per bay between consecutive posts, the end bays to the run
+  ends; viewport layer 3D-PED-RAILING-FABRIC drawn see-through (`SceneBuilder.FabricOpacity` 0.22), IFC IfcPlate USERDEFINED 'FENCE_FABRIC' aggregated in the run's
+  IfcRailing (Kind Fence = IFC4.3 FENCE), DB class IFCPLATE 'railing fence fabric', table row "PEDESTRIAN RAILING FENCE FABRIC" (SF). `RailPostDefinition.GridStation` = posts on
+  the radial lines at `GridStation + k x Spacing` measured ALONG THE ALIGNMENT (plan elevations lay posts out on the centerline; run ends included, 1 mm), else equal
+  spacing from the run ends. `PedestrianRailingDefinition.FlagsDimensionOnly` = post / handrail / fabric flags are `Assumption.DimensionOnly` (normal layers; the envelope
+  flag stays a plain UNRESOLVED). `RailingRun` gains `FabricPanels / FabricArea / FabricMass / PostStations`.
 - Curbs: custom barrier with `BarrierDefinition.IsCurb` (OPTIONAL) -> solids "Left/Right curb", IFC IfcKerb (USERDEFINED, ObjectType = ProfileName), DB category "curb".
 - Sealed joints without blockout (OPTIONAL `ExpansionJointDefinition` fields): `ExpansionJointType.Sealed` (appended), `BlockoutWidth` 0 = no blockout (deck not
   cut back, no blockout element in IFC / DB), `BodyCentered` (device envelope +-GapAt50F/2 about the deck-end line, for plans that dimension the slab to the
@@ -953,9 +961,17 @@ UNRESOLVED FLAG (general, reusable): `SBM.Core/Assumption.cs` `Assumption{Status
   IFC: validate_ifc 0 schema / EXPRESS issues, new products mesh closed (BS-EJCP sleeve anchors 1.03 volume ratio = tiny Pset mass rounding).
 - NHT railing / curbs / joints / mow strips: `samples/plans/rail-joints-nht.csx` (hooked at the end of build-nht.csx before its regeneration and in arch-nht.csx
   before its final regeneration; works on whatever NHT bridges exist). Curbs 10" x 4" with 3/4" chamfers (p.89, 113, 83). RAIL (PED) LOW / HIGH on the curb
-  line (7'-0 from CL NHT = the p.84-88 "face of rail", LF reproduced to 0.006 ft per side), sections from the p.89 page VECTORS (1.5 pt/in) as flagged
-  envelopes (posts / spacing / plates / anchors UNRESOLVED: railing detail sheets not in the set, p.84 note 2 "diagrammatic"), mass = p.83 design dead load
-  50 / 100 PLF, handrail top 3'-0 (dimensioned, pipe scaled). SEJ-B(MOD) / BS-EJCP / IGTS and T80SS(MOD): see "NHT TxDOT standards" above (the 4 in
+  line (7'-0 from CL NHT = the p.84-88 "face of rail", LF reproduced to 0.006 ft per side). SINCE 2026-10-19 (user: "Northaven fence is still solid") NO envelope:
+  posts + see-through fence fabric + handrail. POST LAYOUT read on the p.85-88 elevation vectors (1" = 20', 3.6 pt/ft): post symbols (double lines 1.8 pt = 6" apart) every
+  28.8 pt = 8.00 ft on CL NHT stations, one unbroken grid per run, not tied to the joints; LOW grid 20+51.74 (2.44 ft after the begin-of-rail line 20+49.30, last low
+  post 23+31.74 = 7.0-7.5 ft before the transition), HIGH grid starts WITH a post at the transition 23+38.74 and runs through the arch to 29+06.74 (rail end 29+10.87:
+  4.13-4.19 ft open end bay); match-line scatter +-0.5 ft in the low grid. Posts = p.89 side outline (1.5 pt/in vectors; 4'-3 / 9'-10 dimensioned) x 6" thick (the only
+  plan value: the elevation symbol width), `GridStation`; flagged `Assumption.UnresolvedDimension` (stay on 3D-PED-RAILING): thickness, base plates, anchors, rails
+  (detail sheets 224-226 not in the set, p.84 note 2 "diagrammatic"). Fabric (`RailFabricDefinition`, layer 3D-PED-RAILING-FABRIC): the elevations draw a panel in every bay
+  (fence exists; type NOT given: no pay item, p.89 only refers to the missing sheets) -> chain link GUESS (user's suggestion) 9 ga (0.148") 2 in mesh, 0.40 lb/ft2 nominal,
+  2 wire diameters thick, on the outer face of the posts (handrail bracket on the trail side), curb top to post top (HIGH: follows the curved top); flagged dimension-only.
+  Handrail top 3'-0 (dimensioned, pipe scaled, wall unresolved: weight not counted). Modeled mass 53.8 PLF LOW / 105.0 PLF HIGH vs the p.83 design dead load 50 / 100 PLF
+  (check-nht INFO; fabric only 1.5 / 3.8 PLF; 216 posts, 228 panels). Handoff 1.1 / 9a. SEJ-B(MOD) / BS-EJCP / IGTS and T80SS(MOD): see "NHT TxDOT standards" above (the 4 in
   placeholder of 2026-10-12 morning is replaced). Mow strips 2'-0 x 4" at the 12 approach piers (6.12 CY vs 6.1, top EL. D + 1'-0 flagged).
   The older GAP lines in build-nht.csx about rail / curb / joints / mow strips are superseded by this script's output.
 - NHT model check: `check-nht.csx` 796 PASS / 4 FAIL (2026-10-12; the 4 = arch pier cap / column CY vs the p.102 quantity table, +-0.3 CY; section 6 = reinforcing:

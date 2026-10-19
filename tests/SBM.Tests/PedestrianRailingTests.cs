@@ -94,6 +94,47 @@ public class PedestrianRailingTests
         Assert.Equal("TEST RAIL", asm.ObjectType);
     }
 
+    [Fact]
+    public void Railing_PostsOnAlignmentGrid_FabricPanelPerBay_SeeThroughMass()
+    {
+        var probe = SampleProject.Create().Bridges[0];
+        double off = probe.Deck.RightEdgeOffset - CurbW;
+        var r = Rail(null, off);
+        r.Envelope = null; r.EnvelopeMassPerLength = 0;
+        r.Members.Clear();
+        double g0 = probe.Supports[0].Station + Ft(10);
+        r.Post!.BasePlate = null; r.Post.GridStation = g0; r.Post.Spacing = Ft(8); r.Post.Thickness = In(6);
+        double th = In(0.3), mpa = 1.95;
+        r.Fabric = new RailFabricDefinition
+        {
+            Description = "test fabric", Path = new() { new(In(8), 0), new(In(8), In(42)) }, OffsetFromPost = th / 2, BottomH = 0, Thickness = th, MassPerArea = mpa,
+            Unresolved = "UNRESOLVED (test): type", Basis = "test", Material = "Chain link",
+        };
+        r.FlagsDimensionOnly = true;
+        r.Post.Unresolved = "UNRESOLVED (test): thickness"; r.Post.Basis = "test";
+        var (f, c, p) = Build(r);
+        var rm = PedestrianRailingGenerator.Generate(f, c, p.Units);
+        var run = Assert.Single(rm.Runs);
+        // posts on the 8'-0 grid of CL stations, k integer, inside the run
+        Assert.True(run.Posts >= 3);
+        foreach (double st in run.PostStations) Assert.True(Math.Abs(((st - g0) / Ft(8)) - Math.Round((st - g0) / Ft(8))) < 1e-3);
+        for (int i = 1; i < run.PostStations.Count; i++) Assert.Equal(Ft(8), run.PostStations[i] - run.PostStations[i - 1], 3);
+        // one panel per bay (both end bays; a post exactly on an end would drop one)
+        var fab = rm.Parts.Where(x => x.Category == PartCategory.RailFabric).ToList();
+        Assert.InRange(fab.Count, run.Posts - 1, run.Posts + 1);
+        Assert.Equal(fab.Count, run.FabricPanels);
+        // mass = area x mass per area; area = panel height x its length (the curved line adds a little)
+        Assert.Equal(fab.Sum(x => x.Mass), run.FabricMass, 6);
+        Assert.Equal(mpa * run.FabricArea, run.FabricMass, 3);
+        Assert.InRange(run.FabricArea, 0.9 * In(42) * (run.Length - run.Posts * In(6)), 1.01 * In(42) * run.Length);
+        // flags: dimension-only (normal layer), fabric and posts
+        Assert.All(fab, x => Assert.True(x.Assumption is { DimensionOnly: true }));
+        Assert.All(rm.Parts.Where(x => x.Category == PartCategory.RailPost), x => Assert.True(x.Assumption is { DimensionOnly: true }));
+        // the fabric stands on the outer face of the posts (R >= 8 in)
+        foreach (var v in fab[0].Mesh.Positions) Assert.True(f.Alignment.Inverse(v.XY).Offset >= off + In(8) - 1e-3);
+        Assert.True(SteelModel.IsRailing(PartCategory.RailFabric));
+    }
+
     private static double MeshBuilderArea(List<RailPoint> pts) => SBM.Core.Solids.MeshBuilder.SignedArea(pts.Select(q => new Vec2(q.R, q.H)).ToList());
 
     [Fact]
