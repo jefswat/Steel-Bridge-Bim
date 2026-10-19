@@ -184,6 +184,7 @@ public static class IfcExporter
                 PartCategory.Grating => (0.6, 0.62, 0.66),
                 PartCategory.WalkwayStringer or PartCategory.WalkwayPost or PartCategory.WalkwayRail or PartCategory.WalkwayPlate => (0.45, 0.7, 0.5),
                 PartCategory.RailPost or PartCategory.RailHandrail or PartCategory.RailMember or PartCategory.RailBasePlate or PartCategory.RailEnvelope => (0.78, 0.80, 0.84),
+                PartCategory.RailFabric => (0.62, 0.70, 0.78),
                 PartCategory.JointArmor or PartCategory.JointCoverPlate => (0.50, 0.52, 0.56),
                 PartCategory.JointStud or PartCategory.JointAnchor => (0.62, 0.62, 0.62),
                 _ => (0.95, 0.3, 0.2),
@@ -1236,6 +1237,7 @@ public static class IfcExporter
                     PartCategory.RailHandrail => w.Add("IFCRAILING", $"{common},$,{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.HANDRAIL."),
                     PartCategory.RailMember => w.Add("IFCMEMBER", $"{common},$,{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.MEMBER."),
                     PartCategory.RailBasePlate => w.Add("IFCPLATE", $"{common},$,{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.BASE_PLATE."),
+                    PartCategory.RailFabric => w.Add("IFCPLATE", $"{common},'FENCE_FABRIC',{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.USERDEFINED."),
                     PartCategory.RailEnvelope => w.Add("IFCRAILING", $"{common},'RAILING_ENVELOPE',{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.USERDEFINED."),
                     // Expansion joint hardware (OPTIONAL armor / cover plates): plates, stud anchors, cover plate sleeve anchors.
                     PartCategory.JointArmor => w.Add("IFCPLATE", $"{common},'JOINT_ARMOR_PLATE',{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.USERDEFINED."),

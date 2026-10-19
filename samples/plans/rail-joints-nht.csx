@@ -82,9 +82,9 @@ double hrOd = In(1.87);
 RailMemberDefinition Handrail(double rIn) => new()
 {
     Name = "HR", Kind = RailMemberKind.Handrail, Diameter = hrOd, Center = new RailPoint(In(rIn), In(36 - 4) - hrOd / 2), Description = "Handrail pipe, 1.87\" OD scaled (p.89)",
-    MassPerLength = 0,
+    MassPerLength = 0,                                  // pipe wall unresolved: its weight is not counted (reported in check-nht)
     Unresolved = "UNRESOLVED (p.89): handrail pipe size, wall and bracket - drawn only; the 'Pedestrian railing details' sheets are not in the set",
-    Basis = "pipe OD 1.87\" and position scaled from the p.89 vectors; top 3'-0 above the trail (dimensioned); mass inside the plan design dead load of the envelope",
+    Basis = "pipe OD 1.87\" and position scaled from the p.89 vectors; top 3'-0 above the trail (dimensioned); wall unknown: modeled solid, weight not counted",
 };
 // TxDOT standard check (2026-10-12, C:\SBM\dist\standards): the Northaven RAIL (PED)(LOW) / (HIGH) is NOT a TxDOT standard rail type. RL-PR11 / PR22 are 3'-6 high
 // galvanized A36 plate posts (PL 3/4 / PL 5/8) carrying 5-6 HSS rails (PR22 on a 1'-1 parapet), RL-PR3 is 4'-0 concrete pilasters with HSS + square bars on a
@@ -93,21 +93,56 @@ RailMemberDefinition Handrail(double rIn) => new()
 // bracket handrail and no HSS rails; the pay item is 5110 (a special specification item, p.91) 'RAIL (PED)(LOW / HIGH)', not Item 450 'RAIL (TY PRxx)'; the
 // p.83 design dead loads 50 / 100 PLF differ from PR11's 30 plf. The only TxDOT pedestrian rail standard in the plan set is PR11(MOD) (p.65-66, sheets 116-117,
 // retaining walls, 3'-6). So the post / fence / anchor details stay on the missing project sheets.
-string why = "the project 'Pedestrian railing details' / RAIL (PED) sheets that size the posts, rails, fencing, base plates and anchors are not in this reduced set (p.89, p.90 refer to them), p.84 note 2 says the number and spacing of the posts is diagrammatic only, and the railing is not a TxDOT standard type (RL-PR3 / PR11 / PR22 / PR3-HD / CLF-RO 2019 checked: 3'-6 / 4'-0 galvanized plate-post or pilaster rails and an 8 ft chain link fence vs the p.89 4'-3 / 9'-10 tapered stainless posts, Item 5110 special pay item)";
-string unrPosts = U("p.84 note 2, p.89, p.90", "railing posts, post spacing, base plates, anchor bolts, rails and fencing", why,
-    "Posts / base plates / anchors not modeled; each run is a continuous envelope of the p.89 post section (flagged) plus the 3'-0 handrail.");
+string why = "the project 'Pedestrian railing details' / RAIL (PED) sheets (bridge sheets 224-226 of the plan index, p.3) that size the posts, rails, fencing, base plates and anchors are not in this reduced set (p.89, p.90 refer to them), and the railing is not a TxDOT standard type (RL-PR3 / PR11 / PR22 / PR3-HD / CLF-RO 2019 checked: 3'-6 / 4'-0 galvanized plate-post or pilaster rails and an 8 ft chain link fence vs the p.89 4'-3 / 9'-10 tapered stainless posts, Item 5110 special pay item)";
+// POST LAYOUT (read 2026-10-19 on the p.85-88 elevation VECTORS, 1" = 20'-0 = 3.6 pt per ft, CL NHT stations): the posts are drawn as double lines 1.8 pt (6") apart,
+// every 28.8 pt = 8.00 ft (all 4 sheets, one unbroken 8'-0 grid per run), NOT at the joints (a post is 1.5 ft from the Pier 4 joint, the rail runs on);
+//   LOW rail: first post 8.8 pt = 2.44 ft after the begin-of-rail line (STA 20+49.30), then 8'-0 to the transition; the last low post is 7.5 ft before the transition.
+//   HIGH rail: the first post stands AT the transition 23+38.74 (p.85 sheet 2), 8'-0 on through the arch span to 29+06.74; the rail ends 4.19 ft (scaled 4.13) beyond
+//   the last post at 29+10.87 (end bay open, drawn to the rail end).  The match-line between the elevation views leaves +-0.5 ft of scatter in the low grid.
+// The elevations are drawn on CL NHT (radial posts), so the generator lays the posts on radial lines at CL stations (GridStation), not equally along the curved curb line.
+const double PostSpacing = 8.0;
+double lowGrid = Sta("20+51.74"), highGrid = Sta("23+38.74");
+// Post thickness along the rail: not dimensioned. The only plan value is the 1.8 pt = 6" the post symbol is drawn apart in the p.85-88 elevations (an elevation
+// symbol at 1" = 20', not necessarily to scale) - used for the solid post, flagged.
+double postT = In(6);
+string unrPost = UnresolvedFlag.Text("p.84 note 2, p.85-88, p.89, p.90", "railing post thickness along the rail, post base plates, anchor bolts and the connection to the curb",
+    "the project 'Pedestrian railing details' sheets (224-226) are not in the set; p.89 draws only the side outline, p.84 note 2 says the number and spacing of the posts is diagrammatic only, and the railing is not a TxDOT standard type");
+// FABRIC: the p.85-88 elevations draw a panel frame between every pair of posts, from the curb to the post top (p.89: 'for railing and fencing details'), so the fence
+// exists; its type (fabric / mesh / wire / opening / material), height range, side of the post, and weight are not given anywhere (sheets 224-226 missing, no fabric
+// pay item on p.91, p.83 gives only the posts / hardware as AISI 316 and a design dead load). Modeled see-through: a 9-gauge (0.148") chain link fabric guess
+// (the user's 'chain link' suggestion), 2 wire diameters thick, on the outer face of the posts (the handrail bracket is on the trail side) from the curb to the
+// post top, nominal 0.40 lb/ft2 (9 ga, 2" mesh); NOT a plan value.
+double fabT = In(2 * 0.148), fabW = 0.40 * 4.88242764;
+string unrFab = UnresolvedFlag.Text("p.89, p.84-88, p.91, p.3", "fence fabric type, height range, side of the posts and weight",
+    "the 'Pedestrian railing details' sheets 224-226 that define the fencing are not in the set (p.89 only says 'for railing and fencing details see ...'); the elevations p.85-88 draw a panel between every pair of posts, no fabric pay item is on p.91",
+    "Chain link guess: 9 gauge (0.148\") 2 in mesh, 0.40 lb/ft2, outer face of the posts from the curb to the post top, 8'-0 bays; drawn see-through.");
+RailFabricDefinition Fabric(IEnumerable<RailPoint> outerFace) => new()
+{
+    Description = "Fence fabric panel (chain link guess, 9 ga 2 in mesh)", Path = outerFace.ToList(), OffsetFromPost = fabT / 2, BottomH = 0, TopH = null, Thickness = fabT,
+    MassPerArea = fabW, PostClearance = 0, Material = "Chain link fabric (type UNRESOLVED; galvanized steel guess)",
+    Unresolved = unrFab, Basis = "chain link guess 9 ga (0.148\") 2 in mesh, 0.40 lb/ft2 nominal, on the outer face of the posts, curb top to post top (the elevations p.85-88 draw the panels full height); not a plan value",
+};
+// outer faces of the two post sections (lowSec[1], lowSec[2]; highSec[1 .. tip]) up to the post tops
+var lowFace = new List<RailPoint> { lowSec[1], lowSec[2] };
+var highFace = highSec.Skip(1).Take(2 + 16 + 1).ToList();
 string unrTrans = U("p.85, p.89", "low-to-high railing transition at STA 23+38.74", "the transition detail is on the missing railing sheets; p.89 gives only the section limits",
-    "The low run ends and the high run begins at the radial line at 23+38.74.");
+    "The low run ends and the high run begins at the radial line at 23+38.74 with the first high post.");
+string unrPostU = U("p.84 note 2, p.85-88, p.89, p.90", "railing post thickness, base plates, anchors, rails and fence fabric type", why,
+    "Posts: p.89 side outline x 6\" (the elevation symbol width), 8'-0 on CL NHT stations as the elevations p.85-88 draw them; fabric chain link guess; no base plates / anchors / rails.");
 PedestrianRailingDefinition Rail(string name, bool high, bool left, double? b0 = null, double? b1 = null) => new()
 {
-    Name = name, TypeName = high ? "RAIL (PED)(HIGH)" : "RAIL (PED)(LOW)", Kind = RailingKind.Guardrail,
+    Name = name, TypeName = high ? "RAIL (PED)(HIGH)" : "RAIL (PED)(LOW)", Kind = RailingKind.Fence,
     Offset = (left ? -1 : 1) * Ft(7), BeginStation = b0, EndStation = b1, BaseProbe = In(5),
-    Material = "Stainless steel AISI 316 (p.83)", Density = 7980,
-    Envelope = high ? highSec : lowSec,
-    EnvelopeMassPerLength = (high ? 100 : 50) * 1.48816394,      // p.83 design dead load (lb/ft -> kg/m), handrail included
-    EnvelopeUnresolved = $"UNRESOLVED (p.84, 89, 90): railing posts / fencing - {why}",
-    EnvelopeBasis = high ? "p.89 HIGH post outline swept continuously (scaled; 9'-10 dimensioned); mass = p.83 design dead load 100 PLF"
-                         : "p.89 LOW post outline swept continuously (scaled; 4'-3 dimensioned); mass = p.83 design dead load 50 PLF",
+    Material = "Stainless steel AISI 316 (p.83)", Density = 7980, FlagsDimensionOnly = true,
+    Post = new RailPostDefinition
+    {
+        Profile = high ? highSec : lowSec, Thickness = postT, Spacing = Ft(PostSpacing), GridStation = high ? highGrid : lowGrid,
+        Description = high ? "Tapered post 9'-10 (p.89 outline x 6\")" : "Tapered post 4'-3 (p.89 outline x 6\")",
+        Unresolved = unrPost,
+        Basis = high ? "p.89 HIGH post outline (scaled; 9'-10 dimensioned) x 6\" thick (the p.85-88 elevation symbol width), 8'-0 on CL NHT stations from the transition (p.85-88)"
+                     : "p.89 LOW post outline (scaled; 4'-3 dimensioned) x 6\" thick (the p.85-88 elevation symbol width), 8'-0 on CL NHT stations from 2.44 ft after the begin of rail (p.85-88)",
+    },
+    Fabric = Fabric(high ? highFace : lowFace),
     Members = { Handrail(high ? Rx(857.65, 856.7) : Rx(472.1, 471.1)) },
     Source = "p.83, 84-88, 89, 90, 91",
 };
@@ -140,7 +175,7 @@ if (arch != null)
     }
 }
 foreach (var b in nht.Where(x => x.Railings != null)) foreach (var r in b.Railings!) { r.Unresolved.Clear(); }
-if (units.FirstOrDefault()?.Railings?.FirstOrDefault() is { } r0) { r0.Unresolved.Add(unrPosts); }
+if (units.FirstOrDefault()?.Railings?.FirstOrDefault() is { } r0) { r0.Unresolved.Add(unrPostU); }
 if (units.FirstOrDefault(b => b.Name == "NHT Unit 3")?.Railings?.FirstOrDefault(r => r.Name == "High LT") is { } r3) r3.Unresolved.Add(unrTrans);
 
 // ================================================================ 3. expansion joints SEJ-B(MOD) 4" + BS-EJCP cover plate + IGTS thickened slab ends

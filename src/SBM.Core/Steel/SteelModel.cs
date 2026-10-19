@@ -28,6 +28,8 @@ public enum PartCategory
     // Expansion joint hardware (appended; OPTIONAL ExpansionJointDefinition.Armor / CoverPlate): armor plates with seal retainer bars, armor stud anchors,
     // walkway cover plates, cover plate anchors. Paid by the joint length / as misc steel: excluded from SteelMass.
     JointArmor, JointStud, JointCoverPlate, JointAnchor,
+    // Pedestrian railing fence fabric (appended; OPTIONAL PedestrianRailingDefinition.Fabric): one thin panel per bay, drawn see-through.
+    RailFabric,
 }
 
 public enum AssemblyKind { GirderFieldSection, CrossFrame, Bearing, FieldSplice, LateralBracing, InspectionCable, InspectionWalkway,
@@ -178,7 +180,7 @@ public sealed class SteelModel
 
     public double SteelMass => Parts.Where(p => p.Category is not (PartCategory.BearingPad or PartCategory.Weld or PartCategory.BearingDisc or PartCategory.Ptfe or PartCategory.CableConnector or PartCategory.PtStrand or PartCategory.PtAnchorage) && !IsRailing(p.Category) && !IsJointHardware(p.Category)).Sum(p => p.Mass);
     /// <summary>Pedestrian railing parts (not structural steel).</summary>
-    public static bool IsRailing(PartCategory c) => c is PartCategory.RailPost or PartCategory.RailHandrail or PartCategory.RailMember or PartCategory.RailBasePlate or PartCategory.RailEnvelope;
+    public static bool IsRailing(PartCategory c) => c is PartCategory.RailPost or PartCategory.RailHandrail or PartCategory.RailMember or PartCategory.RailBasePlate or PartCategory.RailEnvelope or PartCategory.RailFabric;
     /// <summary>Expansion joint hardware parts (armor, studs, cover plates, anchors; not structural steel).</summary>
     public static bool IsJointHardware(PartCategory c) => c is PartCategory.JointArmor or PartCategory.JointStud or PartCategory.JointCoverPlate or PartCategory.JointAnchor;
     /// <summary>Pedestrian railing runs built into this model (<c>BridgeDefinition.Railings</c>; null = none).</summary>

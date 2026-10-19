@@ -297,7 +297,17 @@ double UnitLf(string unit, string type) => runsB.Where(x => x.n == unit && x.r.T
 Print($"INFO  p.91 per unit, LOW: Unit 1 model {UnitLf("NHT Unit 1", "RAIL (PED)(LOW)"):0.00} / plan 215.8, Unit 2 {UnitLf("NHT Unit 2", "RAIL (PED)(LOW)"):0.00} / 194.0, Unit 3 {UnitLf("NHT Unit 3", "RAIL (PED)(LOW)"):0.00} / 169.2");
 Print($"INFO  p.91 per unit, HIGH: Unit 3 model {UnitLf("NHT Unit 3", "RAIL (PED)(HIGH)"):0.00} / plan 156.4, Unit 4 {UnitLf("NHT Unit 4", "RAIL (PED)(HIGH)"):0.00} / 152.9 + 91.7 = 244.6, Unit 5 {UnitLf("NHT Unit 5", "RAIL (PED)(HIGH)"):0.00} / 336.0"
     + (archBuilt ? $", arch {allNht.Where(n => Doc.Bridge(n).Arch != null).Sum(n => UnitLf(n, "RAIL (PED)(HIGH)")):0.00} / 407.2" : ""));
-Print($"INFO  RAIL (PED) type: not a TxDOT standard (RL-PR3 / PR11 / PR22 / PR3-HD / CLF-RO checked, see rail-joints-nht.csx); runs {runs.Count}, posts modeled {runs.Sum(r => r.Posts)} (posts / spacing UNRESOLVED U14, p.84 note 2), mass {runs.Sum(r => r.Mass) * 2.20462:N0} lb (p.83 design dead load 50 / 100 PLF)");
+// Posts / fence (2026-10-19): the envelope is replaced by posts at the p.85-88 elevation layout (8'-0 on CL NHT stations; LOW grid 20+51.74, HIGH grid 23+38.74) + fence fabric panels.
+var allPostSt = runs.SelectMany(r => r.PostStations.Zip(r.PostStations.Skip(1), (p, q) => (q - p) / ft)).ToList();
+Print($"INFO  RAIL (PED) type: not a TxDOT standard (RL-PR3 / PR11 / PR22 / PR3-HD / CLF-RO checked, see rail-joints-nht.csx); runs {runs.Count}, posts modeled {runs.Sum(r => r.Posts)} (post thickness / base plates / anchors UNRESOLVED U14, p.84 note 2 'diagrammatic'), fence fabric panels {runs.Sum(r => r.FabricPanels)}");
+Print($"INFO  post spacing along CL NHT (p.85-88 elevations 28.8 pt = 8.00 ft): min {(allPostSt.Count > 0 ? allPostSt.Min() : 0):0.000} max {(allPostSt.Count > 0 ? allPostSt.Max() : 0):0.000} ft");
+foreach (var (type, dl) in new[] { ("RAIL (PED)(LOW)", 50.0), ("RAIL (PED)(HIGH)", 100.0) })
+{
+    var rr = runs.Where(r => r.TypeName == type).ToList();
+    double lf = rr.Sum(r => r.Length) / ft;
+    if (lf <= 0) continue;
+    Print($"INFO  {type}: modeled mass {rr.Sum(r => r.Mass) * 2.20462 / lf:0.0} PLF (posts, handrail pipe weight not counted, fabric {rr.Sum(r => r.FabricMass) * 2.20462 / lf:0.0} PLF at the nominal 0.40 lb/ft2 chain link guess) vs the p.83 design dead load {dl:0} PLF ({rr.Sum(r => r.FabricArea) / (ft * ft):N0} sf of fabric, {rr.Sum(r => r.Posts)} posts)");
+}
 // curbs: 10" x 4" with two 3/4" chamfers = 39.44 in2; both sides together run 2 x the CL NHT length of the approach decks (curvature terms cancel) less the cut-back strips
 double curbV = unitNames.Sum(n => Doc.Model(n).Concrete?.Barriers.Where(x => x.Name.EndsWith("curb")).Sum(x => Math.Abs(x.Mesh.Volume())) ?? 0) / Math.Pow(ft, 3);
 double curbA = (10 * 4 - 2 * 0.5 * 0.75 * 0.75) / 144.0;

@@ -186,6 +186,7 @@ public static class SceneBuilder
         ("3D-ARCH-KNUCKLES", 235, 185, 70, new[] { PartCategory.KnucklePlate }),
         ("3D-ARCH-FORM-DECK", 175, 180, 190, new[] { PartCategory.FormDeck }),
         ("3D-PED-RAILING", 200, 205, 215, new[] { PartCategory.RailPost, PartCategory.RailHandrail, PartCategory.RailMember, PartCategory.RailBasePlate, PartCategory.RailEnvelope }),
+        ("3D-PED-RAILING-FABRIC", 160, 175, 190, new[] { PartCategory.RailFabric }),   // see-through (FabricOpacity)
         ("3D-PIER-CAP-PLATES", 95, 150, 215, new[] { PartCategory.EndPlate, PartCategory.ConnectorPlate, PartCategory.DiaphragmPlate, PartCategory.ContinuityPlate, PartCategory.CoverPlate }),
         ("3D-PIER-CAP-HANDHOLES", 225, 170, 90, new[] { PartCategory.HandholeCover, PartCategory.HandholeBacking }),
         ("3D-PIER-CAP-SCREENS", 190, 190, 195, new[] { PartCategory.MeshScreen }),
@@ -197,6 +198,8 @@ public static class SceneBuilder
     private static (long, long) Tile(Vec3 p) => ((long)Math.Floor(p.X / TileSize), (long)Math.Floor(p.Y / TileSize));
     private static Vec3 Center(Mesh m) { var b = m.Bounds(); return (b.Min + b.Max) * 0.5; }
 
+    /// <summary>Opacity of the railing fence fabric layer (see-through, below the deck's 0.35).</summary>
+    public const float FabricOpacity = 0.22f;
     public const string BoltLayer = "3D-BOLTS";
     public const string StudLayer = "3D-STUDS";
     public const string AnchorLayer = "3D-ANCHOR-BOLTS";
@@ -239,6 +242,7 @@ public static class SceneBuilder
                 // Triangle counts with / without holes (the memory planner scales the buffer by them).
                 long full = parts.Sum(p => (long)p.Mesh.TriangleCount), free = parts.Sum(p => (long)MeshLod.HoleFreeTriangles(p.Mesh));
                 layers[i] = new SolidLayer { Name = name, R = r, G = g, B = b, Parts = new() { (mesh, null) }, Triangles = mesh.Indices!.Count / 3,
+                    Opacity = name == "3D-PED-RAILING-FABRIC" ? FabricOpacity : 1f,
                     PartHoleTriangles = new() { (full, free) } };
                 return;
             }
