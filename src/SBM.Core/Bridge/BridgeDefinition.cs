@@ -1003,12 +1003,17 @@ public sealed class StiffenerDefinition
     public double IntermediateBottomGap { get; set; } = In(2);
     public double WeldSize { get; set; } = In(0.25);
     public double FlangeToWebWeld { get; set; } = In(5.0 / 16);
+    /// <summary>OPTIONAL (false = off, omitted from the file): a stiffener plate wider than the TOP flange (sized for the wider bottom flange, e.g. the
+    /// abutment bearing / jacking stiffeners of the Iowa DOT 1617 plans, p.32 Sect. A-A) has its outer top corner clipped 45 degrees back to the top flange edge, and its
+    /// top weld stops at the flange edge (nothing is welded to air).</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    public bool ClipToTopFlange { get; set; }
     public StiffenerDefinition Clone() => new()
     {
         BearingStiffener = BearingStiffener.Clone(), ConnectionPlate = ConnectionPlate.Clone(),
         IntermediateMaxSpacing = IntermediateMaxSpacing, IntermediateStiffener = IntermediateStiffener.Clone(),
         IntermediateSide = IntermediateSide, CornerClip = CornerClip, IntermediateBottomGap = IntermediateBottomGap,
-        WeldSize = WeldSize, FlangeToWebWeld = FlangeToWebWeld,
+        WeldSize = WeldSize, FlangeToWebWeld = FlangeToWebWeld, ClipToTopFlange = ClipToTopFlange,
     };
 }
 

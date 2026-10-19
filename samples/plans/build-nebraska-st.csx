@@ -236,6 +236,7 @@ br.Stiffeners.ConnectionPlate = new PlateSize(I(7.5), I(0.5));
 br.Stiffeners.IntermediateStiffener = new PlateSize(I(6.5), I(7.0 / 16));
 br.Stiffeners.IntermediateMaxSpacing = Ft(12);    // panels 20'-5 .. 23'-6 between frames -> one stiffener at mid panel (equal spaces, p.27)
 br.Stiffeners.CornerClip = I(1.5);
+br.Stiffeners.ClipToTopFlange = true;   // p.32 Sect. A-A: bearing / jacking stiffeners sized for the bottom flange overhang the narrower top flange at the abutments (1.78" S, ~0.8" N); outer top corner clipped 45 deg to the flange edge, top weld stops there
 br.Stiffeners.FlangeToWebWeld = I(5.0 / 16);
 U("p.27", "first intermediate stiffener at the abutments '9'-6 (TYP.)' from the CL bearing", "the plan note says equal spaces between cross frames, but the abutment panels show 9'-6 to the first stiffener without the rest of the chain",
     "Modeled at equal spaces (mid panel) like every other panel.");
@@ -290,6 +291,7 @@ br.CrossFrames.Styles = new()
 };
 br.CrossFrames.Styles[0].Unresolved = new() { "studs 7/8 x 5 on the W24x68 strut (7 eq. spa., p.33 Section A-A) are not modeled" };
 br.CrossFrames.IntermediateStyle = "INT";
+br.CrossFrames.Orientation = CrossFrameOrientation.NormalToGirders;   // p.27: intermediate cross frames 90 deg 00'00" (TYP.) to the girders (span 3 "with respect to the local tangent"); only the pier 1 frame sits on the pier line
 br.CrossFrames.SupportStyles = new() { ["S. Abut."] = "ABUT", ["Pier 1"] = "INT", ["N. Abut."] = "ABUT" };   // Pier 2: girders frame into the cap (no support frames)
 Doc.Project.Bridges.Add(br);
 
@@ -305,7 +307,7 @@ var cap = new IntegralSteelCapDefinition
     Members = 2, WebOffset = I(10 + 3.0 / 16), WebDepth = I(90), WebThickness = I(7.0 / 8),
     TopFlange = new PlateSize(I(20), I(1.75)), BottomFlange = new PlateSize(I(20), I(1.75)), PlanFlangeGap = I(3.0 / 16),
     Material = "ASTM A709 Gr. HPS 70W", SecondaryMaterial = "ASTM A709 Gr. 50W",
-    BearingStiffener = new PlateSize(I(9), I(1.5)), JackingStiffenerOffset = F(5, 6), StiffenerClip = I(1), StiffenerTopNoWeld = I(4.375), StiffenerWeld = I(5.0 / 16),
+    BearingStiffener = new PlateSize(I(9), I(1.5)), JackingStiffenerOffset = F(5, 6), StiffenerClip = I(1), StiffenerTopNoWeld = I(4.375), StiffenerWeld = I(5.0 / 16), StiffenerBottomWeld = true,   // p.31 B-B / C-C: 5/16 + 5/16 at the bottom (mill to bear), 4 3/8 no weld at the top
     StudLength = I(9),
 };
 // camber diagram (p.29): from the chord between the CL bearings, 6 spa @ 7'-10, tolerances (-0, +x)
@@ -355,6 +357,8 @@ foreach (var (k, toGirder, n2, gap4) in new[] { (0, 67.8125, 19, 4.8125), (1, 88
 var conn = new CapGirderConnection
 {
     EndPlateThickness = I(0.5), ConnectorPlateThickness = I(0.5), DiaphragmPlateThickness = I(0.75), BottomPlate = new PlateSize(I(24), I(2.5)),
+    BottomPlateWeld = I(5.0 / 16),   // p.30 elevation "5/16 + 5/16, mill to bear" at the PL 2 1/2 x 24
+    DiaphragmWeld = I(0.25),         // p.30 weld symbols PL 3/4 to the connector plates carry NO size: drawn at 1/4" and flagged UNRESOLVED (dimension only)
     TopFlangeEndBeyondCapFlange = I(1), CopeRadius = I(2), CopeClearance = 0,
     OuterSplicePlate = new PlateSize(I(24), I(1.375)), InnerSplicePlate = new PlateSize(I(11), I(1.375)), InnerPlateFromWeb = I(1),
     SplicePlateEndDistance = I(1.5), SpliceStudLength = I(4), PlanCapFlangeToGirderFlangeTop = I(4.25),
@@ -568,17 +572,24 @@ double ChordS(int k)
                 fd.Piles.Add(new FootingPoint(Ft(ps), Ft(pn)) { BatterDirN = Math.Abs(pn) > 6 ? Math.Sign(pn) : 0 });
         sd.Footings.Add(fd);
     }
-    // end walls (p.9 / p.15): 4" thick (S) x 3'-7 5/8 (N) at both cap ends, 7'-7 (col 1 end) / 8'-4 1/2 (col 2 end) above the cap top
+    // MASKWALLS (p.9 pier elevation / plan; p.14 "MASKWALLS" concrete quantity 2.7 CY and bars 5c5 "MASKWALL HORIZONTAL" / 5d7 "MASKWALL VERTICAL"; the plans do
+    // not use the word "end wall" or "checkwall"): one at each cap end, square to the CL pier (cap frame), 12" thick along the pier line = 8" at the full cap width
+    // 4'-11 5/8 (inner) + the 4" reveal projection 3'-7 5/8 wide (outer, 8" notches each side, the same projection as the columns), rising 7'-7 (col 1 end) /
+    // 8'-4 1/2 (col 2 end) above the cap top 1115.03 at the OUTER face; the top slopes down 1/2" to the inner face (drawn as one straight line). Volume 36 cf each,
+    // 2 x 36 = 2.7 CY = the p.14 quantity. The barrier bump-out ends above them are square to the deck edge (p.43 Detail C) - the plans' own skew difference.
+    double mwFull = L("4'-11 5/8"), mwProj = L("3'-7 5/8"), mwOut = I(4), mwIn = I(12), mwSlope = I(0.5) / I(12);
     sd.CapBlocks = new()
     {
-        new CapBlockDefinition { Name = "end wall (column 1 end)", Kind = CapBlockKind.Cap, Base = CapBlockBase.CapTop, TopElevation = Ft(1115.03) + F(7, 7),
-            Outline = { new(s0, -L("3'-7 5/8") / 2), new(s0 + I(4), -L("3'-7 5/8") / 2), new(s0 + I(4), L("3'-7 5/8") / 2), new(s0, L("3'-7 5/8") / 2) }, Source = "p.9 pier elevation / plan" },
-        new CapBlockDefinition { Name = "end wall (column 2 end)", Kind = CapBlockKind.Cap, Base = CapBlockBase.CapTop, TopElevation = Ft(1115.03) + F(8, 4.5),
-            Outline = { new(s1 - I(4), -L("3'-7 5/8") / 2), new(s1, -L("3'-7 5/8") / 2), new(s1, L("3'-7 5/8") / 2), new(s1 - I(4), L("3'-7 5/8") / 2) }, Source = "p.9 pier elevation / plan" },
+        new CapBlockDefinition { Name = "maskwall (column 1 end)", Kind = CapBlockKind.Maskwall, Base = CapBlockBase.CapTop, TopElevation = Ft(1115.03) + F(7, 7), TopRefS = s0, TopSlopeS = -mwSlope,
+            Outline = { new(s0, -mwProj / 2), new(s0 + mwOut, -mwProj / 2), new(s0 + mwOut, -mwFull / 2), new(s0 + mwIn, -mwFull / 2), new(s0 + mwIn, mwFull / 2), new(s0 + mwOut, mwFull / 2), new(s0 + mwOut, mwProj / 2), new(s0, mwProj / 2) },
+            Source = "p.9 pier elevation / plan, p.14 maskwall quantity" },
+        new CapBlockDefinition { Name = "maskwall (column 2 end)", Kind = CapBlockKind.Maskwall, Base = CapBlockBase.CapTop, TopElevation = Ft(1115.03) + F(8, 4.5), TopRefS = s1, TopSlopeS = mwSlope,
+            Outline = { new(s1, -mwProj / 2), new(s1, mwProj / 2), new(s1 - mwOut, mwProj / 2), new(s1 - mwOut, mwFull / 2), new(s1 - mwIn, mwFull / 2), new(s1 - mwIn, -mwFull / 2), new(s1 - mwOut, -mwFull / 2), new(s1 - mwOut, -mwProj / 2) },
+            Source = "p.9 pier elevation / plan, p.14 maskwall quantity" },
     };
     sd.Unresolved = new()
     {
-        SBM.Core.UnresolvedFlag.Text("p.9", "8\" corner notches of the 4\" cap end zones and the 1/2\" top slope of the end walls", "minor shapes", "The cap runs full width to its ends; end walls level."),
+        SBM.Core.UnresolvedFlag.Text("p.9", "8\" corner notches of the 4\" cap end projections", "minor shapes", "The cap runs full width to its ends (the maskwalls carry the plan notch)."),
         SBM.Core.UnresolvedFlag.Text("p.9-11", "terra cotta blockouts (south faces) and the thin brick recesses of the columns / cap", "decorative recesses (terra cotta = LS item 17)", "Not cut into the concrete; thin brick as a surface treatment."),
         SBM.Core.UnresolvedFlag.Text("p.11", "uplift anchors 8f6 at the circled piles (Detail I)", "the circled pile positions are not read", "Not modeled."),
     };

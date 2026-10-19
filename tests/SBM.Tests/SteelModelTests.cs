@@ -105,6 +105,27 @@ public class SteelModelTests
     }
 
     [Fact]
+    public void BearingStiffenerWiderThanTopFlange_ClipToTopFlange_ClipsTheCornerAndStopsTheWeld()
+    {
+        // sample: 16" top flange, 18" bottom flange; an 8 1/2" stiffener plate reaches ~8.3" from the web CL = past the 8" top flange half width, inside the bottom flange
+        void Wide(BridgeDefinition b) => b.Stiffeners.BearingStiffener = new PlateSize(In(8.5), In(1));
+        var (_, off) = Build(Wide);
+        var (_, on) = Build(b => { Wide(b); b.Stiffeners.ClipToTopFlange = true; });
+        var bsOff = off.Parts.First(p => p.Category == PartCategory.BearingStiffener);
+        var bsOn = on.Parts.First(p => p.Mark == bsOff.Mark);
+        Assert.Contains(off.Diagnostics, d => d.Message.Contains("projects beyond the flange edge"));
+        Assert.DoesNotContain(on.Diagnostics, d => d.Message.Contains("projects beyond the flange edge"));
+        Assert.DoesNotContain("clipped", bsOff.Description);
+        Assert.Contains("clipped to the", bsOn.Description);
+        Assert.True(bsOn.Mesh.Volume() < bsOff.Mesh.Volume() - 1e-9, "the outer top corner is clipped off");
+        var wOff = off.Parts.First(p => p.Mark == bsOff.Mark + "-W");
+        var wOn = on.Parts.First(p => p.Mark == bsOff.Mark + "-W");
+        Assert.True(wOn.Mesh.Volume() < wOff.Mesh.Volume(), "the top weld stops at the flange edge");
+        // the default (flag off) leaves every other bridge untouched and the file lean
+        Assert.DoesNotContain("ClipToTopFlange", System.Text.Json.JsonSerializer.Serialize(new StiffenerDefinition()));
+    }
+
+    [Fact]
     public void Bolts_StayClearOfFlanges_AndGussetsClearMembers()
     {
         foreach (var type in new[] { CrossFrameType.XFrame, CrossFrameType.KFrame, CrossFrameType.InvertedKFrame, CrossFrameType.Diaphragm })

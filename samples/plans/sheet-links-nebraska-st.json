@@ -5,7 +5,7 @@
   // Hierarchy in this model: bridge > superstructure > girder G1-G4 (field sections, field splices, bearings) | cross frame group | integral steel cap group
   //   "Integral steel pier cap CAP2" (assembly "integral steel pier cap" = twin I members, stiffeners, cover plates, handhole covers / backing plates,
   //   end screens, studs; assemblies "pier cap connection" per girder = connector / diaphragm / mill-to-bear plates, top splice plates, fills, bolts; the two
-  //   cap bearings); end plates are parts of the girder field sections; bridge > deck > slab / barriers; substructure > Pier 1 (cap, pedestals, end walls,
+  //   cap bearings); end plates are parts of the girder field sections; bridge > deck > slab / barriers; substructure > Pier 1 (cap, pedestals, maskwalls = the cap end walls of p.9 / p.14,
   //   columns, footings, piles), Pier 2 (no cap: pedestals, turned columns, footings, piles), stub abutments; surface treatment groups (thin brick, texture).
   "models": [ "Nebraska St Ramp B.sbm" ],
   "planFolders": [ "plans", "C:/SBMData" ],
@@ -97,12 +97,12 @@
     { "id": "staking", "sheets": "^STAKING DIAGRAM", "role": "general", "basis": "Staking diagram: support lines to the chord between abutments, footing positions",
       "target": [ { "level": "unit" } ] },
 
-    { "id": "pier-1", "sheets": "^PIER NO\\. 1 DETAILS", "basis": "Pier 1: cap, pedestals, end walls, columns, footings, piles and reinforcing",
-      "target": [ { "level": "part", "category": "pier", "support": "Pier 1" } ] },
+    { "id": "pier-1", "sheets": "^PIER NO\\. 1 DETAILS", "basis": "Pier 1: cap, pedestals, maskwalls (cap end walls), columns, footings, piles and reinforcing",
+      "target": [ { "level": "part", "category": "pier", "support": "Pier 1" }, { "level": "element", "category": "maskwall", "support": "Pier 1" } ] },
     { "id": "pier-2", "sheets": "^PIER NO\\. 2 DETAILS", "basis": "Pier 2: two turned columns, pedestals under the cap bearings, footings, piles (no concrete cap)",
       "target": [ { "level": "part", "category": "pier", "support": "Pier 2" }, { "level": "group", "category": "integral steel cap group" } ] },
     { "id": "pier-notes", "sheets": "^PIER DETAILS \\(NOTES", "basis": "Pier notes, footing and pile notes, uplift anchors, bar lists",
-      "target": [ { "level": "element", "category": [ "footing", "pile" ], "support": "Pier%" } ] },
+      "target": [ { "level": "element", "category": [ "footing", "pile", "maskwall" ], "support": "Pier%" } ] },
     { "id": "pier-1-aesthetics", "sheets": "^PIER NO\\. 1 AESTHETIC DETAILS", "basis": "Integral thin veneer brick on the pier 1 columns and cap (Details A / B, mockup)",
       "target": [ { "level": "element", "category": "thin brick", "support": "Pier 1" }, { "level": "group", "category": "surface treatment", "name": "%thin veneer brick%" } ] },
     { "id": "pier-2-aesthetics", "sheets": "^PIER NO\\. 2 AESTHETIC DETAILS", "basis": "Integral thin veneer brick on the pier 2 columns",

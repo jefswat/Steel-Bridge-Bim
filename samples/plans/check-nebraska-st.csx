@@ -258,6 +258,22 @@ foreach (var (unit, plan) in new[] { ("Pier 1", 139.5), ("Pier 2", 130.9), ("S. 
     double v = u.Solids.Where(s => s.IsConcrete && s.Kind != SBM.Core.Substructure.SubElementKind.Pile).Sum(s => Math.Abs(s.Mesh.Volume())) / cyF;
     Row("8 quantities", $"{unit} concrete", plan, v, plan * 0.03, "CY", unit.Contains("Abut") ? "wing extensions / maskwalls not modeled" : "3 % tolerance (chamfers, recesses)", info: unit.Contains("Abut"));
 }
+// Pier 1 maskwalls (p.9 / p.14 "MASKWALLS" 2.7 CY; the plans never say "end wall" / "checkwall"): 12" thick (8" full width + 4" reveal 3'-7 5/8 wide), 7'-7 / 8'-4 1/2 high
+{
+    var mw = sub.Units.First(x => x.Name == "Pier 1").Solids.Where(s => s.Kind == SBM.Core.Substructure.SubElementKind.Maskwall).ToList();
+    Row("8 quantities", "Pier 1 maskwalls (2) concrete", 2.7, mw.Sum(s => Math.Abs(s.Mesh.Volume())) / cyF, 0.1, "CY", "p.14 concrete placement quantities, MASKWALLS; square to CL pier, the barrier bump-out ends above them are square to the deck edge (p.43 Detail C): the plans' own skew difference");
+    Row("8 quantities", "Pier 1 maskwall count", 2, mw.Count, 0, "ea", "p.9: one at each cap end");
+}
+// cross frames (p.27: 90 deg 00'00" TYP. to the girders) and abutment stiffeners clipped to the top flange (p.32 Sect. A-A)
+{
+    Row("9 stiffeners", "connection stiffeners skewed to the flange (parts with a skew in the description)", 0, st.Parts.Count(p => p.Category == PartCategory.ConnectionStiffener && p.Description.Contains("skewed")), 0, "ea", "p.27 cross frames 90 deg to the girders (CrossFrameOrientation.NormalToGirders)");
+    int clipped = st.Parts.Count(p => p.Category == PartCategory.BearingStiffener && p.Description.Contains("clipped to the"));
+    Row("9 stiffeners", "abutment bearing + jacking stiffener pairs clipped to the top flange", 16, clipped, 0, "ea", "p.32 Sect. A-A; (bearing + jacking) x 4 girders x S + N abutment");
+    int bw = st.Parts.Count(p => p.Category == PartCategory.Weld && p.Description.Contains("to the bottom flange (milled to bear"));
+    Row("9 stiffeners", "cap bearing + jacking stiffener welds with the bottom 5/16 fillet", 16, bw, 0, "ea", "p.31 B-B / C-C: 8 bearing + 8 jacking, 4 3/8 no weld at the top");
+    int dpw = st.Parts.Count(p => p.Category == PartCategory.Weld && p.Mark.EndsWith("-DPW") && p.Assumption != null);
+    Text("9 stiffeners", "cap connection welds (diaphragm plate to connector plates), size UNRESOLVED", "unsized (p.30)", $"{dpw} weld parts flagged UNRESOLVED (drawn 1/4 in)", "INFO");
+}
 var cm = md.Concrete;
 if (cm != null)
 {

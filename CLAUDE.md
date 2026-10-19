@@ -920,6 +920,11 @@ UNRESOLVED FLAG (general, reusable): `SBM.Core/Assumption.cs` `Assumption{Status
 - Nebraska St. Ramp B (Iowa DOT Design 1617, "911"; PDF "B00167 - Nebraska Ramp B - Design 116.pdf"): `samples/plans/build-nebraska-st.csx` (sbm new + run) ->
   `Nebraska St Ramp B.sbm`, check `check-nebraska-st.csx`, links `sheet-links-nebraska-st.json`, data `docs/plan-data/nebraska-ramp-b-b00167/`. Placement APPROXIMATE in UTM 14N
   (GPS = CL at STA 2475+52.56, p.27/p.29 north arrows true az 296.262 minus convergence), 3DEP terrain. Pier 2 = integral cap + capless turned columns.
+  Pier 1 "end walls" are the plans' MASKWALLS (p.9, p.14; `CapBlockKind.Maskwall`, 12" = 8" full width + 4" reveal, sloped top, 2.7 CY = plan; square to the pier line, the
+  barrier bump-out ends are 90 deg to the deck edge p.43 Detail C = plans' own skew difference), linked to p.9-11 / p.14. `CrossFrameOrientation.NormalToGirders` (p.27; span 2 spacing
+  still not the plan's 23'-0 5/8 + 22'-9: needs `CrossFrameDefinition.Lines`). `StiffenerDefinition.ClipToTopFlange` (abutment stiffeners wider than the top flange, p.32 Sect. A-A;
+  OPTIONAL, off = unchanged). Cap: `IntegralSteelCapDefinition.StiffenerBottomWeld` (5/16, p.31), `CapGirderConnection.DiaphragmWeld` (drawn 1/4", UNRESOLVED size, p.30) /
+  `BottomPlateWeld` (5/16). Check script section 9; notes `docs/plan-data/nebraska-ramp-b-b00167/SUMMARY.md` ("Review 2026-10-13 items 6-12").
 
 ## Conventions (bridge engineering)
 - Offsets right-positive (Civil 3D). Skew from the radial line; positive = right end of support line up-station.

@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Name": "neb",
+  "Name": "Nebraska St Ramp B",
   "UnitSystem": "US",
   "Foot": "International",
   "Alignments": [
@@ -591,8 +591,8 @@
             "CapProfileAhead": [],
             "CapBlocks": [
               {
-                "Name": "end wall (column 1 end)",
-                "Kind": "Cap",
+                "Name": "maskwall (column 1 end)",
+                "Kind": "Maskwall",
                 "Outline": [
                   {
                     "S": -6.61193389377236,
@@ -605,6 +605,38 @@
                   {
                     "S": -6.510333893772359,
                     "N": -0.5540375000000001,
+                    "BatterDirS": 0,
+                    "BatterDirN": 0,
+                    "WebDirS": 0,
+                    "WebDirN": 0
+                  },
+                  {
+                    "S": -6.510333893772359,
+                    "N": -0.7572375,
+                    "BatterDirS": 0,
+                    "BatterDirN": 0,
+                    "WebDirS": 0,
+                    "WebDirN": 0
+                  },
+                  {
+                    "S": -6.30713389377236,
+                    "N": -0.7572375,
+                    "BatterDirS": 0,
+                    "BatterDirN": 0,
+                    "WebDirS": 0,
+                    "WebDirN": 0
+                  },
+                  {
+                    "S": -6.30713389377236,
+                    "N": 0.7572375,
+                    "BatterDirS": 0,
+                    "BatterDirN": 0,
+                    "WebDirS": 0,
+                    "WebDirN": 0
+                  },
+                  {
+                    "S": -6.510333893772359,
+                    "N": 0.7572375,
                     "BatterDirS": 0,
                     "BatterDirN": 0,
                     "WebDirS": 0,
@@ -629,23 +661,15 @@
                 ],
                 "Base": "CapTop",
                 "TopElevation": 342.172544,
-                "TopRefS": 0,
-                "TopSlopeS": 0,
-                "Source": "p.9 pier elevation / plan"
+                "TopRefS": -6.61193389377236,
+                "TopSlopeS": -0.04166666666666667,
+                "Source": "p.9 pier elevation / plan, p.14 maskwall quantity"
               },
               {
-                "Name": "end wall (column 2 end)",
-                "Kind": "Cap",
+                "Name": "maskwall (column 2 end)",
+                "Kind": "Maskwall",
                 "Outline": [
                   {
-                    "S": 2.217741106227642,
-                    "N": -0.5540375000000001,
-                    "BatterDirS": 0,
-                    "BatterDirN": 0,
-                    "WebDirS": 0,
-                    "WebDirN": 0
-                  },
-                  {
                     "S": 2.319341106227642,
                     "N": -0.5540375000000001,
                     "BatterDirS": 0,
@@ -664,6 +688,46 @@
                   {
                     "S": 2.217741106227642,
                     "N": 0.5540375000000001,
+                    "BatterDirS": 0,
+                    "BatterDirN": 0,
+                    "WebDirS": 0,
+                    "WebDirN": 0
+                  },
+                  {
+                    "S": 2.217741106227642,
+                    "N": 0.7572375,
+                    "BatterDirS": 0,
+                    "BatterDirN": 0,
+                    "WebDirS": 0,
+                    "WebDirN": 0
+                  },
+                  {
+                    "S": 2.014541106227642,
+                    "N": 0.7572375,
+                    "BatterDirS": 0,
+                    "BatterDirN": 0,
+                    "WebDirS": 0,
+                    "WebDirN": 0
+                  },
+                  {
+                    "S": 2.014541106227642,
+                    "N": -0.7572375,
+                    "BatterDirS": 0,
+                    "BatterDirN": 0,
+                    "WebDirS": 0,
+                    "WebDirN": 0
+                  },
+                  {
+                    "S": 2.217741106227642,
+                    "N": -0.7572375,
+                    "BatterDirS": 0,
+                    "BatterDirN": 0,
+                    "WebDirS": 0,
+                    "WebDirN": 0
+                  },
+                  {
+                    "S": 2.217741106227642,
+                    "N": -0.5540375000000001,
                     "BatterDirS": 0,
                     "BatterDirN": 0,
                     "WebDirS": 0,
@@ -672,9 +736,9 @@
                 ],
                 "Base": "CapTop",
                 "TopElevation": 342.41384400000004,
-                "TopRefS": 0,
-                "TopSlopeS": 0,
-                "Source": "p.9 pier elevation / plan"
+                "TopRefS": 2.319341106227642,
+                "TopSlopeS": 0.04166666666666667,
+                "Source": "p.9 pier elevation / plan, p.14 maskwall quantity"
               }
             ],
             "Aesthetics": null,
@@ -1071,7 +1135,7 @@
               "PlanBarSets": []
             },
             "Unresolved": [
-              "UNRESOLVED (p.9): 8\u0022 corner notches of the 4\u0022 cap end zones and the 1/2\u0022 top slope of the end walls - minor shapes. The cap runs full width to its ends; end walls level.",
+              "UNRESOLVED (p.9): 8\u0022 corner notches of the 4\u0022 cap end projections - minor shapes. The cap runs full width to its ends (the maskwalls carry the plan notch).",
               "UNRESOLVED (p.9-11): terra cotta blockouts (south faces) and the thin brick recesses of the columns / cap - decorative recesses (terra cotta = LS item 17). Not cut into the concrete; thin brick as a surface treatment.",
               "UNRESOLVED (p.11): uplift anchors 8f6 at the circled piles (Detail I) - the circled pile positions are not read. Not modeled."
             ]
@@ -1704,6 +1768,7 @@
             "StiffenerClip": 0.0254,
             "StiffenerTopNoWeld": 0.111125,
             "StiffenerWeld": 0.0079375,
+            "StiffenerBottomWeld": true,
             "CoverPlates": [
               {
                 "Top": true,
@@ -2246,6 +2311,8 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.0635
               },
+              "DiaphragmWeld": 0.00635,
+              "BottomPlateWeld": 0.0079375,
               "TopFlangeEndBeyondCapFlange": 0.0254,
               "CopeRadius": 0.0508,
               "CopeClearance": 0,
@@ -5750,7 +5817,7 @@
       "CrossFrames": {
         "IntermediateType": "Auto",
         "SupportType": "Auto",
-        "Orientation": "Auto",
+        "Orientation": "NormalToGirders",
         "Arrangement": "Auto",
         "MaxSpacing": 7.62,
         "MaxBayWidth": 0,
@@ -5861,7 +5928,8 @@
         "CornerClip": 0.038099999999999995,
         "IntermediateBottomGap": 0.0508,
         "WeldSize": 0.00635,
-        "FlangeToWebWeld": 0.0079375
+        "FlangeToWebWeld": 0.0079375,
+        "ClipToTopFlange": true
       },
       "FieldSplices": [
         {

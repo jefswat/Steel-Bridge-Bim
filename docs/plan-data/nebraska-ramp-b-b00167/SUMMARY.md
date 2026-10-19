@@ -229,12 +229,33 @@ steel + slab deflection) - B..D outside the cap tolerance window (-0, +1/16..3/1
   with turned columns: MODELED (`NoCap`, `ColumnRotationDeg`). G4 deflecting support: camber chord includes pier 2; cap camber compared (reported).
   G5 fabrication attributes: MODELED (`BridgeDefinition.Fabrication` rules from fabrication-notes.csv; IFC Pset SBM_FabricationAttributes).
   G6 tapered fills: MODELED (beveled washers as a note). G7 handholes: MODELED.
-- Open: G8 pier 1 sections partly (column with 4" projections, end walls modeled; notches / terra cotta blockouts not), G9 bend diagrams (no bars in
+- Open: G8 pier 1 sections partly (column with 4" projections, maskwalls modeled; cap-end notches / terra cotta blockouts not), G9 bend diagrams (no bars in
   3D), G10 drains / lighting / terra cotta panels / wing extensions / abutment diaphragms / cap haunch concrete, G11 moment table; girder stud
   groups, cap web-flange and end-plate welds (U2 / U3, no size).
 
+### Review 2026-10-13 items 6-12 (Nebraska), fixed 2026-10-19
+- **Pier 1 "end walls" = the plans' MASKWALLS** (p.9 elevation + plan; p.14 "MASKWALLS" concrete 2.7 CY, bars 5c5 "MASKWALL HORIZONTAL" / 5d7 "MASKWALL
+  VERTICAL"; the plans never say "end wall" or "checkwall"). They were `CapBlockKind.Cap` blocks named "end wall" (database category "pier cap"); now
+  `CapBlockKind.Maskwall` (category "maskwall", IFCWALL MASKWALL, group "Pier 1 - maskwall (column N end)"), linked by `sheet-links-nebraska-st.json` to
+  p.9-11 (Pier 1 details) and p.14 (bar list + quantities), never to the abutment sheets. The old geometry was also incomplete: only the 4" x 3'-7 5/8
+  reveal; the plan wall is 12" thick = 8" at the full cap width 4'-11 5/8 (inner) + the 4" reveal 3'-7 5/8 wide (outer, 8" notches), 7'-7 (col 1 end) /
+  8'-4 1/2 (col 2 end) above the cap top at the OUTER face, top sloping down 1/2" to the inner face. Now 36 cf each, 2.7 CY together = the p.14 quantity.
+  Square to the CL pier (6 deg 19'46" to the girders). The barrier bump-out ends above are 90 deg to the deck edge (p.43 Detail C): that 6 deg 19'46" skew
+  difference is as the plans draw it (kept). The real S abutment backwall (3 pours, x 713865) was never moved or duplicated; the user's "S abutment
+  backwall" label could not be reproduced in the regenerated database / pick / IFC (all name "Pier 1 end wall ..." with p.9-11 links) - most likely a stale
+  .sqlite (rebuild the database). The S / N abutment maskwalls / wing extensions stay UNRESOLVED (p.18 / p.20).
+- **Cross frames 90 deg to the girders** (p.27): `CrossFrameOrientation.NormalToGirders` set; all connection stiffener skews 0 (check section 9). Spacing
+  along A: span 1 22'-5 7/16, 6 @ 22'-6, 20'-5 3/8 = p.27; span 3 7 @ 23'-1 1/16 = p.27. Span 2 (pier 1 -> pier 2) does NOT match: model 24'-7 then 22'-6 5/8
+  (equal spaces, 9 panels = 205'-0 5/8) vs plan 23'-0 5/8 then 22'-9 (p.27). Needs `CrossFrameDefinition.Lines` from the plan (not done).
+- **Abutment bearing / jacking stiffeners clipped to the top flange** (p.32 Sect. A-A): generic `StiffenerDefinition.ClipToTopFlange` (outer top corner 45 deg
+  back to the top flange edge, top weld stops there); overhang warnings gone (stiffener still limited by the bottom flange).
+- **Cap stiffener welds (p.31 B-B / C-C)**: `IntegralSteelCapDefinition.StiffenerBottomWeld` = 5/16 on both faces along the milled bottom edge (16 stiffeners,
+  4 3/8 unwelded at the top). Diaphragm plate to connector plate welds (p.30 symbols, no size): `CapGirderConnection.DiaphragmWeld` drawn at 1/4"
+  (placeholder), parts flagged UNRESOLVED (dimension only: "the p.30 Girder Splice weld symbols carry no size"); `BottomPlateWeld` 5/16 (p.30 "5/16 + 5/16
+  mill to bear") where the diaphragm plate pieces bear on the PL 2 1/2 x 24. End plate / connector-to-cap-web symbols: joint not identifiable, UNRESOLVED, not modeled.
+
 ### UNRESOLVED (model)
-U1 placement APPROXIMATE (p.6). U2 / U3 weld sizes (p.30 / p.31) - no weld solids. U4 / U6 read at 300-400 dpi as PL 3/4 = girder connection
+U1 placement APPROXIMATE (p.6). U2 / U3 weld sizes (p.30 / p.31): diaphragm-to-connector welds drawn 1/4" flagged, cap web-flange / end plate welds not modeled. U4 / U6 read at 300-400 dpi as PL 3/4 = girder connection
 diaphragm plate between 1/2 connector plates, bolts end plate + cap web + connector plate (confirm). U5 bearing components (vendor) - GENERIC
 bearings, pier 2 sole plate = 28" disc body, the bottom cover plate start follows it (p.31 note *). U8 top cover plate start (p.31). New: end plate
 flare / bottom chamfer vertices scaled from Section E-E (p.30); girder web cope depth (p.30); first intermediate stiffener 9'-6 at the abutments

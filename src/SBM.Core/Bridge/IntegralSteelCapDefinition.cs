@@ -65,6 +65,10 @@ public sealed class IntegralSteelCapDefinition
     /// <summary>Unwelded length of the stiffener-to-web weld under the top flange (plans "4 3/8 NO WELD").</summary>
     public double StiffenerTopNoWeld { get; set; }
     public double StiffenerWeld { get; set; } = In(5.0 / 16);
+    /// <summary>OPTIONAL (false = off, omitted from the file): the stiffeners are milled to bear on the bottom flange and welded there with the
+    /// <see cref="StiffenerWeld"/> fillet on both plate faces (Iowa DOT 1617 p.31 Sections B-B / C-C "mill to bear, 5/16 + 5/16").</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    public bool StiffenerBottomWeld { get; set; }
 
     public List<CapCoverPlate> CoverPlates { get; set; } = new();
 
@@ -258,6 +262,14 @@ public sealed class CapGirderConnection
     public double DiaphragmPlateThickness { get; set; } = In(0.75);
     /// <summary>Mill-to-bear plate inside the cap at the bottom flange level (width along the cap, thickness); null = none.</summary>
     public PlateSize? BottomPlate { get; set; }
+    /// <summary>OPTIONAL (0 = no weld solids, omitted from the file): fillet size DRAWN for the diaphragm plate to connector plate welds (plan weld symbols
+    /// without a size, p.30 Girder Splice elevation). The size is not a plan value: the weld parts are flagged UNRESOLVED (dimension only).</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    public double DiaphragmWeld { get; set; }
+    /// <summary>OPTIONAL (0 = none, omitted from the file): fillet size, both faces, where the diaphragm plate pieces are milled to bear on the bottom plate
+    /// (plan "5/16 + 5/16, mill to bear", p.30).</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    public double BottomPlateWeld { get; set; }
     /// <summary>Girder top flange end beyond the cap flange edge (plans 1").</summary>
     public double TopFlangeEndBeyondCapFlange { get; set; } = In(1);
     /// <summary>Corner radius of the girder web cope under the cap flange (drawn as a chamfer of the same legs).</summary>
