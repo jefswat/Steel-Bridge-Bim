@@ -406,6 +406,15 @@ public sealed class TrussLineItemDefinition
     /// <summary>Steel assembly mark (created when missing) and its description.</summary>
     public string Assembly { get; set; } = "DECK-ITEMS";
     public string AssemblyDescription { get; set; } = "";
+    /// <summary>OPTIONAL repeated pieces (comb teeth of a finger dam, blocks, ...): when &gt; 0 the item is built as separate pieces <see cref="RepeatWidth"/>
+    /// long along the range every <see cref="RepeatPitch"/>, the first starting <see cref="RepeatStart"/> after <see cref="From"/>, none beyond <see cref="To"/>
+    /// (one part, one solid per piece). 0 = one continuous piece (omitted from the .sbm).</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public double RepeatPitch { get; set; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public double RepeatWidth { get; set; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public double RepeatStart { get; set; }
     public string Unresolved { get; set; } = "";
     public string Source { get; set; } = "";
 }

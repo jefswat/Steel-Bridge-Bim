@@ -91,31 +91,57 @@ foreach (var br in bridges)
     br.Truss!.LineItems = items;
 }
 
-// ---------------------------------------------------------------- expansion dams (p.46 / p.54 / p.68 / p.91 / p.92): one plate band per dam, top flush with the finished grade
-void Dam(string bridge, string name, double sta, double widthIn, double thkIn, string kind, string pages, string why)
+// ---------------------------------------------------------------- expansion dams (p.46 / p.54 / p.68 / p.91 / p.92): two interlocking finger plates per dam
+// Section A of each sheet gives (normal @ 68 F) the tooth-root to tooth-root distance = gap + overlap + gap and the plate from the root back to its edge; the plan
+// gives 108 spaces @ 4 1/4 from the curb to the CL bridge (per plate) and the root / tip radii (1 1/8 R slot, 3/4 R tooth corners) -> tooth 2 in., slot 2 1/4 in.
+// Teeth are TrussLineItemDefinition.RepeatPitch pieces across the roadway; the plates follow the grade (top flush with it).
+string toothFlag = U("p.54, p.46", "finger tooth width and plan shape", "the plan prints 108 spaces @ 4 1/4 in. per half roadway with 1 1/8 in. R slot ends and 3/4 in. R tooth corners, no tooth width",
+    "teeth 2 in. wide (slot 2 1/4 in. = the 1 1/8 R) with square tips, the opposite plate shifted half a space; the 12 in. R / 2 in. tip bevel (enlarged detail) and the bead welding pattern not built.");
+void Dam(string bridge, string name, double sta, double rootHalfIn, double toothIn, double solidIn, double thkIn, string pages, string why, bool supports)
 {
     var t = Doc.Project.Bridges.First(b => b.Name == bridge).Truss!;
-    t.LineItems!.Add(new TrussLineItemDefinition
+    string asm = "DAM-" + name.Replace(" ", "-").ToUpperInvariant();
+    string desc = $"finger expansion dam {name} ({pages})";
+    TrussLineItemDefinition Item(string part, List<TrussUV> prof, string flag, double pitch = 0, double start = 0) => new TrussLineItemDefinition
     {
-        Name = name, Kind = TrussLineItemKind.Steel, Category = PartCategory.JointArmor, Transverse = true, Station = sta, From = -Ft(CurbOff), To = Ft(CurbOff),
-        Profile = new() { UV(-widthIn / 2, -thkIn), UV(widthIn / 2, -thkIn), UV(widthIn / 2, 0), UV(-widthIn / 2, 0) }, Material = "C", Assembly = "DAM-" + name.Replace(" ", "-").ToUpperInvariant(),
-        AssemblyDescription = $"{kind} expansion dam {name} ({pages})", Source = pages,
-        Unresolved = U(pages, $"{kind} dam at {name}: teeth, edge channels, stringer supports, anchor bars and the curb / parapet ends", why,
-            $"one steel band {widthIn:0.##} in wide (total dam width at 68 F) x {thkIn:0.###} in, top flush with the grade, 38'-3 each side of the CL (curb to curb)."),
-    });
+        Name = $"{name} {part}", Kind = TrussLineItemKind.Steel, Category = PartCategory.JointArmor, Transverse = true, Station = sta, From = -Ft(CurbOff), To = Ft(CurbOff),
+        Profile = prof, Material = "C", Assembly = asm, AssemblyDescription = desc, Source = pages, Unresolved = flag,
+        RepeatPitch = pitch > 0 ? In(pitch) : 0, RepeatWidth = pitch > 0 ? In(2) : 0, RepeatStart = In(start),
+    };
+    string plateFlag = U(pages, $"finger plates at {name}: plate edges at the curbs / parapet ends, bulkhead / diaphragm plates, anchor bars", why,
+        $"two plates {thkIn:0.###} in. thick, top flush with the grade, curb to curb: {solidIn:0.###} in. solid behind the tooth roots {2 * rootHalfIn:0.###} in. apart at 68 F, teeth {toothIn:0.###} in. long.");
+    foreach (int side in new[] { -1, 1 })
+    {
+        string sd = side < 0 ? "back" : "ahead";
+        double r0 = side * rootHalfIn, r1 = side * (rootHalfIn + solidIn), tip = side * (rootHalfIn - toothIn);
+        t.LineItems!.Add(Item($"plate {sd}", new() { UV(Math.Min(r0, r1), -thkIn), UV(Math.Max(r0, r1), -thkIn), UV(Math.Max(r0, r1), 0), UV(Math.Min(r0, r1), 0) }, plateFlag));
+        t.LineItems.Add(Item($"teeth {sd}", new() { UV(Math.Min(r0, tip), -thkIn), UV(Math.Max(r0, tip), -thkIn), UV(Math.Max(r0, tip), 0), UV(Math.Min(r0, tip), 0) }, toothFlag,
+            4.25, side < 0 ? 0.125 : 0.125 + 2.125));
+        if (!supports) continue;
+        // dam support members under each plate (Section A): 18 I 70 on the back side, 18 [ 58 on the ahead side, top flange under the plate, web 6 in. behind the root (scaled)
+        double w = side * (rootHalfIn + 6), top = -thkIn;
+        var prof = side < 0
+            ? new List<TrussUV> { UV(w - 3.125, top - 18), UV(w + 3.125, top - 18), UV(w + 3.125, top - 17.309), UV(w + 0.3555, top - 17.309), UV(w + 0.3555, top - 0.691), UV(w + 3.125, top - 0.691),
+                UV(w + 3.125, top), UV(w - 3.125, top), UV(w - 3.125, top - 0.691), UV(w - 0.3555, top - 0.691), UV(w - 0.3555, top - 17.309), UV(w - 3.125, top - 17.309) }
+            : new List<TrussUV> { UV(w - 0.35, top - 18), UV(w + 3.85, top - 18), UV(w + 3.85, top - 17.375), UV(w + 0.35, top - 17.375), UV(w + 0.35, top - 0.625), UV(w + 3.85, top - 0.625),
+                UV(w + 3.85, top), UV(w - 0.35, top) };
+        t.LineItems.Add(Item(side < 0 ? "support 18 I 70" : "support 18 [ 58", prof,
+            U(pages, $"dam support members at {name}", "Section A draws the 18 I 70 / 18 [ 58 under the plates with their connection angles to the floor beams / stringers but does not dimension their position; the plan shows them in pieces between the stringer lines",
+                "continuous curb to curb, top flange under the plate, web 6 in. behind the tooth root (scaled); connection angles, bulkheads and anchor bars not built.")));
+    }
 }
-string slidingWhy = "p.46 Section A gives the total dam width 8 1/4 in at 68 F (low confidence) and 3/8 in sliding plates; the serpentine seal, bulkhead plates and supports are drawn, not all dimensioned";
+string slidingWhy = "p.46 Section A gives the roots 8 1/4 in. apart (1 1/2 + 5 1/4 + 1 1/2) and each plate 1'-3 from the CL dam; the plate thickness is read 1 1/2 (low confidence, '1 3/4' possible) and the supports (bracket plates on the floor beams) are drawn, not dimensioned (no dam beams modeled)";
 var girderPiers = new[] { ("Pier 1", "647+44.630"), ("Pier 2", "648+69.046"), ("Pier 3", "649+93.463"), ("Pier 4", "651+17.880"), ("Pier 5", "652+42.297"), ("Pier 6", "653+66.713"), ("Pier 7", "654+91.130"), ("Pier 8", "656+15.547"), ("Pier 9", "657+39.963") };
-foreach (var (p, s) in girderPiers) Dam("PTC Girder spans 1-10", $"dam {p}", Sta(s), 8.25, 0.375, "sliding plate", "p.46", slidingWhy);
-foreach (var (p, s) in new[] { ("Pier 28", "708+20.797"), ("Pier 29", "709+45.213"), ("Pier 30", "710+69.630") }) Dam("PTC Girder spans 28-31", $"dam {p}", Sta(s), 8.25, 0.375, "sliding plate", "p.46", slidingWhy);
-string fingerWhy = "the finger plates are drawn with their teeth (61 + 47 teeth @ 4 1/4 in across the half roadway) and the movement tables; the tooth outline, the plate anchorage and the dam stringers are not all dimensioned";
-Dam("PTC Girder spans 1-10", "dam Pier 10", Sta("658+64.568"), 16.5, 3, "finger", "p.54, p.1", fingerWhy + "; the dam station 658+64.568 is p.1 (3-9-54), not re-printed after the 10-26-54 girder shoe shift");
-Dam("PTC 3-span truss 25-27", "dam Pier 27", Sta("706+96.192"), 16.5, 3, "finger", "p.54, p.1", fingerWhy + "; station 706+96.192 is p.1 only");
-Dam("PTC 3-span truss 11-13", "dam Pier 13", Sta("665+14.880"), 26, 3, "finger", "p.68", fingerWhy);
-Dam("PTC 4-span truss 21-24", "dam Pier 24", Sta("700+45.880"), 26, 3, "finger", "p.68", fingerWhy);
-Dam("PTC 4-span truss 14-17", "dam Pier 17", Sta("675+96.380"), 26, 3, "finger", "p.68", fingerWhy);
-Dam("PTC Arch truss 18-20", "dam Pier 20", Sta("689+64.380"), 44.5, 3.5, "finger", "p.91", fingerWhy + "; steel parapet corners at the dam (3/8 in plates) not built");
-Dam("PTC Arch truss 18-20", "dam W22", Sta("682+80.380"), 20, 3, "finger", "p.92", fingerWhy + "; the middle values of the W22 opening table are blurred (p.92)");
+foreach (var (p, s) in girderPiers) Dam("PTC Girder spans 1-10", $"dam {p}", Sta(s), 4.125, 6.75, 10.875, 1.5, "p.46", slidingWhy, false);
+foreach (var (p, s) in new[] { ("Pier 28", "708+20.797"), ("Pier 29", "709+45.213"), ("Pier 30", "710+69.630") }) Dam("PTC Girder spans 28-31", $"dam {p}", Sta(s), 4.125, 6.75, 10.875, 1.5, "p.46", slidingWhy, false);
+string fingerWhy = "Section A gives the 68 F tooth gaps / overlap and the plate behind the roots (1'-3 + 3 1/2); the curb ends, the parapet openings and the plate splice at the CL bridge are drawn, not all dimensioned";
+Dam("PTC Girder spans 1-10", "dam Pier 10", Sta("658+64.568"), 8.25, 12.5, 18.5, 3, "p.54, p.1", fingerWhy + "; the dam station 658+64.568 is p.1 (3-9-54), not re-printed after the 10-26-54 girder shoe shift", true);
+Dam("PTC 3-span truss 25-27", "dam Pier 27", Sta("706+96.192"), 8.25, 12.5, 18.5, 3, "p.54, p.1", fingerWhy + "; station 706+96.192 is p.1 only", true);
+Dam("PTC 3-span truss 11-13", "dam Pier 13", Sta("665+14.880"), 13, 19.25, 18.5, 3.5, "p.68", fingerWhy, true);
+Dam("PTC 4-span truss 21-24", "dam Pier 24", Sta("700+45.880"), 13, 19.25, 18.5, 3.5, "p.68", fingerWhy, true);
+Dam("PTC 4-span truss 14-17", "dam Pier 17", Sta("675+96.380"), 13, 19.25, 18.5, 3.5, "p.68", fingerWhy, true);
+Dam("PTC Arch truss 18-20", "dam Pier 20", Sta("689+64.380"), 22.25, 31.5, 18.5, 3.5, "p.91", fingerWhy + "; the 18 1/2 in. plate behind the roots is taken from p.54 (p.91 prints 2'-0 + 1'-3 1/2 not decoded); steel parapet corners at the dam (3/8 in plates) not built", true);
+Dam("PTC Arch truss 18-20", "dam W22", Sta("682+80.380"), 10, 15, 18.5, 3, "p.92", fingerWhy + "; the middle values of the W22 opening table are blurred (p.92); 18 1/2 in. plate behind the roots taken from p.54", true);
 
 // ---------------------------------------------------------------- service walkways (p.101 approach spans, p.103 main span)
 // grating 3/4 x 3/16 bearing bars (Irving X-Bar type AA), 2'-0 wide; nominal weight not printed -> 7 psf flagged
@@ -179,7 +205,11 @@ foreach (var (bridge, pierJoints, endJoint) in new[] { ("PTC 3-span truss 11-13"
 }
 // girder spans: no walkway sheet (p.44 only mentions manholes omitted at the end floor beams) - flag on the girder bridges
 foreach (var n in new[] { "PTC Girder spans 1-10", "PTC Girder spans 28-31" })
-    Doc.Project.Bridges.First(b => b.Name == n).Truss!.Unresolved.Add(U("p.44, p.42", "service walkway in the girder spans", "no walkway sheet for the girder spans was found, but p.42 item 14 lists 2,510 / 1,010 sq ft of grating for them and p.44 mentions floor beam manholes", "not built."));
+{
+    var ul = Doc.Project.Bridges.First(b => b.Name == n).Truss!.Unresolved;
+    ul.RemoveAll(x => x.Contains("service walkway in the girder spans"));    // re-runnable
+    ul.Add(U("p.44, p.42", "service walkway in the girder spans", "no walkway sheet for the girder spans was found, but p.42 item 14 lists 2,510 / 1,010 sq ft of grating for them and p.44 mentions floor beam manholes", "not built."));
+}
 
 // ---------------------------------------------------------------- regenerate + save
 var rep = Doc.Regenerate();

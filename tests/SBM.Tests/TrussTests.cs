@@ -416,6 +416,26 @@ public class TrussTests : IDisposable
     }
 
     [Fact]
+    public void LineItemRepeat_BuildsCombTeeth()
+    {
+        var (p, b) = Model();
+        var t = b.Truss!;
+        var tooth = new TrussLineItemDefinition { Name = "teeth", Kind = TrussLineItemKind.Steel, Category = PartCategory.JointArmor, Transverse = true, Station = Ft(250), From = -Ft(10), To = Ft(10),
+            Profile = { new TrussUV(0, -In(3)), new TrussUV(In(12), -In(3)), new TrussUV(In(12), 0), new TrussUV(0, 0) } };
+        t.LineItems = new() { tooth };
+        var json0 = System.Text.Json.JsonSerializer.Serialize(tooth);
+        Assert.DoesNotContain("Repeat", json0);
+        double one = Regen(p).Steel!.Parts.Single(x => x.Mark == "teeth").Volume;
+        Assert.Equal(In(12) * In(3) * Ft(20), one, 6);
+        // 2 in. teeth every 4 1/4 in. starting 1/8 in. after From: floor((240 - 0.125 - 2) / 4.25) + 1 = 56 teeth
+        tooth.RepeatPitch = In(4.25); tooth.RepeatWidth = In(2); tooth.RepeatStart = In(0.125);
+        var part = Regen(p).Steel!.Parts.Single(x => x.Mark == "teeth");
+        Assert.Equal(56 * In(2) * In(12) * In(3), part.Volume, 9);
+        Assert.Equal(56 * In(2), part.Length, 9);
+        Assert.Contains("RepeatPitch", System.Text.Json.JsonSerializer.Serialize(tooth));
+    }
+
+    [Fact]
     public void FileRoundTrip_AndExistingModelsUnchanged()
     {
         var (p, b) = Model();

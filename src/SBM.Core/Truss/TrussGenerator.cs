@@ -646,33 +646,41 @@ public static class TrussGenerator
             var poly = li.Profile.Select(q => new Vec2(q.U, q.V)).ToList();
             if (MeshBuilder.SignedArea(poly) < 0) poly.Reverse();
             var sec = poly.ToArray();
-            var rings = new List<Vec3[]>();
-            if (!li.Transverse)
-            {
-                int n = Math.Max(2, (int)Math.Ceiling((li.To - li.From) / 2.0) + 1);
-                int side = li.Side >= 0 ? 1 : -1;
-                for (int i = 0; i < n; i++)
-                {
-                    double s = li.From + (li.To - li.From) * i / (n - 1);
-                    double z0 = li.FromGrade ? _al.ElevationAt(s, li.ReferenceOffset) : 0;
-                    rings.Add(sec.Select(q => _al.PointAt(s, li.ReferenceOffset + side * q.X).WithZ(z0 + q.Y)).ToArray());
-                }
-            }
-            else
-            {
-                // across: rings at the range ends and at the crown (offset 0) when inside, so the item follows the cross slope
-                var offs = new List<double> { li.From };
-                if (li.From < 0 && li.To > 0) offs.Add(0);
-                offs.Add(li.To);
-                foreach (double o in offs)
-                {
-                    double z0 = li.FromGrade ? _al.ElevationAt(li.Station, o) : 0;
-                    rings.Add(sec.Select(q => _al.PointAt(li.Station + q.X, o).WithZ(z0 + q.Y)).ToArray());
-                }
-            }
+            var ranges = new List<(double lo, double hi)>();
+            if (li.RepeatPitch > 0 && li.RepeatWidth > 0)
+                for (double a = li.From + li.RepeatStart; a + li.RepeatWidth <= li.To + 1e-9; a += li.RepeatPitch) ranges.Add((a, a + li.RepeatWidth));
+            else ranges.Add((li.From, li.To));
             var mesh = new Mesh();
-            MeshBuilder.AddLoft(mesh, sec, rings);
-            double length = li.To - li.From;
+            foreach (var (lo, hi) in ranges)
+            {
+                var rings = new List<Vec3[]>();
+                if (!li.Transverse)
+                {
+                    int n = Math.Max(2, (int)Math.Ceiling((hi - lo) / 2.0) + 1);
+                    int side = li.Side >= 0 ? 1 : -1;
+                    for (int i = 0; i < n; i++)
+                    {
+                        double s = lo + (hi - lo) * i / (n - 1);
+                        double z0 = li.FromGrade ? _al.ElevationAt(s, li.ReferenceOffset) : 0;
+                        rings.Add(sec.Select(q => _al.PointAt(s, li.ReferenceOffset + side * q.X).WithZ(z0 + q.Y)).ToArray());
+                    }
+                }
+                else
+                {
+                    // across: rings at the range ends and at the crown (offset 0) when inside, so the item follows the cross slope
+                    var offs = new List<double> { lo };
+                    if (lo < 0 && hi > 0) offs.Add(0);
+                    offs.Add(hi);
+                    foreach (double o in offs)
+                    {
+                        double z0 = li.FromGrade ? _al.ElevationAt(li.Station, o) : 0;
+                        rings.Add(sec.Select(q => _al.PointAt(li.Station + q.X, o).WithZ(z0 + q.Y)).ToArray());
+                    }
+                }
+                MeshBuilder.AddLoft(mesh, sec, rings);
+            }
+            if (ranges.Count == 0) { Warn($"Truss: line item {li.Name} - no repeated piece fits the range; not built."); return; }
+            double length = ranges.Sum(r => r.hi - r.lo);
             if (li.Kind == TrussLineItemKind.Concrete)
             {
                 Model.Concrete.Barriers.Add((li.Name, mesh));
