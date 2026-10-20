@@ -6,10 +6,12 @@
 //   3 member counts by role per truss line / cross-plane (stress sheets p.47 / p.57, floor and bracing sheets p.48 / p.58)
 //   4 the generator's member length checks (printed geom lengths 26.9496 / 39.0766 / 37.9221 / 27.5000)
 //   5 shoes: bottom of shoe = pier top (p.5 / p.32), shoe type per pier (fixed only at joint 8 / 20), work point to bottom of shoe closes with the printed heights
+//   5b member material letter (C) / (S) per member table row (members.csv, p.47 / p.57)
 //   6 steel weight by material vs the p.42 items 2 + 5 per unit
 //   sbm run samples\plans\check-truss-ptc-approach.csx "samples\plans\PTC approach trusses.sbm"
 // Read-only (never saves). Rows: PASS / DIFF (plan difference reported, never adjusted) / INFO.
 using System.Globalization;
+using System.IO;
 using SBM.Core.Bridge;
 using SBM.Core.Steel;
 
@@ -26,6 +28,26 @@ void Cmp(string item, double plan, double model, double tol, string unit, string
     Row(Math.Abs(model - plan) <= tol ? "PASS" : "DIFF", item, plan.ToString(f, inv) + unit, model.ToString(f, inv) + unit, $"diff {(model - plan).ToString(f, inv)}{unit}" + (note == "" ? "" : "; " + note));
 }
 double ft = 0.3048, lb = 2.20462262;
+List<Dictionary<string, string>> MemberRows()
+{
+    string file = null;
+    for (var dir = new DirectoryInfo(Directory.GetCurrentDirectory()); dir != null && file == null; dir = dir.Parent)
+    {
+        var p = Path.Combine(dir.FullName, "docs", "plan-data", "ptc-delaware-river", "truss-approach", "members.csv");
+        if (File.Exists(p)) file = p;
+    }
+    if (file == null) return new();
+    List<string> Split(string line)
+    {
+        var cells = new List<string>(); var cur = new System.Text.StringBuilder(); bool q = false;
+        foreach (char c in line) { if (c == '"') q = !q; else if (c == ',' && !q) { cells.Add(cur.ToString().Trim()); cur.Clear(); } else cur.Append(c); }
+        cells.Add(cur.ToString().Trim());
+        return cells;
+    }
+    var lines = File.ReadAllLines(file).Where(l => l.Trim() != "").ToList();
+    var hdr = Split(lines[0]);
+    return lines.Skip(1).Select(l => { var f = Split(l); return hdr.Select((h, i) => (h, v: i < f.Count ? f[i] : "")).ToDictionary(x => x.h, x => x.v); }).ToList();
+}
 var rep = Doc.Regenerate();
 
 // plan restatement per unit: printed gutter elevations at the pier joints, pier tops (bottoms of shoes), p.42 weights (carbon / silicon, items 2 / 5)
@@ -176,6 +198,29 @@ foreach (var u in units)
         Cmp($"chord {mk} end past the shoe pin {pt} (p.59, scaled; flagged)", 10.5 / 12, past, 0.03, " ft", "end cut square to the sloping chord (its corner reaches about 1/4 in. further); the sole plate (22 in.) reaches 11 in. past the pin", 4);
     }
     Cmp("CHECK warnings 'top of the shoe projects beyond the end of chord' (generator)", 0, rep.Warnings.Count(w => w.StartsWith(u.name) && w.Contains("beyond the end of chord")), 0, "", dec: 0);
+
+    // 5b. member material (QC I002 / I003): every truss line member's part material letter = the (C) / (S) letter of its member table row (p.47 / p.57, members.csv)
+    Print("--- 5b. member material (C) / (S) by member table row");
+    {
+        var csvRows = MemberRows().Where(r => r["unit"] == (u.four ? "B" : "A")).ToList();
+        int ok = 0, bad = 0, none = 0;
+        foreach (var md in bdef.Truss.Members.Where(m => m.Role is TrussMemberRole.UpperChord or TrussMemberRole.LowerChord or TrussMemberRole.Diagonal or TrussMemberRole.Post or TrussMemberRole.Hanger))
+        {
+            var mm = System.Text.RegularExpressions.Regex.Match(md.Source ?? "", @"member table (?:row (\S+)|\((.+)\))");
+            string rn = mm.Success ? (mm.Groups[1].Success ? mm.Groups[1].Value : mm.Groups[2].Value) : "";
+            var cr = csvRows.FirstOrDefault(r => r["row"] == rn);
+            if (cr == null) { none++; continue; }
+            foreach (var pl in new[] { "N", "S" })
+            {
+                var part = tm.Steel.Parts.FirstOrDefault(p => p.Mark == $"{pl}-{md.Name}");
+                if (part == null) { none++; continue; }
+                string letter = part.Material.Contains("silicon") ? "S" : part.Material.Contains("carbon") ? "C" : "?";
+                if (letter == cr["material"]) ok++;
+                else { bad++; Row("DIFF", $"material of {part.Mark} (row {rn}, {cr["section"]})", cr["material"], letter); }
+            }
+        }
+        Cmp($"truss line members whose material letter differs from the member table row ({ok} agree, {none} without a row / part)", 0, bad, 0, "", dec: 0);
+    }
 
     // 6. weights
     Print("--- 6. weights (p.42 items 2 + 5, one unit)");

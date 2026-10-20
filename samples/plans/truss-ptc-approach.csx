@@ -169,10 +169,20 @@ foreach (var u in units)
     TrussSectionDefinition Add(TrussSectionDefinition s) { if (!secs.ContainsKey(s.Name)) { t.Sections.Add(s); secs[s.Name] = s; } return secs[s.Name]; }
     string sheetOf = four ? "p.57" : "p.47";
     var rows = members.Where(r => r["unit"] == u.Kind).ToList();
-    foreach (var r in rows.OrderBy(r => (r["plates"] != "" ? 1 : 0) + (r["area_sqin"] == "" ? 2 : 0)).Where(r => r["area_sqin"] != ""))      // plain rows first: the printed area of a plated row includes the plates
+    // one section per printed shape AND material letter (QC I002 / I003: the same 14 WF n is carbon in one row and silicon in another, p.47 / p.57 "(C)" / "(S)";
+    // keyed by the name alone, every row took the material of the first row). A shape printed with both letters gets the names "14 WF 87 (C)" / "14 WF 87 (S)".
+    var mixed = rows.Where(r => r["section"].Contains("WF")).GroupBy(r => r["section"]).Where(g => g.Select(r => r["material"]).Distinct().Count() > 1).Select(g => g.Key).ToHashSet();
+    string SecName(string nm, string mat) => mixed.Contains(nm) ? $"{nm} ({mat})" : nm;
+    double AreaOf(string nm) => rows.Where(r => r["section"] == nm && r["area_sqin"] != "").OrderBy(r => r["plates"] != "" ? 1 : 0).Select(r => D(r["area_sqin"])).FirstOrDefault();
+    foreach (var r in rows.OrderBy(r => (r["plates"] != "" ? 1 : 0) + (r["area_sqin"] == "" ? 2 : 0)))      // plain rows first: the printed area of a plated row includes the plates
     {
-        string nm = r["section"];
-        if (nm.Contains("WF") && !secs.ContainsKey(nm)) Add(OldWF(nm, D(r["area_sqin"]), r["material"], sheetOf));
+        string nm = r["section"], key = SecName(nm, r["material"]);
+        if (!nm.Contains("WF") || secs.ContainsKey(key)) continue;
+        double area = r["area_sqin"] != "" && r["plates"] == "" ? D(r["area_sqin"]) : AreaOf(nm);     // rows without a printed area (p.57 C diagonals): the shape's area from its other rows
+        if (area <= 0) continue;
+        var sd = OldWF(nm, area, r["material"], sheetOf);
+        sd.Name = key;
+        Add(sd);
     }
     // cover plates on 14 WF chords / diagonals (p.57): listed in the section column, not built (see the flag)
     foreach (var r in rows.Where(r => r["plates"] != ""))
@@ -205,7 +215,7 @@ foreach (var u in units)
     void Mem(string name, string from, string to, string sec, TrussMemberRole role, string panel, double planLen = 0, string plane = "", string system = "", double? sa = null, double? sb = null, string src = "")
         => t.Members.Add(new TrussMemberDefinition { Name = name, From = from, To = to, Section = sec, Role = role, Panel = panel, PlanLength = planLen, Plane = plane, System = system, StartSetback = sa, EndSetback = sb, Source = src });
     var byRow = rows.ToDictionary(r => r["group"] + "|" + r["row"], r => r);
-    string Sec(Dictionary<string, string> r) => r["section"];
+    string Sec(Dictionary<string, string> r) => r["section"].Contains("WF") ? SecName(r["section"], r["material"]) : r["section"];
     // chords: one member per printed row (2 panels, through the odd-numbered point), mirrored about the centre joint
     void Chord(string kind, int a, int b, string rowName)
     {
