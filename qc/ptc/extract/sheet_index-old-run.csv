@@ -1,0 +1,109 @@
+page,contract,dwg,sheet,title
+1,-,DRB-1 supp,-,General Elevation (supplementary drawing Mar 1954)
+2,-,DRB-10,1/11,Geological section Penna side
+3,-,DRB-10,2/11,Geological section NJ side
+4,PN2,-,1,Cover/approval (substructure west)
+5,PN2,DRB-2,2/11,Site plan & elevation (substructure)
+6,PN2,DRB-2,3/11,Piers 15 & 16
+7,PN2,DRB-2,4/11,Piers 13 & 14
+8,PN2,DRB-2,5/11,Piers 11 & 12
+9,PN2,DRB-2,6/11,Pier 10
+10,PN2,DRB-2,7/11,Piers 1 to 9
+11,PN2,DRB-2,8/11,West abutment plan & elevations
+12,PN2,DRB-2,9/11,West abutment sections & details
+13,PN2,DRB-2,10/11,Miscellaneous details
+14,PN2,DRB-2,11/11,Details of culvert
+15,PN1,-,1,Cover/approval
+16,PN1,DRB-1,2/11,General plan & elevation
+17,PN1,DRB-1,3/11,Piers 17 18 19 20 plans sections elevations
+18,PN1,DRB-1,4/11,Cofferdam piers 18 & 19
+19,PN1,DRB-1,5/11,Cofferdam details piers 18 & 19
+20,PN1,DRB-1,6/11,Piers 18 & 19
+21,PN1,DRB-1,7/11,Piers 18 & 19 shaft sections
+22,-,DRB-10,7/11,Boring logs
+23,PN1,DRB-1,8/11,Piers 18 & 19 misc details
+24,-,DRB-10,8/11,Boring logs
+25,PN1,DRB-1,9/11,Fender system piers 18 & 19
+26,-,DRB-10,9/11,Boring logs
+27,PN1,DRB-1,10/11,Piers 17 & 20 pile plan & footing details
+28,-,DRB-10,10/11,Test pile details
+29,PN1,DRB-1,11/11,Piers 17 & 20 shaft details
+30,-,DRB-10,11/11,Test pile results
+31,PN3,-,1,Cover/approval
+32,PN3,DRB-3,2/10,Site plan & elevation (substructure east)
+33,PN3,DRB-3,3/10,Piers 21 & 22
+34,PN3,DRB-3,4/10,Piers 23 & 24
+35,PN3,DRB-3,5/10,Piers 25 & 26
+36,PN3,DRB-3,6/10,Pier 27
+37,PN3,DRB-3,7/10,Piers 28 29 30
+38,PN3,DRB-3,8/10,East abutment plan & elevations
+39,PN3,DRB-3,9/10,East abutment sections & details
+40,PN3,DRB-3,10/10,Miscellaneous details
+41,PN4,-,1,Cover/approval (superstructure)
+42,PN4,DRB-4,2/68,General plan and elevation (superstructure)
+43,PN4,DRB-4,3/68,Girder spans stress sheet
+44,PN4,DRB-4,4/68,Girder spans steel details
+45,PN4,DRB-4,5/68,Girder spans steel details
+46,PN4,DRB-4,6/68,Girder spans expansion dams piers 1-9 28 29 30
+47,PN4,DRB-4,7/68,3-span approach trusses stress sheet for trusses
+48,PN4,DRB-4,8/68,3-span approach trusses stress sheet floor system & bracing
+49,PN4,DRB-4,9/68,3-span steel details at piers 10 12 25 27
+50,PN4,DRB-4,10/68,3-span truss joints 1 2 3
+51,PN4,DRB-4,11/68,3-span truss joints 4 5 6
+52,PN4,DRB-4,12/68,3-span truss joints 7 8 9 and shoe at piers 11 & 26
+53,PN4,DRB-4,13/68,3-span truss joints 10 11 12
+54,PN4,DRB-4,14/68,Expansion dam at piers 10 & 27
+55,PN4,DRB-4,15/68,Typical details for floor system
+56,PN4,DRB-4,16/68,Typical details for bracing
+57,PN4,DRB-4,17/68,4-span approach trusses stress sheet for trusses
+58,PN4,DRB-4,18/68,4-span stress sheet floor system & bracing
+59,PN4,DRB-4,19/68,Truss joints 0 & 0' and shoe at piers 10 13 17 20 24 27
+60,PN4,DRB-4,20/68,4-span truss joints 1 2 3
+61,PN4,DRB-4,21/68,4-span truss joints 4 5 6
+62,PN4,DRB-4,22/68,4-span truss joints 7 8 9
+63,PN4,DRB-4,23/68,4-span truss joints U10 L10 and shoes at piers 14 16 21 23
+64,PN4,DRB-4,24/68,4-span truss joints 11 12 13
+65,PN4,DRB-4,25/68,4-span truss joints 14 15 16
+66,PN4,DRB-4,26/68,4-span truss joints 17 18 19
+67,PN4,DRB-4,27/68,4-span truss joints U20 L20 and shoe at piers 15 & 22
+68,PN4,DRB-4,28/68,Expansion dam at piers 13 17 24
+69,PN4,DRB-4,29/68,Stress sheet for trusses (main span geometry)
+70,PN4,DRB-4,30/68,Main truss span stress sheet for trusses
+71,PN4,DRB-4,31/68,Main truss span bracing systems
+72,PN4,DRB-4,32/68,Main truss span stress sheet floor system
+73,PN4,DRB-4,33/68,Main span joints U0 L0 shoe hold-down shear lock piers 17 & 20
+74,PN4,DRB-4,34/68,Main span joints 1 & 2
+75,PN4,DRB-4,35/68,Main span joints 3 4 5
+76,PN4,DRB-4,36/68,Main span joints 6 & 7
+77,PN4,DRB-4,37/68,Main span joints 8 & 9
+78,PN4,DRB-4,38/68,Main span joints U10 L10
+79,PN4,DRB-4,39/68,Main span joint U11 portal & FB conns
+80,PN4,DRB-4,40/68,Main span joint and bottom strut at L11
+81,PN4,DRB-4,41/68,Main span joints U12 L12
+82,PN4,DRB-4,42/68,Main span joints U13 U14 U15
+83,PN4,DRB-4,43/68,Main span joint & bracing at L13
+84,PN4,DRB-4,44/68,Main span joint at L14
+85,PN4,DRB-4,45/68,Main span FB conn to L14 & typ interior framed FB
+86,PN4,DRB-4,46/68,Main span joints L15 L16
+87,PN4,DRB-4,47/68,Main span joints U16 U17 L17
+88,PN4,DRB-4,48/68,Main span joints U18 L18 U19 L19
+89,PN4,DRB-4,49/68,Main span joints U20 L20 U21 L21
+90,PN4,DRB-4,50/68,Main span joints U22 L22 and jacking scheme
+91,PN4,DRB-4,51/68,Main span expansion dam at pier 20
+92,PN4,DRB-4,52/68,Main span expansion dam at W22
+93,PN4,DRB-4,53/68,Main span floor beam & shear lock at W22
+94,PN4,DRB-4,54/68,Typical suspended floor beam & suspender details
+95,PN4,DRB-4,55/68,Floor beam & bracing at L13
+96,PN4,DRB-4,56/68,Shoes at piers 18 & 19
+97,PN4,DRB-4,57/68,Main span lateral and sway bracing
+98,PN4,DRB-4,58/68,Main span lateral and sway bracing
+99,PN4,DRB-4,59/68,Main span suspended floor lateral bracing
+100,PN4,DRB-4,60/68,Main span portal at U11
+101,PN4,DRB-4,61/68,Approach spans walkways ladders platforms
+102,PN4,DRB-4,62/68,Approach spans walkways ladders platforms
+103,PN4,DRB-4,63/68,Main span walkways ladders platforms
+104,PN4,DRB-4,64/68,Main span walkways ladders platforms
+105,PN4,DRB-4,65/68,Main span walkways and platforms
+106,PN4,DRB-4,66/68,Main span walkways and platforms
+107,PN4,DRB-4,67/68,All spans pavement cross section parapet & railing
+108,PN4,DRB-4,68/68,All spans parapet railing and drainage details

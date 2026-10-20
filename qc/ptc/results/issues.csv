@@ -1,0 +1,7 @@
+id,severity,page,element GlobalIds,finding,plan value,model value
+I001,high,42,all steel parts (see sqlite),Structural steel (items 1-6) is 83.8% of the plan total; every unit is below the 1% tolerance. Carbon steel is 67-78% in all units (main 70%); silicon 85-97%. Likely unmodeled splices / fills / bracing / diaphragms,"39,280,000 lb","32,920,323 lb"
+I002,medium,47,member marks L10-L12 / L4-U5 (both 3-span units; N and S),Material C/S differs from plan: model carbon where plan shows silicon (14 WF 87),S,C
+I003,medium,47,member marks L2-U3 / L4-U3 / L12-U11 (both 3-span units),Model silicon where plan shows carbon (14 WF 142),C,S
+I004,low,69,N/S L12-L13 and L13-L14 chords (both halves),Lower chord at panel 13 is 0.026 ft low vs the L-chain table; model matches the wind-chord table 140.762 instead. Plan table itself has 140.782 (lower chord) vs 140.762 (wind chord) at panel 13,140.7820,140.7557
+I005,info,43,E abutment shoe,PLAN CONFLICT: shoe bottom 62.033 and gutter 76.478 differ by 14.445 ft vs 14.407 elsewhere (span 31 123'-2 vs 124'-5 geometry); p.1 also gives E abut 711+94.046 vs 711+92.797 on p.43 (later revision). Model follows p.43,62.033 / 14.407,62.033 / 14.445
+I006,low,43,plate girders N/S-G1..,Total depth with 3 cover plates per flange 9.946 ft vs 9.906 computed from 114 + 6 x 13/16 (low confidence: angle legs may stand proud of web top),9.906,9.946

@@ -37,3 +37,4 @@ samples/plans/*.log
 # QC pilot: program copies and model inputs (regenerable); results and reports are kept
 qc/bin/
 qc/*/inputs/
+qc/bin-ptc/
