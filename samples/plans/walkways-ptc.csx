@@ -101,7 +101,7 @@ void Ladder(string bridge, string name, double sta, double off, double zBot, dou
     {
         // stile angle: 3 in. leg across (transverse range = offsets), 2 1/2 in. leg along the alignment (U)
         t.LineItems!.Add(Li($"{name} stile {(sd < 0 ? "B" : "A")} 1", "LADDERS", desc, PartCategory.WalkwayPost, true, sta, off - In(1.5), off + In(1.5), false,
-            P(sd * 8, zb, sd * 8.375, zb, sd * 8.375, zt, sd * 8, zt), pages, ladderFlag, lbft: 6.6));
+            P(sd * 8, zb, sd * 8.375, zb, sd * 8.375, zt, sd * 8, zt), pages, ladderFlag));
         t.LineItems.Add(Li($"{name} stile {(sd < 0 ? "B" : "A")} 2", "LADDERS", desc, PartCategory.WalkwayPost, true, sta, off + In(1.125), off + In(1.5), false,
             P(sd * 8.375, zb, sd * 10.5, zb, sd * 10.5, zt, sd * 8.375, zt), pages, ladderFlag));
     }

@@ -442,6 +442,20 @@ public class TrussTests : IDisposable
     }
 
     [Fact]
+    public void LineItem_TallThinPiece_MassFollowsVolume()
+    {
+        // ladder stile style: a tall section swept across a SHORT range. A nominal lb/ft would multiply the sweep length (3 in.), not the
+        // height, so the stile mass was ~1/70 of its solid (PTC walkways); without it the mass is volume x density.
+        var (p, b) = Model();
+        var stile = new TrussLineItemDefinition { Name = "stile", Kind = TrussLineItemKind.Steel, Category = PartCategory.WalkwayPost, Transverse = true, Station = Ft(250), FromGrade = false,
+            From = -In(1.5), To = In(1.5), Profile = { new TrussUV(0, 0), new TrussUV(In(0.375), 0), new TrussUV(In(0.375), Ft(20)), new TrussUV(0, Ft(20)) } };
+        b.Truss!.LineItems = new() { stile };
+        var part = Regen(p).Steel!.Parts.Single(x => x.Mark == "stile");
+        Assert.Equal(In(0.375) * In(3) * Ft(20), part.Volume, 9);
+        Assert.InRange(part.Mass / (part.Volume * 7850), 0.99, 1.01);
+    }
+
+    [Fact]
     public void FileRoundTrip_AndExistingModelsUnchanged()
     {
         var (p, b) = Model();
