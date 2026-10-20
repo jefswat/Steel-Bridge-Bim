@@ -113,7 +113,9 @@ public static class TrussGenerator
             foreach (var s in _d.Unresolved) Warn(s);
             BuildPoints();
             foreach (var s in _d.Sections) _sec[s.Name] = TrussSections.Build(s);
-            foreach (var bs in _sec.Values) foreach (var n in bs.Notes) Info($"Truss: {n}{Src}.");
+            var perforated = _sec.Values.Where(bs => bs.Notes.Any(n => n.Contains("perforated cover plate"))).Select(bs => bs.Definition.Name).ToList();
+            if (perforated.Count > 0) Info($"Truss: {perforated.Count} sections have perforated cover plates, built solid (access holes not dimensioned){Src}.");
+            foreach (var bs in _sec.Values) foreach (var n in bs.Notes.Where(n => !n.Contains("perforated cover plate"))) Info($"Truss: {n}{Src}.");
             BuildInstances();
             Setbacks();
             foreach (var m in _inst) BuildMember(m);
@@ -226,6 +228,18 @@ public static class TrussGenerator
         private IEnumerable<Inst> At(string plane, string point) => _inst.Where(i =>
             (i.PlaneA.Equals(plane, StringComparison.OrdinalIgnoreCase) && i.PointA.Equals(point, StringComparison.OrdinalIgnoreCase)) ||
             (i.PlaneB.Equals(plane, StringComparison.OrdinalIgnoreCase) && i.PointB.Equals(point, StringComparison.OrdinalIgnoreCase)));
+        /// <summary>In-plane chord members of <paramref name="plane"/> that pass THROUGH the point (interior of the member, e.g. L1 on a chord L0-L2).</summary>
+        private IEnumerable<Inst> Through(string plane, string point)
+        {
+            if (!_pts.TryGetValue((plane.ToUpperInvariant(), point.ToUpperInvariant()), out var P)) yield break;
+            foreach (var i in _inst)
+            {
+                if (!IsChord(i.Def.Role) || !i.Plane.Equals(plane, StringComparison.OrdinalIgnoreCase)) continue;
+                double len = (i.B - i.A).Length, tt = Vec3.Dot(P - i.A, i.Axis);
+                if (tt < 0.01 || tt > len - 0.01) continue;
+                if ((i.A + i.Axis * tt - P).Length < 0.005) yield return i;
+            }
+        }
         private static bool StartsAt(Inst i, string plane, string point) => i.PlaneA.Equals(plane, StringComparison.OrdinalIgnoreCase) && i.PointA.Equals(point, StringComparison.OrdinalIgnoreCase);
         /// <summary>Direction of the member away from the joint.</summary>
         private static Vec3 Away(Inst i, bool start) => start ? i.Axis : -i.Axis;
@@ -257,7 +271,7 @@ public static class TrussGenerator
                     {
                         var d1 = Away(m, start);
                         double ym = Math.Max(m.Sec.YMax, -m.Sec.YMin);
-                        foreach (var c in At(pl, pt).Where(o => o != m && IsChord(o.Def.Role) && o.Plane == m.Plane))
+                        foreach (var c in At(pl, pt).Where(o => o != m && IsChord(o.Def.Role) && o.Plane == m.Plane).Concat(Through(pl, pt)))
                         {
                             double cos = Math.Abs(Vec3.Dot(d1, c.Axis)), sin = Math.Sqrt(Math.Max(0, 1 - cos * cos));
                             if (sin < 0.1) continue;
@@ -369,7 +383,7 @@ public static class TrussGenerator
             {
                 var jdef = _d.Joints.LastOrDefault(j => j.Point.Equals(pt, StringComparison.OrdinalIgnoreCase) && (j.Plane.Length == 0 || j.Plane.Equals(pl, StringComparison.OrdinalIgnoreCase)));
                 if (jdef?.NoGusset == true) continue;
-                var here = At(pl, pt).Where(i => i.Plane.Equals(pl, StringComparison.OrdinalIgnoreCase) && !IsCrossPlane(i.Def.Role)).ToList();
+                var here = At(pl, pt).Where(i => i.Plane.Equals(pl, StringComparison.OrdinalIgnoreCase) && !IsCrossPlane(i.Def.Role)).Concat(Through(pl, pt)).Distinct().ToList();
                 bool hasWeb = here.Any(i => IsWeb(i.Def.Role)), hasChord = here.Any(i => IsChord(i.Def.Role));
                 if (jdef == null && !(jd.AutoGussets && hasWeb && hasChord)) continue;
                 if (here.Count == 0) continue;
@@ -401,16 +415,19 @@ public static class TrussGenerator
                 double margin = jd.Margin;
                 foreach (var m in here)
                 {
+                    bool through = !StartsAt(m, pl, pt) && !(m.PlaneB.Equals(pl, StringComparison.OrdinalIgnoreCase) && m.PointB.Equals(pt, StringComparison.OrdinalIgnoreCase));
                     bool start = StartsAt(m, pl, pt);
-                    var d1 = Away(m, start);
-                    double t0 = IsChord(m.Def.Role) ? 0 : Math.Max(0, start ? m.SA : m.SB);
                     double lap = jd.Lap > 0 ? jd.Lap : Math.Max(m.Sec.Depth, In(18));
-                    foreach (double t in new[] { t0, t0 + lap })
-                        foreach (double y in new[] { m.Sec.YMin - margin, m.Sec.YMax + margin })
-                        {
-                            var w = P + d1 * t + m.Y * y + m.Y * m.Def.OffsetZ - P;
-                            pts.Add(new Vec2(Vec3.Dot(w, u), Vec3.Dot(w, v)));
-                        }
+                    foreach (var d1 in through ? new[] { m.Axis, -m.Axis } : new[] { Away(m, start) })
+                    {
+                        double t0 = IsChord(m.Def.Role) ? 0 : Math.Max(0, start ? m.SA : m.SB);
+                        foreach (double t in new[] { t0, t0 + lap })
+                            foreach (double y in new[] { m.Sec.YMin - margin, m.Sec.YMax + margin })
+                            {
+                                var w = P + d1 * t + m.Y * y + m.Y * m.Def.OffsetZ - P;
+                                pts.Add(new Vec2(Vec3.Dot(w, u), Vec3.Dot(w, v)));
+                            }
+                    }
                 }
                 outline = MeshBuilder.ConvexHull(pts);
                 flags.Add(jd.Unresolved.Length > 0 ? jd.Unresolved : $"gusset outline of joint {pt} not given - convex envelope of the member laps");
@@ -420,7 +437,10 @@ public static class TrussGenerator
             Assumption? asu = flags.Count > 0 || jdef?.Unresolved.Length > 0
                 ? Assumption.UnresolvedDimension(string.Join("; ", (jdef?.Unresolved.Length > 0 ? new[] { jdef.Unresolved } : Array.Empty<string>()).Concat(flags)) + $" (joint {pt}){Src}",
                     "gusset plates outside the chord webs, envelope outline") : null;
-            if (asu != null) Warn(jd.Unresolved.Length > 0 && jdef == null ? jd.Unresolved : asu.Reason);
+            // one warning per distinct text (the per-joint reason stays on the parts)
+            if (jdef?.Unresolved.Length > 0) Warn(jdef.Unresolved);
+            if (flags.Count > 0) Warn(jd.Unresolved.Length > 0 && jdef is not { Outline.Count: >= 3 } ? jd.Unresolved + (tg == In(0.75) && !(jdef is { GussetThickness: > 0 } || jd.GussetThickness > 0) ? " Gusset thickness not given where no joint sheet was read: 3/4\" built." : "")
+                : $"Truss: gussets - {string.Join("; ", flags.Select(f => f.Replace($" of joint {pt}", "")))}{Src}.");
             double area = Math.Abs(MeshBuilder.SignedArea(outline));
             foreach (int side in new[] { -1, 1 })
             {
@@ -630,7 +650,7 @@ public static class TrussGenerator
                 Model.Steel.Parts.Add(new SteelPart { Mark = $"{asm}-MP", Category = PartCategory.MasonryPlate, Assembly = asm, Description = $"masonry PL {TrussSections.FormatIn(s.MasonryThickness)} x {TrussSections.FormatIn(s.MasonryWidth)} x {TrussSections.FormatIn(s.MasonryLength)}", Mesh = mp, Material = _d.DefaultMaterial, Length = s.MasonryLength, Assumption = asu });
             }
             // body: trapezoid in (u, z) from the masonry plate top to the pin, extruded across
-            double z0 = s.MasonryThickness, z1 = pin.Z - bottom;
+            double z0 = s.MasonryThickness, z1 = pin.Z - bottom + Math.Max(0, s.BodyTopAbovePin);
             double bl = s.BodyLength > 0 ? s.BodyLength : s.MasonryLength, bw = s.BodyWidth > 0 ? s.BodyWidth : s.MasonryWidth;
             double topHalf = s.BodyTopLength > 0 ? s.BodyTopLength / 2 : Math.Max(s.PinDiameter * 0.75, 0.1 * bl);
             if (z1 > z0 + 1e-3 && bl > 0 && bw > 0)

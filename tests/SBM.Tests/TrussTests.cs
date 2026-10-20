@@ -240,6 +240,25 @@ public class TrussTests : IDisposable
     }
 
     [Fact]
+    public void ChordThroughAPoint_FramesTheVertical_AndAnglesParse()
+    {
+        var (p0, _) = Model(pratt: true, extras: false);
+        double cut0 = Regen(p0).Steel!.Truss!.Member("N-U1-L1")!.CutLength;
+        var (p, b) = Model(pratt: true, extras: false);
+        var t = b.Truss!;
+        t.Members.RemoveAll(m => m.Name is "L0-L1" or "L1-L2");
+        t.Members.Add(new TrussMemberDefinition { Name = "L0-L2", From = "L0", To = "L2", Section = "BOX", Role = TrussMemberRole.LowerChord, PlanLength = 2 * Panel });
+        var tm = Regen(p).Steel!.Truss!;
+        // U1-L1 stops at the L0-L2 chord passing through L1 exactly as at the two chord members ending there (the U1 end is unchanged)
+        Assert.Equal(cut0, tm.Member("N-U1-L1")!.CutLength, 9);
+        Assert.Contains(tm.Steel.Parts, x => x.Mark == "N-GL1-L");
+        Assert.All(tm.Checks, c => Assert.True(c.Ok, c.Item));
+        var a = TrussSections.ParseAngle("L7x4x7/8")!.Value;
+        Assert.Equal(In(7), a.a, 9); Assert.Equal(In(4), a.b, 9); Assert.Equal(In(0.875), a.t, 9);
+        Assert.Equal(In(1.125), TrussSections.ParseAngle("L8x8x1-1/8")!.Value.t, 9);
+    }
+
+    [Fact]
     public void FileRoundTrip_AndExistingModelsUnchanged()
     {
         var (p, b) = Model();

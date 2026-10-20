@@ -410,6 +410,8 @@ public sealed class TrussShoeDefinition
     /// <summary>Shoe body length along the bridge at the bottom and width across.</summary>
     public double BodyLength { get; set; }
     public double BodyWidth { get; set; }
+    /// <summary>Top of the shoe body (seat of the truss / top forging / sole plate) above the pin centre (0 = at the pin).</summary>
+    public double BodyTopAbovePin { get; set; }
     /// <summary>Body length along the bridge at the pin (0 = 1.5 pin diameters).</summary>
     public double BodyTopLength { get; set; }
     public double MasonryLength { get; set; }

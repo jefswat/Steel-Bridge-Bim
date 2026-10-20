@@ -79,10 +79,22 @@ public static class TrussSections
                 // legs as placed: on the web = lw, outstanding = lo (the catalog orders long, short)
                 return Math.Abs(lw - a.LegA) < 1e-6 ? a : a with { LegA = lw, LegB = lo };
             }
-            notes.Add($"angle {s.Angle} is not in AISC v16 - built from the plan dimensions with a sharp root");
+            notes.Add($"angle {s.Angle} is not in AISC v16 - built from the plan designation / dimensions with a sharp root");
+            if ((lw <= 0 || lo <= 0 || t <= 0) && ParseAngle(s.Angle) is { } pa) { lw = pa.a; lo = pa.b; t = pa.t; }
         }
         if (lw <= 0 || lo <= 0 || t <= 0) return null;
         return new AngleSize(s.Angle.Length > 0 ? s.Angle : $"L{lw / 0.0254:0.###}x{lo / 0.0254:0.###}x{t / 0.0254:0.###}", lw, lo, t);
+    }
+
+    /// <summary>Legs and thickness from a designation "L7x4x7/8" / "L8x8x1-1/8" (inches); null when it does not parse.</summary>
+    public static (double a, double b, double t)? ParseAngle(string name)
+    {
+        var m = System.Text.RegularExpressions.Regex.Match(name.Trim(), @"^L\s*([\d.]+)\s*[xX]\s*([\d.]+)\s*[xX]\s*(?:(\d+)[- ])?(\d+)(?:/(\d+))?$");
+        if (!m.Success) return null;
+        double F(string v) => double.Parse(v, System.Globalization.CultureInfo.InvariantCulture);
+        double t = m.Groups[5].Success ? F(m.Groups[4].Value) / F(m.Groups[5].Value) : F(m.Groups[4].Value);
+        if (m.Groups[3].Success) t += F(m.Groups[3].Value);
+        return (In(F(m.Groups[1].Value)), In(F(m.Groups[2].Value)), In(t));
     }
 
     public static TrussBuiltSection Build(TrussSectionDefinition s)
@@ -233,7 +245,8 @@ public static class TrussSections
         foreach (int e in new[] { 1, -1 })
         {
             double m0 = edge;
-            foreach (var p in e < 0 && s.BottomPlates.Count > 0 ? s.BottomPlates : s.TopPlates)
+            // web vertical (floor beam): top edge = TopPlates, bottom edge = BottomPlates; web across (web member): both edges TopPlates unless BottomPlates given
+            foreach (var p in e < 0 && (s.WebVertical || s.BottomPlates.Count > 0) ? s.BottomPlates : s.TopPlates)
             {
                 var poly = new[] { new Vec2(e * m0, -p.Width / 2), new Vec2(e * (m0 + p.Thickness), -p.Width / 2), new Vec2(e * (m0 + p.Thickness), p.Width / 2), new Vec2(e * m0, p.Width / 2) };
                 r.Pieces.Add(new(poly.Select(Map).ToArray(), p.Label.Length > 0 ? p.Label : $"flange PL {L(p.Width)} x {L(p.Thickness)}"));
@@ -347,7 +360,7 @@ public static class TrussSections
             r.Pieces.Add(new(SteelCatalog.WideFlangePolygon(ws, -ws.WebThickness / 2).Select(Map).ToArray(), n));
             r.WebThickness = s.WebThickness; r.OuterPly = s.FlangeThickness;
             r.LbPerFt = s.WeightLbPerFt;
-            r.Notes.Add($"rolled shape {n} is not in AISC v16 - built from the plan / handbook dimensions (sharp roots){(s.WeightLbPerFt > 0 ? $", {s.WeightLbPerFt:0.#} lb/ft" : "")}");
+            r.Notes.Add($"rolled shape {n} is not in the program's AISC v16 extract (W, C, MC, L, WT) - built from the given dimensions (sharp roots){(s.WeightLbPerFt > 0 ? $", {s.WeightLbPerFt:0.#} lb/ft" : "")}");
             return;
         }
         r.Notes.Add($"rolled shape '{n}' is not in AISC v16 and has no dimensions");
