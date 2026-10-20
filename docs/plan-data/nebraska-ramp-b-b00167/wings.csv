@@ -1,0 +1,66 @@
+element,dimension,value,frame,elevation,page,confidence,note
+footing,width along alignment,6'-3 (1'-6 + 3'-3 + 1'-6),F0 section,,"p.18, p.22, p.19 B-B",high,"piles 1'-6 from each face, 3'-3 apart"
+footing,front face (bottom) to CL brg,3'-1,F0 u = -3'-1,,p.22 (1'-6 + 1'-7 = 3'-1),high,matches BearingToFootingFront in build script
+footing,rear face to CL brg,3'-2 (6'-3 - 3'-1),F0 u = +3'-2,,p.22,derived,
+footing,depth at front (sloped) face,4'-1,F0,,"p.18 section, p.19 A-A / B-B",high,front face batters 1:4 (1'-0 over 4'-1): top edge 1'-0 behind the bottom toe
+footing,depth at rear face / wing end,3'-10,F0,,"p.19 B-B (right), p.19 E-E, p.21",medium,"p.18 section also prints 4'-0 and 3'-10 at the pile-spacing side; footing top may fall 3"" front to rear - not confirmed"
+footing,front face batter,1:4 (1'-0 over 4'-1),F0,,"p.18 section, p.19 A-A",high,sloped face is the FRONT (bridge side); wing extends REAR
+footing,bottom of footing elevation,1112.35 ft,South abutment (S),1112.35,p.18 rear elevation,high,level
+footing,bottom of footing elevation,1105.62 ft,North abutment (N),1105.62,p.20 rear elevation,high,level
+footing,bottom of backwall elevation,1116.18 ft,South abutment (S),1116.18,p.18,high,
+footing,bottom of backwall elevation,1109.45 ft,North abutment (N),1109.45,p.20,high,
+footing,length along support line (pile region),29'-2 = 21'-7 + 7'-7,SL from the CL Ramp B point,,p.22 (both abutments),high,"21'-7 to the left (west) end, 7'-7 to the right (east) end; the wing footings do NOT add length along the support line"
+footing,end faces skew,"5 deg 54'10"" (S) / 5 deg 53'33"" (N)",plan,,p.18 / p.20 / p.22,medium,"p.18 prints 5 deg 54'10"" on the backwall extension; p.20 and p.22 print 5 deg 53'33"" at N; p.22 S prints 1 deg 17'03"" (alignment to chord line). Which line each angle is measured from is not stated in text - see md"
+wing footing,count,"1 (S, east end only)",South abutment (S),,"p.19 A-A, p.22, p.23 concrete table",high,"West wing extension = ""-"" in the S concrete table; west end carries the backwall extension instead"
+wing footing,count,"2 (N, east and west ends)",North abutment (N),,"p.21 A-A / B-B, p.22, p.23 concrete table",high,"N concrete table: west wing ext 3.0 CY, east 3.5 CY"
+wing footing,step-out beyond rear footing face,4'-4 1/2 (= 10'-7 1/2 - 6'-3),F0 u = +3'-2 .. +7'-6 1/2,,"p.18 plan, p.19 A-A (6'-0 + 4'-7 1/2 = 10'-7 1/2), p.22",high,rear end of the wing footing is 7'-6 1/2 behind the CL brg (pile 6'-0 1/2 + 1'-6)
+wing footing,overall length front toe to rear end (at bottom),10'-7 1/2,F0 u = -3'-1 .. +7'-6 1/2,,"p.18 plan (right dim), p.19 A-A bottom, p.21",high,
+wing footing,width along the support line,3'-6 = 2'-0 + 1'-6,SL,,"p.18 plan / section E-E, p.22 (2'-0 + 1'-6)",high,"pile 2'-0 from the inner edge (toward the main footing / bridge), 1'-6 from the outer end face; p.18 plan also prints 1'-11 + 1'-7 = 3'-6 across the wall footprint"
+wing footing,plan break dims,"1'-11 | 1'-7 (S p.18) ; 1'-7 | 1'-11 (mirror, N p.20)",SL,,"p.18, p.20",medium,"1'-7 = wing wall thickness (p.19 C-C 1'-7 at the wing), 1'-11 = footing projection past the wall's inner face; reading from the dimension chain, not a callout"
+wing footing,depth,4'-1 at front toe end / 3'-10 at rear end (same as main footing),F0,,"p.19 A-A, p.21 A-A",medium,
+wing footing,bottom elevation,same as main footing (S 1112.35 / N 1105.62),abs,,"p.19 A-A note ""FOR BOTTOM FOOTING ELEVATION SEE DESIGN SHEET 17"" (= p.18) ; p.21 note (= p.19 ... N sheet 19)",high,note text on p.21 says DESIGN SHEET 19 (= PDF p.20): same intent
+wing footing,bottom bars,"8a2 (5 S / 10 N, VARIES), 8a3 (5 S / 10 N @ 10'-7), 6a4 footing end (5 S, VARIES), hoops 5b2 (3 S / 6 N @ 13'-11)",,,"p.23 bar lists, p.19 A-A",high,"lengths of 8a2 / 6a4 ""VARIES"" - not tabulated"
+wing extension wall,length along alignment (rear of backwall),6'-0 (from 1'-6 1/2 to 7'-6 1/2 behind CL brg),F0 u = +1'-6 1/2 .. +7'-6 1/2,,"p.19 A-A / C-C, p.21 (6'-0 WING EXTENSION)",high,u derived: wing pile 6'-0 1/2 + 1'-6 end = 7'-6 1/2; rear end of the wall is the end of the footing
+wing extension wall,thickness (across the support line),1'-7,SL,,"p.19 C-C left dim 1'-7, p.21 C-C 1'-7",high,outer face flush with the footing end face (plan chain 1'-11 + 1'-7)
+wing extension wall,bottom,footing top,abs,,p.19 A-A,high,footing top is 1'-6 MIN above the bottom bar mat (note '1'-6 MIN.' at the footing)
+wing extension wall,top,sloped parallel to theoretical grade (gutter line),gutter line,,"p.19 A-A ""PARALLEL TO THEORETICAL GRADE"", table of wingwall elevations",high,the barrier-rail wing extension sits on top (box above the wall in A-A; rail details p.54 / p.55)
+wing extension wall,top elevation SE corner (S wing),G 1125.73 / H 1125.73 / I 1125.76 ft,South abutment (S) east end,1125.73-1125.76,p.19 table of wingwall elevations,high,"at the GUTTER LINE; only ELEV. I is labelled on View A-A (the wing end), G / H are labelled on View B-B (the other end): mapping of G / H to a point on the SE wing is UNRESOLVED (p.19): the table lists three letters for SE but A-A labels one"
+wing extension wall,"top elevation SW corner (S, backwall extension end)",G 1124.75 / H 1124.74 ft,South abutment (S) west end,1124.75 / 1124.74,p.19 table; labels on View B-B,high,at the gutter line; CONFLICT / check: rear elevation p.18 prints ELEV. 1124.36 at the end of the backwall extension (see backwall extension)
+wing extension wall,top elevation NW corner (N),G 1118.02 / H 1117.92 ft,North abutment (N) west end,1118.02 / 1117.92,p.21 table of wingwall elevations,high,at the gutter line; G / H labelled on View A-A (p.21 left view)
+wing extension wall,top elevation NE corner (N),G 1119.32 / H 1119.23 ft,North abutment (N) east end,1119.32 / 1119.23,p.21 table,high,at the gutter line
+wing extension wall,height,"UNRESOLVED (p.19, p.21): wall height - the view gives the footing 4'-1 and the maskwall 8'-2 1/2 / 7'-4 1/2 / 8'-6 1/2 but the 6'-0 wing wall height is only given by its top elevation (gutter line) and the footing top; the barrier-rail wing extension part sits above and is on p.54 / p.55",,,"p.19, p.21",n/a,"derive from top elevation minus footing top (bottom of footing + 4'-1 front / 3'-10 rear) if needed: S wing ~9.3 ft, includes the rail"
+wing extension wall,vertical bars,5e2: 14 S / 28 N @ 10'-11 (S) / 11'-3 (N); 14-5e2 @ 6 SPA @ 0'-11 = 5'-6 + 3 each side across the wall (C-C),,,"p.19 C-C, p.23",high,
+wing extension wall,horizontal bars,5d9: 20 S / 38 N @ 5'-8; PVC pipe through the wall,,,"p.19 A-A / C-C, p.23",high,
+wing extension wall,PVC drain pipe,"3 in dia, plugged, location per detail",wing wall,,"p.21 PVC PIPE LOCATION DETAIL (6"" and 6"" dims), p.19 A-A (circle at left of wall), p.20/21 note ""PLUG 3"" dia PVC PIPE WITH EXPANDING FOAM PRIOR TO BACKFILLING BEHIND ABUTMENTS""",medium,"drawn as a small circle in A-A near the wall mid-height; vertical position not dimensioned - UNRESOLVED (p.19): pipe elevation - only the 6"" / 6"" setback from the face is dimensioned"
+wing extension wall,expansion joint filler,1/2 in preformed filler between the wing wall and the maskwall / backwall,joint at u = +1'-6 1/2,,"p.19 A-A, B-B, p.21",high,drawn as a thick top edge and vertical joint at the 6'-0 / 3'-7 1/2 split
+wing extension wall,foam fill,"EPS geofoam (abutment wing extensions), item in p.2",,,p.2 bid item note,medium,"p.2 says the EPS item INCLUDES the foam in the wing extensions; EPS block geometry is in the road plans (UNRESOLVED, p.2)"
+maskwall,length along alignment,3'-7 1/2 (from 2'-1 front of CL brg to 1'-6 1/2 rear of CL brg),F0 u = -2'-1 .. +1'-6 1/2,,"p.19 A-A / B-B, p.21; E-E ""1'-0 | 3'-7 1/2 | 1'-7 1/2""",high,"front face flush with the footing top front edge (1'-0 behind the bottom toe), rear face = backwall front face 1'-6 1/2 from CL brg (p.18 ""1'-6 1/2"")"
+maskwall,thickness (across the support line),10 in,SL,,"p.19 C-C (10"" at the right block), E-E (10"")",medium,"the ""10"" dimension is read on the block that carries 5e1 / 5f3 bars; vertical dimension in the section"
+maskwall,cover to bars,2 1/4 in CL to bar centre line,,,p.19 C-C / E-E,high,
+maskwall,height S wing end (View A-A),8'-2 1/2 above the footing,abs,,p.19 A-A (8 EQ SPA; 18-5f3 bars),high,"top = sloped, parallel to theoretical grade"
+maskwall,height S west end (View B-B),7'-4 1/2,abs,,p.19 B-B (7 EQ SPA; 16-5f4 bars),high,
+maskwall,height N View A-A (p.21 left),7'-4 1/2,abs,,p.21,high,7 EQ. SPA.; 16-5f3 bars as printed on that view
+maskwall,height N View B-B (p.21 right),8'-6 1/2,abs,,p.21,high,18-5f3 (8 EQ. SPA.)
+maskwall,bars,5e1 vertical: 20 each end (S 9'-7 east / 9'-11 N); 5f3 horizontal 18 (S) / 34 (N) @ 5'-10; 5f4 16 @ 4'-9 (S),,,p.23,high,
+maskwall,concrete (CY),"S west 0.8, S east 0.9, N west 0.8, N east 1.0",,,p.23 concrete placement quantities,high,HPC; each CY figure includes the wall as pay-quantity (plan groups: footing + backwall + wing ext + maskwall)
+maskwall,pour order,poured before the bridge deck,,,p.23 abutment notes,high,
+maskwall,surface,"concrete texture on footing, wing extension, maskwall, backwall extension surfaces (sheet 65)",,,p.18 note,high,form liner texture is not modeled
+maskwall,elevation of top,UNRESOLVED (p.19): maskwall top elevation at each end - only the heights above the footing and the gutter-line table are printed,,,p.19 / p.21,n/a,top follows the grade: use the gutter-line corner elevations G / H
+backwall extension,where,"S west end only (no N backwall extension: N concrete table ""-"")",South abutment (S),,"p.18 plan, p.23",high,
+backwall extension,thickness,1'-6,plan,,"p.18 plan (1'-6), p.19 E-E",high,
+backwall extension,length,4'-3 1/4 (long edge) / 4'-2 1/16 (short edge),"plan, rotated 5 deg 54'10""",,"p.18 plan (4'-3 1/4), p.19 E-E (4'-3 1/4, 4'-2 1/16)",high,"the end face is not square to the edge: difference 1 3/16"""
+backwall extension,plan angle,"5 deg 54'10""",plan,,p.18 plan,medium,"the wall axis is turned 5 deg 54'10"" from the backwall line (far end drifts toward the backfill by about 5 1/4"")"
+backwall extension,backwall front face to CL brg,"1'-6 1/2 (marked *, may vary)",F0,,p.18 section,high,
+backwall extension,top elevation at the far end,"1124.36 ft (""LEVEL"" top)",South abutment (S) west end,1124.36,p.18 rear elevation,high,"CONFLICT: gutter-line table p.19 SW corner 1124.75 / 1124.74 (0.39 ft higher; the elevation label is at the stub end, the table is at the gutter line)"
+backwall extension,bottom elevation at the far end,1113.54 ft,South abutment (S) west end,1113.54,p.18 rear elevation,high,bottom slopes from the footing bottom 1112.35 at the abutment end to 1113.54 at the far end (red line)
+backwall extension,height at far end,10.82 ft (1124.36 - 1113.54),,,derived,derived,5d7 bars 10'-7 and 11'-11 (View F-F) fit the sloped bottom
+backwall extension,height to bottom of backwall,4'-11 3/4 / 5'-8 7/8 / 6'-0 3/8 / 1'-1 5/16 ** (measured to bottom of backwall),,,p.18 rear elevation,low,these are backwall / step heights in the rear elevation; which one belongs to the extension is not marked
+backwall extension,bars,5d7 vertical 10 VARIES (11'-11 / 10'-7 in View F-F); 6g4 horizontal 32 (11 E.F. + 5 + 5 each end); 4d6 hoops,,,"p.19 F-F / E-E, p.23",high,
+backwall extension,concrete,2.8 CY S,,,p.23,high,
+backwall extension,foundation,no footing of its own and no pile: sits on the footing outline end,,,"p.19 E-E, p.22 (small outline stub at the top end of the S footing)",medium,stub in the p.22 S drawing is the extension seen in plan; no pile symbol
+barrier rail on wing,special sections,A 1'-6 1/4 (S abutment) / B 6'-0 1/4 (N abutment) rail lengths past the deck end,rail,,p.54 elevation / part section,medium,rail wing extension bars 5c3 / 5c14 are in the itemized summary; not part of this task
+Pier 1 cap soffit brick,clear soffit length between the columns,17'-4 3/8,Pier 1 elevation,,p.9 (17'-4 3/8 between column faces),high,columns 5'-11 5/8 wide at 23'-4 centres; cap length 29'-3 5/8 = 23'-4 + 5'-11 5/8: cap ends are flush with the outer column faces
+Pier 1 cap soffit brick,cap width at the soffit,4'-11 5/8 (= 8 + 3'-7 5/8 + 8),Pier 1 plan,,p.9 cap plan,high,3'-7 5/8 core plus 8 in each side projection; aesthetic notes: brick wraps around ALL sides of the columns and cap beam (p.15 note)
+Pier 1 cap soffit brick,soffit area,86.3 SF (17.364 ft x 4.969 ft),Pier 1,,"p.9 + p.15 note, derived",derived,"matches the to-do value ~86 SF; plan quotes no soffit area. Total Pier 1 brick 822.9 SF (p.3 summary): model 1,492 of 1,626 SF; the difference 134 SF = 86.3 soffit + 43.3 barrier rails (p.3) + 4.4 other"
+Pier 1 cap soffit brick,cap soffit elevation,1110.03 ft (cap top 1115.03 - 5'-0),Pier 1 elevation,1110.03,"p.9 (ELEV. 1115.03 at CL, cap 5'-0 deep)",derived,ELEV. 1115.03 is the label on the cap top line; the 5'-0 cap depth is the dimension at the cap
+Pier 1 cap soffit brick,explicit soffit callout,"UNRESOLVED (p.15): the plan has no ""brick on soffit"" callout - only the note that veneer and feature bands wrap around all sides of columns and cap beam; Detail A shows the cap band: 8 7/16 plain top, 3'-7 7/8 brick, 8 7/16 bottom band plain? (p.15)",,,p.15 note + Detail A,low,"if the 8 7/16"" bottom band is plain concrete the soffit might still be brick; user to confirm"
