@@ -179,9 +179,10 @@ public sealed class RegenerationCache
                 lock (_lock) _sub[subKey] = sub;
             }
             // A tied-arch bridge builds no substructure: its bearings reach the approach units' piers as foreign seats.
-            else if (!found && includeSteel && !pt.f.HasErrors && (pt.s != null || pt.ps != null) && b.Arch == null)
+            else if (!found && includeSteel && !pt.f.HasErrors && b.Arch == null && (pt.s != null || pt.ps != null
+                || (b.SupportLinesOnly && b.Supports.Any(x => x.ResolvedSubstructure.Enabled && x.ResolvedSubstructure.Plan != null))))
             {
-                var seats = (IReadOnlyList<BearingSeat>?)pt.ps?.BearingSeats ?? pt.s!.BearingSeats;
+                var seats = (IReadOnlyList<BearingSeat>?)pt.ps?.BearingSeats ?? (IReadOnlyList<BearingSeat>?)pt.s?.BearingSeats ?? Array.Empty<BearingSeat>();
                 var foreign = new Dictionary<int, List<(string, BearingSeat)>>();
                 for (int j = 0; j < b.Supports.Count; j++)
                 {

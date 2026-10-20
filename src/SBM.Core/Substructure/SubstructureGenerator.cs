@@ -94,6 +94,7 @@ public sealed partial class SubstructureGenerator
         {
             SupportIndex = j, Name = sl.Name, Type = sl.Type, Definition = sd, Origin = sl.AlignmentPoint, D = d, N = n, Station = sl.Station,
         };
+        if (sd.Plan != null) return BuildPlanStructure(unit, sd, sl.Name);
         double S(Vec2 p) => Vec2.Dot(p - sl.AlignmentPoint, d);
         double Nn(Vec2 p) => Vec2.Dot(p - sl.AlignmentPoint, n);
 
