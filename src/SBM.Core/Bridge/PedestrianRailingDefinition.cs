@@ -159,6 +159,9 @@ public sealed class PedestrianRailingDefinition
     public double EndClearance { get; set; }
     /// <summary>R (outward from the reference line) where the base elevation is probed on the concrete (e.g. the middle of a curb).</summary>
     public double BaseProbe { get; set; }
+    /// <summary>Dips of the base narrower than this along the run (e.g. a curb notched around steel) are bridged at the lower rim and reported. 0 = a third of the post spacing, negative = off.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public double BaseBridgeGap { get; set; }
     public string Material { get; set; } = "Stainless steel";
     /// <summary>Density of the material, kg/m3 (stainless steel about 7,980).</summary>
     public double Density { get; set; } = 7980;

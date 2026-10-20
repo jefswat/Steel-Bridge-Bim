@@ -970,7 +970,9 @@ UNRESOLVED FLAG (general, reusable): `SBM.Core/Assumption.cs` `Assumption{Status
   along a REFERENCE LINE at a constant alignment offset (outward = side of the offset), limits = radial lines at Begin/EndStation, else the deck end lines,
   else the first / last support line + Begin/EndLimitOffset (arch: no deck result); base = highest top of the bridge's concrete under the line at `BaseProbe`
   (`Railing/TopSurface`: deck, haunches incl. arch curbs, barriers / curbs, deck bumps; ends searched a few cm inward on skewed ends; no concrete = warning,
-  run not built). Components: `Envelope` (section swept continuously = placeholder of a railing whose post / fence details are missing, mass from
+  run not built; dips of the base narrower than `BaseBridgeGap` (0 = post spacing / 3, < 0 off) are bridged at the lower rim and reported as a warning:
+  NHT arch 2026-10-19 - the knuckle-zone curb outer edge is cut around the inside arch flange plate leg (~0.6 m, curb 4" -> a 2" sliver at the 5" probe), the
+  rail jogged 4 1/4"; plans p.151 show the curb continuous, so the bridge is UNRESOLVED-flagged; `check-rail-base.csx` lists base jumps > 1/4"). Components: `Envelope` (section swept continuously = placeholder of a railing whose post / fence details are missing, mass from
   `EnvelopeMassPerLength`), `Post` (side outline polygon extruded `Thickness` along the rail, plumb, n = ceil((L - 2e)/s) + 1 equally spaced) + `BasePlate`
   + anchor bolts (`BoltInstance` Anchor), `Members` (pipe / bar handrail and rails, `MassPerLength` override), `Unresolved` / per-component `Unresolved` +
   `Basis` (-> `SteelPart.Assumption`, layer 3D-UNRESOLVED-STEEL, IFC SBM_Status, DB status props). Generator `Railing/PedestrianRailingGenerator.cs`
