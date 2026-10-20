@@ -1,0 +1,17 @@
+support,station,gutter_el_ft,bottom_of_shoe_el_ft,page,confidence,note
+W Abutment,646+21.463,56.414,41.974,p.43,medium,girder profile table (labels paired with the supports by the leaders; read at 300 dpi)
+Pier 1,647+44.630,58.831,44.437,p.43,medium,
+Pier 2,648+69.046,61.782,47.381,p.43,medium,
+Pier 3,649+93.463,65.244,50.836,p.43,medium,
+Pier 4,651+17.880,68.975,54.568,p.43,medium,
+Pier 5,652+42.297,72.707,58.300,p.43,medium,
+Pier 6,653+66.713,76.440,62.033,p.43,medium,
+Pier 7,654+91.130,80.172,65.765,p.43,medium,
+Pier 8,656+15.547,83.905,69.498,p.43,medium,
+Pier 9,657+39.963,87.637,73.230,p.43,medium,
+Pier 10 girder brg,658+61.651,91.288,76.918,p.43,medium,CL Brg girder span (rev 10-26-54): 91.288 read at the girder bearing (91.430 is the truss-span label); gutter - shoe = 14.370 = the p.44 vertical stack
+Pier 27 girder brg,706+99.109,91.288,76.918,p.43,medium,CL Brg girder span (rev 10-26-54): as Pier 10 girder brg (gutter - shoe = 14.370)
+Pier 28,708+20.797,87.637,73.230,p.43,medium,
+Pier 29,709+45.213,83.905,69.498,p.43,medium,
+Pier 30,710+69.630,80.172,65.765,p.43,medium,
+E Abutment,711+92.797,76.478,62.033,p.43,medium,

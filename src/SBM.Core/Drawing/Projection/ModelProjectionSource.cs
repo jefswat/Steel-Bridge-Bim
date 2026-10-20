@@ -43,6 +43,7 @@ public static class ModelLayers
         ("3D-PIER-CAP-SCREENS", 190, 190, 195, new[] { PartCategory.MeshScreen }),
         ("3D-JOINT-HARDWARE", 150, 155, 165, new[] { PartCategory.JointArmor, PartCategory.JointStud, PartCategory.JointCoverPlate, PartCategory.JointAnchor }),
         ("3D-TRUSS-CHORDS", 70, 130, 200, new[] { PartCategory.TrussChord }),
+        ("3D-TRUSS-GIRDERS", 60, 110, 185, new[] { PartCategory.TrussGirder }),
         ("3D-TRUSS-WEB-MEMBERS", 95, 150, 215, new[] { PartCategory.TrussDiagonal, PartCategory.TrussVertical, PartCategory.TrussHanger }),
         ("3D-TRUSS-GUSSETS", 235, 185, 70, new[] { PartCategory.TrussGusset }),
         ("3D-TRUSS-BRACING", 80, 200, 110, new[] { PartCategory.TrussBracing }),

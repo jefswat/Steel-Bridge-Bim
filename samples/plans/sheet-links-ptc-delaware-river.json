@@ -2,7 +2,7 @@
 // Format: see sheet-links-nebraska-st.json and docs/API.md "Companion database". Sheet index + notes: docs/plan-data/ptc-delaware-river/INDEX.md, SUMMARY.md, LOCATION.md.
 // PDF "Original Existing Bridge Plans from PTC.pdf" = 108 raster pages. s = drawing number / sheet (DRB-1 .. DRB-4, DRB-10; DRB-4 page = sheet + 40).
 // Model "PTC Delaware River Bridge.sbm" (phase 1a: alignment + profile + support lines only, 7 SupportLinesOnly bridges): the rules link the alignment and each structure unit ONLY to the
-// sheets its stations / profile were read from (user rule: an element references only the sheets used to model it). Truss / girder / pier details are not modeled yet.
+// sheets its stations / profile were read from (user rule: an element references only the sheets used to model it). Girder spans 1-10 / 28-31 are modeled by girders-ptc.csx (rules girders-* below, only the sheets used); truss / pier details are not modeled yet.
 {
  "models": [
   "PTC Delaware River Bridge.sbm"
@@ -280,6 +280,93 @@
         {
           "level": "unit",
           "bridge_group": "PTC Girder spans 28-31"
+        }
+      ]
+    },
+    {
+      "id": "girders-plate-girder",
+      "sheets": ".*",
+      "pages": [
+        42,
+        43,
+        44
+      ],
+      "basis": "Plate girder G1 (girders-ptc.csx): schedule web 114 x 7/16, 4-Ls 8x8x1 1/8, cover plates and elevation dimension lines (p.43), steel details / shoe elevations (p.44), span lengths (p.42)",
+      "target": [
+        {
+          "level": "part",
+          "category": "plate girder",
+          "bridge_group": "PTC Girder spans%"
+        }
+      ]
+    },
+    {
+      "id": "girders-floor-system",
+      "sheets": ".*",
+      "pages": [
+        43,
+        44,
+        45
+      ],
+      "basis": "Floor beams F1 / F2 and brackets B1 (schedule + plan p.43, details p.44-45), stringers S1-S4 (schedule p.43, splices and bearing note p.45)",
+      "target": [
+        {
+          "level": "part",
+          "category": "floor beam",
+          "bridge_group": "PTC Girder spans%"
+        },
+        {
+          "level": "part",
+          "category": "stringer",
+          "bridge_group": "PTC Girder spans%"
+        }
+      ]
+    },
+    {
+      "id": "girders-bracing",
+      "sheets": ".*",
+      "pages": [
+        43,
+        45
+      ],
+      "basis": "Bottom laterals ST 6 WF 29 (plan pattern p.43, connection details p.45)",
+      "target": [
+        {
+          "level": "part",
+          "category": "truss bracing member",
+          "bridge_group": "PTC Girder spans%"
+        }
+      ]
+    },
+    {
+      "id": "girders-shoes",
+      "sheets": ".*",
+      "pages": [
+        43,
+        44
+      ],
+      "basis": "Fixed / expansion shoes (material lists, W.P. to masonry plate 2'-0 1/2, p.44), bottom-of-shoe elevations (p.43 girder profile)",
+      "target": [
+        {
+          "level": "assembly",
+          "category": "bearing",
+          "bridge_group": "PTC Girder spans%"
+        }
+      ]
+    },
+    {
+      "id": "girders-deck",
+      "sheets": ".*",
+      "pages": [
+        43,
+        107
+      ],
+      "basis": "Deck slab between the curbs (76'-6 curb to curb p.43 / p.107, slab 6 3/4 + haunch 7 3/4 over the stringers p.107)",
+      "target": [
+        {
+          "level": "part",
+          "category": "deck",
+          "bridge_group": "PTC Girder spans%"
         }
       ]
     }

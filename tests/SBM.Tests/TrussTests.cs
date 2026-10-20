@@ -166,6 +166,30 @@ public class TrussTests : IDisposable
     }
 
     [Fact]
+    public void PlateGirderMember_PartialCoverPlates_AreCentredAndExact()
+    {
+        var (p, b) = Model(pratt: true, extras: false);
+        double span = 6 * Panel, plateLen = Ft(20);
+        b.Truss!.Sections.Add(new TrussSectionDefinition
+        {
+            Name = "GIR", Kind = TrussSectionKind.H, WebVertical = true, WebDepth = In(60), WebPlies = { new TrussPly(In(60), In(0.5)) }, Angle = "L6x6x1/2", AngleProjection = In(0.25),
+            TopPlates = { new TrussPlate(In(16), In(0.5)), new TrussPlate(In(16), In(0.5)) { Length = plateLen, Offset = Ft(10) } }, BottomPlates = { new TrussPlate(In(16), In(0.5)) { Length = plateLen } },
+        });
+        b.Truss.Members.Add(new TrussMemberDefinition { Name = "GIR", From = "L0", To = "L6", Section = "GIR", Role = TrussMemberRole.Girder, Panel = "Span 1" });
+        var bm = Regen(p);
+        var part = bm.Steel!.Parts.First(x => x.Mark == "N-GIR");
+        Assert.Equal(PartCategory.TrussGirder, part.Category);
+        Assert.Contains(bm.Steel.Assemblies, a => a.Kind == AssemblyKind.PlateGirderLine && a.Mark == "GIRDER-N");
+        var bs = TrussSections.Build(b.Truss.Section("GIR")!);
+        Assert.Equal(3, bs.Pieces.Count(x => x.Length > 0 || x.Label.StartsWith("flange PL")));
+        double full = bs.Pieces.Where(x => x.Length == 0).Sum(x => Math.Abs(SBM.Core.Solids.MeshBuilder.SignedArea(x.Polygon)));
+        double partial = bs.Pieces.Where(x => x.Length > 0).Sum(x => Math.Abs(SBM.Core.Solids.MeshBuilder.SignedArea(x.Polygon)));
+        Assert.Equal(full * span + partial * plateLen, part.Volume, 8);
+        Assert.True(part.Mesh.HasExactSolids);
+        Assert.Equal(span, part.Length, 6);
+    }
+
+    [Fact]
     public void WebMembers_StopAtTheChordEnvelope()
     {
         var (p, b) = Model();

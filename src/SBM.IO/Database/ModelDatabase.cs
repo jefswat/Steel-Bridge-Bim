@@ -586,6 +586,7 @@ public static class ModelDatabase
                         { var mm = Regex.Match(asm.Description, @" at (.+)$"); if (mm.Success) support = mm.Groups[1].Value; }
                         break;
                     case AssemblyKind.TrussLine: parent = TrussGroup(); cat = "truss line"; break;
+                    case AssemblyKind.PlateGirderLine: parent = TrussGroup(); cat = "plate girder"; break;
                     case AssemblyKind.TrussBracing: parent = TrussGroup(); cat = "truss bracing"; sub = asm.Description.Contains(" - ") ? asm.Description[(asm.Description.LastIndexOf(" - ", StringComparison.Ordinal) + 3)..] : ""; break;
                     case AssemblyKind.TrussFloor: parent = TrussGroup(); cat = "floor system"; break;
                     case AssemblyKind.TrussSuspender: parent = TrussGroup(); cat = "suspender"; break;
@@ -793,7 +794,7 @@ public static class ModelDatabase
             PartCategory.HandholeBacking => "handhole backing plate", PartCategory.MeshScreen => "wire mesh screen",
             PartCategory.JointArmor => "joint armor plate", PartCategory.JointStud => "joint stud anchor", PartCategory.JointCoverPlate => "joint cover plate",
             PartCategory.JointAnchor => "cover plate anchor",
-            PartCategory.TrussChord => "truss chord", PartCategory.TrussDiagonal => "truss diagonal", PartCategory.TrussVertical => "truss vertical",
+            PartCategory.TrussGirder => "plate girder", PartCategory.TrussChord => "truss chord", PartCategory.TrussDiagonal => "truss diagonal", PartCategory.TrussVertical => "truss vertical",
             PartCategory.TrussHanger => "truss hanger", PartCategory.TrussBracing => "truss bracing member", PartCategory.TrussFloorBeam => "floor beam",
             PartCategory.TrussStringer => "stringer", PartCategory.TrussGusset => "gusset plate", PartCategory.Suspender => "suspender rope",
             PartCategory.SuspenderSocket => "suspender socket", PartCategory.TrussPin => "pin", PartCategory.TrussShoeFixed => "fixed shoe",
@@ -810,7 +811,7 @@ public static class ModelDatabase
                 or PartCategory.ArchRib or PartCategory.Hanger or PartCategory.ArchBracing or PartCategory.RailPost or PartCategory.RailMember
                 or PartCategory.TrussChord or PartCategory.TrussDiagonal or PartCategory.TrussVertical or PartCategory.TrussHanger or PartCategory.TrussBracing
                 or PartCategory.TrussStringer or PartCategory.Suspender => "IFCMEMBER",
-            PartCategory.TrussFloorBeam => "IFCBEAM",
+            PartCategory.TrussFloorBeam or PartCategory.TrussGirder => "IFCBEAM",
             PartCategory.TrussShoeFixed or PartCategory.TrussShoeExpansion => "IFCBEARING",
             PartCategory.SuspenderSocket or PartCategory.TrussPin => "IFCMECHANICALFASTENER",
             PartCategory.RailHandrail or PartCategory.RailEnvelope => "IFCRAILING",

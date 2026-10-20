@@ -40,6 +40,7 @@ public static class TrussGenerator
         TrussMemberRole.Diagonal => PartCategory.TrussDiagonal,
         TrussMemberRole.Vertical or TrussMemberRole.Post => PartCategory.TrussVertical,
         TrussMemberRole.Hanger => PartCategory.TrussHanger,
+        TrussMemberRole.Girder => PartCategory.TrussGirder,
         TrussMemberRole.FloorBeam => PartCategory.TrussFloorBeam,
         TrussMemberRole.Stringer => PartCategory.TrussStringer,
         _ => PartCategory.TrussBracing,
@@ -161,6 +162,7 @@ public static class TrussGenerator
         // ------------------------------------------------------------------ members
         private string AssemblyFor(TrussMemberDefinition m, string plane)
         {
+            if (m.Role == TrussMemberRole.Girder && plane.Length > 0) return Asm($"GIRDER-{plane}", AssemblyKind.PlateGirderLine, $"{_d.Name} - plate girder line {plane}");
             if (!IsCrossPlane(m.Role) && plane.Length > 0) return Asm($"TRUSS-{plane}", AssemblyKind.TrussLine, $"{_d.Name} - truss line {plane}");
             if (m.Role is TrussMemberRole.FloorBeam or TrussMemberRole.Stringer) return Asm("FLOOR", AssemblyKind.TrussFloor, $"{_d.Name} - floor system");
             string sys = m.System.Length > 0 ? m.System : m.Role switch
@@ -313,8 +315,11 @@ public static class TrussGenerator
             var mesh = new Mesh();
             foreach (var pc in m.Sec.Pieces)
             {
-                var ringA = pc.Polygon.Select(q => a0 + m.X * q.X + m.Y * q.Y).ToArray();
-                var ringB = ringA.Select(p => p + m.Axis * cut).ToArray();
+                // partial-length plate: centred on the member (+ Offset), clipped to the member
+                double pl = pc.Length > 0 ? Math.Min(pc.Length, cut) : cut;
+                double ps = pc.Length > 0 ? Math.Clamp(cut / 2 + pc.Offset - pl / 2, 0, cut - pl) : 0;
+                var ringA = pc.Polygon.Select(q => a0 + m.Axis * ps + m.X * q.X + m.Y * q.Y).ToArray();
+                var ringB = ringA.Select(p => p + m.Axis * pl).ToArray();
                 MeshBuilder.AddLoft(mesh, pc.Polygon, new[] { ringA, ringB });
             }
             foreach (var lf in m.Sec.Lacing) Lacing(mesh, m, a0, cut, lf);
