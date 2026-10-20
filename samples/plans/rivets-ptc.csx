@@ -261,9 +261,8 @@ foreach (var br in Doc.Project.Bridges.Where(b => b.Name.StartsWith("PTC ") && b
     totLb += lb; totN += rv.Count;
     string byDia = string.Join(", ", rv.GroupBy(b => Math.Round(b.Diameter / 0.0254 * 8) / 8).OrderBy(g => g.Key).Select(g => $"{g.Key:0.###} in: {g.Count():N0}"));
     Print($"{br.Name}: {rv.Count:N0} rivets ({byDia}), {rv.Select(b => (b.Diameter, b.Grip)).Distinct().Count()} sizes x grips, rivet heads {lb:N0} lb; steel {st.SteelMass * 2.20462262:N0} lb");
-    foreach (var w in rep.Warnings.Where(w => w.StartsWith(br.Name) && w.Contains("CHECK joint") && w.Contains(" rivets ")).Take(4)) Print("  W: " + w.Substring(0, Math.Min(260, w.Length)));
-    int nCheck = rep.Warnings.Count(w => w.StartsWith(br.Name) && w.Contains("CHECK joint") && w.Contains(" rivets "));
-    if (nCheck > 4) Print($"  ... {nCheck} rivet CHECK warnings");
+    foreach (var w in rep.Warnings.Where(w => w.StartsWith(br.Name) && (w.Contains("CHECK rivets") || w.Contains("rivet heads overlap") || w.Contains("do not fit"))))
+        Print("  W: " + w.Substring(0, Math.Min(300, w.Length)));
 }
 Print($"PTC total: {totN:N0} rivets, rivet heads {totLb:N0} lb");
 foreach (var s in report) Print("  " + s);
