@@ -287,28 +287,28 @@ public sealed partial class SteelModelGenerator
                     if (conn.DiaphragmWeld > 0 && pieces.Count > 0)
                     {
                         var wc = new Mesh();
-                        double wlen = 0;
+                        double wlen = 0, hbD = HoldBack(conn.DiaphragmWeld);
                         foreach (var (z0, z1) in pieces)
                         {
-                            wlen += z1 - z0;
                             foreach (int fce in new[] { -1, 1 })
                                 foreach (int sx in new[] { -1, 1 })
-                                    wc.AddWeld(fd.ToWorld(sx * nIn, z0, fce * td / 2), fd.ToWorld(sx * nIn, z1, fce * td / 2), n3 * -sx, d3 * fce, conn.DiaphragmWeld);
+                                    wlen += wc.AddHeld(fd.ToWorld(sx * nIn, z0, fce * td / 2), fd.ToWorld(sx * nIn, z1, fce * td / 2), n3 * -sx, d3 * fce, conn.DiaphragmWeld, hbD, hbD);
                         }
                         var why = Assumption.UnresolvedDimension(UnresolvedFlag.Text(src, $"{cap.SupName} girder {gl} diaphragm plate to connector plate weld size", "the p.30 Girder Splice weld symbols carry no size", $"Drawn at {In(conn.DiaphragmWeld)} (not a plan value)."),
                             $"fillet drawn at {In(conn.DiaphragmWeld)}, both faces of the diaphragm plate at both connector plates");
-                        Part(casm, $"{casm}-DPW", PartCategory.Weld, wc, wlen, $"Fillet weld, diaphragm plate to connector plates (size UNRESOLVED, drawn {In(conn.DiaphragmWeld)})", "E70XX / E80XX", why);
+                        Part(casm, $"{casm}-DPW", PartCategory.Weld, wc, wlen, $"Fillet weld, diaphragm plate to connector plates (size UNRESOLVED, drawn {In(conn.DiaphragmWeld)}){HoldNote(conn.DiaphragmWeld)}", "E70XX / E80XX", why);
                     }
                     if (conn.BottomPlateWeld > 0 && !double.IsNaN(zBpTop))
                     {
                         var wb = new Mesh();
+                        double hbB = HoldBack(conn.BottomPlateWeld), wbLen = 0;
                         var edges = new List<(double z, int dir)>();
                         if (epTop > zBpTop + 1e-4) edges.Add((zBpTop, 1));
                         if (zBpBot > epBot + 1e-4) edges.Add((zBpBot, -1));
                         foreach (var (ze, dir) in edges)
                             foreach (int fce in new[] { -1, 1 })
-                                wb.AddWeld(fd.ToWorld(-nIn, ze, fce * td / 2), fd.ToWorld(nIn, ze, fce * td / 2), new Vec3(0, 0, dir), d3 * fce, conn.BottomPlateWeld);
-                        Part(casm, $"{casm}-DPB", PartCategory.Weld, wb, 2 * nIn * edges.Count, $"Fillet weld {In(conn.BottomPlateWeld)}, diaphragm plate to the bottom plate (mill to bear, both faces, p.30)", "E70XX / E80XX");
+                                wbLen += wb.AddHeld(fd.ToWorld(-nIn, ze, fce * td / 2), fd.ToWorld(nIn, ze, fce * td / 2), new Vec3(0, 0, dir), d3 * fce, conn.BottomPlateWeld, hbB, hbB);
+                        Part(casm, $"{casm}-DPB", PartCategory.Weld, wb, wbLen, $"Fillet weld {In(conn.BottomPlateWeld)}, diaphragm plate to the bottom plate (mill to bear, both faces, p.30){HoldNote(conn.BottomPlateWeld)}", "E70XX / E80XX", WeldFlag(conn.BottomPlateWeld));
                     }
                 }
 
@@ -555,17 +555,19 @@ public sealed partial class SteelModelGenerator
                             $"{(kind == "bearing" ? "Bearing" : "Jacking")} stiffener {Pl(ws, ts)} x {In(hgt)} (plumb, {In(clip)} clips)");
                         var welds = new Mesh();
                         double top = hgt - Math.Max(clip, cd.StiffenerTopNoWeld);
+                        double hbS = HoldBack(cd.StiffenerWeld), wLen = 0;
+                        double hbTop = cd.StiffenerTopNoWeld > clip ? 0 : hbS;      // an explicit plan "no weld at the top" length is the termination there
                         foreach (int face in new[] { -1, 1 })
                         {
                             var off = f.Z * (face * ts / 2);
-                            welds.AddWeld(f.ToWorld(0, clip, 0) + off, f.ToWorld(0, top, 0) + off, f.Z * face, f.X, cd.StiffenerWeld);
+                            wLen += welds.AddHeld(f.ToWorld(0, clip, 0) + off, f.ToWorld(0, top, 0) + off, f.Z * face, f.X, cd.StiffenerWeld, hbS, hbTop);
                             // milled to bear on the bottom flange: fillet along the bottom edge on both faces of the plate (p.31 B-B / C-C)
                             if (cd.StiffenerBottomWeld)
-                                welds.AddWeld(f.ToWorld(clip, 0, 0) + off, f.ToWorld(ws, 0, 0) + off, f.Z * face, new Vec3(0, 0, 1), cd.StiffenerWeld);
+                                wLen += welds.AddHeld(f.ToWorld(clip, 0, 0) + off, f.ToWorld(ws, 0, 0) + off, f.Z * face, new Vec3(0, 0, 1), cd.StiffenerWeld, hbS, hbS);
                         }
-                        Part(asm, $"{asm}-{(kind == "bearing" ? "BS" : "JS")}{sn}-W", PartCategory.Weld, welds, top - clip,
+                        Part(asm, $"{asm}-{(kind == "bearing" ? "BS" : "JS")}{sn}-W", PartCategory.Weld, welds, wLen,
                             $"Fillet weld {In(cd.StiffenerWeld)}, {kind} stiffener to web" + (cd.StiffenerTopNoWeld > 0 ? $" ({In(cd.StiffenerTopNoWeld)} no weld at the top)" : "")
-                            + (cd.StiffenerBottomWeld ? $" and to the bottom flange (milled to bear, both faces, {In(cd.StiffenerWeld)})" : ""), "E70XX / E80XX");
+                            + (cd.StiffenerBottomWeld ? $" and to the bottom flange (milled to bear, both faces, {In(cd.StiffenerWeld)})" : "") + HoldNote(cd.StiffenerWeld), "E70XX / E80XX", WeldFlag(cd.StiffenerWeld));
                     }
         }
 
