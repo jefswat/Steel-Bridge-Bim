@@ -12,7 +12,7 @@ public static class SheetSet
         Options = new DrawingOptions
         {
             LayoutScale = s, SectionScale = s, BentScale = s,
-            TypicalSectionStation = ctx.Options.TypicalSectionStation, IncludeRebar = ctx.Options.IncludeRebar,
+            TypicalSectionStation = ctx.Options.TypicalSectionStation, IncludeRebar = ctx.Options.IncludeRebar, ProjectedViews = ctx.Options.ProjectedViews,
         },
     };
 
@@ -249,6 +249,8 @@ public static class SheetSet
         // Bar lists.
         foreach (var (title, view) in BarSheet.Pages(ctx, W, H))
             specs.Add(new SheetSpec(title.Replace("BAR LIST — ", "Bar list "), "Bar list and bending diagrams", new[] { Full(new ViewSpec(title, _ => view, ScaleFamily.Architectural, PaperSpace: true)) }));
+        // Views projected from the 3D model (general projector with hidden lines), appended so existing sheet numbers do not move.
+        if (ctx.Options.ProjectedViews) specs.AddRange(ProjectedViews.Specs(ctx, W, H));
         return specs;
     }
 

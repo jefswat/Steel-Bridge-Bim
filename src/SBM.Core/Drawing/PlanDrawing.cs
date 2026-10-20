@@ -6,7 +6,8 @@ public enum LineStyle { Continuous, Center, Dashed, Hidden }
 
 public enum TextAlign { Left, Center, Right }
 
-public sealed record Polyline3(Vec3[] Points, bool Closed = false);
+/// <summary>Polyline; <paramref name="Tag"/> = optional element key (projected views: the model element the line belongs to, for picking / QC).</summary>
+public sealed record Polyline3(Vec3[] Points, bool Closed = false, string? Tag = null);
 
 public sealed record TextItem(Vec3 Position, string Text, double Height, double Rotation, TextAlign Align = TextAlign.Center);
 

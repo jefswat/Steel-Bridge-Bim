@@ -162,6 +162,16 @@ It is practical for scaled sections and details, but not for symbolic or N.T.S. 
    - **Output:** an overlay PDF per view (plan in grey, model in color, differences in red, numbers in a side table), stored as evidence on the QC record.
 5. **What it is not used for:** the model's own generated sheets are never evidence. The checker compares the model to the PLAN sheets.
 
+**View engine (projected views for overlays).** Plans show more than the cut: what lies beyond it, plans and elevations. `sbm project`
+(`SBM.Core.Drawing.Projection.ModelProjector`) projects the model solids onto any view with exact hidden-line removal: orthographic
+(top / front / left / any direction, depth slab near / far, the near plane cutting like a section) or developed along an alignment /
+girder (x = station or girder distance, y = elevation). Output = DXF / SVG / PDF with the 3D layer names (visible) and `-HIDDEN`
+layers (dashed), every line tagged with its element key, so an overlay difference points straight at the model element. It
+uses only the 3D solids, never the generator's 2D sheet linework, so it is independent of the generated sheets. `sbm section`
+can add the "beyond" part by calling it with the view origin on the cut plane and `Near = 0`. Limit: like `MeshSection`, curved
+faces are faceted to the chord tolerance (silhouettes of tessellated surfaces); plane-merged faces and `ExtrudedSolid` recipes keep
+straight plate edges exact.
+
 Practical first scope:
 - Typical deck section, pier cap sections, abutment sections, girder elevation at splices, cross frame details, bearing details, and beam sections with strands.
 - These cover most of the rebar position and steel detail checks.

@@ -16,6 +16,8 @@ public sealed class DrawingOptions
     /// <summary>Station of the typical section; NaN = middle of span 1.</summary>
     public double TypicalSectionStation { get; set; } = double.NaN;
     public bool IncludeRebar { get; set; } = true;
+    /// <summary>Append the sheets projected from the 3D model (<see cref="ProjectedViews"/>: arch framing plan, developed girder elevation).</summary>
+    public bool ProjectedViews { get; set; } = true;
 
     public static DrawingOptions For(UnitSystem u) => u.IsUS
         ? new DrawingOptions()

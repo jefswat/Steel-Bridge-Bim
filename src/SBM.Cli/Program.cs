@@ -53,6 +53,16 @@ public static partial class Program
                                                             tolerance, default 1/16", is not a clash): counts by category pair +
                                                             each pair with station / offset / nearest girder. --bridge = name filter;
                                                             drains / misc items are also tested against the pier concrete
+          sbm project <file.sbm> [--view top|front|left|x,y,z] [--up x,y,z] [--origin x,y,z] [--bridge NAME] [--layers L1,L2,-L3]
+                     [--kinds K1,K2] [--girder N] [--near LEN] [--far LEN] [--developed alignment[:NAME]|girder:G] [--from-left]
+                     [--hidden show|dashed|none|off] [--method exact|zbuffer] [--window x0,y0,x1,y1] [--bolts] [--welds] [--rebar]
+                     [--no-holes] [--no-recipes] [--sharp DEG] [--transparent L1,L2] [--dxf out.dxf] [--svg out.svg] [--pdf out.pdf] [--title TEXT]
+                                                            3D -> 2D projection of the model with hidden-line removal: visible
+                                                            edges on the 3D layer names, hidden ones on <layer>-HIDDEN (dashed),
+                                                            every line tagged with its element. Lengths in model units (12 m, 40');
+                                                            depth (near / far) from the origin (default: center of the selection)
+                                                            along the view direction; developed: x = station (alignment) or distance
+                                                            along the girder, y = elevation, depth = offset (viewer on the right)
           sbm elevations <file.sbm> [bridge]              Step-by-step elevations, grade to bearing seat, at every bearing
           sbm blocking <file.sbm> [bridge] [--all]          Camber / blocking per girder (key points; --all = every plan point)
           sbm drawings <file.sbm> <folder|file.zip> [bridge] [--zip]
@@ -430,6 +440,8 @@ public static partial class Program
                 }
                 case "nurbs":
                     return NurbsCommand(args);
+                case "project":
+                    return ProjectCommand(args);
                 case "clash":
                 {
                     Need(args, 2);
@@ -481,6 +493,130 @@ public static partial class Program
             Console.Error.WriteLine("Error: " + ex.Message);
             return 1;
         }
+    }
+
+    private static int ProjectCommand(string[] args)
+    {
+        Need(args, 2);
+        string? Opt(string name) { int i = Array.IndexOf(args, name); return i > 0 && i + 1 < args.Length ? args[i + 1] : null; }
+        var doc = SbmDocument.Open(args[1]);
+        var u = doc.Units;
+        double Len(string t) => u.TryParseLength(t, SBM.Core.Units.LengthKind.Long, out double v) ? v : throw new ArgumentException($"Can't read length '{t}'.");
+        SBM.Core.Geometry.Vec3 V3(string t, bool lengths)
+        {
+            var p = t.Split(',');
+            if (p.Length != 3) throw new ArgumentException($"Expected x,y,z: '{t}'.");
+            double C(string c) => lengths ? Len(c.Trim()) : double.Parse(c, System.Globalization.CultureInfo.InvariantCulture);
+            return new SBM.Core.Geometry.Vec3(C(p[0]), C(p[1]), C(p[2]));
+        }
+        List<string>? List(string name) => Opt(name)?.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToList();
+        var src = new SBM.Core.Drawing.Projection.ProjectionSourceOptions
+        {
+            Bolts = args.Contains("--bolts"), Welds = args.Contains("--welds"), Rebar = args.Contains("--rebar"), Layers = List("--layers"), Kinds = List("--kinds"), Transparent = List("--transparent"),
+            Girder = Opt("--girder") is { } gs ? int.Parse(gs) - 1 : null,
+        };
+        var o = new SBM.Core.Drawing.Projection.ProjectionOptions
+        {
+            Hidden = (Opt("--hidden") ?? "show").ToLowerInvariant() switch
+            {
+                "show" or "dashed" => SBM.Core.Drawing.Projection.HiddenLines.Show,
+                "none" => SBM.Core.Drawing.Projection.HiddenLines.None,
+                "off" => SBM.Core.Drawing.Projection.HiddenLines.Off,
+                var h => throw new ArgumentException($"--hidden {h}: use show, dashed, none or off."),
+            },
+            Method = (Opt("--method") ?? "exact").StartsWith("z", StringComparison.OrdinalIgnoreCase) ? SBM.Core.Drawing.Projection.HlrMethod.DepthBuffer : SBM.Core.Drawing.Projection.HlrMethod.Exact,
+            Holes = !args.Contains("--no-holes"),
+            UseRecipes = !args.Contains("--no-recipes"),
+        };
+        if (Opt("--sharp") is { } sh) o.SharpAngleDegrees = double.Parse(sh, System.Globalization.CultureInfo.InvariantCulture);
+        if (Opt("--window") is { } win)
+        {
+            var w = win.Split(',').Select(x => Len(x.Trim())).ToArray();
+            if (w.Length != 4) throw new ArgumentException("--window x0,y0,x1,y1");
+            o.Window = new SBM.Core.Geometry.Box2 { MinX = w[0], MinY = w[1], MaxX = w[2], MaxY = w[3] };
+        }
+        string? bridge = Opt("--bridge");
+        SBM.Core.Bridge.BridgeDefinition FirstBridge() => bridge == null ? doc.Project.Bridges[0]
+            : doc.Project.Bridges.FirstOrDefault(x => x.Name.Contains(bridge, StringComparison.OrdinalIgnoreCase)) ?? throw new ArgumentException($"No bridge matches '{bridge}'.");
+        var sw = Stopwatch.StartNew();
+        doc.Regenerate();
+        Console.WriteLine($"Regenerated in {sw.Elapsed.TotalSeconds:F1} s");
+        double? near = Opt("--near") is { } ns ? Len(ns) : null, far = Opt("--far") is { } fs ? Len(fs) : null;
+        SBM.Core.Drawing.Projection.IViewMap view;
+        string title;
+        if (Opt("--developed") is { } dev)
+        {
+            bool left = args.Contains("--from-left");
+            if (dev.StartsWith("girder:", StringComparison.OrdinalIgnoreCase))
+            {
+                string gname = dev[7..];
+                var b = FirstBridge();
+                var f = doc.Framing(b.Name);
+                int gi = Enumerable.Range(0, f.Girders.Count).FirstOrDefault(i => f.Girders[i].Name.Equals(gname, StringComparison.OrdinalIgnoreCase)
+                    || (b.Girders.PlanNames?.ElementAtOrDefault(i)?.Equals(gname, StringComparison.OrdinalIgnoreCase) ?? false)
+                    || (int.TryParse(gname, out int k) && k - 1 == i), -1);
+                if (gi < 0) throw new ArgumentException($"Girder '{gname}' not found in '{b.Name}' (use G1.., a plan name or a number).");
+                var dv = SBM.Core.Drawing.Projection.DevelopedView.AlongGirder(f.Girders[gi]);
+                double half = b.Girders.Section.Segments(SBM.Core.Bridge.GirderPlate.TopFlange).Concat(b.Girders.Section.Segments(SBM.Core.Bridge.GirderPlate.BottomFlange))
+                    .Select(x => x.Width).DefaultIfEmpty(0.6).Max() / 2;
+                view = dv.WithSlab(near ?? -(half + 0.15), far, left, $"girder {gname} of {b.Name}");
+                bridge = b.Name;
+                title = $"{b.Name} girder {gname} developed elevation";
+            }
+            else
+            {
+                string? an = dev.Contains(':') ? dev[(dev.IndexOf(':') + 1)..] : null;
+                var al = doc.Alignment(an ?? FirstBridge().AlignmentName);
+                var stas = doc.ProjectionItems(src, bridge).Where(i => i.Mesh != null).SelectMany(i => { var bb = i.Mesh!.Bounds(); return new[] { bb.Min, bb.Max }; })
+                    .Select(p => al.Inverse(p.XY).Station).ToList();
+                if (stas.Count == 0) throw new ArgumentException("Nothing to project.");
+                view = SBM.Core.Drawing.Projection.DevelopedView.Along(al, stas.Min(), stas.Max()).WithSlab(near, far, left, al.Name);
+                title = $"Developed elevation along {al.Name}";
+            }
+        }
+        else
+        {
+            string vname = (Opt("--view") ?? "top").ToLowerInvariant();
+            var dir = vname switch
+            {
+                "top" or "plan" => new SBM.Core.Geometry.Vec3(0, 0, -1),
+                "front" => new SBM.Core.Geometry.Vec3(0, 1, 0),
+                "left" => new SBM.Core.Geometry.Vec3(1, 0, 0),
+                _ => V3(vname, false),
+            };
+            var up = Opt("--up") is { } us ? V3(us, false) : Math.Abs(dir.Normalized().Z) > 0.99 ? new SBM.Core.Geometry.Vec3(0, 1, 0) : new SBM.Core.Geometry.Vec3(0, 0, 1);
+            SBM.Core.Geometry.Vec3 origin;
+            if (Opt("--origin") is { } os) origin = V3(os, true);
+            else
+            {
+                var bb = SBM.Core.Solids.Box3.Empty;
+                foreach (var it in doc.ProjectionItems(src, bridge)) if (it.Mesh != null) { var b = it.Mesh.Bounds(); bb.Add(b.Min); bb.Add(b.Max); }
+                origin = bb.IsEmpty ? SBM.Core.Geometry.Vec3.Zero : (bb.Min + bb.Max) * 0.5;
+            }
+            view = new SBM.Core.Drawing.Projection.OrthographicView(origin, dir, up) { Near = near, Far = far };
+            title = $"{bridge ?? doc.Project.Name} - {vname} view";
+        }
+        title = Opt("--title") ?? title;
+        sw.Restart();
+        var r = doc.ProjectView(view, o, src, bridge);
+        Console.WriteLine($"Projected ({view.Describe}): {r.Stats}");
+        Console.WriteLine($"  visible {u.FormatLength(r.Stats.VisibleLength)}, hidden {u.FormatLength(r.Stats.HiddenLength)} of lines; {r.Elements.Count} elements; layers: " +
+            string.Join(", ", r.Drawing.Layers.Where(l => l.Polylines.Count > 0).Select(l => $"{l.Name} ({l.Polylines.Count})")));
+        if (Opt("--dxf") is { } dxf) { SBM.IO.Dxf.DxfWriter.Write(dxf, r.Drawing, u.LongUnit, flat: true); Console.WriteLine($"  -> {dxf}"); }
+        if (Opt("--svg") is { } svg) { SBM.IO.Svg.SvgWriter.Write(svg, r.Drawing); Console.WriteLine($"  -> {svg}"); }
+        if (Opt("--pdf") is { } pdf)
+        {
+            var fmt = new SBM.Core.Drawing.Sheets.SheetFormat(17, 11, doc.Project.Name, bridge ?? doc.Project.Name, DateTime.Now.ToString("MM/dd/yyyy"));
+            var (ax0, ay0, ax1, ay1) = fmt.Area;
+            string t2 = title;
+            var spec = new SBM.Core.Drawing.Sheets.SheetSpec(title, view.Describe, new[] { new SBM.Core.Drawing.Sheets.Panel(new SBM.Core.Drawing.Sheets.ViewSpec(title,
+                sc => SBM.Core.Drawing.Views.ProjectedViews.View(r, t2, t2.ToUpperInvariant(), "Projected from the 3D model, hidden lines dashed", sc, u),
+                o.Window != null ? SBM.Core.Drawing.Sheets.ScaleFamily.Architectural : SBM.Core.Drawing.Sheets.ScaleFamily.Engineering), 0, 0, ax1 - ax0, ay1 - ay0) });
+            var sheets = SBM.Core.Drawing.Sheets.SheetComposer.Number(new List<SBM.Core.Drawing.Sheets.Sheet> { SBM.Core.Drawing.Sheets.SheetComposer.Compose(spec, fmt, u) });
+            SBM.IO.Pdf.PdfWriter.Write(pdf, sheets, title);
+            Console.WriteLine($"  -> {pdf} ({string.Join("; ", sheets[0].ScaleNotes)})");
+        }
+        return 0;
     }
 
     private static int NurbsCommand(string[] args)

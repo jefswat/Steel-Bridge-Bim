@@ -212,6 +212,16 @@
                             <StackPanel><TextBlock Style="{StaticResource RibbonIcon}" Text="&#xE8B3;"/><TextBlock Style="{StaticResource RibbonLabel}" Text="Section Cut"/></StackPanel>
                         </Button>
                     </HeaderedContentControl>
+                    <HeaderedContentControl Header="2D projection" Style="{StaticResource RibbonGroup}">
+                        <StackPanel Orientation="Horizontal">
+                            <Button Style="{StaticResource RibbonButton}" Click="OnProjectView2D" ToolTip="Project view to 2D: the current 3D camera direction (or the section cut, when on), the visible layers, projected from the model solids with hidden lines (dashed), in a drawing window with DXF / PDF export">
+                                <StackPanel><TextBlock Style="{StaticResource RibbonIcon}" Text="&#xE7C3;"/><TextBlock Style="{StaticResource RibbonLabel}" Text="Project View"/></StackPanel>
+                            </Button>
+                            <Button x:Name="ProjectedPlanButton" Style="{StaticResource RibbonButton}" Click="OnProjectedPlanToggle" ToolTip="Projected plan (model): the plan view shows the top view projected from the 3D model for EVERY bridge (framing linework stays where it exists). Bridges without framing linework (tied arch, segmental) always show it.">
+                                <StackPanel><TextBlock Style="{StaticResource RibbonIcon}" Text="&#xE81E;"/><TextBlock x:Name="ProjectedPlanLabel" Style="{StaticResource RibbonLabel}" Text="Projected Plan: off"/></StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </HeaderedContentControl>
                     <HeaderedContentControl Header="Inquiry" Style="{StaticResource RibbonGroup}">
                         <StackPanel Orientation="Horizontal">
                             <Button Style="{StaticResource RibbonButton}" Click="OnMeasureDistance" ToolTip="Measure (Ctrl+M): click two points (snapped) for the 3D and plan distance, dE / dN / dZ, slope, bearing and the station / offset of both points. Chain keeps measuring from the last point.">

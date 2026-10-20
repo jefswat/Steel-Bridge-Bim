@@ -244,6 +244,22 @@ public sealed class SbmDocument
         return names.Select(n => SBM.Core.Checks.SteelClashCheck.Run(Model(n), o, Units)).ToList();
     }
 
+    /// <summary>
+    /// Projects model solids onto a view (<see cref="SBM.Core.Drawing.Projection.ModelProjector"/>: orthographic or developed, depth slab,
+    /// hidden-line removal). <paramref name="bridgeFilter"/> = bridges whose name contains it (null = all bridges).
+    /// </summary>
+    public SBM.Core.Drawing.Projection.ProjectionResult ProjectView(SBM.Core.Drawing.Projection.IViewMap view, SBM.Core.Drawing.Projection.ProjectionOptions? options = null,
+        SBM.Core.Drawing.Projection.ProjectionSourceOptions? source = null, string? bridgeFilter = null) =>
+        SBM.Core.Drawing.Projection.ModelProjector.Project(ProjectionItems(source, bridgeFilter), view, options);
+
+    /// <summary>The projectable elements (steel parts, concrete, substructure ...) of the bridges whose name contains <paramref name="bridgeFilter"/>.</summary>
+    public List<SBM.Core.Drawing.Projection.ProjectionItem> ProjectionItems(SBM.Core.Drawing.Projection.ProjectionSourceOptions? source = null, string? bridgeFilter = null)
+    {
+        var names = Project.Bridges.Select(b => b.Name).Where(n => bridgeFilter == null || n.Contains(bridgeFilter, StringComparison.OrdinalIgnoreCase)).ToList();
+        if (names.Count == 0) throw new ArgumentException($"No bridge matches '{bridgeFilter}'.");
+        return names.SelectMany(n => SBM.Core.Drawing.Projection.ModelProjectionSource.Items(Model(n), source)).ToList();
+    }
+
     public BridgeFraming Framing(string? bridgeName = null) => Model(bridgeName).Framing;
     public SteelModel Steel(string? bridgeName = null) => Model(bridgeName).Steel ?? throw new InvalidOperationException("3D steel was not generated (framing errors).");
     public SBM.Core.Substructure.SubstructureModel Substructure(string? bridgeName = null) => Model(bridgeName).Substructure ?? throw new InvalidOperationException("Substructure was not generated (framing errors).");

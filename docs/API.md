@@ -81,6 +81,19 @@ sbm asset      "C:\Jobs\Br12\Br12.sbm" photo add IMG_0412.jpg --element CAP2   #
                                                  # (see "Asset management" below; "sbm asset <model> help" lists the commands)
 sbm drawings   "C:\Jobs\Br12\Br12.sbm" "C:\Jobs\Br12\dxf"   # 2D DXF models: layout, plan, typical section, bents, bar bending
 sbm drawings   "C:\Jobs\Br12\Br12.sbm" "C:\Jobs\Br12\dxf" --zip   # same views as one zip (dxf.zip); a target ending in .zip does the same
+sbm project    "C:\Jobs\Br12\Br12.sbm" --view top --bridge "Unit 2" --transparent 3D-DECK --pdf plan.pdf --dxf plan.dxf --svg plan.svg
+                                                 # 3D -> 2D projection of the model solids with hidden-line removal (view engine):
+                                                 # visible edges on the 3D layer names, hidden edges on <layer>-HIDDEN (dashed), every
+                                                 # line tagged with its element (DXF layer, SVG data-tag). --view top|front|left|x,y,z
+                                                 # [--up x,y,z] [--origin x,y,z]; depth slab --near/--far (model units, from the origin
+                                                 # = center of the selection, along the view direction; the near plane cuts and caps
+                                                 # solids like a section); --layers 3D-ARCH,-3D-ARCH-PT (prefixes, '-' excludes),
+                                                 # --kinds, --girder N; --bolts --welds --rebar (centerlines); --hidden show|none|off;
+                                                 # --method exact|zbuffer; --no-holes; --window x0,y0,x1,y1
+sbm project    "C:\Jobs\Br12\Br12.sbm" --bridge "Unit 2" --developed girder:C --girder 3 --window "100',-1000',160',2000'" --pdf gC.pdf
+                                                 # developed elevation: x = distance along the girder (or --developed alignment[:name]
+                                                 # = station), y = elevation, viewer on the right (--from-left); girder default near
+                                                 # plane just right of its widest flange
 sbm elevations "C:\Jobs\Br12\Br12.sbm"          # grade → deck → haunch → web → flange → sole plate → seat, every bearing
 sbm blocking   "C:\Jobs\Br12\Br12.sbm"          # camber, deflections, girder-line haunch elevation and blocking at each key point (--all: every plan point)
 ```
@@ -222,6 +235,35 @@ doc.Save();                                          // or Save("other.sbm")
 doc.ExportIfc("Br12.ifc");
 var res = doc.ExportIfc("Br12-abv.ifc", IfcGeometryMode.ReferenceView);   // AbV geometry; optional 3rd arg chord tolerance (m)
 ```
+
+## View engine: projected 2D views (hidden lines)
+
+`SBM.Core.Drawing.Projection` projects the model SOLIDS (not generator 2D data) onto a view, with hidden-line removal:
+
+```csharp
+using SBM.Core.Drawing.Projection;
+var view = new OrthographicView(origin, direction, up) { Near = -2, Far = 30 };   // or OrthographicView.Top(), DevelopedView.AlongGirder(g) / .Along(alignment, sta0, sta1)
+var src  = new ProjectionSourceOptions { Layers = new[] { "3D-ARCH", "-3D-ARCH-PT" }, Transparent = new[] { "3D-DECK" }, Girder = 2, Bolts = false, Rebar = false };
+var r = doc.ProjectView(view, new ProjectionOptions { Method = HlrMethod.Exact, Hidden = HiddenLines.Show }, src, bridgeFilter: "Arch");
+// r.Drawing = PlanDrawing: layers "3D-..." (visible) + "3D-...-HIDDEN" (dashed); every Polyline3.Tag = element key
+// r.Elements[key] = (Layer, Kind, Name, Bridge, Source object); r.Pick(point, radius); r.Stats (counts, timings)
+```
+
+- Edges: faces merged BY PLANE (no tessellation lines, T-junctions resolved), sharp edges (> 30 deg, `SharpAngleDegrees`), boundary
+  edges, silhouettes of smooth (curved, tessellated) surfaces; exact `ExtrudedSolid` recipe edges when the recipes describe the whole mesh.
+- Hidden lines: `Exact` = every edge split exactly against the occluding triangles (2D BVH, parallel); `DepthBuffer` = z-buffer, fast,
+  approximate at pixel size. Coincident lines are drawn once (visible wins over hidden).
+- Depth slab: `Near` cuts the solids (cut outline drawn, cut capped so what is behind stays hidden), `Far` drops what is beyond.
+  A section view = `OrthographicView` with its origin on the cut plane and `Near = 0`; everything returned beyond the cut is the
+  "beyond" projection (hook for `sbm section`).
+- Developed views: x = station / distance along a path, y = elevation, depth = horizontal offset; edges are subdivided so curves unroll.
+- Timings (2026-10-19, 12 cores): Northaven arch top view 1,161 elements / 0.7 M triangles 2.0-2.4 s exact; I-80 + Ramp G top view
+  (all 7 bridges, 58 k elements, 26 M triangles) exact 74 s with the deck hiding the steel, 27 s framing plan (deck transparent, no bolt
+  holes), depth buffer 22 s; one girder developed elevation (480 parts) 0.75 s.
+- App: View > 2D projection > **Project View** (also right-click > "Project view to 2D") projects the camera direction (or the section
+  cut) with the visible layers into a drawing window (click a line = its element; DXF / PDF export). **Projected Plan** toggles the
+  projected top view of every bridge in the plan view (layers `PLAN-...`); bridges without framing linework (tied arch) always show it.
+  Snapshot options `--projectedplan`, `--projectview` (writes `<out>_projected.png`).
 
 ## Plan-driven deck reinforcing
 

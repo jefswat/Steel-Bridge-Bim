@@ -1085,6 +1085,7 @@ public sealed partial class MainViewModel : ObservableObject
         StatusText = "Regenerating…";
         var project = _project;
         var origin = _origin;
+        bool projectedAll = ProjectedPlanAll;
         var sw = Stopwatch.StartNew();
         try
         {
@@ -1100,6 +1101,7 @@ public sealed partial class MainViewModel : ObservableObject
                 var subs = models.Select(m => m?.Substructure).OfType<SBM.Core.Substructure.SubstructureModel>().ToList();
                 var merged = MergeDrawings(project, bridges, results);
                 foreach (var sub in subs) SubstructurePlanBuilder.Add(merged, sub);
+                AddProjectedPlans(merged, models, projectedAll);
                 // A stable origin keeps reference models (built separately) aligned with the bridge.
                 var sc = SceneBuilder.Build(merged, origin);
                 sc.BridgeNames.AddRange(bridges.Select(b => b.Name));

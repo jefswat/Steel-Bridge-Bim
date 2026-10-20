@@ -617,6 +617,8 @@ public partial class MainWindow
             layers.Items.Add(Item("Show all layers", ShowAllLayers));
         }
         menu.Items.Add(layers);
+        menu.Items.Add(new Separator());
+        menu.Items.Add(Item(_sectionOn ? "Project section view to 2D" : "Project view to 2D", () => _ = ProjectView2DAsync(), Ic(0xE7C3)));
         menu.PlacementTarget = View;
         menu.Placement = System.Windows.Controls.Primitives.PlacementMode.MousePoint;
         menu.IsOpen = true;
