@@ -60,7 +60,7 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   Agents reviewing plans: query instead of reading PDFs: `sbm db <model.sbm> --sheets-for <mark|name> [--json]` (pages to read per PDF) and `--find-sheet <title|no.>` (read-only, existing db, no regeneration).
   Keep `ModelDatabase.Builder` numbering in step with `IfcExporter` (test `GlobalIds_AreTheIfcGlobalIds`). CLI `sbm db`, docs in docs/API.md.
 - `src/SBM.Cli` — `sbm.exe` command line over SBM.Api (new/info/get/set/add/remove/import-landxml/regen/export/run/bench/
-  elevations/drawings/sheets/nurbs).
+  elevations/drawings/sheets/nurbs/project).
 - `src/SBM.Core` â€” no UI. All geometry and the parametric model.
   - `Geometry/` Vec2/Vec3 (double), Box2, Numerics (Gauss-Legendre, Brent, FindRoots, line intersection).
   - `Alignments/` `HorizontalElement` = one class for line/arc/clothoid (linear curvature K0â†’K1, partial spirals OK);
@@ -269,6 +269,36 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
     is its own view (`BentViews.CapSectionView`, legend = bars cut). Pile plans at the bottom of the footing (`PierViews.PileAt`), tips plumb / battered
     (`PierViews.TipText`). `MiscViews`: dap details, misc items plan + schedule. Optional `GirderLayoutDefinition.PlanNames` -> `ViewContext.GirderName` (sheets only).
     DXF zip: `SheetExport.WriteAll/WriteSheets` (folder or .zip), `SbmDocument.ExportSheetsDxf`, `sbm sheets ... --dxf <folder|zip> [--models]`, `sbm drawings ... --zip`, app button.
+  - VIEW ENGINE (2026-10-19): `Drawing/Projection/` = general 3D -> 2D projection of the model SOLIDS with hidden-line removal (pure, tests
+    `ProjectionTests`). `ModelProjectionSource.Items(BridgeModel | parts, ProjectionSourceOptions)` -> `ProjectionItem`s (mesh or centerlines,
+    viewport layer name via `ModelLayers` = the steel layer table SceneBuilder now uses (`SolidLayerDefs` points at it; keep SubLayer /
+    MiscLayer in step with SceneBuilder), key "bridge/assembly/mark", Kind, Girder, Source object; filters Layers (prefixes, '-' excludes),
+    Kinds, Girder, Where; `Transparent` layers hide only their own back edges (`OccludesOthers = false`: deck outline over the framing);
+    bolts / studs / rebar optional). `IViewMap`: `OrthographicView` (origin, direction, up; x = dir x up; Near / Far depth slab; Top/Front/Left)
+    and `DevelopedView` (plan path + stations, x = station, y = Z, depth = -offset, viewer on the right; miter-normal interpolation so a
+    chorded arc develops exactly at its vertices; `Along(alignment)`, `AlongGirder(g)`, `WithSlab`). `FeatureEdges.Of(mesh)` (cached per mesh):
+    weld 0.01 mm, faces merged BY PLANE (coplanar edge neighbours + plane hash), per-edge face coverage cancels interior edges, T-junction
+    leftovers resolved by a 1D sweep per edge line; Boundary / Sharp (> 30 deg default: 16-gon holes stay smooth) / Smooth (silhouette only:
+    the two face normals straddle the view direction); meshes fully described by `ExtrudedSolid` recipes use the profile polygon + sweep
+    edges (hole walls always smooth). `ModelProjector.Project(items, view, options)`: edges mapped to (x, y, depth) (subdivided to
+    `MaxSegment` under a non-linear map), slab + `Window` clipped; occluders = triangles (back faces of CLOSED meshes culled), slab-clipped,
+    near-plane cut outline drawn + capped (`MeshSection.Loops`, even-odd, `TriangulateWithHoles`); HLR `Exact` (2D BVH with min depth per
+    node, per-edge hidden intervals: inside the triangle 1 nm and behind its plane by `DepthTolerance` 0.2 mm, parallel) or `DepthBuffer`
+    (z-buffer, atomic min, sampled at half a pixel, slack 2 px); `MergeOverlaps` draws coincident collinear pieces once (visible wins, lowest
+    item tag); `ChainPieces` per element. Output `ProjectionResult` (PlanDrawing with layers "<3D layer>" + "<3D layer>-HIDDEN" (dashed),
+    `Polyline3.Tag` = element key (new optional record member), `Elements`, `Pick`, `DropLayers`, `Stats`). `SbmDocument.ProjectView` /
+    `ProjectionItems`; CLI `sbm project` (DXF / SVG (`SBM.IO/Svg/SvgWriter`, data-tag) / PDF sheet). Sheets: `Views/ProjectedViews`
+    (ArchPlan, GirderElevation developed with near plane right of the widest flange + windows) appended at the END of the set
+    (`DrawingOptions.ProjectedViews`, numbers of existing sheets unchanged). `sbm section` (other agent) should call the projector with the
+    view origin on its cut plane and Near = 0 for the "beyond" part. Handoff 6i: the double vertical lines on the girder elevations were
+    GirderViews' field splice symbol (two full-depth lines 0.02" apart per splice), not tessellation; now one line. Timings: docs/API.md.
+    App: `MainWindow.Projection.cs` (Project View = camera direction or the section cut (dir = cut normal, Near 0), visible layers, unhidden
+    elements -> `Editors/ProjectionWindow` (DrawingCanvas, click = element via `DrawingCanvas.Clicked`, hidden toggle, DXF / PDF), right-click
+    item, ribbon View > 2D projection), `ViewModels/MainViewModel.Projection.cs` (projected plan: bridges with no girders always, every bridge
+    with the "Projected Plan" toggle; exact under 3 M triangles else depth buffer without holes; cached per BridgeModel; layers `PLAN-...`
+    drawn in plan mode only (`LayerModeOk`); KeepDepth = world Z). Snapshot `--projectedplan`, `--projectview` (`<out>_projected.png`).
+    Not yet: exact recipe-based (B-rep) cuts, migrating the recreated sheet views (girder elevations, cross girders, splices, sections) to it,
+    dashed hidden lines in the GPU plan view (hidden layers are drawn dimmer), NURBS-exact silhouettes.
   - App 3D: `MainWindow.Viewport3D.cs` â€” camera depth range follows the scene (`KeepCameraInRange` on CameraChanged; do
     not hand-set Near/Far elsewhere); section cut = CPU clipping of all solids/lines/text (Helix
     `CrossSectionMeshGeometryModel3D` was tried: transparent models stop rendering when it is in the scene â€” don't use
