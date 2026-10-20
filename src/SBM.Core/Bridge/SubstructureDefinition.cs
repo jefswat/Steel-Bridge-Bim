@@ -519,6 +519,11 @@ public sealed class SubstructureDefinition
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
     public double ColumnRotationDeg { get; set; }
 
+    /// <summary>OPTIONAL plan-drawn substructure (tapered shafts, cap beams, odd footings, pile groups, abutment walls) read straight from the plans; builds
+    /// WITHOUT bearing seats (support-lines-only bridges). Null = none; omitted from the .sbm.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public PlanSubstructureDefinition? Plan { get; set; }
+
     public static SubstructureDefinition Default(SupportType type) => type == SupportType.Pier
         ? new SubstructureDefinition()
         : new SubstructureDefinition
@@ -542,6 +547,7 @@ public sealed class SubstructureDefinition
     public List<string> Validate(string name, SupportType type)
     {
         var e = new List<string>();
+        if (Plan != null) return e;   // plan-drawn substructure: the parametric bent is not built
         if (CapWidth <= 0 || CapDepth <= 0) e.Add($"{name}: cap width and depth must be positive.");
         if (MinPedestalHeight < 0) e.Add($"{name}: minimum pedestal height must not be negative.");
         if (type == SupportType.Pier)
@@ -574,6 +580,7 @@ public sealed class SubstructureDefinition
         c.Abutment = Abutment?.Clone();
         c.Unresolved = Unresolved?.ToList();
         c.PlanColumnHeights = PlanColumnHeights?.ToList();
+        c.Plan = Plan?.Clone();
         return c;
     }
 }

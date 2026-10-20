@@ -186,10 +186,14 @@ public sealed class RegenerationCache
                 lock (_lock) _sub[subKey] = sub;
             }
             // A tied-arch bridge builds no substructure: its bearings reach the approach units' piers as foreign seats.
-            // A truss bridge builds no substructure either (its shoes publish bearing seats with locations; piers belong to the substructure model).
-            else if (!found && includeSteel && !pt.f.HasErrors && (pt.s != null || pt.ps != null) && b.Arch == null && b.Truss == null)
+            // A truss bridge builds no automatic substructure either (its shoes publish bearing seats with locations); plan-defined substructures
+            // (SubstructureDefinition.Plan, seats from plan elevations, no bearings needed) are built for any non-arch bridge, incl. truss and
+            // support-lines-only bridges (PTC piers).
+            else if (!found && includeSteel && !pt.f.HasErrors && b.Arch == null
+                && (((pt.s != null || pt.ps != null) && b.Truss == null)
+                    || b.Supports.Any(x => x.ResolvedSubstructure.Enabled && x.ResolvedSubstructure.Plan != null)))
             {
-                var seats = (IReadOnlyList<BearingSeat>?)pt.ps?.BearingSeats ?? pt.s!.BearingSeats;
+                var seats = (IReadOnlyList<BearingSeat>?)pt.ps?.BearingSeats ?? (IReadOnlyList<BearingSeat>?)pt.s?.BearingSeats ?? Array.Empty<BearingSeat>();
                 var foreign = new Dictionary<int, List<(string, BearingSeat)>>();
                 for (int j = 0; j < b.Supports.Count; j++)
                 {

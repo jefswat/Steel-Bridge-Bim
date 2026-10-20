@@ -141,6 +141,7 @@ foreach (var unit in units)
 }
 
 // ================================================================ 3. regenerate + save
+{ var sr = await SBM.Api.ScriptHost.RunFileAsync(@"samples\plans\substructure-ptc.csx", Doc, new[] { "--nosave" }); Print(sr.Output.TrimEnd()); if (!sr.Success) Print("ERROR in substructure-ptc.csx: " + sr.Error); }   // phase 4: piers + abutments
 var rep = Doc.Regenerate();
 Print($"Regenerated {rep.Bridges} bridge(s) in {rep.Elapsed.TotalSeconds:0.0} s; {rep.Warnings.Count} warnings, {rep.Errors.Count} errors");
 foreach (var w in rep.Warnings.Take(10)) Print("  W: " + w);

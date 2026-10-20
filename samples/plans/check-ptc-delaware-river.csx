@@ -172,5 +172,56 @@ Print("== 5. Crown / cross slope (p.107)");
 Row("slope each side of the CL 1/8\" per ft", -(al.ElevationAt(Sta("680+00"), 12 * ft) - al.ElevationAt(Sta("680+00"))) / ft / 12, 1.0 / 96, 1e-9, "ft/ft");
 Print("INFO  the gutter line 38'-3 from the CL (p.107) is on the printed profile; the deck / barrier / walkway are NOT modeled (SupportLinesOnly)");
 
+// ---------------------------------------------------------------- 6. substructure (phase 4): piers.csv vs the generated solids
+Print("== 6. Substructure vs piers.csv (seat / footing elevations, footing size) and the p.42 concrete quantity");
+var pr = new List<string[]>();
+foreach (var line in File.ReadAllLines(Path.Combine(dataDir, "piers.csv")).Skip(1))
+{
+    if (line.Trim() == "") continue;
+    var cells = new List<string>(); var cur = new System.Text.StringBuilder(); bool q = false;
+    foreach (char c in line) { if (c == '"') q = !q; else if (c == ',' && !q) { cells.Add(cur.ToString()); cur.Clear(); } else cur.Append(c); }
+    cells.Add(cur.ToString());
+    pr.Add(cells.ToArray());
+}
+double Dd(string t) => double.Parse(t, inv);
+var allUnits = names.SelectMany(n => Doc.Model(n).Substructure.Units.Select(u => (n, u))).ToList();
+double totalCy = 0;
+double Vol(IEnumerable<SBM.Core.Substructure.SubSolid> ss) => ss.Where(x => x.IsConcrete && x.Kind != SBM.Core.Substructure.SubElementKind.Pile).Sum(x => Math.Abs(x.Mesh.Volume()));
+(double lo, double hi) ZExt(SBM.Core.Substructure.SubSolid sd2) { var ps = sd2.Mesh.Positions; return (ps.Min(p => p.Z), ps.Max(p => p.Z)); }
+foreach (var r in pr)
+{
+    string pier = r[0]; var u = allUnits.First(x => x.u.Name == r[1]).u;
+    double seatPlan = Dd(r[4]), fb = Dd(r[5]), ftp = Dd(r[6]), fl = Dd(r[8]), fw = Dd(r[9]);
+    string cls = r[2], pg = r[3];
+    Row($"Pier {pier}: top-of-shaft / seat El", u.FixedSeats.Max(f => f.Z) / ft, seatPlan, 0.0005, "ft", pg);
+    if (cls == "river")
+    {
+        var seal = u.Solids.First(x => x.Name.EndsWith("tremie seal"));
+        Row($"Pier {pier}: tremie seal bottom El", ZExt(seal).lo / ft, -25.0, 0.0005, "ft", "p.17 / p.19 (outline UNRESOLVED, flagged)");
+        Row($"Pier {pier}: pile cap slab top El", ZExt(u.Solids.First(x => x.Name.EndsWith("pile cap slab"))).hi / ft, -15.0, 0.0005, "ft", "p.17");
+        totalCy += Vol(u.Solids) / (ft * ft * ft) / 27.0;
+        continue;
+    }
+    var ftg = u.Solids.First(x => x.Name.EndsWith(" footing") || x.Name.EndsWith(" pile cap"));
+    var (lo, hi) = ZExt(ftg);
+    Row($"Pier {pier}: footing bottom El", lo / ft, fb, 0.0005, "ft", pg);
+    Row($"Pier {pier}: footing top El", hi / ft, ftp, 0.0005, "ft", pg);
+    var ps2 = ftg.Mesh.Positions;
+    var us2 = ps2.Select(p => Vec2.Dot(new Vec2(p.X, p.Y) - u.Origin, u.D)); Row($"Pier {pier}: footing length along the pier line", (us2.Max() - us2.Min()) / ft, fl, 0.0005, "ft", pg);
+    var ns2 = ps2.Select(p => Vec2.Dot(new Vec2(p.X, p.Y) - u.Origin, u.N)); Row($"Pier {pier}: footing width", (ns2.Max() - ns2.Min()) / ft, fw, 0.0005, "ft", pg);
+    totalCy += Vol(u.Solids) / (ft * ft * ft) / 27.0;
+}
+foreach (var (nm, pgs, fbp, ftpp, seatp) in new[] { ("W Abutment", "p.11", 16.0, 20.5, 41.974), ("E Abutment", "p.38", 51.154, 55.154, 62.033) })
+{
+    var u = allUnits.First(x => x.u.Name == nm).u;
+    var f = ZExt(u.Solids.First(x => x.Name.EndsWith(" footing")));
+    Row($"{nm}: footing bottom El", f.lo / ft, fbp, 0.0005, "ft", pgs);
+    Row($"{nm}: footing top El", f.hi / ft, ftpp, 0.0005, "ft", pgs);
+    Row($"{nm}: seat El (shoe pedestal top)", u.FixedSeats.Max(x => x.Z) / ft, seatp, 0.0005, "ft", pgs);
+    totalCy += Vol(u.Solids) / (ft * ft * ft) / 27.0;
+}
+foreach (var nm in new[] { "Pier 17 W brg", "Pier 18", "Pier 19", "Pier 20 main brg", "E Abutment" })
+    Print($"INFO  {nm}: {allUnits.First(x => x.u.Name == nm).u.Foundations.Sum(f => f.Piles.Count)} piles modeled (count is not printed on the plans: UNRESOLVED, flagged)");
+Print($"INFO  {allUnits.Count} substructure units; concrete modeled (footings, shafts, caps, abutment walls, seals; piles excluded) = {totalCy:0} cu yd. p.42 (DRB-4 = the superstructure contract) prints Class A concrete 13,200 cu yd = deck / parapets / walkways by span group and no substructure line, so there is no printed substructure quantity to compare (reported only); piers 18 / 19 bodies are modeled SOLID (hollow / cored interior not read, UNRESOLVED), which dominates the total");
 Print($"\nPTC Delaware River location check: {pass} PASS / {diff} DIFF");
 foreach (var d in diffs) Print("  " + d);
