@@ -532,7 +532,8 @@ public sealed partial class ConcreteGenerator
                 sec ??= new[] { new Vec2(-hw, 0), new Vec2(hw, 0), new Vec2(hw, 1), new Vec2(-hw, 1) };
                 rings.Add(new[] { pl.WithZ(ztf), pr.WithZ(ztf), pr.WithZ(Math.Max(zr, ztf + 1e-4)), pl.WithZ(Math.Max(zl, ztf + 1e-4)) });
             }
-            MeshBuilder.AddLoft(mesh, sec!, rings);
+            rings = ClipHaunchRings(rings);
+            if (rings.Count >= 2) MeshBuilder.AddLoft(mesh, sec!, rings);
         }
         _m.Haunches = mesh;
     }
