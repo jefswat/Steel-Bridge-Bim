@@ -49,7 +49,7 @@ public static class SheetComposer
 {
     private const double In = 0.0254;
 
-    public static readonly double[] Engineering = { 120, 240, 360, 480, 600, 720, 960, 1200, 1800, 2400 };
+    public static readonly double[] Engineering = { 120, 240, 360, 480, 600, 720, 960, 1200, 1800, 2400, 3600, 4800, 6000 };   // 1" = 300' / 400' / 500': long bridges (PTC 6571 ft; p.1 is 1" = 300')
     /// <summary>Architectural scales, falling back to engineer's scales for very tall or long views.</summary>
     public static readonly double[] Architectural = { 4, 6, 8, 12, 16, 24, 32, 48, 64, 96, 120, 192, 240, 360, 480 };
     public static readonly double[] Metric = { 5, 10, 20, 25, 50, 75, 100, 200, 250, 500, 1000 };
