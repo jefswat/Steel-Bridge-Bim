@@ -149,7 +149,8 @@ public static class IfcExporter
             string Opt(string s) => string.IsNullOrEmpty(s) ? "$" : S(s);
             int crs = w.Add("IFCPROJECTEDCRS", $"{S(geo.CrsName)},{Opt(geo.Description)},{Opt(geo.GeodeticDatum)},$,{Opt(geo.MapProjection)},{Opt(geo.MapZone)},{Ref(mapUnit)}");
             double g = geo.GridScale > 0 ? geo.GridScale : 1;
-            w.Add("IFCMAPCONVERSION", $"{Ref(ctx)},{Ref(crs)},{R(basePt.X * scale * g * toMap)},{R(basePt.Y * scale * g * toMap)},{R(basePt.Z * scale * toMap)},1.0,0.0,{R(g * toMap)}");
+            double cx = geo.ScaleCenterX ?? 0, cy = geo.ScaleCenterY ?? 0;   // grid scale about this point (NCDOT localized coordinates), default the origin
+            w.Add("IFCMAPCONVERSION", $"{Ref(ctx)},{Ref(crs)},{R(((basePt.X - cx) * g + cx) * scale * toMap)},{R(((basePt.Y - cy) * g + cy) * scale * toMap)},{R(basePt.Z * scale * toMap)},1.0,0.0,{R(g * toMap)}");
         }
         else
         {

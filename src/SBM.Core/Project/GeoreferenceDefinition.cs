@@ -17,6 +17,12 @@ public sealed class GeoreferenceDefinition
     public bool MapUnitUsSurveyFoot { get; set; }
     /// <summary>Map (grid) distance / project distance (1 = none).</summary>
     public double GridScale { get; set; } = 1;
+    /// <summary>OPTIONAL point (project X / Y, meters) the grid scale is applied about (map = centre + (project - centre) x GridScale): NCDOT "localized" coordinates
+    /// keep the control point's state plane values and scale about it. null = about the origin (TxDOT surface coordinates).</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public double? ScaleCenterX { get; set; }
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public double? ScaleCenterY { get; set; }
     /// <summary>Evidence / source of the georeference (report).</summary>
     public string Basis { get; set; } = "";
 }

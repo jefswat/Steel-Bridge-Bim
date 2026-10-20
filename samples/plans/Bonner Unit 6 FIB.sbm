@@ -6,37 +6,37 @@
   "Alignments": [
     {
       "Name": "-L- (NC 12)",
-      "Description": "-L- (NC 12), B-2500 general drawings p3-16; local grid (coordinates p21-34 not extracted)",
+      "Description": "-L- (NC 12), B-2500 general drawings p3-16; localized NC State Plane (PC 2 from monument B2500-2, p.35)",
       "StartStation": 1584.96,
       "StationEquations": [],
       "Elements": [
         {
-          "X": 3086.953343348323,
-          "Y": 3041.475446826339,
+          "X": 923388.9117888652,
+          "Y": 229230.95494898534,
           "Angle": 2.9756365672228693,
           "Length": 39.49598400000001,
           "K0": 0,
           "K1": 0
         },
         {
-          "X": 3048,
-          "Y": 3048,
+          "X": 923349.9584455169,
+          "Y": 229237.479502159,
           "Angle": 2.9756365672228693,
           "Length": 530.30628,
           "K0": -0.0011654848650135428,
           "K1": -0.0011654848650135428
         },
         {
-          "X": 2583.87019314865,
-          "Y": 3286.682008036774,
+          "X": 922885.8286386655,
+          "Y": 229476.16151019576,
           "Angle": 2.3575726240612354,
           "Length": 968.474568,
           "K0": 0,
           "K1": 0
         },
         {
-          "X": 1898.1121426710995,
-          "Y": 3970.552525801662,
+          "X": 922200.0705881879,
+          "Y": 230160.03202796064,
           "Angle": 2.3575726240612354,
           "Length": 91.44,
           "K0": -0.0005422875859525823,
@@ -215,6 +215,8 @@
             "ColumnChamferN": 0,
             "ColumnProjectionS": 0,
             "ColumnProjectionWidth": 0,
+            "ColumnProjectionBack": 0,
+            "ColumnProjectionBackWidth": 0,
             "ColumnFlareElevation": "NaN",
             "ColumnFlareWidth": 0,
             "ColumnFlareDepth": 0,
@@ -313,7 +315,8 @@
               "BackwallBarSize": "#5",
               "BackwallBarSpacing": 0.30479999999999996,
               "MaxBarLength": 18.288,
-              "CapBars": []
+              "CapBars": [],
+              "PlanBarSets": []
             }
           },
           "ExpansionJoint": null,
@@ -385,6 +388,8 @@
             "ColumnChamferN": 0,
             "ColumnProjectionS": 0,
             "ColumnProjectionWidth": 0,
+            "ColumnProjectionBack": 0,
+            "ColumnProjectionBackWidth": 0,
             "ColumnFlareElevation": "NaN",
             "ColumnFlareWidth": 0,
             "ColumnFlareDepth": 0,
@@ -653,7 +658,8 @@
               "BackwallBarSize": "#5",
               "BackwallBarSpacing": 0.30479999999999996,
               "MaxBarLength": 18.288,
-              "CapBars": []
+              "CapBars": [],
+              "PlanBarSets": []
             },
             "Unresolved": [
               "UNRESOLVED (p.458, 477): precast segmental columns - the column is CIP base to el 12.50; seg1 5\u0027-0\u0022; seg2 12\u0027-0\u0022; seg3 12\u0027-0\u0022; seg4 12\u0027-0\u0022; seg5 4\u0027-9\u0022 variable with 1 3/4\u0022 PT bars in 3\u0022 ducts and 2\u0022 grout beds; SBM has no segmental column. One solid 6\u0027-0\u0022 x 6\u0027-0\u0022 column from the footing top to the cap soffit (4\u0022 corner radius, segment joints, PT and the 2\u0022 grout bed under the cap not modeled; printed top of column 58.25).",
@@ -730,6 +736,8 @@
             "ColumnChamferN": 0,
             "ColumnProjectionS": 0,
             "ColumnProjectionWidth": 0,
+            "ColumnProjectionBack": 0,
+            "ColumnProjectionBackWidth": 0,
             "ColumnFlareElevation": "NaN",
             "ColumnFlareWidth": 0,
             "ColumnFlareDepth": 0,
@@ -998,7 +1006,8 @@
               "BackwallBarSize": "#5",
               "BackwallBarSpacing": 0.30479999999999996,
               "MaxBarLength": 18.288,
-              "CapBars": []
+              "CapBars": [],
+              "PlanBarSets": []
             },
             "Unresolved": [
               "UNRESOLVED (p.458, 477): precast segmental columns - the column is CIP base to el 12.50; seg1 5\u0027-0\u0022; seg2 12\u0027-0\u0022; seg3 12\u0027-0\u0022; seg4 8\u0027-11\u0022 variable with 1 3/4\u0022 PT bars in 3\u0022 ducts and 2\u0022 grout beds; SBM has no segmental column. One solid 6\u0027-0\u0022 x 6\u0027-0\u0022 column from the footing top to the cap soffit (4\u0022 corner radius, segment joints, PT and the 2\u0022 grout bed under the cap not modeled; printed top of column 50.41).",
@@ -1075,6 +1084,8 @@
             "ColumnChamferN": 0,
             "ColumnProjectionS": 0,
             "ColumnProjectionWidth": 0,
+            "ColumnProjectionBack": 0,
+            "ColumnProjectionBackWidth": 0,
             "ColumnFlareElevation": "NaN",
             "ColumnFlareWidth": 0,
             "ColumnFlareDepth": 0,
@@ -1327,7 +1338,8 @@
               "BackwallBarSize": "#5",
               "BackwallBarSpacing": 0.30479999999999996,
               "MaxBarLength": 18.288,
-              "CapBars": []
+              "CapBars": [],
+              "PlanBarSets": []
             },
             "Unresolved": [
               "UNRESOLVED (p.458, 477): precast segmental columns - the column is CIP base to el 12.50; seg1 5\u0027-0\u0022; seg2 12\u0027-0\u0022; seg3 14\u0027-1\u0022 variable with 1 3/4\u0022 PT bars in 3\u0022 ducts and 2\u0022 grout beds; SBM has no segmental column. One solid 6\u0027-0\u0022 x 6\u0027-0\u0022 column from the footing top to the cap soffit (4\u0022 corner radius, segment joints, PT and the 2\u0022 grout bed under the cap not modeled; printed top of column 43.58).",
@@ -1404,6 +1416,8 @@
             "ColumnChamferN": 0,
             "ColumnProjectionS": 0,
             "ColumnProjectionWidth": 0,
+            "ColumnProjectionBack": 0,
+            "ColumnProjectionBackWidth": 0,
             "ColumnFlareElevation": "NaN",
             "ColumnFlareWidth": 0,
             "ColumnFlareDepth": 0,
@@ -1608,7 +1622,8 @@
               "BackwallBarSize": "#5",
               "BackwallBarSpacing": 0.30479999999999996,
               "MaxBarLength": 18.288,
-              "CapBars": []
+              "CapBars": [],
+              "PlanBarSets": []
             },
             "Unresolved": [
               "UNRESOLVED (p.464, 467, 479): precast segmental columns - the column is precast seg1 6\u0027-10\u0022 to el 12.50 (incl 2\u0022 grout); seg2 5\u0027-0\u0022; seg3 12\u0027-0\u0022; seg4 7\u0027-5\u0022 with 1 3/4\u0022 PT bars in 3\u0022 ducts and 2\u0022 grout beds; SBM has no segmental column. One solid 5\u0027-0\u0022 x 5\u0027-0\u0022 column from the footing top to the cap soffit (4\u0022 corner radius, segment joints, PT and the 2\u0022 grout bed under the cap not modeled; printed top of column 36.91).",
@@ -1685,6 +1700,8 @@
             "ColumnChamferN": 0,
             "ColumnProjectionS": 0,
             "ColumnProjectionWidth": 0,
+            "ColumnProjectionBack": 0,
+            "ColumnProjectionBackWidth": 0,
             "ColumnFlareElevation": "NaN",
             "ColumnFlareWidth": 0,
             "ColumnFlareDepth": 0,
@@ -1905,7 +1922,8 @@
               "BackwallBarSize": "#5",
               "BackwallBarSpacing": 0.30479999999999996,
               "MaxBarLength": 18.288,
-              "CapBars": []
+              "CapBars": [],
+              "PlanBarSets": []
             },
             "Unresolved": [
               "UNRESOLVED (p.464, 467, 479): precast segmental columns - the column is seg1 6\u0027-10\u0022; seg2 5\u0027-0\u0022; seg3 14\u0027-0\u0022 with 1 3/4\u0022 PT bars in 3\u0022 ducts and 2\u0022 grout beds; SBM has no segmental column. One solid 5\u0027-0\u0022 x 5\u0027-0\u0022 column from the footing top to the cap soffit (4\u0022 corner radius, segment joints, PT and the 2\u0022 grout bed under the cap not modeled; printed top of column 31.50).",
@@ -1982,6 +2000,8 @@
             "ColumnChamferN": 0,
             "ColumnProjectionS": 0,
             "ColumnProjectionWidth": 0,
+            "ColumnProjectionBack": 0,
+            "ColumnProjectionBackWidth": 0,
             "ColumnFlareElevation": "NaN",
             "ColumnFlareWidth": 0,
             "ColumnFlareDepth": 0,
@@ -2186,7 +2206,8 @@
               "BackwallBarSize": "#5",
               "BackwallBarSpacing": 0.30479999999999996,
               "MaxBarLength": 18.288,
-              "CapBars": []
+              "CapBars": [],
+              "PlanBarSets": []
             },
             "Unresolved": [
               "UNRESOLVED (p.464, 467, 479): precast segmental columns - the column is seg1 6\u0027-10\u0022; seg2 5\u0027-0\u0022; seg3 9\u0027-0\u0022 with 1 3/4\u0022 PT bars in 3\u0022 ducts and 2\u0022 grout beds; SBM has no segmental column. One solid 5\u0027-0\u0022 x 5\u0027-0\u0022 column from the footing top to the cap soffit (4\u0022 corner radius, segment joints, PT and the 2\u0022 grout bed under the cap not modeled; printed top of column 26.50).",
@@ -27208,7 +27229,8 @@
           "NegativeRegionFraction": 0.25,
           "RequiredSteelRatio": 0.01,
           "MarkLengthTolerance": 0.0508,
-          "Plan": null
+          "Plan": null,
+          "PlanBarSets": []
         }
       },
       "CrossFrames": {
@@ -27330,13 +27352,15 @@
         "Diameter": 0.022224999999999998,
         "RowsAcross": 3,
         "TransverseSpacing": 0.1143,
+        "EdgeDistance": 0,
         "Pitch": 0.30479999999999996,
         "Penetration": 0.0508,
         "MinCover": 0.0508,
         "HeadDiameter": 0.034925,
         "HeadHeight": 0.009524999999999999,
         "LengthIncrement": 0.0127,
-        "Clearance": 0.038099999999999995
+        "Clearance": 0.038099999999999995,
+        "Zones": []
       },
       "LateralBracing": {
         "Enabled": false,
@@ -27356,5 +27380,36 @@
       "PsSteelDiaphragms": null
     }
   ],
-  "References": []
+  "References": [
+    {
+      "Name": "NCEI 1/9 arc-second topobathy 2019v2 (Oregon Inlet)",
+      "Path": "C:\\SBM\\dist\\terrain\\bonner\\bonner-oregon-inlet-ncei-ninth-3m-ncsp.flt",
+      "Kind": "Terrain",
+      "Format": "Grid",
+      "Visible": true,
+      "R": 120,
+      "G": 135,
+      "B": 150,
+      "Opacity": 1,
+      "UnitScale": 1,
+      "OffsetX": 0,
+      "OffsetY": 0,
+      "OffsetZ": 0,
+      "ContourInterval": 0.6096,
+      "ImagePath": "",
+      "DisplayMaxVertices": 0
+    }
+  ],
+  "Georeference": {
+    "CrsName": "EPSG:2264",
+    "Description": "NAD83 / North Carolina (ftUS), NCDOT localized project coordinates (NSRS 2007 CORS96); vertical NAVD88",
+    "GeodeticDatum": "NAD83",
+    "MapProjection": "Lambert Conformal Conic",
+    "MapZone": "North Carolina",
+    "MapUnitUsSurveyFoot": true,
+    "GridScale": 0.99991846,
+    "ScaleCenterX": 924144.5111506223,
+    "ScaleCenterY": 229057.54290068577,
+    "Basis": "B-2500 structure plans S0-34 / S0-35 (p.35 / p.36): monument B2500-2 N 751499.622 / E 3031964.117 US ft, combined grid factor 0.99991846, NAVD88; -L- placed from that monument along curve 1 (docs/plan-data/bonner-b2500/L-coordinates.csv). Model coordinates = US survey ft x 1200 / 3937 (m)."
+  }
 }
