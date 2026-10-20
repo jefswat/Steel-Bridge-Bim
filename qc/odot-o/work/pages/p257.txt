@@ -1,0 +1,207 @@
+FOUNDATION REPORT
+1100
+1095
+1090
+1080
+1085
+1075
+1070
+1065
+1060
+1055
+1050
+1045
+1040
+1035
+1105
+1100
+1095
+1090
+1085
+1080
+1075
+1070
+1065
+1060
+1055
+1050
+1045
+1040
+1035
+BORING O-3
+1030
+1025
+1030
+1025
+1020
+1015
+1110
+BORING O-4
+1020
+1015
+1105.26
+1075.26
+1065.26
+1054.26
+1015.01
+Light reddish brown to reddish brown lean clay with
+sand, stiff, moist (CL)
+Reddish brown to grayish brown lean clay,
+medium stiff to very soft, moist to wet (CL)
+Very soft @ depth 35.0'
+Wet @ depth 35.0'
+Reddish brown sandy silty clay to clayey sand, medium
+stiff,  moist (CL-ML)
+Reddish brown and maroon sandstone interbedded with
+shale, medium hard to hard
+Medium hard from depth 51.0' to 55.0'
+Hard from depth 55.0' to terminal depth
+Bore hole terminated @ depth 90.25'
+Cave in @ depth 67.6' after the completion of drilling
+--- 1100.26 --  SS-1:  N=14; RECOVERY = 14" ;
+LL=27, PI= 7, -#200= 83.4%
+--- 1095.26 --  SS-2:  N=15; RECOVERY = 16"
+--- 1090.26 --  SS-3:  N=10; RECOVERY = 18"
+--- 1085.26 --  SS-4:  N=11; RECOVERY = 18" ;
+LL=32, PI=14, -#200=91.8%
+--- 1080.26 --  SS-5:  N=9; RECOVERY = 18"
+--- 1075.26 --  SS-6:  N=4; RECOVERY = 18"
+--- 1070.26 --  SS-7:  N=1; RECOVERY = 18" ;
+LL=25, PI=7, -#200=87.7%
+--- 1065.26 --  SS-8:  N=5; RECOVERY = 18"
+--- 1060.26 --  SS-9:  N=6; RECOVERY = 18"
+--- 1055.76 --
+--- 1055.26 --  SS-10:  N=30/6.0", 50/ 2.5";
+RECOVERY =13.5" ; LL=23, PI =8, -#200=51.7%
+--- 1054.06 --  TC-1:  TCP= 50/3.5"
+--- 1050.26 --  TC-2:  TCP= 50/0.75"
+--- 1045.26 --  TC-3:  TCP= 50/2.25"
+--- 1040.26 --  TC-4:  TCP= 50/1.0"
+--- 1035.26 --  TC-5:  TCP= 50/0.25"
+--- 1030.26 --  TC-6:  TCP= 50/0.75"
+--- 1025.26 --  TC-7:  TCP= 50/1.0"
+--- 1020.26 --  TC-8:  TCP= 50/0.75"
+--- 1015.26 --  TC-9:  TCP= 50/1.00"
+0
+5
+10
+15
+20
+25
+30
+35
+40
+45
+50
+55
+60
+65
+70
+75
+80
+85
+90
+1105.12
+1095.12
+1070.12
+1060.12
+1054.12
+1013.87
+Dark reddish brown silty clay with sand, medium stiff,
+moist (CL-ML)
+Reddish brown lean clay, medium stiff to stiff, moist
+(CL)
+Grayish brown silty clay, soft to medium stiff, moist
+(CL-ML)
+Grayish brown sandy lean clay, stiff to very stiff, moist
+(CLS)
+Reddish brown and maroon sandstone interbedded with
+shale, hard
+Bore hole terminated @ depth 91.25'
+--- 1100.12 --  SS-1:  N=6; RECOVERY = 18" ;  LL=
+27, PI=7, -#200=83.4%
+--- 1095.12 --  SS-2:  N=10; RECOVERY = 18"
+--- 1090.12 --  SS-3:  N=10; RECOVERY = 18"
+--- 1085.12 --  SS-4:  N=6; RECOVERY = 18" ;
+LL=32, PI=14, -#200=91.8%
+--- 1080.12 --  SS-5:  N=9; RECOVERY = 18"
+--- 1075.12 --  SS-6:  N=6; RECOVERY = 18"
+--- 1070.12 --  SS-7:  N=3; RECOVERY = 18" ;
+LL=25, PI=7, -#200=87.7%
+--- 1065.12 --  SS-8:  N=7; RECOVERY = 18"
+--- 1060.12 --  SS-9:  N=11; RECOVERY = 18"
+--- 1055.12 --  SS-10:  N=10/6.00", 50/5.50";
+RECOVERY = 14.5" ; LL=23, PI=8, -#200=51.7%
+--- 1053.62 --  TC-1:  TCP= 50/0.5"
+--- 1049.12 --  TC-2:  TCP= 50/0.5"
+--- 1044.12 --  TC-3:  TCP= 50/1.5"
+--- 1039.12 --  TC-4:  TCP= 50/0.75"
+--- 1034.12 --  TC-5:  TCP= 50/1.75"
+--- 1029.12 --  TC-6:  TCP= 50/1.50"
+--- 1024.12 --  TC-7:  TCP= 50/1.25"
+--- 1019.12 --  TC-8:  TCP= 50/1.75"
+--- 1014.12 --  TC-9:  TCP= 50/1.00"
+0
+5
+10
+15
+20
+25
+30
+35
+40
+45
+50
+55
+60
+65
+70
+75
+80
+85
+90
+STA. 304+30.27 - 11.80' RT.
+STA. 305+94.64 - 23.30' LT.
+                     TCP= 50/1.0"
+                     TCP= 50/0.25"
+                     TCP= 50/0.5"
+                     TCP= 50/0.25"
+                     TCP= 50/0.0"
+                     TCP= 50/0.5"
+                     TCP= 50/0.75"
+                     TCP= 50/0.75"
+                     TCP= 50/1.00"
+                     TCP= 50/0.25"
+                     TCP= 50/0.5"
+                     TCP= 50/0.25"
+                     TCP= 50/1.25"
+                     TCP= 50/0.75"
+                     TCP= 50/0.50"
+                     TCP= 50/1.00"
+                     TCP= 50/1.00"
+                     TCP= 50/0.16"
+O-3
+(SHEET 2 OF 3)
+RAMP 44F OVER I-44 & RAMP 44N & 44M2
+BRIDGE 'O'
+09033(11)
+ I-235 / I-44
+OKLAHOMA COUNTY
+P:\FDB\1641-OKC\CIV\30305400\20_CAD\DGN\S\BRIDGE O\B03SfrO02.dgn
+11/19/2016
+DESIGN
+DRAWN
+CHECKED
+APPROVED
+SQUAD
+JOB PIECE NO.
+SHEET NO.
+11/16
+11/16
+11/16
+11/16
+11/21/2016
+OKLAHOMA DEPARTMENT OF TRANSPORTATION
+MEETING
+FINAL FIELD
+BENHAM

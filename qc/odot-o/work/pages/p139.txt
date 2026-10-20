@@ -1,0 +1,201 @@
+1105
+1100
+1095
+1090
+1085
+1080
+1075
+1070
+1065
+1060
+1055
+1050
+1105
+1100
+1095
+1090
+1080
+1085
+1075
+1070
+1065
+1060
+1055
+1050
+1045
+1040
+1035
+1045
+1040
+1035
+STA. 288+75.82 - 32.12' RT.
+STA. 289+50.08 - 11.98' LT.
+NOTES:
+1103.77
+1087.77
+1082.77
+1043.52
+Grayish brown lean clay with sand, stiff, moist (CL)
+Reddish brown sandy silty clay to sandy lean clay, very
+stiff, moist (CL-ML)
+Reddish brown and maroon sandstone interbedded with
+shale, medium hard to hard
+Medium hard from depth 16.0'
+Hard from depth 30.0'
+Bore hole terminated @ depth 60.25'
+--- 1098.77 --  SS-1:  N= 8; RECOVERY = 18";
+LL=27 , PI=8 -#200=72.6%
+--- 1093.77 --  SS-2:  N=16; RECOVERY = 18";
+LL=27 , PI=9 -#200=74.0%
+--- 1088.77 --  SS-3:    N=17; RECOVERY=18" ;
+LL=23 , PI=7 -#200=64.9%
+--- 1083.77 --  SS-4:    N=50/5.0"; RECOVERY=11";
+LL=25 , PI=9 -#200=63.5%
+--- 1082.27 --  TC-1:  TCP= 50/4.0"
+--- 1078.77 --  TC-2:  TCP= 50/2.0"
+--- 1073.77 --  TC-3:  TCP= 50/2.0"
+--- 1068.77 --  TC-4:  TCP= 50/0.5"
+--- 1063.77 --  TC-5:  TCP= 50/1.0"
+--- 1058.77 --  TC-6:  TCP= 50/1.0"
+--- 1053.77 --  TC-7:  TCP= 50/1.0"
+--- 1048.77 --  TC-8:  TCP= 50/0.5"
+--- 1043.77 --  TC-9:  TCP= 50/1.0"
+0
+5
+10
+15
+20
+25
+30
+35
+40
+45
+50
+55
+60
+1103.62
+1093.62
+1077.62
+1038.37
+Grayish brown lean clay with sand, stiff, moist (CL)
+Grayish brown to reddish brown sandy silty clay, medium
+stiff to very stiff, moist (CL-ML)
+Very stiff @ depth 10.0'
+Stiff @ depth 15.0'
+Medium stiff @ depth 20.0'
+Reddish brown and maroon sandstone interbedded with
+shale, medium hard to hard
+Medium hard from depth 25.0'
+Hard from depth 40.0'
+Bore hole terminated @ depth 65.25'
+NP= Non Plastic
+--- 1098.62 --  SS-1:  N= 12; RECOVERY = 18";
+LL=29 , PI=9 -#200=77.9%
+--- 1093.62 --  SS-2:  N=20; RECOVERY = 18"
+--- 1088.62 --  SS-3:  N=14; RECOVERY = 18";
+LL=23 , PI=5 -#200=62.8%
+--- 1083.62 --  SS-4:  N=7; RECOVERY = 18";   LL=21
+, PI=4 -#200=58.5%
+--- 1078.62 --  SS-5:  N=50/4.0"; RECOVERY = 10";
+LL=NP , PI=NP -#200=42.2%
+--- 1077.12 --  TC-1:  TCP= 50/3.0"
+--- 1073.62 --  TC-2:  TCP= 50/2.0"
+--- 1068.62 --  TC-3:  TCP= 50/2.25"
+--- 1063.62 --  TC-4:  TCP= 50/1.0"
+--- 1058.62 --  TC-5:  TCP= 50/2.0"
+--- 1053.62 --  TC-6:  TCP= 50/1.25"
+--- 1048.62 --  TC-7:  TCP= 50/1.0"
+--- 1043.62 --  TC-8:  TCP= 50/2.0"
+--- 1038.62 --  TC-9:  TCP= 50/0.5"
+0
+5
+10
+15
+20
+25
+30
+35
+40
+45
+50
+55
+60
+65
+BORING N-1
+BORING N-2
+                     TCP= 50/3.5"
+                     TCP= 50/2.0"
+                     TCP= 50/1.0"
+                     TCP= 50/1.0"
+                     TCP= 50/1.5"
+                     TCP= 50/0.25"
+                     TCP= 50/1.0"
+                     TCP= 50/0.5"
+                     TCP= 50/0.25"
+                     TCP= 50/1.0"
+                     TCP= 50/1.0"
+                     TCP= 50/1.0"
+                     TCP= 50/0.5"
+                     TCP= 50/0.25"
+                     TCP= 50/0.5"
+                     TCP= 50/0.5"
+                     TCP= 50/1.0"
+                     TCP= 50/0.5"
+N-7
+generally grass covered or cultivated."
+Division Four. Topographically, the Unit is nearly level to gently rolling and is
+band across Grant, Garfield, Kingfisher, Logan, Canadian, and Oklahoma Counties in
+Unit is about 400 feet. The Hennessey Unit outcrops in a 5 to 15 mile north-south
+ranging from a few inches to four feet in thickness. The total thickness of the
+is characterized by numerous bands or streaks of white or light green color
+mudstones are hard and appear blocky. The red clay shale of the Hennessey Unit
+   "This Unit consists of red platy to blocky clay shales and mudstones. The
+   Hennessey Unit (Phy):
+2.
+1.
+731-04025 (2 REPORTS).
+INC.  FOR DETAILED INFORMATION SEE THE REPORT, FILE NO.
+BORING DATA IS PROVIDED BY BURGESS ENGINEERING AND TESTING,
+OF DRILLING OPERATIONS.
+ELEVATIONS NOTED WERE OBTAINED 24 HOURS AFTER COMPLETION
+OPERATIONS AND MAY FLUCTUATE THROUGHOUT THE YEAR.  GROUNDWATER
+GROUNDWATER LEVELS WERE OBTAINED DURING THE  DRILLING
+capped by sandstones and covered by thick growths of Blackjack Oak, and Post Oak trees."
+the increase in sandstone results in a rolling to gently rolling topography with hills generally
+Four than the overlying Hennessy Unit and underlying Wellington Unit. In southern Division Four,
+of Division Four. Topographically, the Unit is only slightly more rolling in northern Division
+in a 12 to 24 mile band across Grant, Garfield, Kingfisher, Logan, Noble, and Oklahoma Counties
+Garfield County and continues to thicken northward to the state line. The Garber Unit outcrops
+thickness of the Unit is about 400 feet in Oklahoma County, it thickens to about 600 feet in
+Division Four. Northward, the sandstones thin and shales become more dominant. The total 
+crossbedded lenticular sandstones. The sandstones are more prominent in the southern portion of
+   "This Unit consists of a series of red clay shales, red sandy shales, and red massive commonly
+   Garber Unit (Pg):
+based the Engineering classification of Geological Materials for Oklahoma County, Division Four.
+   The bedrock stratum can either be classified as Garber Unit (Pg) or Hennesey Unit (Phy)
+GEOLOGIC STATEMENT:
+FOUNDATION REPORT
+(SHEET 1 OF 8)
+RAMP 44E OVER I-235 & I-44
+BRIDGE 'N'
+09033(11)
+ I-235 / I-44
+OKLAHOMA COUNTY
+P:\FDB\1641-OKC\CIV\30305400\20_CAD\DGN\S\BRIDGE N\B03SfrN01.dgn
+11/20/2016
+DESIGN
+DRAWN
+CHECKED
+APPROVED
+SQUAD
+JOB PIECE NO.
+SHEET NO.
+11/16
+11/16
+11/16
+11/16
+11/21/2016
+OKLAHOMA DEPARTMENT OF TRANSPORTATION
+MEETING
+FINAL FIELD
+BENHAM

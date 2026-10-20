@@ -1,0 +1,201 @@
+1105
+1100
+1095
+1090
+1080
+1085
+1075
+1070
+1065
+1060
+1055
+1050
+1110
+1045
+1040
+1035
+1030
+1105
+1100
+1095
+1090
+1085
+1080
+1075
+1070
+1065
+1060
+1055
+1050
+1110
+1045
+1040
+1035
+1030
+1025
+1020
+1025
+1108.20
+1088.20
+1083.20
+1062.20
+1022.95
+Reddish brown to dark reddish brown sandy silty clay, stiff,
+moist (CL-ML)
+Reddish brown sandy silt, stiff, moist (MLS)
+Reddish brown to grayish brown lean clay, very stiff to
+medium stiff, moist (CL)
+Medium stiff from depth 30.0'
+Reddish brown and maroon sandstone interbedded with
+shale, medium hard to hard
+Medium hard from 46.0'
+Hard from depth 60.0'
+Bore hole terminated @ depth 85.25'
+NP= Non Plastic
+--- 1103.20 --  SS-1:  N= 12; RECOVERY = 18"
+--- 1098.20 --  SS-2:  N= 14; RECOVERY = 18"
+--- 1093.20 --  SS-3:  N= 9; RECOVERY = 18";
+LL=23 , PI=6 -#200=69.4%
+--- 1088.20 --  SS-4:  N= 10; RECOVERY = 18";
+LL=NP , PI=NP -#200=57.6%
+--- 1083.20 --  SS-5:  N= 17; RECOVERY = 18"
+--- 1078.20 --  SS-6:  N= 6; RECOVERY = 18";
+LL=26 , PI=8 -#200=86.6%
+--- 1073.20 --  SS-7:  N= 4; RECOVERY = 18"
+--- 1068.20 --  SS-8:  N= 6; RECOVERY = 18"
+--- 1063.20 --  SS-9:  N= 12/6.0"; RECOVERY = 17";
+LL=NP , PI=NP -#200=45.6%
+--- 1062.20 --             N= 50/3.5"
+--- 1061.70 --  TC-1:  TCP= 50/2.5"
+--- 1058.20 --  TC-2:  TCP= 50/2.0"
+--- 1053.20 --  TC-3:  TCP= 50/3.5"
+--- 1048.20 --  TC-4:  TCP= 50/2.0"
+--- 1043.20 --  TC-5:  TCP= 50/1.0"
+--- 1038.20 --  TC-6:  TCP= 50/1.75"
+--- 1033.20 --  TC-7:  TCP= 50/2.25"
+--- 1028.20 --  TC-8:  TCP= 50/1.0"
+--- 1023.20 --  TC-9:  TCP= 50/1.5"
+0
+5
+10
+15
+20
+25
+30
+35
+40
+45
+50
+55
+60
+65
+70
+75
+80
+85
+1108.54
+1088.54
+1083.54
+1063.54
+1023.29
+Reddish brown sandy lean clay, medium stiff to very stiff,
+moist (CLS)
+Medium stiff @ depth 10.0'
+Reddish brown sandy silt,stiff, moist ( MLS)
+Reddish brown lean clay with sand, stiff to very stiff, moist
+(CL)
+Reddish brown and maroon sandstone interbedded with
+shale, medium hard to very hard
+Medium hard @ depth 55.0', 65.0' and 85.0'
+Very hard @ depth 45.5' and 70.0'
+Bore hole terminated @ depth 85.25'
+Cave in @ depth 71.4' after the completion of drilling
+NP= Non Plastic
+--- 1103.54 --  SS-1:  N= 27; RECOVERY = 18"
+--- 1098.54 --  SS-2:  N= 5; RECOVERY = 18" ;
+LL=25 , PI=9 -#200=58.9%
+--- 1093.54 --  SS-3:  N= 26; RECOVERY = 18"
+--- 1088.54 --  SS-4:  N= 11; RECOVERY = 18" ;
+LL=NP , PI=NP -#200=57.0%
+--- 1083.54 --  SS-5:  N= 24; RECOVERY = 18"
+--- 1078.54 --  SS-6:  N=11; RECOVERY = 18"
+--- 1073.54 --  SS-7:  N= 13; RECOVERY = 18" ;
+LL=27 , PI=10 -#200=73.9%
+--- 1068.54 --  SS-8:  N=8; RECOVERY = 18"
+--- 1063.54 --   SS-9:  N=50/5.75"; RECOVERY =
+5.75" ; LL=NP , PI=NP -#200=41.2%
+--- 1063.04 --  TC-1:  TCP= 50/0.25"
+--- 1058.54 --  TC-2:  TCP= 50/0.75"
+--- 1053.54 --  TC-3:  TCP= 50/2.5"
+--- 1048.54 --  TC-4:  TCP= 50/0.5"
+--- 1043.54 --  TC-5:  TCP= 50/3.0"
+--- 1038.54 --  TC-6:  TCP= 50/0.25"
+--- 1033.54 --  TC-7:  TCP= 50/0.5"
+--- 1028.54 --  TC-8:  TCP= 50/0.75"
+--- 1023.54 --  TC-9:  TCP= 50/1.25"
+0
+5
+10
+15
+20
+25
+30
+35
+40
+45
+50
+55
+60
+65
+70
+75
+80
+85
+STA. 294+45.42 - 44.71' RT.
+STA. 295+27.84 - 35.55' RT.
+BORING N-7
+BORING N-8
+                     TCP= 50/0.25"
+                     TCP= 50/0.25"
+                     TCP= 50/2.0"
+                     TCP= 50/0.25"
+                     TCP= 50/1.5"
+                     TCP= 50/0.0"
+                     TCP= 50/0.25"
+                     TCP= 50/0.0"
+                     TCP= 50/2.75"
+                     TCP= 50/2.25"
+                     TCP= 50/1.5"
+                     TCP= 50/1.5"
+                     TCP= 50/0.75"
+                     TCP= 50/0.0"
+                     TCP= 50/1.0"
+                     TCP= 50/1.0"
+                     TCP= 50/1.0"
+                     TCP= 50/0.5"
+N-10
+FOUNDATION REPORT
+(SHEET 4 OF 8)
+RAMP 44E OVER I-235 & I-44
+BRIDGE 'N'
+09033(11)
+ I-235 / I-44
+OKLAHOMA COUNTY
+P:\FDB\1641-OKC\CIV\30305400\20_CAD\DGN\S\BRIDGE N\B03SfrN04.dgn
+11/20/2016
+DESIGN
+DRAWN
+CHECKED
+APPROVED
+SQUAD
+JOB PIECE NO.
+SHEET NO.
+11/16
+11/16
+11/16
+11/16
+11/21/2016
+OKLAHOMA DEPARTMENT OF TRANSPORTATION
+MEETING
+FINAL FIELD
+BENHAM

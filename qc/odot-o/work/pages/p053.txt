@@ -1,0 +1,306 @@
+1130
+1140
+1120
+1110
+1100
+1090
+1080
+1070
+1060
+1050
+1040
+1030
+1150
+1020
+1010
+1150
+1140
+1130
+1120
+1110
+1100
+1090
+1080
+1070
+1060
+1040
+1050
+1030
+1020
+1010
+STA. 298+88.62 - 8.48' RT.
+BORING K-7
+      the year.
+      drilling operations and may fluctuate throughout
+NOTE: Groundwater levels were obtained during the
+OBSERVED WATER LEVELS @ 24 HRS
+FOUNDATION REPORT
+(Sheet 2 of 5)
+STA. 297+09.51 - 5.84' LT.
+BORING K-5
+BORING K-6
+BORING K-8
+STA. 297+89.22 - 29.98' RT.
+STA. 299+59.94 - 11.98' RT.
+BRIDGE 'K'
+RAMP 44A OVER DEEP FORK CR., I-235 & I-44
+K-8
+1105.94
+1098.94
+1089.44
+1077.94
+1075.94
+1035.69
+Very soft @ depth 25.0'
+Bore hole terminated @ 70.25'
+--- 1095.94 --  SS-2:  N=20; RECOVERY = 18"
+--- 1085.94 --  SS-4:  N=7; RECOVERY = 18"
+0
+5
+10
+15
+20
+25
+30
+35
+40
+45
+50
+55
+60
+65
+70
+DATE DRILLED: 9-16-04
+@ 24 Hours
+1061.94
+damp (CL)
+Dark brown silt, medium stiff,
+medium dense, damp (SC-SM)
+Reddish brown silty clayey sand,
+very soft, damp to moist (CL)
+clay with sand, medium stiff to
+Dark brown to reddish brown lean
+soft to medium stiff, moist (CM-CL)
+Reddish brown sandy silty lean clay,
+Hard from depth 50.0'
+Medium hard from depth 30.0'
+interbedded with shale, medium hard to hard
+Reddish brown and maroon sandstone
+LL= 27, PI = 2, -#200=89.1%
+--- 1100.94 --  SS-1:  N=10; RECOVERY =18" ;
+LL= 19, PI = 7, -#200=49.8%
+--- 1090.94 --  SS-3:  N=12; RECOVERY = 18" ;
+LL= 23, PI = 10, -#200=73.8%
+--- 1080.94 --  SS-5:  N=W.O.H; RECOVERY = 18" ;
+--- 1075.29 --         TCP= 50/0.0"
+--- 1075.54 --  TC-1:  TCP= 50/4.0"
+LL= 22, PI = 5, -#200=62.2%
+--- 1075.94 --  SS-6:  N=50/5.0"; RECOVERY = 4.5" ;
+--- 1070.69 --         TCP= 50/1.0"
+--- 1070.94 --  TC-2:  TCP= 50/4.0"
+--- 1065.69 --         TCP= 50/2.5"
+--- 1065.94 --  TC-3:  TCP= 50/3.5"
+--- 1060.69 --         TCP= 50/3.75"
+--- 1060.94 --  TC-4:  TCP= 50/2.0"
+--- 1055.69 --         TCP= 50/0.25"
+--- 1055.94 --  TC-5:  TCP= 50/1.0"
+--- 1050.69 --         TCP= 50/0.63"
+--- 1050.94 --  TC-6:  TCP= 50/1.13"
+--- 1045.69 --         TCP= 50/0.25"
+--- 1045.94 --  TC-7:  TCP= 50/0.25"
+--- 1040.69 --         TCP= 50/0.75"
+--- 1040.94 --  TC-8:  TCP= 50/0.75"
+--- 1035.69 --         TCP= 50/0.25"
+--- 1035.94 --  TC-9:  TCP= 50/0.87"
+1105.30
+1098.30
+1083.30
+1075.30
+1035.05
+Dark brown silt, stiff, damp (ML)
+Bore hole terminated @ 70.25'
+NP= Non Plastic
+--- 1090.30 --  SS-3:  N=20; RECOVERY = 18"
+--- 1080.30 --  SS-5:  N=58; RECOVERY = 14"
+0
+5
+10
+15
+20
+25
+30
+35
+40
+45
+50
+55
+60
+65
+70
+DATE DRILLED: 9-24-04
+@ 24 Hours
+1077.90
+LL= 16, PI = 1 -#200= 85.9%
+--- 1100.30 --  SS-1:  N=29; RECOVERY = 18" ;
+LL= 25, PI = 8, -#200= 79.6%
+--- 1095.30 --  SS-2:  N=25; RECOVERY = 18" ;
+LL= 28, PI = 14, -#200= 80.1%
+--- 1085.30 --  SS-4:  N=15; RECOVERY = 18" ;
+LL= NP, PI = NP, -#200= 14.5%
+--- 1075.30 --  SS-6:  N=50/5.0"; RECOVERY = 5" ;
+stiff, damp to moist (CL)
+Reddish brown lean clay with sand,
+Medium hard @ depth 60.0'
+Very hard  @ depth 50.0'
+stiff, moist (CLS)
+Reddish brown sandy lean clay,
+shale, medium hard to very hard
+sandstone interbedded with
+Reddish brown and maroon
+--- 1074.65 --         TCP= 50/0.75"
+--- 1074.90 --  TC-1:  TCP= 50/2.0"
+--- 1070.05 --         TCP= 50/0.25"
+--- 1070.30 --  TC-2:  TCP= 50/0.75"
+--- 1065.05 --         TCP= 50/0.75"
+--- 1065.30 --  TC-3:  TCP= 50/1.0"
+--- 1055.05 --         TCP= 50/0.25"
+--- 1055.30 --  TC-5:  TCP= 50/0.0"
+--- 1050.05 --         TCP= 50/0.5"
+--- 1050.30 --  TC-6:  TCP= 50/1.0"
+--- 1060.05 --         TCP= 50/1.13"
+--- 1060.30 --  TC-4:  TCP= 50/1.25"
+--- 1045.05 --         TCP= 50/1.5"
+--- 1045.30 --  TC-7:  TCP= 50/2.0"
+--- 1040.05 --         TCP= 50/0.75"
+--- 1040.30 --  TC-8:  TCP= 50/1.5"
+--- 1035.05 --         TCP= 50/0.5"
+--- 1035.30 --  TC-9:  TCP= 50/1.0"
+1104.07
+1092.07
+1085.57
+1045.32
+Very hard @ terminal depth
+Bore hole terminated @ 58.75'
+NP= Non Plastic
+--- 1094.07 --  SS-2:  N=6; RECOVERY = 18"
+--- 1087.07 --
+0
+5
+10
+15
+20
+25
+30
+35
+40
+45
+50
+55
+DATE DRILLED: 9-26-04
+stiff, moist (CL)
+lean clay with sand, medium
+Dark brown to reddish brown
+sand, medium dense, moist (SM)
+Reddish brown and tan silty
+With white seams @ 21'
+With shale seams @ depth 18.5'
+medium hard to very hard
+sandstone interbedded with shale,
+Reddish brown and maroon
+LL= 27, PI = 8, -#200= 81.4%
+--- 1099.07 --  SS-1:  N=6; RECOVERY = 18" ;
+LL= NP, PI = NP, -#200= 31.0%
+--- 1089.07 --  SS-3:  N=10; RECOVERY = 18" ;
+LL= 24, PI = 8, -#200= 85.4%
+--- 1086.57 --  SS-4:  N=50/4.5"; RECOVERY = 16" ;
+--- 1080.32 --         TCP= 50/0.13"
+--- 1080.57 --  TC-2:  TCP= 50/1.5"
+--- 1084.92 --         TCP= 50/5.5"
+--- 1085.17 --  TC-1:  TCP= 50/3.38"
+--- 1075.32 --         TCP= 50/1.0"
+--- 1075.57 --  TC-3:  TCP= 50/1.25"
+--- 1070.32 --         TCP= 50/0.5"
+--- 1070.57 --  TC-4:  TCP= 50/1.0"
+--- 1065.32 --         TCP= 50/0.5"
+--- 1065.57 --  TC-5:  TCP= 50/0.75"
+--- 1060.32 --         TCP= 50/0.5"
+--- 1060.57 --  TC-6:  TCP= 50/0.75"
+--- 1055.32 --         TCP= 50/0.5"
+--- 1055.57 --  TC-7:  TCP= 50/1.0"
+--- 1050.32 --         TCP= 50/0.25"
+--- 1050.57 --  TC-8:  TCP= 50/0.75"
+--- 1045.32 --         TCP= 50/0.13"
+--- 1045.57 --  TC-9:  TCP= 50/0.0"
+1104.30
+1094.30
+1088.80
+1054.05
+--- 1094.30 --  SS-2:  N=52; RECOVERY = 18"
+0
+5
+10
+15
+20
+25
+30
+35
+40
+45
+50
+DATE DRILLED: 10-07-04
+@ 24 Hours
+1063.80
+Hard from depth 35.0'
+Very hard from depth 25.0'
+moist to damp (CL)
+clay with sand, very stiff,
+Dark reddish brown lean
+very dense, damp (SM)
+Reddish brown silty sand,
+shale, medium hard to very hard
+sandstone interbedded with
+Reddish brown and maroon
+NP= Non Plastic
+@ depth 50.25'
+Bore hole terminated
+LL=28, PI=11, -#200=79.4%
+--- 1099.30 --  SS-1:  N=25; RECOVERY = 18" ;
+LL=NP, PI=NP, -#200=28.1%
+--- 1089.30 --  SS-3:  N=50/2.0"; RECOVERY = 8" ;
+--- 1088.35 --         TCP= 50/1.5"
+--- 1088.60 --  TC-1:  TCP= 50/1.75"
+--- 1084.05 --         TCP= 50/0.25"
+--- 1084.30 --  TC-2:  TCP= 50/1.0"
+--- 1079.05 --         TCP= 50/0.06"
+--- 1079.30 --  TC-3:  TCP= 50/0.0"
+--- 1074.05 --         TCP= 50/0.25"
+--- 1074.30 --  TC-4:  TCP= 50/0.25"
+--- 1069.05 --         TCP= 50/0.5"
+--- 1069.30 --  TC-5:  TCP= 50/1.0"
+--- 1064.05 --         TCP= 50/0.25"
+--- 1064.30 --  TC-6:  TCP= 50/0.5"
+--- 1059.05 --         TCP= 50/1.0"
+--- 1059.30 --  TC-7:  TCP= 50/1.5"
+--- 1054.05 --         TCP= 50/0.5"
+--- 1054.30 --  TC-8:  TCP= 50/1.25"
+09033(11)
+ I-235 / I-44
+OKLAHOMA COUNTY
+P:\FDB\1641-OKC\CIV\30305400\20_CAD\DGN\S\BRIDGE K\B2BFRK02.dgn
+11/19/2016
+DESIGN
+DRAWN
+CHECKED
+APPROVED
+SQUAD
+JOB PIECE NO.
+SHEET NO.
+11/16
+11/16
+11/16
+11/16
+11/21/2016
+OKLAHOMA DEPARTMENT OF TRANSPORTATION
+MEETING
+FINAL FIELD
+BENHAM

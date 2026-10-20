@@ -41,7 +41,9 @@ public enum IfcGeometryMode
 
 /// <param name="ChordTolerance">ReferenceView: max sagitta (m) of the polygons replacing hole circles and profile arcs;
 /// 0 = default 1/32 in (0.79 mm).</param>
-public sealed record IfcExportOptions(IfcGeometryMode Geometry = IfcGeometryMode.Parametric, double ChordTolerance = 0);
+/// <param name="ForCheck">CHECKING export for an independent checker: strips the originator's interpretation (see <see cref="IfcCheckFilter"/>). Geometry unchanged.</param>
+/// <param name="KeepDesignations">With ForCheck: keep section designations (e.g. WT 7x26.5) and fabrication specification attributes; plan size strings and notes are still stripped.</param>
+public sealed record IfcExportOptions(IfcGeometryMode Geometry = IfcGeometryMode.Parametric, double ChordTolerance = 0, bool ForCheck = false, bool KeepDesignations = false);
 
 /// <summary>
 /// Exports the model to IFC 4.3 (IFC4X3_ADD2) with semantic entities:
@@ -87,6 +89,7 @@ public static class IfcExporter
         var u = project.Units;
         double scale = 1 / u.LongUnit; // meters → project length units
         var w = new StepWriter(tw);
+        if (options.ForCheck) w.Filter = new IfcCheckFilter(options.KeepDesignations);
         bool abv = options.Geometry == IfcGeometryMode.ReferenceView;
         w.Header(fileName, "IFC4X3_ADD2", abv ? "AlignmentBasedView" : "ReferenceView");
 
@@ -184,6 +187,7 @@ public static class IfcExporter
                 PartCategory.Grating => (0.6, 0.62, 0.66),
                 PartCategory.WalkwayStringer or PartCategory.WalkwayPost or PartCategory.WalkwayRail or PartCategory.WalkwayPlate => (0.45, 0.7, 0.5),
                 PartCategory.RailPost or PartCategory.RailHandrail or PartCategory.RailMember or PartCategory.RailBasePlate or PartCategory.RailEnvelope => (0.78, 0.80, 0.84),
+                PartCategory.RailFabric => (0.62, 0.70, 0.78),
                 PartCategory.JointArmor or PartCategory.JointCoverPlate => (0.50, 0.52, 0.56),
                 PartCategory.JointStud or PartCategory.JointAnchor => (0.62, 0.62, 0.62),
                 _ => (0.95, 0.3, 0.2),
@@ -1236,6 +1240,7 @@ public static class IfcExporter
                     PartCategory.RailHandrail => w.Add("IFCRAILING", $"{common},$,{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.HANDRAIL."),
                     PartCategory.RailMember => w.Add("IFCMEMBER", $"{common},$,{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.MEMBER."),
                     PartCategory.RailBasePlate => w.Add("IFCPLATE", $"{common},$,{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.BASE_PLATE."),
+                    PartCategory.RailFabric => w.Add("IFCPLATE", $"{common},'FENCE_FABRIC',{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.USERDEFINED."),
                     PartCategory.RailEnvelope => w.Add("IFCRAILING", $"{common},'RAILING_ENVELOPE',{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.USERDEFINED."),
                     // Expansion joint hardware (OPTIONAL armor / cover plates): plates, stud anchors, cover plate sleeve anchors.
                     PartCategory.JointArmor => w.Add("IFCPLATE", $"{common},'JOINT_ARMOR_PLATE',{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.USERDEFINED."),
@@ -1280,12 +1285,12 @@ public static class IfcExporter
                     _ => ("Bolt", boltRef is { Diameter: > 0 } ? boltRef.Diameter : steel.Bolt.Diameter, ".BOLT.", (steel.BoltGrade.StartsWith("ASTM") ? steel.BoltGrade : $"ASTM F3125 Gr. {steel.BoltGrade}")),
                 };
                 var k2 = (kind, (long)Math.Round(bolt.Grip * 1e5), (long)Math.Round(bolt.Length * 1e5),
-                    kind == 1 ? (long)Math.Round(boltRef!.Diameter * 1e5 + boltRef.Embedment * 1e9) : kind is 0 or 3 ? (long)Math.Round(dia * 1e5) : 0L);
+                    kind == 1 ? (long)Math.Round(boltRef!.Diameter * 1e5 + boltRef.Embedment * 1e9 + boltRef.TopHeight * 1e12) : kind is 0 or 3 ? (long)Math.Round(dia * 1e5) : 0L);
                 if (!types.TryGetValue(k2, out var ty))
                 {
                     var mesh = kind switch
                     {
-                        1 => SteelModel.AnchorBoltMesh(boltRef!.Diameter, boltRef.Grip, boltRef.Embedment, 10),
+                        1 => SteelModel.AnchorBoltMesh(boltRef!.Diameter, boltRef.Grip, boltRef.Embedment, 10, boltRef.TopHeight),
                         2 => steel.StudMesh(bolt.Length, 10),
                         _ => SteelModel.BoltMesh(new BoltGeometry(dia), bolt.Grip, bolt.Length, 10),
                     };

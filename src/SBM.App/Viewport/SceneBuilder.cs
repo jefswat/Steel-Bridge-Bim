@@ -170,6 +170,8 @@ public static class SceneBuilder
     private static (long, long) Tile(Vec3 p) => ((long)Math.Floor(p.X / TileSize), (long)Math.Floor(p.Y / TileSize));
     private static Vec3 Center(Mesh m) { var b = m.Bounds(); return (b.Min + b.Max) * 0.5; }
 
+    /// <summary>Opacity of the railing fence fabric layer (see-through, below the deck's 0.35).</summary>
+    public const float FabricOpacity = 0.22f;
     public const string BoltLayer = "3D-BOLTS";
     public const string StudLayer = "3D-STUDS";
     public const string AnchorLayer = "3D-ANCHOR-BOLTS";
@@ -212,6 +214,7 @@ public static class SceneBuilder
                 // Triangle counts with / without holes (the memory planner scales the buffer by them).
                 long full = parts.Sum(p => (long)p.Mesh.TriangleCount), free = parts.Sum(p => (long)MeshLod.HoleFreeTriangles(p.Mesh));
                 layers[i] = new SolidLayer { Name = name, R = r, G = g, B = b, Parts = new() { (mesh, null) }, Triangles = mesh.Indices!.Count / 3,
+                    Opacity = name == "3D-PED-RAILING-FABRIC" ? FabricOpacity : 1f,
                     PartHoleTriangles = new() { (full, free) } };
                 return;
             }
@@ -229,7 +232,7 @@ public static class SceneBuilder
                     1 => m.Studs.GroupBy(s => (Math.Round(s.Length, 5), Tile(s.Frame.Origin)))
                         .Select(gr => (m.StudMesh(gr.First().Length, 10), gr.Select(s => ToMatrix(s.Frame, o)).ToList(), gr.Cast<object>().ToList())),
                     _ => m.Bolts.Where(b => b.Kind == BoltKind.Anchor).GroupBy(b => (Math.Round(b.Diameter, 5), Math.Round(b.Grip, 5), Math.Round(b.Embedment, 5), Tile(b.Frame.Origin)))
-                        .Select(gr => (SteelModel.AnchorBoltMesh(gr.First().Diameter, gr.First().Grip, gr.First().Embedment), gr.Select(b => ToMatrix(b.Frame, o)).ToList(), gr.Cast<object>().ToList())),
+                        .Select(gr => (SteelModel.AnchorBoltMesh(gr.First().Diameter, gr.First().Grip, gr.First().Embedment, 12, gr.First().TopHeight), gr.Select(b => ToMatrix(b.Frame, o)).ToList(), gr.Cast<object>().ToList())),
                 };
                 foreach (var (mesh0, inst, itags) in groups)
                 {

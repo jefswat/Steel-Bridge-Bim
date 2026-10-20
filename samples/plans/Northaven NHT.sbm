@@ -4155,33 +4155,39 @@
         {
           "Name": "Low LT",
           "TypeName": "RAIL (PED)(LOW)",
-          "Kind": "Guardrail",
+          "Kind": "Fence",
           "Offset": -2.1336,
           "BaseProbe": 0.127,
           "Material": "Stainless steel AISI 316 (p.83)",
           "Density": 7980,
           "SampleStep": 0.3048,
-          "Envelope": [
-            {
-              "R": 0.0508,
-              "H": 0
-            },
-            {
-              "R": 0.2032,
-              "H": 0
-            },
-            {
-              "R": 0.2032,
-              "H": 1.1938
-            },
-            {
-              "R": 0.09313333333333333,
-              "H": 1.1938
-            }
-          ],
-          "EnvelopeMassPerLength": 74.408197,
-          "EnvelopeUnresolved": "UNRESOLVED (p.84, 89, 90): railing posts / fencing - the project \u0027Pedestrian railing details\u0027 / RAIL (PED) sheets that size the posts, rails, fencing, base plates and anchors are not in this reduced set (p.89, p.90 refer to them), p.84 note 2 says the number and spacing of the posts is diagrammatic only, and the railing is not a TxDOT standard type (RL-PR3 / PR11 / PR22 / PR3-HD / CLF-RO 2019 checked: 3\u0027-6 / 4\u0027-0 galvanized plate-post or pilaster rails and an 8 ft chain link fence vs the p.89 4\u0027-3 / 9\u0027-10 tapered stainless posts, Item 5110 special pay item)",
-          "EnvelopeBasis": "p.89 LOW post outline swept continuously (scaled; 4\u0027-3 dimensioned); mass = p.83 design dead load 50 PLF",
+          "Post": {
+            "Profile": [
+              {
+                "R": 0.0508,
+                "H": 0
+              },
+              {
+                "R": 0.2032,
+                "H": 0
+              },
+              {
+                "R": 0.2032,
+                "H": 1.1938
+              },
+              {
+                "R": 0.09313333333333333,
+                "H": 1.1938
+              }
+            ],
+            "Thickness": 0.15239999999999998,
+            "Spacing": 2.4384,
+            "EndDistance": 0,
+            "GridStation": 625.3703519999999,
+            "Description": "Tapered post 4\u0027-3 (p.89 outline x 6\u0022)",
+            "Unresolved": "UNRESOLVED (p.84 note 2, p.85-88, p.89, p.90): railing post thickness along the rail, post base plates, anchor bolts and the connection to the curb - the project \u0027Pedestrian railing details\u0027 sheets (224-226) are not in the set; p.89 draws only the side outline, p.84 note 2 says the number and spacing of the posts is diagrammatic only, and the railing is not a TxDOT standard type.",
+            "Basis": "p.89 LOW post outline (scaled; 4\u0027-3 dimensioned) x 6\u0022 thick (the p.85-88 elevation symbol width), 8\u0027-0 on CL NHT stations from 2.44 ft after the begin of rail (p.85-88)"
+          },
           "Members": [
             {
               "Name": "HR",
@@ -4194,44 +4200,71 @@
               "Description": "Handrail pipe, 1.87\u0022 OD scaled (p.89)",
               "MassPerLength": 0,
               "Unresolved": "UNRESOLVED (p.89): handrail pipe size, wall and bracket - drawn only; the \u0027Pedestrian railing details\u0027 sheets are not in the set",
-              "Basis": "pipe OD 1.87\u0022 and position scaled from the p.89 vectors; top 3\u0027-0 above the trail (dimensioned); mass inside the plan design dead load of the envelope"
+              "Basis": "pipe OD 1.87\u0022 and position scaled from the p.89 vectors; top 3\u0027-0 above the trail (dimensioned); wall unknown: modeled solid, weight not counted"
             }
           ],
+          "Fabric": {
+            "Description": "Fence fabric panel (chain link guess, 9 ga 2 in mesh)",
+            "Path": [
+              {
+                "R": 0.2032,
+                "H": 0
+              },
+              {
+                "R": 0.2032,
+                "H": 1.1938
+              }
+            ],
+            "OffsetFromPost": 0.0037592,
+            "BottomH": 0,
+            "Thickness": 0.0075184,
+            "MassPerArea": 1.9529710560000002,
+            "Material": "Chain link fabric (type UNRESOLVED; galvanized steel guess)",
+            "Unresolved": "UNRESOLVED (p.89, p.84-88, p.91, p.3): fence fabric type, height range, side of the posts and weight - the \u0027Pedestrian railing details\u0027 sheets 224-226 that define the fencing are not in the set (p.89 only says \u0027for railing and fencing details see ...\u0027); the elevations p.85-88 draw a panel between every pair of posts, no fabric pay item is on p.91. Chain link guess: 9 gauge (0.148\u0022) 2 in mesh, 0.40 lb/ft2, outer face of the posts from the curb to the post top, 8\u0027-0 bays; drawn see-through.",
+            "Basis": "chain link guess 9 ga (0.148\u0022) 2 in mesh, 0.40 lb/ft2 nominal, on the outer face of the posts, curb top to post top (the elevations p.85-88 draw the panels full height); not a plan value"
+          },
+          "FlagsDimensionOnly": true,
           "Source": "p.83, 84-88, 89, 90, 91",
           "Unresolved": [
-            "UNRESOLVED (p.84 note 2, p.89, p.90): railing posts, post spacing, base plates, anchor bolts, rails and fencing - the project \u0027Pedestrian railing details\u0027 / RAIL (PED) sheets that size the posts, rails, fencing, base plates and anchors are not in this reduced set (p.89, p.90 refer to them), p.84 note 2 says the number and spacing of the posts is diagrammatic only, and the railing is not a TxDOT standard type (RL-PR3 / PR11 / PR22 / PR3-HD / CLF-RO 2019 checked: 3\u0027-6 / 4\u0027-0 galvanized plate-post or pilaster rails and an 8 ft chain link fence vs the p.89 4\u0027-3 / 9\u0027-10 tapered stainless posts, Item 5110 special pay item). Posts / base plates / anchors not modeled; each run is a continuous envelope of the p.89 post section (flagged) plus the 3\u0027-0 handrail."
+            "UNRESOLVED (p.84 note 2, p.85-88, p.89, p.90): railing post thickness, base plates, anchors, rails and fence fabric type - the project \u0027Pedestrian railing details\u0027 / RAIL (PED) sheets (bridge sheets 224-226 of the plan index, p.3) that size the posts, rails, fencing, base plates and anchors are not in this reduced set (p.89, p.90 refer to them), and the railing is not a TxDOT standard type (RL-PR3 / PR11 / PR22 / PR3-HD / CLF-RO 2019 checked: 3\u0027-6 / 4\u0027-0 galvanized plate-post or pilaster rails and an 8 ft chain link fence vs the p.89 4\u0027-3 / 9\u0027-10 tapered stainless posts, Item 5110 special pay item). Posts: p.89 side outline x 6\u0022 (the elevation symbol width), 8\u0027-0 on CL NHT stations as the elevations p.85-88 draw them; fabric chain link guess; no base plates / anchors / rails."
           ]
         },
         {
           "Name": "Low RT",
           "TypeName": "RAIL (PED)(LOW)",
-          "Kind": "Guardrail",
+          "Kind": "Fence",
           "Offset": 2.1336,
           "BaseProbe": 0.127,
           "Material": "Stainless steel AISI 316 (p.83)",
           "Density": 7980,
           "SampleStep": 0.3048,
-          "Envelope": [
-            {
-              "R": 0.0508,
-              "H": 0
-            },
-            {
-              "R": 0.2032,
-              "H": 0
-            },
-            {
-              "R": 0.2032,
-              "H": 1.1938
-            },
-            {
-              "R": 0.09313333333333333,
-              "H": 1.1938
-            }
-          ],
-          "EnvelopeMassPerLength": 74.408197,
-          "EnvelopeUnresolved": "UNRESOLVED (p.84, 89, 90): railing posts / fencing - the project \u0027Pedestrian railing details\u0027 / RAIL (PED) sheets that size the posts, rails, fencing, base plates and anchors are not in this reduced set (p.89, p.90 refer to them), p.84 note 2 says the number and spacing of the posts is diagrammatic only, and the railing is not a TxDOT standard type (RL-PR3 / PR11 / PR22 / PR3-HD / CLF-RO 2019 checked: 3\u0027-6 / 4\u0027-0 galvanized plate-post or pilaster rails and an 8 ft chain link fence vs the p.89 4\u0027-3 / 9\u0027-10 tapered stainless posts, Item 5110 special pay item)",
-          "EnvelopeBasis": "p.89 LOW post outline swept continuously (scaled; 4\u0027-3 dimensioned); mass = p.83 design dead load 50 PLF",
+          "Post": {
+            "Profile": [
+              {
+                "R": 0.0508,
+                "H": 0
+              },
+              {
+                "R": 0.2032,
+                "H": 0
+              },
+              {
+                "R": 0.2032,
+                "H": 1.1938
+              },
+              {
+                "R": 0.09313333333333333,
+                "H": 1.1938
+              }
+            ],
+            "Thickness": 0.15239999999999998,
+            "Spacing": 2.4384,
+            "EndDistance": 0,
+            "GridStation": 625.3703519999999,
+            "Description": "Tapered post 4\u0027-3 (p.89 outline x 6\u0022)",
+            "Unresolved": "UNRESOLVED (p.84 note 2, p.85-88, p.89, p.90): railing post thickness along the rail, post base plates, anchor bolts and the connection to the curb - the project \u0027Pedestrian railing details\u0027 sheets (224-226) are not in the set; p.89 draws only the side outline, p.84 note 2 says the number and spacing of the posts is diagrammatic only, and the railing is not a TxDOT standard type.",
+            "Basis": "p.89 LOW post outline (scaled; 4\u0027-3 dimensioned) x 6\u0022 thick (the p.85-88 elevation symbol width), 8\u0027-0 on CL NHT stations from 2.44 ft after the begin of rail (p.85-88)"
+          },
           "Members": [
             {
               "Name": "HR",
@@ -4244,9 +4277,30 @@
               "Description": "Handrail pipe, 1.87\u0022 OD scaled (p.89)",
               "MassPerLength": 0,
               "Unresolved": "UNRESOLVED (p.89): handrail pipe size, wall and bracket - drawn only; the \u0027Pedestrian railing details\u0027 sheets are not in the set",
-              "Basis": "pipe OD 1.87\u0022 and position scaled from the p.89 vectors; top 3\u0027-0 above the trail (dimensioned); mass inside the plan design dead load of the envelope"
+              "Basis": "pipe OD 1.87\u0022 and position scaled from the p.89 vectors; top 3\u0027-0 above the trail (dimensioned); wall unknown: modeled solid, weight not counted"
             }
           ],
+          "Fabric": {
+            "Description": "Fence fabric panel (chain link guess, 9 ga 2 in mesh)",
+            "Path": [
+              {
+                "R": 0.2032,
+                "H": 0
+              },
+              {
+                "R": 0.2032,
+                "H": 1.1938
+              }
+            ],
+            "OffsetFromPost": 0.0037592,
+            "BottomH": 0,
+            "Thickness": 0.0075184,
+            "MassPerArea": 1.9529710560000002,
+            "Material": "Chain link fabric (type UNRESOLVED; galvanized steel guess)",
+            "Unresolved": "UNRESOLVED (p.89, p.84-88, p.91, p.3): fence fabric type, height range, side of the posts and weight - the \u0027Pedestrian railing details\u0027 sheets 224-226 that define the fencing are not in the set (p.89 only says \u0027for railing and fencing details see ...\u0027); the elevations p.85-88 draw a panel between every pair of posts, no fabric pay item is on p.91. Chain link guess: 9 gauge (0.148\u0022) 2 in mesh, 0.40 lb/ft2, outer face of the posts from the curb to the post top, 8\u0027-0 bays; drawn see-through.",
+            "Basis": "chain link guess 9 ga (0.148\u0022) 2 in mesh, 0.40 lb/ft2 nominal, on the outer face of the posts, curb top to post top (the elevations p.85-88 draw the panels full height); not a plan value"
+          },
+          "FlagsDimensionOnly": true,
           "Source": "p.83, 84-88, 89, 90, 91",
           "Unresolved": []
         }
@@ -8106,33 +8160,39 @@
         {
           "Name": "Low LT",
           "TypeName": "RAIL (PED)(LOW)",
-          "Kind": "Guardrail",
+          "Kind": "Fence",
           "Offset": -2.1336,
           "BaseProbe": 0.127,
           "Material": "Stainless steel AISI 316 (p.83)",
           "Density": 7980,
           "SampleStep": 0.3048,
-          "Envelope": [
-            {
-              "R": 0.0508,
-              "H": 0
-            },
-            {
-              "R": 0.2032,
-              "H": 0
-            },
-            {
-              "R": 0.2032,
-              "H": 1.1938
-            },
-            {
-              "R": 0.09313333333333333,
-              "H": 1.1938
-            }
-          ],
-          "EnvelopeMassPerLength": 74.408197,
-          "EnvelopeUnresolved": "UNRESOLVED (p.84, 89, 90): railing posts / fencing - the project \u0027Pedestrian railing details\u0027 / RAIL (PED) sheets that size the posts, rails, fencing, base plates and anchors are not in this reduced set (p.89, p.90 refer to them), p.84 note 2 says the number and spacing of the posts is diagrammatic only, and the railing is not a TxDOT standard type (RL-PR3 / PR11 / PR22 / PR3-HD / CLF-RO 2019 checked: 3\u0027-6 / 4\u0027-0 galvanized plate-post or pilaster rails and an 8 ft chain link fence vs the p.89 4\u0027-3 / 9\u0027-10 tapered stainless posts, Item 5110 special pay item)",
-          "EnvelopeBasis": "p.89 LOW post outline swept continuously (scaled; 4\u0027-3 dimensioned); mass = p.83 design dead load 50 PLF",
+          "Post": {
+            "Profile": [
+              {
+                "R": 0.0508,
+                "H": 0
+              },
+              {
+                "R": 0.2032,
+                "H": 0
+              },
+              {
+                "R": 0.2032,
+                "H": 1.1938
+              },
+              {
+                "R": 0.09313333333333333,
+                "H": 1.1938
+              }
+            ],
+            "Thickness": 0.15239999999999998,
+            "Spacing": 2.4384,
+            "EndDistance": 0,
+            "GridStation": 625.3703519999999,
+            "Description": "Tapered post 4\u0027-3 (p.89 outline x 6\u0022)",
+            "Unresolved": "UNRESOLVED (p.84 note 2, p.85-88, p.89, p.90): railing post thickness along the rail, post base plates, anchor bolts and the connection to the curb - the project \u0027Pedestrian railing details\u0027 sheets (224-226) are not in the set; p.89 draws only the side outline, p.84 note 2 says the number and spacing of the posts is diagrammatic only, and the railing is not a TxDOT standard type.",
+            "Basis": "p.89 LOW post outline (scaled; 4\u0027-3 dimensioned) x 6\u0022 thick (the p.85-88 elevation symbol width), 8\u0027-0 on CL NHT stations from 2.44 ft after the begin of rail (p.85-88)"
+          },
           "Members": [
             {
               "Name": "HR",
@@ -8145,42 +8205,69 @@
               "Description": "Handrail pipe, 1.87\u0022 OD scaled (p.89)",
               "MassPerLength": 0,
               "Unresolved": "UNRESOLVED (p.89): handrail pipe size, wall and bracket - drawn only; the \u0027Pedestrian railing details\u0027 sheets are not in the set",
-              "Basis": "pipe OD 1.87\u0022 and position scaled from the p.89 vectors; top 3\u0027-0 above the trail (dimensioned); mass inside the plan design dead load of the envelope"
+              "Basis": "pipe OD 1.87\u0022 and position scaled from the p.89 vectors; top 3\u0027-0 above the trail (dimensioned); wall unknown: modeled solid, weight not counted"
             }
           ],
+          "Fabric": {
+            "Description": "Fence fabric panel (chain link guess, 9 ga 2 in mesh)",
+            "Path": [
+              {
+                "R": 0.2032,
+                "H": 0
+              },
+              {
+                "R": 0.2032,
+                "H": 1.1938
+              }
+            ],
+            "OffsetFromPost": 0.0037592,
+            "BottomH": 0,
+            "Thickness": 0.0075184,
+            "MassPerArea": 1.9529710560000002,
+            "Material": "Chain link fabric (type UNRESOLVED; galvanized steel guess)",
+            "Unresolved": "UNRESOLVED (p.89, p.84-88, p.91, p.3): fence fabric type, height range, side of the posts and weight - the \u0027Pedestrian railing details\u0027 sheets 224-226 that define the fencing are not in the set (p.89 only says \u0027for railing and fencing details see ...\u0027); the elevations p.85-88 draw a panel between every pair of posts, no fabric pay item is on p.91. Chain link guess: 9 gauge (0.148\u0022) 2 in mesh, 0.40 lb/ft2, outer face of the posts from the curb to the post top, 8\u0027-0 bays; drawn see-through.",
+            "Basis": "chain link guess 9 ga (0.148\u0022) 2 in mesh, 0.40 lb/ft2 nominal, on the outer face of the posts, curb top to post top (the elevations p.85-88 draw the panels full height); not a plan value"
+          },
+          "FlagsDimensionOnly": true,
           "Source": "p.83, 84-88, 89, 90, 91",
           "Unresolved": []
         },
         {
           "Name": "Low RT",
           "TypeName": "RAIL (PED)(LOW)",
-          "Kind": "Guardrail",
+          "Kind": "Fence",
           "Offset": 2.1336,
           "BaseProbe": 0.127,
           "Material": "Stainless steel AISI 316 (p.83)",
           "Density": 7980,
           "SampleStep": 0.3048,
-          "Envelope": [
-            {
-              "R": 0.0508,
-              "H": 0
-            },
-            {
-              "R": 0.2032,
-              "H": 0
-            },
-            {
-              "R": 0.2032,
-              "H": 1.1938
-            },
-            {
-              "R": 0.09313333333333333,
-              "H": 1.1938
-            }
-          ],
-          "EnvelopeMassPerLength": 74.408197,
-          "EnvelopeUnresolved": "UNRESOLVED (p.84, 89, 90): railing posts / fencing - the project \u0027Pedestrian railing details\u0027 / RAIL (PED) sheets that size the posts, rails, fencing, base plates and anchors are not in this reduced set (p.89, p.90 refer to them), p.84 note 2 says the number and spacing of the posts is diagrammatic only, and the railing is not a TxDOT standard type (RL-PR3 / PR11 / PR22 / PR3-HD / CLF-RO 2019 checked: 3\u0027-6 / 4\u0027-0 galvanized plate-post or pilaster rails and an 8 ft chain link fence vs the p.89 4\u0027-3 / 9\u0027-10 tapered stainless posts, Item 5110 special pay item)",
-          "EnvelopeBasis": "p.89 LOW post outline swept continuously (scaled; 4\u0027-3 dimensioned); mass = p.83 design dead load 50 PLF",
+          "Post": {
+            "Profile": [
+              {
+                "R": 0.0508,
+                "H": 0
+              },
+              {
+                "R": 0.2032,
+                "H": 0
+              },
+              {
+                "R": 0.2032,
+                "H": 1.1938
+              },
+              {
+                "R": 0.09313333333333333,
+                "H": 1.1938
+              }
+            ],
+            "Thickness": 0.15239999999999998,
+            "Spacing": 2.4384,
+            "EndDistance": 0,
+            "GridStation": 625.3703519999999,
+            "Description": "Tapered post 4\u0027-3 (p.89 outline x 6\u0022)",
+            "Unresolved": "UNRESOLVED (p.84 note 2, p.85-88, p.89, p.90): railing post thickness along the rail, post base plates, anchor bolts and the connection to the curb - the project \u0027Pedestrian railing details\u0027 sheets (224-226) are not in the set; p.89 draws only the side outline, p.84 note 2 says the number and spacing of the posts is diagrammatic only, and the railing is not a TxDOT standard type.",
+            "Basis": "p.89 LOW post outline (scaled; 4\u0027-3 dimensioned) x 6\u0022 thick (the p.85-88 elevation symbol width), 8\u0027-0 on CL NHT stations from 2.44 ft after the begin of rail (p.85-88)"
+          },
           "Members": [
             {
               "Name": "HR",
@@ -8193,9 +8280,30 @@
               "Description": "Handrail pipe, 1.87\u0022 OD scaled (p.89)",
               "MassPerLength": 0,
               "Unresolved": "UNRESOLVED (p.89): handrail pipe size, wall and bracket - drawn only; the \u0027Pedestrian railing details\u0027 sheets are not in the set",
-              "Basis": "pipe OD 1.87\u0022 and position scaled from the p.89 vectors; top 3\u0027-0 above the trail (dimensioned); mass inside the plan design dead load of the envelope"
+              "Basis": "pipe OD 1.87\u0022 and position scaled from the p.89 vectors; top 3\u0027-0 above the trail (dimensioned); wall unknown: modeled solid, weight not counted"
             }
           ],
+          "Fabric": {
+            "Description": "Fence fabric panel (chain link guess, 9 ga 2 in mesh)",
+            "Path": [
+              {
+                "R": 0.2032,
+                "H": 0
+              },
+              {
+                "R": 0.2032,
+                "H": 1.1938
+              }
+            ],
+            "OffsetFromPost": 0.0037592,
+            "BottomH": 0,
+            "Thickness": 0.0075184,
+            "MassPerArea": 1.9529710560000002,
+            "Material": "Chain link fabric (type UNRESOLVED; galvanized steel guess)",
+            "Unresolved": "UNRESOLVED (p.89, p.84-88, p.91, p.3): fence fabric type, height range, side of the posts and weight - the \u0027Pedestrian railing details\u0027 sheets 224-226 that define the fencing are not in the set (p.89 only says \u0027for railing and fencing details see ...\u0027); the elevations p.85-88 draw a panel between every pair of posts, no fabric pay item is on p.91. Chain link guess: 9 gauge (0.148\u0022) 2 in mesh, 0.40 lb/ft2, outer face of the posts from the curb to the post top, 8\u0027-0 bays; drawn see-through.",
+            "Basis": "chain link guess 9 ga (0.148\u0022) 2 in mesh, 0.40 lb/ft2 nominal, on the outer face of the posts, curb top to post top (the elevations p.85-88 draw the panels full height); not a plan value"
+          },
+          "FlagsDimensionOnly": true,
           "Source": "p.83, 84-88, 89, 90, 91",
           "Unresolved": []
         }
@@ -9929,14 +10037,15 @@
                   }
                 ],
                 "Base": "CapTop",
-                "TopElevation": 163.0006392,
+                "TopElevation": 162.93926947784325,
                 "TopRefS": 0,
                 "TopSlopeS": 0,
                 "Source": "p.102 / sh 153 EL. A",
                 "SeatS": 2.8194000000000004,
                 "SeatN": 0.174625,
                 "Reported": [
-                  "B1-B3 (p.102, 107, 119, 124): plan pedestal top 534.779 vs tie WP 535.74 - 2\u0022 steel - 11.75\u0022 bearing = 534.594 (\u002B0.185 ft); the plan top is modeled (p.107 note 8: pedestal elevations to be adjusted to the fabricated bearing)."
+                  "B1-B3 (p.102, 107, 119, 124): plan pedestal top 534.779 vs tie WP 535.74 - 2\u0022 steel - 11.75\u0022 bearing = 534.594 (\u002B0.185 ft); the plan top is modeled (p.107 note 8: pedestal elevations to be adjusted to the fabricated bearing).",
+                  "CONFLICT (p.102 vs p.107): arch pedestal \u0027arch bearing south\u0027 of Pier 10: top modeled at EL 534.578\u0027 = bottom of the arch bearing SW (pad on the conc. brg. surface, stack 11 3/4\u0022 hung from the steel, p.107 Section A-A / table H) instead of the p.102 EL 534.779\u0027 (2.42\u0022 lower) - p.107 note 8 / p.102 note 1: the contractor adjusts the pedestal elevations to the fabricated bearing."
                 ]
               },
               {
@@ -9977,14 +10086,15 @@
                   }
                 ],
                 "Base": "CapTop",
-                "TopElevation": 162.98448480000002,
+                "TopElevation": 162.93925348303222,
                 "TopRefS": 0,
                 "TopSlopeS": 0,
                 "Source": "p.102 / sh 153 EL. E",
                 "SeatS": -3.1273750000000002,
                 "SeatN": 0.174625,
                 "Reported": [
-                  "B1-B3 (p.102, 107, 119, 124): plan pedestal top 534.726 vs tie WP 535.74 - 2\u0022 steel - 11.75\u0022 bearing = 534.594 (\u002B0.132 ft); the plan top is modeled (p.107 note 8: pedestal elevations to be adjusted to the fabricated bearing)."
+                  "B1-B3 (p.102, 107, 119, 124): plan pedestal top 534.726 vs tie WP 535.74 - 2\u0022 steel - 11.75\u0022 bearing = 534.594 (\u002B0.132 ft); the plan top is modeled (p.107 note 8: pedestal elevations to be adjusted to the fabricated bearing).",
+                  "CONFLICT (p.102 vs p.107): arch pedestal \u0027arch bearing north\u0027 of Pier 10: top modeled at EL 534.578\u0027 = bottom of the arch bearing NW (pad on the conc. brg. surface, stack 11 3/4\u0022 hung from the steel, p.107 Section A-A / table H) instead of the p.102 EL 534.726\u0027 (1.78\u0022 lower) - p.107 note 8 / p.102 note 1: the contractor adjusts the pedestal elevations to the fabricated bearing."
                 ]
               }
             ],
@@ -11361,18 +11471,18 @@
                   "CoverTop": "NaN",
                   "CheckCover": true,
                   "Bars": [
-                    "2.7656,-0.2701,161.9719 2.7656,-0.2701,162.9292 2.4912,-0.1303,162.9292 2.4912,-0.1303,161.9719",
-                    "2.842,-0.1202,161.9719 2.842,-0.1202,162.9292 2.5676,0.0196,162.9292 2.5676,0.0196,161.9719",
-                    "2.9184,0.0297,161.9719 2.9184,0.0297,162.9292 2.644,0.1696,162.9292 2.644,0.1696,161.9719",
-                    "2.9948,0.1797,161.9719 2.9948,0.1797,162.9292 2.7204,0.3195,162.9292 2.7204,0.3195,161.9719",
-                    "3.0712,0.3296,161.9719 3.0712,0.3296,162.9292 2.7968,0.4694,162.9292 2.7968,0.4694,161.9719",
-                    "3.1476,0.4796,161.9719 3.1476,0.4796,162.9292 2.8732,0.6194,162.9292 2.8732,0.6194,161.9719",
-                    "-3.1812,-0.2701,161.9558 -3.1812,-0.2701,162.913 -3.4556,-0.1303,162.913 -3.4556,-0.1303,161.9558",
-                    "-3.1048,-0.1202,161.9558 -3.1048,-0.1202,162.913 -3.3792,0.0196,162.913 -3.3792,0.0196,161.9558",
-                    "-3.0284,0.0297,161.9558 -3.0284,0.0297,162.913 -3.3028,0.1696,162.913 -3.3028,0.1696,161.9558",
-                    "-2.952,0.1797,161.9558 -2.952,0.1797,162.913 -3.2264,0.3195,162.913 -3.2264,0.3195,161.9558",
-                    "-2.8756,0.3296,161.9558 -2.8756,0.3296,162.913 -3.15,0.4694,162.913 -3.15,0.4694,161.9558",
-                    "-2.7992,0.4796,161.9558 -2.7992,0.4796,162.913 -3.0736,0.6194,162.913 -3.0736,0.6194,161.9558"
+                    "2.7656,-0.2701,161.9106 2.7656,-0.2701,162.8678 2.4912,-0.1303,162.8678 2.4912,-0.1303,161.9106",
+                    "2.842,-0.1202,161.9106 2.842,-0.1202,162.8678 2.5676,0.0196,162.8678 2.5676,0.0196,161.9106",
+                    "2.9184,0.0297,161.9106 2.9184,0.0297,162.8678 2.644,0.1696,162.8678 2.644,0.1696,161.9106",
+                    "2.9948,0.1797,161.9106 2.9948,0.1797,162.8678 2.7204,0.3195,162.8678 2.7204,0.3195,161.9106",
+                    "3.0712,0.3296,161.9106 3.0712,0.3296,162.8678 2.7968,0.4694,162.8678 2.7968,0.4694,161.9106",
+                    "3.1476,0.4796,161.9106 3.1476,0.4796,162.8678 2.8732,0.6194,162.8678 2.8732,0.6194,161.9106",
+                    "-3.1812,-0.2701,161.9106 -3.1812,-0.2701,162.8678 -3.4556,-0.1303,162.8678 -3.4556,-0.1303,161.9106",
+                    "-3.1048,-0.1202,161.9106 -3.1048,-0.1202,162.8678 -3.3792,0.0196,162.8678 -3.3792,0.0196,161.9106",
+                    "-3.0284,0.0297,161.9106 -3.0284,0.0297,162.8678 -3.3028,0.1696,162.8678 -3.3028,0.1696,161.9106",
+                    "-2.952,0.1797,161.9106 -2.952,0.1797,162.8678 -3.2264,0.3195,162.8678 -3.2264,0.3195,161.9106",
+                    "-2.8756,0.3296,161.9106 -2.8756,0.3296,162.8678 -3.15,0.4694,162.8678 -3.15,0.4694,161.9106",
+                    "-2.7992,0.4796,161.9106 -2.7992,0.4796,162.8678 -3.0736,0.6194,162.8678 -3.0736,0.6194,161.9106"
                   ],
                   "Spirals": [],
                   "Unplaced": 0,
@@ -11397,11 +11507,11 @@
                   "CoverTop": "NaN",
                   "CheckCover": true,
                   "Bars": [
-                    "2.8976,0.5441,162.9292 2.8662,0.6407,162.9292 2.4699,-0.1372,162.9292 2.7726,-0.2915,162.9292 3.1689,0.4865,162.9292 2.8662,0.6407,162.9371 2.8976,0.5441,162.9451",
-                    "2.8976,0.5441,162.7629 2.8662,0.6407,162.7629 2.4699,-0.1372,162.7629 2.7726,-0.2915,162.7629 3.1689,0.4865,162.7629 2.8662,0.6407,162.7708 2.8976,0.5441,162.7788",
+                    "2.8976,0.5441,162.8678 2.8662,0.6407,162.8678 2.4699,-0.1372,162.8678 2.7726,-0.2915,162.8678 3.1689,0.4865,162.8678 2.8662,0.6407,162.8758 2.8976,0.5441,162.8837",
+                    "2.8976,0.5441,162.7322 2.8662,0.6407,162.7322 2.4699,-0.1372,162.7322 2.7726,-0.2915,162.7322 3.1689,0.4865,162.7322 2.8662,0.6407,162.7401 2.8976,0.5441,162.7481",
                     "2.8976,0.5441,162.5966 2.8662,0.6407,162.5966 2.4699,-0.1372,162.5966 2.7726,-0.2915,162.5966 3.1689,0.4865,162.5966 2.8662,0.6407,162.6045 2.8976,0.5441,162.6125",
-                    "-3.0491,0.5441,162.913 -3.0805,0.6407,162.913 -3.4769,-0.1372,162.913 -3.1742,-0.2915,162.913 -2.7778,0.4865,162.913 -3.0805,0.6407,162.921 -3.0491,0.5441,162.9289",
-                    "-3.0491,0.5441,162.7548 -3.0805,0.6407,162.7548 -3.4769,-0.1372,162.7548 -3.1742,-0.2915,162.7548 -2.7778,0.4865,162.7548 -3.0805,0.6407,162.7628 -3.0491,0.5441,162.7707",
+                    "-3.0491,0.5441,162.8678 -3.0805,0.6407,162.8678 -3.4769,-0.1372,162.8678 -3.1742,-0.2915,162.8678 -2.7778,0.4865,162.8678 -3.0805,0.6407,162.8758 -3.0491,0.5441,162.8837",
+                    "-3.0491,0.5441,162.7322 -3.0805,0.6407,162.7322 -3.4769,-0.1372,162.7322 -3.1742,-0.2915,162.7322 -2.7778,0.4865,162.7322 -3.0805,0.6407,162.7401 -3.0491,0.5441,162.7481",
                     "-3.0491,0.5441,162.5966 -3.0805,0.6407,162.5966 -3.4769,-0.1372,162.5966 -3.1742,-0.2915,162.5966 -2.7778,0.4865,162.5966 -3.0805,0.6407,162.6045 -3.0491,0.5441,162.6125"
                   ],
                   "Spirals": [],
@@ -11431,12 +11541,12 @@
                   "CoverTop": "NaN",
                   "CheckCover": true,
                   "Bars": [
-                    "2.7757,-0.2503,161.9561 2.7757,-0.2503,162.9133 3.1375,0.4597,162.9133 3.1375,0.4597,161.9561",
-                    "2.6385,-0.1804,161.9561 2.6385,-0.1804,162.9133 3.0003,0.5297,162.9133 3.0003,0.5297,161.9561",
-                    "2.5013,-0.1105,161.9561 2.5013,-0.1105,162.9133 2.8631,0.5996,162.9133 2.8631,0.5996,161.9561",
-                    "-3.1711,-0.2503,161.9399 -3.1711,-0.2503,162.8972 -2.8093,0.4597,162.8972 -2.8093,0.4597,161.9399",
-                    "-3.3083,-0.1804,161.9399 -3.3083,-0.1804,162.8972 -2.9465,0.5297,162.8972 -2.9465,0.5297,161.9399",
-                    "-3.4455,-0.1105,161.9399 -3.4455,-0.1105,162.8972 -3.0837,0.5996,162.8972 -3.0837,0.5996,161.9399"
+                    "2.7757,-0.2503,161.8947 2.7757,-0.2503,162.852 3.1375,0.4597,162.852 3.1375,0.4597,161.8947",
+                    "2.6385,-0.1804,161.8947 2.6385,-0.1804,162.852 3.0003,0.5297,162.852 3.0003,0.5297,161.8947",
+                    "2.5013,-0.1105,161.8947 2.5013,-0.1105,162.852 2.8631,0.5996,162.852 2.8631,0.5996,161.8947",
+                    "-3.1711,-0.2503,161.8947 -3.1711,-0.2503,162.8519 -2.8093,0.4597,162.8519 -2.8093,0.4597,161.8947",
+                    "-3.3083,-0.1804,161.8947 -3.3083,-0.1804,162.8519 -2.9465,0.5297,162.8519 -2.9465,0.5297,161.8947",
+                    "-3.4455,-0.1105,161.8947 -3.4455,-0.1105,162.8519 -3.0837,0.5996,162.8519 -3.0837,0.5996,161.8947"
                   ],
                   "Spirals": [],
                   "Unplaced": 0,
@@ -13906,34 +14016,40 @@
         {
           "Name": "Low LT",
           "TypeName": "RAIL (PED)(LOW)",
-          "Kind": "Guardrail",
+          "Kind": "Fence",
           "Offset": -2.1336,
           "EndStation": 712.847952,
           "BaseProbe": 0.127,
           "Material": "Stainless steel AISI 316 (p.83)",
           "Density": 7980,
           "SampleStep": 0.3048,
-          "Envelope": [
-            {
-              "R": 0.0508,
-              "H": 0
-            },
-            {
-              "R": 0.2032,
-              "H": 0
-            },
-            {
-              "R": 0.2032,
-              "H": 1.1938
-            },
-            {
-              "R": 0.09313333333333333,
-              "H": 1.1938
-            }
-          ],
-          "EnvelopeMassPerLength": 74.408197,
-          "EnvelopeUnresolved": "UNRESOLVED (p.84, 89, 90): railing posts / fencing - the project \u0027Pedestrian railing details\u0027 / RAIL (PED) sheets that size the posts, rails, fencing, base plates and anchors are not in this reduced set (p.89, p.90 refer to them), p.84 note 2 says the number and spacing of the posts is diagrammatic only, and the railing is not a TxDOT standard type (RL-PR3 / PR11 / PR22 / PR3-HD / CLF-RO 2019 checked: 3\u0027-6 / 4\u0027-0 galvanized plate-post or pilaster rails and an 8 ft chain link fence vs the p.89 4\u0027-3 / 9\u0027-10 tapered stainless posts, Item 5110 special pay item)",
-          "EnvelopeBasis": "p.89 LOW post outline swept continuously (scaled; 4\u0027-3 dimensioned); mass = p.83 design dead load 50 PLF",
+          "Post": {
+            "Profile": [
+              {
+                "R": 0.0508,
+                "H": 0
+              },
+              {
+                "R": 0.2032,
+                "H": 0
+              },
+              {
+                "R": 0.2032,
+                "H": 1.1938
+              },
+              {
+                "R": 0.09313333333333333,
+                "H": 1.1938
+              }
+            ],
+            "Thickness": 0.15239999999999998,
+            "Spacing": 2.4384,
+            "EndDistance": 0,
+            "GridStation": 625.3703519999999,
+            "Description": "Tapered post 4\u0027-3 (p.89 outline x 6\u0022)",
+            "Unresolved": "UNRESOLVED (p.84 note 2, p.85-88, p.89, p.90): railing post thickness along the rail, post base plates, anchor bolts and the connection to the curb - the project \u0027Pedestrian railing details\u0027 sheets (224-226) are not in the set; p.89 draws only the side outline, p.84 note 2 says the number and spacing of the posts is diagrammatic only, and the railing is not a TxDOT standard type.",
+            "Basis": "p.89 LOW post outline (scaled; 4\u0027-3 dimensioned) x 6\u0022 thick (the p.85-88 elevation symbol width), 8\u0027-0 on CL NHT stations from 2.44 ft after the begin of rail (p.85-88)"
+          },
           "Members": [
             {
               "Name": "HR",
@@ -13946,171 +14062,198 @@
               "Description": "Handrail pipe, 1.87\u0022 OD scaled (p.89)",
               "MassPerLength": 0,
               "Unresolved": "UNRESOLVED (p.89): handrail pipe size, wall and bracket - drawn only; the \u0027Pedestrian railing details\u0027 sheets are not in the set",
-              "Basis": "pipe OD 1.87\u0022 and position scaled from the p.89 vectors; top 3\u0027-0 above the trail (dimensioned); mass inside the plan design dead load of the envelope"
+              "Basis": "pipe OD 1.87\u0022 and position scaled from the p.89 vectors; top 3\u0027-0 above the trail (dimensioned); wall unknown: modeled solid, weight not counted"
             }
           ],
+          "Fabric": {
+            "Description": "Fence fabric panel (chain link guess, 9 ga 2 in mesh)",
+            "Path": [
+              {
+                "R": 0.2032,
+                "H": 0
+              },
+              {
+                "R": 0.2032,
+                "H": 1.1938
+              }
+            ],
+            "OffsetFromPost": 0.0037592,
+            "BottomH": 0,
+            "Thickness": 0.0075184,
+            "MassPerArea": 1.9529710560000002,
+            "Material": "Chain link fabric (type UNRESOLVED; galvanized steel guess)",
+            "Unresolved": "UNRESOLVED (p.89, p.84-88, p.91, p.3): fence fabric type, height range, side of the posts and weight - the \u0027Pedestrian railing details\u0027 sheets 224-226 that define the fencing are not in the set (p.89 only says \u0027for railing and fencing details see ...\u0027); the elevations p.85-88 draw a panel between every pair of posts, no fabric pay item is on p.91. Chain link guess: 9 gauge (0.148\u0022) 2 in mesh, 0.40 lb/ft2, outer face of the posts from the curb to the post top, 8\u0027-0 bays; drawn see-through.",
+            "Basis": "chain link guess 9 ga (0.148\u0022) 2 in mesh, 0.40 lb/ft2 nominal, on the outer face of the posts, curb top to post top (the elevations p.85-88 draw the panels full height); not a plan value"
+          },
+          "FlagsDimensionOnly": true,
           "Source": "p.83, 84-88, 89, 90, 91",
           "Unresolved": []
         },
         {
           "Name": "High LT",
           "TypeName": "RAIL (PED)(HIGH)",
-          "Kind": "Guardrail",
+          "Kind": "Fence",
           "Offset": -2.1336,
           "BeginStation": 712.847952,
           "BaseProbe": 0.127,
           "Material": "Stainless steel AISI 316 (p.83)",
           "Density": 7980,
           "SampleStep": 0.3048,
-          "Envelope": [
-            {
-              "R": 0.0508,
-              "H": 0
-            },
-            {
-              "R": 0.2032,
-              "H": 0
-            },
-            {
-              "R": 0.2032,
-              "H": 1.7525999999999995
-            },
-            {
-              "R": 0.20098080729166937,
-              "H": 1.8337708593750002
-            },
-            {
-              "R": 0.19433645833333332,
-              "H": 1.914604374999999
-            },
-            {
-              "R": 0.18328679687499883,
-              "H": 1.9949219531249998
-            },
-            {
-              "R": 0.16785166666666512,
-              "H": 2.074544999999999
-            },
-            {
-              "R": 0.14805091145833332,
-              "H": 2.1532949218749997
-            },
-            {
-              "R": 0.12390437499999885,
-              "H": 2.2309931249999995
-            },
-            {
-              "R": 0.09543190104166667,
-              "H": 2.307461015625
-            },
-            {
-              "R": 0.06265333333333217,
-              "H": 2.38252
-            },
-            {
-              "R": 0.026326041666666664,
-              "H": 2.4556839062499995
-            },
-            {
-              "R": -0.01397000000000077,
-              "H": 2.5265062499999997
-            },
-            {
-              "R": -0.05807604166666667,
-              "H": 2.5948679687499996
-            },
-            {
-              "R": -0.10583333333333525,
-              "H": 2.6606499999999995
-            },
-            {
-              "R": -0.15708312500000116,
-              "H": 2.72373328125
-            },
-            {
-              "R": -0.21166666666666667,
-              "H": 2.7839987499999994
-            },
-            {
-              "R": -0.2694252083333341,
-              "H": 2.8413273437499997
-            },
-            {
-              "R": -0.3302,
-              "H": 2.8955999999999995
-            },
-            {
-              "R": -0.3589866666666674,
-              "H": 2.8600399999999992
-            },
-            {
-              "R": -0.30265356770833257,
-              "H": 2.806485026041666
-            },
-            {
-              "R": -0.24931687500000266,
-              "H": 2.7500527083333326
-            },
-            {
-              "R": -0.19911549479166665,
-              "H": 2.6908819531249994
-            },
-            {
-              "R": -0.15218833333333448,
-              "H": 2.6291116666666663
-            },
-            {
-              "R": -0.10867429687500076,
-              "H": 2.564880755208333
-            },
-            {
-              "R": -0.0687122916666659,
-              "H": 2.4983281249999996
-            },
-            {
-              "R": -0.032441223958334105,
-              "H": 2.429592682291666
-            },
-            {
-              "R": 0,
-              "H": 2.358813333333333
-            },
-            {
-              "R": 0.028485703124999612,
-              "H": 2.2863009635416667
-            },
-            {
-              "R": 0.05294312499999962,
-              "H": 2.2124193749999996
-            },
-            {
-              "R": 0.07331273437499847,
-              "H": 2.1373868489583328
-            },
-            {
-              "R": 0.08953499999999846,
-              "H": 2.0614216666666656
-            },
-            {
-              "R": 0.101550390625,
-              "H": 1.9847421093749997
-            },
-            {
-              "R": 0.10929937499999769,
-              "H": 1.9075664583333332
-            },
-            {
-              "R": 0.11272242187499769,
-              "H": 1.830112994791666
-            },
-            {
-              "R": 0.11175999999999844,
-              "H": 1.7525999999999995
-            }
-          ],
-          "EnvelopeMassPerLength": 148.816394,
-          "EnvelopeUnresolved": "UNRESOLVED (p.84, 89, 90): railing posts / fencing - the project \u0027Pedestrian railing details\u0027 / RAIL (PED) sheets that size the posts, rails, fencing, base plates and anchors are not in this reduced set (p.89, p.90 refer to them), p.84 note 2 says the number and spacing of the posts is diagrammatic only, and the railing is not a TxDOT standard type (RL-PR3 / PR11 / PR22 / PR3-HD / CLF-RO 2019 checked: 3\u0027-6 / 4\u0027-0 galvanized plate-post or pilaster rails and an 8 ft chain link fence vs the p.89 4\u0027-3 / 9\u0027-10 tapered stainless posts, Item 5110 special pay item)",
-          "EnvelopeBasis": "p.89 HIGH post outline swept continuously (scaled; 9\u0027-10 dimensioned); mass = p.83 design dead load 100 PLF",
+          "Post": {
+            "Profile": [
+              {
+                "R": 0.0508,
+                "H": 0
+              },
+              {
+                "R": 0.2032,
+                "H": 0
+              },
+              {
+                "R": 0.2032,
+                "H": 1.7525999999999995
+              },
+              {
+                "R": 0.20098080729166937,
+                "H": 1.8337708593750002
+              },
+              {
+                "R": 0.19433645833333332,
+                "H": 1.914604374999999
+              },
+              {
+                "R": 0.18328679687499883,
+                "H": 1.9949219531249998
+              },
+              {
+                "R": 0.16785166666666512,
+                "H": 2.074544999999999
+              },
+              {
+                "R": 0.14805091145833332,
+                "H": 2.1532949218749997
+              },
+              {
+                "R": 0.12390437499999885,
+                "H": 2.2309931249999995
+              },
+              {
+                "R": 0.09543190104166667,
+                "H": 2.307461015625
+              },
+              {
+                "R": 0.06265333333333217,
+                "H": 2.38252
+              },
+              {
+                "R": 0.026326041666666664,
+                "H": 2.4556839062499995
+              },
+              {
+                "R": -0.01397000000000077,
+                "H": 2.5265062499999997
+              },
+              {
+                "R": -0.05807604166666667,
+                "H": 2.5948679687499996
+              },
+              {
+                "R": -0.10583333333333525,
+                "H": 2.6606499999999995
+              },
+              {
+                "R": -0.15708312500000116,
+                "H": 2.72373328125
+              },
+              {
+                "R": -0.21166666666666667,
+                "H": 2.7839987499999994
+              },
+              {
+                "R": -0.2694252083333341,
+                "H": 2.8413273437499997
+              },
+              {
+                "R": -0.3302,
+                "H": 2.8955999999999995
+              },
+              {
+                "R": -0.3589866666666674,
+                "H": 2.8600399999999992
+              },
+              {
+                "R": -0.30265356770833257,
+                "H": 2.806485026041666
+              },
+              {
+                "R": -0.24931687500000266,
+                "H": 2.7500527083333326
+              },
+              {
+                "R": -0.19911549479166665,
+                "H": 2.6908819531249994
+              },
+              {
+                "R": -0.15218833333333448,
+                "H": 2.6291116666666663
+              },
+              {
+                "R": -0.10867429687500076,
+                "H": 2.564880755208333
+              },
+              {
+                "R": -0.0687122916666659,
+                "H": 2.4983281249999996
+              },
+              {
+                "R": -0.032441223958334105,
+                "H": 2.429592682291666
+              },
+              {
+                "R": 0,
+                "H": 2.358813333333333
+              },
+              {
+                "R": 0.028485703124999612,
+                "H": 2.2863009635416667
+              },
+              {
+                "R": 0.05294312499999962,
+                "H": 2.2124193749999996
+              },
+              {
+                "R": 0.07331273437499847,
+                "H": 2.1373868489583328
+              },
+              {
+                "R": 0.08953499999999846,
+                "H": 2.0614216666666656
+              },
+              {
+                "R": 0.101550390625,
+                "H": 1.9847421093749997
+              },
+              {
+                "R": 0.10929937499999769,
+                "H": 1.9075664583333332
+              },
+              {
+                "R": 0.11272242187499769,
+                "H": 1.830112994791666
+              },
+              {
+                "R": 0.11175999999999844,
+                "H": 1.7525999999999995
+              }
+            ],
+            "Thickness": 0.15239999999999998,
+            "Spacing": 2.4384,
+            "EndDistance": 0,
+            "GridStation": 712.847952,
+            "Description": "Tapered post 9\u0027-10 (p.89 outline x 6\u0022)",
+            "Unresolved": "UNRESOLVED (p.84 note 2, p.85-88, p.89, p.90): railing post thickness along the rail, post base plates, anchor bolts and the connection to the curb - the project \u0027Pedestrian railing details\u0027 sheets (224-226) are not in the set; p.89 draws only the side outline, p.84 note 2 says the number and spacing of the posts is diagrammatic only, and the railing is not a TxDOT standard type.",
+            "Basis": "p.89 HIGH post outline (scaled; 9\u0027-10 dimensioned) x 6\u0022 thick (the p.85-88 elevation symbol width), 8\u0027-0 on CL NHT stations from the transition (p.85-88)"
+          },
           "Members": [
             {
               "Name": "HR",
@@ -14123,45 +14266,140 @@
               "Description": "Handrail pipe, 1.87\u0022 OD scaled (p.89)",
               "MassPerLength": 0,
               "Unresolved": "UNRESOLVED (p.89): handrail pipe size, wall and bracket - drawn only; the \u0027Pedestrian railing details\u0027 sheets are not in the set",
-              "Basis": "pipe OD 1.87\u0022 and position scaled from the p.89 vectors; top 3\u0027-0 above the trail (dimensioned); mass inside the plan design dead load of the envelope"
+              "Basis": "pipe OD 1.87\u0022 and position scaled from the p.89 vectors; top 3\u0027-0 above the trail (dimensioned); wall unknown: modeled solid, weight not counted"
             }
           ],
+          "Fabric": {
+            "Description": "Fence fabric panel (chain link guess, 9 ga 2 in mesh)",
+            "Path": [
+              {
+                "R": 0.2032,
+                "H": 0
+              },
+              {
+                "R": 0.2032,
+                "H": 1.7525999999999995
+              },
+              {
+                "R": 0.20098080729166937,
+                "H": 1.8337708593750002
+              },
+              {
+                "R": 0.19433645833333332,
+                "H": 1.914604374999999
+              },
+              {
+                "R": 0.18328679687499883,
+                "H": 1.9949219531249998
+              },
+              {
+                "R": 0.16785166666666512,
+                "H": 2.074544999999999
+              },
+              {
+                "R": 0.14805091145833332,
+                "H": 2.1532949218749997
+              },
+              {
+                "R": 0.12390437499999885,
+                "H": 2.2309931249999995
+              },
+              {
+                "R": 0.09543190104166667,
+                "H": 2.307461015625
+              },
+              {
+                "R": 0.06265333333333217,
+                "H": 2.38252
+              },
+              {
+                "R": 0.026326041666666664,
+                "H": 2.4556839062499995
+              },
+              {
+                "R": -0.01397000000000077,
+                "H": 2.5265062499999997
+              },
+              {
+                "R": -0.05807604166666667,
+                "H": 2.5948679687499996
+              },
+              {
+                "R": -0.10583333333333525,
+                "H": 2.6606499999999995
+              },
+              {
+                "R": -0.15708312500000116,
+                "H": 2.72373328125
+              },
+              {
+                "R": -0.21166666666666667,
+                "H": 2.7839987499999994
+              },
+              {
+                "R": -0.2694252083333341,
+                "H": 2.8413273437499997
+              },
+              {
+                "R": -0.3302,
+                "H": 2.8955999999999995
+              },
+              {
+                "R": -0.3589866666666674,
+                "H": 2.8600399999999992
+              }
+            ],
+            "OffsetFromPost": 0.0037592,
+            "BottomH": 0,
+            "Thickness": 0.0075184,
+            "MassPerArea": 1.9529710560000002,
+            "Material": "Chain link fabric (type UNRESOLVED; galvanized steel guess)",
+            "Unresolved": "UNRESOLVED (p.89, p.84-88, p.91, p.3): fence fabric type, height range, side of the posts and weight - the \u0027Pedestrian railing details\u0027 sheets 224-226 that define the fencing are not in the set (p.89 only says \u0027for railing and fencing details see ...\u0027); the elevations p.85-88 draw a panel between every pair of posts, no fabric pay item is on p.91. Chain link guess: 9 gauge (0.148\u0022) 2 in mesh, 0.40 lb/ft2, outer face of the posts from the curb to the post top, 8\u0027-0 bays; drawn see-through.",
+            "Basis": "chain link guess 9 ga (0.148\u0022) 2 in mesh, 0.40 lb/ft2 nominal, on the outer face of the posts, curb top to post top (the elevations p.85-88 draw the panels full height); not a plan value"
+          },
+          "FlagsDimensionOnly": true,
           "Source": "p.83, 84-88, 89, 90, 91",
           "Unresolved": [
-            "UNRESOLVED (p.85, p.89): low-to-high railing transition at STA 23\u002B38.74 - the transition detail is on the missing railing sheets; p.89 gives only the section limits. The low run ends and the high run begins at the radial line at 23\u002B38.74."
+            "UNRESOLVED (p.85, p.89): low-to-high railing transition at STA 23\u002B38.74 - the transition detail is on the missing railing sheets; p.89 gives only the section limits. The low run ends and the high run begins at the radial line at 23\u002B38.74 with the first high post."
           ]
         },
         {
           "Name": "Low RT",
           "TypeName": "RAIL (PED)(LOW)",
-          "Kind": "Guardrail",
+          "Kind": "Fence",
           "Offset": 2.1336,
           "EndStation": 712.847952,
           "BaseProbe": 0.127,
           "Material": "Stainless steel AISI 316 (p.83)",
           "Density": 7980,
           "SampleStep": 0.3048,
-          "Envelope": [
-            {
-              "R": 0.0508,
-              "H": 0
-            },
-            {
-              "R": 0.2032,
-              "H": 0
-            },
-            {
-              "R": 0.2032,
-              "H": 1.1938
-            },
-            {
-              "R": 0.09313333333333333,
-              "H": 1.1938
-            }
-          ],
-          "EnvelopeMassPerLength": 74.408197,
-          "EnvelopeUnresolved": "UNRESOLVED (p.84, 89, 90): railing posts / fencing - the project \u0027Pedestrian railing details\u0027 / RAIL (PED) sheets that size the posts, rails, fencing, base plates and anchors are not in this reduced set (p.89, p.90 refer to them), p.84 note 2 says the number and spacing of the posts is diagrammatic only, and the railing is not a TxDOT standard type (RL-PR3 / PR11 / PR22 / PR3-HD / CLF-RO 2019 checked: 3\u0027-6 / 4\u0027-0 galvanized plate-post or pilaster rails and an 8 ft chain link fence vs the p.89 4\u0027-3 / 9\u0027-10 tapered stainless posts, Item 5110 special pay item)",
-          "EnvelopeBasis": "p.89 LOW post outline swept continuously (scaled; 4\u0027-3 dimensioned); mass = p.83 design dead load 50 PLF",
+          "Post": {
+            "Profile": [
+              {
+                "R": 0.0508,
+                "H": 0
+              },
+              {
+                "R": 0.2032,
+                "H": 0
+              },
+              {
+                "R": 0.2032,
+                "H": 1.1938
+              },
+              {
+                "R": 0.09313333333333333,
+                "H": 1.1938
+              }
+            ],
+            "Thickness": 0.15239999999999998,
+            "Spacing": 2.4384,
+            "EndDistance": 0,
+            "GridStation": 625.3703519999999,
+            "Description": "Tapered post 4\u0027-3 (p.89 outline x 6\u0022)",
+            "Unresolved": "UNRESOLVED (p.84 note 2, p.85-88, p.89, p.90): railing post thickness along the rail, post base plates, anchor bolts and the connection to the curb - the project \u0027Pedestrian railing details\u0027 sheets (224-226) are not in the set; p.89 draws only the side outline, p.84 note 2 says the number and spacing of the posts is diagrammatic only, and the railing is not a TxDOT standard type.",
+            "Basis": "p.89 LOW post outline (scaled; 4\u0027-3 dimensioned) x 6\u0022 thick (the p.85-88 elevation symbol width), 8\u0027-0 on CL NHT stations from 2.44 ft after the begin of rail (p.85-88)"
+          },
           "Members": [
             {
               "Name": "HR",
@@ -14174,171 +14412,198 @@
               "Description": "Handrail pipe, 1.87\u0022 OD scaled (p.89)",
               "MassPerLength": 0,
               "Unresolved": "UNRESOLVED (p.89): handrail pipe size, wall and bracket - drawn only; the \u0027Pedestrian railing details\u0027 sheets are not in the set",
-              "Basis": "pipe OD 1.87\u0022 and position scaled from the p.89 vectors; top 3\u0027-0 above the trail (dimensioned); mass inside the plan design dead load of the envelope"
+              "Basis": "pipe OD 1.87\u0022 and position scaled from the p.89 vectors; top 3\u0027-0 above the trail (dimensioned); wall unknown: modeled solid, weight not counted"
             }
           ],
+          "Fabric": {
+            "Description": "Fence fabric panel (chain link guess, 9 ga 2 in mesh)",
+            "Path": [
+              {
+                "R": 0.2032,
+                "H": 0
+              },
+              {
+                "R": 0.2032,
+                "H": 1.1938
+              }
+            ],
+            "OffsetFromPost": 0.0037592,
+            "BottomH": 0,
+            "Thickness": 0.0075184,
+            "MassPerArea": 1.9529710560000002,
+            "Material": "Chain link fabric (type UNRESOLVED; galvanized steel guess)",
+            "Unresolved": "UNRESOLVED (p.89, p.84-88, p.91, p.3): fence fabric type, height range, side of the posts and weight - the \u0027Pedestrian railing details\u0027 sheets 224-226 that define the fencing are not in the set (p.89 only says \u0027for railing and fencing details see ...\u0027); the elevations p.85-88 draw a panel between every pair of posts, no fabric pay item is on p.91. Chain link guess: 9 gauge (0.148\u0022) 2 in mesh, 0.40 lb/ft2, outer face of the posts from the curb to the post top, 8\u0027-0 bays; drawn see-through.",
+            "Basis": "chain link guess 9 ga (0.148\u0022) 2 in mesh, 0.40 lb/ft2 nominal, on the outer face of the posts, curb top to post top (the elevations p.85-88 draw the panels full height); not a plan value"
+          },
+          "FlagsDimensionOnly": true,
           "Source": "p.83, 84-88, 89, 90, 91",
           "Unresolved": []
         },
         {
           "Name": "High RT",
           "TypeName": "RAIL (PED)(HIGH)",
-          "Kind": "Guardrail",
+          "Kind": "Fence",
           "Offset": 2.1336,
           "BeginStation": 712.847952,
           "BaseProbe": 0.127,
           "Material": "Stainless steel AISI 316 (p.83)",
           "Density": 7980,
           "SampleStep": 0.3048,
-          "Envelope": [
-            {
-              "R": 0.0508,
-              "H": 0
-            },
-            {
-              "R": 0.2032,
-              "H": 0
-            },
-            {
-              "R": 0.2032,
-              "H": 1.7525999999999995
-            },
-            {
-              "R": 0.20098080729166937,
-              "H": 1.8337708593750002
-            },
-            {
-              "R": 0.19433645833333332,
-              "H": 1.914604374999999
-            },
-            {
-              "R": 0.18328679687499883,
-              "H": 1.9949219531249998
-            },
-            {
-              "R": 0.16785166666666512,
-              "H": 2.074544999999999
-            },
-            {
-              "R": 0.14805091145833332,
-              "H": 2.1532949218749997
-            },
-            {
-              "R": 0.12390437499999885,
-              "H": 2.2309931249999995
-            },
-            {
-              "R": 0.09543190104166667,
-              "H": 2.307461015625
-            },
-            {
-              "R": 0.06265333333333217,
-              "H": 2.38252
-            },
-            {
-              "R": 0.026326041666666664,
-              "H": 2.4556839062499995
-            },
-            {
-              "R": -0.01397000000000077,
-              "H": 2.5265062499999997
-            },
-            {
-              "R": -0.05807604166666667,
-              "H": 2.5948679687499996
-            },
-            {
-              "R": -0.10583333333333525,
-              "H": 2.6606499999999995
-            },
-            {
-              "R": -0.15708312500000116,
-              "H": 2.72373328125
-            },
-            {
-              "R": -0.21166666666666667,
-              "H": 2.7839987499999994
-            },
-            {
-              "R": -0.2694252083333341,
-              "H": 2.8413273437499997
-            },
-            {
-              "R": -0.3302,
-              "H": 2.8955999999999995
-            },
-            {
-              "R": -0.3589866666666674,
-              "H": 2.8600399999999992
-            },
-            {
-              "R": -0.30265356770833257,
-              "H": 2.806485026041666
-            },
-            {
-              "R": -0.24931687500000266,
-              "H": 2.7500527083333326
-            },
-            {
-              "R": -0.19911549479166665,
-              "H": 2.6908819531249994
-            },
-            {
-              "R": -0.15218833333333448,
-              "H": 2.6291116666666663
-            },
-            {
-              "R": -0.10867429687500076,
-              "H": 2.564880755208333
-            },
-            {
-              "R": -0.0687122916666659,
-              "H": 2.4983281249999996
-            },
-            {
-              "R": -0.032441223958334105,
-              "H": 2.429592682291666
-            },
-            {
-              "R": 0,
-              "H": 2.358813333333333
-            },
-            {
-              "R": 0.028485703124999612,
-              "H": 2.2863009635416667
-            },
-            {
-              "R": 0.05294312499999962,
-              "H": 2.2124193749999996
-            },
-            {
-              "R": 0.07331273437499847,
-              "H": 2.1373868489583328
-            },
-            {
-              "R": 0.08953499999999846,
-              "H": 2.0614216666666656
-            },
-            {
-              "R": 0.101550390625,
-              "H": 1.9847421093749997
-            },
-            {
-              "R": 0.10929937499999769,
-              "H": 1.9075664583333332
-            },
-            {
-              "R": 0.11272242187499769,
-              "H": 1.830112994791666
-            },
-            {
-              "R": 0.11175999999999844,
-              "H": 1.7525999999999995
-            }
-          ],
-          "EnvelopeMassPerLength": 148.816394,
-          "EnvelopeUnresolved": "UNRESOLVED (p.84, 89, 90): railing posts / fencing - the project \u0027Pedestrian railing details\u0027 / RAIL (PED) sheets that size the posts, rails, fencing, base plates and anchors are not in this reduced set (p.89, p.90 refer to them), p.84 note 2 says the number and spacing of the posts is diagrammatic only, and the railing is not a TxDOT standard type (RL-PR3 / PR11 / PR22 / PR3-HD / CLF-RO 2019 checked: 3\u0027-6 / 4\u0027-0 galvanized plate-post or pilaster rails and an 8 ft chain link fence vs the p.89 4\u0027-3 / 9\u0027-10 tapered stainless posts, Item 5110 special pay item)",
-          "EnvelopeBasis": "p.89 HIGH post outline swept continuously (scaled; 9\u0027-10 dimensioned); mass = p.83 design dead load 100 PLF",
+          "Post": {
+            "Profile": [
+              {
+                "R": 0.0508,
+                "H": 0
+              },
+              {
+                "R": 0.2032,
+                "H": 0
+              },
+              {
+                "R": 0.2032,
+                "H": 1.7525999999999995
+              },
+              {
+                "R": 0.20098080729166937,
+                "H": 1.8337708593750002
+              },
+              {
+                "R": 0.19433645833333332,
+                "H": 1.914604374999999
+              },
+              {
+                "R": 0.18328679687499883,
+                "H": 1.9949219531249998
+              },
+              {
+                "R": 0.16785166666666512,
+                "H": 2.074544999999999
+              },
+              {
+                "R": 0.14805091145833332,
+                "H": 2.1532949218749997
+              },
+              {
+                "R": 0.12390437499999885,
+                "H": 2.2309931249999995
+              },
+              {
+                "R": 0.09543190104166667,
+                "H": 2.307461015625
+              },
+              {
+                "R": 0.06265333333333217,
+                "H": 2.38252
+              },
+              {
+                "R": 0.026326041666666664,
+                "H": 2.4556839062499995
+              },
+              {
+                "R": -0.01397000000000077,
+                "H": 2.5265062499999997
+              },
+              {
+                "R": -0.05807604166666667,
+                "H": 2.5948679687499996
+              },
+              {
+                "R": -0.10583333333333525,
+                "H": 2.6606499999999995
+              },
+              {
+                "R": -0.15708312500000116,
+                "H": 2.72373328125
+              },
+              {
+                "R": -0.21166666666666667,
+                "H": 2.7839987499999994
+              },
+              {
+                "R": -0.2694252083333341,
+                "H": 2.8413273437499997
+              },
+              {
+                "R": -0.3302,
+                "H": 2.8955999999999995
+              },
+              {
+                "R": -0.3589866666666674,
+                "H": 2.8600399999999992
+              },
+              {
+                "R": -0.30265356770833257,
+                "H": 2.806485026041666
+              },
+              {
+                "R": -0.24931687500000266,
+                "H": 2.7500527083333326
+              },
+              {
+                "R": -0.19911549479166665,
+                "H": 2.6908819531249994
+              },
+              {
+                "R": -0.15218833333333448,
+                "H": 2.6291116666666663
+              },
+              {
+                "R": -0.10867429687500076,
+                "H": 2.564880755208333
+              },
+              {
+                "R": -0.0687122916666659,
+                "H": 2.4983281249999996
+              },
+              {
+                "R": -0.032441223958334105,
+                "H": 2.429592682291666
+              },
+              {
+                "R": 0,
+                "H": 2.358813333333333
+              },
+              {
+                "R": 0.028485703124999612,
+                "H": 2.2863009635416667
+              },
+              {
+                "R": 0.05294312499999962,
+                "H": 2.2124193749999996
+              },
+              {
+                "R": 0.07331273437499847,
+                "H": 2.1373868489583328
+              },
+              {
+                "R": 0.08953499999999846,
+                "H": 2.0614216666666656
+              },
+              {
+                "R": 0.101550390625,
+                "H": 1.9847421093749997
+              },
+              {
+                "R": 0.10929937499999769,
+                "H": 1.9075664583333332
+              },
+              {
+                "R": 0.11272242187499769,
+                "H": 1.830112994791666
+              },
+              {
+                "R": 0.11175999999999844,
+                "H": 1.7525999999999995
+              }
+            ],
+            "Thickness": 0.15239999999999998,
+            "Spacing": 2.4384,
+            "EndDistance": 0,
+            "GridStation": 712.847952,
+            "Description": "Tapered post 9\u0027-10 (p.89 outline x 6\u0022)",
+            "Unresolved": "UNRESOLVED (p.84 note 2, p.85-88, p.89, p.90): railing post thickness along the rail, post base plates, anchor bolts and the connection to the curb - the project \u0027Pedestrian railing details\u0027 sheets (224-226) are not in the set; p.89 draws only the side outline, p.84 note 2 says the number and spacing of the posts is diagrammatic only, and the railing is not a TxDOT standard type.",
+            "Basis": "p.89 HIGH post outline (scaled; 9\u0027-10 dimensioned) x 6\u0022 thick (the p.85-88 elevation symbol width), 8\u0027-0 on CL NHT stations from the transition (p.85-88)"
+          },
           "Members": [
             {
               "Name": "HR",
@@ -14351,9 +14616,98 @@
               "Description": "Handrail pipe, 1.87\u0022 OD scaled (p.89)",
               "MassPerLength": 0,
               "Unresolved": "UNRESOLVED (p.89): handrail pipe size, wall and bracket - drawn only; the \u0027Pedestrian railing details\u0027 sheets are not in the set",
-              "Basis": "pipe OD 1.87\u0022 and position scaled from the p.89 vectors; top 3\u0027-0 above the trail (dimensioned); mass inside the plan design dead load of the envelope"
+              "Basis": "pipe OD 1.87\u0022 and position scaled from the p.89 vectors; top 3\u0027-0 above the trail (dimensioned); wall unknown: modeled solid, weight not counted"
             }
           ],
+          "Fabric": {
+            "Description": "Fence fabric panel (chain link guess, 9 ga 2 in mesh)",
+            "Path": [
+              {
+                "R": 0.2032,
+                "H": 0
+              },
+              {
+                "R": 0.2032,
+                "H": 1.7525999999999995
+              },
+              {
+                "R": 0.20098080729166937,
+                "H": 1.8337708593750002
+              },
+              {
+                "R": 0.19433645833333332,
+                "H": 1.914604374999999
+              },
+              {
+                "R": 0.18328679687499883,
+                "H": 1.9949219531249998
+              },
+              {
+                "R": 0.16785166666666512,
+                "H": 2.074544999999999
+              },
+              {
+                "R": 0.14805091145833332,
+                "H": 2.1532949218749997
+              },
+              {
+                "R": 0.12390437499999885,
+                "H": 2.2309931249999995
+              },
+              {
+                "R": 0.09543190104166667,
+                "H": 2.307461015625
+              },
+              {
+                "R": 0.06265333333333217,
+                "H": 2.38252
+              },
+              {
+                "R": 0.026326041666666664,
+                "H": 2.4556839062499995
+              },
+              {
+                "R": -0.01397000000000077,
+                "H": 2.5265062499999997
+              },
+              {
+                "R": -0.05807604166666667,
+                "H": 2.5948679687499996
+              },
+              {
+                "R": -0.10583333333333525,
+                "H": 2.6606499999999995
+              },
+              {
+                "R": -0.15708312500000116,
+                "H": 2.72373328125
+              },
+              {
+                "R": -0.21166666666666667,
+                "H": 2.7839987499999994
+              },
+              {
+                "R": -0.2694252083333341,
+                "H": 2.8413273437499997
+              },
+              {
+                "R": -0.3302,
+                "H": 2.8955999999999995
+              },
+              {
+                "R": -0.3589866666666674,
+                "H": 2.8600399999999992
+              }
+            ],
+            "OffsetFromPost": 0.0037592,
+            "BottomH": 0,
+            "Thickness": 0.0075184,
+            "MassPerArea": 1.9529710560000002,
+            "Material": "Chain link fabric (type UNRESOLVED; galvanized steel guess)",
+            "Unresolved": "UNRESOLVED (p.89, p.84-88, p.91, p.3): fence fabric type, height range, side of the posts and weight - the \u0027Pedestrian railing details\u0027 sheets 224-226 that define the fencing are not in the set (p.89 only says \u0027for railing and fencing details see ...\u0027); the elevations p.85-88 draw a panel between every pair of posts, no fabric pay item is on p.91. Chain link guess: 9 gauge (0.148\u0022) 2 in mesh, 0.40 lb/ft2, outer face of the posts from the curb to the post top, 8\u0027-0 bays; drawn see-through.",
+            "Basis": "chain link guess 9 ga (0.148\u0022) 2 in mesh, 0.40 lb/ft2 nominal, on the outer face of the posts, curb top to post top (the elevations p.85-88 draw the panels full height); not a plan value"
+          },
+          "FlagsDimensionOnly": true,
           "Source": "p.83, 84-88, 89, 90, 91",
           "Unresolved": []
         }
@@ -14449,14 +14803,15 @@
                   }
                 ],
                 "Base": "CapTop",
-                "TopElevation": 161.9993712,
+                "TopElevation": 161.95546626566906,
                 "TopRefS": 0,
                 "TopSlopeS": 0,
                 "Source": "p.102 / sh 153 EL. E",
                 "SeatS": 3.1273750000000002,
                 "SeatN": -0.174625,
                 "Reported": [
-                  "B1-B3 (p.102, 107, 119, 124): plan pedestal top 531.494 vs tie WP 532.49 - 2\u0022 steel - 11.75\u0022 bearing = 531.344 (\u002B0.150 ft); the plan top is modeled (p.107 note 8: pedestal elevations to be adjusted to the fabricated bearing)."
+                  "B1-B3 (p.102, 107, 119, 124): plan pedestal top 531.494 vs tie WP 532.49 - 2\u0022 steel - 11.75\u0022 bearing = 531.344 (\u002B0.150 ft); the plan top is modeled (p.107 note 8: pedestal elevations to be adjusted to the fabricated bearing).",
+                  "CONFLICT (p.102 vs p.107): arch pedestal \u0027arch bearing south\u0027 of Pier 11: top modeled at EL 531.350\u0027 = bottom of the arch bearing SE (pad on the conc. brg. surface, stack 11 3/4\u0022 hung from the steel, p.107 Section A-A / table H) instead of the p.102 EL 531.494\u0027 (1.73\u0022 lower) - p.107 note 8 / p.102 note 1: the contractor adjusts the pedestal elevations to the fabricated bearing."
                 ]
               },
               {
@@ -14497,14 +14852,15 @@
                   }
                 ],
                 "Base": "CapTop",
-                "TopElevation": 162.01522080000004,
+                "TopElevation": 161.95545027085802,
                 "TopRefS": 0,
                 "TopSlopeS": 0,
                 "Source": "p.102 / sh 153 EL. A",
                 "SeatS": -2.8194000000000004,
                 "SeatN": -0.174625,
                 "Reported": [
-                  "B1-B3 (p.102, 107, 119, 124): plan pedestal top 531.546 vs tie WP 532.49 - 2\u0022 steel - 11.75\u0022 bearing = 531.344 (\u002B0.202 ft); the plan top is modeled (p.107 note 8: pedestal elevations to be adjusted to the fabricated bearing)."
+                  "B1-B3 (p.102, 107, 119, 124): plan pedestal top 531.546 vs tie WP 532.49 - 2\u0022 steel - 11.75\u0022 bearing = 531.344 (\u002B0.202 ft); the plan top is modeled (p.107 note 8: pedestal elevations to be adjusted to the fabricated bearing).",
+                  "CONFLICT (p.102 vs p.107): arch pedestal \u0027arch bearing north\u0027 of Pier 11: top modeled at EL 531.350\u0027 = bottom of the arch bearing NE (pad on the conc. brg. surface, stack 11 3/4\u0022 hung from the steel, p.107 Section A-A / table H) instead of the p.102 EL 531.546\u0027 (2.35\u0022 lower) - p.107 note 8 / p.102 note 1: the contractor adjusts the pedestal elevations to the fabricated bearing."
                 ]
               }
             ],
@@ -15673,18 +16029,18 @@
                   "CoverTop": "NaN",
                   "CheckCover": true,
                   "Bars": [
-                    "3.0736,-0.6194,160.9707 3.0736,-0.6194,161.9279 2.7992,-0.4796,161.9279 2.7992,-0.4796,160.9707",
-                    "3.15,-0.4694,160.9707 3.15,-0.4694,161.9279 2.8756,-0.3296,161.9279 2.8756,-0.3296,160.9707",
-                    "3.2264,-0.3195,160.9707 3.2264,-0.3195,161.9279 2.952,-0.1797,161.9279 2.952,-0.1797,160.9707",
-                    "3.3028,-0.1696,160.9707 3.3028,-0.1696,161.9279 3.0284,-0.0297,161.9279 3.0284,-0.0297,160.9707",
-                    "3.3792,-0.0196,160.9707 3.3792,-0.0196,161.9279 3.1048,0.1202,161.9279 3.1048,0.1202,160.9707",
-                    "3.4556,0.1303,160.9707 3.4556,0.1303,161.9279 3.1812,0.2701,161.9279 3.1812,0.2701,160.9707",
-                    "-2.8732,-0.6194,160.9865 -2.8732,-0.6194,161.9438 -3.1476,-0.4796,161.9438 -3.1476,-0.4796,160.9865",
-                    "-2.7968,-0.4694,160.9865 -2.7968,-0.4694,161.9438 -3.0712,-0.3296,161.9438 -3.0712,-0.3296,160.9865",
-                    "-2.7204,-0.3195,160.9865 -2.7204,-0.3195,161.9438 -2.9948,-0.1797,161.9438 -2.9948,-0.1797,160.9865",
-                    "-2.644,-0.1696,160.9865 -2.644,-0.1696,161.9438 -2.9184,-0.0297,161.9438 -2.9184,-0.0297,160.9865",
-                    "-2.5676,-0.0196,160.9865 -2.5676,-0.0196,161.9438 -2.842,0.1202,161.9438 -2.842,0.1202,160.9865",
-                    "-2.4912,0.1303,160.9865 -2.4912,0.1303,161.9438 -2.7656,0.2701,161.9438 -2.7656,0.2701,160.9865"
+                    "3.0736,-0.6194,160.9268 3.0736,-0.6194,161.884 2.7992,-0.4796,161.884 2.7992,-0.4796,160.9268",
+                    "3.15,-0.4694,160.9268 3.15,-0.4694,161.884 2.8756,-0.3296,161.884 2.8756,-0.3296,160.9268",
+                    "3.2264,-0.3195,160.9268 3.2264,-0.3195,161.884 2.952,-0.1797,161.884 2.952,-0.1797,160.9268",
+                    "3.3028,-0.1696,160.9268 3.3028,-0.1696,161.884 3.0284,-0.0297,161.884 3.0284,-0.0297,160.9268",
+                    "3.3792,-0.0196,160.9268 3.3792,-0.0196,161.884 3.1048,0.1202,161.884 3.1048,0.1202,160.9268",
+                    "3.4556,0.1303,160.9268 3.4556,0.1303,161.884 3.1812,0.2701,161.884 3.1812,0.2701,160.9268",
+                    "-2.8732,-0.6194,160.9268 -2.8732,-0.6194,161.884 -3.1476,-0.4796,161.884 -3.1476,-0.4796,160.9268",
+                    "-2.7968,-0.4694,160.9268 -2.7968,-0.4694,161.884 -3.0712,-0.3296,161.884 -3.0712,-0.3296,160.9268",
+                    "-2.7204,-0.3195,160.9268 -2.7204,-0.3195,161.884 -2.9948,-0.1797,161.884 -2.9948,-0.1797,160.9268",
+                    "-2.644,-0.1696,160.9268 -2.644,-0.1696,161.884 -2.9184,-0.0297,161.884 -2.9184,-0.0297,160.9268",
+                    "-2.5676,-0.0196,160.9268 -2.5676,-0.0196,161.884 -2.842,0.1202,161.884 -2.842,0.1202,160.9268",
+                    "-2.4912,0.1303,160.9268 -2.4912,0.1303,161.884 -2.7656,0.2701,161.884 -2.7656,0.2701,160.9268"
                   ],
                   "Spirals": [],
                   "Unplaced": 0,
@@ -15709,11 +16065,11 @@
                   "CoverTop": "NaN",
                   "CheckCover": true,
                   "Bars": [
-                    "3.2056,0.1948,161.9279 3.1742,0.2915,161.9279 2.7778,-0.4865,161.9279 3.0805,-0.6407,161.9279 3.4769,0.1372,161.9279 3.1742,0.2915,161.9359 3.2056,0.1948,161.9438",
-                    "3.2056,0.1948,161.7558 3.1742,0.2915,161.7558 2.7778,-0.4865,161.7558 3.0805,-0.6407,161.7558 3.4769,0.1372,161.7558 3.1742,0.2915,161.7638 3.2056,0.1948,161.7717",
+                    "3.2056,0.1948,161.884 3.1742,0.2915,161.884 2.7778,-0.4865,161.884 3.0805,-0.6407,161.884 3.4769,0.1372,161.884 3.1742,0.2915,161.892 3.2056,0.1948,161.8999",
+                    "3.2056,0.1948,161.7339 3.1742,0.2915,161.7339 2.7778,-0.4865,161.7339 3.0805,-0.6407,161.7339 3.4769,0.1372,161.7339 3.1742,0.2915,161.7418 3.2056,0.1948,161.7498",
                     "3.2056,0.1948,161.5837 3.1742,0.2915,161.5837 2.7778,-0.4865,161.5837 3.0805,-0.6407,161.5837 3.4769,0.1372,161.5837 3.1742,0.2915,161.5917 3.2056,0.1948,161.5996",
-                    "-2.7412,0.1948,161.9438 -2.7726,0.2915,161.9438 -3.1689,-0.4865,161.9438 -2.8662,-0.6407,161.9438 -2.4699,0.1372,161.9438 -2.7726,0.2915,161.9517 -2.7412,0.1948,161.9597",
-                    "-2.7412,0.1948,161.7638 -2.7726,0.2915,161.7638 -3.1689,-0.4865,161.7638 -2.8662,-0.6407,161.7638 -2.4699,0.1372,161.7638 -2.7726,0.2915,161.7717 -2.7412,0.1948,161.7796",
+                    "-2.7412,0.1948,161.884 -2.7726,0.2915,161.884 -3.1689,-0.4865,161.884 -2.8662,-0.6407,161.884 -2.4699,0.1372,161.884 -2.7726,0.2915,161.892 -2.7412,0.1948,161.8999",
+                    "-2.7412,0.1948,161.7339 -2.7726,0.2915,161.7339 -3.1689,-0.4865,161.7339 -2.8662,-0.6407,161.7339 -2.4699,0.1372,161.7339 -2.7726,0.2915,161.7418 -2.7412,0.1948,161.7498",
                     "-2.7412,0.1948,161.5837 -2.7726,0.2915,161.5837 -3.1689,-0.4865,161.5837 -2.8662,-0.6407,161.5837 -2.4699,0.1372,161.5837 -2.7726,0.2915,161.5917 -2.7412,0.1948,161.5996"
                   ],
                   "Spirals": [],
@@ -15743,12 +16099,12 @@
                   "CoverTop": "NaN",
                   "CheckCover": true,
                   "Bars": [
-                    "3.0837,-0.5996,160.9548 3.0837,-0.5996,161.9121 3.4455,0.1105,161.9121 3.4455,0.1105,160.9548",
-                    "2.9465,-0.5297,160.9548 2.9465,-0.5297,161.9121 3.3083,0.1804,161.9121 3.3083,0.1804,160.9548",
-                    "2.8093,-0.4597,160.9548 2.8093,-0.4597,161.9121 3.1711,0.2503,161.9121 3.1711,0.2503,160.9548",
-                    "-2.8631,-0.5996,160.9706 -2.8631,-0.5996,161.9279 -2.5013,0.1105,161.9279 -2.5013,0.1105,160.9706",
-                    "-3.0003,-0.5297,160.9706 -3.0003,-0.5297,161.9279 -2.6385,0.1804,161.9279 -2.6385,0.1804,160.9706",
-                    "-3.1375,-0.4597,160.9706 -3.1375,-0.4597,161.9279 -2.7757,0.2503,161.9279 -2.7757,0.2503,160.9706"
+                    "3.0837,-0.5996,160.9109 3.0837,-0.5996,161.8682 3.4455,0.1105,161.8682 3.4455,0.1105,160.9109",
+                    "2.9465,-0.5297,160.9109 2.9465,-0.5297,161.8682 3.3083,0.1804,161.8682 3.3083,0.1804,160.9109",
+                    "2.8093,-0.4597,160.9109 2.8093,-0.4597,161.8682 3.1711,0.2503,161.8682 3.1711,0.2503,160.9109",
+                    "-2.8631,-0.5996,160.9109 -2.8631,-0.5996,161.8681 -2.5013,0.1105,161.8681 -2.5013,0.1105,160.9109",
+                    "-3.0003,-0.5297,160.9109 -3.0003,-0.5297,161.8681 -2.6385,0.1804,161.8681 -2.6385,0.1804,160.9109",
+                    "-3.1375,-0.4597,160.9109 -3.1375,-0.4597,161.8681 -2.7757,0.2503,161.8681 -2.7757,0.2503,160.9109"
                   ],
                   "Spirals": [],
                   "Unplaced": 0,
@@ -19337,161 +19693,167 @@
         {
           "Name": "High LT",
           "TypeName": "RAIL (PED)(HIGH)",
-          "Kind": "Guardrail",
+          "Kind": "Fence",
           "Offset": -2.1336,
           "BaseProbe": 0.127,
           "Material": "Stainless steel AISI 316 (p.83)",
           "Density": 7980,
           "SampleStep": 0.3048,
-          "Envelope": [
-            {
-              "R": 0.0508,
-              "H": 0
-            },
-            {
-              "R": 0.2032,
-              "H": 0
-            },
-            {
-              "R": 0.2032,
-              "H": 1.7525999999999995
-            },
-            {
-              "R": 0.20098080729166937,
-              "H": 1.8337708593750002
-            },
-            {
-              "R": 0.19433645833333332,
-              "H": 1.914604374999999
-            },
-            {
-              "R": 0.18328679687499883,
-              "H": 1.9949219531249998
-            },
-            {
-              "R": 0.16785166666666512,
-              "H": 2.074544999999999
-            },
-            {
-              "R": 0.14805091145833332,
-              "H": 2.1532949218749997
-            },
-            {
-              "R": 0.12390437499999885,
-              "H": 2.2309931249999995
-            },
-            {
-              "R": 0.09543190104166667,
-              "H": 2.307461015625
-            },
-            {
-              "R": 0.06265333333333217,
-              "H": 2.38252
-            },
-            {
-              "R": 0.026326041666666664,
-              "H": 2.4556839062499995
-            },
-            {
-              "R": -0.01397000000000077,
-              "H": 2.5265062499999997
-            },
-            {
-              "R": -0.05807604166666667,
-              "H": 2.5948679687499996
-            },
-            {
-              "R": -0.10583333333333525,
-              "H": 2.6606499999999995
-            },
-            {
-              "R": -0.15708312500000116,
-              "H": 2.72373328125
-            },
-            {
-              "R": -0.21166666666666667,
-              "H": 2.7839987499999994
-            },
-            {
-              "R": -0.2694252083333341,
-              "H": 2.8413273437499997
-            },
-            {
-              "R": -0.3302,
-              "H": 2.8955999999999995
-            },
-            {
-              "R": -0.3589866666666674,
-              "H": 2.8600399999999992
-            },
-            {
-              "R": -0.30265356770833257,
-              "H": 2.806485026041666
-            },
-            {
-              "R": -0.24931687500000266,
-              "H": 2.7500527083333326
-            },
-            {
-              "R": -0.19911549479166665,
-              "H": 2.6908819531249994
-            },
-            {
-              "R": -0.15218833333333448,
-              "H": 2.6291116666666663
-            },
-            {
-              "R": -0.10867429687500076,
-              "H": 2.564880755208333
-            },
-            {
-              "R": -0.0687122916666659,
-              "H": 2.4983281249999996
-            },
-            {
-              "R": -0.032441223958334105,
-              "H": 2.429592682291666
-            },
-            {
-              "R": 0,
-              "H": 2.358813333333333
-            },
-            {
-              "R": 0.028485703124999612,
-              "H": 2.2863009635416667
-            },
-            {
-              "R": 0.05294312499999962,
-              "H": 2.2124193749999996
-            },
-            {
-              "R": 0.07331273437499847,
-              "H": 2.1373868489583328
-            },
-            {
-              "R": 0.08953499999999846,
-              "H": 2.0614216666666656
-            },
-            {
-              "R": 0.101550390625,
-              "H": 1.9847421093749997
-            },
-            {
-              "R": 0.10929937499999769,
-              "H": 1.9075664583333332
-            },
-            {
-              "R": 0.11272242187499769,
-              "H": 1.830112994791666
-            },
-            {
-              "R": 0.11175999999999844,
-              "H": 1.7525999999999995
-            }
-          ],
-          "EnvelopeMassPerLength": 148.816394,
-          "EnvelopeUnresolved": "UNRESOLVED (p.84, 89, 90): railing posts / fencing - the project \u0027Pedestrian railing details\u0027 / RAIL (PED) sheets that size the posts, rails, fencing, base plates and anchors are not in this reduced set (p.89, p.90 refer to them), p.84 note 2 says the number and spacing of the posts is diagrammatic only, and the railing is not a TxDOT standard type (RL-PR3 / PR11 / PR22 / PR3-HD / CLF-RO 2019 checked: 3\u0027-6 / 4\u0027-0 galvanized plate-post or pilaster rails and an 8 ft chain link fence vs the p.89 4\u0027-3 / 9\u0027-10 tapered stainless posts, Item 5110 special pay item)",
-          "EnvelopeBasis": "p.89 HIGH post outline swept continuously (scaled; 9\u0027-10 dimensioned); mass = p.83 design dead load 100 PLF",
+          "Post": {
+            "Profile": [
+              {
+                "R": 0.0508,
+                "H": 0
+              },
+              {
+                "R": 0.2032,
+                "H": 0
+              },
+              {
+                "R": 0.2032,
+                "H": 1.7525999999999995
+              },
+              {
+                "R": 0.20098080729166937,
+                "H": 1.8337708593750002
+              },
+              {
+                "R": 0.19433645833333332,
+                "H": 1.914604374999999
+              },
+              {
+                "R": 0.18328679687499883,
+                "H": 1.9949219531249998
+              },
+              {
+                "R": 0.16785166666666512,
+                "H": 2.074544999999999
+              },
+              {
+                "R": 0.14805091145833332,
+                "H": 2.1532949218749997
+              },
+              {
+                "R": 0.12390437499999885,
+                "H": 2.2309931249999995
+              },
+              {
+                "R": 0.09543190104166667,
+                "H": 2.307461015625
+              },
+              {
+                "R": 0.06265333333333217,
+                "H": 2.38252
+              },
+              {
+                "R": 0.026326041666666664,
+                "H": 2.4556839062499995
+              },
+              {
+                "R": -0.01397000000000077,
+                "H": 2.5265062499999997
+              },
+              {
+                "R": -0.05807604166666667,
+                "H": 2.5948679687499996
+              },
+              {
+                "R": -0.10583333333333525,
+                "H": 2.6606499999999995
+              },
+              {
+                "R": -0.15708312500000116,
+                "H": 2.72373328125
+              },
+              {
+                "R": -0.21166666666666667,
+                "H": 2.7839987499999994
+              },
+              {
+                "R": -0.2694252083333341,
+                "H": 2.8413273437499997
+              },
+              {
+                "R": -0.3302,
+                "H": 2.8955999999999995
+              },
+              {
+                "R": -0.3589866666666674,
+                "H": 2.8600399999999992
+              },
+              {
+                "R": -0.30265356770833257,
+                "H": 2.806485026041666
+              },
+              {
+                "R": -0.24931687500000266,
+                "H": 2.7500527083333326
+              },
+              {
+                "R": -0.19911549479166665,
+                "H": 2.6908819531249994
+              },
+              {
+                "R": -0.15218833333333448,
+                "H": 2.6291116666666663
+              },
+              {
+                "R": -0.10867429687500076,
+                "H": 2.564880755208333
+              },
+              {
+                "R": -0.0687122916666659,
+                "H": 2.4983281249999996
+              },
+              {
+                "R": -0.032441223958334105,
+                "H": 2.429592682291666
+              },
+              {
+                "R": 0,
+                "H": 2.358813333333333
+              },
+              {
+                "R": 0.028485703124999612,
+                "H": 2.2863009635416667
+              },
+              {
+                "R": 0.05294312499999962,
+                "H": 2.2124193749999996
+              },
+              {
+                "R": 0.07331273437499847,
+                "H": 2.1373868489583328
+              },
+              {
+                "R": 0.08953499999999846,
+                "H": 2.0614216666666656
+              },
+              {
+                "R": 0.101550390625,
+                "H": 1.9847421093749997
+              },
+              {
+                "R": 0.10929937499999769,
+                "H": 1.9075664583333332
+              },
+              {
+                "R": 0.11272242187499769,
+                "H": 1.830112994791666
+              },
+              {
+                "R": 0.11175999999999844,
+                "H": 1.7525999999999995
+              }
+            ],
+            "Thickness": 0.15239999999999998,
+            "Spacing": 2.4384,
+            "EndDistance": 0,
+            "GridStation": 712.847952,
+            "Description": "Tapered post 9\u0027-10 (p.89 outline x 6\u0022)",
+            "Unresolved": "UNRESOLVED (p.84 note 2, p.85-88, p.89, p.90): railing post thickness along the rail, post base plates, anchor bolts and the connection to the curb - the project \u0027Pedestrian railing details\u0027 sheets (224-226) are not in the set; p.89 draws only the side outline, p.84 note 2 says the number and spacing of the posts is diagrammatic only, and the railing is not a TxDOT standard type.",
+            "Basis": "p.89 HIGH post outline (scaled; 9\u0027-10 dimensioned) x 6\u0022 thick (the p.85-88 elevation symbol width), 8\u0027-0 on CL NHT stations from the transition (p.85-88)"
+          },
           "Members": [
             {
               "Name": "HR",
@@ -19504,170 +19866,265 @@
               "Description": "Handrail pipe, 1.87\u0022 OD scaled (p.89)",
               "MassPerLength": 0,
               "Unresolved": "UNRESOLVED (p.89): handrail pipe size, wall and bracket - drawn only; the \u0027Pedestrian railing details\u0027 sheets are not in the set",
-              "Basis": "pipe OD 1.87\u0022 and position scaled from the p.89 vectors; top 3\u0027-0 above the trail (dimensioned); mass inside the plan design dead load of the envelope"
+              "Basis": "pipe OD 1.87\u0022 and position scaled from the p.89 vectors; top 3\u0027-0 above the trail (dimensioned); wall unknown: modeled solid, weight not counted"
             }
           ],
+          "Fabric": {
+            "Description": "Fence fabric panel (chain link guess, 9 ga 2 in mesh)",
+            "Path": [
+              {
+                "R": 0.2032,
+                "H": 0
+              },
+              {
+                "R": 0.2032,
+                "H": 1.7525999999999995
+              },
+              {
+                "R": 0.20098080729166937,
+                "H": 1.8337708593750002
+              },
+              {
+                "R": 0.19433645833333332,
+                "H": 1.914604374999999
+              },
+              {
+                "R": 0.18328679687499883,
+                "H": 1.9949219531249998
+              },
+              {
+                "R": 0.16785166666666512,
+                "H": 2.074544999999999
+              },
+              {
+                "R": 0.14805091145833332,
+                "H": 2.1532949218749997
+              },
+              {
+                "R": 0.12390437499999885,
+                "H": 2.2309931249999995
+              },
+              {
+                "R": 0.09543190104166667,
+                "H": 2.307461015625
+              },
+              {
+                "R": 0.06265333333333217,
+                "H": 2.38252
+              },
+              {
+                "R": 0.026326041666666664,
+                "H": 2.4556839062499995
+              },
+              {
+                "R": -0.01397000000000077,
+                "H": 2.5265062499999997
+              },
+              {
+                "R": -0.05807604166666667,
+                "H": 2.5948679687499996
+              },
+              {
+                "R": -0.10583333333333525,
+                "H": 2.6606499999999995
+              },
+              {
+                "R": -0.15708312500000116,
+                "H": 2.72373328125
+              },
+              {
+                "R": -0.21166666666666667,
+                "H": 2.7839987499999994
+              },
+              {
+                "R": -0.2694252083333341,
+                "H": 2.8413273437499997
+              },
+              {
+                "R": -0.3302,
+                "H": 2.8955999999999995
+              },
+              {
+                "R": -0.3589866666666674,
+                "H": 2.8600399999999992
+              }
+            ],
+            "OffsetFromPost": 0.0037592,
+            "BottomH": 0,
+            "Thickness": 0.0075184,
+            "MassPerArea": 1.9529710560000002,
+            "Material": "Chain link fabric (type UNRESOLVED; galvanized steel guess)",
+            "Unresolved": "UNRESOLVED (p.89, p.84-88, p.91, p.3): fence fabric type, height range, side of the posts and weight - the \u0027Pedestrian railing details\u0027 sheets 224-226 that define the fencing are not in the set (p.89 only says \u0027for railing and fencing details see ...\u0027); the elevations p.85-88 draw a panel between every pair of posts, no fabric pay item is on p.91. Chain link guess: 9 gauge (0.148\u0022) 2 in mesh, 0.40 lb/ft2, outer face of the posts from the curb to the post top, 8\u0027-0 bays; drawn see-through.",
+            "Basis": "chain link guess 9 ga (0.148\u0022) 2 in mesh, 0.40 lb/ft2 nominal, on the outer face of the posts, curb top to post top (the elevations p.85-88 draw the panels full height); not a plan value"
+          },
+          "FlagsDimensionOnly": true,
           "Source": "p.83, 84-88, 89, 90, 91",
           "Unresolved": []
         },
         {
           "Name": "High RT",
           "TypeName": "RAIL (PED)(HIGH)",
-          "Kind": "Guardrail",
+          "Kind": "Fence",
           "Offset": 2.1336,
           "BaseProbe": 0.127,
           "Material": "Stainless steel AISI 316 (p.83)",
           "Density": 7980,
           "SampleStep": 0.3048,
-          "Envelope": [
-            {
-              "R": 0.0508,
-              "H": 0
-            },
-            {
-              "R": 0.2032,
-              "H": 0
-            },
-            {
-              "R": 0.2032,
-              "H": 1.7525999999999995
-            },
-            {
-              "R": 0.20098080729166937,
-              "H": 1.8337708593750002
-            },
-            {
-              "R": 0.19433645833333332,
-              "H": 1.914604374999999
-            },
-            {
-              "R": 0.18328679687499883,
-              "H": 1.9949219531249998
-            },
-            {
-              "R": 0.16785166666666512,
-              "H": 2.074544999999999
-            },
-            {
-              "R": 0.14805091145833332,
-              "H": 2.1532949218749997
-            },
-            {
-              "R": 0.12390437499999885,
-              "H": 2.2309931249999995
-            },
-            {
-              "R": 0.09543190104166667,
-              "H": 2.307461015625
-            },
-            {
-              "R": 0.06265333333333217,
-              "H": 2.38252
-            },
-            {
-              "R": 0.026326041666666664,
-              "H": 2.4556839062499995
-            },
-            {
-              "R": -0.01397000000000077,
-              "H": 2.5265062499999997
-            },
-            {
-              "R": -0.05807604166666667,
-              "H": 2.5948679687499996
-            },
-            {
-              "R": -0.10583333333333525,
-              "H": 2.6606499999999995
-            },
-            {
-              "R": -0.15708312500000116,
-              "H": 2.72373328125
-            },
-            {
-              "R": -0.21166666666666667,
-              "H": 2.7839987499999994
-            },
-            {
-              "R": -0.2694252083333341,
-              "H": 2.8413273437499997
-            },
-            {
-              "R": -0.3302,
-              "H": 2.8955999999999995
-            },
-            {
-              "R": -0.3589866666666674,
-              "H": 2.8600399999999992
-            },
-            {
-              "R": -0.30265356770833257,
-              "H": 2.806485026041666
-            },
-            {
-              "R": -0.24931687500000266,
-              "H": 2.7500527083333326
-            },
-            {
-              "R": -0.19911549479166665,
-              "H": 2.6908819531249994
-            },
-            {
-              "R": -0.15218833333333448,
-              "H": 2.6291116666666663
-            },
-            {
-              "R": -0.10867429687500076,
-              "H": 2.564880755208333
-            },
-            {
-              "R": -0.0687122916666659,
-              "H": 2.4983281249999996
-            },
-            {
-              "R": -0.032441223958334105,
-              "H": 2.429592682291666
-            },
-            {
-              "R": 0,
-              "H": 2.358813333333333
-            },
-            {
-              "R": 0.028485703124999612,
-              "H": 2.2863009635416667
-            },
-            {
-              "R": 0.05294312499999962,
-              "H": 2.2124193749999996
-            },
-            {
-              "R": 0.07331273437499847,
-              "H": 2.1373868489583328
-            },
-            {
-              "R": 0.08953499999999846,
-              "H": 2.0614216666666656
-            },
-            {
-              "R": 0.101550390625,
-              "H": 1.9847421093749997
-            },
-            {
-              "R": 0.10929937499999769,
-              "H": 1.9075664583333332
-            },
-            {
-              "R": 0.11272242187499769,
-              "H": 1.830112994791666
-            },
-            {
-              "R": 0.11175999999999844,
-              "H": 1.7525999999999995
-            }
-          ],
-          "EnvelopeMassPerLength": 148.816394,
-          "EnvelopeUnresolved": "UNRESOLVED (p.84, 89, 90): railing posts / fencing - the project \u0027Pedestrian railing details\u0027 / RAIL (PED) sheets that size the posts, rails, fencing, base plates and anchors are not in this reduced set (p.89, p.90 refer to them), p.84 note 2 says the number and spacing of the posts is diagrammatic only, and the railing is not a TxDOT standard type (RL-PR3 / PR11 / PR22 / PR3-HD / CLF-RO 2019 checked: 3\u0027-6 / 4\u0027-0 galvanized plate-post or pilaster rails and an 8 ft chain link fence vs the p.89 4\u0027-3 / 9\u0027-10 tapered stainless posts, Item 5110 special pay item)",
-          "EnvelopeBasis": "p.89 HIGH post outline swept continuously (scaled; 9\u0027-10 dimensioned); mass = p.83 design dead load 100 PLF",
+          "Post": {
+            "Profile": [
+              {
+                "R": 0.0508,
+                "H": 0
+              },
+              {
+                "R": 0.2032,
+                "H": 0
+              },
+              {
+                "R": 0.2032,
+                "H": 1.7525999999999995
+              },
+              {
+                "R": 0.20098080729166937,
+                "H": 1.8337708593750002
+              },
+              {
+                "R": 0.19433645833333332,
+                "H": 1.914604374999999
+              },
+              {
+                "R": 0.18328679687499883,
+                "H": 1.9949219531249998
+              },
+              {
+                "R": 0.16785166666666512,
+                "H": 2.074544999999999
+              },
+              {
+                "R": 0.14805091145833332,
+                "H": 2.1532949218749997
+              },
+              {
+                "R": 0.12390437499999885,
+                "H": 2.2309931249999995
+              },
+              {
+                "R": 0.09543190104166667,
+                "H": 2.307461015625
+              },
+              {
+                "R": 0.06265333333333217,
+                "H": 2.38252
+              },
+              {
+                "R": 0.026326041666666664,
+                "H": 2.4556839062499995
+              },
+              {
+                "R": -0.01397000000000077,
+                "H": 2.5265062499999997
+              },
+              {
+                "R": -0.05807604166666667,
+                "H": 2.5948679687499996
+              },
+              {
+                "R": -0.10583333333333525,
+                "H": 2.6606499999999995
+              },
+              {
+                "R": -0.15708312500000116,
+                "H": 2.72373328125
+              },
+              {
+                "R": -0.21166666666666667,
+                "H": 2.7839987499999994
+              },
+              {
+                "R": -0.2694252083333341,
+                "H": 2.8413273437499997
+              },
+              {
+                "R": -0.3302,
+                "H": 2.8955999999999995
+              },
+              {
+                "R": -0.3589866666666674,
+                "H": 2.8600399999999992
+              },
+              {
+                "R": -0.30265356770833257,
+                "H": 2.806485026041666
+              },
+              {
+                "R": -0.24931687500000266,
+                "H": 2.7500527083333326
+              },
+              {
+                "R": -0.19911549479166665,
+                "H": 2.6908819531249994
+              },
+              {
+                "R": -0.15218833333333448,
+                "H": 2.6291116666666663
+              },
+              {
+                "R": -0.10867429687500076,
+                "H": 2.564880755208333
+              },
+              {
+                "R": -0.0687122916666659,
+                "H": 2.4983281249999996
+              },
+              {
+                "R": -0.032441223958334105,
+                "H": 2.429592682291666
+              },
+              {
+                "R": 0,
+                "H": 2.358813333333333
+              },
+              {
+                "R": 0.028485703124999612,
+                "H": 2.2863009635416667
+              },
+              {
+                "R": 0.05294312499999962,
+                "H": 2.2124193749999996
+              },
+              {
+                "R": 0.07331273437499847,
+                "H": 2.1373868489583328
+              },
+              {
+                "R": 0.08953499999999846,
+                "H": 2.0614216666666656
+              },
+              {
+                "R": 0.101550390625,
+                "H": 1.9847421093749997
+              },
+              {
+                "R": 0.10929937499999769,
+                "H": 1.9075664583333332
+              },
+              {
+                "R": 0.11272242187499769,
+                "H": 1.830112994791666
+              },
+              {
+                "R": 0.11175999999999844,
+                "H": 1.7525999999999995
+              }
+            ],
+            "Thickness": 0.15239999999999998,
+            "Spacing": 2.4384,
+            "EndDistance": 0,
+            "GridStation": 712.847952,
+            "Description": "Tapered post 9\u0027-10 (p.89 outline x 6\u0022)",
+            "Unresolved": "UNRESOLVED (p.84 note 2, p.85-88, p.89, p.90): railing post thickness along the rail, post base plates, anchor bolts and the connection to the curb - the project \u0027Pedestrian railing details\u0027 sheets (224-226) are not in the set; p.89 draws only the side outline, p.84 note 2 says the number and spacing of the posts is diagrammatic only, and the railing is not a TxDOT standard type.",
+            "Basis": "p.89 HIGH post outline (scaled; 9\u0027-10 dimensioned) x 6\u0022 thick (the p.85-88 elevation symbol width), 8\u0027-0 on CL NHT stations from the transition (p.85-88)"
+          },
           "Members": [
             {
               "Name": "HR",
@@ -19680,9 +20137,98 @@
               "Description": "Handrail pipe, 1.87\u0022 OD scaled (p.89)",
               "MassPerLength": 0,
               "Unresolved": "UNRESOLVED (p.89): handrail pipe size, wall and bracket - drawn only; the \u0027Pedestrian railing details\u0027 sheets are not in the set",
-              "Basis": "pipe OD 1.87\u0022 and position scaled from the p.89 vectors; top 3\u0027-0 above the trail (dimensioned); mass inside the plan design dead load of the envelope"
+              "Basis": "pipe OD 1.87\u0022 and position scaled from the p.89 vectors; top 3\u0027-0 above the trail (dimensioned); wall unknown: modeled solid, weight not counted"
             }
           ],
+          "Fabric": {
+            "Description": "Fence fabric panel (chain link guess, 9 ga 2 in mesh)",
+            "Path": [
+              {
+                "R": 0.2032,
+                "H": 0
+              },
+              {
+                "R": 0.2032,
+                "H": 1.7525999999999995
+              },
+              {
+                "R": 0.20098080729166937,
+                "H": 1.8337708593750002
+              },
+              {
+                "R": 0.19433645833333332,
+                "H": 1.914604374999999
+              },
+              {
+                "R": 0.18328679687499883,
+                "H": 1.9949219531249998
+              },
+              {
+                "R": 0.16785166666666512,
+                "H": 2.074544999999999
+              },
+              {
+                "R": 0.14805091145833332,
+                "H": 2.1532949218749997
+              },
+              {
+                "R": 0.12390437499999885,
+                "H": 2.2309931249999995
+              },
+              {
+                "R": 0.09543190104166667,
+                "H": 2.307461015625
+              },
+              {
+                "R": 0.06265333333333217,
+                "H": 2.38252
+              },
+              {
+                "R": 0.026326041666666664,
+                "H": 2.4556839062499995
+              },
+              {
+                "R": -0.01397000000000077,
+                "H": 2.5265062499999997
+              },
+              {
+                "R": -0.05807604166666667,
+                "H": 2.5948679687499996
+              },
+              {
+                "R": -0.10583333333333525,
+                "H": 2.6606499999999995
+              },
+              {
+                "R": -0.15708312500000116,
+                "H": 2.72373328125
+              },
+              {
+                "R": -0.21166666666666667,
+                "H": 2.7839987499999994
+              },
+              {
+                "R": -0.2694252083333341,
+                "H": 2.8413273437499997
+              },
+              {
+                "R": -0.3302,
+                "H": 2.8955999999999995
+              },
+              {
+                "R": -0.3589866666666674,
+                "H": 2.8600399999999992
+              }
+            ],
+            "OffsetFromPost": 0.0037592,
+            "BottomH": 0,
+            "Thickness": 0.0075184,
+            "MassPerArea": 1.9529710560000002,
+            "Material": "Chain link fabric (type UNRESOLVED; galvanized steel guess)",
+            "Unresolved": "UNRESOLVED (p.89, p.84-88, p.91, p.3): fence fabric type, height range, side of the posts and weight - the \u0027Pedestrian railing details\u0027 sheets 224-226 that define the fencing are not in the set (p.89 only says \u0027for railing and fencing details see ...\u0027); the elevations p.85-88 draw a panel between every pair of posts, no fabric pay item is on p.91. Chain link guess: 9 gauge (0.148\u0022) 2 in mesh, 0.40 lb/ft2, outer face of the posts from the curb to the post top, 8\u0027-0 bays; drawn see-through.",
+            "Basis": "chain link guess 9 ga (0.148\u0022) 2 in mesh, 0.40 lb/ft2 nominal, on the outer face of the posts, curb top to post top (the elevations p.85-88 draw the panels full height); not a plan value"
+          },
+          "FlagsDimensionOnly": true,
           "Source": "p.83, 84-88, 89, 90, 91",
           "Unresolved": []
         }
@@ -23760,161 +24306,167 @@
         {
           "Name": "High LT",
           "TypeName": "RAIL (PED)(HIGH)",
-          "Kind": "Guardrail",
+          "Kind": "Fence",
           "Offset": -2.1336,
           "BaseProbe": 0.127,
           "Material": "Stainless steel AISI 316 (p.83)",
           "Density": 7980,
           "SampleStep": 0.3048,
-          "Envelope": [
-            {
-              "R": 0.0508,
-              "H": 0
-            },
-            {
-              "R": 0.2032,
-              "H": 0
-            },
-            {
-              "R": 0.2032,
-              "H": 1.7525999999999995
-            },
-            {
-              "R": 0.20098080729166937,
-              "H": 1.8337708593750002
-            },
-            {
-              "R": 0.19433645833333332,
-              "H": 1.914604374999999
-            },
-            {
-              "R": 0.18328679687499883,
-              "H": 1.9949219531249998
-            },
-            {
-              "R": 0.16785166666666512,
-              "H": 2.074544999999999
-            },
-            {
-              "R": 0.14805091145833332,
-              "H": 2.1532949218749997
-            },
-            {
-              "R": 0.12390437499999885,
-              "H": 2.2309931249999995
-            },
-            {
-              "R": 0.09543190104166667,
-              "H": 2.307461015625
-            },
-            {
-              "R": 0.06265333333333217,
-              "H": 2.38252
-            },
-            {
-              "R": 0.026326041666666664,
-              "H": 2.4556839062499995
-            },
-            {
-              "R": -0.01397000000000077,
-              "H": 2.5265062499999997
-            },
-            {
-              "R": -0.05807604166666667,
-              "H": 2.5948679687499996
-            },
-            {
-              "R": -0.10583333333333525,
-              "H": 2.6606499999999995
-            },
-            {
-              "R": -0.15708312500000116,
-              "H": 2.72373328125
-            },
-            {
-              "R": -0.21166666666666667,
-              "H": 2.7839987499999994
-            },
-            {
-              "R": -0.2694252083333341,
-              "H": 2.8413273437499997
-            },
-            {
-              "R": -0.3302,
-              "H": 2.8955999999999995
-            },
-            {
-              "R": -0.3589866666666674,
-              "H": 2.8600399999999992
-            },
-            {
-              "R": -0.30265356770833257,
-              "H": 2.806485026041666
-            },
-            {
-              "R": -0.24931687500000266,
-              "H": 2.7500527083333326
-            },
-            {
-              "R": -0.19911549479166665,
-              "H": 2.6908819531249994
-            },
-            {
-              "R": -0.15218833333333448,
-              "H": 2.6291116666666663
-            },
-            {
-              "R": -0.10867429687500076,
-              "H": 2.564880755208333
-            },
-            {
-              "R": -0.0687122916666659,
-              "H": 2.4983281249999996
-            },
-            {
-              "R": -0.032441223958334105,
-              "H": 2.429592682291666
-            },
-            {
-              "R": 0,
-              "H": 2.358813333333333
-            },
-            {
-              "R": 0.028485703124999612,
-              "H": 2.2863009635416667
-            },
-            {
-              "R": 0.05294312499999962,
-              "H": 2.2124193749999996
-            },
-            {
-              "R": 0.07331273437499847,
-              "H": 2.1373868489583328
-            },
-            {
-              "R": 0.08953499999999846,
-              "H": 2.0614216666666656
-            },
-            {
-              "R": 0.101550390625,
-              "H": 1.9847421093749997
-            },
-            {
-              "R": 0.10929937499999769,
-              "H": 1.9075664583333332
-            },
-            {
-              "R": 0.11272242187499769,
-              "H": 1.830112994791666
-            },
-            {
-              "R": 0.11175999999999844,
-              "H": 1.7525999999999995
-            }
-          ],
-          "EnvelopeMassPerLength": 148.816394,
-          "EnvelopeUnresolved": "UNRESOLVED (p.84, 89, 90): railing posts / fencing - the project \u0027Pedestrian railing details\u0027 / RAIL (PED) sheets that size the posts, rails, fencing, base plates and anchors are not in this reduced set (p.89, p.90 refer to them), p.84 note 2 says the number and spacing of the posts is diagrammatic only, and the railing is not a TxDOT standard type (RL-PR3 / PR11 / PR22 / PR3-HD / CLF-RO 2019 checked: 3\u0027-6 / 4\u0027-0 galvanized plate-post or pilaster rails and an 8 ft chain link fence vs the p.89 4\u0027-3 / 9\u0027-10 tapered stainless posts, Item 5110 special pay item)",
-          "EnvelopeBasis": "p.89 HIGH post outline swept continuously (scaled; 9\u0027-10 dimensioned); mass = p.83 design dead load 100 PLF",
+          "Post": {
+            "Profile": [
+              {
+                "R": 0.0508,
+                "H": 0
+              },
+              {
+                "R": 0.2032,
+                "H": 0
+              },
+              {
+                "R": 0.2032,
+                "H": 1.7525999999999995
+              },
+              {
+                "R": 0.20098080729166937,
+                "H": 1.8337708593750002
+              },
+              {
+                "R": 0.19433645833333332,
+                "H": 1.914604374999999
+              },
+              {
+                "R": 0.18328679687499883,
+                "H": 1.9949219531249998
+              },
+              {
+                "R": 0.16785166666666512,
+                "H": 2.074544999999999
+              },
+              {
+                "R": 0.14805091145833332,
+                "H": 2.1532949218749997
+              },
+              {
+                "R": 0.12390437499999885,
+                "H": 2.2309931249999995
+              },
+              {
+                "R": 0.09543190104166667,
+                "H": 2.307461015625
+              },
+              {
+                "R": 0.06265333333333217,
+                "H": 2.38252
+              },
+              {
+                "R": 0.026326041666666664,
+                "H": 2.4556839062499995
+              },
+              {
+                "R": -0.01397000000000077,
+                "H": 2.5265062499999997
+              },
+              {
+                "R": -0.05807604166666667,
+                "H": 2.5948679687499996
+              },
+              {
+                "R": -0.10583333333333525,
+                "H": 2.6606499999999995
+              },
+              {
+                "R": -0.15708312500000116,
+                "H": 2.72373328125
+              },
+              {
+                "R": -0.21166666666666667,
+                "H": 2.7839987499999994
+              },
+              {
+                "R": -0.2694252083333341,
+                "H": 2.8413273437499997
+              },
+              {
+                "R": -0.3302,
+                "H": 2.8955999999999995
+              },
+              {
+                "R": -0.3589866666666674,
+                "H": 2.8600399999999992
+              },
+              {
+                "R": -0.30265356770833257,
+                "H": 2.806485026041666
+              },
+              {
+                "R": -0.24931687500000266,
+                "H": 2.7500527083333326
+              },
+              {
+                "R": -0.19911549479166665,
+                "H": 2.6908819531249994
+              },
+              {
+                "R": -0.15218833333333448,
+                "H": 2.6291116666666663
+              },
+              {
+                "R": -0.10867429687500076,
+                "H": 2.564880755208333
+              },
+              {
+                "R": -0.0687122916666659,
+                "H": 2.4983281249999996
+              },
+              {
+                "R": -0.032441223958334105,
+                "H": 2.429592682291666
+              },
+              {
+                "R": 0,
+                "H": 2.358813333333333
+              },
+              {
+                "R": 0.028485703124999612,
+                "H": 2.2863009635416667
+              },
+              {
+                "R": 0.05294312499999962,
+                "H": 2.2124193749999996
+              },
+              {
+                "R": 0.07331273437499847,
+                "H": 2.1373868489583328
+              },
+              {
+                "R": 0.08953499999999846,
+                "H": 2.0614216666666656
+              },
+              {
+                "R": 0.101550390625,
+                "H": 1.9847421093749997
+              },
+              {
+                "R": 0.10929937499999769,
+                "H": 1.9075664583333332
+              },
+              {
+                "R": 0.11272242187499769,
+                "H": 1.830112994791666
+              },
+              {
+                "R": 0.11175999999999844,
+                "H": 1.7525999999999995
+              }
+            ],
+            "Thickness": 0.15239999999999998,
+            "Spacing": 2.4384,
+            "EndDistance": 0,
+            "GridStation": 712.847952,
+            "Description": "Tapered post 9\u0027-10 (p.89 outline x 6\u0022)",
+            "Unresolved": "UNRESOLVED (p.84 note 2, p.85-88, p.89, p.90): railing post thickness along the rail, post base plates, anchor bolts and the connection to the curb - the project \u0027Pedestrian railing details\u0027 sheets (224-226) are not in the set; p.89 draws only the side outline, p.84 note 2 says the number and spacing of the posts is diagrammatic only, and the railing is not a TxDOT standard type.",
+            "Basis": "p.89 HIGH post outline (scaled; 9\u0027-10 dimensioned) x 6\u0022 thick (the p.85-88 elevation symbol width), 8\u0027-0 on CL NHT stations from the transition (p.85-88)"
+          },
           "Members": [
             {
               "Name": "HR",
@@ -23927,170 +24479,265 @@
               "Description": "Handrail pipe, 1.87\u0022 OD scaled (p.89)",
               "MassPerLength": 0,
               "Unresolved": "UNRESOLVED (p.89): handrail pipe size, wall and bracket - drawn only; the \u0027Pedestrian railing details\u0027 sheets are not in the set",
-              "Basis": "pipe OD 1.87\u0022 and position scaled from the p.89 vectors; top 3\u0027-0 above the trail (dimensioned); mass inside the plan design dead load of the envelope"
+              "Basis": "pipe OD 1.87\u0022 and position scaled from the p.89 vectors; top 3\u0027-0 above the trail (dimensioned); wall unknown: modeled solid, weight not counted"
             }
           ],
+          "Fabric": {
+            "Description": "Fence fabric panel (chain link guess, 9 ga 2 in mesh)",
+            "Path": [
+              {
+                "R": 0.2032,
+                "H": 0
+              },
+              {
+                "R": 0.2032,
+                "H": 1.7525999999999995
+              },
+              {
+                "R": 0.20098080729166937,
+                "H": 1.8337708593750002
+              },
+              {
+                "R": 0.19433645833333332,
+                "H": 1.914604374999999
+              },
+              {
+                "R": 0.18328679687499883,
+                "H": 1.9949219531249998
+              },
+              {
+                "R": 0.16785166666666512,
+                "H": 2.074544999999999
+              },
+              {
+                "R": 0.14805091145833332,
+                "H": 2.1532949218749997
+              },
+              {
+                "R": 0.12390437499999885,
+                "H": 2.2309931249999995
+              },
+              {
+                "R": 0.09543190104166667,
+                "H": 2.307461015625
+              },
+              {
+                "R": 0.06265333333333217,
+                "H": 2.38252
+              },
+              {
+                "R": 0.026326041666666664,
+                "H": 2.4556839062499995
+              },
+              {
+                "R": -0.01397000000000077,
+                "H": 2.5265062499999997
+              },
+              {
+                "R": -0.05807604166666667,
+                "H": 2.5948679687499996
+              },
+              {
+                "R": -0.10583333333333525,
+                "H": 2.6606499999999995
+              },
+              {
+                "R": -0.15708312500000116,
+                "H": 2.72373328125
+              },
+              {
+                "R": -0.21166666666666667,
+                "H": 2.7839987499999994
+              },
+              {
+                "R": -0.2694252083333341,
+                "H": 2.8413273437499997
+              },
+              {
+                "R": -0.3302,
+                "H": 2.8955999999999995
+              },
+              {
+                "R": -0.3589866666666674,
+                "H": 2.8600399999999992
+              }
+            ],
+            "OffsetFromPost": 0.0037592,
+            "BottomH": 0,
+            "Thickness": 0.0075184,
+            "MassPerArea": 1.9529710560000002,
+            "Material": "Chain link fabric (type UNRESOLVED; galvanized steel guess)",
+            "Unresolved": "UNRESOLVED (p.89, p.84-88, p.91, p.3): fence fabric type, height range, side of the posts and weight - the \u0027Pedestrian railing details\u0027 sheets 224-226 that define the fencing are not in the set (p.89 only says \u0027for railing and fencing details see ...\u0027); the elevations p.85-88 draw a panel between every pair of posts, no fabric pay item is on p.91. Chain link guess: 9 gauge (0.148\u0022) 2 in mesh, 0.40 lb/ft2, outer face of the posts from the curb to the post top, 8\u0027-0 bays; drawn see-through.",
+            "Basis": "chain link guess 9 ga (0.148\u0022) 2 in mesh, 0.40 lb/ft2 nominal, on the outer face of the posts, curb top to post top (the elevations p.85-88 draw the panels full height); not a plan value"
+          },
+          "FlagsDimensionOnly": true,
           "Source": "p.83, 84-88, 89, 90, 91",
           "Unresolved": []
         },
         {
           "Name": "High RT",
           "TypeName": "RAIL (PED)(HIGH)",
-          "Kind": "Guardrail",
+          "Kind": "Fence",
           "Offset": 2.1336,
           "BaseProbe": 0.127,
           "Material": "Stainless steel AISI 316 (p.83)",
           "Density": 7980,
           "SampleStep": 0.3048,
-          "Envelope": [
-            {
-              "R": 0.0508,
-              "H": 0
-            },
-            {
-              "R": 0.2032,
-              "H": 0
-            },
-            {
-              "R": 0.2032,
-              "H": 1.7525999999999995
-            },
-            {
-              "R": 0.20098080729166937,
-              "H": 1.8337708593750002
-            },
-            {
-              "R": 0.19433645833333332,
-              "H": 1.914604374999999
-            },
-            {
-              "R": 0.18328679687499883,
-              "H": 1.9949219531249998
-            },
-            {
-              "R": 0.16785166666666512,
-              "H": 2.074544999999999
-            },
-            {
-              "R": 0.14805091145833332,
-              "H": 2.1532949218749997
-            },
-            {
-              "R": 0.12390437499999885,
-              "H": 2.2309931249999995
-            },
-            {
-              "R": 0.09543190104166667,
-              "H": 2.307461015625
-            },
-            {
-              "R": 0.06265333333333217,
-              "H": 2.38252
-            },
-            {
-              "R": 0.026326041666666664,
-              "H": 2.4556839062499995
-            },
-            {
-              "R": -0.01397000000000077,
-              "H": 2.5265062499999997
-            },
-            {
-              "R": -0.05807604166666667,
-              "H": 2.5948679687499996
-            },
-            {
-              "R": -0.10583333333333525,
-              "H": 2.6606499999999995
-            },
-            {
-              "R": -0.15708312500000116,
-              "H": 2.72373328125
-            },
-            {
-              "R": -0.21166666666666667,
-              "H": 2.7839987499999994
-            },
-            {
-              "R": -0.2694252083333341,
-              "H": 2.8413273437499997
-            },
-            {
-              "R": -0.3302,
-              "H": 2.8955999999999995
-            },
-            {
-              "R": -0.3589866666666674,
-              "H": 2.8600399999999992
-            },
-            {
-              "R": -0.30265356770833257,
-              "H": 2.806485026041666
-            },
-            {
-              "R": -0.24931687500000266,
-              "H": 2.7500527083333326
-            },
-            {
-              "R": -0.19911549479166665,
-              "H": 2.6908819531249994
-            },
-            {
-              "R": -0.15218833333333448,
-              "H": 2.6291116666666663
-            },
-            {
-              "R": -0.10867429687500076,
-              "H": 2.564880755208333
-            },
-            {
-              "R": -0.0687122916666659,
-              "H": 2.4983281249999996
-            },
-            {
-              "R": -0.032441223958334105,
-              "H": 2.429592682291666
-            },
-            {
-              "R": 0,
-              "H": 2.358813333333333
-            },
-            {
-              "R": 0.028485703124999612,
-              "H": 2.2863009635416667
-            },
-            {
-              "R": 0.05294312499999962,
-              "H": 2.2124193749999996
-            },
-            {
-              "R": 0.07331273437499847,
-              "H": 2.1373868489583328
-            },
-            {
-              "R": 0.08953499999999846,
-              "H": 2.0614216666666656
-            },
-            {
-              "R": 0.101550390625,
-              "H": 1.9847421093749997
-            },
-            {
-              "R": 0.10929937499999769,
-              "H": 1.9075664583333332
-            },
-            {
-              "R": 0.11272242187499769,
-              "H": 1.830112994791666
-            },
-            {
-              "R": 0.11175999999999844,
-              "H": 1.7525999999999995
-            }
-          ],
-          "EnvelopeMassPerLength": 148.816394,
-          "EnvelopeUnresolved": "UNRESOLVED (p.84, 89, 90): railing posts / fencing - the project \u0027Pedestrian railing details\u0027 / RAIL (PED) sheets that size the posts, rails, fencing, base plates and anchors are not in this reduced set (p.89, p.90 refer to them), p.84 note 2 says the number and spacing of the posts is diagrammatic only, and the railing is not a TxDOT standard type (RL-PR3 / PR11 / PR22 / PR3-HD / CLF-RO 2019 checked: 3\u0027-6 / 4\u0027-0 galvanized plate-post or pilaster rails and an 8 ft chain link fence vs the p.89 4\u0027-3 / 9\u0027-10 tapered stainless posts, Item 5110 special pay item)",
-          "EnvelopeBasis": "p.89 HIGH post outline swept continuously (scaled; 9\u0027-10 dimensioned); mass = p.83 design dead load 100 PLF",
+          "Post": {
+            "Profile": [
+              {
+                "R": 0.0508,
+                "H": 0
+              },
+              {
+                "R": 0.2032,
+                "H": 0
+              },
+              {
+                "R": 0.2032,
+                "H": 1.7525999999999995
+              },
+              {
+                "R": 0.20098080729166937,
+                "H": 1.8337708593750002
+              },
+              {
+                "R": 0.19433645833333332,
+                "H": 1.914604374999999
+              },
+              {
+                "R": 0.18328679687499883,
+                "H": 1.9949219531249998
+              },
+              {
+                "R": 0.16785166666666512,
+                "H": 2.074544999999999
+              },
+              {
+                "R": 0.14805091145833332,
+                "H": 2.1532949218749997
+              },
+              {
+                "R": 0.12390437499999885,
+                "H": 2.2309931249999995
+              },
+              {
+                "R": 0.09543190104166667,
+                "H": 2.307461015625
+              },
+              {
+                "R": 0.06265333333333217,
+                "H": 2.38252
+              },
+              {
+                "R": 0.026326041666666664,
+                "H": 2.4556839062499995
+              },
+              {
+                "R": -0.01397000000000077,
+                "H": 2.5265062499999997
+              },
+              {
+                "R": -0.05807604166666667,
+                "H": 2.5948679687499996
+              },
+              {
+                "R": -0.10583333333333525,
+                "H": 2.6606499999999995
+              },
+              {
+                "R": -0.15708312500000116,
+                "H": 2.72373328125
+              },
+              {
+                "R": -0.21166666666666667,
+                "H": 2.7839987499999994
+              },
+              {
+                "R": -0.2694252083333341,
+                "H": 2.8413273437499997
+              },
+              {
+                "R": -0.3302,
+                "H": 2.8955999999999995
+              },
+              {
+                "R": -0.3589866666666674,
+                "H": 2.8600399999999992
+              },
+              {
+                "R": -0.30265356770833257,
+                "H": 2.806485026041666
+              },
+              {
+                "R": -0.24931687500000266,
+                "H": 2.7500527083333326
+              },
+              {
+                "R": -0.19911549479166665,
+                "H": 2.6908819531249994
+              },
+              {
+                "R": -0.15218833333333448,
+                "H": 2.6291116666666663
+              },
+              {
+                "R": -0.10867429687500076,
+                "H": 2.564880755208333
+              },
+              {
+                "R": -0.0687122916666659,
+                "H": 2.4983281249999996
+              },
+              {
+                "R": -0.032441223958334105,
+                "H": 2.429592682291666
+              },
+              {
+                "R": 0,
+                "H": 2.358813333333333
+              },
+              {
+                "R": 0.028485703124999612,
+                "H": 2.2863009635416667
+              },
+              {
+                "R": 0.05294312499999962,
+                "H": 2.2124193749999996
+              },
+              {
+                "R": 0.07331273437499847,
+                "H": 2.1373868489583328
+              },
+              {
+                "R": 0.08953499999999846,
+                "H": 2.0614216666666656
+              },
+              {
+                "R": 0.101550390625,
+                "H": 1.9847421093749997
+              },
+              {
+                "R": 0.10929937499999769,
+                "H": 1.9075664583333332
+              },
+              {
+                "R": 0.11272242187499769,
+                "H": 1.830112994791666
+              },
+              {
+                "R": 0.11175999999999844,
+                "H": 1.7525999999999995
+              }
+            ],
+            "Thickness": 0.15239999999999998,
+            "Spacing": 2.4384,
+            "EndDistance": 0,
+            "GridStation": 712.847952,
+            "Description": "Tapered post 9\u0027-10 (p.89 outline x 6\u0022)",
+            "Unresolved": "UNRESOLVED (p.84 note 2, p.85-88, p.89, p.90): railing post thickness along the rail, post base plates, anchor bolts and the connection to the curb - the project \u0027Pedestrian railing details\u0027 sheets (224-226) are not in the set; p.89 draws only the side outline, p.84 note 2 says the number and spacing of the posts is diagrammatic only, and the railing is not a TxDOT standard type.",
+            "Basis": "p.89 HIGH post outline (scaled; 9\u0027-10 dimensioned) x 6\u0022 thick (the p.85-88 elevation symbol width), 8\u0027-0 on CL NHT stations from the transition (p.85-88)"
+          },
           "Members": [
             {
               "Name": "HR",
@@ -24103,9 +24750,98 @@
               "Description": "Handrail pipe, 1.87\u0022 OD scaled (p.89)",
               "MassPerLength": 0,
               "Unresolved": "UNRESOLVED (p.89): handrail pipe size, wall and bracket - drawn only; the \u0027Pedestrian railing details\u0027 sheets are not in the set",
-              "Basis": "pipe OD 1.87\u0022 and position scaled from the p.89 vectors; top 3\u0027-0 above the trail (dimensioned); mass inside the plan design dead load of the envelope"
+              "Basis": "pipe OD 1.87\u0022 and position scaled from the p.89 vectors; top 3\u0027-0 above the trail (dimensioned); wall unknown: modeled solid, weight not counted"
             }
           ],
+          "Fabric": {
+            "Description": "Fence fabric panel (chain link guess, 9 ga 2 in mesh)",
+            "Path": [
+              {
+                "R": 0.2032,
+                "H": 0
+              },
+              {
+                "R": 0.2032,
+                "H": 1.7525999999999995
+              },
+              {
+                "R": 0.20098080729166937,
+                "H": 1.8337708593750002
+              },
+              {
+                "R": 0.19433645833333332,
+                "H": 1.914604374999999
+              },
+              {
+                "R": 0.18328679687499883,
+                "H": 1.9949219531249998
+              },
+              {
+                "R": 0.16785166666666512,
+                "H": 2.074544999999999
+              },
+              {
+                "R": 0.14805091145833332,
+                "H": 2.1532949218749997
+              },
+              {
+                "R": 0.12390437499999885,
+                "H": 2.2309931249999995
+              },
+              {
+                "R": 0.09543190104166667,
+                "H": 2.307461015625
+              },
+              {
+                "R": 0.06265333333333217,
+                "H": 2.38252
+              },
+              {
+                "R": 0.026326041666666664,
+                "H": 2.4556839062499995
+              },
+              {
+                "R": -0.01397000000000077,
+                "H": 2.5265062499999997
+              },
+              {
+                "R": -0.05807604166666667,
+                "H": 2.5948679687499996
+              },
+              {
+                "R": -0.10583333333333525,
+                "H": 2.6606499999999995
+              },
+              {
+                "R": -0.15708312500000116,
+                "H": 2.72373328125
+              },
+              {
+                "R": -0.21166666666666667,
+                "H": 2.7839987499999994
+              },
+              {
+                "R": -0.2694252083333341,
+                "H": 2.8413273437499997
+              },
+              {
+                "R": -0.3302,
+                "H": 2.8955999999999995
+              },
+              {
+                "R": -0.3589866666666674,
+                "H": 2.8600399999999992
+              }
+            ],
+            "OffsetFromPost": 0.0037592,
+            "BottomH": 0,
+            "Thickness": 0.0075184,
+            "MassPerArea": 1.9529710560000002,
+            "Material": "Chain link fabric (type UNRESOLVED; galvanized steel guess)",
+            "Unresolved": "UNRESOLVED (p.89, p.84-88, p.91, p.3): fence fabric type, height range, side of the posts and weight - the \u0027Pedestrian railing details\u0027 sheets 224-226 that define the fencing are not in the set (p.89 only says \u0027for railing and fencing details see ...\u0027); the elevations p.85-88 draw a panel between every pair of posts, no fabric pay item is on p.91. Chain link guess: 9 gauge (0.148\u0022) 2 in mesh, 0.40 lb/ft2, outer face of the posts from the curb to the post top, 8\u0027-0 bays; drawn see-through.",
+            "Basis": "chain link guess 9 ga (0.148\u0022) 2 in mesh, 0.40 lb/ft2 nominal, on the outer face of the posts, curb top to post top (the elevations p.85-88 draw the panels full height); not a plan value"
+          },
+          "FlagsDimensionOnly": true,
           "Source": "p.83, 84-88, 89, 90, 91",
           "Unresolved": []
         }
@@ -28110,7 +28846,173 @@
             "Basis": "plan p.148 ADJUSTABLE OPEN STRAND SOCKET DIMENSIONS (turnbuckle body drawn at the shank diameter - its outline is not dimensioned)"
           }
         },
-        "Welds": [],
+        "Welds": [
+          {
+            "Name": "knuckle end web to end flange",
+            "Parts": "^KNUCKLE-[A-Z]\u002B-EW$",
+            "Onto": "^KNUCKLE-[A-Z]\u002B-EF$",
+            "Size": 0.0079375,
+            "OneSide": false,
+            "SideToward": "",
+            "AngleTolDeg": 3,
+            "Tolerance": 0.00079375,
+            "Source": "p.124 A-A \u002B plan",
+            "Unresolved": "",
+            "Material": "E70XX (AWS D1.5)",
+            "HoldBack": "NaN",
+            "HoldBackSource": ""
+          },
+          {
+            "Name": "knuckle arch flange plate to end flange",
+            "Parts": "^KNUCKLE-[A-Z]\u002B-T\\d\u002BP?-AF[OI]$",
+            "Onto": "^KNUCKLE-[A-Z]\u002B-EF$",
+            "Size": 0.0079375,
+            "OneSide": false,
+            "SideToward": "",
+            "AngleTolDeg": 3,
+            "Tolerance": 0.00079375,
+            "Source": "p.124 B-B / A-A (mill to bear)",
+            "Unresolved": "",
+            "Material": "E70XX (AWS D1.5)",
+            "HoldBack": "NaN",
+            "HoldBackSource": ""
+          },
+          {
+            "Name": "knuckle stub web to end flange",
+            "Parts": "^KNUCKLE-[A-Z]\u002B-T\\d\u002BP?-SW$",
+            "Onto": "^KNUCKLE-[A-Z]\u002B-EF$",
+            "Size": 0.0079375,
+            "OneSide": false,
+            "SideToward": "",
+            "AngleTolDeg": 3,
+            "Tolerance": 0.00079375,
+            "Source": "p.124 A-A (mill to bear)",
+            "Unresolved": "UNRESOLVED (p.124 / 125 A-A): stub web weld targets - the upper A-A symbol is one 5/16\u0022 fillet-both-sides leader with 5 arrowheads at the stub web / arch flange plate / arch stiffener joints and the individual targets cannot be told apart. 5/16\u0022 fillet both sides of the stub web along its edge on the end flange and on the arch flange plates.",
+            "Material": "E70XX (AWS D1.5)",
+            "HoldBack": "NaN",
+            "HoldBackSource": ""
+          },
+          {
+            "Name": "knuckle stub web to arch flange plates",
+            "Parts": "^KNUCKLE-[A-Z]\u002B-T\\d\u002BP?-SW$",
+            "Onto": "^KNUCKLE-[A-Z]\u002B-T\\d\u002BP?-AF[OI]$",
+            "Size": 0.0079375,
+            "OneSide": false,
+            "SideToward": "",
+            "AngleTolDeg": 3,
+            "Tolerance": 0.00079375,
+            "Source": "p.124 A-A (mill to bear)",
+            "Unresolved": "UNRESOLVED (p.124 / 125 A-A): stub web weld targets - the upper A-A symbol is one 5/16\u0022 fillet-both-sides leader with 5 arrowheads at the stub web / arch flange plate / arch stiffener joints and the individual targets cannot be told apart. 5/16\u0022 fillet both sides of the stub web along its edges on the arch flange plates.",
+            "Material": "E70XX (AWS D1.5)",
+            "HoldBack": "NaN",
+            "HoldBackSource": ""
+          },
+          {
+            "Name": "knuckle arch stiffener to flange plates and stub web",
+            "Parts": "^KNUCKLE-[A-Z]\u002B-T\\d\u002BP?-AS$",
+            "Onto": "^KNUCKLE-[A-Z]\u002B-T\\d\u002BP?-(AF[OI]|SW)$",
+            "Size": 0.0079375,
+            "OneSide": false,
+            "SideToward": "",
+            "AngleTolDeg": 3,
+            "Tolerance": 0.00079375,
+            "Source": "p.124 A-A",
+            "Unresolved": "UNRESOLVED (p.124 / 125 A-A): arch stiffener weld targets - the upper A-A symbol is one 5/16\u0022 fillet-both-sides leader with 5 arrowheads at the stub web / arch flange plate / arch stiffener joints and the individual targets cannot be told apart. 5/16\u0022 fillet both sides along every edge that sits on a flange plate or the stub web.",
+            "Material": "E70XX (AWS D1.5)",
+            "HoldBack": "NaN",
+            "HoldBackSource": ""
+          },
+          {
+            "Name": "knuckle stiffener to end flange and arch flange plates",
+            "Parts": "^KNUCKLE-[A-Z]\u002B-T\\d\u002BP?-ST$",
+            "Onto": "^KNUCKLE-[A-Z]\u002B-(EF|T\\d\u002BP?-AF[OI])$",
+            "Size": 0.0079375,
+            "OneSide": false,
+            "SideToward": "",
+            "AngleTolDeg": 3,
+            "Tolerance": 0.00079375,
+            "Source": "p.124 A-A / B-B",
+            "Unresolved": "",
+            "Material": "E70XX (AWS D1.5)",
+            "HoldBack": "NaN",
+            "HoldBackSource": ""
+          },
+          {
+            "Name": "bracing gusset to connection plate",
+            "Parts": "^(UPPER-BRACING-U\\d\u002BP?)-G([TB])$",
+            "Onto": "^$1-CP$2$",
+            "Size": 0.0079375,
+            "OneSide": false,
+            "SideToward": "",
+            "AngleTolDeg": 3,
+            "Tolerance": 0.0015875,
+            "Source": "p.129-140 D-D / E-E / I-I / J-J",
+            "Unresolved": "",
+            "Material": "E70XX (AWS D1.5)",
+            "HoldBack": "NaN",
+            "HoldBackSource": ""
+          },
+          {
+            "Name": "bracing rib stiffener to rib",
+            "Parts": "^UPPER-BRACING-U\\d\u002BP?-ST\\d$",
+            "Onto": "^(NORTH|SOUTH)-RIB-\\d$",
+            "Size": 0.0079375,
+            "OneSide": false,
+            "SideToward": "",
+            "AngleTolDeg": 6,
+            "Tolerance": 0.0015875,
+            "Source": "p.129-140 B-B",
+            "Unresolved": "",
+            "Material": "E70XX (AWS D1.5)",
+            "HoldBack": "NaN",
+            "HoldBackSource": ""
+          },
+          {
+            "Name": "tie girder web to flange",
+            "Parts": "^(NORTH|SOUTH)-TIE-\\d\u002B-W$",
+            "Onto": "^(NORTH|SOUTH)-TIE-\\d\u002B-F$",
+            "Size": 0.0079375,
+            "OneSide": true,
+            "SideToward": "span",
+            "AngleTolDeg": 3,
+            "Tolerance": 0.0015875,
+            "Source": "p.143 typical tie girder section",
+            "Unresolved": "UNRESOLVED (p.143): tie girder web-to-flange weld side - the typical tie girder section shows one 5/16\u0022 fillet symbol (arrow side only) and is not oriented to the span. 5/16\u0022 fillet on the span-centre side of the web, continuous.",
+            "Material": "E70XX (AWS D1.5)",
+            "HoldBack": "NaN",
+            "HoldBackSource": ""
+          },
+          {
+            "Name": "floorbeam web to flange",
+            "Parts": "^FB\\d\u002B-W$",
+            "Onto": "^FB\\d\u002B-F$",
+            "Size": 0.0079375,
+            "OneSide": true,
+            "SideToward": "\u002Bx",
+            "AngleTolDeg": 3,
+            "Tolerance": 0.0015875,
+            "Source": "p.145 Section A-A",
+            "Unresolved": "UNRESOLVED (p.145): floorbeam web-to-flange weld side - Section A-A shows one 5/16\u0022 fillet symbol (arrow side only); the section is looked at along the floorbeam but its station direction is not tied to the local X axis. 5/16\u0022 fillet on the \u002BX (up-station per the framing plan numbering) face of the web, continuous.",
+            "Material": "E70XX (AWS D1.5)",
+            "HoldBack": "NaN",
+            "HoldBackSource": ""
+          },
+          {
+            "Name": "floorbeam connection stiffener to tie web and flange",
+            "Parts": "^FB\\d\u002B-ST[AB]$",
+            "Onto": "^(NORTH|SOUTH)-TIE-\\d\u002B-[WF]$",
+            "Size": 0.0079375,
+            "OneSide": true,
+            "SideToward": "\u002Bx",
+            "AngleTolDeg": 3,
+            "Tolerance": 0.0015875,
+            "Source": "p.146 stiffener detail",
+            "Unresolved": "UNRESOLVED (p.146): floorbeam connection stiffener weld side - the stiffener detail shows one 5/16\u0022 symbol with two arrowheads (web and flange) and does not say which face of the stiffener plate is welded. 5/16\u0022 fillet on the \u002BX face of the stiffener along its web edge and its flange edge.",
+            "Material": "E70XX (AWS D1.5)",
+            "HoldBack": "NaN",
+            "HoldBackSource": ""
+          }
+        ],
         "Floorbeams": [
           {
             "Name": "FB1",
@@ -29927,6 +30829,7 @@
             ],
             "CheckGussetFromPlateEdge": 0.0254,
             "GussetThickness": 0.022224999999999998,
+            "MitreWeldedEdge": true,
             "ConnectionPlateThickness": 0.022224999999999998,
             "StiffenerThickness": 0.0254,
             "StiffenerClip": 0.038099999999999995,
@@ -30295,6 +31198,7 @@
             ],
             "CheckGussetFromPlateEdge": 0.0254,
             "GussetThickness": 0.022224999999999998,
+            "MitreWeldedEdge": true,
             "ConnectionPlateThickness": 0.022224999999999998,
             "StiffenerThickness": 0.0254,
             "StiffenerClip": 0.038099999999999995,
@@ -30882,6 +31786,7 @@
             ],
             "CheckGussetFromPlateEdge": 0.0254,
             "GussetThickness": 0.022224999999999998,
+            "MitreWeldedEdge": true,
             "ConnectionPlateThickness": 0.022224999999999998,
             "StiffenerThickness": 0.0254,
             "StiffenerClip": 0.038099999999999995,
@@ -31469,6 +32374,7 @@
             ],
             "CheckGussetFromPlateEdge": 0.0254,
             "GussetThickness": 0.022224999999999998,
+            "MitreWeldedEdge": true,
             "ConnectionPlateThickness": 0.022224999999999998,
             "StiffenerThickness": 0.0254,
             "StiffenerClip": 0.038099999999999995,
@@ -32068,6 +32974,7 @@
             ],
             "CheckGussetFromPlateEdge": 0.0254,
             "GussetThickness": 0.022224999999999998,
+            "MitreWeldedEdge": true,
             "ConnectionPlateThickness": 0.022224999999999998,
             "StiffenerThickness": 0.0254,
             "StiffenerClip": 0.038099999999999995,
@@ -32667,6 +33574,7 @@
             ],
             "CheckGussetFromPlateEdge": 0.0254,
             "GussetThickness": 0.022224999999999998,
+            "MitreWeldedEdge": true,
             "ConnectionPlateThickness": 0.022224999999999998,
             "StiffenerThickness": 0.0254,
             "StiffenerClip": 0.038099999999999995,
@@ -33278,6 +34186,7 @@
             ],
             "CheckGussetFromPlateEdge": 0.0254,
             "GussetThickness": 0.022224999999999998,
+            "MitreWeldedEdge": true,
             "ConnectionPlateThickness": 0.022224999999999998,
             "StiffenerThickness": 0.0254,
             "StiffenerClip": 0.038099999999999995,
@@ -33889,6 +34798,7 @@
             ],
             "CheckGussetFromPlateEdge": 0.0254,
             "GussetThickness": 0.022224999999999998,
+            "MitreWeldedEdge": true,
             "ConnectionPlateThickness": 0.022224999999999998,
             "StiffenerThickness": 0.0254,
             "StiffenerClip": 0.038099999999999995,
@@ -34500,6 +35410,7 @@
             ],
             "CheckGussetFromPlateEdge": 0.0254,
             "GussetThickness": 0.022224999999999998,
+            "MitreWeldedEdge": true,
             "ConnectionPlateThickness": 0.022224999999999998,
             "StiffenerThickness": 0.0254,
             "StiffenerClip": 0.038099999999999995,
@@ -35111,6 +36022,7 @@
             ],
             "CheckGussetFromPlateEdge": 0.0254,
             "GussetThickness": 0.022224999999999998,
+            "MitreWeldedEdge": true,
             "ConnectionPlateThickness": 0.022224999999999998,
             "StiffenerThickness": 0.0254,
             "StiffenerClip": 0.038099999999999995,
@@ -35728,6 +36640,7 @@
             ],
             "CheckGussetFromPlateEdge": 0.0254,
             "GussetThickness": 0.022224999999999998,
+            "MitreWeldedEdge": true,
             "ConnectionPlateThickness": 0.022224999999999998,
             "StiffenerThickness": 0.0254,
             "StiffenerClip": 0.038099999999999995,
@@ -36345,6 +37258,7 @@
             ],
             "CheckGussetFromPlateEdge": 0.0254,
             "GussetThickness": 0.022224999999999998,
+            "MitreWeldedEdge": true,
             "ConnectionPlateThickness": 0.022224999999999998,
             "StiffenerThickness": 0.0254,
             "StiffenerClip": 0.038099999999999995,
@@ -36950,6 +37864,7 @@
             ],
             "CheckGussetFromPlateEdge": 0.0254,
             "GussetThickness": 0.022224999999999998,
+            "MitreWeldedEdge": true,
             "ConnectionPlateThickness": 0.022224999999999998,
             "StiffenerThickness": 0.0254,
             "StiffenerClip": 0.038099999999999995,
@@ -37555,6 +38470,7 @@
             ],
             "CheckGussetFromPlateEdge": 0.0254,
             "GussetThickness": 0.022224999999999998,
+            "MitreWeldedEdge": true,
             "ConnectionPlateThickness": 0.022224999999999998,
             "StiffenerThickness": 0.0254,
             "StiffenerClip": 0.038099999999999995,
@@ -38184,6 +39100,7 @@
             ],
             "CheckGussetFromPlateEdge": 0.0254,
             "GussetThickness": 0.022224999999999998,
+            "MitreWeldedEdge": true,
             "ConnectionPlateThickness": 0.022224999999999998,
             "StiffenerThickness": 0.0254,
             "StiffenerClip": 0.038099999999999995,
@@ -38813,6 +39730,7 @@
             ],
             "CheckGussetFromPlateEdge": 0.0254,
             "GussetThickness": 0.022224999999999998,
+            "MitreWeldedEdge": true,
             "ConnectionPlateThickness": 0.022224999999999998,
             "StiffenerThickness": 0.0254,
             "StiffenerClip": 0.038099999999999995,
@@ -39418,6 +40336,7 @@
             ],
             "CheckGussetFromPlateEdge": 0.0254,
             "GussetThickness": 0.022224999999999998,
+            "MitreWeldedEdge": true,
             "ConnectionPlateThickness": 0.022224999999999998,
             "StiffenerThickness": 0.0254,
             "StiffenerClip": 0.038099999999999995,
@@ -40023,6 +40942,7 @@
             ],
             "CheckGussetFromPlateEdge": 0.0254,
             "GussetThickness": 0.022224999999999998,
+            "MitreWeldedEdge": true,
             "ConnectionPlateThickness": 0.022224999999999998,
             "StiffenerThickness": 0.0254,
             "StiffenerClip": 0.038099999999999995,
@@ -40640,6 +41560,7 @@
             ],
             "CheckGussetFromPlateEdge": 0.0254,
             "GussetThickness": 0.022224999999999998,
+            "MitreWeldedEdge": true,
             "ConnectionPlateThickness": 0.022224999999999998,
             "StiffenerThickness": 0.0254,
             "StiffenerClip": 0.038099999999999995,
@@ -41257,6 +42178,7 @@
             ],
             "CheckGussetFromPlateEdge": 0.0254,
             "GussetThickness": 0.022224999999999998,
+            "MitreWeldedEdge": true,
             "ConnectionPlateThickness": 0.022224999999999998,
             "StiffenerThickness": 0.0254,
             "StiffenerClip": 0.038099999999999995,
@@ -41637,6 +42559,7 @@
             ],
             "CheckGussetFromPlateEdge": 0.0254,
             "GussetThickness": 0.022224999999999998,
+            "MitreWeldedEdge": true,
             "ConnectionPlateThickness": 0.022224999999999998,
             "StiffenerThickness": 0.0254,
             "StiffenerClip": 0.038099999999999995,
@@ -42017,6 +42940,7 @@
             ],
             "CheckGussetFromPlateEdge": 0.0254,
             "GussetThickness": 0.022224999999999998,
+            "MitreWeldedEdge": true,
             "ConnectionPlateThickness": 0.022224999999999998,
             "StiffenerThickness": 0.0254,
             "StiffenerClip": 0.038099999999999995,
@@ -42044,6 +42968,8 @@
             "EndFlangeBottomZ": -0.028575,
             "EndWebOffset": 0.3429,
             "EndWebThickness": 0.0254,
+            "EndWebInset": 0.0127,
+            "EndWebEndUnresolved": "UNRESOLVED (p.124 / 125): knuckle end web end positions - the end web ends are drawn (square cuts) but not dimensioned. Scaled from the vector linework: 9 1/4\u0022 (acute corners T34\u0027 / T34) and 8 5/16\u0022 (obtuse corners T0 / T0\u0027) outside the tie chord, mid-thickness.",
             "EndWebHeightAtChord": 0.307975,
             "EndWebHeightAtEnds": "NaN",
             "EndWebScaledHeightAtEnds": 0.26034999999999997,
@@ -42067,6 +42993,7 @@
               "ArchStiffenerThickness": 0.0254,
               "ArchStiffenerUnresolved": "UNRESOLVED (p.124 / 125 Section A-A): knuckle arch stiffener extent - the 1\u0022 arch stiffener is shown on the intrados side only, its width is not dimensioned. From the stub web face to the flange tip (7 3/8 from the rib CL).",
               "JointGap": 0.0127,
+              "TieCutParallelToEndWeb": true,
               "GussetThickness": 0.0127,
               "GussetHeight": 0.2286,
               "GussetTopBelowWeb": 0.0127,
@@ -42107,7 +43034,8 @@
                 "Tie": "North tie",
                 "Splice": "RS5\u0027",
                 "OutsideLegHeight": 0.2524125,
-                "InsideLegHeight": 0.2587625
+                "InsideLegHeight": 0.2587625,
+                "EndWebEndBeyondChord": 0.23495
               },
               {
                 "Point": "T0",
@@ -42115,7 +43043,8 @@
                 "Tie": "South tie",
                 "Splice": "RS1",
                 "OutsideLegHeight": 0.2667,
-                "InsideLegHeight": 0.2667
+                "InsideLegHeight": 0.2667,
+                "EndWebEndBeyondChord": 0.21113749999999998
               }
             ],
             "EndWebOpeningsAt": [
@@ -42225,6 +43154,8 @@
             "EndFlangeBottomZ": -0.028575,
             "EndWebOffset": 0.3429,
             "EndWebThickness": 0.0254,
+            "EndWebInset": 0.0127,
+            "EndWebEndUnresolved": "UNRESOLVED (p.124 / 125): knuckle end web end positions - the end web ends are drawn (square cuts) but not dimensioned. Scaled from the vector linework: 9 1/4\u0022 (acute corners T34\u0027 / T34) and 8 5/16\u0022 (obtuse corners T0 / T0\u0027) outside the tie chord, mid-thickness.",
             "EndWebHeightAtChord": 0.307975,
             "EndWebHeightAtEnds": "NaN",
             "EndWebScaledHeightAtEnds": 0.26034999999999997,
@@ -42248,6 +43179,7 @@
               "ArchStiffenerThickness": 0.0254,
               "ArchStiffenerUnresolved": "UNRESOLVED (p.124 / 125 Section A-A): knuckle arch stiffener extent - the 1\u0022 arch stiffener is shown on the intrados side only, its width is not dimensioned. From the stub web face to the flange tip (7 3/8 from the rib CL).",
               "JointGap": 0.0127,
+              "TieCutParallelToEndWeb": true,
               "GussetThickness": 0.0127,
               "GussetHeight": 0.2286,
               "GussetTopBelowWeb": 0.0127,
@@ -42288,7 +43220,8 @@
                 "Tie": "South tie",
                 "Splice": "RS5",
                 "OutsideLegHeight": 0.2524125,
-                "InsideLegHeight": 0.2587625
+                "InsideLegHeight": 0.2587625,
+                "EndWebEndBeyondChord": 0.23495
               },
               {
                 "Point": "T0\u0027",
@@ -42296,7 +43229,8 @@
                 "Tie": "North tie",
                 "Splice": "RS1\u0027",
                 "OutsideLegHeight": 0.2667,
-                "InsideLegHeight": 0.2667
+                "InsideLegHeight": 0.2667,
+                "EndWebEndBeyondChord": 0.21113749999999998
               }
             ],
             "EndWebOpeningsAt": [
@@ -42415,7 +43349,9 @@
           "Material": "ASTM A709 Gr. 50-F1 (FCM)",
           "RibWeldSize": 0.0079375,
           "RibWeldSetback": 0,
-          "RibWeldUnresolved": "UNRESOLVED (p.148): rib fin plate weld start - D = P3 - 1/2\u0022 implies the weld covers the P3 edge less 1/4\u0022 at each end, but the top corner clip (scaled 1\u0022, not dimensioned) shortens the flange contact edge. weld D from the end of the scaled 1\u0022 clip toward the pin; it runs up to 1/2\u0022 past the straight edge (CHECK rows)",
+          "RibWeldHoldBack": 0.00635,
+          "RibWeldHoldBackSource": "p.148 Section A-A: 1/4 \u002B- 1/8",
+          "RibWeldUnresolved": "UNRESOLVED (p.148): rib fin plate weld start - D = P3 - 1/2\u0022 implies the weld covers the P3 edge less 1/4\u0022 at each end, but the top corner clip (scaled 1\u0022, not dimensioned) shortens the flange contact edge. weld from 1/4\u0022 below the end of the scaled 1\u0022 clip toward the pin, length D but on the flange contact only (CHECK rows)",
           "WeldMaterial": "E70XX (AWS D1.5)"
         },
         "CableConnectors": [
@@ -43520,7 +44456,9 @@
               }
             ]
           },
-          "FlutesOnBarGrid": true
+          "FlutesOnBarGrid": true,
+          "KnuckleZonesFromSteel": true,
+          "KnuckleZoneUnresolved": "UNRESOLVED (p.124 / 125 / 151): deck concrete at the knuckle rib corners - the pocket between the outside and inside arch flange plate legs (open at the top, below the deck surface) is neither shown filled nor formed; p.151 ends the deck bars at the inside arch flange plate. Deck concrete stops at the deck-side face of the inside arch flange plate (vertical, from the end web to where the plate\u0027s intrados edge passes the slab top) and at the end web inside face; the pocket is not filled; curbs cut back to the same face."
         },
         "Bearings": [
           {
@@ -43531,6 +44469,7 @@
             "SteelUndersideZ": -0.053974999999999995,
             "Fixity": "Partially fixed",
             "HangFromSteel": true,
+            "PedestalAdjusted": true,
             "LongAxisAngleDeg": 63,
             "LongAxisSource": "p.102 pier plan: arch span pedestal 63 deg (TYP) to the CL pier; p.107 bearing plan inside it",
             "PadThickness": 0.003175,
@@ -43560,6 +44499,7 @@
             "SteelUndersideZ": -0.053974999999999995,
             "Fixity": "Partially fixed",
             "HangFromSteel": true,
+            "PedestalAdjusted": true,
             "LongAxisAngleDeg": 63,
             "LongAxisSource": "p.102 pier plan: arch span pedestal 63 deg (TYP) to the CL pier; p.107 bearing plan inside it",
             "PadThickness": 0.003175,
@@ -43589,6 +44529,7 @@
             "SteelUndersideZ": -0.053974999999999995,
             "Fixity": "Partially fixed",
             "HangFromSteel": true,
+            "PedestalAdjusted": true,
             "LongAxisAngleDeg": 63,
             "LongAxisSource": "p.102 pier plan: arch span pedestal 63 deg (TYP) to the CL pier; p.107 bearing plan inside it",
             "PadThickness": 0.003175,
@@ -43618,6 +44559,7 @@
             "SteelUndersideZ": -0.053974999999999995,
             "Fixity": "Partially fixed",
             "HangFromSteel": true,
+            "PedestalAdjusted": true,
             "LongAxisAngleDeg": 63,
             "LongAxisSource": "p.102 pier plan: arch span pedestal 63 deg (TYP) to the CL pier; p.107 bearing plan inside it",
             "PadThickness": 0.003175,
@@ -43642,7 +44584,7 @@
         ],
         "Unresolved": [
           "CONFLICT (p.129-140 sheet titles vs p.128 table): the bracing connection drawn on the sheet \u0027U(n) and U(n)\u0027 details\u0027 fits the table points U(12-n) / U(12-n)\u0027 (drawn gusset angles within 0.4 deg; at U(n) they are geometrically impossible, e.g. sheet U1: 24.6 deg vs \u003E= 36.2 deg at U1). Each sheet is modeled at U(12-n) / U(12-n)\u0027; U6 is its own mirror.",
-          "UNRESOLVED (p.102, 107, 119, 124): arch pedestal / bearing elevations (B1-B3) - the plan pedestal tops do not reconcile with the WP elevations \u002B bearing stack (0.13-0.20 ft; EL A vs E 0.053 ft). Bearings are built up from the plan pedestal tops; the chain difference is a CHECK row.",
+          "UNRESOLVED (p.102, 107, 119, 124): arch pedestal / bearing elevations (B1-B3) - the plan pedestal tops do not reconcile with the WP elevations \u002B bearing stack (0.13-0.20 ft; EL A vs E 0.053 ft). Bearings hang from the steel (p.107 Section A-A); the approach-unit pedestal tops are modeled at the stack bottom per p.107 note 8 / p.102 note 1 (contractor adjusts the pedestals); the p.102 differences are CHECK rows.",
           "UNRESOLVED (p.102): which arch pedestal is EL A / EL E - the view direction of the pier elevation is not stated on the sheet. EL A = south at Pier 10 / north at Pier 11, as derived from p.102 \u002B p.91 by the approach model.",
           "UNRESOLVED (p.94, 102, 119): CL1 / CL2 relative to the piers (U3) - no combination of the layout offsets reproduces the plan chord 200\u0027-11 11/16. CL1/CL2 = 7\u0022 along the pier \u002B 4 13/16\u0022 toward the span; the local geometry is kept and the difference reported.",
           "UNRESOLVED (p.119-150): camber / no-load geometry (U4) - not given. Final geometry modeled.",
@@ -43657,7 +44599,7 @@
         {
           "Name": "High LT",
           "TypeName": "RAIL (PED)(HIGH)",
-          "Kind": "Guardrail",
+          "Kind": "Fence",
           "Offset": -2.1336,
           "BeginLimitOffset": 0.23495,
           "EndLimitOffset": 0.23495,
@@ -43665,155 +44607,161 @@
           "Material": "Stainless steel AISI 316 (p.83)",
           "Density": 7980,
           "SampleStep": 0.3048,
-          "Envelope": [
-            {
-              "R": 0.0508,
-              "H": 0
-            },
-            {
-              "R": 0.2032,
-              "H": 0
-            },
-            {
-              "R": 0.2032,
-              "H": 1.7525999999999995
-            },
-            {
-              "R": 0.20098080729166937,
-              "H": 1.8337708593750002
-            },
-            {
-              "R": 0.19433645833333332,
-              "H": 1.914604374999999
-            },
-            {
-              "R": 0.18328679687499883,
-              "H": 1.9949219531249998
-            },
-            {
-              "R": 0.16785166666666512,
-              "H": 2.074544999999999
-            },
-            {
-              "R": 0.14805091145833332,
-              "H": 2.1532949218749997
-            },
-            {
-              "R": 0.12390437499999885,
-              "H": 2.2309931249999995
-            },
-            {
-              "R": 0.09543190104166667,
-              "H": 2.307461015625
-            },
-            {
-              "R": 0.06265333333333217,
-              "H": 2.38252
-            },
-            {
-              "R": 0.026326041666666664,
-              "H": 2.4556839062499995
-            },
-            {
-              "R": -0.01397000000000077,
-              "H": 2.5265062499999997
-            },
-            {
-              "R": -0.05807604166666667,
-              "H": 2.5948679687499996
-            },
-            {
-              "R": -0.10583333333333525,
-              "H": 2.6606499999999995
-            },
-            {
-              "R": -0.15708312500000116,
-              "H": 2.72373328125
-            },
-            {
-              "R": -0.21166666666666667,
-              "H": 2.7839987499999994
-            },
-            {
-              "R": -0.2694252083333341,
-              "H": 2.8413273437499997
-            },
-            {
-              "R": -0.3302,
-              "H": 2.8955999999999995
-            },
-            {
-              "R": -0.3589866666666674,
-              "H": 2.8600399999999992
-            },
-            {
-              "R": -0.30265356770833257,
-              "H": 2.806485026041666
-            },
-            {
-              "R": -0.24931687500000266,
-              "H": 2.7500527083333326
-            },
-            {
-              "R": -0.19911549479166665,
-              "H": 2.6908819531249994
-            },
-            {
-              "R": -0.15218833333333448,
-              "H": 2.6291116666666663
-            },
-            {
-              "R": -0.10867429687500076,
-              "H": 2.564880755208333
-            },
-            {
-              "R": -0.0687122916666659,
-              "H": 2.4983281249999996
-            },
-            {
-              "R": -0.032441223958334105,
-              "H": 2.429592682291666
-            },
-            {
-              "R": 0,
-              "H": 2.358813333333333
-            },
-            {
-              "R": 0.028485703124999612,
-              "H": 2.2863009635416667
-            },
-            {
-              "R": 0.05294312499999962,
-              "H": 2.2124193749999996
-            },
-            {
-              "R": 0.07331273437499847,
-              "H": 2.1373868489583328
-            },
-            {
-              "R": 0.08953499999999846,
-              "H": 2.0614216666666656
-            },
-            {
-              "R": 0.101550390625,
-              "H": 1.9847421093749997
-            },
-            {
-              "R": 0.10929937499999769,
-              "H": 1.9075664583333332
-            },
-            {
-              "R": 0.11272242187499769,
-              "H": 1.830112994791666
-            },
-            {
-              "R": 0.11175999999999844,
-              "H": 1.7525999999999995
-            }
-          ],
-          "EnvelopeMassPerLength": 148.816394,
-          "EnvelopeUnresolved": "UNRESOLVED (p.84, 89, 90): railing posts / fencing - the project \u0027Pedestrian railing details\u0027 / RAIL (PED) sheets that size the posts, rails, fencing, base plates and anchors are not in this reduced set (p.89, p.90 refer to them), p.84 note 2 says the number and spacing of the posts is diagrammatic only, and the railing is not a TxDOT standard type (RL-PR3 / PR11 / PR22 / PR3-HD / CLF-RO 2019 checked: 3\u0027-6 / 4\u0027-0 galvanized plate-post or pilaster rails and an 8 ft chain link fence vs the p.89 4\u0027-3 / 9\u0027-10 tapered stainless posts, Item 5110 special pay item)",
-          "EnvelopeBasis": "p.89 HIGH post outline swept continuously (scaled; 9\u0027-10 dimensioned); mass = p.83 design dead load 100 PLF",
+          "Post": {
+            "Profile": [
+              {
+                "R": 0.0508,
+                "H": 0
+              },
+              {
+                "R": 0.2032,
+                "H": 0
+              },
+              {
+                "R": 0.2032,
+                "H": 1.7525999999999995
+              },
+              {
+                "R": 0.20098080729166937,
+                "H": 1.8337708593750002
+              },
+              {
+                "R": 0.19433645833333332,
+                "H": 1.914604374999999
+              },
+              {
+                "R": 0.18328679687499883,
+                "H": 1.9949219531249998
+              },
+              {
+                "R": 0.16785166666666512,
+                "H": 2.074544999999999
+              },
+              {
+                "R": 0.14805091145833332,
+                "H": 2.1532949218749997
+              },
+              {
+                "R": 0.12390437499999885,
+                "H": 2.2309931249999995
+              },
+              {
+                "R": 0.09543190104166667,
+                "H": 2.307461015625
+              },
+              {
+                "R": 0.06265333333333217,
+                "H": 2.38252
+              },
+              {
+                "R": 0.026326041666666664,
+                "H": 2.4556839062499995
+              },
+              {
+                "R": -0.01397000000000077,
+                "H": 2.5265062499999997
+              },
+              {
+                "R": -0.05807604166666667,
+                "H": 2.5948679687499996
+              },
+              {
+                "R": -0.10583333333333525,
+                "H": 2.6606499999999995
+              },
+              {
+                "R": -0.15708312500000116,
+                "H": 2.72373328125
+              },
+              {
+                "R": -0.21166666666666667,
+                "H": 2.7839987499999994
+              },
+              {
+                "R": -0.2694252083333341,
+                "H": 2.8413273437499997
+              },
+              {
+                "R": -0.3302,
+                "H": 2.8955999999999995
+              },
+              {
+                "R": -0.3589866666666674,
+                "H": 2.8600399999999992
+              },
+              {
+                "R": -0.30265356770833257,
+                "H": 2.806485026041666
+              },
+              {
+                "R": -0.24931687500000266,
+                "H": 2.7500527083333326
+              },
+              {
+                "R": -0.19911549479166665,
+                "H": 2.6908819531249994
+              },
+              {
+                "R": -0.15218833333333448,
+                "H": 2.6291116666666663
+              },
+              {
+                "R": -0.10867429687500076,
+                "H": 2.564880755208333
+              },
+              {
+                "R": -0.0687122916666659,
+                "H": 2.4983281249999996
+              },
+              {
+                "R": -0.032441223958334105,
+                "H": 2.429592682291666
+              },
+              {
+                "R": 0,
+                "H": 2.358813333333333
+              },
+              {
+                "R": 0.028485703124999612,
+                "H": 2.2863009635416667
+              },
+              {
+                "R": 0.05294312499999962,
+                "H": 2.2124193749999996
+              },
+              {
+                "R": 0.07331273437499847,
+                "H": 2.1373868489583328
+              },
+              {
+                "R": 0.08953499999999846,
+                "H": 2.0614216666666656
+              },
+              {
+                "R": 0.101550390625,
+                "H": 1.9847421093749997
+              },
+              {
+                "R": 0.10929937499999769,
+                "H": 1.9075664583333332
+              },
+              {
+                "R": 0.11272242187499769,
+                "H": 1.830112994791666
+              },
+              {
+                "R": 0.11175999999999844,
+                "H": 1.7525999999999995
+              }
+            ],
+            "Thickness": 0.15239999999999998,
+            "Spacing": 2.4384,
+            "EndDistance": 0,
+            "GridStation": 712.847952,
+            "Description": "Tapered post 9\u0027-10 (p.89 outline x 6\u0022)",
+            "Unresolved": "UNRESOLVED (p.84 note 2, p.85-88, p.89, p.90): railing post thickness along the rail, post base plates, anchor bolts and the connection to the curb - the project \u0027Pedestrian railing details\u0027 sheets (224-226) are not in the set; p.89 draws only the side outline, p.84 note 2 says the number and spacing of the posts is diagrammatic only, and the railing is not a TxDOT standard type.",
+            "Basis": "p.89 HIGH post outline (scaled; 9\u0027-10 dimensioned) x 6\u0022 thick (the p.85-88 elevation symbol width), 8\u0027-0 on CL NHT stations from the transition (p.85-88)"
+          },
           "Members": [
             {
               "Name": "HR",
@@ -43826,16 +44774,105 @@
               "Description": "Handrail pipe, 1.87\u0022 OD scaled (p.89)",
               "MassPerLength": 0,
               "Unresolved": "UNRESOLVED (p.89): handrail pipe size, wall and bracket - drawn only; the \u0027Pedestrian railing details\u0027 sheets are not in the set",
-              "Basis": "pipe OD 1.87\u0022 and position scaled from the p.89 vectors; top 3\u0027-0 above the trail (dimensioned); mass inside the plan design dead load of the envelope"
+              "Basis": "pipe OD 1.87\u0022 and position scaled from the p.89 vectors; top 3\u0027-0 above the trail (dimensioned); wall unknown: modeled solid, weight not counted"
             }
           ],
+          "Fabric": {
+            "Description": "Fence fabric panel (chain link guess, 9 ga 2 in mesh)",
+            "Path": [
+              {
+                "R": 0.2032,
+                "H": 0
+              },
+              {
+                "R": 0.2032,
+                "H": 1.7525999999999995
+              },
+              {
+                "R": 0.20098080729166937,
+                "H": 1.8337708593750002
+              },
+              {
+                "R": 0.19433645833333332,
+                "H": 1.914604374999999
+              },
+              {
+                "R": 0.18328679687499883,
+                "H": 1.9949219531249998
+              },
+              {
+                "R": 0.16785166666666512,
+                "H": 2.074544999999999
+              },
+              {
+                "R": 0.14805091145833332,
+                "H": 2.1532949218749997
+              },
+              {
+                "R": 0.12390437499999885,
+                "H": 2.2309931249999995
+              },
+              {
+                "R": 0.09543190104166667,
+                "H": 2.307461015625
+              },
+              {
+                "R": 0.06265333333333217,
+                "H": 2.38252
+              },
+              {
+                "R": 0.026326041666666664,
+                "H": 2.4556839062499995
+              },
+              {
+                "R": -0.01397000000000077,
+                "H": 2.5265062499999997
+              },
+              {
+                "R": -0.05807604166666667,
+                "H": 2.5948679687499996
+              },
+              {
+                "R": -0.10583333333333525,
+                "H": 2.6606499999999995
+              },
+              {
+                "R": -0.15708312500000116,
+                "H": 2.72373328125
+              },
+              {
+                "R": -0.21166666666666667,
+                "H": 2.7839987499999994
+              },
+              {
+                "R": -0.2694252083333341,
+                "H": 2.8413273437499997
+              },
+              {
+                "R": -0.3302,
+                "H": 2.8955999999999995
+              },
+              {
+                "R": -0.3589866666666674,
+                "H": 2.8600399999999992
+              }
+            ],
+            "OffsetFromPost": 0.0037592,
+            "BottomH": 0,
+            "Thickness": 0.0075184,
+            "MassPerArea": 1.9529710560000002,
+            "Material": "Chain link fabric (type UNRESOLVED; galvanized steel guess)",
+            "Unresolved": "UNRESOLVED (p.89, p.84-88, p.91, p.3): fence fabric type, height range, side of the posts and weight - the \u0027Pedestrian railing details\u0027 sheets 224-226 that define the fencing are not in the set (p.89 only says \u0027for railing and fencing details see ...\u0027); the elevations p.85-88 draw a panel between every pair of posts, no fabric pay item is on p.91. Chain link guess: 9 gauge (0.148\u0022) 2 in mesh, 0.40 lb/ft2, outer face of the posts from the curb to the post top, 8\u0027-0 bays; drawn see-through.",
+            "Basis": "chain link guess 9 ga (0.148\u0022) 2 in mesh, 0.40 lb/ft2 nominal, on the outer face of the posts, curb top to post top (the elevations p.85-88 draw the panels full height); not a plan value"
+          },
+          "FlagsDimensionOnly": true,
           "Source": "p.83, 84-88, 89, 90, 91",
           "Unresolved": []
         },
         {
           "Name": "High RT",
           "TypeName": "RAIL (PED)(HIGH)",
-          "Kind": "Guardrail",
+          "Kind": "Fence",
           "Offset": 2.1336,
           "BeginLimitOffset": 0.23495,
           "EndLimitOffset": 0.23495,
@@ -43843,155 +44880,161 @@
           "Material": "Stainless steel AISI 316 (p.83)",
           "Density": 7980,
           "SampleStep": 0.3048,
-          "Envelope": [
-            {
-              "R": 0.0508,
-              "H": 0
-            },
-            {
-              "R": 0.2032,
-              "H": 0
-            },
-            {
-              "R": 0.2032,
-              "H": 1.7525999999999995
-            },
-            {
-              "R": 0.20098080729166937,
-              "H": 1.8337708593750002
-            },
-            {
-              "R": 0.19433645833333332,
-              "H": 1.914604374999999
-            },
-            {
-              "R": 0.18328679687499883,
-              "H": 1.9949219531249998
-            },
-            {
-              "R": 0.16785166666666512,
-              "H": 2.074544999999999
-            },
-            {
-              "R": 0.14805091145833332,
-              "H": 2.1532949218749997
-            },
-            {
-              "R": 0.12390437499999885,
-              "H": 2.2309931249999995
-            },
-            {
-              "R": 0.09543190104166667,
-              "H": 2.307461015625
-            },
-            {
-              "R": 0.06265333333333217,
-              "H": 2.38252
-            },
-            {
-              "R": 0.026326041666666664,
-              "H": 2.4556839062499995
-            },
-            {
-              "R": -0.01397000000000077,
-              "H": 2.5265062499999997
-            },
-            {
-              "R": -0.05807604166666667,
-              "H": 2.5948679687499996
-            },
-            {
-              "R": -0.10583333333333525,
-              "H": 2.6606499999999995
-            },
-            {
-              "R": -0.15708312500000116,
-              "H": 2.72373328125
-            },
-            {
-              "R": -0.21166666666666667,
-              "H": 2.7839987499999994
-            },
-            {
-              "R": -0.2694252083333341,
-              "H": 2.8413273437499997
-            },
-            {
-              "R": -0.3302,
-              "H": 2.8955999999999995
-            },
-            {
-              "R": -0.3589866666666674,
-              "H": 2.8600399999999992
-            },
-            {
-              "R": -0.30265356770833257,
-              "H": 2.806485026041666
-            },
-            {
-              "R": -0.24931687500000266,
-              "H": 2.7500527083333326
-            },
-            {
-              "R": -0.19911549479166665,
-              "H": 2.6908819531249994
-            },
-            {
-              "R": -0.15218833333333448,
-              "H": 2.6291116666666663
-            },
-            {
-              "R": -0.10867429687500076,
-              "H": 2.564880755208333
-            },
-            {
-              "R": -0.0687122916666659,
-              "H": 2.4983281249999996
-            },
-            {
-              "R": -0.032441223958334105,
-              "H": 2.429592682291666
-            },
-            {
-              "R": 0,
-              "H": 2.358813333333333
-            },
-            {
-              "R": 0.028485703124999612,
-              "H": 2.2863009635416667
-            },
-            {
-              "R": 0.05294312499999962,
-              "H": 2.2124193749999996
-            },
-            {
-              "R": 0.07331273437499847,
-              "H": 2.1373868489583328
-            },
-            {
-              "R": 0.08953499999999846,
-              "H": 2.0614216666666656
-            },
-            {
-              "R": 0.101550390625,
-              "H": 1.9847421093749997
-            },
-            {
-              "R": 0.10929937499999769,
-              "H": 1.9075664583333332
-            },
-            {
-              "R": 0.11272242187499769,
-              "H": 1.830112994791666
-            },
-            {
-              "R": 0.11175999999999844,
-              "H": 1.7525999999999995
-            }
-          ],
-          "EnvelopeMassPerLength": 148.816394,
-          "EnvelopeUnresolved": "UNRESOLVED (p.84, 89, 90): railing posts / fencing - the project \u0027Pedestrian railing details\u0027 / RAIL (PED) sheets that size the posts, rails, fencing, base plates and anchors are not in this reduced set (p.89, p.90 refer to them), p.84 note 2 says the number and spacing of the posts is diagrammatic only, and the railing is not a TxDOT standard type (RL-PR3 / PR11 / PR22 / PR3-HD / CLF-RO 2019 checked: 3\u0027-6 / 4\u0027-0 galvanized plate-post or pilaster rails and an 8 ft chain link fence vs the p.89 4\u0027-3 / 9\u0027-10 tapered stainless posts, Item 5110 special pay item)",
-          "EnvelopeBasis": "p.89 HIGH post outline swept continuously (scaled; 9\u0027-10 dimensioned); mass = p.83 design dead load 100 PLF",
+          "Post": {
+            "Profile": [
+              {
+                "R": 0.0508,
+                "H": 0
+              },
+              {
+                "R": 0.2032,
+                "H": 0
+              },
+              {
+                "R": 0.2032,
+                "H": 1.7525999999999995
+              },
+              {
+                "R": 0.20098080729166937,
+                "H": 1.8337708593750002
+              },
+              {
+                "R": 0.19433645833333332,
+                "H": 1.914604374999999
+              },
+              {
+                "R": 0.18328679687499883,
+                "H": 1.9949219531249998
+              },
+              {
+                "R": 0.16785166666666512,
+                "H": 2.074544999999999
+              },
+              {
+                "R": 0.14805091145833332,
+                "H": 2.1532949218749997
+              },
+              {
+                "R": 0.12390437499999885,
+                "H": 2.2309931249999995
+              },
+              {
+                "R": 0.09543190104166667,
+                "H": 2.307461015625
+              },
+              {
+                "R": 0.06265333333333217,
+                "H": 2.38252
+              },
+              {
+                "R": 0.026326041666666664,
+                "H": 2.4556839062499995
+              },
+              {
+                "R": -0.01397000000000077,
+                "H": 2.5265062499999997
+              },
+              {
+                "R": -0.05807604166666667,
+                "H": 2.5948679687499996
+              },
+              {
+                "R": -0.10583333333333525,
+                "H": 2.6606499999999995
+              },
+              {
+                "R": -0.15708312500000116,
+                "H": 2.72373328125
+              },
+              {
+                "R": -0.21166666666666667,
+                "H": 2.7839987499999994
+              },
+              {
+                "R": -0.2694252083333341,
+                "H": 2.8413273437499997
+              },
+              {
+                "R": -0.3302,
+                "H": 2.8955999999999995
+              },
+              {
+                "R": -0.3589866666666674,
+                "H": 2.8600399999999992
+              },
+              {
+                "R": -0.30265356770833257,
+                "H": 2.806485026041666
+              },
+              {
+                "R": -0.24931687500000266,
+                "H": 2.7500527083333326
+              },
+              {
+                "R": -0.19911549479166665,
+                "H": 2.6908819531249994
+              },
+              {
+                "R": -0.15218833333333448,
+                "H": 2.6291116666666663
+              },
+              {
+                "R": -0.10867429687500076,
+                "H": 2.564880755208333
+              },
+              {
+                "R": -0.0687122916666659,
+                "H": 2.4983281249999996
+              },
+              {
+                "R": -0.032441223958334105,
+                "H": 2.429592682291666
+              },
+              {
+                "R": 0,
+                "H": 2.358813333333333
+              },
+              {
+                "R": 0.028485703124999612,
+                "H": 2.2863009635416667
+              },
+              {
+                "R": 0.05294312499999962,
+                "H": 2.2124193749999996
+              },
+              {
+                "R": 0.07331273437499847,
+                "H": 2.1373868489583328
+              },
+              {
+                "R": 0.08953499999999846,
+                "H": 2.0614216666666656
+              },
+              {
+                "R": 0.101550390625,
+                "H": 1.9847421093749997
+              },
+              {
+                "R": 0.10929937499999769,
+                "H": 1.9075664583333332
+              },
+              {
+                "R": 0.11272242187499769,
+                "H": 1.830112994791666
+              },
+              {
+                "R": 0.11175999999999844,
+                "H": 1.7525999999999995
+              }
+            ],
+            "Thickness": 0.15239999999999998,
+            "Spacing": 2.4384,
+            "EndDistance": 0,
+            "GridStation": 712.847952,
+            "Description": "Tapered post 9\u0027-10 (p.89 outline x 6\u0022)",
+            "Unresolved": "UNRESOLVED (p.84 note 2, p.85-88, p.89, p.90): railing post thickness along the rail, post base plates, anchor bolts and the connection to the curb - the project \u0027Pedestrian railing details\u0027 sheets (224-226) are not in the set; p.89 draws only the side outline, p.84 note 2 says the number and spacing of the posts is diagrammatic only, and the railing is not a TxDOT standard type.",
+            "Basis": "p.89 HIGH post outline (scaled; 9\u0027-10 dimensioned) x 6\u0022 thick (the p.85-88 elevation symbol width), 8\u0027-0 on CL NHT stations from the transition (p.85-88)"
+          },
           "Members": [
             {
               "Name": "HR",
@@ -44004,9 +45047,98 @@
               "Description": "Handrail pipe, 1.87\u0022 OD scaled (p.89)",
               "MassPerLength": 0,
               "Unresolved": "UNRESOLVED (p.89): handrail pipe size, wall and bracket - drawn only; the \u0027Pedestrian railing details\u0027 sheets are not in the set",
-              "Basis": "pipe OD 1.87\u0022 and position scaled from the p.89 vectors; top 3\u0027-0 above the trail (dimensioned); mass inside the plan design dead load of the envelope"
+              "Basis": "pipe OD 1.87\u0022 and position scaled from the p.89 vectors; top 3\u0027-0 above the trail (dimensioned); wall unknown: modeled solid, weight not counted"
             }
           ],
+          "Fabric": {
+            "Description": "Fence fabric panel (chain link guess, 9 ga 2 in mesh)",
+            "Path": [
+              {
+                "R": 0.2032,
+                "H": 0
+              },
+              {
+                "R": 0.2032,
+                "H": 1.7525999999999995
+              },
+              {
+                "R": 0.20098080729166937,
+                "H": 1.8337708593750002
+              },
+              {
+                "R": 0.19433645833333332,
+                "H": 1.914604374999999
+              },
+              {
+                "R": 0.18328679687499883,
+                "H": 1.9949219531249998
+              },
+              {
+                "R": 0.16785166666666512,
+                "H": 2.074544999999999
+              },
+              {
+                "R": 0.14805091145833332,
+                "H": 2.1532949218749997
+              },
+              {
+                "R": 0.12390437499999885,
+                "H": 2.2309931249999995
+              },
+              {
+                "R": 0.09543190104166667,
+                "H": 2.307461015625
+              },
+              {
+                "R": 0.06265333333333217,
+                "H": 2.38252
+              },
+              {
+                "R": 0.026326041666666664,
+                "H": 2.4556839062499995
+              },
+              {
+                "R": -0.01397000000000077,
+                "H": 2.5265062499999997
+              },
+              {
+                "R": -0.05807604166666667,
+                "H": 2.5948679687499996
+              },
+              {
+                "R": -0.10583333333333525,
+                "H": 2.6606499999999995
+              },
+              {
+                "R": -0.15708312500000116,
+                "H": 2.72373328125
+              },
+              {
+                "R": -0.21166666666666667,
+                "H": 2.7839987499999994
+              },
+              {
+                "R": -0.2694252083333341,
+                "H": 2.8413273437499997
+              },
+              {
+                "R": -0.3302,
+                "H": 2.8955999999999995
+              },
+              {
+                "R": -0.3589866666666674,
+                "H": 2.8600399999999992
+              }
+            ],
+            "OffsetFromPost": 0.0037592,
+            "BottomH": 0,
+            "Thickness": 0.0075184,
+            "MassPerArea": 1.9529710560000002,
+            "Material": "Chain link fabric (type UNRESOLVED; galvanized steel guess)",
+            "Unresolved": "UNRESOLVED (p.89, p.84-88, p.91, p.3): fence fabric type, height range, side of the posts and weight - the \u0027Pedestrian railing details\u0027 sheets 224-226 that define the fencing are not in the set (p.89 only says \u0027for railing and fencing details see ...\u0027); the elevations p.85-88 draw a panel between every pair of posts, no fabric pay item is on p.91. Chain link guess: 9 gauge (0.148\u0022) 2 in mesh, 0.40 lb/ft2, outer face of the posts from the curb to the post top, 8\u0027-0 bays; drawn see-through.",
+            "Basis": "chain link guess 9 ga (0.148\u0022) 2 in mesh, 0.40 lb/ft2 nominal, on the outer face of the posts, curb top to post top (the elevations p.85-88 draw the panels full height); not a plan value"
+          },
+          "FlagsDimensionOnly": true,
           "Source": "p.83, 84-88, 89, 90, 91",
           "Unresolved": []
         }

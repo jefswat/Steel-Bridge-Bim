@@ -1,0 +1,10 @@
+page,sheet,view,item,value,quoted_source_text
+293,O-39,Schedule,P13,"pad 13 x 22, 5 x 1/2 int, 6 x 1/8, ext 1/4, H 3 3/4; PL 2 1/2 x 23 x 14; 4.52 / -4.92 %",P13 SPAN NO. 14 - ALL GIRDERS 13 22 5 1/2 6 1/4 3 3/4 2 1/2 23 14 4.52 -4.92
+293,O-39,Schedule,P14,20 x 30 x 3 3/4; PL 31 x 21; 6.00 / -1.48,P14 SPANS NO. 14 & 15 - ALL GIRDERS 20 30 5 1/2 6 1/4 3 3/4 2 1/2 31 21 6.00 -1.48
+293,O-39,Schedule,P15,22 x 30 x 3 3/4; PL 31 x 23; 6.00 / -0.57,P15 SPANS NO. 15 & 16 - ALL GIRDERS 22 30 5 1/2 6 1/4 3 3/4 2 1/2 31 23 6.00 -0.57
+293,O-39,Schedule,P16,"15 x 23 x 5 (7 int, 8 lam); PL 24 x 16; 6.00 / -0.57",P16 SPAN NO. 16 - ALL GIRDERS 15 23 7 1/2 8 1/4 5 2 1/2 24 16 6.00 -0.57
+293,O-39,Bearing location schematic,types,"P13 G1, P14 F1, P15 G2, P16 G1",G1 / F1 / G2 marks on schematic
+292,O-38,Bearing plans,anchor bolts,G1: 2 AB; G2: 4; F1: 4; 2 in dia; 1'-9 1/2 each side; 9 from CL brg,2-6 DIA. HOLES FOR 2 DIA. ANCHOR BOLTS / 4-2 1/2 DIA. HOLES FOR 2 DIA. ANCHOR BOLTS / 1'-9 1/2
+292,O-38,Typical section at bearing,offset / contact plates / holes,"3 in CL brg horizontal offset; 8x8x1/2 top contact PL with 2 1/2 x 6 slot; 4x4 bottom contact PL; 6 in hole in BF at exp., 2 1/2 at fixed","HORIZ. OFFSET 3 CL BRG. / 8x8x1/2 TOP CONTACT PL / 6 DIA. HOLE IN BOTT. PL @ EXP. BRGS, 2 1/2 DIA. HOLE @ FIXED BRGS"
+292,O-38,Detail of anchor bolt,anchor bolt,"2 in dia, 3'-0 long, 1'-3 min into concrete",3'-0 / 2 DIA. THREADED BOLT / 1'-3 MIN. INTO CONCRETE
+292,O-38,Note 3,material,sole and contact plates AASHTO M270 Gr 50W,ALL STRUCTURAL STEEL FOR SOLE PLATES AND CONTACT PLATES SHALL BE AASHTO M270 GR 50W

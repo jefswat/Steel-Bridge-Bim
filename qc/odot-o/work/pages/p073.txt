@@ -1,0 +1,531 @@
+RAMP 44A OVER DEEP FORK CR., & 1-44
+EPOXY COATED REINFORCING
+(ONE REQUIRED)
+PLAIN REINFORCING
+MARK SIZE QTY. FORM
+LENGTH
+REMARKS
+MARK SIZE QTY. FORM
+LENGTH
+REMARKS
+PIER NO.7 BAR LIST
+EPOXY COATED REINFORCING
+(ONE REQUIRED)
+PLAIN REINFORCING
+MARK SIZE QTY. FORM
+LENGTH
+REMARKS
+MARK SIZE QTY. FORM
+LENGTH
+REMARKS
+PIER NO.8 BAR LIST
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+#4    
+#4    
+#4    
+#4    
+#5    
+#5    
+#6    
+#6    
+#6    
+#6    
+#6    
+#6    
+#11   
+#5    
+#11   
+#5    
+#5    
+#5    
+#11   
+#11   
+#11   
+#5    
+#5    
+#9    
+#11     
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+#4    
+#4    
+#4    
+#4    
+#5    
+#5    
+#6    
+#6    
+#6    
+#6    
+#6    
+#6    
+#11   
+#5    
+#11   
+#5    
+#5    
+#5    
+#11   
+#11   
+#11   
+#5    
+#5    
+#9    
+#11     
+ITEM
+UNIT
+PIER NO. 4,5,6,7 & 8 QUANTITIES
+PIER 4
+PIER 5
+PIER 6
+PIER 7
+PIER 8
+PU2
+PU1
+CE2
+CE1
+PS2
+PS1
+PH7
+PH6
+PH5
+PH4
+PH3
+PH2
+PH1
+T1
+C1
+T4
+T3
+T2
+CD1
+CD2
+CH1 
+FS1
+FH3
+FH2
+FH1
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+14'-11" TO 16'-9"     
+17'-3" TO 20'-5"      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+        
+PU2
+PU1
+CE2
+CE1
+PS2
+PS1
+PH7
+PH6
+PH5
+PH4
+PH3
+PH2
+PH1
+T1
+C1
+T4
+T3
+T2
+CD1
+CD2
+CH1 
+FS1
+FH3
+FH2
+FH1
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+14'-11" TO 16'-9"     
+17'-3" TO 20'-5"      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+        
+DT1
+DS1
+      
+      
+      
+      
+      
+W20   
+#11     
+BNT.
+BNT.
+999'-0" 
+35'-7" 
+DT1
+DS1
+BNT.
+BNT.
+      
+      
+      
+      
+      
+W20   
+#11     
+983'-0" 
+35'-1" 
+BNT.
+BNT.
+BNT.
+BNT.
+BNT.
+BNT.
+STR.
+STR.
+STR.
+STR.
+STR.
+BNT.
+BNT.
+BNT.
+BNT.
+BNT.
+BNT.
+BNT.
+STR.
+BNT.
+BNT.
+BNT.
+STR.
+BNT.
+BNT.
+BNT.
+BNT.
+BNT.
+BNT.
+BNT.
+BNT.
+STR.
+STR.
+STR.
+STR.
+STR.
+BNT.
+BNT.
+BNT.
+BNT.
+BNT.
+BNT.
+BNT.
+STR.
+BNT.
+BNT.
+BNT.
+STR.
+BNT.
+BNT.
+18
+24
+8
+12
+24
+68
+2
+2
+2
+6
+2
+10
+20
+90
+56
+9
+18
+18
+56
+56
+21
+50
+6
+10
+21
+18
+24
+8
+12
+24
+68
+2
+2
+2
+6
+2
+10
+20
+86
+56
+9
+18
+18
+56
+56
+21
+50
+6
+10
+21
+K-28
+IN THE QUANTITIES.
+PURPOSES ONLY.  THE BARS NOTED ARE NOT INCLUDED
+THE DRILLED SHAFT BARS ARE FOR INFORMATION
+1.
+NOTES:
+2
+100
+2
+100
+9'-9" 
+7'-5" 
+8'-5" 
+8'-4" 
+15'-10" (AVG.)
+18'-10" (AVG.)
+9'-7" 
+19'-8" 
+29'-8" 
+39'-9" 
+39'-3" 
+40'-6" 
+41'-8" 
+20'-9" 
+51'-7" 
+14'-9" 
+5'-9" 
+26'-11" 
+24'-4" 
+15'-7" 
+16'-7" 
+17'-9" 
+20'-11" 
+23'-5" 
+24'-1" 
+9'-9" 
+7'-5" 
+8'-5" 
+8'-4" 
+15'-10" (AVG.)
+18'-10" (AVG.)
+9'-7" 
+19'-8" 
+29'-8" 
+39'-9" 
+39'-3" 
+40'-6" 
+41'-8" 
+20'-9" 
+49'-9" 
+14'-9" 
+5'-9" 
+26'-11" 
+24'-4" 
+15'-7" 
+16'-7" 
+17'-9" 
+20'-11" 
+23'-5" 
+24'-1" 
+      
+      
+      
+      
+SEE NOTE 1    
+SEE NOTE 1      
+      
+      
+      
+      
+      
+SEE NOTE 1    
+SEE NOTE 1      
+(PL) ORNAMENTAL MEDALLION
+DRILLED SHAFTS 96" DIAMETER
+DRILLED SHAFTS 84" DIAMETER
+DRILLED SHAFTS 72" DIAMETER
+DRILLED SHAFTS 60" DIAMETER
+WATER REPELLENT (VISUALLY INSPECTED)
+EPOXY COATED REINF. STEEL
+REINFORCING STEEL
+GRAFFITI TREATMENT
+CLASS A CONCRETE
+SUBSTRUCTURE EXCAVATION COMMON
+EA
+LF
+LF
+LF
+LF
+SY
+LB
+LB
+SF
+CY
+CY
+2
+0
+0
+80
+0
+290
+43850
+0
+643
+158.6
+95
+2
+0
+0
+61
+0
+289
+43830
+0
+643
+158.4
+80
+2
+0
+0
+61
+0
+295
+44460
+0
+643
+161.1
+80
+2
+0
+0
+90
+0
+286
+43440
+0
+643
+156.7
+80
+2
+0
+0
+71
+0
+316
+43630
+0
+643
+171.0
+70
+BRIDGE 'K'
+PIER NO.4,5,6,7 & 8 DETAILS
+(SHEET 3 OF 3)
+09033(11)
+ I-235 / I-44
+OKLAHOMA COUNTY
+P:\FDB\1641-OKC\CIV\30305400\20_CAD\DGN\S\BRIDGE K\B2BSP_4_5_6_7_8_K03.dgn
+11/19/2016
+DESIGN
+DRAWN
+CHECKED
+APPROVED
+SQUAD
+JOB PIECE NO.
+SHEET NO.
+11/16
+11/16
+11/16
+11/16
+11/21/2016
+OKLAHOMA DEPARTMENT OF TRANSPORTATION
+MEETING
+FINAL FIELD
+BENHAM

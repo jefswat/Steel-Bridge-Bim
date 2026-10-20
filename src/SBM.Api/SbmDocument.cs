@@ -97,6 +97,10 @@ public sealed class SbmDocument
     /// <summary>Wraps an existing in-memory project (used by the desktop app's script runner).</summary>
     public static SbmDocument Attach(BridgeProject project, string? path = null) => new(project, path);
 
+    /// <summary>Wraps an in-memory project together with its already generated results (one per bridge, in project order), so result
+    /// queries (<see cref="Model"/>) do not regenerate. Used by the app's calc comparison.</summary>
+    public static SbmDocument Attach(BridgeProject project, string? path, IReadOnlyList<BridgeModel?> models) => new(project, path) { _models = models.ToList() };
+
     public void Save(string? path = null)
     {
         path ??= FilePath ?? throw new InvalidOperationException("No file path; pass one to Save.");
@@ -339,11 +343,12 @@ public sealed class SbmDocument
     // ------------------------------------------------------------------ export
 
     /// <param name="chordTolerance">ReferenceView only: max sagitta (m) of hole / profile-arc polygons; 0 = 1/32 in.</param>
-    public IfcExportResult ExportIfc(string path, IfcGeometryMode geometry = IfcGeometryMode.Parametric, double chordTolerance = 0)
+    /// <param name="forCheck">Checking export: the originator's interpretation is stripped (see IfcCheckFilter, docs/API.md); geometry is identical.</param>
+    public IfcExportResult ExportIfc(string path, IfcGeometryMode geometry = IfcGeometryMode.Parametric, double chordTolerance = 0, bool forCheck = false, bool keepDesignations = false)
     {
         Regenerate();
         var data = _models.OfType<BridgeModel>().Where(m => m.Steel != null || m.Prestressed != null || m.Concrete?.Segmental != null).Select(m => new IfcBridgeData(m.Framing, m.Steel, m.Concrete, m.Substructure, m.Prestressed)).ToList();
-        return IfcExporter.Export(path, Project, data, new IfcExportOptions(geometry, chordTolerance));
+        return IfcExporter.Export(path, Project, data, new IfcExportOptions(geometry, chordTolerance, forCheck, keepDesignations));
     }
 
     /// <summary>Writes the companion SQLite database (element registry with IFC GlobalIds and hierarchy, plan sheets, sheet links, QC).</summary>

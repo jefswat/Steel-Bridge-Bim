@@ -84,6 +84,7 @@ public sealed class RegenerationCache
                 var am = SBM.Core.Arch.ArchGenerator.Generate(f, project.Units);
                 st = am.Steel;
                 cm = am.Concrete;
+                RoundBends(cm, null);
             }
             else if (includeSteel && !f.HasErrors && b.Segmental != null)
             {
@@ -98,6 +99,7 @@ public sealed class RegenerationCache
                 var tp = Task.Run(() => Prestressed.PrestressedGenerator.Generate(f, project.Units));
                 cm = Concrete.ConcreteGenerator.Generate(f, project.Units, geo);
                 ps = tp.Result;
+                RoundBends(cm, ps);
                 if (b.PsSteelDiaphragms is { } dd) st = SteelDiaphragms(dd, ps);
             }
             else if (includeSteel && !f.HasErrors)
@@ -106,6 +108,7 @@ public sealed class RegenerationCache
                 var ts = Task.Run(() => SteelModelGenerator.Generate(f, project.Units, geo));
                 cm = Concrete.ConcreteGenerator.Generate(f, project.Units, geo);
                 st = ts.Result;
+                RoundBends(cm, null);
                 if (cm != null && st != null) { Checks.DeckEndBlockCheck.Run(f, st, cm, project.Units); Checks.DeckRebarCheck.Run(f, st, cm, project.Units); }
             }
             // Pedestrian railings (OPTIONAL): on the finished concrete (deck, curbs, arch curbs); parts merged into the bridge's steel model.
@@ -191,6 +194,11 @@ public sealed class RegenerationCache
                 }
                 bool Skip(int j) => b.SupportAt(j).SharedPier is { Length: > 0 } id && owners.ContainsKey(id) && !IsOwner(id, i);
                 sub = Substructure.SubstructureGenerator.Generate(pt.f, seats, project.Units, Ground, foreign, Skip);
+                if (sub != null && sub.Bars.Count > 0)
+                {
+                    var rs = Concrete.RebarBends.Apply(sub.Marks, sub.Bars);
+                    if (rs.Bends > 0) sub.Diagnostics.Add(new Diagnostic(DiagnosticSeverity.Info, rs.Text));
+                }
                 if (sub != null && (b.Misc != null || b.Drains.Any(d => d.Trench != null)))
                     sub.Misc = Misc.MiscItemsGenerator.Generate(pt.f, pt.s, sub, project.Units, Ground);
                 lock (_lock) _sub[subKey] = sub;
@@ -220,6 +228,23 @@ public sealed class RegenerationCache
     /// beams, kept on <see cref="Prestressed.PrestressedModel.SteelDiaphragms"/> and returned as the bridge's steel model (diaphragm
     /// parts, bolts and assemblies only) so every steel consumer (viewport, IFC, database, quantities) includes them. Diagnostics go
     /// to the prestressed model.</summary>
+    /// <summary>True bend radii (pin / 2 + db / 2) on every placed bar of the superstructure models: THE one place generated bars pass through
+    /// before any consumer (checks, cache, viewport, IFC, database) reads them (<see cref="Concrete.RebarBends"/>).</summary>
+    private static void RoundBends(Concrete.ConcreteModel? cm, Prestressed.PrestressedModel? ps)
+    {
+        if (cm != null && cm.Bars.Count > 0)
+        {
+            var r = Concrete.RebarBends.Apply(cm.Marks, cm.Bars);
+            if (r.Bends > 0) cm.Diagnostics.Add(new Diagnostic(DiagnosticSeverity.Info, r.Text));
+        }
+        if (ps != null && ps.Beams.Any(x => x.Bars.Count > 0))
+        {
+            var all = ps.Beams.SelectMany(x => x.Bars).ToList();
+            var r = Concrete.RebarBends.Apply(ps.BarMarks, all);
+            if (r.Bends > 0) ps.Diagnostics.Add(new Diagnostic(DiagnosticSeverity.Info, r.Text));
+        }
+    }
+
     internal static SteelModel SteelDiaphragms(PsSteelDiaphragmDefinition dd, Prestressed.PrestressedModel ps)
     {
         var lines = ps.Beams.Select(be => Diaphragms.PsDiaphragmBeamLine.FromPrestressed(be, be.Shape.Depth, be.Shape.WebWidth)).ToList();

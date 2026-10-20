@@ -73,11 +73,20 @@ public sealed class TubLateralBracingDefinition
     public double WorkPointFromPanelPoint { get; set; } = In(8);
     /// <summary>Same from a support diaphragm CL per support (framing index); missing = <see cref="WorkPointFromPanelPoint"/>.</summary>
     public Dictionary<int, double> WorkPointFromSupport { get; set; } = new();
-    /// <summary>Bolt lines (each side of the member axis, at the gage) x bolts per line at each end.</summary>
-    public int BoltsPerLine { get; set; } = 3;
+    /// <summary>Transverse distance (across the girder) from the work point line on the top flange CL to the WT end edge. The end edge runs parallel to
+    /// the girder axis (Detail A, p.289). INPUT: the plans give NO dimension for it; the build script sets the scaled value and flags it.</summary>
+    public double EndSetback { get; set; } = In(2.875);
+    /// <summary>Plain-language UNRESOLVED text (<see cref="UnresolvedFlag.Text"/>) for the end setback, set by the build script when it is a scaled value;
+    /// empty = a plan dimension. Becomes <c>Assumption.UnresolvedDimension</c> on the lateral members (they stay on their layer).</summary>
+    public string EndSetbackFlag { get; set; } = "";
+    /// <summary>Detail A bolt pattern (6 per member end, 1" A325): two staggered groups of 3 along the WT axis, pitch <see cref="BoltPitch"/>, the second group
+    /// starting one group length (2 pitches) after the first; gages ACROSS the WT flange, edge to edge: 1 3/4 / 1 3/4 / 4 1/16 / 1 3/4 / 1 3/4
+    /// (sum = flange width). Group 1 zigzags between rows 2 and 1 on the near side (nearest the end edge), group 2 between rows 3 and 4 on the far side.</summary>
     public double BoltPitch { get; set; } = In(3);
-    public double BoltGage { get; set; } = In(4.0625);
-    public TubLateralBracingDefinition Clone() { var c = (TubLateralBracingDefinition)MemberwiseClone(); c.WorkPointFromSupport = new(WorkPointFromSupport); return c; }
+    public List<double> BoltGages { get; set; } = new() { In(1.75), In(1.75), In(4.0625), In(1.75), In(1.75) };
+    /// <summary>Nearest bolt row from the WT end edge, measured across the girder (Detail A: 1 3/4 TYP).</summary>
+    public double FirstBoltFromEndEdge { get; set; } = In(1.75);
+    public TubLateralBracingDefinition Clone() { var c = (TubLateralBracingDefinition)MemberwiseClone(); c.WorkPointFromSupport = new(WorkPointFromSupport); c.BoltGages = BoltGages.ToList(); return c; }
 }
 
 /// <summary>External intermediate diaphragm between two adjacent tubs (plate girder bolted to angles on the webs).</summary>
@@ -97,13 +106,18 @@ public sealed class TubExternalDiaphragmDefinition
     public double AngleLength { get; set; } = In(32);
     public int GirderLegBolts { get; set; } = 8;
     public int DiaphragmLegBolts { get; set; } = 9;
+    /// <summary>Bolt columns on the diaphragm leg of each angle (plan p.282 O-28: 2 columns x 9). Positions across the leg from the heel; empty = ONE column
+    /// on the usual gage of the leg (the earlier default).</summary>
+    public List<double> DiaphragmLegColumns { get; set; } = new();
+    /// <summary>UNRESOLVED text (<see cref="UnresolvedFlag.Text"/>) when the column gages are not dimensioned on the plans (empty = none).</summary>
+    public string DiaphragmLegFlag { get; set; } = "";
     public double BoltPitch { get; set; } = In(3.5);
     /// <summary>Clear distance between the diaphragm web end and the tub web.</summary>
     public double EndClearance { get; set; } = In(0.5);
     public TubExternalDiaphragmDefinition Clone()
     {
         var c = (TubExternalDiaphragmDefinition)MemberwiseClone();
-        c.Points = Points.Select(p => p.Clone()).ToList(); c.Flange = Flange.Clone();
+        c.Points = Points.Select(p => p.Clone()).ToList(); c.Flange = Flange.Clone(); c.DiaphragmLegColumns = DiaphragmLegColumns.ToList();
         return c;
     }
 }
@@ -116,6 +130,64 @@ public sealed class TubPanelRef
     public TubPanelRef() { }
     public TubPanelRef(int span, int point) { Span = span; Point = point; }
     public TubPanelRef Clone() => (TubPanelRef)MemberwiseClone();
+}
+
+/// <summary>TOP CONNECTION PL over a girder top flange at a support diaphragm (p.283-288): bolted to the girder top flange and to the diaphragm top
+/// flange(s) either side of it. All offsets are measured ACROSS the tub from the INNER edge of the girder top flange, positive toward the outside of
+/// the tub (negative = over the interior support diaphragm top flange, beyond the flange width = over the exterior support diaphragm flange).
+/// "Interior flange" = the flange facing the neighbour tub (plate over both diaphragm flanges, 4'-3"); "exterior flange" = the flange at the edge
+/// of the unit (plate over the interior diaphragm flange only, 1'-5 1/2"). Two rows of holes <see cref="RowGage"/> apart, on lines parallel to the girder.</summary>
+public sealed class TubTopConnectionDefinition
+{
+    public double Thickness { get; set; } = In(1);
+    public double Width { get; set; } = In(12);
+    public double RowGage { get; set; } = In(7);
+    public double InteriorStart { get; set; } = In(-15);
+    public double InteriorEnd { get; set; } = In(36);
+    public List<double> InteriorHoles { get; set; } = new() { In(-13), In(-9.5), In(-6), In(-2.5), In(2), In(7.5), In(13.5), In(19), In(23.5), In(27), In(30.5), In(34) };
+    public double ExteriorStart { get; set; } = In(-8);
+    public double ExteriorEnd { get; set; } = In(9.5);
+    public List<double> ExteriorHoles { get; set; } = new() { In(-6), In(-2.5), In(2), In(7.5) };
+    public TubTopConnectionDefinition Clone() { var c = (TubTopConnectionDefinition)MemberwiseClone(); c.InteriorHoles = InteriorHoles.ToList(); c.ExteriorHoles = ExteriorHoles.ToList(); return c; }
+}
+
+/// <summary>BOTT. CONNECTION PL beneath the tub bottom flange and the exterior support diaphragm bottom flange (p.284, 286, 288): one per tub on the
+/// side of the exterior diaphragm, lying across the girder (length along the diaphragm), bolted to both flanges. The plate starts
+/// <see cref="InsetFromFlangeEdge"/> inside the bottom flange edge; hole rows are measured along the girder from the support line (+ = ahead).</summary>
+public sealed class TubBottomConnectionDefinition
+{
+    public double Thickness { get; set; } = In(1);
+    public double Length { get; set; } = In(26);
+    public double GirderEndWidth { get; set; } = In(16);
+    public double DiaphragmEndWidth { get; set; } = In(12);
+    public double InsetFromFlangeEdge { get; set; } = In(8);
+    /// <summary>Taper from <see cref="GirderEndWidth"/> to <see cref="DiaphragmEndWidth"/>: starts this far from the girder-end of the plate (NOT dimensioned on the plans).</summary>
+    public double TaperStart { get; set; } = In(11);
+    public List<double> GirderHoleColumns { get; set; } = new() { In(2), In(5.5) };
+    public List<double> GirderHoleRows { get; set; } = new() { In(-6), In(-2.5), In(2.5), In(6) };
+    public List<double> DiaphragmHoleColumns { get; set; } = new() { In(13.5), In(17), In(20.5), In(24) };
+    public List<double> DiaphragmHoleRows { get; set; } = new() { In(-3.5), In(3.5) };
+    /// <summary>UNRESOLVED text for the taper (empty = none).</summary>
+    public string TaperFlag { get; set; } = "";
+    public TubBottomConnectionDefinition Clone()
+    {
+        var c = (TubBottomConnectionDefinition)MemberwiseClone();
+        c.GirderHoleColumns = GirderHoleColumns.ToList(); c.GirderHoleRows = GirderHoleRows.ToList();
+        c.DiaphragmHoleColumns = DiaphragmHoleColumns.ToList(); c.DiaphragmHoleRows = DiaphragmHoleRows.ToList();
+        return c;
+    }
+}
+
+/// <summary>STRUT PL of the interior support diaphragm (piers 14-15, Section A-A p.287): a horizontal plate on each face of the interior web under the
+/// access opening, between the two bearing stiffeners, with <see cref="Clip"/> x <see cref="Clip"/> clips at its ends. The plans give neither thickness
+/// nor width: the build script sets them and flags them.</summary>
+public sealed class TubStrutPlateDefinition
+{
+    public double Thickness { get; set; }
+    public double Width { get; set; }
+    public double Clip { get; set; } = In(1);
+    public string Flag { get; set; } = "";
+    public TubStrutPlateDefinition Clone() => (TubStrutPlateDefinition)MemberwiseClone();
 }
 
 public enum TubDiaphragmConnection { Angles, BentPlates }
@@ -145,10 +217,22 @@ public sealed class TubSupportDiaphragmDefinition
     public int GirderLegBolts { get; set; } = 11;
     public int DiaphragmLegBolts { get; set; } = 12;
     public double BoltPitch { get; set; } = In(3.5);
+    /// <summary>OPTIONAL top / bottom connection plates, corner clips and strut plate (null / 0 = not built). With a top connection the support diaphragm top
+    /// flanges end <see cref="FlangeEndGap"/> short of the girder top flange edges and lie flush with the top of the girder top flange (the plate lies on both);
+    /// with a bottom connection the exterior diaphragm bottom flange is flush with the underside of the tub bottom flange.</summary>
+    public TubTopConnectionDefinition? TopConnection { get; set; }
+    public TubBottomConnectionDefinition? BottomConnection { get; set; }
+    public TubStrutPlateDefinition? StrutPlate { get; set; }
+    /// <summary>Gap between the girder flange edge and the end of the diaphragm flange (1/2" TYP, p.284 / 288 elevations).</summary>
+    public double FlangeEndGap { get; set; } = In(0.5);
+    /// <summary>Corner clips of the interior diaphragm web at the bottom corners (p.284 3 x 1 1/2, p.288 3 1/2 x 1 1/2): length along the bottom edge x height.</summary>
+    public double CornerClipLength { get; set; }
+    public double CornerClipHeight { get; set; }
     public List<string> Unresolved { get; set; } = new();
     public TubSupportDiaphragmDefinition Clone()
     {
         var c = (TubSupportDiaphragmDefinition)MemberwiseClone();
+        c.TopConnection = TopConnection?.Clone(); c.BottomConnection = BottomConnection?.Clone(); c.StrutPlate = StrutPlate?.Clone();
         c.InteriorTopFlange = InteriorTopFlange.Clone(); c.ExteriorFlange = ExteriorFlange.Clone(); c.BearingStiffener = BearingStiffener.Clone();
         c.Unresolved = Unresolved.ToList();
         return c;
@@ -234,6 +318,25 @@ public sealed class TubBearingDefinition
     /// <summary>Anchor bolt rows along the girder from the CL bearing (+ ahead); empty = none.</summary>
     public List<double> AnchorRows { get; set; } = new();
     public double AnchorEmbedment { get; set; } = In(15);
+    /// <summary>Plan p.292 O-38 "Typical section at bearing": diameter of the hole in the bottom flange for each 2" anchor bolt at a non-fixed (expansion /
+    /// guided) bearing (6") and at a fixed bearing (2 1/2"); 0 = no hole cut (older models).</summary>
+    public double AnchorHoleExpansion { get; set; }
+    public double AnchorHoleFixed { get; set; }
+    /// <summary>Anchor bolt overall length (p.292 Detail of Anchor Bolt: 3'-0) and projection of its top above the top of the bottom flange (7" MIN., p.292):
+    /// both 0 = the older solid (embedment below the seat, standard nut stack). With both set the embedment follows from the length.</summary>
+    public double AnchorLength { get; set; }
+    public double AnchorProjection { get; set; }
+    /// <summary>Top contact PL at non-fixed bearings (p.292: 8 x 8 x 1/2 with a 2 1/2 x 6 slot in the direction of expansion movement, on top of the bottom
+    /// flange, one per anchor bolt) and bottom contact PL at fixed bearings (4 x 4 with a 2 3/8 hole, from the underside of the bottom flange down to the seat,
+    /// top bevelled to the flange). 0 = not modeled.</summary>
+    public double TopContactSide { get; set; }
+    public double TopContactThickness { get; set; }
+    public double TopContactSlotWidth { get; set; }
+    public double TopContactSlotLength { get; set; }
+    public double BottomContactSide { get; set; }
+    public double BottomContactHole { get; set; }
+    /// <summary>1/4" gap between the contact plate (or the flange) and the washer / nut (p.292 elevations).</summary>
+    public double NutGap { get; set; }
     public TubBearingDefinition Clone() { var c = (TubBearingDefinition)MemberwiseClone(); c.AnchorRows = AnchorRows.ToList(); return c; }
 }
 
@@ -309,6 +412,12 @@ public sealed class TubGirderDefinition
     public double StudDiameter { get; set; } = In(0.875);
     public double StudLength { get; set; } = In(7);
     public List<TubTensionZone> TensionZones { get; set; } = new();
+    /// <summary>Fillet weld size of the shop welds (plans: 5/16" both sides TYP.: web to flanges, stiffeners, diaphragm webs, bearing stiffeners); 0 = no welds modeled.</summary>
+    public double FilletWeld { get; set; }
+    /// <summary>Girder plates end on the SKEWED support line (the end plane parallel to the support line through the girder CL end, p.284 "END OF GIRDER")
+    /// when the support line is skewed more than <see cref="SkewedEndMinDegrees"/> from square to the girder; otherwise square (radial supports).</summary>
+    public bool SkewedEnds { get; set; } = true;
+    public double SkewedEndMinDegrees { get; set; } = 0.5;
     public List<DeckPourDefinition> DeckPours { get; set; } = new();
     /// <summary>Plan structural steel quantity for the unit (lb) for the check; NaN = not given.</summary>
     public double PlanSteelWeightLb { get; set; } = double.NaN;

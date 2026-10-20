@@ -220,6 +220,25 @@ public static partial class ElevationCheck
         int nSpan = g.Spans.Count;
         double s = !double.IsNaN(br.PathDistance) ? br.PathDistance : g.DistanceAt(Math.Min(support, nSpan - 1), support == nSpan ? 1 : 0);
         double grade = g.Path.GradeAt(s);
+
+        // STEEL TUB girders: the chain follows the MODELED tub bearing (beveled plate J at the CL + pad H, p.292 / 293), not the default
+        // bearing, and the tub section is rotated with the deck about the top working point (the web / flange stack is measured along the rotated axis).
+        if (def.Girders.Tub is { } tub && tub.Bearings.FirstOrDefault(x => x.Support == support) is { } tb)
+        {
+            double th = Math.Atan(TubSection.DeckSlope(f, g.Path.At(s).point.XY));
+            double stack = def.Girders.Section.WebDepth + (g.PlateAt(GirderPlate.BottomFlange, s)?.Thickness ?? def.Girders.Section.BottomFlange.Thickness);
+            double rot = stack * (1 - Math.Cos(th));
+            z += rot;
+            ch.Steps.Add(new CalcStep("+ Tub rotation with the deck",
+                $"the tub is rotated about the top working point with the deck plane (cross slope {Pct(Math.Tan(th))}): web + bottom flange {Dec(stack, u)} × (1 − cos {Math.Atan(Math.Tan(th)) * 180 / Math.PI:0.000}°) = {Dec(rot, u)}",
+                rot, z, "Bottom of steel at the tub CL (rotated section) = top of the beveled bearing plate"));
+            z -= tb.PlateThickness;
+            ch.Steps.Add(new CalcStep("− Beveled bearing plate at CL",
+                $"plate thickness at its centre J = {In(tb.PlateThickness)} ({tb.Mark}, bottom level; p.292 / p.293 schedule)", -tb.PlateThickness, z, "Bottom of beveled plate = top of pad"));
+            z -= tb.PadHeight;
+            ch.Steps.Add(new CalcStep("− Elastomeric pad", $"pad {In(tb.PadLength)} × {In(tb.PadWidth)} × {In(tb.PadHeight)} ({tb.Mark})", -tb.PadHeight, z, "Bottom of bearing = bearing seat"));
+            return FinishBearing(ch, f, steel, support, girder, br, z, sub, others, u);
+        }
         var bd = def.BearingsAt(support);
         double ls = bd.SolePlateLength;
         double soleAtCl = bd.SoleAtCl(grade);
@@ -268,6 +287,15 @@ public static partial class ElevationCheck
             }
         }
 
+        return FinishBearing(ch, f, steel, support, girder, br, z, sub, others, u);
+    }
+
+    /// <summary>Compares the chain's bearing seat with the 3D model and appends the substructure part of the chain.</summary>
+    private static ElevationChain FinishBearing(ElevationChain ch, BridgeFraming f, SteelModel? steel, int support, int girder, BearingResult br, double z, Substructure.SubstructureModel? sub,
+        IEnumerable<Substructure.SubstructureModel>? others, UnitSystem u)
+    {
+        string E(double v) => u.FormatLength(v, LengthKind.Coordinate);
+        string In(double m) => u.FormatLength(m, LengthKind.Short);
         if (steel?.BearingSeats.FirstOrDefault(x => x.Girder == girder && Math.Abs(x.Station - br.Station) < 1e-6) is { } seat)
         {
             double diff = seat.SeatElevation - z;

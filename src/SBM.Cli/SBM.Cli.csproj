@@ -14,4 +14,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <!-- Plan-sheet link rules, found by CompanionDatabase.FindLinksFile for models opened outside samples\plans. -->
+    <None Include="..\..\samples\plans\sheet-links-*.json" Link="plans\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>

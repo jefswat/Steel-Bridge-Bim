@@ -106,7 +106,8 @@ public static partial class ArchGenerator
                     foreach (var (_, mp) in maps)
                         (_weldEdges.TryGetValue(c.Name, out var we) ? we : _weldEdges[c.Name] = new()).Add((mp.Map(mp.Weld1), mp.Map(mp.Weld2), top, mp.Brace));
                     var gg = g; bool tt = top; var mm = maps;
-                    _connectionParts.Add(() => BuildGusset(c, gg, tt, mm, w, src));
+                    var nbc = nb; var faceC = faceP;
+                    _connectionParts.Add(() => BuildGusset(c, gg, tt, mm, w, src, nbc, faceC));
                 }
                 foreach (var (bn, ends) in endBy)
                 {
@@ -387,7 +388,7 @@ public static partial class ArchGenerator
         }
 
         /// <summary>Gusset solid(s): the flat pattern split at the bend line, each part in its leg's plane (true arcs kept), holes and bolts.</summary>
-        private void BuildGusset(ArchBracingConnection c, ArchGussetPlate g, bool top, List<(ArchGussetLeg Leg, LegMap Map)> maps, WideFlangeSize w, string src)
+        private void BuildGusset(ArchBracingConnection c, ArchGussetPlate g, bool top, List<(ArchGussetLeg Leg, LegMap Map)> maps, WideFlangeSize w, string src, Vec3 faceNormal, Vec3 faceP)
         {
             string side = top ? "top" : "bottom";
             string asm = ConnAsm(c);
@@ -421,7 +422,7 @@ public static partial class ArchGenerator
             }
             var bolt = Model.Steel.Bolt;
             var mesh = new Mesh();
-            double area = 0; int nb = 0;
+            double area = 0; int nb = 0; bool mitred = false;
             foreach (var (poly, mp) in parts)
             {
                 // frame on the contact face: x = D (ξ), y = ±V (η); thickness away from the brace flange (mp.M = outward normal of the flange)
@@ -443,10 +444,28 @@ public static partial class ArchGenerator
                     Model.Steel.Bolts.Add(new BoltInstance { Frame = new Frame3(head, xd, Vec3.Cross(zd, xd).Normalized(), zd), Grip = grip, Length = bolt.LengthForGrip(grip), Assembly = asm });
                     nb++;
                 }
+                int vFrom = mesh.Positions.Count;
                 PlateBuilder.AddPlanarArc(mesh, local, holes, fr, 0, zs * c.GussetThickness);
                 area += Math.Abs(local.SignedArea());
+                // The gusset butts the 7/8" connection plate face (views D-D / E-E / I-I / J-J, welded 5/16" both sides): its welded edge is cut to the plate
+                // face (a bevel of the dihedral angle between the gusset and the plate face) so the edge bears over the full thickness, not square to the gusset.
+                Vec2 Loc(Vec2 d) => new(Vec2.Dot(d - mp.P0d, mp.Ad), Vec2.Dot(d - mp.P0d, mp.Ad.Left));
+                double shift = 0, angle = 0;
+                int moved = c.MitreWeldedEdge ? MitreToFace(mesh, vFrom, fr, Loc(mp.Weld1), Loc(mp.Weld2), W(faceP), Wd(faceNormal).Normalized(), out shift, out angle) : 0;
+                if (moved > 0)
+                {
+                    mitred = true;
+                    Info($"Arch bracing {c.Name} {side} gusset ({mp.Brace}): welded edge cut to the connection plate face - angle between the gusset plane and the plate face {angle:F2} deg (plan prints the supplement), a square edge would leave a {L(shift)} wedge gap ({src}).");
+                }
             }
             if (mesh.IsEmpty) return;
+            if (mitred)
+            {
+                // The mesh is no longer the exact extrusion of the outline: keep only the triangles (IFC writes the faceted solid).
+                var plain = new Mesh();
+                plain.Positions.AddRange(mesh.Positions); plain.Indices.AddRange(mesh.Indices);
+                mesh = plain;
+            }
             int arcs = o.Count(p => p.Radius != 0);
             Model.Steel.Parts.Add(new SteelPart
             {
@@ -454,6 +473,32 @@ public static partial class ArchGenerator
                 Description = $"PL {L(c.GussetThickness)} {side} gusset{(parts.Count > 1 ? " (bent)" : "")} at {c.Name}, {o.Count} edges ({arcs} arcs), {nb} holes ({src})",
                 Length = Math.Sqrt(area),
             });
+        }
+
+        /// <summary>Moves the vertices of <paramref name="mesh"/> (from index <paramref name="from"/>) that lie on the plate edge a-b (plate frame coordinates) along the
+        /// in-plane normal of the edge onto the plane (<paramref name="faceP"/>, <paramref name="nb"/>), so the edge face is that plane. Returns the number moved.</summary>
+        private static int MitreToFace(Mesh mesh, int from, Frame3 fr, Vec2 a, Vec2 b, Vec3 faceP, Vec3 nb, out double maxShift, out double angleDeg)
+        {
+            maxShift = 0; angleDeg = 0;
+            var e = b - a; double el = e.Length; if (el < 1e-9) return 0;
+            var ed = e * (1 / el);
+            var u3 = (fr.X * (-ed.Y) + fr.Y * ed.X).Normalized();               // in the plate plane, normal to the edge
+            double un = Vec3.Dot(u3, nb);
+            if (Math.Abs(un) < 0.2) return 0;                                    // edge (nearly) square to the plane normal: nothing sensible to cut
+            angleDeg = Math.Acos(Math.Clamp(Math.Abs(Vec3.Dot(fr.Z, nb)), 0, 1)) * 180 / Math.PI;
+            int n = 0;
+            for (int i = from; i < mesh.Positions.Count; i++)
+            {
+                var p = mesh.Positions[i]; var r = p - fr.Origin;
+                var q = new Vec2(Vec3.Dot(r, fr.X), Vec3.Dot(r, fr.Y)) - a;
+                double t = Vec2.Dot(q, ed);
+                if (Math.Abs(Vec2.Cross(ed, q)) > 2e-6 || t < -2e-6 || t > el + 2e-6) continue;
+                double s = -Vec3.Dot(p - faceP, nb) / un;
+                if (Math.Abs(s) > In(1.5)) continue;
+                mesh.Positions[i] = p + u3 * s;
+                maxShift = Math.Max(maxShift, Math.Abs(s)); n++;
+            }
+            return n;
         }
 
         private static bool Inside(Vec2 p, IReadOnlyList<Vec2> poly)

@@ -104,9 +104,9 @@ const string BrName = "Bridge O spans 14-16 (steel tub unit)";
 Doc.Project.Bridges.RemoveAll(x => x.Name == BrName);
 var b = new BridgeDefinition { Name = BrName, AlignmentName = AlName, Structure = "Bridge O (Ramp 44F over I-44 & Ramps 44N, 44M2)" };
 b.FieldSplices.Clear();
-SupportDefinition Sup(string name, double sta, double skew, double endExt, BearingFixity fix) => new()
+SupportDefinition Sup(string name, double sta, double skew, double endExt, BearingFixity fix, double deckEnd = -1) => new()
 {
-    Name = name, Type = SupportType.Pier, Station = sta, SkewDegrees = skew, GirderEndExtension = endExt, Fixity = fix, DeckEndOffset = Ft(1),
+    Name = name, Type = SupportType.Pier, Station = sta, SkewDegrees = skew, GirderEndExtension = endExt, Fixity = fix, DeckEndOffset = deckEnd < 0 ? Ft(1) : deckEnd,
     Substructure = new SubstructureDefinition { Enabled = false },   // SUPERSTRUCTURE ONLY (user scope): no piers / footings
 };
 // Pier 13 (p.273 O-19, p.278 O-24, p.279 O-25, p.283 O-29). The CL bearing line is fixed by the two girder spans on the elevation sheets:
@@ -142,13 +142,13 @@ double skew13, sta13;
 }
 
 // Bearing marks (p.293 O-39): P13 / P16 G1 (guided expansion), P14 F1 (fixed), P15 G2 (guided expansion).
-b.Supports.Add(Sup("Pier 13", sta13, skew13, Fr(0, 9, 11, 16), BearingFixity.GuidedExpansion));
+b.Supports.Add(Sup("Pier 13", sta13, skew13, Fr(0, 9, 11, 16), BearingFixity.GuidedExpansion, In(11)));   // deck 1" ahead of CL pier 13: 2" joint opening at CL pier (p.271 note 1)
 b.Supports.Add(Sup("Pier 14", Sta("302+93.00"), 0, 0, BearingFixity.Fixed));
 b.Supports.Add(Sup("Pier 15", Sta("304+54.00"), 0, 0, BearingFixity.GuidedExpansion));
-b.Supports.Add(Sup("Pier 16", Sta("306+14.00"), 0, In(9), BearingFixity.GuidedExpansion));   // CL brg 1'-0 back of CL pier 16 (p.273), girder end 9" (p.278)
+b.Supports.Add(Sup("Pier 16", Sta("306+14.00"), 0, In(9), BearingFixity.GuidedExpansion, In(11)));   // deck 1" short of CL pier 16 (2" joint, p.271 note 1); CL brg 1'-0 back of CL pier 16 (p.273), girder end 9" (p.278)
 Print($"Pier 13 CL brg station {Doc.Units.FormatStation(sta13)} (from the girder spans); Pier 16 CL brg 306+14.00 (CL pier 306+15.00 - 1'-0).");
 U("p.273", "deck ends at piers 13 and 16", "the unit's slab continues into Bridge N (pier 13) and span 17 (pier 16); the joint / continuity details there are outside this unit",
-  "The modeled deck stops at CL pier 13 and CL pier 16 (DeckEndOffset 1'-0 from CL brg) - a model boundary, not a joint.");
+  "The modeled deck stops 1\" short of CL pier 13 / CL pier 16 (DeckEndOffset 11\" from CL brg): the 2\" joint opening of p.271 note 1 at the CL pier; the joint device itself is not modeled.");
 
 // Girders (p.273 O-19, p.270 O-16): 2 tubs 17'-8 apart (radial), G2 4'-4 right of CL Ramp 44F (radial), G1 13'-4 left; concentric:
 // G1 R 868'-1 11/16, CL R 881'-5 11/16, G2 R 885'-9 11/16.
@@ -276,9 +276,16 @@ tub.Internal = new TubInternalBracingDefinition
 tub.Internal.Unresolved.Add(UnresolvedFlag.Text("p.282", "internal cross frame centre gusset outline", "Detail C shows the gusset PL 3/4 but dimensions only the bolt spacing", "Gusset drawn 1'-10 x 1'-2 below the strut."));
 tub.Internal.Unresolved.Add(UnresolvedFlag.Text("p.282", "diagonal work points", "Detail B1 / C give bolt spacings but not the work lines", "Diagonals run from the web CL at the top of the bottom flange to the top working point, 3 bolts at each end."));
 U("p.273", "which panel points carry internal cross frames", "the framing plan distinguishes solid / dashed lines graphically only", "Even panel points (solid lines) = K frame + top strut, odd = top strut, as drawn.");
-tub.Lateral = new TubLateralBracingDefinition { Member = "WT9x38", WorkPointFromPanelPoint = In(8), BoltsPerLine = 3, BoltPitch = In(3), BoltGage = In(4.0625) };
+tub.FilletWeld = In(5.0 / 16);   // fillet welds 5/16" both sides TYP. (p.278-279 web to flanges, p.282 diaphragm webs, p.283-288 support diaphragms; p.273 note 8: AWS minimums unless noted)
+tub.Lateral = new TubLateralBracingDefinition
+{
+    Member = "WT9x38", WorkPointFromPanelPoint = In(8), BoltPitch = In(3),
+    // p.289 Detail A: the WT end is NOT dimensioned - the end edge (parallel to the girder axis) scales 2 13/16 to 2 7/8" across the girder from the W.P. line
+    EndSetback = In(2.875),
+    EndSetbackFlag = UnresolvedFlag.Text("p.289", "top lateral WT end setback (WT end edge to the W.P. line)", "end setback not dimensioned; scaled", "Scaled 2 7/8\" across the girder (about 4 3/16\" along the WT) from the W.P. line, end edge parallel to the girder axis."),
+};   // 6 x 1\" A325 per end, 2 staggered groups of 3 @ 3\", gages 1 3/4 / 1 3/4 / 4 1/16 / 1 3/4 / 1 3/4 across the WT flange (class defaults = Detail A)
 tub.Lateral.WorkPointFromSupport[0] = In(12);   // 1'-0 from CL support diaphragm at pier 13 (p.289)
-U("p.289", "lateral bracing end bolts", "Detail A shows 6 holes per member end with 1 3/4\" / 3\" / 4 1/16\" dimensions", "2 lines x 3 bolts @ 3\" near each end modeled; bolts off the flange are dropped.");
+U("p.289", "lateral WT flange level against the girder top flange", "Detail A is a plan view only; no section shows the WT flange against the top flange", "WT flange modeled directly under the girder top flange (bolted to it, no gusset - none is drawn).");
 // External intermediate diaphragms (p.273 bold radial lines, p.282): G1 points 4, 10 (span 14), 6, 12 (span 15), 6, 10 (span 16).
 tub.External = new TubExternalDiaphragmDefinition
 {
@@ -286,15 +293,30 @@ tub.External = new TubExternalDiaphragmDefinition
     Points = { new(0, 4), new(0, 10), new(1, 6), new(1, 12), new(2, 6), new(2, 10) },
     WebThickness = In(0.625), WebDepth = F(3, 2), WebTopBelowWebTop = In(6), Flange = new PlateSize(In(12), In(0.75)),
     Angle = "L8x8x3/4", AngleLength = In(32), GirderLegBolts = 8, DiaphragmLegBolts = 9, BoltPitch = In(3.5), EndClearance = In(0.5),
+    // p.282 O-28 (QC back-check I01): the diaphragm leg of each 2-L8x8x3/4 has 2 COLUMNS x 9 bolts (8 spa @ 3 1/2" = 2'-4"), the girder leg 8 per angle (7 sp @ 3 1/2") = 34 per end.
+    // The column gages are not dimensioned: scaled on the sheet (about 2 1/4" and 5 7/8" from the heel of the 8" leg, 3 5/8" apart), taken symmetric about the leg centre.
+    DiaphragmLegColumns = { In(2.1875), In(5.8125) },
+    DiaphragmLegFlag = UnresolvedFlag.Text("p.282", "external intermediate diaphragm bolt gages across the diaphragm leg of the connection angles", "2 columns x 9 bolts are drawn, the gage between the columns and the edge distances are not dimensioned",
+        "Columns at 2 3/16\" and 5 13/16\" from the heel of the 8\" leg (scaled, 3 5/8\" gage, centred), 9 rows @ 3 1/2\"."),
 };
 // Support diaphragms (p.283-288 O-29..O-34).
+// BOTT. CONNECTION PL (p.284 / 286 / 288): 1" x 2'-2" under the tub bottom flange and the exterior diaphragm bottom flange, 1'-4" wide at the girder end, 1'-0" at the diaphragm end
+// (taper length not printed), 8 holes in the girder flange (2 columns x 4 rows, 2" / 3 1/2" / 5" / 3 1/2" / 2") and 8 in the diaphragm flange (3 spa @ 3 1/2", 2" ends, 7" gage).
+TubBottomConnectionDefinition Bot() => new()
+{
+    TaperStart = In(11),
+    TaperFlag = UnresolvedFlag.Text("p.284, p.286, p.288", "BOTT. CONNECTION PL taper length", "the plan shows the plate narrowing from 1'-4\" at the girder end to 1'-0\" at the diaphragm end without a taper length", "Full 1'-4\" width over the first 11\" (scaled), then linear to 1'-0\" at the end."),
+};
+string ExtWeb(string pages, string why) => UnresolvedFlag.Text(pages, "exterior support diaphragm web height and position between its flanges", why,
+    "Built from the top of the girder top flange to the underside of the girder bottom flange (flanges flush with the girder flanges), notched around the girder flanges.");
 tub.SupportDiaphragms.Add(new TubSupportDiaphragmDefinition
 {
     Support = 0, InteriorWebThickness = In(0.75), InteriorTopFlange = new PlateSize(In(12), In(1)), ExteriorWebThickness = In(0.75), ExteriorFlange = new PlateSize(In(12), In(1)),
     BearingStiffener = new PlateSize(In(8), In(1)), BearingStiffenerSpacing = F(1, 6), Connection = TubDiaphragmConnection.BentPlates, ConnectionShape = "L8x8x1/2",
     ConnectionLength = In(35.5), GirderLegBolts = 9, DiaphragmLegBolts = 10, BoltPitch = In(3.5),
-    Unresolved = { UnresolvedFlag.Text("p.284", "exterior diaphragm height 2'-11 1/2\" and its position", "the dimension does not reconcile with the 4'-2\" tub depth on the sheet", "Exterior diaphragm built full depth (top flange at the top-of-web line, bottom flange on the bottom-flange top)."),
-                   UnresolvedFlag.Text("p.283-284", "top / bottom connection plates PL 1 x 12", "lengths and bolt patterns only partly dimensioned", "Not built.") },
+    CornerClipLength = In(3), CornerClipHeight = In(1.5),   // p.284 "3" x 1 1/2" CORNER CLIP"
+    TopConnection = new TubTopConnectionDefinition(), BottomConnection = Bot(),
+    Unresolved = { ExtWeb("p.284", "the 2'-11 1/2\" on the sheet is the length of the bent PL (9 spa @ 3 1/2\" + 2 x 2\"), not a diaphragm height") },
 });
 foreach (int j in new[] { 1, 2 })
     tub.SupportDiaphragms.Add(new TubSupportDiaphragmDefinition
@@ -303,16 +325,23 @@ foreach (int j in new[] { 1, 2 })
         BearingStiffener = new PlateSize(In(8), In(1.25)), BearingStiffenerSpacing = F(2, 0),
         AccessOpeningWidth = F(1, 6), AccessOpeningHeight = F(2, 8), AccessOpeningRadius = In(8), AccessOpeningBottom = In(11),
         Connection = TubDiaphragmConnection.Angles, ConnectionShape = "L8x8x1/2", ConnectionLength = In(42.5), GirderLegBolts = 11, DiaphragmLegBolts = 12, BoltPitch = In(3.5),
-        Unresolved = { UnresolvedFlag.Text("p.287-288", "top / bottom connection plates PL 1 x 12", "lengths and bolt patterns only partly dimensioned", "Not built.") },
+        CornerClipLength = In(3.5), CornerClipHeight = In(1.5),   // p.288 "3 1/2" x 1 1/2" CORNER CLIP"
+        TopConnection = new TubTopConnectionDefinition(), BottomConnection = Bot(),
+        StrutPlate = new TubStrutPlateDefinition { Thickness = In(1.25), Width = In(8), Clip = In(1),
+            Flag = UnresolvedFlag.Text("p.287", "STRUT PL under the access opening (Section A-A): thickness and width", "Section A-A draws the plate between the bearing stiffeners with 1\" x 1\" clips but gives no thickness or width",
+                "PL 1 1/4 x 8 (the bearing stiffener size) on each face of the interior web.") },
+        Unresolved = { ExtWeb("p.287-288", "the exterior web is drawn between its flanges without a height") },
     });
 tub.SupportDiaphragms.Add(new TubSupportDiaphragmDefinition
 {
     Support = 3, InteriorWebThickness = In(0.75), InteriorTopFlange = new PlateSize(In(12), In(1)), ExteriorWebThickness = In(0.75), ExteriorFlange = new PlateSize(In(12), In(1)),
     BearingStiffener = new PlateSize(In(8), In(1)), BearingStiffenerSpacing = F(1, 6), Connection = TubDiaphragmConnection.Angles, ConnectionShape = "L8x8x1/2",
     ConnectionLength = In(35.5), GirderLegBolts = 9, DiaphragmLegBolts = 10, BoltPitch = In(3.5),
-    Unresolved = { UnresolvedFlag.Text("p.285-286", "top / bottom connection plates PL 1 x 12", "lengths and bolt patterns only partly dimensioned", "Not built.") },
+    CornerClipLength = In(3), CornerClipHeight = In(1.5),   // p.286 "3" x 1 1/2" CORNER CLIP"
+    TopConnection = new TubTopConnectionDefinition(), BottomConnection = Bot(),
+    Unresolved = { ExtWeb("p.285-286", "the exterior web is drawn between its flanges without a height") },
 });
-G("Support diaphragm details not modeled: top/bottom connection plates, corner clips, rodent screens / expanded metal (p.290), drip plates (p.290), drain holes (p.290), flange-to-web and stiffener fillet welds of the tubs, transverse stiffener ticks in the end bays (p.273, not dimensioned).");
+G("Support diaphragm details not modeled: rodent screens / expanded metal (p.290), drip plates (p.290), drain holes (p.290), transverse stiffener ticks in the end bays (p.273, not dimensioned), the 2\" radius at the exterior web notches (p.284 / 288, built square), the corner clips of the exterior webs (drawn at the web feet, p.286).");
 
 // ================================================================ 5. bearings (p.292 O-38, p.293 O-39) and access hatches (p.273, p.290)
 TubBearingDefinition Brg(int sup, string mark, double B, double C, int D, int Fn, double H, double K, double L, double M, double N, double planH, params double[] rows) => new()
@@ -320,17 +349,23 @@ TubBearingDefinition Brg(int sup, string mark, double B, double C, int D, int Fn
     Support = sup, Mark = mark, PadLength = In(B), PadWidth = In(C), PadHeight = In(H), InteriorLayers = D, InteriorLayer = In(0.5), Laminates = Fn, ExteriorLayer = In(0.25),
     PlateThickness = In(2.5), PlateWidth = In(K), PlateLength = In(L), PlanTransverseSlope = M / 100, PlanLongitudinalSlope = N / 100, PlanH = planH,
     PlanHorizontalOffset = In(3), AnchorDiameter = In(2), AnchorAcross = F(1, 9.5), AnchorEmbedment = F(1, 3), AnchorRows = rows.Select(r => In(r)).ToList(),
+    // p.292 O-38 (QC back-check I02-I04, I10): 6" hole (expansion / guided) / 2 1/2" hole (fixed) in the bottom flange for each 2" anchor bolt; anchor bolt 3'-0" overall (Detail of
+    // Anchor Bolt), top 7" MIN. above the bottom flange, set 1'-3" MIN. into the concrete; 8 x 8 x 1/2 top contact PL with 2 1/2 x 6 slot (expansion), 4 x 4 bottom contact PL with
+    // 2 3/8" hole (fixed); 1/4" gap under the washer; all structural steel of the sole and contact plates AASHTO M270 Gr 50W (note 3).
+    AnchorHoleExpansion = In(6), AnchorHoleFixed = In(2.5), AnchorLength = F(3, 0), AnchorProjection = In(7),
+    TopContactSide = In(8), TopContactThickness = In(0.5), TopContactSlotWidth = In(2.5), TopContactSlotLength = In(6), BottomContactSide = In(4), BottomContactHole = In(2.375), NutGap = In(0.25),
 };
 tub.Bearings.Add(Brg(0, "P13 (G1)", 13, 22, 5, 6, 3.75, 23, 14, 4.52, -4.92, F(5, 10), 9));
 tub.Bearings.Add(Brg(1, "P14 (F1)", 20, 30, 5, 6, 3.75, 31, 21, 6.00, -1.48, Fr(5, 10, 5, 8), -9, 9));
 tub.Bearings.Add(Brg(2, "P15 (G2)", 22, 30, 5, 6, 3.75, 31, 23, 6.00, -0.57, F(5, 11), -9, 9));
 tub.Bearings.Add(Brg(3, "P16 (G1)", 15, 23, 7, 8, 5.0, 24, 16, 6.00, -0.57, Fr(5, 11, 3, 8), -9));
 U("p.292", "anchor bolt rows at the end piers 13 / 16", "the expansion-pier plan (G1) shows one row 9\" from the CL brg; the row side at each end is not labeled", "Row placed 9\" from the CL brg on the span side.");
-G("Bearing contact plates (4x4 bottom contact PL at fixed, 8x8x1/2 top contact PL with 2 1/2 x 6 slots at expansion, p.292) and guide details not modeled; pads are single solids (laminates listed in the description).");
+U("p.292", "anchor bolt projection above the bottom flange and the embedment", "the section gives 7\" MIN. projection and 1'-3\" MIN. into the concrete, the bolt 3'-0\" overall", "Top at the 7\" minimum above the top of the bottom flange (the 3'-0\" bolt then sits about 1'-8\" into the concrete, more than the 1'-3\" minimum).");
+G("Bearing guide details (guided bearings: the plan shows no guide bar / PTFE in the pad assembly) not modeled; pads are single solids (laminates listed in the description).");
 foreach (int g in new[] { 0, 1 })
 {
-    tub.Hatches.Add(new TubAccessHatchDefinition { Girder = g, At = TubLocation.AtSupport(0, F(4, 3)) });
-    tub.Hatches.Add(new TubAccessHatchDefinition { Girder = g, At = TubLocation.AtSupport(3, -F(4, 3)) });
+    tub.Hatches.Add(new TubAccessHatchDefinition { Girder = g, At = TubLocation.AtSupport(0, F(4, 3)), HoleWidth = In(18), HoleLength = In(30) });
+    tub.Hatches.Add(new TubAccessHatchDefinition { Girder = g, At = TubLocation.AtSupport(3, -F(4, 3)), HoleWidth = In(18), HoleLength = In(30) });
 }
 U("p.273", "access hatch position reference", "4'-3\" is dimensioned from the CL hatch to the CL brg line drawn at the girder; the side (span) is from the drawing", "Hatches 4'-3\" into spans 14 and 16 on the tub CL.");
 
@@ -371,6 +406,30 @@ foreach (var (sec_, a, e, note) in new[] { (1, "301+53.72", "302+58.00", "span 1
 
 foreach (var u in unresolved) tub.Unresolved.Add(u);
 b.Girders.Tub = tub;
+
+// ================================================================ fabrication notes (steel tub notes p.273, p.278, p.282-288, p.289) -> part grade / attributes,
+// the same mechanism the I-girder bridges use (BridgeDefinition.Fabrication -> SteelPart.Material / Fabrication, part properties, IFC SBM_FabricationAttributes).
+{
+    List<string> C(params string[] c) => c.ToList();
+    FabricationRule Rule(string id, string src, Action<FabricationRule> set) { var r = new FabricationRule { Note = id, Source = src }; set(r); return r; }
+    var plates = C("FlangePlate", "WebPlate", "BearingStiffener", "ConnectionStiffener", "Gusset", "FillerPlate", "Angle", "SplicePlate", "ConnectorPlate", "DiaphragmPlate", "RolledTee", "AccessDoor");
+    b.Fabrication = new()
+    {
+        Rule("OT1", "p.278 note 3, p.282-288 note 2", r => { r.Categories = plates; r.Material = "AASHTO M270 Gr. 50W"; r.Set.Notes.Add("weathering steel"); }),
+        Rule("OT2", "p.278 note 3, p.282-288 note 2", r => { r.Categories = plates; r.Set.Toughness = "Charpy V-notch Zone 2, non-fracture critical (unless noted otherwise)"; }),
+        Rule("OT3", "p.278 note 6", r => { r.Categories = C("FlangePlate"); r.MarkPattern = "-BF\\d+$"; r.DescriptionPattern = "tension flange"; r.Set.Toughness = "Fracture critical member (bottom tension flange): CVN requirements for fracture critical members, Zone 2; fabricated per the AASHTO/AWS D1.5 fracture control plan"; }),
+        Rule("OT4", "p.278 note 6", r => { r.Categories = C("WebPlate"); r.AssemblyKinds = C("GirderFieldSection"); r.Set.Toughness = "Fracture critical member (tub webs): CVN requirements for fracture critical members, Zone 2; fabricated per the AASHTO/AWS D1.5 fracture control plan"; }),
+        Rule("OT5", "p.270 note 2, p.278 note 4", r => { r.Categories = C("FlangePlate"); r.MarkPattern = "-TF[LR]\\d+$"; r.Set.ShopAssembly = "Shear connectors (studs) welded on the compression flange only; omitted at the field splices"; }),
+        Rule("OT6", "p.273 note 5", r => { r.Categories = C("ConnectionStiffener", "Gusset"); r.Set.Weld = "Transverse stiffeners and connection plates welded to both flanges"; }),
+        Rule("OT7", "p.282-288 notes 3, 5; p.270 note 3", r => { r.Categories = C("FlangePlate", "WebPlate", "ConnectionStiffener", "BearingStiffener", "DiaphragmPlate", "Gusset"); r.Set.CoatingInterior = "Interior surfaces of the tub: light colored paint (white polyamide cured epoxy) for future inspection, not intended as corrosion protection"; }),
+        Rule("OT8", "p.282-288 note 3", r => { r.Categories = C("SplicePlate", "FillerPlate", "ConnectorPlate", "Angle", "RolledTee"); r.Set.ContactFinish = "Faying surfaces of bolted connections cleaned of rust / foreign matter (ODOT 506.04.F), blast cleaned SSPC-SP10 (near white) before assembly, protected from paint"; }),
+        Rule("OT9", "p.283-288 elevations (bearing stiffener note)", r => { r.Categories = C("BearingStiffener"); r.Set.ContactFinish = "Finish to bear on the bottom flange (before welding), tight fit at the top flange; placed normal to the bottom flange"; r.Set.Weld = "Weld to the bottom flange (5/16 fillet both sides), not to the top flange"; }),
+        Rule("OT10", "p.278 note 5", r => { r.Categories = C("WebPlate", "FlangePlate"); r.MarkPattern = "-SD\\d+-(W|TF)$|^XSD"; r.Set.Tolerance = "Girder ends and end diaphragm web plates plumb after total dead load; end diaphragm flange plates parallel to the girder flanges"; }),
+        Rule("OT11", "p.282 note 4, p.283-288 note 4", r => { r.Categories = C("SplicePlate", "FillerPlate", "ConnectorPlate", "Angle", "RolledTee"); r.Set.ShopAssembly = "1\" dia A325 type 3 bolts with direct tension indicators (ODOT 506 / 724.02.D), holes 1 1/16\"; calibrated wrench method not allowed"; }),
+        Rule("OT13", "p.292 note 3", r => { r.Categories = C("BearingPlate"); r.Material = "AASHTO M270 Gr. 50W"; r.Set.Notes.Add("beveled bearing (sole) plate: all structural steel for sole plates and contact plates AASHTO M270 Gr 50W"); }),
+        Rule("OT12", "p.282 note 6, p.283-288 note 6", r => { r.Categories = C("Weld"); r.Set.Weld = "Fillet weld 5/16 both sides TYP.; AWS minimum sizes unless noted; terminated 3/8 (+/- 1/8) from edges of angles or stiffener plates"; }),
+    };
+}
 
 // ================================================================ 8. camber data (p.280 O-26, dead-load-deflections.csv)
 // Tenth points of each span (equal spacing between CL bearings) + the field splices. Point numbers: 1 + 10 x span + tenth; key points = CL bearings.

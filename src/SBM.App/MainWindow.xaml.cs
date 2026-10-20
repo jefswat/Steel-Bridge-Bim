@@ -38,7 +38,7 @@ public partial class MainWindow : Window
         SetPlanMode(true);
 
         _vm.SceneReady += OnSceneReady;
-        _vm.ProjectOpened += () => { if (_iso.Active) ExitIsolate(); };
+        _vm.ProjectOpened += () => { if (_iso.Active) ExitIsolate(); Database.PlanSheetWindow.CloseIfOpen(); };
         _vm.ZoomExtentsRequested += ZoomExtents;
         _vm.ViewModeRequested += SetPlanMode;
         _vm.LayerVisibilityChanged += (_, _) => { if (!_layerBatch) ApplyLayerVisibility(); };
@@ -188,7 +188,7 @@ public partial class MainWindow : Window
                 bool frameBenchDone = false;
                 var t2 = new System.Windows.Threading.DispatcherTimer { Interval = TimeSpan.FromSeconds(threeD ? 1.5 : args.Any(x => x is "--measure" or "--query" or "--snapbench") ? 1.5 : 0.1) };
                 bool cameraAgain = false;
-                t2.Tick += (_, _) =>
+                t2.Tick += async (_, _) =>
                 {
                     int fbi = Array.IndexOf(args, "--framebench");
                     if (!_lodBusy && fbi >= 0 && !frameBenchDone)
@@ -226,6 +226,20 @@ public partial class MainWindow : Window
                     SaveSnapshot(path);
                     SnapshotEditors(path);
                     SnapshotRecentDialog(path);
+                    if (args.Contains("--sheetwindow"))
+                    {
+                        // the plan sheet window opened by the pick: give the PDF viewer time to load, then capture it (_sheet.png)
+                        await Task.Delay(8000);
+                        string sheetPng = System.IO.Path.ChangeExtension(path, null) + "_sheet.png";
+                        ViewModels.MainViewModel.Log($"SHEETWIN: {Database.PlanSheetWindow.LastShown}, capture {(await Database.PlanSheetWindow.CaptureAsync(sheetPng) ? sheetPng : "not available")}");
+                    }
+                    if (args.Contains("--calcswindow"))
+                    {
+                        // G9: the Calcs window (first calc), captured as _calcs.png (+ _calcs_pdf.png = the summary page in the PDF viewer)
+                        ShowCalcsWindow(0);
+                        await Task.Delay(8000);
+                        ViewModels.MainViewModel.Log($"CALCSWIN: {Database.CalcsWindow.LastSummary}; capture {await Database.CalcsWindow.CaptureAsync(System.IO.Path.ChangeExtension(path, null) + "_calcs")}");
+                    }
                     _vm.IsDirty = false;
                     Close();
                 };
@@ -580,6 +594,7 @@ public partial class MainWindow : Window
 
     private static void SaveElement(FrameworkElement root, string path)
     {
+        root.UpdateLayout(); // content added in the same tick (e.g. the database panel after --pickafter) is measured first
         var rtb = new System.Windows.Media.Imaging.RenderTargetBitmap((int)root.ActualWidth, (int)root.ActualHeight, 96, 96, PixelFormats.Pbgra32);
         rtb.Render(root);
         SavePng(rtb, path);

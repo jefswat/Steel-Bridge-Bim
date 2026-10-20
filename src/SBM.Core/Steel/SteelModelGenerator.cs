@@ -102,6 +102,8 @@ public sealed partial class SteelModelGenerator
         foreach (var r in g._model.IntegralCaps)
             r.SteelMassKg = g._model.Parts.Where(p => p.Category != PartCategory.Weld && (p.Assembly == r.Mark || p.Assembly.StartsWith(r.Mark + "-C", StringComparison.Ordinal))).Sum(p => p.Mass);
         g.ApplyFabricationRules();
+        if (g._model.Parts.FirstOrDefault(p => p.Category == PartCategory.Weld && p.Assumption != null && p.Description.Contains(", held back ")) is { Assumption: { } wa })
+            g.Warn($"{wa.Reason} {wa.Basis}.");
         g._model.Diagnostics.AddRange(g._diag.Distinct());
         g._model.GenerationTime = sw.Elapsed;
         return g._model;
@@ -175,6 +177,15 @@ public sealed partial class SteelModelGenerator
     private string In(double m) => _u.FormatLength(m, LengthKind.Short);
     private string Pl(double w, double t) => _u.IsUS ? $"PL {In(w)} x {In(t)}" : $"PL {w * 1000:0}x{t * 1000:0}";
     private static double Inch(double inches) => UnitSystem.In(inches);
+
+    // ================================================================== weld termination (WeldTermination, BridgeDefinition.Welds)
+
+    /// <summary>Hold-back of a fillet weld of the given size from free edges, clips and the end of contact (plan value or the AWS default).</summary>
+    private double HoldBack(double size) => WeldTermination.HoldBack(_def.Welds, size);
+    /// <summary>UNRESOLVED flag of the weld termination (null when the plans give it).</summary>
+    private Assumption? WeldFlag(double size) => WeldTermination.Flag(_def.Welds, size, In);
+    /// <summary>", held back 1/4" (p.120)" for weld descriptions.</summary>
+    private string HoldNote(double size) => ", " + WeldTermination.Note(_def.Welds, size, In);
 
     // ================================================================== girder geometry helpers
 
@@ -493,13 +504,15 @@ public sealed partial class SteelModelGenerator
             // Continuous flange-to-web fillet welds, both sides, top and bottom.
             double aw = _def.Stiffeners.FlangeToWebWeld;
             var welds = new Mesh();
+            double fwHb = HoldBack(aw), fwLen = 0;                   // held back from the plate ends of the field section
             foreach (var (rs, zs) in new[] { (-1, 0), (1, 0), (-1, 1), (1, 1) })
             {
                 double dz = zs == 0 ? -aw : aw;
                 bool topWeld = zs == 0;
-                if (topWeld && tf1 <= tf0 + 1e-6) continue;
-                if (!topWeld && bf1 <= s0 + 1e-6) continue;
-                SweepAlongGirder(welds, path, topWeld ? tf0 : s0, topWeld ? tf1 : bf1, topWeld ? dapS : Array.Empty<double>(), s =>
+                double wa = (topWeld ? tf0 : s0) + fwHb, wb = (topWeld ? tf1 : bf1) - fwHb;
+                if (wb <= wa + WeldTermination.MinBead) continue;
+                fwLen += wb - wa;
+                SweepAlongGirder(welds, path, wa, wb, topWeld ? dapS.Where(x => x > wa && x < wb).ToArray() : Array.Empty<double>(), s =>
                 {
                     double tw = web.Thickness(s) / 2;
                     double z = topWeld ? -drop(s) : -d;
@@ -508,8 +521,8 @@ public sealed partial class SteelModelGenerator
             }
             _parts.Add(new SteelPart
             {
-                Mark = $"{mark}-FW", Category = PartCategory.Weld, Assembly = mark, Mesh = welds, Length = 2 * (s1 - s0) + 2 * (tf1 - tf0), Material = "E70XX",
-                Description = $"Fillet weld {In(aw)}, flange to web, both sides",
+                Mark = $"{mark}-FW", Category = PartCategory.Weld, Assembly = mark, Mesh = welds, Length = fwLen, Material = "E70XX",
+                Description = $"Fillet weld {In(aw)}, flange to web, both sides{HoldNote(aw)}", Assumption = WeldFlag(aw),
             });
         }
     }
@@ -613,7 +626,12 @@ public sealed partial class SteelModelGenerator
             StiffenerKind.ConnectionPlate => (PartCategory.ConnectionStiffener, "CS", "Connection stiffener"),
             _ => (PartCategory.IntermediateStiffener, "IS", "Intermediate stiffener"),
         };
-        double flangeW = Math.Min(_top[s.Girder].Width(s.GirderDistance), _bot[s.Girder].Width(s.GirderDistance));
+        double topW = _top[s.Girder].Width(s.GirderDistance), botW = _bot[s.Girder].Width(s.GirderDistance);
+        // ClipToTopFlange: the plate may be wider than the top flange (clipped below), so only the bottom flange limits it
+        double flangeW = sd.ClipToTopFlange ? botW : Math.Min(topW, botW);
+        // plate-frame x of the top flange edge (the plate runs along u, the flange edge is flangeW/2 from the web centre line across the girder)
+        double xe = topW / 2 / Math.Max(sin, 0.2);
+        bool clipTop = sd.ClipToTopFlange && xf + c < xe - 1e-4 && xf + w > xe + 1e-4;
         if ((xf + w) * sin > flangeW / 2 + 1e-4)
             Warn($"{g.Name}: {label.ToLowerInvariant()} at {_u.FormatStation(sta)} projects beyond the flange edge (skewed {Numerics.RadToDeg(s.SkewAngle):F1}°).");
 
@@ -623,11 +641,15 @@ public sealed partial class SteelModelGenerator
 
         var mesh = new Mesh();
         var welds = new Mesh();
+        double weldLen = 0;
         foreach (int side in new[] { 1, -1 })
         {
             if (side == 1 && s.Side is not (StiffenerSide.Both or StiffenerSide.Right)) continue;
             if (side == -1 && s.Side is not (StiffenerSide.Both or StiffenerSide.Left)) continue;
-            var poly = new List<Vec2> { new(xf, -c), new(xf + c, 0), new(xf + w, 0), new(xf + w, -h) };
+            var poly = new List<Vec2> { new(xf, -c), new(xf + c, 0) };
+            if (clipTop) { poly.Add(new Vec2(xe, 0)); poly.Add(new Vec2(xf + w, -(xf + w - xe))); }   // 45 deg back to the top flange edge (p.32 Sect. A-A)
+            else poly.Add(new Vec2(xf + w, 0));
+            poly.Add(new Vec2(xf + w, -h));
             if (weldBottom) { poly.Add(new Vec2(xf + c, -h)); poly.Add(new Vec2(xf, -h + c)); }
             else poly.Add(new Vec2(xf, -h));
             var pts = poly.Select(q => new Vec2(q.X * side, q.Y)).ToList();
@@ -638,25 +660,33 @@ public sealed partial class SteelModelGenerator
             double a = sd.WeldSize;
             var along = u * side;
             var tang3 = new Vec3(t.X, t.Y, 0);
+            // Weld termination: the stiffener-to-web weld stops short of the corner clips (hold-back past the clip, or the plans' distance from the toe of
+            // the flange-to-web weld, Iowa X = 5T min 2 1/4") or of the free plate end (intermediate stiffener gap); the flange welds stop the hold-back
+            // short of the clip and of the stiffener's outer edge.
+            double hb = HoldBack(a);
+            double webEnd = c + hb;
+            if (_def.Welds is { StiffenerWebEndFactor: > 0 } or { StiffenerWebEndMin: > 0 })
+                webEnd = Math.Max(webEnd, sd.FlangeToWebWeld + Math.Max(_def.Welds!.StiffenerWebEndFactor * tw, _def.Welds.StiffenerWebEndMin));
             foreach (int face in new[] { 1, -1 })
             {
                 var nrm = frame.Z * face;
                 var webLeg = Vec3.Dot(tang3, nrm) >= 0 ? tang3 : -tang3;
                 var off = nrm * (tp / 2);
-                welds.AddWeld(frame.ToWorld(side * xf, -c, 0) + off, frame.ToWorld(side * xf, weldBottom ? -h + c : -h, 0) + off, webLeg, along, a);
-                welds.AddWeld(frame.ToWorld(side * (xf + c), 0, 0) + off, frame.ToWorld(side * (xf + w), 0, 0) + off, -frame.Y, nrm, a);
+                weldLen += welds.AddHeld(frame.ToWorld(side * xf, 0, 0) + off, frame.ToWorld(side * xf, -h, 0) + off, webLeg, along, a, webEnd, weldBottom ? webEnd : hb);
+                // clipped outer top corner (Nebraska p.32): the flange weld stops at the clip, held back from it
+                weldLen += welds.AddHeld(frame.ToWorld(side * (xf + c), 0, 0) + off, frame.ToWorld(side * (clipTop ? xe : xf + w), 0, 0) + off, -frame.Y, nrm, a, hb, hb);
                 if (weldBottom)
-                    welds.AddWeld(frame.ToWorld(side * (xf + c), -h, 0) + off, frame.ToWorld(side * (xf + w), -h, 0) + off, frame.Y, nrm, a);
+                    weldLen += welds.AddHeld(frame.ToWorld(side * (xf + c), -h, 0) + off, frame.ToWorld(side * (xf + w), -h, 0) + off, frame.Y, nrm, a, hb, hb);
             }
         }
         if (mesh.IsEmpty) return;
-        string desc = Pl(w, tp) + (s.SkewAngle > Numerics.DegToRad(0.5) ? $", skewed {Numerics.RadToDeg(s.SkewAngle):F1}°" : "")
+        string desc = Pl(w, tp) + (clipTop ? $" (outer top corner clipped to the {In(topW)} top flange)" : "") + (s.SkewAngle > Numerics.DegToRad(0.5) ? $", skewed {Numerics.RadToDeg(s.SkewAngle):F1}°" : "")
                       + (s.Side == StiffenerSide.Both ? " (pair)" : "");
         _parts.Add(new SteelPart { Mark = $"{mark}-{code}{n}", Category = cat, Assembly = mark, Description = desc, Mesh = mesh, Length = h });
         _parts.Add(new SteelPart
         {
-            Mark = $"{mark}-{code}{n}-W", Category = PartCategory.Weld, Assembly = mark, Mesh = welds, Material = "E70XX", Length = h,
-            Description = $"Fillet weld {In(sd.WeldSize)}, {label.ToLowerInvariant()}",
+            Mark = $"{mark}-{code}{n}-W", Category = PartCategory.Weld, Assembly = mark, Mesh = welds, Material = "E70XX", Length = weldLen,
+            Description = $"Fillet weld {In(sd.WeldSize)}, {label.ToLowerInvariant()}{HoldNote(sd.WeldSize)}", Assumption = WeldFlag(sd.WeldSize),
         });
     }
 

@@ -38,7 +38,56 @@ public partial class MainWindow
         DbPanel.CreateRequested += () => _ = BuildDatabaseAsync(false);
         DbPanel.ImportPagesRequested += () => _ = BuildDatabaseAsync(true);
         DbPanel.NavigateRequested += gid => { ShowDbElement(gid); HighlightDbGroup(gid); };
+        DbPanel.OpenSheetRequested += (gid, s) => { if (_db != null) Database.PlanSheetWindow.ShowElement(this, _db, gid, DbLabel(gid), s); };
+        // G9 asset management: calc values vs the live model, the picked 3D point for findings, the Calcs window
+        DbPanel.CalcDiff = (v, title) =>
+            v.ResultPath.Length > 0 && !_vm.Project.Bridges.All(_vm.Framings.ContainsKey)
+                ? new SBM.Api.CalcDiffRow { Value = v, CalcTitle = title, Status = "error", CalcText = v.ValueText, Message = "results not generated (regenerate the model)" } // never regenerate here
+                : SBM.Api.CalcSync.DiffOne(CalcDoc(), _db, v, title);
+        DbPanel.PickedPoint = () => _dbPickWorld is { } w ? (w.X, w.Y, w.Z) : null;
+        DbPanel.OpenCalcsRequested += id => ShowCalcsWindow(id);
         RefreshDbStatus();
+    }
+
+    private Vec3? _dbPickWorld;
+
+    /// <summary>The live model with its current results (no regeneration) for calc comparisons.</summary>
+    private SBM.Api.SbmDocument CalcDoc()
+    {
+        var models = _vm.Project.Bridges.Select(b => _vm.Framings.TryGetValue(b, out var f)
+            ? new SBM.Core.Project.BridgeModel(b, f, _vm.SteelModels.GetValueOrDefault(b), true, _vm.ConcreteModels.GetValueOrDefault(b),
+                _vm.SubstructureModels.GetValueOrDefault(b), _vm.PrestressedModels.GetValueOrDefault(b))
+            : null).ToList();
+        return SBM.Api.SbmDocument.Attach(_vm.Project, _vm.FilePath, models);
+    }
+
+    private void OnShowCalcs(object sender, RoutedEventArgs e) => ShowCalcsWindow(0);
+
+    private void ShowCalcsWindow(long calcId)
+    {
+        if (_db == null)
+        {
+            MessageBox.Show(this, DbPath == null ? "Save the model first: calcs live in its companion database." : "Create the database first (Properties panel, Database).", "Calcs",
+                MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+        Database.CalcsWindow.ShowCalcs(this, new Database.CalcsWindow.Host { Db = () => _db, Doc = CalcDoc, ApplyAsync = ApplyCalcValuesAsync }, calcId);
+    }
+
+    /// <summary>Applies confirmed calc values to the live model: undo checkpoint, PropertyPath set + log per value, regenerate, save.</summary>
+    private async Task<SBM.Api.CalcApplyResult> ApplyCalcValuesAsync(IReadOnlyList<long> ids)
+    {
+        if (_db == null) throw new InvalidOperationException("No database.");
+        _vm.Checkpoint();
+        var res = SBM.Api.CalcSync.Apply(SBM.Api.SbmDocument.Attach(_vm.Project, _vm.FilePath), _db, ids, null, save: false);
+        foreach (var (row, o, n) in res.Applied) ViewModels.MainViewModel.Log($"CALC APPLY: {row.Value.PropertyPath}: {o} -> {n} (calc #{row.Value.CalcId} p.{row.Value.Page})");
+        if (res.Applied.Count > 0)
+        {
+            await _vm.RegenerateAsync(false);
+            if (_vm.FilePath != null) { _vm.SaveToPath(null); res.SavedTo = _vm.FilePath; }
+        }
+        if (_dbShown != null && _db != null) ShowDbElement(_dbShown);
+        return res;
     }
 
     private List<IfcBridgeData> DbSnapshotData() =>
@@ -73,7 +122,7 @@ public partial class MainWindow
     /// </summary>
     private async Task RelinkIfNeededAsync()
     {
-        if (_db == null || _dbBusy || DbPath is not { } path || CompanionDatabase.FindLinksFile(_vm.FilePath) is not { } links) return;
+        if (_db == null || _dbBusy || DbPath is not { } path || CompanionDatabase.FindLinksFile(_vm.FilePath, _vm.Project.Bridges.Select(b => b.Name)) is not { } links) return;
         string key = path + "|" + links + "|" + File.GetLastWriteTimeUtc(links).Ticks;
         if (_dbRelinked == key) return;
         bool applied = DateTime.TryParse(_db.Meta("links_applied_at"), null, System.Globalization.DateTimeStyles.RoundtripKind, out var at);
@@ -87,9 +136,10 @@ public partial class MainWindow
         RefreshDbStatus();
         string name = _vm.Project.Name;
         string? model = _vm.FilePath;
+        var opts = Opts(model, links);
         try
         {
-            var res = await Task.Run(() => CompanionDatabase.Relink(path, name, new DatabaseOptions { ModelFile = model, LinksFile = links, Log = m => ViewModels.MainViewModel.Log("DB: " + m) }));
+            var res = await Task.Run(() => CompanionDatabase.Relink(path, name, opts));
             ViewModels.MainViewModel.Log($"DB: plan sheet links from {Path.GetFileName(links)}: {res.Sheets} sheets, {res.Links?.Links ?? 0} links in {res.Elapsed.TotalSeconds:F1} s");
             if (res.Coverage.Length > 0) ViewModels.MainViewModel.Log("DB: " + res.Coverage);
         }
@@ -98,6 +148,13 @@ public partial class MainWindow
         OpenDb();
         RefreshDbStatus();
         if (_dbShown != null) ShowDbElement(_dbShown);
+    }
+
+    private DatabaseOptions Opts(string? model, string? links)
+    {
+        var o = new DatabaseOptions { ModelFile = model, LinksFile = links, Log = m => ViewModels.MainViewModel.Log("DB: " + m) };
+        o.BridgeNames.AddRange(_vm.Project.Bridges.Select(b => b.Name));
+        return o;
     }
 
     private void OpenDb()
@@ -133,7 +190,7 @@ public partial class MainWindow
     {
         if (_dbBusy || DbPath is not { } path) return;
         string? folder = null;
-        string? links = CompanionDatabase.FindLinksFile(_vm.FilePath);
+        string? links = CompanionDatabase.FindLinksFile(_vm.FilePath, _vm.Project.Bridges.Select(b => b.Name));
         if (pages)
         {
             if (links == null) { MessageBox.Show(this, "No sheet-links*.json (plan sets and link rules) naming this model beside it.", "Plan pages", MessageBoxButton.OK, MessageBoxImage.Information); return; }
@@ -192,6 +249,7 @@ public partial class MainWindow
 
     private void DbOnPicked(object tag, System.Numerics.Vector3 hitLocal)
     {
+        _dbPickWorld = _scene != null ? new Vec3(hitLocal.X, hitLocal.Y, hitLocal.Z) + _scene.Origin : null;
         if (_db == null) { _dbShown = null; DbPanel.ShowMessage(DbPath == null ? "Save the model to use the database." : "No database for this model yet: Create database."); return; }
         var task = _dbTagTask;
         if (task == null) { DbPanel.ShowMessage("Indexing the model…"); return; }
@@ -215,6 +273,10 @@ public partial class MainWindow
                 }
                 if (gid == null) { _dbShown = null; DbPanel.ShowMessage("This object is not in the database (rebuild it after model changes)."); return; }
                 ShowDbElement(gid);
+                // G1: a click in the 3D view opens the element's plan sheets in the app (unless the user closed the sheet window).
+                if (!Database.PlanSheetWindow.IsOpen && !Database.PlanSheetWindow.ClosedByUser && _db!.LinkCount > 0
+                    && !Environment.GetCommandLineArgs().Contains("--snapshot") || Environment.GetCommandLineArgs().Contains("--sheetwindow"))
+                    Database.PlanSheetWindow.ShowElement(this, _db!, gid, DbLabel(gid));
             }
             catch (Exception ex) { DbPanel.ShowMessage("Database error: " + ex.Message); }
         }
@@ -226,6 +288,8 @@ public partial class MainWindow
             task.ContinueWith(_ => Dispatcher.BeginInvoke(Resolve), TaskScheduler.Default);
         }
     }
+
+    private string DbLabel(string gid) => _db?.Get(gid) is { } e ? (e.Name.Length > 0 ? e.Name : e.Category) : gid;
 
     private void DbOnCleared()
     {
@@ -239,6 +303,7 @@ public partial class MainWindow
         _dbShown = gid;
         DbPanel.ShowElement(_db, gid);
         ViewModels.MainViewModel.Log("DB: " + DbPanel.LastSummary);
+        Database.PlanSheetWindow.Follow(_db, gid, DbLabel(gid));
     }
 
     /// <summary>Highlights, in the viewport, the mesh objects (plates, caps, columns, ...) below a hierarchy item. Bolts, studs and bars are instanced and not drawn in the highlight.</summary>

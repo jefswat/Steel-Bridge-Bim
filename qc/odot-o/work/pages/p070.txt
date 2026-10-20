@@ -1,0 +1,731 @@
+EPOXY COATED REINFORCING
+(ONE REQUIRED)
+PLAIN REINFORCING
+MARK SIZE QTY. FORM
+LENGTH
+REMARKS
+MARK SIZE QTY. FORM
+LENGTH
+REMARKS
+EPOXY COATED REINFORCING
+(ONE REQUIRED)
+PLAIN REINFORCING
+MARK SIZE QTY. FORM
+LENGTH
+REMARKS
+MARK SIZE QTY. FORM
+LENGTH
+REMARKS
+PIER NO.2 BAR LIST
+PIER NO.3 BAR LIST
+SCALE: ‰" = 1'-0"
+ PLAN - PIER NO. 2 
+7'-1"
+40'-0"
+2'-9•"
+ 
+ 
+(TYP.)
+8-PU3 #4@12
+(TYP.)
+3-PU2 #4@12
+ 
+ 
+4'-1•"
+12'-10•"
+90°0'0"
+(TYP.)
+6-PU3 #4@12
+(TYP.)
+3-PU1 #4@12
+1'-9•"
+STA 294+45.00
+! RAMP 44A
+WORKING POINT
+! BEARING
+! PIER
+5'-0"
+2'-6"
+2'-6"
+1'-0"
+10"
+! BEARING
+! 76" TUB GIRDERS
+PEACE SHIELD (TYP.)
+LOOKING DOWN STATION
+RAMP 44A OVER DEEP FORK CR., & 1-44
+K-25
+6'-0" DIA.
+6" CLR.
+DS1 #11
+DT1 W-20
+SCALE: •" = 1'-0"
+ SECTION D-D 
+PIER
+PIER DIMENSIONS 
+A
+B
+C
+D
+E
+3
+2
+68'-5"
+63'-4•"
+70'-8„"
+64'-1•"
+47'-9†"
+41'-11"
+36'-0"
+47'-0"
+49
+43
+UNIT
+PIER 2
+PIER 11
+PIER NO. 2 & 3 QUANTITIES
+ITEM
+IN THE QUANTITIES.
+PURPOSES ONLY.  THE BARS NOTED ARE NOT INCLUDED
+THE DRILLED SHAFT BARS ARE FOR INFORMATION
+1.
+NOTES:
+16'-5"
+5'-4"
+2'-1"
+5'-4"
+CH1
+PH1
+1'-7"
+1'-7"
+1'-7"
+39'-8"
+1'-7"
+1'-6"
+2'-1"
+2'-0"
+11"
+5"
+5• "
+5•"
+FS1
+FS1
+PS2
+PS1
+T1
+PS1 & PS2
+T1
+3'-7"
+3'-5"
+10"
+1'-0"
+6"
+3'-5"
+5'-0" TO 6'-3"
+2'-1"
+CE1 #4 X 10'-10"
+1'-7"
+21'-0"
+1'-7"
+FH2 #9 X 23'-6"
+FH1 #11 X 24'-2"
+PH1 #11 X 42'-10"
+CH1 #11 X 19'-7"
+FH1
+FH2
+1'-3"
+21'-0"
+1'-3"
+19'-10"
+19'-10"
+4'-7"
+6"
+16'-5"
+T2
+T4
+T5
+6"
+4'-5"
+CE2
+4'-3"
+4'-5"
+PU2
+6'-9"
+PU1 & PU7
+PU3 & PU6
+PU1 - PU3
+PU6 & PU7
+4'-2"
+50'-3"
+2'-0"
+55'-7"
+PIER 2
+PIER 3
+DS1 #11 X 40'-7" (PIER 3)
+DS1 #11 X 51'-7" (PIER 2)
+50'-0"
+1'-7"
+39'-0"
+1'-7"
+PIER 2
+PIER 3
+6'-6" TO 8'-0"
+T3
+4'-5"
+T3
+3'-1"
+10'-6"
+7'-11"
+4'-1"
+PU7
+PU6
+PU3
+PU2
+PU1
+CE2
+CE1
+PS2
+PS1
+PH10
+PH9
+PH8
+PH7
+PH6
+PH5
+PH4
+PH3
+PH2
+PH1
+T2
+T1
+C1
+CD1
+CD2
+T5
+T4
+T3
+CH1 
+FS1
+FH3
+FH2
+FH1 
+6
+61
+36
+9
+6
+14
+12
+52
+24
+2
+2
+2
+2
+2
+2
+10
+5
+10
+20
+86
+86
+52
+52
+52
+9
+18
+18
+48
+50
+6
+10
+24
+BNT.
+BNT.
+BNT.
+BNT.
+BNT.
+BNT.
+BNT.
+BNT.
+BNT.
+STR.
+STR.
+STR.
+STR.
+STR.
+STR.
+STR.
+STR.
+BNT.
+BNT.
+BNT.
+BNT.
+BNT.
+STR.
+BNT.
+BNT.
+BNT.
+BNT.
+BNT.
+BNT.
+STR.
+BNT.
+BNT.
+      
+      
+      
+      
+      
+#4    
+#4    
+#4    
+#4    
+#4    
+#4    
+#4    
+#5    
+#5    
+#6    
+#6    
+#6    
+#6    
+#6    
+#6    
+#6    
+#6    
+#6    
+#11   
+#5    
+#5    
+#11   
+#11   
+#11   
+#5    
+#5    
+#5    
+#11   
+#6    
+#6    
+#9    
+#11     
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+20'-1" TO 23'-1"      
+17'-1" TO 19'-7"      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+        
+DT1
+DS1
+2
+72
+BNT.
+BNT.
+      
+      
+      
+      
+      
+W20   
+#11     
+1,502'-0" 
+51'-7" 
+PU7
+PU6
+PU3
+PU2
+PU1
+CE2
+CE1
+PS2
+PS1
+PH10
+PH9
+PH8
+PH7
+PH6
+PH5
+PH4
+PH3
+PH2
+PH1
+T2
+T1
+C1
+CD1
+CD2
+T5
+T4
+T3
+CH1 
+FS1
+FH3
+FH2
+FH1 
+6
+61
+36
+9
+6
+14
+12
+52
+24
+2
+2
+2
+2
+2
+2
+10
+5
+10
+20
+98
+98
+52
+52
+52
+9
+18
+18
+48
+50
+6
+10
+24
+BNT.
+BNT.
+BNT.
+BNT.
+BNT.
+BNT.
+BNT.
+BNT.
+BNT.
+STR.
+STR.
+STR.
+STR.
+STR.
+STR.
+STR.
+STR.
+BNT.
+BNT.
+BNT.
+BNT.
+BNT.
+STR.
+BNT.
+BNT.
+BNT.
+BNT.
+BNT.
+BNT.
+STR.
+BNT.
+BNT.
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+20'-1" TO 23'-1"      
+17'-1" TO 19'-7"      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+        
+      
+      
+      
+      
+      
+#4    
+#4    
+#4    
+#4    
+#4    
+#4    
+#4    
+#5    
+#5    
+#6    
+#6    
+#6    
+#6    
+#6    
+#6    
+#6    
+#6    
+#6    
+#11   
+#5    
+#5    
+#11   
+#11   
+#11   
+#5    
+#5    
+#5    
+#11   
+#6    
+#6    
+#9    
+#11     
+DT1
+DS1
+2
+72
+BNT.
+BNT.
+      
+      
+      
+      
+      
+W20   
+#11     
+1,156'-0" 
+40'-7" 
+SEE SHEET K-97
+2" DIA. ANCHOR BOLTS
+      
+      
+      
+      
+      
+SEE NOTE 1    
+SEE NOTE 1      
+      
+      
+      
+      
+      
+SEE NOTE 1    
+SEE NOTE 1      
+T5 #5 X 17'-10"
+T4 #5 X 5'-9"
+T2 #5 X 4'-9"
+PIER 2
+PIER 3
+3'-9"
+PIER 2
+PIER 3
+6'-2"
+12'-9" 
+10'-5" 
+5'-1" 
+9'-9" 
+7'-5" 
+8'-5" 
+10'-10" 
+21'-7" (AVG.)
+18'-4" (AVG.)
+39'-9" 
+3'-2" 
+7'-8" 
+15'-8" 
+23'-8" 
+31'-8" 
+39'-9" 
+33'-1" 
+40'-11" 
+42'-10" 
+4'-9" 
+23'-7" 
+52'-3" 
+24'-4" 
+15'-7" 
+17'-9" 
+5'-9" 
+30'-9" 
+19'-7" 
+16'-3" 
+21'-0" 
+23'-6" 
+24'-2" 
+12'-9" 
+10'-5" 
+5'-1" 
+9'-9" 
+7'-5" 
+8'-5" 
+10'-10" 
+21'-7" (AVG.)
+18'-4" (AVG.)
+39'-9" 
+3'-2" 
+7'-8" 
+15'-8" 
+23'-8" 
+31'-8" 
+39'-9" 
+33'-1" 
+40'-11" 
+42'-10" 
+4'-9" 
+23'-7" 
+57'-7" 
+24'-4" 
+15'-7" 
+17'-9" 
+5'-9" 
+30'-9" 
+19'-7" 
+16'-3" 
+21'-0" 
+23'-6" 
+24'-2" 
+13'-7"
+CD2
+PS2 #5 X 21'-7" (AVG.)
+PS1 #5 X 18'-4" (AVG.)
+T3 #5 X 30'-9"
+T1 #5 X 23'-7"
+FS1 #5 X 16'-3"
+CE2
+PU7 #4 X 12'-9"
+PU6 #4 X 10'-5"
+PU3 #4 X 5'-1"
+PU2 #4 X 9'-9"
+PU1 #4 X 7'-5"
+CE2 #4 X 8'-5"
+C1 #11 X 57'-7" (PIER 3)
+C1 #11 X 52'-3" (PIER 2)
+CD2 #11 X 15'-7"
+PH2 #6 X 40'-11"
+! BEARING
+! U 54" BEAMS
+7'-1"
+7'-1"
+2'-11"
+11•"
+1'-11•"
+24'-6"
+15'-6"
+5'-6"
+10'-0"
+4'-6"
+2'-9•"
+5'-1" 1'-7"
+10'-4"
+5'-1"
+1'-9•"
+1'-9"
+BRIDGE 'K'
+PIER NO. 2 & 3 DETAILS
+(SHEET 2 OF 2)
+ORNAMENTAL MEDALLION
+CROSSHOLE SONIC LOGGING
+DRILLED SHAFTS 72" DIAMETER
+WATER REPELLENT (VISUALLY INSPECTED)
+EPOXY COATED REINFORCING STEEL
+(SP) GRAFFITI TREATMENT
+CLASS A CONCRETE
+SUBSTRUCTURE EXCAVATION COMMON
+EA
+EA
+LF
+SY
+LB
+SF
+CY
+CY
+2
+5
+94
+359
+48380
+452
+199.8
+235
+2
+0
+72
+383
+50200
+453
+211.6
+455
+09033(11)
+ I-235 / I-44
+OKLAHOMA COUNTY
+P:\FDB\1641-OKC\CIV\30305400\20_CAD\DGN\S\BRIDGE K\B2BSP_2_3_K02.dgn
+11/21/2016
+DESIGN
+DRAWN
+CHECKED
+APPROVED
+SQUAD
+JOB PIECE NO.
+SHEET NO.
+11/16
+11/16
+11/16
+11/16
+11/21/2016
+OKLAHOMA DEPARTMENT OF TRANSPORTATION
+MEETING
+FINAL FIELD
+BENHAM
+B2BSP 2 3 K02.dgn 11/21/2016 5:46:06 PM

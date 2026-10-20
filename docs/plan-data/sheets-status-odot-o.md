@@ -120,3 +120,11 @@ Counts by severity: **H 9, M 13, L 11 (33 findings)**.
 10. **Deck reinforcing section / bar list** (needs deck bars in the model), curve / profile data on the layout, deflection curve and FS points in the camber sheet, quantity table in plan item format (22, 24, 26, 30, 31).
 
 The existing data sheets (S-11 spacing, S-14 camber, S-15 / S-16 elevations, S-17 quantities) and the splice plate content are sound and can be kept.
+
+## Model inputs for the missing sheets (2026-10-19, handoff items 5 / 7a-7g)
+
+The model behind the sheets now carries what items 5 (lateral bracing detail), 7 (support diaphragm sheets) and 9 (steel / fabrication notes) of the list above need as data:
+WT 9x38 laterals with the Detail A 6-hole pattern (end setback scaled and flagged, p.289), pier 13 / 16 and pier 14 / 15 top and bottom connection plates with bolt holes
+(p.284, 286, 288), interior diaphragm corner clips, the Section A-A strut plates (thickness / width flagged, p.287), 5/16" fillet welds (web to flanges, stiffeners, diaphragms,
+bearing stiffeners), girder plates ending on the pier 13 skew line, and fabrication rules OT1-OT12 (M270 Gr 50W, Charpy zone 2 / fracture critical, faying surfaces, interior paint,
+weld notes). The sheets themselves are still to be generated; see `CLAUDE.md` (Steel TUB girders) for the inputs and what is not built.

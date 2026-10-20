@@ -196,7 +196,10 @@ public sealed class Alignment
         foreach (var (boxDist, e) in order)
         {
             if (boxDist > bestAbs) break;
-            foreach (double s in e.PerpendicularFeet(p))
+            // The element ends are candidates too: a foot exactly at an element junction (point square to the alignment at a PC / PT) can be
+            // missed by the root search of BOTH neighbours, which fell through to the "start of alignment" fallback (Nebraska St barrier
+            // lines: one point 8 m high at the PT). The closest point of an element is a perpendicular foot or an end.
+            foreach (double s in e.PerpendicularFeet(p).Append(0).Append(e.Length))
             {
                 var foot = e.PointAt(s);
                 double off = Vec2.Dot(p - foot, e.TangentAt(s).Right);

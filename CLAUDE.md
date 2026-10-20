@@ -33,11 +33,31 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
 - Companion database: `SBM.IO/Database` (`ModelDatabase` writer + schema, `PlanSheets` sheets/link rules/reports, `ModelDb` reader, `CompanionDatabase`
   orchestration; `IfcKeys` = the key patterns behind the IFC GlobalIds, shared with `IfcExporter` — never change a pattern). Compact layout `el` +
   `strings` + `props`, readable VIEW `elements`; groups (no IFC entity) at the plans' granularity; links on groups/assemblies, children inherit
-  (`v_element_sheets`). `tools/plan_split.py` splits plan PDFs. App: `MainWindow.Database.cs` + `SBM.App/Database/` (panel, preview window, `PdfOpener` = open at page).
+  (`v_element_sheets`) ONLY from their NEAREST linked ancestor (none when they have links of their own) and never general-role sheets (quantities, notes,
+  situation plans stay on the element they are linked to) - user rule 2026-10-19: an element references only the sheets used to model it; `ModelDb.Sheets` mirrors it. `tools/plan_split.py` splits plan PDFs. App: `MainWindow.Database.cs` + `SBM.App/Database/` (panel, preview window, `PdfOpener` = open at page in an external viewer,
+  `PlanSheetWindow` = the element's linked sheets INSIDE the app: one modeless window (movable to a second monitor, closable), sheet list + the plan PDF in
+  WebView2 (Edge PDF viewer, `#page=N`; package Microsoft.Web.WebView2, user data in %LOCALAPPDATA%\SteelBridgeModeler\WebView2), opened by a 3D pick when the
+  database has links unless the user closed it, follows the selection; panel "Show sheet"; snapshot `--sheetwindow` (with `--pickafter`) logs SHEETWIN: and writes `_sheet.png`).
   Sheet links need no PDF split: rules files `samples/plans/sheet-links-{i80-rampg,woodbury,br02069,nht,odot-o,bonner-unit5,bonner-unit6}.json` carry each plan set's sheet index
   (`sheets: [{p,s,t}]`) and `models` (which .sbm they belong to; `CompanionDatabase.FindLinksFile` picks by it) + `planFolders` (PDF lookup ->
-  `sheets.pdf_path`). Every build applies them; `CompanionDatabase.Relink` / `sbm db --relink` re-applies to an existing db; the app relinks on
+  `sheets.pdf_path`). A model outside that folder (copied / saved elsewhere) gets the SHIPPED rules: `CompanionDatabase.LibraryFolders` = `%SBM_LINKS%`, the program's `plans` folder
+  (the rules are copied there by the App / Cli csproj) and the repo's `samples/plans`, matched by `models` (file name) then by plan set `bridgeGroup` = a bridge name
+  (`DatabaseOptions.BridgeNames`); a generic rules file is never taken from the library. Every build applies them; `CompanionDatabase.Relink` / `sbm db --relink` re-applies to an existing db; the app relinks on
   load when links are missing or the rules file is newer. A new bridge needs its own `sheet-links-<name>.json` with an index (tests check every rule matches a sheet).
+  Asset management (G9, `AssetSchema` / `AssetStore` / `ModelDb.Assets.cs` / `InspectionCsv`, `SBM.Api/CalcSync`, CLI `sbm asset` in `SBM.Cli/AssetCommand.cs`,
+  docs/API.md "Asset management"): tables asset_files / asset_links / inspections / element_condition (AASHTO CS1-CS4 + defects) / component_ratings
+  (NBI 0-9, N) / findings / calcs / calc_values / calc_applied, version `meta.asset_schema_version` (created on Open = migration). NEVER touched by
+  `ModelDatabase.Write` (keep it that way: a rebuild must only rewrite el / strings / props / element_sheet); keyed by GlobalId; orphans kept and
+  reported (`v_asset_orphans`), never deleted; asset views reference the table `el`, never the view `elements`. Files are NOT in the database: copied
+  into `<db name>_assets\{photos,documents,calcs,thumbnails}` named by SHA-256 prefix; `location` relative to that folder + `location_kind` file|url
+  (permalinks later), resolved only through `AssetStore.Resolve`. Thumbnails / PDF text: `tools/asset_tool.py` (PyMuPDF, python -I); photos added in
+  the app get WPF thumbnails (`SBM.App/Database/AssetImages`). Calc values JSON `sbm-calc-values/1` -> `CalcSync.Diff` (inputs via `PropertyPath.Parse`,
+  results via `resultPath` on `BridgeModel` or a db element field) -> `Apply` only selected differing inputs, each logged in calc_applied. App: panel
+  sections in `ElementDbPanel.Assets.cs` (photos, inspection, findings + Add finding via `FormDialog`, calcs vs the live model through
+  `SbmDocument.Attach(project, path, models)` = no regeneration), `CalcsWindow` (Review > Asset > Calcs; WebView2 PDF at the summary page, diff grid,
+  Apply selected… with confirmation -> checkpoint, set, log, regenerate, save); snapshot `--calcswindow` -> `_calcs.png` / `_calcs_pdf.png`.
+  The .sqlite and `*_assets/` are git-ignored but are USER DATA now (no longer only regenerable output).
+  Agents reviewing plans: query instead of reading PDFs: `sbm db <model.sbm> --sheets-for <mark|name> [--json]` (pages to read per PDF) and `--find-sheet <title|no.>` (read-only, existing db, no regeneration).
   Keep `ModelDatabase.Builder` numbering in step with `IfcExporter` (test `GlobalIds_AreTheIfcGlobalIds`). CLI `sbm db`, docs in docs/API.md.
 - `src/SBM.Cli` — `sbm.exe` command line over SBM.Api (new/info/get/set/add/remove/import-landxml/regen/export/run/bench/
   elevations/drawings/sheets/nurbs).
@@ -393,6 +413,24 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
     `Steel/TubGirderGenerator.cs` (partial SteelModelGenerator, `RunTub` replaces `Run` when `IsTub`: plates from `Section.Layouts` (top flange width = one
     flange), splices, panel points (`TubPanelSegment`), stiffeners, internal K frames + WT top struts, WT top laterals, external / support diaphragms,
     pad + beveled-plate bearings + seats, hatches, studs, tension zones), report `SteelModel.Tub` (`TubGirderReport`), haunches `Concrete/ConcreteTubHaunch.cs`.
+    Handoff items 5 / 7a-7g (2026-10-19; all inputs OPTIONAL / additive): (5) top laterals `TubLateralBracingDefinition.EndSetback` (transverse distance WP line -> WT end edge, was a
+    hard-coded 4"; Bridge O 2 7/8" scaled p.289 with `EndSetbackFlag` = `UnresolvedFlag` text -> `Assumption.UnresolvedDimension` on the members, they stay on their layer), WT flange cut
+    parallel to the girder axis, Detail A pattern = 6 x 1" A325 per end (`BoltPitch` 3", `BoltGages` 1 3/4 / 1 3/4 / 4 1/16 / 1 3/4 / 1 3/4 across the WT flange, `FirstBoltFromEndEdge`
+    1 3/4"; `TubLateralPattern`), holes registered in the girder top flange AND the WT flange, none dropped. `Steel/TubSupportConnections.cs` (`TubSupportDiaphragm` moved there):
+    (7b/7e/7f) `TubSupportDiaphragmDefinition.TopConnection` (PL 1 x 12, 4'-3" over the interior flange = both diaphragm flanges, 1'-5 1/2" over the exterior flange; hole offsets from the
+    girder flange inner edge, rows 7" apart on lines parallel to the girder = skewed at pier 13) / `BottomConnection` (PL 1 x 2'-2", 1'-4" -> 1'-0" tapered, 8 + 8 holes, lies beneath the
+    tub bottom flange and the exterior diaphragm bottom flange) / `StrutPlate` (Section A-A, thickness + width flagged) / `CornerClipLength/Height` (interior web bottom corners);
+    holes registered in the girder flange, the interior diaphragm flange (`TubDiaphragmExtras`) and the exterior diaphragm flange; with plates the diaphragm flanges are FLUSH with the
+    girder flange face the plate lies on and end `FlangeEndGap` (1/2") short of the girder flange edges, the exterior web is notched around the girder flanges (`TubSupportFit`), the interior
+    web + bearing stiffeners follow; `TubFrame.Grade` (new, optional) lifts `AtInPlane` by the girder grade over the skew shift; studs under a plate are omitted (listed in a warning).
+    (7d) `TubGirderDefinition.FilletWeld` (5/16"): `Steel/TubWelds.cs` = web-to-flange sweeps per field section (`G1-1-FW`, like the I-girder `-FW`) + T-joint rules
+    (`WeldFinder.TJoint`, new optional `tJunctions` = collinear-neighbour + box containment for plates built analytically) as `PartCategory.Weld` parts `<plate>-W<rule>` (stiffeners to web / top
+    flange, K frame tabs / gussets, interior diaphragm webs, bearing stiffeners, strut plates, external diaphragm webs): viewport, IFC (IFCFASTENER .WELD) and DB like the I-girder welds,
+    not in `SteelMass`. (7a) `TubGirderDefinition.SkewedEnds` (default on, `SkewedEndMinDegrees` 0.5): girder plates end on the support line's vertical plane through the girder CL end
+    (`TubLongPlate`, `PlateBuilder.AddLongPlate` optional `cutA` / `cutB`; such plates have no exact-extrusion description). (7g) `BridgeDefinition.Fabrication` rules `OT1-OT12` in the
+    build script (M270 Gr 50W, CVN Zone 2 / fracture critical bottom tension flange + webs, faying surfaces, interior coating, bearing stiffener finish, plumb ends, weld notes) -> part
+    material / `SBM_FabricationAttributes` like the Nebraska I-girder rules; DB status now also stored for `DimensionOnly` flags. NOT built (reported by the generator / check): tab -> web
+    welds (no contact), stiffener top clip 1 1/2 x 3 (p.282), the 2" radius at the exterior web notches, exterior web corner clips, weld stops 3/8 from edges.
     FramingGenerator skips cross frames / stiffeners for tubs. New part categories `RolledTee` (IfcMember; WT top struts = role TopChord -> .CHORD.,
     top laterals .BRACE.) / `AccessDoor` (IfcPlate 'ACCESS_DOOR') appended AFTER main's arch categories (enum order). Support diaphragm top flanges carry
     2 studs @ 1'-0 (p.283) - girder studs are the parts whose assembly is not XSD*. Path distances (`BearingS`, `SpliceS`, plate runs) are PLAN arc lengths
@@ -401,7 +439,7 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
     the pier 14 / 16 working points (p.259; pier 13's N/E on p.148 is a Ramp 44E point off the arc - UNRESOLVED), 44F stationing back from 301+53.72 (the
     44E = 44F equation is data only: a station-gap profile broke IfcGradientCurve continuity). Pier 13 bearing line from the two girder spans
     141'-4 / 137'-2 5/16 (reproduces 18'-11 13/16 along CL brg and CL pier 301+53.72; the p.273 angles 69 deg 02'38"/18'54" do not fit - UNRESOLVED).
-    Check `samples/plans/check-odot-o-tub.csx` (74 OK / 38 DIFF, all reported: plan rounding 1/16-1/12" at pier 16 / G2 span 15, H +3/32" from the
+    Check `samples/plans/check-odot-o-tub.csx` (73 OK / 39 DIFF, all reported; the new one = 6 studs under the pier 13 top connection plates: plan rounding 1/16-1/12" at pier 16 / G2 span 15, H +3/32" from the
     rotated tub (plan H = vertical stack sum), bearing offset 3 1/16-3 1/8 vs 3", pedestal seats pier 14 +0.02 ft / pier 16 +0.17 ft, G2 top tension zone
     UNRESOLVED). Tests `TubGirderTests`; links `sheet-links-odot-o.json` (49-page index). IFC: 0 schema / EXPRESS issues; validator "open" connection
     angles = multi-item SweptSolid bodies (each item closed), top strut volume ratio 0.84 = nominal weight x length of a coped WT. I-girder IFCs
@@ -418,6 +456,21 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
     own mark; straight bars within `MarkLengthTolerance` snap to the cluster's SHORTEST length; odd closures grouped
     into "varies" marks (â‰¤3 ft range). Negative-moment bars are one length centered on the pier. Equal-piece splits
     except staggered longitudinals (stock 60 ft + closure).
+  - TRUE BEND RADII (user rule 2026-10-13, review 6f: "no kinks anywhere"): `Concrete/RebarBends.cs`. Generators may place bars with SHARP corners (plan bend
+    diagrams, script polylines, hooks as one vertex); `RebarBends.Apply(marks, bars)` replaces every corner with a tangent circular arc of centerline radius
+    pin / 2 + db / 2 (<= 15 deg per segment, >= 3 segments so `ArcFit` recovers it -> IfcArcIndex). It runs in ONE place: `RegenerationCache` right after each
+    bridge's concrete / prestressed models (`RoundBends`, before DeckRebarCheck and the cache) and substructure model; `BarPlacement.Points` is then the bent
+    bar for every consumer (`BendsRounded` = done once; tests that call generators directly see the sharp bars). Pin = `BarShape.PinDiameter` (printed /
+    generator) else `RebarBends.StandardPin` = AASHTO LRFD 5.10.2.3 (ties / stirrups / hoops #3-#5 4 db; else 6 / 8 / 10 db) - no state table that differs is
+    known (Iowa / MnDOT / TxDOT / NCDOT / ODOT plans bend per AASHTO / CRSI). Left alone: SPIRAL marks, already-sampled curves (turn <= 25 deg with a similar
+    neighbour turn within 0.3 m: generators' own `BarShape.Rounded` bends, circular hoops, helices), invisible turns (< 0.05 mm from the arc), reversals > 175 deg;
+    legs shorter than the tangent get the largest radius that fits (counted). Points closer than 0.1 mm are merged. Scheduled lengths (marks) are unchanged
+    (out-to-out sums); the 3D developed length is shorter by the bend deductions (expected). In-generator cover / containment checks still see the sharp
+    corner (conservative: the arc lies inside it). Info diagnostic "Rebar bends: ..." per model. `Round(..., fitRadius: true)` = smooth path through given
+    points (largest radius that fits, half end legs straight) - used for the arch PT tendons. Viewport `SmoothRebar.Densify` subdivides on the arc's
+    circumradius. Bar sheets (`BarSheet.BendPoints`) print "D = <pin>" at EVERY bend of a diagram + "D = PIN DIAMETER" (review 6m). Cost (I-80 + Ramp G,
+    2026-10-19): regen 31-34 s -> 33-34 s, IFC 351.2 -> 361.5 MB (+2.9 %), IfcArcIndex 14,801 -> 31,889. Known: I-80 U2 6b1 / U3 6b2 deck longitudinals
+    have a ~2.8" lateral crank where plan zones meet (generator) - now two reduced-radius bends. Tests `RebarBendsTests`.
   - `Steel/` â€” `Sections.cs` (AISC angle/channel catalog, bolt dims + length rounding), `SteelModel` (parts,
     assemblies, bolt instances, bearing seats), `SteelModelGenerator` (girder plates swept along `GirderPath`, plate
     changes with 1:2.5 width tapers, field-section split at splices, flange-web welds, stiffeners in their skewed
@@ -546,7 +599,7 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
     barrier `NamedPick.Source`, SubPick) is refined onto the exact face (`NurbsSnap.TryRefine`: coarse sample + closest point, then Newton
     ray / surface; planar faces ray / plane; holes rejected); `SnapHit.ExactWorld` is used by the measure and the readout says
     "(exact, x off the mesh)". OFF = today's mesh snap unchanged.
-  - Near-view rebar LOD (`MainWindow.RebarLod.cs`, `Viewport/SmoothRebar.cs`): zoomed in (width < 60 ft) and settled, bars within 20 ft of the view-center ray become smooth
+  - Near-view rebar LOD (`MainWindow.RebarLod.cs`, `Viewport/SmoothRebar.cs`; bends already true arcs from `RebarBends`): zoomed in (width < 60 ft) and settled, bars within 20 ft of the view-center ray become smooth
     lofted tubes (parallel transport, bends <= 10 deg/step, 10 sides) in an overlay model per rebar layer; the same bars are skipped in the light tile/instanced models via
     `_lodSkip` (flows through ApplyToModel / HiddenRanges). Settings in static `RebarLod`; snapshot `--nolod --lodradius --lodwidth --width --noterrain --framebench --pickafter --hideafter`.
 - Units/shared piers: `SupportDefinition.SharedPier` + `PierCenterOffset`; `RegenerationCache` is two-phase (superstructure
@@ -678,6 +731,22 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   connections, bent-plate posts at skewed frames; grating = one solid slab (mass from nominal weight). Data: `samples/plans/inspection-i80.csx`,
   `inspection-ramp-g.csx`. BoltInstance.Diameter is honored per instance (viewport, IFC fastener types, material list).
   Snapshot: `--closeup MARK@Bridge name` also selects one bridge for steel assemblies (walkway marks repeat in every bridge).
+- Weld termination / hold-back (2026-10-19, handoff 6e, user "fin welds go past the flanges and don't respect hold backs"): ONE rule for every fillet
+  weld generator, `Steel/WeldTermination.cs`: beads stop a hold-back short of free plate edges / corners, corner clips / copes and the end of contact; solids
+  end square. Value: OPTIONAL `BridgeDefinition.Welds` = `Bridge/WeldTerminationDefinition` (`HoldBack`, `Source`, `Unresolved`, Iowa
+  `StiffenerWebEndFactor` / `StiffenerWebEndMin` = stiffener-to-web weld ends X = 5T min 2 1/4" past the toe of the flange-to-web weld) + per-rule overrides
+  `ArchWeldRule.HoldBack(Source)`, `ArchFinSettings.RibWeldHoldBack(Source)`; null = AWS D1.5 practice (weld size, min 1/4") and every weld part carries an
+  UNRESOLVED dimension `Assumption` (+ one warning). Analytic welds use `Mesh.AddHeld(p0, p1, legs, size, h0, h1)` (I-girder stiffeners / connection plates /
+  bearing stiffeners in `SteelModelGenerator.BuildStiffener`, flange-to-web `-FW` held back from the field-section plate ends, cross frame and lateral lap
+  welds, sole plate welds, cross girder `-WLD`, tub web-to-flange sweeps at field-section ends only); mesh-found welds (`WeldFinder.TJoint`: arch rules, tub
+  T-joint rules) go through `WeldTermination.Terminate` (beads chained end to end with the same legs and < 30 deg turn, every run trimmed at both ends, closed
+  loops kept, runs < 2 hold-backs dropped). Weld part `Length` = the modeled root length now (was nominal), description ends ", held back X (source)".
+  Plan values (`samples/plans/weld-holdbacks.csx`, re-runnable on the models): I-80 / Ramp G / Nebraska St = Iowa std. 1021W Detail A 1/4" (PDF p.120 /
+  p.103 / p.32) + X = 5T min 2 1/4"; ODOT Bridge O = 3/8" (p.273 note 7, p.282-288 note 6); NHT rib fin = 1/4" (p.148), other NHT welds and the Sample =
+  default (flagged). Not applied: `IntegralCapDetailer` (Nebraska cap welds, being edited elsewhere). Drawings: `SteelDetailViews.Stiffeners` draws the
+  beads held back, dimensions the hold-back at the plate edge and notes the hold-back / web weld end / plan source (UNRESOLVED text when defaulted).
+  Tests `WeldTerminationTests`. Found: the ODOT tub rule GS (cross frame gusset to WT top strut) only ever found bolt-hole walls (0.2" chords) - no T-joint
+  in the model; those 42 bogus weld parts vanish now.
 - Clash check (`SBM.Core/Checks/SteelClashCheck.cs`, `SbmDocument.Clashes`, `sbm clash`): steel parts (+ optional bolts / welds), misc items, simple drains and
   substructure concrete (concrete only vs drains / misc); depth > 1/16" = clash. Walkways as designed (`InspectionAccessDefinition.SupportOnFrames`, built AFTER the
   connections phase from the generated frames, `Steel/InspectionWalkwayDetailer.cs`), cross girder `Level` / discontinuous girder cope inputs, drain pipes one mitred
@@ -780,13 +849,53 @@ UNRESOLVED FLAG (general, reusable): `SBM.Core/Assumption.cs` `Assumption{Status
   v4 (design note section 9, user review): gussets are ONE bent plate (`OneBentPlate`: brace rolls + leg slides solved together by a small
   Nelder-Mead, legs closed on the common bend line; CHECKS for the leg tilt / welded edge gap); knuckle splice + fill plates from the p.124 plan outline
   (`ArchKnuckleDetail.Splice*`, acute end corner cut, end flange bolt rows), end flange ends cut parallel to the chords; bearings hung from the steel
-  (`ArchBearingDefinition.HangFromSteel`, upper sole top in the steel plane, pedestal kept = CONFLICT per p.107 note 8); cable connectors on their own
+  (`ArchBearingDefinition.HangFromSteel`, upper sole top in the steel plane; v7: pedestal lowered to the stack bottom = CONFLICT per p.107 note 8); cable connectors on their own
   layer 3D-ARCH-CABLE-CONNECTORS.
+  v5 / v6 WELDS (design note sections 10 / 11): every weld symbol on the steel sheets is a 5/16" fillet (no CJP / field / all-around). PartCategory.Weld parts
+  (viewport layer 3D-WELDS = a DETAIL layer: tiled, hidden while the camera moves, drawn ~1/4 s after it stops, only near the view line; IFC IfcFastener WELD;
+  5/16" beads are ~2 px at overview zoom - look at them at <= 1.5 m wide). Rib fin plates (p.148): `ArchFinSettings.RibWeldSize`, 4 x D per cable
+  (`RibFinWelds`, 2026-10-19: beads ONLY on the fin edge's contact with the rib flanges, found by `WeldFinder.TJoint` fin onto the rib segments, from
+  `RibWeldHoldBack` (p.148 1/4" +- 1/8") below the end of the top clip, length D but stopped 1/4" before the flange tip; D longer than that = CHECK row
+  "weld length D vs the flange contact less 2 hold-backs", all 64 fins: 1,990" -> 1,562"). Tie fin plate (p.146 / 149): bolted, NO weld
+  symbol on the plans -> none (`TieFinWelds` is the explicit "none" hook). Everything else is data-driven: `ArchDefinition.Welds` = `ArchWeldRule` (Parts / Onto
+  regex on part marks, `$1` capture groups pair a plate with its own base plate, Size, OneSide + `SideToward` "span" | "+x" | "-x" for single-sided symbols
+  whose side the plan does not say (flagged `Unresolved`), Tolerance, AngleTolDeg, Source) -> `ArchGenerator.BuildWeldRules` -> `Steel/WeldFinder.TJoint`: the
+  attached plate's perimeter edges whose edge face sits on the other part (opposite normal within AngleTolDeg, edge within Tolerance, inside a triangle) get a
+  bead along the stretches really on it (sampled + bisected); `out overhang` = plate edge length hanging past the joint -> CHECK row per rule, rules that find no
+  contact list the marks. NHT rules in `arch-nht.csx` ("v6 welds" block): knuckle end web / arch flange plates / stub web / arch stiffener / vertical stiffener
+  (p.124 / 125, 5/16" both sides, mill to bear), bracing gusset to connection plate and rib stiffener to rib (p.129-140, both sides), tie web-to-flange
+  (p.143, one side), floorbeam web-to-flange (p.145), floorbeam connection stiffener (p.146); 286 weld parts. Bolted joints (knuckle splice / fill / cheese /
+  tie-joint gussets, rib / tie splices, floorbeam connection plates, tie fin plates) get none. Knuckle plates are now MILL TO BEAR: arch flange plates, stub
+  web and vertical stiffener bottoms lie in the end flange top plane (they were cut square to the leaning plate: +-0.044" / +-0.30" wedge gaps, the
+  stiffener also sank 0.75" into the flange and was inside out). `ArchBracingConnection.MitreWeldedEdge` (NHT: on) cuts each gusset's welded edge to the 7/8"
+  connection plate face (gusset plane to plate face 58 - 90 deg, the plan prints the supplement 90 - 122; a square edge left a 1/16" - 5/8" wedge gap at 80
+  gusset legs; Info line per leg; the gusset is then a faceted solid in IFC). Checks (v6): check-arch-nht 1064 OK / 508 DIFF (+22 weld rows: EW overhangs the end flange 4.2" at one end per knuckle, gusset edge overhang
+  6 7/16" in total, FB33-STB has no contact on its +X face), check-nht 827 / 6 (unchanged), tests 476.
+  v7 KNUCKLE AT THE BEARINGS (design note section 12, user screenshots 2026-10-19; all OPTIONAL, defaults = v6): `ArchKnuckleDetail.TieCutParallelToEndWeb`
+  (tie flange + web end in a VERTICAL cut parallel to the end web, JointGap normal to it from the end flange edge; knuckle tie web ends at the edge;
+  `TieCutS` / `KnuckleAt` in ArchGeneratorKnuckle.cs, BuildTie `Plate(..., cutA, cutB)` = per-lateral end stations), `ArchKnuckleDefinition.EndWebInset`
+  (end web outside face 1/2" inside the end flange edge; use `EndWebOutsideDn()` / `EndWebInsideDn()` everywhere, never -EndWebOffset + thickness),
+  `ArchKnuckleCorner.EndWebEndBeyondChord` (end web ends square to the web at the plan position per corner, flagged via `EndWebEndUnresolved`), arch
+  flange plate ends cut in the end web inside face plane per vertex (always), `ArchDeckDefinition.KnuckleZonesFromSteel` (new partial
+  ArchGeneratorKnuckleZone.cs: `RibBox` recorded per corner = deck-side face of the inside arch flange plate + its intrados edge; knuckle-zone slab =
+  ring loft between `ZoneSide` boundaries from the end web INSIDE face to the floorbeam knot, cut back to the rib box; curbs end skewed on the end web
+  inside face and are clipped to the zone outline; bars use `ZoneClear` / `ClearRun` on the zone outline: D1 / D2 knuckle runs stop EndCover short of any
+  steel, A1 hooks / B1 ends keep 1/8" off the steel, S1 / D4 ranges start where both stirrup legs are EndCover clear, D3 in a knuckle panel shorter than the
+  bar = counted, not placed (`AddBars(..., unplaced)` -> "(n of m not modeled - UNRESOLVED)")), `ArchBearingDefinition.PedestalAdjusted` (warning text +
+  BearingSeat at the stack bottom; arch-nht.csx lowers the approach units' arch pedestal CapBlocks to the stack bottom with a CONFLICT `Reported` text and
+  re-runs rebar-nht-sub.csx; check-nht prints those seats as CONFLICT rows and checks them against the arch BearingSeat). Checks (v7): check-arch-nht 1077 OK
+  / 507 DIFF (same code on the v6 model: 1076 / 508; the stated v6 baseline 1064 / 508 predates later main commits), check-nht 827 PASS / 6 FAIL + 4 CONFLICT,
+  tests 498, Woodbury IFC identical (FILE_NAME only), NHT IFC 0 issues.
 - True-arc plate outlines (generic): `Solids/ArcPolygon` (points + signed minor-arc radii per edge, exact area, tessellation, Sub / Map / Reversed),
   `PlateBuilder.AddPlanarArc` (mesh from the tessellation, `ExtrudedSolid.ExactOutline` keeps the arcs) -> IFC Parametric IfcIndexedPolyCurve with
   IfcArcIndex, ReferenceView tessellated to its chord tolerance. Tests `ArchBracingConnectionTests`. Tests `ArchTests`, `ArchV2Tests`. Knuckle visual check without a snapshot: `temp`-style dump of part triangles + a small
   kg/m3, not in SteelMass), ArchConnectionPlate, ArchStiffener, PtStrand, PtAnchorage. Remaining GAPs: bracing U-point gussets (p.129-140), railing,
-  duct, camber (D3 bars done 2026-10-12). Tests `ArchTests`, `ArchV2Tests`. Knuckle visual check without a snapshot: `temp`-style dump of part triangles + a small
+  duct, camber (D3 bars done 2026-10-12). Tests `ArchTests`, `ArchV2Tests`.
+  Kinks fixed 2026-10-19 (review 1.3 / 9d): deck D1 / D2 lines in the knuckle zones run STRAIGHT parallel to the CL1-CL2 chord (local X) from the first / last
+  floorbeam point to the end web inside face less EndCover and bend there (p.151 "BEND LONG. REINF. TO STUD GRID"; grid m + e y between the floorbeams);
+  PT tendons: knuckle run straight along local X from the last slot to the end web inside face (the old "nearest end web opening" picked the far side
+  opening for N2 / S2 = the last-bay kink; CHECK vs the printed openings 2'-7 1/2 / 4'-1 1/2 along the face: 31 3/16 / 49 1/16), whole path smoothed with
+  `RebarBends.Round(fitRadius)`, curve radius UNRESOLVED (p.155 / 145, flagged on every strand + CHECK rows "smooth path": min R ~472 ft, offset 3/16"). Knuckle visual check without a snapshot: `temp`-style dump of part triangles + a small
   pymupdf painter's renderer (no matplotlib in the sandbox).
 - Precast PT SEGMENTAL box girder (OPTIONAL `BridgeDefinition.Segmental` = `Bridge/SegmentalDefinition.cs`, omitted from the .sbm when null; design note
   `docs/plan-data/bonner-b2500/segmental-unit5/SEGMENTAL-DESIGN.md`): own bridge with `Girders.Count = 0` (support lines only, like the arch; supports =
@@ -832,6 +941,14 @@ UNRESOLVED FLAG (general, reusable): `SBM.Core/Assumption.cs` `Assumption{Status
   `SteelAssembly.PredefinedType/ObjectType`, `SteelPart.Density`. IFC: one IfcRailing per run (GUARDRAIL / HANDRAIL / FENCE / BALUSTRADE, ObjectType = type
   name) aggregating IfcMember POST / MEMBER, IfcRailing HANDRAIL, IfcPlate BASE_PLATE, IfcRailing 'RAILING_ENVELOPE', anchor IfcMechanicalFastener.
   Database: group "Pedestrian railings" > assemblies "pedestrian railing". Viewport layer 3D-PED-RAILING; quantity table rows by type (LF). Tests `PedestrianRailingTests`.
+  FENCE FABRIC + post grid (2026-10-19): `PedestrianRailingDefinition.Fabric` (`RailFabricDefinition`: `Path` = section polyline bottom to top, e.g. the post's outer face,
+  `OffsetFromPost` to its right-hand = outward side, `BottomH` / `TopH` height range, `Thickness`, `MassPerArea`, `PostClearance`, `Unresolved` / `Basis`) -> one thin
+  panel (`PartCategory.RailFabric`, appended; density = MassPerArea / Thickness, so Mass = area x MassPerArea) per bay between consecutive posts, the end bays to the run
+  ends; viewport layer 3D-PED-RAILING-FABRIC drawn see-through (`SceneBuilder.FabricOpacity` 0.22), IFC IfcPlate USERDEFINED 'FENCE_FABRIC' aggregated in the run's
+  IfcRailing (Kind Fence = IFC4.3 FENCE), DB class IFCPLATE 'railing fence fabric', table row "PEDESTRIAN RAILING FENCE FABRIC" (SF). `RailPostDefinition.GridStation` = posts on
+  the radial lines at `GridStation + k x Spacing` measured ALONG THE ALIGNMENT (plan elevations lay posts out on the centerline; run ends included, 1 mm), else equal
+  spacing from the run ends. `PedestrianRailingDefinition.FlagsDimensionOnly` = post / handrail / fabric flags are `Assumption.DimensionOnly` (normal layers; the envelope
+  flag stays a plain UNRESOLVED). `RailingRun` gains `FabricPanels / FabricArea / FabricMass / PostStations`.
 - Curbs: custom barrier with `BarrierDefinition.IsCurb` (OPTIONAL) -> solids "Left/Right curb", IFC IfcKerb (USERDEFINED, ObjectType = ProfileName), DB category "curb".
 - Sealed joints without blockout (OPTIONAL `ExpansionJointDefinition` fields): `ExpansionJointType.Sealed` (appended), `BlockoutWidth` 0 = no blockout (deck not
   cut back, no blockout element in IFC / DB), `BodyCentered` (device envelope +-GapAt50F/2 about the deck-end line, for plans that dimension the slab to the
@@ -873,13 +990,21 @@ UNRESOLVED FLAG (general, reusable): `SBM.Core/Assumption.cs` `Assumption{Status
   T80SS(MOD) at Pier 10 (section 5): RL-T80SS bridge-slab section + 1'-0 lower back face (= the p.105 D-D vectors), 9'-1 / 4'-6 / 7'-11 + 15'-0 1:10 taper +
   1'-8, base shaft top + 2'-9 (flagged), pavement 2'-4 x 1'-1; Pier 11 not drawn (76.33 vs 78 LF); bars / UHMW wedge UNRESOLVED.
   Check: the approach slab lengths / SF and rail LF are compared to the CL SEJ (cut-back strips added back in check-nht.csx).
-  check-nht.csx after build-nht + arch-nht: 827 PASS / 6 FAIL (4 arch pier CY +-0.3, p.91 low rail 579.0 vs 578.88 layout, T80SS 76.33 vs 78 LF);
+  check-nht.csx after build-nht + arch-nht: 827 PASS / 6 FAIL (4 arch pier CY +-0.3, p.91 low rail 579.0 vs 578.88 layout, T80SS 76.33 vs 78 LF) + 4 CONFLICT rows (v7: arch pedestal tops at the bearing stack bottom vs p.102, p.107 note 8);
   IFC: validate_ifc 0 schema / EXPRESS issues, new products mesh closed (BS-EJCP sleeve anchors 1.03 volume ratio = tiny Pset mass rounding).
 - NHT railing / curbs / joints / mow strips: `samples/plans/rail-joints-nht.csx` (hooked at the end of build-nht.csx before its regeneration and in arch-nht.csx
   before its final regeneration; works on whatever NHT bridges exist). Curbs 10" x 4" with 3/4" chamfers (p.89, 113, 83). RAIL (PED) LOW / HIGH on the curb
-  line (7'-0 from CL NHT = the p.84-88 "face of rail", LF reproduced to 0.006 ft per side), sections from the p.89 page VECTORS (1.5 pt/in) as flagged
-  envelopes (posts / spacing / plates / anchors UNRESOLVED: railing detail sheets not in the set, p.84 note 2 "diagrammatic"), mass = p.83 design dead load
-  50 / 100 PLF, handrail top 3'-0 (dimensioned, pipe scaled). SEJ-B(MOD) / BS-EJCP / IGTS and T80SS(MOD): see "NHT TxDOT standards" above (the 4 in
+  line (7'-0 from CL NHT = the p.84-88 "face of rail", LF reproduced to 0.006 ft per side). SINCE 2026-10-19 (user: "Northaven fence is still solid") NO envelope:
+  posts + see-through fence fabric + handrail. POST LAYOUT read on the p.85-88 elevation vectors (1" = 20', 3.6 pt/ft): post symbols (double lines 1.8 pt = 6" apart) every
+  28.8 pt = 8.00 ft on CL NHT stations, one unbroken grid per run, not tied to the joints; LOW grid 20+51.74 (2.44 ft after the begin-of-rail line 20+49.30, last low
+  post 23+31.74 = 7.0-7.5 ft before the transition), HIGH grid starts WITH a post at the transition 23+38.74 and runs through the arch to 29+06.74 (rail end 29+10.87:
+  4.13-4.19 ft open end bay); match-line scatter +-0.5 ft in the low grid. Posts = p.89 side outline (1.5 pt/in vectors; 4'-3 / 9'-10 dimensioned) x 6" thick (the only
+  plan value: the elevation symbol width), `GridStation`; flagged `Assumption.UnresolvedDimension` (stay on 3D-PED-RAILING): thickness, base plates, anchors, rails
+  (detail sheets 224-226 not in the set, p.84 note 2 "diagrammatic"). Fabric (`RailFabricDefinition`, layer 3D-PED-RAILING-FABRIC): the elevations draw a panel in every bay
+  (fence exists; type NOT given: no pay item, p.89 only refers to the missing sheets) -> chain link GUESS (user's suggestion) 9 ga (0.148") 2 in mesh, 0.40 lb/ft2 nominal,
+  2 wire diameters thick, on the outer face of the posts (handrail bracket on the trail side), curb top to post top (HIGH: follows the curved top); flagged dimension-only.
+  Handrail top 3'-0 (dimensioned, pipe scaled, wall unresolved: weight not counted). Modeled mass 53.8 PLF LOW / 105.0 PLF HIGH vs the p.83 design dead load 50 / 100 PLF
+  (check-nht INFO; fabric only 1.5 / 3.8 PLF; 216 posts, 228 panels). Handoff 1.1 / 9a. SEJ-B(MOD) / BS-EJCP / IGTS and T80SS(MOD): see "NHT TxDOT standards" above (the 4 in
   placeholder of 2026-10-12 morning is replaced). Mow strips 2'-0 x 4" at the 12 approach piers (6.12 CY vs 6.1, top EL. D + 1'-0 flagged).
   The older GAP lines in build-nht.csx about rail / curb / joints / mow strips are superseded by this script's output.
 - NHT model check: `check-nht.csx` 796 PASS / 4 FAIL (2026-10-12; the 4 = arch pier cap / column CY vs the p.102 quantity table, +-0.3 CY; section 6 = reinforcing:
@@ -920,6 +1045,11 @@ UNRESOLVED FLAG (general, reusable): `SBM.Core/Assumption.cs` `Assumption{Status
 - Nebraska St. Ramp B (Iowa DOT Design 1617, "911"; PDF "B00167 - Nebraska Ramp B - Design 116.pdf"): `samples/plans/build-nebraska-st.csx` (sbm new + run) ->
   `Nebraska St Ramp B.sbm`, check `check-nebraska-st.csx`, links `sheet-links-nebraska-st.json`, data `docs/plan-data/nebraska-ramp-b-b00167/`. Placement APPROXIMATE in UTM 14N
   (GPS = CL at STA 2475+52.56, p.27/p.29 north arrows true az 296.262 minus convergence), 3DEP terrain. Pier 2 = integral cap + capless turned columns.
+  Pier 1 "end walls" are the plans' MASKWALLS (p.9, p.14; `CapBlockKind.Maskwall`, 12" = 8" full width + 4" reveal, sloped top, 2.7 CY = plan; square to the pier line, the
+  barrier bump-out ends are 90 deg to the deck edge p.43 Detail C = plans' own skew difference), linked to p.9-11 / p.14. `CrossFrameOrientation.NormalToGirders` (p.27; span 2 spacing
+  still not the plan's 23'-0 5/8 + 22'-9: needs `CrossFrameDefinition.Lines`). `StiffenerDefinition.ClipToTopFlange` (abutment stiffeners wider than the top flange, p.32 Sect. A-A;
+  OPTIONAL, off = unchanged). Cap: `IntegralSteelCapDefinition.StiffenerBottomWeld` (5/16, p.31), `CapGirderConnection.DiaphragmWeld` (drawn 1/4", UNRESOLVED size, p.30) /
+  `BottomPlateWeld` (5/16). Check script section 9; notes `docs/plan-data/nebraska-ramp-b-b00167/SUMMARY.md` ("Review 2026-10-13 items 6-12").
 
 ## Conventions (bridge engineering)
 - Offsets right-positive (Civil 3D). Skew from the radial line; positive = right end of support line up-station.

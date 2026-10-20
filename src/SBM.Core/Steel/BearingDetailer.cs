@@ -66,10 +66,11 @@ public sealed partial class SteelModelGenerator
         var sw = new Mesh();
         double a = _def.Stiffeners.WeldSize;
         double half = Math.Min(ws, bfW) / 2;
-        foreach (int side in new[] { 1, -1 })
-            sw.AddWeld(frame.ToWorld(-ls / 2, -grade * ls / 2, side * half), frame.ToWorld(ls / 2, grade * ls / 2, side * half), -Up, frame.Z * side, a);
-        _parts.Add(new SteelPart { Mark = $"{mark}-SPW", Category = PartCategory.Weld, Assembly = mark, Mesh = sw, Length = 2 * ls, Material = "E70XX",
-            Description = $"Fillet weld {In(a)}, sole plate to flange (field)" });
+        double spLen = 0;
+        foreach (int side in new[] { 1, -1 })                   // stops short of the sole plate ends
+            spLen += sw.AddHeld(frame.ToWorld(-ls / 2, -grade * ls / 2, side * half), frame.ToWorld(ls / 2, grade * ls / 2, side * half), -Up, frame.Z * side, a, HoldBack(a), HoldBack(a));
+        _parts.Add(new SteelPart { Mark = $"{mark}-SPW", Category = PartCategory.Weld, Assembly = mark, Mesh = sw, Length = spLen, Material = "E70XX",
+            Description = $"Fillet weld {In(a)}, sole plate to flange (field){HoldNote(a)}", Assumption = WeldFlag(a) });
 
         double seat;
         if (bd.Type == BearingType.Elastomeric)

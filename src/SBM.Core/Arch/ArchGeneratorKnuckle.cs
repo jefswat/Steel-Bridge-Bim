@@ -25,19 +25,38 @@ public static partial class ArchGenerator
         /// edge (p.124: end flange 2" x 32" from the end web outside face), plus half the joint gap. Null = no knuckle detail at that end.</summary>
         private double? KnuckleJoint(ArchTieDefinition t, TieGeo geo, bool atStart)
         {
+            if (KnuckleAt(t, atStart) is not { } k) return null;
+            double edge = k.EndFlangeWidth - k.EndWebOffset;
+            // v7 (TieCutParallelToEndWeb): the joint centre = the middle of the gap, which is measured normal to the skewed cut from the end flange edge.
+            if (k.Detail!.TieCutParallelToEndWeb) edge += k.Detail.JointGap / 2;
+            return TieCutS(geo, atStart, 0, edge, k);
+        }
+
+        /// <summary>The v2 knuckle (with a detail) whose corners include the tie's start / end point.</summary>
+        private ArchKnuckleDefinition? KnuckleAt(ArchTieDefinition t, bool atStart)
+        {
             string pt = atStart ? t.Start : t.End;
-            foreach (var k in _d.Knuckles)
+            return _d.Knuckles.FirstOrDefault(k => k.Detail != null && EndLine(k) != null && k.Corners.Any(c => string.Equals(c.Point, pt, StringComparison.OrdinalIgnoreCase)));
+        }
+
+        /// <summary>Distance from the tie end (start or end) along the tie where the point at lateral offset <paramref name="lat"/> (left of the tie in its own
+        /// direction) lies <paramref name="dn"/> from the knuckle end line (toward the span). Beyond the tie end the end tangent is extended. Null = no crossing.</summary>
+        private double? TieCutS(TieGeo geo, bool atStart, double lat, double dn, ArchKnuckleDefinition k)
+        {
+            if (EndLine(k) is not { } el) return null;
+            Vec2 Pt(double s)
             {
-                if (k.Detail == null || !k.Corners.Any(c => string.Equals(c.Point, pt, StringComparison.OrdinalIgnoreCase))) continue;
-                if (EndLine(k) is not { } el) continue;
-                double edge = k.EndFlangeWidth - k.EndWebOffset;
-                double F(double s) => Vec2.Dot(geo.At(atStart ? s : geo.Length - s).p - el.a, el.n) - edge;
-                double lo = 0, hi = Ft(10);
-                if (Math.Sign(F(lo)) == Math.Sign(F(hi))) continue;
-                for (int i = 0; i < 80; i++) { double m = (lo + hi) / 2; if (Math.Sign(F(m)) == Math.Sign(F(lo))) lo = m; else hi = m; }
-                return (lo + hi) / 2;
+                double u = atStart ? s : geo.Length - s;
+                var (p, a) = geo.At(Math.Clamp(u, 0, geo.Length));
+                var d = Vec2.FromAngle(a);
+                if (u < 0) p += d * u; else if (u > geo.Length) p += d * (u - geo.Length);
+                return p + d.Left * lat;
             }
-            return null;
+            double F(double s) => Vec2.Dot(Pt(s) - el.a, el.n) - dn;
+            double lo = -Ft(3), hi = Ft(10);
+            if (Math.Sign(F(lo)) == Math.Sign(F(hi))) return null;
+            for (int i = 0; i < 80; i++) { double m = (lo + hi) / 2; if (Math.Sign(F(m)) == Math.Sign(F(lo))) lo = m; else hi = m; }
+            return (lo + hi) / 2;
         }
 
         private static List<Vec2> Fillet(List<Vec2> poly, int i, double r, int seg = 6)
@@ -105,18 +124,42 @@ public static partial class ArchGenerator
             double hEnd = !double.IsNaN(k.EndWebHeightAtEnds) ? k.EndWebHeightAtEnds : k.EndWebScaledHeightAtEnds;
             if (!double.IsNaN(hEnd))
             {
-                var poly = Ccw(new List<Vec2> { new(-half, zef), new(half, zef), new(half, zef + hEnd), new(0, zef + k.EndWebHeightAtChord), new(-half, zef + hEnd) });
+                // End web: outside face EndWebInset inside the end flange outer edge (p.124 / 125 vector: 1/2"); ends at the corners' plan positions (cut square
+                // to the web, EndWebEndBeyondChord outside each tie chord) or EndLength centred on the chord crossing.
+                double oW = k.EndWebOutsideDn();
+                double xA = -half, xB = half;
+                var endAt = new List<string>();
+                foreach (var c in k.Corners)
+                {
+                    if (double.IsNaN(c.EndWebEndBeyondChord) || CornerChord(c) is not { } cc) continue;
+                    var (t0, _, o2) = cc;
+                    var mid = el.ctr + el.n * (oW + k.EndWebThickness / 2);
+                    double den = Vec2.Dot(el.t, o2);
+                    if (Math.Abs(den) < 0.2) continue;
+                    double x = (c.EndWebEndBeyondChord - Vec2.Dot(mid - t0, o2)) / den;
+                    if (x < 0) xA = x; else xB = x;
+                    endAt.Add($"{c.Point} {L(c.EndWebEndBeyondChord)}");
+                }
+                double Zt(double x) => zef + k.EndWebHeightAtChord + (hEnd - k.EndWebHeightAtChord) * Math.Abs(x) / half;
+                var poly = Ccw(new List<Vec2> { new(xA, zef), new(xB, zef), new(xB, Zt(xB)), new(0, zef + k.EndWebHeightAtChord), new(xA, Zt(xA)) });
                 var ops = k.EndWebOpeningsAt.Select(x => PlateBuilder.RoundedRectangle(new Vec2(x, zef + k.EndWebOpeningZ), k.EndWebOpeningLength, k.EndWebOpeningHeight, k.EndWebOpeningHeight * 0.45, 8)).ToList();
                 var wf = new Frame3(org, et, _fr.Z, en);
                 var web = new Mesh();
-                if (ops.Count > 0) PlateBuilder.AddPlanarWithOpenings(web, poly, Array.Empty<Hole>(), ops, wf, o0, o0 + k.EndWebThickness);
-                else PlateBuilder.AddPlanar(web, poly, Array.Empty<Hole>(), wf, o0, o0 + k.EndWebThickness);
-                var asu = double.IsNaN(k.EndWebHeightAtEnds) && k.EndWebUnresolved.Length > 0 ? Assumption.UnresolvedDimension(k.EndWebUnresolved, $"end height {L(hEnd)} scaled") : null;
-                AddPart($"{asm}-EW", PartCategory.KnucklePlate, asm, $"PL {L(k.EndWebThickness)} x {L(k.EndLength)} end web{(ops.Count > 0 ? $", {ops.Count} PT openings {L(k.EndWebOpeningLength)} x {L(k.EndWebOpeningHeight)}" : "")} (p.126)",
-                    web, k.Material, k.EndLength, 0, asu);
+                if (ops.Count > 0) PlateBuilder.AddPlanarWithOpenings(web, poly, Array.Empty<Hole>(), ops, wf, oW, oW + k.EndWebThickness);
+                else PlateBuilder.AddPlanar(web, poly, Array.Empty<Hole>(), wf, oW, oW + k.EndWebThickness);
+                var why = new List<string>();
+                if (double.IsNaN(k.EndWebHeightAtEnds) && k.EndWebUnresolved.Length > 0) why.Add(k.EndWebUnresolved);
+                if (endAt.Count > 0 && k.EndWebEndUnresolved.Length > 0) why.Add(k.EndWebEndUnresolved);
+                var asu = why.Count > 0 ? Assumption.UnresolvedDimension(string.Join(" ", why),
+                    $"end height {L(hEnd)} scaled{(endAt.Count > 0 ? $"; ends square to the web, outside the tie chords: {string.Join(", ", endAt)}" : "")}") : null;
+                double lenW = xB - xA;
+                AddPart($"{asm}-EW", PartCategory.KnucklePlate, asm, $"PL {L(k.EndWebThickness)} x {L(lenW)} end web{(ops.Count > 0 ? $", {ops.Count} PT openings {L(k.EndWebOpeningLength)} x {L(k.EndWebOpeningHeight)}" : "")}{(k.EndWebInset > 0 ? $", outside face {L(k.EndWebInset)} inside the end flange edge" : "")} (p.126)",
+                    web, k.Material, lenW, 0, asu);
+                if (endAt.Count > 0)
+                    Info($"Arch knuckle {k.Name}: end web {L(lenW)} long, ends square to the web at {string.Join(", ", endAt)} outside the tie chords (p.124 / 125 vector) instead of {L(k.EndLength)} centred on the chord.");
                 foreach (double x in k.EndWebStudsAt)
                 {
-                    var o = wf.ToWorld(x, zef + k.EndWebStudZ, o0 + k.EndWebThickness);
+                    var o = wf.ToWorld(x, zef + k.EndWebStudZ, oW + k.EndWebThickness);
                     Model.Steel.Studs.Add(new StudInstance { Frame = new Frame3(o, et, _fr.Z, en), Length = k.EndWebStudLength, Assembly = asm + "-EP" });
                 }
             }
@@ -162,7 +205,7 @@ public static partial class ArchGenerator
             if (k.DeckStudRows.Count > 0 && k.DeckStudSpacing > 0)
             {
                 // Clip region: the deck plate outline extended to the end web inside face, less the stud edge clearance.
-                var region = Ccw(new List<Vec2> { X((el.a + el.n * (k.EndWebThickness - k.EndWebOffset), el.t), lT1), X(lT1, lFb), X(lFb, lT2), X(lT2, (el.a + el.n * (k.EndWebThickness - k.EndWebOffset), el.t)) });
+                var region = Ccw(new List<Vec2> { X((el.a + el.n * k.EndWebInsideDn(), el.t), lT1), X(lT1, lFb), X(lFb, lT2), X(lT2, (el.a + el.n * k.EndWebInsideDn(), el.t)) });
                 bool Inside(Vec2 p)
                 {
                     for (int i = 0; i < region.Count; i++)
@@ -219,7 +262,7 @@ public static partial class ArchGenerator
             string cm = $"{asm}-{c.Point.Replace("'", "P")}";
             var mat = kd.Material;
             // End web inside face in plan: distance from the end line toward the span.
-            double dIn = -k.EndWebOffset + k.EndWebThickness;
+            double dIn = k.EndWebInsideDn();
             double Dn(Vec3 p) => Vec2.Dot(p.XY - el.a, el.n);
             // ---- bent arch flange plates (outside / inside)
             foreach (var (outside, h) in new[] { (true, c.OutsideLegHeight), (false, c.InsideLegHeight) })
@@ -238,7 +281,27 @@ public static partial class ArchGenerator
                 poly = Fillet(poly, 2, kd.BendRadius);
                 poly = Ccw(poly);
                 var m = new Mesh();
-                PlateBuilder.AddPrism(m, poly, Array.Empty<Hole>(), (u, v, t) => W(o3 + bn * t + cIn * u + up * v), _ => -tp / 2, _ => tp / 2);
+                // Mill to bear (p.124 A-A / B-B): the bottom end of the plate lies in the end flange top plane (the plate leans with the rib, so a cut square
+                // to the plate would leave a wedge gap against the flat flange).
+                double vBot = vb;
+                // The end against the end web: in the end web inside face plane for every vertex (the plate leans with the rib, so a cut at the bottom
+                // edge position alone runs into / away from the skewed end web higher up).
+                double UEnd(double v, double t) => (dIn - Dn(o3 + bn * t + up * v)) / du;
+                PlateBuilder.AddPrism(m, poly, Array.Empty<Hole>(), (u, v, t) =>
+                {
+                    if (Math.Abs(u - uEnd) < 1e-9 && Math.Abs(v - vBot) > 1e-9) u = UEnd(v, t);
+                    return W(o3 + bn * t + cIn * u + up * (Math.Abs(v - vBot) < 1e-9 ? (zef - o3.Z - cIn.Z * u - bn.Z * t) / up.Z : v));
+                }, _ => -tp / 2, _ => tp / 2);
+                if (!outside)
+                {
+                    // Rib box record for the deck (KnuckleZonesFromSteel): inside face of this plate (toward the deck) and its intrados edge line.
+                    double so = -sOut;   // the inside plate sits at bn * (-sOut) ...; its deck-side face is further along -sOut
+                    var facePt = o3 + bn * (so * tp / 2);
+                    var faceN = (bn * so).Normalized();
+                    var e0 = o3 + cIn * (-n2.X * hw) + up * (-n2.Y * hw);
+                    var ed = (cIn * t2.X + up * t2.Y).Normalized();
+                    _ribBoxes.Add(new RibBox(c.Tie, string.Equals(tg.Def.Start, c.Point, StringComparison.OrdinalIgnoreCase), facePt, faceN, e0, ed, k.Name));
+                }
                 AddPart($"{cm}-AF{(outside ? "O" : "I")}", PartCategory.KnucklePlate, asm,
                     $"PL {L(tp)} {(outside ? "outside" : "inside")} arch flange plate, bent (leg {L(h)}, R {L(kd.BendRadius)}) at {c.Point} (p.124/125)", m, mat, sCut + Math.Abs(uEnd));
             }
@@ -249,7 +312,9 @@ public static partial class ArchGenerator
                 double Sb(double wv) => (zef - T.Z - wv * bn.Z) / tan.Z;
                 var poly = Ccw(new List<Vec2> { new(Sb(-hwW), -hwW), new(sCut, -hwW), new(sCut, hwW), new(Sb(hwW), hwW) });
                 var m = new Mesh();
-                PlateBuilder.AddPrism(m, poly, Array.Empty<Hole>(), (s, wv, t) => W(T + tan * s + bn * wv + nW * t), _ => -kd.StubWebThickness / 2, _ => kd.StubWebThickness / 2);
+                // Mill to bear on the end flange top: the bottom end is cut in that (horizontal) plane, not square to the web.
+                PlateBuilder.AddPrism(m, poly, Array.Empty<Hole>(), (s, wv, t) =>
+                    W(T + tan * (Math.Abs(s - sCut) > 1e-9 ? (zef - T.Z - bn.Z * wv - nW.Z * t) / tan.Z : s) + bn * wv + nW * t), _ => -kd.StubWebThickness / 2, _ => kd.StubWebThickness / 2);
                 var asu = kd.StubWebUnresolved.Length > 0 ? Assumption.UnresolvedDimension(kd.StubWebUnresolved, $"PL {L(kd.StubWebThickness)}") : null;
                 AddPart($"{cm}-SW", PartCategory.KnucklePlate, asm, $"PL {L(kd.StubWebThickness)} arch stub web at {c.Point}, milled to bear (p.124 A-A)", m, mat, sCut, 0, asu);
                 // Arch stiffener: normal to the rib at ArchStiffenerAlongRib, intrados side, web face to the flange tip.
@@ -265,7 +330,10 @@ public static partial class ArchGenerator
                 double vb0 = (zef - ov.Z) / up.Z;
                 var vp = Ccw(new List<Vec2> { new(-hwW, vb0), new(hwW, vb0), new(hwW, vb0 + kd.StiffenerHeight / up.Z), new(-hwW, vb0 + kd.StiffenerHeight / up.Z) });
                 var mv = new Mesh();
-                PlateBuilder.AddPrism(mv, vp, Array.Empty<Hole>(), (wv, v, t) => W(ov + bn * wv + up * v + cIn * t), _ => -kd.StiffenerThickness / 2, _ => kd.StiffenerThickness / 2);
+                double hand = Vec3.Dot(Vec3.Cross(bn, up), cIn) >= 0 ? 1 : -1;   // the (wv, v, t) map must be right-handed or the plate comes out inside out
+                // Bottom on the end flange top and top level, both horizontal (the plate leans with the rib plane).
+                PlateBuilder.AddPrism(mv, vp, Array.Empty<Hole>(), (wv, v, t) =>
+                    W(ov + bn * wv + cIn * (hand * t) + up * ((zef + (v > vb0 + 1e-9 ? kd.StiffenerHeight : 0) - ov.Z - bn.Z * wv - cIn.Z * hand * t) / up.Z)), _ => -kd.StiffenerThickness / 2, _ => kd.StiffenerThickness / 2);
                 AddPart($"{cm}-ST", PartCategory.KnucklePlate, asm, $"PL {L(kd.StiffenerThickness)} stiffener at {c.Point} ({L(kd.StiffenerFromSpringing)} outside the springing, {L(kd.StiffenerHeight)} high, p.124 B-B)", mv, mat, 2 * hwW);
             }
             // ---- tie joint: tie web stub (knuckle side), gussets + bolts, fill + splice under the tie flange, cheese plates at the jacks
@@ -290,8 +358,17 @@ public static partial class ArchGenerator
                 double sw1 = zw * cot + (sw0 - zt0 * cot);
                 var poly = Ccw(new List<Vec2> { new(sw0, zt0), new(sj - g2, zt0), new(sj - g2, zw), new(sw1, zw) });
                 var m = new Mesh();
-                PlateBuilder.AddPrism(m, poly, Array.Empty<Hole>(), (s, z, t) => TieMap(s, z, t), _ => -tdef.WebThickness / 2, _ => tdef.WebThickness / 2);
-                AddPart($"{cm}-TW", PartCategory.KnucklePlate, asm, $"PL {L(tdef.WebThickness)} knuckle tie web at {c.Point} (to the tie joint at the end flange edge)", m, mat, sj);
+                // v7: the joint end is the vertical plane through the end flange inner edge (parallel to the end web); per face of the web (lat = t).
+                bool skewCut = kd.TieCutParallelToEndWeb;
+                double edgeDn = k.EndFlangeWidth - k.EndWebOffset;
+                double SEnd(double t)
+                {
+                    // TA lateral (left of the direction away from the end) -> the tie's own left
+                    double lat = tieAtStart ? t : -t;
+                    return TieCutS(tg, tieAtStart, lat, edgeDn, k) ?? sj - g2;
+                }
+                PlateBuilder.AddPrism(m, poly, Array.Empty<Hole>(), (s, z, t) => TieMap(skewCut && Math.Abs(s - (sj - g2)) < 1e-9 ? SEnd(t) : s, z, t), _ => -tdef.WebThickness / 2, _ => tdef.WebThickness / 2);
+                AddPart($"{cm}-TW", PartCategory.KnucklePlate, asm, $"PL {L(tdef.WebThickness)} knuckle tie web at {c.Point} (to the tie joint at the end flange edge{(skewCut ? ", end parallel to the end web" : "")})", m, mat, sj);
             }
             {
                 double lg = kd.GussetBoltFirst + (kd.GussetBoltColumns - 1) * kd.GussetBoltPitch + kd.GussetEdge;
@@ -315,7 +392,7 @@ public static partial class ArchGenerator
                 double hwF = tdef.FlangeWidth / 2;
                 var asu = kd.SpliceUnresolved.Length > 0 ? Assumption.UnresolvedDimension(kd.SpliceUnresolved, $"splice plate from the end web to {L(kd.SplicePlateLength / 2)} past the joint, {L(tdef.FlangeWidth)} wide; bolts not modeled") : null;
                 if (!double.IsNaN(kd.SpliceHalfWidth) && !double.IsNaN(kd.SpliceBeyondJoint))
-                    SpliceFromPlan(k, kd, c, el, T, cIn, cm, asm, mat, g2, asu);
+                    SpliceFromPlan(k, kd, c, el, T, cIn, cm, asm, mat, kd.TieCutParallelToEndWeb ? kd.JointGap : g2, asu);   // fill from the tie end
                 else
                 {
                 var mf = new Mesh();

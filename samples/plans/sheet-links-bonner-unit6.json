@@ -512,17 +512,6 @@
   ],
   "rules": [
     {
-      "id": "general",
-      "sheets": "^GENERAL DRAWING INDEX OF SHEETS - NORTH TRANSITION",
-      "role": "general",
-      "basis": "Unit 6-14 sheet index and general notes",
-      "target": [
-        {
-          "level": "unit"
-        }
-      ]
-    },
-    {
       "id": "foundation-layout",
       "sheets": "^GENERAL DRAWING FOUNDATION LAYOUT UNIT 6",
       "role": "general",
@@ -582,12 +571,15 @@
     {
       "id": "plan-of-spans",
       "sheets": "^SUPERSTRUCTURE PLAN OF SPANS (DETAILS )?UNIT 6",
-      "basis": "Deck plan, deck reinforcing (not placed), joints, diaphragms (not modeled)",
+      "basis": "Plan of spans sheet 1: bent stations, deck 42'-7 and unit ends (p409); the continuation sheets (deck bars, drains, diaphragms p410-415) are not modeled",
       "target": [
         {
           "level": "part",
           "category": "deck"
         }
+      ],
+      "pages": [
+        409
       ]
     },
     {
@@ -707,33 +699,9 @@
       ]
     },
     {
-      "id": "bill-of-material",
-      "sheets": "^SUPERSTRUCTURE BILL OF MATERIAL UNITS 6 AND 7",
-      "role": "general",
-      "basis": "Unit 6 superstructure bar list and quantities (deck bars not placed)",
-      "target": [
-        {
-          "level": "part",
-          "category": "deck"
-        }
-      ]
-    },
-    {
-      "id": "pour-sequence",
-      "sheets": "^DECK SLAB POURING SEQUENCE",
-      "role": "general",
-      "basis": "Deck pours and closures (not modeled)",
-      "target": [
-        {
-          "level": "part",
-          "category": "deck"
-        }
-      ]
-    },
-    {
       "id": "bents-30-31",
       "sheets": "^SUBSTRUCTURE BENTS 30 & 31",
-      "basis": "Bents 30 / 31: side view, footing plan, piles, column PT, quantities",
+      "basis": "Bents 30 / 31: side view (pile heads, column position), footing plan and piles (p459), footing quantities, 14 piles = 1,611 LF (p460)",
       "target": [
         {
           "level": "part",
@@ -745,24 +713,52 @@
           "category": "pier",
           "support": "Bent 31"
         }
+      ],
+      "pages": [
+        458,
+        459,
+        460
+      ]
+    },
+    {
+      "id": "bents-side-view",
+      "sheets": "^SUBSTRUCTURE BENTS 30 & 31",
+      "pages": [
+        458
+      ],
+      "basis": "Typical side view: pile heads 4'-0 above the footing bottom, footing 6'-0 / 5'-9 (p458), applied to bents 32-35",
+      "target": [
+        {
+          "level": "part",
+          "category": "pier",
+          "support": [
+            "Bent 32",
+            "Bent 33",
+            "Bent 34",
+            "Bent 35"
+          ]
+        }
       ]
     },
     {
       "id": "bent-32",
       "sheets": "^SUBSTRUCTURE BENT 32$",
-      "basis": "Bent 32: footing plan, piles, column PT",
+      "basis": "Bent 32: footing plan and piles (p462)",
       "target": [
         {
           "level": "part",
           "category": "pier",
           "support": "Bent 32"
         }
+      ],
+      "pages": [
+        462
       ]
     },
     {
       "id": "bents-33-35",
       "sheets": "^SUBSTRUCTURE BENTS 33 & 35",
-      "basis": "Bents 33 / 35: footing plan, piles, column PT",
+      "basis": "Bents 33 / 35: footing plan and piles (p465)",
       "target": [
         {
           "level": "part",
@@ -774,24 +770,30 @@
           "category": "pier",
           "support": "Bent 35"
         }
+      ],
+      "pages": [
+        465
       ]
     },
     {
       "id": "bent-34",
       "sheets": "^SUBSTRUCTURE BENT 34$",
-      "basis": "Bent 34: footing plan, piles, column PT",
+      "basis": "Bent 34: footing plan and piles (p468)",
       "target": [
         {
           "level": "part",
           "category": "pier",
           "support": "Bent 34"
         }
+      ],
+      "pages": [
+        468
       ]
     },
     {
       "id": "columns-30-32",
       "sheets": "^SUBSTRUCTURE PRECAST COLUMN SEGMENT DETAILS BENTS 30 - 32",
-      "basis": "Precast column segments (modeled as solid columns)",
+      "basis": "Precast column segments 6'-0 x 6'-0 (modeled as solid columns; segment heights bent-columns-caps.csv, p477)",
       "target": [
         {
           "level": "element",
@@ -802,12 +804,15 @@
             "Bent 32"
           ]
         }
+      ],
+      "pages": [
+        477
       ]
     },
     {
       "id": "columns-33-35",
       "sheets": "^SUBSTRUCTURE PRECAST COLUMN SEGMENT DETAILS BENTS 33",
-      "basis": "Precast column segments (modeled as solid columns)",
+      "basis": "Precast column segments 5'-0 x 5'-0 (modeled as solid columns; segment heights bent-columns-caps.csv, p479)",
       "target": [
         {
           "level": "element",
@@ -818,6 +823,9 @@
             "Bent 35"
           ]
         }
+      ],
+      "pages": [
+        479
       ]
     },
     {
@@ -837,6 +845,10 @@
             "Bent 32"
           ]
         }
+      ],
+      "pages": [
+        481,
+        483
       ]
     },
     {
@@ -856,19 +868,10 @@
             "Bent 35"
           ]
         }
-      ]
-    },
-    {
-      "id": "post-tensioning",
-      "sheets": "^SUBSTRUCTURE POST-TENSIONING DETAILS",
-      "role": "general",
-      "basis": "Column PT bars (not modeled)",
-      "target": [
-        {
-          "level": "element",
-          "category": "column",
-          "support": "Bent%"
-        }
+      ],
+      "pages": [
+        484,
+        486
       ]
     }
   ]

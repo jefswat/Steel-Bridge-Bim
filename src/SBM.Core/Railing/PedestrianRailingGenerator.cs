@@ -23,6 +23,13 @@ public sealed class RailingRun
     public double Length { get; init; }
     public double? PlanLength { get; init; }
     public int Posts { get; init; }
+    /// <summary>Fence fabric panels (one per bay) and their total area (m2, one face).</summary>
+    public int FabricPanels { get; init; }
+    public double FabricArea { get; init; }
+    /// <summary>Mass of the fabric panels (kg), included in <see cref="Mass"/>.</summary>
+    public double FabricMass { get; init; }
+    /// <summary>Alignment stations of the posts (m, station values), begin to end.</summary>
+    public List<double> PostStations { get; init; } = new();
     /// <summary>Mass of the run's parts (kg; envelope by its mass per length).</summary>
     public double Mass { get; init; }
     /// <summary>Reference-line points (plan, base elevation) from begin to end (sampled).</summary>
@@ -103,6 +110,15 @@ public static class PedestrianRailingGenerator
             double t = (s - ls[lo]) / Math.Max(1e-12, ls[hi] - ls[lo]);
             return ds[lo] + (ds[hi] - ds[lo]) * t;
         }
+        double SAt(double dist)
+        {
+            if (dist <= ds[0]) return 0;
+            if (dist >= ds[^1]) return ls[^1];
+            int lo = 0, hi = ds.Count - 1;
+            while (hi - lo > 1) { int m = (lo + hi) / 2; if (ds[m] <= dist) lo = m; else hi = m; }
+            double t = (dist - ds[lo]) / Math.Max(1e-12, ds[hi] - ds[lo]);
+            return ls[lo] + (ls[hi] - ls[lo]) * t;
+        }
         double s0 = d.EndClearance, s1 = ls[^1] - d.EndClearance, len = s1 - s0;
         if (len <= 1e-3) { res.Diagnostics.Add(new(DiagnosticSeverity.Warning, $"{where}: run shorter than the end clearances; not built.")); return; }
 
@@ -143,7 +159,8 @@ public static class PedestrianRailingGenerator
         double mass = 0;
         var asmDesc = $"{(d.TypeName.Length > 0 ? d.TypeName : "Pedestrian railing")} {name}, {u.FormatLength(len)} along the reference line {u.FormatLength(Math.Abs(d.Offset))} {(side < 0 ? "left" : "right")} of the alignment";
         res.Assemblies.Add(new SteelAssembly { Mark = asm, Kind = AssemblyKind.Railing, Description = asmDesc, PredefinedType = d.Kind.ToString().ToUpperInvariant(), ObjectType = d.TypeName.Length > 0 ? d.TypeName : null });
-        Assumption? Flag(string? why, string? basis) => why == null ? null : Assumption.Unresolved(why, basis ?? "as modeled");
+        // dimOnly: the plans show the part (posts, handrail, fence), only a size / type is open -> stays on its normal layer (Assumption.DimensionOnly)
+        Assumption? Flag(string? why, string? basis, bool dimOnly = false) => why == null ? null : dimOnly ? Assumption.UnresolvedDimension(why, basis ?? "as modeled") : Assumption.Unresolved(why, basis ?? "as modeled");
 
         // ---- envelope (one swept solid)
         if (d.Envelope is { Count: >= 3 } env)
@@ -187,13 +204,14 @@ public static class PedestrianRailingGenerator
                 Length = ms1 - ms0, Material = d.Material, Density = d.Density, Description = mem.Description.Length > 0 ? mem.Description : mem.Kind.ToString(),
                 // explicit mass per length (0 = carried by the envelope: a vanishing nominal weight keeps Mass at zero)
                 NominalWeightLbPerFt = mem.MassPerLength is double mpl ? Math.Max(mpl, 1e-12) / 1.48816394 : 0,
-                Assumption = Flag(mem.Unresolved, mem.Basis),
+                Assumption = Flag(mem.Unresolved, mem.Basis, d.FlagsDimensionOnly),
             };
             res.Parts.Add(part); mass += part.Mass;
         }
 
         // ---- posts, base plates, anchor bolts
         int posts = 0;
+        var postS = new List<double>();
         if (d.Post is { } pd && pd.Profile.Count >= 3 && pd.Thickness > 0)
         {
             if (pd.Spacing <= 0) res.Diagnostics.Add(new(DiagnosticSeverity.Warning, $"{where}: post spacing not given; posts not built."));
@@ -201,15 +219,23 @@ public static class PedestrianRailingGenerator
             {
                 double inner = len - 2 * pd.EndDistance;
                 var ps = new List<double>();
-                if (inner < -1e-9) ps.Add(s0 + len / 2);
+                if (pd.GridStation is double g0)
+                {
+                    // layout along the alignment stations (plan elevations): radial lines at g0 + k x Spacing inside the run (ends included, 1 mm)
+                    double dg = a.StationToDistance(g0), dLo = DAt(s0), dHi = DAt(s1);
+                    int k0 = (int)Math.Ceiling((dLo - dg - 1e-3) / pd.Spacing), k1 = (int)Math.Floor((dHi - dg + 1e-3) / pd.Spacing);
+                    for (int k = k0; k <= k1; k++) ps.Add(SAt(dg + k * pd.Spacing));
+                }
+                else if (inner < -1e-9) ps.Add(s0 + len / 2);
                 else
                 {
                     int n = Math.Max(2, (int)Math.Ceiling(inner / pd.Spacing - 1e-9) + 1);
                     if (inner < 1e-6) n = 1;
                     for (int i = 0; i < n; i++) ps.Add(s0 + pd.EndDistance + (n == 1 ? 0 : inner * i / (n - 1)));
                 }
+                postS = ps;
                 var sec = pd.Profile.Select(q => new Vec2(q.R, q.H)).ToList();
-                var flag = Flag(pd.Unresolved, pd.Basis);
+                var flag = Flag(pd.Unresolved, pd.Basis, d.FlagsDimensionOnly);
                 foreach (double s in ps)
                 {
                     posts++;
@@ -252,10 +278,47 @@ public static class PedestrianRailingGenerator
             }
         }
 
+        // ---- fence fabric: one thin panel per bay between the posts (the end bays run to the run ends)
+        int panels = 0; double fabArea = 0, fabMass = 0;
+        if (d.Fabric is { } fab && fab.Path.Count >= 2 && fab.Thickness > 0)
+        {
+            var secPoly = FabricSection(fab);
+            if (secPoly.Count < 4) res.Diagnostics.Add(new(DiagnosticSeverity.Warning, $"{where}: fence fabric path / height range gives no panel; not built."));
+            else
+            {
+                double half = (d.Post?.Thickness ?? 0) / 2 + fab.PostClearance;
+                var edges = new List<(double s, bool post)>();
+                foreach (double pS in postS.OrderBy(x => x)) edges.Add((pS, true));
+                if (edges.Count == 0 || edges[0].s > s0 + 1e-3) edges.Insert(0, (s0, false));
+                if (edges[^1].s < s1 - 1e-3) edges.Add((s1, false));
+                var fflag = Flag(fab.Unresolved, fab.Basis, d.FlagsDimensionOnly);
+                double dens = fab.MassPerArea / fab.Thickness;
+                for (int i = 0; i + 1 < edges.Count; i++)
+                {
+                    double b0 = edges[i].s + (edges[i].post ? half : 0), b1 = edges[i + 1].s - (edges[i + 1].post ? half : 0);
+                    if (b1 - b0 < 0.02) continue;
+                    var mst = st.Where(x => x > b0 + 1e-6 && x < b1 - 1e-6).Prepend(b0).Append(b1).ToList();
+                    var rings = mst.Select(x => { var fr = FrameAt(x); return secPoly.Select(q => W(fr, q.X, q.Y)).ToArray(); }).ToList();
+                    var fm = new Mesh();
+                    MeshBuilder.AddLoft(fm, secPoly, rings);
+                    panels++;
+                    var part = new SteelPart
+                    {
+                        Mark = $"{asm}-FAB{panels}", Category = PartCategory.RailFabric, Assembly = asm, Mesh = fm, Length = b1 - b0,
+                        Material = fab.Material.Length > 0 ? fab.Material : d.Material, Density = dens,
+                        Description = fab.Description.Length > 0 ? fab.Description : "fence fabric panel", Assumption = fflag,
+                    };
+                    res.Parts.Add(part); mass += part.Mass; fabMass += part.Mass;
+                    fabArea += part.Volume / fab.Thickness;
+                }
+            }
+        }
+
         var line = frames.Select(fr => fr.p.WithZ(fr.z)).ToList();
         res.Runs.Add(new RailingRun
         {
-            Name = name, Assembly = asm, TypeName = d.TypeName, Kind = d.Kind, Offset = d.Offset, Length = len, PlanLength = d.PlanLength, Posts = posts, Mass = mass, Line = line,
+            Name = name, Assembly = asm, TypeName = d.TypeName, Kind = d.Kind, Offset = d.Offset, Length = len, PlanLength = d.PlanLength, Posts = posts, Mass = mass, Line = line, FabricPanels = panels, FabricArea = fabArea, FabricMass = fabMass,
+            PostStations = postS.Select(x => a.DistanceToStation(DAt(x))).ToList(),
             BeginStation = a.DistanceToStation(DAt(s0)), EndStation = a.DistanceToStation(DAt(s1)),
         });
         if (d.PlanLength is double pl)
@@ -265,6 +328,37 @@ public static class PedestrianRailingGenerator
             res.Diagnostics.Add(new(ok ? DiagnosticSeverity.Info : DiagnosticSeverity.Warning,
                 $"{where}: length along the reference line {u.FormatLength(len)} vs plan {u.FormatLength(pl)} ({(diff >= 0 ? "+" : "")}{u.FormatLength(diff, LengthKind.Short)})."));
         }
+    }
+
+    /// <summary>Closed section polygon (R, H as X, Y) of the fabric panel: the clipped path offset by +- thickness / 2 about the offset line.</summary>
+    private static List<Vec2> FabricSection(RailFabricDefinition f)
+    {
+        double lo = f.BottomH, hi = f.TopH ?? double.MaxValue;
+        var pts = new List<Vec2>();
+        var p = f.Path.Select(q => new Vec2(q.R, q.H)).ToList();
+        for (int i = 0; i + 1 < p.Count; i++)
+        {
+            Vec2 a = p[i], b = p[i + 1];
+            if (b.Y <= a.Y + 1e-12) continue;                                   // the path rises
+            double t0 = Math.Clamp((lo - a.Y) / (b.Y - a.Y), 0, 1), t1 = Math.Clamp((hi - a.Y) / (b.Y - a.Y), 0, 1);
+            if (t1 - t0 < 1e-9) continue;
+            var q0 = a + (b - a) * t0; var q1 = a + (b - a) * t1;
+            if (pts.Count == 0 || (pts[^1] - q0).Length > 1e-9) pts.Add(q0);
+            pts.Add(q1);
+        }
+        if (pts.Count < 2) return new();
+        var left = new List<Vec2>(); var right = new List<Vec2>();
+        for (int i = 0; i < pts.Count; i++)
+        {
+            Vec2 dir = i == 0 ? pts[1] - pts[0] : i == pts.Count - 1 ? pts[i] - pts[i - 1] : (pts[i + 1] - pts[i]).Normalized() + (pts[i] - pts[i - 1]).Normalized();
+            dir = dir.Normalized();
+            var n = new Vec2(dir.Y, -dir.X);                                    // right-hand side of the upward path = outward
+            left.Add(pts[i] + n * (f.OffsetFromPost - f.Thickness / 2));
+            right.Add(pts[i] + n * (f.OffsetFromPost + f.Thickness / 2));
+        }
+        right.Reverse();
+        left.AddRange(right);
+        return left;
     }
 
     /// <summary>Alignment distance of a run end: radial line at the given station, else the deck end line, else the support line moved by the limit offset.</summary>

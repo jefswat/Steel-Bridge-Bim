@@ -10,16 +10,19 @@ namespace SBM.App.Database;
 
 /// <summary>
 /// Properties-side panel with the database record of the selected element: GlobalId, clickable hierarchy chain, category / mark /
-/// quantities, the plan sheets it is based on (open the single-page PDF, preview, set the QC status and note).
+/// quantities, asset records (photos / documents, inspection history, findings, calcs: ElementDbPanel.Assets.cs), the plan sheets it is based on
+/// (open the single-page PDF, preview, set the QC status and note).
 /// Built in code so it follows the app's dark theme resources.
 /// </summary>
-public sealed class ElementDbPanel : UserControl
+public sealed partial class ElementDbPanel : UserControl
 {
     public event Action? CreateRequested;
     public event Action? ImportPagesRequested;
     /// <summary>A hierarchy item was clicked (global id).</summary>
     public event Action<string>? NavigateRequested;
     public event Action<string, string>? QcSaved;
+    /// <summary>Open a linked sheet in the app's plan sheet window (element GlobalId, sheet).</summary>
+    public event Action<string, SheetLink>? OpenSheetRequested;
 
     private readonly StackPanel _root = new() { Margin = new Thickness(8, 4, 8, 8) };
     private readonly TextBlock _status = new() { TextWrapping = TextWrapping.Wrap, FontSize = 11 };
@@ -168,6 +171,8 @@ public sealed class ElementDbPanel : UserControl
             _body.Children.Add(kp);
         }
 
+        ShowAssets(db, globalId, sum);
+
         var sheets = db.Sheets(globalId);
         _body.Children.Add(Header($"Based on plan sheets ({sheets.Count})"));
         if (sheets.Count == 0)
@@ -204,26 +209,31 @@ public sealed class ElementDbPanel : UserControl
             Foreground = Muted, FontSize = 11, TextWrapping = TextWrapping.Wrap,
         });
         var row = new WrapPanel { Margin = new Thickness(0, 3, 0, 0) };
-        var open = Btn("Open PDF");
+        var open = Btn("Show sheet");
+        var ext = Btn("PDF viewer");
         var prev = Btn("Preview");
         var target = db.PdfTarget(s);
         string pdf = target?.File ?? "";
         string img = s.PreviewFile.Length > 0 ? db.Resolve(s.PreviewFile) : "";
-        open.IsEnabled = target != null;
+        open.IsEnabled = ext.IsEnabled = target != null;
         prev.IsEnabled = img.Length > 0 && File.Exists(img);
         // ToolTipService.ShowOnDisabled so the reason shows on a disabled button too.
         ToolTipService.SetShowOnDisabled(open, true);
+        ToolTipService.SetShowOnDisabled(ext, true);
         ToolTipService.SetShowOnDisabled(prev, true);
         open.ToolTip = target is { } t ? $"{t.File}, page {t.Page}" : $"Plan PDF not found ({(s.PdfPath.Length > 0 ? s.PdfPath : s.PlanSet)}): put it beside the model, in a folder named in the rules file's planFolders or in %SBM_PLANS%, then rebuild.";
         prev.ToolTip = prev.IsEnabled ? img : "No preview image: Import plan pages… (splits the PDF and renders previews).";
-        open.Click += (_, _) =>
+        ext.ToolTip = target is { } te ? $"Open {Path.GetFileName(te.File)} at page {te.Page} in the external PDF viewer" : open.ToolTip;
+        open.ToolTip = target is { } to ? $"Show {Path.GetFileName(to.File)}, page {to.Page}, in the plan sheet window" : open.ToolTip;
+        open.Click += (_, _) => OpenSheetRequested?.Invoke(globalId, s);
+        ext.Click += (_, _) =>
         {
             if (db.PdfTarget(s) is not { } tt) return;
             try { LastOpen = PdfOpener.Open(tt.File, tt.Page); }
             catch (Exception ex) { MessageBox.Show(Window.GetWindow(this)!, ex.Message, "Open PDF", MessageBoxButton.OK, MessageBoxImage.Warning); }
         };
         prev.Click += (_, _) => PlanPreviewWindow.ShowSheet(Window.GetWindow(this)!, $"{s.PlanSet} · design sheet {s.DesignSheet} · PDF {s.PdfPage} · {s.Title}", img, pdf, target?.Page ?? 1);
-        row.Children.Add(open); row.Children.Add(prev);
+        row.Children.Add(open); row.Children.Add(ext); row.Children.Add(prev);
         var status = new ComboBox { MinWidth = 90, Margin = new Thickness(0, 0, 6, 4), ItemsSource = new[] { "unchecked", "ok", "issue" }, SelectedItem = s.QcStatus };
         row.Children.Add(status);
         sp.Children.Add(row);

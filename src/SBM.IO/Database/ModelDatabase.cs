@@ -43,11 +43,12 @@ public sealed class DatabaseBuildResult
 /// and pier / abutment → cap, column, pedestal, footing, pile, rebar. Virtual groups (bridge group, girder, cross frames,
 /// lateral bracing) have no IFC entity (<c>in_ifc</c> = 0) but deterministic ids too.
 /// Plan sheets (<c>sheets</c>), links (<c>element_sheet</c>) and QC records (<c>qc</c>) live in the same file; a rebuild replaces
-/// the element and link tables but keeps <c>sheets</c> and <c>qc</c> (GlobalIds are stable across rebuilds).
+/// the element and link tables but keeps <c>sheets</c> and <c>qc</c> (GlobalIds are stable across rebuilds). The asset management tables
+/// (<see cref="AssetSchema"/>: photos / documents / calcs by reference, inspections, findings, calc values) are never touched by a rebuild either.
 /// </summary>
 public static class ModelDatabase
 {
-    public const int SchemaVersion = 2;
+    public const int SchemaVersion = 3; // 3 = asset management tables (AssetSchema, G9)
 
     private static readonly Regex UnitName = new(@"^(?<g>.*?)\s+Unit\s+(?<n>\d+)\s*$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
     private static readonly Regex CfName = new(@"^(?<type>.*?)\s+G(?<a>\d+)[–-]G(?<b>\d+)(?:, span (?<span>\d+))?", RegexOptions.Compiled);
@@ -105,7 +106,10 @@ public static class ModelDatabase
           WITH RECURSIVE d(id, sheet_id, role, basis, link_root) AS (
             SELECT e.id, l.sheet_id, l.role, l.basis, l.global_id FROM element_sheet l JOIN el e ON e.global_id = l.global_id
             UNION ALL
-            SELECT c.id, d.sheet_id, d.role, d.basis, d.link_root FROM d JOIN el c ON c.parent_id = d.id)
+            -- Only the sheets used to model an element (user, 2026-10-19): a child inherits the links of its NEAREST linked ancestor (none when it
+            -- has links of its own) and general sheets (quantities, notes, situation plans) stay on the element they are linked to.
+            SELECT c.id, d.sheet_id, d.role, d.basis, d.link_root FROM d JOIN el c ON c.parent_id = d.id
+            WHERE d.role <> 'general' AND NOT EXISTS (SELECT 1 FROM element_sheet l2 WHERE l2.global_id = c.global_id AND l2.role <> 'general'))
           SELECT e.global_id, d.sheet_id, d.role, d.basis, d.link_root FROM d JOIN el e ON e.id = d.id;
         DROP VIEW IF EXISTS v_element_path;
         CREATE VIEW v_element_path AS
@@ -144,6 +148,7 @@ public static class ModelDatabase
         Exec(cn, SchemaSql);
         if (Scalar<int>(cn, "SELECT COUNT(*) FROM pragma_table_info('sheets') WHERE name='note'") == 0) Exec(cn, "ALTER TABLE sheets ADD COLUMN note TEXT");
         if (Scalar<int>(cn, "SELECT COUNT(*) FROM pragma_table_info('sheets') WHERE name='pdf_path'") == 0) Exec(cn, "ALTER TABLE sheets ADD COLUMN pdf_path TEXT");
+        AssetSchema.Ensure(cn);
         return cn;
     }
 
@@ -178,7 +183,7 @@ public static class ModelDatabase
             while (r.Read()) bytes[r.GetString(0)] = r.GetDouble(1);
         }
         catch (SqliteException) { }
-        foreach (var t in new[] { "el", "strings", "props", "element_sheet", "sheets", "qc" })
+        foreach (var t in new[] { "el", "strings", "props", "element_sheet", "sheets", "qc" }.Concat(AssetSchema.Tables))
             list.Add((t, bytes.GetValueOrDefault(t, double.NaN), Scalar<long>(cn, $"SELECT COUNT(*) FROM {t}")));
         return (total, list);
     }
@@ -693,7 +698,7 @@ public static class ModelDatabase
                 }
                 var pjs = new Json().Add("description", part.Description).Add("assembly", part.Assembly)
                     .Add("role", part.Role == MemberRole.None ? null : part.Role.ToString()).Add("lb_per_ft", part.NominalWeightLbPerFt, 3);
-                if (part.Assumption is { } pas && (SteelModel.IsRailing(part.Category) || IsCapPart(part) || SteelModel.IsJointHardware(part.Category))) pjs.Add("status", pas.Status).Add("reason", pas.Reason).Add("assumed", pas.Basis);
+                if (part.Assumption is { } pas && (SteelModel.IsRailing(part.Category) || IsCapPart(part) || SteelModel.IsJointHardware(part.Category) || pas.DimensionOnly)) pjs.Add("status", pas.Status).Add("reason", pas.Reason).Add("assumed", pas.Basis);
                 if (part.Fabrication is { IsEmpty: false } fab) foreach (var (fn, fv) in fab.Fields()) pjs.Add("fab_" + fn.ToLowerInvariant(), fv);
                 r.Props = pjs.ToString();
                 _w.Add(r);
@@ -765,7 +770,7 @@ public static class ModelDatabase
             PartCategory.ArchStiffener => "stiffener", PartCategory.PtStrand => "PT strand", PartCategory.PtAnchorage => "PT anchorage",
             PartCategory.RolledTee => "tee", PartCategory.AccessDoor => "access door",
             PartCategory.RailPost => "railing post", PartCategory.RailHandrail => "handrail", PartCategory.RailMember => "rail member",
-            PartCategory.RailBasePlate => "post base plate", PartCategory.RailEnvelope => "railing envelope",
+            PartCategory.RailBasePlate => "post base plate", PartCategory.RailEnvelope => "railing envelope", PartCategory.RailFabric => "railing fence fabric",
             PartCategory.EndPlate => "end plate", PartCategory.ConnectorPlate => "connector plate", PartCategory.DiaphragmPlate => "connection diaphragm plate",
             PartCategory.ContinuityPlate => "mill-to-bear plate", PartCategory.CoverPlate => "cover plate", PartCategory.HandholeCover => "handhole cover",
             PartCategory.HandholeBacking => "handhole backing plate", PartCategory.MeshScreen => "wire mesh screen",

@@ -8,7 +8,7 @@ namespace SBM.Cli;
 /// sbm — command-line access to Steel Bridge Modeler projects (for batch work, Python/Excel automation, CI).
 /// Exit code 0 = success, 1 = usage/input error, 2 = model has errors.
 /// </summary>
-public static class Program
+public static partial class Program
 {
     private const string Usage = """
         sbm — Steel Bridge Modeler command line
@@ -29,10 +29,19 @@ public static class Program
                                                             shows running copies. (All other commands work on .sbm files.)
           sbm regen <file.sbm>                              Regenerate; print counts, warnings, timing
           sbm export <file.sbm> [--ifc a.ifc|a.ifczip] [--geometry parametric|abv] [--chord-tol mm] [--dxf b.dxf] [--landxml c.xml]
+                                                            [--for-check [--keep-designations]]  IFC for an independent checker: originator notes stripped
           sbm db <file.sbm> [out.sqlite] [--pages] [--plans <folder>[,<folder>]] [--links rules.json] [--no-previews] [--no-vacuum]
+                                                            [--for-check]  registry only: no sheet links, props text or model path
                                                             [--unused report.md]
+          sbm db <file.sbm> --sheets-for <text> | --find-sheet <text> [--db <file.sqlite>] [--json]
+                                                            Read-only queries on an existing database (no rebuild): sheets for an element
+                                                            (mark / name / category match) or sheets by title / sheet no. (^regex ok)
                                                             Companion SQLite database: every element (IFC GlobalIds + hierarchy),
                                                             plan sheets (--pages splits the plan PDFs), element -> sheet links, QC
+          sbm asset <file.sbm> <command> ...                Asset management in the companion database: photos, documents,
+                                                            inspections (element-level CS1-CS4, NBI/SNBI ratings, CSV import /
+                                                            export), findings, calcs (summary pages, values, diff, apply).
+                                                            "sbm asset <file.sbm> help" lists the commands
           sbm run <script.csx> [file.sbm] [-- args...]      Run a C# script (globals: Doc, Print, Ft, In, Sta, Len)
           sbm bench <file.sbm> [n]                          Time cold/warm regeneration
           sbm nurbs <file.sbm> [--bridge NAME] [--chord LEN] [--tol LEN] [--csv out.csv]
@@ -74,6 +83,61 @@ public static class Program
         Values:  lengths 12'-6 1/2"  54"  1.2 m  300 mm   stations 12+34.56   angles 15°30'00"   slopes -2%
                  plain numbers use the field's display unit (ft or in / m or mm); JSON sets whole objects (SI units)
         """;
+
+    private static int DbQuery(string[] args, string? dbOpt, string? sheetsFor, string? findSheet)
+    {
+        string dbFile = dbOpt ?? SBM.IO.Database.CompanionDatabase.DefaultPath(args[1]);
+        if (!File.Exists(dbFile)) { Console.Error.WriteLine($"{dbFile} does not exist: build it first (sbm db {args[1]})."); return 1; }
+        bool json = args.Contains("--json");
+        var jo = new System.Text.Json.JsonSerializerOptions { WriteIndented = true, Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
+        using var mdb = new SBM.IO.Database.ModelDb(dbFile);
+        if (sheetsFor != null)
+        {
+            var res = mdb.SheetsFor(sheetsFor);
+            if (json)
+            {
+                Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(new
+                {
+                    query = res.Query, totalMatches = res.TotalMatches, shown = res.Elements.Count,
+                    elements = res.Elements.Select(e => new
+                    {
+                        globalId = e.GlobalId, mark = e.Mark, name = e.Name, category = e.Category, path = e.Path,
+                        sheets = e.Sheets.Select(s => new { planSet = s.PlanSet, pdfPage = s.PdfPage, sheetNo = s.DesignSheet, title = s.Title, role = s.Role, inherited = s.Inherited, linkedOn = s.LinkRootName, pdfPath = s.PdfPath }),
+                    }),
+                    pagesToRead = res.Pages.ToDictionary(k => k.Key, k => string.Join(",", k.Value)),
+                }, jo));
+                return 0;
+            }
+            Console.WriteLine($"{res.TotalMatches} element(s) match \"{res.Query}\"" + (res.TotalMatches > res.Elements.Count ? $" (showing {res.Elements.Count}, {res.TotalMatches - res.Elements.Count} more: refine the text)" : ""));
+            foreach (var e in res.Elements)
+            {
+                Console.WriteLine($"- {(e.Mark.Length > 0 ? e.Mark + " " : "")}[{e.Category}] {e.Name}\n    {e.Path}");
+                if (e.Sheets.Count == 0) Console.WriteLine("    (no linked sheets)");
+                foreach (var s in e.Sheets)
+                    Console.WriteLine($"    {s.PlanSet} p.{s.PdfPage} sheet {(s.DesignSheet.Length > 0 ? s.DesignSheet : "-")} \"{s.Title}\" {s.Role}{(s.Inherited ? $" (inherited from {s.LinkRootName})" : "")} {s.PdfPath}");
+            }
+            if (res.Pages.Count > 0)
+            {
+                Console.WriteLine("Pages to read:");
+                foreach (var (pdf, pages) in res.Pages) Console.WriteLine($"{pdf}: {string.Join(",", pages)}");
+            }
+            return 0;
+        }
+        var sheets = mdb.FindSheets(findSheet!);
+        if (json)
+        {
+            Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(new
+            {
+                query = findSheet, count = sheets.Count,
+                sheets = sheets.Select(s => new { planSet = s.PlanSet, pdfPage = s.PdfPage, sheetNo = s.DesignSheet, title = s.Title, pdfPath = s.PdfPath, linkedElements = s.LinkedElements }),
+            }, jo));
+            return 0;
+        }
+        Console.WriteLine($"{sheets.Count} sheet(s) match \"{findSheet}\"");
+        foreach (var s in sheets)
+            Console.WriteLine($"- {s.PlanSet} p.{s.PdfPage} sheet {(s.DesignSheet.Length > 0 ? s.DesignSheet : "-")} \"{s.Title}\" {s.PdfPath} ({s.LinkedElements:N0} linked element(s))");
+        return 0;
+    }
 
     public static async Task<int> Main(string[] args)
     {
@@ -214,8 +278,8 @@ public static class Program
                     {
                         doc.Regenerate();
                         var sw = System.Diagnostics.Stopwatch.StartNew();
-                        var res = doc.ExportIfc(ifc, geometry, chord);
-                        Console.WriteLine($"  IFC 4.3 ({geometry}) → {ifc}  ({sw.Elapsed.TotalSeconds:0.0} s, {new FileInfo(ifc).Length / 1048576.0:0.0} MB, {res.EntityCount:N0} entities" +
+                        var res = doc.ExportIfc(ifc, geometry, chord, args.Contains("--for-check"), args.Contains("--keep-designations"));
+                        Console.WriteLine($"  IFC 4.3 ({geometry}{(args.Contains("--for-check") ? ", FOR CHECK" : "")}) → {ifc}  ({sw.Elapsed.TotalSeconds:0.0} s, {new FileInfo(ifc).Length / 1048576.0:0.0} MB, {res.EntityCount:N0} entities" +
                                           (geometry == SBM.IO.Ifc.IfcGeometryMode.ReferenceView ? $", {res.PolygonalSolids:N0} polygonal face sets, chord tol {res.ChordTolerance * 1000:0.###} mm)" : ")"));
                     }
                     if (Opt("--dxf") is { } dxf) { doc.ExportDxf(dxf); Console.WriteLine($"  DXF → {dxf}"); }
@@ -226,13 +290,16 @@ public static class Program
                 {
                     Need(args, 2);
                     string? Opt(string name) { int i = Array.IndexOf(args, name); return i > 0 && i + 1 < args.Length ? args[i + 1] : null; }
+                    if (Opt("--sheets-for") is { } sf) return DbQuery(args, Opt("--db"), sf, null);
+                    if (Opt("--find-sheet") is { } fs) return DbQuery(args, Opt("--db"), null, fs);
                     var doc = SbmDocument.Open(args[1]);
                     var o = new SBM.IO.Database.DatabaseOptions
                     {
                         Pages = args.Contains("--pages"), Vacuum = !args.Contains("--no-vacuum"), Previews = !args.Contains("--no-previews"), LinksFile = Opt("--links"),
-                        UnusedReport = Opt("--unused"), Log = m => Console.WriteLine("  " + m),
+                        UnusedReport = Opt("--unused"), ForCheck = args.Contains("--for-check"), Log = m => Console.WriteLine("  " + m),
                     };
                     if (Opt("--plans") is { } pl) o.PlanFolders.AddRange(pl.Split(','));
+                    o.BridgeNames.AddRange(doc.Project.Bridges.Select(b => b.Name));
                     string? outPath = args.Length > 2 && !args[2].StartsWith("--") ? args[2] : null;
                     if (args.Contains("--relink"))
                     {
@@ -250,7 +317,7 @@ public static class Program
                     var r = doc.ExportDatabase(outPath, o);
                     Console.WriteLine($"Database {r.Build.Path}: {r.Build.Elements:N0} elements in {r.Elapsed.TotalSeconds:F1} s (registry {r.Build.Elapsed.TotalSeconds:F1} s)");
                     foreach (var (lv, n) in r.Build.ByLevel.OrderByDescending(x => x.Value)) Console.WriteLine($"  {lv,-10} {n,9:N0}");
-                    Console.WriteLine(r.LinksFile != null ? $"  link rules {r.LinksFile}" : "  link rules: none found (no sheet-links*.json naming this model beside it): no plan sheet links");
+                    Console.WriteLine(o.ForCheck ? "  checking database (--for-check): no sheet links, plan sheets, QC or property text" : r.LinksFile != null ? $"  link rules {r.LinksFile}" : "  link rules: none found (no sheet-links*.json naming this model beside it): no plan sheet links");
                     if (r.Links is { } l)
                         Console.WriteLine($"  sheets {l.Sheets}, links {l.Links:N0}, sheets linked {l.SheetsLinked}, unlinked {l.SheetsUnused}");
                     else if (r.LinksFile != null) Console.WriteLine($"  sheets {r.Sheets}: no links (no sheet index in the rules and no imported pages: run with --pages)");
@@ -259,6 +326,10 @@ public static class Program
                     if (r.Links != null) foreach (var w in r.Links.Warnings) Console.WriteLine("  warning: " + w);
                     return 0;
                 }
+                case "asset":
+                case "assets":
+                    Need(args, 2);
+                    return AssetCommand(args);
                 case "run":
                 {
                     Need(args, 2);
@@ -417,7 +488,7 @@ public static class Program
                     return 1;
             }
         }
-        catch (Exception ex) when (ex is ArgumentException or IOException or InvalidOperationException or FormatException or System.Text.Json.JsonException or SbmAppException or TimeoutException)
+        catch (Exception ex) when (ex is ArgumentException or IOException or InvalidOperationException or FormatException or System.Text.Json.JsonException or SbmAppException or TimeoutException or Microsoft.Data.Sqlite.SqliteException)
         {
             Console.Error.WriteLine("Error: " + ex.Message);
             return 1;

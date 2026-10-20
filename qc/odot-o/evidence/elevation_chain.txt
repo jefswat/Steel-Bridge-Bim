@@ -1,0 +1,11 @@
+G1 1 sta 30149.50 off 13.329 TOS plan(PGL-6%) 1134.651 model 1134.651 d=0.000 slab bottom 1133.985 thick 8.000 in pad bottom 1128.825 ; TOS-H plan 1128.818 d=0.007
+G1 2 sta 30293.00 off 13.329 TOS plan(PGL-6%) 1131.339 model 1131.339 d=0.000 slab bottom 1130.673 thick 8.000 in pad bottom 1125.461 ; TOS-H plan 1125.454 d=0.008
+G1 3 sta 30454.00 off 13.329 TOS plan(PGL-6%) 1130.071 model 1130.072 d=0.000 slab bottom 1129.405 thick 8.000 in pad bottom 1124.162 ; TOS-H plan 1124.155 d=0.008
+G1 4 sta 30614.00 off 13.329 TOS plan(PGL-6%) 1129.159 model 1129.160 d=0.000 slab bottom 1128.493 thick 8.000 in pad bottom 1123.219 ; TOS-H plan 1123.212 d=0.007
+G2 1 sta 30156.48 off -4.337 TOS plan(PGL-6%) 1135.506 model 1135.507 d=0.000 slab bottom 1134.840 thick 8.000 in pad bottom 1129.681 ; TOS-H plan 1129.673 d=0.007
+G2 2 sta 30293.00 off -4.337 TOS plan(PGL-6%) 1132.399 model 1132.399 d=0.000 slab bottom 1131.733 thick 8.000 in pad bottom 1126.521 ; TOS-H plan 1126.514 d=0.008
+G2 3 sta 30454.00 off -4.337 TOS plan(PGL-6%) 1131.131 model 1131.131 d=0.000 slab bottom 1130.465 thick 8.000 in pad bottom 1125.222 ; TOS-H plan 1125.215 d=0.008
+G2 4 sta 30614.00 off -4.337 TOS plan(PGL-6%) 1130.219 model 1130.220 d=0.000 slab bottom 1129.553 thick 8.000 in pad bottom 1124.279 ; TOS-H plan 1124.272 d=0.007
+--- haunch at CL brg
+G1 1 ['G1-1-TFL1', 'G1-SD1-TF'] TF-bottom avg z 1133.439 haunch(slab bottom - TFbottom@CL) 6.554 in TOS-WP 14.554 in BF [(np.float64(59.81), 'G1-1-BF1')] girder depth WP->BF bottom 51.417 in
+G2 1 ['G2-1-TFL1', 'G2-SD1-TF'] TF-bottom avg z 1134.293 haunch(slab bottom - TFbottom@CL) 6.564 in TOS-WP 14.564 in BF [(np.float64(60.41), 'G2-1-BF1')] girder depth WP->BF bottom 51.406 in

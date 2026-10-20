@@ -198,6 +198,14 @@ public static class SteelDetailViews
         var sec = def.Girders.Section;
         var st = def.Stiffeners;
         double wd = sec.WebDepth, tw = sec.WebThickness, clip = st.CornerClip, ws = st.WeldSize;
+        // weld termination as generated (SteelModelGenerator stiffeners): hold-back past the clip / from the plate edges, web weld end below the flanges
+        double hb = WeldTermination.HoldBack(def.Welds, ws), webEnd = clip + hb;
+        string webEndNote = $"(CLIP + {d.Short(hb)})";
+        if (def.Welds is { StiffenerWebEndFactor: > 0 } or { StiffenerWebEndMin: > 0 })
+        {
+            double x5 = Math.Max(def.Welds!.StiffenerWebEndFactor * tw, def.Welds.StiffenerWebEndMin);
+            if (st.FlangeToWebWeld + x5 > webEnd) { webEnd = st.FlangeToWebWeld + x5; webEndNote = $"(X = {def.Welds.StiffenerWebEndFactor:0.#}T, MIN {d.Short(def.Welds.StiffenerWebEndMin)} = {d.Short(x5)} PAST F-W WELD TOE)"; }
+        }
         var tf = sec.TopFlange;
         var bf = sec.BottomFlange;
         double ht = In(10);                                        // shown at the top and at the bottom of the web
@@ -245,19 +253,28 @@ public static class SteelDetailViews
                 Break(Math.Min(x0, x1) - d.Paper(0.05), Math.Max(x0, x1) + d.Paper(0.05));
                 // Fillet weld to the web, held back from the flange-to-web welds by the clips (and stopped at the plate
                 // end for a cut-short stiffener).
-                double webBottom = full ? zb + clip : zb;
-                Bead(new List<Vec2> { P(x0, -clip), P(x0 + side * ws, -clip - ws), P(x0 + side * ws, -ht + In(0.5)), P(x0, -ht + In(0.5)) });
-                Bead(new List<Vec2> { P(x0, -wd + ht - In(0.5)), P(x0 + side * ws, -wd + ht - In(0.5)), P(x0 + side * ws, webBottom + ws), P(x0, webBottom) });
-                // Fillet welds to the flanges outside the clips.
-                Bead(new List<Vec2> { P(x0 + side * clip, 0), P(x1, 0), P(x1 - side * ws, -ws), P(x0 + side * (clip + ws), -ws) });
-                if (full) Bead(new List<Vec2> { P(x0 + side * clip, -wd), P(x1, -wd), P(x1 - side * ws, -wd + ws), P(x0 + side * (clip + ws), -wd + ws) });
+                // Weld termination (Steel.WeldTermination, as generated): web weld ends webEnd below the flanges, flange welds hb short of the clip and the
+                // outer plate edge, a cut-short stiffener's web weld hb short of its end; the beads end square.
+                double webBottom = full ? zb + webEnd : zb + hb;
+                Bead(new List<Vec2> { P(x0, -webEnd), P(x0 + side * ws, -webEnd), P(x0 + side * ws, -ht + In(0.5)), P(x0, -ht + In(0.5)) });
+                Bead(new List<Vec2> { P(x0, -wd + ht - In(0.5)), P(x0 + side * ws, -wd + ht - In(0.5)), P(x0 + side * ws, webBottom), P(x0, webBottom) });
+                // Fillet welds to the flanges outside the clips, held back from the clip and the plate edge.
+                double fa = clip + hb, fb = p.Width - hb;
+                if (fb > fa)
+                {
+                    Bead(new List<Vec2> { P(x0 + side * fa, 0), P(x0 + side * fb, 0), P(x0 + side * fb, -ws), P(x0 + side * fa, -ws) });
+                    if (full) Bead(new List<Vec2> { P(x0 + side * fa, -wd), P(x0 + side * fb, -wd), P(x0 + side * fb, -wd + ws), P(x0 + side * fa, -wd + ws) });
+                }
             }
             double xr = cx + tw / 2, xp = cx + tw / 2 + p.Width;
             d.Dim(new Vec2(xr, Z(-wd * 0.5) + In(4)), new Vec2(xp, Z(-wd * 0.5) + In(4)), 0.2, d.Short(p.Width));
             // Clip at the top (horizontal leg), weld hold back at the clip, hold back from the tension flange.
             d.Dim(new Vec2(xr, 0), new Vec2(xr + clip, 0), 0.35, d.Short(clip));
             d.Dim(new Vec2(xp, 0), new Vec2(xp, -clip), -0.3, d.Short(clip));
-            d.Leader(new Vec2(xr + clip * 0.5, -clip * 0.5), new Vec2(xp + d.Paper(0.55), -clip - d.Paper(0.2)), $"{d.Short(clip)} CLIP (TYP)\nWELD HELD BACK\nAT CLIP");
+            d.Leader(new Vec2(xr + clip * 0.5, -clip * 0.5), new Vec2(xp + d.Paper(0.55), -clip - d.Paper(0.2)),
+                $"{d.Short(clip)} CLIP (TYP)\nWELDS HELD BACK {d.Short(hb)}");
+            // hold-back of the flange weld at the outer plate edge (as modeled)
+            d.Dim(new Vec2(xp - hb, 0), new Vec2(xp, 0), 0.35, d.Short(hb));
             if (bottomGap > 0)
             {
                 d.Dim(new Vec2(xp, Z(-wd + bottomGap)), new Vec2(xp, Z(-wd)), -0.3, d.Short(bottomGap));
@@ -267,7 +284,7 @@ public static class SteelDetailViews
             else
             {
                 d.Dim(new Vec2(xp, Z(-wd + clip)), new Vec2(xp, Z(-wd)), -0.3, d.Short(clip));
-                d.Leader(new Vec2(xr + clip * 0.5, Z(-wd + clip * 0.5)), new Vec2(xp + d.Paper(0.55), Z(-wd) - d.Paper(0.05)), $"{d.Short(clip)} CLIP\nWELD HELD BACK");
+                d.Leader(new Vec2(xr + clip * 0.5, Z(-wd + clip * 0.5)), new Vec2(xp + d.Paper(0.55), Z(-wd) - d.Paper(0.05)), $"{d.Short(clip)} CLIP\nWELDS HELD BACK {d.Short(hb)}");
             }
             d.WeldSymbol(new Vec2(xr + ws, Z(-ht * 0.6)), new Vec2(xp + d.Paper(0.6), Z(-ht * 0.6) - d.Paper(0.35)), d.Short(ws), bothSides: true, tail: "TO WEB");
             d.WeldSymbol(new Vec2(xp - p.Width * 0.25, -ws), new Vec2(xp + d.Paper(0.6), tf.Thickness + d.Paper(0.35)), d.Short(ws), bothSides: true,
@@ -289,8 +306,15 @@ public static class SteelDetailViews
             Detail("INTERMEDIATE STIFFENER", st.IntermediateStiffener, false, st.IntermediateBottomGap,
                 new[] { "TIGHT FIT TO TOP FLANGE", $"MAX SPACING {d.Len(st.IntermediateMaxSpacing)}, {st.IntermediateSide.ToString().ToUpperInvariant()} FACE" });
         var box0 = dwg.Extents();
-        d.Text($"FLANGE-TO-WEB WELDS: {d.Short(st.FlangeToWebWeld)} FILLET BOTH SIDES, CONTINUOUS. STIFFENER WELDS STOP AT THE CLIPS (DO NOT WRAP).",
-            new Vec2((box0.MinX + box0.MaxX) / 2, box0.MinY - d.Paper(0.2)), d.TextH, 0, TextAlign.Center);
+        double nx = (box0.MinX + box0.MaxX) / 2;
+        d.Text($"FLANGE-TO-WEB WELDS: {d.Short(st.FlangeToWebWeld)} FILLET BOTH SIDES, CONTINUOUS, STOP {d.Short(WeldTermination.HoldBack(def.Welds, st.FlangeToWebWeld))} FROM PL ENDS.",
+            new Vec2(nx, box0.MinY - d.Paper(0.2)), d.TextH, 0, TextAlign.Center);
+        d.Text($"STIFFENER WELDS STOP {d.Short(hb)} SHORT OF THE CLIPS AND PLATE EDGES (DO NOT WRAP).",
+            new Vec2(nx, box0.MinY - d.Paper(0.2) - d.TextH * 1.6), d.TextH, 0, TextAlign.Center);
+        d.Text($"WEB WELDS END {d.Short(webEnd)} FROM THE FLANGES {webEndNote}.",
+            new Vec2(nx, box0.MinY - d.Paper(0.2) - d.TextH * 3.2), d.TextH, 0, TextAlign.Center);
+        d.Text(WeldTermination.FromPlans(def.Welds) ? $"HOLD-BACK PER {def.Welds!.Source.ToUpperInvariant()}" : "HOLD-BACK = WELD SIZE, MIN 1/4\" (AWS D1.5) - UNRESOLVED: NOT ON THE PLANS",
+            new Vec2(nx, box0.MinY - d.Paper(0.2) - d.TextH * 4.7), d.SmallTextH, 0, TextAlign.Center);
         var box = dwg.Extents();
         d.Title("STIFFENER DETAILS", "Sections looking along the girder; web broken (not to scale vertically)", new Vec2((box.MinX + box.MaxX) / 2, box.MinY - d.Paper(0.3)));
         return new SheetView("Stiffener details", "Stiffeners", dwg, d.Scale, "Bearing stiffeners, connection plates and intermediate stiffeners with welds and hold backs.");

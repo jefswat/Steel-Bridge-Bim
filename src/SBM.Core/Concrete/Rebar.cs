@@ -7,7 +7,8 @@ namespace SBM.Core.Concrete;
 /// <summary>ASTM A615/A706 deformed bar (US customary designation). Meters, m², kg/m.</summary>
 public sealed record RebarSize(string Name, double Diameter, double Area, double MassPerLength)
 {
-    /// <summary>Minimum inside bend diameter for standard hooks/bends (AASHTO 5.10.2.3: 6db for #3–#8, 8db for #9–#11, 10db for #14/#18).</summary>
+    /// <summary>Minimum inside bend diameter for standard hooks/bends (AASHTO 5.10.2.3: 6db for #3–#8, 8db for #9–#11, 10db for #14/#18).
+    /// Stirrups and ties #3-#5 may use 4db: <see cref="RebarBends.StandardPin"/>.</summary>
     public double MinPinDiameter => (Name is "#14" or "#18" ? 10 : Name is "#9" or "#10" or "#11" ? 8 : 6) * Diameter;
 }
 
@@ -167,7 +168,11 @@ public sealed class BarMark
 public sealed class BarPlacement
 {
     public required string Mark { get; init; }
-    public required Vec3[] Points { get; init; }
+    /// <summary>World centerline. Generators may give sharp corners; <see cref="RebarBends.Apply"/> (run once by the regeneration) replaces them
+    /// with true bends of the mark's pin radius, so every consumer reads the bent bar.</summary>
+    public required Vec3[] Points { get; set; }
+    /// <summary>Set once <see cref="RebarBends.Apply"/> has processed the bar (it is then not rounded again).</summary>
+    public bool BendsRounded { get; set; }
     /// <summary>For identical shaped bars: local frame (x, y = shape plane) so they can be GPU-instanced.</summary>
     public Frame3? Frame { get; init; }
     public string Group { get; init; } = "Deck";

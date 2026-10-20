@@ -1,0 +1,141 @@
+1106
+1108
+1104
+1102
+1100
+1098
+1096
+1094
+1092
+1090
+1088
+1086
+1110
+      the year.
+      drilling operations and may fluctuate throughout
+NOTE: Groundwater levels were obtained during the
+(Sheet 1 of 2)
+1084
+1082
+STA. 315+34.17 - 41.42' RT.
+RAMP 44A OVER DEEP FORK CR., I-235 & I-44
+1110
+1115
+1105
+1100
+1095
+1090
+1085
+1080
+1075
+1070
+1065
+1060
+1120
+1055
+1050
+1106
+1108
+1104
+1102
+1100
+1098
+1096
+1094
+1092
+1090
+1088
+1086
+1110
+1084
+1082
+BORING RW5-1
+1110
+1115
+1105
+1100
+1095
+1090
+1085
+1080
+1075
+1070
+1065
+1060
+1120
+1055
+1050
+BORING RW5-2
+STA. 314+38.62 - 9.20' RT.
+RW3
+RETAINING WALLS 44ARW-2
+FOUNDATION REPORT
+--- 1101.17 --  SS-1: N=15; RECOVERY=18"
+--- 1096.17 --  SS-2: N=10; RECOVERY=18"; LL=38,
+PI=17 -#200=96.8%
+--- 1091.17 --  SS-3: N=11; RECOVERY=18"
+--- 1086.17 --  SS-4: N=7; RECOVERY=18"; LL=35,
+PI=22 -#200=85.6%
+--- 1081.17 --  SS-5: N=W.O.H.; RECOVERY=18"
+--- 1076.17 --  SS-6: N=W.O.H.; RECOVERY=18";
+LL=30, PI=11 -#200=84.6%
+1106.17
+1084.67
+1074.67
+Reddish brown lean clay, moist, medium stiff to stiff (CL)
+Reddish brown lean clay with sand, moist, very soft (CL)
+Bore hole terminated @ depth 31.5'
+W.O.H= Weight On Hammer
+0
+5
+10
+15
+20
+25
+30
+Ground Water
+09033(11)
+ I-235 / I-44
+OKLAHOMA COUNTY
+P:\FDB\1641-OKC\CIV\30305400\20_CAD\DGN\S\B2BSBO01.dgn
+11/22/2016
+DESIGN
+DRAWN
+CHECKED
+APPROVED
+SQUAD
+JOB PIECE NO.
+SHEET NO.
+11/16
+11/16
+11/16
+11/16
+11/21/2016
+OKLAHOMA DEPARTMENT OF TRANSPORTATION
+MEETING
+FINAL FIELD
+BENHAM
+--- 1103.38 --  SS-1: N=16; RECOVERY=18"; LL=33,
+PI=17 -#200=84.0%
+--- 1098.38 --  SS-2: N=22; RECOVERY=18"
+--- 1093.38 --  SS-3: N=50/2.50"; RECOVERY=8.5";
+LL=32, PI=17 -#200=69.6%
+--- 1092.38 --  TC-1: TCP=50/1.0", 50/0.75"
+--- 1088.38 --  SS-4: N=50/1.75"; RECOVERY=7.75"
+--- 1087.38 --  TC-2: TCP=50/0.50", 50/0.50"
+--- 1083.38 --  SS-5: N=50/1.50"; RECOVERY=7.5";
+LL=21, PI=4 -#200=29.8%
+--- 1082.38 --  TC-3: TCP=50/0.50", 50/0.0"
+1108.38
+1093.38
+1082.13
+Reddish brown lean clay with sand, moist, very stiff (CL)
+Reddish brown shale interbedded with sandstone, medium
+hard to very hard
+0
+5
+10
+15
+20
+25
+Ground Water

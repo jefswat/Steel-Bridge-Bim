@@ -211,6 +211,8 @@ public static class TableViews
             if (st.Railings is { Runs.Count: > 0 } rails)
                 foreach (var g in rails.Runs.GroupBy(r => r.TypeName.Length > 0 ? r.TypeName : "PEDESTRIAN RAILING"))
                     Row(Sup, g.Key.ToUpperInvariant(), g.Sum(r => r.Length) / (u.IsUS ? 0.3048 : 1), "N1", u.IsUS ? "LF" : "M", "LENGTH ALONG THE RAILING REFERENCE LINE");
+            if (st.Railings is { Runs.Count: > 0 } rails2 && rails2.Runs.Sum(r => r.FabricArea) > 0)
+                Row(Sup, "PEDESTRIAN RAILING FENCE FABRIC", rails2.Runs.Sum(r => r.FabricArea) / (u.IsUS ? 0.09290304 : 1), "N0", u.IsUS ? "SF" : "M2", "PANEL AREA, ONE FACE (NOMINAL WEIGHT PER AREA)");
             foreach (var g in st.Bolts.Where(b => b.Kind == BoltKind.Structural).GroupBy(b => Math.Round((b.Diameter > 0 ? b.Diameter : st.Bolt.Diameter) / 0.0254 * 1000) / 1000).OrderBy(g => g.Key))
                 Row(Sup, $"HIGH-STRENGTH BOLTS {st.BoltGrade}, {g.Key:0.###}\" DIA", g.Count(), "N0", "EACH", "COUNT OF BOLT INSTANCES");
             if (st.Bolts.Any(b => b.Kind == BoltKind.Anchor)) Row(Sup, "ANCHOR BOLTS", st.Bolts.Count(b => b.Kind == BoltKind.Anchor), "N0", "EACH", "COUNT");

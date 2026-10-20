@@ -1,0 +1,87 @@
+kind,category,pdf_page,element_count,meaning
+linked_not_used,anchor bolt,180,4,element claims this sheet but no check of the element used it
+linked_not_used,anchor bolt,262,8,element claims this sheet but no check of the element used it
+linked_not_used,anchor bolt,264,8,element claims this sheet but no check of the element used it
+linked_not_used,anchor bolt,266,4,element claims this sheet but no check of the element used it
+linked_not_used,anchor bolt,271,24,element claims this sheet but no check of the element used it
+linked_not_used,anchor bolt,293,24,element claims this sheet but no check of the element used it
+linked_not_used,angle,284,4,element claims this sheet but no check of the element used it
+linked_not_used,angle,286,4,element claims this sheet but no check of the element used it
+linked_not_used,angle,288,8,element claims this sheet but no check of the element used it
+linked_not_used,barrier,270,2,element claims this sheet but no check of the element used it
+linked_not_used,barrier,271,2,element claims this sheet but no check of the element used it
+linked_not_used,bearing pad,180,2,element claims this sheet but no check of the element used it
+linked_not_used,bearing pad,262,2,element claims this sheet but no check of the element used it
+linked_not_used,bearing pad,264,2,element claims this sheet but no check of the element used it
+linked_not_used,bearing pad,266,2,element claims this sheet but no check of the element used it
+linked_not_used,bearing plate,180,2,element claims this sheet but no check of the element used it
+linked_not_used,bearing plate,262,2,element claims this sheet but no check of the element used it
+linked_not_used,bearing plate,264,2,element claims this sheet but no check of the element used it
+linked_not_used,bearing plate,266,2,element claims this sheet but no check of the element used it
+linked_not_used,bearing plate,292,8,element claims this sheet but no check of the element used it
+linked_not_used,bearing stiffener,284,8,element claims this sheet but no check of the element used it
+linked_not_used,bearing stiffener,286,8,element claims this sheet but no check of the element used it
+linked_not_used,bearing stiffener,288,16,element claims this sheet but no check of the element used it
+linked_not_used,bolt,282,1592,element claims this sheet but no check of the element used it
+linked_not_used,bolt,283,152,element claims this sheet but no check of the element used it
+linked_not_used,bolt,284,152,element claims this sheet but no check of the element used it
+linked_not_used,bolt,285,152,element claims this sheet but no check of the element used it
+linked_not_used,bolt,286,152,element claims this sheet but no check of the element used it
+linked_not_used,bolt,287,328,element claims this sheet but no check of the element used it
+linked_not_used,bolt,288,328,element claims this sheet but no check of the element used it
+linked_not_used,bolt,289,1128,element claims this sheet but no check of the element used it
+linked_not_used,connection diaphragm plate,288,8,element claims this sheet but no check of the element used it
+linked_not_used,connection stiffener,290,176,element claims this sheet but no check of the element used it
+linked_not_used,connector plate,283,6,element claims this sheet but no check of the element used it
+linked_not_used,connector plate,284,6,element claims this sheet but no check of the element used it
+linked_not_used,connector plate,285,6,element claims this sheet but no check of the element used it
+linked_not_used,connector plate,286,6,element claims this sheet but no check of the element used it
+linked_not_used,connector plate,287,12,element claims this sheet but no check of the element used it
+linked_not_used,connector plate,288,12,element claims this sheet but no check of the element used it
+linked_not_used,deck slab,272,1,element claims this sheet but no check of the element used it
+linked_not_used,flange plate,284,4,element claims this sheet but no check of the element used it
+linked_not_used,flange plate,286,4,element claims this sheet but no check of the element used it
+linked_not_used,flange plate,288,8,element claims this sheet but no check of the element used it
+linked_not_used,flange plate,290,54,element claims this sheet but no check of the element used it
+linked_not_used,shear stud,283,14,element claims this sheet but no check of the element used it
+linked_not_used,shear stud,284,14,element claims this sheet but no check of the element used it
+linked_not_used,shear stud,285,12,element claims this sheet but no check of the element used it
+linked_not_used,shear stud,286,12,element claims this sheet but no check of the element used it
+linked_not_used,shear stud,287,24,element claims this sheet but no check of the element used it
+linked_not_used,shear stud,288,24,element claims this sheet but no check of the element used it
+linked_not_used,web plate,284,3,element claims this sheet but no check of the element used it
+linked_not_used,web plate,286,3,element claims this sheet but no check of the element used it
+linked_not_used,web plate,288,6,element claims this sheet but no check of the element used it
+linked_not_used,web plate,290,28,element claims this sheet but no check of the element used it
+linked_not_used,weld,282,138,element claims this sheet but no check of the element used it
+linked_not_used,weld,283,22,element claims this sheet but no check of the element used it
+linked_not_used,weld,284,22,element claims this sheet but no check of the element used it
+linked_not_used,weld,285,22,element claims this sheet but no check of the element used it
+linked_not_used,weld,286,22,element claims this sheet but no check of the element used it
+linked_not_used,weld,287,60,element claims this sheet but no check of the element used it
+linked_not_used,weld,288,60,element claims this sheet but no check of the element used it
+linked_not_used,weld,290,362,element claims this sheet but no check of the element used it
+used_not_linked,access door,273,4,a check of the element used this sheet but the DB link (nearest-ancestor rule) does not include it
+used_not_linked,angle,271,4,a check of the element used this sheet but the DB link (nearest-ancestor rule) does not include it
+used_not_linked,angle,273,112,a check of the element used this sheet but the DB link (nearest-ancestor rule) does not include it
+used_not_linked,bearing stiffener,271,8,a check of the element used this sheet but the DB link (nearest-ancestor rule) does not include it
+used_not_linked,bearing stiffener,273,8,a check of the element used this sheet but the DB link (nearest-ancestor rule) does not include it
+used_not_linked,connection stiffener,273,176,a check of the element used this sheet but the DB link (nearest-ancestor rule) does not include it
+used_not_linked,connection stiffener,282,176,a check of the element used this sheet but the DB link (nearest-ancestor rule) does not include it
+used_not_linked,deck slab,270,1,a check of the element used this sheet but the DB link (nearest-ancestor rule) does not include it
+used_not_linked,deck slab,271,1,a check of the element used this sheet but the DB link (nearest-ancestor rule) does not include it
+used_not_linked,filler plate,278,4,a check of the element used this sheet but the DB link (nearest-ancestor rule) does not include it
+used_not_linked,flange plate,271,4,a check of the element used this sheet but the DB link (nearest-ancestor rule) does not include it
+used_not_linked,flange plate,273,16,a check of the element used this sheet but the DB link (nearest-ancestor rule) does not include it
+used_not_linked,flange plate,278,54,a check of the element used this sheet but the DB link (nearest-ancestor rule) does not include it
+used_not_linked,flange plate,279,54,a check of the element used this sheet but the DB link (nearest-ancestor rule) does not include it
+used_not_linked,gusset,273,126,a check of the element used this sheet but the DB link (nearest-ancestor rule) does not include it
+used_not_linked,shear stud,278,7002,a check of the element used this sheet but the DB link (nearest-ancestor rule) does not include it
+used_not_linked,shear stud,279,3760,a check of the element used this sheet but the DB link (nearest-ancestor rule) does not include it
+used_not_linked,splice plate,278,96,a check of the element used this sheet but the DB link (nearest-ancestor rule) does not include it
+used_not_linked,tee,273,182,a check of the element used this sheet but the DB link (nearest-ancestor rule) does not include it
+used_not_linked,web plate,271,3,a check of the element used this sheet but the DB link (nearest-ancestor rule) does not include it
+used_not_linked,web plate,273,9,a check of the element used this sheet but the DB link (nearest-ancestor rule) does not include it
+used_not_linked,web plate,278,28,a check of the element used this sheet but the DB link (nearest-ancestor rule) does not include it
+used_not_linked,web plate,279,28,a check of the element used this sheet but the DB link (nearest-ancestor rule) does not include it
+used_not_linked,weld,278,10,a check of the element used this sheet but the DB link (nearest-ancestor rule) does not include it

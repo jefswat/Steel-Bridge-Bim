@@ -1,0 +1,7 @@
+page,sheet,view,item,value,quoted_source_text
+281,O-27,Detail 1 / elevation,TF splice,1 PL 3/4 x 21 x 3'-2 1/2; 2 PL 3/4 x 9 1/2 x 3'-2 1/2,1-SPLICE PLATE PL 3/4x21x3'-2 1/2 / 2-SPLICE PLATES PL 3/4x9 1/2x3'-2 1/2
+281,O-27,Elevation,web splice,2 PL 5/8 x 22 1/2 x 3'-6 1/2,2-SPLICE PLATES PL 5/8x22 1/2x3'-6 1/2
+281,O-27,Field splice section,BF splice,PL 3/4 x 63 1/2 x 3'-0 1/2 (splice 1); PL 7/8 x 63 1/2 x 3'-0 1/2 (splices 2-4),PL 3/4x63 1/2x3'-0 1/2 (SPLICE 1) / PL 7/8x63 1/2x3'-0 1/2 (SPLICE 2-4)
+281,O-27,Detail 1,filler,1 PL 1/8 x 1'-9 x 1'-7 1/8 (splice 3 only),1-FILLER PLATE PL 1/8x1'-9x1'-7 1/8 (SPLICE 3 ONLY)
+281,O-27,Plans,bolt patterns,TF 4 cols x 12 rows (5 SPA @ 3 each side); web 6 cols x 12 rows (11 SPA @ 3 1/2); BF 18 cols (17 SPA @ 3 1/2) x 10 rows (4 SPA @ 3 1/2 each side),5 SPA. @ 3 = 1'-3 / 11 SPA. @ 3 1/2 = 3'-2 1/2 / 17 SPA. @ 3 1/2 = 4'-11 1/2 / 4 SPA. @ 3 1/2 = 1'-2
+281,O-27,Notes,bolts / gap,"1 in A325 Ty 3 with DTI, holes 1 1/16, 1/4 max gap",ALL BOLTED CONNECTIONS SHALL USE 1 DIA HIGH STRENGTH BOLTS / (MAX.) GAP BETWEEN GIRDER SECTIONS 1/4

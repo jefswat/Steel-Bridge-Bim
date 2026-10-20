@@ -1,0 +1,200 @@
+FOUNDATION REPORT
+1100
+1095
+1090
+1080
+1085
+1075
+1070
+1065
+1060
+1055
+1050
+1045
+1040
+1035
+1105
+1100
+1095
+1090
+1085
+1080
+1075
+1070
+1065
+1060
+1055
+1050
+1045
+1040
+1035
+BORING O-1
+1030
+1025
+1030
+1025
+1020
+1015
+1110
+1108.88
+1108.08
+1078.88
+1068.88
+1028.63
+(10") Portland cement concrete pavement
+Reddish brown lean clay (CL)
+Reddish brown silty sand (SM)
+Reddish brown and maroon sandstone interbedded
+with shale, medium hard to hard
+Medium hard from depth 55.0'
+Hard from depth 70.0'
+Bore hole terminated @ depth 80.25'
+--- 1068.88 --  SS-1:  N=50/4.5"; RECOVERY = 4"
+--- 1068.38 --  TC-1:  TCP= 50/1.00"
+--- 1063.88 --  TC-2:  TCP= 50/1.00"
+--- 1058.88 --  TC-3:  TCP= 50/0.50"
+--- 1053.88 --  TC-4:  TCP= 50/2.50"
+--- 1048.88 --  TC-5:  TCP= 50/4.00"
+--- 1043.88 --  TC-6:  TCP= 50/2.00"
+--- 1038.88 --  TC-7:  TCP= 50/1.00"
+--- 1033.88 --  TC-8:  TCP= 50/1.00"
+--- 1028.88 --  TC-9:  TCP= 50/0.50"
+0
+5
+10
+15
+20
+25
+30
+35
+40
+45
+50
+55
+60
+65
+70
+75
+80
+1103.83
+1083.83
+1073.83
+1058.83
+1053.83
+1013.58
+Reddish brown lean clay, stiff, moist (CL)
+Reddish brown lean clay,  very soft to stiff, moist (CL)
+Very soft @ depth 20.0'
+Stiff @ depth 25.0'
+Grayish brown lean clay with sand,  medium stiff to
+stiff, wet  to moist (CL)
+Medium stiff @ depth 30.0'
+Wet @ depth 30.0'
+Stiff @ depth 40.0'
+Reddish brown silty sand, medium dense to dense,
+moist (SM)
+Reddish brown and maroon sandstone interbedded
+with shale, medium hard to hard
+Medium hard @ depth 50.0' and 80.0'
+Bore hole terminated @ depth 90.25'
+W.O.H. = Weight on Hammer
+NP = Non Plastic
+--- 1098.83 --  SS-1:  N=14; RECOVERY = 18"
+--- 1093.83 --  SS-2:  N=14; RECOVERY = 18"
+--- 1088.83 --  SS-3:  N=9; RECOVERY = 18" ;
+LL=11, PI=30, -#200=90.3%
+--- 1083.83 --  SS-4:  N=W.O.H ; RECOVERY = 18"
+--- 1078.83 --  SS-5:  N=11; RECOVERY = 18" ;
+LL=14, PI= 32, -#200=92.2%
+--- 1073.83 --  SS-6:  N=5; RECOVERY = 18"
+--- 1068.83 --  SS-7:  N=6; RECOVERY = 18"
+--- 1063.83 --  SS-8:  N=14; RECOVERY = 18" ;
+LL=25, PI= 8, -#200=82.6%
+--- 1058.83 --  SS-9:  N=15; RECOVERY = 18"
+--- 1053.83 --  SS-10:  N=50/5.50"; RECOVERY = 5" ;
+LL=NP, PI= NP, -#200=40.4%
+--- 1053.33 --  TC-1:  TCP= 50/2.00"
+--- 1048.83 --  TC-2:  TCP= 50/1.00"
+--- 1043.83 --  TC-3:  TCP= 50/2.00"
+--- 1038.83 --  TC-4:  TCP= 50/1.50"
+--- 1033.83 --  TC-5:  TCP= 50/1.25"
+--- 1028.83 --  TC-6:  TCP= 50/0.75"
+--- 1023.83 --  TC-7:  TCP= 50/2.50"
+--- 1018.83 --  TC-8:  TCP= 50/1.00"
+--- 1013.83 --  TC-9:  TCP= 50/1.75"
+0
+5
+10
+15
+20
+25
+30
+35
+40
+45
+50
+55
+60
+65
+70
+75
+80
+85
+90
+BORING O-2
+STA. 301+57.28 - 12.15' RT.
+STA. 302+93.67 - 22.76' LT.
+                     TCP= 50/0.50"
+                     TCP= 50/0.50"
+                     TCP= 50/1.25"
+                     TCP= 50/1.00"
+                     TCP= 50/3.50"
+                     TCP= 50/1.00"
+                     TCP= 50/0.50"
+                     TCP= 50/0.25"
+                     TCP= 50/1.00"
+                     TCP= 50/3.50"
+                     TCP= 50/0.75"
+                     TCP= 50/0.50"
+                     TCP= 50/0.75"
+                     TCP= 50/0.25"
+                     TCP= 50/0.00"
+                     TCP= 50/1.00"
+                     TCP= 50/0.50"
+                     TCP= 50/0.25"
+O-2
+NOTES:
+2.
+1.
+731-04025 (2 REPORTS).
+INC.  FOR DETAILED INFORMATION SEE THE REPORT, FILE NO.
+BORING DATA IS PROVIDED BY BURGESS ENGINEERING AND TESTING,
+FOR BORINGS 0-2 THROUGH 0-5.
+BORING O-1 AND 24 HOURS AFTER COMPLETION OF DRILLING OPERATIONS
+ELEVATIONS NOTED WERE OBTAINED AT COMPLETION OF DRILLING FOR
+OPERATIONS AND MAY FLUCTUATE THROUGHOUT THE YEAR.  GROUNDWATER
+GROUNDWATER LEVELS WERE OBTAINED DURING THE  DRILLING
+(SHEET 1 OF 3)
+RAMP 44F OVER I-44 & RAMP 44N & 44M2
+BRIDGE 'O'
+09033(11)
+ I-235 / I-44
+OKLAHOMA COUNTY
+P:\FDB\1641-OKC\CIV\30305400\20_CAD\DGN\S\BRIDGE O\B03SfrO01.dgn
+11/19/2016
+DESIGN
+DRAWN
+CHECKED
+APPROVED
+SQUAD
+JOB PIECE NO.
+SHEET NO.
+11/16
+11/16
+11/16
+11/16
+11/21/2016
+OKLAHOMA DEPARTMENT OF TRANSPORTATION
+MEETING
+FINAL FIELD
+BENHAM

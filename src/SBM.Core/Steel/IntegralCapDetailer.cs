@@ -282,6 +282,34 @@ public sealed partial class SteelModelGenerator
                         MeshBuilder.AddBox(dm, fd, -nIn, nIn, z0, z1, -td / 2, td / 2);
                         Part(casm, $"{casm}-DP{pn++}", PartCategory.DiaphragmPlate, dm, z1 - z0, $"Girder connection diaphragm {Pl(2 * nIn, td)} x {In(z1 - z0)} (girder web plane, inside the cap)");
                     }
+                    // Welds of the diaphragm plate pieces: to the connector plates (symbols without a size: UNRESOLVED dimension) and, where they are milled to
+                    // bear on the bottom plate, 5/16 both faces (p.30). Welds on both faces of the diaphragm plate; legs along its face and along the other plate.
+                    if (conn.DiaphragmWeld > 0 && pieces.Count > 0)
+                    {
+                        var wc = new Mesh();
+                        double wlen = 0;
+                        foreach (var (z0, z1) in pieces)
+                        {
+                            wlen += z1 - z0;
+                            foreach (int fce in new[] { -1, 1 })
+                                foreach (int sx in new[] { -1, 1 })
+                                    wc.AddWeld(fd.ToWorld(sx * nIn, z0, fce * td / 2), fd.ToWorld(sx * nIn, z1, fce * td / 2), n3 * -sx, d3 * fce, conn.DiaphragmWeld);
+                        }
+                        var why = Assumption.UnresolvedDimension(UnresolvedFlag.Text(src, $"{cap.SupName} girder {gl} diaphragm plate to connector plate weld size", "the p.30 Girder Splice weld symbols carry no size", $"Drawn at {In(conn.DiaphragmWeld)} (not a plan value)."),
+                            $"fillet drawn at {In(conn.DiaphragmWeld)}, both faces of the diaphragm plate at both connector plates");
+                        Part(casm, $"{casm}-DPW", PartCategory.Weld, wc, wlen, $"Fillet weld, diaphragm plate to connector plates (size UNRESOLVED, drawn {In(conn.DiaphragmWeld)})", "E70XX / E80XX", why);
+                    }
+                    if (conn.BottomPlateWeld > 0 && !double.IsNaN(zBpTop))
+                    {
+                        var wb = new Mesh();
+                        var edges = new List<(double z, int dir)>();
+                        if (epTop > zBpTop + 1e-4) edges.Add((zBpTop, 1));
+                        if (zBpBot > epBot + 1e-4) edges.Add((zBpBot, -1));
+                        foreach (var (ze, dir) in edges)
+                            foreach (int fce in new[] { -1, 1 })
+                                wb.AddWeld(fd.ToWorld(-nIn, ze, fce * td / 2), fd.ToWorld(nIn, ze, fce * td / 2), new Vec3(0, 0, dir), d3 * fce, conn.BottomPlateWeld);
+                        Part(casm, $"{casm}-DPB", PartCategory.Weld, wb, 2 * nIn * edges.Count, $"Fillet weld {In(conn.BottomPlateWeld)}, diaphragm plate to the bottom plate (mill to bear, both faces, p.30)", "E70XX / E80XX");
+                    }
                 }
 
                 // ---- top flange splice over the cap
@@ -528,9 +556,13 @@ public sealed partial class SteelModelGenerator
                         {
                             var off = f.Z * (face * ts / 2);
                             welds.AddWeld(f.ToWorld(0, clip, 0) + off, f.ToWorld(0, top, 0) + off, f.Z * face, f.X, cd.StiffenerWeld);
+                            // milled to bear on the bottom flange: fillet along the bottom edge on both faces of the plate (p.31 B-B / C-C)
+                            if (cd.StiffenerBottomWeld)
+                                welds.AddWeld(f.ToWorld(clip, 0, 0) + off, f.ToWorld(ws, 0, 0) + off, f.Z * face, new Vec3(0, 0, 1), cd.StiffenerWeld);
                         }
                         Part(asm, $"{asm}-{(kind == "bearing" ? "BS" : "JS")}{sn}-W", PartCategory.Weld, welds, top - clip,
-                            $"Fillet weld {In(cd.StiffenerWeld)}, {kind} stiffener to web" + (cd.StiffenerTopNoWeld > 0 ? $" ({In(cd.StiffenerTopNoWeld)} no weld at the top)" : ""), "E70XX / E80XX");
+                            $"Fillet weld {In(cd.StiffenerWeld)}, {kind} stiffener to web" + (cd.StiffenerTopNoWeld > 0 ? $" ({In(cd.StiffenerTopNoWeld)} no weld at the top)" : "")
+                            + (cd.StiffenerBottomWeld ? $" and to the bottom flange (milled to bear, both faces, {In(cd.StiffenerWeld)})" : ""), "E70XX / E80XX");
                     }
         }
 
@@ -633,7 +665,11 @@ public sealed partial class SteelModelGenerator
             Part(asm, $"{asm}-W{mtag}", PartCategory.WebPlate, wm, x1 - x0, $"{Pl(cd.WebDepth, tw)} x {In(x1 - x0)} (cap web, {webOpen[mm].Count} handholes)");
         }
         Warn(UnresolvedFlag.Text(src, $"{cap.SupName} cap web-to-flange welds", "continuous submerged arc welds without a size (U3)", "Not modeled as weld solids."));
-        if (conn != null) Warn(UnresolvedFlag.Text(src, $"{cap.SupName} girder end plate / connector plate welds", "weld symbols without size or type (U2)", "Not modeled as weld solids."));
+        if (conn != null)
+        {
+            if (conn.DiaphragmWeld > 0) Warn(UnresolvedFlag.Text(src, $"{cap.SupName} diaphragm plate to connector plate weld size", "the weld symbols on the Girder Splice elevation carry no size or type (U2)", $"Drawn at {In(conn.DiaphragmWeld)} (placeholder, not a plan value); parts flagged."));
+            Warn(UnresolvedFlag.Text(src, $"{cap.SupName} end plate / connector plate weld symbols other than diaphragm plate to connector plate", "the symbols are unsized and their joint (end plate to girder web, connector plate to cap web) is not identifiable from the detail (U2)", "Not modeled as weld solids."));
+        }
 
         // camber record
         if (cd.Camber.Count > 0)

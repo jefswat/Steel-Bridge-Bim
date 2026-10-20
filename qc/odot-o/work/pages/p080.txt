@@ -1,0 +1,808 @@
+PIER
+PIER DIMENSIONS 
+AA
+BB
+CC
+DD
+A
+B
+C
+F
+21'-0"
+15
+14
+12
+1102.00
+1105.00
+1104.00
+1065.50
+1063.50
+1080.00
+EPOXY COATED REINFORCING
+(ONE REQUIRED)
+PLAIN REINFORCING
+MARK SIZE QTY. FORM
+LENGTH
+REMARKS
+MARK SIZE QTY. FORM
+LENGTH
+REMARKS
+PIER NO.14 BAR LIST
+EPOXY COATED REINFORCING
+(ONE REQUIRED)
+PLAIN REINFORCING
+MARK SIZE QTY. FORM
+LENGTH
+REMARKS
+MARK SIZE QTY. FORM
+LENGTH
+REMARKS
+EPOXY COATED REINFORCING
+(ONE REQUIRED)
+PLAIN REINFORCING
+MARK SIZE QTY. FORM
+LENGTH
+REMARKS
+MARK SIZE QTY. FORM
+LENGTH
+REMARKS
+PIER NO.15 BAR LIST
+6"
+T2 #5 X 4'-9"
+D
+36'-6"
+41'-6"
+24'-0"
+1'-2‚"
+1'-6"
+40'-0"
+5'-1"
+1'-8†"
+10'-2…"
+5'-1"
+24'-6"
+15'-6"
+TO TAN.
+(TYP.)
+6-PU1 #4@12
+(TYP.)
+6-PU1 #4@12
+ 
+ 
+9"
+9"
+! BEARING
+! U 54" BEAMS
+12'-8‡"
+4'-3„"
+LOOKING UP STATION
+SCALE: ‰" = 1'-0"
+ PLAN - PIER NO. 14 
+! BEARING
+! PIER
+5'-0"
+2'-6"2'-6"
+1'-2"
+1'-6"
+1'-9•"
+1'-9•"
+90°0'0"
+1130.30
+1139.44
+1152.99
+1132.56
+1141.70
+1155.25
+28'-3†"
+34'-5‚"
+48'-11‡"
+6
+11
+26
+E
+15'-0"
+20'-0"
+15'-0"
+PIER NO.12 BAR LIST
+RAMP 44A OVER DEEP FORK CR., & 1-44
+SCALE: •" = 1'-0"
+ SECTION D-D 
+DT1 W-20
+DS1 #11
+6" CLR.
+6'-0" DIA.
+ITEM
+UNIT
+PIER 14
+PIER 15
+PIER NO. 12, 14 & 15 QUANTITIES
+PIER 12
+1'-7"
+1'-7"
+10"
+3'-5"
+PU1
+CE2
+CE1
+PS2
+PS1
+PH10
+PH9
+PH8
+PH7
+PH6
+PH5
+PH4
+PH3
+PH2
+PH1
+C1
+T2
+T1
+CD1
+CS1
+C2
+CU1
+CH2
+CH1
+24
+14
+12
+16
+80
+2
+2
+2
+2
+2
+2
+12
+2
+10
+20
+56
+54
+54
+56
+56
+10
+16
+16
+48
+BNT.
+BNT.
+BNT.
+BNT.
+BNT.
+STR.
+STR.
+STR.
+STR.
+STR.
+STR.
+STR.
+STR.
+BNT.
+BNT.
+STR.
+BNT.
+BNT.
+STR.
+BNT.
+STR.
+BNT.
+STR.
+BNT.
+      
+      
+      
+      
+      
+      
+#4    
+#4    
+#4    
+#5    
+#5    
+#6    
+#6    
+#6    
+#6    
+#6    
+#6    
+#6    
+#6    
+#6    
+#11   
+#11   
+#5    
+#5    
+#11   
+#5    
+#5    
+#4    
+#6    
+#11     
+      
+      
+      
+      
+      
+      
+      
+      
+      
+21'-3" TO 23'-7"      
+24'-5" TO 29'-7"      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+        
+      
+      
+      
+      
+      
+      
+#4    
+#4    
+#4    
+#5    
+#5    
+#6    
+#6    
+#6    
+#6    
+#6    
+#6    
+#6    
+#6    
+#6    
+#11   
+#11   
+#5    
+#5    
+#5    
+#5    
+#4    
+#6    
+#11     
+      
+      
+      
+      
+#4    
+#4    
+#4    
+#4    
+#4    
+#4    
+#4    
+#5    
+#5    
+#6    
+#6    
+#6    
+#6    
+#6    
+#6    
+#6    
+#6    
+#6    
+#11   
+#11   
+#5    
+#5    
+#5    
+#5    
+#4    
+#6    
+#11     
+DT1
+DS1
+2
+84
+BNT.
+STR.
+      
+      
+      
+      
+      
+W20   
+#11     
+1,172'-0" 
+45'-6" 
+DT1
+DS1
+2
+84
+BNT.
+STR.
+      
+      
+      
+      
+      
+W20   
+#11     
+1,329'-0" 
+50'-6" 
+DT1
+DS1
+2
+84
+BNT.
+STR.
+      
+      
+      
+      
+      
+W20   
+#11     
+779'-0" 
+33'-0" 
+5'-9"
+2'-1"
+2'-0"
+11"
+11"
+6"
+PU1
+PU2
+PU3
+4'-5"
+7'-8"
+7'-0"
+1'-6"
+2'-1"
+4'-3"
+CE1 #4 X 11'-2"
+7'-5" 
+8'-5" 
+11'-2" 
+22'-5" (AVG.)
+27'-0" (AVG.)
+5'-5" 
+11'-1" 
+16'-10" 
+22'-7" 
+28'-3" 
+34'-0" 
+39'-9" 
+39'-2" 
+42'-1" 
+41'-8" 
+37'-11" 
+4'-9" 
+24'-5" 
+37'-10" 
+27'-9" 
+9'-6" 
+9'-11" 
+21'-0" 
+24'-2" 
+5• "
+5•"
+CS1 #5 X 27'-9"
+PS2 #5 X 22'-5" (AVG.)
+PS1 #5 X 27'-0" (AVG.)
+T1 #5 X 24'-5"
+T1
+3'-1"
+PS1
+PS2
+CS1
+9'-6"
+T1
+3'-5"
+7'-1" TO 8'-3"
+8'-8" TO 11'-3"
+5'-9"
+19'-10"
+19'-10"
+8'-2"
+PH2 #11 X 42'-1"
+K-35
+CS1
+PS1 & PS2
+IN THE QUANTITIES.
+PURPOSES ONLY.  THE BARS NOTED ARE NOT INCLUDED
+THE DRILLED SHAFT BARS ARE FOR INFORMATION
+1.
+NOTES:
+PU1
+CE2
+CE1
+PS2
+PS1
+PH10
+PH9
+PH8
+PH7
+PH6
+PH5
+PH4
+PH3
+PH2
+PH1
+C1
+T2
+T1
+CS1
+C2
+CU1
+CH2
+CH1
+24
+14
+12
+16
+80
+2
+2
+2
+2
+2
+2
+12
+2
+10
+20
+56
+24
+24
+56
+10
+16
+16
+48
+BNT.
+BNT.
+BNT.
+BNT.
+BNT.
+STR.
+STR.
+STR.
+STR.
+STR.
+STR.
+STR.
+STR.
+BNT.
+BNT.
+STR.
+BNT.
+BNT.
+BNT.
+STR.
+BNT.
+STR.
+BNT.
+      
+      
+      
+      
+      
+      
+      
+      
+      
+21'-3" TO 23'-7"      
+24'-5" TO 29'-7"      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+        
+PU5
+PU4
+PU3
+PU2
+PU1
+CE2
+CE1
+PS2
+PS1
+PH10
+PH9
+PH8
+PH7
+PH6
+PH5
+PH4
+PH3
+PH2
+PH1
+C1
+T2
+T1
+CS1
+C2
+CU1
+CH2
+CH1
+6
+6
+8
+3
+17
+14
+12
+16
+80
+2
+2
+2
+2
+2
+2
+12
+2
+10
+20
+56
+14
+14
+56
+10
+16
+16
+48
+BNT.
+BNT.
+BNT.
+BNT.
+BNT.
+BNT.
+BNT.
+BNT.
+BNT.
+STR.
+STR.
+STR.
+STR.
+STR.
+STR.
+STR.
+STR.
+BNT.
+BNT.
+STR.
+BNT.
+BNT.
+BNT.
+STR.
+BNT.
+STR.
+BNT.
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+21'-3" TO 23'-7"      
+24'-5" TO 29'-7"      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+        
+10'-0" 
+10'-8" 
+5'-1" 
+9'-9" 
+7'-5" 
+8'-5" 
+11'-2" 
+22'-5" (AVG.)
+27'-0" (AVG.)
+5'-5" 
+11'-1" 
+16'-10" 
+22'-7" 
+28'-3" 
+34'-0" 
+39'-9" 
+39'-2" 
+42'-1" 
+41'-8" 
+27'-3" 
+4'-9" 
+24'-5" 
+27'-9" 
+9'-6" 
+9'-11" 
+21'-0" 
+24'-2" 
+7'-5" 
+8'-5" 
+11'-2" 
+22'-5" (AVG.)
+27'-0" (AVG.)
+5'-5" 
+11'-1" 
+16'-10" 
+22'-7" 
+28'-3" 
+34'-0" 
+39'-9" 
+39'-2" 
+42'-1" 
+41'-8" 
+33'-2" 
+4'-9" 
+24'-5" 
+27'-9" 
+9'-6" 
+9'-11" 
+21'-0" 
+24'-2" 
+PH1 #11 X 41'-8"
+CH1 #11 X 24'-2"
+1'-7"
+38'-6"
+1'-7"
+PH1
+CH1
+8'-4"
+3'-11"
+CE2
+PU5
+PU4
+PU1 - PU5
+6'-9"
+2'-1"
+CU1
+5'-9"
+CE2 & CU1
+(TYP.) SEE SHEET K-81
+2" DIA. ANCHOR BOLTS
+(TYP.)
+PEACE SHIELD
+STA 309+94.00
+! RAMP 44A
+WORKING POINT
+5'-3…"
+11'-5"
+25'-11†"
+30'-6ƒ""
+36'-8…""
+51'-3"
+      
+      
+      
+      
+      
+SEE NOTE 1    
+SEE NOTE 1      
+      
+      
+      
+      
+      
+SEE NOTE 1    
+SEE NOTE 1      
+      
+      
+      
+      
+      
+SEE NOTE 1    
+SEE NOTE 1      
+PU5 #4 X 10'-0"
+PU4 #4 X 10'-8"
+PU3 #4 X 5'-1"
+PU2 #4 X 9'-9"
+PU1 #4 X 7'-5"
+CE2 #4 X 8'-5"
+CU1 #4 X 9'-11"
+BRIDGE 'K'
+PIER NO. 12,14 & 15 DETAILS
+(SHEET 2 OF 2)
+ORNAMENTAL MEDALLION
+DRILLED SHAFTS 72" DIAMETER
+WATER REPELLENT (VISUALLY INSPECTED)
+EPOXY COATED REINFORCING STEEL
+(SP) GRAFFITI TREATMENT
+CLASS A CONCRETE
+SUBSTRUCTURE EXCAVATION COMMON
+EA
+LF
+SY
+LB
+SF
+CY
+CY
+2
+48
+324
+42210
+922
+185.2
+50
+2
+93
+269
+28630
+922
+157.2
+50
+2
+73
+250
+26660
+923
+146.5
+50
+09033(11)
+ I-235 / I-44
+OKLAHOMA COUNTY
+P:\FDB\1641-OKC\CIV\30305400\20_CAD\DGN\S\BRIDGE K\B2BSP_12_14_15_K02.dgn
+11/19/2016
+DESIGN
+DRAWN
+CHECKED
+APPROVED
+SQUAD
+JOB PIECE NO.
+SHEET NO.
+11/16
+11/16
+11/16
+11/16
+11/21/2016
+OKLAHOMA DEPARTMENT OF TRANSPORTATION
+MEETING
+FINAL FIELD
+BENHAM
+B2BSP 12 14 15 K02.dgn 11/19/2016 8:36:05 PM

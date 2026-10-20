@@ -240,8 +240,20 @@ foreach (var (name, elA, elE, elC, elF, top, tip) in new[] { ("Pier 10", 534.779
     bool p10 = name == "Pier 10";
     var south = su.FixedSeats.First(x => x.Name == "arch bearing south");
     var north = su.FixedSeats.First(x => x.Name == "arch bearing north");
-    Chk($"{name} arch seat south (EL. {(p10 ? "A" : "E")})", south.Z / ft, p10 ? elA : elE, 0.001);
-    Chk($"{name} arch seat north (EL. {(p10 ? "E" : "A")})", north.Z / ft, p10 ? elE : elA, 0.001);
+    // v7 (arch-nht.csx): the arch pedestal tops are modeled at the bottom of the bearing stack hung from the steel (p.107 note 8 / p.102 note 1: the contractor
+    // adjusts the pedestal elevations) - then the p.102 EL is a CONFLICT row (not counted) and the seat is checked against the arch bearing seat (stack bottom).
+    var supDef = Doc.Project.Bridges.SelectMany(b => b.Supports).First(x => x.Name == name && x.Substructure.CapBlocks.Any(cb => cb.Kind == CapBlockKind.Pedestal));
+    var archSeats = Doc.Project.Bridges.Where(b => b.Arch != null).SelectMany(b => Doc.Steel(b.Name).BearingSeats).Where(bs => bs.Support == name).ToList();
+    foreach (var (seat, nm, el) in new[] { (south, $"{name} arch seat south (EL. {(p10 ? "A" : "E")})", p10 ? elA : elE), (north, $"{name} arch seat north (EL. {(p10 ? "E" : "A")})", p10 ? elE : elA) })
+    {
+        var cbk = supDef.Substructure.CapBlocks.First(cb => cb.Name == seat.Name);
+        bool adjusted = cbk.Reported?.Any(r => r.Contains("p.107 note 8")) == true;
+        if (!adjusted) { Chk(nm, seat.Z / ft, el, 0.001); continue; }
+        var w = su.World(seat.S, seat.N, seat.Z);
+        var bs = archSeats.Where(x => x.Location != null).OrderBy(x => (x.Location!.Value - w.XY).Length).FirstOrDefault();
+        Print($"CONFLICT  {nm}: model {seat.Z / ft:0.000} plan p.102 {el:0.000} ({seat.Z / ft - el:+0.000;-0.000} ft) - pedestal adjusted to the bearing (p.107 note 8 / p.102 note 1), not counted");
+        if (bs != null) Chk($"{nm} = bottom of the arch bearing stack (conc. brg. surface, p.107 Section A-A)", seat.Z / ft, bs.SeatElevation / ft, 0.001);
+    }
     Chk($"{name} CL arch brg from CL pier (6 7/8\")", Math.Abs(south.N) / In(1), 6.875, 1 / 16.0, "in");
     Chk($"{name} arch bearings 9'-10 + 9'-8 1/8 = 19'-6 1/8 apart", Math.Abs(south.S - north.S) / ft, 19 + 6.125 / 12, 1 / 16.0 / 12);
     double cap = su.Solids.Where(s => s.Kind is SubElementKind.Cap or SubElementKind.Pedestal).Sum(s => Math.Abs(s.Mesh.Volume())) / Math.Pow(ft * 3, 3);
@@ -297,7 +309,17 @@ double UnitLf(string unit, string type) => runsB.Where(x => x.n == unit && x.r.T
 Print($"INFO  p.91 per unit, LOW: Unit 1 model {UnitLf("NHT Unit 1", "RAIL (PED)(LOW)"):0.00} / plan 215.8, Unit 2 {UnitLf("NHT Unit 2", "RAIL (PED)(LOW)"):0.00} / 194.0, Unit 3 {UnitLf("NHT Unit 3", "RAIL (PED)(LOW)"):0.00} / 169.2");
 Print($"INFO  p.91 per unit, HIGH: Unit 3 model {UnitLf("NHT Unit 3", "RAIL (PED)(HIGH)"):0.00} / plan 156.4, Unit 4 {UnitLf("NHT Unit 4", "RAIL (PED)(HIGH)"):0.00} / 152.9 + 91.7 = 244.6, Unit 5 {UnitLf("NHT Unit 5", "RAIL (PED)(HIGH)"):0.00} / 336.0"
     + (archBuilt ? $", arch {allNht.Where(n => Doc.Bridge(n).Arch != null).Sum(n => UnitLf(n, "RAIL (PED)(HIGH)")):0.00} / 407.2" : ""));
-Print($"INFO  RAIL (PED) type: not a TxDOT standard (RL-PR3 / PR11 / PR22 / PR3-HD / CLF-RO checked, see rail-joints-nht.csx); runs {runs.Count}, posts modeled {runs.Sum(r => r.Posts)} (posts / spacing UNRESOLVED U14, p.84 note 2), mass {runs.Sum(r => r.Mass) * 2.20462:N0} lb (p.83 design dead load 50 / 100 PLF)");
+// Posts / fence (2026-10-19): the envelope is replaced by posts at the p.85-88 elevation layout (8'-0 on CL NHT stations; LOW grid 20+51.74, HIGH grid 23+38.74) + fence fabric panels.
+var allPostSt = runs.SelectMany(r => r.PostStations.Zip(r.PostStations.Skip(1), (p, q) => (q - p) / ft)).ToList();
+Print($"INFO  RAIL (PED) type: not a TxDOT standard (RL-PR3 / PR11 / PR22 / PR3-HD / CLF-RO checked, see rail-joints-nht.csx); runs {runs.Count}, posts modeled {runs.Sum(r => r.Posts)} (post thickness / base plates / anchors UNRESOLVED U14, p.84 note 2 'diagrammatic'), fence fabric panels {runs.Sum(r => r.FabricPanels)}");
+Print($"INFO  post spacing along CL NHT (p.85-88 elevations 28.8 pt = 8.00 ft): min {(allPostSt.Count > 0 ? allPostSt.Min() : 0):0.000} max {(allPostSt.Count > 0 ? allPostSt.Max() : 0):0.000} ft");
+foreach (var (type, dl) in new[] { ("RAIL (PED)(LOW)", 50.0), ("RAIL (PED)(HIGH)", 100.0) })
+{
+    var rr = runs.Where(r => r.TypeName == type).ToList();
+    double lf = rr.Sum(r => r.Length) / ft;
+    if (lf <= 0) continue;
+    Print($"INFO  {type}: modeled mass {rr.Sum(r => r.Mass) * 2.20462 / lf:0.0} PLF (posts, handrail pipe weight not counted, fabric {rr.Sum(r => r.FabricMass) * 2.20462 / lf:0.0} PLF at the nominal 0.40 lb/ft2 chain link guess) vs the p.83 design dead load {dl:0} PLF ({rr.Sum(r => r.FabricArea) / (ft * ft):N0} sf of fabric, {rr.Sum(r => r.Posts)} posts)");
+}
 // curbs: 10" x 4" with two 3/4" chamfers = 39.44 in2; both sides together run 2 x the CL NHT length of the approach decks (curvature terms cancel) less the cut-back strips
 double curbV = unitNames.Sum(n => Doc.Model(n).Concrete?.Barriers.Where(x => x.Name.EndsWith("curb")).Sum(x => Math.Abs(x.Mesh.Volume())) ?? 0) / Math.Pow(ft, 3);
 double curbA = (10 * 4 - 2 * 0.5 * 0.75 * 0.75) / 144.0;

@@ -79,16 +79,14 @@
       "target": [ { "level": "assembly", "category": "prestressed girder" } ] },
     { "id": "diaphragm-connection", "sheets": "^PRESTRESSED CONCRETE BEAM DIAPHRAGM CONNECTION", "basis": "Beam / end diaphragm connection (inserts in the beams)",
       "target": [ { "level": "assembly", "category": "prestressed girder" } ] },
-    { "id": "superstructure", "sheets": "^SUPERSTRUCTURE DETAILS", "basis": "Deck, end diaphragms, deck reinforcing and bar list",
+    { "id": "superstructure", "sheets": "^SUPERSTRUCTURE DETAILS [12]", "basis": "Deck: slab, transverse section, deck reinforcing layout and bar list (sheets 18, 19; sheets 20, 21 = end diaphragm, linked to its reinforcing and the abutment)",
       "target": [ { "level": "part", "category": "deck" } ] },
     { "id": "diaphragm-rebar", "sheets": "^SUPERSTRUCTURE DETAILS [34]", "basis": "End diaphragm reinforcing: plan / elevation (sheet 20), sections A-A / B-B and bill (sheet 21)",
       "target": [ { "level": "group", "category": "diaphragm reinforcing" } ] },
     { "id": "abutment-section-semi-integral", "sheets": "^SUPERSTRUCTURE DETAILS 4", "basis": "Section A-A / B-B: semi-integral end diaphragm on the abutment stem (back ledge, seat, polystyrene)",
       "target": [ { "level": "part", "category": "abutment" } ] },
 
-    { "id": "barrier", "sheets": "^(BARRIER LAYOUT|CONCRETE BARRIER|MISCELLANEOUS CONCRETE BARRIER|BRIDGE DETAILS 4)", "basis": "Concrete barrier: layout, profile, reinforcing",
-      "target": [ { "level": "group", "category": "barrier group" } ] },
-    { "id": "barrier-cover-plate", "sheets": "^BRIDGE APPROACH PANEL BARRIER", "role": "general", "basis": "Barrier end at the approach panel (cover plate; not modeled)",
+    { "id": "barrier", "sheets": "^(BARRIER LAYOUT|CONCRETE BARRIER|MISCELLANEOUS CONCRETE BARRIER)", "basis": "Concrete barrier: layout, profile, reinforcing (sheets 22, 24, 25; Bridge Details 4 = B801 joint / B830 not used)",
       "target": [ { "level": "group", "category": "barrier group" } ] },
     { "id": "pile-splice", "sheets": "^BRIDGE DETAILS 1", "basis": "Standard pile splice (B201)",
       "target": [ { "level": "element", "category": "pile" } ] },
@@ -100,9 +98,7 @@
       "target": [ { "level": "element", "category": "bearing pad" } ] },
 
     { "id": "survey", "sheets": "^(BRIDGE SURVEY|ALIGNMENT TABULATION 1)", "role": "general", "basis": "Survey and alignment tabulation (SB65)",
-      "target": [ { "level": "alignment", "bridge_group": "SB65" } ] },
-    { "id": "borings", "sheets": "^BORINGS", "role": "general", "basis": "Borings (pile design basis)",
-      "target": [ { "level": "group", "category": "footing group" } ] }
+      "target": [ { "level": "alignment", "bridge_group": "SB65" } ] }
   ],
 
   "hints": [
@@ -110,6 +106,8 @@
     { "sheets": "LIGHTING", "suggests": "Underpass lighting: not modeled." },
     { "sheets": "SLOPE PAVING", "suggests": "Concrete slope paving under the bridge: no slope-protection elements." },
     { "sheets": "PROFILES|ALIGNMENT TABULATION 2", "suggests": "Profiles / alignments of the roads under the bridge (117th Ave, ramps): not in the model." },
-    { "sheets": "TOPOGRAPHY", "suggests": "Existing topography and utilities: no terrain / utility elements in this model." }
+    { "sheets": "TOPOGRAPHY", "suggests": "Existing topography and utilities: no terrain / utility elements in this model." },
+    { "sheets": "BORINGS", "suggests": "Borings: recorded in the plan data (pile design basis) but not used to build any element." },
+    { "sheets": "BRIDGE APPROACH PANEL", "suggests": "Barrier end / cover plate at the approach panel: not modeled." }
   ]
 }
