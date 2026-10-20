@@ -1047,6 +1047,15 @@ UNRESOLVED FLAG (general, reusable): `SBM.Core/Assumption.cs` `Assumption{Status
   than 1 in. past an end chord. PTC data: approach S5 21 WF 62 at 39'-1 (was 33'-8: p.48 / p.58 / p.55 = 33'-0 + 6'-1, 8 in. inside the 10'-9 bracket tip),
   B1 brackets tapered 6'-3 1/2 -> 2'-0 1/2 (p.55; girder spans via the p.45 note, tip now 39'-9), end chords at L0 / L0' extended past the shoe pin
   (scaled, flagged: main 1'-5 p.73, approach 10 1/2 in. p.59). Shoes were already on the plan positions (pin under L0 / L11, checked).
+  QC PASS 2 BACK-CHECK (2026-10-20; qc/ptc/results/answers.csv I007-I017, TRUSS-DESIGN.md section 13): generic OPTIONAL section inputs (omitted when unset):
+  `TrussPlate.BetweenGussets` (cover plate from gusset edge to gusset edge of the member's end joints, `GussetReach` = the joint outline / envelope projected on
+  the member; not counted in `TrussBuiltSection.HalfWidthAtJoints`, which the gusset inside distance / overlap CHECK / cross-plane setbacks now use),
+  `TrussPlate.Start` / `TrussPly.Start` + `TrussPly.Length` (partial pieces from a distance after the START working point; `TrussSectionPiece.Start`, one
+  `PieceSpan` for the member solid and the rivet-line grips), `TrussSectionDefinition.ShapeArea` (Rolled / LacedChannels: web thickness adjusted so one shape has
+  the printed gross area), Rolled `TopPlates` / `BottomPlates` = cover plates on the two flange faces (mass by volume). PTC: 4-span 14 WF chords / diagonals with
+  p.57 cover plates (between the gussets), approach 14 WF at the printed areas, F3 / F4 partial floor beam plates (p.55), main post U11-L11 partial 34 x 9/16 o.s.
+  / 34 x 1 1/8 plies (p.69 / p.70 areas 293.67 / 217.17), main 18 in channels at the 1954 areas (p.70), piers 10 / 27 stepped top 10'-10 1/2 along (p.9 / p.36
+  B-B: bases 12'-6 / 12'-10 1/2 now exact), piers 17 / 20 pile column 8 = 8 piles on the 1'-6 offset rows (196 piles, p.27).
 - Bonner Unit 6 (spans 30-35, 4 x FIB-96, `samples/plans/build-bonner-unit6.csx` -> `Bonner Unit 6 FIB.sbm`, reads docs/plan-data/bonner-b2500/fib-unit6
   CSVs; same -L- placement as Unit 5; terrain + georeference `samples/plans/terrain-bonner.csx`, `docs/plan-data/bonner-b2500/TERRAIN.md`): 24 SpanBeams, per-span layouts (G1 LEFT, CL bearing 1'-2" / 3'-2" bent 29 / 1'-4" bent 35), p439 strand pattern
   read from the VECTOR drawing (72 + 4 slack, 8 draped, 20 debonded), E1/E2/E3 + P sole plates, camber tables, bents 30-35 (level precast cap profile,

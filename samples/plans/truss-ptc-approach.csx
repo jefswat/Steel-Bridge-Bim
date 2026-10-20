@@ -99,7 +99,8 @@ TrussSectionDefinition OldWF(string printed, double areaSqIn, string material, s
     {
         Name = printed, Kind = TrussSectionKind.Rolled, Designation = printed, Rotated = true,
         Depth = Lerp(lo.Depth, hi.Depth), FlangeWidth = Lerp(lo.FlangeWidth, hi.FlangeWidth), WebThickness = Lerp(lo.WebThickness, hi.WebThickness), FlangeThickness = Lerp(lo.FlangeThickness, hi.FlangeThickness),
-        WeightLbPerFt = areaSqIn * 3.4, Material = material, Label = $"{printed} ({areaSqIn:0.##} sq.in.)", Source = pages,
+        WeightLbPerFt = areaSqIn * 3.4, ShapeArea = areaSqIn * 0.00064516,     // QC I017: the sharp-root polygon of the interpolated d / bf / tw / tf lacked the fillets (14 WF 61: 17.67 vs 17.94 printed) - web thickened to the printed area
+        Material = material, Label = $"{printed} ({areaSqIn:0.##} sq.in.)", Source = pages,
         Unresolved = U(pages, $"rolled shape {printed} (1954 series) dimensions", $"the sheets print the designation and the gross area {areaSqIn:0.##} sq.in., not d / bf / tw / tf, and the 1954 series differs from AISC v16",
             $"d / bf / tw / tf interpolated by area between AISC {lo.Name} and {hi.Name}, weight 3.4 lb/ft per sq.in.; flanges in planes parallel to the truss plane with the gusset pairs outside them (p.50 / p.60: gusset in-to-in = depth + fills)."),
     };
@@ -184,18 +185,41 @@ foreach (var u in units)
         sd.Name = key;
         Add(sd);
     }
-    // cover plates on 14 WF chords / diagonals (p.57): listed in the section column, not built (see the flag)
+    // cover plates on 14 WF chords / diagonals (p.57, QC I009): "2-Pls. w x t" in the section column = one plate on the outer face of each flange (the printed gross
+    // area = shape + 2 plates: 84.37 + 2 x 16 x 15/16 = 114.37, 100.59 + 2 x 16 1/2 x 13/16 = 127.40, 100.59 + 2 x 16 1/2 x 7/8 = 129.47, 92.30 + 2 x 16 x 11/16 = 114.30).
+    // The joint sheets (p.60 U3: "2-Cover Pls 16 x 15/16" begin where the gusset ends; splice plates of the same size cover the joint) end them at the gussets.
+    var platePat = new System.Text.RegularExpressions.Regex(@"^2-Pls\.?\s*(.+?)\s*x\s*(.+)$");
     foreach (var r in rows.Where(r => r["plates"] != ""))
-        UG("p.57", $"cover plates {r["plates"]} on {r["section"]} (member {r["row"]})", "the member table lists them as part of the section (area includes them) but the joint sheets draw them only between the splices and the sheet gives no length / position",
-            "not built (the rolled shape alone; the gross area in the table is larger by the plates).");
-    // floor beams (p.55 / p.48 / p.58): web 75 x 7/16, 4 angles 6x6x1/2, cover plates 14 x 1/2 (full length top built; partial plates not)
-    string fbPartial = U("p.55, p.48, p.58", "partial-length floor beam cover plates (F.L. + 28'-0 / 40'-0 / 20'-0 bottom plates, F3 / F4 / B1 plate counts 2 / 4 / 1)", "the lengths are listed on p.55 but their positions along the beam were not decoded; the bracket (B1) web is drawn tapering 6'-3 1/2 to 2'-0 1/2",
-        "only the full-length top plate 14 x 1/2 is built (the B1 bracket taper 6'-3 1/2 -> 2'-0 1/2 is modeled).");
-    foreach (var (nm, lbl) in new[] { ("F3", "F3 (end floor beam): 1-Pl 75x7/16; 4-Ls 6x6x1/2; 2-Pls 14x1/2"), ("F4", "F4 (typical): 1-Pl 75x7/16; 4-Ls 6x6x1/2; 4-Pls 14x1/2"), ("B1", "B1 (bracket): 1-Pl 75x7/16; 4-Ls 6x6x1/2; 1-Pl 14x1/2") })
+    {
+        string key = SecName(r["section"], r["material"]) + " + " + r["plates"];
+        if (secs.ContainsKey(key)) continue;
+        var pm = platePat.Match(r["plates"].Trim());
+        if (!pm.Success) throw new Exception("plates not understood: " + r["plates"]);
+        double w = Inch(pm.Groups[1].Value), th = Inch(pm.Groups[2].Value);
+        var sd = OldWF(r["section"], AreaOf(r["section"]), r["material"], sheetOf);
+        sd.Name = key;
+        sd.Label = $"{r["section"]} + {r["plates"]} ({r["area_sqin"]} sq.in.)";
+        sd.TopPlates = new() { new TrussPlate(w, th, false, "cover PL " + pm.Groups[1].Value + " x " + pm.Groups[2].Value) { BetweenGussets = true } };
+        sd.BottomPlates = new() { new TrussPlate(w, th, false, "cover PL " + pm.Groups[1].Value + " x " + pm.Groups[2].Value) { BetweenGussets = true } };
+        sd.WeightLbPerFt = 0;
+        sd.Unresolved += " " + U(sheetOf + ", " + jointPages, $"cover plate ends on {r["section"]} + {r["plates"]} (member {r["row"]})",
+            "the joint sheets draw the cover plates starting where the gussets end (same-size splice plates over the joint) but print no plate length",
+            "one plate on the outer face of each flange, from gusset edge to gusset edge of the modeled (envelope) gussets; the splice plates over the joints are not modeled.");
+        Add(sd);
+    }
+    // floor beams (p.55 / p.48 / p.58): web 75 x 7/16, 4 angles 6x6x1/2, cover plates 14 x 1/2. p.55 elevation (QC I016): top "Cov. Pl. 14 x 1/2 x F.L." + "14 x 1/2 x 28'-0
+    // Int. Fl. Bm. only"; bottom "14 x 1/2 x 40'-0 Int. Fl. Bm." / "14 x 1/2 x 20'-0 End Fl. Bm." + "14 x 1/2 x 28'-0 Int. Fl. Bm. only" -> F3 (end) 2 plates, F4 (interior) 4 plates.
+    string fbPartial = U("p.55, p.48, p.58", "position of the partial-length floor beam cover plates (28'-0 / 40'-0 / 20'-0)", "p.55 lists their lengths but the elevation is broken at the CL and does not dimension their ends",
+        "partial plates centred on the CL of the bridge (the beam is symmetric), outer plates stacked on the inner ones; the B1 bracket taper 6'-3 1/2 -> 2'-0 1/2 is modeled.");
+    TrussPlate Fp(double lengthFt = 0) => new TrussPlate(In(14), In(0.5), false, lengthFt > 0 ? $"cover PL 14 x 1/2 x {lengthFt:0}'-0" : "cover PL 14 x 1/2 F.L.") { Length = Ft(lengthFt) };
+    foreach (var (nm, lbl, top, bot) in new[] {
+        ("F3", "F3 (end floor beam): 1-Pl 75x7/16; 4-Ls 6x6x1/2; 2-Pls 14x1/2 (top F.L., bottom 20'-0)", new[] { Fp() }, new[] { Fp(20) }),
+        ("F4", "F4 (typical): 1-Pl 75x7/16; 4-Ls 6x6x1/2; 4-Pls 14x1/2 (top F.L. + 28'-0, bottom 40'-0 + 28'-0)", new[] { Fp(), Fp(28) }, new[] { Fp(40), Fp(28) }),
+        ("B1", "B1 (bracket): 1-Pl 75x7/16; 4-Ls 6x6x1/2; 1-Pl 14x1/2", new[] { Fp() }, new TrussPlate[0]) })
         Add(new TrussSectionDefinition
         {
             Name = nm, Kind = TrussSectionKind.H, WebVertical = true, Material = "S", Label = lbl, WebDepth = In(75), WebPlies = { new TrussPly(In(75), In(7.0 / 16)) },
-            Angle = "L6x6x1/2", AngleProjection = In(0.25), TopPlates = { new TrussPlate(In(14), In(0.5)) }, Source = pgFloor + " / p.55", Unresolved = fbPartial,
+            Angle = "L6x6x1/2", AngleProjection = In(0.25), TopPlates = top.ToList(), BottomPlates = bot.ToList(), Source = pgFloor + " / p.55", Unresolved = nm == "B1" ? "" : fbPartial,
         });
     // stringers: S5 21 WF 62, S6-S8 24 WF 76 (S6 printed 24 WF 78 on p.58, same section modulus)
     Add(new TrussSectionDefinition { Name = "W21x62", Kind = TrussSectionKind.Rolled, Designation = "W21x62", Material = "C", Label = "21 WF 62 (S5)", Source = pgFloor });
@@ -215,7 +239,7 @@ foreach (var u in units)
     void Mem(string name, string from, string to, string sec, TrussMemberRole role, string panel, double planLen = 0, string plane = "", string system = "", double? sa = null, double? sb = null, string src = "")
         => t.Members.Add(new TrussMemberDefinition { Name = name, From = from, To = to, Section = sec, Role = role, Panel = panel, PlanLength = planLen, Plane = plane, System = system, StartSetback = sa, EndSetback = sb, Source = src });
     var byRow = rows.ToDictionary(r => r["group"] + "|" + r["row"], r => r);
-    string Sec(Dictionary<string, string> r) => r["section"].Contains("WF") ? SecName(r["section"], r["material"]) : r["section"];
+    string Sec(Dictionary<string, string> r) => r["section"].Contains("WF") ? SecName(r["section"], r["material"]) + (r["plates"] != "" ? " + " + r["plates"] : "") : r["section"];
     // chords: one member per printed row (2 panels, through the odd-numbered point), mirrored about the centre joint
     void Chord(string kind, int a, int b, string rowName)
     {

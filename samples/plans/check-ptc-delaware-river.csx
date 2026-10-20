@@ -218,8 +218,8 @@ foreach (var r in pr)
         var lp = leg.Mesh.Positions; double zmin = lp.Min(p => p.Z);
         var bot = lp.Where(p => p.Z < zmin + 0.001).ToList();
         var bs = bot.Select(p => Vec2.Dot(new Vec2(p.X, p.Y) - u.Origin, u.D)).ToList(); var bn = bot.Select(p => Vec2.Dot(new Vec2(p.X, p.Y) - u.Origin, u.N)).ToList();
-        Row($"Pier {pier}: shaft size across at the footing top (printed base)", (bs.Max() - bs.Min()) / ft, baseA, 1.0 / 16 / 12, "ft", pg + " (model: straight faces from the printed top to the printed base; piers 10 / 27: 1/4in per 12in from the stepped top, along-bridge base UNRESOLVED p.9 / p.36)");
-        Row($"Pier {pier}: shaft size along at the footing top (printed base)", (bn.Max() - bn.Min()) / ft, baseB, 1.0 / 16 / 12, "ft", pg + " (model: straight faces from the printed top to the printed base; piers 10 / 27: 1/4in per 12in from the stepped top, along-bridge base UNRESOLVED p.9 / p.36)");
+        Row($"Pier {pier}: shaft size across at the footing top (printed base)", (bs.Max() - bs.Min()) / ft, baseA, 1.0 / 16 / 12, "ft", pg + " (model: straight faces from the printed top to the printed base; piers 10 / 27: 1/4in per 12in from the stepped top 10'-10 1/2 along, QC I014)");
+        Row($"Pier {pier}: shaft size along at the footing top (printed base)", (bn.Max() - bn.Min()) / ft, baseB, 1.0 / 16 / 12, "ft", pg + " (model: straight faces from the printed top to the printed base; piers 10 / 27: 1/4in per 12in from the stepped top 10'-10 1/2 along, QC I014)");
     }
     if (cls == "cap")
     {

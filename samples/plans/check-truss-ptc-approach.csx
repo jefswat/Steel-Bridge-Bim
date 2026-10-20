@@ -7,6 +7,7 @@
 //   4 the generator's member length checks (printed geom lengths 26.9496 / 39.0766 / 37.9221 / 27.5000)
 //   5 shoes: bottom of shoe = pier top (p.5 / p.32), shoe type per pier (fixed only at joint 8 / 20), work point to bottom of shoe closes with the printed heights
 //   5b member material letter (C) / (S) per member table row (members.csv, p.47 / p.57)
+//   5c member section gross area at mid-member vs the member table row (incl. cover plates, p.57)
 //   6 steel weight by material vs the p.42 items 2 + 5 per unit
 //   sbm run samples\plans\check-truss-ptc-approach.csx "samples\plans\PTC approach trusses.sbm"
 // Read-only (never saves). Rows: PASS / DIFF (plan difference reported, never adjusted) / INFO.
@@ -220,6 +221,31 @@ foreach (var u in units)
             }
         }
         Cmp($"truss line members whose material letter differs from the member table row ({ok} agree, {none} without a row / part)", 0, bad, 0, "", dec: 0);
+    }
+
+    // 5c. gross area of each member section at mid-member vs the printed "GROSS SQ. IN." of its table row (QC pass 2: I009 cover plates, I017 1954 14 WF areas);
+    // cover plates stop at the end gussets (p.60), so the member's mean area (volume / length) is lower - reported as INFO.
+    Print("--- 5c. member section gross area (mid-member) vs the member table row");
+    {
+        var csvRows = MemberRows().Where(r => r["unit"] == (u.four ? "B" : "A") && r["area_sqin"] != "").ToList();
+        var seen = new HashSet<string>();
+        foreach (var md in bdef.Truss.Members.Where(m => m.Role is TrussMemberRole.UpperChord or TrussMemberRole.LowerChord or TrussMemberRole.Diagonal or TrussMemberRole.Post or TrussMemberRole.Hanger))
+        {
+            var mm = System.Text.RegularExpressions.Regex.Match(md.Source ?? "", @"member table (?:row (\S+)|\((.+)\))");
+            string rn = mm.Success ? (mm.Groups[1].Success ? mm.Groups[1].Value : mm.Groups[2].Value) : "";
+            var cr = csvRows.FirstOrDefault(r => r["row"] == rn);
+            if (cr == null || !seen.Add(rn)) continue;
+            var sd = bdef.Truss.Sections.First(x => x.Name == md.Section);
+            double a = SBM.Core.Truss.TrussSections.Build(sd).Area / 0.00064516;
+            double pa = double.Parse(cr["area_sqin"], inv);
+            Cmp($"gross area {rn} ({md.Section})", pa, a, 0.01 * pa, " sq in", "", 2);
+            if (cr["plates"] != "")
+            {
+                var part = tm.Steel.Parts.FirstOrDefault(p => p.Mark == $"N-{md.Name}");
+                var res = tm.Members.FirstOrDefault(x => x.Mark == $"N-{md.Name}");
+                if (part != null && res != null) Row("INFO", $"mean area {part.Mark} (volume / solid length; cover plates end at the gussets)", cr["area_sqin"] + " sq in", $"{part.Mesh.Volume() / res.CutLength / 0.00064516:F2} sq in");
+            }
+        }
     }
 
     // 6. weights

@@ -191,6 +191,9 @@ TrussSectionDefinition Chord(Dictionary<string, string> r)
         TopPlates = { cov[0] }, BottomPlates = { cov[1] }, Source = r["note"],
     };
 }
+// QC I012: gross area of ONE 1954 18 in channel = (p.70 full gross - cover plates) / 2: 42.7 (45.98 / 45.96 - 21.0), 45.8 (54.76 - 28.0), 51.9 (61.86 - 31.5,
+// 58.36 - 28.0), 58.0 (65.46 - 31.5). The AISC v16 MC18 polygons (parallel flanges + fillets) are 0.29 sq in larger each (+0.58 per member).
+var Channel1954 = new Dictionary<string, double> { ["42.7"] = 12.49, ["45.8"] = 13.38, ["51.9"] = 15.18, ["58.0"] = 16.98 };
 TrussSectionDefinition WebMember(string name, Dictionary<string, string> r)
 {
     string sec = r["section"];
@@ -202,6 +205,7 @@ TrussSectionDefinition WebMember(string name, Dictionary<string, string> r)
         return new TrussSectionDefinition
         {
             Name = "WM " + name, Kind = TrussSectionKind.LacedChannels, Label = sec, Material = Mat(r["material"]), Channel = "MC18x" + D(ch.Groups[1].Value).ToString("0.###", inv),
+            ShapeArea = In(1) * In(1) * Channel1954[ch.Groups[1].Value.Trim()],
             BackToBack = FI(2, 5), TopPlates = { cv }, BottomPlates = { new TrussPlate(cv.Width, cv.Thickness, cv.Perforated, cv.Label) }, Source = r["note"],
             Unresolved = U("p.70, p.74", "1954 18 in channel '18[ " + ch.Groups[1].Value + "' of the channel verticals / diagonals and their width",
                 "the sheets give the weight only (taken as AISC v16 MC18x" + ch.Groups[1].Value + ", same nominal weight) and no out-to-out width", "channel backs 2'-5 apart (in. to in. of the gussets), flanges inward under the perforated covers."),
@@ -222,17 +226,23 @@ TrussSectionDefinition Add(TrussSectionDefinition s) { t.Sections.Add(s); secs[s
 foreach (var r in chords) Add(Chord(r));
 foreach (var (k, r) in webs) if (r["section"] != "POST") Add(WebMember(k, r));
 // Post U11-L11 (p.69 "Elevation of Post U11-L11", main material; p.79): upper section 2'-6 1/8 o-o webs, 1'-11 3/4 b-b Ls
+double PostU11 = Ft(D(elev[11]["lower_chord_ft"]) + D(webs["U11-L11"]["length_ft"]));      // El of U11 (L11 + 96'-0)
+double PostFbTop = Ft(D(elev[11]["gutter_ft"])) - In(FbTopBelowGutterIn);                   // top of the floor beam Ls at point 11 (p.94)
 Add(new TrussSectionDefinition
 {
     Name = "POST U11-L11", Kind = TrussSectionKind.Box, Material = "S", WebDepth = In(34),
     Label = "4-Ls 5x5x7/8; 2-Cov. Pls (23-12) x 1 1/8; 2-Web Pls 18x7/8; 2-Web Pls 34x9/16 o.s., 34x1 1/8, 4-Web Pls 34x3/4 i.s. (upper section)",
-    WebPlies = { new TrussPly(In(34), In(9.0 / 16), "web PL 34 x 9/16 o.s."), new TrussPly(In(34), In(1.125), "web PL 34 x 1 1/8"), new TrussPly(In(34), In(0.75), "web PL 34 x 3/4"),
+    // QC I011: the p.70 table full gross areas are 293.67 (upper part, above the floor beam connection) = all plies but the 34 x 9/16 o.s., and 217.17
+    // (lower part) = without the 34 x 1 1/8 too; the elevation dimensions them as partial plies: 34 x 9/16 o.s. from 5'-0 +- above the floor beam to 5'-0 +-
+    // below it, 34 x 1 1/8 from U11 to 9'-0 +- below the floor beam (8'-10 1/2 b-b Ls, top of Ls 2'-9 1/2 under the gutter, p.94). Start = from U11 (member start).
+    WebPlies = { new TrussPly(In(34), In(9.0 / 16), "web PL 34 x 9/16 o.s.") { Start = PostU11 - (PostFbTop + Ft(5)), Length = Ft(5) + In(FbDepthIn) + Ft(5) },
+        new TrussPly(In(34), In(1.125), "web PL 34 x 1 1/8") { Start = 0, Length = PostU11 - (PostFbTop - In(FbDepthIn) - Ft(9)) }, new TrussPly(In(34), In(0.75), "web PL 34 x 3/4"),
         new TrussPly(In(34), In(0.75), "web PL 34 x 3/4 i.s."), new TrussPly(In(18), In(7.0 / 8), "web PL 18 x 7/8") },
     WebsOutToOut = FI(2, 6.125), WebsBackToBack = FI(1, 11.75), Angle = "L5x5x7/8", AngleProjection = In(0.25),
     TopPlates = { new TrussPlate(In(23), In(1.125), true, "Cov. PL (23-12) x 1 1/8") }, BottomPlates = { new TrussPlate(In(23), In(1.125), true, "Cov. PL (23-12) x 1 1/8") },
     Source = "p.69 / p.79",
-    Unresolved = U("p.69", "post U11-L11 section along its length", "the 34 x 1 1/8 and 34 x 9/16 web plates run only over parts of the post (9'-0 / 5'-0 zones about the floor beam) and the lower section is 2'-2 3/4 o-o webs",
-        "the upper section (2'-6 1/8 o-o webs, all plies) is built over the full length."),
+    Unresolved = U("p.69", "post U11-L11 partial web plates (34 x 9/16 o.s., 34 x 1 1/8)", "the elevation is drawn with breaks and gives the plate ends only as 5'-0 +- / 9'-0 +- from the floor beam; which plate starts at U11 is read from the p.70 table areas (293.67 upper / 217.17 lower part)",
+        "34 x 1 1/8 from U11 to 9'-0 below the floor beam, 34 x 9/16 o.s. from 5'-0 above to 5'-0 below it (2'-6 1/8 o-o webs there, 2'-2 3/4 below the 1 1/8 plates)."),
 });
 // Rigid suspender 14 (p.70 suspenders table, cover plates p.84 = Sheet 44 not read)
 Add(new TrussSectionDefinition
