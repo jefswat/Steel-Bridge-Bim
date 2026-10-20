@@ -1,0 +1,24 @@
+id,item,location,parameter,value_printed,value_in,page,confidence,note
+B1,fixed shoe (girder spans),one per girder end,sole plate,11 x 4 3/4 x 1 ft 6 in beveled,,44,high,"material list; read at 280 dpi"
+B2,fixed shoe,girder spans,key,3 x 1 x 5 1/2 in,,44,high,
+B3,fixed shoe,girder spans,stem plate,18 x 9 x varies,,44,high,
+B4,fixed shoe,girder spans,stiffener plates,2 pcs 7 x 1,,44,high,
+B5,fixed shoe,girder spans,wing plates,2 pcs 15 x 1 x 1 ft 10 in,,44,high,
+B6,fixed shoe,girder spans,masonry plate,24 x 4 x 3 ft 0 in,,44,high,"details at top of shoe same as the expansion shoe; carbon steel marked C"
+B7,expansion shoe,girder spans,sole plate,11 x 4 3/4 x 1 ft 6 in beveled (carbon),,44,high,
+B8,expansion shoe,girder spans,key,3 x 1 x 5 1/2 in (carbon),,44,high,
+B9,expansion shoe,girder spans,rocker,17 5/8 x 9 x 3 ft 0 in (carbon),,44,high,"GIRDERS.md also reads 17 5/8"
+B10,expansion shoe,girder spans,dowels,2 pcs 2 in dia x 3 in long stainless steel (ASTM A276-49T),,44,high,
+B11,expansion shoe,girder spans,masonry plate,19 x 3 1/2 x 4 ft 0 in (carbon),,44,high,
+B12,shoes,girder spans,anchor bolts,holes for 1 1/4 in anchor bolts; fixed shoe 9 in + 9 in centres (1'-2 each side of CL girder); masonry plate 2 ft 0 in wide at the fixed shoe 3 ft 0 in long,,44,medium,"drawings of the shoes at 3/8 in = 1 ft"
+B13,shoes,girder spans,expansion shoe dimensions,"masonry plate 4 ft 0 in x 1 ft 7 in?, anchor holes 6 in / 3 1/2 in, 1'-9 + 1'-9 centre to centre of key plates",,44,low,"UNRESOLVED (p.44): footprint dimension digits at the expansion shoe (1'-7 / 1'-9 / 4'-0)"
+B14,shoes,girder spans,as built revisions,"rev 3 3-1-55 draw added to tension plate; rev 2 9-13-54 corrected material for shoes; rev 1 8-2-54 revised shoes also camber for spans 1, 2 and 3",,44,high,"camber 1 1/4 in for spans 1 2 3 and 2 in for the other spans (camber diagram)"
+B15,stringer bearing,truss and girder spans,bearing plate length at stringer,8 1/2 in at 24 WF 76 (also 24 WF 84 and 24 WF 94 on girder spans); 8 in at 21 WF 62,,55,high,"enlarged details of bearing plate and sole plate (at pavement breaks)"
+B16,stringer bearing,truss and girder spans,sole plate size,8 5/8 in at 24 WF 76; 8 1/8 in at 21 WF 62 (width) x 3 1/2 in; 8 1/2 / 8 in other dimension,,55,medium,"3 1/2 x 1 grooved plate; sole plate 5/8 in; bevel to grade; two holes with 3/8 in"
+B17,stringer bearing,intermediate fixed points with stringer splices,bearing detail,"1 ft 1 1/2 in at 24 WF 76; 1 ft 2 in at 21 WF 62 (plate width), 10 in from the curb side",,55,medium,"revision 1 (6-2-54) some widths of stringer bearing plates changed; rev 2 (3-8-56) brackets extended for light poles"
+B18,stringer bearing,truss and girder spans,fixed / expansion,"expansion end of a walkway panel / stringer bearing is the upgrade end; hold-down angles 7/16 in at expansion joints; bearing details at fixed points, at pavement breaks, at end floor beams and brackets",,55,medium,
+B19,stringer bearing,approach truss spans,stringer to floor beam,"15 [ 33.9 diaphragms midway between floor beams and on each side of pavement break; stringers 21 WF / 24 WF on 24 WF floor beams",,55,medium,
+B20,stringer bearing,approach truss spans,tension plate,PL 14 x 3/4 with 1 in dia high strength rivets (stringer continuity over floor beams),,55,high,"detail of tension plate"
+B21,stringer gaps,over floor beams,open gaps 1.7-5.9 in. in the model,not printed as such,,55,low,"UNRESOLVED (p.55 / p.43 / p.45): no printed 'gap over the floor beam' - the stringers are continuous over the floor beams on bearing plates 8 / 8 1/2 in long; the model gap (stringer bottom to floor beam top) comes from the p.43 / p.45 stringer elevations and the bearing plate stack: sole plate 5/8 in + bearing plate; re-derive the stack at the fixed and expansion bearings before closing"
+B22,shoe plates,main span piers 17 20,sole / masonry / rocker,see p.73 (L0 rocker shoes) and p.96 (piers 18 / 19),,"73,96",low,"not re-read here; truss shoes are in TRUSS-DESIGN.md and the other agent's scope"
+B23,shoe plates,approach truss shoes,see p.49 p.52 p.59 p.63 p.67,,,"49,52,59,63,67",low,"truss shoe sheets belong to the connections agent"
