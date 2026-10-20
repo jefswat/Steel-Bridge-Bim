@@ -11032,7 +11032,7 @@
             "Width": 0,
             "Diameter": 0,
             "WorkingLineOffset": 0,
-            "Unresolved": "UNRESOLVED (p.43, p.44): girder web stiffeners, end stiffeners and fills, cover plate splice, rivets - the end stiffeners (4-Ls 7x4x3/4 \u002B fills 15x1 1/8), intermediate stiffener pairs (2-Ls 6x4x7/16, 9 / 6 / 6 / 9 equal spaces per panel), long stiffeners, the full length cover plate splice (CL splice 37\u0027-0 from the CL girder \u002B 6\u0027-0 additional material) and the rivet patterns are drawn / listed but not dimensioned station by station. built: web, 4 flange angles and the cover plates; not built: the items listed. UNRESOLVED (p.43, p.44): CONFLICT: top cover plate length 86\u0027-0 - the stress sheet and the p.44 label both print 86\u0027-0 but the elevation dimension lines (25\u0027-6 / 37\u0027-0 / 45\u0027-0 each side of the CL = 51 / 74 / 90 ft) match the BOTTOM plates (90 / 74 / 51) and no dimension gives 86. the top plates are built as printed (full length \u002B 86\u0027-0 \u002B 51\u0027-0, centred); the 86\u0027-0 is reported as a plan conflict.",
+            "Unresolved": "UNRESOLVED (p.43, p.44): girder web stiffeners, end stiffeners and fills, cover plate splice, rivets - the end stiffeners (4-Ls 7x4x3/4 \u002B fills 15x1 1/8), intermediate stiffener pairs (2-Ls 6x4x7/16, 9 / 6 / 6 / 9 equal spaces per panel), long stiffeners, the full length cover plate splice (CL splice 37\u0027-0 from the CL girder \u002B 6\u0027-0 additional material) and the rivet patterns are drawn / listed but not dimensioned station by station. built: web, 4 flange angles and the cover plates; not built: the items listed.",
             "Source": "p.43 / p.44"
           },
           {
@@ -117895,7 +117895,7 @@
             "Width": 0,
             "Diameter": 0,
             "WorkingLineOffset": 0,
-            "Unresolved": "UNRESOLVED (p.43, p.44): girder web stiffeners, end stiffeners and fills, cover plate splice, rivets - the end stiffeners (4-Ls 7x4x3/4 \u002B fills 15x1 1/8), intermediate stiffener pairs (2-Ls 6x4x7/16, 9 / 6 / 6 / 9 equal spaces per panel), long stiffeners, the full length cover plate splice (CL splice 37\u0027-0 from the CL girder \u002B 6\u0027-0 additional material) and the rivet patterns are drawn / listed but not dimensioned station by station. built: web, 4 flange angles and the cover plates; not built: the items listed. UNRESOLVED (p.43, p.44): CONFLICT: top cover plate length 86\u0027-0 - the stress sheet and the p.44 label both print 86\u0027-0 but the elevation dimension lines (25\u0027-6 / 37\u0027-0 / 45\u0027-0 each side of the CL = 51 / 74 / 90 ft) match the BOTTOM plates (90 / 74 / 51) and no dimension gives 86. the top plates are built as printed (full length \u002B 86\u0027-0 \u002B 51\u0027-0, centred); the 86\u0027-0 is reported as a plan conflict.",
+            "Unresolved": "UNRESOLVED (p.43, p.44): girder web stiffeners, end stiffeners and fills, cover plate splice, rivets - the end stiffeners (4-Ls 7x4x3/4 \u002B fills 15x1 1/8), intermediate stiffener pairs (2-Ls 6x4x7/16, 9 / 6 / 6 / 9 equal spaces per panel), long stiffeners, the full length cover plate splice (CL splice 37\u0027-0 from the CL girder \u002B 6\u0027-0 additional material) and the rivet patterns are drawn / listed but not dimensioned station by station. built: web, 4 flange angles and the cover plates; not built: the items listed.",
             "Source": "p.43 / p.44"
           },
           {

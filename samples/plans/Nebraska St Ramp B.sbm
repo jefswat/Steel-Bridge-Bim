@@ -6218,7 +6218,7 @@
           "Width": 0.1905,
           "Thickness": 0.0127
         },
-        "IntermediateMaxSpacing": 3.6576000000000004,
+        "IntermediateMaxSpacing": 0,
         "IntermediateStiffener": {
           "Width": 0.1651,
           "Thickness": 0.011112499999999999
@@ -6228,7 +6228,109 @@
         "IntermediateBottomGap": 0.0508,
         "WeldSize": 0.00635,
         "FlangeToWebWeld": 0.0079375,
-        "ClipToTopFlange": true
+        "ClipToTopFlange": true,
+        "IntermediateLocations": [
+          {
+            "Girder": -1,
+            "Span": 0,
+            "Reference": "SpanBegin",
+            "Distance": 2.8956000000000004,
+            "Panel": 0,
+            "Fraction": 0.5,
+            "SpliceNumber": 0
+          },
+          {
+            "Girder": -1,
+            "Span": 0,
+            "Reference": "Panel",
+            "Distance": 0,
+            "Panel": -2,
+            "Fraction": 0.5,
+            "SpliceNumber": 0
+          },
+          {
+            "Girder": -1,
+            "Span": 0,
+            "Reference": "Panel",
+            "Distance": 0,
+            "Panel": -1,
+            "Fraction": 0.5,
+            "SpliceNumber": 0
+          },
+          {
+            "Girder": -1,
+            "Span": 1,
+            "Reference": "Panel",
+            "Distance": 0,
+            "Panel": 0,
+            "Fraction": 0.5,
+            "SpliceNumber": 0
+          },
+          {
+            "Girder": -1,
+            "Span": 1,
+            "Reference": "Panel",
+            "Distance": 0,
+            "Panel": 1,
+            "Fraction": 0.5,
+            "SpliceNumber": 0
+          },
+          {
+            "Girder": -1,
+            "Span": 1,
+            "Reference": "Panel",
+            "Distance": 0,
+            "Panel": -2,
+            "Fraction": 0.5,
+            "SpliceNumber": 0
+          },
+          {
+            "Girder": -1,
+            "Span": 1,
+            "Reference": "Panel",
+            "Distance": 0,
+            "Panel": -1,
+            "Fraction": 0.5,
+            "SpliceNumber": 0
+          },
+          {
+            "Girder": -1,
+            "Span": 2,
+            "Reference": "Panel",
+            "Distance": 0,
+            "Panel": 0,
+            "Fraction": 0.5,
+            "SpliceNumber": 0
+          },
+          {
+            "Girder": -1,
+            "Span": 2,
+            "Reference": "Panel",
+            "Distance": 0,
+            "Panel": 1,
+            "Fraction": 0.5,
+            "SpliceNumber": 0
+          },
+          {
+            "Girder": -1,
+            "Span": 2,
+            "Reference": "SpanEnd",
+            "Distance": 2.8956000000000004,
+            "Panel": 0,
+            "Fraction": 0.5,
+            "SpliceNumber": 0
+          },
+          {
+            "Girder": 3,
+            "Span": 2,
+            "Reference": "Splice",
+            "Distance": 0.9652000000000001,
+            "Panel": 0,
+            "Fraction": 0.5,
+            "SpliceNumber": 4,
+            "Unresolved": "UNRESOLVED (p.27): girder D extra intermediate stiffener in the FS 4 panel (3\u0027-2 ahead of the CL FS 4) - the tick is drawn but not dimensioned; 3\u0027-2 is scaled from the sheet (\u002B-1\u0022). Modeled 3\u0027-2 ahead of CL FS 4 (clear of the splice plates by 22\u0022 or more)."
+          }
+        ]
       },
       "FieldSplices": [
         {
@@ -8213,14 +8315,6 @@
           "Material": null
         }
       ],
-      "Welds": {
-        "HoldBack": 0.00635,
-        "Source": "p.32 std. 1021W Detail A",
-        "Unresolved": "",
-        "StiffenerWebEndFactor": 5,
-        "StiffenerWebEndMin": 0.05715,
-        "StiffenerWebEndSource": "p.32 std. 1021W Sections C-C / D-D: X = 5T, 2 1/4\u0022 min from the toe of the flange-to-web weld"
-      },
       "FlangeDeflectors": {
         "Angle": "L4x3x5/16",
         "VerticalLeg": 0.1016,
