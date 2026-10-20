@@ -124,6 +124,10 @@ public sealed class TrussPlate
     public bool Perforated { get; set; }
     /// <summary>Plan label, e.g. "1-PL (24-12) x 3/8".</summary>
     public string Label { get; set; } = "";
+    /// <summary>OPTIONAL length along the member (m); 0 = the full member (partial-length cover plates of plate girders / floor beams).</summary>
+    public double Length { get; set; }
+    /// <summary>OPTIONAL distance of the centre of a partial plate from the member mid-length (m, + toward the member end); 0 = centred.</summary>
+    public double Offset { get; set; }
     public TrussPlate() { }
     public TrussPlate(double width, double thickness, bool perforated = false, string label = "") { Width = width; Thickness = thickness; Perforated = perforated; Label = label; }
 }
@@ -226,6 +230,8 @@ public enum TrussMemberRole
 {
     UpperChord, LowerChord, WindChord, Diagonal, Vertical, Post, Hanger, EndPost,
     UpperLateral, LowerLateral, Sway, Portal, Strut, FloorBeam, Stringer, Other,
+    /// <summary>Riveted / built-up plate girder along a line (appended): in-plane member with no gussets, ends at its points (simple spans between bearings).</summary>
+    Girder,
 }
 
 /// <summary>

@@ -34,6 +34,8 @@ public enum PartCategory
     // stringers, rope suspenders + sockets, shoes (fixed pin / expansion rocker bodies) and their pins.
     TrussChord, TrussDiagonal, TrussVertical, TrussHanger, TrussBracing, TrussFloorBeam, TrussStringer, TrussGusset,
     Suspender, SuspenderSocket, TrussShoeFixed, TrussShoeExpansion, TrussPin,
+    // Riveted plate girder as a truss-generator member (appended; TrussMemberRole.Girder, e.g. PTC Delaware River girder spans).
+    TrussGirder,
 }
 
 public enum AssemblyKind { GirderFieldSection, CrossFrame, Bearing, FieldSplice, LateralBracing, InspectionCable, InspectionWalkway,
@@ -45,7 +47,9 @@ public enum AssemblyKind { GirderFieldSection, CrossFrame, Bearing, FieldSplice,
     /// <summary>Flange deflectors on the exterior girders (appended; OPTIONAL BridgeDefinition.FlangeDeflectors).</summary>
     FlangeDeflector,
     /// <summary>Steel truss (appended): one truss line (plane: chords, web members, gussets), a bracing system, the floor system, one suspender.</summary>
-    TrussLine, TrussBracing, TrussFloor, TrussSuspender }
+    TrussLine, TrussBracing, TrussFloor, TrussSuspender,
+    /// <summary>Riveted plate girder line of a truss-generator bridge (appended): girder member of one line (TrussMemberRole.Girder).</summary>
+    PlateGirderLine }
 
 /// <summary>Member role, used for IFC predefined types and reports.</summary>
 public enum MemberRole { None, TopChord, BottomChord, Diagonal, Diaphragm, Lateral }

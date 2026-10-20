@@ -7,7 +7,7 @@ using static SBM.Core.Units.UnitSystem;
 namespace SBM.Core.Truss;
 
 /// <summary>One solid of a built-up section: a simple polygon in the section plane (x across, y up; CCW), swept along the member axis.</summary>
-public sealed record TrussSectionPiece(Vec2[] Polygon, string Label);
+public sealed record TrussSectionPiece(Vec2[] Polygon, string Label, double Length = 0, double Offset = 0);
 
 /// <summary>Lacing bar face of a section: bars lie in the plane y = <see cref="Y"/> .. Y + Thickness * Side (outside the face), spanning x = +/- HalfLines.</summary>
 public sealed record TrussLacingFace(double Y, int Side, double HalfLines, TrussLacing Lacing);
@@ -205,14 +205,14 @@ public static class TrussSections
         double y = yTop;
         foreach (var p in s.TopPlates)
         {
-            r.Pieces.Add(new(Rect(-p.Width / 2, p.Width / 2, y, y + p.Thickness), p.Label.Length > 0 ? p.Label : $"cover PL {L(p.Width)} x {L(p.Thickness)}"));
+            r.Pieces.Add(new(Rect(-p.Width / 2, p.Width / 2, y, y + p.Thickness), p.Label.Length > 0 ? p.Label : $"cover PL {L(p.Width)} x {L(p.Thickness)}", p.Length, p.Offset));
             if (p.Perforated) r.Notes.Add($"section {s.Name}: perforated cover plate {p.Label} built solid (access holes not dimensioned)");
             y += p.Thickness;
         }
         double yb = yBot;
         foreach (var p in s.BottomPlates)
         {
-            r.Pieces.Add(new(Rect(-p.Width / 2, p.Width / 2, yb - p.Thickness, yb), p.Label.Length > 0 ? p.Label : $"cover PL {L(p.Width)} x {L(p.Thickness)}"));
+            r.Pieces.Add(new(Rect(-p.Width / 2, p.Width / 2, yb - p.Thickness, yb), p.Label.Length > 0 ? p.Label : $"cover PL {L(p.Width)} x {L(p.Thickness)}", p.Length, p.Offset));
             if (p.Perforated) r.Notes.Add($"section {s.Name}: perforated cover plate {p.Label} built solid (access holes not dimensioned)");
             yb -= p.Thickness;
         }
@@ -249,7 +249,7 @@ public static class TrussSections
             foreach (var p in e < 0 && (s.WebVertical || s.BottomPlates.Count > 0) ? s.BottomPlates : s.TopPlates)
             {
                 var poly = new[] { new Vec2(e * m0, -p.Width / 2), new Vec2(e * (m0 + p.Thickness), -p.Width / 2), new Vec2(e * (m0 + p.Thickness), p.Width / 2), new Vec2(e * m0, p.Width / 2) };
-                r.Pieces.Add(new(poly.Select(Map).ToArray(), p.Label.Length > 0 ? p.Label : $"flange PL {L(p.Width)} x {L(p.Thickness)}"));
+                r.Pieces.Add(new(poly.Select(Map).ToArray(), p.Label.Length > 0 ? p.Label : $"flange PL {L(p.Width)} x {L(p.Thickness)}", p.Length, p.Offset));
                 m0 += p.Thickness;
             }
         }
@@ -278,13 +278,13 @@ public static class TrussSections
         double yt = c.Depth / 2, ybt = -c.Depth / 2;
         foreach (var p in s.TopPlates)
         {
-            r.Pieces.Add(new(Rect(-p.Width / 2, p.Width / 2, yt, yt + p.Thickness), p.Label.Length > 0 ? p.Label : $"cover PL {L(p.Width)} x {L(p.Thickness)}"));
+            r.Pieces.Add(new(Rect(-p.Width / 2, p.Width / 2, yt, yt + p.Thickness), p.Label.Length > 0 ? p.Label : $"cover PL {L(p.Width)} x {L(p.Thickness)}", p.Length, p.Offset));
             if (p.Perforated) r.Notes.Add($"section {s.Name}: perforated cover plate {p.Label} built solid (access holes not dimensioned)");
             yt += p.Thickness;
         }
         foreach (var p in s.BottomPlates)
         {
-            r.Pieces.Add(new(Rect(-p.Width / 2, p.Width / 2, ybt - p.Thickness, ybt), p.Label.Length > 0 ? p.Label : $"cover PL {L(p.Width)} x {L(p.Thickness)}"));
+            r.Pieces.Add(new(Rect(-p.Width / 2, p.Width / 2, ybt - p.Thickness, ybt), p.Label.Length > 0 ? p.Label : $"cover PL {L(p.Width)} x {L(p.Thickness)}", p.Length, p.Offset));
             if (p.Perforated) r.Notes.Add($"section {s.Name}: perforated cover plate {p.Label} built solid (access holes not dimensioned)");
             ybt -= p.Thickness;
         }

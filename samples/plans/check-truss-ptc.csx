@@ -30,7 +30,7 @@ var elev = File.ReadAllLines(Path.Combine(dataDir!, "elevations.csv")).Skip(1).W
     .ToDictionary(f => int.Parse(f[0]), f => (g: double.Parse(f[1], inv), l: double.Parse(f[2], inv), w: f[3] == "" ? double.NaN : double.Parse(f[3], inv)));
 
 var rep = Doc.Regenerate();
-var bdef = Doc.Project.Bridges.FirstOrDefault(b => b.Truss != null);
+var bdef = Doc.Project.Bridges.FirstOrDefault(b => b.Truss != null && b.Name == "PTC Arch truss 18-20") ?? Doc.Project.Bridges.FirstOrDefault(b => b.Truss != null);
 if (bdef == null) { Print("No truss bridge in this model."); return; }
 var bm = Doc.Model(bdef.Name);
 var tm = bm.Steel!.Truss!;
