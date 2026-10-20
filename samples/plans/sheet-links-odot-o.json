@@ -99,6 +99,14 @@
       "target": [ { "level": "group", "category": "girder", "girder": "G1" } ] },
     { "id": "girder-2", "sheets": "^STEEL GIRDER ELEVATION \\(SPANS NO\\. 14-16 - GIRDER NO\\. 2\\)", "basis": "Girder 2 plates, splices, tension zones, studs",
       "target": [ { "level": "group", "category": "girder", "girder": "G2" } ] },
+    // QC back-check I14 (qc/odot-o): the girder field sections carried only p.290 (misc), so the flange / web plates and the studs of a field section did not
+    // link the elevation sheets that define their sizes and stud rows. The field sections of each girder now link p.278 (G1) / p.279 (G2) as well.
+    { "id": "girder-1-sections", "sheets": "^STEEL GIRDER ELEVATION \\(SPANS NO\\. 14-16 - GIRDER NO\\. 1\\)", "basis": "Girder 1 field section plates (widths, thicknesses, lengths), stud spacing rows, tension zones",
+      "target": [ { "level": "assembly", "category": "girder field section", "name": "G1-%" } ] },
+    { "id": "girder-2-sections", "sheets": "^STEEL GIRDER ELEVATION \\(SPANS NO\\. 14-16 - GIRDER NO\\. 2\\)", "basis": "Girder 2 field section plates (widths, thicknesses, lengths), stud spacing rows, tension zones",
+      "target": [ { "level": "assembly", "category": "girder field section", "name": "G2-%" } ] },
+    { "id": "framing-plan-bracing", "sheets": "^FRAMING PLAN", "basis": "Panel points (n EQ. SPA. strings), solid / dashed bracing lines, bold radial external diaphragm lines, support diaphragm lines and bearing lines that place the bracing assemblies",
+      "target": [ { "level": "assembly", "category": [ "cross frame", "lateral bracing" ] } ] },
     { "id": "deflections", "sheets": "^STEEL GIRDER DEAD LOAD DEFLECTIONS", "basis": "Dead load deflections at the tenth points and splices (camber input)",
       "target": [ { "level": "group", "category": "girder" } ] },
     { "id": "field-splices", "sheets": "^FIELD SPLICE DETAILS", "basis": "Top / web / bottom splice plates, fillers, 1 in. A325 bolts",

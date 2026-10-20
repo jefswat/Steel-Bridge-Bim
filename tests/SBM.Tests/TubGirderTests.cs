@@ -251,4 +251,31 @@ public class TubGirderTests
         Assert.Equal(tm.Parts.Count, m2.Parts.Count);
         Assert.Equal(tm.SteelMass, m2.SteelMass, 6);
     }
+
+    /// <summary>PROGRAM DEFECT regression (ODOT Bridge O QC back-check I13 / C171): `sbm elevations` built a tub's bearing chain from the default
+    /// bearing / sole plate instead of the MODELED tub bearings (beveled plate J + pad H, p.292-293), so its deck-to-seat depth disagreed with the
+    /// 3D seat (and with the plan H dimensions) by 1" to 2 7/16". The chain must use the tub bearing's plate and pad and agree with the 3D model.</summary>
+    [Fact]
+    public void Elevations_UseTheModeledTubBearings()
+    {
+        var (p, f, m) = Model(b =>
+        {
+            foreach (int j in new[] { 0, 1, 2 })
+                b.Girders.Tub!.Bearings.Add(new TubBearingDefinition
+                {
+                    Support = j, Mark = $"P{j + 1}", PadLength = In(20), PadWidth = In(30), PadHeight = In(3.75), InteriorLayers = 5, InteriorLayer = In(0.5), Laminates = 6, ExteriorLayer = In(0.25),
+                    PlateThickness = In(2.5), PlateWidth = In(31), PlateLength = In(21),
+                });
+        });
+        Assert.NotEmpty(m.BearingSeats);
+        var chains = SBM.Core.Checks.ElevationCheck.AllBearings(f, m, p.Units);
+        Assert.Equal(6, chains.Count);
+        foreach (var ch in chains)
+        {
+            Assert.False(ch.Mismatch, ch.Title + ": " + string.Join("; ", ch.Checks));
+            Assert.Contains(ch.Checks, c => c.StartsWith("Bearing seat matches the 3D model"));
+            Assert.Contains(ch.Steps, s => s.Item.Contains("Beveled bearing plate") && Math.Abs(s.Change + In(2.5)) < 1e-9);
+            Assert.Contains(ch.Steps, s => s.Item.Contains("Elastomeric pad") && Math.Abs(s.Change + In(3.75)) < 1e-9);
+        }
+    }
 }

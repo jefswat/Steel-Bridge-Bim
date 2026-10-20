@@ -102,6 +102,9 @@ public sealed class BoltInstance
     /// <summary>Anchor bolts: diameter and embedment (structural bolts use the model's bolt spec).</summary>
     public double Diameter { get; init; }
     public double Embedment { get; init; }
+    /// <summary>Anchor bolts, OPTIONAL: height of the bolt top above the frame origin (0 = the standard washer + nut + stick-through stack). Tub bearings set it
+    /// from the plan's projection above the bottom flange (p.292); other bridges leave it 0 (their solids and IFC are unchanged).</summary>
+    public double TopHeight { get; init; }
     /// <summary>OPTIONAL material of this bolt when it is not the model's bolt grade (e.g. stainless screen bolts); null = the model's.</summary>
     public string? Material { get; init; }
 }
@@ -197,14 +200,14 @@ public sealed class SteelModel
     }
 
     /// <summary>Anchor rod embedded below the masonry plate with a plate washer and nut on top and a nut at the bottom.</summary>
-    public static Mesh AnchorBoltMesh(double diameter, double plateThickness, double embedment, int segments = 12)
+    public static Mesh AnchorBoltMesh(double diameter, double plateThickness, double embedment, int segments = 12, double topHeight = 0)
     {
         var m = new Mesh();
         var f = Frame3.World;
         var g = new BoltGeometry(diameter);
         double bottom = -plateThickness - embedment;
         double washerT = Units.UnitSystem.In(0.375), washer = 3 * diameter;
-        double top = washerT + g.NutHeight + g.StickThrough;
+        double top = topHeight > 0 ? topHeight : washerT + g.NutHeight + g.StickThrough;
         MeshBuilder.AddPrism(m, f, diameter / 2, segments, bottom, top);
         MeshBuilder.AddBox(m, f, -washer / 2, washer / 2, -washer / 2, washer / 2, 0, washerT);
         MeshBuilder.AddPrism(m, f, g.NutAcrossFlats / Math.Sqrt(3), 6, washerT, washerT + g.NutHeight);

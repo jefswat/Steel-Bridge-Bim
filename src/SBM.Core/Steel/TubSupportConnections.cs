@@ -88,7 +88,13 @@ public sealed partial class SteelModelGenerator
             var nrm3 = new Vec3(-dir.Y, dir.X, 0);    // horizontal normal of the support plane
             var nrm2 = new Vec2(-dir.Y, dir.X);
             // (x, y) on the support plane, n horizontally normal to it; the girder rises / falls with its grade over the horizontal shift (the plates sit on its flanges)
-            Vec3 Map(double x, double y, double n) => f.AtInPlane(x, y, dir) + nrm3 * n + new Vec3(0, 0, f.Grade * Vec2.Dot(nrm2, f.PlanAhead) * n);
+            // the plates keep to the girder flange / bottom flange SURFACES: over the shift n (normal to the support plane, which at a skewed support also moves
+            // the point across the girder) the surface rises with the girder grade along the girder and with the deck cross slope across it
+            double tanTh = f.Sin / f.Cos;
+            Vec3 Map(double x, double y, double n) => f.AtInPlane(x, y, dir) + nrm3 * n
+                + new Vec3(0, 0, (f.Grade * Vec2.Dot(nrm2, f.PlanAhead) + tanTh * Vec2.Dot(nrm2, f.PlanRight)) * n);
+            // lateral shift per unit n of a point of the support plane (0 at a square support): plate ENDS against a girder web / flange edge are cut parallel to it
+            double qS = Vec2.Dot(nrm2, f.PlanRight) / f.Cos;
             string asm = $"{g.Name}-SD{j + 1}";
             _assemblies.Add(new SteelAssembly { Mark = asm, Kind = AssemblyKind.CrossFrame, Girder = gi, Description = $"{g.Name} internal support diaphragm at {line.Name}" });
             double XI(int side, double y) => TubSection.WebFaceX(t, side, y, tw, false);
@@ -113,7 +119,9 @@ public sealed partial class SteelModelGenerator
             if (sd.AccessOpeningWidth > 0)
                 openings.Add(PlateBuilder.RoundedRectangle(new Vec2(0, -D + sd.AccessOpeningBottom + sd.AccessOpeningHeight / 2), sd.AccessOpeningWidth, sd.AccessOpeningHeight, sd.AccessOpeningRadius));
             var web = new Mesh();
-            PlateBuilder.AddMappedWithOpenings(web, outline, Array.Empty<Hole>(), openings, Map, -sd.InteriorWebThickness / 2, sd.InteriorWebThickness / 2);
+            // the web's ends lie on the tub web faces: at a skewed support the end faces follow the web instead of staying square to the plate
+            Vec3 MapEnds(double x, double y, double n) => Map(Math.Abs(Math.Abs(x) - Math.Abs(XI(x < 0 ? -1 : 1, y))) < 1e-7 ? x - n * qS : x, y, n);
+            PlateBuilder.AddMappedWithOpenings(web, outline, Array.Empty<Hole>(), openings, MapEnds, -sd.InteriorWebThickness / 2, sd.InteriorWebThickness / 2);
             _parts.Add(new SteelPart { Mark = $"{asm}-W", Category = PartCategory.WebPlate, Assembly = asm, Mesh = web, Length = 2 * T,
                 Description = $"Interior support diaphragm web PL {In(sd.InteriorWebThickness)}" + (openings.Count > 0 ? $", access opening {In(sd.AccessOpeningWidth)} x {In(sd.AccessOpeningHeight)} R {In(sd.AccessOpeningRadius)}" : "")
                     + (cH > 0 ? $", corner clips {In(cL)} x {In(cH)}" : "") });
@@ -130,7 +138,9 @@ public sealed partial class SteelModelGenerator
                 double xa = -xf, xb = xf;
                 double y0 = fit != null ? yWT : 0, y1 = y0 + thkI;
                 var m = new Mesh();
-                PlateBuilder.AddPrism(m, new[] { new Vec2(xa, -sd.InteriorTopFlange.Width / 2), new Vec2(xb, -sd.InteriorTopFlange.Width / 2), new Vec2(xb, sd.InteriorTopFlange.Width / 2), new Vec2(xa, sd.InteriorTopFlange.Width / 2) },
+                double hwI = sd.InteriorTopFlange.Width / 2;
+                // ends parallel to the girder flange edge (square ends would cross it at a skewed support), the 1/2" gap kept across the girder
+                PlateBuilder.AddPrism(m, new[] { new Vec2(xa + hwI * qS, -hwI), new Vec2(xb + hwI * qS, -hwI), new Vec2(xb - hwI * qS, hwI), new Vec2(xa - hwI * qS, hwI) },
                     intFlangeHoles, (x, n, y) => Map(x, y, n), _ => y0, _ => y1);
                 _parts.Add(new SteelPart { Mark = $"{asm}-TF", Category = PartCategory.FlangePlate, Assembly = asm, Mesh = m, Length = xb - xa,
                     Description = $"Interior support diaphragm top flange {Pl(sd.InteriorTopFlange.Width, thkI)}" });
