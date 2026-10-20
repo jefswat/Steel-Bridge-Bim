@@ -442,7 +442,7 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
     `Steel/TubSection.cs` (section math in the ROTATED section about the top working point = girder path; `TubFrame`, `AtInPlane` for skewed support planes),
     `Steel/TubGirderGenerator.cs` (partial SteelModelGenerator, `RunTub` replaces `Run` when `IsTub`: plates from `Section.Layouts` (top flange width = one
     flange), splices, panel points (`TubPanelSegment`), stiffeners, internal K frames + WT top struts, WT top laterals, external / support diaphragms,
-    pad + beveled-plate bearings + seats, hatches, studs, tension zones), report `SteelModel.Tub` (`TubGirderReport`), haunches `Concrete/ConcreteTubHaunch.cs`.
+    pad + beveled-plate bearings + seats, hatches, studs, tension zones), report `SteelModel.Tub` (`TubGirderReport`), haunches `Concrete/ConcreteTubHaunch.cs` (tub and I-girder haunch rings are cut at the deck end lines by `ClipHaunchRings`, FromBegin / FromEnd, so no haunch projects past a skewed / offset / kinked deck end).
     Handoff items 5 / 7a-7g (2026-10-19; all inputs OPTIONAL / additive): (5) top laterals `TubLateralBracingDefinition.EndSetback` (transverse distance WP line -> WT end edge, was a
     hard-coded 4"; Bridge O 2 7/8" scaled p.289 with `EndSetbackFlag` = `UnresolvedFlag` text -> `Assumption.UnresolvedDimension` on the members, they stay on their layer), WT flange cut
     parallel to the girder axis, Detail A pattern = 6 x 1" A325 per end (`BoltPitch` 3", `BoltGages` 1 3/4 / 1 3/4 / 4 1/16 / 1 3/4 / 1 3/4 across the WT flange, `FirstBoltFromEndEdge`
