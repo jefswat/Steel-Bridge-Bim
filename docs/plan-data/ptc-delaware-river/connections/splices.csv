@@ -181,3 +181,10 @@ main,U22,top chord crown pin splice (pin plates),,34,1.125,,"U22 crown pin joint
 main,U22,top chord cover splice plate,1,24,0.625,,"1-Spl. Pl. 24x5/8; Max. Pitch 4 in each side",1.125,,,,90,medium,"callout read"
 main,L22,lower chord splice (crown),2,24,1.125,,"plan view: 1-Spl. Pl. 24x1 1/8 (read); 2-Inside Spl. Pls. 31 1/2 x 1 1/8; 2-Inlay Spl. Pls 34x1 1/16 (read)",1.125,,,"L22 jacking scheme: 2 jacks 2'-4 in. bearing, 4'-0 c.c. rods, 6'-0 c.c. jacks, tap bolts FS for jack and slab support, timber support; 2-Slabs 22x10 1/2 (C) and 22x13 1/2 (C)",90,medium,"jacking scheme (Sections A-F, H) is temporary erection equipment"
 main,U22,erection bolts,,,,,"1 1/4 in dia erection bolts at the pin; 1 1/8 in shop bolts",1.25,,,,90,medium,
+approach3,U1 (top chord 14 WF 87 to 14 WF 219),flange splice plates + fills at the joint,2,10,0.4375,,"2 Pls 10 x 7/16 (flange splice plan), 2-Fills 10x1/4 (C); splice CL just left of the joint CL (fin.)",1,4,,"4 + 2 rivet columns visible; about 12 per plate",50,medium,"all rivets on sheet 1 in dia high strength except csk. tack rivets 3/4 in carbon; holes M (rivets cannot be driven): use 1 in A325 high tensile bolts, nuts torqued to 110 ft lbs"
+approach3,U1,gusset-edge fills at the chord,2,14.5,0.3125,,"2-Fills 14 1/2 x 5/16 (C) at the gusset edge; 2-Fills 14 1/2 x 3/4 beside the diagonal",,,,,50,medium,
+approach3,U2,top chord fill,1,,0.625,,"1-5/8 Fill (C) at the left end; rivet spacings 11 1/4, 3, 4 1/2, 3 3/4 typical",1,,,,50,medium,"14 WF 219 continuous through U2"
+approach3,U3,top chord splice bars,4,6,1.125,13,"4-Splice Bars 6 x 1 1/8 x 1'-1 (read; callout reads 6x1'-1/8'); CL of splice - fin.; 2-Fills 16 x 1/4 (C)",1,,,,50,low,"dimension misread risk"
+approach3,L2,bottom chord splice plates and bars,2,16,0.75,,"2-Splice Pls 16 x 3/4; 4-Splice Bars 6 x 1'-1/8 (read); 1-3/4 Fill (C); 1-1/2 Fill (C); 6 holes M (N.S. only)",1,,,,50,low,
+approach3,L2 (chord below),lower chord flange splice,2,10,0.4375,,"2-Splice Pls 10 x 7/16; 2-Fills 10x1/4",1,,,,50,medium,"splice plan below L2"
+approach3,L1,bottom chord fills,2,,0.625,,"1-5/8 Fill (C) each side; typical rivet spacings 3 3/8",1,,,,50,medium,
