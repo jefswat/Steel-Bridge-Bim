@@ -556,6 +556,9 @@ public static class ModelDatabase
             string? CapOfBearing(SteelAssembly a) => a.Girder < 0 && a.Description.Contains("integral steel cap")
                 ? steel.IntegralCaps.FirstOrDefault(c => a.Description.Contains(", " + c.Support + ","))?.Mark : null;
             string ArchGroup() => archGroup.Length > 0 ? archGroup : (archGroup = Group($"{bk}/group/arch", superId, "Tied arch", "tied arch"));
+            // Steel truss (Truss/TrussGenerator): group "truss" > truss line / bracing / floor / suspender / shoe assemblies > panel / joint groups > members
+            string trussGroup = "";
+            string TrussGroup() => trussGroup.Length > 0 ? trussGroup : (trussGroup = Group($"{bk}/group/truss", superId, steel.Truss?.Name ?? "Truss", "truss"));
             string GirderGroup(int g)
             {
                 if (girderGroup.TryGetValue(g, out var id)) return id;
@@ -578,6 +581,14 @@ public static class ModelDatabase
                         parent = ArchGroup(); cat = "bearing"; sub = "arch bearing";
                         { var mm = Regex.Match(asm.Description, @" at (.+)$"); if (mm.Success) support = mm.Groups[1].Value; }
                         break;
+                    case AssemblyKind.Bearing when steel.Truss != null:
+                        parent = TrussGroup(); cat = "bearing"; sub = "truss shoe";
+                        { var mm = Regex.Match(asm.Description, @" at (.+)$"); if (mm.Success) support = mm.Groups[1].Value; }
+                        break;
+                    case AssemblyKind.TrussLine: parent = TrussGroup(); cat = "truss line"; break;
+                    case AssemblyKind.TrussBracing: parent = TrussGroup(); cat = "truss bracing"; sub = asm.Description.Contains(" - ") ? asm.Description[(asm.Description.LastIndexOf(" - ", StringComparison.Ordinal) + 3)..] : ""; break;
+                    case AssemblyKind.TrussFloor: parent = TrussGroup(); cat = "floor system"; break;
+                    case AssemblyKind.TrussSuspender: parent = TrussGroup(); cat = "suspender"; break;
                     case AssemblyKind.ArchRib: parent = ArchGroup(); cat = "arch rib"; break;
                     case AssemblyKind.ArchTie: parent = ArchGroup(); cat = "tie girder"; break;
                     case AssemblyKind.ArchHanger: parent = ArchGroup(); cat = "hanger"; break;
@@ -683,7 +694,9 @@ public static class ModelDatabase
             {
                 string gid = Id(IfcKeys.Part(bk, part.Mark));
                 asmInfo.TryGetValue(part.Assembly, out var ai);
-                string partParent = part.Category == PartCategory.Weld && ai != null ? AsmGroup(part.Assembly, "welds", "welds", "weld group") : ai?.GlobalId ?? superId;
+                string partParent = part.Category == PartCategory.Weld && ai != null ? AsmGroup(part.Assembly, "welds", "welds", "weld group")
+                    : ai != null && steel.Truss != null && steel.Truss.PanelOf.TryGetValue(part.Mark, out var panel) ? AsmGroup(part.Assembly, "panel/" + panel, panel, panel.StartsWith("Joint") ? "truss joint" : "truss panel")
+                    : ai?.GlobalId ?? superId;
                 var r = New(gid, partParent, "part", PartCategoryName(part.Category), IfcClassOf(part), part.Mark);
                 r.InIfc = !part.Mesh.IsEmpty;
                 r.Mark = part.Mark; r.Material = part.Material; r.Support = ai?.Support ?? ""; r.Girder = ai?.Girder ?? "";
@@ -713,29 +726,30 @@ public static class ModelDatabase
                 string gid = Id(IfcKeys.Fastener(bk, kind, asmMark, no++));
                 asmInfo.TryGetValue(asmMark, out var ai);
                 int idx = perAsm[asmMark] = perAsm.GetValueOrDefault(asmMark) + 1;
-                string cat = kind switch { 1 => "anchor bolt", 2 => "shear stud", _ => "bolt" };
-                string tag = kind switch { 1 => "AB", 2 => "SS", _ => "B" };
+                string cat = kind switch { 1 => "anchor bolt", 2 => "shear stud", 4 => "rivet", _ => "bolt" };
+                string tag = kind switch { 1 => "AB", 2 => "SS", 4 => "R", _ => "B" };
                 string fparent = ai == null ? superId : kind switch
                 {
                     1 => AsmGroup(asmMark, "anchors", "anchor bolts", "anchor bolt group"),
                     2 => AsmGroup(asmMark, "studs", "shear studs", "stud group"),
+                    4 => AsmGroup(asmMark, "rivets", "rivets", "rivet group"),
                     _ => AsmGroup(asmMark, "bolts", "bolts", "bolt group"),
                 };
                 var r = New(gid, fparent, "fastener", cat, "IFCMECHANICALFASTENER", "");
                 r.Mark = $"{asmMark}-{tag}{idx}";
                 r.Support = ai?.Support ?? ""; r.Girder = ai?.Girder ?? "";
-                r.Material = kind switch { 1 => "ASTM F1554", 2 => "ASTM A108 (AWS D1.5 Type B)", _ => boltMat };
+                r.Material = kind switch { 1 => "ASTM F1554", 2 => "ASTM A108 (AWS D1.5 Type B)", 4 => (tagObj as BoltInstance)?.Material ?? "Rivet steel (high strength / carbon, per plan notes)", _ => boltMat };
                 r.Tag = tagObj;
                 if (_keysOnly) { _w.Add(r); return; }
                 r.Length = len;
                 r.Box.Add(f.Origin); r.Box.Add(f.Origin + f.Z * len);
                 if (_al != null) { double s = _al.Inverse(new Vec2(f.Origin.X, f.Origin.Y)).Station; SetStation(r, s, s); }
-                r.Props = new Json().Add("diameter", kind == 1 ? dia : kind == 2 ? steel.StudDiameter : steel.Bolt.Diameter).Add("grip", grip)
+                r.Props = new Json().Add("diameter", kind is 1 or 4 ? dia : kind == 2 ? steel.StudDiameter : steel.Bolt.Diameter).Add("grip", grip)
                     .Add("embedment", embed).ToString();
                 _w.Add(r);
             }
             foreach (var bolt in steel.Bolts)
-                Fastener(bolt, bolt.Kind == BoltKind.Anchor ? 1 : 0, bolt.Frame, bolt.Assembly, bolt.Grip, bolt.Length, bolt.Diameter, bolt.Embedment);
+                Fastener(bolt, bolt.Kind == BoltKind.Anchor ? 1 : bolt.Kind == BoltKind.Rivet ? 4 : 0, bolt.Frame, bolt.Assembly, bolt.Grip, bolt.Length, bolt.Diameter, bolt.Embedment);
             foreach (var st in steel.Studs)
                 Fastener(st, 2, st.Frame, st.Assembly, 0, st.Length, steel.StudDiameter, 0);
         }
@@ -775,7 +789,12 @@ public static class ModelDatabase
             PartCategory.ContinuityPlate => "mill-to-bear plate", PartCategory.CoverPlate => "cover plate", PartCategory.HandholeCover => "handhole cover",
             PartCategory.HandholeBacking => "handhole backing plate", PartCategory.MeshScreen => "wire mesh screen",
             PartCategory.JointArmor => "joint armor plate", PartCategory.JointStud => "joint stud anchor", PartCategory.JointCoverPlate => "joint cover plate",
-            PartCategory.JointAnchor => "cover plate anchor", _ => c.ToString(),
+            PartCategory.JointAnchor => "cover plate anchor",
+            PartCategory.TrussChord => "truss chord", PartCategory.TrussDiagonal => "truss diagonal", PartCategory.TrussVertical => "truss vertical",
+            PartCategory.TrussHanger => "truss hanger", PartCategory.TrussBracing => "truss bracing member", PartCategory.TrussFloorBeam => "floor beam",
+            PartCategory.TrussStringer => "stringer", PartCategory.TrussGusset => "gusset plate", PartCategory.Suspender => "suspender rope",
+            PartCategory.SuspenderSocket => "suspender socket", PartCategory.TrussPin => "pin", PartCategory.TrussShoeFixed => "fixed shoe",
+            PartCategory.TrussShoeExpansion => "expansion shoe", _ => c.ToString(),
         };
 
         private static bool IsCapPart(SteelPart p) => p.Category is PartCategory.EndPlate or PartCategory.ConnectorPlate or PartCategory.DiaphragmPlate
@@ -785,7 +804,12 @@ public static class ModelDatabase
         {
             PartCategory.Angle or PartCategory.Channel or PartCategory.InspectionBracket or PartCategory.InspectionCable
                 or PartCategory.WalkwayStringer or PartCategory.WalkwayPost or PartCategory.RolledTee
-                or PartCategory.ArchRib or PartCategory.Hanger or PartCategory.ArchBracing or PartCategory.RailPost or PartCategory.RailMember => "IFCMEMBER",
+                or PartCategory.ArchRib or PartCategory.Hanger or PartCategory.ArchBracing or PartCategory.RailPost or PartCategory.RailMember
+                or PartCategory.TrussChord or PartCategory.TrussDiagonal or PartCategory.TrussVertical or PartCategory.TrussHanger or PartCategory.TrussBracing
+                or PartCategory.TrussStringer or PartCategory.Suspender => "IFCMEMBER",
+            PartCategory.TrussFloorBeam => "IFCBEAM",
+            PartCategory.TrussShoeFixed or PartCategory.TrussShoeExpansion => "IFCBEARING",
+            PartCategory.SuspenderSocket or PartCategory.TrussPin => "IFCMECHANICALFASTENER",
             PartCategory.RailHandrail or PartCategory.RailEnvelope => "IFCRAILING",
             PartCategory.HangerSocket or PartCategory.CableConnector => "IFCMECHANICALFASTENER",
             PartCategory.PtStrand => "IFCTENDON",

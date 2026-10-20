@@ -190,6 +190,13 @@ public static class IfcExporter
                 PartCategory.RailFabric => (0.62, 0.70, 0.78),
                 PartCategory.JointArmor or PartCategory.JointCoverPlate => (0.50, 0.52, 0.56),
                 PartCategory.JointStud or PartCategory.JointAnchor => (0.62, 0.62, 0.62),
+                PartCategory.TrussChord or PartCategory.TrussDiagonal or PartCategory.TrussVertical or PartCategory.TrussHanger => (0.30, 0.55, 0.80),
+                PartCategory.TrussBracing => (0.35, 0.85, 0.45),
+                PartCategory.TrussFloorBeam or PartCategory.TrussStringer => (0.45, 0.62, 0.85),
+                PartCategory.TrussGusset => (0.95, 0.75, 0.25),
+                PartCategory.Suspender => (0.82, 0.82, 0.86),
+                PartCategory.SuspenderSocket or PartCategory.TrussPin => (0.55, 0.55, 0.6),
+                PartCategory.TrussShoeFixed or PartCategory.TrussShoeExpansion => (0.6, 0.6, 0.6),
                 _ => (0.95, 0.3, 0.2),
             };
             int rgb = w.Add("IFCCOLOURRGB", $"$,{R(r)},{R(g)},{R(b)}");
@@ -717,7 +724,7 @@ public static class IfcExporter
             var contained = new List<int>();
             int concreteStyle = RgbStyle("Concrete", 0.72, 0.72, 0.69);
             int jointStyle = RgbStyle("Expansion joint (generic)", 0.9, 0.55, 0.15);
-            string concreteMat = $"Concrete, f'c = {(def.Arch?.Deck?.ConcreteStrengthKsi ?? def.Deck.Reinforcement.ConcreteStrengthKsi):0.#} ksi";
+            string concreteMat = $"Concrete, f'c = {(def.Arch?.Deck?.ConcreteStrengthKsi ?? def.Truss?.Floor?.Deck?.ConcreteStrengthKsi ?? def.Deck.Reinforcement.ConcreteStrengthKsi):0.#} ksi";
             if (c.Deck != null)
             {
                 var items = new List<int> { FaceSet(c.Deck, concreteStyle) };
@@ -725,7 +732,7 @@ public static class IfcExporter
                 foreach (var (_, db) in c.DeckBumps) if (!db.IsEmpty) items.Add(FaceSet(db, concreteStyle));   // deck widenings under barrier zones
                 int rep = w.Add("IFCSHAPEREPRESENTATION", $"{Ref(body)},'Body','Tessellation',{Refs(items)}");
                 int pds = w.Add("IFCPRODUCTDEFINITIONSHAPE", $"$,$,({Ref(rep)})");
-                int slab = deckSlab = w.Add("IFCSLAB", $"{Guid(IfcKeys.DeckSlab(bk))},$,'Deck slab',{S(def.Arch != null ? "Cast-in-place deck on corrugated steel deck forms, with curbs" : $"{u.FormatLength(def.Deck.Thickness, LengthKind.Short)} cast-in-place deck with haunches")},'BRIDGE_DECK',{Ref(pl)},{Ref(pds)},'DECK',.USERDEFINED.");
+                int slab = deckSlab = w.Add("IFCSLAB", $"{Guid(IfcKeys.DeckSlab(bk))},$,'Deck slab',{S(def.Arch != null ? "Cast-in-place deck on corrugated steel deck forms, with curbs" : def.Truss?.Floor?.Deck is { } tdk ? $"{u.FormatLength(tdk.Thickness, LengthKind.Short)} cast-in-place deck on stringers" : $"{u.FormatLength(def.Deck.Thickness, LengthKind.Short)} cast-in-place deck with haunches")},'BRIDGE_DECK',{Ref(pl)},{Ref(pds)},'DECK',.USERDEFINED.");
                 contained.Add(slab);
                 AddMaterial(concreteMat, slab);
                 psetTargets.Add((slab, "DECK", "Deck slab", 0, (c.DeckVolume + c.HaunchVolume + c.DeckBumpVolume) * 2400));
@@ -1169,6 +1176,10 @@ public static class IfcExporter
                     AssemblyKind.PierCap => (".FACTORY.", ".GIRDER.", "'INTEGRAL_STEEL_PIER_CAP'"),
                     AssemblyKind.PierCapConnection => (".FACTORY.", ".USERDEFINED.", "'PIER_CAP_GIRDER_CONNECTION'"),
                     AssemblyKind.ExpansionJoint => (".SITE.", ".USERDEFINED.", "'EXPANSION_JOINT'"),
+                    AssemblyKind.TrussLine => (".SITE.", ".TRUSS.", "$"),
+                    AssemblyKind.TrussBracing => (".SITE.", ".CROSS_BRACING.", "$"),
+                    AssemblyKind.TrussFloor => (".SITE.", ".BEAM_GRID.", "$"),
+                    AssemblyKind.TrussSuspender => (".SITE.", ".SUSPENSIONASSEMBLY.", "$"),
                     _ => (".SITE.", ".USERDEFINED.", "'BEARING'"),
                 };
                 if (asm.Kind == AssemblyKind.Railing)
@@ -1256,6 +1267,21 @@ public static class IfcExporter
                     PartCategory.HandholeCover => w.Add("IFCPLATE", $"{common},'HANDHOLE_COVER',{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.USERDEFINED."),
                     PartCategory.HandholeBacking => w.Add("IFCPLATE", $"{common},'HANDHOLE_BACKING_PLATE',{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.USERDEFINED."),
                     PartCategory.MeshScreen => w.Add("IFCPLATE", $"{common},'WIRE_MESH_SCREEN',{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.USERDEFINED."),
+                    // Steel truss: chords CHORD, diagonals BRACE, verticals / posts STRUT, hangers MEMBER, bracing BRACE, floor beams IfcBeam 'FLOOR_BEAM',
+                    // stringers STRINGER, gussets GUSSET_PLATE, rope suspenders SUSPENDER, sockets 'CABLE_SOCKET', shoes IfcBearing (fixed pin / rocker), pins 'PIN'.
+                    PartCategory.TrussChord => w.Add("IFCMEMBER", $"{common},$,{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.CHORD."),
+                    PartCategory.TrussDiagonal => w.Add("IFCMEMBER", $"{common},$,{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.BRACE."),
+                    PartCategory.TrussVertical => w.Add("IFCMEMBER", $"{common},$,{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.STRUT."),
+                    PartCategory.TrussHanger => w.Add("IFCMEMBER", $"{common},'HANGER',{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.MEMBER."),
+                    PartCategory.TrussBracing => w.Add("IFCMEMBER", $"{common},$,{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.BRACE."),
+                    PartCategory.TrussFloorBeam => w.Add("IFCBEAM", $"{common},'FLOOR_BEAM',{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.USERDEFINED."),
+                    PartCategory.TrussStringer => w.Add("IFCMEMBER", $"{common},$,{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.STRINGER."),
+                    PartCategory.TrussGusset => w.Add("IFCPLATE", $"{common},$,{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.GUSSET_PLATE."),
+                    PartCategory.Suspender => w.Add("IFCMEMBER", $"{common},$,{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.SUSPENDER."),
+                    PartCategory.SuspenderSocket => w.Add("IFCMECHANICALFASTENER", $"{common},'CABLE_SOCKET',{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},$,$,.USERDEFINED."),
+                    PartCategory.TrussPin => w.Add("IFCMECHANICALFASTENER", $"{common},'PIN',{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},$,$,.USERDEFINED."),
+                    PartCategory.TrussShoeFixed => w.Add("IFCBEARING", $"{common},'FIXED_PIN_SHOE',{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.USERDEFINED."),
+                    PartCategory.TrussShoeExpansion => w.Add("IFCBEARING", $"{common},$,{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.ROCKER."),
                     _ => w.Add("IFCFASTENER", $"{common},$,{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.WELD."),
                 };
                 if (part.Assumption != null) miscStatus.Add((id, part.Assumption));
@@ -1271,7 +1297,7 @@ public static class IfcExporter
             // product shape pointing at the type's shared mapped representation.
             var types = new Dictionary<(int, long, long, long), (int type, int rep, List<int> occ)>();
             int boltNo = 0;
-            var fasteners = steel.Bolts.Select(b => (kind: b.Kind == BoltKind.Anchor ? 1 : b.Material != null ? 3 : 0, frame: b.Frame, grip: b.Grip, len: b.Length, asm: b.Assembly, bolt: (BoltInstance?)b))
+            var fasteners = steel.Bolts.Select(b => (kind: b.Kind == BoltKind.Anchor ? 1 : b.Kind == BoltKind.Rivet ? 4 : b.Material != null ? 3 : 0, frame: b.Frame, grip: b.Grip, len: b.Length, asm: b.Assembly, bolt: (BoltInstance?)b))
                 .Concat(steel.Studs.Select(s => (kind: 2, frame: s.Frame, grip: 0.0, len: s.Length, asm: s.Assembly, bolt: (BoltInstance?)null)))
                 .ToList();
             foreach (var (kind, frame, grip, length, asmMark, boltRef) in fasteners)
@@ -1282,16 +1308,18 @@ public static class IfcExporter
                     1 => ("Anchor bolt", boltRef!.Diameter, ".ANCHORBOLT.", "ASTM F1554"),
                     2 => ("Shear stud", steel.StudDiameter, ".STUDSHEARCONNECTOR.", "ASTM A108 (AWS D1.5 Type B)"),
                     3 => ("Bolt", boltRef!.Diameter, ".BOLT.", boltRef.Material!),
+                    4 => ("Rivet", boltRef!.Diameter, ".RIVET.", boltRef.Material ?? "Rivet steel (high strength / carbon, per plan notes)"),
                     _ => ("Bolt", boltRef is { Diameter: > 0 } ? boltRef.Diameter : steel.Bolt.Diameter, ".BOLT.", (steel.BoltGrade.StartsWith("ASTM") ? steel.BoltGrade : $"ASTM F3125 Gr. {steel.BoltGrade}")),
                 };
                 var k2 = (kind, (long)Math.Round(bolt.Grip * 1e5), (long)Math.Round(bolt.Length * 1e5),
-                    kind == 1 ? (long)Math.Round(boltRef!.Diameter * 1e5 + boltRef.Embedment * 1e9 + boltRef.TopHeight * 1e12) : kind is 0 or 3 ? (long)Math.Round(dia * 1e5) : 0L);
+                    kind == 1 ? (long)Math.Round(boltRef!.Diameter * 1e5 + boltRef.Embedment * 1e9 + boltRef.TopHeight * 1e12) : kind is 0 or 3 or 4 ? (long)Math.Round(dia * 1e5) : 0L);
                 if (!types.TryGetValue(k2, out var ty))
                 {
                     var mesh = kind switch
                     {
                         1 => SteelModel.AnchorBoltMesh(boltRef!.Diameter, boltRef.Grip, boltRef.Embedment, 10, boltRef.TopHeight),
                         2 => steel.StudMesh(bolt.Length, 10),
+                        4 => SteelModel.RivetMesh(dia, bolt.Grip),
                         _ => SteelModel.BoltMesh(new BoltGeometry(dia), bolt.Grip, bolt.Length, 10),
                     };
                     var sb = new StringBuilder("(");
@@ -1314,7 +1342,7 @@ public static class IfcExporter
                     w.Add("IFCSTYLEDITEM", $"{Ref(fsId)},({Ref(Style(PartCategory.Weld))}),$");
                     int rep = w.Add("IFCSHAPEREPRESENTATION", $"{Ref(body)},'Body','Tessellation',({Ref(fsId)})");
                     int map = w.Add("IFCREPRESENTATIONMAP", $"{Ref(axis)},{Ref(rep)}");
-                    string desc = $"{u.FormatLength(dia, LengthKind.Short)} {(kind == 0 ? steel.BoltGrade + " bolt" : kind == 3 ? boltRef!.Material + " bolt" : kind == 1 ? "anchor bolt" : "headed stud")} x {u.FormatLength(bolt.Length, LengthKind.Short)}";
+                    string desc = $"{u.FormatLength(dia, LengthKind.Short)} {(kind == 0 ? steel.BoltGrade + " bolt" : kind == 3 ? boltRef!.Material + " bolt" : kind == 4 ? "rivet" : kind == 1 ? "anchor bolt" : "headed stud")} x {u.FormatLength(bolt.Length, LengthKind.Short)}";
                     int type = w.Add("IFCMECHANICALFASTENERTYPE",
                         $"{Guid($"{bk}/fastenertype/{k2}")},$,{S(desc)},{S($"{desc}, grip {u.FormatLength(bolt.Grip, LengthKind.Short)}")},$,$,({Ref(map)}),$,{S(name)},{ptype},{R(dia * scale)},{R(bolt.Length * scale)}");
                     // Occurrences share one mapped shape (identity transform); their placement does the move.
