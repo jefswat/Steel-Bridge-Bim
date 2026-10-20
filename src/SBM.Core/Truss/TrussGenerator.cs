@@ -121,7 +121,9 @@ public static class TrussGenerator
             Setbacks();
             foreach (var m in _inst) BuildMember(m);
             BuildJoints();
+            BuildJointPlates();
             if (_d.Floor != null) BuildFloor(_d.Floor);
+            if (_d.LineItems != null) foreach (var li in _d.LineItems) BuildLineItem(li);
             foreach (var s in _d.Suspenders) BuildSuspender(s);
             for (int i = 0; i < _d.Shoes.Count; i++) BuildShoe(_d.Shoes[i], i);
             if (_d.PlanSteelWeightLb > 0)
@@ -498,6 +500,136 @@ public static class TrussGenerator
             Info($"Truss: joint {pt} ({pl}) member {m.Mark}: {placed} rivets {TrussSections.FormatIn(dia)} placed{(rg.Source.Length > 0 ? " (" + rg.Source + ")" : "")}.");
         }
 
+        // ------------------------------------------------------------------ splice / fill plates at the joints
+        private void BuildJointPlates()
+        {
+            foreach (var jdef in _d.Joints.Where(j => j.Plates is { Count: > 0 }))
+                foreach (var pl in _d.Planes.Where(p => jdef.Plane.Length == 0 || p.Name.Equals(jdef.Plane, StringComparison.OrdinalIgnoreCase)))
+                {
+                    if (!_pts.TryGetValue((pl.Name.ToUpperInvariant(), jdef.Point.ToUpperInvariant()), out var P)) continue;
+                    var chords = At(pl.Name, jdef.Point).Where(i => IsChord(i.Def.Role) && i.Plane.Equals(pl.Name, StringComparison.OrdinalIgnoreCase))
+                        .Concat(Through(pl.Name, jdef.Point)).Distinct().ToList();
+                    if (chords.Count == 0) { Warn($"Truss: splice plates of joint {jdef.Point} ({pl.Name}) - no chord member at the point; not built."); continue; }
+                    double st = StationOf(P);
+                    var tan = Tangent(st);
+                    // chord direction toward the higher station (mean of the members at the point)
+                    var dirs = chords.Select(c => Vec3.Dot(c.Axis, tan) >= 0 ? c.Axis : -c.Axis).ToList();
+                    var ax = dirs.Aggregate(new Vec3(0, 0, 0), (a, b) => a + b).Normalized();
+                    var c0 = chords[0];
+                    var xv = (c0.X - ax * Vec3.Dot(c0.X, ax)).Normalized();
+                    var yv = Vec3.Cross(ax, xv).Normalized();
+                    if (Vec3.Dot(yv, c0.Y) < 0) { yv = -yv; xv = -xv; }
+                    // member under a plate: the one on the side of its offset (through members cover both)
+                    Inst SideMember(double off) => chords.FirstOrDefault(c => Through(pl.Name, jdef.Point).Contains(c))
+                        ?? chords.OrderByDescending(c => Vec3.Dot(StartsAt(c, pl.Name, jdef.Point) ? c.Axis : -c.Axis, ax) * Math.Sign(off == 0 ? 1 : off)).First();
+                    double FaceOf(Inst c, TrussPlateFace f) => f switch
+                    {
+                        TrussPlateFace.Top => c.Sec.YMax + c.Def.OffsetZ,
+                        TrussPlateFace.Bottom => c.Sec.YMin + c.Def.OffsetZ,
+                        TrussPlateFace.WebInside => c.Sec.WebInnerX > 0 ? c.Sec.WebInnerX : c.Sec.HalfWidth,
+                        _ => c.Sec.WebOuterX > 0 ? c.Sec.WebOuterX : c.Sec.HalfWidth,
+                    };
+                    int sgnOut(TrussPlateFace f) => f is TrussPlateFace.Top or TrussPlateFace.WebOutside ? 1 : -1;   // growth direction of a stack
+                    var fillTops = new List<(TrussPlateFace f, double a0, double a1, double top)>();
+                    var stackTop = new Dictionary<TrussPlateFace, double>();
+                    string asm = Asm($"TRUSS-{pl.Name}", AssemblyKind.TrussLine, $"{_d.Name} - truss line {pl.Name}");
+                    int k = 0;
+                    foreach (var p in jdef.Plates!.OrderBy(p => p.Fill ? 0 : 1))
+                    {
+                        k++;
+                        if (p.Width <= 0 || p.Thickness <= 0 || p.Length <= 0) { Warn($"Truss: plate '{p.Label}' at joint {jdef.Point} - width / thickness / length missing; not built{(p.Unresolved.Length > 0 ? " (" + p.Unresolved + ")" : "")}."); continue; }
+                        double a0 = p.Offset - p.Length / 2, a1 = p.Offset + p.Length / 2;
+                        int g = sgnOut(p.Face);
+                        double baseLevel;
+                        if (p.Fill) baseLevel = FaceOf(SideMember(p.Offset), p.Face);
+                        else
+                        {
+                            var levels = chords.Select(c => FaceOf(c, p.Face)).Concat(fillTops.Where(t => t.f == p.Face && t.a1 > a0 && t.a0 < a1).Select(t => t.top));
+                            baseLevel = g > 0 ? levels.Max() : levels.Min();
+                            if (stackTop.TryGetValue(p.Face, out var st0)) baseLevel = g > 0 ? Math.Max(baseLevel, st0) : Math.Min(baseLevel, st0);
+                        }
+                        double outer = baseLevel + g * p.Thickness;
+                        if (p.Fill) fillTops.Add((p.Face, a0, a1, outer)); else stackTop[p.Face] = outer;
+                        var mesh = new Mesh();
+                        void Box(double x0, double x1, double y0, double y1)
+                        {
+                            var poly = new[] { new Vec2(Math.Min(x0, x1), Math.Min(y0, y1)), new Vec2(Math.Max(x0, x1), Math.Min(y0, y1)), new Vec2(Math.Max(x0, x1), Math.Max(y0, y1)), new Vec2(Math.Min(x0, x1), Math.Max(y0, y1)) };
+                            var ra = poly.Select(q => P + ax * a0 + xv * q.X + yv * q.Y).ToArray();
+                            MeshBuilder.AddLoft(mesh, poly, new[] { ra, ra.Select(q => q + ax * (a1 - a0)).ToArray() });
+                        }
+                        double yc = c0.Sec.WebDepth > 0 ? c0.Sec.WebCenterY + c0.Def.OffsetZ : 0;
+                        switch (p.Face)
+                        {
+                            case TrussPlateFace.Top: case TrussPlateFace.Bottom: Box(-p.Width / 2, p.Width / 2, baseLevel, outer); break;
+                            default:
+                                foreach (int sx in new[] { -1, 1 }) Box(sx * baseLevel, sx * outer, yc - p.Width / 2, yc + p.Width / 2);
+                                break;
+                        }
+                        string mark = $"{pl.Name}-{(p.Fill ? "F" : "SP")}{jdef.Point}-{k}";
+                        Assumption? asu = p.Unresolved.Length > 0 ? Assumption.UnresolvedDimension(p.Unresolved, "plate as listed, extent scaled") : null;
+                        if (asu != null) Warn(p.Unresolved);
+                        Model.Steel.Parts.Add(new SteelPart
+                        {
+                            Mark = mark, Category = p.Fill ? PartCategory.FillerPlate : PartCategory.SplicePlate, Assembly = asm, Mesh = mesh, Material = Material(p.Material), Length = p.Length, Assumption = asu,
+                            Description = $"{(p.Label.Length > 0 ? p.Label : (p.Fill ? "fill" : "splice") + " PL")} {TrussSections.FormatIn(p.Width)} x {TrussSections.FormatIn(p.Thickness)} x {TrussSections.FormatIn(p.Length)} ({p.Face}) at {jdef.Point}"
+                                + (p.Face is TrussPlateFace.WebInside or TrussPlateFace.WebOutside ? " (pair)" : ""),
+                        });
+                        Model.PanelOf[mark] = $"Joint {jdef.Point}";
+                        Model.SplicePlates++;
+                    }
+                }
+        }
+
+        // ------------------------------------------------------------------ line items (curbs / parapets, walkways, dams)
+        private void BuildLineItem(TrussLineItemDefinition li)
+        {
+            if (li.Unresolved.Length > 0) Warn(li.Unresolved);
+            if (li.Profile.Count < 3 || li.To <= li.From) { Warn($"Truss: line item {li.Name} - profile / range missing; not built."); return; }
+            var poly = li.Profile.Select(q => new Vec2(q.U, q.V)).ToList();
+            if (MeshBuilder.SignedArea(poly) < 0) poly.Reverse();
+            var sec = poly.ToArray();
+            var rings = new List<Vec3[]>();
+            if (!li.Transverse)
+            {
+                int n = Math.Max(2, (int)Math.Ceiling((li.To - li.From) / 2.0) + 1);
+                int side = li.Side >= 0 ? 1 : -1;
+                for (int i = 0; i < n; i++)
+                {
+                    double s = li.From + (li.To - li.From) * i / (n - 1);
+                    double z0 = li.FromGrade ? _al.ElevationAt(s, li.ReferenceOffset) : 0;
+                    rings.Add(sec.Select(q => _al.PointAt(s, li.ReferenceOffset + side * q.X).WithZ(z0 + q.Y)).ToArray());
+                }
+            }
+            else
+            {
+                // across: rings at the range ends and at the crown (offset 0) when inside, so the item follows the cross slope
+                var offs = new List<double> { li.From };
+                if (li.From < 0 && li.To > 0) offs.Add(0);
+                offs.Add(li.To);
+                foreach (double o in offs)
+                {
+                    double z0 = li.FromGrade ? _al.ElevationAt(li.Station, o) : 0;
+                    rings.Add(sec.Select(q => _al.PointAt(li.Station + q.X, o).WithZ(z0 + q.Y)).ToArray());
+                }
+            }
+            var mesh = new Mesh();
+            MeshBuilder.AddLoft(mesh, sec, rings);
+            double length = li.To - li.From;
+            if (li.Kind == TrussLineItemKind.Concrete)
+            {
+                Model.Concrete.Barriers.Add((li.Name, mesh));
+                return;
+            }
+            string asm = Asm(li.Assembly.Length > 0 ? li.Assembly : "DECK-ITEMS", li.Category is PartCategory.JointArmor or PartCategory.JointCoverPlate ? AssemblyKind.ExpansionJoint
+                : SteelModel.IsRailing(li.Category) ? AssemblyKind.Railing : AssemblyKind.InspectionWalkway, li.AssemblyDescription.Length > 0 ? li.AssemblyDescription : $"{_d.Name} - {li.Assembly}");
+            Model.Steel.Parts.Add(new SteelPart
+            {
+                Mark = li.Name, Category = li.Category, Assembly = asm, Mesh = mesh, Material = li.Material.Length > 0 ? Material(li.Material) : _d.DefaultMaterial, Length = length,
+                NominalWeightLbPerFt = li.NominalWeightLbPerFt, Density = li.Density, Description = li.Name + (li.Source.Length > 0 ? $" ({li.Source})" : ""),
+                Assumption = li.Unresolved.Length > 0 ? Assumption.UnresolvedDimension(li.Unresolved, "constant section swept along / across the alignment") : null,
+            });
+        }
+
         // ------------------------------------------------------------------ floor (stringers + deck)
         private void BuildFloor(TrussFloorDefinition fl)
         {
@@ -538,10 +670,10 @@ public static class TrussGenerator
                 }
                 if (no == 0) Warn($"Truss: stringer line {line.Name} - no floor beam bay found (floor beams are members with role FloorBeam crossing offset {L(line.Offset)}).");
             }
-            if (fl.Deck is { } dk) BuildDeck(dk);
+            if (fl.Deck is { } dk) BuildDeck(dk, fl);
         }
 
-        private void BuildDeck(TrussDeckDefinition dk)
+        private void BuildDeck(TrussDeckDefinition dk, TrussFloorDefinition fl)
         {
             if (dk.Unresolved.Length > 0) Warn(dk.Unresolved);
             if (dk.Thickness <= 0 || dk.EndStation <= dk.BeginStation || dk.RightOffset <= dk.LeftOffset) { Warn("Truss: deck slab - thickness / stations / offsets missing; not built."); return; }
@@ -561,6 +693,34 @@ public static class TrussGenerator
             MeshBuilder.AddLoft(mesh, sec, rings);
             Model.Concrete.Deck = mesh;
             Model.SlabArea = (dk.EndStation - dk.BeginStation) * (dk.RightOffset - dk.LeftOffset);
+            if (dk.HaunchDepth > 0 && dk.HaunchBottomWidth > 0)
+            {
+                // slab thickening under every stringer line: top on the slab soffit (follows the crown), bottom level across at the line
+                double h = dk.HaunchDepth, wb = dk.HaunchBottomWidth / 2, wt = wb + Math.Max(0, dk.HaunchSideSlope) * h;
+                var hsec = new[] { new Vec2(-wt, 0), new Vec2(-wb, -h), new Vec2(wb, -h), new Vec2(wt, 0) };
+                var hm = new Mesh();
+                int lines = 0;
+                foreach (var line in fl.Stringers)
+                {
+                    double o = line.Offset;
+                    if (o - wt < dk.LeftOffset - 1e-6 || o + wt > dk.RightOffset + 1e-6) continue;
+                    double s0 = Math.Max(dk.BeginStation, line.FromStation ?? dk.BeginStation), s1 = Math.Min(dk.EndStation, line.ToStation ?? dk.EndStation);
+                    if (s1 - s0 < 0.05) continue;
+                    int k = Math.Max(2, (int)Math.Ceiling((s1 - s0) / 2.0) + 1);
+                    var hr = new List<Vec3[]>();
+                    for (int i = 0; i < k; i++)
+                    {
+                        double s = s0 + (s1 - s0) * i / (k - 1);
+                        double zc = _al.ElevationAt(s, o) - dk.Thickness;
+                        Vec3 Top(double u) => _al.PointAt(s, o + u).WithZ(_al.ElevationAt(s, o + u) - dk.Thickness);
+                        hr.Add(new[] { Top(-wt), _al.PointAt(s, o - wb).WithZ(zc - h), _al.PointAt(s, o + wb).WithZ(zc - h), Top(wt) });
+                    }
+                    MeshBuilder.AddLoft(hm, hsec, hr);
+                    lines++;
+                }
+                if (!hm.IsEmpty) Model.Concrete.Haunches = hm;
+                Info($"Truss: deck thickening {L(h)} deep, {L(2 * wb)} wide at the bottom under {lines} stringer line runs{Src}.");
+            }
         }
 
         // ------------------------------------------------------------------ suspenders

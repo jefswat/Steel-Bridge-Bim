@@ -6618,7 +6618,7 @@
         "StayInPlaceForms": true,
         "SipFormDepth": 0.0508,
         "Barrier": {
-          "Type": "TxDotSstr",
+          "Type": "Custom",
           "Reinforcement": true,
           "EpoxyCoated": true,
           "StirrupSpacing": 0.15239999999999998,
@@ -6626,7 +6626,8 @@
           "BaseWidth": 0.4064,
           "TopWidth": 0.15239999999999998,
           "Left": false,
-          "Right": false
+          "Right": false,
+          "ProfileName": "PTC curb \u002B parapet wall (p.107)"
         },
         "Reinforcement": {
           "Enabled": false,
@@ -16913,14 +16914,17 @@
           "StringersOnTop": true,
           "StringerEndClearance": 0,
           "Deck": {
-            "Thickness": 0.19685,
-            "LeftOffset": -11.6586,
-            "RightOffset": 11.6586,
+            "Thickness": 0.17145,
+            "LeftOffset": -12.5222,
+            "RightOffset": 12.5222,
             "BeginStation": 19696.2917224,
             "EndStation": 20074.9614248,
             "ConcreteStrengthKsi": 3,
-            "Unresolved": "UNRESOLVED (p.107, p.46): deck slab: 6 3/4 slab \u002B haunch, curbs, parapets, expansion dams, walkway - p.107 gives the 6 3/4 slab with 7 3/4 typical over the stringers; the dams (p.46) and the curb / parapet sheets are not modeled here. one 7 3/4 slab between the curb lines (76\u0027-6) from the first to the last girder end, continuous over the 4 in. gaps at the piers (the expansion dam fills them).",
-            "Source": "p.43 / p.107"
+            "Unresolved": "UNRESOLVED (p.107, p.55): slab edge under the parapet and the haunch depth - Section A prints 7 3/4 / 7 7/8 at the curb and the 1 in thickening (7 3/4 - 6 3/4) is derived, not printed; the slab edge under the wall is drawn with a 4 1/4 in drop not dimensioned. 6 3/4 slab (crown 1/8 in per ft) from outside face to outside face of the parapets (82\u0027-2), 1 in x 1\u0027-5 thickening with 12:12 sides under every stringer line; CL key joint / pipe sockets / drip grooves not built.",
+            "Source": "p.107 (half cross section, Section A)",
+            "HaunchDepth": 0.0254,
+            "HaunchBottomWidth": 0.4318,
+            "HaunchSideSlope": 1
           },
           "Unresolved": "UNRESOLVED (p.43, p.45): stringer bearings, splices and diaphragms - the stringers are 4-span continuous with a CL splice per line (p.45 splice plates 24 WF: 4x9/16 \u002B 9x1/2 \u002B 2 x 18 1/2x3/8) and bearing plates thickened for the dead load camber; the diaphragms 15[ 33.9 mid-panel and 18 WF 64 at the piers are only located. stringers built as straight W pieces between consecutive floor beams (CL to CL) with their tops 7 3/4 under the finished grade; bearing plates, splices, clip angles and diaphragms not built.",
           "Source": "p.43 / p.107"
@@ -17900,9 +17904,586 @@
           "UNRESOLVED (p.43, p.44): fixed / expansion end of the girder spans 28-31 - the stress sheet draws the spans with the fixed end away from the river (spans 1-10 fixed at the west end); the same drawing serves spans 28-31. spans 28-31 mirrored: fixed at the EAST end of each span (to be confirmed on sheets 9 / 67 / 68, not read).",
           "UNRESOLVED (p.43, p.44): girder end and bearing position of spans 10 and 28 - p.43 gives the 120\u0027-5 1/4 c-c bearings and \u0027alike except expansion end\u0027 but the floor beam spacing (30\u0027-5 3/4 is for 121\u0027-11) and the end detail are on sheet 9. floor beams at equal spaces of the c-c bearing length (4 spaces), girder ends 1\u0027-1 beyond the bearings, cover plates as spans 1-9.",
           "UNRESOLVED (p.46): expansion dams at the piers and the end dams / backwall joints - p.46 dimensions the finger plate dam (edge members 12[ 35, 18 WF 64 diaphragms with 2-Ls 4x4x7/16, anchor bars) but it is a separate pay item. not built; the 4 in. gap between adjacent girder ends is bridged by the slab.",
-          "UNRESOLVED (p.43): inspection walk (CL 2\u0027-0 from the CL bridge), scuppers, signal / light pole bracket extensions (p.45) - shown on the plan / sections without dimensions I could read. not built."
+          "UNRESOLVED (p.43): inspection walk (CL 2\u0027-0 from the CL bridge), scuppers, signal / light pole bracket extensions (p.45) - shown on the plan / sections without dimensions I could read. not built.",
+          "UNRESOLVED (p.44, p.42): service walkway in the girder spans - no walkway sheet for the girder spans was found, but p.42 item 14 lists 2,510 / 1,010 sq ft of grating for them and p.44 mentions floor beam manholes. not built."
+        ],
+        "LineItems": [
+          {
+            "Name": "Left curb \u002B parapet",
+            "Kind": "Concrete",
+            "Category": "WalkwayPlate",
+            "Transverse": false,
+            "ReferenceOffset": -11.6586,
+            "Station": 0,
+            "From": 19696.2917224,
+            "To": 20074.9614248,
+            "Side": -1,
+            "Profile": [
+              {
+                "U": 0,
+                "V": 0
+              },
+              {
+                "U": 0,
+                "V": 0.2286
+              },
+              {
+                "U": 0.6095999999999999,
+                "V": 0.23495
+              },
+              {
+                "U": 0.6095999999999999,
+                "V": 0.76835
+              },
+              {
+                "U": 0.8635999999999999,
+                "V": 0.76835
+              },
+              {
+                "U": 0.8635999999999999,
+                "V": -0.008995833333333333
+              }
+            ],
+            "FromGrade": true,
+            "Material": "Class A concrete",
+            "NominalWeightLbPerFt": 0,
+            "Density": 0,
+            "Assembly": "DECK-ITEMS",
+            "AssemblyDescription": "",
+            "Unresolved": "UNRESOLVED (p.107, p.108): curb \u002B parapet details - the 3/4 in radius at the curb face, the chamfers, the drainage openings in the curb (2\u0027-2 / 2\u0027-0 alternating, size not read), scoring and the openings at the expansion dams are drawn without all dimensions. one solid section (curb 2\u0027-0 x 9 in, curb top \u002B1/4 in, wall 10 in x 1\u0027-9 above the curb top) continuous over the deck length.",
+            "Source": "p.107 Section A / B"
+          },
+          {
+            "Name": "Right curb \u002B parapet",
+            "Kind": "Concrete",
+            "Category": "WalkwayPlate",
+            "Transverse": false,
+            "ReferenceOffset": 11.6586,
+            "Station": 0,
+            "From": 19696.2917224,
+            "To": 20074.9614248,
+            "Side": 1,
+            "Profile": [
+              {
+                "U": 0,
+                "V": 0
+              },
+              {
+                "U": 0,
+                "V": 0.2286
+              },
+              {
+                "U": 0.6095999999999999,
+                "V": 0.23495
+              },
+              {
+                "U": 0.6095999999999999,
+                "V": 0.76835
+              },
+              {
+                "U": 0.8635999999999999,
+                "V": 0.76835
+              },
+              {
+                "U": 0.8635999999999999,
+                "V": -0.008995833333333333
+              }
+            ],
+            "FromGrade": true,
+            "Material": "Class A concrete",
+            "NominalWeightLbPerFt": 0,
+            "Density": 0,
+            "Assembly": "DECK-ITEMS",
+            "AssemblyDescription": "",
+            "Unresolved": "UNRESOLVED (p.107, p.108): curb \u002B parapet details - the 3/4 in radius at the curb face, the chamfers, the drainage openings in the curb (2\u0027-2 / 2\u0027-0 alternating, size not read), scoring and the openings at the expansion dams are drawn without all dimensions. one solid section (curb 2\u0027-0 x 9 in, curb top \u002B1/4 in, wall 10 in x 1\u0027-9 above the curb top) continuous over the deck length.",
+            "Source": "p.107 Section A / B"
+          },
+          {
+            "Name": "dam Pier 1",
+            "Kind": "Steel",
+            "Category": "JointArmor",
+            "Transverse": true,
+            "ReferenceOffset": 0,
+            "Station": 19734.163224,
+            "From": -11.6586,
+            "To": 11.6586,
+            "Side": 1,
+            "Profile": [
+              {
+                "U": -0.104775,
+                "V": -0.009524999999999999
+              },
+              {
+                "U": 0.104775,
+                "V": -0.009524999999999999
+              },
+              {
+                "U": 0.104775,
+                "V": 0
+              },
+              {
+                "U": -0.104775,
+                "V": 0
+              }
+            ],
+            "FromGrade": true,
+            "Material": "C",
+            "NominalWeightLbPerFt": 0,
+            "Density": 0,
+            "Assembly": "DAM-DAM-PIER-1",
+            "AssemblyDescription": "sliding plate expansion dam dam Pier 1 (p.46)",
+            "Unresolved": "UNRESOLVED (p.46): sliding plate dam at dam Pier 1: teeth, edge channels, stringer supports, anchor bars and the curb / parapet ends - p.46 Section A gives the total dam width 8 1/4 in at 68 F (low confidence) and 3/8 in sliding plates; the serpentine seal, bulkhead plates and supports are drawn, not all dimensioned. one steel band 8.25 in wide (total dam width at 68 F) x 0.375 in, top flush with the grade, 38\u0027-3 each side of the CL (curb to curb).",
+            "Source": "p.46"
+          },
+          {
+            "Name": "dam Pier 2",
+            "Kind": "Steel",
+            "Category": "JointArmor",
+            "Transverse": true,
+            "ReferenceOffset": 0,
+            "Station": 19772.085220800003,
+            "From": -11.6586,
+            "To": 11.6586,
+            "Side": 1,
+            "Profile": [
+              {
+                "U": -0.104775,
+                "V": -0.009524999999999999
+              },
+              {
+                "U": 0.104775,
+                "V": -0.009524999999999999
+              },
+              {
+                "U": 0.104775,
+                "V": 0
+              },
+              {
+                "U": -0.104775,
+                "V": 0
+              }
+            ],
+            "FromGrade": true,
+            "Material": "C",
+            "NominalWeightLbPerFt": 0,
+            "Density": 0,
+            "Assembly": "DAM-DAM-PIER-2",
+            "AssemblyDescription": "sliding plate expansion dam dam Pier 2 (p.46)",
+            "Unresolved": "UNRESOLVED (p.46): sliding plate dam at dam Pier 2: teeth, edge channels, stringer supports, anchor bars and the curb / parapet ends - p.46 Section A gives the total dam width 8 1/4 in at 68 F (low confidence) and 3/8 in sliding plates; the serpentine seal, bulkhead plates and supports are drawn, not all dimensioned. one steel band 8.25 in wide (total dam width at 68 F) x 0.375 in, top flush with the grade, 38\u0027-3 each side of the CL (curb to curb).",
+            "Source": "p.46"
+          },
+          {
+            "Name": "dam Pier 3",
+            "Kind": "Steel",
+            "Category": "JointArmor",
+            "Transverse": true,
+            "ReferenceOffset": 0,
+            "Station": 19810.007522400003,
+            "From": -11.6586,
+            "To": 11.6586,
+            "Side": 1,
+            "Profile": [
+              {
+                "U": -0.104775,
+                "V": -0.009524999999999999
+              },
+              {
+                "U": 0.104775,
+                "V": -0.009524999999999999
+              },
+              {
+                "U": 0.104775,
+                "V": 0
+              },
+              {
+                "U": -0.104775,
+                "V": 0
+              }
+            ],
+            "FromGrade": true,
+            "Material": "C",
+            "NominalWeightLbPerFt": 0,
+            "Density": 0,
+            "Assembly": "DAM-DAM-PIER-3",
+            "AssemblyDescription": "sliding plate expansion dam dam Pier 3 (p.46)",
+            "Unresolved": "UNRESOLVED (p.46): sliding plate dam at dam Pier 3: teeth, edge channels, stringer supports, anchor bars and the curb / parapet ends - p.46 Section A gives the total dam width 8 1/4 in at 68 F (low confidence) and 3/8 in sliding plates; the serpentine seal, bulkhead plates and supports are drawn, not all dimensioned. one steel band 8.25 in wide (total dam width at 68 F) x 0.375 in, top flush with the grade, 38\u0027-3 each side of the CL (curb to curb).",
+            "Source": "p.46"
+          },
+          {
+            "Name": "dam Pier 4",
+            "Kind": "Steel",
+            "Category": "JointArmor",
+            "Transverse": true,
+            "ReferenceOffset": 0,
+            "Station": 19847.929824,
+            "From": -11.6586,
+            "To": 11.6586,
+            "Side": 1,
+            "Profile": [
+              {
+                "U": -0.104775,
+                "V": -0.009524999999999999
+              },
+              {
+                "U": 0.104775,
+                "V": -0.009524999999999999
+              },
+              {
+                "U": 0.104775,
+                "V": 0
+              },
+              {
+                "U": -0.104775,
+                "V": 0
+              }
+            ],
+            "FromGrade": true,
+            "Material": "C",
+            "NominalWeightLbPerFt": 0,
+            "Density": 0,
+            "Assembly": "DAM-DAM-PIER-4",
+            "AssemblyDescription": "sliding plate expansion dam dam Pier 4 (p.46)",
+            "Unresolved": "UNRESOLVED (p.46): sliding plate dam at dam Pier 4: teeth, edge channels, stringer supports, anchor bars and the curb / parapet ends - p.46 Section A gives the total dam width 8 1/4 in at 68 F (low confidence) and 3/8 in sliding plates; the serpentine seal, bulkhead plates and supports are drawn, not all dimensioned. one steel band 8.25 in wide (total dam width at 68 F) x 0.375 in, top flush with the grade, 38\u0027-3 each side of the CL (curb to curb).",
+            "Source": "p.46"
+          },
+          {
+            "Name": "dam Pier 5",
+            "Kind": "Steel",
+            "Category": "JointArmor",
+            "Transverse": true,
+            "ReferenceOffset": 0,
+            "Station": 19885.852125600002,
+            "From": -11.6586,
+            "To": 11.6586,
+            "Side": 1,
+            "Profile": [
+              {
+                "U": -0.104775,
+                "V": -0.009524999999999999
+              },
+              {
+                "U": 0.104775,
+                "V": -0.009524999999999999
+              },
+              {
+                "U": 0.104775,
+                "V": 0
+              },
+              {
+                "U": -0.104775,
+                "V": 0
+              }
+            ],
+            "FromGrade": true,
+            "Material": "C",
+            "NominalWeightLbPerFt": 0,
+            "Density": 0,
+            "Assembly": "DAM-DAM-PIER-5",
+            "AssemblyDescription": "sliding plate expansion dam dam Pier 5 (p.46)",
+            "Unresolved": "UNRESOLVED (p.46): sliding plate dam at dam Pier 5: teeth, edge channels, stringer supports, anchor bars and the curb / parapet ends - p.46 Section A gives the total dam width 8 1/4 in at 68 F (low confidence) and 3/8 in sliding plates; the serpentine seal, bulkhead plates and supports are drawn, not all dimensioned. one steel band 8.25 in wide (total dam width at 68 F) x 0.375 in, top flush with the grade, 38\u0027-3 each side of the CL (curb to curb).",
+            "Source": "p.46"
+          },
+          {
+            "Name": "dam Pier 6",
+            "Kind": "Steel",
+            "Category": "JointArmor",
+            "Transverse": true,
+            "ReferenceOffset": 0,
+            "Station": 19923.774122400002,
+            "From": -11.6586,
+            "To": 11.6586,
+            "Side": 1,
+            "Profile": [
+              {
+                "U": -0.104775,
+                "V": -0.009524999999999999
+              },
+              {
+                "U": 0.104775,
+                "V": -0.009524999999999999
+              },
+              {
+                "U": 0.104775,
+                "V": 0
+              },
+              {
+                "U": -0.104775,
+                "V": 0
+              }
+            ],
+            "FromGrade": true,
+            "Material": "C",
+            "NominalWeightLbPerFt": 0,
+            "Density": 0,
+            "Assembly": "DAM-DAM-PIER-6",
+            "AssemblyDescription": "sliding plate expansion dam dam Pier 6 (p.46)",
+            "Unresolved": "UNRESOLVED (p.46): sliding plate dam at dam Pier 6: teeth, edge channels, stringer supports, anchor bars and the curb / parapet ends - p.46 Section A gives the total dam width 8 1/4 in at 68 F (low confidence) and 3/8 in sliding plates; the serpentine seal, bulkhead plates and supports are drawn, not all dimensioned. one steel band 8.25 in wide (total dam width at 68 F) x 0.375 in, top flush with the grade, 38\u0027-3 each side of the CL (curb to curb).",
+            "Source": "p.46"
+          },
+          {
+            "Name": "dam Pier 7",
+            "Kind": "Steel",
+            "Category": "JointArmor",
+            "Transverse": true,
+            "ReferenceOffset": 0,
+            "Station": 19961.696424,
+            "From": -11.6586,
+            "To": 11.6586,
+            "Side": 1,
+            "Profile": [
+              {
+                "U": -0.104775,
+                "V": -0.009524999999999999
+              },
+              {
+                "U": 0.104775,
+                "V": -0.009524999999999999
+              },
+              {
+                "U": 0.104775,
+                "V": 0
+              },
+              {
+                "U": -0.104775,
+                "V": 0
+              }
+            ],
+            "FromGrade": true,
+            "Material": "C",
+            "NominalWeightLbPerFt": 0,
+            "Density": 0,
+            "Assembly": "DAM-DAM-PIER-7",
+            "AssemblyDescription": "sliding plate expansion dam dam Pier 7 (p.46)",
+            "Unresolved": "UNRESOLVED (p.46): sliding plate dam at dam Pier 7: teeth, edge channels, stringer supports, anchor bars and the curb / parapet ends - p.46 Section A gives the total dam width 8 1/4 in at 68 F (low confidence) and 3/8 in sliding plates; the serpentine seal, bulkhead plates and supports are drawn, not all dimensioned. one steel band 8.25 in wide (total dam width at 68 F) x 0.375 in, top flush with the grade, 38\u0027-3 each side of the CL (curb to curb).",
+            "Source": "p.46"
+          },
+          {
+            "Name": "dam Pier 8",
+            "Kind": "Steel",
+            "Category": "JointArmor",
+            "Transverse": true,
+            "ReferenceOffset": 0,
+            "Station": 19999.6187256,
+            "From": -11.6586,
+            "To": 11.6586,
+            "Side": 1,
+            "Profile": [
+              {
+                "U": -0.104775,
+                "V": -0.009524999999999999
+              },
+              {
+                "U": 0.104775,
+                "V": -0.009524999999999999
+              },
+              {
+                "U": 0.104775,
+                "V": 0
+              },
+              {
+                "U": -0.104775,
+                "V": 0
+              }
+            ],
+            "FromGrade": true,
+            "Material": "C",
+            "NominalWeightLbPerFt": 0,
+            "Density": 0,
+            "Assembly": "DAM-DAM-PIER-8",
+            "AssemblyDescription": "sliding plate expansion dam dam Pier 8 (p.46)",
+            "Unresolved": "UNRESOLVED (p.46): sliding plate dam at dam Pier 8: teeth, edge channels, stringer supports, anchor bars and the curb / parapet ends - p.46 Section A gives the total dam width 8 1/4 in at 68 F (low confidence) and 3/8 in sliding plates; the serpentine seal, bulkhead plates and supports are drawn, not all dimensioned. one steel band 8.25 in wide (total dam width at 68 F) x 0.375 in, top flush with the grade, 38\u0027-3 each side of the CL (curb to curb).",
+            "Source": "p.46"
+          },
+          {
+            "Name": "dam Pier 9",
+            "Kind": "Steel",
+            "Category": "JointArmor",
+            "Transverse": true,
+            "ReferenceOffset": 0,
+            "Station": 20037.5407224,
+            "From": -11.6586,
+            "To": 11.6586,
+            "Side": 1,
+            "Profile": [
+              {
+                "U": -0.104775,
+                "V": -0.009524999999999999
+              },
+              {
+                "U": 0.104775,
+                "V": -0.009524999999999999
+              },
+              {
+                "U": 0.104775,
+                "V": 0
+              },
+              {
+                "U": -0.104775,
+                "V": 0
+              }
+            ],
+            "FromGrade": true,
+            "Material": "C",
+            "NominalWeightLbPerFt": 0,
+            "Density": 0,
+            "Assembly": "DAM-DAM-PIER-9",
+            "AssemblyDescription": "sliding plate expansion dam dam Pier 9 (p.46)",
+            "Unresolved": "UNRESOLVED (p.46): sliding plate dam at dam Pier 9: teeth, edge channels, stringer supports, anchor bars and the curb / parapet ends - p.46 Section A gives the total dam width 8 1/4 in at 68 F (low confidence) and 3/8 in sliding plates; the serpentine seal, bulkhead plates and supports are drawn, not all dimensioned. one steel band 8.25 in wide (total dam width at 68 F) x 0.375 in, top flush with the grade, 38\u0027-3 each side of the CL (curb to curb).",
+            "Source": "p.46"
+          },
+          {
+            "Name": "dam Pier 10",
+            "Kind": "Steel",
+            "Category": "JointArmor",
+            "Transverse": true,
+            "ReferenceOffset": 0,
+            "Station": 20075.5203264,
+            "From": -11.6586,
+            "To": 11.6586,
+            "Side": 1,
+            "Profile": [
+              {
+                "U": -0.20955,
+                "V": -0.07619999999999999
+              },
+              {
+                "U": 0.20955,
+                "V": -0.07619999999999999
+              },
+              {
+                "U": 0.20955,
+                "V": 0
+              },
+              {
+                "U": -0.20955,
+                "V": 0
+              }
+            ],
+            "FromGrade": true,
+            "Material": "C",
+            "NominalWeightLbPerFt": 0,
+            "Density": 0,
+            "Assembly": "DAM-DAM-PIER-10",
+            "AssemblyDescription": "finger expansion dam dam Pier 10 (p.54, p.1)",
+            "Unresolved": "UNRESOLVED (p.54, p.1): finger dam at dam Pier 10: teeth, edge channels, stringer supports, anchor bars and the curb / parapet ends - the finger plates are drawn with their teeth (61 \u002B 47 teeth @ 4 1/4 in across the half roadway) and the movement tables; the tooth outline, the plate anchorage and the dam stringers are not all dimensioned; the dam station 658\u002B64.568 is p.1 (3-9-54), not re-printed after the 10-26-54 girder shoe shift. one steel band 16.5 in wide (total dam width at 68 F) x 3 in, top flush with the grade, 38\u0027-3 each side of the CL (curb to curb).",
+            "Source": "p.54, p.1"
+          }
         ]
-      }
+      },
+      "Railings": [
+        {
+          "Name": "Left parapet railing",
+          "TypeName": "PTC aluminum parapet railing (p.107 / p.108)",
+          "Kind": "Guardrail",
+          "Offset": -12.395199999999999,
+          "BeginStation": 19696.2917224,
+          "EndStation": 20074.9614248,
+          "BaseProbe": 0,
+          "Material": "Aluminum (rail ASTM B235 GS10A-T6, posts B108 356-T6)",
+          "Density": 2700,
+          "SampleStep": 0.3048,
+          "Post": {
+            "Profile": [
+              {
+                "R": -0.127,
+                "H": 0
+              },
+              {
+                "R": 0.127,
+                "H": 0
+              },
+              {
+                "R": 0.07619999999999999,
+                "H": 0.3857625
+              },
+              {
+                "R": -0.07619999999999999,
+                "H": 0.3857625
+              }
+            ],
+            "Thickness": 0.17779999999999999,
+            "Spacing": 1.74625,
+            "EndDistance": 0.358775,
+            "Description": "cast aluminum post 10 x 7 at the base, 6 in at the top",
+            "Unresolved": "UNRESOLVED (p.107, p.108): post layout and shape - the posts are laid out per railing panel (31\u0027-0 / 30\u0027-5 3/4 panels: 5 spaces with 1\u0027-2 1/8 to the joints, special panels on p.108) and the cast post is hollow with a 3/8 web. solid tapered post 10 in -\u003E 6 in x 7 in, equally spaced at most 5\u0027-8 3/4 over each bridge run, 1\u0027-2 1/8 from its ends; anchor bolts and pads not built."
+          },
+          "Members": [
+            {
+              "Name": "oval rail",
+              "Kind": "Rail",
+              "Diameter": 0,
+              "Width": 0.2032,
+              "Height": 0.142875,
+              "Center": {
+                "R": 0,
+                "H": 0.3857625
+              },
+              "Description": "oval aluminum tube 8 x 5 5/8 x 3/16",
+              "MassPerLength": 7,
+              "Unresolved": "UNRESOLVED (p.108): rail section - the oval tube is 8 in \u002B- x 5 5/8 in \u002B- with a 3/16 wall. rectangular envelope 8 x 5 5/8, mass of the tube (about 4.7 lb/ft)"
+            }
+          ],
+          "FlagsDimensionOnly": true,
+          "Source": "p.107 / p.108",
+          "Unresolved": []
+        },
+        {
+          "Name": "Right parapet railing",
+          "TypeName": "PTC aluminum parapet railing (p.107 / p.108)",
+          "Kind": "Guardrail",
+          "Offset": 12.395199999999999,
+          "BeginStation": 19696.2917224,
+          "EndStation": 20074.9614248,
+          "BaseProbe": 0,
+          "Material": "Aluminum (rail ASTM B235 GS10A-T6, posts B108 356-T6)",
+          "Density": 2700,
+          "SampleStep": 0.3048,
+          "Post": {
+            "Profile": [
+              {
+                "R": -0.127,
+                "H": 0
+              },
+              {
+                "R": 0.127,
+                "H": 0
+              },
+              {
+                "R": 0.07619999999999999,
+                "H": 0.3857625
+              },
+              {
+                "R": -0.07619999999999999,
+                "H": 0.3857625
+              }
+            ],
+            "Thickness": 0.17779999999999999,
+            "Spacing": 1.74625,
+            "EndDistance": 0.358775,
+            "Description": "cast aluminum post 10 x 7 at the base, 6 in at the top",
+            "Unresolved": "UNRESOLVED (p.107, p.108): post layout and shape - the posts are laid out per railing panel (31\u0027-0 / 30\u0027-5 3/4 panels: 5 spaces with 1\u0027-2 1/8 to the joints, special panels on p.108) and the cast post is hollow with a 3/8 web. solid tapered post 10 in -\u003E 6 in x 7 in, equally spaced at most 5\u0027-8 3/4 over each bridge run, 1\u0027-2 1/8 from its ends; anchor bolts and pads not built."
+          },
+          "Members": [
+            {
+              "Name": "oval rail",
+              "Kind": "Rail",
+              "Diameter": 0,
+              "Width": 0.2032,
+              "Height": 0.142875,
+              "Center": {
+                "R": 0,
+                "H": 0.3857625
+              },
+              "Description": "oval aluminum tube 8 x 5 5/8 x 3/16",
+              "MassPerLength": 7,
+              "Unresolved": "UNRESOLVED (p.108): rail section - the oval tube is 8 in \u002B- x 5 5/8 in \u002B- with a 3/16 wall. rectangular envelope 8 x 5 5/8, mass of the tube (about 4.7 lb/ft)"
+            }
+          ],
+          "FlagsDimensionOnly": true,
+          "Source": "p.107 / p.108",
+          "Unresolved": []
+        }
+      ]
     },
     {
       "Name": "PTC 3-span truss 11-13",
@@ -19591,7 +20172,7 @@
         "StayInPlaceForms": true,
         "SipFormDepth": 0.0508,
         "Barrier": {
-          "Type": "TxDotSstr",
+          "Type": "Custom",
           "Reinforcement": true,
           "EpoxyCoated": true,
           "StirrupSpacing": 0.15239999999999998,
@@ -19599,7 +20180,8 @@
           "BaseWidth": 0.4064,
           "TopWidth": 0.15239999999999998,
           "Left": false,
-          "Right": false
+          "Right": false,
+          "ProfileName": "PTC curb \u002B parapet wall (p.107)"
         },
         "Reinforcement": {
           "Enabled": false,
@@ -29112,13 +29694,16 @@
           "StringerEndClearance": 0,
           "Deck": {
             "Thickness": 0.17145,
-            "LeftOffset": -11.6586,
-            "RightOffset": 11.6586,
+            "LeftOffset": -12.5222,
+            "RightOffset": 12.5222,
             "BeginStation": 20076.072624000004,
             "EndStation": 20273.125824000002,
             "ConcreteStrengthKsi": 3,
-            "Unresolved": "UNRESOLVED (p.107, p.54, p.68): slab thickness (6 3/4 on p.107, \u00276 1/4\u0027 read at low confidence on p.55), haunch over the stringers, curbs / parapets, railing, pavement breaks and the expansion dams at the unit ends - p.107 gives 6 3/4 three times; the haunch and parapets belong to the deck / parapet work and the dam sheets p.54 / p.68 are not modeled yet. 6 3/4 slab between the curb lines (76\u0027-6), joint 0 to joint 0\u0027.",
-            "Source": "p.107"
+            "Unresolved": "UNRESOLVED (p.107, p.55): slab edge under the parapet and the haunch depth - Section A prints 7 3/4 / 7 7/8 at the curb and the 1 in thickening (7 3/4 - 6 3/4) is derived, not printed; the slab edge under the wall is drawn with a 4 1/4 in drop not dimensioned. 6 3/4 slab (crown 1/8 in per ft) from outside face to outside face of the parapets (82\u0027-2), 1 in x 1\u0027-5 thickening with 12:12 sides under every stringer line; CL key joint / pipe sockets / drip grooves not built.",
+            "Source": "p.107 (half cross section, Section A)",
+            "HaunchDepth": 0.0254,
+            "HaunchBottomWidth": 0.4318,
+            "HaunchSideSlope": 1
           },
           "Unresolved": "UNRESOLVED (p.55, p.107, p.48): stringer bearings (variable bearing plates, sliding \u0027S\u0027 / fixed \u0027F\u0027 bearings), diaphragms 15 C 33.9, splices and which mark lies on which line - the printed stringer-to-slab dimension is 7 3/4 (p.107) and the floor beam top is level 2\u0027-8 3/4 under the gutter line (p.55): the bearing plate between them varies 1.1 - 5.9 in. across the crown (\u0022thicknesses ... shall be adjusted\u0022, p.55) and is not dimensioned; the half plan names S5-S8 but not their lines. stringer tops 7 3/4 under the finished grade (p.107), continuous over the floor beams, one straight piece per bay; the gap above each floor beam is NOT filled.",
           "Source": "p.48 / p.107"
@@ -29337,8 +29922,399 @@
           "UNRESOLVED (p.55, p.48, p.58): partial-length floor beam cover plates (F.L. \u002B 28\u0027-0 / 40\u0027-0 / 20\u0027-0 bottom plates, F3 / F4 / B1 plate counts 2 / 4 / 1) - the lengths are listed on p.55 but their positions along the beam were not decoded; the bracket (B1) web is drawn tapering 6\u0027-3 1/2 to 2\u0027-0 1/2. only the full-length top plate 14 x 1/2 is built; the cantilever brackets B1 are built as the full-depth beam (taper not modeled, overstates the bracket).",
           "UNRESOLVED (p.49-53): L8 / L0 second gusset pairs (7/8 \u002B 3/4 outer / inner at L8 of the 3-span unit; 3/4 \u002B 1/2 at L0 of both units), fills, splice plates, lug angles, diaphragms, stitch rivets - listed per joint without extents. only one gusset pair per joint (the outer / first listed) is built; fills and splices not built.",
           "UNRESOLVED (p.49-53): plan weight check (p.42): floor steel, bracing, shoes, expansion dams, splices and fills are in the p.42 totals - the totals are per unit (carbon \u002B silicon, items 2 \u002B 5) and include all steel of the unit. the check script reports the model steel as a share of the p.42 figure."
+        ],
+        "LineItems": [
+          {
+            "Name": "Left curb \u002B parapet",
+            "Kind": "Concrete",
+            "Category": "WalkwayPlate",
+            "Transverse": false,
+            "ReferenceOffset": -11.6586,
+            "Station": 0,
+            "From": 20076.072624000004,
+            "To": 20273.125824000002,
+            "Side": -1,
+            "Profile": [
+              {
+                "U": 0,
+                "V": 0
+              },
+              {
+                "U": 0,
+                "V": 0.2286
+              },
+              {
+                "U": 0.6095999999999999,
+                "V": 0.23495
+              },
+              {
+                "U": 0.6095999999999999,
+                "V": 0.76835
+              },
+              {
+                "U": 0.8635999999999999,
+                "V": 0.76835
+              },
+              {
+                "U": 0.8635999999999999,
+                "V": -0.008995833333333333
+              }
+            ],
+            "FromGrade": true,
+            "Material": "Class A concrete",
+            "NominalWeightLbPerFt": 0,
+            "Density": 0,
+            "Assembly": "DECK-ITEMS",
+            "AssemblyDescription": "",
+            "Unresolved": "UNRESOLVED (p.107, p.108): curb \u002B parapet details - the 3/4 in radius at the curb face, the chamfers, the drainage openings in the curb (2\u0027-2 / 2\u0027-0 alternating, size not read), scoring and the openings at the expansion dams are drawn without all dimensions. one solid section (curb 2\u0027-0 x 9 in, curb top \u002B1/4 in, wall 10 in x 1\u0027-9 above the curb top) continuous over the deck length.",
+            "Source": "p.107 Section A / B"
+          },
+          {
+            "Name": "Right curb \u002B parapet",
+            "Kind": "Concrete",
+            "Category": "WalkwayPlate",
+            "Transverse": false,
+            "ReferenceOffset": 11.6586,
+            "Station": 0,
+            "From": 20076.072624000004,
+            "To": 20273.125824000002,
+            "Side": 1,
+            "Profile": [
+              {
+                "U": 0,
+                "V": 0
+              },
+              {
+                "U": 0,
+                "V": 0.2286
+              },
+              {
+                "U": 0.6095999999999999,
+                "V": 0.23495
+              },
+              {
+                "U": 0.6095999999999999,
+                "V": 0.76835
+              },
+              {
+                "U": 0.8635999999999999,
+                "V": 0.76835
+              },
+              {
+                "U": 0.8635999999999999,
+                "V": -0.008995833333333333
+              }
+            ],
+            "FromGrade": true,
+            "Material": "Class A concrete",
+            "NominalWeightLbPerFt": 0,
+            "Density": 0,
+            "Assembly": "DECK-ITEMS",
+            "AssemblyDescription": "",
+            "Unresolved": "UNRESOLVED (p.107, p.108): curb \u002B parapet details - the 3/4 in radius at the curb face, the chamfers, the drainage openings in the curb (2\u0027-2 / 2\u0027-0 alternating, size not read), scoring and the openings at the expansion dams are drawn without all dimensions. one solid section (curb 2\u0027-0 x 9 in, curb top \u002B1/4 in, wall 10 in x 1\u0027-9 above the curb top) continuous over the deck length.",
+            "Source": "p.107 Section A / B"
+          },
+          {
+            "Name": "dam Pier 13",
+            "Kind": "Steel",
+            "Category": "JointArmor",
+            "Transverse": true,
+            "ReferenceOffset": 0,
+            "Station": 20273.735424000002,
+            "From": -11.6586,
+            "To": 11.6586,
+            "Side": 1,
+            "Profile": [
+              {
+                "U": -0.3302,
+                "V": -0.07619999999999999
+              },
+              {
+                "U": 0.3302,
+                "V": -0.07619999999999999
+              },
+              {
+                "U": 0.3302,
+                "V": 0
+              },
+              {
+                "U": -0.3302,
+                "V": 0
+              }
+            ],
+            "FromGrade": true,
+            "Material": "C",
+            "NominalWeightLbPerFt": 0,
+            "Density": 0,
+            "Assembly": "DAM-DAM-PIER-13",
+            "AssemblyDescription": "finger expansion dam dam Pier 13 (p.68)",
+            "Unresolved": "UNRESOLVED (p.68): finger dam at dam Pier 13: teeth, edge channels, stringer supports, anchor bars and the curb / parapet ends - the finger plates are drawn with their teeth (61 \u002B 47 teeth @ 4 1/4 in across the half roadway) and the movement tables; the tooth outline, the plate anchorage and the dam stringers are not all dimensioned. one steel band 26 in wide (total dam width at 68 F) x 3 in, top flush with the grade, 38\u0027-3 each side of the CL (curb to curb).",
+            "Source": "p.68"
+          },
+          {
+            "Name": "walkway CL",
+            "Kind": "Steel",
+            "Category": "Grating",
+            "Transverse": false,
+            "ReferenceOffset": 0,
+            "Station": 0,
+            "From": 20076.072624000004,
+            "To": 20273.125824000002,
+            "Side": 1,
+            "Profile": [
+              {
+                "U": -0.3048,
+                "V": -2.845804626670746
+              },
+              {
+                "U": 0.3048,
+                "V": -2.845804626670746
+              },
+              {
+                "U": 0.3048,
+                "V": -2.826754626670746
+              },
+              {
+                "U": -0.3048,
+                "V": -2.826754626670746
+              }
+            ],
+            "FromGrade": true,
+            "Material": "Galvanized steel grating",
+            "NominalWeightLbPerFt": 0,
+            "Density": 1794.0678992125986,
+            "Assembly": "WALKWAYS",
+            "AssemblyDescription": "PTC 3-span truss 11-13 - service walkways (p.101)",
+            "Unresolved": "UNRESOLVED (p.101): walkway level, lateral position and the openings in the floor beams - the walkway runs at the bottom flange of the floor beams through the manholes of the floor beam webs (drawn, not dimensioned); its line is drawn near the CL bridge. grating bottom 1 in above the floor beam bottom (on the bottom flange angles), longitudinal walkway centred on the CL bridge; the floor beam webs are not cut for the manholes, walk angles / hangers (L 4x4x3/8) / hand railing / ladders not built. UNRESOLVED (p.101): grating weight - the sheet names the grating (3/4 x 3/16 bearing bars, Irving X-Bar type AA) but prints no weight. 7 lb/sq ft (catalogue value for the type, not from the plans).",
+            "Source": "p.101"
+          },
+          {
+            "Name": "walkway at FB8",
+            "Kind": "Steel",
+            "Category": "Grating",
+            "Transverse": true,
+            "ReferenceOffset": 0,
+            "Station": 20142.35392399997,
+            "From": -8.1026,
+            "To": 8.1026,
+            "Side": 1,
+            "Profile": [
+              {
+                "U": -0.3048,
+                "V": 27.114246000000005
+              },
+              {
+                "U": 0.3048,
+                "V": 27.114246000000005
+              },
+              {
+                "U": 0.3048,
+                "V": 27.133296000000005
+              },
+              {
+                "U": -0.3048,
+                "V": 27.133296000000005
+              }
+            ],
+            "FromGrade": false,
+            "Material": "Galvanized steel grating",
+            "NominalWeightLbPerFt": 0,
+            "Density": 1794.0678992125986,
+            "Assembly": "WALKWAYS",
+            "AssemblyDescription": "PTC 3-span truss 11-13 - service walkways (p.101)",
+            "Unresolved": "UNRESOLVED (p.101): cross walkway beside the pier floor beam - the key plan shows a cross walkway at the pier floor beams 53\u0027-2 long between the walkway ends at the trusses; its side of the floor beam and its level are drawn only. 2\u0027-0 grating beside the floor beam (centre 1\u0027-2 from the web face), level with the floor beam bottom flange; supports from the top chord not built. UNRESOLVED (p.101): grating weight - the sheet names the grating (3/4 x 3/16 bearing bars, Irving X-Bar type AA) but prints no weight. 7 lb/sq ft (catalogue value for the type, not from the plans).",
+            "Source": "p.101"
+          },
+          {
+            "Name": "walkway at FB8\u0027",
+            "Kind": "Steel",
+            "Category": "Grating",
+            "Transverse": true,
+            "ReferenceOffset": 0,
+            "Station": 20208.038323999972,
+            "From": -8.1026,
+            "To": 8.1026,
+            "Side": 1,
+            "Profile": [
+              {
+                "U": -0.3048,
+                "V": 29.084778000000004
+              },
+              {
+                "U": 0.3048,
+                "V": 29.084778000000004
+              },
+              {
+                "U": 0.3048,
+                "V": 29.103828000000004
+              },
+              {
+                "U": -0.3048,
+                "V": 29.103828000000004
+              }
+            ],
+            "FromGrade": false,
+            "Material": "Galvanized steel grating",
+            "NominalWeightLbPerFt": 0,
+            "Density": 1794.0678992125986,
+            "Assembly": "WALKWAYS",
+            "AssemblyDescription": "PTC 3-span truss 11-13 - service walkways (p.101)",
+            "Unresolved": "UNRESOLVED (p.101): cross walkway beside the pier floor beam - the key plan shows a cross walkway at the pier floor beams 53\u0027-2 long between the walkway ends at the trusses; its side of the floor beam and its level are drawn only. 2\u0027-0 grating beside the floor beam (centre 1\u0027-2 from the web face), level with the floor beam bottom flange; supports from the top chord not built. UNRESOLVED (p.101): grating weight - the sheet names the grating (3/4 x 3/16 bearing bars, Irving X-Bar type AA) but prints no weight. 7 lb/sq ft (catalogue value for the type, not from the plans).",
+            "Source": "p.101"
+          },
+          {
+            "Name": "walkway at FB0",
+            "Kind": "Steel",
+            "Category": "Grating",
+            "Transverse": true,
+            "ReferenceOffset": 0,
+            "Station": 20076.66952399997,
+            "From": -8.1026,
+            "To": 8.1026,
+            "Side": 1,
+            "Profile": [
+              {
+                "U": -0.3048,
+                "V": 25.143714000000006
+              },
+              {
+                "U": 0.3048,
+                "V": 25.143714000000006
+              },
+              {
+                "U": 0.3048,
+                "V": 25.162764000000006
+              },
+              {
+                "U": -0.3048,
+                "V": 25.162764000000006
+              }
+            ],
+            "FromGrade": false,
+            "Material": "Galvanized steel grating",
+            "NominalWeightLbPerFt": 0,
+            "Density": 1794.0678992125986,
+            "Assembly": "WALKWAYS",
+            "AssemblyDescription": "PTC 3-span truss 11-13 - service walkways (p.101)",
+            "Unresolved": "UNRESOLVED (p.101): cross walkway beside the pier floor beam - the key plan shows a cross walkway at the pier floor beams 53\u0027-2 long between the walkway ends at the trusses; its side of the floor beam and its level are drawn only. 2\u0027-0 grating beside the floor beam (centre 1\u0027-2 from the web face), level with the floor beam bottom flange; supports from the top chord not built. UNRESOLVED (p.101): grating weight - the sheet names the grating (3/4 x 3/16 bearing bars, Irving X-Bar type AA) but prints no weight. 7 lb/sq ft (catalogue value for the type, not from the plans).",
+            "Source": "p.101"
+          }
         ]
-      }
+      },
+      "Railings": [
+        {
+          "Name": "Left parapet railing",
+          "TypeName": "PTC aluminum parapet railing (p.107 / p.108)",
+          "Kind": "Guardrail",
+          "Offset": -12.395199999999999,
+          "BeginStation": 20076.072624000004,
+          "EndStation": 20273.125824000002,
+          "BaseProbe": 0,
+          "Material": "Aluminum (rail ASTM B235 GS10A-T6, posts B108 356-T6)",
+          "Density": 2700,
+          "SampleStep": 0.3048,
+          "Post": {
+            "Profile": [
+              {
+                "R": -0.127,
+                "H": 0
+              },
+              {
+                "R": 0.127,
+                "H": 0
+              },
+              {
+                "R": 0.07619999999999999,
+                "H": 0.3857625
+              },
+              {
+                "R": -0.07619999999999999,
+                "H": 0.3857625
+              }
+            ],
+            "Thickness": 0.17779999999999999,
+            "Spacing": 1.74625,
+            "EndDistance": 0.358775,
+            "Description": "cast aluminum post 10 x 7 at the base, 6 in at the top",
+            "Unresolved": "UNRESOLVED (p.107, p.108): post layout and shape - the posts are laid out per railing panel (31\u0027-0 / 30\u0027-5 3/4 panels: 5 spaces with 1\u0027-2 1/8 to the joints, special panels on p.108) and the cast post is hollow with a 3/8 web. solid tapered post 10 in -\u003E 6 in x 7 in, equally spaced at most 5\u0027-8 3/4 over each bridge run, 1\u0027-2 1/8 from its ends; anchor bolts and pads not built."
+          },
+          "Members": [
+            {
+              "Name": "oval rail",
+              "Kind": "Rail",
+              "Diameter": 0,
+              "Width": 0.2032,
+              "Height": 0.142875,
+              "Center": {
+                "R": 0,
+                "H": 0.3857625
+              },
+              "Description": "oval aluminum tube 8 x 5 5/8 x 3/16",
+              "MassPerLength": 7,
+              "Unresolved": "UNRESOLVED (p.108): rail section - the oval tube is 8 in \u002B- x 5 5/8 in \u002B- with a 3/16 wall. rectangular envelope 8 x 5 5/8, mass of the tube (about 4.7 lb/ft)"
+            }
+          ],
+          "FlagsDimensionOnly": true,
+          "Source": "p.107 / p.108",
+          "Unresolved": []
+        },
+        {
+          "Name": "Right parapet railing",
+          "TypeName": "PTC aluminum parapet railing (p.107 / p.108)",
+          "Kind": "Guardrail",
+          "Offset": 12.395199999999999,
+          "BeginStation": 20076.072624000004,
+          "EndStation": 20273.125824000002,
+          "BaseProbe": 0,
+          "Material": "Aluminum (rail ASTM B235 GS10A-T6, posts B108 356-T6)",
+          "Density": 2700,
+          "SampleStep": 0.3048,
+          "Post": {
+            "Profile": [
+              {
+                "R": -0.127,
+                "H": 0
+              },
+              {
+                "R": 0.127,
+                "H": 0
+              },
+              {
+                "R": 0.07619999999999999,
+                "H": 0.3857625
+              },
+              {
+                "R": -0.07619999999999999,
+                "H": 0.3857625
+              }
+            ],
+            "Thickness": 0.17779999999999999,
+            "Spacing": 1.74625,
+            "EndDistance": 0.358775,
+            "Description": "cast aluminum post 10 x 7 at the base, 6 in at the top",
+            "Unresolved": "UNRESOLVED (p.107, p.108): post layout and shape - the posts are laid out per railing panel (31\u0027-0 / 30\u0027-5 3/4 panels: 5 spaces with 1\u0027-2 1/8 to the joints, special panels on p.108) and the cast post is hollow with a 3/8 web. solid tapered post 10 in -\u003E 6 in x 7 in, equally spaced at most 5\u0027-8 3/4 over each bridge run, 1\u0027-2 1/8 from its ends; anchor bolts and pads not built."
+          },
+          "Members": [
+            {
+              "Name": "oval rail",
+              "Kind": "Rail",
+              "Diameter": 0,
+              "Width": 0.2032,
+              "Height": 0.142875,
+              "Center": {
+                "R": 0,
+                "H": 0.3857625
+              },
+              "Description": "oval aluminum tube 8 x 5 5/8 x 3/16",
+              "MassPerLength": 7,
+              "Unresolved": "UNRESOLVED (p.108): rail section - the oval tube is 8 in \u002B- x 5 5/8 in \u002B- with a 3/16 wall. rectangular envelope 8 x 5 5/8, mass of the tube (about 4.7 lb/ft)"
+            }
+          ],
+          "FlagsDimensionOnly": true,
+          "Source": "p.107 / p.108",
+          "Unresolved": []
+        }
+      ]
     },
     {
       "Name": "PTC 4-span truss 14-17",
@@ -33189,7 +34165,7 @@
         "StayInPlaceForms": true,
         "SipFormDepth": 0.0508,
         "Barrier": {
-          "Type": "TxDotSstr",
+          "Type": "Custom",
           "Reinforcement": true,
           "EpoxyCoated": true,
           "StirrupSpacing": 0.15239999999999998,
@@ -33197,7 +34173,8 @@
           "BaseWidth": 0.4064,
           "TopWidth": 0.15239999999999998,
           "Left": false,
-          "Right": false
+          "Right": false,
+          "ProfileName": "PTC curb \u002B parapet wall (p.107)"
         },
         "Reinforcement": {
           "Enabled": false,
@@ -48100,13 +49077,16 @@
           "StringerEndClearance": 0,
           "Deck": {
             "Thickness": 0.17145,
-            "LeftOffset": -11.6586,
-            "RightOffset": 11.6586,
+            "LeftOffset": -12.5222,
+            "RightOffset": 12.5222,
             "BeginStation": 20274.345024000002,
             "EndStation": 20602.767024,
             "ConcreteStrengthKsi": 3,
-            "Unresolved": "UNRESOLVED (p.107, p.54, p.68): slab thickness (6 3/4 on p.107, \u00276 1/4\u0027 read at low confidence on p.55), haunch over the stringers, curbs / parapets, railing, pavement breaks and the expansion dams at the unit ends - p.107 gives 6 3/4 three times; the haunch and parapets belong to the deck / parapet work and the dam sheets p.54 / p.68 are not modeled yet. 6 3/4 slab between the curb lines (76\u0027-6), joint 0 to joint 0\u0027.",
-            "Source": "p.107"
+            "Unresolved": "UNRESOLVED (p.107, p.55): slab edge under the parapet and the haunch depth - Section A prints 7 3/4 / 7 7/8 at the curb and the 1 in thickening (7 3/4 - 6 3/4) is derived, not printed; the slab edge under the wall is drawn with a 4 1/4 in drop not dimensioned. 6 3/4 slab (crown 1/8 in per ft) from outside face to outside face of the parapets (82\u0027-2), 1 in x 1\u0027-5 thickening with 12:12 sides under every stringer line; CL key joint / pipe sockets / drip grooves not built.",
+            "Source": "p.107 (half cross section, Section A)",
+            "HaunchDepth": 0.0254,
+            "HaunchBottomWidth": 0.4318,
+            "HaunchSideSlope": 1
           },
           "Unresolved": "UNRESOLVED (p.55, p.107, p.48): stringer bearings (variable bearing plates, sliding \u0027S\u0027 / fixed \u0027F\u0027 bearings), diaphragms 15 C 33.9, splices and which mark lies on which line - the printed stringer-to-slab dimension is 7 3/4 (p.107) and the floor beam top is level 2\u0027-8 3/4 under the gutter line (p.55): the bearing plate between them varies 1.1 - 5.9 in. across the crown (\u0022thicknesses ... shall be adjusted\u0022, p.55) and is not dimensioned; the half plan names S5-S8 but not their lines. stringer tops 7 3/4 under the finished grade (p.107), continuous over the floor beams, one straight piece per bay; the gap above each floor beam is NOT filled.",
           "Source": "p.58 / p.107"
@@ -48380,8 +49360,362 @@
           "UNRESOLVED (p.59-67): gusset thickness of joint L5\u0027 - the joint sheet was not read for this joint (not printed or not extracted). 3/4 in. built, flagged.",
           "UNRESOLVED (p.59-67): L8 / L0 second gusset pairs (7/8 \u002B 3/4 outer / inner at L8 of the 3-span unit; 3/4 \u002B 1/2 at L0 of both units), fills, splice plates, lug angles, diaphragms, stitch rivets - listed per joint without extents. only one gusset pair per joint (the outer / first listed) is built; fills and splices not built.",
           "UNRESOLVED (p.59-67): plan weight check (p.42): floor steel, bracing, shoes, expansion dams, splices and fills are in the p.42 totals - the totals are per unit (carbon \u002B silicon, items 2 \u002B 5) and include all steel of the unit. the check script reports the model steel as a share of the p.42 figure."
+        ],
+        "LineItems": [
+          {
+            "Name": "Left curb \u002B parapet",
+            "Kind": "Concrete",
+            "Category": "WalkwayPlate",
+            "Transverse": false,
+            "ReferenceOffset": -11.6586,
+            "Station": 0,
+            "From": 20274.345024000002,
+            "To": 20602.767024,
+            "Side": -1,
+            "Profile": [
+              {
+                "U": 0,
+                "V": 0
+              },
+              {
+                "U": 0,
+                "V": 0.2286
+              },
+              {
+                "U": 0.6095999999999999,
+                "V": 0.23495
+              },
+              {
+                "U": 0.6095999999999999,
+                "V": 0.76835
+              },
+              {
+                "U": 0.8635999999999999,
+                "V": 0.76835
+              },
+              {
+                "U": 0.8635999999999999,
+                "V": -0.008995833333333333
+              }
+            ],
+            "FromGrade": true,
+            "Material": "Class A concrete",
+            "NominalWeightLbPerFt": 0,
+            "Density": 0,
+            "Assembly": "DECK-ITEMS",
+            "AssemblyDescription": "",
+            "Unresolved": "UNRESOLVED (p.107, p.108): curb \u002B parapet details - the 3/4 in radius at the curb face, the chamfers, the drainage openings in the curb (2\u0027-2 / 2\u0027-0 alternating, size not read), scoring and the openings at the expansion dams are drawn without all dimensions. one solid section (curb 2\u0027-0 x 9 in, curb top \u002B1/4 in, wall 10 in x 1\u0027-9 above the curb top) continuous over the deck length.",
+            "Source": "p.107 Section A / B"
+          },
+          {
+            "Name": "Right curb \u002B parapet",
+            "Kind": "Concrete",
+            "Category": "WalkwayPlate",
+            "Transverse": false,
+            "ReferenceOffset": 11.6586,
+            "Station": 0,
+            "From": 20274.345024000002,
+            "To": 20602.767024,
+            "Side": 1,
+            "Profile": [
+              {
+                "U": 0,
+                "V": 0
+              },
+              {
+                "U": 0,
+                "V": 0.2286
+              },
+              {
+                "U": 0.6095999999999999,
+                "V": 0.23495
+              },
+              {
+                "U": 0.6095999999999999,
+                "V": 0.76835
+              },
+              {
+                "U": 0.8635999999999999,
+                "V": 0.76835
+              },
+              {
+                "U": 0.8635999999999999,
+                "V": -0.008995833333333333
+              }
+            ],
+            "FromGrade": true,
+            "Material": "Class A concrete",
+            "NominalWeightLbPerFt": 0,
+            "Density": 0,
+            "Assembly": "DECK-ITEMS",
+            "AssemblyDescription": "",
+            "Unresolved": "UNRESOLVED (p.107, p.108): curb \u002B parapet details - the 3/4 in radius at the curb face, the chamfers, the drainage openings in the curb (2\u0027-2 / 2\u0027-0 alternating, size not read), scoring and the openings at the expansion dams are drawn without all dimensions. one solid section (curb 2\u0027-0 x 9 in, curb top \u002B1/4 in, wall 10 in x 1\u0027-9 above the curb top) continuous over the deck length.",
+            "Source": "p.107 Section A / B"
+          },
+          {
+            "Name": "dam Pier 17",
+            "Kind": "Steel",
+            "Category": "JointArmor",
+            "Transverse": true,
+            "ReferenceOffset": 0,
+            "Station": 20603.376624000004,
+            "From": -11.6586,
+            "To": 11.6586,
+            "Side": 1,
+            "Profile": [
+              {
+                "U": -0.3302,
+                "V": -0.07619999999999999
+              },
+              {
+                "U": 0.3302,
+                "V": -0.07619999999999999
+              },
+              {
+                "U": 0.3302,
+                "V": 0
+              },
+              {
+                "U": -0.3302,
+                "V": 0
+              }
+            ],
+            "FromGrade": true,
+            "Material": "C",
+            "NominalWeightLbPerFt": 0,
+            "Density": 0,
+            "Assembly": "DAM-DAM-PIER-17",
+            "AssemblyDescription": "finger expansion dam dam Pier 17 (p.68)",
+            "Unresolved": "UNRESOLVED (p.68): finger dam at dam Pier 17: teeth, edge channels, stringer supports, anchor bars and the curb / parapet ends - the finger plates are drawn with their teeth (61 \u002B 47 teeth @ 4 1/4 in across the half roadway) and the movement tables; the tooth outline, the plate anchorage and the dam stringers are not all dimensioned. one steel band 26 in wide (total dam width at 68 F) x 3 in, top flush with the grade, 38\u0027-3 each side of the CL (curb to curb).",
+            "Source": "p.68"
+          },
+          {
+            "Name": "walkway CL",
+            "Kind": "Steel",
+            "Category": "Grating",
+            "Transverse": false,
+            "ReferenceOffset": 0,
+            "Station": 0,
+            "From": 20274.345024000002,
+            "To": 20602.767024,
+            "Side": 1,
+            "Profile": [
+              {
+                "U": -0.3048,
+                "V": -2.8457370641271686
+              },
+              {
+                "U": 0.3048,
+                "V": -2.8457370641271686
+              },
+              {
+                "U": 0.3048,
+                "V": -2.8266870641271686
+              },
+              {
+                "U": -0.3048,
+                "V": -2.8266870641271686
+              }
+            ],
+            "FromGrade": true,
+            "Material": "Galvanized steel grating",
+            "NominalWeightLbPerFt": 0,
+            "Density": 1794.0678992125986,
+            "Assembly": "WALKWAYS",
+            "AssemblyDescription": "PTC 4-span truss 14-17 - service walkways (p.101)",
+            "Unresolved": "UNRESOLVED (p.101): walkway level, lateral position and the openings in the floor beams - the walkway runs at the bottom flange of the floor beams through the manholes of the floor beam webs (drawn, not dimensioned); its line is drawn near the CL bridge. grating bottom 1 in above the floor beam bottom (on the bottom flange angles), longitudinal walkway centred on the CL bridge; the floor beam webs are not cut for the manholes, walk angles / hangers (L 4x4x3/8) / hand railing / ladders not built. UNRESOLVED (p.101): grating weight - the sheet names the grating (3/4 x 3/16 bearing bars, Irving X-Bar type AA) but prints no weight. 7 lb/sq ft (catalogue value for the type, not from the plans).",
+            "Source": "p.101"
+          },
+          {
+            "Name": "walkway at FB10",
+            "Kind": "Steel",
+            "Category": "Grating",
+            "Transverse": true,
+            "ReferenceOffset": 0,
+            "Station": 20357.047424000026,
+            "From": -8.1026,
+            "To": 8.1026,
+            "Side": 1,
+            "Profile": [
+              {
+                "U": -0.3048,
+                "V": 33.555051
+              },
+              {
+                "U": 0.3048,
+                "V": 33.555051
+              },
+              {
+                "U": 0.3048,
+                "V": 33.574101
+              },
+              {
+                "U": -0.3048,
+                "V": 33.574101
+              }
+            ],
+            "FromGrade": false,
+            "Material": "Galvanized steel grating",
+            "NominalWeightLbPerFt": 0,
+            "Density": 1794.0678992125986,
+            "Assembly": "WALKWAYS",
+            "AssemblyDescription": "PTC 4-span truss 14-17 - service walkways (p.101)",
+            "Unresolved": "UNRESOLVED (p.101): cross walkway beside the pier floor beam - the key plan shows a cross walkway at the pier floor beams 53\u0027-2 long between the walkway ends at the trusses; its side of the floor beam and its level are drawn only. 2\u0027-0 grating beside the floor beam (centre 1\u0027-2 from the web face), level with the floor beam bottom flange; supports from the top chord not built. UNRESOLVED (p.101): grating weight - the sheet names the grating (3/4 x 3/16 bearing bars, Irving X-Bar type AA) but prints no weight. 7 lb/sq ft (catalogue value for the type, not from the plans).",
+            "Source": "p.101"
+          },
+          {
+            "Name": "walkway at FB10\u0027",
+            "Kind": "Steel",
+            "Category": "Grating",
+            "Transverse": true,
+            "ReferenceOffset": 0,
+            "Station": 20521.258423999974,
+            "From": -8.1026,
+            "To": 8.1026,
+            "Side": 1,
+            "Profile": [
+              {
+                "U": -0.3048,
+                "V": 38.481381
+              },
+              {
+                "U": 0.3048,
+                "V": 38.481381
+              },
+              {
+                "U": 0.3048,
+                "V": 38.500431
+              },
+              {
+                "U": -0.3048,
+                "V": 38.500431
+              }
+            ],
+            "FromGrade": false,
+            "Material": "Galvanized steel grating",
+            "NominalWeightLbPerFt": 0,
+            "Density": 1794.0678992125986,
+            "Assembly": "WALKWAYS",
+            "AssemblyDescription": "PTC 4-span truss 14-17 - service walkways (p.101)",
+            "Unresolved": "UNRESOLVED (p.101): cross walkway beside the pier floor beam - the key plan shows a cross walkway at the pier floor beams 53\u0027-2 long between the walkway ends at the trusses; its side of the floor beam and its level are drawn only. 2\u0027-0 grating beside the floor beam (centre 1\u0027-2 from the web face), level with the floor beam bottom flange; supports from the top chord not built. UNRESOLVED (p.101): grating weight - the sheet names the grating (3/4 x 3/16 bearing bars, Irving X-Bar type AA) but prints no weight. 7 lb/sq ft (catalogue value for the type, not from the plans).",
+            "Source": "p.101"
+          }
         ]
-      }
+      },
+      "Railings": [
+        {
+          "Name": "Left parapet railing",
+          "TypeName": "PTC aluminum parapet railing (p.107 / p.108)",
+          "Kind": "Guardrail",
+          "Offset": -12.395199999999999,
+          "BeginStation": 20274.345024000002,
+          "EndStation": 20602.767024,
+          "BaseProbe": 0,
+          "Material": "Aluminum (rail ASTM B235 GS10A-T6, posts B108 356-T6)",
+          "Density": 2700,
+          "SampleStep": 0.3048,
+          "Post": {
+            "Profile": [
+              {
+                "R": -0.127,
+                "H": 0
+              },
+              {
+                "R": 0.127,
+                "H": 0
+              },
+              {
+                "R": 0.07619999999999999,
+                "H": 0.3857625
+              },
+              {
+                "R": -0.07619999999999999,
+                "H": 0.3857625
+              }
+            ],
+            "Thickness": 0.17779999999999999,
+            "Spacing": 1.74625,
+            "EndDistance": 0.358775,
+            "Description": "cast aluminum post 10 x 7 at the base, 6 in at the top",
+            "Unresolved": "UNRESOLVED (p.107, p.108): post layout and shape - the posts are laid out per railing panel (31\u0027-0 / 30\u0027-5 3/4 panels: 5 spaces with 1\u0027-2 1/8 to the joints, special panels on p.108) and the cast post is hollow with a 3/8 web. solid tapered post 10 in -\u003E 6 in x 7 in, equally spaced at most 5\u0027-8 3/4 over each bridge run, 1\u0027-2 1/8 from its ends; anchor bolts and pads not built."
+          },
+          "Members": [
+            {
+              "Name": "oval rail",
+              "Kind": "Rail",
+              "Diameter": 0,
+              "Width": 0.2032,
+              "Height": 0.142875,
+              "Center": {
+                "R": 0,
+                "H": 0.3857625
+              },
+              "Description": "oval aluminum tube 8 x 5 5/8 x 3/16",
+              "MassPerLength": 7,
+              "Unresolved": "UNRESOLVED (p.108): rail section - the oval tube is 8 in \u002B- x 5 5/8 in \u002B- with a 3/16 wall. rectangular envelope 8 x 5 5/8, mass of the tube (about 4.7 lb/ft)"
+            }
+          ],
+          "FlagsDimensionOnly": true,
+          "Source": "p.107 / p.108",
+          "Unresolved": []
+        },
+        {
+          "Name": "Right parapet railing",
+          "TypeName": "PTC aluminum parapet railing (p.107 / p.108)",
+          "Kind": "Guardrail",
+          "Offset": 12.395199999999999,
+          "BeginStation": 20274.345024000002,
+          "EndStation": 20602.767024,
+          "BaseProbe": 0,
+          "Material": "Aluminum (rail ASTM B235 GS10A-T6, posts B108 356-T6)",
+          "Density": 2700,
+          "SampleStep": 0.3048,
+          "Post": {
+            "Profile": [
+              {
+                "R": -0.127,
+                "H": 0
+              },
+              {
+                "R": 0.127,
+                "H": 0
+              },
+              {
+                "R": 0.07619999999999999,
+                "H": 0.3857625
+              },
+              {
+                "R": -0.07619999999999999,
+                "H": 0.3857625
+              }
+            ],
+            "Thickness": 0.17779999999999999,
+            "Spacing": 1.74625,
+            "EndDistance": 0.358775,
+            "Description": "cast aluminum post 10 x 7 at the base, 6 in at the top",
+            "Unresolved": "UNRESOLVED (p.107, p.108): post layout and shape - the posts are laid out per railing panel (31\u0027-0 / 30\u0027-5 3/4 panels: 5 spaces with 1\u0027-2 1/8 to the joints, special panels on p.108) and the cast post is hollow with a 3/8 web. solid tapered post 10 in -\u003E 6 in x 7 in, equally spaced at most 5\u0027-8 3/4 over each bridge run, 1\u0027-2 1/8 from its ends; anchor bolts and pads not built."
+          },
+          "Members": [
+            {
+              "Name": "oval rail",
+              "Kind": "Rail",
+              "Diameter": 0,
+              "Width": 0.2032,
+              "Height": 0.142875,
+              "Center": {
+                "R": 0,
+                "H": 0.3857625
+              },
+              "Description": "oval aluminum tube 8 x 5 5/8 x 3/16",
+              "MassPerLength": 7,
+              "Unresolved": "UNRESOLVED (p.108): rail section - the oval tube is 8 in \u002B- x 5 5/8 in \u002B- with a 3/16 wall. rectangular envelope 8 x 5 5/8, mass of the tube (about 4.7 lb/ft)"
+            }
+          ],
+          "FlagsDimensionOnly": true,
+          "Source": "p.107 / p.108",
+          "Unresolved": []
+        }
+      ]
     },
     {
       "Name": "PTC Arch truss 18-20",
@@ -63407,7 +64741,7 @@
         "StayInPlaceForms": true,
         "SipFormDepth": 0.0508,
         "Barrier": {
-          "Type": "TxDotSstr",
+          "Type": "Custom",
           "Reinforcement": true,
           "EpoxyCoated": true,
           "StirrupSpacing": 0.15239999999999998,
@@ -63415,7 +64749,8 @@
           "BaseWidth": 0.4064,
           "TopWidth": 0.15239999999999998,
           "Left": false,
-          "Right": false
+          "Right": false,
+          "ProfileName": "PTC curb \u002B parapet wall (p.107)"
         },
         "Reinforcement": {
           "Enabled": false,
@@ -82549,14 +83884,17 @@
           "StringersOnTop": true,
           "StringerEndClearance": 0,
           "Deck": {
-            "Thickness": 0.19685,
-            "LeftOffset": -11.6586,
-            "RightOffset": 11.6586,
+            "Thickness": 0.17145,
+            "LeftOffset": -12.5222,
+            "RightOffset": 12.5222,
             "BeginStation": 20603.986224000004,
             "EndStation": 21019.733424000005,
             "ConcreteStrengthKsi": 3,
-            "Unresolved": "UNRESOLVED (p.107, p.91-92): deck slab beyond the curb lines, curbs, parapets and the expansion dams at L0 / W22 / L0\u0027 - the parapet / curb sheets (p.107-108) and the dam sheets (p.91-92) are not modeled yet. 7 3/4 slab between the curb lines (76\u0027-6), continuous from L0 to L0\u0027.",
-            "Source": "p.94 / p.107"
+            "Unresolved": "UNRESOLVED (p.107, p.55): slab edge under the parapet and the haunch depth - Section A prints 7 3/4 / 7 7/8 at the curb and the 1 in thickening (7 3/4 - 6 3/4) is derived, not printed; the slab edge under the wall is drawn with a 4 1/4 in drop not dimensioned. 6 3/4 slab (crown 1/8 in per ft) from outside face to outside face of the parapets (82\u0027-2), 1 in x 1\u0027-5 thickening with 12:12 sides under every stringer line; CL key joint / pipe sockets / drip grooves not built.",
+            "Source": "p.107 (half cross section, Section A)",
+            "HaunchDepth": 0.0254,
+            "HaunchBottomWidth": 0.4318,
+            "HaunchSideSlope": 1
           },
           "Unresolved": "UNRESOLVED (p.94): stringer bearings (Section D) and diaphragms 15[ 33.9 - the bearing heights per line are not decoded and the diaphragms are only located (midway between floor beams). stringers continuous over the floor beams, top = finished grade - 7 3/4 slab; one straight piece per bay; bearings / diaphragms not built.",
           "Source": "p.72 / p.94"
@@ -83377,8 +84715,436 @@
           "UNRESOLVED (p.69, p.70): perforated cover plates (manholes 12 x 20 / 11 1/2 x 20 at 3\u0027-6 or 4\u0027-0) - spacing printed as approximate. covers built solid (weight overstated by the manholes).",
           "UNRESOLVED (p.69, p.74): order of the web plies of the chords - the sections list the plies without their order; the half section L13-L17 shows inlays at the joints. plies stacked from the outside in the printed order, angles against the innermost ply deeper than their leg.",
           "UNRESOLVED (p.73): hold-down rollers and shear lock at piers 17 / 20 - detailed on p.73 but not part of this phase. not built."
+        ],
+        "LineItems": [
+          {
+            "Name": "Left curb \u002B parapet",
+            "Kind": "Concrete",
+            "Category": "WalkwayPlate",
+            "Transverse": false,
+            "ReferenceOffset": -11.6586,
+            "Station": 0,
+            "From": 20603.986224000004,
+            "To": 21019.733424000005,
+            "Side": -1,
+            "Profile": [
+              {
+                "U": 0,
+                "V": 0
+              },
+              {
+                "U": 0,
+                "V": 0.2286
+              },
+              {
+                "U": 0.6095999999999999,
+                "V": 0.23495
+              },
+              {
+                "U": 0.6095999999999999,
+                "V": 0.76835
+              },
+              {
+                "U": 0.8635999999999999,
+                "V": 0.76835
+              },
+              {
+                "U": 0.8635999999999999,
+                "V": -0.008995833333333333
+              }
+            ],
+            "FromGrade": true,
+            "Material": "Class A concrete",
+            "NominalWeightLbPerFt": 0,
+            "Density": 0,
+            "Assembly": "DECK-ITEMS",
+            "AssemblyDescription": "",
+            "Unresolved": "UNRESOLVED (p.107, p.108): curb \u002B parapet details - the 3/4 in radius at the curb face, the chamfers, the drainage openings in the curb (2\u0027-2 / 2\u0027-0 alternating, size not read), scoring and the openings at the expansion dams are drawn without all dimensions. one solid section (curb 2\u0027-0 x 9 in, curb top \u002B1/4 in, wall 10 in x 1\u0027-9 above the curb top) continuous over the deck length.",
+            "Source": "p.107 Section A / B"
+          },
+          {
+            "Name": "Right curb \u002B parapet",
+            "Kind": "Concrete",
+            "Category": "WalkwayPlate",
+            "Transverse": false,
+            "ReferenceOffset": 11.6586,
+            "Station": 0,
+            "From": 20603.986224000004,
+            "To": 21019.733424000005,
+            "Side": 1,
+            "Profile": [
+              {
+                "U": 0,
+                "V": 0
+              },
+              {
+                "U": 0,
+                "V": 0.2286
+              },
+              {
+                "U": 0.6095999999999999,
+                "V": 0.23495
+              },
+              {
+                "U": 0.6095999999999999,
+                "V": 0.76835
+              },
+              {
+                "U": 0.8635999999999999,
+                "V": 0.76835
+              },
+              {
+                "U": 0.8635999999999999,
+                "V": -0.008995833333333333
+              }
+            ],
+            "FromGrade": true,
+            "Material": "Class A concrete",
+            "NominalWeightLbPerFt": 0,
+            "Density": 0,
+            "Assembly": "DECK-ITEMS",
+            "AssemblyDescription": "",
+            "Unresolved": "UNRESOLVED (p.107, p.108): curb \u002B parapet details - the 3/4 in radius at the curb face, the chamfers, the drainage openings in the curb (2\u0027-2 / 2\u0027-0 alternating, size not read), scoring and the openings at the expansion dams are drawn without all dimensions. one solid section (curb 2\u0027-0 x 9 in, curb top \u002B1/4 in, wall 10 in x 1\u0027-9 above the curb top) continuous over the deck length.",
+            "Source": "p.107 Section A / B"
+          },
+          {
+            "Name": "dam Pier 20",
+            "Kind": "Steel",
+            "Category": "JointArmor",
+            "Transverse": true,
+            "ReferenceOffset": 0,
+            "Station": 21020.343024,
+            "From": -11.6586,
+            "To": 11.6586,
+            "Side": 1,
+            "Profile": [
+              {
+                "U": -0.5651499999999999,
+                "V": -0.08889999999999999
+              },
+              {
+                "U": 0.5651499999999999,
+                "V": -0.08889999999999999
+              },
+              {
+                "U": 0.5651499999999999,
+                "V": 0
+              },
+              {
+                "U": -0.5651499999999999,
+                "V": 0
+              }
+            ],
+            "FromGrade": true,
+            "Material": "C",
+            "NominalWeightLbPerFt": 0,
+            "Density": 0,
+            "Assembly": "DAM-DAM-PIER-20",
+            "AssemblyDescription": "finger expansion dam dam Pier 20 (p.91)",
+            "Unresolved": "UNRESOLVED (p.91): finger dam at dam Pier 20: teeth, edge channels, stringer supports, anchor bars and the curb / parapet ends - the finger plates are drawn with their teeth (61 \u002B 47 teeth @ 4 1/4 in across the half roadway) and the movement tables; the tooth outline, the plate anchorage and the dam stringers are not all dimensioned; steel parapet corners at the dam (3/8 in plates) not built. one steel band 44.5 in wide (total dam width at 68 F) x 3.5 in, top flush with the grade, 38\u0027-3 each side of the CL (curb to curb).",
+            "Source": "p.91"
+          },
+          {
+            "Name": "dam W22",
+            "Kind": "Steel",
+            "Category": "JointArmor",
+            "Transverse": true,
+            "ReferenceOffset": 0,
+            "Station": 20811.859824000003,
+            "From": -11.6586,
+            "To": 11.6586,
+            "Side": 1,
+            "Profile": [
+              {
+                "U": -0.254,
+                "V": -0.07619999999999999
+              },
+              {
+                "U": 0.254,
+                "V": -0.07619999999999999
+              },
+              {
+                "U": 0.254,
+                "V": 0
+              },
+              {
+                "U": -0.254,
+                "V": 0
+              }
+            ],
+            "FromGrade": true,
+            "Material": "C",
+            "NominalWeightLbPerFt": 0,
+            "Density": 0,
+            "Assembly": "DAM-DAM-W22",
+            "AssemblyDescription": "finger expansion dam dam W22 (p.92)",
+            "Unresolved": "UNRESOLVED (p.92): finger dam at dam W22: teeth, edge channels, stringer supports, anchor bars and the curb / parapet ends - the finger plates are drawn with their teeth (61 \u002B 47 teeth @ 4 1/4 in across the half roadway) and the movement tables; the tooth outline, the plate anchorage and the dam stringers are not all dimensioned; the middle values of the W22 opening table are blurred (p.92). one steel band 20 in wide (total dam width at 68 F) x 3 in, top flush with the grade, 38\u0027-3 each side of the CL (curb to curb).",
+            "Source": "p.92"
+          },
+          {
+            "Name": "walkway on strut L11",
+            "Kind": "Steel",
+            "Category": "Grating",
+            "Transverse": true,
+            "ReferenceOffset": 0,
+            "Station": 20707.923023999912,
+            "From": -3.3528000000000002,
+            "To": 3.3528000000000002,
+            "Side": 1,
+            "Profile": [
+              {
+                "U": -0.3048,
+                "V": 30.4603023
+              },
+              {
+                "U": 0.3048,
+                "V": 30.4603023
+              },
+              {
+                "U": 0.3048,
+                "V": 30.4793523
+              },
+              {
+                "U": -0.3048,
+                "V": 30.4793523
+              }
+            ],
+            "FromGrade": false,
+            "Material": "Galvanized steel grating",
+            "NominalWeightLbPerFt": 0,
+            "Density": 1794.0678992125986,
+            "Assembly": "WALKWAYS",
+            "AssemblyDescription": "PTC Arch truss 18-20 - service walkways (p.103)",
+            "Unresolved": "UNRESOLVED (p.103): walkway on the bottom strut L11 - the key plan gives 22\u0027-0 x 2\u0027-0 on the strut; its fastening and the platform / ladder to the pier top are drawn without all dimensions. 2\u0027-0 grating centred on the strut top, 22\u0027-0 long; ladders, cages and the top-of-pier platform (El. 87.701) not built. UNRESOLVED (p.101): grating weight - the sheet names the grating (3/4 x 3/16 bearing bars, Irving X-Bar type AA) but prints no weight. 7 lb/sq ft (catalogue value for the type, not from the plans).",
+            "Source": "p.103"
+          },
+          {
+            "Name": "walkway at FB11",
+            "Kind": "Steel",
+            "Category": "Grating",
+            "Transverse": true,
+            "ReferenceOffset": 0,
+            "Station": 20708.532623999916,
+            "From": -8.1026,
+            "To": 8.1026,
+            "Side": 1,
+            "Profile": [
+              {
+                "U": -0.3048,
+                "V": 42.51325
+              },
+              {
+                "U": 0.3048,
+                "V": 42.51325
+              },
+              {
+                "U": 0.3048,
+                "V": 42.5323
+              },
+              {
+                "U": -0.3048,
+                "V": 42.5323
+              }
+            ],
+            "FromGrade": false,
+            "Material": "Galvanized steel grating",
+            "NominalWeightLbPerFt": 0,
+            "Density": 1794.0678992125986,
+            "Assembly": "WALKWAYS",
+            "AssemblyDescription": "PTC Arch truss 18-20 - service walkways (p.103)",
+            "Unresolved": "UNRESOLVED (p.103): walkway at the floor beam FB11 (U11-L11) - the key plan shows the walkway along the floor beam with a 1\u0027-0 stub; the walkway elevations printed (141.67 / 141.60 / 151.06) cannot be assigned. 2\u0027-0 grating beside the floor beam at its bottom flange level, 53\u0027-2 long. UNRESOLVED (p.101): grating weight - the sheet names the grating (3/4 x 3/16 bearing bars, Irving X-Bar type AA) but prints no weight. 7 lb/sq ft (catalogue value for the type, not from the plans).",
+            "Source": "p.103"
+          },
+          {
+            "Name": "walkway on strut L11\u0027",
+            "Kind": "Steel",
+            "Category": "Grating",
+            "Transverse": true,
+            "ReferenceOffset": 0,
+            "Station": 20915.79662399993,
+            "From": -3.3528000000000002,
+            "To": 3.3528000000000002,
+            "Side": 1,
+            "Profile": [
+              {
+                "U": -0.3048,
+                "V": 30.4603023
+              },
+              {
+                "U": 0.3048,
+                "V": 30.4603023
+              },
+              {
+                "U": 0.3048,
+                "V": 30.4793523
+              },
+              {
+                "U": -0.3048,
+                "V": 30.4793523
+              }
+            ],
+            "FromGrade": false,
+            "Material": "Galvanized steel grating",
+            "NominalWeightLbPerFt": 0,
+            "Density": 1794.0678992125986,
+            "Assembly": "WALKWAYS",
+            "AssemblyDescription": "PTC Arch truss 18-20 - service walkways (p.103)",
+            "Unresolved": "UNRESOLVED (p.103): walkway on the bottom strut L11\u0027 - the key plan gives 22\u0027-0 x 2\u0027-0 on the strut; its fastening and the platform / ladder to the pier top are drawn without all dimensions. 2\u0027-0 grating centred on the strut top, 22\u0027-0 long; ladders, cages and the top-of-pier platform (El. 87.701) not built. UNRESOLVED (p.101): grating weight - the sheet names the grating (3/4 x 3/16 bearing bars, Irving X-Bar type AA) but prints no weight. 7 lb/sq ft (catalogue value for the type, not from the plans).",
+            "Source": "p.103"
+          },
+          {
+            "Name": "walkway at FB11\u0027",
+            "Kind": "Steel",
+            "Category": "Grating",
+            "Transverse": true,
+            "ReferenceOffset": 0,
+            "Station": 20916.406223999933,
+            "From": -8.1026,
+            "To": 8.1026,
+            "Side": 1,
+            "Profile": [
+              {
+                "U": -0.3048,
+                "V": 42.51325
+              },
+              {
+                "U": 0.3048,
+                "V": 42.51325
+              },
+              {
+                "U": 0.3048,
+                "V": 42.5323
+              },
+              {
+                "U": -0.3048,
+                "V": 42.5323
+              }
+            ],
+            "FromGrade": false,
+            "Material": "Galvanized steel grating",
+            "NominalWeightLbPerFt": 0,
+            "Density": 1794.0678992125986,
+            "Assembly": "WALKWAYS",
+            "AssemblyDescription": "PTC Arch truss 18-20 - service walkways (p.103)",
+            "Unresolved": "UNRESOLVED (p.103): walkway at the floor beam FB11\u0027 (U11-L11) - the key plan shows the walkway along the floor beam with a 1\u0027-0 stub; the walkway elevations printed (141.67 / 141.60 / 151.06) cannot be assigned. 2\u0027-0 grating beside the floor beam at its bottom flange level, 53\u0027-2 long. UNRESOLVED (p.101): grating weight - the sheet names the grating (3/4 x 3/16 bearing bars, Irving X-Bar type AA) but prints no weight. 7 lb/sq ft (catalogue value for the type, not from the plans).",
+            "Source": "p.103"
+          }
         ]
-      }
+      },
+      "Railings": [
+        {
+          "Name": "Left parapet railing",
+          "TypeName": "PTC aluminum parapet railing (p.107 / p.108)",
+          "Kind": "Guardrail",
+          "Offset": -12.395199999999999,
+          "BeginStation": 20603.986224000004,
+          "EndStation": 21019.733424000005,
+          "BaseProbe": 0,
+          "Material": "Aluminum (rail ASTM B235 GS10A-T6, posts B108 356-T6)",
+          "Density": 2700,
+          "SampleStep": 0.3048,
+          "Post": {
+            "Profile": [
+              {
+                "R": -0.127,
+                "H": 0
+              },
+              {
+                "R": 0.127,
+                "H": 0
+              },
+              {
+                "R": 0.07619999999999999,
+                "H": 0.3857625
+              },
+              {
+                "R": -0.07619999999999999,
+                "H": 0.3857625
+              }
+            ],
+            "Thickness": 0.17779999999999999,
+            "Spacing": 1.74625,
+            "EndDistance": 0.358775,
+            "Description": "cast aluminum post 10 x 7 at the base, 6 in at the top",
+            "Unresolved": "UNRESOLVED (p.107, p.108): post layout and shape - the posts are laid out per railing panel (31\u0027-0 / 30\u0027-5 3/4 panels: 5 spaces with 1\u0027-2 1/8 to the joints, special panels on p.108) and the cast post is hollow with a 3/8 web. solid tapered post 10 in -\u003E 6 in x 7 in, equally spaced at most 5\u0027-8 3/4 over each bridge run, 1\u0027-2 1/8 from its ends; anchor bolts and pads not built."
+          },
+          "Members": [
+            {
+              "Name": "oval rail",
+              "Kind": "Rail",
+              "Diameter": 0,
+              "Width": 0.2032,
+              "Height": 0.142875,
+              "Center": {
+                "R": 0,
+                "H": 0.3857625
+              },
+              "Description": "oval aluminum tube 8 x 5 5/8 x 3/16",
+              "MassPerLength": 7,
+              "Unresolved": "UNRESOLVED (p.108): rail section - the oval tube is 8 in \u002B- x 5 5/8 in \u002B- with a 3/16 wall. rectangular envelope 8 x 5 5/8, mass of the tube (about 4.7 lb/ft)"
+            }
+          ],
+          "FlagsDimensionOnly": true,
+          "Source": "p.107 / p.108",
+          "Unresolved": []
+        },
+        {
+          "Name": "Right parapet railing",
+          "TypeName": "PTC aluminum parapet railing (p.107 / p.108)",
+          "Kind": "Guardrail",
+          "Offset": 12.395199999999999,
+          "BeginStation": 20603.986224000004,
+          "EndStation": 21019.733424000005,
+          "BaseProbe": 0,
+          "Material": "Aluminum (rail ASTM B235 GS10A-T6, posts B108 356-T6)",
+          "Density": 2700,
+          "SampleStep": 0.3048,
+          "Post": {
+            "Profile": [
+              {
+                "R": -0.127,
+                "H": 0
+              },
+              {
+                "R": 0.127,
+                "H": 0
+              },
+              {
+                "R": 0.07619999999999999,
+                "H": 0.3857625
+              },
+              {
+                "R": -0.07619999999999999,
+                "H": 0.3857625
+              }
+            ],
+            "Thickness": 0.17779999999999999,
+            "Spacing": 1.74625,
+            "EndDistance": 0.358775,
+            "Description": "cast aluminum post 10 x 7 at the base, 6 in at the top",
+            "Unresolved": "UNRESOLVED (p.107, p.108): post layout and shape - the posts are laid out per railing panel (31\u0027-0 / 30\u0027-5 3/4 panels: 5 spaces with 1\u0027-2 1/8 to the joints, special panels on p.108) and the cast post is hollow with a 3/8 web. solid tapered post 10 in -\u003E 6 in x 7 in, equally spaced at most 5\u0027-8 3/4 over each bridge run, 1\u0027-2 1/8 from its ends; anchor bolts and pads not built."
+          },
+          "Members": [
+            {
+              "Name": "oval rail",
+              "Kind": "Rail",
+              "Diameter": 0,
+              "Width": 0.2032,
+              "Height": 0.142875,
+              "Center": {
+                "R": 0,
+                "H": 0.3857625
+              },
+              "Description": "oval aluminum tube 8 x 5 5/8 x 3/16",
+              "MassPerLength": 7,
+              "Unresolved": "UNRESOLVED (p.108): rail section - the oval tube is 8 in \u002B- x 5 5/8 in \u002B- with a 3/16 wall. rectangular envelope 8 x 5 5/8, mass of the tube (about 4.7 lb/ft)"
+            }
+          ],
+          "FlagsDimensionOnly": true,
+          "Source": "p.107 / p.108",
+          "Unresolved": []
+        }
+      ]
     },
     {
       "Name": "PTC 4-span truss 21-24",
@@ -85536,7 +87302,7 @@
         "StayInPlaceForms": true,
         "SipFormDepth": 0.0508,
         "Barrier": {
-          "Type": "TxDotSstr",
+          "Type": "Custom",
           "Reinforcement": true,
           "EpoxyCoated": true,
           "StirrupSpacing": 0.15239999999999998,
@@ -85544,7 +87310,8 @@
           "BaseWidth": 0.4064,
           "TopWidth": 0.15239999999999998,
           "Left": false,
-          "Right": false
+          "Right": false,
+          "ProfileName": "PTC curb \u002B parapet wall (p.107)"
         },
         "Reinforcement": {
           "Enabled": false,
@@ -100447,13 +102214,16 @@
           "StringerEndClearance": 0,
           "Deck": {
             "Thickness": 0.17145,
-            "LeftOffset": -11.6586,
-            "RightOffset": 11.6586,
+            "LeftOffset": -12.5222,
+            "RightOffset": 12.5222,
             "BeginStation": 21020.952624000005,
             "EndStation": 21349.374624000004,
             "ConcreteStrengthKsi": 3,
-            "Unresolved": "UNRESOLVED (p.107, p.54, p.68): slab thickness (6 3/4 on p.107, \u00276 1/4\u0027 read at low confidence on p.55), haunch over the stringers, curbs / parapets, railing, pavement breaks and the expansion dams at the unit ends - p.107 gives 6 3/4 three times; the haunch and parapets belong to the deck / parapet work and the dam sheets p.54 / p.68 are not modeled yet. 6 3/4 slab between the curb lines (76\u0027-6), joint 0 to joint 0\u0027.",
-            "Source": "p.107"
+            "Unresolved": "UNRESOLVED (p.107, p.55): slab edge under the parapet and the haunch depth - Section A prints 7 3/4 / 7 7/8 at the curb and the 1 in thickening (7 3/4 - 6 3/4) is derived, not printed; the slab edge under the wall is drawn with a 4 1/4 in drop not dimensioned. 6 3/4 slab (crown 1/8 in per ft) from outside face to outside face of the parapets (82\u0027-2), 1 in x 1\u0027-5 thickening with 12:12 sides under every stringer line; CL key joint / pipe sockets / drip grooves not built.",
+            "Source": "p.107 (half cross section, Section A)",
+            "HaunchDepth": 0.0254,
+            "HaunchBottomWidth": 0.4318,
+            "HaunchSideSlope": 1
           },
           "Unresolved": "UNRESOLVED (p.55, p.107, p.48): stringer bearings (variable bearing plates, sliding \u0027S\u0027 / fixed \u0027F\u0027 bearings), diaphragms 15 C 33.9, splices and which mark lies on which line - the printed stringer-to-slab dimension is 7 3/4 (p.107) and the floor beam top is level 2\u0027-8 3/4 under the gutter line (p.55): the bearing plate between them varies 1.1 - 5.9 in. across the crown (\u0022thicknesses ... shall be adjusted\u0022, p.55) and is not dimensioned; the half plan names S5-S8 but not their lines. stringer tops 7 3/4 under the finished grade (p.107), continuous over the floor beams, one straight piece per bay; the gap above each floor beam is NOT filled.",
           "Source": "p.58 / p.107"
@@ -100727,8 +102497,362 @@
           "UNRESOLVED (p.59-67): gusset thickness of joint L5\u0027 - the joint sheet was not read for this joint (not printed or not extracted). 3/4 in. built, flagged.",
           "UNRESOLVED (p.59-67): L8 / L0 second gusset pairs (7/8 \u002B 3/4 outer / inner at L8 of the 3-span unit; 3/4 \u002B 1/2 at L0 of both units), fills, splice plates, lug angles, diaphragms, stitch rivets - listed per joint without extents. only one gusset pair per joint (the outer / first listed) is built; fills and splices not built.",
           "UNRESOLVED (p.59-67): plan weight check (p.42): floor steel, bracing, shoes, expansion dams, splices and fills are in the p.42 totals - the totals are per unit (carbon \u002B silicon, items 2 \u002B 5) and include all steel of the unit. the check script reports the model steel as a share of the p.42 figure."
+        ],
+        "LineItems": [
+          {
+            "Name": "Left curb \u002B parapet",
+            "Kind": "Concrete",
+            "Category": "WalkwayPlate",
+            "Transverse": false,
+            "ReferenceOffset": -11.6586,
+            "Station": 0,
+            "From": 21020.952624000005,
+            "To": 21349.374624000004,
+            "Side": -1,
+            "Profile": [
+              {
+                "U": 0,
+                "V": 0
+              },
+              {
+                "U": 0,
+                "V": 0.2286
+              },
+              {
+                "U": 0.6095999999999999,
+                "V": 0.23495
+              },
+              {
+                "U": 0.6095999999999999,
+                "V": 0.76835
+              },
+              {
+                "U": 0.8635999999999999,
+                "V": 0.76835
+              },
+              {
+                "U": 0.8635999999999999,
+                "V": -0.008995833333333333
+              }
+            ],
+            "FromGrade": true,
+            "Material": "Class A concrete",
+            "NominalWeightLbPerFt": 0,
+            "Density": 0,
+            "Assembly": "DECK-ITEMS",
+            "AssemblyDescription": "",
+            "Unresolved": "UNRESOLVED (p.107, p.108): curb \u002B parapet details - the 3/4 in radius at the curb face, the chamfers, the drainage openings in the curb (2\u0027-2 / 2\u0027-0 alternating, size not read), scoring and the openings at the expansion dams are drawn without all dimensions. one solid section (curb 2\u0027-0 x 9 in, curb top \u002B1/4 in, wall 10 in x 1\u0027-9 above the curb top) continuous over the deck length.",
+            "Source": "p.107 Section A / B"
+          },
+          {
+            "Name": "Right curb \u002B parapet",
+            "Kind": "Concrete",
+            "Category": "WalkwayPlate",
+            "Transverse": false,
+            "ReferenceOffset": 11.6586,
+            "Station": 0,
+            "From": 21020.952624000005,
+            "To": 21349.374624000004,
+            "Side": 1,
+            "Profile": [
+              {
+                "U": 0,
+                "V": 0
+              },
+              {
+                "U": 0,
+                "V": 0.2286
+              },
+              {
+                "U": 0.6095999999999999,
+                "V": 0.23495
+              },
+              {
+                "U": 0.6095999999999999,
+                "V": 0.76835
+              },
+              {
+                "U": 0.8635999999999999,
+                "V": 0.76835
+              },
+              {
+                "U": 0.8635999999999999,
+                "V": -0.008995833333333333
+              }
+            ],
+            "FromGrade": true,
+            "Material": "Class A concrete",
+            "NominalWeightLbPerFt": 0,
+            "Density": 0,
+            "Assembly": "DECK-ITEMS",
+            "AssemblyDescription": "",
+            "Unresolved": "UNRESOLVED (p.107, p.108): curb \u002B parapet details - the 3/4 in radius at the curb face, the chamfers, the drainage openings in the curb (2\u0027-2 / 2\u0027-0 alternating, size not read), scoring and the openings at the expansion dams are drawn without all dimensions. one solid section (curb 2\u0027-0 x 9 in, curb top \u002B1/4 in, wall 10 in x 1\u0027-9 above the curb top) continuous over the deck length.",
+            "Source": "p.107 Section A / B"
+          },
+          {
+            "Name": "dam Pier 24",
+            "Kind": "Steel",
+            "Category": "JointArmor",
+            "Transverse": true,
+            "ReferenceOffset": 0,
+            "Station": 21349.984224000003,
+            "From": -11.6586,
+            "To": 11.6586,
+            "Side": 1,
+            "Profile": [
+              {
+                "U": -0.3302,
+                "V": -0.07619999999999999
+              },
+              {
+                "U": 0.3302,
+                "V": -0.07619999999999999
+              },
+              {
+                "U": 0.3302,
+                "V": 0
+              },
+              {
+                "U": -0.3302,
+                "V": 0
+              }
+            ],
+            "FromGrade": true,
+            "Material": "C",
+            "NominalWeightLbPerFt": 0,
+            "Density": 0,
+            "Assembly": "DAM-DAM-PIER-24",
+            "AssemblyDescription": "finger expansion dam dam Pier 24 (p.68)",
+            "Unresolved": "UNRESOLVED (p.68): finger dam at dam Pier 24: teeth, edge channels, stringer supports, anchor bars and the curb / parapet ends - the finger plates are drawn with their teeth (61 \u002B 47 teeth @ 4 1/4 in across the half roadway) and the movement tables; the tooth outline, the plate anchorage and the dam stringers are not all dimensioned. one steel band 26 in wide (total dam width at 68 F) x 3 in, top flush with the grade, 38\u0027-3 each side of the CL (curb to curb).",
+            "Source": "p.68"
+          },
+          {
+            "Name": "walkway CL",
+            "Kind": "Steel",
+            "Category": "Grating",
+            "Transverse": false,
+            "ReferenceOffset": 0,
+            "Station": 0,
+            "From": 21020.952624000005,
+            "To": 21349.374624000004,
+            "Side": 1,
+            "Profile": [
+              {
+                "U": -0.3048,
+                "V": -2.8455937500014463
+              },
+              {
+                "U": 0.3048,
+                "V": -2.8455937500014463
+              },
+              {
+                "U": 0.3048,
+                "V": -2.8265437500014463
+              },
+              {
+                "U": -0.3048,
+                "V": -2.8265437500014463
+              }
+            ],
+            "FromGrade": true,
+            "Material": "Galvanized steel grating",
+            "NominalWeightLbPerFt": 0,
+            "Density": 1794.0678992125986,
+            "Assembly": "WALKWAYS",
+            "AssemblyDescription": "PTC 4-span truss 21-24 - service walkways (p.101)",
+            "Unresolved": "UNRESOLVED (p.101): walkway level, lateral position and the openings in the floor beams - the walkway runs at the bottom flange of the floor beams through the manholes of the floor beam webs (drawn, not dimensioned); its line is drawn near the CL bridge. grating bottom 1 in above the floor beam bottom (on the bottom flange angles), longitudinal walkway centred on the CL bridge; the floor beam webs are not cut for the manholes, walk angles / hangers (L 4x4x3/8) / hand railing / ladders not built. UNRESOLVED (p.101): grating weight - the sheet names the grating (3/4 x 3/16 bearing bars, Irving X-Bar type AA) but prints no weight. 7 lb/sq ft (catalogue value for the type, not from the plans).",
+            "Source": "p.101"
+          },
+          {
+            "Name": "walkway at FB10",
+            "Kind": "Steel",
+            "Category": "Grating",
+            "Transverse": true,
+            "ReferenceOffset": 0,
+            "Station": 21267.86602399996,
+            "From": -8.1026,
+            "To": 8.1026,
+            "Side": 1,
+            "Profile": [
+              {
+                "U": -0.3048,
+                "V": 33.555051
+              },
+              {
+                "U": 0.3048,
+                "V": 33.555051
+              },
+              {
+                "U": 0.3048,
+                "V": 33.574101
+              },
+              {
+                "U": -0.3048,
+                "V": 33.574101
+              }
+            ],
+            "FromGrade": false,
+            "Material": "Galvanized steel grating",
+            "NominalWeightLbPerFt": 0,
+            "Density": 1794.0678992125986,
+            "Assembly": "WALKWAYS",
+            "AssemblyDescription": "PTC 4-span truss 21-24 - service walkways (p.101)",
+            "Unresolved": "UNRESOLVED (p.101): cross walkway beside the pier floor beam - the key plan shows a cross walkway at the pier floor beams 53\u0027-2 long between the walkway ends at the trusses; its side of the floor beam and its level are drawn only. 2\u0027-0 grating beside the floor beam (centre 1\u0027-2 from the web face), level with the floor beam bottom flange; supports from the top chord not built. UNRESOLVED (p.101): grating weight - the sheet names the grating (3/4 x 3/16 bearing bars, Irving X-Bar type AA) but prints no weight. 7 lb/sq ft (catalogue value for the type, not from the plans).",
+            "Source": "p.101"
+          },
+          {
+            "Name": "walkway at FB10\u0027",
+            "Kind": "Steel",
+            "Category": "Grating",
+            "Transverse": true,
+            "ReferenceOffset": 0,
+            "Station": 21103.655023999992,
+            "From": -8.1026,
+            "To": 8.1026,
+            "Side": 1,
+            "Profile": [
+              {
+                "U": -0.3048,
+                "V": 38.481381
+              },
+              {
+                "U": 0.3048,
+                "V": 38.481381
+              },
+              {
+                "U": 0.3048,
+                "V": 38.500431
+              },
+              {
+                "U": -0.3048,
+                "V": 38.500431
+              }
+            ],
+            "FromGrade": false,
+            "Material": "Galvanized steel grating",
+            "NominalWeightLbPerFt": 0,
+            "Density": 1794.0678992125986,
+            "Assembly": "WALKWAYS",
+            "AssemblyDescription": "PTC 4-span truss 21-24 - service walkways (p.101)",
+            "Unresolved": "UNRESOLVED (p.101): cross walkway beside the pier floor beam - the key plan shows a cross walkway at the pier floor beams 53\u0027-2 long between the walkway ends at the trusses; its side of the floor beam and its level are drawn only. 2\u0027-0 grating beside the floor beam (centre 1\u0027-2 from the web face), level with the floor beam bottom flange; supports from the top chord not built. UNRESOLVED (p.101): grating weight - the sheet names the grating (3/4 x 3/16 bearing bars, Irving X-Bar type AA) but prints no weight. 7 lb/sq ft (catalogue value for the type, not from the plans).",
+            "Source": "p.101"
+          }
         ]
-      }
+      },
+      "Railings": [
+        {
+          "Name": "Left parapet railing",
+          "TypeName": "PTC aluminum parapet railing (p.107 / p.108)",
+          "Kind": "Guardrail",
+          "Offset": -12.395199999999999,
+          "BeginStation": 21020.952624000005,
+          "EndStation": 21349.374624000004,
+          "BaseProbe": 0,
+          "Material": "Aluminum (rail ASTM B235 GS10A-T6, posts B108 356-T6)",
+          "Density": 2700,
+          "SampleStep": 0.3048,
+          "Post": {
+            "Profile": [
+              {
+                "R": -0.127,
+                "H": 0
+              },
+              {
+                "R": 0.127,
+                "H": 0
+              },
+              {
+                "R": 0.07619999999999999,
+                "H": 0.3857625
+              },
+              {
+                "R": -0.07619999999999999,
+                "H": 0.3857625
+              }
+            ],
+            "Thickness": 0.17779999999999999,
+            "Spacing": 1.74625,
+            "EndDistance": 0.358775,
+            "Description": "cast aluminum post 10 x 7 at the base, 6 in at the top",
+            "Unresolved": "UNRESOLVED (p.107, p.108): post layout and shape - the posts are laid out per railing panel (31\u0027-0 / 30\u0027-5 3/4 panels: 5 spaces with 1\u0027-2 1/8 to the joints, special panels on p.108) and the cast post is hollow with a 3/8 web. solid tapered post 10 in -\u003E 6 in x 7 in, equally spaced at most 5\u0027-8 3/4 over each bridge run, 1\u0027-2 1/8 from its ends; anchor bolts and pads not built."
+          },
+          "Members": [
+            {
+              "Name": "oval rail",
+              "Kind": "Rail",
+              "Diameter": 0,
+              "Width": 0.2032,
+              "Height": 0.142875,
+              "Center": {
+                "R": 0,
+                "H": 0.3857625
+              },
+              "Description": "oval aluminum tube 8 x 5 5/8 x 3/16",
+              "MassPerLength": 7,
+              "Unresolved": "UNRESOLVED (p.108): rail section - the oval tube is 8 in \u002B- x 5 5/8 in \u002B- with a 3/16 wall. rectangular envelope 8 x 5 5/8, mass of the tube (about 4.7 lb/ft)"
+            }
+          ],
+          "FlagsDimensionOnly": true,
+          "Source": "p.107 / p.108",
+          "Unresolved": []
+        },
+        {
+          "Name": "Right parapet railing",
+          "TypeName": "PTC aluminum parapet railing (p.107 / p.108)",
+          "Kind": "Guardrail",
+          "Offset": 12.395199999999999,
+          "BeginStation": 21020.952624000005,
+          "EndStation": 21349.374624000004,
+          "BaseProbe": 0,
+          "Material": "Aluminum (rail ASTM B235 GS10A-T6, posts B108 356-T6)",
+          "Density": 2700,
+          "SampleStep": 0.3048,
+          "Post": {
+            "Profile": [
+              {
+                "R": -0.127,
+                "H": 0
+              },
+              {
+                "R": 0.127,
+                "H": 0
+              },
+              {
+                "R": 0.07619999999999999,
+                "H": 0.3857625
+              },
+              {
+                "R": -0.07619999999999999,
+                "H": 0.3857625
+              }
+            ],
+            "Thickness": 0.17779999999999999,
+            "Spacing": 1.74625,
+            "EndDistance": 0.358775,
+            "Description": "cast aluminum post 10 x 7 at the base, 6 in at the top",
+            "Unresolved": "UNRESOLVED (p.107, p.108): post layout and shape - the posts are laid out per railing panel (31\u0027-0 / 30\u0027-5 3/4 panels: 5 spaces with 1\u0027-2 1/8 to the joints, special panels on p.108) and the cast post is hollow with a 3/8 web. solid tapered post 10 in -\u003E 6 in x 7 in, equally spaced at most 5\u0027-8 3/4 over each bridge run, 1\u0027-2 1/8 from its ends; anchor bolts and pads not built."
+          },
+          "Members": [
+            {
+              "Name": "oval rail",
+              "Kind": "Rail",
+              "Diameter": 0,
+              "Width": 0.2032,
+              "Height": 0.142875,
+              "Center": {
+                "R": 0,
+                "H": 0.3857625
+              },
+              "Description": "oval aluminum tube 8 x 5 5/8 x 3/16",
+              "MassPerLength": 7,
+              "Unresolved": "UNRESOLVED (p.108): rail section - the oval tube is 8 in \u002B- x 5 5/8 in \u002B- with a 3/16 wall. rectangular envelope 8 x 5 5/8, mass of the tube (about 4.7 lb/ft)"
+            }
+          ],
+          "FlagsDimensionOnly": true,
+          "Source": "p.107 / p.108",
+          "Unresolved": []
+        }
+      ]
     },
     {
       "Name": "PTC 3-span truss 25-27",
@@ -102685,7 +104809,7 @@
         "StayInPlaceForms": true,
         "SipFormDepth": 0.0508,
         "Barrier": {
-          "Type": "TxDotSstr",
+          "Type": "Custom",
           "Reinforcement": true,
           "EpoxyCoated": true,
           "StirrupSpacing": 0.15239999999999998,
@@ -102693,7 +104817,8 @@
           "BaseWidth": 0.4064,
           "TopWidth": 0.15239999999999998,
           "Left": false,
-          "Right": false
+          "Right": false,
+          "ProfileName": "PTC curb \u002B parapet wall (p.107)"
         },
         "Reinforcement": {
           "Enabled": false,
@@ -112206,13 +114331,16 @@
           "StringerEndClearance": 0,
           "Deck": {
             "Thickness": 0.17145,
-            "LeftOffset": -11.6586,
-            "RightOffset": 11.6586,
+            "LeftOffset": -12.5222,
+            "RightOffset": 12.5222,
             "BeginStation": 21350.593824000003,
             "EndStation": 21547.647024,
             "ConcreteStrengthKsi": 3,
-            "Unresolved": "UNRESOLVED (p.107, p.54, p.68): slab thickness (6 3/4 on p.107, \u00276 1/4\u0027 read at low confidence on p.55), haunch over the stringers, curbs / parapets, railing, pavement breaks and the expansion dams at the unit ends - p.107 gives 6 3/4 three times; the haunch and parapets belong to the deck / parapet work and the dam sheets p.54 / p.68 are not modeled yet. 6 3/4 slab between the curb lines (76\u0027-6), joint 0 to joint 0\u0027.",
-            "Source": "p.107"
+            "Unresolved": "UNRESOLVED (p.107, p.55): slab edge under the parapet and the haunch depth - Section A prints 7 3/4 / 7 7/8 at the curb and the 1 in thickening (7 3/4 - 6 3/4) is derived, not printed; the slab edge under the wall is drawn with a 4 1/4 in drop not dimensioned. 6 3/4 slab (crown 1/8 in per ft) from outside face to outside face of the parapets (82\u0027-2), 1 in x 1\u0027-5 thickening with 12:12 sides under every stringer line; CL key joint / pipe sockets / drip grooves not built.",
+            "Source": "p.107 (half cross section, Section A)",
+            "HaunchDepth": 0.0254,
+            "HaunchBottomWidth": 0.4318,
+            "HaunchSideSlope": 1
           },
           "Unresolved": "UNRESOLVED (p.55, p.107, p.48): stringer bearings (variable bearing plates, sliding \u0027S\u0027 / fixed \u0027F\u0027 bearings), diaphragms 15 C 33.9, splices and which mark lies on which line - the printed stringer-to-slab dimension is 7 3/4 (p.107) and the floor beam top is level 2\u0027-8 3/4 under the gutter line (p.55): the bearing plate between them varies 1.1 - 5.9 in. across the crown (\u0022thicknesses ... shall be adjusted\u0022, p.55) and is not dimensioned; the half plan names S5-S8 but not their lines. stringer tops 7 3/4 under the finished grade (p.107), continuous over the floor beams, one straight piece per bay; the gap above each floor beam is NOT filled.",
           "Source": "p.48 / p.107"
@@ -112431,8 +114559,399 @@
           "UNRESOLVED (p.55, p.48, p.58): partial-length floor beam cover plates (F.L. \u002B 28\u0027-0 / 40\u0027-0 / 20\u0027-0 bottom plates, F3 / F4 / B1 plate counts 2 / 4 / 1) - the lengths are listed on p.55 but their positions along the beam were not decoded; the bracket (B1) web is drawn tapering 6\u0027-3 1/2 to 2\u0027-0 1/2. only the full-length top plate 14 x 1/2 is built; the cantilever brackets B1 are built as the full-depth beam (taper not modeled, overstates the bracket).",
           "UNRESOLVED (p.49-53): L8 / L0 second gusset pairs (7/8 \u002B 3/4 outer / inner at L8 of the 3-span unit; 3/4 \u002B 1/2 at L0 of both units), fills, splice plates, lug angles, diaphragms, stitch rivets - listed per joint without extents. only one gusset pair per joint (the outer / first listed) is built; fills and splices not built.",
           "UNRESOLVED (p.49-53): plan weight check (p.42): floor steel, bracing, shoes, expansion dams, splices and fills are in the p.42 totals - the totals are per unit (carbon \u002B silicon, items 2 \u002B 5) and include all steel of the unit. the check script reports the model steel as a share of the p.42 figure."
+        ],
+        "LineItems": [
+          {
+            "Name": "Left curb \u002B parapet",
+            "Kind": "Concrete",
+            "Category": "WalkwayPlate",
+            "Transverse": false,
+            "ReferenceOffset": -11.6586,
+            "Station": 0,
+            "From": 21350.593824000003,
+            "To": 21547.647024,
+            "Side": -1,
+            "Profile": [
+              {
+                "U": 0,
+                "V": 0
+              },
+              {
+                "U": 0,
+                "V": 0.2286
+              },
+              {
+                "U": 0.6095999999999999,
+                "V": 0.23495
+              },
+              {
+                "U": 0.6095999999999999,
+                "V": 0.76835
+              },
+              {
+                "U": 0.8635999999999999,
+                "V": 0.76835
+              },
+              {
+                "U": 0.8635999999999999,
+                "V": -0.008995833333333333
+              }
+            ],
+            "FromGrade": true,
+            "Material": "Class A concrete",
+            "NominalWeightLbPerFt": 0,
+            "Density": 0,
+            "Assembly": "DECK-ITEMS",
+            "AssemblyDescription": "",
+            "Unresolved": "UNRESOLVED (p.107, p.108): curb \u002B parapet details - the 3/4 in radius at the curb face, the chamfers, the drainage openings in the curb (2\u0027-2 / 2\u0027-0 alternating, size not read), scoring and the openings at the expansion dams are drawn without all dimensions. one solid section (curb 2\u0027-0 x 9 in, curb top \u002B1/4 in, wall 10 in x 1\u0027-9 above the curb top) continuous over the deck length.",
+            "Source": "p.107 Section A / B"
+          },
+          {
+            "Name": "Right curb \u002B parapet",
+            "Kind": "Concrete",
+            "Category": "WalkwayPlate",
+            "Transverse": false,
+            "ReferenceOffset": 11.6586,
+            "Station": 0,
+            "From": 21350.593824000003,
+            "To": 21547.647024,
+            "Side": 1,
+            "Profile": [
+              {
+                "U": 0,
+                "V": 0
+              },
+              {
+                "U": 0,
+                "V": 0.2286
+              },
+              {
+                "U": 0.6095999999999999,
+                "V": 0.23495
+              },
+              {
+                "U": 0.6095999999999999,
+                "V": 0.76835
+              },
+              {
+                "U": 0.8635999999999999,
+                "V": 0.76835
+              },
+              {
+                "U": 0.8635999999999999,
+                "V": -0.008995833333333333
+              }
+            ],
+            "FromGrade": true,
+            "Material": "Class A concrete",
+            "NominalWeightLbPerFt": 0,
+            "Density": 0,
+            "Assembly": "DECK-ITEMS",
+            "AssemblyDescription": "",
+            "Unresolved": "UNRESOLVED (p.107, p.108): curb \u002B parapet details - the 3/4 in radius at the curb face, the chamfers, the drainage openings in the curb (2\u0027-2 / 2\u0027-0 alternating, size not read), scoring and the openings at the expansion dams are drawn without all dimensions. one solid section (curb 2\u0027-0 x 9 in, curb top \u002B1/4 in, wall 10 in x 1\u0027-9 above the curb top) continuous over the deck length.",
+            "Source": "p.107 Section A / B"
+          },
+          {
+            "Name": "dam Pier 27",
+            "Kind": "Steel",
+            "Category": "JointArmor",
+            "Transverse": true,
+            "ReferenceOffset": 0,
+            "Station": 21548.1993216,
+            "From": -11.6586,
+            "To": 11.6586,
+            "Side": 1,
+            "Profile": [
+              {
+                "U": -0.20955,
+                "V": -0.07619999999999999
+              },
+              {
+                "U": 0.20955,
+                "V": -0.07619999999999999
+              },
+              {
+                "U": 0.20955,
+                "V": 0
+              },
+              {
+                "U": -0.20955,
+                "V": 0
+              }
+            ],
+            "FromGrade": true,
+            "Material": "C",
+            "NominalWeightLbPerFt": 0,
+            "Density": 0,
+            "Assembly": "DAM-DAM-PIER-27",
+            "AssemblyDescription": "finger expansion dam dam Pier 27 (p.54, p.1)",
+            "Unresolved": "UNRESOLVED (p.54, p.1): finger dam at dam Pier 27: teeth, edge channels, stringer supports, anchor bars and the curb / parapet ends - the finger plates are drawn with their teeth (61 \u002B 47 teeth @ 4 1/4 in across the half roadway) and the movement tables; the tooth outline, the plate anchorage and the dam stringers are not all dimensioned; station 706\u002B96.192 is p.1 only. one steel band 16.5 in wide (total dam width at 68 F) x 3 in, top flush with the grade, 38\u0027-3 each side of the CL (curb to curb).",
+            "Source": "p.54, p.1"
+          },
+          {
+            "Name": "walkway CL",
+            "Kind": "Steel",
+            "Category": "Grating",
+            "Transverse": false,
+            "ReferenceOffset": 0,
+            "Station": 0,
+            "From": 21350.593824000003,
+            "To": 21547.647024,
+            "Side": 1,
+            "Profile": [
+              {
+                "U": -0.3048,
+                "V": -2.845593749998789
+              },
+              {
+                "U": 0.3048,
+                "V": -2.845593749998789
+              },
+              {
+                "U": 0.3048,
+                "V": -2.826543749998789
+              },
+              {
+                "U": -0.3048,
+                "V": -2.826543749998789
+              }
+            ],
+            "FromGrade": true,
+            "Material": "Galvanized steel grating",
+            "NominalWeightLbPerFt": 0,
+            "Density": 1794.0678992125986,
+            "Assembly": "WALKWAYS",
+            "AssemblyDescription": "PTC 3-span truss 25-27 - service walkways (p.101)",
+            "Unresolved": "UNRESOLVED (p.101): walkway level, lateral position and the openings in the floor beams - the walkway runs at the bottom flange of the floor beams through the manholes of the floor beam webs (drawn, not dimensioned); its line is drawn near the CL bridge. grating bottom 1 in above the floor beam bottom (on the bottom flange angles), longitudinal walkway centred on the CL bridge; the floor beam webs are not cut for the manholes, walk angles / hangers (L 4x4x3/8) / hand railing / ladders not built. UNRESOLVED (p.101): grating weight - the sheet names the grating (3/4 x 3/16 bearing bars, Irving X-Bar type AA) but prints no weight. 7 lb/sq ft (catalogue value for the type, not from the plans).",
+            "Source": "p.101"
+          },
+          {
+            "Name": "walkway at FB8",
+            "Kind": "Steel",
+            "Category": "Grating",
+            "Transverse": true,
+            "ReferenceOffset": 0,
+            "Station": 21482.559524000048,
+            "From": -8.1026,
+            "To": 8.1026,
+            "Side": 1,
+            "Profile": [
+              {
+                "U": -0.3048,
+                "V": 27.114246000000005
+              },
+              {
+                "U": 0.3048,
+                "V": 27.114246000000005
+              },
+              {
+                "U": 0.3048,
+                "V": 27.133296000000005
+              },
+              {
+                "U": -0.3048,
+                "V": 27.133296000000005
+              }
+            ],
+            "FromGrade": false,
+            "Material": "Galvanized steel grating",
+            "NominalWeightLbPerFt": 0,
+            "Density": 1794.0678992125986,
+            "Assembly": "WALKWAYS",
+            "AssemblyDescription": "PTC 3-span truss 25-27 - service walkways (p.101)",
+            "Unresolved": "UNRESOLVED (p.101): cross walkway beside the pier floor beam - the key plan shows a cross walkway at the pier floor beams 53\u0027-2 long between the walkway ends at the trusses; its side of the floor beam and its level are drawn only. 2\u0027-0 grating beside the floor beam (centre 1\u0027-2 from the web face), level with the floor beam bottom flange; supports from the top chord not built. UNRESOLVED (p.101): grating weight - the sheet names the grating (3/4 x 3/16 bearing bars, Irving X-Bar type AA) but prints no weight. 7 lb/sq ft (catalogue value for the type, not from the plans).",
+            "Source": "p.101"
+          },
+          {
+            "Name": "walkway at FB8\u0027",
+            "Kind": "Steel",
+            "Category": "Grating",
+            "Transverse": true,
+            "ReferenceOffset": 0,
+            "Station": 21416.875124000035,
+            "From": -8.1026,
+            "To": 8.1026,
+            "Side": 1,
+            "Profile": [
+              {
+                "U": -0.3048,
+                "V": 29.084778000000004
+              },
+              {
+                "U": 0.3048,
+                "V": 29.084778000000004
+              },
+              {
+                "U": 0.3048,
+                "V": 29.103828000000004
+              },
+              {
+                "U": -0.3048,
+                "V": 29.103828000000004
+              }
+            ],
+            "FromGrade": false,
+            "Material": "Galvanized steel grating",
+            "NominalWeightLbPerFt": 0,
+            "Density": 1794.0678992125986,
+            "Assembly": "WALKWAYS",
+            "AssemblyDescription": "PTC 3-span truss 25-27 - service walkways (p.101)",
+            "Unresolved": "UNRESOLVED (p.101): cross walkway beside the pier floor beam - the key plan shows a cross walkway at the pier floor beams 53\u0027-2 long between the walkway ends at the trusses; its side of the floor beam and its level are drawn only. 2\u0027-0 grating beside the floor beam (centre 1\u0027-2 from the web face), level with the floor beam bottom flange; supports from the top chord not built. UNRESOLVED (p.101): grating weight - the sheet names the grating (3/4 x 3/16 bearing bars, Irving X-Bar type AA) but prints no weight. 7 lb/sq ft (catalogue value for the type, not from the plans).",
+            "Source": "p.101"
+          },
+          {
+            "Name": "walkway at FB0",
+            "Kind": "Steel",
+            "Category": "Grating",
+            "Transverse": true,
+            "ReferenceOffset": 0,
+            "Station": 21547.050124000052,
+            "From": -8.1026,
+            "To": 8.1026,
+            "Side": 1,
+            "Profile": [
+              {
+                "U": -0.3048,
+                "V": 25.143714000000006
+              },
+              {
+                "U": 0.3048,
+                "V": 25.143714000000006
+              },
+              {
+                "U": 0.3048,
+                "V": 25.162764000000006
+              },
+              {
+                "U": -0.3048,
+                "V": 25.162764000000006
+              }
+            ],
+            "FromGrade": false,
+            "Material": "Galvanized steel grating",
+            "NominalWeightLbPerFt": 0,
+            "Density": 1794.0678992125986,
+            "Assembly": "WALKWAYS",
+            "AssemblyDescription": "PTC 3-span truss 25-27 - service walkways (p.101)",
+            "Unresolved": "UNRESOLVED (p.101): cross walkway beside the pier floor beam - the key plan shows a cross walkway at the pier floor beams 53\u0027-2 long between the walkway ends at the trusses; its side of the floor beam and its level are drawn only. 2\u0027-0 grating beside the floor beam (centre 1\u0027-2 from the web face), level with the floor beam bottom flange; supports from the top chord not built. UNRESOLVED (p.101): grating weight - the sheet names the grating (3/4 x 3/16 bearing bars, Irving X-Bar type AA) but prints no weight. 7 lb/sq ft (catalogue value for the type, not from the plans).",
+            "Source": "p.101"
+          }
         ]
-      }
+      },
+      "Railings": [
+        {
+          "Name": "Left parapet railing",
+          "TypeName": "PTC aluminum parapet railing (p.107 / p.108)",
+          "Kind": "Guardrail",
+          "Offset": -12.395199999999999,
+          "BeginStation": 21350.593824000003,
+          "EndStation": 21547.647024,
+          "BaseProbe": 0,
+          "Material": "Aluminum (rail ASTM B235 GS10A-T6, posts B108 356-T6)",
+          "Density": 2700,
+          "SampleStep": 0.3048,
+          "Post": {
+            "Profile": [
+              {
+                "R": -0.127,
+                "H": 0
+              },
+              {
+                "R": 0.127,
+                "H": 0
+              },
+              {
+                "R": 0.07619999999999999,
+                "H": 0.3857625
+              },
+              {
+                "R": -0.07619999999999999,
+                "H": 0.3857625
+              }
+            ],
+            "Thickness": 0.17779999999999999,
+            "Spacing": 1.74625,
+            "EndDistance": 0.358775,
+            "Description": "cast aluminum post 10 x 7 at the base, 6 in at the top",
+            "Unresolved": "UNRESOLVED (p.107, p.108): post layout and shape - the posts are laid out per railing panel (31\u0027-0 / 30\u0027-5 3/4 panels: 5 spaces with 1\u0027-2 1/8 to the joints, special panels on p.108) and the cast post is hollow with a 3/8 web. solid tapered post 10 in -\u003E 6 in x 7 in, equally spaced at most 5\u0027-8 3/4 over each bridge run, 1\u0027-2 1/8 from its ends; anchor bolts and pads not built."
+          },
+          "Members": [
+            {
+              "Name": "oval rail",
+              "Kind": "Rail",
+              "Diameter": 0,
+              "Width": 0.2032,
+              "Height": 0.142875,
+              "Center": {
+                "R": 0,
+                "H": 0.3857625
+              },
+              "Description": "oval aluminum tube 8 x 5 5/8 x 3/16",
+              "MassPerLength": 7,
+              "Unresolved": "UNRESOLVED (p.108): rail section - the oval tube is 8 in \u002B- x 5 5/8 in \u002B- with a 3/16 wall. rectangular envelope 8 x 5 5/8, mass of the tube (about 4.7 lb/ft)"
+            }
+          ],
+          "FlagsDimensionOnly": true,
+          "Source": "p.107 / p.108",
+          "Unresolved": []
+        },
+        {
+          "Name": "Right parapet railing",
+          "TypeName": "PTC aluminum parapet railing (p.107 / p.108)",
+          "Kind": "Guardrail",
+          "Offset": 12.395199999999999,
+          "BeginStation": 21350.593824000003,
+          "EndStation": 21547.647024,
+          "BaseProbe": 0,
+          "Material": "Aluminum (rail ASTM B235 GS10A-T6, posts B108 356-T6)",
+          "Density": 2700,
+          "SampleStep": 0.3048,
+          "Post": {
+            "Profile": [
+              {
+                "R": -0.127,
+                "H": 0
+              },
+              {
+                "R": 0.127,
+                "H": 0
+              },
+              {
+                "R": 0.07619999999999999,
+                "H": 0.3857625
+              },
+              {
+                "R": -0.07619999999999999,
+                "H": 0.3857625
+              }
+            ],
+            "Thickness": 0.17779999999999999,
+            "Spacing": 1.74625,
+            "EndDistance": 0.358775,
+            "Description": "cast aluminum post 10 x 7 at the base, 6 in at the top",
+            "Unresolved": "UNRESOLVED (p.107, p.108): post layout and shape - the posts are laid out per railing panel (31\u0027-0 / 30\u0027-5 3/4 panels: 5 spaces with 1\u0027-2 1/8 to the joints, special panels on p.108) and the cast post is hollow with a 3/8 web. solid tapered post 10 in -\u003E 6 in x 7 in, equally spaced at most 5\u0027-8 3/4 over each bridge run, 1\u0027-2 1/8 from its ends; anchor bolts and pads not built."
+          },
+          "Members": [
+            {
+              "Name": "oval rail",
+              "Kind": "Rail",
+              "Diameter": 0,
+              "Width": 0.2032,
+              "Height": 0.142875,
+              "Center": {
+                "R": 0,
+                "H": 0.3857625
+              },
+              "Description": "oval aluminum tube 8 x 5 5/8 x 3/16",
+              "MassPerLength": 7,
+              "Unresolved": "UNRESOLVED (p.108): rail section - the oval tube is 8 in \u002B- x 5 5/8 in \u002B- with a 3/16 wall. rectangular envelope 8 x 5 5/8, mass of the tube (about 4.7 lb/ft)"
+            }
+          ],
+          "FlagsDimensionOnly": true,
+          "Source": "p.107 / p.108",
+          "Unresolved": []
+        }
+      ]
     },
     {
       "Name": "PTC Girder spans 28-31",
@@ -115953,7 +118472,7 @@
         "StayInPlaceForms": true,
         "SipFormDepth": 0.0508,
         "Barrier": {
-          "Type": "TxDotSstr",
+          "Type": "Custom",
           "Reinforcement": true,
           "EpoxyCoated": true,
           "StirrupSpacing": 0.15239999999999998,
@@ -115961,7 +118480,8 @@
           "BaseWidth": 0.4064,
           "TopWidth": 0.15239999999999998,
           "Left": false,
-          "Right": false
+          "Right": false,
+          "ProfileName": "PTC curb \u002B parapet wall (p.107)"
         },
         "Reinforcement": {
           "Enabled": false,
@@ -120464,14 +122984,17 @@
           "StringersOnTop": true,
           "StringerEndClearance": 0,
           "Deck": {
-            "Thickness": 0.19685,
-            "LeftOffset": -11.6586,
-            "RightOffset": 11.6586,
+            "Thickness": 0.17145,
+            "LeftOffset": -12.5222,
+            "RightOffset": 12.5222,
             "BeginStation": 21548.7582232,
             "EndStation": 21699.894725600003,
             "ConcreteStrengthKsi": 3,
-            "Unresolved": "UNRESOLVED (p.107, p.46): deck slab: 6 3/4 slab \u002B haunch, curbs, parapets, expansion dams, walkway - p.107 gives the 6 3/4 slab with 7 3/4 typical over the stringers; the dams (p.46) and the curb / parapet sheets are not modeled here. one 7 3/4 slab between the curb lines (76\u0027-6) from the first to the last girder end, continuous over the 4 in. gaps at the piers (the expansion dam fills them).",
-            "Source": "p.43 / p.107"
+            "Unresolved": "UNRESOLVED (p.107, p.55): slab edge under the parapet and the haunch depth - Section A prints 7 3/4 / 7 7/8 at the curb and the 1 in thickening (7 3/4 - 6 3/4) is derived, not printed; the slab edge under the wall is drawn with a 4 1/4 in drop not dimensioned. 6 3/4 slab (crown 1/8 in per ft) from outside face to outside face of the parapets (82\u0027-2), 1 in x 1\u0027-5 thickening with 12:12 sides under every stringer line; CL key joint / pipe sockets / drip grooves not built.",
+            "Source": "p.107 (half cross section, Section A)",
+            "HaunchDepth": 0.0254,
+            "HaunchBottomWidth": 0.4318,
+            "HaunchSideSlope": 1
           },
           "Unresolved": "UNRESOLVED (p.43, p.45): stringer bearings, splices and diaphragms - the stringers are 4-span continuous with a CL splice per line (p.45 splice plates 24 WF: 4x9/16 \u002B 9x1/2 \u002B 2 x 18 1/2x3/8) and bearing plates thickened for the dead load camber; the diaphragms 15[ 33.9 mid-panel and 18 WF 64 at the piers are only located. stringers built as straight W pieces between consecutive floor beams (CL to CL) with their tops 7 3/4 under the finished grade; bearing plates, splices, clip angles and diaphragms not built.",
           "Source": "p.43 / p.107"
@@ -120875,9 +123398,327 @@
           "UNRESOLVED (p.43, p.44): fixed / expansion end of the girder spans 28-31 - the stress sheet draws the spans with the fixed end away from the river (spans 1-10 fixed at the west end); the same drawing serves spans 28-31. spans 28-31 mirrored: fixed at the EAST end of each span (to be confirmed on sheets 9 / 67 / 68, not read).",
           "UNRESOLVED (p.43, p.44): girder end and bearing position of spans 10 and 28 - p.43 gives the 120\u0027-5 1/4 c-c bearings and \u0027alike except expansion end\u0027 but the floor beam spacing (30\u0027-5 3/4 is for 121\u0027-11) and the end detail are on sheet 9. floor beams at equal spaces of the c-c bearing length (4 spaces), girder ends 1\u0027-1 beyond the bearings, cover plates as spans 1-9.",
           "UNRESOLVED (p.46): expansion dams at the piers and the end dams / backwall joints - p.46 dimensions the finger plate dam (edge members 12[ 35, 18 WF 64 diaphragms with 2-Ls 4x4x7/16, anchor bars) but it is a separate pay item. not built; the 4 in. gap between adjacent girder ends is bridged by the slab.",
-          "UNRESOLVED (p.43): inspection walk (CL 2\u0027-0 from the CL bridge), scuppers, signal / light pole bracket extensions (p.45) - shown on the plan / sections without dimensions I could read. not built."
+          "UNRESOLVED (p.43): inspection walk (CL 2\u0027-0 from the CL bridge), scuppers, signal / light pole bracket extensions (p.45) - shown on the plan / sections without dimensions I could read. not built.",
+          "UNRESOLVED (p.44, p.42): service walkway in the girder spans - no walkway sheet for the girder spans was found, but p.42 item 14 lists 2,510 / 1,010 sq ft of grating for them and p.44 mentions floor beam manholes. not built."
+        ],
+        "LineItems": [
+          {
+            "Name": "Left curb \u002B parapet",
+            "Kind": "Concrete",
+            "Category": "WalkwayPlate",
+            "Transverse": false,
+            "ReferenceOffset": -11.6586,
+            "Station": 0,
+            "From": 21548.7582232,
+            "To": 21699.894725600003,
+            "Side": -1,
+            "Profile": [
+              {
+                "U": 0,
+                "V": 0
+              },
+              {
+                "U": 0,
+                "V": 0.2286
+              },
+              {
+                "U": 0.6095999999999999,
+                "V": 0.23495
+              },
+              {
+                "U": 0.6095999999999999,
+                "V": 0.76835
+              },
+              {
+                "U": 0.8635999999999999,
+                "V": 0.76835
+              },
+              {
+                "U": 0.8635999999999999,
+                "V": -0.008995833333333333
+              }
+            ],
+            "FromGrade": true,
+            "Material": "Class A concrete",
+            "NominalWeightLbPerFt": 0,
+            "Density": 0,
+            "Assembly": "DECK-ITEMS",
+            "AssemblyDescription": "",
+            "Unresolved": "UNRESOLVED (p.107, p.108): curb \u002B parapet details - the 3/4 in radius at the curb face, the chamfers, the drainage openings in the curb (2\u0027-2 / 2\u0027-0 alternating, size not read), scoring and the openings at the expansion dams are drawn without all dimensions. one solid section (curb 2\u0027-0 x 9 in, curb top \u002B1/4 in, wall 10 in x 1\u0027-9 above the curb top) continuous over the deck length.",
+            "Source": "p.107 Section A / B"
+          },
+          {
+            "Name": "Right curb \u002B parapet",
+            "Kind": "Concrete",
+            "Category": "WalkwayPlate",
+            "Transverse": false,
+            "ReferenceOffset": 11.6586,
+            "Station": 0,
+            "From": 21548.7582232,
+            "To": 21699.894725600003,
+            "Side": 1,
+            "Profile": [
+              {
+                "U": 0,
+                "V": 0
+              },
+              {
+                "U": 0,
+                "V": 0.2286
+              },
+              {
+                "U": 0.6095999999999999,
+                "V": 0.23495
+              },
+              {
+                "U": 0.6095999999999999,
+                "V": 0.76835
+              },
+              {
+                "U": 0.8635999999999999,
+                "V": 0.76835
+              },
+              {
+                "U": 0.8635999999999999,
+                "V": -0.008995833333333333
+              }
+            ],
+            "FromGrade": true,
+            "Material": "Class A concrete",
+            "NominalWeightLbPerFt": 0,
+            "Density": 0,
+            "Assembly": "DECK-ITEMS",
+            "AssemblyDescription": "",
+            "Unresolved": "UNRESOLVED (p.107, p.108): curb \u002B parapet details - the 3/4 in radius at the curb face, the chamfers, the drainage openings in the curb (2\u0027-2 / 2\u0027-0 alternating, size not read), scoring and the openings at the expansion dams are drawn without all dimensions. one solid section (curb 2\u0027-0 x 9 in, curb top \u002B1/4 in, wall 10 in x 1\u0027-9 above the curb top) continuous over the deck length.",
+            "Source": "p.107 Section A / B"
+          },
+          {
+            "Name": "dam Pier 28",
+            "Kind": "Steel",
+            "Category": "JointArmor",
+            "Transverse": true,
+            "ReferenceOffset": 0,
+            "Station": 21586.1789256,
+            "From": -11.6586,
+            "To": 11.6586,
+            "Side": 1,
+            "Profile": [
+              {
+                "U": -0.104775,
+                "V": -0.009524999999999999
+              },
+              {
+                "U": 0.104775,
+                "V": -0.009524999999999999
+              },
+              {
+                "U": 0.104775,
+                "V": 0
+              },
+              {
+                "U": -0.104775,
+                "V": 0
+              }
+            ],
+            "FromGrade": true,
+            "Material": "C",
+            "NominalWeightLbPerFt": 0,
+            "Density": 0,
+            "Assembly": "DAM-DAM-PIER-28",
+            "AssemblyDescription": "sliding plate expansion dam dam Pier 28 (p.46)",
+            "Unresolved": "UNRESOLVED (p.46): sliding plate dam at dam Pier 28: teeth, edge channels, stringer supports, anchor bars and the curb / parapet ends - p.46 Section A gives the total dam width 8 1/4 in at 68 F (low confidence) and 3/8 in sliding plates; the serpentine seal, bulkhead plates and supports are drawn, not all dimensioned. one steel band 8.25 in wide (total dam width at 68 F) x 0.375 in, top flush with the grade, 38\u0027-3 each side of the CL (curb to curb).",
+            "Source": "p.46"
+          },
+          {
+            "Name": "dam Pier 29",
+            "Kind": "Steel",
+            "Category": "JointArmor",
+            "Transverse": true,
+            "ReferenceOffset": 0,
+            "Station": 21624.1009224,
+            "From": -11.6586,
+            "To": 11.6586,
+            "Side": 1,
+            "Profile": [
+              {
+                "U": -0.104775,
+                "V": -0.009524999999999999
+              },
+              {
+                "U": 0.104775,
+                "V": -0.009524999999999999
+              },
+              {
+                "U": 0.104775,
+                "V": 0
+              },
+              {
+                "U": -0.104775,
+                "V": 0
+              }
+            ],
+            "FromGrade": true,
+            "Material": "C",
+            "NominalWeightLbPerFt": 0,
+            "Density": 0,
+            "Assembly": "DAM-DAM-PIER-29",
+            "AssemblyDescription": "sliding plate expansion dam dam Pier 29 (p.46)",
+            "Unresolved": "UNRESOLVED (p.46): sliding plate dam at dam Pier 29: teeth, edge channels, stringer supports, anchor bars and the curb / parapet ends - p.46 Section A gives the total dam width 8 1/4 in at 68 F (low confidence) and 3/8 in sliding plates; the serpentine seal, bulkhead plates and supports are drawn, not all dimensioned. one steel band 8.25 in wide (total dam width at 68 F) x 0.375 in, top flush with the grade, 38\u0027-3 each side of the CL (curb to curb).",
+            "Source": "p.46"
+          },
+          {
+            "Name": "dam Pier 30",
+            "Kind": "Steel",
+            "Category": "JointArmor",
+            "Transverse": true,
+            "ReferenceOffset": 0,
+            "Station": 21662.023224000004,
+            "From": -11.6586,
+            "To": 11.6586,
+            "Side": 1,
+            "Profile": [
+              {
+                "U": -0.104775,
+                "V": -0.009524999999999999
+              },
+              {
+                "U": 0.104775,
+                "V": -0.009524999999999999
+              },
+              {
+                "U": 0.104775,
+                "V": 0
+              },
+              {
+                "U": -0.104775,
+                "V": 0
+              }
+            ],
+            "FromGrade": true,
+            "Material": "C",
+            "NominalWeightLbPerFt": 0,
+            "Density": 0,
+            "Assembly": "DAM-DAM-PIER-30",
+            "AssemblyDescription": "sliding plate expansion dam dam Pier 30 (p.46)",
+            "Unresolved": "UNRESOLVED (p.46): sliding plate dam at dam Pier 30: teeth, edge channels, stringer supports, anchor bars and the curb / parapet ends - p.46 Section A gives the total dam width 8 1/4 in at 68 F (low confidence) and 3/8 in sliding plates; the serpentine seal, bulkhead plates and supports are drawn, not all dimensioned. one steel band 8.25 in wide (total dam width at 68 F) x 0.375 in, top flush with the grade, 38\u0027-3 each side of the CL (curb to curb).",
+            "Source": "p.46"
+          }
         ]
-      }
+      },
+      "Railings": [
+        {
+          "Name": "Left parapet railing",
+          "TypeName": "PTC aluminum parapet railing (p.107 / p.108)",
+          "Kind": "Guardrail",
+          "Offset": -12.395199999999999,
+          "BeginStation": 21548.7582232,
+          "EndStation": 21699.894725600003,
+          "BaseProbe": 0,
+          "Material": "Aluminum (rail ASTM B235 GS10A-T6, posts B108 356-T6)",
+          "Density": 2700,
+          "SampleStep": 0.3048,
+          "Post": {
+            "Profile": [
+              {
+                "R": -0.127,
+                "H": 0
+              },
+              {
+                "R": 0.127,
+                "H": 0
+              },
+              {
+                "R": 0.07619999999999999,
+                "H": 0.3857625
+              },
+              {
+                "R": -0.07619999999999999,
+                "H": 0.3857625
+              }
+            ],
+            "Thickness": 0.17779999999999999,
+            "Spacing": 1.74625,
+            "EndDistance": 0.358775,
+            "Description": "cast aluminum post 10 x 7 at the base, 6 in at the top",
+            "Unresolved": "UNRESOLVED (p.107, p.108): post layout and shape - the posts are laid out per railing panel (31\u0027-0 / 30\u0027-5 3/4 panels: 5 spaces with 1\u0027-2 1/8 to the joints, special panels on p.108) and the cast post is hollow with a 3/8 web. solid tapered post 10 in -\u003E 6 in x 7 in, equally spaced at most 5\u0027-8 3/4 over each bridge run, 1\u0027-2 1/8 from its ends; anchor bolts and pads not built."
+          },
+          "Members": [
+            {
+              "Name": "oval rail",
+              "Kind": "Rail",
+              "Diameter": 0,
+              "Width": 0.2032,
+              "Height": 0.142875,
+              "Center": {
+                "R": 0,
+                "H": 0.3857625
+              },
+              "Description": "oval aluminum tube 8 x 5 5/8 x 3/16",
+              "MassPerLength": 7,
+              "Unresolved": "UNRESOLVED (p.108): rail section - the oval tube is 8 in \u002B- x 5 5/8 in \u002B- with a 3/16 wall. rectangular envelope 8 x 5 5/8, mass of the tube (about 4.7 lb/ft)"
+            }
+          ],
+          "FlagsDimensionOnly": true,
+          "Source": "p.107 / p.108",
+          "Unresolved": []
+        },
+        {
+          "Name": "Right parapet railing",
+          "TypeName": "PTC aluminum parapet railing (p.107 / p.108)",
+          "Kind": "Guardrail",
+          "Offset": 12.395199999999999,
+          "BeginStation": 21548.7582232,
+          "EndStation": 21699.894725600003,
+          "BaseProbe": 0,
+          "Material": "Aluminum (rail ASTM B235 GS10A-T6, posts B108 356-T6)",
+          "Density": 2700,
+          "SampleStep": 0.3048,
+          "Post": {
+            "Profile": [
+              {
+                "R": -0.127,
+                "H": 0
+              },
+              {
+                "R": 0.127,
+                "H": 0
+              },
+              {
+                "R": 0.07619999999999999,
+                "H": 0.3857625
+              },
+              {
+                "R": -0.07619999999999999,
+                "H": 0.3857625
+              }
+            ],
+            "Thickness": 0.17779999999999999,
+            "Spacing": 1.74625,
+            "EndDistance": 0.358775,
+            "Description": "cast aluminum post 10 x 7 at the base, 6 in at the top",
+            "Unresolved": "UNRESOLVED (p.107, p.108): post layout and shape - the posts are laid out per railing panel (31\u0027-0 / 30\u0027-5 3/4 panels: 5 spaces with 1\u0027-2 1/8 to the joints, special panels on p.108) and the cast post is hollow with a 3/8 web. solid tapered post 10 in -\u003E 6 in x 7 in, equally spaced at most 5\u0027-8 3/4 over each bridge run, 1\u0027-2 1/8 from its ends; anchor bolts and pads not built."
+          },
+          "Members": [
+            {
+              "Name": "oval rail",
+              "Kind": "Rail",
+              "Diameter": 0,
+              "Width": 0.2032,
+              "Height": 0.142875,
+              "Center": {
+                "R": 0,
+                "H": 0.3857625
+              },
+              "Description": "oval aluminum tube 8 x 5 5/8 x 3/16",
+              "MassPerLength": 7,
+              "Unresolved": "UNRESOLVED (p.108): rail section - the oval tube is 8 in \u002B- x 5 5/8 in \u002B- with a 3/16 wall. rectangular envelope 8 x 5 5/8, mass of the tube (about 4.7 lb/ft)"
+            }
+          ],
+          "FlagsDimensionOnly": true,
+          "Source": "p.107 / p.108",
+          "Unresolved": []
+        }
+      ]
     }
   ],
   "References": [
