@@ -303,7 +303,7 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
     not hand-set Near/Far elsewhere); section cut = CPU clipping of all solids/lines/text (Helix
     `CrossSectionMeshGeometryModel3D` was tried: transparent models stop rendering when it is in the scene â€” don't use
     it); picking via `SceneBuilder.Picks` (triangle range â†’ source object) and `InstanceTags`; clipped meshes map
-    triangles back via `_triMap`. Hide/unhide: `_hidden` (tags) filters merged meshes by pick-table ranges and
+    triangles back via `_triMap`. A Helix hit names the triangle by its three VERTEX indices: always resolve it with `PickTable.TriangleOf` (SBM.Core/Geometry; shared flat-shaded vertices make vertex / 3 another element's triangle); `--pick` / `--pickafter` log the hit point vs the highlight bounds (`hitOutside` must be 0). Hide/unhide: `_hidden` (tags) filters merged meshes by pick-table ranges and
     instanced meshes by `_visibleInstances`, through the same ClipMesh/ApplySection path as the section cut; `RemapHidden`
     re-matches hidden tags after regeneration via `HideKey`. Right-click (no drag) = context menu. Sheets mode: `MainWindow.Sheets.cs`. Snapshot options: `--section STA[,skew]`,
     `--pick fx,fy` (logs PICK: properties), `--sheets`, `--orbit fx,fy,dx,dy` (simulated orbit drag; logs ORBIT: pivot, leaves the marker), DETAIL: log lines = detail tiles drawn.

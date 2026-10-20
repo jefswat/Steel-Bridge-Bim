@@ -10,24 +10,6 @@ using SBM.Core.Steel;
 
 namespace SBM.App.Viewport;
 
-/// <summary>Maps triangles of a merged (batched) mesh back to the objects they came from, for picking.</summary>
-public sealed class PickTable
-{
-    public List<int> TriStart { get; } = new();
-    public List<object> Tags { get; } = new();
-
-    public object? Find(int triangle, out int start, out int end)
-    {
-        int i = TriStart.BinarySearch(triangle);
-        if (i < 0) i = ~i - 1;
-        start = end = 0;
-        if (i < 0 || i >= Tags.Count) return null;
-        start = TriStart[i];
-        end = i + 1 < TriStart.Count ? TriStart[i + 1] : int.MaxValue;
-        return Tags[i];
-    }
-}
-
 /// <summary>Pick context for reinforcing and substructure solids.</summary>
 public sealed record RebarPick(SBM.Core.Concrete.BarPlacement Bar, SBM.Core.Concrete.BarMark Mark);
 public sealed record SubPick(SBM.Core.Substructure.SubstructureUnit Unit, SBM.Core.Substructure.SubSolid Solid);

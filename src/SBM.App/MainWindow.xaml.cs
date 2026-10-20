@@ -177,7 +177,7 @@ public partial class MainWindow : Window
                     Dispatcher.BeginInvoke(() =>
                     {
                         Pick(new Point(pp[0] * View.ActualWidth, pp[1] * View.ActualHeight));
-                        ViewModels.MainViewModel.Log("PICK: " + string.Join(" | ", _vm.SelectedProperties.Select(r => $"{r.Name}={r.Value}")));
+                        ViewModels.MainViewModel.Log("PICK: " + string.Join(" | ", _vm.SelectedProperties.Select(r => $"{r.Name}={r.Value}")) + PickHitReport());
                     }, System.Windows.Threading.DispatcherPriority.ApplicationIdle);
                 }
                 int obi = Array.IndexOf(args, "--orbit");
@@ -216,7 +216,7 @@ public partial class MainWindow : Window
                         if (oi2 < 0 || oi2 + 1 >= args.Length) continue;
                         var pp2 = args[oi2 + 1].Split(',').Select(x => double.Parse(x, System.Globalization.CultureInfo.InvariantCulture)).ToArray();
                         Pick(new Point(pp2[0] * View.ActualWidth, pp2[1] * View.ActualHeight));
-                        ViewModels.MainViewModel.Log("PICKAFTER: " + string.Join(" | ", _vm.SelectedProperties.Select(r => $"{r.Name}={r.Value}")) + $" (smooth bars {_lodSkip.Count})");
+                        ViewModels.MainViewModel.Log("PICKAFTER: " + string.Join(" | ", _vm.SelectedProperties.Select(r => $"{r.Name}={r.Value}")) + $" (smooth bars {_lodSkip.Count})" + PickHitReport());
                         if (opt == "--hideafter" && _selectedTag != null) { HideElement(_selectedTag, _selectedTitle); ViewModels.MainViewModel.Log($"HIDEAFTER: {_hiddenList.Count} hidden: {string.Join(", ", _hiddenList.Select(h => h.label))}"); }
                     }
                     SnapshotIsolate(args);
