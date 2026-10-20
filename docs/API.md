@@ -266,6 +266,66 @@ Doc.Regenerate();
 foreach (var r in Doc.ExactQuantities("Br12 Unit 2")) Print($"{r.Element} {r.Kind}: exact {r.ExactVolume:F4} m3, mesh {r.VolumeDiffPercent:+0.000;-0.000}%");
 ```
 
+## QC measurements (`sbm measure`, `sbm section`)
+
+Read-only tools for the independent checker (docs/QC-PLAN.md section 3). The model is opened and regenerated in memory and
+**never saved**. Output is a text report, or JSON with `--json` (stdout) / `--out file.json`. Several queries can be given
+in one call (`--part A --part B`), or one per line in `--batch file.txt`; they share one regeneration, so each query
+after the regeneration takes milliseconds (an assembly with its adjoining girder plates ~0.3 s).
+
+```
+sbm measure model.sbm --part FS1-G1-SP1 [--ref longest-edge|horizontal|holes|girder-tangent|alignment|x,y,z] [--leg N] [--svg p.svg]
+sbm measure model.sbm --assembly FS1-G1 [--ref ...] [--no-neighbours] [--svg a.svg]
+sbm measure model.sbm --member G1-2 --at 12ft|301+50 [--width all|LEN] [--svg s.svg] [--dxf s.dxf] [--csv s.csv]
+sbm measure model.sbm --distance G1-LAT1-L1 G1-1-TFL1
+sbm measure model.sbm --point E,N[,Z] | --station 301+50 --offset 4ft
+sbm measure model.sbm --bar 5d2[#n] | --cover 5d2 | --spacing A --along girder:G1|alignment|axis|x,y,z | --laps T --fc 4  [--unit "Pier 2"]
+sbm section model.sbm --station 2476+50.56 [--offset O] [--normal-to alignment|girder:G1|member:MARK|plumb] [--skew DEG]
+                      | --plane x,y,z,nx,ny,nz   [--width LEN] [--height LEN] [--bolts] [--no-bars] [--only text,..] [--dims]
+                      [--svg s.svg] [--dxf s.dxf] [--csv s.csv] [--json] [--out s.json]
+common: --bridge NAME (exact or substring), --tol 1/8" (hole row / column clustering)
+```
+
+**Frames come from the geometry, never from the world axes** (parts on grade, cross slope, skew, curvature, arch parts):
+- *Plate normal and thickness:* the triangles are clustered into face planes; the pair of largest opposite parallel faces
+  (thin compared to their size) is the plate (`--leg 2` = the next pair: the other angle leg, a WT stem). When the part's
+  `ExtrudedSolid` recipes lie in that plane the outline and holes are the exact recipe polygon and circles (`source:
+  recipe`, sweep vector -> edge bevel); otherwise the mesh is cut at the mid plane (`source: mesh section`; hole diameter =
+  2 x apothem of the circumscribed hole polygon). Strips of long plates are merged by cancelling shared edges.
+- *In-plane axes:* u = the reference projected into the plate plane: the longest straight edge (default for parts), the
+  girder tangent incl. grade (`girder-tangent`, default for field splices / field sections; nearest girder to the part),
+  the alignment tangent incl. profile grade, a level line in the plane (`horizontal`), the hole pattern (`holes`) or any
+  vector. v is "up" in the plane (for level plates n points up and v = n x u); n = u x v. The JSON gives u, v, n and the
+  world origin (lower-left of the outline on the mid plane), so every (u, v) can be mapped back to E/N/Z.
+- *Hole patterns:* each hole group is read along its own pattern axes (dominant nearest-neighbour direction): a bolt
+  column parallel to a sloped end edge is one column (`axisDeg` = its angle to u / v). Groups split at spacings clearly
+  larger than the typical one (the two sides of a splice). Edge distances are measured from each hole center to the edge
+  hit along the pattern axes, **perpendicular to that edge** (`perpendicular`; `alongAxis` = along the ray).
+- *Assemblies:* plate components are grouped by parallel normals (1.5 deg) and stacks along the normal (gaps <= 4", so a flange between its outside and inside splice plates keeps them in one plane),
+  one plane per group. Parts of other assemblies in the same plane near the assembly (girder webs / flanges at a splice,
+  stiffeners a frame bolts to) are added as "adjoining" (cut, clipped). Per plane: layers with near / far face offsets
+  (fillers, gaps, overlaps < 0), joint gaps between like adjoining plates of different assemblies, bolts (axis within 5 deg
+  of the normal) with the plates they pass through and the bolts on each side of the joint, bolt rows / columns.
+- *Sections:* the plane normal is the alignment tangent incl. grade (default), a girder tangent incl. grade, a member axis
+  (girders: path tangent; parts: exact sweep or principal axis) or a given vector, optionally skewed about v. 2D frame:
+  u = right looking ahead, v = world up made normal to the plane. Every solid is cut (`MeshSection`), closed loops listed
+  per element with its GlobalId; bars crossing the plane are dots with mark, size, angle to the plane and clear cover to
+  the concrete loop holding them; bars lying in the plane are polylines. `--dims` adds element extents (width / height),
+  vertical / horizontal clear distances between neighbouring elements, and bar covers.
+- *Rebar:* `--bar` = centerline, bends (sampled arcs merged: angle, centerline radius, pin = 2R - db vs AASHTO minimum;
+  a sharp model corner is reported as such), straights, hooks (90/135/180 with tail in db), developed vs scheduled
+  length. `--cover` = minimum clear cover per bar to each host face type (top / bottom / side by face normal; faces shared
+  with another host solid are not free faces; mesh distances). `--spacing` = sorted positions along a girder path, the
+  alignment (stations) or the principal axis, collapsed into "n spa @ s". `--laps` = parallel overlapping bars of the
+  same size in the same host: lap length, clear distance, lap centers, closest lap stagger, Class B lap for `--fc`.
+  A mark used in several places (deck and piers) picks the largest set and says so; use `--unit` / `--bridge`.
+
+JSON lengths are `{in, text, mm}` (text = ft-in to 1/16"); 2D coordinates are in inches (US) / mm (SI), world points in
+ft / m. API: `SbmDocument.MeasureModel()` (GlobalIds attached) and the classes in `SBM.Core.Checks.Measure`
+(`PlateMeasure`, `AssemblyMeasure`, `ModelSection`, `SectionPlanes`, `MeasureQueries`, `MeasureSvg`).
+Limits: meshes are faceted (curved faces to the chord tolerance); curved / bent plates are measured at the cut of their
+largest flat faces (`flatSharePct` and a note say so); hole polygons from meshes are assumed circumscribed.
+
 ## Performance notes
 
 - **Incremental regeneration:** each bridge is keyed by a hash of its definition, alignment and units. Unchanged

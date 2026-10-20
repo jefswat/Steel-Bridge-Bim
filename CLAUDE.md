@@ -40,7 +40,7 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   load when links are missing or the rules file is newer. A new bridge needs its own `sheet-links-<name>.json` with an index (tests check every rule matches a sheet).
   Keep `ModelDatabase.Builder` numbering in step with `IfcExporter` (test `GlobalIds_AreTheIfcGlobalIds`). CLI `sbm db`, docs in docs/API.md.
 - `src/SBM.Cli` — `sbm.exe` command line over SBM.Api (new/info/get/set/add/remove/import-landxml/regen/export/run/bench/
-  elevations/drawings/sheets/nurbs).
+  elevations/drawings/sheets/nurbs/measure/section).
 - `src/SBM.Core` â€” no UI. All geometry and the parametric model.
   - `Geometry/` Vec2/Vec3 (double), Box2, Numerics (Gauss-Legendre, Brent, FindRoots, line intersection).
   - `Alignments/` `HorizontalElement` = one class for line/arc/clothoid (linear curvature K0â†’K1, partial spirals OK);
@@ -682,6 +682,15 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   substructure concrete (concrete only vs drains / misc); depth > 1/16" = clash. Walkways as designed (`InspectionAccessDefinition.SupportOnFrames`, built AFTER the
   connections phase from the generated frames, `Steel/InspectionWalkwayDetailer.cs`), cross girder `Level` / discontinuous girder cope inputs, drain pipes one mitred
   piece (`MiscMesh.Pipe`), pier drains `NoTrough` / `ColumnNumber` / jog / fittings. Status: docs/plan-data/cutoff-diaphragms-and-inspection.md (end).
+- QC measure tools (read-only, never save; `SBM.Core/Checks/Measure/`, CLI `src/SBM.Cli/MeasureCommand.cs` = `sbm measure` / `sbm section`, docs/API.md "QC measurements",
+  tests `MeasureTests`): `MeasureModel` (parts / assemblies / bars by mark, every solid as `MeasureElement` with `ElementRef`; GlobalIds via `SbmDocument.MeasureModel()`
+  = the IfcKeys patterns, bars numbered as the IFC export numbers them), `PlateGeometry` (face-plane clustering -> `PlateComponent` = largest opposite parallel faces;
+  outline from the `ExtrudedSolid` recipes when they lie in that plane, else the mid-plane `MeshSection` cut; strip union by edge cancellation), `PlateMeasure`
+  (frame u = reference projected into the plane, v = in-plane up, n = u x v; edges / arcs / kinks / clips / re-entrant corners; holes; `Pattern` = groups read along
+  their own pattern axes, edge distances perpendicular to the edge hit), `AssemblyMeasure` (plane groups, adjoining plates of other assemblies cropped to the
+  assembly, stack gaps, joint gaps, bolts per side), `ModelSection` + `SectionPlanes` (true cut, plane normal = alignment / girder tangent incl. grade / member axis,
+  bars as dots with cover), `MeasureQueries` (distance via the clash engine + exact min distance, vertical point query, bar bends / hooks, cover per face type,
+  spacing chains, laps), `MeasureSvg`. Never assume world axes there. Profile with env `SBM_MEASURE_PROFILE=1`.
 - Misc items (OPTIONAL, `BridgeDefinition.Misc` = `MiscItemsDefinition` + `DeckDrainDefinition.Trench`; null = none; `Bridge/MiscItemsDefinition.cs`, generator `SBM.Core/Misc/`
   `MiscItemsGenerator` (+ `MiscPierDrains`, `MiscOthers`, `MiscMesh`), result `MiscModel` hung on `SubstructureModel.Misc` and built in `RegenerationCache` after the substructure):
   Ramp G deck drainage (trench inlets positioned FROM THE GUTTER LINE = deck edge - EdgeStrip width, tube, grate, splash basin, 12" span collector at the printed

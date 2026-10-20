@@ -320,6 +320,42 @@ public sealed class SbmDocument
         return sheets.Count;
     }
 
+    // ------------------------------------------------------------------ measure (read-only QC tools)
+
+    private SBM.Core.Checks.Measure.MeasureModel? _measure;
+    private List<BridgeModel?>? _measureFor;
+
+    /// <summary>Read-only measure view of the regenerated model (parts, assemblies, bars, every solid) with IFC GlobalIds attached, for
+    /// <c>sbm measure</c> / <c>sbm section</c> (<see cref="SBM.Core.Checks.Measure"/>). Regenerates when needed; cached until the next regeneration.</summary>
+    public SBM.Core.Checks.Measure.MeasureModel MeasureModel()
+    {
+        Regenerate();
+        if (_measure != null && ReferenceEquals(_measureFor, _models)) return _measure;
+        string key = Project.Name;
+        string? Gid(SBM.Core.Checks.Measure.ElementRef r)
+        {
+            string bk = IfcKeys.Bridge(key, r.Bridge);
+            string? k = r.Kind switch
+            {
+                "part" => IfcKeys.Part(bk, r.Mark),
+                "assembly" => IfcKeys.Assembly(bk, r.Mark),
+                "deck" when r.Mark == "Deck slab" => IfcKeys.DeckSlab(bk),
+                "haunch" => IfcKeys.DeckSlab(bk),           // the haunches are an item of the deck slab in the IFC
+                "barrier" => IfcKeys.Barrier(bk, r.Mark),
+                "caphaunch" when r.Assembly != null => IfcKeys.CapHaunch(bk, r.Assembly),
+                "sub" when r.Unit != null && r.Index is { } i => IfcKeys.SubSolid(IfcKeys.Unit(bk, r.Unit), i),
+                "psbeam" => IfcKeys.PsBeam(bk, r.Mark),
+                "deckbar" when r.Index is { } i => IfcKeys.DeckBar(bk, i),
+                "subbar" when r.Unit != null && r.Index is { } i => IfcKeys.SubBar(IfcKeys.Unit(bk, r.Unit), i),
+                "psbar" when r.Assembly != null && r.Index is { } i => IfcKeys.PsBar(bk, r.Assembly, i),
+                _ => null,
+            };
+            return k == null ? null : IfcKeys.GlobalId(k);
+        }
+        _measureFor = _models;
+        return _measure = new SBM.Core.Checks.Measure.MeasureModel(_models.OfType<BridgeModel>(), Units) { GlobalIds = Gid };
+    }
+
     // ------------------------------------------------------------------ export
 
     /// <param name="chordTolerance">ReferenceView only: max sagitta (m) of hole / profile-arc polygons; 0 = 1/32 in.</param>
