@@ -773,7 +773,7 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   loops kept, runs < 2 hold-backs dropped). Weld part `Length` = the modeled root length now (was nominal), description ends ", held back X (source)".
   Plan values (`samples/plans/weld-holdbacks.csx`, re-runnable on the models): I-80 / Ramp G / Nebraska St = Iowa std. 1021W Detail A 1/4" (PDF p.120 /
   p.103 / p.32) + X = 5T min 2 1/4"; ODOT Bridge O = 3/8" (p.273 note 7, p.282-288 note 6); NHT rib fin = 1/4" (p.148), other NHT welds and the Sample =
-  default (flagged). Not applied: `IntegralCapDetailer` (Nebraska cap welds, being edited elsewhere). Drawings: `SteelDetailViews.Stiffeners` draws the
+  default (flagged). Integral steel cap welds (`IntegralCapDetailer`: stiffener web + bottom, diaphragm plate, bottom plate) use `AddHeld` with `HoldBack` / `HoldNote` / `WeldFlag` too (2026-10-20; an explicit stiffener `StiffenerTopNoWeld` longer than the clip is the termination at the top). Drawings: `SteelDetailViews.Stiffeners` draws the
   beads held back, dimensions the hold-back at the plate edge and notes the hold-back / web weld end / plan source (UNRESOLVED text when defaulted).
   Tests `WeldTerminationTests`. Found: the ODOT tub rule GS (cross frame gusset to WT top strut) only ever found bolt-hole walls (0.2" chords) - no T-joint
   in the model; those 42 bogus weld parts vanish now.

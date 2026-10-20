@@ -261,8 +261,18 @@ foreach (var xd in st.Assemblies.Where(a => a.Mark.StartsWith("XD")).OrderBy(a =
     int nb = st.Bolts.Count(b => b.Assembly == xd.Mark);
     Row($"{xd.Mark} connection bolts (2 ends x (2 columns x 9 + 2 angles x 8))", "68", $"{nb}", nb == 68, "p.282 O-28");
 }
-foreach (var d in st.Parts.Where(p => p.Category == PartCategory.AccessDoor).OrderBy(p => p.Mark))
-    Row($"{d.Mark} bottom flange opening 18\" x 30\" (R 9\", centres 6\" either side of CL; door 24\" x 36\")", "1'-6 x 2'-6", d.Description.Contains("opening 18\" x 30\"") ? "1'-6 x 2'-6" : d.Description, d.Description.Contains("opening 18\" x 30\""), "p.290 O-36");
+// Matched on the part CATEGORY and the hatch DEFINITION values; the description only echoes them in the model's length format, so it is not matched.
+var hatchDefs = br.Girders.Tub?.Hatches ?? new List<TubAccessHatchDefinition>();
+var doors = st.Parts.Where(p => p.Category == PartCategory.AccessDoor).OrderBy(p => p.Mark).ToList();
+Row("access doors modeled = hatches entered", $"{hatchDefs.Count}", $"{doors.Count}", doors.Count == hatchDefs.Count, "p.273 / p.290");
+for (int hi = 0; hi < hatchDefs.Count; hi++)
+{
+    var h = hatchDefs[hi];
+    bool good = Math.Abs(h.HoleWidth - F(0, 18)) <= Sixteenth && Math.Abs(h.HoleLength - F(0, 30)) <= Sixteenth && Math.Abs(h.DoorWidth - F(0, 24)) <= Sixteenth && Math.Abs(h.DoorLength - F(0, 36)) <= Sixteenth;
+    Row($"hatch {hi + 1} (girder {h.Girder + 1}) bottom flange opening 18\" x 30\" (R 9\", centres 6\" either side of CL), door 24\" x 36\"", "1'-6 x 2'-6, door 2'-0 x 3'-0", $"{FI(h.HoleWidth)} x {FI(h.HoleLength)}, door {FI(h.DoorWidth)} x {FI(h.DoorLength)}", good, "p.290 O-36");
+}
+foreach (var d in doors)
+    Row($"{d.Mark} door length 3'-0 (part category AccessDoor)", "3'-0", FI(d.Length), Math.Abs(d.Length - F(0, 36)) <= Sixteenth, "p.290 O-36");
 var anchors = st.Bolts.Where(b => b.Kind == BoltKind.Anchor).ToList();
 Row("anchor bolts", "24", $"{anchors.Count}", anchors.Count == 24, "p.292");
 Row("anchor bolts 3'-0\" long", "36\"", $"{anchors.Min(b => ToIn(b.Length)):F2}\" .. {anchors.Max(b => ToIn(b.Length)):F2}\"", anchors.All(b => Math.Abs(ToIn(b.Length) - 36) < 0.01), "p.292 Detail of Anchor Bolt");

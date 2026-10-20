@@ -207,6 +207,27 @@ public class IntegralSteelCapTests
     }
 
     [Fact]
+    public void CapStiffenerWelds_AreHeldBack_PlanValueOrFlaggedDefault()
+    {
+        double Run(bool plan, out List<SteelPart> welds)
+        {
+            var doc = Doc();
+            var b = doc.Bridge();
+            b.Supports[1].IntegralSteelCap!.StiffenerBottomWeld = true;
+            if (plan) b.Welds = new WeldTerminationDefinition { HoldBack = In(0.5), Source = "p.32 test" };
+            Assert.Empty(doc.Regenerate().Errors);
+            welds = doc.Steel().Parts.Where(p => p.Category == PartCategory.Weld && p.Mark.StartsWith("CAP1") && (p.Mark.Contains("-BS") || p.Mark.Contains("-JS"))).ToList();
+            Assert.NotEmpty(welds);
+            return welds.Sum(w => w.Length);
+        }
+        double dflt = Run(false, out var wd);
+        Assert.All(wd, w => { Assert.Contains("held back", w.Description); Assert.Contains("UNRESOLVED", w.Description); Assert.NotNull(w.Assumption); });
+        double plan = Run(true, out var wp);
+        Assert.All(wp, w => { Assert.EndsWith("(p.32 test)", w.Description); Assert.Null(w.Assumption); });
+        Assert.True(plan < dflt - 1e-6, "a larger plan hold-back must shorten the beads");
+    }
+
+    [Fact]
     public void JackingStiffeners_AndPerSupportBearingStiffenerPlate()
     {
         var doc = Doc(cap: false);
