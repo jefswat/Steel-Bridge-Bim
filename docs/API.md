@@ -554,3 +554,25 @@ names / marks / strings matching the leak rules (name falls back to category + m
 (page_ref, note, UNRESOLVED, scaled, assumed, plan_text, inch_size, designation) and prints counts per kind and per entity attribute; with `--expect-clean` the exit code is 1 when anything is found.
 Not detectable by rule (accepted, named here): descriptive element names without sizes ("Left curb", "Pier 3 pedestal G1"), material strengths in material names, rolled-section Mass (nominal weight x length), the
 SBM_Status flag itself.
+
+## Headless screenshots and turntable video (`--snapshot`)
+
+The app can render itself without anyone touching it and exit. Run these on a PC with a display (a GPU is needed for the viewport):
+
+```
+:: full app window + the viewport only (nebraska.png and nebraska_view.png)
+SteelBridgeModeler.exe "samples\plans\Nebraska St Ramp B.sbm" --snapshot "temp\media\nebraska.png" --3d --winsize 1920,1080
+
+:: turntable frames of the viewport only: nebraska_frame0001.png ... nebraska_frame0180.png
+SteelBridgeModeler.exe "samples\plans\Nebraska St Ramp B.sbm" --snapshot "temp\media\nebraska.png" --3d --winsize 1920,1080 --turntable 180
+
+:: frames -> video (pip install imageio imageio-ffmpeg; without them an animated GIF is written)
+python -I tools\frames_to_video.py temp\media\nebraska temp\media\nebraska.mp4 --fps 30
+```
+
+`--turntable N[,degrees[,pitch]]`: N frames (default 120), `degrees` of yaw over the run (default 360; frame i turns by degrees * i / N, so a
+full turn loops), `pitch` = degrees the camera looks down (default: the current 3D view). The orthographic camera circles the scene centre
+(yaw about world Z), the view width is set once from the bounding sphere so nothing clips. Detail layers (welds, rivets, bolts, near rebar)
+are off in every frame unless `--detail` is given (then the set drawn at the start stays drawn, no flicker). Also accepts `--winsize`,
+`--noterrain`, `--off PREFIX,...`, `--camera`. Log lines `TURNTABLE:` in `%LOCALAPPDATA%\SteelBridgeModeler\session.log`.
+Large models can take ~0.2 s per frame plus load time.
