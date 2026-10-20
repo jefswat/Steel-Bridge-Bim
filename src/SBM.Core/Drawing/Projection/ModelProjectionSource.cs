@@ -42,6 +42,14 @@ public static class ModelLayers
         ("3D-PIER-CAP-HANDHOLES", 225, 170, 90, new[] { PartCategory.HandholeCover, PartCategory.HandholeBacking }),
         ("3D-PIER-CAP-SCREENS", 190, 190, 195, new[] { PartCategory.MeshScreen }),
         ("3D-JOINT-HARDWARE", 150, 155, 165, new[] { PartCategory.JointArmor, PartCategory.JointStud, PartCategory.JointCoverPlate, PartCategory.JointAnchor }),
+        ("3D-TRUSS-CHORDS", 70, 130, 200, new[] { PartCategory.TrussChord }),
+        ("3D-TRUSS-WEB-MEMBERS", 95, 150, 215, new[] { PartCategory.TrussDiagonal, PartCategory.TrussVertical, PartCategory.TrussHanger }),
+        ("3D-TRUSS-GUSSETS", 235, 185, 70, new[] { PartCategory.TrussGusset }),
+        ("3D-TRUSS-BRACING", 80, 200, 110, new[] { PartCategory.TrussBracing }),
+        ("3D-TRUSS-FLOOR-BEAMS", 120, 160, 225, new[] { PartCategory.TrussFloorBeam }),
+        ("3D-TRUSS-STRINGERS", 140, 175, 215, new[] { PartCategory.TrussStringer }),
+        ("3D-TRUSS-SUSPENDERS", 215, 215, 225, new[] { PartCategory.Suspender, PartCategory.SuspenderSocket }),
+        ("3D-TRUSS-SHOES", 150, 150, 155, new[] { PartCategory.TrussShoeFixed, PartCategory.TrussShoeExpansion, PartCategory.TrussPin }),
     };
 
     private static readonly Dictionary<string, (byte r, byte g, byte b)> Colors = new()

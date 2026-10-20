@@ -78,7 +78,7 @@ public sealed class RegenerationCache
             SteelModel? st = null;
             Concrete.ConcreteModel? cm = null;
             Prestressed.PrestressedModel? ps = null;
-            if (b.SupportLinesOnly && b.Arch == null && b.Segmental == null)
+            if (b.SupportLinesOnly && b.Arch == null && b.Segmental == null && b.Truss == null)
             {
                 // Support lines only: no steel, concrete or substructure (st / cm / ps stay null).
             }
@@ -89,6 +89,13 @@ public sealed class RegenerationCache
                 st = am.Steel;
                 cm = am.Concrete;
                 RoundBends(cm, null);
+            }
+            else if (includeSteel && !f.HasErrors && b.Truss != null)
+            {
+                // Steel truss: its own generator; members / gussets / floor / suspenders / shoes in a SteelModel, the deck slab in a ConcreteModel.
+                var tm = SBM.Core.Truss.TrussGenerator.Generate(f, project.Units);
+                st = tm.Steel;
+                cm = tm.Concrete;
             }
             else if (includeSteel && !f.HasErrors && b.Segmental != null)
             {
@@ -179,7 +186,8 @@ public sealed class RegenerationCache
                 lock (_lock) _sub[subKey] = sub;
             }
             // A tied-arch bridge builds no substructure: its bearings reach the approach units' piers as foreign seats.
-            else if (!found && includeSteel && !pt.f.HasErrors && (pt.s != null || pt.ps != null) && b.Arch == null)
+            // A truss bridge builds no substructure either (its shoes publish bearing seats with locations; piers belong to the substructure model).
+            else if (!found && includeSteel && !pt.f.HasErrors && (pt.s != null || pt.ps != null) && b.Arch == null && b.Truss == null)
             {
                 var seats = (IReadOnlyList<BearingSeat>?)pt.ps?.BearingSeats ?? pt.s!.BearingSeats;
                 var foreign = new Dictionary<int, List<(string, BearingSeat)>>();
@@ -274,6 +282,12 @@ public sealed class RegenerationCache
             yield break;
         }
         if (s == null) yield break;
+        if (s.Truss != null)
+        {
+            foreach (var seat in s.BearingSeats.Where(x => x.Support == sl.Name && x.Location != null))
+                yield return ($"{b.Name} {(s.Truss.BearingNames.ElementAtOrDefault(seat.Girder) ?? "S" + (seat.Girder + 1))}", seat);
+            yield break;
+        }
         if (s.Arch != null)
         {
             // Tied arch: seats carry their plan location and axis.
