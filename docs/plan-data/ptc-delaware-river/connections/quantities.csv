@@ -1,0 +1,17 @@
+item,description,unit,pa_girder_spans,pa_3span_unit,pa_4span_unit,main_river_spans,nj_4span_unit,nj_3span_unit,nj_girder_spans,total,page,confidence,note
+1,Structural carbon steel - girder spans,Lb,2496000,,,,,,1004000,3500000,42,high,DRB-4/2 quantity table (230 dpi crop); totals add
+2,Structural carbon steel - approach truss spans,Lb,,1532000,2423000,,2423000,1532000,,7910000,42,high,
+3,Structural carbon steel - main river spans,Lb,,,,5730000,,,,5730000,42,high,
+4,Structural silicon steel - girder spans,Lb,2727000,,,,,,1093000,3820000,42,high,
+5,Structural silicon steel - approach truss spans,Lb,,1324000,2736000,,2736000,1324000,,8120000,42,high,
+6,Structural silicon steel - main river spans,Lb,,,,10200000,,,,10200000,42,high,
+7,Bridge rope suspenders,Lin.Ft,,,,1760,,,,1760,42,high,
+8,Forgings,Lb,,,2300,134400,2300,,,139000,42,high,
+9,Steel castings,Lb,1900,,,190100,,,,192000,42,high,
+10,Stainless steel,Lb,100,2250,5830,1700,5830,2250,40,18000,42,high,
+11,Class A concrete,Cu.Yd,2505,1300,2165,2730,2165,1300,1035,13200,42,high,
+12,Reinforcement bars,Lb,698000,363000,606000,764000,606000,363000,280000,3680000,42,high,
+13,Parapet railing,Lin.Ft,2620,1302,2164,2737,2164,1302,1061,13350,42,high,
+14,Grating (for walkways and platforms),Sq.Ft,2510,1650,2660,3860,2660,1650,1010,16000,42,high,
+15,Walkways and platforms,Lb,83000,60000,94000,146000,94000,60000,33000,570000,42,high,
+16,Downspouts,Lin.Ft,100,,,,,,,100,42,high,
