@@ -24339,6 +24339,96 @@
             "Source": "p.107 Section A / B"
           },
           {
+            "Name": "Left abutment parapet (W)",
+            "Kind": "Concrete",
+            "Category": "WalkwayPlate",
+            "Transverse": false,
+            "ReferenceOffset": -11.6586,
+            "Station": 0,
+            "From": 19675.9717224,
+            "To": 19696.2917224,
+            "Side": -1,
+            "Profile": [
+              {
+                "U": 0,
+                "V": 0
+              },
+              {
+                "U": 0,
+                "V": 0.2286
+              },
+              {
+                "U": 0.6095999999999999,
+                "V": 0.23495
+              },
+              {
+                "U": 0.6095999999999999,
+                "V": 0.76835
+              },
+              {
+                "U": 0.8635999999999999,
+                "V": 0.76835
+              },
+              {
+                "U": 0.8635999999999999,
+                "V": -0.008995833333333333
+              }
+            ],
+            "FromGrade": true,
+            "Material": "Class A concrete",
+            "NominalWeightLbPerFt": 0,
+            "Density": 0,
+            "Assembly": "DECK-ITEMS",
+            "AssemblyDescription": "",
+            "Unresolved": "UNRESOLVED (p.108, p.11, p.38): abutment parapet - the abutment parapet is drawn as the bridge section (curb seat for the approach curb / sidewalk, 10 in. wall, 2\u0027-7 overall) on the concrete wing wall with joints and scoring; its bottom on the wing wall and the curb end at the wing end are not dimensioned. the bridge curb \u002B parapet section continued from the deck end to the wing end (67\u0027-9 / 34\u0027-9 from the CL bearing); approach curb / sidewalk seats, joints and scoring not built.",
+            "Source": "p.108 / p.11"
+          },
+          {
+            "Name": "Right abutment parapet (W)",
+            "Kind": "Concrete",
+            "Category": "WalkwayPlate",
+            "Transverse": false,
+            "ReferenceOffset": 11.6586,
+            "Station": 0,
+            "From": 19675.9717224,
+            "To": 19696.2917224,
+            "Side": 1,
+            "Profile": [
+              {
+                "U": 0,
+                "V": 0
+              },
+              {
+                "U": 0,
+                "V": 0.2286
+              },
+              {
+                "U": 0.6095999999999999,
+                "V": 0.23495
+              },
+              {
+                "U": 0.6095999999999999,
+                "V": 0.76835
+              },
+              {
+                "U": 0.8635999999999999,
+                "V": 0.76835
+              },
+              {
+                "U": 0.8635999999999999,
+                "V": -0.008995833333333333
+              }
+            ],
+            "FromGrade": true,
+            "Material": "Class A concrete",
+            "NominalWeightLbPerFt": 0,
+            "Density": 0,
+            "Assembly": "DECK-ITEMS",
+            "AssemblyDescription": "",
+            "Unresolved": "UNRESOLVED (p.108, p.11, p.38): abutment parapet - the abutment parapet is drawn as the bridge section (curb seat for the approach curb / sidewalk, 10 in. wall, 2\u0027-7 overall) on the concrete wing wall with joints and scoring; its bottom on the wing wall and the curb end at the wing end are not dimensioned. the bridge curb \u002B parapet section continued from the deck end to the wing end (67\u0027-9 / 34\u0027-9 from the CL bearing); approach curb / sidewalk seats, joints and scoring not built.",
+            "Source": "p.108 / p.11"
+          },
+          {
             "Name": "dam Pier 1 plate back",
             "Kind": "Steel",
             "Category": "JointArmor",
@@ -26008,7 +26098,7 @@
           "TypeName": "PTC aluminum parapet railing (p.107 / p.108)",
           "Kind": "Guardrail",
           "Offset": -12.395199999999999,
-          "BeginStation": 19696.2917224,
+          "BeginStation": 19675.9717224,
           "EndStation": 20074.9614248,
           "BaseProbe": 0,
           "Material": "Aluminum (rail ASTM B235 GS10A-T6, posts B108 356-T6)",
@@ -26064,7 +26154,7 @@
           "TypeName": "PTC aluminum parapet railing (p.107 / p.108)",
           "Kind": "Guardrail",
           "Offset": 12.395199999999999,
-          "BeginStation": 19696.2917224,
+          "BeginStation": 19675.9717224,
           "EndStation": 20074.9614248,
           "BaseProbe": 0,
           "Material": "Aluminum (rail ASTM B235 GS10A-T6, posts B108 356-T6)",
@@ -179143,6 +179233,96 @@
             "Source": "p.107 Section A / B"
           },
           {
+            "Name": "Left abutment parapet (E)",
+            "Kind": "Concrete",
+            "Category": "WalkwayPlate",
+            "Transverse": false,
+            "ReferenceOffset": -11.6586,
+            "Station": 0,
+            "From": 21699.894725600003,
+            "To": 21710.1563256,
+            "Side": -1,
+            "Profile": [
+              {
+                "U": 0,
+                "V": 0
+              },
+              {
+                "U": 0,
+                "V": 0.2286
+              },
+              {
+                "U": 0.6095999999999999,
+                "V": 0.23495
+              },
+              {
+                "U": 0.6095999999999999,
+                "V": 0.76835
+              },
+              {
+                "U": 0.8635999999999999,
+                "V": 0.76835
+              },
+              {
+                "U": 0.8635999999999999,
+                "V": -0.008995833333333333
+              }
+            ],
+            "FromGrade": true,
+            "Material": "Class A concrete",
+            "NominalWeightLbPerFt": 0,
+            "Density": 0,
+            "Assembly": "DECK-ITEMS",
+            "AssemblyDescription": "",
+            "Unresolved": "UNRESOLVED (p.108, p.11, p.38): abutment parapet - the abutment parapet is drawn as the bridge section (curb seat for the approach curb / sidewalk, 10 in. wall, 2\u0027-7 overall) on the concrete wing wall with joints and scoring; its bottom on the wing wall and the curb end at the wing end are not dimensioned. the bridge curb \u002B parapet section continued from the deck end to the wing end (67\u0027-9 / 34\u0027-9 from the CL bearing); approach curb / sidewalk seats, joints and scoring not built.",
+            "Source": "p.108 / p.38"
+          },
+          {
+            "Name": "Right abutment parapet (E)",
+            "Kind": "Concrete",
+            "Category": "WalkwayPlate",
+            "Transverse": false,
+            "ReferenceOffset": 11.6586,
+            "Station": 0,
+            "From": 21699.894725600003,
+            "To": 21710.1563256,
+            "Side": 1,
+            "Profile": [
+              {
+                "U": 0,
+                "V": 0
+              },
+              {
+                "U": 0,
+                "V": 0.2286
+              },
+              {
+                "U": 0.6095999999999999,
+                "V": 0.23495
+              },
+              {
+                "U": 0.6095999999999999,
+                "V": 0.76835
+              },
+              {
+                "U": 0.8635999999999999,
+                "V": 0.76835
+              },
+              {
+                "U": 0.8635999999999999,
+                "V": -0.008995833333333333
+              }
+            ],
+            "FromGrade": true,
+            "Material": "Class A concrete",
+            "NominalWeightLbPerFt": 0,
+            "Density": 0,
+            "Assembly": "DECK-ITEMS",
+            "AssemblyDescription": "",
+            "Unresolved": "UNRESOLVED (p.108, p.11, p.38): abutment parapet - the abutment parapet is drawn as the bridge section (curb seat for the approach curb / sidewalk, 10 in. wall, 2\u0027-7 overall) on the concrete wing wall with joints and scoring; its bottom on the wing wall and the curb end at the wing end are not dimensioned. the bridge curb \u002B parapet section continued from the deck end to the wing end (67\u0027-9 / 34\u0027-9 from the CL bearing); approach curb / sidewalk seats, joints and scoring not built.",
+            "Source": "p.108 / p.38"
+          },
+          {
             "Name": "dam Pier 28 plate back",
             "Kind": "Steel",
             "Category": "JointArmor",
@@ -179613,7 +179793,7 @@
           "Kind": "Guardrail",
           "Offset": -12.395199999999999,
           "BeginStation": 21548.7582232,
-          "EndStation": 21699.894725600003,
+          "EndStation": 21710.1563256,
           "BaseProbe": 0,
           "Material": "Aluminum (rail ASTM B235 GS10A-T6, posts B108 356-T6)",
           "Density": 2700,
@@ -179669,7 +179849,7 @@
           "Kind": "Guardrail",
           "Offset": 12.395199999999999,
           "BeginStation": 21548.7582232,
-          "EndStation": 21699.894725600003,
+          "EndStation": 21710.1563256,
           "BaseProbe": 0,
           "Material": "Aluminum (rail ASTM B235 GS10A-T6, posts B108 356-T6)",
           "Density": 2700,

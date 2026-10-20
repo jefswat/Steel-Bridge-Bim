@@ -290,7 +290,7 @@ Print("== 7. Quantities vs p.42 by span group (items 1-15; 12 reinforcement not 
         if (Plan(7, col) > 0) Row($"p.42 item 7 bridge rope suspenders, {grp}", (by.TryGetValue("rope", out var rp) ? rp.Sum(p => p.Length) : 0) / ft, Plan(7, col), 0.05 * Plan(7, col), "LF", "rope length between the sockets");
         var rails = bm.Steel?.Railings;
         Row($"p.42 item 13 parapet railing, {grp}", (rails?.Runs.Sum(r => r.Length) ?? 0) / ft, Plan(13, col), 0.01 * Plan(13, col), "LF",
-            bn.Contains("Girder") ? "the girder-span pay length includes the railing on the abutment wing walls (p.108: 67'-9 west / 34'-9 east from the CL bearing to the wing end per side), which is not modeled (abutment parapets)" : "both runs, deck begin to end");
+            bn.Contains("Girder") ? "both runs incl. the railing on the abutment wing parapets (p.108: 67'-9 west / 34'-9 east from the CL bearing to the wing end per side)" : "both runs, deck begin to end");
         double gratArea = by.TryGetValue("grating", out var gl) ? gl.Sum(p => p.Volume) / In(0.75) : 0;     // 3/4 in. grating solids: area = volume / depth
         Row($"p.42 item 14 grating, {grp}", gratArea / (ft * ft), Plan(14, col), 0.05 * Plan(14, col), "SF", bn.Contains("Girder") ? "no walkway sheet for the girder spans (UNRESOLVED p.42 / p.101)" : "walkways, cross walks and inspection platforms as built (walkways-ptc.csx, p.101-106); navigation light platforms / catwalk not built");
         Row($"p.42 item 15 walkways and platforms (steel), {grp}", M("grating") + M("walkway"), Plan(15, col), 0.05 * Plan(15, col), "lb", "grating at 7 psf (UNRESOLVED weight) + walk channels, hand railing, ladders, platform frames; hangers, connection angles, ladder cages not built");

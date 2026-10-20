@@ -63,6 +63,25 @@ foreach (var br in bridges)
             Unresolved = U("p.107, p.108", "curb + parapet details", "the 3/4 in radius at the curb face, the chamfers, the drainage openings in the curb (2'-2 / 2'-0 alternating, size not read), scoring and the openings at the expansion dams are drawn without all dimensions",
                 "one solid section (curb 2'-0 x 9 in, curb top +1/4 in, wall 10 in x 1'-9 above the curb top) continuous over the deck length."),
         });
+    // ---- parapets on the abutment wing walls (p.108 'Elevation - parapet railing at west / east abutment', 'Parapet details at east & west abutments'): same curb + wall
+    // section from the deck end to the end of the wing wall, 67'-9 (west) / 34'-9 (east) from the CL bearing; the railing runs over them (payment length)
+    double railBeg = dk.BeginStation, railEnd = dk.EndStation;
+    string wingFlag = U("p.108, p.11, p.38", "abutment parapet", "the abutment parapet is drawn as the bridge section (curb seat for the approach curb / sidewalk, 10 in. wall, 2'-7 overall) on the concrete wing wall with joints and scoring; its bottom on the wing wall and the curb end at the wing end are not dimensioned",
+        "the bridge curb + parapet section continued from the deck end to the wing end (67'-9 / 34'-9 from the CL bearing); approach curb / sidewalk seats, joints and scoring not built.");
+    if (br.Name == "PTC Girder spans 1-10")
+    {
+        railBeg = Sta("646+21.463") - FI(67, 9);
+        foreach (int side in new[] { -1, 1 })
+            items.Add(new TrussLineItemDefinition { Name = side < 0 ? "Left abutment parapet (W)" : "Right abutment parapet (W)", Kind = TrussLineItemKind.Concrete, ReferenceOffset = side * Ft(CurbOff), Side = side,
+                From = railBeg, To = dk.BeginStation, Profile = prof, Material = "Class A concrete", Source = "p.108 / p.11", Unresolved = wingFlag });
+    }
+    if (br.Name == "PTC Girder spans 28-31")
+    {
+        railEnd = Sta("711+92.797") + FI(34, 9);
+        foreach (int side in new[] { -1, 1 })
+            items.Add(new TrussLineItemDefinition { Name = side < 0 ? "Left abutment parapet (E)" : "Right abutment parapet (E)", Kind = TrussLineItemKind.Concrete, ReferenceOffset = side * Ft(CurbOff), Side = side,
+                From = dk.EndStation, To = railEnd, Profile = prof, Material = "Class A concrete", Source = "p.108 / p.38", Unresolved = wingFlag });
+    }
     br.Deck.Barrier.Type = BarrierType.Custom;
     br.Deck.Barrier.ProfileName = "PTC curb + parapet wall (p.107)";
 
@@ -72,7 +91,7 @@ foreach (var br in bridges)
         br.Railings.Add(new PedestrianRailingDefinition
         {
             Name = side < 0 ? "Left parapet railing" : "Right parapet railing", TypeName = "PTC aluminum parapet railing (p.107 / p.108)", Kind = RailingKind.Guardrail,
-            Offset = side * (Ft(CurbOff) + In(29)), BeginStation = dk.BeginStation, EndStation = dk.EndStation, BaseProbe = 0, Material = "Aluminum (rail ASTM B235 GS10A-T6, posts B108 356-T6)", Density = 2700,
+            Offset = side * (Ft(CurbOff) + In(29)), BeginStation = railBeg, EndStation = railEnd, BaseProbe = 0, Material = "Aluminum (rail ASTM B235 GS10A-T6, posts B108 356-T6)", Density = 2700,
             Source = "p.107 / p.108", FlagsDimensionOnly = true,
             Post = new RailPostDefinition
             {
