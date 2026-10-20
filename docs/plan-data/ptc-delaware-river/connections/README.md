@@ -56,3 +56,16 @@ Confirmed: W22 finger table (dams.csv), railing gaps by pier (dams.csv, p.108), 
 Pages done this pass: p.44 / 45 / 50 (re-reads), 51-53, 59-67 (counts), 70 (notes), 73 (shoe), 78 / 81 / 83 / 84 / 86 (partial) / 88-90 (counts), 92, 101, 103, 108 (re-reads).
 Still OPEN: rivet counts for p.50 U1-L3, p.74-77 (first-pass counts exist for chord fields only), p.79 / p.80 (U11, L11), p.82 (U13-U15), p.86 L16, p.87 (U16 U17 L17), p.85; U15 / L16 / L17 flange plan splice counts; the digit risk of dense fills at 3-5 layer gussets; U10 / U12 / U14 etc. details-not-shown joints have no counts by definition. p.45 stringer splice flange plate widths. Walkway sheets p.102 / 104-106 not in this pass.
 UNRESOLVED unchanged: U20 gusset thickness as printed; L0 in-to-in as printed; stainless clamp pattern at W22 (p.93); L13 skew bracing (p.95); signal / light pole brackets (by others).
+
+
+Gusset layers (2026-10-20, `gusset-layers.csv`; every joint sheet p.49-53, 59-67, 73-90 re-checked for stacked gussets)
+- STACKED (two or more gusset plates per face): approach 3-span L8 / L8' (7/8 + 3/4, p.52 / p.49), both 3-span end joints L0' (5/8 + 1/2, p.59), 4-span L0 / L0' (3/4 + 1/2, p.59),
+  4-span L10 / L10' (7/8 + 7/8, p.63 - NEW, the earlier extraction had one pair), 4-span L20 (7/8 + 3/4, p.67), main L10 / L10' (3/4 + 1/2, p.78), main L22 crown (1 in. half gussets + 1 1/8 splice
+  gusset, p.90), main L11 / L11' at the river piers (1 1/8 + 3/4 + 3/4 lower zone, p.80 Section E; LOW confidence). All other joints: one gusset per face (one thickness callout); chord web
+  plies, inlay plates and splice plates of the main chords are splice material, not gusset layers (splices.csv).
+- Stack order: the thicker / printed-in-to-in plate lies against the members (its in-to-in is the member width + fills); the second plate lies OUTSIDE it: its edges are drawn solid across the
+  member rivet fields, which a plate between the member and the gusset could not do without a fill. This SUPERSEDES the "outer 7/8 + inner 3/4" wording of the gussets.csv / joints.csv
+  L8 rows ("outer" there meant the larger outline). L22: the two 1 in. halves (one per half truss, 1/8 in. apart, flame cut on line X) are spliced by the 1 1/8 plates outside them.
+- Outlines: the outer layers are SMALLER than the inner gusset (lower / central zone of the joint). Polygons in `outline_uv_in` are scaled from 300-450 dpi renders (u = drawing x, right +,
+  which is toward the higher panel number on every sheet; v up; origin = the work point; inches): +-1 in. Dimension-only in the model.
+- Not separated: the 1/8 in. gap between the L22 half gussets; the step positions of the L11 3/4 plates along the chords (three dimension lines in the elevation); fills between layers (none drawn).

@@ -294,6 +294,64 @@ public class TrussTests : IDisposable
     }
 
     [Fact]
+    public void GussetLayers_StackOutward_VolumesGripAndRoundTrip()
+    {
+        var (p0, _) = Model();
+        var bm0 = Regen(p0);
+        var (p, b) = Model();
+        var jd = b.Truss!.Joints.First(j => j.Point == "L2" && j.Plane == "N");
+        jd.GussetLayers = new()
+        {
+            new TrussGussetLayer { Thickness = In(0.5), Label = "2-1/2 Gussets" },                     // whole gusset outline
+            new TrussGussetLayer { Thickness = In(0.375), Outline = { new TrussUV(-0.2, -0.15), new TrussUV(0.2, -0.15), new TrussUV(0.2, 0.15), new TrussUV(-0.2, 0.15) },
+                Unresolved = "UNRESOLVED (p.0): layer outline scaled - test." },
+        };
+        // round trip: the layers survive; a joint without layers writes no GussetLayers key
+        var p2 = BridgeProject.FromJson(p.ToJson());
+        Assert.Equal(2, p2.Bridges[0].Truss!.Joints.First(j => j.Point == "L2" && j.Plane == "N").GussetLayers!.Count);
+        Assert.Equal(1, System.Text.RegularExpressions.Regex.Matches(p.ToJson(), "GussetLayers").Count);
+        var bm = Regen(p);
+        var steel = bm.Steel!;
+        var tm = steel.Truss!;
+        // stack record: inner 3/4 + 1/2 + 3/8 per face
+        var st = tm.GussetStacks.Single(s => s.Plane == "N" && s.Point == "L2");
+        Assert.Equal(3, st.Layers);
+        Assert.Equal(In(0.75 + 0.5 + 0.375), st.TotalThickness, 9);
+        Assert.Equal(1, tm.GussetStacks.Single(s => s.Plane == "S" && s.Point == "L2").Layers);
+        Assert.Equal(bm0.Steel!.Truss!.Gussets + 4, tm.Gussets);
+        // volumes: layer 2 = inner outline x 1/2, layer 3 = 0.4 x 0.3 m x 3/8
+        var inner = steel.Parts.First(x => x.Mark == "N-GL2-R");
+        var l2 = steel.Parts.First(x => x.Mark == "N-GL2-R2");
+        var l3 = steel.Parts.First(x => x.Mark == "N-GL2-L3");
+        Assert.Equal(inner.Volume * 0.5 / 0.75, l2.Volume, 9);
+        Assert.Equal(0.12 * In(0.375), l3.Volume, 9);
+        Assert.Equal(PartCategory.TrussGusset, l3.Category);
+        Assert.True(l3.Assumption!.DimensionOnly);
+        Assert.True(steel.Parts.First(x => x.Mark == "N-GL2-L2").Assumption!.DimensionOnly);   // envelope outline inherited -> its flag
+        // stack order: across the plane (world y here) the plates of one face touch: inner | layer 2 | layer 3, outward
+        (double lo, double hi) Y(string mark) { var v = steel.Parts.First(x => x.Mark == mark).Mesh.Positions; return (v.Min(q => q.Y), v.Max(q => q.Y)); }
+        foreach (var f in new[] { "L", "R" })
+        {
+            var (a0, a1) = Y($"N-GL2-{f}"); var (b0, b1) = Y($"N-GL2-{f}2"); var (c0, c1) = Y($"N-GL2-{f}3");
+            bool outwardPlus = b0 >= a1 - 1e-9;
+            if (outwardPlus) { Assert.Equal(a1, b0, 9); Assert.Equal(b1, c0, 9); }
+            else { Assert.Equal(a0, b1, 9); Assert.Equal(b0, c1, 9); }
+            Assert.Equal(In(0.5), b1 - b0, 9);
+            Assert.Equal(In(0.375), c1 - c0, 9);
+        }
+        // rivets of the L2 group: grip and head move out by the layers they pass through (1/2 everywhere, + 3/8 inside the small layer)
+        var r0 = bm0.Steel!.Bolts.Where(x => x.Kind == BoltKind.Rivet).OrderBy(x => x.Frame.Origin.X).ThenBy(x => x.Frame.Origin.Z).ThenBy(x => x.Frame.Origin.Y).ToList();
+        var r1 = steel.Bolts.Where(x => x.Kind == BoltKind.Rivet).OrderBy(x => x.Frame.Origin.X).ThenBy(x => x.Frame.Origin.Z).ThenBy(x => x.Frame.Origin.Y).ToList();
+        Assert.Equal(r0.Count, r1.Count);
+        for (int i = 0; i < r0.Count; i++)
+        {
+            double d = r1[i].Grip - r0[i].Grip;
+            Assert.True(Math.Abs(d - In(0.5)) < 1e-9 || Math.Abs(d - In(0.875)) < 1e-9, $"grip change {d / 0.0254} in");
+            Assert.Equal(d, Math.Abs(r1[i].Frame.Origin.Y - r0[i].Frame.Origin.Y), 9);
+        }
+    }
+
+    [Fact]
     public void EndChordExtension_CoversTheShoe_TaperedMember()
     {
         // default: the end chords are cut square at L0 / L6 -> the shoe tops (4 1/2 in. each side of the pin) project past them: CHECK warnings

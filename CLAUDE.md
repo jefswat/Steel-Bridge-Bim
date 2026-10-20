@@ -1029,6 +1029,11 @@ UNRESOLVED FLAG (general, reusable): `SBM.Core/Assumption.cs` `Assumption{Status
   tests `TrussTests.ShoePieces_*`, `LineItemRepeat_*`. PTC: all 100 shoes piece by piece (shoes-ptc.csx), finger dams (two plates + 2 in. teeth @ 4 1/4 + 18 I 70 / 18 [ 58 supports),
   walkways / ladders / platforms (walkways-ptc.csx, p.101-106), abutment wing parapets + railing (deck-ptc). Checks: location 378 / 42, castings main 1.34 x p.42 (was 2.8 x),
   forgings 137 k vs 134 k, structural steel 82.6 % (shoe envelopes no longer counted as carbon plate). Gusset outlines NOT scaled (raster, edges not separable; still envelopes).
+  STACKED GUSSETS (2026-10-20, TRUSS-DESIGN.md section 14): generic OPTIONAL `TrussJointDefinition.GussetLayers` (`TrussGussetLayer` thickness / own (u, v) outline clipped
+  to the inner gusset / Unresolved; the `GussetThickness` plate stays the inner layer, layers stack OUTWARD at constant offsets, marks `-L2` / `-R2`..., rivet head + grip over the
+  stack, `TrussModel.GussetStacks`; test `TrussTests.GussetLayers_*`). PTC data `connections/gusset-layers.csv` (every joint sheet re-checked) -> connections-ptc.csx section 5:
+  approach L0 / L0' (5/8 or 3/4 + 1/2), 3-span L8 / L8' (7/8 + 3/4), 4-span L10 / L10' (7/8 + 7/8) and L20 (7/8 + 3/4), main L10 (3/4 + 1/2), L11 (1 1/8 + 3/4 + 3/4, low), L22 (1 + 1 1/8);
+  outer plates = smaller scaled outlines (dimension-only flags). Steel 84.9 -> 85.0 % of p.42; checks main 426 / 11, approach 1268 / 12.
   RIVETS (user decision d39, 2026-10-20; run `rivets-ptc.csx` LAST, after walkways-ptc; re-runnable): generic OPTIONAL inputs `TrussRivetGroup.Distributed` (count per gusset face
   spread on an even square grid over the gusset outline clipped to the member band (box: web depth; else the in-plane extent), `EdgeDistance` (0 = 1.5 d), nearest the member end
   first; `Member = "*"` = whole-joint count split by lap area; grid < 3 d -> Info per group + ONE "Truss CHECK rivets" warning per bridge, < 1.6 d = heads overlap warning),

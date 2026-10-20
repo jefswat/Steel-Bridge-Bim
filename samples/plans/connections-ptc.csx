@@ -241,6 +241,81 @@ foreach (var br in Doc.Project.Bridges.Where(b => b.Name.StartsWith("PTC ") && b
     }
 report.Add($"shoe bodies of built-up carbon steel plates: {shoeC} (main L11 / L11' stay cast steel, p.96)");
 
+// ================================================================ 5. stacked gusset layers (gusset-layers.csv, 2026-10-20): a second (third) gusset plate per face OUTSIDE the
+// inner gusset at approach L0 / L0' / L8 / L10 / L20 and main L10 / L11 / L22. Outlines are scaled from the joint sheets in the sheet frame (u = drawing x = toward the
+// higher panel number, v up, origin = work point, inches) -> mirrored for the primed half of a unit and for the New Jersey units (stations decreasing with the panel number).
+{
+    var lay = Csv("gusset-layers.csv").Where(r => r["layers"] != "1").ToList();
+    List<TrussUV> Outline(string s, int sign) => s.Trim().Length == 0 ? new() : s.Split(';').Select(p => p.Split(','))
+        .Select(a => new TrussUV(sign * In(double.Parse(a[0], inv)), In(double.Parse(a[1], inv)))).ToList();
+    double Thk(string s) { double v = 0; foreach (var part in s.Split(' ', StringSplitOptions.RemoveEmptyEntries)) v += part.Contains('/') ? double.Parse(part.Split('/')[0], inv) / double.Parse(part.Split('/')[1], inv) : double.Parse(part, inv); return In(v); }
+    int nLayerJoints = 0;
+    // (bridge, data structure, data joint, model joint, mirror sign)
+    var targets = new List<(string bridge, string st, string dj, string mj, int sign)>();
+    foreach (var (bn, dir, A) in new[] { ("PTC 3-span truss 11-13", 1, true), ("PTC 4-span truss 14-17", 1, false), ("PTC 4-span truss 21-24", -1, false), ("PTC 3-span truss 25-27", -1, true) })
+    {
+        string st = A ? "approach3 (unit A)" : "approach4 (unit B)";
+        if (A)
+        {
+            targets.Add((bn, st, "L8", "L8", dir)); targets.Add((bn, st, "L8", "L8'", -dir));
+            targets.Add((bn, st, "L0'", "L0'", dir)); targets.Add((bn, st, "L0'", "L0", -dir));     // p.59 draws the unit-A end at the high end (L0'); p.49: L0 similar, opposite hand
+        }
+        else
+        {
+            targets.Add((bn, "approach4 (unit B)", "L0", "L0", dir)); targets.Add((bn, "approach4 (unit B)", "L0", "L0'", -dir));
+            targets.Add((bn, st, "L10", "L10", dir)); targets.Add((bn, st, "L10", "L10'", -dir));
+            targets.Add((bn, st, "L20", "L20", dir));
+        }
+    }
+    foreach (var j in new[] { "L10", "L11", "L22" })
+    {
+        targets.Add(("PTC Arch truss 18-20", "main", j, j, 1));
+        if (j != "L22") targets.Add(("PTC Arch truss 18-20", "main", j, j + "'", -1));
+    }
+    foreach (var bn in targets.Select(x => x.bridge).Distinct())
+        if (Doc.Project.Bridges.FirstOrDefault(b => b.Name == bn)?.Truss is { } tt) foreach (var j in tt.Joints) j.GussetLayers = null;
+    foreach (var (bn, st, dj, mj, sign) in targets)
+    {
+        var t = Doc.Project.Bridges.FirstOrDefault(b => b.Name == bn)?.Truss;
+        if (t == null) { report.Add($"gusset layers: no truss bridge '{bn}' - skipped"); continue; }
+        var rows = lay.Where(r => r["structure"] == st && r["joint"] == dj).ToList();
+        var inner = rows.First(r => r["position"].StartsWith("inner"));
+        var jd = t.Joints.LastOrDefault(x => x.Point == mj && x.Plane.Length == 0);
+        if (jd == null) { jd = new TrussJointDefinition { Point = mj }; t.Joints.Add(jd); }
+        string pg = "p." + inner["page"].Replace("; ", " / p.");
+        string conf = inner["confidence"];
+        double t0 = Thk(inner["thickness_in"]);
+        if (Math.Abs(jd.GussetThickness - t0) > In(1.0 / 32))
+        {
+            report.Add($"gusset layers {bn} {mj}: inner gusset {jd.GussetThickness / 0.0254:0.###} -> {t0 / 0.0254:0.###} in ({pg})");
+            jd.GussetThickness = t0;
+            if (st == "main" && dj == "L11")
+            {
+                jd.GussetsInsideFaceDistance = In(29);
+                jd.Unresolved = U(pg, $"gusset stack of joint {mj}", "Section E lists 1 1/8 + 3/4 + 3/4 gusset plates and prints '2'-5 o. to o. 1 1/8 Gus. Pls.' - the 1 1/8 plates may be inlaid in the chord web plane (the chord 1 1/8 webs end at the joint); the outlines are drawn, not dimensioned",
+                    "1 1/8 gussets against the members at 2'-5 in. to in. (as every main joint), 3/4 plates stacked outside; outline = envelope of the member laps.");
+            }
+        }
+        jd.GussetLayers = new();
+        foreach (var r in rows.Where(r => !r["position"].StartsWith("inner")).OrderByDescending(r => int.Parse(r["layer_from_outside"])))
+        {
+            double tl = Thk(r["thickness_in"]);
+            bool whole = r["outline_uv_in"].Trim().Length == 0;
+            jd.GussetLayers.Add(new TrussGussetLayer
+            {
+                Thickness = tl, Outline = Outline(r["outline_uv_in"], sign), Label = $"2-{r["thickness_in"]} Gussets ({r["position"]} layer)",
+                Source = $"gusset-layers.csv {pg} ({conf}): {r["extent_note"]}",
+                Unresolved = U(pg, $"{r["thickness_in"]} in. gusset layer at joint {mj}",
+                    (whole ? "its extent is not separable from the inner gusset on the sheet" : "the plate is drawn, not dimensioned; outline scaled from a 300-450 dpi render (+-1 in.)")
+                    + (conf == "low" ? "; LOW confidence reading of the stack (Section E)" : ""),
+                    whole ? "same outline as the inner gusset (envelope)." : "outline as scaled, clipped to the inner gusset, stacked outside it."),
+            });
+        }
+        nLayerJoints++;
+    }
+    report.Add($"gusset layers: {nLayerJoints} joint definitions with stacked gussets (gusset-layers.csv)");
+}
+
 // ================================================================ regenerate + save
 var rep = Doc.Regenerate();
 foreach (var name in new[] { "PTC Arch truss 18-20", "PTC Girder spans 1-10", "PTC Girder spans 28-31" })

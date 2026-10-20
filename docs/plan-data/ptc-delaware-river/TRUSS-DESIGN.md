@@ -293,3 +293,44 @@ approach 1014 / 12 -> 1046 / 12, girders 125 / 6 -> 131 / 6.
 - I007 / I008 answered (no change): L0 chord end 1'-5 re-measured (17.7 in. at 10.3 px/in., p.73 scale from the 1'-6 3/4 / 3'-8 dimensions); chord solid lengths
   = working-point length + half depth x tan(deflection / 2) per end (square cuts closing the joint); working-point lengths = p.69 (generator checks PASS).
 
+## 14. Stacked (multi-layer) gusset plates (2026-10-20; data `connections/gusset-layers.csv`, script `connections-ptc.csx` section 5)
+User observation: "the gusset plates in the plans are multi-layer". Every joint sheet (p.49-53, 59-67, 73-90) was re-checked for more than one gusset callout per joint.
+
+| Joint (both trusses) | Plates per face, inner -> outer | Outer plate extent (scaled, flagged dimension-only) | Page, confidence |
+|---|---|---|---|
+| 3-span L8 / L8' (piers 11 / 12, 26 / 25) | 7/8 (17 5/8 in. to in.) + 3/4 | lower central zone, chord bottom to ~3'-1 above the W.P., ~6'-0 wide (revision 1: "outer gusset plates at L8 extended") | p.52 / p.49, medium |
+| 3-span end joints L0 / L0' | 5/8 (16 1/8) + 1/2 | lower part from the chord end ~3'-0 into the span, up to ~2'-6 | p.59 (p.49: similar), medium |
+| 4-span end joints L0 / L0' | 3/4 (16 7/8) + 1/2 | as the 3-span ends, opposite hand | p.59, medium |
+| 4-span L10 / L10' (piers 14 / 16, 23 / 21) | 7/8 (17 5/8) + 7/8 | lower zone, 4'-0 past the W.P. toward the higher panel (over the chord splice) | p.63, medium - NEW (the earlier extraction had one pair) |
+| 4-span L20 (piers 15 / 22) | 7/8 (17 5/8) + 3/4 | lower central zone, ~5'-3 wide, up to ~2'-8 | p.67, medium |
+| main L10 / L10' | 3/4 (2'-5) + 1/2 | central zone over the chord and the lower member ends | p.78, medium |
+| main L11 / L11' (river piers) | 1 1/8 + 3/4 + 3/4 | middle 3/4 = whole joint, outer 3/4 below the Section E step (~3'-4 above the W.P.) | p.80 Section E, LOW |
+| main L22 (crown) | 1 (the two half gussets, 1/8 in. apart) + 1 1/8 splice gusset | central hexagon across the closure, ~6'-9 wide | p.90, medium |
+
+All other joints have one gusset per face (one thickness callout). Chord web plies, inlay and splice plates of the main chords are splice material, not gusset
+layers. Stack order: the plate whose in-to-in is printed lies against the members; the second plate lies outside it (its edges are drawn solid across the
+member rivet fields - a plate between member and gusset could not stop inside a member lap without a fill). This supersedes the "outer 7/8 / inner 3/4"
+wording of the earlier L8 rows ("outer" meant the larger outline).
+
+Generic input (OPTIONAL, omitted from the .sbm when null; other trusses unchanged): `TrussJointDefinition.GussetLayers` = list of `TrussGussetLayer`
+{Thickness, Outline (joint u, v; empty = the joint's gusset outline), ClipToGusset (default on: clipped to the inner gusset outline), Label, Material,
+Unresolved (-> dimension-only flag), Source}. The `GussetThickness` gusset stays the inner layer; each further layer is one plate per face (marks
+`{plane}-G{pt}-L2` / `-R2`, `-L3` ...) on the outer face of the one under it (constant offset = sum of the thicknesses under it; a layer reaching past a
+partial layer under it raises "Truss CHECK ... extends past layer under it"). Rivets: the head sits on the outer face of the outermost layer present at the
+rivet; grip = the full stack there + fills / plies to the member's inner web face. Results `TrussModel.GussetStacks` (plane, point, thickness and area per
+layer). IFC / database / quantities need nothing new (layers are TrussGusset parts: IfcPlate GUSSET_PLATE, one database part each, panel "Joint n").
+Test `TrussTests.GussetLayers_StackOutward_VolumesGripAndRoundTrip`.
+
+PTC data: outlines scaled in the sheet frame (u = drawing x = toward the higher panel number, v up, origin = work point, inches), mirrored for the primed
+half and for the New Jersey units; each layer carries an UNRESOLVED dimension flag with page + reason. Main L11 gets its inner gusset 1 1/8 (was the 3/4
+default: no joints.csv row), flagged: "2'-5 o. to o. 1 1/8 Gus. Pls." suggests the 1 1/8 plates may be inlaid in the chord web plane.
+
+Results (full run order re-run from truss-ptc-arch; the "before" run reproduced the committed model byte for byte): gusset plates main 368 -> 396 parts,
+403,857 -> 430,177 lb; 3-span 200 -> 216 parts per unit, 93,235 -> 99,707 lb; 4-span 328 -> 348, 181,880 -> 190,408 lb. Structural steel +56,300 lb:
+33.35 -> 33.41 M lb = 84.9 % -> 85.0 % of p.42 (silicon 93.3 -> 93.5 %, carbon 74.1 % unchanged). Checks: location 378 / 42 (unchanged), main
+405 / 11 / 47 -> 426 / 11 / 62 (layer count + stack thickness per joint and plane), approach 1192 / 12 / 108 -> 1268 / 12 / 144, girders 131 / 6 (unchanged).
+The layers are clipped to the inner ENVELOPE gussets, which are smaller than the drawn plates (e.g. 3-span L8 outer layer 20.5 SF built of ~22 SF drawn), so
+the gusset weight stays low: the drawn inner outlines remain the open item (section 10). Not modeled: the 1/8 in. gap between the L22 half gussets, the L11
+3/4 plate ends along the chords, fills between layers (none drawn). The copies "PTC main truss 18-20.sbm" / "PTC approach trusses.sbm" are unchanged
+(connections-ptc.csx needs the full PTC model).
+

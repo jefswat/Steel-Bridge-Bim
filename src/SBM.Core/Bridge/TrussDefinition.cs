@@ -359,6 +359,31 @@ public sealed class TrussJointDefinition
     /// (<see cref="TrussJointPlate"/>). Built on every plane the joint applies to.</summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public List<TrussJointPlate>? Plates { get; set; }
+    /// <summary>OPTIONAL (null = one gusset plate per face, omitted from the .sbm): further gusset plates STACKED on each face outside the
+    /// <see cref="GussetThickness"/> gusset (which stays the inner layer against the members / fills, at <see cref="GussetsInsideFaceDistance"/>).
+    /// List order = from the inner gusset outward; each layer lies on the outer face of the previous one (constant offset = sum of the thicknesses
+    /// under it). Rivet heads sit on the outer face of the stack where they pass through it and the grip includes every layer there.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public List<TrussGussetLayer>? GussetLayers { get; set; }
+}
+
+/// <summary>
+/// An additional gusset plate layer of a joint (<see cref="TrussJointDefinition.GussetLayers"/>): thickness and its own outline in the joint frame
+/// (u along the bridge toward the higher station in the truss plane, v up, origin = the point, meters). Empty outline = the joint's gusset outline.
+/// The outline is clipped to the inner gusset's outline when <see cref="ClipToGusset"/> (a layer cannot hang past the plate it is riveted to).
+/// </summary>
+public sealed class TrussGussetLayer
+{
+    public double Thickness { get; set; }
+    public List<TrussUV> Outline { get; set; } = new();
+    public bool ClipToGusset { get; set; } = true;
+    /// <summary>Plan callout, e.g. "2-3/4 Gussets".</summary>
+    public string Label { get; set; } = "";
+    /// <summary>Plan material letter / name (resolved through <see cref="TrussDefinition.Materials"/>); "" = the inner gusset's material.</summary>
+    public string Material { get; set; } = "";
+    /// <summary>UNRESOLVED text (page + reason) -> dimension-only flag on the layer plates (e.g. a scaled outline).</summary>
+    public string Unresolved { get; set; } = "";
+    public string Source { get; set; } = "";
 }
 
 /// <summary>Face of a chord a <see cref="TrussJointPlate"/> lies on.</summary>
