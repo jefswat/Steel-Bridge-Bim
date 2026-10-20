@@ -13,12 +13,24 @@ public sealed class StepWriter
 
     public StepWriter(TextWriter w) => _w = w;
 
-    public int Count => _next - 1;
+    private int _skipped;
+
+    /// <summary>Optional entity filter (checking export). Null for normal exports: output is unchanged.</summary>
+    public IfcCheckFilter? Filter { get; set; }
+
+    public int Count => _next - 1 - _skipped;
 
     /// <summary>Writes an entity and returns its id. <paramref name="body"/> is the attribute list without parentheses.</summary>
     public int Add(string type, string body)
     {
         int id = _next++;
+        if (Filter != null)
+        {
+            // Checking export: the filter may rewrite the attributes or drop the entity (its id stays unused).
+            var nb = Filter.Filter(id, type, body);
+            if (nb == null) { _skipped++; return id; }
+            body = nb;
+        }
         _w.Write('#');
         _w.Write(id.ToString(Inv));
         _w.Write('=');

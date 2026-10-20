@@ -29,7 +29,9 @@ public static class Program
                                                             shows running copies. (All other commands work on .sbm files.)
           sbm regen <file.sbm>                              Regenerate; print counts, warnings, timing
           sbm export <file.sbm> [--ifc a.ifc|a.ifczip] [--geometry parametric|abv] [--chord-tol mm] [--dxf b.dxf] [--landxml c.xml]
+                                                            [--for-check [--keep-designations]]  IFC for an independent checker: originator notes stripped
           sbm db <file.sbm> [out.sqlite] [--pages] [--plans <folder>[,<folder>]] [--links rules.json] [--no-previews] [--no-vacuum]
+                                                            [--for-check]  registry only: no sheet links, props text or model path
                                                             [--unused report.md]
                                                             Companion SQLite database: every element (IFC GlobalIds + hierarchy),
                                                             plan sheets (--pages splits the plan PDFs), element -> sheet links, QC
@@ -204,8 +206,8 @@ public static class Program
                     {
                         doc.Regenerate();
                         var sw = System.Diagnostics.Stopwatch.StartNew();
-                        var res = doc.ExportIfc(ifc, geometry, chord);
-                        Console.WriteLine($"  IFC 4.3 ({geometry}) → {ifc}  ({sw.Elapsed.TotalSeconds:0.0} s, {new FileInfo(ifc).Length / 1048576.0:0.0} MB, {res.EntityCount:N0} entities" +
+                        var res = doc.ExportIfc(ifc, geometry, chord, args.Contains("--for-check"), args.Contains("--keep-designations"));
+                        Console.WriteLine($"  IFC 4.3 ({geometry}{(args.Contains("--for-check") ? ", FOR CHECK" : "")}) → {ifc}  ({sw.Elapsed.TotalSeconds:0.0} s, {new FileInfo(ifc).Length / 1048576.0:0.0} MB, {res.EntityCount:N0} entities" +
                                           (geometry == SBM.IO.Ifc.IfcGeometryMode.ReferenceView ? $", {res.PolygonalSolids:N0} polygonal face sets, chord tol {res.ChordTolerance * 1000:0.###} mm)" : ")"));
                     }
                     if (Opt("--dxf") is { } dxf) { doc.ExportDxf(dxf); Console.WriteLine($"  DXF → {dxf}"); }
@@ -220,7 +222,7 @@ public static class Program
                     var o = new SBM.IO.Database.DatabaseOptions
                     {
                         Pages = args.Contains("--pages"), Vacuum = !args.Contains("--no-vacuum"), Previews = !args.Contains("--no-previews"), LinksFile = Opt("--links"),
-                        UnusedReport = Opt("--unused"), Log = m => Console.WriteLine("  " + m),
+                        UnusedReport = Opt("--unused"), ForCheck = args.Contains("--for-check"), Log = m => Console.WriteLine("  " + m),
                     };
                     if (Opt("--plans") is { } pl) o.PlanFolders.AddRange(pl.Split(','));
                     string? outPath = args.Length > 2 && !args[2].StartsWith("--") ? args[2] : null;
@@ -240,7 +242,7 @@ public static class Program
                     var r = doc.ExportDatabase(outPath, o);
                     Console.WriteLine($"Database {r.Build.Path}: {r.Build.Elements:N0} elements in {r.Elapsed.TotalSeconds:F1} s (registry {r.Build.Elapsed.TotalSeconds:F1} s)");
                     foreach (var (lv, n) in r.Build.ByLevel.OrderByDescending(x => x.Value)) Console.WriteLine($"  {lv,-10} {n,9:N0}");
-                    Console.WriteLine(r.LinksFile != null ? $"  link rules {r.LinksFile}" : "  link rules: none found (no sheet-links*.json naming this model beside it): no plan sheet links");
+                    Console.WriteLine(o.ForCheck ? "  checking database (--for-check): no sheet links, plan sheets, QC or property text" : r.LinksFile != null ? $"  link rules {r.LinksFile}" : "  link rules: none found (no sheet-links*.json naming this model beside it): no plan sheet links");
                     if (r.Links is { } l)
                         Console.WriteLine($"  sheets {l.Sheets}, links {l.Links:N0}, sheets linked {l.SheetsLinked}, unlinked {l.SheetsUnused}");
                     else if (r.LinksFile != null) Console.WriteLine($"  sheets {r.Sheets}: no links (no sheet index in the rules and no imported pages: run with --pages)");

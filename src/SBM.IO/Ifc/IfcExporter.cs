@@ -41,7 +41,9 @@ public enum IfcGeometryMode
 
 /// <param name="ChordTolerance">ReferenceView: max sagitta (m) of the polygons replacing hole circles and profile arcs;
 /// 0 = default 1/32 in (0.79 mm).</param>
-public sealed record IfcExportOptions(IfcGeometryMode Geometry = IfcGeometryMode.Parametric, double ChordTolerance = 0);
+/// <param name="ForCheck">CHECKING export for an independent checker: strips the originator's interpretation (see <see cref="IfcCheckFilter"/>). Geometry unchanged.</param>
+/// <param name="KeepDesignations">With ForCheck: keep section designations (e.g. WT 7x26.5) and fabrication specification attributes; plan size strings and notes are still stripped.</param>
+public sealed record IfcExportOptions(IfcGeometryMode Geometry = IfcGeometryMode.Parametric, double ChordTolerance = 0, bool ForCheck = false, bool KeepDesignations = false);
 
 /// <summary>
 /// Exports the model to IFC 4.3 (IFC4X3_ADD2) with semantic entities:
@@ -87,6 +89,7 @@ public static class IfcExporter
         var u = project.Units;
         double scale = 1 / u.LongUnit; // meters → project length units
         var w = new StepWriter(tw);
+        if (options.ForCheck) w.Filter = new IfcCheckFilter(options.KeepDesignations);
         bool abv = options.Geometry == IfcGeometryMode.ReferenceView;
         w.Header(fileName, "IFC4X3_ADD2", abv ? "AlignmentBasedView" : "ReferenceView");
 
