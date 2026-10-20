@@ -193,3 +193,36 @@ Quantities (check-ptc-delaware-river.csx section 7, p.42 by span group): structu
 92.3 %); by group: girder spans 78 %, 3-span units 80 %, 4-span units 80 %, main spans 86.7 %. Concrete within 3 % everywhere; railing LF within 1 % on the
 truss units (girder units short by the abutment wing railing, not modeled); grating 3-span 1,612 / 1,650 SF, 4-span 2,368 / 2,660 SF, main 301 / 3,860 SF.
 Castings: the main span shoe envelopes / sockets are 2.8 x the p.42 figure (envelopes, flagged).
+
+## 10. Second pass (2026-10-20): shoes, dams, walkways, abutment parapets
+Generic additions (OPTIONAL, omitted from the .sbm when unset; tests `TrussTests.ShoePieces_ReplaceTheEnvelope_ExactVolumes`, `LineItemRepeat_BuildsCombTeeth`):
+- `TrussShoeDefinition.Pieces` (`TrussShoePiece`): polygon or circle (segmental roller: `ClipHalfWidth`) in the shoe frame (origin = pin centre, u along the bridge, n = plane
+  normal made horizontal, z up) swept Across (profile (u, z) along n), Along (profile (n, z) along u) or Vertical; copies (`ShiftsProfileX`, `ShiftsSweep`), `MirrorN` / `MirrorU`;
+  Kind -> category (Body = shoe category by type, Plate = bearing plate, Sole, Masonry, Pin / Roller = pin, Rocker = expansion shoe body). Pieces replace the body envelope;
+  the masonry plate and the pin of the fields are still built (MasonryThickness 0 = none, e.g. the pier 18 casting with its own base).
+- `TrussLineItemDefinition.RepeatPitch / RepeatWidth / RepeatStart` (separate pieces along the range: dam teeth, rail posts) and `CopiesV` (V-shifted copies: ladder rungs).
+
+PTC (every open item is a flag with page + reason):
+- Shoes (`shoes-ptc.csx`, 100 shoes): girder spans p.44 (fixed: sole, stem, 2 wings, 2 stiffeners; expansion: sole + rocker R 1'-6), approach fixed p.52 / p.67 (sole, 2 stems, 3 wings,
+  4 end stiffeners - position along the truss scaled; masonry 5'-6 along x 60 across, the previous model had them swapped), unit-end rockers p.59, intermediate rockers p.49 / p.63
+  (pin below the W.P. now from the printed chains 8 3/4 + 9 / 8 3/4 + 10 1/4: model total 60.25 in. vs printed 5'-0 1/4 within 0.005 in.; bearing plates 1 1/2 in. proud, 1 in. let in),
+  main L0 rockers p.73, L11 fixed cast shoe (pier 18: cast base 9'-2 x 8'-8 x 6, walls 4 3/4 / 3 1/2 / 4 3/4 to the 10 in. cradle, diaphragm, ribs @ 1'-9) and L11' roller nest (pier 19:
+  5 forged segmental rollers 2'-0 x 1'-3 in two 3'-6 pieces, cast stem 4 in. walls, masonry 6 in. per the side view vs 6 3/4 listed = CONFLICT), forged tops 4'-1 x 4'-4.
+  Not built: keys, dowels, pin nuts / rings, link bars, inlays (rocker lens), anchor bolts, hold-down / shear lock, fillets / bosses. Main castings 255 k lb vs p.42 190 k (shoes 150 k +
+  sockets 105 k as solid cylinders), forgings 137 k vs 134 k.
+- Expansion dams (`deck-ptc.csx`): two finger plates per dam, solid part behind the tooth roots + teeth 2 in. wide @ 4 1/4 (the opposite plate shifted half a space), plate data from
+  each Section A at 68 F: p.46 (piers 1-9, 28-30: roots 8 1/4 apart, teeth 6 3/4, plate 1'-3 from the CL, 1 1/2 thick - NOT a sliding plate as first read), p.54 (piers 10 / 27: 16 1/2,
+  12 1/2, 18 1/2 behind, 3 in.), p.68 (13 / 17 / 24: 26, 19 1/4, 3 1/2 in.), p.91 (pier 20: 44 1/2, 31 1/2), p.92 (W22: 20, 15). 18 I 70 (back) / 18 [ 58 (ahead) support members under the
+  finger dams, continuous, web 6 in. behind the root (scaled). Tooth width derived from the 1 1/8 R slot (flag).
+- Walkways (`walkways-ptc.csx`, p.101-106): grating 2'-0 between C10x15.3 walk channels, rails L3x3x5/16 (3'-0) and L3x2 1/2x5/16 (1'-6), posts @ 6'-0 both sides; approach CL walkway
+  centred 1'-0 north of the CL at the floor beam bottom flange; cross walkways per the p.101 key plan (pier 10 / 27 truss to truss, the others CL to the north truss), at the p.102 ladder
+  stations (4'-9 3/8 / 6'-0 3/8 from the pier / bearing CL); safety ladders (Ls 3x2 1/2x3/8, rungs @ 12) down to the inspection platforms on the pier tops (grating on 8 [ 13.75, 9 3/8 above
+  the pier top); main span CL walkway FB15 - FB15', cross walks at W15 / W20 / W19' / W15' (40'-9 1/2 each side), floor beam and strut walkways at L11 / L11', platforms N / S at
+  piers 18 / 19 with a ladder at the north. Not built: hangers, connection angles, ladder cages, catwalk on the north top chord (p.105), navigation light platforms (p.106),
+  girder-span walkways (no sheet; p.42 lists them).
+- Abutment wing parapets (p.108): the curb + parapet section continued from the deck ends to the wing ends (67'-9 / 34'-9 from the CL bearing) with the railing on them; railing
+  LF 2,618 / 1,059 vs 2,620 / 1,061. The abutment concrete itself was already in substructure-ptc.csx.
+- Gusset outlines: NOT replaced. The raster joint sheets (p.50-90) draw two gusset layers whose edges coincide with member flange, fill and splice outlines; where the outline follows
+  the diagonal ends it cannot be separated at the scan resolution (a test read of L8 p.52 and L10 p.78 gave +-1-2 in. and ambiguous vertices), so the envelopes stay (flagged).
+- Railing check after the main-branch railing base change (upward-facing surfaces only): rail LF and post bottoms unchanged (posts 30.25 in. above the gutter grade = parapet top, all 7 bridges).
+

@@ -1012,7 +1012,7 @@ UNRESOLVED FLAG (general, reusable): `SBM.Core/Assumption.cs` `Assumption{Status
   in `sheet-links-ptc-delaware-river.json`. Joint sheets p.61-67 are medium confidence (two digit misreads found at U10 / L10 and corrected). Open: expansion dams, partial cover plates / splices / fills, shoe plates,
   stringer bearings (gaps 1.7 - 5.9 in. over the floor beams), rivets, curbs / parapets / walkways.
 - PTC DECK + VISIBLE CONNECTIONS (2026-10-20; TRUSS-DESIGN.md section 9, SUMMARY.md status): build order on `PTC Delaware River Bridge.sbm` = build -> (substructure) ->
-  truss-ptc-arch -> truss-ptc-approach -> girders-ptc -> `deck-ptc.csx` -> `connections-ptc.csx` (the truss / girder scripts rebuild `Truss`). Generic truss inputs (OPTIONAL, omitted
+  truss-ptc-arch -> truss-ptc-approach -> girders-ptc -> `deck-ptc.csx` -> `connections-ptc.csx` -> `shoes-ptc.csx` -> `walkways-ptc.csx` (the truss / girder scripts rebuild `Truss`; deck-ptc replaces the line items, so walkways-ptc follows it). Generic truss inputs (OPTIONAL, omitted
   when unset; test `TrussTests.DeckItems_SplicePlates_Stiffeners_ShoeMaterial`): `TrussDeckDefinition.HaunchDepth/HaunchBottomWidth/HaunchSideSlope` (thickening under every
   stringer -> ConcreteModel.Haunches), `TrussDefinition.LineItems` (`TrussLineItemDefinition`: constant (U, V) section swept along the alignment at an offset or ACROSS it at a
   station, V from the finished grade; concrete -> ConcreteModel.Barriers, steel -> SteelPart of a Category: curbs / parapets, dam plates, gratings, diaphragm channels),
@@ -1022,6 +1022,12 @@ UNRESOLVED FLAG (general, reusable): `SBM.Core/Assumption.cs` `Assumption{Status
   L11 struts / FB11), main gussets from connections/gussets.csv + 110 chord splice / fill plates (splices.csv), girder stiffeners + web splice, mid-panel 15[33.9 diaphragms.
   Piers: piers.csv corrected per piers-review.md, legs lofted to the PRINTED base (`Leg(..., baseA, baseB)`). Checks: location 373 PASS / 47 DIFF (section 7 = p.42 quantities by
   group and item: steel 83.5 % of 39.28 M lb, concrete within 3 %), girders 125 / 6, approach 1014 / 12, arch 381 / 11. Rivets not placed (no pitch / gage; viewport load).
+  2026-10-20 (TRUSS-DESIGN.md section 10): `TrussShoeDefinition.Pieces` (`TrussShoePiece`: polygon / circle (segmental `ClipHalfWidth`) in the shoe frame (origin pin, u along,
+  n across, z up) swept Across / Along / Vertical, `ShiftsProfileX` / `ShiftsSweep` copies, `MirrorN/U`, Kind -> category Body / Plate / Sole / Masonry / Pin / Roller / Rocker; replaces the
+  body envelope, masonry plate + pin still from the fields), `TrussLineItemDefinition.RepeatPitch/RepeatWidth/RepeatStart` (comb pieces: dam teeth, posts) and `CopiesV` (rungs);
+  tests `TrussTests.ShoePieces_*`, `LineItemRepeat_*`. PTC: all 100 shoes piece by piece (shoes-ptc.csx), finger dams (two plates + 2 in. teeth @ 4 1/4 + 18 I 70 / 18 [ 58 supports),
+  walkways / ladders / platforms (walkways-ptc.csx, p.101-106), abutment wing parapets + railing (deck-ptc). Checks: location 378 / 42, castings main 1.34 x p.42 (was 2.8 x),
+  forgings 137 k vs 134 k, structural steel 82.6 % (shoe envelopes no longer counted as carbon plate). Gusset outlines NOT scaled (raster, edges not separable; still envelopes).
 - Bonner Unit 6 (spans 30-35, 4 x FIB-96, `samples/plans/build-bonner-unit6.csx` -> `Bonner Unit 6 FIB.sbm`, reads docs/plan-data/bonner-b2500/fib-unit6
   CSVs; same -L- placement as Unit 5; terrain + georeference `samples/plans/terrain-bonner.csx`, `docs/plan-data/bonner-b2500/TERRAIN.md`): 24 SpanBeams, per-span layouts (G1 LEFT, CL bearing 1'-2" / 3'-2" bent 29 / 1'-4" bent 35), p439 strand pattern
   read from the VECTOR drawing (72 + 4 slack, 8 draped, 20 debonded), E1/E2/E3 + P sole plates, camber tables, bents 30-35 (level precast cap profile,

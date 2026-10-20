@@ -645,34 +645,45 @@ public static class TrussGenerator
             if (li.Profile.Count < 3 || li.To <= li.From) { Warn($"Truss: line item {li.Name} - profile / range missing; not built."); return; }
             var poly = li.Profile.Select(q => new Vec2(q.U, q.V)).ToList();
             if (MeshBuilder.SignedArea(poly) < 0) poly.Reverse();
-            var sec = poly.ToArray();
-            var rings = new List<Vec3[]>();
-            if (!li.Transverse)
-            {
-                int n = Math.Max(2, (int)Math.Ceiling((li.To - li.From) / 2.0) + 1);
-                int side = li.Side >= 0 ? 1 : -1;
-                for (int i = 0; i < n; i++)
-                {
-                    double s = li.From + (li.To - li.From) * i / (n - 1);
-                    double z0 = li.FromGrade ? _al.ElevationAt(s, li.ReferenceOffset) : 0;
-                    rings.Add(sec.Select(q => _al.PointAt(s, li.ReferenceOffset + side * q.X).WithZ(z0 + q.Y)).ToArray());
-                }
-            }
-            else
-            {
-                // across: rings at the range ends and at the crown (offset 0) when inside, so the item follows the cross slope
-                var offs = new List<double> { li.From };
-                if (li.From < 0 && li.To > 0) offs.Add(0);
-                offs.Add(li.To);
-                foreach (double o in offs)
-                {
-                    double z0 = li.FromGrade ? _al.ElevationAt(li.Station, o) : 0;
-                    rings.Add(sec.Select(q => _al.PointAt(li.Station + q.X, o).WithZ(z0 + q.Y)).ToArray());
-                }
-            }
+            var sec0 = poly.ToArray();
+            var ranges = new List<(double lo, double hi)>();
+            if (li.RepeatPitch > 0 && li.RepeatWidth > 0)
+                for (double a = li.From + li.RepeatStart; a + li.RepeatWidth <= li.To + 1e-9; a += li.RepeatPitch) ranges.Add((a, a + li.RepeatWidth));
+            else ranges.Add((li.From, li.To));
             var mesh = new Mesh();
-            MeshBuilder.AddLoft(mesh, sec, rings);
-            double length = li.To - li.From;
+            var copies = li.CopiesV is { Count: > 0 } cv ? cv : new List<double> { 0 };
+            foreach (var dv in copies)
+            foreach (var (lo, hi) in ranges)
+            {
+                var sec = dv == 0 ? sec0 : sec0.Select(q => new Vec2(q.X, q.Y + dv)).ToArray();
+                var rings = new List<Vec3[]>();
+                if (!li.Transverse)
+                {
+                    int n = Math.Max(2, (int)Math.Ceiling((hi - lo) / 2.0) + 1);
+                    int side = li.Side >= 0 ? 1 : -1;
+                    for (int i = 0; i < n; i++)
+                    {
+                        double s = lo + (hi - lo) * i / (n - 1);
+                        double z0 = li.FromGrade ? _al.ElevationAt(s, li.ReferenceOffset) : 0;
+                        rings.Add(sec.Select(q => _al.PointAt(s, li.ReferenceOffset + side * q.X).WithZ(z0 + q.Y)).ToArray());
+                    }
+                }
+                else
+                {
+                    // across: rings at the range ends and at the crown (offset 0) when inside, so the item follows the cross slope
+                    var offs = new List<double> { lo };
+                    if (lo < 0 && hi > 0) offs.Add(0);
+                    offs.Add(hi);
+                    foreach (double o in offs)
+                    {
+                        double z0 = li.FromGrade ? _al.ElevationAt(li.Station, o) : 0;
+                        rings.Add(sec.Select(q => _al.PointAt(li.Station + q.X, o).WithZ(z0 + q.Y)).ToArray());
+                    }
+                }
+                MeshBuilder.AddLoft(mesh, sec, rings);
+            }
+            if (ranges.Count == 0) { Warn($"Truss: line item {li.Name} - no repeated piece fits the range; not built."); return; }
+            double length = ranges.Sum(r => r.hi - r.lo) * copies.Count;
             if (li.Kind == TrussLineItemKind.Concrete)
             {
                 Model.Concrete.Barriers.Add((li.Name, mesh));
@@ -876,7 +887,9 @@ public static class TrussGenerator
             double z0 = s.MasonryThickness, z1 = pin.Z - bottom + Math.Max(0, s.BodyTopAbovePin);
             double bl = s.BodyLength > 0 ? s.BodyLength : s.MasonryLength, bw = s.BodyWidth > 0 ? s.BodyWidth : s.MasonryWidth;
             double topHalf = s.BodyTopLength > 0 ? s.BodyTopLength / 2 : Math.Max(s.PinDiameter * 0.75, 0.1 * bl);
-            if (z1 > z0 + 1e-3 && bl > 0 && bw > 0)
+            bool pieces = s.Pieces is { Count: > 0 };
+            if (pieces) BuildShoePieces(s, asm, pin, u, n, pt);
+            if (!pieces && z1 > z0 + 1e-3 && bl > 0 && bw > 0)
             {
                 var poly = new[] { new Vec2(-bl / 2, z0), new Vec2(bl / 2, z0), new Vec2(topHalf, z1), new Vec2(-topHalf, z1) };
                 var body = new Mesh();
@@ -897,10 +910,74 @@ public static class TrussGenerator
                 MeshBuilder.AddLoft(pm, c, new[] { ra, ra.Select(q => q + n * plen).ToArray() });
                 Model.Steel.Parts.Add(new SteelPart { Mark = $"{asm}-PIN", Category = PartCategory.TrussPin, Assembly = asm, Description = $"shoe pin {TrussSections.FormatIn(s.PinDiameter)} x {TrussSections.FormatIn(plen)}", Mesh = pm, Material = "Forged steel (pin)", Length = plen, Assumption = asu });
             }
+            if (pieces) Info($"Truss: shoe {s.Name} built of {s.Pieces!.Count} drawn pieces ({s.Source}).");
             Model.BearingNames.Add(s.Name);
             Model.Steel.BearingSeats.Add(new BearingSeat(s.Support, Model.BearingNames.Count - 1, st, bottom, 0, "Truss shoe", s.Type == TrussShoeType.Expansion ? "Expansion" : "Fixed",
                 pin.XY, u.XY, s.MasonryLength, s.MasonryWidth, s.Name));
             Model.Shoes.Add(new TrussShoeResult(s.Name, s.Support, s.Type, pin, bottom, pin.XY));
+        }
+
+        /// <summary>Shoe pieces as drawn (<see cref="TrussShoeDefinition.Pieces"/>) in the shoe frame (origin pin, u along, n across, z up).</summary>
+        private void BuildShoePieces(TrussShoeDefinition s, string asm, Vec3 pin, Vec3 u, Vec3 n, string pt)
+        {
+            int k = 0;
+            foreach (var pc in s.Pieces!)
+            {
+                k++;
+                var prof = new List<Vec2>();
+                if (pc.CircleDiameter > 0)
+                {
+                    double r = pc.CircleDiameter / 2;
+                    int seg = 32;
+                    for (int i = 0; i < seg; i++)
+                    {
+                        var q = new Vec2(pc.CircleX, pc.CircleY) + Vec2.FromAngle(2 * Math.PI * i / seg) * r;
+                        if (pc.ClipHalfWidth > 0) q = new Vec2(Math.Clamp(q.X, pc.CircleX - pc.ClipHalfWidth, pc.CircleX + pc.ClipHalfWidth), q.Y);
+                        if (prof.Count == 0 || (prof[^1] - q).Length > 1e-6) prof.Add(q);
+                    }
+                    if (prof.Count > 1 && (prof[0] - prof[^1]).Length < 1e-6) prof.RemoveAt(prof.Count - 1);
+                }
+                else prof.AddRange(pc.Profile.Select(q => new Vec2(q.U, q.V)));
+                if (prof.Count < 3 || Math.Abs(pc.To - pc.From) < 1e-6) { Warn($"Truss: shoe {s.Name} piece '{pc.Name}' has no profile / length; not built."); continue; }
+                var (ex, ey, ez) = pc.Axis switch
+                {
+                    TrussShoePieceAxis.Across => (u, Up, n),
+                    TrussShoePieceAxis.Along => (n, Up, u),
+                    _ => (u, n, Up),
+                };
+                var sx = pc.ShiftsProfileX.Count > 0 ? pc.ShiftsProfileX : new List<double> { 0 };
+                var sw = pc.ShiftsSweep.Count > 0 ? pc.ShiftsSweep : new List<double> { 0 };
+                var mesh = new Mesh();
+                foreach (int mu in pc.MirrorU ? new[] { 1, -1 } : new[] { 1 })
+                    foreach (int mn in pc.MirrorN ? new[] { 1, -1 } : new[] { 1 })
+                        foreach (var dx in sx)
+                            foreach (var dz in sw)
+                            {
+                                // mirror = flip the axis that carries u (or n) in this frame
+                                var fx = ex; var fy = ey; var fz = ez;
+                                if (mu < 0) { if (fx == u) fx = -u; else if (fz == u) fz = -u; else if (fy == u) fy = -u; }
+                                if (mn < 0) { if (fx == n) fx = -n; else if (fz == n) fz = -n; else if (fy == n) fy = -n; }
+                                var f = new Frame3(pin, fx, fy, fz);
+                                MeshBuilder.AddExtrusion(mesh, prof.Select(q => new Vec2(q.X + dx, q.Y)).ToList(), f, pc.From + dz, pc.To + dz);
+                            }
+                var cat = pc.Kind switch
+                {
+                    TrussShoePieceKind.Plate => PartCategory.BearingPlate,
+                    TrussShoePieceKind.Sole => PartCategory.SolePlate,
+                    TrussShoePieceKind.Masonry => PartCategory.MasonryPlate,
+                    TrussShoePieceKind.Pin or TrussShoePieceKind.Roller => PartCategory.TrussPin,
+                    TrussShoePieceKind.Rocker => PartCategory.TrussShoeExpansion,
+                    _ => s.Type == TrussShoeType.Expansion ? PartCategory.TrussShoeExpansion : PartCategory.TrussShoeFixed,
+                };
+                string flag = pc.Unresolved.Length > 0 ? pc.Unresolved : s.Unresolved;
+                if (pc.Unresolved.Length > 0) Warn(pc.Unresolved);
+                Model.Steel.Parts.Add(new SteelPart
+                {
+                    Mark = $"{asm}-{k:00}", Category = cat, Assembly = asm, Description = $"{pc.Name} {pc.Description}".Trim() + $" ({pt})", Mesh = mesh,
+                    Material = Material(pc.Material), Length = Math.Abs(pc.To - pc.From),
+                    Assumption = flag.Length > 0 ? Assumption.UnresolvedDimension(flag, $"{pc.Name}: drawn outline / listed size") : null,
+                });
+            }
         }
     }
 }

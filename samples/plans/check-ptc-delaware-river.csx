@@ -269,6 +269,7 @@ Print("== 7. Quantities vs p.42 by span group (items 1-15; 12 reinforcement not 
             if (SBM.Core.Steel.SteelModel.IsRailing(p.Category)) return "rail";
             if (p.Category == SBM.Core.Steel.PartCategory.Suspender) return "rope";
             if (p.Category == SBM.Core.Steel.PartCategory.Grating) return "grating";
+            if (p.Category is SBM.Core.Steel.PartCategory.WalkwayStringer or SBM.Core.Steel.PartCategory.WalkwayPost or SBM.Core.Steel.PartCategory.WalkwayRail or SBM.Core.Steel.PartCategory.WalkwayPlate) return "walkway";
             if (p.Category == SBM.Core.Steel.PartCategory.Weld) return "weld";
             if (m.Contains("forged") || p.Category == SBM.Core.Steel.PartCategory.TrussPin) return "forging";
             if (m.Contains("cast")) return "casting";
@@ -284,15 +285,15 @@ Print("== 7. Quantities vs p.42 by span group (items 1-15; 12 reinforcement not 
         Row($"p.42 item {itS} silicon steel, {grp}", s, Plan(itS, col), 0.05 * Plan(itS, col), "lb", $"model {s / Plan(itS, col):P1} of plan");
         Row($"p.42 items {itC} + {itS} structural steel, {grp}", c + s, Plan(itC, col) + Plan(itS, col), 0.05 * (Plan(itC, col) + Plan(itS, col)), "lb", $"model {(c + s) / (Plan(itC, col) + Plan(itS, col)):P1} of plan");
         tC += c; tS += s; pC += Plan(itC, col); pS += Plan(itS, col);
-        if (Plan(8, col) > 0 || M("forging") > 0) Row($"p.42 item 8 forgings (pins), {grp}", M("forging"), Plan(8, col), 0.05 * Math.Max(1, Plan(8, col)), "lb", "pins modeled as cylinders; shoe pins / suspender pins");
-        if (Plan(9, col) > 0 || M("casting") > 0) Row($"p.42 item 9 steel castings, {grp}", M("casting"), Plan(9, col), 0.05 * Math.Max(1, Plan(9, col)), "lb", "shoe bodies are trapezoidal ENVELOPES (UNRESOLVED) and sockets cylinders: weight is not representative");
+        if (Plan(8, col) > 0 || M("forging") > 0) Row($"p.42 item 8 forgings (pins), {grp}", M("forging"), Plan(8, col), 0.05 * Math.Max(1, Plan(8, col)), "lb", "pins, shoe forgings and forged rollers (shoes-ptc.csx); approach pins listed as (C) carbon forgings on p.49 / p.52 / p.59 / p.63 but p.42 lists no forgings for the 3-span units");
+        if (Plan(9, col) > 0 || M("casting") > 0) Row($"p.42 item 9 steel castings, {grp}", M("casting"), Plan(9, col), 0.05 * Math.Max(1, Plan(9, col)), "lb", "shoes piece by piece (shoes-ptc.csx: cast bases / walls / ribs as drawn, fillets / bosses not built); suspender sockets are solid cylinders (open sockets, UNRESOLVED); girder-span castings not identified on p.44");
         if (Plan(7, col) > 0) Row($"p.42 item 7 bridge rope suspenders, {grp}", (by.TryGetValue("rope", out var rp) ? rp.Sum(p => p.Length) : 0) / ft, Plan(7, col), 0.05 * Plan(7, col), "LF", "rope length between the sockets");
         var rails = bm.Steel?.Railings;
         Row($"p.42 item 13 parapet railing, {grp}", (rails?.Runs.Sum(r => r.Length) ?? 0) / ft, Plan(13, col), 0.01 * Plan(13, col), "LF",
-            bn.Contains("Girder") ? "the girder-span pay length includes the railing on the abutment wing walls (p.108: 67'-9 west / 34'-9 east from the CL bearing to the wing end per side), which is not modeled (abutment parapets)" : "both runs, deck begin to end");
-        double gratLen = by.TryGetValue("grating", out var gl) ? gl.Sum(p => p.Length) : 0;
-        Row($"p.42 item 14 grating, {grp}", gratLen / ft * 2.0, Plan(14, col), 0.05 * Plan(14, col), "SF", bn.Contains("Girder") ? "no walkway sheet for the girder spans (UNRESOLVED p.44)" : "2'-0 walkways as built (p.101 / p.103); ladders, platforms not built");
-        Row($"p.42 item 15 walkways and platforms (steel), {grp}", M("grating"), Plan(15, col), 0.05 * Plan(15, col), "lb", "grating at 7 psf (UNRESOLVED weight); walk angles, hangers, hand rails, ladders, platforms not built");
+            bn.Contains("Girder") ? "both runs incl. the railing on the abutment wing parapets (p.108: 67'-9 west / 34'-9 east from the CL bearing to the wing end per side)" : "both runs, deck begin to end");
+        double gratArea = by.TryGetValue("grating", out var gl) ? gl.Sum(p => p.Volume) / In(0.75) : 0;     // 3/4 in. grating solids: area = volume / depth
+        Row($"p.42 item 14 grating, {grp}", gratArea / (ft * ft), Plan(14, col), 0.05 * Plan(14, col), "SF", bn.Contains("Girder") ? "no walkway sheet for the girder spans (UNRESOLVED p.42 / p.101)" : "walkways, cross walks and inspection platforms as built (walkways-ptc.csx, p.101-106); navigation light platforms / catwalk not built");
+        Row($"p.42 item 15 walkways and platforms (steel), {grp}", M("grating") + M("walkway"), Plan(15, col), 0.05 * Plan(15, col), "lb", "grating at 7 psf (UNRESOLVED weight) + walk channels, hand railing, ladders, platform frames; hangers, connection angles, ladder cages not built");
         double cy = ((bm.Concrete?.DeckVolume ?? 0) + (bm.Concrete?.HaunchVolume ?? 0) + (bm.Concrete?.BarrierVolume ?? 0)) / 0.764554857984;
         Row($"p.42 item 11 Class A concrete (deck, thickening, curbs, parapets), {grp}", cy, Plan(11, col), 0.03 * Plan(11, col), "CY", "slab 6 3/4 + 1 in thickening + curb / parapet sections (deck-ptc.csx)");
         Print($"INFO  p.42 item 12 reinforcement {grp}: plan {Plan(12, col):N0} lb - not modeled (user: no rebar)");
