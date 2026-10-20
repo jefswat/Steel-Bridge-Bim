@@ -1142,6 +1142,7 @@ UNRESOLVED FLAG (general, reusable): `SBM.Core/Assumption.cs` `Assumption{Status
   `Steel/FlangeDeflectorDetailer.cs`, `AssemblyKind.FlangeDeflector`, 6 on the exterior girders at pier 1 / pier 2 / N abut, UNRESOLVED dimension flags); Pier 1 cap end projections (4" x 3'-7 5/8, `CapBlockKind.Cap`),
   brick on the cap end faces; the girder web cope under the cap flange is cut to the cap-flange plane (not parallel to the grade); support cross frames use the support's own bearing stiffener. NOT done (UNRESOLVED
   with page + reason in the build script): abutment wing extensions / maskwalls / backwall extension / L-shaped wing footing + wing piles (p.19 / p.21), Pier 1 cap soffit brick, reinforcing marks (user queue item 3).
+  Intermediate stiffeners 2026-10-20 (user decision d35): OPTIONAL `StiffenerDefinition.IntermediateLocations` (`IntermediateStiffenerLocation`: Girder -1 = all, Span, Reference SpanBegin | SpanEnd | Panel (index, negative = from the end, Fraction 0.5 = mid panel) | Splice (number + signed Distance), `Unresolved` text raised as a warning; null = the automatic `IntermediateMaxSpacing` rule, list set = REPLACES it; omitted from the .sbm when null). Nebraska: 10 per girder + 1 on D (p.27 ticks), the 7 stiffener x splice plate clash groups are gone (clash 13 -> 6, the rest = cap ContinuityPlate x DiaphragmPlate).
 
 ## Conventions (bridge engineering)
 - Offsets right-positive (Civil 3D). Skew from the radial line; positive = right end of support line up-station.

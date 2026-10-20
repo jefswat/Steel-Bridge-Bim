@@ -224,7 +224,7 @@ foreach (var (no, sup, fo) in fsLoc)
 }
 
 // ---- stiffeners (p.27, p.32): bearing stiffeners per support, jacking stiffeners 1'-5 from CL brg at the abutments (toward the span) and 3'-3 each side
-// at pier 1; connection plates PL 1/2 x 7 1/2; intermediate PL 7/16 x 6 1/2 at equal spaces between cross frames (p.27 note) - one per panel as drawn.
+// at pier 1; connection plates PL 1/2 x 7 1/2; intermediate PL 7/16 x 6 1/2 at equal spaces between cross frames (p.27 note).
 br.Stiffeners.BearingStiffener = new PlateSize(I(10.5), I(1));
 br.Supports[0].BearingStiffener = new PlateSize(I(10.5), I(1));
 br.Supports[1].BearingStiffener = new PlateSize(I(10.5), I(1));
@@ -234,14 +234,29 @@ br.Supports[1].JackingStiffenerOffsets = new() { -F(3, 3), F(3, 3) };
 br.Supports[3].JackingStiffenerOffsets = new() { -F(1, 5) };
 br.Stiffeners.ConnectionPlate = new PlateSize(I(7.5), I(0.5));
 br.Stiffeners.IntermediateStiffener = new PlateSize(I(6.5), I(7.0 / 16));
-br.Stiffeners.IntermediateMaxSpacing = Ft(12);    // panels 20'-5 .. 23'-6 between frames -> one stiffener at mid panel (equal spaces, p.27)
 br.Stiffeners.CornerClip = I(1.5);
 br.Stiffeners.ClipToTopFlange = true;   // p.32 Sect. A-A: bearing / jacking stiffeners sized for the bottom flange overhang the narrower top flange at the abutments (1.78" S, ~0.8" N); outer top corner clipped 45 deg to the flange edge, top weld stops there
 br.Stiffeners.FlangeToWebWeld = I(5.0 / 16);
-U("p.27 / p.34", "intermediate stiffeners that land inside a field splice", "p.27 puts them at equal spaces between the cross frames; with the plan frame lines the mid-panel stiffener lies 0.8 ft from FS 4 on every girder and on FS 2 of girders C / D, inside the splice plates (clashes 0.2 - 0.25 in); the plans give no other position",
-    "Kept at mid panel (clashes reported, nothing moved).");
-U("p.27", "first intermediate stiffener at the abutments '9'-6 (TYP.)' from the CL bearing", "the plan note says equal spaces between cross frames, but the abutment panels show 9'-6 to the first stiffener without the rest of the chain",
-    "Modeled at equal spaces (mid panel) like every other panel.");
+// INTERMEDIATE STIFFENERS as drawn on p.27 (vector linework re-read 2026-10-20, user decision d35): short ticks only in the abutment panels at 9'-6 from the CL bearing
+// ("9'-6 (TYP.)", both abutments), in the two panels on each side of Pier 1 and of Pier 2 (the cap) at mid panel, and one extra on girder D in the FS 4 panel; none in the
+// FS 1 / FS 2 / FS 3 panels = 10 per girder, 11 on D. (The generator's automatic mid-panel rule put 25 per girder and 7 clash groups with the splice plates.)
+{
+    var il = new List<IntermediateStiffenerLocation>();
+    // spans: 0 = S abutment - Pier 1, 1 = Pier 1 - Pier 2 (cap), 2 = Pier 2 - N abutment
+    il.Add(new() { Span = 0, Reference = StiffenerLocationReference.SpanBegin, Distance = F(9, 6) });
+    foreach (int pn in new[] { -2, -1 }) il.Add(new() { Span = 0, Reference = StiffenerLocationReference.Panel, Panel = pn });
+    foreach (int pn in new[] { 0, 1 }) il.Add(new() { Span = 1, Reference = StiffenerLocationReference.Panel, Panel = pn });
+    foreach (int pn in new[] { -2, -1 }) il.Add(new() { Span = 1, Reference = StiffenerLocationReference.Panel, Panel = pn });
+    foreach (int pn in new[] { 0, 1 }) il.Add(new() { Span = 2, Reference = StiffenerLocationReference.Panel, Panel = pn });
+    il.Add(new() { Span = 2, Reference = StiffenerLocationReference.SpanEnd, Distance = F(9, 6) });
+    il.Add(new()
+    {
+        Girder = 3, Span = 2, Reference = StiffenerLocationReference.Splice, SpliceNumber = 4, Distance = F(3, 2),
+        Unresolved = SBM.Core.UnresolvedFlag.Text("p.27", "girder D extra intermediate stiffener in the FS 4 panel (3'-2 ahead of the CL FS 4)", "the tick is drawn but not dimensioned; 3'-2 is scaled from the sheet (+-1\")",
+            "Modeled 3'-2 ahead of CL FS 4 (clear of the splice plates by 22\" or more)."),
+    });
+    br.Stiffeners.IntermediateLocations = il;
+}
 // Shear studs 7/8 x 5, 3 per row (1 1/2, 2 eq spa, 1 1/2) (p.28, p.32): spacing groups not reproduced (generic pitch).
 br.Studs.Diameter = I(0.875); br.Studs.RowsAcross = 3; br.Studs.TransverseSpacing = I(7.5); br.Studs.Pitch = I(12);
 br.Studs.EdgeDistance = I(1.5);   // p.32 shear stud detail: 1 1/2 from the flange edge, 2 EQ. SPA. across (6 1/2 on the 16\" flange, 7 1/2 on 18\", 8 1/2 on 20\", ...)

@@ -1412,8 +1412,54 @@ public sealed class FramingGenerator
                 });
             }
 
+            // Intermediate transverse stiffeners as listed on the plan (OPTIONAL list replaces the automatic rule).
+            if (sd.IntermediateLocations != null)
+            {
+                var side = sd.IntermediateSide;
+                if (side == StiffenerSide.Interior)
+                {
+                    double off = _offsets[0][i];
+                    side = off < center ? StiffenerSide.Right : StiffenerSide.Left;
+                }
+                foreach (var loc in sd.IntermediateLocations)
+                {
+                    if (loc.Girder >= 0 && loc.Girder != i) continue;
+                    if (loc.Span < 0 || loc.Span >= NSpan) { if (i == 0) Warn($"Intermediate stiffener list: span {loc.Span + 1} does not exist."); continue; }
+                    var c = _curves[i][loc.Span];
+                    double s;
+                    switch (loc.Reference)
+                    {
+                        case StiffenerLocationReference.SpanBegin: s = loc.Distance; break;
+                        case StiffenerLocationReference.SpanEnd: s = c.Length - loc.Distance; break;
+                        case StiffenerLocationReference.Splice:
+                        {
+                            var hit = _spliceS.Length > i ? _spliceS[i][loc.Span].Where(x => SpliceNo(x.Index) == loc.SpliceNumber).Select(x => (double?)x.S).FirstOrDefault() : null;
+                            if (hit == null) { Warn($"Intermediate stiffener list: girder {i + 1} has no field splice {loc.SpliceNumber} in span {loc.Span + 1}."); continue; }
+                            s = hit.Value + loc.Distance;
+                            break;
+                        }
+                        default:
+                        {
+                            var stops = conn.Where(x => x.span == loc.Span).Select(x => x.s).Append(0).Append(c.Length).Distinct().OrderBy(x => x).ToList();
+                            int np = stops.Count - 1, pi = loc.Panel < 0 ? np + loc.Panel : loc.Panel;
+                            if (pi < 0 || pi >= np) { Warn($"Intermediate stiffener list: girder {i + 1} span {loc.Span + 1} has {np} panels, no panel {loc.Panel}."); continue; }
+                            s = stops[pi] + (stops[pi + 1] - stops[pi]) * loc.Fraction;
+                            break;
+                        }
+                    }
+                    if (s < 0 || s > c.Length) { Warn($"Intermediate stiffener list: girder {i + 1} span {loc.Span + 1}: position {Sh(s)} is outside the span."); continue; }
+                    if (loc.Unresolved is { Length: > 0 } why && i == (loc.Girder >= 0 ? loc.Girder : 0)) Warn(why);
+                    double u = c.UAt(s);
+                    var t = c.TangentAt(u);
+                    list.Add(new StiffenerResult
+                    {
+                        Girder = i, Kind = StiffenerKind.Intermediate, Location = Point3(c, u), GirderTangent = t, Direction = t.Right,
+                        Side = side, Plate = sd.IntermediateStiffener, GirderDistance = GirderDistance(i, loc.Span, u),
+                    });
+                }
+            }
             // Intermediate transverse stiffeners in panels between bearings and connection plates.
-            if (sd.IntermediateMaxSpacing > 0)
+            else if (sd.IntermediateMaxSpacing > 0)
             {
                 var side = sd.IntermediateSide;
                 if (side == StiffenerSide.Interior)

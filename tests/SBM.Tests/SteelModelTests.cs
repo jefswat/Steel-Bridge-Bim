@@ -126,6 +126,32 @@ public class SteelModelTests
     }
 
     [Fact]
+    public void IntermediateStiffenerList_ReplacesTheAutomaticRule_AndIsLeanWhenUnused()
+    {
+        var (fAuto, _) = Build();
+        int autoCount = fAuto.Stiffeners.Count(s => s.Kind == StiffenerKind.Intermediate && s.Girder == 0);
+        Assert.True(autoCount > 2);
+        var (f, _) = Build(b => b.Stiffeners.IntermediateLocations = new()
+        {
+            new() { Girder = 0, Span = 0, Reference = StiffenerLocationReference.SpanBegin, Distance = In(114) },
+            new() { Girder = -1, Span = 0, Reference = StiffenerLocationReference.Panel, Panel = -1 },
+            new() { Girder = 1, Span = 0, Reference = StiffenerLocationReference.SpanEnd, Distance = In(60), Unresolved = "UNRESOLVED (p.27): test position - not dimensioned." },
+        });
+        var g0 = f.Stiffeners.Where(s => s.Kind == StiffenerKind.Intermediate && s.Girder == 0).ToList();
+        Assert.Equal(2, g0.Count);
+        Assert.Equal(1, f.Stiffeners.Count(s => s.Kind == StiffenerKind.Intermediate && s.Girder == 2));
+        var begin = f.Stiffeners.Where(s => s.Kind == StiffenerKind.Bearing && s.Girder == 0).Min(s => s.GirderDistance);
+        Assert.Contains(g0, s => Math.Abs(s.GirderDistance - begin - In(114)) < 1e-6);
+        Assert.Contains(f.Diagnostics, d => d.Message.Contains("test position - not dimensioned"));
+        // default = no output change
+        Assert.DoesNotContain("IntermediateLocations", System.Text.Json.JsonSerializer.Serialize(new StiffenerDefinition()));
+        var roundTrip = System.Text.Json.JsonSerializer.Deserialize<StiffenerDefinition>(System.Text.Json.JsonSerializer.Serialize(new StiffenerDefinition
+        { IntermediateLocations = new() { new() { Girder = 2, Span = 1, Reference = StiffenerLocationReference.Splice, SpliceNumber = 3, Distance = In(38) } } }))!;
+        Assert.Equal(StiffenerLocationReference.Splice, roundTrip.IntermediateLocations![0].Reference);
+        Assert.Equal(3, roundTrip.IntermediateLocations[0].SpliceNumber);
+    }
+
+    [Fact]
     public void Bolts_StayClearOfFlanges_AndGussetsClearMembers()
     {
         foreach (var type in new[] { CrossFrameType.XFrame, CrossFrameType.KFrame, CrossFrameType.InvertedKFrame, CrossFrameType.Diaphragm })

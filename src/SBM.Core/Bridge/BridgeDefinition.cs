@@ -1008,13 +1008,40 @@ public sealed class StiffenerDefinition
     /// top weld stops at the flange edge (nothing is welded to air).</summary>
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
     public bool ClipToTopFlange { get; set; }
+    /// <summary>OPTIONAL (null = the automatic rule from <see cref="IntermediateMaxSpacing"/>, omitted from the file): the intermediate stiffeners exactly as the
+    /// plan draws them, one entry per location (and girder). When the list is set it REPLACES the automatic spacing rule (an empty list = no intermediate stiffeners).</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public List<IntermediateStiffenerLocation>? IntermediateLocations { get; set; }
     public StiffenerDefinition Clone() => new()
     {
         BearingStiffener = BearingStiffener.Clone(), ConnectionPlate = ConnectionPlate.Clone(),
         IntermediateMaxSpacing = IntermediateMaxSpacing, IntermediateStiffener = IntermediateStiffener.Clone(),
         IntermediateSide = IntermediateSide, CornerClip = CornerClip, IntermediateBottomGap = IntermediateBottomGap,
         WeldSize = WeldSize, FlangeToWebWeld = FlangeToWebWeld, ClipToTopFlange = ClipToTopFlange,
+        IntermediateLocations = IntermediateLocations?.Select(l => l.Clone()).ToList(),
     };
+}
+
+public enum StiffenerLocationReference { SpanBegin, SpanEnd, Panel, Splice }
+
+/// <summary>One intermediate stiffener as the plan places it (see <see cref="StiffenerDefinition.IntermediateLocations"/>). Distances are measured along the girder
+/// (plan arc length from the CL bearing of the span). <see cref="Reference"/>: SpanBegin = Distance after the CL bearing at the begin of <see cref="Span"/>; SpanEnd = Distance
+/// before the CL bearing at its end; Panel = at Fraction (0.5 = mid panel, the plan's "equal spaces between cross frames") of the panel between consecutive connection plates / bearings
+/// (panel index from the span begin, negative = from the end: -1 = the last panel); Splice = Distance (signed, + ahead) from the CL of field splice number <see cref="SpliceNumber"/>.</summary>
+public sealed class IntermediateStiffenerLocation
+{
+    /// <summary>0-based girder; -1 = every girder.</summary>
+    public int Girder { get; set; } = -1;
+    public int Span { get; set; }
+    public StiffenerLocationReference Reference { get; set; }
+    public double Distance { get; set; }
+    public int Panel { get; set; }
+    public double Fraction { get; set; } = 0.5;
+    public int SpliceNumber { get; set; }
+    /// <summary>Plain-language text when the plan does not fix this position (raised as an UNRESOLVED warning; the position stays as given).</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public string? Unresolved { get; set; }
+    public IntermediateStiffenerLocation Clone() => (IntermediateStiffenerLocation)MemberwiseClone();
 }
 
 /// <summary>

@@ -92,6 +92,21 @@ for (int g = 0; g < 4; g++)
     Row("2 field splices", $"FS4 {GL[g]}: FS4 to CL N abut brg", planN, (Brg(g, 3) - sp.GirderDistance) / ft, 1.0 / 16 / 12);
 }
 
+// ---- 2b. intermediate stiffeners (p.27 ticks, vector linework re-read 2026-10-20; user decision d35): 9'-6 from CL brg at both abutments + 2 panels each side of Pier 1 and Pier 2
+// (mid panel) = 10 per girder, +1 on girder D in the FS 4 panel; none in the FS 1 / FS 2 / FS 3 panels
+for (int g = 0; g < 4; g++)
+    Row("2 intermediate stiffeners", $"{GL[g]} count", g == 3 ? 11 : 10, fr.Stiffeners.Count(x => x.Girder == g && x.Kind == SBM.Core.Framing.StiffenerKind.Intermediate), 0, "ea", "p.27 ticks; the generator's old automatic rule (one per panel) gave 25");
+{
+    double minClear = double.MaxValue; string where = "";
+    foreach (var x in fr.Stiffeners.Where(x => x.Kind == SBM.Core.Framing.StiffenerKind.Intermediate))
+        foreach (var sp in fr.Splices.Where(sp => sp.Girder == x.Girder))
+        {
+            double c = Math.Abs(x.GirderDistance - sp.GirderDistance);
+            if (c < minClear) { minClear = c; where = $"{GL[x.Girder]} FS {sp.Number}"; }
+        }
+    Row("2 intermediate stiffeners", "closest stiffener to a splice CL (half length of the longest top plate 12.5 in)", 12.5 / 12, minClear / ft, 0, "ft", $"{where}; plan: none drawn in the FS panels except girder D in FS 4 (3'-2 scaled, UNRESOLVED)", info: true);
+}
+
 // ================================================================ 3. plate schedule (p.28; one typical elevation for all girders)
 string[] planTop = { "1x18", "1x22", "2x22", "1 1/8x22", "7/8x16", "1 1/8x24", "2x24", "1x24", "1x24" };
 string[] planBot = { "1x22", "1 1/8x22", "2x22", "1 1/4x22", "1x20", "1 1/8x24", "2 1/4x24", "1 1/8x24", "1 1/2x26" };
