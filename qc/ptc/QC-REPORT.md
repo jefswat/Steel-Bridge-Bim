@@ -33,3 +33,48 @@ Answers per issue in `results/answers.csv`.
 - I005 accepted plan conflict (as-built E abutment 711+92.797 per p.38 / 32 / 42 / 43; p.1 superseded; printed abutment seats 0.07 ft below the p.44 stack at both abutments, model takes the printed values).
 - I001 answered: open, list of unmodeled steel and per-item numbers in answers.csv.
 Check counts before / after: check-truss-ptc-approach 1046 PASS / 12 DIFF -> 1050 / 12 (+4 new material rows, all PASS); check-ptc-delaware-river 376 / 44 -> 376 / 44 (approach C / S rows move 1-2 %, totals unchanged; structural steel 84.1 % of p.42); check-girders-ptc 131 / 6 (not affected). Please re-run the p.47 material rows and the p.42 carbon / silicon rows on a fresh export.
+
+---
+
+# Pass 2 (checker: Claude Sonnet 5.5, independent run)
+
+Independence: the session again showed me the full text of `C:\SBM\CLAUDE.md` (originator PTC notes) automatically. I did not open it and did not use it for any plan value, method or expectation. I did not open `samples/plans/*.csx`, `docs/plan-data/**`, git history or other bridges' qc folders. Model data come from `inputs/ptc-forcheck.ifc` (IfcOpenShell, mesh extents, cached in `work/sub.pkl`, `piles.pkl`, `main.pkl`, `fb.pkl`, `dam.pkl`, `susp.pkl` by `work/ext2.py`) and `inputs/ptc-forcheck.sqlite` (section area = volume / length). No `sbm` command, no clash run, no app. Items I002 / I003 / I006 (being fixed by the originator) were not re-checked.
+
+## Result counts
+| | pass | fail | conflict | n.a. | total |
+|---|---|---|---|---|---|
+| Pass 2 (C0224-C1080) | 751 | 100 | 2 | 4 | 857 |
+| Combined (C0001-C1080) | 945 | 128 | 3 | 4 | 1080 |
+
+Fails fall into 11 findings (I007-I017, issues.csv). 80 of the 100 fails are two systematic patterns (chord length bias I008, 4-span material / cover plate I009, I010); the real count of distinct defects is about 11.
+
+## Coverage by sheet (pass 2)
+- Substructure, checked: p.6 (piers 15 / 16: footing bottom / top, plan size, cap, leg sizes), p.7 (13 / 14), p.8 (11 / 12), p.9 (pier 10), p.10 (piers 1-9: footing and shaft top elevations, footing sizes, shaft base and top sizes, c-c of shafts), p.11 (W abutment footing, wing extensions, pedestal top), p.17 and p.20 (piers 17-20: pile cap, tremie seal, pier body, shafts, legs, caps), p.27 (piers 17 / 20 pile plan and cut-off El), p.33 / 34 / 35 (piers 21-26), p.36 (pier 27), p.37 (piers 28-30), p.38 (E abutment footing, pedestal, pile plan). 
+- Substructure NOT checked: p.12-14 (W abutment sections, misc details, culvert) and p.39-40, p.18-19 and 21-26, 28-30 (cofferdam, fender, shaft details, boring logs, test piles), pile counts for piers 18 / 19 (498 each, plan not read), pile tip elevations, rebar. E abutment pile count is a visual count (LOW CONFIDENCE).
+- Main span: p.69 / p.70 (all member lengths, areas and C / S materials of top chords, bottom chords, verticals, diagonals), p.73 (shoe at L0 / L0': masonry plate, pin, sole, rocker, pin elevation 111.098, shoe station), p.96 (shoes at piers 18 / 19: masonry plate, pin 10 in at 94.284, shoe bottom 87.701), suspender ropes (count, 4 in diameter), plate hanger area. NOT checked: gusset thicknesses (p.74-90), splice plates, bracing p.71 / 97-99, portal p.100, floor beam / suspended floor p.72, 94, 95.
+- 4-span trusses p.57: all chord, diagonal, vertical and hanger areas and materials in both units (248 rows). NOT checked: 3-span member sections beyond pass 1 (p.47), joints p.59-67, p.50-53 gussets.
+- Floor system: p.44 / 45 (girder spans: stringer lines, bracket tip 39'-9, outside stringer 39'-1, girder spacing), p.48 / 55 / 58 (stringer count and sections, floor beam length 58'-0 and bracket taper 6'-3 1/2 to 2'-0 1/2, floor beam count). NOT checked: girder stiffener count / spacing on p.44 (n.a. row), stringer connection details, p.56 bracing.
+- Deck / curb / parapet (p.107): slab 6 3/4 in, curb to CL 38'-3, parapet 10 in, crown 1/8 in per ft. Expansion dams (p.46 / 54 / 68): plan dam length, count, 2'-6 c-c. NOT checked: dam details p.51 / 52 / 91 / 92 (teeth, plate thickness), walkways / ladders / platforms p.101-106, railing p.108.
+- Sheet index: all 108 titles verified from the title blocks (p.1 to p.108, composites in `work/p/cs*.png`, `d*.png`). `extract/sheet_index.csv` is correct as it stands.
+
+## Findings (every FAIL / CONFLICT; ids in results/issues.csv)
+1. I007 (medium) p.69 / p.73: L0-L2 lower chord 63.444 ft vs 62.025 ft plan (+1.42 ft). Model chord projects past the L0 pin by about 1.4 ft; p.73 elevation (scaled) shows about 0.5-0.7 ft. Plan value low confidence.
+2. I008 (low) p.69: chord lengths +0.01 to +0.11 ft vs the p.69 table (top chords 21 of 22, bottom chords 19 of 20 beyond 0.02 ft). Systematic, grows with chord slope / distance from L0; may be a definition difference (working-line vs solid length).
+3. I009 (medium) p.57: in both 4-span units chords U3-U5, U9-U11 and diagonals U9-L10, L10-U11 have no cover plates in the member solid (plan 114.37 / 127.40 / 129.47 / 114.30 sq in, model 83.92 / 99.95 / 99.95 / 91.84).
+4. I010 (medium) p.57: 4-span material C / S wrong on 6 members in both units (L12-L14, U3-L4, L4-U5, L14-U15, U15-L16, L16-U17), the same kind of error as I002 / I003 in the 3-span units.
+5. I011 (medium) p.70: vertical U11-L11 332.2 vs 293.67 sq in (+13 %); perforated covers counted solid.
+6. I012 (low) p.70: 13 members systematically +0.58 sq in (1.0-1.3 %).
+7. I013 (info, PLAN CONFLICT) p.70: diagonals U13-L14 / U14-L15 printed areas 118.69 / 116.69 disagree with their own section arithmetic (116.69 / 120.69); the model follows the sections.
+8. I014 (low) p.9 / p.36: piers 10 and 27 lower shaft base along the bridge 12.31 / 12.69 ft vs plan 12.50 / 12.875 ft (-0.19 ft).
+9. I015 (medium, low confidence) p.27: pier 17 / 20 pile count 194 vs 196 (column 8 has 8 piles on 1'-6 offset rows in the plan, 7 on the 3'-0 rows in the model).
+10. I016 (low) p.58: floor beam F3 area 63.0 vs 69.8 sq in (cover plates partial length?). Low confidence.
+11. I017 (low) p.57: 14 WF 61 hangers 17.67 vs 17.94 sq in (-1.5 %).
+
+PASS highlights: all 25 piers footing bottom / top elevations, footing plan sizes (to 1/4 in), shaft top elevations and sizes (p.6-10, 33-37), pile cap -7.0 / 5.0 and tremie seal -25.0 / -19.0 at the arch piers, abutment footing and pedestal elevations, shoe pin elevations, main span member areas (within 1 % in 205 of 215 rows), 4-span member areas (208 of 248 rows), stringer offsets and sections, floor beam 58'-0 and bracket taper, deck 6 3/4 in and curb / parapet geometry.
+
+## Method notes
+Plan values read from page crops at 3-12 x zoom (`work/p/*.png`), dimensions typed into `work/sub1.py`, `sub2.py`, `sub3.py`, `man1-4.py`, `plan_main.py` (p.69 / p.70 tables), `four_rec.py` (p.57 tables). Model: footing / cap / shaft extents from mesh bounding boxes of the named IFC elements in the station / offset frame of pass 1 (S0 = 63800, same alignment transform as `extract_geom.py`); member length and area from the sqlite registry (volume / length is the mean gross area of the solid, so it excludes anything modelled as a separate plate). Tolerances: elevations 0.01 ft, plan sizes 1/4 in, member areas 1 %, lengths 0.02 ft.
+Bookkeeping: while recording I mistakenly removed rows C0224-C1041 for about 15 minutes (my confusion over images no longer displayed) and restored them from `work/invalid_unseen_rows.csv`; the rows are intact and renumbered C0256-C1073; C0224-C0255 are the first rows of this pass (piers p.10 etc. were re-verified against the plan crops after the restore: pier 1-9 elevations read again and agree).
+
+## Still open after pass 2
+Gusset thicknesses and joint plates (p.50-53, 59-67, 74-90), splices and fills, lateral / sway bracing (p.56, 71, 97-99), portal p.100, suspended floor p.72 / 94 / 95, girder stiffeners (p.44), walkways / platforms (p.101-106), railing and parapet details (p.108), expansion dam details (p.51 / 52 / 91 / 92), abutment sections (p.12, 39), culvert (p.14), pile counts at piers 18 / 19, shoes at piers 11 / 26 (p.52), 14 / 16 / 21 / 23 (p.63), 15 / 22 (p.67), 10 / 13 / 17 / 20 / 24 / 27 (p.59), rivets (226,632 in the registry; not checked), the clash run (not allowed), element-by-element reconciliation (unverified-element list not produced).
