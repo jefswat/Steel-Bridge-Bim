@@ -123,7 +123,7 @@ public static class PedestrianRailingGenerator
         if (len <= 1e-3) { res.Diagnostics.Add(new(DiagnosticSeverity.Warning, $"{where}: run shorter than the end clearances; not built.")); return; }
 
         // base elevation: top of concrete under the probe point (searched a little toward the run interior at the ends, e.g. skewed deck ends)
-        double? Base(double s)
+        double? BaseRaw(double s)
         {
             foreach (double step in new[] { 0.0, 0.02, 0.05, 0.1, 0.2, 0.3 })
             {
@@ -132,6 +132,46 @@ public static class PedestrianRailingGenerator
                 if (top.At(P(dd) + Out(dd) * d.BaseProbe) is double z) return z;
             }
             return null;
+        }
+        // Short dips of the base (a curb notched around steel, a break in the concrete narrower than BaseBridgeGap) are bridged: grey-scale closing of the
+        // sampled base over the window (the dip is filled up to the lower rim). Each bridged dip is reported.
+        double bridge = d.BaseBridgeGap > 0 ? d.BaseBridgeGap : d.BaseBridgeGap < 0 ? 0 : (d.Post?.Spacing ?? 0) / 3;
+        double[]? bsz = null; const double bstep = 0.05;
+        if (bridge >= 2 * bstep)
+        {
+            int nb = (int)Math.Ceiling(ls[^1] / bstep) + 1;
+            var raw = new double?[nb];
+            for (int i = 0; i < nb; i++) raw[i] = BaseRaw(Math.Min(ls[^1], i * bstep));
+            int w = (int)Math.Ceiling(bridge / bstep);
+            bsz = new double[nb];
+            var rep = new List<string>();
+            double runLow = 0; int runStart = -1;
+            for (int i = 0; i < nb; i++)
+            {
+                if (raw[i] is not double z) { bsz[i] = double.NaN; continue; }
+                double mL = double.NegativeInfinity, mR = double.NegativeInfinity;
+                for (int j = Math.Max(0, i - w); j <= i; j++) if (raw[j] is double zj) mL = Math.Max(mL, zj);
+                for (int j = i; j <= Math.Min(nb - 1, i + w); j++) if (raw[j] is double zj) mR = Math.Max(mR, zj);
+                double zb = Math.Max(z, Math.Min(mL, mR));
+                bsz[i] = zb;
+                if (zb - z > 0.0064) { if (runStart < 0) { runStart = i; runLow = z; } }
+                else if (runStart >= 0)
+                {
+                    rep.Add($"{u.FormatStation(a.DistanceToStation(DAt(runStart * bstep)))} to {u.FormatStation(a.DistanceToStation(DAt(i * bstep)))} ({u.FormatLength((i - runStart) * bstep)} long, {u.FormatLength(bsz[runStart] - runLow, LengthKind.Short)} deep)");
+                    runStart = -1;
+                }
+            }
+            if (rep.Count > 0)
+                res.Diagnostics.Add(new(DiagnosticSeverity.Warning,
+                    $"{where}: the concrete under the reference line dips for less than {u.FormatLength(bridge)} at {rep.Count} place(s) ({string.Join("; ", rep.Take(6))}{(rep.Count > 6 ? "; ..." : "")}) - base bridged at the lower rim (UNRESOLVED: curb / slab notched around steel in the model, the plans show the curb continuous)."));
+        }
+        double? Base(double s)
+        {
+            if (bsz == null) return BaseRaw(s);
+            double x = Math.Clamp(s, 0, ls[^1]) / bstep; int i0 = Math.Min(bsz.Length - 1, (int)Math.Floor(x)), i1 = Math.Min(bsz.Length - 1, i0 + 1);
+            double a0 = bsz[i0], a1 = bsz[i1];
+            if (double.IsNaN(a0) || double.IsNaN(a1)) return BaseRaw(s);
+            return a0 + (a1 - a0) * (x - i0);
         }
         // ring stations (length along the line)
         int nr = Math.Max(1, (int)Math.Ceiling(len / Math.Max(0.05, d.SampleStep)));
