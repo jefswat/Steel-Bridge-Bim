@@ -158,6 +158,7 @@ public partial class MainWindow : Window
                 int wi = Array.IndexOf(args, "--width");
                 if (wi >= 0 && wi + 1 < args.Length && View.Camera is OrthographicCamera wc) wc.Width = double.Parse(args[wi + 1], System.Globalization.CultureInfo.InvariantCulture);
                 if (args.Contains("--sheets")) ModeSheets.IsChecked = true;
+                if (args.Contains("--projectedplan")) OnProjectedPlanToggle(this, new RoutedEventArgs());
                 int hi = Array.IndexOf(args, "--hide");
                 if (hi >= 0 && hi + 1 < args.Length)
                 {
@@ -221,6 +222,7 @@ public partial class MainWindow : Window
                     SnapshotIsolate(args);
                     LogDetailVisibility();
                     LogVideoMemory("snapshot");
+                    SnapshotProjection(path);
                     SaveSnapshot(path);
                     SnapshotEditors(path);
                     SnapshotRecentDialog(path);

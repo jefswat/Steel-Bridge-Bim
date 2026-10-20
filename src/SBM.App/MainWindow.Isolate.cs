@@ -36,7 +36,8 @@ public partial class MainWindow
 
     /// <summary>Plan view draws only 2D linework, except the 3D layers of an isolate (a top view of what is isolated); 3D omits plan-only layers.</summary>
     private bool LayerModeOk(string name) =>
-        _planMode ? !name.StartsWith("3D-") || _iso.ShowsInPlan(name) : !PlanOnlyLayers.Contains(name);
+        _planMode ? !name.StartsWith("3D-") || _iso.ShowsInPlan(name)
+                  : !PlanOnlyLayers.Contains(name) && !name.StartsWith(ViewModels.MainViewModel.PlanPrefix, StringComparison.Ordinal);   // projected plan = plan view only
 
     private void SetLayersBatch(Func<string, bool> on)
     {

@@ -112,8 +112,18 @@ public sealed class DrawingCanvas : FrameworkElement
         }
     }
 
+    /// <summary>Click without drag (model coordinates): picking in projected views.</summary>
+    public event Action<Vec2>? Clicked;
+
+    /// <summary>Model point under a screen point.</summary>
+    public Vec2 ToModel(Point p) => new((p.X - _offset.X) / _scale, -(p.Y - _offset.Y) / _scale);
+
+    /// <summary>Model length of one screen pixel.</summary>
+    public double PixelSize => 1 / _scale;
+
     protected override void OnMouseUp(MouseButtonEventArgs e)
     {
+        if (_drag is { } d0 && (e.GetPosition(this) - d0).Length < 3 && e.ChangedButton == MouseButton.Left) Clicked?.Invoke(ToModel(e.GetPosition(this)));
         _drag = null;
         ReleaseMouseCapture();
     }

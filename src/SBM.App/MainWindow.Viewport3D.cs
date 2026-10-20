@@ -612,6 +612,8 @@ public partial class MainWindow
         var layers = new MenuItem { Header = $"Show layer ({hiddenLayers.Count})", IsEnabled = hiddenLayers.Count > 0 };
         foreach (var l in hiddenLayers) layers.Items.Add(Item(l.Name, () => l.IsVisible = true));
         menu.Items.Add(layers);
+        menu.Items.Add(new Separator());
+        menu.Items.Add(Item(_sectionOn ? "Project section view to 2D" : "Project view to 2D", () => _ = ProjectView2DAsync(), Ic(0xE7C3)));
         menu.PlacementTarget = View;
         menu.Placement = System.Windows.Controls.Primitives.PlacementMode.MousePoint;
         menu.IsOpen = true;

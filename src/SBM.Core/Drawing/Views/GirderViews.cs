@@ -144,7 +144,8 @@ public static class GirderViews
         foreach (double s in splices)
         {
             d.Line(SheetLayers.Steel, new Vec2(s, -d.Paper(0.05)), new Vec2(s, H + d.Paper(0.05)));
-            d.Line(SheetLayers.Steel, new Vec2(s + d.Paper(0.02), -d.Paper(0.05)), new Vec2(s + d.Paper(0.02), H + d.Paper(0.05)));
+            // One line at the CL splice (handoff 6i: a second line drawn 0.02" beside it read as a spurious double line; the
+            // projected elevation sheet shows the splice plates as modeled).
             d.Text("FIELD SPLICE", new Vec2(s, H + d.Paper(1.0 + topShift)), d.SmallTextH, 0, TextAlign.Center);
         }
         var bounds = new List<double> { 0 };

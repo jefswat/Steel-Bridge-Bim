@@ -162,35 +162,8 @@ public static class SceneBuilder
         return new SceneData { Layers = result.ToList(), Origin = o, Extents = ext, FocusExtents = focus.IsEmpty ? ext : focus };
     }
 
-    public static readonly (string name, byte r, byte g, byte b, PartCategory[] cats)[] SolidLayerDefs =
-    {
-        ("3D-GIRDER-PLATES", 70, 130, 200, new[] { PartCategory.FlangePlate, PartCategory.WebPlate, PartCategory.AccessDoor }),
-        ("3D-STIFFENERS", 200, 110, 210, new[] { PartCategory.BearingStiffener, PartCategory.ConnectionStiffener, PartCategory.IntermediateStiffener }),
-        ("3D-CROSSFRAME-MEMBERS", 80, 200, 110, new[] { PartCategory.Angle, PartCategory.Channel, PartCategory.RolledTee }),
-        ("3D-GUSSETS", 235, 185, 70, new[] { PartCategory.Gusset, PartCategory.FillerPlate }),
-        ("3D-SPLICE-PLATES", 120, 210, 230, new[] { PartCategory.SplicePlate }),
-        ("3D-BEARINGS", 150, 150, 155, new[] { PartCategory.SolePlate, PartCategory.BearingPlate, PartCategory.MasonryPlate, PartCategory.GuideBar, PartCategory.ShearPin }),
-        ("3D-BEARING-ELASTOMER", 40, 40, 45, new[] { PartCategory.BearingPad, PartCategory.BearingDisc, PartCategory.Ptfe }),
-        ("3D-WELDS", 240, 80, 60, new[] { PartCategory.Weld }),
-        ("3D-INSPECTION", 120, 195, 150, new[] { PartCategory.InspectionBracket, PartCategory.InspectionCable, PartCategory.Grating,
-            PartCategory.WalkwayStringer, PartCategory.WalkwayPost, PartCategory.WalkwayRail, PartCategory.WalkwayPlate }),
-        ("3D-ARCH-RIBS", 70, 130, 200, new[] { PartCategory.ArchRib }),
-        ("3D-ARCH-TIES", 60, 110, 190, new[] { PartCategory.TiePlate }),
-        ("3D-ARCH-FLOORBEAMS", 90, 150, 210, new[] { PartCategory.FloorbeamPlate }),
-        ("3D-ARCH-HANGERS", 215, 215, 225, new[] { PartCategory.Hanger, PartCategory.HangerSocket }),
-        ("3D-ARCH-CABLE-CONNECTORS", 150, 150, 155, new[] { PartCategory.CableConnector }),   // p.150 UHMW-PE "shall be color gray"
-        ("3D-ARCH-FIN-PLATES", 235, 150, 70, new[] { PartCategory.FinPlate }),
-        ("3D-ARCH-CONNECTIONS", 120, 210, 230, new[] { PartCategory.ArchConnectionPlate, PartCategory.ArchStiffener }),
-        ("3D-ARCH-PT", 230, 120, 40, new[] { PartCategory.PtStrand, PartCategory.PtAnchorage }),
-        ("3D-ARCH-BRACING", 80, 200, 110, new[] { PartCategory.ArchBracing }),
-        ("3D-ARCH-KNUCKLES", 235, 185, 70, new[] { PartCategory.KnucklePlate }),
-        ("3D-ARCH-FORM-DECK", 175, 180, 190, new[] { PartCategory.FormDeck }),
-        ("3D-PED-RAILING", 200, 205, 215, new[] { PartCategory.RailPost, PartCategory.RailHandrail, PartCategory.RailMember, PartCategory.RailBasePlate, PartCategory.RailEnvelope }),
-        ("3D-PIER-CAP-PLATES", 95, 150, 215, new[] { PartCategory.EndPlate, PartCategory.ConnectorPlate, PartCategory.DiaphragmPlate, PartCategory.ContinuityPlate, PartCategory.CoverPlate }),
-        ("3D-PIER-CAP-HANDHOLES", 225, 170, 90, new[] { PartCategory.HandholeCover, PartCategory.HandholeBacking }),
-        ("3D-PIER-CAP-SCREENS", 190, 190, 195, new[] { PartCategory.MeshScreen }),
-        ("3D-JOINT-HARDWARE", 150, 155, 165, new[] { PartCategory.JointArmor, PartCategory.JointStud, PartCategory.JointCoverPlate, PartCategory.JointAnchor }),
-    };
+    /// <summary>Steel solid layers (names, colors, categories) - shared with the 2D projector (<see cref="SBM.Core.Drawing.Projection.ModelLayers"/>).</summary>
+    public static readonly (string name, byte r, byte g, byte b, PartCategory[] cats)[] SolidLayerDefs = SBM.Core.Drawing.Projection.ModelLayers.Steel;
 
     /// <summary>Detail layers are split into square tiles (m) so the viewport can draw only tiles near the view.</summary>
     public const double TileSize = 40;
