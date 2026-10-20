@@ -132,6 +132,42 @@ public static class SheetComposer
         }
     }
 
+    /// <summary>Usable width (paper inches) of the centre title cell: the 6.5" cell less a margin on each side.</summary>
+    public const double TitleCellWidthIn = 6.3;
+
+    /// <summary>
+    /// Fits a sheet title into the centre cell: the normal 0.2" text when it fits; else the text height shrinks to 0.12" at the smallest; else it wraps
+    /// at word breaks into up to 3 lines of 0.12" (a single word longer than the cell is cut with "...").
+    /// </summary>
+    public static (List<string> Lines, double Height) FitTitle(string title, double maxWidthIn)
+    {
+        double W(string t) => Views.LabelPlacer.WidthInHeights(t);
+        if (W(title) * 0.2 <= maxWidthIn) return (new List<string> { title }, 0.2);
+        double h = maxWidthIn / W(title);
+        if (h >= 0.12) return (new List<string> { title }, h);
+        h = 0.12;
+        double max = maxWidthIn / h;
+        var lines = new List<string>();
+        string cur = "";
+        foreach (var word0 in title.Split(' ', StringSplitOptions.RemoveEmptyEntries))
+        {
+            string word = word0;
+            while (W(word) > max && word.Length > 1) word = word[..^1];
+            if (word.Length < word0.Length) word = word[..Math.Max(1, word.Length - 3)] + "...";
+            string next = cur.Length == 0 ? word : cur + " " + word;
+            if (W(next) <= max) cur = next;
+            else { lines.Add(cur); cur = word; }
+        }
+        if (cur.Length > 0) lines.Add(cur);
+        if (lines.Count > 3)
+        {
+            var rest = string.Join(" ", lines.Skip(2));
+            while (W(rest + "...") > max && rest.Length > 1) rest = rest[..^1];
+            lines = new List<string> { lines[0], lines[1], rest + "..." };
+        }
+        return (lines, h);
+    }
+
     private static void TitleBlock(PlanDrawing dwg, SheetSpec spec, SheetFormat fmt, Sheet sheet)
     {
         var d = new Drafter(dwg, new UnitSystem(), 1);
@@ -147,7 +183,9 @@ public static class SheetComposer
         double ym = (y0 + y1) / 2;
         void T(string s, double x, double y, double h, TextAlign a = TextAlign.Left) => d.Text(s, new Vec2(P(x), P(y)), P(h), 0, a, SheetLayers.Title);
         // Sheet title (center block).
-        T(spec.Title.ToUpperInvariant(), (xB + xA) / 2, ym + 0.2, 0.2, TextAlign.Center);
+        var (tLines, tH) = FitTitle(spec.Title.ToUpperInvariant(), TitleCellWidthIn);
+        for (int i = 0; i < tLines.Count; i++)
+            T(tLines[i], (xB + xA) / 2, ym + 0.2 + (tLines.Count - 1) * tH * 0.7 - i * tH * 1.4, tH, TextAlign.Center);
         T(spec.Subtitle, (xB + xA) / 2, ym - 0.12, 0.1, TextAlign.Center);
         T(fmt.Bridge.ToUpperInvariant(), (xB + xA) / 2, y0 + 0.17, 0.11, TextAlign.Center);
         // Sheet number block.
