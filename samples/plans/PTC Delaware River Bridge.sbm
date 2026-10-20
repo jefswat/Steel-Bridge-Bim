@@ -34821,7 +34821,7 @@
         ],
         "Sections": [
           {
-            "Name": "14 WF 87",
+            "Name": "14 WF 87 (C)",
             "Kind": "Rolled",
             "Label": "14 WF 87 (25.56 sq.in.)",
             "Material": "C",
@@ -35080,7 +35080,7 @@
             "Source": "p.47"
           },
           {
-            "Name": "14 WF 142",
+            "Name": "14 WF 142 (S)",
             "Kind": "Rolled",
             "Label": "14 WF 142 (41.85 sq.in.)",
             "Material": "S",
@@ -35114,6 +35114,43 @@
             "Diameter": 0,
             "WorkingLineOffset": 0,
             "Unresolved": "UNRESOLVED (p.47): rolled shape 14 WF 142 (1954 series) dimensions - the sheets print the designation and the gross area 41.85 sq.in., not d / bf / tw / tf, and the 1954 series differs from AISC v16. d / bf / tw / tf interpolated by area between AISC W14x132 and W14x145, weight 3.4 lb/ft per sq.in.; flanges in planes parallel to the truss plane with the gusset pairs outside them (p.50 / p.60: gusset in-to-in = depth \u002B fills).",
+            "Source": "p.47"
+          },
+          {
+            "Name": "14 WF 87 (S)",
+            "Kind": "Rolled",
+            "Label": "14 WF 87 (25.56 sq.in.)",
+            "Material": "S",
+            "WebDepth": 0,
+            "WebPlies": [],
+            "WebsOutToOut": 0,
+            "WebsBackToBack": 0,
+            "Angle": "",
+            "AngleLegOnWeb": 0,
+            "AngleLegOut": 0,
+            "AngleThickness": 0,
+            "AnglesOutside": false,
+            "AngleEdges": "both",
+            "AngleProjection": 0,
+            "TopPlates": [],
+            "BottomPlates": [],
+            "Lacing": null,
+            "WebVertical": false,
+            "Channel": "",
+            "BackToBack": 0,
+            "FlangesOut": false,
+            "AngleCount": 2,
+            "Designation": "14 WF 87",
+            "Depth": 0.35846511999999997,
+            "FlangeWidth": 0.32627824,
+            "WebThickness": 0.011844528,
+            "FlangeThickness": 0.019418808,
+            "WeightLbPerFt": 86.904,
+            "Rotated": true,
+            "Width": 0,
+            "Diameter": 0,
+            "WorkingLineOffset": 0,
+            "Unresolved": "UNRESOLVED (p.47): rolled shape 14 WF 87 (1954 series) dimensions - the sheets print the designation and the gross area 25.56 sq.in., not d / bf / tw / tf, and the 1954 series differs from AISC v16. d / bf / tw / tf interpolated by area between AISC W14x82 and W14x90, weight 3.4 lb/ft per sq.in.; flanges in planes parallel to the truss plane with the gusset pairs outside them (p.50 / p.60: gusset in-to-in = depth \u002B fills).",
             "Source": "p.47"
           },
           {
@@ -35151,6 +35188,43 @@
             "Diameter": 0,
             "WorkingLineOffset": 0,
             "Unresolved": "UNRESOLVED (p.47): rolled shape 14 WF 228 (1954 series) dimensions - the sheets print the designation and the gross area 67.06 sq.in., not d / bf / tw / tf, and the 1954 series differs from AISC v16. d / bf / tw / tf interpolated by area between AISC W14x211 and W14x233, weight 3.4 lb/ft per sq.in.; flanges in planes parallel to the truss plane with the gusset pairs outside them (p.50 / p.60: gusset in-to-in = depth \u002B fills).",
+            "Source": "p.47"
+          },
+          {
+            "Name": "14 WF 142 (C)",
+            "Kind": "Rolled",
+            "Label": "14 WF 142 (41.85 sq.in.)",
+            "Material": "C",
+            "WebDepth": 0,
+            "WebPlies": [],
+            "WebsOutToOut": 0,
+            "WebsBackToBack": 0,
+            "Angle": "",
+            "AngleLegOnWeb": 0,
+            "AngleLegOut": 0,
+            "AngleThickness": 0,
+            "AnglesOutside": false,
+            "AngleEdges": "both",
+            "AngleProjection": 0,
+            "TopPlates": [],
+            "BottomPlates": [],
+            "Lacing": null,
+            "WebVertical": false,
+            "Channel": "",
+            "BackToBack": 0,
+            "FlangesOut": false,
+            "AngleCount": 2,
+            "Designation": "14 WF 142",
+            "Depth": 0.3753664102564102,
+            "FlangeWidth": 0.38927128205128203,
+            "WebThickness": 0.017078243589743587,
+            "FlangeThickness": 0.027353846153846156,
+            "WeightLbPerFt": 142.29,
+            "Rotated": true,
+            "Width": 0,
+            "Diameter": 0,
+            "WorkingLineOffset": 0,
+            "Unresolved": "UNRESOLVED (p.47): rolled shape 14 WF 142 (1954 series) dimensions - the sheets print the designation and the gross area 41.85 sq.in., not d / bf / tw / tf, and the 1954 series differs from AISC v16. d / bf / tw / tf interpolated by area between AISC W14x132 and W14x145, weight 3.4 lb/ft per sq.in.; flanges in planes parallel to the truss plane with the gusset pairs outside them (p.50 / p.60: gusset in-to-in = depth \u002B fills).",
             "Source": "p.47"
           },
           {
@@ -35852,7 +35926,7 @@
             "From": "U0",
             "To": "U1",
             "Plane": "",
-            "Section": "14 WF 87",
+            "Section": "14 WF 87 (C)",
             "Role": "UpperChord",
             "Panel": "Panel 0-1",
             "System": "",
@@ -35868,7 +35942,7 @@
             "From": "U1\u0027",
             "To": "U0\u0027",
             "Plane": "",
-            "Section": "14 WF 87",
+            "Section": "14 WF 87 (C)",
             "Role": "UpperChord",
             "Panel": "Panel 1\u0027-0\u0027",
             "System": "",
@@ -36012,7 +36086,7 @@
             "From": "U9",
             "To": "U11",
             "Plane": "",
-            "Section": "14 WF 87",
+            "Section": "14 WF 87 (C)",
             "Role": "UpperChord",
             "Panel": "Panel 9-11",
             "System": "",
@@ -36028,7 +36102,7 @@
             "From": "U11\u0027",
             "To": "U9\u0027",
             "Plane": "",
-            "Section": "14 WF 87",
+            "Section": "14 WF 87 (C)",
             "Role": "UpperChord",
             "Panel": "Panel 11\u0027-9\u0027",
             "System": "",
@@ -36188,7 +36262,7 @@
             "From": "L8",
             "To": "L10",
             "Plane": "",
-            "Section": "14 WF 142",
+            "Section": "14 WF 142 (S)",
             "Role": "LowerChord",
             "Panel": "Panel 8-10",
             "System": "",
@@ -36204,7 +36278,7 @@
             "From": "L10\u0027",
             "To": "L8\u0027",
             "Plane": "",
-            "Section": "14 WF 142",
+            "Section": "14 WF 142 (S)",
             "Role": "LowerChord",
             "Panel": "Panel 10\u0027-8\u0027",
             "System": "",
@@ -36220,7 +36294,7 @@
             "From": "L10",
             "To": "L12",
             "Plane": "",
-            "Section": "14 WF 87",
+            "Section": "14 WF 87 (S)",
             "Role": "LowerChord",
             "Panel": "Panel 10-12",
             "System": "",
@@ -36236,7 +36310,7 @@
             "From": "L12",
             "To": "L10\u0027",
             "Plane": "",
-            "Section": "14 WF 87",
+            "Section": "14 WF 87 (S)",
             "Role": "LowerChord",
             "Panel": "Panel 12-10\u0027",
             "System": "",
@@ -36284,7 +36358,7 @@
             "From": "L2",
             "To": "U3",
             "Plane": "",
-            "Section": "14 WF 142",
+            "Section": "14 WF 142 (C)",
             "Role": "Diagonal",
             "Panel": "Panel 2-3",
             "System": "",
@@ -36300,7 +36374,7 @@
             "From": "U3",
             "To": "L4",
             "Plane": "",
-            "Section": "14 WF 142",
+            "Section": "14 WF 142 (C)",
             "Role": "Diagonal",
             "Panel": "Panel 3-4",
             "System": "",
@@ -36316,7 +36390,7 @@
             "From": "L4",
             "To": "U5",
             "Plane": "",
-            "Section": "14 WF 87",
+            "Section": "14 WF 87 (S)",
             "Role": "Diagonal",
             "Panel": "Panel 4-5",
             "System": "",
@@ -36396,7 +36470,7 @@
             "From": "U9",
             "To": "L10",
             "Plane": "",
-            "Section": "14 WF 142",
+            "Section": "14 WF 142 (S)",
             "Role": "Diagonal",
             "Panel": "Panel 9-10",
             "System": "",
@@ -36428,7 +36502,7 @@
             "From": "U11",
             "To": "L12",
             "Plane": "",
-            "Section": "14 WF 142",
+            "Section": "14 WF 142 (C)",
             "Role": "Diagonal",
             "Panel": "Panel 11-12",
             "System": "",
@@ -36444,7 +36518,7 @@
             "From": "L12",
             "To": "U11\u0027",
             "Plane": "",
-            "Section": "14 WF 142",
+            "Section": "14 WF 142 (C)",
             "Role": "Diagonal",
             "Panel": "Panel 12-11\u0027",
             "System": "",
@@ -36476,7 +36550,7 @@
             "From": "L10\u0027",
             "To": "U9\u0027",
             "Plane": "",
-            "Section": "14 WF 142",
+            "Section": "14 WF 142 (S)",
             "Role": "Diagonal",
             "Panel": "Panel 10\u0027-9\u0027",
             "System": "",
@@ -36556,7 +36630,7 @@
             "From": "U5\u0027",
             "To": "L4\u0027",
             "Plane": "",
-            "Section": "14 WF 87",
+            "Section": "14 WF 87 (S)",
             "Role": "Diagonal",
             "Panel": "Panel 5\u0027-4\u0027",
             "System": "",
@@ -36572,7 +36646,7 @@
             "From": "L4\u0027",
             "To": "U3\u0027",
             "Plane": "",
-            "Section": "14 WF 142",
+            "Section": "14 WF 142 (C)",
             "Role": "Diagonal",
             "Panel": "Panel 4\u0027-3\u0027",
             "System": "",
@@ -36588,7 +36662,7 @@
             "From": "U3\u0027",
             "To": "L2\u0027",
             "Plane": "",
-            "Section": "14 WF 142",
+            "Section": "14 WF 142 (C)",
             "Role": "Diagonal",
             "Panel": "Panel 3\u0027-2\u0027",
             "System": "",
@@ -60751,7 +60825,7 @@
         ],
         "Sections": [
           {
-            "Name": "14 WF 87",
+            "Name": "14 WF 87 (C)",
             "Kind": "Rolled",
             "Label": "14 WF 87 (25.56 sq.in.)",
             "Material": "C",
@@ -61010,7 +61084,7 @@
             "Source": "p.57"
           },
           {
-            "Name": "14 WF 142",
+            "Name": "14 WF 142 (S)",
             "Kind": "Rolled",
             "Label": "14 WF 142 (41.85 sq.in.)",
             "Material": "S",
@@ -61081,6 +61155,43 @@
             "Diameter": 0,
             "WorkingLineOffset": 0,
             "Unresolved": "UNRESOLVED (p.57): rolled shape 14 WF 167 (1954 series) dimensions - the sheets print the designation and the gross area 49.09 sq.in., not d / bf / tw / tf, and the 1954 series differs from AISC v16. d / bf / tw / tf interpolated by area between AISC W14x159 and W14x176, weight 3.4 lb/ft per sq.in.; flanges in planes parallel to the truss plane with the gusset pairs outside them (p.50 / p.60: gusset in-to-in = depth \u002B fills).",
+            "Source": "p.57"
+          },
+          {
+            "Name": "14 WF 87 (S)",
+            "Kind": "Rolled",
+            "Label": "14 WF 87 (25.56 sq.in.)",
+            "Material": "S",
+            "WebDepth": 0,
+            "WebPlies": [],
+            "WebsOutToOut": 0,
+            "WebsBackToBack": 0,
+            "Angle": "",
+            "AngleLegOnWeb": 0,
+            "AngleLegOut": 0,
+            "AngleThickness": 0,
+            "AnglesOutside": false,
+            "AngleEdges": "both",
+            "AngleProjection": 0,
+            "TopPlates": [],
+            "BottomPlates": [],
+            "Lacing": null,
+            "WebVertical": false,
+            "Channel": "",
+            "BackToBack": 0,
+            "FlangesOut": false,
+            "AngleCount": 2,
+            "Designation": "14 WF 87",
+            "Depth": 0.35846511999999997,
+            "FlangeWidth": 0.32627824,
+            "WebThickness": 0.011844528,
+            "FlangeThickness": 0.019418808,
+            "WeightLbPerFt": 86.904,
+            "Rotated": true,
+            "Width": 0,
+            "Diameter": 0,
+            "WorkingLineOffset": 0,
+            "Unresolved": "UNRESOLVED (p.57): rolled shape 14 WF 87 (1954 series) dimensions - the sheets print the designation and the gross area 25.56 sq.in., not d / bf / tw / tf, and the 1954 series differs from AISC v16. d / bf / tw / tf interpolated by area between AISC W14x82 and W14x90, weight 3.4 lb/ft per sq.in.; flanges in planes parallel to the truss plane with the gusset pairs outside them (p.50 / p.60: gusset in-to-in = depth \u002B fills).",
             "Source": "p.57"
           },
           {
@@ -61303,6 +61414,43 @@
             "Diameter": 0,
             "WorkingLineOffset": 0,
             "Unresolved": "UNRESOLVED (p.57): rolled shape 14 WF 246 (1954 series) dimensions - the sheets print the designation and the gross area 72.33 sq.in., not d / bf / tw / tf, and the 1954 series differs from AISC v16. d / bf / tw / tf interpolated by area between AISC W14x233 and W14x257, weight 3.4 lb/ft per sq.in.; flanges in planes parallel to the truss plane with the gusset pairs outside them (p.50 / p.60: gusset in-to-in = depth \u002B fills).",
+            "Source": "p.57"
+          },
+          {
+            "Name": "14 WF 142 (C)",
+            "Kind": "Rolled",
+            "Label": "14 WF 142 (41.85 sq.in.)",
+            "Material": "C",
+            "WebDepth": 0,
+            "WebPlies": [],
+            "WebsOutToOut": 0,
+            "WebsBackToBack": 0,
+            "Angle": "",
+            "AngleLegOnWeb": 0,
+            "AngleLegOut": 0,
+            "AngleThickness": 0,
+            "AnglesOutside": false,
+            "AngleEdges": "both",
+            "AngleProjection": 0,
+            "TopPlates": [],
+            "BottomPlates": [],
+            "Lacing": null,
+            "WebVertical": false,
+            "Channel": "",
+            "BackToBack": 0,
+            "FlangesOut": false,
+            "AngleCount": 2,
+            "Designation": "14 WF 142",
+            "Depth": 0.3753664102564102,
+            "FlangeWidth": 0.38927128205128203,
+            "WebThickness": 0.017078243589743587,
+            "FlangeThickness": 0.027353846153846156,
+            "WeightLbPerFt": 142.29,
+            "Rotated": true,
+            "Width": 0,
+            "Diameter": 0,
+            "WorkingLineOffset": 0,
+            "Unresolved": "UNRESOLVED (p.57): rolled shape 14 WF 142 (1954 series) dimensions - the sheets print the designation and the gross area 41.85 sq.in., not d / bf / tw / tf, and the 1954 series differs from AISC v16. d / bf / tw / tf interpolated by area between AISC W14x132 and W14x145, weight 3.4 lb/ft per sq.in.; flanges in planes parallel to the truss plane with the gusset pairs outside them (p.50 / p.60: gusset in-to-in = depth \u002B fills).",
             "Source": "p.57"
           },
           {
@@ -61893,7 +62041,7 @@
             "From": "U0",
             "To": "U1",
             "Plane": "",
-            "Section": "14 WF 87",
+            "Section": "14 WF 87 (C)",
             "Role": "UpperChord",
             "Panel": "Panel 0-1",
             "System": "",
@@ -61909,7 +62057,7 @@
             "From": "U1\u0027",
             "To": "U0\u0027",
             "Plane": "",
-            "Section": "14 WF 87",
+            "Section": "14 WF 87 (C)",
             "Role": "UpperChord",
             "Panel": "Panel 1\u0027-0\u0027",
             "System": "",
@@ -62181,7 +62329,7 @@
             "From": "U17",
             "To": "U19",
             "Plane": "",
-            "Section": "14 WF 87",
+            "Section": "14 WF 87 (C)",
             "Role": "UpperChord",
             "Panel": "Panel 17-19",
             "System": "",
@@ -62197,7 +62345,7 @@
             "From": "U19\u0027",
             "To": "U17\u0027",
             "Plane": "",
-            "Section": "14 WF 87",
+            "Section": "14 WF 87 (C)",
             "Role": "UpperChord",
             "Panel": "Panel 19\u0027-17\u0027",
             "System": "",
@@ -62229,7 +62377,7 @@
             "From": "L0",
             "To": "L2",
             "Plane": "",
-            "Section": "14 WF 142",
+            "Section": "14 WF 142 (S)",
             "Role": "LowerChord",
             "Panel": "Panel 0-2",
             "System": "",
@@ -62245,7 +62393,7 @@
             "From": "L2\u0027",
             "To": "L0\u0027",
             "Plane": "",
-            "Section": "14 WF 142",
+            "Section": "14 WF 142 (S)",
             "Role": "LowerChord",
             "Panel": "Panel 2\u0027-0\u0027",
             "System": "",
@@ -62421,7 +62569,7 @@
             "From": "L12",
             "To": "L14",
             "Plane": "",
-            "Section": "14 WF 87",
+            "Section": "14 WF 87 (S)",
             "Role": "LowerChord",
             "Panel": "Panel 12-14",
             "System": "",
@@ -62437,7 +62585,7 @@
             "From": "L14\u0027",
             "To": "L12\u0027",
             "Plane": "",
-            "Section": "14 WF 87",
+            "Section": "14 WF 87 (S)",
             "Role": "LowerChord",
             "Panel": "Panel 14\u0027-12\u0027",
             "System": "",
@@ -62597,7 +62745,7 @@
             "From": "U3",
             "To": "L4",
             "Plane": "",
-            "Section": "14 WF 142",
+            "Section": "14 WF 142 (C)",
             "Role": "Diagonal",
             "Panel": "Panel 3-4",
             "System": "",
@@ -62613,7 +62761,7 @@
             "From": "L4",
             "To": "U5",
             "Plane": "",
-            "Section": "14 WF 142",
+            "Section": "14 WF 142 (C)",
             "Role": "Diagonal",
             "Panel": "Panel 4-5",
             "System": "",
@@ -62773,7 +62921,7 @@
             "From": "L14",
             "To": "U15",
             "Plane": "",
-            "Section": "14 WF 142",
+            "Section": "14 WF 142 (C)",
             "Role": "Diagonal",
             "Panel": "Panel 14-15",
             "System": "",
@@ -62789,7 +62937,7 @@
             "From": "U15",
             "To": "L16",
             "Plane": "",
-            "Section": "14 WF 142",
+            "Section": "14 WF 142 (C)",
             "Role": "Diagonal",
             "Panel": "Panel 15-16",
             "System": "",
@@ -62805,7 +62953,7 @@
             "From": "L16",
             "To": "U17",
             "Plane": "",
-            "Section": "14 WF 87",
+            "Section": "14 WF 87 (S)",
             "Role": "Diagonal",
             "Panel": "Panel 16-17",
             "System": "",
@@ -62917,7 +63065,7 @@
             "From": "U17\u0027",
             "To": "L16\u0027",
             "Plane": "",
-            "Section": "14 WF 87",
+            "Section": "14 WF 87 (S)",
             "Role": "Diagonal",
             "Panel": "Panel 17\u0027-16\u0027",
             "System": "",
@@ -62933,7 +63081,7 @@
             "From": "L16\u0027",
             "To": "U15\u0027",
             "Plane": "",
-            "Section": "14 WF 142",
+            "Section": "14 WF 142 (C)",
             "Role": "Diagonal",
             "Panel": "Panel 16\u0027-15\u0027",
             "System": "",
@@ -62949,7 +63097,7 @@
             "From": "U15\u0027",
             "To": "L14\u0027",
             "Plane": "",
-            "Section": "14 WF 142",
+            "Section": "14 WF 142 (C)",
             "Role": "Diagonal",
             "Panel": "Panel 15\u0027-14\u0027",
             "System": "",
@@ -63109,7 +63257,7 @@
             "From": "U5\u0027",
             "To": "L4\u0027",
             "Plane": "",
-            "Section": "14 WF 142",
+            "Section": "14 WF 142 (C)",
             "Role": "Diagonal",
             "Panel": "Panel 5\u0027-4\u0027",
             "System": "",
@@ -63125,7 +63273,7 @@
             "From": "L4\u0027",
             "To": "U3\u0027",
             "Plane": "",
-            "Section": "14 WF 142",
+            "Section": "14 WF 142 (C)",
             "Role": "Diagonal",
             "Panel": "Panel 4\u0027-3\u0027",
             "System": "",
@@ -119669,7 +119817,7 @@
             ],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.74): gusset plates of joint U1 - thickness / in-to-in read from the joint sheet (low confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "p.74 2-3/4 Gussets (C); gussets.csv p.74 (medium): 0.75 in, 29 in in-to-in; gussets.csv p.74 (low): 0.75 in, 29 in in-to-in; gussets.csv p.74 (low): 0.75 in, 29 in in-to-in; gussets.csv p.74 (low): 0.75 in, 29 in in-to-in",
+            "Source": "p.74 2-3/4 Gussets (C); gussets.csv p.74 (medium): 0.75 in, 29 in in-to-in; gussets.csv p.74 (low): 0.75 in, 29 in in-to-in; gussets.csv p.74 (low): 0.75 in, 29 in in-to-in; gussets.csv p.74 (low): 0.75 in, 29 in in-to-in; gussets.csv p.74 (medium): 0.75 in, 29 in in-to-in; gussets.csv p.74 (low): 0.75 in, 29 in in-to-in; gussets.csv p.74 (low): 0.75 in, 29 in in-to-in; gussets.csv p.74 (low): 0.75 in, 29 in in-to-in",
             "Plates": [
               {
                 "Face": "Top",
@@ -119832,7 +119980,7 @@
             ],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.74): gusset plates of joint U1\u0027 - thickness / in-to-in read from the joint sheet (low confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "p.74 2-3/4 Gussets (C); gussets.csv p.74 (medium): 0.75 in, 29 in in-to-in; gussets.csv p.74 (low): 0.75 in, 29 in in-to-in; gussets.csv p.74 (low): 0.75 in, 29 in in-to-in; gussets.csv p.74 (low): 0.75 in, 29 in in-to-in",
+            "Source": "p.74 2-3/4 Gussets (C); gussets.csv p.74 (medium): 0.75 in, 29 in in-to-in; gussets.csv p.74 (low): 0.75 in, 29 in in-to-in; gussets.csv p.74 (low): 0.75 in, 29 in in-to-in; gussets.csv p.74 (low): 0.75 in, 29 in in-to-in; gussets.csv p.74 (medium): 0.75 in, 29 in in-to-in; gussets.csv p.74 (low): 0.75 in, 29 in in-to-in; gussets.csv p.74 (low): 0.75 in, 29 in in-to-in; gussets.csv p.74 (low): 0.75 in, 29 in in-to-in",
             "Plates": [
               {
                 "Face": "Top",
@@ -119995,7 +120143,7 @@
             ],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.74): gusset plates of joint L2 - thickness / in-to-in read from the joint sheet (low confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "p.74 2-3/4 Gussets (C); gussets.csv p.74 (medium): 0.75 in, 29 in in-to-in; gussets.csv p.74 (low): 0.75 in, 29 in in-to-in; gussets.csv p.74 (low): 0.75 in, 29 in in-to-in; gussets.csv p.74 (low): 0.75 in, 29 in in-to-in",
+            "Source": "p.74 2-3/4 Gussets (C); gussets.csv p.74 (medium): 0.75 in, 29 in in-to-in; gussets.csv p.74 (low): 0.75 in, 29 in in-to-in; gussets.csv p.74 (low): 0.75 in, 29 in in-to-in; gussets.csv p.74 (low): 0.75 in, 29 in in-to-in; gussets.csv p.74 (medium): 0.75 in, 29 in in-to-in; gussets.csv p.74 (low): 0.75 in, 29 in in-to-in; gussets.csv p.74 (low): 0.75 in, 29 in in-to-in; gussets.csv p.74 (low): 0.75 in, 29 in in-to-in",
             "Plates": [
               {
                 "Face": "Top",
@@ -120134,7 +120282,7 @@
             ],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.74): gusset plates of joint L2\u0027 - thickness / in-to-in read from the joint sheet (low confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "p.74 2-3/4 Gussets (C); gussets.csv p.74 (medium): 0.75 in, 29 in in-to-in; gussets.csv p.74 (low): 0.75 in, 29 in in-to-in; gussets.csv p.74 (low): 0.75 in, 29 in in-to-in; gussets.csv p.74 (low): 0.75 in, 29 in in-to-in",
+            "Source": "p.74 2-3/4 Gussets (C); gussets.csv p.74 (medium): 0.75 in, 29 in in-to-in; gussets.csv p.74 (low): 0.75 in, 29 in in-to-in; gussets.csv p.74 (low): 0.75 in, 29 in in-to-in; gussets.csv p.74 (low): 0.75 in, 29 in in-to-in; gussets.csv p.74 (medium): 0.75 in, 29 in in-to-in; gussets.csv p.74 (low): 0.75 in, 29 in in-to-in; gussets.csv p.74 (low): 0.75 in, 29 in in-to-in; gussets.csv p.74 (low): 0.75 in, 29 in in-to-in",
             "Plates": [
               {
                 "Face": "Top",
@@ -120247,7 +120395,7 @@
             ],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.74): gusset plates of joint U2 - thickness / in-to-in read from the joint sheet (medium confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "p.74 2-5/8 Gussets (C); gussets.csv p.74 (medium): 0.625 in, 29 in in-to-in; gussets.csv p.74 (medium): 0.625 in, 29 in in-to-in",
+            "Source": "p.74 2-5/8 Gussets (C); gussets.csv p.74 (medium): 0.625 in, 29 in in-to-in; gussets.csv p.74 (medium): 0.625 in, 29 in in-to-in; gussets.csv p.74 (medium): 0.625 in, 29 in in-to-in; gussets.csv p.74 (medium): 0.625 in, 29 in in-to-in",
             "Plates": [
               {
                 "Face": "Top",
@@ -120360,7 +120508,7 @@
             ],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.74): gusset plates of joint U2\u0027 - thickness / in-to-in read from the joint sheet (medium confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "p.74 2-5/8 Gussets (C); gussets.csv p.74 (medium): 0.625 in, 29 in in-to-in; gussets.csv p.74 (medium): 0.625 in, 29 in in-to-in",
+            "Source": "p.74 2-5/8 Gussets (C); gussets.csv p.74 (medium): 0.625 in, 29 in in-to-in; gussets.csv p.74 (medium): 0.625 in, 29 in in-to-in; gussets.csv p.74 (medium): 0.625 in, 29 in in-to-in; gussets.csv p.74 (medium): 0.625 in, 29 in in-to-in",
             "Plates": [
               {
                 "Face": "Top",
@@ -120627,7 +120775,7 @@
             ],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.78): gusset plates of joint U10 - thickness / in-to-in read from the joint sheet (low confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "p.78 2-3/4 Gussets; gussets.csv p.78 (medium): 0.75 in, 30 in in-to-in; gussets.csv p.78 (low): 0.75 in, in-to-in not read"
+            "Source": "p.78 2-3/4 Gussets; gussets.csv p.78 (medium): 0.75 in, 30 in in-to-in; gussets.csv p.78 (low): 0.75 in, in-to-in not read; gussets.csv p.78 (medium): 0.75 in, 30 in in-to-in; gussets.csv p.78 (low): 0.75 in, in-to-in not read"
           },
           {
             "Point": "U10\u0027",
@@ -120678,7 +120826,7 @@
             ],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.78): gusset plates of joint U10\u0027 - thickness / in-to-in read from the joint sheet (low confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "p.78 2-3/4 Gussets; gussets.csv p.78 (medium): 0.75 in, 30 in in-to-in; gussets.csv p.78 (low): 0.75 in, in-to-in not read"
+            "Source": "p.78 2-3/4 Gussets; gussets.csv p.78 (medium): 0.75 in, 30 in in-to-in; gussets.csv p.78 (low): 0.75 in, in-to-in not read; gussets.csv p.78 (medium): 0.75 in, 30 in in-to-in; gussets.csv p.78 (low): 0.75 in, in-to-in not read"
           },
           {
             "Point": "U11",
@@ -120689,7 +120837,7 @@
             "Rivets": [],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.79): gusset plates of joint U11 - thickness / in-to-in read from the joint sheet (medium confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "p.79 2-1 1/8 Gus. Pls. (S); gussets.csv p.79 (medium): 1.125 in, 29 in in-to-in"
+            "Source": "p.79 2-1 1/8 Gus. Pls. (S); gussets.csv p.79 (medium): 1.125 in, 29 in in-to-in; gussets.csv p.79 (medium): 1.125 in, 29 in in-to-in"
           },
           {
             "Point": "U11\u0027",
@@ -120700,7 +120848,7 @@
             "Rivets": [],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.79): gusset plates of joint U11\u0027 - thickness / in-to-in read from the joint sheet (medium confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "p.79 2-1 1/8 Gus. Pls. (S); gussets.csv p.79 (medium): 1.125 in, 29 in in-to-in"
+            "Source": "p.79 2-1 1/8 Gus. Pls. (S); gussets.csv p.79 (medium): 1.125 in, 29 in in-to-in; gussets.csv p.79 (medium): 1.125 in, 29 in in-to-in"
           },
           {
             "Point": "L12",
@@ -120764,7 +120912,7 @@
             ],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.81): gusset plates of joint L12 - thickness / in-to-in read from the joint sheet (low confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "p.81 2-1 Gussets; gussets.csv p.81 (medium): 1 in, 29 in in-to-in; gussets.csv p.81 (medium): 1 in, 29 in in-to-in; gussets.csv p.81 (low): 1 in, 29 in in-to-in; gussets.csv p.81 (medium): 1 in, 29 in in-to-in; gussets.csv p.81 (medium): 1 in, 29 in in-to-in; gussets.csv p.81 (medium): 1 in, 29 in in-to-in; gussets.csv p.81 (low): 1 in, 29 in in-to-in; gussets.csv p.81 (medium): 1 in, 29 in in-to-in; gussets.csv p.81 (low): 1 in, 29 in in-to-in"
+            "Source": "p.81 2-1 Gussets; gussets.csv p.81 (medium): 1 in, 29 in in-to-in; gussets.csv p.81 (medium): 1 in, 29 in in-to-in; gussets.csv p.81 (low): 1 in, 29 in in-to-in; gussets.csv p.81 (medium): 1 in, 29 in in-to-in; gussets.csv p.81 (medium): 1 in, 29 in in-to-in; gussets.csv p.81 (medium): 1 in, 29 in in-to-in; gussets.csv p.81 (low): 1 in, 29 in in-to-in; gussets.csv p.81 (medium): 1 in, 29 in in-to-in; gussets.csv p.81 (low): 1 in, 29 in in-to-in; gussets.csv p.81 (medium): 1 in, 29 in in-to-in; gussets.csv p.81 (medium): 1 in, 29 in in-to-in; gussets.csv p.81 (low): 1 in, 29 in in-to-in; gussets.csv p.81 (medium): 1 in, 29 in in-to-in; gussets.csv p.81 (medium): 1 in, 29 in in-to-in; gussets.csv p.81 (medium): 1 in, 29 in in-to-in; gussets.csv p.81 (low): 1 in, 29 in in-to-in; gussets.csv p.81 (medium): 1 in, 29 in in-to-in; gussets.csv p.81 (low): 1 in, 29 in in-to-in"
           },
           {
             "Point": "L12\u0027",
@@ -120828,7 +120976,7 @@
             ],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.81): gusset plates of joint L12\u0027 - thickness / in-to-in read from the joint sheet (low confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "p.81 2-1 Gussets; gussets.csv p.81 (medium): 1 in, 29 in in-to-in; gussets.csv p.81 (medium): 1 in, 29 in in-to-in; gussets.csv p.81 (low): 1 in, 29 in in-to-in; gussets.csv p.81 (medium): 1 in, 29 in in-to-in; gussets.csv p.81 (medium): 1 in, 29 in in-to-in; gussets.csv p.81 (medium): 1 in, 29 in in-to-in; gussets.csv p.81 (low): 1 in, 29 in in-to-in; gussets.csv p.81 (medium): 1 in, 29 in in-to-in; gussets.csv p.81 (low): 1 in, 29 in in-to-in"
+            "Source": "p.81 2-1 Gussets; gussets.csv p.81 (medium): 1 in, 29 in in-to-in; gussets.csv p.81 (medium): 1 in, 29 in in-to-in; gussets.csv p.81 (low): 1 in, 29 in in-to-in; gussets.csv p.81 (medium): 1 in, 29 in in-to-in; gussets.csv p.81 (medium): 1 in, 29 in in-to-in; gussets.csv p.81 (medium): 1 in, 29 in in-to-in; gussets.csv p.81 (low): 1 in, 29 in in-to-in; gussets.csv p.81 (medium): 1 in, 29 in in-to-in; gussets.csv p.81 (low): 1 in, 29 in in-to-in; gussets.csv p.81 (medium): 1 in, 29 in in-to-in; gussets.csv p.81 (medium): 1 in, 29 in in-to-in; gussets.csv p.81 (low): 1 in, 29 in in-to-in; gussets.csv p.81 (medium): 1 in, 29 in in-to-in; gussets.csv p.81 (medium): 1 in, 29 in in-to-in; gussets.csv p.81 (medium): 1 in, 29 in in-to-in; gussets.csv p.81 (low): 1 in, 29 in in-to-in; gussets.csv p.81 (medium): 1 in, 29 in in-to-in; gussets.csv p.81 (low): 1 in, 29 in in-to-in"
           },
           {
             "Point": "U12",
@@ -120839,7 +120987,7 @@
             "Rivets": [],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.81): gusset plates of joint U12 - thickness / in-to-in read from the joint sheet (medium confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "p.81 2-1 1/8 Gussets; gussets.csv p.81 (medium): 1.125 in, 29 in in-to-in"
+            "Source": "p.81 2-1 1/8 Gussets; gussets.csv p.81 (medium): 1.125 in, 29 in in-to-in; gussets.csv p.81 (medium): 1.125 in, 29 in in-to-in"
           },
           {
             "Point": "U12\u0027",
@@ -120850,7 +120998,7 @@
             "Rivets": [],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.81): gusset plates of joint U12\u0027 - thickness / in-to-in read from the joint sheet (medium confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "p.81 2-1 1/8 Gussets; gussets.csv p.81 (medium): 1.125 in, 29 in in-to-in"
+            "Source": "p.81 2-1 1/8 Gussets; gussets.csv p.81 (medium): 1.125 in, 29 in in-to-in; gussets.csv p.81 (medium): 1.125 in, 29 in in-to-in"
           },
           {
             "Point": "L13",
@@ -120914,7 +121062,7 @@
             ],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.83): gusset plates of joint L13 - thickness / in-to-in read from the joint sheet (low confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "p.69 half longitudinal section L13-L17: 1 1/8 Gusset; gussets.csv p.83 (medium): 1.125 in, 26.5 in in-to-in; gussets.csv p.83 (low): 1.125 in, 26.5 in in-to-in; gussets.csv p.83 (low): 1.125 in, 26.5 in in-to-in; gussets.csv p.83 (low): 1.125 in, 26.5 in in-to-in; gussets.csv p.83 (medium): 1.125 in, 26.5 in in-to-in; gussets.csv p.83 (low): 1.125 in, 26.5 in in-to-in; gussets.csv p.83 (low): 1.125 in, 26.5 in in-to-in; gussets.csv p.83 (low): 1.125 in, 26.5 in in-to-in"
+            "Source": "p.69 half longitudinal section L13-L17: 1 1/8 Gusset; gussets.csv p.83 (medium): 1.125 in, 26.5 in in-to-in; gussets.csv p.83 (low): 1.125 in, 26.5 in in-to-in; gussets.csv p.83 (low): 1.125 in, 26.5 in in-to-in; gussets.csv p.83 (low): 1.125 in, 26.5 in in-to-in; gussets.csv p.83 (medium): 1.125 in, 26.5 in in-to-in; gussets.csv p.83 (low): 1.125 in, 26.5 in in-to-in; gussets.csv p.83 (low): 1.125 in, 26.5 in in-to-in; gussets.csv p.83 (low): 1.125 in, 26.5 in in-to-in; gussets.csv p.83 (medium): 1.125 in, 26.5 in in-to-in; gussets.csv p.83 (low): 1.125 in, 26.5 in in-to-in; gussets.csv p.83 (low): 1.125 in, 26.5 in in-to-in; gussets.csv p.83 (low): 1.125 in, 26.5 in in-to-in; gussets.csv p.83 (medium): 1.125 in, 26.5 in in-to-in; gussets.csv p.83 (low): 1.125 in, 26.5 in in-to-in; gussets.csv p.83 (low): 1.125 in, 26.5 in in-to-in; gussets.csv p.83 (low): 1.125 in, 26.5 in in-to-in"
           },
           {
             "Point": "L13\u0027",
@@ -120978,7 +121126,7 @@
             ],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.83): gusset plates of joint L13\u0027 - thickness / in-to-in read from the joint sheet (low confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "p.69 half longitudinal section L13-L17: 1 1/8 Gusset; gussets.csv p.83 (medium): 1.125 in, 26.5 in in-to-in; gussets.csv p.83 (low): 1.125 in, 26.5 in in-to-in; gussets.csv p.83 (low): 1.125 in, 26.5 in in-to-in; gussets.csv p.83 (low): 1.125 in, 26.5 in in-to-in; gussets.csv p.83 (medium): 1.125 in, 26.5 in in-to-in; gussets.csv p.83 (low): 1.125 in, 26.5 in in-to-in; gussets.csv p.83 (low): 1.125 in, 26.5 in in-to-in; gussets.csv p.83 (low): 1.125 in, 26.5 in in-to-in"
+            "Source": "p.69 half longitudinal section L13-L17: 1 1/8 Gusset; gussets.csv p.83 (medium): 1.125 in, 26.5 in in-to-in; gussets.csv p.83 (low): 1.125 in, 26.5 in in-to-in; gussets.csv p.83 (low): 1.125 in, 26.5 in in-to-in; gussets.csv p.83 (low): 1.125 in, 26.5 in in-to-in; gussets.csv p.83 (medium): 1.125 in, 26.5 in in-to-in; gussets.csv p.83 (low): 1.125 in, 26.5 in in-to-in; gussets.csv p.83 (low): 1.125 in, 26.5 in in-to-in; gussets.csv p.83 (low): 1.125 in, 26.5 in in-to-in; gussets.csv p.83 (medium): 1.125 in, 26.5 in in-to-in; gussets.csv p.83 (low): 1.125 in, 26.5 in in-to-in; gussets.csv p.83 (low): 1.125 in, 26.5 in in-to-in; gussets.csv p.83 (low): 1.125 in, 26.5 in in-to-in; gussets.csv p.83 (medium): 1.125 in, 26.5 in in-to-in; gussets.csv p.83 (low): 1.125 in, 26.5 in in-to-in; gussets.csv p.83 (low): 1.125 in, 26.5 in in-to-in; gussets.csv p.83 (low): 1.125 in, 26.5 in in-to-in"
           },
           {
             "Point": "L14",
@@ -121055,7 +121203,7 @@
             ],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.84): gusset plates of joint L14 - thickness / in-to-in read from the joint sheet (low confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "p.69 half longitudinal section: 1 1/8 Inlaid Gusset Pl.; gussets.csv p.84 (low): 1.125 in, 29 in in-to-in; gussets.csv p.84 (low): 1.125 in, 29 in in-to-in; gussets.csv p.84 (low): 1.125 in, 29 in in-to-in; gussets.csv p.84 (medium): 1.125 in, 29 in in-to-in; gussets.csv p.84 (medium): 1.125 in, 29 in in-to-in; gussets.csv p.84 (medium): 1.125 in, 29 in in-to-in; gussets.csv p.84 (low): 1.125 in, 29 in in-to-in; gussets.csv p.84 (low): 1.125 in, 29 in in-to-in"
+            "Source": "p.69 half longitudinal section: 1 1/8 Inlaid Gusset Pl.; gussets.csv p.84 (low): 1.125 in, 29 in in-to-in; gussets.csv p.84 (low): 1.125 in, 29 in in-to-in; gussets.csv p.84 (low): 1.125 in, 29 in in-to-in; gussets.csv p.84 (medium): 1.125 in, 29 in in-to-in; gussets.csv p.84 (medium): 1.125 in, 29 in in-to-in; gussets.csv p.84 (medium): 1.125 in, 29 in in-to-in; gussets.csv p.84 (low): 1.125 in, 29 in in-to-in; gussets.csv p.84 (low): 1.125 in, 29 in in-to-in; gussets.csv p.84 (low): 1.125 in, 29 in in-to-in; gussets.csv p.84 (low): 1.125 in, 29 in in-to-in; gussets.csv p.84 (low): 1.125 in, 29 in in-to-in; gussets.csv p.84 (medium): 1.125 in, 29 in in-to-in; gussets.csv p.84 (medium): 1.125 in, 29 in in-to-in; gussets.csv p.84 (medium): 1.125 in, 29 in in-to-in; gussets.csv p.84 (low): 1.125 in, 29 in in-to-in; gussets.csv p.84 (low): 1.125 in, 29 in in-to-in"
           },
           {
             "Point": "L14\u0027",
@@ -121132,7 +121280,7 @@
             ],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.84): gusset plates of joint L14\u0027 - thickness / in-to-in read from the joint sheet (low confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "p.69 half longitudinal section: 1 1/8 Inlaid Gusset Pl.; gussets.csv p.84 (low): 1.125 in, 29 in in-to-in; gussets.csv p.84 (low): 1.125 in, 29 in in-to-in; gussets.csv p.84 (low): 1.125 in, 29 in in-to-in; gussets.csv p.84 (medium): 1.125 in, 29 in in-to-in; gussets.csv p.84 (medium): 1.125 in, 29 in in-to-in; gussets.csv p.84 (medium): 1.125 in, 29 in in-to-in; gussets.csv p.84 (low): 1.125 in, 29 in in-to-in; gussets.csv p.84 (low): 1.125 in, 29 in in-to-in"
+            "Source": "p.69 half longitudinal section: 1 1/8 Inlaid Gusset Pl.; gussets.csv p.84 (low): 1.125 in, 29 in in-to-in; gussets.csv p.84 (low): 1.125 in, 29 in in-to-in; gussets.csv p.84 (low): 1.125 in, 29 in in-to-in; gussets.csv p.84 (medium): 1.125 in, 29 in in-to-in; gussets.csv p.84 (medium): 1.125 in, 29 in in-to-in; gussets.csv p.84 (medium): 1.125 in, 29 in in-to-in; gussets.csv p.84 (low): 1.125 in, 29 in in-to-in; gussets.csv p.84 (low): 1.125 in, 29 in in-to-in; gussets.csv p.84 (low): 1.125 in, 29 in in-to-in; gussets.csv p.84 (low): 1.125 in, 29 in in-to-in; gussets.csv p.84 (low): 1.125 in, 29 in in-to-in; gussets.csv p.84 (medium): 1.125 in, 29 in in-to-in; gussets.csv p.84 (medium): 1.125 in, 29 in in-to-in; gussets.csv p.84 (medium): 1.125 in, 29 in in-to-in; gussets.csv p.84 (low): 1.125 in, 29 in in-to-in; gussets.csv p.84 (low): 1.125 in, 29 in in-to-in"
           },
           {
             "Point": "L15",
@@ -121196,7 +121344,7 @@
             ],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.86): gusset plates of joint L15 - thickness / in-to-in read from the joint sheet (medium confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "p.69 half longitudinal section: 1 1/8 Gusset; gussets.csv p.86 (low): 1.125 in, 29 in in-to-in; gussets.csv p.86 (medium): 1.125 in, 29 in in-to-in; gussets.csv p.86 (medium): 1.125 in, 29 in in-to-in; gussets.csv p.86 (medium): 1.125 in, 29 in in-to-in; gussets.csv p.86 (medium): 1.125 in, 29 in in-to-in; gussets.csv p.86 (medium): 1.125 in, 29 in in-to-in; gussets.csv p.86 (low): 1.125 in, 29 in in-to-in; gussets.csv p.86 (medium): 1.125 in, 29 in in-to-in",
+            "Source": "p.69 half longitudinal section: 1 1/8 Gusset; gussets.csv p.86 (low): 1.125 in, 29 in in-to-in; gussets.csv p.86 (medium): 1.125 in, 29 in in-to-in; gussets.csv p.86 (medium): 1.125 in, 29 in in-to-in; gussets.csv p.86 (medium): 1.125 in, 29 in in-to-in; gussets.csv p.86 (medium): 1.125 in, 29 in in-to-in; gussets.csv p.86 (medium): 1.125 in, 29 in in-to-in; gussets.csv p.86 (low): 1.125 in, 29 in in-to-in; gussets.csv p.86 (medium): 1.125 in, 29 in in-to-in; gussets.csv p.86 (low): 1.125 in, 29 in in-to-in; gussets.csv p.86 (medium): 1.125 in, 29 in in-to-in; gussets.csv p.86 (medium): 1.125 in, 29 in in-to-in; gussets.csv p.86 (medium): 1.125 in, 29 in in-to-in; gussets.csv p.86 (medium): 1.125 in, 29 in in-to-in; gussets.csv p.86 (medium): 1.125 in, 29 in in-to-in; gussets.csv p.86 (low): 1.125 in, 29 in in-to-in; gussets.csv p.86 (medium): 1.125 in, 29 in in-to-in",
             "Plates": [
               {
                 "Face": "WebInside",
@@ -121274,7 +121422,7 @@
             ],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.86): gusset plates of joint L15\u0027 - thickness / in-to-in read from the joint sheet (medium confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "p.69 half longitudinal section: 1 1/8 Gusset; gussets.csv p.86 (low): 1.125 in, 29 in in-to-in; gussets.csv p.86 (medium): 1.125 in, 29 in in-to-in; gussets.csv p.86 (medium): 1.125 in, 29 in in-to-in; gussets.csv p.86 (medium): 1.125 in, 29 in in-to-in; gussets.csv p.86 (medium): 1.125 in, 29 in in-to-in; gussets.csv p.86 (medium): 1.125 in, 29 in in-to-in; gussets.csv p.86 (low): 1.125 in, 29 in in-to-in; gussets.csv p.86 (medium): 1.125 in, 29 in in-to-in",
+            "Source": "p.69 half longitudinal section: 1 1/8 Gusset; gussets.csv p.86 (low): 1.125 in, 29 in in-to-in; gussets.csv p.86 (medium): 1.125 in, 29 in in-to-in; gussets.csv p.86 (medium): 1.125 in, 29 in in-to-in; gussets.csv p.86 (medium): 1.125 in, 29 in in-to-in; gussets.csv p.86 (medium): 1.125 in, 29 in in-to-in; gussets.csv p.86 (medium): 1.125 in, 29 in in-to-in; gussets.csv p.86 (low): 1.125 in, 29 in in-to-in; gussets.csv p.86 (medium): 1.125 in, 29 in in-to-in; gussets.csv p.86 (low): 1.125 in, 29 in in-to-in; gussets.csv p.86 (medium): 1.125 in, 29 in in-to-in; gussets.csv p.86 (medium): 1.125 in, 29 in in-to-in; gussets.csv p.86 (medium): 1.125 in, 29 in in-to-in; gussets.csv p.86 (medium): 1.125 in, 29 in in-to-in; gussets.csv p.86 (medium): 1.125 in, 29 in in-to-in; gussets.csv p.86 (low): 1.125 in, 29 in in-to-in; gussets.csv p.86 (medium): 1.125 in, 29 in in-to-in",
             "Plates": [
               {
                 "Face": "WebInside",
@@ -121313,7 +121461,7 @@
             ],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.86): gusset plates of joint L16 - thickness / in-to-in read from the joint sheet (low confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "p.69 half longitudinal section: 1 Gusset; gussets.csv p.86 (low): 1 in, 29 in in-to-in"
+            "Source": "p.69 half longitudinal section: 1 Gusset; gussets.csv p.86 (low): 1 in, 29 in in-to-in; gussets.csv p.86 (low): 1 in, 29 in in-to-in"
           },
           {
             "Point": "L16\u0027",
@@ -121338,7 +121486,7 @@
             ],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.86): gusset plates of joint L16\u0027 - thickness / in-to-in read from the joint sheet (low confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "p.69 half longitudinal section: 1 Gusset; gussets.csv p.86 (low): 1 in, 29 in in-to-in"
+            "Source": "p.69 half longitudinal section: 1 Gusset; gussets.csv p.86 (low): 1 in, 29 in in-to-in; gussets.csv p.86 (low): 1 in, 29 in in-to-in"
           },
           {
             "Point": "L17",
@@ -121349,7 +121497,7 @@
             "Rivets": [],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.87): gusset plates of joint L17 - thickness / in-to-in read from the joint sheet (medium confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "p.69 half longitudinal section: 7/8 Gusset; gussets.csv p.87 (medium): 0.875 in, 29 in in-to-in"
+            "Source": "p.69 half longitudinal section: 7/8 Gusset; gussets.csv p.87 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.87 (medium): 0.875 in, 29 in in-to-in"
           },
           {
             "Point": "L17\u0027",
@@ -121360,7 +121508,7 @@
             "Rivets": [],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.87): gusset plates of joint L17\u0027 - thickness / in-to-in read from the joint sheet (medium confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "p.69 half longitudinal section: 7/8 Gusset; gussets.csv p.87 (medium): 0.875 in, 29 in in-to-in"
+            "Source": "p.69 half longitudinal section: 7/8 Gusset; gussets.csv p.87 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.87 (medium): 0.875 in, 29 in in-to-in"
           },
           {
             "Point": "U18",
@@ -121424,7 +121572,7 @@
             ],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.88): gusset plates of joint U18 - thickness / in-to-in read from the joint sheet (medium confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "p.88 2-7/8 Gus. Pls.; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (low): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in"
+            "Source": "p.88 2-7/8 Gus. Pls.; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (low): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (low): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in"
           },
           {
             "Point": "U18\u0027",
@@ -121488,7 +121636,7 @@
             ],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.88): gusset plates of joint U18\u0027 - thickness / in-to-in read from the joint sheet (medium confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "p.88 2-7/8 Gus. Pls.; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (low): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in"
+            "Source": "p.88 2-7/8 Gus. Pls.; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (low): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (low): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in"
           },
           {
             "Point": "L18",
@@ -121539,7 +121687,7 @@
             ],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.88): gusset plates of joint L18 - thickness / in-to-in read from the joint sheet (medium confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "p.88 2-7/8 Gus. Pls.; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (low): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in"
+            "Source": "p.88 2-7/8 Gus. Pls.; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (low): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (low): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in"
           },
           {
             "Point": "L18\u0027",
@@ -121590,7 +121738,7 @@
             ],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.88): gusset plates of joint L18\u0027 - thickness / in-to-in read from the joint sheet (medium confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "p.88 2-7/8 Gus. Pls.; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (low): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in"
+            "Source": "p.88 2-7/8 Gus. Pls.; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (low): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (low): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in"
           },
           {
             "Point": "U19",
@@ -121654,7 +121802,7 @@
             ],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.88): gusset plates of joint U19 - thickness / in-to-in read from the joint sheet (medium confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "p.88 2-7/8 Gus. Pls.; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (low): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (low): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in"
+            "Source": "p.88 2-7/8 Gus. Pls.; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (low): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (low): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (low): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (low): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in"
           },
           {
             "Point": "U19\u0027",
@@ -121718,7 +121866,7 @@
             ],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.88): gusset plates of joint U19\u0027 - thickness / in-to-in read from the joint sheet (medium confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "p.88 2-7/8 Gus. Pls.; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (low): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (low): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in"
+            "Source": "p.88 2-7/8 Gus. Pls.; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (low): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (low): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (low): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (low): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in"
           },
           {
             "Point": "L19",
@@ -121782,7 +121930,7 @@
             ],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.88): gusset plates of joint L19 - thickness / in-to-in read from the joint sheet (medium confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "p.88 2-7/8 Gus. Pls.; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (low): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in"
+            "Source": "p.88 2-7/8 Gus. Pls.; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (low): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (low): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in"
           },
           {
             "Point": "L19\u0027",
@@ -121846,7 +121994,7 @@
             ],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.88): gusset plates of joint L19\u0027 - thickness / in-to-in read from the joint sheet (medium confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "p.88 2-7/8 Gus. Pls.; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (low): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in"
+            "Source": "p.88 2-7/8 Gus. Pls.; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (low): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (low): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.88 (medium): 0.875 in, 29 in in-to-in"
           },
           {
             "Point": "U3",
@@ -121923,7 +122071,7 @@
             ],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.75): gusset plates of joint U3 - thickness / in-to-in read from the joint sheet (low confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "gussets.csv p.75 (medium): 0.75 in, 29 in in-to-in; gussets.csv p.75 (low): 0.75 in, 29 in in-to-in; gussets.csv p.75 (low): 0.75 in, 29 in in-to-in; gussets.csv p.75 (low): 0.75 in, 29 in in-to-in",
+            "Source": "gussets.csv p.75 (medium): 0.75 in, 29 in in-to-in; gussets.csv p.75 (low): 0.75 in, 29 in in-to-in; gussets.csv p.75 (low): 0.75 in, 29 in in-to-in; gussets.csv p.75 (low): 0.75 in, 29 in in-to-in; gussets.csv p.75 (medium): 0.75 in, 29 in in-to-in; gussets.csv p.75 (low): 0.75 in, 29 in in-to-in; gussets.csv p.75 (low): 0.75 in, 29 in in-to-in; gussets.csv p.75 (low): 0.75 in, 29 in in-to-in",
             "Plates": [
               {
                 "Face": "Top",
@@ -122074,7 +122222,7 @@
             ],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.75): gusset plates of joint U3\u0027 - thickness / in-to-in read from the joint sheet (low confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "gussets.csv p.75 (medium): 0.75 in, 29 in in-to-in; gussets.csv p.75 (low): 0.75 in, 29 in in-to-in; gussets.csv p.75 (low): 0.75 in, 29 in in-to-in; gussets.csv p.75 (low): 0.75 in, 29 in in-to-in",
+            "Source": "gussets.csv p.75 (medium): 0.75 in, 29 in in-to-in; gussets.csv p.75 (low): 0.75 in, 29 in in-to-in; gussets.csv p.75 (low): 0.75 in, 29 in in-to-in; gussets.csv p.75 (low): 0.75 in, 29 in in-to-in; gussets.csv p.75 (medium): 0.75 in, 29 in in-to-in; gussets.csv p.75 (low): 0.75 in, 29 in in-to-in; gussets.csv p.75 (low): 0.75 in, 29 in in-to-in; gussets.csv p.75 (low): 0.75 in, 29 in in-to-in",
             "Plates": [
               {
                 "Face": "Top",
@@ -122173,7 +122321,7 @@
             ],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.75): gusset plates of joint L3 - thickness / in-to-in read from the joint sheet (low confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "gussets.csv p.75 (low): 0.5 in, in-to-in not read"
+            "Source": "gussets.csv p.75 (low): 0.5 in, in-to-in not read; gussets.csv p.75 (low): 0.5 in, in-to-in not read"
           },
           {
             "Point": "L3\u0027",
@@ -122198,7 +122346,7 @@
             ],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.75): gusset plates of joint L3\u0027 - thickness / in-to-in read from the joint sheet (low confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "gussets.csv p.75 (low): 0.5 in, in-to-in not read"
+            "Source": "gussets.csv p.75 (low): 0.5 in, in-to-in not read; gussets.csv p.75 (low): 0.5 in, in-to-in not read"
           },
           {
             "Point": "U4",
@@ -122249,7 +122397,7 @@
             ],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.75): gusset plates of joint U4 - thickness / in-to-in read from the joint sheet (low confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "gussets.csv p.75 (medium): 0.625 in, 29 in in-to-in; gussets.csv p.75 (low): 0.625 in, in-to-in not read",
+            "Source": "gussets.csv p.75 (medium): 0.625 in, 29 in in-to-in; gussets.csv p.75 (low): 0.625 in, in-to-in not read; gussets.csv p.75 (medium): 0.625 in, 29 in in-to-in; gussets.csv p.75 (low): 0.625 in, in-to-in not read",
             "Plates": [
               {
                 "Face": "Top",
@@ -122362,7 +122510,7 @@
             ],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.75): gusset plates of joint U4\u0027 - thickness / in-to-in read from the joint sheet (low confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "gussets.csv p.75 (medium): 0.625 in, 29 in in-to-in; gussets.csv p.75 (low): 0.625 in, in-to-in not read",
+            "Source": "gussets.csv p.75 (medium): 0.625 in, 29 in in-to-in; gussets.csv p.75 (low): 0.625 in, in-to-in not read; gussets.csv p.75 (medium): 0.625 in, 29 in in-to-in; gussets.csv p.75 (low): 0.625 in, in-to-in not read",
             "Plates": [
               {
                 "Face": "Top",
@@ -122501,7 +122649,7 @@
             ],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.75): gusset plates of joint L4 - thickness / in-to-in read from the joint sheet (low confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "gussets.csv p.75 (medium): 0.75 in, 29 in in-to-in; gussets.csv p.75 (low): 0.75 in, in-to-in not read; gussets.csv p.75 (low): 0.75 in, in-to-in not read; gussets.csv p.75 (low): 0.75 in, in-to-in not read",
+            "Source": "gussets.csv p.75 (medium): 0.75 in, 29 in in-to-in; gussets.csv p.75 (low): 0.75 in, in-to-in not read; gussets.csv p.75 (low): 0.75 in, in-to-in not read; gussets.csv p.75 (low): 0.75 in, in-to-in not read; gussets.csv p.75 (medium): 0.75 in, 29 in in-to-in; gussets.csv p.75 (low): 0.75 in, in-to-in not read; gussets.csv p.75 (low): 0.75 in, in-to-in not read; gussets.csv p.75 (low): 0.75 in, in-to-in not read",
             "Plates": [
               {
                 "Face": "Top",
@@ -122640,7 +122788,7 @@
             ],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.75): gusset plates of joint L4\u0027 - thickness / in-to-in read from the joint sheet (low confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "gussets.csv p.75 (medium): 0.75 in, 29 in in-to-in; gussets.csv p.75 (low): 0.75 in, in-to-in not read; gussets.csv p.75 (low): 0.75 in, in-to-in not read; gussets.csv p.75 (low): 0.75 in, in-to-in not read",
+            "Source": "gussets.csv p.75 (medium): 0.75 in, 29 in in-to-in; gussets.csv p.75 (low): 0.75 in, in-to-in not read; gussets.csv p.75 (low): 0.75 in, in-to-in not read; gussets.csv p.75 (low): 0.75 in, in-to-in not read; gussets.csv p.75 (medium): 0.75 in, 29 in in-to-in; gussets.csv p.75 (low): 0.75 in, in-to-in not read; gussets.csv p.75 (low): 0.75 in, in-to-in not read; gussets.csv p.75 (low): 0.75 in, in-to-in not read",
             "Plates": [
               {
                 "Face": "Top",
@@ -122779,7 +122927,7 @@
             ],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.75): gusset plates of joint U5 - thickness / in-to-in read from the joint sheet (low confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "gussets.csv p.75 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.75 (low): 0.875 in, in-to-in not read; gussets.csv p.75 (low): 0.875 in, in-to-in not read; gussets.csv p.75 (low): 0.875 in, in-to-in not read",
+            "Source": "gussets.csv p.75 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.75 (low): 0.875 in, in-to-in not read; gussets.csv p.75 (low): 0.875 in, in-to-in not read; gussets.csv p.75 (low): 0.875 in, in-to-in not read; gussets.csv p.75 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.75 (low): 0.875 in, in-to-in not read; gussets.csv p.75 (low): 0.875 in, in-to-in not read; gussets.csv p.75 (low): 0.875 in, in-to-in not read",
             "Plates": [
               {
                 "Face": "Top",
@@ -122942,7 +123090,7 @@
             ],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.75): gusset plates of joint U5\u0027 - thickness / in-to-in read from the joint sheet (low confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "gussets.csv p.75 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.75 (low): 0.875 in, in-to-in not read; gussets.csv p.75 (low): 0.875 in, in-to-in not read; gussets.csv p.75 (low): 0.875 in, in-to-in not read",
+            "Source": "gussets.csv p.75 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.75 (low): 0.875 in, in-to-in not read; gussets.csv p.75 (low): 0.875 in, in-to-in not read; gussets.csv p.75 (low): 0.875 in, in-to-in not read; gussets.csv p.75 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.75 (low): 0.875 in, in-to-in not read; gussets.csv p.75 (low): 0.875 in, in-to-in not read; gussets.csv p.75 (low): 0.875 in, in-to-in not read",
             "Plates": [
               {
                 "Face": "Top",
@@ -123079,7 +123227,7 @@
             ],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.75): gusset plates of joint L5 - thickness / in-to-in read from the joint sheet (medium confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "gussets.csv p.75 (low): 0.75 in, in-to-in not read; gussets.csv p.75 (medium): 0.75 in, 29 in in-to-in"
+            "Source": "gussets.csv p.75 (low): 0.75 in, in-to-in not read; gussets.csv p.75 (medium): 0.75 in, 29 in in-to-in; gussets.csv p.75 (low): 0.75 in, in-to-in not read; gussets.csv p.75 (medium): 0.75 in, 29 in in-to-in"
           },
           {
             "Point": "L5\u0027",
@@ -123130,7 +123278,7 @@
             ],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.75): gusset plates of joint L5\u0027 - thickness / in-to-in read from the joint sheet (medium confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "gussets.csv p.75 (low): 0.75 in, in-to-in not read; gussets.csv p.75 (medium): 0.75 in, 29 in in-to-in"
+            "Source": "gussets.csv p.75 (low): 0.75 in, in-to-in not read; gussets.csv p.75 (medium): 0.75 in, 29 in in-to-in; gussets.csv p.75 (low): 0.75 in, in-to-in not read; gussets.csv p.75 (medium): 0.75 in, 29 in in-to-in"
           },
           {
             "Point": "U6",
@@ -123181,7 +123329,7 @@
             ],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.76): gusset plates of joint U6 - thickness / in-to-in read from the joint sheet (low confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "gussets.csv p.76 (medium): 0.625 in, 31 in in-to-in; gussets.csv p.76 (low): 0.625 in, in-to-in not read",
+            "Source": "gussets.csv p.76 (medium): 0.625 in, 31 in in-to-in; gussets.csv p.76 (low): 0.625 in, in-to-in not read; gussets.csv p.76 (medium): 0.625 in, 31 in in-to-in; gussets.csv p.76 (low): 0.625 in, in-to-in not read",
             "Plates": [
               {
                 "Face": "WebOutside",
@@ -123282,7 +123430,7 @@
             ],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.76): gusset plates of joint U6\u0027 - thickness / in-to-in read from the joint sheet (low confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "gussets.csv p.76 (medium): 0.625 in, 31 in in-to-in; gussets.csv p.76 (low): 0.625 in, in-to-in not read",
+            "Source": "gussets.csv p.76 (medium): 0.625 in, 31 in in-to-in; gussets.csv p.76 (low): 0.625 in, in-to-in not read; gussets.csv p.76 (medium): 0.625 in, 31 in in-to-in; gussets.csv p.76 (low): 0.625 in, in-to-in not read",
             "Plates": [
               {
                 "Face": "WebOutside",
@@ -123409,7 +123557,7 @@
             ],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.76): gusset plates of joint L6 - thickness / in-to-in read from the joint sheet (low confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "gussets.csv p.76 (medium): 0.625 in, 31 in in-to-in; gussets.csv p.76 (low): 0.625 in, in-to-in not read; gussets.csv p.76 (low): 0.625 in, in-to-in not read; gussets.csv p.76 (low): 0.625 in, in-to-in not read",
+            "Source": "gussets.csv p.76 (medium): 0.625 in, 31 in in-to-in; gussets.csv p.76 (low): 0.625 in, in-to-in not read; gussets.csv p.76 (low): 0.625 in, in-to-in not read; gussets.csv p.76 (low): 0.625 in, in-to-in not read; gussets.csv p.76 (medium): 0.625 in, 31 in in-to-in; gussets.csv p.76 (low): 0.625 in, in-to-in not read; gussets.csv p.76 (low): 0.625 in, in-to-in not read; gussets.csv p.76 (low): 0.625 in, in-to-in not read",
             "Plates": [
               {
                 "Face": "WebInside",
@@ -123536,7 +123684,7 @@
             ],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.76): gusset plates of joint L6\u0027 - thickness / in-to-in read from the joint sheet (low confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "gussets.csv p.76 (medium): 0.625 in, 31 in in-to-in; gussets.csv p.76 (low): 0.625 in, in-to-in not read; gussets.csv p.76 (low): 0.625 in, in-to-in not read; gussets.csv p.76 (low): 0.625 in, in-to-in not read",
+            "Source": "gussets.csv p.76 (medium): 0.625 in, 31 in in-to-in; gussets.csv p.76 (low): 0.625 in, in-to-in not read; gussets.csv p.76 (low): 0.625 in, in-to-in not read; gussets.csv p.76 (low): 0.625 in, in-to-in not read; gussets.csv p.76 (medium): 0.625 in, 31 in in-to-in; gussets.csv p.76 (low): 0.625 in, in-to-in not read; gussets.csv p.76 (low): 0.625 in, in-to-in not read; gussets.csv p.76 (low): 0.625 in, in-to-in not read",
             "Plates": [
               {
                 "Face": "WebInside",
@@ -123663,7 +123811,7 @@
             ],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.76): gusset plates of joint U7 - thickness / in-to-in read from the joint sheet (low confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "gussets.csv p.76 (medium): 1.125 in, 31 in in-to-in; gussets.csv p.76 (low): 1.125 in, in-to-in not read; gussets.csv p.76 (low): 1.125 in, in-to-in not read; gussets.csv p.76 (low): 1.125 in, in-to-in not read",
+            "Source": "gussets.csv p.76 (medium): 1.125 in, 31 in in-to-in; gussets.csv p.76 (low): 1.125 in, in-to-in not read; gussets.csv p.76 (low): 1.125 in, in-to-in not read; gussets.csv p.76 (low): 1.125 in, in-to-in not read; gussets.csv p.76 (medium): 1.125 in, 31 in in-to-in; gussets.csv p.76 (low): 1.125 in, in-to-in not read; gussets.csv p.76 (low): 1.125 in, in-to-in not read; gussets.csv p.76 (low): 1.125 in, in-to-in not read",
             "Plates": [
               {
                 "Face": "WebInside",
@@ -123766,7 +123914,7 @@
             ],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.76): gusset plates of joint U7\u0027 - thickness / in-to-in read from the joint sheet (low confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "gussets.csv p.76 (medium): 1.125 in, 31 in in-to-in; gussets.csv p.76 (low): 1.125 in, in-to-in not read; gussets.csv p.76 (low): 1.125 in, in-to-in not read; gussets.csv p.76 (low): 1.125 in, in-to-in not read",
+            "Source": "gussets.csv p.76 (medium): 1.125 in, 31 in in-to-in; gussets.csv p.76 (low): 1.125 in, in-to-in not read; gussets.csv p.76 (low): 1.125 in, in-to-in not read; gussets.csv p.76 (low): 1.125 in, in-to-in not read; gussets.csv p.76 (medium): 1.125 in, 31 in in-to-in; gussets.csv p.76 (low): 1.125 in, in-to-in not read; gussets.csv p.76 (low): 1.125 in, in-to-in not read; gussets.csv p.76 (low): 1.125 in, in-to-in not read",
             "Plates": [
               {
                 "Face": "WebInside",
@@ -123843,7 +123991,7 @@
             ],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.76): gusset plates of joint L7 - thickness / in-to-in read from the joint sheet (low confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "gussets.csv p.76 (medium): 0.625 in, 31 in in-to-in; gussets.csv p.76 (low): 0.625 in, in-to-in not read",
+            "Source": "gussets.csv p.76 (medium): 0.625 in, 31 in in-to-in; gussets.csv p.76 (low): 0.625 in, in-to-in not read; gussets.csv p.76 (medium): 0.625 in, 31 in in-to-in; gussets.csv p.76 (low): 0.625 in, in-to-in not read",
             "Plates": [
               {
                 "Face": "WebOutside",
@@ -123944,7 +124092,7 @@
             ],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.76): gusset plates of joint L7\u0027 - thickness / in-to-in read from the joint sheet (low confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "gussets.csv p.76 (medium): 0.625 in, 31 in in-to-in; gussets.csv p.76 (low): 0.625 in, in-to-in not read",
+            "Source": "gussets.csv p.76 (medium): 0.625 in, 31 in in-to-in; gussets.csv p.76 (low): 0.625 in, in-to-in not read; gussets.csv p.76 (medium): 0.625 in, 31 in in-to-in; gussets.csv p.76 (low): 0.625 in, in-to-in not read",
             "Plates": [
               {
                 "Face": "WebOutside",
@@ -124032,7 +124180,7 @@
             ],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.77): gusset plates of joint U8 - thickness / in-to-in read from the joint sheet (low confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "gussets.csv p.77 (medium): 0.625 in, 30.5 in in-to-in; gussets.csv p.77 (low): 0.625 in, in-to-in not read"
+            "Source": "gussets.csv p.77 (medium): 0.625 in, 30.5 in in-to-in; gussets.csv p.77 (low): 0.625 in, in-to-in not read; gussets.csv p.77 (medium): 0.625 in, 30.5 in in-to-in; gussets.csv p.77 (low): 0.625 in, in-to-in not read"
           },
           {
             "Point": "U8\u0027",
@@ -124070,7 +124218,7 @@
             ],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.77): gusset plates of joint U8\u0027 - thickness / in-to-in read from the joint sheet (low confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "gussets.csv p.77 (medium): 0.625 in, 30.5 in in-to-in; gussets.csv p.77 (low): 0.625 in, in-to-in not read"
+            "Source": "gussets.csv p.77 (medium): 0.625 in, 30.5 in in-to-in; gussets.csv p.77 (low): 0.625 in, in-to-in not read; gussets.csv p.77 (medium): 0.625 in, 30.5 in in-to-in; gussets.csv p.77 (low): 0.625 in, in-to-in not read"
           },
           {
             "Point": "U9",
@@ -124147,7 +124295,7 @@
             ],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.77): gusset plates of joint U9 - thickness / in-to-in read from the joint sheet (low confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "gussets.csv p.77 (medium): 1 in, 30.5 in in-to-in; gussets.csv p.77 (low): 1 in, in-to-in not read; gussets.csv p.77 (low): 1 in, in-to-in not read; gussets.csv p.77 (low): 1 in, in-to-in not read"
+            "Source": "gussets.csv p.77 (medium): 1 in, 30.5 in in-to-in; gussets.csv p.77 (low): 1 in, in-to-in not read; gussets.csv p.77 (low): 1 in, in-to-in not read; gussets.csv p.77 (low): 1 in, in-to-in not read; gussets.csv p.77 (medium): 1 in, 30.5 in in-to-in; gussets.csv p.77 (low): 1 in, in-to-in not read; gussets.csv p.77 (low): 1 in, in-to-in not read; gussets.csv p.77 (low): 1 in, in-to-in not read"
           },
           {
             "Point": "U9\u0027",
@@ -124224,7 +124372,7 @@
             ],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.77): gusset plates of joint U9\u0027 - thickness / in-to-in read from the joint sheet (low confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "gussets.csv p.77 (medium): 1 in, 30.5 in in-to-in; gussets.csv p.77 (low): 1 in, in-to-in not read; gussets.csv p.77 (low): 1 in, in-to-in not read; gussets.csv p.77 (low): 1 in, in-to-in not read"
+            "Source": "gussets.csv p.77 (medium): 1 in, 30.5 in in-to-in; gussets.csv p.77 (low): 1 in, in-to-in not read; gussets.csv p.77 (low): 1 in, in-to-in not read; gussets.csv p.77 (low): 1 in, in-to-in not read; gussets.csv p.77 (medium): 1 in, 30.5 in in-to-in; gussets.csv p.77 (low): 1 in, in-to-in not read; gussets.csv p.77 (low): 1 in, in-to-in not read; gussets.csv p.77 (low): 1 in, in-to-in not read"
           },
           {
             "Point": "L8",
@@ -124301,7 +124449,7 @@
             ],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.77): gusset plates of joint L8 - thickness / in-to-in read from the joint sheet (low confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "gussets.csv p.77 (medium): 1 in, 30.5 in in-to-in; gussets.csv p.77 (low): 1 in, in-to-in not read; gussets.csv p.77 (low): 1 in, in-to-in not read; gussets.csv p.77 (low): 1 in, in-to-in not read"
+            "Source": "gussets.csv p.77 (medium): 1 in, 30.5 in in-to-in; gussets.csv p.77 (low): 1 in, in-to-in not read; gussets.csv p.77 (low): 1 in, in-to-in not read; gussets.csv p.77 (low): 1 in, in-to-in not read; gussets.csv p.77 (medium): 1 in, 30.5 in in-to-in; gussets.csv p.77 (low): 1 in, in-to-in not read; gussets.csv p.77 (low): 1 in, in-to-in not read; gussets.csv p.77 (low): 1 in, in-to-in not read"
           },
           {
             "Point": "L8\u0027",
@@ -124378,7 +124526,7 @@
             ],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.77): gusset plates of joint L8\u0027 - thickness / in-to-in read from the joint sheet (low confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "gussets.csv p.77 (medium): 1 in, 30.5 in in-to-in; gussets.csv p.77 (low): 1 in, in-to-in not read; gussets.csv p.77 (low): 1 in, in-to-in not read; gussets.csv p.77 (low): 1 in, in-to-in not read"
+            "Source": "gussets.csv p.77 (medium): 1 in, 30.5 in in-to-in; gussets.csv p.77 (low): 1 in, in-to-in not read; gussets.csv p.77 (low): 1 in, in-to-in not read; gussets.csv p.77 (low): 1 in, in-to-in not read; gussets.csv p.77 (medium): 1 in, 30.5 in in-to-in; gussets.csv p.77 (low): 1 in, in-to-in not read; gussets.csv p.77 (low): 1 in, in-to-in not read; gussets.csv p.77 (low): 1 in, in-to-in not read"
           },
           {
             "Point": "L9",
@@ -124429,7 +124577,7 @@
             ],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.77): gusset plates of joint L9 - thickness / in-to-in read from the joint sheet (low confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "gussets.csv p.77 (medium): 0.625 in, 30.5 in in-to-in; gussets.csv p.77 (low): 0.625 in, in-to-in not read"
+            "Source": "gussets.csv p.77 (medium): 0.625 in, 30.5 in in-to-in; gussets.csv p.77 (low): 0.625 in, in-to-in not read; gussets.csv p.77 (medium): 0.625 in, 30.5 in in-to-in; gussets.csv p.77 (low): 0.625 in, in-to-in not read"
           },
           {
             "Point": "L9\u0027",
@@ -124480,7 +124628,7 @@
             ],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.77): gusset plates of joint L9\u0027 - thickness / in-to-in read from the joint sheet (low confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "gussets.csv p.77 (medium): 0.625 in, 30.5 in in-to-in; gussets.csv p.77 (low): 0.625 in, in-to-in not read"
+            "Source": "gussets.csv p.77 (medium): 0.625 in, 30.5 in in-to-in; gussets.csv p.77 (low): 0.625 in, in-to-in not read; gussets.csv p.77 (medium): 0.625 in, 30.5 in in-to-in; gussets.csv p.77 (low): 0.625 in, in-to-in not read"
           },
           {
             "Point": "U13",
@@ -124491,7 +124639,7 @@
             "Rivets": [],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.82): gusset plates of joint U13 - thickness / in-to-in read from the joint sheet (medium confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "gussets.csv p.82 (medium): 1.125 in, 29 in in-to-in"
+            "Source": "gussets.csv p.82 (medium): 1.125 in, 29 in in-to-in; gussets.csv p.82 (medium): 1.125 in, 29 in in-to-in"
           },
           {
             "Point": "U13\u0027",
@@ -124502,7 +124650,7 @@
             "Rivets": [],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.82): gusset plates of joint U13\u0027 - thickness / in-to-in read from the joint sheet (medium confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "gussets.csv p.82 (medium): 1.125 in, 29 in in-to-in"
+            "Source": "gussets.csv p.82 (medium): 1.125 in, 29 in in-to-in; gussets.csv p.82 (medium): 1.125 in, 29 in in-to-in"
           },
           {
             "Point": "U14",
@@ -124513,7 +124661,7 @@
             "Rivets": [],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.82): gusset plates of joint U14 - thickness / in-to-in read from the joint sheet (medium confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "gussets.csv p.82 (medium): 1.125 in, 29 in in-to-in"
+            "Source": "gussets.csv p.82 (medium): 1.125 in, 29 in in-to-in; gussets.csv p.82 (medium): 1.125 in, 29 in in-to-in"
           },
           {
             "Point": "U14\u0027",
@@ -124524,7 +124672,7 @@
             "Rivets": [],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.82): gusset plates of joint U14\u0027 - thickness / in-to-in read from the joint sheet (medium confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "gussets.csv p.82 (medium): 1.125 in, 29 in in-to-in"
+            "Source": "gussets.csv p.82 (medium): 1.125 in, 29 in in-to-in; gussets.csv p.82 (medium): 1.125 in, 29 in in-to-in"
           },
           {
             "Point": "U15",
@@ -124535,7 +124683,7 @@
             "Rivets": [],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.82): gusset plates of joint U15 - thickness / in-to-in read from the joint sheet (medium confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "gussets.csv p.82 (medium): 0.875 in, 29 in in-to-in"
+            "Source": "gussets.csv p.82 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.82 (medium): 0.875 in, 29 in in-to-in"
           },
           {
             "Point": "U15\u0027",
@@ -124546,7 +124694,7 @@
             "Rivets": [],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.82): gusset plates of joint U15\u0027 - thickness / in-to-in read from the joint sheet (medium confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "gussets.csv p.82 (medium): 0.875 in, 29 in in-to-in"
+            "Source": "gussets.csv p.82 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.82 (medium): 0.875 in, 29 in in-to-in"
           },
           {
             "Point": "U16",
@@ -124557,7 +124705,7 @@
             "Rivets": [],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.87): gusset plates of joint U16 - thickness / in-to-in read from the joint sheet (medium confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "gussets.csv p.87 (medium): 0.875 in, 29 in in-to-in"
+            "Source": "gussets.csv p.87 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.87 (medium): 0.875 in, 29 in in-to-in"
           },
           {
             "Point": "U16\u0027",
@@ -124568,7 +124716,7 @@
             "Rivets": [],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.87): gusset plates of joint U16\u0027 - thickness / in-to-in read from the joint sheet (medium confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "gussets.csv p.87 (medium): 0.875 in, 29 in in-to-in"
+            "Source": "gussets.csv p.87 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.87 (medium): 0.875 in, 29 in in-to-in"
           },
           {
             "Point": "U17",
@@ -124579,7 +124727,7 @@
             "Rivets": [],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.87): gusset plates of joint U17 - thickness / in-to-in read from the joint sheet (medium confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "gussets.csv p.87 (medium): 0.875 in, 29 in in-to-in"
+            "Source": "gussets.csv p.87 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.87 (medium): 0.875 in, 29 in in-to-in"
           },
           {
             "Point": "U17\u0027",
@@ -124590,7 +124738,7 @@
             "Rivets": [],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.87): gusset plates of joint U17\u0027 - thickness / in-to-in read from the joint sheet (medium confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "gussets.csv p.87 (medium): 0.875 in, 29 in in-to-in"
+            "Source": "gussets.csv p.87 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.87 (medium): 0.875 in, 29 in in-to-in"
           },
           {
             "Point": "U20",
@@ -124654,7 +124802,7 @@
             ],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.89): gusset plates of joint U20 - thickness / in-to-in read from the joint sheet (low confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "gussets.csv p.89 (low): 0.875 in, 29 in in-to-in; gussets.csv p.89 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.89 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.89 (low): 0.875 in, 29 in in-to-in; gussets.csv p.89 (low): 0.875 in, 29 in in-to-in; gussets.csv p.89 (low): 0.875 in, 29 in in-to-in; gussets.csv p.89 (low): 0.875 in, 29 in in-to-in"
+            "Source": "gussets.csv p.89 (low): 0.875 in, 29 in in-to-in; gussets.csv p.89 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.89 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.89 (low): 0.875 in, 29 in in-to-in; gussets.csv p.89 (low): 0.875 in, 29 in in-to-in; gussets.csv p.89 (low): 0.875 in, 29 in in-to-in; gussets.csv p.89 (low): 0.875 in, 29 in in-to-in; gussets.csv p.89 (low): 0.875 in, 29 in in-to-in; gussets.csv p.89 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.89 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.89 (low): 0.875 in, 29 in in-to-in; gussets.csv p.89 (low): 0.875 in, 29 in in-to-in; gussets.csv p.89 (low): 0.875 in, 29 in in-to-in; gussets.csv p.89 (low): 0.875 in, 29 in in-to-in"
           },
           {
             "Point": "U20\u0027",
@@ -124718,7 +124866,7 @@
             ],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.89): gusset plates of joint U20\u0027 - thickness / in-to-in read from the joint sheet (low confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "gussets.csv p.89 (low): 0.875 in, 29 in in-to-in; gussets.csv p.89 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.89 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.89 (low): 0.875 in, 29 in in-to-in; gussets.csv p.89 (low): 0.875 in, 29 in in-to-in; gussets.csv p.89 (low): 0.875 in, 29 in in-to-in; gussets.csv p.89 (low): 0.875 in, 29 in in-to-in"
+            "Source": "gussets.csv p.89 (low): 0.875 in, 29 in in-to-in; gussets.csv p.89 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.89 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.89 (low): 0.875 in, 29 in in-to-in; gussets.csv p.89 (low): 0.875 in, 29 in in-to-in; gussets.csv p.89 (low): 0.875 in, 29 in in-to-in; gussets.csv p.89 (low): 0.875 in, 29 in in-to-in; gussets.csv p.89 (low): 0.875 in, 29 in in-to-in; gussets.csv p.89 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.89 (medium): 0.875 in, 29 in in-to-in; gussets.csv p.89 (low): 0.875 in, 29 in in-to-in; gussets.csv p.89 (low): 0.875 in, 29 in in-to-in; gussets.csv p.89 (low): 0.875 in, 29 in in-to-in; gussets.csv p.89 (low): 0.875 in, 29 in in-to-in"
           },
           {
             "Point": "U21",
@@ -124782,7 +124930,7 @@
             ],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.89): gusset plates of joint U21 - thickness / in-to-in read from the joint sheet (low confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "gussets.csv p.89 (low): 0.75 in, 29 in in-to-in; gussets.csv p.89 (medium): 0.75 in, 29 in in-to-in; gussets.csv p.89 (low): 0.75 in, 29 in in-to-in; gussets.csv p.89 (low): 0.75 in, 29 in in-to-in; gussets.csv p.89 (medium): 0.75 in, 29 in in-to-in; gussets.csv p.89 (low): 0.75 in, 29 in in-to-in; gussets.csv p.89 (low): 0.75 in, 29 in in-to-in; gussets.csv p.89 (medium): 0.75 in, 29 in in-to-in; gussets.csv p.89 (low): 0.75 in, 29 in in-to-in"
+            "Source": "gussets.csv p.89 (low): 0.75 in, 29 in in-to-in; gussets.csv p.89 (medium): 0.75 in, 29 in in-to-in; gussets.csv p.89 (low): 0.75 in, 29 in in-to-in; gussets.csv p.89 (low): 0.75 in, 29 in in-to-in; gussets.csv p.89 (medium): 0.75 in, 29 in in-to-in; gussets.csv p.89 (low): 0.75 in, 29 in in-to-in; gussets.csv p.89 (low): 0.75 in, 29 in in-to-in; gussets.csv p.89 (medium): 0.75 in, 29 in in-to-in; gussets.csv p.89 (low): 0.75 in, 29 in in-to-in; gussets.csv p.89 (low): 0.75 in, 29 in in-to-in; gussets.csv p.89 (medium): 0.75 in, 29 in in-to-in; gussets.csv p.89 (low): 0.75 in, 29 in in-to-in; gussets.csv p.89 (low): 0.75 in, 29 in in-to-in; gussets.csv p.89 (medium): 0.75 in, 29 in in-to-in; gussets.csv p.89 (low): 0.75 in, 29 in in-to-in; gussets.csv p.89 (low): 0.75 in, 29 in in-to-in; gussets.csv p.89 (medium): 0.75 in, 29 in in-to-in; gussets.csv p.89 (low): 0.75 in, 29 in in-to-in"
           },
           {
             "Point": "U21\u0027",
@@ -124846,7 +124994,7 @@
             ],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.89): gusset plates of joint U21\u0027 - thickness / in-to-in read from the joint sheet (low confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "gussets.csv p.89 (low): 0.75 in, 29 in in-to-in; gussets.csv p.89 (medium): 0.75 in, 29 in in-to-in; gussets.csv p.89 (low): 0.75 in, 29 in in-to-in; gussets.csv p.89 (low): 0.75 in, 29 in in-to-in; gussets.csv p.89 (medium): 0.75 in, 29 in in-to-in; gussets.csv p.89 (low): 0.75 in, 29 in in-to-in; gussets.csv p.89 (low): 0.75 in, 29 in in-to-in; gussets.csv p.89 (medium): 0.75 in, 29 in in-to-in; gussets.csv p.89 (low): 0.75 in, 29 in in-to-in"
+            "Source": "gussets.csv p.89 (low): 0.75 in, 29 in in-to-in; gussets.csv p.89 (medium): 0.75 in, 29 in in-to-in; gussets.csv p.89 (low): 0.75 in, 29 in in-to-in; gussets.csv p.89 (low): 0.75 in, 29 in in-to-in; gussets.csv p.89 (medium): 0.75 in, 29 in in-to-in; gussets.csv p.89 (low): 0.75 in, 29 in in-to-in; gussets.csv p.89 (low): 0.75 in, 29 in in-to-in; gussets.csv p.89 (medium): 0.75 in, 29 in in-to-in; gussets.csv p.89 (low): 0.75 in, 29 in in-to-in; gussets.csv p.89 (low): 0.75 in, 29 in in-to-in; gussets.csv p.89 (medium): 0.75 in, 29 in in-to-in; gussets.csv p.89 (low): 0.75 in, 29 in in-to-in; gussets.csv p.89 (low): 0.75 in, 29 in in-to-in; gussets.csv p.89 (medium): 0.75 in, 29 in in-to-in; gussets.csv p.89 (low): 0.75 in, 29 in in-to-in; gussets.csv p.89 (low): 0.75 in, 29 in in-to-in; gussets.csv p.89 (medium): 0.75 in, 29 in in-to-in; gussets.csv p.89 (low): 0.75 in, 29 in in-to-in"
           },
           {
             "Point": "L20",
@@ -124910,7 +125058,7 @@
             ],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.89): gusset plates of joint L20 - thickness / in-to-in read from the joint sheet (medium confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "gussets.csv p.89 (low): 1 in, 29 in in-to-in; gussets.csv p.89 (medium): 1 in, 29 in in-to-in; gussets.csv p.89 (low): 1 in, 29 in in-to-in; gussets.csv p.89 (low): 1 in, 29 in in-to-in; gussets.csv p.89 (low): 1 in, 29 in in-to-in; gussets.csv p.89 (medium): 1 in, 29 in in-to-in; gussets.csv p.89 (medium): 1 in, 29 in in-to-in"
+            "Source": "gussets.csv p.89 (low): 1 in, 29 in in-to-in; gussets.csv p.89 (medium): 1 in, 29 in in-to-in; gussets.csv p.89 (low): 1 in, 29 in in-to-in; gussets.csv p.89 (low): 1 in, 29 in in-to-in; gussets.csv p.89 (low): 1 in, 29 in in-to-in; gussets.csv p.89 (medium): 1 in, 29 in in-to-in; gussets.csv p.89 (medium): 1 in, 29 in in-to-in; gussets.csv p.89 (low): 1 in, 29 in in-to-in; gussets.csv p.89 (medium): 1 in, 29 in in-to-in; gussets.csv p.89 (low): 1 in, 29 in in-to-in; gussets.csv p.89 (low): 1 in, 29 in in-to-in; gussets.csv p.89 (low): 1 in, 29 in in-to-in; gussets.csv p.89 (medium): 1 in, 29 in in-to-in; gussets.csv p.89 (medium): 1 in, 29 in in-to-in"
           },
           {
             "Point": "L20\u0027",
@@ -124974,7 +125122,7 @@
             ],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.89): gusset plates of joint L20\u0027 - thickness / in-to-in read from the joint sheet (medium confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "gussets.csv p.89 (low): 1 in, 29 in in-to-in; gussets.csv p.89 (medium): 1 in, 29 in in-to-in; gussets.csv p.89 (low): 1 in, 29 in in-to-in; gussets.csv p.89 (low): 1 in, 29 in in-to-in; gussets.csv p.89 (low): 1 in, 29 in in-to-in; gussets.csv p.89 (medium): 1 in, 29 in in-to-in; gussets.csv p.89 (medium): 1 in, 29 in in-to-in"
+            "Source": "gussets.csv p.89 (low): 1 in, 29 in in-to-in; gussets.csv p.89 (medium): 1 in, 29 in in-to-in; gussets.csv p.89 (low): 1 in, 29 in in-to-in; gussets.csv p.89 (low): 1 in, 29 in in-to-in; gussets.csv p.89 (low): 1 in, 29 in in-to-in; gussets.csv p.89 (medium): 1 in, 29 in in-to-in; gussets.csv p.89 (medium): 1 in, 29 in in-to-in; gussets.csv p.89 (low): 1 in, 29 in in-to-in; gussets.csv p.89 (medium): 1 in, 29 in in-to-in; gussets.csv p.89 (low): 1 in, 29 in in-to-in; gussets.csv p.89 (low): 1 in, 29 in in-to-in; gussets.csv p.89 (low): 1 in, 29 in in-to-in; gussets.csv p.89 (medium): 1 in, 29 in in-to-in; gussets.csv p.89 (medium): 1 in, 29 in in-to-in"
           },
           {
             "Point": "L21",
@@ -125038,7 +125186,7 @@
             ],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.89): gusset plates of joint L21 - thickness / in-to-in read from the joint sheet (medium confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "gussets.csv p.89 (low): 1 in, 29 in in-to-in; gussets.csv p.89 (medium): 1 in, 29 in in-to-in; gussets.csv p.89 (low): 1 in, 29 in in-to-in; gussets.csv p.89 (low): 1 in, 29 in in-to-in; gussets.csv p.89 (low): 1 in, 29 in in-to-in; gussets.csv p.89 (medium): 1 in, 29 in in-to-in; gussets.csv p.89 (medium): 1 in, 29 in in-to-in"
+            "Source": "gussets.csv p.89 (low): 1 in, 29 in in-to-in; gussets.csv p.89 (medium): 1 in, 29 in in-to-in; gussets.csv p.89 (low): 1 in, 29 in in-to-in; gussets.csv p.89 (low): 1 in, 29 in in-to-in; gussets.csv p.89 (low): 1 in, 29 in in-to-in; gussets.csv p.89 (medium): 1 in, 29 in in-to-in; gussets.csv p.89 (medium): 1 in, 29 in in-to-in; gussets.csv p.89 (low): 1 in, 29 in in-to-in; gussets.csv p.89 (medium): 1 in, 29 in in-to-in; gussets.csv p.89 (low): 1 in, 29 in in-to-in; gussets.csv p.89 (low): 1 in, 29 in in-to-in; gussets.csv p.89 (low): 1 in, 29 in in-to-in; gussets.csv p.89 (medium): 1 in, 29 in in-to-in; gussets.csv p.89 (medium): 1 in, 29 in in-to-in"
           },
           {
             "Point": "L21\u0027",
@@ -125102,7 +125250,7 @@
             ],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.89): gusset plates of joint L21\u0027 - thickness / in-to-in read from the joint sheet (medium confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "gussets.csv p.89 (low): 1 in, 29 in in-to-in; gussets.csv p.89 (medium): 1 in, 29 in in-to-in; gussets.csv p.89 (low): 1 in, 29 in in-to-in; gussets.csv p.89 (low): 1 in, 29 in in-to-in; gussets.csv p.89 (low): 1 in, 29 in in-to-in; gussets.csv p.89 (medium): 1 in, 29 in in-to-in; gussets.csv p.89 (medium): 1 in, 29 in in-to-in"
+            "Source": "gussets.csv p.89 (low): 1 in, 29 in in-to-in; gussets.csv p.89 (medium): 1 in, 29 in in-to-in; gussets.csv p.89 (low): 1 in, 29 in in-to-in; gussets.csv p.89 (low): 1 in, 29 in in-to-in; gussets.csv p.89 (low): 1 in, 29 in in-to-in; gussets.csv p.89 (medium): 1 in, 29 in in-to-in; gussets.csv p.89 (medium): 1 in, 29 in in-to-in; gussets.csv p.89 (low): 1 in, 29 in in-to-in; gussets.csv p.89 (medium): 1 in, 29 in in-to-in; gussets.csv p.89 (low): 1 in, 29 in in-to-in; gussets.csv p.89 (low): 1 in, 29 in in-to-in; gussets.csv p.89 (low): 1 in, 29 in in-to-in; gussets.csv p.89 (medium): 1 in, 29 in in-to-in; gussets.csv p.89 (medium): 1 in, 29 in in-to-in"
           },
           {
             "Point": "L22",
@@ -125166,7 +125314,7 @@
             ],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.90): gusset plates of joint L22 - thickness / in-to-in read from the joint sheet (low confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "gussets.csv p.90 (medium): 1 in, 29 in in-to-in; gussets.csv p.90 (medium): 1 in, 29 in in-to-in; gussets.csv p.90 (medium): 1 in, 29 in in-to-in; gussets.csv p.90 (medium): 1 in, 29 in in-to-in; gussets.csv p.90 (medium): 1 in, 29 in in-to-in; gussets.csv p.90 (medium): 1 in, 29 in in-to-in; gussets.csv p.90 (low): 1 in, 29 in in-to-in; gussets.csv p.90 (low): 1 in, 29 in in-to-in; gussets.csv p.90 (low): 1 in, 29 in in-to-in; gussets.csv p.90 (low): 1 in, 29 in in-to-in; gussets.csv p.90 (low): 1 in, 29 in in-to-in; gussets.csv p.90 (low): 1 in, 29 in in-to-in; gussets.csv p.90 (low): 1 in, 29 in in-to-in"
+            "Source": "gussets.csv p.90 (medium): 1 in, 29 in in-to-in; gussets.csv p.90 (medium): 1 in, 29 in in-to-in; gussets.csv p.90 (medium): 1 in, 29 in in-to-in; gussets.csv p.90 (medium): 1 in, 29 in in-to-in; gussets.csv p.90 (medium): 1 in, 29 in in-to-in; gussets.csv p.90 (medium): 1 in, 29 in in-to-in; gussets.csv p.90 (low): 1 in, 29 in in-to-in; gussets.csv p.90 (low): 1 in, 29 in in-to-in; gussets.csv p.90 (low): 1 in, 29 in in-to-in; gussets.csv p.90 (low): 1 in, 29 in in-to-in; gussets.csv p.90 (low): 1 in, 29 in in-to-in; gussets.csv p.90 (low): 1 in, 29 in in-to-in; gussets.csv p.90 (low): 1 in, 29 in in-to-in; gussets.csv p.90 (medium): 1 in, 29 in in-to-in; gussets.csv p.90 (medium): 1 in, 29 in in-to-in; gussets.csv p.90 (medium): 1 in, 29 in in-to-in; gussets.csv p.90 (medium): 1 in, 29 in in-to-in; gussets.csv p.90 (medium): 1 in, 29 in in-to-in; gussets.csv p.90 (medium): 1 in, 29 in in-to-in; gussets.csv p.90 (low): 1 in, 29 in in-to-in; gussets.csv p.90 (low): 1 in, 29 in in-to-in; gussets.csv p.90 (low): 1 in, 29 in in-to-in; gussets.csv p.90 (low): 1 in, 29 in in-to-in; gussets.csv p.90 (low): 1 in, 29 in in-to-in; gussets.csv p.90 (low): 1 in, 29 in in-to-in; gussets.csv p.90 (low): 1 in, 29 in in-to-in"
           },
           {
             "Point": "U0",
@@ -125177,7 +125325,7 @@
             "Rivets": [],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.73): gusset plates of joint U0 - thickness / in-to-in read from the joint sheet (medium confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "gussets.csv p.73 (medium): 0.875 in, 34 in in-to-in; gussets.csv p.73 (high): 0.875 in, 29 in in-to-in"
+            "Source": "gussets.csv p.73 (medium): 0.875 in, 34 in in-to-in; gussets.csv p.73 (high): 0.875 in, 29 in in-to-in; gussets.csv p.73 (medium): 0.875 in, 34 in in-to-in; gussets.csv p.73 (high): 0.875 in, 29 in in-to-in"
           },
           {
             "Point": "U0\u0027",
@@ -125188,7 +125336,7 @@
             "Rivets": [],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.73): gusset plates of joint U0\u0027 - thickness / in-to-in read from the joint sheet (medium confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "gussets.csv p.73 (medium): 0.875 in, 34 in in-to-in; gussets.csv p.73 (high): 0.875 in, 29 in in-to-in"
+            "Source": "gussets.csv p.73 (medium): 0.875 in, 34 in in-to-in; gussets.csv p.73 (high): 0.875 in, 29 in in-to-in; gussets.csv p.73 (medium): 0.875 in, 34 in in-to-in; gussets.csv p.73 (high): 0.875 in, 29 in in-to-in"
           },
           {
             "Point": "L0",
@@ -125199,7 +125347,7 @@
             "Rivets": [],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.73): gusset plates of joint L0 - thickness / in-to-in read from the joint sheet (low confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "gussets.csv p.73 (low): 0.875 in, in-to-in not read; gussets.csv p.73 (low): 0.875 in, in-to-in not read"
+            "Source": "gussets.csv p.73 (low): 0.875 in, in-to-in not read; gussets.csv p.73 (low): 0.875 in, in-to-in not read; gussets.csv p.73 (low): 0.875 in, in-to-in not read; gussets.csv p.73 (low): 0.875 in, in-to-in not read"
           },
           {
             "Point": "L0\u0027",
@@ -125210,7 +125358,7 @@
             "Rivets": [],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.73): gusset plates of joint L0\u0027 - thickness / in-to-in read from the joint sheet (low confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "gussets.csv p.73 (low): 0.875 in, in-to-in not read; gussets.csv p.73 (low): 0.875 in, in-to-in not read"
+            "Source": "gussets.csv p.73 (low): 0.875 in, in-to-in not read; gussets.csv p.73 (low): 0.875 in, in-to-in not read; gussets.csv p.73 (low): 0.875 in, in-to-in not read; gussets.csv p.73 (low): 0.875 in, in-to-in not read"
           },
           {
             "Point": "U22",
@@ -125367,7 +125515,7 @@
             "HaunchBottomWidth": 0.4318,
             "HaunchSideSlope": 1
           },
-          "Unresolved": "UNRESOLVED (p.94): stringer bearings (Section D) and diaphragms 15[ 33.9 - the bearing heights per line are not decoded and the diaphragms are only located (midway between floor beams). stringers continuous over the floor beams, top = finished grade - 7 3/4 slab; one straight piece per bay; bearings / diaphragms not built (except the mid-panel 15 [ 33.9, connections-ptc.csx).",
+          "Unresolved": "UNRESOLVED (p.94): stringer bearings (Section D) and diaphragms 15[ 33.9 - the bearing heights per line are not decoded and the diaphragms are only located (midway between floor beams). stringers continuous over the floor beams, top = finished grade - 7 3/4 slab; one straight piece per bay; bearings / diaphragms not built (except the mid-panel 15 [ 33.9, connections-ptc.csx) (except the mid-panel 15 [ 33.9, connections-ptc.csx).",
           "Source": "p.72 / p.94"
         },
         "Suspenders": [
@@ -129039,6 +129187,7 @@
           "UNRESOLVED (p.69, p.70): perforated cover plates (manholes 12 x 20 / 11 1/2 x 20 at 3\u0027-6 or 4\u0027-0) - spacing printed as approximate. covers built solid (weight overstated by the manholes).",
           "UNRESOLVED (p.69, p.74): order of the web plies of the chords - the sections list the plies without their order; the half section L13-L17 shows inlays at the joints. plies stacked from the outside in the printed order, angles against the innermost ply deeper than their leg.",
           "UNRESOLVED (p.73): hold-down rollers and shear lock at piers 17 / 20 - detailed on p.73 but not part of this phase. not built.",
+          "UNRESOLVED (p.69, p.74-90): inlay plates, lug angles, stiffeners, diaphragms, stitch rivets and the splice plates whose extent was not read - they are listed per joint without extents (141 splice / fill callouts have no length in splices.csv). chord cover / web splice plates and fills with a scaled length are built (connections-ptc.csx); the rest is not built.",
           "UNRESOLVED (p.69, p.74-90): inlay plates, lug angles, stiffeners, diaphragms, stitch rivets and the splice plates whose extent was not read - they are listed per joint without extents (141 splice / fill callouts have no length in splices.csv). chord cover / web splice plates and fills with a scaled length are built (connections-ptc.csx); the rest is not built.",
           "UNRESOLVED (p.73-90): rivets (rivets-ptc.csx) of the parts not modeled - the counted groups on cover plate splices (flange plan views), member splice details, lug / diaphragm / bracing / strut / shoe connections, secondary angle members and stubs belong to parts the model does not have (4532 per gusset face). not placed; joints without a count (p.74-87 web groups not counted, p.50 U1-L3) have no rivets."
         ],
@@ -145515,7 +145664,7 @@
         ],
         "Sections": [
           {
-            "Name": "14 WF 87",
+            "Name": "14 WF 87 (C)",
             "Kind": "Rolled",
             "Label": "14 WF 87 (25.56 sq.in.)",
             "Material": "C",
@@ -145774,7 +145923,7 @@
             "Source": "p.57"
           },
           {
-            "Name": "14 WF 142",
+            "Name": "14 WF 142 (S)",
             "Kind": "Rolled",
             "Label": "14 WF 142 (41.85 sq.in.)",
             "Material": "S",
@@ -145845,6 +145994,43 @@
             "Diameter": 0,
             "WorkingLineOffset": 0,
             "Unresolved": "UNRESOLVED (p.57): rolled shape 14 WF 167 (1954 series) dimensions - the sheets print the designation and the gross area 49.09 sq.in., not d / bf / tw / tf, and the 1954 series differs from AISC v16. d / bf / tw / tf interpolated by area between AISC W14x159 and W14x176, weight 3.4 lb/ft per sq.in.; flanges in planes parallel to the truss plane with the gusset pairs outside them (p.50 / p.60: gusset in-to-in = depth \u002B fills).",
+            "Source": "p.57"
+          },
+          {
+            "Name": "14 WF 87 (S)",
+            "Kind": "Rolled",
+            "Label": "14 WF 87 (25.56 sq.in.)",
+            "Material": "S",
+            "WebDepth": 0,
+            "WebPlies": [],
+            "WebsOutToOut": 0,
+            "WebsBackToBack": 0,
+            "Angle": "",
+            "AngleLegOnWeb": 0,
+            "AngleLegOut": 0,
+            "AngleThickness": 0,
+            "AnglesOutside": false,
+            "AngleEdges": "both",
+            "AngleProjection": 0,
+            "TopPlates": [],
+            "BottomPlates": [],
+            "Lacing": null,
+            "WebVertical": false,
+            "Channel": "",
+            "BackToBack": 0,
+            "FlangesOut": false,
+            "AngleCount": 2,
+            "Designation": "14 WF 87",
+            "Depth": 0.35846511999999997,
+            "FlangeWidth": 0.32627824,
+            "WebThickness": 0.011844528,
+            "FlangeThickness": 0.019418808,
+            "WeightLbPerFt": 86.904,
+            "Rotated": true,
+            "Width": 0,
+            "Diameter": 0,
+            "WorkingLineOffset": 0,
+            "Unresolved": "UNRESOLVED (p.57): rolled shape 14 WF 87 (1954 series) dimensions - the sheets print the designation and the gross area 25.56 sq.in., not d / bf / tw / tf, and the 1954 series differs from AISC v16. d / bf / tw / tf interpolated by area between AISC W14x82 and W14x90, weight 3.4 lb/ft per sq.in.; flanges in planes parallel to the truss plane with the gusset pairs outside them (p.50 / p.60: gusset in-to-in = depth \u002B fills).",
             "Source": "p.57"
           },
           {
@@ -146067,6 +146253,43 @@
             "Diameter": 0,
             "WorkingLineOffset": 0,
             "Unresolved": "UNRESOLVED (p.57): rolled shape 14 WF 246 (1954 series) dimensions - the sheets print the designation and the gross area 72.33 sq.in., not d / bf / tw / tf, and the 1954 series differs from AISC v16. d / bf / tw / tf interpolated by area between AISC W14x233 and W14x257, weight 3.4 lb/ft per sq.in.; flanges in planes parallel to the truss plane with the gusset pairs outside them (p.50 / p.60: gusset in-to-in = depth \u002B fills).",
+            "Source": "p.57"
+          },
+          {
+            "Name": "14 WF 142 (C)",
+            "Kind": "Rolled",
+            "Label": "14 WF 142 (41.85 sq.in.)",
+            "Material": "C",
+            "WebDepth": 0,
+            "WebPlies": [],
+            "WebsOutToOut": 0,
+            "WebsBackToBack": 0,
+            "Angle": "",
+            "AngleLegOnWeb": 0,
+            "AngleLegOut": 0,
+            "AngleThickness": 0,
+            "AnglesOutside": false,
+            "AngleEdges": "both",
+            "AngleProjection": 0,
+            "TopPlates": [],
+            "BottomPlates": [],
+            "Lacing": null,
+            "WebVertical": false,
+            "Channel": "",
+            "BackToBack": 0,
+            "FlangesOut": false,
+            "AngleCount": 2,
+            "Designation": "14 WF 142",
+            "Depth": 0.3753664102564102,
+            "FlangeWidth": 0.38927128205128203,
+            "WebThickness": 0.017078243589743587,
+            "FlangeThickness": 0.027353846153846156,
+            "WeightLbPerFt": 142.29,
+            "Rotated": true,
+            "Width": 0,
+            "Diameter": 0,
+            "WorkingLineOffset": 0,
+            "Unresolved": "UNRESOLVED (p.57): rolled shape 14 WF 142 (1954 series) dimensions - the sheets print the designation and the gross area 41.85 sq.in., not d / bf / tw / tf, and the 1954 series differs from AISC v16. d / bf / tw / tf interpolated by area between AISC W14x132 and W14x145, weight 3.4 lb/ft per sq.in.; flanges in planes parallel to the truss plane with the gusset pairs outside them (p.50 / p.60: gusset in-to-in = depth \u002B fills).",
             "Source": "p.57"
           },
           {
@@ -146657,7 +146880,7 @@
             "From": "U0",
             "To": "U1",
             "Plane": "",
-            "Section": "14 WF 87",
+            "Section": "14 WF 87 (C)",
             "Role": "UpperChord",
             "Panel": "Panel 0-1",
             "System": "",
@@ -146673,7 +146896,7 @@
             "From": "U1\u0027",
             "To": "U0\u0027",
             "Plane": "",
-            "Section": "14 WF 87",
+            "Section": "14 WF 87 (C)",
             "Role": "UpperChord",
             "Panel": "Panel 1\u0027-0\u0027",
             "System": "",
@@ -146945,7 +147168,7 @@
             "From": "U17",
             "To": "U19",
             "Plane": "",
-            "Section": "14 WF 87",
+            "Section": "14 WF 87 (C)",
             "Role": "UpperChord",
             "Panel": "Panel 17-19",
             "System": "",
@@ -146961,7 +147184,7 @@
             "From": "U19\u0027",
             "To": "U17\u0027",
             "Plane": "",
-            "Section": "14 WF 87",
+            "Section": "14 WF 87 (C)",
             "Role": "UpperChord",
             "Panel": "Panel 19\u0027-17\u0027",
             "System": "",
@@ -146993,7 +147216,7 @@
             "From": "L0",
             "To": "L2",
             "Plane": "",
-            "Section": "14 WF 142",
+            "Section": "14 WF 142 (S)",
             "Role": "LowerChord",
             "Panel": "Panel 0-2",
             "System": "",
@@ -147009,7 +147232,7 @@
             "From": "L2\u0027",
             "To": "L0\u0027",
             "Plane": "",
-            "Section": "14 WF 142",
+            "Section": "14 WF 142 (S)",
             "Role": "LowerChord",
             "Panel": "Panel 2\u0027-0\u0027",
             "System": "",
@@ -147185,7 +147408,7 @@
             "From": "L12",
             "To": "L14",
             "Plane": "",
-            "Section": "14 WF 87",
+            "Section": "14 WF 87 (S)",
             "Role": "LowerChord",
             "Panel": "Panel 12-14",
             "System": "",
@@ -147201,7 +147424,7 @@
             "From": "L14\u0027",
             "To": "L12\u0027",
             "Plane": "",
-            "Section": "14 WF 87",
+            "Section": "14 WF 87 (S)",
             "Role": "LowerChord",
             "Panel": "Panel 14\u0027-12\u0027",
             "System": "",
@@ -147361,7 +147584,7 @@
             "From": "U3",
             "To": "L4",
             "Plane": "",
-            "Section": "14 WF 142",
+            "Section": "14 WF 142 (C)",
             "Role": "Diagonal",
             "Panel": "Panel 3-4",
             "System": "",
@@ -147377,7 +147600,7 @@
             "From": "L4",
             "To": "U5",
             "Plane": "",
-            "Section": "14 WF 142",
+            "Section": "14 WF 142 (C)",
             "Role": "Diagonal",
             "Panel": "Panel 4-5",
             "System": "",
@@ -147537,7 +147760,7 @@
             "From": "L14",
             "To": "U15",
             "Plane": "",
-            "Section": "14 WF 142",
+            "Section": "14 WF 142 (C)",
             "Role": "Diagonal",
             "Panel": "Panel 14-15",
             "System": "",
@@ -147553,7 +147776,7 @@
             "From": "U15",
             "To": "L16",
             "Plane": "",
-            "Section": "14 WF 142",
+            "Section": "14 WF 142 (C)",
             "Role": "Diagonal",
             "Panel": "Panel 15-16",
             "System": "",
@@ -147569,7 +147792,7 @@
             "From": "L16",
             "To": "U17",
             "Plane": "",
-            "Section": "14 WF 87",
+            "Section": "14 WF 87 (S)",
             "Role": "Diagonal",
             "Panel": "Panel 16-17",
             "System": "",
@@ -147681,7 +147904,7 @@
             "From": "U17\u0027",
             "To": "L16\u0027",
             "Plane": "",
-            "Section": "14 WF 87",
+            "Section": "14 WF 87 (S)",
             "Role": "Diagonal",
             "Panel": "Panel 17\u0027-16\u0027",
             "System": "",
@@ -147697,7 +147920,7 @@
             "From": "L16\u0027",
             "To": "U15\u0027",
             "Plane": "",
-            "Section": "14 WF 142",
+            "Section": "14 WF 142 (C)",
             "Role": "Diagonal",
             "Panel": "Panel 16\u0027-15\u0027",
             "System": "",
@@ -147713,7 +147936,7 @@
             "From": "U15\u0027",
             "To": "L14\u0027",
             "Plane": "",
-            "Section": "14 WF 142",
+            "Section": "14 WF 142 (C)",
             "Role": "Diagonal",
             "Panel": "Panel 15\u0027-14\u0027",
             "System": "",
@@ -147873,7 +148096,7 @@
             "From": "U5\u0027",
             "To": "L4\u0027",
             "Plane": "",
-            "Section": "14 WF 142",
+            "Section": "14 WF 142 (C)",
             "Role": "Diagonal",
             "Panel": "Panel 5\u0027-4\u0027",
             "System": "",
@@ -147889,7 +148112,7 @@
             "From": "L4\u0027",
             "To": "U3\u0027",
             "Plane": "",
-            "Section": "14 WF 142",
+            "Section": "14 WF 142 (C)",
             "Role": "Diagonal",
             "Panel": "Panel 4\u0027-3\u0027",
             "System": "",
@@ -175631,7 +175854,7 @@
         ],
         "Sections": [
           {
-            "Name": "14 WF 87",
+            "Name": "14 WF 87 (C)",
             "Kind": "Rolled",
             "Label": "14 WF 87 (25.56 sq.in.)",
             "Material": "C",
@@ -175890,7 +176113,7 @@
             "Source": "p.47"
           },
           {
-            "Name": "14 WF 142",
+            "Name": "14 WF 142 (S)",
             "Kind": "Rolled",
             "Label": "14 WF 142 (41.85 sq.in.)",
             "Material": "S",
@@ -175924,6 +176147,43 @@
             "Diameter": 0,
             "WorkingLineOffset": 0,
             "Unresolved": "UNRESOLVED (p.47): rolled shape 14 WF 142 (1954 series) dimensions - the sheets print the designation and the gross area 41.85 sq.in., not d / bf / tw / tf, and the 1954 series differs from AISC v16. d / bf / tw / tf interpolated by area between AISC W14x132 and W14x145, weight 3.4 lb/ft per sq.in.; flanges in planes parallel to the truss plane with the gusset pairs outside them (p.50 / p.60: gusset in-to-in = depth \u002B fills).",
+            "Source": "p.47"
+          },
+          {
+            "Name": "14 WF 87 (S)",
+            "Kind": "Rolled",
+            "Label": "14 WF 87 (25.56 sq.in.)",
+            "Material": "S",
+            "WebDepth": 0,
+            "WebPlies": [],
+            "WebsOutToOut": 0,
+            "WebsBackToBack": 0,
+            "Angle": "",
+            "AngleLegOnWeb": 0,
+            "AngleLegOut": 0,
+            "AngleThickness": 0,
+            "AnglesOutside": false,
+            "AngleEdges": "both",
+            "AngleProjection": 0,
+            "TopPlates": [],
+            "BottomPlates": [],
+            "Lacing": null,
+            "WebVertical": false,
+            "Channel": "",
+            "BackToBack": 0,
+            "FlangesOut": false,
+            "AngleCount": 2,
+            "Designation": "14 WF 87",
+            "Depth": 0.35846511999999997,
+            "FlangeWidth": 0.32627824,
+            "WebThickness": 0.011844528,
+            "FlangeThickness": 0.019418808,
+            "WeightLbPerFt": 86.904,
+            "Rotated": true,
+            "Width": 0,
+            "Diameter": 0,
+            "WorkingLineOffset": 0,
+            "Unresolved": "UNRESOLVED (p.47): rolled shape 14 WF 87 (1954 series) dimensions - the sheets print the designation and the gross area 25.56 sq.in., not d / bf / tw / tf, and the 1954 series differs from AISC v16. d / bf / tw / tf interpolated by area between AISC W14x82 and W14x90, weight 3.4 lb/ft per sq.in.; flanges in planes parallel to the truss plane with the gusset pairs outside them (p.50 / p.60: gusset in-to-in = depth \u002B fills).",
             "Source": "p.47"
           },
           {
@@ -175961,6 +176221,43 @@
             "Diameter": 0,
             "WorkingLineOffset": 0,
             "Unresolved": "UNRESOLVED (p.47): rolled shape 14 WF 228 (1954 series) dimensions - the sheets print the designation and the gross area 67.06 sq.in., not d / bf / tw / tf, and the 1954 series differs from AISC v16. d / bf / tw / tf interpolated by area between AISC W14x211 and W14x233, weight 3.4 lb/ft per sq.in.; flanges in planes parallel to the truss plane with the gusset pairs outside them (p.50 / p.60: gusset in-to-in = depth \u002B fills).",
+            "Source": "p.47"
+          },
+          {
+            "Name": "14 WF 142 (C)",
+            "Kind": "Rolled",
+            "Label": "14 WF 142 (41.85 sq.in.)",
+            "Material": "C",
+            "WebDepth": 0,
+            "WebPlies": [],
+            "WebsOutToOut": 0,
+            "WebsBackToBack": 0,
+            "Angle": "",
+            "AngleLegOnWeb": 0,
+            "AngleLegOut": 0,
+            "AngleThickness": 0,
+            "AnglesOutside": false,
+            "AngleEdges": "both",
+            "AngleProjection": 0,
+            "TopPlates": [],
+            "BottomPlates": [],
+            "Lacing": null,
+            "WebVertical": false,
+            "Channel": "",
+            "BackToBack": 0,
+            "FlangesOut": false,
+            "AngleCount": 2,
+            "Designation": "14 WF 142",
+            "Depth": 0.3753664102564102,
+            "FlangeWidth": 0.38927128205128203,
+            "WebThickness": 0.017078243589743587,
+            "FlangeThickness": 0.027353846153846156,
+            "WeightLbPerFt": 142.29,
+            "Rotated": true,
+            "Width": 0,
+            "Diameter": 0,
+            "WorkingLineOffset": 0,
+            "Unresolved": "UNRESOLVED (p.47): rolled shape 14 WF 142 (1954 series) dimensions - the sheets print the designation and the gross area 41.85 sq.in., not d / bf / tw / tf, and the 1954 series differs from AISC v16. d / bf / tw / tf interpolated by area between AISC W14x132 and W14x145, weight 3.4 lb/ft per sq.in.; flanges in planes parallel to the truss plane with the gusset pairs outside them (p.50 / p.60: gusset in-to-in = depth \u002B fills).",
             "Source": "p.47"
           },
           {
@@ -176662,7 +176959,7 @@
             "From": "U0",
             "To": "U1",
             "Plane": "",
-            "Section": "14 WF 87",
+            "Section": "14 WF 87 (C)",
             "Role": "UpperChord",
             "Panel": "Panel 0-1",
             "System": "",
@@ -176678,7 +176975,7 @@
             "From": "U1\u0027",
             "To": "U0\u0027",
             "Plane": "",
-            "Section": "14 WF 87",
+            "Section": "14 WF 87 (C)",
             "Role": "UpperChord",
             "Panel": "Panel 1\u0027-0\u0027",
             "System": "",
@@ -176822,7 +177119,7 @@
             "From": "U9",
             "To": "U11",
             "Plane": "",
-            "Section": "14 WF 87",
+            "Section": "14 WF 87 (C)",
             "Role": "UpperChord",
             "Panel": "Panel 9-11",
             "System": "",
@@ -176838,7 +177135,7 @@
             "From": "U11\u0027",
             "To": "U9\u0027",
             "Plane": "",
-            "Section": "14 WF 87",
+            "Section": "14 WF 87 (C)",
             "Role": "UpperChord",
             "Panel": "Panel 11\u0027-9\u0027",
             "System": "",
@@ -176998,7 +177295,7 @@
             "From": "L8",
             "To": "L10",
             "Plane": "",
-            "Section": "14 WF 142",
+            "Section": "14 WF 142 (S)",
             "Role": "LowerChord",
             "Panel": "Panel 8-10",
             "System": "",
@@ -177014,7 +177311,7 @@
             "From": "L10\u0027",
             "To": "L8\u0027",
             "Plane": "",
-            "Section": "14 WF 142",
+            "Section": "14 WF 142 (S)",
             "Role": "LowerChord",
             "Panel": "Panel 10\u0027-8\u0027",
             "System": "",
@@ -177030,7 +177327,7 @@
             "From": "L10",
             "To": "L12",
             "Plane": "",
-            "Section": "14 WF 87",
+            "Section": "14 WF 87 (S)",
             "Role": "LowerChord",
             "Panel": "Panel 10-12",
             "System": "",
@@ -177046,7 +177343,7 @@
             "From": "L12",
             "To": "L10\u0027",
             "Plane": "",
-            "Section": "14 WF 87",
+            "Section": "14 WF 87 (S)",
             "Role": "LowerChord",
             "Panel": "Panel 12-10\u0027",
             "System": "",
@@ -177094,7 +177391,7 @@
             "From": "L2",
             "To": "U3",
             "Plane": "",
-            "Section": "14 WF 142",
+            "Section": "14 WF 142 (C)",
             "Role": "Diagonal",
             "Panel": "Panel 2-3",
             "System": "",
@@ -177110,7 +177407,7 @@
             "From": "U3",
             "To": "L4",
             "Plane": "",
-            "Section": "14 WF 142",
+            "Section": "14 WF 142 (C)",
             "Role": "Diagonal",
             "Panel": "Panel 3-4",
             "System": "",
@@ -177126,7 +177423,7 @@
             "From": "L4",
             "To": "U5",
             "Plane": "",
-            "Section": "14 WF 87",
+            "Section": "14 WF 87 (S)",
             "Role": "Diagonal",
             "Panel": "Panel 4-5",
             "System": "",
@@ -177206,7 +177503,7 @@
             "From": "U9",
             "To": "L10",
             "Plane": "",
-            "Section": "14 WF 142",
+            "Section": "14 WF 142 (S)",
             "Role": "Diagonal",
             "Panel": "Panel 9-10",
             "System": "",
@@ -177238,7 +177535,7 @@
             "From": "U11",
             "To": "L12",
             "Plane": "",
-            "Section": "14 WF 142",
+            "Section": "14 WF 142 (C)",
             "Role": "Diagonal",
             "Panel": "Panel 11-12",
             "System": "",
@@ -177254,7 +177551,7 @@
             "From": "L12",
             "To": "U11\u0027",
             "Plane": "",
-            "Section": "14 WF 142",
+            "Section": "14 WF 142 (C)",
             "Role": "Diagonal",
             "Panel": "Panel 12-11\u0027",
             "System": "",
@@ -177286,7 +177583,7 @@
             "From": "L10\u0027",
             "To": "U9\u0027",
             "Plane": "",
-            "Section": "14 WF 142",
+            "Section": "14 WF 142 (S)",
             "Role": "Diagonal",
             "Panel": "Panel 10\u0027-9\u0027",
             "System": "",
@@ -177366,7 +177663,7 @@
             "From": "U5\u0027",
             "To": "L4\u0027",
             "Plane": "",
-            "Section": "14 WF 87",
+            "Section": "14 WF 87 (S)",
             "Role": "Diagonal",
             "Panel": "Panel 5\u0027-4\u0027",
             "System": "",
@@ -177382,7 +177679,7 @@
             "From": "L4\u0027",
             "To": "U3\u0027",
             "Plane": "",
-            "Section": "14 WF 142",
+            "Section": "14 WF 142 (C)",
             "Role": "Diagonal",
             "Panel": "Panel 4\u0027-3\u0027",
             "System": "",
@@ -177398,7 +177695,7 @@
             "From": "U3\u0027",
             "To": "L2\u0027",
             "Plane": "",
-            "Section": "14 WF 142",
+            "Section": "14 WF 142 (C)",
             "Role": "Diagonal",
             "Panel": "Panel 3\u0027-2\u0027",
             "System": "",
