@@ -240,6 +240,46 @@ public class TrussTests : IDisposable
     }
 
     [Fact]
+    public void EndChordExtension_CoversTheShoe_TaperedMember()
+    {
+        // default: the end chords are cut square at L0 / L6 -> the shoe tops (4 1/2 in. each side of the pin) project past them: CHECK warnings
+        var (p, b) = Model();
+        b.Truss!.Joints.Add(new TrussJointDefinition { Point = "L0", GussetThickness = In(0.5) });   // envelope gusset at the end joint
+        var bm = Regen(p);
+        Assert.Contains(bm.Steel!.Diagnostics, d => d.Message.Contains("CHECK shoe N-L0") && d.Message.Contains("beyond the end of chord N-L0-L1"));
+        Assert.Contains(bm.Steel!.Diagnostics, d => d.Message.Contains("CHECK shoe N-L6") && d.Message.Contains("beyond the end of chord N-L5-L6"));
+        var al = bm.Framing.Alignment;
+        double MinSta(SteelPart q) => q.Mesh.Positions.Min(v => al.Inverse(v.XY).Station);
+        double s0 = Ft(100);
+        Assert.Equal(s0, MinSta(bm.Steel.Parts.First(x => x.Mark == "N-L0-L1")), 4);
+        double gussetBefore = MinSta(bm.Steel.Parts.First(x => x.Mark == "N-GL0-L"));
+
+        // chord ends extended 12 in. past the end points (negative setbacks): no CHECK, the chord and the envelope gusset reach 12 in. before L0
+        b.Truss!.Members.First(m => m.Name == "L0-L1").StartSetback = -In(12);
+        b.Truss.Members.First(m => m.Name == "L5-L6").EndSetback = -In(12);
+        // tapered member: floor beam FB2 loses 10 in. of depth at its S end (bottom raised, top straight)
+        b.Truss.Members.First(m => m.Name == "FB2").DepthReductionEnd = In(10);
+        bm = Regen(p);
+        Assert.DoesNotContain(bm.Steel!.Diagnostics, d => d.Message.Contains("beyond the end of chord"));
+        Assert.Equal(s0 - In(12), MinSta(bm.Steel.Parts.First(x => x.Mark == "N-L0-L1")), 4);
+        Assert.True(MinSta(bm.Steel.Parts.First(x => x.Mark == "N-GL0-L")) < Math.Min(gussetBefore, s0 - In(12)) + 1e-6);
+        var fb = bm.Steel.Parts.First(x => x.Mark == "FB2");
+        var pts = fb.Mesh.Positions.Select(v => (o: al.Inverse(v.XY).Offset, z: v.Z)).ToList();
+        double oMin = pts.Min(q => q.o), oMax = pts.Max(q => q.o);
+        double DepthNear(double o) { var s = pts.Where(q => Math.Abs(q.o - o) < 1e-3).ToList(); return s.Max(q => q.z) - s.Min(q => q.z); }
+        double d0 = DepthNear(oMin), d1 = DepthNear(oMax);
+        Assert.Equal(In(10), d0 - d1, 4);
+        Assert.Equal(pts.Where(q => Math.Abs(q.o - oMin) < 1e-3).Max(q => q.z), pts.Where(q => Math.Abs(q.o - oMax) < 1e-3).Max(q => q.z), 6);   // top straight
+        Assert.Contains(bm.Steel.Diagnostics, d => d.Message.Contains("tapered members"));
+        // round trip keeps the new inputs; defaults are omitted from the file
+        string json = p.ToJson();
+        var back = BridgeProject.FromJson(json).Bridges[0].Truss!;
+        Assert.Equal(In(10), back.Members.First(m => m.Name == "FB2").DepthReductionEnd, 9);
+        Assert.Equal(-In(12), back.Members.First(m => m.Name == "L0-L1").StartSetback!.Value, 9);
+        Assert.DoesNotContain("DepthReductionStart", json);
+    }
+
+    [Fact]
     public void Ifc_WritesTrussEntities_AndDatabaseGroups()
     {
         var (p, _) = Model();

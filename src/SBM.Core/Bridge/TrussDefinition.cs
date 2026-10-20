@@ -260,6 +260,14 @@ public sealed class TrussMemberDefinition
     /// members: where they leave the chord envelope; cross-plane members: at the in-plane members' outer face).</summary>
     public double? StartSetback { get; set; }
     public double? EndSetback { get; set; }
+    /// <summary>OPTIONAL (0 = none, omitted from the .sbm): TAPERED member (e.g. a floor beam bracket whose bottom flange slopes up toward the tip):
+    /// the part of the section BELOW its axis (section y &lt; 0: lower web, bottom angles, bottom plates) is raised by this amount at the START cut end
+    /// of the member (m), linear to <see cref="DepthReductionEnd"/> at the end cut; the top stays straight. Lacing, stiffeners and rivet lines are not tapered.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public double DepthReductionStart { get; set; }
+    /// <summary>OPTIONAL (0 = none): depth reduction at the END cut (see <see cref="DepthReductionStart"/>).</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public double DepthReductionEnd { get; set; }
     /// <summary>Shift of the working line along the section y (e.g. floor beam axis below the panel point).</summary>
     public double OffsetZ { get; set; }
     /// <summary>Plan member length (check only, m; 0 = none).</summary>

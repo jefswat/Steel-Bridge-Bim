@@ -319,15 +319,22 @@ public static class TrussGenerator
             var a0 = m.A + m.Axis * m.SA + m.Y * m.Def.OffsetZ;
             double cut = len - m.SA - m.SB;
             var mesh = new Mesh();
+            // tapered member (brackets): the part of the section below its axis rises by DepthReductionStart / End at the cut ends, linear in between
+            double rA = Math.Max(0, m.Def.DepthReductionStart), rB = Math.Max(0, m.Def.DepthReductionEnd);
+            bool taper = (rA > 0 || rB > 0) && cut > 1e-6;
+            double Rise(double t) => rA + (rB - rA) * Math.Clamp(t / cut, 0, 1);
             foreach (var pc in m.Sec.Pieces)
             {
                 // partial-length plate: centred on the member (+ Offset), clipped to the member
                 double pl = pc.Length > 0 ? Math.Min(pc.Length, cut) : cut;
                 double ps = pc.Length > 0 ? Math.Clamp(cut / 2 + pc.Offset - pl / 2, 0, cut - pl) : 0;
-                var ringA = pc.Polygon.Select(q => a0 + m.Axis * ps + m.X * q.X + m.Y * q.Y).ToArray();
-                var ringB = ringA.Select(p => p + m.Axis * pl).ToArray();
+                var ringA = pc.Polygon.Select(q => a0 + m.Axis * ps + m.X * q.X + m.Y * (q.Y + (taper && q.Y < 0 ? Rise(ps) : 0))).ToArray();
+                var ringB = taper
+                    ? pc.Polygon.Select(q => a0 + m.Axis * (ps + pl) + m.X * q.X + m.Y * (q.Y + (q.Y < 0 ? Rise(ps + pl) : 0))).ToArray()
+                    : ringA.Select(p => p + m.Axis * pl).ToArray();
                 MeshBuilder.AddLoft(mesh, pc.Polygon, new[] { ringA, ringB });
             }
+            if (taper) Info($"Truss: tapered members ({m.Sec.Definition.Name}): depth reduced by {L(rA)} at the start and {L(rB)} at the end (bottom part raised, top straight){(m.Def.Source.Length > 0 ? " (" + m.Def.Source + ")" : "")}.");
             foreach (var lf in m.Sec.Lacing) Lacing(mesh, m, a0, cut, lf);
             if (m.Def.RivetLines is { Count: > 0 }) MemberRivetLines(m, a0, cut);
             Assumption? asu = null;
@@ -490,7 +497,11 @@ public static class TrussGenerator
                     double lap = jd.Lap > 0 ? jd.Lap : Math.Max(m.Sec.Depth, In(18));
                     foreach (var d1 in through ? new[] { m.Axis, -m.Axis } : new[] { Away(m, start) })
                     {
-                        double t0 = IsChord(m.Def.Role) ? 0 : Math.Max(0, start ? m.SA : m.SB);
+                        // chords from the point (a chord ending here and extended past it by a negative setback: from its end, the gusset covers the extension)
+                        // END chord: no other chord (or end post) leaves the point backward (a continuing chord would close the joint)
+                        bool endChord = IsChord(m.Def.Role) && !through && !here.Any(o => o != m && IsChord(o.Def.Role)
+                            && (Through(pl, pt).Contains(o) || Vec3.Dot(Away(o, StartsAt(o, pl, pt)), d1) < 0));
+                        double t0 = IsChord(m.Def.Role) ? (endChord ? Math.Min(0, start ? m.SA : m.SB) : 0) : Math.Max(0, start ? m.SA : m.SB);
                         foreach (double t in new[] { t0, t0 + lap })
                             foreach (double y in new[] { m.Sec.YMin - margin, m.Sec.YMax + margin })
                             {
@@ -1163,10 +1174,49 @@ public static class TrussGenerator
                 Model.Steel.Parts.Add(new SteelPart { Mark = $"{asm}-PIN", Category = PartCategory.TrussPin, Assembly = asm, Description = $"shoe pin {TrussSections.FormatIn(s.PinDiameter)} x {TrussSections.FormatIn(plen)}", Mesh = pm, Material = "Forged steel (pin)", Length = plen, Assumption = asu });
             }
             if (pieces) Info($"Truss: shoe {s.Name} built of {s.Pieces!.Count} drawn pieces ({s.Source}).");
+            // CHECK: the top of the shoe (sole plate / body top) must lie under the chord; at an END joint the chord stops where its setback says
+            var soles = pieces ? s.Pieces!.Where(q => q.Kind == TrussShoePieceKind.Sole).ToList() : null;
+            if (!pieces) CheckShoeUnderChordEnd(s, pl, pt, pin, u, -topHalf, topHalf);
+            else if (soles!.Count > 0)
+            {
+                double lo = double.MaxValue, hi = double.MinValue;
+                foreach (var q in soles)
+                {
+                    IEnumerable<double> xs = q.Axis == TrussShoePieceAxis.Along ? new[] { q.From, q.To }
+                        : q.CircleDiameter > 0 ? new[] { q.CircleX - q.CircleDiameter / 2, q.CircleX + q.CircleDiameter / 2 } : q.Profile.Select(p => p.U);
+                    var sh = q.Axis == TrussShoePieceAxis.Along ? q.ShiftsSweep : q.ShiftsProfileX;
+                    foreach (var x in xs)
+                        foreach (var d in sh.Count > 0 ? sh : new List<double> { 0 })
+                            foreach (int mu in q.MirrorU ? new[] { 1, -1 } : new[] { 1 }) { lo = Math.Min(lo, mu * (x + d)); hi = Math.Max(hi, mu * (x + d)); }
+                }
+                CheckShoeUnderChordEnd(s, pl, pt, pin, u, lo, hi);
+            }
             Model.BearingNames.Add(s.Name);
             Model.Steel.BearingSeats.Add(new BearingSeat(s.Support, Model.BearingNames.Count - 1, st, bottom, 0, "Truss shoe", s.Type == TrussShoeType.Expansion ? "Expansion" : "Fixed",
                 pin.XY, u.XY, s.MasonryLength, s.MasonryWidth, s.Name));
             Model.Shoes.Add(new TrussShoeResult(s.Name, s.Support, s.Type, pin, bottom, pin.XY));
+        }
+
+        /// <summary>CHECK at an END joint (all in-plane chords leave the point to the same side): the shoe top from <paramref name="uLo"/> to
+        /// <paramref name="uHi"/> (along u from the pin) should not project more than 1 in. beyond the chord end; the extension of a chord past its end point is an
+        /// input (negative setback). Reported, never adjusted.</summary>
+        private void CheckShoeUnderChordEnd(TrussShoeDefinition s, string pl, string pt, Vec3 pin, Vec3 u, double uLo, double uHi)
+        {
+            if (Through(pl, pt).Any()) return;
+            var ends = At(pl, pt).Where(i => IsChord(i.Def.Role) && !IsCrossPlane(i.Def.Role) && i.Plane.Equals(pl, StringComparison.OrdinalIgnoreCase))
+                .Select(c =>
+                {
+                    bool st = StartsAt(c, pl, pt);
+                    var end = st ? c.A + c.Axis * c.SA : c.B - c.Axis * c.SB;
+                    return (c, du: Vec3.Dot(Away(c, st), u), uEnd: Vec3.Dot(end - pin, u));
+                }).ToList();
+            if (ends.Count == 0 || ends.Any(e => Math.Abs(e.du) < 0.5 || Math.Sign(e.du) != Math.Sign(ends[0].du))) return;
+            bool ahead = ends[0].du > 0;                                   // the chords run up-station from the joint: the open end is behind
+            var near = ahead ? ends.MinBy(e => e.uEnd) : ends.MaxBy(e => e.uEnd);
+            double over = ahead ? near.uEnd - uLo : uHi - near.uEnd;
+            if (over > In(1))
+                Warn($"Truss CHECK shoe {s.Name} ({pt}): the top of the shoe projects {L(over)} beyond the end of chord {near.c.Mark}, which ends {L(Math.Abs(near.uEnd))} " +
+                     $"{((ahead ? near.uEnd < 0 : near.uEnd > 0) ? "past" : "short of")} the pin - give the chord end extension past the end point (negative setback) from the joint sheet{(s.Source.Length > 0 ? " (" + s.Source + ")" : "")}.");
         }
 
         /// <summary>Shoe pieces as drawn (<see cref="TrussShoeDefinition.Pieces"/>) in the shoe frame (origin pin, u along, n across, z up).</summary>
