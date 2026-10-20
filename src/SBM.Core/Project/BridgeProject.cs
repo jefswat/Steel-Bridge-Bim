@@ -24,10 +24,25 @@ public sealed class BridgeProject
     /// e.g. 1 / surface adjustment factor for TxDOT surface coordinates).</summary>
     public GeoreferenceDefinition? Georeference { get; set; }
 
-    /// <summary>Resolves a reference path (relative paths are relative to the project file's folder).</summary>
-    public static string ResolvePath(string path, string? projectFile) =>
-        System.IO.Path.IsPathRooted(path) || projectFile == null ? path
-            : System.IO.Path.GetFullPath(System.IO.Path.Combine(System.IO.Path.GetDirectoryName(projectFile)!, path));
+    /// <summary>Resolves a reference path (relative paths are relative to the project file's folder). An absolute path that does not exist
+    /// (a model saved on another machine or in the sandbox, e.g. C:\SBM\dist\terrain\...) is looked up again under the project file's folders:
+    /// for each ancestor folder of the project file, the trailing parts of the stored path (shortest first: "x.flt", "ptc\x.flt", ...,
+    /// "dist\terrain\ptc\x.flt") are tried; the first file that exists wins. Otherwise the stored path is returned unchanged.</summary>
+    public static string ResolvePath(string path, string? projectFile)
+    {
+        if (string.IsNullOrWhiteSpace(path) || projectFile == null) return path;
+        string dir = System.IO.Path.GetDirectoryName(System.IO.Path.GetFullPath(projectFile))!;
+        if (!System.IO.Path.IsPathRooted(path)) return System.IO.Path.GetFullPath(System.IO.Path.Combine(dir, path));
+        if (System.IO.File.Exists(path)) return path;
+        var parts = path.Split('\\', '/').Where(p => p.Length > 0).ToArray();
+        for (var d = new System.IO.DirectoryInfo(dir); d != null; d = d.Parent)
+            for (int k = parts.Length - 1; k >= 1; k--)   // k = first kept part; parts[0] is the drive / root
+            {
+                string candidate = System.IO.Path.Combine(d.FullName, System.IO.Path.Combine(parts[k..]));
+                if (System.IO.File.Exists(candidate)) return candidate;
+            }
+        return path;
+    }
 
     public Alignment? FindAlignment(string name) =>
         Alignments.FirstOrDefault(a => string.Equals(a.Name, name, StringComparison.OrdinalIgnoreCase)) ?? Alignments.FirstOrDefault();
