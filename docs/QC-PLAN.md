@@ -44,7 +44,24 @@ The checker uses the program read-only, through the CLI. All of the following pr
 | `--snapshot --closeup / --camera / --section` | exists | images for the report and visual review |
 | `sbm section <model> --station STA [--offset o] [--normal-to alignment\|girder:G\|member:M\|plumb] [--skew deg] \| --plane x,y,z,nx,ny,nz [--width/--height] [--dims] --svg/--dxf/--csv/--json` | **exists** (2026-10-19) | true section through every solid (`MeshSection`), plane normal = alignment / girder tangent incl. grade or member axis (not plumb), drawn in the plane's own u/v, loops per element with GlobalId, bars crossing as dots (mark, size, clear cover), bars in the plane as polylines; `--dims` = element extents and clear distances |
 | `sbm measure <model> --part / --assembly / --member --at / --distance / --point / --station / --bar / --cover / --spacing / --laps` [--json] [--svg] [--batch]` | **exists** (2026-10-19) | plates flattened into their own plane (thickness, outline, angles, clips / copes, holes, bolt pattern along its own axes, edge distances perpendicular to the edges); assemblies collapsed into their planes (stack, fillers, joint gaps, bolts per side); min distance / overlap; point query; bar bends / hooks / developed length, clear cover per face type, spacing chains "n spa @ s", laps / stagger. Read-only, never saves (docs/API.md) |
+| `python -I tools/pdf_dims.py <pdf> --page N [--clip x0,y0,x1,y1] [--near x,y] [--words RE] [--kind k,..] [--leaders] [--json f] [--png overlay.png]` | exists | **plan dimension / fraction reader**: every dimension-like string on a page with its decoded value (feet-inch-fraction, inches, decimals, stations, elevations, angles, counts `6 SPA. @ 22'-6 = 135'-0` with arithmetic check, plates `PL 1 1/4" x 21"`, bar marks, scale), bbox, rotation, confidence; reassembles the stacked / diagonal fraction glyphs that text extraction loses (the ~40 % intake cost in the ODOT pilot). `--leaders` adds the measured end points from the dimension line. Plan intake: run it per sheet region instead of reading fractions off crops. |
+| `python -I tools/pdf_dims.py --selftest [--verbose]` | exists | accuracy check against the hand-made truth set `tools/pdf_dims_truth.json` (11 pages, 878 dimensions, 396 with fractions); rerun after any change to the reader |
 | `sbm qc plan / record / report / issues` | **new** | check list, results into the database, report, issue round trip |
+
+`pdf_dims.py` accuracy on the truth set (exact string match per dimension, clipped regions of each page):
+
+| PDF / page | text kind | dims | recall | precision | fractions exact |
+|---|---|---|---|---|---|
+| ODOT Vol 2 Phase 2B p.273 / 278 / 282 / 289 | plotted stroke font, hidden text | 67 / 96 / 79 / 29 | 100 % | 100 % | 38/38, 66/66, 54/54, 14/14 |
+| ODOT Vol 2 Phase 2B p.284 | same | 98 | 96.9 % | 94.1 % | 49/52 (3 counts split by an adjacent dimension) |
+| Nebraska Ramp B Design 116 p.27 / 28 / 31 / 32 | same, fractions stacked | 98 / 51 / 87 / 62 | 100 % | 98-100 % | 39/39, 14/14, 60/60, 44/44 |
+| NHT 0047-07-228 p.148 (cable fin table) | no text layer, filled outline font | 192 decimals | 100 % | 100 % | n/a (decimals) |
+| NHT 0047-07-228 p.124 (knuckle plan) | no text layer, tilted text | 19 | 37 % | 33 % | 7/15 |
+
+Known limits: text drawn tilted (not 0 / 90 / 270 deg) in outline fonts, outline fonts other than the HNTB / TxDOT one (needs glyph
+labels in `tools/pdf_dims_glyphs.json`), raster scans (reported "raster/vector text, OCR needed"), title block dates `11/16` look like
+fractions (conf 0.6), a count whose "= total" is on a line shared with another dimension, `--leaders` when the text sits outside its arrows.
+Treat conf < 1 and every `vector` result as "check against the crop"; counts carry an arithmetic check (`parts.check`).
 
 **Results go into the companion database (G1 / G9 tables):**
 - Today the `qc` table holds one status per (element, sheet).
