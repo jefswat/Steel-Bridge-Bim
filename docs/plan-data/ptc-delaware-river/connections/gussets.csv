@@ -51,3 +51,6 @@ main,L8,vertical U8-L8 (bottom group),1,2,,1.125,,0,16,16,"",77,low,"image-count
 main,L8,diagonal L8-U9 (right),1,2,,1.125,,11,31,42,"",77,low,"image-counted"
 main,L9,lower chord web field (L8-L9 / L9-L10),0.625,2,30.5,1.25,6,86,104,190,"image-counted",77,medium,"2-5/8 Gussets (2'-6 1/2 in. to in.)"
 main,L9,vertical U9-L9 (bottom group),0.625,2,,1.125,,7,25,32,"2-Ls 4x3 1/2 x 7/16 member beside",77,low,"image-counted"
+main,U10,chord web field (U9-U10 / U10-U11),0.75,2,30,1.25,8,102,109,211,"2'-7 1/4 in. to in. Gussets; 2'-5 out to out webs; 2'-10 1/2 b.-to-b. Ls",78,medium,"2-3/4 Gussets; sheet 38 notes: chord webs 1 1/4 in; cover splices 1 1/8 in; web members and stiffener Ls 1 1/8 in; stitch 1 in carbon; manholes 12x20 at 4'-0 c/c in web members"
+main,U10,vertical U10-L10 (top group),0.75,2,,1.125,,16,24,40,"2'-6 min.; 2-Fills 26x1/16 (C) at the vertical; 5 in rad half holes",78,low,"image-counted"
+main,L10,whole joint: lower chord web field + diagonals U9-L10 and L10-U11 + angle member 4x3 1/2x7/8 (C),,2,29,1.125,,134,238,372,"gusset thickness callouts 2-3/4 and 2-1/2 (as joints.csv); 2'-5 in. to in. Gussets at the flange; diagonal groups 2'-6 min.",78,low,"cluster total; chord field not separated from the diagonals"
