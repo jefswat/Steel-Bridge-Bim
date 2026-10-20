@@ -270,6 +270,9 @@ public sealed class TrussMemberDefinition
     /// (riveted plate girders, floor beams; <see cref="TrussStiffenerSet"/>).</summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public List<TrussStiffenerSet>? Stiffeners { get; set; }
+    /// <summary>OPTIONAL (null = none, omitted from the .sbm): rivet lines along the member (<see cref="TrussRivetLine"/>).</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public List<TrussRivetLine>? RivetLines { get; set; }
 }
 
 /// <summary>
@@ -443,6 +446,48 @@ public sealed class TrussRivetGroup
     public double Gage { get; set; }
     public double FirstFromEnd { get; set; }
     public double Diameter { get; set; }
+    public string Source { get; set; } = "";
+    /// <summary>OPTIONAL (omitted when false): the plans print the COUNT but no pitch / gage: <see cref="Count"/> rivets per gusset face are spread evenly
+    /// over the lap area the gusset shares with the member (gusset outline clipped to the member band: web depth of a box / the in-plane extent of
+    /// other sections, inset <see cref="EdgeDistance"/>), square grid along the member axis, nearest the member end first; <see cref="Pitch"/> /
+    /// <see cref="Gage"/> / <see cref="Rows"/> are ignored. A grid tighter than 3 diameters is reported (CHECK). <see cref="Member"/> "*" = a whole-joint
+    /// count: split over every member at the joint in proportion to its lap area.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public bool Distributed { get; set; }
+    /// <summary>OPTIONAL edge distance of distributed rivets from the member band and gusset edges (m; 0 = 1.5 diameters).</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public double EdgeDistance { get; set; }
+    /// <summary>OPTIONAL rivet material text (e.g. "1 1/8 in H.S. rivet steel"); null = a generic rivet steel text.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? Material { get; set; }
+    /// <summary>OPTIONAL open item of the group (UNRESOLVED text, page + reason): carried by every rivet as a dimension-only flag (IFC SBM_Status, database
+    /// status) and raised once as a warning.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? Unresolved { get; set; }
+}
+
+/// <summary>
+/// Line of rivets along a member (OPTIONAL <see cref="TrussMemberDefinition.RivetLines"/>; riveted plate girders: flange angles to the web, cover plates
+/// to the angles). The shank line is parallel to section axis <see cref="Along"/> ("x" across, "y" up) through the section point (<see cref="X"/>,
+/// <see cref="Y"/>); at each rivet station the grip is the CONNECTED stack of section pieces present there (partial-length cover plates included)
+/// that contains that point, the head at the + end when <see cref="HeadPositive"/>. Rivets every <see cref="Pitch"/> from <see cref="FirstFromEnd"/>
+/// after the member start to the same distance before its end, shifted by <see cref="Stagger"/> (staggered gage lines).
+/// </summary>
+public sealed class TrussRivetLine
+{
+    public string Label { get; set; } = "";
+    public double X { get; set; }
+    public double Y { get; set; }
+    /// <summary>"x" or "y": section axis the shank is parallel to.</summary>
+    public string Along { get; set; } = "x";
+    public bool HeadPositive { get; set; } = true;
+    public double Pitch { get; set; }
+    public double FirstFromEnd { get; set; }
+    public double Stagger { get; set; }
+    public double Diameter { get; set; }
+    public string? Material { get; set; }
+    /// <summary>UNRESOLVED text (e.g. "rule-based positions"): dimension-only flag on every rivet, warning once.</summary>
+    public string? Unresolved { get; set; }
     public string Source { get; set; } = "";
 }
 

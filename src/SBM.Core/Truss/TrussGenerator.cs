@@ -71,6 +71,9 @@ public static class TrussGenerator
         private readonly Dictionary<string, TrussBuiltSection> _sec = new(StringComparer.OrdinalIgnoreCase);
         private readonly List<Inst> _inst = new();
         private readonly HashSet<string> _warned = new();
+        private sealed record JointCtx(string Plane, string Point, List<Inst> Here, TrussJointDefinition Def, double X, double Tg, Vec3 P, Vec3 U, Vec3 V, Vec3 N, List<Vec2> Outline, string Asm);
+        private readonly List<JointCtx> _jointRivets = new();
+        private readonly List<(string plane, string point, Vec3 P, Vec3 ax, Vec3 yv, double a0, double a1, double y0, double y1, double t)> _insidePlates = new();
 
         public Gen(BridgeFraming f, UnitSystem u) { _f = f; _b = f.Definition; _d = f.Definition.Truss!; _al = f.Alignment; _u = u; }
 
@@ -122,6 +125,7 @@ public static class TrussGenerator
             foreach (var m in _inst) BuildMember(m);
             BuildJoints();
             BuildJointPlates();
+            PlaceJointRivets();
             if (_d.Floor != null) BuildFloor(_d.Floor);
             if (_d.LineItems != null) foreach (var li in _d.LineItems) BuildLineItem(li);
             foreach (var s in _d.Suspenders) BuildSuspender(s);
@@ -523,39 +527,276 @@ public static class TrussGenerator
             }
             foreach (var m in here.Where(i => i.Sec.HalfWidth > X + 1e-4))
                 Warn($"Truss CHECK joint {pt} ({pl}): member {m.Mark} is {L(2 * m.Sec.HalfWidth)} wide, more than the gusset inside distance {L(2 * X)} - it overlaps the gusset plates.");
-            if (jdef != null) foreach (var rg in jdef.Rivets) Rivets(pl, pt, here, rg, X, tg, n, asmMark);
+            if (jdef is { Rivets.Count: > 0 }) _jointRivets.Add(new JointCtx(pl, pt, here, jdef, X, tg, P, u, v, n, outline, asmMark));
         }
 
-        private void Rivets(string pl, string pt, List<Inst> here, TrussRivetGroup rg, double X, double tg, Vec3 n, string asm)
+        // ------------------------------------------------------------------ rivets (joint groups after the joint plates: the grip includes the inside splice plates)
+        private static double Grip16(double g) { double q = In(1.0 / 16); return Math.Max(q, Math.Round(g / q) * q); }
+
+        private readonly Dictionary<string, Assumption> _rivetFlags = new();
+        private Assumption? RivetFlag(string? text, string basis)
         {
-            var m = here.FirstOrDefault(i => i.Def.Name.Equals(rg.Member, StringComparison.OrdinalIgnoreCase) || i.Mark.Equals(rg.Member, StringComparison.OrdinalIgnoreCase));
-            if (m == null) { Warn($"Truss: rivets of joint {pt} ({pl}) - member '{rg.Member}' does not frame into the joint; not placed."); return; }
+            if (string.IsNullOrWhiteSpace(text)) return null;
+            if (!_rivetFlags.TryGetValue(text + "|" + basis, out var a)) { a = Assumption.UnresolvedDimension(text, basis); _rivetFlags[text + "|" + basis] = a; Warn(text); }
+            return a;
+        }
+
+        /// <summary>Rivet with its factory head on the face at <paramref name="origin"/>, shank along <paramref name="z"/> through <paramref name="grip"/>.</summary>
+        private void AddRivet(Vec3 origin, Vec3 z, Vec3 xHint, double grip, double dia, string asm, string? material, Assumption? asu)
+        {
+            var zz = z.Normalized();
+            var xx = xHint - zz * Vec3.Dot(xHint, zz);
+            if (xx.Length < 1e-9) xx = Vec3.Cross(zz, Math.Abs(zz.Z) < 0.9 ? Up : new Vec3(1, 0, 0));
+            xx = xx.Normalized();
+            var yy = Vec3.Cross(zz, xx).Normalized();
+            double g = Grip16(grip);
+            Model.Steel.Bolts.Add(new BoltInstance { Frame = new Frame3(origin, xx, yy, zz), Grip = g, Length = g, Assembly = asm, Kind = BoltKind.Rivet, Diameter = dia, Material = material, Assumption = asu });
+        }
+
+        private void PlaceJointRivets()
+        {
+            foreach (var c in _jointRivets)
+            {
+                // whole-joint counts first need every member's lap area
+                foreach (var rg in c.Def.Rivets)
+                {
+                    if (rg.Member == "*") { WholeJointRivets(c, rg); continue; }
+                    var m = c.Here.FirstOrDefault(i => i.Def.Name.Equals(rg.Member, StringComparison.OrdinalIgnoreCase) || i.Mark.Equals(rg.Member, StringComparison.OrdinalIgnoreCase));
+                    if (m == null) { Warn($"Truss: rivets of joint {c.Point} ({c.Plane}) - member '{rg.Member}' does not frame into the joint; not placed."); continue; }
+                    if (rg.Distributed) DistributedRivets(c, m, rg, rg.Count); else PitchRivets(c, m, rg);
+                }
+            }
+        }
+
+        private void PitchRivets(JointCtx c, Inst m, TrussRivetGroup rg)
+        {
             double dia = rg.Diameter > 0 ? rg.Diameter : _d.JointDefaults.RivetDiameter;
-            if (dia <= 0 || rg.Count <= 0 || rg.Pitch <= 0) { Warn($"Truss: rivets of joint {pt} member {rg.Member} - diameter / count / pitch missing; not placed."); return; }
-            bool start = StartsAt(m, pl, pt);
+            if (dia <= 0 || rg.Count <= 0 || rg.Pitch <= 0) { Warn($"Truss: rivets of joint {c.Point} member {rg.Member} - diameter / count / pitch missing; not placed."); return; }
+            bool start = StartsAt(m, c.Plane, c.Point);
             var d1 = Away(m, start);
-            var P = _pts[(pl.ToUpperInvariant(), pt.ToUpperInvariant())];
             double t0 = start ? m.SA : m.SB;
             int rows = Math.Max(1, rg.Rows), perRow = (int)Math.Ceiling(rg.Count / (double)rows);
-            double grip = tg + m.Sec.OuterPly;
+            var asu = RivetFlag(rg.Unresolved, "rivets at the given pitch / gage from the member end");
             int placed = 0;
             foreach (int side in new[] { -1, 1 })
             {
-                int c = 0;
+                int k0 = 0;
                 for (int r = 0; r < rows; r++)
-                    for (int k = 0; k < perRow && c < rg.Count; k++, c++)
+                    for (int k = 0; k < perRow && k0 < rg.Count; k++, k0++)
                     {
                         double y = (r - (rows - 1) / 2.0) * rg.Gage;
-                        var c0 = P + d1 * (t0 + rg.FirstFromEnd + k * rg.Pitch) + m.Y * (y + m.Def.OffsetZ);
-                        var z = n * (-side);
-                        var origin = c0 + n * (side * (X + tg));
-                        var xx = d1;
-                        var yy = Vec3.Cross(z, xx).Normalized();
-                        Model.Steel.Bolts.Add(new BoltInstance { Frame = new Frame3(origin, xx, yy, z), Grip = grip, Length = grip, Assembly = asm, Kind = BoltKind.Rivet, Diameter = dia });
+                        var c0 = c.P + d1 * (t0 + rg.FirstFromEnd + k * rg.Pitch) + m.Y * (y + m.Def.OffsetZ);
+                        AddRivet(c0 + c.N * (side * (c.X + c.Tg)), c.N * (-side), d1, Grip(c, m, c0), dia, c.Asm, rg.Material, asu);
                         placed++;
                     }
             }
-            Info($"Truss: joint {pt} ({pl}) member {m.Mark}: {placed} rivets {TrussSections.FormatIn(dia)} placed{(rg.Source.Length > 0 ? " (" + rg.Source + ")" : "")}.");
+            Info($"Truss: joint {c.Point} ({c.Plane}) member {m.Mark}: {placed} rivets {TrussSections.FormatIn(dia)} placed{(rg.Source.Length > 0 ? " (" + rg.Source + ")" : "")}.");
+        }
+
+        /// <summary>Grip of a joint rivet at <paramref name="at"/> (a point on the joint plane): gusset + everything from the gusset's inner face to the
+        /// member's inner web face (fills, web plies) + inside splice plates over that point.</summary>
+        private double Grip(JointCtx c, Inst m, Vec3 at)
+        {
+            double inner = m.Sec.WebInnerX > 0 ? m.Sec.WebInnerX : c.X - m.Sec.OuterPly;
+            double g = c.Tg + Math.Max(m.Sec.OuterPly, c.X - inner);
+            if (IsChord(m.Def.Role))
+                foreach (var ip in _insidePlates)
+                {
+                    if (ip.plane != c.Plane.ToUpperInvariant() || ip.point != c.Point.ToUpperInvariant()) continue;
+                    var w = at - ip.P;
+                    double a = Vec3.Dot(w, ip.ax), y = Vec3.Dot(w, ip.yv);
+                    if (a >= ip.a0 && a <= ip.a1 && y >= ip.y0 && y <= ip.y1) g += ip.t;
+                }
+            return g;
+        }
+
+        /// <summary>Lap of a member on the gusset in joint (u, v) coordinates: the gusset outline clipped to the member band (both directions for a
+        /// chord passing through the point).</summary>
+        private List<List<Vec2>> LapRegions(JointCtx c, Inst m)
+        {
+            bool start = StartsAt(m, c.Plane, c.Point);
+            bool through = !start && !(m.PlaneB.Equals(c.Plane, StringComparison.OrdinalIgnoreCase) && m.PointB.Equals(c.Point, StringComparison.OrdinalIgnoreCase));
+            double y0, y1;
+            if (m.Sec.WebDepth > 0) { y0 = m.Sec.WebCenterY - m.Sec.WebDepth / 2; y1 = m.Sec.WebCenterY + m.Sec.WebDepth / 2; }
+            else { y0 = m.Sec.YMin; y1 = m.Sec.YMax; }
+            y0 += m.Def.OffsetZ; y1 += m.Def.OffsetZ;
+            var res = new List<List<Vec2>>();
+            foreach (var d1 in through ? new[] { m.Axis, -m.Axis } : new[] { Away(m, start) })
+            {
+                double t0 = through ? 0 : Math.Max(0, start ? m.SA : m.SB), t1 = t0 + 20;
+                Vec2 UV(double t, double y) { var w = d1 * t + m.Y * y; return new Vec2(Vec3.Dot(w, c.U), Vec3.Dot(w, c.V)); }
+                var band = new List<Vec2> { UV(t0, y0), UV(t1, y0), UV(t1, y1), UV(t0, y1) };
+                if (MeshBuilder.SignedArea(band) < 0) band.Reverse();
+                var clip = ClipConvex(c.Outline, band);
+                if (clip.Count >= 3) res.Add(clip);
+            }
+            return res;
+        }
+
+        /// <summary>Sutherland-Hodgman: <paramref name="subject"/> (any simple polygon) clipped by the convex CCW <paramref name="clip"/>.</summary>
+        private static List<Vec2> ClipConvex(List<Vec2> subject, List<Vec2> clip)
+        {
+            var output = new List<Vec2>(subject);
+            for (int i = 0; i < clip.Count && output.Count > 0; i++)
+            {
+                var a = clip[i]; var b = clip[(i + 1) % clip.Count];
+                double Side(Vec2 p) => (b.X - a.X) * (p.Y - a.Y) - (b.Y - a.Y) * (p.X - a.X);
+                var input = output; output = new List<Vec2>();
+                for (int k = 0; k < input.Count; k++)
+                {
+                    var p = input[k]; var q = input[(k + 1) % input.Count];
+                    double sp = Side(p), sq = Side(q);
+                    if (sp >= 0) output.Add(p);
+                    if ((sp >= 0) != (sq >= 0)) { double t = sp / (sp - sq); output.Add(new Vec2(p.X + (q.X - p.X) * t, p.Y + (q.Y - p.Y) * t)); }
+                }
+            }
+            return output;
+        }
+
+        private static bool Inside(List<Vec2> poly, Vec2 p, double edge)
+        {
+            bool inside = false;
+            for (int i = 0, j = poly.Count - 1; i < poly.Count; j = i++)
+            {
+                var a = poly[i]; var b = poly[j];
+                if ((a.Y > p.Y) != (b.Y > p.Y) && p.X < (b.X - a.X) * (p.Y - a.Y) / (b.Y - a.Y) + a.X) inside = !inside;
+            }
+            if (!inside) return false;
+            for (int i = 0, j = poly.Count - 1; i < poly.Count; j = i++)
+            {
+                var a = poly[j]; var b = poly[i]; var ab = b - a;
+                double l2 = ab.X * ab.X + ab.Y * ab.Y;
+                double t = l2 < 1e-18 ? 0 : Math.Clamp(((p.X - a.X) * ab.X + (p.Y - a.Y) * ab.Y) / l2, 0, 1);
+                var q = new Vec2(a.X + ab.X * t - p.X, a.Y + ab.Y * t - p.Y);
+                if (q.X * q.X + q.Y * q.Y < edge * edge * 0.999999) return false;
+            }
+            return true;
+        }
+
+        private void WholeJointRivets(JointCtx c, TrussRivetGroup rg)
+        {
+            var members = c.Here.Where(i => !IsCrossPlane(i.Def.Role)).ToList();
+            var areas = members.Select(m => LapRegions(c, m).Sum(p => Math.Abs(MeshBuilder.SignedArea(p)))).ToList();
+            double tot = areas.Sum();
+            if (tot <= 0 || rg.Count <= 0) { Warn($"Truss: whole-joint rivets of joint {c.Point} ({c.Plane}) - no member lap on the gusset; not placed."); return; }
+            // largest remainder split of the count by lap area (deterministic: ties by member order)
+            var share = areas.Select(a => rg.Count * a / tot).ToList();
+            var n = share.Select(x => (int)Math.Floor(x)).ToList();
+            int left = rg.Count - n.Sum();
+            foreach (int i in Enumerable.Range(0, members.Count).OrderByDescending(i => share[i] - n[i]).ThenBy(i => i).Take(left)) n[i]++;
+            for (int i = 0; i < members.Count; i++) if (n[i] > 0) DistributedRivets(c, members[i], rg, n[i]);
+        }
+
+        private void DistributedRivets(JointCtx c, Inst m, TrussRivetGroup rg, int count)
+        {
+            double dia = rg.Diameter > 0 ? rg.Diameter : _d.JointDefaults.RivetDiameter;
+            if (dia <= 0 || count <= 0) { Warn($"Truss: rivets of joint {c.Point} member {m.Mark} - diameter / count missing; not placed."); return; }
+            double e = rg.EdgeDistance > 0 ? rg.EdgeDistance : 1.5 * dia;
+            var regions = LapRegions(c, m);
+            double area = regions.Sum(p => Math.Abs(MeshBuilder.SignedArea(p)));
+            if (area <= 0) { Warn($"Truss: rivets of joint {c.Point} ({c.Plane}) member {m.Mark} - the member does not lap the gusset; {count} rivets not placed."); return; }
+            bool start = StartsAt(m, c.Plane, c.Point);
+            bool through = !start && !(m.PlaneB.Equals(c.Plane, StringComparison.OrdinalIgnoreCase) && m.PointB.Equals(c.Point, StringComparison.OrdinalIgnoreCase));
+            var dirs = through ? new[] { m.Axis, -m.Axis } : new[] { Away(m, start) };
+            double yc = (m.Sec.WebDepth > 0 ? m.Sec.WebCenterY : (m.Sec.YMin + m.Sec.YMax) / 2) + m.Def.OffsetZ;
+            // candidates on a square grid aligned with the member: rows across at spacing s centred on the band, columns from the member end + e
+            List<(double t, double y, Vec3 d1)> Grid(double s)
+            {
+                var pts = new List<(double, double, Vec3)>();
+                for (int di = 0; di < dirs.Length; di++)
+                {
+                    var d1 = dirs[di];
+                    var reg = regions.Count == dirs.Length ? regions[di] : regions[Math.Min(di, regions.Count - 1)];
+                    double t0 = through ? 0 : Math.Max(0, start ? m.SA : m.SB);
+                    // extent of the region along the member
+                    var duv = new Vec2(Vec3.Dot(d1, c.U), Vec3.Dot(d1, c.V));
+                    var yuv = new Vec2(Vec3.Dot(m.Y, c.U), Vec3.Dot(m.Y, c.V));
+                    double tMax = reg.Max(q => q.X * duv.X + q.Y * duv.Y);
+                    double half = (m.Sec.WebDepth > 0 ? m.Sec.WebDepth : m.Sec.Depth) / 2;
+                    int rows = Math.Max(1, (int)Math.Floor((2 * (half - e)) / s + 1e-9) + 1);
+                    for (double t = t0 + (through ? s / 2 : e); t <= tMax + 1e-9; t += s)
+                        for (int r = 0; r < rows; r++)
+                        {
+                            double y = yc + (r - (rows - 1) / 2.0) * s;
+                            var q = new Vec2(duv.X * t + yuv.X * y, duv.Y * t + yuv.Y * y);
+                            if (Inside(reg, q, e)) pts.Add((t, y, d1));
+                        }
+                }
+                return pts;
+            }
+            double s0 = Math.Sqrt(area / count), s = 1.3 * s0;
+            var cand = Grid(s);
+            for (int it = 0; it < 200 && cand.Count < count && s > 0.3 * dia; it++) { s *= 0.97; cand = Grid(s); }
+            if (cand.Count < count)
+            {
+                Warn($"Truss CHECK joint {c.Point} ({c.Plane}) member {m.Mark}: {count} rivets do not fit the lap area ({area / 0.00064516:0} sq in) even at {TrussSections.FormatIn(s)} spacing; {cand.Count} placed.");
+                count = cand.Count;
+            }
+            if (s < 3 * dia - 1e-6)
+                Warn($"Truss CHECK joint {c.Point} ({c.Plane}) member {m.Mark}: {count} rivets {TrussSections.FormatIn(dia)} per gusset face on {area / 0.00064516:0} sq in of lap need a {TrussSections.FormatIn(s)} grid, under 3 diameters - count or lap area (gusset envelope) disagree.");
+            var pick = cand.OrderBy(q => q.t).ThenBy(q => Math.Abs(q.y - yc)).ThenBy(q => q.y).Take(count).ToList();
+            var asu = RivetFlag(rg.Unresolved, "count as read; positions on an even square grid over the gusset / member lap (pitch / gage not printed)");
+            foreach (var (t, y, d1) in pick)
+            {
+                var c0 = c.P + d1 * t + m.Y * y;
+                foreach (int side in new[] { -1, 1 })
+                    AddRivet(c0 + c.N * (side * (c.X + c.Tg)), c.N * (-side), d1, Grip(c, m, c0), dia, c.Asm, rg.Material, asu);
+            }
+            Info($"Truss: joint {c.Point} ({c.Plane}) member {m.Mark}: {2 * count} rivets {TrussSections.FormatIn(dia)} ({count} per gusset face, grid {TrussSections.FormatIn(s)}){(rg.Source.Length > 0 ? " (" + rg.Source + ")" : "")}.");
+        }
+
+        /// <summary>Rivet lines along a member (<see cref="TrussMemberDefinition.RivetLines"/>): grip = connected stack of the section pieces present
+        /// at each station through the line point.</summary>
+        private void MemberRivetLines(Inst m, Vec3 a0, double cut)
+        {
+            foreach (var rl in m.Def.RivetLines!)
+            {
+                if (rl.Pitch <= 0 || rl.Diameter <= 0) { Warn($"Truss: rivet line '{rl.Label}' on {m.Mark} - pitch / diameter missing; not placed."); continue; }
+                bool alongX = !rl.Along.Equals("y", StringComparison.OrdinalIgnoreCase);
+                var asu = RivetFlag(rl.Unresolved, "rule-based positions along the member (pitch from the plan's pitch rules)");
+                int placed = 0, missed = 0;
+                for (double s = rl.FirstFromEnd + rl.Stagger; s <= cut - rl.FirstFromEnd + 1e-9; s += rl.Pitch)
+                {
+                    var iv = new List<(double lo, double hi)>();
+                    foreach (var pc in m.Sec.Pieces)
+                    {
+                        if (pc.Length > 0)
+                        {
+                            double pl = Math.Min(pc.Length, cut), ps = Math.Clamp(cut / 2 + pc.Offset - pl / 2, 0, cut - pl);
+                            if (s < ps || s > ps + pl) continue;
+                        }
+                        var xs = new List<double>();
+                        var poly = pc.Polygon;
+                        for (int i = 0, j = poly.Length - 1; i < poly.Length; j = i++)
+                        {
+                            var a = poly[j]; var b = poly[i];
+                            double fa = alongX ? a.Y - rl.Y : a.X - rl.X, fb = alongX ? b.Y - rl.Y : b.X - rl.X;
+                            if ((fa > 0) == (fb > 0) || fa == fb) continue;
+                            double t = fa / (fa - fb);
+                            xs.Add(alongX ? a.X + (b.X - a.X) * t : a.Y + (b.Y - a.Y) * t);
+                        }
+                        xs.Sort();
+                        for (int k = 0; k + 1 < xs.Count; k += 2) iv.Add((xs[k], xs[k + 1]));
+                    }
+                    double c0 = alongX ? rl.X : rl.Y;
+                    iv.Sort((p, q) => p.lo.CompareTo(q.lo));
+                    // merge touching intervals (plies in contact), keep the one containing the line point
+                    double lo = double.NaN, hi = double.NaN; bool hit = false;
+                    foreach (var (a, b) in iv)
+                    {
+                        if (!double.IsNaN(lo) && a <= hi + 5e-4) { hi = Math.Max(hi, b); }
+                        else { if (hit) break; lo = a; hi = b; }
+                        if (c0 >= lo - 1e-9 && c0 <= hi + 1e-9) hit = true;
+                    }
+                    if (!hit) { missed++; continue; }
+                    var ax = alongX ? m.X : m.Y;
+                    Vec3 Pt(double w) => a0 + m.Axis * s + (alongX ? m.X * w + m.Y * rl.Y : m.X * rl.X + m.Y * w);
+                    if (rl.HeadPositive) AddRivet(Pt(hi), -ax, m.Axis, hi - lo, rl.Diameter, m.Assembly, rl.Material, asu);
+                    else AddRivet(Pt(lo), ax, m.Axis, hi - lo, rl.Diameter, m.Assembly, rl.Material, asu);
+                    placed++;
+                }
+                if (missed > 0) Warn($"Truss: rivet line '{rl.Label}' on {m.Mark} - {missed} stations where the line point lies in no section piece; skipped.");
+            }
         }
 
         // ------------------------------------------------------------------ splice / fill plates at the joints
@@ -623,6 +864,7 @@ public static class TrussGenerator
                                 foreach (int sx in new[] { -1, 1 }) Box(sx * baseLevel, sx * outer, yc - p.Width / 2, yc + p.Width / 2);
                                 break;
                         }
+                        if (p.Face == TrussPlateFace.WebInside) _insidePlates.Add((pl.Name.ToUpperInvariant(), jdef.Point.ToUpperInvariant(), P, ax, yv, a0, a1, yc - p.Width / 2, yc + p.Width / 2, p.Thickness));
                         string mark = $"{pl.Name}-{(p.Fill ? "F" : "SP")}{jdef.Point}-{k}";
                         Assumption? asu = p.Unresolved.Length > 0 ? Assumption.UnresolvedDimension(p.Unresolved, "plate as listed, extent scaled") : null;
                         if (asu != null) Warn(p.Unresolved);
