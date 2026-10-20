@@ -13,6 +13,7 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   the GPU viewport (`out_view.png`) and every editor tab, then exits. Normal screen capture of WPF shows blank in this
   environment â€” use `--snapshot`.
 - Session log: `%LOCALAPPDATA%\SteelBridgeModeler\session.log` (messages + exceptions).
+- Turntable video: `--snapshot out.png --3d --winsize 1920,1080 --turntable N[,degrees[,pitch]]` writes `out_frame0001.png`... (viewport only; math `SBM.Core/Geometry/Turntable.cs`, `MainWindow.Turntable.cs`), then `python -I tools/frames_to_video.py out out.mp4 --fps 30`; commands in docs/API.md. Detail layers off per frame unless `--detail`.
 - Close-up of any point: `--camera E,N,Z,dx,dy,dz,width[,dist]` (re-applied after the 3D switch's animated zoom, so it now takes), `--winsize W,H`
   (bigger window / viewport), `--off REF-` (hide reference models). Flagged-layer parts are NOT hidden by default.
 

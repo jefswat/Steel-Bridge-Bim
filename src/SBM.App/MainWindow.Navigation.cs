@@ -127,7 +127,7 @@ public partial class MainWindow
 
     private void OnCameraMoved()
     {
-        if (_detailBounds.Count == 0 || _navTimer == null) return;
+        if (_detailBounds.Count == 0 || _navTimer == null || _turntableFreeze) return;
         _cameraEvents++;
         // CameraChanged also fires for updates that change nothing on screen (KeepCameraInRange re-setting the eye depth and
         // the look length); those must not count as navigation, or the timer restarts forever and detail (rebar) never returns.

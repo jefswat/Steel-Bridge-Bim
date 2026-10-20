@@ -226,6 +226,8 @@ public partial class MainWindow : Window
                     SaveSnapshot(path);
                     SnapshotEditors(path);
                     SnapshotRecentDialog(path);
+                    int tti = Array.IndexOf(args, "--turntable");
+                    if (tti >= 0) await RunTurntable(tti + 1 < args.Length && !args[tti + 1].StartsWith("--") ? args[tti + 1] : "120", path, args.Contains("--detail"));
                     if (args.Contains("--sheetwindow"))
                     {
                         // the plan sheet window opened by the pick: give the PDF viewer time to load, then capture it (_sheet.png)
