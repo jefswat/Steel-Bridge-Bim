@@ -148,3 +148,7 @@ above); rope 1,745 LF pin to pin vs p.42 1,760 LF.
   (supports already at the shoe stations, incl. the derived 2'-0 offsets at the truss-to-truss piers).
 - Program: rivet counts / gusset outlines would need the joint sheets scaled (raster); sheet-link rules for the truss groups (truss / joint / panel ->
   stress sheet and joint sheets) in `sheet-links-ptc-delaware-river.json`.
+
+### Status (2026-10-19): approach trusses built
+`samples/plans/truss-ptc-approach.csx` + `check-truss-ptc-approach.csx` (see CLAUDE.md, PTC APPROACH trusses); data in `truss-approach/`. Items listed above that are still open: the 3-span L0 / U0 joint sheet (p.49 says
+'similar to L0' / U0'': p.59 values used), joint sheets p.61-66 only medium confidence, rivet counts, gusset outlines, expansion dams (p.54 / p.68), partial floor beam cover plates and the tapered brackets.

@@ -5,7 +5,8 @@
 // sheets its stations / profile were read from (user rule: an element references only the sheets used to model it). Girder spans 1-10 / 28-31 are modeled by girders-ptc.csx (rules girders-* below, only the sheets used); truss / pier details are not modeled yet.
 {
  "models": [
-  "PTC Delaware River Bridge.sbm"
+  "PTC Delaware River Bridge.sbm",
+  "PTC approach trusses.sbm"
  ],
  "planFolders": [
   "plans",
@@ -369,6 +370,26 @@
           "bridge_group": "PTC Girder spans%"
         }
       ]
-    }
+    },
+    {"id": "truss-3-span-truss-11-13-lines", "pages": [47], "basis": "Truss lines of the approach unit: panel points / grade (gutter line, 27'-6 depth, 58'-0 c-c) and the chord / diagonal / post / hanger table (stress sheet p.47)", "target": [{"level": "assembly", "category": "truss line", "bridge_group": "PTC 3-span truss 11-13"}]},
+    {"id": "truss-3-span-truss-11-13-joints", "pages": [50, 51, 52, 53, 59], "basis": "Gusset pairs per joint (thickness, in-to-in width) from the truss joint sheets; outlines are envelopes", "target": [{"level": "group", "category": "truss joint", "bridge_group": "PTC 3-span truss 11-13"}]},
+    {"id": "truss-3-span-truss-11-13-bracing", "pages": [48, 56], "basis": "Top / bottom lateral K bracing (ST 6 WF 29, 14 BP 73), sway V frames, bottom struts, 10 WF 33 hanger bracing (floor / bracing stress sheet + typical bracing details)", "target": [{"level": "assembly", "category": "truss bracing", "bridge_group": "PTC 3-span truss 11-13"}]},
+    {"id": "truss-3-span-truss-11-13-floor", "pages": [48, 55, 107], "basis": "Floor beams F3 / F4 + brackets B1, stringers S5-S8, 6 3/4 slab (floor system stress sheet, typical floor details, pavement section)", "target": [{"level": "assembly", "category": "floor system", "bridge_group": "PTC 3-span truss 11-13"}, {"level": "part", "category": "deck", "bridge_group": "PTC 3-span truss 11-13"}]},
+    {"id": "truss-3-span-truss-11-13-shoes", "pages": [5, 49, 52, 59], "basis": "Shoes and pier top elevations (bottom of shoe) at the unit's piers", "target": [{"level": "assembly", "category": "bearing", "bridge_group": "PTC 3-span truss 11-13"}]},
+    {"id": "truss-3-span-truss-25-27-lines", "pages": [47], "basis": "Truss lines of the approach unit: panel points / grade (gutter line, 27'-6 depth, 58'-0 c-c) and the chord / diagonal / post / hanger table (stress sheet p.47)", "target": [{"level": "assembly", "category": "truss line", "bridge_group": "PTC 3-span truss 25-27"}]},
+    {"id": "truss-3-span-truss-25-27-joints", "pages": [50, 51, 52, 53, 59], "basis": "Gusset pairs per joint (thickness, in-to-in width) from the truss joint sheets; outlines are envelopes", "target": [{"level": "group", "category": "truss joint", "bridge_group": "PTC 3-span truss 25-27"}]},
+    {"id": "truss-3-span-truss-25-27-bracing", "pages": [48, 56], "basis": "Top / bottom lateral K bracing (ST 6 WF 29, 14 BP 73), sway V frames, bottom struts, 10 WF 33 hanger bracing (floor / bracing stress sheet + typical bracing details)", "target": [{"level": "assembly", "category": "truss bracing", "bridge_group": "PTC 3-span truss 25-27"}]},
+    {"id": "truss-3-span-truss-25-27-floor", "pages": [48, 55, 107], "basis": "Floor beams F3 / F4 + brackets B1, stringers S5-S8, 6 3/4 slab (floor system stress sheet, typical floor details, pavement section)", "target": [{"level": "assembly", "category": "floor system", "bridge_group": "PTC 3-span truss 25-27"}, {"level": "part", "category": "deck", "bridge_group": "PTC 3-span truss 25-27"}]},
+    {"id": "truss-3-span-truss-25-27-shoes", "pages": [32, 49, 52, 59], "basis": "Shoes and pier top elevations (bottom of shoe) at the unit's piers", "target": [{"level": "assembly", "category": "bearing", "bridge_group": "PTC 3-span truss 25-27"}]},
+    {"id": "truss-4-span-truss-14-17-lines", "pages": [57], "basis": "Truss lines of the approach unit: panel points / grade (gutter line, 27'-6 depth, 58'-0 c-c) and the chord / diagonal / post / hanger table (stress sheet p.57)", "target": [{"level": "assembly", "category": "truss line", "bridge_group": "PTC 4-span truss 14-17"}]},
+    {"id": "truss-4-span-truss-14-17-joints", "pages": [59, 60, 61, 62, 63, 64, 65, 66, 67], "basis": "Gusset pairs per joint (thickness, in-to-in width) from the truss joint sheets; outlines are envelopes", "target": [{"level": "group", "category": "truss joint", "bridge_group": "PTC 4-span truss 14-17"}]},
+    {"id": "truss-4-span-truss-14-17-bracing", "pages": [58, 56], "basis": "Top / bottom lateral K bracing (ST 6 WF 29, 14 BP 73), sway V frames, bottom struts, 10 WF 33 hanger bracing (floor / bracing stress sheet + typical bracing details)", "target": [{"level": "assembly", "category": "truss bracing", "bridge_group": "PTC 4-span truss 14-17"}]},
+    {"id": "truss-4-span-truss-14-17-floor", "pages": [58, 55, 107], "basis": "Floor beams F3 / F4 + brackets B1, stringers S5-S8, 6 3/4 slab (floor system stress sheet, typical floor details, pavement section)", "target": [{"level": "assembly", "category": "floor system", "bridge_group": "PTC 4-span truss 14-17"}, {"level": "part", "category": "deck", "bridge_group": "PTC 4-span truss 14-17"}]},
+    {"id": "truss-4-span-truss-14-17-shoes", "pages": [5, 27, 59, 63, 67], "basis": "Shoes and pier top elevations (bottom of shoe) at the unit's piers", "target": [{"level": "assembly", "category": "bearing", "bridge_group": "PTC 4-span truss 14-17"}]},
+    {"id": "truss-4-span-truss-21-24-lines", "pages": [57], "basis": "Truss lines of the approach unit: panel points / grade (gutter line, 27'-6 depth, 58'-0 c-c) and the chord / diagonal / post / hanger table (stress sheet p.57)", "target": [{"level": "assembly", "category": "truss line", "bridge_group": "PTC 4-span truss 21-24"}]},
+    {"id": "truss-4-span-truss-21-24-joints", "pages": [59, 60, 61, 62, 63, 64, 65, 66, 67], "basis": "Gusset pairs per joint (thickness, in-to-in width) from the truss joint sheets; outlines are envelopes", "target": [{"level": "group", "category": "truss joint", "bridge_group": "PTC 4-span truss 21-24"}]},
+    {"id": "truss-4-span-truss-21-24-bracing", "pages": [58, 56], "basis": "Top / bottom lateral K bracing (ST 6 WF 29, 14 BP 73), sway V frames, bottom struts, 10 WF 33 hanger bracing (floor / bracing stress sheet + typical bracing details)", "target": [{"level": "assembly", "category": "truss bracing", "bridge_group": "PTC 4-span truss 21-24"}]},
+    {"id": "truss-4-span-truss-21-24-floor", "pages": [58, 55, 107], "basis": "Floor beams F3 / F4 + brackets B1, stringers S5-S8, 6 3/4 slab (floor system stress sheet, typical floor details, pavement section)", "target": [{"level": "assembly", "category": "floor system", "bridge_group": "PTC 4-span truss 21-24"}, {"level": "part", "category": "deck", "bridge_group": "PTC 4-span truss 21-24"}]},
+    {"id": "truss-4-span-truss-21-24-shoes", "pages": [32, 27, 59, 63, 67], "basis": "Shoes and pier top elevations (bottom of shoe) at the unit's piers", "target": [{"level": "assembly", "category": "bearing", "bridge_group": "PTC 4-span truss 21-24"}]}
   ]
 }

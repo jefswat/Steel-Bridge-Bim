@@ -1,0 +1,335 @@
+=============== PTC 3-span truss 11-13
+640 members, 200 gussets, 8 shoes, 864 parts, deck built
+--- 1. panels and support lines
+PASS  N truss: panel length 26'-11 1/4 (largest difference over 24 panels): plan 0.0000 ft | model 0.0000 ft | diff 0.0000 ft
+PASS  N truss: joint 0 to 0' = 24 x 26'-11 1/4 (646.500 ft; p.47 646'-6): plan 646.500 ft | model 646.500 ft | diff 0.000 ft
+PASS  S truss: panel length 26'-11 1/4 (largest difference over 24 panels): plan 0.0000 ft | model 0.0000 ft | diff 0.0000 ft
+PASS  S truss: joint 0 to 0' = 24 x 26'-11 1/4 (646.500 ft; p.47 646'-6): plan 646.500 ft | model 646.500 ft | diff 0.000 ft
+PASS  support Pier 10 truss brg: station of the shoe line vs joint L0: plan 65866.380 ft | model 65866.380 ft | diff -0.000 ft; printed 658+66.380
+PASS  support Pier 11: station of the shoe line vs joint L8: plan 66081.880 ft | model 66081.880 ft | diff -0.000 ft; printed 660+81.880
+PASS  support Pier 12: station of the shoe line vs joint L8': plan 66297.380 ft | model 66297.380 ft | diff -0.000 ft; printed 662+97.380
+PASS  support Pier 13 W brg: station of the shoe line vs joint L0': plan 66512.880 ft | model 66512.880 ft | diff -0.000 ft; printed 665+12.880
+--- 2. gutter line, chord work points, floor beams
+PASS  gutter El at joint 0 = top chord WP + 3'-6 (printed 91.430): plan 91.430 ft | model 91.430 ft | diff 0.000 ft; the printed values are rounded to 0.001
+PASS  gutter El at joint 8 = top chord WP + 3'-6 (printed 97.895): plan 97.895 ft | model 97.895 ft | diff 0.000 ft; the printed values are rounded to 0.001
+PASS  gutter El at joint 8' = top chord WP + 3'-6 (printed 104.360): plan 104.360 ft | model 104.360 ft | diff 0.000 ft; the printed values are rounded to 0.001
+PASS  gutter El at joint 0' = top chord WP + 3'-6 (printed 110.825): plan 110.825 ft | model 110.825 ft | diff -0.000 ft; the printed values are rounded to 0.001
+PASS  PTC model profile at the gutter line vs top chord WP + 3'-6, all 50 points (largest at joint 0): plan 0.0000 ft | model -0.0008 ft | diff -0.0008 ft; the model carries the printed gutter profile + 38'-3 x 1/8 in. crown (p.107)
+PASS  chord depth 27'-6 vertical at every joint (largest difference): plan 0.0000 ft | model 0.0000 ft | diff 0.0000 ft
+PASS  back of the floor beam angles 2'-8 3/4 under the gutter line (p.55, largest difference): plan 0.0000 ft | model 0.0008 ft | diff 0.0008 ft
+--- 3. member counts
+PASS  upper chord members (printed rows incl. mirror, x 2 trusses): plan 26 | model 26 | diff 0
+PASS  lower chord members (x 2 trusses): plan 24 | model 24 | diff 0
+PASS  diagonals (one per panel, x 2 trusses): plan 48 | model 48 | diff 0
+PASS  posts at the even points (x 2 trusses): plan 26 | model 26 | diff 0
+PASS  hangers at the odd points (x 2 trusses): plan 24 | model 24 | diff 0
+PASS  floor beams: one per panel point + 2 brackets B1 each: plan 75 | model 75 | diff 0
+PASS  stringers: 11 lines x panels (4-span / 3-span continuous): plan 264 | model 264 | diff 0
+PASS  top lateral diagonals (K, 2 per panel): plan 48 | model 48 | diff 0
+PASS  bottom lateral diagonals (K, 2 per panel): plan 48 | model 48 | diff 0
+PASS  sway V frames at 7 joints (2 diagonals each): plan 14 | model 14 | diff 0
+PASS  bottom struts at every joint + 10 WF 33 hanger bracing at the other joints: plan 43 | model 43 | diff 0
+PASS  shoes (one per truss at each pier joint): plan 8 | model 8 | diff 0
+INFO  gusset plates (2 per joint and truss where a chord meets web members): plan - | model 200
+--- 4. member lengths vs the printed geom lengths and generator checks
+      (156 generator length / shoe checks PASS)
+--- 5. shoes (bottom of shoe = pier top, p.5 / p.32)
+PASS  shoe N-L0 (Pier 10 truss brg): bottom of shoe: plan 55.962 ft | model 55.962 ft | diff 0.000 ft; pier top printed on p.5 / p.32
+PASS  shoe N-L0: type: plan expansion | model Expansion
+INFO  work point L0 to bottom of the unit-end shoe: plan p.59: pin 3'-1 1/2 above the bottom | model 4.4680 ft | pin 1.463 ft below the work point (derived; 4'-5 5/8 at 3-span ends, 4'-7 1/16 at the 4-span ends)
+PASS  shoe S-L0 (Pier 10 truss brg): bottom of shoe: plan 55.962 ft | model 55.962 ft | diff 0.000 ft; pier top printed on p.5 / p.32
+PASS  shoe S-L0: type: plan expansion | model Expansion
+PASS  shoe N-L8 (Pier 11): bottom of shoe: plan 62.312 ft | model 62.312 ft | diff 0.000 ft; pier top printed on p.5 / p.32
+PASS  shoe N-L8: type: plan fixed | model Fixed
+PASS  work point L8 to bottom of shoe (printed 55.00 in.): plan 4.5833 ft | model 4.5830 ft | diff -0.0003 ft; p.49 5'-0 1/4 rocker / p.52 4'-7 fixed
+PASS  shoe S-L8 (Pier 11): bottom of shoe: plan 62.312 ft | model 62.312 ft | diff 0.000 ft; pier top printed on p.5 / p.32
+PASS  shoe S-L8: type: plan fixed | model Fixed
+PASS  shoe N-L8' (Pier 12): bottom of shoe: plan 68.339 ft | model 68.339 ft | diff 0.000 ft; pier top printed on p.5 / p.32
+PASS  shoe N-L8': type: plan expansion | model Expansion
+PASS  work point L8' to bottom of shoe (printed 60.25 in.): plan 5.0208 ft | model 5.0210 ft | diff 0.0002 ft; p.49 5'-0 1/4 rocker / p.52 4'-7 fixed
+PASS  shoe S-L8' (Pier 12): bottom of shoe: plan 68.339 ft | model 68.339 ft | diff 0.000 ft; pier top printed on p.5 / p.32
+PASS  shoe S-L8': type: plan expansion | model Expansion
+PASS  shoe N-L0' (Pier 13 W brg): bottom of shoe: plan 75.357 ft | model 75.357 ft | diff 0.000 ft; pier top printed on p.5 / p.32
+PASS  shoe N-L0': type: plan expansion | model Expansion
+INFO  work point L0' to bottom of the unit-end shoe: plan p.59: pin 3'-1 1/2 above the bottom | model 4.4680 ft | pin 1.463 ft below the work point (derived; 4'-5 5/8 at 3-span ends, 4'-7 1/16 at the 4-span ends)
+PASS  shoe S-L0' (Pier 13 W brg): bottom of shoe: plan 75.357 ft | model 75.357 ft | diff 0.000 ft; pier top printed on p.5 / p.32
+PASS  shoe S-L0': type: plan expansion | model Expansion
+INFO  bearing seats published for the substructure (Location + axis): plan 8 | model 8
+--- 6. weights (p.42 items 2 + 5, one unit)
+DIFF  structural carbon steel (C): plan 1532000 lb | model 982917 lb | diff -549083 lb; not modeled: splice / fill plates, diaphragms, hand-hole details, rivet heads, partial cover plates; shoes excluded; 1954 14 WF dimensions interpolated; perforated struts solid
+DIFF  structural silicon steel (S): plan 1324000 lb | model 1183906 lb | diff -140094 lb; not modeled: splice / fill plates, diaphragms, hand-hole details, rivet heads, partial cover plates; shoes excluded; 1954 14 WF dimensions interpolated; perforated struts solid
+DIFF  structural steel C + S: plan 2856000 lb | model 2209942 lb | diff -646058 lb; 77.4 % of the plan quantity
+INFO  weight MasonryPlate: plan - | model 43,120 lb (8 parts)
+INFO  weight TrussChord: plan - | model 394,234 lb (50 parts)
+INFO  weight TrussDiagonal: plan - | model 305,923 lb (48 parts)
+INFO  weight TrussVertical: plan - | model 58,536 lb (26 parts)
+INFO  weight TrussHanger: plan - | model 38,358 lb (24 parts)
+INFO  weight TrussBracing: plan - | model 344,600 lb (153 parts)
+INFO  weight TrussFloorBeam: plan - | model 409,323 lb (75 parts)
+INFO  weight TrussStringer: plan - | model 522,607 lb (264 parts)
+INFO  weight TrussGusset: plan - | model 93,241 lb (200 parts)
+INFO  deck slab 6 3/4 between the curb lines: plan - | model 1,030 CY
+--- 7. 80 warnings (47 UNRESOLVED, 13 CHECK)
+  PTC 3-span truss 11-13: Truss CHECK joint U8 (N): member N-U8-L8 is 16 15/16" wide, more than the gusset inside distance 16 1/2" - it overlaps the gusset plates.
+  PTC 3-span truss 11-13: Truss CHECK joint L9 (N): member N-L8-L10 is 14 3/4" wide, more than the gusset inside distance 14 3/4" - it overlaps the gusset plates.
+  PTC 3-span truss 11-13: Truss CHECK joint L11 (N): member N-L10-L12 is 14 1/8" wide, more than the gusset inside distance 14" - it overlaps the gusset plates.
+  PTC 3-span truss 11-13: Truss CHECK joint L11' (N): member N-L12-L10' is 14 1/8" wide, more than the gusset inside distance 14" - it overlaps the gusset plates.
+  PTC 3-span truss 11-13: Truss CHECK joint L9' (N): member N-L10'-L8' is 14 3/4" wide, more than the gusset inside distance 14 3/4" - it overlaps the gusset plates.
+  PTC 3-span truss 11-13: Truss CHECK joint U8' (N): member N-U8'-L8' is 16 15/16" wide, more than the gusset inside distance 16 1/2" - it overlaps the gusset plates.
+  PTC 3-span truss 11-13: Truss CHECK joint U8 (S): member S-U8-L8 is 16 15/16" wide, more than the gusset inside distance 16 1/2" - it overlaps the gusset plates.
+  PTC 3-span truss 11-13: Truss CHECK joint L9 (S): member S-L8-L10 is 14 3/4" wide, more than the gusset inside distance 14 3/4" - it overlaps the gusset plates.
+=============== PTC 4-span truss 14-17
+1062 members, 328 gussets, 10 shoes, 1420 parts, deck built
+--- 1. panels and support lines
+PASS  N truss: panel length 26'-11 1/4 (largest difference over 40 panels): plan 0.0000 ft | model 0.0000 ft | diff 0.0000 ft
+PASS  N truss: joint 0 to 0' = 40 x 26'-11 1/4 (1077.500 ft; p.57 1077'-6): plan 1077.500 ft | model 1077.500 ft | diff 0.000 ft
+PASS  S truss: panel length 26'-11 1/4 (largest difference over 40 panels): plan 0.0000 ft | model 0.0000 ft | diff 0.0000 ft
+PASS  S truss: joint 0 to 0' = 40 x 26'-11 1/4 (1077.500 ft; p.57 1077'-6): plan 1077.500 ft | model 1077.500 ft | diff 0.000 ft
+PASS  support Pier 13 E brg: station of the shoe line vs joint L0: plan 66516.880 ft | model 66516.880 ft | diff 0.000 ft; printed 665+16.880
+PASS  support Pier 14: station of the shoe line vs joint L10: plan 66786.255 ft | model 66786.255 ft | diff 0.000 ft; printed 667+86.255
+PASS  support Pier 15: station of the shoe line vs joint L20: plan 67055.630 ft | model 67055.630 ft | diff -0.000 ft; printed 670+55.630
+PASS  support Pier 16: station of the shoe line vs joint L10': plan 67325.005 ft | model 67325.005 ft | diff -0.000 ft; printed 673+25.005
+PASS  support Pier 17 W brg: station of the shoe line vs joint L0': plan 67594.380 ft | model 67594.380 ft | diff 0.000 ft; printed 675+94.380
+--- 2. gutter line, chord work points, floor beams
+PASS  gutter El at joint 0 = top chord WP + 3'-6 (printed 110.945): plan 110.945 ft | model 110.945 ft | diff -0.000 ft; the printed values are rounded to 0.001
+PASS  gutter El at joint 10 = top chord WP + 3'-6 (printed 119.026): plan 119.026 ft | model 119.026 ft | diff 0.000 ft; the printed values are rounded to 0.001
+PASS  gutter El at joint 20 = top chord WP + 3'-6 (printed 127.108): plan 127.108 ft | model 127.107 ft | diff -0.001 ft; the printed values are rounded to 0.001
+PASS  gutter El at joint 10' = top chord WP + 3'-6 (printed 135.189): plan 135.189 ft | model 135.189 ft | diff -0.000 ft; the printed values are rounded to 0.001
+PASS  gutter El at joint 0' = top chord WP + 3'-6 (printed 143.270): plan 143.270 ft | model 143.270 ft | diff -0.000 ft; the printed values are rounded to 0.001
+PASS  PTC model profile at the gutter line vs top chord WP + 3'-6, all 82 points (largest at joint 0): plan 0.0000 ft | model -0.0006 ft | diff -0.0006 ft; the model carries the printed gutter profile + 38'-3 x 1/8 in. crown (p.107)
+PASS  chord depth 27'-6 vertical at every joint (largest difference): plan 0.0000 ft | model 0.0000 ft | diff 0.0000 ft
+PASS  back of the floor beam angles 2'-8 3/4 under the gutter line (p.55, largest difference): plan 0.0000 ft | model 0.0006 ft | diff 0.0006 ft
+--- 3. member counts
+PASS  upper chord members (printed rows incl. mirror, x 2 trusses): plan 42 | model 42 | diff 0
+PASS  lower chord members (x 2 trusses): plan 40 | model 40 | diff 0
+PASS  diagonals (one per panel, x 2 trusses): plan 80 | model 80 | diff 0
+PASS  posts at the even points (x 2 trusses): plan 42 | model 42 | diff 0
+PASS  hangers at the odd points (x 2 trusses): plan 40 | model 40 | diff 0
+PASS  floor beams: one per panel point + 2 brackets B1 each: plan 123 | model 123 | diff 0
+PASS  stringers: 11 lines x panels (4-span / 3-span continuous): plan 440 | model 440 | diff 0
+PASS  top lateral diagonals (K, 2 per panel): plan 80 | model 80 | diff 0
+PASS  bottom lateral diagonals (K, 2 per panel): plan 80 | model 80 | diff 0
+PASS  sway V frames at 13 joints (2 diagonals each): plan 26 | model 26 | diff 0
+PASS  bottom struts at every joint + 10 WF 33 hanger bracing at the other joints: plan 69 | model 69 | diff 0
+PASS  shoes (one per truss at each pier joint): plan 10 | model 10 | diff 0
+INFO  gusset plates (2 per joint and truss where a chord meets web members): plan - | model 328
+--- 4. member lengths vs the printed geom lengths and generator checks
+      (254 generator length / shoe checks PASS)
+--- 5. shoes (bottom of shoe = pier top, p.5 / p.32)
+PASS  shoe N-L0 (Pier 13 E brg): bottom of shoe: plan 75.357 ft | model 75.357 ft | diff 0.000 ft; pier top printed on p.5 / p.32
+PASS  shoe N-L0: type: plan expansion | model Expansion
+INFO  work point L0 to bottom of the unit-end shoe: plan p.59: pin 3'-1 1/2 above the bottom | model 4.5880 ft | pin 1.463 ft below the work point (derived; 4'-5 5/8 at 3-span ends, 4'-7 1/16 at the 4-span ends)
+PASS  shoe S-L0 (Pier 13 E brg): bottom of shoe: plan 75.357 ft | model 75.357 ft | diff 0.000 ft; pier top printed on p.5 / p.32
+PASS  shoe S-L0: type: plan expansion | model Expansion
+PASS  shoe N-L10 (Pier 14): bottom of shoe: plan 83.005 ft | model 83.005 ft | diff 0.000 ft; pier top printed on p.5 / p.32
+PASS  shoe N-L10: type: plan expansion | model Expansion
+PASS  work point L10 to bottom of shoe (printed 60.25 in.): plan 5.0208 ft | model 5.0213 ft | diff 0.0005 ft; p.49 5'-0 1/4 rocker / p.52 4'-7 fixed
+PASS  shoe S-L10 (Pier 14): bottom of shoe: plan 83.005 ft | model 83.005 ft | diff 0.000 ft; pier top printed on p.5 / p.32
+PASS  shoe S-L10: type: plan expansion | model Expansion
+PASS  shoe N-L20 (Pier 15): bottom of shoe: plan 91.525 ft | model 91.525 ft | diff 0.000 ft; pier top printed on p.5 / p.32
+PASS  shoe N-L20: type: plan fixed | model Fixed
+PASS  work point L20 to bottom of shoe (printed 55.00 in.): plan 4.5833 ft | model 4.5825 ft | diff -0.0008 ft; p.49 5'-0 1/4 rocker / p.52 4'-7 fixed
+PASS  shoe S-L20 (Pier 15): bottom of shoe: plan 91.525 ft | model 91.525 ft | diff 0.000 ft; pier top printed on p.5 / p.32
+PASS  shoe S-L20: type: plan fixed | model Fixed
+PASS  shoe N-L10' (Pier 16): bottom of shoe: plan 99.168 ft | model 99.168 ft | diff 0.000 ft; pier top printed on p.5 / p.32
+PASS  shoe N-L10': type: plan expansion | model Expansion
+PASS  work point L10' to bottom of shoe (printed 60.25 in.): plan 5.0208 ft | model 5.0207 ft | diff -0.0001 ft; p.49 5'-0 1/4 rocker / p.52 4'-7 fixed
+PASS  shoe S-L10' (Pier 16): bottom of shoe: plan 99.168 ft | model 99.168 ft | diff 0.000 ft; pier top printed on p.5 / p.32
+PASS  shoe S-L10': type: plan expansion | model Expansion
+PASS  shoe N-L0' (Pier 17 W brg): bottom of shoe: plan 107.682 ft | model 107.682 ft | diff 0.000 ft; pier top printed on p.5 / p.32
+PASS  shoe N-L0': type: plan expansion | model Expansion
+INFO  work point L0' to bottom of the unit-end shoe: plan p.59: pin 3'-1 1/2 above the bottom | model 4.5880 ft | pin 1.463 ft below the work point (derived; 4'-5 5/8 at 3-span ends, 4'-7 1/16 at the 4-span ends)
+PASS  shoe S-L0' (Pier 17 W brg): bottom of shoe: plan 107.682 ft | model 107.682 ft | diff 0.000 ft; pier top printed on p.5 / p.32
+PASS  shoe S-L0': type: plan expansion | model Expansion
+INFO  bearing seats published for the substructure (Location + axis): plan 10 | model 10
+--- 6. weights (p.42 items 2 + 5, one unit)
+DIFF  structural carbon steel (C): plan 2423000 lb | model 1595580 lb | diff -827420 lb; not modeled: splice / fill plates, diaphragms, hand-hole details, rivet heads, partial cover plates; shoes excluded; 1954 14 WF dimensions interpolated; perforated struts solid
+DIFF  structural silicon steel (S): plan 2736000 lb | model 2340938 lb | diff -395062 lb; not modeled: splice / fill plates, diaphragms, hand-hole details, rivet heads, partial cover plates; shoes excluded; 1954 14 WF dimensions interpolated; perforated struts solid
+DIFF  structural steel C + S: plan 5159000 lb | model 4006067 lb | diff -1152933 lb; 77.7 % of the plan quantity
+INFO  weight MasonryPlate: plan - | model 69,549 lb (10 parts)
+INFO  weight TrussChord: plan - | model 894,897 lb (82 parts)
+INFO  weight TrussDiagonal: plan - | model 578,927 lb (80 parts)
+INFO  weight TrussVertical: plan - | model 97,979 lb (42 parts)
+INFO  weight TrussHanger: plan - | model 63,830 lb (40 parts)
+INFO  weight TrussBracing: plan - | model 576,766 lb (255 parts)
+INFO  weight TrussFloorBeam: plan - | model 671,290 lb (123 parts)
+INFO  weight TrussStringer: plan - | model 871,012 lb (440 parts)
+INFO  weight TrussGusset: plan - | model 181,818 lb (328 parts)
+INFO  deck slab 6 3/4 between the curb lines: plan - | model 1,717 CY
+--- 7. 153 warnings (109 UNRESOLVED, 21 CHECK)
+  PTC 4-span truss 14-17: Truss CHECK joint L1 (N): member N-L0-L2 is 14 3/4" wide, more than the gusset inside distance 14 3/4" - it overlaps the gusset plates.
+  PTC 4-span truss 14-17: Truss CHECK joint U2 (N): member N-U2-L2 is 16 15/16" wide, more than the gusset inside distance 16 3/4" - it overlaps the gusset plates.
+  PTC 4-span truss 14-17: Truss CHECK joint U8 (N): member N-U8-L8 is 14 3/16" wide, more than the gusset inside distance 14 1/8" - it overlaps the gusset plates.
+  PTC 4-span truss 14-17: Truss CHECK joint L9 (N): member N-L8-L10 is 16 3/4" wide, more than the gusset inside distance 16 3/8" - it overlaps the gusset plates.
+  PTC 4-span truss 14-17: Truss CHECK joint L13 (N): member N-L12-L14 is 14 1/8" wide, more than the gusset inside distance 14" - it overlaps the gusset plates.
+  PTC 4-span truss 14-17: Truss CHECK joint L13' (N): member N-L14'-L12' is 14 1/8" wide, more than the gusset inside distance 14" - it overlaps the gusset plates.
+  PTC 4-span truss 14-17: Truss CHECK joint L9' (N): member N-L10'-L8' is 16 3/4" wide, more than the gusset inside distance 16 3/8" - it overlaps the gusset plates.
+  PTC 4-span truss 14-17: Truss CHECK joint U8' (N): member N-U8'-L8' is 14 3/16" wide, more than the gusset inside distance 14 1/8" - it overlaps the gusset plates.
+=============== PTC 4-span truss 21-24
+1062 members, 328 gussets, 10 shoes, 1420 parts, deck built
+--- 1. panels and support lines
+PASS  N truss: panel length 26'-11 1/4 (largest difference over 40 panels): plan 0.0000 ft | model 0.0000 ft | diff 0.0000 ft
+PASS  N truss: joint 0 to 0' = 40 x 26'-11 1/4 (1077.500 ft; p.57 1077'-6): plan 1077.500 ft | model 1077.500 ft | diff 0.000 ft
+PASS  S truss: panel length 26'-11 1/4 (largest difference over 40 panels): plan 0.0000 ft | model 0.0000 ft | diff 0.0000 ft
+PASS  S truss: joint 0 to 0' = 40 x 26'-11 1/4 (1077.500 ft; p.57 1077'-6): plan 1077.500 ft | model 1077.500 ft | diff 0.000 ft
+PASS  support Pier 20 E brg: station of the shoe line vs joint L0: plan 70043.880 ft | model 70043.880 ft | diff 0.000 ft; printed 700+43.880
+PASS  support Pier 21: station of the shoe line vs joint L10: plan 69774.505 ft | model 69774.505 ft | diff -0.000 ft; printed 697+74.505
+PASS  support Pier 22: station of the shoe line vs joint L20: plan 69505.130 ft | model 69505.130 ft | diff -0.000 ft; printed 695+05.130
+PASS  support Pier 23: station of the shoe line vs joint L10': plan 69235.755 ft | model 69235.755 ft | diff 0.000 ft; printed 692+35.755
+PASS  support Pier 24 W brg: station of the shoe line vs joint L0': plan 68966.380 ft | model 68966.380 ft | diff -0.000 ft; printed 689+66.380
+--- 2. gutter line, chord work points, floor beams
+PASS  gutter El at joint 0 = top chord WP + 3'-6 (printed 110.945): plan 110.945 ft | model 110.945 ft | diff -0.000 ft; the printed values are rounded to 0.001
+PASS  gutter El at joint 10 = top chord WP + 3'-6 (printed 119.026): plan 119.026 ft | model 119.026 ft | diff 0.000 ft; the printed values are rounded to 0.001
+PASS  gutter El at joint 20 = top chord WP + 3'-6 (printed 127.108): plan 127.108 ft | model 127.107 ft | diff -0.001 ft; the printed values are rounded to 0.001
+PASS  gutter El at joint 10' = top chord WP + 3'-6 (printed 135.189): plan 135.189 ft | model 135.189 ft | diff -0.000 ft; the printed values are rounded to 0.001
+PASS  gutter El at joint 0' = top chord WP + 3'-6 (printed 143.270): plan 143.270 ft | model 143.270 ft | diff -0.000 ft; the printed values are rounded to 0.001
+PASS  PTC model profile at the gutter line vs top chord WP + 3'-6, all 82 points (largest at joint 8): plan 0.0000 ft | model 0.0000 ft | diff 0.0000 ft; the model carries the printed gutter profile + 38'-3 x 1/8 in. crown (p.107)
+PASS  chord depth 27'-6 vertical at every joint (largest difference): plan 0.0000 ft | model 0.0000 ft | diff 0.0000 ft
+PASS  back of the floor beam angles 2'-8 3/4 under the gutter line (p.55, largest difference): plan 0.0000 ft | model 0.0000 ft | diff 0.0000 ft
+--- 3. member counts
+PASS  upper chord members (printed rows incl. mirror, x 2 trusses): plan 42 | model 42 | diff 0
+PASS  lower chord members (x 2 trusses): plan 40 | model 40 | diff 0
+PASS  diagonals (one per panel, x 2 trusses): plan 80 | model 80 | diff 0
+PASS  posts at the even points (x 2 trusses): plan 42 | model 42 | diff 0
+PASS  hangers at the odd points (x 2 trusses): plan 40 | model 40 | diff 0
+PASS  floor beams: one per panel point + 2 brackets B1 each: plan 123 | model 123 | diff 0
+PASS  stringers: 11 lines x panels (4-span / 3-span continuous): plan 440 | model 440 | diff 0
+PASS  top lateral diagonals (K, 2 per panel): plan 80 | model 80 | diff 0
+PASS  bottom lateral diagonals (K, 2 per panel): plan 80 | model 80 | diff 0
+PASS  sway V frames at 13 joints (2 diagonals each): plan 26 | model 26 | diff 0
+PASS  bottom struts at every joint + 10 WF 33 hanger bracing at the other joints: plan 69 | model 69 | diff 0
+PASS  shoes (one per truss at each pier joint): plan 10 | model 10 | diff 0
+INFO  gusset plates (2 per joint and truss where a chord meets web members): plan - | model 328
+--- 4. member lengths vs the printed geom lengths and generator checks
+      (254 generator length / shoe checks PASS)
+--- 5. shoes (bottom of shoe = pier top, p.5 / p.32)
+PASS  shoe N-L0 (Pier 20 E brg): bottom of shoe: plan 75.357 ft | model 75.357 ft | diff 0.000 ft; pier top printed on p.5 / p.32
+PASS  shoe N-L0: type: plan expansion | model Expansion
+INFO  work point L0 to bottom of the unit-end shoe: plan p.59: pin 3'-1 1/2 above the bottom | model 4.5880 ft | pin 1.463 ft below the work point (derived; 4'-5 5/8 at 3-span ends, 4'-7 1/16 at the 4-span ends)
+PASS  shoe S-L0 (Pier 20 E brg): bottom of shoe: plan 75.357 ft | model 75.357 ft | diff 0.000 ft; pier top printed on p.5 / p.32
+PASS  shoe S-L0: type: plan expansion | model Expansion
+PASS  shoe N-L10 (Pier 21): bottom of shoe: plan 83.005 ft | model 83.005 ft | diff 0.000 ft; pier top printed on p.5 / p.32
+PASS  shoe N-L10: type: plan expansion | model Expansion
+PASS  work point L10 to bottom of shoe (printed 60.25 in.): plan 5.0208 ft | model 5.0213 ft | diff 0.0005 ft; p.49 5'-0 1/4 rocker / p.52 4'-7 fixed
+PASS  shoe S-L10 (Pier 21): bottom of shoe: plan 83.005 ft | model 83.005 ft | diff 0.000 ft; pier top printed on p.5 / p.32
+PASS  shoe S-L10: type: plan expansion | model Expansion
+PASS  shoe N-L20 (Pier 22): bottom of shoe: plan 91.525 ft | model 91.525 ft | diff 0.000 ft; pier top printed on p.5 / p.32
+PASS  shoe N-L20: type: plan fixed | model Fixed
+PASS  work point L20 to bottom of shoe (printed 55.00 in.): plan 4.5833 ft | model 4.5825 ft | diff -0.0008 ft; p.49 5'-0 1/4 rocker / p.52 4'-7 fixed
+PASS  shoe S-L20 (Pier 22): bottom of shoe: plan 91.525 ft | model 91.525 ft | diff 0.000 ft; pier top printed on p.5 / p.32
+PASS  shoe S-L20: type: plan fixed | model Fixed
+PASS  shoe N-L10' (Pier 23): bottom of shoe: plan 99.168 ft | model 99.168 ft | diff 0.000 ft; pier top printed on p.5 / p.32
+PASS  shoe N-L10': type: plan expansion | model Expansion
+PASS  work point L10' to bottom of shoe (printed 60.25 in.): plan 5.0208 ft | model 5.0207 ft | diff -0.0001 ft; p.49 5'-0 1/4 rocker / p.52 4'-7 fixed
+PASS  shoe S-L10' (Pier 23): bottom of shoe: plan 99.168 ft | model 99.168 ft | diff 0.000 ft; pier top printed on p.5 / p.32
+PASS  shoe S-L10': type: plan expansion | model Expansion
+PASS  shoe N-L0' (Pier 24 W brg): bottom of shoe: plan 107.682 ft | model 107.682 ft | diff 0.000 ft; pier top printed on p.5 / p.32
+PASS  shoe N-L0': type: plan expansion | model Expansion
+INFO  work point L0' to bottom of the unit-end shoe: plan p.59: pin 3'-1 1/2 above the bottom | model 4.5880 ft | pin 1.463 ft below the work point (derived; 4'-5 5/8 at 3-span ends, 4'-7 1/16 at the 4-span ends)
+PASS  shoe S-L0' (Pier 24 W brg): bottom of shoe: plan 107.682 ft | model 107.682 ft | diff 0.000 ft; pier top printed on p.5 / p.32
+PASS  shoe S-L0': type: plan expansion | model Expansion
+INFO  bearing seats published for the substructure (Location + axis): plan 10 | model 10
+--- 6. weights (p.42 items 2 + 5, one unit)
+DIFF  structural carbon steel (C): plan 2423000 lb | model 1595580 lb | diff -827420 lb; not modeled: splice / fill plates, diaphragms, hand-hole details, rivet heads, partial cover plates; shoes excluded; 1954 14 WF dimensions interpolated; perforated struts solid
+DIFF  structural silicon steel (S): plan 2736000 lb | model 2340938 lb | diff -395062 lb; not modeled: splice / fill plates, diaphragms, hand-hole details, rivet heads, partial cover plates; shoes excluded; 1954 14 WF dimensions interpolated; perforated struts solid
+DIFF  structural steel C + S: plan 5159000 lb | model 4006067 lb | diff -1152933 lb; 77.7 % of the plan quantity
+INFO  weight MasonryPlate: plan - | model 69,549 lb (10 parts)
+INFO  weight TrussChord: plan - | model 894,897 lb (82 parts)
+INFO  weight TrussDiagonal: plan - | model 578,927 lb (80 parts)
+INFO  weight TrussVertical: plan - | model 97,979 lb (42 parts)
+INFO  weight TrussHanger: plan - | model 63,830 lb (40 parts)
+INFO  weight TrussBracing: plan - | model 576,766 lb (255 parts)
+INFO  weight TrussFloorBeam: plan - | model 671,290 lb (123 parts)
+INFO  weight TrussStringer: plan - | model 871,012 lb (440 parts)
+INFO  weight TrussGusset: plan - | model 181,818 lb (328 parts)
+INFO  deck slab 6 3/4 between the curb lines: plan - | model 1,717 CY
+--- 7. 153 warnings (109 UNRESOLVED, 21 CHECK)
+  PTC 4-span truss 21-24: Truss CHECK joint L1 (N): member N-L0-L2 is 14 3/4" wide, more than the gusset inside distance 14 3/4" - it overlaps the gusset plates.
+  PTC 4-span truss 21-24: Truss CHECK joint U2 (N): member N-U2-L2 is 16 15/16" wide, more than the gusset inside distance 16 3/4" - it overlaps the gusset plates.
+  PTC 4-span truss 21-24: Truss CHECK joint U8 (N): member N-U8-L8 is 14 3/16" wide, more than the gusset inside distance 14 1/8" - it overlaps the gusset plates.
+  PTC 4-span truss 21-24: Truss CHECK joint L9 (N): member N-L8-L10 is 16 3/4" wide, more than the gusset inside distance 16 3/8" - it overlaps the gusset plates.
+  PTC 4-span truss 21-24: Truss CHECK joint L13 (N): member N-L12-L14 is 14 1/8" wide, more than the gusset inside distance 14" - it overlaps the gusset plates.
+  PTC 4-span truss 21-24: Truss CHECK joint L13' (N): member N-L14'-L12' is 14 1/8" wide, more than the gusset inside distance 14" - it overlaps the gusset plates.
+  PTC 4-span truss 21-24: Truss CHECK joint L9' (N): member N-L10'-L8' is 16 3/4" wide, more than the gusset inside distance 16 3/8" - it overlaps the gusset plates.
+  PTC 4-span truss 21-24: Truss CHECK joint U8' (N): member N-U8'-L8' is 14 3/16" wide, more than the gusset inside distance 14 1/8" - it overlaps the gusset plates.
+=============== PTC 3-span truss 25-27
+640 members, 200 gussets, 8 shoes, 864 parts, deck built
+--- 1. panels and support lines
+PASS  N truss: panel length 26'-11 1/4 (largest difference over 24 panels): plan 0.0000 ft | model 0.0000 ft | diff 0.0000 ft
+PASS  N truss: joint 0 to 0' = 24 x 26'-11 1/4 (646.500 ft; p.47 646'-6): plan 646.500 ft | model 646.500 ft | diff 0.000 ft
+PASS  S truss: panel length 26'-11 1/4 (largest difference over 24 panels): plan 0.0000 ft | model 0.0000 ft | diff 0.0000 ft
+PASS  S truss: joint 0 to 0' = 24 x 26'-11 1/4 (646.500 ft; p.47 646'-6): plan 646.500 ft | model 646.500 ft | diff 0.000 ft
+PASS  support Pier 24 E brg: station of the shoe line vs joint L0: plan 70694.380 ft | model 70694.380 ft | diff 0.000 ft; printed 706+94.380
+PASS  support Pier 25: station of the shoe line vs joint L8: plan 70478.880 ft | model 70478.880 ft | diff 0.000 ft; printed 704+78.880
+PASS  support Pier 26: station of the shoe line vs joint L8': plan 70263.380 ft | model 70263.380 ft | diff 0.000 ft; printed 702+63.380
+PASS  support Pier 27 truss brg: station of the shoe line vs joint L0': plan 70047.880 ft | model 70047.880 ft | diff 0.000 ft; printed 700+47.880
+--- 2. gutter line, chord work points, floor beams
+PASS  gutter El at joint 0 = top chord WP + 3'-6 (printed 91.430): plan 91.430 ft | model 91.430 ft | diff 0.000 ft; the printed values are rounded to 0.001
+PASS  gutter El at joint 8 = top chord WP + 3'-6 (printed 97.895): plan 97.895 ft | model 97.895 ft | diff 0.000 ft; the printed values are rounded to 0.001
+PASS  gutter El at joint 8' = top chord WP + 3'-6 (printed 104.360): plan 104.360 ft | model 104.360 ft | diff 0.000 ft; the printed values are rounded to 0.001
+PASS  gutter El at joint 0' = top chord WP + 3'-6 (printed 110.825): plan 110.825 ft | model 110.825 ft | diff -0.000 ft; the printed values are rounded to 0.001
+PASS  PTC model profile at the gutter line vs top chord WP + 3'-6, all 50 points (largest at joint 9): plan 0.0000 ft | model -0.0000 ft | diff -0.0000 ft; the model carries the printed gutter profile + 38'-3 x 1/8 in. crown (p.107)
+PASS  chord depth 27'-6 vertical at every joint (largest difference): plan 0.0000 ft | model 0.0000 ft | diff 0.0000 ft
+PASS  back of the floor beam angles 2'-8 3/4 under the gutter line (p.55, largest difference): plan 0.0000 ft | model 0.0000 ft | diff 0.0000 ft
+--- 3. member counts
+PASS  upper chord members (printed rows incl. mirror, x 2 trusses): plan 26 | model 26 | diff 0
+PASS  lower chord members (x 2 trusses): plan 24 | model 24 | diff 0
+PASS  diagonals (one per panel, x 2 trusses): plan 48 | model 48 | diff 0
+PASS  posts at the even points (x 2 trusses): plan 26 | model 26 | diff 0
+PASS  hangers at the odd points (x 2 trusses): plan 24 | model 24 | diff 0
+PASS  floor beams: one per panel point + 2 brackets B1 each: plan 75 | model 75 | diff 0
+PASS  stringers: 11 lines x panels (4-span / 3-span continuous): plan 264 | model 264 | diff 0
+PASS  top lateral diagonals (K, 2 per panel): plan 48 | model 48 | diff 0
+PASS  bottom lateral diagonals (K, 2 per panel): plan 48 | model 48 | diff 0
+PASS  sway V frames at 7 joints (2 diagonals each): plan 14 | model 14 | diff 0
+PASS  bottom struts at every joint + 10 WF 33 hanger bracing at the other joints: plan 43 | model 43 | diff 0
+PASS  shoes (one per truss at each pier joint): plan 8 | model 8 | diff 0
+INFO  gusset plates (2 per joint and truss where a chord meets web members): plan - | model 200
+--- 4. member lengths vs the printed geom lengths and generator checks
+      (156 generator length / shoe checks PASS)
+--- 5. shoes (bottom of shoe = pier top, p.5 / p.32)
+PASS  shoe N-L0 (Pier 24 E brg): bottom of shoe: plan 55.962 ft | model 55.962 ft | diff 0.000 ft; pier top printed on p.5 / p.32
+PASS  shoe N-L0: type: plan expansion | model Expansion
+INFO  work point L0 to bottom of the unit-end shoe: plan p.59: pin 3'-1 1/2 above the bottom | model 4.4680 ft | pin 1.463 ft below the work point (derived; 4'-5 5/8 at 3-span ends, 4'-7 1/16 at the 4-span ends)
+PASS  shoe S-L0 (Pier 24 E brg): bottom of shoe: plan 55.962 ft | model 55.962 ft | diff 0.000 ft; pier top printed on p.5 / p.32
+PASS  shoe S-L0: type: plan expansion | model Expansion
+PASS  shoe N-L8 (Pier 25): bottom of shoe: plan 62.312 ft | model 62.312 ft | diff 0.000 ft; pier top printed on p.5 / p.32
+PASS  shoe N-L8: type: plan fixed | model Fixed
+PASS  work point L8 to bottom of shoe (printed 55.00 in.): plan 4.5833 ft | model 4.5830 ft | diff -0.0003 ft; p.49 5'-0 1/4 rocker / p.52 4'-7 fixed
+PASS  shoe S-L8 (Pier 25): bottom of shoe: plan 62.312 ft | model 62.312 ft | diff 0.000 ft; pier top printed on p.5 / p.32
+PASS  shoe S-L8: type: plan fixed | model Fixed
+PASS  shoe N-L8' (Pier 26): bottom of shoe: plan 68.339 ft | model 68.339 ft | diff 0.000 ft; pier top printed on p.5 / p.32
+PASS  shoe N-L8': type: plan expansion | model Expansion
+PASS  work point L8' to bottom of shoe (printed 60.25 in.): plan 5.0208 ft | model 5.0210 ft | diff 0.0002 ft; p.49 5'-0 1/4 rocker / p.52 4'-7 fixed
+PASS  shoe S-L8' (Pier 26): bottom of shoe: plan 68.339 ft | model 68.339 ft | diff 0.000 ft; pier top printed on p.5 / p.32
+PASS  shoe S-L8': type: plan expansion | model Expansion
+PASS  shoe N-L0' (Pier 27 truss brg): bottom of shoe: plan 75.357 ft | model 75.357 ft | diff 0.000 ft; pier top printed on p.5 / p.32
+PASS  shoe N-L0': type: plan expansion | model Expansion
+INFO  work point L0' to bottom of the unit-end shoe: plan p.59: pin 3'-1 1/2 above the bottom | model 4.4680 ft | pin 1.463 ft below the work point (derived; 4'-5 5/8 at 3-span ends, 4'-7 1/16 at the 4-span ends)
+PASS  shoe S-L0' (Pier 27 truss brg): bottom of shoe: plan 75.357 ft | model 75.357 ft | diff 0.000 ft; pier top printed on p.5 / p.32
+PASS  shoe S-L0': type: plan expansion | model Expansion
+INFO  bearing seats published for the substructure (Location + axis): plan 8 | model 8
+--- 6. weights (p.42 items 2 + 5, one unit)
+DIFF  structural carbon steel (C): plan 1532000 lb | model 982917 lb | diff -549083 lb; not modeled: splice / fill plates, diaphragms, hand-hole details, rivet heads, partial cover plates; shoes excluded; 1954 14 WF dimensions interpolated; perforated struts solid
+DIFF  structural silicon steel (S): plan 1324000 lb | model 1183906 lb | diff -140094 lb; not modeled: splice / fill plates, diaphragms, hand-hole details, rivet heads, partial cover plates; shoes excluded; 1954 14 WF dimensions interpolated; perforated struts solid
+DIFF  structural steel C + S: plan 2856000 lb | model 2209942 lb | diff -646058 lb; 77.4 % of the plan quantity
+INFO  weight MasonryPlate: plan - | model 43,120 lb (8 parts)
+INFO  weight TrussChord: plan - | model 394,234 lb (50 parts)
+INFO  weight TrussDiagonal: plan - | model 305,923 lb (48 parts)
+INFO  weight TrussVertical: plan - | model 58,536 lb (26 parts)
+INFO  weight TrussHanger: plan - | model 38,358 lb (24 parts)
+INFO  weight TrussBracing: plan - | model 344,600 lb (153 parts)
+INFO  weight TrussFloorBeam: plan - | model 409,323 lb (75 parts)
+INFO  weight TrussStringer: plan - | model 522,607 lb (264 parts)
+INFO  weight TrussGusset: plan - | model 93,241 lb (200 parts)
+INFO  deck slab 6 3/4 between the curb lines: plan - | model 1,030 CY
+--- 7. 80 warnings (47 UNRESOLVED, 13 CHECK)
+  PTC 3-span truss 25-27: Truss CHECK joint U8 (N): member N-U8-L8 is 16 15/16" wide, more than the gusset inside distance 16 1/2" - it overlaps the gusset plates.
+  PTC 3-span truss 25-27: Truss CHECK joint L9 (N): member N-L8-L10 is 14 3/4" wide, more than the gusset inside distance 14 3/4" - it overlaps the gusset plates.
+  PTC 3-span truss 25-27: Truss CHECK joint L11 (N): member N-L10-L12 is 14 1/8" wide, more than the gusset inside distance 14" - it overlaps the gusset plates.
+  PTC 3-span truss 25-27: Truss CHECK joint L11' (N): member N-L12-L10' is 14 1/8" wide, more than the gusset inside distance 14" - it overlaps the gusset plates.
+  PTC 3-span truss 25-27: Truss CHECK joint L9' (N): member N-L10'-L8' is 14 3/4" wide, more than the gusset inside distance 14 3/4" - it overlaps the gusset plates.
+  PTC 3-span truss 25-27: Truss CHECK joint U8' (N): member N-U8'-L8' is 16 15/16" wide, more than the gusset inside distance 16 1/2" - it overlaps the gusset plates.
+  PTC 3-span truss 25-27: Truss CHECK joint U8 (S): member S-U8-L8 is 16 15/16" wide, more than the gusset inside distance 16 1/2" - it overlaps the gusset plates.
+  PTC 3-span truss 25-27: Truss CHECK joint L9 (S): member S-L8-L10 is 14 3/4" wide, more than the gusset inside distance 14 3/4" - it overlaps the gusset plates.
+SUMMARY: 1014 PASS / 12 DIFF / 56 INFO

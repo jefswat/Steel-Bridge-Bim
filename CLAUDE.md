@@ -990,6 +990,13 @@ UNRESOLVED FLAG (general, reusable): `SBM.Core/Assumption.cs` `Assumption{Status
   `AssemblyKind.PlateGirderLine`, IFC IfcBeam 'PLATE_GIRDER', layer 3D-TRUSS-GIRDERS), `TrussPlate.Length` / `Offset` = partial-length cover plates (generic, optional), floor beams
   F1 / F2 + brackets B1 (halves girder -> CL, crowned), per-span stringer lines (`TrussStringerLine.FromStation/ToStation`, 4 bays), bottom laterals WT6x29, shoes (p.44, seat from p.43), one slab.
   Flags: top plate 86'-0 vs the 51 / 74 / 90 ft dimension lines (plan conflict), stiffeners / splices / rivets / camber / dams not built. Rules `girders-*` in `sheet-links-ptc-delaware-river.json`.
+  PTC APPROACH trusses (3-span 11-13 / 25-27, 4-span 14-17 / 21-24; DECK trusses, Warren with verticals 27'-6 deep, 58'-0 c-c, 26'-11 1/4 panels, floor beams ON the top chords, stringers on them):
+  `samples/plans/truss-ptc-approach.csx` (turns the four SupportLinesOnly bridges of the PTC model into truss bridges; the NJ units are the same sheets in the opposite hand: joint 0 = low end at
+  pier 27 / 24, stations decreasing), data `docs/plan-data/ptc-delaware-river/truss-approach/{members,joints}.csv` (+ `check-result.txt`), check `check-truss-ptc-approach.csx` (1,014 PASS / 12 DIFF / 56 INFO:
+  the DIFFs are steel weight vs p.42 items 2 + 5 = 77 % of the plan; everything geometric passes), model copy `samples/plans/PTC approach trusses.sbm`. 1954 `14 WF n` chords / diagonals / posts: rolled
+  shapes with web across the plane (flanges in planes parallel to the truss, gussets outside them with fills, p.50 / p.60), dimensions interpolated by the printed gross area (flagged). Sheet rules `truss-*`
+  in `sheet-links-ptc-delaware-river.json`. Joint sheets p.61-67 are medium confidence (two digit misreads found at U10 / L10 and corrected). Open: expansion dams, partial cover plates / splices / fills, shoe plates,
+  stringer bearings (gaps 1.7 - 5.9 in. over the floor beams), rivets, curbs / parapets / walkways.
 - Bonner Unit 6 (spans 30-35, 4 x FIB-96, `samples/plans/build-bonner-unit6.csx` -> `Bonner Unit 6 FIB.sbm`, reads docs/plan-data/bonner-b2500/fib-unit6
   CSVs; same -L- placement as Unit 5; terrain + georeference `samples/plans/terrain-bonner.csx`, `docs/plan-data/bonner-b2500/TERRAIN.md`): 24 SpanBeams, per-span layouts (G1 LEFT, CL bearing 1'-2" / 3'-2" bent 29 / 1'-4" bent 35), p439 strand pattern
   read from the VECTOR drawing (72 + 4 slack, 8 draped, 20 debonded), E1/E2/E3 + P sole plates, camber tables, bents 30-35 (level precast cap profile,
