@@ -132,3 +132,8 @@ main,U15,inside splice plates 31 1/2 x 7/8,2,31.5,0.875,,"extent per dim lines",
 main,U15,web fills 31 1/2 x 9/16 i.s.,2,31.5,0.5625,,"extent per dim lines",,,,,82,medium,"callout 2-Fills 31 1/2 x 9/16 i.s."
 main,U15,web fills 18 x 1/2,2,18,0.5,,"extent per dim lines",,,,,82,medium,"callout 2-Fills 18x1/2"
 main,U15,web fills 18 x 3/4,2,18,0.75,,"extent per dim lines",,,,,82,medium,"callout 2-Fills 18x3/4; revision 1 (8-2-54) thickness of 31 1/2 fills changed"
+main,L13,lower chord cover splice plates,2,24,0.9375,,"plan view; 4 in Max. Pitch; 1 1/8 in H.S. rivets (cover plate splices)",1.125,5,87,"32 solid + 55 open (image-counted)",83,medium,"callout 2-Spl. Pls. 24x15/16; 3/4 Bent Pl. (C) connect to diaphragm"
+main,L13,inlay plates 34 x 1 1/8 (two),4,34,1.125,,"two callouts 2-Inlay Pls. 34x1 1/8",1.25,,403,"whole L13 joint cluster 403 rivets (241 solid + 162 open) incl. diagonals and vertical; chord webs to gussets and splice plates 1 1/4 in H.S.; near half of chord: countersunk N.S. in gusset and F.S. in 34x1 1/16 inlay plate; far half use field rivets (note)",83,low,"callouts as read"
+main,L13,inside splice plates 31 1/2 x 13/16,2,31.5,0.8125,,"extent per dim lines",1.25,,,,83,medium,"callout 2-Spl. Pls. 31 1/2 x 13/16 - I.S."
+main,L13,fills 31 1/2 x 5/8,2,31.5,0.625,,"extent per dim lines",,,,,83,medium,"callout 2-Fills 31 1/2 x 5/8"
+main,L13,fills 18 x 1,2,18,1,,"extent per dim lines",,,,,83,medium,"callout 2-Fills 18x1; outside splice 2-o.s. Splice Pls. 34x1 1/8 at the L13-L14 side"
