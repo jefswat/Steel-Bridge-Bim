@@ -209,6 +209,27 @@ foreach (var r in pr)
     var ps2 = ftg.Mesh.Positions;
     var us2 = ps2.Select(p => Vec2.Dot(new Vec2(p.X, p.Y) - u.Origin, u.D)); Row($"Pier {pier}: footing length along the pier line", (us2.Max() - us2.Min()) / ft, fl, 0.0005, "ft", pg);
     var ns2 = ps2.Select(p => Vec2.Dot(new Vec2(p.X, p.Y) - u.Origin, u.N)); Row($"Pier {pier}: footing width", (ns2.Max() - ns2.Min()) / ft, fw, 0.0005, "ft", pg);
+    // shaft size at the footing top (printed base_a across / base_b along; piers-review.md 2026-10-20) vs the modeled 1/4in per 12in batter from the top size
+    double baseA = Dd(r[16]), baseB = Dd(r[17]);
+    string legName = cls == "free" ? " shaft W" : cls == "cap" ? " leg W" : cls.StartsWith("pier") ? " shaft W lower" : null;
+    if (legName != null && baseA > 0)
+    {
+        var leg = u.Solids.First(x => x.Name.EndsWith(legName));
+        var lp = leg.Mesh.Positions; double zmin = lp.Min(p => p.Z);
+        var bot = lp.Where(p => p.Z < zmin + 0.001).ToList();
+        var bs = bot.Select(p => Vec2.Dot(new Vec2(p.X, p.Y) - u.Origin, u.D)).ToList(); var bn = bot.Select(p => Vec2.Dot(new Vec2(p.X, p.Y) - u.Origin, u.N)).ToList();
+        Row($"Pier {pier}: shaft size across at the footing top (printed base)", (bs.Max() - bs.Min()) / ft, baseA, 1.0 / 16 / 12, "ft", pg + " (model: straight faces from the printed top to the printed base; piers 10 / 27: 1/4in per 12in from the stepped top, along-bridge base UNRESOLVED p.9 / p.36)");
+        Row($"Pier {pier}: shaft size along at the footing top (printed base)", (bn.Max() - bn.Min()) / ft, baseB, 1.0 / 16 / 12, "ft", pg + " (model: straight faces from the printed top to the printed base; piers 10 / 27: 1/4in per 12in from the stepped top, along-bridge base UNRESOLVED p.9 / p.36)");
+    }
+    if (cls == "cap")
+    {
+        var cap = u.Solids.First(x => x.Name.EndsWith(" cap beam"));
+        var cp = cap.Mesh.Positions.Select(p => (s: Vec2.Dot(new Vec2(p.X, p.Y) - u.Origin, u.D), z: p.Z)).ToList();
+        var mid = cp.Where(t => Math.Abs(t.s) < 0.01).ToList();
+        if (mid.Count > 0) Row($"Pier {pier}: cap beam depth at the CL bridge", (cp.Max(t => t.z) - mid.Min(t => t.z)) / ft, Dd(r[14]), 1.0 / 16 / 12, "ft", pg);
+        double smax = cp.Max(t => t.s); var end = cp.Where(t => t.s > smax - 0.01).ToList();
+        Row($"Pier {pier}: cap beam depth at the leg inner face", (end.Max(t => t.z) - end.Min(t => t.z)) / ft, Dd(r[13]), 1.0 / 16 / 12, "ft", pg);
+    }
     totalCy += Vol(u.Solids) / (ft * ft * ft) / 27.0;
 }
 foreach (var (nm, pgs, fbp, ftpp, seatp) in new[] { ("W Abutment", "p.11", 16.0, 20.5, 41.974), ("E Abutment", "p.38", 51.154, 55.154, 62.033) })

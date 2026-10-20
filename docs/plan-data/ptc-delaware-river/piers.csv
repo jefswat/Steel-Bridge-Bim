@@ -1,31 +1,31 @@
 pier,support,class,pages,seat_el,ftg_bot,ftg_top,ftg_plan,ftg_len,ftg_wid,so,a,b,cap_end,cap_mid,cl_n,base_a_printed,base_b_printed,notes
 1,Pier 1,free,"p.10 (pier details, footing type B), p.5",44.437,8.0,13.0,B,85,16,0,6.5,6.5,0,0,0,7.7917,7.7917,"top El revised 7-27-54 (p.10 rev 1); 48in RC pipe through the footing zone (p.10 / p.14) not modeled; shafts 6'-6 sq at the top, 1/4in per 12in on every face; shoes at 58'-0 c.c. (p.10)"
-2,Pier 2,free,"p.10 (footing type B), p.5",47.381,12.0,17.0,B,85,16,0,6.5,6.5,0,0,0,7.7917,7.7917,"top El revised 7-27-54"
-3,Pier 3,free,"p.10 (footing type A), p.5",50.836,12.0,17.0,A,80,22,0,6.5,6.5,0,0,0,7.9167,7.9167,"top El revised 7-27-54"
+2,Pier 2,free,"p.10 (footing type B), p.5",47.381,12.0,17.0,B,85,16,0,6.5,6.5,0,0,0,7.7917,7.7917,top El revised 7-27-54
+3,Pier 3,free,"p.10 (footing type A), p.5",50.836,12.0,17.0,A,80,22,0,6.5,6.5,0,0,0,7.9167,7.9167,top El revised 7-27-54
 4,Pier 4,free,"p.10 (footing type A), p.5",54.568,12.5,17.5,A,80,22,0,6.5,6.5,0,0,0,8.0417,8.0417,
 5,Pier 5,free,"p.10 (footing type A), p.5",58.300,14.0,19.0,A,80,22,0,6.5,6.5,0,0,0,8.1458,8.1458,"base 8'-1 3/4 read, legibility fair"
 6,Pier 6,free,"p.10 (footing type A), p.5",62.033,16.0,21.0,A,80,22,0,6.5,6.5,0,0,0,8.2083,8.2083,
 7,Pier 7,free,"p.10 (footing type A), p.5",65.765,18.0,23.0,A,80,22,0,6.5,6.5,0,0,0,8.2917,8.2917,
 8,Pier 8,free,"p.10 (footing type A), p.5",69.498,21.5,26.5,A,80,22,0,6.5,6.5,0,0,0,8.2917,8.2917,
 9,Pier 9,free,"p.10 (footing type A, pier 9 elevation), p.5",73.230,20.5,25.5,A,80,22,0,6.5,6.5,0,0,0,8.4792,8.4792,
-10,Pier 10 girder brg,pier10,"p.9, p.5",76.918,20.5,27.5,10,86.5,24,0,6.5,10.6875,0,0,0,0,0,"expansion pier, stepped tops 76.918 / 55.962; footing rev 10-26-54 (p.9 rev 1-2)"
-11,Pier 11,cap,"p.8, p.5",62.312,16.5,24.5,R,94,24,33.0,8.3958,9.0,11.2813,8.0,0,9.1875,10.5833,"shaft top 8'-4 3/4 x 9'-0; cap beam 8'-0 mid / 11'-3 3/8 at the shafts (read, legibility fair)"
-12,Pier 12,cap,"p.8, p.5",68.339,15.5,23.5,R,94,24,33.0,8.3958,9.0,11.2813,8.0,0,0,0,"same drawing as pier 11 (p.8); shaft base not printed separately"
-13,Pier 13 W brg,cap,"p.7, p.5",75.357,11.0,19.0,R,96,24,33.625,9.8333,10.0,12.1667,9.0,2.0,11.0,12.3333,"CL pier = 2'-0 up-station of the W bearing line (665+14.88, p.7)"
-14,Pier 14,cap,"p.7, p.5",83.005,8.0,17.0,R,98,28,34.25,11.2083,11.0,13.0833,10.0,0,12.5625,13.75,
-15,Pier 15,cap,"p.6, p.5",91.525,2.0,10.0,R,98,40,34.75,12.3333,11.0,13.0,10.0,0,14.0417,14.1042,
-16,Pier 16,cap,"p.6, p.5",99.168,4.0,14.0,R,98,30,34.75,12.3333,11.0,13.0,10.0,0,14.0417,14.1042,
-17,Pier 17 W brg,tall,"p.17, p.27, p.29, p.16",107.682,-7.0,5.0,P,121.125,33,49.5,12.0,12.0,15.0,10.0,2.0,14.125,16.25,"piles 12 H 74 (p.27); CL pier = 2'-0 up-station of the W bearing line"
-18,Pier 18,river,"p.17, p.19, p.20, p.21, p.23",87.701,-19.0,-15.0,S,158.8333,53,0,13.5,14.0,0,0,0,18.125,23.25,"cofferdam footing; tremie seal -25.0 to -19.0; pier body -15.0 to +12.0"
-19,Pier 19,river,"p.17, p.19, p.20, p.21, p.23",87.701,-19.0,-15.0,S,158.8333,53,0,13.5,14.0,0,0,0,18.125,23.25,"same as pier 18 (p.17: 'Piers Nos. 18 & 19')"
-20,Pier 20 main brg,tall,"p.17, p.27, p.29, p.16",107.682,-7.0,5.0,P,121.125,33,49.5,12.0,12.0,15.0,10.0,2.0,14.125,16.25,"same as pier 17 (footing El. -7.0 to +5.0; ground El +8.0 vs +9.0); CL pier = 2'-0 up-station of the main bearing line"
-21,Pier 21,cap,"p.33, p.32",99.168,-5.0,5.0,R,98,30,34.75,12.3333,11.0,13.0,10.0,0,0,0,
-22,Pier 22,cap,"p.33, p.32",91.525,2.0,10.0,R,98,40,34.75,12.3333,11.0,13.0,10.0,0,0,0,
-23,Pier 23,cap,"p.34, p.32",83.005,5.5,14.5,R,96,28,34.25,11.2083,11.0,13.0833,10.0,0,0,0,
-24,Pier 24 W brg,cap,"p.34, p.32",75.357,3.0,11.0,R,96,26,33.625,9.8333,10.0,12.1667,9.0,2.0,0,0,"CL pier = 2'-0 up-station of the W bearing line (700+45.88)"
-25,Pier 25,cap,"p.35, p.32",68.339,5.0,13.0,R,94,27,33.0,8.3958,9.0,11.2813,8.0,0,0,0,
-26,Pier 26,cap,"p.35, p.32",62.312,6.0,14.0,R,94,27,33.0,8.3958,9.0,11.2813,8.0,0,0,0,
-27,Pier 27 truss brg,pier27,"p.36, p.32",76.918,11.5,18.5,27,86.5,24,0,6.5,10.6875,0,0,0,0,0,"expansion pier, stepped tops 76.918 / 55.962; shafts and girder bearings changed 10-26-54"
-28,Pier 28,free,"p.37, p.32",73.230,17.0,22.0,A,80,22,0,6.5,6.5,0,0,0,0,0,"typical footing for piers 28-30 (p.37)"
+10,Pier 10 girder brg,pier10,"p.9, p.5",76.918,20.5,27.5,10,86.5,24,0,6.5,10.6875,0,0,0,8.5625,12.5,"expansion pier, stepped tops 76.918 / 55.962; footing rev 10-26-54 (p.9 rev 1-2); base 8'-6 3/4 across x 12'-6 along (p.9 B-B); b 10.6875 is NOT a printed value (printed: 5'-11 1/2 top block, 12'-6 base) - UNRESOLVED (p.9), the pier 10 solids do not use it"
+11,Pier 11,cap,"p.8, p.5",62.312,16.5,24.5,R,94,24,33.0,8.3958,9.0,11.2813,8.0,0,9.1875,10.5833,"shaft top 8'-4 3/4 x 9'-0; cap beam 8'-0 mid / 11'-3 3/8 at the shafts (read, legibility fair); shaft widths revised 11-5-54 (rev 1); twin shafts joined by the cap beam only"
+12,Pier 12,cap,"p.8, p.5",68.339,15.5,23.5,R,94,24,33.0,8.3958,9.0,11.2813,8.0,0,9.3333,10.875,same drawing as pier 11 (p.8); shaft base not printed separately; shaft widths revised 11-5-54 (rev 1); twin shafts joined by the cap beam only
+13,Pier 13 W brg,cap,"p.7, p.5",75.357,11.0,19.0,R,96,24,33.625,9.8333,10.0,12.1667,9.0,2.0,11.0,12.3333,"CL pier = 2'-0 up-station of the W bearing line (665+14.88, p.7); shaft widths revised 11-5-54 (rev 1); twin shafts joined by the cap beam only"
+14,Pier 14,cap,"p.7, p.5",83.005,8.0,17.0,R,98,28,34.25,11.1875,11.0,13.0833,10.0,0,12.5625,13.75,"shaft widths revised 11-5-54 (rev 1); twin shafts joined by the cap beam only; shaft top 11'-2 1/4 across (p.7: 5'-3 + 11'-2 1/4 + 46'-1 1/2 chain, re-read 2026-10-20; was 11'-2 1/2)"
+15,Pier 15,cap,"p.6, p.5",91.525,2.0,10.0,R,98,40,34.75,12.3333,11.0,13.0,10.0,0,14.0417,14.3958,shaft widths revised 11-5-54 (rev 1); twin shafts joined by the cap beam only; base along 14'-4 3/4 (p.6; was 14'-1 1/4)
+16,Pier 16,cap,"p.6, p.5",99.168,4.0,14.0,R,100,30,34.75,12.3333,11.0,13.0,10.0,0,14.1042,14.5417,"shaft widths revised 11-5-54 (rev 1); twin shafts joined by the cap beam only; footing 100'-0 (section D-D, p.6; was 98)"
+17,Pier 17 W brg,tall,"p.17, p.27, p.29, p.16",107.682,-7.0,5.0,P,121.125,33,49.5,12.0,12.0,15.0,10.0,2.0,14.125,16.25,piles 12 H 74 (p.27); CL pier = 2'-0 up-station of the W bearing line
+18,Pier 18,river,"p.17, p.19, p.20, p.21, p.23",87.701,-19.0,-15.0,S,158.8333,53,0,13.5,14.0,0,0,0,18.125,23.25,cofferdam footing; tremie seal -25.0 to -19.0; pier body -15.0 to +12.0
+19,Pier 19,river,"p.17, p.19, p.20, p.21, p.23",87.701,-19.0,-15.0,S,158.8333,53,0,13.5,14.0,0,0,0,18.125,23.25,same as pier 18 (p.17: 'Piers Nos. 18 & 19')
+20,Pier 20 main brg,tall,"p.17, p.27, p.29, p.16",107.682,-7.0,5.0,P,121.125,33,49.5,12.0,12.0,15.0,10.0,2.0,14.125,16.25,same as pier 17 (footing El. -7.0 to +5.0; ground El +8.0 vs +9.0); CL pier = 2'-0 up-station of the main bearing line
+21,Pier 21,cap,"p.33, p.32",99.168,-5.0,5.0,R,100,30,34.75,12.3333,11.0,13.0,10.0,0,14.2917,14.9167,"shaft widths revised 11-5-54 (rev 1); twin shafts joined by the cap beam only; footing 100'-0 (section A-A, p.33; was 98)"
+22,Pier 22,cap,"p.33, p.32",91.525,2.0,10.0,R,98,40,34.75,12.3333,11.0,13.0,10.0,0,14.0417,14.3958,shaft widths revised 11-5-54 (rev 1); twin shafts joined by the cap beam only
+23,Pier 23,cap,"p.34, p.32",83.005,5.5,14.5,R,98,28,34.25,11.1875,11.0,13.0833,10.0,0,12.6042,13.8333,"shaft widths revised 11-5-54 (rev 1); twin shafts joined by the cap beam only; footing 98'-0 (section A-A, p.34; was 96); p.34 prints the shaft top 11'-2 1/4 vs 11'-2 1/2 at pier 14 - top 11'-2 1/4 confirmed by the chain 11'-2 1/4 + 46'-1 1/2 + 11'-2 1/4 (p.34; pier 14 p.7 is the same)"
+24,Pier 24 W brg,cap,"p.34, p.32",75.357,3.0,11.0,R,96,26,33.625,9.8333,10.0,12.1667,9.0,2.0,11.1667,12.6667,CL pier = 2'-0 up-station of the W bearing line (700+45.88); shaft widths revised 11-5-54 (rev 1); twin shafts joined by the cap beam only
+25,Pier 25,cap,"p.35, p.32",68.339,5.0,13.0,R,94,27,33.0,8.3958,9.0,11.2813,8.0,0,9.5417,11.2917,shaft widths revised 11-5-54 (rev 1); twin shafts joined by the cap beam only
+26,Pier 26,cap,"p.35, p.32",62.312,6.0,14.0,R,94,27,33.0,8.3958,9.0,11.2813,8.0,0,9.3958,11.0,shaft widths revised 11-5-54 (rev 1); twin shafts joined by the cap beam only
+27,Pier 27 truss brg,pier27,"p.36, p.32",76.918,11.5,18.5,27,86.5,24,0,6.5,10.6875,0,0,0,8.9375,12.875,"expansion pier, stepped tops 76.918 / 55.962; shafts and girder bearings changed 10-26-54; base 8'-11 1/4 across x 12'-10 1/2 along (p.36); b 10.6875 not printed (see pier 10)"
+28,Pier 28,free,"p.37, p.32",73.230,17.0,22.0,A,80,22,0,6.5,6.5,0,0,0,8.625,8.625,typical footing for piers 28-30 (p.37)
 29,Pier 29,free,"p.37, p.32",69.498,21.0,26.0,A,80,22,0,6.5,6.5,0,0,0,8.3125,8.3125,
 30,Pier 30,free,"p.37, p.32",65.765,24.5,29.5,A,80,22,0,6.5,6.5,0,0,0,8.0,8.0,

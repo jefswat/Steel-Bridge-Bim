@@ -1047,38 +1047,38 @@
                 {
                   "Name": "shaft W",
                   "Kind": "Column",
-                  "Source": "p.10 (pier details, footing type B), p.5",
+                  "Source": "p.10 (pier details, footing type B), p.5 (top 6\u0027-6\u0022 x 6\u0027-6\u0022, printed base 7\u0027-9.5\u0022 x 7\u0027-9.5\u0022)",
                   "Sections": [
                     {
                       "Elevation": 3.9624,
                       "Polygon": [
                         {
-                          "S": -10.029424950000001,
-                          "N": -1.19022495,
+                          "S": -10.026655080000001,
+                          "N": -1.18745508,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": -7.648975050000001,
-                          "N": -1.19022495,
+                          "S": -7.6517449200000005,
+                          "N": -1.18745508,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": -7.648975050000001,
-                          "N": 1.19022495,
+                          "S": -7.6517449200000005,
+                          "N": 1.18745508,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": -10.029424950000001,
-                          "N": 1.19022495,
+                          "S": -10.026655080000001,
+                          "N": 1.18745508,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -1132,38 +1132,38 @@
                 {
                   "Name": "shaft E",
                   "Kind": "Column",
-                  "Source": "p.10 (pier details, footing type B), p.5",
+                  "Source": "p.10 (pier details, footing type B), p.5 (top 6\u0027-6\u0022 x 6\u0027-6\u0022, printed base 7\u0027-9.5\u0022 x 7\u0027-9.5\u0022)",
                   "Sections": [
                     {
                       "Elevation": 3.9624,
                       "Polygon": [
                         {
-                          "S": 7.648975050000001,
-                          "N": -1.19022495,
+                          "S": 7.6517449200000005,
+                          "N": -1.18745508,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": 10.029424950000001,
-                          "N": -1.19022495,
+                          "S": 10.026655080000001,
+                          "N": -1.18745508,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": 10.029424950000001,
-                          "N": 1.19022495,
+                          "S": 10.026655080000001,
+                          "N": 1.18745508,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": 7.648975050000001,
-                          "N": 1.19022495,
+                          "S": 7.6517449200000005,
+                          "N": 1.18745508,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -1499,38 +1499,38 @@
                 {
                   "Name": "shaft W",
                   "Kind": "Column",
-                  "Source": "p.10 (footing type B), p.5",
+                  "Source": "p.10 (footing type B), p.5 (top 6\u0027-6\u0022 x 6\u0027-6\u0022, printed base 7\u0027-9.5\u0022 x 7\u0027-9.5\u0022)",
                   "Sections": [
                     {
                       "Elevation": 5.1816,
                       "Polygon": [
                         {
-                          "S": -10.02271935,
-                          "N": -1.18351935,
+                          "S": -10.026655080000001,
+                          "N": -1.18745508,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": -7.65568065,
-                          "N": -1.18351935,
+                          "S": -7.6517449200000005,
+                          "N": -1.18745508,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": -7.65568065,
-                          "N": 1.18351935,
+                          "S": -7.6517449200000005,
+                          "N": 1.18745508,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": -10.02271935,
-                          "N": 1.18351935,
+                          "S": -10.026655080000001,
+                          "N": 1.18745508,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -1584,38 +1584,38 @@
                 {
                   "Name": "shaft E",
                   "Kind": "Column",
-                  "Source": "p.10 (footing type B), p.5",
+                  "Source": "p.10 (footing type B), p.5 (top 6\u0027-6\u0022 x 6\u0027-6\u0022, printed base 7\u0027-9.5\u0022 x 7\u0027-9.5\u0022)",
                   "Sections": [
                     {
                       "Elevation": 5.1816,
                       "Polygon": [
                         {
-                          "S": 7.65568065,
-                          "N": -1.18351935,
+                          "S": 7.6517449200000005,
+                          "N": -1.18745508,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": 10.02271935,
-                          "N": -1.18351935,
+                          "S": 10.026655080000001,
+                          "N": -1.18745508,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": 10.02271935,
-                          "N": 1.18351935,
+                          "S": 10.026655080000001,
+                          "N": 1.18745508,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": 7.65568065,
-                          "N": 1.18351935,
+                          "S": 7.6517449200000005,
+                          "N": 1.18745508,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -2079,38 +2079,38 @@
                 {
                   "Name": "shaft W",
                   "Kind": "Column",
-                  "Source": "p.10 (footing type A), p.5",
+                  "Source": "p.10 (footing type A), p.5 (top 6\u0027-6\u0022 x 6\u0027-6\u0022, printed base 7\u0027-11\u0022 x 7\u0027-11\u0022)",
                   "Sections": [
                     {
                       "Elevation": 5.1816,
                       "Polygon": [
                         {
-                          "S": -10.044658600000002,
-                          "N": -1.2054586,
+                          "S": -10.045705080000001,
+                          "N": -1.20650508,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": -7.633741400000001,
-                          "N": -1.2054586,
+                          "S": -7.6326949200000005,
+                          "N": -1.20650508,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": -7.633741400000001,
-                          "N": 1.2054586,
+                          "S": -7.6326949200000005,
+                          "N": 1.20650508,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": -10.044658600000002,
-                          "N": 1.2054586,
+                          "S": -10.045705080000001,
+                          "N": 1.20650508,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -2164,38 +2164,38 @@
                 {
                   "Name": "shaft E",
                   "Kind": "Column",
-                  "Source": "p.10 (footing type A), p.5",
+                  "Source": "p.10 (footing type A), p.5 (top 6\u0027-6\u0022 x 6\u0027-6\u0022, printed base 7\u0027-11\u0022 x 7\u0027-11\u0022)",
                   "Sections": [
                     {
                       "Elevation": 5.1816,
                       "Polygon": [
                         {
-                          "S": 7.633741400000001,
-                          "N": -1.2054586,
+                          "S": 7.6326949200000005,
+                          "N": -1.20650508,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": 10.044658600000002,
-                          "N": -1.2054586,
+                          "S": 10.045705080000001,
+                          "N": -1.20650508,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": 10.044658600000002,
-                          "N": 1.2054586,
+                          "S": 10.045705080000001,
+                          "N": 1.20650508,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": 7.633741400000001,
-                          "N": 1.2054586,
+                          "S": 7.6326949200000005,
+                          "N": 1.20650508,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -2659,38 +2659,38 @@
                 {
                   "Name": "shaft W",
                   "Kind": "Column",
-                  "Source": "p.10 (footing type A), p.5",
+                  "Source": "p.10 (footing type A), p.5 (top 6\u0027-6\u0022 x 6\u0027-6\u0022, printed base 8\u0027-0.5\u0022 x 8\u0027-0.5\u0022)",
                   "Sections": [
                     {
                       "Elevation": 5.3340000000000005,
                       "Polygon": [
                         {
-                          "S": -10.065181800000001,
-                          "N": -1.2259818,
+                          "S": -10.064755080000001,
+                          "N": -1.2255550800000001,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": -7.6132182,
-                          "N": -1.2259818,
+                          "S": -7.6136449200000005,
+                          "N": -1.2255550800000001,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": -7.6132182,
-                          "N": 1.2259818,
+                          "S": -7.6136449200000005,
+                          "N": 1.2255550800000001,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": -10.065181800000001,
-                          "N": 1.2259818,
+                          "S": -10.064755080000001,
+                          "N": 1.2255550800000001,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -2744,38 +2744,38 @@
                 {
                   "Name": "shaft E",
                   "Kind": "Column",
-                  "Source": "p.10 (footing type A), p.5",
+                  "Source": "p.10 (footing type A), p.5 (top 6\u0027-6\u0022 x 6\u0027-6\u0022, printed base 8\u0027-0.5\u0022 x 8\u0027-0.5\u0022)",
                   "Sections": [
                     {
                       "Elevation": 5.3340000000000005,
                       "Polygon": [
                         {
-                          "S": 7.6132182,
-                          "N": -1.2259818,
+                          "S": 7.6136449200000005,
+                          "N": -1.2255550800000001,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": 10.065181800000001,
-                          "N": -1.2259818,
+                          "S": 10.064755080000001,
+                          "N": -1.2255550800000001,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": 10.065181800000001,
-                          "N": 1.2259818,
+                          "S": 10.064755080000001,
+                          "N": 1.2255550800000001,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": 7.6132182,
-                          "N": 1.2259818,
+                          "S": 7.6136449200000005,
+                          "N": 1.2255550800000001,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -3239,38 +3239,38 @@
                 {
                   "Name": "shaft W",
                   "Kind": "Column",
-                  "Source": "p.10 (footing type A), p.5",
+                  "Source": "p.10 (footing type A), p.5 (top 6\u0027-6\u0022 x 6\u0027-6\u0022, printed base 8\u0027-1.75\u0022 x 8\u0027-1.75\u0022)",
                   "Sections": [
                     {
                       "Elevation": 5.7912,
                       "Polygon": [
                         {
-                          "S": -10.079355000000001,
-                          "N": -1.240155,
+                          "S": -10.08061992,
+                          "N": -1.24141992,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": -7.599045,
-                          "N": -1.240155,
+                          "S": -7.597780080000001,
+                          "N": -1.24141992,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": -7.599045,
-                          "N": 1.240155,
+                          "S": -7.597780080000001,
+                          "N": 1.24141992,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": -10.079355000000001,
-                          "N": 1.240155,
+                          "S": -10.08061992,
+                          "N": 1.24141992,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -3324,38 +3324,38 @@
                 {
                   "Name": "shaft E",
                   "Kind": "Column",
-                  "Source": "p.10 (footing type A), p.5",
+                  "Source": "p.10 (footing type A), p.5 (top 6\u0027-6\u0022 x 6\u0027-6\u0022, printed base 8\u0027-1.75\u0022 x 8\u0027-1.75\u0022)",
                   "Sections": [
                     {
                       "Elevation": 5.7912,
                       "Polygon": [
                         {
-                          "S": 7.599045,
-                          "N": -1.240155,
+                          "S": 7.597780080000001,
+                          "N": -1.24141992,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": 10.079355000000001,
-                          "N": -1.240155,
+                          "S": 10.08061992,
+                          "N": -1.24141992,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": 10.079355000000001,
-                          "N": 1.240155,
+                          "S": 10.08061992,
+                          "N": 1.24141992,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": 7.599045,
-                          "N": 1.240155,
+                          "S": 7.597780080000001,
+                          "N": 1.24141992,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -3819,38 +3819,38 @@
                 {
                   "Name": "shaft W",
                   "Kind": "Column",
-                  "Source": "p.10 (footing type A), p.5",
+                  "Source": "p.10 (footing type A), p.5 (top 6\u0027-6\u0022 x 6\u0027-6\u0022, printed base 8\u0027-2.5\u0022 x 8\u0027-2.5\u0022)",
                   "Sections": [
                     {
                       "Elevation": 6.4008,
                       "Polygon": [
                         {
-                          "S": -10.09035955,
-                          "N": -1.2511595500000001,
+                          "S": -10.09014492,
+                          "N": -1.25094492,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": -7.58804045,
-                          "N": -1.2511595500000001,
+                          "S": -7.588255080000001,
+                          "N": -1.25094492,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": -7.58804045,
-                          "N": 1.2511595500000001,
+                          "S": -7.588255080000001,
+                          "N": 1.25094492,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": -10.09035955,
-                          "N": 1.2511595500000001,
+                          "S": -10.09014492,
+                          "N": 1.25094492,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -3904,38 +3904,38 @@
                 {
                   "Name": "shaft E",
                   "Kind": "Column",
-                  "Source": "p.10 (footing type A), p.5",
+                  "Source": "p.10 (footing type A), p.5 (top 6\u0027-6\u0022 x 6\u0027-6\u0022, printed base 8\u0027-2.5\u0022 x 8\u0027-2.5\u0022)",
                   "Sections": [
                     {
                       "Elevation": 6.4008,
                       "Polygon": [
                         {
-                          "S": 7.58804045,
-                          "N": -1.2511595500000001,
+                          "S": 7.588255080000001,
+                          "N": -1.25094492,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": 10.09035955,
-                          "N": -1.2511595500000001,
+                          "S": 10.09014492,
+                          "N": -1.25094492,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": 10.09035955,
-                          "N": 1.2511595500000001,
+                          "S": 10.09014492,
+                          "N": 1.25094492,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": 7.58804045,
-                          "N": 1.2511595500000001,
+                          "S": 7.588255080000001,
+                          "N": 1.25094492,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -4399,38 +4399,38 @@
                 {
                   "Name": "shaft W",
                   "Kind": "Column",
-                  "Source": "p.10 (footing type A), p.5",
+                  "Source": "p.10 (footing type A), p.5 (top 6\u0027-6\u0022 x 6\u0027-6\u0022, printed base 8\u0027-3.5\u0022 x 8\u0027-3.5\u0022)",
                   "Sections": [
                     {
                       "Elevation": 7.010400000000001,
                       "Polygon": [
                         {
-                          "S": -10.10135775,
-                          "N": -1.26215775,
+                          "S": -10.102855080000001,
+                          "N": -1.2636550800000002,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": -7.577042250000001,
-                          "N": -1.26215775,
+                          "S": -7.5755449200000005,
+                          "N": -1.2636550800000002,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": -7.577042250000001,
-                          "N": 1.26215775,
+                          "S": -7.5755449200000005,
+                          "N": 1.2636550800000002,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": -10.10135775,
-                          "N": 1.26215775,
+                          "S": -10.102855080000001,
+                          "N": 1.2636550800000002,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -4484,38 +4484,38 @@
                 {
                   "Name": "shaft E",
                   "Kind": "Column",
-                  "Source": "p.10 (footing type A), p.5",
+                  "Source": "p.10 (footing type A), p.5 (top 6\u0027-6\u0022 x 6\u0027-6\u0022, printed base 8\u0027-3.5\u0022 x 8\u0027-3.5\u0022)",
                   "Sections": [
                     {
                       "Elevation": 7.010400000000001,
                       "Polygon": [
                         {
-                          "S": 7.577042250000001,
-                          "N": -1.26215775,
+                          "S": 7.5755449200000005,
+                          "N": -1.2636550800000002,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": 10.10135775,
-                          "N": -1.26215775,
+                          "S": 10.102855080000001,
+                          "N": -1.2636550800000002,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": 10.10135775,
-                          "N": 1.26215775,
+                          "S": 10.102855080000001,
+                          "N": 1.2636550800000002,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": 7.577042250000001,
-                          "N": 1.26215775,
+                          "S": 7.5755449200000005,
+                          "N": 1.2636550800000002,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -4979,38 +4979,38 @@
                 {
                   "Name": "shaft W",
                   "Kind": "Column",
-                  "Source": "p.10 (footing type A), p.5",
+                  "Source": "p.10 (footing type A), p.5 (top 6\u0027-6\u0022 x 6\u0027-6\u0022, printed base 8\u0027-3.5\u0022 x 8\u0027-3.5\u0022)",
                   "Sections": [
                     {
                       "Elevation": 8.077200000000001,
                       "Polygon": [
                         {
-                          "S": -10.102837300000001,
-                          "N": -1.2636373,
+                          "S": -10.102855080000001,
+                          "N": -1.2636550800000002,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": -7.5755627,
-                          "N": -1.2636373,
+                          "S": -7.5755449200000005,
+                          "N": -1.2636550800000002,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": -7.5755627,
-                          "N": 1.2636373,
+                          "S": -7.5755449200000005,
+                          "N": 1.2636550800000002,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": -10.102837300000001,
-                          "N": 1.2636373,
+                          "S": -10.102855080000001,
+                          "N": 1.2636550800000002,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -5064,38 +5064,38 @@
                 {
                   "Name": "shaft E",
                   "Kind": "Column",
-                  "Source": "p.10 (footing type A), p.5",
+                  "Source": "p.10 (footing type A), p.5 (top 6\u0027-6\u0022 x 6\u0027-6\u0022, printed base 8\u0027-3.5\u0022 x 8\u0027-3.5\u0022)",
                   "Sections": [
                     {
                       "Elevation": 8.077200000000001,
                       "Polygon": [
                         {
-                          "S": 7.5755627,
-                          "N": -1.2636373,
+                          "S": 7.5755449200000005,
+                          "N": -1.2636550800000002,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": 10.102837300000001,
-                          "N": -1.2636373,
+                          "S": 10.102855080000001,
+                          "N": -1.2636550800000002,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": 10.102837300000001,
-                          "N": 1.2636373,
+                          "S": 10.102855080000001,
+                          "N": 1.2636550800000002,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": 7.5755627,
-                          "N": 1.2636373,
+                          "S": 7.5755449200000005,
+                          "N": 1.2636550800000002,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -5559,38 +5559,38 @@
                 {
                   "Name": "shaft W",
                   "Kind": "Column",
-                  "Source": "p.10 (footing type A, pier 9 elevation), p.5",
+                  "Source": "p.10 (footing type A, pier 9 elevation), p.5 (top 6\u0027-6\u0022 x 6\u0027-6\u0022, printed base 8\u0027-5.75\u0022 x 8\u0027-5.75\u0022)",
                   "Sections": [
                     {
                       "Elevation": 7.7724,
                       "Polygon": [
                         {
-                          "S": -10.1328855,
-                          "N": -1.2936855,
+                          "S": -10.131430080000001,
+                          "N": -1.2922300800000002,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": -7.5455145,
-                          "N": -1.2936855,
+                          "S": -7.54696992,
+                          "N": -1.2922300800000002,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": -7.5455145,
-                          "N": 1.2936855,
+                          "S": -7.54696992,
+                          "N": 1.2922300800000002,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": -10.1328855,
-                          "N": 1.2936855,
+                          "S": -10.131430080000001,
+                          "N": 1.2922300800000002,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -5644,38 +5644,38 @@
                 {
                   "Name": "shaft E",
                   "Kind": "Column",
-                  "Source": "p.10 (footing type A, pier 9 elevation), p.5",
+                  "Source": "p.10 (footing type A, pier 9 elevation), p.5 (top 6\u0027-6\u0022 x 6\u0027-6\u0022, printed base 8\u0027-5.75\u0022 x 8\u0027-5.75\u0022)",
                   "Sections": [
                     {
                       "Elevation": 7.7724,
                       "Polygon": [
                         {
-                          "S": 7.5455145,
-                          "N": -1.2936855,
+                          "S": 7.54696992,
+                          "N": -1.2922300800000002,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": 10.1328855,
-                          "N": -1.2936855,
+                          "S": 10.131430080000001,
+                          "N": -1.2922300800000002,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": 10.1328855,
-                          "N": 1.2936855,
+                          "S": 10.131430080000001,
+                          "N": 1.2922300800000002,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": 7.5455145,
-                          "N": 1.2936855,
+                          "S": 7.54696992,
+                          "N": 1.2922300800000002,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -18314,14 +18314,14 @@
                 {
                   "Name": "leg W",
                   "Kind": "Column",
-                  "Source": "p.8, p.5",
+                  "Source": "p.8, p.5 (top 8\u0027-4.75\u0022 x 9\u0027-0\u0022, printed base 9\u0027-2.25\u0022 x 10\u0027-7\u0022)",
                   "Sections": [
                     {
                       "Elevation": 7.4676,
                       "Polygon": [
                         {
-                          "S": -10.298506200000002,
-                          "N": -1.6117062,
+                          "S": -10.29971016,
+                          "N": -1.61289492,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -18329,7 +18329,7 @@
                         },
                         {
                           "S": -7.49936016,
-                          "N": -1.6117062,
+                          "N": -1.61289492,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -18337,15 +18337,15 @@
                         },
                         {
                           "S": -7.49936016,
-                          "N": 1.6117062,
+                          "N": 1.61289492,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": -10.298506200000002,
-                          "N": 1.6117062,
+                          "S": -10.29971016,
+                          "N": 1.61289492,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -18399,30 +18399,30 @@
                 {
                   "Name": "leg E",
                   "Kind": "Column",
-                  "Source": "p.8, p.5",
+                  "Source": "p.8, p.5 (top 8\u0027-4.75\u0022 x 9\u0027-0\u0022, printed base 9\u0027-2.25\u0022 x 10\u0027-7\u0022)",
                   "Sections": [
                     {
                       "Elevation": 7.4676,
                       "Polygon": [
                         {
                           "S": 7.49936016,
-                          "N": -1.6117062,
+                          "N": -1.61289492,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": 10.298506200000002,
-                          "N": -1.6117062,
+                          "S": 10.29971016,
+                          "N": -1.61289492,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": 10.298506200000002,
-                          "N": 1.6117062,
+                          "S": 10.29971016,
+                          "N": 1.61289492,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -18430,7 +18430,7 @@
                         },
                         {
                           "S": 7.49936016,
-                          "N": 1.6117062,
+                          "N": 1.61289492,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -18783,14 +18783,14 @@
                 {
                   "Name": "leg W",
                   "Kind": "Column",
-                  "Source": "p.8, p.5",
+                  "Source": "p.8, p.5 (top 8\u0027-4.75\u0022 x 9\u0027-0\u0022, printed base 9\u0027-4\u0022 x 10\u0027-10.5\u0022)",
                   "Sections": [
                     {
                       "Elevation": 7.162800000000001,
                       "Polygon": [
                         {
-                          "S": -10.34312765,
-                          "N": -1.65632765,
+                          "S": -10.34415,
+                          "N": -1.65735,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -18798,7 +18798,7 @@
                         },
                         {
                           "S": -7.49936016,
-                          "N": -1.65632765,
+                          "N": -1.65735,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -18806,15 +18806,15 @@
                         },
                         {
                           "S": -7.49936016,
-                          "N": 1.65632765,
+                          "N": 1.65735,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": -10.34312765,
-                          "N": 1.65632765,
+                          "S": -10.34415,
+                          "N": 1.65735,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -18868,30 +18868,30 @@
                 {
                   "Name": "leg E",
                   "Kind": "Column",
-                  "Source": "p.8, p.5",
+                  "Source": "p.8, p.5 (top 8\u0027-4.75\u0022 x 9\u0027-0\u0022, printed base 9\u0027-4\u0022 x 10\u0027-10.5\u0022)",
                   "Sections": [
                     {
                       "Elevation": 7.162800000000001,
                       "Polygon": [
                         {
                           "S": 7.49936016,
-                          "N": -1.65632765,
+                          "N": -1.65735,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": 10.34312765,
-                          "N": -1.65632765,
+                          "S": 10.34415,
+                          "N": -1.65735,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": 10.34312765,
-                          "N": 1.65632765,
+                          "S": 10.34415,
+                          "N": 1.65735,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -18899,7 +18899,7 @@
                         },
                         {
                           "S": 7.49936016,
-                          "N": 1.65632765,
+                          "N": 1.65735,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -19252,14 +19252,14 @@
                 {
                   "Name": "leg W",
                   "Kind": "Column",
-                  "Source": "p.7, p.5",
+                  "Source": "p.7, p.5 (top 9\u0027-10\u0022 x 10\u0027-0\u0022, printed base 11\u0027-0\u0022 x 12\u0027-4\u0022)",
                   "Sections": [
                     {
                       "Elevation": 5.7912,
                       "Polygon": [
                         {
-                          "S": -10.60676695,
-                          "N": -1.27226695,
+                          "S": -10.60451016,
+                          "N": -1.26999492,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -19267,7 +19267,7 @@
                         },
                         {
                           "S": -7.25171016,
-                          "N": -1.27226695,
+                          "N": -1.26999492,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -19275,15 +19275,15 @@
                         },
                         {
                           "S": -7.25171016,
-                          "N": 2.49146695,
+                          "N": 2.4891949200000005,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": -10.60676695,
-                          "N": 2.49146695,
+                          "S": -10.60451016,
+                          "N": 2.4891949200000005,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -19337,30 +19337,30 @@
                 {
                   "Name": "leg E",
                   "Kind": "Column",
-                  "Source": "p.7, p.5",
+                  "Source": "p.7, p.5 (top 9\u0027-10\u0022 x 10\u0027-0\u0022, printed base 11\u0027-0\u0022 x 12\u0027-4\u0022)",
                   "Sections": [
                     {
                       "Elevation": 5.7912,
                       "Polygon": [
                         {
                           "S": 7.25171016,
-                          "N": -1.27226695,
+                          "N": -1.26999492,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": 10.60676695,
-                          "N": -1.27226695,
+                          "S": 10.60451016,
+                          "N": -1.26999492,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": 10.60676695,
-                          "N": 2.49146695,
+                          "S": 10.60451016,
+                          "N": 2.4891949200000005,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -19368,7 +19368,7 @@
                         },
                         {
                           "S": 7.25171016,
-                          "N": 2.49146695,
+                          "N": 2.4891949200000005,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -29750,38 +29750,38 @@
                 {
                   "Name": "leg W",
                   "Kind": "Column",
-                  "Source": "p.7, p.5",
+                  "Source": "p.7, p.5 (top 11\u0027-2.25\u0022 x 11\u0027-0\u0022, printed base 12\u0027-6.75\u0022 x 13\u0027-9\u0022)",
                   "Sections": [
                     {
                       "Elevation": 5.1816,
                       "Polygon": [
                         {
-                          "S": -10.858531750000001,
-                          "N": -2.09553175,
+                          "S": -10.858500000000001,
+                          "N": -2.0955,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": -7.02311016,
-                          "N": -2.09553175,
+                          "S": -7.029450000000001,
+                          "N": -2.0955,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": -7.02311016,
-                          "N": 2.09553175,
+                          "S": -7.029450000000001,
+                          "N": 2.0955,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": -10.858531750000001,
-                          "N": 2.09553175,
+                          "S": -10.858500000000001,
+                          "N": 2.0955,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -29801,7 +29801,7 @@
                           "WebDirN": 0
                         },
                         {
-                          "S": -7.02311016,
+                          "S": -7.029450000000001,
                           "N": -1.6764000000000001,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
@@ -29809,7 +29809,7 @@
                           "WebDirN": 0
                         },
                         {
-                          "S": -7.02311016,
+                          "S": -7.029450000000001,
                           "N": 1.6764000000000001,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
@@ -29835,38 +29835,38 @@
                 {
                   "Name": "leg E",
                   "Kind": "Column",
-                  "Source": "p.7, p.5",
+                  "Source": "p.7, p.5 (top 11\u0027-2.25\u0022 x 11\u0027-0\u0022, printed base 12\u0027-6.75\u0022 x 13\u0027-9\u0022)",
                   "Sections": [
                     {
                       "Elevation": 5.1816,
                       "Polygon": [
                         {
-                          "S": 7.02311016,
-                          "N": -2.09553175,
+                          "S": 7.029450000000001,
+                          "N": -2.0955,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": 10.858531750000001,
-                          "N": -2.09553175,
+                          "S": 10.858500000000001,
+                          "N": -2.0955,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": 10.858531750000001,
-                          "N": 2.09553175,
+                          "S": 10.858500000000001,
+                          "N": 2.0955,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": 7.02311016,
-                          "N": 2.09553175,
+                          "S": 7.029450000000001,
+                          "N": 2.0955,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -29878,7 +29878,7 @@
                       "Elevation": 25.299924,
                       "Polygon": [
                         {
-                          "S": 7.02311016,
+                          "S": 7.029450000000001,
                           "N": -1.6764000000000001,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
@@ -29902,7 +29902,7 @@
                           "WebDirN": 0
                         },
                         {
-                          "S": 7.02311016,
+                          "S": 7.029450000000001,
                           "N": 1.6764000000000001,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
@@ -29924,15 +29924,15 @@
                   "Sections": [],
                   "Profile": [
                     {
-                      "S": -7.02311016,
+                      "S": -7.029450000000001,
                       "Elevation": 25.299924
                     },
                     {
-                      "S": 7.02311016,
+                      "S": 7.029450000000001,
                       "Elevation": 25.299924
                     },
                     {
-                      "S": 7.02311016,
+                      "S": 7.029450000000001,
                       "Elevation": 21.312134160000003
                     },
                     {
@@ -29940,7 +29940,7 @@
                       "Elevation": 22.251924
                     },
                     {
-                      "S": -7.02311016,
+                      "S": -7.029450000000001,
                       "Elevation": 21.312134160000003
                     }
                   ],
@@ -30219,14 +30219,14 @@
                 {
                   "Name": "leg W",
                   "Kind": "Column",
-                  "Source": "p.6, p.5",
+                  "Source": "p.6, p.5 (top 12\u0027-4\u0022 x 11\u0027-0\u0022, printed base 14\u0027-0.5\u0022 x 14\u0027-4.75\u0022)",
                   "Sections": [
                     {
                       "Elevation": 3.048,
                       "Polygon": [
                         {
-                          "S": -11.109483749999999,
-                          "N": -2.19408375,
+                          "S": -11.11252032,
+                          "N": -2.19391992,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -30234,7 +30234,7 @@
                         },
                         {
                           "S": -6.83261016,
-                          "N": -2.19408375,
+                          "N": -2.19391992,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -30242,15 +30242,15 @@
                         },
                         {
                           "S": -6.83261016,
-                          "N": 2.19408375,
+                          "N": 2.19391992,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": -11.109483749999999,
-                          "N": 2.19408375,
+                          "S": -11.11252032,
+                          "N": 2.19391992,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -30304,30 +30304,30 @@
                 {
                   "Name": "leg E",
                   "Kind": "Column",
-                  "Source": "p.6, p.5",
+                  "Source": "p.6, p.5 (top 12\u0027-4\u0022 x 11\u0027-0\u0022, printed base 14\u0027-0.5\u0022 x 14\u0027-4.75\u0022)",
                   "Sections": [
                     {
                       "Elevation": 3.048,
                       "Polygon": [
                         {
                           "S": 6.83261016,
-                          "N": -2.19408375,
+                          "N": -2.19391992,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": 11.109483749999999,
-                          "N": -2.19408375,
+                          "S": 11.11252032,
+                          "N": -2.19391992,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": 11.109483749999999,
-                          "N": 2.19408375,
+                          "S": 11.11252032,
+                          "N": 2.19391992,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -30335,7 +30335,7 @@
                         },
                         {
                           "S": 6.83261016,
-                          "N": 2.19408375,
+                          "N": 2.19391992,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -30603,13 +30603,13 @@
                 {
                   "Name": "footing",
                   "Kind": "Footing",
-                  "Source": "p.6, p.5 (footing 98\u0027-0\u0022 x 30\u0027-0\u0022, 10\u0027-0\u0022 thick)",
+                  "Source": "p.6, p.5 (footing 100\u0027-0\u0022 x 30\u0027-0\u0022, 10\u0027-0\u0022 thick)",
                   "Sections": [
                     {
                       "Elevation": 1.2192,
                       "Polygon": [
                         {
-                          "S": -14.9352,
+                          "S": -15.24,
                           "N": -4.572,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
@@ -30617,7 +30617,7 @@
                           "WebDirN": 0
                         },
                         {
-                          "S": 14.9352,
+                          "S": 15.24,
                           "N": -4.572,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
@@ -30625,7 +30625,7 @@
                           "WebDirN": 0
                         },
                         {
-                          "S": 14.9352,
+                          "S": 15.24,
                           "N": 4.572,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
@@ -30633,7 +30633,7 @@
                           "WebDirN": 0
                         },
                         {
-                          "S": -14.9352,
+                          "S": -15.24,
                           "N": 4.572,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
@@ -30646,7 +30646,7 @@
                       "Elevation": 4.2672,
                       "Polygon": [
                         {
-                          "S": -14.9352,
+                          "S": -15.24,
                           "N": -4.572,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
@@ -30654,7 +30654,7 @@
                           "WebDirN": 0
                         },
                         {
-                          "S": 14.9352,
+                          "S": 15.24,
                           "N": -4.572,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
@@ -30662,7 +30662,7 @@
                           "WebDirN": 0
                         },
                         {
-                          "S": 14.9352,
+                          "S": 15.24,
                           "N": 4.572,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
@@ -30670,7 +30670,7 @@
                           "WebDirN": 0
                         },
                         {
-                          "S": -14.9352,
+                          "S": -15.24,
                           "N": 4.572,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
@@ -30688,14 +30688,14 @@
                 {
                   "Name": "leg W",
                   "Kind": "Column",
-                  "Source": "p.6, p.5",
+                  "Source": "p.6, p.5 (top 12\u0027-4\u0022 x 11\u0027-0\u0022, printed base 14\u0027-1.25\u0022 x 14\u0027-6.5\u0022)",
                   "Sections": [
                     {
                       "Elevation": 4.2672,
                       "Polygon": [
                         {
-                          "S": -11.1326168,
-                          "N": -2.2172168,
+                          "S": -11.13157032,
+                          "N": -2.21615508,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -30703,7 +30703,7 @@
                         },
                         {
                           "S": -6.83261016,
-                          "N": -2.2172168,
+                          "N": -2.21615508,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -30711,15 +30711,15 @@
                         },
                         {
                           "S": -6.83261016,
-                          "N": 2.2172168,
+                          "N": 2.21615508,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": -11.1326168,
-                          "N": 2.2172168,
+                          "S": -11.13157032,
+                          "N": 2.21615508,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -30773,30 +30773,30 @@
                 {
                   "Name": "leg E",
                   "Kind": "Column",
-                  "Source": "p.6, p.5",
+                  "Source": "p.6, p.5 (top 12\u0027-4\u0022 x 11\u0027-0\u0022, printed base 14\u0027-1.25\u0022 x 14\u0027-6.5\u0022)",
                   "Sections": [
                     {
                       "Elevation": 4.2672,
                       "Polygon": [
                         {
                           "S": 6.83261016,
-                          "N": -2.2172168,
+                          "N": -2.21615508,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": 11.1326168,
-                          "N": -2.2172168,
+                          "S": 11.13157032,
+                          "N": -2.21615508,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": 11.1326168,
-                          "N": 2.2172168,
+                          "S": 11.13157032,
+                          "N": 2.21615508,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -30804,7 +30804,7 @@
                         },
                         {
                           "S": 6.83261016,
-                          "N": 2.2172168,
+                          "N": 2.21615508,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -83705,13 +83705,13 @@
                 {
                   "Name": "footing",
                   "Kind": "Footing",
-                  "Source": "p.33, p.32 (footing 98\u0027-0\u0022 x 30\u0027-0\u0022, 10\u0027-0\u0022 thick)",
+                  "Source": "p.33, p.32 (footing 100\u0027-0\u0022 x 30\u0027-0\u0022, 10\u0027-0\u0022 thick)",
                   "Sections": [
                     {
                       "Elevation": -1.524,
                       "Polygon": [
                         {
-                          "S": -14.9352,
+                          "S": -15.24,
                           "N": -4.572,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
@@ -83719,7 +83719,7 @@
                           "WebDirN": 0
                         },
                         {
-                          "S": 14.9352,
+                          "S": 15.24,
                           "N": -4.572,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
@@ -83727,7 +83727,7 @@
                           "WebDirN": 0
                         },
                         {
-                          "S": 14.9352,
+                          "S": 15.24,
                           "N": 4.572,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
@@ -83735,7 +83735,7 @@
                           "WebDirN": 0
                         },
                         {
-                          "S": -14.9352,
+                          "S": -15.24,
                           "N": 4.572,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
@@ -83748,7 +83748,7 @@
                       "Elevation": 1.524,
                       "Polygon": [
                         {
-                          "S": -14.9352,
+                          "S": -15.24,
                           "N": -4.572,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
@@ -83756,7 +83756,7 @@
                           "WebDirN": 0
                         },
                         {
-                          "S": 14.9352,
+                          "S": 15.24,
                           "N": -4.572,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
@@ -83764,7 +83764,7 @@
                           "WebDirN": 0
                         },
                         {
-                          "S": 14.9352,
+                          "S": 15.24,
                           "N": 4.572,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
@@ -83772,7 +83772,7 @@
                           "WebDirN": 0
                         },
                         {
-                          "S": -14.9352,
+                          "S": -15.24,
                           "N": 4.572,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
@@ -83790,14 +83790,14 @@
                 {
                   "Name": "leg W",
                   "Kind": "Column",
-                  "Source": "p.33, p.32",
+                  "Source": "p.33, p.32 (top 12\u0027-4\u0022 x 11\u0027-0\u0022, printed base 14\u0027-3.5\u0022 x 14\u0027-11\u0022)",
                   "Sections": [
                     {
                       "Elevation": 1.524,
                       "Polygon": [
                         {
-                          "S": -11.1897668,
-                          "N": -2.2743668,
+                          "S": -11.18872032,
+                          "N": -2.27330508,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -83805,7 +83805,7 @@
                         },
                         {
                           "S": -6.83261016,
-                          "N": -2.2743668,
+                          "N": -2.27330508,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -83813,15 +83813,15 @@
                         },
                         {
                           "S": -6.83261016,
-                          "N": 2.2743668,
+                          "N": 2.27330508,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": -11.1897668,
-                          "N": 2.2743668,
+                          "S": -11.18872032,
+                          "N": 2.27330508,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -83875,30 +83875,30 @@
                 {
                   "Name": "leg E",
                   "Kind": "Column",
-                  "Source": "p.33, p.32",
+                  "Source": "p.33, p.32 (top 12\u0027-4\u0022 x 11\u0027-0\u0022, printed base 14\u0027-3.5\u0022 x 14\u0027-11\u0022)",
                   "Sections": [
                     {
                       "Elevation": 1.524,
                       "Polygon": [
                         {
                           "S": 6.83261016,
-                          "N": -2.2743668,
+                          "N": -2.27330508,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": 11.1897668,
-                          "N": -2.2743668,
+                          "S": 11.18872032,
+                          "N": -2.27330508,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": 11.1897668,
-                          "N": 2.2743668,
+                          "S": 11.18872032,
+                          "N": 2.27330508,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -83906,7 +83906,7 @@
                         },
                         {
                           "S": 6.83261016,
-                          "N": 2.2743668,
+                          "N": 2.27330508,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -84259,14 +84259,14 @@
                 {
                   "Name": "leg W",
                   "Kind": "Column",
-                  "Source": "p.33, p.32",
+                  "Source": "p.33, p.32 (top 12\u0027-4\u0022 x 11\u0027-0\u0022, printed base 14\u0027-0.5\u0022 x 14\u0027-4.75\u0022)",
                   "Sections": [
                     {
                       "Elevation": 3.048,
                       "Polygon": [
                         {
-                          "S": -11.109483749999999,
-                          "N": -2.19408375,
+                          "S": -11.11252032,
+                          "N": -2.19391992,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -84274,7 +84274,7 @@
                         },
                         {
                           "S": -6.83261016,
-                          "N": -2.19408375,
+                          "N": -2.19391992,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -84282,15 +84282,15 @@
                         },
                         {
                           "S": -6.83261016,
-                          "N": 2.19408375,
+                          "N": 2.19391992,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": -11.109483749999999,
-                          "N": 2.19408375,
+                          "S": -11.11252032,
+                          "N": 2.19391992,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -84344,30 +84344,30 @@
                 {
                   "Name": "leg E",
                   "Kind": "Column",
-                  "Source": "p.33, p.32",
+                  "Source": "p.33, p.32 (top 12\u0027-4\u0022 x 11\u0027-0\u0022, printed base 14\u0027-0.5\u0022 x 14\u0027-4.75\u0022)",
                   "Sections": [
                     {
                       "Elevation": 3.048,
                       "Polygon": [
                         {
                           "S": 6.83261016,
-                          "N": -2.19408375,
+                          "N": -2.19391992,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": 11.109483749999999,
-                          "N": -2.19408375,
+                          "S": 11.11252032,
+                          "N": -2.19391992,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": 11.109483749999999,
-                          "N": 2.19408375,
+                          "S": 11.11252032,
+                          "N": 2.19391992,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -84375,7 +84375,7 @@
                         },
                         {
                           "S": 6.83261016,
-                          "N": 2.19408375,
+                          "N": 2.19391992,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -84643,13 +84643,13 @@
                 {
                   "Name": "footing",
                   "Kind": "Footing",
-                  "Source": "p.34, p.32 (footing 96\u0027-0\u0022 x 28\u0027-0\u0022, 9\u0027-0\u0022 thick)",
+                  "Source": "p.34, p.32 (footing 98\u0027-0\u0022 x 28\u0027-0\u0022, 9\u0027-0\u0022 thick)",
                   "Sections": [
                     {
                       "Elevation": 1.6764000000000001,
                       "Polygon": [
                         {
-                          "S": -14.630400000000002,
+                          "S": -14.9352,
                           "N": -4.2672,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
@@ -84657,7 +84657,7 @@
                           "WebDirN": 0
                         },
                         {
-                          "S": 14.630400000000002,
+                          "S": 14.9352,
                           "N": -4.2672,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
@@ -84665,7 +84665,7 @@
                           "WebDirN": 0
                         },
                         {
-                          "S": 14.630400000000002,
+                          "S": 14.9352,
                           "N": 4.2672,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
@@ -84673,7 +84673,7 @@
                           "WebDirN": 0
                         },
                         {
-                          "S": -14.630400000000002,
+                          "S": -14.9352,
                           "N": 4.2672,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
@@ -84686,7 +84686,7 @@
                       "Elevation": 4.4196,
                       "Polygon": [
                         {
-                          "S": -14.630400000000002,
+                          "S": -14.9352,
                           "N": -4.2672,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
@@ -84694,7 +84694,7 @@
                           "WebDirN": 0
                         },
                         {
-                          "S": 14.630400000000002,
+                          "S": 14.9352,
                           "N": -4.2672,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
@@ -84702,7 +84702,7 @@
                           "WebDirN": 0
                         },
                         {
-                          "S": 14.630400000000002,
+                          "S": 14.9352,
                           "N": 4.2672,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
@@ -84710,7 +84710,7 @@
                           "WebDirN": 0
                         },
                         {
-                          "S": -14.630400000000002,
+                          "S": -14.9352,
                           "N": 4.2672,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
@@ -84728,38 +84728,38 @@
                 {
                   "Name": "leg W",
                   "Kind": "Column",
-                  "Source": "p.34, p.32",
+                  "Source": "p.34, p.32 (top 11\u0027-2.25\u0022 x 11\u0027-0\u0022, printed base 12\u0027-7.25\u0022 x 13\u0027-10\u0022)",
                   "Sections": [
                     {
                       "Elevation": 4.4196,
                       "Polygon": [
                         {
-                          "S": -10.874406750000002,
-                          "N": -2.11140675,
+                          "S": -10.87121016,
+                          "N": -2.10819492,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": -7.02311016,
-                          "N": -2.11140675,
+                          "S": -7.029450000000001,
+                          "N": -2.10819492,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": -7.02311016,
-                          "N": 2.11140675,
+                          "S": -7.029450000000001,
+                          "N": 2.10819492,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": -10.874406750000002,
-                          "N": 2.11140675,
+                          "S": -10.87121016,
+                          "N": 2.10819492,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -84779,7 +84779,7 @@
                           "WebDirN": 0
                         },
                         {
-                          "S": -7.02311016,
+                          "S": -7.029450000000001,
                           "N": -1.6764000000000001,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
@@ -84787,7 +84787,7 @@
                           "WebDirN": 0
                         },
                         {
-                          "S": -7.02311016,
+                          "S": -7.029450000000001,
                           "N": 1.6764000000000001,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
@@ -84813,38 +84813,38 @@
                 {
                   "Name": "leg E",
                   "Kind": "Column",
-                  "Source": "p.34, p.32",
+                  "Source": "p.34, p.32 (top 11\u0027-2.25\u0022 x 11\u0027-0\u0022, printed base 12\u0027-7.25\u0022 x 13\u0027-10\u0022)",
                   "Sections": [
                     {
                       "Elevation": 4.4196,
                       "Polygon": [
                         {
-                          "S": 7.02311016,
-                          "N": -2.11140675,
+                          "S": 7.029450000000001,
+                          "N": -2.10819492,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": 10.874406750000002,
-                          "N": -2.11140675,
+                          "S": 10.87121016,
+                          "N": -2.10819492,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": 10.874406750000002,
-                          "N": 2.11140675,
+                          "S": 10.87121016,
+                          "N": 2.10819492,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": 7.02311016,
-                          "N": 2.11140675,
+                          "S": 7.029450000000001,
+                          "N": 2.10819492,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -84856,7 +84856,7 @@
                       "Elevation": 25.299924,
                       "Polygon": [
                         {
-                          "S": 7.02311016,
+                          "S": 7.029450000000001,
                           "N": -1.6764000000000001,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
@@ -84880,7 +84880,7 @@
                           "WebDirN": 0
                         },
                         {
-                          "S": 7.02311016,
+                          "S": 7.029450000000001,
                           "N": 1.6764000000000001,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
@@ -84902,15 +84902,15 @@
                   "Sections": [],
                   "Profile": [
                     {
-                      "S": -7.02311016,
+                      "S": -7.029450000000001,
                       "Elevation": 25.299924
                     },
                     {
-                      "S": 7.02311016,
+                      "S": 7.029450000000001,
                       "Elevation": 25.299924
                     },
                     {
-                      "S": 7.02311016,
+                      "S": 7.029450000000001,
                       "Elevation": 21.312134160000003
                     },
                     {
@@ -84918,7 +84918,7 @@
                       "Elevation": 22.251924
                     },
                     {
-                      "S": -7.02311016,
+                      "S": -7.029450000000001,
                       "Elevation": 21.312134160000003
                     }
                   ],
@@ -85197,14 +85197,14 @@
                 {
                   "Name": "leg W",
                   "Kind": "Column",
-                  "Source": "p.34, p.32",
+                  "Source": "p.34, p.32 (top 9\u0027-10\u0022 x 10\u0027-0\u0022, printed base 11\u0027-2\u0022 x 12\u0027-8\u0022)",
                   "Sections": [
                     {
                       "Elevation": 3.3528000000000002,
                       "Polygon": [
                         {
-                          "S": -10.65756695,
-                          "N": -1.32306695,
+                          "S": -10.65532032,
+                          "N": -1.3208050800000002,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -85212,7 +85212,7 @@
                         },
                         {
                           "S": -7.25171016,
-                          "N": -1.32306695,
+                          "N": -1.3208050800000002,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -85220,15 +85220,15 @@
                         },
                         {
                           "S": -7.25171016,
-                          "N": 2.54226695,
+                          "N": 2.54000508,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": -10.65756695,
-                          "N": 2.54226695,
+                          "S": -10.65532032,
+                          "N": 2.54000508,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -85282,30 +85282,30 @@
                 {
                   "Name": "leg E",
                   "Kind": "Column",
-                  "Source": "p.34, p.32",
+                  "Source": "p.34, p.32 (top 9\u0027-10\u0022 x 10\u0027-0\u0022, printed base 11\u0027-2\u0022 x 12\u0027-8\u0022)",
                   "Sections": [
                     {
                       "Elevation": 3.3528000000000002,
                       "Polygon": [
                         {
                           "S": 7.25171016,
-                          "N": -1.32306695,
+                          "N": -1.3208050800000002,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": 10.65756695,
-                          "N": -1.32306695,
+                          "S": 10.65532032,
+                          "N": -1.3208050800000002,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": 10.65756695,
-                          "N": 2.54226695,
+                          "S": 10.65532032,
+                          "N": 2.54000508,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -85313,7 +85313,7 @@
                         },
                         {
                           "S": 7.25171016,
-                          "N": 2.54226695,
+                          "N": 2.54000508,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -101140,14 +101140,14 @@
                 {
                   "Name": "leg W",
                   "Kind": "Column",
-                  "Source": "p.35, p.32",
+                  "Source": "p.35, p.32 (top 8\u0027-4.75\u0022 x 9\u0027-0\u0022, printed base 9\u0027-6.5\u0022 x 11\u0027-3.5\u0022)",
                   "Sections": [
                     {
                       "Elevation": 3.9624,
                       "Polygon": [
                         {
-                          "S": -10.40980265,
-                          "N": -1.72300265,
+                          "S": -10.40767032,
+                          "N": -1.7208550800000002,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -101155,7 +101155,7 @@
                         },
                         {
                           "S": -7.49936016,
-                          "N": -1.72300265,
+                          "N": -1.7208550800000002,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -101163,15 +101163,15 @@
                         },
                         {
                           "S": -7.49936016,
-                          "N": 1.72300265,
+                          "N": 1.7208550800000002,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": -10.40980265,
-                          "N": 1.72300265,
+                          "S": -10.40767032,
+                          "N": 1.7208550800000002,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -101225,30 +101225,30 @@
                 {
                   "Name": "leg E",
                   "Kind": "Column",
-                  "Source": "p.35, p.32",
+                  "Source": "p.35, p.32 (top 8\u0027-4.75\u0022 x 9\u0027-0\u0022, printed base 9\u0027-6.5\u0022 x 11\u0027-3.5\u0022)",
                   "Sections": [
                     {
                       "Elevation": 3.9624,
                       "Polygon": [
                         {
                           "S": 7.49936016,
-                          "N": -1.72300265,
+                          "N": -1.7208550800000002,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": 10.40980265,
-                          "N": -1.72300265,
+                          "S": 10.40767032,
+                          "N": -1.7208550800000002,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": 10.40980265,
-                          "N": 1.72300265,
+                          "S": 10.40767032,
+                          "N": 1.7208550800000002,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -101256,7 +101256,7 @@
                         },
                         {
                           "S": 7.49936016,
-                          "N": 1.72300265,
+                          "N": 1.7208550800000002,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -101609,14 +101609,14 @@
                 {
                   "Name": "leg W",
                   "Kind": "Column",
-                  "Source": "p.35, p.32",
+                  "Source": "p.35, p.32 (top 8\u0027-4.75\u0022 x 9\u0027-0\u0022, printed base 9\u0027-4.75\u0022 x 11\u0027-0\u0022)",
                   "Sections": [
                     {
                       "Elevation": 4.2672,
                       "Polygon": [
                         {
-                          "S": -10.365181200000002,
-                          "N": -1.6783812,
+                          "S": -10.3632,
+                          "N": -1.6764000000000001,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -101624,7 +101624,7 @@
                         },
                         {
                           "S": -7.49936016,
-                          "N": -1.6783812,
+                          "N": -1.6764000000000001,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -101632,15 +101632,15 @@
                         },
                         {
                           "S": -7.49936016,
-                          "N": 1.6783812,
+                          "N": 1.6764000000000001,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": -10.365181200000002,
-                          "N": 1.6783812,
+                          "S": -10.3632,
+                          "N": 1.6764000000000001,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -101694,30 +101694,30 @@
                 {
                   "Name": "leg E",
                   "Kind": "Column",
-                  "Source": "p.35, p.32",
+                  "Source": "p.35, p.32 (top 8\u0027-4.75\u0022 x 9\u0027-0\u0022, printed base 9\u0027-4.75\u0022 x 11\u0027-0\u0022)",
                   "Sections": [
                     {
                       "Elevation": 4.2672,
                       "Polygon": [
                         {
                           "S": 7.49936016,
-                          "N": -1.6783812,
+                          "N": -1.6764000000000001,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": 10.365181200000002,
-                          "N": -1.6783812,
+                          "S": 10.3632,
+                          "N": -1.6764000000000001,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": 10.365181200000002,
-                          "N": 1.6783812,
+                          "S": 10.3632,
+                          "N": 1.6764000000000001,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -101725,7 +101725,7 @@
                         },
                         {
                           "S": 7.49936016,
-                          "N": 1.6783812,
+                          "N": 1.6764000000000001,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -112972,38 +112972,38 @@
                 {
                   "Name": "shaft W",
                   "Kind": "Column",
-                  "Source": "p.37, p.32",
+                  "Source": "p.37, p.32 (top 6\u0027-6\u0022 x 6\u0027-6\u0022, printed base 8\u0027-7.5\u0022 x 8\u0027-7.5\u0022)",
                   "Sections": [
                     {
                       "Elevation": 6.7056000000000004,
                       "Polygon": [
                         {
-                          "S": -10.155110500000001,
-                          "N": -1.3159105,
+                          "S": -10.15365,
+                          "N": -1.3144500000000001,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": -7.523289500000001,
-                          "N": -1.3159105,
+                          "S": -7.52475,
+                          "N": -1.3144500000000001,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": -7.523289500000001,
-                          "N": 1.3159105,
+                          "S": -7.52475,
+                          "N": 1.3144500000000001,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": -10.155110500000001,
-                          "N": 1.3159105,
+                          "S": -10.15365,
+                          "N": 1.3144500000000001,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -113057,38 +113057,38 @@
                 {
                   "Name": "shaft E",
                   "Kind": "Column",
-                  "Source": "p.37, p.32",
+                  "Source": "p.37, p.32 (top 6\u0027-6\u0022 x 6\u0027-6\u0022, printed base 8\u0027-7.5\u0022 x 8\u0027-7.5\u0022)",
                   "Sections": [
                     {
                       "Elevation": 6.7056000000000004,
                       "Polygon": [
                         {
-                          "S": 7.523289500000001,
-                          "N": -1.3159105,
+                          "S": 7.52475,
+                          "N": -1.3144500000000001,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": 10.155110500000001,
-                          "N": -1.3159105,
+                          "S": 10.15365,
+                          "N": -1.3144500000000001,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": 10.155110500000001,
-                          "N": 1.3159105,
+                          "S": 10.15365,
+                          "N": 1.3144500000000001,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": 7.523289500000001,
-                          "N": 1.3159105,
+                          "S": 7.52475,
+                          "N": 1.3144500000000001,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -113552,38 +113552,38 @@
                 {
                   "Name": "shaft W",
                   "Kind": "Column",
-                  "Source": "p.37, p.32",
+                  "Source": "p.37, p.32 (top 6\u0027-6\u0022 x 6\u0027-6\u0022, printed base 8\u0027-3.75\u0022 x 8\u0027-3.75\u0022)",
                   "Sections": [
                     {
                       "Elevation": 7.9248,
                       "Polygon": [
                         {
-                          "S": -10.1060123,
-                          "N": -1.2668123000000002,
+                          "S": -10.106025,
+                          "N": -1.266825,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": -7.572387700000001,
-                          "N": -1.2668123000000002,
+                          "S": -7.572375,
+                          "N": -1.266825,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": -7.572387700000001,
-                          "N": 1.2668123000000002,
+                          "S": -7.572375,
+                          "N": 1.266825,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": -10.1060123,
-                          "N": 1.2668123000000002,
+                          "S": -10.106025,
+                          "N": 1.266825,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -113637,38 +113637,38 @@
                 {
                   "Name": "shaft E",
                   "Kind": "Column",
-                  "Source": "p.37, p.32",
+                  "Source": "p.37, p.32 (top 6\u0027-6\u0022 x 6\u0027-6\u0022, printed base 8\u0027-3.75\u0022 x 8\u0027-3.75\u0022)",
                   "Sections": [
                     {
                       "Elevation": 7.9248,
                       "Polygon": [
                         {
-                          "S": 7.572387700000001,
-                          "N": -1.2668123000000002,
+                          "S": 7.572375,
+                          "N": -1.266825,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": 10.1060123,
-                          "N": -1.2668123000000002,
+                          "S": 10.106025,
+                          "N": -1.266825,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": 10.1060123,
-                          "N": 1.2668123000000002,
+                          "S": 10.106025,
+                          "N": 1.266825,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": 7.572387700000001,
-                          "N": 1.2668123000000002,
+                          "S": 7.572375,
+                          "N": 1.266825,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -114132,38 +114132,38 @@
                 {
                   "Name": "shaft W",
                   "Kind": "Column",
-                  "Source": "p.37, p.32",
+                  "Source": "p.37, p.32 (top 6\u0027-6\u0022 x 6\u0027-6\u0022, printed base 8\u0027-0\u0022 x 8\u0027-0\u0022)",
                   "Sections": [
                     {
                       "Elevation": 8.9916,
                       "Polygon": [
                         {
-                          "S": -10.060082750000001,
-                          "N": -1.2208827500000001,
+                          "S": -10.0584,
+                          "N": -1.2192,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": -7.6183172500000005,
-                          "N": -1.2208827500000001,
+                          "S": -7.62,
+                          "N": -1.2192,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": -7.6183172500000005,
-                          "N": 1.2208827500000001,
+                          "S": -7.62,
+                          "N": 1.2192,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": -10.060082750000001,
-                          "N": 1.2208827500000001,
+                          "S": -10.0584,
+                          "N": 1.2192,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
@@ -114217,38 +114217,38 @@
                 {
                   "Name": "shaft E",
                   "Kind": "Column",
-                  "Source": "p.37, p.32",
+                  "Source": "p.37, p.32 (top 6\u0027-6\u0022 x 6\u0027-6\u0022, printed base 8\u0027-0\u0022 x 8\u0027-0\u0022)",
                   "Sections": [
                     {
                       "Elevation": 8.9916,
                       "Polygon": [
                         {
-                          "S": 7.6183172500000005,
-                          "N": -1.2208827500000001,
+                          "S": 7.62,
+                          "N": -1.2192,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": 10.060082750000001,
-                          "N": -1.2208827500000001,
+                          "S": 10.0584,
+                          "N": -1.2192,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": 10.060082750000001,
-                          "N": 1.2208827500000001,
+                          "S": 10.0584,
+                          "N": 1.2192,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
                           "WebDirN": 0
                         },
                         {
-                          "S": 7.6183172500000005,
-                          "N": 1.2208827500000001,
+                          "S": 7.62,
+                          "N": 1.2192,
                           "BatterDirS": 0,
                           "BatterDirN": 0,
                           "WebDirS": 0,
