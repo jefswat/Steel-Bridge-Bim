@@ -221,6 +221,27 @@ public class ArchV2Tests
     }
 
     [Fact]
+    public void KnuckleCheesePlates_AlongTheTieChord_FromTheBearing()
+    {
+        var (p, b) = ArchTests.Model();
+        var a = b.Arch!;
+        var k = a.Knuckles.First(q => q.Name == "West");
+        k.Detail = new ArchKnuckleDetail { TieCutParallelToEndWeb = true, CheeseFromBearing = In(8), CheeseLength = In(11) };
+        k.Corners.Add(new ArchKnuckleCorner { Point = "T0", Rib = "South rib", Tie = "South tie", Splice = "RS1", OutsideLegHeight = In(10.5), InsideLegHeight = In(10.5) });
+        var (_, m) = ArchTests.Generate(p);
+        var t0 = a.Point("T0")!.Vec.XY; var t34 = a.Point("T34")!.Vec.XY;
+        var c = (t34 - t0).Normalized();
+        var ch = m.Steel.Parts.First(q => q.Mark == "KNUCKLE-WEST-T0-CH");
+        var along = ch.Mesh.Positions.Select(q => Vec2.Dot(m.Local(q).XY - t0, c)).ToList();
+        double brg = k.Detail.BearingFromSpringing;
+        // inner edges 8" each side of the CL bearing (square to the chord), span-side plate 11" long
+        Assert.Contains(along, x => Math.Abs(x - (brg + In(8))) < 1e-6);
+        Assert.Contains(along, x => Math.Abs(x - (brg - In(8))) < 1e-6);
+        Assert.Equal(brg + In(19), along.Max(), 6);
+        Assert.DoesNotContain(along, x => x > brg - In(8) + 1e-6 && x < brg + In(8) - 1e-6);
+    }
+
+    [Fact]
     public void Pt_DeckRebar_Ifc()
     {
         var (p, b) = ArchTests.Model();

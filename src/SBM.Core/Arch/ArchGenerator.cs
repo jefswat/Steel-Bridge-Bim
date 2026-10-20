@@ -97,6 +97,7 @@ public static partial class ArchGenerator
             foreach (var fb in _d.Floorbeams) BuildFloorbeam(fb);
             BuildBracing();
             foreach (var k in _d.Knuckles) { if (k.Detail is { } kd) BuildKnuckleV2(k, kd); else BuildKnuckle(k); }
+            FloorbeamFillConflicts();
             if (_d.Deck != null) BuildDeck(_d.Deck);
             for (int i = 0; i < _d.Bearings.Count; i++) BuildBearing(_d.Bearings[i], i);
             if (_d.Welds.Count > 0) BuildWeldRules();
@@ -845,9 +846,26 @@ public static partial class ArchGenerator
             var ex = Wd(e.WithZ(0));
             var en = Wd(nrm.WithZ(0));
             var flange = new Mesh();
-            RolledBuilder.AddExtrusion(flange, new[] { new Vec2(-fb.FlangeWidth / 2, 0), new Vec2(fb.FlangeWidth / 2, 0), new Vec2(fb.FlangeWidth / 2, fb.FlangeThickness), new Vec2(-fb.FlangeWidth / 2, fb.FlangeThickness) },
-                org, en, _fr.Z, ex, s0, s1);
-            AddPart($"{asm}-F", PartCategory.FloorbeamPlate, asm, $"PL {L(fb.FlangeThickness)} x {L(fb.FlangeWidth)} floorbeam flange", flange, fb.Material, s1 - s0);
+            // OPTIONAL (ArchKnuckleDetail.FloorbeamsStopAtEndFlange): a floorbeam whose flange reaches over a knuckle end flange (FB1 / FB33: T1 / T33' lie on
+            // the end flange edge, p.126) stops at the end flange edge - both flanges are in the same level (the end plate lies on both).
+            var cuts = EndFlangeCuts(pa.XY, e, nrm);
+            var fpoly = new List<Vec2> { new(s0, -fb.FlangeWidth / 2), new(s1, -fb.FlangeWidth / 2), new(s1, fb.FlangeWidth / 2), new(s0, fb.FlangeWidth / 2) };
+            var fcut = ClipCuts(fpoly, cuts);
+            string fNote = "";
+            if (fcut.Count >= 3 && Math.Abs(MeshBuilder.SignedArea(fcut)) < Math.Abs(MeshBuilder.SignedArea(fpoly)) - 1e-9)
+            {
+                var loc = fcut.Select(q => pa.XY + e * q.X + nrm * q.Y).ToList();
+                if (MeshBuilder.SignedArea(loc) < 0) loc.Reverse();
+                MeshBuilder.AddExtrusion(flange, loc, _fr, 0, fb.FlangeThickness);
+                double cutA = Math.Abs(MeshBuilder.SignedArea(fpoly)) - Math.Abs(MeshBuilder.SignedArea(fcut));
+                fNote = $", cut at the knuckle end flange edge ({cutA / (0.0254 * 0.0254):F1} sq in removed)";
+                Info($"Arch floorbeam {fb.Name}: flange stops at the knuckle end flange edge ({cutA / (0.0254 * 0.0254):F1} sq in of the {L(fb.FlangeWidth)} flange would lie in the end flange; p.126: T point on the end flange edge, end floorbeam detail sheet not in the set).");
+            }
+            else
+                RolledBuilder.AddExtrusion(flange, new[] { new Vec2(-fb.FlangeWidth / 2, 0), new Vec2(fb.FlangeWidth / 2, 0), new Vec2(fb.FlangeWidth / 2, fb.FlangeThickness), new Vec2(-fb.FlangeWidth / 2, fb.FlangeThickness) },
+                    org, en, _fr.Z, ex, s0, s1);
+            AddPart($"{asm}-F", PartCategory.FloorbeamPlate, asm, $"PL {L(fb.FlangeThickness)} x {L(fb.FlangeWidth)} floorbeam flange{fNote}", flange, fb.Material, s1 - s0,
+                0, fNote.Length > 0 && EndFlangeCutFlag() is { Length: > 0 } fl ? Assumption.UnresolvedDimension(fl, "flange cut along the end flange edge") : null);
             var web = new Mesh();
             var poly = new[]
             {
@@ -869,8 +887,8 @@ public static partial class ArchGenerator
             AddPart($"{asm}-W", PartCategory.FloorbeamPlate, asm, $"PL {L(fb.WebThickness)} floorbeam web {L(fb.DepthAtEnds)} - {L(fb.DepthAtCrown)} deep{slotNote}", web, fb.Material, s1 - s0);
             if (_d.FloorbeamConnection is { } fc)
             {
-                FloorbeamEnd(fb, fc, ta.Def, asm, wf, len, false);
-                FloorbeamEnd(fb, fc, tb.Def, asm, wf, len, true);
+                FloorbeamEnd(fb, fc, ta.Def, asm, wf, len, false, cuts);
+                FloorbeamEnd(fb, fc, tb.Def, asm, wf, len, true, cuts);
             }
             // Horizontal studs on both web faces at StudZ, 32 per face over the clear web (connection plates and PT slots excluded).
             if (fb.StudsPerFace > 0 && !double.IsNaN(fb.StudLength))
@@ -918,7 +936,7 @@ public static partial class ArchGenerator
 
         /// <summary>Floorbeam end at one tie (p.146): stiffener in the floorbeam web plane (tie web to the tie flange edge), web connection plates both
         /// faces (stiffener to floorbeam web), flange connection plates top (and bottom) each side of the web, 7/8" bolts.</summary>
-        private void FloorbeamEnd(ArchFloorbeamDefinition fb, ArchFloorbeamConnection fc, ArchTieDefinition tie, string asm, Frame3 wf, double len, bool atB)
+        private void FloorbeamEnd(ArchFloorbeamDefinition fb, ArchFloorbeamConnection fc, ArchTieDefinition tie, string asm, Frame3 wf, double len, bool atB, List<(Vec2 n, double c)>? cuts = null)
         {
             // s measured from the tie CL toward the span; map to the floorbeam frame (s from tie A).
             double S(double s) => atB ? len - s : s;
@@ -952,7 +970,7 @@ public static partial class ArchGenerator
             double fe = fb.FlangeWidth / 2;
             var mf = new Mesh();
             var mfb = new Mesh();
-            int nfb = 0;
+            int nfb = 0, droppedHoles = 0, cutBottom = 0;   // cuts: in the floorbeam plan frame (s from tie A, lateral) = the flange plate frame ff (u, v)
             foreach (int sd in new[] { 1, -1 })
             {
                 var fh = new List<Hole>();
@@ -962,15 +980,28 @@ public static partial class ArchGenerator
                 double w0 = sd > 0 ? fe - fc.FlangePlateWidth : -fe, w1 = sd > 0 ? fe : -fe + fc.FlangePlateWidth;
                 var fp = Ccw(new List<Vec2> { new(S(joint - pl), w0), new(S(joint + pl), w0), new(S(joint + pl), w1), new(S(joint - pl), w1) });
                 const double up = 1;
+                // Holes over a knuckle end flange (FloorbeamsStopAtEndFlange): no bolt there (the flange stops at the end flange edge), the bottom plate is cut.
+                var keepH = cuts is { Count: > 0 } ? fh.Where(h => cuts.All(cc => Vec2.Dot(h.Center, cc.n) >= cc.c + h.Diameter / 2)).ToList() : fh;
+                droppedHoles += fh.Count - keepH.Count;
                 PlateBuilder.AddPlanar(mf, fp, fh, ff, up > 0 ? zf : -zf - fc.PlateThickness, up > 0 ? zf + fc.PlateThickness : -zf);
-                if (fc.BottomFlangePlates) { PlateBuilder.AddPlanar(mfb, fp, fh, ff, up > 0 ? -fc.PlateThickness : 0, up > 0 ? 0 : fc.PlateThickness); nfb++; }
+                if (fc.BottomFlangePlates)
+                {
+                    var fpb = cuts is { Count: > 0 } ? ClipCuts(fp, cuts) : fp;
+                    if (fpb.Count >= 3)
+                    {
+                        if (Math.Abs(MeshBuilder.SignedArea(fpb)) < Math.Abs(MeshBuilder.SignedArea(fp)) - 1e-9) cutBottom++;
+                        PlateBuilder.AddPlanar(mfb, Ccw(fpb), keepH, ff, up > 0 ? -fc.PlateThickness : 0, up > 0 ? 0 : fc.PlateThickness); nfb++;
+                    }
+                }
                 double gf = fc.PlateThickness + zf + (fc.BottomFlangePlates ? fc.PlateThickness : 0);
-                foreach (var h in fh)
+                foreach (var h in keepH)
                     Model.Steel.Bolts.Add(new BoltInstance { Frame = BoltFrame((u, v, t) => ff.ToWorld(u, v, t), h.Center.X, h.Center.Y, up * (zf + fc.PlateThickness), -up), Grip = gf, Length = bolt.LengthForGrip(gf), Assembly = asm });
             }
             AddPart($"{asm}-ST{end}", PartCategory.ArchStiffener, asm, $"PL {L(fc.StiffenerThickness)} connection stiffener at {tie.Name} (p.146)", ms, fc.Material, half - sw);
             AddPart($"{asm}-WP{end}", PartCategory.ArchConnectionPlate, asm, $"2 - PL {L(fc.PlateThickness)} x {L(fc.WebPlateHeight)} x {L(fc.PlateLength)} web connection plates (p.146)", mw, fc.Material, fc.PlateLength);
             AddPart($"{asm}-FP{end}", PartCategory.ArchConnectionPlate, asm, $"2 - PL {L(fc.PlateThickness)} x {L(fc.FlangePlateWidth)} x {L(fc.PlateLength)} top flange connection plates (p.146)", mf, fc.Material, fc.PlateLength);
+            if (droppedHoles > 0 || cutBottom > 0)
+                Info($"Arch floorbeam {fb.Name} end {end}: {cutBottom} bottom flange connection plate(s) cut at the knuckle end flange edge, {droppedHoles} bolt(s) over the end flange not modeled (end floorbeam detail sheet not in the set).");
             if (nfb > 0)
                 AddPart($"{asm}-FB{end}", PartCategory.ArchConnectionPlate, asm, $"2 - PL {L(fc.PlateThickness)} x {L(fc.FlangePlateWidth)} x {L(fc.PlateLength)} bottom flange connection plates (p.146)", mfb, fc.Material, fc.PlateLength,
                     0, fc.BottomUnresolved.Length > 0 ? Assumption.Unresolved(fc.BottomUnresolved, "bottom plates = the top plates mirrored") : null);

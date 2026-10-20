@@ -118,6 +118,46 @@ public static partial class ArchGenerator
             Model.RibBoxFillSteelVolume = steelIn;
         }
 
+        /// <summary>
+        /// Reports (never moves) the bottom flange connection plates of the floorbeams at the knuckles that overlap the knuckle fill plates under the tie
+        /// flange: p.146 Detail 1 (typical connection) puts a plate under the floorbeam / tie flanges, p.124 / 125 put the 1 1/8" fill (splice outline) under
+        /// the tie flange past the joint - at FB1 / FB33 both occupy that space; the end floorbeam detail sheet (p.124 note 1) is not in the set.
+        /// </summary>
+        private void FloorbeamFillConflicts()
+        {
+            if (!_d.Knuckles.Any(k => k.Detail is { FloorbeamsStopAtEndFlange: true })) return;
+            var plates = Model.Steel.Parts.Where(p => p.Category == PartCategory.ArchConnectionPlate && System.Text.RegularExpressions.Regex.IsMatch(p.Mark, @"-FB[AB]$")).ToList();
+            var fills = Model.Steel.Parts.Where(p => p.Category == PartCategory.KnucklePlate && p.Mark.EndsWith("-FI")).ToList();
+            foreach (var pl in plates)
+            {
+                var bp = pl.Mesh.Bounds();
+                foreach (var fi in fills)
+                {
+                    var bf = fi.Mesh.Bounds();
+                    if (!BoxesOverlap(bp, bf)) continue;
+                    var a = new RebarCover(new[] { pl.Mesh }, 0.01); var b = new RebarCover(new[] { fi.Mesh }, 0.01);
+                    double h = In(1.0 / 16);
+                    var lo = new Vec3(Math.Max(bp.Min.X, bf.Min.X), Math.Max(bp.Min.Y, bf.Min.Y), Math.Max(bp.Min.Z, bf.Min.Z));
+                    var hi = new Vec3(Math.Min(bp.Max.X, bf.Max.X), Math.Min(bp.Max.Y, bf.Max.Y), Math.Min(bp.Max.Z, bf.Max.Z));
+                    int n = 0;
+                    for (double x = lo.X + h / 2; x < hi.X; x += h)
+                        for (double y = lo.Y + h / 2; y < hi.Y; y += h)
+                            for (double z = lo.Z + h / 2; z < hi.Z; z += h)
+                            {
+                                var q = new Vec3(x, y, z);
+                                if (a.Contains(q) && b.Contains(q)) n++;
+                            }
+                    if (n == 0) continue;
+                    double vol = n * h * h * h / Math.Pow(0.0254, 3);
+                    string item = $"floorbeam {pl.Assembly} bottom flange connection plates {pl.Mark} vs the knuckle fill {fi.Mark} under the tie flange";
+                    Model.Checks.Add(new ArchCheck("CONFLICT (p.146 vs p.124 / 125): " + item, "one plate under the tie flange",
+                        $"both: overlap ~{vol:F0} cu in", vol, false,
+                        "p.146 Detail 1 (typical floorbeam connection; bottom plates = top plates mirrored, already UNRESOLVED) vs the 1 1/8\" fill under the tie flange past the joint (p.124 / 125 plan + A-A); the end floorbeam detail (p.124 note 1) is not in the set - plates kept, not moved"));
+                    Warn($"Arch CONFLICT (p.146 vs p.124 / 125): {item} overlap ~{vol:F0} cu in (sampled at 1/16\") - the typical bottom connection plate and the knuckle fill both sit under the tie flange at the end floorbeam; the end floorbeam detail sheet (p.124 note 1) is not in the set. Both kept as drawn.");
+                }
+            }
+        }
+
         private static bool BoxesOverlap(Box3 a, Box3 b) => a.Min.X <= b.Max.X && b.Min.X <= a.Max.X && a.Min.Y <= b.Max.Y && b.Min.Y <= a.Max.Y && a.Min.Z <= b.Max.Z && b.Min.Z <= a.Max.Z;
     }
 }

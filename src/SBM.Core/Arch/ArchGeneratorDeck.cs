@@ -400,6 +400,7 @@ public static partial class ArchGenerator
             var asu = Assumption.UnresolvedDimension(pt.Unresolved.Length > 0 ? pt.Unresolved + " " + radiusFlag : radiusFlag, basis);
             if (pt.Unresolved.Length > 0) Warn(pt.Unresolved);
             var ptSmooth = new List<(string name, int bends, double dev, double minR)>();
+            double anchorShift = 0;
             var zs = new List<Vec3[]>();
             foreach (var t in dk.Tendons)
             {
@@ -442,8 +443,9 @@ public static partial class ArchGenerator
                         "along the end web inside face from the chord crossing"));
                     return e;
                 }
-                if (Opening(path[0]) is { } o0) path.Insert(0, KnuckleEnd(path[0], o0.q, o0.face, o0.at, "start"));
-                if (Opening(path[^1]) is { } o1) path.Add(KnuckleEnd(path[^1], o1.q, o1.face, o1.at, "end"));
+                Vec2? face0 = null, face1 = null;
+                if (Opening(path[0]) is { } o0) { path.Insert(0, KnuckleEnd(path[0], o0.q, o0.face, o0.at, "start")); face0 = o0.face; }
+                if (Opening(path[^1]) is { } o1) { path.Add(KnuckleEnd(path[^1], o1.q, o1.face, o1.at, "end")); face1 = o1.face; }
                 // No kinks (user review 9d): a strand cannot turn at a point. The plans give the slot / opening points and draw the tendons straight in
                 // the knuckle, but no curve radius -> every change of direction becomes a tangent circular arc using the full half-legs (largest radius
                 // that fits), so the path is tangent-continuous end to end; the offset from each given point is reported.
@@ -473,7 +475,27 @@ public static partial class ArchGenerator
                     var dx = (p1 - p0).XY.Normalized().WithZ(0);
                     var fr = new Frame3(W(p0), Wd(dx), Wd(dx.XY.Left.WithZ(0)), _fr.Z);
                     var m = new Mesh();
-                    MeshBuilder.AddBox(m, fr, 0, pt.AnchorLength, -pt.AnchorWidth / 2, pt.AnchorWidth / 2, -pt.AnchorHeight / 2, pt.AnchorHeight / 2);
+                    // OPTIONAL (p.155 anchorage plan / A-A): the envelope's back follows the skewed end web inside face (the drawn block between the end web and
+                    // the anchorage casting); front square to the tendon AnchorLength from the face at the tendon CL. v2-v7: a box from the CL crossing,
+                    // so one back corner sat in the end web.
+                    var face = p0 == path[0] ? face0 : face1;
+                    bool skewBack = false;
+                    if (pt.AnchorBackOnEndWeb && face is { } fdir)
+                    {
+                        var nF = fdir.Left; var lat = dx.XY.Left;
+                        double den = Vec2.Dot(dx.XY, nF);
+                        if (Math.Abs(den) > 0.2)
+                        {
+                            double kf = -Vec2.Dot(lat, nF) / den;   // face: u = kf v
+                            double hwA = pt.AnchorWidth / 2;
+                            var outline = new List<Vec2> { new(-kf * hwA, -hwA), new(pt.AnchorLength, -hwA), new(pt.AnchorLength, hwA), new(kf * hwA, hwA) };
+                            if (MeshBuilder.SignedArea(outline) < 0) outline.Reverse();
+                            MeshBuilder.AddExtrusion(m, outline, fr, -pt.AnchorHeight / 2, pt.AnchorHeight / 2);
+                            anchorShift = Math.Max(anchorShift, Math.Abs(kf) * hwA);
+                            skewBack = true;
+                        }
+                    }
+                    if (!skewBack) MeshBuilder.AddBox(m, fr, 0, pt.AnchorLength, -pt.AnchorWidth / 2, pt.AnchorWidth / 2, -pt.AnchorHeight / 2, pt.AnchorHeight / 2);
                     AddPart($"{asm}-A{(p0 == path[0] ? 1 : 2)}", PartCategory.PtAnchorage, asm, $"PT flat anchorage of {t.Name} (envelope)", m, pt.AnchorMaterial, pt.AnchorLength, 0, asu);
                     foreach (double at in pt.ZoneBarsAt)
                     {
@@ -484,6 +506,11 @@ public static partial class ArchGenerator
                         zs.Add(new[] { Q(-hw, -hh), Q(hw, -hh), Q(hw, hh), Q(-hw, hh), Q(-hw, -hh) });
                     }
                 }
+            }
+            if (anchorShift > 0)
+            {
+                Info($"Arch PT anchorages: envelope back on the skewed end web inside face (p.155 anchorage plan / A-A: the drawn block between the end web and the casting), front square to the tendon {L(pt.AnchorLength)} from the face at the tendon CL; the face is up to {L(anchorShift)} off square across the {L(pt.AnchorWidth)} width.");
+                if (pt.AnchorWedgeUnresolved.Length > 0) Warn(pt.AnchorWedgeUnresolved);
             }
             if (ptSmooth.Count > 0)
             {

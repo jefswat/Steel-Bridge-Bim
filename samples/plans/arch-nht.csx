@@ -369,7 +369,19 @@ var kDetail = new ArchKnuckleDetail
     // at 117.47 deg, end web 117.45-117.49 deg, tie CL 7.42 deg -> 20.05 deg off square), 1/2" gap normal to it from the end flange inner edge; the
     // knuckle tie web ends at the end flange edge (Section A-A: end flange and knuckle web end on one line, tie 1/2" further).
     TieCutParallelToEndWeb = true,
-    CheeseUnresolved = U("p.124 / 125 Section A-A", "knuckle jack cheese plates", "the 1\" cheese plates at the jacks (1'-1 each side of CL bearing) are drawn ~10 1/4\" long but not dimensioned in plan", "10 1/4\" x 10 1/4\" centred on the jacks."),
+    // t30 / d22 (2026-10-20): p.124 Section A-A VECTOR (1" = 1'-0 = 6 pt/in, CL brg x = 285.7 pt, CL jacks 207.7 / 363.7): the cheese plates are drawn from 8.0" to
+    // 19.0" (span side) and 8.0" to 18.3" (end side, ending with the end flange / splice plate at x = 175.9) from the CL bearing - their inner edges abut the
+    // 1'-4 upper sole plate (p.107: 8" each side of CL brg). The partial plan locates the jacks and the bearing on the T0'-T34' CHORD, not on the tie tangent
+    // (the v2-v7 plates followed the tie tangent, 7.42 deg off it, and were centred on the jacks: 1/2" into the upper sole plate).
+    CheeseFromBearing = In(8), CheeseLength = In(11),
+    // t30 / d22: FB1 / FB33 meet the ties at T1 / T33' which lie ON the end flange edge (p.126 end plate layout: T1 at the edge line; model 1/4" off); the 12"
+    // floorbeam flange (same level as the end flange top: the end plate lies on both) cannot continue over the end flange -> it stops at the end flange edge,
+    // as does the (assumed) bottom connection plate; bolts there are not modeled. The bottom plate vs the 1 1/8" fill under the tie flange = CONFLICT rows.
+    FloorbeamsStopAtEndFlange = true,
+    FloorbeamEndUnresolved = U("p.124 note 1, p.126", "FB1 / FB33 flange end at the knuckle", "the end floorbeam detail sheet ('ARCH SPAN END FLOORBEAM', p.124 note 1) is not in the set; p.126 puts T1 / T33' on the end flange edge",
+        "Floorbeam flange and bottom connection plates cut along the end flange edge; bolts over the end flange not modeled."),
+    CheeseUnresolved = U("p.124 / 125 Section A-A", "knuckle jack cheese plates", "the 1\" cheese plates at the jacks (1'-1 each side of CL bearing) are drawn but not dimensioned, and not shown in plan (width)",
+        "Along the tie chord from 8\" each side of the CL bearing (abutting the 1'-4 upper sole plate) 11\" outward, the end-side plate cut at the end flange end (p.124 A-A vector, to scale); width 10 1/4\" (scaled)."),
 };
 var studRows = new List<ArchPoint>();
 for (int i = -3; i <= 5; i++) studRows.Add(new ArchPoint($"R{i + 4}", In(23.875) + i * In(10.625), 0, i < 0 ? In(8) : In(7)));
@@ -443,6 +455,12 @@ deck.PtSystem = new ArchPtSystem
     AnchorLength = In(10.5), AnchorWidth = In(13), AnchorHeight = In(4),
     ZoneBarsAt = { In(12), In(16), In(34.5), In(38.5) }, ZoneBarWidth = In(9.25), ZoneBarHeight = In(6),
     Unresolved = U("p.155", "PT strand arrangement and anchorage envelope", "the flat duct, the strand spacing in it and the anchorage casting are drawn (Section A-A / B-B) but not dimensioned", "Strands side by side at 1 15/16\", anchorage 13\" x 4\" x 10 1/2\" (scaled); duct not modeled."),
+    // t30 / d22 (2026-10-20): p.155 anchorage plan VECTOR (1/4" = 1'-0 = 1.5 pt/in): each anchorage starts with a block whose back edge lies ON the skewed end web
+    // inside face (192.3,169.7)-(203.3,190.8) = the face line, front square to the tendon at 212.5 (6.1" / 13.4" from the face at its sides, 9.7" at the CL);
+    // the v2-v7 box started square at the CL crossing, one back corner 1/2" in the end web.
+    AnchorBackOnEndWeb = true,
+    AnchorWedgeUnresolved = U("p.155 anchorage plan / Section A-A", "PT anchorage block at the end web", "the tapered block between the skewed end web and the anchorage casting is drawn but not labelled (pocket former, bearing block or part of the anchorage)",
+        "Part of the anchorage envelope: back on the end web inside face, front square to the tendon 10 1/2\" from the face at the tendon CL (scaled)."),
 };
 deck.Curbs.Add(new ArchCurbDefinition { Name = "Curb LT", InnerOffset = -F(7) });
 deck.Curbs.Add(new ArchCurbDefinition { Name = "Curb RT", InnerOffset = F(7) });
@@ -467,10 +485,11 @@ Brg("NW", "Pier 10", "T34'", 534.726); Brg("SW", "Pier 10", "T0", 534.779); Brg(
 foreach (var (bn, tn) in new[] { ("NW", "T34'"), ("SW", "T0"), ("NE", "T0'"), ("SE", "T34") })
 {
     var t = arch.Point(tn)!;
-    bool west = t.X < 0;
-    var other = west ? (tn == "T34'" ? arch.Point("T0")! : arch.Point("T34'")!) : (tn == "T0'" ? arch.Point("T34")! : arch.Point("T0'")!);
-    var line = new Vec2(other.X - t.X, other.Y - t.Y).Normalized();
-    var nrm = line.Left; if (Vec2.Dot(nrm, new Vec2(-t.X, -t.Y)) < 0) nrm = -nrm;
+    // t30 / d22 (2026-10-20): p.124 partial plan - the 2" from T34' to CL BRG is a dimension ALONG the T0'-T34' (tie) chord, the CL BRG line is drawn square
+    // to that chord and the bearing (dashed 15" elastomer) square to it (vector). v2-v7 took the 2" normal to the T0-T34' end chord (27 deg off): the bearing
+    // sat 1/4" too far along and 15/16" sideways, and the upper sole plate ran 1/2" into the jack cheese plates.
+    var other = arch.Point(tn switch { "T34'" => "T0'", "T0'" => "T34'", "T0" => "T34", _ => "T0" })!;
+    var nrm = new Vec2(other.X - t.X, other.Y - t.Y).Normalized();
     arch.Points.Add(new ArchPoint("BRG-" + bn, t.X + nrm.X * In(2), t.Y + nrm.Y * In(2), 0));
 }
 
