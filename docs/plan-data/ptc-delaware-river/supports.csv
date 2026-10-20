@@ -1,0 +1,46 @@
+support,station,type,skew,page,source text,bridge,note
+W Abutment,646+21.463,Abutment,0,"p.11, p.1, p.43","p.11 plan: CL Shoe Sta. 646+21.463; p.1 / p.43 CL Brg - W. Abut. Sta 646+21.463",PTC Girder spans 1-10,CL bearing
+Pier 1,647+44.630,Pier,0,"p.5, p.43","CL Pier No.1 Sta 647+44.630",PTC Girder spans 1-10,CL pier; simple girder spans: bearings 1'-3 each side of the CL (p.42 / p.43 note 121'-11 c.c. brgs spans 1-9 and 29-31); bearing lines are not separate supports here
+Pier 2,648+69.046,Pier,0,"p.5, p.43","Sta. 648+69.046",PTC Girder spans 1-10,CL pier
+Pier 3,649+93.463,Pier,0,"p.5, p.43","Sta. 649+93.463",PTC Girder spans 1-10,CL pier
+Pier 4,651+17.880,Pier,0,"p.5, p.43","Sta. 651+17.880",PTC Girder spans 1-10,CL pier
+Pier 5,652+42.297,Pier,0,"p.5, p.43","Sta. 652+42.297",PTC Girder spans 1-10,CL pier
+Pier 6,653+66.713,Pier,0,"p.5, p.43","Sta. 653+66.713",PTC Girder spans 1-10,CL pier
+Pier 7,654+91.130,Pier,0,"p.5, p.43","Sta. 654+91.130",PTC Girder spans 1-10,CL pier
+Pier 8,656+15.547,Pier,0,"p.5, p.43","Sta. 656+15.547",PTC Girder spans 1-10,CL pier
+Pier 9,657+39.963,Pier,0,"p.5, p.43","Sta. 657+39.963",PTC Girder spans 1-10,CL pier
+Pier 10 girder brg,658+61.651,Pier (girder shoe),0,"p.9, p.5, p.43, p.42","p.9 plan: CL Shoe Sta. 658+61.651; p.43 CL Brg - Gdr. Span Sta. 658+61.651 (rev 10-26-54 Changed Shafts & Girder Brgs; p.1 original 3-9-54 = 121'-5 / 5'-0 = 658+61.380)",PTC Girder spans 1-10,as-built girder shoe line; span 10 = 121'-8 1/4 from pier 9 CL (p.42)
+Pier 10 truss brg,658+66.380,Pier (truss shoe),0,"p.9, p.5, p.43","p.9 plan: CL Shoe Sta. 658+66.380; p.43 CL Brg - Truss Span Sta. 658+66.380",PTC 3-span truss 11-13,4'-8 3/4 from the girder shoe (p.9 / p.42)
+Pier 11,660+81.880,Pier,0,"p.5","Sta. 660+81.880 (3-span truss 215'-6 spans)",PTC 3-span truss 11-13,CL pier = shoe (intermediate truss pier)
+Pier 12,662+97.380,Pier,0,"p.5","Sta. 662+97.380",PTC 3-span truss 11-13,CL pier = shoe
+Pier 13 W brg,665+12.880,Pier (truss shoe),0,"p.7, p.1, p.42","CL Pier 13 Sta 665+14.880 (p.7); 2'-0 each side, 4'-0 c.c. brgs (p.1, p.42): 3-span truss end bearing = CL - 2'-0",PTC 3-span truss 11-13,DERIVED from CL pier +/- 2'-0 (p.1 dimension)
+Pier 13 E brg,665+16.880,Pier (truss shoe),0,"p.7, p.1, p.42","CL + 2'-0 (p.1): 4-span truss start bearing",PTC 4-span truss 14-17,DERIVED from CL pier +/- 2'-0 (p.1 dimension)
+Pier 14,667+86.255,Pier,0,"p.7","Pier No. 14 CL Pier Sta. 667+86.255",PTC 4-span truss 14-17,CL pier = shoe
+Pier 15,670+55.630,Pier,0,"p.6","Pier No. 15 CL Pier Sta. 670+55.630",PTC 4-span truss 14-17,CL pier = shoe
+Pier 16,673+25.005,Pier,0,"p.6","Pier No. 16 CL Pier Sta. 673+25.005",PTC 4-span truss 14-17,CL pier = shoe
+Pier 17 W brg,675+94.380,Pier (truss shoe),0,"p.16, p.1, p.69","CL Pier 17 Sta 675+96.38 (p.16); 2'-0 each side (p.1)",PTC 4-span truss 14-17,DERIVED CL - 2'-0 (665+16.880 + 1077'-6 closes on it)
+Pier 17 main brg,675+98.380,Pier (truss shoe),0,"p.1, p.69, p.16","p.1 / p.69: V.P.C. Sta. 675+98.380 = CL Bearing Span 18; CL Pier 17 Sta 675+96.38 (p.16)",PTC Arch truss 18-20,main span start bearing = CL pier + 2'-0
+Pier 18,679+39.380,Pier,0,"p.16, p.69","CL Pier No.18 Sta. 679+39.38 (p.16); p.69 CL of Pier 18 Sta. 679+39.380",PTC Arch truss 18-20,fixed shoe
+Pier 19,686+21.380,Pier,0,"p.16, p.1","CL Pier No.19 Sta. 686+21.38",PTC Arch truss 18-20,fixed shoe
+Pier 20 main brg,689+62.380,Pier (truss shoe),0,"p.1, p.69, p.16","p.1 P.V.T. Sta. 689+62.380 = CL Brg (Main Span); CL Pier 20 Sta 689+64.38 (p.16)",PTC Arch truss 18-20,main span end bearing = CL pier - 2'-0
+Pier 20 E brg,689+66.380,Pier (truss shoe),0,"p.1, p.16","CL Pier 20 Sta 689+64.38 + 2'-0",PTC 4-span truss 21-24,DERIVED CL + 2'-0
+Pier 21,692+35.755,Pier,0,"p.32","Sta. 692+35.755",PTC 4-span truss 21-24,CL pier = shoe
+Pier 22,695+05.130,Pier,0,"p.32","Sta. 695+05.130",PTC 4-span truss 21-24,CL pier = shoe
+Pier 23,697+74.505,Pier,0,"p.32, p.34","Sta. 697+74.505",PTC 4-span truss 21-24,CL pier = shoe
+Pier 24 W brg,700+43.880,Pier (truss shoe),0,"p.34, p.32, p.1","CL Pier 24 Sta. 700+45.880 (p.34 / p.32); 2'-0 each side, 4'-0 c.c. (p.1)",PTC 4-span truss 21-24,DERIVED CL - 2'-0 (689+66.380 + 1077'-6 closes on it)
+Pier 24 E brg,700+47.880,Pier (truss shoe),0,"p.34, p.32, p.1","CL + 2'-0",PTC 3-span truss 25-27,DERIVED CL + 2'-0
+Pier 25,702+63.380,Pier,0,"p.32","Sta. 702+63.380",PTC 3-span truss 25-27,CL pier = shoe
+Pier 26,704+78.880,Pier,0,"p.32","Sta. 704+78.880",PTC 3-span truss 25-27,CL pier = shoe
+Pier 27 truss brg,706+94.380,Pier (truss shoe),0,"p.36, p.32, p.43","p.36 plan: CL Shoe Sta. 706+94.380; p.43 CL Brg - Truss Span Sta. 706+94.380",PTC 3-span truss 25-27,
+Pier 27 girder brg,706+99.109,Pier (girder shoe),0,"p.36, p.32, p.43, p.42","p.36 plan: CL Shoe Sta. 706+99.109; p.43 CL Brg - Gdr. Span Sta. 706+99.109 (rev 10-26-54; p.1 original 706+99.380)",PTC Girder spans 28-31,4'-8 3/4 from the truss shoe
+Pier 28,708+20.797,Pier,0,"p.32, p.43","Sta. 708+20.797",PTC Girder spans 28-31,CL pier; span 28 = 121'-8 1/4 from the girder shoe (p.42)
+Pier 29,709+45.213,Pier,0,"p.32, p.43","Sta. 709+45.213",PTC Girder spans 28-31,CL pier
+Pier 30,710+69.630,Pier,0,"p.32, p.43","Sta. 710+69.630",PTC Girder spans 28-31,CL pier
+E Abutment,711+92.797,Abutment,0,"p.38, p.32, p.43, p.42, p.3","p.38 plan + pile plan: CL Shoe Sta. 711+92.797; p.32 / p.43 / p.42 CL Brg - E. Abut. 711+92.797 (p.1 original 3-9-54: 711+94.046)",PTC Girder spans 28-31,CL bearing (shoe); the end of structure is 34'-9 east of it = 712+27.547 (p.38 Section A-A, p.41)
+Pier 10 CL footing,658+63.880,Reference (not a support),0,"p.9","p.9 plan: CL Footing Sta. 658+63.88",,centre between the two shoes
+Pier 27 CL footing,706+96.880,Reference (not a support),0,"p.36","p.36 plan: CL Footing Sta. 706+96.88",,centre between the two shoes
+Expansion dam centre pier 10,658+64.568,Expansion dam,0,"p.1","Ctr. Expansion Dam Sta. 658+64.568 (p.1, 3-9-54; p.54 prints no station; UNRESOLVED whether it moved with the 10-26-54 girder shoe shift)",,
+Expansion dam centre pier 27,706+96.192,Expansion dam,0,"p.1","Ctr. Expansion Dam Sta. 706+96.192 (p.1 only)",,
+Expansion dam W22 mid-span,682+80.380,Expansion dam,0,"p.92, p.69, p.1","expansion dam at the arch mid-span panel point W22 = Center of Bridge P.V.I. 682+80.380",,
+Paving notch W,646+17.796,Paving notch,0,"p.1","Paving Notch Sta. 646+17.796",,
+Paving notch E,712+27.047,Paving notch,0,"p.1","Paving Notch Sta. 712+27.047 (p.1 original; as-built end of structure 712+27.547 on p.38 / p.41)",,

@@ -383,7 +383,7 @@ public sealed class SbmDocument
     public IfcExportResult ExportIfc(string path, IfcGeometryMode geometry = IfcGeometryMode.Parametric, double chordTolerance = 0, bool forCheck = false, bool keepDesignations = false)
     {
         Regenerate();
-        var data = _models.OfType<BridgeModel>().Where(m => m.Steel != null || m.Prestressed != null || m.Concrete?.Segmental != null).Select(m => new IfcBridgeData(m.Framing, m.Steel, m.Concrete, m.Substructure, m.Prestressed)).ToList();
+        var data = _models.OfType<BridgeModel>().Where(m => m.Steel != null || m.Prestressed != null || m.Concrete?.Segmental != null || m.Framing.Definition.SupportLinesOnly).Select(m => new IfcBridgeData(m.Framing, m.Steel, m.Concrete, m.Substructure, m.Prestressed)).ToList();
         return IfcExporter.Export(path, Project, data, new IfcExportOptions(geometry, chordTolerance, forCheck, keepDesignations));
     }
 

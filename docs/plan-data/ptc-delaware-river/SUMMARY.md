@@ -85,3 +85,11 @@ Riveted steel, AASHTO 1953, H20-S16-44 live load. Reinforced concrete deck on ro
 5. **Deck and rail:** p.107, 108, 91, 92, 101-106, checked against the p.42 quantities.
 
 **Program gaps:** the program has no generic inputs yet for a riveted truss with gusset joints, bridge-rope suspenders, or cofferdam-built pier footings. They would have to be added (decision for the user).
+
+## Phase 1a status (2026-10-19): location only - DONE
+- Model `samples/plans/PTC Delaware River Bridge.sbm` = `build-ptc-delaware-river.csx`; check `check-ptc-delaware-river.csx` 132 PASS / 0 DIFF; links `sheet-links-ptc-delaware-river.json` (alignment + 7 units linked only to the sheets used: p.1, 5, 6, 7, 9, 11, 16, 32, 34, 36, 38, 42, 43, 69, 107).
+- Seven bridges, each `SupportLinesOnly` (new generic option, see CLAUDE.md): girder spans 1-10, 3-span truss 11-13, 4-span truss 14-17, arch truss 18-20, 4-span truss 21-24, 3-span truss 25-27, girder spans 28-31; 31 spans, 38 support lines. Stations, expansion dams, notches: `supports.csv`.
+- Alignment: LOCAL grid (origin CL brg W abutment 646+21.463), one tangent S 69 54'15" E, no georeference. Profile = printed gutter profile on the CL + crown 1/8"/ft (p.107). NGVD29 as printed.
+- Resolved: E abutment CL bearing 711+92.797 (p.38 / 32 / 42 / 43; p.1 711+94.046 is the superseded original), total 6571'-4" as built; piers 10 / 27 girder shoes 658+61.651 / 706+99.109; piers 14 / 15 read on p.7 / p.6.
+- UNRESOLVED: meridian of the bearing; map coordinates / CRS (georeference waits for the user's download OK: aerial / LiDAR fit in PA South EPSG:2272 + NAVD88); survey vs international feet; entry grade of the west curve (-0.5 % derived) and the profile beyond the structure ends (derived -3 %); whether the p.1 centre expansion dams (658+64.568 / 706+96.192) moved with the 10-26-54 shoe shift; expansion dam stations at the other piers (dams are at the pier CLs, not printed); the east paving notch as built (p.1 712+27.047 original vs structure end 712+27.547); state line station; deck, trusses, girders, substructure NOT modeled (no program features yet).
+- Not yet read in detail: p.8 and p.10 (piers 1-12 sheets; their stations were taken from p.5 / p.43), p.17 / 27 / 29 (piers 17-20 footings; stations from p.16), p.33 / 35 / 37 (piers 21-22, 25-26, 28-30; stations from p.32).

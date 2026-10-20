@@ -1,7 +1,8 @@
 // Plan sheet links of the PTC / NJTA Delaware River Bridge (Bucks Co. PA - Burlington Co. NJ, 1954; I-95 / former I-276, Delaware River-Turnpike Toll Bridge).
 // Format: see sheet-links-nebraska-st.json and docs/API.md "Companion database". Sheet index + notes: docs/plan-data/ptc-delaware-river/INDEX.md, SUMMARY.md, LOCATION.md.
 // PDF "Original Existing Bridge Plans from PTC.pdf" = 108 raster pages. s = drawing number / sheet (DRB-1 .. DRB-4, DRB-10; DRB-4 page = sheet + 40).
-// No model exists yet ("PTC Delaware River Bridge.sbm" is the planned name); no link rules yet (rules: []) - add them when the model's groups exist.
+// Model "PTC Delaware River Bridge.sbm" (phase 1a: alignment + profile + support lines only, 7 SupportLinesOnly bridges): the rules link the alignment and each structure unit ONLY to the
+// sheets its stations / profile were read from (user rule: an element references only the sheets used to model it). Truss / girder / pier details are not modeled yet.
 {
  "models": [
   "PTC Delaware River Bridge.sbm"
@@ -130,5 +131,157 @@
  "administrative": [
   "^TITLE SHEET"
  ],
- "rules": []
+ "rules": [
+    {
+      "id": "alignment-profile",
+      "sheets": ".*",
+      "pages": [
+        1,
+        5,
+        16,
+        32,
+        42,
+        43,
+        69,
+        107
+      ],
+      "basis": "Baseline S 69 54'15\" E (p.5 / 16 / 32 / 42), profile: west VPI 644+67.14 L 1060 (p.5, 42, 43), crest VPI 682+80.38 El 163.850 L 1364 (p.1, 42, 69), +/-3.00 % grades, gutter elevations (p.43 piers, p.69 panel points), crown 1/8\" per ft (p.107)",
+      "target": [
+        {
+          "level": "alignment",
+          "bridge_group": "*"
+        }
+      ]
+    },
+    {
+      "id": "supports-girders-1-10",
+      "sheets": ".*",
+      "pages": [
+        1,
+        5,
+        9,
+        11,
+        42,
+        43
+      ],
+      "basis": "Support lines: W abutment, piers 1-9 CL and the pier 10 girder shoe (p.5 piers, p.9 shoes, p.11 W abutment shoe, p.43 shoe stations / gutter elevations, p.1 / p.42 spans)",
+      "target": [
+        {
+          "level": "unit",
+          "bridge_group": "PTC Girder spans 1-10"
+        }
+      ]
+    },
+    {
+      "id": "supports-truss-11-13",
+      "sheets": ".*",
+      "pages": [
+        1,
+        5,
+        7,
+        9,
+        42,
+        43
+      ],
+      "basis": "Support lines: Pier 10 truss shoe (p.9), piers 11 / 12 (p.5), pier 13 and its 2'-0 bearings (p.7, p.1 / p.42)",
+      "target": [
+        {
+          "level": "unit",
+          "bridge_group": "PTC 3-span truss 11-13"
+        }
+      ]
+    },
+    {
+      "id": "supports-truss-14-17",
+      "sheets": ".*",
+      "pages": [
+        1,
+        5,
+        6,
+        7,
+        16,
+        42
+      ],
+      "basis": "Support lines: Pier 13 E bearing (p.7), pier 14 (p.7), piers 15 / 16 (p.6), pier 17 and its 2'-0 bearings (p.16, p.1 / p.42)",
+      "target": [
+        {
+          "level": "unit",
+          "bridge_group": "PTC 4-span truss 14-17"
+        }
+      ]
+    },
+    {
+      "id": "supports-arch-18-20",
+      "sheets": ".*",
+      "pages": [
+        1,
+        16,
+        42,
+        69
+      ],
+      "basis": "Support lines: Main span bearings at piers 17 / 20 (p.1, p.69 PVC / PVT), CL piers 17-20 (p.16), panel points / 31'-0 panels (p.69)",
+      "target": [
+        {
+          "level": "unit",
+          "bridge_group": "PTC Arch truss 18-20"
+        }
+      ]
+    },
+    {
+      "id": "supports-truss-21-24",
+      "sheets": ".*",
+      "pages": [
+        1,
+        16,
+        32,
+        34,
+        42
+      ],
+      "basis": "Support lines: Pier 20 E bearing (p.16, p.1), piers 21-23 (p.32), pier 24 and its 2'-0 bearings (p.34 / p.32, p.1)",
+      "target": [
+        {
+          "level": "unit",
+          "bridge_group": "PTC 4-span truss 21-24"
+        }
+      ]
+    },
+    {
+      "id": "supports-truss-25-27",
+      "sheets": ".*",
+      "pages": [
+        1,
+        32,
+        34,
+        36,
+        42,
+        43
+      ],
+      "basis": "Support lines: Pier 24 E bearing (p.34), piers 25 / 26 (p.32), pier 27 truss shoe (p.36, p.43)",
+      "target": [
+        {
+          "level": "unit",
+          "bridge_group": "PTC 3-span truss 25-27"
+        }
+      ]
+    },
+    {
+      "id": "supports-girders-28-31",
+      "sheets": ".*",
+      "pages": [
+        1,
+        32,
+        36,
+        38,
+        42,
+        43
+      ],
+      "basis": "Support lines: Pier 27 girder shoe (p.36), piers 28-30 (p.32), E abutment shoe 711+92.797 (p.38, p.32, p.43)",
+      "target": [
+        {
+          "level": "unit",
+          "bridge_group": "PTC Girder spans 28-31"
+        }
+      ]
+    }
+  ]
 }

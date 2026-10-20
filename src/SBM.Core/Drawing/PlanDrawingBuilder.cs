@@ -116,7 +116,22 @@ public static class PlanDrawingBuilder
         foreach (var s in f.Supports)
         {
             var bs = s.Bearings.OfType<BearingResult>().ToList();
-            if (bs.Count == 0) continue;
+            if (bs.Count == 0)
+            {
+                // Support lines only (no girders): the line across the deck width (definition edge offsets) with its label.
+                if (def.SupportLinesOnly)
+                {
+                    double z0 = f.Alignment.Profile.IsEmpty ? 0 : f.Alignment.Profile.ElevationAt(s.Station);
+                    var q0 = (s.AlignmentPoint + s.Direction * def.Deck.LeftEdgeOffset).WithZ(z0);
+                    var q1 = (s.AlignmentPoint + s.Direction * def.Deck.RightEdgeOffset).WithZ(z0);
+                    sl.Line(q0, q1);
+                    double rot0 = s.Direction.Angle;
+                    labels.Texts.Add(new TextItem((q0.XY - s.Direction * (ext + textH * 6)).WithZ(z0), $"CL BRG {s.Name}", textH, rot0));
+                    labels.Texts.Add(new TextItem((q0.XY - s.Direction * (ext + textH * 6) - s.Direction.Right * textH * 1.6).WithZ(z0),
+                        $"STA {units.FormatStation(s.Station)}", textH * 0.8, rot0));
+                }
+                continue;
+            }
             var p0 = bs[0].TopOfSteel;
             var p1 = bs[^1].TopOfSteel;
             var a = (p0.XY - s.Direction * ext).WithZ(p0.Z);
