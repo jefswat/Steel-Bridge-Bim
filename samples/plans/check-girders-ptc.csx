@@ -112,6 +112,18 @@ foreach (var (bname, first, nSpans, planC, planS, planCY) in specs)
     Cmp("S2 to G1 4'-0", 4.0, Math.Abs(sl[1].Offset) / ft - 29, 0.0005, " ft");
     Cmp("S1 to S2 6'-1", FtIn(6, 1), Math.Abs(sl[0].Offset - sl[1].Offset) / ft, 0.0005, " ft", dec: 4);
     Cmp("outer stringer lines S2 to S2: 8 spaces @ 8'-3 = 66'-0", 66, Math.Abs(sl[1].Offset - sl[9].Offset) / ft, 0.0005, " ft");
+    // brackets B1 (p.45 note: as the approach truss spans, p.55: 10'-9 cantilever = S1 + 8 in., 2'-0 1/2 b. to b. of angles at the tip; flagged)
+    {
+        var br = tm.Steel.Parts.First(p => p.Mark == $"S-B1-{first}-1");
+        var pos = br.Mesh.Positions.Select(v => (o: al0.Inverse(v.XY).Offset, z: v.Z)).ToList();
+        double tip = pos.Max(q => q.o);
+        var atTip = pos.Where(q => q.o > tip - 0.02).ToList();
+        Cmp("bracket B1 tip from the CL: 29'-0 + 10'-9 = S1 + 8 in. (p.45 -> p.55 / p.48)", 39.75, tip / ft, 0.04, " ft", "end cut square to the crowned bracket axis: its top corner reaches 3/8 in. further", 4);
+        Cmp("bracket B1 depth at the tip: 2'-0 1/2 b. to b. of angles + 1/2 cover plate (p.45 -> p.55)", 25.0 / 12, (atTip.Max(q => q.z) - atTip.Min(q => q.z)) / ft, 0.01, " ft", "", 4);
+        var f2 = tm.Steel.Parts.First(p => p.Mark == $"S-F2-{first}-1");
+        double o0 = f2.Mesh.Positions.Max(v => al0.Inverse(v.XY).Offset) / ft;
+        Cmp("floor beam F2 end at the girder (11 in. = the girder cover plate edge; p.45 cover plates flush with the girder F.L. plate)", 29 - 11.0 / 12, o0, 0.04, " ft", "end cut square to the crowned beam axis: its bottom corner reaches 3/8 in. further", 4);
+    }
     var d = t.Floor.Deck!;
     var curbs = (t.LineItems ?? new()).Where(li => li.Name.EndsWith("curb + parapet")).ToList();
     if (curbs.Count == 2) Cmp("slab: curb to curb 76'-6 (curb faces, deck-ptc.csx)", 76.5, Math.Abs(curbs[1].ReferenceOffset - curbs[0].ReferenceOffset) / ft, 0.0005, " ft");

@@ -180,7 +180,7 @@ foreach (var u in units)
             "not built (the rolled shape alone; the gross area in the table is larger by the plates).");
     // floor beams (p.55 / p.48 / p.58): web 75 x 7/16, 4 angles 6x6x1/2, cover plates 14 x 1/2 (full length top built; partial plates not)
     string fbPartial = U("p.55, p.48, p.58", "partial-length floor beam cover plates (F.L. + 28'-0 / 40'-0 / 20'-0 bottom plates, F3 / F4 / B1 plate counts 2 / 4 / 1)", "the lengths are listed on p.55 but their positions along the beam were not decoded; the bracket (B1) web is drawn tapering 6'-3 1/2 to 2'-0 1/2",
-        "only the full-length top plate 14 x 1/2 is built; the cantilever brackets B1 are built as the full-depth beam (taper not modeled, overstates the bracket).");
+        "only the full-length top plate 14 x 1/2 is built (the B1 bracket taper 6'-3 1/2 -> 2'-0 1/2 is modeled).");
     foreach (var (nm, lbl) in new[] { ("F3", "F3 (end floor beam): 1-Pl 75x7/16; 4-Ls 6x6x1/2; 2-Pls 14x1/2"), ("F4", "F4 (typical): 1-Pl 75x7/16; 4-Ls 6x6x1/2; 4-Pls 14x1/2"), ("B1", "B1 (bracket): 1-Pl 75x7/16; 4-Ls 6x6x1/2; 1-Pl 14x1/2") })
         Add(new TrussSectionDefinition
         {
@@ -252,6 +252,20 @@ foreach (var u in units)
         Mem($"U{J(m)}-L{J(m)}", "L" + J(m), "U" + J(m), Sec(r), post ? TrussMemberRole.Post : TrussMemberRole.Hanger, $"Point {J(m)}", Ft(DepthFt), src: $"{r["page"]} member table ({r["row"]})");
     }
 
+    // bottom chord ends at the unit-end joints L0 / L0' (p.59 ELEVATION, "shoes for both ends of the 3-span and 4-span trusses alike"): the 14 WF chord with its
+    // fills and the gussets run past the vertical line through the pin toward the pier CL; a chord cut square at L0 left the sole plate (22 in.) half outside the
+    // steel above it. Scaled (no dimension): 10 1/2 in. (p.59: the two pins 4'-0 apart = 97.7 pt -> 24.4 pt/ft; chord ends 21.3 / 22.1 pt from the pins).
+    double l0Ext = In(10.5);
+    string l0Flag = U("p.59, p.49", "bottom chord / gusset end beyond L0 and L0'", "the ELEVATION draws the chord and the gussets ending about 10 1/2 in. beyond the vertical line through the shoe pin but prints no dimension (scaled from the 4'-0 between the two units' pins)",
+        "end chords extended 10 1/2 in. past L0 / L0' (scaled); the gusset envelope follows the chord end.");
+    unresolved.Add(l0Flag);
+    foreach (var m in t.Members.Where(m => m.Role == TrussMemberRole.LowerChord && (m.From == "L0" || m.To == "L0'")))
+    {
+        if (m.From == "L0") m.StartSetback = -l0Ext; else m.EndSetback = -l0Ext;
+        string secFlag = t.Sections.FirstOrDefault(s => s.Name == m.Section)?.Unresolved ?? "";
+        m.Unresolved = string.Join(" ", new[] { secFlag, l0Flag }.Where(x => x.Length > 0));
+    }
+
     // floor beams (F3 at the end joints, F4 elsewhere) between the trusses + B1 brackets (10'-9 cantilevers). The beam passes the truss at the top chord level:
     // ends set back from the truss CL by half the gusset-to-gusset width plus the gusset (p.55 shows the bracket on the outside of the chord).
     string fbEnd = U("p.55", "floor beam end connections at the truss (bracket / top chord connection)", "p.55 draws the connection on the top chord (2 tension plates, bent plate) but without the dimensions needed to build it",
@@ -265,6 +279,9 @@ foreach (var u in units)
         Mem("BR-N" + j, "N:FT" + j, "N:FB" + j, "B1", TrussMemberRole.FloorBeam, $"Bay {j}", sa: 0, sb: In(9.5), src: pgFloor + " / p.55 (bracket B1)");
         Mem("BR-S" + j, "S:FT" + j, "S:FB" + j, "B1", TrussMemberRole.FloorBeam, $"Bay {j}", sa: 0, sb: In(9.5), src: pgFloor + " / p.55 (bracket B1)");
     }
+    // B1 brackets are TAPERED (p.55 floor beam elevation): 6'-3 1/2 b. to b. of bracket angles at the truss, bottom angles sloping straight up to 2'-0 1/2 at the tip
+    // (the tip is 8 in. beyond the outside stringer S5, p.48 / p.58 half plan); the top stays level with the floor beam.
+    foreach (var m in t.Members.Where(m => m.Section == "B1")) m.DepthReductionStart = In(75.5 - 24.5);
 
     // laterals (p.48 / p.58 plans): K diagonals from the truss corners at one floor beam to the CL apex at the neighbouring one; same pattern top and bottom.
     // Left half: panels before the first pier joint: apex at the panel's first point, corners at the next; after it: apex at the next, corners at the first
@@ -315,11 +332,14 @@ foreach (var u in units)
             "the printed stringer-to-slab dimension is 7 3/4 (p.107) and the floor beam top is level 2'-8 3/4 under the gutter line (p.55): the bearing plate between them varies 1.1 - 5.9 in. across the crown (\"thicknesses ... shall be adjusted\", p.55) and is not dimensioned; the half plan names S5-S8 but not their lines",
             "stringer tops 7 3/4 under the finished grade (p.107), continuous over the floor beams, one straight piece per bay; the gap above each floor beam is NOT filled."),
     };
-    foreach (var (off, sec, nm) in new[] { (-33.0 - 8.0 / 12, "W21x62", "N33.67"), (-33.0, "W24x76", "N33"), (-24.75, "W24x76", "N24.75"), (-16.5, "W24x76", "N16.5"), (-8.25, "W24x76", "N8.25"), (0.0, "W24x76", "CL"),
-        (8.25, "W24x76", "S8.25"), (16.5, "W24x76", "S16.5"), (24.75, "W24x76", "S24.75"), (33.0, "W24x76", "S33"), (33.0 + 8.0 / 12, "W21x62", "S33.67") })
+    // stringer lines (p.48 / p.58 half plans, p.55 bearing details): 4 spaces @ 8'-3 = 33'-0 each side of the CL, then the OUTSIDE (edge) stringer S5 21 WF 62
+    // 6'-1 beyond the 33'-0 line = 39'-1 from the CL, 10 in. outside the gutter line (38'-3) under the curb / parapet and 8 in. inside the bracket tip (39'-9).
+    // (Until 2026-10-20 S5 was built 8 in. outside the 33'-0 line - the 8 in. read as the stringer-to-stringer space - so the edge stringer was missing.)
+    foreach (var (off, sec, nm) in new[] { (-39.0 - 1.0 / 12, "W21x62", "N39.08"), (-33.0, "W24x76", "N33"), (-24.75, "W24x76", "N24.75"), (-16.5, "W24x76", "N16.5"), (-8.25, "W24x76", "N8.25"), (0.0, "W24x76", "CL"),
+        (8.25, "W24x76", "S8.25"), (16.5, "W24x76", "S16.5"), (24.75, "W24x76", "S24.75"), (33.0, "W24x76", "S33"), (39.0 + 1.0 / 12, "W21x62", "S39.08") })
         t.Floor.Stringers.Add(new TrussStringerLine { Name = nm, Offset = Ft(off), Section = sec });
-    UG("p.48, p.58", "stringer lines (11 built: 4 spaces @ 8'-3 = 33'-0 each side of the CL + 21 WF 62 S5 8 in. outside the 33'-0 lines)", "the half plan dimensions 6'-1 + 8 in. + 4 spaces @ 8'-3 from the floor beam tip (39'-9) but the line of each mark S5 / S6 / S7 / S8 and the centre line pair are not decoded",
-        "S5 = 21 WF 62 at 33'-8 from the CL, all other lines 24 WF 76 (S6 printed 24 WF 78 on p.58).");
+    UG("p.48, p.58", "stringer mark per line (S6 / S7 / S8 = 24 WF 76)", "the half plans name S5 - S8 at the lines but the 24 WF 76 marks differ only in their stresses; S5 (21 WF 62) is the outside line at 39'-1 (p.55: 6'-1 beyond the 33'-0 line, 10 in. outside the gutter line)",
+        "S5 = 21 WF 62 at 39'-1 from the CL, all other lines 24 WF 76 (S6 printed 24 WF 78 on p.58).");
     double sBeg = Math.Min(StaOf(0), StaOf(N)), sEnd = Math.Max(StaOf(0), StaOf(N));
     t.Floor.Deck = new TrussDeckDefinition
     {

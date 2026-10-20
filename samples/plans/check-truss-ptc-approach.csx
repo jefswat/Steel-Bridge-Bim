@@ -112,6 +112,29 @@ foreach (var u in units)
     Cmp("shoes (one per truss at each pier joint)", 2 * u.piers.Length, tm.Shoes.Count, 0, "", dec: 0);
     Row("INFO", "gusset plates (2 per joint and truss where a chord meets web members)", "-", $"{tm.Gussets}");
 
+    // 3b. floor layout across the bridge (p.48 / p.58 half plans, p.55 floor beam elevation and bearing details)
+    Print("--- 3b. floor layout (p.48 / p.58 / p.55)");
+    var alU = bm.Framing.Alignment;
+    var lines = bdef.Truss!.Floor!.Stringers.Select(s => s.Offset / ft).OrderBy(o => o).ToList();
+    Cmp("stringer lines (4 @ 8'-3 each side of the CL + the outside S5 lines)", 11, lines.Count, 0, "", dec: 0);
+    Cmp("outside stringer S5 (21 WF 62) from the CL: 33'-0 + 6'-1 (p.55; 10 in. outside the 38'-3 gutter line)", 39 + 1.0 / 12, Math.Max(-lines[0], lines[^1]), 0.0005, " ft", "", 4);
+    Cmp("next stringer line 4 @ 8'-3 = 33'-0 (p.48 / p.58)", 33, Math.Max(-lines[1], lines[^2]), 0.0005, " ft", "", 4);
+    (double o0, double o1, double z0, double z1) Ext(PartCategory? cat, string mark)
+    {
+        var p = tm.Steel.Parts.First(q => q.Mark == mark);
+        double o0 = 1e9, o1 = -1e9, z0 = 1e9, z1 = -1e9;
+        foreach (var v in p.Mesh.Positions) { var so = alU.Inverse(v.XY); o0 = Math.Min(o0, so.Offset); o1 = Math.Max(o1, so.Offset); }
+        double tip = o1;
+        foreach (var v in p.Mesh.Positions) { var so = alU.Inverse(v.XY); if (so.Offset > tip - 0.02) { z0 = Math.Min(z0, v.Z); z1 = Math.Max(z1, v.Z); } }
+        return (o0, o1, z0, z1);
+    }
+    var brS = Ext(null, "BR-S1");
+    Cmp("bracket B1 tip from the CL: 29'-0 + 10'-9 (p.48 / p.58 / p.55) = S5 + 8 in.", 39.75, brS.o1 / ft, 0.0005, " ft", "", 4);
+    Cmp("bracket B1 depth at the tip: 2'-0 1/2 b. to b. of angles + 1/2 cover plate (p.55)", 25.0 / 12, (brS.z1 - brS.z0) / ft, 0.01, " ft", "", 4);
+    var fbX = Ext(null, "FB1");
+    Row("INFO", "floor beam F4 / bracket ends at the truss (p.55: end angles on the post flange; set back 9 1/2 in. from the truss CL, flagged)", "-",
+        $"floor beam {fbX.o0 / ft:F3} .. {fbX.o1 / ft:F3} ft, bracket from {brS.o0 / ft:F3} ft");
+
     // 4. generator checks
     Print("--- 4. member lengths vs the printed geom lengths and generator checks");
     foreach (var c in tm.Checks.Where(c => !c.Item.StartsWith("steel weight")))
@@ -142,6 +165,17 @@ foreach (var u in units)
         }
     }
     Row("INFO", "bearing seats published for the substructure (Location + axis)", $"{2 * u.piers.Length}", $"{bm.Steel.BearingSeats.Count}");
+    // end chords: the chord + gussets run past the shoe pin at L0 / L0' (p.59 ELEVATION, scaled 10 1/2 in.); the shoe must lie under the chord
+    foreach (var (pt, mk) in new[] { ("L0", "N-L0-L2"), ($"L{J(N)}", $"N-L{J(N - 2)}-L{J(N)}") })
+    {
+        var sh = tm.Shoes.First(s => s.Name == $"N-{pt}");
+        var ch = tm.Steel.Parts.First(p => p.Mark == mk);
+        double pinS = alU.Inverse(sh.Pin.XY).Station;
+        var ss = ch.Mesh.Positions.Select(v => alU.Inverse(v.XY).Station).ToList();
+        double past = (Math.Abs(ss.Min() - pinS) < Math.Abs(ss.Max() - pinS) ? pinS - ss.Min() : ss.Max() - pinS) / ft;
+        Cmp($"chord {mk} end past the shoe pin {pt} (p.59, scaled; flagged)", 10.5 / 12, past, 0.03, " ft", "end cut square to the sloping chord (its corner reaches about 1/4 in. further); the sole plate (22 in.) reaches 11 in. past the pin", 4);
+    }
+    Cmp("CHECK warnings 'top of the shoe projects beyond the end of chord' (generator)", 0, rep.Warnings.Count(w => w.StartsWith(u.name) && w.Contains("beyond the end of chord")), 0, "", dec: 0);
 
     // 6. weights
     Print("--- 6. weights (p.42 items 2 + 5, one unit)");

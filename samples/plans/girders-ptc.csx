@@ -41,7 +41,7 @@ double topAngleBelowGutter = FI(2, 9.375);          // p.43 / p.44: gutter grade
 double girderDepthV = FI(9, 6.5625);                // p.44: 9'-6 9/16 b. to b. Ls VERTICALLY (= 9'-6 1/2 normal to grade, p.43)
 double fbAngleBackBelowGutter = FI(2, 9.0625);      // p.43 section A-A: gutter grade to back of floor beam / bracket flange Ls 2'-9 1/16 (= girder FL cover top flush, p.45 note)
 double fbDepth = In(75.5);                          // 6'-3 1/2 b. to b. Ls (p.43 / p.45)
-double bracketEnd = Ft(39 + 1.0 / 12 + 0.5);        // UNRESOLVED: bracket B1 outer end = S1 line (39'-1) + 6"
+double bracketEnd = Ft(39.75);                      // bracket B1 tip 10'-9 beyond the girder line = S1 line (39'-1) + 8" (p.45 note: details as the approach trusses, p.55 / p.48 / p.58)
 double lowerLatNodeAboveFbTop = 0;                  // laterals at the top of the floor beam cover plates (see the flag)
 
 var bridgeSpecs = new[]
@@ -122,8 +122,8 @@ foreach (var spec in bridgeSpecs)
         Name = "B1", Kind = TrussSectionKind.H, WebVertical = true, Material = "S", Label = "B1: 7/16 web; 4-Ls 6x6x1/2 (+ diagonal 2-Ls 6x6x1/2); top 1-Pl 14x1/2 F.L.; 6'-3 1/2 b.b. Ls",
         WebDepth = In(75), WebPlies = { new TrussPly(In(75), In(7.0 / 16), "web PL 75 x 7/16") }, Angle = "L6x6x1/2", AngleProjection = In(0.25), TopPlates = { Pl(fw, ft_, "cover PL 14 x 1/2 F.L.") },
         Source = "p.43 / p.45",
-        Unresolved = fbPartial + " " + fbCrown + " " + U("p.43, p.45", "bracket B1 depth along its length", "the bracket bottom slopes up toward the outer end (diagonal 2-Ls 6x6x1/2, 2-7/16 plates) but no end depth is dimensioned on the sheets read",
-            "constant 6'-3 1/2 depth over the whole bracket (weight overstated); outer end = S1 line + 6\"."),
+        Unresolved = fbPartial + " " + fbCrown + " " + U("p.43, p.45, p.55", "bracket B1 tip position and tip depth", "the girder sheets draw the bracket (bottom angles sloping up to the tip) without dimensioning its length or tip depth; p.45 says details not shown are as for the approach truss spans (p.55: 10'-9 cantilever, 2'-0 1/2 b. to b. of angles at the tip, 8 in. beyond the outside stringer, p.48 / p.58)",
+            "tip 10'-9 from the girder line (39'-9 from the CL), depth tapering straight from 6'-3 1/2 at the girder to 2'-0 1/2 at the tip, as p.55."),
     });
     // stringers: 1954 WF = AISC v16 W of the same nominal size and weight (not identical dimensions)
     string wfFlag = U("p.43", "old WF designations 21 WF 62 / 24 WF 84 / 24 WF 94", "the 1954 rolled shapes pre-date the W series; their flange / web dimensions are not on the sheets", "AISC v16 W21x62 / W24x84 / W24x94 of the same nominal weight (dimensions differ slightly).");
@@ -183,7 +183,7 @@ foreach (var spec in bridgeSpecs)
                 t.Members.Add(new TrussMemberDefinition { Name = $"{pl}-{(fsec == "F1" ? "F1" : "F2")}-{s.n}-{k}", From = $"{pl}:F{s.n}_{k}", To = $"{pl}:C{s.n}_{k}", Section = fsec, Role = TrussMemberRole.FloorBeam,
                     Panel = panel, StartSetback = In(11), EndSetback = 0, Source = "p.43 / p.45" });
                 t.Members.Add(new TrussMemberDefinition { Name = $"{pl}-B1-{s.n}-{k}", From = $"{pl}:F{s.n}_{k}", To = $"{pl}:X{s.n}_{k}", Section = "B1", Role = TrussMemberRole.FloorBeam,
-                    Panel = panel, StartSetback = In(11), EndSetback = 0, Source = "p.43 / p.45" });
+                    Panel = panel, StartSetback = In(11), EndSetback = 0, DepthReductionEnd = fbDepth - In(24.5), Source = "p.43 / p.45 / p.55 (tapered bracket)" });
             }
         }
         // bottom laterals (p.43 plan): CL0-G1 / CL1-G2 / G2-CL3 / G3-CL4 on each side
