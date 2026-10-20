@@ -276,3 +276,20 @@ the envelope gusset to an extended end chord and (b) warns "Truss CHECK shoe ...
 than 1 in. past an end chord (it fired at all 20 end shoes before the fix, none after). Generic taper input `TrussMemberDefinition.DepthReductionStart/End`.
 Checks after the full run order (truss-ptc-arch -> ... -> rivets-ptc): location 376 PASS / 44 DIFF (unchanged), main 381 / 11 -> 405 / 11 (+24 new rows),
 approach 1014 / 12 -> 1046 / 12, girders 125 / 6 -> 131 / 6.
+
+## 13. QC pass 2 back-check (2026-10-20; answers in `qc/ptc/results/answers.csv` I007-I017)
+- Generic OPTIONAL inputs: `TrussPlate.BetweenGussets` (cover plates that stop where the end gussets begin), `TrussPlate.Start` / `TrussPly.Start` / `TrussPly.Length`
+  (partial pieces from the start working point), `TrussSectionDefinition.ShapeArea` (rolled shape / channel at a printed gross area: web thickness adjusted),
+  Rolled sections take `TopPlates` / `BottomPlates` as flange cover plates. Test `TrussTests.RolledCoverPlates_StopAtTheGussets_PartialPlies_ShapeArea`.
+- 4-span units (p.57): U3-U5 14 WF 287 + 2-Pls 16 x 15/16, U9-U11 14 WF 342 + 2-Pls 16 1/2 x 13/16, U9-L10 14 WF 342 + 2-Pls 16 1/2 x 7/8, L10-U11 14 WF 314 + 2-Pls
+  16 x 11/16: one plate per flange, gusset edge to gusset edge (p.60 U3: the cover plates begin where the gusset ends; mid joints U4 / U10 have the gussets over the
+  plates: in-to-in 18 3/8 / 19 1/8 = d + 2 t). Section area = the printed area; the member's mean area is 3 % lower (plates absent under the end gussets). 3-span (p.47):
+  no plated members.
+- Approach 14 / 16 WF at the printed gross areas (`ShapeArea`): the interpolated sharp-root polygon lacked the fillets (14 WF 61 17.67 vs 17.94).
+- Floor beams (p.55): F3 = top 14 x 1/2 F.L. + bottom 14 x 1/2 x 20'-0; F4 = top F.L. + 28'-0, bottom 40'-0 + 28'-0 (centred on the CL bridge, flagged).
+- Main post U11-L11 (p.69 / p.70): 34 x 1 1/8 plies from U11 to 9'-0 below the floor beam, 34 x 9/16 o.s. from 5'-0 above to 5'-0 below it; table areas 293.67 (upper)
+  / 217.17 (lower) are those sections exactly (the perforated covers count at their gross 23 in. width in the table, as in the model). Mean area 332.17 -> 277.25.
+- Main 18 in channel members at the 1954 areas from p.70 (12.49 / 13.38 / 15.18 / 16.98 sq in for 18[ 42.7 / 45.8 / 51.9 / 58.0; AISC v16 MC18 polygons were 0.29 larger).
+- I007 / I008 answered (no change): L0 chord end 1'-5 re-measured (17.7 in. at 10.3 px/in., p.73 scale from the 1'-6 3/4 / 3'-8 dimensions); chord solid lengths
+  = working-point length + half depth x tan(deflection / 2) per end (square cuts closing the joint); working-point lengths = p.69 (generator checks PASS).
+

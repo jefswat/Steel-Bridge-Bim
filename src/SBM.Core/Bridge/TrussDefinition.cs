@@ -132,6 +132,13 @@ public sealed class TrussPlate
     public double Length { get; set; }
     /// <summary>OPTIONAL distance of the centre of a partial plate from the member mid-length (m, + toward the member end); 0 = centred.</summary>
     public double Offset { get; set; }
+    /// <summary>OPTIONAL distance of a partial plate's start from the member's START working point (m, along the axis); set = <see cref="Offset"/> ignored.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public double? Start { get; set; }
+    /// <summary>OPTIONAL: the plate runs between the gusset plates of the member's two end joints (riveted cover plates that stop where the gussets / splice
+    /// plates begin; gusset envelope or the joint's outline). It does not count for the member width at the joints.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public bool BetweenGussets { get; set; }
     public TrussPlate() { }
     public TrussPlate(double width, double thickness, bool perforated = false, string label = "") { Width = width; Thickness = thickness; Perforated = perforated; Label = label; }
 }
@@ -142,6 +149,12 @@ public sealed class TrussPly
     public double Depth { get; set; }
     public double Thickness { get; set; }
     public string Label { get; set; } = "";
+    /// <summary>OPTIONAL length of a partial-length ply along the member (m); 0 = the full member (e.g. local web reinforcing plates of a post).</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public double Length { get; set; }
+    /// <summary>OPTIONAL start of a partial ply from the member's START working point (m, along the axis); null = centred on the member.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public double? Start { get; set; }
     public TrussPly() { }
     public TrussPly(double depth, double thickness, string label = "") { Depth = depth; Thickness = thickness; Label = label; }
 }
@@ -197,7 +210,8 @@ public sealed class TrussSectionDefinition
     public string AngleEdges { get; set; } = "both";
     /// <summary>Distance the angle backs stand above / below the web edge (riveted chords: webs 1/4" - 1/2" below the angle backs; 0 = flush).</summary>
     public double AngleProjection { get; set; }
-    /// <summary>Box: plates on top (+y) / bottom (-y) stacked outward; H: flange plates on both web edges.</summary>
+    /// <summary>Box: plates on top (+y) / bottom (-y) stacked outward; H: flange plates on both web edges; Rolled (OPTIONAL): cover plates on the outer
+    /// faces of the two flanges (Top = the +depth flange, Bottom = the other).</summary>
     public List<TrussPlate> TopPlates { get; set; } = new();
     public List<TrussPlate> BottomPlates { get; set; } = new();
     public TrussLacing? Lacing { get; set; }
@@ -221,6 +235,10 @@ public sealed class TrussSectionDefinition
     public double WeightLbPerFt { get; set; }
     /// <summary>Rolled: web horizontal (shape turned 90 degrees).</summary>
     public bool Rotated { get; set; }
+    /// <summary>OPTIONAL gross area of ONE rolled shape / channel as printed (m2; 0 = the catalog / dimension polygon): the web thickness of the built polygon
+    /// is adjusted so its area matches (1950s shapes whose handbook areas differ from AISC v16 / the sharp-root polygon). Rolled and LacedChannels.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public double ShapeArea { get; set; }
     // ---- plate / round / nominal
     public double Width { get; set; }
     public double Diameter { get; set; }

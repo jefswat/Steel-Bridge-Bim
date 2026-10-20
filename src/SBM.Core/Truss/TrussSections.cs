@@ -7,7 +7,12 @@ using static SBM.Core.Units.UnitSystem;
 namespace SBM.Core.Truss;
 
 /// <summary>One solid of a built-up section: a simple polygon in the section plane (x across, y up; CCW), swept along the member axis.</summary>
-public sealed record TrussSectionPiece(Vec2[] Polygon, string Label, double Length = 0, double Offset = 0);
+/// <remarks>Length / Offset: partial piece centred on the member (+ Offset); Start (not NaN): partial piece from that distance after the START working point;
+/// BetweenGussets: runs between the gusset plates of the two end joints (not counted for the member width at the joints).</remarks>
+public sealed record TrussSectionPiece(Vec2[] Polygon, string Label, double Length = 0, double Offset = 0, double Start = double.NaN, bool BetweenGussets = false)
+{
+    public static TrussSectionPiece Of(Vec2[] polygon, string label, TrussPlate p) => new(polygon, label, p.Length, p.Offset, p.Start ?? double.NaN, p.BetweenGussets);
+}
 
 /// <summary>Lacing bar face of a section: bars lie in the plane y = <see cref="Y"/> .. Y + Thickness * Side (outside the face), spanning x = +/- HalfLines.</summary>
 public sealed record TrussLacingFace(double Y, int Side, double HalfLines, TrussLacing Lacing);
@@ -38,6 +43,8 @@ public sealed class TrussBuiltSection
     public List<string> Notes { get; } = new();
     public string Description => Definition.Label.Length > 0 ? Definition.Label : Definition.Name;
     public double HalfWidth => Math.Max(Math.Abs(XMin), Math.Abs(XMax));
+    /// <summary>Half width at the joints: pieces that stop at the gussets (<see cref="TrussPlate.BetweenGussets"/>) excluded.</summary>
+    public double HalfWidthAtJoints { get; set; }
     public double Depth => YMax - YMin;
     /// <summary>Gross area of the pieces (lacing bars excluded).</summary>
     public double Area => Pieces.Sum(p => Math.Abs(MeshBuilder.SignedArea(p.Polygon)));
@@ -143,6 +150,8 @@ public static class TrussSections
         for (int i = 0; i < r.Pieces.Count; i++) r.Pieces[i] = r.Pieces[i] with { Polygon = Ccw(r.Pieces[i].Polygon) };
         var all = r.Pieces.SelectMany(p => p.Polygon).ToList();
         r.XMin = all.Min(p => p.X); r.XMax = all.Max(p => p.X); r.YMin = all.Min(p => p.Y); r.YMax = all.Max(p => p.Y);
+        var atJoints = r.Pieces.Where(p => !p.BetweenGussets).SelectMany(p => p.Polygon).ToList();
+        r.HalfWidthAtJoints = atJoints.Count > 0 ? atJoints.Max(p => Math.Abs(p.X)) : r.HalfWidth;
         foreach (var lf in r.Lacing.ToList())
         {
             // lacing bars lie outside the face: extents grow
@@ -182,7 +191,7 @@ public static class TrussSections
             foreach (var p in s.WebPlies)
             {
                 double pd = p.Depth > 0 ? p.Depth : d;
-                r.Pieces.Add(new(Rect(sg * x0, sg * (x0 - p.Thickness), -pd / 2, pd / 2), p.Label.Length > 0 ? p.Label : $"web PL {L(pd)} x {L(p.Thickness)}"));
+                r.Pieces.Add(new(Rect(sg * x0, sg * (x0 - p.Thickness), -pd / 2, pd / 2), p.Label.Length > 0 ? p.Label : $"web PL {L(pd)} x {L(p.Thickness)}", p.Length, 0, p.Start ?? double.NaN));
                 x0 -= p.Thickness;
             }
         }
@@ -212,14 +221,14 @@ public static class TrussSections
         double y = yTop;
         foreach (var p in s.TopPlates)
         {
-            r.Pieces.Add(new(Rect(-p.Width / 2, p.Width / 2, y, y + p.Thickness), p.Label.Length > 0 ? p.Label : $"cover PL {L(p.Width)} x {L(p.Thickness)}", p.Length, p.Offset));
+            r.Pieces.Add(TrussSectionPiece.Of(Rect(-p.Width / 2, p.Width / 2, y, y + p.Thickness), p.Label.Length > 0 ? p.Label : $"cover PL {L(p.Width)} x {L(p.Thickness)}", p));
             if (p.Perforated) r.Notes.Add($"section {s.Name}: perforated cover plate {p.Label} built solid (access holes not dimensioned)");
             y += p.Thickness;
         }
         double yb = yBot;
         foreach (var p in s.BottomPlates)
         {
-            r.Pieces.Add(new(Rect(-p.Width / 2, p.Width / 2, yb - p.Thickness, yb), p.Label.Length > 0 ? p.Label : $"cover PL {L(p.Width)} x {L(p.Thickness)}", p.Length, p.Offset));
+            r.Pieces.Add(TrussSectionPiece.Of(Rect(-p.Width / 2, p.Width / 2, yb - p.Thickness, yb), p.Label.Length > 0 ? p.Label : $"cover PL {L(p.Width)} x {L(p.Thickness)}", p));
             if (p.Perforated) r.Notes.Add($"section {s.Name}: perforated cover plate {p.Label} built solid (access holes not dimensioned)");
             yb -= p.Thickness;
         }
@@ -256,7 +265,7 @@ public static class TrussSections
             foreach (var p in e < 0 && (s.WebVertical || s.BottomPlates.Count > 0) ? s.BottomPlates : s.TopPlates)
             {
                 var poly = new[] { new Vec2(e * m0, -p.Width / 2), new Vec2(e * (m0 + p.Thickness), -p.Width / 2), new Vec2(e * (m0 + p.Thickness), p.Width / 2), new Vec2(e * m0, p.Width / 2) };
-                r.Pieces.Add(new(poly.Select(Map).ToArray(), p.Label.Length > 0 ? p.Label : $"flange PL {L(p.Width)} x {L(p.Thickness)}", p.Length, p.Offset));
+                r.Pieces.Add(TrussSectionPiece.Of(poly.Select(Map).ToArray(), p.Label.Length > 0 ? p.Label : $"flange PL {L(p.Width)} x {L(p.Thickness)}", p));
                 m0 += p.Thickness;
             }
         }
@@ -273,6 +282,7 @@ public static class TrussSections
             c = new ChannelSize(s.Channel, s.Depth, s.FlangeWidth, s.WebThickness, s.FlangeThickness);
             r.Notes.Add($"channel {s.Channel} not in AISC v16 - plan dimensions, parallel flanges, sharp roots");
         }
+        c = WithArea(c, s.ShapeArea, r.Notes);
         double b = s.BackToBack;
         if (b <= 0) return;
         foreach (int sg in new[] { 1, -1 })
@@ -281,17 +291,17 @@ public static class TrussSections
             r.Pieces.Add(new(SteelCatalog.ChannelPolygon(c, sg * b / 2, o).Select(q => new Vec2(q.Y, q.X)).ToArray(), $"C {c.Name}"));
         }
         r.WebThickness = c.WebThickness; r.OuterPly = c.WebThickness;
-        r.LbPerFt = c.WeightPerFootLb > 0 && s.TopPlates.Count == 0 && s.BottomPlates.Count == 0 ? 2 * c.WeightPerFootLb : 0;
+        r.LbPerFt = c.WeightPerFootLb > 0 && s.ShapeArea <= 0 && s.TopPlates.Count == 0 && s.BottomPlates.Count == 0 ? 2 * c.WeightPerFootLb : 0;
         double yt = c.Depth / 2, ybt = -c.Depth / 2;
         foreach (var p in s.TopPlates)
         {
-            r.Pieces.Add(new(Rect(-p.Width / 2, p.Width / 2, yt, yt + p.Thickness), p.Label.Length > 0 ? p.Label : $"cover PL {L(p.Width)} x {L(p.Thickness)}", p.Length, p.Offset));
+            r.Pieces.Add(TrussSectionPiece.Of(Rect(-p.Width / 2, p.Width / 2, yt, yt + p.Thickness), p.Label.Length > 0 ? p.Label : $"cover PL {L(p.Width)} x {L(p.Thickness)}", p));
             if (p.Perforated) r.Notes.Add($"section {s.Name}: perforated cover plate {p.Label} built solid (access holes not dimensioned)");
             yt += p.Thickness;
         }
         foreach (var p in s.BottomPlates)
         {
-            r.Pieces.Add(new(Rect(-p.Width / 2, p.Width / 2, ybt - p.Thickness, ybt), p.Label.Length > 0 ? p.Label : $"cover PL {L(p.Width)} x {L(p.Thickness)}", p.Length, p.Offset));
+            r.Pieces.Add(TrussSectionPiece.Of(Rect(-p.Width / 2, p.Width / 2, ybt - p.Thickness, ybt), p.Label.Length > 0 ? p.Label : $"cover PL {L(p.Width)} x {L(p.Thickness)}", p));
             if (p.Perforated) r.Notes.Add($"section {s.Name}: perforated cover plate {p.Label} built solid (access holes not dimensioned)");
             ybt -= p.Thickness;
         }
@@ -338,8 +348,10 @@ public static class TrussSections
         Vec2 Map(Vec2 q) => s.Rotated ? new Vec2(q.X, q.Y) : new Vec2(q.Y, q.X);   // (m along the depth, v across)
         if (SteelCatalog.FindWideFlange(n) is { } w)
         {
+            w = WithArea(w, s.ShapeArea, r.Notes);
             r.Pieces.Add(new(SteelCatalog.WideFlangePolygon(w, -w.WebThickness / 2).Select(Map).ToArray(), w.Name));
-            r.LbPerFt = w.WeightPerFootLb; r.WebThickness = w.WebThickness; r.OuterPly = w.FlangeThickness;
+            r.LbPerFt = s.ShapeArea > 0 ? 0 : w.WeightPerFootLb; r.WebThickness = w.WebThickness; r.OuterPly = w.FlangeThickness;
+            FlangePlates(s, r, w.Depth, Map);
             return;
         }
         if (SteelCatalog.FindChannel(n) is { } c)
@@ -363,14 +375,61 @@ public static class TrussSections
         // Not in AISC v16 (1950s rolled shapes): plan dimensions (W-like, sharp roots), else nothing (-> flagged envelope).
         if (s.Depth > 0 && s.FlangeWidth > 0 && s.WebThickness > 0 && s.FlangeThickness > 0)
         {
-            var ws = new WideFlangeSize(n, s.Depth, s.FlangeWidth, s.WebThickness, s.FlangeThickness);
+            var ws = WithArea(new WideFlangeSize(n, s.Depth, s.FlangeWidth, s.WebThickness, s.FlangeThickness), s.ShapeArea, r.Notes);
             r.Pieces.Add(new(SteelCatalog.WideFlangePolygon(ws, -ws.WebThickness / 2).Select(Map).ToArray(), n));
-            r.WebThickness = s.WebThickness; r.OuterPly = s.FlangeThickness;
+            r.WebThickness = ws.WebThickness; r.OuterPly = s.FlangeThickness;
             r.LbPerFt = s.WeightLbPerFt;
+            FlangePlates(s, r, ws.Depth, Map);
             r.Notes.Add($"rolled shape {n} is not in the program's AISC v16 extract (W, C, MC, L, WT) - built from the given dimensions (sharp roots){(s.WeightLbPerFt > 0 ? $", {s.WeightLbPerFt:0.#} lb/ft" : "")}");
             return;
         }
         r.Notes.Add($"rolled shape '{n}' is not in AISC v16 and has no dimensions");
         r.Flag ??= $"UNRESOLVED: rolled shape '{n}' of section {s.Name} is not in AISC v16 and its dimensions are not given - envelope built.";
+    }
+
+    /// <summary>Web thickness adjusted so the wide flange polygon has the printed gross area (<see cref="TrussSectionDefinition.ShapeArea"/>).</summary>
+    private static WideFlangeSize WithArea(WideFlangeSize w, double area, List<string> notes)
+    {
+        if (area <= 0) return w;
+        double a0 = Math.Abs(MeshBuilder.SignedArea(SteelCatalog.WideFlangePolygon(w, -w.WebThickness / 2)));
+        var w1 = w;
+        for (int i = 0; i < 3; i++)
+        {
+            double a = Math.Abs(MeshBuilder.SignedArea(SteelCatalog.WideFlangePolygon(w1, -w1.WebThickness / 2)));
+            w1 = w1 with { WebThickness = w1.WebThickness + (area - a) / Math.Max(1e-6, w1.Depth - 2 * w1.FlangeThickness) };
+        }
+        notes.Add($"shape {w.Name}: web {L(w.WebThickness)} -> {L(w1.WebThickness)} so the gross area is the printed {area / 0.00064516:0.00} sq in (polygon {a0 / 0.00064516:0.00})");
+        return w1;
+    }
+
+    private static ChannelSize WithArea(ChannelSize c, double area, List<string> notes)
+    {
+        if (area <= 0) return c;
+        double a0 = Math.Abs(MeshBuilder.SignedArea(SteelCatalog.ChannelPolygon(c, 0, 1)));
+        var c1 = c;
+        for (int i = 0; i < 3; i++)
+        {
+            double a = Math.Abs(MeshBuilder.SignedArea(SteelCatalog.ChannelPolygon(c1, 0, 1)));
+            c1 = c1 with { WebThickness = c1.WebThickness + (area - a) / Math.Max(1e-6, c1.Depth - 2 * c1.FlangeThickness) };
+        }
+        notes.Add($"channel {c.Name}: web {L(c.WebThickness)} -> {L(c1.WebThickness)} so the gross area is the printed {area / 0.00064516:0.00} sq in (polygon {a0 / 0.00064516:0.00})");
+        return c1;
+    }
+
+    /// <summary>Rolled shape cover plates on the outer faces of the flanges (m = +/- depth / 2), stacked outward; mass then by volume.</summary>
+    private static void FlangePlates(TrussSectionDefinition s, TrussBuiltSection r, double depth, Func<Vec2, Vec2> map)
+    {
+        if (s.TopPlates.Count == 0 && s.BottomPlates.Count == 0) return;
+        foreach (int e in new[] { 1, -1 })
+        {
+            double m0 = depth / 2;
+            foreach (var p in e > 0 ? s.TopPlates : s.BottomPlates)
+            {
+                var poly = new[] { new Vec2(e * m0, -p.Width / 2), new Vec2(e * (m0 + p.Thickness), -p.Width / 2), new Vec2(e * (m0 + p.Thickness), p.Width / 2), new Vec2(e * m0, p.Width / 2) };
+                r.Pieces.Add(TrussSectionPiece.Of(poly.Select(map).ToArray(), p.Label.Length > 0 ? p.Label : $"cover PL {L(p.Width)} x {L(p.Thickness)}", p));
+                m0 += p.Thickness;
+            }
+        }
+        r.LbPerFt = 0;
     }
 }

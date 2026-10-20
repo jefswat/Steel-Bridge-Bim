@@ -190,6 +190,60 @@ public class TrussTests : IDisposable
     }
 
     [Fact]
+    public void RolledCoverPlates_StopAtTheGussets_PartialPlies_ShapeArea()
+    {
+        var (p, b) = Model(pratt: true, extras: false);
+        var t = b.Truss!;
+        double sq = 0.00064516;
+        string json0 = System.Text.Json.JsonSerializer.Serialize(t);
+        foreach (var key in new[] { "ShapeArea", "BetweenGussets", "\"Start\"" }) Assert.DoesNotContain(key, json0);
+        // rolled diagonal with the printed area (web thickened) and one cover plate on each flange between the gussets (QC PTC I009 / I017)
+        t.Sections.Add(new TrussSectionDefinition
+        {
+            Name = "WCP", Kind = TrussSectionKind.Rolled, Designation = "W14x90", Rotated = true, ShapeArea = 27.0 * sq,
+            TopPlates = { new TrussPlate(In(14), In(0.75)) { BetweenGussets = true } }, BottomPlates = { new TrussPlate(In(14), In(0.75)) { BetweenGussets = true } },
+        });
+        t.Members.First(m => m.Name == "U2-L3").Section = "WCP";
+        // partial outer web ply on a chord box: 5 ft from 2 ft after the start working point
+        var box2 = new TrussSectionDefinition
+        {
+            Name = "BOX2", Kind = TrussSectionKind.Box, WebDepth = In(24), WebsOutToOut = In(20), Angle = "L4x4x1/2",
+            WebPlies = { new TrussPly(0, In(0.375)) { Start = Ft(2), Length = Ft(5) }, new TrussPly(0, In(0.5)) },
+        };
+        t.Sections.Add(box2);
+        t.Members.First(m => m.Name == "L2-L3").Section = "BOX2";
+        // channel member at a printed channel area
+        t.Section("CH")!.ShapeArea = 5.9 * sq;
+        var bm = Regen(p);
+        var tm = bm.Steel!.Truss!;
+        var wcp = TrussSections.Build(t.Section("WCP")!);
+        Assert.Equal((27.0 + 2 * 14 * 0.75) * sq, wcp.Area, 9);
+        Assert.True(wcp.HalfWidthAtJoints < wcp.HalfWidth - In(0.7));
+        var d = tm.Member("N-U2-L3")!;
+        var part = bm.Steel.Parts.First(x => x.Mark == "N-U2-L3");
+        double plateLen = (part.Volume - 27.0 * sq * d.CutLength) / (2 * 14 * 0.75 * sq);
+        double lap = Math.Max(wcp.Depth, In(18));
+        Assert.True(plateLen > Ft(5) && plateLen <= d.CutLength - 2 * lap + 1e-6, $"plate length {plateLen} vs cut {d.CutLength}");
+        Assert.True(part.Mesh.HasExactSolids);
+        Assert.Equal(0, part.NominalWeightLbPerFt);
+        // no "wider than the gusset" CHECK for the plates that stop at the gussets
+        Assert.DoesNotContain(bm.Steel.Diagnostics, x => x.Message.Contains("N-U2-L3 is"));
+        var c = tm.Member("N-L2-L3")!;
+        var bx = TrussSections.Build(box2);
+        var ply = bx.Pieces.Where(x => !double.IsNaN(x.Start)).ToList();
+        Assert.Equal(2, ply.Count);
+        double full = bx.Pieces.Where(x => double.IsNaN(x.Start)).Sum(x => Math.Abs(SBM.Core.Solids.MeshBuilder.SignedArea(x.Polygon)));
+        double partA = ply.Sum(x => Math.Abs(SBM.Core.Solids.MeshBuilder.SignedArea(x.Polygon)));
+        Assert.Equal(full * c.CutLength + partA * Ft(5), bm.Steel.Parts.First(x => x.Mark == "N-L2-L3").Volume, 8);
+        Assert.Equal(2 * 5.9 * sq, TrussSections.Build(t.Section("CH")!).Area, 9);
+        // the inputs are written when set and read back
+        var back = BridgeProject.FromJson(p.ToJson()).Bridges[0].Truss!;
+        Assert.True(back.Section("WCP")!.TopPlates[0].BetweenGussets);
+        Assert.Equal(Ft(2), back.Section("BOX2")!.WebPlies[0].Start!.Value, 9);
+        Assert.Equal(27.0 * sq, back.Section("WCP")!.ShapeArea, 12);
+    }
+
+    [Fact]
     public void WebMembers_StopAtTheChordEnvelope()
     {
         var (p, b) = Model();

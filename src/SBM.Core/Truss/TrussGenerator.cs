@@ -296,7 +296,7 @@ public static class TrussGenerator
                             var n = Normal(c.Plane.Length > 0 ? c.Plane : pl, StationOf(c.A));
                             double k = Math.Abs(Vec3.Dot(d1, n));
                             if (k < 0.2) continue;
-                            t = Math.Max(t, c.Sec.HalfWidth / k + clr);
+                            t = Math.Max(t, c.Sec.HalfWidthAtJoints / k + clr);
                         }
                     }
                     if (start) m.SA = t; else m.SB = t;
@@ -325,9 +325,8 @@ public static class TrussGenerator
             double Rise(double t) => rA + (rB - rA) * Math.Clamp(t / cut, 0, 1);
             foreach (var pc in m.Sec.Pieces)
             {
-                // partial-length plate: centred on the member (+ Offset), clipped to the member
-                double pl = pc.Length > 0 ? Math.Min(pc.Length, cut) : cut;
-                double ps = pc.Length > 0 ? Math.Clamp(cut / 2 + pc.Offset - pl / 2, 0, cut - pl) : 0;
+                if (PieceSpan(m, pc, cut) is not { } span) { Warn($"Truss: {pc.Label} of {m.Mark} - no length left on the member{(pc.BetweenGussets ? " between the gussets" : "")}; not built."); continue; }
+                var (ps, pl) = span;
                 var ringA = pc.Polygon.Select(q => a0 + m.Axis * ps + m.X * q.X + m.Y * (q.Y + (taper && q.Y < 0 ? Rise(ps) : 0))).ToArray();
                 var ringB = taper
                     ? pc.Polygon.Select(q => a0 + m.Axis * (ps + pl) + m.X * q.X + m.Y * (q.Y + (q.Y < 0 ? Rise(ps + pl) : 0))).ToArray()
@@ -358,6 +357,31 @@ public static class TrussGenerator
             if (m.Def.Stiffeners != null) BuildStiffeners(m);
             if (m.Def.Panel.Length > 0) Model.PanelOf[m.Mark] = m.Def.Panel;
             Model.Members.Add(new TrussMemberResult(m.Def.Name, m.Mark, m.Plane, m.PointA, m.PointB, m.A, m.B, len, cut, m.Def.Role, m.Sec.Definition.Name, part.Mass, asu != null));
+        }
+
+        private readonly Dictionary<Inst, (double a, double b)> _gussetSpan = new();
+        /// <summary>Extent of a section piece along the member solid (start from the cut start, length): full, partial centred (+ Offset), from
+        /// <see cref="TrussSectionPiece.Start"/> after the start working point, or between the end gussets; null = nothing left.</summary>
+        private (double ps, double pl)? PieceSpan(Inst m, TrussSectionPiece pc, double cut)
+        {
+            double pl = pc.Length > 0 ? Math.Min(pc.Length, cut) : cut;
+            double ps = pc.Length > 0 ? Math.Clamp(cut / 2 + pc.Offset - pl / 2, 0, cut - pl) : 0;
+            if (!double.IsNaN(pc.Start))
+            {
+                double s0 = Math.Clamp(pc.Start - m.SA, 0, cut), s1 = Math.Clamp(pc.Start - m.SA + (pc.Length > 0 ? pc.Length : cut), 0, cut);
+                ps = s0; pl = s1 - s0;
+            }
+            if (pc.BetweenGussets)
+            {
+                if (!_gussetSpan.TryGetValue(m, out var g))
+                {
+                    double len = (m.B - m.A).Length;
+                    _gussetSpan[m] = g = (Math.Max(0, GussetReach(m, true) - m.SA), Math.Min(cut, len - GussetReach(m, false) - m.SA));
+                }
+                double s0 = Math.Max(ps, g.a), s1 = Math.Min(ps + pl, g.b);
+                ps = s0; pl = s1 - s0;
+            }
+            return pl < 1e-4 ? null : (ps, pl);
         }
 
         /// <summary>Web stiffener angles / web splice plates on both web faces (<see cref="TrussStiffenerSet"/>).</summary>
@@ -458,14 +482,69 @@ public static class TrussGenerator
                 }
             foreach (var (pl, pt) in keys)
             {
-                var jdef = _d.Joints.LastOrDefault(j => j.Point.Equals(pt, StringComparison.OrdinalIgnoreCase) && (j.Plane.Length == 0 || j.Plane.Equals(pl, StringComparison.OrdinalIgnoreCase)));
-                if (jdef?.NoGusset == true) continue;
-                var here = At(pl, pt).Where(i => i.Plane.Equals(pl, StringComparison.OrdinalIgnoreCase) && !IsCrossPlane(i.Def.Role)).Concat(Through(pl, pt)).Distinct().ToList();
-                bool hasWeb = here.Any(i => IsWeb(i.Def.Role)), hasChord = here.Any(i => IsChord(i.Def.Role));
-                if (jdef == null && !(jd.AutoGussets && hasWeb && hasChord)) continue;
-                if (here.Count == 0) continue;
-                BuildGusset(pl, pt, here, jdef);
+                if (JointMembers(pl, pt) is not { } jm) continue;
+                BuildGusset(pl, pt, jm.here, jm.jdef);
             }
+        }
+
+        /// <summary>Gusset outline of a joint in its (u, v) frame about the point: the joint's own outline, else the convex envelope of the member laps.</summary>
+        private List<Vec2> GussetOutline(string pl, string pt, List<Inst> here, TrussJointDefinition? jdef, Vec3 P, Vec3 u, Vec3 v)
+        {
+            if (jdef is { Outline.Count: >= 3 }) return jdef.Outline.Select(q => new Vec2(q.U, q.V)).ToList();
+            var jd = _d.JointDefaults;
+            var pts = new List<Vec2>();
+            double margin = jd.Margin;
+            foreach (var m in here)
+            {
+                bool through = !StartsAt(m, pl, pt) && !(m.PlaneB.Equals(pl, StringComparison.OrdinalIgnoreCase) && m.PointB.Equals(pt, StringComparison.OrdinalIgnoreCase));
+                bool start = StartsAt(m, pl, pt);
+                double lap = jd.Lap > 0 ? jd.Lap : Math.Max(m.Sec.Depth, In(18));
+                foreach (var d1 in through ? new[] { m.Axis, -m.Axis } : new[] { Away(m, start) })
+                {
+                    // chords from the point (a chord ending here and extended past it by a negative setback: from its end, the gusset covers the extension)
+                    // END chord: no other chord (or end post) leaves the point backward (a continuing chord would close the joint)
+                    bool endChord = IsChord(m.Def.Role) && !through && !here.Any(o => o != m && IsChord(o.Def.Role)
+                        && (Through(pl, pt).Contains(o) || Vec3.Dot(Away(o, StartsAt(o, pl, pt)), d1) < 0));
+                    double t0 = IsChord(m.Def.Role) ? (endChord ? Math.Min(0, start ? m.SA : m.SB) : 0) : Math.Max(0, start ? m.SA : m.SB);
+                    foreach (double t in new[] { t0, t0 + lap })
+                        foreach (double y in new[] { m.Sec.YMin - margin, m.Sec.YMax + margin })
+                        {
+                            var w = P + d1 * t + m.Y * y + m.Y * m.Def.OffsetZ - P;
+                            pts.Add(new Vec2(Vec3.Dot(w, u), Vec3.Dot(w, v)));
+                        }
+                }
+            }
+            return MeshBuilder.ConvexHull(pts);
+        }
+
+        /// <summary>Members of a joint that get a gusset (null = no gusset at that point), as <see cref="BuildJoints"/> decides.</summary>
+        private (List<Inst> here, TrussJointDefinition? jdef)? JointMembers(string pl, string pt)
+        {
+            if (!_pts.ContainsKey((pl.ToUpperInvariant(), pt.ToUpperInvariant()))) return null;
+            var jdef = _d.Joints.LastOrDefault(j => j.Point.Equals(pt, StringComparison.OrdinalIgnoreCase) && (j.Plane.Length == 0 || j.Plane.Equals(pl, StringComparison.OrdinalIgnoreCase)));
+            if (jdef?.NoGusset == true) return null;
+            var here = At(pl, pt).Where(i => i.Plane.Equals(pl, StringComparison.OrdinalIgnoreCase) && !IsCrossPlane(i.Def.Role)).Concat(Through(pl, pt)).Distinct().ToList();
+            bool hasWeb = here.Any(i => IsWeb(i.Def.Role)), hasChord = here.Any(i => IsChord(i.Def.Role));
+            if (jdef == null && !(_d.JointDefaults.AutoGussets && hasWeb && hasChord)) return null;
+            if (here.Count == 0) return null;
+            return (here, jdef);
+        }
+
+        /// <summary>How far the gusset of the joint at one end of a member reaches along the member from that working point (0 = no gusset).</summary>
+        private double GussetReach(Inst m, bool start)
+        {
+            string pl = start ? m.PlaneA : m.PlaneB, pt = start ? m.PointA : m.PointB;
+            if (pl.Length == 0 || JointMembers(pl, pt) is not { } jm || !jm.here.Contains(m)) return 0;
+            var P = _pts[(pl.ToUpperInvariant(), pt.ToUpperInvariant())];
+            double st = StationOf(P);
+            var u = Tangent(st);
+            var n = Normal(pl, st);
+            var v = Vec3.Cross(n, u).Normalized();
+            u = Vec3.Cross(v, n).Normalized();
+            var d1 = Away(m, start);
+            double du = Vec3.Dot(d1, u), dv = Vec3.Dot(d1, v);
+            var outline = GussetOutline(pl, pt, jm.here, jm.jdef, P, u, v);
+            return outline.Count < 3 ? 0 : Math.Max(0, outline.Max(q => q.X * du + q.Y * dv));
         }
 
         private void BuildGusset(string pl, string pt, List<Inst> here, TrussJointDefinition? jdef)
@@ -478,41 +557,14 @@ public static class TrussGenerator
             var v = Vec3.Cross(n, u).Normalized();
             u = Vec3.Cross(v, n).Normalized();
             var chords = here.Where(i => IsChord(i.Def.Role)).ToList();
-            double X = jdef is { GussetsInsideFaceDistance: > 0 } ? jdef.GussetsInsideFaceDistance / 2 : (chords.Count > 0 ? chords : here).Max(i => i.Sec.HalfWidth);
+            double X = jdef is { GussetsInsideFaceDistance: > 0 } ? jdef.GussetsInsideFaceDistance / 2 : (chords.Count > 0 ? chords : here).Max(i => i.Sec.HalfWidthAtJoints);
             double tg = jdef is { GussetThickness: > 0 } ? jdef.GussetThickness : jd.GussetThickness;
             var flags = new List<string>();
             if (tg <= 0) { tg = In(0.75); flags.Add("gusset thickness not given (3/4\" built)"); }
-            List<Vec2> outline;
+            List<Vec2> outline = GussetOutline(pl, pt, here, jdef, P, u, v);
             string asmMark = Asm($"TRUSS-{pl}", AssemblyKind.TrussLine, $"{_d.Name} - truss line {pl}");
-            if (jdef is { Outline.Count: >= 3 })
-                outline = jdef.Outline.Select(q => new Vec2(q.U, q.V)).ToList();
-            else
-            {
-                var pts = new List<Vec2>();
-                double margin = jd.Margin;
-                foreach (var m in here)
-                {
-                    bool through = !StartsAt(m, pl, pt) && !(m.PlaneB.Equals(pl, StringComparison.OrdinalIgnoreCase) && m.PointB.Equals(pt, StringComparison.OrdinalIgnoreCase));
-                    bool start = StartsAt(m, pl, pt);
-                    double lap = jd.Lap > 0 ? jd.Lap : Math.Max(m.Sec.Depth, In(18));
-                    foreach (var d1 in through ? new[] { m.Axis, -m.Axis } : new[] { Away(m, start) })
-                    {
-                        // chords from the point (a chord ending here and extended past it by a negative setback: from its end, the gusset covers the extension)
-                        // END chord: no other chord (or end post) leaves the point backward (a continuing chord would close the joint)
-                        bool endChord = IsChord(m.Def.Role) && !through && !here.Any(o => o != m && IsChord(o.Def.Role)
-                            && (Through(pl, pt).Contains(o) || Vec3.Dot(Away(o, StartsAt(o, pl, pt)), d1) < 0));
-                        double t0 = IsChord(m.Def.Role) ? (endChord ? Math.Min(0, start ? m.SA : m.SB) : 0) : Math.Max(0, start ? m.SA : m.SB);
-                        foreach (double t in new[] { t0, t0 + lap })
-                            foreach (double y in new[] { m.Sec.YMin - margin, m.Sec.YMax + margin })
-                            {
-                                var w = P + d1 * t + m.Y * y + m.Y * m.Def.OffsetZ - P;
-                                pts.Add(new Vec2(Vec3.Dot(w, u), Vec3.Dot(w, v)));
-                            }
-                    }
-                }
-                outline = MeshBuilder.ConvexHull(pts);
+            if (jdef is not { Outline.Count: >= 3 })
                 flags.Add(jd.Unresolved.Length > 0 ? jd.Unresolved : $"gusset outline of joint {pt} not given - convex envelope of the member laps");
-            }
             if (outline.Count < 3) return;
             if (MeshBuilder.SignedArea(outline) < 0) outline.Reverse();
             Assumption? asu = flags.Count > 0 || jdef?.Unresolved.Length > 0
@@ -537,8 +589,8 @@ public static class TrussGenerator
                 Model.PanelOf[mark] = $"Joint {pt}";
                 Model.Gussets++;
             }
-            foreach (var m in here.Where(i => i.Sec.HalfWidth > X + 1e-4))
-                Warn($"Truss CHECK joint {pt} ({pl}): member {m.Mark} is {L(2 * m.Sec.HalfWidth)} wide, more than the gusset inside distance {L(2 * X)} - it overlaps the gusset plates.");
+            foreach (var m in here.Where(i => i.Sec.HalfWidthAtJoints > X + 1e-4))
+                Warn($"Truss CHECK joint {pt} ({pl}): member {m.Mark} is {L(2 * m.Sec.HalfWidthAtJoints)} wide, more than the gusset inside distance {L(2 * X)} - it overlaps the gusset plates.");
             if (jdef is { Rivets.Count: > 0 }) _jointRivets.Add(new JointCtx(pl, pt, here, jdef, X, tg, P, u, v, n, outline, asmMark));
         }
 
@@ -781,11 +833,7 @@ public static class TrussGenerator
                     var iv = new List<(double lo, double hi)>();
                     foreach (var pc in m.Sec.Pieces)
                     {
-                        if (pc.Length > 0)
-                        {
-                            double pl = Math.Min(pc.Length, cut), ps = Math.Clamp(cut / 2 + pc.Offset - pl / 2, 0, cut - pl);
-                            if (s < ps || s > ps + pl) continue;
-                        }
+                        if (PieceSpan(m, pc, cut) is not { } sp || s < sp.ps || s > sp.ps + sp.pl) continue;
                         var xs = new List<double>();
                         var poly = pc.Polygon;
                         for (int i = 0, j = poly.Length - 1; i < poly.Length; j = i++)

@@ -164,9 +164,11 @@ foreach (var r in csv)
             // expansion-dam pier: two legs 6'-6 along the pier line, stepped tops 76.918 (girder side) / 55.962 (truss side), dog-bone footing 86'-6 x 24' x 7' (p.9, p.36)
             double girderN = cls == "pier10" ? 0.0 : 4.729, trussN = cls == "pier10" ? 4.729 : 0.0;
             double fcN = cls == "pier10" ? 2.229 : 2.5;              // CL footing station vs the support line: 658+63.88 / 706+96.88
-            double hiN0 = girderN - 2.979, hiN1 = girderN + 1.75;     // high block 4'-8 3/4 wide from 2'-11 3/4 outside the girder shoe (p.9 section B-B)
-            double loN0 = cls == "pier10" ? hiN1 : trussN - 2.979, loN1 = cls == "pier10" ? trussN + 2.979 : hiN0;
-            if (cls == "pier27") { hiN0 = girderN - 1.75; hiN1 = girderN + 2.979; loN0 = trussN - 2.979; loN1 = hiN0; }
+            // p.9 / p.36 section B-B (QC I014): high block 5'-11 1/2 = 2'-11 3/4 each side of the girder shoe line; the shoe lines 4'-8 3/4 apart; the low step runs
+            // from the high block's vertical face (1'-9 before the truss shoe line) to 3'-2 beyond it (4'-11 step). Top 10'-10 1/2 along the bridge; with the
+            // 1/4 in per 12 in batters from each top: base 12'-6 (pier 10, footing top 27.5) / 12'-10 1/2 (pier 27, 18.5) = the printed bases.
+            double hiN0 = girderN - 2.979, hiN1 = girderN + 2.979;
+            double loN0 = cls == "pier10" ? hiN1 : trussN - 3.167, loN1 = cls == "pier10" ? trussN + 3.167 : hiN0;
             double zLo = 55.962;
             sd.Plan.Solids.Add(Footing("footing", fb, ft, DogBone(86.5, 24, 6, 12, 24, fcN), pg + " (86'-6 x 24', end pads 24', 6' transitions, 12' neck, 7' thick; CL footing 658+63.88 / 706+96.88)"));
             foreach (int sg in new[] { -1, 1 })
@@ -192,7 +194,7 @@ foreach (var r in csv)
                 Seat(sd, $"girder shoe {w}", 29 * sg, girderN, seat, "p.9 / p.36: girder shoe line (El. +76.918, bush-hammered)");
                 Seat(sd, $"truss shoe {w}", 29 * sg, trussN, zLo, "p.9 / p.36: truss shoe line (El. +55.962, bush-hammered)");
             }
-            U(sd, pg, "which step carries which bearing line, and the exact step position", "the stepped top is read from section B-B (4'-8 3/4 high block, 1'-9 past the girder shoe) but the sheet does not name the bearing on each step in the scan",
+            U(sd, pg, "which step carries which bearing line", "the stepped top is read from section B-B (5'-11 1/2 high block centred on one shoe line, 4'-11 low step 1'-9 / 3'-2 about the other) but the sheet does not name the bearing on each step in the scan",
               "High step (76.918) under the girder shoe line, low step (55.962) under the truss shoe line (deck-truss end bearing 21 ft lower, as the truss seats on p.49 / p.59).");
             U(sd, pg, "across-bridge width of the shafts below the step and the batter on the step face", "only the top dimensions 2'-11 3/4 / 4'-8 3/4 / 4'-11 are legible", "Shafts lean 1/4in per 12in on every face from the high top; the low part leans from the low top.");
             U(sd, "p.9, p.36", "existing PRR 6-duct tile line near the footing (p.9 note 3)", "belongs to the railroad, not the pier", "Not modeled.");
@@ -227,7 +229,7 @@ foreach (var r in csv)
             double[] padCols = { 1.5, 5.0, 8.5, 12.0, 16.0, 20.0, 24.0 };
             int[] all11 = Enumerable.Range(-5, 11).ToArray();
             for (int i = 0; i < 7; i++) cols.Add((half - padCols[i], all11));
-            cols.Add((32.5625 + 0.0, new[] { -4, -3, -2, -1, 0, 1, 2, 3, 4 }.Where(k => Math.Abs(k * 3) <= 11.0).ToArray()));
+            cols.Add((32.5625 + 0.0, new[] { -7, -5, -3, -1, 1, 3, 5, 7 }));   // column 8 (QC I015): 8 piles on rows offset 1'-6 from the main rows (p.27 string 3-0, 3-0, 3-0, 1-6, 1-6, 3-0, 3-0, 3-0)
             cols.Add((28.5625, new[] { -2, -1, 0, 1, 2 }));
             cols.Add((24.0, new[] { -1, 1 }.Select(k => k).ToArray()));
             cols.Add((19.75, new[] { 0 }));
@@ -239,7 +241,7 @@ foreach (var r in csv)
                     var (d, rows) = cols[ci];
                     foreach (int k in rows)
                     {
-                        double ny = ci >= 9 ? k * 4.5 : k * 3.0;     // neck columns 10-13 carry rows 4'-6 either side of the CL (3'-0 / 9'-0 / 3'-0 across the 15'-0 neck)
+                        double ny = ci >= 9 ? k * 4.5 : ci == 7 ? k * 1.5 : k * 3.0;     // neck columns 10-13 carry rows 4'-6 either side of the CL (3'-0 / 9'-0 / 3'-0 across the 15'-0 neck); column 8 at +-1'-6, 4'-6, 7'-6, 10'-6
                         var fp = new FootingPoint(Ft(side * d), Ft(nc + fc + ny));
                         if (ci < 2) { fp.BatterDirS = side; fp.BatterDirN = 0; }   // columns 1-2 of each end, 1:4 outward (section B-B)
                         pile.Piles.Add(fp);
