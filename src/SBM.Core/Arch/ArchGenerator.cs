@@ -1392,24 +1392,24 @@ public static partial class ArchGenerator
             if (dk.Curbs.Count == 0 || ka == null || kb == null) return;
             if (P(ka.EndFrom) is not { } a0 || P(ka.EndTo) is not { } a1 || P(kb.EndFrom) is not { } b0 || P(kb.EndTo) is not { } b1) return;
             // End lines in plan (outside faces of the end webs), world.
-            (Vec2 p, Vec2 d) EndLine(Vec3 p, Vec3 q, double off)
+            // v7: the end web face is vertical in the LOCAL (tilted) frame -> its world plan line is taken at the curb bottom (finished grade), as the
+            // knuckle-zone slab end; at local z = 0 it was up to 1/2" off along the curb, which left a step at the slab end under the railing.
+            (Vec2 p, Vec2 d) EndLine(Vec3 p, Vec3 q, double off, bool atGrade)
             {
                 var t = (q - p).XY.Normalized();
                 var n = t.Left;
                 if (Vec2.Dot(n, -p.XY) < 0) n = -n;
                 var lp = p.XY - n * off;
-                return (W(lp.WithZ(0)).XY, (W((lp + t).WithZ(0)) - W(lp.WithZ(0))).XY.Normalized());
+                double z = atGrade ? GradeZ(lp.X, lp.Y) : 0;
+                return (W(lp.WithZ(z)).XY, (W((lp + t).WithZ(z)) - W(lp.WithZ(z))).XY.Normalized());
             }
             bool v7 = dk.KnuckleZonesFromSteel && ka.Detail != null && kb.Detail != null;
-            var e0 = EndLine(a0, a1, v7 ? -ka.EndWebInsideDn() : ka.EndWebOffset);
-            var e1 = EndLine(b0, b1, v7 ? -kb.EndWebInsideDn() : kb.EndWebOffset);
+            var e0 = EndLine(a0, a1, v7 ? -ka.EndWebInsideDn() : ka.EndWebOffset, v7);
+            var e1 = EndLine(b0, b1, v7 ? -kb.EndWebInsideDn() : kb.EndWebOffset, v7);
             var curbs = new Mesh();
             if (v7)
             {
                 // v7: each curb edge ends on the end web inside face (skewed end), the outer edge kept inside the knuckle-zone outline (rib corners).
-                var fr = Model.Frame;
-                Vec2 Loc(Vec2 w, double zw) { var d = w.WithZ(zw) - fr.Origin; return new Vec2(Vec3.Dot(d, fr.X), Vec3.Dot(d, fr.Y)); }
-                int cut = 0;
                 foreach (var c in dk.Curbs)
                 {
                     double outer = c.InnerOffset + Math.Sign(c.InnerOffset) * c.Width;
@@ -1430,15 +1430,7 @@ public static partial class ArchGenerator
                     {
                         double si = i0 + (i1 - i0) * t, so = o0 + (o1 - o0) * t;
                         var pi = _al.PointAt(si, c.InnerOffset); var po = _al.PointAt(so, outer);
-                        // outer edge inside the knuckle-zone outline (bar outline = slab outline at the knuckles)
-                        double zw = _b.Deck.FinishedElevation(_al, si, c.InnerOffset);
-                        var li = Loc(pi, zw); var lo = Loc(po, zw);
-                        if (ZoneClear(lo) < 0 && ZoneClear(li) > 0)
-                        {
-                            double lo_ = 0, hi_ = 1;
-                            for (int it = 0; it < 40; it++) { double m = (lo_ + hi_) / 2; if (ZoneClear(Vec2.Lerp(li, lo, m)) > 0) lo_ = m; else hi_ = m; }
-                            po = Vec2.Lerp(pi, po, lo_); cut++;
-                        }
+                        // plans p.151: the curb is continuous; the inside arch flange plate leg is embedded in it (no cut back to the knuckle-zone outline)
                         var soO = _al.Inverse(po);
                         double gi = _b.Deck.FinishedElevation(_al, si, c.InnerOffset), go = _b.Deck.FinishedElevation(_al, soO.Station, soO.Offset);
                         double top = gi + c.Height;
@@ -1448,7 +1440,7 @@ public static partial class ArchGenerator
                     MeshBuilder.AddLoft(curbs, sec!, rings);
                 }
                 Model.Curbs = curbs;
-                Info($"Arch curbs: ends on the knuckle end web inside faces (skewed){(cut > 0 ? $"; outer edge cut back to the inside arch flange plates at {cut} sections (rib corners)" : "")}.");
+                Info($"Arch curbs: ends on the knuckle end web inside faces (skewed); continuous, the inside arch flange plate legs are embedded in the curb concrete.");
                 return;
             }
             foreach (var c in dk.Curbs)
