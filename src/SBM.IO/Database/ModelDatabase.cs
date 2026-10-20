@@ -632,6 +632,9 @@ public static class ModelDatabase
                         cat = "expansion joint hardware"; sub = asm.ObjectType ?? "";
                         { var mm = Regex.Match(asm.Description, @" at (.+)$"); if (mm.Success) support = mm.Groups[1].Value; }
                         break;
+                    case AssemblyKind.FlangeDeflector:
+                        parent = GirderGroup(asm.Girder); cat = "flange deflector";
+                        break;
                     case AssemblyKind.LateralBracing:
                         parent = lbGroup.Length > 0 ? lbGroup : (lbGroup = Group($"{bk}/group/lateral", superId, "Lateral bracing", "lateral bracing group"));
                         cat = "lateral bracing";

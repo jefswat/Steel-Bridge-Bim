@@ -141,7 +141,7 @@ public static class PlanBarSetBuilder
         var shape = new BarShape
         {
             Code = string.IsNullOrEmpty(set.Shape) ? (cl.Length == 2 ? "STR" : "BENT") : set.Shape,
-            Description = set.Location, Centerline = cl, FixedLength = set.ListedLength > 0 ? set.ListedLength : null,
+            Description = set.Location, Centerline = cl, FixedLength = set.ListedLength > 0 ? set.ListedLength : null, PinDiameter = set.Pin,
         };
         if (set.Dims.Length > 0 && set.Dims.Length == cl.Length - 1)
             for (int i = 1; i < cl.Length; i++)

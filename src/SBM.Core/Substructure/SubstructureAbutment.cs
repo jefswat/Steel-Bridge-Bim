@@ -460,13 +460,17 @@ public sealed partial class SubstructureGenerator
         geo.PileStationsS = ad.PileStations.ToArray();
         string where = $"{name} pile group 1";
         foreach (double ps in ad.PileStations.OrderBy(x => x))
-            foreach (double xr in ad.PileRows)
+            for (int ri = 0; ri < ad.PileRows.Count; ri++)
             {
+                double xr = ad.PileRows[ri];
                 double pn = Nx(xr);
                 if (ps < leftEnd(pn) + In(6) || ps > rightEnd(pn) - In(6))
                     Warn($"{name}: pile at S {L(ps)}, x {Sh(xr)} is within 6\" of (or beyond) the footing end line.");
                 geo.PileXY.Add((ps, pn));
-                AddPilesAt(unit, sd, main, 0, 0, FB(ps), new List<FootingPoint> { new(ps, pn) }, ad.PileLength, 0, where, embedment: ad.PileTopAboveFootingBottom);
+                bool batter = ad.PileBatterRatio > 0 && ad.PileBatterRows.Contains(ri);
+                var pt = new FootingPoint(ps, pn);
+                if (batter) pt.BatterDirN = Math.Sign(Nx(Math.Sign(xr)));   // the tip moves outward (away from the CL bearing)
+                AddPilesAt(unit, sd, main, 0, 0, FB(ps), new List<FootingPoint> { pt }, ad.PileLength, batter ? ad.PileBatterRatio : 0, where, embedment: ad.PileTopAboveFootingBottom);
             }
 
         // ---- wingwalls, counterforts, wing footings with piles

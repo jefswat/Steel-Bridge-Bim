@@ -167,6 +167,8 @@ public sealed class CapHaunchStirrups
     public double BottomWidth { get; set; }
     public double LegHeight { get; set; }
     public double HookLength { get; set; }
+    /// <summary>Printed bend pin diameter D (plan bend diagram; 0 = the standard minimum).</summary>
+    public double Pin { get; set; }
     public double ClearAboveSteel { get; set; } = In(2);
     /// <summary>Plan clear cover to the concrete faces (checked).</summary>
     public double Cover { get; set; } = In(2);

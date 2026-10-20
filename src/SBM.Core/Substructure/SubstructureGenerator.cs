@@ -945,6 +945,19 @@ public sealed partial class SubstructureGenerator
 
     private static Vec2[] ColumnSectionCore(SubstructureDefinition sd)
     {
+        if (sd.ColumnShape == ColumnShape.Rectangular && sd.ColumnProjectionBack > 0 && sd.ColumnProjectionBackWidth > 0 && sd.ColumnChamferS <= 0 && sd.ColumnChamferN <= 0)
+        {
+            // as below, plus a centred projection on the -N face (counter-clockwise: inserted after the first vertex of the bottom edge)
+            double a0 = sd.ColumnWidth / 2, b0 = sd.ColumnDepth / 2, w0 = Math.Min(sd.ColumnProjectionBackWidth, sd.ColumnWidth) / 2, pb = b0 + sd.ColumnProjectionBack;
+            var pts = new List<Vec2> { new Vec2(-a0, -b0), new Vec2(-w0, -b0), new Vec2(-w0, -pb), new Vec2(w0, -pb), new Vec2(w0, -b0), new Vec2(a0, -b0) };
+            if (sd.ColumnProjectionS > 0 && sd.ColumnProjectionWidth > 0)
+            {
+                double p = a0 + sd.ColumnProjectionS, h = Math.Min(sd.ColumnProjectionWidth, sd.ColumnDepth) / 2;
+                pts.AddRange(new[] { new Vec2(a0, -h), new Vec2(p, -h), new Vec2(p, h), new Vec2(a0, h), new Vec2(a0, b0), new Vec2(-a0, b0), new Vec2(-a0, h), new Vec2(-p, h), new Vec2(-p, -h), new Vec2(-a0, -h) });
+            }
+            else pts.AddRange(new[] { new Vec2(a0, b0), new Vec2(-a0, b0) });
+            return pts.ToArray();
+        }
         if (sd.ColumnShape == ColumnShape.Rectangular && sd.ColumnProjectionS > 0 && sd.ColumnProjectionWidth > 0 && sd.ColumnChamferS <= 0 && sd.ColumnChamferN <= 0)
         {
             // rectangle with a centred projection (reveal) on both S faces, counter-clockwise

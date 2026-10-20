@@ -250,6 +250,8 @@
             "ColumnChamferN": 0,
             "ColumnProjectionS": 0,
             "ColumnProjectionWidth": 0,
+            "ColumnProjectionBack": 0,
+            "ColumnProjectionBackWidth": 0,
             "ColumnFlareElevation": "NaN",
             "ColumnFlareWidth": 0,
             "ColumnFlareDepth": 0,
@@ -376,6 +378,10 @@
               "PileBackRowToBearing": 0.508,
               "PileFrontRowToBearing": 0.48260000000000003,
               "PileTopAboveFootingBottom": 0.6096,
+              "PileBatterRatio": 4,
+              "PileBatterRows": [
+                1
+              ],
               "PileLength": 57.912000000000006,
               "Wings": [],
               "Rebar": {
@@ -486,8 +492,7 @@
               "PlanBarSets": []
             },
             "Unresolved": [
-              "UNRESOLVED (p.18, p.22): S. Abut. wing extensions, maskwall, backwall extension and their footing / pile - the wing extension sections were not read in this pass. Not modeled (1 pile of the 13 missing).",
-              "UNRESOLVED (p.18 / p.22): S. Abut. front pile row batter 1:4 - the stub abutment generator places plumb piles. Front row plumb at its footing-bottom position.",
+              "UNRESOLVED (p.18-19, p.22): S. Abut. wing extension, maskwall, backwall extension and the L-shaped wing footing (10\u0027-7 1/2 overall) with its pile - the stub abutment generator has no wing-extension footing: the plan footing outline steps out 4\u0027-4 1/2 x 3\u0027-6 beyond the main footing at the end(s) with a skewed end face (5 deg 54\u002710\u0022 S / 5 deg 53\u002733\u0022 N) and bevelled bottom (p.19 / p.21 Views A-A, B-B, F-F, C-C, E-E), wall tops from the wingwall elevation table; the wing pile (1\u0027-6 from the end, p.22) needs that footing. Not modeled (1 pile of the 13 missing; 12 main piles placed, front row battered 1:4).",
               "UNRESOLVED (p.18): S. Abut. step blocks - steps run from the backwall face to 2\u0027-1 ahead of CL brg (p.18 section). Generator steps (BearingToStepFront 2\u0027-1)."
             ]
           },
@@ -572,24 +577,110 @@
             "CapOffset": 0,
             "CapProfile": [
               {
-                "S": -6.61193389377236,
+                "S": -6.510333893772359,
                 "Elevation": 338.337144
               },
               {
-                "S": 2.319341106227642,
+                "S": 2.217741106227642,
                 "Elevation": 338.337144
               },
               {
-                "S": 2.319341106227642,
+                "S": 2.217741106227642,
                 "Elevation": 339.861144
               },
               {
-                "S": -6.61193389377236,
+                "S": -6.510333893772359,
                 "Elevation": 339.861144
               }
             ],
             "CapProfileAhead": [],
             "CapBlocks": [
+              {
+                "Name": "end projection (column 1 end)",
+                "Kind": "Cap",
+                "Outline": [
+                  {
+                    "S": -6.61193389377236,
+                    "N": -0.5540375000000001,
+                    "BatterDirS": 0,
+                    "BatterDirN": 0,
+                    "WebDirS": 0,
+                    "WebDirN": 0
+                  },
+                  {
+                    "S": -6.510333893772359,
+                    "N": -0.5540375000000001,
+                    "BatterDirS": 0,
+                    "BatterDirN": 0,
+                    "WebDirS": 0,
+                    "WebDirN": 0
+                  },
+                  {
+                    "S": -6.510333893772359,
+                    "N": 0.5540375000000001,
+                    "BatterDirS": 0,
+                    "BatterDirN": 0,
+                    "WebDirS": 0,
+                    "WebDirN": 0
+                  },
+                  {
+                    "S": -6.61193389377236,
+                    "N": 0.5540375000000001,
+                    "BatterDirS": 0,
+                    "BatterDirN": 0,
+                    "WebDirS": 0,
+                    "WebDirN": 0
+                  }
+                ],
+                "Base": "CapBottom",
+                "TopElevation": 339.861144,
+                "TopRefS": -6.61193389377236,
+                "TopSlopeS": 0,
+                "Source": "p.9 pier cap plan (4\u0022 x 3\u0027-7 5/8 end projection, 8\u0022 notches)"
+              },
+              {
+                "Name": "end projection (column 2 end)",
+                "Kind": "Cap",
+                "Outline": [
+                  {
+                    "S": 2.217741106227642,
+                    "N": -0.5540375000000001,
+                    "BatterDirS": 0,
+                    "BatterDirN": 0,
+                    "WebDirS": 0,
+                    "WebDirN": 0
+                  },
+                  {
+                    "S": 2.319341106227642,
+                    "N": -0.5540375000000001,
+                    "BatterDirS": 0,
+                    "BatterDirN": 0,
+                    "WebDirS": 0,
+                    "WebDirN": 0
+                  },
+                  {
+                    "S": 2.319341106227642,
+                    "N": 0.5540375000000001,
+                    "BatterDirS": 0,
+                    "BatterDirN": 0,
+                    "WebDirS": 0,
+                    "WebDirN": 0
+                  },
+                  {
+                    "S": 2.217741106227642,
+                    "N": 0.5540375000000001,
+                    "BatterDirS": 0,
+                    "BatterDirN": 0,
+                    "WebDirS": 0,
+                    "WebDirN": 0
+                  }
+                ],
+                "Base": "CapBottom",
+                "TopElevation": 339.861144,
+                "TopRefS": 2.319341106227642,
+                "TopSlopeS": 0,
+                "Source": "p.9 pier cap plan (4\u0022 x 3\u0027-7 5/8 end projection, 8\u0022 notches)"
+              },
               {
                 "Name": "maskwall (column 1 end)",
                 "Kind": "Maskwall",
@@ -768,6 +859,8 @@
             "ColumnChamferN": 0,
             "ColumnProjectionS": 0.1016,
             "ColumnProjectionWidth": 1.1080750000000001,
+            "ColumnProjectionBack": 0,
+            "ColumnProjectionBackWidth": 0,
             "ColumnFlareElevation": "NaN",
             "ColumnFlareWidth": 0,
             "ColumnFlareDepth": 0,
@@ -1135,7 +1228,6 @@
               "PlanBarSets": []
             },
             "Unresolved": [
-              "UNRESOLVED (p.9): 8\u0022 corner notches of the 4\u0022 cap end projections - minor shapes. The cap runs full width to its ends (the maskwalls carry the plan notch).",
               "UNRESOLVED (p.9-11): terra cotta blockouts (south faces) and the thin brick recesses of the columns / cap - decorative recesses (terra cotta = LS item 17). Not cut into the concrete; thin brick as a surface treatment.",
               "UNRESOLVED (p.11): uplift anchors 8f6 at the circled piles (Detail I) - the circled pile positions are not read. Not modeled."
             ]
@@ -1234,6 +1326,8 @@
             "ColumnChamferN": 0,
             "ColumnProjectionS": 0.1016,
             "ColumnProjectionWidth": 1.819275,
+            "ColumnProjectionBack": 0.1016,
+            "ColumnProjectionBackWidth": 1.209675,
             "ColumnFlareElevation": "NaN",
             "ColumnFlareWidth": 0,
             "ColumnFlareDepth": 0,
@@ -1833,7 +1927,7 @@
                   0.3349625,
                   0.4619625
                 ],
-                "Unresolved": "UNRESOLVED (p.31): top cover plate start at column 1 (U8) - the Detail B dimension 4\u0027-5 / 6\u0027-2 runs into the cap end and its origin is not legible. Plate from the cap end to 5\u0027-6 \u002B 4\u0027-5 / 6\u0027-2 past the CL bearing (View E-E bolt chain reproduces 11\u0027-5 / 13\u0027-2 within 6\u0022)."
+                "Unresolved": null
               },
               {
                 "Top": true,
@@ -1905,7 +1999,7 @@
                   0.3349625,
                   0.4619625
                 ],
-                "Unresolved": "UNRESOLVED (p.31): top cover plate start at column 2 (U8) - the Detail B dimension 4\u0027-5 / 6\u0027-2 runs into the cap end and its origin is not legible. Plate from the cap end to 5\u0027-6 \u002B 4\u0027-5 / 6\u0027-2 past the CL bearing (View E-E bolt chain reproduces 11\u0027-5 / 13\u0027-2 within 6\u0022)."
+                "Unresolved": null
               },
               {
                 "Top": false,
@@ -2739,6 +2833,7 @@
                   "BottomWidth": 0.9144,
                   "LegHeight": 0.2032,
                   "HookLength": 0.15239999999999998,
+                  "Pin": 0.0635,
                   "ClearAboveSteel": 0.0508,
                   "Cover": 0.0508,
                   "ListedLength": 1.6256,
@@ -2888,6 +2983,8 @@
             "ColumnChamferN": 0,
             "ColumnProjectionS": 0,
             "ColumnProjectionWidth": 0,
+            "ColumnProjectionBack": 0,
+            "ColumnProjectionBackWidth": 0,
             "ColumnFlareElevation": "NaN",
             "ColumnFlareWidth": 0,
             "ColumnFlareDepth": 0,
@@ -3014,6 +3111,10 @@
               "PileBackRowToBearing": 0.508,
               "PileFrontRowToBearing": 0.48260000000000003,
               "PileTopAboveFootingBottom": 0.6096,
+              "PileBatterRatio": 4,
+              "PileBatterRows": [
+                1
+              ],
               "PileLength": 42.672000000000004,
               "Wings": [],
               "Rebar": {
@@ -3124,8 +3225,7 @@
               "PlanBarSets": []
             },
             "Unresolved": [
-              "UNRESOLVED (p.20, p.22): N. Abut. wing extensions, maskwall, backwall extension and their footing / piles - the wing extension sections were not read in this pass. Not modeled (2 piles of the 14 missing).",
-              "UNRESOLVED (p.18 / p.22): N. Abut. front pile row batter 1:4 - the stub abutment generator places plumb piles. Front row plumb at its footing-bottom position.",
+              "UNRESOLVED (p.20-21, p.22): N. Abut. wing extensions, maskwalls, backwall extension and the L-shaped wing footing (10\u0027-7 1/2 overall) with its piles - the stub abutment generator has no wing-extension footing: the plan footing outline steps out 4\u0027-4 1/2 x 3\u0027-6 beyond the main footing at the end(s) with a skewed end face (5 deg 54\u002710\u0022 S / 5 deg 53\u002733\u0022 N) and bevelled bottom (p.19 / p.21 Views A-A, B-B, F-F, C-C, E-E), wall tops from the wingwall elevation table; the wing pile (1\u0027-6 from the end, p.22) needs that footing. Not modeled (2 piles of the 14 missing; 12 main piles placed, front row battered 1:4).",
               "UNRESOLVED (p.20): N. Abut. step blocks - steps run from the backwall face to 2\u0027-1 ahead of CL brg (p.18 section). Generator steps (BearingToStepFront 2\u0027-1)."
             ]
           },
@@ -5907,7 +6007,206 @@
         },
         "SupportBayStyles": {},
         "SupportStyle": "",
-        "Lines": [],
+        "Lines": [
+          {
+            "Girder": 0,
+            "Distance": 6.8437125000000005,
+            "NormalToGirder": true,
+            "Style": "",
+            "BayStyles": {},
+            "Bays": null,
+            "Unresolved": []
+          },
+          {
+            "Girder": 0,
+            "Distance": 13.701712500000001,
+            "NormalToGirder": true,
+            "Style": "",
+            "BayStyles": {},
+            "Bays": null,
+            "Unresolved": []
+          },
+          {
+            "Girder": 0,
+            "Distance": 20.559712500000003,
+            "NormalToGirder": true,
+            "Style": "",
+            "BayStyles": {},
+            "Bays": null,
+            "Unresolved": []
+          },
+          {
+            "Girder": 0,
+            "Distance": 27.4177125,
+            "NormalToGirder": true,
+            "Style": "",
+            "BayStyles": {},
+            "Bays": null,
+            "Unresolved": []
+          },
+          {
+            "Girder": 0,
+            "Distance": 34.275712500000004,
+            "NormalToGirder": true,
+            "Style": "",
+            "BayStyles": {},
+            "Bays": null,
+            "Unresolved": []
+          },
+          {
+            "Girder": 0,
+            "Distance": 41.13371250000001,
+            "NormalToGirder": true,
+            "Style": "",
+            "BayStyles": {},
+            "Bays": null,
+            "Unresolved": []
+          },
+          {
+            "Girder": 0,
+            "Distance": 47.991712500000006,
+            "NormalToGirder": true,
+            "Style": "",
+            "BayStyles": {},
+            "Bays": null,
+            "Unresolved": []
+          },
+          {
+            "Girder": 0,
+            "Distance": 61.249795083098284,
+            "NormalToGirder": true,
+            "Style": "",
+            "BayStyles": {},
+            "Bays": null,
+            "Unresolved": []
+          },
+          {
+            "Girder": 0,
+            "Distance": 68.18399508309828,
+            "NormalToGirder": true,
+            "Style": "",
+            "BayStyles": {},
+            "Bays": null,
+            "Unresolved": []
+          },
+          {
+            "Girder": 0,
+            "Distance": 75.11819508309829,
+            "NormalToGirder": true,
+            "Style": "",
+            "BayStyles": {},
+            "Bays": null,
+            "Unresolved": []
+          },
+          {
+            "Girder": 0,
+            "Distance": 82.05239508309829,
+            "NormalToGirder": true,
+            "Style": "",
+            "BayStyles": {},
+            "Bays": null,
+            "Unresolved": []
+          },
+          {
+            "Girder": 0,
+            "Distance": 88.98659508309828,
+            "NormalToGirder": true,
+            "Style": "",
+            "BayStyles": {},
+            "Bays": null,
+            "Unresolved": []
+          },
+          {
+            "Girder": 0,
+            "Distance": 95.92079508309828,
+            "NormalToGirder": true,
+            "Style": "",
+            "BayStyles": {},
+            "Bays": null,
+            "Unresolved": []
+          },
+          {
+            "Girder": 0,
+            "Distance": 102.85499508309829,
+            "NormalToGirder": true,
+            "Style": "",
+            "BayStyles": {},
+            "Bays": null,
+            "Unresolved": []
+          },
+          {
+            "Girder": 0,
+            "Distance": 109.78919508309829,
+            "NormalToGirder": true,
+            "Style": "",
+            "BayStyles": {},
+            "Bays": null,
+            "Unresolved": []
+          },
+          {
+            "Girder": 0,
+            "Distance": 123.65599517823114,
+            "NormalToGirder": true,
+            "Style": "",
+            "BayStyles": {},
+            "Bays": null,
+            "Unresolved": []
+          },
+          {
+            "Girder": 0,
+            "Distance": 130.70925767823113,
+            "NormalToGirder": true,
+            "Style": "",
+            "BayStyles": {},
+            "Bays": null,
+            "Unresolved": []
+          },
+          {
+            "Girder": 0,
+            "Distance": 137.76252017823114,
+            "NormalToGirder": true,
+            "Style": "",
+            "BayStyles": {},
+            "Bays": null,
+            "Unresolved": []
+          },
+          {
+            "Girder": 0,
+            "Distance": 144.81578267823113,
+            "NormalToGirder": true,
+            "Style": "",
+            "BayStyles": {},
+            "Bays": null,
+            "Unresolved": []
+          },
+          {
+            "Girder": 0,
+            "Distance": 151.86904517823115,
+            "NormalToGirder": true,
+            "Style": "",
+            "BayStyles": {},
+            "Bays": null,
+            "Unresolved": []
+          },
+          {
+            "Girder": 0,
+            "Distance": 158.92230767823114,
+            "NormalToGirder": true,
+            "Style": "",
+            "BayStyles": {},
+            "Bays": null,
+            "Unresolved": []
+          },
+          {
+            "Girder": 0,
+            "Distance": 165.97557017823112,
+            "NormalToGirder": true,
+            "Style": "",
+            "BayStyles": {},
+            "Bays": null,
+            "Unresolved": []
+          }
+        ],
         "Links": []
       },
       "Stiffeners": {
@@ -6306,13 +6605,136 @@
         "Diameter": 0.022224999999999998,
         "RowsAcross": 3,
         "TransverseSpacing": 0.1905,
+        "EdgeDistance": 0.038099999999999995,
         "Pitch": 0.30479999999999996,
         "Penetration": 0.0508,
         "MinCover": 0.0508,
         "HeadDiameter": 0.034925,
         "HeadHeight": 0.009524999999999999,
         "LengthIncrement": 0.0127,
-        "Clearance": 0.038099999999999995
+        "Clearance": 0.038099999999999995,
+        "Zones": [
+          {
+            "Girders": [],
+            "From": {
+              "Kind": "GirderStart",
+              "Number": 0,
+              "Offset": 0.3048
+            },
+            "To": {
+              "Kind": "GirderStart",
+              "Number": 0,
+              "Offset": 6.096
+            },
+            "Spaces": 24,
+            "Source": "p.28 24 EQ. SPA. = 19\u0027-0"
+          },
+          {
+            "Girders": [],
+            "From": {
+              "Kind": "GirderStart",
+              "Number": 0,
+              "Offset": 6.096
+            },
+            "To": {
+              "Kind": "Splice",
+              "Number": 1,
+              "Offset": -0.5334
+            },
+            "Spaces": 90,
+            "Source": "p.28 90 EQ. SPA."
+          },
+          {
+            "Girders": [],
+            "From": {
+              "Kind": "Splice",
+              "Number": 1,
+              "Offset": 0.5334
+            },
+            "To": {
+              "Kind": "Splice",
+              "Number": 2,
+              "Offset": -0.5334
+            },
+            "Spaces": 84,
+            "Source": "p.28 84 EQ. SPA."
+          },
+          {
+            "Girders": [],
+            "From": {
+              "Kind": "Splice",
+              "Number": 2,
+              "Offset": 0.5334
+            },
+            "To": {
+              "Kind": "Splice",
+              "Number": 3,
+              "Offset": -0.5334
+            },
+            "Spaces": 73,
+            "Source": "p.28 73 EQ. SPA."
+          },
+          {
+            "Girders": [],
+            "From": {
+              "Kind": "Splice",
+              "Number": 3,
+              "Offset": 0.5334
+            },
+            "To": {
+              "Kind": "Support",
+              "Number": 2,
+              "Offset": -2.5908
+            },
+            "Spaces": 40,
+            "Source": "p.28 40 EQ. SPA., 8\u0027-6 to CL pier 2"
+          },
+          {
+            "Girders": [],
+            "From": {
+              "Kind": "Support",
+              "Number": 2,
+              "Offset": 2.5908
+            },
+            "To": {
+              "Kind": "Splice",
+              "Number": 4,
+              "Offset": -0.5334
+            },
+            "Spaces": 39,
+            "Source": "p.28 39 EQ. SPA., 8\u0027-6 from CL pier 2"
+          },
+          {
+            "Girders": [],
+            "From": {
+              "Kind": "Splice",
+              "Number": 4,
+              "Offset": 0.5334
+            },
+            "To": {
+              "Kind": "GirderEnd",
+              "Number": 0,
+              "Offset": -6.096
+            },
+            "Spaces": 95,
+            "Source": "p.28 95 EQ. SPA."
+          },
+          {
+            "Girders": [],
+            "From": {
+              "Kind": "GirderEnd",
+              "Number": 0,
+              "Offset": -6.096
+            },
+            "To": {
+              "Kind": "GirderEnd",
+              "Number": 0,
+              "Offset": -0.3048
+            },
+            "Spaces": 24,
+            "Source": "p.28 24 EQ. SPA. = 19\u0027-0"
+          }
+        ]
       },
       "LateralBracing": {
         "Enabled": false,
@@ -6533,6 +6955,86 @@
               "Basis": ""
             },
             {
+              "Name": "Pier 1 cap column 2 end faces",
+              "Host": "Substructure",
+              "Support": "Pier 1",
+              "Tag": "",
+              "Elements": [
+                "Cap"
+              ],
+              "NameContains": "",
+              "FacingS": 1,
+              "FacingN": 0,
+              "MaxAngleDeg": 30,
+              "FacingOffsetSide": 0,
+              "SMin": "NaN",
+              "SMax": "NaN",
+              "Lower": {
+                "Ref": "Elevation",
+                "Points": [
+                  {
+                    "S": 0,
+                    "Elevation": 338.55145650000003
+                  }
+                ],
+                "Offset": 0
+              },
+              "Upper": {
+                "Ref": "Elevation",
+                "Points": [
+                  {
+                    "S": 0,
+                    "Elevation": 339.6468315
+                  }
+                ],
+                "Offset": 0
+              },
+              "Exclude": [],
+              "Source": "p.15 notes (wrap), Detail A (8 7/16 \u002B 3\u0027-7 1/8 \u002B 8 7/16)",
+              "Unresolved": "",
+              "Basis": ""
+            },
+            {
+              "Name": "Pier 1 cap column 1 end faces",
+              "Host": "Substructure",
+              "Support": "Pier 1",
+              "Tag": "",
+              "Elements": [
+                "Cap"
+              ],
+              "NameContains": "",
+              "FacingS": -1,
+              "FacingN": 0,
+              "MaxAngleDeg": 30,
+              "FacingOffsetSide": 0,
+              "SMin": "NaN",
+              "SMax": "NaN",
+              "Lower": {
+                "Ref": "Elevation",
+                "Points": [
+                  {
+                    "S": 0,
+                    "Elevation": 338.55145650000003
+                  }
+                ],
+                "Offset": 0
+              },
+              "Upper": {
+                "Ref": "Elevation",
+                "Points": [
+                  {
+                    "S": 0,
+                    "Elevation": 339.6468315
+                  }
+                ],
+                "Offset": 0
+              },
+              "Exclude": [],
+              "Source": "p.15 notes (wrap), Detail A (8 7/16 \u002B 3\u0027-7 1/8 \u002B 8 7/16)",
+              "Unresolved": "",
+              "Basis": ""
+            },
+            {
               "Name": "Pier 2 columns",
               "Host": "Substructure",
               "Support": "Pier 2",
@@ -6639,6 +7141,7 @@
             }
           ],
           "Unresolved": [
+            "(p.15) Pier 1 cap soffit between the columns (about 86 SF, 4\u0027-11 5/8 x 17\u0027-4 3/8): the p.15 note wraps the brick around all sides of the cap beam, but the surface-region model has no horizontal (soffit) host; the p.3 quantity 822.9 SF is short in the model by about that area.",
             "(p.15-17) terra cotta panels (LS item 17: prepare and install only) in the south-face blockouts are not modeled; the blockouts are not cut."
           ]
         },
@@ -7717,6 +8220,35 @@
         "StiffenerWebEndFactor": 5,
         "StiffenerWebEndMin": 0.05715,
         "StiffenerWebEndSource": "p.32 std. 1021W Sections C-C / D-D: X = 5T, 2 1/4\u0022 min from the toe of the flange-to-web weld"
+      },
+      "FlangeDeflectors": {
+        "Angle": "L4x3x5/16",
+        "VerticalLeg": 0.1016,
+        "HorizontalLeg": 0.07619999999999999,
+        "AngleThickness": 0.0079375,
+        "PlateWidth": 0.07619999999999999,
+        "PlateThickness": 0.0079375,
+        "PlateHeight": 0.17779999999999999,
+        "SkewDegrees": 30,
+        "BackFromBearing": 1.524,
+        "BoltDiameter": 0.019049999999999997,
+        "HoleDiameter": 0.0206375,
+        "BoltAlong": [
+          0.0635,
+          0.127
+        ],
+        "BoltGage": 0.044449999999999996,
+        "Supports": [
+          1,
+          2,
+          3
+        ],
+        "Material": "ASTM A709 Gr. 50W",
+        "Source": "p.32 flange deflector details / p.27",
+        "Unresolved": [
+          "UNRESOLVED (p.27, p.32): which supports carry the 6 flange deflectors - p.32 says \u0027at the abutment and piers as shown on the framing plan\u0027 and p.27 only draws callouts at pier 1 and the N abutment. Read as the supports where the grade runs DOWN toward the bearing along the girder (grade decreases with the stationing): pier 1, pier 2 and the N abutment, both exterior girders = 6; none at the S abutment.",
+          "UNRESOLVED (p.32): flange that carries the deflectors and the 5\u0027-0 reference - the detail shows a girder flange plan without saying top or bottom; the dimension runs to the CL bearing line with \u0027GRADE DECREASES\u0027 toward it. Bottom flange (the top flange is under the deck), the web-end corner 5\u0027-0 before the CL bearing (up-grade side)."
+        ]
       }
     }
   ],

@@ -29,6 +29,8 @@ public sealed class PlanBarSet
     public double[] Dims { get; set; } = Array.Empty<double>();
     /// <summary>Listed (scheduled) length from the plan bar table, meters; 0 = the geometry's developed length (bars with different lengths get a varying mark).</summary>
     public double ListedLength { get; set; }
+    /// <summary>OPTIONAL printed plan bend pin diameter D (0 = the standard minimum, <see cref="SBM.Core.Concrete.RebarBends.StandardPin"/>).</summary>
+    public double Pin { get; set; }
     /// <summary>Clear cover the plan requires for these bars (meters) to every concrete face; <see cref="CoverBottom"/> / <see cref="CoverTop"/> override it at faces looking down / up.</summary>
     public double Cover { get; set; } = In(2);
     public double CoverBottom { get; set; } = double.NaN;
