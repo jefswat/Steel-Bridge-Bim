@@ -113,13 +113,13 @@ string unrPost = UnresolvedFlag.Text("p.84 note 2, p.85-88, p.89, p.90", "railin
 // (the user's 'chain link' suggestion), 2 wire diameters thick, on the outer face of the posts (the handrail bracket is on the trail side) from the curb to the
 // post top, nominal 0.40 lb/ft2 (9 ga, 2" mesh); NOT a plan value.
 double fabT = In(2 * 0.148), fabW = 0.40 * 4.88242764;
-string unrFab = UnresolvedFlag.Text("p.89, p.84-88, p.91, p.3", "fence fabric type, height range, side of the posts and weight",
+string unrFab = UnresolvedFlag.Text("p.89, p.84-88, p.91, p.3", "fence fabric type (chain link, mesh, wire or opening), height range, side of the posts and weight - the panels are placeholders and their weight is NOT counted in the railing mass, dead load or quantities (user decision d20 2026-10-20)",
     "the 'Pedestrian railing details' sheets 224-226 that define the fencing are not in the set (p.89 only says 'for railing and fencing details see ...'); the elevations p.85-88 draw a panel between every pair of posts, no fabric pay item is on p.91",
     "Chain link guess: 9 gauge (0.148\") 2 in mesh, 0.40 lb/ft2, outer face of the posts from the curb to the post top, 8'-0 bays; drawn see-through.");
 RailFabricDefinition Fabric(IEnumerable<RailPoint> outerFace) => new()
 {
     Description = "Fence fabric panel (chain link guess, 9 ga 2 in mesh)", Path = outerFace.ToList(), OffsetFromPost = fabT / 2, BottomH = 0, TopH = null, Thickness = fabT,
-    MassPerArea = fabW, PostClearance = 0, Material = "Chain link fabric (type UNRESOLVED; galvanized steel guess)",
+    MassPerArea = fabW, MassNotCounted = true, PostClearance = 0, Material = "Chain link fabric (type UNRESOLVED; galvanized steel guess)",
     Unresolved = unrFab, Basis = "chain link guess 9 ga (0.148\") 2 in mesh, 0.40 lb/ft2 nominal, on the outer face of the posts, curb top to post top (the elevations p.85-88 draw the panels full height); not a plan value",
 };
 // outer faces of the two post sections (lowSec[1], lowSec[2]; highSec[1 .. tip]) up to the post tops
