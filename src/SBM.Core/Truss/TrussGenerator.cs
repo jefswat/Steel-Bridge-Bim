@@ -885,7 +885,7 @@ public static class TrussGenerator
                 Model.Steel.Parts.Add(new SteelPart
                 {
                     Mark = $"{asm}-BODY", Category = s.Type == TrussShoeType.Expansion ? PartCategory.TrussShoeExpansion : PartCategory.TrussShoeFixed, Assembly = asm,
-                    Description = $"{s.Type} shoe body {pt}", Mesh = body, Material = "Cast steel (shoe)", Length = bl, Assumption = asu,
+                    Description = $"{s.Type} shoe body {pt}", Mesh = body, Material = s.BodyMaterial is { Length: > 0 } bmat ? Material(bmat) : "Cast steel (shoe)", Length = bl, Assumption = asu,
                 });
             }
             if (s.PinDiameter > 0)

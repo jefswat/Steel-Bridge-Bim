@@ -543,6 +543,9 @@ public sealed class TrussShoeDefinition
     public double MasonryThickness { get; set; }
     /// <summary>OPTIONAL plan elevation of the masonry plate bottom (bearing seat); NaN = pin - Height.</summary>
     public double SeatElevation { get; set; } = double.NaN;
+    /// <summary>OPTIONAL material of the shoe body (plan letter or name; null = cast steel, omitted from the .sbm), e.g. "C" for shoes built up of plates.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? BodyMaterial { get; set; }
     public int AnchorBolts { get; set; }
     public double AnchorDiameter { get; set; }
     public double AnchorEmbedment { get; set; }

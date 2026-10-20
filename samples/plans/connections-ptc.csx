@@ -185,6 +185,62 @@ foreach (var name in new[] { "PTC Girder spans 1-10", "PTC Girder spans 28-31" }
     report.Add($"{name}: stiffeners + web splice on {nG} girder members");
 }
 
+// ================================================================ 3. stringer diaphragms 15 [ 33.9 at mid-panel (p.43 note, p.48 / p.58, p.94): one channel across all stringer lines
+{
+    var ch = SteelCatalog.FindChannel("C15x33.9");
+    foreach (var br in Doc.Project.Bridges.Where(b => b.Name.StartsWith("PTC ") && b.Truss?.Floor != null))
+    {
+        var t = br.Truss!;
+        var al = Doc.Project.Alignments.First(a => a.Name == br.AlignmentName);
+        var tm = Doc.Model(br.Name).Steel?.Truss;
+        if (tm == null || ch == null) continue;
+        t.LineItems ??= new();
+        t.LineItems.RemoveAll(li => li.Name.StartsWith("diaphragm 15[33.9"));
+        var fbSta = tm.Members.Where(m => m.Role == TrussMemberRole.FloorBeam).Select(m => al.Inverse(((m.A + m.B) * 0.5).XY).Station).OrderBy(s => s).ToList();
+        var stas = new List<double>();
+        foreach (var s in fbSta) if (stas.Count == 0 || s - stas[^1] > 0.5) stas.Add(s);
+        double o0 = t.Floor!.Stringers.Min(s => s.Offset), o1 = t.Floor.Stringers.Max(s => s.Offset);
+        double top = t.Floor.StringerTopBelowGrade + In(3);
+        var prof = new List<TrussUV>
+        {
+            new() { U = -ch.FlangeWidth / 2, V = -top }, new() { U = ch.FlangeWidth / 2, V = -top }, new() { U = ch.FlangeWidth / 2, V = -top - ch.FlangeThickness },
+            new() { U = -ch.FlangeWidth / 2 + ch.WebThickness, V = -top - ch.FlangeThickness }, new() { U = -ch.FlangeWidth / 2 + ch.WebThickness, V = -top - ch.Depth + ch.FlangeThickness },
+            new() { U = ch.FlangeWidth / 2, V = -top - ch.Depth + ch.FlangeThickness }, new() { U = ch.FlangeWidth / 2, V = -top - ch.Depth }, new() { U = -ch.FlangeWidth / 2, V = -top - ch.Depth },
+        };
+        int k = 0;
+        string flag = U("p.43, p.48, p.58, p.94", "stringer diaphragms 15 [ 33.9", "the notes place them at the centre of each floor panel (and at the abutments / piers, 18 WF 64 at the girder-span piers) without their height or connection angles",
+            "one continuous 15 [ 33.9 across the outermost stringer lines at mid-panel, top 3 in. below the stringer tops, web vertical; connection angles, the end / pier diaphragms and the 18 WF 64 not built.");
+        for (int i = 0; i + 1 < stas.Count; i++)
+        {
+            double gap = stas[i + 1] - stas[i];
+            if (gap < Ft(16) || gap > Ft(40)) continue;     // floor panels only (not the dam gaps or span gaps)
+            double sm = (stas[i] + stas[i + 1]) / 2;
+            k++;
+            t.LineItems.Add(new TrussLineItemDefinition
+            {
+                Name = $"diaphragm 15[33.9 #{k}", Kind = TrussLineItemKind.Steel, Category = PartCategory.Channel, Transverse = true, Station = sm, From = o0, To = o1,
+                Profile = prof, NominalWeightLbPerFt = 33.9, Material = "C", Assembly = "FLOOR", AssemblyDescription = $"{t.Name} - floor system", Source = "p.43 / p.48 / p.58 / p.94", Unresolved = flag,
+            });
+        }
+        report.Add($"{br.Name}: {k} mid-panel stringer diaphragms 15[33.9");
+        // the floor flag of the truss / girder scripts says "diaphragms not built": now only partly true
+        if (k > 0) t.Floor.Unresolved = t.Floor.Unresolved.Replace("diaphragms not built", "diaphragms not built (except the mid-panel 15 [ 33.9, connections-ptc.csx)");
+    }
+}
+
+// ================================================================ 4. shoe body material (shoes.csv): built up of carbon steel plates (p.44 girder shoes "all carbon steel C",
+// p.49 / 52 / 59 / 63 / 67 approach shoes: stem, wing, stiffener plates and rockers (C), sole plates (S); p.73 main L0 rocker shoes (C)); only the main L11 / L11'
+// shoes at piers 18 / 19 are a steel forging / casting (p.96). The envelope body is carbon steel then (p.42 item 9 lists no castings for the approach units).
+int shoeC = 0;
+foreach (var br in Doc.Project.Bridges.Where(b => b.Name.StartsWith("PTC ") && b.Truss != null))
+    foreach (var sh in br.Truss!.Shoes)
+    {
+        bool castMain = br.Name.StartsWith("PTC Arch") && sh.Point.StartsWith("L11");
+        sh.BodyMaterial = castMain ? null : "C";
+        if (!castMain) shoeC++;
+    }
+report.Add($"shoe bodies of built-up carbon steel plates: {shoeC} (main L11 / L11' stay cast steel, p.96)");
+
 // ================================================================ regenerate + save
 var rep = Doc.Regenerate();
 foreach (var name in new[] { "PTC Arch truss 18-20", "PTC Girder spans 1-10", "PTC Girder spans 28-31" })

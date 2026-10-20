@@ -244,5 +244,64 @@ foreach (var (nm, pgs, fbp, ftpp, seatp) in new[] { ("W Abutment", "p.11", 16.0,
 foreach (var nm in new[] { "Pier 17 W brg", "Pier 18", "Pier 19", "Pier 20 main brg", "E Abutment" })
     Print($"INFO  {nm}: {allUnits.First(x => x.u.Name == nm).u.Foundations.Sum(f => f.Piles.Count)} piles modeled (count is not printed on the plans: UNRESOLVED, flagged)");
 Print($"INFO  {allUnits.Count} substructure units; concrete modeled (footings, shafts, caps, abutment walls, seals; piles excluded) = {totalCy:0} cu yd. p.42 (DRB-4 = the superstructure contract) prints Class A concrete 13,200 cu yd = deck / parapets / walkways by span group and no substructure line, so there is no printed substructure quantity to compare (reported only); piers 18 / 19 bodies are modeled SOLID (hollow / cored interior not read, UNRESOLVED), which dominates the total");
+// ---------------------------------------------------------------- 7. quantities vs p.42 (connections/quantities.csv), by span group
+// Steel classes by the part material: "(S)" / silicon = items 4-6, forged pins = item 8, cast shoe bodies / sockets = item 9, ropes = item 7 (LF),
+// gratings = items 14 (SF) / 15 (lb), parapet railing = item 13 (LF), everything else = carbon steel items 1-3. Rivet heads, perforations, the parts listed as
+// not built in the UNRESOLVED flags are missing from the model; the rows REPORT the difference (5 % tolerance), nothing is adjusted.
+Print("== 7. Quantities vs p.42 by span group (items 1-15; 12 reinforcement not modeled by request)");
+{
+    var q = new List<Dictionary<string, string>>();
+    var ql = File.ReadAllLines(Path.Combine(dataDir, "connections", "quantities.csv"));
+    var qh = ql[0].Split(',');
+    foreach (var l in ql.Skip(1).Where(l => l.Trim() != "")) { var c = l.Split(','); q.Add(qh.Select((h, i) => (h, v: i < c.Length ? c[i] : "")).ToDictionary(x => x.h, x => x.v)); }
+    double Plan(int item, string col) => double.TryParse(q.First(r => r["item"] == item.ToString())[col], NumberStyles.Float, inv, out var v) ? v : 0;
+    var groups = new[] { ("PTC Girder spans 1-10", "pa_girder_spans", 1, 4), ("PTC 3-span truss 11-13", "pa_3span_unit", 2, 5), ("PTC 4-span truss 14-17", "pa_4span_unit", 2, 5),
+        ("PTC Arch truss 18-20", "main_river_spans", 3, 6), ("PTC 4-span truss 21-24", "nj_4span_unit", 2, 5), ("PTC 3-span truss 25-27", "nj_3span_unit", 2, 5), ("PTC Girder spans 28-31", "nj_girder_spans", 1, 4) };
+    const double Lb = 2.20462262;
+    double tC = 0, tS = 0, pC = 0, pS = 0;
+    foreach (var (bn, col, itC, itS) in groups)
+    {
+        var bm = Doc.Model(bn);
+        var parts = bm.Steel?.Parts ?? new List<SBM.Core.Steel.SteelPart>();
+        string Cls(SBM.Core.Steel.SteelPart p)
+        {
+            string m = (p.Material ?? "").ToLowerInvariant();
+            if (SBM.Core.Steel.SteelModel.IsRailing(p.Category)) return "rail";
+            if (p.Category == SBM.Core.Steel.PartCategory.Suspender) return "rope";
+            if (p.Category == SBM.Core.Steel.PartCategory.Grating) return "grating";
+            if (p.Category == SBM.Core.Steel.PartCategory.Weld) return "weld";
+            if (m.Contains("forged") || p.Category == SBM.Core.Steel.PartCategory.TrussPin) return "forging";
+            if (m.Contains("cast")) return "casting";
+            if (m.Contains("stainless")) return "stainless";
+            if (m.Contains("(s)") || m.Contains("silicon")) return "S";
+            return "C";
+        }
+        var by = parts.GroupBy(Cls).ToDictionary(g => g.Key, g => g.ToList());
+        double M(string k) => by.TryGetValue(k, out var l) ? l.Sum(p => p.Mass) * Lb : 0;
+        string grp = bn.Replace("PTC ", "");
+        double c = M("C"), s = M("S");
+        Row($"p.42 item {itC} carbon steel, {grp}", c, Plan(itC, col), 0.05 * Plan(itC, col), "lb", $"model {c / Plan(itC, col):P1} of plan; rivet heads, perforations, lacing / connection angles and the parts flagged 'not built' are missing");
+        Row($"p.42 item {itS} silicon steel, {grp}", s, Plan(itS, col), 0.05 * Plan(itS, col), "lb", $"model {s / Plan(itS, col):P1} of plan");
+        Row($"p.42 items {itC} + {itS} structural steel, {grp}", c + s, Plan(itC, col) + Plan(itS, col), 0.05 * (Plan(itC, col) + Plan(itS, col)), "lb", $"model {(c + s) / (Plan(itC, col) + Plan(itS, col)):P1} of plan");
+        tC += c; tS += s; pC += Plan(itC, col); pS += Plan(itS, col);
+        if (Plan(8, col) > 0 || M("forging") > 0) Row($"p.42 item 8 forgings (pins), {grp}", M("forging"), Plan(8, col), 0.05 * Math.Max(1, Plan(8, col)), "lb", "pins modeled as cylinders; shoe pins / suspender pins");
+        if (Plan(9, col) > 0 || M("casting") > 0) Row($"p.42 item 9 steel castings, {grp}", M("casting"), Plan(9, col), 0.05 * Math.Max(1, Plan(9, col)), "lb", "shoe bodies are trapezoidal ENVELOPES (UNRESOLVED) and sockets cylinders: weight is not representative");
+        if (Plan(7, col) > 0) Row($"p.42 item 7 bridge rope suspenders, {grp}", (by.TryGetValue("rope", out var rp) ? rp.Sum(p => p.Length) : 0) / ft, Plan(7, col), 0.05 * Plan(7, col), "LF", "rope length between the sockets");
+        var rails = bm.Steel?.Railings;
+        Row($"p.42 item 13 parapet railing, {grp}", (rails?.Runs.Sum(r => r.Length) ?? 0) / ft, Plan(13, col), 0.01 * Plan(13, col), "LF",
+            bn.Contains("Girder") ? "the girder-span pay length includes the railing on the abutment wing walls (p.108: 67'-9 west / 34'-9 east from the CL bearing to the wing end per side), which is not modeled (abutment parapets)" : "both runs, deck begin to end");
+        double gratLen = by.TryGetValue("grating", out var gl) ? gl.Sum(p => p.Length) : 0;
+        Row($"p.42 item 14 grating, {grp}", gratLen / ft * 2.0, Plan(14, col), 0.05 * Plan(14, col), "SF", bn.Contains("Girder") ? "no walkway sheet for the girder spans (UNRESOLVED p.44)" : "2'-0 walkways as built (p.101 / p.103); ladders, platforms not built");
+        Row($"p.42 item 15 walkways and platforms (steel), {grp}", M("grating"), Plan(15, col), 0.05 * Plan(15, col), "lb", "grating at 7 psf (UNRESOLVED weight); walk angles, hangers, hand rails, ladders, platforms not built");
+        double cy = ((bm.Concrete?.DeckVolume ?? 0) + (bm.Concrete?.HaunchVolume ?? 0) + (bm.Concrete?.BarrierVolume ?? 0)) / 0.764554857984;
+        Row($"p.42 item 11 Class A concrete (deck, thickening, curbs, parapets), {grp}", cy, Plan(11, col), 0.03 * Plan(11, col), "CY", "slab 6 3/4 + 1 in thickening + curb / parapet sections (deck-ptc.csx)");
+        Print($"INFO  p.42 item 12 reinforcement {grp}: plan {Plan(12, col):N0} lb - not modeled (user: no rebar)");
+        Print($"INFO  p.42 item 10 stainless {grp}: plan {Plan(10, col):N0} lb - not modeled (dowels, clamps, dam seals); dams in the model (carbon): {(parts.Where(p => p.Category == SBM.Core.Steel.PartCategory.JointArmor).Sum(p => p.Mass) * Lb):N0} lb");
+    }
+    Row("p.42 items 1-3 carbon steel, whole bridge", tC, pC, 0.05 * pC, "lb", $"model {tC / pC:P1}");
+    Row("p.42 items 4-6 silicon steel, whole bridge", tS, pS, 0.05 * pS, "lb", $"model {tS / pS:P1}");
+    Row("p.42 items 1-6 structural steel, whole bridge", tC + tS, pC + pS, 0.05 * (pC + pS), "lb", $"model {(tC + tS) / (pC + pS):P1} of 39.28 M lb");
+}
+
 Print($"\nPTC Delaware River location check: {pass} PASS / {diff} DIFF");
 foreach (var d in diffs) Print("  " + d);
