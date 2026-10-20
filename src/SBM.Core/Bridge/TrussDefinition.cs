@@ -551,4 +551,47 @@ public sealed class TrussShoeDefinition
     public double AnchorEmbedment { get; set; }
     public string Unresolved { get; set; } = "";
     public string Source { get; set; } = "";
+    /// <summary>OPTIONAL pieces of the shoe as drawn (plates, castings, pins, rockers, rollers; null / empty = the trapezoidal body envelope, omitted from the
+    /// .sbm). When given they REPLACE the body envelope; the masonry plate and the pin of the fields above are still built (set their size 0 to give them as pieces).</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public List<TrussShoePiece>? Pieces { get; set; }
+}
+
+/// <summary>Role of a shoe piece: part category (Body = the shoe body category by shoe type, Plate = bearing plate, Pin / Roller = pin, Rocker = expansion
+/// shoe body, Sole / Masonry = sole / masonry plate).</summary>
+public enum TrussShoePieceKind { Body, Plate, Sole, Masonry, Pin, Roller, Rocker }
+
+/// <summary>Extrusion direction of a shoe piece: Across = profile in (u along the bridge, z up) swept across the truss (n) from <see cref="TrussShoePiece.From"/>
+/// to <see cref="TrussShoePiece.To"/>; Along = profile in (n across, z up) swept along the bridge (u); Vertical = profile in plan (u, n) swept up (z).</summary>
+public enum TrussShoePieceAxis { Across, Along, Vertical }
+
+/// <summary>One piece of a truss shoe in the shoe frame: origin = the shoe reference point (pin centre = point - PinBelowPoint), u along the bridge
+/// (up-station +), n = the plane normal made horizontal (right +), z up. Profile = closed polygon (or a circle, optionally clipped to |profile x - centre x|
+/// &lt;= <see cref="ClipHalfWidth"/> for segmental rollers), swept along the <see cref="Axis"/> from <see cref="From"/> to <see cref="To"/>; copies at every
+/// combination of <see cref="ShiftsProfileX"/> (in the profile plane, its first coordinate) and <see cref="ShiftsSweep"/> (along the sweep), optionally
+/// mirrored about n = 0 (<see cref="MirrorN"/>) or u = 0 (<see cref="MirrorU"/>). All meters.</summary>
+public sealed class TrussShoePiece
+{
+    public string Name { get; set; } = "";
+    public TrussShoePieceKind Kind { get; set; }
+    public TrussShoePieceAxis Axis { get; set; }
+    public List<TrussUV> Profile { get; set; } = new();
+    /// <summary>Circle instead of a polygon: diameter (0 = polygon) and centre in the profile plane.</summary>
+    public double CircleDiameter { get; set; }
+    public double CircleX { get; set; }
+    public double CircleY { get; set; }
+    /// <summary>Segmental roller: the circle is cut by two lines |x - CircleX| = ClipHalfWidth (0 = full circle).</summary>
+    public double ClipHalfWidth { get; set; }
+    public double From { get; set; }
+    public double To { get; set; }
+    public List<double> ShiftsProfileX { get; set; } = new();
+    public List<double> ShiftsSweep { get; set; } = new();
+    public bool MirrorN { get; set; }
+    public bool MirrorU { get; set; }
+    /// <summary>Plan letter / material name (truss <c>Materials</c> map); empty = the truss default.</summary>
+    public string Material { get; set; } = "";
+    /// <summary>Size text for the part description, e.g. "PL 22 x 10 3/16 x 3'-2".</summary>
+    public string Description { get; set; } = "";
+    /// <summary>Plan item not dimensioned for this piece (dimension-only flag; empty = the shoe's flag, if any).</summary>
+    public string Unresolved { get; set; } = "";
 }

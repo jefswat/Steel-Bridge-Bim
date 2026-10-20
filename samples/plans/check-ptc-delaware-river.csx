@@ -284,8 +284,8 @@ Print("== 7. Quantities vs p.42 by span group (items 1-15; 12 reinforcement not 
         Row($"p.42 item {itS} silicon steel, {grp}", s, Plan(itS, col), 0.05 * Plan(itS, col), "lb", $"model {s / Plan(itS, col):P1} of plan");
         Row($"p.42 items {itC} + {itS} structural steel, {grp}", c + s, Plan(itC, col) + Plan(itS, col), 0.05 * (Plan(itC, col) + Plan(itS, col)), "lb", $"model {(c + s) / (Plan(itC, col) + Plan(itS, col)):P1} of plan");
         tC += c; tS += s; pC += Plan(itC, col); pS += Plan(itS, col);
-        if (Plan(8, col) > 0 || M("forging") > 0) Row($"p.42 item 8 forgings (pins), {grp}", M("forging"), Plan(8, col), 0.05 * Math.Max(1, Plan(8, col)), "lb", "pins modeled as cylinders; shoe pins / suspender pins");
-        if (Plan(9, col) > 0 || M("casting") > 0) Row($"p.42 item 9 steel castings, {grp}", M("casting"), Plan(9, col), 0.05 * Math.Max(1, Plan(9, col)), "lb", "shoe bodies are trapezoidal ENVELOPES (UNRESOLVED) and sockets cylinders: weight is not representative");
+        if (Plan(8, col) > 0 || M("forging") > 0) Row($"p.42 item 8 forgings (pins), {grp}", M("forging"), Plan(8, col), 0.05 * Math.Max(1, Plan(8, col)), "lb", "pins, shoe forgings and forged rollers (shoes-ptc.csx); approach pins listed as (C) carbon forgings on p.49 / p.52 / p.59 / p.63 but p.42 lists no forgings for the 3-span units");
+        if (Plan(9, col) > 0 || M("casting") > 0) Row($"p.42 item 9 steel castings, {grp}", M("casting"), Plan(9, col), 0.05 * Math.Max(1, Plan(9, col)), "lb", "shoes piece by piece (shoes-ptc.csx: cast bases / walls / ribs as drawn, fillets / bosses not built); suspender sockets are solid cylinders (open sockets, UNRESOLVED); girder-span castings not identified on p.44");
         if (Plan(7, col) > 0) Row($"p.42 item 7 bridge rope suspenders, {grp}", (by.TryGetValue("rope", out var rp) ? rp.Sum(p => p.Length) : 0) / ft, Plan(7, col), 0.05 * Plan(7, col), "LF", "rope length between the sockets");
         var rails = bm.Steel?.Railings;
         Row($"p.42 item 13 parapet railing, {grp}", (rails?.Runs.Sum(r => r.Length) ?? 0) / ft, Plan(13, col), 0.01 * Plan(13, col), "LF",

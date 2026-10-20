@@ -365,6 +365,57 @@ public class TrussTests : IDisposable
     }
 
     [Fact]
+    public void ShoePieces_ReplaceTheEnvelope_ExactVolumes()
+    {
+        var (p, b) = Model();
+        var t = b.Truss!;
+        var json0 = System.Text.Json.JsonSerializer.Serialize(t, new System.Text.Json.JsonSerializerOptions { NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.AllowNamedFloatingPointLiterals });
+        Assert.DoesNotContain("\"Pieces\"", json0);
+        var sh = t.Shoes[0];
+        sh.Pieces = new()
+        {
+            // 12 x 10 plate under the pin swept 2 ft across; two wing plates 1 in thick mirrored about n = 0 (profile in (u, z))
+            new TrussShoePiece { Name = "stem", Kind = TrussShoePieceKind.Body, Axis = TrussShoePieceAxis.Across, From = -Ft(1), To = Ft(1),
+                Profile = { new TrussUV(-In(6), -In(30)), new TrussUV(In(6), -In(30)), new TrussUV(In(6), -In(20)), new TrussUV(-In(6), -In(20)) } },
+            new TrussShoePiece { Name = "wing", Kind = TrussShoePieceKind.Plate, Axis = TrussShoePieceAxis.Across, From = Ft(1), To = Ft(1) + In(1), MirrorN = true,
+                Profile = { new TrussUV(-In(12), -In(32)), new TrussUV(In(12), -In(32)), new TrussUV(0, -In(20)) }, Unresolved = "UNRESOLVED (p.0): wing - test." },
+            // three segmental rollers (circle 12 in clipped to +-4 in) at 10 in pitch, 18 in long
+            new TrussShoePiece { Name = "roller", Kind = TrussShoePieceKind.Roller, CircleDiameter = In(12), CircleY = -In(38), ClipHalfWidth = In(4), From = -In(9), To = In(9),
+                ShiftsProfileX = { -In(10), 0, In(10) }, Material = "Forged steel" },
+            // rib in the (n, z) plane swept along u
+            new TrussShoePiece { Name = "rib", Kind = TrussShoePieceKind.Plate, Axis = TrussShoePieceAxis.Along, From = -In(1), To = In(1),
+                Profile = { new TrussUV(Ft(1), -In(32)), new TrussUV(Ft(1) + In(6), -In(32)), new TrussUV(Ft(1), -In(26)) } },
+        };
+        var bm = Regen(p);
+        var parts = bm.Steel!.Parts.Where(x => x.Assembly == "SHOE-N-L0").ToList();
+        Assert.DoesNotContain(parts, x => x.Mark.EndsWith("-BODY"));       // envelope replaced
+        Assert.Contains(parts, x => x.Mark.EndsWith("-MP"));                // masonry plate + pin still from the fields
+        Assert.Contains(parts, x => x.Mark.EndsWith("-PIN"));
+        var stem = parts.Single(x => x.Description.StartsWith("stem"));
+        Assert.Equal(PartCategory.TrussShoeExpansion, stem.Category);
+        Assert.Equal(In(12) * In(10) * Ft(2), stem.Volume, 9);
+        var wing = parts.Single(x => x.Description.StartsWith("wing"));
+        Assert.Equal(2 * In(24) * In(12) / 2 * In(1), wing.Volume, 9);
+        Assert.NotNull(wing.Assumption);
+        var roller = parts.Single(x => x.Description.StartsWith("roller"));
+        Assert.Equal(PartCategory.TrussPin, roller.Category);
+        double h = Math.Sqrt(36 - 16), seg = 2 * (36 * Math.Asin(4 / 6.0)) + 2 * 4 * h;       // circle r 6 clipped to |x| <= 4 (32-gon inscribed: within 1 %)
+        Assert.Equal(3 * seg * 18 * Math.Pow(In(1), 3), roller.Volume, 0.01 * roller.Volume);
+        var rib = parts.Single(x => x.Description.StartsWith("rib"));
+        Assert.Equal(In(6) * In(6) / 2 * In(2), rib.Volume, 9);
+        // the rib lies across the truss: 1 ft to 1'-6 from the pin across (horizontal distance normal to the alignment = y here)
+        var pin = parts.Single(x => x.Mark.EndsWith("-PIN")).Mesh.Bounds();
+        double yc = (pin.Min.Y + pin.Max.Y) / 2;
+        var rb = rib.Mesh.Bounds();
+        Assert.Equal(In(6), rb.Max.Y - rb.Min.Y, 6);
+        Assert.Equal(Ft(1) + In(3), Math.Abs((rb.Min.Y + rb.Max.Y) / 2 - yc), 6);
+        // round trip keeps the pieces
+        var p2 = BridgeProject.FromJson(p.ToJson());
+        Assert.Equal(4, p2.Bridges[0].Truss!.Shoes[0].Pieces!.Count);
+        Assert.Equal(Regen(p).Steel!.Parts.Count, Regen(p2).Steel!.Parts.Count);
+    }
+
+    [Fact]
     public void FileRoundTrip_AndExistingModelsUnchanged()
     {
         var (p, b) = Model();
