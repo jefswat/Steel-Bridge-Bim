@@ -286,6 +286,62 @@ if (stm != null)
     foreach (var (t, area) in stm.Totals.Where(t => t.Treatment.Kind == SurfaceTreatmentKind.ThinBrick))
         Row("8 quantities", "integral thin veneer brick (area)", 1626, area / (ft * ft), 1626 * 0.05, "SF", "regions per p.15-16; 5 % tolerance", info: true);
 
+// ================================================================ 10. QC answers (qc/nebraska-st): studs, cap studs, frame lines, deflectors, batter, column projection, bend pin
+{
+    // p.28: 475 stud rows per girder (3 per row; 1'-0 end, 24 / 90 / 84 / 73 / 40 | cap | 39 / 95 / 24 equal spaces)
+    for (int g = 0; g < 4; g++)
+    {
+        int n = st.Studs.Count(s => s.Assembly.StartsWith($"G{g + 1}-"));
+        Row("10 qc", $"girder {GL[g]} shear stud rows (p.28 zones, 3 per row)", 475, n / 3.0, 0.34, "ea", "p.28 equal spaces; rows inside the splice / cap exclusions would be reported");
+    }
+    // p.28 / p.32: rows on the 16" top flange (span 2) have 3 studs 6 1/2" apart (1 1/2 from the edges, 2 EQ. SPA.)
+    // p.29: cap stud rows from CL bearing col. 1 (horizontal): 7'-9 5/16, chain ... 9'-5 11/16 to col. 2
+    {
+        var cap = st.IntegralCaps[0];
+        var sl = fr.SupportLine(2);
+        double b1 = cap.Bearings[0].S, b2 = cap.Bearings[^1].S;
+        var ss = st.Studs.Where(q => q.Assembly == cap.Mark).Select(q => Vec2.Dot(q.Frame.Origin.XY - sl.AlignmentPoint, sl.Direction)).Distinct().OrderBy(x => x).ToList();
+        var rowsS = new List<double>();
+        foreach (var x in ss) if (rowsS.Count == 0 || x - rowsS[^1] > 0.01) rowsS.Add(x);
+        Row("10 qc", "cap stud rows: first row from CL bearing col. 1 (7'-9 5/16)", 7 + (9 + 5.0 / 16) / 12, (rowsS[0] - b1) / ft, 0.01, "ft", "p.29 elevation chain (horizontal)");
+        Row("10 qc", "cap stud rows: last row to CL bearing col. 2 (9'-5 11/16)", 9 + (5 + 11.0 / 16) / 12, (b2 - rowsS[^1]) / ft, 0.01, "ft", "p.29 elevation chain (horizontal)");
+    }
+    // p.27 cross frame lines along girder A (distance from the span's CL bearing): span 1 22'-5 7/16 + 6 @ 22'-6; span 2 23'-0 5/8 + 7 @ 22'-9; span 3 22'-8 15/16 + 6 @ 23'-1 11/16
+    {
+        var gA = fr.Girders[0];
+        double s0 = gA.DistanceAt(0, 0);
+        double[] bs = { 0, gA.DistanceAt(1, 0) - s0, gA.DistanceAt(2, 0) - s0 };
+        var plan = new List<double>();
+        for (int k = 0; k < 7; k++) plan.Add(22 + 5.4375 / 12 + 22.5 * k);
+        for (int k = 0; k < 8; k++) plan.Add(bs[1] / ft + 23 + 0.625 / 12 + 22.75 * k);
+        for (int k = 0; k < 7; k++) plan.Add(bs[2] / ft + 22 + 8.9375 / 12 + (23 + 1.6875 / 12) * k);
+        if (plan.Count > 0) plan = plan.Select((v, i) => i < 7 ? v + bs[0] / ft : v).ToList();
+        var mod = fr.CrossFrames.Where(c => !c.AtSupport && c.Bay == 0).OrderBy(c => c.Span).ThenBy(c => c.LeftGirderDistance).Select((c, i) => (bs[c.Span] + c.LeftGirderDistance) / ft).ToList();
+        Row("10 qc", "intermediate cross frame lines along girder A (count)", plan.Count, mod.Count, 0, "ea", "p.27: 7 + 8 + 7");
+        double worst = 0;
+        for (int i = 0; i < Math.Min(plan.Count, mod.Count); i++) worst = Math.Max(worst, Math.Abs(plan[i] - mod[i]));
+        Row("10 qc", "cross frame line positions along girder A, worst difference", 0, worst, 0.06, "ft", "p.27 spacing strings (gusset-centre tolerance 0.06 ft)");
+    }
+    // p.32: 6 flange deflectors
+    Row("10 qc", "flange deflectors (assemblies)", 6, st.Assemblies.Count(a => a.Kind == AssemblyKind.FlangeDeflector), 0, "ea", "p.32 (6 required): exterior girders at pier 1, pier 2, N abutment; UNRESOLVED flags on the parts");
+    // p.18 / p.20 / p.22: abutment piles, front row battered 1:4 (6 of 12 per abutment)
+    foreach (var un in new[] { "S. Abut.", "N. Abut." })
+        Row("10 qc", $"{un} battered piles (front row, 1:4)", 6, sub.Units.First(x => x.Name == un).Foundations.Sum(f => f.Piles.Count(p => p.IsBattered)), 0, "ea", "p.18 / p.20 section, p.22 notes");
+    // p.13 Section A-A: Pier 2 column overall length 7'-7 5/8 (4" projection on the south face) x 6'-7 5/8
+    {
+        var sd2 = b.Supports[2].Substructure!;
+        double rot = sd2.ColumnRotationDeg; sd2.ColumnRotationDeg = 0;
+        var o = SBM.Core.Substructure.SubstructureGenerator.ColumnSectionOutline(sd2);
+        sd2.ColumnRotationDeg = rot;
+        Row("10 qc", "Pier 2 column overall length (7'-7 5/8)", 7 * 12 + 7.625, (o.Max(q => q.Y) - o.Min(q => q.Y)) / inch, 1.0 / 16, "in", "p.13 Section A-A, 4 in south projection");
+        Row("10 qc", "Pier 2 column overall width (6'-7 5/8)", 6 * 12 + 7.625, (o.Max(q => q.X) - o.Min(q => q.X)) / inch, 1.0 / 16, "in", "p.13 Section A-A");
+    }
+    // p.25 / p.45: 5d2 bend pin D = 2 1/2"
+    if (cm != null)
+        foreach (var mk in cm.Marks.Where(m => m.Mark == "5d2"))
+            Row("10 qc", "5d2 bend pin diameter (D = 2 1/2)", 2.5, SBM.Core.Concrete.RebarBends.PinFor(mk) / inch, 1.0 / 64, "in", "p.25 Section A-A, p.45 bend diagram");
+}
+
 // ================================================================ report
 Print($"== Plan vs model: {BrName} (Iowa DOT Design 1617) - {rows.Count} rows: {rows.Count(r => r.status == "PASS")} PASS, {rows.Count(r => r.status == "FAIL")} FAIL, {rows.Count(r => r.status == "INFO")} INFO");
 foreach (var grp in rows.GroupBy(r => r.group))

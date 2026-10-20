@@ -78,7 +78,11 @@ public sealed class RegenerationCache
             SteelModel? st = null;
             Concrete.ConcreteModel? cm = null;
             Prestressed.PrestressedModel? ps = null;
-            if (includeSteel && !f.HasErrors && b.Arch != null)
+            if (b.SupportLinesOnly && b.Arch == null && b.Segmental == null && b.Truss == null)
+            {
+                // Support lines only: no steel, concrete or substructure (st / cm / ps stay null).
+            }
+            else if (includeSteel && !f.HasErrors && b.Arch != null)
             {
                 // Steel tied arch: its own generator; steel parts + seats in a SteelModel, the slab / curbs in a ConcreteModel.
                 var am = SBM.Core.Arch.ArchGenerator.Generate(f, project.Units);

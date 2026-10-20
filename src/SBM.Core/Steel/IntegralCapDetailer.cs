@@ -510,8 +510,11 @@ public sealed partial class SteelModelGenerator
             double sb = cap.Sb[k];
             var (s0, s1) = cap.CoverRange(cp, soleHalf);
             if (cp.Top) topCovers.Add((s0, s1));
-            double xa = cap.Xc(s0), xb = cap.Xc(s1);
-            var holes = cp.BoltColumns.SelectMany(c => cp.BoltRows.Select(r => new Hole(new Vec2(cap.Xc(sb + sgn * c), r), hole))).ToList();
+            // Detail B / View E-E dimension the top cover from the PLUMB CL bearing line: at the top flange level that line is M * z further along the tilted cap axis
+            // (the same horizontal convention as the p.29 stud rows); bottom covers (z = 0) stay as dimensioned.
+            double dx = cp.Top ? cap.M * cap.ZTop : 0;
+            double xa = cap.Xc(s0) + dx, xb = cap.Xc(s1) + dx;
+            var holes = cp.BoltColumns.SelectMany(c => cp.BoltRows.Select(r => new Hole(new Vec2(cap.Xc(sb + sgn * c) + dx, r), hole))).ToList();
             var m = new Mesh();
             PlateBuilder.AddLongPlate(m, xa, xb, Array.Empty<double>(), _ => -cp.Width / 2, _ => cp.Width / 2,
                 _ => cp.Top ? cap.ZTop : -cp.Thickness, _ => cp.Top ? cap.ZTop + cp.Thickness : 0, holes, (x, y, z) => fs.ToWorld(x, y, z));
@@ -630,7 +633,7 @@ public sealed partial class SteelModelGenerator
                 var rowsS = onCover && cd.CoverPlateStudRows.Count > 0 ? cd.CoverPlateStudRows : cd.StudRows;
                 double ztop = cap.ZTop + (onCover ? cd.CoverPlates.Where(c => c.Top).Select(c => c.Thickness).DefaultIfEmpty(0).Max() : 0);
                 foreach (double r in rowsS)
-                    _studs.Add(new StudInstance { Frame = new Frame3(fs.ToWorld(cap.Xc(s), r, ztop), cap.X, cap.Y, cap.Z), Length = cd.StudLength, Assembly = asm });
+                    _studs.Add(new StudInstance { Frame = new Frame3(fs.ToWorld(cap.Xc(s) + cap.M * ztop, r, ztop), cap.X, cap.Y, cap.Z), Length = cd.StudLength, Assembly = asm });   // plan dimension: the row stands at the HORIZONTAL distance l from the CL bearing (the cap frame is tilted by the cap slope, p.29)
             }
 
         // ---------------------------------------------------------------- the cap members (flanges with holes, webs with openings and holes)

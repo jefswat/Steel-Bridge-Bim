@@ -238,12 +238,49 @@ br.Stiffeners.IntermediateMaxSpacing = Ft(12);    // panels 20'-5 .. 23'-6 betwe
 br.Stiffeners.CornerClip = I(1.5);
 br.Stiffeners.ClipToTopFlange = true;   // p.32 Sect. A-A: bearing / jacking stiffeners sized for the bottom flange overhang the narrower top flange at the abutments (1.78" S, ~0.8" N); outer top corner clipped 45 deg to the flange edge, top weld stops there
 br.Stiffeners.FlangeToWebWeld = I(5.0 / 16);
+U("p.27 / p.34", "intermediate stiffeners that land inside a field splice", "p.27 puts them at equal spaces between the cross frames; with the plan frame lines the mid-panel stiffener lies 0.8 ft from FS 4 on every girder and on FS 2 of girders C / D, inside the splice plates (clashes 0.2 - 0.25 in); the plans give no other position",
+    "Kept at mid panel (clashes reported, nothing moved).");
 U("p.27", "first intermediate stiffener at the abutments '9'-6 (TYP.)' from the CL bearing", "the plan note says equal spaces between cross frames, but the abutment panels show 9'-6 to the first stiffener without the rest of the chain",
     "Modeled at equal spaces (mid panel) like every other panel.");
 // Shear studs 7/8 x 5, 3 per row (1 1/2, 2 eq spa, 1 1/2) (p.28, p.32): spacing groups not reproduced (generic pitch).
 br.Studs.Diameter = I(0.875); br.Studs.RowsAcross = 3; br.Studs.TransverseSpacing = I(7.5); br.Studs.Pitch = I(12);
-U("p.28", "girder stud spacing groups (24 / 90 / 84 / 73 / 40 / 39 / 95 eq. spa.) and the flange-width dependent transverse spacing", "not reproduced by the generic stud layout",
-    "Studs modeled at 12\" pitch, 3 per row 7 1/2\" apart (count / weight of studs not checked).");
+br.Studs.EdgeDistance = I(1.5);   // p.32 shear stud detail: 1 1/2 from the flange edge, 2 EQ. SPA. across (6 1/2 on the 16\" flange, 7 1/2 on 18\", 8 1/2 on 20\", ...)
+// p.28 girder elevation (all girders): 1'-0 from the girder end, 24 EQ. SPA. = 19'-0, 90 EQ. SPA. to 1'-9 before FS 1; 84 between 1'-9 after FS 1 and 1'-9 before FS 2; 73 FS 2 - FS 3 (1'-9 each side);
+// 40 from 1'-9 after FS 3 to 8'-6 before CL pier 2 (the cap, p.29 lays out the rest), 39 from 8'-6 after CL pier 2 to 1'-9 before FS 4; 95 from 1'-9 after FS 4 to 19'-0 + 1'-0 from the N end, 24 EQ. SPA. = 19'-0, 1'-0 to the end.
+// A row where two zones meet is one row (475 rows per girder A). Rows inside a splice / cap exclusion are reported.
+{
+    var SL = StudLocationKind.Splice;
+    StudZone Z(StudLocation a, StudLocation b, int n, string src) => new() { From = a, To = b, Spaces = n, Source = src };
+    StudLocation Gs(double ft) => new(StudLocationKind.GirderStart, 0, Ft(ft));
+    StudLocation Ge(double ft) => new(StudLocationKind.GirderEnd, 0, Ft(ft));
+    StudLocation Fs(int n, double ft) => new(SL, n, Ft(ft));
+    StudLocation Pc(int sup, double ft) => new(StudLocationKind.Support, sup, Ft(ft));
+    br.Studs.Zones = new()
+    {
+        Z(Gs(1), Gs(20), 24, "p.28 24 EQ. SPA. = 19'-0"),
+        Z(Gs(20), Fs(1, -1.75), 90, "p.28 90 EQ. SPA."),
+        Z(Fs(1, 1.75), Fs(2, -1.75), 84, "p.28 84 EQ. SPA."),
+        Z(Fs(2, 1.75), Fs(3, -1.75), 73, "p.28 73 EQ. SPA."),
+        Z(Fs(3, 1.75), Pc(2, -8.5), 40, "p.28 40 EQ. SPA., 8'-6 to CL pier 2"),
+        Z(Pc(2, 8.5), Fs(4, -1.75), 39, "p.28 39 EQ. SPA., 8'-6 from CL pier 2"),
+        Z(Fs(4, 1.75), Ge(-20), 95, "p.28 95 EQ. SPA."),
+        Z(Ge(-20), Ge(-1), 24, "p.28 24 EQ. SPA. = 19'-0"),
+    };
+}
+
+// ---- flange deflectors (p.32 "Flange deflector details (6 required)", p.27 callouts): L4x3x5/16 + PL 3 x 5/16 x 0'-7, 2 bolts 3/4 in 13/16 holes, 30 deg line, 5'-0 from the CL bearing,
+// "on the outside of the exterior girders at the abutment and piers as shown on the framing plan" = 6 = two exterior girders at three supports.
+br.FlangeDeflectors = new FlangeDeflectorDefinition
+{
+    Source = "p.32 flange deflector details / p.27", Supports = new() { 1, 2, 3 },
+    Unresolved =
+    {
+        SBM.Core.UnresolvedFlag.Text("p.27, p.32", "which supports carry the 6 flange deflectors", "p.32 says 'at the abutment and piers as shown on the framing plan' and p.27 only draws callouts at pier 1 and the N abutment",
+            "Read as the supports where the grade runs DOWN toward the bearing along the girder (grade decreases with the stationing): pier 1, pier 2 and the N abutment, both exterior girders = 6; none at the S abutment."),
+        SBM.Core.UnresolvedFlag.Text("p.32", "flange that carries the deflectors and the 5'-0 reference", "the detail shows a girder flange plan without saying top or bottom; the dimension runs to the CL bearing line with 'GRADE DECREASES' toward it",
+            "Bottom flange (the top flange is under the deck), the web-end corner 5'-0 before the CL bearing (up-grade side)."),
+    },
+};
 
 // ---- bearings (p.40-42 bearing data, bearings.csv): vendor-designed disc bearings -> GENERIC (height incl. the 1/8 preformed pad).
 var bd = br.Bearings;
@@ -327,8 +364,7 @@ foreach (var (k, tail, n2) in new[] { (0, 53.0, 16), (1, 74.0, 23) })
     {
         Top = true, Bearing = k, From = -F(1, 6), To = F(5, 6) + I(tail), Width = I(40.375), Thickness = I(0.75),
         BoltColumns = cols.Select(I).ToList(), BoltRows = coverRows,
-        Unresolved = SBM.Core.UnresolvedFlag.Text("p.31", $"top cover plate start at {(k == 0 ? "column 1" : "column 2")} (U8)", "the Detail B dimension 4'-5 / 6'-2 runs into the cap end and its origin is not legible",
-            "Plate from the cap end to 5'-6 + 4'-5 / 6'-2 past the CL bearing (View E-E bolt chain reproduces 11'-5 / 13'-2 within 6\")."),
+        // p.31 Detail B (read at 110 dpi 2026-10-19): 1'-6 cap end to CL bearing... CL bearing to the future jacking location 5'-6, then 4'-5 (col. 1) / 6'-2 (col. 2) to the plate end: View E-E chain 11'-5 / 13'-2 from the cap end
     });
 }
 // bottom cover plates (p.31 Detail C + View F-F): start 1 1/2" from the edge of the bearing sole plate (note *), end 2'-10 1/2 past the CL exterior girder
@@ -449,7 +485,7 @@ cap.Unresolved.AddRange(new[]
         Width = 0,   // = top flanges out to out (2 x 10 3/16 + 20 = 40 3/8, Section A-A: haunch sides flush with the flange edges)
         Stirrups =
         {
-            new CapHaunchStirrups { Mark = "5d2", Size = "#5", Location = "INTEGRAL STEEL PIER CAP HAUNCH", BottomWidth = I(36), LegHeight = I(8), HookLength = I(6),
+            new CapHaunchStirrups { Mark = "5d2", Size = "#5", Location = "INTEGRAL STEEL PIER CAP HAUNCH", BottomWidth = I(36), LegHeight = I(8), HookLength = I(6), Pin = I(2.5),
                 ClearAboveSteel = I(clr), ListedLength = L("5'-4"), PlanCount = 38, PlanWeightLb = 211, Source = "p.25 Section A-A, p.45 (5d2 bend diagram)" },
         },
         Bars =
@@ -527,6 +563,25 @@ br.Supports[2].IntegralSteelCap = cap;
 var units = new List<string>();
 Doc.Regenerate(includeSteel: false);
 var fr = Doc.Framing(br.Name);
+// ---- intermediate cross frame lines (p.27 framing plan, measured along girder A, normal to the girders; "7 SPA. @ ..." strings anchored at the CL bearing of each span):
+// span 1: 22'-5 7/16 then 6 spa @ 22'-6 (last line 20'-5 3/8 before pier 1); span 2: 23'-0 5/8 then 7 spa @ 22'-9 (22'-9 to pier 2; along D 20'-6 5/8, 7 @ 22'-9);
+// span 3: 22'-8 15/16 then 6 spa @ 23'-1 11/16 (the 7th space ends at the N abutment frame; along D 23'-0 5/8, 7 @ 23'-6).
+{
+    var gA = fr.Girders[0];
+    int nsp = gA.Spans.Count;
+    double s0A = gA.DistanceAt(0, 0);
+    double[] bA = Enumerable.Range(0, nsp).Select(k => gA.DistanceAt(k, 0) - s0A).ToArray();
+    var lines = new List<CrossFrameLine>();
+    void Ln(int span, double first, double step, int n)
+    {
+        for (int k = 0; k < n; k++) lines.Add(new CrossFrameLine { Girder = 0, Distance = bA[span] + first + step * k, NormalToGirder = true });
+    }
+    Ln(0, F(22, 5.4375), F(22, 6), 7);
+    Ln(1, F(23, 0.625), F(22, 9), 8);
+    Ln(2, F(22, 8.9375), F(23, 1.6875), 7);
+    br.CrossFrames.Lines = lines;
+    Print($"Cross frame lines (p.27): {lines.Count} along girder A; span starts {string.Join(", ", bA.Select(v => (v / 0.3048).ToString("F3")))} ft");
+}
 // chord line between the abutments (staking p.8): CL at the CL abutment bearings
 var cS = al.PointAt(br.Supports[0].Station, 0); var cN = al.PointAt(br.Supports[3].Station, 0);
 var chordDir = (cN - cS).Normalized();
@@ -555,7 +610,9 @@ double ChordS(int k)
     double s0 = sc - L("18'-1 3/8"), s1 = sc + L("11'-2 1/4");
     var sd = SubstructureDefinition.Default(SupportType.Pier);
     sd.CapWidth = L("4'-11 5/8"); sd.CapDepth = F(5);
-    sd.CapProfile = new() { new(s0, Ft(1110.03)), new(s1, Ft(1110.03)), new(s1, Ft(1115.03)), new(s0, Ft(1115.03)) };
+    // p.9 pier cap plan: the 29'-3 5/8 overall length includes a 4" end projection 3'-7 5/8 wide (8" notches at the four corners); the full-width cap body is 4" in from each end.
+    double capEnd = I(4), capProjW = L("3'-7 5/8");
+    sd.CapProfile = new() { new(s0 + capEnd, Ft(1110.03)), new(s1 - capEnd, Ft(1110.03)), new(s1 - capEnd, Ft(1115.03)), new(s0 + capEnd, Ft(1115.03)) };
     sd.PedestalSizeAlong = F(5); sd.PedestalSizeAcross = L("4'-5 5/8");
     sd.ColumnCount = 2; sd.FirstColumnOffset = s0 + L("2'-11 13/16"); sd.ColumnSpacings = new() { F(23, 4) };
     sd.ColumnShape = ColumnShape.Rectangular; sd.ColumnWidth = L("5'-3 5/8"); sd.ColumnDepth = L("4'-11 5/8");
@@ -580,6 +637,10 @@ double ChordS(int k)
     double mwFull = L("4'-11 5/8"), mwProj = L("3'-7 5/8"), mwOut = I(4), mwIn = I(12), mwSlope = I(0.5) / I(12);
     sd.CapBlocks = new()
     {
+        new CapBlockDefinition { Name = "end projection (column 1 end)", Kind = CapBlockKind.Cap, Base = CapBlockBase.CapBottom, TopElevation = Ft(1115.03), TopRefS = s0,
+            Outline = { new(s0, -capProjW / 2), new(s0 + capEnd, -capProjW / 2), new(s0 + capEnd, capProjW / 2), new(s0, capProjW / 2) }, Source = "p.9 pier cap plan (4\" x 3'-7 5/8 end projection, 8\" notches)" },
+        new CapBlockDefinition { Name = "end projection (column 2 end)", Kind = CapBlockKind.Cap, Base = CapBlockBase.CapBottom, TopElevation = Ft(1115.03), TopRefS = s1,
+            Outline = { new(s1 - capEnd, -capProjW / 2), new(s1, -capProjW / 2), new(s1, capProjW / 2), new(s1 - capEnd, capProjW / 2) }, Source = "p.9 pier cap plan (4\" x 3'-7 5/8 end projection, 8\" notches)" },
         new CapBlockDefinition { Name = "maskwall (column 1 end)", Kind = CapBlockKind.Maskwall, Base = CapBlockBase.CapTop, TopElevation = Ft(1115.03) + F(7, 7), TopRefS = s0, TopSlopeS = -mwSlope,
             Outline = { new(s0, -mwProj / 2), new(s0 + mwOut, -mwProj / 2), new(s0 + mwOut, -mwFull / 2), new(s0 + mwIn, -mwFull / 2), new(s0 + mwIn, mwFull / 2), new(s0 + mwOut, mwFull / 2), new(s0 + mwOut, mwProj / 2), new(s0, mwProj / 2) },
             Source = "p.9 pier elevation / plan, p.14 maskwall quantity" },
@@ -589,7 +650,6 @@ double ChordS(int k)
     };
     sd.Unresolved = new()
     {
-        SBM.Core.UnresolvedFlag.Text("p.9", "8\" corner notches of the 4\" cap end projections", "minor shapes", "The cap runs full width to its ends (the maskwalls carry the plan notch)."),
         SBM.Core.UnresolvedFlag.Text("p.9-11", "terra cotta blockouts (south faces) and the thin brick recesses of the columns / cap", "decorative recesses (terra cotta = LS item 17)", "Not cut into the concrete; thin brick as a surface treatment."),
         SBM.Core.UnresolvedFlag.Text("p.11", "uplift anchors 8f6 at the circled piles (Detail I)", "the circled pile positions are not read", "Not modeled."),
     };
@@ -610,6 +670,7 @@ double ChordS(int k)
     sd.ColumnCount = 2; sd.FirstColumnOffset = cap.BearingOffsets[0]; sd.ColumnSpacings = new() { F(47) };
     sd.ColumnShape = ColumnShape.Rectangular; sd.ColumnWidth = L("5'-11 5/8"); sd.ColumnDepth = L("7'-3 5/8");
     sd.ColumnProjectionS = I(4); sd.ColumnProjectionWidth = L("5'-11 5/8");
+    sd.ColumnProjectionBack = I(4); sd.ColumnProjectionBackWidth = L("3'-11 5/8");   // p.13 Section A-A: 4" projection on the south (back-station) face, 3'-11 5/8 wide; 7'-7 5/8 overall
     sd.ColumnRotationDeg = 15;
     sd.Foundation = FoundationType.PileCap; sd.FoundationTopElevation = Ft(1085.64 + 4); sd.FootingThickness = F(4);
     sd.FootingLength = F(13, 6); sd.FootingWidth = F(13, 6);
@@ -663,6 +724,9 @@ foreach (var (k, nm, bot, seats, pileLen) in new[]
         FootingDepth = F(4), WashHeight = I(1), BackwallBaseAboveFootingBottom = F(3, 10),
         LedgeBelowTop = F(1, 1), CorbelProjection = I(8), CorbelVertical = F(1, 3), CorbelTaperRise = F(1, 3), StepLength = F(4),
         PileBackRowToBearing = F(1, 8), PileFrontRowToBearing = F(1, 7), PileTopAboveFootingBottom = F(2), PileLength = Ft(pileLen),
+        // p.18 / p.20 "Section through abutment" (and p.22 notes "batter piles in the direction shown"): the rear (fill side) pile is plumb, the FRONT (span side) pile
+        // is battered 1:4 outward toward the span; dimensions (1'-6 from each face) are at the bottom of the footing.
+        PileBatterRatio = 4, PileBatterRows = new() { 1 },
     };
     ad.FootingBottom.Add(new CapProfilePoint(0, Ft(bot)));
     // backwall top parallel to the roadway crown line (p.18): the finished grade at the backwall front face along the support line
@@ -685,8 +749,9 @@ foreach (var (k, nm, bot, seats, pileLen) in new[]
     sd.Reinforcement.Enabled = false;
     sd.Unresolved = new()
     {
-        SBM.Core.UnresolvedFlag.Text($"p.{(k == 0 ? 18 : 20)}, p.22", $"{nm} wing extensions, maskwall, backwall extension and their footing / pile{(k == 0 ? "" : "s")}", "the wing extension sections were not read in this pass", $"Not modeled ({(k == 0 ? 1 : 2)} pile{(k == 0 ? "" : "s")} of the {(k == 0 ? 13 : 14)} missing)."),
-        SBM.Core.UnresolvedFlag.Text("p.18 / p.22", $"{nm} front pile row batter 1:4", "the stub abutment generator places plumb piles", "Front row plumb at its footing-bottom position."),
+        SBM.Core.UnresolvedFlag.Text($"p.{(k == 0 ? "18-19" : "20-21")}, p.22", $"{nm} wing extension{(k == 0 ? "" : "s")}, maskwall{(k == 0 ? "" : "s")}, backwall extension and the L-shaped wing footing (10'-7 1/2 overall) with its pile{(k == 0 ? "" : "s")}",
+            "the stub abutment generator has no wing-extension footing: the plan footing outline steps out 4'-4 1/2 x 3'-6 beyond the main footing at the end(s) with a skewed end face (5 deg 54'10\" S / 5 deg 53'33\" N) and bevelled bottom (p.19 / p.21 Views A-A, B-B, F-F, C-C, E-E), wall tops from the wingwall elevation table; the wing pile (1'-6 from the end, p.22) needs that footing",
+            $"Not modeled ({(k == 0 ? 1 : 2)} pile{(k == 0 ? "" : "s")} of the {(k == 0 ? 13 : 14)} missing; 12 main piles placed, front row battered 1:4)."),
         SBM.Core.UnresolvedFlag.Text($"p.{(k == 0 ? 18 : 20)}", $"{nm} step blocks", "steps run from the backwall face to 2'-1 ahead of CL brg (p.18 section)", "Generator steps (BearingToStepFront 2'-1)."),
     };
     sup.Substructure = sd;
@@ -782,6 +847,15 @@ foreach (var (k, nm, bot, seats, pileLen) in new[]
             Name = $"Pier 1 cap {(fn > 0 ? "ahead" : "back")} face", Host = SurfaceHost.Substructure, Support = "Pier 1", Elements = { "Cap" }, NameContains = "cap", FacingN = fn,
             Lower = SurfaceLevel.Level(soff + I(8 + 7.0 / 16)), Upper = SurfaceLevel.Level(Ft(1115.03) - I(8 + 7.0 / 16)), Source = "p.15 Detail A (8 7/16 + 3'-7 1/8 + 8 7/16)",
         });
+    // Pier 1 cap ends (p.15 notes: "thin veneer brick and feature bands without brick veneer shall wrap around all sides of columns and cap beam"): the end faces
+    // (4" projection and the 8" steps) get the same Detail A band as the long faces. The soffit between the columns is a horizontal face (not a surface-region host): UNRESOLVED below.
+    foreach (double fsn in new[] { 1.0, -1.0 })
+        brick.Regions.Add(new SurfaceRegion
+        {
+            Name = $"Pier 1 cap {(fsn > 0 ? "column 2" : "column 1")} end faces", Host = SurfaceHost.Substructure, Support = "Pier 1", Elements = { "Cap" }, FacingS = fsn,
+            Lower = SurfaceLevel.Level(soff + I(8 + 7.0 / 16)), Upper = SurfaceLevel.Level(Ft(1115.03) - I(8 + 7.0 / 16)), Source = "p.15 notes (wrap), Detail A (8 7/16 + 3'-7 1/8 + 8 7/16)",
+        });
+    brick.Unresolved.Add("(p.15) Pier 1 cap soffit between the columns (about 86 SF, 4'-11 5/8 x 17'-4 3/8): the p.15 note wraps the brick around all sides of the cap beam, but the surface-region model has no horizontal (soffit) host; the p.3 quantity 822.9 SF is short in the model by about that area.");
     // Pier 2 columns (p.16 elevation, Detail A): from ELEV. 1095.60 to 9" + ... below the column top: brick ends at the 2'-0 / 1'-5 band chain under the
     // pedestal (9" plain at the top), Detail B bands at the bottom like pier 1.
     double b2 = Ft(1095.60);

@@ -42,6 +42,8 @@ public enum AssemblyKind { GirderFieldSection, CrossFrame, Bearing, FieldSplice,
     PierCap, PierCapConnection,
     /// <summary>Expansion joint hardware (appended).</summary>
     ExpansionJoint,
+    /// <summary>Flange deflectors on the exterior girders (appended; OPTIONAL BridgeDefinition.FlangeDeflectors).</summary>
+    FlangeDeflector,
     /// <summary>Steel truss (appended): one truss line (plane: chords, web members, gussets), a bracing system, the floor system, one suspender.</summary>
     TrussLine, TrussBracing, TrussFloor, TrussSuspender }
 

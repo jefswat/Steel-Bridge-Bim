@@ -256,7 +256,7 @@ public class TrussTests : IDisposable
         // enum values appended (existing numbers unchanged)
         Assert.Equal(25, (int)PartCategory.WalkwayPlate);
         Assert.Equal((int)PartCategory.RailFabric + 1, (int)PartCategory.TrussChord);
-        Assert.Equal((int)AssemblyKind.ExpansionJoint + 1, (int)AssemblyKind.TrussLine);
+        Assert.Equal((int)AssemblyKind.FlangeDeflector + 1, (int)AssemblyKind.TrussLine);
         Assert.Equal(1, (int)BoltKind.Anchor);
     }
 }

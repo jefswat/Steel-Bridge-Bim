@@ -381,6 +381,11 @@ public sealed class AbutmentDefinition
     public double PileBackRowToBearing { get; set; } = Ft(1) + In(11.5);
     public double PileFrontRowToBearing { get; set; } = Ft(1) + In(9);
     public double PileTopAboveFootingBottom { get; set; } = Ft(2);
+    /// <summary>OPTIONAL batter of the piles in <see cref="PileBatterRows"/> (1 horizontal : this many vertical; 0 = plumb). The plan row position is the pile at the FOOTING BOTTOM
+    /// ("dimensions at bottom of footing"); the tip moves OUTWARD (away from the CL bearing along the row's side). Nebraska St. Ramp B p.18 / p.20 section: 1:4.</summary>
+    public double PileBatterRatio { get; set; }
+    /// <summary>Indices into <see cref="PileRows"/> of the battered rows (stub abutments).</summary>
+    public List<int> PileBatterRows { get; set; } = new();
     /// <summary>Contract pile length (from the pile top).</summary>
     public double PileLength { get; set; } = Ft(125);
     // ---- wings

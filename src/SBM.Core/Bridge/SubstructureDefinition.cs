@@ -432,6 +432,10 @@ public sealed class SubstructureDefinition
     /// centred (Woodbury p.11 section B-B: 4" x 2'-11 5/8 on a 5'-3 5/8 x 4'-3 5/8 column, 5'-11 5/8 overall). 0 = none. Not with chamfers.</summary>
     public double ColumnProjectionS { get; set; }
     public double ColumnProjectionWidth { get; set; }
+    /// <summary>Rectangular columns, OPTIONAL: projection on ONE face across the cap, the BACK-station (-N, plan "south") face: depth beyond the face and its width along S,
+    /// centred (Nebraska St. Ramp B p.13 Section A-A: 4" x 3'-11 5/8 on the 5'-11 5/8 x 7'-3 5/8 column, 7'-7 5/8 overall). 0 = none. Not with chamfers.</summary>
+    public double ColumnProjectionBack { get; set; }
+    public double ColumnProjectionBackWidth { get; set; }
     /// <summary>Optional flared base: below this elevation the column has the flare section (NaN = no flare).</summary>
     public double ColumnFlareElevation { get; set; } = double.NaN;
     public double ColumnFlareWidth { get; set; }
