@@ -1066,6 +1066,9 @@ public sealed class StudDefinition
     public double Diameter { get; set; } = In(0.875);
     public int RowsAcross { get; set; } = 3;
     public double TransverseSpacing { get; set; } = In(4.5);
+    /// <summary>OPTIONAL edge distance of the outer studs from the flange edge (plan "1 1/2, 2 EQ. SPA., 1 1/2", Nebraska St. p.32): when > 0 the rows span the
+    /// flange width minus twice this at equal spaces (the <see cref="TransverseSpacing"/> is then width dependent). 0 = the fixed transverse spacing.</summary>
+    public double EdgeDistance { get; set; }
     /// <summary>Uniform pitch along the girder (0 = no studs).</summary>
     public double Pitch { get; set; } = In(12);
     /// <summary>Required penetration above the bottom of the deck (AASHTO 6.10.10.1.4: 2").</summary>
@@ -1078,7 +1081,38 @@ public sealed class StudDefinition
     public double LengthIncrement { get; set; } = In(0.5);
     /// <summary>Clearance from splice plates, bolt heads and girder ends.</summary>
     public double Clearance { get; set; } = In(1.5);
-    public StudDefinition Clone() => (StudDefinition)MemberwiseClone();
+    /// <summary>OPTIONAL plan stud zones (girder elevation "n EQ. SPA."): equal spaces between two locations along the girder. Empty = the uniform
+    /// <see cref="Pitch"/>. A row where two zones meet is placed once; rows inside the splice / cap exclusions are still omitted (reported).</summary>
+    public List<StudZone> Zones { get; set; } = new();
+    public StudDefinition Clone() { var c = (StudDefinition)MemberwiseClone(); c.Zones = Zones.Select(z => z.Clone()).ToList(); return c; }
+}
+
+public enum StudLocationKind { GirderStart, GirderEnd, Splice, Support }
+
+/// <summary>A location along a girder: its start end, its end, the CL of a field splice (plan number) or the CL of a support (index), plus an offset (+ toward the girder end).</summary>
+public sealed class StudLocation
+{
+    public StudLocationKind Kind { get; set; }
+    /// <summary>Plan splice number (Splice) or support index (Support, 0-based).</summary>
+    public int Number { get; set; }
+    public double Offset { get; set; }
+    public StudLocation Clone() => (StudLocation)MemberwiseClone();
+    public StudLocation() { }
+    public StudLocation(StudLocationKind kind, int number, double offset) { Kind = kind; Number = number; Offset = offset; }
+    public override string ToString() => Kind switch { StudLocationKind.GirderStart => $"girder start {Offset:0.###}", StudLocationKind.GirderEnd => $"girder end {Offset:0.###}", StudLocationKind.Splice => $"FS{Number} {Offset:0.###}", _ => $"support {Number + 1} {Offset:0.###}" };
+}
+
+/// <summary>Stud rows at equal spaces from <see cref="From"/> to <see cref="To"/> (rows at both ends).</summary>
+public sealed class StudZone
+{
+    /// <summary>0-based girders (empty = all).</summary>
+    public List<int> Girders { get; set; } = new();
+    public StudLocation From { get; set; } = new();
+    public StudLocation To { get; set; } = new();
+    public int Spaces { get; set; }
+    /// <summary>Plan note (page / text), for reports.</summary>
+    public string Source { get; set; } = "";
+    public StudZone Clone() => new() { Girders = Girders.ToList(), From = From.Clone(), To = To.Clone(), Spaces = Spaces, Source = Source };
 }
 
 public enum LateralFlange { Bottom, Top }
@@ -1255,6 +1289,11 @@ public sealed class BridgeDefinition
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
     public WeldTerminationDefinition? Welds { get; set; }
 
+    /// <summary>OPTIONAL flange deflectors (angle + drip plate on the outside of the exterior girders' bottom flanges ahead of / before a support;
+    /// Nebraska St. Ramp B p.32 "Flange deflector details", 6 required); null = none. Omitted from the .sbm when null.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public FlangeDeflectorDefinition? FlangeDeflectors { get; set; }
+
     /// <summary>A typical two-span continuous layout starting at the given station.</summary>
     public static BridgeDefinition CreateDefault(double beginStation, string alignmentName)
     {
@@ -1353,5 +1392,46 @@ public sealed class BridgeDefinition
         Railings = Railings?.Select(r => r.Clone()).ToList(),
         Fabrication = Fabrication?.Select(r => r.Clone()).ToList(),
         Welds = Welds?.Clone(),
+        FlangeDeflectors = FlangeDeflectors?.Clone(),
     };
+}
+
+/// <summary>
+/// Flange deflectors (Iowa DOT Design 1617 p.32): on the outside of the EXTERIOR girders at the listed supports, a bolted angle on the flange (3 in. leg flat on
+/// the flange, 4 in. leg up) running from the web face outward across the flange at <see cref="SkewDegrees"/> from the girder's transverse line, with a vertical
+/// drip plate continuing it beyond the flange edge. Where the plans do not fix a dimension the part is built with an UNRESOLVED dimension flag.
+/// </summary>
+public sealed class FlangeDeflectorDefinition
+{
+    public string Angle { get; set; } = "L4x3x5/16";
+    /// <summary>Vertical (4") and horizontal (3") legs of the angle.</summary>
+    public double VerticalLeg { get; set; } = In(4);
+    public double HorizontalLeg { get; set; } = In(3);
+    public double AngleThickness { get; set; } = In(5.0 / 16);
+    /// <summary>PL 3 x 5/16 x 0'-7: width along the angle line beyond the flange edge, thickness, height (4 in. above the flange top, rest below).</summary>
+    public double PlateWidth { get; set; } = In(3);
+    public double PlateThickness { get; set; } = In(5.0 / 16);
+    public double PlateHeight { get; set; } = In(7);
+    /// <summary>Plan angle of the deflector line from the transverse (perpendicular-to-girder) line.</summary>
+    public double SkewDegrees { get; set; } = 30;
+    /// <summary>Distance of the web-end corner from the CL bearing, measured BACK along the girder (against the stationing = up-grade side; plan detail "5'-0", grade decreases toward the bearing).</summary>
+    public double BackFromBearing { get; set; } = Ft(5);
+    public double BoltDiameter { get; set; } = In(0.75);
+    public double HoleDiameter { get; set; } = In(13.0 / 16);
+    /// <summary>Bolt positions along the angle from its web end (plan: 2 EQ SPA, 2 1/2).</summary>
+    public List<double> BoltAlong { get; set; } = new() { In(2.5), In(5) };
+    /// <summary>Bolt line from the vertical leg (gage of the 3" leg).</summary>
+    public double BoltGage { get; set; } = In(1.75);
+    /// <summary>Support indices (0-based) that get a deflector on both exterior girders.</summary>
+    public List<int> Supports { get; set; } = new();
+    public string Material { get; set; } = "ASTM A709 Gr. 50W";
+    public string Source { get; set; } = "";
+    /// <summary>Items the plans do not settle (raised once as UNRESOLVED warnings and on the parts).</summary>
+    public List<string> Unresolved { get; set; } = new();
+    public FlangeDeflectorDefinition Clone()
+    {
+        var c = (FlangeDeflectorDefinition)MemberwiseClone();
+        c.BoltAlong = BoltAlong.ToList(); c.Supports = Supports.ToList(); c.Unresolved = Unresolved.ToList();
+        return c;
+    }
 }

@@ -143,6 +143,7 @@ public sealed partial class SteelModelGenerator
         foreach (var sp in _f.Splices) { var s = sp; conn.Add(() => BuildFieldSplice(s)); }
         conn.Add(BuildLateralBracing);
         conn.Add(BuildInspectionAccess);
+        conn.Add(BuildFlangeDeflectors);
         foreach (var x in _f.CrossGirders) { var xx = x; conn.Add(() => BuildCrossGirder(xx)); }   // registers bolt holes in girder webs
         foreach (var cp in _caps) { var cc = cp; conn.Add(() => BuildIntegralCap(cc)); }   // registers top flange holes and stud exclusions
         Parallel.ForEach(conn, a => a());
@@ -418,9 +419,9 @@ public sealed partial class SteelModelGenerator
             {
                 tf1 = Math.Min(tf1, Math.Max(s0, xc0.sc)); bf1 = Math.Max(s0, xc0.sc);
             }
-            var copes = new List<(double a, double b, double depth)>();
-            if (capE != null && tf1 < s1 - 1e-6) copes.Add((tf1, s1, CopeDepth(path, capE)));
-            if (capS != null && tf0 > s0 + 1e-6) copes.Add((s0, tf0, CopeDepth(path, capS)));
+            var copes = new List<(double a, double b, double depth, CapCut cut)>();
+            if (capE != null && tf1 < s1 - 1e-6) copes.Add((tf1, s1, CopeDepth(path, capE), capE));
+            if (capS != null && tf0 > s0 + 1e-6) copes.Add((s0, tf0, CopeDepth(path, capS), capS));
             int n = 1;
             foreach (var (a, b, seg) in top.PiecesWithin(tf0, tf1))
             {
@@ -454,7 +455,10 @@ public sealed partial class SteelModelGenerator
                     {
                         double pa = cutsW[ci], pb = cutsW[ci + 1], mid = (pa + pb) / 2;
                         double dep = copes.Where(c => mid > c.a && mid < c.b).Select(c => c.depth).DefaultIfEmpty(0).Max();
-                        LongPlate(mesh, path, pa, pb, path.S, Array.Empty<double>(), _ => -d, _ => -dep, _ => -tw / 2, _ => tw / 2,
+                        var cope = copes.Where(c => mid > c.a && mid < c.b).Select(c => ((CapCut, bool)?)(c.cut, true)).FirstOrDefault();
+                        // the cap flange underside is a plane (cap slope), the girder top of web follows the grade: the cope face is cut to the plane, not parallel to the web top
+                        Func<double, double> copeTop = cope is { } cc ? (ss => -(path.At(ss).Item1.Z - (cc.Item1.Cap.SurfaceZ(cc.Item1.Cap.S(path.At(ss).Item1.XY), cc.Item1.Cap.ZTow) - (cc.Item1.Cap.D.Connection?.CopeClearance ?? 0)))) : (_ => -dep);
+                        LongPlate(mesh, path, pa, pb, path.S, Array.Empty<double>(), _ => -d, copeTop, _ => -tw / 2, _ => tw / 2,
                             hs.Where(h => h.Center.X > pa && h.Center.X < pb).ToList(), webMap, true, "girder web");
                     }
                 }
@@ -706,9 +710,13 @@ public sealed partial class SteelModelGenerator
         double headR = _model.Bolt.HeadAcrossFlats / Math.Sqrt(3);
         bool coverWarned = false;
 
-        for (double s = clear + sd.Pitch / 2; s < g.Length - clear; s += sd.Pitch)
+        foreach (double s in StudRows(g, sd, clear))
         {
-            if (excl.Any(e => s > e.s0 - clear && s < e.s1 + clear)) continue;
+            if (excl.Any(e => s > e.s0 - clear && s < e.s1 + clear))
+            {
+                if (sd.Zones.Count > 0) Warn($"{g.Name}: stud row at {_u.FormatStation(path.At(s).Item3)} (plan zone) omitted - inside a splice / cap exclusion.");
+                continue;
+            }
             var (p, t, sta) = path.At(s);
             // Deck cross slope at the girder (finished grade is parallel to the deck bottom).
             var so = align.Inverse(p.XY);
@@ -718,9 +726,10 @@ public sealed partial class SteelModelGenerator
             double halfW = top.Width(s) / 2;
             string mark = SectionMark(g.Index, s);
             var right = new Vec3(t.Right.X, t.Right.Y, 0);
+            double tsp = sd.EdgeDistance > 0 && sd.RowsAcross > 1 ? (top.Width(s) - 2 * sd.EdgeDistance) / (sd.RowsAcross - 1) : sd.TransverseSpacing;
             for (int k = 0; k < sd.RowsAcross; k++)
             {
-                double r = (k - (sd.RowsAcross - 1) / 2.0) * sd.TransverseSpacing;
+                double r = (k - (sd.RowsAcross - 1) / 2.0) * tsp;
                 if (Math.Abs(r) + sd.HeadDiameter / 2 > halfW) continue;
                 if (boltHoles.Any(h => Math.Abs(h.Center.X - s) < headR + clear && Math.Abs(h.Center.Y - r) < headR + clear)) continue;
                 double gapToDeck = haunch - tf + slope * r;
@@ -735,6 +744,44 @@ public sealed partial class SteelModelGenerator
                 _studs.Add(new StudInstance { Frame = new Frame3(origin, new Vec3(t.X, t.Y, 0), Vec3.Cross(Up, new Vec3(t.X, t.Y, 0)), Up), Length = len, Assembly = mark });
             }
         }
+    }
+
+    /// <summary>Stud row positions along a girder: the uniform pitch, or the plan zones (equal spaces, a shared end row once).</summary>
+    private IEnumerable<double> StudRows(GirderResult g, StudDefinition sd, double clear)
+    {
+        if (sd.Zones.Count == 0)
+        {
+            for (double s = clear + sd.Pitch / 2; s < g.Length - clear; s += sd.Pitch) yield return s;
+            yield break;
+        }
+        double Loc(StudLocation l)
+        {
+            switch (l.Kind)
+            {
+                case StudLocationKind.GirderStart: return l.Offset;
+                case StudLocationKind.GirderEnd: return g.Length + l.Offset;
+                case StudLocationKind.Splice:
+                    var sp = _f.Splices.FirstOrDefault(x => x.Girder == g.Index && x.Number == l.Number);
+                    return sp == null ? double.NaN : sp.GirderDistance + l.Offset;
+                default:
+                    if (l.Number < 0 || l.Number > g.Spans.Count) return double.NaN;
+                    return (l.Number == 0 ? g.StartExtension : g.DistanceAt(l.Number - 1, g.Spans[l.Number - 1].Length)) + l.Offset;
+            }
+        }
+        var rows = new List<double>();
+        foreach (var z in sd.Zones)
+        {
+            if (z.Girders.Count > 0 && !z.Girders.Contains(g.Index)) continue;
+            double a = Loc(z.From), b = Loc(z.To);
+            if (double.IsNaN(a) || double.IsNaN(b) || z.Spaces < 1) { Warn($"{g.Name}: stud zone {z.From}..{z.To}: location not found."); continue; }
+            for (int i = 0; i <= z.Spaces; i++)
+            {
+                double s = a + (b - a) * i / z.Spaces;
+                if (rows.Any(r => Math.Abs(r - s) < 0.005)) continue;   // a row shared by two zones
+                rows.Add(s);
+            }
+        }
+        foreach (double s in rows.OrderBy(x => x)) yield return s;
     }
 
     /// <summary>Orders marks naturally (G1-2 before G1-10).</summary>

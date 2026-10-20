@@ -132,7 +132,7 @@ public sealed partial class SteelModelGenerator
         // Right girder's top of web in plane coordinates (its "elevation" along the tilted up axis).
         double prZ = plane.Local(pr).xz.Y;
 
-        var connPlate = cf.AtSupport ? _def.Stiffeners.BearingStiffener : _def.Stiffeners.ConnectionPlate;
+        var connPlate = cf.AtSupport ? (cf.SupportIndex >= 0 ? _def.SupportAt(cf.SupportIndex).BearingStiffener : null) ?? _def.Stiffeners.BearingStiffener : _def.Stiffeners.ConnectionPlate;   // the support's own bearing stiffener (Nebraska N abutment 12 1/2 x 1 1/8)
         double tp = connPlate.Thickness, wcp = connPlate.Width, clr = def.MemberClearance;
         double tg = st?.GussetThickness ?? def.GussetThickness;
         double e = st is { BoltEdgeDistance: > 0 } ? st.BoltEdgeDistance : bolts.EdgeDistance;

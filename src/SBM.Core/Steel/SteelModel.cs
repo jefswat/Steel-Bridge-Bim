@@ -37,7 +37,9 @@ public enum AssemblyKind { GirderFieldSection, CrossFrame, Bearing, FieldSplice,
     /// <summary>Integral steel pier cap member (appended) and the girder-to-cap connection inside / over it.</summary>
     PierCap, PierCapConnection,
     /// <summary>Expansion joint hardware (appended).</summary>
-    ExpansionJoint }
+    ExpansionJoint,
+    /// <summary>Flange deflectors on the exterior girders (appended; OPTIONAL BridgeDefinition.FlangeDeflectors).</summary>
+    FlangeDeflector }
 
 /// <summary>Member role, used for IFC predefined types and reports.</summary>
 public enum MemberRole { None, TopChord, BottomChord, Diagonal, Diaphragm, Lateral }

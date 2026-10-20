@@ -69,7 +69,7 @@ public sealed partial class ConcreteGenerator
         var covers = cd.CoverPlates.Where(c => c.Top).Select(c =>
         {
             var (s0, s1) = cap.CoverRange(c, soleHalf);
-            return (s0, s1, t: c.Thickness, p0: cap.PlanS(cap.Xc(s0), cap.ZTop + c.Thickness), p1: cap.PlanS(cap.Xc(s1), cap.ZTop + c.Thickness));
+            return (s0, s1, t: c.Thickness, p0: cap.PlanS(cap.Xc(s0) + cap.M * cap.ZTop, cap.ZTop + c.Thickness), p1: cap.PlanS(cap.Xc(s1) + cap.M * cap.ZTop, cap.ZTop + c.Thickness));
         }).ToList();
         // steel top (local z) at a plan S on the cap top: flange, or the cover plate whose top face covers it
         double SteelC(double s) => cap.ZTop + covers.Where(c => s >= c.p0 - 1e-9 && s <= c.p1 + 1e-9).Select(c => c.t).DefaultIfEmpty(0).Max();
@@ -263,7 +263,7 @@ public sealed partial class ConcreteGenerator
             var set = new PlanBarSet
             {
                 Mark = st.Mark, Size = st.Size, Location = st.Location.Length > 0 ? st.Location : $"{sl.Name} integral steel pier cap haunch", Element = "cap haunch", Coating = st.Coating,
-                Shape = "BENT", Dims = new[] { st.HookLength, st.LegHeight, st.BottomWidth, st.LegHeight, st.HookLength }, ListedLength = st.ListedLength, Cover = st.Cover,
+                Shape = "BENT", Dims = new[] { st.HookLength, st.LegHeight, st.BottomWidth, st.LegHeight, st.HookLength }, ListedLength = st.ListedLength, Pin = st.Pin, Cover = st.Cover,
                 PlanCount = st.PlanCount, PlanWeightLb = st.PlanWeightLb, Source = st.Source.Length > 0 ? st.Source : src,
                 Note = $"midway between the cap stud lines, {In16(st.ClearAboveSteel)} clear above the cap steel, in the plane square to the cap axis; legs / hooks from the out-to-out bend diagram",
             };
@@ -273,7 +273,7 @@ public sealed partial class ConcreteGenerator
             for (int k = 0; k + 1 < lineS.Count; k++)
             {
                 double sm = (lineS[k] + lineS[k + 1]) / 2;
-                double x = cap.Xc(sm);
+                double x = cap.Xc(sm) + cap.M * cap.ZTop;   // between the studs, which stand at the horizontal plan distance from the CL bearing (tilted cap frame)
                 double c = SteelCAtLine(sm);
                 double sPlan = cap.PlanS(x, c);
                 if (sPlan < lo0 || sPlan > hi0 || InFoot(sPlan, 0)) continue;

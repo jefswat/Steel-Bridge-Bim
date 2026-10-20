@@ -1046,10 +1046,17 @@ UNRESOLVED FLAG (general, reusable): `SBM.Core/Assumption.cs` `Assumption{Status
   `Nebraska St Ramp B.sbm`, check `check-nebraska-st.csx`, links `sheet-links-nebraska-st.json`, data `docs/plan-data/nebraska-ramp-b-b00167/`. Placement APPROXIMATE in UTM 14N
   (GPS = CL at STA 2475+52.56, p.27/p.29 north arrows true az 296.262 minus convergence), 3DEP terrain. Pier 2 = integral cap + capless turned columns.
   Pier 1 "end walls" are the plans' MASKWALLS (p.9, p.14; `CapBlockKind.Maskwall`, 12" = 8" full width + 4" reveal, sloped top, 2.7 CY = plan; square to the pier line, the
-  barrier bump-out ends are 90 deg to the deck edge p.43 Detail C = plans' own skew difference), linked to p.9-11 / p.14. `CrossFrameOrientation.NormalToGirders` (p.27; span 2 spacing
-  still not the plan's 23'-0 5/8 + 22'-9: needs `CrossFrameDefinition.Lines`). `StiffenerDefinition.ClipToTopFlange` (abutment stiffeners wider than the top flange, p.32 Sect. A-A;
+  barrier bump-out ends are 90 deg to the deck edge p.43 Detail C = plans' own skew difference), linked to p.9-11 / p.14. `CrossFrameOrientation.NormalToGirders` + `CrossFrameDefinition.Lines` (p.27 spacing strings along girder A,
+  22 lines, QC 2026-10-19). `StiffenerDefinition.ClipToTopFlange` (abutment stiffeners wider than the top flange, p.32 Sect. A-A;
   OPTIONAL, off = unchanged). Cap: `IntegralSteelCapDefinition.StiffenerBottomWeld` (5/16, p.31), `CapGirderConnection.DiaphragmWeld` (drawn 1/4", UNRESOLVED size, p.30) /
   `BottomPlateWeld` (5/16). Check script section 9; notes `docs/plan-data/nebraska-ramp-b-b00167/SUMMARY.md` ("Review 2026-10-13 items 6-12").
+  QC answers 2026-10-19 (`qc/nebraska-st/results/answers.csv`, check script section 10): `StudDefinition.Zones` (`StudZone` / `StudLocation`: plan "n EQ. SPA." zones, a shared end row once) + `StudDefinition.EdgeDistance`
+  (p.32 stud detail 1 1/2, 2 EQ. SPA. = width dependent spacing; 475 rows per girder); cap stud rows / top cover plates are placed at the HORIZONTAL distance from the CL bearing (the cap frame is tilted by the cap slope:
+  x = K l + M z, `IntegralCapFrame`), cap haunch stirrups follow the stud lines, `CapHaunchStirrups.Pin` / `PlanBarSet.Pin` (5d2 D = 2 1/2); `SubstructureDefinition.ColumnProjectionBack` (+ `...BackWidth`, p.13 Pier 2 4"
+  south projection); `AbutmentDefinition.PileBatterRatio` / `PileBatterRows` (stub abutment: front row 1:4 outward, p.18 / p.20); `BridgeDefinition.FlangeDeflectors` (`FlangeDeflectorDefinition`, detailer
+  `Steel/FlangeDeflectorDetailer.cs`, `AssemblyKind.FlangeDeflector`, 6 on the exterior girders at pier 1 / pier 2 / N abut, UNRESOLVED dimension flags); Pier 1 cap end projections (4" x 3'-7 5/8, `CapBlockKind.Cap`),
+  brick on the cap end faces; the girder web cope under the cap flange is cut to the cap-flange plane (not parallel to the grade); support cross frames use the support's own bearing stiffener. NOT done (UNRESOLVED
+  with page + reason in the build script): abutment wing extensions / maskwalls / backwall extension / L-shaped wing footing + wing piles (p.19 / p.21), Pier 1 cap soffit brick, reinforcing marks (user queue item 3).
 
 ## Conventions (bridge engineering)
 - Offsets right-positive (Civil 3D). Skew from the radial line; positive = right end of support line up-station.

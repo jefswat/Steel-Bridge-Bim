@@ -1169,6 +1169,7 @@ public static class IfcExporter
                     AssemblyKind.PierCap => (".FACTORY.", ".GIRDER.", "'INTEGRAL_STEEL_PIER_CAP'"),
                     AssemblyKind.PierCapConnection => (".FACTORY.", ".USERDEFINED.", "'PIER_CAP_GIRDER_CONNECTION'"),
                     AssemblyKind.ExpansionJoint => (".SITE.", ".USERDEFINED.", "'EXPANSION_JOINT'"),
+                    AssemblyKind.FlangeDeflector => (".SITE.", ".USERDEFINED.", "'FLANGE_DEFLECTOR'"),
                     _ => (".SITE.", ".USERDEFINED.", "'BEARING'"),
                 };
                 if (asm.Kind == AssemblyKind.Railing)
