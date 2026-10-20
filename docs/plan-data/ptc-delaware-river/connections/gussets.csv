@@ -1,0 +1,12 @@
+structure,joint,group,gusset_thk_in,gusset_qty,in_to_in_in,rivet_dia_in,rivet_lines,rivet_open_field,rivet_solid_shop,rivet_total,outline_note,page,confidence,note
+main,U1,chord web field (U0-U1 / U1-U2),0.75,2,29,1.125,6,50,55,105,"width along chord scaled about 96 in; chord 2'-10 1/2 b.-to-b. Ls; image-counted per gusset face",74,medium,"2-3/4 Gussets (C); all rivets in gussets and cover splice plates 1 1/8 in H.S. (note p.74); stitch 1 in carbon"
+main,U1,diagonal L0-U1 (left),0.75,2,29,1.125,,0,30,30,"group 2'-6 min. long with 5 in rad half holes T and B on CL; 10 in setback",74,low,"image-counted (polygon cut may lose a few)"
+main,U1,vertical U1-L1,0.75,2,29,1.125,4,2,19,21,"vertical channels 2-18[ 42.7 with 2-Cov Pls (28-12)x3/8",74,low,"counted inside the gusset only"
+main,U1,diagonal U1-L2 (right),0.75,2,29,1.125,,0,27,27,"group about 2'-6 long",74,low,
+main,U2,chord web field (U1-U2 / U2-U3),0.625,2,29,1.125,6,27,37,64,"2'-10 1/2 b.-to-b. Ls; image-counted per gusset face",74,medium,"2-5/8 Gussets (C); 2'-5 in to in Guss.; note U2 U3 same as U1 U2"
+main,U2,vertical U2-L2,0.625,2,29,1.125,3,2,18,20,"gusset tapers from the chord web down to the vertical channel width",74,medium,"image-counted inside the gusset"
+main,L2,lower chord web field (L0-L2 / L2-L4),0.75,2,29,1.125,5,58,66,124,"image-counted per gusset face (includes fill and angle rivets in the chord web field)",74,medium,"2-3/4 Gussets (C)"
+main,L2,vertical U2-L2,0.75,2,29,1.125,4,4,20,24,"10 in setback; 2'-6 min. long edge",74,low,"image-counted"
+main,L2,diagonal U1-L2 (left),0.75,2,29,1.125,,0,26,26,"2'-6 min. / 1'-9 1/2 b.-to-b. Ls; 5 in rad half holes T and B on CL",74,low,"image-counted"
+main,L2,diagonal L2-U3 (right),0.75,2,29,1.125,,0,27,27,"1'-9 1/2 b.-to-b. Ls",74,low,"image-counted"
+main,L1,vertical U1-L1 end at lower chord,,,,1,,,,,"similar to L3 sheet 35; diaphragm 4-Ls 5x5x1/2 + 1-Web Pl 26x3/4 (C) between the angles 8'-10 1/2 b.-to-b. of floor beam Ls (see sheet 54); 12x20 manholes at 4'-0 c/c",74,medium,"Section A-A: 1 in carbon rivets in the diaphragm; 1 1/8 in H.S. in gusset"

@@ -1,0 +1,13 @@
+structure,joint,item,qty,width_in,thk_in,length_in,extent_note,rivet_dia_in,rivet_rows,rivet_count,rivet_note,page,confidence,note
+main,U1,top chord cover (flange) splice plates top and bottom,2,24,0.5,24,"plan view dim line; scaled 23.8 in centred on joint CL (HALF TOP FLANGE / HALF BOTTOM FLANGE)",1.125,5,30,"5 gage lines; per line about 2 field (open) + about 4 shop (solid) rivets; counted approx",74,medium,"callout 2-Spl. Pls. 24x1/2 (C)"
+main,U1,cover splice fill under flange splice plates,1,24,0.3125,15,"scaled extent from the joint CL toward the lighter member (U0 side)",,,,,74,medium,"callout Fill 24x5/16 (C)"
+main,U1,web splice plates both faces of chord web,2,31.5,0.5,39,"scaled from dimension line (centred on CL; about 19.5 in each side)",1.125,6,105,"6 gage lines in the chord web field; 50 open (field-driven) left of CL + 55 solid (shop) right of CL = 105 visible rivets per gusset face (image-counted, +-5 %); same field serves gusset to web",74,medium,"callout 2-Spl. Pls. 31 1/2 x 1/2 (C)"
+main,U1,web fills (left; U0-U1 side),2,31.5,0.4375,29.5,"scaled extent from the joint CL leftward",,,,,74,medium,"callout 2-Fills 31 1/2 x 7/16 (C)"
+main,U1,web fills (left; outer),2,22,0.375,38.6,"scaled extent from the joint CL leftward",,,,,74,medium,"callout 2-Fills 22 x 3/8 (C); U0-U1 web 34x3/8 vs U1-U2 web 34x11/16"
+main,U1,web fills (right; U1-U2 side),2,18,0.5,27.4,"scaled extent from the joint CL rightward",,,,,74,medium,"callout 2-Fills 18 x 1/2 (C)"
+main,L2,lower chord cover splice plates,2,24,0.5,24,"plan view dim line; scaled about 24 in centred on CL",1.125,5,30,"5 gage lines; per line about 2 field + about 4 shop rivets (counted approx)",74,medium,"callout 2-Spl. Pls. 24x1/2 (C)"
+main,L2,web splice plates,2,31.5,0.5,24,"scaled from dim line about 12 in each side of CL (left end overlaps fills)",1.125,5,,,74,low,"callout 2-Spl. Pls. 31 1/2 x 1/2 (C)"
+main,L2,web fills (each side of CL),2,18,0.5,22,"two callouts 2-Fills 18x1/2 (one each side of CL); scaled about 22 in each",,,,,74,medium,"callout 2-Fills 18 x 1/2 (C) x 2"
+main,U2,top chord cover splice plates,2,24,0.5,24,"plan view dim line scaled about 24 in",1.125,5,30,"5 lines; 10 open + 20 solid image-counted",74,medium,"callout 2-Spl. Pls. 24x1/2 (C); note: U2 U3 same as U1 U2"
+main,U2,web splice plates,2,31.5,0.5,24,"scaled from dim line",1.125,5,,,74,low,"callout 2-Spl. Pls. 31 1/2 x 1/2 (C)"
+main,U2,web fills (each side of CL),2,18,0.5,20,"two callouts 2-Fills 18x1/2",,,,,74,medium,"callout 2-Fills 18 x 1/2 (C) x 2"
