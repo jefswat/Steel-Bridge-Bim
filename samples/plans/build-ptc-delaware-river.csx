@@ -62,22 +62,41 @@ const string AlName = "CL Roadway (PTC)";
 const double CrownRiseFt = 38.25 / 96.0;                  // p.107: 38'-3 CL to curb x 1/8" per ft
 Doc.Project.Alignments.RemoveAll(a => a.Name == AlName);
 double bearingRad = (69 + 54 / 60.0 + 15 / 3600.0) * Math.PI / 180;
-double heading = -(Math.PI / 2 - bearingRad);              // S 69 54'15" E as a math angle (east = 0, counter-clockwise)
+double heading = -(Math.PI / 2 - bearingRad);              // S 69 54'15" E as a math angle (east = 0, counter-clockwise), plan (true) bearing
+// GEOREFERENCE (docs/plan-data/ptc-delaware-river/GEOREFERENCE.md, user decision: fit to current aerial / LiDAR in PA South EPSG:2272 + NAVD88):
+// the plan bearing is TRUE north (fitted true azimuth 110.055 deg vs plan 110.096); in EPSG:2272 GRID the axis runs at 108.162 deg, and the
+// W abutment CL brg (646+21.463) sits at E 2,781,357.274 / N 300,154.409 ftUS (APPROXIMATE: +/-10 m along, +/-5 m across, azimuth +/-0.15 deg;
+// fit to the approach-fill ends + the LiDAR footprint of the land spans, no control). Model X / Y = EPSG:2272 grid coordinates in metres.
+const bool Georeferenced = true;
+if (Georeferenced) heading = (90 - 108.162) * Math.PI / 180;
 double staWest = Sta("646+21.463");
 double staStart = Sta("638+00.00"), staEnd = Sta("713+30.00");   // profile start (before the west vertical curve) / R/W end (p.31, p.32)
-var origin = new Vec2(0, 0);
+var origin = Georeferenced ? new Vec2(2781357.274 * 1200 / 3937.0, 300154.409 * 1200 / 3937.0) : new Vec2(0, 0);
 var startPt = origin - Vec2.FromAngle(heading) * (staWest - staStart);
 var al = new Alignment(new List<HorizontalElement> { new HorizontalElement(startPt, heading, staEnd - staStart, 0, 0) })
 {
     Name = AlName,
     StartStation = staStart,
-    Description = "PTC / NJTA Delaware River Bridge baseline S 69 54'15\" E (p.5, 16, 32, 42); LOCAL grid, origin = CL brg W abutment 646+21.463; not georeferenced",
+    Description = "PTC / NJTA Delaware River Bridge baseline S 69 54'15\" E (p.5, 16, 32, 42); " + (Georeferenced ? "EPSG:2272 grid (m), fitted to 3DEP / NAIP (approximate), CL brg W abutment 646+21.463" : "LOCAL grid, origin = CL brg W abutment 646+21.463; not georeferenced"),
 };
 Doc.Project.Alignments.Add(al);
 U("p.5, 16, 32, 42", "reference meridian of the bearing S 69 54'15\" E", "the plans do not say whether it is true, grid or magnetic (the north arrows only show the direction)",
   "North = local +Y; the azimuth 110 05'45\" is used as printed, no convergence applied.");
-U("p.5, 16, 32, 42", "map coordinates / CRS of the baseline", "the plans give no coordinates, state plane or benchmarks",
-  "Local grid, Project.Georeference = null. Fit to aerial / LiDAR (PA South EPSG:2272 + NAVD88) is a later step and waits for the user's download OK.");
+U("p.5, 16, 32, 42", "map coordinates of the baseline", "the plans give no coordinates, state plane or benchmarks",
+  "Fitted to current 3DEP LiDAR + NAIP in PA South EPSG:2272 (GEOREFERENCE.md): approximate +/-10 m along, +/-5 m across, azimuth +/-0.15 deg; R/W monument coordinates from the Turnpike would close it.");
+Doc.Project.Georeference = !Georeferenced ? null : new SBM.Core.Project.GeoreferenceDefinition
+{
+    CrsName = "EPSG:2272", Description = "NAD83 / Pennsylvania South (ftUS); model X / Y = grid coordinates in metres; elevations NGVD29 as printed (NAVD88 = NGVD29 - 1.020 ft, VERTCON 3.0)",
+    GeodeticDatum = "NAD83", MapProjection = "Lambert Conformal Conic", MapZone = "Pennsylvania South (3702)", MapUnitUsSurveyFoot = true, GridScale = 0.999976,
+    Basis = "Fit 2026-10-19 to USGS 3DEP 1 m + NAIP 2023 (approach-fill ends + land-span LiDAR footprint); plan bearing = true north; no survey control",
+};
+Doc.Project.References.RemoveAll(x => x.Name.StartsWith("3DEP lidar 1 m (Delaware River"));
+if (Georeferenced) Doc.Project.References.Add(new SBM.Core.References.ReferenceModelDefinition
+{
+    Name = "3DEP lidar 1 m (Delaware River, PA South)", Path = @"C:\SBM\dist\terrain\ptc\ptc-delaware-3dep-1m-pa-south-ftus-ngvd29.flt",
+    Kind = SBM.Core.References.ReferenceKind.Terrain, Format = SBM.Core.References.ReferenceFormat.Grid, UnitScale = 0.3048006096,
+    ContourInterval = Ft(2), R = 150, G = 140, B = 120,
+});
 U("p.1, 5, 42", "unit of the printed feet (US survey vs international)", "the plans just say feet", "International feet (0.3048 m), like the other models.");
 U("p.5, 42", "entry grade of the west vertical curve", "only the VPI 644+67.14 El 49.454, L = 1060 and M.O. 4.637 are printed; the -0.5 % grade is derived",
   "First VPI at 638+00 on the derived -0.50 % grade (El 53.790, derived).");

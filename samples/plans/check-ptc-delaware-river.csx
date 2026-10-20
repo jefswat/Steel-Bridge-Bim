@@ -58,8 +58,16 @@ foreach (var n in names)
     for (int i = 0; i < csv.Count; i++)
         Row($"{n}: {csv[i][0]} station", fr[n].Supports[i].Station / ft, Pl(csv[i][1]), 0.0005, "ft");
 }
-Row("W abutment at the local origin (east)", al.PointAt(Sta("646+21.463")).X / ft, 0, 0.0005, "ft");
-Row("W abutment at the local origin (north)", al.PointAt(Sta("646+21.463")).Y / ft, 0, 0.0005, "ft");
+if (Doc.Project.Georeference == null)
+{
+    Row("W abutment at the local origin (east)", al.PointAt(Sta("646+21.463")).X / ft, 0, 0.0005, "ft");
+    Row("W abutment at the local origin (north)", al.PointAt(Sta("646+21.463")).Y / ft, 0, 0.0005, "ft");
+}
+else   // fitted EPSG:2272 position (GEOREFERENCE.md, approximate +/-10 m); model metres -> ftUS
+{
+    Row("W abutment E (EPSG:2272 ftUS, fitted)", al.PointAt(Sta("646+21.463")).X * 3937 / 1200.0, 2781357.274, 0.001, "ftUS");
+    Row("W abutment N (EPSG:2272 ftUS, fitted)", al.PointAt(Sta("646+21.463")).Y * 3937 / 1200.0, 300154.409, 0.001, "ftUS");
+}
 
 // ---------------------------------------------------------------- 2. span lengths (p.1 / p.42 / p.43 as-built)
 Print("== 2. Span lengths (pier CL to pier CL, or bearing to bearing at a unit end)");
@@ -110,7 +118,10 @@ Row("PN 4 length (p.41): 712+27.547 - 645+53.713", Pl("712+27.547") - Pl("645+53
 // ---------------------------------------------------------------- 3. alignment
 Print("== 3. Alignment");
 double az = (Math.PI / 2 - al.AngleAt(Sta("680+00"))) * 180 / Math.PI; if (az < 0) az += 360;
-Row("azimuth from local north (S 69 54'15\" E = 110 05'45\")", az, 110 + 5 / 60.0 + 45 / 3600.0, 1e-6, "deg");
+if (Doc.Project.Georeference == null)
+    Row("azimuth from local north (S 69 54'15\" E = 110 05'45\")", az, 110 + 5 / 60.0 + 45 / 3600.0, 1e-6, "deg");
+else   // EPSG:2272 grid azimuth of the fitted axis (GEOREFERENCE.md); the plan bearing 110 05'45" is TRUE north (fitted true 110.055 deg, +/-0.15)
+    Row("grid azimuth EPSG:2272 (fitted, GEOREFERENCE.md; plan S 69 54'15\" E = true bearing)", az, 108.162, 1e-6, "deg");
 var pW = al.PointAt(Sta("646+21.463")); var pE = al.PointAt(Sta("711+92.797"));
 Row("plan distance W - E abutment = station difference", Vec2.Distance(pW, pE) / ft, Pl("711+92.797") - Pl("646+21.463"), 0.0005, "ft");
 Row("alignment elements (one tangent)", al.Elements.Count, 1, 0, "");
