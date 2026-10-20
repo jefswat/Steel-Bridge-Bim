@@ -18,7 +18,7 @@ The plans are the authority. A model is checked against the plans, never against
 | Role | Who | Sees | Does not see |
 |---|---|---|---|
 | Originator | Build agent(s) (today: Opus code agents + Sonnet extraction agents) | Everything | — |
-| **Checker** | Separate agent, fresh context, **different model from the originator of that work** (Opus checks Sonnet-built work and vice versa) | Plan PDFs (`C:\SBMData`, read-only), the model's **outputs**: IFC export, companion database, sections / sheets / snapshots made by read-only `sbm` commands, standards in `dist\standards` | `samples/plans/*.csx`, `docs/plan-data/**`, `CLAUDE.md` bridge notes, originator transcripts, check-*.csx |
+| **Checker** | Separate agent, fresh context, **different model from the originator of that work** (Opus checks Sonnet-built work and vice versa) | Plan PDFs (`C:\SBMData`, read-only), the model's **outputs** as CHECKING exports: IFC from `sbm export --ifc --for-check`, database from `sbm db --for-check` (no plan notes, page refs, size strings, UNRESOLVED reasons, assumption bases, sheet links; docs/API.md "Checking export"; verified with `tools/check_ifc_leaks.py --expect-clean`), sections / sheets / snapshots made by read-only `sbm` commands, standards in `dist\standards` | `samples/plans/*.csx`, `docs/plan-data/**`, `CLAUDE.md` bridge notes, originator transcripts, check-*.csx |
 | Back-checker | The originator | The checker's issue list | — |
 | Program verifier | Separate agent (section 9) | Source code, tests | — |
 | Approver | The user | QC report, open issues, plan conflicts | — |
@@ -35,8 +35,9 @@ The checker uses the program read-only, through the CLI. All of the following pr
 
 | Command | Status | Use |
 |---|---|---|
-| `sbm export <model> --ifc` | exists | the delivered artifact; coordinates and quantities read with IfcOpenShell |
-| `sbm db <model> --sheets-for / --find-sheet` | exists | which sheets an element claims to come from (checks the claim too) |
+| `sbm export <model> --ifc out.ifc --for-check` | exists | the artifact handed to the checker: geometry identical to the normal export, originator text stripped (`--keep-designations` keeps section designations); coordinates and quantities read with IfcOpenShell. Run `python -I tools/check_ifc_leaks.py out.ifc --expect-clean` before handing it over |
+| `sbm db <model> out.sqlite --for-check` | exists | element registry only (no sheet links, props text, model path); the checker builds its own sheet mapping |
+| `sbm db <model> --sheets-for / --find-sheet` (normal db) | exists | which sheets an element claims to come from; given to the checker only AFTER its own mapping, to check the claim as a finding source |
 | `sbm get`, `sbm info`, `sbm elevations`, `sbm blocking` | exist | model values, elevation chains |
 | `sbm clash` | exists | steel / misc / concrete clashes (section 7) |
 | `sbm sheets`, `sbm drawings` | exist | the model's own sheets (compare layout only, not as evidence) |

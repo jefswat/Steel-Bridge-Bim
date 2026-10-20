@@ -20,6 +20,10 @@ public sealed class DatabaseOptions
     public string? ModelFile { get; set; }
     /// <summary>Bridge names of the project: pick the shipped link rules by plan set <c>bridgeGroup</c> when the model folder has none.</summary>
     public List<string> BridgeNames { get; } = new();
+    /// <summary>CHECKING database for an independent checker: the element registry only (GlobalId, parent, level, category, mark, bridge / unit /
+    /// support / girder, measured mass / volume / length / bbox) WITHOUT sheet links, plan sheets, QC, property text (descriptions, status reasons,
+    /// bases) or the model path; elements the originator flagged carry <c>{"flagged":true}</c> and nothing else. See docs/API.md.</summary>
+    public bool ForCheck { get; set; }
     public Action<string>? Log { get; set; }
 }
 
@@ -123,11 +127,66 @@ public static class CompanionDatabase
         string dbDir = Path.GetDirectoryName(Path.GetFullPath(dbPath))!;
         Directory.CreateDirectory(dbDir);
         if (options.BridgeNames.Count == 0) options.BridgeNames.AddRange(project.Bridges.Select(b => b.Name));
-        res.Build = ModelDatabase.Write(dbPath, project, bridges, options.ModelFile, options.Vacuum);
+        res.Build = ModelDatabase.Write(dbPath, project, bridges, options.ForCheck ? null : options.ModelFile, options.Vacuum && !options.ForCheck);
         using (var cn = ModelDatabase.Open(dbPath))
-            ApplySheets(cn, project.Name, options, res, dbDir);
+        {
+            if (options.ForCheck) StripForCheck(cn, options.Vacuum);
+            else ApplySheets(cn, project.Name, options, res, dbDir);
+        }
         res.Elapsed = sw.Elapsed;
         return res;
+    }
+
+    /// <summary>Turns a freshly written database into the checking database (see <see cref="DatabaseOptions.ForCheck"/>): no sheets, links, QC,
+    /// property text or model path; names / marks / category strings that cite plans or state sizes are removed; flagged elements keep only a flag.</summary>
+    public static void StripForCheck(Microsoft.Data.Sqlite.SqliteConnection cn, bool vacuum = false)
+    {
+        ModelDatabase.Exec(cn, "DELETE FROM element_sheet; DELETE FROM qc; DELETE FROM sheets;");
+        // Property JSON (descriptions, reasons, bases, plan-derived values) is dropped; a status marks the element as flagged, nothing more.
+        const string flagJson = "{\"flagged\":true}";
+        ModelDatabase.Exec(cn, "INSERT INTO props(id, json) VALUES((SELECT COALESCE(MAX(id),0)+1 FROM props), $j) ON CONFLICT(json) DO NOTHING", ("$j", flagJson));
+        long flagId = ModelDatabase.Scalar<long>(cn, "SELECT id FROM props WHERE json = $j", ("$j", flagJson));
+        ModelDatabase.Exec(cn, "UPDATE el SET props_id = $f WHERE props_id IN (SELECT id FROM props WHERE json_extract(json, '$.status') IS NOT NULL)", ("$f", flagId));
+        ModelDatabase.Exec(cn, "UPDATE el SET props_id = NULL WHERE props_id IS NOT NULL AND props_id <> $f", ("$f", flagId));
+        ModelDatabase.Exec(cn, "DELETE FROM props WHERE id <> $f", ("$f", flagId));
+        // Text that cites the plans or states a size / judgement: names and marks to NULL (the view falls back to category + mark), strings dropped.
+        var leakNames = new List<(long id, bool name, bool mark)>();
+        using (var c = cn.CreateCommand())
+        {
+            c.CommandText = "SELECT id, name, mark FROM el WHERE name IS NOT NULL OR mark IS NOT NULL";
+            using var r = c.ExecuteReader();
+            while (r.Read())
+            {
+                bool n = !r.IsDBNull(1) && IfcCheckFilter.IsLeak(r.GetString(1)), m = !r.IsDBNull(2) && IfcCheckFilter.IsLeak(r.GetString(2));
+                if (n || m) leakNames.Add((r.GetInt64(0), n, m));
+            }
+        }
+        using (var tx = cn.BeginTransaction())
+        {
+            foreach (var (id, n, m) in leakNames)
+                ModelDatabase.Exec(cn, $"UPDATE el SET {(n ? "name = NULL" : "")}{(n && m ? ", " : "")}{(m ? "mark = NULL" : "")} WHERE id = $i", ("$i", id));
+            tx.Commit();
+        }
+        var leakStrings = new List<long>();
+        using (var c = cn.CreateCommand())
+        {
+            c.CommandText = "SELECT id, value FROM strings";
+            using var r = c.ExecuteReader();
+            while (r.Read()) if (IfcCheckFilter.IsLeak(r.GetString(1))) leakStrings.Add(r.GetInt64(0));
+        }
+        foreach (long sid in leakStrings)
+        {
+            foreach (string col in new[] { "level_s", "category_s", "subtype_s", "ifc_class_s", "bridge_group_s", "bridge_s", "unit_s", "support_s", "girder_s", "material_s" })
+                ModelDatabase.Exec(cn, $"UPDATE el SET {col} = NULL WHERE {col} = $s", ("$s", sid));
+            ModelDatabase.Exec(cn, "DELETE FROM strings WHERE id = $s", ("$s", sid));
+        }
+        ModelDatabase.Exec(cn, "DELETE FROM meta WHERE key IN ('model_file','links_file','links_applied_at')");
+        ModelDatabase.Exec(cn, "INSERT OR REPLACE INTO meta VALUES('for_check', '1')");
+        ModelDatabase.Exec(cn, "INSERT OR REPLACE INTO meta VALUES('for_check_note', 'Checking database: element registry only. Flagged elements carry properties = {\"flagged\":true}.')");
+        ModelDatabase.Exec(cn, "DROP VIEW IF EXISTS v_unresolved");
+        ModelDatabase.Exec(cn, "DROP VIEW IF EXISTS v_flagged");
+        ModelDatabase.Exec(cn, "CREATE VIEW v_flagged AS SELECT global_id, level, category, name, mark, bridge, unit, support, girder FROM elements WHERE json_extract(properties, '$.flagged') = 1");
+        if (vacuum) ModelDatabase.Exec(cn, "VACUUM");
     }
 
     /// <summary>

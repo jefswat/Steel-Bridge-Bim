@@ -420,3 +420,35 @@ or its parents and their values vs the live model). Review > Asset > **Calcs** o
 pages (embedded Edge viewer), Add calc…, Import values…, the values-vs-model table, Summary text, Applied changes, and **Apply selected…**: a
 confirmation lists every change (path: model -> calc, page); then each is logged, the model regenerates and is saved (Undo restores the inputs;
 the log keeps the record). Snapshot `--calcswindow` captures the window (`_calcs.png`; the PDF viewer `_calcs_pdf.png`).
+
+## Checking export (`--for-check`): what an independent checker is NOT given
+
+For QC (docs/QC-PLAN.md sections 2 and 3) the checker must measure the model, not read the originator's reasoning. `sbm export <model> --ifc out.ifc --for-check [--keep-designations]`
+(`SbmDocument.ExportIfc(..., forCheck: true, keepDesignations: false)`, `IfcExportOptions.ForCheck`) and `sbm db <model> out.sqlite --for-check`
+(`DatabaseOptions.ForCheck`) write the checking versions. Normal exports are unchanged (byte-identical). The IFC filter (`SBM.IO.Ifc.IfcCheckFilter`, applied in
+`StepWriter.Add`) never touches geometry: entity ids, placements, solids, GlobalIds, classes, predefined types, materials, relationships are identical to the normal export.
+
+**Kept (IFC):** geometry, placements, GlobalIds, IFC class / PredefinedType, element Name when it is a plain identifier (mark), Tag, ObjectType class refinements (`END_DIAPHRAGM`),
+material NAME, Pset SBM_Fabrication `Mark` / `Length` / `Mass` (measured or nominal-weight x length), SBM_Tendon model length / weight / strands, SBM_Placeholder `IsPlaceholder` / `Location` / `DeviceType`,
+Pset_Stationing, alignment geometry, SBM_Status `Status` as the neutral flag `FLAGGED`.
+
+**Stripped (IFC):**
+- `Description` of every IfcRoot entity (element, assembly, type, alignment, project), of IfcMaterial and IfcProjectedCRS.
+- `Name` / `Tag` / `ObjectType` / `ElementType` / material category and name remarks when they cite a plan or state a size or judgement (matches `IfcCheckFilter.IsLeak`: page refs `p.`, PDF, sheet, note, detail ref,
+  OT1-style refs, UNRESOLVED, scaled / vectors / inferred / derived, assumed, plan(s), "not given", dates / revisions of standard drawings `(08-2017 rev. 11-24)`, inch fractions and inch marks, section
+  designations such as `WT9x38`). A Name becomes the GlobalId; a USERDEFINED ObjectType becomes `USERDEFINED`; material remarks in parentheses are dropped (`Steel (placeholder, A36 minimum per plans)` -> `Steel`).
+- SBM_Status: `Reason` and `Basis` removed; `Status` is rewritten to `FLAGGED` (the checker knows the part is flagged, not why).
+- Properties: `Size` (the size string / designation of each part), `Reason`, `Basis`, `Source`, `PlanNotes`, `QuantityItem`, `Products`, `Pattern`, `Treatment`, `Anchors`, every `Plan*` property
+  (PlanLength, PlanWeight_lb, PlanQuantity: the plan value is the checker's to read), SBM_Placeholder `Basis`, and any property whose text matches the leak rules.
+- SBM_FabricationAttributes content (Toughness, ContactFinish, NDT, CoatingExterior / Interior, ShopAssembly, Tolerance, Camber, Weld) unless `--keep-designations`; PlanNotes never. A property set left empty is not written (nor its relationship).
+- `--keep-designations` keeps the `Size` property when it holds a designation without inch-fraction size strings or plan references, and the fabrication attributes above (checkable claims).
+
+**Companion database `--for-check`:** the element registry only: GlobalId, parent, level, category, subtype, IFC class, mark, name, bridge group / bridge / unit / support / girder, station range, material, mass, volume,
+length, bounding box. Removed: `sheets`, `element_sheet` (sheet links, basis, source), `qc`, all property JSON (descriptions, status reasons, assumed bases, plan-derived values), the model path / links file in `meta`,
+names / marks / strings matching the leak rules (name falls back to category + mark). Elements the originator flagged carry `properties = {"flagged":true}` (view `v_flagged`); `meta.for_check = 1`. The normal database
+(with the sheet links) is a separate file and can be given to the checker later to CHECK the links as a finding source.
+
+**Verifier:** `python -I tools/check_ifc_leaks.py file.ifc [--expect-clean] [--examples N] [--json out]` scans every string attribute / property value (GlobalIds and enumerations excluded) for the leak kinds
+(page_ref, note, UNRESOLVED, scaled, assumed, plan_text, inch_size, designation) and prints counts per kind and per entity attribute; with `--expect-clean` the exit code is 1 when anything is found.
+Not detectable by rule (accepted, named here): descriptive element names without sizes ("Left curb", "Pier 3 pedestal G1"), material strengths in material names, rolled-section Mass (nominal weight x length), the
+SBM_Status flag itself.
