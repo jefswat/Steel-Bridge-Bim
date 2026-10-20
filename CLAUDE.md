@@ -469,7 +469,7 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
     the pier 14 / 16 working points (p.259; pier 13's N/E on p.148 is a Ramp 44E point off the arc - UNRESOLVED), 44F stationing back from 301+53.72 (the
     44E = 44F equation is data only: a station-gap profile broke IfcGradientCurve continuity). Pier 13 bearing line from the two girder spans
     141'-4 / 137'-2 5/16 (reproduces 18'-11 13/16 along CL brg and CL pier 301+53.72; the p.273 angles 69 deg 02'38"/18'54" do not fit - UNRESOLVED).
-    Check `samples/plans/check-odot-o-tub.csx` (73 OK / 39 DIFF, all reported; the new one = 6 studs under the pier 13 top connection plates: plan rounding 1/16-1/12" at pier 16 / G2 span 15, H +3/32" from the
+    Pier 16 CL bearing = CL pier - 1'-0 1/12" (306+13.993; user decision d14 2026-10-20: G2 span 16 = 160'-9 3/8 per p.279, p.273's 160'-9 1/2 = plan conflict row; check now 95 OK / 38 DIFF, was 94 / 39; the G2 FS4 / bottom zone rows move 1/12"). Check `samples/plans/check-odot-o-tub.csx` (73 OK / 39 DIFF, all reported; the new one = 6 studs under the pier 13 top connection plates: plan rounding 1/16-1/12" at pier 16 / G2 span 15, H +3/32" from the
     rotated tub (plan H = vertical stack sum), bearing offset 3 1/16-3 1/8 vs 3", pedestal seats pier 14 +0.02 ft / pier 16 +0.17 ft, G2 top tension zone
     UNRESOLVED). Tests `TubGirderTests`; links `sheet-links-odot-o.json` (49-page index). IFC: 0 schema / EXPRESS issues; validator "open" connection
     angles = multi-item SweptSolid bodies (each item closed), top strut volume ratio 0.84 = nominal weight x length of a coped WT. I-girder IFCs
@@ -732,6 +732,9 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   `docs/plan-data/deck-rebar.md`, `deck-bar-lists.csv`; scripts `samples/plans/deck-rebar-i80.csx`, `deck-rebar-ramp-g.csx` (run LAST, after the joint/deck-edge/girder scripts and `deck-end-kinks.csx`), `report-deck-rebar.csx`,
   `check-deck-rebar.csx`. The typical-section sheet text and the database group "deck reinforcing" (unit bar schedule in its properties, incl. schedule-only marks) follow the plan.
 - Variable deck width: `DeckDefinition.LeftAt/RightAt(station)`; constant decks keep the old code path.
+- Deck overhang soffit (OPTIONAL `DeckDefinition.Overhang` = `DeckOverhangDefinition`, null = flat slab, JSON omitted when null; constant-width decks only, a variable width reports it ignored): beyond `Length` inboard of an
+  edge (`Left` / `Right`) the slab bottom slopes straight from `RootThickness` to `TipThickness` at the edge (`ConcreteGenerator.SlabT`, extra grid columns at edge +- Length; NURBS deck path skipped when set; deck bars / views / `Thickness`
+  readers are unchanged). `Unresolved` -> warning. Nebraska Ramp B (p.24, decision d23): 9" tip, 11 3/4" at 25" (scaled, flagged) -> deck 440.0 -> 459.7 CY vs the plan 460.2 (p.45); check-nebraska-st 468 PASS / 8 FAIL / 25 INFO -> 468 / 8 / 26. Tests `DeckOverhangTests`.
 - Deck edge strip (OPTIONAL, default off, PROJECT-SPECIFIC to the Iowa plans): `DeckDefinition.EdgeStrip` (`DeckEdgeStrip` Width inboard from the edge, follows
   `LeftAt/RightAt`). `DeckDefinition.FinishedElevation(alignment, sta, off)` = `Alignment.ElevationAt` except beyond the gutter line (edge -/+ Width) on a side whose
   slope at the gutter line falls toward the edge: level at the gutter elevation (switches exactly at the slope's sign change; `CrossSlopeTable.Side.SlopeAt`).
@@ -1034,6 +1037,8 @@ UNRESOLVED FLAG (general, reusable): `SBM.Core/Assumption.cs` `Assumption{Status
   the radial lines at `GridStation + k x Spacing` measured ALONG THE ALIGNMENT (plan elevations lay posts out on the centerline; run ends included, 1 mm), else equal
   spacing from the run ends. `PedestrianRailingDefinition.FlagsDimensionOnly` = post / handrail / fabric flags are `Assumption.DimensionOnly` (normal layers; the envelope
   flag stays a plain UNRESOLVED). `RailingRun` gains `FabricPanels / FabricArea / FabricMass / PostStations`.
+- Rail fence fabric placeholder (OPTIONAL `RailFabricDefinition.MassNotCounted`, `SteelPart.MassNotCounted` -> `Mass` = 0; JSON omitted when false): panels keep their volume / area (viewport, IFC, area quantity "WEIGHT NOT COUNTED") but no weight in the run mass,
+  `RailingRun.FabricMass`, material lists. NHT fabric type is undetermined (sheets 224-226 missing; user decision d20 2026-10-20): set in rail-joints-nht.csx, modeled mass 52.4 / 101.2 PLF LOW / HIGH vs the p.83 design 50 / 100 PLF. Test `Railing_FabricMassNotCounted_*`.
 - Curbs: custom barrier with `BarrierDefinition.IsCurb` (OPTIONAL) -> solids "Left/Right curb", IFC IfcKerb (USERDEFINED, ObjectType = ProfileName), DB category "curb".
 - Sealed joints without blockout (OPTIONAL `ExpansionJointDefinition` fields): `ExpansionJointType.Sealed` (appended), `BlockoutWidth` 0 = no blockout (deck not
   cut back, no blockout element in IFC / DB), `BodyCentered` (device envelope +-GapAt50F/2 about the deck-end line, for plans that dimension the slab to the

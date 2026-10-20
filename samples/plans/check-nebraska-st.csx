@@ -293,6 +293,13 @@ var cm = md.Concrete;
 if (cm != null)
 {
     Row("8 quantities", "deck concrete (slab + haunches + bump-outs + pier cap haunch)", 460.2, (cm.DeckVolume + cm.HaunchVolume + cm.DeckBumpVolume + cm.CapHaunchVolume) / cyF, 460.2 * 0.03, "CY", "p.45 placement sections 1-5 INCLUDE the abutment diaphragms (sections 1, 3; not modeled)", info: true);
+    {
+        double modelDeckCy = (cm.DeckVolume + cm.HaunchVolume + cm.DeckBumpVolume + cm.CapHaunchVolume) / cyF;
+        double flatSlabCy = 19.4444 * 571.625 / 27, wedgeCy = cm.DeckVolume / cyF - flatSlabCy;
+        Text("8 quantities", "deck concrete: explanation of the difference to the plan quantity (CHECK, not hidden)", "460.2 CY (p.45)",
+            $"{modelDeckCy:0.0} CY ({modelDeckCy - 460.2:+0.0;-0.0} CY)",
+            "INFO", $"p.24 prints DECK AREA = 20.50 SQ. FT. (not including the haunch) = 20.50 SF x 571.6 ft / 27 = 434 CY, but the dimensioned 8\" slab over 29'-2 is only 19.44 SF (about 412 CY). With the flat 8\" slab the model was 440.0 CY, 20.2 CY under the plan. The overhang soffit of p.24 (9\" at the tip, sloping down to the exterior flange edge, build script, scaled 11 3/4\" / 25\") adds {wedgeCy:+0.0} CY (slab {cm.DeckVolume / cyF:0.0} CY vs a flat 8\" ~{flatSlabCy:0.0} CY) and closes the gap to {modelDeckCy - 460.2:+0.0;-0.0} CY. That reading rests on two SCALED values (soffit depth at the flange edge and where the slope starts, UNRESOLVED flag on the deck); the abutment diaphragms of p.45 sections 1 and 3 are not modeled (a small plan item the model is short of). The printed 20.50 SF therefore agrees with the DRAWN section (flat 8\" slab + sloped overhangs), not with the 8\" x 29'-2 rectangle.");
+    }
     Text("8 quantities", "integral steel pier cap haunch (p.25 Section A-A; no separate plan CY - inside p.45 section 5)", "", string.Join("; ", cm.CapHaunches.Select(c => $"{c.Volume / cyF:0.00} CY, depth {c.MinDepth / 0.0254:0.00}..{c.MaxDepth / 0.0254:0.00} in")), "INFO");
     Row("8 quantities", "barrier rail concrete (both rails)", 159.0, cm.BarrierVolume / cyF, 159.0 * 0.03, "CY", "p.56: incl. special sections on the wing extensions (not modeled)", info: true);
 }

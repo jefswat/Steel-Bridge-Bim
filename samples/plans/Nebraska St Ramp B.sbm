@@ -5419,6 +5419,15 @@
         ]
       },
       "Deck": {
+        "Overhang": {
+          "TipThickness": 0.2286,
+          "RootThickness": 0.29845,
+          "Length": 0.635,
+          "Left": true,
+          "Right": true,
+          "Source": "p.24 typical section (overhang 9\u0022 at the tip)",
+          "Unresolved": "UNRESOLVED (p.24): deck overhang soffit: depth at the exterior girder flange edge (11 3/4\u0022) and where the slope starts (25\u0022 from the tip) - only the 9\u0022 at the tip is dimensioned; the soffit line to the flange edge is drawn, not dimensioned, so those two values are scaled from the drawing (1/8\u0022 reading precision) and the left overhang is taken equal to the drawn right one. Soffit modeled as a straight line from 11 3/4\u0022 thick, 25\u0022 in from the deck edge, to 9\u0022 at the edge, both edges."
+        },
         "EdgeStrip": {
           "Width": 0.48260000000000003,
           "LowSideLevel": true
@@ -8315,6 +8324,14 @@
           "Material": null
         }
       ],
+      "Welds": {
+        "HoldBack": 0.00635,
+        "Source": "p.32 std. 1021W Detail A",
+        "Unresolved": "",
+        "StiffenerWebEndFactor": 5,
+        "StiffenerWebEndMin": 0.05715,
+        "StiffenerWebEndSource": "p.32 std. 1021W Sections C-C / D-D: X = 5T, 2 1/4\u0022 min from the toe of the flange-to-web weld"
+      },
       "FlangeDeflectors": {
         "Angle": "L4x3x5/16",
         "VerticalLeg": 0.1016,
