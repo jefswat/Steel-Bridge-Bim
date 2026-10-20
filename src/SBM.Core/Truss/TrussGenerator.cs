@@ -71,7 +71,7 @@ public static class TrussGenerator
         private readonly Dictionary<string, TrussBuiltSection> _sec = new(StringComparer.OrdinalIgnoreCase);
         private readonly List<Inst> _inst = new();
         private readonly HashSet<string> _warned = new();
-        private sealed record JointCtx(string Plane, string Point, List<Inst> Here, TrussJointDefinition Def, double X, double Tg, Vec3 P, Vec3 U, Vec3 V, Vec3 N, List<Vec2> Outline, string Asm);
+        private sealed record JointCtx(string Plane, string Point, List<Inst> Here, TrussJointDefinition Def, double X, double Tg, Vec3 P, Vec3 U, Vec3 V, Vec3 N, List<Vec2> Outline, string Asm, List<(List<Vec2> poly, double t)>? Layers = null);
         private readonly List<JointCtx> _jointRivets = new();
         private readonly List<(string plane, string point, Vec3 P, Vec3 ax, Vec3 yv, double a0, double a1, double y0, double y1, double t)> _insidePlates = new();
 
@@ -591,7 +591,113 @@ public static class TrussGenerator
             }
             foreach (var m in here.Where(i => i.Sec.HalfWidthAtJoints > X + 1e-4))
                 Warn($"Truss CHECK joint {pt} ({pl}): member {m.Mark} is {L(2 * m.Sec.HalfWidthAtJoints)} wide, more than the gusset inside distance {L(2 * X)} - it overlaps the gusset plates.");
-            if (jdef is { Rivets.Count: > 0 }) _jointRivets.Add(new JointCtx(pl, pt, here, jdef, X, tg, P, u, v, n, outline, asmMark));
+            var layers = BuildGussetLayers(pl, pt, jdef, outline, X, tg, P, u, v, n, asmMark, chords.FirstOrDefault()?.Sec.Definition.Material ?? "", asu);
+            Model.GussetStacks.Add(new TrussGussetStack(pl, pt, new[] { tg }.Concat(layers.Select(l => l.t)).ToList(), new[] { area }.Concat(layers.Select(l => Math.Abs(MeshBuilder.SignedArea(l.poly)))).ToList()));
+            if (jdef is { Rivets.Count: > 0 }) _jointRivets.Add(new JointCtx(pl, pt, here, jdef, X, tg, P, u, v, n, outline, asmMark, layers));
+        }
+
+        /// <summary>Further gusset layers of a joint (<see cref="TrussJointDefinition.GussetLayers"/>), one plate per face each, stacked outward on the
+        /// inner gusset (offset = sum of the thicknesses under it). Returns the layer outlines (joint u, v) with their thickness.</summary>
+        private List<(List<Vec2> poly, double t)> BuildGussetLayers(string pl, string pt, TrussJointDefinition? jdef, List<Vec2> baseOutline, double X, double tg,
+            Vec3 P, Vec3 u, Vec3 v, Vec3 n, string asmMark, string baseMaterial, Assumption? baseFlag)
+        {
+            var res = new List<(List<Vec2> poly, double t)>();
+            if (jdef?.GussetLayers is not { Count: > 0 } defs) return res;
+            bool baseConvex = IsConvex(baseOutline);
+            double off = tg;
+            for (int k = 0; k < defs.Count; k++)
+            {
+                var ld = defs[k];
+                string name = $"gusset layer {k + 2} of joint {pt} ({pl}){(ld.Label.Length > 0 ? " '" + ld.Label + "'" : "")}";
+                if (ld.Thickness <= 0) { Warn($"Truss: {name} - thickness missing; not built{(ld.Unresolved.Length > 0 ? " (" + ld.Unresolved + ")" : "")}."); continue; }
+                var poly = ld.Outline.Count >= 3 ? ld.Outline.Select(q => new Vec2(q.U, q.V)).ToList() : new List<Vec2>(baseOutline);
+                if (MeshBuilder.SignedArea(poly) < 0) poly.Reverse();
+                if (ld.Outline.Count >= 3 && ld.ClipToGusset)
+                {
+                    double a0 = MeshBuilder.SignedArea(poly);
+                    if (baseConvex) poly = ClipConvex(poly, baseOutline);
+                    else if (IsConvex(poly)) { var c = ClipConvex(baseOutline, poly); poly = c; }
+                    else Warn($"Truss: {name} - neither the layer nor the inner gusset outline is convex; the layer is not clipped to the gusset.");
+                    if (poly.Count < 3) { Warn($"Truss: {name} - the layer outline does not overlap the inner gusset; not built."); continue; }
+                    if (MeshBuilder.SignedArea(poly) < 0) poly.Reverse();
+                    double a1 = MeshBuilder.SignedArea(poly);
+                    if (a1 < a0 * 0.98)
+                        Info($"Truss: {name} clipped to the inner gusset outline{(jdef!.Outline.Count >= 3 ? "" : " (envelope)")}: {a0 / 0.09290304:0.0} -> {a1 / 0.09290304:0.0} SF per plate.");
+                }
+                // a layer resting on a partial layer under it would bridge a gap where that layer is missing
+                foreach (var (q, _) in res)
+                    if (poly.Any(p => !InsideOrOn(q, p)))
+                    { Warn($"Truss CHECK {name}: it extends past layer under it - the stack is built at constant offsets (a gap / fill where the lower layer is missing)."); break; }
+                string flagText = string.Join("; ", new[] { ld.Unresolved }.Where(s => s.Length > 0));
+                if (ld.Unresolved.Length > 0) Warn(ld.Unresolved);
+                var asu = flagText.Length > 0 ? Assumption.UnresolvedDimension(flagText + $" (joint {pt}){Src}", $"gusset layer {TrussSections.FormatIn(ld.Thickness)} stacked outside the inner gusset") : ld.Outline.Count >= 3 ? null : baseFlag;
+                double area = Math.Abs(MeshBuilder.SignedArea(poly));
+                foreach (int side in new[] { -1, 1 })
+                {
+                    var mesh = new Mesh();
+                    var fr = new Frame3(P + n * (side * (X + off)), u, v, n);
+                    if (side > 0) MeshBuilder.AddExtrusion(mesh, poly, fr, 0, ld.Thickness); else MeshBuilder.AddExtrusion(mesh, poly, fr, -ld.Thickness, 0);
+                    string mark = $"{pl}-G{pt}-{(side < 0 ? "L" : "R")}{k + 2}";
+                    Model.Steel.Parts.Add(new SteelPart
+                    {
+                        Mark = mark, Category = PartCategory.TrussGusset, Assembly = asmMark,
+                        Description = $"gusset PL {TrussSections.FormatIn(ld.Thickness)} at {pt}, layer {k + 2} of {defs.Count + 1} (outside {TrussSections.FormatIn(off)}){(ld.Label.Length > 0 ? " " + ld.Label : "")} ({area / 0.09290304:0.0} SF)",
+                        Mesh = mesh, Material = ld.Material.Length > 0 ? Material(ld.Material) : Material(baseMaterial), Length = poly.Max(q => q.X) - poly.Min(q => q.X), Assumption = asu,
+                    });
+                    Model.PanelOf[mark] = $"Joint {pt}";
+                    Model.Gussets++;
+                }
+                res.Add((poly, ld.Thickness));
+                off += ld.Thickness;
+            }
+            return res;
+        }
+
+        private static bool IsConvex(List<Vec2> poly)
+        {
+            if (poly.Count < 3) return false;
+            int sign = 0;
+            for (int i = 0; i < poly.Count; i++)
+            {
+                var a = poly[i]; var b = poly[(i + 1) % poly.Count]; var c = poly[(i + 2) % poly.Count];
+                double cr = (b.X - a.X) * (c.Y - b.Y) - (b.Y - a.Y) * (c.X - b.X);
+                if (Math.Abs(cr) < 1e-12) continue;
+                int s = Math.Sign(cr);
+                if (sign == 0) sign = s; else if (s != sign) return false;
+            }
+            return true;
+        }
+
+        /// <summary>Point inside a polygon or within 1 mm of its boundary.</summary>
+        private static bool InsideOrOn(List<Vec2> poly, Vec2 p)
+        {
+            bool inside = false;
+            for (int i = 0, j = poly.Count - 1; i < poly.Count; j = i++)
+            {
+                var a = poly[i]; var b = poly[j];
+                if ((a.Y > p.Y) != (b.Y > p.Y) && p.X < (b.X - a.X) * (p.Y - a.Y) / (b.Y - a.Y) + a.X) inside = !inside;
+                var ab = b - a; double l2 = ab.X * ab.X + ab.Y * ab.Y;
+                double t = l2 < 1e-18 ? 0 : Math.Clamp(((p.X - a.X) * ab.X + (p.Y - a.Y) * ab.Y) / l2, 0, 1);
+                double dx = a.X + ab.X * t - p.X, dy = a.Y + ab.Y * t - p.Y;
+                if (dx * dx + dy * dy < 1e-6) return true;
+            }
+            return inside;
+        }
+
+        /// <summary>Thickness of the gusset stack (inner gusset + layers up to the outermost one present) at a joint point (u, v).</summary>
+        private static double StackAt(JointCtx c, Vec3 at)
+        {
+            double tot = c.Tg;
+            if (c.Layers is not { Count: > 0 }) return tot;
+            var w = at - c.P;
+            var uv = new Vec2(Vec3.Dot(w, c.U), Vec3.Dot(w, c.V));
+            double cum = c.Tg;
+            foreach (var (poly, t) in c.Layers)
+            {
+                cum += t;
+                if (InsideOrOn(poly, uv)) tot = cum;
+            }
+            return tot;
         }
 
         // ------------------------------------------------------------------ rivets (joint groups after the joint plates: the grip includes the inside splice plates)
@@ -654,7 +760,7 @@ public static class TrussGenerator
                     {
                         double y = (r - (rows - 1) / 2.0) * rg.Gage;
                         var c0 = c.P + d1 * (t0 + rg.FirstFromEnd + k * rg.Pitch) + m.Y * (y + m.Def.OffsetZ);
-                        AddRivet(c0 + c.N * (side * (c.X + c.Tg)), c.N * (-side), d1, Grip(c, m, c0), dia, c.Asm, rg.Material, asu);
+                        AddRivet(c0 + c.N * (side * (c.X + StackAt(c, c0))), c.N * (-side), d1, Grip(c, m, c0), dia, c.Asm, rg.Material, asu);
                         placed++;
                     }
             }
@@ -666,7 +772,7 @@ public static class TrussGenerator
         private double Grip(JointCtx c, Inst m, Vec3 at)
         {
             double inner = m.Sec.WebInnerX > 0 ? m.Sec.WebInnerX : c.X - m.Sec.OuterPly;
-            double g = c.Tg + Math.Max(m.Sec.OuterPly, c.X - inner);
+            double g = StackAt(c, at) + Math.Max(m.Sec.OuterPly, c.X - inner);
             if (IsChord(m.Def.Role))
                 foreach (var ip in _insidePlates)
                 {
@@ -813,7 +919,7 @@ public static class TrussGenerator
             {
                 var c0 = c.P + d1 * t + m.Y * y;
                 foreach (int side in new[] { -1, 1 })
-                    AddRivet(c0 + c.N * (side * (c.X + c.Tg)), c.N * (-side), d1, Grip(c, m, c0), dia, c.Asm, rg.Material, asu);
+                    AddRivet(c0 + c.N * (side * (c.X + StackAt(c, c0))), c.N * (-side), d1, Grip(c, m, c0), dia, c.Asm, rg.Material, asu);
             }
             Info($"Truss: joint {c.Point} ({c.Plane}) member {m.Mark}: {2 * count} rivets {TrussSections.FormatIn(dia)} ({count} per gusset face, grid {TrussSections.FormatIn(s)}){(rg.Source.Length > 0 ? " (" + rg.Source + ")" : "")}.");
         }

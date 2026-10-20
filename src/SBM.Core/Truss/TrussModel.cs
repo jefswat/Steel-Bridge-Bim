@@ -21,6 +21,14 @@ public sealed record TrussSuspenderResult(string Name, string Plane, Vec3 UpperP
 /// <summary>Generated shoe: pin centre, masonry plate bottom (seat), type.</summary>
 public sealed record TrussShoeResult(string Name, string Support, Bridge.TrussShoeType Type, Vec3 Pin, double SeatElevation, Vec2 Location);
 
+/// <summary>Gusset stack of one joint on one plane (per face; both faces alike): thickness of every layer from the inner gusset outward, plate area of
+/// each layer (m2, one face) and the total stack thickness where all layers overlap.</summary>
+public sealed record TrussGussetStack(string Plane, string Point, IReadOnlyList<double> Thicknesses, IReadOnlyList<double> Areas)
+{
+    public int Layers => Thicknesses.Count;
+    public double TotalThickness => Thicknesses.Sum();
+}
+
 /// <summary>Generated truss: steel (parts, assemblies, rivets, bearing seats), deck slab, data items and checks.</summary>
 public sealed class TrussModel
 {
@@ -38,6 +46,8 @@ public sealed class TrussModel
     /// <summary>Truss name (database group).</summary>
     public string Name { get; init; } = "Truss";
     public int Gussets { get; set; }
+    /// <summary>Gusset stacks per joint and plane (one entry per joint that got gussets; single-plate joints have one layer).</summary>
+    public List<TrussGussetStack> GussetStacks { get; } = new();
     /// <summary>Splice / fill plates built from <see cref="Bridge.TrussJointDefinition.Plates"/>.</summary>
     public int SplicePlates { get; set; }
     public int Rivets => Steel.Bolts.Count(b => b.Kind == BoltKind.Rivet);
