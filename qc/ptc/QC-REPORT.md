@@ -24,3 +24,12 @@ FAIL / CONFLICT:
 
 ## Method notes
 Member axes were fitted from IFC meshes (slab bounding-box centres, least squares); axis evaluation carries about 0.005 ft bias, within tolerance. Station = distance along the IFC alignment tangent + 63800 ft. Gutter = IFC centerline profile - 0.400 (p.43 note). Scripts in `work/` (geom.csv, girder_prof.csv, chk_*.py). Temporary images in `work/` remain (cs_*.png contact sheets from the earlier run); delete as needed.
+
+## Back-check (originator, 2026-10-20)
+Answers per issue in `results/answers.csv`.
+- I002 / I003 FIXED (commit 9362334): the data (`truss-approach/members.csv`) agreed with p.47 / p.57; `truss-ptc-approach.csx` keyed the 1954 sections by the printed name only, so 14 WF 87 and 14 WF 142 took the letter of their first row. The 4-span units had the same error (L12-L14, L16-U17 should be S; U3-L4, L4-U5, L14-U15, U15-L16 should be C). Sections are now per shape and letter; new check-truss-ptc-approach section 5b compares every truss-line member with its table row (old model 20 / 24 / 24 / 20 mismatches, now 0). Run order truss-ptc-approach .. rivets-ptc re-run.
+- I006 ANSWERED: p.44 dimensions 9'-6 1/2 b. to b. Ls on the 114 in. web (angles 1/4 in. proud); 114 1/2 + 6 x 13/16 = 9.948 ft = model.
+- I004 accepted plan conflict (p.69 L13 140.7820 vs member closure / wind chord 140.7620, already reported by check-truss-ptc).
+- I005 accepted plan conflict (as-built E abutment 711+92.797 per p.38 / 32 / 42 / 43; p.1 superseded; printed abutment seats 0.07 ft below the p.44 stack at both abutments, model takes the printed values).
+- I001 answered: open, list of unmodeled steel and per-item numbers in answers.csv.
+Check counts before / after: check-truss-ptc-approach 1046 PASS / 12 DIFF -> 1050 / 12 (+4 new material rows, all PASS); check-ptc-delaware-river 376 / 44 -> 376 / 44 (approach C / S rows move 1-2 %, totals unchanged; structural steel 84.1 % of p.42); check-girders-ptc 131 / 6 (not affected). Please re-run the p.47 material rows and the p.42 carbon / silicon rows on a fresh export.
