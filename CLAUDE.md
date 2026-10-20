@@ -928,6 +928,17 @@ UNRESOLVED FLAG (general, reusable): `SBM.Core/Assumption.cs` `Assumption{Status
   re-runs rebar-nht-sub.csx; check-nht prints those seats as CONFLICT rows and checks them against the arch BearingSeat). Checks (v7): check-arch-nht 1077 OK
   / 507 DIFF (same code on the v6 model: 1076 / 508; the stated v6 baseline 1064 / 508 predates later main commits), check-nht 827 PASS / 6 FAIL + 4 CONFLICT,
   tests 498, Woodbury IFC identical (FILE_NAME only), NHT IFC 0 issues.
+  v8 KNUCKLE (2026-10-20, design note section 14; all OPTIONAL, defaults = v7): `ArchDeckDefinition.KnuckleRibBoxFill` (+ `KnuckleRibBoxFillFlag`; user decision d21 = assumption
+  confirmed by the user, plans neither show it filled nor formed) = concrete between the inner faces of the outside / inside arch flange plates, end web inside face to
+  the plates' intrados edge, end flange top to the finished grade (`ArchGeneratorKnuckleFill.cs` `RibBoxFill`, built in KnuckleCorner, appended to `SlabEnds` = the deck
+  IfcSlab second body / DB / quantities; steel inside not subtracted: `ArchModel.RibBoxFillVolume / RibBoxFillSteelVolume`, NHT 0.335 / 0.036 CY). d22 / t30 overlaps:
+  NHT bearing CL = T + 2" ALONG the tie chord (p.124; the csx took it normal to the T0-T34' end chord: 15/16" sideways), `ArchKnuckleDetail.CheeseFromBearing` (cheese
+  plates along the tie chord from 8" each side of CL brg = abutting the 1'-4 upper sole, CheeseLength outward, end-side plate cut at the end flange end; p.124 A-A vector),
+  `ArchPtSystem.AnchorBackOnEndWeb` (+ `AnchorWedgeUnresolved`: anchorage envelope back on the skewed end web inside face, p.155 drawn block), `ArchKnuckleDetail.FloorbeamsStopAtEndFlange`
+  (+ `FloorbeamEndUnresolved`: floorbeam flange + bottom connection plates clipped at the end flange inner edge, bolts there not modeled; T1 / T33' lie on that edge, p.126;
+  end floorbeam sheet not in the set) + `FloorbeamFillConflicts` (CONFLICT rows: bottom plate vs the knuckle fill under the tie flange, p.146 vs p.124). t32: curbs continuous
+  around the inside arch flange plate (p.151), curb end lines taken at the grade in the tilted frame. Clash (arch, bolts) 5,948 -> 5,896; check-arch-nht 1077 OK / 573 DIFF
+  (+2 CONFLICT), check-nht 827 / 6, check-rail-base 0 jumps / 0 bridged.
 - True-arc plate outlines (generic): `Solids/ArcPolygon` (points + signed minor-arc radii per edge, exact area, tessellation, Sub / Map / Reversed),
   `PlateBuilder.AddPlanarArc` (mesh from the tessellation, `ExtrudedSolid.ExactOutline` keeps the arcs) -> IFC Parametric IfcIndexedPolyCurve with
   IfcArcIndex, ReferenceView tessellated to its chord tolerance. Tests `ArchBracingConnectionTests`. Tests `ArchTests`, `ArchV2Tests`. Knuckle visual check without a snapshot: `temp`-style dump of part triangles + a small
@@ -1027,10 +1038,10 @@ UNRESOLVED FLAG (general, reusable): `SBM.Core/Assumption.cs` `Assumption{Status
 - Pedestrian railing (OPTIONAL `BridgeDefinition.Railings` = list of `Bridge/PedestrianRailingDefinition.cs`, null = none, omitted from the .sbm): generic run
   along a REFERENCE LINE at a constant alignment offset (outward = side of the offset), limits = radial lines at Begin/EndStation, else the deck end lines,
   else the first / last support line + Begin/EndLimitOffset (arch: no deck result); base = highest top of the bridge's concrete under the line at `BaseProbe`
-  (`Railing/TopSurface`: deck, haunches incl. arch curbs, barriers / curbs, deck bumps; ends searched a few cm inward on skewed ends; no concrete = warning,
-  run not built; dips of the base narrower than `BaseBridgeGap` (0 = post spacing / 3, < 0 off) are bridged at the lower rim and reported as a warning:
-  NHT arch 2026-10-19 - the knuckle-zone curb outer edge is cut around the inside arch flange plate leg (~0.6 m, curb 4" -> a 2" sliver at the 5" probe), the
-  rail jogged 4 1/4"; plans p.151 show the curb continuous, so the bridge is UNRESOLVED-flagged; `check-rail-base.csx` lists base jumps > 1/4"). Components: `Envelope` (section swept continuously = placeholder of a railing whose post / fence details are missing, mass from
+  (`Railing/TopSurface`: deck, haunches incl. arch curbs, barriers / curbs, deck bumps; only UPWARD triangles flatter than 85 deg count as tops (2026-10-20: a slab
+  end face vertical in the arch's tilted frame or a bottom face reaching past the top edge gave end probes a mid-face height); ends searched a few cm inward on
+  skewed ends; no concrete = warning, run not built; dips of the base narrower than `BaseBridgeGap` (0 = post spacing / 3, < 0 off) are bridged at the lower
+  rim and reported as a warning (NHT arch: none since the knuckle-zone curbs are continuous, t32 2026-10-20); `check-rail-base.csx` lists base jumps > 1/4"). Components: `Envelope` (section swept continuously = placeholder of a railing whose post / fence details are missing, mass from
   `EnvelopeMassPerLength`), `Post` (side outline polygon extruded `Thickness` along the rail, plumb, n = ceil((L - 2e)/s) + 1 equally spaced) + `BasePlate`
   + anchor bolts (`BoltInstance` Anchor), `Members` (pipe / bar handrail and rails, `MassPerLength` override), `Unresolved` / per-component `Unresolved` +
   `Basis` (-> `SteelPart.Assumption`, layer 3D-UNRESOLVED-STEEL, IFC SBM_Status, DB status props). Generator `Railing/PedestrianRailingGenerator.cs`

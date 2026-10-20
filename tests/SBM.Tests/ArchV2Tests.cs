@@ -196,6 +196,52 @@ public class ArchV2Tests
     }
 
     [Fact]
+    public void KnuckleRibBoxFill_AddsConcreteBetweenTheArchFlangePlates()
+    {
+        double Vol(bool fill, out SBM.Core.Arch.ArchModel model)
+        {
+            var (p, b) = ArchTests.Model();
+            var a = b.Arch!;
+            var k = a.Knuckles.First(q => q.Name == "West");
+            k.Detail = new ArchKnuckleDetail { TieCutParallelToEndWeb = true };
+            k.EndWebInset = In(0.5);
+            k.Corners.Add(new ArchKnuckleCorner { Point = "T0", Rib = "South rib", Tie = "South tie", Splice = "RS1", OutsideLegHeight = In(10.5), InsideLegHeight = In(10.5), EndWebEndBeyondChord = In(8.3125) });
+            a.Deck!.KnuckleZonesFromSteel = true;
+            a.Deck.KnuckleRibBoxFill = fill;
+            var (_, m) = ArchTests.Generate(p);
+            model = m;
+            return Math.Abs(m.SlabEnds!.Volume());
+        }
+        double v0 = Vol(false, out var m0), v1 = Vol(true, out var m1);
+        Assert.Equal(0, m0.RibBoxFillVolume);
+        Assert.True(m1.RibBoxFillVolume > 0);
+        Assert.Equal(v0 + m1.RibBoxFillVolume, v1, 6);
+        // the steel inside the fill (stub web, tie web, stiffeners) is a small part of it, the arch flange plates are outside it
+        Assert.True(m1.RibBoxFillSteelVolume > 0 && m1.RibBoxFillSteelVolume < 0.25 * m1.RibBoxFillVolume);
+    }
+
+    [Fact]
+    public void KnuckleCheesePlates_AlongTheTieChord_FromTheBearing()
+    {
+        var (p, b) = ArchTests.Model();
+        var a = b.Arch!;
+        var k = a.Knuckles.First(q => q.Name == "West");
+        k.Detail = new ArchKnuckleDetail { TieCutParallelToEndWeb = true, CheeseFromBearing = In(8), CheeseLength = In(11) };
+        k.Corners.Add(new ArchKnuckleCorner { Point = "T0", Rib = "South rib", Tie = "South tie", Splice = "RS1", OutsideLegHeight = In(10.5), InsideLegHeight = In(10.5) });
+        var (_, m) = ArchTests.Generate(p);
+        var t0 = a.Point("T0")!.Vec.XY; var t34 = a.Point("T34")!.Vec.XY;
+        var c = (t34 - t0).Normalized();
+        var ch = m.Steel.Parts.First(q => q.Mark == "KNUCKLE-WEST-T0-CH");
+        var along = ch.Mesh.Positions.Select(q => Vec2.Dot(m.Local(q).XY - t0, c)).ToList();
+        double brg = k.Detail.BearingFromSpringing;
+        // inner edges 8" each side of the CL bearing (square to the chord), span-side plate 11" long
+        Assert.Contains(along, x => Math.Abs(x - (brg + In(8))) < 1e-6);
+        Assert.Contains(along, x => Math.Abs(x - (brg - In(8))) < 1e-6);
+        Assert.Equal(brg + In(19), along.Max(), 6);
+        Assert.DoesNotContain(along, x => x > brg - In(8) + 1e-6 && x < brg + In(8) - 1e-6);
+    }
+
+    [Fact]
     public void Pt_DeckRebar_Ifc()
     {
         var (p, b) = ArchTests.Model();
