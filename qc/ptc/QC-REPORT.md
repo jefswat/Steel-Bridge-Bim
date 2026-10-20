@@ -78,3 +78,30 @@ Bookkeeping: while recording I mistakenly removed rows C0224-C1041 for about 15 
 
 ## Still open after pass 2
 Gusset thicknesses and joint plates (p.50-53, 59-67, 74-90), splices and fills, lateral / sway bracing (p.56, 71, 97-99), portal p.100, suspended floor p.72 / 94 / 95, girder stiffeners (p.44), walkways / platforms (p.101-106), railing and parapet details (p.108), expansion dam details (p.51 / 52 / 91 / 92), abutment sections (p.12, 39), culvert (p.14), pile counts at piers 18 / 19, shoes at piers 11 / 26 (p.52), 14 / 16 / 21 / 23 (p.63), 15 / 22 (p.67), 10 / 13 / 17 / 20 / 24 / 27 (p.59), rivets (226,632 in the registry; not checked), the clash run (not allowed), element-by-element reconciliation (unverified-element list not produced).
+
+---
+
+# Back-check round 2 (originator, 2026-10-20)
+Answers per issue in `results/answers.csv` (I007-I017). Fix commit 399bd51 (generic truss inputs + PTC data; run order substructure-ptc, truss-ptc-arch, truss-ptc-approach, girders-ptc, deck-ptc, connections-ptc, shoes-ptc, walkways-ptc, rivets-ptc re-run; the model copies `PTC main truss 18-20.sbm` / `PTC approach trusses.sbm` updated by their truss scripts).
+- I009 FIXED: 4-span cover plates (p.57) built, one per flange, gusset edge to gusset edge (p.60; new `TrussPlate.BetweenGussets`). Section areas = 114.37 / 127.40 / 129.47 / 114.30; the volume / length mean is about 3 % lower because the plates stop at the end gussets (by plan). 3-span p.47 has no plated members.
+- I010 already FIXED in round 1 (9362334; the checker's IFC predates it): section 5b 0 mismatches in all four approach units.
+- I011 FIXED: the p.70 293.67 / 217.17 are the post without the 34 x 9/16 o.s. plates / without the 34 x 1 1/8 too (perforated covers are counted at full width in the table, as in the model); both plates are now partial (p.69 elevation, flagged). Mean area 332.17 -> 277.25.
+- I012 FIXED: the 13 members are all 2-18[ channel members; AISC v16 MC18 polygons were 0.29 sq in per channel larger than the 1954 channels; now built at the 1954 areas from p.70 (new `ShapeArea`): 45.98 / 54.76 / 61.86 / 58.36 / 65.46 exact.
+- I014 FIXED: p.9 / p.36 B-B stepped top read again (low step 1'-9 / 3'-2 about the truss shoe line): bases 12.4975 / 12.8725 ft = 12'-6 / 12'-10 1/2.
+- I015 FIXED: column 8 = 8 piles on the 1'-6 offset rows; piers 17 / 20 196 piles.
+- I016 FIXED: F3 / F4 partial cover plates per p.55 (F3 bottom 20'-0; F4 top 28'-0, bottom 40'-0 + 28'-0), centred (flagged).
+- I017 FIXED: every approach 14 / 16 WF at its printed area (sharp-root polygons lacked the fillets).
+- I007 ANSWERED, model kept: the chord / gussets end 1'-5 1/2 (17.7 in.) past the pin line on p.73 (scale from 1'-6 3/4 and 3'-8); 0.5-0.7 ft is the end strut face. p.69 62.0254 = working points; solid = 62.0254 + 1'-5 + 0.007.
+- I008 ANSWERED: solid length = working-point length + half depth x tan(deflection / 2) per end (square cuts closing the joint); working-point lengths match p.69 (generator checks PASS); L21-L22 31.0199 + 0.1084 = 31.1283.
+- I013 ACCEPTED plan conflict: rows U13-L14 / U14-L15 print 118.69 / 116.69 for 2-Pls 26 x 1 / 28 x 1 (arithmetic 116.69 / 120.69) with the same net area 82.35; model follows the section text.
+
+Check counts before / after (same session, before = previous CLI on the round-1 model):
+| script | before | after |
+|---|---|---|
+| check-truss-ptc (main truss model) | 405 PASS / 11 DIFF / 35 INFO | 405 / 11 / 35 |
+| check-truss-ptc-approach | 1050 PASS / 12 DIFF / 100 INFO | 1192 / 12 / 108 (+142 section 5c gross-area rows, all PASS; +8 INFO mean areas) |
+| check-ptc-delaware-river | 376 PASS / 44 DIFF | 378 / 42 (piers 10 / 27 bases) |
+| check-girders-ptc | 131 PASS / 6 DIFF / 14 INFO | 131 / 6 / 14 |
+
+p.42 steel by group (model / plan): 4-span silicon 84.3 % -> 89.7 %, 3-span silicon 87.9 % -> 92.0 % (floor beam plates), arch silicon 97.2 % -> 96.5 % (post plies now partial). Please re-check I009 / I011 / I012 / I014-I017 on a fresh export; for areas read the mid-member section (or volume / length knowing that cover plates stop at the gussets), and for chord lengths use the working points.
+
