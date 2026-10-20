@@ -135,6 +135,37 @@ public class PedestrianRailingTests
         Assert.True(SteelModel.IsRailing(PartCategory.RailFabric));
     }
 
+    [Fact]
+    public void Railing_FabricMassNotCounted_KeepsPanelsAndAreaButNoMass()
+    {
+        var probe = SampleProject.Create().Bridges[0];
+        double off = probe.Deck.RightEdgeOffset - CurbW;
+        RailingModel Gen(bool notCounted)
+        {
+            var r = Rail(null, off);
+            r.Envelope = null; r.EnvelopeMassPerLength = 0; r.Members.Clear();
+            r.Post!.BasePlate = null; r.Post.GridStation = probe.Supports[0].Station + Ft(10); r.Post.Spacing = Ft(8); r.Post.Thickness = In(6);
+            r.Fabric = new RailFabricDefinition
+            {
+                Description = "test fabric", Path = new() { new(In(8), 0), new(In(8), In(42)) }, OffsetFromPost = In(0.15), BottomH = 0, Thickness = In(0.3), MassPerArea = 1.95,
+                Material = "Chain link", MassNotCounted = notCounted,
+            };
+            var (f, c, p) = Build(r);
+            return PedestrianRailingGenerator.Generate(f, c, p.Units);
+        }
+        var counted = Gen(false); var not = Gen(true);
+        var rc = Assert.Single(counted.Runs); var rn = Assert.Single(not.Runs);
+        Assert.True(rc.FabricMass > 0);
+        Assert.Equal(rc.FabricPanels, rn.FabricPanels);
+        Assert.Equal(rc.FabricArea, rn.FabricArea, 6);
+        Assert.Equal(0, rn.FabricMass);
+        Assert.Equal(rc.Mass - rc.FabricMass, rn.Mass, 6);
+        Assert.All(not.Parts.Where(x => x.Category == PartCategory.RailFabric), x => Assert.Equal(0, x.Mass));
+        // default is omitted from the JSON
+        Assert.DoesNotContain("MassNotCounted", System.Text.Json.JsonSerializer.Serialize(counted.Runs.Count > 0 ? new RailFabricDefinition() : null));
+        Assert.Contains("MassNotCounted", System.Text.Json.JsonSerializer.Serialize(new RailFabricDefinition { MassNotCounted = true }));
+    }
+
     private static double MeshBuilderArea(List<RailPoint> pts) => SBM.Core.Solids.MeshBuilder.SignedArea(pts.Select(q => new Vec2(q.R, q.H)).ToList());
 
     [Fact]

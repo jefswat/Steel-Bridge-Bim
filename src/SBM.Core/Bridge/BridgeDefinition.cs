@@ -596,8 +596,46 @@ public sealed class DeckEdgeStrip
     public DeckEdgeStrip Clone() => (DeckEdgeStrip)MemberwiseClone();
 }
 
+/// <summary>
+/// Deck overhang soffit (OPTIONAL <see cref="DeckDefinition.Overhang"/>, null = a flat slab of <see cref="DeckDefinition.Thickness"/> to the edges; JSON omitted
+/// when null): beyond the line <see cref="Length"/> inboard of a deck edge the slab bottom slopes in a straight line from <see cref="RootThickness"/> (slab
+/// thickness there, measured from the finished grade straight down) to <see cref="TipThickness"/> at the edge (Iowa DOT overhang drawn 9" at the tip, deeper
+/// at the exterior girder flange). Constant-width decks only (a variable width ignores it, reported). The deck bars / views still use <see cref="DeckDefinition.Thickness"/>.
+/// </summary>
+public sealed class DeckOverhangDefinition
+{
+    /// <summary>Slab thickness at the deck edge.</summary>
+    public double TipThickness { get; set; }
+    /// <summary>Slab thickness <see cref="Length"/> inboard of the edge (where the sloped soffit starts).</summary>
+    public double RootThickness { get; set; }
+    /// <summary>Horizontal length from the edge over which the soffit slopes.</summary>
+    public double Length { get; set; }
+    public bool Left { get; set; } = true;
+    public bool Right { get; set; } = true;
+    /// <summary>Plan page / note.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public string? Source { get; set; }
+    /// <summary>OPTIONAL UNRESOLVED text (a value that is only drawn / scaled), raised as a warning.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public string? Unresolved { get; set; }
+    public DeckOverhangDefinition Clone() => (DeckOverhangDefinition)MemberwiseClone();
+
+    /// <summary>Slab thickness at an offset (right positive) of a deck between <paramref name="left"/> and <paramref name="right"/>, else <paramref name="flat"/>.</summary>
+    public double ThicknessAt(double o, double left, double right, double flat)
+    {
+        double best = flat;
+        if (Left && Length > 1e-9 && o - left < Length) best = Math.Max(best, Blend(Math.Max(0, o - left)));
+        if (Right && Length > 1e-9 && right - o < Length) best = Math.Max(best, Blend(Math.Max(0, right - o)));
+        return best;
+    }
+    private double Blend(double fromEdge) => TipThickness + (RootThickness - TipThickness) * Math.Min(1, fromEdge / Length);
+}
+
 public sealed class DeckDefinition
 {
+    /// <summary>Optional sloped overhang soffit (see <see cref="DeckOverhangDefinition"/>); null = flat slab.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public DeckOverhangDefinition? Overhang { get; set; }
     /// <summary>Optional level strip at the deck edges (see <see cref="DeckEdgeStrip"/>); null = the cross-slope plane to the edge.</summary>
     public DeckEdgeStrip? EdgeStrip { get; set; }
 
@@ -667,7 +705,7 @@ public sealed class DeckDefinition
         LeftEdgeOffset = LeftEdgeOffset, RightEdgeOffset = RightEdgeOffset, Thickness = Thickness, Haunch = Haunch,
         LeftEdgeTable = LeftEdgeTable?.Select(p => p.Clone()).ToList(), RightEdgeTable = RightEdgeTable?.Select(p => p.Clone()).ToList(),
         OverhangThickness = OverhangThickness, StayInPlaceForms = StayInPlaceForms, SipFormDepth = SipFormDepth,
-        Barrier = Barrier.Clone(), Reinforcement = Reinforcement.Clone(), EdgeStrip = EdgeStrip?.Clone(),
+        Barrier = Barrier.Clone(), Reinforcement = Reinforcement.Clone(), EdgeStrip = EdgeStrip?.Clone(), Overhang = Overhang?.Clone(),
     };
 }
 

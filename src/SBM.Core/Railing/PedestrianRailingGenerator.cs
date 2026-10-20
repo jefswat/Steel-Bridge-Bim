@@ -346,7 +346,7 @@ public static class PedestrianRailingGenerator
                     {
                         Mark = $"{asm}-FAB{panels}", Category = PartCategory.RailFabric, Assembly = asm, Mesh = fm, Length = b1 - b0,
                         Material = fab.Material.Length > 0 ? fab.Material : d.Material, Density = dens,
-                        Description = fab.Description.Length > 0 ? fab.Description : "fence fabric panel", Assumption = fflag,
+                        Description = fab.Description.Length > 0 ? fab.Description : "fence fabric panel", Assumption = fflag, MassNotCounted = fab.MassNotCounted,
                     };
                     res.Parts.Add(part); mass += part.Mass; fabMass += part.Mass;
                     fabArea += part.Volume / fab.Thickness;

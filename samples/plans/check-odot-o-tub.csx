@@ -87,7 +87,7 @@ for (int g = 0; g < 2; g++)
     {
         double m = Brg(g, j + 1) - Brg(g, j);
         Len($"G{g + 1} span {14 + j} CL brg to CL brg (elevation sheet)", spanPlan[g][j], m);
-        if (Math.Abs(panelPlan[g][j] - spanPlan[g][j]) > 1e-6) Len($"G{g + 1} span {14 + j} bracing panel string (framing plan p.273)", panelPlan[g][j], m, "plan strings disagree with each other");
+        if (Math.Abs(panelPlan[g][j] - spanPlan[g][j]) > 1e-6) Len($"G{g + 1} span {14 + j} bracing panel string (framing plan p.273)", panelPlan[g][j], m, g == 1 && j == 2 ? "PLAN CONFLICT: p.273 prints 160'-9 1/2, p.279 160'-9 3/8; p.279 governs (user decision d14 2026-10-20: its strings close to 459'-9 1/4, p.273's 1/2 = drafting slip); model CL brg pier 16 = CL pier - 1'-0 1/12 (306+13.993)" : "plan strings disagree with each other");
     }
 Print("== field splices (CL brg to CL splice along the girder) and derived plan dimensions");
 Len("G1 FS2 to FS3 (65'-2 3/4 BOTH)", F(65, 2, 3, 4), Fs(0, 3) - Fs(0, 2));

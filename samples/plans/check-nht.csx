@@ -318,7 +318,7 @@ foreach (var (type, dl) in new[] { ("RAIL (PED)(LOW)", 50.0), ("RAIL (PED)(HIGH)
     var rr = runs.Where(r => r.TypeName == type).ToList();
     double lf = rr.Sum(r => r.Length) / ft;
     if (lf <= 0) continue;
-    Print($"INFO  {type}: modeled mass {rr.Sum(r => r.Mass) * 2.20462 / lf:0.0} PLF (posts, handrail pipe weight not counted, fabric {rr.Sum(r => r.FabricMass) * 2.20462 / lf:0.0} PLF at the nominal 0.40 lb/ft2 chain link guess) vs the p.83 design dead load {dl:0} PLF ({rr.Sum(r => r.FabricArea) / (ft * ft):N0} sf of fabric, {rr.Sum(r => r.Posts)} posts)");
+    Print($"INFO  {type}: modeled mass {rr.Sum(r => r.Mass) * 2.20462 / lf:0.0} PLF (posts, handrail pipe weight not counted, fabric placeholder weight NOT counted: {rr.Sum(r => r.FabricMass) * 2.20462 / lf:0.0} PLF; its type is undetermined, sheets 224-226 missing, p.84 / p.89) vs the p.83 design dead load {dl:0} PLF ({rr.Sum(r => r.FabricArea) / (ft * ft):N0} sf of fabric, {rr.Sum(r => r.Posts)} posts)");
 }
 // curbs: 10" x 4" with two 3/4" chamfers = 39.44 in2; both sides together run 2 x the CL NHT length of the approach decks (curvature terms cancel) less the cut-back strips
 double curbV = unitNames.Sum(n => Doc.Model(n).Concrete?.Barriers.Where(x => x.Name.EndsWith("curb")).Sum(x => Math.Abs(x.Mesh.Volume())) ?? 0) / Math.Pow(ft, 3);

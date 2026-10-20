@@ -202,7 +202,7 @@ public sealed partial class ConcreteGenerator
         (double, Vec3) Slab(Vec3 p)
         {
             var iv = _a.Inverse(p.XY);
-            double d = iv.Distance, o = iv.Offset, top = Top(d, o), bot = top - Deck.Thickness;
+            double d = iv.Distance, o = iv.Offset, top = Top(d, o), bot = top - SlabT(o);
             double best = o - LeftAtD(d); var n = new Vec3(0, 0, 0);
             void Take(double v, Vec3 nn) { if (v < best) { best = v; n = nn; } }
             Take(RightAtD(d) - o, new Vec3(0, 0, 0));
@@ -320,8 +320,19 @@ public sealed partial class ConcreteGenerator
         foreach (double piv in PivotColumns()) if (piv > l && piv < r) list.Add(piv);
         foreach (var g in StripLines(l, r)) list.Add(g);
         foreach (var v in KinkVertices()) list.Add(_a.Inverse(v).Offset);
+        if (SlopedOverhang is { } oh)
+        {
+            if (oh.Left && l + oh.Length < r - 1e-6) list.Add(l + oh.Length);
+            if (oh.Right && r - oh.Length > l + 1e-6) list.Add(r - oh.Length);
+        }
         return list.Distinct().OrderBy(x => x).ToList();
     }
+
+    /// <summary>The optional sloped overhang soffit (constant-width decks only; a variable-width deck reports it ignored).</summary>
+    private DeckOverhangDefinition? SlopedOverhang => Deck.Overhang is { Length: > 0 } oh && !Deck.VariableWidth ? oh : null;
+
+    /// <summary>Slab thickness at an offset: <see cref="DeckDefinition.Thickness"/>, or the sloped overhang soffit near the edges.</summary>
+    private double SlabT(double o) => SlopedOverhang is { } oh ? oh.ThicknessAt(o, Deck.LeftEdgeOffset, Deck.RightEdgeOffset, Deck.Thickness) : Deck.Thickness;
 
     /// <summary>Deck grid columns at the crown (cross-slope pivot): the constant pivot offset, or with a varying pivot
     /// (<see cref="CrossSlopeTable.PivotOffsets"/>) every table offset; a crown that moves between columns inside the deck is
@@ -434,11 +445,16 @@ public sealed partial class ConcreteGenerator
 
     private void BuildDeckSolid()
     {
-        if (Deck.VariableWidth) { BuildVariableDeckSolid(); return; }
+        if (Deck.VariableWidth)
+        {
+            if (Deck.Overhang != null) Warn("Deck overhang soffit: a variable-width deck is not supported - the slab stays a flat " + _u.FormatLength(Deck.Thickness, LengthKind.Short) + " to the edges.");
+            BuildVariableDeckSolid(); return;
+        }
         var offs = DeckOffsets(1.0);
         var (b0, e0) = Ends(0, InsetB, InsetE);
         int ni = AlongSamples(e0 - b0) + 1;
-        if (_geo != null && NurbsDeck(offs.Select(o => (Func<double, double>)(_ => o)).ToList(), ref ni, out var nt, out var nb) is { } slab)
+        if (Deck.Overhang?.Unresolved is { Length: > 0 } ut) Warn(ut);
+        if (SlopedOverhang == null && _geo != null && NurbsDeck(offs.Select(o => (Func<double, double>)(_ => o)).ToList(), ref ni, out var nt, out var nb) is { } slab)
         {
             _m.Deck = GridSolid(nt, nb);
             _m.Deck.AddNurbs(slab.ToSolid("deck slab"), 0);
@@ -456,7 +472,7 @@ public sealed partial class ConcreteGenerator
                 var p = _a.PointAtDistance(d, offs[k]);
                 double z = Top(d, offs[k]);
                 top[i, k] = p.WithZ(z);
-                bot[i, k] = p.WithZ(z - Deck.Thickness);
+                bot[i, k] = p.WithZ(z - SlabT(offs[k]));
             }
         }
         _m.Deck = GridSolid(top, bot);

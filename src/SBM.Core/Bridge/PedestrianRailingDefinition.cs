@@ -73,6 +73,10 @@ public sealed class RailFabricDefinition
     public double Thickness { get; set; }
     /// <summary>Nominal mass per area of the fabric (kg/m2).</summary>
     public double MassPerArea { get; set; }
+    /// <summary>OPTIONAL: the fabric is a PLACEHOLDER whose type (and so weight) is not determined by the plans; the panels are modeled (volume, area) but their
+    /// mass counts as 0 in the part mass, the run mass, material lists and quantities. JSON omitted when false.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public bool MassNotCounted { get; set; }
     /// <summary>Gap between the fabric edge and the post face (along the rail).</summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public double PostClearance { get; set; }

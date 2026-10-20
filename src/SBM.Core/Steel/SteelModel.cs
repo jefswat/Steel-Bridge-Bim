@@ -94,7 +94,9 @@ public sealed class SteelPart
     /// <summary>OPTIONAL fabrication attributes from the plan notes (toughness, contact faces, NDT, coating, shop assembly, tolerances); null = none.
     /// IFC Pset SBM_FabricationAttributes.</summary>
     public Bridge.FabricationAttributes? Fabrication { get; set; }
-    public double Mass => NominalWeightLbPerFt > 0 ? NominalWeightLbPerFt * 1.48816394 * Length : Category switch
+    /// <summary>OPTIONAL: placeholder part whose weight is not determined (rail fence fabric of an undetermined type); <see cref="Mass"/> = 0.</summary>
+    public bool MassNotCounted { get; init; }
+    public double Mass => MassNotCounted ? 0 : NominalWeightLbPerFt > 0 ? NominalWeightLbPerFt * 1.48816394 * Length : Category switch
     {
         PartCategory.BearingPad or PartCategory.BearingDisc => Volume * 1150,
         PartCategory.Ptfe => Volume * 2200,

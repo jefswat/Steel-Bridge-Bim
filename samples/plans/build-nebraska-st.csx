@@ -142,6 +142,16 @@ br.Deck.RightEdgeOffset = F(7, 7);           // 6'-0 + 1'-7
 br.Deck.Thickness = I(8);                    // 8" incl. 1/2" integral wearing surface
 br.Deck.Haunch = I(3.5);                     // nominal haunch (11 1/2" top of deck to top of web)
 br.Deck.OverhangThickness = I(9);
+// p.24 typical section (user decision d23 2026-10-20): the overhang is 9" at the tip (dimensioned) and its soffit slopes in a straight line down to the exterior girder's top flange
+// edge. Vector read of the drawing (1.5 pt per inch): soffit from the flange edge 25" in from the tip, 11 3/4" below the finished grade there, to 9" at the tip (both sides assumed alike:
+// only the right half is drawn).
+br.Deck.Overhang = new DeckOverhangDefinition
+{
+    TipThickness = I(9), RootThickness = I(11.75), Length = I(25), Source = "p.24 typical section (overhang 9\" at the tip)",
+    Unresolved = SBM.Core.UnresolvedFlag.Text("p.24", "deck overhang soffit: depth at the exterior girder flange edge (11 3/4\") and where the slope starts (25\" from the tip)",
+        "only the 9\" at the tip is dimensioned; the soffit line to the flange edge is drawn, not dimensioned, so those two values are scaled from the drawing (1/8\" reading precision) and the left overhang is taken equal to the drawn right one",
+        "Soffit modeled as a straight line from 11 3/4\" thick, 25\" in from the deck edge, to 9\" at the edge, both edges."),
+};
 br.Deck.StayInPlaceForms = false;
 br.Deck.Reinforcement.Enabled = false;       // deck bars: bar list only (bar-lists.csv), bend diagrams not transcribed (G9)
 br.Deck.EdgeStrip = new DeckEdgeStrip { Width = F(1, 7) };   // deck under the rail level where the deck slopes toward the rail (p.24)
