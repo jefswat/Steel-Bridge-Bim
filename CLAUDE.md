@@ -1039,6 +1039,13 @@ UNRESOLVED FLAG (general, reusable): `SBM.Core/Assumption.cs` `Assumption{Status
   3D-RIVETS; IFC types keyed by diameter + grip + material. PTC: 226,632 rivets (main 56,872, each 3-span 13,880, each 4-span 35,360, girder spans 50,940 / 20,340), heads
   107.6 k lb; IFC 41 -> 105 MB (1.15 M entities; validate 0 issues); viewport buffers 186 -> 211 MB. Group text -> member mapping, p.70 diameter rules, skipped
   groups (cover plate splice plan views, member splices, lugs, bracing, stubs) and the third-pass CORRECTION rows: see TRUSS-DESIGN.md section 11.
+  REVIEW FIXES 2026-10-20 (user questions: edge stringer / floor beam length / main truss bearings; TRUSS-DESIGN.md section 12): generic OPTIONAL
+  `TrussMemberDefinition.DepthReductionStart/End` (tapered member: the section part below its axis rises by that amount at the cut end, linear, top straight;
+  Info "tapered members"), END chords (no chord continuing backward at the point) extended by a NEGATIVE setback now carry the envelope gusset to their end,
+  and `CheckShoeUnderChordEnd` warns "Truss CHECK shoe ... projects ... beyond the end of chord" when the shoe top (envelope top / Sole pieces) sticks out more
+  than 1 in. past an end chord. PTC data: approach S5 21 WF 62 at 39'-1 (was 33'-8: p.48 / p.58 / p.55 = 33'-0 + 6'-1, 8 in. inside the 10'-9 bracket tip),
+  B1 brackets tapered 6'-3 1/2 -> 2'-0 1/2 (p.55; girder spans via the p.45 note, tip now 39'-9), end chords at L0 / L0' extended past the shoe pin
+  (scaled, flagged: main 1'-5 p.73, approach 10 1/2 in. p.59). Shoes were already on the plan positions (pin under L0 / L11, checked).
 - Bonner Unit 6 (spans 30-35, 4 x FIB-96, `samples/plans/build-bonner-unit6.csx` -> `Bonner Unit 6 FIB.sbm`, reads docs/plan-data/bonner-b2500/fib-unit6
   CSVs; same -L- placement as Unit 5; terrain + georeference `samples/plans/terrain-bonner.csx`, `docs/plan-data/bonner-b2500/TERRAIN.md`): 24 SpanBeams, per-span layouts (G1 LEFT, CL bearing 1'-2" / 3'-2" bent 29 / 1'-4" bent 35), p439 strand pattern
   read from the VECTOR drawing (72 + 4 slack, 8 draped, 20 debonded), E1/E2/E3 + P sole plates, camber tables, bents 30-35 (level precast cap profile,

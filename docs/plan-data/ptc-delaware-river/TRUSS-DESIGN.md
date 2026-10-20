@@ -249,3 +249,30 @@ PTC (every open item is a flag with page + reason):
 - Corrections of the third pass applied: U0 gusset in-to-in 29 in. (connections-ptc reads the CORRECTION row), approach U20 gusset 5/8 (rivets-ptc, still flagged),
   shoes-ptc: L20 fixed shoe sole 10 3/16, wings 29 7/8, stems 2'-5 7/8 (both sheets), main L0 rocker wings / stiffeners 1 1/2 thick and base 6 3/4 (stack flag: 1/4 in. over the
   drawn pin height). Splice-plate corrections L19-L21 / U20-U21 change rows that have no length, so no built plate changes; p.50 splice bars 6 x 1'-8 kept flagged (not built).
+
+## 12. Review fixes (2026-10-20): edge stringer, floor beam / bracket length, chord ends at the end shoes
+
+User questions: "Is there an edge stringer missing?", "Is the floor beam too long?", "The main truss bearings are in the wrong spot, or the lower chord is
+trimmed too short." Checked in every unit (main 18-20, approach 11-13 / 14-17 / 21-24 / 25-27, girder spans 1-10 / 28-31).
+
+| Item | Plan | Model before | Model now |
+|---|---|---|---|
+| Outside stringer S5 21 WF 62, approach trusses (all 4 units) | 33'-0 + 6'-1 = 39'-1 from CL, 10 in. outside the 38'-3 gutter line, 8 in. inside the bracket tip (p.48 / p.58 half plans, p.55 bearing details; pixel row profile of p.48: 11 lines, outermost at ~38.5 ft drawn) | 33'-8 (8 in. outside the 33'-0 line - the 8 in. read as stringer spacing): no stringer under the curb / parapet | 39'-1 |
+| Outside stringer, main span (S13) / girder spans (S1) | 39'-1 (p.72 / p.85: 6'-1 + 4 @ 8'-3; p.43 Section A-A: 6'-1 + 8 @ 8'-3) | 39'-1 | unchanged |
+| B1 bracket tip, approach | 10'-9 beyond the truss = 39'-9 (p.48 / p.58 / p.55) | 39'-9 (but 6'-1 bare past the misplaced S5) | 39'-9 |
+| B1 bracket depth | 6'-3 1/2 b.b. angles at the truss, bottom angles sloping straight up to 2'-0 1/2 at the tip (p.55 elevation, extension sketches) | full 6'-3 1/2 to the tip (flagged) | tapered (`DepthReductionStart` 4'-3) |
+| B1 bracket, girder spans | p.45: "details and parts not shown same as shown for Approach Truss Spans, Sh. 15" (= p.55); girder sheets draw the taper without dimensions | tip S1 + 6 in. (guess), full depth | tip 39'-9, taper as p.55 (flagged: via the p.45 note) |
+| Floor beam ends, main (framed F5 / F6) | "Fin. Floor Beam" at the inside face of the truss vertical, scaled 1'-2 3/4 from the truss CL (p.85, 4'-5 = 308 px) | 1'-2 1/2 | unchanged (check row) |
+| Floor beam ends, approach (F3 / F4) | end angles on the post flange, ~8 in. from the truss CL (p.55, scaled) | 9 1/2 in. (flagged) | unchanged |
+| Floor beam ends, girder spans | cover plates flush with the girder F.L. cover plate (22 in. wide, p.45) | 11 in. from the girder CL | unchanged |
+| Main shoes L0 / L0' (piers 17 / 20) | rocker pin on the vertical line through L0, 2'-0 1/2 below the chord CL, 3'-5 to the bottom El. 107.682 (p.73), L0 = 675+98.380 / L0' = 689+62.380 (p.1 / p.69, CL pier +- 2'-0, p.16) | as plan | unchanged (check rows) |
+| Main shoes L11 / L11' (piers 18 / 19) | pin under L11, 3'-11 below, bottom El. 87.701 (p.96) | as plan | unchanged (check rows) |
+| Main lower chord end at L0 / L0' | chord L0-L1 with its end diaphragm (4-Cann. Ls 8x8x3/4, 7/8 web) and the 7/8 gussets end ~1'-5 beyond the vertical line through L0 (p.73 ELEVATION scaled: CL chord to pin 2'-0 1/2 = 51.1 pt -> 25.0 pt/ft; chord end 35.7 pt before the pin line) | cut square AT L0 (generator: a chord with no neighbour at its end point stops at the point) -> the 19 in. sole plate / rocker half outside the steel | extended 1'-5 (flagged dimension-only) |
+| Approach bottom chord end at L0 / L0' | chord + gussets end ~10 1/2 in. beyond the pin line (p.59 ELEVATION: the two units' pins 4'-0 apart = 97.7 pt; chord ends 21.3 / 22.1 pt from the pins) | cut at the pin | extended 10 1/2 in. (flagged) |
+
+Root cause of question 3: the generator stops a chord exactly at its last panel point when no other chord continues there (automatic setback 0); the
+shoes were in the right place. The chord end extension past an end point is plan data (negative StartSetback / EndSetback); the generator now (a) carries
+the envelope gusset to an extended end chord and (b) warns "Truss CHECK shoe ... projects ... beyond the end of chord" when a shoe top sticks out more
+than 1 in. past an end chord (it fired at all 20 end shoes before the fix, none after). Generic taper input `TrussMemberDefinition.DepthReductionStart/End`.
+Checks after the full run order (truss-ptc-arch -> ... -> rivets-ptc): location 376 PASS / 44 DIFF (unchanged), main 381 / 11 -> 405 / 11 (+24 new rows),
+approach 1014 / 12 -> 1046 / 12, girders 125 / 6 -> 131 / 6.

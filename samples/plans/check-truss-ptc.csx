@@ -137,6 +137,34 @@ foreach (var s in tm.Shoes)
     Cmp($"shoe {s.Name} at {s.Support}: bottom of shoe", plan, s.SeatElevation / ft, 0.001, " ft", dec: 3);
 }
 foreach (var seat in bm.Steel.BearingSeats.Take(1)) Row("INFO", "bearing seats published for the substructure (Location + axis)", "8", $"{bm.Steel.BearingSeats.Count}");
+// shoe positions and the chord ends above them (p.73 ELEVATION: rocker pin on the vertical line through L0, chord + gussets about 1'-5 past it, scaled; p.96: pin under L11)
+foreach (var s in tm.Shoes)
+{
+    string pt = s.Name.Substring(2);
+    var P = tm.Point(s.Name.Substring(0, 1), pt)!;
+    Cmp($"shoe {s.Name}: pin on the vertical line through {pt} (p.73 / p.96)", 0, (al.Inverse(s.Pin.XY).Station - P.Station) / ft, 0.0005, " ft");
+    double below = (P.World.Z - s.Pin.Z) / ft, planBelow = pt.StartsWith("L0") ? 2 + 0.5 / 12 : 3 + 11.0 / 12;
+    Cmp($"shoe {s.Name}: pin below the chord work point {pt} (p.73 2'-0 1/2 / p.96 3'-11)", planBelow, below, 0.001, " ft");
+}
+foreach (var (pl, mk, pt) in new[] { ("N", "N-L0-L2", "L0"), ("N", "N-L2'-L0'", "L0'"), ("S", "S-L0-L2", "L0"), ("S", "S-L2'-L0'", "L0'") })
+{
+    var sh = tm.Shoes.First(s => s.Name == $"{pl}-{pt}");
+    var ch = tm.Steel.Parts.First(p => p.Mark == mk);
+    double pinS = al.Inverse(sh.Pin.XY).Station;
+    var ss = ch.Mesh.Positions.Select(v => al.Inverse(v.XY).Station).ToList();
+    double past = (pt == "L0" ? pinS - ss.Min() : ss.Max() - pinS) / ft;
+    Cmp($"chord {mk} end past the rocker pin {pt} (p.73, scaled 1'-5; flagged)", 17.0 / 12, past, 0.05, " ft", "end cut square to the 3 % chord: its lower corner reaches 1/2 in. further; sole plate 19 in. long = 9 1/2 in. each side of the pin", 4);
+}
+Cmp("CHECK warnings 'top of the shoe projects beyond the end of chord' (generator)", 0, rep.Warnings.Count(w => w.StartsWith(bdef.Name) && w.Contains("beyond the end of chord")), 0, "", dec: 0);
+// floor (p.72 / p.85 / p.94): stringer lines and floor beam ends
+var sOff = bdef.Truss!.Floor!.Stringers.Select(s => s.Offset / ft).OrderBy(o => o).ToList();
+Cmp("stringer lines (p.72: S13 S14 S15 S15 S15 S16 S15 S15 S15 S14 S13)", 11, sOff.Count, 0, "", dec: 0);
+Cmp("outside stringer S13 from the CL (p.85: 33'-0 + 6'-1; 10 in. outside the gutter, 4'-5 inside the truss)", 39 + 1.0 / 12, Math.Max(-sOff[0], sOff[^1]), 0.0005, " ft");
+{
+    var fb = tm.Steel.Parts.First(p => p.Mark == "FB1");
+    double o1 = fb.Mesh.Positions.Max(v => al.Inverse(v.XY).Offset) / ft;
+    Cmp("framed floor beam F6 end from the truss CL (p.85: floor beam finished at the inside face of the truss vertical, scaled 1'-2 3/4; built 1'-2 1/2)", 1 + 2.75 / 12, 43.5 - o1, 0.03, " ft", "end angles / connection material not built", 4);
+}
 
 // 8. suspenders (pin-to-pin lengths; no plan table)
 Print("--- 8. rope suspenders (pin to pin, N truss)");

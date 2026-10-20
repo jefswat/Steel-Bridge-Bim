@@ -334,6 +334,20 @@ foreach (bool pr in halves)
     Mem("L" + P(14, pr) + "-W" + P(14, pr), "L" + P(14, pr), "W" + P(14, pr), "SUSP 14", TrussMemberRole.Hanger, $"Point {P(14, pr)}");
 }
 
+// lower chord ends at L0 / L0' (p.73 ELEVATION): the chord L0-L1 with its end diaphragm (4-Cann. Ls 8x8x3/4, 7/8 web) and the 7/8 gussets run past the vertical
+// line through L0 (= the rocker pin) to the pier-side end; a chord cut square at L0 left the rocker / sole plate (19 in.) half outside the steel above it.
+// Scaled from the drawing (no dimension): 1'-5 (p.73: CL chord to pin 2'-0 1/2 = 51.1 pt -> 25.0 pt/ft; chord end 35.7 pt before the pin line).
+double l0Ext = FI(1, 5);
+string l0Flag = U("p.73", "lower chord / gusset end beyond L0 and L0'", "the ELEVATION draws the chord with its end diaphragm and the gussets ending about 1'-5 beyond the vertical line through L0 but prints no dimension (scaled at 25.0 pt/ft from the 2'-0 1/2 chord-to-pin dimension)",
+    "chord L0-L2 / L2'-L0' extended 1'-5 past L0 / L0' (scaled); the gusset envelope follows the chord end.");
+unresolved.Add(l0Flag);
+foreach (var m in t.Members.Where(m => m.Role == TrussMemberRole.LowerChord && (m.From == "L0" || m.To == "L0'")))
+{
+    if (m.From == "L0") m.StartSetback = -l0Ext; else m.EndSetback = -l0Ext;
+    string secFlag = t.Sections.FirstOrDefault(s => s.Name == m.Section)?.Unresolved ?? "";
+    m.Unresolved = string.Join(" ", new[] { secFlag, l0Flag }.Where(x => x.Length > 0));
+}
+
 // floor beams (p.72 marks; p.94 level); framed beams end at the truss members' inside line, suspended beams reach the suspender pin at the truss CL
 string FbEnd = U("p.85, p.94", "floor beam end connections", "the framed (p.85) and suspended (p.94) end details were not read in full",
     "framed floor beams (points 0-13) end 1'-2 1/2 from the truss CL (the members' outer face line), suspended ones at the truss CL.");

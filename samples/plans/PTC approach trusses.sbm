@@ -6487,7 +6487,9 @@
                 "Width": 0.35559999999999997,
                 "Thickness": 0.0127,
                 "Perforated": false,
-                "Label": ""
+                "Label": "",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [],
@@ -6507,7 +6509,7 @@
             "Width": 0,
             "Diameter": 0,
             "WorkingLineOffset": 0,
-            "Unresolved": "UNRESOLVED (p.55, p.48, p.58): partial-length floor beam cover plates (F.L. \u002B 28\u0027-0 / 40\u0027-0 / 20\u0027-0 bottom plates, F3 / F4 / B1 plate counts 2 / 4 / 1) - the lengths are listed on p.55 but their positions along the beam were not decoded; the bracket (B1) web is drawn tapering 6\u0027-3 1/2 to 2\u0027-0 1/2. only the full-length top plate 14 x 1/2 is built; the cantilever brackets B1 are built as the full-depth beam (taper not modeled, overstates the bracket).",
+            "Unresolved": "UNRESOLVED (p.55, p.48, p.58): partial-length floor beam cover plates (F.L. \u002B 28\u0027-0 / 40\u0027-0 / 20\u0027-0 bottom plates, F3 / F4 / B1 plate counts 2 / 4 / 1) - the lengths are listed on p.55 but their positions along the beam were not decoded; the bracket (B1) web is drawn tapering 6\u0027-3 1/2 to 2\u0027-0 1/2. only the full-length top plate 14 x 1/2 is built (the B1 bracket taper 6\u0027-3 1/2 -\u003E 2\u0027-0 1/2 is modeled).",
             "Source": "p.48 / p.55"
           },
           {
@@ -6537,7 +6539,9 @@
                 "Width": 0.35559999999999997,
                 "Thickness": 0.0127,
                 "Perforated": false,
-                "Label": ""
+                "Label": "",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [],
@@ -6557,7 +6561,7 @@
             "Width": 0,
             "Diameter": 0,
             "WorkingLineOffset": 0,
-            "Unresolved": "UNRESOLVED (p.55, p.48, p.58): partial-length floor beam cover plates (F.L. \u002B 28\u0027-0 / 40\u0027-0 / 20\u0027-0 bottom plates, F3 / F4 / B1 plate counts 2 / 4 / 1) - the lengths are listed on p.55 but their positions along the beam were not decoded; the bracket (B1) web is drawn tapering 6\u0027-3 1/2 to 2\u0027-0 1/2. only the full-length top plate 14 x 1/2 is built; the cantilever brackets B1 are built as the full-depth beam (taper not modeled, overstates the bracket).",
+            "Unresolved": "UNRESOLVED (p.55, p.48, p.58): partial-length floor beam cover plates (F.L. \u002B 28\u0027-0 / 40\u0027-0 / 20\u0027-0 bottom plates, F3 / F4 / B1 plate counts 2 / 4 / 1) - the lengths are listed on p.55 but their positions along the beam were not decoded; the bracket (B1) web is drawn tapering 6\u0027-3 1/2 to 2\u0027-0 1/2. only the full-length top plate 14 x 1/2 is built (the B1 bracket taper 6\u0027-3 1/2 -\u003E 2\u0027-0 1/2 is modeled).",
             "Source": "p.48 / p.55"
           },
           {
@@ -6587,7 +6591,9 @@
                 "Width": 0.35559999999999997,
                 "Thickness": 0.0127,
                 "Perforated": false,
-                "Label": ""
+                "Label": "",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [],
@@ -6607,7 +6613,7 @@
             "Width": 0,
             "Diameter": 0,
             "WorkingLineOffset": 0,
-            "Unresolved": "UNRESOLVED (p.55, p.48, p.58): partial-length floor beam cover plates (F.L. \u002B 28\u0027-0 / 40\u0027-0 / 20\u0027-0 bottom plates, F3 / F4 / B1 plate counts 2 / 4 / 1) - the lengths are listed on p.55 but their positions along the beam were not decoded; the bracket (B1) web is drawn tapering 6\u0027-3 1/2 to 2\u0027-0 1/2. only the full-length top plate 14 x 1/2 is built; the cantilever brackets B1 are built as the full-depth beam (taper not modeled, overstates the bracket).",
+            "Unresolved": "UNRESOLVED (p.55, p.48, p.58): partial-length floor beam cover plates (F.L. \u002B 28\u0027-0 / 40\u0027-0 / 20\u0027-0 bottom plates, F3 / F4 / B1 plate counts 2 / 4 / 1) - the lengths are listed on p.55 but their positions along the beam were not decoded; the bracket (B1) web is drawn tapering 6\u0027-3 1/2 to 2\u0027-0 1/2. only the full-length top plate 14 x 1/2 is built (the B1 bracket taper 6\u0027-3 1/2 -\u003E 2\u0027-0 1/2 is modeled).",
             "Source": "p.48 / p.55"
           },
           {
@@ -6816,7 +6822,9 @@
                 "Width": 0.3302,
                 "Thickness": 0.009524999999999999,
                 "Perforated": true,
-                "Label": "PL (13-6) x 3/8"
+                "Label": "PL (13-6) x 3/8",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -6824,7 +6832,9 @@
                 "Width": 0.3302,
                 "Thickness": 0.009524999999999999,
                 "Perforated": true,
-                "Label": "PL (13-6) x 3/8"
+                "Label": "PL (13-6) x 3/8",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -7065,11 +7075,11 @@
             "Role": "LowerChord",
             "Panel": "Panel 0-2",
             "System": "",
-            "StartSetback": null,
+            "StartSetback": -0.2667,
             "EndSetback": null,
             "OffsetZ": 0,
             "PlanLength": 16.428476160000002,
-            "Unresolved": "",
+            "Unresolved": "UNRESOLVED (p.47): rolled shape 14 WF 111 (1954 series) dimensions - the sheets print the designation and the gross area 32.65 sq.in., not d / bf / tw / tf, and the 1954 series differs from AISC v16. d / bf / tw / tf interpolated by area between AISC W14x109 and W14x120, weight 3.4 lb/ft per sq.in.; flanges in planes parallel to the truss plane with the gusset pairs outside them (p.50 / p.60: gusset in-to-in = depth \u002B fills). UNRESOLVED (p.59, p.49): bottom chord / gusset end beyond L0 and L0\u0027 - the ELEVATION draws the chord and the gussets ending about 10 1/2 in. beyond the vertical line through the shoe pin but prints no dimension (scaled from the 4\u0027-0 between the two units\u0027 pins). end chords extended 10 1/2 in. past L0 / L0\u0027 (scaled); the gusset envelope follows the chord end.",
             "Source": "47 member table row L0-L2"
           },
           {
@@ -7082,10 +7092,10 @@
             "Panel": "Panel 2\u0027-0\u0027",
             "System": "",
             "StartSetback": null,
-            "EndSetback": null,
+            "EndSetback": -0.2667,
             "OffsetZ": 0,
             "PlanLength": 16.428476160000002,
-            "Unresolved": "",
+            "Unresolved": "UNRESOLVED (p.47): rolled shape 14 WF 111 (1954 series) dimensions - the sheets print the designation and the gross area 32.65 sq.in., not d / bf / tw / tf, and the 1954 series differs from AISC v16. d / bf / tw / tf interpolated by area between AISC W14x109 and W14x120, weight 3.4 lb/ft per sq.in.; flanges in planes parallel to the truss plane with the gusset pairs outside them (p.50 / p.60: gusset in-to-in = depth \u002B fills). UNRESOLVED (p.59, p.49): bottom chord / gusset end beyond L0 and L0\u0027 - the ELEVATION draws the chord and the gussets ending about 10 1/2 in. beyond the vertical line through the shoe pin but prints no dimension (scaled from the 4\u0027-0 between the two units\u0027 pins). end chords extended 10 1/2 in. past L0 / L0\u0027 (scaled); the gusset envelope follows the chord end.",
             "Source": "47 member table row L0-L2"
           },
           {
@@ -8059,6 +8069,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -8075,6 +8086,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -8107,6 +8119,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -8123,6 +8136,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -8155,6 +8169,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -8171,6 +8186,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -8203,6 +8219,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -8219,6 +8236,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -8251,6 +8269,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -8267,6 +8286,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -8299,6 +8319,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -8315,6 +8336,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -8347,6 +8369,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -8363,6 +8386,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -8395,6 +8419,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -8411,6 +8436,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -8443,6 +8469,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -8459,6 +8486,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -8491,6 +8519,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -8507,6 +8536,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -8539,6 +8569,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -8555,6 +8586,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -8587,6 +8619,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -8603,6 +8636,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -8635,6 +8669,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -8651,6 +8686,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -8683,6 +8719,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -8699,6 +8736,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -8731,6 +8769,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -8747,6 +8786,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -8779,6 +8819,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -8795,6 +8836,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -8827,6 +8869,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -8843,6 +8886,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -8875,6 +8919,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -8891,6 +8936,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -8923,6 +8969,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -8939,6 +8986,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -8971,6 +9019,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -8987,6 +9036,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -9019,6 +9069,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -9035,6 +9086,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -9067,6 +9119,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -9083,6 +9136,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -9115,6 +9169,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -9131,6 +9186,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -9163,6 +9219,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -9179,6 +9236,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -9211,6 +9269,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -9227,6 +9286,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -12245,8 +12305,8 @@
         "Floor": {
           "Stringers": [
             {
-              "Name": "N33.67",
-              "Offset": -10.2616,
+              "Name": "N39.08",
+              "Offset": -11.912600000000001,
               "Section": "W21x62",
               "TopBelowGrade": null,
               "FromStation": null,
@@ -12325,8 +12385,8 @@
               "ToStation": null
             },
             {
-              "Name": "S33.67",
-              "Offset": 10.2616,
+              "Name": "S39.08",
+              "Offset": 11.912600000000001,
               "Section": "W21x62",
               "TopBelowGrade": null,
               "FromStation": null,
@@ -12552,15 +12612,16 @@
         "PlanSteelWeightLb": 2856000,
         "PlanSteelWeightSource": "p.42 items 2 \u002B 5 (carbon \u002B silicon approach truss spans, one unit)",
         "Unresolved": [
+          "UNRESOLVED (p.59, p.49): bottom chord / gusset end beyond L0 and L0\u0027 - the ELEVATION draws the chord and the gussets ending about 10 1/2 in. beyond the vertical line through the shoe pin but prints no dimension (scaled from the 4\u0027-0 between the two units\u0027 pins). end chords extended 10 1/2 in. past L0 / L0\u0027 (scaled); the gusset envelope follows the chord end.",
           "UNRESOLVED (p.55): floor beam end connections at the truss (bracket / top chord connection) - p.55 draws the connection on the top chord (2 tension plates, bent plate) but without the dimensions needed to build it. floor beam between the trusses and the brackets stop 9 1/2 in. from the truss CL (half of a typical 17 in. gusset-to-gusset width \u002B gusset), plain butt.",
           "UNRESOLVED (p.48, p.58): top / bottom lateral K pattern and the end panels - read from the half plans (K from the CL apex to the corners of the next floor beam, diamond about the pier joints, X at the centre) at 250-400 dpi; the first panel is drawn with the apex at the end joint. pattern as read; transverse top struts = the floor beams.",
           "UNRESOLVED (p.48, p.58): location of 10 WF 33 hanger bracing - the sketch shows it vertical within the 58\u0027-0 frame under the floor beam without the exact line. built vertical on the CL from the floor beam bottom to the bottom strut at every point without sway bracing.",
           "UNRESOLVED (p.48, p.56, p.58): lateral / strut rivet counts (10 / 20 / 40 / 6 per end), 7/16 gusset plates - counts printed in zones of the plan whose allocation is ambiguous; gusset outlines not drawn. not placed / not built.",
           "UNRESOLVED (p.47, p.48): camber - no camber ordinates are printed on these sheets (p.47: floor beams and brackets need not be cambered; stringers uncambered). geometry = final shape.",
-          "UNRESOLVED (p.48, p.58): stringer lines (11 built: 4 spaces @ 8\u0027-3 = 33\u0027-0 each side of the CL \u002B 21 WF 62 S5 8 in. outside the 33\u0027-0 lines) - the half plan dimensions 6\u0027-1 \u002B 8 in. \u002B 4 spaces @ 8\u0027-3 from the floor beam tip (39\u0027-9) but the line of each mark S5 / S6 / S7 / S8 and the centre line pair are not decoded. S5 = 21 WF 62 at 33\u0027-8 from the CL, all other lines 24 WF 76 (S6 printed 24 WF 78 on p.58).",
+          "UNRESOLVED (p.48, p.58): stringer mark per line (S6 / S7 / S8 = 24 WF 76) - the half plans name S5 - S8 at the lines but the 24 WF 76 marks differ only in their stresses; S5 (21 WF 62) is the outside line at 39\u0027-1 (p.55: 6\u0027-1 beyond the 33\u0027-0 line, 10 in. outside the gutter line). S5 = 21 WF 62 at 39\u0027-1 from the CL, all other lines 24 WF 76 (S6 printed 24 WF 78 on p.58).",
           "UNRESOLVED (p.54, p.68): expansion dams at the unit ends and the pier joints - the dam sheets give dimension strings and clearance tables but are not modeled in this phase. not built; deck / floor system end at joint 0 and 0\u0027.",
           "UNRESOLVED (p.101-106): inspection walkways, ladders and platforms under the trusses; light pole brackets - not part of the truss steel (separate sheets); brackets for light poles are on DRB-6 (not in the set). not built.",
-          "UNRESOLVED (p.55, p.48, p.58): partial-length floor beam cover plates (F.L. \u002B 28\u0027-0 / 40\u0027-0 / 20\u0027-0 bottom plates, F3 / F4 / B1 plate counts 2 / 4 / 1) - the lengths are listed on p.55 but their positions along the beam were not decoded; the bracket (B1) web is drawn tapering 6\u0027-3 1/2 to 2\u0027-0 1/2. only the full-length top plate 14 x 1/2 is built; the cantilever brackets B1 are built as the full-depth beam (taper not modeled, overstates the bracket).",
+          "UNRESOLVED (p.55, p.48, p.58): partial-length floor beam cover plates (F.L. \u002B 28\u0027-0 / 40\u0027-0 / 20\u0027-0 bottom plates, F3 / F4 / B1 plate counts 2 / 4 / 1) - the lengths are listed on p.55 but their positions along the beam were not decoded; the bracket (B1) web is drawn tapering 6\u0027-3 1/2 to 2\u0027-0 1/2. only the full-length top plate 14 x 1/2 is built (the B1 bracket taper 6\u0027-3 1/2 -\u003E 2\u0027-0 1/2 is modeled).",
           "UNRESOLVED (p.49-53): L8 / L0 second gusset pairs (7/8 \u002B 3/4 outer / inner at L8 of the 3-span unit; 3/4 \u002B 1/2 at L0 of both units), fills, splice plates, lug angles, diaphragms, stitch rivets - listed per joint without extents. only one gusset pair per joint (the outer / first listed) is built; fills and splices not built.",
           "UNRESOLVED (p.49-53): plan weight check (p.42): floor steel, bracing, shoes, expansion dams, splices and fills are in the p.42 totals - the totals are per unit (carbon \u002B silicon, items 2 \u002B 5) and include all steel of the unit. the check script reports the model steel as a share of the p.42 figure."
         ]
@@ -19023,7 +19084,9 @@
                 "Width": 0.35559999999999997,
                 "Thickness": 0.0127,
                 "Perforated": false,
-                "Label": ""
+                "Label": "",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [],
@@ -19043,7 +19106,7 @@
             "Width": 0,
             "Diameter": 0,
             "WorkingLineOffset": 0,
-            "Unresolved": "UNRESOLVED (p.55, p.48, p.58): partial-length floor beam cover plates (F.L. \u002B 28\u0027-0 / 40\u0027-0 / 20\u0027-0 bottom plates, F3 / F4 / B1 plate counts 2 / 4 / 1) - the lengths are listed on p.55 but their positions along the beam were not decoded; the bracket (B1) web is drawn tapering 6\u0027-3 1/2 to 2\u0027-0 1/2. only the full-length top plate 14 x 1/2 is built; the cantilever brackets B1 are built as the full-depth beam (taper not modeled, overstates the bracket).",
+            "Unresolved": "UNRESOLVED (p.55, p.48, p.58): partial-length floor beam cover plates (F.L. \u002B 28\u0027-0 / 40\u0027-0 / 20\u0027-0 bottom plates, F3 / F4 / B1 plate counts 2 / 4 / 1) - the lengths are listed on p.55 but their positions along the beam were not decoded; the bracket (B1) web is drawn tapering 6\u0027-3 1/2 to 2\u0027-0 1/2. only the full-length top plate 14 x 1/2 is built (the B1 bracket taper 6\u0027-3 1/2 -\u003E 2\u0027-0 1/2 is modeled).",
             "Source": "p.58 / p.55"
           },
           {
@@ -19073,7 +19136,9 @@
                 "Width": 0.35559999999999997,
                 "Thickness": 0.0127,
                 "Perforated": false,
-                "Label": ""
+                "Label": "",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [],
@@ -19093,7 +19158,7 @@
             "Width": 0,
             "Diameter": 0,
             "WorkingLineOffset": 0,
-            "Unresolved": "UNRESOLVED (p.55, p.48, p.58): partial-length floor beam cover plates (F.L. \u002B 28\u0027-0 / 40\u0027-0 / 20\u0027-0 bottom plates, F3 / F4 / B1 plate counts 2 / 4 / 1) - the lengths are listed on p.55 but their positions along the beam were not decoded; the bracket (B1) web is drawn tapering 6\u0027-3 1/2 to 2\u0027-0 1/2. only the full-length top plate 14 x 1/2 is built; the cantilever brackets B1 are built as the full-depth beam (taper not modeled, overstates the bracket).",
+            "Unresolved": "UNRESOLVED (p.55, p.48, p.58): partial-length floor beam cover plates (F.L. \u002B 28\u0027-0 / 40\u0027-0 / 20\u0027-0 bottom plates, F3 / F4 / B1 plate counts 2 / 4 / 1) - the lengths are listed on p.55 but their positions along the beam were not decoded; the bracket (B1) web is drawn tapering 6\u0027-3 1/2 to 2\u0027-0 1/2. only the full-length top plate 14 x 1/2 is built (the B1 bracket taper 6\u0027-3 1/2 -\u003E 2\u0027-0 1/2 is modeled).",
             "Source": "p.58 / p.55"
           },
           {
@@ -19123,7 +19188,9 @@
                 "Width": 0.35559999999999997,
                 "Thickness": 0.0127,
                 "Perforated": false,
-                "Label": ""
+                "Label": "",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [],
@@ -19143,7 +19210,7 @@
             "Width": 0,
             "Diameter": 0,
             "WorkingLineOffset": 0,
-            "Unresolved": "UNRESOLVED (p.55, p.48, p.58): partial-length floor beam cover plates (F.L. \u002B 28\u0027-0 / 40\u0027-0 / 20\u0027-0 bottom plates, F3 / F4 / B1 plate counts 2 / 4 / 1) - the lengths are listed on p.55 but their positions along the beam were not decoded; the bracket (B1) web is drawn tapering 6\u0027-3 1/2 to 2\u0027-0 1/2. only the full-length top plate 14 x 1/2 is built; the cantilever brackets B1 are built as the full-depth beam (taper not modeled, overstates the bracket).",
+            "Unresolved": "UNRESOLVED (p.55, p.48, p.58): partial-length floor beam cover plates (F.L. \u002B 28\u0027-0 / 40\u0027-0 / 20\u0027-0 bottom plates, F3 / F4 / B1 plate counts 2 / 4 / 1) - the lengths are listed on p.55 but their positions along the beam were not decoded; the bracket (B1) web is drawn tapering 6\u0027-3 1/2 to 2\u0027-0 1/2. only the full-length top plate 14 x 1/2 is built (the B1 bracket taper 6\u0027-3 1/2 -\u003E 2\u0027-0 1/2 is modeled).",
             "Source": "p.58 / p.55"
           },
           {
@@ -19352,7 +19419,9 @@
                 "Width": 0.3302,
                 "Thickness": 0.009524999999999999,
                 "Perforated": true,
-                "Label": "PL (13-6) x 3/8"
+                "Label": "PL (13-6) x 3/8",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -19360,7 +19429,9 @@
                 "Width": 0.3302,
                 "Thickness": 0.009524999999999999,
                 "Perforated": true,
-                "Label": "PL (13-6) x 3/8"
+                "Label": "PL (13-6) x 3/8",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -19729,11 +19800,11 @@
             "Role": "LowerChord",
             "Panel": "Panel 0-2",
             "System": "",
-            "StartSetback": null,
+            "StartSetback": -0.2667,
             "EndSetback": null,
             "OffsetZ": 0,
             "PlanLength": 16.428476160000002,
-            "Unresolved": "",
+            "Unresolved": "UNRESOLVED (p.57): rolled shape 14 WF 142 (1954 series) dimensions - the sheets print the designation and the gross area 41.85 sq.in., not d / bf / tw / tf, and the 1954 series differs from AISC v16. d / bf / tw / tf interpolated by area between AISC W14x132 and W14x145, weight 3.4 lb/ft per sq.in.; flanges in planes parallel to the truss plane with the gusset pairs outside them (p.50 / p.60: gusset in-to-in = depth \u002B fills). UNRESOLVED (p.59, p.49): bottom chord / gusset end beyond L0 and L0\u0027 - the ELEVATION draws the chord and the gussets ending about 10 1/2 in. beyond the vertical line through the shoe pin but prints no dimension (scaled from the 4\u0027-0 between the two units\u0027 pins). end chords extended 10 1/2 in. past L0 / L0\u0027 (scaled); the gusset envelope follows the chord end.",
             "Source": "57 member table row L0-L2"
           },
           {
@@ -19746,10 +19817,10 @@
             "Panel": "Panel 2\u0027-0\u0027",
             "System": "",
             "StartSetback": null,
-            "EndSetback": null,
+            "EndSetback": -0.2667,
             "OffsetZ": 0,
             "PlanLength": 16.428476160000002,
-            "Unresolved": "",
+            "Unresolved": "UNRESOLVED (p.57): rolled shape 14 WF 142 (1954 series) dimensions - the sheets print the designation and the gross area 41.85 sq.in., not d / bf / tw / tf, and the 1954 series differs from AISC v16. d / bf / tw / tf interpolated by area between AISC W14x132 and W14x145, weight 3.4 lb/ft per sq.in.; flanges in planes parallel to the truss plane with the gusset pairs outside them (p.50 / p.60: gusset in-to-in = depth \u002B fills). UNRESOLVED (p.59, p.49): bottom chord / gusset end beyond L0 and L0\u0027 - the ELEVATION draws the chord and the gussets ending about 10 1/2 in. beyond the vertical line through the shoe pin but prints no dimension (scaled from the 4\u0027-0 between the two units\u0027 pins). end chords extended 10 1/2 in. past L0 / L0\u0027 (scaled); the gusset envelope follows the chord end.",
             "Source": "57 member table row L0-L2"
           },
           {
@@ -21363,6 +21434,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -21379,6 +21451,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -21411,6 +21484,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -21427,6 +21501,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -21459,6 +21534,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -21475,6 +21551,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -21507,6 +21584,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -21523,6 +21601,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -21555,6 +21634,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -21571,6 +21651,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -21603,6 +21684,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -21619,6 +21701,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -21651,6 +21734,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -21667,6 +21751,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -21699,6 +21784,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -21715,6 +21801,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -21747,6 +21834,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -21763,6 +21851,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -21795,6 +21884,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -21811,6 +21901,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -21843,6 +21934,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -21859,6 +21951,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -21891,6 +21984,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -21907,6 +22001,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -21939,6 +22034,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -21955,6 +22051,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -21987,6 +22084,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -22003,6 +22101,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -22035,6 +22134,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -22051,6 +22151,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -22083,6 +22184,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -22099,6 +22201,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -22131,6 +22234,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -22147,6 +22251,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -22179,6 +22284,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -22195,6 +22301,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -22227,6 +22334,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -22243,6 +22351,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -22275,6 +22384,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -22291,6 +22401,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -22323,6 +22434,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -22339,6 +22451,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -22371,6 +22484,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -22387,6 +22501,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -22419,6 +22534,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -22435,6 +22551,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -22467,6 +22584,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -22483,6 +22601,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -22515,6 +22634,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -22531,6 +22651,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -22563,6 +22684,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -22579,6 +22701,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -22611,6 +22734,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -22627,6 +22751,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -22659,6 +22784,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -22675,6 +22801,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -22707,6 +22834,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -22723,6 +22851,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -22755,6 +22884,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -22771,6 +22901,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -22803,6 +22934,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -22819,6 +22951,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -22851,6 +22984,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -22867,6 +23001,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -22899,6 +23034,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -22915,6 +23051,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -22947,6 +23084,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -22963,6 +23101,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -22995,6 +23134,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -23011,6 +23151,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -23043,6 +23184,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -23059,6 +23201,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -23091,6 +23234,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -23107,6 +23251,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -23139,6 +23284,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -23155,6 +23301,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -23187,6 +23334,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -23203,6 +23351,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -23235,6 +23384,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -23251,6 +23401,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -23283,6 +23434,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -23299,6 +23451,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -28268,8 +28421,8 @@
         "Floor": {
           "Stringers": [
             {
-              "Name": "N33.67",
-              "Offset": -10.2616,
+              "Name": "N39.08",
+              "Offset": -11.912600000000001,
               "Section": "W21x62",
               "TopBelowGrade": null,
               "FromStation": null,
@@ -28348,8 +28501,8 @@
               "ToStation": null
             },
             {
-              "Name": "S33.67",
-              "Offset": 10.2616,
+              "Name": "S39.08",
+              "Offset": 11.912600000000001,
               "Section": "W21x62",
               "TopBelowGrade": null,
               "FromStation": null,
@@ -28627,15 +28780,16 @@
           "UNRESOLVED (p.57): cover plates 2-Pls. 16 1/2 x 13/16 on 14 WF 342 (member U9-U11) - the member table lists them as part of the section (area includes them) but the joint sheets draw them only between the splices and the sheet gives no length / position. not built (the rolled shape alone; the gross area in the table is larger by the plates).",
           "UNRESOLVED (p.57): cover plates 2-Pls. 16 1/2 x 7/8 on 14 WF 342 (member U9-L10) - the member table lists them as part of the section (area includes them) but the joint sheets draw them only between the splices and the sheet gives no length / position. not built (the rolled shape alone; the gross area in the table is larger by the plates).",
           "UNRESOLVED (p.57): cover plates 2-Pls. 16 x 11/16 on 14 WF 314 (member L10-U11) - the member table lists them as part of the section (area includes them) but the joint sheets draw them only between the splices and the sheet gives no length / position. not built (the rolled shape alone; the gross area in the table is larger by the plates).",
+          "UNRESOLVED (p.59, p.49): bottom chord / gusset end beyond L0 and L0\u0027 - the ELEVATION draws the chord and the gussets ending about 10 1/2 in. beyond the vertical line through the shoe pin but prints no dimension (scaled from the 4\u0027-0 between the two units\u0027 pins). end chords extended 10 1/2 in. past L0 / L0\u0027 (scaled); the gusset envelope follows the chord end.",
           "UNRESOLVED (p.55): floor beam end connections at the truss (bracket / top chord connection) - p.55 draws the connection on the top chord (2 tension plates, bent plate) but without the dimensions needed to build it. floor beam between the trusses and the brackets stop 9 1/2 in. from the truss CL (half of a typical 17 in. gusset-to-gusset width \u002B gusset), plain butt.",
           "UNRESOLVED (p.48, p.58): top / bottom lateral K pattern and the end panels - read from the half plans (K from the CL apex to the corners of the next floor beam, diamond about the pier joints, X at the centre) at 250-400 dpi; the first panel is drawn with the apex at the end joint. pattern as read; transverse top struts = the floor beams.",
           "UNRESOLVED (p.48, p.58): location of 10 WF 33 hanger bracing - the sketch shows it vertical within the 58\u0027-0 frame under the floor beam without the exact line. built vertical on the CL from the floor beam bottom to the bottom strut at every point without sway bracing.",
           "UNRESOLVED (p.48, p.56, p.58): lateral / strut rivet counts (10 / 20 / 40 / 6 per end), 7/16 gusset plates - counts printed in zones of the plan whose allocation is ambiguous; gusset outlines not drawn. not placed / not built.",
           "UNRESOLVED (p.57, p.58): camber - no camber ordinates are printed on these sheets (p.47: floor beams and brackets need not be cambered; stringers uncambered). geometry = final shape.",
-          "UNRESOLVED (p.48, p.58): stringer lines (11 built: 4 spaces @ 8\u0027-3 = 33\u0027-0 each side of the CL \u002B 21 WF 62 S5 8 in. outside the 33\u0027-0 lines) - the half plan dimensions 6\u0027-1 \u002B 8 in. \u002B 4 spaces @ 8\u0027-3 from the floor beam tip (39\u0027-9) but the line of each mark S5 / S6 / S7 / S8 and the centre line pair are not decoded. S5 = 21 WF 62 at 33\u0027-8 from the CL, all other lines 24 WF 76 (S6 printed 24 WF 78 on p.58).",
+          "UNRESOLVED (p.48, p.58): stringer mark per line (S6 / S7 / S8 = 24 WF 76) - the half plans name S5 - S8 at the lines but the 24 WF 76 marks differ only in their stresses; S5 (21 WF 62) is the outside line at 39\u0027-1 (p.55: 6\u0027-1 beyond the 33\u0027-0 line, 10 in. outside the gutter line). S5 = 21 WF 62 at 39\u0027-1 from the CL, all other lines 24 WF 76 (S6 printed 24 WF 78 on p.58).",
           "UNRESOLVED (p.54, p.68): expansion dams at the unit ends and the pier joints - the dam sheets give dimension strings and clearance tables but are not modeled in this phase. not built; deck / floor system end at joint 0 and 0\u0027.",
           "UNRESOLVED (p.101-106): inspection walkways, ladders and platforms under the trusses; light pole brackets - not part of the truss steel (separate sheets); brackets for light poles are on DRB-6 (not in the set). not built.",
-          "UNRESOLVED (p.55, p.48, p.58): partial-length floor beam cover plates (F.L. \u002B 28\u0027-0 / 40\u0027-0 / 20\u0027-0 bottom plates, F3 / F4 / B1 plate counts 2 / 4 / 1) - the lengths are listed on p.55 but their positions along the beam were not decoded; the bracket (B1) web is drawn tapering 6\u0027-3 1/2 to 2\u0027-0 1/2. only the full-length top plate 14 x 1/2 is built; the cantilever brackets B1 are built as the full-depth beam (taper not modeled, overstates the bracket).",
+          "UNRESOLVED (p.55, p.48, p.58): partial-length floor beam cover plates (F.L. \u002B 28\u0027-0 / 40\u0027-0 / 20\u0027-0 bottom plates, F3 / F4 / B1 plate counts 2 / 4 / 1) - the lengths are listed on p.55 but their positions along the beam were not decoded; the bracket (B1) web is drawn tapering 6\u0027-3 1/2 to 2\u0027-0 1/2. only the full-length top plate 14 x 1/2 is built (the B1 bracket taper 6\u0027-3 1/2 -\u003E 2\u0027-0 1/2 is modeled).",
           "UNRESOLVED (p.59-67): gusset thickness of joint L5 - the joint sheet was not read for this joint (not printed or not extracted). 3/4 in. built, flagged.",
           "UNRESOLVED (p.59-67): gusset thickness of joint U20 - the joint sheet was not read for this joint (not printed or not extracted). 3/4 in. built, flagged.",
           "UNRESOLVED (p.59-67): gusset thickness of joint L5\u0027 - the joint sheet was not read for this joint (not printed or not extracted). 3/4 in. built, flagged.",
@@ -33528,7 +33682,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.011112499999999999,
                 "Perforated": false,
-                "Label": "1-PL 24x7/16"
+                "Label": "1-PL 24x7/16",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -33536,7 +33692,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.009524999999999999,
                 "Perforated": true,
-                "Label": "1-PL (24-12)x3/8"
+                "Label": "1-PL (24-12)x3/8",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -33585,7 +33743,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.0127,
                 "Perforated": false,
-                "Label": "1-PL 24x1/2"
+                "Label": "1-PL 24x1/2",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -33593,7 +33753,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.015875,
                 "Perforated": true,
-                "Label": "1-PL (24-12)x5/8"
+                "Label": "1-PL (24-12)x5/8",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -33642,7 +33804,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.0127,
                 "Perforated": false,
-                "Label": "1-PL 24x1/2"
+                "Label": "1-PL 24x1/2",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -33650,7 +33814,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.015875,
                 "Perforated": true,
-                "Label": "1-PL (24-12)x5/8"
+                "Label": "1-PL (24-12)x5/8",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -33699,7 +33865,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.0142875,
                 "Perforated": false,
-                "Label": "1-PL 24x9/16"
+                "Label": "1-PL 24x9/16",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -33707,7 +33875,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.0174625,
                 "Perforated": true,
-                "Label": "1-PL (24-12)x11/16"
+                "Label": "1-PL (24-12)x11/16",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -33756,7 +33926,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.0142875,
                 "Perforated": false,
-                "Label": "1-PL 24x9/16"
+                "Label": "1-PL 24x9/16",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -33764,7 +33936,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.0174625,
                 "Perforated": true,
-                "Label": "1-PL (24-12)x11/16"
+                "Label": "1-PL (24-12)x11/16",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -33818,7 +33992,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.015875,
                 "Perforated": false,
-                "Label": "1-PL 24x5/8"
+                "Label": "1-PL 24x5/8",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -33826,7 +34002,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.019049999999999997,
                 "Perforated": true,
-                "Label": "1-PL (24-12)x3/4"
+                "Label": "1-PL (24-12)x3/4",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -33880,7 +34058,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.0174625,
                 "Perforated": false,
-                "Label": "1-PL 24x11/16"
+                "Label": "1-PL 24x11/16",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -33888,7 +34068,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.0206375,
                 "Perforated": true,
-                "Label": "1-PL (24-12)x13/16"
+                "Label": "1-PL (24-12)x13/16",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -33952,7 +34134,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.019049999999999997,
                 "Perforated": false,
-                "Label": "1-PL 24x3/4"
+                "Label": "1-PL 24x3/4",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -33960,7 +34144,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.022224999999999998,
                 "Perforated": true,
-                "Label": "1-PL (24-12)x7/8"
+                "Label": "1-PL (24-12)x7/8",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -34024,7 +34210,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.0206375,
                 "Perforated": false,
-                "Label": "1-PL 24x13/16"
+                "Label": "1-PL 24x13/16",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -34032,7 +34220,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.0238125,
                 "Perforated": true,
-                "Label": "1-PL (24-12)x15/16"
+                "Label": "1-PL (24-12)x15/16",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -34096,7 +34286,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.0206375,
                 "Perforated": false,
-                "Label": "1-PL 24x13/16"
+                "Label": "1-PL 24x13/16",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -34104,7 +34296,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.0238125,
                 "Perforated": true,
-                "Label": "1-PL (24-12)x15/16"
+                "Label": "1-PL (24-12)x15/16",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -34168,7 +34362,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.022224999999999998,
                 "Perforated": false,
-                "Label": "1-PL 24x7/8"
+                "Label": "1-PL 24x7/8",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -34176,7 +34372,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.0254,
                 "Perforated": true,
-                "Label": "1-PL (24-12)x1"
+                "Label": "1-PL (24-12)x1",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -34240,7 +34438,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.022224999999999998,
                 "Perforated": false,
-                "Label": "1-PL 24x7/8"
+                "Label": "1-PL 24x7/8",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -34248,7 +34448,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.0254,
                 "Perforated": true,
-                "Label": "1-PL (24-12)x1"
+                "Label": "1-PL (24-12)x1",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -34307,7 +34509,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.0206375,
                 "Perforated": false,
-                "Label": "1-PL 24x13/16"
+                "Label": "1-PL 24x13/16",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -34315,7 +34519,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.0238125,
                 "Perforated": true,
-                "Label": "1-PL (24-12)x15/16"
+                "Label": "1-PL (24-12)x15/16",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -34369,7 +34575,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.019049999999999997,
                 "Perforated": false,
-                "Label": "1-PL 24x3/4"
+                "Label": "1-PL 24x3/4",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -34377,7 +34585,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.022224999999999998,
                 "Perforated": true,
-                "Label": "1-PL (24-12)x7/8"
+                "Label": "1-PL (24-12)x7/8",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -34426,7 +34636,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.0127,
                 "Perforated": false,
-                "Label": "1-PL 24x1/2"
+                "Label": "1-PL 24x1/2",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -34434,7 +34646,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.015875,
                 "Perforated": true,
-                "Label": "1-PL (24-12)x5/8"
+                "Label": "1-PL (24-12)x5/8",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -34483,7 +34697,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.0127,
                 "Perforated": false,
-                "Label": "1-PL 24x1/2"
+                "Label": "1-PL 24x1/2",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -34491,7 +34707,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.015875,
                 "Perforated": true,
-                "Label": "1-PL (24-12)x5/8"
+                "Label": "1-PL (24-12)x5/8",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -34540,7 +34758,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.0127,
                 "Perforated": false,
-                "Label": "1-PL 24x1/2"
+                "Label": "1-PL 24x1/2",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -34548,7 +34768,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.015875,
                 "Perforated": true,
-                "Label": "1-PL (24-12)x5/8"
+                "Label": "1-PL (24-12)x5/8",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -34597,7 +34819,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.0142875,
                 "Perforated": false,
-                "Label": "1-PL 24x9/16"
+                "Label": "1-PL 24x9/16",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -34605,7 +34829,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.0174625,
                 "Perforated": true,
-                "Label": "1-PL (24-12)x11/16"
+                "Label": "1-PL (24-12)x11/16",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -34659,7 +34885,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.0174625,
                 "Perforated": false,
-                "Label": "1-PL 24x11/16"
+                "Label": "1-PL 24x11/16",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -34667,7 +34895,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.0206375,
                 "Perforated": true,
-                "Label": "1-PL (24-12)x13/16"
+                "Label": "1-PL (24-12)x13/16",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -34726,7 +34956,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.019049999999999997,
                 "Perforated": false,
-                "Label": "1-PL 24x3/4"
+                "Label": "1-PL 24x3/4",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -34734,7 +34966,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.022224999999999998,
                 "Perforated": true,
-                "Label": "1-PL (24-12)x7/8"
+                "Label": "1-PL (24-12)x7/8",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -34793,7 +35027,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.019049999999999997,
                 "Perforated": false,
-                "Label": "1-PL 24x3/4"
+                "Label": "1-PL 24x3/4",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -34801,7 +35037,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.022224999999999998,
                 "Perforated": true,
-                "Label": "1-PL (24-12)x7/8"
+                "Label": "1-PL (24-12)x7/8",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -34860,7 +35098,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.019049999999999997,
                 "Perforated": false,
-                "Label": "1-PL 24x3/4"
+                "Label": "1-PL 24x3/4",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -34868,7 +35108,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.022224999999999998,
                 "Perforated": true,
-                "Label": "1-PL (24-12)x7/8"
+                "Label": "1-PL (24-12)x7/8",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -34917,7 +35159,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.0127,
                 "Perforated": false,
-                "Label": "1-PL 24x1/2"
+                "Label": "1-PL 24x1/2",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -34925,7 +35169,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.015875,
                 "Perforated": true,
-                "Label": "1-PL (24-12)x5/8"
+                "Label": "1-PL (24-12)x5/8",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -34974,7 +35220,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.0127,
                 "Perforated": false,
-                "Label": "1-PL 24x1/2"
+                "Label": "1-PL 24x1/2",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -34982,7 +35230,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.015875,
                 "Perforated": true,
-                "Label": "1-PL (24-12)x5/8"
+                "Label": "1-PL (24-12)x5/8",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -35031,7 +35281,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.015875,
                 "Perforated": false,
-                "Label": "1-PL 24x5/8"
+                "Label": "1-PL 24x5/8",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -35039,7 +35291,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.019049999999999997,
                 "Perforated": true,
-                "Label": "1-PL (24-12)x3/4"
+                "Label": "1-PL (24-12)x3/4",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -35088,7 +35342,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.0174625,
                 "Perforated": false,
-                "Label": "1-PL 24x11/16"
+                "Label": "1-PL 24x11/16",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -35096,7 +35352,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.0206375,
                 "Perforated": true,
-                "Label": "1-PL (24-12)x13/16"
+                "Label": "1-PL (24-12)x13/16",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -35150,7 +35408,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.019049999999999997,
                 "Perforated": false,
-                "Label": "1-PL 24x3/4"
+                "Label": "1-PL 24x3/4",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -35158,7 +35418,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.022224999999999998,
                 "Perforated": true,
-                "Label": "1-PL (24-12)x7/8"
+                "Label": "1-PL (24-12)x7/8",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -35212,7 +35474,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.019049999999999997,
                 "Perforated": false,
-                "Label": "1-PL 24x3/4"
+                "Label": "1-PL 24x3/4",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -35220,7 +35484,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.022224999999999998,
                 "Perforated": true,
-                "Label": "1-PL (24-12)x7/8"
+                "Label": "1-PL (24-12)x7/8",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -35279,7 +35545,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.022224999999999998,
                 "Perforated": false,
-                "Label": "1-PL 24x7/8"
+                "Label": "1-PL 24x7/8",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -35287,7 +35555,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.0254,
                 "Perforated": true,
-                "Label": "1-PL (24-12)x1"
+                "Label": "1-PL (24-12)x1",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -35346,7 +35616,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.0238125,
                 "Perforated": false,
-                "Label": "1-PL 24x15/16"
+                "Label": "1-PL 24x15/16",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -35354,7 +35626,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.026987499999999998,
                 "Perforated": true,
-                "Label": "1-PL (24-12)x1 1/16"
+                "Label": "1-PL (24-12)x1 1/16",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -35418,7 +35692,9 @@
                 "Width": 0.5969,
                 "Thickness": 0.0238125,
                 "Perforated": false,
-                "Label": "1-PL 23 1/2x15/16"
+                "Label": "1-PL 23 1/2x15/16",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -35426,7 +35702,9 @@
                 "Width": 0.5969,
                 "Thickness": 0.026987499999999998,
                 "Perforated": true,
-                "Label": "1-PL (23 1/2-11 1/2)x1 1/16"
+                "Label": "1-PL (23 1/2-11 1/2)x1 1/16",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -35495,7 +35773,9 @@
                 "Width": 0.5969,
                 "Thickness": 0.0254,
                 "Perforated": false,
-                "Label": "1-PL 23 1/2x1"
+                "Label": "1-PL 23 1/2x1",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -35503,7 +35783,9 @@
                 "Width": 0.5969,
                 "Thickness": 0.028575,
                 "Perforated": true,
-                "Label": "1-PL (23 1/2-11 1/2)x1 1/8"
+                "Label": "1-PL (23 1/2-11 1/2)x1 1/8",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -35567,7 +35849,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.0254,
                 "Perforated": false,
-                "Label": "1-PL 24x1"
+                "Label": "1-PL 24x1",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -35575,7 +35859,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.028575,
                 "Perforated": true,
-                "Label": "1-PL (24-12)x1 1/8"
+                "Label": "1-PL (24-12)x1 1/8",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -35639,7 +35925,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.0238125,
                 "Perforated": false,
-                "Label": "1-PL 24x15/16"
+                "Label": "1-PL 24x15/16",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -35647,7 +35935,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.026987499999999998,
                 "Perforated": true,
-                "Label": "1-PL (24-12)x1 1/16"
+                "Label": "1-PL (24-12)x1 1/16",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -35706,7 +35996,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.022224999999999998,
                 "Perforated": false,
-                "Label": "1-PL 24x7/8"
+                "Label": "1-PL 24x7/8",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -35714,7 +36006,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.0254,
                 "Perforated": true,
-                "Label": "1-PL (24-12)x1"
+                "Label": "1-PL (24-12)x1",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -35763,7 +36057,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.0206375,
                 "Perforated": false,
-                "Label": "1-PL 24x13/16"
+                "Label": "1-PL 24x13/16",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -35771,7 +36067,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.0238125,
                 "Perforated": true,
-                "Label": "1-PL (24-12)x15/16"
+                "Label": "1-PL (24-12)x15/16",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -35820,7 +36118,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.0142875,
                 "Perforated": false,
-                "Label": "1-PL 24x9/16"
+                "Label": "1-PL 24x9/16",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -35828,7 +36128,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.0174625,
                 "Perforated": true,
-                "Label": "1-PL (24-12)x11/16"
+                "Label": "1-PL (24-12)x11/16",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -35877,7 +36179,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.0142875,
                 "Perforated": false,
-                "Label": "1-PL 24x9/16"
+                "Label": "1-PL 24x9/16",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -35885,7 +36189,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.0174625,
                 "Perforated": true,
-                "Label": "1-PL (24-12)x11/16"
+                "Label": "1-PL (24-12)x11/16",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -35934,7 +36240,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.0142875,
                 "Perforated": false,
-                "Label": "1-PL 24x9/16"
+                "Label": "1-PL 24x9/16",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -35942,7 +36250,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.0174625,
                 "Perforated": true,
-                "Label": "1-PL (24-12)x11/16"
+                "Label": "1-PL (24-12)x11/16",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -35996,7 +36306,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.015875,
                 "Perforated": false,
-                "Label": "1-PL 24x5/8"
+                "Label": "1-PL 24x5/8",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -36004,7 +36316,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.019049999999999997,
                 "Perforated": true,
-                "Label": "1-PL (24-12)x3/4"
+                "Label": "1-PL (24-12)x3/4",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -36063,7 +36377,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.019049999999999997,
                 "Perforated": false,
-                "Label": "1-PL 24x3/4"
+                "Label": "1-PL 24x3/4",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -36071,7 +36387,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.022224999999999998,
                 "Perforated": true,
-                "Label": "1-PL (24-12)x7/8"
+                "Label": "1-PL (24-12)x7/8",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -36130,7 +36448,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.0206375,
                 "Perforated": false,
-                "Label": "1-PL 24x13/16"
+                "Label": "1-PL 24x13/16",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -36138,7 +36458,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.0238125,
                 "Perforated": true,
-                "Label": "1-PL (24-12)x15/16"
+                "Label": "1-PL (24-12)x15/16",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -36187,7 +36509,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.011112499999999999,
                 "Perforated": true,
-                "Label": "2-PL (24-12)x7/16"
+                "Label": "2-PL (24-12)x7/16",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -36195,7 +36519,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.011112499999999999,
                 "Perforated": true,
-                "Label": "2-PL (24-12)x7/16"
+                "Label": "2-PL (24-12)x7/16",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -36238,7 +36564,9 @@
                 "Width": 0.7111999999999999,
                 "Thickness": 0.009524999999999999,
                 "Perforated": true,
-                "Label": "2-PL (28-12)x3/8"
+                "Label": "2-PL (28-12)x3/8",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -36246,7 +36574,9 @@
                 "Width": 0.7111999999999999,
                 "Thickness": 0.009524999999999999,
                 "Perforated": true,
-                "Label": "2-PL (28-12)x3/8"
+                "Label": "2-PL (28-12)x3/8",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -36289,7 +36619,9 @@
                 "Width": 0.7111999999999999,
                 "Thickness": 0.0127,
                 "Perforated": true,
-                "Label": "2-PL (28-12)x1/2"
+                "Label": "2-PL (28-12)x1/2",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -36297,7 +36629,9 @@
                 "Width": 0.7111999999999999,
                 "Thickness": 0.0127,
                 "Perforated": true,
-                "Label": "2-PL (28-12)x1/2"
+                "Label": "2-PL (28-12)x1/2",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -36340,7 +36674,9 @@
                 "Width": 0.7111999999999999,
                 "Thickness": 0.009524999999999999,
                 "Perforated": true,
-                "Label": "2-PL (28-12)x3/8"
+                "Label": "2-PL (28-12)x3/8",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -36348,7 +36684,9 @@
                 "Width": 0.7111999999999999,
                 "Thickness": 0.009524999999999999,
                 "Perforated": true,
-                "Label": "2-PL (28-12)x3/8"
+                "Label": "2-PL (28-12)x3/8",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -36391,7 +36729,9 @@
                 "Width": 0.7111999999999999,
                 "Thickness": 0.0127,
                 "Perforated": true,
-                "Label": "2-PL (28-12)x1/2"
+                "Label": "2-PL (28-12)x1/2",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -36399,7 +36739,9 @@
                 "Width": 0.7111999999999999,
                 "Thickness": 0.0127,
                 "Perforated": true,
-                "Label": "2-PL (28-12)x1/2"
+                "Label": "2-PL (28-12)x1/2",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -36442,7 +36784,9 @@
                 "Width": 0.7111999999999999,
                 "Thickness": 0.0127,
                 "Perforated": true,
-                "Label": "2-PL (28-12)x1/2"
+                "Label": "2-PL (28-12)x1/2",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -36450,7 +36794,9 @@
                 "Width": 0.7111999999999999,
                 "Thickness": 0.0127,
                 "Perforated": true,
-                "Label": "2-PL (28-12)x1/2"
+                "Label": "2-PL (28-12)x1/2",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -36493,7 +36839,9 @@
                 "Width": 0.7111999999999999,
                 "Thickness": 0.0127,
                 "Perforated": true,
-                "Label": "2-PL (28-12)x1/2"
+                "Label": "2-PL (28-12)x1/2",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -36501,7 +36849,9 @@
                 "Width": 0.7111999999999999,
                 "Thickness": 0.0127,
                 "Perforated": true,
-                "Label": "2-PL (28-12)x1/2"
+                "Label": "2-PL (28-12)x1/2",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -36544,7 +36894,9 @@
                 "Width": 0.7111999999999999,
                 "Thickness": 0.0127,
                 "Perforated": true,
-                "Label": "2-PL (28-12)x1/2"
+                "Label": "2-PL (28-12)x1/2",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -36552,7 +36904,9 @@
                 "Width": 0.7111999999999999,
                 "Thickness": 0.0127,
                 "Perforated": true,
-                "Label": "2-PL (28-12)x1/2"
+                "Label": "2-PL (28-12)x1/2",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -36595,7 +36949,9 @@
                 "Width": 0.7111999999999999,
                 "Thickness": 0.0127,
                 "Perforated": true,
-                "Label": "2-PL (28-12)x1/2"
+                "Label": "2-PL (28-12)x1/2",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -36603,7 +36959,9 @@
                 "Width": 0.7111999999999999,
                 "Thickness": 0.0127,
                 "Perforated": true,
-                "Label": "2-PL (28-12)x1/2"
+                "Label": "2-PL (28-12)x1/2",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -36652,7 +37010,9 @@
                 "Width": 0.6858,
                 "Thickness": 0.011112499999999999,
                 "Perforated": true,
-                "Label": "2-PL (27-12)x7/16"
+                "Label": "2-PL (27-12)x7/16",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -36660,7 +37020,9 @@
                 "Width": 0.6858,
                 "Thickness": 0.011112499999999999,
                 "Perforated": true,
-                "Label": "2-PL (27-12)x7/16"
+                "Label": "2-PL (27-12)x7/16",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -36709,7 +37071,9 @@
                 "Width": 0.6858,
                 "Thickness": 0.0127,
                 "Perforated": true,
-                "Label": "2-PL (27-12)x1/2"
+                "Label": "2-PL (27-12)x1/2",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -36717,7 +37081,9 @@
                 "Width": 0.6858,
                 "Thickness": 0.0127,
                 "Perforated": true,
-                "Label": "2-PL (27-12)x1/2"
+                "Label": "2-PL (27-12)x1/2",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -36771,7 +37137,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.0142875,
                 "Perforated": true,
-                "Label": "2-PL (24-12)x9/16"
+                "Label": "2-PL (24-12)x9/16",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -36779,7 +37147,9 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.0142875,
                 "Perforated": true,
-                "Label": "2-PL (24-12)x9/16"
+                "Label": "2-PL (24-12)x9/16",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -36833,7 +37203,9 @@
                 "Width": 0.635,
                 "Thickness": 0.0142875,
                 "Perforated": true,
-                "Label": "2-PL (25-12)x9/16"
+                "Label": "2-PL (25-12)x9/16",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -36841,7 +37213,9 @@
                 "Width": 0.635,
                 "Thickness": 0.0142875,
                 "Perforated": true,
-                "Label": "2-PL (25-12)x9/16"
+                "Label": "2-PL (25-12)x9/16",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -36895,7 +37269,9 @@
                 "Width": 0.635,
                 "Thickness": 0.0142875,
                 "Perforated": true,
-                "Label": "2-PL (25-12)x9/16"
+                "Label": "2-PL (25-12)x9/16",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -36903,7 +37279,9 @@
                 "Width": 0.635,
                 "Thickness": 0.0142875,
                 "Perforated": true,
-                "Label": "2-PL (25-12)x9/16"
+                "Label": "2-PL (25-12)x9/16",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -36957,7 +37335,9 @@
                 "Width": 0.635,
                 "Thickness": 0.015875,
                 "Perforated": true,
-                "Label": "2-PL (25-12)x5/8"
+                "Label": "2-PL (25-12)x5/8",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -36965,7 +37345,9 @@
                 "Width": 0.635,
                 "Thickness": 0.015875,
                 "Perforated": true,
-                "Label": "2-PL (25-12)x5/8"
+                "Label": "2-PL (25-12)x5/8",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -37014,7 +37396,9 @@
                 "Width": 0.6604,
                 "Thickness": 0.015875,
                 "Perforated": true,
-                "Label": "2-PL (26-12)x5/8"
+                "Label": "2-PL (26-12)x5/8",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -37022,7 +37406,9 @@
                 "Width": 0.6604,
                 "Thickness": 0.015875,
                 "Perforated": true,
-                "Label": "2-PL (26-12)x5/8"
+                "Label": "2-PL (26-12)x5/8",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -37071,7 +37457,9 @@
                 "Width": 0.6604,
                 "Thickness": 0.0142875,
                 "Perforated": true,
-                "Label": "2-PL (26-12)x9/16"
+                "Label": "2-PL (26-12)x9/16",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -37079,7 +37467,9 @@
                 "Width": 0.6604,
                 "Thickness": 0.0142875,
                 "Perforated": true,
-                "Label": "2-PL (26-12)x9/16"
+                "Label": "2-PL (26-12)x9/16",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -37128,7 +37518,9 @@
                 "Width": 0.6604,
                 "Thickness": 0.0127,
                 "Perforated": true,
-                "Label": "2-PL (26-12)x1/2"
+                "Label": "2-PL (26-12)x1/2",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -37136,7 +37528,9 @@
                 "Width": 0.6604,
                 "Thickness": 0.0127,
                 "Perforated": true,
-                "Label": "2-PL (26-12)x1/2"
+                "Label": "2-PL (26-12)x1/2",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -37185,7 +37579,9 @@
                 "Width": 0.6858,
                 "Thickness": 0.0127,
                 "Perforated": true,
-                "Label": "2-PL (27-12)x1/2"
+                "Label": "2-PL (27-12)x1/2",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -37193,7 +37589,9 @@
                 "Width": 0.6858,
                 "Thickness": 0.0127,
                 "Perforated": true,
-                "Label": "2-PL (27-12)x1/2"
+                "Label": "2-PL (27-12)x1/2",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -37236,7 +37634,9 @@
                 "Width": 0.7111999999999999,
                 "Thickness": 0.0142875,
                 "Perforated": true,
-                "Label": "2-PL (28-12)x9/16"
+                "Label": "2-PL (28-12)x9/16",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -37244,7 +37644,9 @@
                 "Width": 0.7111999999999999,
                 "Thickness": 0.0142875,
                 "Perforated": true,
-                "Label": "2-PL (28-12)x9/16"
+                "Label": "2-PL (28-12)x9/16",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -37287,7 +37689,9 @@
                 "Width": 0.7111999999999999,
                 "Thickness": 0.0127,
                 "Perforated": true,
-                "Label": "2-PL (28-12)x1/2"
+                "Label": "2-PL (28-12)x1/2",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -37295,7 +37699,9 @@
                 "Width": 0.7111999999999999,
                 "Thickness": 0.0127,
                 "Perforated": true,
-                "Label": "2-PL (28-12)x1/2"
+                "Label": "2-PL (28-12)x1/2",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -37338,7 +37744,9 @@
                 "Width": 0.7111999999999999,
                 "Thickness": 0.009524999999999999,
                 "Perforated": true,
-                "Label": "2-PL (28-12)x3/8"
+                "Label": "2-PL (28-12)x3/8",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -37346,7 +37754,9 @@
                 "Width": 0.7111999999999999,
                 "Thickness": 0.009524999999999999,
                 "Perforated": true,
-                "Label": "2-PL (28-12)x3/8"
+                "Label": "2-PL (28-12)x3/8",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -37389,7 +37799,9 @@
                 "Width": 0.7111999999999999,
                 "Thickness": 0.0127,
                 "Perforated": true,
-                "Label": "2-PL (28-12)x1/2"
+                "Label": "2-PL (28-12)x1/2",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -37397,7 +37809,9 @@
                 "Width": 0.7111999999999999,
                 "Thickness": 0.0127,
                 "Perforated": true,
-                "Label": "2-PL (28-12)x1/2"
+                "Label": "2-PL (28-12)x1/2",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -37440,7 +37854,9 @@
                 "Width": 0.7111999999999999,
                 "Thickness": 0.0142875,
                 "Perforated": true,
-                "Label": "2-PL (28-12)x9/16"
+                "Label": "2-PL (28-12)x9/16",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -37448,7 +37864,9 @@
                 "Width": 0.7111999999999999,
                 "Thickness": 0.0142875,
                 "Perforated": true,
-                "Label": "2-PL (28-12)x9/16"
+                "Label": "2-PL (28-12)x9/16",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -37497,7 +37915,9 @@
                 "Width": 0.6858,
                 "Thickness": 0.009524999999999999,
                 "Perforated": true,
-                "Label": "2-PL (27-12)x3/8"
+                "Label": "2-PL (27-12)x3/8",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -37505,7 +37925,9 @@
                 "Width": 0.6858,
                 "Thickness": 0.009524999999999999,
                 "Perforated": true,
-                "Label": "2-PL (27-12)x3/8"
+                "Label": "2-PL (27-12)x3/8",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -37554,7 +37976,9 @@
                 "Width": 0.6858,
                 "Thickness": 0.0127,
                 "Perforated": true,
-                "Label": "2-PL (27-12)x1/2"
+                "Label": "2-PL (27-12)x1/2",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -37562,7 +37986,9 @@
                 "Width": 0.6858,
                 "Thickness": 0.0127,
                 "Perforated": true,
-                "Label": "2-PL (27-12)x1/2"
+                "Label": "2-PL (27-12)x1/2",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -37611,7 +38037,9 @@
                 "Width": 0.6858,
                 "Thickness": 0.0127,
                 "Perforated": true,
-                "Label": "2-PL (27-12)x1/2"
+                "Label": "2-PL (27-12)x1/2",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -37619,7 +38047,9 @@
                 "Width": 0.6858,
                 "Thickness": 0.0127,
                 "Perforated": true,
-                "Label": "2-PL (27-12)x1/2"
+                "Label": "2-PL (27-12)x1/2",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -37668,7 +38098,9 @@
                 "Width": 0.6604,
                 "Thickness": 0.0127,
                 "Perforated": true,
-                "Label": "2-PL (26-12)x1/2"
+                "Label": "2-PL (26-12)x1/2",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -37676,7 +38108,9 @@
                 "Width": 0.6604,
                 "Thickness": 0.0127,
                 "Perforated": true,
-                "Label": "2-PL (26-12)x1/2"
+                "Label": "2-PL (26-12)x1/2",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -37725,7 +38159,9 @@
                 "Width": 0.6604,
                 "Thickness": 0.0127,
                 "Perforated": true,
-                "Label": "2-PL (26-12)x1/2"
+                "Label": "2-PL (26-12)x1/2",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -37733,7 +38169,9 @@
                 "Width": 0.6604,
                 "Thickness": 0.0127,
                 "Perforated": true,
-                "Label": "2-PL (26-12)x1/2"
+                "Label": "2-PL (26-12)x1/2",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -37782,7 +38220,9 @@
                 "Width": 0.6858,
                 "Thickness": 0.0127,
                 "Perforated": true,
-                "Label": "2-PL (27-12)x1/2"
+                "Label": "2-PL (27-12)x1/2",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -37790,7 +38230,9 @@
                 "Width": 0.6858,
                 "Thickness": 0.0127,
                 "Perforated": true,
-                "Label": "2-PL (27-12)x1/2"
+                "Label": "2-PL (27-12)x1/2",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -37839,7 +38281,9 @@
                 "Width": 0.6858,
                 "Thickness": 0.0127,
                 "Perforated": true,
-                "Label": "2-PL (27-12)x1/2"
+                "Label": "2-PL (27-12)x1/2",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -37847,7 +38291,9 @@
                 "Width": 0.6858,
                 "Thickness": 0.0127,
                 "Perforated": true,
-                "Label": "2-PL (27-12)x1/2"
+                "Label": "2-PL (27-12)x1/2",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -37896,7 +38342,9 @@
                 "Width": 0.6858,
                 "Thickness": 0.0127,
                 "Perforated": true,
-                "Label": "2-PL (27-12)x1/2"
+                "Label": "2-PL (27-12)x1/2",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -37904,7 +38352,9 @@
                 "Width": 0.6858,
                 "Thickness": 0.0127,
                 "Perforated": true,
-                "Label": "2-PL (27-12)x1/2"
+                "Label": "2-PL (27-12)x1/2",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -37953,7 +38403,9 @@
                 "Width": 0.6858,
                 "Thickness": 0.009524999999999999,
                 "Perforated": true,
-                "Label": "2-PL (27-12)x3/8"
+                "Label": "2-PL (27-12)x3/8",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -37961,7 +38413,9 @@
                 "Width": 0.6858,
                 "Thickness": 0.009524999999999999,
                 "Perforated": true,
-                "Label": "2-PL (27-12)x3/8"
+                "Label": "2-PL (27-12)x3/8",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -38010,7 +38464,9 @@
                 "Width": 0.6604,
                 "Thickness": 0.0142875,
                 "Perforated": true,
-                "Label": "2-PL (26-12)x9/16"
+                "Label": "2-PL (26-12)x9/16",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -38018,7 +38474,9 @@
                 "Width": 0.6604,
                 "Thickness": 0.0142875,
                 "Perforated": true,
-                "Label": "2-PL (26-12)x9/16"
+                "Label": "2-PL (26-12)x9/16",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -38067,7 +38525,9 @@
                 "Width": 0.6604,
                 "Thickness": 0.0142875,
                 "Perforated": true,
-                "Label": "2-PL (26-12)x9/16"
+                "Label": "2-PL (26-12)x9/16",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -38075,7 +38535,9 @@
                 "Width": 0.6604,
                 "Thickness": 0.0142875,
                 "Perforated": true,
-                "Label": "2-PL (26-12)x9/16"
+                "Label": "2-PL (26-12)x9/16",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -38124,7 +38586,9 @@
                 "Width": 0.6604,
                 "Thickness": 0.0142875,
                 "Perforated": true,
-                "Label": "2-PL (26-12)x9/16"
+                "Label": "2-PL (26-12)x9/16",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -38132,7 +38596,9 @@
                 "Width": 0.6604,
                 "Thickness": 0.0142875,
                 "Perforated": true,
-                "Label": "2-PL (26-12)x9/16"
+                "Label": "2-PL (26-12)x9/16",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -38181,7 +38647,9 @@
                 "Width": 0.6604,
                 "Thickness": 0.0142875,
                 "Perforated": true,
-                "Label": "2-PL (26-12)x9/16"
+                "Label": "2-PL (26-12)x9/16",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -38189,7 +38657,9 @@
                 "Width": 0.6604,
                 "Thickness": 0.0142875,
                 "Perforated": true,
-                "Label": "2-PL (26-12)x9/16"
+                "Label": "2-PL (26-12)x9/16",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -38238,7 +38708,9 @@
                 "Width": 0.6604,
                 "Thickness": 0.0142875,
                 "Perforated": true,
-                "Label": "2-PL (26-12)x9/16"
+                "Label": "2-PL (26-12)x9/16",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -38246,7 +38718,9 @@
                 "Width": 0.6604,
                 "Thickness": 0.0142875,
                 "Perforated": true,
-                "Label": "2-PL (26-12)x9/16"
+                "Label": "2-PL (26-12)x9/16",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -38295,7 +38769,9 @@
                 "Width": 0.6604,
                 "Thickness": 0.0142875,
                 "Perforated": true,
-                "Label": "2-PL (26-12)x9/16"
+                "Label": "2-PL (26-12)x9/16",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -38303,7 +38779,9 @@
                 "Width": 0.6604,
                 "Thickness": 0.0142875,
                 "Perforated": true,
-                "Label": "2-PL (26-12)x9/16"
+                "Label": "2-PL (26-12)x9/16",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -38352,7 +38830,9 @@
                 "Width": 0.6604,
                 "Thickness": 0.0142875,
                 "Perforated": true,
-                "Label": "2-PL (26-12)x9/16"
+                "Label": "2-PL (26-12)x9/16",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -38360,7 +38840,9 @@
                 "Width": 0.6604,
                 "Thickness": 0.0142875,
                 "Perforated": true,
-                "Label": "2-PL (26-12)x9/16"
+                "Label": "2-PL (26-12)x9/16",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -38409,7 +38891,9 @@
                 "Width": 0.6604,
                 "Thickness": 0.0142875,
                 "Perforated": true,
-                "Label": "2-PL (26-12)x9/16"
+                "Label": "2-PL (26-12)x9/16",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -38417,7 +38901,9 @@
                 "Width": 0.6604,
                 "Thickness": 0.0142875,
                 "Perforated": true,
-                "Label": "2-PL (26-12)x9/16"
+                "Label": "2-PL (26-12)x9/16",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -38466,7 +38952,9 @@
                 "Width": 0.6604,
                 "Thickness": 0.0127,
                 "Perforated": true,
-                "Label": "2-PL (26-12)x1/2"
+                "Label": "2-PL (26-12)x1/2",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -38474,7 +38962,9 @@
                 "Width": 0.6604,
                 "Thickness": 0.0127,
                 "Perforated": true,
-                "Label": "2-PL (26-12)x1/2"
+                "Label": "2-PL (26-12)x1/2",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -38523,7 +39013,9 @@
                 "Width": 0.6858,
                 "Thickness": 0.0127,
                 "Perforated": true,
-                "Label": "2-PL (27-12)x1/2"
+                "Label": "2-PL (27-12)x1/2",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -38531,7 +39023,9 @@
                 "Width": 0.6858,
                 "Thickness": 0.0127,
                 "Perforated": true,
-                "Label": "2-PL (27-12)x1/2"
+                "Label": "2-PL (27-12)x1/2",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -38574,7 +39068,9 @@
                 "Width": 0.7111999999999999,
                 "Thickness": 0.0127,
                 "Perforated": true,
-                "Label": "2-PL (28-12)x1/2"
+                "Label": "2-PL (28-12)x1/2",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -38582,7 +39078,9 @@
                 "Width": 0.7111999999999999,
                 "Thickness": 0.0127,
                 "Perforated": true,
-                "Label": "2-PL (28-12)x1/2"
+                "Label": "2-PL (28-12)x1/2",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -38651,7 +39149,9 @@
                 "Width": 0.5841999999999999,
                 "Thickness": 0.028575,
                 "Perforated": true,
-                "Label": "Cov. PL (23-12) x 1 1/8"
+                "Label": "Cov. PL (23-12) x 1 1/8",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -38659,7 +39159,9 @@
                 "Width": 0.5841999999999999,
                 "Thickness": 0.028575,
                 "Perforated": true,
-                "Label": "Cov. PL (23-12) x 1 1/8"
+                "Label": "Cov. PL (23-12) x 1 1/8",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -38708,19 +39210,25 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.028575,
                 "Perforated": false,
-                "Label": ""
+                "Label": "",
+                "Length": 0,
+                "Offset": 0
               },
               {
                 "Width": 0.6095999999999999,
                 "Thickness": 0.028575,
                 "Perforated": false,
-                "Label": ""
+                "Label": "",
+                "Length": 0,
+                "Offset": 0
               },
               {
                 "Width": 0.6095999999999999,
                 "Thickness": 0.022224999999999998,
                 "Perforated": false,
-                "Label": ""
+                "Label": "",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -38728,19 +39236,25 @@
                 "Width": 0.6095999999999999,
                 "Thickness": 0.028575,
                 "Perforated": false,
-                "Label": ""
+                "Label": "",
+                "Length": 0,
+                "Offset": 0
               },
               {
                 "Width": 0.6095999999999999,
                 "Thickness": 0.028575,
                 "Perforated": false,
-                "Label": ""
+                "Label": "",
+                "Length": 0,
+                "Offset": 0
               },
               {
                 "Width": 0.6095999999999999,
                 "Thickness": 0.022224999999999998,
                 "Perforated": false,
-                "Label": ""
+                "Label": "",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -38789,7 +39303,9 @@
                 "Width": 0.4572,
                 "Thickness": 0.0127,
                 "Perforated": false,
-                "Label": ""
+                "Label": "",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [],
@@ -38839,7 +39355,9 @@
                 "Width": 0.4572,
                 "Thickness": 0.015875,
                 "Perforated": false,
-                "Label": ""
+                "Label": "",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [],
@@ -38889,7 +39407,9 @@
                 "Width": 0.4572,
                 "Thickness": 0.015875,
                 "Perforated": false,
-                "Label": ""
+                "Label": "",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -38897,7 +39417,9 @@
                 "Width": 0.4572,
                 "Thickness": 0.015875,
                 "Perforated": false,
-                "Label": ""
+                "Label": "",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -38946,7 +39468,9 @@
                 "Width": 0.635,
                 "Thickness": 0.0142875,
                 "Perforated": false,
-                "Label": ""
+                "Label": "",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -38954,7 +39478,9 @@
                 "Width": 0.635,
                 "Thickness": 0.0142875,
                 "Perforated": false,
-                "Label": ""
+                "Label": "",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -39145,7 +39671,9 @@
                 "Width": 0.3302,
                 "Thickness": 0.0127,
                 "Perforated": true,
-                "Label": "PL (13-6) x 1/2"
+                "Label": "PL (13-6) x 1/2",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -39153,7 +39681,9 @@
                 "Width": 0.3302,
                 "Thickness": 0.0127,
                 "Perforated": true,
-                "Label": "PL (13-6) x 1/2"
+                "Label": "PL (13-6) x 1/2",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -39196,7 +39726,9 @@
                 "Width": 0.7493,
                 "Thickness": 0.0127,
                 "Perforated": true,
-                "Label": ""
+                "Label": "",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -39204,7 +39736,9 @@
                 "Width": 0.7493,
                 "Thickness": 0.0127,
                 "Perforated": true,
-                "Label": ""
+                "Label": "",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -39247,7 +39781,9 @@
                 "Width": 0.7493,
                 "Thickness": 0.0127,
                 "Perforated": true,
-                "Label": ""
+                "Label": "",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -39255,7 +39791,9 @@
                 "Width": 0.7493,
                 "Thickness": 0.0127,
                 "Perforated": true,
-                "Label": ""
+                "Label": "",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -39298,7 +39836,9 @@
                 "Width": 0.7493,
                 "Thickness": 0.0127,
                 "Perforated": true,
-                "Label": ""
+                "Label": "",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -39306,7 +39846,9 @@
                 "Width": 0.7493,
                 "Thickness": 0.0127,
                 "Perforated": true,
-                "Label": ""
+                "Label": "",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -39349,7 +39891,9 @@
                 "Width": 0.3175,
                 "Thickness": 0.009524999999999999,
                 "Perforated": true,
-                "Label": ""
+                "Label": "",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -39357,7 +39901,9 @@
                 "Width": 0.3175,
                 "Thickness": 0.009524999999999999,
                 "Perforated": true,
-                "Label": ""
+                "Label": "",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -39400,7 +39946,9 @@
                 "Width": 0.5588,
                 "Thickness": 0.009524999999999999,
                 "Perforated": true,
-                "Label": ""
+                "Label": "",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -39408,7 +39956,9 @@
                 "Width": 0.5588,
                 "Thickness": 0.009524999999999999,
                 "Perforated": true,
-                "Label": ""
+                "Label": "",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -39451,7 +40001,9 @@
                 "Width": 0.3302,
                 "Thickness": 0.009524999999999999,
                 "Perforated": true,
-                "Label": ""
+                "Label": "",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -39459,7 +40011,9 @@
                 "Width": 0.3302,
                 "Thickness": 0.009524999999999999,
                 "Perforated": true,
-                "Label": ""
+                "Label": "",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -39508,7 +40062,9 @@
                 "Width": 0.43179999999999996,
                 "Thickness": 0.022224999999999998,
                 "Perforated": false,
-                "Label": ""
+                "Label": "",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -39516,7 +40072,9 @@
                 "Width": 0.43179999999999996,
                 "Thickness": 0.022224999999999998,
                 "Perforated": false,
-                "Label": ""
+                "Label": "",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -39565,7 +40123,9 @@
                 "Width": 0.5588,
                 "Thickness": 0.0142875,
                 "Perforated": false,
-                "Label": ""
+                "Label": "",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -39573,7 +40133,9 @@
                 "Width": 0.5588,
                 "Thickness": 0.0142875,
                 "Perforated": false,
-                "Label": ""
+                "Label": "",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -55403,7 +55965,9 @@
                 "Width": 0.35559999999999997,
                 "Thickness": 0.0127,
                 "Perforated": false,
-                "Label": ""
+                "Label": "",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [],
@@ -55423,7 +55987,7 @@
             "Width": 0,
             "Diameter": 0,
             "WorkingLineOffset": 0,
-            "Unresolved": "UNRESOLVED (p.55, p.48, p.58): partial-length floor beam cover plates (F.L. \u002B 28\u0027-0 / 40\u0027-0 / 20\u0027-0 bottom plates, F3 / F4 / B1 plate counts 2 / 4 / 1) - the lengths are listed on p.55 but their positions along the beam were not decoded; the bracket (B1) web is drawn tapering 6\u0027-3 1/2 to 2\u0027-0 1/2. only the full-length top plate 14 x 1/2 is built; the cantilever brackets B1 are built as the full-depth beam (taper not modeled, overstates the bracket).",
+            "Unresolved": "UNRESOLVED (p.55, p.48, p.58): partial-length floor beam cover plates (F.L. \u002B 28\u0027-0 / 40\u0027-0 / 20\u0027-0 bottom plates, F3 / F4 / B1 plate counts 2 / 4 / 1) - the lengths are listed on p.55 but their positions along the beam were not decoded; the bracket (B1) web is drawn tapering 6\u0027-3 1/2 to 2\u0027-0 1/2. only the full-length top plate 14 x 1/2 is built (the B1 bracket taper 6\u0027-3 1/2 -\u003E 2\u0027-0 1/2 is modeled).",
             "Source": "p.58 / p.55"
           },
           {
@@ -55453,7 +56017,9 @@
                 "Width": 0.35559999999999997,
                 "Thickness": 0.0127,
                 "Perforated": false,
-                "Label": ""
+                "Label": "",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [],
@@ -55473,7 +56039,7 @@
             "Width": 0,
             "Diameter": 0,
             "WorkingLineOffset": 0,
-            "Unresolved": "UNRESOLVED (p.55, p.48, p.58): partial-length floor beam cover plates (F.L. \u002B 28\u0027-0 / 40\u0027-0 / 20\u0027-0 bottom plates, F3 / F4 / B1 plate counts 2 / 4 / 1) - the lengths are listed on p.55 but their positions along the beam were not decoded; the bracket (B1) web is drawn tapering 6\u0027-3 1/2 to 2\u0027-0 1/2. only the full-length top plate 14 x 1/2 is built; the cantilever brackets B1 are built as the full-depth beam (taper not modeled, overstates the bracket).",
+            "Unresolved": "UNRESOLVED (p.55, p.48, p.58): partial-length floor beam cover plates (F.L. \u002B 28\u0027-0 / 40\u0027-0 / 20\u0027-0 bottom plates, F3 / F4 / B1 plate counts 2 / 4 / 1) - the lengths are listed on p.55 but their positions along the beam were not decoded; the bracket (B1) web is drawn tapering 6\u0027-3 1/2 to 2\u0027-0 1/2. only the full-length top plate 14 x 1/2 is built (the B1 bracket taper 6\u0027-3 1/2 -\u003E 2\u0027-0 1/2 is modeled).",
             "Source": "p.58 / p.55"
           },
           {
@@ -55503,7 +56069,9 @@
                 "Width": 0.35559999999999997,
                 "Thickness": 0.0127,
                 "Perforated": false,
-                "Label": ""
+                "Label": "",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [],
@@ -55523,7 +56091,7 @@
             "Width": 0,
             "Diameter": 0,
             "WorkingLineOffset": 0,
-            "Unresolved": "UNRESOLVED (p.55, p.48, p.58): partial-length floor beam cover plates (F.L. \u002B 28\u0027-0 / 40\u0027-0 / 20\u0027-0 bottom plates, F3 / F4 / B1 plate counts 2 / 4 / 1) - the lengths are listed on p.55 but their positions along the beam were not decoded; the bracket (B1) web is drawn tapering 6\u0027-3 1/2 to 2\u0027-0 1/2. only the full-length top plate 14 x 1/2 is built; the cantilever brackets B1 are built as the full-depth beam (taper not modeled, overstates the bracket).",
+            "Unresolved": "UNRESOLVED (p.55, p.48, p.58): partial-length floor beam cover plates (F.L. \u002B 28\u0027-0 / 40\u0027-0 / 20\u0027-0 bottom plates, F3 / F4 / B1 plate counts 2 / 4 / 1) - the lengths are listed on p.55 but their positions along the beam were not decoded; the bracket (B1) web is drawn tapering 6\u0027-3 1/2 to 2\u0027-0 1/2. only the full-length top plate 14 x 1/2 is built (the B1 bracket taper 6\u0027-3 1/2 -\u003E 2\u0027-0 1/2 is modeled).",
             "Source": "p.58 / p.55"
           },
           {
@@ -55732,7 +56300,9 @@
                 "Width": 0.3302,
                 "Thickness": 0.009524999999999999,
                 "Perforated": true,
-                "Label": "PL (13-6) x 3/8"
+                "Label": "PL (13-6) x 3/8",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -55740,7 +56310,9 @@
                 "Width": 0.3302,
                 "Thickness": 0.009524999999999999,
                 "Perforated": true,
-                "Label": "PL (13-6) x 3/8"
+                "Label": "PL (13-6) x 3/8",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -56109,11 +56681,11 @@
             "Role": "LowerChord",
             "Panel": "Panel 0-2",
             "System": "",
-            "StartSetback": null,
+            "StartSetback": -0.2667,
             "EndSetback": null,
             "OffsetZ": 0,
             "PlanLength": 16.428476160000002,
-            "Unresolved": "",
+            "Unresolved": "UNRESOLVED (p.57): rolled shape 14 WF 142 (1954 series) dimensions - the sheets print the designation and the gross area 41.85 sq.in., not d / bf / tw / tf, and the 1954 series differs from AISC v16. d / bf / tw / tf interpolated by area between AISC W14x132 and W14x145, weight 3.4 lb/ft per sq.in.; flanges in planes parallel to the truss plane with the gusset pairs outside them (p.50 / p.60: gusset in-to-in = depth \u002B fills). UNRESOLVED (p.59, p.49): bottom chord / gusset end beyond L0 and L0\u0027 - the ELEVATION draws the chord and the gussets ending about 10 1/2 in. beyond the vertical line through the shoe pin but prints no dimension (scaled from the 4\u0027-0 between the two units\u0027 pins). end chords extended 10 1/2 in. past L0 / L0\u0027 (scaled); the gusset envelope follows the chord end.",
             "Source": "57 member table row L0-L2"
           },
           {
@@ -56126,10 +56698,10 @@
             "Panel": "Panel 2\u0027-0\u0027",
             "System": "",
             "StartSetback": null,
-            "EndSetback": null,
+            "EndSetback": -0.2667,
             "OffsetZ": 0,
             "PlanLength": 16.428476160000002,
-            "Unresolved": "",
+            "Unresolved": "UNRESOLVED (p.57): rolled shape 14 WF 142 (1954 series) dimensions - the sheets print the designation and the gross area 41.85 sq.in., not d / bf / tw / tf, and the 1954 series differs from AISC v16. d / bf / tw / tf interpolated by area between AISC W14x132 and W14x145, weight 3.4 lb/ft per sq.in.; flanges in planes parallel to the truss plane with the gusset pairs outside them (p.50 / p.60: gusset in-to-in = depth \u002B fills). UNRESOLVED (p.59, p.49): bottom chord / gusset end beyond L0 and L0\u0027 - the ELEVATION draws the chord and the gussets ending about 10 1/2 in. beyond the vertical line through the shoe pin but prints no dimension (scaled from the 4\u0027-0 between the two units\u0027 pins). end chords extended 10 1/2 in. past L0 / L0\u0027 (scaled); the gusset envelope follows the chord end.",
             "Source": "57 member table row L0-L2"
           },
           {
@@ -57743,6 +58315,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -57759,6 +58332,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -57791,6 +58365,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -57807,6 +58382,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -57839,6 +58415,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -57855,6 +58432,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -57887,6 +58465,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -57903,6 +58482,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -57935,6 +58515,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -57951,6 +58532,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -57983,6 +58565,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -57999,6 +58582,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -58031,6 +58615,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -58047,6 +58632,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -58079,6 +58665,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -58095,6 +58682,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -58127,6 +58715,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -58143,6 +58732,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -58175,6 +58765,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -58191,6 +58782,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -58223,6 +58815,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -58239,6 +58832,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -58271,6 +58865,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -58287,6 +58882,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -58319,6 +58915,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -58335,6 +58932,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -58367,6 +58965,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -58383,6 +58982,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -58415,6 +59015,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -58431,6 +59032,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -58463,6 +59065,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -58479,6 +59082,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -58511,6 +59115,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -58527,6 +59132,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -58559,6 +59165,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -58575,6 +59182,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -58607,6 +59215,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -58623,6 +59232,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -58655,6 +59265,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -58671,6 +59282,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -58703,6 +59315,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -58719,6 +59332,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -58751,6 +59365,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -58767,6 +59382,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -58799,6 +59415,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -58815,6 +59432,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -58847,6 +59465,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -58863,6 +59482,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -58895,6 +59515,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -58911,6 +59532,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -58943,6 +59565,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -58959,6 +59582,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -58991,6 +59615,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -59007,6 +59632,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -59039,6 +59665,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -59055,6 +59682,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -59087,6 +59715,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -59103,6 +59732,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -59135,6 +59765,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -59151,6 +59782,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -59183,6 +59815,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -59199,6 +59832,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -59231,6 +59865,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -59247,6 +59882,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -59279,6 +59915,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -59295,6 +59932,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -59327,6 +59965,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -59343,6 +59982,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -59375,6 +60015,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -59391,6 +60032,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -59423,6 +60065,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -59439,6 +60082,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -59471,6 +60115,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -59487,6 +60132,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -59519,6 +60165,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -59535,6 +60182,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -59567,6 +60215,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -59583,6 +60232,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -59615,6 +60265,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -59631,6 +60282,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -59663,6 +60315,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -59679,6 +60332,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -64648,8 +65302,8 @@
         "Floor": {
           "Stringers": [
             {
-              "Name": "N33.67",
-              "Offset": -10.2616,
+              "Name": "N39.08",
+              "Offset": -11.912600000000001,
               "Section": "W21x62",
               "TopBelowGrade": null,
               "FromStation": null,
@@ -64728,8 +65382,8 @@
               "ToStation": null
             },
             {
-              "Name": "S33.67",
-              "Offset": 10.2616,
+              "Name": "S39.08",
+              "Offset": 11.912600000000001,
               "Section": "W21x62",
               "TopBelowGrade": null,
               "FromStation": null,
@@ -65007,15 +65661,16 @@
           "UNRESOLVED (p.57): cover plates 2-Pls. 16 1/2 x 13/16 on 14 WF 342 (member U9-U11) - the member table lists them as part of the section (area includes them) but the joint sheets draw them only between the splices and the sheet gives no length / position. not built (the rolled shape alone; the gross area in the table is larger by the plates).",
           "UNRESOLVED (p.57): cover plates 2-Pls. 16 1/2 x 7/8 on 14 WF 342 (member U9-L10) - the member table lists them as part of the section (area includes them) but the joint sheets draw them only between the splices and the sheet gives no length / position. not built (the rolled shape alone; the gross area in the table is larger by the plates).",
           "UNRESOLVED (p.57): cover plates 2-Pls. 16 x 11/16 on 14 WF 314 (member L10-U11) - the member table lists them as part of the section (area includes them) but the joint sheets draw them only between the splices and the sheet gives no length / position. not built (the rolled shape alone; the gross area in the table is larger by the plates).",
+          "UNRESOLVED (p.59, p.49): bottom chord / gusset end beyond L0 and L0\u0027 - the ELEVATION draws the chord and the gussets ending about 10 1/2 in. beyond the vertical line through the shoe pin but prints no dimension (scaled from the 4\u0027-0 between the two units\u0027 pins). end chords extended 10 1/2 in. past L0 / L0\u0027 (scaled); the gusset envelope follows the chord end.",
           "UNRESOLVED (p.55): floor beam end connections at the truss (bracket / top chord connection) - p.55 draws the connection on the top chord (2 tension plates, bent plate) but without the dimensions needed to build it. floor beam between the trusses and the brackets stop 9 1/2 in. from the truss CL (half of a typical 17 in. gusset-to-gusset width \u002B gusset), plain butt.",
           "UNRESOLVED (p.48, p.58): top / bottom lateral K pattern and the end panels - read from the half plans (K from the CL apex to the corners of the next floor beam, diamond about the pier joints, X at the centre) at 250-400 dpi; the first panel is drawn with the apex at the end joint. pattern as read; transverse top struts = the floor beams.",
           "UNRESOLVED (p.48, p.58): location of 10 WF 33 hanger bracing - the sketch shows it vertical within the 58\u0027-0 frame under the floor beam without the exact line. built vertical on the CL from the floor beam bottom to the bottom strut at every point without sway bracing.",
           "UNRESOLVED (p.48, p.56, p.58): lateral / strut rivet counts (10 / 20 / 40 / 6 per end), 7/16 gusset plates - counts printed in zones of the plan whose allocation is ambiguous; gusset outlines not drawn. not placed / not built.",
           "UNRESOLVED (p.57, p.58): camber - no camber ordinates are printed on these sheets (p.47: floor beams and brackets need not be cambered; stringers uncambered). geometry = final shape.",
-          "UNRESOLVED (p.48, p.58): stringer lines (11 built: 4 spaces @ 8\u0027-3 = 33\u0027-0 each side of the CL \u002B 21 WF 62 S5 8 in. outside the 33\u0027-0 lines) - the half plan dimensions 6\u0027-1 \u002B 8 in. \u002B 4 spaces @ 8\u0027-3 from the floor beam tip (39\u0027-9) but the line of each mark S5 / S6 / S7 / S8 and the centre line pair are not decoded. S5 = 21 WF 62 at 33\u0027-8 from the CL, all other lines 24 WF 76 (S6 printed 24 WF 78 on p.58).",
+          "UNRESOLVED (p.48, p.58): stringer mark per line (S6 / S7 / S8 = 24 WF 76) - the half plans name S5 - S8 at the lines but the 24 WF 76 marks differ only in their stresses; S5 (21 WF 62) is the outside line at 39\u0027-1 (p.55: 6\u0027-1 beyond the 33\u0027-0 line, 10 in. outside the gutter line). S5 = 21 WF 62 at 39\u0027-1 from the CL, all other lines 24 WF 76 (S6 printed 24 WF 78 on p.58).",
           "UNRESOLVED (p.54, p.68): expansion dams at the unit ends and the pier joints - the dam sheets give dimension strings and clearance tables but are not modeled in this phase. not built; deck / floor system end at joint 0 and 0\u0027.",
           "UNRESOLVED (p.101-106): inspection walkways, ladders and platforms under the trusses; light pole brackets - not part of the truss steel (separate sheets); brackets for light poles are on DRB-6 (not in the set). not built.",
-          "UNRESOLVED (p.55, p.48, p.58): partial-length floor beam cover plates (F.L. \u002B 28\u0027-0 / 40\u0027-0 / 20\u0027-0 bottom plates, F3 / F4 / B1 plate counts 2 / 4 / 1) - the lengths are listed on p.55 but their positions along the beam were not decoded; the bracket (B1) web is drawn tapering 6\u0027-3 1/2 to 2\u0027-0 1/2. only the full-length top plate 14 x 1/2 is built; the cantilever brackets B1 are built as the full-depth beam (taper not modeled, overstates the bracket).",
+          "UNRESOLVED (p.55, p.48, p.58): partial-length floor beam cover plates (F.L. \u002B 28\u0027-0 / 40\u0027-0 / 20\u0027-0 bottom plates, F3 / F4 / B1 plate counts 2 / 4 / 1) - the lengths are listed on p.55 but their positions along the beam were not decoded; the bracket (B1) web is drawn tapering 6\u0027-3 1/2 to 2\u0027-0 1/2. only the full-length top plate 14 x 1/2 is built (the B1 bracket taper 6\u0027-3 1/2 -\u003E 2\u0027-0 1/2 is modeled).",
           "UNRESOLVED (p.59-67): gusset thickness of joint L5 - the joint sheet was not read for this joint (not printed or not extracted). 3/4 in. built, flagged.",
           "UNRESOLVED (p.59-67): gusset thickness of joint U20 - the joint sheet was not read for this joint (not printed or not extracted). 3/4 in. built, flagged.",
           "UNRESOLVED (p.59-67): gusset thickness of joint L5\u0027 - the joint sheet was not read for this joint (not printed or not extracted). 3/4 in. built, flagged.",
@@ -69421,7 +70076,9 @@
                 "Width": 0.35559999999999997,
                 "Thickness": 0.0127,
                 "Perforated": false,
-                "Label": ""
+                "Label": "",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [],
@@ -69441,7 +70098,7 @@
             "Width": 0,
             "Diameter": 0,
             "WorkingLineOffset": 0,
-            "Unresolved": "UNRESOLVED (p.55, p.48, p.58): partial-length floor beam cover plates (F.L. \u002B 28\u0027-0 / 40\u0027-0 / 20\u0027-0 bottom plates, F3 / F4 / B1 plate counts 2 / 4 / 1) - the lengths are listed on p.55 but their positions along the beam were not decoded; the bracket (B1) web is drawn tapering 6\u0027-3 1/2 to 2\u0027-0 1/2. only the full-length top plate 14 x 1/2 is built; the cantilever brackets B1 are built as the full-depth beam (taper not modeled, overstates the bracket).",
+            "Unresolved": "UNRESOLVED (p.55, p.48, p.58): partial-length floor beam cover plates (F.L. \u002B 28\u0027-0 / 40\u0027-0 / 20\u0027-0 bottom plates, F3 / F4 / B1 plate counts 2 / 4 / 1) - the lengths are listed on p.55 but their positions along the beam were not decoded; the bracket (B1) web is drawn tapering 6\u0027-3 1/2 to 2\u0027-0 1/2. only the full-length top plate 14 x 1/2 is built (the B1 bracket taper 6\u0027-3 1/2 -\u003E 2\u0027-0 1/2 is modeled).",
             "Source": "p.48 / p.55"
           },
           {
@@ -69471,7 +70128,9 @@
                 "Width": 0.35559999999999997,
                 "Thickness": 0.0127,
                 "Perforated": false,
-                "Label": ""
+                "Label": "",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [],
@@ -69491,7 +70150,7 @@
             "Width": 0,
             "Diameter": 0,
             "WorkingLineOffset": 0,
-            "Unresolved": "UNRESOLVED (p.55, p.48, p.58): partial-length floor beam cover plates (F.L. \u002B 28\u0027-0 / 40\u0027-0 / 20\u0027-0 bottom plates, F3 / F4 / B1 plate counts 2 / 4 / 1) - the lengths are listed on p.55 but their positions along the beam were not decoded; the bracket (B1) web is drawn tapering 6\u0027-3 1/2 to 2\u0027-0 1/2. only the full-length top plate 14 x 1/2 is built; the cantilever brackets B1 are built as the full-depth beam (taper not modeled, overstates the bracket).",
+            "Unresolved": "UNRESOLVED (p.55, p.48, p.58): partial-length floor beam cover plates (F.L. \u002B 28\u0027-0 / 40\u0027-0 / 20\u0027-0 bottom plates, F3 / F4 / B1 plate counts 2 / 4 / 1) - the lengths are listed on p.55 but their positions along the beam were not decoded; the bracket (B1) web is drawn tapering 6\u0027-3 1/2 to 2\u0027-0 1/2. only the full-length top plate 14 x 1/2 is built (the B1 bracket taper 6\u0027-3 1/2 -\u003E 2\u0027-0 1/2 is modeled).",
             "Source": "p.48 / p.55"
           },
           {
@@ -69521,7 +70180,9 @@
                 "Width": 0.35559999999999997,
                 "Thickness": 0.0127,
                 "Perforated": false,
-                "Label": ""
+                "Label": "",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [],
@@ -69541,7 +70202,7 @@
             "Width": 0,
             "Diameter": 0,
             "WorkingLineOffset": 0,
-            "Unresolved": "UNRESOLVED (p.55, p.48, p.58): partial-length floor beam cover plates (F.L. \u002B 28\u0027-0 / 40\u0027-0 / 20\u0027-0 bottom plates, F3 / F4 / B1 plate counts 2 / 4 / 1) - the lengths are listed on p.55 but their positions along the beam were not decoded; the bracket (B1) web is drawn tapering 6\u0027-3 1/2 to 2\u0027-0 1/2. only the full-length top plate 14 x 1/2 is built; the cantilever brackets B1 are built as the full-depth beam (taper not modeled, overstates the bracket).",
+            "Unresolved": "UNRESOLVED (p.55, p.48, p.58): partial-length floor beam cover plates (F.L. \u002B 28\u0027-0 / 40\u0027-0 / 20\u0027-0 bottom plates, F3 / F4 / B1 plate counts 2 / 4 / 1) - the lengths are listed on p.55 but their positions along the beam were not decoded; the bracket (B1) web is drawn tapering 6\u0027-3 1/2 to 2\u0027-0 1/2. only the full-length top plate 14 x 1/2 is built (the B1 bracket taper 6\u0027-3 1/2 -\u003E 2\u0027-0 1/2 is modeled).",
             "Source": "p.48 / p.55"
           },
           {
@@ -69750,7 +70411,9 @@
                 "Width": 0.3302,
                 "Thickness": 0.009524999999999999,
                 "Perforated": true,
-                "Label": "PL (13-6) x 3/8"
+                "Label": "PL (13-6) x 3/8",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "BottomPlates": [
@@ -69758,7 +70421,9 @@
                 "Width": 0.3302,
                 "Thickness": 0.009524999999999999,
                 "Perforated": true,
-                "Label": "PL (13-6) x 3/8"
+                "Label": "PL (13-6) x 3/8",
+                "Length": 0,
+                "Offset": 0
               }
             ],
             "Lacing": null,
@@ -69999,11 +70664,11 @@
             "Role": "LowerChord",
             "Panel": "Panel 0-2",
             "System": "",
-            "StartSetback": null,
+            "StartSetback": -0.2667,
             "EndSetback": null,
             "OffsetZ": 0,
             "PlanLength": 16.428476160000002,
-            "Unresolved": "",
+            "Unresolved": "UNRESOLVED (p.47): rolled shape 14 WF 111 (1954 series) dimensions - the sheets print the designation and the gross area 32.65 sq.in., not d / bf / tw / tf, and the 1954 series differs from AISC v16. d / bf / tw / tf interpolated by area between AISC W14x109 and W14x120, weight 3.4 lb/ft per sq.in.; flanges in planes parallel to the truss plane with the gusset pairs outside them (p.50 / p.60: gusset in-to-in = depth \u002B fills). UNRESOLVED (p.59, p.49): bottom chord / gusset end beyond L0 and L0\u0027 - the ELEVATION draws the chord and the gussets ending about 10 1/2 in. beyond the vertical line through the shoe pin but prints no dimension (scaled from the 4\u0027-0 between the two units\u0027 pins). end chords extended 10 1/2 in. past L0 / L0\u0027 (scaled); the gusset envelope follows the chord end.",
             "Source": "47 member table row L0-L2"
           },
           {
@@ -70016,10 +70681,10 @@
             "Panel": "Panel 2\u0027-0\u0027",
             "System": "",
             "StartSetback": null,
-            "EndSetback": null,
+            "EndSetback": -0.2667,
             "OffsetZ": 0,
             "PlanLength": 16.428476160000002,
-            "Unresolved": "",
+            "Unresolved": "UNRESOLVED (p.47): rolled shape 14 WF 111 (1954 series) dimensions - the sheets print the designation and the gross area 32.65 sq.in., not d / bf / tw / tf, and the 1954 series differs from AISC v16. d / bf / tw / tf interpolated by area between AISC W14x109 and W14x120, weight 3.4 lb/ft per sq.in.; flanges in planes parallel to the truss plane with the gusset pairs outside them (p.50 / p.60: gusset in-to-in = depth \u002B fills). UNRESOLVED (p.59, p.49): bottom chord / gusset end beyond L0 and L0\u0027 - the ELEVATION draws the chord and the gussets ending about 10 1/2 in. beyond the vertical line through the shoe pin but prints no dimension (scaled from the 4\u0027-0 between the two units\u0027 pins). end chords extended 10 1/2 in. past L0 / L0\u0027 (scaled); the gusset envelope follows the chord end.",
             "Source": "47 member table row L0-L2"
           },
           {
@@ -70993,6 +71658,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -71009,6 +71675,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -71041,6 +71708,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -71057,6 +71725,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -71089,6 +71758,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -71105,6 +71775,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -71137,6 +71808,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -71153,6 +71825,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -71185,6 +71858,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -71201,6 +71875,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -71233,6 +71908,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -71249,6 +71925,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -71281,6 +71958,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -71297,6 +71975,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -71329,6 +72008,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -71345,6 +72025,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -71377,6 +72058,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -71393,6 +72075,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -71425,6 +72108,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -71441,6 +72125,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -71473,6 +72158,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -71489,6 +72175,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -71521,6 +72208,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -71537,6 +72225,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -71569,6 +72258,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -71585,6 +72275,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -71617,6 +72308,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -71633,6 +72325,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -71665,6 +72358,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -71681,6 +72375,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -71713,6 +72408,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -71729,6 +72425,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -71761,6 +72458,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -71777,6 +72475,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -71809,6 +72508,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -71825,6 +72525,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -71857,6 +72558,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -71873,6 +72575,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -71905,6 +72608,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -71921,6 +72625,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -71953,6 +72658,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -71969,6 +72675,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -72001,6 +72708,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -72017,6 +72725,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -72049,6 +72758,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -72065,6 +72775,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -72097,6 +72808,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -72113,6 +72825,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -72145,6 +72858,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -72161,6 +72875,7 @@
             "System": "",
             "StartSetback": 0,
             "EndSetback": 0.2413,
+            "DepthReductionStart": 1.2953999999999999,
             "OffsetZ": 0,
             "PlanLength": 0,
             "Unresolved": "",
@@ -75179,8 +75894,8 @@
         "Floor": {
           "Stringers": [
             {
-              "Name": "N33.67",
-              "Offset": -10.2616,
+              "Name": "N39.08",
+              "Offset": -11.912600000000001,
               "Section": "W21x62",
               "TopBelowGrade": null,
               "FromStation": null,
@@ -75259,8 +75974,8 @@
               "ToStation": null
             },
             {
-              "Name": "S33.67",
-              "Offset": 10.2616,
+              "Name": "S39.08",
+              "Offset": 11.912600000000001,
               "Section": "W21x62",
               "TopBelowGrade": null,
               "FromStation": null,
@@ -75486,15 +76201,16 @@
         "PlanSteelWeightLb": 2856000,
         "PlanSteelWeightSource": "p.42 items 2 \u002B 5 (carbon \u002B silicon approach truss spans, one unit)",
         "Unresolved": [
+          "UNRESOLVED (p.59, p.49): bottom chord / gusset end beyond L0 and L0\u0027 - the ELEVATION draws the chord and the gussets ending about 10 1/2 in. beyond the vertical line through the shoe pin but prints no dimension (scaled from the 4\u0027-0 between the two units\u0027 pins). end chords extended 10 1/2 in. past L0 / L0\u0027 (scaled); the gusset envelope follows the chord end.",
           "UNRESOLVED (p.55): floor beam end connections at the truss (bracket / top chord connection) - p.55 draws the connection on the top chord (2 tension plates, bent plate) but without the dimensions needed to build it. floor beam between the trusses and the brackets stop 9 1/2 in. from the truss CL (half of a typical 17 in. gusset-to-gusset width \u002B gusset), plain butt.",
           "UNRESOLVED (p.48, p.58): top / bottom lateral K pattern and the end panels - read from the half plans (K from the CL apex to the corners of the next floor beam, diamond about the pier joints, X at the centre) at 250-400 dpi; the first panel is drawn with the apex at the end joint. pattern as read; transverse top struts = the floor beams.",
           "UNRESOLVED (p.48, p.58): location of 10 WF 33 hanger bracing - the sketch shows it vertical within the 58\u0027-0 frame under the floor beam without the exact line. built vertical on the CL from the floor beam bottom to the bottom strut at every point without sway bracing.",
           "UNRESOLVED (p.48, p.56, p.58): lateral / strut rivet counts (10 / 20 / 40 / 6 per end), 7/16 gusset plates - counts printed in zones of the plan whose allocation is ambiguous; gusset outlines not drawn. not placed / not built.",
           "UNRESOLVED (p.47, p.48): camber - no camber ordinates are printed on these sheets (p.47: floor beams and brackets need not be cambered; stringers uncambered). geometry = final shape.",
-          "UNRESOLVED (p.48, p.58): stringer lines (11 built: 4 spaces @ 8\u0027-3 = 33\u0027-0 each side of the CL \u002B 21 WF 62 S5 8 in. outside the 33\u0027-0 lines) - the half plan dimensions 6\u0027-1 \u002B 8 in. \u002B 4 spaces @ 8\u0027-3 from the floor beam tip (39\u0027-9) but the line of each mark S5 / S6 / S7 / S8 and the centre line pair are not decoded. S5 = 21 WF 62 at 33\u0027-8 from the CL, all other lines 24 WF 76 (S6 printed 24 WF 78 on p.58).",
+          "UNRESOLVED (p.48, p.58): stringer mark per line (S6 / S7 / S8 = 24 WF 76) - the half plans name S5 - S8 at the lines but the 24 WF 76 marks differ only in their stresses; S5 (21 WF 62) is the outside line at 39\u0027-1 (p.55: 6\u0027-1 beyond the 33\u0027-0 line, 10 in. outside the gutter line). S5 = 21 WF 62 at 39\u0027-1 from the CL, all other lines 24 WF 76 (S6 printed 24 WF 78 on p.58).",
           "UNRESOLVED (p.54, p.68): expansion dams at the unit ends and the pier joints - the dam sheets give dimension strings and clearance tables but are not modeled in this phase. not built; deck / floor system end at joint 0 and 0\u0027.",
           "UNRESOLVED (p.101-106): inspection walkways, ladders and platforms under the trusses; light pole brackets - not part of the truss steel (separate sheets); brackets for light poles are on DRB-6 (not in the set). not built.",
-          "UNRESOLVED (p.55, p.48, p.58): partial-length floor beam cover plates (F.L. \u002B 28\u0027-0 / 40\u0027-0 / 20\u0027-0 bottom plates, F3 / F4 / B1 plate counts 2 / 4 / 1) - the lengths are listed on p.55 but their positions along the beam were not decoded; the bracket (B1) web is drawn tapering 6\u0027-3 1/2 to 2\u0027-0 1/2. only the full-length top plate 14 x 1/2 is built; the cantilever brackets B1 are built as the full-depth beam (taper not modeled, overstates the bracket).",
+          "UNRESOLVED (p.55, p.48, p.58): partial-length floor beam cover plates (F.L. \u002B 28\u0027-0 / 40\u0027-0 / 20\u0027-0 bottom plates, F3 / F4 / B1 plate counts 2 / 4 / 1) - the lengths are listed on p.55 but their positions along the beam were not decoded; the bracket (B1) web is drawn tapering 6\u0027-3 1/2 to 2\u0027-0 1/2. only the full-length top plate 14 x 1/2 is built (the B1 bracket taper 6\u0027-3 1/2 -\u003E 2\u0027-0 1/2 is modeled).",
           "UNRESOLVED (p.49-53): L8 / L0 second gusset pairs (7/8 \u002B 3/4 outer / inner at L8 of the 3-span unit; 3/4 \u002B 1/2 at L0 of both units), fills, splice plates, lug angles, diaphragms, stitch rivets - listed per joint without extents. only one gusset pair per joint (the outer / first listed) is built; fills and splices not built.",
           "UNRESOLVED (p.49-53): plan weight check (p.42): floor steel, bracing, shoes, expansion dams, splices and fills are in the p.42 totals - the totals are per unit (carbon \u002B silicon, items 2 \u002B 5) and include all steel of the unit. the check script reports the model steel as a share of the p.42 figure."
         ]
