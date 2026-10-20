@@ -106,7 +106,7 @@ Coordinates are checked in plan units on the plan's grid (SAF applied as the pla
 ### 4.4 Tolerances (defaults, per check type)
 - Steel detail dimensions: 1/16".
 - Concrete outline: 1/4".
-- Rebar position: ±1/4" in cover, ±1" in spacing chains and lap positions, unless the plan gives a tolerance.
+- Rebar position: 1/16" in cover and in spacing chains (user 2026-10-19: concrete cover and spacing 1/16" by default), ±1" for lap positions, unless the plan gives a tolerance.
 - Elevations: 0.01 ft (steel seats 1/8").
 - Coordinates: 0.01 ft. Angles: 1".
 - Quantities: 1% steel, 2% concrete, 3% rebar weight with exact bar counts.
@@ -255,4 +255,4 @@ How program defects are handled:
 1. ~~Who signs off, report form~~ - user 2026-10-19: no formal report currently; the markdown QC-REPORT per bridge is enough for now.
 2. Are the default tolerances right (4.4), or does an agency spec govern?
 3. Is the first bridge for the pilot Nebraska St?
-4. Should the checker also check the generated plan sheets (the program's own sheets) against the plans as a separate deliverable, or only the model?
+4. ~~Generated sheets~~ - user 2026-10-19: yes, checked against the plans as a separate deliverable. Checker exports keep section designations (`--keep-designations`).
