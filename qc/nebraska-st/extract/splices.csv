@@ -1,0 +1,57 @@
+page,table,splice,field,value_text,source_quote
+34,FIELD SPLICE SCHEDULE,1,TF min flange width,18,p34 schedule
+34,FIELD SPLICE SCHEDULE,1,TF plate B,7/16x18x2'-11,p34 schedule
+34,FIELD SPLICE SCHEDULE,1,TF plate C (2),1/2x8x2'-11,p34 schedule
+34,FIELD SPLICE SCHEDULE,1,TF bolt spacing,7@2=1'-2,p34 schedule
+34,FIELD SPLICE SCHEDULE,1,TF bolt gage,5,p34 schedule
+34,FIELD SPLICE SCHEDULE,1,Web plate A (2),5/16x13x5'-11 1/4,p34 schedule
+34,FIELD SPLICE SCHEDULE,1,web bolt column spacing,1@3=0'-3,p34 schedule
+34,FIELD SPLICE SCHEDULE,1,web bolt row spacing,21@3 1/4=5'-8 1/4,p34 schedule
+34,FIELD SPLICE SCHEDULE,1,dim S,3 7/8,p34 schedule
+34,FIELD SPLICE SCHEDULE,1,BF min flange width,22,p34 schedule
+34,FIELD SPLICE SCHEDULE,1,BF plate D (2),9/16x10x2'-7,p34 schedule
+34,FIELD SPLICE SCHEDULE,1,BF plate E,1/2x22x2'-7,p34 schedule
+34,FIELD SPLICE SCHEDULE,1,BF bolt spacing,4@3=1'-0,p34 schedule
+34,FIELD SPLICE SCHEDULE,1,BF bolt gage,6,p34 schedule
+34,FIELD SPLICE SCHEDULE,2,TF min flange width,16,p34 schedule
+34,FIELD SPLICE SCHEDULE,2,TF plate B,3/8x16x2'-11,p34 schedule
+34,FIELD SPLICE SCHEDULE,2,TF plate C (2),7/16x7x2'-11,p34 schedule
+34,FIELD SPLICE SCHEDULE,2,TF bolt spacing,7@2=1'-2,p34 schedule
+34,FIELD SPLICE SCHEDULE,2,TF bolt gage,4,p34 schedule
+34,FIELD SPLICE SCHEDULE,2,Web plate A (2),5/16x13x5'-11 1/4,p34 schedule
+34,FIELD SPLICE SCHEDULE,2,web bolt column spacing,1@3=0'-3,p34 schedule
+34,FIELD SPLICE SCHEDULE,2,web bolt row spacing,21@3 1/4=5'-8 1/4,p34 schedule
+34,FIELD SPLICE SCHEDULE,2,dim S,3 7/8,p34 schedule
+34,FIELD SPLICE SCHEDULE,2,BF min flange width,20,p34 schedule
+34,FIELD SPLICE SCHEDULE,2,BF plate D (2),9/16x9x3'-1,p34 schedule
+34,FIELD SPLICE SCHEDULE,2,BF plate E,1/2x20x3'-1,p34 schedule
+34,FIELD SPLICE SCHEDULE,2,BF bolt spacing,5@3=1'-3,p34 schedule
+34,FIELD SPLICE SCHEDULE,2,BF bolt gage,5,p34 schedule
+34,FIELD SPLICE SCHEDULE,3,TF min flange width,16,p34 schedule
+34,FIELD SPLICE SCHEDULE,3,TF plate B,3/8x16x2'-11,p34 schedule
+34,FIELD SPLICE SCHEDULE,3,TF plate C (2),7/16x7x2'-11,p34 schedule
+34,FIELD SPLICE SCHEDULE,3,TF bolt spacing,7@2=1'-2,p34 schedule
+34,FIELD SPLICE SCHEDULE,3,TF bolt gage,4,p34 schedule
+34,FIELD SPLICE SCHEDULE,3,Web plate A (2),5/16x13x5'-11 1/4,p34 schedule
+34,FIELD SPLICE SCHEDULE,3,web bolt column spacing,1@3=0'-3,p34 schedule
+34,FIELD SPLICE SCHEDULE,3,web bolt row spacing,21@3 1/4=5'-8 1/4,p34 schedule
+34,FIELD SPLICE SCHEDULE,3,dim S,3 7/8,p34 schedule
+34,FIELD SPLICE SCHEDULE,3,BF min flange width,20,p34 schedule
+34,FIELD SPLICE SCHEDULE,3,BF plate D (2),9/16x9x2'-7,p34 schedule
+34,FIELD SPLICE SCHEDULE,3,BF plate E,1/2x20x2'-7,p34 schedule
+34,FIELD SPLICE SCHEDULE,3,BF bolt spacing,4@3=1'-0,p34 schedule
+34,FIELD SPLICE SCHEDULE,3,BF bolt gage,5,p34 schedule
+34,FIELD SPLICE SCHEDULE,4,TF min flange width,24,p34 schedule
+34,FIELD SPLICE SCHEDULE,4,TF plate B,7/16x24x2'-1,p34 schedule
+34,FIELD SPLICE SCHEDULE,4,TF plate C (2),1/2x11x2'-1,p34 schedule
+34,FIELD SPLICE SCHEDULE,4,TF bolt spacing,3@3=0'-9,p34 schedule
+34,FIELD SPLICE SCHEDULE,4,TF bolt gage,2@3 1/2,p34 schedule
+34,FIELD SPLICE SCHEDULE,4,Web plate A (2),5/16x13x6'-0,p34 schedule
+34,FIELD SPLICE SCHEDULE,4,web bolt column spacing,1@3=0'-3,p34 schedule
+34,FIELD SPLICE SCHEDULE,4,web bolt row spacing,23@3=5'-9,p34 schedule
+34,FIELD SPLICE SCHEDULE,4,dim S,3 1/2,p34 schedule
+34,FIELD SPLICE SCHEDULE,4,BF min flange width,24,p34 schedule
+34,FIELD SPLICE SCHEDULE,4,BF plate D (2),9/16x11x2'-7,p34 schedule
+34,FIELD SPLICE SCHEDULE,4,BF plate E,1/2x24x2'-7,p34 schedule
+34,FIELD SPLICE SCHEDULE,4,BF bolt spacing,4@3=1'-0,p34 schedule
+34,FIELD SPLICE SCHEDULE,4,BF bolt gage,2@3 1/2,p34 schedule
