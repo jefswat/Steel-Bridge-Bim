@@ -254,6 +254,25 @@ foreach (var b in tr.Bearings)
     if (ped.TryGetValue((b.Support, b.Girder), out var pe))
         Row($"{b.Support} G{b.Girder + 1} seat (bottom of pad)", $"{pe.el:F2} ({pe.src})", $"{ToFt(b.SeatElevation):F3}", Math.Abs(ToFt(b.SeatElevation) - pe.el) <= 0.0051 + 1e-9, "+-0.005 ft");
 
+// ---------------------------------------------------------------- 6b. QC back-check items (QC report odot-o, issues I01-I04, I09, I10)
+Print("== QC back-check: XD connection bolts (p.282), access opening (p.290), anchor bolts / contact plates (p.292)");
+foreach (var xd in st.Assemblies.Where(a => a.Mark.StartsWith("XD")).OrderBy(a => a.Mark))
+{
+    int nb = st.Bolts.Count(b => b.Assembly == xd.Mark);
+    Row($"{xd.Mark} connection bolts (2 ends x (2 columns x 9 + 2 angles x 8))", "68", $"{nb}", nb == 68, "p.282 O-28");
+}
+foreach (var d in st.Parts.Where(p => p.Category == PartCategory.AccessDoor).OrderBy(p => p.Mark))
+    Row($"{d.Mark} bottom flange opening 18\" x 30\" (R 9\", centres 6\" either side of CL; door 24\" x 36\")", "1'-6 x 2'-6", d.Description.Contains("opening 18\" x 30\"") ? "1'-6 x 2'-6" : d.Description, d.Description.Contains("opening 18\" x 30\""), "p.290 O-36");
+var anchors = st.Bolts.Where(b => b.Kind == BoltKind.Anchor).ToList();
+Row("anchor bolts", "24", $"{anchors.Count}", anchors.Count == 24, "p.292");
+Row("anchor bolts 3'-0\" long", "36\"", $"{anchors.Min(b => ToIn(b.Length)):F2}\" .. {anchors.Max(b => ToIn(b.Length)):F2}\"", anchors.All(b => Math.Abs(ToIn(b.Length) - 36) < 0.01), "p.292 Detail of Anchor Bolt");
+Row("anchor bolt embedment >= 1'-3\" MIN.", "15\"", $"{anchors.Min(b => ToIn(b.Embedment)):F2}\"", anchors.All(b => ToIn(b.Embedment) >= 15 - 1e-6), "p.292");
+int topCp = st.Parts.Count(p => p.Mark.Contains("-CPT")), botCp = st.Parts.Count(p => p.Mark.Contains("-CPB"));
+Row("top contact PL 8 x 8 x 1/2 with slot (one per anchor at the guided bearings P13, P15, P16)", "16", $"{topCp}", topCp == 16, "p.292");
+Row("bottom contact PL 4 x 4 (one per anchor at the fixed bearings P14)", "8", $"{botCp}", botCp == 8, "p.292");
+var bearingPlates = st.Parts.Where(p => p.Category == PartCategory.BearingPlate).ToList();
+Row("beveled bearing (sole) plates AASHTO M270 Gr 50W (p.292 note 3)", "8 x M270 Gr. 50W", $"{bearingPlates.Count(p => p.Material == "AASHTO M270 Gr. 50W")} of {bearingPlates.Count}", bearingPlates.Count == 8 && bearingPlates.All(p => p.Material == "AASHTO M270 Gr. 50W"));
+
 // ---------------------------------------------------------------- 7. weight
 Print("== steel weight");
 double lb = st.SteelMass / 0.45359237;

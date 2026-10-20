@@ -76,7 +76,7 @@ public static class SteelClashCheck
                 {
                     var key = (b.Diameter, b.Grip, b.Length, b.Kind, b.Embedment);
                     if (!cache.TryGetValue(key, out var local))
-                        cache[key] = local = b.Kind == BoltKind.Anchor ? SteelModel.AnchorBoltMesh(b.Diameter, b.Grip, b.Embedment)
+                        cache[key] = local = b.Kind == BoltKind.Anchor ? SteelModel.AnchorBoltMesh(b.Diameter, b.Grip, b.Embedment, 12, b.TopHeight)
                             : SteelModel.BoltMesh(b.Diameter > 0 ? new BoltGeometry(b.Diameter) : st.Bolt, b.Grip, b.Length);
                     var w = new Mesh();
                     foreach (var q in local.Positions) w.Positions.Add(b.Frame.ToWorld(q));

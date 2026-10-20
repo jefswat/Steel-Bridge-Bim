@@ -1,0 +1,154 @@
+1105
+1100
+1095
+1090
+1085
+1080
+1075
+1070
+1065
+1060
+1055
+1050
+1110
+1105
+1100
+1095
+1090
+1080
+1085
+1075
+1070
+1065
+1060
+1055
+1050
+STA. 298+94.30 - 12.55' RT.
+STA. 298+05.76 - 39.44' RT.
+1106.02
+1096.02
+1090.02
+1050.77
+Grayish brown sandy silty clay, very stiff, damp (CL-ML)
+Reddish brown silty clayey sand, medium dense, moist
+(SC-SM)
+Reddish brown and maroon sandstone interbedded with
+shale, soft to hard
+Soft @ depth 16.0'
+Hard from depth 20.0'
+Bore hole terminated @ depth 55.25'
+NP= Non Plastic
+--- 1101.02 --  SS-1:  N=18; RECOVERY = 18";
+LL=23 , PI=6 -#200=67.1%
+--- 1096.02 --  SS-2:  N=15; RECOVERY = 18"
+--- 1091.02 --  SS-3:  N=50/6.0"; RECOVERY = 18";
+LL=NP , PI=NP -#200=34.8%
+--- 1089.52 --  TC-1:  TCP= 50/5.5"
+--- 1086.02 --  TC-2:  TCP= 50/2.0"
+--- 1081.02 --  TC-3:  TCP= 50/1.0"
+--- 1076.02 --  TC-4:  TCP= 50/1.25"
+--- 1071.02 --  TC-5:  TCP= 50/1.0"
+--- 1066.02 --  TC-6:  TCP= 50/0.5"
+--- 1061.02 --  TC-7:  TCP= 50/1.0"
+--- 1056.02 --  TC-8:  TCP= 50/1.0"
+--- 1051.02 --  TC-9:  TCP= 50/1.0"
+0
+5
+10
+15
+20
+25
+30
+35
+40
+45
+50
+55
+1105.71
+1095.71
+1090.21
+1050.46
+Reddish brown silty clay with sand, medium stiff, moist
+(CL-ML)
+Reddish brown  to light brown silty sand, medium dense,
+damp (SM)
+Reddish brown and maroon sandstone interbedded with
+shale, medium hard to very hard
+Very hard @ depth 20.0'
+Medium hard @ depth 30.0'
+Hard from depth 35.0'
+Bore hole terminated @ depth 55.25'
+NP= Non Plastic
+--- 1100.71 --  SS-1:  N= 8; RECOVERY = 18";
+LL=26 , PI=7 -#200=73.0%
+--- 1095.71 --  SS-2:  N= 16; RECOVERY = 18";
+LL=NP , PI=NP -#200=30.4%
+--- 1090.71 --  SS-3:  N= 50/4.5"; RECOVERY =10.5";
+LL=NP , PI=NP -#200=13.1%
+--- 1089.71 --  TC-1:  TCP= 50/1.75"
+--- 1085.71 --  TC-2:  TCP= 50/0.06"
+--- 1080.71 --  TC-3:  TCP= 50/1.0"
+--- 1075.71 --  TC-4:  TCP= 50/3.5"
+--- 1070.71 --  TC-5:  TCP= 50/1.0"
+--- 1065.71 --  TC-6:  TCP= 50/2.0"
+--- 1060.71 --  TC-7:  TCP= 50/2.0"
+--- 1055.71 --  TC-8:  TCP= 50/1.5"
+--- 1050.71 --  TC-9:  TCP= 50/2.25"
+0
+5
+10
+15
+20
+25
+30
+35
+40
+45
+50
+55
+BORING N-11
+BORING N-12
+                     TCP= 50/0.25"
+                     TCP= 50/0.25"
+                     TCP= 50/0.25"
+                     TCP= 50/1.5"
+                     TCP= 50/1.0"
+                     TCP= 50/0.25"
+                     TCP= 50/1.0"
+                     TCP= 50/0.5"
+                     TCP= 50/1.5"
+                     TCP= 50/3.0"
+                     TCP= 50/0.5"
+                     TCP= 50/1.0"
+                     TCP= 50/1.0"
+                     TCP= 50/0.25"
+                     TCP= 50/0.25"
+                     TCP= 50/0.5"
+                     TCP= 50/0.38"
+                     TCP= 50/0.25"
+N-12
+FOUNDATION REPORT
+(SHEET 6 OF 8)
+RAMP 44E OVER I-235 & I-44
+BRIDGE 'N'
+09033(11)
+ I-235 / I-44
+OKLAHOMA COUNTY
+P:\FDB\1641-OKC\CIV\30305400\20_CAD\DGN\S\BRIDGE N\B03SfrN06.dgn
+11/20/2016
+DESIGN
+DRAWN
+CHECKED
+APPROVED
+SQUAD
+JOB PIECE NO.
+SHEET NO.
+11/16
+11/16
+11/16
+11/16
+11/21/2016
+OKLAHOMA DEPARTMENT OF TRANSPORTATION
+MEETING
+FINAL FIELD
+BENHAM

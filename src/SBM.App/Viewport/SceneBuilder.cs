@@ -260,7 +260,7 @@ public static class SceneBuilder
                     1 => m.Studs.GroupBy(s => (Math.Round(s.Length, 5), Tile(s.Frame.Origin)))
                         .Select(gr => (m.StudMesh(gr.First().Length, 10), gr.Select(s => ToMatrix(s.Frame, o)).ToList(), gr.Cast<object>().ToList())),
                     _ => m.Bolts.Where(b => b.Kind == BoltKind.Anchor).GroupBy(b => (Math.Round(b.Diameter, 5), Math.Round(b.Grip, 5), Math.Round(b.Embedment, 5), Tile(b.Frame.Origin)))
-                        .Select(gr => (SteelModel.AnchorBoltMesh(gr.First().Diameter, gr.First().Grip, gr.First().Embedment), gr.Select(b => ToMatrix(b.Frame, o)).ToList(), gr.Cast<object>().ToList())),
+                        .Select(gr => (SteelModel.AnchorBoltMesh(gr.First().Diameter, gr.First().Grip, gr.First().Embedment, 12, gr.First().TopHeight), gr.Select(b => ToMatrix(b.Frame, o)).ToList(), gr.Cast<object>().ToList())),
                 };
                 foreach (var (mesh0, inst, itags) in groups)
                 {

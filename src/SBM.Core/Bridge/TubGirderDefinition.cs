@@ -106,13 +106,18 @@ public sealed class TubExternalDiaphragmDefinition
     public double AngleLength { get; set; } = In(32);
     public int GirderLegBolts { get; set; } = 8;
     public int DiaphragmLegBolts { get; set; } = 9;
+    /// <summary>Bolt columns on the diaphragm leg of each angle (plan p.282 O-28: 2 columns x 9). Positions across the leg from the heel; empty = ONE column
+    /// on the usual gage of the leg (the earlier default).</summary>
+    public List<double> DiaphragmLegColumns { get; set; } = new();
+    /// <summary>UNRESOLVED text (<see cref="UnresolvedFlag.Text"/>) when the column gages are not dimensioned on the plans (empty = none).</summary>
+    public string DiaphragmLegFlag { get; set; } = "";
     public double BoltPitch { get; set; } = In(3.5);
     /// <summary>Clear distance between the diaphragm web end and the tub web.</summary>
     public double EndClearance { get; set; } = In(0.5);
     public TubExternalDiaphragmDefinition Clone()
     {
         var c = (TubExternalDiaphragmDefinition)MemberwiseClone();
-        c.Points = Points.Select(p => p.Clone()).ToList(); c.Flange = Flange.Clone();
+        c.Points = Points.Select(p => p.Clone()).ToList(); c.Flange = Flange.Clone(); c.DiaphragmLegColumns = DiaphragmLegColumns.ToList();
         return c;
     }
 }
@@ -313,6 +318,25 @@ public sealed class TubBearingDefinition
     /// <summary>Anchor bolt rows along the girder from the CL bearing (+ ahead); empty = none.</summary>
     public List<double> AnchorRows { get; set; } = new();
     public double AnchorEmbedment { get; set; } = In(15);
+    /// <summary>Plan p.292 O-38 "Typical section at bearing": diameter of the hole in the bottom flange for each 2" anchor bolt at a non-fixed (expansion /
+    /// guided) bearing (6") and at a fixed bearing (2 1/2"); 0 = no hole cut (older models).</summary>
+    public double AnchorHoleExpansion { get; set; }
+    public double AnchorHoleFixed { get; set; }
+    /// <summary>Anchor bolt overall length (p.292 Detail of Anchor Bolt: 3'-0) and projection of its top above the top of the bottom flange (7" MIN., p.292):
+    /// both 0 = the older solid (embedment below the seat, standard nut stack). With both set the embedment follows from the length.</summary>
+    public double AnchorLength { get; set; }
+    public double AnchorProjection { get; set; }
+    /// <summary>Top contact PL at non-fixed bearings (p.292: 8 x 8 x 1/2 with a 2 1/2 x 6 slot in the direction of expansion movement, on top of the bottom
+    /// flange, one per anchor bolt) and bottom contact PL at fixed bearings (4 x 4 with a 2 3/8 hole, from the underside of the bottom flange down to the seat,
+    /// top bevelled to the flange). 0 = not modeled.</summary>
+    public double TopContactSide { get; set; }
+    public double TopContactThickness { get; set; }
+    public double TopContactSlotWidth { get; set; }
+    public double TopContactSlotLength { get; set; }
+    public double BottomContactSide { get; set; }
+    public double BottomContactHole { get; set; }
+    /// <summary>1/4" gap between the contact plate (or the flange) and the washer / nut (p.292 elevations).</summary>
+    public double NutGap { get; set; }
     public TubBearingDefinition Clone() { var c = (TubBearingDefinition)MemberwiseClone(); c.AnchorRows = AnchorRows.ToList(); return c; }
 }
 

@@ -1,0 +1,307 @@
+RAMP 44A OVER DEEP FORK CR., & 1-44
+IN THE QUANTITIES.
+PURPOSES ONLY.  THE BARS NOTED ARE NOT INCLUDED
+THE DRILLED SHAFT BARS ARE FOR INFORMATION
+1.
+NOTES:
+K-37
+20'-11"
+5'-9"
+2'-1"
+6'-1"
+CH1
+PH1
+1'-7"
+1'-7"
+1'-7"
+43'-0"
+1'-7"
+PU1
+4'-8"
+1'-6"
+2'-1"
+4'-3"
+CE2
+2'-0"
+11"
+7"
+5• "
+5•"
+CS1
+CS1
+PS2
+PS1
+T1
+PS1 & PS2
+3'-1"
+T1
+9'-7"
+3'-5"
+9'-2" TO 11'-7"
+10"
+6"
+4'-5"
+8'-4"
+7'-1" TO 8'-10"
+22'-1"
+22'-1"
+EPOXY COATED REINFORCING
+(ONE REQUIRED)
+PLAIN REINFORCING
+MARK SIZE QTY. FORM
+LENGTH
+REMARKS
+MARK SIZE QTY. FORM
+LENGTH
+REMARKS
+PIER NO.13 BAR LIST
+PH1 #11 X 46'-2"
+CH1 #11 X 24'-1"
+7'-10"
+PH2 #11 X 46'-4"
+T2 #5 X 5'-9"
+CU1
+5'-9"
+CE2 & CU1
+PS2 #5 X 23'-0" (AVG.)
+PS1 #5 X 27'-10" (AVG.)
+T1 #5 X 24'-5"
+CS1 #5 X 27'-9"
+3'-10"
+CE1 #4 X 11'-3"
+PU1
+CE2
+CE1
+PS2
+PS1
+PH10
+PH9
+PH8
+PH7
+PH6
+PH5
+PH4
+PH3
+PH2
+PH1
+C1
+T2
+T1
+CD1
+C2
+CS1
+CU1
+CH2
+CH1 
+24
+14
+12
+28
+80
+2
+2
+2
+2
+2
+2
+12
+2
+10
+20
+56
+20
+20
+56
+10
+54
+16
+16
+48
+      
+      
+      
+      
+      
+      
+#4    
+#4    
+#4    
+#5    
+#5    
+#6    
+#6    
+#6    
+#6    
+#6    
+#6    
+#6    
+#6    
+#6    
+#11   
+#11   
+#5    
+#5    
+#11   
+#5    
+#5    
+#4    
+#6    
+#11     
+7'-5" 
+8'-5" 
+11'-3" 
+23'-0" (AVG.)
+27'-10" (AVG.)
+6'-0" 
+12'-5" 
+18'-9" 
+25'-1" 
+31'-6" 
+37'-10" 
+44'-2" 
+43'-6" 
+46'-4" 
+46'-2" 
+21'-2" 
+5'-9" 
+24'-5" 
+24'-5" 
+9'-7" 
+27'-9" 
+9'-11" 
+21'-0" 
+24'-1" 
+      
+      
+      
+      
+      
+      
+      
+      
+      
+21'-3" TO 24'-9"      
+25'-5" TO 30'-3"      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+        
+BNT.
+BNT.
+BNT.
+BNT.
+BNT.
+STR.
+STR.
+STR.
+STR.
+STR.
+STR.
+STR.
+STR.
+BNT.
+BNT.
+STR.
+BNT.
+BNT.
+STR.
+STR.
+BNT.
+BNT.
+STR.
+BNT.
+DT1
+DS1
+2
+84
+BNT.
+STR.
+      
+      
+      
+      
+      
+W20   
+#11     
+1,486'-0" 
+55'-3" 
+ITEM
+UNIT
+PIER 13
+PIER 13 QUANTITIES
+11"
+      
+      
+      
+      
+      
+SEE NOTE 1    
+SEE NOTE 1      
+PU1 & PU2
+PU2
+5'-2"
+PU2 #4 X 7'-8"
+PU1 #4 X 8'-2"
+CE2 #4 X 8'-5"
+CU1 #4 X 9'-11"
+BRIDGE 'K'
+PIER NO. 13 DETAILS
+(SHEET 2 OF 2)
+ORNAMENTAL MEDALLION
+DRILLED SHAFTS 72" DIAMETER
+WATER REPELLENT (VISUALLY INSPECTED)
+EPOXY COATED REINFORCING STEEL
+(SP) GRAFFITI TREATMENT
+CLASS A CONCRETE
+SUBSTRUCTURE EXCAVATION COMMON
+EA
+LF
+SY
+LB
+SF
+CY
+CY
+2
+93
+276
+33190
+842
+161.7
+50
+09033(11)
+ I-235 / I-44
+OKLAHOMA COUNTY
+P:\FDB\1641-OKC\CIV\30305400\20_CAD\DGN\S\BRIDGE K\B2BSP_13_K02.dgn
+11/19/2016
+DESIGN
+DRAWN
+CHECKED
+APPROVED
+SQUAD
+JOB PIECE NO.
+SHEET NO.
+11/16
+11/16
+11/16
+11/16
+11/21/2016
+OKLAHOMA DEPARTMENT OF TRANSPORTATION
+MEETING
+FINAL FIELD
+BENHAM
+B2BSP 13 K02.dgn 11/19/2016 8:39:38 PM

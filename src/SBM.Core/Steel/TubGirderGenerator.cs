@@ -138,6 +138,7 @@ public sealed partial class SteelModelGenerator
         foreach (var g in _f.Girders) foreach (var pp in panels[g.Index].Select((p, i) => (p, i))) TubPanelBracing(g, pp.p, pp.i);
         TubExternalDiaphragms(panels);
         foreach (var sd in t.SupportDiaphragms) TubSupportDiaphragm(sd);
+        foreach (var bd in t.Bearings) TubAnchorHoles(bd);   // 6" / 2 1/2" holes for the anchor bolts in the bottom flanges (p.292)
 
         // Members.
         foreach (var g in _f.Girders)
@@ -207,7 +208,16 @@ public sealed partial class SteelModelGenerator
             bool top = p == GirderPlate.TopFlange;
             var z = _tr.TensionZones.Where(r => r.Girder == gi && r.S1 > a + 1e-3 && r.S0 < b - 1e-3
                 && (r.Flanges == TubFlangeZone.Both || (top ? r.Flanges == TubFlangeZone.Top : r.Flanges == TubFlangeZone.Bottom))).ToList();
-            return z.Count == 0 ? "" : ", tension flange (FCM) over " + string.Join(", ", z.Select(r => $"{Ft2(Math.Max(a, r.S0) - a)}..{Ft2(Math.Min(b, r.S1) - a)}"));
+            if (z.Count == 0) return "";
+            // adjoining zones of the same plate (e.g. "bottom" then "both" flanges in tension) read as one range
+            var ranges = new List<(double s0, double s1)>();
+            foreach (var r in z.OrderBy(r => r.S0))
+            {
+                double r0 = Math.Max(a, r.S0), r1 = Math.Min(b, r.S1);
+                if (ranges.Count > 0 && r0 - ranges[^1].s1 < 1e-3) ranges[^1] = (ranges[^1].s0, Math.Max(ranges[^1].s1, r1));
+                else ranges.Add((r0, r1));
+            }
+            return ", tension flange (FCM) over " + string.Join(", ", ranges.Select(r => $"{Ft2(r.s0 - a)}..{Ft2(r.s1 - a)}"));
         }
         IEnumerable<(double a, double b, double w, double th)> Pieces(GirderPlate p, double s0, double s1) =>
             g.PlateRuns.Where(r => r.Plate == p).Select(r => (a: Math.Max(s0, r.S0), b: Math.Min(s1, r.S1), w: r.Width, th: r.Thickness)).Where(x => x.b > x.a + 1e-4);
@@ -627,10 +637,9 @@ public sealed partial class SteelModelGenerator
                 var P1 = Vec3.Lerp(PA, PB, 1 - trim);
                 var e = (P1 - P0).Normalized();
                 var fm = TF(gi, (a + b) / 2);
-                var up0 = fm.Up;
+                var up0 = (TF(gi, a).Up + TF(gi, b).Up).Normalized();   // the WT flange plane is tilted to the girder flange planes at both ends
                 var nrm = Vec3.Cross(up0, e).Normalized();
                 var up = Vec3.Cross(e, nrm);
-                var fr = new Frame3(P0, nrm, up, e);
                 double len = (P1 - P0).Length;
                 // bolt pattern in member coordinates (u along the axis from the end edge point, v across, + toward sg*nrm)
                 double fwT = tee.FlangeWidth;
@@ -640,7 +649,6 @@ public sealed partial class SteelModelGenerator
                 var holesUV = TubLateralPattern(lb, fwT, fm.Lateral * (-sA), e, nrm, out int sgn);
                 // WT: flange (hanging below the girder top flange, outline cut parallel to the girder axis) + stem
                 var mesh = new Mesh();
-                var pf = new Frame3(P0, e, nrm, up);
                 // end edges are lines u = w * edgeSlope (start) and u = len + w * edgeSlope (end), parallel to the girder axis
                 var outline = new[]
                 {
@@ -653,15 +661,27 @@ public sealed partial class SteelModelGenerator
                     wtHoles.Add(new Hole(new Vec2(u, sgn * v), HoleDia));          // start end
                     wtHoles.Add(new Hole(new Vec2(len - u, -sgn * v), HoleDia));   // end: pattern turned 180 deg about the member centre
                 }
+                // The WT flange is one flat plane while the girder top flanges at its two ends are warped by the grade / plan curvature: lower the WT just enough that its
+                // top face touches the flange undersides (the lateral is bolted to the UNDERSIDE of the flange, p.289 Detail A) instead of entering them.
+                double drop = 0;
+                foreach (var (corner, endSide, sEnd) in outline.Select(c => (c, c.X < len / 2 ? sA : sB, c.X < len / 2 ? a : b))
+                    .Concat(wtHoles.Select(h => (h.Center, h.Center.X < len / 2 ? sA : sB, h.Center.X < len / 2 ? a : b))))
+                {
+                    var q0 = P0 + e * corner.X + nrm * corner.Y;
+                    double sg2 = sEnd;
+                    for (int it = 0; it < 4; it++) sg2 += Vec3.Dot(q0 - TF(gi, sg2).Origin, TF(gi, sg2).Ahead);
+                    var f2 = TF(gi, sg2);
+                    double x2 = Vec3.Dot(q0 - f2.Origin, f2.Lateral);
+                    if (Math.Abs(x2 - endSide * T) > TubPlate(gi, GirderPlate.TopFlange, sg2).W / 2) continue;   // not under the flange
+                    drop = Math.Max(drop, Vec3.Dot(q0 - f2.At(x2, 0), f2.Up));
+                }
+                var P0m = P0 - up * drop;
+                var fr = new Frame3(P0m, nrm, up, e);
+                var pf = new Frame3(P0m, e, nrm, up);
                 PlateBuilder.AddPlanar(mesh, outline, wtHoles, pf, -tee.FlangeThickness, 0);
                 MeshBuilder.AddBox(mesh, fr, -tee.StemThickness / 2, tee.StemThickness / 2, -tee.Depth, -tee.FlangeThickness, 0, len);
-                Assumption? asu = lb.EndSetbackFlag.Length > 0
-                    ? Assumption.UnresolvedDimension(lb.EndSetbackFlag, $"WT end edge {In(lb.EndSetback)} across the girder from the work point line, parallel to the girder axis (scaled from p.289 Detail A)")
-                    : null;
-                _parts.Add(new SteelPart { Mark = $"{asm}-L{n++}", Category = PartCategory.RolledTee, Role = MemberRole.Lateral, Assembly = asm, Mesh = mesh,
-                    Length = len, NominalWeightLbPerFt = tee.WeightPerFootLb, Assumption = asu, Description = $"Top lateral {tee.Name}, 6 holes per end" });
-                _tr.LateralMembers++;
-                // bolts through the girder top flange and the tee flange: 6 per end (Detail A)
+                // bolt positions through the girder top flange and the tee flange: 6 per end (Detail A)
+                var latBolts = new List<(double sg, double w, int side, TubFrame fs, double x, double ft, bool inFlange)>();
                 foreach (var (end, side, sgnEnd) in new[] { (0, sA, 1.0), (1, sB, -1.0) })
                     foreach (var (u, v) in holesUV)
                     {
@@ -671,11 +691,27 @@ public sealed partial class SteelModelGenerator
                         var fs = TF(gi, sg);
                         double x = Vec3.Dot(pos - fs.Origin, fs.Lateral), w = x - side * T;
                         var (fw, ft) = TubPlate(gi, GirderPlate.TopFlange, sg);
-                        if (Math.Abs(w) > fw / 2 - Inch(1.0))
-                            Warn($"{asm}-L{n - 1}: lateral bolt {In(Math.Abs(w))} from the top flange CL, flange half width {In(fw / 2)} (bolt within 1\" of the flange edge).");
-                        TubHoles(gi, TopKey(side)).Add(new Hole(new Vec2(sg, w), HoleDia));
-                        AddBolt(fs.At(x, ft), -fs.Up, ft + tee.FlangeThickness, asm);
+                        latBolts.Add((sg, w, side, fs, x, ft, Math.Abs(w) <= fw / 2 - HoleDia / 2 - Inch(0.0625)));
                     }
+                Assumption? asu = lb.EndSetbackFlag.Length > 0
+                    ? Assumption.UnresolvedDimension(lb.EndSetbackFlag, $"WT end edge {In(lb.EndSetback)} across the girder from the work point line, parallel to the girder axis (scaled from p.289 Detail A)")
+                    : null;
+                int outside = latBolts.Count(q => !q.inFlange);
+                if (outside > 0)
+                {
+                    // the Detail A pattern (4 pitches along the WT axis) does not fit the 21" flange on this oblique member: the bolt holes would cut the flange edge
+                    string why = $"{asm}-L{n}: {outside} of {latBolts.Count} lateral bolts of the p.289 Detail A pattern fall on or beyond the edge of the 21\" top flange (bolt up to {In(latBolts.Max(q => Math.Abs(q.w)))} from the flange CL, half width {In(Sec.TopFlange.Width / 2)}) on this oblique member";
+                    Warn($"UNRESOLVED (p.289): {why}; the plan gives the pattern for the typical member only. Those holes are not cut in the flange (bolts kept).");
+                    asu = Assumption.UnresolvedDimension($"UNRESOLVED (p.289): {why}", "lateral bolt pattern does not fit the flange on this member; holes outside the flange not cut");
+                }
+                _parts.Add(new SteelPart { Mark = $"{asm}-L{n++}", Category = PartCategory.RolledTee, Role = MemberRole.Lateral, Assembly = asm, Mesh = mesh,
+                    Length = len, NominalWeightLbPerFt = tee.WeightPerFootLb, Assumption = asu, Description = $"Top lateral {tee.Name}, 6 holes per end" });
+                _tr.LateralMembers++;
+                foreach (var q in latBolts)
+                {
+                    if (q.inFlange) TubHoles(gi, TopKey(q.side)).Add(new Hole(new Vec2(q.sg, q.w), HoleDia));
+                    AddBolt(q.fs.At(q.x, q.ft), -q.fs.Up, q.ft + tee.FlangeThickness, asm);
+                }
             }
         }
     }
@@ -714,7 +750,7 @@ public sealed partial class SteelModelGenerator
     /// (dir = null: the line between the two section planes; else the support line direction). Returns the built part count.</summary>
     private void TubDiaphragmBetween(string asm, int gl, double sL, int gr, double sR, Vec2? dir, double yTopWeb, double webDepth,
         double webT, PlateSize flange, bool flangesOutside, string connection, double connLength, int girderBolts, int diaBolts, double pitch,
-        double clear, bool studs, string what, TubSupportFit? fit = null, TubDiaphragmExtras? extras = null)
+        double clear, bool studs, string what, TubSupportFit? fit = null, TubDiaphragmExtras? extras = null, IReadOnlyList<double>? diaColumns = null, Assumption? connAssumption = null)
     {
         var t = TubDef;
         var fl = TF(gl, sL);
@@ -730,10 +766,20 @@ public sealed partial class SteelModelGenerator
         var upA = (fl.Up + fr.Up).Normalized();
         var N = Vec3.Cross(X, upA).Normalized();
         var V = Vec3.Cross(N, X);
+        if (dir != null)
+        {
+            // support diaphragms lie in the PLUMB plane through the support line (the plane of the connection angles / bent plates, bearing stiffeners ...):
+            // horizontal X along the line, vertical V, horizontal normal N (the rotated-section frame above is tilted from the plumb plane at a skewed support)
+            X = new Vec3(X.X, X.Y, 0).Normalized();
+            V = new Vec3(0, 0, 1);
+            N = Vec3.Cross(X, V);
+        }
         var O = aT;
         Vec2 P2(Vec3 p) => new(Vec3.Dot(p - O, X), Vec3.Dot(p - O, V));
         var frame = new Frame3(O, X, V, N);
         var webPoly = new[] { P2(aB), P2(bB), P2(bT), P2(aT) };
+        var endL = new List<Vec2> { P2(aB), P2(aT) };   // web end vertices on the tub web faces (cut parallel to the girder at a skew, below)
+        var endR = new List<Vec2> { P2(bB), P2(bT) };
         // flange extents (u along X): the web top / bottom corners unless the diaphragm fits the girder flanges (support diaphragms with connection plates:
         // flanges flush with the girder flange levels and ending Gap short of the girder flange edges, the web notched around the girder flanges)
         double uTopL = P2(aT).X, uTopR = P2(bT).X, uBotL = P2(aB).X, uBotR = P2(bB).X;
@@ -749,8 +795,10 @@ public sealed partial class SteelModelGenerator
             void Add(Vec3 p) { var q = P2(p); if (pts.Count == 0 || (q - pts[^1]).Length > 1e-6) pts.Add(q); }
             // left side, bottom to top
             Add(Pt(fl, xBL, yBot)); Add(Pt(fl, xBL, yNb)); Add(Pt(fl, XL(yNb), yNb)); Add(Pt(fl, XL(yNt), yNt)); Add(Pt(fl, xTL, yNt)); Add(Pt(fl, xTL, yTopWeb));
+            endL.Clear(); endL.Add(P2(Pt(fl, XL(yNb), yNb))); endL.Add(P2(Pt(fl, XL(yNt), yNt)));
             // right side, top to bottom
             Add(Pt(fr, xTR, yTopWeb)); Add(Pt(fr, xTR, yNt)); Add(Pt(fr, XR(yNt), yNt)); Add(Pt(fr, XR(yNb), yNb)); Add(Pt(fr, xBR, yNb)); Add(Pt(fr, xBR, yBot));
+            endR.Clear(); endR.Add(P2(Pt(fr, XR(yNt), yNt))); endR.Add(P2(Pt(fr, XR(yNb), yNb)));
             webPoly = pts.ToArray();
             uTopL = P2(Pt(fl, xTL, yTopWeb)).X; uTopR = P2(Pt(fr, xTR, yTopWeb)).X;
             uBotL = P2(Pt(fl, xBL, yBot)).X; uBotR = P2(Pt(fr, xBR, yBot)).X;
@@ -765,41 +813,74 @@ public sealed partial class SteelModelGenerator
         else
         {
             double g = SteelCatalog.AngleGage(ang.LegA).G;
+            var cols = diaColumns is { Count: > 0 } ? diaColumns : new[] { g };
             foreach (var (gi, s, side, f, tw) in new[] { (gl, sL, 1, fl, twL), (gr, sR, -1, fr, twR) })
             {
-                double Lw = TubSection.WebSlopeLength(t, Sec.WebDepth);
                 double yc = (yTopWeb + yBot) / 2;
                 double wc = -yc * Math.Sqrt(1 + t.WebSlope * t.WebSlope);   // slope distance of the mid depth
                 double w0 = wc - connLength / 2;
                 var down = Dir(f, TubSection.WebDown(t, side));
                 var outN = Dir(f, TubSection.WebOut(t, side));
                 var along = N;   // diaphragm web normal
+                // The connection lies in the tub web plane (leg A) and against the diaphragm web (leg B). At a SKEWED support (pier 13: BENT PLs, p.283 / 284) the two
+                // planes are not square to each other: the legs are then built in their own planes (heel line = intersection of the planes, bend angle = the dihedral).
+                bool oblique = Math.Abs(Vec3.Dot(along, outN)) > 2e-3 || Math.Abs(Vec3.Dot(along, down)) > 2e-3;
                 foreach (int k in new[] { -1, 1 })
                 {
                     var surf0 = Pt(f, TubSection.WebPoint(t, side, w0, tw / 2).X, TubSection.WebPoint(t, side, w0, tw / 2).Y);
-                    var heel = surf0 + along * (k * webT / 2);
-                    var dA = along * k;
+                    Vec3 axis = down, aA = along * k, legDirB = outN, heel = surf0 + along * (k * webT / 2);
+                    double startB = ang.Thickness;
+                    if (oblique)
+                    {
+                        axis = Vec3.Cross(outN, along).Normalized();
+                        if (Vec3.Dot(axis, down) < 0) axis = -axis;
+                        aA = Vec3.Cross(axis, outN).Normalized();
+                        if (Vec3.Dot(aA, along * k) < 0) aA = -aA;
+                        legDirB = Vec3.Cross(axis, along).Normalized();
+                        if (Vec3.Dot(legDirB, outN) < 0) legDirB = -legDirB;
+                        heel = surf0 + aA * ((webT / 2) / Vec3.Dot(aA, along * k));          // on the tub web surface AND the diaphragm web face
+                        startB = ang.Thickness / Vec3.Dot(legDirB, outN);                          // leg B starts on the outer face of leg A (mitred below)
+                    }
                     var m = new Mesh();
                     var hA = Enumerable.Range(0, girderBolts).Select(i => new Hole(new Vec2((connLength - (girderBolts - 1) * pitch) / 2 + i * pitch, g), HoleDia)).ToList();
-                    var hB = Enumerable.Range(0, diaBolts).Select(i => new Hole(new Vec2((connLength - (diaBolts - 1) * pitch) / 2 + i * pitch, g), HoleDia)).ToList();
-                    RolledBuilder.AddAngle(m, heel, down, dA, outN, connLength, ang.LegA, ang.LegB, ang.Thickness,
-                        bent ? 0 : ang.RootRadius, hA, hB);
+                    var hB = new List<Hole>();
+                    foreach (double col in cols)
+                        hB.AddRange(Enumerable.Range(0, diaBolts).Select(i => new Hole(new Vec2((connLength - (diaBolts - 1) * pitch) / 2 + i * pitch, col), HoleDia)));
+                    if (!oblique)
+                        RolledBuilder.AddAngle(m, heel, down, along * k, outN, connLength, ang.LegA, ang.LegB, ang.Thickness, bent ? 0 : ang.RootRadius, hA, hB);
+                    else
+                    {
+                        // the legs' end faces at the bend are cut (mitred) on the other leg's face plane: leg A on the diaphragm web face, leg B on the outer face of leg A
+                        var ka = along * k;
+                        double mA = -Vec3.Dot(outN, ka) / Vec3.Dot(aA, ka), mB = -Vec3.Dot(ka, outN) / Vec3.Dot(legDirB, outN);
+                        PlateBuilder.AddPrism(m, new[] { new Vec2(0, 0), new Vec2(connLength, 0), new Vec2(connLength, ang.LegA), new Vec2(0, ang.LegA) }, hA,
+                            (u, w, th) => heel + axis * u + aA * (w + th * mA) + outN * th, _ => 0, _ => ang.Thickness);
+                        PlateBuilder.AddPrism(m, new[] { new Vec2(0, startB), new Vec2(connLength, startB), new Vec2(connLength, ang.LegB), new Vec2(0, ang.LegB) }, hB,
+                            (u, w, th) => heel + axis * u + legDirB * (w + th * mB) + ka * th, _ => 0, _ => ang.Thickness);
+                    }
                     _parts.Add(new SteelPart { Mark = $"{asm}-C{(side > 0 ? "L" : "R")}{(k < 0 ? 1 : 2)}", Category = PartCategory.Angle, Role = MemberRole.Diaphragm, Assembly = asm,
-                        Mesh = m, Length = connLength, NominalWeightLbPerFt = bent ? 0 : ang.WeightPerFootLb,
-                        Description = bent ? $"Bent PL {In(ang.Thickness)} x {In(ang.LegA + ang.LegB)} (legs {In(ang.LegA)})" : $"Connection {ang.Name}" });
+                        Mesh = m, Length = connLength, NominalWeightLbPerFt = bent ? 0 : ang.WeightPerFootLb, Assumption = connAssumption,
+                        Description = (bent ? $"Bent PL {In(ang.Thickness)} x {In(ang.LegA + ang.LegB)} (legs {In(ang.LegA)})" : $"Connection {ang.Name}")
+                            + (cols.Count > 1 ? $", {cols.Count} bolt columns on the diaphragm leg" : "") + (oblique ? ", bent to the skew" : "") });
                     foreach (var h in hA)
                     {
-                        var p = heel + down * h.Center.X + dA * h.Center.Y;
+                        var p = heel + axis * h.Center.X + aA * h.Center.Y;
                         AddBolt(p + outN * ang.Thickness, -outN, ang.Thickness + tw, asm);
                         // hole in the tub web: (s, slope distance)
-                        double sh = s;
-                        for (int it = 0; it < 3; it++) sh += Vec3.Dot(p - TF(gi, sh).At(TubSection.WebPoint(t, side, w0 + h.Center.X, tw / 2)), TF(gi, sh).Ahead);
-                        TubHoles(gi, WebKey(side)).Add(new Hole(new Vec2(sh, w0 + h.Center.X), HoleDia));
+                        double sh = s, wh = w0 + h.Center.X * Vec3.Dot(axis, down);
+                        for (int it = 0; it < 4; it++)
+                        {
+                            var fs = TF(gi, sh);
+                            var d = p - fs.At(TubSection.WebPoint(t, side, wh, tw / 2));
+                            sh += Vec3.Dot(d, fs.Ahead);
+                            if (oblique) wh += Vec3.Dot(d, down);
+                        }
+                        TubHoles(gi, WebKey(side)).Add(new Hole(new Vec2(sh, wh), HoleDia));
                     }
                     if (k < 0)
                         foreach (var h in hB)
                         {
-                            var p = heel + down * h.Center.X + outN * h.Center.Y;
+                            var p = heel + axis * h.Center.X + legDirB * h.Center.Y;
                             AddBolt(p - along * ang.Thickness, along, 2 * ang.Thickness + webT, asm);
                             webHoles.Add(new Hole(P2(p), HoleDia));
                         }
@@ -807,7 +888,19 @@ public sealed partial class SteelModelGenerator
             }
         }
         var web = new Mesh();
-        PlateBuilder.AddPlanar(web, webPoly, webHoles, frame, -webT / 2, webT / 2);
+        // web ends against the tub webs: cut parallel to the girder (lateral position constant over the web thickness) so the plan's 1/2" clear holds at a skew too
+        double qWL = 0, qWR = 0;
+        {
+            Vec3 prL = new Vec3(fl.PlanRight.X, fl.PlanRight.Y, 0), prR = new Vec3(fr.PlanRight.X, fr.PlanRight.Y, 0);
+            qWL = Vec3.Dot(N, prL) / Vec3.Dot(X, prL); qWR = Vec3.Dot(N, prR) / Vec3.Dot(X, prR);
+        }
+        PlateBuilder.AddPrism(web, webPoly, webHoles, (u, v, tt) =>
+        {
+            double uu = u;
+            if (endL.Any(q => q.X == u && q.Y == v)) uu = u - tt * qWL;
+            else if (endR.Any(q => q.X == u && q.Y == v)) uu = u - tt * qWR;
+            return frame.ToWorld(uu, v, tt);
+        }, _ => -webT / 2, _ => webT / 2);
         _parts.Add(new SteelPart { Mark = $"{asm}-W", Category = PartCategory.WebPlate, Assembly = asm, Mesh = web, Length = (bT - aT).Length,
             Description = $"Diaphragm web PL {In(webT)} x {In(webDepth)}" });
         // flanges: top above the web top edge, bottom below the bottom edge (or inside when flangesOutside = false)
@@ -823,8 +916,21 @@ public sealed partial class SteelModelGenerator
             foreach (var hp in (top ? extras?.TopHoles : extras?.BottomHoles) ?? new List<Vec3>())
                 fh.Add(new Hole(new Vec2(Vec3.Dot(hp - O, X), Vec3.Dot(hp - O, N)), HoleDia));
             double z0 = top ? (flangesOutside ? 0 : -flange.Thickness) : (flangesOutside ? -flange.Thickness : 0);
-            Vec3 Map(double u, double nn, double tt) { var q = On(u); return frame.ToWorld(u, q.Y + tt, 0) + N * nn; }
-            PlateBuilder.AddPrism(m, new[] { new Vec2(p0.X, -flange.Width / 2), new Vec2(p1.X, -flange.Width / 2), new Vec2(p1.X, flange.Width / 2), new Vec2(p0.X, flange.Width / 2) },
+            // fitted flanges (support diaphragms, flush with the girder flanges) follow the girder flange surface along the girder grade, and their ends are cut
+            // PARALLEL to the girder flange edge (a square end of a 12" plate at a skewed support would cross the edge by 12" x sin(skew)); the plan's 1/2" gap holds across the girder
+            double gradeFit = fit != null ? (fl.Grade + fr.Grade) / 2 : 0;
+            Vec3 ahead3 = new Vec3(fl.PlanAhead.X, fl.PlanAhead.Y, 0);
+            double tanFit = fit != null ? (fl.Sin / fl.Cos + fr.Sin / fr.Cos) / 2 : 0;
+            Vec3 prFit = new Vec3(fl.PlanRight.X, fl.PlanRight.Y, 0);
+            Vec3 Map(double u, double nn, double tt) { var q = On(u); return frame.ToWorld(u, q.Y + tt, 0) + N * nn + new Vec3(0, 0, (gradeFit * Vec3.Dot(N, ahead3) + (dir != null ? tanFit * Vec3.Dot(N, prFit) : 0)) * nn); }
+            double qL = 0, qR = 0;
+            if (fit != null)
+            {
+                Vec3 prL = new Vec3(fl.PlanRight.X, fl.PlanRight.Y, 0), prR = new Vec3(fr.PlanRight.X, fr.PlanRight.Y, 0);
+                qL = Vec3.Dot(N, prL) / Vec3.Dot(X, prL); qR = Vec3.Dot(N, prR) / Vec3.Dot(X, prR);
+            }
+            double hw = flange.Width / 2;
+            PlateBuilder.AddPrism(m, new[] { new Vec2(p0.X + hw * qL, -hw), new Vec2(p1.X + hw * qR, -hw), new Vec2(p1.X - hw * qR, hw), new Vec2(p0.X - hw * qL, hw) },
                 fh, (u, nn, tt) => Map(u, nn, tt), _ => z0, _ => z0 + flange.Thickness);
             _parts.Add(new SteelPart { Mark = $"{asm}-{(top ? "TF" : "BF")}", Category = PartCategory.FlangePlate, Assembly = asm, Mesh = m, Length = p1.X - p0.X,
                 Description = $"Diaphragm {(top ? "top" : "bottom")} flange {Pl(flange.Width, flange.Thickness)}" });
@@ -852,6 +958,7 @@ public sealed partial class SteelModelGenerator
         var t = TubDef;
         var ex = t.External;
         int n = 1;
+        if (ex.DiaphragmLegFlag.Length > 0 && ex.Points.Count > 0) Warn(ex.DiaphragmLegFlag);
         foreach (var r in ex.Points)
         {
             int gref = ex.ReferenceGirder;
@@ -869,7 +976,8 @@ public sealed partial class SteelModelGenerator
                 string asm = $"XD{n}";
                 TubDiaphragmBetween(asm, gl, pl.S, gr, pg.S, null, -ex.WebTopBelowWebTop, ex.WebDepth, ex.WebThickness, ex.Flange, true, ex.Angle, ex.AngleLength,
                     ex.GirderLegBolts, ex.DiaphragmLegBolts, ex.BoltPitch, ex.EndClearance, false,
-                    $"External intermediate diaphragm XD{n}, span {r.Span + 1}, G{gl + 1} point {pl.Point} - G{gr + 1} point {pg.Point}");
+                    $"External intermediate diaphragm XD{n}, span {r.Span + 1}, G{gl + 1} point {pl.Point} - G{gr + 1} point {pg.Point}", null, null, ex.DiaphragmLegColumns,
+                    ex.DiaphragmLegFlag.Length > 0 ? Assumption.UnresolvedDimension(ex.DiaphragmLegFlag, $"{ex.DiaphragmLegColumns.Count} bolt columns on the diaphragm leg at the scaled gages") : null);
                 _tr.ExternalDiaphragms++;
                 n++;
             }
@@ -877,6 +985,35 @@ public sealed partial class SteelModelGenerator
     }
 
     // ================================================================== bearings
+
+    /// <summary>Holes of the anchor bolts in the tub bottom flanges (plan p.292 O-38: 6" dia at expansion / guided bearings, 2 1/2" at fixed bearings), registered
+    /// before the plates are built; the anchor positions are those of <see cref="TubBearings"/>.</summary>
+    private void TubAnchorHoles(TubBearingDefinition bd)
+    {
+        int j = bd.Support;
+        if (j < 0 || j >= _f.Supports.Count || bd.AnchorRows.Count == 0) return;
+        var line = _f.SupportLine(j);
+        var dir = line.Direction;
+        var ahead = dir.Left;
+        double D = Sec.WebDepth;
+        foreach (var g in _f.Girders)
+        {
+            int gi = g.Index;
+            double sb = BrgS(gi, j);
+            var f = TF(gi, sb);
+            double bf = TubPlate(gi, GirderPlate.BottomFlange, sb).T;
+            var B = f.At(0, -D - bf);
+            double dia = _def.SupportAt(j).FixityOf(gi).ToString() == "Fixed" ? bd.AnchorHoleFixed : bd.AnchorHoleExpansion;
+            if (dia <= 0) continue;
+            foreach (double ra in bd.AnchorRows)
+                foreach (int sgn in new[] { -1, 1 })
+                {
+                    var q = B.XY + ahead * ra + dir * (sgn * bd.AnchorAcross);
+                    var (s, x) = TubPlanToGirder(gi, q, -D - bf / 2, sb);
+                    TubHoles(gi, "BF").Add(new Hole(new Vec2(s, x), dia));
+                }
+        }
+    }
 
     private void TubBearings(TubBearingDefinition bd)
     {
@@ -918,14 +1055,49 @@ public sealed partial class SteelModelGenerator
             _parts.Add(new SteelPart { Mark = $"{asm}-PAD", Category = PartCategory.BearingPad, Assembly = asm, Mesh = pad, Length = bd.PadLength, Material = "Elastomer (laminated)",
                 Description = $"Elastomeric pad {In(bd.PadLength)} x {In(bd.PadWidth)} x {In(bd.PadHeight)} ({bd.InteriorLayers} x {In(bd.InteriorLayer)} interior, {bd.Laminates} x 1/8\" laminates, {In(bd.ExteriorLayer)} exterior)" });
             double seat = zPlateBot - bd.PadHeight;
-            // anchor bolts through the bottom flange holes
+            // anchor bolts through the bottom flange holes (p.292): 6" holes + top contact PL 8 x 8 x 1/2 (slotted) at expansion / guided bearings,
+            // 2 1/2" holes + bottom contact PL 4 x 4 (2 3/8" hole, from the flange underside to the seat) at fixed bearings
+            bool fixedBrg = fix == "Fixed";
+            int ca = 0;
             foreach (double ra in bd.AnchorRows)
                 foreach (int sgn in new[] { -1, 1 })
                 {
                     var q = B.XY + ahead * ra + dir * (sgn * bd.AnchorAcross);
                     double ztop = Zf(q) + bf / f.Cos;
-                    _bolts.Add(new BoltInstance { Frame = new Frame3(q.WithZ(ztop), ahead.WithZ(0), dir.WithZ(0), new Vec3(0, 0, 1)), Grip = ztop - seat, Length = ztop - seat + bd.AnchorEmbedment,
-                        Assembly = asm, Kind = BoltKind.Anchor, Diameter = bd.AnchorDiameter, Embedment = bd.AnchorEmbedment });
+                    double zWasher = ztop, topH = 0, len = ztop - seat + bd.AnchorEmbedment, emb = bd.AnchorEmbedment;
+                    ca++;
+                    if (!fixedBrg && bd.TopContactSide > 0)
+                    {
+                        // top contact PL on the bottom flange, in the girder's rotated section: square to the girder, slot along the girder (direction of movement)
+                        var (sq, xq) = TubPlanToGirder(gi, q, -D - bf / 2, sb);
+                        double cs = bd.TopContactSide / 2;
+                        var cm = new Mesh();
+                        var slot = PlateBuilder.RoundedRectangle(new Vec2(sq, xq), bd.TopContactSlotLength, bd.TopContactSlotWidth, bd.TopContactSlotWidth / 2);
+                        PlateBuilder.AddMappedWithOpenings(cm, new[] { new Vec2(sq - cs, xq - cs), new Vec2(sq + cs, xq - cs), new Vec2(sq + cs, xq + cs), new Vec2(sq - cs, xq + cs) },
+                            Array.Empty<Hole>(), new[] { slot }, (s2, w2, tt) => TF(gi, s2).At(w2, -D + tt), 0, bd.TopContactThickness);
+                        _parts.Add(new SteelPart { Mark = $"{asm}-CPT{ca}", Category = PartCategory.ConnectorPlate, Assembly = asm, Mesh = cm, Length = bd.TopContactSide,
+                            Description = $"Top contact PL {In(bd.TopContactThickness)} x {In(bd.TopContactSide)} x {In(bd.TopContactSide)} with {In(bd.TopContactSlotWidth)} x {In(bd.TopContactSlotLength)} slot (direction of expansion movement) on the bottom flange" });
+                        zWasher += bd.TopContactThickness / f.Cos;
+                    }
+                    if (fixedBrg && bd.BottomContactSide > 0)
+                    {
+                        double cs = bd.BottomContactSide / 2;
+                        var cm = new Mesh();
+                        PlateBuilder.AddPrism(cm, new[] { new Vec2(-cs, -cs), new Vec2(cs, -cs), new Vec2(cs, cs), new Vec2(-cs, cs) },
+                            new[] { new Hole(new Vec2(0, 0), bd.BottomContactHole) },
+                            (a2, c2, tt) => { var p2 = q + ahead * a2 + dir * c2; return p2.WithZ(seat + tt * (Zf(p2) - seat)); }, _ => 0, _ => 1);
+                        _parts.Add(new SteelPart { Mark = $"{asm}-CPB{ca}", Category = PartCategory.ConnectorPlate, Assembly = asm, Mesh = cm, Length = bd.BottomContactSide,
+                            Description = $"Bottom contact PL {In(bd.BottomContactSide)} x {In(bd.BottomContactSide)} with {In(bd.BottomContactHole)} hole, from the seat to the underside of the bottom flange (top bevelled to match, height {In(Zf(q) - seat)} here)" });
+                    }
+                    if (bd.AnchorLength > 0 && bd.AnchorProjection > 0)
+                    {
+                        zWasher += bd.NutGap;
+                        topH = ztop + bd.AnchorProjection - zWasher;                  // top of the bolt = 7" above the top of the bottom flange (p.292, MIN.)
+                        len = bd.AnchorLength;                                        // 3'-0" overall (p.292 Detail of Anchor Bolt)
+                        emb = bd.AnchorLength - topH - (zWasher - seat);
+                    }
+                    _bolts.Add(new BoltInstance { Frame = new Frame3(q.WithZ(zWasher), ahead.WithZ(0), dir.WithZ(0), new Vec3(0, 0, 1)), Grip = zWasher - seat, Length = len,
+                        Assembly = asm, Kind = BoltKind.Anchor, Diameter = bd.AnchorDiameter, Embedment = emb, TopHeight = topH });
                 }
             var (pt, _, sta) = g.Path.At(sb);
             var so = _f.Alignment.Inverse(B.XY);
