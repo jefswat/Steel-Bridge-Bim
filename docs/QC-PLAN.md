@@ -1,6 +1,6 @@
 # QC plan: checking models built from plans
 
-Status: proposal for the user, 2026-10-19. Nothing here is built yet unless marked **exists**.
+Status: proposal for the user, 2026-10-19. Nothing here is built yet unless marked **exists** (`sbm measure` / `sbm section` exist since 2026-10-19).
 
 ## 1. Purpose and rules
 
@@ -42,8 +42,8 @@ The checker uses the program read-only, through the CLI. All of the following pr
 | `sbm clash` | exists | steel / misc / concrete clashes (section 7) |
 | `sbm sheets`, `sbm drawings` | exist | the model's own sheets (compare layout only, not as evidence) |
 | `--snapshot --closeup / --camera / --section` | exists | images for the report and visual review |
-| `sbm section <model> --at <station|support|girder@dist> [--skew][--normal] --svg/--dxf/--csv` | **new** | true section through the model (`MeshSection`), bars as points with marks, dimensions measurable |
-| `sbm measure <model> --points ... / --at <mark> <query>` | **new** | distances, clear cover, spacing chains, lap lengths |
+| `sbm section <model> --station STA [--offset o] [--normal-to alignment\|girder:G\|member:M\|plumb] [--skew deg] \| --plane x,y,z,nx,ny,nz [--width/--height] [--dims] --svg/--dxf/--csv/--json` | **exists** (2026-10-19) | true section through every solid (`MeshSection`), plane normal = alignment / girder tangent incl. grade or member axis (not plumb), drawn in the plane's own u/v, loops per element with GlobalId, bars crossing as dots (mark, size, clear cover), bars in the plane as polylines; `--dims` = element extents and clear distances |
+| `sbm measure <model> --part / --assembly / --member --at / --distance / --point / --station / --bar / --cover / --spacing / --laps` [--json] [--svg] [--batch]` | **exists** (2026-10-19) | plates flattened into their own plane (thickness, outline, angles, clips / copes, holes, bolt pattern along its own axes, edge distances perpendicular to the edges); assemblies collapsed into their planes (stack, fillers, joint gaps, bolts per side); min distance / overlap; point query; bar bends / hooks / developed length, clear cover per face type, spacing chains "n spa @ s", laps / stagger. Read-only, never saves (docs/API.md) |
 | `sbm qc plan / record / report / issues` | **new** | check list, results into the database, report, issue round trip |
 
 **Results go into the companion database (G1 / G9 tables):**

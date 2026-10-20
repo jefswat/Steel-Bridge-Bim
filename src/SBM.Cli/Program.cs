@@ -77,6 +77,10 @@ public static partial class Program
                                                             plans = folder with the plan PDFs or split pages; default <model folder>\plans)
           sbm qc-sheet <db.sqlite> "<bridge>:<S-n>" <plan set>:<pdf page> <ok|issue|unchecked> [note]
                                                             Store the check result of a generated sheet vs a plan page in the companion database (qc table)
+          sbm measure <file.sbm> --part|--assembly|--member|--distance|--point|--station|--bar|--cover|--spacing|--laps ... [--json] [--svg f]
+          sbm section <file.sbm> --plane x,y,z,nx,ny,nz | --station STA [--normal-to ...] [--svg/--dxf/--csv f] [--dims]
+                                                            Read-only QC measurements (flattened plates, assembly planes, true sections,
+                                                            distances, rebar); "sbm measure" alone lists the options. Never saves the model.
 
         Paths:   Bridges[0].Supports[1].SkewDegrees   Bridges["Sample Bridge"].Girders.Section.WebDepth
                  Alignments[0].StartStation           Bridges[0].FieldSplices   Units.Kind
@@ -442,6 +446,12 @@ public static partial class Program
                     return NurbsCommand(args);
                 case "project":
                     return ProjectCommand(args);
+                case "measure":
+                    if (args.Length < 3) { Console.WriteLine(MeasureCommand.Help); return args.Length < 2 ? 1 : 0; }
+                    return MeasureCommand.Measure(args);
+                case "section":
+                    if (args.Length < 3) { Console.WriteLine(MeasureCommand.Help); return args.Length < 2 ? 1 : 0; }
+                    return MeasureCommand.Section(args);
                 case "clash":
                 {
                     Need(args, 2);

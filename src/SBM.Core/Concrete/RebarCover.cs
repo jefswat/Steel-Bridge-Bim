@@ -71,6 +71,9 @@ public sealed class RebarCover
 
     public bool HasHosts => _hosts.Count > 0 || _analytic.Count > 0;
 
+    /// <summary>True when the point lies inside the union of the host solids (vertical-ray parity per host, analytic hosts by sign).</summary>
+    public bool Contains(Vec3 p) => InUnion(p);
+
     private static Vec3[] BuildDirs()
     {
         var l = new List<Vec3>();
