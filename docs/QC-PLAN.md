@@ -242,7 +242,7 @@ How program defects are handled:
 | 8 | Roll out to the other bridges; I-80 clash triage | Sonnet runs, Opus review |
 
 ## 11. Questions for the user
-1. Who signs off as the human checker, and do you want a stamped QC report format (DOT QC/QA form)?
+1. ~~Who signs off, report form~~ - user 2026-10-19: no formal report currently; the markdown QC-REPORT per bridge is enough for now.
 2. Are the default tolerances right (4.4), or does an agency spec govern?
 3. Is the first bridge for the pilot Nebraska St?
 4. Should the checker also check the generated plan sheets (the program's own sheets) against the plans as a separate deliverable, or only the model?

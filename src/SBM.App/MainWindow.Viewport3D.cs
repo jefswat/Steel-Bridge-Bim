@@ -611,10 +611,26 @@ public partial class MainWindow
         var hiddenLayers = _vm.LayerItems.Where(l => !l.IsVisible).ToList();
         var layers = new MenuItem { Header = $"Show layer ({hiddenLayers.Count})", IsEnabled = hiddenLayers.Count > 0 };
         foreach (var l in hiddenLayers) layers.Items.Add(Item(l.Name, () => l.IsVisible = true));
+        if (hiddenLayers.Count > 1)
+        {
+            layers.Items.Add(new Separator());
+            layers.Items.Add(Item("Show all layers", ShowAllLayers));
+        }
         menu.Items.Add(layers);
         menu.PlacementTarget = View;
         menu.Placement = System.Windows.Controls.Primitives.PlacementMode.MousePoint;
         menu.IsOpen = true;
+    }
+
+    private void ShowAllLayers_Click(object sender, System.Windows.RoutedEventArgs e) => ShowAllLayers();
+
+    private void ShowAllLayers()
+    {
+        _layerBatch = true;
+        try { _vm.ShowAllLayers(); }
+        finally { _layerBatch = false; }
+        ApplyLayerVisibility();
+        StatusText("All layers shown");
     }
 
     private void HideElement(object tag, string label)

@@ -303,6 +303,7 @@ public sealed partial class MainViewModel : ObservableObject
         _refCache.Clear();
         _regenCache.Clear();
         if (path != null) NoteRecent(path);
+        _layerVisibilityReset = true; // a different project starts with every layer visible (user 2026-10-19: layers hidden in one model stayed hidden in the next)
         ProjectOpened?.Invoke();
         _ = LoadAfterRegen(zoom);
     }
@@ -1216,9 +1217,19 @@ public sealed partial class MainViewModel : ObservableObject
         }
     }
 
+    private bool _layerVisibilityReset;
+
+    /// <summary>Makes every layer visible (layer panel / viewport context menu "Show all layers").</summary>
+    public void ShowAllLayers()
+    {
+        foreach (var l in LayerItems.Where(l => !l.IsVisible).ToList()) l.IsVisible = true;
+    }
+
     private void RebuildLayers(SceneData scene)
     {
-        var vis = LayerItems.ToDictionary(l => l.Name, l => l.IsVisible);
+        // Layer visibility is kept across regenerations of the SAME project only; layer names repeat between models (terrain, 3D-BARRIER, ...).
+        var vis = _layerVisibilityReset ? new Dictionary<string, bool>() : LayerItems.ToDictionary(l => l.Name, l => l.IsVisible);
+        _layerVisibilityReset = false;
         LayerItems.Clear();
         foreach (var l in scene.Layers.OrderBy(l => l.Style.Name))
         {

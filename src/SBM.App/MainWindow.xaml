@@ -612,6 +612,11 @@
                 <TextBlock Grid.Row="2" Style="{StaticResource PanelHeader}" Text="Layers"/>
                 <ScrollViewer Grid.Row="3" VerticalScrollBarVisibility="Auto">
                     <ItemsControl ItemsSource="{Binding LayerItems}" Margin="8,4">
+                        <ItemsControl.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="Show all layers" Click="ShowAllLayers_Click"/>
+                            </ContextMenu>
+                        </ItemsControl.ContextMenu>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal" Margin="0,1">
