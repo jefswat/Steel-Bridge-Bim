@@ -37,6 +37,9 @@ public sealed class ArchModel
     public Mesh? SlabEnds { get; set; }
     public Mesh? Curbs { get; set; }
     public double SlabArea { get; set; }
+    /// <summary>Gross volume of the knuckle rib-box concrete fills (m3, part of <see cref="SlabEnds"/>; 0 = none) and the steel inside them (not subtracted).</summary>
+    public double RibBoxFillVolume { get; set; }
+    public double RibBoxFillSteelVolume { get; set; }
     public List<Diagnostic> Diagnostics => Steel.Diagnostics;
 
     /// <summary>World point of a local point.</summary>

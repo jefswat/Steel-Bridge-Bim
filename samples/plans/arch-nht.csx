@@ -413,7 +413,11 @@ var deck = new ArchDeckDefinition
     // the bars end at the inside arch flange plate at the rib corners).
     KnuckleZonesFromSteel = true,
     KnuckleZoneUnresolved = U("p.124 / 125 / 151", "deck concrete at the knuckle rib corners", "the pocket between the outside and inside arch flange plate legs (open at the top, below the deck surface) is neither shown filled nor formed; p.151 ends the deck bars at the inside arch flange plate",
-        "Deck concrete stops at the deck-side face of the inside arch flange plate (vertical, from the end web to where the plate's intrados edge passes the slab top) and at the end web inside face; the pocket is not filled; curbs cut back to the same face."),
+        "Deck slab stops at the deck-side face of the inside arch flange plate (vertical, from the end web to where the plate's intrados edge passes the slab top) and at the end web inside face; the pocket is filled separately (KnuckleRibBoxFill, user decision 2026-10-20)."),
+    // d21 (user decision 2026-10-20): the pocket between the arch flange plates is FILLED with concrete; the plans neither show it filled nor formed.
+    KnuckleRibBoxFill = true,
+    KnuckleRibBoxFillFlag = U("p.124 / 125 / 151", "concrete fill between the arch flange plates at the knuckle rib corners", "the plans neither show the pocket between the outside and inside arch flange plate legs (open at the top, below the deck surface) filled nor formed",
+        "Filled with deck concrete - ASSUMPTION CONFIRMED BY THE USER 2026-10-20 (decision d21): between the inner plate faces, end web inside face to the plates' intrados edge, end flange top to the finished grade; steel plates inside it are not subtracted (volume reported)."),
     ConcreteStrengthKsi = 5,
 };
 // Deck bars (p.152 section, p.154 bill): A1 #5 13'-10 top transverse @ 8 between the curbs, B1 #5 18'-2 bottom transverse @ 8, 27 - D1 (top) / D2 (bottom, one

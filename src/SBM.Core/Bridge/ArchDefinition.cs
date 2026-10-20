@@ -761,6 +761,13 @@ public sealed class ArchDeckDefinition
     public bool KnuckleZonesFromSteel { get; set; }
     /// <summary>UNRESOLVED text raised with <see cref="KnuckleZonesFromSteel"/> (e.g. whether the rib-box pocket is filled).</summary>
     public string KnuckleZoneUnresolved { get; set; } = "";
+    /// <summary>OPTIONAL (false = the rib-box pocket stays empty, v7): with <see cref="KnuckleZonesFromSteel"/>, the space between the inner faces of the outside
+    /// and inside arch flange plates at each knuckle rib corner is filled with deck concrete - from the end web inside face to the plates' intrados edge, on
+    /// the end flange top, up to the finished grade (the pocket is open at the top). Appended to the knuckle-zone concrete (deck IfcSlab second body, database,
+    /// quantities); steel plates inside it (stub web, tie web, stiffeners) are not subtracted (their volume is reported).</summary>
+    public bool KnuckleRibBoxFill { get; set; }
+    /// <summary>UNRESOLVED / assumption text raised with <see cref="KnuckleRibBoxFill"/> (e.g. "user decision, plans neither show it filled nor formed").</summary>
+    public string KnuckleRibBoxFillFlag { get; set; } = "";
 }
 
 /// <summary>Longitudinal PT (p.155): strands per tendon (flat duct), strand size, jacking force, strand spacing in the duct, anchorage envelope at the

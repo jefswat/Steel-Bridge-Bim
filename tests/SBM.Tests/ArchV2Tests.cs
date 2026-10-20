@@ -196,6 +196,31 @@ public class ArchV2Tests
     }
 
     [Fact]
+    public void KnuckleRibBoxFill_AddsConcreteBetweenTheArchFlangePlates()
+    {
+        double Vol(bool fill, out SBM.Core.Arch.ArchModel model)
+        {
+            var (p, b) = ArchTests.Model();
+            var a = b.Arch!;
+            var k = a.Knuckles.First(q => q.Name == "West");
+            k.Detail = new ArchKnuckleDetail { TieCutParallelToEndWeb = true };
+            k.EndWebInset = In(0.5);
+            k.Corners.Add(new ArchKnuckleCorner { Point = "T0", Rib = "South rib", Tie = "South tie", Splice = "RS1", OutsideLegHeight = In(10.5), InsideLegHeight = In(10.5), EndWebEndBeyondChord = In(8.3125) });
+            a.Deck!.KnuckleZonesFromSteel = true;
+            a.Deck.KnuckleRibBoxFill = fill;
+            var (_, m) = ArchTests.Generate(p);
+            model = m;
+            return Math.Abs(m.SlabEnds!.Volume());
+        }
+        double v0 = Vol(false, out var m0), v1 = Vol(true, out var m1);
+        Assert.Equal(0, m0.RibBoxFillVolume);
+        Assert.True(m1.RibBoxFillVolume > 0);
+        Assert.Equal(v0 + m1.RibBoxFillVolume, v1, 6);
+        // the steel inside the fill (stub web, tie web, stiffeners) is a small part of it, the arch flange plates are outside it
+        Assert.True(m1.RibBoxFillSteelVolume > 0 && m1.RibBoxFillSteelVolume < 0.25 * m1.RibBoxFillVolume);
+    }
+
+    [Fact]
     public void Pt_DeckRebar_Ifc()
     {
         var (p, b) = ArchTests.Model();

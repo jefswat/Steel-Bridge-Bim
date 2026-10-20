@@ -301,6 +301,9 @@ public static partial class ArchGenerator
                     var e0 = o3 + cIn * (-n2.X * hw) + up * (-n2.Y * hw);
                     var ed = (cIn * t2.X + up * t2.Y).Normalized();
                     _ribBoxes.Add(new RibBox(c.Tie, string.Equals(tg.Def.Start, c.Point, StringComparison.OrdinalIgnoreCase), facePt, faceN, e0, ed, k.Name));
+                    // Concrete in the rib box between the two plates (user decision d21), built here where the plate geometry is known.
+                    if (_d.Deck is { KnuckleZonesFromSteel: true, KnuckleRibBoxFill: true })
+                        RibBoxFill($"{k.Name} {c.Point}", T, cIn, up, bn, t2, n2, hw, w.Depth / 2 - tp, el, dIn, zef);
                 }
                 AddPart($"{cm}-AF{(outside ? "O" : "I")}", PartCategory.KnucklePlate, asm,
                     $"PL {L(tp)} {(outside ? "outside" : "inside")} arch flange plate, bent (leg {L(h)}, R {L(kd.BendRadius)}) at {c.Point} (p.124/125)", m, mat, sCut + Math.Abs(uEnd));

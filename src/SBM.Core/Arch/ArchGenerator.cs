@@ -1335,6 +1335,7 @@ public static partial class ArchGenerator
             if (zoneB) area += KnuckleZoneSlab(ends, ts, tn, (knots[^1].s, knots[^1].n), (knots[^2].s, knots[^2].n), false, kb!, zbEnds, topN);
             else Zone(knots.Count - 2, knots.Count - 1, false, 0, ext1);
             if ((zoneA || zoneB) && dk.KnuckleZoneUnresolved.Length > 0) Warn(dk.KnuckleZoneUnresolved);
+            if (zoneA || zoneB) FinishRibBoxFills(ends, dk);
             Model.Slab = slab;
             Model.SlabArea = area;
             Model.Concrete.Deck = slab;

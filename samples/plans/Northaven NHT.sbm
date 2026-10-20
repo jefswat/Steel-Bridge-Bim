@@ -44841,7 +44841,9 @@
           },
           "FlutesOnBarGrid": true,
           "KnuckleZonesFromSteel": true,
-          "KnuckleZoneUnresolved": "UNRESOLVED (p.124 / 125 / 151): deck concrete at the knuckle rib corners - the pocket between the outside and inside arch flange plate legs (open at the top, below the deck surface) is neither shown filled nor formed; p.151 ends the deck bars at the inside arch flange plate. Deck concrete stops at the deck-side face of the inside arch flange plate (vertical, from the end web to where the plate\u0027s intrados edge passes the slab top) and at the end web inside face; the pocket is not filled; curbs cut back to the same face."
+          "KnuckleZoneUnresolved": "UNRESOLVED (p.124 / 125 / 151): deck concrete at the knuckle rib corners - the pocket between the outside and inside arch flange plate legs (open at the top, below the deck surface) is neither shown filled nor formed; p.151 ends the deck bars at the inside arch flange plate. Deck slab stops at the deck-side face of the inside arch flange plate (vertical, from the end web to where the plate\u0027s intrados edge passes the slab top) and at the end web inside face; the pocket is filled separately (KnuckleRibBoxFill, user decision 2026-10-20).",
+          "KnuckleRibBoxFill": true,
+          "KnuckleRibBoxFillFlag": "UNRESOLVED (p.124 / 125 / 151): concrete fill between the arch flange plates at the knuckle rib corners - the plans neither show the pocket between the outside and inside arch flange plate legs (open at the top, below the deck surface) filled nor formed. Filled with deck concrete - ASSUMPTION CONFIRMED BY THE USER 2026-10-20 (decision d21): between the inner plate faces, end web inside face to the plates\u0027 intrados edge, end flange top to the finished grade; steel plates inside it are not subtracted (volume reported)."
         },
         "Bearings": [
           {
