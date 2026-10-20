@@ -145,8 +145,8 @@ double skew13, sta13;
 b.Supports.Add(Sup("Pier 13", sta13, skew13, Fr(0, 9, 11, 16), BearingFixity.GuidedExpansion, In(11)));   // deck 1" ahead of CL pier 13: 2" joint opening at CL pier (p.271 note 1)
 b.Supports.Add(Sup("Pier 14", Sta("302+93.00"), 0, 0, BearingFixity.Fixed));
 b.Supports.Add(Sup("Pier 15", Sta("304+54.00"), 0, 0, BearingFixity.GuidedExpansion));
-b.Supports.Add(Sup("Pier 16", Sta("306+14.00"), 0, In(9), BearingFixity.GuidedExpansion, In(11)));   // deck 1" short of CL pier 16 (2" joint, p.271 note 1); CL brg 1'-0 back of CL pier 16 (p.273), girder end 9" (p.278)
-Print($"Pier 13 CL brg station {Doc.Units.FormatStation(sta13)} (from the girder spans); Pier 16 CL brg 306+14.00 (CL pier 306+15.00 - 1'-0).");
+b.Supports.Add(Sup("Pier 16", Sta("306+13.993"), 0, In(9), BearingFixity.GuidedExpansion, In(11)));   // deck 1" short of CL pier 16 (2" joint, p.271 note 1); CL brg 1'-0 1/12" back of CL pier 16 (user decision d14 2026-10-20: G2 span 16 = 160'-9 3/8 p.279, which closes the p.279 strings; p.273 prints 1'-0 and 160'-9 1/2), girder end 9" (p.278)
+Print($"Pier 13 CL brg station {Doc.Units.FormatStation(sta13)} (from the girder spans); Pier 16 CL brg 306+13.993 (CL pier 306+15.00 - 1'-0 1/12 in, decision d14: G2 span 16 160'-9 3/8 per p.279).");
 U("p.273", "deck ends at piers 13 and 16", "the unit's slab continues into Bridge N (pier 13) and span 17 (pier 16); the joint / continuity details there are outside this unit",
   "The modeled deck stops 1\" short of CL pier 13 / CL pier 16 (DeckEndOffset 11\" from CL brg): the 2\" joint opening of p.271 note 1 at the CL pier; the joint device itself is not modeled.");
 
