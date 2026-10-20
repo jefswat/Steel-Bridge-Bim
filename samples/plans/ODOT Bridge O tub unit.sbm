@@ -117,6 +117,8 @@
             "ColumnChamferN": 0,
             "ColumnProjectionS": 0,
             "ColumnProjectionWidth": 0,
+            "ColumnProjectionBack": 0,
+            "ColumnProjectionBackWidth": 0,
             "ColumnFlareElevation": "NaN",
             "ColumnFlareWidth": 0,
             "ColumnFlareDepth": 0,
@@ -272,6 +274,8 @@
             "ColumnChamferN": 0,
             "ColumnProjectionS": 0,
             "ColumnProjectionWidth": 0,
+            "ColumnProjectionBack": 0,
+            "ColumnProjectionBackWidth": 0,
             "ColumnFlareElevation": "NaN",
             "ColumnFlareWidth": 0,
             "ColumnFlareDepth": 0,
@@ -427,6 +431,8 @@
             "ColumnChamferN": 0,
             "ColumnProjectionS": 0,
             "ColumnProjectionWidth": 0,
+            "ColumnProjectionBack": 0,
+            "ColumnProjectionBackWidth": 0,
             "ColumnFlareElevation": "NaN",
             "ColumnFlareWidth": 0,
             "ColumnFlareDepth": 0,
@@ -582,6 +588,8 @@
             "ColumnChamferN": 0,
             "ColumnProjectionS": 0,
             "ColumnProjectionWidth": 0,
+            "ColumnProjectionBack": 0,
+            "ColumnProjectionBackWidth": 0,
             "ColumnFlareElevation": "NaN",
             "ColumnFlareWidth": 0,
             "ColumnFlareDepth": 0,
@@ -2945,13 +2953,15 @@
         "Diameter": 0.022224999999999998,
         "RowsAcross": 3,
         "TransverseSpacing": 0.1143,
+        "EdgeDistance": 0,
         "Pitch": 0.30479999999999996,
         "Penetration": 0.0508,
         "MinCover": 0.0508,
         "HeadDiameter": 0.034925,
         "HeadHeight": 0.009524999999999999,
         "LengthIncrement": 0.0127,
-        "Clearance": 0.038099999999999995
+        "Clearance": 0.038099999999999995,
+        "Zones": []
       },
       "LateralBracing": {
         "Enabled": false,
@@ -3362,5 +3372,34 @@
       }
     }
   ],
-  "References": []
+  "References": [
+    {
+      "Name": "3DEP lidar 1 m (I-44 / I-235 Oklahoma City)",
+      "Path": "C:\\SBM\\dist\\terrain\\odot-o\\odot-o-ramp44f-3dep-1m-okn-sft.flt",
+      "Kind": "Terrain",
+      "Format": "Grid",
+      "Visible": true,
+      "R": 150,
+      "G": 140,
+      "B": 120,
+      "Opacity": 1,
+      "UnitScale": 0.3048,
+      "OffsetX": 0,
+      "OffsetY": 0,
+      "OffsetZ": 0,
+      "ContourInterval": 0.6096,
+      "ImagePath": "",
+      "DisplayMaxVertices": 0
+    }
+  ],
+  "Georeference": {
+    "CrsName": "EPSG:2267",
+    "Description": "NAD83 / Oklahoma North (ftUS); project X = Easting, Y = Northing as printed on the plans (used as ft). UNRESOLVED: datum / zone not printed",
+    "GeodeticDatum": "NAD83",
+    "MapProjection": "Lambert Conformal Conic",
+    "MapZone": "Oklahoma North (3501)",
+    "MapUnitUsSurveyFoot": false,
+    "GridScale": 1,
+    "Basis": "Inferred, not stated on the plans: E 2113643.09 N 193275.14 (Pier 14 working point, p.259) -\u003E lat 35.5304 lon -97.5124 under EPSG:2267 = the I-44 / I-235 / US-77 interchange, Oklahoma City"
+  }
 }

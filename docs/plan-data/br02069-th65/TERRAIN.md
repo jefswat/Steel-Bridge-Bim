@@ -1,0 +1,10 @@
+# Br. 02069 TH 65 SB - terrain (2026-10-19)
+
+- No terrain existed in the model (References empty; no earlier terrain file). Plans: Blaine, Anoka County, T31N R23W Sec 8, T.H. 65 SB over 117th Ave NE; vertical datum N.A.V.D. 88 ADJ. (benchmarks p.34). Horizontal system NOT named (U1).
+- CRS of the model X / Y: plan X / Y (p.34, p.36, p.37) used as ft = **Anoka County coordinate system** (NAD83 HARN Adj MN Anoka (ftUS), ESRI:103708: LCC 2SP 45 04' / 45 22', origin 45 02'07" N 93 16' W, FE 500000 / FN 100000 ftUS, county-adjusted ellipsoid a 6378418.941, rf 298.257222101). INFERRED, flagged UNRESOLVED in the Georeference text.
+  Evidence: SB65 STA 248+67.045 X 508192.059 Y 153852.460 -> 45.18305 N 93.2349 W (Blaine, 117th Ave); the DEM relief image shows T.H. 65 (N-S divided road) and the E-W 117th Ave / Cloud Dr crossing with the NE-diverging ramp at X ~508230 Y ~153870, within ~40 ft of the p.34 control point.
+- Source (public USGS 3DEP): `USGS_1M_15_x48y501_MN_CentralMissRiver_B22.tif`, 298.4 MB, NAD83 UTM 15N, NAVD88 m. Saved `C:\SBM\dist\terrain\br02069\`.
+- Placement: `tools/terrain/terrain_clip.py ... mn-anoka 506950 152700 509450 155050 1.0 ft` -> `br02069-th65-3dep-1m-anoka-sft.flt/.hdr`, 763 x 717 cells of 1 m (3.2808 ft), 2.2 MB, z NAVD88 ft, UnitScale 0.3048. The tile is the existing at-grade intersection (ground ~908 ft); the bridge (deck ~928, abutment footing bottom 917.75, p.34 / p.5) floats over it because the MSE walls / embankment (Ret. Walls 20-24, 35, 36) are not modeled.
+- `samples/plans/terrain-br02069.csx` sets Georeference + Reference, regenerates, saves.
+- Ground check: DEM 908.75 at SB65 x EB117 (p.34 control 1), 907.9 / 908.3 at S / N abutment CL brg, 908.3 at NB65 x EB117; plan p.34 existing ground line (read off the drawing, +-1 ft) ~906-907 and proposed 117th Ave grade 906.5-907.1 (p.35): DEM ~1.5-2 ft higher (drawing read tolerance / existing vs proposed). Bench marks 0208G 907.780 and 0208AD 899.992 are 1 mile south of the junction with CR 14, off this DEM clip.
+- Snapshot: `temp/br-terrain_view.png` (worktree).
