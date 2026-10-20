@@ -1,6 +1,6 @@
 // PTC / NJTA DELAWARE RIVER BRIDGE (1954-57, AS-BUILT) - DECK AND EVERYTHING ON IT, on all seven truss-generator bridges of the PTC model:
 // slab 6 3/4 + 1" thickening over every stringer (p.107), curb + parapet wall (p.107 Section A), aluminum parapet railing (p.107 / p.108),
-// expansion dams (p.46 sliding plate, p.54 / p.68 / p.91 / p.92 finger dams), service walkways (approach truss spans p.101, main span piers 18 / 19 p.103).
+// expansion dams (p.46 / p.54 / p.68 / p.91 / p.92 finger dams). Service walkways / ladders / platforms: walkways-ptc.csx (p.101-106).
 // Generic inputs used: TrussDeckDefinition.Haunch*, TrussDefinition.LineItems (concrete curb / parapet, steel dam plates / walkway gratings),
 // PedestrianRailingDefinition (posts + rail on the parapet). Re-runnable (replaces its own items), run AFTER truss-ptc-arch.csx, truss-ptc-approach.csx and
 // girders-ptc.csx (they rebuild Truss):
@@ -143,73 +143,7 @@ Dam("PTC 4-span truss 14-17", "dam Pier 17", Sta("675+96.380"), 13, 19.25, 18.5,
 Dam("PTC Arch truss 18-20", "dam Pier 20", Sta("689+64.380"), 22.25, 31.5, 18.5, 3.5, "p.91", fingerWhy + "; the 18 1/2 in. plate behind the roots is taken from p.54 (p.91 prints 2'-0 + 1'-3 1/2 not decoded); steel parapet corners at the dam (3/8 in plates) not built", true);
 Dam("PTC Arch truss 18-20", "dam W22", Sta("682+80.380"), 10, 15, 18.5, 3, "p.92", fingerWhy + "; the middle values of the W22 opening table are blurred (p.92); 18 1/2 in. plate behind the roots taken from p.54", true);
 
-// ---------------------------------------------------------------- service walkways (p.101 approach spans, p.103 main span)
-// grating 3/4 x 3/16 bearing bars (Irving X-Bar type AA), 2'-0 wide; nominal weight not printed -> 7 psf flagged
-double gratingDensity = 7.0 * 4.88242764 / In(0.75);   // 7 lb/sq ft over a 3/4 in plate (kg/m3)
-string gratingFlag = U("p.101", "grating weight", "the sheet names the grating (3/4 x 3/16 bearing bars, Irving X-Bar type AA) but prints no weight", "7 lb/sq ft (catalogue value for the type, not from the plans).");
-void Walk(string bridge, string name, bool transverse, double reference, double from, double to, double vBottom, bool fromGrade, string pages, string unresolved)
-{
-    var t = Doc.Project.Bridges.First(b => b.Name == bridge).Truss!;
-    t.LineItems!.Add(new TrussLineItemDefinition
-    {
-        Name = name, Kind = TrussLineItemKind.Steel, Category = PartCategory.Grating, Transverse = transverse, Station = transverse ? reference : 0, ReferenceOffset = transverse ? 0 : reference,
-        From = from, To = to, Side = 1, FromGrade = fromGrade, Density = gratingDensity, Material = "Galvanized steel grating", Assembly = "WALKWAYS", AssemblyDescription = $"{bridge} - service walkways ({pages})",
-        Profile = new() { new TrussUV { U = -Ft(1), V = vBottom }, new TrussUV { U = Ft(1), V = vBottom }, new TrussUV { U = Ft(1), V = vBottom + In(0.75) }, new TrussUV { U = -Ft(1), V = vBottom + In(0.75) } },
-        Source = pages, Unresolved = unresolved + " " + gratingFlag,
-    });
-}
-var walkSummary = new List<string>();
-foreach (var (bridge, pierJoints, endJoint) in new[] { ("PTC 3-span truss 11-13", new[] { "8", "8'" }, "0"), ("PTC 3-span truss 25-27", new[] { "8", "8'" }, "0"), ("PTC 4-span truss 14-17", new[] { "10", "10'" }, ""), ("PTC 4-span truss 21-24", new[] { "10", "10'" }, "") })
-{
-    var br = Doc.Project.Bridges.First(b => b.Name == bridge);
-    var al = Doc.Project.Alignments.First(a => a.Name == br.AlignmentName);
-    var dk = br.Truss!.Floor!.Deck!;
-    // floor beam bottom (cover plate underside) relative to the grade on the CL, read at the first pier floor beam (the floor beams are parallel to the grade)
-    var fb = PartBox(bridge, p => p.Mark == "FB" + pierJoints[0]);
-    if (fb == null) { Print($"{bridge}: floor beam FB{pierJoints[0]} not found - walkways not built"); continue; }
-    double vFb = fb.Value.zMin - al.ElevationAt(fb.Value.sta, 0);
-    double vBot = vFb + In(1);    // grating on the bottom flange angles (1/2 cover + 1/2 angle leg)
-    string wflag = U("p.101", "walkway level, lateral position and the openings in the floor beams", "the walkway runs at the bottom flange of the floor beams through the manholes of the floor beam webs (drawn, not dimensioned); its line is drawn near the CL bridge",
-        "grating bottom 1 in above the floor beam bottom (on the bottom flange angles), longitudinal walkway centred on the CL bridge; the floor beam webs are not cut for the manholes, walk angles / hangers (L 4x4x3/8) / hand railing / ladders not built.");
-    Walk(bridge, "walkway CL", false, 0, dk.BeginStation, dk.EndStation, vBot, true, "p.101", wflag);
-    // cross walkways along the pier floor beams, truss to truss (53'-2 to the ladder at the south truss, p.101 plan of walkway at pier 10); omitted at piers 13 / 15 / 17 (p.101 note)
-    var cross = pierJoints.Select(j => (j, PartBox(bridge, p => p.Mark == "FB" + j))).ToList();
-    if (endJoint.Length > 0) cross.Add((endJoint, PartBox(bridge, p => p.Mark == "FB" + endJoint)));
-    foreach (var (j, box) in cross)
-    {
-        if (box == null) continue;
-        double s = box.Value.sta + In(9.5) + Ft(1) + In(2);    // beside the floor beam: web side + 1 ft half walkway + clearance (position UNRESOLVED)
-        if (s > dk.EndStation) s = box.Value.sta - In(9.5) - Ft(1) - In(2);
-        double vb = box.Value.zMin + In(1);
-        Walk(bridge, $"walkway at FB{j}", true, s, -FI(26, 7), FI(26, 7), vb, false, "p.101",
-            U("p.101", "cross walkway beside the pier floor beam", "the key plan shows a cross walkway at the pier floor beams 53'-2 long between the walkway ends at the trusses; its side of the floor beam and its level are drawn only", "2'-0 grating beside the floor beam (centre 1'-2 from the web face), level with the floor beam bottom flange; supports from the top chord not built."));
-    }
-    walkSummary.Add($"{bridge}: CL walkway {(dk.EndStation - dk.BeginStation) / 0.3048:0} ft + {cross.Count(c => c.Item2 != null)} cross walkways");
-}
-// main span (p.103): walkway at the floor beam at L11 (pier 18) / L11' (pier 19) and on top of the L11 bottom strut (22'-0 long, 2'-0 wide)
-{
-    string bridge = "PTC Arch truss 18-20";
-    foreach (var j in new[] { "L11", "L11'" })
-    {
-        var strut = PartBox(bridge, p => p.Mark == "LS-" + j);
-        if (strut != null)
-            Walk(bridge, $"walkway on strut {j}", true, strut.Value.sta, -Ft(11), Ft(11), strut.Value.zMax, false, "p.103",
-                U("p.103", $"walkway on the bottom strut {j}", "the key plan gives 22'-0 x 2'-0 on the strut; its fastening and the platform / ladder to the pier top are drawn without all dimensions", "2'-0 grating centred on the strut top, 22'-0 long; ladders, cages and the top-of-pier platform (El. 87.701) not built."));
-        string fbj = "FB" + j.Substring(1);
-        var fb = PartBox(bridge, p => p.Mark == fbj);
-        if (fb != null)
-            Walk(bridge, $"walkway at {fbj}", true, fb.Value.sta + In(12) + Ft(1), -FI(26, 7), FI(26, 7), fb.Value.zMin + In(1), false, "p.103",
-                U("p.103", $"walkway at the floor beam {fbj} (U11-L11)", "the key plan shows the walkway along the floor beam with a 1'-0 stub; the walkway elevations printed (141.67 / 141.60 / 151.06) cannot be assigned", "2'-0 grating beside the floor beam at its bottom flange level, 53'-2 long."));
-        walkSummary.Add($"{bridge}: {j}: strut walkway {(strut != null ? "built" : "strut LS-" + j + " not found")}, floor beam walkway {(fb != null ? "built" : fbj + " not found")}");
-    }
-}
-// girder spans: no walkway sheet (p.44 only mentions manholes omitted at the end floor beams) - flag on the girder bridges
-foreach (var n in new[] { "PTC Girder spans 1-10", "PTC Girder spans 28-31" })
-{
-    var ul = Doc.Project.Bridges.First(b => b.Name == n).Truss!.Unresolved;
-    ul.RemoveAll(x => x.Contains("service walkway in the girder spans"));    // re-runnable
-    ul.Add(U("p.44, p.42", "service walkway in the girder spans", "no walkway sheet for the girder spans was found, but p.42 item 14 lists 2,510 / 1,010 sq ft of grating for them and p.44 mentions floor beam manholes", "not built."));
-}
+// ---------------------------------------------------------------- service walkways, ladders, platforms: walkways-ptc.csx (run after this script)
 
 // ---------------------------------------------------------------- regenerate + save
 var rep = Doc.Regenerate();
@@ -223,6 +157,5 @@ foreach (var n in names)
     Print($"{n}: slab {c?.DeckVolume / 0.764554858:0} CY + thickening {c?.HaunchVolume / 0.764554858:0} CY, curb + parapet {c?.BarrierVolume / 0.764554858:0} CY, railing runs {st?.Railings?.Runs.Count ?? 0} ({st?.Railings?.Runs.Sum(r => r.Length) / 0.3048:0} ft), dams {dams}, grating {grating / 0.3048:0} ft x 2 ft");
     foreach (var e in rep.Errors.Where(e => e.StartsWith(n))) Print("  ERROR " + e);
 }
-foreach (var w in walkSummary) Print("  " + w);
 Doc.Save(outPath);
 Print($"Saved {outPath}");

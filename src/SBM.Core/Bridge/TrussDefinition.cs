@@ -415,6 +415,10 @@ public sealed class TrussLineItemDefinition
     public double RepeatWidth { get; set; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public double RepeatStart { get; set; }
+    /// <summary>OPTIONAL copies of the profile shifted by these V offsets (m; e.g. ladder rungs, rails at several levels), each a separate solid of the
+    /// same part (combined with <see cref="RepeatPitch"/>). Null / empty = the profile once (omitted from the .sbm).</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public List<double>? CopiesV { get; set; }
     public string Unresolved { get; set; } = "";
     public string Source { get; set; } = "";
 }

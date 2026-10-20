@@ -645,14 +645,17 @@ public static class TrussGenerator
             if (li.Profile.Count < 3 || li.To <= li.From) { Warn($"Truss: line item {li.Name} - profile / range missing; not built."); return; }
             var poly = li.Profile.Select(q => new Vec2(q.U, q.V)).ToList();
             if (MeshBuilder.SignedArea(poly) < 0) poly.Reverse();
-            var sec = poly.ToArray();
+            var sec0 = poly.ToArray();
             var ranges = new List<(double lo, double hi)>();
             if (li.RepeatPitch > 0 && li.RepeatWidth > 0)
                 for (double a = li.From + li.RepeatStart; a + li.RepeatWidth <= li.To + 1e-9; a += li.RepeatPitch) ranges.Add((a, a + li.RepeatWidth));
             else ranges.Add((li.From, li.To));
             var mesh = new Mesh();
+            var copies = li.CopiesV is { Count: > 0 } cv ? cv : new List<double> { 0 };
+            foreach (var dv in copies)
             foreach (var (lo, hi) in ranges)
             {
+                var sec = dv == 0 ? sec0 : sec0.Select(q => new Vec2(q.X, q.Y + dv)).ToArray();
                 var rings = new List<Vec3[]>();
                 if (!li.Transverse)
                 {
@@ -680,7 +683,7 @@ public static class TrussGenerator
                 MeshBuilder.AddLoft(mesh, sec, rings);
             }
             if (ranges.Count == 0) { Warn($"Truss: line item {li.Name} - no repeated piece fits the range; not built."); return; }
-            double length = ranges.Sum(r => r.hi - r.lo);
+            double length = ranges.Sum(r => r.hi - r.lo) * copies.Count;
             if (li.Kind == TrussLineItemKind.Concrete)
             {
                 Model.Concrete.Barriers.Add((li.Name, mesh));

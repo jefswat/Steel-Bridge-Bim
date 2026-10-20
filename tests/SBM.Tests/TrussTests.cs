@@ -433,6 +433,12 @@ public class TrussTests : IDisposable
         Assert.Equal(56 * In(2) * In(12) * In(3), part.Volume, 9);
         Assert.Equal(56 * In(2), part.Length, 9);
         Assert.Contains("RepeatPitch", System.Text.Json.JsonSerializer.Serialize(tooth));
+        Assert.DoesNotContain("CopiesV", System.Text.Json.JsonSerializer.Serialize(tooth));
+        // CopiesV: the same teeth at three levels (ladder rungs, rails): three times the volume, top raised by the largest shift
+        tooth.CopiesV = new() { 0, In(12), In(24) };
+        var part3 = Regen(p).Steel!.Parts.Single(x => x.Mark == "teeth");
+        Assert.Equal(3 * part.Volume, part3.Volume, 9);
+        Assert.Equal(part.Mesh.Bounds().Max.Z + In(24), part3.Mesh.Bounds().Max.Z, 6);
     }
 
     [Fact]
