@@ -253,6 +253,6 @@ How program defects are handled:
 
 ## 11. Questions for the user
 1. ~~Who signs off, report form~~ - user 2026-10-19: no formal report currently; the markdown QC-REPORT per bridge is enough for now.
-2. Are the default tolerances right (4.4), or does an agency spec govern?
+2. ~~Tolerances~~ - user 2026-10-19: defaults, but concrete cover and rebar spacing 1/16".
 3. Is the first bridge for the pilot Nebraska St?
 4. ~~Generated sheets~~ - user 2026-10-19: yes, checked against the plans as a separate deliverable. Checker exports keep section designations (`--keep-designations`).
