@@ -170,6 +170,48 @@ Cmp("outside stringer S13 from the CL (p.85: 33'-0 + 6'-1; 10 in. outside the gu
 Print("--- 8. rope suspenders (pin to pin, N truss)");
 foreach (var s in tm.Suspenders.Where(s => s.Plane == "N").OrderBy(s => s.LowerPin.X)) Row("INFO", $"suspender {s.Name}", "-", $"{s.Length / ft:F3} ft");
 
+// 8b. gusset layers per face (gusset-layers.csv: L10 / L10' p.78, L11 / L11' p.80 Section E (low confidence), L22 p.90; every other joint one plate per face)
+Print("--- 8b. gusset layers (plates per face, total thickness)");
+{
+    var layerFile = Path.Combine(Path.GetDirectoryName(dataDir!)!, "connections", "gusset-layers.csv");
+    var plan = new Dictionary<string, (int n, double tot, string pg, string conf)>();
+    if (File.Exists(layerFile))
+    {
+        List<string> Split(string line)
+        {
+            var cells = new List<string>(); var cur = new System.Text.StringBuilder(); bool q = false;
+            foreach (char c in line) { if (c == '"') q = !q; else if (c == ',' && !q) { cells.Add(cur.ToString().Trim()); cur.Clear(); } else cur.Append(c); }
+            cells.Add(cur.ToString().Trim());
+            return cells;
+        }
+        var lines = File.ReadAllLines(layerFile).Where(l => l.Trim() != "").ToList();
+        var hdr = Split(lines[0]);
+        var rows = lines.Skip(1).Select(l => { var f = Split(l); return hdr.Select((h, i) => (h, v: i < f.Count ? f[i] : "")).ToDictionary(x => x.h, x => x.v); })
+            .Where(r => r["structure"] == "main" && r["layers"] != "1").ToList();
+        double Frac(string s) { double v = 0; foreach (var part in s.Split(' ', StringSplitOptions.RemoveEmptyEntries)) v += part.Contains('/') ? double.Parse(part.Split('/')[0], inv) / double.Parse(part.Split('/')[1], inv) : double.Parse(part, inv); return v; }
+        foreach (var g in rows.GroupBy(r => r["joint"]))
+        {
+            var e = (int.Parse(g.First()["layers"]), g.Sum(r => Frac(r["thickness_in"])), g.First()["page"], g.First()["confidence"]);
+            plan[g.Key] = e;
+            if (g.Key != "L22") plan[g.Key + "'"] = e;
+        }
+    }
+    int single = 0, singleOk = 0;
+    foreach (var gs in tm.GussetStacks.OrderBy(g => g.Plane).ThenBy(g => g.Point))
+    {
+        if (plan.TryGetValue(gs.Point, out var e))
+        {
+            Cmp($"gusset layers per face {gs.Plane} {gs.Point} (p.{e.pg}, {e.conf} confidence)", e.n, gs.Layers, 0, "", $"model {string.Join(" + ", gs.Thicknesses.Select(t => (t / 0.0254).ToString("0.###", inv)))} in.", 0);
+            Cmp($"gusset stack thickness {gs.Plane} {gs.Point} (p.{e.pg})", e.tot, gs.TotalThickness / 0.0254, 1.0 / 64, " in", "", 4);
+            for (int k = 1; k < gs.Layers; k++) Row("INFO", $"gusset layer {k + 1} area {gs.Plane} {gs.Point} (outline scaled / whole joint, clipped to the inner gusset envelope)", "-", $"{gs.Areas[k] / 0.09290304:F1} SF per plate (inner {gs.Areas[0] / 0.09290304:F1} SF)");
+        }
+        else { single++; if (gs.Layers == 1) singleOk++; }
+    }
+    Cmp("joints with ONE gusset per face (p.73-90 re-checked 2026-10-20)", single, singleOk, 0, "", "", 0);
+    var gp = tm.Steel.Parts.Where(p => p.Category == PartCategory.TrussGusset).ToList();
+    Row("INFO", "gusset plates (all layers)", "-", $"{gp.Count} plates, {gp.Sum(p => p.Mass) * 2.20462262:N0} lb ({gp.Where(p => System.Text.RegularExpressions.Regex.IsMatch(p.Mark, @"-[LR]\d$")).Sum(p => p.Mass) * 2.20462262:N0} lb in the outer layers)");
+}
+
 // 9. warnings
 var warns = rep.Warnings.Where(w => w.StartsWith(bdef.Name)).ToList();
 Print($"--- 9. {warns.Count} warnings ({warns.Count(w => w.Contains("UNRESOLVED"))} UNRESOLVED, {warns.Count(w => w.Contains("CHECK"))} CHECK)");

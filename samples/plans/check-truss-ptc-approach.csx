@@ -49,6 +49,31 @@ List<Dictionary<string, string>> MemberRows()
     var hdr = Split(lines[0]);
     return lines.Skip(1).Select(l => { var f = Split(l); return hdr.Select((h, i) => (h, v: i < f.Count ? f[i] : "")).ToDictionary(x => x.h, x => x.v); }).ToList();
 }
+List<Dictionary<string, string>> _layerRows = null;
+List<Dictionary<string, string>> LayerRows()
+{
+    if (_layerRows != null) return _layerRows;
+    _layerRows = new();
+    string file = null;
+    for (var dir = new DirectoryInfo(Directory.GetCurrentDirectory()); dir != null && file == null; dir = dir.Parent)
+    {
+        var p = Path.Combine(dir.FullName, "docs", "plan-data", "ptc-delaware-river", "connections", "gusset-layers.csv");
+        if (File.Exists(p)) file = p;
+    }
+    if (file == null) return _layerRows;
+    List<string> Split(string line)
+    {
+        var cells = new List<string>(); var cur = new System.Text.StringBuilder(); bool q = false;
+        foreach (char c in line) { if (c == '"') q = !q; else if (c == ',' && !q) { cells.Add(cur.ToString().Trim()); cur.Clear(); } else cur.Append(c); }
+        cells.Add(cur.ToString().Trim());
+        return cells;
+    }
+    var lines = File.ReadAllLines(file).Where(l => l.Trim() != "").ToList();
+    var hdr = Split(lines[0]);
+    _layerRows = lines.Skip(1).Select(l => { var f = Split(l); return hdr.Select((h, i) => (h, v: i < f.Count ? f[i] : "")).ToDictionary(x => x.h, x => x.v); }).Where(r => r["layers"] != "1").ToList();
+    return _layerRows;
+}
+double Frac(string s) { double v = 0; foreach (var part in s.Split(' ', StringSplitOptions.RemoveEmptyEntries)) v += part.Contains('/') ? double.Parse(part.Split('/')[0], inv) / double.Parse(part.Split('/')[1], inv) : double.Parse(part, inv); return v; }
 var rep = Doc.Regenerate();
 
 // plan restatement per unit: printed gutter elevations at the pier joints, pier tops (bottoms of shoes), p.42 weights (carbon / silicon, items 2 / 5)
@@ -246,6 +271,33 @@ foreach (var u in units)
                 if (part != null && res != null) Row("INFO", $"mean area {part.Mark} (volume / solid length; cover plates end at the gussets)", cr["area_sqin"] + " sq in", $"{part.Mesh.Volume() / res.CutLength / 0.00064516:F2} sq in");
             }
         }
+    }
+
+    // 5d. gusset layers per face (gusset-layers.csv, p.49 / 52 / 59 / 63 / 67): stacked joints by name, every other joint one plate per face
+    Print("--- 5d. gusset layers (plates per face, total thickness)");
+    {
+        var stack = new Dictionary<string, (string key, int n, double tot, string pg)>();
+        foreach (var r in LayerRows().Where(r => r["structure"].StartsWith(u.four ? "approach4" : "approach3") || (!u.four && r["joint"] == "L0'")))
+        {
+            if (!r["position"].StartsWith("inner")) continue;
+            string dj = r["joint"];
+            int n = int.Parse(r["layers"]);
+            double tot = LayerRows().Where(x => x["structure"] == r["structure"] && x["joint"] == dj).Sum(x => Frac(x["thickness_in"]));
+            string[] mj = dj == "L0'" ? new[] { "L0", "L0'" } : dj == "L0" ? (u.four ? new[] { "L0", "L0'" } : new string[0]) : dj == "L20" ? new[] { "L20" } : new[] { dj, dj + "'" };
+            foreach (var j in mj) stack[j] = (dj, n, tot, r["page"]);
+        }
+        int single = 0, singleOk = 0;
+        foreach (var gs in tm.GussetStacks.OrderBy(g => g.Plane).ThenBy(g => g.Point))
+        {
+            if (stack.TryGetValue(gs.Point, out var e))
+            {
+                Cmp($"gusset layers per face {gs.Plane} {gs.Point} (p.{e.pg}, data joint {e.key})", e.n, gs.Layers, 0, "", $"model {string.Join(" + ", gs.Thicknesses.Select(t => (t / 0.0254).ToString("0.###", inv)))} in.", 0);
+                Cmp($"gusset stack thickness {gs.Plane} {gs.Point} (p.{e.pg})", e.tot, gs.TotalThickness / 0.0254, 1.0 / 64, " in", "", 4);
+                for (int k = 1; k < gs.Layers; k++) Row("INFO", $"gusset layer {k + 1} area {gs.Plane} {gs.Point} (outline scaled, clipped to the inner gusset envelope)", "-", $"{gs.Areas[k] / 0.09290304:F1} SF per plate (inner {gs.Areas[0] / 0.09290304:F1} SF)");
+            }
+            else { single++; if (gs.Layers == 1) singleOk++; }
+        }
+        Cmp("joints with ONE gusset per face (all joint sheets re-checked 2026-10-20)", single, singleOk, 0, "", "", 0);
     }
 
     // 6. weights

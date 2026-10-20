@@ -40878,7 +40878,43 @@
             "Rivets": [],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.59): gusset thickness / width of joint L0 - read from a 130-230 dpi render (medium confidence: 5/8, 3/4 and 7/8 can be confused - two misreads were found at U10 / L10); 2 - 5/8\u0022 Gussets (16 1/8\u0022 in. to in.); 2 - 1/2\u0022 Gussets. value as read.",
-            "Source": "p.59 joint L0\u0027 (span 13 side; p.49 says \u0027similar to L0\u0027 / U0\u0027\u0027), medium"
+            "Source": "p.59 joint L0\u0027 (span 13 side; p.49 says \u0027similar to L0\u0027 / U0\u0027\u0027), medium",
+            "GussetLayers": [
+              {
+                "Thickness": 0.0127,
+                "Outline": [
+                  {
+                    "U": 0.9220199999999998,
+                    "V": -0.2032
+                  },
+                  {
+                    "U": -0.29717999999999994,
+                    "V": -0.2032
+                  },
+                  {
+                    "U": -0.29717999999999994,
+                    "V": 0.23367999999999997
+                  },
+                  {
+                    "U": -0.24892,
+                    "V": 0.7493
+                  },
+                  {
+                    "U": 0.43688,
+                    "V": 0.7493
+                  },
+                  {
+                    "U": 0.9220199999999998,
+                    "V": 0.24892
+                  }
+                ],
+                "ClipToGusset": true,
+                "Label": "2-1/2 Gussets (outer layer)",
+                "Material": "",
+                "Unresolved": "UNRESOLVED (p.59 / p.49): 1/2 in. gusset layer at joint L0 - the plate is drawn, not dimensioned; outline scaled from a 300-450 dpi render (\u002B-1 in.). outline as scaled, clipped to the inner gusset, stacked outside it.",
+                "Source": "gusset-layers.csv p.59 / p.49 (medium): mirror image of the 4-span L0 layer (the span is to the left on the sheet); scaled (8.13 px/in)"
+              }
+            ]
           },
           {
             "Point": "U1",
@@ -41424,7 +41460,43 @@
             ],
             "NoGusset": false,
             "Unresolved": "",
-            "Source": "p.52 joint L8, high"
+            "Source": "p.52 joint L8, high",
+            "GussetLayers": [
+              {
+                "Thickness": 0.019049999999999997,
+                "Outline": [
+                  {
+                    "U": -0.91694,
+                    "V": -0.20827999999999997
+                  },
+                  {
+                    "U": 0.91694,
+                    "V": -0.20827999999999997
+                  },
+                  {
+                    "U": 0.91694,
+                    "V": 0.6527799999999999
+                  },
+                  {
+                    "U": 0.5892799999999999,
+                    "V": 0.9474199999999999
+                  },
+                  {
+                    "U": -0.61976,
+                    "V": 0.9474199999999999
+                  },
+                  {
+                    "U": -0.91694,
+                    "V": 0.6527799999999999
+                  }
+                ],
+                "ClipToGusset": true,
+                "Label": "2-3/4 Gussets (outer layer)",
+                "Material": "",
+                "Unresolved": "UNRESOLVED (p.52 / p.49): 3/4 in. gusset layer at joint L8 - the plate is drawn, not dimensioned; outline scaled from a 300-450 dpi render (\u002B-1 in.). outline as scaled, clipped to the inner gusset, stacked outside it.",
+                "Source": "gusset-layers.csv p.52 / p.49 (medium): lower central zone: chord bottom to 3\u0027-1 above the work point, between the diagonal laps (edges cross the diagonal rivet fields); chamfered top corners; outline scaled (8.18 px/in from the 11 in. dimensions)"
+              }
+            ]
           },
           {
             "Point": "U9",
@@ -42196,7 +42268,43 @@
             ],
             "NoGusset": false,
             "Unresolved": "",
-            "Source": "p.52 joint L8, high"
+            "Source": "p.52 joint L8, high",
+            "GussetLayers": [
+              {
+                "Thickness": 0.019049999999999997,
+                "Outline": [
+                  {
+                    "U": 0.91694,
+                    "V": -0.20827999999999997
+                  },
+                  {
+                    "U": -0.91694,
+                    "V": -0.20827999999999997
+                  },
+                  {
+                    "U": -0.91694,
+                    "V": 0.6527799999999999
+                  },
+                  {
+                    "U": -0.5892799999999999,
+                    "V": 0.9474199999999999
+                  },
+                  {
+                    "U": 0.61976,
+                    "V": 0.9474199999999999
+                  },
+                  {
+                    "U": 0.91694,
+                    "V": 0.6527799999999999
+                  }
+                ],
+                "ClipToGusset": true,
+                "Label": "2-3/4 Gussets (outer layer)",
+                "Material": "",
+                "Unresolved": "UNRESOLVED (p.52 / p.49): 3/4 in. gusset layer at joint L8\u0027 - the plate is drawn, not dimensioned; outline scaled from a 300-450 dpi render (\u002B-1 in.). outline as scaled, clipped to the inner gusset, stacked outside it.",
+                "Source": "gusset-layers.csv p.52 / p.49 (medium): lower central zone: chord bottom to 3\u0027-1 above the work point, between the diagonal laps (edges cross the diagonal rivet fields); chamfered top corners; outline scaled (8.18 px/in from the 11 in. dimensions)"
+              }
+            ]
           },
           {
             "Point": "U7\u0027",
@@ -42636,7 +42744,43 @@
             "Rivets": [],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.59): gusset thickness / width of joint L0\u0027 - read from a 130-230 dpi render (medium confidence: 5/8, 3/4 and 7/8 can be confused - two misreads were found at U10 / L10); 2 - 5/8\u0022 Gussets (16 1/8\u0022 in. to in.); 2 - 1/2\u0022 Gussets. value as read.",
-            "Source": "p.59 joint L0\u0027 (span 13 side; p.49 says \u0027similar to L0\u0027 / U0\u0027\u0027), medium"
+            "Source": "p.59 joint L0\u0027 (span 13 side; p.49 says \u0027similar to L0\u0027 / U0\u0027\u0027), medium",
+            "GussetLayers": [
+              {
+                "Thickness": 0.0127,
+                "Outline": [
+                  {
+                    "U": -0.9220199999999998,
+                    "V": -0.2032
+                  },
+                  {
+                    "U": 0.29717999999999994,
+                    "V": -0.2032
+                  },
+                  {
+                    "U": 0.29717999999999994,
+                    "V": 0.23367999999999997
+                  },
+                  {
+                    "U": 0.24892,
+                    "V": 0.7493
+                  },
+                  {
+                    "U": -0.43688,
+                    "V": 0.7493
+                  },
+                  {
+                    "U": -0.9220199999999998,
+                    "V": 0.24892
+                  }
+                ],
+                "ClipToGusset": true,
+                "Label": "2-1/2 Gussets (outer layer)",
+                "Material": "",
+                "Unresolved": "UNRESOLVED (p.59 / p.49): 1/2 in. gusset layer at joint L0\u0027 - the plate is drawn, not dimensioned; outline scaled from a 300-450 dpi render (\u002B-1 in.). outline as scaled, clipped to the inner gusset, stacked outside it.",
+                "Source": "gusset-layers.csv p.59 / p.49 (medium): mirror image of the 4-span L0 layer (the span is to the left on the sheet); scaled (8.13 px/in)"
+              }
+            ]
           }
         ],
         "JointDefaults": {
@@ -70564,7 +70708,43 @@
             ],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.59): gusset thickness / width of joint L0 - read from a 130-230 dpi render (medium confidence: 5/8, 3/4 and 7/8 can be confused - two misreads were found at U10 / L10); 2 - 3/4\u0022 Gussets (16 7/8\u0022 in. to in.); 2 - 1/2\u0022 Gussets. value as read.",
-            "Source": "p.59 joint L0 (span 14 side), medium"
+            "Source": "p.59 joint L0 (span 14 side), medium",
+            "GussetLayers": [
+              {
+                "Thickness": 0.0127,
+                "Outline": [
+                  {
+                    "U": -0.27432,
+                    "V": -0.22097999999999998
+                  },
+                  {
+                    "U": 1.02362,
+                    "V": -0.22097999999999998
+                  },
+                  {
+                    "U": 1.02362,
+                    "V": 0.2413
+                  },
+                  {
+                    "U": 0.4445,
+                    "V": 0.77724
+                  },
+                  {
+                    "U": -0.22606,
+                    "V": 0.77724
+                  },
+                  {
+                    "U": -0.27432,
+                    "V": 0.20827999999999997
+                  }
+                ],
+                "ClipToGusset": true,
+                "Label": "2-1/2 Gussets (outer layer)",
+                "Material": "",
+                "Unresolved": "UNRESOLVED (p.59): 1/2 in. gusset layer at joint L0 - the plate is drawn, not dimensioned; outline scaled from a 300-450 dpi render (\u002B-1 in.). outline as scaled, clipped to the inner gusset, stacked outside it.",
+                "Source": "gusset-layers.csv p.59 (medium): lower part of the end joint: from the chord end to 3\u0027-4 into the span, chord bottom to 2\u0027-7 above the work point, the inner edge cut square to the diagonal across its lap; scaled (8.13 px/in from the 4\u0027-0 pin spacing)"
+              }
+            ]
           },
           {
             "Point": "U1",
@@ -71474,7 +71654,43 @@
             ],
             "NoGusset": false,
             "Unresolved": "",
-            "Source": "p.63 joint L10, high"
+            "Source": "p.63 joint L10, high",
+            "GussetLayers": [
+              {
+                "Thickness": 0.022224999999999998,
+                "Outline": [
+                  {
+                    "U": -0.8509,
+                    "V": -0.25654
+                  },
+                  {
+                    "U": 1.2191999999999998,
+                    "V": -0.25654
+                  },
+                  {
+                    "U": 1.2191999999999998,
+                    "V": 0.25654
+                  },
+                  {
+                    "U": 0.19558,
+                    "V": 0.8509
+                  },
+                  {
+                    "U": -0.55626,
+                    "V": 0.8509
+                  },
+                  {
+                    "U": -0.8509,
+                    "V": 0.55626
+                  }
+                ],
+                "ClipToGusset": true,
+                "Label": "2-7/8 Gussets (outer layer)",
+                "Material": "",
+                "Unresolved": "UNRESOLVED (p.63): 7/8 in. gusset layer at joint L10 - the plate is drawn, not dimensioned; outline scaled from a 300-450 dpi render (\u002B-1 in.). outline as scaled, clipped to the inner gusset, stacked outside it.",
+                "Source": "gusset-layers.csv p.63 (medium): lower zone between the diagonals, longer toward the higher panel (over the chord splice to 4\u0027-0 past the work point), right edge square to the L10-U11 diagonal; scaled (8.44 px/in from the 2\u0027-3 shoe dimensions)"
+              }
+            ]
           },
           {
             "Point": "U11",
@@ -72357,7 +72573,43 @@
             ],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.67): gusset thickness / width of joint L20 - read from a 130-230 dpi render (medium confidence: 5/8, 3/4 and 7/8 can be confused - two misreads were found at U10 / L10); 2 - 7/8\u0022 Gussets (17 5/8\u0022 in. to in.); 2 - 3/4\u0022 Gussets. value as read.",
-            "Source": "p.67 joint L20, medium"
+            "Source": "p.67 joint L20, medium",
+            "GussetLayers": [
+              {
+                "Thickness": 0.019049999999999997,
+                "Outline": [
+                  {
+                    "U": -0.7975599999999999,
+                    "V": -0.27686
+                  },
+                  {
+                    "U": 0.7975599999999999,
+                    "V": -0.27686
+                  },
+                  {
+                    "U": 0.7975599999999999,
+                    "V": 0.57912
+                  },
+                  {
+                    "U": 0.54102,
+                    "V": 0.8051799999999999
+                  },
+                  {
+                    "U": -0.54102,
+                    "V": 0.8051799999999999
+                  },
+                  {
+                    "U": -0.7975599999999999,
+                    "V": 0.57912
+                  }
+                ],
+                "ClipToGusset": true,
+                "Label": "2-3/4 Gussets (outer layer)",
+                "Material": "",
+                "Unresolved": "UNRESOLVED (p.67): 3/4 in. gusset layer at joint L20 - the plate is drawn, not dimensioned; outline scaled from a 300-450 dpi render (\u002B-1 in.). outline as scaled, clipped to the inner gusset, stacked outside it.",
+                "Source": "gusset-layers.csv p.67 (medium): lower central zone between the diagonal laps, chord bottom to 2\u0027-8 above the work point; outline scaled (8.41 px/in from the 11 in. dimensions); smaller than the extended L8 plate of the 3-span unit"
+              }
+            ]
           },
           {
             "Point": "U19\u0027",
@@ -73251,7 +73503,43 @@
             ],
             "NoGusset": false,
             "Unresolved": "",
-            "Source": "p.63 joint L10, high"
+            "Source": "p.63 joint L10, high",
+            "GussetLayers": [
+              {
+                "Thickness": 0.022224999999999998,
+                "Outline": [
+                  {
+                    "U": 0.8509,
+                    "V": -0.25654
+                  },
+                  {
+                    "U": -1.2191999999999998,
+                    "V": -0.25654
+                  },
+                  {
+                    "U": -1.2191999999999998,
+                    "V": 0.25654
+                  },
+                  {
+                    "U": -0.19558,
+                    "V": 0.8509
+                  },
+                  {
+                    "U": 0.55626,
+                    "V": 0.8509
+                  },
+                  {
+                    "U": 0.8509,
+                    "V": 0.55626
+                  }
+                ],
+                "ClipToGusset": true,
+                "Label": "2-7/8 Gussets (outer layer)",
+                "Material": "",
+                "Unresolved": "UNRESOLVED (p.63): 7/8 in. gusset layer at joint L10\u0027 - the plate is drawn, not dimensioned; outline scaled from a 300-450 dpi render (\u002B-1 in.). outline as scaled, clipped to the inner gusset, stacked outside it.",
+                "Source": "gusset-layers.csv p.63 (medium): lower zone between the diagonals, longer toward the higher panel (over the chord splice to 4\u0027-0 past the work point), right edge square to the L10-U11 diagonal; scaled (8.44 px/in from the 2\u0027-3 shoe dimensions)"
+              }
+            ]
           },
           {
             "Point": "U9\u0027",
@@ -74162,7 +74450,43 @@
             ],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.59): gusset thickness / width of joint L0\u0027 - read from a 130-230 dpi render (medium confidence: 5/8, 3/4 and 7/8 can be confused - two misreads were found at U10 / L10); 2 - 3/4\u0022 Gussets (16 7/8\u0022 in. to in.); 2 - 1/2\u0022 Gussets. value as read.",
-            "Source": "p.59 joint L0 (span 14 side), medium"
+            "Source": "p.59 joint L0 (span 14 side), medium",
+            "GussetLayers": [
+              {
+                "Thickness": 0.0127,
+                "Outline": [
+                  {
+                    "U": 0.27432,
+                    "V": -0.22097999999999998
+                  },
+                  {
+                    "U": -1.02362,
+                    "V": -0.22097999999999998
+                  },
+                  {
+                    "U": -1.02362,
+                    "V": 0.2413
+                  },
+                  {
+                    "U": -0.4445,
+                    "V": 0.77724
+                  },
+                  {
+                    "U": 0.22606,
+                    "V": 0.77724
+                  },
+                  {
+                    "U": 0.27432,
+                    "V": 0.20827999999999997
+                  }
+                ],
+                "ClipToGusset": true,
+                "Label": "2-1/2 Gussets (outer layer)",
+                "Material": "",
+                "Unresolved": "UNRESOLVED (p.59): 1/2 in. gusset layer at joint L0\u0027 - the plate is drawn, not dimensioned; outline scaled from a 300-450 dpi render (\u002B-1 in.). outline as scaled, clipped to the inner gusset, stacked outside it.",
+                "Source": "gusset-layers.csv p.59 (medium): lower part of the end joint: from the chord end to 3\u0027-4 into the span, chord bottom to 2\u0027-7 above the work point, the inner edge cut square to the diagonal across its lap; scaled (8.13 px/in from the 4\u0027-0 pin spacing)"
+              }
+            ]
           }
         ],
         "JointDefaults": {
@@ -121034,7 +121358,51 @@
             ],
             "NoGusset": false,
             "Unresolved": "",
-            "Source": "p.78 two callouts 2-3/4 and 2-1/2 Gussets: 3/4 used"
+            "Source": "p.78 two callouts 2-3/4 and 2-1/2 Gussets: 3/4 used",
+            "GussetLayers": [
+              {
+                "Thickness": 0.0127,
+                "Outline": [
+                  {
+                    "U": -1.10998,
+                    "V": -0.22606
+                  },
+                  {
+                    "U": 0.89916,
+                    "V": -0.6070599999999999
+                  },
+                  {
+                    "U": 1.0515599999999998,
+                    "V": 0.13208
+                  },
+                  {
+                    "U": 0.70612,
+                    "V": 1.1302999999999999
+                  },
+                  {
+                    "U": 0.1651,
+                    "V": 1.32334
+                  },
+                  {
+                    "U": -0.22097999999999998,
+                    "V": 1.32334
+                  },
+                  {
+                    "U": -0.80264,
+                    "V": 1.0896599999999999
+                  },
+                  {
+                    "U": -0.94234,
+                    "V": 0.6324599999999999
+                  }
+                ],
+                "ClipToGusset": true,
+                "Label": "2-1/2 Gussets (outer layer)",
+                "Material": "",
+                "Unresolved": "UNRESOLVED (p.78): 1/2 in. gusset layer at joint L10 - the plate is drawn, not dimensioned; outline scaled from a 300-450 dpi render (\u002B-1 in.). outline as scaled, clipped to the inner gusset, stacked outside it.",
+                "Source": "gusset-layers.csv p.78 (medium): central zone over the chord and the lower ends of both diagonals and the vertical (edges cross the diagonal rivet lines), sides square to the sloping chord below its top; scaled (9.17 px/in at 300 dpi from the 2\u0027-10 1/2 chord depth)"
+              }
+            ]
           },
           {
             "Point": "L10\u0027",
@@ -121111,7 +121479,51 @@
             ],
             "NoGusset": false,
             "Unresolved": "",
-            "Source": "p.78 two callouts 2-3/4 and 2-1/2 Gussets: 3/4 used"
+            "Source": "p.78 two callouts 2-3/4 and 2-1/2 Gussets: 3/4 used",
+            "GussetLayers": [
+              {
+                "Thickness": 0.0127,
+                "Outline": [
+                  {
+                    "U": 1.10998,
+                    "V": -0.22606
+                  },
+                  {
+                    "U": -0.89916,
+                    "V": -0.6070599999999999
+                  },
+                  {
+                    "U": -1.0515599999999998,
+                    "V": 0.13208
+                  },
+                  {
+                    "U": -0.70612,
+                    "V": 1.1302999999999999
+                  },
+                  {
+                    "U": -0.1651,
+                    "V": 1.32334
+                  },
+                  {
+                    "U": 0.22097999999999998,
+                    "V": 1.32334
+                  },
+                  {
+                    "U": 0.80264,
+                    "V": 1.0896599999999999
+                  },
+                  {
+                    "U": 0.94234,
+                    "V": 0.6324599999999999
+                  }
+                ],
+                "ClipToGusset": true,
+                "Label": "2-1/2 Gussets (outer layer)",
+                "Material": "",
+                "Unresolved": "UNRESOLVED (p.78): 1/2 in. gusset layer at joint L10\u0027 - the plate is drawn, not dimensioned; outline scaled from a 300-450 dpi render (\u002B-1 in.). outline as scaled, clipped to the inner gusset, stacked outside it.",
+                "Source": "gusset-layers.csv p.78 (medium): central zone over the chord and the lower ends of both diagonals and the vertical (edges cross the diagonal rivet lines), sides square to the sloping chord below its top; scaled (9.17 px/in at 300 dpi from the 2\u0027-10 1/2 chord depth)"
+              }
+            ]
           },
           {
             "Point": "U10",
@@ -125701,7 +126113,51 @@
             ],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.90): gusset plates of joint L22 - thickness / in-to-in read from the joint sheet (low confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
-            "Source": "gussets.csv p.90 (medium): 1 in, 29 in in-to-in; gussets.csv p.90 (medium): 1 in, 29 in in-to-in; gussets.csv p.90 (medium): 1 in, 29 in in-to-in; gussets.csv p.90 (medium): 1 in, 29 in in-to-in; gussets.csv p.90 (medium): 1 in, 29 in in-to-in; gussets.csv p.90 (medium): 1 in, 29 in in-to-in; gussets.csv p.90 (low): 1 in, 29 in in-to-in; gussets.csv p.90 (low): 1 in, 29 in in-to-in; gussets.csv p.90 (low): 1 in, 29 in in-to-in; gussets.csv p.90 (low): 1 in, 29 in in-to-in; gussets.csv p.90 (low): 1 in, 29 in in-to-in; gussets.csv p.90 (low): 1 in, 29 in in-to-in; gussets.csv p.90 (low): 1 in, 29 in in-to-in"
+            "Source": "gussets.csv p.90 (medium): 1 in, 29 in in-to-in; gussets.csv p.90 (medium): 1 in, 29 in in-to-in; gussets.csv p.90 (medium): 1 in, 29 in in-to-in; gussets.csv p.90 (medium): 1 in, 29 in in-to-in; gussets.csv p.90 (medium): 1 in, 29 in in-to-in; gussets.csv p.90 (medium): 1 in, 29 in in-to-in; gussets.csv p.90 (low): 1 in, 29 in in-to-in; gussets.csv p.90 (low): 1 in, 29 in in-to-in; gussets.csv p.90 (low): 1 in, 29 in in-to-in; gussets.csv p.90 (low): 1 in, 29 in in-to-in; gussets.csv p.90 (low): 1 in, 29 in in-to-in; gussets.csv p.90 (low): 1 in, 29 in in-to-in; gussets.csv p.90 (low): 1 in, 29 in in-to-in",
+            "GussetLayers": [
+              {
+                "Thickness": 0.028575,
+                "Outline": [
+                  {
+                    "U": -1.0007599999999999,
+                    "V": -0.44195999999999996
+                  },
+                  {
+                    "U": -0.18033999999999997,
+                    "V": -1.07696
+                  },
+                  {
+                    "U": 0.17526,
+                    "V": -1.07696
+                  },
+                  {
+                    "U": 1.03378,
+                    "V": -0.44195999999999996
+                  },
+                  {
+                    "U": 1.03378,
+                    "V": 0.7543799999999999
+                  },
+                  {
+                    "U": 0.7543799999999999,
+                    "V": 1.016
+                  },
+                  {
+                    "U": -0.73914,
+                    "V": 1.016
+                  },
+                  {
+                    "U": -1.0007599999999999,
+                    "V": 0.7543799999999999
+                  }
+                ],
+                "ClipToGusset": true,
+                "Label": "2-1 1/8 Gussets (outer layer)",
+                "Material": "",
+                "Unresolved": "UNRESOLVED (p.90): 1 1/8 in. gusset layer at joint L22 - the plate is drawn, not dimensioned; outline scaled from a 300-450 dpi render (\u002B-1 in.). outline as scaled, clipped to the inner gusset, stacked outside it.",
+                "Source": "gusset-layers.csv p.90 (medium): central splice gusset across the closure: the two 1 in. half gussets (one per half truss, 1/8 in. apart at the CL, flame cut on line X after the field rivets) are spliced by the 1 1/8 plates; outline scaled (6.8 px/in at 220 dpi)"
+              }
+            ]
           },
           {
             "Point": "U0",
@@ -125746,6 +126202,102 @@
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.73): gusset plates of joint L0\u0027 - thickness / in-to-in read from the joint sheet (low confidence); the outline is drawn, not dimensioned. thickness and in-to-in as read; outline = convex envelope of the member laps \u002B 2\u0027-6.",
             "Source": "gussets.csv p.73 (low): 0.875 in, in-to-in not read; gussets.csv p.73 (low): 0.875 in, in-to-in not read"
+          },
+          {
+            "Point": "L11",
+            "Plane": "",
+            "GussetThickness": 0.028575,
+            "Outline": [],
+            "GussetsInsideFaceDistance": 0.7365999999999999,
+            "Rivets": [],
+            "NoGusset": false,
+            "Unresolved": "UNRESOLVED (p.80): gusset stack of joint L11 - Section E lists 1 1/8 \u002B 3/4 \u002B 3/4 gusset plates and prints \u00272\u0027-5 o. to o. 1 1/8 Gus. Pls.\u0027 - the 1 1/8 plates may be inlaid in the chord web plane (the chord 1 1/8 webs end at the joint); the outlines are drawn, not dimensioned. 1 1/8 gussets against the members at 2\u0027-5 in. to in. (as every main joint), 3/4 plates stacked outside; outline = envelope of the member laps.",
+            "Source": "",
+            "GussetLayers": [
+              {
+                "Thickness": 0.019049999999999997,
+                "Outline": [],
+                "ClipToGusset": true,
+                "Label": "2-3/4 Gussets (middle layer)",
+                "Material": "",
+                "Unresolved": "UNRESOLVED (p.80): 3/4 in. gusset layer at joint L11 - its extent is not separable from the inner gusset on the sheet; LOW confidence reading of the stack (Section E). same outline as the inner gusset (envelope).",
+                "Source": "gusset-layers.csv p.80 (low): whole joint (the elevation dimensions the 3/4 plates along the L11-L12 chord in three lines, ends not readable as plate edges)"
+              },
+              {
+                "Thickness": 0.019049999999999997,
+                "Outline": [
+                  {
+                    "U": -5.08,
+                    "V": -5.08
+                  },
+                  {
+                    "U": 5.08,
+                    "V": -5.08
+                  },
+                  {
+                    "U": 5.08,
+                    "V": 1.016
+                  },
+                  {
+                    "U": -5.08,
+                    "V": 1.016
+                  }
+                ],
+                "ClipToGusset": true,
+                "Label": "2-3/4 Gussets (outer layer)",
+                "Material": "",
+                "Unresolved": "UNRESOLVED (p.80): 3/4 in. gusset layer at joint L11 - the plate is drawn, not dimensioned; outline scaled from a 300-450 dpi render (\u002B-1 in.); LOW confidence reading of the stack (Section E). outline as scaled, clipped to the inner gusset, stacked outside it.",
+                "Source": "gusset-layers.csv p.80 (low): lower zone only: Section E shows this plate from the bottom up to a step about 3\u0027-4 above the work point (El. 98.2010 line)"
+              }
+            ]
+          },
+          {
+            "Point": "L11\u0027",
+            "Plane": "",
+            "GussetThickness": 0.028575,
+            "Outline": [],
+            "GussetsInsideFaceDistance": 0.7365999999999999,
+            "Rivets": [],
+            "NoGusset": false,
+            "Unresolved": "UNRESOLVED (p.80): gusset stack of joint L11\u0027 - Section E lists 1 1/8 \u002B 3/4 \u002B 3/4 gusset plates and prints \u00272\u0027-5 o. to o. 1 1/8 Gus. Pls.\u0027 - the 1 1/8 plates may be inlaid in the chord web plane (the chord 1 1/8 webs end at the joint); the outlines are drawn, not dimensioned. 1 1/8 gussets against the members at 2\u0027-5 in. to in. (as every main joint), 3/4 plates stacked outside; outline = envelope of the member laps.",
+            "Source": "",
+            "GussetLayers": [
+              {
+                "Thickness": 0.019049999999999997,
+                "Outline": [],
+                "ClipToGusset": true,
+                "Label": "2-3/4 Gussets (middle layer)",
+                "Material": "",
+                "Unresolved": "UNRESOLVED (p.80): 3/4 in. gusset layer at joint L11\u0027 - its extent is not separable from the inner gusset on the sheet; LOW confidence reading of the stack (Section E). same outline as the inner gusset (envelope).",
+                "Source": "gusset-layers.csv p.80 (low): whole joint (the elevation dimensions the 3/4 plates along the L11-L12 chord in three lines, ends not readable as plate edges)"
+              },
+              {
+                "Thickness": 0.019049999999999997,
+                "Outline": [
+                  {
+                    "U": 5.08,
+                    "V": -5.08
+                  },
+                  {
+                    "U": -5.08,
+                    "V": -5.08
+                  },
+                  {
+                    "U": -5.08,
+                    "V": 1.016
+                  },
+                  {
+                    "U": 5.08,
+                    "V": 1.016
+                  }
+                ],
+                "ClipToGusset": true,
+                "Label": "2-3/4 Gussets (outer layer)",
+                "Material": "",
+                "Unresolved": "UNRESOLVED (p.80): 3/4 in. gusset layer at joint L11\u0027 - the plate is drawn, not dimensioned; outline scaled from a 300-450 dpi render (\u002B-1 in.); LOW confidence reading of the stack (Section E). outline as scaled, clipped to the inner gusset, stacked outside it.",
+                "Source": "gusset-layers.csv p.80 (low): lower zone only: Section E shows this plate from the bottom up to a step about 3\u0027-4 above the work point (El. 98.2010 line)"
+              }
+            ]
           },
           {
             "Point": "U22",
@@ -155720,7 +156272,43 @@
             ],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.59): gusset thickness / width of joint L0 - read from a 130-230 dpi render (medium confidence: 5/8, 3/4 and 7/8 can be confused - two misreads were found at U10 / L10); 2 - 3/4\u0022 Gussets (16 7/8\u0022 in. to in.); 2 - 1/2\u0022 Gussets. value as read.",
-            "Source": "p.59 joint L0 (span 14 side), medium"
+            "Source": "p.59 joint L0 (span 14 side), medium",
+            "GussetLayers": [
+              {
+                "Thickness": 0.0127,
+                "Outline": [
+                  {
+                    "U": 0.27432,
+                    "V": -0.22097999999999998
+                  },
+                  {
+                    "U": -1.02362,
+                    "V": -0.22097999999999998
+                  },
+                  {
+                    "U": -1.02362,
+                    "V": 0.2413
+                  },
+                  {
+                    "U": -0.4445,
+                    "V": 0.77724
+                  },
+                  {
+                    "U": 0.22606,
+                    "V": 0.77724
+                  },
+                  {
+                    "U": 0.27432,
+                    "V": 0.20827999999999997
+                  }
+                ],
+                "ClipToGusset": true,
+                "Label": "2-1/2 Gussets (outer layer)",
+                "Material": "",
+                "Unresolved": "UNRESOLVED (p.59): 1/2 in. gusset layer at joint L0 - the plate is drawn, not dimensioned; outline scaled from a 300-450 dpi render (\u002B-1 in.). outline as scaled, clipped to the inner gusset, stacked outside it.",
+                "Source": "gusset-layers.csv p.59 (medium): lower part of the end joint: from the chord end to 3\u0027-4 into the span, chord bottom to 2\u0027-7 above the work point, the inner edge cut square to the diagonal across its lap; scaled (8.13 px/in from the 4\u0027-0 pin spacing)"
+              }
+            ]
           },
           {
             "Point": "U1",
@@ -156630,7 +157218,43 @@
             ],
             "NoGusset": false,
             "Unresolved": "",
-            "Source": "p.63 joint L10, high"
+            "Source": "p.63 joint L10, high",
+            "GussetLayers": [
+              {
+                "Thickness": 0.022224999999999998,
+                "Outline": [
+                  {
+                    "U": 0.8509,
+                    "V": -0.25654
+                  },
+                  {
+                    "U": -1.2191999999999998,
+                    "V": -0.25654
+                  },
+                  {
+                    "U": -1.2191999999999998,
+                    "V": 0.25654
+                  },
+                  {
+                    "U": -0.19558,
+                    "V": 0.8509
+                  },
+                  {
+                    "U": 0.55626,
+                    "V": 0.8509
+                  },
+                  {
+                    "U": 0.8509,
+                    "V": 0.55626
+                  }
+                ],
+                "ClipToGusset": true,
+                "Label": "2-7/8 Gussets (outer layer)",
+                "Material": "",
+                "Unresolved": "UNRESOLVED (p.63): 7/8 in. gusset layer at joint L10 - the plate is drawn, not dimensioned; outline scaled from a 300-450 dpi render (\u002B-1 in.). outline as scaled, clipped to the inner gusset, stacked outside it.",
+                "Source": "gusset-layers.csv p.63 (medium): lower zone between the diagonals, longer toward the higher panel (over the chord splice to 4\u0027-0 past the work point), right edge square to the L10-U11 diagonal; scaled (8.44 px/in from the 2\u0027-3 shoe dimensions)"
+              }
+            ]
           },
           {
             "Point": "U11",
@@ -157513,7 +158137,43 @@
             ],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.67): gusset thickness / width of joint L20 - read from a 130-230 dpi render (medium confidence: 5/8, 3/4 and 7/8 can be confused - two misreads were found at U10 / L10); 2 - 7/8\u0022 Gussets (17 5/8\u0022 in. to in.); 2 - 3/4\u0022 Gussets. value as read.",
-            "Source": "p.67 joint L20, medium"
+            "Source": "p.67 joint L20, medium",
+            "GussetLayers": [
+              {
+                "Thickness": 0.019049999999999997,
+                "Outline": [
+                  {
+                    "U": 0.7975599999999999,
+                    "V": -0.27686
+                  },
+                  {
+                    "U": -0.7975599999999999,
+                    "V": -0.27686
+                  },
+                  {
+                    "U": -0.7975599999999999,
+                    "V": 0.57912
+                  },
+                  {
+                    "U": -0.54102,
+                    "V": 0.8051799999999999
+                  },
+                  {
+                    "U": 0.54102,
+                    "V": 0.8051799999999999
+                  },
+                  {
+                    "U": 0.7975599999999999,
+                    "V": 0.57912
+                  }
+                ],
+                "ClipToGusset": true,
+                "Label": "2-3/4 Gussets (outer layer)",
+                "Material": "",
+                "Unresolved": "UNRESOLVED (p.67): 3/4 in. gusset layer at joint L20 - the plate is drawn, not dimensioned; outline scaled from a 300-450 dpi render (\u002B-1 in.). outline as scaled, clipped to the inner gusset, stacked outside it.",
+                "Source": "gusset-layers.csv p.67 (medium): lower central zone between the diagonal laps, chord bottom to 2\u0027-8 above the work point; outline scaled (8.41 px/in from the 11 in. dimensions); smaller than the extended L8 plate of the 3-span unit"
+              }
+            ]
           },
           {
             "Point": "U19\u0027",
@@ -158407,7 +159067,43 @@
             ],
             "NoGusset": false,
             "Unresolved": "",
-            "Source": "p.63 joint L10, high"
+            "Source": "p.63 joint L10, high",
+            "GussetLayers": [
+              {
+                "Thickness": 0.022224999999999998,
+                "Outline": [
+                  {
+                    "U": -0.8509,
+                    "V": -0.25654
+                  },
+                  {
+                    "U": 1.2191999999999998,
+                    "V": -0.25654
+                  },
+                  {
+                    "U": 1.2191999999999998,
+                    "V": 0.25654
+                  },
+                  {
+                    "U": 0.19558,
+                    "V": 0.8509
+                  },
+                  {
+                    "U": -0.55626,
+                    "V": 0.8509
+                  },
+                  {
+                    "U": -0.8509,
+                    "V": 0.55626
+                  }
+                ],
+                "ClipToGusset": true,
+                "Label": "2-7/8 Gussets (outer layer)",
+                "Material": "",
+                "Unresolved": "UNRESOLVED (p.63): 7/8 in. gusset layer at joint L10\u0027 - the plate is drawn, not dimensioned; outline scaled from a 300-450 dpi render (\u002B-1 in.). outline as scaled, clipped to the inner gusset, stacked outside it.",
+                "Source": "gusset-layers.csv p.63 (medium): lower zone between the diagonals, longer toward the higher panel (over the chord splice to 4\u0027-0 past the work point), right edge square to the L10-U11 diagonal; scaled (8.44 px/in from the 2\u0027-3 shoe dimensions)"
+              }
+            ]
           },
           {
             "Point": "U9\u0027",
@@ -159318,7 +160014,43 @@
             ],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.59): gusset thickness / width of joint L0\u0027 - read from a 130-230 dpi render (medium confidence: 5/8, 3/4 and 7/8 can be confused - two misreads were found at U10 / L10); 2 - 3/4\u0022 Gussets (16 7/8\u0022 in. to in.); 2 - 1/2\u0022 Gussets. value as read.",
-            "Source": "p.59 joint L0 (span 14 side), medium"
+            "Source": "p.59 joint L0 (span 14 side), medium",
+            "GussetLayers": [
+              {
+                "Thickness": 0.0127,
+                "Outline": [
+                  {
+                    "U": -0.27432,
+                    "V": -0.22097999999999998
+                  },
+                  {
+                    "U": 1.02362,
+                    "V": -0.22097999999999998
+                  },
+                  {
+                    "U": 1.02362,
+                    "V": 0.2413
+                  },
+                  {
+                    "U": 0.4445,
+                    "V": 0.77724
+                  },
+                  {
+                    "U": -0.22606,
+                    "V": 0.77724
+                  },
+                  {
+                    "U": -0.27432,
+                    "V": 0.20827999999999997
+                  }
+                ],
+                "ClipToGusset": true,
+                "Label": "2-1/2 Gussets (outer layer)",
+                "Material": "",
+                "Unresolved": "UNRESOLVED (p.59): 1/2 in. gusset layer at joint L0\u0027 - the plate is drawn, not dimensioned; outline scaled from a 300-450 dpi render (\u002B-1 in.). outline as scaled, clipped to the inner gusset, stacked outside it.",
+                "Source": "gusset-layers.csv p.59 (medium): lower part of the end joint: from the chord end to 3\u0027-4 into the span, chord bottom to 2\u0027-7 above the work point, the inner edge cut square to the diagonal across its lap; scaled (8.13 px/in from the 4\u0027-0 pin spacing)"
+              }
+            ]
           }
         ],
         "JointDefaults": {
@@ -182581,7 +183313,43 @@
             "Rivets": [],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.59): gusset thickness / width of joint L0 - read from a 130-230 dpi render (medium confidence: 5/8, 3/4 and 7/8 can be confused - two misreads were found at U10 / L10); 2 - 5/8\u0022 Gussets (16 1/8\u0022 in. to in.); 2 - 1/2\u0022 Gussets. value as read.",
-            "Source": "p.59 joint L0\u0027 (span 13 side; p.49 says \u0027similar to L0\u0027 / U0\u0027\u0027), medium"
+            "Source": "p.59 joint L0\u0027 (span 13 side; p.49 says \u0027similar to L0\u0027 / U0\u0027\u0027), medium",
+            "GussetLayers": [
+              {
+                "Thickness": 0.0127,
+                "Outline": [
+                  {
+                    "U": -0.9220199999999998,
+                    "V": -0.2032
+                  },
+                  {
+                    "U": 0.29717999999999994,
+                    "V": -0.2032
+                  },
+                  {
+                    "U": 0.29717999999999994,
+                    "V": 0.23367999999999997
+                  },
+                  {
+                    "U": 0.24892,
+                    "V": 0.7493
+                  },
+                  {
+                    "U": -0.43688,
+                    "V": 0.7493
+                  },
+                  {
+                    "U": -0.9220199999999998,
+                    "V": 0.24892
+                  }
+                ],
+                "ClipToGusset": true,
+                "Label": "2-1/2 Gussets (outer layer)",
+                "Material": "",
+                "Unresolved": "UNRESOLVED (p.59 / p.49): 1/2 in. gusset layer at joint L0 - the plate is drawn, not dimensioned; outline scaled from a 300-450 dpi render (\u002B-1 in.). outline as scaled, clipped to the inner gusset, stacked outside it.",
+                "Source": "gusset-layers.csv p.59 / p.49 (medium): mirror image of the 4-span L0 layer (the span is to the left on the sheet); scaled (8.13 px/in)"
+              }
+            ]
           },
           {
             "Point": "U1",
@@ -183127,7 +183895,43 @@
             ],
             "NoGusset": false,
             "Unresolved": "",
-            "Source": "p.52 joint L8, high"
+            "Source": "p.52 joint L8, high",
+            "GussetLayers": [
+              {
+                "Thickness": 0.019049999999999997,
+                "Outline": [
+                  {
+                    "U": 0.91694,
+                    "V": -0.20827999999999997
+                  },
+                  {
+                    "U": -0.91694,
+                    "V": -0.20827999999999997
+                  },
+                  {
+                    "U": -0.91694,
+                    "V": 0.6527799999999999
+                  },
+                  {
+                    "U": -0.5892799999999999,
+                    "V": 0.9474199999999999
+                  },
+                  {
+                    "U": 0.61976,
+                    "V": 0.9474199999999999
+                  },
+                  {
+                    "U": 0.91694,
+                    "V": 0.6527799999999999
+                  }
+                ],
+                "ClipToGusset": true,
+                "Label": "2-3/4 Gussets (outer layer)",
+                "Material": "",
+                "Unresolved": "UNRESOLVED (p.52 / p.49): 3/4 in. gusset layer at joint L8 - the plate is drawn, not dimensioned; outline scaled from a 300-450 dpi render (\u002B-1 in.). outline as scaled, clipped to the inner gusset, stacked outside it.",
+                "Source": "gusset-layers.csv p.52 / p.49 (medium): lower central zone: chord bottom to 3\u0027-1 above the work point, between the diagonal laps (edges cross the diagonal rivet fields); chamfered top corners; outline scaled (8.18 px/in from the 11 in. dimensions)"
+              }
+            ]
           },
           {
             "Point": "U9",
@@ -183899,7 +184703,43 @@
             ],
             "NoGusset": false,
             "Unresolved": "",
-            "Source": "p.52 joint L8, high"
+            "Source": "p.52 joint L8, high",
+            "GussetLayers": [
+              {
+                "Thickness": 0.019049999999999997,
+                "Outline": [
+                  {
+                    "U": -0.91694,
+                    "V": -0.20827999999999997
+                  },
+                  {
+                    "U": 0.91694,
+                    "V": -0.20827999999999997
+                  },
+                  {
+                    "U": 0.91694,
+                    "V": 0.6527799999999999
+                  },
+                  {
+                    "U": 0.5892799999999999,
+                    "V": 0.9474199999999999
+                  },
+                  {
+                    "U": -0.61976,
+                    "V": 0.9474199999999999
+                  },
+                  {
+                    "U": -0.91694,
+                    "V": 0.6527799999999999
+                  }
+                ],
+                "ClipToGusset": true,
+                "Label": "2-3/4 Gussets (outer layer)",
+                "Material": "",
+                "Unresolved": "UNRESOLVED (p.52 / p.49): 3/4 in. gusset layer at joint L8\u0027 - the plate is drawn, not dimensioned; outline scaled from a 300-450 dpi render (\u002B-1 in.). outline as scaled, clipped to the inner gusset, stacked outside it.",
+                "Source": "gusset-layers.csv p.52 / p.49 (medium): lower central zone: chord bottom to 3\u0027-1 above the work point, between the diagonal laps (edges cross the diagonal rivet fields); chamfered top corners; outline scaled (8.18 px/in from the 11 in. dimensions)"
+              }
+            ]
           },
           {
             "Point": "U7\u0027",
@@ -184339,7 +185179,43 @@
             "Rivets": [],
             "NoGusset": false,
             "Unresolved": "UNRESOLVED (p.59): gusset thickness / width of joint L0\u0027 - read from a 130-230 dpi render (medium confidence: 5/8, 3/4 and 7/8 can be confused - two misreads were found at U10 / L10); 2 - 5/8\u0022 Gussets (16 1/8\u0022 in. to in.); 2 - 1/2\u0022 Gussets. value as read.",
-            "Source": "p.59 joint L0\u0027 (span 13 side; p.49 says \u0027similar to L0\u0027 / U0\u0027\u0027), medium"
+            "Source": "p.59 joint L0\u0027 (span 13 side; p.49 says \u0027similar to L0\u0027 / U0\u0027\u0027), medium",
+            "GussetLayers": [
+              {
+                "Thickness": 0.0127,
+                "Outline": [
+                  {
+                    "U": 0.9220199999999998,
+                    "V": -0.2032
+                  },
+                  {
+                    "U": -0.29717999999999994,
+                    "V": -0.2032
+                  },
+                  {
+                    "U": -0.29717999999999994,
+                    "V": 0.23367999999999997
+                  },
+                  {
+                    "U": -0.24892,
+                    "V": 0.7493
+                  },
+                  {
+                    "U": 0.43688,
+                    "V": 0.7493
+                  },
+                  {
+                    "U": 0.9220199999999998,
+                    "V": 0.24892
+                  }
+                ],
+                "ClipToGusset": true,
+                "Label": "2-1/2 Gussets (outer layer)",
+                "Material": "",
+                "Unresolved": "UNRESOLVED (p.59 / p.49): 1/2 in. gusset layer at joint L0\u0027 - the plate is drawn, not dimensioned; outline scaled from a 300-450 dpi render (\u002B-1 in.). outline as scaled, clipped to the inner gusset, stacked outside it.",
+                "Source": "gusset-layers.csv p.59 / p.49 (medium): mirror image of the 4-span L0 layer (the span is to the left on the sheet); scaled (8.13 px/in)"
+              }
+            ]
           }
         ],
         "JointDefaults": {
