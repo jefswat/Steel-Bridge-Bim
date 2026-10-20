@@ -458,8 +458,22 @@ public partial class MainWindow
     private readonly List<(object tag, string label)> _hiddenList = new();
     private readonly Dictionary<MeshGeometryModel3D, List<int>> _visibleInstances = new();
 
+    /// <summary>Scene-local point of the last successful pick (snapshot --pick logs it against the highlight's bounds).</summary>
+    private Vector3? _lastPickHit;
+
+    /// <summary>Hit point vs the highlighted element's bounds (scene-local) for the --pick log: the hit must lie on the highlight.</summary>
+    private string PickHitReport()
+    {
+        if (_lastPickHit is not { } h || _highlight?.Geometry is not MeshGeometry3D g || g.Positions is not { Count: > 0 } p) return "";
+        var mn = new Vector3(float.MaxValue); var mx = new Vector3(float.MinValue);
+        foreach (var v in p) { mn = Vector3.Min(mn, v); mx = Vector3.Max(mx, v); }
+        var d = Vector3.Max(Vector3.Zero, Vector3.Max(mn - h, h - mx)).Length();
+        return $" | hit=({h.X:F2},{h.Y:F2},{h.Z:F2}) highlight=({mn.X:F2},{mn.Y:F2},{mn.Z:F2})-({mx.X:F2},{mx.Y:F2},{mx.Z:F2}) hitOutside={d:F3} m";
+    }
+
     private void Pick(Point pt)
     {
+        _lastPickHit = null;
         ClearHighlight();
         _selectedTag = null;
         _selectedModel = null;
@@ -496,13 +510,17 @@ public partial class MainWindow
             {
                 // Clipped meshes map back to the full mesh (and its pick table).
                 var full = _fullMeshes.TryGetValue(model, out var fm) ? fm : geo;
-                int triangle = tri.Item1 / 3;
-                if (!ReferenceEquals(full, geo) && _triMap.TryGetValue(geo, out var map) && triangle < map.Count) triangle = map[triangle];
+                // The hit names the triangle by its VERTEX indices; merged meshes share vertices (SceneBuilder.ShareVertices), so
+                // vertex / 3 is not the triangle there (it selected and highlighted another element).
+                int triangle = PickTable.TriangleOf(geo.Indices!, tri.Item1, tri.Item2, tri.Item3);
+                if (triangle < 0) continue;
+                if (!ReferenceEquals(full, geo) && _triMap.TryGetValue(geo, out var map)) { if (triangle >= map.Count) continue; triangle = map[triangle]; }
                 if (!SceneBuilder.Picks.TryGetValue(full, out var table)) continue;
                 tag = table.Find(triangle, out int t0, out int t1);
                 if (tag != null) hl = Extract(full, t0, Math.Min(t1, full.Indices!.Count / 3));
             }
             if (tag == null || TagHidden(tag)) continue; // hidden / outside the isolate: not pickable
+            _lastPickHit = hit.PointHit;
             _selectedTitle = _vm.ShowPicked(tag);
             _selectedTag = tag;
             _selectedModel = model;
@@ -679,19 +697,29 @@ public partial class MainWindow
     private void RemapHidden(SceneData scene)
     {
         if (_hidden.Count == 0) return;
-        var wanted = _hiddenList.Select(h => (key: HideKey(h.tag), h.label)).ToList();
-        var fresh = new Dictionary<string, object>();
+        var wanted = _hiddenList.Select(h => (key: HideKey(h.tag), h.label, at: TagCenter(h.tag))).ToList();
+        // Marks repeat between bridges / units (e.g. the same truss drawn twice): every fresh object per key, the nearest one wins.
+        var fresh = new Dictionary<string, List<object>>();
+        void Put(object t) { var k = HideKey(t); if (!fresh.TryGetValue(k, out var l)) fresh[k] = l = new(); l.Add(t); }
         foreach (var solid in scene.Solids)
             foreach (var (mesh, _) in solid.Parts)
             {
-                if (SceneBuilder.Picks.TryGetValue(mesh, out var table)) foreach (var t in table.Tags) fresh.TryAdd(HideKey(t), t);
-                if (SceneBuilder.InstanceTags.TryGetValue(mesh, out var it)) foreach (var t in it) fresh.TryAdd(HideKey(t), t);
+                if (SceneBuilder.Picks.TryGetValue(mesh, out var table)) foreach (var t in table.Tags) Put(t);
+                if (SceneBuilder.InstanceTags.TryGetValue(mesh, out var it)) foreach (var t in it) Put(t);
             }
         _hidden.Clear();
         _hiddenList.Clear();
-        foreach (var (key, label) in wanted)
-            if (fresh.TryGetValue(key, out var t) && _hidden.Add(t)) _hiddenList.Add((t, label));
+        foreach (var (key, label, at) in wanted)
+        {
+            if (!fresh.TryGetValue(key, out var cands)) continue;
+            var t = cands.Count == 1 || at is not { } a ? cands[0]
+                : cands.MinBy(c => TagCenter(c) is { } cc ? (cc - a).Length : double.MaxValue)!;
+            if (_hidden.Add(t)) _hiddenList.Add((t, label));
+        }
     }
+
+    /// <summary>World centre of a steel part (to tell apart parts with the same mark in different bridges); null for other tags.</summary>
+    private static Vec3? TagCenter(object tag) => tag is SBM.Core.Steel.SteelPart p && !p.Mesh.IsEmpty && p.Mesh.Bounds() is var b ? (b.Min + b.Max) * 0.5 : null;
 
     private void HideLayer(string layer)
     {
