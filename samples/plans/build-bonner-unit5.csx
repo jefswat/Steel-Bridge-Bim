@@ -58,14 +58,17 @@ double D(string s) => double.Parse(s, inv);
 // ================================================================ 1. alignment -L- over Unit 5 (general drawings p3-16, ../SUMMARY.md section 1)
 // The unit (57+45.00 - 92+95.00) lies on curve 2 (PC 53+29.58, R 2,815.00 RT, delta 35 24'44.6", L 1,739.85, PT 70+69.43) and the tangent
 // N 45 04'44.5" W to PC 3 102+46.84 (curve 3 R 6,050.00 RT). Back tangent N 80 29'29.1" W. No spirals, no station equations.
-U("p.21-34", "-L- coordinates (northing / easting)", "the long chord layout sheets were not extracted", "The alignment is built in a LOCAL grid (PC 2 at E 10,000 / N 10,000 ft) from the printed bearings, radius and stations; geometry along -L- is exact, absolute position is not.");
+U("p.35 / p.36 (S0-34 / S0-35 location sketches)", "-L- state plane coordinates of the PIs / PCs", "the structure plans print no N / E for the -L- PI / PC / PT; only the GPS monument B2500-2 (N 751499.622, E 3031964.117 US ft, -L- STA 26+47.55, 23.82' RT) is given", "The alignment is placed by that monument (curve 1 PI 27+27.13 R 2,347 LT, printed tangent bearings, p.21-34 curve data; check: long chord 794.52 ft vs 794'-6 1/4\" printed); the direction of increasing stations (towards N 0 44' E) rests on the printed bearings + the location sketch. PC / PT N / E in docs/plan-data/bonner-b2500/L-coordinates.csv.");
 const string AlName = "-L- (NC 12)";
 Doc.Project.Alignments.RemoveAll(a => a.Name == AlName);
 double Brg(int d, int m, double s, bool west) { double a = (d + m / 60.0 + s / 3600.0) * Math.PI / 180; return west ? Math.PI / 2 + a : Math.PI / 2 - a; }   // N ... W/E -> math angle
 double Dms(int d, int m, double s) => (d + m / 60.0 + s / 3600.0) * Math.PI / 180;
 double heading = Brg(80, 29, 29.1, true);
 var elems = new List<HorizontalElement>();
-var pc2 = new Vec2(Ft(10000), Ft(10000));
+// PC 2 (STA 53+29.58) in the plans' LOCALIZED NC State Plane (EPSG:2264, US survey ft; project metres = US ft x 1200 / 3937): derived from the GPS monument
+// B2500-2 (p.35 / p.36) along curve 1 and the 1,773.51 ft tangent (docs/plan-data/bonner-b2500/L-coordinates.csv, tools: temp/bonner-geo/lgeom.py).
+const double UsFt = 1200.0 / 3937.0;
+var pc2 = new Vec2(3029357.322 * UsFt, 752089.964 * UsFt);
 var cur = pc2 - Vec2.FromAngle(heading) * Ft(129.58);              // start 52+00.00 on the back tangent
 void Tan(double lenFt) { var e = new HorizontalElement(cur, heading, Ft(lenFt), 0, 0); elems.Add(e); cur = e.EndPoint; }
 void Arc(double rFt, double lenFt, bool right) { double k = (right ? -1 : 1) / Ft(rFt); var e = new HorizontalElement(cur, heading, Ft(lenFt), k, k); elems.Add(e); cur = e.EndPoint; heading = e.EndAngle; }
@@ -74,7 +77,7 @@ Arc(2815.00, 1739.85, true);                   // curve 2 PC 53+29.58 - PT 70+69
 Tan(10246.84 - 7069.43);                       // PT 70+69.43 - PC 3 102+46.84
 Arc(6050.00, 300.0, true);                     // part of curve 3 (beyond the unit)
 var al = new Alignment(elems) { Name = AlName, StartStation = Sta("52+00.00") };
-al.Description = "-L- (NC 12), B-2500 general drawings p3-16; local grid (coordinates p21-34 not extracted)";
+al.Description = "-L- (NC 12), B-2500 general drawings p3-16; localized NC State Plane (PC 2 from monument B2500-2, p.35)";
 Doc.Project.Alignments.Add(al);
 {
     double dDelta = (Ft(1739.85) / Ft(2815.00) - Dms(35, 24, 44.6)) * Ft(2815.00);
