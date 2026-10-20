@@ -21,6 +21,29 @@ public static partial class ArchGenerator
             return (a.XY, b.XY, t, n, Vec2.Lerp(a.XY, b.XY, sy));
         }
 
+        /// <summary>Half-planes (n, c: keep dot(q, n) >= c) in a floorbeam's plan frame q = (u along e from pa, v along nrm) that keep plates out of the knuckle end
+        /// flanges (<see cref="ArchKnuckleDetail.FloorbeamsStopAtEndFlange"/>): the end flange inner edge, end line normal toward the span.</summary>
+        private List<(Vec2 n, double c)> EndFlangeCuts(Vec2 pa, Vec2 e, Vec2 nrm)
+        {
+            var res = new List<(Vec2 n, double c)>();
+            foreach (var k in _d.Knuckles)
+            {
+                if (k.Detail is not { FloorbeamsStopAtEndFlange: true } || EndLine(k) is not { } el) continue;
+                double c = Vec2.Dot(el.a, el.n) + (k.EndFlangeWidth - k.EndWebOffset);
+                res.Add((new Vec2(Vec2.Dot(e, el.n), Vec2.Dot(nrm, el.n)), c - Vec2.Dot(pa, el.n)));
+            }
+            return res;
+        }
+
+        private static List<Vec2> ClipCuts(List<Vec2> poly, List<(Vec2 n, double c)> cuts)
+        {
+            var r = poly;
+            foreach (var (n, c) in cuts) { r = PlateBuilder.ClipHalfPlane(r, n, c); if (r.Count < 3) break; }
+            return r;
+        }
+
+        private string EndFlangeCutFlag() => _d.Knuckles.Select(k => k.Detail?.FloorbeamEndUnresolved ?? "").FirstOrDefault(s => s.Length > 0) ?? "";
+
         /// <summary>Tie trim at a knuckle with a v2 detail: the tie field piece starts / ends at the joint = where the tie CL crosses the end flange inner
         /// edge (p.124: end flange 2" x 32" from the end web outside face), plus half the joint gap. Null = no knuckle detail at that end.</summary>
         private double? KnuckleJoint(ArchTieDefinition t, TieGeo geo, bool atStart)
@@ -301,6 +324,9 @@ public static partial class ArchGenerator
                     var e0 = o3 + cIn * (-n2.X * hw) + up * (-n2.Y * hw);
                     var ed = (cIn * t2.X + up * t2.Y).Normalized();
                     _ribBoxes.Add(new RibBox(c.Tie, string.Equals(tg.Def.Start, c.Point, StringComparison.OrdinalIgnoreCase), facePt, faceN, e0, ed, k.Name));
+                    // Concrete in the rib box between the two plates (user decision d21), built here where the plate geometry is known.
+                    if (_d.Deck is { KnuckleZonesFromSteel: true, KnuckleRibBoxFill: true })
+                        RibBoxFill($"{k.Name} {c.Point}", T, cIn, up, bn, t2, n2, hw, w.Depth / 2 - tp, el, dIn, zef);
                 }
                 AddPart($"{cm}-AF{(outside ? "O" : "I")}", PartCategory.KnucklePlate, asm,
                     $"PL {L(tp)} {(outside ? "outside" : "inside")} arch flange plate, bent (leg {L(h)}, R {L(kd.BendRadius)}) at {c.Point} (p.124/125)", m, mat, sCut + Math.Abs(uEnd));
@@ -408,6 +434,29 @@ public static partial class ArchGenerator
                 // Jack cheese plates (CL bearing BearingFromSpringing into the span; jacks +- JackFromBearing along the chord).
                 var asuC = kd.CheeseUnresolved.Length > 0 ? Assumption.UnresolvedDimension(kd.CheeseUnresolved, $"{L(kd.CheeseLength)} x {L(kd.CheeseWidth)} scaled") : null;
                 var mc = new Mesh();
+                if (!double.IsNaN(kd.CheeseFromBearing) && CornerChord(c) is { } chC)
+                {
+                    // Along the tie CHORD from the T point (the bearing is centred BearingFromSpringing along it, p.124 plan); inner edges CheeseFromBearing from
+                    // the CL bearing, outward CheeseLength; the end-side plate is cut at the end flange outer end (A-A: both end there).
+                    var (tC, cC, oC) = chC;
+                    double zc0 = k.EndFlangeBottomZ - kd.SplicePlateThickness - kd.CheeseThickness, zc1 = k.EndFlangeBottomZ - kd.SplicePlateThickness;
+                    var lens = new List<string>();
+                    foreach (int sg in new[] { -1, 1 })
+                    {
+                        double a0 = kd.BearingFromSpringing + sg * kd.CheeseFromBearing, a1 = a0 + sg * kd.CheeseLength;
+                        Vec2 Q(double s, double lat) => tC + cC * s + oC * lat;
+                        var poly = new List<Vec2> { Q(a0, -kd.CheeseWidth / 2), Q(a1, -kd.CheeseWidth / 2), Q(a1, kd.CheeseWidth / 2), Q(a0, kd.CheeseWidth / 2) };
+                        // keep dn >= end flange outer end (end line normal toward the span): dot(p, n) >= dot(a, n) - EndWebOffset
+                        poly = PlateBuilder.ClipHalfPlane(poly, el.n, Vec2.Dot(el.a, el.n) - k.EndWebOffset);
+                        if (poly.Count < 3) continue;
+                        double along = poly.Max(q => sg * Vec2.Dot(q - tC, cC)) - sg * a0;
+                        lens.Add($"{L(along)}");
+                        PlateBuilder.AddPrism(mc, Ccw(poly), Array.Empty<Hole>(), (x, y, z) => W(new Vec3(x, y, z)), _ => zc0, _ => zc1);
+                    }
+                    AddPart($"{cm}-CH", PartCategory.KnucklePlate, asm, $"2 - PL {L(kd.CheeseThickness)} x {L(kd.CheeseWidth)} jack cheese plates at {c.Point}, along the tie chord from {L(kd.CheeseFromBearing)} each side of the CL bearing ({string.Join(" / ", lens)} long, end side cut at the end flange end; jacks {L(kd.JackFromBearing)} from CL bearing, p.124 A-A)", mc, mat, kd.CheeseLength, 0, asuC);
+                }
+                else
+                {
                 foreach (int sg in new[] { -1, 1 })
                 {
                     double s0 = kd.BearingFromSpringing + sg * kd.JackFromBearing;
@@ -415,6 +464,7 @@ public static partial class ArchGenerator
                         (s, lat, z) => TieMap(s, z, lat), _ => k.EndFlangeBottomZ - kd.SplicePlateThickness - kd.CheeseThickness, _ => k.EndFlangeBottomZ - kd.SplicePlateThickness);
                 }
                 AddPart($"{cm}-CH", PartCategory.KnucklePlate, asm, $"2 - PL {L(kd.CheeseThickness)} jack cheese plates at {c.Point} (jacks {L(kd.JackFromBearing)} each side of CL bearing, p.124 A-A)", mc, mat, kd.CheeseLength, 0, asuC);
+                }
             }
         }
             /// <summary>

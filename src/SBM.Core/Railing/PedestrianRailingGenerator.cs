@@ -440,10 +440,11 @@ public static class PedestrianRailingGenerator
     }
 }
 
-/// <summary>Highest top surface of a set of meshes at a plan point (non-vertical triangles bucketed in a plan grid).</summary>
+/// <summary>Highest top surface of a set of meshes at a plan point (upward triangles flatter than 85 deg, bucketed in a plan grid).</summary>
 public sealed class TopSurface
 {
     private const double Cell = 0.5;
+    private const double SinSteepest = 0.0871557;   // sin(5 deg)
     private readonly List<(Vec3 a, Vec3 b, Vec3 c)> _tris = new();
     private readonly Dictionary<(long, long), List<int>> _grid = new();
 
@@ -467,7 +468,9 @@ public sealed class TopSurface
             {
                 var a = m.Positions[m.Indices[i]]; var b = m.Positions[m.Indices[i + 1]]; var c = m.Positions[m.Indices[i + 2]];
                 var n = Vec3.Cross(b - a, c - a);
-                if (Math.Abs(n.Z) < 1e-9 * Math.Max(1e-12, n.Length) || Math.Abs(n.Z) < 1e-14) continue;
+                // only upward faces flatter than 85 deg are tops: a near-vertical face (a slab end face vertical in a tilted local frame) or a bottom face
+                // reaching past the top edge would give a probe near the edge a height between the bottom and the top (closed solids, outward normals)
+                if (n.Z < SinSteepest * Math.Max(1e-12, n.Length) || Math.Abs(n.Z) < 1e-14) continue;
                 int id = _tris.Count;
                 _tris.Add((a, b, c));
                 long x0 = (long)Math.Floor(Math.Min(a.X, Math.Min(b.X, c.X)) / Cell), x1 = (long)Math.Floor(Math.Max(a.X, Math.Max(b.X, c.X)) / Cell);

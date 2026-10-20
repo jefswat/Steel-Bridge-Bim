@@ -721,6 +721,17 @@ public sealed class ArchKnuckleDetail
     /// <summary>CL bearing from the springing point along the chord toward the span (p.124: 2").</summary>
     public double BearingFromSpringing { get; set; } = In(2);
     public string CheeseUnresolved { get; set; } = "";
+    /// <summary>OPTIONAL (NaN = v2-v7: <see cref="CheeseLength"/> centred on each jack, laid along the tie TANGENT at the end): inner edge of each jack cheese
+    /// plate this far from the CL bearing, measured along the tie CHORD (as the partial plan locates the jacks and the bearing); each plate runs
+    /// <see cref="CheeseLength"/> outward from it, also along the chord, and the end-side plate stops at the end flange outer end (p.124 A-A: 8" = half the
+    /// 1'-4 upper sole plate, the cheese plates abut it).</summary>
+    public double CheeseFromBearing { get; set; } = double.NaN;
+    /// <summary>OPTIONAL (false = v2-v7): floorbeam flanges and bottom flange connection plates that would reach over this knuckle's end flange (the first /
+    /// last floorbeam meets the tie at a panel point on the end flange edge, p.126) stop at the end flange inner edge - the floorbeam flange, tie flange and
+    /// end flange are in one level under the end plate; bolts over the end flange are not modeled.</summary>
+    public bool FloorbeamsStopAtEndFlange { get; set; }
+    /// <summary>UNRESOLVED dimension text for <see cref="FloorbeamsStopAtEndFlange"/> (flag on the cut floorbeam flanges).</summary>
+    public string FloorbeamEndUnresolved { get; set; } = "";
     public string Material { get; set; } = "ASTM A709 Gr. 50";
 }
 
@@ -761,6 +772,13 @@ public sealed class ArchDeckDefinition
     public bool KnuckleZonesFromSteel { get; set; }
     /// <summary>UNRESOLVED text raised with <see cref="KnuckleZonesFromSteel"/> (e.g. whether the rib-box pocket is filled).</summary>
     public string KnuckleZoneUnresolved { get; set; } = "";
+    /// <summary>OPTIONAL (false = the rib-box pocket stays empty, v7): with <see cref="KnuckleZonesFromSteel"/>, the space between the inner faces of the outside
+    /// and inside arch flange plates at each knuckle rib corner is filled with deck concrete - from the end web inside face to the plates' intrados edge, on
+    /// the end flange top, up to the finished grade (the pocket is open at the top). Appended to the knuckle-zone concrete (deck IfcSlab second body, database,
+    /// quantities); steel plates inside it (stub web, tie web, stiffeners) are not subtracted (their volume is reported).</summary>
+    public bool KnuckleRibBoxFill { get; set; }
+    /// <summary>UNRESOLVED / assumption text raised with <see cref="KnuckleRibBoxFill"/> (e.g. "user decision, plans neither show it filled nor formed").</summary>
+    public string KnuckleRibBoxFillFlag { get; set; } = "";
 }
 
 /// <summary>Longitudinal PT (p.155): strands per tendon (flat duct), strand size, jacking force, strand spacing in the duct, anchorage envelope at the
@@ -778,6 +796,11 @@ public sealed class ArchPtSystem
     public string Unresolved { get; set; } = "";
     public string StrandMaterial { get; set; } = "ASTM A416 Gr. 270 low-relaxation strand";
     public string AnchorMaterial { get; set; } = "PT flat anchorage (DYWIDAG, by supplier)";
+    /// <summary>OPTIONAL (false = v2-v7: the anchorage box starts where the tendon CL meets the end web inside face, so on a skewed end web one corner is in
+    /// the web): the anchorage bears square to the tendon with its nearest corner on the end web inside face (p.155 anchorage plan).</summary>
+    public bool AnchorBackOnEndWeb { get; set; }
+    /// <summary>UNRESOLVED text raised with <see cref="AnchorBackOnEndWeb"/> (e.g. the drawn block between the skewed end web and the anchorage).</summary>
+    public string AnchorWedgeUnresolved { get; set; } = "";
     /// <summary>OPTIONAL flat duct (0 width = no duct, v1-v4): outside width x height (obround), wall, from the anchorage end (AnchorLength from the end
     /// web) along the tendon to the other anchorage; strands inside side by side at <see cref="DuctStrandSpacing"/> (converging from
     /// <see cref="StrandSpacing"/> at the anchor over the anchorage length).</summary>

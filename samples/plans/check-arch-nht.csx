@@ -128,6 +128,8 @@ double sf = am.SlabArea / 0.09290304;
 Row("arch deck area (top surface, end web to end web)", "3,698 SF", $"{sf:N0} SF", Math.Abs(sf - 3698) / 3698 < 0.01, "pay limits of the plan quantity not stated");
 double cy = (Math.Abs(am.Slab?.Volume() ?? 0) + Math.Abs(am.SlabEnds?.Volume() ?? 0)) / 0.764554857984;
 Print($"     slab {cy:N1} CY (incl. concrete in the form flutes; steel inside the slab not deducted), curbs {Math.Abs(am.Curbs?.Volume() ?? 0) / 0.764554857984:N1} CY");
+if (am.RibBoxFillVolume > 0)
+    Print($"     knuckle rib box fill (d21, user decision 2026-10-20, no plan quantity; included in the slab above): {am.RibBoxFillVolume / 0.764554857984:N3} CY gross, steel inside not subtracted {am.RibBoxFillSteelVolume / 0.764554857984:N3} CY");
 
 // ---- field splices (p.127 rib RS1-RS5: 68 bolts each = flanges 2 x 2 x 12 + web 2 x 10; p.144 tie: 42 each = flange 2 x 12 + web 2 x 9)
 Print("== field splices (p.127, p.144)");
