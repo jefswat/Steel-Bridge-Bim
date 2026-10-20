@@ -55,7 +55,7 @@ public static class ModelLayers
 
     private static readonly Dictionary<string, (byte r, byte g, byte b)> Colors = new()
     {
-        ["3D-UNRESOLVED-STEEL"] = (255, 110, 40), ["3D-BOLTS"] = (220, 220, 225), ["3D-STUDS"] = (200, 200, 160), ["3D-ANCHOR-BOLTS"] = (180, 160, 120),
+        ["3D-UNRESOLVED-STEEL"] = (255, 110, 40), ["3D-BOLTS"] = (220, 220, 225), ["3D-RIVETS"] = (205, 190, 175), ["3D-STUDS"] = (200, 200, 160), ["3D-ANCHOR-BOLTS"] = (180, 160, 120),
         ["3D-DECK"] = (180, 180, 172), ["3D-BARRIER"] = (190, 190, 182), ["3D-JOINTS"] = (230, 140, 40), ["3D-SEGMENTS"] = (205, 200, 186),
         ["3D-UNRESOLVED-SEGMENTS"] = (255, 110, 40), ["3D-SEGMENTAL-BEARINGS"] = (140, 140, 150), ["3D-PS-GIRDERS"] = (205, 200, 186),
         ["3D-BEARING-SOLE-PLATES"] = (140, 145, 155), ["3D-DIAPHRAGMS"] = (188, 186, 176), ["3D-DIAPHRAGM-FILLERS"] = (235, 232, 200),
@@ -201,8 +201,9 @@ public static class ModelProjectionSource
                     var key = (b.Diameter, b.Grip, b.Length, b.Kind, b.Embedment);
                     if (!cache.TryGetValue(key, out var local))
                         cache[key] = local = b.Kind == BoltKind.Anchor ? SteelModel.AnchorBoltMesh(b.Diameter, b.Grip, b.Embedment)
+                            : b.Kind == BoltKind.Rivet ? SteelModel.RivetMesh(b.Diameter, b.Grip)
                             : SteelModel.BoltMesh(b.Diameter > 0 ? new BoltGeometry(b.Diameter) : steel.Bolt, b.Grip, b.Length);
-                    Add(Transform(local, b.Frame), b.Kind == BoltKind.Anchor ? "3D-ANCHOR-BOLTS" : "3D-BOLTS", $"{b.Assembly}/bolt{i++}", "Bolt", "bolt", b,
+                    Add(Transform(local, b.Frame), b.Kind == BoltKind.Anchor ? "3D-ANCHOR-BOLTS" : b.Kind == BoltKind.Rivet ? "3D-RIVETS" : "3D-BOLTS", $"{b.Assembly}/bolt{i++}", b.Kind == BoltKind.Rivet ? "Rivet" : "Bolt", b.Kind == BoltKind.Rivet ? "rivet" : "bolt", b,
                         girderOf.GetValueOrDefault(b.Assembly, -1));
                 }
                 int si = 0;

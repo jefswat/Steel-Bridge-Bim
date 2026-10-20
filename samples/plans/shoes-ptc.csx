@@ -100,14 +100,15 @@ foreach (var bn in new[] { "PTC 3-span truss 11-13", "PTC 4-span truss 14-17", "
         {
             // p.52 / p.67: pin 3'-0 1/4 above the bottom, masonry 6 in. (top 2'-6 1/4 below the pin), 3 wing plates 4 in. (centre + 2 outer at 1'-1 clear), 2 stems 13 x 9
             string pg = four ? "p.67" : "p.52";
-            double soleT = four ? 10.4375 : 10.1875, wingH = four ? 29.75 : 29.875;
+            // CORRECTION rows (shoes.csv, third pass 2026-10-20): p.67 is identical to p.52 - sole 10 3/16 (not 10 7/16), wings 29 7/8 (not 29 3/4), stems 2'-5 7/8 (not 5 5/8 / 5 3/8)
+            double soleT = 10.1875, wingH = 29.875;
             s.MasonryLength = FI(5, 6); s.MasonryWidth = In(60);    // 'Masonry Pl. 60 x 6 x 5'-6': 5'-6 along the truss (2'-9 + 2'-9 about the CL brg), 60 in. across (2'-6 + 2'-6)
-            pc.Add(P("sole plate", Sole, Across, Rect(-11, 11, 0.1875, 0.1875 + soleT), -19, 19, "S", $"PL 22 x {(four ? "10 7/16" : "10 3/16")} (on CL) x 3'-2", flag: bevel(pg)));
-            pc.Add(P("stem plate", Body, Across, SeatTop(new double[] { -4.5, -30.25, 4.5, -30.25 }, 4.5, -0.625, 2.75), 2, 15, "C", "PL 13 x 9 x 2'-5 5/8", mirrorN: true));
+            pc.Add(P("sole plate", Sole, Across, Rect(-11, 11, 0.1875, 0.1875 + soleT), -19, 19, "S", "PL 22 x 10 3/16 (on CL) x 3'-2", flag: bevel(pg)));
+            pc.Add(P("stem plate", Body, Across, SeatTop(new double[] { -4.5, -30.25, 4.5, -30.25 }, 4.5, -30.25 + 29.875, 2.75), 2, 15, "C", "PL 13 x 9 x 2'-5 7/8", mirrorN: true));
             var wing = SeatTop(new double[] { -31.75, -30.25, 31.75, -30.25 }, 5.5, -30.25 + wingH, 2.75);
-            string wingFlag = U(pg, "wing plate top width", "the wing plates are drawn as triangles reaching the pin (29 7/8 x 4 x 5'-3 1/2 listed; p.67 prints 29 3/4)", "5'-3 1/2 at the masonry plate tapering to 11 in. at the pin seat.");
-            pc.Add(P("wing plate (centre)", Plate, Across, wing, -2, 2, "C", $"PL {(four ? "29 3/4" : "29 7/8")} x 4 x 5'-3 1/2", flag: wingFlag));
-            pc.Add(P("wing plate (outer)", Plate, Across, wing, 15, 19, "C", $"PL {(four ? "29 3/4" : "29 7/8")} x 4 x 5'-3 1/2", mirrorN: true, flag: wingFlag));
+            string wingFlag = U(pg, "wing plate top width", "the wing plates are drawn as triangles reaching the pin (29 7/8 x 4 x 5'-3 1/2 listed on p.52 and p.67)", "5'-3 1/2 at the masonry plate tapering to 11 in. at the pin seat.");
+            pc.Add(P("wing plate (centre)", Plate, Across, wing, -2, 2, "C", "PL 29 7/8 x 4 x 5'-3 1/2", flag: wingFlag));
+            pc.Add(P("wing plate (outer)", Plate, Across, wing, 15, 19, "C", "PL 29 7/8 x 4 x 5'-3 1/2", mirrorN: true, flag: wingFlag));
             pc.Add(P("end stiffener plate", Plate, Along, Poly(19, -30.25, 29, -30.25, 19, -6.75), 4.5, 6.5, "C", "PL 10 x 2 x 1'-11 1/2", mirrorN: true, mirrorU: true,
                 flag: U(pg, "end stiffener position", "four end stiffeners 10 x 2 x 1'-11 1/2 are listed and drawn sloped outside the outer wing plates; their position along the truss is not dimensioned", "against the stem plate faces (u = 4 1/2 to 6 1/2 in.), triangular.")));
             s.Unresolved = U(pg, "fixed shoe keys, pin nuts / rings and the anchor bolts", "listed / drawn (8 holes for 3 in. anchor bolts, 2 - 2 1/2 keys) but not part of the shoe solid", "not built.");
@@ -172,13 +173,15 @@ foreach (var bn in new[] { "PTC 3-span truss 11-13", "PTC 4-span truss 14-17", "
         var pc = new List<TrussShoePiece>();
         if (s.Source == "p.73")
         {
-            // pin 3 in., 3'-5 above the bottom: masonry 5 in., rocker R 3'-0 about the pin, base 32 x 6 1/2 (on CL) x 3'-0, stem 9 in. x 29 1/4 under the pin
+            // pin 3 in., 3'-5 above the bottom: masonry 5 in., rocker R 3'-0 about the pin, base 32 x 6 3/4 (on CL) x 3'-0, stem 9 in. x 29 1/4 under the pin
+            // CORRECTION rows (shoes.csv, third pass): wing plates and stiffeners 1 1/2 thick (not 1/2), rocker base 6 3/4 (not 6 1/2); the stem keeps its listed 29 1/4 and sits on the base top
+            string stackFlag = U("p.73", "rocker shoe stack", "with the corrected 6 3/4 rocker base (R 3'-0 about the pin) and the 29 1/4 stem the stack is 1/4 in. taller than the pin height drawn (3'-5 over a 5 in. masonry plate)", "stem, wings and stiffeners from the base top (-29 1/4 in. below the pin) up; 1/4 in. stem overlap into the pin seat accepted.");
             pc.Add(P("sole plate", Sole, Across, Rect(-9.5, 9.5, 0.375, 6.125), -13.75, 13.75, "C", "PL 19 x 5 3/4 (on CL) x 2'-3 1/2", flag: bevel("p.73")));
-            pc.Add(P("stem plate", Body, Across, SeatTop(new double[] { -4.5, -29.5, 4.5, -29.5 }, 4.5, -0.25, 1.5), -13.5, 13.5, "C", "PL 29 1/4 x 9 x 2'-3"));
-            pc.Add(P("wing plate", Plate, Across, Poly(-16, -29.5, 16, -29.5, 9.5, -5, -9.5, -5), 13.5, 14, "C", "PL 24 1/2 x 1/2 x 2'-8", mirrorN: true));
-            pc.Add(P("stiffener plate", Plate, Across, Poly(4.5, -29.5, 16, -29.5, 9.5, -5, 4.5, -5), -0.25, 0.25, "C", "PL 24 1/2 x 1/2 x 0'-11 1/2", mirrorU: true,
-                flag: U("p.73", "stiffener plate position", "the two stiffeners 24 1/2 x 1/2 x 11 1/2 are listed; the elevation shows them on the stem faces, their position across is not dimensioned", "on the truss CL, one each side of the stem.")));
-            pc.Add(P("rocker base plate", Rocker, Across, RockerBase(16, -29.5, 36), -18, 18, "C", "PL 32 x 6 1/2 x 3'-0, R 3'-0"));
+            pc.Add(P("stem plate", Body, Across, SeatTop(new double[] { -4.5, -29.25, 4.5, -29.25 }, 4.5, -0.25, 1.5), -13.5, 13.5, "C", "PL 29 1/4 x 9 x 2'-3", flag: stackFlag));
+            pc.Add(P("wing plate", Plate, Across, Poly(-16, -29.25, 16, -29.25, 9.5, -5, -9.5, -5), 13.5, 15, "C", "PL 24 1/2 x 1 1/2 x 2'-8", mirrorN: true));
+            pc.Add(P("stiffener plate", Plate, Across, Poly(4.5, -29.25, 16, -29.25, 9.5, -5, 4.5, -5), -0.75, 0.75, "C", "PL 24 1/2 x 1 1/2 x 0'-11 1/2", mirrorU: true,
+                flag: U("p.73", "stiffener plate position", "the two stiffeners 24 1/2 x 1 1/2 x 11 1/2 are listed; the elevation shows them on the stem faces, their position across is not dimensioned", "on the truss CL, one each side of the stem.")));
+            pc.Add(P("rocker base plate", Rocker, Across, RockerBase(16, -29.25, 36), -18, 18, "C", "PL 32 x 6 3/4 x 3'-0, R 3'-0"));
             s.Unresolved = U("p.73", "rocker shoe dowels, hold-down / shear lock (Section E / H) and the anchor bolts", "8 stainless dowels 2 x 4, the shear lock tongue plate in its pedestal pocket and 5 in. anchor bolts 13'-4 are drawn / listed with the substructure contract", "not built.");
         }
         else

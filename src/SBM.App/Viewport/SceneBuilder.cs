@@ -157,6 +157,8 @@ public static class SceneBuilder
     public const string BoltLayer = "3D-BOLTS";
     public const string StudLayer = "3D-STUDS";
     public const string AnchorLayer = "3D-ANCHOR-BOLTS";
+    /// <summary>Rivets (BoltKind.Rivet): detail layer like the bolts (tiled, instanced, near the view only, hidden while the camera moves).</summary>
+    public const string RivetLayer = "3D-RIVETS";
     /// <summary>Flagged (UNRESOLVED) steel parts, e.g. tied arch details the plans do not dimension.</summary>
     public const string UnresolvedSteelLayer = "3D-UNRESOLVED-STEEL";
 
@@ -164,7 +166,7 @@ public static class SceneBuilder
     public static void AddSolids(SceneData scene, IReadOnlyList<SteelModel> models)
     {
         var o = scene.Origin;
-        var layers = new SolidLayer?[SolidLayerDefs.Length + 4];
+        var layers = new SolidLayer?[SolidLayerDefs.Length + 5];
         Parallel.For(0, layers.Length, i =>
         {
             if (i == SolidLayerDefs.Length + 3)
@@ -202,14 +204,14 @@ public static class SceneBuilder
             }
             // Fasteners: one mesh per distinct size, drawn with GPU instancing.
             if (SkipDetail) return;
-            int kind = i - SolidLayerDefs.Length;
+            int kind = i == SolidLayerDefs.Length + 4 ? 3 : i - SolidLayerDefs.Length;
             var list = new List<(MeshGeometry3D, List<Matrix4x4>?)>();
             int tris = 0;
             foreach (var m in models)
             {
                     IEnumerable<(Mesh mesh, List<Matrix4x4> inst, List<object> tags)> groups = kind switch
                 {
-                    0 => m.Bolts.Where(b => b.Kind is BoltKind.Structural or BoltKind.Rivet).GroupBy(b => (b.Kind, Math.Round(b.Diameter > 0 ? b.Diameter : m.Bolt.Diameter, 5), Math.Round(b.Grip, 5), Math.Round(b.Length, 5), Tile(b.Frame.Origin)))
+                    0 or 3 => m.Bolts.Where(b => kind == 3 ? b.Kind == BoltKind.Rivet : b.Kind == BoltKind.Structural).GroupBy(b => (b.Kind, Math.Round(b.Diameter > 0 ? b.Diameter : m.Bolt.Diameter, 5), Math.Round(b.Grip, 5), Math.Round(b.Length, 5), Tile(b.Frame.Origin)))
                         .Select(gr => (gr.Key.Kind == BoltKind.Rivet ? SteelModel.RivetMesh(gr.First().Diameter, gr.First().Grip)
                             : SteelModel.BoltMesh(gr.First().Diameter > 0 ? new BoltGeometry(gr.First().Diameter) : m.Bolt, gr.First().Grip, gr.First().Length), gr.Select(b => ToMatrix(b.Frame, o)).ToList(), gr.Cast<object>().ToList())),
                     1 => m.Studs.GroupBy(s => (Math.Round(s.Length, 5), Tile(s.Frame.Origin)))
@@ -229,6 +231,7 @@ public static class SceneBuilder
             layers[i] = kind switch
             {
                 0 => new SolidLayer { Name = BoltLayer, R = 220, G = 220, B = 225, Parts = list, Triangles = tris },
+                3 => new SolidLayer { Name = RivetLayer, R = 205, G = 190, B = 175, Parts = list, Triangles = tris },
                 1 => new SolidLayer { Name = StudLayer, R = 200, G = 200, B = 160, Parts = list, Triangles = tris },
                 _ => new SolidLayer { Name = AnchorLayer, R = 180, G = 160, B = 120, Parts = list, Triangles = tris },
             };

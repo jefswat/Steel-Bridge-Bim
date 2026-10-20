@@ -329,6 +329,7 @@ public static class TrussGenerator
                 MeshBuilder.AddLoft(mesh, pc.Polygon, new[] { ringA, ringB });
             }
             foreach (var lf in m.Sec.Lacing) Lacing(mesh, m, a0, cut, lf);
+            if (m.Def.RivetLines is { Count: > 0 }) MemberRivetLines(m, a0, cut);
             Assumption? asu = null;
             string flag = m.Def.Unresolved.Length > 0 ? m.Def.Unresolved : m.Sec.Flag ?? "";
             if (flag.Length > 0) asu = Assumption.UnresolvedDimension(flag, m.Sec.Definition.Kind == TrussSectionKind.Nominal ? "nominal envelope of the member" : "section as described");
@@ -566,7 +567,11 @@ public static class TrussGenerator
                     if (rg.Distributed) DistributedRivets(c, m, rg, rg.Count); else PitchRivets(c, m, rg);
                 }
             }
+            if (_tightGroups > 0)
+                Warn($"Truss CHECK rivets: {_tightGroups} distributed rivet groups need a grid under 3 diameters (tightest {_tightest:0.00} d) - the image count and the gusset / member lap (envelope outline where the gussets are not dimensioned) disagree; each group is listed as Info. Positions are not adjusted.");
         }
+        private int _tightGroups;
+        private double _tightest = double.MaxValue;
 
         private void PitchRivets(JointCtx c, Inst m, TrussRivetGroup rg)
         {
@@ -733,7 +738,12 @@ public static class TrussGenerator
                 count = cand.Count;
             }
             if (s < 3 * dia - 1e-6)
-                Warn($"Truss CHECK joint {c.Point} ({c.Plane}) member {m.Mark}: {count} rivets {TrussSections.FormatIn(dia)} per gusset face on {area / 0.00064516:0} sq in of lap need a {TrussSections.FormatIn(s)} grid, under 3 diameters - count or lap area (gusset envelope) disagree.");
+            {
+                // under the 3 d minimum spacing: one summary CHECK per bridge (the group lines are Info); heads overlapping (< 1.6 d) = own warning
+                string txt = $"Truss CHECK joint {c.Point} ({c.Plane}) member {m.Mark}: {count} rivets {TrussSections.FormatIn(dia)} per gusset face on {area / 0.00064516:0} sq in of lap need a {TrussSections.FormatIn(s)} grid, under 3 diameters - count or lap area (gusset envelope) disagree.";
+                if (s < 1.6 * dia) Warn(txt + " The rivet heads overlap."); else Info(txt);
+                _tightGroups++; _tightest = Math.Min(_tightest, s / dia);
+            }
             var pick = cand.OrderBy(q => q.t).ThenBy(q => Math.Abs(q.y - yc)).ThenBy(q => q.y).Take(count).ToList();
             var asu = RivetFlag(rg.Unresolved, "count as read; positions on an even square grid over the gusset / member lap (pitch / gage not printed)");
             foreach (var (t, y, d1) in pick)
