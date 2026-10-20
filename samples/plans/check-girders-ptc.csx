@@ -75,8 +75,7 @@ foreach (var (bname, first, nSpans, planC, planS, planCY) in specs)
     string Plates(List<TrussPlate> l) => string.Join(", ", l.Select(p => p.Length > 0 ? $"{p.Length / ft:0}'" : "F.L."));
     Row(Plates(g1.TopPlates) == "F.L., 86', 51'" ? "PASS" : "DIFF", "top cover plates 22 x 13/16: F.L., 86'-0, 51'-0", "F.L., 86', 51'", Plates(g1.TopPlates));
     Row(Plates(g1.BottomPlates) == "90', 74', 51'" ? "PASS" : "DIFF", "bottom cover plates 22 x 13/16: 90'-0, 74'-0, 51'-0", "90', 74', 51'", Plates(g1.BottomPlates));
-    Row("DIFF", "CONFLICT p.43 stress sheet + p.44 label (86'-0 top plate) vs the p.43 elevation dimension lines 25'-6 / 37'-0 / 45'-0 (51 / 74 / 90 ft)", "86'-0 (top plate 2)", "86'-0 built as printed",
-        "no dimension line gives 86 (the lines match the BOTTOM plates 90 / 74 / 51); flagged UNRESOLVED, not adjusted. A top plate of 90'-0 would also fit the lines.");
+    Row(Plates(g1.TopPlates) == "F.L., 86', 51'" ? "PASS" : "DIFF", "top cover plate 86'-0 confirmed by the user 2026-10-20 (p.43 stress sheet + p.44 label; the p.43 dimension lines 51 / 74 / 90 ft are not a conflict)", "86'-0 (top plate 2)", Plates(g1.TopPlates));
     foreach (var pl in new[] { "N", "S" })
     {
         var p5 = tm.Steel.Parts.FirstOrDefault(p => p.Mark == $"{pl}-G{first + Math.Min(4, nSpans - 1)}");

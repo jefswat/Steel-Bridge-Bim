@@ -85,9 +85,7 @@ foreach (var spec in bridgeSpecs)
     string stiffNotBuilt = U("p.43, p.44", "girder web stiffeners, end stiffeners and fills, cover plate splice, rivets",
         "the end stiffeners (4-Ls 7x4x3/4 + fills 15x1 1/8), intermediate stiffener pairs (2-Ls 6x4x7/16, 9 / 6 / 6 / 9 equal spaces per panel), long stiffeners, the full length cover plate splice (CL splice 37'-0 from the CL girder + 6'-0 additional material) and the rivet patterns are drawn / listed but not dimensioned station by station",
         "built: web, 4 flange angles and the cover plates; not built: the items listed.");
-    string topPlateConflict = U("p.43, p.44", "CONFLICT: top cover plate length 86'-0",
-        "the stress sheet and the p.44 label both print 86'-0 but the elevation dimension lines (25'-6 / 37'-0 / 45'-0 each side of the CL = 51 / 74 / 90 ft) match the BOTTOM plates (90 / 74 / 51) and no dimension gives 86",
-        "the top plates are built as printed (full length + 86'-0 + 51'-0, centred); the 86'-0 is reported as a plan conflict.");
+    // Top cover plate 86'-0 as printed (p.43 stress sheet, p.44 label): user decision 2026-10-20 - no conflict, no flag.
     TrussPlate Pl(double w, double t_, string label, double len = 0, double off = 0) => new TrussPlate(w, t_, false, label) { Length = len, Offset = off };
     var cw = In(22); var ct = In(13.0 / 16);
     t.Sections.Add(new TrussSectionDefinition
@@ -97,7 +95,7 @@ foreach (var spec in bridgeSpecs)
         WebDepth = In(114), WebPlies = { new TrussPly(In(114), In(7.0 / 16), "web PL 114 x 7/16") }, Angle = "L8x8x1-1/8", AngleProjection = In(0.25),   // 9'-6 1/2 b.b. = 114 + 2 x 1/4
         TopPlates = { Pl(cw, ct, "cover PL 22 x 13/16 F.L."), Pl(cw, ct, "cover PL 22 x 13/16 x 86'-0", Ft(86)), Pl(cw, ct, "cover PL 22 x 13/16 x 51'-0", Ft(51)) },
         BottomPlates = { Pl(cw, ct, "cover PL 22 x 13/16 x 90'-0", Ft(90)), Pl(cw, ct, "cover PL 22 x 13/16 x 74'-0", Ft(74)), Pl(cw, ct, "cover PL 22 x 13/16 x 51'-0", Ft(51)) },
-        Source = "p.43 / p.44", Unresolved = stiffNotBuilt + " " + topPlateConflict,
+        Source = "p.43 / p.44", Unresolved = stiffNotBuilt,
     });
     // floor beam halves (girder -> CL): partial plates are measured from the CL (F2: bottom 42'-0 + 30'-0, top 30'-0; F1: bottom 16'-0)
     double crown = Ft(GirderCC / 2) / 96.0;                                           // 1/8" per ft over 29'-0 (p.107)

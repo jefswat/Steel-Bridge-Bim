@@ -33,7 +33,7 @@ of the same nominal weight), 8 laterals per span, fixed / expansion shoe envelop
 Gutter profile = the printed profile of the PTC model; the girder is the straight chord between its end W.P.s (final shape, camber not modeled).
 
 ## UNRESOLVED / flagged (each with page + reason in the model; none adjusted)
-- CONFLICT p.43 + p.44: top cover plate 86'-0 vs the dimension lines 25'-6 / 37'-0 / 45'-0 (= 51 / 74 / 90 ft, the BOTTOM plates): built as printed.
+- (resolved 2026-10-20, user decision) top cover plate 86'-0 as printed on p.43 / p.44: no conflict, no flag.
 - F.L. cover plate splice (CL splice 37'-0 + 6'-0 extra material), web / end stiffeners (4-Ls 7x4x3/4 + fills; 2-Ls 6x4x7/16 pairs 9 / 6 / 6 / 9
   equal spaces per panel), long stiffeners, rivets (1" carbon, 1 1/8 H.S. in tension plates), girder camber (1 1/4" / 2") not built.
 - Floor beam / bracket connection angles, fills, B1 taper (constant 6'-3 1/2 depth, outer end = S1 + 6"), stringer splices / bearings / diaphragms
