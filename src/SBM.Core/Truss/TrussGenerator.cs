@@ -343,8 +343,66 @@ public static class TrussGenerator
             };
             if (!mesh.IsEmpty) Model.Steel.Parts.Add(part);
             if (asu != null) Warn(asu.Reason);
+            if (m.Def.Stiffeners != null) BuildStiffeners(m);
             if (m.Def.Panel.Length > 0) Model.PanelOf[m.Mark] = m.Def.Panel;
             Model.Members.Add(new TrussMemberResult(m.Def.Name, m.Mark, m.Plane, m.PointA, m.PointB, m.A, m.B, len, cut, m.Def.Role, m.Sec.Definition.Name, part.Mass, asu != null));
+        }
+
+        /// <summary>Web stiffener angles / web splice plates on both web faces (<see cref="TrussStiffenerSet"/>).</summary>
+        private void BuildStiffeners(Inst m)
+        {
+            double tw = m.Sec.WebThickness > 0 ? m.Sec.WebThickness : 2 * m.Sec.HalfWidth;
+            double yc = m.Sec.WebCenterY + m.Def.OffsetZ;
+            int k = 0;
+            foreach (var set in m.Def.Stiffeners!)
+            {
+                double legOut = 0, legWeb = 0, t = 0;
+                bool plate = set.PlateWidth > 0 && set.PlateThickness > 0;
+                if (!plate)
+                {
+                    var ad = TrussSections.ParseAngle(set.Angle);
+                    if (ad == null) { Warn($"Truss: stiffeners '{set.Label}' of {m.Mark} - angle '{set.Angle}' not understood; not built."); continue; }
+                    (legOut, legWeb, t) = ad.Value;
+                }
+                if (set.Height <= 0) { Warn($"Truss: stiffeners '{set.Label}' of {m.Mark} - height missing; not built."); continue; }
+                Assumption? asu = set.Unresolved.Length > 0 ? Assumption.UnresolvedDimension(set.Unresolved, "stiffeners as listed") : null;
+                if (asu != null) Warn(set.Unresolved);
+                var mesh = new Mesh();
+                // section in (a along the member, x across the web), extruded along the member y over the height
+                void Prism(IReadOnlyList<Vec2> poly, double d)
+                {
+                    var pl = poly.ToArray();
+                    if (MeshBuilder.SignedArea(pl.ToList()) < 0) Array.Reverse(pl);
+                    var ra = pl.Select(q => m.A + m.Axis * (d + q.X) + m.X * q.Y + m.Y * (yc - set.Height / 2)).ToArray();
+                    MeshBuilder.AddLoft(mesh, pl, new[] { ra, ra.Select(p => p + m.Y * set.Height).ToArray() });
+                }
+                foreach (double d in set.Distances)
+                    foreach (int sx in new[] { -1, 1 })
+                    {
+                        double x0 = sx * tw / 2;
+                        if (plate)
+                        {
+                            Prism(new[] { new Vec2(-set.PlateWidth / 2, x0), new Vec2(set.PlateWidth / 2, x0), new Vec2(set.PlateWidth / 2, x0 + sx * set.PlateThickness), new Vec2(-set.PlateWidth / 2, x0 + sx * set.PlateThickness) }, d);
+                            continue;
+                        }
+                        foreach (int sa in set.PerFace >= 2 ? new[] { -1, 1 } : new[] { 1 })
+                        {
+                            // web leg along +-a from the heel, outstanding leg normal to the web
+                            var poly = new[] { new Vec2(0, x0), new Vec2(sa * legWeb, x0), new Vec2(sa * legWeb, x0 + sx * t), new Vec2(sa * t, x0 + sx * t), new Vec2(sa * t, x0 + sx * legOut), new Vec2(0, x0 + sx * legOut) };
+                            Prism(poly, d);
+                        }
+                    }
+                if (mesh.IsEmpty) continue;
+                k++;
+                string mark = $"{m.Mark}-ST{k}";
+                int n = set.Distances.Count * 2 * (plate ? 1 : Math.Max(1, Math.Min(2, set.PerFace)));
+                Model.Steel.Parts.Add(new SteelPart
+                {
+                    Mark = mark, Category = plate ? PartCategory.SplicePlate : PartCategory.IntermediateStiffener, Assembly = m.Assembly, Mesh = mesh, Material = Material(set.Material), Length = set.Height, Assumption = asu,
+                    Description = $"{(set.Label.Length > 0 ? set.Label : plate ? "web plates" : set.Angle)} x {n} on {m.Mark}",
+                });
+                if (Model.PanelOf.TryGetValue(m.Mark, out var pnl)) Model.PanelOf[mark] = pnl;
+            }
         }
 
         /// <summary>Lacing bars (flat bars in the face plane, zigzag between the rivet lines; double = crossed).</summary>

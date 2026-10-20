@@ -266,6 +266,30 @@ public sealed class TrussMemberDefinition
     public double PlanLength { get; set; }
     public string Unresolved { get; set; } = "";
     public string Source { get; set; } = "";
+    /// <summary>OPTIONAL (null = none, omitted from the .sbm): web stiffeners / web splice plates riveted to the member's web
+    /// (riveted plate girders, floor beams; <see cref="TrussStiffenerSet"/>).</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public List<TrussStiffenerSet>? Stiffeners { get; set; }
+}
+
+/// <summary>
+/// Web stiffeners of a riveted member (generic): at every <see cref="Distances"/> (along the member axis from the START working point, m) on both
+/// faces of the web (section x = +-web thickness / 2), <see cref="PerFace"/> angles (<see cref="Angle"/>, e.g. "L6x4x7/16": the first leg stands out,
+/// the second lies on the web; two per face are placed back to back) or, when <see cref="PlateWidth"/> > 0, a plate PlateWidth (along the member)
+/// x <see cref="PlateThickness"/> (web splice plates). Height <see cref="Height"/> centred on the web (section y), normal to the member axis.
+/// </summary>
+public sealed class TrussStiffenerSet
+{
+    public string Label { get; set; } = "";
+    public string Angle { get; set; } = "";
+    public int PerFace { get; set; } = 1;
+    public double PlateWidth { get; set; }
+    public double PlateThickness { get; set; }
+    public double Height { get; set; }
+    public List<double> Distances { get; set; } = new();
+    public string Material { get; set; } = "";
+    public string Unresolved { get; set; } = "";
+    public string Source { get; set; } = "";
 }
 
 /// <summary>Defaults for the joints without their own <see cref="TrussJointDefinition"/>.</summary>
