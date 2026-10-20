@@ -148,8 +148,8 @@ foreach (var (bname, first, nSpans, planC, planS, planCY) in specs)
     double lbS = tm.Steel.Parts.Where(p => (p.Material ?? "").Contains("(S)") && !SteelModel.IsTrussNonStructural(p.Category)).Sum(p => p.Mass) * 2.20462262;
     double lbC = tm.Steel.Parts.Where(p => (p.Material ?? "").Contains("(C)") && !SteelModel.IsTrussNonStructural(p.Category)).Sum(p => p.Mass) * 2.20462262;
     double lbOther = tm.Steel.SteelMass * 2.20462262 - lbS - lbC;
-    Row("DIFF", "silicon steel (item 4: girders, floor beams, brackets, end stiffeners, plates)", $"{planS:N0} lb", $"{lbS:N0} lb ({lbS / planS:P0})", "not built: stiffeners, fills, splice plates, connection angles, rivet heads, dams, walkway steel");
-    Row("DIFF", "carbon steel (item 1: stringers, laterals, diaphragms, dams, bracing, castings listed apart)", $"{planC:N0} lb", $"{lbC:N0} lb ({lbC / planC:P0})", "not built: diaphragms (15[ 33.9, 18 WF 64), stringer splices, dam material, shoes are castings (item 9) in the model");
+    Row("DIFF", "silicon steel (item 4: girders, floor beams, brackets, end stiffeners, plates)", $"{planS:N0} lb", $"{lbS:N0} lb ({lbS / planS:P0})", "not built: fills, cover plate / flange angle splices, longitudinal stiffener, connection angles, rivet heads (stiffeners + web splice: connections-ptc.csx)");
+    Row("DIFF", "carbon steel (item 1: stringers, laterals, diaphragms, dams, bracing, castings listed apart)", $"{planC:N0} lb", $"{lbC:N0} lb ({lbC / planC:P0})", "not built: pier diaphragms 18 WF 64, stringer splices / bearings, dam steel beyond the plate band, connection angles; mid-panel 15[ 33.9, dam bands and shoe bodies (C) are in");
     Row("INFO", "other steel in the model (shoes / masonry plates as steel parts)", "-", $"{lbOther:N0} lb");
     Row("INFO", "total", $"{planC + planS:N0} lb", $"{tm.Steel.SteelMass * 2.20462262:N0} lb ({tm.Steel.SteelMass * 2.20462262 / (planC + planS):P1})");
     double cy = tm.SlabArea * (d.Thickness / ft) / 27.0 * 1.0;   // ft2 x ft / 27

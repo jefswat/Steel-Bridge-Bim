@@ -997,6 +997,17 @@ UNRESOLVED FLAG (general, reusable): `SBM.Core/Assumption.cs` `Assumption{Status
   shapes with web across the plane (flanges in planes parallel to the truss, gussets outside them with fills, p.50 / p.60), dimensions interpolated by the printed gross area (flagged). Sheet rules `truss-*`
   in `sheet-links-ptc-delaware-river.json`. Joint sheets p.61-67 are medium confidence (two digit misreads found at U10 / L10 and corrected). Open: expansion dams, partial cover plates / splices / fills, shoe plates,
   stringer bearings (gaps 1.7 - 5.9 in. over the floor beams), rivets, curbs / parapets / walkways.
+- PTC DECK + VISIBLE CONNECTIONS (2026-10-20; TRUSS-DESIGN.md section 9, SUMMARY.md status): build order on `PTC Delaware River Bridge.sbm` = build -> (substructure) ->
+  truss-ptc-arch -> truss-ptc-approach -> girders-ptc -> `deck-ptc.csx` -> `connections-ptc.csx` (the truss / girder scripts rebuild `Truss`). Generic truss inputs (OPTIONAL, omitted
+  when unset; test `TrussTests.DeckItems_SplicePlates_Stiffeners_ShoeMaterial`): `TrussDeckDefinition.HaunchDepth/HaunchBottomWidth/HaunchSideSlope` (thickening under every
+  stringer -> ConcreteModel.Haunches), `TrussDefinition.LineItems` (`TrussLineItemDefinition`: constant (U, V) section swept along the alignment at an offset or ACROSS it at a
+  station, V from the finished grade; concrete -> ConcreteModel.Barriers, steel -> SteelPart of a Category: curbs / parapets, dam plates, gratings, diaphragm channels),
+  `TrussJointDefinition.Plates` (`TrussJointPlate` Top / Bottom / WebInside / WebOutside splice + fill plates, fills on their side's member face, splice plates stacked over
+  them), `TrussMemberDefinition.Stiffeners` (`TrussStiffenerSet`: web stiffener angles / web plates at distances along the member), `TrussShoeDefinition.BodyMaterial`.
+  PTC: 6 3/4 slab to the parapet faces + 1 in thickening, curb + parapet section, aluminum railing (`Railings`), 18 dam bands, walkways (approach CL + pier floor beams, main
+  L11 struts / FB11), main gussets from connections/gussets.csv + 110 chord splice / fill plates (splices.csv), girder stiffeners + web splice, mid-panel 15[33.9 diaphragms.
+  Piers: piers.csv corrected per piers-review.md, legs lofted to the PRINTED base (`Leg(..., baseA, baseB)`). Checks: location 373 PASS / 47 DIFF (section 7 = p.42 quantities by
+  group and item: steel 83.5 % of 39.28 M lb, concrete within 3 %), girders 125 / 6, approach 1014 / 12, arch 381 / 11. Rivets not placed (no pitch / gage; viewport load).
 - Bonner Unit 6 (spans 30-35, 4 x FIB-96, `samples/plans/build-bonner-unit6.csx` -> `Bonner Unit 6 FIB.sbm`, reads docs/plan-data/bonner-b2500/fib-unit6
   CSVs; same -L- placement as Unit 5; terrain + georeference `samples/plans/terrain-bonner.csx`, `docs/plan-data/bonner-b2500/TERRAIN.md`): 24 SpanBeams, per-span layouts (G1 LEFT, CL bearing 1'-2" / 3'-2" bent 29 / 1'-4" bent 35), p439 strand pattern
   read from the VECTOR drawing (72 + 4 slack, 8 draped, 20 debonded), E1/E2/E3 + P sole plates, camber tables, bents 30-35 (level precast cap profile,

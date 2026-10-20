@@ -152,3 +152,44 @@ above); rope 1,745 LF pin to pin vs p.42 1,760 LF.
 ### Status (2026-10-19): approach trusses built
 `samples/plans/truss-ptc-approach.csx` + `check-truss-ptc-approach.csx` (see CLAUDE.md, PTC APPROACH trusses); data in `truss-approach/`. Items listed above that are still open: the 3-span L0 / U0 joint sheet (p.49 says
 'similar to L0' / U0'': p.59 values used), joint sheets p.61-66 only medium confidence, rivet counts, gusset outlines, expansion dams (p.54 / p.68), partial floor beam cover plates and the tapered brackets.
+
+## 9. Deck, visible connections, quantities (2026-10-20; scripts `deck-ptc.csx`, `connections-ptc.csx`)
+Generic additions (all OPTIONAL, omitted from the .sbm when unset; trusses without them build exactly as before; test `TrussTests.DeckItems_SplicePlates_Stiffeners_ShoeMaterial`):
+- `TrussDeckDefinition.HaunchDepth / HaunchBottomWidth / HaunchSideSlope`: slab thickening under every stringer line (top on the slab soffit, follows the crown;
+  bottom level at the line) -> `ConcreteModel.Haunches` (IFC: second item of the deck IfcSlab).
+- `TrussDefinition.LineItems` (`TrussLineItemDefinition`): constant section (U, V) swept ALONG the alignment at a reference offset (U outward toward `Side`) or
+  ACROSS it at a station (`Transverse`, U along the alignment, rings at the range ends + the crown); V above the finished grade at the reference point (or
+  absolute, `FromGrade = false`). Concrete -> `ConcreteModel.Barriers` (IfcRailing GUARDRAIL / database barrier), steel -> a `SteelPart` of `Category`
+  (`Density` / `NominalWeightLbPerFt`; assembly created by name: JointArmor -> ExpansionJoint kind, railing -> Railing, else InspectionWalkway).
+- `TrussJointDefinition.Plates` (`TrussJointPlate`, faces Top / Bottom / WebInside / WebOutside): splice and fill plates on the chord(s) at a joint, along the
+  mean chord direction, `Offset` + toward the higher station; fills sit on the face of the member on their side, splice plates on the outermost of the chord
+  faces and the fills under them, further splice plates stack. Web plates are one per web (pair). Parts SplicePlate / FillerPlate, panel "Joint n".
+- `TrussMemberDefinition.Stiffeners` (`TrussStiffenerSet`): angles (one or two per web face, first leg out, second on the web) or web plates at distances along
+  the member from its start working point, height centred on the web; parts IntermediateStiffener / SplicePlate.
+- `TrussShoeDefinition.BodyMaterial` (null = cast steel): shoes built up of plates.
+- `TrussBuiltSection.WebOuterX / WebInnerX / WebDepth / WebCenterY` (box sections) for the web faces.
+
+PTC data (every flag names page + reason):
+- Deck (p.107): 6 3/4 slab between the outside faces of the parapets (82'-2), 1 in x 1'-5 thickening with 12:12 sides under every stringer; curb 2'-0 x 9 in +
+  parapet wall 10 in x 1'-9 as one concrete section per side; aluminum railing (p.107 / p.108) as `PedestrianRailingDefinition` per side (oval rail 8 x 5 5/8
+  envelope with the tube mass, cast posts 10 -> 6 in x 7 in equally spaced <= 5'-8 3/4: the per-panel layout of p.108 is flagged). Class A concrete reproduces
+  p.42 item 11 within 3 % in all 7 groups.
+- Expansion dams: one steel band per dam (total width at 68 F x plate thickness, top flush with the grade, curb to curb): sliding plate 8 1/4 x 3/8 at piers
+  1-9 / 28-30 (p.46), fingers 1'-4 1/2 x 3 at piers 10 / 27 (p.54; stations from p.1, flagged), 2'-2 x 3 at 13 / 17 / 24 (p.68), 3'-8 1/2 x 3 1/2 at 20
+  (p.91), 1'-8 x 3 at W22 (p.92). Teeth, edge channels, supports, parapet ends flagged.
+- Walkways: approach units one 2'-0 grating along the CL at the floor beam bottom flange level (through the floor beam manholes, webs not cut) + cross walkways
+  along the pier floor beams (3-span: joints 0, 8, 8'; 4-span: 10, 10'); main span: on the L11 / L11' bottom struts (22'-0) and along FB11 / FB11' (p.103).
+  Grating 7 psf flagged (no weight printed). Girder spans: no walkway sheet (flag; p.42 lists grating for them).
+- Main truss joints: gusset thickness + in-to-in from gussets.csv on 153 joint definitions (no conflict with joints.csv); outlines stay envelopes (drawn,
+  not dimensioned). Chord splices: 110 plate definitions (cover splice plates top + bottom, inside / outside web splice plates, fills with scaled lengths,
+  both halves); 133 callouts without a length (and the inlay plates) not built, flagged.
+- Girder spans: end stiffeners 4-Ls 7x4x3/4 at the CL bearings, 2-Ls 6x4x1/2 at the floor beams, intermediate 2-Ls 6x4x7/16 at 9 / 6 / 6 / 9 equal
+  spaces per panel, web splice 2-Pls 21 x 3/8 at mid-span (heights 9'-4 1/4 / 8'-2 derived, flagged).
+- Stringer diaphragms 15 [ 33.9 at mid-panel in all spans (one continuous channel across the stringer lines, top 3 in. below the stringer tops, flagged).
+- Shoe bodies of plates = carbon steel (only the main L11 shoes are castings, p.96).
+- Rivets are NOT placed: counts are image estimates without pitch / gage per group and would add ~10^5 instances to the viewport.
+
+Quantities (check-ptc-delaware-river.csx section 7, p.42 by span group): structural steel 32.78 M lb of 39.28 M lb = 83.5 % (carbon 72.0 %, silicon
+92.3 %); by group: girder spans 78 %, 3-span units 80 %, 4-span units 80 %, main spans 86.7 %. Concrete within 3 % everywhere; railing LF within 1 % on the
+truss units (girder units short by the abutment wing railing, not modeled); grating 3-span 1,612 / 1,650 SF, 4-span 2,368 / 2,660 SF, main 301 / 3,860 SF.
+Castings: the main span shoe envelopes / sockets are 2.8 x the p.42 figure (envelopes, flagged).
