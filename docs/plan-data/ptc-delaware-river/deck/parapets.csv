@@ -1,0 +1,29 @@
+id,item,location,parameter,value_printed,value_in,page,confidence,note
+P1,curb + parapet,all spans,overall width,2 ft 10 in,34,107,high,"10 in parapet wall (outboard) + 2 ft 0 in curb (inboard); outer face is the 2'-10 mark from the gutter line"
+P2,curb + parapet,all spans,curb face height at gutter line,9 in,9,107,high,"gutter line / W.P. at the top of the 9 in curb face; drawn with 3/4 in radius"
+P3,curb + parapet,all spans,curb top surface,2 ft 0 in wide sloping 1/8 in per ft,24,107,medium,"Section A slope arrow"
+P4,parapet wall,all spans,wall thickness,10 in,10,107,high,"Section A / B"
+P5,parapet wall,all spans,wall height above curb top,1 ft 9 in,21,107,high,"Sections A / B: 1'-9"
+P6,parapet wall,all spans,total concrete height below top,2 ft 7 in,31,107,high,"printed 2'-7 overall from the bottom of the wall (bears on the slab edge) to the top"
+P7,railing,all spans,height of rail above parapet top,1 ft 6 in,18,107,high,"3'-3 above the curb top = 1'-9 + 1'-6"
+P8,railing,all spans,overall height above curb top,3 ft 3 in,39,107,high,
+P9,railing,all spans,rail section,oval aluminum extruded tube 8 in x 5 5/8 in approx,,108,high,"printed 8 in +/- and 5 5/8 in +/-, wall 3/16 in (3/16 and 5/16 printed at the section); ASTM B235 alloy GS10A T6"
+P10,railing post,all spans,post material,aluminum permanent-mold casting ASTM B108-52T alloy 5G70A (356-T6),,108,high,
+P11,railing post,all spans,post base,10 in across the parapet x 7 in along the rail,,108,medium,"detail of parapet post and railing: base 10 in (inside face of parapet to outside) and 7 in; web 3/8 in; hollow cast post width 6 in at the top"
+P12,railing post,all spans,anchoring,2 anchor bolts 1 in dia per post (holes) + 5/8 in dia holes; 1/8 in cotton duck rubber impregnated pad,,108,medium,"aluminum bolts / nuts / washers per the notes"
+P13,railing post,all spans,spacing typical panel 31'-0,5 posts at 5 ft 8 3/4 in = 28 ft 7 3/4 in; 1 ft 2 1/8 in post to joint each end,,107,high,"31'-0 panel (and 30'-5 3/4 panel: 5 @ 5'-7 1/2 = 28'-1 1/2); special panels see p.108"
+P14,railing post,all spans,spacing typical panel 30'-5 3/4,5 posts at 5 ft 7 1/2 in = 28 ft 1 1/2 in,,107,high,
+P15,railing post,expansion pier joints,post spacing at piers 1-9 28-30,5 posts at 5 ft 9 1/2 in = 28 ft 11 1/2 in each side; 1 ft 2 1/8 in end offset; 1 ft 7 7/8 in joint side,,108,medium,"Parapet railing expansion joint at piers 1 to 9 incl. 28, 29, 30"
+P16,railing expansion joint,piers 1-9 28-30,gap at 68 F / full exp / full contr,1 1/2 in / 1 in / 3 in,,108,medium,
+P17,railing expansion joint,pier 10 (27 opposite hand),gap at 68 F / full exp / full contr,1 1/8 in / 1 1/8 in / 1 3/8 in (read),,108,low,"UNRESOLVED (p.108): digits of the pier 10 / W22 gap values are small and crowded; re-read at 400 dpi before use"
+P18,railing expansion joint,piers 13 17 24,gap at 68 F / full exp / full contr,1 ft 7 in / 1 ft 11 3/4 in / 11 1/2 in,,108,medium,"Piers 20 and 24 shown, 13 and 17 opposite hand"
+P19,railing expansion joint,pier 20,gap at 68 F / full exp / full contr,1 ft 7 in / 2 ft 6 in / 5 1/2 in,,108,medium,
+P20,railing expansion joint,W22 main span,"post spacing each side","5 posts at 5 ft 4 7/8 in = 27 ft 0 3/8 in (read); 1 ft 2 1/2 in ends",,108,low,"UNRESOLVED (p.108): spacing digits"
+P21,railing expansion joint,all,packing,square flex graphite packing 1 in x 3/4 in; hand rail ends 1/2 in (typical packing at expansion joint),,108,medium,
+P22,parapet drainage,all spans,openings in curb,"typical drainage openings at 2'-2 and 2'-0 alternating, 4'-2 c-c between opening pairs",,107,low,"Elevation inside face of parapet; opening height not read - UNRESOLVED (p.107): scupper opening size; scupper detail with 1 1/2 in grating on p.108 (cast iron / malleable iron)"
+P23,parapet reinforcing,all spans,bars in parapet,11-#4; #5 @ 9 in; #4 @ 2 1/4 in alt; 3-#4 @ 8 in,,107,medium,"Sections A / B / abutment parapet (p.108): bar sizes read, positions drawn only"
+P24,parapet,at light poles,widened to pole base,"2 ft 7 in deep (along the roadway) x 10 in; additional 8-#4 at light poles",,107,medium,"Sections B / C; light pole anchor bolts 2 per pole; pole spacing along the parapet at the post positions marked on the elevation (spacing not dimensioned on this sheet) - UNRESOLVED (p.107): pole stations (sheet 6 of Contract PN 6, not in the set)"
+P25,parapet,abutments,parapet at east / west abutments,"concrete (Class A) with #5 @ 9, 11-#4, 2 in cover; 1 1/2 in hot poured Para-Plastic joint and 1/2 in premolded filler where specified",,108,medium,"Details of parapet at abutments; approach curb and sidewalk seats at east abutment (plan on p.108): seat for approach curb, seat for approach sidewalk. No sidewalk on the bridge itself."
+P26,railing,main span at expansion dam pier 20,steel parapet,"steel parapet corners welded with 3/8 in plates (not concrete at the dam)",,91,medium,"enlarged detail of corners of steel parapet showing welding of 3/8 in plates"
+P27,railing,first panel in girder span at abutments,payment length,"67'-9 CL brg to end of wing wall (west); 34'-9 CL brg to end of wing wall (east)",,108,medium,"railing elevation at the abutments"
+P28,railing,all spans,finish,railing not painted; anodic coating at least 0.0002 in on bolts and nuts,,108,high,"general notes on p.108"
