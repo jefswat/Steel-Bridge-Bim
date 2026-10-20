@@ -283,6 +283,88 @@ public class TrussTests : IDisposable
     }
 
     [Fact]
+    public void DeckItems_SplicePlates_Stiffeners_ShoeMaterial()
+    {
+        var (p, b) = Model();
+        var t = b.Truss!;
+        var json0 = System.Text.Json.JsonSerializer.Serialize(t, new System.Text.Json.JsonSerializerOptions { NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.AllowNamedFloatingPointLiterals });
+        // none of the optional inputs set: nothing new in the file
+        foreach (var key in new[] { "LineItems", "Plates", "Stiffeners", "HaunchDepth", "BodyMaterial" }) Assert.DoesNotContain($"\"{key}\"", json0);
+        double s0 = Ft(100), s1 = s0 + 6 * Panel;
+        // haunch (thickening) under the 3 stringer lines: 1 in deep, 17 in at the bottom, 12:12 sides -> area (17 + 19) / 2 x 1 in2 per line
+        t.Floor!.Deck!.HaunchDepth = In(1); t.Floor.Deck.HaunchBottomWidth = In(17); t.Floor.Deck.HaunchSideSlope = 1;
+        // concrete curb along the right edge (12 x 9 in), steel plate across at mid-length (24 x 1 in, curb to curb)
+        t.LineItems = new()
+        {
+            new TrussLineItemDefinition { Name = "curb R", Kind = TrussLineItemKind.Concrete, ReferenceOffset = Ft(12), Side = 1, From = s0, To = s1,
+                Profile = { new TrussUV(0, 0), new TrussUV(In(12), 0), new TrussUV(In(12), In(9)), new TrussUV(0, In(9)) } },
+            new TrussLineItemDefinition { Name = "dam", Kind = TrussLineItemKind.Steel, Category = PartCategory.JointArmor, Transverse = true, Station = s0 + 3 * Panel, From = -Ft(12), To = Ft(12),
+                Profile = { new TrussUV(-In(12), -In(1)), new TrussUV(In(12), -In(1)), new TrussUV(In(12), 0), new TrussUV(-In(12), 0) }, Unresolved = "UNRESOLVED (p.0): dam - test." },
+        };
+        // splice plates at L3 (chord L2-L3 / L3-L4 box): fill on top of the left member, splice plate over it, web splice inside the webs
+        t.Joints.Add(new TrussJointDefinition { Point = "L3", Plane = "N", Plates = new()
+        {
+            new TrussJointPlate { Face = TrussPlateFace.Top, Width = In(18), Thickness = In(0.5), Length = In(24), Label = "spl" },
+            new TrussJointPlate { Face = TrussPlateFace.Top, Width = In(18), Thickness = In(0.25), Length = In(10), Offset = -In(5), Fill = true, Label = "fill" },
+            new TrussJointPlate { Face = TrussPlateFace.WebInside, Width = In(16), Thickness = In(0.5), Length = In(30), Label = "web spl" },
+        } });
+        // stiffeners on a plate girder member (H, web vertical): 3 pairs of L6x4x1/2 + one web splice plate pair
+        t.Sections.Add(new TrussSectionDefinition { Name = "GIR", Kind = TrussSectionKind.H, WebVertical = true, WebDepth = In(60), WebPlies = { new TrussPly(In(60), In(0.5)) }, Angle = "L6x6x1/2" });
+        t.Members.Add(new TrussMemberDefinition { Name = "GIR", From = "L0", To = "L6", Plane = "N", Section = "GIR", Role = TrussMemberRole.Girder, OffsetZ = -Ft(10), Stiffeners = new()
+        {
+            new TrussStiffenerSet { Angle = "L6x4x1/2", Height = In(48), Distances = { Ft(10), Ft(20), Ft(30) } },
+            new TrussStiffenerSet { PlateWidth = In(20), PlateThickness = In(0.375), Height = In(40), Distances = { 3 * Panel } },
+        } });
+        t.Shoes[0].BodyMaterial = "S";
+        var bm = Regen(p);
+        var c = bm.Concrete!;
+        Assert.NotNull(c.Haunches);
+        // top on the slab soffit (follows the crown of the alignment's cross slope), bottom level at the line: area by the shoelace formula
+        var al = p.Alignments[0];
+        double Area(double o)
+        {
+            double sm = s0 + Panel, wt = In(9.5), wb = In(8.5), T = In(8);
+            var q = new[] { (o - wt, al.ElevationAt(sm, o - wt) - T), (o - wb, al.ElevationAt(sm, o) - T - In(1)), (o + wb, al.ElevationAt(sm, o) - T - In(1)), (o + wt, al.ElevationAt(sm, o + wt) - T) };
+            double a = 0; for (int i = 0; i < 4; i++) { var (x0, y0) = q[i]; var (x1, y1) = q[(i + 1) % 4]; a += x0 * y1 - x1 * y0; }
+            return Math.Abs(a) / 2;
+        }
+        Assert.Equal((Area(-Ft(8)) + Area(0) + Area(Ft(8))) * 6 * Panel, c.HaunchVolume, 6);
+        var curb = Assert.Single(c.Barriers);
+        Assert.Equal("curb R", curb.Name);
+        Assert.Equal(In(12) * In(9) * 6 * Panel, Math.Abs(curb.Mesh.Volume()), 6);
+        var st = bm.Steel!;
+        var dam = st.Parts.Single(x => x.Mark == "dam");
+        Assert.Equal(In(24) * In(1) * Ft(24), dam.Volume, 6);
+        Assert.NotNull(dam.Assumption);
+        Assert.Contains(st.Assemblies, a => a.Kind == AssemblyKind.ExpansionJoint);
+        // dam top flush with the grade at the CL
+        Assert.Equal(Ft(100), dam.Mesh.Bounds().Max.Z, 6);
+        var spl = st.Parts.Where(x => x.Category == PartCategory.SplicePlate && x.Mark.StartsWith("N-SPL3")).ToList();
+        var fill = st.Parts.Single(x => x.Category == PartCategory.FillerPlate);
+        Assert.Equal(2, spl.Count);
+        Assert.Equal(In(18) * In(0.25) * In(10), fill.Volume, 9);
+        var box = TrussSections.Build(t.Section("BOX")!);
+        double ztop = bm.Steel!.Truss!.Point("N", "L3")!.World.Z + box.YMax;
+        var top = spl.Single(x => x.Description.StartsWith("spl "));
+        Assert.Equal(ztop + In(0.25), top.Mesh.Bounds().Min.Z, 6);     // on the fill
+        Assert.Equal(In(18) * In(0.5) * In(24), top.Volume, 9);
+        var web = spl.Single(x => x.Description.StartsWith("web spl"));
+        Assert.Equal(2 * In(16) * In(0.5) * In(30), web.Volume, 9);   // one plate per web
+        Assert.Equal(3, bm.Steel.Truss.SplicePlates);
+        var stf = st.Parts.Where(x => x.Mark.StartsWith("N-GIR-ST")).ToList();
+        Assert.Equal(2, stf.Count);
+        var ang = TrussSections.ParseAngle("L6x4x1/2")!.Value;
+        double angArea = (ang.a + ang.b - ang.t) * ang.t;
+        Assert.Equal(3 * 2 * angArea * In(48), stf.Single(x => x.Category == PartCategory.IntermediateStiffener).Volume, 9);
+        Assert.Equal(2 * In(20) * In(0.375) * In(40), stf.Single(x => x.Category == PartCategory.SplicePlate).Volume, 9);
+        Assert.Contains("(S)", st.Parts.Single(x => x.Mark == "SHOE-N-L0-BODY").Material);
+        // round trip keeps the new inputs
+        var p2 = BridgeProject.FromJson(p.ToJson());
+        Assert.Equal(2, p2.Bridges[0].Truss!.LineItems!.Count);
+        Assert.Equal(Regen(p).Steel!.Parts.Count, Regen(p2).Steel!.Parts.Count);
+    }
+
+    [Fact]
     public void FileRoundTrip_AndExistingModelsUnchanged()
     {
         var (p, b) = Model();

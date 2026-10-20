@@ -43,6 +43,10 @@ public sealed class TrussDefinition
     public string PlanSteelWeightSource { get; set; } = "";
     /// <summary>Plan items that are open (each an UNRESOLVED warning, text built with <c>UnresolvedFlag.Text</c>).</summary>
     public List<string> Unresolved { get; set; } = new();
+    /// <summary>OPTIONAL (null = none, omitted from the .sbm): constant-section items swept along the alignment (curbs / parapets, walkway gratings,
+    /// stringers and hand rails) or across it at a station (expansion dam plates), positioned from the finished grade (<see cref="TrussLineItemDefinition"/>).</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public List<TrussLineItemDefinition>? LineItems { get; set; }
 
     public TrussSectionDefinition? Section(string name) => Sections.FirstOrDefault(s => string.Equals(s.Name, name, StringComparison.OrdinalIgnoreCase));
     public TrussPlaneDefinition? Plane(string name) => Planes.FirstOrDefault(s => string.Equals(s.Name, name, StringComparison.OrdinalIgnoreCase));
@@ -262,6 +266,30 @@ public sealed class TrussMemberDefinition
     public double PlanLength { get; set; }
     public string Unresolved { get; set; } = "";
     public string Source { get; set; } = "";
+    /// <summary>OPTIONAL (null = none, omitted from the .sbm): web stiffeners / web splice plates riveted to the member's web
+    /// (riveted plate girders, floor beams; <see cref="TrussStiffenerSet"/>).</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public List<TrussStiffenerSet>? Stiffeners { get; set; }
+}
+
+/// <summary>
+/// Web stiffeners of a riveted member (generic): at every <see cref="Distances"/> (along the member axis from the START working point, m) on both
+/// faces of the web (section x = +-web thickness / 2), <see cref="PerFace"/> angles (<see cref="Angle"/>, e.g. "L6x4x7/16": the first leg stands out,
+/// the second lies on the web; two per face are placed back to back) or, when <see cref="PlateWidth"/> > 0, a plate PlateWidth (along the member)
+/// x <see cref="PlateThickness"/> (web splice plates). Height <see cref="Height"/> centred on the web (section y), normal to the member axis.
+/// </summary>
+public sealed class TrussStiffenerSet
+{
+    public string Label { get; set; } = "";
+    public string Angle { get; set; } = "";
+    public int PerFace { get; set; } = 1;
+    public double PlateWidth { get; set; }
+    public double PlateThickness { get; set; }
+    public double Height { get; set; }
+    public List<double> Distances { get; set; } = new();
+    public string Material { get; set; } = "";
+    public string Unresolved { get; set; } = "";
+    public string Source { get; set; } = "";
 }
 
 /// <summary>Defaults for the joints without their own <see cref="TrussJointDefinition"/>.</summary>
@@ -296,6 +324,88 @@ public sealed class TrussJointDefinition
     public List<TrussRivetGroup> Rivets { get; set; } = new();
     /// <summary>No gussets at this point (e.g. a chord splice only).</summary>
     public bool NoGusset { get; set; }
+    public string Unresolved { get; set; } = "";
+    public string Source { get; set; } = "";
+    /// <summary>OPTIONAL (null = none, omitted from the .sbm): splice plates, inlay / web splice plates and fills on the chord(s) at this point
+    /// (<see cref="TrussJointPlate"/>). Built on every plane the joint applies to.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public List<TrussJointPlate>? Plates { get; set; }
+}
+
+/// <summary>Face of a chord a <see cref="TrussJointPlate"/> lies on.</summary>
+public enum TrussPlateFace
+{
+    /// <summary>On the top of the chord (above its top cover plate), across the section.</summary>
+    Top,
+    /// <summary>Under the bottom of the chord.</summary>
+    Bottom,
+    /// <summary>Against the INSIDE face of both webs of a box chord (one plate per web).</summary>
+    WebInside,
+    /// <summary>Against the OUTSIDE face of both webs (one plate per web; under the gussets where they overlap).</summary>
+    WebOutside,
+}
+
+/// <summary>
+/// Splice / fill plate on a chord at a joint (generic riveted splice): rectangular plate <see cref="Width"/> (across the face: section x for Top / Bottom,
+/// section y for the webs) x <see cref="Thickness"/> x <see cref="Length"/> (along the chord), centred <see cref="Offset"/> from the point along the chord
+/// (+ toward the higher station). Plates on one face are stacked outward in list order starting at the face of the chord member(s) that lie under
+/// them (the deeper member wins where two meet), so a fill listed before a splice plate makes up the thickness difference as on the plans.
+/// </summary>
+public sealed class TrussJointPlate
+{
+    public TrussPlateFace Face { get; set; }
+    public double Width { get; set; }
+    public double Thickness { get; set; }
+    public double Length { get; set; }
+    public double Offset { get; set; }
+    /// <summary>Fill plate (PartCategory.FillerPlate) instead of a splice plate.</summary>
+    public bool Fill { get; set; }
+    /// <summary>Plan callout, e.g. "2-Spl. Pls. 24 x 1/2".</summary>
+    public string Label { get; set; } = "";
+    /// <summary>Plan material letter / name (resolved through <see cref="TrussDefinition.Materials"/>).</summary>
+    public string Material { get; set; } = "";
+    public string Unresolved { get; set; } = "";
+    public string Source { get; set; } = "";
+}
+
+public enum TrussLineItemKind { Steel, Concrete }
+
+/// <summary>
+/// Constant-section item swept along the alignment at a reference offset (longitudinal: curb + parapet, walkway grating, walkway stringer, hand rail)
+/// or across it at a station (transverse: expansion dam plates, edge channels). The <see cref="Profile"/> is in (U, V): longitudinal U = horizontal
+/// distance from the reference offset toward <see cref="Side"/>, transverse U = distance along the alignment from <see cref="Station"/>; V = height above
+/// the FINISHED GRADE at the reference point of the ring (plumb, rigid). Concrete items go to the bridge's concrete barriers list (IFC IfcRailing
+/// GUARDRAIL / database "barrier"), steel items are steel parts of <see cref="Category"/> (excluded from the steel weight when the category is railing /
+/// joint hardware) in the assembly <see cref="Assembly"/>.
+/// </summary>
+public sealed class TrussLineItemDefinition
+{
+    public string Name { get; set; } = "";
+    public TrussLineItemKind Kind { get; set; }
+    public Steel.PartCategory Category { get; set; } = Steel.PartCategory.WalkwayPlate;
+    /// <summary>Across the alignment at <see cref="Station"/> (between offsets <see cref="From"/> and <see cref="To"/>) instead of along it.</summary>
+    public bool Transverse { get; set; }
+    /// <summary>Longitudinal: offset of the reference line (m, right +). Ignored when transverse.</summary>
+    public double ReferenceOffset { get; set; }
+    /// <summary>Transverse: station of the reference line.</summary>
+    public double Station { get; set; }
+    /// <summary>Range: stations (longitudinal) or offsets (transverse).</summary>
+    public double From { get; set; }
+    public double To { get; set; }
+    /// <summary>Longitudinal: +1 = U toward the right of the alignment, -1 = toward the left (mirrored profile).</summary>
+    public int Side { get; set; } = 1;
+    /// <summary>Closed section polygon (U, V), meters.</summary>
+    public List<TrussUV> Profile { get; set; } = new();
+    /// <summary>V measured from the finished grade at the reference point (true) or from the absolute elevation 0 (false).</summary>
+    public bool FromGrade { get; set; } = true;
+    public string Material { get; set; } = "";
+    /// <summary>Nominal weight (lb/ft) when the solid is an envelope (grating, rope); 0 = solid x density.</summary>
+    public double NominalWeightLbPerFt { get; set; }
+    /// <summary>Density (kg/m3) of a non-steel item (aluminum 2700); 0 = steel.</summary>
+    public double Density { get; set; }
+    /// <summary>Steel assembly mark (created when missing) and its description.</summary>
+    public string Assembly { get; set; } = "DECK-ITEMS";
+    public string AssemblyDescription { get; set; } = "";
     public string Unresolved { get; set; } = "";
     public string Source { get; set; } = "";
 }
@@ -362,6 +472,14 @@ public sealed class TrussDeckDefinition
     public double ConcreteStrengthKsi { get; set; } = 3;
     public string Unresolved { get; set; } = "";
     public string Source { get; set; } = "";
+    /// <summary>OPTIONAL (0 = none, omitted from the .sbm): slab thickening under every stringer line (haunch depth below the slab bottom),
+    /// its width at the bottom and side slope (horizontal per vertical). Built as the deck's haunch body.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public double HaunchDepth { get; set; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public double HaunchBottomWidth { get; set; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public double HaunchSideSlope { get; set; }
 }
 
 /// <summary>
@@ -425,6 +543,9 @@ public sealed class TrussShoeDefinition
     public double MasonryThickness { get; set; }
     /// <summary>OPTIONAL plan elevation of the masonry plate bottom (bearing seat); NaN = pin - Height.</summary>
     public double SeatElevation { get; set; } = double.NaN;
+    /// <summary>OPTIONAL material of the shoe body (plan letter or name; null = cast steel, omitted from the .sbm), e.g. "C" for shoes built up of plates.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? BodyMaterial { get; set; }
     public int AnchorBolts { get; set; }
     public double AnchorDiameter { get; set; }
     public double AnchorEmbedment { get; set; }

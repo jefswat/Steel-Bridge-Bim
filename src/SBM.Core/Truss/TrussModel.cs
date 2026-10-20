@@ -38,6 +38,8 @@ public sealed class TrussModel
     /// <summary>Truss name (database group).</summary>
     public string Name { get; init; } = "Truss";
     public int Gussets { get; set; }
+    /// <summary>Splice / fill plates built from <see cref="Bridge.TrussJointDefinition.Plates"/>.</summary>
+    public int SplicePlates { get; set; }
     public int Rivets => Steel.Bolts.Count(b => b.Kind == BoltKind.Rivet);
     public double SlabArea { get; set; }
     public List<Diagnostic> Diagnostics => Steel.Diagnostics;

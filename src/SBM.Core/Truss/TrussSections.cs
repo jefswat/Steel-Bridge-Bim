@@ -28,6 +28,11 @@ public sealed class TrussBuiltSection
     public double OuterPly { get; set; }
     /// <summary>Thickness of the web (H / rolled: the web; Box: the plies of one side) - stringer end clearance to a floor beam web.</summary>
     public double WebThickness { get; set; }
+    /// <summary>Box sections: outside / inside face of the web plies (|x|) and the web depth (0 = not a box).</summary>
+    public double WebOuterX { get; set; }
+    public double WebInnerX { get; set; }
+    public double WebDepth { get; set; }
+    public double WebCenterY { get; set; }
     /// <summary>UNRESOLVED dimension text (null = fully dimensioned).</summary>
     public string? Flag { get; set; }
     public List<string> Notes { get; } = new();
@@ -131,6 +136,7 @@ public static class TrussSections
             r.Pieces.Add(new(Rect(-w / 2, w / 2, -d / 2, d / 2), $"envelope {L(w)} x {L(d)}"));
             r.Flag ??= $"UNRESOLVED: section {s.Name} ({s.Kind}) input incomplete - envelope {L(w)} x {L(d)} built.";
         }
+        r.WebCenterY = -s.WorkingLineOffset;
         if (s.WorkingLineOffset != 0)
             for (int i = 0; i < r.Pieces.Count; i++)
                 r.Pieces[i] = r.Pieces[i] with { Polygon = r.Pieces[i].Polygon.Select(p => new Vec2(p.X, p.Y - s.WorkingLineOffset)).ToArray() };
@@ -168,6 +174,7 @@ public static class TrussSections
         else if (s.WebsBackToBack > 0) outer = s.WebsBackToBack / 2 + tReach;
         else return;
         r.WebThickness = tw;
+        r.WebOuterX = outer; r.WebInnerX = outer - tw; r.WebDepth = d;
         double angleFace = outer - tReach;
         foreach (int sg in new[] { -1, 1 })
         {

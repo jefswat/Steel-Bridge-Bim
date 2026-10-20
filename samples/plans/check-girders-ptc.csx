@@ -113,7 +113,10 @@ foreach (var (bname, first, nSpans, planC, planS, planCY) in specs)
     Cmp("S1 to S2 6'-1", FtIn(6, 1), Math.Abs(sl[0].Offset - sl[1].Offset) / ft, 0.0005, " ft", dec: 4);
     Cmp("outer stringer lines S2 to S2: 8 spaces @ 8'-3 = 66'-0", 66, Math.Abs(sl[1].Offset - sl[9].Offset) / ft, 0.0005, " ft");
     var d = t.Floor.Deck!;
-    Cmp("slab: curb to curb 76'-6", 76.5, (d.RightOffset - d.LeftOffset) / ft, 0.0005, " ft");
+    var curbs = (t.LineItems ?? new()).Where(li => li.Name.EndsWith("curb + parapet")).ToList();
+    if (curbs.Count == 2) Cmp("slab: curb to curb 76'-6 (curb faces, deck-ptc.csx)", 76.5, Math.Abs(curbs[1].ReferenceOffset - curbs[0].ReferenceOffset) / ft, 0.0005, " ft");
+    else Cmp("slab: curb to curb 76'-6 (no curbs: slab edges)", 76.5, (d.RightOffset - d.LeftOffset) / ft, 0.0005, " ft");
+    Cmp("slab: outside to outside of the parapets 82'-2 (p.11 / p.38 / p.107)", 82 + 2.0 / 12, (d.RightOffset - d.LeftOffset) / ft, 0.0005, " ft", dec: 4);
 
     // 4. shoes vs the p.43 bottom-of-shoe table
     Print("--- 4. shoes (p.43 girder profile: bottom of shoe elevations at the bridge seats; p.44 W.P. to the masonry plate bottom 2'-0 1/2)");
@@ -145,12 +148,13 @@ foreach (var (bname, first, nSpans, planC, planS, planCY) in specs)
     double lbS = tm.Steel.Parts.Where(p => (p.Material ?? "").Contains("(S)") && !SteelModel.IsTrussNonStructural(p.Category)).Sum(p => p.Mass) * 2.20462262;
     double lbC = tm.Steel.Parts.Where(p => (p.Material ?? "").Contains("(C)") && !SteelModel.IsTrussNonStructural(p.Category)).Sum(p => p.Mass) * 2.20462262;
     double lbOther = tm.Steel.SteelMass * 2.20462262 - lbS - lbC;
-    Row("DIFF", "silicon steel (item 4: girders, floor beams, brackets, end stiffeners, plates)", $"{planS:N0} lb", $"{lbS:N0} lb ({lbS / planS:P0})", "not built: stiffeners, fills, splice plates, connection angles, rivet heads, dams, walkway steel");
-    Row("DIFF", "carbon steel (item 1: stringers, laterals, diaphragms, dams, bracing, castings listed apart)", $"{planC:N0} lb", $"{lbC:N0} lb ({lbC / planC:P0})", "not built: diaphragms (15[ 33.9, 18 WF 64), stringer splices, dam material, shoes are castings (item 9) in the model");
+    Row("DIFF", "silicon steel (item 4: girders, floor beams, brackets, end stiffeners, plates)", $"{planS:N0} lb", $"{lbS:N0} lb ({lbS / planS:P0})", "not built: fills, cover plate / flange angle splices, longitudinal stiffener, connection angles, rivet heads (stiffeners + web splice: connections-ptc.csx)");
+    Row("DIFF", "carbon steel (item 1: stringers, laterals, diaphragms, dams, bracing, castings listed apart)", $"{planC:N0} lb", $"{lbC:N0} lb ({lbC / planC:P0})", "not built: pier diaphragms 18 WF 64, stringer splices / bearings, dam steel beyond the plate band, connection angles; mid-panel 15[ 33.9, dam bands and shoe bodies (C) are in");
     Row("INFO", "other steel in the model (shoes / masonry plates as steel parts)", "-", $"{lbOther:N0} lb");
     Row("INFO", "total", $"{planC + planS:N0} lb", $"{tm.Steel.SteelMass * 2.20462262:N0} lb ({tm.Steel.SteelMass * 2.20462262 / (planC + planS):P1})");
     double cy = tm.SlabArea * (d.Thickness / ft) / 27.0 * 1.0;   // ft2 x ft / 27
-    Row("INFO", "deck slab concrete (7 3/4 envelope incl. the haunch, between the curbs) vs item 11 Class A (also curbs, parapets, end blocks, dams)", $"{planCY:N0} CY", $"{(tm.SlabArea / (ft * ft)) * (d.Thickness / ft) / 27:N0} CY");
+    double cyDeck = ((bm.Concrete?.DeckVolume ?? 0) + (bm.Concrete?.HaunchVolume ?? 0) + (bm.Concrete?.BarrierVolume ?? 0)) / 0.764554857984;
+    Row(Math.Abs(cyDeck - planCY) <= 0.03 * planCY ? "PASS" : "DIFF", "deck concrete: slab 6 3/4 + thickening + curbs / parapets (deck-ptc.csx) vs item 11 Class A (3 %)", $"{planCY:N0} CY", $"{cyDeck:N0} CY ({cyDeck / planCY:P1})");
     Row("INFO", "generator diagnostics", "-", $"{rep.Warnings.Count(w => w.StartsWith(bname))} warnings, {rep.Errors.Count(e => e.StartsWith(bname))} errors");
 }
 // 6. between the two bridges

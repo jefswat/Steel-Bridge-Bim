@@ -34,8 +34,10 @@ Gutter profile = the printed profile of the PTC model; the girder is the straigh
 
 ## UNRESOLVED / flagged (each with page + reason in the model; none adjusted)
 - (resolved 2026-10-20, user decision) top cover plate 86'-0 as printed on p.43 / p.44: no conflict, no flag.
-- F.L. cover plate splice (CL splice 37'-0 + 6'-0 extra material), web / end stiffeners (4-Ls 7x4x3/4 + fills; 2-Ls 6x4x7/16 pairs 9 / 6 / 6 / 9
-  equal spaces per panel), long stiffeners, rivets (1" carbon, 1 1/8 H.S. in tension plates), girder camber (1 1/4" / 2") not built.
+- F.L. cover plate splice (CL splice 37'-0 + 6'-0 extra material), stiffener fills / crimps, long stiffeners, rivets (1" carbon, 1 1/8 H.S. in tension
+  plates), girder camber (1 1/4" / 2") not built. (2026-10-20, connections-ptc.csx: end stiffeners 4-Ls 7x4x3/4, 2-Ls 6x4x1/2 at the floor beams,
+  intermediate 2-Ls 6x4x7/16 at 9 / 6 / 6 / 9 equal spaces per panel and the mid-span web splice 2-Pls 21 x 3/8 ARE built, layout / heights flagged;
+  deck, curbs, parapets, railing and the sliding-plate dams by deck-ptc.csx; check 125 PASS / 6 DIFF.)
 - Floor beam / bracket connection angles, fills, B1 taper (constant 6'-3 1/2 depth, outer end = S1 + 6"), stringer splices / bearings / diaphragms
   (15[ 33.9, 18 WF 64), laterals (ST 6 WF 29 = AISC WT6x29, plane = top of the floor beam covers, gussets / tension plates not built).
 - Spans 10 / 28: floor beam spacing (equal spaces), girder ends and end details on sheet 9 (not read); spans 28-31 fixed end assumed EAST (mirror).

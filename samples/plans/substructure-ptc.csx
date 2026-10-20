@@ -69,19 +69,24 @@ List<FootingPoint> Stadium(double cx, double r, double nc, int n = 24)
     return l;
 }
 // tapered leg: right leg (sg = +1) has the vertical (inner) face at S = so - a, the outer face (S = so at the top) leans out by r per unit drop; across N both faces lean
-PlanSolidDefinition Leg(string name, int sg, double so, double a, double b, double nc, double zTop, double zBot, double r, string src, double nHi = double.NaN, bool bothFaces = false)
+// baseA / baseB (> 0) = the PRINTED shaft size at the footing top (across / along; piers.csv base_*_printed, piers-review.md): the plan dimension governs over
+// the 1/4in per 12in batter (they differ by up to 3/8in from rounding), so the faces run straight from the printed top to the printed base.
+PlanSolidDefinition Leg(string name, int sg, double so, double a, double b, double nc, double zTop, double zBot, double r, string src, double nHi = double.NaN, bool bothFaces = false,
+    double baseA = 0, double baseB = 0)
 {
     double dzB = zTop - zBot;
     List<FootingPoint> At(double z)
     {
-        double dz = zTop - z, e = r * dz;
+        double dz = zTop - z, e = r * dz, t = dzB > 0 ? dz / dzB : 0;
+        double eA = baseA > 0 ? (bothFaces ? (baseA - a) / 2 : baseA - a) * t : e;   // growth of the leaning across face(s)
+        double eB = baseB > 0 ? (baseB - b) / 2 * t : e;                              // growth of each along face
         double s0, s1;
-        if (bothFaces) { s0 = sg * so - a / 2 - e; s1 = sg * so + a / 2 + e; }
-        else if (sg > 0) { s0 = so - a; s1 = so + e; }
-        else { s0 = -so - e; s1 = -so + a; }
-        return Rect(s0, s1, nc - b / 2 - e, nc + b / 2 + e);
+        if (bothFaces) { s0 = sg * so - a / 2 - eA; s1 = sg * so + a / 2 + eA; }
+        else if (sg > 0) { s0 = so - a; s1 = so + eA; }
+        else { s0 = -so - eA; s1 = -so + a; }
+        return Rect(s0, s1, nc - b / 2 - eB, nc + b / 2 + eB);
     }
-    return Loft(name, SubElementKind.Column, src, Sec(zBot, At(zBot)), Sec(zTop, At(zTop)));
+    return Loft(name, SubElementKind.Column, src + (baseA > 0 ? $" (top {FtIn(a)} x {FtIn(b)}, printed base {FtIn(baseA)} x {FtIn(baseB)})" : ""), Sec(zBot, At(zBot)), Sec(zTop, At(zTop)));
 }
 PlanSolidDefinition Footing(string name, double zBot, double zTop, List<FootingPoint> plan, string src, string flag = "") =>
     new() { Name = name, Kind = SubElementKind.Footing, Source = src, Flag = flag, Sections = { Sec(zBot, plan), Sec(zTop, plan.Select(p => p.Clone()).ToList()) } };
@@ -108,6 +113,7 @@ foreach (var r in csv)
     double seat = D(r[4]), fb = D(r[5]), ft = D(r[6]);
     string fplan = r[7]; double fl = D(r[8]), fw = D(r[9]);
     double so = D(r[10]), a = D(r[11]), b = D(r[12]), capEnd = D(r[13]), capMid = D(r[14]), cl = D(r[15]);
+    double baseA = D(r[16]), baseB = D(r[17]);
     var sd = NewSd();
     string pg = pages;
     switch (cls)
@@ -118,7 +124,7 @@ foreach (var r in csv)
             var ftgPlan = fplan == "A" ? DogBone(80, 24, 8, 8, 22, 0) : Rect(-42.5, 42.5, -8, 8);
             sd.Plan.Solids.Add(Footing("footing", fb, ft, ftgPlan, pg + (fplan == "A" ? " (type A: 80' x 22', end pads 24', 8' transitions, 8' neck, 5' thick)" : " (type B: 85' x 16', 5' thick)")));
             foreach (int sg in new[] { -1, 1 })
-                sd.Plan.Solids.Add(Leg(sg < 0 ? "shaft W" : "shaft E", sg, 29, a, b, 0, seat, ft, TaperApproach, pg, bothFaces: true));
+                sd.Plan.Solids.Add(Leg(sg < 0 ? "shaft W" : "shaft E", sg, 29, a, b, 0, seat, ft, TaperApproach, pg, bothFaces: true, baseA: baseA, baseB: baseB));
             foreach (int sg in new[] { -1, 1 })
                 foreach (int k in new[] { -1, 1 })
                     Seat(sd, $"shoe {(sg < 0 ? "left" : "right")} {(k < 0 ? "back" : "ahead")}", 29 * sg, 1.25 * k, seat, "p.10 / p.37 (shoe lines 58'-0 c.c.); bearings 1'-3 each side of the CL pier: p.42 / p.43 note (simple girder spans)");
@@ -132,8 +138,8 @@ foreach (var r in csv)
             // two tapered legs 58'-0 c.c. with a haunched cap beam between them (p.6-8, p.33-35); outer faces lean 1/4in per 12in, inner faces vertical
             var ftgPlan = Rect(-fl / 2, fl / 2, -fw / 2 + cl, fw / 2 + cl);
             sd.Plan.Solids.Add(Footing("footing", fb, ft, ftgPlan, pg + $" (footing {FtIn(fl)} x {FtIn(fw)}, {FtIn(ft - fb)} thick)"));
-            sd.Plan.Solids.Add(Leg("leg W", -1, so, a, b, cl, seat, ft, TaperApproach, pg));
-            sd.Plan.Solids.Add(Leg("leg E", 1, so, a, b, cl, seat, ft, TaperApproach, pg));
+            sd.Plan.Solids.Add(Leg("leg W", -1, so, a, b, cl, seat, ft, TaperApproach, pg, baseA: baseA, baseB: baseB));
+            sd.Plan.Solids.Add(Leg("leg E", 1, so, a, b, cl, seat, ft, TaperApproach, pg, baseA: baseA, baseB: baseB));
             double si = so - a;
             sd.Plan.Solids.Add(new PlanSolidDefinition
             {
