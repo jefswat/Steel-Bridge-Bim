@@ -1301,6 +1301,7 @@ public static class IfcExporter
             // product shape pointing at the type's shared mapped representation.
             var types = new Dictionary<(int, long, long, long), (int type, int rep, List<int> occ)>();
             int boltNo = 0;
+            var fastenerStatus = new Dictionary<SBM.Core.Assumption, List<int>>();
             var fasteners = steel.Bolts.Select(b => (kind: b.Kind == BoltKind.Anchor ? 1 : b.Kind == BoltKind.Rivet ? 4 : b.Material != null ? 3 : 0, frame: b.Frame, grip: b.Grip, len: b.Length, asm: b.Assembly, bolt: (BoltInstance?)b))
                 .Concat(steel.Studs.Select(s => (kind: 2, frame: s.Frame, grip: 0.0, len: s.Length, asm: s.Assembly, bolt: (BoltInstance?)null)))
                 .ToList();
@@ -1316,7 +1317,7 @@ public static class IfcExporter
                     _ => ("Bolt", boltRef is { Diameter: > 0 } ? boltRef.Diameter : steel.Bolt.Diameter, ".BOLT.", (steel.BoltGrade.StartsWith("ASTM") ? steel.BoltGrade : $"ASTM F3125 Gr. {steel.BoltGrade}")),
                 };
                 var k2 = (kind, (long)Math.Round(bolt.Grip * 1e5), (long)Math.Round(bolt.Length * 1e5),
-                    kind == 1 ? (long)Math.Round(boltRef!.Diameter * 1e5 + boltRef.Embedment * 1e9 + boltRef.TopHeight * 1e12) : kind is 0 or 3 or 4 ? (long)Math.Round(dia * 1e5) : 0L);
+                    kind == 1 ? (long)Math.Round(boltRef!.Diameter * 1e5 + boltRef.Embedment * 1e9 + boltRef.TopHeight * 1e12) : kind == 4 ? (long)Math.Round(dia * 1e5) + StableHash(mat) % 9973 * 10_000_000L : kind is 0 or 3 ? (long)Math.Round(dia * 1e5) : 0L);
                 if (!types.TryGetValue(k2, out var ty))
                 {
                     var mesh = kind switch
@@ -1367,7 +1368,19 @@ public static class IfcExporter
                 int id = w.Add("IFCMECHANICALFASTENER",
                     $"{Guid(IfcKeys.Fastener(bk, kind, bolt.Assembly, boltNo++))},$,{S(name)},$,$,{Ref(lp)},{Ref(pds)},$,$,$,{ptype}");
                 ty.occ.Add(id);
+                if (boltRef?.Assumption is { } fas) { if (!fastenerStatus.TryGetValue(fas, out var fl)) fastenerStatus[fas] = fl = new List<int>(); fl.Add(id); }
                 if (children.TryGetValue(bolt.Assembly, out var list)) list.Add(id);
+            }
+            // flagged fasteners (rivet positions derived, not printed): one SBM_Status set per distinct flag, one relationship to all its fasteners
+            int fsNo = 0;
+            foreach (var (fas, ids) in fastenerStatus)
+            {
+                int q1 = w.Add("IFCPROPERTYSINGLEVALUE", $"'Status',$,IFCLABEL({S(fas.Status)}),$");
+                int q2 = w.Add("IFCPROPERTYSINGLEVALUE", $"'Reason',$,IFCTEXT({S(fas.Reason)}),$");
+                int q3 = w.Add("IFCPROPERTYSINGLEVALUE", $"'Basis',$,IFCTEXT({S(fas.Basis)}),$");
+                int ps = w.Add("IFCPROPERTYSET", $"{Guid($"{bk}/fastenerstatus/{fsNo}")},$,'SBM_Status',$,({Ref(q1)},{Ref(q2)},{Ref(q3)})");
+                w.Add("IFCRELDEFINESBYPROPERTIES", $"{Guid($"{bk}/relfastenerstatus/{fsNo}")},$,$,$,{Refs(ids)},{Ref(ps)}");
+                fsNo++;
             }
             // A type (and a property set) may have only ONE defining relationship (inverse SET [0:1]): never chunk these.
             foreach (var (k2, (type, _, occ)) in types)
@@ -1476,5 +1489,13 @@ public static class IfcExporter
         result.TessellatedSolids = meshParts;
         if (rv != null) { result.PolygonalSolids = rv.FaceSets; result.ChordTolerance = rv.ChordTolerance; }
         return result;
+    }
+
+    /// <summary>Deterministic string hash (FNV-1a; string.GetHashCode is randomized per process).</summary>
+    private static long StableHash(string s)
+    {
+        ulong h = 14695981039346656037UL;
+        foreach (char c in s) { h ^= c; h *= 1099511628211UL; }
+        return (long)(h % 1_000_000_007UL);
     }
 }

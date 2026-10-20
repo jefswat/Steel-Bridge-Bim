@@ -281,6 +281,13 @@ Print("== 7. Quantities vs p.42 by span group (items 1-15; 12 reinforcement not 
         double M(string k) => by.TryGetValue(k, out var l) ? l.Sum(p => p.Mass) * Lb : 0;
         string grp = bn.Replace("PTC ", "");
         double c = M("C"), s = M("S");
+        // rivet heads (rivets-ptc.csx; SteelModel.RivetHeadMass = 2 button heads per rivet, the shank fills its hole): carbon rivets (girder spans, p.43) with the
+        // carbon steel items, high-strength rivets (p.70 / p.50: all 1 / 1 1/8 / 1 1/4 in. truss rivets) with the silicon steel items (assumed: p.42 has no rivet line)
+        var rivets = (bm.Steel?.Bolts ?? new List<SBM.Core.Steel.BoltInstance>()).Where(b => b.Kind == SBM.Core.Steel.BoltKind.Rivet).ToList();
+        double rC = rivets.Where(b => (b.Material ?? "").Contains("carbon")).Sum(b => SBM.Core.Steel.SteelModel.RivetHeadMassOf(b.Diameter)) * Lb;
+        double rS = rivets.Sum(b => SBM.Core.Steel.SteelModel.RivetHeadMassOf(b.Diameter)) * Lb - rC;
+        Print($"INFO  rivets {bn.Replace("PTC ", "")}: {rivets.Count:N0} rivets, heads {rC + rS:N0} lb (carbon {rC:N0} -> item {itC}, high strength {rS:N0} -> item {itS})");
+        c += rC; s += rS;
         Row($"p.42 item {itC} carbon steel, {grp}", c, Plan(itC, col), 0.05 * Plan(itC, col), "lb", $"model {c / Plan(itC, col):P1} of plan; rivet heads, perforations, lacing / connection angles and the parts flagged 'not built' are missing");
         Row($"p.42 item {itS} silicon steel, {grp}", s, Plan(itS, col), 0.05 * Plan(itS, col), "lb", $"model {s / Plan(itS, col):P1} of plan");
         Row($"p.42 items {itC} + {itS} structural steel, {grp}", c + s, Plan(itC, col) + Plan(itS, col), 0.05 * (Plan(itC, col) + Plan(itS, col)), "lb", $"model {(c + s) / (Plan(itC, col) + Plan(itS, col)):P1} of plan");

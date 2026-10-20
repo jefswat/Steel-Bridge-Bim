@@ -1012,7 +1012,7 @@ UNRESOLVED FLAG (general, reusable): `SBM.Core/Assumption.cs` `Assumption{Status
   in `sheet-links-ptc-delaware-river.json`. Joint sheets p.61-67 are medium confidence (two digit misreads found at U10 / L10 and corrected). Open: expansion dams, partial cover plates / splices / fills, shoe plates,
   stringer bearings (gaps 1.7 - 5.9 in. over the floor beams), rivets, curbs / parapets / walkways.
 - PTC DECK + VISIBLE CONNECTIONS (2026-10-20; TRUSS-DESIGN.md section 9, SUMMARY.md status): build order on `PTC Delaware River Bridge.sbm` = build -> (substructure) ->
-  truss-ptc-arch -> truss-ptc-approach -> girders-ptc -> `deck-ptc.csx` -> `connections-ptc.csx` -> `shoes-ptc.csx` -> `walkways-ptc.csx` (the truss / girder scripts rebuild `Truss`; deck-ptc replaces the line items, so walkways-ptc follows it). Generic truss inputs (OPTIONAL, omitted
+  truss-ptc-arch -> truss-ptc-approach -> girders-ptc -> `deck-ptc.csx` -> `connections-ptc.csx` -> `shoes-ptc.csx` -> `walkways-ptc.csx` -> `rivets-ptc.csx` (the truss / girder scripts rebuild `Truss`; deck-ptc replaces the line items, so walkways-ptc follows it). Generic truss inputs (OPTIONAL, omitted
   when unset; test `TrussTests.DeckItems_SplicePlates_Stiffeners_ShoeMaterial`): `TrussDeckDefinition.HaunchDepth/HaunchBottomWidth/HaunchSideSlope` (thickening under every
   stringer -> ConcreteModel.Haunches), `TrussDefinition.LineItems` (`TrussLineItemDefinition`: constant (U, V) section swept along the alignment at an offset or ACROSS it at a
   station, V from the finished grade; concrete -> ConcreteModel.Barriers, steel -> SteelPart of a Category: curbs / parapets, dam plates, gratings, diaphragm channels),
@@ -1028,6 +1028,17 @@ UNRESOLVED FLAG (general, reusable): `SBM.Core/Assumption.cs` `Assumption{Status
   tests `TrussTests.ShoePieces_*`, `LineItemRepeat_*`. PTC: all 100 shoes piece by piece (shoes-ptc.csx), finger dams (two plates + 2 in. teeth @ 4 1/4 + 18 I 70 / 18 [ 58 supports),
   walkways / ladders / platforms (walkways-ptc.csx, p.101-106), abutment wing parapets + railing (deck-ptc). Checks: location 378 / 42, castings main 1.34 x p.42 (was 2.8 x),
   forgings 137 k vs 134 k, structural steel 82.6 % (shoe envelopes no longer counted as carbon plate). Gusset outlines NOT scaled (raster, edges not separable; still envelopes).
+  RIVETS (user decision d39, 2026-10-20; run `rivets-ptc.csx` LAST, after walkways-ptc; re-runnable): generic OPTIONAL inputs `TrussRivetGroup.Distributed` (count per gusset face
+  spread on an even square grid over the gusset outline clipped to the member band (box: web depth; else the in-plane extent), `EdgeDistance` (0 = 1.5 d), nearest the member end
+  first; `Member = "*"` = whole-joint count split by lap area; grid < 3 d -> Info per group + ONE "Truss CHECK rivets" warning per bridge, < 1.6 d = heads overlap warning),
+  `.Material`, `.Unresolved` (-> `BoltInstance.Assumption`, NEW optional: dimension-only flag, IFC one SBM_Status set per distinct flag, DB props status) and
+  `TrussMemberDefinition.RivetLines` (`TrussRivetLine`: shank parallel to section x / y through (X, Y), grip = the connected stack of section pieces present at the station incl.
+  partial cover plates, Pitch / Stagger / FirstFromEnd). Joint rivets are placed AFTER the joint plates (grip = gusset + gusset-to-web-inner-face + WebInside splice plates
+  over the rivet); grips rounded to 1/16". No holes are cut (plates stay solid). Mass: `SteelModel.RivetHeadMass` (2 button-head caps 1.6 d x 0.6 d per rivet; shank not counted)
+  is part of `SteelMass`. Viewport: own detail layer `3D-RIVETS` (instanced per diameter x grip x 40 m tile, VRAM group Bolts; `DetailLayerPrefixes`), projection layer
+  3D-RIVETS; IFC types keyed by diameter + grip + material. PTC: 226,632 rivets (main 56,872, each 3-span 13,880, each 4-span 35,360, girder spans 50,940 / 20,340), heads
+  107.6 k lb; IFC 41 -> 105 MB (1.15 M entities; validate 0 issues); viewport buffers 186 -> 211 MB. Group text -> member mapping, p.70 diameter rules, skipped
+  groups (cover plate splice plan views, member splices, lugs, bracing, stubs) and the third-pass CORRECTION rows: see TRUSS-DESIGN.md section 11.
 - Bonner Unit 6 (spans 30-35, 4 x FIB-96, `samples/plans/build-bonner-unit6.csx` -> `Bonner Unit 6 FIB.sbm`, reads docs/plan-data/bonner-b2500/fib-unit6
   CSVs; same -L- placement as Unit 5; terrain + georeference `samples/plans/terrain-bonner.csx`, `docs/plan-data/bonner-b2500/TERRAIN.md`): 24 SpanBeams, per-span layouts (G1 LEFT, CL bearing 1'-2" / 3'-2" bent 29 / 1'-4" bent 35), p439 strand pattern
   read from the VECTOR drawing (72 + 4 slack, 8 draped, 20 debonded), E1/E2/E3 + P sole plates, camber tables, bents 30-35 (level precast cap profile,

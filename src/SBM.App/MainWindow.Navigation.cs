@@ -36,7 +36,7 @@ namespace SBM.App;
 /// </summary>
 public partial class MainWindow
 {
-    private static readonly string[] DetailLayerPrefixes = { SceneBuilder.BoltLayer, SceneBuilder.StudLayer, SceneBuilder.AnchorLayer, "3D-WELDS", "3D-REBAR" };
+    private static readonly string[] DetailLayerPrefixes = { SceneBuilder.BoltLayer, SceneBuilder.RivetLayer, SceneBuilder.StudLayer, SceneBuilder.AnchorLayer, "3D-WELDS", "3D-REBAR" };
     /// <summary>Detail models (tiles) with their layer and scene-local bounding box.</summary>
     private readonly Dictionary<Element3D, (string layer, Vector3 min, Vector3 max)> _detailBounds = new();
     private bool _navigating;

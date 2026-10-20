@@ -748,8 +748,10 @@ public static class ModelDatabase
                 r.Length = len;
                 r.Box.Add(f.Origin); r.Box.Add(f.Origin + f.Z * len);
                 if (_al != null) { double s = _al.Inverse(new Vec2(f.Origin.X, f.Origin.Y)).Station; SetStation(r, s, s); }
-                r.Props = new Json().Add("diameter", kind is 1 or 4 ? dia : kind == 2 ? steel.StudDiameter : steel.Bolt.Diameter).Add("grip", grip)
-                    .Add("embedment", embed).ToString();
+                var fj = new Json().Add("diameter", kind is 1 or 4 ? dia : kind == 2 ? steel.StudDiameter : steel.Bolt.Diameter).Add("grip", grip)
+                    .Add("embedment", embed);
+                if ((tagObj as BoltInstance)?.Assumption is { } fas) fj.Add("status", fas.Status).Add("reason", fas.Reason).Add("assumed", fas.Basis);
+                r.Props = fj.ToString();
                 _w.Add(r);
             }
             foreach (var bolt in steel.Bolts)

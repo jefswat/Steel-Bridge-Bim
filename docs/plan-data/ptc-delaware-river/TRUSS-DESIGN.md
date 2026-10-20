@@ -226,3 +226,26 @@ PTC (every open item is a flag with page + reason):
   the diagonal ends it cannot be separated at the scan resolution (a test read of L8 p.52 and L10 p.78 gave +-1-2 in. and ambiguous vertices), so the envelopes stay (flagged).
 - Railing check after the main-branch railing base change (upward-facing surfaces only): rail LF and post bottoms unchanged (posts 30.25 in. above the gutter grade = parapet top, all 7 bridges).
 
+
+## 11. Rivets (2026-10-20, user decision d39; script `rivets-ptc.csx`, run last)
+- Counts: connections/gussets.csv image counts per group and gusset FACE (solid = shop, ring = field). Each row is placed on both gusset faces of both trusses, and on both halves
+  of a symmetric unit (data joint n -> n and n'; rows naming a primed joint are used as given). Rows of the third pass replace the whole-joint / sheet-half totals of the same joint
+  (L10, L12-L15, U18-L21 sheet halves, U22 + L22 sheet portions). Multi-joint rows are split equally.
+- Group text -> member: "chord ... left / west" = chord member toward the lower panel number (mirrored in the primed half), "right / east" = higher, "(A / B)" chord fields =
+  field count on the lower-panel member and shop count on the other (as drawn), no side = halves; "diagonal / vertical / hanger" = the named member or the diagonal on that side /
+  the vertical at the joint; rows drawn just outside the gusset (fill / splice blocks, member ends, free ends) are added to that member's lap (flag says so).
+  NOT placed (no part in the model; counts reported per bridge and flagged): flange-plan cover plate splices (338 per face main), member splice details (approach 159 / 386),
+  lug / diaphragm / bracket / strut / shoe connections, secondary angle members, stubs, pin plates, x / star symbol holes.
+- Diameters: p.70 rule for the main truss (chord webs 1 1/4 in. U6-U13, U20-U22, L6-L15, L20-L22, else 1 1/8; web members 1 1/8 except U11-L11 and the U11 ends of L10-U11 /
+  U11-L12 = 1 1/4); approach 1 in. H.S. (p.50); girders 1 in. carbon (p.43). 57 main row placements (rows x halves) carried another size than the p.70 rule (rule used).
+- Positions: count exact, even square grid over the lap the gusset shares with the member (gusset envelope clipped to the member band), 1.5 d edges. DIMENSION-ONLY flag on every
+  rivet (page + reason). Grids under 3 d: main 150 groups (tightest 2.17 d), 3-span 52 (1.71 d), 4-span 166 (1.61 d) - the envelope gussets are smaller than the drawn ones and the
+  dense layers L8 p.52 / L10 p.63 / L20 p.67 are over-counted 15-25 % (flagged). Not adjusted.
+- Girder spans: rule-based lines (p.43 max sealing pitch 6 + 4t, 7 in.): flange angles to web 2 gage lines per vertical leg, cover plates to the horizontal legs 2 lines each side,
+  7 in. pitch, alternate lines staggered 3 1/2 in., 2 in. from the ends; grip follows the partial cover plates. Stiffener, splice, floor beam, lateral rivets not placed.
+- Totals: 226,632 rivets (main 56,872 = 30,104 x 1 1/8 + 26,768 x 1 1/4; 3-span 2 x 13,880; 4-span 2 x 35,360; girders 50,940 + 20,340), heads 107,610 lb.
+  p.42 structural steel: 82.6 % (model on main) -> 84.0 % (run order re-applied: the saved model had lost the mid-panel 15[33.9 diaphragms, +557 k lb) -> 84.3 % with the rivet heads
+  (H.S. heads counted with the silicon items, carbon heads with the carbon items: p.42 has no rivet line - assumption).
+- Corrections of the third pass applied: U0 gusset in-to-in 29 in. (connections-ptc reads the CORRECTION row), approach U20 gusset 5/8 (rivets-ptc, still flagged),
+  shoes-ptc: L20 fixed shoe sole 10 3/16, wings 29 7/8, stems 2'-5 7/8 (both sheets), main L0 rocker wings / stiffeners 1 1/2 thick and base 6 3/4 (stack flag: 1/4 in. over the
+  drawn pin height). Splice-plate corrections L19-L21 / U20-U21 change rows that have no length, so no built plate changes; p.50 splice bars 6 x 1'-8 kept flagged (not built).

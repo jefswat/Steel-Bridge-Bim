@@ -13,7 +13,7 @@ public static class SceneInventory
         _ when layer.StartsWith("3D-DIAPHRAGM", StringComparison.Ordinal) || layer == "3D-UNRESOLVED-DIAPHRAGMS" => VramGroup.Concrete,
         _ when layer.StartsWith("3D-SUB-", StringComparison.Ordinal) || layer is "3D-DRAINAGE" or "3D-SPLASH-BASIN" => VramGroup.Substructure,
         "3D-WELDS" => VramGroup.Welds,
-        SceneBuilder.BoltLayer => VramGroup.Bolts,
+        SceneBuilder.BoltLayer or SceneBuilder.RivetLayer => VramGroup.Bolts,
         SceneBuilder.StudLayer => VramGroup.Studs,
         SceneBuilder.AnchorLayer => VramGroup.AnchorBolts,
         _ when layer.StartsWith("3D-REBAR", StringComparison.Ordinal) => VramGroup.Rebar,
