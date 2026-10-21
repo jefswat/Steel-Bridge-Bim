@@ -788,6 +788,69 @@ public class TrussTests : IDisposable
     }
 
     [Fact]
+    public void BracingCornerClearance_BracingGussets_ClearEndsPlatesAndRivets()
+    {
+        // K of two laterals from the chord points N:L2 / S:L2 to the CL point of strut 3 (the strut passes the apex)
+        (BridgeModel bm, BridgeDefinition b) Build(bool on)
+        {
+            var (p, b) = Model();
+            var t = b.Truss!;
+            t.Points.Add(new TrussPointDefinition("LM3", Ft(100) + 3 * Panel, Ft(60)) { Offset = Half, Planes = new() { "N" } });
+            t.Members.First(m => m.Name == "STRUT3").Section = "PL";
+            t.Members.Add(new TrussMemberDefinition { Name = "KA", From = "N:L2", To = "N:LM3", Section = "PL", Role = TrussMemberRole.LowerLateral });
+            t.Members.Add(new TrussMemberDefinition { Name = "KB", From = "S:L2", To = "N:LM3", Section = "PL", Role = TrussMemberRole.LowerLateral });
+            if (on)
+            {
+                t.JointDefaults.BracingCornerClearance = In(0.5);
+                t.JointDefaults.BracingStackClearance = In(4);
+                t.BracingGussets = new()
+                {
+                    new TrussBracingGussetDefinition { Point = "N:LM3", Thickness = In(0.5), Side = TrussBracingPlateSide.Below, RivetsPerMember = 6, RivetPitch = In(3), RivetGage = In(4), RivetDiameter = In(0.875) },
+                    new TrussBracingGussetDefinition { Point = "N:L2", Thickness = In(0.5), Side = TrussBracingPlateSide.Below, EdgeAngle = "L4x3-1/2x7/16", EdgeRivets = 4, RivetsPerMember = 6,
+                        RivetPitch = In(3), RivetGage = In(4), RivetDiameter = In(0.875), Unresolved = "UNRESOLVED (p.0): test plate - scaled." },
+                };
+            }
+            return (Regen(p), b);
+        }
+        var (off, _) = Build(false);
+        var (on, bOn) = Build(true);
+        var o = new SBM.Core.Checks.ClashOptions();
+        bool Pair(BridgeModel m, string a, string c) => SBM.Core.Checks.SteelClashCheck.Run(m, o).Clashes.Any(x => (x.A.Mark == a && x.B.Mark == c) || (x.A.Mark == c && x.B.Mark == a));
+        // off: the K diagonals overlap each other and the strut at the apex (work point to work point)
+        Assert.True(Pair(off, "KA", "KB") || Pair(off, "KA", "STRUT3"));
+        // on: every corner clear - no overlap among the bracing, nor with the chord joint
+        foreach (var (a, c) in new[] { ("KA", "KB"), ("KA", "STRUT3"), ("KB", "STRUT3") }) Assert.False(Pair(on, a, c), $"{a} x {c}");
+        Assert.DoesNotContain(SBM.Core.Checks.SteelClashCheck.Run(on, o).Clashes, x => (x.A.Mark == "KA" || x.B.Mark == "KA") && (x.A.Kind == "TrussChord" || x.B.Kind == "TrussChord" || x.A.Kind == "TrussGusset" || x.B.Kind == "TrussGusset"));
+        var ka0 = off.Steel!.Truss!.Member("KA")!; var ka1 = on.Steel!.Truss!.Member("KA")!;
+        Assert.True(ka1.CutLength < ka0.CutLength - In(4));
+        // plates: exact extrusions under the members, plate at L2 clear of the joint stack with its edge angle; rivets through plate + member
+        var steel = on.Steel!;
+        var apex = steel.Parts.Single(x => x.Mark == "N-BGLM3");
+        var l2 = steel.Parts.Single(x => x.Mark == "N-BGL2");
+        var ea = steel.Parts.Single(x => x.Mark == "N-BGL2-EA");
+        Assert.Equal(PartCategory.TrussConnectionPlate, apex.Category);
+        Assert.Equal(PartCategory.TrussConnectionAngle, ea.Category);
+        Assert.True(apex.Mesh.HasExactSolids && l2.Mesh.HasExactSolids && ea.Mesh.HasExactSolids);
+        Assert.NotNull(l2.Assumption);
+        double topPl = apex.Mesh.Bounds().Max.Z, botK = steel.Parts.Single(x => x.Mark == "KA").Mesh.Bounds().Min.Z;
+        Assert.InRange(topPl - botK, -1e-4, 1e-4);                                   // plate top on the member bottom (level members)
+        Assert.InRange(apex.Mesh.Bounds().Max.Z - apex.Mesh.Bounds().Min.Z, In(0.5) - 1e-6, In(0.5) + 1e-6);
+        double yN = Half - In(10) - In(0.75);                                         // stack face of the N plane (left = +y): box webs 20 in. out to out + 3/4 gussets
+        Assert.True(l2.Mesh.Bounds().Max.Y <= yN - In(0.25) + 1e-4);
+        Assert.True(ea.Mesh.Bounds().Max.Y <= yN + 1e-4);
+        var bracingRivets = steel.Bolts.Where(x => x.Kind == BoltKind.Rivet && x.Diameter == In(0.875) && x.Assembly.StartsWith("BR-")).ToList();
+        Assert.True(bracingRivets.Count >= 3 * 6, $"{bracingRivets.Count} rivets");
+        Assert.All(bracingRivets, r => Assert.True(r.Grip >= In(7.0 / 16) - 1e-6));
+        // the .sbm stays unchanged without the inputs; round trip with them
+        var json = System.Text.Json.JsonSerializer.Serialize(new TrussDefinition());
+        Assert.DoesNotContain("BracingGussets", json);
+        Assert.DoesNotContain("BracingCornerClearance", json);
+        var p2 = BridgeProject.FromJson(new BridgeProject { Alignments = { new Alignment { Name = "A" } }, Bridges = { bOn } }.ToJson());
+        Assert.Equal(2, p2.Bridges[0].Truss!.BracingGussets!.Count);
+        Assert.Equal(In(4), p2.Bridges[0].Truss!.JointDefaults.BracingStackClearance, 9);
+    }
+
+    [Fact]
     public void FileRoundTrip_AndExistingModelsUnchanged()
     {
         var (p, b) = Model();

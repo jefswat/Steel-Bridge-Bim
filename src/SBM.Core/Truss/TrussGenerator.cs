@@ -227,6 +227,7 @@ public static partial class TrussGenerator
             BuildJoints();
             BuildJointPlates();
             BuildEndConnections();
+            BuildBracingGussets();
             PlaceJointRivets();
             FlushConnectionRivets();
             if (_d.Floor != null) BuildFloor(_d.Floor);
@@ -414,6 +415,9 @@ public static partial class TrussGenerator
                                 double reach = Math.Abs(Vec3.Dot(m.X, c.X)) * m.Sec.HalfWidth + Math.Abs(Vec3.Dot(m.Y, c.X)) * Math.Max(m.Sec.YMax, -m.Sec.YMin);
                                 t = Math.Max(t, (c.Sec.HalfWidth + reach) / k + clr);
                             }
+                        // OPTIONAL: every corner of the end section clear of the joint, the members passing the point and the bracing ending there
+                        if (_d.JointDefaults.BracingCornerClearance > 0 && IsBracing(m.Def.Role) && given == null)
+                            t = Math.Max(t, CornerClearSetback(m, start, pl, pt, _d.JointDefaults.BracingCornerClearance));
                     }
                     if (start) m.SA = t; else m.SB = t;
                 }
