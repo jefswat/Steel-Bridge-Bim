@@ -497,3 +497,64 @@ Results (run order truss-ptc-arch -> ... -> walkways-ptc -> floor-connections-pt
   as the CHECK warning.
 - Open (UNRESOLVED flags): approach 3/4 bent plate and lower angles at the floor beam bottom (p.55), F7 two-web floor beam end at W22 (p.93), suspended bent bottom angles / pin hole,
   floor beam manhole reinforcement plates at the CL (p.55 / p.95), F8 extra angles (p.95), bracing / portal / lateral connections (p.56, p.97-100), stringer bearings / splices.
+
+## 19. Bracing connections, connection fills, stringer seats (step 4, 2026-10-21; script `bracing-ptc.csx`, run after floor-connections-ptc, before rivets-ptc)
+Scope given: bracing / portal / sway / lateral connections (connection plates, angles, fills, rivets) fixing the I022 overlaps; the step 3 clash leftovers; stringer bearings /
+splices / seats; F7 at W22, F5 at L0, F8 at L13, post U11-L11 perforations.
+
+Generic code (all OPTIONAL, omitted from the .sbm when unset; other trusses unchanged; tests `TrussTests.BracingCornerClearance_BracingGussets_ClearEndsPlatesAndRivets`,
+`EndConnection_OutFill_FillsTheStandOffBelowTheGusset`, `StringerSeats_FillTheGapOverTheFloorBeams`; new file `Truss/TrussGeneratorBracing.cs`):
+- `TrussJointDefaults.BracingCornerClearance` (+ `BracingStackClearance` for rule a only): a bracing member end (lateral, strut, sway, portal) stops where EVERY corner of its
+  end section is clear of (a) the truss-plane joint stack (`StackHalf`: gusset inside face + whole gusset stack, or the widest in-plane member; also in-plane members whose axis
+  passes the point, e.g. a sway frame end on a vertical), (b) any member passing near the point (its section box: the earliest time all corners lie beyond ONE face - x, y or
+  the along-axis end; parallel members and clearances over half the member are skipped) and (c) the cross-plane members of equal or higher rank ending at the same point
+  (floor beam / stringer 3 > strut / portal 2 > laterals 1 > sway 0; their box half-infinite from the point). A member steep to a bracing plate defined at the point (a sway
+  diagonal at a lateral plate) also clears the slab of the flatter bracing faces there + the plate + 1 in. (a fitted plate tilts with the chord).
+- `TrussDefinition.BracingGussets` (`TrussBracingGussetDefinition`): at a point ("N:L1"; no plane = every plane), Orientation Horizontal / Transverse / Fitted (at a panel point
+  with an edge angle or several members: the plane through the mean chord direction and the truss normal, so the plate edge runs along the chord; otherwise the plane of the
+  connected members, one member = its own flange plane), Side Below / Above / Both (one plate on the members' common bottom / top face, or both = built-up members with cover
+  plates top and bottom), members = names / marks or automatic (laterals / struts / portals within 30 deg of the plate plane, sway only for transverse plates), outline =
+  given or the convex envelope of the member laps (`Lap` lengthened to the member's rivet run, `Margin`) clipped `Gap` clear of the joint stack and of any other member crossing
+  the plate (a floor beam through a lateral apex, a girder beside a lateral node), `EdgeAngle` on the stack face (heel at the plate's member-side face, first leg up the stack,
+  second on the plate; rivets `EdgeRivets` per leg), rivets per member (`Rivets` by name or `RivetsPerMember`) in 2 or 4 lines (`RivetGage` / `RivetGage2`) at `RivetPitch` from the
+  member's cut end + 1 1/2 d (through members: centred on the point), positions within 1 1/4 d of the plate edge skipped (counted), grips probed (one rivet per hole). `Suffix`
+  for several plates at a point. Parts TrussConnectionPlate / TrussConnectionAngle, panel "Joint n", dimension-only flag from `Unresolved`.
+- `TrussEndConnection.OutFillWidth` / `OutFillPlanThickness`: fills under the outstanding legs where the angle backs (probed on a gusset that ends part way down) stand off the
+  face behind: the gap is probed at 49 levels x 5 points across the fill width; each run of levels with 1 mm - 3 in. gets one fill (one level kept off a contact level at each
+  end), as thick as the smallest gap of the run; the printed fill sum is compared in the Info line.
+- `TrussFloorDefinition.Seats` (`TrussStringerSeatDefinition`) + `TrussStringerLine.SeatWidth`: with stringers on top of the floor beams, one seat plate per stringer line and
+  floor beam crossing: bottom on the highest steel probed under the plate (corners + centre), top on the stringer bottom bevelled to its grade each side of the crossing, exact
+  extrusion (PartCategory.BearingPlate); a gap under `MinGap` builds nothing; a stringer below the floor beam top is reported as CHECK.
+
+PTC data (every scaled value a dimension-only flag with page + reason; nothing adjusted):
+
+| Item | Plan | Model |
+|---|---|---|
+| Approach lateral / strut connections | p.56 TOP / BOTTOM LATERAL DETAILS: 7/16 plates, L 4 x 3 1/2 x 7/16 along the chord joint (L 7 x 4 x 5/8 (S) at the pier joints with the box strut), plate on the strut at the CL apex; 7/8 carbon rivets (p.56 note); p.48 / p.58: 10 per top lateral end, 20 per bottom lateral / strut end, 40 per box strut end | plates under the members' bottom faces (envelope of the laps), edge angles over the plate length, members 4 1/4 in. clear of the stack, 1/2 in. of the strut / floor beam / other bracing; rivets 2 3/4 / 5 1/2 in. from the member CL (14 BP: 4 lines), 3 in. pitch; 140 / 236 plates per 3-span / 4-span unit |
+| Approach strut "6-Riv. (each end)" | p.48 / p.58 stacked dimension lines | 20 used (flag: extent not separable) |
+| Main lateral / strut connections | p.97 / p.98: "2-1/2 Pls." (top and bottom), "2-Ls 7 x 4 x 1/2" along the chord (bent at L15-L17), W.P. line 1'-2 1/2 = gusset face; 1 in carbon rivets (notes) | Fitted plate pairs, edge angle per plate, 18 (struts) / 20 (2-13[ 31.8) / 24 (2-13[ 50) rivets per member per plate, 13 per edge angle leg, 12 per strut at the CL apex; L0 / L11 box struts: one plate pair per lateral, no edge angle (flag) |
+| Main L13 strut | p.95: the floor beam F8 carries the lateral system on its bottom flange (bracing work line, gussets to the flange, 1-Cov. Pl. 18 x 5/8 x 76'-0 + 2-Ls 8 x 4 x 1 x 76'-0) | the 2-18[ 45.8 strut LS-L13 / L13' (from the p.71 diagram) removed; F8 extra angles not built (leg position not given) |
+| Girder-span laterals | p.45: 7/16 Pl. (C) at the floor beam top flange level, fills 13/16 / 7/16, laterals pass under the stringers | tees lowered 3.05 in. (flange top = floor beam top; they crossed the stringer bottoms by 0.59 in.), ends clear of floor beams / girder, 7/16 plate on the lateral flanges at every node, 8 x 1 in rivets per lateral end; plate-to-floor-beam rivets / fills not built |
+| Approach floor beam connection fills | p.50 U2: "2-Fills 12 x 13/16" + "2-Fills 10 x 5/8" below the gusset; p.60 U2: 11 1/2 x 5/8 + 10 x 3/4 | probed fills under the outstanding legs, 4 1/2 in. each side of the web (10 in. across): 3-span 200 fills 7/16 - 2 1/2 in., 4-span 328 fills 9/16 - 2 3/4 in. (printed sums 1 7/16 / 1 3/8); rivets gripping the leg only 1,382 -> 124 (3-span), 2,246 -> 190 (4-span) per unit |
+| Girder corner plate fills | (step 3) | start 3/8 in. beyond the end stiffener leg toe (1/4 left 0.08 in. overlap, 196 rows) |
+| Stringer seats | p.55 bearing details: sole plate bevelled to grade ("Varies") on a bearing plate (3 1/2 x 1 grooved plate at expansion points), 8 1/2 in. wide under the 24 WF, 8 in. under the 21 WF; p.45 / p.94 the same details | one seat 14 in. along the stringer per stringer and floor beam: 550 + 220 (girder spans), 275 (3-span), 451 (4-span), 495 (main); gaps 3/4 - 5 3/4 in.; tension plates (Pl. 14 x 3/4 x 4'-0 / 4'-3), stringer splices, grooved plates not built (flag) |
+| Post U11-L11 access holes | p.81 note: "MANHOLES: for all web members 12 x 20 @ 4'-0 c.c."; covers "(23-12)" | both covers perforated 12 x 20 @ 4'-0, 10 in. clear of the gussets, staggered (flag: positions) |
+| Sway / hanger bracing plates | p.56 / p.48 / p.58 (approach, "14 BP 73 H", 24 / 4 rivets each end), p.97 (main, at L7 only) | members trimmed clear (rule a-c); plates not built (orientation of the plates vs the member flanges not drawn / only one point detailed) |
+| Portal at U11 | p.100: curved knee braces (2-[ 26 b.b., Cov. Pl. 36 1/2, 6 x 6 angles, 1 in rivets) | not built: curve radius / centre and the plate widths along the curve not dimensioned (flag); strut stays the nominal envelope |
+| Floor laterals (span 19) | p.99 not read | X / K members trimmed at their ends only; the X crossing at the floor beams (8 rows, 0.3 in.) and the floor beam crossings (16 rows) remain (flag) |
+| F7 at W22, F5 at L0 | p.93 (two-web floor beam + shear lock), p.73 | not built in this pass (step 3 flags stand) |
+| Wind chord vs suspended floor beams | p.69 elevations vs p.94 floor beam depth | 0.3 in. overlap reported (flag), nothing moved |
+
+Results (run order truss-ptc-arch -> ... -> walkways-ptc -> floor-connections-ptc -> bracing-ptc -> rivets-ptc; "before" = the committed model of step 3):
+- Bracing plates: approach 140 / 236 per unit (+ 94 / 158 edge angles), main 376 (+ 240 edge angles), girder spans 100 + 40; stringer seats 2,717; approach connection fills 1,056.
+- sbm clash (bolts on): 837,236 -> 918,834 rows. NON-BOLT rows 12,442 -> 6,537: TrussBracing x TrussBracing 1,868 -> 8, x TrussGusset 1,190 -> 0, x TrussChord 888 -> 0, x TrussFloorBeam
+  654 -> 16, x TrussStringer 504 -> 0, x TrussGirder 112 -> 0, x TrussConnectionAngle 108 -> 0, x TrussVertical 48 -> 0, x SplicePlate 44 -> 0, x TrussHanger 32 -> 0, x FillerPlate 28 -> 0,
+  IntermediateStiffener x TrussBracing 120 -> 0, x TrussConnectionPlate 196 -> 0, Grating x TrussBracing 116 -> 22; all bracing groups 5,942 -> 225 (left: walkway items vs hanger
+  bracing / floor laterals 193, floor lateral crossings 24, main sway at L8 / L9 vs the top lateral plate 8 rows <= 0.25 in.). New: SolePlate x TrussConnectionPlate 4 (3-span L8 shoe
+  sole vs the bottom lateral plate, 0.5 in.), TrussConnectionPlate x TrussFloorBeam 4 (0.22 in.). Bolt rows 824,794 -> 912,297 (the new rivets through solid plates; Bolt x Bolt
+  1,008 -> 520).
+- Structural steel (check-ptc-delaware-river section 7): 34.54 -> 34.92 M lb = 87.9 % -> 88.9 % of p.42 (girder spans 84.6 -> 85.5 % / 83.0 -> 83.8 %, 3-span 88.1 -> 89.5 % / 87.7 -> 89.1 %,
+  4-span 87.6 -> 88.9 %, main 89.9 -> 90.5 %).
+- Rivets: 399,356 -> 449,796 (girder spans 69,800 -> 71,080 / 27,884 -> 28,396; 3-span 33,208 -> 38,518 each; 4-span 59,778 -> 68,678 each; main 115,700 -> 135,928), heads 170,019 -> 186,682 lb.
+- Checks: main 608 PASS / 11 DIFF / 66 INFO, approach 1796 / 12 / 160, girders 131 / 6 / 14, location 379 / 41 - unchanged. Tests 575 passed.
+- IFC (Parametric): 196.3 -> 223.9 MB, 2.36 M entities; validate_ifc 0 schema + 0 EXPRESS issues (2,000 instances per type).

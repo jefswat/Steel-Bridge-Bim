@@ -1013,7 +1013,7 @@ UNRESOLVED FLAG (general, reusable): `SBM.Core/Assumption.cs` `Assumption{Status
   in `sheet-links-ptc-delaware-river.json`. Joint sheets p.61-67 are medium confidence (two digit misreads found at U10 / L10 and corrected). Open: expansion dams, partial cover plates / splices / fills, shoe plates,
   stringer bearings (gaps 1.7 - 5.9 in. over the floor beams), rivets, curbs / parapets / walkways.
 - PTC DECK + VISIBLE CONNECTIONS (2026-10-20; TRUSS-DESIGN.md section 9, SUMMARY.md status): build order on `PTC Delaware River Bridge.sbm` = build -> (substructure) ->
-  truss-ptc-arch -> truss-ptc-approach -> girders-ptc -> `deck-ptc.csx` -> `connections-ptc.csx` -> `shoes-ptc.csx` -> `walkways-ptc.csx` -> `floor-connections-ptc.csx` -> `rivets-ptc.csx` (the truss / girder scripts rebuild `Truss`; deck-ptc replaces the line items, so walkways-ptc follows it; floor-connections-ptc needs the connections-ptc diaphragms / girder stiffeners). Generic truss inputs (OPTIONAL, omitted
+  truss-ptc-arch -> truss-ptc-approach -> girders-ptc -> `deck-ptc.csx` -> `connections-ptc.csx` -> `shoes-ptc.csx` -> `walkways-ptc.csx` -> `floor-connections-ptc.csx` -> `bracing-ptc.csx` -> `rivets-ptc.csx` (the truss / girder scripts rebuild `Truss`; deck-ptc replaces the line items, so walkways-ptc follows it; floor-connections-ptc needs the connections-ptc diaphragms / girder stiffeners; bracing-ptc needs the floor-connections end connections and removes the main L13 struts). Generic truss inputs (OPTIONAL, omitted
   when unset; test `TrussTests.DeckItems_SplicePlates_Stiffeners_ShoeMaterial`): `TrussDeckDefinition.HaunchDepth/HaunchBottomWidth/HaunchSideSlope` (thickening under every
   stringer -> ConcreteModel.Haunches), `TrussDefinition.LineItems` (`TrussLineItemDefinition`: constant (U, V) section swept along the alignment at an offset or ACROSS it at a
   station, V from the finished grade; concrete -> ConcreteModel.Barriers, steel -> SteelPart of a Category: curbs / parapets, dam plates, gratings, diaphragm channels),
@@ -1091,6 +1091,21 @@ UNRESOLVED FLAG (general, reusable): `SBM.Core/Assumption.cs` `Assumption{Status
   stiffeners now plumb, end stiffener pair straddling the web), main framed 2-Ls 8x4 1/2x3/4 + 2-Fills 11 1/2x3/4 + 38 x 1 1/8 field rivets (p.85; W14 framed to the rigid hanger), suspended
   end plates 25 1/2 x 3/4 + pin plates + edge angles (p.94), stiffeners under every stringer, diaphragm clip angles L4x3 1/2x7/16, 11,250 + 430 access holes cut. Steel 86.2 -> 87.9 % of p.42,
   rivets 280,040 -> 399,356, IFC 126 -> 196 MB (0 issues). Open (flagged): approach bent plate / lower angles, F7 W22 end, suspended bent bottom angles / pin hole, bracing connections.
+  BRACING CONNECTIONS (step 4, 2026-10-21, TRUSS-DESIGN.md section 19; `samples/plans/bracing-ptc.csx`, run after floor-connections-ptc, before rivets-ptc): generic OPTIONAL inputs
+  (omitted when unset) `TrussJointDefaults.BracingCornerClearance` / `BracingStackClearance` (bracing member ends stop with EVERY corner of the end section clear of (a) the truss-plane
+  joint stack (chord / web faces + gusset stack, any in-plane member whose axis passes the point), (b) any member passing near the point (strut through a K apex, floor beam, girder;
+  separating face of its box, parallel members skipped), (c) bracing of equal / higher rank ending there (strut / portal 2 > laterals 1 > sway 0), a member steep to a bracing plate
+  also clears the plate slab), `TrussDefinition.BracingGussets` (`TrussBracingGussetDefinition`: Horizontal / Transverse / Fitted (chord + truss normal at a panel point with an edge angle
+  or several members, else the members' plane) plate or plate pair (`Side` Below / Above / Both) on the members' common face, envelope of the member laps (lap lengthened to the rivet
+  count), clipped clear of the joint stack and of members crossing it, `EdgeAngle` on the stack face, rivets per member in 2 / 4 lines with probed grips, `Suffix` for several plates at a
+  point), `TrussEndConnection.OutFillWidth` / `OutFillPlanThickness` (fills under the outstanding legs where they stand off the face behind: probed per run of levels), `TrussFloorDefinition.Seats`
+  (`TrussStringerSeatDefinition`) + `TrussStringerLine.SeatWidth` (stringer seat plates filling the floor beam to stringer gap, bevelled to grade, BearingPlate). Tests `TrussTests.BracingCornerClearance_*`,
+  `EndConnection_OutFill_*`, `StringerSeats_*`. PTC: approach 7/16 lateral / strut plates + L 4x3 1/2x7/16 / L 7x4x5/8 (S) edge angles, 10 / 20 / 40 x 7/8 rivets per end (p.56, p.48 / p.58);
+  main 2-1/2 Pls + 2-Ls 7x4x1/2, 1 in rivets (p.97 / p.98; L0 / L11 box struts: per-lateral plates, no edge angle); girder spans 7/16 plates, laterals lowered under the stringers (p.45);
+  approach floor beam fills below the gussets (p.50 / p.60); main LS-L13 strut removed (p.95: F8 bottom flange is the strut); stringer seats 14 x 8 1/2 / 8 in. (p.55); post U11-L11 covers
+  perforated 12 x 20 @ 4'-0 (p.81 note). Non-bolt clash rows 12,442 -> 6,537 (bracing groups ~5,900 -> 225); steel 87.9 -> 88.9 % of p.42, rivets 399,356 -> 449,796, IFC 196.3 -> 223.9 MB (0 issues).
+  Open (flagged): sway / hanger bracing plates (approach + main), portal knee braces at U11 (p.100), floor lateral X / K connections (p.99), F7 at W22 (p.93), F5 at L0 (p.73), F8 extra angles,
+  stringer tension plates / splices, the wind chord vs suspended floor beam 0.3 in. overlap.
 - Bonner Unit 6 (spans 30-35, 4 x FIB-96, `samples/plans/build-bonner-unit6.csx` -> `Bonner Unit 6 FIB.sbm`, reads docs/plan-data/bonner-b2500/fib-unit6
   CSVs; same -L- placement as Unit 5; terrain + georeference `samples/plans/terrain-bonner.csx`, `docs/plan-data/bonner-b2500/TERRAIN.md`): 24 SpanBeams, per-span layouts (G1 LEFT, CL bearing 1'-2" / 3'-2" bent 29 / 1'-4" bent 35), p439 strand pattern
   read from the VECTOR drawing (72 + 4 slack, 8 draped, 20 debonded), E1/E2/E3 + P sole plates, camber tables, bents 30-35 (level precast cap profile,

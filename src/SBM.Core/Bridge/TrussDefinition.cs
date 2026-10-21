@@ -52,6 +52,10 @@ public sealed class TrussDefinition
     /// face only (<see cref="Steel.BoltInstance.FlushEnd"/>); one Info line counts them.</summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public bool RivetHeadsFlushAtSolePlates { get; set; }
+    /// <summary>OPTIONAL (null = none, omitted from the .sbm): bracing connection plates (lateral / strut / sway gusset plates) at a point, with an
+    /// optional edge angle onto the truss-plane joint and rivets (<see cref="TrussBracingGussetDefinition"/>).</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public List<TrussBracingGussetDefinition>? BracingGussets { get; set; }
 
     public TrussSectionDefinition? Section(string name) => Sections.FirstOrDefault(s => string.Equals(s.Name, name, StringComparison.OrdinalIgnoreCase));
     public TrussPlaneDefinition? Plane(string name) => Planes.FirstOrDefault(s => string.Equals(s.Name, name, StringComparison.OrdinalIgnoreCase));
@@ -387,6 +391,15 @@ public sealed class TrussEndConnection
     public double FillWidth { get; set; }
     public double FillLength { get; set; }
     public double? FillTop { get; set; }
+    /// <summary>OPTIONAL (0 = none, omitted when 0): fills UNDER THE OUTSTANDING LEGS, <see cref="OutFillWidth"/> wide from the heel outward, where the
+    /// outstanding leg stands off the face it bears on (the angle back lies on a gusset that ends part way down: below it the leg would stand off the
+    /// post / hanger flange). The gap is probed at 25 levels over the angle height; each run of levels with a gap of 1 mm - 3 in. gets one fill, its
+    /// thickness = the smallest gap of the run (the plans print the fill size; <see cref="OutFillPlanThickness"/> is compared, never used).</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public double OutFillWidth { get; set; }
+    /// <summary>Printed fill thickness to compare with the probed gap (0 = not printed); Info line per connection.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public double OutFillPlanThickness { get; set; }
     public double PlateWidth { get; set; }
     public double PlateThickness { get; set; }
     /// <summary>Plate outline (u = distance from the back along the member, v = section y), replacing the PlateWidth x [Top - Length, Top] rectangle.</summary>
@@ -469,6 +482,70 @@ public sealed class TrussJointDefaults
     /// <summary>Why the joint outlines are envelopes (UNRESOLVED text, page + reason); "" = a generic text.</summary>
     public string Unresolved { get; set; } = "";
     public double RivetDiameter { get; set; }
+    /// <summary>OPTIONAL (0 = off, omitted from the .sbm): bracing members (laterals, struts, sway, portal) ending at a point stop with EVERY corner of
+    /// their end section this far clear of (a) the truss-plane joint there (chord / web member faces + the gusset stack), (b) every other member whose
+    /// axis passes the point (a strut through the apex of a K, a floor beam over a sway frame) and (c) the other bracing members ending at the same
+    /// point; the connection plates (<see cref="TrussDefinition.BracingGussets"/>) close the gap. Off = the end at the in-plane member face measured on
+    /// the axis only (corners may overlap).</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public double BracingCornerClearance { get; set; }
+    /// <summary>OPTIONAL (0 = <see cref="BracingCornerClearance"/>, omitted when 0): the clearance to the truss-plane joint stack (rule a) only, e.g. room for
+    /// the edge angle of a bracing plate (<see cref="TrussBracingGussetDefinition.EdgeAngle"/>).</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public double BracingStackClearance { get; set; }
+}
+
+/// <summary>Plane of a bracing connection plate: Horizontal (lateral systems, normal up), Transverse (sway frames / portals: vertical, normal along
+/// the alignment tangent) or Fitted (the plane of the connected members: laterals of an arch chord; one member or parallel members = Horizontal).</summary>
+public enum TrussBracingPlateOrientation { Horizontal, Transverse, Fitted }
+/// <summary>Where the plate lies: against the common BOTTOM / far face of the connected members (Below), against their TOP / near face (Above), or one
+/// plate on each (Both: built-up members with cover plates top and bottom).</summary>
+public enum TrussBracingPlateSide { Below, Above, Both }
+
+/// <summary>
+/// Bracing connection plate (generic, OPTIONAL): at <see cref="Point"/> ("N:L1" = point L1 of plane N; without a plane = every plane that has the point),
+/// one (or, <see cref="Side"/> Both, two) plate(s) <see cref="Thickness"/> thick in the <see cref="Orientation"/> plane, lying on the common face of the
+/// connected members: the members ENDING at the point and the members whose axis PASSES it (<see cref="Members"/> = names / marks; empty = every lateral /
+/// strut / sway / portal member there whose axis lies within 30 deg of the plate plane). Plate frame: horizontal u = alignment tangent, v = left (n x u);
+/// transverse u = left, v = up. Outline = <see cref="Outline"/> (u, v about the point) or the convex envelope of the member laps (<see cref="Lap"/> from each
+/// member's cut end, member width + <see cref="Margin"/>), clipped <see cref="Gap"/> clear of the truss-plane joint stack (chord + gussets) when the point is
+/// a truss panel point. <see cref="EdgeAngle"/> = angle along that stack face (heel on the stack face at the plate's member-side face: first leg up the stack
+/// face toward the members, second leg on the plate; the members must stop clear of it, see <see cref="TrussJointDefaults.BracingCornerClearance"/>) with
+/// <see cref="EdgeRivets"/> per leg. Rivets per member: <see cref="Rivets"/> (count per member name) or <see cref="RivetsPerMember"/>, in lines at
+/// +-<see cref="RivetGage"/> (and +-<see cref="RivetGage2"/>) from the member axis, <see cref="RivetPitch"/> apart from the member's cut end + 1 1/2 d
+/// outward (through members: centred on the point); grip = the contiguous steel along the shank (plate + member face). Parts TrussConnectionPlate /
+/// TrussConnectionAngle (dimension-only flag = <see cref="Unresolved"/>).
+/// </summary>
+public sealed class TrussBracingGussetDefinition
+{
+    public string Point { get; set; } = "";
+    public string Label { get; set; } = "";
+    /// <summary>Mark suffix when several plates are defined at one point (e.g. one per lateral on each side of a deep strut).</summary>
+    public string Suffix { get; set; } = "";
+    public TrussBracingPlateOrientation Orientation { get; set; }
+    public TrussBracingPlateSide Side { get; set; }
+    public double Thickness { get; set; }
+    public List<string> Members { get; set; } = new();
+    /// <summary>Member lap covered by the plate from the member's cut end (m; 0 = 1'-6").</summary>
+    public double Lap { get; set; }
+    /// <summary>Plate edge beyond the member width (m; 0 = 1 1/2").</summary>
+    public double Margin { get; set; }
+    /// <summary>Clear distance between the plate edge and the truss-plane joint stack (m; 0 = 1/4").</summary>
+    public double Gap { get; set; }
+    public List<TrussUV>? Outline { get; set; }
+    public string EdgeAngle { get; set; } = "";
+    public int EdgeRivets { get; set; }
+    public int RivetsPerMember { get; set; }
+    /// <summary>Rivet count per member name (Def.Name or mark), overriding <see cref="RivetsPerMember"/>.</summary>
+    public Dictionary<string, int>? Rivets { get; set; }
+    public double RivetGage { get; set; }
+    public double RivetGage2 { get; set; }
+    public double RivetPitch { get; set; }
+    public double RivetDiameter { get; set; }
+    public string? RivetMaterial { get; set; }
+    public string Material { get; set; } = "";
+    public string Unresolved { get; set; } = "";
+    public string Source { get; set; } = "";
 }
 
 /// <summary>Joint (panel point) detail: gusset plates and rivet groups.</summary>
@@ -739,6 +816,11 @@ public sealed class TrussFloorDefinition
     /// <summary>Clear distance between a stringer end and the floor beam web face (framed stringers).</summary>
     public double StringerEndClearance { get; set; }
     public TrussDeckDefinition? Deck { get; set; }
+    /// <summary>OPTIONAL (null = none, omitted from the .sbm): stringer SEATS where stringers lie on the floor beams (<see cref="StringersOnTop"/>): one plate per
+    /// stringer line and floor beam crossing, filling the gap between the floor beam top (probed: the highest steel under the plate) and the stringer
+    /// bottom, top bevelled to the stringer grade (<see cref="TrussStringerSeatDefinition"/>).</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public TrussStringerSeatDefinition? Seats { get; set; }
     public string Unresolved { get; set; } = "";
     public string Source { get; set; } = "";
 }
@@ -754,9 +836,27 @@ public sealed class TrussStringerLine
     /// <summary>OPTIONAL station limits (null = every floor beam bay).</summary>
     public double? FromStation { get; set; }
     public double? ToStation { get; set; }
+    /// <summary>OPTIONAL seat plate width across this stringer line (m; null = <see cref="TrussStringerSeatDefinition.Width"/>).</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public double? SeatWidth { get; set; }
 }
 
 /// <summary>Deck slab between two alignment offsets and stations; top = finished grade.</summary>
+/// <summary>Stringer seat plates (generic): <see cref="Length"/> along the stringer centred on the floor beam crossing, <see cref="Width"/> across (or the line's
+/// <see cref="TrussStringerLine.SeatWidth"/>); bottom on the highest steel found under the plate (vertical probes at its corners and centre), top on the
+/// stringer bottom flange (bevelled to the stringer grade on each side of the crossing). A gap under <see cref="MinGap"/> builds nothing (the stringer
+/// bears directly); a stringer below the floor beam top is reported. Part category BearingPlate (exact extrusion).</summary>
+public sealed class TrussStringerSeatDefinition
+{
+    public double Length { get; set; }
+    public double Width { get; set; }
+    public double MinGap { get; set; } = 0.0016;
+    public string Label { get; set; } = "";
+    public string Material { get; set; } = "";
+    public string Unresolved { get; set; } = "";
+    public string Source { get; set; } = "";
+}
+
 public sealed class TrussDeckDefinition
 {
     public double Thickness { get; set; }

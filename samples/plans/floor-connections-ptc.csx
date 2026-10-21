@@ -160,7 +160,7 @@ foreach (var bn in girders)
         // the girder stiffener's outstanding leg under the plate: 7 x 3/4 end stiffeners at the end floor beams (CL bearings), 6 x 1/2 at the others; the fill
         // (of the leg thickness) starts beyond the leg toe
         bool endFb = System.Text.RegularExpressions.Regex.IsMatch(m.Name, @"-[04]$");
-        double uFill = (endFb ? In(7) : In(6)) + In(7.0 / 32) - (gWebHalf + In(0.5)) + In(0.25);
+        double uFill = (endFb ? In(7) : In(6)) + In(7.0 / 32) - (gWebHalf + In(0.5)) + In(0.375);   // 3/8 in. beyond the leg toe (1/4 left the end stiffener legs 0.08 in. into the fill, step 4)
         m.EndConnections = new()
         {
             new TrussEndConnection

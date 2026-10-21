@@ -227,6 +227,7 @@ public static partial class TrussGenerator
             BuildJoints();
             BuildJointPlates();
             BuildEndConnections();
+            BuildBracingGussets();
             PlaceJointRivets();
             FlushConnectionRivets();
             if (_d.Floor != null) BuildFloor(_d.Floor);
@@ -414,6 +415,9 @@ public static partial class TrussGenerator
                                 double reach = Math.Abs(Vec3.Dot(m.X, c.X)) * m.Sec.HalfWidth + Math.Abs(Vec3.Dot(m.Y, c.X)) * Math.Max(m.Sec.YMax, -m.Sec.YMin);
                                 t = Math.Max(t, (c.Sec.HalfWidth + reach) / k + clr);
                             }
+                        // OPTIONAL: every corner of the end section clear of the joint, the members passing the point and the bracing ending there
+                        if (_d.JointDefaults.BracingCornerClearance > 0 && IsBracing(m.Def.Role) && given == null)
+                            t = Math.Max(t, CornerClearSetback(m, start, pl, pt, _d.JointDefaults.BracingCornerClearance));
                     }
                     if (start) m.SA = t; else m.SB = t;
                 }
@@ -1406,6 +1410,7 @@ public static partial class TrussGenerator
                 cross = cross.OrderBy(c => c.sta).ToList();
                 double top = line.TopBelowGrade ?? fl.StringerTopBelowGrade;
                 int no = 0;
+                var seatAt = new SortedSet<double>();
                 for (int i = 0; i + 1 < cross.Count; i++)
                 {
                     double e0 = fl.StringersOnTop ? 0 : cross[i].halfWeb + fl.StringerEndClearance, e1 = fl.StringersOnTop ? 0 : cross[i + 1].halfWeb + fl.StringerEndClearance;
@@ -1420,10 +1425,69 @@ public static partial class TrussGenerator
                     var inst = new Inst { Def = def, Mark = def.Name, Plane = "", PlaneA = "", PlaneB = "", PointA = $"{_u.FormatStation(s0)}", PointB = $"{_u.FormatStation(s1)}", A = pa, B = pb, Sec = sec, Assembly = asm };
                     Orient(inst);
                     BuildMember(inst);
+                    seatAt.Add(cross[i].sta); seatAt.Add(cross[i + 1].sta);
                 }
+                if (fl.Seats != null && fl.StringersOnTop) BuildSeats(fl.Seats, line, sec, top, seatAt, asm);
                 if (no == 0) Warn($"Truss: stringer line {line.Name} - no floor beam bay found (floor beams are members with role FloorBeam crossing offset {L(line.Offset)}).");
             }
             if (fl.Deck is { } dk) BuildDeck(dk, fl);
+            if (fl.Seats != null && _seatCount + _seatSkipped + _seatBelow > 0)
+                Info($"Truss: stringer seats - {_seatCount} plates (gap {L(_seatGapMin)} - {L(_seatGapMax)}){(_seatSkipped > 0 ? $", {_seatSkipped} crossings bear directly (gap under {L(fl.Seats.MinGap)}) or have no steel under them" : "")}{Src}.");
+            if (_seatBelow > 0) Warn($"Truss CHECK stringer seats: {_seatBelow} stringer bottoms lie below the floor beam top (overlap up to {L(_seatBelowMax)}){Src}.");
+        }
+
+        private int _seatCount, _seatSkipped, _seatBelow;
+        private double _seatGapMin = double.PositiveInfinity, _seatGapMax, _seatBelowMax;
+        /// <summary>Stringer seat plates of one stringer line at its floor beam crossings (<see cref="TrussStringerSeatDefinition"/>).</summary>
+        private void BuildSeats(TrussStringerSeatDefinition sd, TrussStringerLine line, TrussBuiltSection sec, double top, IEnumerable<double> stations, string asm)
+        {
+            if (sd.Length <= 0) return;
+            double w = line.SeatWidth ?? sd.Width;
+            if (w <= 0) w = 2 * sec.HalfWidth;
+            if (sd.Unresolved.Length > 0) Warn(sd.Unresolved);
+            Assumption? asu = sd.Unresolved.Length > 0 ? Assumption.UnresolvedDimension(sd.Unresolved + Src, "seat plate as listed, thickness = the gap") : null;
+            var parts = Model.Steel.Parts;
+            int k = 0;
+            foreach (double sta in stations)
+            {
+                var c = _al.PointAt(sta, line.Offset);
+                var t = Tangent(sta);
+                var acr = Vec3.Cross(Up, t).Normalized();
+                double Zb(double s) => _al.ElevationAt(s, line.Offset) - top - sec.YMax + sec.YMin;   // stringer bottom on the grade line
+                // probe the steel under the plate (floor beam top, cover plates, connection material)
+                var pts = new List<(double u, double v)> { (0, 0), (-sd.Length / 2 + 0.005, -w / 2 + 0.005), (sd.Length / 2 - 0.005, -w / 2 + 0.005), (sd.Length / 2 - 0.005, w / 2 - 0.005), (-sd.Length / 2 + 0.005, w / 2 - 0.005) };
+                var lo = new Vec3(c.X - 1, c.Y - 1, Zb(sta) - 0.6); var hi = new Vec3(c.X + 1, c.Y + 1, Zb(sta) + 0.1);
+                var pr = new SteelLineProbe();
+                for (int i = 0; i < parts.Count; i++)
+                {
+                    if (parts[i].Category == PartCategory.TrussStringer || parts[i].Mesh is not { IsEmpty: false } m) continue;
+                    var bb = m.Bounds();
+                    if (bb.Max.X < lo.X || bb.Min.X > hi.X || bb.Max.Y < lo.Y || bb.Min.Y > hi.Y || bb.Max.Z < lo.Z || bb.Min.Z > hi.Z) continue;
+                    pr.Add(m, i, lo, hi);
+                }
+                double bottom = double.NegativeInfinity;
+                foreach (var (u, v) in pts)
+                {
+                    var q = new Vec3(c.X, c.Y, 0) + t * u + acr * v;
+                    var o = new Vec3(q.X, q.Y, Zb(sta + u) + 0.05);
+                    foreach (var iv in pr.Intervals(o, -Up, 0.65))
+                        if (iv.t1 > 0) { bottom = Math.Max(bottom, o.Z - Math.Max(0, iv.t0)); break; }
+                }
+                if (double.IsNegativeInfinity(bottom)) { _seatSkipped++; continue; }
+                double gap = Zb(sta) - bottom;
+                if (gap < -1e-4) { _seatBelow++; _seatBelowMax = Math.Max(_seatBelowMax, -gap); continue; }
+                if (gap < sd.MinGap) { _seatSkipped++; continue; }
+                var poly = new[] { new Vec2(-sd.Length / 2, bottom), new Vec2(sd.Length / 2, bottom), new Vec2(sd.Length / 2, Zb(sta + sd.Length / 2)), new Vec2(-sd.Length / 2, Zb(sta - sd.Length / 2)) };
+                Vec3 W(Vec2 q, double v) { var xy = new Vec3(c.X, c.Y, 0) + t * q.X + acr * v; return new Vec3(xy.X, xy.Y, q.Y); }
+                var mesh = new Mesh();
+                var ra = poly.Select(q => W(q, -w / 2)).ToArray();
+                MeshBuilder.AddLoft(mesh, poly, new[] { ra, poly.Select(q => W(q, w / 2)).ToArray() });
+                string mark = $"SEAT-{line.Name}-{++k}";
+                parts.Add(new SteelPart { Mark = mark, Category = PartCategory.BearingPlate, Assembly = asm, Mesh = mesh, Material = Material(sd.Material), Length = sd.Length, Assumption = asu,
+                    Description = $"stringer seat {(sd.Label.Length > 0 ? sd.Label + " " : "")}{L(sd.Length)} x {L(w)}, {L(gap)} at the floor beam CL (bevelled to grade), line {line.Name} at {_u.FormatStation(sta)}" });
+                Model.PanelOf[mark] = $"Seat {line.Name}";
+                _seatCount++; _seatGapMin = Math.Min(_seatGapMin, gap); _seatGapMax = Math.Max(_seatGapMax, gap);
+            }
         }
 
         private void BuildDeck(TrussDeckDefinition dk, TrussFloorDefinition fl)
