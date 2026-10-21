@@ -1066,6 +1066,11 @@ UNRESOLVED FLAG (general, reusable): `SBM.Core/Assumption.cs` `Assumption{Status
   p.57 cover plates (between the gussets), approach 14 WF at the printed areas, F3 / F4 partial floor beam plates (p.55), main post U11-L11 partial 34 x 9/16 o.s.
   / 34 x 1 1/8 plies (p.69 / p.70 areas 293.67 / 217.17), main 18 in channels at the 1954 areas (p.70), piers 10 / 27 stepped top 10'-10 1/2 along (p.9 / p.36
   B-B: bases 12'-6 / 12'-10 1/2 now exact), piers 17 / 20 pile column 8 = 8 piles on the 1'-6 offset rows (196 piles, p.27).
+  QC PASS 3 BACK-CHECK (2026-10-21; answers I006, I021-I028, I030-I035, TRUSS-DESIGN.md section 16): laterals meeting a `Portal` member stop clear of its side face
+  (TrussGenerator.Setbacks); OPTIONAL open rope socket `SuspenderDefinition.SocketBeyondPin` / `SocketJawWidth` / `SocketJawLength` (lugs round the pin plate).
+  PTC: main floor laterals X centred on W14 / W16 / W18 / W20 + K to WM22 (p.71 / p.99), floor beam partial cover plates (p.72), sockets per p.94 with pins along the
+  bridge, 14 BP 73 / laced channels at the 1954 areas, stringer diaphragms between the stringer webs, gusset in-to-in / thickness re-reads, outlines U9 / L15 / L17,
+  inspection platforms per p.102 / p.104, FB11 walkway north ladder to CL. Steel 86.1 % of p.42.
 - Bonner Unit 6 (spans 30-35, 4 x FIB-96, `samples/plans/build-bonner-unit6.csx` -> `Bonner Unit 6 FIB.sbm`, reads docs/plan-data/bonner-b2500/fib-unit6
   CSVs; same -L- placement as Unit 5; terrain + georeference `samples/plans/terrain-bonner.csx`, `docs/plan-data/bonner-b2500/TERRAIN.md`): 24 SpanBeams, per-span layouts (G1 LEFT, CL bearing 1'-2" / 3'-2" bent 29 / 1'-4" bent 35), p439 strand pattern
   read from the VECTOR drawing (72 + 4 slack, 8 draped, 20 debonded), E1/E2/E3 + P sole plates, camber tables, bents 30-35 (level precast cap profile,

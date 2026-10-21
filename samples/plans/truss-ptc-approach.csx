@@ -228,7 +228,7 @@ foreach (var u in units)
     string bracingDetail = U("p.56, p.48, p.58", "bracing member orientation, gusset outlines (7/16 plates) and connections", "p.56 gives the sections and the 7/16 gusset note, not the member orientation or outlines",
         "members run work point to work point with automatic end setbacks; web of 14 BP 73 vertical.");
     Add(new TrussSectionDefinition { Name = "HP14x73", Kind = TrussSectionKind.Rolled, Designation = "HP14x73", Depth = In(13.6), FlangeWidth = In(14.6), WebThickness = In(0.505), FlangeThickness = In(0.505),
-        WeightLbPerFt = 73, Material = "C", Label = "14 BP 73", Source = "p.48 / p.56", Unresolved = U("p.48, p.56", "14 BP 73 shape", "HP shapes are not in the program's AISC extract and the sheet gives the designation only", "AISC v16 HP14x73 dimensions (web vertical).") });
+        WeightLbPerFt = 73, ShapeArea = In(1) * In(1) * 21.4, Material = "C", Label = "14 BP 73", Source = "p.48 / p.56", Unresolved = U("p.48, p.56", "14 BP 73 shape", "HP shapes are not in the program's AISC extract and the sheet gives the designation only", "AISC v16 HP14x73 dimensions (web vertical).") });
     Add(new TrussSectionDefinition { Name = "WT6x29", Kind = TrussSectionKind.Rolled, Designation = "WT6x29", Material = "C", Label = "ST 6 WF 29", Source = "p.48 / p.56", Unresolved = bracingDetail });
     Add(new TrussSectionDefinition { Name = "W10x33", Kind = TrussSectionKind.Rolled, Designation = "W10x33", Material = "C", Label = "10 WF 33", Source = "p.48 / p.58 / p.56", Unresolved = bracingDetail });
     Add(new TrussSectionDefinition { Name = "STRUTBOX", Kind = TrussSectionKind.LacedChannels, Channel = "C12x25", BackToBack = In(13), Material = "C", Label = "2-12[ 25; 2-Pls (13-6) x 3/8 (box strut at the piers)", Source = "p.48 / p.56 / p.58",
@@ -395,10 +395,10 @@ foreach (var u in units)
             TrussShoeDefinition sh;
             if (type == "F")
             {
-                // fixed: p.52 (pier 11 / 26) / p.67 (15 / 22): 5 1/2 pin 3'-6 5/8, CL pin to bottom of shoe 3'-0 1/4, masonry plate 60 x 6 x 5'-6, 8 anchor bolts 3"
+                // fixed: p.52 (pier 11 / 26) / p.67 (15 / 22): 5 1/2 shouldered pin 3'-6 1/8 (material lists p.52 / p.67; was 3'-6 5/8, QC I031), CL pin to bottom of shoe 3'-0 1/4, masonry plate 60 x 6 x 5'-6, 8 anchor bolts 3"
                 sh = new TrussShoeDefinition
                 {
-                    Name = $"{pl}-{pt}", Plane = pl, Point = pt, Support = sup, Type = TrussShoeType.Fixed, PinDiameter = In(5.5), PinLength = FI(3, 6.625), Height = FI(3, 0.25),
+                    Name = $"{pl}-{pt}", Plane = pl, Point = pt, Support = sup, Type = TrussShoeType.Fixed, PinDiameter = In(5.5), PinLength = FI(3, 6.125), Height = FI(3, 0.25),
                     PinBelowPoint = total - FI(3, 0.25), BodyLength = In(29.875), BodyTopLength = In(22), BodyWidth = FI(5, 3.5), MasonryLength = In(60), MasonryWidth = FI(5, 6), MasonryThickness = In(6),
                     SeatElevation = seat, AnchorBolts = 8, AnchorDiameter = In(3), Source = four ? "p.67" : "p.52",
                     Unresolved = U(four ? "p.67" : "p.52", "fixed shoe parts (stem plates 2-13x9x2'-5 5/8, 3 wing plates 29 7/8 x 4 x 5'-3 1/2, 4 end stiffeners, sole plate 22 x 10 3/16, inlay)", "the plates are listed but not drawn piece by piece in a form that can be placed from the raster",
