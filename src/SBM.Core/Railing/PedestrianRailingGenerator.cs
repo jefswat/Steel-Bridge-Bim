@@ -259,7 +259,28 @@ public static class PedestrianRailingGenerator
             {
                 double inner = len - 2 * pd.EndDistance;
                 var ps = new List<double>();
-                if (pd.GridStation is double g0)
+                double fdLo = DAt(s0), fdHi = DAt(s1);
+                var fixedD = pd.FixedStations is { Count: > 0 }
+                    ? pd.FixedStations.Select(x => a.StationToDistance(x)).Where(x => x >= fdLo - 1e-3 && x <= fdHi + 1e-3).OrderBy(x => x).ToList()
+                    : new List<double>();
+                if (fixedD.Count > 0)
+                {
+                    // listed stations as given; the rest of the run (beyond the outermost listed posts) follows the equal-spacing rule
+                    foreach (double x in fixedD) ps.Add(SAt(x));
+                    double lo = fdLo + pd.EndDistance, hi = fdHi - pd.EndDistance;
+                    if (fixedD[0] - lo > 1e-3)
+                    {
+                        int n = (int)Math.Ceiling((fixedD[0] - lo) / pd.Spacing - 1e-9);
+                        for (int i = 0; i < n; i++) ps.Add(SAt(lo + i * (fixedD[0] - lo) / n));
+                    }
+                    if (hi - fixedD[^1] > 1e-3)
+                    {
+                        int n = (int)Math.Ceiling((hi - fixedD[^1]) / pd.Spacing - 1e-9);
+                        for (int i = 1; i <= n; i++) ps.Add(SAt(fixedD[^1] + i * (hi - fixedD[^1]) / n));
+                    }
+                    ps.Sort();
+                }
+                else if (pd.GridStation is double g0)
                 {
                     // layout along the alignment stations (plan elevations): radial lines at g0 + k x Spacing inside the run (ends included, 1 mm)
                     double dg = a.StationToDistance(g0), dLo = DAt(s0), dHi = DAt(s1);

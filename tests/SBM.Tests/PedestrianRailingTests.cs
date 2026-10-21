@@ -136,6 +136,39 @@ public class PedestrianRailingTests
     }
 
     [Fact]
+    public void Railing_FixedPostStations_ListedPanelsThenEqualSpacing_FabricFollows()
+    {
+        var probe = SampleProject.Create().Bridges[0];
+        double off = probe.Deck.RightEdgeOffset - CurbW;
+        double g0 = probe.Supports[0].Station + Ft(10);
+        var listed = Enumerable.Range(0, 4).Select(k => g0 + k * Ft(5.5)).ToList();
+        RailingModel Gen(List<double>? fixedSt)
+        {
+            var r = Rail(null, off);
+            r.Envelope = null; r.EnvelopeMassPerLength = 0; r.Members.Clear();
+            r.Post!.BasePlate = null; r.Post.Spacing = Ft(8); r.Post.Thickness = In(6); r.Post.FixedStations = fixedSt;
+            r.Fabric = new RailFabricDefinition { Description = "f", Path = new() { new(In(8), 0), new(In(8), In(42)) }, OffsetFromPost = In(0.15), BottomH = 0, Thickness = In(0.3), MassPerArea = 1.95, Material = "Chain link" };
+            var (f, c, p) = Build(r);
+            return PedestrianRailingGenerator.Generate(f, c, p.Units);
+        }
+        var run0 = Assert.Single(Gen(null).Runs);
+        var rm = Gen(listed);
+        var run = Assert.Single(rm.Runs);
+        // every listed station carries a post, the 5 1/2 ft panels are kept, the rest is spaced at most 8 ft
+        foreach (double st in listed) Assert.Contains(run.PostStations, x => Math.Abs(x - st) < 1e-3);
+        for (int i = 1; i < 4; i++) Assert.Equal(Ft(5.5), run.PostStations.OrderBy(x => x).SkipWhile(x => x < g0 - 1e-3).ElementAt(i) - run.PostStations.OrderBy(x => x).SkipWhile(x => x < g0 - 1e-3).ElementAt(i - 1), 3);
+        var ord = run.PostStations.OrderBy(x => x).ToList();
+        for (int i = 1; i < ord.Count; i++) Assert.True(ord[i] - ord[i - 1] <= Ft(8) + 1e-3);
+        Assert.Equal(ord.Count, run.PostStations.Count);
+        Assert.InRange(run.FabricPanels, run.Posts - 1, run.Posts + 1);
+        // default off: nothing written
+        Assert.DoesNotContain("FixedStations", System.Text.Json.JsonSerializer.Serialize(new RailPostDefinition()));
+        Assert.Contains("FixedStations", System.Text.Json.JsonSerializer.Serialize(new RailPostDefinition { FixedStations = new() { 1.0 } }));
+        // a list with no station inside the run keeps the normal rule
+        Assert.Equal(run0.Posts, Gen(new() { g0 + Ft(100000) }).Runs.Single().Posts);
+    }
+
+    [Fact]
     public void Railing_FabricMassNotCounted_KeepsPanelsAndAreaButNoMass()
     {
         var probe = SampleProject.Create().Bridges[0];
