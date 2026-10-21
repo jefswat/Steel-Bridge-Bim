@@ -241,6 +241,17 @@ foreach (var (nm, pgs, fbp, ftpp, seatp) in new[] { ("W Abutment", "p.11", 16.0,
     Row($"{nm}: seat El (shoe pedestal top)", u.FixedSeats.Max(x => x.Z) / ft, seatp, 0.0005, "ft", pgs);
     totalCy += Vol(u.Solids) / (ft * ft * ft) / 27.0;
 }
+// fender system and dolphins at piers 18 / 19 (p.25, substructure-ptc.csx): counts against the half plan (x 2 for the symmetry about the CL bridge)
+foreach (var nm in new[] { "Pier 18", "Pier 19" })
+{
+    var u = allUnits.First(x => x.u.Name == nm).u;
+    var fs = u.Solids.Where(s => s.Name.Contains(" fender ") || s.Name.Contains(" dolphin ")).ToList();
+    Row($"{nm}: fender posts (2 x (9 on the straight + 14 on the arc), p.25 half plan)", fs.Count(s => s.Name.Contains("fender post")), 46, 0, "posts", "p.25");
+    Row($"{nm}: dolphin piles (2 x 19 pile dolphin, p.25)", fs.Count(s => s.Name.Contains("dolphin")), 38, 0, "piles", "p.25");
+    Row($"{nm}: outer wales (4 levels, Section F-F) + inner wales (3 levels)", fs.Count(s => s.Name.Contains("fender wale")), 7, 0, "wales", "p.25");
+    double tim = fs.Where(s => s.Material != null && s.Material.Contains("imber")).Sum(s => Math.Abs(s.Mesh.Volume())) / (ft * ft * ft);
+    Print($"INFO  {nm}: fender + dolphin timber {tim:N0} cu ft ({tim * 12 * 12 / 12:N0} FBM), 12 H 74 fender piles {fs.Count(s => s.Name.Contains("12 H 74"))}; nose bracing frames / catwalk / cable wraps not built (UNRESOLVED p.25)");
+}
 foreach (var nm in new[] { "Pier 17 W brg", "Pier 18", "Pier 19", "Pier 20 main brg", "E Abutment" })
     Print($"INFO  {nm}: {allUnits.First(x => x.u.Name == nm).u.Foundations.Sum(f => f.Piles.Count)} piles modeled (count is not printed on the plans: UNRESOLVED, flagged)");
 Print($"INFO  {allUnits.Count} substructure units; concrete modeled (footings, shafts, caps, abutment walls, seals; piles excluded) = {totalCy:0} cu yd. p.42 (DRB-4 = the superstructure contract) prints Class A concrete 13,200 cu yd = deck / parapets / walkways by span group and no substructure line, so there is no printed substructure quantity to compare (reported only); piers 18 / 19 bodies are modeled SOLID (hollow / cored interior not read, UNRESOLVED), which dominates the total");
