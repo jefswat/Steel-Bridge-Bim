@@ -248,6 +248,88 @@ if (T(Main) is { } tmF)
     }
     report.Add($"{Main}: floor lateral X split at the floor beams ({split} members -> halves), {t.BracingGussets.Count(b => b.Label.StartsWith("floor lat."))} floor lateral plate definitions");
 }
+// ================================================================ 4. floor beam ends: F8 at L13 (p.95), F7 at W22 (p.93), F5 at L0 (p.73)
+// p.95 elevation at the post: "2-Ls 8 x 8 x 3/4" vertical end connection + "1-Fill 11 1/2 x 3/4" (not the typical 8 x 4 1/2 of p.85); Sections B / C: the lateral
+// gusset ("3/4 Gusset Pl.") at the laterals' top face held between "L 9 x 4 x 1" (below) and "L 7 x 4 x 7/8" (above) along the web ("2-Ls 9 x 4 x 1 F.L., 2-Ls 7 x 4 x 7/8 F.L.,
+// 2-Fills 4 x 3/4 betw. stiffs"), "2-Ls 8 x 4 x 1 x 76'-0" with the bottom cover plate.
+string f8EndFlag = U("p.95, p.85", "F8 end connection at L13 (2-Ls 8 x 8 x 3/4, 1-Fill 11 1/2 x 3/4)",
+    "p.95 names the angles and the fill; the gages and the web rivet pitch are drawn like the typical p.85 detail (scaled there), the second fill is not listed",
+    "angles 8 x 8 x 3/4 on the p.85 typical rivet layout, a fill 11 1/2 x 3/4 under each angle.");
+string f8ExtraFlag = U("p.95", "F8 extra angles (2-Ls 9 x 4 x 1 F.L., 2-Ls 7 x 4 x 7/8 F.L., 2-Fills 4 x 3/4 betw. stiffs, 2-Ls 8 x 4 x 1 x 76'-0)",
+    "Sections B / C place the 9 x 4 / 7 x 4 shelf angles on the web at the lateral gusset level, but the elevation does not show how they pass the full-depth stiffeners (the fills sit between the stiffeners) and the 8 x 4 x 1 bottom angles are drawn at section scale only",
+    "not built; the lateral gussets at L13 are 3/4 in. per Section B.");
+string f7Flag2 = U("p.93, p.94", "end of the two-web floor beam F7 at W22 (end diaphragm, expansion bearing on stainless plates, tongue beam slot)",
+    "p.93 draws the two ends of the beam with different dimensions beyond the 43'-6 line (1'-0 5/8 at one end, 4'-0 past the hanger at the other) and the bearing (stainless plates, clamps, shims) without its seat on the lower chord / hanger",
+    "not built (the beam ends at the truss CL as before).");
+string f5Flag = U("p.72, p.73", "end connection of floor beam F5 at L0",
+    "p.73 (truss joints at L0, shear lock and strut) refers the floor beam and sway connections to another sheet, which is not in the set",
+    "the typical framed detail of p.85.");
+if (T(Main) is { } tmE)
+{
+    var t = tmE;
+    int nF8 = 0;
+    foreach (var m in t.Members.Where(m => m.Role == TrussMemberRole.FloorBeam && (m.Name == "FB13" || m.Name == "FB13'" || m.Name == "FB0" || m.Name == "FB0'")))
+        foreach (var ec in m.EndConnections ?? new())
+        {
+            if (ec.Angle != "L4-1/2x8x3/4" && ec.Angle != "L8x8x3/4") continue;
+            // drop the step-3 "F5 at L0 / F8 at L13 not read" text, keep the p.85 layout flag
+            int cut = ec.Unresolved.IndexOf("UNRESOLVED (p.72, p.");
+            if (cut > 0) ec.Unresolved = ec.Unresolved[..cut].Trim();
+            ec.Unresolved = ec.Unresolved.Replace(f8EndFlag, "").Replace(f5Flag, "").Trim();
+            if (m.Name.StartsWith("FB13"))
+            {
+                ec.Angle = "L8x8x3/4"; ec.Label = "2-Ls 8x8x3/4, 1-Fill 11 1/2x3/4 (F8)"; ec.Source = "p.95";
+                ec.Unresolved = (ec.Unresolved + " " + f8EndFlag).Trim();
+                nF8++;
+            }
+            else ec.Unresolved = (ec.Unresolved + " " + f5Flag).Trim();
+        }
+    foreach (var bg in (t.BracingGussets ?? new()).Where(b => b.Point is "N:L13" or "S:L13" or "N:L13'" or "S:L13'" && b.Label == "2-1/2 Pls."))
+    { bg.Thickness = In(0.75); bg.Label = "3/4 Gusset Pl. (L13)"; bg.Source = "p.95 Section B"; }
+    Flag(t, "lower strut at L13 = the floor beam F8", null);
+    Flag(t, "F8 extra angles", f8ExtraFlag);
+    Flag(t, "end of the two-web floor beam F7 at W22", f7Flag2);
+    report.Add($"{Main}: F8 end connections {nF8} set to 2-Ls 8 x 8 x 3/4");
+}
+
+// ================================================================ 5. stringer splices (p.48 / p.58) and tension plates (p.55)
+// p.48 / p.58 "4 SPAN CONTINUOUS STRINGER": the stringers run continuous over 4 panels between pavement breaks ("S" / "F" marks: the half plans show runs of 4 bays
+// from the expansion dam) with the "Stringer Splice" at the middle support; "SPLICE FOR 24 WF 76": 2-Pls 18 1/2 x 3/8 (web), 1-Pl 9 x 7/16 N.S. + 1-Pl 4 x 1/2 F.S.
+// (top flange); "SPLICE FOR 21 WF 62": 2-Pls 18 1/2 x 3/8, 1-Pl 8 1/2 x 3/8 N.S. + 1-Pl 3 1/2 x 7/16 F.S.; drawn: 7 web rows, 2 field + 4 shop columns, 2 flange rows.
+string splFlag = U("p.48, p.58", "approach stringer splices (plate lengths, rivet pitch and gages)",
+    "the splice details give the plate sizes but no lengths, pitch or gages; the splice positions follow the 4-span continuous stringer diagram (splice at the middle support)",
+    "rivet pitch 2 1/2 in. (7 rows in the 18 1/2 in. web plates), 2 field + 4 shop columns at 2 1/2 in. from 1 1/4 in. each side of the joint (plates 5 in. before / 10 in. after the joint), flange rows at the AISC workable gage 5 1/2 in.; the F.S. plates one each side of the web clear of the root fillet; at every 4th floor beam from the 2nd (the middle support of each 4-bay run).");
+string tensionFlag = U("p.55, p.45, p.94", "stringer / floor beam tension plates (Pl. 14 x 3/4 (S), 4'-0 + 4'-3, 1 in H.S. rivets) and the stringer splices of the girder spans and the main span",
+    "the tension plate detail is drawn without its position along the bridge (which floor beams) and the girder span / main span sheets do not show where their stringers are spliced",
+    "not built.");
+foreach (var bn in approach)
+{
+    var t = T(bn); if (t?.Floor == null) continue;
+    int nFb = t.Members.Count(m => m.Role == TrussMemberRole.FloorBeam && m.Name.StartsWith("FB"));   // (brackets BR-N / BR-S lie on the same lines)
+    Flag(t, "approach stringer splices (plate lengths", splFlag);
+    Flag(t, "stringer / floor beam tension plates", tensionFlag);
+    if ((nFb - 1) % 4 != 0) { report.Add($"{bn}: {nFb - 1} bays - not runs of 4, splices not placed"); t.Floor.Splices = null; continue; }
+    double[] cols = { -3.75, -1.25, 1.25, 3.75, 6.25, 8.75 };
+    TrussStringerSpliceDefinition Spl(string sec, string label, double topW, double topT, double fsW, double fsT) => new()
+    {
+        Label = label, Section = sec, Every = 4, First = 2, Before = In(5), After = In(10), WebPlateHeight = In(18.5), WebPlateThickness = In(0.375),
+        TopPlateWidth = topW, TopPlateThickness = topT, UnderPlateWidth = fsW, UnderPlateThickness = fsT,
+        WebRivetColumns = cols.Select(c => In(c)).ToList(), WebRivetRows = 7, WebRivetPitch = In(2.5), FlangeRivetColumns = cols.Select(c => In(c)).ToList(), FlangeRivetGage = In(2.75),
+        RivetDiameter = In(0.875), RivetMaterial = "7/8 in carbon steel rivet", Material = "C", Unresolved = splFlag, Source = "p.48 / p.58",
+    };
+    var secs = t.Floor.Stringers.Select(s => s.Section).Distinct().ToList();
+    t.Floor.Splices = new();
+    foreach (var s in secs)
+    {
+        if (s.StartsWith("W24")) t.Floor.Splices.Add(Spl(s, "24 WF 76: 2-Pls 18 1/2 x 3/8, 1-Pl 9 x 7/16 N.S., 2-Pls 4 x 1/2 F.S.", In(9), In(7.0 / 16), In(4), In(0.5)));
+        else if (s.StartsWith("W21")) t.Floor.Splices.Add(Spl(s, "21 WF 62: 2-Pls 18 1/2 x 3/8, 1-Pl 8 1/2 x 3/8 N.S., 2-Pls 3 1/2 x 7/16 F.S.", In(8.5), In(0.375), In(3.5), In(7.0 / 16)));
+        else report.Add($"{bn}: stringer section {s} has no splice detail");
+    }
+    report.Add($"{bn}: stringer splices at every 4th of {nFb} floor beams from the 2nd, sections {string.Join(", ", secs)}");
+}
+foreach (var gn in new[] { "PTC Girder spans 1-10", "PTC Girder spans 28-31", Main })
+    if (T(gn) is { } tg) Flag(tg, "stringer / floor beam tension plates", tensionFlag);
+
 TrussMemberDefinition Clone2(TrussMemberDefinition m) => System.Text.Json.JsonSerializer.Deserialize<TrussMemberDefinition>(System.Text.Json.JsonSerializer.Serialize(m))!;
 
 // ================================================================ regenerate + save
@@ -259,7 +341,7 @@ foreach (var b in Doc.Project.Bridges.Where(b => b.Truss != null))
     Print($"{b.Name}: connection plates {st.Parts.Count(p => p.Category == PartCategory.TrussConnectionPlate)}, connection angles {st.Parts.Count(p => p.Category == PartCategory.TrussConnectionAngle)}, rivets {tm.Rivets:N0}, steel {st.SteelMass * 2.20462262:N0} lb");
     var sw = st.Parts.Where(p => p.Description.Contains("sway gus. PL") || p.Description.Contains("(sway)")).ToList();
     if (sw.Count > 0) Print($"   sway plates {sw.Count(p => p.Category == PartCategory.TrussConnectionPlate)} ({sw.Where(p => p.Category == PartCategory.TrussConnectionPlate).Sum(p => p.Mass) * 2.20462262:N0} lb), sway edge angles {st.Parts.Count(p => p.Mark.EndsWith("-EA") && sw.Any(q => p.Mark.StartsWith(q.Mark)))}");
-    foreach (var d in st.Diagnostics.Where(d => d.Message.Contains("bracing connection plates -") || d.Message.Contains("end connections -") || d.Message.Contains("CHECK"))) Print("   " + d.Message[..Math.Min(400, d.Message.Length)]);
+    foreach (var d in st.Diagnostics.Where(d => d.Message.Contains("bracing connection plates -") || d.Message.Contains("end connections -") || d.Message.Contains("stringer splices -") || d.Message.Contains("plane items -") || (d.Message.Contains("CHECK") && !d.Message.Contains("rivets 1\" per") && !d.Message.Contains("CHECK shoe")))) Print("   " + d.Message[..Math.Min(400, d.Message.Length)]);
     foreach (var d in st.Diagnostics.Where(d => d.Severity != DiagnosticSeverity.Info && d.Message.Contains("not built") && !d.Message.StartsWith("UNRESOLVED")).Take(10)) Print("   " + d.Severity + ": " + d.Message[..Math.Min(300, d.Message.Length)]);
     foreach (var e in rep.Errors.Where(e => e.StartsWith(b.Name))) Print("  ERROR " + e);
 }

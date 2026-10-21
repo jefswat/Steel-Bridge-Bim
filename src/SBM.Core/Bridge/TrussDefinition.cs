@@ -563,6 +563,43 @@ public sealed class TrussBracingGussetDefinition
     public bool NoStackClip { get; set; }
 }
 
+/// <summary>
+/// Splice of rolled stringers laid ON the floor beams (generic, OPTIONAL; <see cref="TrussFloorDefinition.Splices"/>): at the floor beam crossings of a
+/// stringer line chosen by <see cref="Crossings"/> (index of the crossing along the line in station order, 0 = the first floor beam) or by the pattern
+/// <see cref="Every"/> / <see cref="First"/> (index - First divisible by Every), where two stringer pieces abut: two web plates (<see cref="WebPlateHeight"/>
+/// centred on the web, <see cref="Before"/> / <see cref="After"/> along the stringer from the joint), a plate on the top flange (<see cref="TopPlateWidth"/>, N.S.)
+/// and two plates under the top flange (<see cref="UnderPlateWidth"/> each, F.S., clear of the root fillet), rivets in columns at signed distances from the joint
+/// (web rows centred on the web; flange rows at +-<see cref="FlangeRivetGage"/>). Only stringer lines of <see cref="Section"/> ("" = any) / <see cref="Lines"/>.
+/// Parts SplicePlate; dimension-only flag from <see cref="Unresolved"/>.
+/// </summary>
+public sealed class TrussStringerSpliceDefinition
+{
+    public string Label { get; set; } = "";
+    public List<string> Lines { get; set; } = new();
+    public string Section { get; set; } = "";
+    public List<int>? Crossings { get; set; }
+    public int Every { get; set; }
+    public int First { get; set; }
+    public double Before { get; set; }
+    public double After { get; set; }
+    public double WebPlateHeight { get; set; }
+    public double WebPlateThickness { get; set; }
+    public double TopPlateWidth { get; set; }
+    public double TopPlateThickness { get; set; }
+    public double UnderPlateWidth { get; set; }
+    public double UnderPlateThickness { get; set; }
+    public List<double> WebRivetColumns { get; set; } = new();
+    public int WebRivetRows { get; set; }
+    public double WebRivetPitch { get; set; }
+    public List<double> FlangeRivetColumns { get; set; } = new();
+    public double FlangeRivetGage { get; set; }
+    public double RivetDiameter { get; set; }
+    public string? RivetMaterial { get; set; }
+    public string Material { get; set; } = "";
+    public string Unresolved { get; set; } = "";
+    public string Source { get; set; } = "";
+}
+
 /// <summary>Kind of a <see cref="TrussPlaneItemDefinition"/>.</summary>
 public enum TrussPlaneItemKind { Plate, Sweep }
 
@@ -883,6 +920,9 @@ public sealed class TrussFloorDefinition
     /// bottom, top bevelled to the stringer grade (<see cref="TrussStringerSeatDefinition"/>).</summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public TrussStringerSeatDefinition? Seats { get; set; }
+    /// <summary>OPTIONAL (null = none, omitted from the .sbm): splices of the stringers laid on top of the floor beams (<see cref="TrussStringerSpliceDefinition"/>).</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public List<TrussStringerSpliceDefinition>? Splices { get; set; }
     public string Unresolved { get; set; } = "";
     public string Source { get; set; } = "";
 }

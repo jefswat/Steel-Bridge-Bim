@@ -1002,6 +1002,38 @@ public class TrussTests : IDisposable
     }
 
     [Fact]
+    public void StringerSplices_PlatesAtTheChosenFloorBeams_ExactRivetedClear()
+    {
+        var (p, b) = Model();
+        var fl = b.Truss!.Floor!;
+        var (p0, _) = Model();
+        double fbTop = Regen(p0).Steel!.Parts.First(x => x.Mark == "FB2").Mesh.Bounds().Max.Z;
+        var w21 = SteelCatalog.FindWideFlange("W21x62")!;
+        fl.StringersOnTop = true;
+        fl.StringerTopBelowGrade = Ft(100) - (fbTop + w21.Depth);
+        fl.Deck = null;
+        fl.Splices = new()
+        {
+            new TrussStringerSpliceDefinition { Section = "ST", Every = 2, First = 1, Before = In(5), After = In(10), WebPlateHeight = In(16), WebPlateThickness = In(0.375),
+                TopPlateWidth = In(8), TopPlateThickness = In(0.375), UnderPlateWidth = In(3), UnderPlateThickness = In(0.4375),
+                WebRivetColumns = new() { -In(3.75), -In(1.25), In(1.25), In(3.75) }, WebRivetRows = 5, WebRivetPitch = In(3),
+                FlangeRivetColumns = new() { -In(3.75), In(3.75) }, FlangeRivetGage = In(2.75), RivetDiameter = In(0.875), Unresolved = "UNRESOLVED (p.0): splice lengths - scaled." },
+        };
+        var bm = Regen(p);
+        var st = bm.Steel!;
+        var spl = st.Parts.Where(x => x.Mark.StartsWith("SPL-")).ToList();
+        Assert.Equal(3 * 3, spl.Count);                                                 // 3 lines x crossings 1, 3, 5 of the 7 floor beams
+        Assert.All(spl, x => { Assert.Equal(PartCategory.SplicePlate, x.Category); Assert.True(x.Mesh.HasExactSolids); Assert.NotNull(x.Assumption); });
+        double vol = 2 * In(16) * In(0.375) * In(15) + In(8) * In(0.375) * In(15) + 2 * In(3) * In(0.4375) * In(15);
+        Assert.Equal(vol, spl[0].Volume, 9);
+        Assert.Contains(st.Diagnostics, d => d.Message.StartsWith("Truss: stringer splices - 9 splices, 216 rivets"));   // 9 x (4 x 5 web + 2 x 2 flange)
+        Assert.DoesNotContain(st.Diagnostics, d => d.Message.Contains("rivet positions not in steel"));
+        var o = new SBM.Core.Checks.ClashOptions();
+        Assert.DoesNotContain(SBM.Core.Checks.SteelClashCheck.Run(bm, o).Clashes, c => c.A.Mark.StartsWith("SPL-") || c.B.Mark.StartsWith("SPL-"));
+        Assert.DoesNotContain("Splices", System.Text.Json.JsonSerializer.Serialize(new TrussFloorDefinition { Stringers = { new TrussStringerLine() } }));
+    }
+
+    [Fact]
     public void FileRoundTrip_AndExistingModelsUnchanged()
     {
         var (p, b) = Model();
