@@ -207,6 +207,11 @@
                             </Button>
                         </StackPanel>
                     </HeaderedContentControl>
+                    <HeaderedContentControl Header="Display" Style="{StaticResource RibbonGroup}">
+                        <Button Style="{StaticResource RibbonButton}" Click="OnToggleBackground" ToolTip="Viewport background: light (default) or dark. On the light background, pale line and text colors are drawn darker. Saved for next time.">
+                            <StackPanel><TextBlock Style="{StaticResource RibbonIcon}" Text="&#xE793;"/><TextBlock x:Name="BackgroundLabel" Style="{StaticResource RibbonLabel}" Text="Background: light"/></StackPanel>
+                        </Button>
+                    </HeaderedContentControl>
                     <HeaderedContentControl Header="Section" Style="{StaticResource RibbonGroup}">
                         <Button Style="{StaticResource RibbonButton}" Click="OnToggleSection" ToolTip="Section Cut (Ctrl+Shift+S): cut the 3D model with a vertical plane at a station (along any skew) or an offset; the cut face and everything behind it stay visible. Drag the slider to move it live.">
                             <StackPanel><TextBlock Style="{StaticResource RibbonIcon}" Text="&#xE8B3;"/><TextBlock Style="{StaticResource RibbonLabel}" Text="Section Cut"/></StackPanel>

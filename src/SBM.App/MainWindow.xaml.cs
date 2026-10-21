@@ -26,7 +26,7 @@ public partial class MainWindow : Window
         DataContext = _vm;
 
         View.EffectsManager = new DefaultEffectsManager();
-        View.BackgroundColor = Color.FromRgb(0x1B, 0x1D, 0x21);
+        InitTheme();
         View.MSAA = MSAALevel.Four;
         // D3DImage composition: GPU-rendered, but composes correctly with the surrounding WPF UI.
         View.EnableSwapChainRendering = false;
@@ -623,7 +623,7 @@ public partial class MainWindow : Window
         _scene = scene;
         ClearHighlight();
         foreach (var list in _layerModels.Values)
-            foreach (var m in list) View.Items.Remove(m);
+            foreach (var m in list) { View.Items.Remove(m); if (m is LineGeometryModel3D lm0) _rawLineColor.Remove(lm0); }
         _layerModels.Clear();
         _fullLines.Clear();
         _fullText.Clear();
@@ -643,25 +643,26 @@ public partial class MainWindow : Window
                 var lm = new LineGeometryModel3D
                 {
                     Geometry = layer.Lines,
-                    Color = color,
                     Thickness = layer.Style.Weight,
                     Smoothness = 0,
                     IsHitTestVisible = false,
                     Visibility = visible ? Visibility.Visible : Visibility.Collapsed,
                 };
+                ThemedLine(lm, color);
                 _fullLines[lm] = layer.Lines;
                 models.Add(lm);
             }
             if (layer.Text != null)
             {
+                var textGeometry = ThemedText(layer.Text, color);
                 var tm = new BillboardTextModel3D
                 {
-                    Geometry = layer.Text,
+                    Geometry = textGeometry,
                     FixedSize = false, // model-sized text, like CAD annotation
                     IsHitTestVisible = false,
                     Visibility = visible ? Visibility.Visible : Visibility.Collapsed,
                 };
-                _fullText[tm] = layer.Text;
+                _fullText[tm] = textGeometry;
                 models.Add(tm);
             }
             foreach (var m in models) View.Items.Add(m);
@@ -737,7 +738,7 @@ public partial class MainWindow : Window
     private void OnReferencesReady(List<ReferenceRender> renders)
     {
         foreach (var list in _refModels.Values)
-            foreach (var m in list) View.Items.Remove(m);
+            foreach (var m in list) { View.Items.Remove(m); if (m is LineGeometryModel3D lm0) _rawLineColor.Remove(lm0); }
         _refModels.Clear();
         _refRadius = 0;
         foreach (var r in renders)
@@ -768,7 +769,7 @@ public partial class MainWindow : Window
                 _refRadius = Math.Max(_refRadius, (bb.Maximum - bb.Minimum).Length() / 2);
             }
             if (r.Lines != null)
-                models.Add(new LineGeometryModel3D { Geometry = r.Lines, Color = Color.FromRgb(def.R, def.G, def.B), Thickness = 1, IsHitTestVisible = false });
+                models.Add(ThemedLine(new LineGeometryModel3D { Geometry = r.Lines, Thickness = 1, IsHitTestVisible = false }, Color.FromRgb(def.R, def.G, def.B)));
             _refModels[r.LayerName] = models;
             var contours = new List<Element3D>();
             if (r.MinorContours != null)
