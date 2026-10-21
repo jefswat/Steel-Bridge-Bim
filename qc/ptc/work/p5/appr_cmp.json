@@ -1,0 +1,802 @@
+[
+[
+"PTC 3-span truss 11-13",
+"U0-U1",
+"14 WF 87 C",
+"14 WF 87 C ",
+"",
+"pass"
+],
+[
+"PTC 3-span truss 11-13",
+"U1-U3",
+"14 WF 219 S",
+"14 WF 219 S ",
+"",
+"pass"
+],
+[
+"PTC 3-span truss 11-13",
+"U3-U5",
+"14 WF 246 S",
+"14 WF 246 S ",
+"",
+"pass"
+],
+[
+"PTC 3-span truss 11-13",
+"U5-U7",
+"14 WF 103 S",
+"14 WF 103 S ",
+"",
+"pass"
+],
+[
+"PTC 3-span truss 11-13",
+"U7-U9",
+"14 WF 246 S",
+"14 WF 246 S ",
+"",
+"pass"
+],
+[
+"PTC 3-span truss 11-13",
+"U9-U11",
+"14 WF 87 C",
+"14 WF 87 C ",
+"",
+"pass"
+],
+[
+"PTC 3-span truss 11-13",
+"U11-U11'",
+"14 WF 111 S",
+"14 WF 111 S ",
+"",
+"pass"
+],
+[
+"PTC 3-span truss 11-13",
+"L0-L2",
+"14 WF 111 S",
+"14 WF 111 S ",
+"",
+"pass"
+],
+[
+"PTC 3-span truss 11-13",
+"L2-L4",
+"14 WF 211 S",
+"14 WF 211 S ",
+"",
+"pass"
+],
+[
+"PTC 3-span truss 11-13",
+"L4-L6",
+"14 WF 167 S",
+"14 WF 167 S ",
+"",
+"pass"
+],
+[
+"PTC 3-span truss 11-13",
+"L6-L8",
+"14 WF 111 S",
+"14 WF 111 S ",
+"",
+"pass"
+],
+[
+"PTC 3-span truss 11-13",
+"L8-L10",
+"14 WF 142 S",
+"14 WF 142 S ",
+"",
+"pass"
+],
+[
+"PTC 3-span truss 11-13",
+"L10-L12",
+"14 WF 87 S",
+"14 WF 87 S ",
+"",
+"pass"
+],
+[
+"PTC 3-span truss 11-13",
+"L0-U1",
+"14 WF 228 S",
+"14 WF 228 S ",
+"",
+"pass"
+],
+[
+"PTC 3-span truss 11-13",
+"U1-L2",
+"14 WF 111 S",
+"14 WF 111 S ",
+"",
+"pass"
+],
+[
+"PTC 3-span truss 11-13",
+"L2-U3",
+"14 WF 142 C",
+"14 WF 142 C ",
+"",
+"pass"
+],
+[
+"PTC 3-span truss 11-13",
+"U3-L4",
+"14 WF 142 C",
+"14 WF 142 C ",
+"",
+"pass"
+],
+[
+"PTC 3-span truss 11-13",
+"L4-U5",
+"14 WF 87 S",
+"14 WF 87 S ",
+"",
+"pass"
+],
+[
+"PTC 3-span truss 11-13",
+"U5-L6",
+"14 WF 202 S",
+"14 WF 202 S ",
+"",
+"pass"
+],
+[
+"PTC 3-span truss 11-13",
+"L6-U7",
+"14 WF 184 S",
+"14 WF 184 S ",
+"",
+"pass"
+],
+[
+"PTC 3-span truss 11-13",
+"U7-L8",
+"14 WF 342 S",
+"14 WF 342 S ",
+"",
+"pass"
+],
+[
+"PTC 3-span truss 11-13",
+"L8-U9",
+"14 WF 287 S",
+"14 WF 287 S ",
+"",
+"pass"
+],
+[
+"PTC 3-span truss 11-13",
+"U9-L10",
+"14 WF 142 S",
+"14 WF 142 S ",
+"",
+"pass"
+],
+[
+"PTC 3-span truss 11-13",
+"L10-U11",
+"14 WF 150 S",
+"14 WF 150 S ",
+"",
+"pass"
+],
+[
+"PTC 3-span truss 11-13",
+"U11-L12",
+"14 WF 142 C",
+"14 WF 142 C ",
+"",
+"pass"
+],
+[
+"PTC 3-span truss 11-13",
+"U0-L0",
+"14 WF 84 S",
+"14 WF 84 S ",
+"",
+"pass"
+],
+[
+"PTC 3-span truss 11-13",
+"U8-L8",
+"16 WF 96 S",
+"16 WF 96 S ",
+"",
+"pass"
+],
+[
+"PTC 3-span truss 11-13",
+"U2-L2",
+"14 WF 84 S",
+"14 WF 84 S ",
+"",
+"pass"
+],
+[
+"PTC 3-span truss 11-13",
+"U4-L4",
+"14 WF 84 S",
+"14 WF 84 S ",
+"",
+"pass"
+],
+[
+"PTC 3-span truss 11-13",
+"U6-L6",
+"14 WF 84 S",
+"14 WF 84 S ",
+"",
+"pass"
+],
+[
+"PTC 3-span truss 11-13",
+"U10-L10",
+"14 WF 84 S",
+"14 WF 84 S ",
+"",
+"pass"
+],
+[
+"PTC 3-span truss 11-13",
+"U12-L12",
+"14 WF 84 S",
+"14 WF 84 S ",
+"",
+"pass"
+],
+[
+"PTC 3-span truss 11-13",
+"U1-L1",
+"14 WF 61 C",
+"14 WF 61 C ",
+"",
+"pass"
+],
+[
+"PTC 3-span truss 11-13",
+"U3-L3",
+"14 WF 61 C",
+"14 WF 61 C ",
+"",
+"pass"
+],
+[
+"PTC 3-span truss 11-13",
+"U5-L5",
+"14 WF 61 C",
+"14 WF 61 C ",
+"",
+"pass"
+],
+[
+"PTC 3-span truss 11-13",
+"U7-L7",
+"14 WF 61 C",
+"14 WF 61 C ",
+"",
+"pass"
+],
+[
+"PTC 3-span truss 11-13",
+"U9-L9",
+"14 WF 61 C",
+"14 WF 61 C ",
+"",
+"pass"
+],
+[
+"PTC 3-span truss 11-13",
+"U11-L11",
+"14 WF 61 C",
+"14 WF 61 C ",
+"",
+"pass"
+],
+[
+"PTC 4-span truss 14-17",
+"U0-U1",
+"14 WF 87 C",
+"14 WF 87 C ",
+"",
+"pass"
+],
+[
+"PTC 4-span truss 14-17",
+"U1-U3",
+"14 WF 287 S",
+"14 WF 287 S ",
+"",
+"pass"
+],
+[
+"PTC 4-span truss 14-17",
+"U3-U5",
+"14 WF 287 S + 2-Pls 16 x 15/16",
+"14 WF 287 S  covers 16x0.9375 btwG,16x0.9375 btwG",
+"",
+"pass"
+],
+[
+"PTC 4-span truss 14-17",
+"U5-U7",
+"14 WF 314 S",
+"14 WF 314 S ",
+"",
+"pass"
+],
+[
+"PTC 4-span truss 14-17",
+"U7-U9",
+"14 WF 95 S",
+"14 WF 95 S ",
+"",
+"pass"
+],
+[
+"PTC 4-span truss 14-17",
+"U9-U11",
+"14 WF 342 S + 2-Pls 16 1/2 x 13/16",
+"14 WF 342 S  covers 16.5x0.8125 btwG,16.5x0.8125 btwG",
+"",
+"pass"
+],
+[
+"PTC 4-span truss 14-17",
+"U11-U13",
+"14 WF 119 S",
+"14 WF 119 S ",
+"",
+"pass"
+],
+[
+"PTC 4-span truss 14-17",
+"U13-U15",
+"14 WF 150 S",
+"14 WF 150 S ",
+"",
+"pass"
+],
+[
+"PTC 4-span truss 14-17",
+"U15-U17",
+"14 WF 184 S",
+"14 WF 184 S ",
+"",
+"pass"
+],
+[
+"PTC 4-span truss 14-17",
+"U17-U19",
+"14 WF 87 C",
+"14 WF 87 C ",
+"",
+"pass"
+],
+[
+"PTC 4-span truss 14-17",
+"U19-U19'",
+"14 WF 314 S",
+"14 WF 314 S ",
+"",
+"pass"
+],
+[
+"PTC 4-span truss 14-17",
+"L0-L2",
+"14 WF 142 S",
+"14 WF 142 S ",
+"",
+"pass"
+],
+[
+"PTC 4-span truss 14-17",
+"L2-L4",
+"14 WF 314 S",
+"14 WF 314 S ",
+"",
+"pass"
+],
+[
+"PTC 4-span truss 14-17",
+"L4-L6",
+"14 WF 314 S",
+"14 WF 314 S ",
+"",
+"pass"
+],
+[
+"PTC 4-span truss 14-17",
+"L6-L8",
+"14 WF 167 S",
+"14 WF 167 S ",
+"",
+"pass"
+],
+[
+"PTC 4-span truss 14-17",
+"L8-L10",
+"14 WF 287 S",
+"14 WF 287 S ",
+"",
+"pass"
+],
+[
+"PTC 4-span truss 14-17",
+"L10-L12",
+"14 WF 314 S",
+"14 WF 314 S ",
+"",
+"pass"
+],
+[
+"PTC 4-span truss 14-17",
+"L12-L14",
+"14 WF 87 S",
+"14 WF 87 S ",
+"",
+"pass"
+],
+[
+"PTC 4-span truss 14-17",
+"L14-L16",
+"14 WF 158 S",
+"14 WF 158 S ",
+"",
+"pass"
+],
+[
+"PTC 4-span truss 14-17",
+"L16-L18",
+"14 WF 111 S",
+"14 WF 111 S ",
+"",
+"pass"
+],
+[
+"PTC 4-span truss 14-17",
+"L18-L20",
+"14 WF 193 S",
+"14 WF 193 S ",
+"",
+"pass"
+],
+[
+"PTC 4-span truss 14-17",
+"L0-U1",
+"14 WF 287 S",
+"14 WF 287 S ",
+"",
+"pass"
+],
+[
+"PTC 4-span truss 14-17",
+"U1-L2",
+"14 WF 150 S",
+"14 WF 150 S ",
+"",
+"pass"
+],
+[
+"PTC 4-span truss 14-17",
+"L2-U3",
+"14 WF 150 S",
+"14 WF 150 S ",
+"",
+"pass"
+],
+[
+"PTC 4-span truss 14-17",
+"U3-L4",
+"14 WF 142 C",
+"14 WF 142 C ",
+"",
+"pass"
+],
+[
+"PTC 4-span truss 14-17",
+"L4-U5",
+"14 WF 142 C",
+"14 WF 142 C ",
+"",
+"pass"
+],
+[
+"PTC 4-span truss 14-17",
+"U5-L6",
+"14 WF 158 S",
+"14 WF 158 S ",
+"",
+"pass"
+],
+[
+"PTC 4-span truss 14-17",
+"L6-U7",
+"14 WF 158 S",
+"14 WF 158 S ",
+"",
+"pass"
+],
+[
+"PTC 4-span truss 14-17",
+"U7-L8",
+"14 WF 314 S",
+"14 WF 314 S ",
+"",
+"pass"
+],
+[
+"PTC 4-span truss 14-17",
+"L8-U9",
+"14 WF 264 S",
+"14 WF 264 S ",
+"",
+"pass"
+],
+[
+"PTC 4-span truss 14-17",
+"U9-L10",
+"14 WF 342 S + 2-Pls 16 1/2 x 7/8",
+"14 WF 342 S  covers 16.5x0.875 btwG,16.5x0.875 btwG",
+"",
+"pass"
+],
+[
+"PTC 4-span truss 14-17",
+"L10-U11",
+"14 WF 314 S + 2-Pls 16 x 11/16",
+"14 WF 314 S  covers 16x0.6875 btwG,16x0.6875 btwG",
+"",
+"pass"
+],
+[
+"PTC 4-span truss 14-17",
+"U11-L12",
+"14 WF 211 S",
+"14 WF 211 S ",
+"",
+"pass"
+],
+[
+"PTC 4-span truss 14-17",
+"L12-U13",
+"14 WF 246 S",
+"14 WF 246 S ",
+"",
+"pass"
+],
+[
+"PTC 4-span truss 14-17",
+"U13-L14",
+"14 WF 119 S",
+"14 WF 119 S ",
+"",
+"pass"
+],
+[
+"PTC 4-span truss 14-17",
+"L14-U15",
+"14 WF 142 C",
+"14 WF 142 C ",
+"",
+"pass"
+],
+[
+"PTC 4-span truss 14-17",
+"U15-L16",
+"14 WF 142 C",
+"14 WF 142 C ",
+"",
+"pass"
+],
+[
+"PTC 4-span truss 14-17",
+"L16-U17",
+"14 WF 87 S",
+"14 WF 87 S ",
+"",
+"pass"
+],
+[
+"PTC 4-span truss 14-17",
+"U17-L18",
+"14 WF 202 S",
+"14 WF 202 S ",
+"",
+"pass"
+],
+[
+"PTC 4-span truss 14-17",
+"L18-U19",
+"14 WF 184 S",
+"14 WF 184 S ",
+"",
+"pass"
+],
+[
+"PTC 4-span truss 14-17",
+"U19-L20",
+"14 WF 342 S",
+"14 WF 342 S ",
+"",
+"pass"
+],
+[
+"PTC 4-span truss 14-17",
+"U0-L0",
+"14 WF 84 S",
+"14 WF 84 S ",
+"",
+"pass"
+],
+[
+"PTC 4-span truss 14-17",
+"U2-L2",
+"16 WF 96 S",
+"16 WF 96 S ",
+"",
+"pass"
+],
+[
+"PTC 4-span truss 14-17",
+"U4-L4",
+"16 WF 96 S",
+"16 WF 96 S ",
+"",
+"pass"
+],
+[
+"PTC 4-span truss 14-17",
+"U6-L6",
+"16 WF 96 S",
+"16 WF 96 S ",
+"",
+"pass"
+],
+[
+"PTC 4-span truss 14-17",
+"U10-L10",
+"16 WF 96 S",
+"16 WF 96 S ",
+"",
+"pass"
+],
+[
+"PTC 4-span truss 14-17",
+"U20-L20",
+"16 WF 96 S",
+"16 WF 96 S ",
+"",
+"pass"
+],
+[
+"PTC 4-span truss 14-17",
+"U8-L8",
+"14 WF 84 S",
+"14 WF 84 S ",
+"",
+"pass"
+],
+[
+"PTC 4-span truss 14-17",
+"U12-L12",
+"14 WF 84 S",
+"14 WF 84 S ",
+"",
+"pass"
+],
+[
+"PTC 4-span truss 14-17",
+"U14-L14",
+"14 WF 84 S",
+"14 WF 84 S ",
+"",
+"pass"
+],
+[
+"PTC 4-span truss 14-17",
+"U16-L16",
+"14 WF 84 S",
+"14 WF 84 S ",
+"",
+"pass"
+],
+[
+"PTC 4-span truss 14-17",
+"U18-L18",
+"14 WF 84 S",
+"14 WF 84 S ",
+"",
+"pass"
+],
+[
+"PTC 4-span truss 14-17",
+"U1-L1",
+"14 WF 61 C",
+"14 WF 61 C ",
+"",
+"pass"
+],
+[
+"PTC 4-span truss 14-17",
+"U3-L3",
+"14 WF 61 C",
+"14 WF 61 C ",
+"",
+"pass"
+],
+[
+"PTC 4-span truss 14-17",
+"U5-L5",
+"14 WF 61 C",
+"14 WF 61 C ",
+"",
+"pass"
+],
+[
+"PTC 4-span truss 14-17",
+"U7-L7",
+"14 WF 61 C",
+"14 WF 61 C ",
+"",
+"pass"
+],
+[
+"PTC 4-span truss 14-17",
+"U9-L9",
+"14 WF 61 C",
+"14 WF 61 C ",
+"",
+"pass"
+],
+[
+"PTC 4-span truss 14-17",
+"U11-L11",
+"14 WF 61 C",
+"14 WF 61 C ",
+"",
+"pass"
+],
+[
+"PTC 4-span truss 14-17",
+"U13-L13",
+"14 WF 61 C",
+"14 WF 61 C ",
+"",
+"pass"
+],
+[
+"PTC 4-span truss 14-17",
+"U15-L15",
+"14 WF 61 C",
+"14 WF 61 C ",
+"",
+"pass"
+],
+[
+"PTC 4-span truss 14-17",
+"U17-L17",
+"14 WF 61 C",
+"14 WF 61 C ",
+"",
+"pass"
+],
+[
+"PTC 4-span truss 14-17",
+"U19-L19",
+"14 WF 61 C",
+"14 WF 61 C ",
+"",
+"pass"
+]
+]
