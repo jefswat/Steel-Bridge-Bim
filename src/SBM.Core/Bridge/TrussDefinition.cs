@@ -52,6 +52,12 @@ public sealed class TrussDefinition
     /// face only (<see cref="Steel.BoltInstance.FlushEnd"/>); one Info line counts them.</summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public bool RivetHeadsFlushAtSolePlates { get; set; }
+    /// <summary>OPTIONAL (omitted when false): the distributed (inside) rivet groups of the CHORD members meeting at a joint are laid as one rivet field - one
+    /// grid spacing for all chord sides, sized for their total count; each side takes the positions of its own lap (the side counts follow the laps, the
+    /// total is kept; one Info line per joint lists the counts before / after). The sheets draw the chord rivets as one field through the joint (the chord
+    /// field splice is often off the panel point, so a per-member split of the count is not a per-side density).</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public bool UniformChordRivets { get; set; }
     /// <summary>OPTIONAL (null = none, omitted from the .sbm): bracing connection plates (lateral / strut / sway gusset plates) at a point, with an
     /// optional edge angle onto the truss-plane joint and rivets (<see cref="TrussBracingGussetDefinition"/>).</summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
@@ -175,6 +181,10 @@ public sealed class TrussPly
     /// <summary>OPTIONAL (null = none): access holes cut in a perforated web ply (manholes of box struts), see <see cref="TrussPerforation"/>.</summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public TrussPerforation? Perforation { get; set; }
+    /// <summary>OPTIONAL (false = full length, omitted when false): the ply runs between the gusset plates of the member's two end joints (an outer ply whose
+    /// layer the gussets are INLAID in, e.g. PTC L13-L14 / L14-L15 "1 1/8 Inlaid Gusset Pl."); it does not count for the member width at the joints.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public bool BetweenGussets { get; set; }
     public TrussPly() { }
     public TrussPly(double depth, double thickness, string label = "") { Depth = depth; Thickness = thickness; Label = label; }
 }

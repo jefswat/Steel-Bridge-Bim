@@ -975,7 +975,8 @@ UNRESOLVED FLAG (general, reusable): `SBM.Core/Assumption.cs` `Assumption{Status
   shoes publish `BearingSeat`s with Location / axis -> `ForeignSeats`; a `SupportLinesOnly` bridge that gets a Truss generates it). `Truss/TrussGenerator` (pure,
   RegenerationCache branch) -> `TrussModel` (`SteelModel.Truss`; deck slab in `ConcreteModel.Deck`). Inputs: `Planes` (offset from the alignment, tilt), named
   `Points` (station + elevation, optional offset from the plane / plane filter: arch-type chords = the plan elevation table, no curve fit), `Sections`
-  (`TrussSectionKind` Box = web plies stacked from the OUTSIDE in + 4 angles (inside: backs on the innermost ply deeper than the angle leg) + covers (perforated =
+  (`TrussSectionKind` Box = web plies stacked from the OUTSIDE in + 4 angles (inside: backs on the innermost ply deeper than the angle leg; a ply that fits between the angle legs lies in
+  the leg layer and a deeper ply listed AFTER it lies inside the angles, between their outstanding legs; OPTIONAL `TrussPly.BetweenGussets` = outer ply the gussets are inlaid in) + covers (perforated =
   built solid, noted) + lacing / H (web vertical = floor beam) / LacedChannels / Angles / Rolled (AISC v16 exact name; not in the extract -> explicit dims or
   flagged envelope; `TrussSections.ParseAngle` for angles missing from AISC) / Plate / Round / Nominal (always flagged)), `Members` ("U3" on the member's plane or
   "N:U3" between planes; `Plane` "" = one per plane, mark "{plane}-{name}"; `Role`, `Panel` / `System` labels, setbacks, `OffsetZ`, `PlanLength` check), `Joints`
@@ -1017,8 +1018,9 @@ UNRESOLVED FLAG (general, reusable): `SBM.Core/Assumption.cs` `Assumption{Status
   when unset; test `TrussTests.DeckItems_SplicePlates_Stiffeners_ShoeMaterial`): `TrussDeckDefinition.HaunchDepth/HaunchBottomWidth/HaunchSideSlope` (thickening under every
   stringer -> ConcreteModel.Haunches), `TrussDefinition.LineItems` (`TrussLineItemDefinition`: constant (U, V) section swept along the alignment at an offset or ACROSS it at a
   station, V from the finished grade; concrete -> ConcreteModel.Barriers, steel -> SteelPart of a Category: curbs / parapets, dam plates, gratings, diaphragm channels),
-  `TrussJointDefinition.Plates` (`TrussJointPlate` Top / Bottom / WebInside / WebOutside splice + fill plates, fills on their side's member face, splice plates stacked over
-  them), `TrussMemberDefinition.Stiffeners` (`TrussStiffenerSet`: web stiffener angles / web plates at distances along the member), `TrussShoeDefinition.BodyMaterial`.
+  `TrussJointDefinition.Plates` (`TrussJointPlate` Top / Bottom / WebInside / WebOutside splice + fill plates; since QC pass 4 every plate
+  lies on the steel UNDER IT within its own band - member pieces (plies, angle legs, covers; `TrussGenerator.PieceLevel`) of the chord(s) its length reaches and the plates already placed
+  that overlap it; fills first, the one closest to the member first, then splice plates; marks keep the listed order), `TrussMemberDefinition.Stiffeners` (`TrussStiffenerSet`: web stiffener angles / web plates at distances along the member), `TrussShoeDefinition.BodyMaterial`.
   PTC: 6 3/4 slab to the parapet faces + 1 in thickening, curb + parapet section, aluminum railing (`Railings`), 18 dam bands, walkways (approach CL + pier floor beams, main
   L11 struts / FB11), main gussets from connections/gussets.csv + 110 chord splice / fill plates (splices.csv), girder stiffeners + web splice, mid-panel 15[33.9 diaphragms.
   Piers: piers.csv corrected per piers-review.md, legs lofted to the PRINTED base (`Leg(..., baseA, baseB)`). Checks: location 373 PASS / 47 DIFF (section 7 = p.42 quantities by
@@ -1050,6 +1052,11 @@ UNRESOLVED FLAG (general, reusable): `SBM.Core/Assumption.cs` `Assumption{Status
   3D-RIVETS; IFC types keyed by diameter + grip + material. PTC: 226,632 rivets (main 56,872, each 3-span 13,880, each 4-span 35,360, girder spans 50,940 / 20,340), heads
   107.6 k lb; IFC 41 -> 105 MB (1.15 M entities; validate 0 issues); viewport buffers 186 -> 211 MB. Group text -> member mapping, p.70 diameter rules, skipped
   groups (cover plate splice plan views, member splices, lugs, bracing, stubs) and the third-pass CORRECTION rows: see TRUSS-DESIGN.md section 11.
+  CHORD RIVET FIELD (2026-10-21, user review of 4-span L20; TRUSS-DESIGN.md 21): OPTIONAL `TrussDefinition.UniformChordRivets` (set by rivets-ptc.csx) lays the distributed
+  inside groups of the chord members at a joint as ONE field (`TrussGenerator.PooledChordRivets`: one grid sized for their total, each side takes its lap's positions,
+  total kept, Info per joint "chord rivets laid as one field"); diagnostics `qc/ptc/work/fix4/rivet_grid.csx` + `grid_balance.py`.
+  QC PASS 4 (2026-10-21, TRUSS-DESIGN.md 21): Box ply layers (a ply after one that fits between the angle legs lies inside the angles), `TrussPly.BetweenGussets`
+  (inlaid gussets: L13-L14 / L14-L15 2'-7 1/4 o. to o.), joint plates stacked on the steel under them.
   STEP 2 (2026-10-21, TRUSS-DESIGN.md 11b): counts = rivet SYMBOLS drawn inside each gusset outline per member (`tools/ptc_rivet_count.py` -> `connections/rivet-counts.csv`, hand zones
   `rivet-count-zones.csv`, main L11 `rivet-counts-extra.csv`), given to the joint, its other half and its 'similar to' joints; symbols just outside the outline -> OPTIONAL
   `TrussRivetGroup.Beyond` / `BeyondLength`; generic placement: clean plate stack under both heads (`SectionRun`), no head over another (>= 0.8 (d1 + d2)), grid >= 1.6 d; OPTIONAL

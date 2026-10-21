@@ -144,6 +144,10 @@ foreach (var (key, bridges, C) in structures)
         if (br?.Truss == null) { report.Add($"{bn}: no truss in this model - skipped"); continue; }
         var t = br.Truss;
         t.RivetHeadsFlushAtSolePlates = true;   // heads that would bear into a shoe sole plate are countersunk flush (QC I020)
+        // user review 2026-10-21 (4-span L20 over the shoe, p.67): the chord rivets are drawn as ONE field through the joint (4 lines, ~3 in. pitch both sides;
+        // the field splice is 2'-1 right of L20, so the symbol count split at the panel point gave 38 / 54 per side = a 3 15/16 / 2 7/8 grid). Lay the
+        // chord sides of every joint on one grid, total count kept.
+        t.UniformChordRivets = true;
         foreach (var j in t.Joints) j.Rivets.Clear();
         foreach (var cr in thkCorr)
             foreach (Match m in tokenRx.Matches(cr["joint"]))

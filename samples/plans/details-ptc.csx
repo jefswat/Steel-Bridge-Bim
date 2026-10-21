@@ -278,6 +278,9 @@ if (T(Main) is { } tmE)
             ec.Unresolved = ec.Unresolved.Replace(f8EndFlag, "").Replace(f5Flag, "").Trim();
             if (m.Name.StartsWith("FB13"))
             {
+                // QC pass 4 (I039, 2026-10-21): the L13 gussets are now at 2'-5 in to in (p.83), OUTSIDE the chord line, and the deep F8 reaches down into
+                // the gusset height - its web ends at the gusset's outer face (1'-3 5/8 from the truss CL) instead of the 1'-2 1/2 member face line.
+                m.StartSetback = Ft(1) + In(3.625); m.EndSetback = Ft(1) + In(3.625);
                 ec.Angle = "L8x8x3/4"; ec.Label = "2-Ls 8x8x3/4, 1-Fill 11 1/2x3/4 (F8)"; ec.Source = "p.95";
                 ec.Unresolved = (ec.Unresolved + " " + f8EndFlag).Trim();
                 nF8++;

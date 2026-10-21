@@ -172,9 +172,16 @@ public static class TrussSections
         var a = AngleOf(s, r.Notes);
         bool angIn = a != null && !s.AnglesOutside && s.AngleEdges != "none";
         double legZone = a != null ? d / 2 + s.AngleProjection - a.LegA : d / 2;   // the angle leg on the web reaches down to this |y|
-        // plies reaching the inside angles (from the outside face inward, up to the last ply deeper than the angle leg zone)
+        // plies reaching the inside angles (from the outside face inward, up to the last ply deeper than the angle leg zone). A ply that FITS between the
+        // angle legs lies in the layer of the legs; a deeper ply listed after it cannot be in that layer, so it lies INSIDE the angles (between their
+        // outstanding legs), e.g. PTC "34 x 1 1/8; 18 x 1 (between the Ls); 31 1/2 x 5/8 (inside the Ls)" (p.69 half section).
+        double PlyDepth(TrussPly p) => p.Depth > 0 ? p.Depth : d;
+        int kFit = -1;
+        if (angIn)
+            for (int k = 0; k < s.WebPlies.Count; k++) if (PlyDepth(s.WebPlies[k]) / 2 <= legZone + 1e-6) { kFit = k; break; }
+        bool InsideAngles(int k) => kFit >= 0 && k > kFit && PlyDepth(s.WebPlies[k]) / 2 > legZone + 1e-6;
         int kLast = 0;
-        for (int k = 0; k < s.WebPlies.Count; k++) if ((s.WebPlies[k].Depth > 0 ? s.WebPlies[k].Depth : d) / 2 > legZone + 1e-6) kLast = k;
+        for (int k = 0; k < s.WebPlies.Count; k++) if (PlyDepth(s.WebPlies[k]) / 2 > legZone + 1e-6 && !InsideAngles(k)) kLast = k;
         double tReach = angIn ? s.WebPlies.Take(kLast + 1).Sum(p => p.Thickness) : tw;
         double outer;
         if (s.WebsOutToOut > 0)
@@ -186,16 +193,31 @@ public static class TrussSections
         else if (s.WebsBackToBack > 0) outer = s.WebsBackToBack / 2 + tReach;
         else return;
         r.WebThickness = tw;
-        r.WebOuterX = outer; r.WebInnerX = outer - tw; r.WebDepth = d;
         double angleFace = outer - tReach;
+        double tInside = Enumerable.Range(0, s.WebPlies.Count).Where(InsideAngles).Sum(k => s.WebPlies[k].Thickness);
+        r.WebOuterX = outer; r.WebDepth = d;
+        r.WebInnerX = tInside > 0 ? angleFace - a!.Thickness - tInside : outer - tw;
+        if (tInside > 0)
+        {
+            double free = d + 2 * (s.AngleProjection - a!.Thickness);   // between the outstanding legs
+            foreach (var k in Enumerable.Range(0, s.WebPlies.Count).Where(InsideAngles))
+            {
+                if (PlyDepth(s.WebPlies[k]) > free + 1e-6)
+                    r.Notes.Add($"CHECK section {s.Name}: ply {L(PlyDepth(s.WebPlies[k]))} inside the angles is deeper than the {L(free)} between their outstanding legs");
+            }
+            r.Notes.Add($"section {s.Name}: {string.Join(", ", Enumerable.Range(0, s.WebPlies.Count).Where(InsideAngles).Select(k => $"{L(PlyDepth(s.WebPlies[k]))} x {L(s.WebPlies[k].Thickness)}"))} ply inside the angles (listed after a ply that fits between the angle legs)");
+        }
         foreach (int sg in new[] { -1, 1 })
         {
-            double x0 = outer;
-            foreach (var p in s.WebPlies)
+            double x0 = outer, xi = angleFace - (a?.Thickness ?? 0);
+            for (int k = 0; k < s.WebPlies.Count; k++)
             {
-                double pd = p.Depth > 0 ? p.Depth : d;
-                r.Pieces.Add(new(Rect(sg * x0, sg * (x0 - p.Thickness), -pd / 2, pd / 2), p.Label.Length > 0 ? p.Label : $"web PL {L(pd)} x {L(p.Thickness)}", p.Length, 0, p.Start ?? double.NaN, false, p.Perforation));
-                x0 -= p.Thickness;
+                var p = s.WebPlies[k];
+                double pd = PlyDepth(p);
+                bool ins = InsideAngles(k);
+                double xa = ins ? xi : x0;
+                r.Pieces.Add(new(Rect(sg * xa, sg * (xa - p.Thickness), -pd / 2, pd / 2), p.Label.Length > 0 ? p.Label : $"web PL {L(pd)} x {L(p.Thickness)}", p.Length, 0, p.Start ?? double.NaN, p.BetweenGussets, p.Perforation));
+                if (ins) xi -= p.Thickness; else x0 -= p.Thickness;
             }
         }
         r.OuterPly = s.WebPlies[0].Thickness;
