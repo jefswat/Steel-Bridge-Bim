@@ -1,0 +1,310 @@
+[
+[
+"U0-L0",
+"2-Pls 23x9/16; L6x6x7/16; 2-Pls (24-12)x7/16; C",
+"23x0.5625 /side; L6x6x7/16; covers 24x0.4375 perf,24x0.4375 perf; C",
+"",
+"pass"
+],
+[
+"U1-L1",
+"C18x42.7; -; 2-Pls (28-12)x3/8; C",
+"channel MC18x42.7; -; covers 28x0.375 perf,28x0.375 perf; C",
+"",
+"pass"
+],
+[
+"U2-L2",
+"C18x45.8; -; 2-Pls (28-12)x1/2; C",
+"channel MC18x45.8; -; covers 28x0.5 perf,28x0.5 perf; C",
+"",
+"pass"
+],
+[
+"U3-L3",
+"C18x42.7; -; 2-Pls (28-12)x3/8; C",
+"channel MC18x42.7; -; covers 28x0.375 perf,28x0.375 perf; C",
+"",
+"pass"
+],
+[
+"U4-L4",
+"C18x45.8; -; 2-Pls (28-12)x1/2; C",
+"channel MC18x45.8; -; covers 28x0.5 perf,28x0.5 perf; C",
+"",
+"pass"
+],
+[
+"U5-L5",
+"C18x45.8; -; 2-Pls (28-12)x1/2; C",
+"channel MC18x45.8; -; covers 28x0.5 perf,28x0.5 perf; C",
+"",
+"pass"
+],
+[
+"U6-L6",
+"C18x45.8; -; 2-Pls (28-12)x1/2; C",
+"channel MC18x45.8; -; covers 28x0.5 perf,28x0.5 perf; C",
+"",
+"pass"
+],
+[
+"U7-L7",
+"C18x45.8; -; 2-Pls (28-12)x1/2; C",
+"channel MC18x45.8; -; covers 28x0.5 perf,28x0.5 perf; C",
+"",
+"pass"
+],
+[
+"U8-L8",
+"C18x45.8; -; 2-Pls (28-12)x1/2; C",
+"channel MC18x45.8; -; covers 28x0.5 perf,28x0.5 perf; C",
+"",
+"pass"
+],
+[
+"U9-L9",
+"2-Pls 21x1/2; L5x5x1/2; 2-Pls (27-12)x7/16; C",
+"21x0.5 /side; L5x5x1/2; covers 27x0.4375 perf,27x0.4375 perf; C",
+"",
+"pass"
+],
+[
+"U10-L10",
+"2-Pls 26x1/2; L7x4x1/2; 2-Pls (27-12)x1/2; C",
+"26x0.5 /side; L7x4x1/2; covers 27x0.5 perf,27x0.5 perf; C",
+"",
+"pass"
+],
+[
+"U12-L12",
+"4-Pls 28x1; L7x4x7/8; 2-Pls (24-12)x9/16; S",
+"28x1 + 28x1 /side; L7x4x7/8; covers 24x0.5625 perf,24x0.5625 perf; S",
+"",
+"pass"
+],
+[
+"U13-L13",
+"2-Pls 26x15/16 + 2-Pls 26x7/8; L7x4x7/8; 2-Pls (25-12)x9/16; S",
+"26x0.9375 + 26x0.875 /side; L7x4x7/8; covers 25x0.5625 perf,25x0.5625 perf; S",
+"",
+"pass"
+],
+[
+"U14-L14",
+"4-Pls 26x13/16; L7x4x3/4; 2-Pls (25-12)x9/16; S",
+"26x0.8125 + 26x0.8125 /side; L7x4x3/4; covers 25x0.5625 perf,25x0.5625 perf; S",
+"",
+"pass"
+],
+[
+"U15-L15",
+"4-Pls 26x11/16; L7x4x3/4; 2-Pls (25-12)x5/8; S",
+"26x0.6875 + 26x0.6875 /side; L7x4x3/4; covers 25x0.625 perf,25x0.625 perf; S",
+"",
+"pass"
+],
+[
+"U16-L16",
+"2-Pls 26x1 1/8; L7x4x3/4; 2-Pls (26-12)x5/8; S",
+"26x1.125 /side; L7x4x3/4; covers 26x0.625 perf,26x0.625 perf; S",
+"",
+"pass"
+],
+[
+"U17-L17",
+"2-Pls 26x15/16; L7x4x3/4; 2-Pls (26-12)x9/16; S",
+"26x0.9375 /side; L7x4x3/4; covers 26x0.5625 perf,26x0.5625 perf; S",
+"",
+"pass"
+],
+[
+"U18-L18",
+"2-Pls 26x13/16; L7x4x5/8; 2-Pls (28-12)x1/2; S",
+"26x0.8125 /side; L7x4x5/8; covers 26x0.5 perf,26x0.5 perf; S",
+"covers [(26.0, 0.5, True, 0), (26.0, 0.5, True, 0)]",
+"fail"
+],
+[
+"U19-L19",
+"2-Pls 24x9/16; L7x4x9/16; 2-Pls (27-12)x1/2; S",
+"24x0.5625 /side; L7x4x9/16; covers 27x0.5 perf,27x0.5 perf; S",
+"",
+"pass"
+],
+[
+"U20-L20",
+"C18x51.9; -; 2-Pls (28-12)x9/16; S",
+"channel MC18x51.9; -; covers 28x0.5625 perf,28x0.5625 perf; S",
+"",
+"pass"
+],
+[
+"U21-L21",
+"C18x45.8; -; 2-Pls (28-12)x1/2; C",
+"channel MC18x45.8; -; covers 28x0.5 perf,28x0.5 perf; C",
+"",
+"pass"
+],
+[
+"U22-L22",
+"C18x42.7; -; 2-Pls (28-12)x3/8; C",
+"channel MC18x42.7; -; covers 28x0.375 perf,28x0.375 perf; C",
+"",
+"pass"
+],
+[
+"L0-U1",
+"C18x45.8; -; 2-Pls (28-12)x1/2; C",
+"channel MC18x45.8; -; covers 28x0.5 perf,28x0.5 perf; C",
+"",
+"pass"
+],
+[
+"U1-L2",
+"C18x58; -; 2-Pls (28-12)x9/16; C",
+"channel MC18x58; -; covers 28x0.5625 perf,28x0.5625 perf; C",
+"",
+"pass"
+],
+[
+"L2-U3",
+"2-Pls 21x9/16; L7x4x1/2; 2-Pls (27-12)x3/8; S",
+"21x0.5625 /side; L7x4x1/2; covers 27x0.375 perf,27x0.375 perf; S",
+"",
+"pass"
+],
+[
+"U3-L4",
+"2-Pls 24x5/8; L7x4x1/2; 2-Pls (27-12)x1/2; S",
+"24x0.625 /side; L7x4x1/2; covers 27x0.5 perf,27x0.5 perf; S",
+"",
+"pass"
+],
+[
+"L4-U5",
+"2-Pls 26x3/4; L7x4x9/16; 2-Pls (27-12)x1/2; S",
+"26x0.75 /side; L7x4x9/16; covers 27x0.5 perf,27x0.5 perf; S",
+"",
+"pass"
+],
+[
+"U5-L6",
+"2-Pls 26x7/8; L7x4x9/16; 2-Pls (26-12)x1/2; S",
+"26x0.875 /side; L7x4x9/16; covers 26x0.5 perf,26x0.5 perf; S",
+"",
+"pass"
+],
+[
+"L6-U7",
+"2-Pls 26x13/16; L7x4x5/8; 2-Pls (26-12)x1/2; S",
+"26x0.8125 /side; L7x4x5/8; covers 26x0.5 perf,26x0.5 perf; S",
+"",
+"pass"
+],
+[
+"U7-L8",
+"2-Pls 26x13/16; L7x4x9/16; 2-Pls (27-12)x1/2; S",
+"26x0.8125 /side; L7x4x9/16; covers 27x0.5 perf,27x0.5 perf; S",
+"",
+"pass"
+],
+[
+"L8-U9",
+"2-Pls 26x5/8; L7x4x1/2; 2-Pls (27-12)x1/2; S",
+"26x0.625 /side; L7x4x1/2; covers 27x0.5 perf,27x0.5 perf; S",
+"",
+"pass"
+],
+[
+"U9-L10",
+"2-Pls 26x9/16; L7x4x1/2; 2-Pls (27-12)x1/2; S",
+"26x0.5625 /side; L7x4x1/2; covers 27x0.5 perf,27x0.5 perf; S",
+"",
+"pass"
+],
+[
+"L10-U11",
+"2-Pls 26x7/16; L7x4x7/16; 2-Pls (27-12)x3/8; S",
+"26x0.4375 /side; L7x4x7/16; covers 27x0.375 perf,27x0.375 perf; S",
+"",
+"pass"
+],
+[
+"U11-L12",
+"2-Pls 26x1; L7x4x7/8; 2-Pls (26-12)x9/16; S",
+"26x1 /side; L7x4x7/8; covers 26x0.5625 perf,26x0.5625 perf; S",
+"",
+"pass"
+],
+[
+"U12-L13",
+"2-Pls 26x1 1/16; L7x4x7/8; 2-Pls (26-12)x9/16; S",
+"26x1.0625 /side; L7x4x7/8; covers 26x0.5625 perf,26x0.5625 perf; S",
+"",
+"pass"
+],
+[
+"U13-L14",
+"2-Pls 26x1; L7x4x7/8; 2-Pls (26-12)x9/16; S",
+"26x1 /side; L7x4x7/8; covers 26x0.5625 perf,26x0.5625 perf; S",
+"",
+"pass"
+],
+[
+"U14-L15",
+"2-Pls 28x1; L7x4x7/8; 2-Pls (26-12)x9/16; S",
+"28x1 /side; L7x4x7/8; covers 26x0.5625 perf,26x0.5625 perf; S",
+"",
+"pass"
+],
+[
+"U15-L16",
+"2-Pls 26x1 1/16; L7x4x7/8; 2-Pls (26-12)x9/16; S",
+"26x1.0625 /side; L7x4x7/8; covers 26x0.5625 perf,26x0.5625 perf; S",
+"",
+"pass"
+],
+[
+"U16-L17",
+"2-Pls 26x1 1/16; L7x4x7/8; 2-Pls (26-12)x9/16; S",
+"26x1.0625 /side; L7x4x7/8; covers 26x0.5625 perf,26x0.5625 perf; S",
+"",
+"pass"
+],
+[
+"U17-L18",
+"2-Pls 26x1 1/16; L7x4x7/8; 2-Pls (26-12)x9/16; S",
+"26x1.0625 /side; L7x4x7/8; covers 26x0.5625 perf,26x0.5625 perf; S",
+"",
+"pass"
+],
+[
+"U18-L19",
+"2-Pls 26x1; L7x4x3/4; 2-Pls (26-12)x9/16; S",
+"26x1 /side; L7x4x3/4; covers 26x0.5625 perf,26x0.5625 perf; S",
+"",
+"pass"
+],
+[
+"U19-L20",
+"2-Pls 24x7/8; L7x4x3/4; 2-Pls (26-12)x1/2; S",
+"24x0.875 /side; L7x4x3/4; covers 26x0.5 perf,26x0.5 perf; S",
+"",
+"pass"
+],
+[
+"U20-L21",
+"2-Pls 21x5/8; L7x4x9/16; 2-Pls (27-12)x1/2; S",
+"21x0.625 /side; L7x4x9/16; covers 27x0.5 perf,27x0.5 perf; S",
+"",
+"pass"
+],
+[
+"U21-L22",
+"C18x51.9; -; 2-Pls (28-12)x1/2; C",
+"channel MC18x51.9; -; covers 28x0.5 perf,28x0.5 perf; C",
+"",
+"pass"
+]
+]

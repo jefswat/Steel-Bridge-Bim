@@ -181,3 +181,63 @@ User focus: "member make up and any layered plates, especially at gussets". Inde
 - Approach joint sheets other than p.60 / p.63 (3-span p.49-53, 4-span p.59, 61, 62, 64-67): gusset thickness / in-to-in not re-read in this pass.
 - Splice / fill / inlay plates that the model flags as not built (no length on the sheets) were not raised; the outer layer outlines at L10 / L11 / L22 and the approach L0 / L8 / L10 / L20 were not re-scaled.
 - Angle leg orientation (8 in. leg on the web) is inferred from the 18 in. plates fitting between the legs, not from a drawn section.
+
+# Pass 5 (web members, approach make-up and joints, floor beams, bracing, outer gusset layers; 2026-10-21)
+
+Independent checker, same focus as pass 4 (member make-up and layered plates, especially at gussets), covering what pass 4 did not. The model is checked against the sheets; the CSVs / scripts are the thing under test. Nothing in the code, scripts or data was changed.
+
+## Scope and method
+- Model: copy of `samples/plans/PTC Delaware River Bridge.sbm` at main 68f8f39 (regenerated with the pass 4 fixes) in `C:\SBM\temp\qc5\ptc.sbm`; CLI built from the same commit into `C:\SBM\temp\cli-qc5`. Read-only.
+- Model data: `work/p5/dump_sbm.py` (truss inputs per bridge -> `work/p5/dump_*.txt`), `work/p5/dump_solids.csx` (every exact extrusion as x from the truss plane / station / z / member-local y), `work/p5/rivets_multi.csx` + `chord_lines.py` (chord rivet lines per face at a joint), `sbm clash ptc.sbm --bridge Arch` (1/16 in.).
+- Sheets read one page at a time with PyMuPDF (`work/p5/crop.py`, `gridcrop.py` = crop with a labelled pixel grid for scaling): p.47, 49-53, 57, 59, 61, 62, 64-67, 70-72, 74, 76, 78, 82, 93, 94, 97. Evidence crops in `evidence/p5/` (git-ignored like all PNGs; copies in `C:\SBM\qc\ptc\evidence\p5`).
+- Table comparisons scripted: `web_cmp.py` (p.70 SECTION columns, 44 web members), `appr_cmp.py` (p.47 / p.57 member tables, 100 members); rows written by `work/p5/rows.py`, issues by `work/p5/issues.py`.
+
+## Rows and results (results/checks.csv C2028-C2355, 328 rows)
+| Block | Rows | pass | fail | other |
+|---|---|---|---|---|
+| Main web members p.70 (plies / channels, angles, covers, material) + ply order, angle / channel orientation | 48 | 47 | 0 | 1 conflict (U18-L18) |
+| Approach member tables p.47 / p.57 + 14 WF orientation + 4-span cover plate extents | 103 | 103 | 0 | |
+| Approach joints p.49-53, 59, 61, 62, 64-67: gusset thickness, in to in, stacked layers | 120 | 118 | 2 | |
+| Approach fills / splice plates (flagged), chord rivet layout | 8 | 1 | 0 | 7 info |
+| Floor beams F5-F8 (p.72, 93), marks, main bracing sections + gussets (p.71, 97) | 16 | 15 | 1 | |
+| Outer gusset layer outlines (3-span L8, 4-span L20, main L10) + gusset-layers.csv | 16 | 9 | 4 | 2 info, 1 n.a. |
+| Pass 4 fixes I036-I045 re-verified | 10 | 10 | 0 | |
+| Kinked panel points and web member ends (clash + sheets) | 7 | 0 | 7 | |
+| Total | 328 | 303 | 14 | 9 info, 1 conflict, 1 n.a. |
+
+All rows in results/checks.csv: 2,355 (2,100 pass, 229 fail, 8 conflict, 12 info, 6 n.a.).
+
+## Findings
+- Main web members (p.70): every vertical and diagonal agrees with the SECTION column (web plates per side, 18 in. channel weights, 4 angles, perforated covers, C / S). U18-L18: p.70 prints the covers (28-12) x 1/2 but the printed gross 94.17 sq in fits 26 in. (28 gives 96.17) and p.88 prints 26 - plan conflict, the model follows p.88 (webs.csv note). Ply order of the only mixed-ply member (U13-L13, "26 x 15/16 o.s.", p.82) agrees.
+- Angle / channel orientation now read from drawn sections (p.70 member sketches): chords 8 in. leg on the web (gage chain 2 3/8 + 3 in the web leg), web members 7 in. leg on the web with the angles inside the webs and the covers between the webs on the outstanding legs, channel webs on the gusset side with the flanges inward. The model agrees in every case (pass 4 had only inferred it).
+- Approach tables (p.47 / p.57): all 37 + 63 members agree (designation, carbon / silicon). The 4-span cover plates (U3-U5 2-Pls 16 x 15/16, U9-U11 16 1/2 x 13/16, U9-L10 16 1/2 x 7/8, L10-U11 16 x 11/16) are modeled between the gussets, which is what p.62 / p.64 show (the cover starts at the gusset edge, the 16 x 1 1/8 splice plates lie outside the gussets; the 17 1/2 in to in at U11 equals the 14 WF 342 depth). The 14 WF orientation (web across the truss plane) is confirmed by the p.47 chord net-area sketch (drain hole in the web) and p.49 Section B-B.
+- Approach joints: of 61 joints read (both units of each type share the inputs), thickness and in to in agree everywhere except 4-span U6 (model 7/8; the sheet prints no thickness and says "similar to U2" = 5/8; I049) and 4-span U20 (in to in left automatic: 17 1/8 vs printed 17 1/4; I050). Stacked layers at 3-span L8 / L8' / L0', 4-span L0 / L20 agree in thickness and order (outer plate drawn over the rivet fields). The 25-27 / 21-24 units use the same inputs.
+- Approach fills / splice plates: not built and flagged "listed per joint without extents"; the sheets give sizes and draw the extents to scale like the main truss sheets, and the modeled gussets stand up to 1 3/4 in. off the member flanges (I051).
+- Chord rivet layout (uniform chord grid, TRUSS-DESIGN 21): 4 lines per face as drawn; but at 3-span U3 the sheet draws 36 (+5 beyond) / 27 rivets per face on the two members (the data file agrees) and the uniform grid gives 36 / 33, and at L4 the sheet is dense next to the splice and sparse toward the gusset ends (I052, for the user).
+- Floor beams (p.72 schedule, p.93, p.94): F5, F6, F7, F8 make-up and cover plate lengths agree, marks by panel (F5 0, F8 13, F7 22, F6 elsewhere) agree; F8 extra angles are flagged (reason checked on p.72 / p.95). F7 at W22 is 1 3/8 in. too narrow: p.93 "2'-1 1/2 in to in Webs" / "2'-1 1/2 b.b. Ls", model 25 o. to o.; the flag claims p.93 was not read (I046).
+- Main bracing (p.71, p.97): struts (typical, L0, L11), lateral diagonals (13[ 31.8 / 13[ 50 panels), sway diagonals (typical, L11), floor laterals W21-W22 and L13-W14 (web plates flagged) agree; lateral gussets 2-1/2 plates + 2-Ls 7 x 4 x 1/2 agree.
+- Outer gusset layer outlines, re-scaled on 300 dpi grid crops: 3-span L8 within 1.6 in. of gusset-layers.csv everywhere; 4-span L20 within 1.4 in. except the right top corner (sheet about 25.8 in. from the WP vs 21.3, low confidence) and the bottom edge (-8.5 vs -10.9). Main L10: edges not separable from the rivet / member linework. gusset-layers.csv still carries the pre-fix in to in values at U7 / U9 / L8 / L13 (data only, I053).
+- Pass 4 fixes I036-I045: all confirmed on the regenerated model (C2339-C2348); status set to closed.
+
+## Kinked panel points (the 116 overlaps left by pass 4) - for the user's decision
+The sheets show ONE finished ("Fin.", milled) joint line through the panel point where two chords meet at an angle: p.74 U1 (a straight line about 1 in. left of the work point, field rivets on one side, shop rivets on the other) and p.76 L6 ("Fin." on the L6 axis; the left fills 31 1/2 x 1 1/16 and 18 x 7/8 END at that line and the right fills 18 x 7/8 START there). Fills and splice fills are dimensioned to the joint line. The model cuts each chord square at the point and extends it by h/2 x tan(deflection / 2), so the two end wedges overlap each other and each reaches 1-1 1/2 in. back past the point into the neighbour's fills / splice plates: on the qc5 build `sbm clash` gives TrussChord x TrussChord 168 rows (up to 0.63 in.), FillerPlate x TrussChord 64 (up to 0.44) and SplicePlate x TrussChord 52 (up to 0.50) - the last two are the pass 4 "116". Suggested option: cut both chord ends on the bisector (mitre) plane through the panel point; the fills then end on it as drawn and all three groups should disappear (I047). Separately, the vertical members run to the chord envelope and overlap the cover splice plates on the chord face by 5/16 in. (28 rows; p.74 draws the U1-L1 channels ending about 2 in. below the chord; I048).
+
+## New issues (results/issues.csv, status open)
+| id | sev | page | finding |
+|---|---|---|---|
+| I046 | medium | 93 | F7 (FB22) webs 25 in. o. to o.; p.93 "2'-1 1/2 in to in Webs" (26 3/8 o. to o.); flag says p.93 not read |
+| I047 | medium | 74-89 | kinked chord joints: sheets show one milled joint line through the point, fills end at it; model square cut + extension -> 284 overlaps |
+| I048 | low | 74-75 | verticals overlap the chord cover splice plates / fill by 5/16 (0.15) in.; p.74 vertical ends about 2 in. below the chord |
+| I049 | low | 61 | 4-span U6 gussets 7/8 in model; sheet "similar to U2" = 5/8 (joints.csv callout not on the sheet) |
+| I050 | low | 67 | 4-span U20 in to in automatic 17 1/8 vs printed 17 1/4 |
+| I051 | low | 49-67 | approach fills / splice plates flagged "without extents" but sized and drawn to scale; gussets up to 1 3/4 in. off the flanges |
+| I052 | low | 50, 51 | uniform chord rivet grid vs per-member densities drawn at 3-span U3 / L4 |
+| I053 | low | 76, 77, 83 | gusset-layers.csv in_to_in stale at U7 / U9 / L8 / L13 (model correct) |
+
+## Not verified in pass 5
+- Approach joints: fills / splice plates are not built, so their stacking could not be checked against the sheets; their sizes were read at 5 joints only (C2299-C2303).
+- Main floor beam F5-F8 partial cover plate positions along the beam (flagged; the p.94 elevation is broken, not measurable), F7 reinforcing plates, end diaphragm and bearing at W22, the tongue beam (flagged).
+- Approach bracing connection plates (p.48 / 56 / 58) and the main sway / portal / floor lateral connection plates (p.98-100) beyond the gusset thickness / edge angle row; approach bracing sections were checked in pass 3.
+- Outer gusset layers other than 3-span L8 / 4-span L20 (main L10 / L11 / L22 and approach L0 / L10 not re-scaled; main L10 not separable).
+- Chord rivet layout at joints other than 3-span U3 / L4 (hand counts; no detector run).
+- 1954 rolled-shape dimensions (d / bf / tw / tf) of the approach 14 WF members remain flagged; in to in minus the drawn fills gives d at a few joints (14 WF 87: 14.0 at 3-span U10, 14 1/8 at L12) and does not contradict the model's interpolated depths by more than 1/8 in.
