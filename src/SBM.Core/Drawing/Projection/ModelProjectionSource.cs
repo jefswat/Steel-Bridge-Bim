@@ -194,14 +194,14 @@ public static class ModelProjectionSource
             }
             if (o.Bolts)
             {
-                var cache = new Dictionary<(double, double, double, BoltKind, double), Mesh>();
+                var cache = new Dictionary<(double, double, double, BoltKind, double, bool), Mesh>();
                 int i = 0;
                 foreach (var b in steel.Bolts)
                 {
-                    var key = (b.Diameter, b.Grip, b.Length, b.Kind, b.Embedment);
+                    var key = (b.Diameter, b.Grip, b.Length, b.Kind, b.Embedment, b.FlushEnd);
                     if (!cache.TryGetValue(key, out var local))
                         cache[key] = local = b.Kind == BoltKind.Anchor ? SteelModel.AnchorBoltMesh(b.Diameter, b.Grip, b.Embedment)
-                            : b.Kind == BoltKind.Rivet ? SteelModel.RivetMesh(b.Diameter, b.Grip)
+                            : b.Kind == BoltKind.Rivet ? SteelModel.RivetMesh(b.Diameter, b.Grip, flushEnd: b.FlushEnd)
                             : SteelModel.BoltMesh(b.Diameter > 0 ? new BoltGeometry(b.Diameter) : steel.Bolt, b.Grip, b.Length);
                     Add(Transform(local, b.Frame), b.Kind == BoltKind.Anchor ? "3D-ANCHOR-BOLTS" : b.Kind == BoltKind.Rivet ? "3D-RIVETS" : "3D-BOLTS", $"{b.Assembly}/bolt{i++}", b.Kind == BoltKind.Rivet ? "Rivet" : "Bolt", b.Kind == BoltKind.Rivet ? "rivet" : "bolt", b,
                         girderOf.GetValueOrDefault(b.Assembly, -1));

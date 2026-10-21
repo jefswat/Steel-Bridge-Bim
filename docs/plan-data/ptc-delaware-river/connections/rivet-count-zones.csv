@@ -1,0 +1,61 @@
+structure,joint,member,zone_px,note
+main,L15,BAND,"-4,40",drawn work point at the top of the arch chord field; band taken from the field
+main,L15,U15-L15,"552,185;692,185;692,478;552,478",vertical field (p.86)
+main,L15,U14-L15,"355,300;505,205;552,215;552,528;505,535;355,420",diagonal field (p.86)
+main,U11,SKIP,"1352,640;1371,640;1371,1225;1352,1225",post U11-L11 left edge: rivets drawn in profile (angle legs) - not through the gusset
+main,U11,SKIP,"1510,780;1523,780;1523,1225;1510,1225",post U11-L11 right edge: rivets drawn in profile
+main,U11,SKIP,"1527,1060;1548,1060;1548,1125;1527,1125",diagonal U11-L12 left edge: rivets drawn in profile
+main,U11,SKIP,"1598,940;1628,940;1628,1003;1598,1003",half hole callout text
+main,U11,SKIP,"1125,875;1215,875;1215,1195;1125,1195",bracing angle strip 2-Ls 5 x 3 1/2 x 7/16 (C) on the gusset edge (not a truss member)
+main,U11,SKIP,"1640,690;1730,690;1730,1150;1640,1150",bracing angle strip 2-Ls 5 x 3 1/2 x 7/16 (C) on the gusset edge
+main,U11,SKIP,"1150,855;1330,855;1330,900;1150,900",callout text (1-L 8 x 6 x 5/8 / bent plate / half hole)
+main,U11,U11-L11,"1371,787;1510,787;1510,1225;1371,1225",post field between the profile edges (p.79)
+main,U12,SKIP,"1666,671;1689,671;1689,1000;1666,1000",post U12-L12 left edge: rivets drawn in profile
+main,U12,SKIP,"1802,671;1816,671;1816,1000;1802,1000",post U12-L12 right edge: rivets drawn in profile
+main,U12,SKIP,"1505,725;1665,725;1665,950;1505,950",bracing angle strip L 4 x 3 1/2 x 7/16 (C) on the gusset edge
+main,U12,SKIP,"1950,555;2015,555;2015,920;1950,920",bracing angle strip L 4 x 3 1/2 x 7/16 (C) on the gusset edge
+main,U12,SKIP,"1668,494;1702,488;1735,652;1700,660",chord splice line: profile symbols of the inlay / fill edges
+main,U12,SKIP,"1728,498;1765,494;1815,630;1785,640",chord splice line: profile symbols of the inlay / fill edges
+main,U12,U12-L12,"1689,640;1802,640;1802,1000;1689,1000",post field (p.81)
+main,L0,SKIP,"1695,915;1712,915;1712,1072;1695,1072",double-line outline of the end strut connection plate (slits read as circles)
+main,L0,SKIP,"1769,915;1786,915;1786,1072;1769,1072",double-line outline of the end strut connection plate
+main,L0,SKIP,"1695,1054;1786,1054;1786,1072;1695,1072",double-line outline of the end strut connection plate
+main,L0,SKIP,"1695,915;1786,915;1786,936;1695,936",double-line outline of the end strut connection plate / chord top line
+main,L0,SKIP,"1678,795;1694,795;1694,915;1678,915",end post U0-L0 left edge: rivets drawn in profile
+main,L0,SKIP,"1778,795;1797,795;1797,915;1778,915",end post U0-L0 right edge: rivets drawn in profile
+main,U13,SKIP,"605,630;619,630;619,915;605,915",post U13-L13 left edge: rivets drawn in profile
+main,U13,SKIP,"719,630;738,630;738,915;719,915",post U13-L13 right edge: rivets drawn in profile
+main,U13,SKIP,"485,660;605,660;605,880;485,880",bracing angle strip 2-Ls 4 x 3 1/2 x 7/16 (C) on the gusset edge
+main,U13,SKIP,"893,520;946,520;946,840;893,840",bracing angle strip 2-Ls 4 x 3 1/2 x 7/16 (C) on the gusset edge
+main,U13,SKIP,"608,458;628,452;668,598;648,603",chord splice line: profile symbols of the inlay / fill edges
+main,U13,SKIP,"683,452;707,447;748,572;724,578",chord splice line: profile symbols of the inlay / fill edges
+main,U13,U13-L13,"619,630;719,630;719,915;619,915",post field (p.82)
+main,U14,SKIP,"1360,1160;1374,1160;1374,1365;1360,1365",post U14-L14 left edge: rivets drawn in profile
+main,U14,SKIP,"1484,1160;1494,1160;1494,1365;1484,1365",post U14-L14 right edge: rivets drawn in profile
+main,U14,SKIP,"1238,1185;1352,1185;1352,1365;1238,1365",bracing angle strip 2-Ls 4 x 3 1/2 x 7/16 (C) on the gusset edge
+main,U14,SKIP,"1235,1172;1415,1128;1418,1142;1238,1186",chord bottom line: profile symbols
+main,U14,SKIP,"1636,1080;1664,1080;1664,1280;1636,1280",bracing angle strip 2-Ls 4 x 3 1/2 x 7/16 (C) on the gusset edge
+main,U14,SKIP,"1355,1003;1375,998;1410,1128;1392,1132",chord splice line: profile symbols of the inlay / fill edges
+main,U14,SKIP,"1436,978;1458,973;1490,1112;1470,1117",chord splice line: profile symbols of the inlay / fill edges
+main,U14,U14-L14,"1374,1160;1484,1160;1484,1365;1374,1365",post field (p.82)
+main,U15,SKIP,"1944,590;1957,590;1957,820;1944,820",post U15-L15 left edge: rivets drawn in profile
+main,U15,SKIP,"2065,590;2079,590;2079,820;2065,820",post U15-L15 right edge: rivets drawn in profile
+main,U15,SKIP,"1868,612;1938,612;1938,755;1868,755",bracing angle strip 2-Ls 4 x 3 1/2 x 7/16 (C) on the gusset edge
+main,U15,SKIP,"2206,525;2244,525;2244,675;2206,675",bracing angle strip 2-Ls 4 x 3 1/2 on the gusset edge
+main,U15,SKIP,"1946,428;1968,423;2000,565;1980,570",chord splice line: profile symbols of the inlay / fill edges
+main,U15,SKIP,"2027,408;2047,403;2075,552;2055,557",chord splice line: profile symbols of the inlay / fill edges
+main,U15,U15-L15,"1957,590;2065,590;2065,820;1957,820",post field (p.82)
+main,U16,SKIP,"490,610;502,610;502,805;490,805",post U16-L16 left edge: rivets drawn in profile
+main,U16,SKIP,"614,610;626,610;626,805;614,805",post U16-L16 right edge: rivets drawn in profile
+main,U16,SKIP,"428,610;490,610;490,740;428,740",stiffener angle strip L 4 x 3 1/2 x 7/16 (C) on the gusset edge
+main,U16,U16-L16,"502,610;614,610;614,805;502,805",post field (p.87)
+main,U17,SKIP,"1911,615;1929,615;1929,795;1911,795",post U17-L17 left edge: rivets drawn in profile
+main,U17,SKIP,"2034,615;2048,615;2048,795;2034,795",post U17-L17 right edge: rivets drawn in profile
+main,U17,SKIP,"1858,628;1911,628;1911,738;1858,738",stiffener angle strip L 4 x 3 1/2 x 7/16 (C) on the gusset edge
+main,U17,U17-L17,"1929,615;2034,615;2034,795;1929,795",post field (p.87)
+main,U18,SKIP,"830,595;858,580;905,700;880,708",diagonal U18-L19 lower edge: rivets drawn in profile
+main,L17,SKIP,"1335,715;1430,715;1430,850;1335,850",stiffener angle strip L 4 x 3 1/2 x 7/16 (C) on the gusset edge
+main,L17,SKIP,"1202,675;1217,675;1217,875;1202,875",post U17-L17 left edge: rivets drawn in profile
+main,L17,SKIP,"1312,675;1336,675;1336,875;1312,875",post U17-L17 right edge: rivets drawn in profile
+main,L17,SKIP,"1205,936;1222,931;1264,1063;1247,1070",chord splice line: profile symbols of the inlay / fill edges
+main,L17,SKIP,"1275,912;1292,907;1335,1033;1318,1040",chord splice line: profile symbols of the inlay / fill edges

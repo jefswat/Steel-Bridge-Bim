@@ -211,8 +211,8 @@ public static class SceneBuilder
             {
                     IEnumerable<(Mesh mesh, List<Matrix4x4> inst, List<object> tags)> groups = kind switch
                 {
-                    0 or 3 => m.Bolts.Where(b => kind == 3 ? b.Kind == BoltKind.Rivet : b.Kind == BoltKind.Structural).GroupBy(b => (b.Kind, Math.Round(b.Diameter > 0 ? b.Diameter : m.Bolt.Diameter, 5), Math.Round(b.Grip, 5), Math.Round(b.Length, 5), Tile(b.Frame.Origin)))
-                        .Select(gr => (gr.Key.Kind == BoltKind.Rivet ? SteelModel.RivetMesh(gr.First().Diameter, gr.First().Grip)
+                    0 or 3 => m.Bolts.Where(b => kind == 3 ? b.Kind == BoltKind.Rivet : b.Kind == BoltKind.Structural).GroupBy(b => (b.Kind, Math.Round(b.Diameter > 0 ? b.Diameter : m.Bolt.Diameter, 5), Math.Round(b.Grip, 5), Math.Round(b.Length, 5), b.FlushEnd, Tile(b.Frame.Origin)))
+                        .Select(gr => (gr.Key.Kind == BoltKind.Rivet ? SteelModel.RivetMesh(gr.First().Diameter, gr.First().Grip, flushEnd: gr.Key.FlushEnd)
                             : SteelModel.BoltMesh(gr.First().Diameter > 0 ? new BoltGeometry(gr.First().Diameter) : m.Bolt, gr.First().Grip, gr.First().Length), gr.Select(b => ToMatrix(b.Frame, o)).ToList(), gr.Cast<object>().ToList())),
                     1 => m.Studs.GroupBy(s => (Math.Round(s.Length, 5), Tile(s.Frame.Origin)))
                         .Select(gr => (m.StudMesh(gr.First().Length, 10), gr.Select(s => ToMatrix(s.Frame, o)).ToList(), gr.Cast<object>().ToList())),

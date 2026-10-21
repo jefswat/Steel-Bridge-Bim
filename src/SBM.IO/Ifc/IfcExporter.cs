@@ -1316,7 +1316,8 @@ public static class IfcExporter
                     4 => ("Rivet", boltRef!.Diameter, ".RIVET.", boltRef.Material ?? "Rivet steel (high strength / carbon, per plan notes)"),
                     _ => ("Bolt", boltRef is { Diameter: > 0 } ? boltRef.Diameter : steel.Bolt.Diameter, ".BOLT.", (steel.BoltGrade.StartsWith("ASTM") ? steel.BoltGrade : $"ASTM F3125 Gr. {steel.BoltGrade}")),
                 };
-                var k2 = (kind, (long)Math.Round(bolt.Grip * 1e5), (long)Math.Round(bolt.Length * 1e5),
+                bool flush = boltRef is { FlushEnd: true };
+                var k2 = (kind + (flush ? 100 : 0), (long)Math.Round(bolt.Grip * 1e5), (long)Math.Round(bolt.Length * 1e5),
                     kind == 1 ? (long)Math.Round(boltRef!.Diameter * 1e5 + boltRef.Embedment * 1e9 + boltRef.TopHeight * 1e12) : kind == 4 ? (long)Math.Round(dia * 1e5) + StableHash(mat) % 9973 * 10_000_000L : kind is 0 or 3 ? (long)Math.Round(dia * 1e5) : 0L);
                 if (!types.TryGetValue(k2, out var ty))
                 {
@@ -1324,7 +1325,7 @@ public static class IfcExporter
                     {
                         1 => SteelModel.AnchorBoltMesh(boltRef!.Diameter, boltRef.Grip, boltRef.Embedment, 10, boltRef.TopHeight),
                         2 => steel.StudMesh(bolt.Length, 10),
-                        4 => SteelModel.RivetMesh(dia, bolt.Grip),
+                        4 => SteelModel.RivetMesh(dia, bolt.Grip, flushEnd: flush),
                         _ => SteelModel.BoltMesh(new BoltGeometry(dia), bolt.Grip, bolt.Length, 10),
                     };
                     var sb = new StringBuilder("(");
@@ -1347,7 +1348,7 @@ public static class IfcExporter
                     w.Add("IFCSTYLEDITEM", $"{Ref(fsId)},({Ref(Style(PartCategory.Weld))}),$");
                     int rep = w.Add("IFCSHAPEREPRESENTATION", $"{Ref(body)},'Body','Tessellation',({Ref(fsId)})");
                     int map = w.Add("IFCREPRESENTATIONMAP", $"{Ref(axis)},{Ref(rep)}");
-                    string desc = $"{u.FormatLength(dia, LengthKind.Short)} {(kind == 0 ? steel.BoltGrade + " bolt" : kind == 3 ? boltRef!.Material + " bolt" : kind == 4 ? "rivet" : kind == 1 ? "anchor bolt" : "headed stud")} x {u.FormatLength(bolt.Length, LengthKind.Short)}";
+                    string desc = $"{u.FormatLength(dia, LengthKind.Short)} {(kind == 0 ? steel.BoltGrade + " bolt" : kind == 3 ? boltRef!.Material + " bolt" : kind == 4 ? (flush ? "rivet (one head countersunk flush)" : "rivet") : kind == 1 ? "anchor bolt" : "headed stud")} x {u.FormatLength(bolt.Length, LengthKind.Short)}";
                     int type = w.Add("IFCMECHANICALFASTENERTYPE",
                         $"{Guid($"{bk}/fastenertype/{k2}")},$,{S(desc)},{S($"{desc}, grip {u.FormatLength(bolt.Grip, LengthKind.Short)}")},$,$,({Ref(map)}),$,{S(name)},{ptype},{R(dia * scale)},{R(bolt.Length * scale)}");
                     // Occurrences share one mapped shape (identity transform); their placement does the move.
