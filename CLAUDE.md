@@ -1034,6 +1034,11 @@ UNRESOLVED FLAG (general, reusable): `SBM.Core/Assumption.cs` `Assumption{Status
   stack, `TrussModel.GussetStacks`; test `TrussTests.GussetLayers_*`). PTC data `connections/gusset-layers.csv` (every joint sheet re-checked) -> connections-ptc.csx section 5:
   approach L0 / L0' (5/8 or 3/4 + 1/2), 3-span L8 / L8' (7/8 + 3/4), 4-span L10 / L10' (7/8 + 7/8) and L20 (7/8 + 3/4), main L10 (3/4 + 1/2), L11 (1 1/8 + 3/4 + 3/4, low), L22 (1 + 1 1/8);
   outer plates = smaller scaled outlines (dimension-only flags). Steel 84.9 -> 85.0 % of p.42; checks main 426 / 11, approach 1268 / 12.
+  GUSSET OUTLINES (2026-10-20, TRUSS-DESIGN.md section 15): inner gussets = the plates DRAWN on the joint sheets (`connections/gusset-outlines.csv`, 79 rows read with
+  `tools/ptc_gusset_outlines.py`: page px polygon + work point + drawn chord + scale -> sheet-frame inches; 'similar to' joints take the drawn joint's outline) -> connections-ptc.csx
+  section 4b: VERTICAL SHEAR onto the model chord (posts stay plumb; also used for the section 5 layers), mirrored for primed / NJ halves, dimension-only flag per joint (page + reason).
+  Envelopes kept at main L11 / L13 / L14 / L22 / U22 (edges not separable). `TrussModel.GussetRivetCovers` (check rows "gusset covers its rivets"; rivets are distributed, so it checks
+  the grid). Steel 85.0 -> 85.5 % of p.42 (main gussets 430 k -> 705 k lb, approach gussets smaller than the envelopes); check counts unchanged.
   RIVETS (user decision d39, 2026-10-20; run `rivets-ptc.csx` LAST, after walkways-ptc; re-runnable): generic OPTIONAL inputs `TrussRivetGroup.Distributed` (count per gusset face
   spread on an even square grid over the gusset outline clipped to the member band (box: web depth; else the in-plane extent), `EdgeDistance` (0 = 1.5 d), nearest the member end
   first; `Member = "*"` = whole-joint count split by lap area; grid < 3 d -> Info per group + ONE "Truss CHECK rivets" warning per bridge, < 1.6 d = heads overlap warning),
