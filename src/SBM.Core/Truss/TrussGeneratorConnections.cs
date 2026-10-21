@@ -230,7 +230,8 @@ public static partial class TrussGenerator
             // part bounding boxes once
             var parts = Model.Steel.Parts;
             var boxes = parts.Select(p => p.Mesh is { IsEmpty: false } ? p.Mesh.Bounds() : default).ToList();
-            int nAngles = 0, nPlates = 0, nRiv = 0, nLoose = 0, nNoWeb = 0, nWebExt = 0;
+            int nAngles = 0, nPlates = 0, nRiv = 0, nLoose = 0, nNoWeb = 0, nWebExt = 0, nOutFill = 0;
+            var outFillT = new List<double>(); var outFillCmp = new List<string>();
             var backs = new List<string>();
             var missed = new List<string>();
             SteelLineProbe Probe(Vec3 lo, Vec3 hi, string? exclude, IEnumerable<Mesh>? extra = null)
@@ -313,7 +314,7 @@ public static partial class TrussGenerator
                         }
                         Assumption? asu = ec.Unresolved.Length > 0 ? Assumption.UnresolvedDimension(ec.Unresolved + Src, "connection as listed") : null;
                         if (asu != null) Warn(ec.Unresolved);
-                        var meshA = new Mesh(); var meshF = new Mesh(); var meshP = new Mesh(); var meshW = new Mesh();
+                        var meshA = new Mesh(); var meshF = new Mesh(); var meshP = new Mesh(); var meshW = new Mesh(); var meshOF = new Mesh();
                         // section (a along din from the working point, x across) prism over y [yBot, yTop]
                         void Prism(Mesh mesh, IReadOnlyList<Vec2> poly, double ya, double yb)
                         {
@@ -332,6 +333,45 @@ public static partial class TrussGenerator
                                 Prism(meshA, new[] { new Vec2(back, xh), new Vec2(back + a.legWeb, xh), new Vec2(back + a.legWeb, xh + sx * a.t), new Vec2(back + a.t, xh + sx * a.t),
                                     new Vec2(back + a.t, xh + sx * a.legOut), new Vec2(back, xh + sx * a.legOut) }, yBot, yTop);
                                 nAngles++;
+                                if (ec.OutFillWidth > 0)
+                                {
+                                    // fills under the outstanding leg where it stands off the face behind it (probed gap; runs of levels -> one fill each)
+                                    var probeOut = new List<Vec3>();
+                                    foreach (double yy in new[] { yBot, yTop }) foreach (double xx in new[] { xh, xh + sx * ec.OutFillWidth }) foreach (double aa in new[] { back - In(3.5), back + 0.01 }) probeOut.Add(P(aa, xx, yy));
+                                    var (plo, phi) = Box(probeOut, 0.05);
+                                    var prO = Probe(plo, phi, m.Mark);
+                                    // gap per level = the smallest over 5 points across the fill width (a gusset edge crossing the fill = contact = no fill there)
+                                    const int nLev = 49;
+                                    var gaps = new double[nLev];
+                                    for (int iy = 0; iy < nLev; iy++)
+                                    {
+                                        double yy = yBot + (yTop - yBot) * (iy + 0.5) / nLev;
+                                        gaps[iy] = double.NaN;
+                                        foreach (double xr in new[] { 0.02, 0.25, 0.5, 0.75, 0.98 })
+                                        {
+                                            var q0 = P(back, xh + sx * ec.OutFillWidth * xr, yy);
+                                            double g = double.PositiveInfinity;
+                                            foreach (var iv in prO.Intervals(q0, -din, In(3.5)))
+                                                if (iv.t1 > 0.0005) { g = Math.Max(0, iv.t0); break; }
+                                            if (!double.IsInfinity(g)) gaps[iy] = double.IsNaN(gaps[iy]) ? g : Math.Min(gaps[iy], g);
+                                        }
+                                    }
+                                    bool Gap(int i) => i >= 0 && i < nLev && !double.IsNaN(gaps[i]) && gaps[i] > 0.001 && gaps[i] <= In(3);
+                                    for (int iy = 0; iy < nLev; )
+                                    {
+                                        if (!Gap(iy)) { iy++; continue; }
+                                        int j0 = iy; double th = gaps[iy];
+                                        while (Gap(iy)) { th = Math.Min(th, gaps[iy]); iy++; }
+                                        // one level kept off a contact level at each end (a sloping gusset edge between two sampled levels)
+                                        int ja = j0 + (j0 > 0 && !double.IsNaN(gaps[j0 - 1]) ? 1 : 0), jb = iy - (iy < nLev && !double.IsNaN(gaps[iy]) ? 1 : 0);
+                                        if (jb <= ja) continue;
+                                        double ya = yBot + (yTop - yBot) * ja / (double)nLev, yb = yBot + (yTop - yBot) * jb / (double)nLev;
+                                        Prism(meshOF, new[] { new Vec2(back - th, xh), new Vec2(back, xh), new Vec2(back, xh + sx * ec.OutFillWidth), new Vec2(back - th, xh + sx * ec.OutFillWidth) }, ya, yb);
+                                        nOutFill++;
+                                        outFillT.Add(th);
+                                        if (ec.OutFillPlanThickness > 0) outFillCmp.Add($"{where}: {L(th)} (plan {L(ec.OutFillPlanThickness)})");
+                                    }
+                                }
                                 if (ec.FillThickness > 0)
                                 {
                                     double fw = ec.FillWidth > 0 ? ec.FillWidth : a.legWeb;
@@ -378,6 +418,7 @@ public static partial class TrussGenerator
                         }
                         Part(meshA, "", PartCategory.TrussConnectionAngle, $"connection {ec.Angle} x 2 x {L(ec.Length)} ({lbl}) at {where}", ec.Length);
                         Part(meshF, "F", PartCategory.TrussConnectionPlate, $"fill {L(ec.FillThickness)} x 2 under the connection angles ({lbl}) at {where}", ec.FillLength > 0 ? ec.FillLength : ec.Length);
+                        Part(meshOF, "OF", PartCategory.TrussConnectionPlate, $"fill under the outstanding legs (probed stand-off) ({lbl}) at {where}", ec.Length);
                         Part(meshP, "P", PartCategory.TrussConnectionPlate, $"end PL {L(ec.PlateWidth)} x {L(ec.PlateThickness)} x 2 x {L(ec.Length)} ({lbl}) at {where}", ec.Length);
                         Part(meshW, "W", m.Def.Role == TrussMemberRole.FloorBeam ? PartCategory.TrussFloorBeam : CategoryOf(m.Def.Role), $"web {L(tw)} extended to the connection ({lbl}) at {where}", setb - back);
                         // rivets: web columns (shank across the web), outstanding leg columns (shank along the member)
@@ -440,6 +481,7 @@ public static partial class TrussGenerator
                 }
             }
             Info($"Truss: end connections - {nAngles} connection angles, {nPlates} end plates, {nWebExt} web extensions, {nRiv} rivets{(nNoWeb > 0 ? $" ({nNoWeb} rivet positions not in steel, skipped; e.g. {string.Join("; ", missed)})" : "")}{Src}.");
+            if (nOutFill > 0) Info($"Truss: end connections - {nOutFill} fills under the outstanding legs where the angles stand off the post / hanger face (probed, {L(outFillT.Min())} - {L(outFillT.Max())}){(outFillCmp.Count > 0 ? "; vs plan: " + string.Join("; ", outFillCmp.Distinct().Take(6)) : "")}{Src}.");
             if (nLoose > 0) Warn($"Truss CHECK end connections: {nLoose} rivets through the outstanding legs find no steel behind the leg (gap to the post / girder face over 1 mm; fills not drawn?) - placed with the leg as grip{Src}.");
             if (backs.Count > 0) Model.ConnectionBacks.AddRange(backs);
         }

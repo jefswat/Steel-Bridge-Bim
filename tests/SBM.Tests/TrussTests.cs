@@ -851,6 +851,36 @@ public class TrussTests : IDisposable
     }
 
     [Fact]
+    public void EndConnection_OutFill_FillsTheStandOffBelowTheGusset()
+    {
+        // FB2's N end: the angle backs lie on the L2 gusset (10 3/4 in. from the plane); above the gusset the outstanding legs stand off the vertical's
+        // channel flanges (8 in.): OutFillWidth fills that run, as thick as the probed gap, and the leg rivets then grip leg + fill + flange
+        (BridgeModel bm, int loose) Build(double w)
+        {
+            var (p, b) = Model();
+            var fb = b.Truss!.Members.First(m => m.Name == "FB2");
+            fb.EndConnections = new() { new TrussEndConnection { Label = "2-Ls 4x4x3/4", Angle = "L4x4x3/4", Top = In(14), Length = In(24), RivetDiameter = In(0.875), OutFillWidth = w,
+                OutFillPlanThickness = In(2.75), OutRivets = new() { new TrussRivetColumn(In(2.5), 8, In(3), In(1.5)) } } };
+            var m = Regen(p);
+            var d = m.Steel!.Diagnostics.FirstOrDefault(x => x.Message.StartsWith("Truss CHECK end connections"));
+            int n = d == null ? 0 : int.Parse(System.Text.RegularExpressions.Regex.Match(d.Message, @"connections: (\d+)").Groups[1].Value);
+            return (m, n);
+        }
+        var (m0, loose0) = Build(0);
+        var (m1, loose1) = Build(In(4));
+        Assert.DoesNotContain(m0.Steel!.Parts, x => x.Mark.EndsWith("OF"));
+        var fills = m1.Steel!.Parts.Where(x => x.Mark.StartsWith("FB2-EC1") && x.Mark.EndsWith("OF")).ToList();
+        Assert.NotEmpty(fills);
+        Assert.All(fills, f => { Assert.Equal(PartCategory.TrussConnectionPlate, f.Category); Assert.True(f.Mesh.HasExactSolids); });
+        Assert.True(loose1 < loose0, $"{loose1} vs {loose0}");
+        Assert.Contains(m1.Steel.Diagnostics, x => x.Message.Contains("fills under the outstanding legs where") && x.Message.Contains("plan 2 3/4"));
+        // no fill overlaps the gusset or the vertical
+        var o = new SBM.Core.Checks.ClashOptions();
+        Assert.DoesNotContain(SBM.Core.Checks.SteelClashCheck.Run(m1, o).Clashes, c => c.A.Mark.EndsWith("OF") || c.B.Mark.EndsWith("OF"));
+        Assert.DoesNotContain("OutFill", System.Text.Json.JsonSerializer.Serialize(new TrussEndConnection()));
+    }
+
+    [Fact]
     public void FileRoundTrip_AndExistingModelsUnchanged()
     {
         var (p, b) = Model();

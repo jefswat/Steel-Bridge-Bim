@@ -100,6 +100,19 @@ if (T(Main) is { } tm0)
     t.Unresolved.RemoveAll(s => s.Contains("main span lateral / strut gusset plates") || s.Contains("main span sway frame connections") || s.Contains("floor lateral (14 BP 73 X") || s.Contains("portal at U11: portal strut"));
     t.Unresolved.RemoveAll(s => s.Contains("box strut L0 / L11 connection"));
     t.Unresolved.Add(mainSwayFlag); t.Unresolved.Add(mainFloorLatFlag); t.Unresolved.Add(mainPortalFlag); t.Unresolved.Add(mainBoxFlag);
+    // p.95 (FLOOR BEAM & BRACING AT L13): the floor beam F8 at L13 carries the lower lateral system on its bottom flange (the "bracing work line" runs along it,
+    // Sections B-E rivet the lateral gussets to it, its bottom flange is reinforced by 1-Cov. Pl. 18 x 5/8 x 76'-0 and 2-Ls 8 x 4 x 1 x 76'-0); there is no
+    // separate 2-18[ 45.8 strut at L13 (truss-ptc-arch.csx built one from the p.71 diagram, overlapping the floor beam stiffeners / connection angles).
+    int removedL13 = t.Members.RemoveAll(m => m.Name == "LS-L13" || m.Name == "LS-L13'");
+    t.Unresolved.RemoveAll(s => s.Contains("lower strut at L13 = the floor beam F8"));
+    t.Unresolved.Add(U("p.95, p.71", "lower strut at L13 = the floor beam F8 bottom flange",
+        "p.95 draws the lateral gussets riveted to the F8 bottom flange along the bracing work line and no separate strut; the extra bottom flange angles 2-Ls 8 x 4 x 1 x 76'-0 are listed without their leg position",
+        "the 2-18[ 45.8 strut at L13 / L13' is removed; the laterals end at the floor beam; the 2-Ls 8 x 4 x 1 x 76'-0 are not built."));
+    t.Unresolved.RemoveAll(s => s.Contains("wind chord top vs the suspended floor beam bottom"));
+    t.Unresolved.Add(U("p.69, p.94, p.99", "wind chord top vs the suspended floor beam bottom (overlap about 0.3 in.)",
+        "the wind chord CL elevations (p.69 table) and the suspended floor beam depth / bottom (p.94) leave less than the 14 BP 73 half depth between them; the wind chord to floor beam connection (p.99) was not read",
+        "both kept as printed; the overlap (and the floor beam end plates / edge angles over the wind chord) is reported, not adjusted."));
+    report.Add($"{Main}: L13 struts removed {removedL13}");
     var pts = new SortedSet<string>(StringComparer.OrdinalIgnoreCase);
     string Norm(string spec) => spec.Contains(":UM") || spec.Contains(":LM") ? "N:" + spec[(spec.IndexOf(':') + 1)..] : spec;
     var lat = t.Members.Where(m => m.Role is TrussMemberRole.UpperLateral or TrussMemberRole.LowerLateral && m.System is "Upper laterals" or "Lower laterals").ToList();
@@ -125,7 +138,7 @@ if (T(Main) is { } tm0)
             {
                 Members = members, Suffix = groups.Count > 1 ? "-" + "abcd"[gi++] : "",
                 Point = spec, Label = "2-1/2 Pls.", Orientation = TrussBracingPlateOrientation.Fitted, Side = TrussBracingPlateSide.Both, Thickness = In(0.5),
-                EdgeAngle = apex ? "" : "L7x4x1/2", EdgeRivets = apex ? 0 : 13, Rivets = rv, RivetPitch = In(3), RivetGage = In(15.25), RivetGage2 = In(12.75),
+                EdgeAngle = apex || deep.Count > 0 ? "" : "L7x4x1/2", EdgeRivets = apex || deep.Count > 0 ? 0 : 13, Rivets = rv, RivetPitch = In(3), RivetGage = In(15.25), RivetGage2 = In(12.75),
                 RivetDiameter = In(1), RivetMaterial = "1 in carbon steel rivet", Material = "C", Unresolved = mainPlateFlag, Source = "p.97 / p.98",
             });
     }
@@ -160,6 +173,30 @@ foreach (var gn in new[] { "PTC Girder spans 1-10", "PTC Girder spans 28-31" })
     report.Add($"{gn}: {t.BracingGussets.Count} lateral plate definitions; laterals lowered {wt.YMax / 0.0254:0.00} in.");
 }
 
+// ================================================================ 4. approach floor beam / bracket end connections: fills below the gussets (step 3 CHECK)
+// p.50 U2 (3-span): "2-Fills 12 x 13/16" (vertical to gusset, continued below the gusset) + "2-Fills 10 x 5/8" from the gusset bottom to below the floor
+// beam = 1 7/16 in. under the connection angles' outstanding legs; p.60 U2 (4-span): "2-Fills 11 1/2 x 5/8" + "2-Fills 10 x 3/4" = 1 3/8 in. (other U joints
+// "similar"). floor-connections-ptc.csx stood the angles on the gussets, so below them the legs stood ~1 1/2 in. off the vertical flange and their rivets
+// gripped the leg only (CHECK). The stack of fills is modeled as one fill per run of the stand-off under each angle (10 in. across both), thickness = the probed gap (compared with
+// the printed sum).
+string apOutFillFlag = U("p.50, p.60", "fills under the floor beam / bracket connection angles below the top chord gussets",
+    "the joint sheets print two fills (12 x 13/16 + 10 x 5/8 on 3-span U2, 11 1/2 x 5/8 + 10 x 3/4 on 4-span U2; the other U joints 'similar') whose ends are drawn, not dimensioned",
+    "one fill per run of stand-off and per angle, 4 1/2 in. from the angle heel (10 in. across both angles), as thick as the probed gap (compared with the printed sum in the Info line).");
+int nOutFill = 0;
+foreach (var bn in approach)
+{
+    var t = T(bn); if (t == null) continue;
+    bool four = bn.Contains("4-span");
+    foreach (var m in t.Members.Where(m => m.Role == TrussMemberRole.FloorBeam && m.EndConnections != null))
+        foreach (var ec in m.EndConnections!.Where(e => e.Angle == "L4x4x3/4"))
+        {
+            ec.OutFillWidth = In(4.5);   // each side: 10 in. fill across the post flange, centred on the floor beam web ec.OutFillPlanThickness = four ? In(1.375) : In(1.4375);
+            if (!ec.Unresolved.Contains("fills under the floor beam / bracket connection angles")) ec.Unresolved = (ec.Unresolved + " " + apOutFillFlag).Trim();
+            nOutFill++;
+        }
+}
+report.Add($"approach end connections with fills below the gussets: {nOutFill}");
+
 // ================================================================ regenerate + save
 var rep = Doc.Regenerate();
 foreach (var b in Doc.Project.Bridges.Where(b => b.Truss != null && b.Truss.BracingGussets != null))
@@ -167,7 +204,7 @@ foreach (var b in Doc.Project.Bridges.Where(b => b.Truss != null && b.Truss.Brac
     var st = Doc.Model(b.Name).Steel; var tm = st?.Truss;
     if (st == null || tm == null) { Print($"{b.Name}: no model"); continue; }
     Print($"{b.Name}: bracing plates {st.Parts.Count(p => p.Mark.Contains("-BG") && p.Category == PartCategory.TrussConnectionPlate)}, edge angles {st.Parts.Count(p => p.Mark.EndsWith("-EA"))}, rivets {tm.Rivets:N0}, steel {st.SteelMass * 2.20462262:N0} lb");
-    foreach (var d in st.Diagnostics.Where(d => d.Message.Contains("bracing connection plates -") || d.Message.Contains("end connection / stiffener rivets -"))) Print("   " + d.Message);
+    foreach (var d in st.Diagnostics.Where(d => d.Message.Contains("bracing connection plates -") || d.Message.Contains("end connection / stiffener rivets -") || d.Message.Contains("fills under the outstanding legs where") || d.Message.Contains("CHECK end connections"))) Print("   " + d.Message);
     foreach (var d in st.Diagnostics.Where(d => d.Severity != DiagnosticSeverity.Info && (d.Message.Contains("bracing plate") || d.Message.Contains("setbacks"))).Take(10)) Print("   " + d.Severity + ": " + d.Message[..Math.Min(300, d.Message.Length)]);
     foreach (var e in rep.Errors.Where(e => e.StartsWith(b.Name))) Print("  ERROR " + e);
 }

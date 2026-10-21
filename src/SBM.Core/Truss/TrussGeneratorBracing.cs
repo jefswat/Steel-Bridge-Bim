@@ -217,11 +217,11 @@ public static partial class TrussGenerator
                     if (bg.Orientation == TrussBracingPlateOrientation.Fitted)
                     {
                         // at a truss panel point: the plane through the chord direction there (mean of the chords) and the truss-plane normal (the
-                        // strut direction), so the plate edge runs along the chord; elsewhere the plane of the connected members (the pair of axes most
+                        // strut direction), so the plate edge runs along the chord (the edge angle with it); elsewhere (one member, no edge angle) the plane of the connected members (the pair of axes most
                         // apart), one member = its own flange plane; normal up; u = the tangent projected into it
                         Vec3 best = default; double bl = 0;
                         var chords = InPlaneAt(pl, ptName, P).Where(o => IsChord(o.Def.Role) && o.Plane.Equals(pl, StringComparison.OrdinalIgnoreCase)).ToList();
-                        if (chords.Count > 0)
+                        if (chords.Count > 0 && (conn.Count > 1 || bg.EdgeAngle.Length > 0))
                         {
                             var cd = chords.Select(o => Vec3.Dot(o.Axis, tan) >= 0 ? o.Axis : -o.Axis).Aggregate(Vec3.Zero, (a, b) => a + b).Normalized();
                             best = Vec3.Cross(cd, Normal(pl, st)); bl = best.Length;

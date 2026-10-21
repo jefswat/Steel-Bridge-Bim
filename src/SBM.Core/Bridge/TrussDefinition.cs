@@ -391,6 +391,15 @@ public sealed class TrussEndConnection
     public double FillWidth { get; set; }
     public double FillLength { get; set; }
     public double? FillTop { get; set; }
+    /// <summary>OPTIONAL (0 = none, omitted when 0): fills UNDER THE OUTSTANDING LEGS, <see cref="OutFillWidth"/> wide from the heel outward, where the
+    /// outstanding leg stands off the face it bears on (the angle back lies on a gusset that ends part way down: below it the leg would stand off the
+    /// post / hanger flange). The gap is probed at 25 levels over the angle height; each run of levels with a gap of 1 mm - 3 in. gets one fill, its
+    /// thickness = the smallest gap of the run (the plans print the fill size; <see cref="OutFillPlanThickness"/> is compared, never used).</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public double OutFillWidth { get; set; }
+    /// <summary>Printed fill thickness to compare with the probed gap (0 = not printed); Info line per connection.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public double OutFillPlanThickness { get; set; }
     public double PlateWidth { get; set; }
     public double PlateThickness { get; set; }
     /// <summary>Plate outline (u = distance from the back along the member, v = section y), replacing the PlateWidth x [Top - Length, Top] rectangle.</summary>
