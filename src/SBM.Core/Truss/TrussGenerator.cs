@@ -1246,6 +1246,54 @@ public static partial class TrussGenerator
         }
 
         // ------------------------------------------------------------------ splice / fill plates at the joints
+        /// <summary>Polygon clipped to the band lo &lt;= coordinate &lt;= hi (axis 0 = x, 1 = y); Sutherland-Hodgman on two half-planes.</summary>
+        internal static List<Vec2> ClipBand(IReadOnlyList<Vec2> poly, int axis, double lo, double hi)
+        {
+            static double C(Vec2 p, int ax) => ax == 0 ? p.X : p.Y;
+            List<Vec2> Half(List<Vec2> pts, double v, int s)
+            {
+                var res = new List<Vec2>();
+                for (int i = 0; i < pts.Count; i++)
+                {
+                    var a = pts[i]; var b = pts[(i + 1) % pts.Count];
+                    double da = s * (C(a, axis) - v), db = s * (C(b, axis) - v);
+                    if (da >= 0) res.Add(a);
+                    if (da >= 0 != db >= 0) { double t = da / (da - db); res.Add(a + (b - a) * t); }
+                }
+                return res;
+            }
+            var r = Half(poly.ToList(), lo, 1);
+            return r.Count < 3 ? new() : Half(r, hi, -1);
+        }
+
+        /// <summary>Level of the steel of member <paramref name="c"/> a joint plate on <paramref name="face"/> bears on within its band [b0, b1] (section x for
+        /// Top / Bottom, section y + OffsetZ for the webs): the highest top / lowest bottom, or the innermost / outermost web-side face of the pieces of the +x
+        /// half (sections are symmetric). Partial-length pieces are ignored. Null = no piece in the band.</summary>
+        internal static double? PieceLevel(TrussBuiltSection sec, double offsetZ, TrussPlateFace face, double b0, double b1)
+        {
+            const double eps = 1e-5;
+            double? best = null;
+            foreach (var pc in sec.Pieces)
+            {
+                if (pc.Length > 0 || !double.IsNaN(pc.Start)) continue;
+                if (face is TrussPlateFace.Top or TrussPlateFace.Bottom)
+                {
+                    var cl = ClipBand(pc.Polygon, 0, b0 + eps, b1 - eps);
+                    if (cl.Count < 3) continue;
+                    double v = face == TrussPlateFace.Top ? cl.Max(q => q.Y) + offsetZ : cl.Min(q => q.Y) + offsetZ;
+                    best = best is { } bq ? (face == TrussPlateFace.Top ? Math.Max(bq, v) : Math.Min(bq, v)) : v;
+                }
+                else
+                {
+                    var cl = ClipBand(pc.Polygon, 1, b0 - offsetZ + eps, b1 - offsetZ - eps);
+                    if (cl.Count < 3 || cl.Min(q => q.X) <= 1e-6) continue;   // +x half only (cover plates across the box excluded)
+                    double v = face == TrussPlateFace.WebInside ? cl.Min(q => q.X) : cl.Max(q => q.X);
+                    best = best is { } bq ? (face == TrussPlateFace.WebInside ? Math.Min(bq, v) : Math.Max(bq, v)) : v;
+                }
+            }
+            return best;
+        }
+
         private void BuildJointPlates()
         {
             foreach (var jdef in _d.Joints.Where(j => j.Plates is { Count: > 0 }))
@@ -1264,9 +1312,6 @@ public static partial class TrussGenerator
                     var xv = (c0.X - ax * Vec3.Dot(c0.X, ax)).Normalized();
                     var yv = Vec3.Cross(ax, xv).Normalized();
                     if (Vec3.Dot(yv, c0.Y) < 0) { yv = -yv; xv = -xv; }
-                    // member under a plate: the one on the side of its offset (through members cover both)
-                    Inst SideMember(double off) => chords.FirstOrDefault(c => Through(pl.Name, jdef.Point).Contains(c))
-                        ?? chords.OrderByDescending(c => Vec3.Dot(StartsAt(c, pl.Name, jdef.Point) ? c.Axis : -c.Axis, ax) * Math.Sign(off == 0 ? 1 : off)).First();
                     double FaceOf(Inst c, TrussPlateFace f) => f switch
                     {
                         TrussPlateFace.Top => c.Sec.YMax + c.Def.OffsetZ,
@@ -1275,26 +1320,55 @@ public static partial class TrussGenerator
                         _ => c.Sec.WebOuterX > 0 ? c.Sec.WebOuterX : c.Sec.HalfWidth,
                     };
                     int sgnOut(TrussPlateFace f) => f is TrussPlateFace.Top or TrussPlateFace.WebOutside ? 1 : -1;   // growth direction of a stack
-                    var fillTops = new List<(TrussPlateFace f, double a0, double a1, double top)>();
-                    var stackTop = new Dictionary<TrussPlateFace, double>();
                     string asm = Asm($"TRUSS-{pl.Name}", AssemblyKind.TrussLine, $"{_d.Name} - truss line {pl.Name}");
-                    int k = 0;
-                    foreach (var p in jdef.Plates!.OrderBy(p => p.Fill ? 0 : 1))
+                    double yc = c0.Sec.WebDepth > 0 ? c0.Sec.WebCenterY + c0.Def.OffsetZ : 0;
+                    // STACKING (QC pass 4, I042): every plate lies on the steel under it within its own band - the member pieces (web plies, angle legs on the web,
+                    // cover plates) of the chord(s) it reaches along the joint, and the plates already placed on that face whose length and band overlap it. Fills
+                    // are placed first, the one closest to the member first (a fill between the angle legs before a wider fill that bears on the legs and on it).
+                    var placed = new List<(TrussPlateFace f, double a0, double a1, double b0, double b1, double top)>();
+                    (double b0, double b1) Band(TrussJointPlate p) => p.Face is TrussPlateFace.Top or TrussPlateFace.Bottom ? (-p.Width / 2, p.Width / 2) : (yc - p.Width / 2, yc + p.Width / 2);
+                    double BaseOf(TrussJointPlate p)
                     {
-                        k++;
-                        if (p.Width <= 0 || p.Thickness <= 0 || p.Length <= 0) { Warn($"Truss: plate '{p.Label}' at joint {jdef.Point} - width / thickness / length missing; not built{(p.Unresolved.Length > 0 ? " (" + p.Unresolved + ")" : "")}."); continue; }
+                        double a0 = p.Offset - p.Length / 2, a1 = p.Offset + p.Length / 2;
+                        var (b0, b1) = Band(p);
+                        int g = sgnOut(p.Face);
+                        double? best = null;
+                        void Take(double v) => best = best is { } q ? (g > 0 ? Math.Max(q, v) : Math.Min(q, v)) : v;
+                        foreach (var c in chords)
+                        {
+                            bool through = Through(pl.Name, jdef.Point).Contains(c);
+                            double dir = Vec3.Dot(StartsAt(c, pl.Name, jdef.Point) ? c.Axis : -c.Axis, ax);
+                            if (!through && !(dir > 0 ? a1 > 1e-4 : a0 < -1e-4)) continue;
+                            if (PieceLevel(c.Sec, c.Def.OffsetZ, p.Face, b0, b1) is { } lv) Take(lv); else Take(FaceOf(c, p.Face));
+                        }
+                        if (best == null) foreach (var c in chords) Take(FaceOf(c, p.Face));
+                        foreach (var q in placed)
+                            if (q.f == p.Face && q.a1 > a0 + 1e-4 && q.a0 < a1 - 1e-4 && q.b1 > b0 + 1e-5 && q.b0 < b1 - 1e-5) Take(q.top);
+                        return best!.Value;
+                    }
+                    // marks keep the listed order (fills first), placement follows the stacking order
+                    var listed = jdef.Plates!.OrderBy(p => p.Fill ? 0 : 1).Select((p, i) => (p, k: i + 1)).ToList();
+                    var order = new List<(TrussJointPlate p, int k, double baseLevel)>();
+                    foreach (bool fillPass in new[] { true, false })
+                    {
+                        var rest = listed.Where(x => x.p.Fill == fillPass && x.p.Width > 0 && x.p.Thickness > 0 && x.p.Length > 0).ToList();
+                        while (rest.Count > 0)
+                        {
+                            var pick = rest.Select(x => (x, b: BaseOf(x.p))).OrderBy(z => sgnOut(z.x.p.Face) * z.b).ThenBy(z => z.x.k).First();
+                            rest.Remove(pick.x);
+                            var pp = pick.x.p;
+                            var (b0, b1) = Band(pp);
+                            placed.Add((pp.Face, pp.Offset - pp.Length / 2, pp.Offset + pp.Length / 2, b0, b1, pick.b + sgnOut(pp.Face) * pp.Thickness));
+                            order.Add((pp, pick.x.k, pick.b));
+                        }
+                    }
+                    foreach (var (p, _) in listed.Where(x => !(x.p.Width > 0 && x.p.Thickness > 0 && x.p.Length > 0)))
+                        Warn($"Truss: plate '{p.Label}' at joint {jdef.Point} - width / thickness / length missing; not built{(p.Unresolved.Length > 0 ? " (" + p.Unresolved + ")" : "")}.");
+                    foreach (var (p, k, baseLevel) in order.OrderBy(o => o.k))
+                    {
                         double a0 = p.Offset - p.Length / 2, a1 = p.Offset + p.Length / 2;
                         int g = sgnOut(p.Face);
-                        double baseLevel;
-                        if (p.Fill) baseLevel = FaceOf(SideMember(p.Offset), p.Face);
-                        else
-                        {
-                            var levels = chords.Select(c => FaceOf(c, p.Face)).Concat(fillTops.Where(t => t.f == p.Face && t.a1 > a0 && t.a0 < a1).Select(t => t.top));
-                            baseLevel = g > 0 ? levels.Max() : levels.Min();
-                            if (stackTop.TryGetValue(p.Face, out var st0)) baseLevel = g > 0 ? Math.Max(baseLevel, st0) : Math.Min(baseLevel, st0);
-                        }
                         double outer = baseLevel + g * p.Thickness;
-                        if (p.Fill) fillTops.Add((p.Face, a0, a1, outer)); else stackTop[p.Face] = outer;
                         var mesh = new Mesh();
                         void Box(double x0, double x1, double y0, double y1)
                         {
@@ -1302,7 +1376,6 @@ public static partial class TrussGenerator
                             var ra = poly.Select(q => P + ax * a0 + xv * q.X + yv * q.Y).ToArray();
                             MeshBuilder.AddLoft(mesh, poly, new[] { ra, ra.Select(q => q + ax * (a1 - a0)).ToArray() });
                         }
-                        double yc = c0.Sec.WebDepth > 0 ? c0.Sec.WebCenterY + c0.Def.OffsetZ : 0;
                         switch (p.Face)
                         {
                             case TrussPlateFace.Top: case TrussPlateFace.Bottom: Box(-p.Width / 2, p.Width / 2, baseLevel, outer); break;

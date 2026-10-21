@@ -98,7 +98,12 @@ var report = new List<string>();
         bool inlay = item.Contains("inlay");
         if (inlay) { nSkip++; skipped.Add($"{j} {r["item"]} (inlay: lies in the web ply, not an added plate)"); continue; }
         var faces = new List<TrussPlateFace>();
-        if (item.Contains("cover") || item.Contains("flange")) { faces.Add(TrussPlateFace.Top); if (!(fill && r["qty"] == "1")) faces.Add(TrussPlateFace.Bottom); }
+        // a single cover fill lies on the flange its callout names (QC I043: U1 "Fill 24 x 5/16" under the HALF BOTTOM FLANGE)
+        if (item.Contains("cover") || item.Contains("flange"))
+        {
+            if (fill && r["qty"] == "1") faces.Add(item.Contains("bottom") ? TrussPlateFace.Bottom : TrussPlateFace.Top);
+            else { faces.Add(TrussPlateFace.Top); faces.Add(TrussPlateFace.Bottom); }
+        }
         else if (item.Contains("web") || item.Contains("splice plates") || item.Contains("fills"))
             faces.Add(item.Contains("outside") || item.Contains("o.s.") ? TrussPlateFace.WebOutside : TrussPlateFace.WebInside);
         else { nSkip++; skipped.Add($"{j} {r["item"]} (face not recognised)"); continue; }
@@ -127,7 +132,7 @@ var report = new List<string>();
                         Face = f, Width = In(wid.Value), Thickness = In(thk.Value), Length = In(len.Value), Offset = sgn * In(len.Value) / 2, Fill = fill,
                         Label = r["item"], Material = r["note"].Contains("(S)") ? "S" : "C", Source = $"p.{r["page"]} ({conf})",
                         Unresolved = U("p." + r["page"], $"{r["item"]} at {pt}", $"the length is scaled from the joint sheet ({r["extent_note"]}; {conf} confidence) and the plate order in the stack is drawn, not dimensioned",
-                            "plate as listed, length as scaled, " + (o == 0 ? "centred on the joint" : "from the joint toward " + (o < 0 ? "the lower" : "the higher") + " panel number") + ", stacked on the chord face."),
+                            "plate as listed, length as scaled, " + (o == 0 ? "centred on the joint" : "from the joint toward " + (o < 0 ? "the lower" : "the higher") + " panel number") + ", stacked on the steel under it (web, angle legs or the fills already placed)."),
                     });
                     nPl++;
                 }
@@ -432,6 +437,18 @@ var jointShear = new Dictionary<(string bridge, string joint), double>();
         nLayerJoints++;
     }
     report.Add($"gusset layers: {nLayerJoints} joint definitions with stacked gussets (gusset-layers.csv)");
+    // QC I045 (2026-10-21): the approach script's flag said "only one gusset pair per joint is built"; the stacked layers are built here now -> keep only the
+    // part that is still open (fills, splice plates, lug angles, diaphragms, stitch rivets).
+    foreach (var bn in targets.Select(x => x.bridge).Distinct().Where(b => !b.Contains("Arch")))
+    {
+        var tt = Doc.Project.Bridges.FirstOrDefault(b => b.Name == bn)?.Truss;
+        if (tt == null) continue;
+        int n0 = tt.Unresolved.RemoveAll(s => s.Contains("second gusset pairs") && s.Contains("only one gusset pair per joint"));
+        if (n0 == 0) continue;
+        string pages = bn.Contains("3-span") ? "p.49-53, p.59" : "p.59-67";
+        tt.Unresolved.Add(U(pages, "fills, splice plates, lug angles, diaphragms and stitch rivets of the approach truss joints", "listed per joint without extents",
+            "not built. (The stacked gusset layers - 3-span L0 / L0' 5/8 + 1/2 and L8 / L8' 7/8 + 3/4, 4-span L0 / L0' 3/4 + 1/2, L10 / L10' 7/8 + 7/8, L20 7/8 + 3/4 - are built from gusset-layers.csv by connections-ptc.csx section 5.)"));
+    }
 }
 
 // ================================================================ regenerate + save

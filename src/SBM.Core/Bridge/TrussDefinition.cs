@@ -175,6 +175,10 @@ public sealed class TrussPly
     /// <summary>OPTIONAL (null = none): access holes cut in a perforated web ply (manholes of box struts), see <see cref="TrussPerforation"/>.</summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public TrussPerforation? Perforation { get; set; }
+    /// <summary>OPTIONAL (false = full length, omitted when false): the ply runs between the gusset plates of the member's two end joints (an outer ply whose
+    /// layer the gussets are INLAID in, e.g. PTC L13-L14 / L14-L15 "1 1/8 Inlaid Gusset Pl."); it does not count for the member width at the joints.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public bool BetweenGussets { get; set; }
     public TrussPly() { }
     public TrussPly(double depth, double thickness, string label = "") { Depth = depth; Thickness = thickness; Label = label; }
 }

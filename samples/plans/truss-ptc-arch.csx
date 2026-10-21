@@ -225,6 +225,18 @@ TrussSectionDefinition WebMember(string name, Dictionary<string, string> r)
 }
 TrussSectionDefinition Add(TrussSectionDefinition s) { t.Sections.Add(s); secs[s.Name] = s; return s; }
 foreach (var r in chords) Add(Chord(r));
+// QC pass 4 (I041, 2026-10-21): L13-L14 and L14-L15 carry one more 34 x 1 1/8 ply OUTSIDE the 2'-5 line. The p.69 half longitudinal section L13-L17 draws
+// it in the layer of the 1 1/8 gussets at L13 / L14 ("1 1/8 Inlaid Gusset Pl." at L14) / L15: the ply runs between the gussets, the gussets lie in its layer
+// (2'-5 in to in, p.83 / p.84 / p.86) and the o.s. splice plates 34 x 1 / 34 x 1 1/8 cover the butts. p.84 prints 2'-0 5/8 (L13-L14) and 2'-2 3/4 (L14-L15)
+// b. to b. Ls: 2'-0 5/8 + 2 x (1 1/8 + 1 1/8 + 1 1/16) = 2'-2 3/4 + 2 x (1 1/8 + 1 1/8) = 2'-7 1/4 out to out (TrussPly.BetweenGussets on the outer ply).
+foreach (var (m, bb) in new[] { ("L13-L14", FI(2, 0.625)), ("L14-L15", FI(2, 2.75)) })
+{
+    var s = secs["CH " + m];
+    s.WebsOutToOut = FI(2, 7.25); s.WebsBackToBack = bb;
+    s.WebPlies[0].BetweenGussets = true;
+    s.WebPlies[0].Label += " o.s. (between the inlaid gussets)";
+    s.Source += "; p.69 half section / p.84 b. to b. Ls: 2'-7 1/4 o. to o., outer ply between the inlaid gussets (QC I041)";
+}
 foreach (var (k, r) in webs) if (r["section"] != "POST") Add(WebMember(k, r));
 // Post U11-L11 (p.69 "Elevation of Post U11-L11", main material; p.79): upper section 2'-6 1/8 o-o webs, 1'-11 3/4 b-b Ls
 double PostU11 = Ft(D(elev[11]["lower_chord_ft"]) + D(webs["U11-L11"]["length_ft"]));      // El of U11 (L11 + 96'-0)
@@ -516,7 +528,9 @@ foreach (var r in Csv("joints.csv"))
 UG("p.70, p.74-90", "rivets", "the joint sheets draw the rivets and give their sizes (1 1/4 / 1 1/8 H.S., 1\" stitch, 7/8 floor) but print no counts", "rivets are not placed (the program places rivet groups when counts / pitch are given).");
 UG("p.69, p.74-90", "chord splice plates, inlay plates, fills, lug angles, stiffeners, diaphragms and stitch rivets", "they are listed per joint without their extents", "not built (the steel weight check shows what is missing).");
 UG("p.69, p.70", "perforated cover plates (manholes 12 x 20 / 11 1/2 x 20 at 3'-6 or 4'-0)", "spacing printed as approximate", "covers built solid (weight overstated by the manholes).");
-UG("p.69, p.74", "order of the web plies of the chords", "the sections list the plies without their order; the half section L13-L17 shows inlays at the joints", "plies stacked from the outside in the printed order, angles against the innermost ply deeper than their leg.");
+// Ply order (QC I036 / I038, 2026-10-21): no longer a flag - the p.69 half longitudinal section L13-L17 draws the layers (34 plies outside, "18x1 Web & 1in Ls" in
+// one layer, "31 1/2 x 5/8 Web" innermost) and p.81 / p.84 dimension "2'-5 o. to o. 1 1/8 webs" / b. to b. Ls; chords.csv lists the plies outside -> inside and the
+// generator puts a ply that follows a ply fitting between the angle legs inside the angles (TrussSections.Box).
 UG("p.73", "hold-down rollers and shear lock at piers 17 / 20", "detailed on p.73 but not part of this phase", "not built.");
 t.Unresolved.AddRange(unresolved.Distinct());
 br.Truss = t;
