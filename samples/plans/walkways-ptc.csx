@@ -92,9 +92,9 @@ void Walk(string bridge, string name, bool transverse, double reference, double 
 // CL walkway between the floor beams (p.101 floor beam elevation / key plan, p.106 plan of walkway at W15 and expansion detail at piers 17 / 20, p.43 Section A-A):
 // the walkway is centred 2'-0 NORTH of the CL bridge (1'-0 to 3'-0: p.106 '1'-0 | Walkway 2'-0' from the CL, p.101 manhole and walk 2'-0 from the CL, p.43 'CL of
 // inspection walk 2'-0'), seated between the floor beams on their bottom flanges and interrupted at every floor beam web (the inspector passes the 12 x 20 manhole;
-// the walk channels are connected to the webs). Pieces run from floor beam web to floor beam web (1 3/4 in. clear of the web CL), the grating top 10 1/2 in. above
-// the floor beam bottom (10 [ 15.3 on the 1/2 in. bottom flange angle legs; approach / girder spans) or 3'-0 1/2 above it (main span: channel bottom 2'-2 1/2 above
-// the floor beam bottom, p.106 expansion detail).
+// the walk channels are connected to the webs). Pieces run from floor beam web to floor beam web (1 3/4 in. clear of the web CL), the 10 [ 15.3 channels
+// standing on the floor beam bottom flange (angle legs + cover plates, probed; approach / girder spans) or with their bottom 2'-2 1/2 above the floor beam bottom
+// (main span, p.106 expansion detail); grating between the channel webs just under their top flanges.
 const double ClOffsetFt = -2.0;
 double? FbBottomAt(SBM.Core.Steel.SteelPart p, SBM.Core.Alignments.Alignment al, double sta, double off)
 {
@@ -112,7 +112,31 @@ double? FbBottomAt(SBM.Core.Steel.SteelPart p, SBM.Core.Alignments.Alignment al,
     }
     return double.IsPositiveInfinity(best) ? null : best;
 }
-int WalkCl(string bridge, string name, double from, double to, double aboveFbBottomIn, string pages, string flag)
+// top of the bottom flange stack (angle legs + cover plates) beside the web: the second surface a vertical ray meets, 4 in. each side of the floor beam centre
+double? FbFlangeTopAt(SBM.Core.Steel.SteelPart p, SBM.Core.Alignments.Alignment al, double sta, double off)
+{
+    double best = double.NegativeInfinity;
+    foreach (double ds in new[] { -In(4), In(4) })
+    {
+        var xy = al.PointAt(sta + ds, off);
+        var zs = new List<double>();
+        var pos = p.Mesh.Positions; var idx = p.Mesh.Indices;
+        for (int i = 0; i + 2 < idx.Count; i += 3)
+        {
+            var A = pos[idx[i]]; var B = pos[idx[i + 1]]; var C = pos[idx[i + 2]];
+            double d = (B.Y - C.Y) * (A.X - C.X) + (C.X - B.X) * (A.Y - C.Y);
+            if (Math.Abs(d) < 1e-14) continue;
+            double l1 = ((B.Y - C.Y) * (xy.X - C.X) + (C.X - B.X) * (xy.Y - C.Y)) / d, l2 = ((C.Y - A.Y) * (xy.X - C.X) + (A.X - C.X) * (xy.Y - C.Y)) / d, l3 = 1 - l1 - l2;
+            if (l1 < -1e-9 || l2 < -1e-9 || l3 < -1e-9) continue;
+            zs.Add(l1 * A.Z + l2 * B.Z + l3 * C.Z);
+        }
+        zs.Sort();
+        var u = new List<double>(); foreach (var z in zs) if (u.Count == 0 || z - u[^1] > 1e-4) u.Add(z);
+        if (u.Count >= 2) best = Math.Max(best, u[1]);
+    }
+    return double.IsNegativeInfinity(best) ? null : best;
+}
+int WalkCl(string bridge, string name, double from, double to, double aboveFbBottomIn, string pages, string flag, bool onFlange = false)
 {
     var al = alOf[bridge];
     double off = Ft(ClOffsetFt), clear = In(1.75);
@@ -125,7 +149,7 @@ int WalkCl(string bridge, string name, double from, double to, double aboveFbBot
         if (c.Station < from - 0.01 || c.Station > to + 0.01) continue;
         var e1 = al.Inverse(new SBM.Core.Geometry.Vec2(bb.Min.X, bb.Min.Y)); var e2 = al.Inverse(new SBM.Core.Geometry.Vec2(bb.Max.X, bb.Max.Y));
         if (Math.Max(e1.Offset, e2.Offset) < off + In(6) || Math.Min(e1.Offset, e2.Offset) > off - In(6)) continue;
-        if (FbBottomAt(p, al, c.Station, off) is not { } zb) continue;
+        if ((onFlange ? FbFlangeTopAt(p, al, c.Station, off) : FbBottomAt(p, al, c.Station, off)) is not { } zb) continue;   // onFlange: channel bottom on the bottom flange stack
         if (fbs.Any(f => Math.Abs(f.sta - c.Station) < 0.3)) continue;
         fbs.Add((c.Station, zb));
     }
@@ -204,7 +228,7 @@ const double TrussOff = 29.0, LadderOff = 26.0 + 7.0 / 12;      // 58'-0 c.c. tr
 string crossFlag = U("p.101, p.102", "cross walkway station", "the key plans put the cross walkways at the pier floor beams and the ladders 4'-9 3/8 from the CL bearing of the end shoe (piers 10 / 13 / 17; at 13 / 17 the 4-span shoe 2'-0 from the CL pier) or 6'-0 3/8 from the CL pier (piers 11 / 12 / 14 / 15 / 16); the walkway's own station is drawn only",
     "cross walkway centred on the ladder station (pier 13 / 24 of the 3-span unit: beside its end floor beam, no ladder); north half only except piers 10 / 27 (p.101 note 'omit this section of walkways at piers 13, 15 and 17'); NJ units opposite hand along the bridge, still to the north truss.");
 string clFlag = U("p.101, p.106", "CL walkway level and floor beam connections", "p.101 / p.106 dimension the walkway 2'-0 wide from 1'-0 to 3'-0 north of the CL bridge (p.101 floor beam elevation: manhole and walk 2'-0 from the CL; p.106: '1'-0 | Walkway 2'-0' from the CL) and draw it seated between the floor beams on their bottom flanges (channels connected to the webs, manhole above); the connection angles / hangers and the exact seat are drawn, not dimensioned",
-    "pieces from floor beam web to floor beam web (1 3/4 in. clear of the web CL), centred 2'-0 north of the CL, grating top 10 1/2 in. above the floor beam bottom (10 [ 15.3 on the 1/2 in. bottom flange angle legs), rails and posts per piece; manholes not cut, connection angles not built. (Before 2026-10-21 the walkway was centred 1'-0 north, through the webs at the bottom flange: it clashed with the hanger bracing / sway members on the CL.)");
+    "pieces from floor beam web to floor beam web (1 3/4 in. clear of the web CL), centred 2'-0 north of the CL, the 10 [ 15.3 walk channels standing on the floor beam bottom flange (angle legs + cover plates, probed), grating between the channel webs just under their top flanges, rails and posts per piece; manholes not cut, connection angles not built. (Before 2026-10-21 the walkway was centred 1'-0 north, through the webs at the bottom flange: it clashed with the hanger bracing / sway members on the CL.)");
 var units = new (string bridge, int east, (string fb, double ladderFt, bool full, bool ladder, bool platformBoth)[] pts)[]
 {
     ("PTC 3-span truss 11-13", 1, new[] { ("FB0", 4 + 9.375 / 12, true, true, true), ("FB8", 6 + 0.375 / 12, false, true, false), ("FB8'", 6 + 0.375 / 12, false, true, false), ("FB0'", double.NaN, false, false, false) }),
@@ -223,7 +247,7 @@ foreach (var (bn, east, pts) in units)
     var fb0 = PartBox(bn, "FB" + (bn.Contains("3-span") ? "8" : "10"));
     if (fb0 == null) { Print($"{bn}: floor beams not found - walkways not built"); continue; }
     double vTop = (fb0.Value.zMin - al.ElevationAt(fb0.Value.sta, 0)) / In(1) + 1.75;    // grating top above the grade (in.)
-    WalkCl(bn, "walkway CL", dk.BeginStation, dk.EndStation, 10.5, "p.101", clFlag);
+    WalkCl(bn, "walkway CL", dk.BeginStation, dk.EndStation, 10.0, "p.101", clFlag, onFlange: true);
     foreach (var (fb, ladderFt, full, ladder, both) in pts)
     {
         var box = PartBox(bn, fb);
@@ -300,7 +324,7 @@ foreach (var (bn, east, pts) in units)
 // ================================================================ girder spans: CL inspection walk (p.43 Section A-A 'CL of Inspection Walk' 2'-0 from the CL bridge, p.44 note
 // 'Omit walkway manholes in End Fl. Beams adjacent to Abutments'; no own walkway detail sheet: the p.101 walkway details (same floor beam depth 6'-3 1/2, same manholes) are used)
 string gwFlag = U("p.43, p.44, p.101", "girder-span CL inspection walk", "p.43 Section A-A draws the inspection walk through the floor beam manholes with its CL 2'-0 from the CL bridge and p.44 omits the manholes in the end floor beams at the abutments; there is no walkway detail sheet for the girder spans (the p.101 approach details: 10 [ 15.3 channels 2'-0 b.b., grating, rails, the same 6'-3 1/2 floor beams) and the side of the CL is read from the section's orientation (north, as the approach / main span walks)",
-    "as the approach CL walkway (p.101): pieces between the floor beam webs centred 2'-0 north of the CL, grating top 10 1/2 in. above the floor beam bottom, from the end floor beam at the abutment (no manhole: the walk ends there) to the deck end at pier 10 / 27 (continuing into the approach unit's walkway).");
+    "as the approach CL walkway (p.101): pieces between the floor beam webs centred 2'-0 north of the CL, channels on the floor beam bottom flange, from the end floor beam at the abutment (no manhole: the walk ends there) to the deck end at pier 10 / 27 (continuing into the approach unit's walkway).");
 foreach (var n in new[] { "PTC Girder spans 1-10", "PTC Girder spans 28-31" })
 {
     var ul = bridges[n].Truss!.Unresolved;
@@ -311,7 +335,7 @@ foreach (var n in new[] { "PTC Girder spans 1-10", "PTC Girder spans 28-31" })
         .Select(p => { var bb = p.Mesh.Bounds(); return alOf[n].Inverse(new SBM.Core.Geometry.Vec2((bb.Min.X + bb.Max.X) / 2, (bb.Min.Y + bb.Max.Y) / 2)).Station; }).OrderBy(s => s).ToList();
     bool west = n.Contains("1-10");
     double from = west ? fbSt.First() : dk.BeginStation, to = west ? dk.EndStation : fbSt.Last();
-    int k = WalkCl(n, "walkway CL", from, to, 10.5, "p.43, p.44, p.101", gwFlag);
+    int k = WalkCl(n, "walkway CL", from, to, 10.0, "p.43, p.44, p.101", gwFlag, onFlange: true);
     Print($"{n}: CL inspection walk in {k} pieces");
 }
 
