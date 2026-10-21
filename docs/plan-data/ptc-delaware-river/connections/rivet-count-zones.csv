@@ -1,5 +1,9 @@
 structure,joint,member,zone_px,note
 main,L15,BAND,"-4,40",drawn work point at the top of the arch chord field; band taken from the field
+main,L15,SKIP,"350,330;385,330;385,610;350,610",bracing angle strip Ls 4 x 3 1/2 x 7/16 (C) on the gusset edge
+main,L15,SKIP,"546,185;563,185;563,478;546,478",post U15-L15 left edge: rivets drawn in profile
+main,L15,SKIP,"668,185;685,185;685,478;668,478",post U15-L15 right edge: rivets drawn in profile
+main,L15,SKIP,"688,230;815,230;815,410;688,410",bracing angle strip 2-Ls 4 x 3 1/2 x 7/16 (C)
 main,L15,U15-L15,"552,185;692,185;692,478;552,478",vertical field (p.86)
 main,L15,U14-L15,"355,300;505,205;552,215;552,528;505,535;355,420",diagonal field (p.86)
 main,U11,SKIP,"1352,640;1371,640;1371,1225;1352,1225",post U11-L11 left edge: rivets drawn in profile (angle legs) - not through the gusset
