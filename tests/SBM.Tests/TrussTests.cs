@@ -914,6 +914,37 @@ public class TrussTests : IDisposable
     }
 
     [Fact]
+    public void PlaneItems_PlateAndFilletedSweep_ExactAndMirrored()
+    {
+        var (p, b) = Model();
+        var t = b.Truss!;
+        double L = 2 * Half;
+        // knee: straight up at 30 deg from (1 ft, -10 ft) to a horizontal run ending at the CL, R 6 ft fillet; 12 x 1/2 bar section
+        double th = 30 * Math.PI / 180, zc = -Ft(2);
+        double uV = Ft(1) + (zc + Ft(10)) / Math.Tan(th);
+        t.PlaneItems = new()
+        {
+            new TrussPlaneItemDefinition { Name = "K", PointA = "N:U3", PointB = "S:U3", Kind = TrussPlaneItemKind.Sweep, Mirror = true, ArcStepDegrees = 5,
+                Path = { new(Ft(1), -Ft(10)), new(uV, zc, Ft(6)), new(L / 2, zc) }, Section = { new(-In(6), -In(0.25)), new(In(6), -In(0.25)), new(In(6), In(0.25)), new(-In(6), In(0.25)) },
+                Unresolved = "UNRESOLVED (p.0): knee - scaled." },
+            new TrussPlaneItemDefinition { Name = "G", PointA = "N:U3", PointB = "S:U3", Kind = TrussPlaneItemKind.Plate, W0 = In(5), W1 = In(5.5),
+                Outline = { new(Ft(2), -Ft(3)), new(Ft(4), -Ft(3)), new(Ft(4), -Ft(1)), new(Ft(2), -Ft(1)) } },
+        };
+        var st = Regen(p).Steel!;
+        var k = st.Parts.Single(x => x.Mark == "K"); var km = st.Parts.Single(x => x.Mark == "K-M"); var g = st.Parts.Single(x => x.Mark == "G");
+        Assert.True(k.Mesh.HasExactSolids && km.Mesh.HasExactSolids && g.Mesh.HasExactSolids);
+        Assert.NotNull(k.Assumption); Assert.Null(g.Assumption);
+        Assert.Equal(Ft(2) * Ft(2) * In(0.5), g.Volume, 9);
+        Assert.Equal(k.Volume, km.Volume, 9);
+        // the two halves meet on the CL plane without overlapping (circumscribed arc: the last piece is horizontal, its end square = vertical)
+        Assert.DoesNotContain(SBM.Core.Checks.SteelClashCheck.Run(Regen(p), new SBM.Core.Checks.ClashOptions()).Clashes, c => c.A.Mark.StartsWith("K") && c.B.Mark.StartsWith("K"));
+        var path = TrussGenerator.FilletPathForTest(new List<TrussPathVertex> { new(0, 0), new(10, 0, 4), new(10, 10) }, 10);
+        Assert.Equal(new Vec2(6, 0).X, path[1].X, 9); Assert.Equal(0, path[1].Y, 9);                 // tangent point T = R tan 45 = 4 before the corner
+        Assert.Equal(10, path[^2].X, 9); Assert.Equal(4, path[^2].Y, 9);
+        Assert.DoesNotContain("PlaneItems", System.Text.Json.JsonSerializer.Serialize(new TrussDefinition()));
+    }
+
+    [Fact]
     public void EndConnection_OutFill_FillsTheStandOffBelowTheGusset()
     {
         // FB2's N end: the angle backs lie on the L2 gusset (10 3/4 in. from the plane); above the gusset the outstanding legs stand off the vertical's

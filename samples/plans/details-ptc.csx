@@ -114,6 +114,63 @@ if (T(Main) is { } tmS)
     report.Add($"{Main}: {n} sway plate pairs (L7 / L8)");
 }
 
+// ================================================================ 2. portal knee braces at U11 / U11' (p.100)
+// Dimensioned: knee working line meets the post CL 20'-1 1/8 below U11; straight part = box 2'-11 3/4 b.b. Ls (in the portal plane) x 2'-4 1/2 b.b. Ls, 2-Pls (34 1/2-14) x 1/2
+// (the side plates, manholes 14 x 20 @ 4'-0), 2-Pls 28 x 1/2 (covers), 4-Ls 6 x 6 x 1/2; curved part "R = 20'-0 Back of Ls"; Section C-C developed 2'-3 + 4'-3 1/2 + 2'-3 from the
+// splice to the CL bridge; portal strut working line through U11 (Section D-D), strut 2'-10 1/2 deep. The sheet is drawn with breaks in the post, the strut and the knee,
+// so nothing can be scaled along them. Construction (all from the dimensions above + two readings, flagged): the knee is symmetric about the CL bridge with its
+// centreline horizontal there and its top cover on the strut bottom; R = 20'-0 at the back of the TOP angles (the label points at the upper edge) -> centreline
+// radius 18'-6 1/8; the straight part is the line through the 20'-1 1/8 point tangent to that arc; its end at the post stops 1/2 in. clear of the knee gussets
+// (2'-5 in to in + 3/4 gussets). The curved part is modeled with the straight-part box (Section E-E / B-B: web 36 x 1/2 + L 6 x 6 x 1/2 + 5/8 gusset not built).
+string kneeFlag = U("p.100", "portal knee braces at U11 (straight box + R 20'-0 curve)",
+    "the portal sheet is drawn with breaks in the post, strut and knee: only the 20'-1 1/8 drop of the knee working line, R = 20'-0 (back of Ls), the box section and the developed lengths in Section C-C are dimensioned",
+    "knee symmetric about the CL bridge, centreline horizontal there with the top cover on the strut bottom, R = 20'-0 at the back of the top angles, straight part tangent through the 20'-1 1/8 point, ending 1/2 in. clear of the post knee gussets; the curved part keeps the straight box section; manholes, splice, knee gussets (2-3/4, 5/8) and rivets not built.");
+if (T(Main) is { } tmK)
+{
+    var t = tmK;
+    Flag(t, "portal at U11: portal strut", U("p.100, p.79", "portal strut at U11 (box 34 1/2 deep, Section D-D plates) and the knee brace connections",
+        "Section D-D lists the strut plates (34 1/2 x 11/16, 24 1/2 x 7/16, (33-13 1/2) x 11/16, (35 1/2-13 1/2) x 9/16, 2-6 x 1/2 bars) around a skewed W.P. outline; the knee gussets / splice are drawn without outline dimensions",
+        "the strut stays the nominal envelope between the U11 points; knee gussets, splice and rivets not built."));
+    Flag(t, "portal knee braces at U11", kneeFlag);
+    t.PlaneItems ??= new();
+    t.PlaneItems.RemoveAll(p => p.Name.StartsWith("PK"));
+    double h = In(18.375), zQ = -(Ft(20) + In(1.125)), zc = -In(17.25) - h, Rc = Ft(20) - In(17.875);
+    foreach (var pr in new[] { "", "'" })
+    {
+        if (!t.Points.Any(p => p.Name == "U11" + pr)) { report.Add($"portal U11{pr}: point not found"); continue; }
+        double Lh = Math.Abs(t.Planes.First(p => p.Name == "S").Offset - t.Planes.First(p => p.Name == "N").Offset) / 2;   // planes plumb, U11 points level across
+        double dyp = (zc - Rc) - zQ;
+        double F(double th) => Lh * Math.Sin(th) - dyp * Math.Cos(th) - Rc;
+        double lo = 0, hi = Math.PI / 3;
+        for (int k = 0; k < 80; k++) { double mid = (lo + hi) / 2; if (F(mid) > 0) hi = mid; else lo = mid; }
+        double th = (lo + hi) / 2, uV = (zc - zQ) / Math.Tan(th), us = In(15.25) + In(0.5) + h * Math.Sin(th);
+        var path = new List<TrussPathVertex> { new(us, zQ + us * Math.Tan(th)), new(uV, zc, Rc), new(Lh, zc) };
+        double arc = Rc * th;
+        report.Add($"portal U11{pr}: knee slope {th * 180 / Math.PI:0.00} deg, straight part {((uV - Rc * Math.Tan(th / 2)) - us) / Math.Cos(th) / 0.3048:0.00} ft, arc on the centreline {arc / 0.0254:0.0} in (C-C developed splice -> CL 105.5 in incl. the straight run past the splice)");
+        void Item(string name, string label, params (double w, double v)[] poly) => t.PlaneItems.Add(new TrussPlaneItemDefinition
+        {
+            Name = $"PK{pr}-{name}", Label = $"portal knee brace U11{pr}: {label}", PointA = "N:U11" + pr, PointB = "S:U11" + pr, Kind = TrussPlaneItemKind.Sweep, Path = path,
+            Section = poly.Select(q => new TrussUV(q.w, q.v)).ToList(), ArcStepDegrees = 3, Mirror = true, Role = TrussMemberRole.Portal, Panel = $"Portal U11{pr}",
+            Material = "C", Unresolved = kneeFlag, Source = "p.100",
+        });
+        double tp = In(0.5);
+        foreach (int s in new[] { 1, -1 })
+        {
+            string sd = s > 0 ? "A" : "B";
+            Item($"SP{sd}", "side PL (34 1/2-14) x 1/2", (s * In(14.25), -In(17.25)), (s * In(14.75), -In(17.25)), (s * In(14.75), In(17.25)), (s * In(14.25), In(17.25)));
+            Item($"CV{sd}", "cover PL 28 x 1/2", (-In(14), s * In(17.875)), (In(14), s * In(17.875)), (In(14), s * In(18.375)), (-In(14), s * In(18.375)));
+            foreach (int r in new[] { 1, -1 })
+            {
+                // L 6 x 6 x 1/2 in the corner (W = s side, V = r side): backs on the side plate (W = +-14.25) and on the cover (V = +-17.875)
+                double W0 = s * In(14.25), V0 = r * In(17.875);
+                Item($"L{sd}{(r > 0 ? "T" : "B")}", "L 6 x 6 x 1/2",
+                    (W0, V0), (W0 - s * In(6), V0), (W0 - s * In(6), V0 - r * tp), (W0 - s * tp, V0 - r * tp), (W0 - s * tp, V0 - r * In(6)), (W0, V0 - r * In(6)));
+            }
+        }
+    }
+    report.Add($"{Main}: {t.PlaneItems.Count} portal knee pieces (x 2 mirrored)");
+}
+
 // ================================================================ regenerate + save
 var rep = Doc.Regenerate();
 foreach (var b in Doc.Project.Bridges.Where(b => b.Truss != null))
@@ -134,7 +191,7 @@ if (Environment.GetEnvironmentVariable("DETAILS_CLASH") == "1")
         {
             Print($"  CLASH {r.Bridge} | {g.Key} | {g.Count()} | max {g.Max(c => c.Depth) / 0.0254:0.00} in");
             if (Environment.GetEnvironmentVariable("DETAILS_DETAIL") is { Length: > 0 } det && g.Key.Contains(det))
-                foreach (var c in g.OrderByDescending(c => c.Depth).Take(6)) Print($"      {c.A.Mark} ({c.A.Description[..Math.Min(60, c.A.Description.Length)]}) x {c.B.Mark} ({c.B.Description[..Math.Min(60, c.B.Description.Length)]}) {c.Depth / 0.0254:0.00} in");
+                foreach (var c in g.OrderByDescending(c => c.Depth).Take(40)) Print($"      {c.A.Mark} ({c.A.Description[..Math.Min(60, c.A.Description.Length)]}) x {c.B.Mark} ({c.B.Description[..Math.Min(60, c.B.Description.Length)]}) {c.Depth / 0.0254:0.00} in");
         }
 if (!dev) { Doc.Save(outPath); Print($"Saved {outPath}"); }
 else if (Environment.GetEnvironmentVariable("DETAILS_OUT") is { Length: > 0 } devOut) { Doc.Save(devOut); Print($"Saved (dev, reduced) {devOut}"); }

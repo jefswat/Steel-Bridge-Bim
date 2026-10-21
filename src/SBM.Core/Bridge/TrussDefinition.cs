@@ -56,6 +56,10 @@ public sealed class TrussDefinition
     /// optional edge angle onto the truss-plane joint and rivets (<see cref="TrussBracingGussetDefinition"/>).</summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public List<TrussBracingGussetDefinition>? BracingGussets { get; set; }
+    /// <summary>OPTIONAL (null = none, omitted from the .sbm): pieces drawn in a vertical plane through two truss points (<see cref="TrussPlaneItemDefinition"/>):
+    /// planar plates and constant sections swept along a planar path of straight runs and filleted (arc) corners, e.g. curved portal knee braces.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public List<TrussPlaneItemDefinition>? PlaneItems { get; set; }
 
     public TrussSectionDefinition? Section(string name) => Sections.FirstOrDefault(s => string.Equals(s.Name, name, StringComparison.OrdinalIgnoreCase));
     public TrussPlaneDefinition? Plane(string name) => Planes.FirstOrDefault(s => string.Equals(s.Name, name, StringComparison.OrdinalIgnoreCase));
@@ -557,6 +561,53 @@ public sealed class TrussBracingGussetDefinition
     /// lateral plate under a wind chord).</summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public bool NoStackClip { get; set; }
+}
+
+/// <summary>Kind of a <see cref="TrussPlaneItemDefinition"/>.</summary>
+public enum TrussPlaneItemKind { Plate, Sweep }
+
+/// <summary>A path vertex in the plane of a <see cref="TrussPlaneItemDefinition"/> (U along the plane from point A, V up from A), with an optional fillet
+/// radius (m; 0 = sharp corner): the corner is replaced by a tangent circular arc of that radius (the path's centreline radius).</summary>
+public sealed class TrussPathVertex
+{
+    public double U { get; set; }
+    public double V { get; set; }
+    public double Radius { get; set; }
+    public TrussPathVertex() { }
+    public TrussPathVertex(double u, double v, double radius = 0) { U = u; V = v; Radius = radius; }
+}
+
+/// <summary>
+/// A piece drawn in the VERTICAL plane through two truss points (generic, OPTIONAL; e.g. a curved portal knee brace): frame origin = <see cref="PointA"/>,
+/// U = horizontal toward <see cref="PointB"/>, V = up, W = U x V (out of the plane). <see cref="Kind"/> Plate = the <see cref="Outline"/> (U, V) extruded over
+/// W [<see cref="W0"/>, <see cref="W1"/>]; Sweep = the <see cref="Section"/> (U = W out of the plane, V = offset to the left of the path direction in the plane)
+/// swept along the <see cref="Path"/>, its filleted corners cut into straight pieces of at most <see cref="ArcStepDegrees"/> (every piece an exact straight
+/// extrusion). <see cref="Mirror"/> also builds the piece mirrored about the vertical plane halfway between A and B (mark + "-M"). Part category from
+/// <see cref="Role"/>; dimension-only flag from <see cref="Unresolved"/>.
+/// </summary>
+public sealed class TrussPlaneItemDefinition
+{
+    public string Name { get; set; } = "";
+    public string Label { get; set; } = "";
+    public string PointA { get; set; } = "";
+    public string PointB { get; set; } = "";
+    public TrussPlaneItemKind Kind { get; set; }
+    public List<TrussUV> Outline { get; set; } = new();
+    public double W0 { get; set; }
+    public double W1 { get; set; }
+    public List<TrussPathVertex> Path { get; set; } = new();
+    public List<TrussUV> Section { get; set; } = new();
+    public double ArcStepDegrees { get; set; } = 5;
+    public bool Mirror { get; set; }
+    public TrussMemberRole Role { get; set; } = TrussMemberRole.Portal;
+    /// <summary>Assembly mark ("" = BR-PORTALS) and its description.</summary>
+    public string Assembly { get; set; } = "";
+    public string AssemblyDescription { get; set; } = "";
+    /// <summary>Database panel label (e.g. "Portal U11").</summary>
+    public string Panel { get; set; } = "";
+    public string Material { get; set; } = "";
+    public string Unresolved { get; set; } = "";
+    public string Source { get; set; } = "";
 }
 
 /// <summary>Joint (panel point) detail: gusset plates and rivet groups.</summary>

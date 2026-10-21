@@ -228,6 +228,7 @@ public static partial class TrussGenerator
             BuildJointPlates();
             BuildEndConnections();
             BuildBracingGussets();
+            BuildPlaneItems();
             PlaceJointRivets();
             FlushConnectionRivets();
             if (_d.Floor != null) BuildFloor(_d.Floor);
