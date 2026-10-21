@@ -1050,6 +1050,12 @@ UNRESOLVED FLAG (general, reusable): `SBM.Core/Assumption.cs` `Assumption{Status
   3D-RIVETS; IFC types keyed by diameter + grip + material. PTC: 226,632 rivets (main 56,872, each 3-span 13,880, each 4-span 35,360, girder spans 50,940 / 20,340), heads
   107.6 k lb; IFC 41 -> 105 MB (1.15 M entities; validate 0 issues); viewport buffers 186 -> 211 MB. Group text -> member mapping, p.70 diameter rules, skipped
   groups (cover plate splice plan views, member splices, lugs, bracing, stubs) and the third-pass CORRECTION rows: see TRUSS-DESIGN.md section 11.
+  STEP 2 (2026-10-21, TRUSS-DESIGN.md 11b): counts = rivet SYMBOLS drawn inside each gusset outline per member (`tools/ptc_rivet_count.py` -> `connections/rivet-counts.csv`, hand zones
+  `rivet-count-zones.csv`, main L11 `rivet-counts-extra.csv`), given to the joint, its other half and its 'similar to' joints; symbols just outside the outline -> OPTIONAL
+  `TrussRivetGroup.Beyond` / `BeyondLength`; generic placement: clean plate stack under both heads (`SectionRun`), no head over another (>= 0.8 (d1 + d2)), grid >= 1.6 d; OPTIONAL
+  `TrussDefinition.RivetHeadsFlushAtSolePlates` -> `BoltInstance.FlushEnd` (countersunk end, IFC own type, half head mass); `SteelClashCheck` uses the rivet solid. Totals 280,040
+  rivets (main 88,760, 3-span 20,668 / 4-span 39,332 each, girders 50,940 + 20,340), heads 136,045 lb, IFC 126 MB; not placed: connection groups
+  (`connections/rivet-counts-connections.csv`, floor beam / stringer / bracing sheets UNRESOLVED, step 3).
   REVIEW FIXES 2026-10-20 (user questions: edge stringer / floor beam length / main truss bearings; TRUSS-DESIGN.md section 12): generic OPTIONAL
   `TrussMemberDefinition.DepthReductionStart/End` (tapered member: the section part below its axis rises by that amount at the cut end, linear, top straight;
   Info "tapered members"), END chords (no chord continuing backward at the point) extended by a NEGATIVE setback now carry the envelope gusset to their end,

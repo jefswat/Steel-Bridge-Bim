@@ -250,6 +250,32 @@ PTC (every open item is a flag with page + reason):
   shoes-ptc: L20 fixed shoe sole 10 3/16, wings 29 7/8, stems 2'-5 7/8 (both sheets), main L0 rocker wings / stiffeners 1 1/2 thick and base 6 3/4 (stack flag: 1/4 in. over the
   drawn pin height). Splice-plate corrections L19-L21 / U20-U21 change rows that have no length, so no built plate changes; p.50 splice bars 6 x 1'-8 kept flagged (not built).
 
+### 11b. Step 2 (2026-10-21): symbol counts inside the drawn gusset outlines; QC I018 / I019 / I020 / I029
+- Counts: `tools/ptc_rivet_count.py run geom.csv gusset-outlines.csv rivet-counts.csv overlays ovr=rivet-count-zones.csv` (one process; `geom.csv` = `sbm run temp/dump3.csx`-style
+  dump of the points + in-plane members with their in-plane half depth). For every outline of section 15 (79 drawn joints) the page is rendered at 300 dpi, rivet symbols are
+  detected (dots = shop, open / crossed circles = field; the detector of the QC check), two symbols closer than 1 1/2 in. are one, and loops in a straight chain closer than
+  2 3/8 in. (dashed inlay / fill plate edges, centre lines) are dropped. Each symbol inside the outline goes to the chord on its side when it lies in the chord band (work point
+  +- the model half depth + 3/4 in.), else to the web member whose band is nearest; hand zones (`rivet-count-zones.csv`, page px at 150 dpi) fix the main joints whose post
+  fields, bracing angle strips (2-Ls 4 x 3 1/2 / 5 x 3 1/2 on the gusset edges), post edges drawn in PROFILE (half circles = rivets of the outstanding angle legs, not through the
+  gusset) and splice-line profile chains the automatic rule mis-assigns (U11-U17, L0, L15, L17, U18). Symbols just outside the outline in a member's band (chord within 4 ft,
+  web members within 3 ft) are the 'beyond' rows. Overlays were checked joint by joint; accuracy about +-10 % (text and plate corners next to rivets).
+- `rivet-counts-extra.csv`: main L11 (p.80, no outline: post 95, chord L10-L11 120 field, arch chord L11-L12 184, low confidence).
+- `rivets-ptc.csx`: these counts replace the gussets.csv rows at every joint they cover - its own drawing, the other half of the unit (mirrored), or the joint it is drawn
+  'similar to' (3-span U4 U6 U10 U12 = U2, L3 L5 L7 L11 = L1; 4-span U4-U18 even = U2, L3-L19 odd = L1, U10 / U20 = 3-span U8; main L1 = L3, L16 = L15, L19 = L18, U21 = U20,
+  L21 = L20); member by class (chord toward the lower / higher panel number, vertical, diagonal). Beyond rows -> `TrussRivetGroup.Beyond` (band from the outline edge outward
+  over the drawn extent + 1 1/2 in.; heads on the member face or the joint's web outside plates). Joints still on gussets.csv: main L13, L14, U22, L22. Diameters: p.70 / p.50 rules.
+- Generator (generic, `TrussGenerator.DistributedRivets` / `SectionRun`): a position needs one clean contiguous plate stack under both heads (shank axis and both shank edges,
+  equal within 1/16 in.; a stack reaching the section centre = a rolled web across the shank is refused), grip = that stack + gusset stack + gap (fills) + inside splice plates;
+  rivets on a gusset face keep their heads clear of the ones already placed (centres >= 0.8 (d1 + d2)), grids never below 1.6 d (QC I018 / I019).
+  OPTIONAL `TrussDefinition.RivetHeadsFlushAtSolePlates` -> heads inside a shoe sole plate countersunk flush (`BoltInstance.FlushEnd`; QC I020: 240 girder rivets per girder unit).
+  `SteelClashCheck` checks rivets with their own solid (it used the bolt + nut solid).
+- Not placed (`connections/rivet-counts-connections.csv`): member splice details, flange plan view splices, lugs, brackets, struts, pin plates, secondary angles (counts kept);
+  floor beam / stringer / bracing / portal connection sheets p.45, 55, 56, 85, 94, 97-100 UNRESOLVED (counts not printed, not read in this pass) - step 3, connection angles.
+- Totals (run order on the merged model): 226,632 -> 280,040 rivets (main 56,872 -> 88,760; 3-span 13,880 -> 20,668 each; 4-span 35,360 -> 39,332 each; girders 50,940 +
+  20,340 unchanged), heads 107,610 -> 136,045 lb. Gussets without rivets (N): 3-span 0 / 50, 4-span 0 / 82, main 2 / 92 (W14 / W14': no count on the sheets).
+  Checks: main 608 PASS / 11 DIFF / 63 INFO, approach 1796 / 12 / 148, girders 131 / 6 / 14. IFC 105 -> 126 MB (1.39 M entities). Clash (rivet solid): main Bolt x Chord max
+  0.62 in. (head 0.68-0.75), approach depths = half the 14 WF flange the shank passes (holes not cut), Bolt x Bolt <= 0.12 in., girder Bolt x SolePlate max 0.47 in.
+
 ## 12. Review fixes (2026-10-20): edge stringer, floor beam / bracket length, chord ends at the end shoes
 
 User questions: "Is there an edge stringer missing?", "Is the floor beam too long?", "The main truss bearings are in the wrong spot, or the lower chord is
