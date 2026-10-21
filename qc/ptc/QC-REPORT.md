@@ -105,3 +105,42 @@ Check counts before / after (same session, before = previous CLI on the round-1 
 
 p.42 steel by group (model / plan): 4-span silicon 84.3 % -> 89.7 %, 3-span silicon 87.9 % -> 92.0 % (floor beam plates), arch silicon 97.2 % -> 96.5 % (post plies now partial). Please re-check I009 / I011 / I012 / I014-I017 on a fresh export; for areas read the mid-member section (or volume / length knowing that cover plates stop at the gussets), and for chord lengths use the working points.
 
+
+---
+
+# Pass 3 (independent checker, 2026-10-20 / 21)
+Checker: Claude Sonnet 5.5. Model: `samples/plans/PTC Delaware River Bridge.sbm` copied to `inputs/ptc.sbm`; fresh `sbm export --ifc --for-check` and `sbm db --for-check` (CLI rebuilt in `qc\bin-ptc`). Geometry read with IfcOpenShell from the checking IFC (sqlite registry for areas); `sbm measure --member` (sections of three floor beams) was run on the live .sbm and used for geometry only (its descriptions were not used as plan values). The gusset-outline polygons in `docs/plan-data/ptc-delaware-river/connections/gusset-outlines.csv` were used as DATA to locate the joints and as the comparison outline, never as evidence of themselves: every outline was overlaid on the plan raster and judged by eye (evidence/gusset-*.png).
+
+## Rows and results (results/checks.csv, 1,792 rows in total)
+| Block | Rows | pass | fail | other |
+|---|---|---|---|---|
+| Pass 3 first part (re-checks I002-I017, gusset thicknesses, shoes; C1073-C1679) | 607 | 568 | 30 | 4 conflict, 3 info, 2 n.a. |
+| 3b-1 Gusset outlines at 14 joints (C1680-C1728) | 49 | 42 | 6 | 1 n.a. (L12 height: bbox in another frame, area row used) |
+| 3b-2 Bracing and suspended floor (C1729-C1754) | 26 | 17 | 9 | |
+| 3b-3 Walkways, railing, dams, W abutment (C1755-C1774) | 20 | 14 | 6 | |
+| 3b-4 Rivet counts, 13 joints + rivet-less gussets (C1775-C1790) | 16 | 3 | 13 | |
+| 3b-5 Steel total, L0 chord end (C1791-C1792) | 2 | 1 | 1 | |
+| All rows | 1,792 | 1,585 | 192 | 7 conflict, 3 info, 5 n.a. |
+
+## Method notes (3b)
+- Gussets (3b-1): joints = 3-span U1 U7 L8, 4-span L10 L20, main U9 L10 U11 L12 U12 L15 L17 L18 L20 (+ L0 in 3b-5). Scale 4.28 px/in at 150 dpi (3/4" = 1'-0", checked 4.24 on p.50 from the U1-U3 panel 26'-11 1/4). Model bbox / area from the IFC plate; the outline polygon overlaid on the sheet crop. Result: 11 of 14 follow the drawn plate edges; U9 (right edge about 20 in outboard), L15 (left edge about 17 in), L17 (right edge 11-16 in) do not (I028). Gusset thickness notes read on the same crops: all 7 compared agree.
+- Bracing (3b-2): section areas of the printed members (channel weight / 3.4 + plates; AISC areas for W, BP, WT, L) vs mean section area (volume / length) of the registry members; counts from the registry. Floor lateral X bracing is one panel off the plan (p.71 floor lateral system, p.99 conns at W14 / W16 / W18 / W20) and the suspended floor beams carry reduced sections (F6 / F8: 123.6 / 134.85 vs 157.0 / 220.7 sq in). Stringers (S9-S16 sections, 21 WF 62 / 24 WF 84 / 24 WF 94) agree.
+- Walkways / railing / dams / abutment (3b-3): rail and stringer sections, post spacing 6'-0 (all three walkways), the 22'-0 strut walkway, 87'-0 c.c. and 76'-6 curb to curb, dam teeth pitch / count / width and W abutment footing and pedestal agree. Fails: railing post spacing at the abutment panels, tooth length / plate thickness at Pier 20 (low confidence), walkway at floor beam U11-L11 (low confidence).
+- Rivets (3b-4): the plan count is a raster detection of filled and open rivet symbols inside the drawn gusset outline at 300 dpi (`work/rdet.py`; overlays `evidence/rivets-*.png` reviewed, the detector found every symbol on the three overlays opened; crossed-circle symbols can be missed by a few). Model count = IFC rivet placements inside the plate outline on one face. 88 of 224 N-side gusset plates have no rivets at all in the model; at 9 of 13 sampled joints the count differs by more than max(3, 5 %).
+
+## Open issues after pass 3 (results/issues.csv, now with status and evidence columns)
+- Closed: I002 I003 I007 I008 (accepted as a definition) I009 I010 I011 I012 I014 I015 I016 I017 (12).
+- Accepted plan conflicts, need the user: I004 I005 I013 (3).
+- Open (20): I001 (steel 86.3 % of the plan, was 83.8 %), I006, I018-I025 (clash groups from `clash-summary.csv`, 469,761 clashes in 86 groups: 46 intended contact, 40 model error), and new I026-I035:
+  - I026 floor laterals shifted one panel (p.71 / p.99), medium
+  - I027 suspended floor beams with reduced sections (F6 / F8), medium
+  - I028 gusset outlines U9 / L15 / L17 outboard of the drawn edges, medium
+  - I029 rivets: 88 of 224 N gussets without rivets, counts differ at 9 of 13 sampled joints, medium
+  - I030 4-span gusset stack in-to-in 0.25-0.5 in off at 12 joints, main gusset layer / thickness mismatches, low
+  - I031 shoe pin length 42.63 vs 42 1/8 in at piers 11 / 15, low
+  - I032 bracing section areas 1.0-1.4 % off (14 BP 73, 13[31.8, 18[42.7), low
+  - I033 railing post spacing 5.71 vs 5'-11 1/2 ft at the abutment panels, low
+  - I034 / I035 low-confidence dam tooth and floor beam walkway dimensions, low
+
+## Not checked in pass 3b
+Portal p.100 (U11 portal bracing section and connection), sway bracing counts and positions (dotted lines illegible on p.71), bottom lateral diagonal counts and the L10-L12 diamond (p.71), lateral / sway connection details p.97-98, suspended floor beam F5 / F7 positions (the p.72 panel grid is not legible at the scan resolution), rigid suspender sections, stringer line count (10 vs 11 rows on p.72), walkway ladders / platforms p.102-106 beyond the items above, girder-span walkways, E abutment section p.39, W abutment wall / wing sections (p.12) other than footing and pedestal, culvert p.14, dams p.46 / 51 / 52 / 54 / 68 / 92 other than Pier 20 (p.91), rivet counts at the other joints (only 13 sampled plus the all-gusset presence check), rivet grips, element-by-element reconciliation (unverified-element list not produced), second clash engine (IfcOpenShell ifcclash not run).

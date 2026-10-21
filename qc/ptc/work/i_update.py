@@ -44,7 +44,9 @@ fields=['id','severity','page','element GlobalIds','finding','plan value','model
 out=[]
 for r in rows:
     s,e=st[r['id']]; r['status']=s; r['evidence']=e; out.append(r)
-for (i,sev,pg,el,fi,pv,mv,s,e) in new:
+import re
+for (i,sev,el,fi,pv,mv,s,e) in new:
+    m=re.search(r'p\.([\d\-/ ,.p]+)',el); pg=m.group(1).strip() if m else '-'
     out.append({'id':i,'severity':sev,'page':pg,'element GlobalIds':el,'finding':fi,'plan value':pv,'model value':mv,'status':s,'evidence':e})
 w=csv.DictWriter(open(p,'w',newline='',encoding='utf-8'),fieldnames=fields); w.writeheader(); w.writerows(out)
 print(len(out))
