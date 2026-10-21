@@ -1156,7 +1156,8 @@ public class TrussTests : IDisposable
         // 1. girder (plane N, left of the alignment) with two stiffeners and a longitudinal stiffener on the face toward the alignment
         t.Sections.Add(new TrussSectionDefinition { Name = "GIR", Kind = TrussSectionKind.H, WebVertical = true, WebDepth = In(60), WebPlies = { new TrussPly(In(60), In(0.5)) }, Angle = "L6x6x1/2" });
         t.Members.Add(new TrussMemberDefinition { Name = "GIR", From = "L0", To = "L6", Plane = "N", Section = "GIR", Role = TrussMemberRole.Girder, OffsetZ = -Ft(10),
-            Stiffeners = new() { new TrussStiffenerSet { Angle = "L5x3.5x7/16", Height = In(48), Distances = { Ft(10), Ft(20) } } },
+            Stiffeners = new() { new TrussStiffenerSet { Angle = "L5x3.5x7/16", Height = In(48), Distances = { Ft(10), Ft(20) } },
+                new TrussStiffenerSet { Label = "crimped", Angle = "L5x3.5x7/16", Height = In(48), Distances = { Ft(32) }, CrimpThickness = In(0.5), CrimpHeight = In(36) } },
             LongitudinalStiffeners = new() { new TrussLongitudinalStiffener { Angle = "L6x4x7/16", Y = In(20), From = Ft(2), To = Ft(30), Clearance = In(0.5),
                 RivetPitch = In(7), RivetGage = In(2.25), RivetEdge = In(1.5), RivetDiameter = In(0.875), Unresolved = "UNRESOLVED (p.0): level scaled." } } });
         // 2. stringer line A continued 1 ft beyond its first and last floor beam
@@ -1183,6 +1184,12 @@ public class TrussTests : IDisposable
         var gir = st.Parts.Single(x => x.Mark == "N-GIR");
         var gb = gir.Mesh.Bounds(); double yWeb = (gb.Min.Y + gb.Max.Y) / 2;
         Assert.True(ls.Mesh.Bounds().Min.Y < yWeb && ls.Mesh.Bounds().Max.Y < yWeb + In(0.3), $"web {yWeb} ls {ls.Mesh.Bounds().Min.Y} {ls.Mesh.Bounds().Max.Y}");   // N girder at +Y: the alignment side is -Y
+        // crimped stiffener: same volume, the end zones stand 1/2 in. off the web
+        var cs = st.Parts.Single(x => x.Mark == "N-GIR-ST2");
+        var s5 = TrussSections.ParseAngle("L5x3.5x7/16")!.Value;
+        Assert.Equal(2 * (s5.a + s5.b - s5.t) * s5.t * In(48), cs.Volume, 9);
+        Assert.Equal(In(0.25) + In(0.5) + In(5), cs.Mesh.Bounds().Max.Y - yWeb, 6);
+        Assert.DoesNotContain("Crimp", System.Text.Json.JsonSerializer.Serialize(new TrussStiffenerSet()));
         // rivets centred in each piece at 7 in.: 14 + 17 + 17, grip = leg + web
         var lr = st.Bolts.Where(x => x.Kind == BoltKind.Rivet && x.Assembly.StartsWith("GIRDER")).ToList();
         Assert.Equal(48, lr.Count);

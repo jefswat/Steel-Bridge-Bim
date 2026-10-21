@@ -514,6 +514,12 @@ public sealed class TrussStiffenerSet
     /// <summary>OPTIONAL: +1 / -1 = the web leg of each (single) angle points toward the member end / start; 0 = the <see cref="PerFace"/> rule.</summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public int LegToward { get; set; }
+    /// <summary>OPTIONAL (0 = straight, omitted from the .sbm): CRIMPED angles - outside the middle zone of <see cref="CrimpHeight"/> (centred, e.g. between
+    /// the flange angle toes) the angle stands this far off the web (over the flange angle legs); the middle zone lies on the web (or on the fill).</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public double CrimpThickness { get; set; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public double CrimpHeight { get; set; }
 }
 
 /// <summary>Defaults for the joints without their own <see cref="TrussJointDefinition"/>.</summary>

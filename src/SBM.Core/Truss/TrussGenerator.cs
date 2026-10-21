@@ -564,8 +564,16 @@ public static partial class TrussGenerator
                                 var keep = mesh; mesh = meshF; Prism(fp, d, (set.Height - fh) / 2, fh); mesh = keep;
                             }
                             // web leg along +-a from the heel, outstanding leg normal to the web
-                            var poly = new[] { new Vec2(0, x0), new Vec2(sa * legWeb, x0), new Vec2(sa * legWeb, x0 + sx * t), new Vec2(sa * t, x0 + sx * t), new Vec2(sa * t, x0 + sx * legOut), new Vec2(0, x0 + sx * legOut) };
-                            Prism(poly, d);
+                            Vec2[] Poly(double xb) => new[] { new Vec2(0, xb), new Vec2(sa * legWeb, xb), new Vec2(sa * legWeb, xb + sx * t), new Vec2(sa * t, xb + sx * t), new Vec2(sa * t, xb + sx * legOut), new Vec2(0, xb + sx * legOut) };
+                            if (set.CrimpThickness > 0 && set.CrimpHeight > 0 && set.CrimpHeight < set.Height)
+                            {
+                                // crimped: middle zone on the web / fill, the end zones over the flange angle legs
+                                double ch = set.CrimpHeight, he = (set.Height - ch) / 2, xc = sx * (tw / 2 + set.CrimpThickness);
+                                Prism(Poly(xc), d, 0, he);
+                                Prism(Poly(x0), d, he, ch);
+                                Prism(Poly(xc), d, he + ch, he);
+                            }
+                            else Prism(Poly(x0), d);
                         }
                     }
                 if (mesh.IsEmpty) continue;
