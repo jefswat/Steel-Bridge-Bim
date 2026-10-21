@@ -56,6 +56,7 @@ public static partial class TrussGenerator
         public required TrussBuiltSection Sec;
         public Vec3 Axis, X, Y;
         public double SA, SB;               // setbacks
+        public (Vec3 P, Vec3 N)? MitreA, MitreB;   // mitred chord ends: joint plane through the point (TrussJointDefaults.MitredChordJoints)
         public string Assembly = "";
     }
 
@@ -223,6 +224,7 @@ public static partial class TrussGenerator
             foreach (var bs in _sec.Values) foreach (var n in bs.Notes.Where(n => !n.Contains("perforated cover plate"))) Info($"Truss: {n}{Src}.");
             BuildInstances();
             Setbacks();
+            MitreChordJoints();
             foreach (var m in _inst) BuildMember(m);
             BuildJoints();
             BuildJointPlates();
@@ -393,6 +395,7 @@ public static partial class TrussGenerator
                             if (sin < 0.1) continue;
                             double h = Vec3.Dot(d1, c.Y) > 0 ? c.Sec.YMax : -c.Sec.YMin;
                             t = Math.Max(t, (h + ym * cos) / sin + clr);
+                            t = Math.Max(t, ClearOfJointPlates(m, d1, ym, c, pl, pt));
                         }
                     }
                     else if (IsCrossPlane(m.Def.Role))
@@ -463,6 +466,7 @@ public static partial class TrussGenerator
             if (taper) Info($"Truss: tapered members ({m.Sec.Definition.Name}): depth reduced by {L(rA)} at the start and {L(rB)} at the end (bottom part raised, top straight){(m.Def.Source.Length > 0 ? " (" + m.Def.Source + ")" : "")}.");
             foreach (var lf in m.Sec.Lacing) Lacing(mesh, m, a0, cut, lf);
             if (m.Def.RivetLines is { Count: > 0 }) MemberRivetLines(m, a0, cut);
+            if (m.MitreA != null || m.MitreB != null) mesh = MitreMesh(m, mesh, a0, cut);
             Assumption? asu = null;
             string flag = m.Def.Unresolved.Length > 0 ? m.Def.Unresolved : m.Sec.Flag ?? "";
             if (!string.IsNullOrEmpty(perfFlag) && !flag.Contains(perfFlag)) flag = (flag + " " + perfFlag).Trim();
@@ -1377,6 +1381,7 @@ public static partial class TrussGenerator
                     int sgnOut(TrussPlateFace f) => f is TrussPlateFace.Top or TrussPlateFace.WebOutside ? 1 : -1;   // growth direction of a stack
                     string asm = Asm($"TRUSS-{pl.Name}", AssemblyKind.TrussLine, $"{_d.Name} - truss line {pl.Name}");
                     double yc = c0.Sec.WebDepth > 0 ? c0.Sec.WebCenterY + c0.Def.OffsetZ : 0;
+                    var mj = JointMitre(pl.Name, jdef.Point, P, tan, xv, yv);
                     // STACKING (QC pass 4, I042): every plate lies on the steel under it within its own band - the member pieces (web plies, angle legs on the web,
                     // cover plates) of the chord(s) it reaches along the joint, and the plates already placed on that face whose length and band overlap it. Fills
                     // are placed first, the one closest to the member first (a fill between the angle legs before a wider fill that bears on the legs and on it).
@@ -1427,6 +1432,7 @@ public static partial class TrussGenerator
                         var mesh = new Mesh();
                         void Box(double x0, double x1, double y0, double y1)
                         {
+                            if (mj is { } mjv) { MitredPlateBox(mesh, P, ax, mjv, xv, a0, a1, x0, x1, y0, y1); return; }
                             var poly = new[] { new Vec2(Math.Min(x0, x1), Math.Min(y0, y1)), new Vec2(Math.Max(x0, x1), Math.Min(y0, y1)), new Vec2(Math.Max(x0, x1), Math.Max(y0, y1)), new Vec2(Math.Min(x0, x1), Math.Max(y0, y1)) };
                             var ra = poly.Select(q => P + ax * a0 + xv * q.X + yv * q.Y).ToArray();
                             MeshBuilder.AddLoft(mesh, poly, new[] { ra, ra.Select(q => q + ax * (a1 - a0)).ToArray() });

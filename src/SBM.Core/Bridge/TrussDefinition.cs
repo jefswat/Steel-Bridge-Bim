@@ -507,6 +507,19 @@ public sealed class TrussJointDefaults
     /// the edge angle of a bracing plate (<see cref="TrussBracingGussetDefinition.EdgeAngle"/>).</summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public double BracingStackClearance { get; set; }
+    /// <summary>OPTIONAL (false = off, omitted from the .sbm): where two chord members meet END TO END at a panel point with a deflection (kinked chord,
+    /// arch-type trusses), both ends are cut on ONE plane through the point: the bisector plane of the two axes, normal to the mean chord direction (the
+    /// riveted "finished" / milled joint line the sheets draw through the point). The joint's splice / fill plates (<see cref="TrussJointDefinition.Plates"/>)
+    /// then follow the chord on their side and end on the same plane (a plate across the joint = two halves meeting on it, i.e. bent at the point).
+    /// Off = square cuts lengthened by half depth x tan(deflection / 2) so the joint has no gap (the two end wedges overlap). A chord passing through, an explicit
+    /// setback or a deflection of 25 deg or more keep the square rule; a third chord at the point (e.g. a wind chord starting there) keeps its own square end.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public bool MitredChordJoints { get; set; }
+    /// <summary>OPTIONAL (0 = off, omitted from the .sbm): web members (diagonals, verticals, posts, hangers) whose end lies over joint splice / fill plates on the
+    /// chord face they meet (<see cref="TrussJointDefinition.Plates"/> on the Top / Bottom face reaching the member's footprint) stop this far clear of the outer
+    /// face of that plate stack (the plans draw the member end clear of the cover splice plate). Joints without such plates keep <see cref="WebMemberClearance"/>.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public double WebMemberClearOfJointPlates { get; set; }
 }
 
 /// <summary>Plane of a bracing connection plate: Horizontal (lateral systems, normal up), Transverse (sway frames / portals: vertical, normal along
