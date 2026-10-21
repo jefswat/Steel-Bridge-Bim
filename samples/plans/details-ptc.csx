@@ -171,6 +171,85 @@ if (T(Main) is { } tmK)
     report.Add($"{Main}: {t.PlaneItems.Count} portal knee pieces (x 2 mirrored)");
 }
 
+// ================================================================ 3. span 19 floor lateral connections (p.99)
+// "FLOOR LATERAL CONN. AT FLOOR BEAM W14" / "AT FLOOR BEAMS W16, W18 & W20": the X diagonals END at the floor beam (rivet groups on each half), a bottom plate runs
+// under the floor beam (3/4 Pl. at W14, 7/16 at W16-W20) and two top plates (7/16) stop at the floor beam ("Lateral details sym. abt. CL Bridge except as modified by
+// plates and fillers on web of floor beam"), 1-L 3 1/2 x 3 x 3/8 along the floor beam; at W14 the halves toward L13 are "2-Web Pls 12 x 1/2, 2-15[ 50.0,
+// 2-Pls (13-6) x 1/2" (= the L13-W14 wind chord section), the others 14 BP 73. "FOR WIND CHORD CONN. AT W15, W17 & W19" (Sections A / B): a 7/16 Pl. under the wind
+// chord and the lateral ends ("Slot lateral Pl." in the floor beam web, 1-L 7 x 4 x 3/4 to the floor beam); W21 (K to the tongue beam) similar.
+// Rivets 7/8 carbon (p.99 notes). Counts per lateral end read on the details: 14 BP 73 8 per plate, 2-15[ 50 24 per plate, at the wind chord 10.
+string flXFlag = U("p.99", "floor lateral connection plates at the floor beams W14 / W16 / W18 / W20 (bottom 3/4 or 7/16 Pl., 2 top 7/16 Pls., L 3 1/2 x 3 x 3/8)",
+    "the details draw plates, angles and rivets without outline dimensions or gages; the fillers on the floor beam web are not dimensioned",
+    "the X diagonals are split at the crossing and stop clear of the floor beam; bottom plate = envelope of the four member laps under them, top plates one per side stopping 1/4 in. clear of the floor beam with the angle on the floor beam face, rivets 8 (14 BP 73) / 24 (2-15[ 50) per member per plate in 4 lines 5 3/4 / 4 in. from the member CL; fillers on the floor beam web not built.");
+string flWFlag = U("p.99", "floor lateral plates at the wind chord W15 / W17 / W19 / W21 (7/16 Pl., 1-L 7 x 4 x 3/4 to the floor beam)",
+    "Sections A / B draw the plate under the wind chord and the lateral ends with its rivets but no outline dimensions; the plate passes through a slot in the floor beam web",
+    "one 7/16 plate under the lateral ends and the wind chord = envelope of the lateral laps (not clipped at the chord), 10 rivets per lateral; the angles to the floor beam and the web slot are not built.");
+if (T(Main) is { } tmF)
+{
+    var t = tmF;
+    Flag(t, "floor lateral (14 BP 73 X / 2-12[ 25 K) connections", null);
+    Flag(t, "floor lateral connection plates at the floor beams W14", flXFlag);
+    Flag(t, "floor lateral plates at the wind chord W15", flWFlag);
+    Flag(t, "floor lateral connections at L13 and at the tongue beam", U("p.95, p.99, p.93", "floor lateral connections at L13 (floor beam F8) and at the tongue beam W22",
+        "p.95 draws the lateral gussets on the F8 bottom flange and p.93 / p.99 the tongue beam and shear lock at W22 without outline dimensions",
+        "not built; the laterals stop clear of the floor beam / joint."));
+    var planeN = t.Planes.First(p => p.Name == "N");
+    t.BracingGussets ??= new();
+    t.BracingGussets.RemoveAll(b => b.Label.StartsWith("floor lat."));
+    int split = 0;
+    foreach (var pr in new[] { "", "'" })
+    {
+        string P(int n) => n == 22 ? "22" : $"{n}{pr}";
+        foreach (var (a, b) in new[] { (13, 15), (15, 17), (17, 19), (19, 21) })
+        {
+            int c = (a + b) / 2;
+            string A = (a == 13 ? "L" : "W") + P(a), B = "W" + P(b), FX = "FX" + P(c);
+            var pa = t.Points.First(p => p.Name == A && (p.Planes == null || p.Planes.Count == 0 || p.Planes.Contains("N")));
+            var pb = t.Points.First(p => p.Name == B && (p.Planes == null || p.Planes.Count == 0 || p.Planes.Contains("N")));
+            t.Points.RemoveAll(p => p.Name == FX);
+            t.Points.Add(new TrussPointDefinition(FX, (pa.Station + pb.Station) / 2, (pa.Elevation + pb.Elevation) / 2)
+                { Offset = -planeN.Offset + (pa.Offset + pb.Offset) / 2, Planes = new() { "N" }, Source = "p.99 crossing of the floor lateral X at the CL of floor beam " + c });
+            string Xa = $"FL-X{P(a)}-{P(b)}a", Xb = $"FL-X{P(a)}-{P(b)}b";
+            var ma = t.Members.FirstOrDefault(m => m.Name == Xa); var mb = t.Members.FirstOrDefault(m => m.Name == Xb);
+            if (ma != null && mb != null)
+            {
+                // N:A -> S:B and S:A -> N:B become four halves ending at the crossing
+                foreach (var (m0, from, to) in new[] { (ma, ma.From, ma.To), (mb, mb.From, mb.To) })
+                {
+                    t.Members.Remove(m0);
+                    var h1 = Clone2(m0); h1.Name = m0.Name + "1"; h1.From = from; h1.To = "N:" + FX; if (a == 13) h1.Section = "L13-W14";
+                    var h2 = Clone2(m0); h2.Name = m0.Name + "2"; h2.From = "N:" + FX; h2.To = to;
+                    t.Members.Add(h1); t.Members.Add(h2);
+                    split++;
+                }
+            }
+            string X1a = Xa + "1", X1b = Xb + "1", X2a = Xa + "2", X2b = Xb + "2";
+            var rv = new Dictionary<string, int> { [X1a] = a == 13 ? 24 : 8, [X1b] = a == 13 ? 24 : 8, [X2a] = 8, [X2b] = 8 };
+            TrussBracingGussetDefinition G(string label, TrussBracingPlateSide side, double th, List<string> mem, string suffix, bool angle) => new()
+            {
+                Point = "N:" + FX, Label = label, Orientation = TrussBracingPlateOrientation.Horizontal, Side = side, Thickness = th, Members = mem, Suffix = suffix,
+                EdgeAngle = angle ? "L3-1/2x3x3/8" : "", EdgeAngleOnCrossing = angle, EdgeAngleOutside = angle, EdgeRivets = angle ? 5 : 0,
+                Rivets = rv, RivetPitch = In(3), RivetGage = In(5.75), RivetGage2 = In(4), RivetDiameter = In(0.875), RivetMaterial = "7/8 in carbon steel rivet",
+                Material = "C", Unresolved = flXFlag, Source = "p.99",
+            };
+            t.BracingGussets.Add(G("floor lat. bottom PL", TrussBracingPlateSide.Below, c == 14 ? In(0.75) : In(7.0 / 16), new() { X1a, X1b, X2a, X2b }, "", false));
+            t.BracingGussets.Add(G("floor lat. top PL", TrussBracingPlateSide.Above, In(7.0 / 16), new() { X1a, X1b }, "-1", true));
+            t.BracingGussets.Add(G("floor lat. top PL", TrussBracingPlateSide.Above, In(7.0 / 16), new() { X2a, X2b }, "-2", true));
+        }
+        foreach (int w in new[] { 15, 17, 19, 21 })
+            foreach (var pl in new[] { "N", "S" })
+                t.BracingGussets.Add(new TrussBracingGussetDefinition
+                {
+                    Point = $"{pl}:W{P(w)}", Label = "floor lat. wind chord PL", Orientation = TrussBracingPlateOrientation.Horizontal, Side = TrussBracingPlateSide.Below, Thickness = In(7.0 / 16),
+                    Members = t.Members.Where(m => m.System == "Floor laterals" && (m.From == $"{pl}:W{P(w)}" || m.To == $"{pl}:W{P(w)}")).Select(m => m.Name).ToList(), NoStackClip = true,
+                    RivetsPerMember = 10, RivetPitch = In(3), RivetGage = In(5.75), RivetGage2 = In(4), RivetDiameter = In(0.875), RivetMaterial = "7/8 in carbon steel rivet",
+                    Material = "C", Unresolved = flWFlag, Source = "p.99",
+                });
+    }
+    report.Add($"{Main}: floor lateral X split at the floor beams ({split} members -> halves), {t.BracingGussets.Count(b => b.Label.StartsWith("floor lat."))} floor lateral plate definitions");
+}
+TrussMemberDefinition Clone2(TrussMemberDefinition m) => System.Text.Json.JsonSerializer.Deserialize<TrussMemberDefinition>(System.Text.Json.JsonSerializer.Serialize(m))!;
+
 // ================================================================ regenerate + save
 var rep = Doc.Regenerate();
 foreach (var b in Doc.Project.Bridges.Where(b => b.Truss != null))
