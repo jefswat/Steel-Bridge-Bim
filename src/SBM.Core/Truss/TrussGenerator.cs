@@ -935,8 +935,8 @@ public static partial class TrussGenerator
             foreach (var c in _jointRivets)
             {
                 HashSet<TrussRivetGroup>? pooled = null;
-                // whole-joint counts first need every member's lap area
-                foreach (var rg in c.Def.Rivets)
+                // whole-joint counts first need every member's lap area; groups AS DRAWN (Positions) first, so the derived grids keep clear of them
+                foreach (var rg in c.Def.Rivets.OrderBy(r => r.Positions is { Count: > 0 } ? 0 : 1))
                 {
                     if (rg.Member == "*") { WholeJointRivets(c, rg); continue; }
                     if (pooled?.Contains(rg) == true) continue;
@@ -947,7 +947,8 @@ public static partial class TrussGenerator
                     }
                     var m = c.Here.FirstOrDefault(i => i.Def.Name.Equals(rg.Member, StringComparison.OrdinalIgnoreCase) || i.Mark.Equals(rg.Member, StringComparison.OrdinalIgnoreCase));
                     if (m == null) { Warn($"Truss: rivets of joint {c.Point} ({c.Plane}) - member '{rg.Member}' does not frame into the joint; not placed."); continue; }
-                    if (rg.Distributed) DistributedRivets(c, m, rg, rg.Count); else PitchRivets(c, m, rg);
+                    if (rg.Positions is { Count: > 0 }) PositionRivets(c, m, rg);
+                    else if (rg.Distributed) DistributedRivets(c, m, rg, rg.Count); else PitchRivets(c, m, rg);
                 }
             }
             // gusset rivet cover: every joint rivet inside its inner gusset outline with the group's edge distance (1 mm tolerance)
@@ -965,6 +966,7 @@ public static partial class TrussGenerator
                 if (shortN > 0)
                     Warn($"Truss CHECK joint {c.Point} ({c.Plane}): {shortN} of {l.Count} rivets per face lie outside the gusset outline or closer than their edge distance to its edge (smallest {L(minEdge)}).");
             }
+            ReportPositionRivets();
             if (_pooledJoints > 0) Info($"Truss: chord rivets laid as one field per joint face (uniform chord rivets) at {_pooledJoints} joint faces{Src}.");
             if (_tightGroups > 0)
                 Warn($"Truss CHECK rivets: {_tightGroups} distributed rivet groups need a grid under 3 diameters (tightest {_tightest:0.00} d) - the image count and the gusset / member lap (envelope outline where the gussets are not dimensioned) disagree; each group is listed as Info. Positions are not adjusted.");

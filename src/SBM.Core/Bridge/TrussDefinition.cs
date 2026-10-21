@@ -900,6 +900,17 @@ public sealed class TrussRivetGroup
     /// <summary>OPTIONAL length of the band beyond the gusset edge (m; 0 = 0.6 m), e.g. the extent of the drawn field.</summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public double BeyondLength { get; set; }
+    /// <summary>OPTIONAL (null = off, omitted from the .sbm): the rivet positions AS DRAWN on the joint sheet, one per rivet and gusset face, in the joint frame
+    /// of <see cref="TrussJointDefinition.Outline"/> (u along the bridge from the work point, v up; m). They replace <see cref="Count"/> / the distributed grid /
+    /// pitch rows: each rivet is placed where drawn (moved at most 3/4 in. to the nearest spot with a clean plate stack under both heads and a free head on
+    /// the gusset face, else dropped and counted in a CHECK line); <see cref="Beyond"/> groups lie outside the gusset (heads on the member / fill / splice plates).</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public List<TrussUV>? Positions { get; set; }
+    /// <summary>OPTIONAL (omitted when false): <see cref="Positions"/> are in the MEMBER frame instead: U = distance along the member from the joint's working
+    /// point (away from the joint), V = offset along the member's in-plane section y (up; a vertical member: toward the higher station). Keeps drawn rows on the
+    /// member when the drawn and the model member directions differ.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public bool PositionsInMemberFrame { get; set; }
 }
 
 /// <summary>
