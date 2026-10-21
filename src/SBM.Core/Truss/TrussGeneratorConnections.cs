@@ -232,6 +232,7 @@ public static partial class TrussGenerator
             var boxes = parts.Select(p => p.Mesh is { IsEmpty: false } ? p.Mesh.Bounds() : default).ToList();
             int nAngles = 0, nPlates = 0, nRiv = 0, nLoose = 0, nNoWeb = 0, nWebExt = 0;
             var backs = new List<string>();
+            var missed = new List<string>();
             SteelLineProbe Probe(Vec3 lo, Vec3 hi, string? exclude, IEnumerable<Mesh>? extra = null)
             {
                 var pr = new SteelLineProbe();
@@ -394,7 +395,7 @@ public static partial class TrussGenerator
                                 {
                                     double y = yTop - col.First - k * col.Pitch;
                                     var q = P(back + col.Gage, 0, y);
-                                    if (pr.At(q, Xv, 0.5) is not { } iv) { nNoWeb++; continue; }
+                                    if (pr.At(q, Xv, 0.5) is not { } iv) { nNoWeb++; if (missed.Count < 3) missed.Add($"{lbl} at {where}, column {L(col.Gage)} from the back, {L(yTop - y)} below the top"); continue; }
                                     _pendingConn.Add((q + Xv * iv.t1, -Xv, din, iv.t1 - iv.t0, ec.RivetDiameter, asmR, ec.RivetMaterial, rasu));
                                     nRiv++;
                                 }
@@ -405,7 +406,7 @@ public static partial class TrussGenerator
                                         {
                                             double y = yTop - col.First - k * col.Pitch;
                                             var q = P(back + a2.t / 2, sx * (heel + col.Gage), y);
-                                            if (pr.At(q, din, 0.6) is not { } iv) { nNoWeb++; continue; }
+                                            if (pr.At(q, din, 0.6) is not { } iv) { nNoWeb++; if (missed.Count < 3) missed.Add($"{lbl} outstanding leg at {where}"); continue; }
                                             if (iv.t1 - iv.t0 < a2.t + In(1.0 / 16)) nLoose++;
                                             _pendingConn.Add((q + din * iv.t1, -din, Xv, iv.t1 - iv.t0, ec.OutRivetDiameter > 0 ? ec.OutRivetDiameter : ec.RivetDiameter, asmR, ec.RivetMaterial, rasu));
                                             nRiv++;
@@ -432,13 +433,13 @@ public static partial class TrussGenerator
                             double y = (set.Top is { } st0 ? st0 + m.Def.OffsetZ : yc + set.Height / 2) - col.First - k * col.Pitch;
                             var (ax2, vy) = StiffFrame(m, set);
                             var q = m.A + m.Axis * d + ax2 * (sgn * col.Gage) + vy * y;
-                            if (pr.At(q, m.X, 0.5) is not { } iv) { nNoWeb++; continue; }
+                            if (pr.At(q, m.X, 0.5) is not { } iv) { nNoWeb++; if (missed.Count < 3) missed.Add($"stiffener '{set.Label}' on {m.Mark}"); continue; }
                             _pendingConn.Add((q + m.X * iv.t1, -m.X, m.Axis, iv.t1 - iv.t0, set.RivetDiameter, m.Assembly, null, rasu));
                             nRiv++;
                         }
                 }
             }
-            Info($"Truss: end connections - {nAngles} connection angles, {nPlates} end plates, {nWebExt} web extensions, {nRiv} rivets{(nNoWeb > 0 ? $" ({nNoWeb} rivet positions not in steel, skipped)" : "")}{Src}.");
+            Info($"Truss: end connections - {nAngles} connection angles, {nPlates} end plates, {nWebExt} web extensions, {nRiv} rivets{(nNoWeb > 0 ? $" ({nNoWeb} rivet positions not in steel, skipped; e.g. {string.Join("; ", missed)})" : "")}{Src}.");
             if (nLoose > 0) Warn($"Truss CHECK end connections: {nLoose} rivets through the outstanding legs find no steel behind the leg (gap to the post / girder face over 1 mm; fills not drawn?) - placed with the leg as grip{Src}.");
             if (backs.Count > 0) Model.ConnectionBacks.AddRange(backs);
         }
