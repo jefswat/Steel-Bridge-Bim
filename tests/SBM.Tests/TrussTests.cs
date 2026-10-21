@@ -851,6 +851,69 @@ public class TrussTests : IDisposable
     }
 
     [Fact]
+    public void SwayPlates_EdgeAngleOnCrossingMember_RotatedEndConnection_NoStackClip()
+    {
+        // inverted V sway frame from U3 (both planes) down to the CL point LM3 of strut 3 (the strut passes it); the diagonals are rolled shapes turned 90 deg
+        // (flanges on the transverse plates); a vertical turned W10x33 hanger bracing from the CL of FB4 down to the CL point LM4 with end angles
+        var (p, b) = Model();
+        var t = b.Truss!;
+        t.Sections.Add(new TrussSectionDefinition { Name = "WR", Kind = TrussSectionKind.Rolled, Designation = "W14x61", Rotated = true });
+        t.Sections.Add(new TrussSectionDefinition { Name = "W10R", Kind = TrussSectionKind.Rolled, Designation = "W10x33", Rotated = true });
+        t.Points.Add(new TrussPointDefinition("LM3", Ft(100) + 3 * Panel, Ft(60)) { Offset = Half, Planes = new() { "N" } });
+        t.Points.Add(new TrussPointDefinition("LM4", Ft(100) + 4 * Panel, Ft(60)) { Offset = Half, Planes = new() { "N" } });
+        t.Points.Add(new TrussPointDefinition("TM4", Ft(100) + 4 * Panel, Ft(60) + Depth - Ft(4)) { Offset = Half, Planes = new() { "N" } });
+        t.Members.First(m => m.Name == "STRUT3").Section = "PL";
+        t.Members.RemoveAll(m => m.Name is "FB3" or "FB4");   // (the test floor beams sit 30 in. above the chord: the sway frame would pass through them)
+        t.Members.Add(new TrussMemberDefinition { Name = "STRUT4", From = "N:L4", To = "S:L4", Section = "ST", Role = TrussMemberRole.Strut });
+        t.Members.Add(new TrussMemberDefinition { Name = "SWA", From = "N:U3", To = "N:LM3", Section = "WR", Role = TrussMemberRole.Sway });
+        t.Members.Add(new TrussMemberDefinition { Name = "SWB", From = "S:U3", To = "N:LM3", Section = "WR", Role = TrussMemberRole.Sway });
+        t.Members.Add(new TrussMemberDefinition { Name = "HB4", From = "N:TM4", To = "N:LM4", Section = "W10R", Role = TrussMemberRole.Strut,
+            EndConnections = new() { new TrussEndConnection { End = TrussMemberEnd.End, Label = "2-Ls 5x4x3/8", Angle = "L4x5x3/8", Top = In(3.25), Length = In(6.5), RivetDiameter = In(0.875),
+                WebRivets = new() { new TrussRivetColumn(In(1.75), 2, In(3), In(1.75)) }, OutRivets = new() { new TrussRivetColumn(In(2.25), 2, In(3), In(1.75)) } } } });
+        t.JointDefaults.BracingCornerClearance = In(0.5);
+        t.BracingGussets = new()
+        {
+            new TrussBracingGussetDefinition { Point = "N:LM3", Orientation = TrussBracingPlateOrientation.Transverse, Side = TrussBracingPlateSide.Both, Thickness = In(0.5),
+                EdgeAngle = "L4x3-1/2x7/16", EdgeAngleOnCrossing = true, EdgeAngleOutside = true, EdgeRivets = 3, RivetsPerMember = 6, RivetPitch = In(3), RivetGage = In(4), RivetDiameter = In(0.875) },
+            new TrussBracingGussetDefinition { Point = "N:L5", Thickness = In(0.5), Side = TrussBracingPlateSide.Below, Members = new() { "STRUT5" }, NoStackClip = true,
+                Outline = new() { new TrussUV(-0.3, -0.6), new TrussUV(0.3, -0.6), new TrussUV(0.3, -0.05), new TrussUV(-0.3, -0.05) } },
+        };
+        t.Members.Add(new TrussMemberDefinition { Name = "STRUT5", From = "N:L5", To = "S:L5", Section = "PL", Role = TrussMemberRole.Strut });
+        var bm = Regen(p);
+        var st = bm.Steel!;
+        var plates = st.Parts.Where(x => x.Mark.StartsWith("N-BGLM3-") && !x.Mark.EndsWith("-EA")).ToList();
+        var angles = st.Parts.Where(x => x.Mark.StartsWith("N-BGLM3-") && x.Mark.EndsWith("-EA")).ToList();
+        Assert.True(plates.Count == 2 && angles.Count == 2, string.Join(", ", st.Parts.Where(x => x.Mark.Contains("BG")).Select(x => x.Mark)) + " | "
+            + string.Join(" | ", st.Diagnostics.Where(d => d.Message.Contains("bracing plate") || d.Message.Contains("bracing connection")).Select(d => d.Message)));
+        Assert.All(plates.Concat(angles), x => Assert.True(x.Mesh.HasExactSolids));
+        // the plates reach down to 1/4 in. above the strut, the angles stand on the strut top, outside the plate pair (along the bridge)
+        double strutTop = st.Parts.Single(x => x.Mark == "STRUT3").Mesh.Bounds().Max.Z;
+        Assert.All(plates, x => Assert.InRange(x.Mesh.Bounds().Min.Z - strutTop, In(0.25) - 1e-4, In(0.25) + 1e-4));
+        Assert.All(angles, x => Assert.InRange(x.Mesh.Bounds().Min.Z - strutTop, -1e-4, 1e-4));
+        double pxMin = plates.Min(x => x.Mesh.Bounds().Min.X), pxMax = plates.Max(x => x.Mesh.Bounds().Max.X);
+        Assert.All(angles, x => Assert.True(x.Mesh.Bounds().Max.X <= pxMin + 1e-4 || x.Mesh.Bounds().Min.X >= pxMax - 1e-4));
+        // plates on the flanges of the turned shapes: 2 x half the W14x61 depth apart (inner faces)
+        var w14 = SteelCatalog.FindWideFlange("W14x61")!;
+        Assert.InRange(plates.Max(x => x.Mesh.Bounds().Min.X) - plates.Min(x => x.Mesh.Bounds().Max.X), w14.Depth - 1e-3, w14.Depth + 1e-3);
+        var o = new SBM.Core.Checks.ClashOptions();
+        var cl = SBM.Core.Checks.SteelClashCheck.Run(bm, o).Clashes;
+        Assert.DoesNotContain(cl, c => c.A.Mark.StartsWith("N-BGLM3") || c.B.Mark.StartsWith("N-BGLM3"));
+        // turned W10x33: the end angles lie on its web (no overlap with the member), web legs along the member, backs on the strut top
+        var ec = st.Parts.Where(x => x.Mark.StartsWith("N-HB4-EC1") || x.Mark.StartsWith("HB4-EC1")).ToList();
+        Assert.NotEmpty(ec);
+        Assert.DoesNotContain(cl, c => (c.A.Mark.Contains("HB4") && c.B.Mark.Contains("HB4")));
+        double strut4Top = st.Parts.Single(x => x.Mark == "STRUT4").Mesh.Bounds().Max.Z;
+        Assert.True(Math.Abs(ec.Min(x => x.Mesh.Bounds().Min.Z) - strut4Top) < 1e-3, $"{(ec.Min(x => x.Mesh.Bounds().Min.Z) - strut4Top) / 0.0254:0.00} in; "
+            + string.Join(" | ", st.Diagnostics.Where(d => d.Message.Contains("end connection")).Select(d => d.Message)) + string.Join(",", ec.Select(x => x.Mark)) + $" strut {B(st.Parts.Single(x => x.Mark == "STRUT4"))} hb {B(st.Parts.Single(x => x.Mark == "HB4"))} ang {B(ec[0])}");
+        static string B(SteelPart x) { var b = x.Mesh.Bounds(); return $"({b.Min.X:0.000},{b.Min.Y:0.000},{b.Min.Z:0.000})-({b.Max.X:0.000},{b.Max.Y:0.000},{b.Max.Z:0.000})"; }
+        // NoStackClip: the plate at L5 reaches under the chord joint (not clipped 1/4 in. clear of the stack)
+        var l5 = st.Parts.Single(x => x.Mark == "N-BGL5");
+        Assert.InRange(l5.Mesh.Bounds().Max.Y, Half - 0.05 - 1e-6, Half - 0.05 + 1e-6);
+        Assert.DoesNotContain("EdgeAngleOnCrossing", System.Text.Json.JsonSerializer.Serialize(new TrussBracingGussetDefinition()));
+        Assert.DoesNotContain("NoStackClip", System.Text.Json.JsonSerializer.Serialize(new TrussBracingGussetDefinition()));
+    }
+
+    [Fact]
     public void EndConnection_OutFill_FillsTheStandOffBelowTheGusset()
     {
         // FB2's N end: the angle backs lie on the L2 gusset (10 3/4 in. from the plane); above the gusset the outstanding legs stand off the vertical's

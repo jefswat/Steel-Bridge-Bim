@@ -546,6 +546,17 @@ public sealed class TrussBracingGussetDefinition
     public string Material { get; set; } = "";
     public string Unresolved { get; set; } = "";
     public string Source { get; set; } = "";
+    /// <summary>OPTIONAL (false = default, omitted): the edge angle lies on the face of the member CROSSING the plate that the plate was clipped at (a sway
+    /// plate standing on a strut / hanging under a floor beam: the member of the highest rank, then the largest area removed) instead of the truss-plane stack.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public bool EdgeAngleOnCrossing { get; set; }
+    /// <summary>OPTIONAL: the edge angle's second leg lies on the plate's OUTER face (away from the members) instead of its member-side face.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public bool EdgeAngleOutside { get; set; }
+    /// <summary>OPTIONAL: the plate is NOT clipped clear of the truss-plane joint stack (it lies on the face of a chord in the plate plane, e.g. a floor
+    /// lateral plate under a wind chord).</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public bool NoStackClip { get; set; }
 }
 
 /// <summary>Joint (panel point) detail: gusset plates and rivet groups.</summary>

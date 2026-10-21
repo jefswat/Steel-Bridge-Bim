@@ -269,9 +269,11 @@ public static partial class TrussGenerator
                         var wp = EndPoint(m, start);
                         var din = start ? m.Axis : -m.Axis;        // from the end working point into the member
                         double setb = start ? m.SA : m.SB;
-                        var Yv = m.Y; var Xv = m.X;
+                        // a rolled shape turned 90 degrees (web horizontal in the section): the web plane is spanned by the axis and section x
+                        bool rot = m.Sec.Definition.Kind == TrussSectionKind.Rolled && m.Sec.Definition.Rotated;
+                        var Yv = rot ? m.X : m.Y; var Xv = rot ? -m.Y : m.X;
                         double zoff = m.Def.OffsetZ;
-                        Vec3 P(double s, double x, double y) => wp + din * s + Xv * x + Yv * (y + zoff);
+                        Vec3 P(double s, double x, double y) => wp + din * s + Xv * x + Yv * y + m.Y * zoff;
                         string endTag = start ? "A" : "B";
                         string where = $"{m.Mark} {(start ? m.PointA : m.PointB)} end";
                         (double legOut, double legWeb, double t)? ang = null;
