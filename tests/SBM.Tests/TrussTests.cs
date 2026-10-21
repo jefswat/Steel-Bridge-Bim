@@ -668,8 +668,9 @@ public class TrussTests : IDisposable
         Assert.Equal(2, ang.Count);
         var a = TrussSections.ParseAngle("L4x4x3/4")!.Value;
         foreach (var x in ang) { Assert.Equal(2 * (a.a + a.b - a.t) * a.t * In(24), x.Volume, 9); Assert.True(x.Mesh.HasExactSolids); }
-        // backs probed on the first steel face beyond the cut (S end: the vertical's channel flanges 8 in from the plane; N end: the gusset reaches the cut)
-        Assert.Equal(new[] { "FB2 L2 end: 10\"", "FB2 L2 end: 8\"" }, tm.ConnectionBacks);
+        // backs probed on the first steel face beyond the cut (S end: the vertical's channel flanges 8 in from the plane; N end: the cut lies inside the
+        // 3/4 in gusset at 10 in -> its outer face toward the member)
+        Assert.Equal(new[] { "FB2 L2 end: 10 3/4\"", "FB2 L2 end: 8\"" }, tm.ConnectionBacks);
         // web extended only where the back lies inside the member setback (10 in)
         var ext = Assert.Single(st.Parts, x => x.Mark.StartsWith("FB2-EC1") && x.Mark.EndsWith("W"));
         Assert.Equal(w36Web() * (In(10) - In(8) - In(0.5)) * In(24), ext.Volume, 6);

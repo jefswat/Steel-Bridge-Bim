@@ -444,6 +444,10 @@ public sealed class TrussStiffenerSet
     public double RivetDiameter { get; set; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? RivetUnresolved { get; set; }
+    /// <summary>OPTIONAL (omitted when false): PLUMB stiffeners on a member on a grade (girder stiffeners lined up with plumb floor beams): the section lies in
+    /// the horizontal plane and is extruded vertically (instead of normal to the member axis); heights / tops measured vertically.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public bool Plumb { get; set; }
     /// <summary>OPTIONAL: +1 / -1 = the web leg of each (single) angle points toward the member end / start; 0 = the <see cref="PerFace"/> rule.</summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public int LegToward { get; set; }

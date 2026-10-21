@@ -228,6 +228,7 @@ public static partial class TrussGenerator
             BuildJointPlates();
             BuildEndConnections();
             PlaceJointRivets();
+            FlushConnectionRivets();
             if (_d.Floor != null) BuildFloor(_d.Floor);
             if (_d.LineItems != null) foreach (var li in _d.LineItems) BuildLineItem(li);
             if (_d.LineItems != null) foreach (var li in _d.LineItems.Where(l => l.ClipAngles != null && l.Transverse && l.Kind == TrussLineItemKind.Steel)) BuildClipAngles(li);
@@ -532,8 +533,9 @@ public static partial class TrussGenerator
                     var pl = poly.ToArray();
                     if (h < 0) h = set.Height;
                     if (MeshBuilder.SignedArea(pl.ToList()) < 0) Array.Reverse(pl);
-                    var ra = pl.Select(q => m.A + m.Axis * (d + q.X) + m.X * q.Y + m.Y * ((set.Top is { } st0 ? st0 + m.Def.OffsetZ - set.Height : yc - set.Height / 2) + y0)).ToArray();
-                    MeshBuilder.AddLoft(mesh, pl, new[] { ra, ra.Select(p => p + m.Y * h).ToArray() });
+                    var (ax2, vy) = StiffFrame(m, set);
+                    var ra = pl.Select(q => m.A + m.Axis * d + ax2 * q.X + m.X * q.Y + vy * ((set.Top is { } st0 ? st0 + m.Def.OffsetZ - set.Height : yc - set.Height / 2) + y0)).ToArray();
+                    MeshBuilder.AddLoft(mesh, pl, new[] { ra, ra.Select(p => p + vy * h).ToArray() });
                 }
                 var meshF = new Mesh();
                 double fill = Math.Max(0, set.FillThickness);
@@ -578,6 +580,15 @@ public static partial class TrussGenerator
                 });
                 if (Model.PanelOf.TryGetValue(m.Mark, out var pnl)) Model.PanelOf[mark] = pnl;
             }
+        }
+
+        /// <summary>Stiffener frame: along-member direction of the section and the extrusion direction (member y, or horizontal / plumb for
+        /// <see cref="TrussStiffenerSet.Plumb"/>).</summary>
+        private static (Vec3 along, Vec3 up) StiffFrame(Inst m, TrussStiffenerSet set)
+        {
+            if (!set.Plumb) return (m.Axis, m.Y);
+            var h = m.Axis - Up * Vec3.Dot(m.Axis, Up);
+            return h.Length < 1e-6 ? (m.Axis, m.Y) : (h.Normalized(), Up);
         }
 
         /// <summary>Lacing bars (flat bars in the face plane, zigzag between the rivet lines; double = crossed).</summary>
