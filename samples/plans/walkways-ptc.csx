@@ -118,7 +118,7 @@ double? FbFlangeTopAt(SBM.Core.Steel.SteelPart p, SBM.Core.Alignments.Alignment 
     double best = double.NegativeInfinity;
     foreach (double ds in new[] { -In(4), In(4) })
     {
-        var xy = al.PointAt(sta + ds, off);
+        var xy = al.PointAt(sta + ds, off) + new SBM.Core.Geometry.Vec2(1.37e-6, -0.83e-6);   // off the triangle edges (a diagonal hit counts twice)
         var zs = new List<double>();
         var pos = p.Mesh.Positions; var idx = p.Mesh.Indices;
         for (int i = 0; i + 2 < idx.Count; i += 3)
@@ -131,7 +131,13 @@ double? FbFlangeTopAt(SBM.Core.Steel.SteelPart p, SBM.Core.Alignments.Alignment 
             zs.Add(l1 * A.Z + l2 * B.Z + l3 * C.Z);
         }
         zs.Sort();
-        var u = new List<double>(); foreach (var z in zs) if (u.Count == 0 || z - u[^1] > 1e-4) u.Add(z);
+        // touching pieces (cover plate under the angle leg) give an exit + entry at one level: drop such pairs so u[1] is the top of the whole stack
+        var u = new List<double>();
+        for (int i = 0; i < zs.Count; i++)
+        {
+            if (i + 1 < zs.Count && zs[i + 1] - zs[i] < 1e-4) { i++; continue; }
+            u.Add(zs[i]);
+        }
         if (u.Count >= 2) best = Math.Max(best, u[1]);
     }
     return double.IsNegativeInfinity(best) ? null : best;
@@ -247,7 +253,7 @@ foreach (var (bn, east, pts) in units)
     var fb0 = PartBox(bn, "FB" + (bn.Contains("3-span") ? "8" : "10"));
     if (fb0 == null) { Print($"{bn}: floor beams not found - walkways not built"); continue; }
     double vTop = (fb0.Value.zMin - al.ElevationAt(fb0.Value.sta, 0)) / In(1) + 1.75;    // grating top above the grade (in.)
-    WalkCl(bn, "walkway CL", dk.BeginStation, dk.EndStation, 10.0, "p.101", clFlag, onFlange: true);
+    WalkCl(bn, "walkway CL", dk.BeginStation, dk.EndStation, 10.25, "p.101", clFlag, onFlange: true);   // 1/4 in. over the flange: the walk follows the 3 % grade, the floor beam flange is level
     foreach (var (fb, ladderFt, full, ladder, both) in pts)
     {
         var box = PartBox(bn, fb);
@@ -335,7 +341,7 @@ foreach (var n in new[] { "PTC Girder spans 1-10", "PTC Girder spans 28-31" })
         .Select(p => { var bb = p.Mesh.Bounds(); return alOf[n].Inverse(new SBM.Core.Geometry.Vec2((bb.Min.X + bb.Max.X) / 2, (bb.Min.Y + bb.Max.Y) / 2)).Station; }).OrderBy(s => s).ToList();
     bool west = n.Contains("1-10");
     double from = west ? fbSt.First() : dk.BeginStation, to = west ? dk.EndStation : fbSt.Last();
-    int k = WalkCl(n, "walkway CL", from, to, 10.0, "p.43, p.44, p.101", gwFlag, onFlange: true);
+    int k = WalkCl(n, "walkway CL", from, to, 10.25, "p.43, p.44, p.101", gwFlag, onFlange: true);
     Print($"{n}: CL inspection walk in {k} pieces");
 }
 
