@@ -963,9 +963,9 @@ public static partial class TrussGenerator
                     minEdge = Math.Min(minEdge, d); req = Math.Min(req, e);
                     if (d < e - 0.001) shortN++;
                 }
-                Model.GussetRivetCovers.Add(new TrussGussetRivetCover(c.Plane, c.Point, l.Count, shortN, minEdge, req, c.Def.Outline.Count >= 3));
+                Model.GussetRivetCovers.Add(new TrussGussetRivetCover(c.Plane, c.Point, l.Count, shortN, minEdge, req, c.Def.Outline.Count >= 3, _jointDrawn.TryGetValue(c, out int nd) ? nd : 0));
                 if (shortN > 0)
-                    Warn($"Truss CHECK joint {c.Point} ({c.Plane}): {shortN} of {l.Count} rivets per face lie outside the gusset outline or closer than their edge distance to its edge (smallest {L(minEdge)}).");
+                    Warn($"Truss CHECK joint {c.Point} ({c.Plane}): {shortN} of {l.Count} rivets per face lie outside the gusset outline or closer than their edge distance to its edge (smallest {L(minEdge)}){(_jointDrawn.TryGetValue(c, out int nd2) && nd2 > 0 ? $"; {nd2} of them placed as drawn (the sheet's own edge distance, read with the outline)" : "")}.");
             }
             ReportPositionRivets();
             if (_pooledJoints > 0) Info($"Truss: chord rivets laid as one field per joint face (uniform chord rivets) at {_pooledJoints} joint faces{Src}.");

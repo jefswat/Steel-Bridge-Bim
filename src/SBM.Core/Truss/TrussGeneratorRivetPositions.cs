@@ -10,6 +10,8 @@ public static partial class TrussGenerator
     {
         // ------------------------------------------------------------------ rivets AS DRAWN (TrussRivetGroup.Positions, QC PTC I052)
         private int _posPlaced, _posMoved, _posDropped, _dropFree, _dropRun, _dropRange, _dropOutside;
+        /// <summary>Rivets placed as drawn inside the gusset, per joint context (gusset rivet cover record).</summary>
+        private readonly Dictionary<JointCtx, int> _jointDrawn = new(ReferenceEqualityComparer.Instance);
 
         /// <summary>Rivets of one member at a joint at the drawn positions (<see cref="TrussRivetGroup.Positions"/>, joint u / v). A position whose shank would not
         /// find a clean plate stack under both heads (section rule) or whose head would sit on another rivet's head is moved to the nearest spot within 3/4 in.
@@ -62,7 +64,7 @@ public static partial class TrussGenerator
                 }
                 var at = c.P + c.U * uv.X + c.V * uv.Y;
                 var d1 = through ? (Vec3.Dot(at - c.P, m.Axis) >= 0 ? m.Axis : -m.Axis) : Away(m, start);
-                if (!beyond) { NoteRivet(c, at, e); Occupy(c, uv, dia); }
+                if (!beyond) { NoteRivet(c, at, e); Occupy(c, uv, dia); _jointDrawn[c] = (_jointDrawn.TryGetValue(c, out int nd) ? nd : 0) + 1; }
                 double ins = IsChord(m.Def.Role) ? PlatesAt(_insidePlates, c, at) : 0;
                 foreach (int side in new[] { -1, 1 })
                 {

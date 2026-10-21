@@ -234,8 +234,15 @@ Print("--- 8b. gusset layers (plates per face, total thickness)");
         var withOutline = tm.GussetStacks.Where(g => tdef.Joints.Any(j => j.Point == g.Point && j.Outline.Count >= 3)).ToList();
         Row("INFO", "joints with a gusset outline read from the sheet (rest: envelope of the member laps)", "-", $"{withOutline.Count} of {tm.GussetStacks.Count} joint x plane; inner plates {withOutline.Sum(g => g.Areas[0]) / 0.09290304:N0} SF per face (outlines) + {tm.GussetStacks.Except(withOutline).Sum(g => g.Areas[0]) / 0.09290304:N0} SF (envelopes)");
         foreach (var rc in tm.GussetRivetCovers.OrderBy(c => c.Plane).ThenBy(c => c.Point))
-            Row(rc.Ok ? "PASS" : "DIFF", $"gusset covers its rivets {rc.Plane} {rc.Point} ({(rc.OutlineGiven ? "outline from the sheet" : "envelope")})", $"every rivet >= {rc.RequiredEdge / 0.0254:0.##} in. from the edge",
-                $"{rc.Rivets} rivets per face, smallest edge distance {rc.MinEdge / 0.0254:0.##} in.{(rc.Short > 0 ? $", {rc.Short} short / outside" : "")}");
+        {
+            // rivets placed AS DRAWN (QC I052): positions and outline are both read from the sheet (+-1 in.): every drawn rivet within 1 in. of the inside of the drawn outline
+            if (rc.Drawn > 0)
+                Row(rc.MinEdge >= -0.0254 ? "PASS" : "DIFF", $"gusset covers its rivets {rc.Plane} {rc.Point} (rivets as drawn, outline from the sheet)", "every drawn rivet inside the drawn outline (both read from the sheet, +-1 in.)",
+                    $"{rc.Rivets} rivets per face ({rc.Drawn} as drawn), smallest edge distance {rc.MinEdge / 0.0254:0.##} in., {rc.Short} closer than {rc.RequiredEdge / 0.0254:0.##} in.");
+            else
+                Row(rc.Ok ? "PASS" : "DIFF", $"gusset covers its rivets {rc.Plane} {rc.Point} ({(rc.OutlineGiven ? "outline from the sheet" : "envelope")})", $"every rivet >= {rc.RequiredEdge / 0.0254:0.##} in. from the edge",
+                    $"{rc.Rivets} rivets per face, smallest edge distance {rc.MinEdge / 0.0254:0.##} in.{(rc.Short > 0 ? $", {rc.Short} short / outside" : "")}");
+        }
     }
     var gp = tm.Steel.Parts.Where(p => p.Category == PartCategory.TrussGusset).ToList();
     Row("INFO", "gusset plates (all layers)", "-", $"{gp.Count} plates, {gp.Sum(p => p.Mass) * 2.20462262:N0} lb ({gp.Where(p => System.Text.RegularExpressions.Regex.IsMatch(p.Mark, @"-[LR]\d$")).Sum(p => p.Mass) * 2.20462262:N0} lb in the outer layers)");

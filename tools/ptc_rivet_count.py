@@ -331,20 +331,46 @@ def run(argv):
                 marks.append((p, nme, reg, kind))
                 # position in the sheet frame of the gusset outline (gusset-outlines.csv outline_uv_in: u = drawing x, v up, origin = work point, inches)
                 wu, wv = (p[0] - wx) / s, -(p[1] - wy) / s
-                # web members: also the member frame (t along the member from the work point, y = the perpendicular offset, + = up; a near-vertical member:
-                # + = toward drawing +x), from the ray the symbol was assigned with - keeps the drawn rows on the member when the sheet and the model
-                # members differ in angle (the joint-frame shear keeps verticals plumb but turns diagonals)
-                mt = my = ''
-                ray = next((d for n_, ro, d in rays if n_ == nme and ro not in CHORD), None)
-                if ray is not None:
-                    rx, ry = ray[0], -ray[1]
-                    rl = math.hypot(rx, ry); rx, ry = rx / rl, ry / rl
-                    nx, ny = -ry, rx
-                    if abs(ny) < 0.2:
-                        if nx < 0: nx, ny = -nx, -ny
-                    elif ny < 0: nx, ny = -nx, -ny
-                    mt, my = f"{wu * rx + wv * ry:.2f}", f"{wu * nx + wv * ny:.2f}"
-                posrows.append(dict(structure=r['structure'], joint=pt, member=nme, region=reg, kind=kind, u_in=f"{wu:.2f}", v_in=f"{wv:.2f}", t_in=mt, y_in=my, page=page))
+                posrows.append(dict(structure=r['structure'], joint=pt, member=nme, region=reg, kind=kind, u_in=f"{wu:.2f}", v_in=f"{wv:.2f}", t_in='', y_in='', page=page, _w=(wu, wv)))
+        # web members: also the member frame (t along the member from the work point, y = the perpendicular offset, + = up; a near-vertical member: + = toward
+        # drawing +x). The axis direction is that of the member's own drawn gage lines (>= 8 symbols inside the outline: the direction within 12 deg of the
+        # model ray that lines the symbols up into the sharpest rows), else the model ray rotated onto the drawn chord: keeps the drawn rows on the member when the drawn chord / member angles differ
+        # from the model (the joint-frame shear keeps verticals plumb but turns diagonals)
+        for nme_, ro_, ray in rays:
+            if ro_ in CHORD:
+                continue
+            mine = [x for x in posrows if x['joint'] == pt and x['structure'] == r['structure'] and x['member'] == nme_ and '_w' in x]
+            if not mine:
+                continue
+            rx, ry = ray[0], -ray[1]
+            rl = math.hypot(rx, ry); rx, ry = rx / rl, ry / rl
+            ins_ = [x['_w'] for x in mine if x['region'] == 'inside']
+            if len(ins_) >= 8:
+                # the drawn gage lines: the direction within +-12 deg of the ray whose perpendicular projections bunch the symbols into the sharpest rows
+                # (histogram of 0.4 in. bins, sum of squared counts); robust to the gusset edge clipping the field obliquely
+                def sharp(a):
+                    ca, sa = math.cos(a), math.sin(a)
+                    dx, dy = rx * ca - ry * sa, rx * sa + ry * ca
+                    h = {}
+                    for q in ins_:
+                        k = int(math.floor((-dy * q[0] + dx * q[1]) / 0.4))
+                        h[k] = h.get(k, 0) + 1
+                    return sum(c * c for c in h.values())
+                cands = [math.radians(0.25 * i) for i in range(-48, 49)]
+                base = sharp(0.0)
+                best = max(cands, key=lambda a: (sharp(a), -abs(a)))
+                if sharp(best) > 1.15 * base:
+                    ca, sa = math.cos(best), math.sin(best)
+                    rx, ry = rx * ca - ry * sa, rx * sa + ry * ca
+            nx, ny = -ry, rx
+            if abs(ny) < 0.2:
+                if nx < 0: nx, ny = -nx, -ny
+            elif ny < 0: nx, ny = -nx, -ny
+            for x in mine:
+                wu, wv = x['_w']
+                x['t_in'], x['y_in'] = f"{wu * rx + wv * ry:.2f}", f"{wu * nx + wv * ny:.2f}"
+        for x in posrows:
+            x.pop('_w', None)
         names = sorted({k[0] for k in counts})
         for (nme, reg), (nd, nr) in sorted(counts.items()):
             res.append(dict(structure=r['structure'], joint=pt, member=nme, region=reg, shop_dots=nd, field_rings=nr, total=nd + nr, page=page,
