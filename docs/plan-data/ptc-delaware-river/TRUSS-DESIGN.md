@@ -655,3 +655,4 @@ Results (whole PTC run order on a copy of the committed model, before = the comm
   (QC filter) 166 -> 116, max 0.53 -> 0.50 in.; FillerPlate x FillerPlate 0. The 116 left are all in the end wedge of a chord at a kinked panel point: the chords are cut square
   at the point + half depth x tan(deflection / 2), so the member on the other side reaches 1-1 1/2 in. back past the point and meets the fill / splice plate of its neighbour
   there (e.g. L6 fills 7/16, L15 18 x 1 web plates 1/2 in. vs L14-L15). That is the chord end-cut rule, not the plate stacking; reported, not changed.
+- IFC (Parametric): 234.0 -> 234.1 MB, 2,472,827 entities; validate_ifc 0 schema + 0 EXPRESS issues (2,000 instances per type). Tests 578 -> 580 passed.
