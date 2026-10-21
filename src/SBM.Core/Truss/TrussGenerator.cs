@@ -131,6 +131,8 @@ public static class TrussGenerator
                     foreach (var (l, h) in iv)
                         if (l < lo - 1e-9 && h >= lo - 5e-4) { lo = l; grew = true; }
                 }
+                // a stack that reaches the section centre is a web / plate ACROSS the shank (rolled shapes turned with their web across the plane)
+                if (lo <= 1e-4) return null;
                 return (xo, xo - lo);
             }
             double r = dia / 2, tol = In(1.0 / 16);

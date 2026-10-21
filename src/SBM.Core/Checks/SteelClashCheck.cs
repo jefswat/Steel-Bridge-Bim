@@ -70,19 +70,21 @@ public static class SteelClashCheck
             }
             if (o.Bolts)
             {
-                var cache = new Dictionary<(double, double, double, BoltKind, double), Mesh>();
+                var cache = new Dictionary<(double, double, double, BoltKind, double, bool), Mesh>();
                 int i = 0;
                 foreach (var b in st.Bolts)
                 {
-                    var key = (b.Diameter, b.Grip, b.Length, b.Kind, b.Embedment);
+                    var key = (b.Diameter, b.Grip, b.Length, b.Kind, b.Embedment, b.FlushEnd);
                     if (!cache.TryGetValue(key, out var local))
                         cache[key] = local = b.Kind == BoltKind.Anchor ? SteelModel.AnchorBoltMesh(b.Diameter, b.Grip, b.Embedment, 12, b.TopHeight)
+                            // rivets: button heads as modeled (no nut / washer / stick-through), a countersunk end flush
+                            : b.Kind == BoltKind.Rivet ? SteelModel.RivetMesh(b.Diameter, b.Grip, flushEnd: b.FlushEnd)
                             : SteelModel.BoltMesh(b.Diameter > 0 ? new BoltGeometry(b.Diameter) : st.Bolt, b.Grip, b.Length);
                     var w = new Mesh();
                     foreach (var q in local.Positions) w.Positions.Add(b.Frame.ToWorld(q));
                     w.Indices.AddRange(local.Indices);
                     res.Add(new ClashItem(b.Kind == BoltKind.Anchor ? "AnchorBolt" : "Bolt", $"{b.Assembly}-B{++i}", b.Assembly,
-                        $"bolt {b.Diameter / 0.0254:0.###}\" grip {b.Grip / 0.0254:0.###}\"", w));
+                        $"{(b.Kind == BoltKind.Rivet ? (b.FlushEnd ? "rivet (one end flush)" : "rivet") : "bolt")} {b.Diameter / 0.0254:0.###}\" grip {b.Grip / 0.0254:0.###}\"", w));
                 }
             }
         }
