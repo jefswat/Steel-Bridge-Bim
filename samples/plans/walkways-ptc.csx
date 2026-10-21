@@ -140,16 +140,16 @@ void Platform(string bridge, string name, double sta, double off0, double off1, 
 // ================================================================ approach trusses (p.101 / p.102)
 // unit: (bridge, sign of 'east' in the sheet's hand, list of (joint, ladder distance from the floor beam station (ft, signed toward the sheet's east), cross walkway extent, ladder / platform))
 const double TrussOff = 29.0, LadderOff = 26.0 + 7.0 / 12;      // 58'-0 c.c. trusses, ladders 53'-2 c.c. (2'-5 inside the trusses)
-string crossFlag = U("p.101, p.102", "cross walkway station", "the key plans put the cross walkways at the pier floor beams and the ladders 4'-9 3/8 (piers 10 / 13 / 17) or 6'-0 3/8 (piers 11 / 12 / 14 / 15 / 16) from the pier / bearing CL; the walkway's own station is drawn only",
+string crossFlag = U("p.101, p.102", "cross walkway station", "the key plans put the cross walkways at the pier floor beams and the ladders 4'-9 3/8 from the CL bearing of the end shoe (piers 10 / 13 / 17; at 13 / 17 the 4-span shoe 2'-0 from the CL pier) or 6'-0 3/8 from the CL pier (piers 11 / 12 / 14 / 15 / 16); the walkway's own station is drawn only",
     "cross walkway centred on the ladder station (pier 13 / 24 of the 3-span unit: beside its end floor beam, no ladder); north half only except piers 10 / 27 (p.101 note 'omit this section of walkways at piers 13, 15 and 17'); NJ units opposite hand along the bridge, still to the north truss.");
 string clFlag = U("p.101", "CL walkway position and level", "the key plan draws the walkway band between the CL bridge and 2'-0 north of it at the floor beam bottom flange, through the floor beam manholes (drawn, not dimensioned)",
     "grating top 1 3/4 in. above the floor beam bottom (on the bottom flange angles), centred 1'-0 north of the CL; floor beam webs not cut for the manholes.");
 var units = new (string bridge, int east, (string fb, double ladderFt, bool full, bool ladder, bool platformBoth)[] pts)[]
 {
     ("PTC 3-span truss 11-13", 1, new[] { ("FB0", 4 + 9.375 / 12, true, true, true), ("FB8", 6 + 0.375 / 12, false, true, false), ("FB8'", 6 + 0.375 / 12, false, true, false), ("FB0'", double.NaN, false, false, false) }),
-    ("PTC 4-span truss 14-17", 1, new[] { ("FB0", 2 + 9.375 / 12, false, true, false), ("FB10", 6 + 0.375 / 12, false, true, false), ("FB20", 6 + 0.375 / 12, false, true, false), ("FB10'", 6 + 0.375 / 12, false, true, false), ("FB0'", -(2 + 9.375 / 12), false, true, false) }),
+    ("PTC 4-span truss 14-17", 1, new[] { ("FB0", 4 + 9.375 / 12, false, true, false), ("FB10", 6 + 0.375 / 12, false, true, false), ("FB20", 6 + 0.375 / 12, false, true, false), ("FB10'", 6 + 0.375 / 12, false, true, false), ("FB0'", -(4 + 9.375 / 12), false, true, false) }),
     ("PTC 3-span truss 25-27", -1, new[] { ("FB0", 4 + 9.375 / 12, true, true, true), ("FB8", 6 + 0.375 / 12, false, true, false), ("FB8'", 6 + 0.375 / 12, false, true, false), ("FB0'", double.NaN, false, false, false) }),
-    ("PTC 4-span truss 21-24", -1, new[] { ("FB0", 2 + 9.375 / 12, false, true, false), ("FB10", 6 + 0.375 / 12, false, true, false), ("FB20", 6 + 0.375 / 12, false, true, false), ("FB10'", 6 + 0.375 / 12, false, true, false), ("FB0'", -(2 + 9.375 / 12), false, true, false) }),
+    ("PTC 4-span truss 21-24", -1, new[] { ("FB0", 4 + 9.375 / 12, false, true, false), ("FB10", 6 + 0.375 / 12, false, true, false), ("FB20", 6 + 0.375 / 12, false, true, false), ("FB10'", 6 + 0.375 / 12, false, true, false), ("FB0'", -(4 + 9.375 / 12), false, true, false) }),
 };
 // pier top (= bottom of the truss shoe) at a floor beam station: the nearest shoe seat of the bridge
 double PierTop(string bridge, double sta, int north) =>
@@ -177,9 +177,12 @@ foreach (var (bn, east, pts) in units)
             double off = north * Ft(LadderOff);
             double zp = PierTop(bn, box.Value.sta, north) + In(9.375);
             Ladder(bn, $"ladder {fb} {(north < 0 ? "N" : "S")}", sta, off, zp, zw, "p.101, p.102");
-            // platform: 7'-0 3/8 across (5'-5 5/16 outboard / 1'-7 1/16 inboard of the ladder, p.102 Section A), 3'-6 1/4 along
+            // platform: 7'-0 3/8 across (5'-5 5/16 outboard / 1'-7 1/16 inboard of the ladder, p.102 Section A), 3'-6 3/8 along from 2'-0 beyond the CL bearing
+            // (p.102 View B: 2'-0 + 3'-6 3/8 with the ladder 4'-9 3/8 from the bearing = platform from the ladder - 2'-9 3/8 to the ladder + 9"; it was centred
+            // on the ladder, which put it over the end shoe masonry plates at piers 13 / 17, QC I023)
             double o0 = north < 0 ? off - FI(5, 5.3125) : off - FI(1, 7.0625), o1 = north < 0 ? off + FI(1, 7.0625) : off + FI(5, 5.3125);
-            Platform(bn, $"platform {fb} {(north < 0 ? "N" : "S")}", sta, o0, o1, 42.25, zp, "p.102");
+            double dir = Math.Sign(sta - box.Value.sta);
+            Platform(bn, $"platform {fb} {(north < 0 ? "N" : "S")}", sta - dir * (FI(2, 9.375) - FI(1, 9.1875)), o0, o1, 42.375, zp, "p.102");
         }
     }
 }
@@ -217,17 +220,19 @@ foreach (var (bn, east, pts) in units)
         if (fb == null) continue;
         double sta = fb.Value.sta + east * (In(12) + Ft(1));
         double zw = fb.Value.zMin + In(1.75);
-        Walk(bn, $"walkway at {fbj}", true, sta, -Ft(40), Ft(40), zw / In(1), false, "p.103",
-            U("p.103", $"walkway along the floor beam {fbj} (U11-L11)", "the key plan shows the walkway along the floor beam truss to truss (87'-0 c.c.) with ladders at its ends; the walkway elevations printed (141.67 / 141.60 / 151.06) cannot be assigned",
-                "2'-0 walkway beside the floor beam at its bottom flange level, 40'-0 each side of the CL."));
-        // platforms on the pier tops beside the 9'-2 shoe (p.104: 8'-0 x 6'-4, north pier shown, south opposite hand), ladder from the floor beam walkway (p.103: north side only)
+        Walk(bn, $"walkway at {fbj}", true, sta, -Ft(43.5) + FI(6, 6.375), 0, zw / In(1), false, "p.103",   // QC I035: north ladder line to the CL (p.103 key plan of walkway at Fl. Bm.)
+            U("p.103", $"walkway along the floor beam {fbj} (U11-L11)", "the key plan of walkway at Fl. Bm. draws it from the north ladder (6'-6 3/8 inboard of the north truss) to the CL bridge, where a short 2'-0 piece turns along the bridge (\"2'-0 / 1'-0\"); pier 19 is \"opp. hand\" without saying across or along; the walkway elevations printed (141.67 / 141.60 / 151.06) cannot be assigned",
+                "2'-0 walkway beside the floor beam at its bottom flange level from the north ladder line to the CL (both piers on the north side); the short piece along the bridge at the CL not built."));
+        // platforms on the pier tops INBOARD of the shoe (p.104 INSPECTION PLATFORM AT PIER 18: View B / Section A = 8'-0 along the bridge, 4'-0 each side of the
+        // CL pin; the side view puts it 5'-4 to 5'-4 + 3'-3 1/16 inboard of the CL truss, CL ladder 6'-6 3/8 from the CL truss (p.103 key plan); north pier shown,
+        // south opposite hand). It was 8'-0 along x 6'-4 across centred on the truss line beyond the shoe, through the shoe casting (QC I023).
         foreach (int north in new[] { -1, 1 })
         {
             double pierTop = PierTop(bn, fb.Value.sta, north) + In(9.375);
-            double ps = fb.Value.sta + east * (FI(4, 7) + In(3) + Ft(3));     // along the bridge beside the shoe, toward the span
-            double tl = north * Ft(43.5);
-            Platform(bn, $"platform {j} {(north < 0 ? "N" : "S")}", ps, tl - FI(3, 2), tl + FI(3, 2), 96, pierTop, "p.104");
-            if (north < 0) Ladder(bn, $"ladder {j} N", sta, -Ft(40) + In(6), pierTop, zw, "p.103, p.104");
+            double tl = north * Ft(43.5), inb = -north;                       // inboard = toward the CL
+            double a0 = tl + inb * FI(5, 4), a1 = tl + inb * (FI(5, 4) + FI(3, 3.0625));
+            Platform(bn, $"platform {j} {(north < 0 ? "N" : "S")}", fb.Value.sta, Math.Min(a0, a1), Math.Max(a0, a1), 96, pierTop, "p.104");
+            if (north < 0) Ladder(bn, $"ladder {j} N", sta, tl + inb * FI(6, 6.375), pierTop, zw, "p.103, p.104");   // CL ladder 6'-6 3/8 inboard (p.103 / p.104)
         }
     }
 }

@@ -626,6 +626,17 @@ public sealed class SuspenderDefinition
     public bool RopesAlongBridge { get; set; }
     public double SocketLength { get; set; }
     public double SocketDiameter { get; set; }
+    /// <summary>OPTIONAL: the socket reaches this far beyond the pin centre (m; the eye around the pin); 0 = the socket starts at the pin centre.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public double SocketBeyondPin { get; set; }
+    /// <summary>OPTIONAL open socket jaw: gap between the two lugs (m, measured along the pin axis; 0 = solid envelope). The lugs = the socket circle
+    /// outside the gap, from the socket end at the pin to <see cref="SocketJawLength"/> from the pin centre (toward the rope); the plate the pin
+    /// passes through lies in the gap.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public double SocketJawWidth { get; set; }
+    /// <summary>OPTIONAL: length of the jaw from the pin centre toward the rope (m; the basket starts there).</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public double SocketJawLength { get; set; }
     public double PinDiameter { get; set; }
     /// <summary>Rope designation / grade text (IFC description), e.g. "4\" galvanized bridge rope".</summary>
     public string Rope { get; set; } = "";

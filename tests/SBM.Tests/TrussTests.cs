@@ -263,6 +263,43 @@ public class TrussTests : IDisposable
     }
 
     [Fact]
+    public void LateralStopsClearOfPortal_OpenSocketJaw()
+    {
+        // lateral from the N:U3 corner to S:U4: without a portal both ends stop at the chord faces (symmetric); with a portal N:U3-S:U3 the U3 end
+        // stops where every corner of the lateral's end section is beyond the portal's side face
+        TrussMemberResult Lat(bool portal, out BridgeDefinition bd)
+        {
+            var (p, b) = Model();
+            b.Truss!.Members.Add(new TrussMemberDefinition { Name = "LAT", From = "N:U3", To = "S:U4", Section = "PL", Role = TrussMemberRole.UpperLateral });
+            if (portal) b.Truss.Members.Add(new TrussMemberDefinition { Name = "PORTAL", From = "N:U3", To = "S:U3", Section = "PL", Role = TrussMemberRole.Portal });
+            bd = b;
+            return Regen(p).Steel!.Truss!.Members.First(m => m.Name == "LAT");
+        }
+        var l0 = Lat(false, out _);
+        var l1 = Lat(true, out var b1);
+        double w = l0.WorkLength, s0 = (w - l0.CutLength) / 2;
+        double len = Math.Sqrt(Panel * Panel + 4 * Half * Half), k = Panel / len;
+        double expected = (In(8) + In(8) * (2 * Half / len)) / k + b1.Truss!.JointDefaults.WebMemberClearance;
+        Assert.True(expected > s0);
+        Assert.Equal(w - expected - s0, l1.CutLength, 6);
+
+        // open socket: 7 1/4 beyond the pin, 4 in. jaw over 1'-8 from the pin; the rope runs between the baskets
+        var (p2, b2) = Model();
+        var s = b2.Truss!.Suspenders[0];
+        s.SocketBeyondPin = In(7.25); s.SocketJawWidth = In(4); s.SocketJawLength = In(20); s.RopesAlongBridge = true;
+        var steel = Regen(p2).Steel!;
+        var rope = steel.Parts.First(x => x.Category == PartCategory.Suspender);
+        Assert.Equal(Depth - 2 * (In(40) - In(7.25)), rope.Length, 6);
+        var sock = steel.Parts.First(x => x.Category == PartCategory.SuspenderSocket);
+        double r = In(13.75) / 2, h = In(2);
+        double full = 0.5 * 24 * r * r * Math.Sin(2 * Math.PI / 24) * (In(40) - In(7.25) - In(20));
+        double lugs = (Math.PI * r * r - 2 * (h * Math.Sqrt(r * r - h * h) + r * r * Math.Asin(h / r))) * (In(20) + In(7.25));
+        Assert.Equal(full + lugs, sock.Volume, (full + lugs) * 0.01);
+        // the .sbm stays unchanged for suspenders without the new inputs
+        Assert.DoesNotContain("SocketJawWidth", System.Text.Json.JsonSerializer.Serialize(new SuspenderDefinition()));
+    }
+
+    [Fact]
     public void Joints_FloorSuspendersShoes()
     {
         var (p, _) = Model();

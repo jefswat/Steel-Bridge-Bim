@@ -209,18 +209,23 @@ foreach (var name in new[] { "PTC Girder spans 1-10", "PTC Girder spans 28-31" }
         };
         int k = 0;
         string flag = U("p.43, p.48, p.58, p.94", "stringer diaphragms 15 [ 33.9", "the notes place them at the centre of each floor panel (and at the abutments / piers, 18 WF 64 at the girder-span piers) without their height or connection angles",
-            "one continuous 15 [ 33.9 across the outermost stringer lines at mid-panel, top 3 in. below the stringer tops, web vertical; connection angles, the end / pier diaphragms and the 18 WF 64 not built.");
+            "one 15 [ 33.9 between each pair of adjacent stringer webs (web face to web face) at mid-panel, top 3 in. below the stringer tops, web vertical; connection angles, the end / pier diaphragms and the 18 WF 64 not built.");
+        // QC I021: the channels frame BETWEEN the stringers (p.94 elevation: 15[ 33.9 typical diaph. with L 4 x 3 1/2 x 5/16 connection angles on the stringer webs);
+        // one continuous channel crossed every stringer web. Bays between adjacent stringer lines, ends at the web faces.
+        var lines = t.Floor.Stringers.OrderBy(s => s.Offset).Select(s => (s.Offset, tw: t.Section(s.Section) is { } sd ? SBM.Core.Truss.TrussSections.Build(sd).WebThickness : 0.0)).ToList();
         for (int i = 0; i + 1 < stas.Count; i++)
         {
             double gap = stas[i + 1] - stas[i];
             if (gap < Ft(16) || gap > Ft(40)) continue;     // floor panels only (not the dam gaps or span gaps)
             double sm = (stas[i] + stas[i + 1]) / 2;
             k++;
-            t.LineItems.Add(new TrussLineItemDefinition
-            {
-                Name = $"diaphragm 15[33.9 #{k}", Kind = TrussLineItemKind.Steel, Category = PartCategory.Channel, Transverse = true, Station = sm, From = o0, To = o1,
-                Profile = prof, NominalWeightLbPerFt = 33.9, Material = "C", Assembly = "FLOOR", AssemblyDescription = $"{t.Name} - floor system", Source = "p.43 / p.48 / p.58 / p.94", Unresolved = flag,
-            });
+            for (int j = 0; j + 1 < lines.Count; j++)
+                t.LineItems.Add(new TrussLineItemDefinition
+                {
+                    Name = $"diaphragm 15[33.9 #{k}{(char)('a' + j)}", Kind = TrussLineItemKind.Steel, Category = PartCategory.Channel, Transverse = true, Station = sm,
+                    From = lines[j].Offset + lines[j].tw / 2, To = lines[j + 1].Offset - lines[j + 1].tw / 2,
+                    Profile = prof, NominalWeightLbPerFt = 33.9, Material = "C", Assembly = "FLOOR", AssemblyDescription = $"{t.Name} - floor system", Source = "p.43 / p.48 / p.58 / p.94", Unresolved = flag,
+                });
         }
         report.Add($"{br.Name}: {k} mid-panel stringer diaphragms 15[33.9");
         // the floor flag of the truss / girder scripts says "diaphragms not built": now only partly true
