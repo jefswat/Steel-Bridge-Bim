@@ -7,7 +7,7 @@ using SBM.Core.Alignments;
 
 namespace SBM.Core.Substructure;
 
-public enum SubElementKind { Cap, Pedestal, Backwall, Column, DrilledShaft, Footing, Pile, DeckDrain, DrainPipe, SplashBasin, Coupler, Wingwall, Counterfort, Maskwall, WingFooting, PileCasing, MowStrip, TrafficBarrier, PavementStrip }
+public enum SubElementKind { Cap, Pedestal, Backwall, Column, DrilledShaft, Footing, Pile, DeckDrain, DrainPipe, SplashBasin, Coupler, Wingwall, Counterfort, Maskwall, WingFooting, PileCasing, MowStrip, TrafficBarrier, PavementStrip, Fender }
 
 /// <summary>A solid of the substructure with its quantity data.</summary>
 public sealed record SubSolid(SubElementKind Kind, string Name, string Description, Mesh Mesh, bool IsConcrete = true)
@@ -17,6 +17,10 @@ public sealed record SubSolid(SubElementKind Kind, string Name, string Descripti
     /// <summary>CIP pipe pile: steel shell wall thickness of the concrete-filled pipe (0 = not a pipe pile; NaN = pipe pile, shell not given).
     /// The mesh is the outside diameter; IFC writes one IfcPile COMPOSITE with the shell as a property.</summary>
     public double ShellThickness { get; init; }
+    /// <summary>OPTIONAL material of a non-concrete solid (timber fender, steel pile from a plan-drawn substructure; null = the kind's default) and its
+    /// density (kg/m3, 0 = the kind's default).</summary>
+    public string? Material { get; init; }
+    public double Density { get; init; }
 }
 
 /// <summary>One plan-listed bar outside the clear-cover envelope: Excess = how far (m) the bar surface reaches into the cover zone at its worst point,

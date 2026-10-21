@@ -14,11 +14,13 @@ public sealed partial class SubstructureGenerator
         var plan = sd.Plan!;
         unit.NoCap = true;
         double sMin = double.MaxValue, sMax = double.MinValue, nMin = double.MaxValue, nMax = double.MinValue, zTop = double.MinValue, zBot = double.MaxValue;
-        void Bounds(double s, double n, double z) { sMin = Math.Min(sMin, s); sMax = Math.Max(sMax, s); nMin = Math.Min(nMin, n); nMax = Math.Max(nMax, n); zTop = Math.Max(zTop, z); zBot = Math.Min(zBot, z); }
+        bool skipBounds = false;     // fender solids (outside the pier) do not set the unit extents
+        void Bounds(double s, double n, double z) { if (skipBounds) return; sMin = Math.Min(sMin, s); sMax = Math.Max(sMax, s); nMin = Math.Min(nMin, n); nMax = Math.Max(nMax, n); zTop = Math.Max(zTop, z); zBot = Math.Min(zBot, z); }
         foreach (var so in plan.Solids)
         {
             var m = new Mesh();
             string what;
+            skipBounds = so.Kind == SubElementKind.Fender;
             if (so.Sections.Count >= 2)
             {
                 var sec0 = so.Sections[0].Polygon.Select(p => new Vec2(p.S, p.N)).ToArray();
@@ -45,7 +47,9 @@ public sealed partial class SubstructureGenerator
                 }
             }
             else { Warn($"{name}: {so.Name}: needs two sections or a profile of three points; solid not built."); continue; }
-            var solid = new SubSolid(so.Kind, $"{name} {so.Name}", $"{so.Name} ({so.Source}; {what})", m);
+            var solid = new SubSolid(so.Kind, $"{name} {so.Name}", $"{so.Name} ({so.Source}; {what})", m, IsConcrete: string.IsNullOrEmpty(so.Material))
+                { Material = string.IsNullOrEmpty(so.Material) ? null : so.Material, Density = so.Density };
+            skipBounds = false;
             if (so.Flag != "")
             {
                 solid = solid with { Assumption = so.ElementUncertain ? Assumption.Unresolved(so.Flag, "modeled as drawn") : Assumption.UnresolvedDimension(so.Flag, "modeled as noted") };

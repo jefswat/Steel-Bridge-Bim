@@ -62,7 +62,7 @@ public static class ModelLayers
         ["3D-BEARING-SOLE-PLATES"] = (140, 145, 155), ["3D-DIAPHRAGMS"] = (188, 186, 176), ["3D-DIAPHRAGM-FILLERS"] = (235, 232, 200),
         ["3D-UNRESOLVED-DIAPHRAGMS"] = (255, 110, 40), ["3D-SUB-CAP"] = (196, 190, 176), ["3D-SUB-PEDESTAL"] = (214, 196, 160), ["3D-SUB-COLUMN"] = (186, 182, 170),
         ["3D-SUB-FOUNDATION"] = (160, 150, 135), ["3D-SUB-PILE"] = (120, 130, 150), ["3D-SUB-COUPLER"] = (214, 140, 60), ["3D-SUB-MOW-STRIP"] = (170, 165, 150),
-        ["3D-SUB-TRAFFIC-BARRIER"] = (200, 196, 186), ["3D-UNRESOLVED-SUB"] = (255, 110, 40), ["3D-DRAINAGE"] = (90, 170, 200), ["3D-SPLASH-BASIN"] = (140, 120, 90),
+        ["3D-SUB-TRAFFIC-BARRIER"] = (200, 196, 186), ["3D-UNRESOLVED-SUB"] = (255, 110, 40), ["3D-DRAINAGE"] = (90, 170, 200), ["3D-SPLASH-BASIN"] = (140, 120, 90), ["3D-SUB-FENDER"] = (150, 115, 75),
         ["3D-MISC"] = (150, 160, 190), ["3D-UNRESOLVED"] = (255, 110, 40), ["3D-PLACEHOLDER"] = (200, 80, 200), ["3D-PT-TENDONS"] = (70, 110, 190),
         ["3D-PS-STRANDS"] = (70, 110, 190), ["3D-REBAR-DECK"] = (150, 80, 50), ["3D-REBAR-RAIL"] = (150, 80, 50), ["3D-REBAR-CAP-HAUNCH"] = (150, 80, 50),
         ["3D-REBAR-SUB"] = (150, 80, 50), ["3D-REBAR-BEAM"] = (150, 80, 50),
@@ -89,6 +89,7 @@ public static class ModelLayers
         SubElementKind.TrafficBarrier or SubElementKind.PavementStrip => s.Assumption == null ? "3D-SUB-TRAFFIC-BARRIER" : "3D-UNRESOLVED-SUB",
         SubElementKind.DeckDrain or SubElementKind.DrainPipe => "3D-DRAINAGE",
         SubElementKind.SplashBasin => "3D-SPLASH-BASIN",
+        SubElementKind.Fender => "3D-SUB-FENDER",
         _ => "3D-SUB-OTHER",
     };
 

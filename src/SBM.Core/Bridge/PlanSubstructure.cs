@@ -35,10 +35,18 @@ public sealed class PlanSolidDefinition
     /// <summary>True = the plans do not show the element at all as built (flag puts it on the UNRESOLVED layer); default false = dimension only.</summary>
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
     public bool ElementUncertain { get; set; }
+    /// <summary>OPTIONAL ("" = concrete, omitted from the .sbm): material of a non-concrete solid (e.g. treated timber of a pier fender, steel H pile);
+    /// with <see cref="Density"/> (kg/m3; 0 = steel 7850). Such solids do not count as concrete and do not set the unit's plan extents when their kind is
+    /// <c>SubElementKind.Fender</c>.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    public string? Material { get; set; }
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    public double Density { get; set; }
     public PlanSolidDefinition Clone() => new()
     {
         Name = Name, Kind = Kind, Source = Source, Sections = Sections.Select(s => s.Clone()).ToList(),
         Profile = Profile.Select(p => new CapProfilePoint(p.S, p.Elevation)).ToList(), N0 = N0, N1 = N1, ProfileOverN = ProfileOverN, Flag = Flag, ElementUncertain = ElementUncertain,
+        Material = Material, Density = Density,
     };
 }
 

@@ -476,6 +476,7 @@ public static class SceneBuilder
             () => Layer("3D-UNRESOLVED-SUB", 255, 110, 40, x => x.Kind is SBM.Core.Substructure.SubElementKind.MowStrip or SBM.Core.Substructure.SubElementKind.TrafficBarrier or SBM.Core.Substructure.SubElementKind.PavementStrip && x.Assumption != null, 0.8f),
             () => Layer("3D-DRAINAGE", 90, 170, 200, x => x.Kind is SBM.Core.Substructure.SubElementKind.DeckDrain or SBM.Core.Substructure.SubElementKind.DrainPipe),
             () => Layer("3D-SPLASH-BASIN", 140, 120, 90, x => x.Kind == SBM.Core.Substructure.SubElementKind.SplashBasin),
+            () => Layer("3D-SUB-FENDER", 150, 115, 75, x => x.Kind == SBM.Core.Substructure.SubElementKind.Fender),
             // Optional misc items: Ramp G drainage, sign supports, end posts, lighting (items by others as translucent placeholders).
             () => MiscLayer(models, o, "3D-DRAIN-PIPES", 90, 170, 200, e => e.Assumption == null && e.Group == SBM.Core.Misc.MiscGroup.Drainage && e.Kind is SBM.Core.Misc.MiscKind.DrainTube or SBM.Core.Misc.MiscKind.DrainPipe or SBM.Core.Misc.MiscKind.PipeFitting or SBM.Core.Misc.MiscKind.PipeHanger or SBM.Core.Misc.MiscKind.PipeSupport),
             () => MiscLayer(models, o, "3D-DRAIN-INLETS", 60, 140, 190, e => e.Assumption == null && e.Kind is SBM.Core.Misc.MiscKind.DrainTrench or SBM.Core.Misc.MiscKind.DrainGrate or SBM.Core.Misc.MiscKind.DrainBox or SBM.Core.Misc.MiscKind.DrainTrough),
