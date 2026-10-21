@@ -30,6 +30,7 @@ for (var dir = new DirectoryInfo(Directory.GetCurrentDirectory()); dir != null; 
 if (dataDir == null) throw new InvalidOperationException("Run from the repo (docs/plan-data/ptc-delaware-river/girders not found).");
 double ft = 0.3048;
 double FtIn(double f, double i) => f + i / 12.0;
+bool Walk(PartCategory c) => c is PartCategory.Grating or PartCategory.WalkwayStringer or PartCategory.WalkwayPost or PartCategory.WalkwayRail or PartCategory.WalkwayPlate;   // walkways = p.42 items 14 / 15
 var seats = File.ReadAllLines(Path.Combine(dataDir, "girders", "seats.csv")).Skip(1).Where(l => l.Trim() != "").Select(l => l.Split(','))
     .ToDictionary(f => f[0], f => (sta: Sta(f[1]), gutter: double.Parse(f[2], inv), shoe: double.Parse(f[3], inv)));
 
@@ -157,11 +158,11 @@ foreach (var (bname, first, nSpans, planC, planS, planCY) in specs)
 
     // 5. weights
     Print("--- 5. steel weight and concrete");
-    double lbS = tm.Steel.Parts.Where(p => (p.Material ?? "").Contains("(S)") && !SteelModel.IsTrussNonStructural(p.Category)).Sum(p => p.Mass) * 2.20462262;
-    double lbC = tm.Steel.Parts.Where(p => (p.Material ?? "").Contains("(C)") && !SteelModel.IsTrussNonStructural(p.Category)).Sum(p => p.Mass) * 2.20462262;
+    double lbS = tm.Steel.Parts.Where(p => (p.Material ?? "").Contains("(S)") && !SteelModel.IsTrussNonStructural(p.Category) && !Walk(p.Category)).Sum(p => p.Mass) * 2.20462262;
+    double lbC = tm.Steel.Parts.Where(p => (p.Material ?? "").Contains("(C)") && !SteelModel.IsTrussNonStructural(p.Category) && !Walk(p.Category)).Sum(p => p.Mass) * 2.20462262;
     double lbOther = tm.Steel.SteelMass * 2.20462262 - lbS - lbC;
-    Row("DIFF", "silicon steel (item 4: girders, floor beams, brackets, end stiffeners, plates)", $"{planS:N0} lb", $"{lbS:N0} lb ({lbS / planS:P0})", "not built: fills, cover plate / flange angle splices, longitudinal stiffener, connection angles, rivet heads (stiffeners + web splice: connections-ptc.csx)");
-    Row("DIFF", "carbon steel (item 1: stringers, laterals, diaphragms, dams, bracing, castings listed apart)", $"{planC:N0} lb", $"{lbC:N0} lb ({lbC / planC:P0})", "not built: pier diaphragms 18 WF 64, stringer splices / bearings, dam steel beyond the plate band, connection angles; mid-panel 15[ 33.9, dam bands and shoe bodies (C) are in");
+    Row("DIFF", "silicon steel (item 4: girders, floor beams, brackets, end stiffeners, plates)", $"{planS:N0} lb", $"{lbS:N0} lb ({lbS / planS:P0})", "not built: flange angle splice plates at the web splices, nose details; stiffener fills / crimps, web splices, tension plates (connections-ptc.csx, girder-details-ptc.csx) are in");
+    Row("DIFF", "carbon steel (item 1: stringers, laterals, diaphragms, dams, bracing, castings listed apart)", $"{planC:N0} lb", $"{lbC:N0} lb ({lbC / planC:P0})", "not built: Pc. 18 WF 64 dam supports, 12 [ 35 curb channels, abutment diaphragms; longitudinal stiffeners, stringer splices, 18 WF 64 pier dam diaphragms (girder-details-ptc.csx), mid-panel 15[ 33.9, dam bands and shoe bodies (C) are in");
     Row("INFO", "other steel in the model (shoes / masonry plates as steel parts)", "-", $"{lbOther:N0} lb");
     Row("INFO", "total", $"{planC + planS:N0} lb", $"{tm.Steel.SteelMass * 2.20462262:N0} lb ({tm.Steel.SteelMass * 2.20462262 / (planC + planS):P1})");
     double cy = tm.SlabArea * (d.Thickness / ft) / 27.0 * 1.0;   // ft2 x ft / 27
