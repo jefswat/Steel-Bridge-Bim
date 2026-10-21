@@ -881,6 +881,33 @@ public class TrussTests : IDisposable
     }
 
     [Fact]
+    public void StringerSeats_FillTheGapOverTheFloorBeams()
+    {
+        // stringers on top of the floor beams, their bottoms 2 in. above the W36x150 tops (level grade): one seat per line and floor beam crossing, 2 in. thick
+        var (p, b) = Model();
+        var fl = b.Truss!.Floor!;
+        var w36 = SteelCatalog.FindWideFlange("W36x150")!; var w21 = SteelCatalog.FindWideFlange("W21x62")!;
+        var (p0, b0) = Model();
+        double fbTop = Regen(p0).Steel!.Parts.First(x => x.Mark == "FB2").Mesh.Bounds().Max.Z;
+        fl.StringersOnTop = true;
+        fl.StringerTopBelowGrade = Ft(100) - (fbTop + In(2) + w21.Depth);
+        fl.Deck = null;
+        fl.Seats = new TrussStringerSeatDefinition { Length = In(12), Width = In(8), Unresolved = "UNRESOLVED (p.0): seat length - scaled." };
+        fl.Stringers[1].SeatWidth = In(6);
+        var st = Regen(p).Steel!;
+        var seats = st.Parts.Where(x => x.Mark.StartsWith("SEAT-")).ToList();
+        Assert.Equal(3 * 7, seats.Count);                                             // 3 lines x 7 floor beams
+        Assert.All(seats, s => { Assert.Equal(PartCategory.BearingPlate, s.Category); Assert.True(s.Mesh.HasExactSolids); Assert.NotNull(s.Assumption); });
+        // gap = stringer bottom (the grade crowns: lower at the outer lines) - floor beam top
+        double Gap(string line) => st.Parts.First(x => x.Mark == $"ST-{line}-1").Mesh.Bounds().Min.Z - fbTop;
+        Assert.Equal(In(2), Gap("B"), 6);
+        Assert.Equal(In(12) * In(8) * Gap("A"), seats.First(s => s.Mark == "SEAT-A-1").Volume, In(12) * In(8) * In(1.0 / 64));
+        Assert.Equal(In(12) * In(6) * In(2), seats.First(s => s.Mark == "SEAT-B-1").Volume, In(12) * In(6) * In(1.0 / 64));
+        Assert.Contains(st.Diagnostics, d => d.Message.StartsWith("Truss: stringer seats - 21 plates"));
+        Assert.DoesNotContain("Seat", System.Text.Json.JsonSerializer.Serialize(new TrussFloorDefinition { Stringers = { new TrussStringerLine() } }));
+    }
+
+    [Fact]
     public void FileRoundTrip_AndExistingModelsUnchanged()
     {
         var (p, b) = Model();

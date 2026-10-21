@@ -816,6 +816,11 @@ public sealed class TrussFloorDefinition
     /// <summary>Clear distance between a stringer end and the floor beam web face (framed stringers).</summary>
     public double StringerEndClearance { get; set; }
     public TrussDeckDefinition? Deck { get; set; }
+    /// <summary>OPTIONAL (null = none, omitted from the .sbm): stringer SEATS where stringers lie on the floor beams (<see cref="StringersOnTop"/>): one plate per
+    /// stringer line and floor beam crossing, filling the gap between the floor beam top (probed: the highest steel under the plate) and the stringer
+    /// bottom, top bevelled to the stringer grade (<see cref="TrussStringerSeatDefinition"/>).</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public TrussStringerSeatDefinition? Seats { get; set; }
     public string Unresolved { get; set; } = "";
     public string Source { get; set; } = "";
 }
@@ -831,9 +836,27 @@ public sealed class TrussStringerLine
     /// <summary>OPTIONAL station limits (null = every floor beam bay).</summary>
     public double? FromStation { get; set; }
     public double? ToStation { get; set; }
+    /// <summary>OPTIONAL seat plate width across this stringer line (m; null = <see cref="TrussStringerSeatDefinition.Width"/>).</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public double? SeatWidth { get; set; }
 }
 
 /// <summary>Deck slab between two alignment offsets and stations; top = finished grade.</summary>
+/// <summary>Stringer seat plates (generic): <see cref="Length"/> along the stringer centred on the floor beam crossing, <see cref="Width"/> across (or the line's
+/// <see cref="TrussStringerLine.SeatWidth"/>); bottom on the highest steel found under the plate (vertical probes at its corners and centre), top on the
+/// stringer bottom flange (bevelled to the stringer grade on each side of the crossing). A gap under <see cref="MinGap"/> builds nothing (the stringer
+/// bears directly); a stringer below the floor beam top is reported. Part category BearingPlate (exact extrusion).</summary>
+public sealed class TrussStringerSeatDefinition
+{
+    public double Length { get; set; }
+    public double Width { get; set; }
+    public double MinGap { get; set; } = 0.0016;
+    public string Label { get; set; } = "";
+    public string Material { get; set; } = "";
+    public string Unresolved { get; set; } = "";
+    public string Source { get; set; } = "";
+}
+
 public sealed class TrussDeckDefinition
 {
     public double Thickness { get; set; }

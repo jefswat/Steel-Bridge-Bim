@@ -197,6 +197,38 @@ foreach (var bn in approach)
 }
 report.Add($"approach end connections with fills below the gussets: {nOutFill}");
 
+// ================================================================ 5. stringer seats on the floor beams (p.55 / p.45 / p.94 bearing details)
+// p.55 BEARING DETAIL (intermediate fixed points, pavement breaks) + ENLARGED DETAILS OF BEARING PLATE AND SOLE PLATE: the stringers bear on the floor
+// beams through a sole plate "bevel to grade" (thickness "Varies") on a bearing plate (expansion points: 3 1/2 x 1 grooved plate), 8 1/2 in. wide under the
+// 24 WF stringers, 8 in. under the 21 WF; the girder spans (p.45 "Bearing seat ...") and the main span (p.94 "for deck details see sheet 55") use the same
+// details. The stringer work lines (top 7 3/4 in. below the grade) left 1.7 - 5.9 in. between the stringer bottoms and the floor beam tops: one seat plate
+// per stringer and floor beam fills it (bearing + sole plate as one piece, thickness = the gap).
+string seatFlag = U("p.55, p.45, p.94", "stringer seats (bearing plate + bevelled sole plate) on the floor beams",
+    "the details give the plate widths (8 1/2 / 8 in.) and 'Varies' for the sole plate thickness, not the plate length along the stringer nor the split between bearing and sole plate",
+    "one plate 14 in. along the stringer (the floor beam top flange width), the printed width across, thickness = the gap between the floor beam top and the stringer bottom (bevelled to grade); grooved plates, anchors and tension plates not built.");
+int nSeatDefs = 0;
+foreach (var b in Doc.Project.Bridges.Where(b => b.Truss?.Floor is { StringersOnTop: true }))
+{
+    var fl = b.Truss!.Floor!;
+    fl.Seats = new TrussStringerSeatDefinition { Length = In(14), Width = In(8.5), Label = "bearing + sole PL", Material = "C", Unresolved = seatFlag, Source = "p.55" };
+    foreach (var line in fl.Stringers) line.SeatWidth = line.Section.StartsWith("W21") ? In(8) : In(8.5);
+    nSeatDefs++;
+}
+report.Add($"stringer seats on {nSeatDefs} bridges");
+
+// ================================================================ 6. main post U11-L11 access holes (p.81 note)
+// p.81 note "MANHOLES: for all web members 12 x 20 @ 4'-0 c.c." covers the post U11-L11 too; its covers are "(23-12)" = 12 in. holes (p.69 / p.70).
+string postPerfFlag = U("p.81, p.69", "post U11-L11 cover plate access holes",
+    "the p.81 note gives 12 x 20 @ 4'-0 c.c. for all web members; the post elevation (p.69) is drawn with breaks, so the hole positions are not dimensioned",
+    "holes centred between the end gussets, 10 in. clear of them, the second cover shifted half a space.");
+if (T(Main)?.Section("POST U11-L11") is { } post)
+    foreach (var (pl, bottom) in post.TopPlates.Select(x => (x, false)).Concat(post.BottomPlates.Select(x => (x, true))))
+        if (pl.Perforated)
+        {
+            pl.Perforation = new TrussPerforation { Width = In(12), Length = In(20), Pitch = In(48), EndClear = In(10), Stagger = bottom, Label = "12 x 20 @ 4 ft", Unresolved = postPerfFlag };
+            report.Add($"post U11-L11: {pl.Label} perforated 12 x 20 @ 4'-0");
+        }
+
 // ================================================================ regenerate + save
 var rep = Doc.Regenerate();
 foreach (var b in Doc.Project.Bridges.Where(b => b.Truss != null && b.Truss.BracingGussets != null))
@@ -204,7 +236,7 @@ foreach (var b in Doc.Project.Bridges.Where(b => b.Truss != null && b.Truss.Brac
     var st = Doc.Model(b.Name).Steel; var tm = st?.Truss;
     if (st == null || tm == null) { Print($"{b.Name}: no model"); continue; }
     Print($"{b.Name}: bracing plates {st.Parts.Count(p => p.Mark.Contains("-BG") && p.Category == PartCategory.TrussConnectionPlate)}, edge angles {st.Parts.Count(p => p.Mark.EndsWith("-EA"))}, rivets {tm.Rivets:N0}, steel {st.SteelMass * 2.20462262:N0} lb");
-    foreach (var d in st.Diagnostics.Where(d => d.Message.Contains("bracing connection plates -") || d.Message.Contains("end connection / stiffener rivets -") || d.Message.Contains("fills under the outstanding legs where") || d.Message.Contains("CHECK end connections"))) Print("   " + d.Message);
+    foreach (var d in st.Diagnostics.Where(d => d.Message.Contains("bracing connection plates -") || d.Message.Contains("end connection / stiffener rivets -") || d.Message.Contains("fills under the outstanding legs where") || d.Message.Contains("CHECK end connections") || d.Message.Contains("stringer seats"))) Print("   " + d.Message);
     foreach (var d in st.Diagnostics.Where(d => d.Severity != DiagnosticSeverity.Info && (d.Message.Contains("bracing plate") || d.Message.Contains("setbacks"))).Take(10)) Print("   " + d.Severity + ": " + d.Message[..Math.Min(300, d.Message.Length)]);
     foreach (var e in rep.Errors.Where(e => e.StartsWith(b.Name))) Print("  ERROR " + e);
 }
