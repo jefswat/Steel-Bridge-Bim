@@ -306,6 +306,16 @@ public static class TrussGenerator
                             if (k < 0.2) continue;
                             t = Math.Max(t, c.Sec.HalfWidthAtJoints / k + clr);
                         }
+                        // lateral meeting a portal strut at the same point: the lateral (in plan) stops clear of the portal's side face
+                        if (m.Def.Role is TrussMemberRole.UpperLateral or TrussMemberRole.LowerLateral)
+                            foreach (var c in At(pl, pt).Where(o => o != m && o.Def.Role == TrussMemberRole.Portal))
+                            {
+                                // every corner of the lateral's end section must lie beyond the portal's side face (portal x = its width direction)
+                                double k = Math.Abs(Vec3.Dot(d1, c.X));
+                                if (k < 0.1) continue;
+                                double reach = Math.Abs(Vec3.Dot(m.X, c.X)) * m.Sec.HalfWidth + Math.Abs(Vec3.Dot(m.Y, c.X)) * Math.Max(m.Sec.YMax, -m.Sec.YMin);
+                                t = Math.Max(t, (c.Sec.HalfWidth + reach) / k + clr);
+                            }
                     }
                     if (start) m.SA = t; else m.SB = t;
                 }
@@ -1271,30 +1281,54 @@ public static class TrussGenerator
             Assumption? asu = s.Unresolved.Length > 0 ? Assumption.UnresolvedDimension(s.Unresolved, "rope between the pin centres, sockets as cylinders") : null;
             Vec2[] Circle(double d, int k = 24) => Enumerable.Range(0, k).Select(i => Vec2.FromAngle(2 * Math.PI * i / k) * (d / 2)).ToArray();
             double sl = Math.Min(s.SocketLength, 0.45 * len);
+            double e = Math.Clamp(s.SocketBeyondPin, 0, 0.9 * sl);                 // socket end beyond the pin centre (eye)
+            double jaw = s.SocketJawWidth > 0 && s.SocketJawWidth < s.SocketDiameter ? Math.Min(s.SocketJawLength, sl - e) : 0;   // jaw length from the pin centre
+            // lug outline: the socket circle on one side of the jaw gap (x = along the pin axis)
+            Vec2[] Lug(int side)
+            {
+                var c = Circle(s.SocketDiameter, 48);
+                double h = s.SocketJawWidth / 2;
+                var o = new List<Vec2>();
+                for (int i = 0; i < c.Length; i++)
+                {
+                    Vec2 p = c[i], q = c[(i + 1) % c.Length];
+                    double fp = side * p.X - h, fq = side * q.X - h;
+                    if (fp >= 0) o.Add(p);
+                    if (fp >= 0 != fq >= 0) o.Add(p + (q - p) * (fp / (fp - fq)));
+                }
+                return o.ToArray();
+            }
             for (int r = 0; r < Math.Max(1, s.Ropes); r++)
             {
                 double off = (r - (s.Ropes - 1) / 2.0) * s.RopeSpacing;
                 var b0 = bot + across * off;
-                void Cyl(Mesh m, double d, Vec3 p0, double l)
+                void Prism(Mesh m, Vec2[] c, Vec3 p0, double l)
                 {
-                    var c = Circle(d);
                     var ra = c.Select(q => p0 + across * q.X + yv * q.Y).ToArray();
                     MeshBuilder.AddLoft(m, c, new[] { ra, ra.Select(p => p + ax * l).ToArray() });
                 }
+                void Cyl(Mesh m, double d, Vec3 p0, double l) => Prism(m, Circle(d), p0, l);
                 var rope = new Mesh();
-                Cyl(rope, s.RopeDiameter, b0 + ax * sl, len - 2 * sl);
+                Cyl(rope, s.RopeDiameter, b0 + ax * (sl - e), len - 2 * (sl - e));
                 Model.Steel.Parts.Add(new SteelPart
                 {
                     Mark = $"{asm}-R{r + 1}", Category = PartCategory.Suspender, Assembly = asm, Description = $"{TrussSections.FormatIn(s.RopeDiameter)} {(s.Rope.Length > 0 ? s.Rope : "wire rope")} {nl}-{nu}",
-                    Mesh = rope, Material = s.Rope.Length > 0 ? s.Rope : "Galvanized bridge rope", Length = len - 2 * sl, Assumption = asu,
+                    Mesh = rope, Material = s.Rope.Length > 0 ? s.Rope : "Galvanized bridge rope", Length = len - 2 * (sl - e), Assumption = asu,
                     NominalWeightLbPerFt = s.RopeWeightLbPerFt,
                 });
                 if (s.SocketLength > 0 && s.SocketDiameter > 0)
-                    foreach (var (p0, tag) in new[] { (b0, "LS"), (b0 + ax * (len - sl), "US") })
+                    foreach (var (pin, dir, tag) in new[] { (b0, 1, "LS"), (b0 + ax * len, -1, "US") })
                     {
+                        // along the rope axis from the pin centre (dir = toward the rope): socket from -e to sl - e, lugs from -e to jaw, basket beyond
                         var sock = new Mesh();
-                        Cyl(sock, s.SocketDiameter, p0, sl);
-                        Model.Steel.Parts.Add(new SteelPart { Mark = $"{asm}-R{r + 1}-{tag}", Category = PartCategory.SuspenderSocket, Assembly = asm, Description = $"open socket {TrussSections.FormatIn(s.SocketDiameter)} x {TrussSections.FormatIn(sl)}", Mesh = sock, Material = "Cast steel socket", Length = sl, Assumption = asu });
+                        Vec3 Seg(double u0, double u1) => pin + ax * (dir > 0 ? dir * u0 : dir * u1);
+                        if (jaw > 0)
+                        {
+                            foreach (int sd in new[] { 1, -1 }) Prism(sock, Lug(sd), Seg(-e, jaw), jaw + e);
+                            Cyl(sock, s.SocketDiameter, Seg(jaw, sl - e), sl - e - jaw);
+                        }
+                        else Cyl(sock, s.SocketDiameter, Seg(-e, sl - e), sl);
+                        Model.Steel.Parts.Add(new SteelPart { Mark = $"{asm}-R{r + 1}-{tag}", Category = PartCategory.SuspenderSocket, Assembly = asm, Description = $"open socket {TrussSections.FormatIn(s.SocketDiameter)} x {TrussSections.FormatIn(sl)}{(jaw > 0 ? $", jaw {TrussSections.FormatIn(s.SocketJawWidth)}" : "")}", Mesh = sock, Material = "Cast steel socket", Length = sl, Assumption = asu });
                     }
             }
             if (s.PinDiameter > 0)
