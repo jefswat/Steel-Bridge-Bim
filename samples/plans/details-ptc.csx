@@ -330,6 +330,74 @@ foreach (var bn in approach)
 foreach (var gn in new[] { "PTC Girder spans 1-10", "PTC Girder spans 28-31", Main })
     if (T(gn) is { } tg) Flag(tg, "stringer / floor beam tension plates", tensionFlag);
 
+// ================================================================ 6. main box strut ends at L0 (p.73) and L11 (p.80), sway connection at L11 (p.80)
+// p.73 END VIEW / Sections F, G: the L0 strut (2-Cov. Pls 17 x 7/8, 4-Ls 5 x 5 x 7/8, 2-Web Pls (30-13 1/2) x 1/2) ends on "2-Ls 8 x 8 x 5/8 Fin. Strut" riveted to the
+// truss gussets with 1 1/8 H.S. rivets; a "17 x 7/8 Tension Pl." on each cover passes through a 17 1/2 x 1 1/8 slot in the gusset with 17 x 13/16 fills.
+// p.80 Section A: the L11 strut (2-Cov. Pls 22 x 9/16, 4-Ls 7 x 4 x 9/16, 2-Web Pls (40-16) x 9/16) ends on tees "Cut from 24 WF 94 (S)" with 11/16 fills
+// (N.S. / F.S.), 1 1/4 H.S. rivets into the post; the sway diagonal 2-18[ 42.7 lands on the strut on "2-1/2 Guss. Pls." with "2-Ls 3 1/2 x 3 x 3/8".
+string l0EndFlag = U("p.73", "L0 strut end angles 2-Ls 8 x 8 x 5/8 (1 1/8 H.S. rivets) and tension plates 17 x 7/8",
+    "the end view and Sections F / G draw the angles and rivet rows without the angle length or gages; the tension plates pass through slots in the gussets",
+    "angles on the outer faces of both webs, 28 in. long centred on the web, back on the probed gusset face, 2 x 7 rivets @ 4 in. per leg (1 1/8 H.S. into the gusset, 1 in. through the web); tension plates and the gusset slots not built.");
+string l11EndFlag = U("p.80", "L11 strut end tees 'Cut from 24 WF 94' with 11/16 fills (1 1/4 H.S. rivets)",
+    "Section A draws the tees and rivet bands at the strut end without their length or gages",
+    "each tee modeled as an angle 4 1/2 (half the 24 WF 94 flange, on the post / gusset) x 11 1/2 (stem on the web) x 7/8 on the outer face of both webs over an 11/16 fill, 38 in. long, 2 x 9 rivets @ 4 in. per leg (1 1/4 H.S. / 1 in.).");
+string l11SwayFlag = U("p.80", "sway gusset plates at L11 (2-1/2 Guss. Pls., 2-Ls 3 1/2 x 3 x 3/8)",
+    "the detail draws the plates on the bottom strut with rivets but no outline dimensions or gages",
+    "1/2 in. plates on both channel webs of the 2-18[ 42.7 = envelope of the member laps stopping 1/4 in. above the strut and clear of the truss joint, 12 rivets 7/8 per plate, edge angle on the strut on the plate's outer face, 8 rivets per leg.");
+if (T(Main) is { } tmB)
+{
+    var t = tmB;
+    Flag(t, "box strut L0 / L11 connection to the chord joint", U("p.71, p.73, p.80, p.97", "box strut L0 / L11: the lateral plates against the box struts",
+        "the box strut end connections are detailed on p.73 / p.80 (built), but how the 1/2 in. lateral plates meet the 30 / 40 in. struts is not drawn",
+        "the lateral plates lie on the laterals and stop 1/4 in. clear of the box strut."));
+    Flag(t, "L0 strut end angles 2-Ls 8 x 8 x 5/8", l0EndFlag);
+    Flag(t, "L11 strut end tees", l11EndFlag);
+    Flag(t, "sway gusset plates at L11", l11SwayFlag);
+    int nE = 0;
+    foreach (var m in t.Members.Where(m => m.Role == TrussMemberRole.Strut && (m.Section == "STRUT L0" || m.Section == "STRUT L11")))
+    {
+        bool l0 = m.Section == "STRUT L0";
+        var s = t.Section(m.Section)!;
+        double tw = s.WebPlies.Sum(p => p.Thickness), outer = s.WebsBackToBack / 2 + tw;
+        m.EndConnections = new()
+        {
+            l0 ? new TrussEndConnection { End = TrussMemberEnd.Both, Label = "2-Ls 8x8x5/8 Fin. Strut", Angle = "L8x8x5/8", StandOff = outer - tw / 2, Top = In(14), Length = In(28),
+                    WebRivets = new() { Col(2.5, 7, 4, 2), Col(5.5, 7, 4, 2) }, OutRivets = new() { Col(2.5, 7, 4, 2), Col(5.5, 7, 4, 2) },
+                    RivetDiameter = In(1), OutRivetDiameter = In(1.125), RivetMaterial = "1 1/8 in H.S. rivet (into the gusset), 1 in carbon (web)", Material = "S", Source = "p.73", Unresolved = l0EndFlag }
+               : new TrussEndConnection { End = TrussMemberEnd.Both, Label = "tees cut from 24 WF 94 + 11/16 fills", Angle = "L4-1/2x11-1/2x7/8", StandOff = outer - tw / 2,
+                    FillThickness = In(11.0 / 16), FillWidth = In(11.5), Top = In(19), Length = In(38),
+                    WebRivets = new() { Col(3.5, 9, 4, 3), Col(8.5, 9, 4, 3) }, OutRivets = new() { Col(2.25, 9, 4, 3) },
+                    RivetDiameter = In(1), OutRivetDiameter = In(1.25), RivetMaterial = "1 1/4 in H.S. rivet (into the post), 1 in carbon (web)", Material = "S", Source = "p.80", Unresolved = l11EndFlag },
+        };
+        nE++;
+    }
+    t.BracingGussets ??= new();
+    t.BracingGussets.RemoveAll(b => b.Label == "2-1/2 Guss. Pls. (sway L11)");
+    foreach (var pt in new[] { "N:L11", "S:L11", "N:L11'", "S:L11'" })
+    {
+        var sw = t.Members.Where(m => m.Role == TrussMemberRole.Sway && m.From == pt).Select(m => m.Name).ToList();
+        if (sw.Count == 0) continue;
+        t.BracingGussets.Add(new TrussBracingGussetDefinition
+        {
+            Point = pt, Members = sw, Label = "2-1/2 Guss. Pls. (sway L11)", Orientation = TrussBracingPlateOrientation.Transverse, Side = TrussBracingPlateSide.Both, Thickness = In(0.5),
+            EdgeAngle = "L3-1/2x3x3/8", EdgeAngleOnCrossing = true, EdgeAngleOutside = true, EdgeRivets = 8,
+            RivetsPerMember = 12, RivetPitch = In(3), RivetGage = In(6.5), RivetGage2 = In(3.5), RivetDiameter = In(0.875), RivetMaterial = "7/8 in carbon steel rivet",
+            Material = "C", Unresolved = l11SwayFlag, Source = "p.80",
+        });
+    }
+    // the main sway flag now excludes L11 too
+    t.Unresolved.RemoveAll(s => s.Contains("main span sway frame connections other than L7 / L8"));
+    t.Unresolved.Add(U("p.97, p.71", "main span sway frame connections other than L7 / L8 / L11 (2-15[ 33.9)",
+        "p.97 details the sway connection at L7 only ('L8 similar') and p.80 the one at L11; the other points are not drawn",
+        "not built; the sway members stop 1/2 in. clear of the strut, the laterals and the floor beam."));
+    report.Add($"{Main}: {nE} box strut end connections (L0 / L11), sway plates at L11");
+}
+
+// ---------------------------------------------------------------- wind chord vs the suspended floor beams (re-check, p.69 / p.94 / p.99)
+// p.99 Sections A / B put the wind chord CL on the floor beam's bottom flange level ("Beveled Fill" between the floor beam and the wind chord), the wind chord top
+// plate riveted to the floor beam bottom; p.69 gives the wind chord CL elevations and p.94 the floor beam depth below the gutter: they leave 0.3 in. less than the
+// 14 BP 73 half depth. Re-checked 2026-10-21: the overlap is the same with the floor lateral connections built (plan conflict between the two sheets; flag kept).
+
 TrussMemberDefinition Clone2(TrussMemberDefinition m) => System.Text.Json.JsonSerializer.Deserialize<TrussMemberDefinition>(System.Text.Json.JsonSerializer.Serialize(m))!;
 
 // ================================================================ regenerate + save

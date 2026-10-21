@@ -437,10 +437,15 @@ public static partial class TrussGenerator
                                 for (int k = 0; k < col.Count; k++)
                                 {
                                     double y = yTop - col.First - k * col.Pitch;
-                                    var q = P(back + col.Gage, 0, y);
-                                    if (pr.At(q, Xv, 0.5) is not { } iv) { nNoWeb++; if (missed.Count < 3) missed.Add($"{lbl} at {where}, column {L(col.Gage)} from the back, {L(yTop - y)} below the top"); continue; }
-                                    _pendingConn.Add((q + Xv * iv.t1, -Xv, din, iv.t1 - iv.t0, ec.RivetDiameter, asmR, ec.RivetMaterial, rasu));
-                                    nRiv++;
+                                    // stand-off connection with angles (e.g. the two webs of a box member): one rivet per side through the angle leg and its web;
+                                    // otherwise one rivet through angle - web - angle from the web centre
+                                    var starts = ec.StandOff > 0 && ang is { } aw ? new[] { P(back + col.Gage, -(heel + aw.t / 2), y), P(back + col.Gage, heel + aw.t / 2, y) } : new[] { P(back + col.Gage, 0, y) };
+                                    foreach (var q in starts)
+                                    {
+                                        if (pr.At(q, Xv, 0.5) is not { } iv) { nNoWeb++; if (missed.Count < 3) missed.Add($"{lbl} at {where}, column {L(col.Gage)} from the back, {L(yTop - y)} below the top"); continue; }
+                                        _pendingConn.Add((q + Xv * iv.t1, -Xv, din, iv.t1 - iv.t0, ec.RivetDiameter, asmR, ec.RivetMaterial, rasu));
+                                        nRiv++;
+                                    }
                                 }
                             if (ang is { } a2)
                                 foreach (var col in ec.OutRivets ?? new())
