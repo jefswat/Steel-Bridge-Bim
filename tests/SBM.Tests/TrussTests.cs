@@ -640,8 +640,21 @@ public class TrussTests : IDisposable
             new TrussStiffenerSet { Angle = "L5x3.5x7/16", Height = In(48), Distances = { Ft(10) }, FillThickness = In(0.5), FillWidth = In(3.5), LegToward = 1,
                 Rivets = new() { new TrussRivetColumn(In(2), 6, In(4), In(4)) }, RivetDiameter = In(0.875) },
         } });
+        // 4. framed diaphragm plate between stringers A and B with clip angles L4x3-1/2x5/16 (2 + 2 rivets per end)
+        double twS = SteelCatalog.FindWideFlange("W21x62")!.WebThickness;
+        t.LineItems = new() { new TrussLineItemDefinition { Name = "DIA", Kind = TrussLineItemKind.Steel, Category = PartCategory.Channel, Transverse = true, Station = Ft(100) + 2.5 * Panel,
+            From = -Ft(8) + twS / 2, To = -twS / 2, Profile = { new TrussUV(0, -In(10)), new TrussUV(In(0.5), -In(10)), new TrussUV(In(0.5), -In(22)), new TrussUV(0, -In(22)) },
+            ClipAngles = new TrussClipAngles { Angle = "L4x3-1/2x5/16", HeelU = 0, Toward = -1, Top = -In(11), Length = In(9), RivetDiameter = In(0.75),
+                ItemLegRivets = new TrussRivetColumn(In(2), 2, In(3), In(3)), WebLegRivets = new TrussRivetColumn(In(2.25), 2, In(3), In(3)) } } };
         var bm = Regen(p);
         var st = bm.Steel!; var tm = st.Truss!;
+        var clip = st.Parts.Single(x => x.Mark == "DIA-CA");
+        var ca = TrussSections.ParseAngle("L4x3-1/2x5/16")!.Value;
+        Assert.Equal(2 * (ca.a + ca.b - ca.t) * ca.t * In(9), clip.Volume, 9);
+        var cr = st.Bolts.Where(x => x.Kind == BoltKind.Rivet && Math.Abs(x.Diameter - In(0.75)) < 1e-9).ToList();
+        Assert.Equal(8, cr.Count);
+        Assert.Equal(4, cr.Count(r => Math.Abs(r.Grip - Math.Round((ca.t + In(0.5)) / In(1.0 / 16)) * In(1.0 / 16)) < 1e-9));
+        Assert.Equal(4, cr.Count(r => Math.Abs(r.Grip - Math.Round((ca.t + twS) / In(1.0 / 16)) * In(1.0 / 16)) < 1e-9));
         // perforated chord: volume = solid - holes x hole area x t (hole arcs 8 segments: inscribed polygon), every piece an exact extrusion
         var chord0 = bm0.Steel!.Parts.First(x => x.Mark == "N-L2-L3");
         var chord = st.Parts.First(x => x.Mark == "N-L2-L3");

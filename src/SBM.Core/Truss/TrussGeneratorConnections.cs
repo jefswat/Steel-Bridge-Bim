@@ -216,7 +216,7 @@ public static partial class TrussGenerator
                             if (ang == null) { Warn($"Truss: end connection '{ec.Label}' of {where} - angle '{ec.Angle}' not understood; not built."); continue; }
                         }
                         if (ec.Length <= 0) { Warn($"Truss: end connection '{ec.Label}' of {where} - length missing; not built."); continue; }
-                        double heel = tw / 2 + Math.Max(0, ec.FillThickness);
+                        double heel = tw / 2 + Math.Max(0, ec.FillThickness) + Math.Max(0, ec.StandOff);
                         double yTop = ec.Top, yBot = ec.Top - ec.Length;
                         // back of the outstanding legs / plate end
                         double back;
@@ -254,7 +254,7 @@ public static partial class TrussGenerator
                         }
                         foreach (int sx in new[] { -1, 1 })
                         {
-                            double xw = sx * tw / 2;
+                            double xw = sx * (tw / 2 + Math.Max(0, ec.StandOff));
                             if (ang is { } a)
                             {
                                 double xh = sx * heel;
@@ -269,7 +269,16 @@ public static partial class TrussGenerator
                                     Prism(meshF, new[] { new Vec2(back, xw), new Vec2(back + fw, xw), new Vec2(back + fw, xw + sx * ec.FillThickness), new Vec2(back, xw + sx * ec.FillThickness) }, fTop - fLen, fTop);
                                 }
                             }
-                            if (ec.PlateWidth > 0 && ec.PlateThickness > 0)
+                            if (ec.PlateOutline is { Count: >= 3 } po && ec.PlateThickness > 0)
+                            {
+                                // plate in the web plane (u from the back along the member, v = section y), swept across the web normal
+                                var pl2 = po.Select(q => new Vec2(back + q.U, q.V)).ToArray();
+                                if (MeshBuilder.SignedArea(pl2) < 0) Array.Reverse(pl2);
+                                var ra = pl2.Select(q => P(q.X, xw, q.Y)).ToArray();
+                                MeshBuilder.AddLoft(meshP, pl2, new[] { ra, ra.Select(p => p + Xv * (sx * ec.PlateThickness)).ToArray() });
+                                nPlates++;
+                            }
+                            else if (ec.PlateWidth > 0 && ec.PlateThickness > 0)
                             {
                                 Prism(meshP, new[] { new Vec2(back, xw), new Vec2(back + ec.PlateWidth, xw), new Vec2(back + ec.PlateWidth, xw + sx * ec.PlateThickness), new Vec2(back, xw + sx * ec.PlateThickness) }, yBot, yTop);
                                 nPlates++;
@@ -329,7 +338,7 @@ public static partial class TrussGenerator
                                             var q = P(back + a2.t / 2, sx * (heel + col.Gage), y);
                                             if (pr.At(q, din, 0.6) is not { } iv) { nNoWeb++; continue; }
                                             if (iv.t1 - iv.t0 < a2.t + In(1.0 / 16)) nLoose++;
-                                            AddRivet(q + din * iv.t1, -din, Xv, iv.t1 - iv.t0, ec.RivetDiameter, asmR, ec.RivetMaterial, rasu);
+                                            AddRivet(q + din * iv.t1, -din, Xv, iv.t1 - iv.t0, ec.OutRivetDiameter > 0 ? ec.OutRivetDiameter : ec.RivetDiameter, asmR, ec.RivetMaterial, rasu);
                                             nRiv++;
                                         }
                         }
@@ -351,7 +360,7 @@ public static partial class TrussGenerator
                     foreach (var col in set.Rivets!)
                         for (int k = 0; k < col.Count; k++)
                         {
-                            double y = yc + set.Height / 2 - col.First - k * col.Pitch;
+                            double y = (set.Top is { } st0 ? st0 + m.Def.OffsetZ : yc + set.Height / 2) - col.First - k * col.Pitch;
                             var q = m.A + m.Axis * (d + sgn * col.Gage) + m.Y * y;
                             if (pr.At(q, m.X, 0.5) is not { } iv) { nNoWeb++; continue; }
                             AddRivet(q + m.X * iv.t1, -m.X, m.Axis, iv.t1 - iv.t0, set.RivetDiameter, m.Assembly, null, rasu);
@@ -362,6 +371,93 @@ public static partial class TrussGenerator
             Info($"Truss: end connections - {nAngles} connection angles, {nPlates} end plates, {nWebExt} web extensions, {nRiv} rivets{(nNoWeb > 0 ? $" ({nNoWeb} rivet positions not in steel, skipped)" : "")}{Src}.");
             if (nLoose > 0) Warn($"Truss CHECK end connections: {nLoose} rivets through the outstanding legs find no steel behind the leg (gap to the post / girder face over 1 mm; fills not drawn?) - placed with the leg as grip{Src}.");
             if (backs.Count > 0) Model.ConnectionBacks.AddRange(backs);
+        }
+
+        private readonly Dictionary<TrussLineItemDefinition, List<TrussLineItemRivet>> _clipRivets = new(ReferenceEqualityComparer.Instance);
+        /// <summary>Clip angles of a transverse framed item (<see cref="TrussClipAngles"/>): one part per item, rivets added to the item's rivet list.</summary>
+        private void BuildClipAngles(TrussLineItemDefinition li)
+        {
+            var ca = li.ClipAngles!;
+            var ad = TrussSections.ParseAngle(ca.Angle);
+            if (ad == null && SteelCatalog.FindAngle(ca.Angle) is { } ac) ad = (ac.LegA, ac.LegB, ac.Thickness);
+            if (ad == null || ca.Length <= 0) { Warn($"Truss: clip angles of {li.Name} - angle '{ca.Angle}' / length not understood; not built."); return; }
+            var (legItem, legWeb, t) = ad.Value;
+            int tw = ca.Toward >= 0 ? 1 : -1;
+            var mesh = new Mesh();
+            var cr = _clipRivets[li] = new List<TrussLineItemRivet>();
+            foreach (var (w0, dir) in new[] { (li.From, 1), (li.To, -1) })
+            {
+                // (U, W) polygon: item leg U in [h, h + tw t] (on the item web), W from w0 into the item; web leg along U toward tw from the heel, W in [w0, w0 + dir t]
+                double h = ca.HeelU;
+                var poly = new List<Vec2>
+                {
+                    new(h, w0), new(h + tw * legWeb, w0), new(h + tw * legWeb, w0 + dir * t), new(h + tw * t, w0 + dir * t), new(h + tw * t, w0 + dir * legItem), new(h, w0 + dir * legItem),
+                };
+                var pl = poly.ToArray();
+                if (MeshBuilder.SignedArea(pl) < 0) Array.Reverse(pl);
+                double vb = ca.Top - ca.Length;
+                Vec3 W(Vec2 q, double v) => _al.PointAt(li.Station + q.X, q.Y).WithZ((li.FromGrade ? _al.ElevationAt(li.Station, q.Y) : 0) + v);
+                var ra = pl.Select(q => W(q, vb)).ToArray();
+                MeshBuilder.AddLoft(mesh, pl, new[] { ra, ra.Select(p => p + Up * ca.Length).ToArray() });
+                if (ca.ItemLegRivets is { Count: > 0 } ir)
+                    for (int k = 0; k < ir.Count; k++)
+                        cr.Add(new TrussLineItemRivet { U = h + tw * t / 2, W = w0 + dir * ir.Gage, V = ca.Top - ir.First - k * ir.Pitch, Axis = "U", Diameter = ca.RivetDiameter, Unresolved = ca.RivetUnresolved });
+                if (ca.WebLegRivets is { Count: > 0 } wr)
+                    for (int k = 0; k < wr.Count; k++)
+                        cr.Add(new TrussLineItemRivet { U = h + tw * wr.Gage, W = w0 + dir * t / 2, V = ca.Top - wr.First - k * wr.Pitch, Axis = "W", Diameter = ca.RivetDiameter, Unresolved = ca.RivetUnresolved });
+            }
+            string asm = Asm(li.Assembly.Length > 0 ? li.Assembly : "DECK-ITEMS", AssemblyKind.InspectionWalkway, li.AssemblyDescription.Length > 0 ? li.AssemblyDescription : $"{_d.Name} - {li.Assembly}");
+            Model.Steel.Parts.Add(new SteelPart
+            {
+                Mark = li.Name + "-CA", Category = PartCategory.TrussConnectionAngle, Assembly = asm, Mesh = mesh, Material = ca.Material.Length > 0 ? Material(ca.Material) : _d.DefaultMaterial,
+                Length = ca.Length, Description = $"clip angles {ca.Angle} x 2 x {L(ca.Length)} ({li.Name})",
+                Assumption = ca.Unresolved.Length > 0 ? Assumption.UnresolvedDimension(ca.Unresolved, "clip angles at both ends of the item") : null,
+            });
+            if (ca.Unresolved.Length > 0) Warn(ca.Unresolved);
+        }
+
+        /// <summary>Rivets of steel line items (<see cref="TrussLineItemDefinition.Rivets"/>), after every part is built.</summary>
+        private void PlaceLineItemRivets()
+        {
+            var parts = Model.Steel.Parts;
+            var boxes = parts.Select(p => p.Mesh is { IsEmpty: false } ? p.Mesh.Bounds() : default).ToList();
+            int n = 0, miss = 0;
+            foreach (var li in _d.LineItems!.Where(l => (l.Rivets is { Count: > 0 } || _clipRivets.ContainsKey(l)) && l.Kind == TrussLineItemKind.Steel))
+            {
+                string asm = li.Assembly.Length > 0 ? li.Assembly : "DECK-ITEMS";
+                foreach (var rv in (li.Rivets ?? new()).Concat(_clipRivets.TryGetValue(li, out var cl) ? cl : new()))
+                {
+                    Vec3 at, du, dw;
+                    if (li.Transverse)
+                    {
+                        var p0 = _al.PointAt(li.Station + rv.U, rv.W);
+                        double z = (li.FromGrade ? _al.ElevationAt(li.Station, rv.W) : 0) + rv.V;
+                        at = p0.WithZ(z);
+                        du = Tangent(li.Station); dw = Vec3.Cross(du, Up).Normalized();
+                    }
+                    else
+                    {
+                        int side = li.Side >= 0 ? 1 : -1;
+                        double off = li.ReferenceOffset + side * rv.W;
+                        at = _al.PointAt(rv.U, off).WithZ((li.FromGrade ? _al.ElevationAt(rv.U, li.ReferenceOffset) : 0) + rv.V);
+                        du = Tangent(rv.U); dw = Vec3.Cross(du, Up).Normalized() * side;
+                    }
+                    var ax = rv.Axis.ToUpperInvariant() switch { "U" => du, "V" => Up, _ => dw };
+                    var lo = new Vec3(at.X - 0.4, at.Y - 0.4, at.Z - 0.4); var hi = new Vec3(at.X + 0.4, at.Y + 0.4, at.Z + 0.4);
+                    var pr = new SteelLineProbe();
+                    for (int i = 0; i < parts.Count; i++)
+                    {
+                        var b = boxes[i];
+                        if (parts[i].Mesh is not { IsEmpty: false } || b.Max.X < lo.X || b.Min.X > hi.X || b.Max.Y < lo.Y || b.Min.Y > hi.Y || b.Max.Z < lo.Z || b.Min.Z > hi.Z) continue;
+                        pr.Add(parts[i].Mesh, i, lo, hi);
+                    }
+                    if (pr.At(at, ax, 0.35) is not { } iv) { miss++; continue; }
+                    var asu = RivetFlag(rv.Unresolved ?? (li.Unresolved.Length > 0 ? li.Unresolved : null), "rivets of the line item at the drawn positions");
+                    AddRivet(at + ax * iv.t1, -ax, ax.Z > 0.9 ? du : Up, iv.t1 - iv.t0, rv.Diameter, asm, rv.Material, asu);
+                    n++;
+                }
+            }
+            Info($"Truss: line item rivets - {n} placed{(miss > 0 ? $", {miss} positions not in steel (skipped)" : "")}{Src}.");
         }
     }
 }

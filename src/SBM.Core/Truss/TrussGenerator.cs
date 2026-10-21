@@ -230,6 +230,8 @@ public static partial class TrussGenerator
             PlaceJointRivets();
             if (_d.Floor != null) BuildFloor(_d.Floor);
             if (_d.LineItems != null) foreach (var li in _d.LineItems) BuildLineItem(li);
+            if (_d.LineItems != null) foreach (var li in _d.LineItems.Where(l => l.ClipAngles != null && l.Transverse && l.Kind == TrussLineItemKind.Steel)) BuildClipAngles(li);
+            if (_d.LineItems != null && _d.LineItems.Any(li => li.Rivets is { Count: > 0 } || li.ClipAngles != null)) PlaceLineItemRivets();
             foreach (var s in _d.Suspenders) BuildSuspender(s);
             for (int i = 0; i < _d.Shoes.Count; i++) BuildShoe(_d.Shoes[i], i);
             if (_d.RivetHeadsFlushAtSolePlates) FlushRivetsAtSolePlates();
@@ -525,12 +527,13 @@ public static partial class TrussGenerator
                 if (asu != null) Warn(set.Unresolved);
                 var mesh = new Mesh();
                 // section in (a along the member, x across the web), extruded along the member y over the height
-                void Prism(IReadOnlyList<Vec2> poly, double d)
+                void Prism(IReadOnlyList<Vec2> poly, double d, double y0 = 0, double h = -1)
                 {
                     var pl = poly.ToArray();
+                    if (h < 0) h = set.Height;
                     if (MeshBuilder.SignedArea(pl.ToList()) < 0) Array.Reverse(pl);
-                    var ra = pl.Select(q => m.A + m.Axis * (d + q.X) + m.X * q.Y + m.Y * (yc - set.Height / 2)).ToArray();
-                    MeshBuilder.AddLoft(mesh, pl, new[] { ra, ra.Select(p => p + m.Y * set.Height).ToArray() });
+                    var ra = pl.Select(q => m.A + m.Axis * (d + q.X) + m.X * q.Y + m.Y * ((set.Top is { } st0 ? st0 + m.Def.OffsetZ - set.Height : yc - set.Height / 2) + y0)).ToArray();
+                    MeshBuilder.AddLoft(mesh, pl, new[] { ra, ra.Select(p => p + m.Y * h).ToArray() });
                 }
                 var meshF = new Mesh();
                 double fill = Math.Max(0, set.FillThickness);
@@ -549,7 +552,8 @@ public static partial class TrussGenerator
                             {
                                 double fw = set.FillWidth > 0 ? set.FillWidth : legWeb, xw = sx * tw / 2;
                                 var fp = new[] { new Vec2(0, xw), new Vec2(sa * fw, xw), new Vec2(sa * fw, xw + sx * fill), new Vec2(0, xw + sx * fill) };
-                                var keep = mesh; mesh = meshF; Prism(fp, d); mesh = keep;
+                                double fh = set.FillHeight > 0 ? Math.Min(set.FillHeight, set.Height) : set.Height;
+                                var keep = mesh; mesh = meshF; Prism(fp, d, (set.Height - fh) / 2, fh); mesh = keep;
                             }
                             // web leg along +-a from the heel, outstanding leg normal to the web
                             var poly = new[] { new Vec2(0, x0), new Vec2(sa * legWeb, x0), new Vec2(sa * legWeb, x0 + sx * t), new Vec2(sa * t, x0 + sx * t), new Vec2(sa * t, x0 + sx * legOut), new Vec2(0, x0 + sx * legOut) };
