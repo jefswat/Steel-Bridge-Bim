@@ -1,0 +1,604 @@
+structure,joint,member,region,shop_dots,field_rings,total,page,beyond_extent_in,chord_band_in
+approach3 (unit A),U1,L0-U1,beyond,0,1,1,50,21.7,-8.7..8.7
+approach3 (unit A),U1,L0-U1,inside,1,31,32,50,,-8.7..8.7
+approach3 (unit A),U1,U0-U1,beyond,1,8,9,50,4.3,-8.7..8.7
+approach3 (unit A),U1,U0-U1,inside,28,2,30,50,,-8.7..8.7
+approach3 (unit A),U1,U1-L1,beyond,5,3,8,50,9.6,-8.7..8.7
+approach3 (unit A),U1,U1-L1,inside,9,1,10,50,,-8.7..8.7
+approach3 (unit A),U1,U1-L2,beyond,0,8,8,50,18.5,-8.7..8.7
+approach3 (unit A),U1,U1-L2,inside,26,2,28,50,,-8.7..8.7
+approach3 (unit A),U1,U1-U3,inside,20,0,20,50,,-8.7..8.7
+approach3 (unit A),U2,U1-U3,beyond,0,5,5,50,11.1,-8.7..8.7
+approach3 (unit A),U2,U1-U3,inside,8,7,15,50,,-8.7..8.7
+approach3 (unit A),U2,U2-L2,beyond,4,3,7,50,10.0,-8.7..8.7
+approach3 (unit A),U2,U2-L2,inside,10,1,11,50,,-8.7..8.7
+approach3 (unit A),U3,L2-U3,beyond,0,4,4,50,5.2,-8.7..8.7
+approach3 (unit A),U3,L2-U3,inside,16,0,16,50,,-8.7..8.7
+approach3 (unit A),U3,U1-U3,beyond,0,5,5,50,12.9,-8.7..8.7
+approach3 (unit A),U3,U1-U3,inside,4,32,36,50,,-8.7..8.7
+approach3 (unit A),U3,U3-L3,beyond,6,3,9,50,14.0,-8.7..8.7
+approach3 (unit A),U3,U3-L3,inside,8,0,8,50,,-8.7..8.7
+approach3 (unit A),U3,U3-L4,beyond,0,5,5,50,17.4,-8.7..8.7
+approach3 (unit A),U3,U3-L4,inside,20,3,23,50,,-8.7..8.7
+approach3 (unit A),U3,U3-U5,inside,26,1,27,50,,-8.7..8.7
+approach3 (unit A),L2,L0-L2,beyond,0,4,4,50,5.2,-8.7..8.7
+approach3 (unit A),L2,L0-L2,inside,4,34,38,50,,-8.7..8.7
+approach3 (unit A),L2,L2-L4,beyond,0,2,2,50,0.1,-8.7..8.7
+approach3 (unit A),L2,L2-L4,inside,30,3,33,50,,-8.7..8.7
+approach3 (unit A),L2,L2-U3,beyond,0,6,6,50,4.5,-8.7..8.7
+approach3 (unit A),L2,L2-U3,inside,19,0,19,50,,-8.7..8.7
+approach3 (unit A),L2,U1-L2,beyond,0,6,6,50,8.5,-8.7..8.7
+approach3 (unit A),L2,U1-L2,inside,26,2,28,50,,-8.7..8.7
+approach3 (unit A),L2,U2-L2,beyond,0,2,2,50,1.3,-8.7..8.7
+approach3 (unit A),L2,U2-L2,inside,14,4,18,50,,-8.7..8.7
+approach3 (unit A),L1,L0-L2,beyond,0,7,7,50,10.9,-8.1..8.1
+approach3 (unit A),L1,L0-L2,inside,0,13,13,50,,-8.1..8.1
+approach3 (unit A),L1,U1-L1,inside,8,2,10,50,,-8.1..8.1
+approach3 (unit A),L4,L2-L4,beyond,0,2,2,51,0.3,-8.7..8.7
+approach3 (unit A),L4,L2-L4,inside,4,32,36,51,,-8.7..8.7
+approach3 (unit A),L4,L4-L6,beyond,1,7,8,51,10.0,-8.7..8.7
+approach3 (unit A),L4,L4-L6,inside,37,3,40,51,,-8.7..8.7
+approach3 (unit A),L4,L4-U5,beyond,1,6,7,51,19.9,-8.7..8.7
+approach3 (unit A),L4,L4-U5,inside,25,4,29,51,,-8.7..8.7
+approach3 (unit A),L4,U3-L4,beyond,0,4,4,51,6.0,-8.7..8.7
+approach3 (unit A),L4,U3-L4,inside,21,1,22,51,,-8.7..8.7
+approach3 (unit A),L4,U4-L4,beyond,0,5,5,51,9.7,-8.7..8.7
+approach3 (unit A),L4,U4-L4,inside,12,2,14,51,,-8.7..8.7
+approach3 (unit A),U5,L4-U5,beyond,0,10,10,51,13.1,-8.7..8.7
+approach3 (unit A),U5,L4-U5,inside,24,2,26,51,,-8.7..8.7
+approach3 (unit A),U5,U3-U5,inside,5,37,42,51,,-8.7..8.7
+approach3 (unit A),U5,U5-L5,beyond,7,6,13,51,14.0,-8.7..8.7
+approach3 (unit A),U5,U5-L5,inside,11,1,12,51,,-8.7..8.7
+approach3 (unit A),U5,U5-L6,beyond,0,5,5,51,6.4,-8.7..8.7
+approach3 (unit A),U5,U5-L6,inside,33,0,33,51,,-8.7..8.7
+approach3 (unit A),U5,U5-U7,beyond,0,8,8,51,4.4,-8.7..8.7
+approach3 (unit A),U5,U5-U7,inside,36,1,37,51,,-8.7..8.7
+approach3 (unit A),L6,L4-L6,beyond,0,6,6,51,8.7,-8.6..8.6
+approach3 (unit A),L6,L4-L6,inside,6,34,40,51,,-8.6..8.6
+approach3 (unit A),L6,L6-L8,beyond,0,6,6,51,9.1,-8.6..8.6
+approach3 (unit A),L6,L6-L8,inside,34,3,37,51,,-8.6..8.6
+approach3 (unit A),L6,L6-U7,inside,41,0,41,51,,-8.6..8.6
+approach3 (unit A),L6,U5-L6,inside,28,0,28,51,,-8.6..8.6
+approach3 (unit A),L6,U6-L6,beyond,0,3,3,51,5.1,-8.6..8.6
+approach3 (unit A),L6,U6-L6,inside,17,0,17,51,,-8.6..8.6
+approach3 (unit A),U7,L6-U7,beyond,1,8,9,52,15.5,-8.7..8.7
+approach3 (unit A),U7,L6-U7,inside,44,2,46,52,,-8.7..8.7
+approach3 (unit A),U7,U5-U7,beyond,0,11,11,52,13.2,-8.7..8.7
+approach3 (unit A),U7,U5-U7,inside,4,31,35,52,,-8.7..8.7
+approach3 (unit A),U7,U7-L7,beyond,5,1,6,52,10.6,-8.7..8.7
+approach3 (unit A),U7,U7-L7,inside,13,3,16,52,,-8.7..8.7
+approach3 (unit A),U7,U7-L8,inside,49,0,49,52,,-8.7..8.7
+approach3 (unit A),U7,U7-U9,beyond,0,6,6,52,9.9,-8.7..8.7
+approach3 (unit A),U7,U7-U9,inside,48,2,50,52,,-8.7..8.7
+approach3 (unit A),U8,U7-U9,beyond,3,11,14,52,11.9,-8.7..8.7
+approach3 (unit A),U8,U7-U9,inside,11,11,22,52,,-8.7..8.7
+approach3 (unit A),U8,U8-L8,beyond,4,3,7,52,10.5,-8.7..8.7
+approach3 (unit A),U8,U8-L8,inside,12,3,15,52,,-8.7..8.7
+approach3 (unit A),U9,L8-U9,inside,42,2,44,52,,-8.7..8.7
+approach3 (unit A),U9,U7-U9,beyond,0,6,6,52,10.0,-8.7..8.7
+approach3 (unit A),U9,U7-U9,inside,4,41,45,52,,-8.7..8.7
+approach3 (unit A),U9,U9-L10,beyond,2,10,12,52,16.8,-8.7..8.7
+approach3 (unit A),U9,U9-L10,inside,34,2,36,52,,-8.7..8.7
+approach3 (unit A),U9,U9-L9,beyond,7,1,8,52,14.2,-8.7..8.7
+approach3 (unit A),U9,U9-L9,inside,12,9,21,52,,-8.7..8.7
+approach3 (unit A),U9,U9-U11,beyond,0,9,9,52,13.2,-8.7..8.7
+approach3 (unit A),U9,U9-U11,inside,28,0,28,52,,-8.7..8.7
+approach3 (unit A),L8,L6-L8,beyond,1,11,12,52,12.6,-8.4..8.4
+approach3 (unit A),L8,L6-L8,inside,5,44,49,52,,-8.4..8.4
+approach3 (unit A),L8,L8-L10,beyond,2,9,11,52,13.1,-8.4..8.4
+approach3 (unit A),L8,L8-L10,inside,41,25,66,52,,-8.4..8.4
+approach3 (unit A),L8,L8-U9,beyond,2,2,4,52,6.4,-8.4..8.4
+approach3 (unit A),L8,L8-U9,inside,49,11,60,52,,-8.4..8.4
+approach3 (unit A),L8,U7-L8,inside,50,10,60,52,,-8.4..8.4
+approach3 (unit A),L8,U8-L8,beyond,1,2,3,52,3.9,-8.4..8.4
+approach3 (unit A),L8,U8-L8,inside,16,4,20,52,,-8.4..8.4
+approach3 (unit A),L8,unassigned,inside,0,6,6,52,,-8.4..8.4
+approach3 (unit A),L9,L8-L10,beyond,0,7,7,52,11.0,-8.4..8.4
+approach3 (unit A),L9,L8-L10,inside,3,8,11,52,,-8.4..8.4
+approach3 (unit A),L9,U9-L9,beyond,1,2,3,52,2.5,-8.4..8.4
+approach3 (unit A),L9,U9-L9,inside,8,0,8,52,,-8.4..8.4
+approach3 (unit A),L10,L10-L12,beyond,1,6,7,53,11.3,-8.4..8.4
+approach3 (unit A),L10,L10-L12,inside,30,6,36,53,,-8.4..8.4
+approach3 (unit A),L10,L10-U11,beyond,1,0,1,53,0.1,-8.4..8.4
+approach3 (unit A),L10,L10-U11,inside,21,0,21,53,,-8.4..8.4
+approach3 (unit A),L10,L8-L10,inside,6,24,30,53,,-8.4..8.4
+approach3 (unit A),L10,U10-L10,beyond,0,2,2,53,2.4,-8.4..8.4
+approach3 (unit A),L10,U10-L10,inside,14,0,14,53,,-8.4..8.4
+approach3 (unit A),L10,U9-L10,inside,32,1,33,53,,-8.4..8.4
+approach3 (unit A),U11,L10-U11,inside,20,1,21,53,,-8.1..8.1
+approach3 (unit A),U11,U11-L11,beyond,8,3,11,53,14.2,-8.1..8.1
+approach3 (unit A),U11,U11-L11,inside,8,0,8,53,,-8.1..8.1
+approach3 (unit A),U11,U11-L12,beyond,0,1,1,53,8.7,-8.1..8.1
+approach3 (unit A),U11,U11-L12,inside,16,0,16,53,,-8.1..8.1
+approach3 (unit A),U11,U11-U11',beyond,1,4,5,53,4.4,-8.1..8.1
+approach3 (unit A),U11,U11-U11',inside,29,1,30,53,,-8.1..8.1
+approach3 (unit A),U11,U9-U11,beyond,0,6,6,53,9.0,-8.1..8.1
+approach3 (unit A),U11,U9-U11,inside,4,20,24,53,,-8.1..8.1
+approach3 (unit A),L12,L10-L12,beyond,0,7,7,53,9.1,-7.2..7.2
+approach3 (unit A),L12,L10-L12,inside,5,18,23,53,,-7.2..7.2
+approach3 (unit A),L12,L12-L10',beyond,0,7,7,53,9.6,-7.2..7.2
+approach3 (unit A),L12,L12-L10',inside,22,0,22,53,,-7.2..7.2
+approach3 (unit A),L12,L12-U11',beyond,1,1,2,53,2.4,-7.2..7.2
+approach3 (unit A),L12,L12-U11',inside,17,6,23,53,,-7.2..7.2
+approach3 (unit A),L12,U11-L12,inside,17,3,20,53,,-7.2..7.2
+approach3 (unit A),L12,U12-L12,beyond,2,0,2,53,3.1,-7.2..7.2
+approach3 (unit A),L12,U12-L12,inside,13,0,13,53,,-7.2..7.2
+approach4 (unit B),U0,U0-L0,beyond,5,0,5,59,9.8,-7.2..7.2
+approach4 (unit B),U0,U0-L0,inside,8,2,10,59,,-7.2..7.2
+approach4 (unit B),U0,U0-U1,beyond,0,1,1,59,1.1,-7.2..7.2
+approach4 (unit B),U0,U0-U1,inside,10,15,25,59,,-7.2..7.2
+approach3 (unit A),U0',U0'-L0',beyond,4,3,7,59,9.8,-7.2..7.2
+approach3 (unit A),U0',U0'-L0',inside,8,0,8,59,,-7.2..7.2
+approach3 (unit A),U0',U1'-U0',inside,10,15,25,59,,-7.2..7.2
+approach3 (unit A),L0',L2'-L0',beyond,0,8,8,59,14.6,-8.1..8.1
+approach3 (unit A),L0',L2'-L0',inside,3,50,53,59,,-8.1..8.1
+approach3 (unit A),L0',U0'-L0',beyond,2,1,3,59,5.0,-8.1..8.1
+approach3 (unit A),L0',U0'-L0',inside,16,6,22,59,,-8.1..8.1
+approach3 (unit A),L0',U1'-L0',inside,32,7,39,59,,-8.1..8.1
+approach3 (unit A),L0',unassigned,inside,1,4,5,59,,-8.1..8.1
+approach4 (unit B),L0,L0-L2,beyond,0,7,7,59,13.5,-8.4..8.4
+approach4 (unit B),L0,L0-L2,inside,4,62,66,59,,-8.4..8.4
+approach4 (unit B),L0,L0-U1,beyond,1,0,1,59,0.6,-8.4..8.4
+approach4 (unit B),L0,L0-U1,inside,37,6,43,59,,-8.4..8.4
+approach4 (unit B),L0,U0-L0,beyond,2,1,3,59,3.6,-8.4..8.4
+approach4 (unit B),L0,U0-L0,inside,16,5,21,59,,-8.4..8.4
+approach4 (unit B),L0,unassigned,inside,0,6,6,59,,-8.4..8.4
+approach4 (unit B),L1,L0-L2,beyond,0,7,7,60,13.7,-8.4..8.4
+approach4 (unit B),L1,L0-L2,inside,0,11,11,60,,-8.4..8.4
+approach4 (unit B),L1,U1-L1,beyond,0,2,2,60,1.9,-8.4..8.4
+approach4 (unit B),L1,U1-L1,inside,8,0,8,60,,-8.4..8.4
+approach4 (unit B),U1,L0-U1,inside,0,38,38,60,,-8.8..8.8
+approach4 (unit B),U1,U0-U1,beyond,0,11,11,60,13.6,-8.8..8.8
+approach4 (unit B),U1,U0-U1,inside,34,0,34,60,,-8.8..8.8
+approach4 (unit B),U1,U1-L1,beyond,7,3,10,60,12.9,-8.8..8.8
+approach4 (unit B),U1,U1-L1,inside,12,0,12,60,,-8.8..8.8
+approach4 (unit B),U1,U1-L2,beyond,0,8,8,60,12.1,-8.8..8.8
+approach4 (unit B),U1,U1-L2,inside,32,4,36,60,,-8.8..8.8
+approach4 (unit B),U1,U1-U3,inside,44,0,44,60,,-8.8..8.8
+approach4 (unit B),U2,U1-U3,beyond,0,5,5,60,11.6,-8.8..8.8
+approach4 (unit B),U2,U1-U3,inside,8,8,16,60,,-8.8..8.8
+approach4 (unit B),U2,U2-L2,beyond,4,1,5,60,9.5,-8.8..8.8
+approach4 (unit B),U2,U2-L2,inside,10,0,10,60,,-8.8..8.8
+approach4 (unit B),U3,L2-U3,beyond,1,4,5,60,6.3,-8.8..8.8
+approach4 (unit B),U3,L2-U3,inside,25,6,31,60,,-8.8..8.8
+approach4 (unit B),U3,U1-U3,beyond,0,4,4,60,1.3,-8.8..8.8
+approach4 (unit B),U3,U1-U3,inside,4,38,42,60,,-8.8..8.8
+approach4 (unit B),U3,U3-L3,beyond,4,1,5,60,10.4,-8.8..8.8
+approach4 (unit B),U3,U3-L3,inside,10,7,17,60,,-8.8..8.8
+approach4 (unit B),U3,U3-L4,beyond,0,4,4,60,6.2,-8.8..8.8
+approach4 (unit B),U3,U3-L4,inside,22,2,24,60,,-8.8..8.8
+approach4 (unit B),U3,U3-U5,beyond,20,0,20,60,13.6,-8.8..8.8
+approach4 (unit B),U3,U3-U5,inside,48,0,48,60,,-8.8..8.8
+approach4 (unit B),L2,L0-L2,beyond,1,9,10,60,12.3,-8.9..8.9
+approach4 (unit B),L2,L0-L2,inside,9,40,49,60,,-8.9..8.9
+approach4 (unit B),L2,L2-L4,beyond,12,3,15,60,12.8,-8.9..8.9
+approach4 (unit B),L2,L2-L4,inside,45,2,47,60,,-8.9..8.9
+approach4 (unit B),L2,L2-U3,beyond,0,9,9,60,10.7,-8.9..8.9
+approach4 (unit B),L2,L2-U3,inside,25,1,26,60,,-8.9..8.9
+approach4 (unit B),L2,U1-L2,beyond,0,13,13,60,14.6,-8.9..8.9
+approach4 (unit B),L2,U1-L2,inside,33,2,35,60,,-8.9..8.9
+approach4 (unit B),L2,U2-L2,beyond,0,3,3,60,4.2,-8.9..8.9
+approach4 (unit B),L2,U2-L2,inside,14,1,15,60,,-8.9..8.9
+approach4 (unit B),L4,L2-L4,beyond,0,20,20,61,13.2,-8.9..8.9
+approach4 (unit B),L4,L2-L4,inside,4,44,48,61,,-8.9..8.9
+approach4 (unit B),L4,L4-L6,beyond,16,3,19,61,13.7,-8.9..8.9
+approach4 (unit B),L4,L4-L6,inside,48,2,50,61,,-8.9..8.9
+approach4 (unit B),L4,L4-U5,beyond,0,11,11,61,15.4,-8.9..8.9
+approach4 (unit B),L4,L4-U5,inside,22,3,25,61,,-8.9..8.9
+approach4 (unit B),L4,U3-L4,beyond,2,10,12,61,14.6,-8.9..8.9
+approach4 (unit B),L4,U3-L4,inside,21,4,25,61,,-8.9..8.9
+approach4 (unit B),L4,U4-L4,beyond,0,2,2,61,2.0,-8.9..8.9
+approach4 (unit B),L4,U4-L4,inside,16,1,17,61,,-8.9..8.9
+approach4 (unit B),U5,L4-U5,beyond,1,10,11,61,14.1,-8.9..8.9
+approach4 (unit B),U5,L4-U5,inside,19,6,25,61,,-8.9..8.9
+approach4 (unit B),U5,U3-U5,beyond,0,17,17,61,13.7,-8.9..8.9
+approach4 (unit B),U5,U3-U5,inside,4,41,45,61,,-8.9..8.9
+approach4 (unit B),U5,U5-L5,beyond,7,2,9,61,9.5,-8.9..8.9
+approach4 (unit B),U5,U5-L5,inside,11,6,17,61,,-8.9..8.9
+approach4 (unit B),U5,U5-L6,beyond,1,9,10,61,10.1,-8.9..8.9
+approach4 (unit B),U5,U5-L6,inside,27,3,30,61,,-8.9..8.9
+approach4 (unit B),U5,U5-U7,inside,40,0,40,61,,-8.9..8.9
+approach4 (unit B),L6,L4-L6,beyond,0,20,20,61,13.1,-8.9..8.9
+approach4 (unit B),L6,L4-L6,inside,6,45,51,61,,-8.9..8.9
+approach4 (unit B),L6,L6-L8,beyond,0,8,8,61,13.4,-8.9..8.9
+approach4 (unit B),L6,L6-L8,inside,49,0,49,61,,-8.9..8.9
+approach4 (unit B),L6,L6-U7,beyond,1,11,12,61,14.3,-8.9..8.9
+approach4 (unit B),L6,L6-U7,inside,32,4,36,61,,-8.9..8.9
+approach4 (unit B),L6,U5-L6,beyond,0,11,11,61,11.7,-8.9..8.9
+approach4 (unit B),L6,U5-L6,inside,26,1,27,61,,-8.9..8.9
+approach4 (unit B),L6,U6-L6,beyond,0,3,3,61,4.0,-8.9..8.9
+approach4 (unit B),L6,U6-L6,inside,14,0,14,61,,-8.9..8.9
+approach4 (unit B),U7,L6-U7,beyond,4,8,12,62,17.2,-8.9..8.9
+approach4 (unit B),U7,L6-U7,inside,38,2,40,62,,-8.9..8.9
+approach4 (unit B),U7,U5-U7,inside,5,37,42,62,,-8.9..8.9
+approach4 (unit B),U7,U7-L7,beyond,4,3,7,62,9.7,-8.9..8.9
+approach4 (unit B),U7,U7-L7,inside,11,2,13,62,,-8.9..8.9
+approach4 (unit B),U7,U7-L8,inside,43,0,43,62,,-8.9..8.9
+approach4 (unit B),U7,U7-U9,beyond,0,8,8,62,13.6,-8.9..8.9
+approach4 (unit B),U7,U7-U9,inside,30,1,31,62,,-8.9..8.9
+approach4 (unit B),L8,L6-L8,beyond,0,8,8,62,10.9,-8.8..8.8
+approach4 (unit B),L8,L6-L8,inside,6,32,38,62,,-8.8..8.8
+approach4 (unit B),L8,L8-L10,inside,52,2,54,62,,-8.8..8.8
+approach4 (unit B),L8,L8-U9,beyond,0,8,8,62,14.0,-8.8..8.8
+approach4 (unit B),L8,L8-U9,inside,51,2,53,62,,-8.8..8.8
+approach4 (unit B),L8,U7-L8,inside,43,0,43,62,,-8.8..8.8
+approach4 (unit B),L8,U8-L8,beyond,1,5,6,62,8.9,-8.8..8.8
+approach4 (unit B),L8,U8-L8,inside,14,2,16,62,,-8.8..8.8
+approach4 (unit B),U9,L8-U9,beyond,0,8,8,62,13.4,-8.9..8.9
+approach4 (unit B),U9,L8-U9,inside,50,5,55,62,,-8.9..8.9
+approach4 (unit B),U9,U7-U9,beyond,0,9,9,62,12.9,-8.9..8.9
+approach4 (unit B),U9,U7-U9,inside,4,45,49,62,,-8.9..8.9
+approach4 (unit B),U9,U9-L10,beyond,4,26,30,62,23.5,-8.9..8.9
+approach4 (unit B),U9,U9-L10,inside,49,6,55,62,,-8.9..8.9
+approach4 (unit B),U9,U9-L9,beyond,4,5,9,62,9.8,-8.9..8.9
+approach4 (unit B),U9,U9-L9,inside,13,11,24,62,,-8.9..8.9
+approach4 (unit B),U9,U9-U11,beyond,8,0,8,62,13.1,-8.9..8.9
+approach4 (unit B),U9,U9-U11,inside,50,0,50,62,,-8.9..8.9
+approach4 (unit B),L10,L10-L12,beyond,4,12,16,63,12.7,-8.9..8.9
+approach4 (unit B),L10,L10-L12,inside,37,34,71,63,,-8.9..8.9
+approach4 (unit B),L10,L10-U11,beyond,4,20,24,63,20.7,-8.9..8.9
+approach4 (unit B),L10,L10-U11,inside,49,15,64,63,,-8.9..8.9
+approach4 (unit B),L10,L8-L10,beyond,1,8,9,63,10.2,-8.9..8.9
+approach4 (unit B),L10,L8-L10,inside,2,52,54,63,,-8.9..8.9
+approach4 (unit B),L10,U10-L10,beyond,0,2,2,63,2.3,-8.9..8.9
+approach4 (unit B),L10,U10-L10,inside,14,4,18,63,,-8.9..8.9
+approach4 (unit B),L10,U9-L10,beyond,4,23,27,63,22.0,-8.9..8.9
+approach4 (unit B),L10,U9-L10,inside,51,7,58,63,,-8.9..8.9
+approach4 (unit B),L10,unassigned,inside,7,2,9,63,,-8.9..8.9
+approach4 (unit B),U11,L10-U11,beyond,0,22,22,64,20.9,-8.9..8.9
+approach4 (unit B),U11,L10-U11,inside,57,6,63,64,,-8.9..8.9
+approach4 (unit B),U11,U11-L11,beyond,7,2,9,64,9.0,-8.9..8.9
+approach4 (unit B),U11,U11-L11,inside,14,14,28,64,,-8.9..8.9
+approach4 (unit B),U11,U11-L12,beyond,0,11,11,64,17.6,-8.9..8.9
+approach4 (unit B),U11,U11-L12,inside,50,6,56,64,,-8.9..8.9
+approach4 (unit B),U11,U11-U13,beyond,2,8,10,64,13.1,-8.9..8.9
+approach4 (unit B),U11,U11-U13,inside,47,3,50,64,,-8.9..8.9
+approach4 (unit B),U11,U9-U11,beyond,0,6,6,64,10.6,-8.9..8.9
+approach4 (unit B),U11,U9-U11,inside,4,47,51,64,,-8.9..8.9
+approach4 (unit B),L12,L10-L12,inside,6,39,45,64,,-8.9..8.9
+approach4 (unit B),L12,L12-L14,beyond,0,9,9,64,13.2,-8.9..8.9
+approach4 (unit B),L12,L12-L14,inside,42,3,45,64,,-8.9..8.9
+approach4 (unit B),L12,L12-U13,beyond,0,5,5,64,5.5,-8.9..8.9
+approach4 (unit B),L12,L12-U13,inside,37,0,37,64,,-8.9..8.9
+approach4 (unit B),L12,U11-L12,beyond,4,10,14,64,18.7,-8.9..8.9
+approach4 (unit B),L12,U11-L12,inside,45,4,49,64,,-8.9..8.9
+approach4 (unit B),L12,U12-L12,beyond,3,6,9,64,12.3,-8.9..8.9
+approach4 (unit B),L12,U12-L12,inside,19,0,19,64,,-8.9..8.9
+approach4 (unit B),L12,unassigned,inside,0,1,1,64,,-8.9..8.9
+approach4 (unit B),U13,L12-U13,beyond,0,1,1,64,21.6,-8.5..8.5
+approach4 (unit B),U13,L12-U13,inside,34,1,35,64,,-8.5..8.5
+approach4 (unit B),U13,U11-U13,beyond,0,7,7,64,9.1,-8.5..8.5
+approach4 (unit B),U13,U11-U13,inside,5,22,27,64,,-8.5..8.5
+approach4 (unit B),U13,U13-L13,beyond,7,3,10,64,14.1,-8.5..8.5
+approach4 (unit B),U13,U13-L13,inside,9,1,10,64,,-8.5..8.5
+approach4 (unit B),U13,U13-L14,beyond,0,7,7,64,19.3,-8.5..8.5
+approach4 (unit B),U13,U13-L14,inside,31,3,34,64,,-8.5..8.5
+approach4 (unit B),U13,U13-U15,beyond,0,7,7,64,6.5,-8.5..8.5
+approach4 (unit B),U13,U13-U15,inside,30,2,32,64,,-8.5..8.5
+approach4 (unit B),L14,L12-L14,beyond,0,7,7,65,7.0,-8.6..8.6
+approach4 (unit B),L14,L12-L14,inside,4,22,26,65,,-8.6..8.6
+approach4 (unit B),L14,L14-L16,inside,26,12,38,65,,-8.6..8.6
+approach4 (unit B),L14,L14-U15,beyond,0,1,1,65,2.6,-8.6..8.6
+approach4 (unit B),L14,L14-U15,inside,17,0,17,65,,-8.6..8.6
+approach4 (unit B),L14,U13-L14,beyond,0,9,9,65,12.2,-8.6..8.6
+approach4 (unit B),L14,U13-L14,inside,24,2,26,65,,-8.6..8.6
+approach4 (unit B),L14,U14-L14,beyond,0,2,2,65,1.7,-8.6..8.6
+approach4 (unit B),L14,U14-L14,inside,7,1,8,65,,-8.6..8.6
+approach4 (unit B),U15,L14-U15,beyond,0,4,4,65,4.4,-8.6..8.6
+approach4 (unit B),U15,L14-U15,inside,16,2,18,65,,-8.6..8.6
+approach4 (unit B),U15,U13-U15,beyond,0,7,7,65,7.3,-8.6..8.6
+approach4 (unit B),U15,U13-U15,inside,4,18,22,65,,-8.6..8.6
+approach4 (unit B),U15,U15-L15,beyond,5,5,10,65,13.2,-8.6..8.6
+approach4 (unit B),U15,U15-L15,inside,9,2,11,65,,-8.6..8.6
+approach4 (unit B),U15,U15-L16,beyond,0,4,4,65,4.9,-8.6..8.6
+approach4 (unit B),U15,U15-L16,inside,17,1,18,65,,-8.6..8.6
+approach4 (unit B),U15,U15-U17,inside,24,0,24,65,,-8.6..8.6
+approach4 (unit B),L15,L14-L16,beyond,0,9,9,65,7.6,-8.6..8.6
+approach4 (unit B),L15,L14-L16,inside,0,11,11,65,,-8.6..8.6
+approach4 (unit B),L15,U15-L15,beyond,2,2,4,65,3.4,-8.6..8.6
+approach4 (unit B),L15,U15-L15,inside,8,0,8,65,,-8.6..8.6
+approach4 (unit B),L16,L14-L16,beyond,3,7,10,65,0.3,-8.6..8.6
+approach4 (unit B),L16,L14-L16,inside,12,28,40,65,,-8.6..8.6
+approach4 (unit B),L16,L16-L18,beyond,0,2,2,65,0.4,-8.6..8.6
+approach4 (unit B),L16,L16-L18,inside,28,1,29,65,,-8.6..8.6
+approach4 (unit B),L16,L16-U17,beyond,0,5,5,65,6.3,-8.6..8.6
+approach4 (unit B),L16,L16-U17,inside,18,1,19,65,,-8.6..8.6
+approach4 (unit B),L16,U15-L16,inside,17,0,17,65,,-8.6..8.6
+approach4 (unit B),L16,U16-L16,beyond,0,1,1,65,1.1,-8.6..8.6
+approach4 (unit B),L16,U16-L16,inside,12,0,12,65,,-8.6..8.6
+approach4 (unit B),U17,L16-U17,beyond,0,5,5,66,7.2,-8.6..8.6
+approach4 (unit B),U17,L16-U17,inside,22,4,26,66,,-8.6..8.6
+approach4 (unit B),U17,U15-U17,beyond,0,1,1,66,1.5,-8.6..8.6
+approach4 (unit B),U17,U15-U17,inside,4,23,27,66,,-8.6..8.6
+approach4 (unit B),U17,U17-L17,beyond,4,5,9,66,10.9,-8.6..8.6
+approach4 (unit B),U17,U17-L17,inside,9,2,11,66,,-8.6..8.6
+approach4 (unit B),U17,U17-L18,inside,29,0,29,66,,-8.6..8.6
+approach4 (unit B),U17,U17-U19,beyond,1,7,8,66,9.7,-8.6..8.6
+approach4 (unit B),U17,U17-U19,inside,23,2,25,66,,-8.6..8.6
+approach4 (unit B),L18,L16-L18,beyond,0,7,7,66,8.9,-8.6..8.6
+approach4 (unit B),L18,L16-L18,inside,9,28,37,66,,-8.6..8.6
+approach4 (unit B),L18,L18-L20,beyond,0,1,1,66,11.2,-8.6..8.6
+approach4 (unit B),L18,L18-L20,inside,29,0,29,66,,-8.6..8.6
+approach4 (unit B),L18,L18-U19,beyond,0,1,1,66,3.4,-8.6..8.6
+approach4 (unit B),L18,L18-U19,inside,37,3,40,66,,-8.6..8.6
+approach4 (unit B),L18,U17-L18,inside,29,2,31,66,,-8.6..8.6
+approach4 (unit B),L18,U18-L18,beyond,4,3,7,66,13.1,-8.6..8.6
+approach4 (unit B),L18,U18-L18,inside,26,1,27,66,,-8.6..8.6
+approach4 (unit B),U19,L18-U19,beyond,0,12,12,66,16.3,-8.9..8.9
+approach4 (unit B),U19,L18-U19,inside,45,4,49,66,,-8.9..8.9
+approach4 (unit B),U19,U17-U19,beyond,1,8,9,66,13.5,-8.9..8.9
+approach4 (unit B),U19,U17-U19,inside,5,27,32,66,,-8.9..8.9
+approach4 (unit B),U19,U19-L19,beyond,6,3,9,66,13.2,-8.9..8.9
+approach4 (unit B),U19,U19-L19,inside,12,0,12,66,,-8.9..8.9
+approach4 (unit B),U19,U19-L20,inside,47,0,47,66,,-8.9..8.9
+approach4 (unit B),U19,U19-U19',beyond,2,6,8,66,11.8,-8.9..8.9
+approach4 (unit B),U19,U19-U19',inside,40,0,40,66,,-8.9..8.9
+approach4 (unit B),L20,L18-L20,beyond,0,12,12,67,13.7,-8.6..8.6
+approach4 (unit B),L20,L18-L20,inside,5,33,38,67,,-8.6..8.6
+approach4 (unit B),L20,L20-L18',beyond,0,10,10,67,12.2,-8.6..8.6
+approach4 (unit B),L20,L20-L18',inside,26,28,54,67,,-8.6..8.6
+approach4 (unit B),L20,L20-U19',inside,47,0,47,67,,-8.6..8.6
+approach4 (unit B),L20,U19-L20,inside,47,0,47,67,,-8.6..8.6
+approach4 (unit B),L20,U20-L20,beyond,0,3,3,67,4.3,-8.6..8.6
+approach4 (unit B),L20,U20-L20,inside,14,0,14,67,,-8.6..8.6
+approach4 (unit B),L20,unassigned,inside,2,10,12,67,,-8.6..8.6
+main,U0,U0-L0,beyond,2,17,19,73,13.6,-17.8..17.8
+main,U0,U0-L0,inside,0,19,19,73,,-17.8..17.8
+main,U0,U0-U1,beyond,0,1,1,73,8.4,-17.8..17.8
+main,U0,U0-U1,inside,36,18,54,73,,-17.8..17.8
+main,L0,L0-L2,beyond,0,7,7,73,11.0,-17.8..17.8
+main,L0,L0-L2,inside,18,55,73,73,,-17.8..17.8
+main,L0,L0-U1,inside,26,6,32,73,,-17.8..17.8
+main,L0,U0-L0,beyond,0,3,3,73,5.0,-17.8..17.8
+main,L0,U0-L0,inside,27,8,35,73,,-17.8..17.8
+main,L0,unassigned,inside,0,2,2,73,,-17.8..17.8
+main,U1,L0-U1,inside,26,16,42,74,,-17.8..17.8
+main,U1,U0-U1,inside,5,51,56,74,,-17.8..17.8
+main,U1,U1-L1,beyond,0,1,1,74,7.5,-17.8..17.8
+main,U1,U1-L1,inside,19,7,26,74,,-17.8..17.8
+main,U1,U1-L2,inside,27,14,41,74,,-17.8..17.8
+main,U1,U1-U2,inside,50,1,51,74,,-17.8..17.8
+main,L2,L0-L2,inside,14,70,84,74,,-17.8..17.8
+main,L2,L2-L4,inside,66,5,71,74,,-17.8..17.8
+main,L2,L2-U3,beyond,0,7,7,74,21.5,-17.8..17.8
+main,L2,L2-U3,inside,29,10,39,74,,-17.8..17.8
+main,L2,U1-L2,inside,27,9,36,74,,-17.8..17.8
+main,L2,U2-L2,inside,18,5,23,74,,-17.8..17.8
+main,U2,U1-U2,inside,5,28,33,74,,-17.8..17.8
+main,U2,U2-L2,inside,18,4,22,74,,-17.8..17.8
+main,U2,U2-U3,inside,32,0,32,74,,-17.8..17.8
+main,U3,L2-U3,beyond,0,3,3,75,11.5,-17.8..17.8
+main,U3,L2-U3,inside,28,7,35,75,,-17.8..17.8
+main,U3,U2-U3,beyond,0,1,1,75,0.9,-17.8..17.8
+main,U3,U2-U3,inside,5,64,69,75,,-17.8..17.8
+main,U3,U3-L3,inside,16,1,17,75,,-17.8..17.8
+main,U3,U3-L4,beyond,0,1,1,75,25.6,-17.8..17.8
+main,U3,U3-L4,inside,34,12,46,75,,-17.8..17.8
+main,U3,U3-U4,beyond,3,8,11,75,4.7,-17.8..17.8
+main,U3,U3-U4,inside,47,2,49,75,,-17.8..17.8
+main,L3,L2-L4,beyond,0,6,6,75,8.2,-17.8..17.8
+main,L3,L2-L4,inside,3,74,77,75,,-17.8..17.8
+main,L3,U3-L3,inside,16,6,22,75,,-17.8..17.8
+main,U4,U3-U4,inside,4,32,36,75,,-17.8..17.8
+main,U4,U4-L4,inside,16,5,21,75,,-17.8..17.8
+main,U4,U4-U5,beyond,4,3,7,75,6.2,-17.8..17.8
+main,U4,U4-U5,inside,32,2,34,75,,-17.8..17.8
+main,L4,L2-L4,inside,4,74,78,75,,-17.8..17.8
+main,L4,L4-L5,beyond,0,5,5,75,4.4,-17.8..17.8
+main,L4,L4-L5,inside,50,16,66,75,,-17.8..17.8
+main,L4,L4-U5,beyond,0,4,4,75,12.8,-17.8..17.8
+main,L4,L4-U5,inside,42,10,52,75,,-17.8..17.8
+main,L4,U3-L4,beyond,0,6,6,75,18.7,-17.8..17.8
+main,L4,U3-L4,inside,34,12,46,75,,-17.8..17.8
+main,L4,U4-L4,inside,13,1,14,75,,-17.8..17.8
+main,U5,L4-U5,inside,45,11,56,75,,-17.8..17.8
+main,U5,U4-U5,beyond,0,4,4,75,5.1,-17.8..17.8
+main,U5,U4-U5,inside,5,73,78,75,,-17.8..17.8
+main,U5,U5-L5,beyond,1,0,1,75,0.6,-17.8..17.8
+main,U5,U5-L5,inside,13,4,17,75,,-17.8..17.8
+main,U5,U5-L6,beyond,0,2,2,75,10.3,-17.8..17.8
+main,U5,U5-L6,inside,42,18,60,75,,-17.8..17.8
+main,U5,U5-U6,beyond,1,6,7,75,15.3,-17.8..17.8
+main,U5,U5-U6,inside,68,0,68,75,,-17.8..17.8
+main,L5,L4-L5,beyond,0,11,11,75,5.2,-17.8..17.8
+main,L5,L4-L5,inside,4,44,48,75,,-17.8..17.8
+main,L5,L5-L6,beyond,9,5,14,75,13.2,-17.8..17.8
+main,L5,L5-L6,inside,32,18,50,75,,-17.8..17.8
+main,L5,U5-L5,inside,16,6,22,75,,-17.8..17.8
+main,U6,U5-U6,beyond,0,22,22,76,16.2,-17.8..17.8
+main,U6,U5-U6,inside,5,27,32,76,,-17.8..17.8
+main,U6,U6-L6,beyond,0,1,1,76,1.6,-17.8..17.8
+main,U6,U6-L6,inside,16,3,19,76,,-17.8..17.8
+main,U6,U6-U7,beyond,19,3,22,76,14.8,-17.8..17.8
+main,U6,U6-U7,inside,24,1,25,76,,-17.8..17.8
+main,L6,L5-L6,beyond,0,14,14,76,12.1,-17.8..17.8
+main,L6,L5-L6,inside,5,79,84,76,,-17.8..17.8
+main,L6,L6-L7,inside,76,11,87,76,,-17.8..17.8
+main,L6,L6-U7,inside,54,14,68,76,,-17.8..17.8
+main,L6,U5-L6,beyond,0,5,5,76,15.3,-17.8..17.8
+main,L6,U5-L6,inside,43,18,61,76,,-17.8..17.8
+main,L6,U6-L6,beyond,0,2,2,76,9.2,-17.8..17.8
+main,L6,U6-L6,inside,11,5,16,76,,-17.8..17.8
+main,L6,unassigned,inside,3,0,3,76,,-17.8..17.8
+main,U7,L6-U7,beyond,1,0,1,76,13.5,-17.8..17.8
+main,U7,L6-U7,inside,46,22,68,76,,-17.8..17.8
+main,U7,U6-U7,beyond,0,11,11,76,12.1,-17.8..17.8
+main,U7,U6-U7,inside,5,64,69,76,,-17.8..17.8
+main,U7,U7-L7,beyond,1,1,2,76,9.2,-17.8..17.8
+main,U7,U7-L7,inside,13,7,20,76,,-17.8..17.8
+main,U7,U7-L8,beyond,1,2,3,76,26.8,-17.8..17.8
+main,U7,U7-L8,inside,42,12,54,76,,-17.8..17.8
+main,U7,U7-U8,beyond,0,6,6,76,5.7,-17.8..17.8
+main,U7,U7-U8,inside,64,0,64,76,,-17.8..17.8
+main,L7,L6-L7,beyond,0,20,20,76,13.4,-17.8..17.8
+main,L7,L6-L7,inside,6,42,48,76,,-17.8..17.8
+main,L7,L7-L8,beyond,19,4,23,76,13.4,-17.8..17.8
+main,L7,L7-L8,inside,27,16,43,76,,-17.8..17.8
+main,L7,U7-L7,beyond,0,1,1,76,4.8,-17.8..17.8
+main,L7,U7-L7,inside,20,8,28,76,,-17.8..17.8
+main,U8,U7-U8,beyond,0,17,17,77,15.4,-17.8..17.8
+main,U8,U7-U8,inside,4,24,28,77,,-17.8..17.8
+main,U8,U8-L8,beyond,0,1,1,77,2.1,-17.8..17.8
+main,U8,U8-L8,inside,21,10,31,77,,-17.8..17.8
+main,U8,U8-U9,beyond,17,0,17,77,15.1,-17.8..17.8
+main,U8,U8-U9,inside,32,1,33,77,,-17.8..17.8
+main,U8,unassigned,inside,6,3,9,77,,-17.8..17.8
+main,L8,L7-L8,beyond,0,11,11,77,12.8,-17.8..17.8
+main,L8,L7-L8,inside,8,79,87,77,,-17.8..17.8
+main,L8,L8-L9,inside,60,5,65,77,,-17.8..17.8
+main,L8,L8-U9,beyond,0,4,4,77,13.1,-17.8..17.8
+main,L8,L8-U9,inside,41,15,56,77,,-17.8..17.8
+main,L8,U7-L8,beyond,1,5,6,77,19.9,-17.8..17.8
+main,L8,U7-L8,inside,38,13,51,77,,-17.8..17.8
+main,L8,U8-L8,inside,8,2,10,77,,-17.8..17.8
+main,L8,unassigned,inside,2,0,2,77,,-17.8..17.8
+main,U9,L8-U9,beyond,0,7,7,77,22.2,-17.8..17.8
+main,U9,L8-U9,inside,52,15,67,77,,-17.8..17.8
+main,U9,U8-U9,beyond,4,24,28,77,12.3,-17.8..17.8
+main,U9,U8-U9,inside,15,75,90,77,,-17.8..17.8
+main,U9,U9-L10,beyond,0,4,4,77,24.6,-17.8..17.8
+main,U9,U9-L10,inside,37,16,53,77,,-17.8..17.8
+main,U9,U9-L9,beyond,2,4,6,77,13.1,-17.8..17.8
+main,U9,U9-L9,inside,35,8,43,77,,-17.8..17.8
+main,U9,U9-U10,beyond,22,0,22,77,9.0,-17.8..17.8
+main,U9,U9-U10,inside,59,1,60,77,,-17.8..17.8
+main,L9,L8-L9,beyond,0,18,18,77,13.6,-17.8..17.8
+main,L9,L8-L9,inside,4,50,54,77,,-17.8..17.8
+main,L9,L9-L10,beyond,19,0,19,77,13.5,-17.8..17.8
+main,L9,L9-L10,inside,34,10,44,77,,-17.8..17.8
+main,L9,U9-L9,beyond,0,6,6,77,5.0,-17.8..17.8
+main,L9,U9-L9,inside,24,19,43,77,,-17.8..17.8
+main,U10,U10-L10,beyond,0,14,14,78,12.2,-17.8..17.8
+main,U10,U10-L10,inside,24,3,27,78,,-17.8..17.8
+main,U10,U10-U11,beyond,22,0,22,78,19.5,-17.8..17.8
+main,U10,U10-U11,inside,42,0,42,78,,-17.8..17.8
+main,U10,U9-U10,beyond,0,23,23,78,20.8,-17.8..17.8
+main,U10,U9-U10,inside,10,34,44,78,,-17.8..17.8
+main,L10,L10-L11,beyond,0,3,3,78,0.7,-17.8..17.8
+main,L10,L10-L11,inside,87,12,99,78,,-17.8..17.8
+main,L10,L10-U11,beyond,0,10,10,78,27.1,-17.8..17.8
+main,L10,L10-U11,inside,72,23,95,78,,-17.8..17.8
+main,L10,L9-L10,beyond,0,9,9,78,5.8,-17.8..17.8
+main,L10,L9-L10,inside,14,93,107,78,,-17.8..17.8
+main,L10,U10-L10,inside,52,17,69,78,,-17.8..17.8
+main,L10,U9-L10,beyond,0,3,3,78,26.2,-17.8..17.8
+main,L10,U9-L10,inside,62,43,105,78,,-17.8..17.8
+main,U11,L10-U11,beyond,0,3,3,79,24.6,-17.8..17.8
+main,U11,L10-U11,inside,35,12,47,79,,-17.8..17.8
+main,U11,U10-U11,beyond,1,5,6,79,9.1,-17.8..17.8
+main,U11,U10-U11,inside,15,76,91,79,,-17.8..17.8
+main,U11,U11-L11,beyond,2,9,11,79,12.6,-17.8..17.8
+main,U11,U11-L11,inside,100,2,102,79,,-17.8..17.8
+main,U11,U11-L12,beyond,4,9,13,79,28.9,-17.8..17.8
+main,U11,U11-L12,inside,49,20,69,79,,-17.8..17.8
+main,U11,U11-U12,beyond,11,4,15,79,14.3,-17.8..17.8
+main,U11,U11-U12,inside,90,21,111,79,,-17.8..17.8
+main,L12,L11-L12,beyond,1,4,5,81,7.2,-17.8..17.8
+main,L12,L11-L12,inside,21,27,48,81,,-17.8..17.8
+main,L12,L12-L13,beyond,26,2,28,81,29.2,-17.8..17.8
+main,L12,L12-L13,inside,56,12,68,81,,-17.8..17.8
+main,L12,U11-L12,beyond,1,17,18,81,20.9,-17.8..17.8
+main,L12,U11-L12,inside,74,32,106,81,,-17.8..17.8
+main,L12,U12-L12,beyond,0,8,8,81,21.4,-17.8..17.8
+main,L12,U12-L12,inside,34,16,50,81,,-17.8..17.8
+main,U12,U11-U12,inside,0,65,65,81,,-17.8..17.8
+main,U12,U12-L12,beyond,3,1,4,81,15.1,-17.8..17.8
+main,U12,U12-L12,inside,62,4,66,81,,-17.8..17.8
+main,U12,U12-L13,beyond,5,7,12,81,27.3,-17.8..17.8
+main,U12,U12-L13,inside,46,20,66,81,,-17.8..17.8
+main,U12,U12-U13,beyond,1,0,1,81,0.1,-17.8..17.8
+main,U12,U12-U13,inside,75,12,87,81,,-17.8..17.8
+main,U13,U12-U13,beyond,0,3,3,82,0.5,-17.8..17.8
+main,U13,U12-U13,inside,1,54,55,82,,-17.8..17.8
+main,U13,U13-L13,inside,48,7,55,82,,-17.8..17.8
+main,U13,U13-L14,beyond,0,7,7,82,15.9,-17.8..17.8
+main,U13,U13-L14,inside,58,15,73,82,,-17.8..17.8
+main,U13,U13-U14,beyond,1,4,5,82,5.3,-17.8..17.8
+main,U13,U13-U14,inside,51,7,58,82,,-17.8..17.8
+main,U14,U13-U14,beyond,0,1,1,82,18.8,-17.8..17.8
+main,U14,U13-U14,inside,1,48,49,82,,-17.8..17.8
+main,U14,U14-L14,beyond,7,2,9,82,11.0,-17.8..17.8
+main,U14,U14-L14,inside,46,3,49,82,,-17.8..17.8
+main,U14,U14-L15,beyond,11,6,17,82,25.6,-17.8..17.8
+main,U14,U14-L15,inside,43,6,49,82,,-17.8..17.8
+main,U14,U14-U15,beyond,0,2,2,82,3.2,-17.8..17.8
+main,U14,U14-U15,inside,58,16,74,82,,-17.8..17.8
+main,U15,U14-U15,beyond,0,3,3,82,3.5,-17.8..17.8
+main,U15,U14-U15,inside,0,28,28,82,,-17.8..17.8
+main,U15,U15-L15,beyond,2,1,3,82,3.1,-17.8..17.8
+main,U15,U15-L15,inside,49,4,53,82,,-17.8..17.8
+main,U15,U15-L16,beyond,5,10,15,82,26.1,-17.8..17.8
+main,U15,U15-L16,inside,48,12,60,82,,-17.8..17.8
+main,U15,U15-U16,inside,49,19,68,82,,-17.8..17.8
+main,U16,U15-U16,beyond,0,10,10,87,5.0,-17.8..17.8
+main,U16,U15-U16,inside,8,47,55,87,,-17.8..17.8
+main,U16,U16-L16,beyond,6,3,9,87,19.2,-17.8..17.8
+main,U16,U16-L16,inside,47,5,52,87,,-17.8..17.8
+main,U16,U16-L17,beyond,4,3,7,87,31.9,-17.8..17.8
+main,U16,U16-L17,inside,41,15,56,87,,-17.8..17.8
+main,U16,U16-U17,beyond,2,1,3,87,1.9,-17.8..17.8
+main,U16,U16-U17,inside,53,5,58,87,,-17.8..17.8
+main,U17,U16-U17,beyond,0,5,5,87,13.9,-17.8..17.8
+main,U17,U16-U17,inside,5,59,64,87,,-17.8..17.8
+main,U17,U17-L17,beyond,3,0,3,87,1.1,-17.8..17.8
+main,U17,U17-L17,inside,46,3,49,87,,-17.8..17.8
+main,U17,U17-L18,beyond,1,6,7,87,32.0,-17.8..17.8
+main,U17,U17-L18,inside,49,15,64,87,,-17.8..17.8
+main,U17,U17-U18,beyond,2,0,2,87,1.1,-17.8..17.8
+main,U17,U17-U18,inside,54,14,68,87,,-17.8..17.8
+main,L17,L16-L17,beyond,0,1,1,87,26.7,-17.8..17.8
+main,L17,L16-L17,inside,4,48,52,87,,-17.8..17.8
+main,L17,L17-L18,beyond,1,1,2,87,19.9,-17.8..17.8
+main,L17,L17-L18,inside,46,12,58,87,,-17.8..17.8
+main,L17,U16-L17,beyond,2,3,5,87,35.6,-17.8..17.8
+main,L17,U16-L17,inside,54,10,64,87,,-17.8..17.8
+main,L17,U17-L17,beyond,0,3,3,87,9.6,-17.8..17.8
+main,L17,U17-L17,inside,35,2,37,87,,-17.8..17.8
+main,L17,unassigned,inside,1,19,20,87,,-17.8..17.8
+main,L15,L14-L15,beyond,2,32,34,86,25.8,-4.0..40.0
+main,L15,L14-L15,inside,7,51,58,86,,-4.0..40.0
+main,L15,L15-L16,beyond,22,0,22,86,18.6,-4.0..40.0
+main,L15,L15-L16,inside,75,38,113,86,,-4.0..40.0
+main,L15,U14-L15,beyond,0,1,1,86,1.1,-4.0..40.0
+main,L15,U14-L15,inside,50,28,78,86,,-4.0..40.0
+main,L15,U15-L15,beyond,0,4,4,86,13.0,-4.0..40.0
+main,L15,U15-L15,inside,60,8,68,86,,-4.0..40.0
+main,L15,unassigned,inside,0,12,12,86,,-4.0..40.0
+main,U18,U17-U18,inside,7,50,57,88,,-17.8..17.8
+main,U18,U18-L18,beyond,1,2,3,88,11.8,-17.8..17.8
+main,U18,U18-L18,inside,44,4,48,88,,-17.8..17.8
+main,U18,U18-L19,beyond,0,3,3,88,7.6,-17.8..17.8
+main,U18,U18-L19,inside,40,5,45,88,,-17.8..17.8
+main,U18,U18-U19,beyond,2,3,5,88,13.5,-17.8..17.8
+main,U18,U18-U19,inside,55,17,72,88,,-17.8..17.8
+main,U18,unassigned,inside,6,8,14,88,,-17.8..17.8
+main,U19,U18-U19,beyond,0,11,11,88,9.4,-17.8..17.8
+main,U19,U18-U19,inside,7,54,61,88,,-17.8..17.8
+main,U19,U19-L19,beyond,0,2,2,88,11.3,-17.8..17.8
+main,U19,U19-L19,inside,38,14,52,88,,-17.8..17.8
+main,U19,U19-L20,beyond,3,7,10,88,18.3,-17.8..17.8
+main,U19,U19-L20,inside,36,3,39,88,,-17.8..17.8
+main,U19,U19-U20,beyond,0,3,3,88,16.1,-17.8..17.8
+main,U19,U19-U20,inside,55,15,70,88,,-17.8..17.8
+main,U19,unassigned,inside,0,6,6,88,,-17.8..17.8
+main,L18,L17-L18,beyond,0,3,3,88,15.3,-17.8..17.8
+main,L18,L17-L18,inside,0,57,57,88,,-17.8..17.8
+main,L18,L18-L19,beyond,0,3,3,88,12.6,-17.8..17.8
+main,L18,L18-L19,inside,54,17,71,88,,-17.8..17.8
+main,L18,U17-L18,beyond,0,6,6,88,11.4,-17.8..17.8
+main,L18,U17-L18,inside,50,3,53,88,,-17.8..17.8
+main,L18,U18-L18,beyond,2,2,4,88,6.6,-17.8..17.8
+main,L18,U18-L18,inside,48,20,68,88,,-17.8..17.8
+main,L18,unassigned,inside,0,13,13,88,,-17.8..17.8
+main,U20,U19-U20,inside,5,61,66,89,,-17.8..17.8
+main,U20,U20-L20,inside,26,12,38,89,,-17.8..17.8
+main,U20,U20-L21,inside,33,18,51,89,,-17.8..17.8
+main,U20,U20-U21,inside,67,8,75,89,,-17.8..17.8
+main,U20,unassigned,inside,0,1,1,89,,-17.8..17.8
+main,L20,L19-L20,beyond,0,1,1,89,0.4,-17.8..17.8
+main,L20,L19-L20,inside,6,61,67,89,,-17.8..17.8
+main,L20,L20-L21,inside,59,16,75,89,,-17.8..17.8
+main,L20,U19-L20,beyond,1,3,4,89,4.9,-17.8..17.8
+main,L20,U19-L20,inside,44,10,54,89,,-17.8..17.8
+main,L20,U20-L20,inside,27,6,33,89,,-17.8..17.8
+main,L20,unassigned,inside,0,21,21,89,,-17.8..17.8

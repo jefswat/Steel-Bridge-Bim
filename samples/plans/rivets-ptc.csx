@@ -85,6 +85,52 @@ string[] skipWords = { "member splice detail", "flange plan view", "angle member
 bool Merged(string g) { var t = g.ToLowerInvariant(); return t.Contains("beyond") || t.Contains("below the gusset") || t.Contains("above the gusset") || t.Contains("free end") || t.Contains("end lap") || t.Contains("end ring") || t.Contains("end group") || t.Contains("block") || t.Contains("fill strip"); }
 double MainChordDia(char letter, int n) => (letter == 'U' ? (n >= 6 && n <= 13) || n >= 20 : (n >= 6 && n <= 15) || n >= 20) ? 1.25 : 1.125;
 
+// ---- step 2 (2026-10-21): symbol counts INSIDE the drawn gusset outlines per member (tools/ptc_rivet_count.py -> rivet-counts.csv; hand counts of
+// joints without an outline in rivet-counts-extra.csv) replace the gussets.csv rows at every joint they cover; 'beyond' rows = symbols drawn just
+// outside the outline in the member's band (fills / splice plates), placed beyond the gusset (TrussRivetGroup.Beyond).
+var detRows = Csv("rivet-counts.csv").Concat(File.Exists(Path.Combine(dataDir, "rivet-counts-extra.csv")) ? Csv("rivet-counts-extra.csv") : new List<Dictionary<string, string>>()).ToList();
+string SKey(string structure) => structure.Split(' ')[0];
+var det = detRows.Where(r => r["member"] != "unassigned" && r["member"] != "chord?" && r["member"] != "SKIP")
+    .GroupBy(r => (SKey(r["structure"]), r["joint"])).ToDictionary(g => g.Key, g => g.ToList());
+// joints drawn as "details not shown, similar to X" (truss-approach/joints.csv notes, gusset-outlines.csv also_applies_to, TRUSS-DESIGN.md section 15)
+var similar = new Dictionary<(string st, string pt), (string st, string pt, string page)>
+{
+    [("approach3", "U4")] = ("approach3", "U2", "p.51"), [("approach3", "U6")] = ("approach3", "U2", "p.51"), [("approach3", "U10")] = ("approach3", "U2", "p.53"),
+    [("approach3", "U12")] = ("approach3", "U2", "p.53"), [("approach3", "L3")] = ("approach3", "L1", "p.50"), [("approach3", "L5")] = ("approach3", "L1", "p.51"),
+    [("approach3", "L7")] = ("approach3", "L1", "p.52"), [("approach3", "L11")] = ("approach3", "L1", "p.53"),
+    [("approach4", "U4")] = ("approach4", "U2", "p.61"), [("approach4", "U6")] = ("approach4", "U2", "p.61"), [("approach4", "U8")] = ("approach4", "U2", "p.62"),
+    [("approach4", "U12")] = ("approach4", "U2", "p.64"), [("approach4", "U14")] = ("approach4", "U2", "p.65"), [("approach4", "U16")] = ("approach4", "U2", "p.65"),
+    [("approach4", "U18")] = ("approach4", "U2", "p.66"), [("approach4", "U10")] = ("approach3", "U8", "p.63"), [("approach4", "U20")] = ("approach3", "U8", "p.67"),
+    [("approach4", "L3")] = ("approach4", "L1", "p.60"), [("approach4", "L5")] = ("approach4", "L1", "p.61"), [("approach4", "L7")] = ("approach4", "L1", "p.62"),
+    [("approach4", "L9")] = ("approach4", "L1", "p.62"), [("approach4", "L11")] = ("approach4", "L1", "p.64"), [("approach4", "L13")] = ("approach4", "L1", "p.64"),
+    [("approach4", "L17")] = ("approach4", "L1", "p.66"), [("approach4", "L19")] = ("approach4", "L1", "p.66"),
+    [("main", "L1")] = ("main", "L3", "p.74"), [("main", "L16")] = ("main", "L15", "p.86"), [("main", "L19")] = ("main", "L18", "p.88"),
+    [("main", "U21")] = ("main", "U20", "p.89"), [("main", "L21")] = ("main", "L20", "p.89"),
+};
+// in-plane members of the first bridge of each structure (member classes of a source joint)
+var memsOf = new Dictionary<string, List<TrussMemberDefinition>>();
+foreach (var (key0, bridges0, _) in new[] { ("main", new[] { "PTC Arch truss 18-20" }, 22), ("approach3", new[] { "PTC 3-span truss 11-13", "PTC 3-span truss 25-27" }, 12), ("approach4", new[] { "PTC 4-span truss 14-17", "PTC 4-span truss 21-24" }, 20) })
+{
+    var b0 = bridges0.Select(n => Doc.Project.Bridges.FirstOrDefault(b => b.Name == n)).FirstOrDefault(b => b?.Truss != null);
+    if (b0 != null) memsOf[key0] = b0.Truss.Members.Where(m => !m.From.Contains(':') && !m.To.Contains(':')).ToList();
+}
+var cenOf = new Dictionary<string, int> { ["main"] = 22, ["approach3"] = 12, ["approach4"] = 20 };
+int OrdIn(string st, string pt) { var m = tokenRx.Match(pt); if (!m.Success) return -1000; int n = int.Parse(m.Groups[2].Value); return m.Groups[3].Value == "'" ? 2 * cenOf[st] - n : n; }
+bool IsChordRole(TrussMemberRole r) => r is TrussMemberRole.UpperChord or TrussMemberRole.LowerChord or TrussMemberRole.EndPost;
+// member class at a joint: CL / CR chord toward the lower / higher panel number (mirror swaps), CT chord passing through, V vertical, DL / DR diagonal
+string ClassAt(string st, TrussMemberDefinition m, string pt, bool mirror)
+{
+    if (m.From != pt && m.To != pt) return "CT";
+    string other = m.From == pt ? m.To : m.From;
+    int d = Math.Sign(OrdIn(st, other) - OrdIn(st, pt)); if (mirror) d = -d;
+    if (IsChordRole(m.Role)) return d < 0 ? "CL" : "CR";
+    var mo = tokenRx.Match(other); var mp = tokenRx.Match(pt);
+    if (mo.Success && mp.Success && mo.Groups[2].Value == mp.Groups[2].Value && OrdIn(st, other) == OrdIn(st, pt)) return "V";
+    if (mo.Success && mp.Success && mo.Groups[1].Value != mp.Groups[1].Value && mo.Groups[2].Value == mp.Groups[2].Value) return "V";
+    return d < 0 ? "DL" : "DR";
+}
+int detCount = 0;
+
 foreach (var (key, bridges, C) in structures)
 {
     var srows = rows.Where(r => r["structure"] == key && Count(r) > 0).ToList();
@@ -97,6 +143,7 @@ foreach (var (key, bridges, C) in structures)
         var br = Doc.Project.Bridges.FirstOrDefault(b => b.Name == bn);
         if (br?.Truss == null) { report.Add($"{bn}: no truss in this model - skipped"); continue; }
         var t = br.Truss;
+        t.RivetHeadsFlushAtSolePlates = true;   // heads that would bear into a shoe sole plate are countersunk flush (QC I020)
         foreach (var j in t.Joints) j.Rivets.Clear();
         foreach (var cr in thkCorr)
             foreach (Match m in tokenRx.Matches(cr["joint"]))
@@ -114,8 +161,9 @@ foreach (var (key, bridges, C) in structures)
         bool IsWeb(TrussMemberRole r) => r is TrussMemberRole.Diagonal or TrussMemberRole.Vertical or TrussMemberRole.Post or TrussMemberRole.Hanger;
         bool IsChord(TrussMemberRole r) => r is TrussMemberRole.UpperChord or TrussMemberRole.LowerChord or TrussMemberRole.EndPost;
         var groups = new Dictionary<(string pt, string mem), (int n, double dia, HashSet<string> flags, HashSet<string> src)>();
-        var skipped = new Dictionary<string, int>();
-        void Skip(string why, int n) => skipped[why] = skipped.GetValueOrDefault(why) + n;
+        var skippedList = new List<(string why, List<string> toks, int n)>();
+        List<string> curToks = new();
+        void Skip(string why, int n) => skippedList.Add((why, curToks, n));
         void Add(string pt, string mem, int n, double dia, string flag, string src)
         {
             if (n <= 0) return;
@@ -127,6 +175,7 @@ foreach (var (key, bridges, C) in structures)
         foreach (var r in srows)
         {
             var toks = tokenRx.Matches(r["joint"]).Select(m => m.Value).Distinct().ToList();
+            curToks = toks;
             if (toks.Count == 0) { Skip("joint not named", Count(r)); continue; }
             var (kind, side, member) = Classify(r["group"]);
             if (kind.StartsWith("skip:")) { Skip(kind.Substring(5), Count(r)); continue; }
@@ -194,6 +243,75 @@ foreach (var (key, bridges, C) in structures)
                 }
             }
         }
+        // ---- step 2: detector / hand counts per member at every joint they cover (own drawing, the other half of the unit, or a "similar to" joint)
+        string st = SKey(key);
+        var beyondGroups = new List<(string pt, string mem, int n, double dia, double len, string flag, string src)>();
+        var newPts = new HashSet<string>();
+        var jointPts = mems.SelectMany(m => new[] { m.From, m.To }).Where(p => tokenRx.IsMatch(p)).Distinct().OrderBy(p => p, StringComparer.Ordinal).ToList();
+        foreach (var pt in jointPts)
+        {
+            curToks = new List<string> { pt };
+            var at = mems.Where(m => m.From == pt || m.To == pt).ToList();
+            if (!at.Any(m => IsWeb(m.Role))) continue;
+            var thr = mems.Where(m => IsChord(m.Role) && m.From[0] == pt[0] && m.To[0] == pt[0] && tokenRx.IsMatch(m.From) && tokenRx.IsMatch(m.To)
+                && Math.Min(Ord(m.From), Ord(m.To)) < Ord(pt) && Math.Max(Ord(m.From), Ord(m.To)) > Ord(pt)).Take(1).ToList();
+            if (!at.Any(m => IsChord(m.Role)) && thr.Count == 0) continue;
+            bool primed = pt.EndsWith("'");
+            string cp = primed ? pt.TrimEnd('\'') : pt + "'";
+            List<Dictionary<string, string>>? src = null; string sst = st, spt = pt; bool mirror = false; string how = "";
+            if (det.TryGetValue((st, pt), out var own)) { src = own; }
+            else if (det.TryGetValue((st, cp), out var oth)) { src = oth; spt = cp; mirror = true; how = $" (counts of {cp}, the other half of the unit, mirrored)"; }
+            else if (similar.TryGetValue((st, pt.TrimEnd('\'')), out var sim) && (det.TryGetValue((sim.st, sim.pt), out var srow) || det.TryGetValue((sim.st, sim.pt + "'"), out srow)))
+            {
+                src = srow; sst = sim.st; spt = srow[0]["joint"]; mirror = primed != spt.EndsWith("'");
+                how = $" ({sim.page}: details not shown, similar to {(sim.st == st ? "" : sim.st.Replace("approach3", "3-span ").Replace("approach4", "4-span "))}{spt} - its counts{(mirror ? ", mirrored" : "")})";
+            }
+            if (src == null || !memsOf.ContainsKey(sst)) continue;
+            // target members by class
+            var targets = at.Concat(thr).Select(m => (m, cls: ClassAt(st, m, pt, mirror))).ToList();
+            TrussMemberDefinition? Target(string cls)
+            {
+                var hit = targets.FirstOrDefault(x => x.cls == cls).m;
+                if (hit != null) return hit;
+                if (cls is "CL" or "CR") return targets.FirstOrDefault(x => x.cls == "CT").m ?? targets.FirstOrDefault(x => x.cls is "CL" or "CR").m;
+                if (cls is "DL" or "DR") return targets.FirstOrDefault(x => x.cls is "DL" or "DR").m;
+                return null;
+            }
+            foreach (var k2 in groups.Keys.Where(k => k.pt == pt).ToList()) groups.Remove(k2);
+            newPts.Add(pt);
+            foreach (var r in src)
+            {
+                var sm = memsOf[sst].FirstOrDefault(m => m.Name == r["member"]);
+                if (sm == null) { Skip("counted member not in the model", Int(r["total"]) ?? 0); continue; }
+                string cls = ClassAt(sst, sm, spt, false);
+                int nShop = Int(r["shop_dots"]) ?? 0, nField = Int(r["field_rings"]) ?? 0, n = nShop + nField;
+                if (n <= 0) continue;
+                var targetsFor = new List<TrussMemberDefinition>();
+                if (cls == "CT" && Target("CT") == null) targetsFor.AddRange(new[] { Target("CL"), Target("CR") }.Where(x => x != null).Distinct()!);
+                else if (Target(cls) is { } tm) targetsFor.Add(tm);
+                if (targetsFor.Count == 0) { Skip($"no {cls} member at the joint for the counted {r["member"]}", n); continue; }
+                string pg = r["page"], conf = r.GetValueOrDefault("confidence") is { Length: > 0 } cf ? cf : "medium";
+                string note = r.GetValueOrDefault("note") ?? "";
+                bool inside = r["region"] == "inside";
+                string flag = U("p." + pg, "rivet positions", (note.Length > 0 ? note + "; " : "")
+                    + $"the joint sheet draws the rivets (solid = shop, ring = field) without pitch or gage; the count is the number of symbols drawn {(inside ? "inside the gusset outline" : "just outside the gusset outline in the member's band (fills / splice plates)")}"
+                    + $" (tools/ptc_rivet_count.py, checked on overlays; {conf} confidence, about +-10 %: rivets drawn in profile, text and plate edges can read as symbols){how}",
+                    "count as drawn on each " + (inside ? "gusset face" : "member face") + " of both trusses (and both halves of a symmetric unit); positions derived: even square grid over "
+                    + (inside ? "the lap the gusset shares with the member" : "the member band beyond the gusset edge") + ", 1.5 d edge distance, a clean plate stack under both heads.");
+                string srcTxt = $"rivet-counts p.{pg} {(inside ? "inside" : "beyond")} {sst} {spt} {r["member"]} ({nShop} shop + {nField} field)";
+                for (int q = 0; q < targetsFor.Count; q++)
+                {
+                    var tm = targetsFor[q];
+                    int nq = n / targetsFor.Count + (q < n % targetsFor.Count ? 1 : 0);
+                    double dia = key != "main" ? 1.0 : IsChord(tm.Role) ? MainChordDia(pt[0], int.Parse(tokenRx.Match(pt).Groups[2].Value))
+                        : ((pt.TrimEnd('\'') == "U11" && tm.Name.Contains("U11")) || (pt.TrimEnd('\'') == "L11" && tm.Name.Replace("'", "") == "U11-L11")) ? 1.25 : 1.125;
+                    if (inside) Add(pt, tm.Name, nq, dia, flag, srcTxt);
+                    else if (n >= 2 && Num(r.GetValueOrDefault("beyond_extent_in") ?? "") is double ext)
+                        beyondGroups.Add((pt, tm.Name, nq, dia, In(ext + 1.5), flag, srcTxt));
+                }
+                detCount += n;
+            }
+        }
         int nGroups = 0, perFace = 0;
         foreach (var ((pt, mem), g) in groups.OrderBy(x => x.Key.pt, StringComparer.Ordinal).ThenBy(x => x.Key.mem, StringComparer.Ordinal))
         {
@@ -206,14 +324,29 @@ foreach (var (key, bridges, C) in structures)
             });
             nGroups++; perFace += g.n;
         }
-        report.Add($"{bn}: {nGroups} rivet groups at {groups.Keys.Select(k => k.pt).Distinct().Count()} joints, {perFace} rivets per gusset face (x 2 faces x {t.Planes.Count} trusses = {perFace * 2 * t.Planes.Count}); "
+        int nBeyond = 0;
+        foreach (var bg in beyondGroups.OrderBy(x => x.pt, StringComparer.Ordinal).ThenBy(x => x.mem, StringComparer.Ordinal))
+        {
+            var jd = t.Joints.LastOrDefault(x => x.Point == bg.pt && x.Plane.Length == 0);
+            if (jd == null) { jd = new TrussJointDefinition { Point = bg.pt, Source = "rivets-ptc.csx" }; t.Joints.Add(jd); }
+            jd.Rivets.Add(new TrussRivetGroup
+            {
+                Member = bg.mem, Count = bg.n, Diameter = In(bg.dia), Distributed = true, Beyond = true, BeyondLength = bg.len, Material = HsRivet, Unresolved = bg.flag, Source = bg.src,
+            });
+            nBeyond += bg.n;
+        }
+        // skipped rows of the joints that now have symbol counts are superseded
+        var skipped = skippedList.Where(x => !x.toks.All(newPts.Contains) || x.why.StartsWith("no ") || x.why.StartsWith("counted"))
+            .GroupBy(x => x.why).ToDictionary(g => g.Key, g => g.Sum(x => x.n));
+        report.Add($"{bn}: {nGroups} rivet groups at {groups.Keys.Select(k => k.pt).Distinct().Count()} joints ({newPts.Count} from the symbol counts), {perFace} rivets per gusset face + {nBeyond} per member face beyond the gussets "
+            + $"(x 2 faces x {t.Planes.Count} trusses = {(perFace + nBeyond) * 2 * t.Planes.Count}); "
             + $"{diaChanged} row diameters set by the p.70 rule; not placed per face: {(skipped.Count == 0 ? "none" : string.Join(", ", skipped.OrderByDescending(x => x.Value).Select(x => $"{x.Key} {x.Value}")))}");
         // the generic "rivets are not placed" flags of the truss scripts are superseded
         t.Unresolved.RemoveAll(s => s.Contains("rivets are not placed") || s.Contains("rivets (rivets-ptc.csx)"));
         if (skipped.Count > 0)
             t.Unresolved.Add(U(key == "main" ? "p.73-90" : key.StartsWith("approach3") ? "p.50-53" : "p.59-67", "rivets (rivets-ptc.csx) of the parts not modeled",
                 $"the counted groups on cover plate splices (flange plan views), member splice details, lug / diaphragm / bracing / strut / shoe connections, secondary angle members and stubs belong to parts the model does not have ({skipped.Values.Sum()} per gusset face)",
-                "not placed; joints without a count (p.74-87 web groups not counted, p.50 U1-L3) have no rivets."));
+                "not placed (connection parts not modeled yet: step 3, connection angles, comes later)."));
     }
 }
 
@@ -223,6 +356,7 @@ foreach (var name in new[] { "PTC Girder spans 1-10", "PTC Girder spans 28-31" }
     var br = Doc.Project.Bridges.FirstOrDefault(b => b.Name == name);
     if (br?.Truss == null) { report.Add($"{name}: no truss - skipped"); continue; }
     var t = br.Truss;
+    t.RivetHeadsFlushAtSolePlates = true;   // bottom cover plate heads over the shoe sole plates are countersunk flush (QC I020)
     var g1 = t.Section("G1");
     double tw = g1!.WebPlies[0].Thickness, heel = g1.WebDepth / 2 + g1.AngleProjection, ta = In(1.125);
     double pitch = In(7), first = In(2);

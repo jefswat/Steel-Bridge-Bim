@@ -47,6 +47,11 @@ public sealed class TrussDefinition
     /// stringers and hand rails) or across it at a station (expansion dam plates), positioned from the finished grade (<see cref="TrussLineItemDefinition"/>).</summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public List<TrussLineItemDefinition>? LineItems { get; set; }
+    /// <summary>OPTIONAL (omitted when false): rivet heads that would bear into a shoe sole plate (rivet lines of plate girders / joint rivets over the
+    /// shoe) are COUNTERSUNK and chipped flush on that face (the sole plate bears on a finished surface): the rivet keeps its button head on the other
+    /// face only (<see cref="Steel.BoltInstance.FlushEnd"/>); one Info line counts them.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public bool RivetHeadsFlushAtSolePlates { get; set; }
 
     public TrussSectionDefinition? Section(string name) => Sections.FirstOrDefault(s => string.Equals(s.Name, name, StringComparison.OrdinalIgnoreCase));
     public TrussPlaneDefinition? Plane(string name) => Planes.FirstOrDefault(s => string.Equals(s.Name, name, StringComparison.OrdinalIgnoreCase));
@@ -515,6 +520,15 @@ public sealed class TrussRivetGroup
     /// status) and raised once as a warning.</summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? Unresolved { get; set; }
+    /// <summary>OPTIONAL (omitted when false; <see cref="Distributed"/> groups): the rivets lie on the member JUST OUTSIDE the gusset (fill / splice plate
+    /// zone the joint sheets draw beyond the gusset edge): spread over the member band from the outline edge outward over <see cref="BeyondLength"/>,
+    /// heads on the member face (or on the joint's web outside splice / fill plates there), grip = those plates + the member plate stack + inside splice
+    /// plates. They are not part of the gusset rivet cover check.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public bool Beyond { get; set; }
+    /// <summary>OPTIONAL length of the band beyond the gusset edge (m; 0 = 0.6 m), e.g. the extent of the drawn field.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public double BeyondLength { get; set; }
 }
 
 /// <summary>

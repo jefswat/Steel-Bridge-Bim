@@ -82,6 +82,99 @@ public static class TrussGenerator
             l.Add((new Vec2(Vec3.Dot(w, c.U), Vec3.Dot(w, c.V)), e));
         }
         private readonly List<(string plane, string point, Vec3 P, Vec3 ax, Vec3 yv, double a0, double a1, double y0, double y1, double t)> _insidePlates = new();
+        /// <summary>Web OUTSIDE splice / fill plates of the joints (rivets beyond the gusset have their head on them).</summary>
+        private readonly List<(string plane, string point, Vec3 P, Vec3 ax, Vec3 yv, double a0, double a1, double y0, double y1, double t)> _outsidePlates = new();
+        /// <summary>Rivets placed on each joint face (joint u, v and diameter): later groups keep their heads clear of earlier ones (no rivet on top of another).</summary>
+        private readonly Dictionary<(string plane, string point), List<(Vec2 uv, double dia)>> _occupied = new();
+        private readonly Dictionary<(Inst m, long y, int sx, long mask, long dia), (double xo, double t)?> _runCache = new();
+
+        /// <summary>The member's section along a shank line normal to the truss plane at <paramref name="at"/>, on section side <paramref name="sx"/>
+        /// (+1 = +x): (|x| of the outermost solid face, thickness of the CONTIGUOUS solid inward from it). Sampled on the shank axis and at both edges of the
+        /// shank: null when the member has no material there or the three runs differ by more than 1/16" (the shank would cut an angle root, a web /
+        /// flange across the shank, a plate edge or a partial cover plate end - a rivet is never driven there).</summary>
+        private (double xo, double t)? SectionRun(Inst m, Vec3 at, int sx, double dia)
+        {
+            if (m.Sec.Pieces.Count == 0) return null;
+            double len = (m.B - m.A).Length, cut = len - m.SA - m.SB;
+            double s = Vec3.Dot(at - (m.A + m.Axis * m.SA), m.Axis);
+            if (s < -1e-4 || s > cut + 1e-4) return null;
+            double y = Vec3.Dot(at - m.A, m.Y) - m.Def.OffsetZ;
+            long mask = 0;
+            for (int i = 0; i < m.Sec.Pieces.Count && i < 62; i++)
+                if (PieceSpan(m, m.Sec.Pieces[i], cut) is { } sp && s >= sp.ps - 1e-6 && s <= sp.ps + sp.pl + 1e-6) mask |= 1L << i;
+            var key = (m, (long)Math.Round(y * 1e4), sx, mask, (long)Math.Round(dia * 1e5));
+            if (_runCache.TryGetValue(key, out var hit)) return hit;
+            (double xo, double t)? Run(double yy)
+            {
+                var iv = new List<(double lo, double hi)>();
+                for (int i = 0; i < m.Sec.Pieces.Count; i++)
+                {
+                    if (i < 62 && (mask & (1L << i)) == 0) continue;
+                    var poly = m.Sec.Pieces[i].Polygon;
+                    var xs = new List<double>();
+                    for (int a = 0, b = poly.Length - 1; a < poly.Length; b = a++)
+                    {
+                        var p = poly[a]; var q = poly[b];
+                        if ((p.Y > yy) == (q.Y > yy)) continue;
+                        xs.Add(sx * (p.X + (q.X - p.X) * (yy - p.Y) / (q.Y - p.Y)));
+                    }
+                    xs.Sort();
+                    for (int k = 0; k + 1 < xs.Count; k += 2) iv.Add((xs[k], xs[k + 1]));
+                }
+                if (iv.Count == 0) return null;
+                iv.Sort((p, q) => q.hi.CompareTo(p.hi));
+                double xo = iv[0].hi, lo = iv[0].lo;
+                bool grew = true;
+                while (grew)
+                {
+                    grew = false;
+                    foreach (var (l, h) in iv)
+                        if (l < lo - 1e-9 && h >= lo - 5e-4) { lo = l; grew = true; }
+                }
+                // a stack that reaches the section centre is a web / plate ACROSS the shank (rolled shapes turned with their web across the plane)
+                if (lo <= 1e-4) return null;
+                return (xo, xo - lo);
+            }
+            double r = dia / 2, tol = In(1.0 / 16);
+            var mid = Run(y);
+            var lo1 = Run(y - r);
+            var hi1 = Run(y + r);
+            (double xo, double t)? res = mid is { } b0 && lo1 is { } a0 && hi1 is { } c0
+                && Math.Abs(a0.xo - b0.xo) <= tol && Math.Abs(c0.xo - b0.xo) <= tol && Math.Abs(a0.t - b0.t) <= tol && Math.Abs(c0.t - b0.t) <= tol ? b0 : null;
+            _runCache[key] = res;
+            return res;
+        }
+
+        /// <summary>Thickness of the joint's web plates over a point: inside (WebInside) or outside (WebOutside, fills included) stacks.</summary>
+        private static double PlatesAt(List<(string plane, string point, Vec3 P, Vec3 ax, Vec3 yv, double a0, double a1, double y0, double y1, double t)> plates, JointCtx c, Vec3 at)
+        {
+            double g = 0;
+            foreach (var ip in plates)
+            {
+                if (ip.plane != c.Plane.ToUpperInvariant() || ip.point != c.Point.ToUpperInvariant()) continue;
+                var w = at - ip.P;
+                double a = Vec3.Dot(w, ip.ax), y = Vec3.Dot(w, ip.yv);
+                if (a >= ip.a0 && a <= ip.a1 && y >= ip.y0 && y <= ip.y1) g += ip.t;
+            }
+            return g;
+        }
+
+        private bool Free(JointCtx c, Vec2 uv, double dia)
+        {
+            if (!_occupied.TryGetValue((c.Plane, c.Point), out var l)) return true;
+            foreach (var (q, d) in l)
+            {
+                double min = 0.8 * (dia + d);   // button heads (1.6 d) at most touching
+                double dx = q.X - uv.X, dy = q.Y - uv.Y;
+                if (dx * dx + dy * dy < min * min - 1e-12) return false;
+            }
+            return true;
+        }
+        private void Occupy(JointCtx c, Vec2 uv, double dia)
+        {
+            if (!_occupied.TryGetValue((c.Plane, c.Point), out var l)) _occupied[(c.Plane, c.Point)] = l = new();
+            l.Add((uv, dia));
+        }
 
         public Gen(BridgeFraming f, UnitSystem u) { _f = f; _b = f.Definition; _d = f.Definition.Truss!; _al = f.Alignment; _u = u; }
 
@@ -138,6 +231,7 @@ public static class TrussGenerator
             if (_d.LineItems != null) foreach (var li in _d.LineItems) BuildLineItem(li);
             foreach (var s in _d.Suspenders) BuildSuspender(s);
             for (int i = 0; i < _d.Shoes.Count; i++) BuildShoe(_d.Shoes[i], i);
+            if (_d.RivetHeadsFlushAtSolePlates) FlushRivetsAtSolePlates();
             if (_d.PlanSteelWeightLb > 0)
             {
                 double lb = steel.SteelMass * 2.20462262;
@@ -741,6 +835,54 @@ public static class TrussGenerator
             Model.Steel.Bolts.Add(new BoltInstance { Frame = new Frame3(origin, xx, yy, zz), Grip = g, Length = g, Assembly = asm, Kind = BoltKind.Rivet, Diameter = dia, Material = material, Assumption = asu });
         }
 
+        /// <summary><see cref="TrussDefinition.RivetHeadsFlushAtSolePlates"/>: a rivet whose button head would lie inside a shoe sole plate gets that head
+        /// countersunk flush (the frame is turned so the flush head is the far end).</summary>
+        private void FlushRivetsAtSolePlates()
+        {
+            var soles = Model.Steel.Parts.Where(p => p.Category == PartCategory.SolePlate && p.Mesh is { IsEmpty: false }).Select(p =>
+            {
+                var mesh = p.Mesh;
+                var b = mesh.Bounds();
+                var cen = (b.Min + b.Max) * 0.5;
+                var planes = new List<(Vec3 n, double d)>();
+                for (int i = 0; i + 2 < mesh.Indices.Count; i += 3)
+                {
+                    var a = mesh.Positions[mesh.Indices[i]];
+                    var n = Vec3.Cross(mesh.Positions[mesh.Indices[i + 1]] - a, mesh.Positions[mesh.Indices[i + 2]] - a);
+                    if (n.Length < 1e-12) continue;
+                    n = n.Normalized();
+                    double d = Vec3.Dot(n, a);
+                    if (Vec3.Dot(n, cen) - d > 0) { n = -n; d = -d; }   // outward = away from the centre (convex plate)
+                    planes.Add((n, d));
+                }
+                return (b, planes);
+            }).ToList();
+            if (soles.Count == 0) return;
+            bool Inside(Vec3 q) => soles.Any(s => q.X >= s.b.Min.X && q.X <= s.b.Max.X && q.Y >= s.b.Min.Y && q.Y <= s.b.Max.Y && q.Z >= s.b.Min.Z && q.Z <= s.b.Max.Z
+                && s.planes.All(pl => Vec3.Dot(pl.n, q) - pl.d < -0.001));
+            int n = 0;
+            var bolts = Model.Steel.Bolts;
+            for (int i = 0; i < bolts.Count; i++)
+            {
+                var b = bolts[i];
+                if (b.Kind != BoltKind.Rivet || b.FlushEnd) continue;
+                double hh = 0.6 * b.Diameter;
+                var z = b.Frame.Z;
+                var near = b.Frame.Origin - z * (hh / 2);
+                var far = b.Frame.Origin + z * (b.Grip + hh / 2);
+                bool inNear = Inside(near), inFar = Inside(far);
+                if (!inNear && !inFar) continue;
+                var fr = inNear ? new Frame3(b.Frame.Origin + z * b.Grip, b.Frame.X, -b.Frame.Y, -z) : b.Frame;
+                bolts[i] = new BoltInstance
+                {
+                    Frame = fr, Grip = b.Grip, Length = b.Length, Assembly = b.Assembly, Kind = b.Kind, Diameter = b.Diameter, Embedment = b.Embedment,
+                    Assumption = b.Assumption, TopHeight = b.TopHeight, Material = b.Material, FlushEnd = true,
+                };
+                n++;
+            }
+            if (n > 0) Info($"Truss: {n} rivet heads on the shoe sole plate contact faces are countersunk and chipped flush (one button head each){Src}.");
+        }
+
         private void PlaceJointRivets()
         {
             foreach (var c in _jointRivets)
@@ -916,6 +1058,8 @@ public static class TrussGenerator
             double dia = rg.Diameter > 0 ? rg.Diameter : _d.JointDefaults.RivetDiameter;
             if (dia <= 0 || count <= 0) { Warn($"Truss: rivets of joint {c.Point} member {m.Mark} - diameter / count missing; not placed."); return; }
             double e = rg.EdgeDistance > 0 ? rg.EdgeDistance : 1.5 * dia;
+            bool beyond = rg.Beyond;
+            double beyondLen = rg.BeyondLength > 0 ? rg.BeyondLength : 0.6;
             var regions = LapRegions(c, m);
             double area = regions.Sum(p => Math.Abs(MeshBuilder.SignedArea(p)));
             if (area <= 0) { Warn($"Truss: rivets of joint {c.Point} ({c.Plane}) member {m.Mark} - the member does not lap the gusset; {count} rivets not placed."); return; }
@@ -923,7 +1067,13 @@ public static class TrussGenerator
             bool through = !start && !(m.PlaneB.Equals(c.Plane, StringComparison.OrdinalIgnoreCase) && m.PointB.Equals(c.Point, StringComparison.OrdinalIgnoreCase));
             var dirs = through ? new[] { m.Axis, -m.Axis } : new[] { Away(m, start) };
             double yc = (m.Sec.WebDepth > 0 ? m.Sec.WebCenterY : (m.Sec.YMin + m.Sec.YMax) / 2) + m.Def.OffsetZ;
-            // candidates on a square grid aligned with the member: rows across at spacing s centred on the band, columns from the member end + e
+            double half = (m.Sec.WebDepth > 0 ? m.Sec.WebDepth : m.Sec.Depth) / 2;
+            int sxPos = Vec3.Dot(m.X, c.N) >= 0 ? 1 : -1;
+            bool sectionRule = m.Sec.Pieces.Count > 0;
+            // beyond the gusset: the member band from the outline edge outward over the given length
+            if (beyond) area = dirs.Length * beyondLen * 2 * Math.Max(half - e, dia);
+            (double xo, double t)? RunAt(Vec3 c0, int side) => sectionRule ? SectionRun(m, c0, side * sxPos, dia) : (0, 0);
+            // a candidate needs a clean plate stack under both heads (section rule), a free spot on the gusset face and (beyond) to lie outside the outline
             List<(double t, double y, Vec3 d1)> Grid(double s)
             {
                 var pts = new List<(double, double, Vec3)>();
@@ -932,47 +1082,74 @@ public static class TrussGenerator
                     var d1 = dirs[di];
                     var reg = regions.Count == dirs.Length ? regions[di] : regions[Math.Min(di, regions.Count - 1)];
                     double t0 = through ? 0 : Math.Max(0, start ? m.SA : m.SB);
-                    // extent of the region along the member
                     var duv = new Vec2(Vec3.Dot(d1, c.U), Vec3.Dot(d1, c.V));
                     var yuv = new Vec2(Vec3.Dot(m.Y, c.U), Vec3.Dot(m.Y, c.V));
                     double tMax = reg.Max(q => q.X * duv.X + q.Y * duv.Y);
-                    double half = (m.Sec.WebDepth > 0 ? m.Sec.WebDepth : m.Sec.Depth) / 2;
+                    double ta = beyond ? Math.Max(t0, tMax) + e : t0 + (through ? s / 2 : e);
+                    double tb = beyond ? Math.Max(t0, tMax) + beyondLen : tMax;
                     int rows = Math.Max(1, (int)Math.Floor((2 * (half - e)) / s + 1e-9) + 1);
-                    for (double t = t0 + (through ? s / 2 : e); t <= tMax + 1e-9; t += s)
+                    for (double t = ta; t <= tb + 1e-9; t += s)
                         for (int r = 0; r < rows; r++)
                         {
                             double y = yc + (r - (rows - 1) / 2.0) * s;
                             var q = new Vec2(duv.X * t + yuv.X * y, duv.Y * t + yuv.Y * y);
-                            if (Inside(reg, q, e)) pts.Add((t, y, d1));
+                            if (beyond ? EdgeDistance(c.Outline, q) > -e : !Inside(reg, q, e)) continue;
+                            if (!beyond && !Free(c, q, dia)) continue;
+                            if (sectionRule)
+                            {
+                                var c0 = c.P + d1 * t + m.Y * y;
+                                if (RunAt(c0, -1) == null || RunAt(c0, 1) == null) continue;
+                            }
+                            pts.Add((t, y, d1));
                         }
                 }
                 return pts;
             }
-            double s0 = Math.Sqrt(area / count), s = 1.3 * s0;
+            double sMin = 1.6 * dia;   // button heads (1.6 d) at most touching
+            double s0 = Math.Sqrt(area / count), s = Math.Max(sMin, 1.3 * s0);
             var cand = Grid(s);
-            for (int it = 0; it < 200 && cand.Count < count && s > 0.3 * dia; it++) { s *= 0.97; cand = Grid(s); }
+            for (int it = 0; it < 200 && cand.Count < count && s > sMin + 1e-9; it++) { s = Math.Max(sMin, s * 0.97); cand = Grid(s); }
             if (cand.Count < count)
             {
-                Warn($"Truss CHECK joint {c.Point} ({c.Plane}) member {m.Mark}: {count} rivets do not fit the lap area ({area / 0.00064516:0} sq in) even at {TrussSections.FormatIn(s)} spacing; {cand.Count} placed.");
+                Warn($"Truss CHECK joint {c.Point} ({c.Plane}) member {m.Mark}: {count} rivets{(beyond ? " beyond the gusset" : "")} do not fit {(beyond ? "the member band" : $"the lap area ({area / 0.00064516:0} sq in)")} at the {TrussSections.FormatIn(s)} minimum spacing (heads touching){(sectionRule ? ", on a clean plate stack" : "")} and clear of the rivets already placed; {cand.Count} placed.");
                 count = cand.Count;
             }
-            if (s < 3 * dia - 1e-6)
+            if (s < 3 * dia - 1e-6 && count > 0)
             {
-                // under the 3 d minimum spacing: one summary CHECK per bridge (the group lines are Info); heads overlapping (< 1.6 d) = own warning
-                string txt = $"Truss CHECK joint {c.Point} ({c.Plane}) member {m.Mark}: {count} rivets {TrussSections.FormatIn(dia)} per gusset face on {area / 0.00064516:0} sq in of lap need a {TrussSections.FormatIn(s)} grid, under 3 diameters - count or lap area (gusset envelope) disagree.";
-                if (s < 1.6 * dia) Warn(txt + " The rivet heads overlap."); else Info(txt);
+                Info($"Truss CHECK joint {c.Point} ({c.Plane}) member {m.Mark}: {count} rivets {TrussSections.FormatIn(dia)} per {(beyond ? "member face beyond the gusset" : "gusset face")} on {area / 0.00064516:0} sq in need a {TrussSections.FormatIn(s)} grid, under 3 diameters - count or lap area disagree.");
                 _tightGroups++; _tightest = Math.Min(_tightest, s / dia);
             }
             var pick = cand.OrderBy(q => q.t).ThenBy(q => Math.Abs(q.y - yc)).ThenBy(q => q.y).Take(count).ToList();
-            var asu = RivetFlag(rg.Unresolved, "count as read; positions on an even square grid over the gusset / member lap (pitch / gage not printed)");
+            var asu = RivetFlag(rg.Unresolved, beyond
+                ? "count as read; positions on an even square grid over the member band just outside the gusset (fills / splice plates; pitch / gage not printed)"
+                : "count as read; positions on an even square grid over the gusset / member lap (pitch / gage not printed)");
             foreach (var (t, y, d1) in pick)
             {
                 var c0 = c.P + d1 * t + m.Y * y;
-                NoteRivet(c, c0, e);
+                var w = c0 - c.P;
+                var uv = new Vec2(Vec3.Dot(w, c.U), Vec3.Dot(w, c.V));
+                if (!beyond) { NoteRivet(c, c0, e); Occupy(c, uv, dia); }
+                double ins = IsChord(m.Def.Role) ? PlatesAt(_insidePlates, c, c0) : 0;
                 foreach (int side in new[] { -1, 1 })
-                    AddRivet(c0 + c.N * (side * (c.X + StackAt(c, c0))), c.N * (-side), d1, Grip(c, m, c0), dia, c.Asm, rg.Material, asu);
+                {
+                    var run = RunAt(c0, side);
+                    if (beyond)
+                    {
+                        double xo = sectionRule ? run!.Value.xo : (m.Sec.WebOuterX > 0 ? m.Sec.WebOuterX : m.Sec.HalfWidth);
+                        double tt = sectionRule ? run!.Value.t : m.Sec.OuterPly;
+                        double outs = PlatesAt(_outsidePlates, c, c0);
+                        AddRivet(c0 + c.N * (side * (xo + outs)), c.N * (-side), d1, outs + tt + ins, dia, c.Asm, rg.Material, asu);
+                    }
+                    else if (sectionRule)
+                    {
+                        // gusset stack + the gap to the member face (fills) + the contiguous member plates + inside splice plates
+                        double g = StackAt(c, c0) + Math.Max(0, c.X - run!.Value.xo) + run.Value.t + ins;
+                        AddRivet(c0 + c.N * (side * (c.X + StackAt(c, c0))), c.N * (-side), d1, g, dia, c.Asm, rg.Material, asu);
+                    }
+                    else AddRivet(c0 + c.N * (side * (c.X + StackAt(c, c0))), c.N * (-side), d1, Grip(c, m, c0), dia, c.Asm, rg.Material, asu);
+                }
             }
-            Info($"Truss: joint {c.Point} ({c.Plane}) member {m.Mark}: {2 * count} rivets {TrussSections.FormatIn(dia)} ({count} per gusset face, grid {TrussSections.FormatIn(s)}){(rg.Source.Length > 0 ? " (" + rg.Source + ")" : "")}.");
+            Info($"Truss: joint {c.Point} ({c.Plane}) member {m.Mark}: {2 * count} rivets {TrussSections.FormatIn(dia)} ({count} per {(beyond ? "member face beyond the gusset" : "gusset face")}, grid {TrussSections.FormatIn(s)}){(rg.Source.Length > 0 ? " (" + rg.Source + ")" : "")}.");
         }
 
         /// <summary>Rivet lines along a member (<see cref="TrussMemberDefinition.RivetLines"/>): grip = connected stack of the section pieces present
@@ -1091,6 +1268,7 @@ public static class TrussGenerator
                                 break;
                         }
                         if (p.Face == TrussPlateFace.WebInside) _insidePlates.Add((pl.Name.ToUpperInvariant(), jdef.Point.ToUpperInvariant(), P, ax, yv, a0, a1, yc - p.Width / 2, yc + p.Width / 2, p.Thickness));
+                        if (p.Face == TrussPlateFace.WebOutside) _outsidePlates.Add((pl.Name.ToUpperInvariant(), jdef.Point.ToUpperInvariant(), P, ax, yv, a0, a1, yc - p.Width / 2, yc + p.Width / 2, p.Thickness));
                         string mark = $"{pl.Name}-{(p.Fill ? "F" : "SP")}{jdef.Point}-{k}";
                         Assumption? asu = p.Unresolved.Length > 0 ? Assumption.UnresolvedDimension(p.Unresolved, "plate as listed, extent scaled") : null;
                         if (asu != null) Warn(p.Unresolved);

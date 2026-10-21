@@ -124,6 +124,9 @@ public sealed class BoltInstance
     public double TopHeight { get; init; }
     /// <summary>OPTIONAL material of this bolt when it is not the model's bolt grade (e.g. stainless screen bolts); null = the model's.</summary>
     public string? Material { get; init; }
+    /// <summary>OPTIONAL rivets: the head at the far end of the grip (frame +Z) is countersunk and chipped flush (contact face under a sole plate):
+    /// no protruding head there. False = button heads at both ends.</summary>
+    public bool FlushEnd { get; init; }
 }
 
 /// <summary>Headed shear stud. Frame origin on the top of flange, +Z up the stud.</summary>
@@ -203,7 +206,8 @@ public sealed class SteelModel
     public double SteelMass => Parts.Where(p => p.Category is not (PartCategory.BearingPad or PartCategory.Weld or PartCategory.BearingDisc or PartCategory.Ptfe or PartCategory.CableConnector or PartCategory.PtStrand or PartCategory.PtAnchorage) && !IsRailing(p.Category) && !IsJointHardware(p.Category) && !IsTrussNonStructural(p.Category)).Sum(p => p.Mass) + RivetHeadMass;
     /// <summary>Rivet heads (kg): two button heads per rivet, each a spherical cap 1.6 d across x 0.6 d high (the shank fills its hole - plates are
     /// not cut for rivets - so it is not counted). Part of <see cref="SteelMass"/> (plan steel lists include the rivet heads).</summary>
-    public double RivetHeadMass => Bolts.Where(b => b.Kind == BoltKind.Rivet).Sum(b => RivetHeadMassOf(b.Diameter));
+    public double RivetHeadMass => Bolts.Where(b => b.Kind == BoltKind.Rivet).Sum(b => RivetHeadMassOf(b.Diameter) * (b.FlushEnd ? 0.5 : 1));
+    /// <summary>Mass of the two button heads of a rivet (a countersunk flush end counts half: <see cref="BoltInstance.FlushEnd"/>).</summary>
     public static double RivetHeadMassOf(double diameter)
     {
         double a = 0.8 * diameter, h = 0.6 * diameter;
@@ -246,14 +250,14 @@ public sealed class SteelModel
 
     /// <summary>Rivet solid in the bolt frame (origin = face under the factory head, +Z through the grip): shank + two button heads
     /// (head diameter 1.6 d, height 0.6 d, as octagonal prisms - the heads' rounded shape is not modeled).</summary>
-    public static Mesh RivetMesh(double diameter, double grip, int segments = 8)
+    public static Mesh RivetMesh(double diameter, double grip, int segments = 8, bool flushEnd = false)
     {
         var m = new Mesh();
         var f = Frame3.World;
         double hr = 0.8 * diameter / Math.Cos(Math.PI / segments), hh = 0.6 * diameter;
         MeshBuilder.AddPrism(m, f, hr, segments, -hh, 0);
         MeshBuilder.AddPrism(m, f, diameter / 2 / Math.Cos(Math.PI / segments), segments, 0, grip);
-        MeshBuilder.AddPrism(m, f, hr, segments, grip, grip + hh);
+        if (!flushEnd) MeshBuilder.AddPrism(m, f, hr, segments, grip, grip + hh);
         return m;
     }
 

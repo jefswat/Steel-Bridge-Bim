@@ -389,6 +389,37 @@ public class TrussTests : IDisposable
     }
 
     [Fact]
+    public void DistributedRivets_CleanStack_NoOverlap_Beyond_FlushHead()
+    {
+        var (p, b) = Model();
+        var jd = b.Truss!.Joints.First(j => j.Point == "L2" && j.Plane == "N");
+        jd.Rivets.Clear();
+        jd.Rivets.Add(new TrussRivetGroup { Member = "L2-L3", Count = 30, Diameter = In(0.875), Distributed = true });
+        jd.Rivets.Add(new TrussRivetGroup { Member = "U1-L2", Count = 12, Diameter = In(0.875), Distributed = true });
+        jd.Rivets.Add(new TrussRivetGroup { Member = "L2-L3", Count = 8, Diameter = In(0.875), Distributed = true, Beyond = true, BeyondLength = In(18) });
+        // round trip: Beyond / BeyondLength written only where set
+        var json = p.ToJson();
+        Assert.Equal(1, System.Text.RegularExpressions.Regex.Matches(json, "\"Beyond\"").Count);
+        Assert.Equal(8, BridgeProject.FromJson(json).Bridges[0].Truss!.Joints.First(j => j.Point == "L2" && j.Plane == "N").Rivets.Single(r => r.Beyond).Count);
+        Assert.DoesNotContain("RivetHeadsFlushAtSolePlates", json);
+        var steel = Regen(p).Steel!;
+        var rv = steel.Bolts.Where(x => x.Kind == BoltKind.Rivet).ToList();
+        Assert.Equal(2 * (30 + 12 + 8), rv.Count);
+        // no two rivets of one face closer than 1.6 d (button heads at most touching)
+        var faceHeads = rv.Select(x => x.Frame.Origin).ToList();
+        for (int i = 0; i < faceHeads.Count; i++)
+            for (int j = i + 1; j < faceHeads.Count; j++)
+                Assert.True((faceHeads[i] - faceHeads[j]).Length >= 1.6 * In(0.875) - 1e-6, "rivet heads overlap");
+        // clean stack: every rivet passes a contiguous plate stack (gusset + 1/2 ply, + an angle leg where it lies on one) - never an angle root / horizontal leg
+        var grips = rv.Select(x => Math.Round(x.Grip / 0.0254 * 16) / 16).Distinct().OrderBy(x => x).ToList();
+        Assert.Equal(new[] { 0.5, 1.25, 1.75, 4.125 }, grips.ToArray());   // ply | gusset + ply | gusset + ply + angle leg | H diagonal: gusset + 3" fill gap + angle leg
+        // beyond: 16 rivets with their heads on the member (no gusset in the grip: 1/2 ply, or ply + angle leg)
+        Assert.True(rv.Count(x => x.Grip < In(0.75) + 1e-9) >= 16);
+        // flush end: one head less
+        Assert.True(SteelModel.RivetMesh(In(1), In(2), flushEnd: true).Positions.Count < SteelModel.RivetMesh(In(1), In(2)).Positions.Count);
+    }
+
+    [Fact]
     public void GussetOutline_Given_ReplacesTheEnvelope_RivetCoverCheck()
     {
         // envelope: the L2 rivets (pitch group on U1-L2) are covered, cover record without an outline
