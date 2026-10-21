@@ -609,3 +609,49 @@ Results (run order truss-ptc-arch -> ... -> floor-connections-ptc -> bracing-ptc
   floor lateral plates / edge angles vs the CL walkway W15-W15' posts and rails (p.106; 34 + 13 + 24 rows, 0.19 - 0.22 in.) and the floor lateral bottom plates vs the floor beam bottom covers
   (6 rows, the 0.3 in. plan conflict); main walkway x bracing rows fell 71 -> 51. Bolt rows 912,297 -> 962,547 (new rivets through solid plates: stringer splices x stringer / splice plate 38 k).
 - IFC (Parametric): 223.9 -> 234.0 MB, 2.47 M entities; validate_ifc 0 schema + 0 EXPRESS issues (2,000 instances per type). Tests 578 passed.
+
+## 21. QC pass 4 fixes: member make-up, ply layers, layered plates (2026-10-21; issues I036-I045, answers in `qc/ptc/results/answers.csv`) + chord rivet field
+Every finding was re-read on the sheet first (p.69 half longitudinal section L13-L17 at 600 dpi, p.74-77, p.81, p.83, p.84, p.86).
+
+Generic code (all OPTIONAL / additive; other bridges unchanged; tests `TrussTests.PlyInsideTheAngles_JointPlatesStackOnTheSteelUnderThem_InlaidOuterPly`,
+`UniformChordRivets_OneFieldThroughTheJoint_TotalKept`):
+- `TrussSections.Box`: a ply that FITS between the angle legs on the web lies in the layer of the legs; a deeper ply listed AFTER it lies INSIDE the angles (on the
+  inside face of their web legs, between the outstanding legs; CHECK note when it is deeper than that space). The angles stand on the last deep ply before it.
+  (p.69: "18x1 Web & 1in Ls" in one layer, "31 1/2 x 5/8 Web" innermost.) Sections without such an order are built as before.
+- `TrussPly.BetweenGussets`: an outer ply that runs from gusset to gusset (the gussets are INLAID in its layer); not counted in `HalfWidthAtJoints`.
+- Joint plates (`TrussJointPlate`) STACK on the steel under them: each plate's base = the member pieces in its own band (web plies, angle legs, covers;
+  `TrussGenerator.PieceLevel`, partial pieces ignored) of the chord(s) its length reaches + the plates already placed on that face whose length and band overlap it.
+  Fills first (closest to the member first, so a fill between the angle legs goes under a wider fill that bears on the legs), then splice plates; marks keep the listed order.
+  Before: every fill lay on the member's web face and the splice plates on the outermost fill (fills overlapped each other and the angle legs).
+- `TrussDefinition.UniformChordRivets` (user review below): the distributed inside rivet groups of the chord members at a joint are laid as ONE field (one grid, total kept).
+
+Data (PTC):
+| Issue | Sheet (re-read) | Change |
+|---|---|---|
+| I039 L13 gussets | p.83 Sections A / B "2'-5 in to in Guss. Pls." | gussets.csv L13 26 1/2 -> 29 (outside the 2'-5 chord line); details-ptc: F8 (FB13) web ends at the gusset outer face 1'-3 5/8 from the truss CL (it reached into the gusset height) |
+| I036 ply order | p.69 half section, p.81 | generator rule above; truss-ptc-arch "ply order" UNRESOLVED flag removed (the half section shows it) |
+| I037 L13-L14 | p.83 "1-Top Cov 24x15/16, 4-Ls 8x6x1, 2-Web 34x1 1/8, 2-Web 34x1 1/8, 2-Web 34x1 1/16, 1-Bott Cov (24-12)x1 1/16"; p.84 | chords.csv: 2-34x1 1/8 + 34x1 1/16 per side (webs 225.25 sq in) |
+| I040 U7 / U9 / L8 | p.76 / p.77 "2'-5 in. to in. Gussets" (inlay splices) | gussets.csv 31 / 30 1/2 / 30 1/2 -> 29 |
+| I042 stacking | p.74 U1 (22 x 3/8 between the 6 in. legs + 31 1/2 x 7/16 over it), p.75 L4 | generator rule above; L4 web fills given their scaled lengths (31 1/2 x 13/16 27 1/2, 18 x 1/2 34 1/2, 18 x 7/8 53 in., against the 40 in. splice plate drawn in the same view) |
+| I038 L10-L11 / L11-L12 | p.81 "2'-5 o. to o. 1 1/8 webs" | chords.csv: 34 x 1 1/8 outermost |
+| I041 L14 inlaid gusset | p.69 "1 1/8 Inlaid Gusset Pl." in the OUTER ply row of L13-L14 / L14-L15; p.84 "2'-0 5/8 b. to b. Ls" (L13-L14), "2'-2 3/4 b. to b. Ls" (L14-L15), "2'-5 in to in Gussets" | QC proposed the gusset at x 13 3/8 - 14 1/2 (in the layer of a 2'-5 chord). The printed b. to b. Ls say the chord is WIDER here: 2'-0 5/8 + 2 x (1 1/8 + 1 1/8 + 1 1/16) = 2'-2 3/4 + 2 x (1 1/8 + 1 1/8) = 2'-7 1/4 out to out. So L13-L14 / L14-L15 are 2'-7 1/4 o. to o. with the outer 34 x 1 1/8 ply `BetweenGussets`; the gussets stay at 2'-5 in to in (x 14 1/2 - 15 5/8) = in the outer ply layer, as both sheets say |
+| I043 U1 cover fill | p.74 "Fill 24 x 5/16 (C)" under the HALF BOTTOM FLANGE | splices.csv item names the bottom flange; connections-ptc puts a single cover fill on the flange its callout names |
+| I044 L15 18 x 1 x 16'-0 | p.86 callout on L15-L16, p.69 "16'-0 +-" from L15 | splices.csv: from L15 into L15-L16 |
+| I045 approach flag | gusset layers are built (connections-ptc section 5) | connections-ptc replaces the stale "only one gusset pair per joint" flag with the still-open part (fills, splice plates, lug angles, diaphragms, stitch rivets) |
+
+Chord rivet field (user review 2026-10-21, 4-span L20 over the pier shoe, p.67): the sheet draws the chord rivets as one field through the joint - 4 lines (2 per
+flange), about 3 in. pitch next to the joint on both sides, field rings from the left gusset edge to the "CL of Splice" 2'-1 right of L20, shop dots beyond it. The symbol
+count (rivet-counts.csv) was split at the panel point, not at the splice: L18-L20 38 / L20-L18' 54 per face -> per-member grids 3 15/16 / 2 7/8 in. The "dense patch" of the
+user's screenshot (2026-10-20 16:40) predates the step-2 symbol counts (it was the step-1 whole-joint split); the current imbalance was the 1.37 ratio. With
+`UniformChordRivets` (rivets-ptc.csx) both sides take one grid sized for the total: L20 44 / 48 per face at 3 5/8 in. (4 lines). Joint faces with two chord sides: 410;
+side-grid ratio > 1.25: 64 -> 0 (> 1.5: 4 -> 0); worst before: main L13 / L13' 1.63 (L12-L13 40 @ 5 in. vs L13-L14 102 @ 3 1/16), 4-span L20 1.37 (both units), 4-span U19 1.35;
+worst after 1.08 (main L11, where the grid is at the 1.6 d head limit on one side). Diagnostic scripts `qc/ptc/work/fix4/rivet_grid.csx`, `grid_balance.py`, `rivets_at.csx` +
+`rivet_map.py` (ASCII map of one joint face).
+
+Results (whole PTC run order on a copy of the committed model, before = the committed model):
+- Checks: check-truss-ptc 608 / 11, check-truss-ptc-approach 1796 / 12, check-girders-ptc 131 / 6, check-ptc-delaware-river 379 / 41 (all unchanged).
+- Steel: 89.2 % of p.42 items 1-6 (35.04 M lb), main spans 91.1 %. Rivets 474,428 -> 474,784.
+- Clash (`sbm clash --bolts`): non-bolt rows 6,766 -> 6,682 (gusset x chord / vertical / diagonal at L13 gone, fill x fill gone). Fill / splice x chord rows deeper than 1/16 in.
+  (QC filter) 166 -> 116, max 0.53 -> 0.50 in.; FillerPlate x FillerPlate 0. The 116 left are all in the end wedge of a chord at a kinked panel point: the chords are cut square
+  at the point + half depth x tan(deflection / 2), so the member on the other side reaches 1-1 1/2 in. back past the point and meets the fill / splice plate of its neighbour
+  there (e.g. L6 fills 7/16, L15 18 x 1 web plates 1/2 in. vs L14-L15). That is the chord end-cut rule, not the plate stacking; reported, not changed.

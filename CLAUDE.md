@@ -1052,6 +1052,11 @@ UNRESOLVED FLAG (general, reusable): `SBM.Core/Assumption.cs` `Assumption{Status
   3D-RIVETS; IFC types keyed by diameter + grip + material. PTC: 226,632 rivets (main 56,872, each 3-span 13,880, each 4-span 35,360, girder spans 50,940 / 20,340), heads
   107.6 k lb; IFC 41 -> 105 MB (1.15 M entities; validate 0 issues); viewport buffers 186 -> 211 MB. Group text -> member mapping, p.70 diameter rules, skipped
   groups (cover plate splice plan views, member splices, lugs, bracing, stubs) and the third-pass CORRECTION rows: see TRUSS-DESIGN.md section 11.
+  CHORD RIVET FIELD (2026-10-21, user review of 4-span L20; TRUSS-DESIGN.md 21): OPTIONAL `TrussDefinition.UniformChordRivets` (set by rivets-ptc.csx) lays the distributed
+  inside groups of the chord members at a joint as ONE field (`TrussGenerator.PooledChordRivets`: one grid sized for their total, each side takes its lap's positions,
+  total kept, Info per joint "chord rivets laid as one field"); diagnostics `qc/ptc/work/fix4/rivet_grid.csx` + `grid_balance.py`.
+  QC PASS 4 (2026-10-21, TRUSS-DESIGN.md 21): Box ply layers (a ply after one that fits between the angle legs lies inside the angles), `TrussPly.BetweenGussets`
+  (inlaid gussets: L13-L14 / L14-L15 2'-7 1/4 o. to o.), joint plates stacked on the steel under them.
   STEP 2 (2026-10-21, TRUSS-DESIGN.md 11b): counts = rivet SYMBOLS drawn inside each gusset outline per member (`tools/ptc_rivet_count.py` -> `connections/rivet-counts.csv`, hand zones
   `rivet-count-zones.csv`, main L11 `rivet-counts-extra.csv`), given to the joint, its other half and its 'similar to' joints; symbols just outside the outline -> OPTIONAL
   `TrussRivetGroup.Beyond` / `BeyondLength`; generic placement: clean plate stack under both heads (`SectionRun`), no head over another (>= 0.8 (d1 + d2)), grid >= 1.6 d; OPTIONAL
