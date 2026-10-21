@@ -33,7 +33,9 @@ public static partial class TrussGenerator
                 if (asu != null) Warn(sd.Unresolved);
                 for (int i = 1; i + 1 < crossSta.Count; i++)
                 {
-                    bool pick = sd.Crossings != null ? sd.Crossings.Contains(i) : sd.Every > 0 && i >= sd.First && (i - sd.First) % sd.Every == 0;
+                    bool pick = sd.Stations != null ? sd.Stations.Any(s => Math.Abs(s - crossSta[i]) < 0.5)
+                        : sd.Crossings != null ? sd.Crossings.Contains(i) : sd.Every > 0 && i >= sd.First && (i - sd.First) % sd.Every == 0;
+                    if (pick && sd.Stations != null && Math.Abs(crossSta[i] - crossSta[i - 1]) < 1e-6) continue;   // a line crossing two floor beam halves at one station: once
                     if (!pick || !jointSta.Contains(crossSta[i])) continue;
                     double sta = crossSta[i];
                     var pj = Wp(sta);

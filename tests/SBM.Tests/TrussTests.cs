@@ -1123,6 +1123,93 @@ public class TrussTests : IDisposable
     }
 
     [Fact]
+    public void SpliceStations_PickTheCrossingsNearTheGivenStations()
+    {
+        var (p, b) = Model();
+        var fl = b.Truss!.Floor!;
+        var (p0, _) = Model();
+        double fbTop = Regen(p0).Steel!.Parts.First(x => x.Mark == "FB2").Mesh.Bounds().Max.Z;
+        var w21 = SteelCatalog.FindWideFlange("W21x62")!;
+        fl.StringersOnTop = true;
+        fl.StringerTopBelowGrade = Ft(100) - (fbTop + w21.Depth);
+        fl.Deck = null;
+        fl.Splices = new()
+        {
+            new TrussStringerSpliceDefinition { Section = "ST", Stations = new() { Ft(100) + 3 * Panel + 0.2 }, Before = In(5), After = In(10), WebPlateHeight = In(16), WebPlateThickness = In(0.375),
+                WebRivetColumns = new() { -In(1.25), In(1.25) }, WebRivetRows = 3, WebRivetPitch = In(3), RivetDiameter = In(0.875) },
+        };
+        var st = Regen(p).Steel!;
+        Assert.Equal(3, st.Parts.Count(x => x.Mark.StartsWith("SPL-")));                     // one per line, at the middle floor beam only
+        Assert.Contains(st.Diagnostics, d => d.Message.StartsWith("Truss: stringer splices - 3 splices, 18 rivets"));
+        Assert.DoesNotContain("\"Stations\"", System.Text.Json.JsonSerializer.Serialize(new TrussStringerSpliceDefinition()));
+    }
+
+    [Fact]
+    public void LongitudinalStiffener_StopsAtStiffeners_StringerExtension_ClipAnglePair()
+    {
+        var (p0, b0) = Model();
+        var st0 = Regen(p0).Steel!;
+        var json0 = System.Text.Json.JsonSerializer.Serialize(b0.Truss, new System.Text.Json.JsonSerializerOptions { NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.AllowNamedFloatingPointLiterals });
+        foreach (var key in new[] { "LongitudinalStiffeners", "ExtendStart", "ExtendEnd", "PairHeelU" }) Assert.DoesNotContain($"\"{key}\"", json0);
+        var (p, b) = Model();
+        var t = b.Truss!;
+        // 1. girder (plane N, left of the alignment) with two stiffeners and a longitudinal stiffener on the face toward the alignment
+        t.Sections.Add(new TrussSectionDefinition { Name = "GIR", Kind = TrussSectionKind.H, WebVertical = true, WebDepth = In(60), WebPlies = { new TrussPly(In(60), In(0.5)) }, Angle = "L6x6x1/2" });
+        t.Members.Add(new TrussMemberDefinition { Name = "GIR", From = "L0", To = "L6", Plane = "N", Section = "GIR", Role = TrussMemberRole.Girder, OffsetZ = -Ft(10),
+            Stiffeners = new() { new TrussStiffenerSet { Angle = "L5x3.5x7/16", Height = In(48), Distances = { Ft(10), Ft(20) } } },
+            LongitudinalStiffeners = new() { new TrussLongitudinalStiffener { Angle = "L6x4x7/16", Y = In(20), From = Ft(2), To = Ft(30), Clearance = In(0.5),
+                RivetPitch = In(7), RivetGage = In(2.25), RivetEdge = In(1.5), RivetDiameter = In(0.875), Unresolved = "UNRESOLVED (p.0): level scaled." } } });
+        // 2. stringer line A continued 1 ft beyond its first and last floor beam
+        t.Floor!.Stringers[0].ExtendStart = Ft(1);
+        t.Floor.Stringers[0].ExtendEnd = Ft(1);
+        // 3. framed plate between stringers A and B with an angle PAIR at each end straddling its web
+        double twS = SteelCatalog.FindWideFlange("W21x62")!.WebThickness;
+        t.LineItems = new() { new TrussLineItemDefinition { Name = "DIA", Kind = TrussLineItemKind.Steel, Category = PartCategory.Channel, Transverse = true, Station = Ft(100) + 2.5 * Panel,
+            From = -Ft(8) + twS / 2, To = -twS / 2, Profile = { new TrussUV(0, -In(10)), new TrussUV(In(0.5), -In(10)), new TrussUV(In(0.5), -In(22)), new TrussUV(0, -In(22)) },
+            ClipAngles = new TrussClipAngles { Angle = "L4x3-1/2x5/16", HeelU = 0, Toward = -1, PairHeelU = In(0.5), Top = -In(11), Length = In(9), RivetDiameter = In(0.75),
+                ItemLegRivets = new TrussRivetColumn(In(2), 2, In(3), In(3)), WebLegRivets = new TrussRivetColumn(In(2.25), 2, In(3), In(3)) } } };
+        var bm = Regen(p);
+        var st = bm.Steel!;
+        // longitudinal stiffener: 3 pieces (2 ft - stiffener 1, between, stiffener 2 - 30 ft), each an exact angle sweep, on the +x face (toward the alignment)
+        var ls = st.Parts.Single(x => x.Mark == "N-GIR-LS1");
+        Assert.Equal(PartCategory.IntermediateStiffener, ls.Category);
+        Assert.True(ls.Mesh.HasExactSolids);
+        Assert.NotNull(ls.Assumption);
+        var a6 = TrussSections.ParseAngle("L6x4x7/16")!.Value;
+        double area = (a6.a + a6.b - a6.t) * a6.t;
+        double l1 = Ft(8) - In(0.5), l2 = Ft(10) - In(3.5) - In(1), l3 = Ft(10) - In(3.5) - In(0.5);
+        Assert.Equal(l1 + l2 + l3, ls.Length, 6);
+        Assert.Equal(area * (l1 + l2 + l3), ls.Volume, 9);
+        var gir = st.Parts.Single(x => x.Mark == "N-GIR");
+        var gb = gir.Mesh.Bounds(); double yWeb = (gb.Min.Y + gb.Max.Y) / 2;
+        Assert.True(ls.Mesh.Bounds().Min.Y < yWeb && ls.Mesh.Bounds().Max.Y < yWeb + In(0.3), $"web {yWeb} ls {ls.Mesh.Bounds().Min.Y} {ls.Mesh.Bounds().Max.Y}");   // N girder at +Y: the alignment side is -Y
+        // rivets centred in each piece at 7 in.: 14 + 17 + 17, grip = leg + web
+        var lr = st.Bolts.Where(x => x.Kind == BoltKind.Rivet && x.Assembly.StartsWith("GIRDER")).ToList();
+        Assert.Equal(48, lr.Count);
+        Assert.All(lr, r => Assert.Equal(Math.Round((a6.t + In(0.5)) / In(1.0 / 16)) * In(1.0 / 16), r.Grip, 6));
+        Assert.Contains(st.Diagnostics, d => d.Message.StartsWith("Truss: longitudinal stiffeners - 3 pieces, 48 rivets"));
+        // stringer extension: the first and last pieces of line A are 1 ft longer, the other lines unchanged
+        double LenA(SteelModel s, string mark) => s.Parts.Single(x => x.Mark == mark).Length;
+        int nA = st.Parts.Count(x => x.Mark.StartsWith("ST-A-"));
+        Assert.Equal(LenA(st0, "ST-A-1") + Ft(1), LenA(st, "ST-A-1"), 6);
+        Assert.Equal(LenA(st0, $"ST-A-{nA}") + Ft(1), LenA(st, $"ST-A-{nA}"), 6);
+        Assert.Equal(LenA(st0, "ST-A-2"), LenA(st, "ST-A-2"), 6);
+        Assert.Equal(LenA(st0, "ST-B-1"), LenA(st, "ST-B-1"), 6);
+        // clip angle pair: 4 angles, item-leg rivets once per level through angle + web + angle
+        var clip = st.Parts.Single(x => x.Mark == "DIA-CA");
+        var ca = TrussSections.ParseAngle("L4x3-1/2x5/16")!.Value;
+        Assert.Equal(4 * (ca.a + ca.b - ca.t) * ca.t * In(9), clip.Volume, 9);
+        Assert.Contains("x 4 x", clip.Description);
+        var cr = st.Bolts.Where(x => x.Kind == BoltKind.Rivet && Math.Abs(x.Diameter - In(0.75)) < 1e-9).ToList();
+        Assert.Equal(2 * 2 + 2 * 2 * 2, cr.Count);
+        Assert.Equal(4, cr.Count(r => Math.Abs(r.Grip - Math.Round((2 * ca.t + In(0.5)) / In(1.0 / 16)) * In(1.0 / 16)) < 1e-9));
+        // round trip
+        var p2 = BridgeProject.FromJson(p.ToJson());
+        Assert.Single(p2.Bridges[0].Truss!.Members.First(m => m.Name == "GIR").LongitudinalStiffeners!);
+        Assert.Equal(st.Parts.Count, Regen(p2).Steel!.Parts.Count);
+    }
+
+    [Fact]
     public void FileRoundTrip_AndExistingModelsUnchanged()
     {
         var (p, b) = Model();

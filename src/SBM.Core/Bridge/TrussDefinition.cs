@@ -356,6 +356,42 @@ public sealed class TrussMemberDefinition
     /// girder or hanger; <see cref="TrussEndConnection"/>).</summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public List<TrussEndConnection>? EndConnections { get; set; }
+    /// <summary>OPTIONAL (null = none, omitted from the .sbm): longitudinal web stiffener angles along the member (<see cref="TrussLongitudinalStiffener"/>).</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public List<TrussLongitudinalStiffener>? LongitudinalStiffeners { get; set; }
+}
+
+/// <summary>
+/// Longitudinal web stiffener (generic, OPTIONAL; riveted plate girders): one angle along the member on one web face, web leg on the web with its heel at
+/// section y <see cref="Y"/> (the leg hangs down from the heel when <see cref="LegDown"/>, else it rises), the other leg outstanding normal to the web.
+/// <see cref="Side"/>: +1 / -1 = the section +x / -x web face, 0 = the face toward the alignment (the inside of a girder pair). Extent: <see cref="From"/> /
+/// <see cref="To"/> along the member from its start working point (null = the member's cut ends); with <see cref="StopAtStiffeners"/> it is interrupted at
+/// every <see cref="TrussStiffenerSet"/> of the member (the stiffener legs / fills / plates on that face at the stiffener's height, + <see cref="Clearance"/>).
+/// Rivets: one line through the web leg + web at <see cref="RivetGage"/> from the heel, <see cref="RivetPitch"/> centred in each piece (at least
+/// <see cref="RivetEdge"/> from the piece ends); grips probed. Parts IntermediateStiffener (one per member), dimension-only flag from <see cref="Unresolved"/>.
+/// </summary>
+public sealed class TrussLongitudinalStiffener
+{
+    public string Label { get; set; } = "";
+    /// <summary>Angle, first leg OUTSTANDING (e.g. "L6x4x7/16" = 6 in. out, 4 in. on the web).</summary>
+    public string Angle { get; set; } = "";
+    public int Side { get; set; }
+    public double Y { get; set; }
+    public bool LegDown { get; set; } = true;
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public double? From { get; set; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public double? To { get; set; }
+    public bool StopAtStiffeners { get; set; } = true;
+    public double Clearance { get; set; }
+    public double RivetPitch { get; set; }
+    public double RivetGage { get; set; }
+    public double RivetEdge { get; set; }
+    public double RivetDiameter { get; set; }
+    public string? RivetMaterial { get; set; }
+    public string Material { get; set; } = "";
+    public string Unresolved { get; set; } = "";
+    public string Source { get; set; } = "";
 }
 
 public enum TrussMemberEnd { Start, End, Both }
@@ -588,6 +624,10 @@ public sealed class TrussStringerSpliceDefinition
     public List<string> Lines { get; set; } = new();
     public string Section { get; set; } = "";
     public List<int>? Crossings { get; set; }
+    /// <summary>OPTIONAL (null = <see cref="Crossings"/> / the pattern; omitted from the .sbm): the floor beam crossings within 0.5 m of one of these alignment
+    /// stations (e.g. the middle floor beam of every simple span, whose index differs per stringer line).</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public List<double>? Stations { get; set; }
     public int Every { get; set; }
     public int First { get; set; }
     public double Before { get; set; }
@@ -824,6 +864,11 @@ public sealed class TrussClipAngles
     public string Material { get; set; } = "";
     public string? RivetUnresolved { get; set; }
     public string Unresolved { get; set; } = "";
+    /// <summary>OPTIONAL (null = one angle per end, omitted from the .sbm): a SECOND angle at each end, heel at this U (the other face of the item web),
+    /// web leg toward the opposite side of <see cref="Toward"/> (angle pair straddling the item web, e.g. 2-Ls on a framed WF diaphragm). Item-leg rivets
+    /// are listed once (one shank through angle + web + angle).</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public double? PairHeelU { get; set; }
 }
 
 /// <summary>Rivet of a line item: shank through (U, V, W) along <see cref="Axis"/> ("U" along the alignment, "W" across = offset direction, "V" up),
@@ -951,6 +996,12 @@ public sealed class TrussStringerLine
     /// <summary>OPTIONAL seat plate width across this stringer line (m; null = <see cref="TrussStringerSeatDefinition.Width"/>).</summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public double? SeatWidth { get; set; }
+    /// <summary>OPTIONAL (0 = none, omitted from the .sbm): the stringer continues this far (m, along the alignment) beyond its FIRST / LAST floor beam
+    /// crossing (stringers cantilevered past the end floor beam to an expansion dam diaphragm).</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public double ExtendStart { get; set; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public double ExtendEnd { get; set; }
 }
 
 /// <summary>Deck slab between two alignment offsets and stations; top = finished grade.</summary>

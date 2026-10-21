@@ -483,6 +483,7 @@ public static partial class TrussGenerator
             if (!mesh.IsEmpty) Model.Steel.Parts.Add(part);
             if (asu != null) Warn(asu.Reason);
             if (m.Def.Stiffeners != null) BuildStiffeners(m);
+            if (m.Def.LongitudinalStiffeners is { Count: > 0 }) BuildLongStiffeners(m);
             if (m.Def.Panel.Length > 0) Model.PanelOf[m.Mark] = m.Def.Panel;
             Model.Members.Add(new TrussMemberResult(m.Def.Name, m.Mark, m.Plane, m.PointA, m.PointB, m.A, m.B, len, cut, m.Def.Role, m.Sec.Definition.Name, part.Mass, asu != null));
         }
@@ -1541,6 +1542,16 @@ public static partial class TrussGenerator
                 int no = 0;
                 var seatAt = new SortedSet<double>();
                 var pieceStarts = new HashSet<double>(); var pieceEnds = new HashSet<double>();
+                // pieces of this line (OPTIONAL ExtendStart / ExtendEnd: the first / last piece continues beyond its floor beam)
+                var valid = new List<int>();
+                for (int i = 0; i + 1 < cross.Count; i++)
+                {
+                    double e0 = fl.StringersOnTop ? 0 : cross[i].halfWeb + fl.StringerEndClearance, e1 = fl.StringersOnTop ? 0 : cross[i + 1].halfWeb + fl.StringerEndClearance;
+                    if (line.FromStation is { } fs0 && cross[i].sta < fs0 - 1e-6) continue;
+                    if (line.ToStation is { } ts0 && cross[i + 1].sta > ts0 + 1e-6) continue;
+                    if (cross[i + 1].sta - e1 - (cross[i].sta + e0) < 0.1) continue;
+                    valid.Add(i);
+                }
                 for (int i = 0; i + 1 < cross.Count; i++)
                 {
                     double e0 = fl.StringersOnTop ? 0 : cross[i].halfWeb + fl.StringerEndClearance, e1 = fl.StringersOnTop ? 0 : cross[i + 1].halfWeb + fl.StringerEndClearance;
@@ -1548,6 +1559,8 @@ public static partial class TrussGenerator
                     if (line.FromStation is { } fs && cross[i].sta < fs - 1e-6) continue;
                     if (line.ToStation is { } ts && cross[i + 1].sta > ts + 1e-6) continue;
                     if (s1 - s0 < 0.1) continue;
+                    if (valid.Count > 0 && i == valid[0] && line.ExtendStart > 0) s0 -= line.ExtendStart;
+                    if (valid.Count > 0 && i == valid[^1] && line.ExtendEnd > 0) s1 += line.ExtendEnd;
                     no++;
                     var pa = _al.PointAt(s0, line.Offset).WithZ(_al.ElevationAt(s0, line.Offset) - top - sec.YMax);
                     var pb = _al.PointAt(s1, line.Offset).WithZ(_al.ElevationAt(s1, line.Offset) - top - sec.YMax);
