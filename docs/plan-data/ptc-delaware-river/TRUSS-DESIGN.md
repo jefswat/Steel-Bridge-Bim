@@ -374,3 +374,35 @@ the member-lap envelopes: inner gussets 5,678 -> 8,466 SF per face + 622 SF enve
 approach 1548 / 12 / 148, location 378 / 42 - unchanged counts (the new rows "gusset covers its rivets" were already in the WIP check scripts: 412 PASS, all
 rivets >= 1 1/2 in. from the edge; note the joint rivets are DISTRIBUTED over the outline (section 11), so this checks the grid, not the drawn rivet positions).
 Tests 568 passed. The model copies "PTC main truss 18-20.sbm" / "PTC approach trusses.sbm" are unchanged.
+
+## 16. QC pass 3 back-check (2026-10-21; answers in `qc/ptc/results/answers.csv` I006, I021-I028, I030-I035; rivet issues I018-I020 / I029 handled separately)
+Generic code (OPTIONAL / additive; other trusses unchanged; test `TrussTests.LateralStopsClearOfPortal_OpenSocketJaw`):
+- `TrussGenerator.Setbacks`: an upper / lower lateral that meets a `Portal` member at the same point stops where every corner of its end section lies beyond the
+  portal's side face ((portal half width + lateral reach along the portal's x) / |lateral axis . portal x| + clearance). Only the PTC main span has portals.
+- `SuspenderDefinition.SocketBeyondPin` (eye beyond the pin centre), `SocketJawWidth` / `SocketJawLength` (open socket: two lugs = the socket circle outside the
+  jaw gap, from the socket end at the pin to the jaw length; the basket beyond), omitted from the .sbm when 0. Rope length = pin to pin - 2 x (socket - beyond).
+
+PTC data:
+- Main floor laterals (p.71 / p.99): two-panel X of 14 BP 73 L13-W15, W15-W17, W17-W19, W19-W21 crossing at the CL of floor beams W14 / W16 / W18 / W20, K of
+  2-12[ 25 from W21 to the CL point WM22 (tongue beam 16 WF 88 + shear lock flagged, not built). Was shifted one panel (X centred on L15 / L17 / L19).
+- Main floor beams (p.72 schedule, p.94 / p.95): all partial cover plates built, centred on the CL bridge (flagged): F5 bottom 40'-0; F6 top 46'-0, bottom 60'-0 +
+  46'-0; F7 56'-0 + 40'-0 each flange; F8 top 46'-0, bottom 76'-0. F8's 2-Ls 9x4x1 / 2-Ls 7x4x7/8 F.L. / 2-Ls 8x4x1 x 76'-0 are NOT built (Section B p.95 does not
+  fix the legs / position; flag). F6 mid-span 157.0 sq in = plan.
+- Suspender sockets (p.94 detail, p.86): 7 1/4 below the pin, 1'-8 jaw with 4 in. between the lugs, 1'-3 basket; pins ALONG the bridge (RopesAlongBridge). The lugs
+  still overlap the floor beam top flange angles (~2 1/2 in.): the beam end at the socket is not dimensioned (flag).
+- Bracing areas: 14 BP 73 at 21.4 sq in (ShapeArea), laced channels at their 1954 areas (p.70 for the 18 in, else weight / 3.4).
+- Stringer diaphragms 15[ 33.9: one channel per bay between adjacent stringer webs (was one channel through all stringer webs).
+- Gusset data re-read: 4-span in-to-in at L7 / L8 / U9 / L9 / L12 / U13 / L14 / U16 / L17 / U19 / U4 (fraction misreads 1/8 <-> 5/8; the corrected values match
+  the chord depths), 4-span L5 = L3 (5/8, 17 1/4); main L1 = L3 1/2, L6 7/8 / 29, U10 / U21 / L21 31 1/4 in. to in. Outlines U9 / L15 / L17 re-read (were 11-20 in.
+  outboard of the drawn edges).
+- Approach fixed shoe pin 3'-6 1/8 (p.52 / p.67 material lists).
+- Walkways: main pier 18 / 19 platforms 8'-0 along centred on the pin, 5'-4 to 8'-7 1/16 inboard of the truss (p.104), ladder 6'-6 3/8 inboard (p.103); approach
+  platforms from 2'-0 beyond the CL bearing, 3'-6 3/8 long (p.102 View B), ladders at piers 13 / 17 4'-9 3/8 from the 4-span bearing; FB11 walkway from the north
+  ladder line to the CL (p.103 key plan).
+- Rejected with evidence: I006 girder depth (angle backs 1/4 in. beyond the web edges), I025 bearing plate let 1 in. into the masonry plate (plan), I034 dam tooth
+  1'-8 3/4 = tip to support, not the tooth length. Open: I033 railing post layout per panel (needs explicit post stations), the small bracing / walkway connection
+  overlaps (connection details not built).
+
+Results (full run order from truss-ptc-arch): structural steel 33.60 -> 33.81 M lb = 85.5 % -> 86.1 % of p.42 (main 88.6 -> 90.0 %); checks main 558 / 11 / 63 ->
+560 / 11 / 63, approach 1548 / 12 / 148 (unchanged), girders 131 / 6 (unchanged), location 378 / 42 -> 379 / 41. sbm clash (all PTC bridges, no bolts) 14,293 ->
+11,706 rows; every walkway x shoe and portal x lateral row gone, socket x floor beam 6.82 -> 2.43 in.
