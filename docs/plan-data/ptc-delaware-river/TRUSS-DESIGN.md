@@ -363,8 +363,8 @@ plate edges cannot be separated from the layers and the splice material at the r
 hanger, suspender and lateral connections overlap the gusset edges; not separable), U22 and L22 (p.90 crown: half gussets cut on line "X", splice gusset and the
 jacking scheme drawn on top of each other).
 
-Rows: 3-span 17 drawn joints (U1-U3, U5, U7-U9, U11, L1, L2, L4, L6, L8-L10, L12, U0' / L0'), 4-span 28 (U0, L0, U1-U3, U5, U7, U9, U11, U13, U15, U17, U19, L1, L2,
-L4, L6, L8, L10, L12, L14-L16, L18, L20), main 37 (U0-U20 except U21 / U22, L0, L2-L10, L12, L15, L17, L18, L20). Model: 240 joints from their own drawing +
+Rows (79): 3-span 18 drawn joints (U1-U3, U5, U7-U9, U11, L1, L2, L4, L6, L8-L10, L12, U0', L0'), 4-span 25 (U0, L0, U1-U3, U5, U7, U9, U11, U13, U15, U17,
+U19, L1, L2, L4, L6, L8, L10, L12, L14-L16, L18, L20), main 36 (U0-U20, L0, L2-L10, L12, L15, L17, L18, L20). Model: 240 joints from their own drawing +
 106 from a "similar to" joint (both trusses, both halves) = all approach joints and 164 of 184 main joint x plane.
 
 Results (connections -> shoes -> walkways -> rivets re-run on the committed model): gusset plates main 430,177 -> 704,719 lb (the drawn plates are larger than
