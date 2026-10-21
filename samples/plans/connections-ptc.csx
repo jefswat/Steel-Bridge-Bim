@@ -243,11 +243,13 @@ report.Add($"shoe bodies of built-up carbon steel plates: {shoeC} (main L11 / L1
 
 // ================================================================ 4b. gusset plate OUTLINES (gusset-outlines.csv, 2026-10-20): the inner gusset of every drawn joint read from the joint
 // sheets (tools/ptc_gusset_outlines.py: polygon + work point + chord direction in page pixels, scale from a printed dimension) in the sheet frame (u = drawing x =
-// toward the higher panel number, v up, origin = work point, inches). Placed on the model joint: rotated so the drawn chord lies on the model chord (mean direction of
-// the chords at the point; the approach sheets draw the chords level, the trusses lie on the grade), mirrored for the primed half of a unit and for the New Jersey units.
+// toward the higher panel number, v up, origin = work point, inches). Placed on the model joint by a VERTICAL SHEAR v += u (tan(model chord) - tan(drawn chord)) (mean
+// direction of the chords at the point), then mirrored for the primed half of a unit and for the New Jersey units: the sheets draw one half of a unit on its grade with plumb
+// verticals; the other half is the mirror image in member layout but lies on the same grade, so a mirror alone would tilt the chord edge by twice the grade and a rotation
+// would tilt the plumb post edges - the shear keeps the chord edges on the chord and the post edges plumb (it also absorbs the small scan skew of the drawn chord).
 // Joints the sheets give as "details not shown, similar to X" take X's outline (flagged). Joints without a drawing keep the envelope (JointDefaults flag).
-// The rotation is kept per (bridge, joint) for the stacked layers of section 5.
-var jointRot = new Dictionary<(string bridge, string joint), double>();
+// The shear is kept per (bridge, joint) for the stacked layers of section 5.
+var jointShear = new Dictionary<(string bridge, string joint), double>();
 {
     string dataRoot = Path.GetDirectoryName(dataDir)!;
     var rows = Csv("gusset-outlines.csv");
@@ -300,7 +302,7 @@ var jointRot = new Dictionary<(string bridge, string joint), double>();
         return Math.Atan2(uy, ux) * 180 / Math.PI;
     }
     var units = new[] { ("PTC Arch truss 18-20", "main", 1), ("PTC 3-span truss 11-13", "A", 1), ("PTC 4-span truss 14-17", "B", 1), ("PTC 4-span truss 21-24", "B", -1), ("PTC 3-span truss 25-27", "A", -1) };
-    int nOwn = 0, nSim = 0, nNone = 0; var none = new List<string>(); var bigRot = new List<string>();
+    int nOwn = 0, nSim = 0, nNone = 0; var none = new List<string>(); var bigRot = new List<string>(); double maxShear = 0;
     foreach (var (bn, key, dir) in units)
     {
         var t = Doc.Project.Bridges.FirstOrDefault(b => b.Name == bn)?.Truss;
@@ -323,16 +325,16 @@ var jointRot = new Dictionary<(string bridge, string joint), double>();
             if (!t.Joints.Any(x => x.Point == mj)) t.Joints.Add(new TrussJointDefinition { Point = mj });
             double drawn = double.Parse(r["drawn_chord_deg"], inv);
             double model = ChordDeg(t, mj, sign) ?? drawn;
-            double rot = model - drawn;
-            if (Math.Abs(rot) > 2.5) bigRot.Add($"{bn.Replace("PTC ", "")} {mj}: drawn {drawn:0.0} deg vs model {model:0.0} deg");
-            jointRot[(bn, mj)] = rot;
-            double c = Math.Cos(rot * Math.PI / 180), s = Math.Sin(rot * Math.PI / 180);
-            var outline = UV(r["outline_uv_in"]).Select(q => new TrussUV(sign * In(q.u * c - q.v * s), In(q.u * s + q.v * c))).ToList();
+            double shear = Math.Tan(model * Math.PI / 180) - Math.Tan(drawn * Math.PI / 180);
+            if (Math.Abs(model - drawn) > 2.5) bigRot.Add($"{bn.Replace("PTC ", "")} {mj}: drawn {drawn:0.0} deg vs model {model:0.0} deg");
+            maxShear = Math.Max(maxShear, Math.Abs(shear));
+            jointShear[(bn, mj)] = shear;
+            var outline = UV(r["outline_uv_in"]).Select(q => new TrussUV(sign * In(q.u), In(q.v + shear * q.u))).ToList();
             string pg = "p." + r["page"];
             string oText = U(pg, $"gusset plate outline of joint {mj}" + (simWhy.Length > 0 ? $" (taken from joint {r["joint"]}: {simWhy})" : ""),
                 $"the plate is drawn, not dimensioned: outline scaled from a {r["dpi"]} dpi render ({r["confidence"]} confidence, about +-1 in.; evidence: {r["evidence"]})"
                 + (simWhy.Length > 0 ? "; the sheet gives this joint only as similar to the drawn one" : ""),
-                "outline as scaled, rotated onto the model chord" + (sign < 0 ? ", mirrored" : "") + ".");
+                "outline as scaled, sheared onto the model chord (verticals kept plumb)" + (sign < 0 ? ", mirrored" : "") + ".");
             foreach (var jd in t.Joints.Where(x => x.Point == mj))
             {
                 jd.Outline = outline;
@@ -345,7 +347,7 @@ var jointRot = new Dictionary<(string bridge, string joint), double>();
         }
     }
     report.Add($"gusset outlines: {nOwn} model joints from their own drawing, {nSim} from a 'similar to' joint, {nNone} without an outline (envelope kept): {string.Join(", ", none.Take(30))}{(none.Count > 30 ? ", ..." : "")}");
-    if (bigRot.Count > 0) report.Add($"gusset outlines: drawn vs model chord angle differs > 2.5 deg at {bigRot.Count} joints (rotation applied): {string.Join("; ", bigRot.Take(12))}");
+    if (bigRot.Count > 0) report.Add($"gusset outlines: drawn vs model chord angle differs > 2.5 deg at {bigRot.Count} joints (mirrored half on the same grade; vertical shear applied, largest {Math.Atan(maxShear) * 180 / Math.PI:0.0} deg): {string.Join("; ", bigRot.Take(12))}");
 }
 
 // ================================================================ 5. stacked gusset layers (gusset-layers.csv, 2026-10-20): a second (third) gusset plate per face OUTSIDE the
@@ -353,12 +355,11 @@ var jointRot = new Dictionary<(string bridge, string joint), double>();
 // higher panel number, v up, origin = work point, inches) -> mirrored for the primed half of a unit and for the New Jersey units (stations decreasing with the panel number).
 {
     var lay = Csv("gusset-layers.csv").Where(r => r["layers"] != "1").ToList();
-    // same placement as the inner gusset outline of the joint (section 4b): rotated onto the model chord, then mirrored
-    List<TrussUV> Outline(string s, int sign, double rotDeg)
+    // same placement as the inner gusset outline of the joint (section 4b): vertical shear onto the model chord, then mirrored
+    List<TrussUV> Outline(string s, int sign, double shear)
     {
-        double c = Math.Cos(rotDeg * Math.PI / 180), sn = Math.Sin(rotDeg * Math.PI / 180);
         return s.Trim().Length == 0 ? new() : s.Split(';').Select(p => p.Split(',')).Select(a => (u: double.Parse(a[0], inv), v: double.Parse(a[1], inv)))
-            .Select(q => new TrussUV(sign * In(q.u * c - q.v * sn), In(q.u * sn + q.v * c))).ToList();
+            .Select(q => new TrussUV(sign * In(q.u), In(q.v + shear * q.u))).ToList();
     }
     double Thk(string s) { double v = 0; foreach (var part in s.Split(' ', StringSplitOptions.RemoveEmptyEntries)) v += part.Contains('/') ? double.Parse(part.Split('/')[0], inv) / double.Parse(part.Split('/')[1], inv) : double.Parse(part, inv); return In(v); }
     int nLayerJoints = 0;
@@ -415,7 +416,7 @@ var jointRot = new Dictionary<(string bridge, string joint), double>();
             bool whole = r["outline_uv_in"].Trim().Length == 0;
             jd.GussetLayers.Add(new TrussGussetLayer
             {
-                Thickness = tl, Outline = Outline(r["outline_uv_in"], sign, jointRot.TryGetValue((bn, mj), out var rotL) ? rotL : 0), Label = $"2-{r["thickness_in"]} Gussets ({r["position"]} layer)",
+                Thickness = tl, Outline = Outline(r["outline_uv_in"], sign, jointShear.TryGetValue((bn, mj), out var shL) ? shL : 0), Label = $"2-{r["thickness_in"]} Gussets ({r["position"]} layer)",
                 Source = $"gusset-layers.csv {pg} ({conf}): {r["extent_note"]}",
                 Unresolved = U(pg, $"{r["thickness_in"]} in. gusset layer at joint {mj}",
                     (whole ? "its extent is not separable from the inner gusset on the sheet" : "the plate is drawn, not dimensioned; outline scaled from a 300-450 dpi render (+-1 in.)")
