@@ -1013,7 +1013,7 @@ UNRESOLVED FLAG (general, reusable): `SBM.Core/Assumption.cs` `Assumption{Status
   in `sheet-links-ptc-delaware-river.json`. Joint sheets p.61-67 are medium confidence (two digit misreads found at U10 / L10 and corrected). Open: expansion dams, partial cover plates / splices / fills, shoe plates,
   stringer bearings (gaps 1.7 - 5.9 in. over the floor beams), rivets, curbs / parapets / walkways.
 - PTC DECK + VISIBLE CONNECTIONS (2026-10-20; TRUSS-DESIGN.md section 9, SUMMARY.md status): build order on `PTC Delaware River Bridge.sbm` = build -> (substructure) ->
-  truss-ptc-arch -> truss-ptc-approach -> girders-ptc -> `deck-ptc.csx` -> `connections-ptc.csx` -> `shoes-ptc.csx` -> `walkways-ptc.csx` -> `rivets-ptc.csx` (the truss / girder scripts rebuild `Truss`; deck-ptc replaces the line items, so walkways-ptc follows it). Generic truss inputs (OPTIONAL, omitted
+  truss-ptc-arch -> truss-ptc-approach -> girders-ptc -> `deck-ptc.csx` -> `connections-ptc.csx` -> `shoes-ptc.csx` -> `walkways-ptc.csx` -> `floor-connections-ptc.csx` -> `rivets-ptc.csx` (the truss / girder scripts rebuild `Truss`; deck-ptc replaces the line items, so walkways-ptc follows it; floor-connections-ptc needs the connections-ptc diaphragms / girder stiffeners). Generic truss inputs (OPTIONAL, omitted
   when unset; test `TrussTests.DeckItems_SplicePlates_Stiffeners_ShoeMaterial`): `TrussDeckDefinition.HaunchDepth/HaunchBottomWidth/HaunchSideSlope` (thickening under every
   stringer -> ConcreteModel.Haunches), `TrussDefinition.LineItems` (`TrussLineItemDefinition`: constant (U, V) section swept along the alignment at an offset or ACROSS it at a
   station, V from the finished grade; concrete -> ConcreteModel.Barriers, steel -> SteelPart of a Category: curbs / parapets, dam plates, gratings, diaphragm channels),
@@ -1077,6 +1077,20 @@ UNRESOLVED FLAG (general, reusable): `SBM.Core/Assumption.cs` `Assumption{Status
   PTC: main floor laterals X centred on W14 / W16 / W18 / W20 + K to WM22 (p.71 / p.99), floor beam partial cover plates (p.72), sockets per p.94 with pins along the
   bridge, 14 BP 73 / laced channels at the 1954 areas, stringer diaphragms between the stringer webs, gusset in-to-in / thickness re-reads, outlines U9 / L15 / L17,
   inspection platforms per p.102 / p.104, FB11 walkway north ladder to CL. Steel 86.1 % of p.42.
+  FLOOR CONNECTIONS / PERFORATIONS (step 3, 2026-10-21, TRUSS-DESIGN.md section 18; `samples/plans/floor-connections-ptc.csx`): generic OPTIONAL inputs (omitted when unset)
+  `TrussMemberDefinition.EndConnections` (`TrussEndConnection`: angle pair (first leg outstanding) / end plates (`PlateWidth` or `PlateOutline`, `StandOff`) on both web faces at the
+  member end(s), fills, `Back` from the end working point or null = PROBED on the first steel face (21 rays over the bearing face; a cut end already inside steel takes that steel's face
+  toward the member), `ExtendWeb` (web from the cut to the back), rivet columns `WebRivets` / `OutRivets` (`TrussRivetColumn`), `OutRivetDiameter`), `TrussStiffenerSet.FillThickness /
+  FillWidth / FillHeight / Top / LegToward / Plumb / Rivets`, `TrussLineItemDefinition.ClipAngles` (`TrussClipAngles`: framed diaphragm clip angles) + `Rivets` (`TrussLineItemRivet`),
+  `TrussPlate.Perforation` / `TrussPly.Perforation` (`TrussPerforation`: obround access holes CUT, plate = edge strips + pieces between the holes, all exact extrusions; centred between
+  the end gussets, `EndClear`, `Stagger`). Rivet grips of all of them = contiguous steel found along the shank (`TrussGenerator.SteelLineProbe`, triangle normals); ONE RIVET PER HOLE
+  (`MergeRivet`: a rivet whose axis lies within 0.8 (d1 + d2) of a parallel rivet already placed, shanks touching, becomes that rivet through both stacks - connection / stiffener
+  rivets are placed after the joint rivets). New appended PartCategory TrussConnectionAngle (IfcMember 'CONNECTION_ANGLE') / TrussConnectionPlate (IfcPlate 'CONNECTION_PLATE'),
+  layer 3D-TRUSS-CONNECTIONS. Test `TrussTests.Perforations_EndConnections_StiffenerFills_ExactAndGrips`. The PTC sheets have NO lacing bars / batten plates (perforated plates only).
+  PTC: approach floor beams / brackets 2-Ls 4x4x3/4 + 2-Fills 7x1/2 at the truss verticals (p.55), girder-span webs lapped on the girder stiffeners + corner plates (p.45; those girder
+  stiffeners now plumb, end stiffener pair straddling the web), main framed 2-Ls 8x4 1/2x3/4 + 2-Fills 11 1/2x3/4 + 38 x 1 1/8 field rivets (p.85; W14 framed to the rigid hanger), suspended
+  end plates 25 1/2 x 3/4 + pin plates + edge angles (p.94), stiffeners under every stringer, diaphragm clip angles L4x3 1/2x7/16, 11,250 + 430 access holes cut. Steel 86.2 -> 87.9 % of p.42,
+  rivets 280,040 -> 399,356, IFC 126 -> 196 MB (0 issues). Open (flagged): approach bent plate / lower angles, F7 W22 end, suspended bent bottom angles / pin hole, bracing connections.
 - Bonner Unit 6 (spans 30-35, 4 x FIB-96, `samples/plans/build-bonner-unit6.csx` -> `Bonner Unit 6 FIB.sbm`, reads docs/plan-data/bonner-b2500/fib-unit6
   CSVs; same -L- placement as Unit 5; terrain + georeference `samples/plans/terrain-bonner.csx`, `docs/plan-data/bonner-b2500/TERRAIN.md`): 24 SpanBeams, per-span layouts (G1 LEFT, CL bearing 1'-2" / 3'-2" bent 29 / 1'-4" bent 35), p439 strand pattern
   read from the VECTOR drawing (72 + 4 slack, 8 draped, 20 debonded), E1/E2/E3 + P sole plates, camber tables, bents 30-35 (level precast cap profile,
