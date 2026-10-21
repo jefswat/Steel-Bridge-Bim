@@ -208,6 +208,16 @@ Print("--- 8b. gusset layers (plates per face, total thickness)");
         else { single++; if (gs.Layers == 1) singleOk++; }
     }
     Cmp("joints with ONE gusset per face (p.73-90 re-checked 2026-10-20)", single, singleOk, 0, "", "", 0);
+
+    // gusset outlines (gusset-outlines.csv, connections-ptc.csx 4b) and rivet cover: every joint rivet inside its inner gusset with its edge distance
+    {
+        var tdef = Doc.Project.Bridges.First(b => b.Name == bdef.Name).Truss!;
+        var withOutline = tm.GussetStacks.Where(g => tdef.Joints.Any(j => j.Point == g.Point && j.Outline.Count >= 3)).ToList();
+        Row("INFO", "joints with a gusset outline read from the sheet (rest: envelope of the member laps)", "-", $"{withOutline.Count} of {tm.GussetStacks.Count} joint x plane; inner plates {withOutline.Sum(g => g.Areas[0]) / 0.09290304:N0} SF per face (outlines) + {tm.GussetStacks.Except(withOutline).Sum(g => g.Areas[0]) / 0.09290304:N0} SF (envelopes)");
+        foreach (var rc in tm.GussetRivetCovers.OrderBy(c => c.Plane).ThenBy(c => c.Point))
+            Row(rc.Ok ? "PASS" : "DIFF", $"gusset covers its rivets {rc.Plane} {rc.Point} ({(rc.OutlineGiven ? "outline from the sheet" : "envelope")})", $"every rivet >= {rc.RequiredEdge / 0.0254:0.##} in. from the edge",
+                $"{rc.Rivets} rivets per face, smallest edge distance {rc.MinEdge / 0.0254:0.##} in.{(rc.Short > 0 ? $", {rc.Short} short / outside" : "")}");
+    }
     var gp = tm.Steel.Parts.Where(p => p.Category == PartCategory.TrussGusset).ToList();
     Row("INFO", "gusset plates (all layers)", "-", $"{gp.Count} plates, {gp.Sum(p => p.Mass) * 2.20462262:N0} lb ({gp.Where(p => System.Text.RegularExpressions.Regex.IsMatch(p.Mark, @"-[LR]\d$")).Sum(p => p.Mass) * 2.20462262:N0} lb in the outer layers)");
 }
