@@ -930,10 +930,17 @@ public static partial class TrussGenerator
         {
             foreach (var c in _jointRivets)
             {
+                HashSet<TrussRivetGroup>? pooled = null;
                 // whole-joint counts first need every member's lap area
                 foreach (var rg in c.Def.Rivets)
                 {
                     if (rg.Member == "*") { WholeJointRivets(c, rg); continue; }
+                    if (pooled?.Contains(rg) == true) continue;
+                    if (_d.UniformChordRivets && pooled == null && rg.Distributed && !rg.Beyond)
+                    {
+                        var mm = c.Here.FirstOrDefault(i => i.Def.Name.Equals(rg.Member, StringComparison.OrdinalIgnoreCase) || i.Mark.Equals(rg.Member, StringComparison.OrdinalIgnoreCase));
+                        if (mm != null && IsChord(mm.Def.Role)) { pooled = PooledChordRivets(c); if (pooled.Contains(rg)) continue; }
+                    }
                     var m = c.Here.FirstOrDefault(i => i.Def.Name.Equals(rg.Member, StringComparison.OrdinalIgnoreCase) || i.Mark.Equals(rg.Member, StringComparison.OrdinalIgnoreCase));
                     if (m == null) { Warn($"Truss: rivets of joint {c.Point} ({c.Plane}) - member '{rg.Member}' does not frame into the joint; not placed."); continue; }
                     if (rg.Distributed) DistributedRivets(c, m, rg, rg.Count); else PitchRivets(c, m, rg);
@@ -954,6 +961,7 @@ public static partial class TrussGenerator
                 if (shortN > 0)
                     Warn($"Truss CHECK joint {c.Point} ({c.Plane}): {shortN} of {l.Count} rivets per face lie outside the gusset outline or closer than their edge distance to its edge (smallest {L(minEdge)}).");
             }
+            if (_pooledJoints > 0) Info($"Truss: chord rivets laid as one field per joint face (uniform chord rivets) at {_pooledJoints} joint faces{Src}.");
             if (_tightGroups > 0)
                 Warn($"Truss CHECK rivets: {_tightGroups} distributed rivet groups need a grid under 3 diameters (tightest {_tightest:0.00} d) - the image count and the gusset / member lap (envelope outline where the gussets are not dimensioned) disagree; each group is listed as Info. Positions are not adjusted.");
         }
@@ -1096,16 +1104,18 @@ public static partial class TrussGenerator
             for (int i = 0; i < members.Count; i++) if (n[i] > 0) DistributedRivets(c, members[i], rg, n[i]);
         }
 
-        private void DistributedRivets(JointCtx c, Inst m, TrussRivetGroup rg, int count)
+        /// <summary>Distributed rivets of one member at a joint. <paramref name="fixedS"/> &gt; 0 = use that grid spacing (pooled chord sides, see
+        /// <see cref="PooledChordRivets"/>); <paramref name="countOnly"/> = return the number of free grid positions at that spacing, place nothing.</summary>
+        private int DistributedRivets(JointCtx c, Inst m, TrussRivetGroup rg, int count, double fixedS = 0, bool countOnly = false)
         {
             double dia = rg.Diameter > 0 ? rg.Diameter : _d.JointDefaults.RivetDiameter;
-            if (dia <= 0 || count <= 0) { Warn($"Truss: rivets of joint {c.Point} member {m.Mark} - diameter / count missing; not placed."); return; }
+            if (dia <= 0 || count <= 0) { if (!countOnly) Warn($"Truss: rivets of joint {c.Point} member {m.Mark} - diameter / count missing; not placed."); return 0; }
             double e = rg.EdgeDistance > 0 ? rg.EdgeDistance : 1.5 * dia;
             bool beyond = rg.Beyond;
             double beyondLen = rg.BeyondLength > 0 ? rg.BeyondLength : 0.6;
             var regions = LapRegions(c, m);
             double area = regions.Sum(p => Math.Abs(MeshBuilder.SignedArea(p)));
-            if (area <= 0) { Warn($"Truss: rivets of joint {c.Point} ({c.Plane}) member {m.Mark} - the member does not lap the gusset; {count} rivets not placed."); return; }
+            if (area <= 0) { if (!countOnly) Warn($"Truss: rivets of joint {c.Point} ({c.Plane}) member {m.Mark} - the member does not lap the gusset; {count} rivets not placed."); return 0; }
             bool start = StartsAt(m, c.Plane, c.Point);
             bool through = !start && !(m.PlaneB.Equals(c.Plane, StringComparison.OrdinalIgnoreCase) && m.PointB.Equals(c.Point, StringComparison.OrdinalIgnoreCase));
             var dirs = through ? new[] { m.Axis, -m.Axis } : new[] { Away(m, start) };
@@ -1149,7 +1159,8 @@ public static partial class TrussGenerator
                 return pts;
             }
             double sMin = 1.6 * dia;   // button heads (1.6 d) at most touching
-            double s0 = Math.Sqrt(area / count), s = Math.Max(sMin, 1.3 * s0);
+            if (countOnly) return Grid(Math.Max(sMin, fixedS)).Count;
+            double s0 = Math.Sqrt(area / count), s = fixedS > 0 ? Math.Max(sMin, fixedS) : Math.Max(sMin, 1.3 * s0);
             var cand = Grid(s);
             for (int it = 0; it < 200 && cand.Count < count && s > sMin + 1e-9; it++) { s = Math.Max(sMin, s * 0.97); cand = Grid(s); }
             if (cand.Count < count)
@@ -1193,7 +1204,51 @@ public static partial class TrussGenerator
                 }
             }
             Info($"Truss: joint {c.Point} ({c.Plane}) member {m.Mark}: {2 * count} rivets {TrussSections.FormatIn(dia)} ({count} per {(beyond ? "member face beyond the gusset" : "gusset face")}, grid {TrussSections.FormatIn(s)}){(rg.Source.Length > 0 ? " (" + rg.Source + ")" : "")}.");
+            return count;
         }
+
+        /// <summary><see cref="TrussDefinition.UniformChordRivets"/>: the distributed (inside) groups of the chord members meeting at a joint are laid as ONE
+        /// rivet field: one grid spacing for all of them, chosen so the field holds their total count; each side then takes the grid positions of its own lap
+        /// (its count follows its lap, the total is kept). Returns the groups placed (the caller skips them).</summary>
+        private HashSet<TrussRivetGroup> PooledChordRivets(JointCtx c)
+        {
+            var done = new HashSet<TrussRivetGroup>();
+            var gs = new List<(TrussRivetGroup rg, Inst m)>();
+            foreach (var rg in c.Def.Rivets.Where(r => r.Distributed && !r.Beyond && r.Member != "*" && r.Count > 0))
+            {
+                var m = c.Here.FirstOrDefault(i => i.Def.Name.Equals(rg.Member, StringComparison.OrdinalIgnoreCase) || i.Mark.Equals(rg.Member, StringComparison.OrdinalIgnoreCase));
+                if (m != null && IsChord(m.Def.Role) && m.Plane.Equals(c.Plane, StringComparison.OrdinalIgnoreCase)) gs.Add((rg, m));
+            }
+            if (gs.Count < 2 || gs.Select(g => g.m).Distinct().Count() < 2) return done;
+            double dia = gs.Max(g => g.rg.Diameter > 0 ? g.rg.Diameter : _d.JointDefaults.RivetDiameter);
+            if (dia <= 0) return done;
+            int total = gs.Sum(g => g.rg.Count);
+            double area = gs.Select(g => g.m).Distinct().Sum(m => LapRegions(c, m).Sum(p => Math.Abs(MeshBuilder.SignedArea(p))));
+            if (area <= 0) return done;
+            double sMin = 1.6 * dia, s = Math.Max(sMin, 1.3 * Math.Sqrt(area / total));
+            int[] FreeAt(double sp) => gs.Select(g => DistributedRivets(c, g.m, g.rg, g.rg.Count, sp, countOnly: true)).ToArray();
+            var n = FreeAt(s);
+            for (int it = 0; it < 200 && n.Sum() < total && s > sMin + 1e-9; it++) { s = Math.Max(sMin, s * 0.97); n = FreeAt(s); }
+            int avail = n.Sum();
+            if (avail == 0) return done;
+            // side counts: the total split by the free positions of each lap (largest remainders), never more than a lap holds
+            int take = Math.Min(total, avail);
+            var share = n.Select(k => (double)take * k / avail).ToArray();
+            var cnt = share.Select(x => (int)Math.Floor(x)).ToArray();
+            foreach (int i in Enumerable.Range(0, cnt.Length).OrderByDescending(i => share[i] - cnt[i]).ThenBy(i => i))
+                if (cnt.Sum() < take && cnt[i] < n[i]) cnt[i]++;
+            for (int i = 0; i < gs.Count; i++)
+            {
+                if (cnt[i] > 0) DistributedRivets(c, gs[i].m, gs[i].rg, cnt[i], s);
+                done.Add(gs[i].rg);
+            }
+            Info($"Truss: joint {c.Point} ({c.Plane}) chord rivets laid as one field (grid {TrussSections.FormatIn(s)}): " +
+                string.Join(", ", gs.Select((g, i) => $"{g.m.Mark} {g.rg.Count} -> {cnt[i]}")) + $" per gusset face (total {total}{(take < total ? $", {take} fit" : "")}).");
+            if (take < total) Warn($"Truss CHECK joint {c.Point} ({c.Plane}): {total} chord rivets per gusset face do not fit the chord laps at the {TrussSections.FormatIn(s)} minimum spacing; {take} placed.");
+            _pooledJoints++;
+            return done;
+        }
+        private int _pooledJoints;
 
         /// <summary>Rivet lines along a member (<see cref="TrussMemberDefinition.RivetLines"/>): grip = connected stack of the section pieces present
         /// at each station through the line point.</summary>

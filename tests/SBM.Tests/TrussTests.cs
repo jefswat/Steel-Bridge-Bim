@@ -596,6 +596,35 @@ public class TrussTests : IDisposable
     }
 
     [Fact]
+    public void UniformChordRivets_OneFieldThroughTheJoint_TotalKept()
+    {
+        static (BridgeModel bm, List<double> grids) Run(bool uniform)
+        {
+            var (p, b) = Model();
+            b.Truss!.UniformChordRivets = uniform;
+            b.Truss.Joints.Add(new TrussJointDefinition { Point = "L3", Plane = "N", Rivets =
+            {
+                new TrussRivetGroup { Member = "L2-L3", Count = 6, Diameter = In(0.875), Distributed = true },
+                new TrussRivetGroup { Member = "L3-L4", Count = 30, Diameter = In(0.875), Distributed = true },
+            } });
+            var bm = Regen(p);
+            var rx = new System.Text.RegularExpressions.Regex(@"^Truss: joint L3 \(N\) member N-L[234]-L[34]: \d+ rivets .*grid (.+?)""\)");
+            var grids = bm.Steel!.Diagnostics.Select(d => rx.Match(d.Message)).Where(m => m.Success).Select(m => m.Groups[1].Value).Select(v =>
+                v.Split(' ').Sum(x => x.Contains('/') ? double.Parse(x.Split('/')[0]) / double.Parse(x.Split('/')[1]) : double.Parse(x))).ToList();
+            return (bm, grids);
+        }
+        var (b0, g0) = Run(false);
+        var (b1, g1) = Run(true);
+        Assert.Equal(2, g0.Count); Assert.Equal(2, g1.Count);
+        Assert.True(g0.Max() / g0.Min() > 1.4, "per-member grids differ without the option");
+        Assert.Equal(g1[0], g1[1], 6);                                           // one field: the same grid both sides
+        int Riv(BridgeModel bm) => bm.Steel!.Bolts.Count(x => x.Kind == BoltKind.Rivet);
+        Assert.Equal(Riv(b0), Riv(b1));                                          // total count kept
+        Assert.Contains(b1.Steel!.Diagnostics, d => d.Message.Contains("chord rivets laid as one field"));
+        Assert.DoesNotContain("UniformChordRivets", Model().p.ToJson());
+    }
+
+    [Fact]
     public void DeckItems_SplicePlates_Stiffeners_ShoeMaterial()
     {
         var (p, b) = Model();
