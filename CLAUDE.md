@@ -975,7 +975,8 @@ UNRESOLVED FLAG (general, reusable): `SBM.Core/Assumption.cs` `Assumption{Status
   shoes publish `BearingSeat`s with Location / axis -> `ForeignSeats`; a `SupportLinesOnly` bridge that gets a Truss generates it). `Truss/TrussGenerator` (pure,
   RegenerationCache branch) -> `TrussModel` (`SteelModel.Truss`; deck slab in `ConcreteModel.Deck`). Inputs: `Planes` (offset from the alignment, tilt), named
   `Points` (station + elevation, optional offset from the plane / plane filter: arch-type chords = the plan elevation table, no curve fit), `Sections`
-  (`TrussSectionKind` Box = web plies stacked from the OUTSIDE in + 4 angles (inside: backs on the innermost ply deeper than the angle leg) + covers (perforated =
+  (`TrussSectionKind` Box = web plies stacked from the OUTSIDE in + 4 angles (inside: backs on the innermost ply deeper than the angle leg; a ply that fits between the angle legs lies in
+  the leg layer and a deeper ply listed AFTER it lies inside the angles, between their outstanding legs; OPTIONAL `TrussPly.BetweenGussets` = outer ply the gussets are inlaid in) + covers (perforated =
   built solid, noted) + lacing / H (web vertical = floor beam) / LacedChannels / Angles / Rolled (AISC v16 exact name; not in the extract -> explicit dims or
   flagged envelope; `TrussSections.ParseAngle` for angles missing from AISC) / Plate / Round / Nominal (always flagged)), `Members` ("U3" on the member's plane or
   "N:U3" between planes; `Plane` "" = one per plane, mark "{plane}-{name}"; `Role`, `Panel` / `System` labels, setbacks, `OffsetZ`, `PlanLength` check), `Joints`
@@ -1017,8 +1018,9 @@ UNRESOLVED FLAG (general, reusable): `SBM.Core/Assumption.cs` `Assumption{Status
   when unset; test `TrussTests.DeckItems_SplicePlates_Stiffeners_ShoeMaterial`): `TrussDeckDefinition.HaunchDepth/HaunchBottomWidth/HaunchSideSlope` (thickening under every
   stringer -> ConcreteModel.Haunches), `TrussDefinition.LineItems` (`TrussLineItemDefinition`: constant (U, V) section swept along the alignment at an offset or ACROSS it at a
   station, V from the finished grade; concrete -> ConcreteModel.Barriers, steel -> SteelPart of a Category: curbs / parapets, dam plates, gratings, diaphragm channels),
-  `TrussJointDefinition.Plates` (`TrussJointPlate` Top / Bottom / WebInside / WebOutside splice + fill plates, fills on their side's member face, splice plates stacked over
-  them), `TrussMemberDefinition.Stiffeners` (`TrussStiffenerSet`: web stiffener angles / web plates at distances along the member), `TrussShoeDefinition.BodyMaterial`.
+  `TrussJointDefinition.Plates` (`TrussJointPlate` Top / Bottom / WebInside / WebOutside splice + fill plates; since QC pass 4 every plate
+  lies on the steel UNDER IT within its own band - member pieces (plies, angle legs, covers; `TrussGenerator.PieceLevel`) of the chord(s) its length reaches and the plates already placed
+  that overlap it; fills first, the one closest to the member first, then splice plates; marks keep the listed order), `TrussMemberDefinition.Stiffeners` (`TrussStiffenerSet`: web stiffener angles / web plates at distances along the member), `TrussShoeDefinition.BodyMaterial`.
   PTC: 6 3/4 slab to the parapet faces + 1 in thickening, curb + parapet section, aluminum railing (`Railings`), 18 dam bands, walkways (approach CL + pier floor beams, main
   L11 struts / FB11), main gussets from connections/gussets.csv + 110 chord splice / fill plates (splices.csv), girder stiffeners + web splice, mid-panel 15[33.9 diaphragms.
   Piers: piers.csv corrected per piers-review.md, legs lofted to the PRINTED base (`Leg(..., baseA, baseB)`). Checks: location 373 PASS / 47 DIFF (section 7 = p.42 quantities by

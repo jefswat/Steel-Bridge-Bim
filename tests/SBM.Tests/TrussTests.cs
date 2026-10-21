@@ -536,6 +536,66 @@ public class TrussTests : IDisposable
     }
 
     [Fact]
+    public void PlyInsideTheAngles_JointPlatesStackOnTheSteelUnderThem_InlaidOuterPly()
+    {
+        // (1) box 24 deep, L4x4x1/2 inside, plies 24 x 1/2 | 14 x 1/2 (fits between the 8 in leg zone) | 22 x 3/8 (listed after it: inside the angles)
+        var s = new TrussSectionDefinition
+        {
+            Name = "LAY", Kind = TrussSectionKind.Box, WebDepth = In(24), WebsOutToOut = In(20), Angle = "L4x4x1/2",
+            WebPlies = { new TrussPly(0, In(0.5)) { BetweenGussets = true }, new TrussPly(In(24), In(0.5)), new TrussPly(In(14), In(0.5)), new TrussPly(In(22), In(0.375)) },
+        };
+        var sec = TrussSections.Build(s);
+        var webs = sec.Pieces.Where(pc => pc.Label.StartsWith("web") && pc.Polygon.All(q => q.X > 0)).ToList();
+        (double x0, double x1) X(TrussSectionPiece pc) => (pc.Polygon.Min(q => q.X), pc.Polygon.Max(q => q.X));
+        Assert.Equal(4, webs.Count);
+        Assert.Equal(In(10), X(webs[0]).x1, 9);                      // outer ply (between the gussets)
+        Assert.Equal(In(9), X(webs[1]).x0, 9);                       // angles stand on this face
+        Assert.Equal(In(8.5), X(webs[2]).x0, 9);                     // 14 in ply in the layer of the angle legs (8.5 .. 9)
+        Assert.Equal(In(9), X(webs[2]).x1, 9);
+        Assert.Equal(In(8.125), X(webs[3]).x0, 9);                   // 22 in ply inside the angles (on the inside face of the 1/2 legs: 8.125 .. 8.5)
+        Assert.Equal(In(8.5), X(webs[3]).x1, 9);
+        var ang = sec.Pieces.First(pc => pc.Label.StartsWith("L ") && pc.Polygon.All(q => q.X > 0));
+        Assert.Equal(In(9), X(ang).x1, 9);
+        Assert.Equal(In(8.125), sec.WebInnerX, 9);
+        Assert.True(webs[0].BetweenGussets);
+        Assert.Equal(In(9.5), sec.HalfWidthAtJoints, 9);             // the inlaid-gusset ply does not count at the joints
+        Assert.Contains(sec.Notes, n => n.Contains("inside the angles"));
+        // without a ply that fits between the legs nothing changes (angles on the innermost deep ply)
+        var plain = TrussSections.Build(new TrussSectionDefinition { Name = "P", Kind = TrussSectionKind.Box, WebDepth = In(24), WebsOutToOut = In(20), Angle = "L4x4x1/2",
+            WebPlies = { new TrussPly(0, In(0.5)), new TrussPly(In(22), In(0.375)) } });
+        Assert.Equal(In(10) - In(0.875), plain.WebInnerX, 9);
+
+        // (2) joint plates at L3 (BOX chord: web 1/2 at x 9.5..10, L4x4x1/2 legs 9.0..9.5 for |y| >= 8): a 22 in fill listed BEFORE a 14 in fill must stack on
+        // it (the 14 in fill lies between the angle legs on the web, the 22 in fill on the legs + that fill), the splice plate on both
+        var (p, b) = Model();
+        b.Truss!.Joints.Add(new TrussJointDefinition { Point = "L3", Plane = "N", Plates = new()
+        {
+            new TrussJointPlate { Face = TrussPlateFace.WebInside, Width = In(22), Thickness = In(0.25), Length = In(10), Offset = -In(5), Fill = true, Label = "wide fill" },
+            new TrussJointPlate { Face = TrussPlateFace.WebInside, Width = In(14), Thickness = In(0.5), Length = In(10), Offset = -In(5), Fill = true, Label = "narrow fill" },
+            new TrussJointPlate { Face = TrussPlateFace.WebInside, Width = In(22), Thickness = In(0.375), Length = In(24), Label = "web spl" },
+        } });
+        var bm = Regen(p);
+        var P = bm.Steel!.Truss!.Point("N", "L3")!.World;
+        double Base(string label)
+        {
+            var part = bm.Steel.Parts.Single(x => x.Description.StartsWith(label));
+            var bb = part.Mesh.Bounds();
+            return Math.Max(bb.Max.Y - P.Y, P.Y - bb.Min.Y);           // outer face of the pair = the level it bears on
+        }
+        Assert.Equal(In(9.5), Base("narrow fill"), 6);
+        Assert.Equal(In(9.0), Base("wide fill"), 6);
+        Assert.Equal(In(8.75), Base("web spl"), 6);
+        // marks keep the listed order (fills first)
+        Assert.Contains(bm.Steel.Parts, x => x.Mark == "N-FL3-1" && x.Description.StartsWith("wide fill"));
+        Assert.Contains(bm.Steel.Parts, x => x.Mark == "N-FL3-2" && x.Description.StartsWith("narrow fill"));
+        // round trip keeps BetweenGussets, default omitted
+        var jo = new System.Text.Json.JsonSerializerOptions { NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.AllowNamedFloatingPointLiterals };
+        var t2 = new TrussDefinition(); t2.Sections.Add(s);
+        Assert.Contains("\"BetweenGussets\"", System.Text.Json.JsonSerializer.Serialize(t2, jo));
+        Assert.DoesNotContain("\"BetweenGussets\"", System.Text.Json.JsonSerializer.Serialize(Model().b.Truss, jo));
+    }
+
+    [Fact]
     public void DeckItems_SplicePlates_Stiffeners_ShoeMaterial()
     {
         var (p, b) = Model();
