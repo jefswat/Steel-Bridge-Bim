@@ -9,9 +9,10 @@ namespace SBM.Core.Truss;
 /// <summary>One solid of a built-up section: a simple polygon in the section plane (x across, y up; CCW), swept along the member axis.</summary>
 /// <remarks>Length / Offset: partial piece centred on the member (+ Offset); Start (not NaN): partial piece from that distance after the START working point;
 /// BetweenGussets: runs between the gusset plates of the two end joints (not counted for the member width at the joints).</remarks>
-public sealed record TrussSectionPiece(Vec2[] Polygon, string Label, double Length = 0, double Offset = 0, double Start = double.NaN, bool BetweenGussets = false)
+public sealed record TrussSectionPiece(Vec2[] Polygon, string Label, double Length = 0, double Offset = 0, double Start = double.NaN, bool BetweenGussets = false,
+    TrussPerforation? Perforation = null)
 {
-    public static TrussSectionPiece Of(Vec2[] polygon, string label, TrussPlate p) => new(polygon, label, p.Length, p.Offset, p.Start ?? double.NaN, p.BetweenGussets);
+    public static TrussSectionPiece Of(Vec2[] polygon, string label, TrussPlate p) => new(polygon, label, p.Length, p.Offset, p.Start ?? double.NaN, p.BetweenGussets, p.Perforation);
 }
 
 /// <summary>Lacing bar face of a section: bars lie in the plane y = <see cref="Y"/> .. Y + Thickness * Side (outside the face), spanning x = +/- HalfLines.</summary>
@@ -101,12 +102,14 @@ public static class TrussSections
     /// <summary>Legs and thickness from a designation "L7x4x7/8" / "L8x8x1-1/8" (inches); null when it does not parse.</summary>
     public static (double a, double b, double t)? ParseAngle(string name)
     {
-        var m = System.Text.RegularExpressions.Regex.Match(name.Trim(), @"^L\s*([\d.]+)\s*[xX]\s*([\d.]+)\s*[xX]\s*(?:(\d+)[- ])?(\d+)(?:/(\d+))?$");
+        // legs may carry a fraction too ("L5x3-1/2x7/16", "L5-1/4x4x3/4")
+        var m = System.Text.RegularExpressions.Regex.Match(name.Trim(), @"^L\s*([\d.]+(?:-\d+/\d+)?)\s*[xX]\s*([\d.]+(?:-\d+/\d+)?)\s*[xX]\s*(?:(\d+)[- ])?(\d+)(?:/(\d+))?$");
         if (!m.Success) return null;
         double F(string v) => double.Parse(v, System.Globalization.CultureInfo.InvariantCulture);
+        double Leg(string v) { var p = v.Split('-'); if (p.Length == 1) return F(v); var f = p[1].Split('/'); return F(p[0]) + F(f[0]) / F(f[1]); }
         double t = m.Groups[5].Success ? F(m.Groups[4].Value) / F(m.Groups[5].Value) : F(m.Groups[4].Value);
         if (m.Groups[3].Success) t += F(m.Groups[3].Value);
-        return (In(F(m.Groups[1].Value)), In(F(m.Groups[2].Value)), In(t));
+        return (In(Leg(m.Groups[1].Value)), In(Leg(m.Groups[2].Value)), In(t));
     }
 
     public static TrussBuiltSection Build(TrussSectionDefinition s)
@@ -191,7 +194,7 @@ public static class TrussSections
             foreach (var p in s.WebPlies)
             {
                 double pd = p.Depth > 0 ? p.Depth : d;
-                r.Pieces.Add(new(Rect(sg * x0, sg * (x0 - p.Thickness), -pd / 2, pd / 2), p.Label.Length > 0 ? p.Label : $"web PL {L(pd)} x {L(p.Thickness)}", p.Length, 0, p.Start ?? double.NaN));
+                r.Pieces.Add(new(Rect(sg * x0, sg * (x0 - p.Thickness), -pd / 2, pd / 2), p.Label.Length > 0 ? p.Label : $"web PL {L(pd)} x {L(p.Thickness)}", p.Length, 0, p.Start ?? double.NaN, false, p.Perforation));
                 x0 -= p.Thickness;
             }
         }
@@ -222,14 +225,14 @@ public static class TrussSections
         foreach (var p in s.TopPlates)
         {
             r.Pieces.Add(TrussSectionPiece.Of(Rect(-p.Width / 2, p.Width / 2, y, y + p.Thickness), p.Label.Length > 0 ? p.Label : $"cover PL {L(p.Width)} x {L(p.Thickness)}", p));
-            if (p.Perforated) r.Notes.Add($"section {s.Name}: perforated cover plate {p.Label} built solid (access holes not dimensioned)");
+            if (p.Perforated && p.Perforation == null) r.Notes.Add($"section {s.Name}: perforated cover plate {p.Label} built solid (access holes not dimensioned)");
             y += p.Thickness;
         }
         double yb = yBot;
         foreach (var p in s.BottomPlates)
         {
             r.Pieces.Add(TrussSectionPiece.Of(Rect(-p.Width / 2, p.Width / 2, yb - p.Thickness, yb), p.Label.Length > 0 ? p.Label : $"cover PL {L(p.Width)} x {L(p.Thickness)}", p));
-            if (p.Perforated) r.Notes.Add($"section {s.Name}: perforated cover plate {p.Label} built solid (access holes not dimensioned)");
+            if (p.Perforated && p.Perforation == null) r.Notes.Add($"section {s.Name}: perforated cover plate {p.Label} built solid (access holes not dimensioned)");
             yb -= p.Thickness;
         }
         if (s.Lacing is { } lac)
@@ -296,13 +299,13 @@ public static class TrussSections
         foreach (var p in s.TopPlates)
         {
             r.Pieces.Add(TrussSectionPiece.Of(Rect(-p.Width / 2, p.Width / 2, yt, yt + p.Thickness), p.Label.Length > 0 ? p.Label : $"cover PL {L(p.Width)} x {L(p.Thickness)}", p));
-            if (p.Perforated) r.Notes.Add($"section {s.Name}: perforated cover plate {p.Label} built solid (access holes not dimensioned)");
+            if (p.Perforated && p.Perforation == null) r.Notes.Add($"section {s.Name}: perforated cover plate {p.Label} built solid (access holes not dimensioned)");
             yt += p.Thickness;
         }
         foreach (var p in s.BottomPlates)
         {
             r.Pieces.Add(TrussSectionPiece.Of(Rect(-p.Width / 2, p.Width / 2, ybt - p.Thickness, ybt), p.Label.Length > 0 ? p.Label : $"cover PL {L(p.Width)} x {L(p.Thickness)}", p));
-            if (p.Perforated) r.Notes.Add($"section {s.Name}: perforated cover plate {p.Label} built solid (access holes not dimensioned)");
+            if (p.Perforated && p.Perforation == null) r.Notes.Add($"section {s.Name}: perforated cover plate {p.Label} built solid (access holes not dimensioned)");
             ybt -= p.Thickness;
         }
         if (s.Lacing is { } lac)

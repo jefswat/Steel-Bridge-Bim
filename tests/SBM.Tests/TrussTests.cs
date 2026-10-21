@@ -618,6 +618,71 @@ public class TrussTests : IDisposable
     }
 
     [Fact]
+    public void Perforations_EndConnections_StiffenerFills_ExactAndGrips()
+    {
+        var (p0, b0) = Model();
+        var bm0 = Regen(p0);
+        var json0 = System.Text.Json.JsonSerializer.Serialize(b0.Truss, new System.Text.Json.JsonSerializerOptions { NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.AllowNamedFloatingPointLiterals });
+        foreach (var key in new[] { "Perforation", "EndConnections", "FillThickness", "LegToward" }) Assert.DoesNotContain($"\"{key}\"", json0);
+        var (p, b) = Model();
+        var t = b.Truss!;
+        // 1. perforated bottom cover plate of the box chords: 9 x 15 holes @ 2'-0, 6 in clear of the gussets
+        var bot = t.Section("BOX")!.BottomPlates[0];
+        bot.Perforation = new TrussPerforation { Width = In(9), Length = In(15), Pitch = In(24), EndClear = In(6), Label = "9 x 15 @ 2'-0" };
+        // 2. floor beam FB2: end connection angles L4x4x3/4 on the vertical face (probed), web extended, rivets
+        var fb = t.Members.First(m => m.Name == "FB2");
+        fb.EndConnections = new() { new TrussEndConnection { Label = "2-Ls 4x4x3/4", Angle = "L4x4x3/4", Top = In(14), Length = In(24), ExtendWeb = true, RivetDiameter = In(0.875),
+            WebRivets = new() { new TrussRivetColumn(In(2.5), 8, In(3), In(1.5)) }, OutRivets = new() { new TrussRivetColumn(In(2.5), 8, In(3), In(1.5)) } } };
+        // 3. stiffener with fills and rivets on a girder member
+        t.Sections.Add(new TrussSectionDefinition { Name = "GIR", Kind = TrussSectionKind.H, WebVertical = true, WebDepth = In(60), WebPlies = { new TrussPly(In(60), In(0.5)) }, Angle = "L6x6x1/2" });
+        t.Members.Add(new TrussMemberDefinition { Name = "GIR", From = "L0", To = "L6", Plane = "N", Section = "GIR", Role = TrussMemberRole.Girder, OffsetZ = -Ft(10), Stiffeners = new()
+        {
+            new TrussStiffenerSet { Angle = "L5x3.5x7/16", Height = In(48), Distances = { Ft(10) }, FillThickness = In(0.5), FillWidth = In(3.5), LegToward = 1,
+                Rivets = new() { new TrussRivetColumn(In(2), 6, In(4), In(4)) }, RivetDiameter = In(0.875) },
+        } });
+        var bm = Regen(p);
+        var st = bm.Steel!; var tm = st.Truss!;
+        // perforated chord: volume = solid - holes x hole area x t (hole arcs 8 segments: inscribed polygon), every piece an exact extrusion
+        var chord0 = bm0.Steel!.Parts.First(x => x.Mark == "N-L2-L3");
+        var chord = st.Parts.First(x => x.Mark == "N-L2-L3");
+        int holes = Assert.Single(tm.Perforations.Where(x => x.Member == "N-L2-L3")).Holes;
+        Assert.True(holes >= 1);
+        double inscribed = In(9) * (In(15) - In(9)) + 0.5 * 16 * In(4.5) * In(4.5) * Math.Sin(2 * Math.PI / 16);
+        Assert.Equal(chord0.Volume - holes * inscribed * In(0.5), chord.Volume, 9);
+        Assert.True(chord.Mesh.HasExactSolids);
+        // end connections at both FB2 ends: angles on both web faces, web extension, rivets
+        var ang = st.Parts.Where(x => x.Category == PartCategory.TrussConnectionAngle && x.Mark.StartsWith("FB2-EC")).ToList();
+        Assert.Equal(2, ang.Count);
+        var a = TrussSections.ParseAngle("L4x4x3/4")!.Value;
+        foreach (var x in ang) { Assert.Equal(2 * (a.a + a.b - a.t) * a.t * In(24), x.Volume, 9); Assert.True(x.Mesh.HasExactSolids); }
+        // backs probed on the first steel face beyond the cut (S end: the vertical's channel flanges 8 in from the plane; N end: the gusset reaches the cut)
+        Assert.Equal(new[] { "FB2 L2 end: 10\"", "FB2 L2 end: 8\"" }, tm.ConnectionBacks);
+        // web extended only where the back lies inside the member setback (10 in)
+        var ext = Assert.Single(st.Parts, x => x.Mark.StartsWith("FB2-EC1") && x.Mark.EndsWith("W"));
+        Assert.Equal(w36Web() * (In(10) - In(8) - In(0.5)) * In(24), ext.Volume, 6);
+        static double w36Web() => SteelCatalog.FindWideFlange("W36x150")!.WebThickness;
+        var w36 = SteelCatalog.FindWideFlange("W36x150")!;
+        var riv = st.Bolts.Where(x => x.Kind == BoltKind.Rivet && x.Assembly == "FLOOR").ToList();
+        Assert.Equal(2 * (8 + 2 * 8), riv.Count);
+        // web rivets: grip = 2 legs + web; outstanding leg rivets: the leg + the steel behind it (vertical)
+        Assert.Equal(16, riv.Count(r => Math.Abs(r.Grip - (2 * a.t + w36.WebThickness)) < In(1.0 / 16)));
+        Assert.True(riv.Count(r => r.Grip > a.t + In(1.0 / 8)) >= 16);
+        // stiffener fills: angle stands out by the fill; rivets through angle + fill + web + fill + angle
+        var fill = st.Parts.Single(x => x.Mark == "N-GIR-ST1F");
+        Assert.Equal(PartCategory.TrussConnectionPlate, fill.Category);
+        Assert.Equal(2 * In(3.5) * In(0.5) * In(48), fill.Volume, 9);
+        var sr = st.Bolts.Where(x => x.Kind == BoltKind.Rivet && x.Assembly.StartsWith("GIRDER")).ToList();
+        Assert.Equal(6, sr.Count);
+        var s5 = TrussSections.ParseAngle("L5x3.5x7/16")!.Value;
+        Assert.All(sr, r => Assert.Equal(2 * (s5.t + In(0.5)) + In(0.5), r.Grip, 3));
+        // round trip
+        var p2 = BridgeProject.FromJson(p.ToJson());
+        Assert.NotNull(p2.Bridges[0].Truss!.Section("BOX")!.BottomPlates[0].Perforation);
+        Assert.Single(p2.Bridges[0].Truss!.Members.First(m => m.Name == "FB2").EndConnections!);
+        Assert.Equal(st.Parts.Count, Regen(p2).Steel!.Parts.Count);
+    }
+
+    [Fact]
     public void ShoePieces_ReplaceTheEnvelope_ExactVolumes()
     {
         var (p, b) = Model();

@@ -60,6 +60,10 @@ public sealed class TrussModel
     public List<TrussGussetRivetCover> GussetRivetCovers { get; } = new();
     /// <summary>Splice / fill plates built from <see cref="Bridge.TrussJointDefinition.Plates"/>.</summary>
     public int SplicePlates { get; set; }
+    /// <summary>End connections whose back was found on the steel face (member end: distance of the back of the angles from the working point).</summary>
+    public List<string> ConnectionBacks { get; } = new();
+    /// <summary>Perforated plates built with their access holes cut: (member mark, piece label, holes).</summary>
+    public List<(string Member, string Piece, int Holes)> Perforations { get; } = new();
     public int Rivets => Steel.Bolts.Count(b => b.Kind == BoltKind.Rivet);
     public double SlabArea { get; set; }
     public List<Diagnostic> Diagnostics => Steel.Diagnostics;
