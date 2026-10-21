@@ -87,6 +87,30 @@ foreach (var br in bridges)
 
     // ---- aluminum parapet railing (p.107 / p.108): oval rail 8 x 5 5/8 (3/16 wall) on cast posts 10 x 7 at the base, rail top 1'-6 above the parapet top
     br.Railings = new List<PedestrianRailingDefinition>();
+    // POST STATIONS at the abutments (p.108 elevations, read on the 150 dpi scan; stations increase from west to east). Chains as dimensioned, measured from the rail expansion joint J near
+    // the abutment (J = 2'-0 5/8 west of the CL bearing at the west abutment, 2'-0 3/8 east of it at the east abutment; a post stands 1'-2 1/8 / 1'-2 1/4 on each side of J):
+    //   west: wing 2 x (5 @ 5'-11 1/2 = 29'-9 1/2) with a second rail joint between the groups (1'-2 1/8 each side), girder span 5 @ 6'-0 = 30'-0 (first panel, p.108);
+    //   east: girder span 5 @ 5'-11 1/2 = 29'-9 1/2 (first panel), wing 5 @ 5'-9 1/2 = 28'-11 1/2 then 9 3/4 + 1'-9 to the end of the rail.
+    // Everything else on these runs keeps the equal-spacing rule (the other panels are not dimensioned on p.108; the pier panels p.108 'post spacing for panel each side of pier' are not entered).
+    List<double>? postFix = null;
+    double sp1 = FI(5, 11.5), jp = FI(1, 2.125);
+    if (br.Name == "PTC Girder spans 1-10")
+    {
+        double s0w = Sta("646+21.463"), j1 = s0w - FI(2, 0.625);
+        postFix = new List<double>();
+        for (int k = 0; k <= 5; k++) postFix.Add(j1 + jp + k * Ft(6));                       // first girder-span panel 5 @ 6'-0 = 30'-0
+        double gB = j1 - jp;                                                                    // wing group B, east group (west of J)
+        for (int k = 0; k <= 5; k++) postFix.Add(gB - k * sp1);
+        double gA = gB - 5 * sp1 - 2 * jp;                                                      // second joint, wing group A (west of it)
+        for (int k = 0; k <= 5; k++) postFix.Add(gA - k * sp1);
+    }
+    if (br.Name == "PTC Girder spans 28-31")
+    {
+        double s1e = Sta("711+92.797"), je = s1e + FI(2, 0.375), jq = FI(1, 2.25);
+        postFix = new List<double>();
+        for (int k = 0; k <= 5; k++) postFix.Add(je - jq - k * sp1);                           // first girder-span panel 5 @ 5'-11 1/2 = 29'-9 1/2
+        for (int k = 0; k <= 5; k++) postFix.Add(je + jq + k * FI(5, 9.5));                    // wing 5 @ 5'-9 1/2 = 28'-11 1/2
+    }
     foreach (int side in new[] { -1, 1 })
         br.Railings.Add(new PedestrianRailingDefinition
         {
@@ -95,10 +119,10 @@ foreach (var br in bridges)
             Source = "p.107 / p.108", FlagsDimensionOnly = true,
             Post = new RailPostDefinition
             {
-                Profile = new() { new(-In(5), 0), new(In(5), 0), new(In(3), In(15.1875)), new(-In(3), In(15.1875)) }, Thickness = In(7), Spacing = FI(5, 8.75), EndDistance = FI(1, 2.125),
+                Profile = new() { new(-In(5), 0), new(In(5), 0), new(In(3), In(15.1875)), new(-In(3), In(15.1875)) }, Thickness = In(7), Spacing = FI(5, 8.75), EndDistance = FI(1, 2.125), FixedStations = postFix == null ? null : new List<double>(postFix),
                 Description = "cast aluminum post 10 x 7 at the base, 6 in at the top",
-                Unresolved = U("p.107, p.108", "post layout and shape", "the posts are laid out per railing panel (31'-0 / 30'-5 3/4 panels: 5 spaces with 1'-2 1/8 to the joints, special panels on p.108) and the cast post is hollow with a 3/8 web",
-                    "solid tapered post 10 in -> 6 in x 7 in, equally spaced at most 5'-8 3/4 over each bridge run, 1'-2 1/8 from its ends; anchor bolts and pads not built."),
+                Unresolved = U("p.107, p.108", "post layout and shape", "the posts are laid out per railing panel (5 spaces with 1'-2 1/8 to the joints); only the abutment panels are dimensioned on p.108 (wing + first girder-span panel, entered as listed post stations); the other panels (31'-0 / 30'-5 3/4, pier joints) are not dimensioned, and the cast post is hollow with a 3/8 web",
+                    "solid tapered post 10 in -> 6 in x 7 in; abutment panels at the p.108 stations, all other posts equally spaced at most 5'-8 3/4 over each bridge run, 1'-2 1/8 from its ends; anchor bolts and pads not built."),
             },
             Members = new()
             {
