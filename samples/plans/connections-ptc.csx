@@ -347,7 +347,7 @@ var jointShear = new Dictionary<(string bridge, string joint), double>();
         }
     }
     report.Add($"gusset outlines: {nOwn} model joints from their own drawing, {nSim} from a 'similar to' joint, {nNone} without an outline (envelope kept): {string.Join(", ", none.Take(30))}{(none.Count > 30 ? ", ..." : "")}");
-    if (bigRot.Count > 0) report.Add($"gusset outlines: drawn vs model chord angle differs > 2.5 deg at {bigRot.Count} joints (mirrored half on the same grade; vertical shear applied, largest {Math.Atan(maxShear) * 180 / Math.PI:0.0} deg): {string.Join("; ", bigRot.Take(12))}");
+    if (bigRot.Count > 0) report.Add($"gusset outlines: drawn vs model chord angle differs > 2.5 deg at {bigRot.Count} joints (approach NJ / primed halves: the sheets draw the other half on its grade; main: reading of the drawn chord; vertical shear applied, largest {Math.Atan(maxShear) * 180 / Math.PI:0.0} deg): {string.Join("; ", bigRot.Take(12))}");
 }
 
 // ================================================================ 5. stacked gusset layers (gusset-layers.csv, 2026-10-20): a second (third) gusset plate per face OUTSIDE the
