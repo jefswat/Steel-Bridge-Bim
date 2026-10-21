@@ -144,3 +144,40 @@ Checker: Claude Sonnet 5.5. Model: `samples/plans/PTC Delaware River Bridge.sbm`
 
 ## Not checked in pass 3b
 Portal p.100 (U11 portal bracing section and connection), sway bracing counts and positions (dotted lines illegible on p.71), bottom lateral diagonal counts and the L10-L12 diamond (p.71), lateral / sway connection details p.97-98, suspended floor beam F5 / F7 positions (the p.72 panel grid is not legible at the scan resolution), rigid suspender sections, stringer line count (10 vs 11 rows on p.72), walkway ladders / platforms p.102-106 beyond the items above, girder-span walkways, E abutment section p.39, W abutment wall / wing sections (p.12) other than footing and pedestal, culvert p.14, dams p.46 / 51 / 52 / 54 / 68 / 92 other than Pier 20 (p.91), rivet counts at the other joints (only 13 sampled plus the all-gusset presence check), rivet grips, element-by-element reconciliation (unverified-element list not produced), second clash engine (IfcOpenShell ifcclash not run).
+
+# Pass 4 (member make-up and layered plates, 2026-10-21)
+
+User focus: "member make up and any layered plates, especially at gussets". Independent checker; the model is checked against the sheets, the CSVs / scripts are treated as the thing under test. Nothing in the code, scripts or data was changed.
+
+## Scope and method
+- Model: copy of `samples/plans/PTC Delaware River Bridge.sbm` (main at 4ecc4b1), CLI built from the same commit. Read-only: the .sbm truss inputs (`work/p4/dump_sbm.py` -> `work/p4/dump_*.txt`: every section's plies / angles / covers, every joint's gusset thickness, in-to-in, stacked layers and splice / fill plates), the generated solids (`work/p4/dump_solids.csx`: every exact extrusion recipe as x from the truss plane / station / z, so ply and plate stacking can be read in the section) and `sbm clash --bridge Arch`.
+- Sheets read at 130-560 dpi crops (`work/p4/crop.py`): p.69 SECTION columns (all 22 top and 20 bottom chord rows) and the L13-L17 half longitudinal section; main joint sheets p.74-90 (gusset callouts, in-to-in dimensions, splice / fill / inlay callouts, half flange plan views); 4-span approach p.60, p.63; girders p.44.
+- Rows: `results/checks.csv` C1793-C2027 (235 rows: 212 pass, 23 fail), written by `work/p4/rows.py`. Evidence crops in `evidence/p4/`.
+
+## Results
+- Chord make-up (p.69 table): 42 chord sections x (web plies, angles, cover plates) = 126 rows; all pass except L13-L14 (copied from L12-L13; I037).
+- Ply order / layering: 10 sections with 18 in. + 31 1/2 in. plies have the angles inside the 31 1/2 ply instead of in the 18 ply layer (I036); L10-L11 / L11-L12 have the 3/4 plies outside the 1 1/8 ply (I038).
+- Gussets (main): 40 joints' thickness + stacked layers all pass (incl. L10 3/4 + 1/2, L22 1 + 1 1/8); in-to-in fails at U7, U9, L8 (gussets stand off the web, I040) and L13 (gussets inside the chord, 0.5 in. clash, I039); L14 is an inlaid gusset modeled outside the chord (I041). 4-span approach joints U1-L3, U10, L10 (thickness, layers, in-to-in) pass.
+- Splice / fill layering: fills of one side are not stacked (U1 22x3/8 + 31 1/2x7/16 overlap each other and the angle legs; 166 fill / splice overlaps > 1/16 in. up to 0.53 in., I042); U1 cover fill on the wrong flange (I043); L15 16 ft web plates centred instead of starting at L15 (I044).
+- Girders (p.44): web, angles, b.b. 9'-6 1/2, top / bottom cover plates; floor beam F1: pass.
+- Flag text: the approach "only one gusset pair per joint is built" UNRESOLVED text is stale (layers are built, I045).
+
+## New issues (results/issues.csv, status open)
+| id | sev | page | finding |
+|---|---|---|---|
+| I036 | medium | 69, 81 | angles stand on the 31 1/2 ply; plan: 18 ply in the angle-leg layer, 31 1/2 innermost (10 chord sections) |
+| I037 | medium | 69, 83, 84 | L13-L14 make-up copied from L12-L13; plan 2-34x1 1/8 + 34x1 1/16 per side (= printed 325.25 sq.in.) |
+| I038 | low | 81 | L10-L11 / L11-L12: 34x1 1/8 is the outer ply ("2'-5 o. to o. 1 1/8 webs") |
+| I039 | high | 83 | L13 gussets 26 1/2 in. in to in (inside the chord, clash 0.5 in.); plan 2'-5 |
+| I040 | medium | 76, 77 | U7 / U9 / L8 gussets 31 / 30 1/2 in. in to in; plan 2'-5 (inlay splices) |
+| I041 | low | 69, 84 | L14 inlaid gusset modeled outside the chord |
+| I042 | medium | 74-77 | multiple fills per side not stacked; 166 overlaps up to 0.53 in.; L4 web fills missing |
+| I043 | low | 74 | U1 fill 24x5/16 on the bottom flange, model top |
+| I044 | low | 69, 86 | L15 2-18x1x16'-0 from L15 into L15-L16, model centred |
+| I045 | low | 49-67 | stale approach flag text about gusset layers |
+
+## Not verified in pass 4
+- Web members (p.70 table, diagonals / verticals / post U11-L11 make-up), bracing, floor beams F5-F8 and the approach member tables (p.47 / p.57): earlier passes checked their gross areas; their ply / cover order was not re-read.
+- Approach joint sheets other than p.60 / p.63 (3-span p.49-53, 4-span p.59, 61, 62, 64-67): gusset thickness / in-to-in not re-read in this pass.
+- Splice / fill / inlay plates that the model flags as not built (no length on the sheets) were not raised; the outer layer outlines at L10 / L11 / L22 and the approach L0 / L8 / L10 / L20 were not re-scaled.
+- Angle leg orientation (8 in. leg on the web) is inferred from the 18 in. plates fitting between the legs, not from a drawn section.
