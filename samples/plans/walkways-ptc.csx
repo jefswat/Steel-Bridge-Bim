@@ -69,13 +69,13 @@ void Walk(string bridge, string name, bool transverse, double reference, double 
     string desc = $"{bridge} - service walkways ({pages})";
     var items = t.LineItems!;
     double top = vTopIn;
-    items.Add(Li($"{name} grating", "WALKWAYS", desc, PartCategory.Grating, transverse, reference, from, to, fromGrade, P(-11.76, top - 0.75, 11.76, top - 0.75, 11.76, top, -11.76, top), pages, flag + " " + gratingFlag, gratingDensity));
+    items.Add(Li($"{name} grating", "WALKWAYS", desc, PartCategory.Grating, transverse, reference, from, to, fromGrade, P(-11.76, top - 1.25, 11.76, top - 1.25, 11.76, top - 0.5, -11.76, top - 0.5), pages, flag + " " + gratingFlag, gratingDensity));
     foreach (int sd in new[] { -1, 1 })
     {
         string s = sd < 0 ? "L" : "R";
         items.Add(Li($"{name} channel {s}", "WALKWAYS", desc, PartCategory.WalkwayStringer, transverse, reference, from, to, fromGrade, Channel(sd, top), pages, channelFlag, lbft: 15.3));
-        items.Add(Li($"{name} top rail {s}", "WALKWAYS", desc, PartCategory.WalkwayRail, transverse, reference, from, to, fromGrade, RailAngle(sd, 12, top + 36, 3, 3, 0.3125), pages, railFlag, lbft: 6.1));
-        items.Add(Li($"{name} mid rail {s}", "WALKWAYS", desc, PartCategory.WalkwayRail, transverse, reference, from, to, fromGrade, RailAngle(sd, 12, top + 18, 2.5, 3, 0.3125), pages, railFlag, lbft: 5.6));
+        items.Add(Li($"{name} top rail {s}", "WALKWAYS", desc, PartCategory.WalkwayRail, transverse, reference, from, to, fromGrade, RailAngle(sd, 15, top + 36, 3, 3, 0.3125), pages, railFlag, lbft: 6.1));
+        items.Add(Li($"{name} mid rail {s}", "WALKWAYS", desc, PartCategory.WalkwayRail, transverse, reference, from, to, fromGrade, RailAngle(sd, 15, top + 18, 2.5, 3, 0.3125), pages, railFlag, lbft: 5.6));
         // posts L 3x3x5/16 outside the channel web from the channel bottom to the top rail: leg across (3 in. x 5/16 along the run) + leg along (5/16 x 3 in.)
         double len = to - from, pitch = Ft(6);
         int n = Math.Max(1, (int)Math.Floor((len - In(12)) / pitch) + 1);
@@ -83,7 +83,7 @@ void Walk(string bridge, string name, bool transverse, double reference, double 
         items.Add(Li($"{name} posts {s} a", "WALKWAYS", desc, PartCategory.WalkwayPost, transverse, reference, from, to, fromGrade, P(sd * 12, top - 10, sd * 15, top - 10, sd * 15, top + 33, sd * 12, top + 33), pages, railFlag,
             pitch: pitch, width: In(0.3125), start: start));
         items.Add(Li($"{name} posts {s} b", "WALKWAYS", desc, PartCategory.WalkwayPost, transverse, reference, from, to, fromGrade, P(sd * 12, top - 10, sd * 12.3125, top - 10, sd * 12.3125, top + 33, sd * 12, top + 33), pages, railFlag,
-            pitch: pitch, width: In(3), start: start));
+            pitch: pitch, width: In(3 - 0.3125), start: start + In(0.3125)));   // the along leg starts beyond the across leg (no overlap at the heel)
     }
     var c = counts.GetValueOrDefault(bridge);
     counts[bridge] = (c.walkLf + (to - from) / 0.3048, c.ladders, c.platforms);
@@ -92,7 +92,7 @@ void Walk(string bridge, string name, bool transverse, double reference, double 
 // CL walkway between the floor beams (p.101 floor beam elevation / key plan, p.106 plan of walkway at W15 and expansion detail at piers 17 / 20, p.43 Section A-A):
 // the walkway is centred 2'-0 NORTH of the CL bridge (1'-0 to 3'-0: p.106 '1'-0 | Walkway 2'-0' from the CL, p.101 manhole and walk 2'-0 from the CL, p.43 'CL of
 // inspection walk 2'-0'), seated between the floor beams on their bottom flanges and interrupted at every floor beam web (the inspector passes the 12 x 20 manhole;
-// the walk channels are connected to the webs). Pieces run from floor beam web to floor beam web (1 1/4 in. clear of the web CL), the grating top 10 1/2 in. above
+// the walk channels are connected to the webs). Pieces run from floor beam web to floor beam web (1 3/4 in. clear of the web CL), the grating top 10 1/2 in. above
 // the floor beam bottom (10 [ 15.3 on the 1/2 in. bottom flange angle legs; approach / girder spans) or 3'-0 1/2 above it (main span: channel bottom 2'-2 1/2 above
 // the floor beam bottom, p.106 expansion detail).
 const double ClOffsetFt = -2.0;
@@ -115,7 +115,7 @@ double? FbBottomAt(SBM.Core.Steel.SteelPart p, SBM.Core.Alignments.Alignment al,
 int WalkCl(string bridge, string name, double from, double to, double aboveFbBottomIn, string pages, string flag)
 {
     var al = alOf[bridge];
-    double off = Ft(ClOffsetFt), clear = In(1.25);
+    double off = Ft(ClOffsetFt), clear = In(1.75);
     // floor beams crossing the walkway line (not the dam diaphragms of the girder spans), by station
     var fbs = new List<(double sta, double zBot)>();
     foreach (var p in model0[bridge].Steel!.Parts.Where(p => p.Category == SBM.Core.Steel.PartCategory.TrussFloorBeam && !p.Mark.StartsWith("dam ") && p.Mesh is { IsEmpty: false }))
@@ -204,7 +204,7 @@ const double TrussOff = 29.0, LadderOff = 26.0 + 7.0 / 12;      // 58'-0 c.c. tr
 string crossFlag = U("p.101, p.102", "cross walkway station", "the key plans put the cross walkways at the pier floor beams and the ladders 4'-9 3/8 from the CL bearing of the end shoe (piers 10 / 13 / 17; at 13 / 17 the 4-span shoe 2'-0 from the CL pier) or 6'-0 3/8 from the CL pier (piers 11 / 12 / 14 / 15 / 16); the walkway's own station is drawn only",
     "cross walkway centred on the ladder station (pier 13 / 24 of the 3-span unit: beside its end floor beam, no ladder); north half only except piers 10 / 27 (p.101 note 'omit this section of walkways at piers 13, 15 and 17'); NJ units opposite hand along the bridge, still to the north truss.");
 string clFlag = U("p.101, p.106", "CL walkway level and floor beam connections", "p.101 / p.106 dimension the walkway 2'-0 wide from 1'-0 to 3'-0 north of the CL bridge (p.101 floor beam elevation: manhole and walk 2'-0 from the CL; p.106: '1'-0 | Walkway 2'-0' from the CL) and draw it seated between the floor beams on their bottom flanges (channels connected to the webs, manhole above); the connection angles / hangers and the exact seat are drawn, not dimensioned",
-    "pieces from floor beam web to floor beam web (1 1/4 in. clear of the web CL), centred 2'-0 north of the CL, grating top 10 1/2 in. above the floor beam bottom (10 [ 15.3 on the 1/2 in. bottom flange angle legs), rails and posts per piece; manholes not cut, connection angles not built. (Before 2026-10-21 the walkway was centred 1'-0 north, through the webs at the bottom flange: it clashed with the hanger bracing / sway members on the CL.)");
+    "pieces from floor beam web to floor beam web (1 3/4 in. clear of the web CL), centred 2'-0 north of the CL, grating top 10 1/2 in. above the floor beam bottom (10 [ 15.3 on the 1/2 in. bottom flange angle legs), rails and posts per piece; manholes not cut, connection angles not built. (Before 2026-10-21 the walkway was centred 1'-0 north, through the webs at the bottom flange: it clashed with the hanger bracing / sway members on the CL.)");
 var units = new (string bridge, int east, (string fb, double ladderFt, bool full, bool ladder, bool platformBoth)[] pts)[]
 {
     ("PTC 3-span truss 11-13", 1, new[] { ("FB0", 4 + 9.375 / 12, true, true, true), ("FB8", 6 + 0.375 / 12, false, true, false), ("FB8'", 6 + 0.375 / 12, false, true, false), ("FB0'", double.NaN, false, false, false) }),
@@ -258,7 +258,7 @@ foreach (var (bn, east, pts) in units)
     {
         WalkCl(bn, "walkway CL W15-W15'", Math.Min(fb15.Value.sta, fb15p.Value.sta), Math.Max(fb15.Value.sta, fb15p.Value.sta), 36.5, "p.106",
             U("p.106", "main span CL walkway", "the key plan for navigation light supports and walkways draws the CL walkway from W15 to W15' (material 10 [ 15.3, grating, rails), the plan of walkway at W15 puts it 1'-0 to 3'-0 north of the CL bridge and the expansion detail at piers 17 / 20 draws the walk channels 2'-2 1/2 above the main floor beam bottom, connected to the webs; the connections are drawn, not dimensioned",
-                "pieces from floor beam web to floor beam web (1 1/4 in. clear of the web CL), centred 2'-0 north of the CL, grating top 3'-0 1/2 above the floor beam bottom; connection angles not built. (Before 2026-10-21: centred 1'-0 north at the floor beam bottom, clashing with the floor lateral plates.)"));
+                "pieces from floor beam web to floor beam web (1 3/4 in. clear of the web CL), centred 2'-0 north of the CL, grating top 3'-0 1/2 above the floor beam bottom; connection angles not built. (Before 2026-10-21: centred 1'-0 north at the floor beam bottom, clashing with the floor lateral plates.)"));
         foreach (var j in new[] { "15", "20", "19'", "15'" })
         {
             var box = PartBox(bn, "FB" + j);
