@@ -120,7 +120,7 @@ report.Add($"approach: {nConn} floor beam / bracket end connections, {nStiff} st
 // the bottom corner plates "2-7/16 Pls, 2-1/2 Fills" (p.45, both sides) scaled; stiffeners as the approach (p.45: details not shown same as Sh. 15 = p.55).
 string gConnFlag = U("p.45", "floor beam / bracket connection to the girder (web lapped on the girder stiffener, 2-7/16 corner plates on 1/2 fills)",
     "Section A / the elevation draw it without dimensions: web end, rivet line (22 x 1 in, 3 1/2 in.), corner plate outlines scaled at 5.6 px/in (+-1 in.)",
-    "web extended to 1/2 in. clear of the girder web + its 1 1/8 flange angle legs, on the side of the girder stiffener's outstanding leg (the stiffener moved by half the floor beam web to lie against it), one rivet line (21 x 1 in @ 3 1/2) at 3 1/2 in. from the girder CL, corner plates 7/16 on 1/2 fills.");
+    "web extended to 1/2 in. clear of the girder web + its 1 1/8 flange angle legs, on the side of the girder stiffener's outstanding leg (the stiffener moved by half the floor beam web to lie against it), one rivet line (21 x 1 in @ 3 1/2) at 3 1/2 in. from the girder CL, corner plates 7/16 on 1/2 fills, starting 1/16 in. + 0.4 in. (the floor beam frame leans 1/96 with the crown over the 37 in. plate depth) beyond the web leg of the girder stiffener on its 1 1/8 fill.");
 double gTw = In(7.0 / 16), gWebHalf = In(7.0 / 32) + In(1.125);     // web face of the girder + its flange angle legs (8 x 8 x 1 1/8) the web end must clear
 foreach (var bn in girders)
 {
@@ -141,7 +141,8 @@ foreach (var bn in girders)
         if (es == null) continue;
         es.PerFace = 1; es.LegToward = -1; es.Plumb = true; es.Distances = es.Distances.Select(x => x - gTw / 2).ToList(); es.Label += " (one side of the floor beam web)";
         var es2 = new TrussStiffenerSet { Label = "end stiffeners 4-Ls 7x4x3/4 (other side of the floor beam web)", Angle = es.Angle, PerFace = 1, LegToward = 1, Height = es.Height, Plumb = true,
-            Distances = es.Distances.Select(x => x + gTw).ToList(), Material = es.Material, Source = es.Source, Unresolved = es.Unresolved };
+            Distances = es.Distances.Select(x => x + gTw).ToList(), Material = es.Material, Source = es.Source, Unresolved = es.Unresolved,
+            FillThickness = es.FillThickness, FillWidth = es.FillWidth, FillHeight = es.FillHeight, Rivets = es.Rivets, RivetDiameter = es.RivetDiameter, RivetUnresolved = es.RivetUnresolved };
         g.Stiffeners!.Insert(g.Stiffeners.IndexOf(es) + 1, es2);
     }
     var lines = t.Floor!.Stringers.Select(s => s.Offset).Distinct().OrderBy(o => o).ToList();
@@ -160,7 +161,8 @@ foreach (var bn in girders)
         // the girder stiffener's outstanding leg under the plate: 7 x 3/4 end stiffeners at the end floor beams (CL bearings), 6 x 1/2 at the others; the fill
         // (of the leg thickness) starts beyond the leg toe
         bool endFb = System.Text.RegularExpressions.Regex.IsMatch(m.Name, @"-[04]$");
-        double uFill = (endFb ? In(7) : In(6)) + In(7.0 / 32) - (gWebHalf + In(0.5)) + In(0.375);   // 3/8 in. beyond the leg toe (1/4 left the end stiffener legs 0.08 in. into the fill, step 4)
+        // girder stiffener outstanding leg toe: 4 in. (end stiffeners L 7 x 4, 7 in. leg on the web) / 6 in. (floor beam stiffeners), both standing on 1 1/8 fills (p.44)
+        double uFill = (endFb ? In(4) : In(6)) + In(1.125) + In(7.0 / 32) - (gWebHalf + In(0.5)) + In(0.375);   // 3/8 in. beyond the leg toe (1/4 left the end stiffener legs 0.08 in. into the fill, step 4)
         m.EndConnections = new()
         {
             new TrussEndConnection
@@ -171,7 +173,7 @@ foreach (var bn in girders)
             },
             new TrussEndConnection
             {
-                End = TrussMemberEnd.Start, Label = "2-7/16 corner Pls", Back = gWebHalf + In(0.5), PlateOutline = corner, PlateThickness = In(7.0 / 16), StandOff = endFb ? In(0.75) : In(0.5),
+                End = TrussMemberEnd.Start, Label = "2-7/16 corner Pls", Back = gWebHalf + In(0.5), PlateOutline = corner.Select(q => new TrussUV(Math.Max(q.U, (endFb ? In(0.25) : 0) + In(1.0 / 16) + In(0.4)), q.V)).ToList(), PlateThickness = In(7.0 / 16), StandOff = endFb ? In(0.75) : In(0.5),
                 Top = -half + In(19.25), Length = In(18.75), Material = "S", Source = "p.45", Unresolved = gConnFlag,
                 WebRivets = new() { Col(9.0, 3, 3.5, 3.5), Col(13.0, 2, 3.5, 7.0) }, RivetDiameter = In(0.875), RivetMaterial = "7/8 in carbon steel rivet",
             },
