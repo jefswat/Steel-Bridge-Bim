@@ -44,7 +44,7 @@ B,L7,0.625,15.625,62,medium,"2 - 5/8"" Gussets (15 5/8"" in. to in.); 2-Fills 10
 B,L8,0.75,17.875,62,medium,"2 - 3/4"" Gus. Pls. (17 7/8"" in. to in.)"
 B,U9,0.875,17.875,62,medium,"2 - 7/8"" Gus. Pls. (17 7/8"" in. to in.)"
 B,L9,0.625,16.375,62,medium,"2 - 5/8"" Gussets (16 3/8"" in. to in.); details not shown similar to L1 sheet 20"
-B,U10,0.625,19.125,63,high,p.63 re-read at 450 dpi: 2 - 5/8 in. Gusset Pls. (19 1/8 in. in.) [extraction file had 7/8]
+B,U10,0.625,19.125,63,high,p.63 re-read at 450 dpi: 2 - 5/8 in. Gusset Pls. (19 1/8 in. in.) [extraction file had 7/8]; details not shown similar to U8 sheet 12 (p.63 note: similar to Joint U8 - Sheet 12)
 B,L10,0.875,17.625,63,high,p.63 re-read at 450 dpi: 2 - 7/8 in. Gus. Pls. (17 5/8 in. in.) [extraction file had 17 7/8]
 B,U11,0.875,17.5,64,medium,"2 - 7/8"" Gussets (17 1/2"" in. to in.)"
 B,L11,0.625,17.25,64,medium,"2 - 5/8"" Gussets (17 1/4"" in. to in.); details not shown similar to L1 sheet 20"
@@ -64,5 +64,5 @@ B,U18,0.625,14.25,66,low,"2 - 5/8"" Gussets (14 1/4"" in. to in.); 2-1/8"" Fills
 B,L18,0.75,15.625,66,medium,"2 - 3/4"" Gussets (15 5/8"" in. to in.)"
 B,U19,0.875,17.875,66,medium,"2 - 7/8"" Gussets (17 7/8"" in. to in.)"
 B,L19,0.625,15.5,66,medium,"2 - 5/8"" Gussets (15 1/2"" in. to in.); similar to L1 sheet 20"
-B,U20,,17.25,67,low,gusset thickness not read; 17 1/4 in. to in.
+B,U20,,17.25,67,low,gusset thickness not read; 17 1/4 in. to in.; p.67 note: for details not shown see U8 sheet 12
 B,L20,0.875,17.625,67,medium,"2 - 7/8"" Gussets (17 5/8"" in. to in.); 2 - 3/4"" Gussets"

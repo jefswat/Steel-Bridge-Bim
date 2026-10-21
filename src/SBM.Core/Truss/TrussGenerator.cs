@@ -73,6 +73,14 @@ public static class TrussGenerator
         private readonly HashSet<string> _warned = new();
         private sealed record JointCtx(string Plane, string Point, List<Inst> Here, TrussJointDefinition Def, double X, double Tg, Vec3 P, Vec3 U, Vec3 V, Vec3 N, List<Vec2> Outline, string Asm, List<(List<Vec2> poly, double t)>? Layers = null);
         private readonly List<JointCtx> _jointRivets = new();
+        /// <summary>Joint rivet positions (joint u, v on one face) with their required edge distance, per joint context (gusset rivet cover check).</summary>
+        private readonly Dictionary<JointCtx, List<(Vec2 uv, double e)>> _jointRivetUv = new(ReferenceEqualityComparer.Instance);
+        private void NoteRivet(JointCtx c, Vec3 at, double e)
+        {
+            if (!_jointRivetUv.TryGetValue(c, out var l)) _jointRivetUv[c] = l = new();
+            var w = at - c.P;
+            l.Add((new Vec2(Vec3.Dot(w, c.U), Vec3.Dot(w, c.V)), e));
+        }
         private readonly List<(string plane, string point, Vec3 P, Vec3 ax, Vec3 yv, double a0, double a1, double y0, double y1, double t)> _insidePlates = new();
 
         public Gen(BridgeFraming f, UnitSystem u) { _f = f; _b = f.Definition; _d = f.Definition.Truss!; _al = f.Alignment; _u = u; }
@@ -569,7 +577,7 @@ public static class TrussGenerator
             if (MeshBuilder.SignedArea(outline) < 0) outline.Reverse();
             Assumption? asu = flags.Count > 0 || jdef?.Unresolved.Length > 0
                 ? Assumption.UnresolvedDimension(string.Join("; ", (jdef?.Unresolved.Length > 0 ? new[] { jdef.Unresolved } : Array.Empty<string>()).Concat(flags)) + $" (joint {pt}){Src}",
-                    "gusset plates outside the chord webs, envelope outline") : null;
+                    jdef is { Outline.Count: >= 3 } ? "gusset plates outside the chord webs, outline as given (scaled / derived)" : "gusset plates outside the chord webs, envelope outline") : null;
             // one warning per distinct text (the per-joint reason stays on the parts)
             if (jdef?.Unresolved.Length > 0) Warn(jdef.Unresolved);
             if (flags.Count > 0) Warn(jd.Unresolved.Length > 0 && jdef is not { Outline.Count: >= 3 } ? jd.Unresolved + (tg == In(0.75) && !(jdef is { GussetThickness: > 0 } || jd.GussetThickness > 0) ? " Gusset thickness not given where no joint sheet was read: 3/4\" built." : "")
@@ -736,6 +744,21 @@ public static class TrussGenerator
                     if (rg.Distributed) DistributedRivets(c, m, rg, rg.Count); else PitchRivets(c, m, rg);
                 }
             }
+            // gusset rivet cover: every joint rivet inside its inner gusset outline with the group's edge distance (1 mm tolerance)
+            foreach (var c in _jointRivets)
+            {
+                if (!_jointRivetUv.TryGetValue(c, out var l) || l.Count == 0) continue;
+                int shortN = 0; double minEdge = double.MaxValue, req = double.MaxValue;
+                foreach (var (uv, e) in l)
+                {
+                    double d = EdgeDistance(c.Outline, uv);
+                    minEdge = Math.Min(minEdge, d); req = Math.Min(req, e);
+                    if (d < e - 0.001) shortN++;
+                }
+                Model.GussetRivetCovers.Add(new TrussGussetRivetCover(c.Plane, c.Point, l.Count, shortN, minEdge, req, c.Def.Outline.Count >= 3));
+                if (shortN > 0)
+                    Warn($"Truss CHECK joint {c.Point} ({c.Plane}): {shortN} of {l.Count} rivets per face lie outside the gusset outline or closer than their edge distance to its edge (smallest {L(minEdge)}).");
+            }
             if (_tightGroups > 0)
                 Warn($"Truss CHECK rivets: {_tightGroups} distributed rivet groups need a grid under 3 diameters (tightest {_tightest:0.00} d) - the image count and the gusset / member lap (envelope outline where the gussets are not dimensioned) disagree; each group is listed as Info. Positions are not adjusted.");
         }
@@ -760,6 +783,7 @@ public static class TrussGenerator
                     {
                         double y = (r - (rows - 1) / 2.0) * rg.Gage;
                         var c0 = c.P + d1 * (t0 + rg.FirstFromEnd + k * rg.Pitch) + m.Y * (y + m.Def.OffsetZ);
+                        if (side < 0) NoteRivet(c, c0, rg.EdgeDistance > 0 ? rg.EdgeDistance : 1.5 * dia);
                         AddRivet(c0 + c.N * (side * (c.X + StackAt(c, c0))), c.N * (-side), d1, Grip(c, m, c0), dia, c.Asm, rg.Material, asu);
                         placed++;
                     }
@@ -825,6 +849,22 @@ public static class TrussGenerator
                 }
             }
             return output;
+        }
+
+        /// <summary>Distance from a point to the polygon edge: + inside, - outside.</summary>
+        private static double EdgeDistance(List<Vec2> poly, Vec2 p)
+        {
+            bool inside = false; double best = double.MaxValue;
+            for (int i = 0, j = poly.Count - 1; i < poly.Count; j = i++)
+            {
+                var a = poly[i]; var b = poly[j];
+                if ((a.Y > p.Y) != (b.Y > p.Y) && p.X < (b.X - a.X) * (p.Y - a.Y) / (b.Y - a.Y) + a.X) inside = !inside;
+                var ab = b - a; double l2 = ab.X * ab.X + ab.Y * ab.Y;
+                double t = l2 < 1e-18 ? 0 : Math.Clamp(((p.X - a.X) * ab.X + (p.Y - a.Y) * ab.Y) / l2, 0, 1);
+                double dx = a.X + ab.X * t - p.X, dy = a.Y + ab.Y * t - p.Y;
+                best = Math.Min(best, Math.Sqrt(dx * dx + dy * dy));
+            }
+            return inside ? best : -best;
         }
 
         private static bool Inside(List<Vec2> poly, Vec2 p, double edge)
@@ -918,6 +958,7 @@ public static class TrussGenerator
             foreach (var (t, y, d1) in pick)
             {
                 var c0 = c.P + d1 * t + m.Y * y;
+                NoteRivet(c, c0, e);
                 foreach (int side in new[] { -1, 1 })
                     AddRivet(c0 + c.N * (side * (c.X + StackAt(c, c0))), c.N * (-side), d1, Grip(c, m, c0), dia, c.Asm, rg.Material, asu);
             }

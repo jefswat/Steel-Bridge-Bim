@@ -69,3 +69,16 @@ Gusset layers (2026-10-20, `gusset-layers.csv`; every joint sheet p.49-53, 59-67
 - Outlines: the outer layers are SMALLER than the inner gusset (lower / central zone of the joint). Polygons in `outline_uv_in` are scaled from 300-450 dpi renders (u = drawing x, right +,
   which is toward the higher panel number on every sheet; v up; origin = the work point; inches): +-1 in. Dimension-only in the model.
 - Not separated: the 1/8 in. gap between the L22 half gussets; the step positions of the L11 3/4 plates along the chords (three dimension lines in the elevation); fills between layers (none drawn).
+
+
+Gusset outlines (2026-10-20, `gusset-outlines.csv`; reader `tools/ptc_gusset_outlines.py`)
+- One row per DRAWN joint (the inner gusset = the plate with the 'in. to in.' callout, against the members / fills; stacked outer layers stay in gusset-layers.csv).
+  Columns: page, dpi, `px_per_in` (sheet scale at that dpi from a printed dimension >= 3 ft measured on its extension lines, `scale_basis`), `wp_px` (work point = intersection
+  of the member centre lines), `chord_px` (two points on the chord centre line: direction only), `outline_px` (polygon, absolute page pixels at that dpi) -> derived by
+  `convert`: `drawn_chord_deg`, `outline_uv_in` (sheet frame: u = drawing x = toward the higher panel number, v up, origin = work point, inches), size and area per plate.
+  `also_applies_to` = joints the sheet gives as "details not shown, similar to" this one; `evidence` = drawn edges / rivet fields / printed dimensions / symmetry.
+- Method: grid-overlaid renders (`grid`, labels = absolute page pixels at 150 dpi, `zoom=` 0.75-6 for the render), every polygon checked on an overlay of the page
+  (`overlay`): edges on the drawn plate edges, every rivet of the groups through the plate inside with an edge distance of about 1 1/4 - 1 1/2 in. Edges hidden under members
+  or splice plates continue the drawn edges (or the joint's symmetry). Reading accuracy about +-1 in. (+-3 px at 200 dpi on 3/4" = 1'-0 sheets).
+- Use (connections-ptc.csx section 4b): vertical shear so the drawn chord lies on the model chord and the posts stay plumb (TRUSS-DESIGN.md section 15), mirrored
+  for the primed half and for the New Jersey units; "similar to" joints take the drawn joint's outline (flagged). Every outline is a dimension-only UNRESOLVED flag (page + reason).

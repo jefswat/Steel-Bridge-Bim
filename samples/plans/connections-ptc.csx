@@ -241,13 +241,126 @@ foreach (var br in Doc.Project.Bridges.Where(b => b.Name.StartsWith("PTC ") && b
     }
 report.Add($"shoe bodies of built-up carbon steel plates: {shoeC} (main L11 / L11' stay cast steel, p.96)");
 
+// ================================================================ 4b. gusset plate OUTLINES (gusset-outlines.csv, 2026-10-20): the inner gusset of every drawn joint read from the joint
+// sheets (tools/ptc_gusset_outlines.py: polygon + work point + chord direction in page pixels, scale from a printed dimension) in the sheet frame (u = drawing x =
+// toward the higher panel number, v up, origin = work point, inches). Placed on the model joint by a VERTICAL SHEAR v += u (tan(model chord) - tan(drawn chord)) (mean
+// direction of the chords at the point), then mirrored for the primed half of a unit and for the New Jersey units: the sheets draw one half of a unit on its grade with plumb
+// verticals; the other half is the mirror image in member layout but lies on the same grade, so a mirror alone would tilt the chord edge by twice the grade and a rotation
+// would tilt the plumb post edges - the shear keeps the chord edges on the chord and the post edges plumb (it also absorbs the small scan skew of the drawn chord).
+// Joints the sheets give as "details not shown, similar to X" take X's outline (flagged). Joints without a drawing keep the envelope (JointDefaults flag).
+// The shear is kept per (bridge, joint) for the stacked layers of section 5.
+var jointShear = new Dictionary<(string bridge, string joint), double>();
+{
+    string dataRoot = Path.GetDirectoryName(dataDir)!;
+    var rows = Csv("gusset-outlines.csv");
+    // structure key: main / A (3-span) / B (4-span)
+    string Key(Dictionary<string, string> r) => r["structure"] == "main" ? "main" : r["structure"].Contains("unit A") ? "A" : "B";
+    var own = new Dictionary<(string, string), Dictionary<string, string>>();
+    foreach (var r in rows) own[(Key(r), r["joint"].Trim())] = r;
+    // similar-to references: the readers' also_applies_to + the approach joints.csv notes ("similar to U2 sheet 20": sheet n = PDF page n + 40)
+    var similar = new Dictionary<(string, string), ((string, string) src, string why)>();
+    foreach (var r in rows)
+        foreach (var a in r["also_applies_to"].Split(new[] { ';', ',' }, StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim().Split(' ')[0]).Where(x => System.Text.RegularExpressions.Regex.IsMatch(x, @"^[UL]\d+'?$")))
+            if (!own.ContainsKey((Key(r), a))) similar[(Key(r), a)] = ((Key(r), r["joint"].Trim()), $"p.{r["page"]}: details not shown, similar to {r["joint"]}");
+    string UnitOfPage(int pg, string joint) => pg >= 49 && pg <= 53 ? "A" : pg >= 60 && pg <= 67 ? "B" : pg == 59 ? (joint.EndsWith("'") ? "A" : "B") : "main";
+    var apRows = new List<Dictionary<string, string>>();
+    {
+        var lines = File.ReadAllLines(Path.Combine(dataRoot, "truss-approach", "joints.csv"));
+        var head = lines[0].Split(',');
+        foreach (var l in lines.Skip(1))
+        {
+            var m = System.Text.RegularExpressions.Regex.Match(l, @"similar to ([UL]\d+'?)(?:[^,]*?sheet (\d+))?", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+            var m2 = System.Text.RegularExpressions.Regex.Match(l, @"see ([UL]\d+) sheet (\d+)", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+            if (!m.Success && !m2.Success) continue;
+            var mm = m.Success ? m : m2;
+            string unit = l.Split(',')[0], joint = l.Split(',')[1];
+            string srcUnit = mm.Groups[2].Success ? UnitOfPage(int.Parse(mm.Groups[2].Value) + 40, mm.Groups[1].Value) : unit;
+            var tgt = (unit, joint);
+            if (!own.ContainsKey(tgt) && !similar.ContainsKey(tgt))
+                similar[tgt] = ((srcUnit, mm.Groups[1].Value), $"truss-approach/joints.csv: {mm.Value}{(mm.Groups[2].Success ? "" : " (same unit)")}");
+        }
+    }
+    List<(double u, double v)> UV(string s) => s.Split(';').Where(p => p.Trim().Length > 0).Select(p => p.Split(',')).Select(a => (double.Parse(a[0], inv), double.Parse(a[1], inv))).ToList();
+    // mean chord direction at a point in the sheet-like frame (u' = sign x model u), degrees in (-90, 90]
+    double? ChordDeg(TrussDefinition t, string joint, int sign)
+    {
+        var P = t.Points.FirstOrDefault(p => p.Name == joint);
+        if (P == null) return null;
+        double sx = 0, sy = 0;
+        foreach (var m in t.Members.Where(m => (m.Role == TrussMemberRole.UpperChord || m.Role == TrussMemberRole.LowerChord) && !m.From.Contains(':') && (m.From == joint || m.To == joint)))
+        {
+            var Q = t.Points.FirstOrDefault(p => p.Name == (m.From == joint ? m.To : m.From));
+            if (Q == null) continue;
+            double dx = Q.Station - P.Station, dy = Q.Elevation - P.Elevation;
+            if (dx < 0) { dx = -dx; dy = -dy; }
+            double l = Math.Sqrt(dx * dx + dy * dy); if (l < 1e-9) continue;
+            sx += dx / l; sy += dy / l;
+        }
+        if (sx == 0 && sy == 0) return null;
+        double ux = sign * sx, uy = sy;
+        if (ux < 0) { ux = -ux; uy = -uy; }
+        return Math.Atan2(uy, ux) * 180 / Math.PI;
+    }
+    var units = new[] { ("PTC Arch truss 18-20", "main", 1), ("PTC 3-span truss 11-13", "A", 1), ("PTC 4-span truss 14-17", "B", 1), ("PTC 4-span truss 21-24", "B", -1), ("PTC 3-span truss 25-27", "A", -1) };
+    int nOwn = 0, nSim = 0, nNone = 0; var none = new List<string>(); var bigRot = new List<string>(); double maxShear = 0;
+    foreach (var (bn, key, dir) in units)
+    {
+        var t = Doc.Project.Bridges.FirstOrDefault(b => b.Name == bn)?.Truss;
+        if (t == null) { report.Add($"gusset outlines: no truss bridge '{bn}' - skipped"); continue; }
+        foreach (var j in t.Joints) j.Outline = new();
+        var names = t.Points.Select(p => p.Name).Where(n => System.Text.RegularExpressions.Regex.IsMatch(n, @"^[UL]\d+'?$")).Distinct().ToList();
+        int maxK = names.Select(n => int.Parse(n.TrimEnd('\'').Substring(1))).DefaultIfEmpty(0).Max();
+        foreach (var mj in names)
+        {
+            if (t.Joints.Any(x => x.Point == mj && x.NoGusset)) continue;
+            int k = int.Parse(mj.TrimEnd('\'').Substring(1));
+            string ul = mj.Substring(0, 1);
+            // data joint: unit ends of the approach trusses are drawn on p.59 (3-span: its high end U0' / L0'; 4-span: U0 / L0)
+            string dj = key == "A" && k == 0 ? ul + "0'" : ul + k;
+            int sign = (mj.EndsWith("'") == dj.EndsWith("'")) ? dir : -dir;
+            Dictionary<string, string> r = null; string simWhy = "";
+            if (own.TryGetValue((key, dj), out var r0)) r = r0;
+            else if (similar.TryGetValue((key, dj), out var sm) && own.TryGetValue(sm.src, out var r1)) { r = r1; simWhy = sm.why; }
+            if (r == null) { if (t.Joints.Any(x => x.Point == mj)) { nNone++; none.Add($"{bn.Replace("PTC ", "")} {mj}"); } continue; }
+            if (!t.Joints.Any(x => x.Point == mj)) t.Joints.Add(new TrussJointDefinition { Point = mj });
+            double drawn = double.Parse(r["drawn_chord_deg"], inv);
+            double model = ChordDeg(t, mj, sign) ?? drawn;
+            double shear = Math.Tan(model * Math.PI / 180) - Math.Tan(drawn * Math.PI / 180);
+            if (Math.Abs(model - drawn) > 2.5) bigRot.Add($"{bn.Replace("PTC ", "")} {mj}: drawn {drawn:0.0} deg vs model {model:0.0} deg");
+            maxShear = Math.Max(maxShear, Math.Abs(shear));
+            jointShear[(bn, mj)] = shear;
+            var outline = UV(r["outline_uv_in"]).Select(q => new TrussUV(sign * In(q.u), In(q.v + shear * q.u))).ToList();
+            string pg = "p." + r["page"];
+            string oText = U(pg, $"gusset plate outline of joint {mj}" + (simWhy.Length > 0 ? $" (taken from joint {r["joint"]}: {simWhy})" : ""),
+                $"the plate is drawn, not dimensioned: outline scaled from a {r["dpi"]} dpi render ({r["confidence"]} confidence, about +-1 in.; evidence: {r["evidence"]})"
+                + (simWhy.Length > 0 ? "; the sheet gives this joint only as similar to the drawn one" : ""),
+                "outline as scaled, sheared onto the model chord (verticals kept plumb)" + (sign < 0 ? ", mirrored" : "") + ".");
+            foreach (var jd in t.Joints.Where(x => x.Point == mj))
+            {
+                jd.Outline = outline;
+                // keep the thickness reading flag of the approach joints; drop the old envelope wording
+                string old = jd.Unresolved.Contains("convex envelope") ? "" : jd.Unresolved;
+                jd.Unresolved = oText + (old.Length > 0 ? " " + old : "");
+                jd.Source = System.Text.RegularExpressions.Regex.Replace(jd.Source, @"; outline gusset-outlines\.csv.*$", "") + $"; outline gusset-outlines.csv p.{r["page"]} joint {r["joint"]} ({r["confidence"]})";
+            }
+            if (simWhy.Length > 0) nSim++; else nOwn++;
+        }
+    }
+    report.Add($"gusset outlines: {nOwn} model joints from their own drawing, {nSim} from a 'similar to' joint, {nNone} without an outline (envelope kept): {string.Join(", ", none.Take(30))}{(none.Count > 30 ? ", ..." : "")}");
+    if (bigRot.Count > 0) report.Add($"gusset outlines: drawn vs model chord angle differs > 2.5 deg at {bigRot.Count} joints (approach NJ / primed halves: the sheets draw the other half on its grade; main: reading of the drawn chord; vertical shear applied, largest {Math.Atan(maxShear) * 180 / Math.PI:0.0} deg): {string.Join("; ", bigRot.Take(12))}");
+}
+
 // ================================================================ 5. stacked gusset layers (gusset-layers.csv, 2026-10-20): a second (third) gusset plate per face OUTSIDE the
 // inner gusset at approach L0 / L0' / L8 / L10 / L20 and main L10 / L11 / L22. Outlines are scaled from the joint sheets in the sheet frame (u = drawing x = toward the
 // higher panel number, v up, origin = work point, inches) -> mirrored for the primed half of a unit and for the New Jersey units (stations decreasing with the panel number).
 {
     var lay = Csv("gusset-layers.csv").Where(r => r["layers"] != "1").ToList();
-    List<TrussUV> Outline(string s, int sign) => s.Trim().Length == 0 ? new() : s.Split(';').Select(p => p.Split(','))
-        .Select(a => new TrussUV(sign * In(double.Parse(a[0], inv)), In(double.Parse(a[1], inv)))).ToList();
+    // same placement as the inner gusset outline of the joint (section 4b): vertical shear onto the model chord, then mirrored
+    List<TrussUV> Outline(string s, int sign, double shear)
+    {
+        return s.Trim().Length == 0 ? new() : s.Split(';').Select(p => p.Split(',')).Select(a => (u: double.Parse(a[0], inv), v: double.Parse(a[1], inv)))
+            .Select(q => new TrussUV(sign * In(q.u), In(q.v + shear * q.u))).ToList();
+    }
     double Thk(string s) { double v = 0; foreach (var part in s.Split(' ', StringSplitOptions.RemoveEmptyEntries)) v += part.Contains('/') ? double.Parse(part.Split('/')[0], inv) / double.Parse(part.Split('/')[1], inv) : double.Parse(part, inv); return In(v); }
     int nLayerJoints = 0;
     // (bridge, data structure, data joint, model joint, mirror sign)
@@ -303,7 +416,7 @@ report.Add($"shoe bodies of built-up carbon steel plates: {shoeC} (main L11 / L1
             bool whole = r["outline_uv_in"].Trim().Length == 0;
             jd.GussetLayers.Add(new TrussGussetLayer
             {
-                Thickness = tl, Outline = Outline(r["outline_uv_in"], sign), Label = $"2-{r["thickness_in"]} Gussets ({r["position"]} layer)",
+                Thickness = tl, Outline = Outline(r["outline_uv_in"], sign, jointShear.TryGetValue((bn, mj), out var shL) ? shL : 0), Label = $"2-{r["thickness_in"]} Gussets ({r["position"]} layer)",
                 Source = $"gusset-layers.csv {pg} ({conf}): {r["extent_note"]}",
                 Unresolved = U(pg, $"{r["thickness_in"]} in. gusset layer at joint {mj}",
                     (whole ? "its extent is not separable from the inner gusset on the sheet" : "the plate is drawn, not dimensioned; outline scaled from a 300-450 dpi render (+-1 in.)")

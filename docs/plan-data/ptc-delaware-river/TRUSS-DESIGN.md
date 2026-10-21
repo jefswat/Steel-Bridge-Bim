@@ -334,3 +334,43 @@ the gusset weight stays low: the drawn inner outlines remain the open item (sect
 3/4 plate ends along the chords, fills between layers (none drawn). The copies "PTC main truss 18-20.sbm" / "PTC approach trusses.sbm" are unchanged
 (connections-ptc.csx needs the full PTC model).
 
+
+## 15. Gusset plate outlines read from the joint sheets (2026-10-20; data `connections/gusset-outlines.csv`, script `connections-ptc.csx` section 4b)
+The inner gusset of every joint was an ENVELOPE (convex hull of the member laps, flagged). It is now the plate DRAWN on the joint sheet (p.50-53 3-span,
+p.59-67 4-span / unit ends, p.73-89 main), read with `tools/ptc_gusset_outlines.py` (grid renders with absolute page-pixel labels at 150 dpi x zoom 0.75-6,
+`prof` = dark-run profiles to locate chord lines / dimension ticks; one page per call). Per row: page, scale (px per inch from a printed dimension: p.50 / p.60
+rivet chains 15 in. and 22 1/2 in., p.59 the 4'-0 shoe pin spacing, main sheets the p.73 U0 post 1'-11 1/2 b.-b. Ls; all 3/4 in. = 1 ft, 4.25-4.29 px/in at
+150 dpi), work point, two points on the drawn chord, outline polygon, evidence and confidence. `convert` gives the sheet-frame outline in inches (u = drawing x =
+toward the higher panel number, v up, origin = work point).
+
+Fitting rules used while reading: edges on the drawn plate edges; edges hidden under splice plates / fills continue the drawn edges (corner cuts taken symmetric);
+the bottom (top) edge of a lower (upper) chord joint is the chord bottom (top) line; every rivet of the chord / diagonal / vertical groups inside with about
+1 1/4 - 1 1/2 in. edge distance; pier joints carry the drawn extension round the shoe pin (11 in. each side of the pin CL, dimensioned on p.52 / p.67).
+Joints the sheets give only as "details not shown, similar to X" take X's outline: `also_applies_to` (3-span L3 / L7 = L1; 4-span L3 / L5 = L1; main L1 = L3,
+L16 = L15, L19 = L18, U21 = U20, L21 = L20) and the `truss-approach/joints.csv` notes (3-span U4 / U6 / U10 / U12 = U2, L5 / L11 = L1; 4-span U4 / U6 / U8 /
+U12 / U14 / U16 / U18 = U2, L7 / L9 / L11 / L13 / L17 / L19 = L1; 4-span U10 and U20: p.63 / p.67 "similar to joint U8 - sheet 12" = the 3-span U8).
+
+Placement (generic, in the script): sheet frame -> model joint by a VERTICAL SHEAR v += u (tan(model chord) - tan(drawn chord)) about the work point, then mirrored
+for the primed half of a unit and for the New Jersey units (the NJ 3-span / 4-span units are the same sheets, opposite hand). The sheets draw plumb posts; the
+approach sheets draw one half of each unit on its grade, so the mirrored half would tilt the chord edges by twice the grade under a mirror alone, and a rotation
+would tilt the post edges. The shear keeps the chord edges on the model chord and the post edges plumb. It also absorbs the reading error of the drawn chord
+direction on the main sheets (drawn vs model up to 9 deg at the steep arch joints; largest shear 12.2 deg at main L12). The stacked layers of section 14 are
+placed with the same shear (`jointShear`). Every outline carries a dimension-only UNRESOLVED flag: page + "the plate is drawn, not dimensioned: outline scaled
+from a 150 dpi render (confidence, about +-1 in.; evidence ...)" + the 'similar to' source when taken from another joint.
+
+Kept as ENVELOPES (8 model joints x 2 planes): main L11 / L11' (river pier joint: the 1 1/8 + 3/4 + 3/4 stack runs up the L11-L12 arch chord splice; the inner
+plate edges cannot be separated from the layers and the splice material at the read resolution, p.80), L13 / L13' and L14 / L14' (p.83 / p.84: the floor beam,
+hanger, suspender and lateral connections overlap the gusset edges; not separable), U22 and L22 (p.90 crown: half gussets cut on line "X", splice gusset and the
+jacking scheme drawn on top of each other).
+
+Rows (79): 3-span 18 drawn joints (U1-U3, U5, U7-U9, U11, L1, L2, L4, L6, L8-L10, L12, U0', L0'), 4-span 25 (U0, L0, U1-U3, U5, U7, U9, U11, U13, U15, U17,
+U19, L1, L2, L4, L6, L8, L10, L12, L14-L16, L18, L20), main 36 (U0-U20, L0, L2-L10, L12, L15, L17, L18, L20). Model: 240 joints from their own drawing +
+106 from a "similar to" joint (both trusses, both halves) = all approach joints and 164 of 184 main joint x plane.
+
+Results (connections -> shoes -> walkways -> rivets re-run on the committed model): gusset plates main 430,177 -> 704,719 lb (the drawn plates are larger than
+the member-lap envelopes: inner gussets 5,678 -> 8,466 SF per face + 622 SF envelopes), 3-span 99,707 -> 81,491 lb per unit (2,972 -> 2,472 SF), 4-span
+190,408 -> 169,042 lb per unit (1,753 -> 1,372 SF; the envelopes reached over the whole member laps, the drawn plates stop at the rivet fields). Structural steel
+33.41 -> 33.60 M lb = 85.0 % -> 85.5 % of p.42 (main 86.9 -> 88.6 %, 3-span 85.3 / 84.9 -> 84.7 / 84.3 %, 4-span 85.0 -> 84.6 %). Checks: main 558 / 11 / 63,
+approach 1548 / 12 / 148, location 378 / 42 - unchanged counts (the new rows "gusset covers its rivets" were already in the WIP check scripts: 412 PASS, all
+rivets >= 1 1/2 in. from the edge; note the joint rivets are DISTRIBUTED over the outline (section 11), so this checks the grid, not the drawn rivet positions).
+Tests 568 passed. The model copies "PTC main truss 18-20.sbm" / "PTC approach trusses.sbm" are unchanged.

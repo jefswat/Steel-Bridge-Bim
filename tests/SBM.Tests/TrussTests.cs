@@ -352,6 +352,39 @@ public class TrussTests : IDisposable
     }
 
     [Fact]
+    public void GussetOutline_Given_ReplacesTheEnvelope_RivetCoverCheck()
+    {
+        // envelope: the L2 rivets (pitch group on U1-L2) are covered, cover record without an outline
+        var (p0, _) = Model();
+        var tm0 = Regen(p0).Steel!.Truss!;
+        var c0 = tm0.GussetRivetCovers.Single(c => c.Plane == "N" && c.Point == "L2");
+        Assert.Equal(6, c0.Rivets);
+        Assert.False(c0.OutlineGiven);
+
+        // given outline (3 x 2 m rectangle about the point): plate = that area, flag basis says "outline as given", every rivet covered
+        var (p, b) = Model();
+        var jd = b.Truss!.Joints.First(j => j.Point == "L2" && j.Plane == "N");
+        jd.Outline = new() { new TrussUV(-1.5, -0.5), new TrussUV(1.5, -0.5), new TrussUV(1.5, 1.5), new TrussUV(-1.5, 1.5) };
+        jd.Unresolved = "UNRESOLVED (p.0): gusset outline scaled - test.";
+        var bm = Regen(p);
+        var steel = bm.Steel!;
+        var g = steel.Parts.First(x => x.Mark == "N-GL2-R");
+        Assert.Equal(6.0 * In(0.75), g.Volume, 6);
+        Assert.Contains("outline as given", g.Assumption!.Basis);
+        Assert.True(g.Assumption.DimensionOnly);
+        var c1 = steel.Truss!.GussetRivetCovers.Single(c => c.Plane == "N" && c.Point == "L2");
+        Assert.True(c1.Ok && c1.OutlineGiven && c1.Rivets == 6 && c1.MinEdge >= c1.RequiredEdge);
+
+        // a small outline leaves the pitch rivets outside: reported, never moved
+        jd.Outline = new() { new TrussUV(-0.05, -0.05), new TrussUV(0.05, -0.05), new TrussUV(0.05, 0.05), new TrussUV(-0.05, 0.05) };
+        bm = Regen(p);
+        var c2 = bm.Steel!.Truss!.GussetRivetCovers.Single(c => c.Plane == "N" && c.Point == "L2");
+        Assert.False(c2.Ok);
+        Assert.True(c2.MinEdge < 0);
+        Assert.Contains(bm.Steel.Diagnostics, d => d.Message.Contains("Truss CHECK joint L2 (N)") && d.Message.Contains("outside the gusset outline"));
+    }
+
+    [Fact]
     public void EndChordExtension_CoversTheShoe_TaperedMember()
     {
         // default: the end chords are cut square at L0 / L6 -> the shoe tops (4 1/2 in. each side of the pin) project past them: CHECK warnings
