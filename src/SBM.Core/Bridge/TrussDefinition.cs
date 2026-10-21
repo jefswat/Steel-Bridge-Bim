@@ -144,6 +144,10 @@ public sealed class TrussPlate
     /// plates begin; gusset envelope or the joint's outline). It does not count for the member width at the joints.</summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public bool BetweenGussets { get; set; }
+    /// <summary>OPTIONAL (null = none, omitted from the .sbm): access holes CUT in a perforated plate (<see cref="TrussPerforation"/>); the plate is then built
+    /// as edge strips + the pieces between the holes (exact extrusions) instead of solid.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public TrussPerforation? Perforation { get; set; }
     public TrussPlate() { }
     public TrussPlate(double width, double thickness, bool perforated = false, string label = "") { Width = width; Thickness = thickness; Perforated = perforated; Label = label; }
 }
@@ -160,8 +164,34 @@ public sealed class TrussPly
     /// <summary>OPTIONAL start of a partial ply from the member's START working point (m, along the axis); null = centred on the member.</summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public double? Start { get; set; }
+    /// <summary>OPTIONAL (null = none): access holes cut in a perforated web ply (manholes of box struts), see <see cref="TrussPerforation"/>.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public TrussPerforation? Perforation { get; set; }
     public TrussPly() { }
     public TrussPly(double depth, double thickness, string label = "") { Depth = depth; Thickness = thickness; Label = label; }
+}
+
+/// <summary>
+/// Access holes of a perforated cover plate / web plate (riveted members of the 1930s-1950s: "1-Pl (24-12) x 5/8" = a 24 in. plate with 12 in. wide
+/// holes; "12 x 20 M.H. @ 3'-6"): obround holes <see cref="Width"/> across the plate (semicircular ends of radius Width / 2) x <see cref="Length"/> along
+/// the member, centres <see cref="Pitch"/> apart on the plate's centre line (+ <see cref="CenterOffset"/> across), laid out symmetrically about the middle
+/// of the free length between the member's end gussets (or the plate's own ends when it is a partial plate) as many as fit with at least
+/// <see cref="EndClear"/> from those ends to the hole ends. <see cref="Stagger"/> shifts this plate's holes by half a pitch (holes alternated on the
+/// opposite faces of the member). The plate is built as two edge strips swept along the member plus the pieces between the holes (planar polygons with
+/// the arc ends, swept through the thickness): every piece an exact extrusion; mass by volume (holes removed).
+/// </summary>
+public sealed class TrussPerforation
+{
+    public double Width { get; set; }
+    public double Length { get; set; }
+    public double Pitch { get; set; }
+    public double EndClear { get; set; }
+    public bool Stagger { get; set; }
+    public double CenterOffset { get; set; }
+    /// <summary>Plan callout, e.g. "12 x 20 M.H. @ 3'-6 ctrs".</summary>
+    public string Label { get; set; } = "";
+    /// <summary>UNRESOLVED text (page + reason) for values not printed (end distance, stagger): dimension-only flag on the member.</summary>
+    public string Unresolved { get; set; } = "";
 }
 
 /// <summary>Lacing bars on an open face of a built-up member (single = zigzag, double = crossed), between the rivet lines.</summary>
@@ -304,6 +334,76 @@ public sealed class TrussMemberDefinition
     /// <summary>OPTIONAL (null = none, omitted from the .sbm): rivet lines along the member (<see cref="TrussRivetLine"/>).</summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public List<TrussRivetLine>? RivetLines { get; set; }
+    /// <summary>OPTIONAL (null = none, omitted from the .sbm): end connection angles / plates of a framed member (floor beam / bracket to a truss post,
+    /// girder or hanger; <see cref="TrussEndConnection"/>).</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public List<TrussEndConnection>? EndConnections { get; set; }
+}
+
+public enum TrussMemberEnd { Start, End, Both }
+
+/// <summary>A column of rivets: <see cref="Count"/> rivets <see cref="Pitch"/> apart along the section y (down from the piece top), the first
+/// <see cref="First"/> below it; <see cref="Gage"/> = position of the column (see the owner).</summary>
+public sealed class TrussRivetColumn
+{
+    public double Gage { get; set; }
+    public int Count { get; set; }
+    public double Pitch { get; set; }
+    public double First { get; set; }
+    public string Label { get; set; } = "";
+    public TrussRivetColumn() { }
+    public TrussRivetColumn(double gage, int count, double pitch, double first) { Gage = gage; Count = count; Pitch = pitch; First = first; }
+}
+
+/// <summary>
+/// End connection of a framed member (generic riveted practice: floor beam / bracket end angles on a post, girder or hanger). At the member end(s)
+/// (<see cref="End"/>), on BOTH web faces (section x = +-web thickness / 2): an angle <see cref="Angle"/> (first leg = OUTSTANDING leg, its back on the
+/// connection face; second leg on the web, pointing into the member) <see cref="Length"/> long down from section y <see cref="Top"/>, optionally on a
+/// fill (<see cref="FillThickness"/> x <see cref="FillWidth"/> from the back along the member, <see cref="FillLength"/> down from <see cref="FillTop"/>), or a
+/// plate pair (<see cref="PlateWidth"/> > 0: end / pin plates <see cref="PlateWidth"/> along the member from the back x <see cref="PlateThickness"/>).
+/// Back of the outstanding legs / plate end at <see cref="Back"/> from the member's end WORKING POINT along the axis toward the member, or (null) on the
+/// first steel face the member axis meets beyond its cut end (gusset, post flange, girder web; probed at the top, middle and bottom of the angle, the
+/// nearest face wins). <see cref="ExtendWeb"/> extends the member web (H / rolled sections) from its cut end to <see cref="WebClearance"/> short of the back
+/// over the angle height (the flanges stay at the member setback). Rivets: <see cref="WebRivets"/> (gage = distance from the back along the member) through
+/// the web stack, shank across the web, <see cref="OutRivets"/> (gage = distance from the web face across, along the outstanding leg, on each face) through
+/// the outstanding leg and the steel behind it, shank along the member; the grip of every rivet is the CONTIGUOUS steel found along its shank
+/// (connection parts + the members / gussets built before). All pieces are exact extrusions.
+/// </summary>
+public sealed class TrussEndConnection
+{
+    public TrussMemberEnd End { get; set; } = TrussMemberEnd.Both;
+    public string Label { get; set; } = "";
+    /// <summary>"L4x4x3/4" (AISC v16 or parsed); "" = no angle (plates / web extension + rivets only).</summary>
+    public string Angle { get; set; } = "";
+    /// <summary>Section y of the top of the angles / plates (m; relative to the member working line incl. <see cref="TrussMemberDefinition.OffsetZ"/>).</summary>
+    public double Top { get; set; }
+    public double Length { get; set; }
+    public double? Back { get; set; }
+    /// <summary>With <see cref="Back"/> null: the probed face + this distance (m, + toward the member), e.g. a gap left for a fill not modeled.</summary>
+    public double BackOffset { get; set; }
+    public bool ExtendWeb { get; set; }
+    public double WebClearance { get; set; } = 0.0127;
+    public double FillThickness { get; set; }
+    public double FillWidth { get; set; }
+    public double FillLength { get; set; }
+    public double? FillTop { get; set; }
+    public double PlateWidth { get; set; }
+    public double PlateThickness { get; set; }
+    /// <summary>Plate outline (u = distance from the back along the member, v = section y), replacing the PlateWidth x [Top - Length, Top] rectangle.</summary>
+    public List<TrussUV>? PlateOutline { get; set; }
+    /// <summary>The angle heel / plate inner face stands this far outside the web face (it lies on another connection plate, e.g. a pin plate on an end
+    /// plate); nothing is built for the stand-off.</summary>
+    public double StandOff { get; set; }
+    public List<TrussRivetColumn>? WebRivets { get; set; }
+    public List<TrussRivetColumn>? OutRivets { get; set; }
+    public double RivetDiameter { get; set; }
+    /// <summary>Diameter of the outstanding-leg rivets when it differs (field rivets into the post / hanger; 0 = <see cref="RivetDiameter"/>).</summary>
+    public double OutRivetDiameter { get; set; }
+    public string? RivetMaterial { get; set; }
+    public string? RivetUnresolved { get; set; }
+    public string Material { get; set; } = "";
+    public string Unresolved { get; set; } = "";
+    public string Source { get; set; } = "";
 }
 
 /// <summary>
@@ -324,6 +424,33 @@ public sealed class TrussStiffenerSet
     public string Material { get; set; } = "";
     public string Unresolved { get; set; } = "";
     public string Source { get; set; } = "";
+    /// <summary>OPTIONAL (0 = none): fill plate between the web and the web leg of each angle (thickness; the angle stands out by it), <see cref="FillWidth"/>
+    /// along the member from the heel (0 = the web leg), full stiffener height.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public double FillThickness { get; set; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public double FillWidth { get; set; }
+    /// <summary>OPTIONAL section y of the stiffener top (null = the stiffener is centred on the web); e.g. stiffeners of a tapered bracket hang from the top.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public double? Top { get; set; }
+    /// <summary>OPTIONAL height of the fills (0 = the stiffener height), centred on it (fills between the flange angle legs).</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public double FillHeight { get; set; }
+    /// <summary>OPTIONAL (null = none): rivet columns through the web leg / fill / web (gage = distance from the heel along the member, toward the leg),
+    /// grip = the contiguous steel on the shank line; diameter <see cref="RivetDiameter"/>.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public List<TrussRivetColumn>? Rivets { get; set; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public double RivetDiameter { get; set; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? RivetUnresolved { get; set; }
+    /// <summary>OPTIONAL (omitted when false): PLUMB stiffeners on a member on a grade (girder stiffeners lined up with plumb floor beams): the section lies in
+    /// the horizontal plane and is extruded vertically (instead of normal to the member axis); heights / tops measured vertically.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public bool Plumb { get; set; }
+    /// <summary>OPTIONAL: +1 / -1 = the web leg of each (single) angle points toward the member end / start; 0 = the <see cref="PerFace"/> rule.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public int LegToward { get; set; }
 }
 
 /// <summary>Defaults for the joints without their own <see cref="TrussJointDefinition"/>.</summary>
@@ -478,8 +605,53 @@ public sealed class TrussLineItemDefinition
     /// same part (combined with <see cref="RepeatPitch"/>). Null / empty = the profile once (omitted from the .sbm).</summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public List<double>? CopiesV { get; set; }
+    /// <summary>OPTIONAL (null = none): rivets of a steel item (e.g. clip angles of a framed diaphragm), given in the item frame; grip = the contiguous
+    /// steel along the shank (probed through every part built before, incl. stringers).</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public List<TrussLineItemRivet>? Rivets { get; set; }
+    /// <summary>OPTIONAL (null = none): clip angles at both ends of a TRANSVERSE steel item framed between two webs (diaphragm channels between stringers),
+    /// see <see cref="TrussClipAngles"/>.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public TrussClipAngles? ClipAngles { get; set; }
     public string Unresolved { get; set; } = "";
     public string Source { get; set; } = "";
+}
+
+/// <summary>
+/// Clip angles of a transverse item framed between two webs (generic: a diaphragm channel riveted to the stringer webs by one angle at each end). At each
+/// end W0 = From / To (the abutting web faces) one angle: first leg on the item's web (plane U = <see cref="HeelU"/>, from W0 into the item), second leg on
+/// the abutting web (plane W = W0, along U toward <see cref="Toward"/>), <see cref="Length"/> high down from V = <see cref="Top"/> (item frame, as the
+/// profile). The heel corner lies at (HeelU, W0); the item leg stands on the -U side of HeelU when Toward &lt; 0 (back of a web at HeelU), else on the +U side.
+/// Rivets: <see cref="ItemLegRivets"/> through the item leg + item web (gage = distance from W0 along the item), <see cref="WebLegRivets"/> through the web
+/// leg + abutting web (gage = distance from the heel along U); grips probed. One part per item (category TrussConnectionAngle).
+/// </summary>
+public sealed class TrussClipAngles
+{
+    public string Angle { get; set; } = "";
+    public double HeelU { get; set; }
+    public int Toward { get; set; } = -1;
+    public double Top { get; set; }
+    public double Length { get; set; }
+    public TrussRivetColumn? ItemLegRivets { get; set; }
+    public TrussRivetColumn? WebLegRivets { get; set; }
+    public double RivetDiameter { get; set; }
+    public string Material { get; set; } = "";
+    public string? RivetUnresolved { get; set; }
+    public string Unresolved { get; set; } = "";
+}
+
+/// <summary>Rivet of a line item: shank through (U, V, W) along <see cref="Axis"/> ("U" along the alignment, "W" across = offset direction, "V" up),
+/// head at the + end of the steel stack found there. Transverse items: U from the station, W = offset; longitudinal: U = station, W = offset from
+/// the reference line toward the item side. V above the finished grade (or absolute, as the item).</summary>
+public sealed class TrussLineItemRivet
+{
+    public double U { get; set; }
+    public double V { get; set; }
+    public double W { get; set; }
+    public string Axis { get; set; } = "W";
+    public double Diameter { get; set; }
+    public string? Material { get; set; }
+    public string? Unresolved { get; set; }
 }
 
 public sealed class TrussUV

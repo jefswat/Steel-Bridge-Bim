@@ -36,6 +36,9 @@ public enum PartCategory
     Suspender, SuspenderSocket, TrussShoeFixed, TrussShoeExpansion, TrussPin,
     // Riveted plate girder as a truss-generator member (appended; TrussMemberRole.Girder, e.g. PTC Delaware River girder spans).
     TrussGirder,
+    // Truss end connections (appended; OPTIONAL TrussMemberDefinition.EndConnections): connection angles and their fills / end (pin) plates /
+    // web extensions of framed floor beams and brackets.
+    TrussConnectionAngle, TrussConnectionPlate,
 }
 
 public enum AssemblyKind { GirderFieldSection, CrossFrame, Bearing, FieldSplice, LateralBracing, InspectionCable, InspectionWalkway,

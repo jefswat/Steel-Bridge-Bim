@@ -17,7 +17,7 @@ namespace SBM.Core.Truss;
 /// sockets and pins, shoes (pin, body, masonry plate, bearing seat). Plan values are built as given; plan-vs-plan differences are reported
 /// (<see cref="TrussModel.Checks"/> / warnings), never adjusted.
 /// </summary>
-public static class TrussGenerator
+public static partial class TrussGenerator
 {
     public static TrussModel Generate(BridgeFraming framing, UnitSystem units)
     {
@@ -59,7 +59,7 @@ public static class TrussGenerator
         public string Assembly = "";
     }
 
-    private sealed class Gen
+    private sealed partial class Gen
     {
         private readonly BridgeFraming _f;
         private readonly BridgeDefinition _b;
@@ -226,9 +226,13 @@ public static class TrussGenerator
             foreach (var m in _inst) BuildMember(m);
             BuildJoints();
             BuildJointPlates();
+            BuildEndConnections();
             PlaceJointRivets();
+            FlushConnectionRivets();
             if (_d.Floor != null) BuildFloor(_d.Floor);
             if (_d.LineItems != null) foreach (var li in _d.LineItems) BuildLineItem(li);
+            if (_d.LineItems != null) foreach (var li in _d.LineItems.Where(l => l.ClipAngles != null && l.Transverse && l.Kind == TrussLineItemKind.Steel)) BuildClipAngles(li);
+            if (_d.LineItems != null && _d.LineItems.Any(li => li.Rivets is { Count: > 0 } || li.ClipAngles != null)) PlaceLineItemRivets();
             foreach (var s in _d.Suspenders) BuildSuspender(s);
             for (int i = 0; i < _d.Shoes.Count; i++) BuildShoe(_d.Shoes[i], i);
             if (_d.RivetHeadsFlushAtSolePlates) FlushRivetsAtSolePlates();
@@ -431,6 +435,7 @@ public static class TrussGenerator
             var a0 = m.A + m.Axis * m.SA + m.Y * m.Def.OffsetZ;
             double cut = len - m.SA - m.SB;
             var mesh = new Mesh();
+            string? perfFlag = null;
             // tapered member (brackets): the part of the section below its axis rises by DepthReductionStart / End at the cut ends, linear in between
             double rA = Math.Max(0, m.Def.DepthReductionStart), rB = Math.Max(0, m.Def.DepthReductionEnd);
             bool taper = (rA > 0 || rB > 0) && cut > 1e-6;
@@ -439,6 +444,11 @@ public static class TrussGenerator
             {
                 if (PieceSpan(m, pc, cut) is not { } span) { Warn($"Truss: {pc.Label} of {m.Mark} - no length left on the member{(pc.BetweenGussets ? " between the gussets" : "")}; not built."); continue; }
                 var (ps, pl) = span;
+                if (pc.Perforation != null && !taper)
+                {
+                    if (Perforated(mesh, m, a0, pc, ps, pl, cut, out int holes)) { Model.Perforations.Add((m.Mark, pc.Label, holes)); perfFlag ??= pc.Perforation.Unresolved; continue; }
+                    Warn($"Truss: perforated plate {pc.Label} of {m.Mark} - the access holes ({pc.Perforation.Label}) do not fit between the end gussets / in the plate; built solid.");
+                }
                 var ringA = pc.Polygon.Select(q => a0 + m.Axis * ps + m.X * q.X + m.Y * (q.Y + (taper && q.Y < 0 ? Rise(ps) : 0))).ToArray();
                 var ringB = taper
                     ? pc.Polygon.Select(q => a0 + m.Axis * (ps + pl) + m.X * q.X + m.Y * (q.Y + (q.Y < 0 ? Rise(ps + pl) : 0))).ToArray()
@@ -450,6 +460,7 @@ public static class TrussGenerator
             if (m.Def.RivetLines is { Count: > 0 }) MemberRivetLines(m, a0, cut);
             Assumption? asu = null;
             string flag = m.Def.Unresolved.Length > 0 ? m.Def.Unresolved : m.Sec.Flag ?? "";
+            if (!string.IsNullOrEmpty(perfFlag) && !flag.Contains(perfFlag)) flag = (flag + " " + perfFlag).Trim();
             if (flag.Length > 0) asu = Assumption.UnresolvedDimension(flag, m.Sec.Definition.Kind == TrussSectionKind.Nominal ? "nominal envelope of the member" : "section as described");
             var cat = CategoryOf(m.Def.Role);
             var part = new SteelPart
@@ -517,24 +528,35 @@ public static class TrussGenerator
                 if (asu != null) Warn(set.Unresolved);
                 var mesh = new Mesh();
                 // section in (a along the member, x across the web), extruded along the member y over the height
-                void Prism(IReadOnlyList<Vec2> poly, double d)
+                void Prism(IReadOnlyList<Vec2> poly, double d, double y0 = 0, double h = -1)
                 {
                     var pl = poly.ToArray();
+                    if (h < 0) h = set.Height;
                     if (MeshBuilder.SignedArea(pl.ToList()) < 0) Array.Reverse(pl);
-                    var ra = pl.Select(q => m.A + m.Axis * (d + q.X) + m.X * q.Y + m.Y * (yc - set.Height / 2)).ToArray();
-                    MeshBuilder.AddLoft(mesh, pl, new[] { ra, ra.Select(p => p + m.Y * set.Height).ToArray() });
+                    var (ax2, vy) = StiffFrame(m, set);
+                    var ra = pl.Select(q => m.A + m.Axis * d + ax2 * q.X + m.X * q.Y + vy * ((set.Top is { } st0 ? st0 + m.Def.OffsetZ - set.Height : yc - set.Height / 2) + y0)).ToArray();
+                    MeshBuilder.AddLoft(mesh, pl, new[] { ra, ra.Select(p => p + vy * h).ToArray() });
                 }
+                var meshF = new Mesh();
+                double fill = Math.Max(0, set.FillThickness);
                 foreach (double d in set.Distances)
                     foreach (int sx in new[] { -1, 1 })
                     {
-                        double x0 = sx * tw / 2;
+                        double x0 = sx * (tw / 2 + (plate ? 0 : fill));
                         if (plate)
                         {
                             Prism(new[] { new Vec2(-set.PlateWidth / 2, x0), new Vec2(set.PlateWidth / 2, x0), new Vec2(set.PlateWidth / 2, x0 + sx * set.PlateThickness), new Vec2(-set.PlateWidth / 2, x0 + sx * set.PlateThickness) }, d);
                             continue;
                         }
-                        foreach (int sa in set.PerFace >= 2 ? new[] { -1, 1 } : new[] { 1 })
+                        foreach (int sa in set.LegToward != 0 ? new[] { Math.Sign(set.LegToward) } : set.PerFace >= 2 ? new[] { -1, 1 } : new[] { 1 })
                         {
+                            if (fill > 0)
+                            {
+                                double fw = set.FillWidth > 0 ? set.FillWidth : legWeb, xw = sx * tw / 2;
+                                var fp = new[] { new Vec2(0, xw), new Vec2(sa * fw, xw), new Vec2(sa * fw, xw + sx * fill), new Vec2(0, xw + sx * fill) };
+                                double fh = set.FillHeight > 0 ? Math.Min(set.FillHeight, set.Height) : set.Height;
+                                var keep = mesh; mesh = meshF; Prism(fp, d, (set.Height - fh) / 2, fh); mesh = keep;
+                            }
                             // web leg along +-a from the heel, outstanding leg normal to the web
                             var poly = new[] { new Vec2(0, x0), new Vec2(sa * legWeb, x0), new Vec2(sa * legWeb, x0 + sx * t), new Vec2(sa * t, x0 + sx * t), new Vec2(sa * t, x0 + sx * legOut), new Vec2(0, x0 + sx * legOut) };
                             Prism(poly, d);
@@ -543,6 +565,13 @@ public static class TrussGenerator
                 if (mesh.IsEmpty) continue;
                 k++;
                 string mark = $"{m.Mark}-ST{k}";
+                if (!meshF.IsEmpty)
+                {
+                    Model.Steel.Parts.Add(new SteelPart { Mark = mark + "F", Category = PartCategory.TrussConnectionPlate, Assembly = m.Assembly, Mesh = meshF, Material = Material(set.Material), Length = set.Height, Assumption = asu,
+                        Description = $"fills {L(fill)} under {(set.Label.Length > 0 ? set.Label : set.Angle)} on {m.Mark}" });
+                    if (Model.PanelOf.TryGetValue(m.Mark, out var pf)) Model.PanelOf[mark + "F"] = pf;
+                }
+                if (set.Rivets is { Count: > 0 } && set.RivetDiameter > 0) _stiffRivets.Add((m, set, tw, yc, asu));
                 int n = set.Distances.Count * 2 * (plate ? 1 : Math.Max(1, Math.Min(2, set.PerFace)));
                 Model.Steel.Parts.Add(new SteelPart
                 {
@@ -551,6 +580,15 @@ public static class TrussGenerator
                 });
                 if (Model.PanelOf.TryGetValue(m.Mark, out var pnl)) Model.PanelOf[mark] = pnl;
             }
+        }
+
+        /// <summary>Stiffener frame: along-member direction of the section and the extrusion direction (member y, or horizontal / plumb for
+        /// <see cref="TrussStiffenerSet.Plumb"/>).</summary>
+        private static (Vec3 along, Vec3 up) StiffFrame(Inst m, TrussStiffenerSet set)
+        {
+            if (!set.Plumb) return (m.Axis, m.Y);
+            var h = m.Axis - Up * Vec3.Dot(m.Axis, Up);
+            return h.Length < 1e-6 ? (m.Axis, m.Y) : (h.Normalized(), Up);
         }
 
         /// <summary>Lacing bars (flat bars in the face plane, zigzag between the rivet lines; double = crossed).</summary>

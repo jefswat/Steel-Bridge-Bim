@@ -800,7 +800,8 @@ public static class ModelDatabase
             PartCategory.TrussHanger => "truss hanger", PartCategory.TrussBracing => "truss bracing member", PartCategory.TrussFloorBeam => "floor beam",
             PartCategory.TrussStringer => "stringer", PartCategory.TrussGusset => "gusset plate", PartCategory.Suspender => "suspender rope",
             PartCategory.SuspenderSocket => "suspender socket", PartCategory.TrussPin => "pin", PartCategory.TrussShoeFixed => "fixed shoe",
-            PartCategory.TrussShoeExpansion => "expansion shoe", _ => c.ToString(),
+            PartCategory.TrussShoeExpansion => "expansion shoe", PartCategory.TrussConnectionAngle => "connection angle",
+            PartCategory.TrussConnectionPlate => "connection plate", _ => c.ToString(),
         };
 
         private static bool IsCapPart(SteelPart p) => p.Category is PartCategory.EndPlate or PartCategory.ConnectorPlate or PartCategory.DiaphragmPlate
@@ -812,7 +813,7 @@ public static class ModelDatabase
                 or PartCategory.WalkwayStringer or PartCategory.WalkwayPost or PartCategory.RolledTee
                 or PartCategory.ArchRib or PartCategory.Hanger or PartCategory.ArchBracing or PartCategory.RailPost or PartCategory.RailMember
                 or PartCategory.TrussChord or PartCategory.TrussDiagonal or PartCategory.TrussVertical or PartCategory.TrussHanger or PartCategory.TrussBracing
-                or PartCategory.TrussStringer or PartCategory.Suspender => "IFCMEMBER",
+                or PartCategory.TrussStringer or PartCategory.Suspender or PartCategory.TrussConnectionAngle => "IFCMEMBER",
             PartCategory.TrussFloorBeam or PartCategory.TrussGirder => "IFCBEAM",
             PartCategory.TrussShoeFixed or PartCategory.TrussShoeExpansion => "IFCBEARING",
             PartCategory.SuspenderSocket or PartCategory.TrussPin => "IFCMECHANICALFASTENER",

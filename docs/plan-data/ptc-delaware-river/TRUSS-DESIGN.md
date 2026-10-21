@@ -435,3 +435,65 @@ Results (full run order from truss-ptc-arch): structural steel 33.60 -> 33.81 M 
 
 ## 17. Railing posts at the abutments (2026-10-21, QC I033)
 New generic input `RailPostDefinition.FixedStations` (explicit post stations along the alignment; posts listed inside the run are placed as given, the stretch between the run end and the outermost listed post keeps the equal-spacing rule, JSON omitted when null). `deck-ptc.csx` enters the p.108 abutment panels measured from the rail joint J at the abutment (a post 1'-2 1/8 / 1'-2 1/4 each side): west J = CL bearing - 2'-0 5/8: wing 2 x (5 @ 5'-11 1/2 = 29'-9 1/2) with a second joint between the groups, girder span 5 @ 6'-0 = 30'-0; east J = CL bearing + 2'-0 3/8: girder span 5 @ 5'-11 1/2, wing 5 @ 5'-9 1/2 = 28'-11 1/2, 9 3/4 + 1'-9 to the rail end (the east girder-span panel is 5'-11 1/2 on the sheet, not 6'-0). Check: the first post to the wing end comes out 2'-7 1/8 vs the printed 2'-7 1/2. Not dimensioned and left on the equal-spacing rule (UNRESOLVED flag text updated): all other panels and the pier joint panels. Posts per run: spans 1-10 230 -> 231, spans 28-31 94 -> 95, other bridges unchanged; check-ptc-delaware-river 379 PASS / 41 DIFF unchanged.
+
+## 18. Floor system connections, stiffeners, perforated plates (step 3, 2026-10-21; script `floor-connections-ptc.csx`, run after walkways-ptc, before rivets-ptc)
+Scope given: floor beam / bracket end connection angles, stringer connections, lacing bars, and their rivets. Finding: the PTC sheets show NO lacing bars and NO batten / tie
+plates; every open face of a built-up member is a PERFORATED plate ("1-Pl (24-12) x 5/8" = 24 in. plate with 12 in. access holes; p.69 / p.70 member tables, p.71 bracing
+sections, p.47 / p.57). The visible equivalent - the access holes - is modeled instead; the generic `TrussLacing` input stays unused. Stringers bear ON the floor beams
+(bearing / sole plates, p.55 / p.94 bearing details): there are no stringer end connection angles; the only stringer angles are the clip angles of the 15 [ 33.9 diaphragms.
+
+Generic code (all OPTIONAL, omitted from the .sbm when unset; other bridges / trusses unchanged; test `TrussTests.Perforations_EndConnections_StiffenerFills_ExactAndGrips`):
+- `TrussMemberDefinition.EndConnections` (`TrussEndConnection`): at the start / end / both ends, on both web faces: an angle (first leg OUTSTANDING, back on the connection
+  face, second leg on the web), optional fill under the web leg (`FillThickness` / `FillWidth` / `FillTop` / `FillLength`), or end plates (`PlateWidth` x `PlateThickness`, or
+  a `PlateOutline` (u from the back, section y)), `StandOff` (lies on another connection plate), `Back` from the end working point, or PROBED: 7 levels x 3 points across the
+  bearing face per side, the nearest steel face beyond the cut wins; a cut end already inside a part (floor beam end inside a gusset) takes that part's face toward the
+  member. `ExtendWeb`: the member web continues from its cut to `WebClearance` short of the back over the connection height (flanges stay at the setback). Rivet columns
+  `WebRivets` (gage from the back) / `OutRivets` (gage from the heel), `OutRivetDiameter`. Parts: `PartCategory.TrussConnectionAngle` (IfcMember USERDEFINED 'CONNECTION_ANGLE'),
+  `TrussConnectionPlate` (fills, end / pin plates: IfcPlate 'CONNECTION_PLATE'), web extensions in the member's category; viewport layer 3D-TRUSS-CONNECTIONS.
+- `TrussStiffenerSet`: `FillThickness` / `FillWidth` / `FillHeight` (fills under the web leg between the flange angle legs), `Top` (hang from the top: tapered brackets),
+  `LegToward`, `Plumb` (horizontal section extruded vertically: stiffeners of a girder on grade that pair with plumb floor beams), `Rivets` + `RivetDiameter`.
+- `TrussLineItemDefinition.ClipAngles` (`TrussClipAngles`: one angle per end of a transverse framed item, legs on the item web and on the abutting web, rivets per leg)
+  and `Rivets` (`TrussLineItemRivet` in the item frame).
+- `TrussPlate.Perforation` / `TrussPly.Perforation` (`TrussPerforation`: Width across x Length along, obround, `Pitch`, `EndClear`, `Stagger`, `CenterOffset`): the plate
+  is built as two edge strips swept along the member + the pieces between the holes (concave semicircle ends, 8 segments) swept through the thickness - every piece an
+  exact extrusion; holes laid out symmetrically between the member's end gussets; `TrussModel.Perforations` lists them; mass by volume.
+- `TrussSections.ParseAngle` reads fractional legs ("L5x3-1/2x7/16", "L4-1/2x8x3/4").
+- Rivet grips: `TrussGenerator.SteelLineProbe` = contiguous steel along the shank from the triangles near the connection (entry / exit by the triangle normals, so the pieces of
+  one mesh that touch or overlap count once; gaps under 1 mm closed). ONE RIVET PER HOLE (`MergeRivet`): connection / stiffener rivets are placed after the joint rivets; a
+  rivet whose axis lies within 0.8 (d1 + d2) of a parallel rivet already placed (their button heads would overlap), shanks touching or overlapping, becomes that rivet through
+  both stacks (the earlier rivet's axis, the larger diameter): the joint symbol counts already include the holes the floor beam angles share with the gussets, and diaphragm
+  angles back to back on one stringer web share their 4 rivets.
+
+PTC data (every scaled value a dimension-only flag with page + reason; nothing adjusted):
+
+| Item | Plan | Model |
+|---|---|---|
+| Approach floor beam F3 / F4 (both ends) and bracket B1 at the truss vertical | p.55: 2-Ls 4 x 4 x 3/4, 2-Fills 7 x 1/2 (F.2.E.), 3 in. max pitch; counted 24 + 11-12 web rivets per angle, 13 per outstanding leg | angles full depth between the flange angles (less 1/2 + 5/16 for the root fillet), fills 1/2 (= flange angle thickness) under the web legs between the flange angles, 7 in. wide (rivet line 5 1/2 beyond the toe); backs probed on the top chord gussets (they reach about half the beam depth down): below them the angle stands ~1 1/2 in. off the vertical's flange (no fill drawn there) - CHECK warning; brackets: angles / fills shortened by the bottom angle rise; 7/8 carbon rivets (p.55 note) |
+| Approach stiffeners | p.55: 2-Ls 5 x 3 1/2 x 7/16 + 2-Fills 3 1/2 x 1/2 under the stringers ("Fin. top end"); bracket 2 x F.I.E. at the 33'-0 line and 7'-1 1/2 (scaled), 4-Ls + 2-Fills 11 x 1/2 at the tip | under every stringer line except the CL one (CL walkway manhole and hanger bracing there; the manhole reinforcement is not built); bracket heights follow the taper; 4 1/2 / 3 1/2 in. max pitch |
+| Girder spans F1 / F2 / B1 to the girder | p.45 Section A: web lapped on the girder stiffener 2-Ls 6 x 4 x 1/2, "1 in carbon rivets, holes reamed to a metal templet" (22 drawn), corner plates 2-7/16 Pls on 2-1/2 Fills; p.45 "details not shown same as Sh. 15" | web extended to 1/2 in. clear of the girder web + its 1 1/8 flange angle legs, 21 x 1 in rivets at 3 1/2 (3 1/2 in. from the girder CL); corner plates scaled (bracket plate follows the sloping bottom angles), fills of the stiffener-leg thickness beyond its toe; the girder stiffeners at the floor beams are now PLUMB and beside the floor beam web (they were normal to the 3 % grade and centred on it: 1 1/2 in. lean + overlap), the end stiffener 4-Ls 7 x 4 x 3/4 is split into one pair each side of the end floor beam web; floor beam / bracket stiffeners as the approach |
+| Main framed floor beams FB0-FB14 (F5 / F6 / F8; W14 at the rigid hanger) | p.85: 2-Ls 8 x 4 1/2 x 3/4, 2-Fills 11 1/2 x 3/4, "38 - 1 1/8 dia H.S. rivets - ream to metal templet"; end stiffener 2-Ls 6 x 4 x 7/16 + 2-Fills 4 x 3/4 | 8 in. leg on the web (two gage lines + the 11 1/2 fill show it), web lines 2 / 5 in. (scaled), fill line 9 3/4, ~3 in. pitch, 19 x 1 1/8 per outstanding leg (W14: 1 1/4 into the hanger); W14 now framed (ends 1'-2 1/2 from the truss CL; it ran to the CL through the hanger); F5 / F8 take the typical detail (UNRESOLVED p.73 / p.95) |
+| Main suspended floor beams FB15-FB21 | p.94: 2-Pls 25 1/2 x 3/4, 2-Pls 17 x 13/16 at the 7 1/4 pin hole, 2-Ls 7 x 4 x 1/2 at the edge, 2-Ls 7 x 4 x 3/4 bent at the bottom | end plates centred on the pin (truss CL), web extended to their outer edge, pin plates 14 1/4 wide from the edge angle toe, edge angles (4 in. outstanding), 7 rivet lines @ 5 in. (3 stop under the pin); pin hole not cut, bent bottom angles not built (flag); the dimensions 1'-6 / 6'-10 1/4 / 11'-1 3/4 do not close with the 8'-10 1/2 beam (flag) |
+| Main stiffeners | p.94 / p.85: 2-Ls 6 x 4 x 7/16 + 2-Fills 4 x 3/4 under the stringers | under every stringer line except the CL; fillet clip 7/16 at the 8 x 8 x 3/4 flange angles |
+| Diaphragm clip angles (all 7 bridges) | p.55 "1-L 4 x 3 1/2 x 7/16 - Typical", p.94 "L-4 x 3 1/2 x 7/16 (C)", drawn with 4 rivets per leg | one angle per end on the back of the channel web, 12 1/2 in. long (scaled), 4 + 4 rivets; back-to-back angles of two bays share their web-leg rivets |
+| Perforations | p.81 note "MANHOLES: for all web members 12 x 20 @ 4'-0 c.c.; for chord members as shown" (chords "12 x 20 M.H. 3'-6 ctrs", p.74 / p.81), p.74 "2'-0 alt.", 10 in. clear of the gusset; p.71 bracing 13 1/2 x 24 @ 4'-6 (struts, laterals, L0 strut webs; L11 strut webs 16 x 24), 6 x 12 H.H. @ 2'-6 (sway, floor laterals), 12 x 20 @ 4'-0 (L11 sway); p.58 approach box struts 6 x 12 @ 2'-6 | 11,250 holes in the main truss (1,012 perforated plate pieces), 430 in the approach box struts; holes centred between the end gussets (chords / bracing 1'-0 clear, web members 10 in.), the second face shifted half a space; main post U11-L11 covers (23-12) stay solid (no hole size read) |
+
+Results (run order truss-ptc-arch -> ... -> walkways-ptc -> floor-connections-ptc -> rivets-ptc on the merged model; "before" = the same order without the new script):
+- Parts: connection angles 2,896 parts / 207,367 lb (616 end connection parts + 2,280 diaphragm clip angle parts of 2 angles each); connection plates / fills 2,836 parts / 355,887 lb
+  (main suspended end plates 135 k lb); floor beam / bracket stiffeners under the stringers.
+- Structural steel (check-ptc-delaware-river section 7): 33.84 M lb = 86.2 % -> 34.54 M lb = 87.9 % of p.42 (carbon 73.9 -> 78.3 %, silicon 95.6 -> 95.4 %: the perforations remove
+  ~50 k lb of silicon cover plate in the main span). By group: girder spans 81.4 -> 84.6 % / 79.8 -> 83.0 %, 3-span 84.8 -> 88.1 % / 84.4 -> 87.7 %, 4-span 84.6 -> 87.6 %, main 90.1 -> 89.9 %.
+- Rivets: 280,040 -> 399,356 (girder spans 50,940 -> 69,800 / 20,340 -> 27,884; 3-span 20,668 -> 33,208 each; 4-span 39,332 -> 59,778 each; main 88,760 -> 115,700), heads 136,045 ->
+  170,019 lb. 536 (3-span) / 1,078 (4-span) connection rivets per unit fell into a hole a joint rivet already had (one rivet through both stacks).
+- Checks: main 608 PASS / 11 DIFF / 63 -> 66 INFO, approach 1796 / 12 / 148 -> 160 INFO (approach steel 86.3 -> 89.5 % of the plan in its own check), girders 131 / 6 / 14, location
+  379 / 41 - PASS / DIFF unchanged. Tests 572 passed.
+- IFC (Parametric): 126.3 -> 196.3 MB, 2.08 M entities; validate_ifc 0 schema + 0 EXPRESS issues (200 instances per type); 79 new products meshed (connection angles / plates, stiffeners,
+  a perforated chord): 0 failures, volumes within 2 %.
+- sbm clash (bolts on): 522,562 -> 837,236 rows (bolt rows 510,852 -> 824,794: rivet shanks through the solid plates, holes are not cut; non-bolt rows 11,710 -> 12,442). New non-bolt
+  groups (all reported, none adjusted): main end plates x suspender pins 56 (pin hole not cut, 2.95 in.); suspended end plates / edge angles x wind chord 112 (0.25-0.38 in.: the wind
+  chord already overlapped the floor beam bottom, floor beam x chord 68 -> 116 rows); floor beam stiffeners / fills x lateral strut LS-L13 52 (F8 at L13 not read); approach connection
+  angles x sway bracing ends 60 per 4-span / 44 per 3-span unit (0.25-0.38 in.); girder-span floor beam stiffeners x the ST 6 WF 29 laterals 112 (0.22 in.: the lateral stems pass
+  the floor beam top flange); girder end stiffeners x corner plate fills 196 (0.08 in.); end stiffeners x girder 84 -> 112 (root fillet, existing). Bolt x Bolt 88 -> 1,008 rows
+  (max 0.31 in.): heads of the outstanding-leg rivets where the angle stands off the vertical below the gussets against the heads of the joint 'beyond' rivets - same root cause
+  as the CHECK warning.
+- Open (UNRESOLVED flags): approach 3/4 bent plate and lower angles at the floor beam bottom (p.55), F7 two-web floor beam end at W22 (p.93), suspended bent bottom angles / pin hole,
+  floor beam manhole reinforcement plates at the CL (p.55 / p.95), F8 extra angles (p.95), bracing / portal / lateral connections (p.56, p.97-100), stringer bearings / splices.

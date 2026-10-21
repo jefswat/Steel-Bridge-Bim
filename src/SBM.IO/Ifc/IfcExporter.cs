@@ -195,6 +195,7 @@ public static class IfcExporter
                 PartCategory.TrussBracing => (0.35, 0.85, 0.45),
                 PartCategory.TrussFloorBeam or PartCategory.TrussStringer => (0.45, 0.62, 0.85),
                 PartCategory.TrussGusset => (0.95, 0.75, 0.25),
+                PartCategory.TrussConnectionAngle or PartCategory.TrussConnectionPlate => (0.78, 0.59, 0.84),
                 PartCategory.Suspender => (0.82, 0.82, 0.86),
                 PartCategory.SuspenderSocket or PartCategory.TrussPin => (0.55, 0.55, 0.6),
                 PartCategory.TrussShoeFixed or PartCategory.TrussShoeExpansion => (0.6, 0.6, 0.6),
@@ -1286,6 +1287,8 @@ public static class IfcExporter
                     PartCategory.TrussPin => w.Add("IFCMECHANICALFASTENER", $"{common},'PIN',{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},$,$,.USERDEFINED."),
                     PartCategory.TrussShoeFixed => w.Add("IFCBEARING", $"{common},'FIXED_PIN_SHOE',{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.USERDEFINED."),
                     PartCategory.TrussShoeExpansion => w.Add("IFCBEARING", $"{common},$,{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.ROCKER."),
+                    PartCategory.TrussConnectionAngle => w.Add("IFCMEMBER", $"{common},'CONNECTION_ANGLE',{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.USERDEFINED."),
+                    PartCategory.TrussConnectionPlate => w.Add("IFCPLATE", $"{common},'CONNECTION_PLATE',{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.USERDEFINED."),
                     _ => w.Add("IFCFASTENER", $"{common},$,{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.WELD."),
                 };
                 if (part.Assumption != null) miscStatus.Add((id, part.Assumption));
