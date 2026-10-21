@@ -39,6 +39,12 @@ public sealed class RailPostDefinition
     /// included); <see cref="EndDistance"/> is then ignored. null = equal spacing from the run ends.</summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public double? GridStation { get; set; }
+    /// <summary>OPTIONAL explicit post stations (alignment stations, m) where the plans dimension the posts panel by panel (e.g. 5 @ 5'-11 1/2 at a wing parapet, 5 @ 6'-0 in the
+    /// first girder-span panel). Posts stand on the radial line of each station inside the run (outside it they are dropped). Between the run end and the outermost listed post
+    /// that lies inside the run the rule of <see cref="Spacing"/> / <see cref="EndDistance"/> still applies (equal spaces, none larger than Spacing); a run with no listed station
+    /// inside it keeps the normal rule. Takes precedence over <see cref="GridStation"/>. null = off (JSON omitted).</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public List<double>? FixedStations { get; set; }
     /// <summary>Size text, e.g. "PL 3/4 tapered post".</summary>
     public string Description { get; set; } = "";
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
