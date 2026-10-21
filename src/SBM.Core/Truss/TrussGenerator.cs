@@ -228,6 +228,7 @@ public static partial class TrussGenerator
             BuildJointPlates();
             BuildEndConnections();
             BuildBracingGussets();
+            BuildPlaneItems();
             PlaceJointRivets();
             FlushConnectionRivets();
             if (_d.Floor != null) BuildFloor(_d.Floor);
@@ -1411,6 +1412,7 @@ public static partial class TrussGenerator
                 double top = line.TopBelowGrade ?? fl.StringerTopBelowGrade;
                 int no = 0;
                 var seatAt = new SortedSet<double>();
+                var pieceStarts = new HashSet<double>(); var pieceEnds = new HashSet<double>();
                 for (int i = 0; i + 1 < cross.Count; i++)
                 {
                     double e0 = fl.StringersOnTop ? 0 : cross[i].halfWeb + fl.StringerEndClearance, e1 = fl.StringersOnTop ? 0 : cross[i + 1].halfWeb + fl.StringerEndClearance;
@@ -1426,13 +1428,16 @@ public static partial class TrussGenerator
                     Orient(inst);
                     BuildMember(inst);
                     seatAt.Add(cross[i].sta); seatAt.Add(cross[i + 1].sta);
+                    pieceStarts.Add(cross[i].sta); pieceEnds.Add(cross[i + 1].sta);
                 }
                 if (fl.Seats != null && fl.StringersOnTop) BuildSeats(fl.Seats, line, sec, top, seatAt, asm);
+                if (fl.Splices != null) { pieceStarts.IntersectWith(pieceEnds); BuildStringerSplices(fl, line, sec, top, cross.Select(c => c.sta).ToList(), pieceStarts, asm); }
                 if (no == 0) Warn($"Truss: stringer line {line.Name} - no floor beam bay found (floor beams are members with role FloorBeam crossing offset {L(line.Offset)}).");
             }
             if (fl.Deck is { } dk) BuildDeck(dk, fl);
             if (fl.Seats != null && _seatCount + _seatSkipped + _seatBelow > 0)
                 Info($"Truss: stringer seats - {_seatCount} plates (gap {L(_seatGapMin)} - {L(_seatGapMax)}){(_seatSkipped > 0 ? $", {_seatSkipped} crossings bear directly (gap under {L(fl.Seats.MinGap)}) or have no steel under them" : "")}{Src}.");
+            if (fl.Splices != null) Info($"Truss: stringer splices - {_spliceCount} splices, {_spliceRivets} rivets{(_spliceRivetMiss > 0 ? $" ({_spliceRivetMiss} rivet positions not in steel, skipped)" : "")}{Src}.");
             if (_seatBelow > 0) Warn($"Truss CHECK stringer seats: {_seatBelow} stringer bottoms lie below the floor beam top (overlap up to {L(_seatBelowMax)}){Src}.");
         }
 

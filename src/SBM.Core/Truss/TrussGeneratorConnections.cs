@@ -269,9 +269,11 @@ public static partial class TrussGenerator
                         var wp = EndPoint(m, start);
                         var din = start ? m.Axis : -m.Axis;        // from the end working point into the member
                         double setb = start ? m.SA : m.SB;
-                        var Yv = m.Y; var Xv = m.X;
+                        // a rolled shape turned 90 degrees (web horizontal in the section): the web plane is spanned by the axis and section x
+                        bool rot = m.Sec.Definition.Kind == TrussSectionKind.Rolled && m.Sec.Definition.Rotated;
+                        var Yv = rot ? m.X : m.Y; var Xv = rot ? -m.Y : m.X;
                         double zoff = m.Def.OffsetZ;
-                        Vec3 P(double s, double x, double y) => wp + din * s + Xv * x + Yv * (y + zoff);
+                        Vec3 P(double s, double x, double y) => wp + din * s + Xv * x + Yv * y + m.Y * zoff;
                         string endTag = start ? "A" : "B";
                         string where = $"{m.Mark} {(start ? m.PointA : m.PointB)} end";
                         (double legOut, double legWeb, double t)? ang = null;
@@ -435,10 +437,15 @@ public static partial class TrussGenerator
                                 for (int k = 0; k < col.Count; k++)
                                 {
                                     double y = yTop - col.First - k * col.Pitch;
-                                    var q = P(back + col.Gage, 0, y);
-                                    if (pr.At(q, Xv, 0.5) is not { } iv) { nNoWeb++; if (missed.Count < 3) missed.Add($"{lbl} at {where}, column {L(col.Gage)} from the back, {L(yTop - y)} below the top"); continue; }
-                                    _pendingConn.Add((q + Xv * iv.t1, -Xv, din, iv.t1 - iv.t0, ec.RivetDiameter, asmR, ec.RivetMaterial, rasu));
-                                    nRiv++;
+                                    // stand-off connection with angles (e.g. the two webs of a box member): one rivet per side through the angle leg and its web;
+                                    // otherwise one rivet through angle - web - angle from the web centre
+                                    var starts = ec.StandOff > 0 && ang is { } aw ? new[] { P(back + col.Gage, -(heel + aw.t / 2), y), P(back + col.Gage, heel + aw.t / 2, y) } : new[] { P(back + col.Gage, 0, y) };
+                                    foreach (var q in starts)
+                                    {
+                                        if (pr.At(q, Xv, 0.5) is not { } iv) { nNoWeb++; if (missed.Count < 3) missed.Add($"{lbl} at {where}, column {L(col.Gage)} from the back, {L(yTop - y)} below the top"); continue; }
+                                        _pendingConn.Add((q + Xv * iv.t1, -Xv, din, iv.t1 - iv.t0, ec.RivetDiameter, asmR, ec.RivetMaterial, rasu));
+                                        nRiv++;
+                                    }
                                 }
                             if (ang is { } a2)
                                 foreach (var col in ec.OutRivets ?? new())

@@ -112,9 +112,15 @@ Cmp("shoes L0 / L11 / L11' / L0' x 2 trusses (p.73 / p.96)", 8, tm.Shoes.Count, 
         var pn = tm.Points.FirstOrDefault(p => p.Plane == "N" && p.Name == w); var ps = tm.Points.FirstOrDefault(p => p.Plane == "S" && p.Name == w);
         if (pn != null && ps != null) centres.Add((pn.World + ps.World) * 0.5);
     }
-    var fl = tm.Members.Where(m => m.Role == TrussMemberRole.LowerLateral && m.Section == "HP14x73").ToList();
+    var fl = tm.Members.Where(m => m.Role == TrussMemberRole.LowerLateral && (m.Section == "HP14x73" || m.Section == "L13-W14")).ToList();
     int atFb = fl.Count(m => centres.Any(c => ((m.A + m.B) * 0.5 - c).Length < 0.03));
-    Cmp("floor lateral X members (14 BP 73) crossing at the CL of floor beams W14 / W16 / W18 / W20 and primes (p.71 / p.99)", 16, atFb, 0, "", $"{fl.Count} members", dec: 0);
+    if (atFb == 0)
+    {
+        // details-ptc.csx splits every X at the crossing (p.99: the diagonals end at the floor beam plates): count the halves ending at the centres
+        int halves = fl.Count(m => centres.Any(c => (m.A - c).Length < 0.03 || (m.B - c).Length < 0.03));
+        Cmp("floor lateral X halves (14 BP 73; 2-15[ 50 toward L13) ending at the CL of floor beams W14 / W16 / W18 / W20 and primes (p.71 / p.99)", 32, halves, 0, "", $"{fl.Count} members", dec: 0);
+    }
+    else Cmp("floor lateral X members (14 BP 73) crossing at the CL of floor beams W14 / W16 / W18 / W20 and primes (p.71 / p.99)", 16, atFb, 0, "", $"{fl.Count} members", dec: 0);
     Cmp("floor lateral K members 2-12[ 25 W21-W22-W21' (p.71)", 4, tm.Members.Count(m => m.Role == TrussMemberRole.LowerLateral && m.Section == "FLAT21"), 0, "", dec: 0);
 }
 foreach (var g in tm.Members.Where(m => m.Plane == "").GroupBy(m => m.Role).OrderBy(g => g.Key)) Row("INFO", $"cross-plane members {g.Key}", "-", $"{g.Count()}");

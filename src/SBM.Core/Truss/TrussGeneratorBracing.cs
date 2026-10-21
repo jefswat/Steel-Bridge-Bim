@@ -291,15 +291,15 @@ public static partial class TrussGenerator
                     }
                     // clear of the truss-plane joint stack (point on a truss plane with in-plane members)
                     var inPlane = InPlaneAt(pl, ptName, P).Where(o => o.Plane.Equals(pl, StringComparison.OrdinalIgnoreCase)).ToList();
-                    Vec3 nT = default; double H = 0, sIn = 0;
-                    if (inPlane.Count > 0)
+                    Vec3 nT = default; double H0 = 0, sIn = 0;
+                    if (inPlane.Count > 0 && !bg.NoStackClip)
                     {
                         nT = Normal(pl, st);
-                        H = StackHalf(pl, ptName, inPlane);
+                        H0 = StackHalf(pl, ptName, inPlane);
                         sIn = Math.Sign(conn.Sum(c => Vec3.Dot(c.ends ? Away(c.m, c.start) : c.m.Axis, nT) * (c.ends ? 1 : 0)));
                         if (sIn == 0) sIn = -Math.Sign(_d.Planes.First(p => p.Name.Equals(pl, StringComparison.OrdinalIgnoreCase)).Offset);
                         var n2 = new Vec2(Vec3.Dot(nT, u), Vec3.Dot(nT, v)) * sIn;
-                        if (n2.Length > 0.2) outline = ClipHalf(outline, n2 / n2.Length, (H + gap) / n2.Length);
+                        if (n2.Length > 0.2) outline = ClipHalf(outline, n2 / n2.Length, (H0 + gap) / n2.Length);
                     }
                     (double z0, double z1) ZOf(TrussBracingPlateSide side)
                     {
@@ -311,6 +311,8 @@ public static partial class TrussGenerator
                     // members crossing the plate that are not connected to it (a floor beam through a lateral apex): the plate stops clear of their side
                     // face, on the side of the members ending here
                     var ending = conn.Where(c => c.ends).ToList();
+                    (Vec3 inw, double c, int rank, double area)? crossEdge = null;
+                    Vec2 crossN2 = default;
                     if (ending.Count > 0 && bg.Outline is not { Count: >= 3 })
                     {
                         var cen = ending.Select(c => { var (dp, _, _) = InPlane(c.m, Away(c.m, c.start)); return UV(P + dp * ((c.start ? c.m.SA : c.m.SB) + LapOf(c.m) / 2)); })
@@ -322,7 +324,9 @@ public static partial class TrussGenerator
                             if (ta < -0.3 || ta > len + 0.3) continue;
                             var foot = o.A + o.Axis * Math.Clamp(ta, 0, len) + o.Y * o.Def.OffsetZ;
                             var cz = Corners(o).Select(c => Vec3.Dot(foot - P + o.X * c.x + o.Y * (c.y - o.Def.OffsetZ), n)).ToList();
-                            if (!sides.Any(sd => { var (a0, a1) = ZOf(sd); return cz.Min() < a1 - 1e-4 && cz.Max() > a0 + 1e-4; })) continue;
+                            // (EdgeAngleOnCrossing: a member within an angle leg of the plate also carries the edge angle, e.g. a box strut narrower than the plate pair)
+                            double grow = bg.EdgeAngleOnCrossing ? In(4) : 0;
+                            if (!sides.Any(sd => { var (a0, a1) = ZOf(sd); return cz.Min() < a1 + grow - 1e-4 && cz.Max() > a0 - grow + 1e-4; })) continue;
                             var (dpo, aco, ho) = InPlane(o, o.Axis);
                             var f2 = UV(foot);
                             var ac2 = new Vec2(Vec3.Dot(aco, u), Vec3.Dot(aco, v));
@@ -332,7 +336,29 @@ public static partial class TrussGenerator
                             var nrm = ac2 * sg;
                             double before = Math.Abs(MeshBuilder.SignedArea(outline));
                             outline = ClipHalf(outline, nrm, f2.X * nrm.X + f2.Y * nrm.Y + ho + gap);
+                            double removed = before - (outline.Count >= 3 ? Math.Abs(MeshBuilder.SignedArea(outline)) : 0);
+                            double cFace = f2.X * nrm.X + f2.Y * nrm.Y + ho;
+                            // candidates for the edge angle: clipped, or (EdgeAngleOnCrossing) a face within 0.5 m of the plate
+                            bool near = bg.EdgeAngleOnCrossing && outline.Count >= 3 && outline.Min(q => q.X * nrm.X + q.Y * nrm.Y) - cFace < 0.5;
+                            if ((removed > 1e-6 || near) && (crossEdge == null || Rank(o.Def.Role) > crossEdge.Value.rank || Rank(o.Def.Role) == crossEdge.Value.rank && removed > crossEdge.Value.area))
+                            {
+                                crossEdge = ((u * nrm.X + v * nrm.Y).Normalized(), cFace, Rank(o.Def.Role), removed);
+                                crossN2 = nrm;
+                            }
                             if (outline.Count >= 3 && Math.Abs(MeshBuilder.SignedArea(outline)) < before - 1e-6) Info($"Truss: bracing plate at {where} stops {L(gap)} clear of {o.Mark} (crosses the plate, not connected to it){Src}.");
+                        }
+                    }
+                    // the edge angle lies on the crossing member: the plate reaches down to Gap from its face (its outline projected onto that line is added)
+                    if (bg.EdgeAngleOnCrossing && crossEdge is { } ce && outline.Count >= 3)
+                    {
+                        double lim = ce.c + gap;
+                        double dmin = outline.Min(q => q.X * crossN2.X + q.Y * crossN2.Y);
+                        if (dmin > lim + 1e-4)
+                        {
+                            // only the part of the outline next to the face is carried down (the far lap corners of a V would widen the base)
+                            var ext = outline.Concat(outline.Where(q => q.X * crossN2.X + q.Y * crossN2.Y < dmin + 0.15)
+                                .Select(q => q - crossN2 * (q.X * crossN2.X + q.Y * crossN2.Y - lim))).ToList();
+                            outline = MeshBuilder.ConvexHull(ext);
                         }
                     }
                     if (outline.Count < 3 || Math.Abs(MeshBuilder.SignedArea(outline)) < 1e-4) { Warn($"Truss: bracing plate at {where} - no plate area left; not built{Src}."); continue; }
@@ -356,17 +382,24 @@ public static partial class TrussGenerator
                         Model.PanelOf[mark] = $"Joint {ptName}";
                         newMeshes.Add(mesh); plates.Add((side, z0, z1)); nPlates++;
                         // edge angle on the truss-plane joint stack face: first leg on the stack face (toward the members), second on the plate's member-side face
-                        if (bg.EdgeAngle.Length > 0 && inPlane.Count > 0)
+                        bool onCross = bg.EdgeAngleOnCrossing && crossEdge != null;
+                        if (bg.EdgeAngleOnCrossing && crossEdge == null && bg.EdgeAngle.Length > 0)
+                            Warn($"Truss: bracing plate at {where} - no member crosses the plate edge for the edge angle {bg.EdgeAngle}; angle not built{Src}.");
+                        if (bg.EdgeAngle.Length > 0 && (onCross || inPlane.Count > 0 && !bg.EdgeAngleOnCrossing))
                         {
                             var ang = TrussSections.ParseAngle(bg.EdgeAngle);
                             if (ang == null && SteelCatalog.FindAngle(bg.EdgeAngle) is { } ac) ang = (ac.LegA, ac.LegB, ac.Thickness);
                             if (ang is not { } a) { Warn($"Truss: bracing plate at {where} - edge angle '{bg.EdgeAngle}' not understood; not built{Src}."); continue; }
-                            var e = Vec3.Cross(nT, n);
+                            var nFace = onCross ? crossEdge!.Value.inw : nT;
+                            double sFace = onCross ? 1 : sIn;
+                            double H = onCross ? crossEdge!.Value.c : H0;
+                            var e = Vec3.Cross(nFace, n);
                             if (e.Length < 0.2) continue;
                             e = e.Normalized();
-                            var inw = nT * sIn;                                   // from the stack face toward the bracing
-                            var outN = below ? n : -n;                            // from the plate's member-side face toward the members
-                            double zf = below ? z1 : z0;                          // member-side face of the plate (n)
+                            var inw = nFace * sFace;                              // from the stack / crossing member face toward the bracing
+                            bool outer = bg.EdgeAngleOutside;
+                            var outN = below != outer ? n : -n;                   // from the plate face the angle lies on, away from the plate
+                            double zf = below != outer ? z1 : z0;                 // the plate face the angle lies on (n)
                             var e2 = new Vec2(Vec3.Dot(e, u), Vec3.Dot(e, v));
                             double eLo = outline.Min(q => q.X * e2.X + q.Y * e2.Y), eHi = outline.Max(q => q.X * e2.X + q.Y * e2.Y);
                             var heel = P + inw * H + n * zf + e * eLo;

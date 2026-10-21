@@ -56,6 +56,10 @@ public sealed class TrussDefinition
     /// optional edge angle onto the truss-plane joint and rivets (<see cref="TrussBracingGussetDefinition"/>).</summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public List<TrussBracingGussetDefinition>? BracingGussets { get; set; }
+    /// <summary>OPTIONAL (null = none, omitted from the .sbm): pieces drawn in a vertical plane through two truss points (<see cref="TrussPlaneItemDefinition"/>):
+    /// planar plates and constant sections swept along a planar path of straight runs and filleted (arc) corners, e.g. curved portal knee braces.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public List<TrussPlaneItemDefinition>? PlaneItems { get; set; }
 
     public TrussSectionDefinition? Section(string name) => Sections.FirstOrDefault(s => string.Equals(s.Name, name, StringComparison.OrdinalIgnoreCase));
     public TrussPlaneDefinition? Plane(string name) => Planes.FirstOrDefault(s => string.Equals(s.Name, name, StringComparison.OrdinalIgnoreCase));
@@ -546,6 +550,101 @@ public sealed class TrussBracingGussetDefinition
     public string Material { get; set; } = "";
     public string Unresolved { get; set; } = "";
     public string Source { get; set; } = "";
+    /// <summary>OPTIONAL (false = default, omitted): the edge angle lies on the face of the member CROSSING the plate that the plate was clipped at (a sway
+    /// plate standing on a strut / hanging under a floor beam: the member of the highest rank, then the largest area removed) instead of the truss-plane stack.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public bool EdgeAngleOnCrossing { get; set; }
+    /// <summary>OPTIONAL: the edge angle's second leg lies on the plate's OUTER face (away from the members) instead of its member-side face.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public bool EdgeAngleOutside { get; set; }
+    /// <summary>OPTIONAL: the plate is NOT clipped clear of the truss-plane joint stack (it lies on the face of a chord in the plate plane, e.g. a floor
+    /// lateral plate under a wind chord).</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public bool NoStackClip { get; set; }
+}
+
+/// <summary>
+/// Splice of rolled stringers laid ON the floor beams (generic, OPTIONAL; <see cref="TrussFloorDefinition.Splices"/>): at the floor beam crossings of a
+/// stringer line chosen by <see cref="Crossings"/> (index of the crossing along the line in station order, 0 = the first floor beam) or by the pattern
+/// <see cref="Every"/> / <see cref="First"/> (index - First divisible by Every), where two stringer pieces abut: two web plates (<see cref="WebPlateHeight"/>
+/// centred on the web, <see cref="Before"/> / <see cref="After"/> along the stringer from the joint), a plate on the top flange (<see cref="TopPlateWidth"/>, N.S.)
+/// and two plates under the top flange (<see cref="UnderPlateWidth"/> each, F.S., clear of the root fillet), rivets in columns at signed distances from the joint
+/// (web rows centred on the web; flange rows at +-<see cref="FlangeRivetGage"/>). Only stringer lines of <see cref="Section"/> ("" = any) / <see cref="Lines"/>.
+/// Parts SplicePlate; dimension-only flag from <see cref="Unresolved"/>.
+/// </summary>
+public sealed class TrussStringerSpliceDefinition
+{
+    public string Label { get; set; } = "";
+    public List<string> Lines { get; set; } = new();
+    public string Section { get; set; } = "";
+    public List<int>? Crossings { get; set; }
+    public int Every { get; set; }
+    public int First { get; set; }
+    public double Before { get; set; }
+    public double After { get; set; }
+    public double WebPlateHeight { get; set; }
+    public double WebPlateThickness { get; set; }
+    public double TopPlateWidth { get; set; }
+    public double TopPlateThickness { get; set; }
+    public double UnderPlateWidth { get; set; }
+    public double UnderPlateThickness { get; set; }
+    public List<double> WebRivetColumns { get; set; } = new();
+    public int WebRivetRows { get; set; }
+    public double WebRivetPitch { get; set; }
+    public List<double> FlangeRivetColumns { get; set; } = new();
+    public double FlangeRivetGage { get; set; }
+    public double RivetDiameter { get; set; }
+    public string? RivetMaterial { get; set; }
+    public string Material { get; set; } = "";
+    public string Unresolved { get; set; } = "";
+    public string Source { get; set; } = "";
+}
+
+/// <summary>Kind of a <see cref="TrussPlaneItemDefinition"/>.</summary>
+public enum TrussPlaneItemKind { Plate, Sweep }
+
+/// <summary>A path vertex in the plane of a <see cref="TrussPlaneItemDefinition"/> (U along the plane from point A, V up from A), with an optional fillet
+/// radius (m; 0 = sharp corner): the corner is replaced by a tangent circular arc of that radius (the path's centreline radius).</summary>
+public sealed class TrussPathVertex
+{
+    public double U { get; set; }
+    public double V { get; set; }
+    public double Radius { get; set; }
+    public TrussPathVertex() { }
+    public TrussPathVertex(double u, double v, double radius = 0) { U = u; V = v; Radius = radius; }
+}
+
+/// <summary>
+/// A piece drawn in the VERTICAL plane through two truss points (generic, OPTIONAL; e.g. a curved portal knee brace): frame origin = <see cref="PointA"/>,
+/// U = horizontal toward <see cref="PointB"/>, V = up, W = U x V (out of the plane). <see cref="Kind"/> Plate = the <see cref="Outline"/> (U, V) extruded over
+/// W [<see cref="W0"/>, <see cref="W1"/>]; Sweep = the <see cref="Section"/> (U = W out of the plane, V = offset to the left of the path direction in the plane)
+/// swept along the <see cref="Path"/>, its filleted corners cut into straight pieces of at most <see cref="ArcStepDegrees"/> (every piece an exact straight
+/// extrusion). <see cref="Mirror"/> also builds the piece mirrored about the vertical plane halfway between A and B (mark + "-M"). Part category from
+/// <see cref="Role"/>; dimension-only flag from <see cref="Unresolved"/>.
+/// </summary>
+public sealed class TrussPlaneItemDefinition
+{
+    public string Name { get; set; } = "";
+    public string Label { get; set; } = "";
+    public string PointA { get; set; } = "";
+    public string PointB { get; set; } = "";
+    public TrussPlaneItemKind Kind { get; set; }
+    public List<TrussUV> Outline { get; set; } = new();
+    public double W0 { get; set; }
+    public double W1 { get; set; }
+    public List<TrussPathVertex> Path { get; set; } = new();
+    public List<TrussUV> Section { get; set; } = new();
+    public double ArcStepDegrees { get; set; } = 5;
+    public bool Mirror { get; set; }
+    public TrussMemberRole Role { get; set; } = TrussMemberRole.Portal;
+    /// <summary>Assembly mark ("" = BR-PORTALS) and its description.</summary>
+    public string Assembly { get; set; } = "";
+    public string AssemblyDescription { get; set; } = "";
+    /// <summary>Database panel label (e.g. "Portal U11").</summary>
+    public string Panel { get; set; } = "";
+    public string Material { get; set; } = "";
+    public string Unresolved { get; set; } = "";
+    public string Source { get; set; } = "";
 }
 
 /// <summary>Joint (panel point) detail: gusset plates and rivet groups.</summary>
@@ -821,6 +920,9 @@ public sealed class TrussFloorDefinition
     /// bottom, top bevelled to the stringer grade (<see cref="TrussStringerSeatDefinition"/>).</summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public TrussStringerSeatDefinition? Seats { get; set; }
+    /// <summary>OPTIONAL (null = none, omitted from the .sbm): splices of the stringers laid on top of the floor beams (<see cref="TrussStringerSpliceDefinition"/>).</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public List<TrussStringerSpliceDefinition>? Splices { get; set; }
     public string Unresolved { get; set; } = "";
     public string Source { get; set; } = "";
 }
