@@ -133,7 +133,7 @@ public static partial class TrussGenerator
             bool top = Vec3.Dot(d1, c.Y) > 0;
             var face = top ? TrussPlateFace.Top : TrussPlateFace.Bottom;
             var plates = _d.Joints.Where(j => j.Point.Equals(pt, StringComparison.OrdinalIgnoreCase) && (j.Plane.Length == 0 || j.Plane.Equals(pl, StringComparison.OrdinalIgnoreCase)) && j.Plates != null)
-                .SelectMany(j => j.Plates!).Where(p => p.Face == face && p.Thickness > 0 && p.Length > 0 && p.Width > 0).ToList();
+                .SelectMany(j => j.Plates!).Where(p => p.Member == null && p.Face == face && p.Thickness > 0 && p.Length > 0 && p.Width > 0).ToList();
             if (plates.Count == 0) return 0;
             var tan = Tangent(StationOf(P));
             var cax = Vec3.Dot(c.Axis, tan) >= 0 ? c.Axis : -c.Axis;

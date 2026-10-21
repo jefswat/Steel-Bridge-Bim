@@ -751,6 +751,17 @@ public sealed class TrussJointPlate
     public string Material { get; set; } = "";
     public string Unresolved { get; set; } = "";
     public string Source { get; set; } = "";
+    /// <summary>OPTIONAL (null = a chord plate as above, omitted from the .sbm): the plate lies on THIS member at the joint (name or mark; a web member, or one
+    /// chord member only) along its axis: <see cref="Offset"/> = centre distance from the working point INTO the member (away from the joint), the faces are
+    /// the member's own (WebOutside / WebInside = the outer / inner face of its webs or flanges in the truss plane, Top / Bottom = across its section y),
+    /// stacked on the member's pieces and on the plates already placed on the same member and face (fills between a rolled member's flanges and the gussets,
+    /// splice bars on the inside of the flanges).</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? Member { get; set; }
+    /// <summary>OPTIONAL (0 = centred, omitted when 0): offset of the plate centre across its face (section y for WebOutside / WebInside, section x for
+    /// Top / Bottom), e.g. one of two splice bars above / below a horizontal web.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public double CenterOffset { get; set; }
 }
 
 public enum TrussLineItemKind { Steel, Concrete }

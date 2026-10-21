@@ -451,6 +451,166 @@ var jointShear = new Dictionary<(string bridge, string joint), double>();
     }
 }
 
+// ================================================================ 6. approach truss joint FILLS and chord SPLICE material (QC I051, 2026-10-21; user: "Draw as shown")
+// The approach members are 1954 14 WF shapes turned with the web across the truss plane: the gussets lie on the flange outer faces at the printed in-to-in,
+// and the difference to each member's depth is made up by FILLS between the flange and the gusset (the sheets list them "2-Fills b x t" per member end and
+// draw them to scale, 3/4 in. = 1 ft). Here:
+//   (a) fills on every member lapping a gusset whose depth is less than the printed gusset in-to-in: thickness = (in-to-in - d) / 2 to 1/16 in. (the printed
+//       fill sizes add up to it where read, e.g. p.62 U9: 2 x 7/8 = 1 3/4 = (17 5/8 - 14.12) / 2), width = the flange width to 1/2 in. (14 1/2 / 15 1/2 / 16 /
+//       10 / 12 / 11 1/2 as printed), from the member end at the joint over the member's lap under the gusset (the drawn outline, section 4b) and past the
+//       gusset edge as far as the sheet draws rivets beyond it (rivet-counts.csv 'beyond' extent + 1 1/2 in. edge distance);
+//   (b) chord splice material read from the joint sheets (approach-splices.csv): web splice plates on the web (plan views), splice bars inside the flanges
+//       (elevation, dashed), splice plates outside the gussets - sizes as printed, lengths scaled (dimension-only flags with page + reason).
+// Generic inputs: TrussJointPlate.Member / CenterOffset (fills and bars on one member), TrussGussetLayer with ClipToGusset = false (plates outside the gussets).
+{
+    // structure key / data joint of each model joint (as section 4b: 3-span ends are drawn as U0' / L0' on p.59), similar-to joints
+    var unitsA = new[] { ("PTC 3-span truss 11-13", "approach3", 1, 12), ("PTC 4-span truss 14-17", "approach4", 1, 20), ("PTC 4-span truss 21-24", "approach4", -1, 20), ("PTC 3-span truss 25-27", "approach3", -1, 12) };
+    var cnt = Csv("rivet-counts.csv");
+    string SK(string s) => s.Split(' ')[0];
+    var beyondExt = cnt.Where(r => r["region"] == "beyond" && Num(r["beyond_extent_in"]) is > 0)
+        .GroupBy(r => (SK(r["structure"]), r["joint"], r["member"])).ToDictionary(g => g.Key, g => g.Max(r => Num(r["beyond_extent_in"])!.Value));
+    var drawnJoints = Csv("gusset-outlines.csv").Where(r => r["structure"] != "main").Select(r => (SK(r["structure"]), r["joint"].Trim())).ToHashSet();
+    var tokenRx = new System.Text.RegularExpressions.Regex(@"^([UL])(\d+)('?)$");
+    var spl = File.Exists(Path.Combine(dataDir, "approach-splices.csv")) ? Csv("approach-splices.csv") : new List<Dictionary<string, string>>();
+    int nFill = 0, nFillJ = 0, nBeyond = 0, nSpl = 0, nOuter = 0;
+    var fillChecks = new List<string>();
+    foreach (var (bn, st, dir, C) in unitsA)
+    {
+        var t = Doc.Project.Bridges.FirstOrDefault(b => b.Name == bn)?.Truss;
+        if (t == null) { report.Add($"approach fills: no truss bridge '{bn}' - skipped"); continue; }
+        string pg = st == "approach3" ? "p.49-53, p.59" : "p.59-67";
+        int Ord(string pt) { var m = tokenRx.Match(pt); if (!m.Success) return -1000; int n = int.Parse(m.Groups[2].Value); return m.Groups[3].Value == "'" ? 2 * C - n : n; }
+        var mems = t.Members.Where(m => !m.From.Contains(':') && !m.To.Contains(':')).ToList();
+        TrussSectionDefinition? Sec(TrussMemberDefinition m) => t.Sections.FirstOrDefault(s => s.Name == m.Section);
+        TrussPointDefinition? Pt(string n) => t.Points.LastOrDefault(p => p.Name == n && (p.Planes == null || p.Planes.Count == 0));
+        bool IsChordR(TrussMemberRole r) => r is TrussMemberRole.UpperChord or TrussMemberRole.LowerChord or TrussMemberRole.EndPost;
+        foreach (var jd in t.Joints.Where(j => j.Plane.Length == 0 && j.GussetsInsideFaceDistance > 0 && j.Outline.Count >= 3 && tokenRx.IsMatch(j.Point)))
+        {
+            jd.Plates = null;
+            string pt = jd.Point;
+            var P = Pt(pt);
+            if (P == null) continue;
+            var at = mems.Where(m => m.From == pt || m.To == pt).ToList();
+            // chord passing through the point
+            var thr = mems.Where(m => IsChordR(m.Role) && m.From[0] == pt[0] && m.To[0] == pt[0] && tokenRx.IsMatch(m.From) && tokenRx.IsMatch(m.To)
+                && Math.Min(Ord(m.From), Ord(m.To)) < Ord(pt) && Math.Max(Ord(m.From), Ord(m.To)) > Ord(pt)).ToList();
+            // data joint on the sheets (for the drawn beyond extents): own drawing or the other half of the unit, mirrored
+            string cp = pt.EndsWith("'") ? pt.TrimEnd('\'') : pt + "'";
+            string dj = drawnJoints.Contains((st, pt)) ? pt : drawnJoints.Contains((st, cp)) ? cp : null;
+            bool mirror = dj != null && dj != pt;
+            var outline = jd.Outline.Select(q => new Vec2(q.U, q.V)).ToList();
+            bool Inside(Vec2 p)
+            {
+                bool c = false;
+                for (int i = 0, j = outline.Count - 1; i < outline.Count; j = i++)
+                    if ((outline[i].Y > p.Y) != (outline[j].Y > p.Y) && p.X < (outline[j].X - outline[i].X) * (p.Y - outline[i].Y) / (outline[j].Y - outline[i].Y) + outline[i].X) c = !c;
+                return c;
+            }
+            // reach of the gusset along a direction (u, v) from the work point
+            double Reach(double du, double dv) { double r = 0; for (double s = 0.01; s < 6; s += 0.005) { if (Inside(new Vec2(du * s, dv * s))) r = s; else if (s > r + 0.3) break; } return r; }
+            double inToIn = jd.GussetsInsideFaceDistance;
+            int nHere = 0;
+            foreach (var (m, both) in at.Select(m => (m, false)).Concat(thr.Select(m => (m, true))))
+            {
+                var sd = Sec(m);
+                if (sd == null || sd.Kind != TrussSectionKind.Rolled || !sd.Rotated || sd.Depth <= 0) continue;
+                // cover plates that run gusset edge to gusset edge of the member's END joints (p.57 4-span U3-U5, U9-U11, U9-L10, L10-U11): absent under an end
+                // gusset, present under the gusset of a joint the member passes through (U4 / U10: "18 3/8 / 19 1/8 in to in = d + 2 t")
+                var covers = sd.TopPlates.Concat(sd.BottomPlates).Where(q => q.BetweenGussets).ToList();
+                double depth = sd.Depth + (both ? covers.Sum(q => q.Thickness) : 0);
+                double gap = (inToIn - depth) / 2;
+                double tq = Math.Round(gap / In(1.0 / 16)) * In(1.0 / 16);
+                if (tq < In(1.0 / 16) - 1e-9) continue;
+                // printed widths are the flange width to 1/2 in. (label); the solid is kept within the (interpolated) flange so it cannot hang past the member
+                double nominal = Math.Round(sd.FlangeWidth / In(0.5)) * In(0.5), width = Math.Min(nominal, sd.FlangeWidth);
+                // member direction away from the joint in the joint frame (u = toward the higher station, v up); through chords: both ways
+                var dirs = new List<(int sgn, double du, double dv)>();
+                foreach (var other in both ? new[] { m.From, m.To } : new[] { m.From == pt ? m.To : m.From })
+                {
+                    var Q = Pt(other);
+                    if (Q == null) continue;
+                    double du = Q.Station - P.Station, dv = Q.Elevation - P.Elevation, l = Math.Sqrt(du * du + dv * dv);
+                    dirs.Add((other == m.To ? 1 : -1, du / l, dv / l));
+                }
+                // beyond extent of the drawn rivets on this member (own drawing / mirrored half; member class by direction)
+                double ext = 0;
+                if (dj != null && covers.Count == 0)   // a covered member's cover plates begin at the gusset edge: its fill ends there
+                {
+                    string Other(TrussMemberDefinition x) => x.From == pt ? x.To : x.From;
+                    string Mp(string n) => !mirror ? n : (tokenRx.Match(n) is { Success: true } mm && int.Parse(mm.Groups[2].Value) != C ? (n.EndsWith("'") ? n.TrimEnd('\'') : n + "'") : n);
+                    string dName = string.Join("-", new[] { Mp(m.From), Mp(m.To) });
+                    var keys = beyondExt.Keys.Where(k => k.Item1 == st && k.Item2 == dj && (k.Item3 == dName || k.Item3 == string.Join("-", dName.Split('-').Reverse()) || k.Item3 == m.Name)).ToList();
+                    foreach (var k in keys) ext = Math.Max(ext, In(beyondExt[k] + 1.5));
+                }
+                string why = U(pg, $"fills between the flanges of {m.Name} and the gussets at {pt}",
+                    $"the joint sheet lists the fills per member end (2-Fills b x t) and draws them, but dimensions neither their length nor every thickness; thickness = (gusset in-to-in {SBM.Core.Truss.TrussSections.FormatIn(inToIn)} - member depth {SBM.Core.Truss.TrussSections.FormatIn(depth)}{(both && covers.Count > 0 ? " incl. its cover plates" : "")}) / 2 (the 1954 14 WF depths are interpolated, see the section flags), width = the flange width to 1/2 in.",
+                    "one fill per flange (pair) from the member end over the lap under the drawn gusset outline" + (ext > 0 ? $" and {SBM.Core.Truss.TrussSections.FormatIn(ext)} past the gusset edge where the sheet draws rivets beyond it" : "") + ".");
+                foreach (var (sgn, du, dv) in dirs)
+                {
+                    double r = Reach(du, dv);
+                    if (r <= 0) continue;
+                    double a1 = r + ext;
+                    // through chord: offset along +axis (From -> To); member end: along the member away from the joint
+                    double lo = both ? (sgn > 0 ? 0 : -a1) : 0, hi = both ? (sgn > 0 ? a1 : 0) : a1;
+                    (jd.Plates ??= new()).Add(new TrussJointPlate
+                    {
+                        Member = m.Name, Face = TrussPlateFace.WebOutside, Fill = true, Width = width, Thickness = tq, Length = hi - lo, Offset = (lo + hi) / 2,
+                        Label = $"2-Fills {SBM.Core.Truss.TrussSections.FormatIn(nominal)} x {SBM.Core.Truss.TrussSections.FormatIn(tq)}", Material = sd.Material, Source = $"{pg} (fill = in-to-in - depth)", Unresolved = why,
+                    });
+                    nFill++; nHere++;
+                    if (ext > 0) nBeyond++;
+                }
+            }
+            if (nHere > 0) nFillJ++;
+        }
+        // ---- (b) chord splice material read from the sheets (approach-splices.csv): data joint -> model joints (own / other half mirrored; NJ unit same sheets)
+        foreach (var r in spl.Where(r => SK(r["structure"]) == st))
+        {
+            string dj = r["joint"].Trim();
+            foreach (var mj in new[] { dj, dj.EndsWith("'") ? dj.TrimEnd('\'') : dj + "'" }.Distinct())
+            {
+                if (tokenRx.Match(mj) is { Success: true } mm0 && int.Parse(mm0.Groups[2].Value) == C && mj.EndsWith("'")) continue;
+                bool mirror = mj != dj;
+                var jd = t.Joints.LastOrDefault(x => x.Point == mj && x.Plane.Length == 0);
+                if (jd == null) continue;
+                // member of the data joint -> model member (the same panel points, primed on the other half)
+                string Mp(string n) => !mirror ? n : (tokenRx.Match(n) is { Success: true } mm && int.Parse(mm.Groups[2].Value) != C ? (n.EndsWith("'") ? n.TrimEnd('\'') : n + "'") : n);
+                var ends = r["member"].Split('-').Select(Mp).ToHashSet();
+                var m = mems.FirstOrDefault(x => ends.SetEquals(new[] { x.From, x.To }));
+                if (m == null) { report.Add($"approach splices {bn} {mj}: member {r["member"]} not found - skipped"); continue; }
+                double w = In(Num(r["width_in"]) ?? 0), th = In(Num(r["thk_in"]) ?? 0), a0 = In(Num(r["from_in"]) ?? 0), a1 = In(Num(r["to_in"]) ?? 0);
+                string face = r["face"];
+                string flag = U("p." + r["page"], $"{r["label"]} at {mj}", $"size as printed; the length is scaled from the joint sheet ({r["evidence"]}; {r["confidence"]} confidence, about +-1 in.)",
+                    "plate as printed, length as scaled" + (mirror ? ", mirrored from the drawn half" : "") + ".");
+                if (face == "gusset-out")
+                {
+                    // plate outside the gussets along the chord member: a gusset layer not clipped to the gusset (its own rectangle in the joint frame)
+                    // along the member away from the joint (a chord passing through: From -> To)
+                    var P = Pt(mj); var Q = Pt(m.From != mj && m.To != mj ? m.To : (m.From == mj ? m.To : m.From));
+                    double du = Q.Station - P.Station, dv = Q.Elevation - P.Elevation, l = Math.Sqrt(du * du + dv * dv); du /= l; dv /= l;
+                    double nu = -dv, nv = du;
+                    var poly = new[] { (a0, -w / 2), (a1, -w / 2), (a1, w / 2), (a0, w / 2) }.Select(q => new TrussUV { U = du * q.Item1 + nu * q.Item2, V = dv * q.Item1 + nv * q.Item2 }).ToList();
+                    (jd.GussetLayers ??= new()).Add(new TrussGussetLayer { Thickness = th, Outline = poly, ClipToGusset = false, Label = r["label"] + " (outside the gussets)", Material = r["material"], Unresolved = flag, Source = $"approach-splices.csv p.{r["page"]}" });
+                    nOuter++;
+                    continue;
+                }
+                var pf = face switch { "web-top" => TrussPlateFace.Top, "web-bottom" => TrussPlateFace.Bottom, "flange-in" => TrussPlateFace.WebInside, _ => TrussPlateFace.WebOutside };
+                (jd.Plates ??= new()).Add(new TrussJointPlate
+                {
+                    Member = m.Name, Face = pf, Fill = r["kind"] == "fill", Width = w, Thickness = th, Length = a1 - a0, Offset = (a0 + a1) / 2, CenterOffset = In(Num(r["y_in"]) ?? 0),
+                    Label = r["label"], Material = r["material"], Source = $"approach-splices.csv p.{r["page"]} ({r["confidence"]})", Unresolved = flag,
+                });
+                nSpl++;
+            }
+        }
+        int n0 = t.Unresolved.RemoveAll(s => s.Contains("fills, splice plates, lug angles, diaphragms and stitch rivets of the approach truss joints"));
+        t.Unresolved.Add(U(pg, "lug angles, diaphragms and stitch rivets of the approach truss joints, and the fills drawn outside the joints (vertical stub ends, floor beam connection fills)",
+            "they are listed on the joint sheets but not modeled (the truss generator has no input for them yet)",
+            "not built. Built from the sheets: gusset layers (section 5), fills between the member flanges and the gussets (section 6a), chord splice plates / bars (section 6b)."));
+    }
+    report.Add($"approach fills: {nFill} fill definitions (pairs) on {nFillJ} model joints, {nBeyond} past the gusset edge to the drawn beyond rivets; splice material: {nSpl} plates / bars on members, {nOuter} plates outside the gussets (approach-splices.csv)");
+}
+
 // ================================================================ regenerate + save
 var rep = Doc.Regenerate();
 foreach (var name in new[] { "PTC Arch truss 18-20", "PTC Girder spans 1-10", "PTC Girder spans 28-31" })

@@ -228,6 +228,7 @@ public static partial class TrussGenerator
             foreach (var m in _inst) BuildMember(m);
             BuildJoints();
             BuildJointPlates();
+            BuildMemberJointPlates();
             BuildEndConnections();
             BuildBracingGussets();
             BuildPlaneItems();
@@ -1409,7 +1410,7 @@ public static partial class TrussGenerator
                         return best!.Value;
                     }
                     // marks keep the listed order (fills first), placement follows the stacking order
-                    var listed = jdef.Plates!.OrderBy(p => p.Fill ? 0 : 1).Select((p, i) => (p, k: i + 1)).ToList();
+                    var listed = jdef.Plates!.Where(p => p.Member == null).OrderBy(p => p.Fill ? 0 : 1).Select((p, i) => (p, k: i + 1)).ToList();
                     var order = new List<(TrussJointPlate p, int k, double baseLevel)>();
                     foreach (bool fillPass in new[] { true, false })
                     {
