@@ -29,7 +29,7 @@ def _render(pg, dpi, x0, y0, x1, y1):
     from PIL import Image
     p = _page(pg)
     k = 72.0 / dpi
-    pix = p.get_pixmap(dpi=dpi, clip=pymupdf.Rect(x0 * k, y0 * k, x1 * k, y1 * k), colorspace=pymupdf.csGRAY)
+    pix = p.get_pixmap(matrix=pymupdf.Matrix(dpi / 72.0, dpi / 72.0), clip=pymupdf.Rect(x0 * k, y0 * k, x1 * k, y1 * k), colorspace=pymupdf.csGRAY)
     return Image.frombytes("L", (pix.width, pix.height), pix.samples)
 
 
@@ -44,22 +44,23 @@ def grid(argv):
     out = argv[6]
     opts = dict(a.split('=', 1) for a in argv[7:])
     g = int(opts.get('grid', 20))
-    src = _render(pg, dpi, x0, y0, x1, y1)
+    z = float(opts.get('zoom', 1))  # render at dpi * zoom, grid labels stay in page pixels at DPI
+    src = _render(pg, dpi * z, x0 * z, y0 * z, x1 * z, y1 * z)
     im = src.convert("RGB")
     d = ImageDraw.Draw(im)
     if g > 0:
         for x in range(int(math.ceil(x0 / g)) * g, int(x1) + 1, g):
             major = x % (2 * g) == 0
-            d.line([(x - x0, 0), (x - x0, im.height)], fill=(255, 110, 110) if major else (255, 185, 185), width=1)
+            d.line([((x - x0) * z, 0), ((x - x0) * z, im.height)], fill=(255, 110, 110) if major else (255, 185, 185), width=1)
             if major:
-                d.text((x - x0 + 2, 2), str(x), fill=(220, 0, 0))
-                d.text((x - x0 + 2, im.height - 12), str(x), fill=(220, 0, 0))
+                d.text(((x - x0) * z + 2, 2), str(x), fill=(220, 0, 0))
+                d.text(((x - x0) * z + 2, im.height - 12), str(x), fill=(220, 0, 0))
         for y in range(int(math.ceil(y0 / g)) * g, int(y1) + 1, g):
             major = y % (2 * g) == 0
-            d.line([(0, y - y0), (im.width, y - y0)], fill=(110, 110, 255) if major else (185, 185, 255), width=1)
+            d.line([(0, (y - y0) * z), (im.width, (y - y0) * z)], fill=(110, 110, 255) if major else (185, 185, 255), width=1)
             if major:
-                d.text((2, y - y0 + 2), str(y), fill=(0, 0, 220))
-                d.text((im.width - 30, y - y0 + 2), str(y), fill=(0, 0, 220))
+                d.text((2, (y - y0) * z + 2), str(y), fill=(0, 0, 220))
+                d.text((im.width - 30, (y - y0) * z + 2), str(y), fill=(0, 0, 220))
         px, sp = im.load(), src.load()
         for yy in range(im.height):
             for xx in range(im.width):
@@ -67,10 +68,10 @@ def grid(argv):
                     px[xx, yy] = (sp[xx, yy],) * 3
     if 'poly' in opts:
         P = pts(opts['poly'])
-        d.line([(x - x0, y - y0) for x, y in P + [P[0]]], fill=(0, 170, 0), width=2)
+        d.line([((x - x0) * z, (y - y0) * z) for x, y in P + [P[0]]], fill=(0, 170, 0), width=2)
     if 'marks' in opts:
         for x, y in pts(opts['marks']):
-            d.ellipse([x - x0 - 5, y - y0 - 5, x - x0 + 5, y - y0 + 5], outline=(0, 140, 255), width=2)
+            d.ellipse([(x - x0) * z - 5, (y - y0) * z - 5, (x - x0) * z + 5, (y - y0) * z + 5], outline=(0, 140, 255), width=2)
     im.save(out)
     print(im.size)
 
