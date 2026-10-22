@@ -23,7 +23,7 @@ const double GirderOffFt = 29.0;
 
 // steel top under a point (vertical rays through the regenerated model), relative to the finished grade there; excludes parts above 'below' (rel. grade)
 string bestPart = "";
-double TopUnder(SteelModel st, SBM.Core.Alignments.Alignment al, IEnumerable<(double sta, double off)> pts, double belowRel, double refSta)
+double TopUnder(SteelModel st, SBM.Core.Alignments.Alignment al, IEnumerable<(double sta, double off)> pts, double belowRel, double refSta, double slope = 0)
 {
     double best = double.NegativeInfinity;
     var P = pts.Select(q => (q.sta, q.off, xy: al.PointAt(q.sta, q.off), g: al.ElevationAt(refSta, q.off))).ToList();
@@ -44,7 +44,7 @@ double TopUnder(SteelModel st, SBM.Core.Alignments.Alignment al, IEnumerable<(do
                 if (Math.Abs(d) < 1e-14) continue;
                 double l1 = ((B.Y - C.Y) * (p.xy.X - C.X) + (C.X - B.X) * (p.xy.Y - C.Y)) / d, l2 = ((C.Y - A.Y) * (p.xy.X - C.X) + (A.X - C.X) * (p.xy.Y - C.Y)) / d, l3 = 1 - l1 - l2;
                 if (l1 < -1e-9 || l2 < -1e-9 || l3 < -1e-9) continue;
-                double z = l1 * A.Z + l2 * B.Z + l3 * C.Z - p.g;
+                double z = l1 * A.Z + l2 * B.Z + l3 * C.Z - p.g - slope * (p.sta - refSta);   // relative to the grade line through refSta (OPTIONAL slope along)
                 if (z < belowRel && z > best) { best = z; bestPart = part.Mark; }
             }
         }
@@ -97,14 +97,16 @@ foreach (var bn in girders)
     // templet' (2 lines x 5 each side drawn), '13/16 Fill - Omit at 1/4 Point' + '13/16 Fill' on the bracket / floor beam covers = the girder's extra cover plates
     // (86'-0 at the quarter points, 86'-0 + 51'-0 at the middle floor beam), none at the end floor beams. Length scaled 4'-3 (p.45) / 4'-5 (p.44).
     string tpFlag = U("p.44, p.45", "tension plates 16 1/2 x 3/4 over the girders (length, rivet layout, fills)",
-        "the plate is called out 16 1/2 x 3/4 with 1 1/8 in. H.S. rivets but its length and the rivet pitch are only drawn (scaled 4'-3 on p.45, 4'-5 on p.44); the floor beams are plumb with level tops while the girder top follows the 3 % grade, so the plate cannot lie on both",
-        "4'-3 long centred on the girder, level along the bridge and parallel to the roadway crown across it, its bottom 1/32 in. above the highest steel under it (probed: girder cover plates, floor beam / bracket covers); 13/16 fills (one at the quarter points, two at the middle floor beam) under it on the floor beam and bracket sides, from the girder cover plate edge to the plate end, filling the gap; 2 x 5 rivets 1 1/8 in. H.S. each side at 3 in. (lines 3 in. each side of the floor beam web, first 1 1/2 in. from the plate end).");
+        "the plate is called out 16 1/2 x 3/4 with 1 1/8 in. H.S. rivets but its length and the rivet pitch are only drawn (scaled 4'-3 on p.45, 4'-5 on p.44)",
+        "4'-3 long centred on the girder and on the floor beam top (the floor beams and the girder top are both normal to / on the grade, p.43 / p.44 notes, section 25: the plate lies parallel to the profile grade along the bridge and to the roadway crown across it), its bottom 1/32 in. above the highest steel under it (probed: girder cover plates, floor beam / bracket covers); 13/16 fills (one at the quarter points, two at the middle floor beam) under it on the floor beam and bracket sides, from the girder cover plate edge to the plate end, filling the gap; 2 x 5 rivets 1 1/8 in. H.S. each side at 3 in. (lines 3 in. each side of the floor beam web, first 1 1/2 in. from the plate end).");
     int nTp = 0, nFill = 0;
     double half = In(25.5), halfW = In(8.25), coverHalf = In(11);
     foreach (var n in spans)
         for (int k = 0; k < 5; k++)
         {
-            double sta = fbSta[n][k];
+            // centred on the floor beam TOP: the beam is set normal to grade, its top lies G x 38 1/4 in. down-grade of its axis station (section 25)
+            double G = al.Profile.GradeAt(fbSta[n][k]);
+            double sta = fbSta[n][k] - G * In(38.25) / Math.Sqrt(1 + G * G);
             int nCov = k == 2 ? 3 : (k == 1 || k == 3) ? 2 : 1;
             foreach (int sg in new[] { -1, 1 })
             {
@@ -112,7 +114,7 @@ foreach (var bn in girders)
                 var pts = new List<(double, double)>();
                 for (int iu = -2; iu <= 2; iu++)
                     for (int iw = -10; iw <= 10; iw++) pts.Add((sta + iu * halfW / 2, go + iw * half / 10));
-                double top = TopUnder(st0, al, pts, -In(20), sta);
+                double top = TopUnder(st0, al, pts, -In(20), sta, G);
                 if (double.IsNegativeInfinity(top)) { report.Add($"{bn}: no steel under the tension plate at span {n} floor beam {k} ({(sg < 0 ? "N" : "S")})"); continue; }
                 if (n == 5 && Environment.GetEnvironmentVariable("DEBUG_TP") == "1") Print($"TP {n}-{k}{(sg < 0 ? "N" : "S")}: top {top / In(1):0.###} in rel. grade, by {bestPart}");
                 double vb = top + In(1.0 / 32);              // plate bottom relative to the grade at each offset (the plate follows the crown across)
@@ -121,11 +123,11 @@ foreach (var bn in girders)
                 foreach (int side in new[] { -1, 1 })
                     foreach (double uu in new[] { -3.0, 3.0 })
                         for (int c = 0; c < 5; c++)
-                            rivets.Add(new TrussLineItemRivet { U = In(uu), W = go + side * In(24 - 3 * c), V = vb + In(0.375), Axis = "V", Diameter = In(1.125), Material = "1 1/8 in H.S. rivet" });
+                            rivets.Add(new TrussLineItemRivet { U = In(uu), W = go + side * In(24 - 3 * c), V = vb + In(0.375) + G * In(uu), Axis = "V", Diameter = In(1.125), Material = "1 1/8 in H.S. rivet" });
                 t.LineItems.Add(new TrussLineItemDefinition
                 {
                     Name = name, Kind = TrussLineItemKind.Steel, Category = PartCategory.SplicePlate, Transverse = true, Station = sta, From = go - half, To = go + half, FromGrade = true,
-                    Profile = new() { new TrussUV(-halfW, vb), new TrussUV(halfW, vb), new TrussUV(halfW, vb + In(0.75)), new TrussUV(-halfW, vb + In(0.75)) },
+                    Profile = new() { new TrussUV(-halfW, vb - G * halfW), new TrussUV(halfW, vb + G * halfW), new TrussUV(halfW, vb + G * halfW + In(0.75)), new TrussUV(-halfW, vb - G * halfW + In(0.75)) },
                     Material = "S", Assembly = OwnAsm, AssemblyDescription = $"{t.Name} - floor beam / girder tension plates and dam diaphragms", Source = "p.44 / p.45", Unresolved = tpFlag, Rivets = rivets,
                 });
                 nTp++;
@@ -135,13 +137,13 @@ foreach (var bn in girders)
                     double o0 = go + side * (coverHalf + In(1.0 / 16)), o1 = go + side * half;
                     var fp = new List<(double, double)>();
                     for (int iu = -2; iu <= 2; iu++) for (int iw = 0; iw <= 6; iw++) fp.Add((sta + iu * In(7) / 2, o0 + (o1 - o0) * iw / 6));
-                    double fb = TopUnder(st0, al, fp, -In(20), sta);
+                    double fb = TopUnder(st0, al, fp, -In(20), sta, G);
                     if (double.IsNegativeInfinity(fb) || vb - fb < In(1.0 / 16)) continue;
                     t.LineItems.Add(new TrussLineItemDefinition
                     {
                         Name = $"{name} fill {(side < 0 ? "a" : "b")}", Kind = TrussLineItemKind.Steel, Category = PartCategory.FillerPlate, Transverse = true, Station = sta,
                         From = Math.Min(o0, o1), To = Math.Max(o0, o1), FromGrade = true,
-                        Profile = new() { new TrussUV(-In(7), fb), new TrussUV(In(7), fb), new TrussUV(In(7), vb), new TrussUV(-In(7), vb) },
+                        Profile = new() { new TrussUV(-In(7), fb - G * In(7)), new TrussUV(In(7), fb + G * In(7)), new TrussUV(In(7), vb + G * In(7)), new TrussUV(-In(7), vb - G * In(7)) },
                         Material = "S", Assembly = OwnAsm, AssemblyDescription = $"{t.Name} - floor beam / girder tension plates and dam diaphragms", Source = "p.44 / p.45",
                         Unresolved = tpFlag + $" Fill {(vb - fb) / In(1):0.###} in. (plan {nCov - 1} x 13/16).",
                     });

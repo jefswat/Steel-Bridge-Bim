@@ -106,7 +106,7 @@ foreach (var spec in bridgeSpecs)
         "the connection angles (2-Ls 5x3 1/2x7/16 + fills), stiffeners, 2-Ls 6x4x3/8 gussets and rivets are drawn but not counted; the partial cover plates are listed by length only (taken centred on the beam CL)",
         "web and flange angles + the listed cover plates are built; the beam ends 11 in. from the girder CL (edge of the girder cover plate), connection material not built.");
     string fbCrown = U("p.43, p.45", "floor beam top profile", "p.43 section A-A shows the beam tops following the roadway crown; p.45 says the cover plates are flush with the girder F.L. plate at the girders",
-        "beam halves straight from each girder (flush with its F.L. cover top) to the CL, parallel to the roadway grade.");
+        "beam halves straight from each girder (flush with its F.L. cover top) to the CL, parallel to the roadway grade; set NORMAL TO GRADE (p.43 / p.44 notes 'Floor beams and stiffener Ls shall be set normal to grade'), the ends cut in vertical planes at the girder (11 in. from the girder CL = the cover plate edge) and at the crown (TRUSS-DESIGN.md section 25).");
     TrussSectionDefinition FbSec(string name, string label, List<TrussPlate> top, List<TrussPlate> bot, string extra = "") => new TrussSectionDefinition
     {
         Name = name, Kind = TrussSectionKind.H, WebVertical = true, Material = "S", Label = label, WebDepth = In(75), WebPlies = { new TrussPly(In(75), In(7.0 / 16), "web PL 75 x 7/16") },
@@ -181,9 +181,10 @@ foreach (var spec in bridgeSpecs)
             foreach (var pl in new[] { "N", "S" })
             {
                 t.Members.Add(new TrussMemberDefinition { Name = $"{pl}-{(fsec == "F1" ? "F1" : "F2")}-{s.n}-{k}", From = $"{pl}:F{s.n}_{k}", To = $"{pl}:C{s.n}_{k}", Section = fsec, Role = TrussMemberRole.FloorBeam,
-                    Panel = panel, StartSetback = In(11), EndSetback = 0, Source = "p.43 / p.45" });
+                    Panel = panel, StartSetback = In(11), EndSetback = 0, Source = "p.43 / p.45", NormalToGrade = true, StartCut = TrussEndCut.Vertical, EndCut = TrussEndCut.Vertical });
                 t.Members.Add(new TrussMemberDefinition { Name = $"{pl}-B1-{s.n}-{k}", From = $"{pl}:F{s.n}_{k}", To = $"{pl}:X{s.n}_{k}", Section = "B1", Role = TrussMemberRole.FloorBeam,
-                    Panel = panel, StartSetback = In(11), EndSetback = 0, DepthReductionEnd = fbDepth - In(24.5), Source = "p.43 / p.45 / p.55 (tapered bracket)" });
+                    Panel = panel, StartSetback = In(11), EndSetback = 0, DepthReductionEnd = fbDepth - In(24.5), Source = "p.43 / p.45 / p.55 (tapered bracket)",
+                    NormalToGrade = true, StartCut = TrussEndCut.Vertical, EndCut = TrussEndCut.Vertical });
             }
         }
         // bottom laterals (p.43 plan): CL0-G1 / CL1-G2 / G2-CL3 / G3-CL4 on each side

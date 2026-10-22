@@ -147,7 +147,9 @@ int WalkCl(string bridge, string name, double from, double to, double aboveFbBot
     var al = alOf[bridge];
     double off = Ft(ClOffsetFt), clear = In(1.75);
     // floor beams crossing the walkway line (not the dam diaphragms of the girder spans), by station
-    var fbs = new List<(double sta, double zBot)>();
+    // (lo, hi) = stations of the floor beam web over the walkway channel height: a floor beam set NORMAL TO GRADE (girder spans, p.43 / p.44 notes) leans,
+    // its web lies G x (z - axis) down-grade of its axis station (section 25); plumb beams: lo = hi = the station
+    var fbs = new List<(double sta, double lo, double hi, double zBot)>();
     foreach (var p in model0[bridge].Steel!.Parts.Where(p => p.Category == SBM.Core.Steel.PartCategory.TrussFloorBeam && !p.Mark.StartsWith("dam ") && p.Mesh is { IsEmpty: false }))
     {
         var bb = p.Mesh.Bounds();
@@ -157,7 +159,14 @@ int WalkCl(string bridge, string name, double from, double to, double aboveFbBot
         if (Math.Max(e1.Offset, e2.Offset) < off + In(6) || Math.Min(e1.Offset, e2.Offset) > off - In(6)) continue;
         if ((onFlange ? FbFlangeTopAt(p, al, c.Station, off) : FbBottomAt(p, al, c.Station, off)) is not { } zb) continue;   // onFlange: channel bottom on the bottom flange stack
         if (fbs.Any(f => Math.Abs(f.sta - c.Station) < 0.3)) continue;
-        fbs.Add((c.Station, zb));
+        var tdef = bridges[bridge].Truss!;
+        var mdef = tdef.Members.FirstOrDefault(mm => mm.Name == p.Mark);
+        double lean = mdef is { NormalToGrade: true } ? al.Profile.GradeAt(c.Station) : 0;
+        // a two-web (box) floor beam (main span F7 at W22, p.93): the pieces stop clear of its OUTER web faces (the rule below is 1 3/4 in. from a single web CL)
+        var sdef = mdef == null ? null : tdef.Sections.FirstOrDefault(sc => sc.Name == mdef.Section);
+        double boxHalf = sdef is { Kind: TrussSectionKind.Box, WebsOutToOut: > 0 } ? sdef.WebsOutToOut / 2 : 0;
+        double zc = (bb.Min.Z + bb.Max.Z) / 2, w1 = c.Station - lean * (zb - zc), w2 = c.Station - lean * (zb + In(11) - zc);
+        fbs.Add((c.Station, Math.Min(w1, w2) - boxHalf, Math.Max(w1, w2) + boxHalf, zb));
     }
     fbs = fbs.OrderBy(f => f.sta).ToList();
     if (fbs.Count == 0) { Print($"{bridge}: {name} - no floor beam on the walkway line"); return 0; }
@@ -166,8 +175,8 @@ int WalkCl(string bridge, string name, double from, double to, double aboveFbBot
     double prev = from, zPrev = fbs[0].zBot;
     foreach (var f in fbs)
     {
-        if (f.sta - clear > prev + In(6)) cuts.Add((prev, f.sta - clear, zPrev, f.zBot));
-        prev = Math.Max(prev, f.sta + clear); zPrev = f.zBot;
+        if (f.lo - clear > prev + In(6)) cuts.Add((prev, f.lo - clear, zPrev, f.zBot));
+        prev = Math.Max(prev, f.hi + clear); zPrev = f.zBot;
     }
     if (to > prev + In(6)) cuts.Add((prev, to, zPrev, zPrev));
     int k = 0;
@@ -293,7 +302,9 @@ foreach (var (bn, east, pts) in units)
         {
             var box = PartBox(bn, "FB" + j);
             if (box == null) continue;
-            double sta = box.Value.sta + (j.EndsWith("'") ? -1 : 1) * (In(9.5) + FI(1, 2));
+            // section 25: the walk centre 2'-0 1/2 from the floor beam CL (was 1'-11 1/2): its rail posts on the floor beam side (3 in. outside the channel) then clear the 18 in.
+            // bottom cover plates by 1/2 in. (they reached 1/2 in. over them; p.106 draws the walk beside the beam, not dimensioned)
+            double sta = box.Value.sta + (j.EndsWith("'") ? -1 : 1) * (In(9.5) + FI(1, 3));
             string cwFlag = U("p.106", $"cross walk at W{j} to the navigation light supports", "the key plan shows cross walks at W15, W20 and W19' (and W15') to the navigation light platforms on the wind chords, 40'-9 1/2 each side of the CL; the plan of walkway at W15 ends them at the longitudinal walkway (1'-0 / 3'-0 north of the CL); the W15' line and the platforms (5'-6 x 6'-0, 1'-8 rail) are read from the key plan only",
                 "2'-0 walkway beside the floor beam at its bottom flange level, from 40'-9 1/2 north / south of the CL to the longitudinal walkway's edges; navigation light platforms and supports not built.");
             Walk(bn, $"cross walk W{j} N", true, sta, -FI(40, 9.5), Ft(ClOffsetFt) - Ft(1), (box.Value.zMin + In(1.75)) / In(1), false, "p.106", cwFlag);

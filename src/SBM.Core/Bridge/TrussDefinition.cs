@@ -359,6 +359,66 @@ public sealed class TrussMemberDefinition
     /// <summary>OPTIONAL (null = none, omitted from the .sbm): longitudinal web stiffener angles along the member (<see cref="TrussLongitudinalStiffener"/>).</summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public List<TrussLongitudinalStiffener>? LongitudinalStiffeners { get; set; }
+    /// <summary>OPTIONAL (omitted when false): cross-plane member (floor beam / bracket) set NORMAL TO GRADE: its web is normal to the profile grade at the
+    /// member's station (section x = the graded alignment tangent made normal to the axis) instead of plumb (section x horizontal). E.g. "floor beams and
+    /// stiffeners shall be set normal to grade".</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public bool NormalToGrade { get; set; }
+    /// <summary>OPTIONAL (Square = default, omitted): how the START cut end is cut. Vertical = in the vertical plane through the cut point on the axis whose normal
+    /// is the horizontal direction of the axis (a crowned floor beam half ending on a plumb girder web or on the vertical plane through the crown).</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public TrussEndCut StartCut { get; set; }
+    /// <summary>OPTIONAL: how the END cut end is cut (see <see cref="StartCut"/>).</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public TrussEndCut EndCut { get; set; }
+    /// <summary>OPTIONAL (null = none, omitted from the .sbm): rectangular cut-outs of the member's section pieces (end copes around a chord, slots for
+    /// socket lugs through a flange; <see cref="TrussMemberNotch"/>).</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public List<TrussMemberNotch>? Notches { get; set; }
+    /// <summary>OPTIONAL (null = none, omitted from the .sbm): round holes across the web (pin holes; <see cref="TrussMemberHole"/>) through the member's web
+    /// plate and the end connection plates they pierce.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public List<TrussMemberHole>? Holes { get; set; }
+}
+
+/// <summary>Cut of a member end (<see cref="TrussMemberDefinition.StartCut"/>): Square = normal to the axis (default); Vertical = vertical plane normal to the
+/// horizontal direction of the axis through the cut point on the axis.</summary>
+public enum TrussEndCut { Square, Vertical }
+
+/// <summary>
+/// Rectangular cut-out of a member (generic, OPTIONAL): every section piece of the member loses the box <see cref="XMin"/>..<see cref="XMax"/> x
+/// <see cref="YMin"/>..<see cref="YMax"/> (section coordinates, as <see cref="TrussEndConnection.Top"/>) over the
+/// stretch <see cref="From"/>..<see cref="From"/> + <see cref="Length"/> measured from the member's cut end at <see cref="End"/> into the member (an end cope:
+/// From 0, a slot: From > 0). The pieces are split along the member at the notch ends; each remaining part is an exact extrusion. Not applied to tapered
+/// or perforated pieces (warning). Dimension-only flag from <see cref="Unresolved"/>.
+/// </summary>
+public sealed class TrussMemberNotch
+{
+    public TrussMemberEnd End { get; set; } = TrussMemberEnd.Start;
+    public double From { get; set; }
+    public double Length { get; set; }
+    public double XMin { get; set; } = -1e3;
+    public double XMax { get; set; } = 1e3;
+    public double YMin { get; set; } = -1e3;
+    public double YMax { get; set; } = 1e3;
+    public string Label { get; set; } = "";
+    public string Source { get; set; } = "";
+    public string Unresolved { get; set; } = "";
+}
+
+/// <summary>
+/// Round hole across a member web (generic, OPTIONAL; pin holes): axis along the section x at <see cref="Distance"/> from the END WORKING POINT at
+/// <see cref="End"/> measured into the member (negative = beyond the point) and section y <see cref="Y"/> (as <see cref="TrussEndConnection.Top"/>), <see cref="Diameter"/>. It cuts the
+/// member's web plate (a rectangular section piece spanning the hole) and every rectangular end connection plate / web extension of that end it pierces;
+/// those pieces are built as planar plates with the hole (exact extrusions with a round void).
+/// </summary>
+public sealed class TrussMemberHole
+{
+    public TrussMemberEnd End { get; set; } = TrussMemberEnd.Both;
+    public double Distance { get; set; }
+    public double Y { get; set; }
+    public double Diameter { get; set; }
+    public string Label { get; set; } = "";
 }
 
 /// <summary>
@@ -467,6 +527,16 @@ public sealed class TrussEndConnection
     public string Material { get; set; } = "";
     public string Unresolved { get; set; } = "";
     public string Source { get; set; } = "";
+    /// <summary>OPTIONAL (null = off, omitted from the .sbm): with the back PROBED (<see cref="Back"/> null), the member's square cut end is moved to the back +
+    /// this clearance (the flanges / covers / web end where the connection angles bear, e.g. on the gusset or fill face found there, instead of at the fixed
+    /// member setback). Applied once per member end (the first connection of that end that asks for it); not with a mitred / vertical end cut.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public double? TrimMember { get; set; }
+    /// <summary>OPTIONAL (omitted when false): the angle runs ALONG the member (a horizontal flange / seat angle at a coped end): from the back for
+    /// <see cref="Length"/> along the axis, heel underside at section y <see cref="Top"/>, the second leg up the web face (+ fill / stand-off), the first leg
+    /// outstanding horizontally on both faces. <see cref="WebRivets"/>: gage = height above the heel, First / Pitch / Count along the member from the back.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public bool HorizontalAngle { get; set; }
 }
 
 /// <summary>
@@ -511,6 +581,11 @@ public sealed class TrussStiffenerSet
     /// the horizontal plane and is extruded vertically (instead of normal to the member axis); heights / tops measured vertically.</summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public bool Plumb { get; set; }
+    /// <summary>OPTIONAL (omitted when false): stiffeners NORMAL TO GRADE (paired with floor beams set normal to grade,
+    /// <see cref="TrussMemberDefinition.NormalToGrade"/>): the section is extruded normal to the profile grade at each stiffener's station (in the web plane)
+    /// instead of normal to the member axis; heights / tops measured along that direction. Wins over <see cref="Plumb"/>.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public bool NormalToGrade { get; set; }
     /// <summary>OPTIONAL: +1 / -1 = the web leg of each (single) angle points toward the member end / start; 0 = the <see cref="PerFace"/> rule.</summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public int LegToward { get; set; }

@@ -37,6 +37,7 @@ foreach (var n in approach.Concat(girders).Append(Main))
     foreach (var m in t.Members.Where(m => m.Role == TrussMemberRole.FloorBeam))
     {
         m.EndConnections = null;
+        m.Notches = null; m.Holes = null;   // section 25 inputs (NormalToGrade / vertical end cuts of the girder-span floor beams come from girders-ptc.csx, set again below)
         m.Stiffeners?.RemoveAll(s => s.Source.StartsWith("floor-connections"));
         if (m.Stiffeners is { Count: 0 }) m.Stiffeners = null;
     }
@@ -57,13 +58,13 @@ string fbStiffFlag(string pg) => U(pg, "floor beam / bracket stiffener positions
 // Rivets 7/8 carbon (p.55 RIVETS note). The angle backs bear on the first steel face (gusset / vertical flange) found from the member end (probe).
 string apConnFlag = U("p.55", "approach floor beam / bracket end connection angles (2-Ls 4 x 4 x 3/4, 2-Fills 7 x 1/2)",
     "the section at the truss draws them without dimensions: length (full depth between the flange angle backs), gages and pitches are scaled / counted from the drawing (24 + 12 rivets per angle in the web, 13 per outstanding leg); the 7 in. fills are taken under the leg on the web (fill = flange angle thickness)",
-    "angles flush with the backs of the flange angles less 1/2 in. (under the horizontal legs), backs on the first steel face (the top chord gussets, which reach about half the beam depth down), web gage 2 1/2, fill line 5 1/2, outstanding leg gage 2 1/2; below the gussets the angles stand off the vertical's flange by the gusset + its fill (about 1 1/2 in., no fill drawn there): those outstanding-leg rivets grip the leg only (reported as CHECK).");
+    "angles flush with the backs of the flange angles less 1/2 in. (under the horizontal legs), backs on the first steel face (the top chord gussets, which reach about half the beam depth down), web gage 2 1/2, fill line 5 1/2, outstanding leg gage 2 1/2; below the gussets the angles stand off the vertical's flange by the gusset + its fill (about 1 1/2 in., no fill drawn there): those outstanding-leg rivets grip the leg only (reported as CHECK). Floor beam / bracket flange angles, cover plate and web end FLUSH with the backs of the connection angles on the face found there (p.55 'FIN.' at the gusset line; section 25: they ran 9 1/2 in. from the truss CL into the gussets / fills of the wider joints).");
 string apBentFlag = U("p.55", "3/4 bent plate and the lower angles '2-Ls 4 x 4 x 3/4 on hangers / 2-Ls 5 1/4 x 4 x 3/4 on posts' under the floor beam at the truss",
     "drawn at overview scale only (no dimensions)", "not built.");
 // brackets taper from the truss end (their bottom angles rise 0.43 in. per in.): the connection angle / fill bottoms are raised by the rise over their width
 TrussEndConnection ApproachEnd(TrussMemberEnd end, double fbHalf, double lenCut = 0, double fillCut = 0) => new TrussEndConnection
 {
-    End = end, Label = "2-Ls 4x4x3/4, 2-Fills 7x1/2 (F.2.E.)", Angle = "L4x4x3/4", Top = fbHalf - In(0.5) - clip, Length = 2 * fbHalf - In(1) - 2 * clip - lenCut, ExtendWeb = true,
+    End = end, Label = "2-Ls 4x4x3/4, 2-Fills 7x1/2 (F.2.E.)", Angle = "L4x4x3/4", Top = fbHalf - In(0.5) - clip, Length = 2 * fbHalf - In(1) - 2 * clip - lenCut, ExtendWeb = true, TrimMember = 0,
     FillThickness = In(0.5), FillWidth = In(7), FillTop = fbHalf - In(6), FillLength = 2 * fbHalf - In(12) - fillCut,
     WebRivets = new() { Col(2.5, 24, 3, 2.0), Col(5.5, 11, 6, 8.75) }, OutRivets = new() { Col(2.5, 13, 5.75, 2.75) },
     RivetDiameter = In(0.875), RivetMaterial = "7/8 in carbon steel rivet", Material = "C", Source = "p.55", Unresolved = apConnFlag,
@@ -126,12 +127,37 @@ foreach (var bn in girders)
 {
     var t = T(bn);
     double half = In(75.5 / 2);
+    // section 25 (p.43 / p.44 notes "Floor beams and stiffener Ls shall be set normal to grade" / "Floor Beams and stiffs. shall be normal to grade"): the floor
+    // beam halves and brackets are set NORMAL TO GRADE (web normal to the profile grade at their station, generic TrussMemberDefinition.NormalToGrade; they
+    // were plumb) and the girder stiffeners they are riveted to follow (TrussStiffenerSet.NormalToGrade). A plane normal to the grade through the floor beam
+    // axis point F (hF above the girder axis) meets the girder axis G hF / sqrt(1 + G^2) up-station of where the plumb plane did: the stiffener distances move
+    // by that amount (+ half the floor beam web for the outstanding leg beside it).
+    var brG = Doc.Project.Bridges.First(b => b.Name == bn);
+    var alG = Doc.Project.FindAlignment(brG.AlignmentName)!;
+    TrussPointDefinition? Pt(string name) => t.Points.FirstOrDefault(p => p.Name == name);
+    double GradeShift(TrussMemberDefinition g, double x)
+    {
+        var ga = Pt(g.From); var gb = Pt(g.To);
+        if (ga == null || gb == null) return 0;
+        double L3 = Math.Sqrt(Math.Pow(gb.Station - ga.Station, 2) + Math.Pow(gb.Elevation - ga.Elevation, 2));
+        double sta = ga.Station + x / L3 * (gb.Station - ga.Station);
+        var f = t.Points.Where(p => p.Name.StartsWith("F") && System.Text.RegularExpressions.Regex.IsMatch(p.Name, @"^F\d+_\d$")).OrderBy(p => Math.Abs(p.Station - sta)).FirstOrDefault();
+        if (f == null || Math.Abs(f.Station - sta) > Ft(1)) return 0;
+        double zAxis = ga.Elevation + (gb.Elevation - ga.Elevation) * (f.Station - ga.Station) / (gb.Station - ga.Station);
+        double G = alG.Profile.GradeAt(f.Station);
+        return G * (f.Elevation - zAxis) / Math.Sqrt(1 + G * G);
+    }
+    int nShift = 0; double maxShift = 0;
     // girder stiffeners at the floor beams: outstanding leg beside the floor beam web (was centred on it -> overlap)
     foreach (var g in t.Members.Where(m => m.Role == TrussMemberRole.Girder))
         foreach (var s in g.Stiffeners?.Where(s => s.Label.StartsWith("stiffeners 2-Ls 6x4x1/2 at the floor beams")) ?? Enumerable.Empty<TrussStiffenerSet>())
         {
-            if (!s.Label.Contains("(beside the floor beam web)")) { s.Distances = s.Distances.Select(x => x + gTw / 2).ToList(); s.Label += " (beside the floor beam web)"; }
-            s.Plumb = true;       // plumb like the floor beam web it is riveted to (the girder is on grade: normal to it the leg would lean 1 1/2 in. over its height)
+            if (!s.Label.Contains("(beside the floor beam web)"))
+            {
+                s.Distances = s.Distances.Select(x => { double d = GradeShift(g, x); nShift++; maxShift = Math.Max(maxShift, Math.Abs(d)); return x + d + gTw / 2; }).ToList();
+                s.Label += " (beside the floor beam web)";
+            }
+            s.Plumb = false; s.NormalToGrade = true;     // normal to grade like the floor beam web it is riveted to (p.43 / p.44 notes)
         }
     // end stiffeners 4-Ls 7x4x3/4 at the CL bearings (= the end floor beam lines): the two outstanding legs straddle the floor beam / bracket web
     // (they were back to back with no gap: the web overlapped both legs) -> one angle per side of the web, legs away from it
@@ -139,12 +165,14 @@ foreach (var bn in girders)
     {
         var es = g.Stiffeners?.FirstOrDefault(s => s.Label.StartsWith("end stiffeners 4-Ls 7x4x3/4") && s.PerFace == 2);
         if (es == null) continue;
-        es.PerFace = 1; es.LegToward = -1; es.Plumb = true; es.Distances = es.Distances.Select(x => x - gTw / 2).ToList(); es.Label += " (one side of the floor beam web)";
-        var es2 = new TrussStiffenerSet { Label = "end stiffeners 4-Ls 7x4x3/4 (other side of the floor beam web)", Angle = es.Angle, PerFace = 1, LegToward = 1, Height = es.Height, Plumb = true,
+        es.PerFace = 1; es.LegToward = -1; es.Plumb = false; es.NormalToGrade = true;
+        es.Distances = es.Distances.Select(x => { double d = GradeShift(g, x); nShift++; maxShift = Math.Max(maxShift, Math.Abs(d)); return x + d - gTw / 2; }).ToList(); es.Label += " (one side of the floor beam web)";
+        var es2 = new TrussStiffenerSet { Label = "end stiffeners 4-Ls 7x4x3/4 (other side of the floor beam web)", Angle = es.Angle, PerFace = 1, LegToward = 1, Height = es.Height, NormalToGrade = true,
             Distances = es.Distances.Select(x => x + gTw).ToList(), Material = es.Material, Source = es.Source, Unresolved = es.Unresolved,
             FillThickness = es.FillThickness, FillWidth = es.FillWidth, FillHeight = es.FillHeight, Rivets = es.Rivets, RivetDiameter = es.RivetDiameter, RivetUnresolved = es.RivetUnresolved };
         g.Stiffeners!.Insert(g.Stiffeners.IndexOf(es) + 1, es2);
     }
+    report.Add($"{bn}: floor beams / brackets normal to grade (vertical end cuts at the girder web line and the crown); {nShift} girder stiffener positions moved onto the floor beam web planes (up to {maxShift / 0.0254:0.00} in.)");
     var lines = t.Floor!.Stringers.Select(s => s.Offset).Distinct().OrderBy(o => o).ToList();
     double gl = Ft(29.0), aT = In(7.0 / 16);
     // corner plate outlines (u from the back = girder web face along the member, v = section y): p.45 elevation scaled
@@ -157,6 +185,10 @@ foreach (var bn in girders)
     foreach (var m in t.Members.Where(m => m.Role == TrussMemberRole.FloorBeam))
     {
         bool bracket = m.Section == "B1";
+        // section 25: normal to grade (p.43 / p.44 notes), ends cut in vertical planes: on the girder web line side (parallel to the plumb girder web, the cover
+        // plate edge 11 in. from the girder CL) and at the crown (the two halves meet on the vertical plane through the CL instead of overlapping 0.32 in. at the
+        // bottom), bracket tips vertical
+        m.NormalToGrade = true; m.StartCut = TrussEndCut.Vertical; m.EndCut = TrussEndCut.Vertical;
         var corner = bracket ? plB : plF;
         // the girder stiffener's outstanding leg under the plate: 7 x 3/4 end stiffeners at the end floor beams (CL bearings), 6 x 1/2 at the others; the fill
         // (of the leg thickness) starts beyond the leg toe
@@ -222,11 +254,11 @@ report.Add($"girder spans: {nConn} end connections in total so far, {nStiff} sti
 // Floor beam rivets 7/8 carbon (p.85 RIVETS note). W14 (rigid hanger, p.85 left): the same angles with 1 1/4 in H.S. rivets into the hanger.
 string mConnFlag = U("p.85", "main framed floor beam end connection (2-Ls 8 x 4 1/2 x 3/4, 2-Fills 11 1/2 x 3/4, 38 x 1 1/8 H.S. field rivets)",
     "the elevation draws the angles full depth between the flange angle backs but does not dimension the gages / web rivet pitch (scaled at 9.9 px/in: web lines 2 and 5 in. from the heel, fill line 9 3/4, ~3 in. pitch) nor which leg lies on the web (the two web gage lines + the 11 1/2 fill show the 8 in. leg)",
-    "8 in. leg on the web, angles from 3/4 in. under the top flange angle backs to 3/4 in. above the bottom ones, rivet lines as scaled, 19 field rivets per outstanding leg equally spaced.");
+    "8 in. leg on the web, angles from 3/4 in. under the top flange angle backs to 3/4 in. above the bottom ones, rivet lines as scaled, 19 field rivets per outstanding leg equally spaced; the beam flanges, covers and web end flush with the backs of the end angles on the face found there (p.85 'Fin. Floor Beam (Main material and end Ls)').");
 string mStiffEnd = U("p.85", "end stiffener 2-Ls 6 x 4 x 7/16 + 2-Fills 4 x 3/4 of the framed floor beams", "drawn next to the end connection fill without a dimension", "heel 13 in. from the typical angle back (1'-2 1/4 from the truss CL), clear of the 11 1/2 in. fill also at the wider L11 post, web leg toward the CL.");
 string susFlag = U("p.94", "suspended floor beam end (2-Pls 25 1/2 x 3/4, 2-Pls 17 x 13/16 at the 7 1/4 pin hole, 2-Ls 7 x 4 x 1/2 at the edge, 2-Ls 7 x 4 x 3/4 bent at the bottom)",
-    "the end is drawn at 3/4 in. = 1 ft with the dimensions 1'-6 (pin below the back of the flange angles) and 6'-10 1/4 / 11'-1 3/4 that do not close with the 8'-10 1/2 beam depth; plate heights, the pin plate extent and the rivet grid are scaled (5.2 px/in)",
-    "end plates 25 1/2 wide centred on the pin (truss CL), between the flange angle legs, web extended to their outer edge, pin plates 14 1/4 wide from the edge angle toe, edge angles 7 x 4 x 1/2 (4 in. outstanding), 7 rivet lines @ 5 in. (3 lines stop under the pin); pin hole not cut, bent bottom angles not built.");
+    "the end is drawn at 3/4 in. = 1 ft: the dimensions give the pin 1'-6 below the back of the flange angles, 6'-10 1/4 from the pin and 11'-1 3/4 from the gutter line to the CL of the wind chord, the beam's bottom angles 6 1/4 below it; the plate heights, the pin plate extent, the cope and the rivet grid are scaled (14.4 px/in at 500 dpi)",
+    "(section 25, p.94 re-read) the beam main material runs to the outer edge 12 3/4 in. beyond the truss CL (end plates 25 1/2 centred on the pin) and is COPED around the wind chord: 21 1/4 in. from the edge (1 1/4 in. past the 14 BP 73 flange tip) up to 13 1/16 above the back of the bottom angles (= the wind chord top by the p.94 dimensions); 2-Ls 7 x 4 x 3/4 along the cope top (heel on the chord top, 4 in. legs up the web, 52 3/8 in. from the edge, one rivet row at 2 1/2 @ 3 1/2), end / edge angle bottoms on their top (17 1/16 above the bottom angles), pin plates 14 1/4 wide from the edge angle toe, edge angles 7 x 4 x 1/2 (4 in. outstanding), 7 rivet lines @ 5 in. (3 lines stop under the pin); pin hole 7 1/4 + 1/32 cut through the web, end plates and pin plates; the top flange angle legs and cover plate slotted for the socket lugs (lug + 1/16 in., the slots are not drawn); the bend of the 4 in. legs is not modeled.");
 string f7Flag = U("p.93, p.94", "end of the two-web floor beam F7 at W22 (pin plates of both webs)", "the W22 end detail (p.93) is drawn at overview scale only", "not built (the beam ends at the truss CL as before).");
 string fb14Flag = U("p.85", "floor beam W14 end at the rigid hanger", "the beam frames into the rigid hanger 14 (p.85 left: 'Details for floor beam and rigid hanger at panel pt W14') like the typical framed beams; the earlier model ran it to the truss CL",
     "framed: ends 1'-2 1/2 from the truss CL (hanger webs 2'-5 o. to o.), same connection angles with 1 1/4 H.S. rivets into the hanger.");
@@ -253,7 +285,7 @@ string fb14Flag = U("p.85", "floor beam W14 end at the rigid hanger", "the beam 
             {
                 new TrussEndConnection
                 {
-                    End = TrussMemberEnd.Both, Label = "2-Ls 8x4 1/2x3/4, 2-Fills 11 1/2x3/4", Angle = "L4-1/2x8x3/4", Top = half - In(0.75) - clip, Length = 2 * half - In(1.5) - 2 * clip, ExtendWeb = true,
+                    End = TrussMemberEnd.Both, Label = "2-Ls 8x4 1/2x3/4, 2-Fills 11 1/2x3/4", Angle = "L4-1/2x8x3/4", Top = half - In(0.75) - clip, Length = 2 * half - In(1.5) - 2 * clip, ExtendWeb = true, TrimMember = 0,
                     FillThickness = In(0.75), FillWidth = In(11.5), FillTop = half - In(8), FillLength = 2 * half - In(16),
                     WebRivets = new() { Col(2.0, 34, 3, 2.0), Col(5.0, 34, 3, 3.5), Col(9.75, 15, 6, 10.25) }, OutRivets = new() { Col(2.5, 19, 5.5, 3.0) },
                     RivetDiameter = In(0.875), OutRivetDiameter = n == 14 ? In(1.25) : In(1.125), RivetMaterial = n == 14 ? "1 1/4 in H.S. rivet (into the hanger), 7/8 in carbon (web)" : "1 1/8 in H.S. field rivet (into the post), 7/8 in carbon (web)",
@@ -269,16 +301,31 @@ string fb14Flag = U("p.85", "floor beam W14 end at the rigid hanger", "the beam 
         }
         else
         {
-            double top = half - In(8), len = 2 * half - In(16);
+            // section 25 (p.94 re-read): the beam runs to the outer edge (12 3/4 beyond the pin / truss CL) and is coped round the wind chord; the end and
+            // edge plates stop on the bent bottom angles 2-Ls 7 x 4 x 3/4 that sit on the chord top (13 1/16 = 6 1/4 + 6 13/16 above the back of the bottom
+            // angles, p.94 dimensions); pin hole through web / end plates / pin plates; slots in the top flange for the socket lugs.
+            double edge = In(12.75), copeTop = -half + In(13.0625), bentLeg = In(4);
+            double top = half - In(8), bot = copeTop + bentLeg, len = top - bot;
+            int Rows(double first) => (int)Math.Floor((len - first - In(1.75)) / In(5)) + 1;
+            m.StartSetback = -edge; m.EndSetback = -edge;
+            m.Notches = new()
+            {
+                new TrussMemberNotch { End = TrussMemberEnd.Both, From = 0, Length = In(21.25), YMax = copeTop, Label = "cope round the wind chord (14 BP 73)", Source = "p.94" },
+                new TrussMemberNotch { End = TrussMemberEnd.Both, From = edge - In(6.9375), Length = In(13.875), XMin = In(1.9375), XMax = In(6.9375), YMin = half - In(0.8125), YMax = half + In(2), Label = "slot for the socket lug (+x)", Source = "p.94" },
+                new TrussMemberNotch { End = TrussMemberEnd.Both, From = edge - In(6.9375), Length = In(13.875), XMin = -In(6.9375), XMax = -In(1.9375), YMin = half - In(0.8125), YMax = half + In(2), Label = "slot for the socket lug (-x)", Source = "p.94" },
+            };
+            m.Holes = new() { new TrussMemberHole { End = TrussMemberEnd.Both, Distance = 0, Y = half - In(18), Diameter = In(7.25 + 1.0 / 32), Label = "pin hole 7 1/4 + 1/32" } };
             m.EndConnections = new()
             {
-                new TrussEndConnection { End = TrussMemberEnd.Both, Label = "2-Pls 25 1/2x3/4 (end plates)", Back = -In(12.75), PlateWidth = In(25.5), PlateThickness = In(0.75), ExtendWeb = true, WebClearance = 0,
+                new TrussEndConnection { End = TrussMemberEnd.Both, Label = "2-Pls 25 1/2x3/4 (end plates)", Back = -edge, PlateWidth = In(25.5), PlateThickness = In(0.75), ExtendWeb = true, WebClearance = 0,
                     Top = top, Length = len, Material = "S", Source = "p.94", Unresolved = susFlag,
-                    WebRivets = new() { Col(2.5, 18, 5, 1.75), Col(5.5, 18, 5, 4.25), Col(9.25, 15, 5, 16.5), Col(13.0, 15, 5, 16.5), Col(16.75, 15, 5, 16.5), Col(20.5, 18, 5, 1.75), Col(24.0, 18, 5, 4.25) },
+                    WebRivets = new() { Col(2.5, Rows(In(1.75)), 5, 1.75), Col(5.5, Rows(In(4.25)), 5, 4.25), Col(9.25, Rows(In(16.5)), 5, 16.5), Col(13.0, Rows(In(16.5)), 5, 16.5), Col(16.75, Rows(In(16.5)), 5, 16.5), Col(20.5, Rows(In(1.75)), 5, 1.75), Col(24.0, Rows(In(4.25)), 5, 4.25) },
                     RivetDiameter = In(0.875), RivetMaterial = "7/8 in carbon steel rivet" },
-                new TrussEndConnection { End = TrussMemberEnd.Both, Label = "2-Ls 7x4x1/2 (edge angles)", Angle = "L4x7x1/2", Back = -In(12.75), StandOff = In(0.75), Top = top, Length = len, Material = "C", Source = "p.94", Unresolved = susFlag },
+                new TrussEndConnection { End = TrussMemberEnd.Both, Label = "2-Ls 7x4x1/2 (edge angles)", Angle = "L4x7x1/2", Back = -edge, StandOff = In(0.75), Top = top, Length = len, Material = "C", Source = "p.94", Unresolved = susFlag },
                 new TrussEndConnection { End = TrussMemberEnd.Both, Label = "2-Pls 17x13/16 (pin plates)", Back = -In(5.75), PlateWidth = In(14.25), PlateThickness = In(13.0 / 16), StandOff = In(0.75),
                     Top = top, Length = In(22), Material = "S", Source = "p.94", Unresolved = susFlag },
+                new TrussEndConnection { End = TrussMemberEnd.Both, Label = "2-Ls 7x4x3/4 (bent bottom angles on the wind chord)", Angle = "L7x4x3/4", HorizontalAngle = true, Back = -edge, Top = copeTop, Length = In(52.375),
+                    Material = "C", Source = "p.94", Unresolved = susFlag, WebRivets = new() { Col(2.5, 15, 3.5, 1.75) }, RivetDiameter = In(0.875), RivetMaterial = "7/8 in carbon steel rivet" },
             };
             su++;
         }

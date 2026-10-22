@@ -332,6 +332,12 @@ public static partial class TrussGenerator
                 var n = Normal(m.Plane, sMid);
                 x = (n - ax * Vec3.Dot(ax, n)).Normalized();
             }
+            else if (m.Def.NormalToGrade && IsCrossPlane(m.Def.Role))
+            {
+                // web normal to the profile grade: section x = the graded alignment tangent, made normal to the axis
+                var g = (Tangent(sMid) + Up * _al.Profile.GradeAt(sMid)).Normalized();
+                x = (g - ax * Vec3.Dot(ax, g)).Normalized();
+            }
             else
             {
                 x = Vec3.Cross(Up, ax);
@@ -449,10 +455,13 @@ public static partial class TrussGenerator
             double rA = Math.Max(0, m.Def.DepthReductionStart), rB = Math.Max(0, m.Def.DepthReductionEnd);
             bool taper = (rA > 0 || rB > 0) && cut > 1e-6;
             double Rise(double t) => rA + (rB - rA) * Math.Clamp(t / cut, 0, 1);
+            var notches = MemberNotches(m, cut);
+            var mHoles = MemberHoles(m, a0, cut);
             foreach (var pc in m.Sec.Pieces)
             {
                 if (PieceSpan(m, pc, cut) is not { } span) { Warn($"Truss: {pc.Label} of {m.Mark} - no length left on the member{(pc.BetweenGussets ? " between the gussets" : "")}; not built."); continue; }
                 var (ps, pl) = span;
+                if ((notches.Count > 0 || mHoles.Count > 0) && pc.Perforation == null && !taper && NotchedPiece(mesh, m, a0, pc, ps, pl, notches, mHoles)) continue;
                 if (pc.Perforation != null && !taper)
                 {
                     if (Perforated(mesh, m, a0, pc, ps, pl, cut, out int holes)) { Model.Perforations.Add((m.Mark, pc.Label, holes)); perfFlag ??= pc.Perforation.Unresolved; continue; }
@@ -468,6 +477,7 @@ public static partial class TrussGenerator
             foreach (var lf in m.Sec.Lacing) Lacing(mesh, m, a0, cut, lf);
             if (m.Def.RivetLines is { Count: > 0 }) MemberRivetLines(m, a0, cut);
             if (m.MitreA != null || m.MitreB != null) mesh = MitreMesh(m, mesh, a0, cut);
+            if (m.Def.StartCut == TrussEndCut.Vertical || m.Def.EndCut == TrussEndCut.Vertical) mesh = VerticalCutMesh(m, mesh, a0, cut);
             Assumption? asu = null;
             string flag = m.Def.Unresolved.Length > 0 ? m.Def.Unresolved : m.Sec.Flag ?? "";
             if (!string.IsNullOrEmpty(perfFlag) && !flag.Contains(perfFlag)) flag = (flag + " " + perfFlag).Trim();
@@ -544,7 +554,7 @@ public static partial class TrussGenerator
                     var pl = poly.ToArray();
                     if (h < 0) h = set.Height;
                     if (MeshBuilder.SignedArea(pl.ToList()) < 0) Array.Reverse(pl);
-                    var (ax2, vy) = StiffFrame(m, set);
+                    var (ax2, vy) = StiffFrame(m, set, d);
                     var ra = pl.Select(q => m.A + m.Axis * d + ax2 * q.X + m.X * q.Y + vy * ((set.Top is { } st0 ? st0 + m.Def.OffsetZ - set.Height : yc - set.Height / 2) + y0)).ToArray();
                     MeshBuilder.AddLoft(mesh, pl, new[] { ra, ra.Select(p => p + vy * h).ToArray() });
                 }
@@ -603,8 +613,21 @@ public static partial class TrussGenerator
 
         /// <summary>Stiffener frame: along-member direction of the section and the extrusion direction (member y, or horizontal / plumb for
         /// <see cref="TrussStiffenerSet.Plumb"/>).</summary>
-        private static (Vec3 along, Vec3 up) StiffFrame(Inst m, TrussStiffenerSet set)
+        private (Vec3 along, Vec3 up) StiffFrame(Inst m, TrussStiffenerSet set, double d)
         {
+            if (set.NormalToGrade)
+            {
+                // normal to the profile grade at the stiffener's station, in the web plane (section x = web normal)
+                double sta = StationOf(m.A + m.Axis * d);
+                var g = (Tangent(sta) + Up * _al.Profile.GradeAt(sta)).Normalized();
+                var gw = g - m.X * Vec3.Dot(m.X, g);
+                if (gw.Length < 0.5) return (m.Axis, m.Y);      // the grade direction is not in the web plane (a member across the bridge): normal to the axis
+                g = gw.Normalized();
+                if (Vec3.Dot(g, m.Axis) < 0) g = -g;
+                var v = Vec3.Cross(m.X, g).Normalized();
+                if (Vec3.Dot(v, m.Y) < 0) v = -v;
+                return (g, v);
+            }
             if (!set.Plumb) return (m.Axis, m.Y);
             var h = m.Axis - Up * Vec3.Dot(m.Axis, Up);
             return h.Length < 1e-6 ? (m.Axis, m.Y) : (h.Normalized(), Up);
@@ -1544,15 +1567,21 @@ public static partial class TrussGenerator
             {
                 if (!_sec.TryGetValue(line.Section, out var sec)) { Warn($"Truss: stringer line {line.Name} - section '{line.Section}' is not defined; not built."); continue; }
                 // station of every floor beam where it crosses the stringer line
-                var cross = new List<(double sta, double halfWeb, Inst fb)>();
+                // sta = station of the floor beam TOP where it crosses the line (a floor beam set normal to grade leans: its top is off the axis station; plumb
+                // beams: the same station) - stringer ends / seats; axis = the axis station (the line's From / To stations select the bays by it)
+                var cross = new List<(double sta, double halfWeb, Inst fb, double axis)>();
                 foreach (var fb in fbs)
                 {
                     var ia = _al.Inverse(fb.A.XY); var ib = _al.Inverse(fb.B.XY);
                     if (Math.Abs(ib.Offset - ia.Offset) < 1e-6) continue;
                     double k = (line.Offset - ia.Offset) / (ib.Offset - ia.Offset);
                     if (k < -0.05 || k > 1.05) continue;
-                    cross.Add((ia.Station + k * (ib.Station - ia.Station), fb.Sec.Definition.Kind == TrussSectionKind.H && fb.Sec.Definition.WebVertical || fb.Sec.Definition.Kind == TrussSectionKind.Rolled
-                        ? fb.Sec.WebThickness / 2 : fb.Sec.HalfWidth, fb));
+                    double axis = ia.Station + k * (ib.Station - ia.Station);
+                    var ta = _al.Inverse((fb.A + fb.Y * fb.Sec.YMax).XY); var tb = _al.Inverse((fb.B + fb.Y * fb.Sec.YMax).XY);
+                    double kt = Math.Abs(tb.Offset - ta.Offset) < 1e-6 ? k : (line.Offset - ta.Offset) / (tb.Offset - ta.Offset);
+                    double topSta = ta.Station + kt * (tb.Station - ta.Station);
+                    cross.Add((topSta, fb.Sec.Definition.Kind == TrussSectionKind.H && fb.Sec.Definition.WebVertical || fb.Sec.Definition.Kind == TrussSectionKind.Rolled
+                        ? fb.Sec.WebThickness / 2 : fb.Sec.HalfWidth, fb, axis));
                 }
                 cross = cross.OrderBy(c => c.sta).ToList();
                 double top = line.TopBelowGrade ?? fl.StringerTopBelowGrade;
@@ -1564,8 +1593,8 @@ public static partial class TrussGenerator
                 for (int i = 0; i + 1 < cross.Count; i++)
                 {
                     double e0 = fl.StringersOnTop ? 0 : cross[i].halfWeb + fl.StringerEndClearance, e1 = fl.StringersOnTop ? 0 : cross[i + 1].halfWeb + fl.StringerEndClearance;
-                    if (line.FromStation is { } fs0 && cross[i].sta < fs0 - 1e-6) continue;
-                    if (line.ToStation is { } ts0 && cross[i + 1].sta > ts0 + 1e-6) continue;
+                    if (line.FromStation is { } fs0 && cross[i].axis < fs0 - 1e-6) continue;
+                    if (line.ToStation is { } ts0 && cross[i + 1].axis > ts0 + 1e-6) continue;
                     if (cross[i + 1].sta - e1 - (cross[i].sta + e0) < 0.1) continue;
                     valid.Add(i);
                 }
@@ -1573,8 +1602,8 @@ public static partial class TrussGenerator
                 {
                     double e0 = fl.StringersOnTop ? 0 : cross[i].halfWeb + fl.StringerEndClearance, e1 = fl.StringersOnTop ? 0 : cross[i + 1].halfWeb + fl.StringerEndClearance;
                     double s0 = cross[i].sta + e0, s1 = cross[i + 1].sta - e1;
-                    if (line.FromStation is { } fs && cross[i].sta < fs - 1e-6) continue;
-                    if (line.ToStation is { } ts && cross[i + 1].sta > ts + 1e-6) continue;
+                    if (line.FromStation is { } fs && cross[i].axis < fs - 1e-6) continue;
+                    if (line.ToStation is { } ts && cross[i + 1].axis > ts + 1e-6) continue;
                     if (s1 - s0 < 0.1) continue;
                     if (valid.Count > 0 && i == valid[0] && line.ExtendStart > 0) s0 -= line.ExtendStart;
                     if (valid.Count > 0 && i == valid[^1] && line.ExtendEnd > 0) s1 += line.ExtendEnd;
@@ -1618,7 +1647,12 @@ public static partial class TrussGenerator
                 var acr = Vec3.Cross(Up, t).Normalized();
                 double Zb(double s) => _al.ElevationAt(s, line.Offset) - top - sec.YMax + sec.YMin;   // stringer bottom on the grade line
                 // probe the steel under the plate (floor beam top, cover plates, connection material)
-                var pts = new List<(double u, double v)> { (0, 0), (-sd.Length / 2 + 0.005, -w / 2 + 0.005), (sd.Length / 2 - 0.005, -w / 2 + 0.005), (sd.Length / 2 - 0.005, w / 2 - 0.005), (-sd.Length / 2 + 0.005, w / 2 - 0.005) };
+                // a grid over the plate (9 along x 3 across): a floor beam set normal to grade has its top sloping along the stringer, its high edge can lie between
+                // the plate corners and centre
+                var pts = new List<(double u, double v)>();
+                for (int iu = 0; iu <= 8; iu++)
+                    foreach (double fv in new[] { -1.0, 0, 1 })
+                        pts.Add(((-sd.Length / 2 + 0.005) + (sd.Length - 0.01) * iu / 8, fv * (w / 2 - 0.005)));
                 var lo = new Vec3(c.X - 1, c.Y - 1, Zb(sta) - 0.6); var hi = new Vec3(c.X + 1, c.Y + 1, Zb(sta) + 0.1);
                 var pr = new SteelLineProbe();
                 for (int i = 0; i < parts.Count; i++)
