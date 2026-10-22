@@ -1057,6 +1057,13 @@ UNRESOLVED FLAG (general, reusable): `SBM.Core/Assumption.cs` `Assumption{Status
   total kept, Info per joint "chord rivets laid as one field"); diagnostics `qc/ptc/work/fix4/rivet_grid.csx` + `grid_balance.py`.
   QC PASS 4 (2026-10-21, TRUSS-DESIGN.md 21): Box ply layers (a ply after one that fits between the angle legs lies inside the angles), `TrussPly.BetweenGussets`
   (inlaid gussets: L13-L14 / L14-L15 2'-7 1/4 o. to o.), joint plates stacked on the steel under them.
+  QC PASS 5 (2026-10-21, TRUSS-DESIGN.md 23; all OPTIONAL, omitted when unset; tests `TrussJointDetailTests`): `TrussJointDefaults.MitredChordJoints` (kinked chord ends cut on the
+  bisector plane through the point, joint plates follow their chord and end on it; `Truss/TrussGeneratorMitre.cs`), `TrussJointDefaults.WebMemberClearOfJointPlates` (web member ends
+  clear of the Top / Bottom joint plates), `TrussJointPlate.Member` / `CenterOffset` (plates on one member: fills between rolled flanges and gussets, bars inside flanges; stacked on the
+  pieces present under the plate, clipped to the member; `TrussGeneratorMemberPlates.cs`), `TrussRivetGroup.Positions` / `PositionsInMemberFrame` (rivets AS DRAWN, joint or member
+  frame, moved <= 3/4 in. to a clean stack else dropped; `TrussGeneratorRivetPositions.cs`; `TrussGussetRivetCover.Drawn`). PTC: main truss mitred + verticals 1 1/2 in. clear of the
+  cover splice plates; approach fills by in-to-in minus depth on every member (connections-ptc section 6a) + 3-span splice material `connections/approach-splices.csv` (6b; 4-span not built,
+  flagged); rivets-ptc places the detected symbols where drawn (`connections/rivet-positions.csv` from `tools/ptc_rivet_count.py ... pos=`; main L11 / L13-L16 / L22 / U22 keep the grid).
   STEP 2 (2026-10-21, TRUSS-DESIGN.md 11b): counts = rivet SYMBOLS drawn inside each gusset outline per member (`tools/ptc_rivet_count.py` -> `connections/rivet-counts.csv`, hand zones
   `rivet-count-zones.csv`, main L11 `rivet-counts-extra.csv`), given to the joint, its other half and its 'similar to' joints; symbols just outside the outline -> OPTIONAL
   `TrussRivetGroup.Beyond` / `BeyondLength`; generic placement: clean plate stack under both heads (`SectionRun`), no head over another (>= 0.8 (d1 + d2)), grid >= 1.6 d; OPTIONAL
