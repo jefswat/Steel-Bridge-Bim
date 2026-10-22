@@ -397,7 +397,7 @@ foreach (var (key, bridges, C) in structures)
         var cov = (own: posHow.Values.Count(x => x == "own"), mirrored: posHow.Values.Count(x => x == "mirrored"), similar: posHow.Values.Count(x => x == "similar"));
         var cntJoints = groups.Keys.Select(k => k.pt).Distinct().Where(p => !posHow.ContainsKey(p)).OrderBy(p => p, StringComparer.Ordinal).ToList();
         report.Add($"{bn}: rivets AS DRAWN at {posHow.Count} joints ({cov.own} own drawing, {cov.mirrored} the other half of the unit mirrored, {cov.similar} the 'similar to' joint): {nPos} per gusset face + {nPosBeyond} beyond; "
-            + $"count-based grid kept at {cntJoints.Count} joints{(cntJoints.Count > 0 ? " (" + string.Join(", ", cntJoints) + ": no drawn outline / symbol positions - gussets.csv or hand counts - or the drawn work point is off the chord centre: L15 / L16)" : "")}");
+            + $"count-based grid kept at {cntJoints.Count} joints{(cntJoints.Count > 0 ? " (" + string.Join(", ", cntJoints) + ": no drawn outline / symbol positions - gussets.csv or hand counts -; main L11 / L11': no drawn outline, hand counts)" : "")}");
         foreach (var ((pt, mem), g) in groups.OrderBy(x => x.Key.pt, StringComparer.Ordinal).ThenBy(x => x.Key.mem, StringComparer.Ordinal))
         {
             var jd = t.Joints.LastOrDefault(x => x.Point == pt && x.Plane.Length == 0);
