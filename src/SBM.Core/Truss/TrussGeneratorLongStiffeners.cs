@@ -19,7 +19,7 @@ public static partial class TrussGenerator
         {
             double yc = m.Sec.WebCenterY + m.Def.OffsetZ;
             double vb = set.Top is { } st0 ? st0 + m.Def.OffsetZ - set.Height : yc - set.Height / 2;     // bottom of the stiffener (member y, or vertical for plumb)
-            var (ax2, vy) = StiffFrame(m, set);
+            var (ax2, vy) = StiffFrame(m, set, d);
             double upY = Vec3.Dot(vy, m.Y), upA = Vec3.Dot(vy, m.Axis);
             if (Math.Abs(upY) < 1e-6) return null;
             // along-member legs of the set from the heel at d

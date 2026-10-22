@@ -234,6 +234,9 @@ public static partial class TrussGenerator
             var outFillT = new List<double>(); var outFillCmp = new List<string>();
             var backs = new List<string>();
             var missed = new List<string>();
+            var trimmed = new HashSet<(Inst, bool)>();
+            var trims = new List<double>();
+            int nHoles = 0;
             SteelLineProbe Probe(Vec3 lo, Vec3 hi, string? exclude, IEnumerable<Mesh>? extra = null)
             {
                 var pr = new SteelLineProbe();
@@ -314,8 +317,47 @@ public static partial class TrussGenerator
                             back += ec.BackOffset;
                             backs.Add($"{where}: {L(back)}");
                         }
+                        // OPTIONAL: the member's square end moved to the probed back + clearance (TrimMember)
+                        if (ec.TrimMember is { } trimClr && ec.Back == null && trimmed.Add((m, start)))
+                        {
+                            if ((start ? m.Def.StartCut : m.Def.EndCut) != TrussEndCut.Square || (start ? m.MitreA : m.MitreB) != null)
+                                Warn($"Truss: end connection '{ec.Label}' of {where} - TrimMember ignored (the end has a mitred / vertical cut).");
+                            else
+                            {
+                                double ns = back + trimClr;
+                                int pi = parts.FindIndex(p => p.Mark == m.Mark);
+                                if (pi >= 0 && Math.Abs(ns - setb) > 1e-6)
+                                {
+                                    var op = parts[pi];
+                                    var nm = MoveEndFace(op.Mesh, wp, din, setb, ns);
+                                    parts[pi] = CopyPart(op, nm, op.Length + setb - ns);
+                                    boxes[pi] = nm.Bounds();
+                                    trims.Add(setb - ns);
+                                    setb = ns;
+                                    if (start) m.SA = ns; else m.SB = ns;
+                                }
+                            }
+                        }
                         Assumption? asu = ec.Unresolved.Length > 0 ? Assumption.UnresolvedDimension(ec.Unresolved + Src, "connection as listed") : null;
                         if (asu != null) Warn(ec.Unresolved);
+                        // holes of the member at this end (pin holes) through the rectangular plates / web extension (s along din from the working point, y)
+                        var ecHoles = (m.Def.Holes ?? new()).Where(h => h.Diameter > 0 && (h.End == TrussMemberEnd.Both || (h.End == TrussMemberEnd.Start) == start))
+                            .Select(h => (s: h.Distance, y: h.Y, d: h.Diameter)).ToList();
+                        bool vcut = (start ? m.Def.StartCut : m.Def.EndCut) == TrussEndCut.Vertical && HorizontalAxis(m) != null;
+                        // plate (a along din from the working point, y) x (x across, xa..xb) with the holes that lie inside it; false = none inside (caller builds the prism)
+                        bool HoledPlate(Mesh mesh, double a0p, double a1p, double xa, double xb, double ya, double yb)
+                        {
+                            var hh = ecHoles.Where(h => h.s - h.d / 2 > a0p + 1e-6 && h.s + h.d / 2 < a1p - 1e-6 && h.y - h.d / 2 > ya + 1e-6 && h.y + h.d / 2 < yb - 1e-6).ToList();
+                            if (hh.Count == 0) return false;
+                            var zf = Vec3.Cross(din, Yv);
+                            var f = new Frame3(wp + m.Y * zoff, din, Yv, zf);
+                            double sgn = Vec3.Dot(zf, Xv) > 0 ? 1 : -1;
+                            double z0 = sgn * xa, z1 = sgn * xb;
+                            PlateBuilder.AddPlanar(mesh, new[] { new Vec2(a0p, ya), new Vec2(a1p, ya), new Vec2(a1p, yb), new Vec2(a0p, yb) },
+                                hh.Select(h => new Hole(new Vec2(h.s, h.y), h.d)).ToList(), f, Math.Min(z0, z1), Math.Max(z0, z1));
+                            nHoles += hh.Count;
+                            return true;
+                        }
                         var meshA = new Mesh(); var meshF = new Mesh(); var meshP = new Mesh(); var meshW = new Mesh(); var meshOF = new Mesh();
                         // section (a along din from the working point, x across) prism over y [yBot, yTop]
                         void Prism(Mesh mesh, IReadOnlyList<Vec2> poly, double ya, double yb)
@@ -392,7 +434,8 @@ public static partial class TrussGenerator
                             }
                             else if (ec.PlateWidth > 0 && ec.PlateThickness > 0)
                             {
-                                Prism(meshP, new[] { new Vec2(back, xw), new Vec2(back + ec.PlateWidth, xw), new Vec2(back + ec.PlateWidth, xw + sx * ec.PlateThickness), new Vec2(back, xw + sx * ec.PlateThickness) }, yBot, yTop);
+                                if (!HoledPlate(meshP, back, back + ec.PlateWidth, xw, xw + sx * ec.PlateThickness, yBot, yTop))
+                                Prism(meshP,new[] { new Vec2(back, xw), new Vec2(back + ec.PlateWidth, xw), new Vec2(back + ec.PlateWidth, xw + sx * ec.PlateThickness), new Vec2(back, xw + sx * ec.PlateThickness) }, yBot, yTop);
                                 nPlates++;
                             }
                         }
@@ -402,7 +445,14 @@ public static partial class TrussGenerator
                             double ya = Math.Max(yBot, yWebBot), yb = Math.Min(yTop, yWebTop);
                             if (yb > ya + 1e-4)
                             {
-                                Prism(meshW, new[] { new Vec2(back + ec.WebClearance, -tw / 2), new Vec2(setb, -tw / 2), new Vec2(setb, tw / 2), new Vec2(back + ec.WebClearance, tw / 2) }, ya, yb);
+                                if (!HoledPlate(meshW, back + ec.WebClearance, setb, -tw / 2, tw / 2, ya, yb))
+                                    Prism(meshW, new[] { new Vec2(back + ec.WebClearance, -tw / 2), new Vec2(setb, -tw / 2), new Vec2(setb, tw / 2), new Vec2(back + ec.WebClearance, tw / 2) }, ya, yb);
+                                // a vertical member end cut: the extension meets it on the same vertical plane and ends parallel to it at the back
+                                if (vcut && HorizontalAxis(m) is { } hn)
+                                {
+                                    var o0 = wp + m.Y * zoff;
+                                    meshW = VerticalFace(VerticalFace(meshW, o0, din, setb, hn), o0, din, back + ec.WebClearance, hn);
+                                }
                                 nWebExt++;
                             }
                         }
@@ -479,7 +529,7 @@ public static partial class TrussGenerator
                         for (int k = 0; k < col.Count; k++)
                         {
                             double y = (set.Top is { } st0 ? st0 + m.Def.OffsetZ : yc + set.Height / 2) - col.First - k * col.Pitch;
-                            var (ax2, vy) = StiffFrame(m, set);
+                            var (ax2, vy) = StiffFrame(m, set, d);
                             var q = m.A + m.Axis * d + ax2 * (sgn * col.Gage) + vy * y;
                             if (pr.At(q, m.X, 0.5) is not { } iv) { nNoWeb++; if (missed.Count < 3) missed.Add($"stiffener '{set.Label}' on {m.Mark}"); continue; }
                             _pendingConn.Add((q + m.X * iv.t1, -m.X, m.Axis, iv.t1 - iv.t0, set.RivetDiameter, m.Assembly, null, rasu));
@@ -502,6 +552,9 @@ public static partial class TrussGenerator
             if (nOutFill > 0) Info($"Truss: end connections - {nOutFill} fills under the outstanding legs where the angles stand off the post / hanger face (probed, {L(outFillT.Min())} - {L(outFillT.Max())}){(outFillCmp.Count > 0 ? "; vs plan: " + string.Join("; ", outFillCmp.Distinct().Take(6)) : "")}{Src}.");
             if (nLoose > 0) Warn($"Truss CHECK end connections: {nLoose} rivets through the outstanding legs find no steel behind the leg (gap to the post / girder face over 1 mm; fills not drawn?) - placed with the leg as grip{Src}.");
             if (backs.Count > 0) Model.ConnectionBacks.AddRange(backs);
+            if (trims.Count > 0) Info($"Truss: end connections - {trims.Count} member ends moved to the probed connection face + clearance (TrimMember; shortened up to {L(Math.Max(0, trims.Max()))}, lengthened up to {L(Math.Max(0, -trims.Min()))}){Src}.");
+            if (nHoles + _notchHolesCut > 0 || _notchCount > 0)
+                Info($"Truss: member ends - {_notchCount} notches on {_notchMembers} members, {nHoles + _notchHolesCut} round holes cut ({_notchHolesCut} in member webs, {nHoles} in end connection plates / web extensions){Src}.");
         }
 
         private readonly Dictionary<TrussLineItemDefinition, List<TrussLineItemRivet>> _clipRivets = new(ReferenceEqualityComparer.Instance);

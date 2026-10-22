@@ -332,6 +332,12 @@ public static partial class TrussGenerator
                 var n = Normal(m.Plane, sMid);
                 x = (n - ax * Vec3.Dot(ax, n)).Normalized();
             }
+            else if (m.Def.NormalToGrade && IsCrossPlane(m.Def.Role))
+            {
+                // web normal to the profile grade: section x = the graded alignment tangent, made normal to the axis
+                var g = (Tangent(sMid) + Up * _al.Profile.GradeAt(sMid)).Normalized();
+                x = (g - ax * Vec3.Dot(ax, g)).Normalized();
+            }
             else
             {
                 x = Vec3.Cross(Up, ax);
@@ -449,10 +455,13 @@ public static partial class TrussGenerator
             double rA = Math.Max(0, m.Def.DepthReductionStart), rB = Math.Max(0, m.Def.DepthReductionEnd);
             bool taper = (rA > 0 || rB > 0) && cut > 1e-6;
             double Rise(double t) => rA + (rB - rA) * Math.Clamp(t / cut, 0, 1);
+            var notches = MemberNotches(m, cut);
+            var mHoles = MemberHoles(m, a0, cut);
             foreach (var pc in m.Sec.Pieces)
             {
                 if (PieceSpan(m, pc, cut) is not { } span) { Warn($"Truss: {pc.Label} of {m.Mark} - no length left on the member{(pc.BetweenGussets ? " between the gussets" : "")}; not built."); continue; }
                 var (ps, pl) = span;
+                if ((notches.Count > 0 || mHoles.Count > 0) && pc.Perforation == null && !taper && NotchedPiece(mesh, m, a0, pc, ps, pl, notches, mHoles)) continue;
                 if (pc.Perforation != null && !taper)
                 {
                     if (Perforated(mesh, m, a0, pc, ps, pl, cut, out int holes)) { Model.Perforations.Add((m.Mark, pc.Label, holes)); perfFlag ??= pc.Perforation.Unresolved; continue; }
@@ -468,6 +477,7 @@ public static partial class TrussGenerator
             foreach (var lf in m.Sec.Lacing) Lacing(mesh, m, a0, cut, lf);
             if (m.Def.RivetLines is { Count: > 0 }) MemberRivetLines(m, a0, cut);
             if (m.MitreA != null || m.MitreB != null) mesh = MitreMesh(m, mesh, a0, cut);
+            if (m.Def.StartCut == TrussEndCut.Vertical || m.Def.EndCut == TrussEndCut.Vertical) mesh = VerticalCutMesh(m, mesh, a0, cut);
             Assumption? asu = null;
             string flag = m.Def.Unresolved.Length > 0 ? m.Def.Unresolved : m.Sec.Flag ?? "";
             if (!string.IsNullOrEmpty(perfFlag) && !flag.Contains(perfFlag)) flag = (flag + " " + perfFlag).Trim();
@@ -544,7 +554,7 @@ public static partial class TrussGenerator
                     var pl = poly.ToArray();
                     if (h < 0) h = set.Height;
                     if (MeshBuilder.SignedArea(pl.ToList()) < 0) Array.Reverse(pl);
-                    var (ax2, vy) = StiffFrame(m, set);
+                    var (ax2, vy) = StiffFrame(m, set, d);
                     var ra = pl.Select(q => m.A + m.Axis * d + ax2 * q.X + m.X * q.Y + vy * ((set.Top is { } st0 ? st0 + m.Def.OffsetZ - set.Height : yc - set.Height / 2) + y0)).ToArray();
                     MeshBuilder.AddLoft(mesh, pl, new[] { ra, ra.Select(p => p + vy * h).ToArray() });
                 }
@@ -603,8 +613,19 @@ public static partial class TrussGenerator
 
         /// <summary>Stiffener frame: along-member direction of the section and the extrusion direction (member y, or horizontal / plumb for
         /// <see cref="TrussStiffenerSet.Plumb"/>).</summary>
-        private static (Vec3 along, Vec3 up) StiffFrame(Inst m, TrussStiffenerSet set)
+        private (Vec3 along, Vec3 up) StiffFrame(Inst m, TrussStiffenerSet set, double d)
         {
+            if (set.NormalToGrade)
+            {
+                // normal to the profile grade at the stiffener's station, in the web plane (section x = web normal)
+                double sta = StationOf(m.A + m.Axis * d);
+                var g = (Tangent(sta) + Up * _al.Profile.GradeAt(sta)).Normalized();
+                g = (g - m.X * Vec3.Dot(m.X, g)).Normalized();
+                if (Vec3.Dot(g, m.Axis) < 0) g = -g;
+                var v = Vec3.Cross(m.X, g).Normalized();
+                if (Vec3.Dot(v, m.Y) < 0) v = -v;
+                return (g, v);
+            }
             if (!set.Plumb) return (m.Axis, m.Y);
             var h = m.Axis - Up * Vec3.Dot(m.Axis, Up);
             return h.Length < 1e-6 ? (m.Axis, m.Y) : (h.Normalized(), Up);
