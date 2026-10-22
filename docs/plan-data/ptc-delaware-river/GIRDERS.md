@@ -69,5 +69,8 @@ Several bullets above are superseded:
   Still missing (why): the flange angle splice plates (no length), the dam finger plate supports / curb channels / bulkheads / anchor bars (drawn only), abutment diaphragms
   15 [ 33.9 and the stringer detail at the abutments (p.45, not dimensioned), stringer bearing / tension plate details, signal / light pole bracket extensions (DRB-6, not in
   the set), rivet heads beyond the rule-based lines (floor beam flange / cover rivets, lateral plates), camber.
-- Open plan conflict noted (not changed): p.43 note 'Floor beams and stiffener Ls shall be set normal to grade' - the floor beams and the girder stiffeners at them are plumb
-  in the model (floor-connections-ptc.csx made the stiffeners plumb to match the plumb floor beams).
+- (2026-10-22, TRUSS-DESIGN.md section 25) p.43 / p.44 notes 'Floor beams and stiffener Ls shall be set normal to grade': now MODELED - the floor beam halves and the
+  brackets are normal to the profile grade (generic `TrussMemberDefinition.NormalToGrade`, set in girders-ptc.csx), their ends cut in vertical planes at the girder
+  (11 in. from its CL) and at the crown (`StartCut` / `EndCut`), the girder stiffeners at them and the end stiffener pairs normal to grade and moved onto the leaning
+  web planes; tension plates / fills parallel to the grade, CL walkway pieces clear of the leaning webs. The floor beam x girder (140) and floor beam x floor beam (70)
+  clash rows are gone.

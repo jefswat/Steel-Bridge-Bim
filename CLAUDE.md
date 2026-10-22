@@ -1120,6 +1120,15 @@ UNRESOLVED FLAG (general, reusable): `SBM.Core/Assumption.cs` `Assumption{Status
   perforated 12 x 20 @ 4'-0 (p.81 note). Non-bolt clash rows 12,442 -> 6,537 (bracing groups ~5,900 -> 225); steel 87.9 -> 88.9 % of p.42, rivets 399,356 -> 449,796, IFC 196.3 -> 223.9 MB (0 issues).
   Open (flagged): sway / hanger bracing plates (approach + main), portal knee braces at U11 (p.100), floor lateral X / K connections (p.99), F7 at W22 (p.93), F5 at L0 (p.73), F8 extra angles,
   stringer tension plates / splices, the wind chord vs suspended floor beam 0.3 in. overlap.
+  FLOOR BEAM CONNECTIONS (2026-10-22, TRUSS-DESIGN.md section 25): generic OPTIONAL (omitted when unset) `TrussMemberDefinition.NormalToGrade` (cross-plane member web normal to the
+  profile grade) + `TrussStiffenerSet.NormalToGrade`, `StartCut` / `EndCut` = `TrussEndCut.Vertical` (end in the vertical plane through the cut point; web extensions follow),
+  `Notches` (`TrussMemberNotch`: rectangular cut-outs from a cut end, exact pieces: copes, slots), `Holes` (`TrussMemberHole`: pin holes through the web + pierced end connection plates),
+  `TrussEndConnection.TrimMember` (member end moved to the probed back + clearance; tapers continue) and `.HorizontalAngle` (angle along the member); new partial
+  `Truss/TrussGeneratorMemberEnds.cs`, tests `TrussMemberEndTests`. Stringers on top of floor beams end / seat at the floor beam TOP station (bays still by the axis station),
+  seats probe a 9 x 3 grid. PTC: girder-span floor beams / brackets normal to grade per the p.43 / p.44 notes with vertical end cuts (girders-ptc.csx), girder stiffeners at them
+  follow (floor-connections-ptc.csx), tension plates parallel to the grade (girder-details-ptc.csx), walkway pieces clear of leaning / two-web floor beams (walkways-ptc.csx);
+  approach + main framed beam ends flush with the end angle backs (p.55 'FIN.', p.85 'Fin. Floor Beam'); main suspended beams to the outer edge, coped round the wind chord,
+  bent angles on it, pin holes, socket lug slots (p.94). Left: F7 at W22 (p.93, not built), the p.69 / p.94 floor lateral plate conflict, approach UM12 / UM20 lateral plates.
   REMAINING DETAILS (step 5, 2026-10-21, TRUSS-DESIGN.md section 20; `samples/plans/details-ptc.csx`, run after bracing-ptc, before rivets-ptc): generic OPTIONAL inputs (omitted when unset)
   `TrussBracingGussetDefinition.EdgeAngleOnCrossing` (edge angle on the member crossing the plate edge - highest rank, a face within 0.5 m pulls the plate down to `Gap` from it - instead of the
   truss-plane stack) / `EdgeAngleOutside` (angle on the plate's outer face) / `NoStackClip`; end connections on rolled shapes turned 90 deg (`Rotated`: web plane = axis + section x) and, with a
