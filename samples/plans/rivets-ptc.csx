@@ -115,6 +115,39 @@ foreach (var (key0, bridges0, _) in new[] { ("main", new[] { "PTC Arch truss 18-
     if (b0 != null) memsOf[key0] = b0.Truss.Members.Where(m => !m.From.Contains(':') && !m.To.Contains(':')).ToList();
 }
 var cenOf = new Dictionary<string, int> { ["main"] = 22, ["approach3"] = 12, ["approach4"] = 20 };
+// ---- QC I052 (2026-10-21, user: "Draw as shown"): every symbol the detector counted, with its DRAWN position (tools/ptc_rivet_count.py pos= ->
+// rivet-positions.csv, sheet frame of the gusset outline: u = drawing x toward the higher panel number, v up, origin = work point, inches). The groups of
+// the step-2 counts are placed at these positions (TrussRivetGroup.Positions), mapped like the gusset outlines (connections-ptc.csx section 4b): vertical
+// shear onto the model chord, mirrored for the other half of a unit and the New Jersey units.
+var posOf = File.Exists(Path.Combine(dataDir, "rivet-positions.csv"))
+    ? Csv("rivet-positions.csv").GroupBy(r => (SKey(r["structure"]), r["joint"], r["member"], r["region"])).ToDictionary(g => g.Key, g => g.Select(r => (u: double.Parse(r["u_in"], inv), v: double.Parse(r["v_in"], inv),
+        t: Num(r.GetValueOrDefault("t_in") ?? ""), y: Num(r.GetValueOrDefault("y_in") ?? ""))).ToList())
+    : new Dictionary<(string, string, string, string), List<(double u, double v, double? t, double? y)>>();
+// joints whose outline work point is not on the drawn chord centre (rivet-count-zones.csv BAND rows: main L15, drawn work point at the top of the chord
+// field) keep the count-based grid: their drawn positions cannot be put on the model members reliably
+var bandJoints = Csv("rivet-count-zones.csv").Where(r => r["member"] == "BAND").Select(r => (SKey(r["structure"]), r["joint"].Trim())).ToHashSet();
+var drawnDeg = Csv("gusset-outlines.csv").ToDictionary(r => (SKey(r["structure"]), r["joint"].Trim()), r => double.Parse(r["drawn_chord_deg"], inv));
+// mean chord direction at a model point in the sheet-like frame (u' = sign x model u), degrees in (-90, 90] (as connections-ptc.csx ChordDeg)
+double? ChordDeg(TrussDefinition t, string joint, int sign)
+{
+    var P = t.Points.FirstOrDefault(p => p.Name == joint);
+    if (P == null) return null;
+    double sx = 0, sy = 0;
+    foreach (var m in t.Members.Where(m => (m.Role == TrussMemberRole.UpperChord || m.Role == TrussMemberRole.LowerChord) && !m.From.Contains(':') && (m.From == joint || m.To == joint)))
+    {
+        var Q = t.Points.FirstOrDefault(p => p.Name == (m.From == joint ? m.To : m.From));
+        if (Q == null) continue;
+        double dx = Q.Station - P.Station, dy = Q.Elevation - P.Elevation;
+        if (dx < 0) { dx = -dx; dy = -dy; }
+        double l = Math.Sqrt(dx * dx + dy * dy); if (l < 1e-9) continue;
+        sx += dx / l; sy += dy / l;
+    }
+    if (sx == 0 && sy == 0) return null;
+    double ux = sign * sx, uy = sy;
+    if (ux < 0) { ux = -ux; uy = -uy; }
+    return Math.Atan2(uy, ux) * 180 / Math.PI;
+}
+var posJoints = new Dictionary<string, (int own, int mirrored, int similar, int counts)>();
 int OrdIn(string st, string pt) { var m = tokenRx.Match(pt); if (!m.Success) return -1000; int n = int.Parse(m.Groups[2].Value); return m.Groups[3].Value == "'" ? 2 * cenOf[st] - n : n; }
 bool IsChordRole(TrussMemberRole r) => r is TrussMemberRole.UpperChord or TrussMemberRole.LowerChord or TrussMemberRole.EndPost;
 // member class at a joint: CL / CR chord toward the lower / higher panel number (mirror swaps), CT chord passing through, V vertical, DL / DR diagonal
@@ -143,6 +176,9 @@ foreach (var (key, bridges, C) in structures)
         var br = Doc.Project.Bridges.FirstOrDefault(b => b.Name == bn);
         if (br?.Truss == null) { report.Add($"{bn}: no truss in this model - skipped"); continue; }
         var t = br.Truss;
+        int dirB = bridges.Length > 1 && bn == bridges[1] ? -1 : 1;   // New Jersey unit: panel numbers run against the stations (sheets drawn for the PA unit)
+        var posGroups = new Dictionary<(string pt, string mem, bool beyond, bool memberFrame), (List<TrussUV> uv, double dia, string flag, string src)>();
+        var posHow = new Dictionary<string, string>();
         t.RivetHeadsFlushAtSolePlates = true;   // heads that would bear into a shoe sole plate are countersunk flush (QC I020)
         // user review 2026-10-21 (4-span L20 over the shoe, p.67): the chord rivets are drawn as ONE field through the joint (4 lines, ~3 in. pitch both sides;
         // the field splice is 2'-1 right of L20, so the symbol count split at the panel point gave 38 / 54 per side = a 3 15/16 / 2 7/8 grid). Lay the
@@ -303,6 +339,36 @@ foreach (var (key, bridges, C) in structures)
                     "count as drawn on each " + (inside ? "gusset face" : "member face") + " of both trusses (and both halves of a symmetric unit); positions derived: even square grid over "
                     + (inside ? "the lap the gusset shares with the member" : "the member band beyond the gusset edge") + ", 1.5 d edge distance, a clean plate stack under both heads.");
                 string srcTxt = $"rivet-counts p.{pg} {(inside ? "inside" : "beyond")} {sst} {spt} {r["member"]} ({nShop} shop + {nField} field)";
+                if (!bandJoints.Contains((sst, spt)) && posOf.TryGetValue((sst, spt, r["member"], r["region"]), out var drawnPos) && drawnPos.Count > 0 && drawnDeg.TryGetValue((sst, spt), out var dDeg))
+                {
+                    int sgn = (mirror ? -1 : 1) * dirB;
+                    double shear = Math.Tan((ChordDeg(t, pt, sgn) ?? dDeg) * Math.PI / 180) - Math.Tan(dDeg * Math.PI / 180);
+                    string pflag = U("p." + pg, "rivet positions", (note.Length > 0 ? note + "; " : "")
+                        + $"the joint sheet draws every rivet (solid = shop, ring = field) but dimensions no pitch or gage: the positions are the drawn symbols read from a 300 dpi render (tools/ptc_rivet_count.py; about +-1/4 in.){how}",
+                        "rivets placed AS DRAWN on each " + (inside ? "gusset face" : "member face beyond the gusset") + " of both trusses (the sheet layout sheared onto the model chord" + (sgn < 0 ? ", mirrored" : "")
+                        + "), moved at most 3/4 in. where the model plate stack needs it.");
+                    for (int q = 0; q < targetsFor.Count; q++)
+                    {
+                        var tm = targetsFor[q];
+                        double dia = key != "main" ? 1.0 : IsChord(tm.Role) ? MainChordDia(pt[0], int.Parse(tokenRx.Match(pt).Groups[2].Value))
+                            : ((pt.TrimEnd('\'') == "U11" && tm.Name.Contains("U11")) || (pt.TrimEnd('\'') == "L11" && tm.Name.Replace("'", "") == "U11-L11")) ? 1.25 : 1.125;
+                        // a through chord counted on the source split between the two chords of the target by the side of the drawn position
+                        var mine = targetsFor.Count == 1 ? drawnPos : drawnPos.Where(x => (x.u < 0) == (q == 0)).ToList();
+                        if (mine.Count == 0) continue;
+                        // web members in their own frame (along the member + perpendicular offset, mirror-invariant; a vertical's offset is toward drawing +x =
+                        // the station direction times sgn), chords in the joint frame (sheared onto the model chord)
+                        bool memberFrame = !IsChord(tm.Role) && mine.All(x => x.t != null && x.y != null);
+                        var pa = t.Points.FirstOrDefault(p => p.Name == tm.From); var pb = t.Points.FirstOrDefault(p => p.Name == tm.To);
+                        bool vertical = pa != null && pb != null && Math.Abs(pa.Station - pb.Station) < 0.01;
+                        var keyP = (pt, tm.Name, !inside, memberFrame);
+                        if (!posGroups.TryGetValue(keyP, out var pg0)) pg0 = (new List<TrussUV>(), dia, pflag, srcTxt);
+                        pg0.uv.AddRange(mine.Select(x => memberFrame ? new TrussUV { U = In(x.t!.Value), V = In((vertical ? sgn : 1) * x.y!.Value) } : new TrussUV { U = sgn * In(x.u), V = In(x.v + shear * x.u) }));
+                        posGroups[keyP] = (pg0.uv, Math.Max(pg0.dia, dia), pg0.flag, pg0.src == srcTxt ? srcTxt : pg0.src + "; " + srcTxt);
+                    }
+                    posHow[pt] = how.Length == 0 ? "own" : mirror && sst == st && spt.TrimEnd('\'') == pt.TrimEnd('\'') ? "mirrored" : "similar";
+                    detCount += n;
+                    continue;
+                }
                 for (int q = 0; q < targetsFor.Count; q++)
                 {
                     var tm = targetsFor[q];
@@ -316,7 +382,22 @@ foreach (var (key, bridges, C) in structures)
                 detCount += n;
             }
         }
-        int nGroups = 0, perFace = 0;
+        int nGroups = 0, perFace = 0, nPos = 0, nPosBeyond = 0;
+        foreach (var ((pt, mem, beyond, memberFrame), g) in posGroups.OrderBy(x => x.Key.pt, StringComparer.Ordinal).ThenBy(x => x.Key.mem, StringComparer.Ordinal).ThenBy(x => x.Key.beyond).ThenBy(x => x.Key.memberFrame))
+        {
+            var jd = t.Joints.LastOrDefault(x => x.Point == pt && x.Plane.Length == 0);
+            if (jd == null) { jd = new TrussJointDefinition { Point = pt, Source = "rivets-ptc.csx" }; t.Joints.Add(jd); }
+            jd.Rivets.Add(new TrussRivetGroup
+            {
+                Member = mem, Count = g.uv.Count, Diameter = In(g.dia), Positions = g.uv, PositionsInMemberFrame = memberFrame, Beyond = beyond, Material = HsRivet, Unresolved = g.flag, Source = g.src,
+            });
+            if (beyond) nPosBeyond += g.uv.Count; else nPos += g.uv.Count;
+            nGroups++;
+        }
+        var cov = (own: posHow.Values.Count(x => x == "own"), mirrored: posHow.Values.Count(x => x == "mirrored"), similar: posHow.Values.Count(x => x == "similar"));
+        var cntJoints = groups.Keys.Select(k => k.pt).Distinct().Where(p => !posHow.ContainsKey(p)).OrderBy(p => p, StringComparer.Ordinal).ToList();
+        report.Add($"{bn}: rivets AS DRAWN at {posHow.Count} joints ({cov.own} own drawing, {cov.mirrored} the other half of the unit mirrored, {cov.similar} the 'similar to' joint): {nPos} per gusset face + {nPosBeyond} beyond; "
+            + $"count-based grid kept at {cntJoints.Count} joints{(cntJoints.Count > 0 ? " (" + string.Join(", ", cntJoints) + ": no drawn outline / symbol positions - gussets.csv or hand counts - or the drawn work point is off the chord centre: L15 / L16)" : "")}");
         foreach (var ((pt, mem), g) in groups.OrderBy(x => x.Key.pt, StringComparer.Ordinal).ThenBy(x => x.Key.mem, StringComparer.Ordinal))
         {
             var jd = t.Joints.LastOrDefault(x => x.Point == pt && x.Plane.Length == 0);

@@ -114,7 +114,7 @@ approach4 (unit B),U3,whole joint,0.875,2,16.75,1,,,,,outline drawn only,60,medi
 approach4 (unit B),L2,whole joint,0.875,2,17.375,1,,,,,outline drawn only (gusset read 17 1/8 in the label; joints.csv has 17 3/8),60,low,
 approach4 (unit B),U4,whole joint,0.625,2,18.625,1,,,,,details not shown similar to U2 sheet 20,61,medium,
 approach4 (unit B),U5,whole joint,0.875,2,17.375,1,,,,,outline drawn only,61,medium,
-approach4 (unit B),U6,whole joint,0.875,2,17.25,1,,,,,details not shown similar to U2,61,medium,
+approach4 (unit B),U6,whole joint,0.625,2,17.25,1,,,,,details not shown similar to U2 (U2 = 5/8; QC I049 2026-10-21: was 0.875),61,medium,
 approach4 (unit B),L4,whole joint,0.875,2,17.25,1,,,,,outline drawn only,61,medium,
 approach4 (unit B),L6,whole joint,0.875,2,17.25,1,,,,,outline drawn only,61,medium,
 approach4 (unit B),U7,whole joint,0.75,2,17.25,1,,,,,outline drawn only,62,medium,

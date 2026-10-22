@@ -12,7 +12,8 @@ by small enclosed holes, the detector of the QC check qc/ptc/work/rdet.py) and e
 Symbols just outside the outline in a member's band (chord within 4 ft, web members within 3 ft of the outline) are counted as 'beyond' (fills / splice
 plates / member ends; reported, not placed).
 
-  python -I tools/ptc_rivet_count.py run geom.csv outlines.csv out.csv overlay_dir [structure:joint ...]
+  python -I tools/ptc_rivet_count.py run geom.csv outlines.csv out.csv overlay_dir [structure:joint ...] [ovr=zones.csv] [pos=positions.csv]
+      pos= also writes every counted symbol with its drawn position (sheet frame of the outline, inches) -> connections/rivet-positions.csv
       geom.csv = sbm run temp/dump3.csx model.sbm -- geom.csv (points + in-plane members per structure)
   The overlay PNG per joint colours the symbols by member (legend printed on the image) for the visual check; corrections go to
   connections/rivet-count-corrections.csv and are applied by rivets-ptc.csx.
@@ -215,7 +216,9 @@ OVR = []
 
 def run(argv):
     geom, outl, out, odir = argv[:4]
-    only = set(a for a in argv[4:] if not a.startswith('ovr='))
+    only = set(a for a in argv[4:] if not a.startswith('ovr=') and not a.startswith('pos='))
+    posf = next((a[4:] for a in argv[4:] if a.startswith('pos=')), None)
+    posrows = []
     for a in argv[4:]:
         if a.startswith('ovr=') and os.path.exists(a[4:]):
             for r in csv.DictReader(open(a[4:], encoding='utf-8')):
@@ -326,6 +329,48 @@ def run(argv):
                 c = counts.setdefault(key, [0, 0])
                 c[0 if kind == 'dot' else 1] += 1
                 marks.append((p, nme, reg, kind))
+                # position in the sheet frame of the gusset outline (gusset-outlines.csv outline_uv_in: u = drawing x, v up, origin = work point, inches)
+                wu, wv = (p[0] - wx) / s, -(p[1] - wy) / s
+                posrows.append(dict(structure=r['structure'], joint=pt, member=nme, region=reg, kind=kind, u_in=f"{wu:.2f}", v_in=f"{wv:.2f}", t_in='', y_in='', page=page, _w=(wu, wv)))
+        # web members: also the member frame (t along the member from the work point, y = the perpendicular offset, + = up; a near-vertical member: + = toward
+        # drawing +x). The axis direction is that of the member's own drawn gage lines (>= 8 symbols inside the outline: the direction within 12 deg of the
+        # model ray that lines the symbols up into the sharpest rows), else the model ray rotated onto the drawn chord: keeps the drawn rows on the member when the drawn chord / member angles differ
+        # from the model (the joint-frame shear keeps verticals plumb but turns diagonals)
+        for nme_, ro_, ray in rays:
+            if ro_ in CHORD:
+                continue
+            mine = [x for x in posrows if x['joint'] == pt and x['structure'] == r['structure'] and x['member'] == nme_ and '_w' in x]
+            if not mine:
+                continue
+            rx, ry = ray[0], -ray[1]
+            rl = math.hypot(rx, ry); rx, ry = rx / rl, ry / rl
+            ins_ = [x['_w'] for x in mine if x['region'] == 'inside']
+            if len(ins_) >= 8:
+                # the drawn gage lines: the direction within +-12 deg of the ray whose perpendicular projections bunch the symbols into the sharpest rows
+                # (histogram of 0.4 in. bins, sum of squared counts); robust to the gusset edge clipping the field obliquely
+                def sharp(a):
+                    ca, sa = math.cos(a), math.sin(a)
+                    dx, dy = rx * ca - ry * sa, rx * sa + ry * ca
+                    h = {}
+                    for q in ins_:
+                        k = int(math.floor((-dy * q[0] + dx * q[1]) / 0.4))
+                        h[k] = h.get(k, 0) + 1
+                    return sum(c * c for c in h.values())
+                cands = [math.radians(0.25 * i) for i in range(-48, 49)]
+                base = sharp(0.0)
+                best = max(cands, key=lambda a: (sharp(a), -abs(a)))
+                if sharp(best) > 1.15 * base:
+                    ca, sa = math.cos(best), math.sin(best)
+                    rx, ry = rx * ca - ry * sa, rx * sa + ry * ca
+            nx, ny = -ry, rx
+            if abs(ny) < 0.2:
+                if nx < 0: nx, ny = -nx, -ny
+            elif ny < 0: nx, ny = -nx, -ny
+            for x in mine:
+                wu, wv = x['_w']
+                x['t_in'], x['y_in'] = f"{wu * rx + wv * ry:.2f}", f"{wu * nx + wv * ny:.2f}"
+        for x in posrows:
+            x.pop('_w', None)
         names = sorted({k[0] for k in counts})
         for (nme, reg), (nd, nr) in sorted(counts.items()):
             res.append(dict(structure=r['structure'], joint=pt, member=nme, region=reg, shop_dots=nd, field_rings=nr, total=nd + nr, page=page,
@@ -362,6 +407,13 @@ def run(argv):
             f = 1400 / im.width; im = im.resize((1400, int(im.height * f)))
         print(f"   overlay: page px = ({box[0]:.1f} + ox / {k * f:.4f}, {box[1]:.1f} + oy / {k * f:.4f})")
         im.save(os.path.join(odir, f"{st}_{pt.replace(chr(39), 'p')}.png"))
+    if posf:
+        # every symbol counted (inside the outline or 'beyond' in a member band) with its drawn position: the rivet layout AS DRAWN (QC I052, rivets-ptc.csx)
+        with open(posf, 'w', newline='', encoding='utf-8') as f:
+            w = csv.DictWriter(f, fieldnames=['structure', 'joint', 'member', 'region', 'kind', 'u_in', 'v_in', 't_in', 'y_in', 'page'])
+            w.writeheader()
+            for x in posrows:
+                w.writerow(x)
     with open(out, 'w', newline='', encoding='utf-8') as f:
         w = csv.DictWriter(f, fieldnames=['structure', 'joint', 'member', 'region', 'shop_dots', 'field_rings', 'total', 'page', 'beyond_extent_in', 'chord_band_in'])
         w.writeheader()

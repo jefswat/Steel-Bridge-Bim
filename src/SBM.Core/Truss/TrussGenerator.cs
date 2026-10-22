@@ -56,6 +56,7 @@ public static partial class TrussGenerator
         public required TrussBuiltSection Sec;
         public Vec3 Axis, X, Y;
         public double SA, SB;               // setbacks
+        public (Vec3 P, Vec3 N)? MitreA, MitreB;   // mitred chord ends: joint plane through the point (TrussJointDefaults.MitredChordJoints)
         public string Assembly = "";
     }
 
@@ -223,9 +224,11 @@ public static partial class TrussGenerator
             foreach (var bs in _sec.Values) foreach (var n in bs.Notes.Where(n => !n.Contains("perforated cover plate"))) Info($"Truss: {n}{Src}.");
             BuildInstances();
             Setbacks();
+            MitreChordJoints();
             foreach (var m in _inst) BuildMember(m);
             BuildJoints();
             BuildJointPlates();
+            BuildMemberJointPlates();
             BuildEndConnections();
             BuildBracingGussets();
             BuildPlaneItems();
@@ -393,6 +396,7 @@ public static partial class TrussGenerator
                             if (sin < 0.1) continue;
                             double h = Vec3.Dot(d1, c.Y) > 0 ? c.Sec.YMax : -c.Sec.YMin;
                             t = Math.Max(t, (h + ym * cos) / sin + clr);
+                            t = Math.Max(t, ClearOfJointPlates(m, d1, ym, c, pl, pt));
                         }
                     }
                     else if (IsCrossPlane(m.Def.Role))
@@ -463,6 +467,7 @@ public static partial class TrussGenerator
             if (taper) Info($"Truss: tapered members ({m.Sec.Definition.Name}): depth reduced by {L(rA)} at the start and {L(rB)} at the end (bottom part raised, top straight){(m.Def.Source.Length > 0 ? " (" + m.Def.Source + ")" : "")}.");
             foreach (var lf in m.Sec.Lacing) Lacing(mesh, m, a0, cut, lf);
             if (m.Def.RivetLines is { Count: > 0 }) MemberRivetLines(m, a0, cut);
+            if (m.MitreA != null || m.MitreB != null) mesh = MitreMesh(m, mesh, a0, cut);
             Assumption? asu = null;
             string flag = m.Def.Unresolved.Length > 0 ? m.Def.Unresolved : m.Sec.Flag ?? "";
             if (!string.IsNullOrEmpty(perfFlag) && !flag.Contains(perfFlag)) flag = (flag + " " + perfFlag).Trim();
@@ -931,8 +936,8 @@ public static partial class TrussGenerator
             foreach (var c in _jointRivets)
             {
                 HashSet<TrussRivetGroup>? pooled = null;
-                // whole-joint counts first need every member's lap area
-                foreach (var rg in c.Def.Rivets)
+                // whole-joint counts first need every member's lap area; groups AS DRAWN (Positions) first, so the derived grids keep clear of them
+                foreach (var rg in c.Def.Rivets.OrderBy(r => r.Positions is { Count: > 0 } ? 0 : 1))
                 {
                     if (rg.Member == "*") { WholeJointRivets(c, rg); continue; }
                     if (pooled?.Contains(rg) == true) continue;
@@ -943,7 +948,8 @@ public static partial class TrussGenerator
                     }
                     var m = c.Here.FirstOrDefault(i => i.Def.Name.Equals(rg.Member, StringComparison.OrdinalIgnoreCase) || i.Mark.Equals(rg.Member, StringComparison.OrdinalIgnoreCase));
                     if (m == null) { Warn($"Truss: rivets of joint {c.Point} ({c.Plane}) - member '{rg.Member}' does not frame into the joint; not placed."); continue; }
-                    if (rg.Distributed) DistributedRivets(c, m, rg, rg.Count); else PitchRivets(c, m, rg);
+                    if (rg.Positions is { Count: > 0 }) PositionRivets(c, m, rg);
+                    else if (rg.Distributed) DistributedRivets(c, m, rg, rg.Count); else PitchRivets(c, m, rg);
                 }
             }
             // gusset rivet cover: every joint rivet inside its inner gusset outline with the group's edge distance (1 mm tolerance)
@@ -957,10 +963,11 @@ public static partial class TrussGenerator
                     minEdge = Math.Min(minEdge, d); req = Math.Min(req, e);
                     if (d < e - 0.001) shortN++;
                 }
-                Model.GussetRivetCovers.Add(new TrussGussetRivetCover(c.Plane, c.Point, l.Count, shortN, minEdge, req, c.Def.Outline.Count >= 3));
+                Model.GussetRivetCovers.Add(new TrussGussetRivetCover(c.Plane, c.Point, l.Count, shortN, minEdge, req, c.Def.Outline.Count >= 3, _jointDrawn.TryGetValue(c, out int nd) ? nd : 0));
                 if (shortN > 0)
-                    Warn($"Truss CHECK joint {c.Point} ({c.Plane}): {shortN} of {l.Count} rivets per face lie outside the gusset outline or closer than their edge distance to its edge (smallest {L(minEdge)}).");
+                    Warn($"Truss CHECK joint {c.Point} ({c.Plane}): {shortN} of {l.Count} rivets per face lie outside the gusset outline or closer than their edge distance to its edge (smallest {L(minEdge)}){(_jointDrawn.TryGetValue(c, out int nd2) && nd2 > 0 ? $"; {nd2} of them placed as drawn (the sheet's own edge distance, read with the outline)" : "")}.");
             }
+            ReportPositionRivets();
             if (_pooledJoints > 0) Info($"Truss: chord rivets laid as one field per joint face (uniform chord rivets) at {_pooledJoints} joint faces{Src}.");
             if (_tightGroups > 0)
                 Warn($"Truss CHECK rivets: {_tightGroups} distributed rivet groups need a grid under 3 diameters (tightest {_tightest:0.00} d) - the image count and the gusset / member lap (envelope outline where the gussets are not dimensioned) disagree; each group is listed as Info. Positions are not adjusted.");
@@ -1377,6 +1384,7 @@ public static partial class TrussGenerator
                     int sgnOut(TrussPlateFace f) => f is TrussPlateFace.Top or TrussPlateFace.WebOutside ? 1 : -1;   // growth direction of a stack
                     string asm = Asm($"TRUSS-{pl.Name}", AssemblyKind.TrussLine, $"{_d.Name} - truss line {pl.Name}");
                     double yc = c0.Sec.WebDepth > 0 ? c0.Sec.WebCenterY + c0.Def.OffsetZ : 0;
+                    var mj = JointMitre(pl.Name, jdef.Point, P, tan, xv, yv);
                     // STACKING (QC pass 4, I042): every plate lies on the steel under it within its own band - the member pieces (web plies, angle legs on the web,
                     // cover plates) of the chord(s) it reaches along the joint, and the plates already placed on that face whose length and band overlap it. Fills
                     // are placed first, the one closest to the member first (a fill between the angle legs before a wider fill that bears on the legs and on it).
@@ -1402,7 +1410,7 @@ public static partial class TrussGenerator
                         return best!.Value;
                     }
                     // marks keep the listed order (fills first), placement follows the stacking order
-                    var listed = jdef.Plates!.OrderBy(p => p.Fill ? 0 : 1).Select((p, i) => (p, k: i + 1)).ToList();
+                    var listed = jdef.Plates!.Where(p => p.Member == null).OrderBy(p => p.Fill ? 0 : 1).Select((p, i) => (p, k: i + 1)).ToList();
                     var order = new List<(TrussJointPlate p, int k, double baseLevel)>();
                     foreach (bool fillPass in new[] { true, false })
                     {
@@ -1427,6 +1435,7 @@ public static partial class TrussGenerator
                         var mesh = new Mesh();
                         void Box(double x0, double x1, double y0, double y1)
                         {
+                            if (mj is { } mjv) { MitredPlateBox(mesh, P, ax, mjv, xv, a0, a1, x0, x1, y0, y1); return; }
                             var poly = new[] { new Vec2(Math.Min(x0, x1), Math.Min(y0, y1)), new Vec2(Math.Max(x0, x1), Math.Min(y0, y1)), new Vec2(Math.Max(x0, x1), Math.Max(y0, y1)), new Vec2(Math.Min(x0, x1), Math.Max(y0, y1)) };
                             var ra = poly.Select(q => P + ax * a0 + xv * q.X + yv * q.Y).ToArray();
                             MeshBuilder.AddLoft(mesh, poly, new[] { ra, ra.Select(q => q + ax * (a1 - a0)).ToArray() });

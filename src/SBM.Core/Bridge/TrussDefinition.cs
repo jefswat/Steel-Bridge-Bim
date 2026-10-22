@@ -507,6 +507,19 @@ public sealed class TrussJointDefaults
     /// the edge angle of a bracing plate (<see cref="TrussBracingGussetDefinition.EdgeAngle"/>).</summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public double BracingStackClearance { get; set; }
+    /// <summary>OPTIONAL (false = off, omitted from the .sbm): where two chord members meet END TO END at a panel point with a deflection (kinked chord,
+    /// arch-type trusses), both ends are cut on ONE plane through the point: the bisector plane of the two axes, normal to the mean chord direction (the
+    /// riveted "finished" / milled joint line the sheets draw through the point). The joint's splice / fill plates (<see cref="TrussJointDefinition.Plates"/>)
+    /// then follow the chord on their side and end on the same plane (a plate across the joint = two halves meeting on it, i.e. bent at the point).
+    /// Off = square cuts lengthened by half depth x tan(deflection / 2) so the joint has no gap (the two end wedges overlap). A chord passing through, an explicit
+    /// setback or a deflection of 25 deg or more keep the square rule; a third chord at the point (e.g. a wind chord starting there) keeps its own square end.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public bool MitredChordJoints { get; set; }
+    /// <summary>OPTIONAL (0 = off, omitted from the .sbm): web members (diagonals, verticals, posts, hangers) whose end lies over joint splice / fill plates on the
+    /// chord face they meet (<see cref="TrussJointDefinition.Plates"/> on the Top / Bottom face reaching the member's footprint) stop this far clear of the outer
+    /// face of that plate stack (the plans draw the member end clear of the cover splice plate). Joints without such plates keep <see cref="WebMemberClearance"/>.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public double WebMemberClearOfJointPlates { get; set; }
 }
 
 /// <summary>Plane of a bracing connection plate: Horizontal (lateral systems, normal up), Transverse (sway frames / portals: vertical, normal along
@@ -738,6 +751,17 @@ public sealed class TrussJointPlate
     public string Material { get; set; } = "";
     public string Unresolved { get; set; } = "";
     public string Source { get; set; } = "";
+    /// <summary>OPTIONAL (null = a chord plate as above, omitted from the .sbm): the plate lies on THIS member at the joint (name or mark; a web member, or one
+    /// chord member only) along its axis: <see cref="Offset"/> = centre distance from the working point INTO the member (away from the joint), the faces are
+    /// the member's own (WebOutside / WebInside = the outer / inner face of its webs or flanges in the truss plane, Top / Bottom = across its section y),
+    /// stacked on the member's pieces and on the plates already placed on the same member and face (fills between a rolled member's flanges and the gussets,
+    /// splice bars on the inside of the flanges).</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? Member { get; set; }
+    /// <summary>OPTIONAL (0 = centred, omitted when 0): offset of the plate centre across its face (section y for WebOutside / WebInside, section x for
+    /// Top / Bottom), e.g. one of two splice bars above / below a horizontal web.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public double CenterOffset { get; set; }
 }
 
 public enum TrussLineItemKind { Steel, Concrete }
@@ -887,6 +911,17 @@ public sealed class TrussRivetGroup
     /// <summary>OPTIONAL length of the band beyond the gusset edge (m; 0 = 0.6 m), e.g. the extent of the drawn field.</summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public double BeyondLength { get; set; }
+    /// <summary>OPTIONAL (null = off, omitted from the .sbm): the rivet positions AS DRAWN on the joint sheet, one per rivet and gusset face, in the joint frame
+    /// of <see cref="TrussJointDefinition.Outline"/> (u along the bridge from the work point, v up; m). They replace <see cref="Count"/> / the distributed grid /
+    /// pitch rows: each rivet is placed where drawn (moved at most 3/4 in. to the nearest spot with a clean plate stack under both heads and a free head on
+    /// the gusset face, else dropped and counted in a CHECK line); <see cref="Beyond"/> groups lie outside the gusset (heads on the member / fill / splice plates).</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public List<TrussUV>? Positions { get; set; }
+    /// <summary>OPTIONAL (omitted when false): <see cref="Positions"/> are in the MEMBER frame instead: U = distance along the member from the joint's working
+    /// point (away from the joint), V = offset along the member's in-plane section y (up; a vertical member: toward the higher station). Keeps drawn rows on the
+    /// member when the drawn and the model member directions differ.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public bool PositionsInMemberFrame { get; set; }
 }
 
 /// <summary>

@@ -294,10 +294,15 @@ Fb("F8", "F8: 1-Pl 106x5/8; 4-Ls 8x8x3/4 F.L.; 2-Pls 18x5/8 F.L.; 1-Pl 18x5/8x46
 Add(new TrussSectionDefinition
 {
     Name = "F7", Kind = TrussSectionKind.Box, Material = "S", Label = "F7: 2-Pls 106x7/16; 4-Ls 8x4x3/4; 2-Pls 25x9/16 F.L.; 2-Pls 25x9/16x56'-0; 2-Pls 25x9/16x40'-0", WebDepth = In(106), WebPlies = { new TrussPly(In(106), In(7.0 / 16)) },
-    WebsOutToOut = In(25), Angle = "L8x4x3/4", AngleProjection = In(0.25),
+    // p.93 (Sheet 53) Section A "2'-1 1/2 in to in Webs", Section B "2'-1 1/2 b.b. Ls": webs 25 1/2 in to in = 26 3/8 out to out, angles inside with
+    // their backs on the webs (QC I046 2026-10-21; was 25 o. to o. = the cover width)
+    WebsOutToOut = In(25.5 + 2 * 7.0 / 16), Angle = "L8x4x3/4", AngleProjection = In(0.25),
     TopPlates = { Cp(25, 0.5625, 0, "Cov. PL 25 x 9/16 F.L."), Cp(25, 0.5625, 56, "Cov. PL 25 x 9/16 x 56'-0"), Cp(25, 0.5625, 40, "Cov. PL 25 x 9/16 x 40'-0") },
     BottomPlates = { Cp(25, 0.5625, 0, "Cov. PL 25 x 9/16 F.L."), Cp(25, 0.5625, 56, "Cov. PL 25 x 9/16 x 56'-0"), Cp(25, 0.5625, 40, "Cov. PL 25 x 9/16 x 40'-0") }, Source = "p.72",
-    Unresolved = fbPartial + " " + U("p.72, p.93", "two-web floor beam F7 at W22 (width, angle position)", "p.72 lists the material only; the detail sheet p.93 (Sheet 53) was not read", "webs 25 in. out to out (the cover width), angles inside."),
+    Unresolved = fbPartial + " " + U("p.93", "two-web floor beam F7 at W22: end reinforcing plates (2-7/16 i.s. / o.s., 2-Pls 6 1/2 x 7/16) and web splice 4-Spl. Pls. 20 7/8 x 5/16 + fills",
+        "the elevation (Sheet 53) draws them with their callouts, but their lengths along the beam and the splice position are not dimensioned (the beam is drawn with a break)",
+        "not built; the member section is as drawn: webs 2'-1 1/2 in to in (Section A) with the angles inside, backs on the webs (Section B '2'-1 1/2 b.b. Ls')."
+        + " The internal diaphragms (4-Ls 4 x 4 x 3/8 + 24 x 3/8 web near the end; 2-Ls 5 x 3 1/2 x 7/16 + 23 x 7/16 web at the stringer points) are not modeled: the truss member section has no internal diaphragm input."),
 });
 // Stringers (p.72 schedule; 1954 WF = AISC v16 W of the same nominal size / weight)
 Add(new TrussSectionDefinition { Name = "W21x62", Kind = TrussSectionKind.Rolled, Designation = "W21x62", Material = "C", Label = "21 WF 62 (S9 / S13)", Source = "p.72" });
@@ -442,7 +447,8 @@ foreach (bool pr in halves)
     Mem($"FL-K{P(21, pr)}-22N", "N:W" + P(21, pr), "N:WM22", "FLAT21", TrussMemberRole.LowerLateral, "", system: "Floor laterals");
     Mem($"FL-K{P(21, pr)}-22S", "S:W" + P(21, pr), "S:WM22", "FLAT21", TrussMemberRole.LowerLateral, "", system: "Floor laterals");
 }
-UG("p.71, p.99, p.53", "floor lateral tongue beam 16 WF 88 + 2-Pls 11 1/2 x 1/2 x 5'-6 (W21 - W22 - W21' on the CL) and the shear lock at W22", "the 1954 16 WF 88 is not in the AISC v16 extract and its connection is on detail sheet 53 (p.93), not read",
+UG("p.71, p.93, p.99", "floor lateral tongue beam 16 WF 88 + 2-Cov. Pls. 11 1/2 x 1/2 x 5'-6 (W21 - W22 - W21' on the CL, through the slot in the near-side web of F7) and the shear lock at W22",
+    "p.93 Section E draws the tongue beam, its 2-7/16 lateral plates and the slot, but the beam length and its end at the shear lock are not dimensioned, and the 1954 16 WF 88 is not in the AISC v16 extract (its d / bf / tw / tf are not on the sheets)",
     "not built; the 2-12[ 25 K members end at the CL point of W22.");
 UG("p.71", "lower lateral double K L13-L13 1/2 and the 33 WF 130 strut at L13 1/2; the inverted portal L13 1/2-L15 (Sheets 44 / 45)", "the L13 1/2 point is not dimensioned on the sheets read", "not built.");
 UG("p.71", "sway bracing above the floor beams and the portal knee bracing", "only the V frames below the floor beams are tabulated on p.71", "V frames 0-12 built; nothing above the floor beams except the U11 portal strut envelope.");
@@ -515,6 +521,11 @@ foreach (var pl in new[] { "N", "S" })
 t.JointDefaults = new TrussJointDefaults
 {
     AutoGussets = true, Lap = FI(2, 6), Margin = 0, RivetDiameter = In(1.125),
+    // QC I047 (p.74 U1 "FIN.", p.76 L6 "Fin."): ONE finished joint line through each kinked panel point, fills / splice fills dimensioned to it -> both chord
+    // ends cut on the bisector plane through the point (re-checked at 300 dpi: the U1 line passes the work point within ~3/4 in. and leans like the bisector)
+    MitredChordJoints = true,
+    // QC I048 (p.74 U1-L1): the vertical channels end about 2 in. below the chord bottom, clear of the 24 x 1/2 cover splice plate (scaled 1 1/2 in. clear of it)
+    WebMemberClearOfJointPlates = In(1.5),
     Unresolved = U("p.74-90", "gusset plate outlines", "the joint sheets draw the gussets at 3/4\" = 1'-0 without outline dimensions (only rivet group minimums 2'-6, 5\" half holes)",
         "convex envelope of the member ends + 2'-6 rivet group length (p.88 'Typical for all verticals and diagonals 2'-6 End Distance'); thickness from the joint sheet where read, else 3/4\" flagged."),
 };

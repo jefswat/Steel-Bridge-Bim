@@ -31,8 +31,9 @@ public sealed record TrussGussetStack(string Plane, string Point, IReadOnlyList<
 
 /// <summary>Rivet cover of the inner gusset of one joint on one plane (joint rivet groups, one face): how many rivets were placed, how many lie
 /// outside the gusset outline or closer to its edge than the group's edge distance (<see cref="Short"/>), the smallest edge distance found (m;
-/// negative = outside) and the smallest required one. <see cref="OutlineGiven"/> = the joint has its own outline (not the envelope).</summary>
-public sealed record TrussGussetRivetCover(string Plane, string Point, int Rivets, int Short, double MinEdge, double RequiredEdge, bool OutlineGiven)
+/// negative = outside) and the smallest required one. <see cref="OutlineGiven"/> = the joint has its own outline (not the envelope). <see cref="Drawn"/> = how
+/// many of the rivets are placed AS DRAWN (<see cref="SBM.Core.Bridge.TrussRivetGroup.Positions"/>; their edge distance is the sheet's, read with the outline).</summary>
+public sealed record TrussGussetRivetCover(string Plane, string Point, int Rivets, int Short, double MinEdge, double RequiredEdge, bool OutlineGiven, int Drawn = 0)
 {
     public bool Ok => Short == 0;
 }

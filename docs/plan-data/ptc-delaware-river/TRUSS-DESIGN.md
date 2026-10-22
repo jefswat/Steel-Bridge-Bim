@@ -656,3 +656,50 @@ Results (whole PTC run order on a copy of the committed model, before = the comm
   at the point + half depth x tan(deflection / 2), so the member on the other side reaches 1-1 1/2 in. back past the point and meets the fill / splice plate of its neighbour
   there (e.g. L6 fills 7/16, L15 18 x 1 web plates 1/2 in. vs L14-L15). That is the chord end-cut rule, not the plate stacking; reported, not changed.
 - IFC (Parametric): 234.0 -> 234.1 MB, 2,472,827 entities; validate_ifc 0 schema + 0 EXPRESS issues (2,000 instances per type). Tests 578 -> 580 passed.
+
+## 23. QC pass 5 fixes (2026-10-21; issues I046-I053, answers in `qc/ptc/results/answers.csv`; user: "Implement those changes. Draw as shown")
+Every finding was re-read on the sheet first (p.50-53, p.61, p.67, p.74, p.76, p.80, p.83, p.86, p.93 crops at 150-300 dpi).
+
+Generic code (all OPTIONAL / additive, omitted from the .sbm when unset; other bridges unchanged; tests `TrussJointDetailTests`):
+- `TrussJointDefaults.MitredChordJoints` (new partial `Truss/TrussGeneratorMitre.cs`): two chord members ending at a kinked panel point (mutual partners,
+  deflection 0-25 deg, no explicit setback, no chord passing through) are both cut on the BISECTOR plane through the point (normal = mean chord direction):
+  the square-cut + h/2 tan(d/2) solid is kept and its end faces pulled back onto the plane (`MitreMesh`; the member is then a face set in IFC). The joint's
+  `TrussJointPlate`s follow the chord on their side and end on the plane; a plate across the joint = two halves meeting on it (`MitredPlateBox`: each half a
+  quadrilateral in (along, up) extruded across = exact). A third chord at the point (main L13 wind chord) keeps its square end.
+- `TrussJointDefaults.WebMemberClearOfJointPlates`: web members whose end lies over Top / Bottom joint plates of the chord face they meet stop this far clear
+  of the plate stack (`ClearOfJointPlates`).
+- `TrussJointPlate.Member` / `CenterOffset` (new partial `Truss/TrussGeneratorMemberPlates.cs`): plates on ONE member along its axis from the working point
+  (fills between a rolled member's flanges and the gussets, splice bars inside the flanges, web splice plates), base = the member's pieces present under the
+  plate (`FaceLevel`, scan lines; cover plates between the gussets count only where they run) + the plates already placed on that member / face; clipped to
+  the member's solid.
+- `TrussRivetGroup.Positions` (+ `PositionsInMemberFrame`) (new partial `Truss/TrussGeneratorRivetPositions.cs`): rivets AS DRAWN, one per position and gusset
+  face, in the joint (u, v) frame of the outline or the member frame; moved at most 3/4 in. to a clean plate stack / free head spot, else dropped (CHECK
+  warning per member, totals Info by reason). `TrussGussetRivetCover.Drawn` counts them (check rows compare drawn rivets with the drawn outline, +-1 in.).
+- `tools/ptc_rivet_count.py ... pos=` writes every counted symbol with its drawn position (`connections/rivet-positions.csv`; web members also in their own
+  frame: t along the drawn gage lines found from the symbols, y across).
+
+Data (PTC):
+| Issue | Sheet (re-read) | Change |
+|---|---|---|
+| I046 F7 | p.93 Section A "2'-1 1/2 in to in Webs", Section B "2'-1 1/2 b.b. Ls" | truss-ptc-arch: webs 26 3/8 o. to o.; flag now names only what is open (end reinforcing plates, web splice: lengths not dimensioned; internal diaphragms: no generator input); tongue beam flag: p.93 Section E draws it, length / end not dimensioned, 16 WF 88 not in AISC v16 |
+| I047 kinked joints | p.74 U1 "FIN." line through the point leaning as the bisector (within ~3/4 in. of the WP), p.76 L6 "Fin." on the L6 axis, fills ending / starting at it | main truss `MitredChordJoints`; L11 / L11' (chords end at the post, p.80, deflection > 25 deg) and L13 (wind chord) keep their square ends |
+| I048 verticals | p.74 U1-L1 channels end ~2 in. below the chord (300 dpi crop, 16 px/in) | `WebMemberClearOfJointPlates` 1 1/2 in. (end 2 in. below the chord bottom at U1) |
+| I049 4-span U6 | p.61 "(17 1/4 in to in gussets)", "Details not shown similar to U2" (U2 = 5/8, p.60) | joints.csv / gussets.csv / gusset-layers.csv 5/8 |
+| I050 4-span U20 | p.67 "17 1/4 in. to in.", "For details not shown see U8 sheet 12" | joints.csv thickness 5/8 by reference -> the joint now has its input (in-to-in 17 1/4) |
+| I051 approach fills / splices | p.49-53, 59-67 (fills drawn on every member end; p.50-53 splice bars, web plates, "2-Pls 16 x 1/2" / "15 1/2 x 1 1/8" / "16 x 3/4") | connections-ptc section 6: (a) fills on every member under each gusset, thickness = (printed in-to-in - member depth)/2 to 1/16 (matches the printed sizes where read: p.62 U9 2 x 7/8, p.50 U3 1/4), width = flange, from the member end over the drawn outline + the drawn beyond-rivet extent: 788 fill pairs at 252 model joints; gussets now bear on fills; (b) 3-span chord splice material read joint by joint (`approach-splices.csv`, 34 rows: splice bars inside the flanges, web splice plates + fills, flange splice plates outside the gussets at L2 / L4 / U9); NOT built: 4-span splice material (drawn edge-on in plan views only, flag), the 'fills drawn outside the joints', lug angles, diaphragms |
+| I052 rivet layout | p.50 U3 36 (+5) / 27, p.51 L4 dense rows at the splice | rivets-ptc: every detected symbol placed where drawn (`Positions`): main 78 joints as drawn (35 own drawing, 35 other half mirrored, 8 'similar to'), count grid kept at 12 (L11 / L13 / L14 / L22 / U22: no outline or hand counts; L15 / L16 + primes: the outline work point lies on the chord top edge, BAND override); 3-span 50 / 50, 4-span 82 / 82 joints as drawn. Symbols with no member steel under them (text, rivets drawn in profile at member edges, members narrower than drawn) are dropped and counted |
+| I053 | p.76 / p.77 / p.83 | gusset-layers.csv in_to_in 29 at main U7 / U9 / L8 / L13 (model unchanged) |
+
+Findings for the user: main L15 / L16 outline work point (gusset-outlines.csv) is on the drawn chord top edge ~2 ft left of the working-line crossing at
+page px (613, 544) (p.86 300 dpi crop): the L15 / L16 gusset outline may be shifted in the model; not changed here. Drawn rivets vs sheared outline differ
+by up to 5 in. at main L12 (drawn chord read 12 deg off the model) - DIFF rows in check-truss-ptc.
+
+Results (whole run order truss-ptc-arch -> ... -> details-ptc -> rivets-ptc on a copy of the committed model):
+- Checks: check-truss-ptc 608 / 11 -> 580 PASS / 39 DIFF (the 28 new DIFF rows = drawn rivets vs the sheared drawn outline at main U5 / U7 / U12-U14 / L12 / L17 / L19,
+  up to 5.2 in. at L12), check-truss-ptc-approach 1796 / 12 -> 1790 / 18 (4-span U11' drawn rivets 1.6 in. outside the outline, 2 units x 2 planes; "one gusset per face" counts the
+  3-span outside splice plates as layers), check-girders-ptc 131 / 6, check-ptc-delaware-river 379 / 41 -> 381 / 39.
+- Steel: 35.04 -> 35.33 M lb = 89.2 % -> 89.9 % of p.42 items 1-6 (3-span 92.1 / 91.6 %, 4-span 91.1 %, main 90.8 %). Rivets 474,784 -> 456,490 (heads 183,497 lb).
+- Clash (`sbm clash --bolts`): non-bolt rows 6,682 -> 6,418: main chord x chord 168 -> 8 (L11 / L13 kept), fill / splice x chord 116 -> 0, fill / splice x vertical 32 -> 0;
+  new: fills vs shoe sole plates 12 (the sole plates already overlap the chords there), 4-span U10 vertical fills vs floor beam / bracket ends 16, 3-span U9 outside splice plates vs
+  floor beam / bracket ends 16 (1/16 in.). Bolt / rivet rows 1,016,579.
+- IFC (Parametric): 234.1 -> 236.7 MB, 2,408,261 entities; validate_ifc 0 schema + 0 EXPRESS issues (2,000 instances per type). Tests 582 -> 586 passed.
