@@ -769,3 +769,66 @@ Results (whole run order truss-ptc-arch -> ... -> details-ptc -> rivets-ptc on a
   new: fills vs shoe sole plates 12 (the sole plates already overlap the chords there), 4-span U10 vertical fills vs floor beam / bracket ends 16, 3-span U9 outside splice plates vs
   floor beam / bracket ends 16 (1/16 in.). Bolt / rivet rows 1,016,579.
 - IFC (Parametric): 234.1 -> 236.7 MB, 2,408,261 entities; validate_ifc 0 schema + 0 EXPRESS issues (2,000 instances per type). Tests 582 -> 586 passed.
+
+## 24. Finish the gussets (2026-10-22; user: "Finish the gussets"; data `connections/gusset-outlines.csv`, `gusset-layers.csv`, `rivet-count-zones.csv`, `rivet-counts.csv`, `rivet-positions.csv`)
+No generator change: the 28 + 4 "rivets as drawn" DIFF rows of pass 5 were READING errors of the joint sheets, corrected in the data and in the reader.
+
+Cause. connections-ptc 4b places the drawn outline by a vertical shear v += u (tan(model chord) - tan(drawn chord)), rivets-ptc places the web member rivets in
+their member frame along the MODEL member. The drawn chord direction of the main truss rows had been read from two eye-picked points on the chord centre line and was up
+to 9.5 deg off (U5 12.1 instead of 6.5, U7 14.2 / 9.4, U13 13.7 / 18.7, L8 +3.2 / -5.5, L12 25.2 / 34.8, U18 14.6 / 8.4, U19 12.6 / 6.0): the shear then tilted the
+gusset away from the diagonals by up to 12 deg while the diagonal rivets stayed on the model diagonal (L12 -5.2 in.). The sheets draw the TRUE geometry: the chord rivet gage
+lines agree with the model chords within 1/2 deg everywhere.
+
+Reader (`tools/ptc_gusset_outlines.py`, new commands):
+- `chordrows outlines.csv rivet-positions.csv [structure] [write] [min=]`: drawn chord direction = mean over the chord members of the direction that bunches the member's
+  detected rivet symbols into the sharpest gage rows (`row_direction`); `write` replaces `chord_px` (2 points through the work point) where it differs by more than `min`.
+  Applied to the main truss (19 rows re-read, threshold 1.2 deg); the approach rows agree within 1.2 deg (U0' 1.2, 4-span U13 0.9: left).
+- `wpaxes ... [write] [joints=...]`: work point = least-squares intersection of the member axes, each axis = the symmetric centre line of the member's drawn rivet field
+  (`symmetric_centre`, gage rows symmetric about the member's working line); outlier axes dropped (> 1 in.); moved only when the axes agree (residuals <= 1 in., at most
+  one axis dropped, never the post / vertical). Used as a finder; every move was then checked on a zoom 2.4-6 crop of the drawn working lines and set by hand where the
+  automatic answer and the drawing disagreed (13 joints, notes in the rows).
+Rivet symbols / positions re-run with `tools/ptc_rivet_count.py` for every main row (geom dump with the in-plane web depth as the band half depth, as the committed counts)
+and merged joint by joint into rivet-counts.csv / rivet-positions.csv.
+
+Per joint (main truss unless noted; page):
+| Joint | Page | Change |
+|---|---|---|
+| U3, U4, U5, U6, U7, U12, U13, U14, U17, U18, U19, U20, L6, L7, L8, L9, L12, L15, L17, L18 | p.75-89 | drawn chord direction re-read from the chord rivet rows (largest: U5 12.1 -> 6.5, U7 14.2 -> 9.4, L8 3.2 -> -5.5, L12 25.2 -> 34.8, U18 14.6 -> 8.4, U19 12.6 -> 6.0 deg) |
+| U1, U7, U8, U9, U10, U11, U12, U13, U14, U15, U16, U17, U18, U19, U20, L3, L6, L8, L10, L12, L17, L18, L20, L22 | p.74-90 | work point moved onto the drawn working-line crossing / rivet-field centre (largest: L12 26 in. - the first reading sat at the bottom of the post field; U9 10 in.; U11 9 in.; U12 7 in.; L18 6.5 in.; U15 6 in.) |
+| L12 | p.81 | bottom edge re-traced: it ran from the chord-top corner across the chord rivet field (178 chord symbols fell outside); now square across the chord at both ends, bottom on the chord bottom |
+| L15 | p.86 | work point (500,560) on the chord top edge 2'-2 left of the crossing -> (613,584) = post centre line x diagonal working line = chord web centre; the BAND override is gone, L15 / L15' rivets now AS DRAWN |
+| L16 | p.86 | own outline (was L15's): 2-1 in. gussets, 105 x 125 in., kinked upper-left edge, rivets as drawn (zones for the post field / profile edges / bracing angles) |
+| L13 | p.83 | ENVELOPE -> drawn outline (2-1 1/8: diagonal / post / angle-strip edges, hidden chord crossings, lower edge = the printed R 16'-0 arc fitted through 6 traced points (+-1 px), 108 SF); rivets as drawn (wind chord / floor system connection zone skipped) |
+| L14 | p.84 | ENVELOPE -> drawn outline (2-1 1/8, 97 SF; post, hanger L14-W14 and both diagonals inside, three angle-strip edges skipped); rivets as drawn |
+| L22 | p.90 | ENVELOPE -> drawn outline of the two 1 in. half gussets (dimension line x 257 - 979: 169 x 108 in., 121 SF); lug angle / diaphragm / bottom strut ring blocks skipped; rivets as drawn (405 per face) |
+| U22 | p.90 | ENVELOPE (3/4 default) -> 2-1/2 gusset plates of the vertical (leader on p.90; Section H: 2'-11 1/4 in. to in., outside the pin plates), 41 x 57 in.; new gussets.csv row; flag: the plate may stop at the chord bottom (the sheet does not separate it from the pin plate ends) |
+| 4-span U11 | p.64 | hidden left corner cut placed with the drawn right cut's edge distance (moved 1.2 in. outward) |
+
+Gusset LAYERS (gusset-layers.csv) re-traced in page px on zoom 2-5 crops and converted with the joint's current work point (a moved work point had shifted the stored
+inch outlines): 3-span L8 / L8' (corner cuts and top edge 1.5-2.5 in.), 4-span L20 (bottom edge 2.4 in. too low), 4-span L0 / 3-span L0' (top edge 2.3 in., slope start 3.5 in.),
+4-span L10 (top edge to x 1426 + edge square to the diagonal; was a 30 deg edge ending 14 in. early), main L10 (the 1/2 plate lay 5 in. low and 3 in. narrow), main L22 (1 1/8 splice gusset:
+vertical edges, 45 deg top corners, lower edges to the chord bottom). Main L11 outer layer unchanged (whole-joint clip box).
+
+Still ENVELOPE: main L11 / L11' only (p.80). Why: the river pier joint is drawn with the 1 1/8 + 3/4 + 3/4 gusset stack, the 2'-0 radius corners, the bottom strut / lateral plates
+(34 x 7/8 outside, 31 1/2 x 1/2 inside), the sway diagonal connection and the 2-Ls 5 x 3 1/2 lateral angles all on the same lines; at zoom 2.2 every candidate edge belongs to
+one of those connection plates and no closed gusset edge can be followed round the joint (the step positions of the 3/4 layers are dimensioned in three lines whose ends are not
+plate edges). Its rivets stay the hand counts of rivet-counts-extra.csv on the count grid.
+Uniform (count-based) rivets: main L11 / L11' only. All other main / approach joints: rivets as drawn.
+Other dimension-only flags that stay: every drawn outline is drawn, not dimensioned (scaled +-1 in.); 'similar to' joints (main L1, L19, L21, U21, approach) take the
+drawn joint's outline - the sheets do not draw them.
+Remaining DIFF from the outlines: 4-span U11' (mirrored half, both units): -1.36 in. The sheet draws U11 only; U11' is the mirror image on the opposite grade, where the diagonals
+meet the chord about 1.7 deg steeper / flatter (panel points 8.21 ft apart, chord rising 0.25 ft per panel): the diagonal rivets follow the model diagonal, the mirrored outline does not
+turn with it. Not a reading error; not changed (would need a drawn U11').
+
+Check script: check-truss-ptc-approach no longer counts the 3-span outside flange splice plates (approach-splices.csv layers) as a second gusset (2 DIFF rows -> PASS).
+
+Results (whole run order truss-ptc-arch -> ... -> girder-details-ptc -> rivets-ptc on a copy of the committed model; before = the committed model):
+- Checks: check-truss-ptc 580 / 39 -> 608 PASS / 11 DIFF (all 28 outline rows PASS; main joints with a drawn outline 164 -> 176 of 184 joint x plane, envelope area 622 -> 181 SF per face),
+  check-truss-ptc-approach 1790 / 18 -> 1792 / 16 (left: 4-span U11' in both units, see above, and the steel weight rows), check-girders-ptc 131 / 6, check-ptc-delaware-river 391 / 35 (unchanged).
+- Steel: main gusset plates (all layers) 699,887 -> 762,501 lb; main spans 14.51 -> 14.56 M lb (91.1 -> 91.4 % of p.42); whole bridge 35.74 -> 35.80 M lb (91.0 -> 91.1 %).
+  Rivets 505,132 -> 511,230 (main 125,056 -> 131,154: L13 / L14 / L22 / U22 / L15 / L16 now as drawn), heads 206,229 lb.
+- Clash (`sbm clash --bolts`): non-bolt rows 4,138 -> 4,130; gusset non-bolt rows 416 -> 408 (4-span L10' / L20 gusset x shoe sole plate 36 -> 32 per unit; the rest unchanged:
+  approach gussets x sole plates / pins / shoe bodies at the pier joints (the drawn extension round the shoe pin reaches over the shoe), approach floor beam / vertical ends,
+  main 8 x hanger); no main-truss gusset x chord / web member rows. Gusset x rivet rows (rivets through the plates, expected) 193,072 -> 197,624.
+- IFC (Parametric): 263.3 -> 264.9 MB, 2,666,187 -> 2,690,377 entities; validate_ifc 0 schema + 0 EXPRESS issues (2,000 instances per type).
+- Tests 589 passed (no generator change).

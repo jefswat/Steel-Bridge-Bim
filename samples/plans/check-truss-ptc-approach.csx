@@ -295,9 +295,16 @@ foreach (var u in units)
                 Cmp($"gusset stack thickness {gs.Plane} {gs.Point} (p.{e.pg})", e.tot, gs.TotalThickness / 0.0254, 1.0 / 64, " in", "", 4);
                 for (int k = 1; k < gs.Layers; k++) Row("INFO", $"gusset layer {k + 1} area {gs.Plane} {gs.Point} (outline scaled, clipped to the inner gusset envelope)", "-", $"{gs.Areas[k] / 0.09290304:F1} SF per plate (inner {gs.Areas[0] / 0.09290304:F1} SF)");
             }
-            else { single++; if (gs.Layers == 1) singleOk++; }
+            else
+            {
+                // flange splice plates outside the gussets (connections-ptc section 6, approach-splices.csv: built as layers, ClipToGusset off) are splice material,
+                // not gusset plates (2026-10-22: they were counted as a second gusset here)
+                int spl = bdef.Truss.Joints.Where(j => j.Point == gs.Point && (j.Plane.Length == 0 || j.Plane == gs.Plane)).SelectMany(j => j.GussetLayers ?? new())
+                    .Count(l => l.Source.StartsWith("approach-splices.csv"));
+                single++; if (gs.Layers - spl == 1) singleOk++;
+            }
         }
-        Cmp("joints with ONE gusset per face (all joint sheets re-checked 2026-10-20)", single, singleOk, 0, "", "", 0);
+        Cmp("joints with ONE gusset per face (all joint sheets re-checked 2026-10-20; outside flange splice plates not counted)", single, singleOk, 0, "", "", 0);
 
         // gusset outlines (gusset-outlines.csv, connections-ptc.csx 4b) and rivet cover: every joint rivet inside its inner gusset with its edge distance
         {
