@@ -185,6 +185,7 @@ public static class SteelClashCheck
             }
             string sta = units != null ? units.FormatStation(so.Station) : so.Station.ToString("F3");
             string off = units != null ? units.FormatLength(so.Offset) : so.Offset.ToString("F3");
+            if (gname.Length == 0) { c.Location = $"Sta {sta}, offset {off}"; continue; } // no framing girders (truss / arch / segmental bridges)
             string dist = units != null ? units.FormatLength(Math.Sqrt(best), Units.LengthKind.Short) : Math.Sqrt(best).ToString("F3");
             c.Location = $"Sta {sta}, offset {off}, girder {gname} ({dist} from its web CL)";
         }
