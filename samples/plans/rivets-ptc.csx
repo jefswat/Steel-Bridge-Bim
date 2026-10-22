@@ -104,7 +104,7 @@ var similar = new Dictionary<(string st, string pt), (string st, string pt, stri
     [("approach4", "L3")] = ("approach4", "L1", "p.60"), [("approach4", "L5")] = ("approach4", "L1", "p.61"), [("approach4", "L7")] = ("approach4", "L1", "p.62"),
     [("approach4", "L9")] = ("approach4", "L1", "p.62"), [("approach4", "L11")] = ("approach4", "L1", "p.64"), [("approach4", "L13")] = ("approach4", "L1", "p.64"),
     [("approach4", "L17")] = ("approach4", "L1", "p.66"), [("approach4", "L19")] = ("approach4", "L1", "p.66"),
-    [("main", "L1")] = ("main", "L3", "p.74"), [("main", "L16")] = ("main", "L15", "p.86"), [("main", "L19")] = ("main", "L18", "p.88"),
+    [("main", "L1")] = ("main", "L3", "p.74"), [("main", "L19")] = ("main", "L18", "p.88"),
     [("main", "U21")] = ("main", "U20", "p.89"), [("main", "L21")] = ("main", "L20", "p.89"),
 };
 // in-plane members of the first bridge of each structure (member classes of a source joint)
@@ -123,8 +123,8 @@ var posOf = File.Exists(Path.Combine(dataDir, "rivet-positions.csv"))
     ? Csv("rivet-positions.csv").GroupBy(r => (SKey(r["structure"]), r["joint"], r["member"], r["region"])).ToDictionary(g => g.Key, g => g.Select(r => (u: double.Parse(r["u_in"], inv), v: double.Parse(r["v_in"], inv),
         t: Num(r.GetValueOrDefault("t_in") ?? ""), y: Num(r.GetValueOrDefault("y_in") ?? ""))).ToList())
     : new Dictionary<(string, string, string, string), List<(double u, double v, double? t, double? y)>>();
-// joints whose outline work point is not on the drawn chord centre (rivet-count-zones.csv BAND rows: main L15, drawn work point at the top of the chord
-// field) keep the count-based grid: their drawn positions cannot be put on the model members reliably
+// joints whose outline work point is not on the drawn chord centre (rivet-count-zones.csv BAND rows) keep the count-based grid: their drawn positions
+// cannot be put on the model members reliably (none since 2026-10-22: the main L15 work point was re-read on the working-line crossing, L16 has its own outline)
 var bandJoints = Csv("rivet-count-zones.csv").Where(r => r["member"] == "BAND").Select(r => (SKey(r["structure"]), r["joint"].Trim())).ToHashSet();
 var drawnDeg = Csv("gusset-outlines.csv").ToDictionary(r => (SKey(r["structure"]), r["joint"].Trim()), r => double.Parse(r["drawn_chord_deg"], inv));
 // mean chord direction at a model point in the sheet-like frame (u' = sign x model u), degrees in (-90, 90] (as connections-ptc.csx ChordDeg)
