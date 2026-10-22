@@ -116,11 +116,17 @@ foreach (var (bname, first, nSpans, planC, planS, planCY) in specs)
     // brackets B1 (p.45 note: as the approach truss spans, p.55: 10'-9 cantilever = S1 + 8 in., 2'-0 1/2 b. to b. of angles at the tip; flagged)
     {
         var br = tm.Steel.Parts.First(p => p.Mark == $"S-B1-{first}-1");
-        var pos = br.Mesh.Positions.Select(v => (o: al0.Inverse(v.XY).Offset, z: v.Z)).ToList();
+        // the bracket is set normal to grade (p.43 / p.44 notes, TRUSS-DESIGN.md section 25): its depth is measured along the leaning section (normal to the
+        // grade at its station), not vertically (the 14 in. cover tilts with the grade)
+        double brSta = br.Mesh.Positions.Average(v => al0.Inverse(v.XY).Station);
+        double gB = al0.Profile.GradeAt(brSta);
+        var tanB = SBM.Core.Geometry.Vec2.FromAngle(al0.AngleAt(brSta));
+        var nB = new SBM.Core.Geometry.Vec3(-gB * tanB.X, -gB * tanB.Y, 1) * (1 / Math.Sqrt(1 + gB * gB));
+        var pos = br.Mesh.Positions.Select(v => (o: al0.Inverse(v.XY).Offset, z: SBM.Core.Geometry.Vec3.Dot(v, nB))).ToList();
         double tip = pos.Max(q => q.o);
         var atTip = pos.Where(q => q.o > tip - 0.02).ToList();
-        Cmp("bracket B1 tip from the CL: 29'-0 + 10'-9 = S1 + 8 in. (p.45 -> p.55 / p.48)", 39.75, tip / ft, 0.04, " ft", "end cut square to the crowned bracket axis: its top corner reaches 3/8 in. further", 4);
-        Cmp("bracket B1 depth at the tip: 2'-0 1/2 b. to b. of angles + 1/2 cover plate (p.45 -> p.55)", 25.0 / 12, (atTip.Max(q => q.z) - atTip.Min(q => q.z)) / ft, 0.01, " ft", "", 4);
+        Cmp("bracket B1 tip from the CL: 29'-0 + 10'-9 = S1 + 8 in. (p.45 -> p.55 / p.48)", 39.75, tip / ft, 0.04, " ft", "tip cut in a vertical plane (section 25)", 4);
+        Cmp("bracket B1 depth at the tip: 2'-0 1/2 b. to b. of angles + 1/2 cover plate (p.45 -> p.55)", 25.0 / 12, (atTip.Max(q => q.z) - atTip.Min(q => q.z)) / ft, 0.01, " ft", "measured normal to the grade", 4);
         var f2 = tm.Steel.Parts.First(p => p.Mark == $"S-F2-{first}-1");
         double o0 = f2.Mesh.Positions.Max(v => al0.Inverse(v.XY).Offset) / ft;
         Cmp("floor beam F2 end at the girder (11 in. = the girder cover plate edge; p.45 cover plates flush with the girder F.L. plate)", 29 - 11.0 / 12, o0, 0.04, " ft", "end cut square to the crowned beam axis: its bottom corner reaches 3/8 in. further", 4);

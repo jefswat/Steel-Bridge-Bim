@@ -1567,16 +1567,21 @@ public static partial class TrussGenerator
             {
                 if (!_sec.TryGetValue(line.Section, out var sec)) { Warn($"Truss: stringer line {line.Name} - section '{line.Section}' is not defined; not built."); continue; }
                 // station of every floor beam where it crosses the stringer line
-                var cross = new List<(double sta, double halfWeb, Inst fb)>();
+                // sta = station of the floor beam TOP where it crosses the line (a floor beam set normal to grade leans: its top is off the axis station; plumb
+                // beams: the same station) - stringer ends / seats; axis = the axis station (the line's From / To stations select the bays by it)
+                var cross = new List<(double sta, double halfWeb, Inst fb, double axis)>();
                 foreach (var fb in fbs)
                 {
-                    // stations of the floor beam TOP (a floor beam set normal to grade leans: its top is off the axis station; plumb beams: the same station)
-                    var ia = _al.Inverse((fb.A + fb.Y * fb.Sec.YMax).XY); var ib = _al.Inverse((fb.B + fb.Y * fb.Sec.YMax).XY);
+                    var ia = _al.Inverse(fb.A.XY); var ib = _al.Inverse(fb.B.XY);
                     if (Math.Abs(ib.Offset - ia.Offset) < 1e-6) continue;
                     double k = (line.Offset - ia.Offset) / (ib.Offset - ia.Offset);
                     if (k < -0.05 || k > 1.05) continue;
-                    cross.Add((ia.Station + k * (ib.Station - ia.Station), fb.Sec.Definition.Kind == TrussSectionKind.H && fb.Sec.Definition.WebVertical || fb.Sec.Definition.Kind == TrussSectionKind.Rolled
-                        ? fb.Sec.WebThickness / 2 : fb.Sec.HalfWidth, fb));
+                    double axis = ia.Station + k * (ib.Station - ia.Station);
+                    var ta = _al.Inverse((fb.A + fb.Y * fb.Sec.YMax).XY); var tb = _al.Inverse((fb.B + fb.Y * fb.Sec.YMax).XY);
+                    double kt = Math.Abs(tb.Offset - ta.Offset) < 1e-6 ? k : (line.Offset - ta.Offset) / (tb.Offset - ta.Offset);
+                    double topSta = ta.Station + kt * (tb.Station - ta.Station);
+                    cross.Add((topSta, fb.Sec.Definition.Kind == TrussSectionKind.H && fb.Sec.Definition.WebVertical || fb.Sec.Definition.Kind == TrussSectionKind.Rolled
+                        ? fb.Sec.WebThickness / 2 : fb.Sec.HalfWidth, fb, axis));
                 }
                 cross = cross.OrderBy(c => c.sta).ToList();
                 double top = line.TopBelowGrade ?? fl.StringerTopBelowGrade;
@@ -1588,8 +1593,8 @@ public static partial class TrussGenerator
                 for (int i = 0; i + 1 < cross.Count; i++)
                 {
                     double e0 = fl.StringersOnTop ? 0 : cross[i].halfWeb + fl.StringerEndClearance, e1 = fl.StringersOnTop ? 0 : cross[i + 1].halfWeb + fl.StringerEndClearance;
-                    if (line.FromStation is { } fs0 && cross[i].sta < fs0 - 1e-6) continue;
-                    if (line.ToStation is { } ts0 && cross[i + 1].sta > ts0 + 1e-6) continue;
+                    if (line.FromStation is { } fs0 && cross[i].axis < fs0 - 1e-6) continue;
+                    if (line.ToStation is { } ts0 && cross[i + 1].axis > ts0 + 1e-6) continue;
                     if (cross[i + 1].sta - e1 - (cross[i].sta + e0) < 0.1) continue;
                     valid.Add(i);
                 }
@@ -1597,8 +1602,8 @@ public static partial class TrussGenerator
                 {
                     double e0 = fl.StringersOnTop ? 0 : cross[i].halfWeb + fl.StringerEndClearance, e1 = fl.StringersOnTop ? 0 : cross[i + 1].halfWeb + fl.StringerEndClearance;
                     double s0 = cross[i].sta + e0, s1 = cross[i + 1].sta - e1;
-                    if (line.FromStation is { } fs && cross[i].sta < fs - 1e-6) continue;
-                    if (line.ToStation is { } ts && cross[i + 1].sta > ts + 1e-6) continue;
+                    if (line.FromStation is { } fs && cross[i].axis < fs - 1e-6) continue;
+                    if (line.ToStation is { } ts && cross[i + 1].axis > ts + 1e-6) continue;
                     if (s1 - s0 < 0.1) continue;
                     if (valid.Count > 0 && i == valid[0] && line.ExtendStart > 0) s0 -= line.ExtendStart;
                     if (valid.Count > 0 && i == valid[^1] && line.ExtendEnd > 0) s1 += line.ExtendEnd;
