@@ -42,11 +42,18 @@ public static partial class TrussGenerator
 
         /// <summary>Moves every vertex of <paramref name="mesh"/> lying on the plane normal to <paramref name="dir"/> at distance <paramref name="sFrom"/> from
         /// <paramref name="o"/> to <paramref name="sTo"/> (a square member end trimmed / extended along its axis). Recipes dropped.</summary>
-        private static Mesh MoveEndFace(Mesh mesh, Vec3 o, Vec3 dir, double sFrom, double sTo)
+        private static Mesh MoveEndFace(Mesh mesh, Vec3 o, Vec3 dir, double sFrom, double sTo, Vec3 yAxis = default, double yBelow = 0, double dy = 0)
         {
+            // OPTIONAL (tapered members): vertices of the lowered part (section y below yBelow, measured along yAxis from o) also move by dy along yAxis, so the
+            // sloping bottom continues on its line
             var r = new Mesh();
             foreach (var p in mesh.Positions)
-                r.Add(Math.Abs(Vec3.Dot(p - o, dir) - sFrom) < 1e-6 ? p + dir * (sTo - sFrom) : p);
+            {
+                if (Math.Abs(Vec3.Dot(p - o, dir) - sFrom) >= 1e-6) { r.Add(p); continue; }
+                var q = p + dir * (sTo - sFrom);
+                if (dy != 0 && Vec3.Dot(p - o, yAxis) < yBelow - 1e-9) q += yAxis * dy;
+                r.Add(q);
+            }
             r.Indices.AddRange(mesh.Indices);
             return r;
         }

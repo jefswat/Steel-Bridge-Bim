@@ -532,6 +532,11 @@ public sealed class TrussEndConnection
     /// member setback). Applied once per member end (the first connection of that end that asks for it); not with a mitred / vertical end cut.</summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public double? TrimMember { get; set; }
+    /// <summary>OPTIONAL (omitted when false): the angle runs ALONG the member (a horizontal flange / seat angle at a coped end): from the back for
+    /// <see cref="Length"/> along the axis, heel underside at section y <see cref="Top"/>, the second leg up the web face (+ fill / stand-off), the first leg
+    /// outstanding horizontally on both faces. <see cref="WebRivets"/>: gage = height above the heel, First / Pitch / Count along the member from the back.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public bool HorizontalAngle { get; set; }
 }
 
 /// <summary>

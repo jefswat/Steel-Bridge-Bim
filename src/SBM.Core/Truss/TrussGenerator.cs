@@ -620,7 +620,9 @@ public static partial class TrussGenerator
                 // normal to the profile grade at the stiffener's station, in the web plane (section x = web normal)
                 double sta = StationOf(m.A + m.Axis * d);
                 var g = (Tangent(sta) + Up * _al.Profile.GradeAt(sta)).Normalized();
-                g = (g - m.X * Vec3.Dot(m.X, g)).Normalized();
+                var gw = g - m.X * Vec3.Dot(m.X, g);
+                if (gw.Length < 0.5) return (m.Axis, m.Y);      // the grade direction is not in the web plane (a member across the bridge): normal to the axis
+                g = gw.Normalized();
                 if (Vec3.Dot(g, m.Axis) < 0) g = -g;
                 var v = Vec3.Cross(m.X, g).Normalized();
                 if (Vec3.Dot(v, m.Y) < 0) v = -v;
@@ -1568,7 +1570,8 @@ public static partial class TrussGenerator
                 var cross = new List<(double sta, double halfWeb, Inst fb)>();
                 foreach (var fb in fbs)
                 {
-                    var ia = _al.Inverse(fb.A.XY); var ib = _al.Inverse(fb.B.XY);
+                    // stations of the floor beam TOP (a floor beam set normal to grade leans: its top is off the axis station; plumb beams: the same station)
+                    var ia = _al.Inverse((fb.A + fb.Y * fb.Sec.YMax).XY); var ib = _al.Inverse((fb.B + fb.Y * fb.Sec.YMax).XY);
                     if (Math.Abs(ib.Offset - ia.Offset) < 1e-6) continue;
                     double k = (line.Offset - ia.Offset) / (ib.Offset - ia.Offset);
                     if (k < -0.05 || k > 1.05) continue;
@@ -1639,7 +1642,12 @@ public static partial class TrussGenerator
                 var acr = Vec3.Cross(Up, t).Normalized();
                 double Zb(double s) => _al.ElevationAt(s, line.Offset) - top - sec.YMax + sec.YMin;   // stringer bottom on the grade line
                 // probe the steel under the plate (floor beam top, cover plates, connection material)
-                var pts = new List<(double u, double v)> { (0, 0), (-sd.Length / 2 + 0.005, -w / 2 + 0.005), (sd.Length / 2 - 0.005, -w / 2 + 0.005), (sd.Length / 2 - 0.005, w / 2 - 0.005), (-sd.Length / 2 + 0.005, w / 2 - 0.005) };
+                // a grid over the plate (9 along x 3 across): a floor beam set normal to grade has its top sloping along the stringer, its high edge can lie between
+                // the plate corners and centre
+                var pts = new List<(double u, double v)>();
+                for (int iu = 0; iu <= 8; iu++)
+                    foreach (double fv in new[] { -1.0, 0, 1 })
+                        pts.Add(((-sd.Length / 2 + 0.005) + (sd.Length - 0.01) * iu / 8, fv * (w / 2 - 0.005)));
                 var lo = new Vec3(c.X - 1, c.Y - 1, Zb(sta) - 0.6); var hi = new Vec3(c.X + 1, c.Y + 1, Zb(sta) + 0.1);
                 var pr = new SteelLineProbe();
                 for (int i = 0; i < parts.Count; i++)

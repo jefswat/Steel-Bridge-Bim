@@ -329,7 +329,10 @@ public static partial class TrussGenerator
                                 if (pi >= 0 && Math.Abs(ns - setb) > 1e-6)
                                 {
                                     var op = parts[pi];
-                                    var nm = MoveEndFace(op.Mesh, wp, din, setb, ns);
+                                    // tapered member (DepthReductionStart / End): the lowered bottom continues on its slope over the added / removed length
+                                    double rA = Math.Max(0, m.Def.DepthReductionStart), rB = Math.Max(0, m.Def.DepthReductionEnd), cut0 = (m.B - m.A).Length - m.SA - m.SB;
+                                    double kT = (rA > 0 || rB > 0) && cut0 > 1e-6 ? (rB - rA) / cut0 : 0, grow = setb - ns;
+                                    var nm = MoveEndFace(op.Mesh, wp + m.Y * zoff, din, setb, ns, m.Y, start ? rA : rB, kT == 0 ? 0 : (start ? -kT : kT) * grow);
                                     parts[pi] = CopyPart(op, nm, op.Length + setb - ns);
                                     boxes[pi] = nm.Bounds();
                                     trims.Add(setb - ns);
@@ -370,7 +373,18 @@ public static partial class TrussGenerator
                         foreach (int sx in new[] { -1, 1 })
                         {
                             double xw = sx * (tw / 2 + Math.Max(0, ec.StandOff));
-                            if (ang is { } a)
+                            if (ang is { } ah && ec.HorizontalAngle)
+                            {
+                                // horizontal angle along the member from the back: heel underside at Top, web leg up the web face, outstanding leg horizontal
+                                double xh = sx * heel, yh = ec.Top;
+                                var sec = new[] { new Vec2(xh, yh), new Vec2(xh + sx * ah.legOut, yh), new Vec2(xh + sx * ah.legOut, yh + ah.t), new Vec2(xh + sx * ah.t, yh + ah.t),
+                                    new Vec2(xh + sx * ah.t, yh + ah.legWeb), new Vec2(xh, yh + ah.legWeb) };
+                                if (MeshBuilder.SignedArea(sec) < 0) Array.Reverse(sec);
+                                var ra = sec.Select(q => P(back, q.X, q.Y)).ToArray();
+                                MeshBuilder.AddLoft(meshA, sec, new[] { ra, ra.Select(p => p + din * ec.Length).ToArray() });
+                                nAngles++;
+                            }
+                            else if (ang is { } a)
                             {
                                 double xh = sx * heel;
                                 // outstanding leg along x from the heel (back at a = back), web leg along a into the member
@@ -478,7 +492,10 @@ public static partial class TrussGenerator
                         {
                             var corners = new List<Vec3>();
                             double reachX = heel + (ang?.legOut ?? ec.PlateThickness) + 0.3;
-                            foreach (double y in new[] { yTop, yBot }) foreach (int sx in new[] { -1, 1 }) foreach (double s in new[] { back - 0.4, back + 0.6 }) corners.Add(P(s, sx * reachX, y));
+                            if (ec.HorizontalAngle && ang is { } ha)
+                            { foreach (double y in new[] { ec.Top - 0.3, ec.Top + ha.legWeb + 0.3 }) foreach (int sx in new[] { -1, 1 }) foreach (double s in new[] { back - 0.4, back + ec.Length + 0.4 }) corners.Add(P(s, sx * reachX, y)); }
+                            else
+                                foreach (double y in new[] { yTop, yBot }) foreach (int sx in new[] { -1, 1 }) foreach (double s in new[] { back - 0.4, back + 0.6 }) corners.Add(P(s, sx * reachX, y));
                             var (lo, hi) = Box(corners, 0.05);
                             var pr = Probe(lo, hi, null, null);
                             var rasu = RivetFlag(ec.RivetUnresolved, "rivet columns at the drawn pitch / gage") ?? asu;
@@ -488,8 +505,9 @@ public static partial class TrussGenerator
                                 {
                                     double y = yTop - col.First - k * col.Pitch;
                                     // stand-off connection with angles (e.g. the two webs of a box member): one rivet per side through the angle leg and its web;
-                                    // otherwise one rivet through angle - web - angle from the web centre
-                                    var starts = ec.StandOff > 0 && ang is { } aw ? new[] { P(back + col.Gage, -(heel + aw.t / 2), y), P(back + col.Gage, heel + aw.t / 2, y) } : new[] { P(back + col.Gage, 0, y) };
+                                    // otherwise one rivet through angle - web - angle from the web centre; a horizontal angle: gage = height above the heel, rows along the member
+                                    var starts = ec.HorizontalAngle ? new[] { P(back + col.First + k * col.Pitch, 0, ec.Top + col.Gage) }
+                                        : ec.StandOff > 0 && ang is { } aw ? new[] { P(back + col.Gage, -(heel + aw.t / 2), y), P(back + col.Gage, heel + aw.t / 2, y) } : new[] { P(back + col.Gage, 0, y) };
                                     foreach (var q in starts)
                                     {
                                         if (pr.At(q, Xv, 0.5) is not { } iv) { nNoWeb++; if (missed.Count < 3) missed.Add($"{lbl} at {where}, column {L(col.Gage)} from the back, {L(yTop - y)} below the top"); continue; }
@@ -497,7 +515,7 @@ public static partial class TrussGenerator
                                         nRiv++;
                                     }
                                 }
-                            if (ang is { } a2)
+                            if (ang is { } a2 && !ec.HorizontalAngle)
                                 foreach (var col in ec.OutRivets ?? new())
                                     foreach (int sx in new[] { -1, 1 })
                                         for (int k = 0; k < col.Count; k++)
@@ -552,7 +570,7 @@ public static partial class TrussGenerator
             if (nOutFill > 0) Info($"Truss: end connections - {nOutFill} fills under the outstanding legs where the angles stand off the post / hanger face (probed, {L(outFillT.Min())} - {L(outFillT.Max())}){(outFillCmp.Count > 0 ? "; vs plan: " + string.Join("; ", outFillCmp.Distinct().Take(6)) : "")}{Src}.");
             if (nLoose > 0) Warn($"Truss CHECK end connections: {nLoose} rivets through the outstanding legs find no steel behind the leg (gap to the post / girder face over 1 mm; fills not drawn?) - placed with the leg as grip{Src}.");
             if (backs.Count > 0) Model.ConnectionBacks.AddRange(backs);
-            if (trims.Count > 0) Info($"Truss: end connections - {trims.Count} member ends moved to the probed connection face + clearance (TrimMember; shortened up to {L(Math.Max(0, trims.Max()))}, lengthened up to {L(Math.Max(0, -trims.Min()))}){Src}.");
+            if (trims.Count > 0) Info($"Truss: end connections - {trims.Count} member ends moved to the probed connection face + clearance (TrimMember; lengthened up to {L(Math.Max(0, trims.Max()))}, shortened up to {L(Math.Max(0, -trims.Min()))}){Src}.");
             if (nHoles + _notchHolesCut > 0 || _notchCount > 0)
                 Info($"Truss: member ends - {_notchCount} notches on {_notchMembers} members, {nHoles + _notchHolesCut} round holes cut ({_notchHolesCut} in member webs, {nHoles} in end connection plates / web extensions){Src}.");
         }
