@@ -145,7 +145,7 @@ var report = new List<string>();
         $"they are listed per joint without extents ({nSkip} splice / fill callouts have no length in splices.csv)", "chord cover / web splice plates and fills with a scaled length are built (connections-ptc.csx); the rest is not built."));
 }
 
-// ================================================================ 2. girder spans: stiffeners and the mid-span web splice (p.43 / p.44)
+// ================================================================ 2. girder spans: stiffeners (fills, crimps, rivets), the two web splices and the longitudinal stiffener (p.43 / p.44)
 foreach (var name in new[] { "PTC Girder spans 1-10", "PTC Girder spans 28-31" })
 {
     var br = Doc.Project.Bridges.First(b => b.Name == name);
@@ -155,9 +155,19 @@ foreach (var name in new[] { "PTC Girder spans 1-10", "PTC Girder spans 28-31" }
     if (tm == null) { report.Add($"{name}: no truss model"); continue; }
     double hStiff = FI(9, 6.5) - 2 * In(1.125);    // between the outstanding legs of the flange angles (9'-6 1/2 b.b. Ls - 2 x 1 1/8)
     double hSplice = In(114.5 - 2 * 8 - 0.5);        // between the vertical legs of the flange angles (UNRESOLVED: not printed)
-    string stiffFlag = U("p.43, p.44", "stiffener layout", "the elevation gives the stiffeners as equal spaces per floor beam panel (9 / 6 / 6 / 9) and the sizes (end 4-Ls 7x4x3/4 + 2-Fills 15x1 1/8, intermediate 2-Ls 6x4x7/16 crimped, 2-Ls 6x4x1/2 at the floor beams) without station dimensions; fills, crimps and the longitudinal stiffener L 6x4x7/16 are drawn only",
-        "end stiffeners 2 angles per web face at the CL bearing, intermediate pairs at the equal spaces of each panel between the CL bearing / floor beam lines, 6x4x1/2 pairs at the floor beams; height between the flange angle outstanding legs (9'-4 1/4); fills / crimps / long stiffener not built.");
-    string splFlag = U("p.44", "mid-span web splice", "2-Splice Pls 21 x 3/8 are printed centred on the splice; their height is drawn between the flange angle legs, not dimensioned; the flange-angle splice plates 6 1/4 x 3/8 are not built", "21 x 3/8 plate each web face, 8'-2 high (114 1/2 - 2 x 8 - 1/2), centred at mid-length.");
+    double hFill = In(114.5 - 2 * 8 - 0.25);          // fills / crimp zone between the flange angle vertical leg toes (1/8 in. clear each end)
+    TrussRivetColumn RC(double gIn, double hIn0, double pitchIn, double firstIn) => new TrussRivetColumn(In(gIn), (int)Math.Floor((hIn0 - 2 * firstIn) / pitchIn + 1e-9) + 1, In(pitchIn), In(firstIn));
+    // stiffener ends clear of the flange angle root fillets (3/8 in.; plumb stiffeners 1/2 in.: they lean 3 % against the girder on the grade), plumb fills 1/4 in. shorter
+    double hInt = hStiff - In(0.75), hPl = hStiff - In(1), hFillP = hFill - In(0.5);
+    double hIn = hInt / In(1), hInP = hPl / In(1);
+    string stiffFlag = U("p.43, p.44", "stiffener layout", "the elevation gives the stiffeners as equal spaces per floor beam panel (9 / 6 / 6 / 9) and the sizes (end 4-Ls 7x4x3/4 + 2-Fills 15x1 1/8, intermediate 2-Ls 6x4x7/16 crimped, 2-Ls 6x4x1/2 + 2-1 1/8 fills at the floor beams) without station dimensions",
+        "end stiffeners 2 angles per web face at the CL bearing (7 in. legs on the web on 15 x 1 1/8 fills, 4 in. legs outstanding: the 15 in. fill and the two rivet lines per angle drawn on p.44), intermediate pairs at the equal spaces of each panel between the CL bearing / floor beam lines (crimped over the 1 1/8 flange angle legs), 6x4x1/2 pairs on 1 1/8 fills at the floor beams; height between the flange angle outstanding legs (9'-4 1/4), fills / crimp zone between the flange angle leg toes.");
+    string stiffRivFlag = U("p.44", "stiffener rivets", "the elevation draws the stiffener rivets (1 in. carbon, girder note p.44) without pitch or gage",
+        "end stiffeners 2 staggered lines per angle at 2 1/2 / 5 in. from the heel, 4 in. pitch; floor beam stiffeners 1 line at 2 1/4 in., 5 in. pitch; intermediate stiffeners 1 line at 2 1/4 in., 7 in. pitch (the p.43 maximum pitch); first rivet 2 in. from the stiffener ends.");
+    string splFlag = U("p.43, p.44", "web splices", "p.43 marks two web splices ('CL Splice') in the 6-equal-space panels, 4 spaces from the middle floor beam (scaled 19.6 ft from it vs 20'-3 1/4 for 4 spaces); p.44 prints 2-Splice Pls 21 x 3/8 centred on the splice with the crimped stiffener beside it on 2-Fills 4 x 3/8 and 2-Splice Pls 6 1/4 x 3/8 on the flange angles; the plate height and the rivet pattern are drawn, not dimensioned",
+        "21 x 3/8 plate each web face, 8'-2 high (114 1/2 - 2 x 8 - 1/2), centred on the 4th intermediate stiffener position from the middle floor beam in both middle panels (that stiffener beside the plate on the middle floor beam side, on 3/8 fills); 3 rivet lines each side of the joint at 1 3/4 / 4 3/4 / 7 3/4 in., 3 1/2 in. pitch; the 6 1/4 x 3/8 flange angle splice plates not built.");
+    string longFlag = U("p.44", "longitudinal stiffener L 6 x 4 x 7/16 (C) on the inside of the girder", "the elevation draws it between the transverse stiffeners in every panel (end, floor beam and splice panels) with one rivet line, without its height",
+        "4 in. leg on the web hanging from its heel 2'-5 1/2 below the back of the top flange angles (scaled), 6 in. leg outstanding toward the CL bridge, from end stiffener to end stiffener, interrupted 1/2 in. clear of every transverse stiffener / fill / splice plate, 1 in. rivets at 7 in. (the drawn pitch) 2 1/4 in. below the heel.");
     int nG = 0;
     foreach (var m in t.Members.Where(mm => mm.Role == TrussMemberRole.Girder))
     {
@@ -174,19 +184,38 @@ foreach (var name in new[] { "PTC Girder spans 1-10", "PTC Girder spans 28-31" }
         int[] spaces = { 9, 6, 6, 9 };
         for (int p = 0; p < 4; p++)
             for (int i = 1; i < spaces[p]; i++) inter.Add(bA + p * pitch + i * pitch / spaces[p]);
+        // web splices: 4 spaces from the middle floor beam in both middle panels (p.43 'CL Splice')
+        double sp1 = bA + 2 * pitch - 4 * pitch / 6, sp2 = bA + 2 * pitch + 4 * pitch / 6;
+        inter.RemoveAll(x => Math.Abs(x - sp1) < 0.01 || Math.Abs(x - sp2) < 0.01);
+        double halfPl = In(10.5) + In(1.0 / 16);
         m.Stiffeners = new List<TrussStiffenerSet>
         {
-            new() { Label = "end stiffeners 4-Ls 7x4x3/4", Angle = "L7x4x3/4", PerFace = 2, Height = hStiff, Distances = new() { D(bA), D(bB) }, Material = "S", Source = "p.44", Unresolved = stiffFlag },
-            new() { Label = "stiffeners 2-Ls 6x4x1/2 at the floor beams", Angle = "L6x4x1/2", PerFace = 1, Height = hStiff, Distances = fbs.Select(D).ToList(), Material = "C", Source = "p.44", Unresolved = stiffFlag },
-            new() { Label = "intermediate stiffeners 2-Ls 6x4x7/16", Angle = "L6x4x7/16", PerFace = 1, Height = hStiff, Distances = inter.Select(D).ToList(), Material = "C", Source = "p.44", Unresolved = stiffFlag },
-            new() { Label = "web splice 2-Pls 21 x 3/8", PlateWidth = In(21), PlateThickness = In(0.375), Height = hSplice, Distances = new() { L3 / 2 }, Material = "S", Source = "p.44", Unresolved = splFlag },
+            new() { Label = "end stiffeners 4-Ls 7x4x3/4", Angle = "L4x7x3/4", PerFace = 2, Height = hPl, Distances = new() { D(bA), D(bB) }, Material = "S", Source = "p.44", Unresolved = stiffFlag,
+                FillThickness = In(1.125), FillWidth = (In(15) - In(7.0 / 16)) / 2, FillHeight = hFillP,
+                Rivets = new() { RC(2.5, hInP, 4, 2), RC(5.0, hInP, 4, 4) }, RivetDiameter = In(1), RivetUnresolved = stiffRivFlag },
+            new() { Label = "stiffeners 2-Ls 6x4x1/2 at the floor beams", Angle = "L6x4x1/2", PerFace = 1, Height = hPl, Distances = fbs.Select(D).ToList(), Material = "C", Source = "p.44", Unresolved = stiffFlag,
+                FillThickness = In(1.125), FillHeight = hFillP, Rivets = new() { RC(2.25, hInP, 5, 2) }, RivetDiameter = In(1), RivetUnresolved = stiffRivFlag },
+            new() { Label = "intermediate stiffeners 2-Ls 6x4x7/16", Angle = "L6x4x7/16", PerFace = 1, Height = hInt, Distances = inter.Select(D).ToList(), Material = "C", Source = "p.44", Unresolved = stiffFlag,
+                CrimpThickness = In(1.125), CrimpHeight = hFill, Rivets = new() { RC(2.25, hIn, 7, 2) }, RivetDiameter = In(1), RivetUnresolved = stiffRivFlag },
+            new() { Label = "web splice 2-Pls 21 x 3/8", PlateWidth = In(21), PlateThickness = In(0.375), Height = hSplice, Distances = new() { D(sp1), D(sp2) }, Material = "S", Source = "p.43 / p.44", Unresolved = splFlag,
+                Rivets = new[] { -7.75, -4.75, -1.75, 1.75, 4.75, 7.75 }.Select(g => RC(g, hSplice / In(1), 3.5, 2)).ToList(), RivetDiameter = In(1), RivetUnresolved = splFlag },
+            new() { Label = "intermediate stiffeners 2-Ls 6x4x7/16 beside the web splice (2-Fills 4 x 3/8)", Angle = "L6x4x7/16", PerFace = 1, LegToward = 1, Height = hInt, Distances = new() { D(sp1) + halfPl }, Material = "C", Source = "p.44", Unresolved = splFlag,
+                FillThickness = In(0.375), FillHeight = hFill, CrimpThickness = In(1.125), CrimpHeight = hFill, Rivets = new() { RC(2.25, hIn, 7, 2) }, RivetDiameter = In(1), RivetUnresolved = stiffRivFlag },
+            new() { Label = "intermediate stiffeners 2-Ls 6x4x7/16 beside the web splice (2-Fills 4 x 3/8), second splice", Angle = "L6x4x7/16", PerFace = 1, LegToward = -1, Height = hInt, Distances = new() { D(sp2) - halfPl }, Material = "C", Source = "p.44", Unresolved = splFlag,
+                FillThickness = In(0.375), FillHeight = hFill, CrimpThickness = In(1.125), CrimpHeight = hFill, Rivets = new() { RC(2.25, hIn, 7, 2) }, RivetDiameter = In(1), RivetUnresolved = stiffRivFlag },
+        };
+        m.LongitudinalStiffeners = new()
+        {
+            new TrussLongitudinalStiffener { Label = "long. stiffener L 6x4x7/16 (C) on the inside of the girder", Angle = "L6x4x7/16", Side = 0, Y = In(57.25) - FI(2, 5.5), LegDown = true,
+                From = D(bA), To = D(bB), Clearance = In(0.5), RivetPitch = In(7), RivetGage = In(2.25), RivetEdge = In(1.5), RivetDiameter = In(1), RivetMaterial = "1 in carbon steel rivet",
+                Material = "C", Source = "p.44", Unresolved = longFlag },
         };
         nG++;
     }
     var g1 = t.Section("G1");
-    if (g1 != null) g1.Unresolved = U("p.43, p.44", "full length cover plate splice, flange angle splice plates, fills, longitudinal stiffener, rivets",
-        "the cover plate splice (CL 37'-0 from the CL girder + 6'-0 additional material), the 6 1/4 x 3/8 flange angle splice plates, the stiffener fills / crimps, the long stiffener L 6x4x7/16 and the rivet patterns are drawn / listed but not dimensioned station by station",
-        "built: web, 4 flange angles, the cover plates, stiffeners and the web splice plates (connections-ptc.csx); not built: the items listed.");
+    if (g1 != null) g1.Unresolved = U("p.43, p.44", "flange angle splice plates at the web splices",
+        "the 2-Splice Pls 6 1/4 x 3/8 on the flange angles at the web splices are drawn without their length",
+        "built: web, 4 flange angles, the cover plates (the F.L. plate splices 37'-0 each side of the CL lie under the 86'-0 plate, whose last 6'-0 each end is the 'additional material for splice', p.44: no extra plate), stiffeners with fills / crimps, the web splices and the longitudinal stiffener (connections-ptc.csx); not built: the flange angle splice plates.");
     report.Add($"{name}: stiffeners + web splice on {nG} girder members");
 }
 

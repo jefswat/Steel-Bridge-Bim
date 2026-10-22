@@ -657,6 +657,72 @@ Results (whole PTC run order on a copy of the committed model, before = the comm
   there (e.g. L6 fills 7/16, L15 18 x 1 web plates 1/2 in. vs L14-L15). That is the chord end-cut rule, not the plate stacking; reported, not changed.
 - IFC (Parametric): 234.0 -> 234.1 MB, 2,472,827 entities; validate_ifc 0 schema + 0 EXPRESS issues (2,000 instances per type). Tests 578 -> 580 passed.
 
+## 22. Girder spans steel, CL walkways, pier 18 / 19 fenders (2026-10-21; scripts `connections-ptc.csx`, `floor-connections-ptc.csx`, `girder-details-ptc.csx` (new, run after details-ptc, before rivets-ptc), `walkways-ptc.csx`, `substructure-ptc.csx`)
+
+Generic code (all OPTIONAL, omitted from the .sbm when unset; other models unchanged; tests `TrussTests.LongitudinalStiffener_StopsAtStiffeners_StringerExtension_ClipAnglePair`,
+`SpliceStations_PickTheCrossingsNearTheGivenStations`, `SupportLinesOnlyTests.PlanSubstructure_TimberFenderSolid_NotConcrete_NoExtents_IfcFender`):
+- `TrussMemberDefinition.LongitudinalStiffeners` (`TrussLongitudinalStiffener`, new file `Truss/TrussGeneratorLongStiffeners.cs`): an angle along the member on one web face
+  (`Side` 0 = the face toward the alignment), heel at section y, from / to distances, interrupted at every `TrussStiffenerSet` (their legs / fills / plates at that height,
+  plumb stiffeners measured at the height) + clearance, rivets centred in every piece at a pitch (grips probed).
+- `TrussStiffenerSet.CrimpThickness / CrimpHeight`: crimped stiffener angles (middle zone on the web / fill, end zones stood off over the flange angle legs).
+- `TrussStringerLine.ExtendStart / ExtendEnd`: the first / last stringer piece continues past its floor beam (to a dam diaphragm).
+- `TrussStringerSpliceDefinition.Stations`: splices at the floor beam crossings near given stations (a line crossing two floor beam halves at one station: once).
+- `TrussClipAngles.PairHeelU`: a second clip angle straddling the item web (2-Ls on a framed WF diaphragm).
+- `PlanSolidDefinition.Material / Density` + `SubElementKind.Fender` (appended): non-concrete plan-drawn solids (timber, steel H piles; `SubSolid.Material / Density`);
+  fender solids do not set the unit's plan extents; IFC `IfcImpactProtectionDevice .FENDER.` (timber surface style), database "fender", viewport / projection layer 3D-SUB-FENDER.
+
+### 22.1 Girder spans 1-10 / 28-31 (p.43-46)
+| Item | Sheet | Model |
+|---|---|---|
+| End stiffeners 4-Ls 7x4x3/4 | p.44 elevation: two rivet lines per angle, '2-Fills 15 x 1 1/8' (= 2 x 7 + the floor beam web) | 7 in. legs ON the web (they were outstanding) on 1 1/8 fills between the flange angle toes, 4 in. legs outstanding each side of the floor beam web; 2 staggered 1 in. rivet lines @ 4 in.; corner plates / fills of the floor beam end connection moved clear of the new legs (floor-connections-ptc) |
+| Floor beam stiffeners 2-Ls 6x4x1/2 | p.44 '2-1 1/8 Fills' | on 1 1/8 fills, 1 line @ 5 in. |
+| Intermediate stiffeners 2-Ls 6x4x7/16 (Crimp) | p.44 | crimped 1 1/8 over the flange angle legs, 1 line @ 7 in.; all stiffener ends 3/8 in. (plumb ones 1/2 in.) clear of the flange angle root fillets |
+| Web splices | p.43 'CL Splice' twice, in the 6-space panels 4 spaces from the middle floor beam (scaled 19.6 ft vs 20'-3 1/4); p.44 2-Pls 21 x 3/8, stiffener beside it on 2-Fills 4 x 3/8 | moved from mid-span (where it sat on the middle floor beam stiffener) to both splice positions; 3 lines each side @ 3 1/2 in.; flange angle splice plates 6 1/4 x 3/8 not built (no length) |
+| Longitudinal stiffener L 6x4x7/16 (C) | p.44 'on inside of girder', between every pair of transverse stiffeners | heel 2'-5 1/2 below the back of the top angles (scaled), 4 in. leg on the web, 1 in. rivets @ 7 in. |
+| F.L. cover plate splice | p.44 'additional material 6'-0', 37'-0 to the CL girder | the 86'-0 top plate already ends 43'-0 = 37 + 6 from the CL: its last 6'-0 IS the splice material; nothing added |
+| Tension plates 16 1/2 x 3/4 | p.44 Section A, p.45 plan: over the girder at every floor beam / bracket, 1 1/8 H.S. rivets, 13/16 fills 'omit at 1/4 point' | 4'-3 long (scaled), level along the bridge on the crown, bottom 1/32 in. over the highest steel under it (probed), fills = the gap on the floor beam / bracket sides at the quarter / middle floor beams, 2 x 5 rivets each side (140 plates, 168 fills) |
+| Stringer splices | p.43 stringer diagram 'CL Stringer Splice' at the middle support, p.45 details | at the middle floor beam of every span, plates / rivets as the approach (154 splices) |
+| Dam diaphragms at piers 1-9 / 28-30 | p.46 Section A (stringer ends 11 1/4 apart at 68 F, 18 WF 64 web 5 1/2 inside them, 2-Ls 4x4x7/16), elevation (1-Pl 11 x 3/4, 10 3/4 from the grade) | W18x65 dims at 64 lb/ft, 3 7/8 in. beyond the end floor beam CL, between the stringer webs, 1-Pl 11 x 3/4 on top, clip angle pairs; stringers continued 9 3/8 in.; outer (21 WF) bays shallower (flag); 'Pc. 18 WF 64' finger supports, 12 [ 35 curb channels, bulkheads, anchor bars not built (drawn only) |
+| CL inspection walk | p.43 Section A-A 'CL of inspection walk' 2'-0, p.44 'omit walkway manholes in end floor beams adjacent to abutments' | built with the p.101 walkway details (see 22.2), abutment end floor beam to the deck end at pier 10 / 27 |
+
+Not built (reason): flange angle splice plates (no length), dam finger supports / curb channels / bulkheads / anchor bars (drawn only), abutment diaphragms and the stringer detail at the
+abutments (p.45, not dimensioned), stringer bearing / tension plate details, signal / light pole bracket extensions (DRB-6, not in the set), camber. Plan conflict noted, not changed:
+p.43 / p.44 'floor beams and stiffener Ls shall be set normal to grade' - the model's floor beams and the stiffeners at them are plumb.
+
+### 22.2 CL walkways (task: walkway clashes)
+The ~150 clash rows (approach hanger bracing / turned sway members and their angles vs the CL walkway, main floor lateral plates / edge angles vs the W15-W15' walkway)
+came from a wrong walkway position, not from the bracing: the model had the CL walkway centred 1'-0 north of the CL at the floor beam bottom, running through the floor
+beam webs, its south channel on the CL where the hanger bracing stands. The sheets: p.106 plan of walkway at W15 '1'-0 | Walkway 2'-0' from the CL bridge; p.101 floor beam
+elevation: manhole and walk 2'-0 from the CL, the walk channels seated on the bottom flange between the floor beams (connected to the webs, manhole above); p.106 expansion
+detail at piers 17 / 20: main span channel bottom 2'-2 1/2 above the floor beam bottom; p.43 Section A-A 2'-0 for the girder spans. Corrected in walkways-ptc.csx: centred 2'-0
+north, pieces from web to web (1 3/4 in. clear of the web CL), channels on the probed bottom flange stack (+1/4 in. for the grade) / 2'-2 1/2 above the main floor beam bottom;
+north cross walks end at the CL walkway (3'-0 north), the main cross walks at W15 / W20 / W19' / W15' stop at its edges; posts / rails / grating without internal overlaps
+(rails on the outer face of the posts, grating under the channel top flanges). Item 14 / 15 per p.42: girder spans grating 2,405 / 959 SF (2,510 / 1,010), walkway steel
+92 k / 37 k lb (83 k / 33 k: grating 7 psf assumed); the approach / main values change by < 1 %.
+
+### 22.3 Fenders and dolphins at piers 18 / 19 (p.25 DRB-1/9)
+The sheet dimensions the system: half plan symmetrical about the CL bridge, the channel face fendered (east of pier 18, west of pier 19, opposite hand), the front row of piles
+2'-9 1/2 + 8 @ 5'-7 to the P.C. (47'-5 1/2), then R = 130'-0 along the front row (arc spacings 5'-7 x 3, 8'-10 x 2, 7'-10 x 6, 7'-3 x 3) to a 19 pile dolphin 143'-9 from the
+CL bridge and 21'-9 across the pier CL; Section F-F: 4 x 12 sheeting El +10.0 to -8.0, 12 x 12 wales +8.5 / +3.5 / -1.5 / -6.5 outside and +5.5 / +0.5 / -4.5 inside the 12 x 12 posts
+(+9.5 to -7.5), spreaders, 5'-0 fender face to pier face at El +12.0; Section G-G: 2-12 x 12 posts on 12 H 74 fender piles (slab top El -15.0); dolphins: inside piles to +13.0,
+outside to +11.0, batter 1:15 / 1:7 1/2; all timber treated Southern Yellow Pine. Built in substructure-ptc.csx as plan solids (per pier: sheeting, 7 wale bands, 46 posts,
+28 HP12x74 stubs, spreaders, 38 dolphin piles; 5,441 cu ft timber). Flagged (page + reason): the line's distance from the pier (from Section F-F; the plan's 18'-8 1/2 is read
+to the spreader row), the lowest inner wale reaching into the battered stone line, dolphin pile size (12 in. assumed, not printed) and tips (El -15.0 built; 'driven into
+weathered schist'), H pile tips, timber density 640 kg/m3 (assumed); not built: the braced nose frames, catwalk and cable wraps (drawn without a member-by-member layout).
+Cofferdam sheeting stays not modeled (pulled above El -15.0).
+
+### 22.4 Results (run order build -> ... -> details-ptc -> girder-details-ptc -> rivets-ptc on a copy of the committed model)
+- Structural steel (check-ptc-delaware-river section 7): 89.2 % -> 90.2 % of p.42 items 1-6 (35.04 -> 35.45 M lb); girder spans 1-10 85.5 % -> 91.1 % (carbon 78.3 -> 86.9 %,
+  silicon 92.0 -> 95.0 %), 28-31 83.8 % -> 89.0 % (75.2 -> 82.7 % / 91.8 -> 94.7 %); trusses unchanged.
+- Rivets 474,784 -> 523,426 (girder spans 71,080 -> 106,010 / 28,396 -> 42,108), heads 212,116 lb.
+- Checks: check-truss-ptc 608 / 11, check-truss-ptc-approach 1796 / 12, check-girders-ptc 131 / 6 (unchanged); check-ptc-delaware-river 379 / 41 -> 389 / 37 (+6 fender rows; now PASS: silicon 1-10, grating 1-10, walkway steel of both 4-span units;
+  still DIFF: girder-span grating 28-31 959 vs 1,010 SF (-5.1 %), girder-span walkway steel +11 %).
+- Clash (`sbm clash --bolts`): non-bolt rows 6,682 -> 4,402: walkway x bracing / connection angles / plates 404 -> 37 (approach 0; main 37 = the W15 / W20 cross walks at the
+  floor beam bottom vs the floor lateral plates), walkway x floor beams 1,221 -> 22, walkway internal 886 -> 290 (ladder stiles / platform rails, unchanged geometry),
+  walkway x stiffeners 0 -> 22, girder spans (non-walkway) 1,058 -> 918 (stiffener x girder root fillets and x web splice gone; left: floor beam halves at the crown / girder
+  top 3 % grade, sole plates, railing posts), railing 2,342 unchanged.
+- IFC (Parametric): 234.1 -> 260.8 MB, 2.47 M -> 2.73 M entities (188 IfcImpactProtectionDevice); validate_ifc 0 schema + 0 EXPRESS issues (2,000 instances per type).
+  Tests 582 -> 585 passed.
 ## 23. QC pass 5 fixes (2026-10-21; issues I046-I053, answers in `qc/ptc/results/answers.csv`; user: "Implement those changes. Draw as shown")
 Every finding was re-read on the sheet first (p.50-53, p.61, p.67, p.74, p.76, p.80, p.83, p.86, p.93 crops at 150-300 dpi).
 

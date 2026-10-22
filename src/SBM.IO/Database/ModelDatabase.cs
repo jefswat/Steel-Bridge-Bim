@@ -1036,13 +1036,14 @@ public static class ModelDatabase
                         SubElementKind.MowStrip => ("mow strip", "IFCSLAB"),
                         SubElementKind.TrafficBarrier => ("traffic barrier", "IFCRAILING"),
                         SubElementKind.PavementStrip => ("replacement pavement", "IFCPAVEMENT"),
+                        SubElementKind.Fender => ("fender", "IFCIMPACTPROTECTIONDEVICE"),
                         _ => ("footing", "IFCFOOTING"),
                     };
                     var r = New(Id(IfcKeys.SubSolid(uk, k++)), ParentOfSolid(so), "element", cat, cls, so.Name);
                     r.Support = unit.Name; r.Tag = so;
                     if (_keysOnly) { _w.Add(r); continue; }
-                    r.Material = so.IsConcrete ? concMat : "ASTM A572 Gr. 50 (HP piling)";
-                    r.Volume = Math.Abs(so.Mesh.Volume()); r.Mass = r.Volume * (so.IsConcrete ? 2400 : 7850);
+                    r.Material = so.Material is { Length: > 0 } sm ? sm : so.IsConcrete ? concMat : "ASTM A572 Gr. 50 (HP piling)";
+                    r.Volume = Math.Abs(so.Mesh.Volume()); r.Mass = r.Volume * (so.Density > 0 ? so.Density : so.IsConcrete ? 2400 : 7850);
                     r.Box = so.Mesh.Bounds(); StationOf(r, r.Box);
                     var sj = new Json().Add("description", so.Description);
                     if (so.Assumption is { } sas) sj.Add("status", sas.Status).Add("reason", sas.Reason).Add("assumed", sas.Basis);

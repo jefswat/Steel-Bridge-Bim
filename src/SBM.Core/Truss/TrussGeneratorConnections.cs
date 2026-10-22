@@ -226,7 +226,7 @@ public static partial class TrussGenerator
         private void BuildEndConnections()
         {
             var conns = _inst.Where(i => i.Def.EndConnections is { Count: > 0 }).ToList();
-            if (conns.Count == 0 && _stiffRivets.Count == 0) return;
+            if (conns.Count == 0 && _stiffRivets.Count == 0 && _longRivets.Count == 0) return;
             // part bounding boxes once
             var parts = Model.Steel.Parts;
             var boxes = parts.Select(p => p.Mesh is { IsEmpty: false } ? p.Mesh.Bounds() : default).ToList();
@@ -487,6 +487,17 @@ public static partial class TrussGenerator
                         }
                 }
             }
+            // longitudinal stiffener rivets (web leg + web), grips probed
+            int nLong = 0, nLongMiss = 0;
+            foreach (var (q, dir, hint, dia, asmL, mat, asuL) in _longRivets)
+            {
+                var (lo, hi) = Box(new[] { q - new Vec3(0.3, 0.3, 0.3), q + new Vec3(0.3, 0.3, 0.3) }, 0.0);
+                var pr = Probe(lo, hi, null);
+                if (pr.At(q, dir, 0.3) is not { } iv) { nLongMiss++; continue; }
+                _pendingConn.Add((q + dir * iv.t1, -dir, hint, iv.t1 - iv.t0, dia, asmL, mat, asuL));
+                nLong++;
+            }
+            if (_longRivets.Count > 0) Info($"Truss: longitudinal stiffeners - {_longPieces} pieces, {nLong} rivets{(nLongMiss > 0 ? $" ({nLongMiss} positions not in steel, skipped)" : "")}{Src}.");
             Info($"Truss: end connections - {nAngles} connection angles, {nPlates} end plates, {nWebExt} web extensions, {nRiv} rivets{(nNoWeb > 0 ? $" ({nNoWeb} rivet positions not in steel, skipped; e.g. {string.Join("; ", missed)})" : "")}{Src}.");
             if (nOutFill > 0) Info($"Truss: end connections - {nOutFill} fills under the outstanding legs where the angles stand off the post / hanger face (probed, {L(outFillT.Min())} - {L(outFillT.Max())}){(outFillCmp.Count > 0 ? "; vs plan: " + string.Join("; ", outFillCmp.Distinct().Take(6)) : "")}{Src}.");
             if (nLoose > 0) Warn($"Truss CHECK end connections: {nLoose} rivets through the outstanding legs find no steel behind the leg (gap to the post / girder face over 1 mm; fills not drawn?) - placed with the leg as grip{Src}.");
@@ -503,13 +514,15 @@ public static partial class TrussGenerator
             if (ad == null && SteelCatalog.FindAngle(ca.Angle) is { } ac) ad = (ac.LegA, ac.LegB, ac.Thickness);
             if (ad == null || ca.Length <= 0) { Warn($"Truss: clip angles of {li.Name} - angle '{ca.Angle}' / length not understood; not built."); return; }
             var (legItem, legWeb, t) = ad.Value;
-            int tw = ca.Toward >= 0 ? 1 : -1;
             var mesh = new Mesh();
             var cr = _clipRivets[li] = new List<TrussLineItemRivet>();
+            // one angle per end, or a pair straddling the item web (PairHeelU: second heel, web leg the other way; item-leg rivets once)
+            var heels = new List<(double h, int tw, bool itemRivets)> { (ca.HeelU, ca.Toward >= 0 ? 1 : -1, true) };
+            if (ca.PairHeelU is { } ph) heels.Add((ph, ca.Toward >= 0 ? -1 : 1, false));
+            foreach (var (h, tw, itemRiv) in heels)
             foreach (var (w0, dir) in new[] { (li.From, 1), (li.To, -1) })
             {
                 // (U, W) polygon: item leg U in [h, h + tw t] (on the item web), W from w0 into the item; web leg along U toward tw from the heel, W in [w0, w0 + dir t]
-                double h = ca.HeelU;
                 var poly = new List<Vec2>
                 {
                     new(h, w0), new(h + tw * legWeb, w0), new(h + tw * legWeb, w0 + dir * t), new(h + tw * t, w0 + dir * t), new(h + tw * t, w0 + dir * legItem), new(h, w0 + dir * legItem),
@@ -520,7 +533,7 @@ public static partial class TrussGenerator
                 Vec3 W(Vec2 q, double v) => _al.PointAt(li.Station + q.X, q.Y).WithZ((li.FromGrade ? _al.ElevationAt(li.Station, q.Y) : 0) + v);
                 var ra = pl.Select(q => W(q, vb)).ToArray();
                 MeshBuilder.AddLoft(mesh, pl, new[] { ra, ra.Select(p => p + Up * ca.Length).ToArray() });
-                if (ca.ItemLegRivets is { Count: > 0 } ir)
+                if (itemRiv && ca.ItemLegRivets is { Count: > 0 } ir)
                     for (int k = 0; k < ir.Count; k++)
                         cr.Add(new TrussLineItemRivet { U = h + tw * t / 2, W = w0 + dir * ir.Gage, V = ca.Top - ir.First - k * ir.Pitch, Axis = "U", Diameter = ca.RivetDiameter, Unresolved = ca.RivetUnresolved });
                 if (ca.WebLegRivets is { Count: > 0 } wr)
@@ -531,7 +544,7 @@ public static partial class TrussGenerator
             Model.Steel.Parts.Add(new SteelPart
             {
                 Mark = li.Name + "-CA", Category = PartCategory.TrussConnectionAngle, Assembly = asm, Mesh = mesh, Material = ca.Material.Length > 0 ? Material(ca.Material) : _d.DefaultMaterial,
-                Length = ca.Length, Description = $"clip angles {ca.Angle} x 2 x {L(ca.Length)} ({li.Name})",
+                Length = ca.Length, Description = $"clip angles {ca.Angle} x {2 * heels.Count} x {L(ca.Length)} ({li.Name})",
                 Assumption = ca.Unresolved.Length > 0 ? Assumption.UnresolvedDimension(ca.Unresolved, "clip angles at both ends of the item") : null,
             });
             if (ca.Unresolved.Length > 0) Warn(ca.Unresolved);

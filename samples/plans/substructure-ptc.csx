@@ -6,7 +6,8 @@
 // Built with SubstructureDefinition.Plan (generic plan-drawn substructure: lofted / extruded solids, pile groups, fixed seats; works on SupportLinesOnly
 // bridges, no bearings needed). Rules: plan values only; whatever cannot be read is UNRESOLVED with page + plain reason, raised as generator warnings and
 // carried on the solid. No reinforcement (bar marks / bar lists are on the sheets: piers p.6-10, 17-21, 27, 29, 33-37; footings p.10, 27; abutments p.12, 39).
-// Not modeled yet (noted): fender system / dolphins (p.25), cofferdam sheet piling / bracing (p.18-19), anchor bolts (p.13, 23, 27, 40), scoring (p.13, 40),
+// Fender system / dolphins (p.25): front fender line, posts, 12 H 74 fender piles, spreaders and the 19 pile dolphins (2026-10-21; nose bracing / catwalk not built).
+// Not modeled yet (noted): cofferdam sheet piling / bracing (p.18-19), anchor bolts (p.13, 23, 27, 40), scoring (p.13, 40),
 // shear-lock pedestals (p.29), the 48in RC pipe at pier 1 (p.10, 14).
 using System.IO;
 using System.Globalization;
@@ -311,7 +312,136 @@ foreach (var r in csv)
             U(sd, "p.17, p.20", "interior of the pier body (solid, or cored / cellular)", "the plan elevation / sections show the outline and the shaft reinforcing but no interior voids could be read in the scan", "Pier body modeled SOLID, so its concrete quantity is an upper bound.");
             U(sd, "p.17, p.20", "slope of the top of the pier body (1/2in per ft from El +12.0 to +12.75 at the shafts) and the 1'-6 masonry-faced crown", "detail only", "Pier body top flat at El +12.0; shafts start there.");
             U(sd, "p.17, p.21", "7in top chamfer of the shafts", "detail only", "Square top at El. +87.701.");
-            U(sd, "p.18, p.19, p.25", "cofferdam sheet piling (ZP 38), bracing, the fender system and the dolphins", "temporary / fender works, not part of this phase", "Not modeled.");
+            U(sd, "p.18, p.19", "cofferdam sheet piling (ZP 38) and bracing", "temporary works (the sheeting is pulled above El. -15.0, p.25)", "Not modeled.");
+            // ---------------------------------------------------------------- fender system and dolphins (p.25 DRB-1/9, as-built 4-10-57), 2026-10-21
+            // The half plan (symmetrical about the CL bridge) shows ONE long face fendered (the channel face: east of pier 18, west of pier 19, the sheet serves
+            // both piers - opposite hand) and the two pier noses: a fender line straight along the face, curving at the P.C. (front row of piles, 2'-9 1/2 + 8 @ 5'-7
+            // = 47'-5 1/2 from the CL bridge) on R = 130'-0 'measured along CL front row of piles' (arc piles @ 5'-7 x 3, 8'-10 x 2, 7'-10 x 6, 7'-3 x 3) to a
+            // 19 pile dolphin 100'-3 beyond the CL shoe (143'-9 from the CL bridge) and 21'-9 across the pier CL. Section F-F (straight face): 4 x 12 sheeting
+            // El +10.0 to -8.0, 12 x 12 wales at El +8.5 / +3.5 / -1.5 / -6.5 outside the 12 x 12 posts (El +9.5 to -7.5) and at +5.5 / +0.5 / -4.5 inside them,
+            // spreaders to the stone face, 5'-0 from the face of the fender to the pier face at El +12.0. Section G-G (nose): 2-12 x 12 posts to El -8.0 spliced
+            // to 12 H 74 fender piles, top of the 4 ft slab El -15.0. Dolphin (Sections C / D / E): 19 piles, inside piles to El +13.0, outside to +11.0,
+            // batter inside row 1:15, outside row 1:7 1/2, 6 turns 3/4 in. galv. cable at El +9.0 / +7.0. All timber treated Southern Yellow Pine (note 4).
+            {
+                const string Timber = "Timber, treated Southern Yellow Pine (p.25 note 4)";
+                const double TimberKg = 640;          // assumed density (not on the sheet)
+                int c = pier == "18" ? 1 : -1;        // channel side: +N (east, up-station) at pier 18, -N at pier 19
+                double face12 = 18.0, O = face12 + 5.0, Nf = O - 22.0 / 12;     // fender face 5'-0 outside the pier face at El +12 (36'-0 wide); front post CL 22 in. inside it
+                double pc = 2.0 + 9.5 / 12 + 8 * (5 + 7.0 / 12), R = 130.0;
+                var arcSp = new List<double>();
+                arcSp.AddRange(Enumerable.Repeat(5 + 7.0 / 12, 3)); arcSp.AddRange(Enumerable.Repeat(8 + 10.0 / 12, 2)); arcSp.AddRange(Enumerable.Repeat(7 + 10.0 / 12, 6)); arcSp.AddRange(Enumerable.Repeat(7.25, 3));
+                double T = pc + arcSp.Sum();
+                // path of the front row (t = distance along it from the CL bridge, + toward +S; mirrored for t < 0): point and outward unit normal (toward the channel)
+                (double s, double n, double ns, double nn) Path(double t)
+                {
+                    double aa = Math.Abs(t), sg = t < 0 ? -1 : 1;
+                    if (aa <= pc) return (sg * aa, Nf, 0, 1);
+                    double th = (aa - pc) / R;
+                    return (sg * (pc + R * Math.Sin(th)), Nf - R * (1 - Math.Cos(th)), sg * Math.Sin(th), Math.Cos(th));
+                }
+                FootingPoint Pt(double t, double d) { var q = Path(t); return P(q.s + q.ns * d, c * (q.n + q.nn * d)); }
+                List<FootingPoint> Band(double t0, double t1, double d0, double d1)
+                {
+                    var ts = new List<double> { t0 };
+                    foreach (double k in new[] { -pc, pc }) if (k > t0 + 1e-6 && k < t1 - 1e-6) ts.Add(k);
+                    for (double x = Math.Ceiling(t0 / 2.0) * 2.0; x < t1; x += 2.0) if (Math.Abs(x) > pc + 0.5) ts.Add(x);
+                    ts.Add(t1);
+                    ts = ts.Distinct().OrderBy(x => x).ToList();
+                    var l = ts.Select(x => Pt(x, d1)).ToList();
+                    for (int i = ts.Count - 1; i >= 0; i--) l.Add(Pt(ts[i], d0));
+                    if (c < 0) l.Reverse();
+                    return l;
+                }
+                List<FootingPoint> Block(double t, double along, double d0, double d1)
+                {
+                    var q = Path(t); double ts2 = q.nn, tn = -q.ns;      // tangent (+t direction)
+                    if (t < 0) { ts2 = -q.nn; tn = q.ns; }
+                    var l = new List<FootingPoint>();
+                    foreach (var (u, d) in new[] { (-along / 2, d0), (along / 2, d0), (along / 2, d1), (-along / 2, d1) })
+                        l.Add(P(q.s + ts2 * u + q.ns * d, c * (q.n + tn * u + q.nn * d)));
+                    var a0 = l[0]; var a1 = l[1]; var a2 = l[2];
+                    if ((a1.S - a0.S) * (a2.N - a0.N) - (a1.N - a0.N) * (a2.S - a0.S) < 0) l.Reverse();
+                    return l;
+                }
+                PlanSolidDefinition Fender(string nm, double z0, double z1, List<FootingPoint> plan, string src, string flag, SubElementKind kind = SubElementKind.Fender, string mat = Timber, double dens = TimberKg) =>
+                    new() { Name = nm, Kind = kind, Source = src, Flag = flag, Material = mat, Density = dens, Sections = { Sec(z0, plan), Sec(z1, plan.Select(p => p.Clone()).ToList()) } };
+                string fGeo = UnresolvedFlag.Text("p.25", "fender line position and arc", "the half plan dimensions the post spacings, the P.C. (47'-5 1/2 from the CL bridge), R = 130'-0 along the front row and the dolphin (143'-9 / 21'-9); the distance of the line from the pier is given only by Section F-F (5'-0 from the fender face to the pier face at El +12.0) - the plan's 18'-8 1/2 from the CL pier is read to the inner (spreader) row",
+                    "front post CL 21'-2 from the CL pier on the straight, fender face 23'-0; the stone face batter puts the lowest inner wale (El -4.5) up to 4 in. into the stone line (not adjusted).");
+                string fSec = UnresolvedFlag.Text("p.25", "fender member levels", "Section F-F prints the wale, sheeting and post elevations as levels (centre of the 12 x 12 wales taken)", "levels as printed, members 12 x 12 / 4 x 12 nominal = full size.");
+                // sheeting, outer and inner wales (one solid each, along the whole channel face and both noses)
+                sd.Plan.Solids.Add(Fender("fender sheeting 4x12", -8.0, 10.0, Band(-T, T, 1.5, 22.0 / 12), "p.25 Section F-F (4 x 12 sheeting El +10.0 to -8.0)", fGeo));
+                foreach (double z in new[] { 8.5, 3.5, -1.5, -6.5 })
+                    sd.Plan.Solids.Add(Fender($"fender wale 12x12 outer El {z:+0.0;-0.0}", z - 0.5, z + 0.5, Band(-T, T, 0.5, 1.5), "p.25 Section F-F (12 x 12 wales outside the posts)", fGeo + " " + fSec));
+                double tBack = 10 * (5 + 7.0 / 12);
+                foreach (double z in new[] { 5.5, 0.5, -4.5 })
+                    sd.Plan.Solids.Add(Fender($"fender wale 12x12 inner El {z:+0.0;-0.0}", z - 0.5, z + 0.5, Band(-tBack, tBack, -1.5, -0.5), "p.25 Section F-F (12 x 12 wales inside the posts, 10 spaces @ 5'-7 = 55'-10 each side)", fGeo + " " + fSec));
+                // posts: front row 2'-9 1/2 + k x 5'-7 on the straight, then the arc spacings; the arc posts are 2-12 x 12 on 12 H 74 piles (Section G-G)
+                var tPosts = new List<double>();
+                for (int k = 0; k <= 8; k++) tPosts.Add(2.0 + 9.5 / 12 + k * (5 + 7.0 / 12));
+                double acc = pc; foreach (double sp in arcSp) { acc += sp; tPosts.Add(acc); }
+                string hFlag = UnresolvedFlag.Text("p.25", "12 H 74 fender piles below the nose posts", "Section G-G shows the 12 H 74 pile from the top of the 4 ft slab (El -15.0) spliced to the posts above El -8.0; the pile tips and the piles under the straight-face posts (Section F-F stops the posts at El -7.5) are not given",
+                    "12 H 74 (AISC HP12x74) from El -15.0 to -8.0 under the arc posts only; below El -15.0 not modeled.");
+                int nPost = 0;
+                foreach (int sg in new[] { -1, 1 })
+                    foreach (double tp in tPosts)
+                    {
+                        double t = sg * tp; bool arc = tp > pc + 1e-6;
+                        sd.Plan.Solids.Add(Fender($"fender post {(arc ? "2-12x12" : "12x12")} {(sg < 0 ? "W" : "E")}{++nPost}", arc ? -8.0 : -7.5, 9.5, Block(t, arc ? 2.0 : 1.0, -0.5, 0.5), arc ? "p.25 Section G-G (2-12 x 12 posts)" : "p.25 Section F-F (12 x 12 posts El +9.5 to -7.5)", fGeo));
+                        if (arc)
+                        {
+                            // HP12x74 (d 12.1, bf 12.2, tw / tf 0.61): web along the fender line (flanges facing in / out), centred on the posts
+                            var q = Path(t); double tsx = t < 0 ? -q.nn : q.nn, tsn = t < 0 ? q.ns : -q.ns;
+                            FootingPoint HL(double u, double d) => P(q.s + tsx * u + q.ns * d, c * (q.n + tsn * u + q.nn * d));
+                            double hb = 12.2 / 24, hd = 12.1 / 24, tw = 0.61 / 24, tf = 0.61 / 12;
+                            var h = new List<FootingPoint> { HL(-hb, -hd), HL(hb, -hd), HL(hb, -hd + tf), HL(tw, -hd + tf), HL(tw, hd - tf), HL(hb, hd - tf), HL(hb, hd), HL(-hb, hd), HL(-hb, hd - tf), HL(-tw, hd - tf), HL(-tw, -hd + tf), HL(-hb, -hd + tf) };
+                            var a0 = h[0]; var a1 = h[1]; var a2 = h[6];
+                            if ((a1.S - a0.S) * (a2.N - a0.N) - (a1.N - a0.N) * (a2.S - a0.S) < 0) h.Reverse();
+                            sd.Plan.Solids.Add(Fender($"fender pile 12 H 74 {(sg < 0 ? "W" : "E")}{nPost}", -15.0, -8.0, h, "p.25 Section G-G (12 H 74 fender pile)", hFlag, SubElementKind.Pile, "Structural steel 12 H 74 (= AISC HP12x74)", 7850));
+                        }
+                    }
+                // spreaders between the inner wales and the stone face at the back row stations (k x 5'-7, 0 to 55'-10), where the gap is positive
+                string sFlag = UnresolvedFlag.Text("p.25", "spreaders to the stone face", "Section F-F draws 12 x 12 spreaders from the inner wales to the battered stone face (smooth faced at spreaders); their stations are the back row of the plan (k x 5'-7) and their length follows the stone, which is not dimensioned at each level",
+                    "12 x 12 blocks at El +5.5 / +0.5 from the inner wale to the modeled pier body face (R 20'-3 at El -7.0 to 18'-0 at +12.0); none at El -4.5 where the wale meets the stone line.");
+                int nSp = 0;
+                foreach (int sg in new[] { -1, 1 })
+                    for (int k = sg < 0 ? 1 : 0; k <= 10; k++)
+                    {
+                        double t = sg * k * (5 + 7.0 / 12);
+                        foreach (double z in new[] { 5.5, 0.5 })
+                        {
+                            double faceN = 20.25 - (z + 7.0) / 19.0 * 2.25;              // modeled pier body face at the level (straight part)
+                            var q = Path(t);
+                            double dFace = (faceN - q.n) / q.nn;                        // offset of the stone line from the front row along the normal
+                            if (dFace >= -1.5 - 0.05) continue;
+                            sd.Plan.Solids.Add(Fender($"fender spreader {(sg < 0 ? "W" : "E")}{++nSp}", z - 0.5, z + 0.5, Block(t, 1.0, dFace, -1.5), "p.25 Section F-F (12 x 12 spreaders)", sFlag));
+                        }
+                    }
+                // 19 pile dolphins at both noses
+                string dFlag = UnresolvedFlag.Text("p.25", "dolphin piles (size, bottom)", "Sections C / D / E draw 19 round timber piles (1 + 6 inside, 12 outside) bolted and wrapped with cable but give no pile diameter, and the piles are 'driven into weathered schist to at least 2 ft penetration' (no tip elevation on the sheet)",
+                    "12 in. piles (the plan cluster is about 5 ft across), centre + 6 at 1'-0 + 12 at 2'-0 (hexagonal rings), inside piles El +13.0, outside El +11.0, inside row battered 1:15 and outside row 1:7 1/2 outward, built down to El -15.0; the cable wraps and drift pins not built.");
+                foreach (int sg in new[] { -1, 1 })
+                {
+                    double cs = sg * (43.5 + 100.25), cn = c * -21.75;
+                    var piles = new List<(double ds, double dn, double top, double batter)> { (0, 0, 13.0, 0) };
+                    for (int i = 0; i < 6; i++) { double ang = i * Math.PI / 3; piles.Add((Math.Cos(ang), Math.Sin(ang), 13.0, 15)); }
+                    for (int i = 0; i < 12; i++) { double ang = i * Math.PI / 6, ro = i % 2 == 0 ? 2.0 : Math.Sqrt(3); piles.Add((ro * Math.Cos(ang), ro * Math.Sin(ang), 11.0, 7.5)); }
+                    int j = 0;
+                    foreach (var (ds, dn, top, bat) in piles)
+                    {
+                        double rr = Math.Sqrt(ds * ds + dn * dn), ux = rr > 0 ? ds / rr : 0, uy = rr > 0 ? dn / rr : 0;
+                        double zb = -15.0, out0 = bat > 0 ? (top - zb) / bat : 0;
+                        List<FootingPoint> Circ(double x, double y) => Enumerable.Range(0, 12).Select(k => P(x + 0.5 * Math.Cos(k * Math.PI / 6), y + 0.5 * Math.Sin(k * Math.PI / 6))).ToList();
+                        sd.Plan.Solids.Add(new PlanSolidDefinition
+                        {
+                            Name = $"dolphin {(sg < 0 ? "W" : "E")} pile {++j}", Kind = SubElementKind.Pile, Source = "p.25 (19 pile dolphin, Sections C-C / D-D / E-E)", Flag = dFlag, Material = Timber, Density = TimberKg,
+                            Sections = { Sec(zb, Circ(cs + ds + ux * out0, cn + dn + uy * out0)), Sec(top, Circ(cs + ds, cn + dn)) },
+                        });
+                    }
+                }
+                U(sd, "p.25", "fender nose bracing frames and catwalk", "the half plan draws the braced frames between the arc piles and the back line to the dolphin (12 x 12 struts, 6 x 12 diagonals, 2-12 x 12 posts, Section B-B / H-H / J-J) and the 2-2 x 12 plank catwalk without a dimensioned layout of every member",
+                    "not built (the front fender line, its posts / piles and the dolphins are).");
+                summary.Add($"{pier}: fender system {sd.Plan.Solids.Count(x => x.Kind == SubElementKind.Fender)} timber solids, {nPost} posts, {sd.Plan.Solids.Count(x => x.Name.StartsWith("dolphin"))} dolphin piles");
+            }
             break;
         }
     }

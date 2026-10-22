@@ -662,6 +662,7 @@ public static class IfcExporter
             int subPart = w.Add("IFCBRIDGEPART", $"{Guid(IfcKeys.SubPart(bk))},$,'Substructure',$,$,{Ref(partPl)},$,$,.ELEMENT.,.LATERAL.,.SUBSTRUCTURE.");
             int concreteStyle = RgbStyle("Substructure concrete", 0.70, 0.68, 0.62);
             int pileStyle = RgbStyle("Steel piling", 0.45, 0.5, 0.6);
+            int timberStyle = 0;
             var unitParts = new List<int>();
             foreach (var unit in sub.Units)
             {
@@ -677,7 +678,8 @@ public static class IfcExporter
                 foreach (var so in unit.Solids)
                 {
                     if (so.Mesh.IsEmpty) continue;
-                    int pds = Body(so.Mesh, so.IsConcrete ? concreteStyle : pileStyle);
+                    if (so.Material is { } tm0 && tm0.Contains("imber") && timberStyle == 0) timberStyle = RgbStyle("Timber", 0.59, 0.45, 0.29);
+                    int pds = Body(so.Mesh, so.IsConcrete ? concreteStyle : so.Material is { } tm1 && tm1.Contains("imber") ? timberStyle : pileStyle);
                     string common = $"{Guid(IfcKeys.SubSolid(uk, k++))},$,{S(so.Name)},{S(so.Description)}";
                     int id = so.Kind switch
                     {
@@ -697,15 +699,17 @@ public static class IfcExporter
                         SBM.Core.Substructure.SubElementKind.MowStrip => w.Add("IFCSLAB", $"{common},'MOW_STRIP',{Ref(pl)},{Ref(pds)},$,.USERDEFINED."),
                         SBM.Core.Substructure.SubElementKind.TrafficBarrier => w.Add("IFCRAILING", $"{common},$,{Ref(pl)},{Ref(pds)},$,.GUARDRAIL."),
                         SBM.Core.Substructure.SubElementKind.PavementStrip => w.Add("IFCPAVEMENT", $"{common},$,{Ref(pl)},{Ref(pds)},$,.RIGID."),
+                        // pier fender system (timber sheeting / wales / posts / spreaders, plan-drawn): IFC 4.3 impact protection device FENDER
+                        SBM.Core.Substructure.SubElementKind.Fender => w.Add("IFCIMPACTPROTECTIONDEVICE", $"{common},$,{Ref(pl)},{Ref(pds)},$,.FENDER."),
                         _ => w.Add("IFCFOOTING", $"{common},$,{Ref(pl)},{Ref(pds)},$,{footingType}"),
                     };
                     contained.Add(id);
                     if (so.Assumption != null) miscStatus.Add((id, so.Assumption));
-                    string mat = so.ShellThickness != 0 ? "Steel pipe shell, concrete filled" : so.IsConcrete ? concreteMat : so.Kind == SBM.Core.Substructure.SubElementKind.Coupler ? "Steel (mechanical splice coupler)" : "ASTM A572 Gr. 50 (HP piling)";
+                    string mat = so.Material is { Length: > 0 } sm ? sm : so.ShellThickness != 0 ? "Steel pipe shell, concrete filled" : so.IsConcrete ? concreteMat : so.Kind == SBM.Core.Substructure.SubElementKind.Coupler ? "Steel (mechanical splice coupler)" : "ASTM A572 Gr. 50 (HP piling)";
                     AddMaterial(mat, id);
                     double vol = Math.Abs(so.Mesh.Volume());
                     double steelShare = so.ShellThickness != 0 ? PipeShellShare(unit.Definition.PileSize, so.ShellThickness) : so.IsConcrete ? 0 : 1;
-                    psetTargets.Add((id, so.Name, so.Description, 0, vol * (steelShare * 7850 + (1 - steelShare) * 2400)));
+                    psetTargets.Add((id, so.Name, so.Description, 0, so.Density > 0 ? vol * so.Density : vol * (steelShare * 7850 + (1 - steelShare) * 2400)));
                     if (so.ShellThickness != 0) pipePiles.Add((id, uk + "/pipe-pile/" + k, unit.Definition.PileSize, so.ShellThickness));
                 }
                 var marks = sub.Marks.Where(m => m.Unit == unit.Name).ToDictionary(m => m.Mark);

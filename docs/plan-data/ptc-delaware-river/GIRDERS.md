@@ -45,3 +45,29 @@ Gutter profile = the printed profile of the PTC model; the girder is the straigh
   higher than that seat on the 3 % grade (20 + 8 generator DIFF rows, expected).
 - Expansion dams (p.46), curbs / parapets / walkway (p.107), scuppers, signal / light bracket extensions (p.45) not built; slab continuous over the 4" gaps.
 - Weight: model 3.75 M lb (west) / 1.50 M lb (east) = 72 / 71 % of the p.42 items 1 + 4 (silicon 90 %, carbon 50 %: dams, diaphragms, splices, stiffeners).
+
+## Update 2026-10-21: remaining visible steel, walkway, (TRUSS-DESIGN.md section 22)
+Several bullets above are superseded:
+- F.L. cover plate splice: p.44 'Splice for full length cover plate' = the F.L. plate spliced 37'-0 each side of the CL girder under the 86'-0 plate, whose last 6'-0 at each end
+  IS the 'additional material for splice' (37 + 6 = 43 = 86 / 2). The 86'-0 plate (user decision 2026-10-20) therefore already contains it: nothing to add.
+- Stiffeners (connections-ptc.csx, re-read on p.44): end stiffeners 4-Ls 7x4x3/4 have the 7 in. legs ON THE WEB (two rivet lines each, 2-Fills 15 x 1 1/8 = 2 x 7 + the
+  floor beam web), the 4 in. legs outstanding; floor beam stiffeners 2-Ls 6x4x1/2 on 1 1/8 fills; intermediate 2-Ls 6x4x7/16 CRIMPED over the flange angle legs (new generic
+  `TrussStiffenerSet.CrimpThickness / CrimpHeight`); stiffener rivets 1 in. (rule-based pitch, flagged); ends 3/8 / 1/2 in. clear of the flange angle root fillets.
+- Web splices: p.43 marks TWO web splices ('CL Splice') 4 spaces from the middle floor beam in the 6-equal-space panels (they were at mid-span, on the middle floor beam
+  stiffener); 2-Pls 21 x 3/8 + 3 rivet lines each side; the stiffener beside each splice on 2-Fills 4 x 3/8 (p.44). Flange angle splice plates 6 1/4 x 3/8: not built (no length).
+- Longitudinal stiffener L 6x4x7/16 (C) on the inside of the girder (p.44), interrupted at every transverse stiffener (new generic `TrussMemberDefinition.LongitudinalStiffeners`),
+  heel 2'-5 1/2 below the back of the top flange angles (scaled), 1 in. rivets @ 7 in.
+- Tension plates 16 1/2 x 3/4 over the girders at every floor beam / bracket (p.44 Section A, p.45 plan) with 13/16 fills (one at the quarter points, two at the middle
+  floor beam = the girder's extra cover plates) and 2 x 5 rivets 1 1/8 H.S. each side; length scaled 4'-3 (girder-details-ptc.csx).
+- Stringer splices at the middle floor beam of every span (p.43 stringer diagram 'CL stringer splice', p.45 details; new generic `TrussStringerSpliceDefinition.Stations`).
+- Expansion dam diaphragms at piers 1-9 / 28-30 (p.46 Section A / elevation): 18 WF 64 (AISC W18x65 dimensions at 64 lb/ft) between the stringer webs 3 7/8 in. beyond the
+  end floor beam CL, 1-Pl 11 x 3/4 on top, 2-Ls 4x4x7/16 per stringer web (new generic `TrussClipAngles.PairHeelU`), stringers continued 9 3/8 in. past the end floor beam
+  (new generic `TrussStringerLine.ExtendStart / ExtendEnd`); outer bays (21 WF 62) shallower (flag). 'Pc. 18 WF 64' finger plate supports, 12 [ 35 curb channels, bulkhead
+  plates and anchor bars: not built (drawn, not dimensioned).
+- CL inspection walk (p.43 Section A-A 'CL of inspection walk' 2'-0 from the CL, p.44 manholes): built by walkways-ptc.csx with the p.101 details, between the floor beam webs.
+- Steel vs p.42 items 1 + 4: spans 1-10 85.5 % -> 91.1 %, spans 28-31 83.8 % -> 89.0 % (carbon 78.3 -> 86.9 % / 75.2 -> 82.7 %, silicon 92.0 -> 95.0 % / 91.8 -> 94.7 %).
+  Still missing (why): the flange angle splice plates (no length), the dam finger plate supports / curb channels / bulkheads / anchor bars (drawn only), abutment diaphragms
+  15 [ 33.9 and the stringer detail at the abutments (p.45, not dimensioned), stringer bearing / tension plate details, signal / light pole bracket extensions (DRB-6, not in
+  the set), rivet heads beyond the rule-based lines (floor beam flange / cover rivets, lateral plates), camber.
+- Open plan conflict noted (not changed): p.43 note 'Floor beams and stiffener Ls shall be set normal to grade' - the floor beams and the girder stiffeners at them are plumb
+  in the model (floor-connections-ptc.csx made the stiffeners plumb to match the plumb floor beams).

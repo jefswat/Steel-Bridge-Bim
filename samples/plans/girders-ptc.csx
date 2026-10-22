@@ -239,7 +239,8 @@ foreach (var spec in bridgeSpecs)
         "floor beams at equal spaces of the c-c bearing length (4 spaces), girder ends 1'-1 beyond the bearings, cover plates as spans 1-9.");
     UG("p.46", "expansion dams at the piers and the end dams / backwall joints", "p.46 dimensions the finger plate dam (edge members 12[ 35, 18 WF 64 diaphragms with 2-Ls 4x4x7/16, anchor bars) but it is a separate pay item",
         "not built; the 4 in. gap between adjacent girder ends is bridged by the slab.");
-    UG("p.43", "inspection walk (CL 2'-0 from the CL bridge), scuppers, signal / light pole bracket extensions (p.45)", "shown on the plan / sections without dimensions I could read", "not built.");
+    UG("p.43, p.45", "scuppers (span 1 only) and the signal bridge / light pole bracket extensions", "the scupper is located on the p.43 plan ('Scupper for span #1 only, see sheet 68' = PDF p.108, not modeled in this pass) and p.45 sketches the bracket extensions for signal bridges / light poles whose locations are on the electrical drawings (DRB-6, not in this set)",
+        "not built (the CL inspection walk of p.43 Section A-A is built by walkways-ptc.csx).");
     t.Unresolved.AddRange(unresolved.Distinct());
     // plan quantities p.42 (items 1 + 4 per state): compared by the check; also the generator's own weight check
     if (spec.firstSpan == 1) { t.PlanSteelWeightLb = 2_496_000 + 2_727_000; t.PlanSteelWeightSource = "p.42 items 1 + 4, Pennsylvania girder spans (incl. dams, shoes, walkway, other pay items)"; }
