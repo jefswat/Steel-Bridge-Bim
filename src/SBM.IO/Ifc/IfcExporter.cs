@@ -81,6 +81,24 @@ public static class IfcExporter
         SBM.Core.Bridge.SegmentType.End => "END_SEGMENT", _ => "TYPICAL_SEGMENT",
     };
 
+    /// <summary>Project base point of the export (meters, grid coordinates): rounded center of the first bridge's deck, else the rounded start of
+    /// the first alignment. Geometry is written relative to it (IfcMapConversion carries it); the Rhino export uses the same point.</summary>
+    public static Vec3 BasePoint(BridgeProject project, IEnumerable<BridgeFraming> framings)
+    {
+        var firstDeck = framings.Select(f => f.Deck?.Outline).FirstOrDefault(o => o != null);
+        if (firstDeck != null)
+        {
+            var c = firstDeck.Aggregate(Vec3.Zero, (a, p) => a + p) * (1.0 / firstDeck.Count);
+            return new Vec3(Math.Round(c.X / 100) * 100, Math.Round(c.Y / 100) * 100, Math.Round(c.Z / 10) * 10);
+        }
+        if (project.Alignments.FirstOrDefault() is { Elements.Count: > 0 } a0)
+        {
+            var p = a0.Elements[0].Start;
+            return new Vec3(Math.Round(p.X / 100) * 100, Math.Round(p.Y / 100) * 100, 0);
+        }
+        return Vec3.Zero;
+    }
+
     public static bool IsIfcZip(string path) => path.EndsWith(".ifczip", StringComparison.OrdinalIgnoreCase);
 
     public static IfcExportResult Export(TextWriter tw, string fileName, BridgeProject project, IReadOnlyList<IfcBridgeData> bridges, IfcExportOptions? options = null)
@@ -93,19 +111,7 @@ public static class IfcExporter
         bool abv = options.Geometry == IfcGeometryMode.ReferenceView;
         w.Header(fileName, "IFC4X3_ADD2", abv ? "AlignmentBasedView" : "ReferenceView");
 
-        // Base point: rounded center of the first bridge (or first alignment start).
-        var basePt = Vec3.Zero;
-        var firstDeck = bridges.Select(b => b.Framing.Deck?.Outline).FirstOrDefault(o => o != null);
-        if (firstDeck != null)
-        {
-            var c = firstDeck.Aggregate(Vec3.Zero, (a, p) => a + p) * (1.0 / firstDeck.Count);
-            basePt = new Vec3(Math.Round(c.X / 100) * 100, Math.Round(c.Y / 100) * 100, Math.Round(c.Z / 10) * 10);
-        }
-        else if (project.Alignments.FirstOrDefault() is { Elements.Count: > 0 } a0)
-        {
-            var p = a0.Elements[0].Start;
-            basePt = new Vec3(Math.Round(p.X / 100) * 100, Math.Round(p.Y / 100) * 100, 0);
-        }
+        var basePt = BasePoint(project, bridges.Select(b => b.Framing));
         string P(Vec3 p) => $"({C((p.X - basePt.X) * scale)},{C((p.Y - basePt.Y) * scale)},{C((p.Z - basePt.Z) * scale)})";
         string key = project.Name;
         // AbV: no extrusions / booleans / half spaces; polygonal face sets instead (IfcReferenceViewGeometry).

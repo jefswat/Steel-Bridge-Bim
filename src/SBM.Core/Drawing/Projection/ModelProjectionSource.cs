@@ -1,4 +1,4 @@
-using SBM.Core.Concrete;
+﻿using SBM.Core.Concrete;
 using SBM.Core.Geometry;
 using SBM.Core.Project;
 using SBM.Core.Solids;
@@ -276,7 +276,8 @@ public static class ModelProjectionSource
         return res;
     }
 
-    private static string MiscLayer(Misc.MiscElement e) => e.Group switch
+    /// <summary>Viewport layer of a misc item (drainage / sign support / crash cushion / lighting).</summary>
+    public static string MiscLayer(Misc.MiscElement e) => e.Group switch
     {
         Misc.MiscGroup.Drainage => e.Kind is Misc.MiscKind.SplashBasin or Misc.MiscKind.ErosionMattress ? "3D-DRAIN-STONE"
             : e.Kind is Misc.MiscKind.DrainTrench or Misc.MiscKind.DrainGrate or Misc.MiscKind.DrainBox or Misc.MiscKind.DrainTrough ? "3D-DRAIN-INLETS" : "3D-DRAIN-PIPES",

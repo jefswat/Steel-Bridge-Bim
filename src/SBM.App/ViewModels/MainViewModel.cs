@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
@@ -49,7 +49,7 @@ public sealed record CrossFrameRow(string Mark, string Span, string Bay, string 
 public sealed partial class ExplorerNode : ObservableObject
 {
     public required string Header { get; init; }
-    public string Icon { get; init; } = "";
+    public string Icon { get; init; } = "î¢·";
     public ObservableCollection<ExplorerNode> Children { get; } = new();
     public object? Tag { get; init; }
     public Func<IEnumerable<PropertyRow>>? Properties { get; init; }
@@ -127,7 +127,7 @@ public sealed partial class MainViewModel : ObservableObject
         string S(double m) => u.FormatLength(m, LengthKind.Short);
         string E(double z) => u.FormatLength(z, LengthKind.Coordinate);
         string W(double kg) => u.IsUS ? $"{kg * 2.20462:N0} lb" : $"{kg:N0} kg";
-        string CY(double m3) => u.IsUS ? $"{m3 / 0.764554857984:N2} CY" : $"{m3:N2} m³";
+        string CY(double m3) => u.IsUS ? $"{m3 / 0.764554857984:N2} CY" : $"{m3:N2} mÂ³";
         var rows = new List<PropertyRow>();
         void R(string n, string v) => rows.Add(new PropertyRow(n, v));
         string title;
@@ -135,7 +135,7 @@ public sealed partial class MainViewModel : ObservableObject
         {
             case SteelPart p:
             {
-                title = $"{p.Mark} — {p.Description}";
+                title = $"{p.Mark} â€” {p.Description}";
                 R("Mark", p.Mark);
                 R("Type", ChoiceField.Humanize(p.Category.ToString()) + (p.Role != default ? $" ({ChoiceField.Humanize(p.Role.ToString())})" : ""));
                 R("Size", p.Description);
@@ -157,7 +157,7 @@ public sealed partial class MainViewModel : ObservableObject
             {
                 bool anchor = bolt.Kind == BoltKind.Anchor;
                 var sm = SteelModels.Values.FirstOrDefault();
-                title = anchor ? $"Anchor bolt — {bolt.Assembly}" : $"Bolt — {bolt.Assembly}";
+                title = anchor ? $"Anchor bolt â€” {bolt.Assembly}" : $"Bolt â€” {bolt.Assembly}";
                 R("Type", anchor ? "Anchor bolt with plate washer and nuts" : $"High-strength bolt {sm?.BoltGrade}");
                 R("Diameter", S(anchor || bolt.Diameter > 0 ? bolt.Diameter : sm?.Bolt.Diameter ?? bolt.Diameter));
                 R("Length", S(bolt.Length));
@@ -221,22 +221,22 @@ public sealed partial class MainViewModel : ObservableObject
             {
                 var bm = pb.Beam;
                 var pd = pb.Model.Definition;
-                title = $"{bm.Mark} — {bm.Shape.Name} prestressed girder";
+                title = $"{bm.Mark} â€” {bm.Shape.Name} prestressed girder";
                 R("Mark", bm.Mark);
                 R("Girder / span", $"G{bm.Girder + 1}, span {bm.Span + 1}");
                 R("Type", $"TxDOT {bm.Shape.Name} (IGD)");
                 R("Depth", S(bm.Shape.Depth));
                 R("Length (end to end)", L(bm.Length));
                 R("CL bearing to CL bearing", L(bm.BearingSpan));
-                R("Skew at ends", $"{bm.SkewStart:0.##}° / {bm.SkewEnd:0.##}°");
+                R("Skew at ends", $"{bm.SkewStart:0.##}Â° / {bm.SkewEnd:0.##}Â°");
                 R("Grade (top of beam)", $"{bm.Slope * 100:0.###}%");
                 int dep = bm.Strands.Count(s => s.Depressed);
-                R("Strands", $"{bm.Strands.Count} – {SBM.Core.Prestressed.TxGirderCatalog.StrandSize(pd.StrandDiameter, u)} dia, {pd.StrandStrength:0} ksi low-relaxation");
+                R("Strands", $"{bm.Strands.Count} â€“ {SBM.Core.Prestressed.TxGirderCatalog.StrandSize(pd.StrandDiameter, u)} dia, {pd.StrandStrength:0} ksi low-relaxation");
                 R("Depressed strands", dep == 0 ? "None" : $"{dep}, hold-downs {L(bm.HoldDownFromEnd)} from each end");
                 double cgMid = bm.Strands.Average(s => s.Section.Y), cgEnd = bm.Strands.Average(s => s.EndHeight);
                 R("e at CL / at ends", $"{S(bm.Shape.Yb * 0.0254 - cgMid)} / {S(bm.Shape.Yb * 0.0254 - cgEnd)}");
                 R("f'c / f'ci", $"{pd.ConcreteStrength:0.0#} / {pd.ReleaseStrength:0.0#} ksi");
-                R("Area / Ix (IGD)", $"{bm.Shape.Area:N0} in² / {bm.Shape.Ix:N0} in⁴");
+                R("Area / Ix (IGD)", $"{bm.Shape.Area:N0} inÂ² / {bm.Shape.Ix:N0} inâ´");
                 R("Weight (155 pcf)", W(bm.Mass));
                 R("Concrete", CY(bm.Volume));
                 R("Top of beam at bearings", $"{E(bm.BearingStart.Z)} / {E(bm.BearingEnd.Z)}");
@@ -245,7 +245,7 @@ public sealed partial class MainViewModel : ObservableObject
             }
             case PsStrandPick st:
             {
-                title = $"{(st.Strand.Depressed ? "Depressed strand" : "Strand")} — {st.Beam.Mark}";
+                title = $"{(st.Strand.Depressed ? "Depressed strand" : "Strand")} â€” {st.Beam.Mark}";
                 R("Girder", st.Beam.Mark);
                 R("Diameter", SBM.Core.Prestressed.TxGirderCatalog.StrandSize(st.Beam.StrandDiameter, u));
                 R("Position at CL (x, y)", $"{S(st.Strand.Section.X)}, {S(st.Strand.Section.Y)} above bottom");
@@ -282,7 +282,7 @@ public sealed partial class MainViewModel : ObservableObject
     private void UpdateTitle()
     {
         string name = FilePath != null ? Path.GetFileName(FilePath) : _project.Name;
-        WindowTitle = $"{name}{(IsDirty ? " *" : "")} — Steel Bridge Modeler";
+        WindowTitle = $"{name}{(IsDirty ? " *" : "")} â€” Steel Bridge Modeler";
     }
 
     // ------------------------------------------------------------------ project lifecycle
@@ -343,7 +343,7 @@ public sealed partial class MainViewModel : ObservableObject
     {
         if (!ConfirmDiscard()) return;
         SetProject(new BridgeProject(), null, true);
-        Info("New project created. Import a LandXML alignment or create one with Alignment ▸ New.");
+        Info("New project created. Import a LandXML alignment or create one with Alignment â–¸ New.");
     }
 
     /// <summary>Opens a project file given on the command line (a *.sbm argument or --open path).</summary>
@@ -773,7 +773,7 @@ public sealed partial class MainViewModel : ObservableObject
         var dlg = new OpenFileDialog { Filter = "C# script (*.csx)|*.csx|All files|*.*", Title = "Run script" };
         if (dlg.ShowDialog() != true) return;
         Checkpoint();
-        StatusText = $"Running {Path.GetFileName(dlg.FileName)}…";
+        StatusText = $"Running {Path.GetFileName(dlg.FileName)}â€¦";
         var doc = SBM.Api.SbmDocument.Attach(_project, FilePath);
         var sw = Stopwatch.StartNew();
         var res = await Task.Run(() => SBM.Api.ScriptHost.RunFileAsync(dlg.FileName, doc));
@@ -877,7 +877,7 @@ public sealed partial class MainViewModel : ObservableObject
         var units = Units;
         string? projectFile = FilePath;
         var sw = Stopwatch.StartNew();
-        if (defs.Count > 0) StatusText = $"Loading {defs.Count} reference model(s)…";
+        if (defs.Count > 0) StatusText = $"Loading {defs.Count} reference model(s)â€¦";
         var origin = _origin ?? Vec3.Zero;
         var bridgeBox = Scene?.FocusExtents ?? Box2.Empty;
         // Phase 1: read (or reuse) the geometry.
@@ -904,7 +904,7 @@ public sealed partial class MainViewModel : ObservableObject
             }
             catch (Exception ex) when (ex is IOException or InvalidDataException or FormatException or System.Xml.XmlException or UnauthorizedAccessException or OutOfMemoryException)
             {
-                return (def, null, null, $"{def.Name}: could not load — {ex.Message}");
+                return (def, null, null, $"{def.Name}: could not load â€” {ex.Message}");
             }
         }).ToList());
 
@@ -1055,6 +1055,35 @@ public sealed partial class MainViewModel : ObservableObject
         catch (Exception ex) { Error($"IFC export failed: {ex.Message}"); }
     }
 
+    /// <summary>Rhino 3DM of the generated model (SBM.IO.Rhino3dm): exact extrusions / B-reps, fastener blocks, bar and alignment curves,
+    /// layers per bridge = the viewport layers, IFC GlobalIds as user text; same base point as the IFC export. Runs off the UI thread.</summary>
+    [RelayCommand]
+    private async Task ExportRhino()
+    {
+        if (Framings.Count == 0) { Warn("There is no model to export. Create a bridge first."); return; }
+        var dlg = new SaveFileDialog { Filter = "Rhino 3D model (*.3dm)|*.3dm", FileName = _project.Name + ".3dm" };
+        if (dlg.ShowDialog() != true) return;
+        var models = Framings.Keys.Select(b => new BridgeModel(b, Framings[b], SteelModels.GetValueOrDefault(b), true, ConcreteModels.GetValueOrDefault(b),
+            SubstructureModels.GetValueOrDefault(b), PrestressedModels.GetValueOrDefault(b))).ToList();
+        // the IFC export's base point (bridges the IFC writes), so both files share one local frame
+        var bp = IfcExporter.BasePoint(_project, models.Where(m => m.Steel != null || m.Prestressed != null || m.Concrete?.Segmental != null || m.Definition.SupportLinesOnly).Select(m => m.Framing));
+        var project = _project;
+        string path = dlg.FileName;
+        IsBusy = true;
+        StatusText = "Exporting Rhino 3DMâ€¦";
+        try
+        {
+            var r = await Task.Run(() => SBM.IO.Rhino3dm.Rhino3dmExporter.Export(path, project, models,
+                new SBM.IO.Rhino3dm.Rhino3dmOptions { BasePoint = bp, Source = FilePath != null ? Path.GetFileName(FilePath) : null }));
+            Info($"Exported Rhino 3DM to {path}: {r.Objects:N0} objects ({r.Extrusions + r.MiteredExtrusions:N0} extrusions, {r.ObliqueBreps + r.NurbsBreps + r.ExactBodies:N0} B-reps, " +
+                 $"{r.Meshes:N0} meshes, {r.Curves:N0} curves, {r.BlockInstances:N0} fastener blocks), {r.Units}, in {r.Elapsed.TotalSeconds:0.0} s. Rhino origin = base point " +
+                 $"E {ValueFormat.Format(Units, ValueKind.Coordinate, bp.X)}, N {ValueFormat.Format(Units, ValueKind.Coordinate, bp.Y)}" +
+                 (r.Fallbacks > 0 ? $"; {r.Fallbacks} exact solids written as meshes." : "."));
+        }
+        catch (Exception ex) { Error($"Rhino export failed: {ex.Message}"); }
+        finally { IsBusy = false; StatusText = "Rhino 3DM export done"; }
+    }
+
     // ------------------------------------------------------------------ regeneration
 
     private PlanDrawing? _lastDrawing;
@@ -1082,7 +1111,7 @@ public sealed partial class MainViewModel : ObservableObject
     {
         int version = Interlocked.Increment(ref _regenVersion);
         IsBusy = true;
-        StatusText = "Regenerating…";
+        StatusText = "Regeneratingâ€¦";
         var project = _project;
         var origin = _origin;
         bool projectedAll = ProjectedPlanAll;
@@ -1179,9 +1208,9 @@ public sealed partial class MainViewModel : ObservableObject
             double tons = SteelModels.Values.Sum(m => m.SteelMass) / (Units.IsUS ? 907.18474 : 1000);
             int psBeams = PrestressedModels.Values.Sum(m => m.Beams.Count);
             StatusText = psBeams > 0 && SteelModels.Count == 0
-                ? $"Regenerated in {sw.ElapsedMilliseconds} ms — {psBeams} prestressed girders, {PrestressedModels.Values.Sum(m => m.Beams.Sum(b => b.Strands.Count)):N0} strands, " +
+                ? $"Regenerated in {sw.ElapsedMilliseconds} ms â€” {psBeams} prestressed girders, {PrestressedModels.Values.Sum(m => m.Beams.Sum(b => b.Strands.Count)):N0} strands, " +
                   $"{scene.Solids.Sum(s => s.Triangles):N0} triangles"
-                : $"Regenerated in {sw.ElapsedMilliseconds} ms — {frames} cross frames, {stiff} stiffeners, {parts:N0} parts, {bolts:N0} bolts, " +
+                : $"Regenerated in {sw.ElapsedMilliseconds} ms â€” {frames} cross frames, {stiff} stiffeners, {parts:N0} parts, {bolts:N0} bolts, " +
                   $"{tons:N1} {(Units.IsUS ? "tons" : "t")} steel, {scene.Solids.Sum(s => s.Triangles):N0} triangles";
             if (scene.DetailSkipped) StatusText += " - bolts, studs, welds and rebar not drawn (out of memory)";
             Log("REGEN: " + StatusText);
@@ -1284,7 +1313,7 @@ public sealed partial class MainViewModel : ObservableObject
         Explorer.Clear();
         var root = new ExplorerNode
         {
-            Header = _project.Name, Icon = "",
+            Header = _project.Name, Icon = "î£±",
             Properties = () => new[]
             {
                 new PropertyRow("Units", u.IsUS ? $"US ({(u.Foot == FootDefinition.USSurvey ? "US survey ft" : "international ft")})" : "SI (m)"),
@@ -1295,34 +1324,34 @@ public sealed partial class MainViewModel : ObservableObject
         };
         Explorer.Add(root);
 
-        var alNode = new ExplorerNode { Header = "Alignments", Icon = "" };
+        var alNode = new ExplorerNode { Header = "Alignments", Icon = "î ž" };
         root.Children.Add(alNode);
         foreach (var a in _project.Alignments)
         {
             var al = a;
             alNode.Children.Add(new ExplorerNode
             {
-                Header = a.Name, Icon = "", Tag = a, Open = () => EditAlignment(al),
+                Header = a.Name, Icon = "îž­", Tag = a, Open = () => EditAlignment(al),
                 Properties = () => AlignmentProperties(al),
             });
         }
 
         if (_project.References.Count > 0)
         {
-            var refNode = new ExplorerNode { Header = "References", Icon = "" };
+            var refNode = new ExplorerNode { Header = "References", Icon = "îœ›" };
             root.Children.Add(refNode);
             foreach (var r in _project.References)
             {
                 var rr = r;
                 refNode.Children.Add(new ExplorerNode
                 {
-                    Header = r.Name, Icon = r.Kind == ReferenceKind.Terrain ? "" : "", Tag = r,
+                    Header = r.Name, Icon = r.Kind == ReferenceKind.Terrain ? "î¤‰" : "îž¸", Tag = r,
                     Properties = () =>
                     {
                         string full = BridgeProject.ResolvePath(rr.Path, FilePath);
                         var rows = new List<PropertyRow>
                         {
-                            new("Kind", rr.Kind.ToString()), new("File", full), new("Exists", File.Exists(full) ? "Yes" : "NO — file missing"),
+                            new("Kind", rr.Kind.ToString()), new("File", full), new("Exists", File.Exists(full) ? "Yes" : "NO â€” file missing"),
                         };
                         if (_refCache.TryGetValue(rr.Name, out var c))
                         {
@@ -1338,7 +1367,7 @@ public sealed partial class MainViewModel : ObservableObject
             }
         }
 
-        var brNode = new ExplorerNode { Header = "Bridges", Icon = "" };
+        var brNode = new ExplorerNode { Header = "Bridges", Icon = "î " };
         root.Children.Add(brNode);
         foreach (var b in _project.Bridges)
         {
@@ -1346,11 +1375,11 @@ public sealed partial class MainViewModel : ObservableObject
             Framings.TryGetValue(b, out var f);
             var bn = new ExplorerNode
             {
-                Header = b.Name, Icon = "", Tag = b, Open = () => EditBridge("0"),
+                Header = b.Name, Icon = "î¢¹", Tag = b, Open = () => EditBridge("0"),
                 Properties = () => BridgeProperties(bridge, f),
             };
             brNode.Children.Add(bn);
-            var sup = new ExplorerNode { Header = $"Supports ({b.Supports.Count})", Icon = "", Tag = b, Open = () => EditBridge("0"), IsExpanded = false };
+            var sup = new ExplorerNode { Header = $"Supports ({b.Supports.Count})", Icon = "îŸ", Tag = b, Open = () => EditBridge("0"), IsExpanded = false };
             bn.Children.Add(sup);
             if (f != null)
             {
@@ -1359,28 +1388,28 @@ public sealed partial class MainViewModel : ObservableObject
                     var ss = s;
                     sup.Children.Add(new ExplorerNode
                     {
-                        Header = s.Name, Icon = "", Tag = b, Open = () => EditBridge("0"),
+                        Header = s.Name, Icon = "îŸ", Tag = b, Open = () => EditBridge("0"),
                         Properties = () => SupportProperties(ss),
                     });
                 }
-                var gn = new ExplorerNode { Header = $"Girders ({f.Girders.Count})", Icon = "", Tag = b, Open = () => EditBridge("1"), IsExpanded = false };
+                var gn = new ExplorerNode { Header = $"Girders ({f.Girders.Count})", Icon = "î¢©", Tag = b, Open = () => EditBridge("1"), IsExpanded = false };
                 bn.Children.Add(gn);
                 foreach (var g in f.Girders)
                 {
                     var gg = g;
                     gn.Children.Add(new ExplorerNode
                     {
-                        Header = $"{g.Name}  ({u.FormatLength(g.Length)})", Icon = "", Tag = b, Open = () => EditBridge("1"),
+                        Header = $"{g.Name}  ({u.FormatLength(g.Length)})", Icon = "î¢©", Tag = b, Open = () => EditBridge("1"),
                         Properties = () => GirderProperties(bridge, f, gg),
                     });
                 }
-                bn.Children.Add(new ExplorerNode { Header = "Deck & Barriers", Icon = "", Tag = b, Open = () => EditBridge("2"),
+                bn.Children.Add(new ExplorerNode { Header = "Deck & Barriers", Icon = "î ž", Tag = b, Open = () => EditBridge("2"),
                     Properties = () => DeckProperties(bridge, f) });
-                bn.Children.Add(new ExplorerNode { Header = $"Cross Frames ({f.CrossFrames.Count})", Icon = "", Tag = b, Open = () => EditBridge("3"),
+                bn.Children.Add(new ExplorerNode { Header = $"Cross Frames ({f.CrossFrames.Count})", Icon = "î£", Tag = b, Open = () => EditBridge("3"),
                     Properties = () => f.CrossFrames.GroupBy(c => c.Type).Select(gr => new PropertyRow(ChoiceField.Humanize(gr.Key.ToString()), gr.Count().ToString())) });
-                bn.Children.Add(new ExplorerNode { Header = $"Stiffeners ({f.Stiffeners.Count})", Icon = "", Tag = b, Open = () => EditBridge("4"),
+                bn.Children.Add(new ExplorerNode { Header = $"Stiffeners ({f.Stiffeners.Count})", Icon = "îŸ…", Tag = b, Open = () => EditBridge("4"),
                     Properties = () => f.Stiffeners.GroupBy(c => c.Kind).Select(gr => new PropertyRow(ChoiceField.Humanize(gr.Key.ToString()), gr.Count().ToString())) });
-                bn.Children.Add(new ExplorerNode { Header = $"Field Splices ({b.FieldSplices.Count})", Icon = "", Tag = b, Open = () => EditBridge("5"),
+                bn.Children.Add(new ExplorerNode { Header = $"Field Splices ({b.FieldSplices.Count})", Icon = "î£†", Tag = b, Open = () => EditBridge("5"),
                     Properties = () => b.FieldSplices.Select((s, i) => new PropertyRow($"FS{i + 1}", u.FormatStation(s.Station))) });
             }
         }
@@ -1402,7 +1431,7 @@ public sealed partial class MainViewModel : ObservableObject
         yield return new("PI-editable", a.PiDefinition != null ? "Yes" : "No (imported geometry)");
         foreach (var e in a.Elements.Where(e => e.Kind != HorizontalElementKind.Line))
             yield return new($"{e.Kind} @ {u.FormatStation(a.DistanceToStation(e.StartDistance))}",
-                $"R = {(double.IsInfinity(e.Radius) ? "∞" : u.FormatLength(e.Radius))}, L = {u.FormatLength(e.Length)}");
+                $"R = {(double.IsInfinity(e.Radius) ? "âˆž" : u.FormatLength(e.Radius))}, L = {u.FormatLength(e.Length)}");
     }
 
     private IEnumerable<PropertyRow> BridgeProperties(BridgeDefinition b, BridgeFraming? f)
@@ -1410,14 +1439,14 @@ public sealed partial class MainViewModel : ObservableObject
         var u = Units;
         yield return new("Name", b.Name);
         yield return new("Alignment", b.AlignmentName);
-        yield return new("Spans", string.Join(" – ", b.Supports.Zip(b.Supports.Skip(1), (x, y) => u.FormatLength(y.Station - x.Station))));
+        yield return new("Spans", string.Join(" â€“ ", b.Supports.Zip(b.Supports.Skip(1), (x, y) => u.FormatLength(y.Station - x.Station))));
         yield return new("Begin / end", $"{u.FormatStation(b.Supports.First().Station)} / {u.FormatStation(b.Supports.Last().Station)}");
         yield return new("Girders", $"{b.Girders.Count} ({ChoiceField.Humanize(b.Girders.PlanLayout.ToString())})");
         yield return new("Steel depth", u.FormatLength(b.Girders.Section.TotalDepth, LengthKind.Short));
         yield return new("Deck width", u.FormatLength(b.Deck.RightEdgeOffset - b.Deck.LeftEdgeOffset));
         if (f != null)
         {
-            if (f.Deck != null) yield return new("Deck area", $"{f.Deck.Area / (u.LongUnit * u.LongUnit):N0} {u.LongUnitName}²");
+            if (f.Deck != null) yield return new("Deck area", $"{f.Deck.Area / (u.LongUnit * u.LongUnit):N0} {u.LongUnitName}Â²");
             yield return new("Cross frames", f.CrossFrames.Count.ToString());
             yield return new("Stiffeners", f.Stiffeners.Count.ToString());
             yield return new("Generation time", $"{f.GenerationTime.TotalMilliseconds:F0} ms");
@@ -1447,16 +1476,16 @@ public sealed partial class MainViewModel : ObservableObject
             var shp = SBM.Core.Prestressed.TxGirderCatalog.Get(ps);
             yield return new("Girder", $"TxDOT {shp.Name} prestressed (simple spans)");
             yield return new("Depth / top flange", $"{u.FormatLength(shp.Depth, LengthKind.Short)} / {u.FormatLength(shp.TopWidth, LengthKind.Short)}");
-            yield return new("Strands", $"{ps.StrandCount} – {SBM.Core.Prestressed.TxGirderCatalog.StrandSize(ps.StrandDiameter, u)} ({ps.DepressedStrands} depressed)");
+            yield return new("Strands", $"{ps.StrandCount} â€“ {SBM.Core.Prestressed.TxGirderCatalog.StrandSize(ps.StrandDiameter, u)} ({ps.DepressedStrands} depressed)");
             if (PrestressedModels.TryGetValue(b, out var pm))
                 foreach (var bm in pm.Beams.Where(x => x.Girder == g.Index))
                     yield return new($"Beam {bm.Mark}", $"{u.FormatLength(bm.Length)} long, haunch {u.FormatLength(bm.MinHaunch, LengthKind.Short)} to {u.FormatLength(bm.MaxHaunch, LengthKind.Short)}");
             yield break;
         }
         var sec = b.Girders.Section;
-        yield return new("Top flange", $"{u.FormatLength(sec.TopFlange.Width, LengthKind.Short)} × {u.FormatLength(sec.TopFlange.Thickness, LengthKind.Short)}");
-        yield return new("Web", $"{u.FormatLength(sec.WebDepth, LengthKind.Short)} × {u.FormatLength(sec.WebThickness, LengthKind.Short)}");
-        yield return new("Bottom flange", $"{u.FormatLength(sec.BottomFlange.Width, LengthKind.Short)} × {u.FormatLength(sec.BottomFlange.Thickness, LengthKind.Short)}");
+        yield return new("Top flange", $"{u.FormatLength(sec.TopFlange.Width, LengthKind.Short)} Ã— {u.FormatLength(sec.TopFlange.Thickness, LengthKind.Short)}");
+        yield return new("Web", $"{u.FormatLength(sec.WebDepth, LengthKind.Short)} Ã— {u.FormatLength(sec.WebThickness, LengthKind.Short)}");
+        yield return new("Bottom flange", $"{u.FormatLength(sec.BottomFlange.Width, LengthKind.Short)} Ã— {u.FormatLength(sec.BottomFlange.Thickness, LengthKind.Short)}");
         yield return new("Stiffeners", f.Stiffeners.Count(s => s.Girder == g.Index).ToString());
         foreach (var sp in f.Splices.Where(s => s.Girder == g.Index))
             yield return new($"Field splice {sp.Number}", $"{u.FormatLength(sp.GirderDistance)} from girder end");
@@ -1483,7 +1512,7 @@ public sealed partial class MainViewModel : ObservableObject
         yield return new("Haunch", u.FormatLength(d.Haunch, LengthKind.Short));
         yield return new("SIP forms", d.StayInPlaceForms ? "Yes" : "No");
         yield return new("Barrier", $"{d.Barrier.Type}, {u.FormatLength(d.Barrier.Height, LengthKind.Short)} high");
-        if (f.Deck != null) yield return new("Deck area", $"{f.Deck.Area / (u.LongUnit * u.LongUnit):N0} {u.LongUnitName}²");
+        if (f.Deck != null) yield return new("Deck area", $"{f.Deck.Area / (u.LongUnit * u.LongUnit):N0} {u.LongUnitName}Â²");
     }
 
     private void RebuildReports()
@@ -1517,7 +1546,7 @@ public sealed partial class MainViewModel : ObservableObject
                              .GroupBy(p => (p.Category, p.Description)).OrderBy(g => g.Key.Category).ThenBy(g => g.Key.Description))
                     MaterialRows.Add(new MaterialRow(b.Name, ChoiceField.Humanize(grp.Key.Category.ToString()), grp.Key.Description, grp.Count(),
                         u.FormatLength(grp.Sum(p => p.Length)),
-                        grp.Key.Category == PartCategory.BearingPad ? "—" : $"{grp.Sum(p => p.Mass) / massUnit:N0} {mu}"));
+                        grp.Key.Category == PartCategory.BearingPad ? "â€”" : $"{grp.Sum(p => p.Mass) / massUnit:N0} {mu}"));
                 foreach (var grp in sm.Parts.Where(p => p.Category == PartCategory.Weld).GroupBy(p => p.Description).OrderBy(g => g.Key))
                     MaterialRows.Add(new MaterialRow(b.Name, "Weld", grp.Key, grp.Count(), u.FormatLength(grp.Sum(p => p.Length)), ""));
                 foreach (var grp in sm.Bolts.Where(x => x.Kind == BoltKind.Structural).GroupBy(x => (Dia: Math.Round(x.Diameter > 0 ? x.Diameter : sm.Bolt.Diameter, 5), Len: Math.Round(x.Length, 5)))
@@ -1563,11 +1592,11 @@ public sealed partial class MainViewModel : ObservableObject
                 foreach (var grp in psm.Pads.GroupBy(x => (x.Length, x.Width, x.Thickness)))
                     MaterialRows.Add(new MaterialRow(b.Name, "Bearing pad",
                         $"Elastomeric {u.FormatLength(grp.Key.Length, LengthKind.Short)} x {u.FormatLength(grp.Key.Width, LengthKind.Short)} x {u.FormatLength(grp.Key.Thickness, LengthKind.Short)}",
-                        grp.Count(), "", "—"));
+                        grp.Count(), "", "â€”"));
                 if (psm.ConcreteDiaphragms is { } cdm)
                 {
                     double cy = u.IsUS ? 0.764554857984 : 1;
-                    string vu = u.IsUS ? "CY" : "m³";
+                    string vu = u.IsUS ? "CY" : "mÂ³";
                     foreach (var d in cdm.Diaphragms)
                         MaterialRows.Add(new MaterialRow(b.Name, "Concrete", $"{d.Name} ({d.ObjectType.Replace('_', ' ').ToLowerInvariant()}{(d.UnbuiltParts.Count > 0 ? ", parts UNRESOLVED: " + string.Join(", ", d.UnbuiltParts) : "")}{(d.Assumption != null ? ", UNRESOLVED geometry" : "")})",
                             d.Parts.Count, u.FormatLength(d.Length), $"{d.Volume / cy:N2} {vu}"));
@@ -1581,7 +1610,7 @@ public sealed partial class MainViewModel : ObservableObject
                 double massUnit = u.IsUS ? 0.45359237 : 1;
                 string mu = u.IsUS ? "lb" : "kg";
                 double cy = u.IsUS ? 0.764554857984 : 1;
-                string vu = u.IsUS ? "CY" : "m³";
+                string vu = u.IsUS ? "CY" : "mÂ³";
                 MaterialRows.Add(new MaterialRow(b.Name, "Concrete", "Deck slab", 1, "", $"{(cmod.DeckVolume + cmod.DeckBumpVolume) / cy:N1} {vu}"));
                 MaterialRows.Add(new MaterialRow(b.Name, "Concrete", "Haunches", _project.Bridges.Count, "", $"{cmod.HaunchVolume / cy:N1} {vu}"));
                 foreach (var ch in cmod.CapHaunches) MaterialRows.Add(new MaterialRow(b.Name, "Concrete", ch.Name, 1, "", $"{ch.Volume / cy:N2} {vu}"));
@@ -1608,7 +1637,7 @@ public sealed partial class MainViewModel : ObservableObject
                 double massUnit = u.IsUS ? 0.45359237 : 1;
                 string mu = u.IsUS ? "lb" : "kg";
                 double cy = u.IsUS ? 0.764554857984 : 1;
-                string vu = u.IsUS ? "CY" : "m³";
+                string vu = u.IsUS ? "CY" : "mÂ³";
                 foreach (var g in smod.Units.SelectMany(x => x.Solids).Where(x => x.IsConcrete).GroupBy(x => x.Kind))
                     MaterialRows.Add(new MaterialRow(b.Name, "Concrete", "Substructure " + ChoiceField.Humanize(g.Key.ToString()).ToLowerInvariant() + "s", g.Count(), "",
                         $"{g.Sum(x => Math.Abs(x.Mesh.Volume())) / cy:N1} {vu}"));
@@ -1632,7 +1661,7 @@ public sealed partial class MainViewModel : ObservableObject
                 }
             }
             foreach (var c in f.CrossFrames)
-                CrossFrameRows.Add(new CrossFrameRow(c.Mark, (c.Span + 1).ToString(), $"G{c.Bay + 1}–G{c.RightGirder + 1}",
+                CrossFrameRows.Add(new CrossFrameRow(c.Mark, (c.Span + 1).ToString(), $"G{c.Bay + 1}â€“G{c.RightGirder + 1}",
                     (c.AtSupport ? "Support " : "") + ChoiceField.Humanize(c.Type.ToString()), u.FormatStation(c.Station), u.FormatLength(c.PlanLength),
                     u.FormatLength(c.LeftGirderDistance), u.FormatLength(c.RightGirderDistance)));
         }
@@ -1653,7 +1682,7 @@ public sealed partial class MainViewModel : ObservableObject
             text += $"   |   {align.Name}: STA {u.FormatStation(so.Station)}  OFF {u.FormatLength(so.Offset)} {(so.Offset < 0 ? "LT" : "RT")}" +
                     $"   Grade elev {u.FormatLength(elev, LengthKind.Coordinate)}";
             if (GroundElevation(world) is { } g)
-                text += $"   Ground {u.FormatLength(g, LengthKind.Coordinate)}  (grade − ground {u.FormatLength(elev - g)})";
+                text += $"   Ground {u.FormatLength(g, LengthKind.Coordinate)}  (grade âˆ’ ground {u.FormatLength(elev - g)})";
         }
         else if (GroundElevation(world) is { } g2) text += $"   Ground {u.FormatLength(g2, LengthKind.Coordinate)}";
         CursorText = text;
@@ -1674,9 +1703,9 @@ public sealed partial class MainViewModel : ObservableObject
     {
         var (icon, brush) = severity switch
         {
-            "Error" => ("", ErrBrush),
-            "Warning" => ("", WarnBrush),
-            _ => ("", InfoBrush),
+            "Error" => ("î¨¹", ErrBrush),
+            "Warning" => ("îžº", WarnBrush),
+            _ => ("î¥†", InfoBrush),
         };
         Messages.Add(new MessageItem(severity, text, icon, brush, diagnostic));
         Log($"{severity}: {text}");

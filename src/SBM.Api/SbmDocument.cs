@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using SBM.Core.Alignments;
 using SBM.Core.Bridge;
 using SBM.Core.Drawing;
@@ -284,7 +284,7 @@ public sealed class SbmDocument
         Model(bridgeName).Concrete?.Segmental ?? throw new InvalidOperationException("This bridge has no segmental box (or framing errors).");
     public SBM.Core.Concrete.ConcreteModel Concrete(string? bridgeName = null) => Model(bridgeName).Concrete ?? throw new InvalidOperationException("Concrete was not generated (framing errors).");
 
-    /// <summary>Hand-checkable elevation chains (profile grade → deck → haunch → web → flange → sole plate → bearing seat) for every bearing.</summary>
+    /// <summary>Hand-checkable elevation chains (profile grade â†’ deck â†’ haunch â†’ web â†’ flange â†’ sole plate â†’ bearing seat) for every bearing.</summary>
     public List<SBM.Core.Checks.ElevationChain> BearingElevations(string? bridgeName = null)
     {
         var m = Model(bridgeName);
@@ -324,7 +324,7 @@ public sealed class SbmDocument
     }
 
     /// <summary>The plan set on 11x17 (or another format): layout, typical section, girder elevations, steel and bearing
-    /// details, bents, bar lists — each view at the largest standard scale that fits.</summary>
+    /// details, bents, bar lists â€” each view at the largest standard scale that fits.</summary>
     public List<SBM.Core.Drawing.Sheets.Sheet> Sheets(string? bridgeName = null, double widthIn = 17, double heightIn = 11)
     {
         var m = Model(bridgeName);
@@ -396,6 +396,37 @@ public sealed class SbmDocument
         Regenerate();
         var data = _models.OfType<BridgeModel>().Where(m => m.Steel != null || m.Prestressed != null || m.Concrete?.Segmental != null || m.Framing.Definition.SupportLinesOnly).Select(m => new IfcBridgeData(m.Framing, m.Steel, m.Concrete, m.Substructure, m.Prestressed)).ToList();
         return IfcExporter.Export(path, Project, data, new IfcExportOptions(geometry, chordTolerance, forCheck, keepDesignations));
+    }
+
+    /// <summary>Writes a Rhino 3DM file (rhino3dm): exact extrusions / B-reps where the model records them, meshes elsewhere, fastener blocks,
+    /// bar / strand / alignment curves, layers per bridge = the viewport layers, user text with the IFC GlobalIds. Coordinates are relative to the
+    /// IFC export base point (same local frame as <see cref="ExportIfc"/>), in the project's display length unit. See docs/API.md.</summary>
+    /// <param name="bridges">Bridge names to write (null = all).</param>
+    /// <param name="detail">Bolts, rivets, studs, anchor bolts, welds, bars, strands, tendons.</param>
+    /// <param name="meshOnly">Every solid as a mesh.</param>
+    /// <param name="terrain">Include the visible terrain references (display meshes).</param>
+    /// <param name="barSolids">Also write bars / strands / tendons as tube meshes.</param>
+    public SBM.IO.Rhino3dm.Rhino3dmResult Export3dm(string path, IReadOnlyList<string>? bridges = null, bool detail = true, bool meshOnly = false,
+        bool terrain = false, bool barSolids = false)
+    {
+        Regenerate();
+        var all = _models.OfType<BridgeModel>().ToList();
+        // same base point as the IFC export (computed from the bridges the IFC writes, whatever subset goes to the 3DM)
+        var ifcBridges = all.Where(m => m.Steel != null || m.Prestressed != null || m.Concrete?.Segmental != null || m.Framing.Definition.SupportLinesOnly).Select(m => m.Framing);
+        var bp = IfcExporter.BasePoint(Project, ifcBridges);
+        List<(string, SBM.Core.Solids.Mesh)>? terr = null;
+        if (terrain)
+        {
+            EnsureTerrain();
+            var defs = Project.References.Where(r => r.Kind == ReferenceKind.Terrain && r.Visible).ToList();
+            terr = _terrains!.Select((t, i) => (defs.Count == _terrains!.Count ? Path.GetFileNameWithoutExtension(defs[i].Path) : $"Terrain {i + 1}", t.Mesh)).ToList();
+        }
+        var o = new SBM.IO.Rhino3dm.Rhino3dmOptions
+        {
+            Bridges = bridges, Detail = detail, MeshOnly = meshOnly, BarSolids = barSolids, Terrain = terr, BasePoint = bp,
+            Source = FilePath != null ? Path.GetFileName(FilePath) : null,
+        };
+        return SBM.IO.Rhino3dm.Rhino3dmExporter.Export(path, Project, all, o);
     }
 
     /// <summary>Writes the companion SQLite database (element registry with IFC GlobalIds and hierarchy, plan sheets, sheet links, QC).</summary>
