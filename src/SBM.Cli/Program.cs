@@ -1,17 +1,17 @@
-using SBM.Core.Project;
+﻿using SBM.Core.Project;
 using System.Diagnostics;
 using SBM.Api;
 
 namespace SBM.Cli;
 
 /// <summary>
-/// sbm — command-line access to Steel Bridge Modeler projects (for batch work, Python/Excel automation, CI).
+/// sbm â€” command-line access to Steel Bridge Modeler projects (for batch work, Python/Excel automation, CI).
 /// Exit code 0 = success, 1 = usage/input error, 2 = model has errors.
 /// </summary>
 public static partial class Program
 {
     private const string Usage = """
-        sbm — Steel Bridge Modeler command line
+        sbm â€” Steel Bridge Modeler command line
 
         Usage:
           sbm new <file.sbm> [--sample] [--metric]          Create a project (optionally the demo project)
@@ -30,6 +30,10 @@ public static partial class Program
           sbm regen <file.sbm>                              Regenerate; print counts, warnings, timing
           sbm export <file.sbm> [--ifc a.ifc|a.ifczip] [--geometry parametric|abv] [--chord-tol mm] [--dxf b.dxf] [--landxml c.xml]
                                                             [--for-check [--keep-designations]]  IFC for an independent checker: originator notes stripped
+                                                            [--3dm a.3dm [--bridges A,B] [--no-detail] [--mesh-only] [--terrain] [--bar-solids]]
+                                                            Rhino 3DM: exact extrusions / B-reps, fastener blocks, bar and alignment
+                                                            curves, layers per bridge, IFC GlobalIds as user text (IFC base point)
+          sbm 3dm-info <file.3dm> [--blocks]                Read a 3DM back: units, objects by layer / type, blocks, notes
           sbm db <file.sbm> [out.sqlite] [--pages] [--plans <folder>[,<folder>]] [--links rules.json] [--no-previews] [--no-vacuum]
                                                             [--for-check]  registry only: no sheet links, props text or model path
                                                             [--unused report.md]
@@ -84,7 +88,7 @@ public static partial class Program
 
         Paths:   Bridges[0].Supports[1].SkewDegrees   Bridges["Sample Bridge"].Girders.Section.WebDepth
                  Alignments[0].StartStation           Bridges[0].FieldSplices   Units.Kind
-        Values:  lengths 12'-6 1/2"  54"  1.2 m  300 mm   stations 12+34.56   angles 15°30'00"   slopes -2%
+        Values:  lengths 12'-6 1/2"  54"  1.2 m  300 mm   stations 12+34.56   angles 15Â°30'00"   slopes -2%
                  plain numbers use the field's display unit (ft or in / m or mm); JSON sets whole objects (SI units)
         """;
 
@@ -257,6 +261,18 @@ public static partial class Program
                     doc.Save();
                     return 0;
                 }
+                case "3dm-info":
+                {
+                    Need(args, 2);
+                    var s = SBM.IO.Rhino3dm.Rhino3dmInfo.Read(args[1]);
+                    Console.WriteLine($"{args[1]}: units {s.Units}, {s.Objects:N0} objects, {s.Layers} layers, {s.BlockDefinitions} block definitions, " +
+                                      $"{s.ObjectsWithGlobalId:N0} with GlobalId, B-reps {s.ClosedBreps:N0} closed / {s.OpenBreps:N0} open");
+                    Console.WriteLine("  by type: " + string.Join(", ", s.ByType.Select(kv => $"{kv.Key} {kv.Value:N0}")));
+                    foreach (var (layer, types) in s.ByLayer) Console.WriteLine($"  {layer}: " + string.Join(", ", types.Select(kv => $"{kv.Key} {kv.Value:N0}")));
+                    if (args.Contains("--blocks")) foreach (var (b, n) in s.BlockUse) Console.WriteLine($"  block '{b}': {n:N0}");
+                    foreach (var (k, v) in s.DocumentStrings) Console.WriteLine($"  {k} = {v}");
+                    return 0;
+                }
                 case "regen":
                 {
                     Need(args, 2);
@@ -283,11 +299,25 @@ public static partial class Program
                         doc.Regenerate();
                         var sw = System.Diagnostics.Stopwatch.StartNew();
                         var res = doc.ExportIfc(ifc, geometry, chord, args.Contains("--for-check"), args.Contains("--keep-designations"));
-                        Console.WriteLine($"  IFC 4.3 ({geometry}{(args.Contains("--for-check") ? ", FOR CHECK" : "")}) → {ifc}  ({sw.Elapsed.TotalSeconds:0.0} s, {new FileInfo(ifc).Length / 1048576.0:0.0} MB, {res.EntityCount:N0} entities" +
+                        Console.WriteLine($"  IFC 4.3 ({geometry}{(args.Contains("--for-check") ? ", FOR CHECK" : "")}) â†’ {ifc}  ({sw.Elapsed.TotalSeconds:0.0} s, {new FileInfo(ifc).Length / 1048576.0:0.0} MB, {res.EntityCount:N0} entities" +
                                           (geometry == SBM.IO.Ifc.IfcGeometryMode.ReferenceView ? $", {res.PolygonalSolids:N0} polygonal face sets, chord tol {res.ChordTolerance * 1000:0.###} mm)" : ")"));
                     }
-                    if (Opt("--dxf") is { } dxf) { doc.ExportDxf(dxf); Console.WriteLine($"  DXF → {dxf}"); }
-                    if (Opt("--landxml") is { } lx) { doc.ExportLandXml(lx); Console.WriteLine($"  LandXML → {lx}"); }
+                    if (Opt("--3dm") is { } r3)
+                    {
+                        doc.Regenerate();
+                        var sw = System.Diagnostics.Stopwatch.StartNew();
+                        var bl = Opt("--bridges")?.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                        var rr = doc.Export3dm(r3, bl, detail: !args.Contains("--no-detail"), meshOnly: args.Contains("--mesh-only"),
+                            terrain: args.Contains("--terrain"), barSolids: args.Contains("--bar-solids"));
+                        Console.WriteLine($"  Rhino 3DM ({rr.Units}) â†’ {r3}  ({sw.Elapsed.TotalSeconds:0.0} s, {new FileInfo(r3).Length / 1048576.0:0.0} MB, {rr.Objects:N0} objects: " +
+                                          $"{rr.Extrusions:N0} extrusions, {rr.ObliqueBreps:N0} oblique B-reps, {rr.NurbsBreps:N0} NURBS B-reps ({rr.NurbsBrepsClosed:N0} closed), {rr.Meshes:N0} meshes, " +
+                                          $"{rr.Curves:N0} curves ({rr.CurveSegments:N0} pieces), {rr.BlockInstances:N0} block instances of {rr.BlockDefinitions:N0} blocks; {rr.Layers} layers, {rr.Fallbacks} fallbacks to mesh)");
+                        Console.WriteLine($"  base point (Rhino origin) = grid {rr.BasePoint.X:0.###}, {rr.BasePoint.Y:0.###}, {rr.BasePoint.Z:0.###} m (as the IFC export)");
+                        foreach (var n in rr.Notes.Take(10)) Console.WriteLine("  " + n);
+                        Console.WriteLine("  timings: " + string.Join(", ", rr.Timings.Select(kv => $"{kv.Key} {kv.Value:0.0} s")));
+                    }
+                    if (Opt("--dxf") is { } dxf) { doc.ExportDxf(dxf); Console.WriteLine($"  DXF â†’ {dxf}"); }
+                    if (Opt("--landxml") is { } lx) { doc.ExportLandXml(lx); Console.WriteLine($"  LandXML â†’ {lx}"); }
                     return 0;
                 }
                 case "db":
@@ -376,7 +406,7 @@ public static partial class Program
                     if (args.Contains("--zip") && !SBM.IO.Dxf.SheetExport.IsZip(target)) target = target.TrimEnd('\\', '/') + ".zip";
                     var files = doc.ExportDrawings(target, pos.Count > 3 ? pos[3] : null);
                     foreach (var f in files) Console.WriteLine($"  {f}");
-                    Console.WriteLine($"{files.Count} views{(SBM.IO.Dxf.SheetExport.IsZip(target) ? " → " + target : "")} in {sw.ElapsedMilliseconds} ms");
+                    Console.WriteLine($"{files.Count} views{(SBM.IO.Dxf.SheetExport.IsZip(target) ? " â†’ " + target : "")} in {sw.ElapsedMilliseconds} ms");
                     return 0;
                 }
                 case "sheets":
@@ -391,12 +421,12 @@ public static partial class Program
                     var sheets = doc.Sheets(bridge);
                     string bname = doc.Bridge(bridge).Name;
                     SBM.IO.Pdf.PdfWriter.Write(args[2], sheets, bname);
-                    Console.WriteLine($"{sheets.Count} sheets → {args[2]} in {sw.ElapsedMilliseconds} ms");
+                    Console.WriteLine($"{sheets.Count} sheets â†’ {args[2]} in {sw.ElapsedMilliseconds} ms");
                     if (Opt("--dxf") is { } dxf)
                     {
                         sw.Restart();
                         var files = SBM.IO.Dxf.SheetExport.WriteSheets(dxf, bname, sheets, doc.Project.Units, args.Contains("--models") ? doc.Drawings(bridge) : null);
-                        Console.WriteLine($"{files.Count} DXF files → {dxf} in {sw.ElapsedMilliseconds} ms");
+                        Console.WriteLine($"{files.Count} DXF files â†’ {dxf} in {sw.ElapsedMilliseconds} ms");
                     }
                     return 0;
                 }

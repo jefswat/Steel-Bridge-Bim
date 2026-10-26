@@ -6,6 +6,12 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.12" />
+    <!-- McNeel rhino3dm (MIT): openNURBS 3DM writer for the Rhino export; native librhino3dm_native per RID (win-x64 for the app / CLI). -->
+    <PackageReference Include="Rhino3dm" Version="8.17.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="SBM.Tests" />
   </ItemGroup>
 
   <PropertyGroup>
