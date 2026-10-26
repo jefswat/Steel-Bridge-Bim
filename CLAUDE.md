@@ -522,6 +522,25 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   Validate with IfcOpenShell (`pip install ifcopenshell pytest`; `ifcopenshell.validate.validate(f, log, express_rules=True)`);
   reusable: `python -I tools/validate_ifc.py model.ifc [--express-sample N] [--geom N] [--geom-all REGEX] [--json out]`.
   Last full-model result (2026-10-11, 347 MB, 3.76 M entities): 0 schema + 0 EXPRESS issues; see docs/plan-data/ifc-validation.md.
+  RHINO 3DM export (2026-10-26): `Rhino3dm/` = `Rhino3dmExporter` (+ `RhinoBrepBuilder`, `Rhino3dmInfo` read-back) on McNeel rhino3dm 8.17.0 (NuGet
+  `Rhino3dm`, MIT, openNURBS; native `librhino3dm_native.dll` via runtimes/win-x64 -> root of a `-r win-x64` publish). `SbmDocument.Export3dm`,
+  `sbm export --3dm out.3dm [--bridges A,B] [--no-detail] [--mesh-only] [--terrain] [--bar-solids]`, `sbm 3dm-info`, app Output > CAD > Export Rhino (.3dm).
+  Mapping: `ExtrudedSolid` -> Rhino Extrusion (holes = inner circle profiles, `ArcPolygon` arcs exact); OBLIQUE sweeps (plates along a grade with plumb
+  ends) -> Extrusion along the sweep MITERED to the profile plane at both ends (`MiterPlaneNormalAtStart/End`, profile coords; right section = profile
+  projected along the sweep, circles -> ellipses as rational NURBS) - B-reps for them were 3x larger; sweep within 1/32 of the profile plane -> closed
+  B-rep; `Mesh.Nurbs` NurbsSolid and `PrestressedBeam.Body` -> closed B-reps built by `RhinoBrepBuilder` (FaceSpec: whole-domain NURBS faces or planar
+  faces bounded by NURBS curves; edges SHARED by vertex + geometry match; hole loops reuse the hole walls' boundary arcs, polyline uv trims on curved faces;
+  duplicate holes / zero-area faces dropped; loop ends snapped; openNURBS cannot recompute edge tolerances: they are set when added, then
+  `SetTolerancesBoxesAndFlags(lazy, no vertex/edge/trim tol, iso + type flags)`); everything else Mesh (double vertices, 30 deg crease split);
+  fasteners = one block per type/size + instance refs (`Placement(frame)`); bars / strands / tendons = curves (ArcFit lines + arcs). Layers
+  `<bridge>::<ModelLayers name>` (viewport colours), `Alignments::`, `Terrain::`; object name = mark; user text keys Kind/Mark/Assembly/Description/
+  Material/Mass_kg/GlobalId (= IFC GlobalId via `IfcKeys`, numbering mirrors IfcExporter: sub solids k over non-empty, misc/drains n over all, fasteners
+  bolts then studs)/Status/Reason/Basis; bars and fasteners lean (a first user string costs ~380 B per object); fastener flags = `StatusKey` -> document
+  text `SBM_Reasons`. Units = project display unit (`_s` = 1/foot), coordinates minus `IfcExporter.BasePoint` (shared with the IFC export; base point in
+  document text `SBM\BasePoint_*`, notes, earth anchor description). Written to %TEMP% then copied (openNURBS small writes: 20x slower on the mapped
+  C:\SBM folder). Group names may be locked once added (try/catch). Tests `Rhino3dmTests`
+  (oblique / arc / beam-body B-reps closed, mitered holes = circles in the caps, sample round trip: units, layers, blocks, GlobalIds, volumes, bounds).
+  Results: docs/API.md "Rhino export".
   Exports must be reproducible (test `Ifc_RegeneratedModel_ExportsIdentically`): anything numbered from a parallel
   generator's ConcurrentBag (stiffener marks, bar order, hole order) must be put in a fixed order first. Bar role:
   TIE/HOOP/CROSSTIE/SPIRAL/SSTR-S = LIGATURE.

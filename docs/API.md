@@ -64,6 +64,10 @@ sbm export "C:\Jobs\Br12\Br12.sbm" --ifc Br12.ifc --geometry abv [--chord-tol 0.
                                                  # holes and clipped beam profiles as IfcPolygonalFaceSet (holes = void loops), hole
                                                  # circles and profile arcs polygonized to --chord-tol mm (default 1/32" = 0.79 mm).
                                                  # --geometry parametric (default) = exact extrusions. Prints time, size, entity count.
+sbm export "C:\Jobs\Br12\Br12.sbm" --3dm Br12.3dm [--bridges "Unit 2,Unit 3"] [--no-detail] [--mesh-only] [--terrain] [--bar-solids]
+                                                 # Rhino 3DM (see "Rhino export" below): exact extrusions / B-reps, fastener blocks,
+                                                 # bar + alignment curves, layers per bridge, IFC GlobalIds as user text
+sbm 3dm-info   Br12.3dm [--blocks]              # read a 3DM back: units, objects by layer and type, blocks, document text
 sbm run    "samples\scripts\web-depth-study.csx" "C:\Jobs\Br12\Br12.sbm"
 sbm bench  "C:\Jobs\Br12\Br12.sbm"
 sbm set    "C:\Jobs\Br12\Br12.sbm" "Geometry.ExactCurvedGeometry=true"   # project setting: exact NURBS for curved parts (default off)
@@ -103,6 +107,50 @@ sbm blocking   "C:\Jobs\Br12\Br12.sbm"          # camber, deflections, girder-li
 
 **Python:** see `samples/scripts/skew_study.py`. It calls `sbm` through `subprocess`. Project files are plain JSON
 (SI units), so you can also read them directly.
+
+## Rhino export (`--3dm`)
+
+`sbm export model.sbm --3dm out.3dm`, `SbmDocument.Export3dm(path, bridges, detail, meshOnly, terrain, barSolids)` or the app
+(Output > CAD > Export Rhino (.3dm)) write the whole generated model with McNeel's open-source **rhino3dm 8.17.0** (NuGet `Rhino3dm`,
+MIT; openNURBS; the native `librhino3dm_native.dll` ships beside `sbm.exe` / the app). Rhino 6 or later opens the file (archive version 8).
+
+**Geometry (best fidelity first).**
+
+| Model data | Rhino object |
+| --- | --- |
+| Recorded exact extrusion (`ExtrudedSolid`: plates with bolt holes, rolled shapes, boxes, welds, piles ...), sweep normal to the profile | Extrusion: outer profile (lines; true arcs from `ArcPolygon`) + one circle per hole, capped |
+| Same, sweep oblique to the profile (plates along a grade with plumb ends, battered piles ...) | Extrusion along the sweep, both ends MITERED back to the profile plane (right section = profile projected along the sweep: hole circles become ellipses, arcs ellipse arcs - exact rational curves) |
+| Same, swept almost parallel to its profile plane (no valid miter) | closed B-rep (planar caps, ruled sides, half-cylinder hole walls) |
+| Exact NURBS solid (`Mesh.Nurbs`, project setting Geometry.ExactCurvedGeometry) | closed B-rep: NURBS faces, planar faces, holes trimmed by the hole walls' edges (shared edges) |
+| Prestressed beam with a true-arc profile (`PrestressedBeam.Body`) | closed B-rep: profile caps projected onto the skewed end planes, ruled sides |
+| Everything else (deck, barriers, concrete, substructure, meshes the generators build directly) | Mesh (double-precision vertices, creases split at 30 deg) |
+| Bolts, rivets, studs, anchor bolts | one block (instance definition) per type and size + an instance reference per fastener |
+| Bars, strands, PT tendons | curves: lines + true arcs (ArcFit, 0.5 mm) or polylines; `--bar-solids` adds tube meshes on `<layer>-SOLID` |
+| Alignments | `Alignments::<name>`: plan curve (lines / arcs exact, spirals sampled <= 0.5 m) at the base elevation + 3D profile grade line (<= 1 m) |
+| Terrain references (`--terrain`, visible ones) | `Terrain::<name>` mesh (the display mesh) |
+
+A part whose recorded description Rhino rejects falls back to its mesh (counted and listed: "fallbacks to mesh", `Rhino3dmResult.FallbackItems`).
+`--mesh-only` writes every solid as a mesh (one per element). `--no-detail` leaves out fasteners, welds and bars / strands / tendons.
+
+**Organisation.** Layers `<bridge>::<3D layer>` with the viewport layer names and colours (`ModelLayers`, e.g. `Unit 2::3D-GIRDER-PLATES`,
+`PTC Arch truss 18-20::3D-TRUSS-CHORDS`, `...::3D-RIVETS`), `Alignments::<name>`, `Terrain::<name>`. Object name = the mark (part mark, bar
+"Bar 5a1", unit solid name ...). Attribute user text: `Kind`, `Mark`, `Assembly`, `Description`, `Material`, `Mass_kg`, `Length`, `Volume_m3`,
+`Unit`, `Support`, `Fab_*` (fabrication attributes), `Status` / `Reason` / `Basis` (UNRESOLVED flags) and `GlobalId` = the IFC GlobalId
+of the same element (`IfcKeys`), so Rhino objects match the IFC and the companion database. Bars carry only Kind, Mark, Size, Unit, Coating,
+GlobalId (mark data are in the bar schedule / database); fasteners carry Assembly and GlobalId, and for flagged ones `StatusKey` = a key of
+the document user text section `SBM_Reasons` (the shared reason text). Several Rhino objects of one element (a part made of several
+recorded solids) are grouped.
+
+**Units and base point.** The file is in the project's display length unit (feet for US projects; US survey feet are written as Rhino
+feet with the survey-foot scale and noted). Coordinates are relative to the IFC export base point (rounded centre of the first bridge's
+deck), so the 3DM and the IFC share one local frame and Rhino works near its origin. The base point (grid E / N / Z in file units and in
+meters) is in the document user text (`SBM\BasePoint_E` ...), the notes and the earth anchor point description.
+
+**Performance** (sandbox, 2026-10-26; export only, after regeneration): Woodbury 2.6 s / 35 MB (7.5 k objects); Nebraska St 2.6 s /
+32 MB (19 k); I-80 + Ramp G 55 s / 703 MB (487 k objects: 124 k extrusions, 240 k fastener instances, 121 k bar curves); PTC Delaware River
+50 s / 768 MB, 3.3 GB peak working set (600 k objects, 510 k rivet instances of 377 blocks); `--no-detail` PTC 293 MB. The file is
+written to the local temp folder and copied (openNURBS writes in small pieces: ~20x slower straight onto a network / mapped folder).
+Read back: `sbm 3dm-info out.3dm` or `SBM.IO.Rhino3dm.Rhino3dmInfo.Read`.
 
 ## Two ways in: project files vs. the running app
 

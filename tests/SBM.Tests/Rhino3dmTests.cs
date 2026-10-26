@@ -200,6 +200,32 @@ public class Rhino3dmTests
     }
 
     [Fact]
+    public void GlobalIds_AreThoseOfTheIfcExport()
+    {
+        // every kind of element (parts, fasteners, deck, barriers, substructure solids, bars) carries the GlobalId the IFC export gives it
+        var doc = SbmDocument.Sample();
+        doc.Regenerate();
+        string p3 = TempFile("gid.3dm"), pi = TempFile("gid.ifc");
+        try
+        {
+            doc.Export3dm(p3);
+            doc.ExportIfc(pi);
+            string ifc = File.ReadAllText(pi);
+            using var f = RF.File3dm.Read(p3);
+            var byKind = f.Objects.Where(o => !o.Attributes.IsInstanceDefinitionObject && o.Attributes.GetUserString("GlobalId") is { Length: > 0 })
+                .GroupBy(o => o.Geometry is RG.InstanceReferenceGeometry ? "fastener" : o.Attributes.GetUserString("Kind") ?? "?").ToList();
+            Assert.True(byKind.Count >= 6, string.Join(", ", byKind.Select(g => g.Key)));
+            foreach (var g in byKind)
+                foreach (var o in g.Where((_, i) => i % 97 == 0).Take(5))
+                {
+                    string gid = o.Attributes.GetUserString("GlobalId");
+                    Assert.True(ifc.Contains($"('{gid}'") || ifc.Contains($"'{gid}',"), $"{g.Key} {o.Attributes.Name}: GlobalId {gid} not in the IFC");
+                }
+        }
+        finally { File.Delete(p3); File.Delete(pi); }
+    }
+
+    [Fact]
     public void MeshOnly_And_BridgeFilter()
     {
         var doc = SbmDocument.Sample();
