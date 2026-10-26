@@ -247,6 +247,26 @@ public class Rhino3dmTests
     }
 
     [Fact]
+    public void Rhino7Archive_And_EveryMeshValid()
+    {
+        // Rhino 7 cannot open version 8 archives; every mesh must pass openNURBS IsValid (float-coincident slivers are left out)
+        var doc = SbmDocument.Sample();
+        doc.Regenerate();
+        string p = TempFile("v7.3dm");
+        try
+        {
+            var r = doc.Export3dm(p, meshOnly: true, fileVersion: 7);
+            Assert.Equal(70, RF.File3dm.ReadArchiveVersion(p));
+            using var f = RF.File3dm.Read(p);
+            var meshes = f.Objects.Select(o => o.Geometry).OfType<RG.Mesh>().ToList();
+            Assert.Equal(r.Meshes, meshes.Count(m => true) - f.Objects.Count(o => o.Attributes.IsInstanceDefinitionObject && o.Geometry is RG.Mesh));
+            Assert.All(meshes, m => Assert.True(m.IsValid));
+            Assert.Throws<ArgumentException>(() => doc.Export3dm(TempFile("v6.3dm"), fileVersion: 6));
+        }
+        finally { File.Delete(p); }
+    }
+
+    [Fact]
     public void ExactCurvedGeometry_WritesClosedNurbsBreps()
     {
         var doc = SbmDocument.Sample();

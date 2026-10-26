@@ -406,8 +406,9 @@ public sealed class SbmDocument
     /// <param name="meshOnly">Every solid as a mesh.</param>
     /// <param name="terrain">Include the visible terrain references (display meshes).</param>
     /// <param name="barSolids">Also write bars / strands / tendons as tube meshes.</param>
+    /// <param name="fileVersion">3DM archive version 8 (default) or 7 (for Rhino 7).</param>
     public SBM.IO.Rhino3dm.Rhino3dmResult Export3dm(string path, IReadOnlyList<string>? bridges = null, bool detail = true, bool meshOnly = false,
-        bool terrain = false, bool barSolids = false)
+        bool terrain = false, bool barSolids = false, int fileVersion = 8)
     {
         Regenerate();
         var all = _models.OfType<BridgeModel>().ToList();
@@ -424,7 +425,7 @@ public sealed class SbmDocument
         var o = new SBM.IO.Rhino3dm.Rhino3dmOptions
         {
             Bridges = bridges, Detail = detail, MeshOnly = meshOnly, BarSolids = barSolids, Terrain = terr, BasePoint = bp,
-            Source = FilePath != null ? Path.GetFileName(FilePath) : null,
+            Source = FilePath != null ? Path.GetFileName(FilePath) : null, FileVersion = fileVersion,
         };
         return SBM.IO.Rhino3dm.Rhino3dmExporter.Export(path, Project, all, o);
     }

@@ -35,6 +35,8 @@ public sealed class Rhino3dmOptions
     public Vec3 BasePoint { get; init; }
     /// <summary>Source file name for the notes.</summary>
     public string? Source { get; init; }
+    /// <summary>3DM archive version: 8 (Rhino 8, default) or 7 (readable by Rhino 7 and 8; Rhino 7 cannot open version 8 files).</summary>
+    public int FileVersion { get; init; } = 8;
 }
 
 public sealed class Rhino3dmResult
@@ -55,6 +57,8 @@ public sealed class Rhino3dmResult
     /// <summary>Solids written as meshes (no exact description), and exact descriptions that failed and fell back to the mesh.</summary>
     public int Meshes { get; set; }
     public int Fallbacks { get; set; }
+    /// <summary>Mesh triangles left out because their corners coincide in single precision or their area is zero (openNURBS rejects such meshes).</summary>
+    public int DroppedSlivers { get; set; }
     public int Curves { get; set; }
     public int CurveSegments { get; set; }
     public int BlockDefinitions { get; set; }
@@ -483,7 +487,15 @@ public static class Rhino3dmExporter
                     faces[3 * t + k] = hit;
                 }
             }
-            for (int t = 0; t < nt; t++) r.Faces.AddFace(faces[3 * t], faces[3 * t + 1], faces[3 * t + 2]);
+            // openNURBS validates a mesh on its single-precision vertex copy: a sliver whose corners coincide in float (or a zero-area triangle)
+            // makes the whole mesh a "bad object" in Rhino. Such triangles carry no surface, so they are left out.
+            for (int t = 0; t < nt; t++)
+            {
+                int a = faces[3 * t], b = faces[3 * t + 1], c = faces[3 * t + 2];
+                if (nrm[t].Length == 0 || SameInFloat(r.Vertices[a], r.Vertices[b]) || SameInFloat(r.Vertices[b], r.Vertices[c])
+                    || SameInFloat(r.Vertices[a], r.Vertices[c])) { _r.DroppedSlivers++; continue; }
+                r.Faces.AddFace(a, b, c);
+            }
             r.Normals.ComputeNormals();
             return r;
         }
@@ -552,6 +564,8 @@ public static class Rhino3dmExporter
             _r.BlockDefinitions++;
             return i;
         }
+
+        private static bool SameInFloat(RG.Point3d p, RG.Point3d q) => (float)p.X == (float)q.X && (float)p.Y == (float)q.Y && (float)p.Z == (float)q.Z;
 
         /// <summary>Local (block) mesh in model units, no base point shift.</summary>
         private RG.Mesh ToMeshLocal(SMesh m)
@@ -916,7 +930,7 @@ public static class Rhino3dmExporter
             _f.Notes = new RF.File3dmNotes { Notes = notes.ToString(), IsVisible = false };
             foreach (var (k, v) in _fallbackReasons.OrderByDescending(x => x.Value)) _r.Notes.Add($"{v} x fallback: {k}");
             _r.Layers = _layers.Count;
-            var wo = new RF.File3dmWriteOptions { Version = 8, SaveUserData = true };
+            var wo = new RF.File3dmWriteOptions { Version = _o.FileVersion is 7 or 8 ? _o.FileVersion : throw new ArgumentException("3DM file version must be 7 or 8"), SaveUserData = true };
             string? dir = Path.GetDirectoryName(Path.GetFullPath(path));
             if (dir != null) Directory.CreateDirectory(dir);
             // Write (not WriteWithLog: the log variant validates every object while writing and is ~50x slower)

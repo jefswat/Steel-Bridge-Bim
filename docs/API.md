@@ -64,7 +64,7 @@ sbm export "C:\Jobs\Br12\Br12.sbm" --ifc Br12.ifc --geometry abv [--chord-tol 0.
                                                  # holes and clipped beam profiles as IfcPolygonalFaceSet (holes = void loops), hole
                                                  # circles and profile arcs polygonized to --chord-tol mm (default 1/32" = 0.79 mm).
                                                  # --geometry parametric (default) = exact extrusions. Prints time, size, entity count.
-sbm export "C:\Jobs\Br12\Br12.sbm" --3dm Br12.3dm [--bridges "Unit 2,Unit 3"] [--no-detail] [--mesh-only] [--terrain] [--bar-solids]
+sbm export "C:\Jobs\Br12\Br12.sbm" --3dm Br12.3dm [--bridges "Unit 2,Unit 3"] [--no-detail] [--mesh-only] [--terrain] [--bar-solids] [--3dm-version 7]
                                                  # Rhino 3DM (see "Rhino export" below): exact extrusions / B-reps, fastener blocks,
                                                  # bar + alignment curves, layers per bridge, IFC GlobalIds as user text
 sbm 3dm-info   Br12.3dm [--blocks]              # read a 3DM back: units, objects by layer and type, blocks, document text
@@ -126,6 +126,7 @@ MIT; openNURBS; the native `librhino3dm_native.dll` ships beside `sbm.exe` / the
 | Everything else (deck, barriers, concrete, substructure, meshes the generators build directly) | Mesh (double-precision vertices, creases split at 30 deg) |
 | Bolts, rivets, studs, anchor bolts | one block (instance definition) per type and size + an instance reference per fastener |
 | Bars, strands, PT tendons | curves: lines + true arcs (ArcFit, 0.5 mm) or polylines; `--bar-solids` adds tube meshes on `<layer>-SOLID` |
+| File version | Rhino 8 archive by default; `--3dm-version 7` writes a Rhino 7 archive (Rhino 7 cannot open version 8 files; Rhino 8 reads both). `SbmDocument.Export3dm(..., fileVersion: 7)` |
 | Alignments | `Alignments::<name>`: plan curve (lines / arcs exact, spirals sampled <= 0.5 m) at the base elevation + 3D profile grade line (<= 1 m) |
 | Terrain references (`--terrain`, visible ones) | `Terrain::<name>` mesh (the display mesh) |
 
