@@ -78,6 +78,31 @@ public class Rhino3dmTests
     }
 
     [Fact]
+    public void PrestressedBeamBody_SkewedEnds_IsAClosedBrep()
+    {
+        var shape = SBM.Core.Prestressed.StandardBeamCatalog.Find("IA BTD")!;
+        Assert.NotNull(shape.Profile);
+        double L = 30, skew = 20 * Math.PI / 180, slope = 0.02;
+        // section in the vertical plane x = 0 (section x = world -y), beam axis +x with a 2 % grade, both ends skewed 20 deg (outward normals)
+        var f = new Frame3(new Vec3(-1, 0, 0), new Vec3(0, -1, 0), new Vec3(0, 0, 1), new Vec3(1, 0, 0));
+        var nStart = new Vec3(-Math.Cos(skew), Math.Sin(skew), 0);
+        var body = new SBM.Core.Prestressed.BeamBody(f, 1, new Vec3(L + 2, 0, (L + 2) * slope), Vec3.Zero, nStart, new Vec3(L, 0, L * slope), nStart * -1);
+        var b = new RhinoBrepBuilder(v => new RG.Point3d(v.X, v.Y, v.Z), 1, 1e-6);
+        foreach (var face in RhinoBrepBuilder.Faces(body, shape.Profile!)) b.AddFace(face);
+        var brep = b.Finish();
+        Assert.True(brep != null, b.Error);
+        Assert.True(brep!.IsSolid);
+        Assert.Equal(2 + shape.Profile!.Segments.Count, brep.Faces.Count);
+        // the end faces lie in the end planes
+        foreach (var v in brep.Vertices)
+        {
+            var p = new Vec3(v.Location.X, v.Location.Y, v.Location.Z);
+            double d0 = Math.Abs(Vec3.Dot(p, nStart)), d1 = Math.Abs(Vec3.Dot(p - new Vec3(L, 0, L * slope), nStart));
+            Assert.True(Math.Min(d0, d1) < 1e-9, $"vertex {p} off the end planes");
+        }
+    }
+
+    [Fact]
     public void SampleBridge_RoundTrip_LayersUnitsBlocksUserText()
     {
         var doc = SbmDocument.Sample();
@@ -170,9 +195,10 @@ public class Rhino3dmTests
         try
         {
             var r = doc.Export3dm(path, detail: false);
-            if (nurbsParts == 0 && m.Concrete?.Deck?.Nurbs == null) return;    // sample has no curved parts
-            Assert.True(r.NurbsBreps > 0, string.Join("; ", r.Notes));
-            Assert.True(r.NurbsBrepsClosed >= r.NurbsBreps * 9 / 10, $"{r.NurbsBrepsClosed} of {r.NurbsBreps} closed; {string.Join("; ", r.Notes)}");
+            Assert.True(nurbsParts > 0);                                       // the sample has curved girders
+            Assert.True(r.NurbsBreps >= nurbsParts, string.Join("; ", r.Notes));
+            Assert.True(r.NurbsBrepsClosed == r.NurbsBreps, $"{r.NurbsBrepsClosed} of {r.NurbsBreps} closed; {string.Join("; ", r.Notes)}");
+            Assert.Equal(0, r.Fallbacks);
             var s = Rhino3dmInfo.Read(path);
             Assert.True(s.ClosedBreps >= r.NurbsBrepsClosed);
         }

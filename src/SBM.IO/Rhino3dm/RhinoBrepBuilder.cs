@@ -301,8 +301,8 @@ internal sealed class RhinoBrepBuilder
         var x = f.X.Normalized();
         var y = f.Y.Normalized();
         var o = f.Origin;
-        var outer = f.Outer.Select(c => ((RG.Curve)Curve3(c), (RG.Curve)CurveInPlane(c, o, x, y), RG.IsoStatus.None)).ToList();
-        var holes = f.Holes.Select(h => h.Select(c => ((RG.Curve)Curve3(c), (RG.Curve)CurveInPlane(c, o, x, y), RG.IsoStatus.None)).ToList()).ToList();
+        var outer = Snap(f.Outer).Select(c => ((RG.Curve)Curve3(c), (RG.Curve)CurveInPlane(c, o, x, y), RG.IsoStatus.None)).ToList();
+        var holes = f.Holes.Select(h => Snap(h).Select(c => ((RG.Curve)Curve3(c), (RG.Curve)CurveInPlane(c, o, x, y), RG.IsoStatus.None)).ToList()).ToList();
         // plane surface domain = the loops' extent in plane coordinates (+ margin): the trims stay inside the surface
         double minU = double.MaxValue, minV = double.MaxValue, maxU = double.MinValue, maxV = double.MinValue;
         foreach (var (_, c2, _) in outer)
@@ -338,8 +338,10 @@ internal sealed class RhinoBrepBuilder
     public static List<FaceSpec> Faces(NurbsSolid solid)
     {
         var res = new List<FaceSpec>();
-        var wallCurves = solid.Faces.Where(f => f.Surface != null && f.Role == "hole wall")
-            .SelectMany(f => new[] { f.Surface!.Boundary(true, false), f.Surface!.Boundary(true, true) }).ToList();
+        var wallCurves = new List<SCurve>();
+        foreach (var c in solid.Faces.Where(f => f.Surface != null && f.Role == "hole wall")
+                     .SelectMany(f => new[] { f.Surface!.Boundary(true, false), f.Surface!.Boundary(true, true) }))
+            if (!wallCurves.Any(w => SameCurve(w, c))) wallCurves.Add(c);   // walls of a hole registered twice
         List<SCurve> HoleLoop(NurbsHole h)
         {
             bool On(SCurve c)
@@ -357,20 +359,51 @@ internal sealed class RhinoBrepBuilder
             var (ax, ay) = NurbsArc.Axes(h.Normal);
             return new List<SCurve> { NurbsArc.Arc(h.Center, ax, ay, h.Radius, 0, Math.PI), NurbsArc.Arc(h.Center, ax, ay, h.Radius, Math.PI, 2 * Math.PI) };
         }
+        static bool SameCurve(SCurve a, SCurve b) =>
+            a.Control.Length == b.Control.Length && a.Control.Zip(b.Control).All(x => (x.First - x.Second).Length < 1e-9);
+        var walls = new List<SSurface>();
+        bool SameSurface(SSurface a, SSurface b)
+        {
+            if (a.CountU != b.CountU || a.CountV != b.CountV) return false;
+            for (int i = 0; i < a.CountU; i++) for (int j = 0; j < a.CountV; j++) if ((a.Control[i, j] - b.Control[i, j]).Length > 1e-9) return false;
+            return true;
+        }
         foreach (var f in solid.Faces)
         {
             FaceSpec fs;
-            if (f.Surface != null) fs = new FaceSpec { Surface = f.Surface };
+            if (f.Surface is { } srf)
+            {
+                // the same hole registered twice gives identical walls (and loops): keep one
+                if (f.Role == "hole wall")
+                {
+                    if (walls.Any(w => SameSurface(w, srf))) continue;
+                    walls.Add(srf);
+                }
+                // zero-area face (two opposite boundaries coincide, e.g. a section corner of zero width): its neighbours share that edge directly
+                if (SameCurve(srf.Boundary(true, false), srf.Boundary(true, true)) || SameCurve(srf.Boundary(false, false), srf.Boundary(false, true))) continue;
+                fs = new FaceSpec { Surface = srf };
+            }
             else
             {
-                var p = f.Polygon!;
+                var p0 = f.Polygon!;
+                var pl = new List<Vec3>();
+                foreach (var q in p0) if (pl.Count == 0 || (q - pl[^1]).Length > 1e-9) pl.Add(q);
+                if (pl.Count > 1 && (pl[0] - pl[^1]).Length <= 1e-9) pl.RemoveAt(pl.Count - 1);
+                if (pl.Count < 3) continue;
+                var p = pl.ToArray();
                 var n = f.PlaneNormal();
                 var x = p[1] - p[0];
                 x = (x - n * Vec3.Dot(x, n)).Normalized();
                 fs = new FaceSpec { Origin = p[0], X = x, Y = Vec3.Cross(n, x) };
                 for (int i = 0; i < p.Length; i++) fs.Outer.Add(Line(p[i], p[(i + 1) % p.Length]));
             }
-            foreach (var h in f.Holes) fs.Holes.Add(HoleLoop(h));
+            var seen = new List<NurbsHole>();
+            foreach (var h in f.Holes)
+            {
+                if (seen.Any(x => (x.Center - h.Center).Length < 1e-7 && Math.Abs(x.Radius - h.Radius) < 1e-7)) continue;
+                seen.Add(h);
+                fs.Holes.Add(HoleLoop(h));
+            }
             res.Add(fs);
         }
         return res;
@@ -412,7 +445,8 @@ internal sealed class RhinoBrepBuilder
         }
         var top = bottom.Select(c => c.Translated(d)).ToList();
         var holesB = new List<List<SCurve>>();
-        foreach (var h in es.Holes)
+        var holes = DistinctHoles(es.Holes);
+        foreach (var h in holes)
         {
             var c = W(h.Center);
             double r = h.Diameter / 2;
@@ -437,7 +471,7 @@ internal sealed class RhinoBrepBuilder
         }
         for (int k = 0; k < holesB.Count; k++)
         {
-            var axisPt = W(es.Holes[k].Center) + d * 0.5;
+            var axisPt = W(holes[k].Center) + d * 0.5;
             foreach (var hb in holesB[k])
             {
                 var s = SSurface.Ruled(hb, hb.Translated(d));
@@ -447,6 +481,80 @@ internal sealed class RhinoBrepBuilder
             }
         }
         return res;
+    }
+
+    /// <summary>Faces of an exact prestressed beam body: the section profile (lines + true arcs) swept along the beam axis and cut by the two
+    /// end planes. The end caps are the profile projected along the axis onto each plane (an affine map, so the arcs stay exact rational
+    /// curves - ellipse arcs on a skewed end); the sides are ruled faces between the two caps.</summary>
+    public static List<FaceSpec> Faces(SBM.Core.Prestressed.BeamBody bb, SBM.Core.Prestressed.SectionProfile profile)
+    {
+        var f = bb.Frame;
+        var segs = profile.Segments.ToList();
+        if (bb.SectionXSign < 0)   // section x runs against the placement X: mirror (as the IFC export) and keep the outline counter-clockwise
+        {
+            static Vec2 M(Vec2 p) => new(-p.X, p.Y);
+            segs = segs.Select(g => new SBM.Core.Prestressed.ProfileSegment(M(g.End), M(g.Start), g.Center is { } c ? M(c) : null, g.Ccw)).Reverse().ToList();
+        }
+        double area = 0;
+        foreach (var g in segs) area += g.Start.X * g.End.Y - g.End.X * g.Start.Y;
+        double orient = area >= 0 ? 1 : -1;
+        Vec3 W(Vec2 q) => f.ToWorld(q.X, q.Y, 0);
+        var a = bb.Extrusion.Normalized();
+        Vec3 OnPlane(Vec3 p, Vec3 pp, Vec3 n) => p + a * (Vec3.Dot(pp - p, n) / Vec3.Dot(a, n));
+        SCurve Map(SCurve c, Vec3 pp, Vec3 n) => new(c.Degree, c.Knots, c.Control.Select(x => OnPlane(x, pp, n)).ToArray(), c.Weights);
+        var prof = new List<SCurve>();
+        var dirs = new List<Vec3>();
+        foreach (var g in segs)
+        {
+            prof.Add(g.Center is { } c ? Arc2(W(c), f.X, f.Y, c, g.Start, g.Sweep, g.Radius) : Line(W(g.Start), W(g.End)));
+            var t = g.PointAt(0.51) - g.PointAt(0.49);
+            dirs.Add((f.X * t.Y - f.Y * t.X) * orient);
+        }
+        prof = Snap(prof);          // fillet radii rounded in the profile data: arc ends meet the next segment exactly
+        var start = prof.Select(c => Map(c, bb.StartPoint, bb.StartNormal)).ToList();
+        var end = prof.Select(c => Map(c, bb.EndPoint, bb.EndNormal)).ToList();
+        FaceSpec Cap(Vec3 pp, Vec3 n, List<SCurve> loop)
+        {
+            n = n.Normalized();
+            var x = f.X - n * Vec3.Dot(f.X, n);
+            if (x.Length < 1e-6) x = f.Y - n * Vec3.Dot(f.Y, n);
+            x = x.Normalized();
+            var fs = new FaceSpec { Origin = pp, X = x, Y = Vec3.Cross(n, x) };
+            fs.Outer.AddRange(loop);
+            return fs;
+        }
+        var res = new List<FaceSpec> { Cap(bb.StartPoint, bb.StartNormal, start), Cap(bb.EndPoint, bb.EndNormal, end) };
+        for (int i = 0; i < prof.Count; i++)
+        {
+            var s = SSurface.Ruled(start[i], end[i]);
+            if (Vec3.Dot(s.NormalAt((s.U0 + s.U1) / 2, 0.5), dirs[i]) < 0) s = s.ReversedV();
+            res.Add(new FaceSpec { Surface = s });
+        }
+        return res;
+    }
+
+    /// <summary>Closes a chained loop exactly: each curve starts at the previous curve's last control point (clamped curves: = its end point).</summary>
+    public static List<SCurve> Snap(List<SCurve> loop)
+    {
+        var r = new List<SCurve>(loop.Count);
+        for (int i = 0; i < loop.Count; i++)
+        {
+            var c = loop[i];
+            var prev = loop[(i + loop.Count - 1) % loop.Count];
+            var ctrl = c.Control.ToArray();
+            ctrl[0] = prev.Control[^1];
+            r.Add(new SCurve(c.Degree, c.Knots, ctrl, c.Weights));
+        }
+        return r;
+    }
+
+    /// <summary>Holes without repeats (a hole registered twice would give two identical loops).</summary>
+    public static List<Hole> DistinctHoles(IEnumerable<Hole> holes)
+    {
+        var r = new List<Hole>();
+        foreach (var h in holes)
+            if (!r.Any(x => Vec2.Distance(x.Center, h.Center) < 1e-7 && Math.Abs(x.Diameter - h.Diameter) < 1e-7)) r.Add(h);
+        return r;
     }
 
     /// <summary>Arc of an outline edge (2D centre c2, start p0, signed sweep) as an exact rational curve in the profile frame.</summary>

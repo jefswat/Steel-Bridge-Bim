@@ -47,6 +47,8 @@ public sealed class Rhino3dmResult
     /// <summary>Exact NURBS solids written as B-reps (and how many of them are closed).</summary>
     public int NurbsBreps { get; set; }
     public int NurbsBrepsClosed { get; set; }
+    /// <summary>Exact bodies kept outside the mesh (prestressed beams with a true-arc profile, cut by the skewed end planes) written as closed B-reps.</summary>
+    public int ExactBodies { get; set; }
     /// <summary>Solids written as meshes (no exact description), and exact descriptions that failed and fell back to the mesh.</summary>
     public int Meshes { get; set; }
     public int Fallbacks { get; set; }
@@ -207,11 +209,23 @@ public static class Rhino3dmExporter
         // ------------------------------------------------------------ solids
 
         /// <summary>Writes one model element (its mesh and any exact description) on a layer; several Rhino objects of one element are grouped.</summary>
-        private void Solid(SMesh mesh, int layer, Props p)
+        private void Solid(SMesh mesh, int layer, Props p, Func<List<FaceSpec>>? faces = null)
         {
             if (mesh.IsEmpty) return;
             var geoms = new List<RG.GeometryBase>();
-            if (!_o.MeshOnly)
+            if (!_o.MeshOnly && faces != null)
+            {
+                // an exact body the generator keeps outside the mesh (prestressed beams with a true-arc profile)
+                var bb = new RhinoBrepBuilder(P, _s, _tol);
+                try
+                {
+                    foreach (var f in faces()) bb.AddFace(f);
+                    if (bb.Finish() is { } brep) { geoms.Add(brep); _r.ExactBodies++; }
+                    else Fallback("beam body: " + bb.Error);
+                }
+                catch (Exception ex) when (ex is InvalidOperationException or ArgumentException) { Fallback("beam body: " + ex.Message); }
+            }
+            if (!_o.MeshOnly && geoms.Count == 0)
             {
                 try { Exact(mesh, geoms); }
                 catch (Exception ex) when (ex is not OutOfMemoryException)
@@ -268,7 +282,7 @@ public static class Rhino3dmExporter
                         err = bb.Error;
                     }
                     catch (Exception ex) when (ex is InvalidOperationException or ArgumentException) { err = ex.Message; }
-                    if (brep == null) { Fallback("NURBS solid: " + err); continue; }
+                    if (brep == null) { Fallback($"NURBS solid ({nurbs[k].Kind}): " + err); continue; }
                     for (int i = start; i < start + count; i++) covered[i] = true;
                     geoms.Add(brep);
                     _r.NurbsBreps++;
@@ -349,7 +363,7 @@ public static class Rhino3dmExporter
             for (int i = 0; i < 64; i++) { var q = outer.PointAt(dom.T0 + dom.Length * i / 64); probe.Add(new Vec2(q.X, q.Y)); }
             if (MeshBuilder.SignedArea(probe) < 0) outer.Reverse();
             if (!ext.SetOuterProfile(outer, true)) { Fallback("extrusion profile"); ext.Dispose(); return null; }
-            foreach (var h in es.Holes)
+            foreach (var h in RhinoBrepBuilder.DistinctHoles(es.Holes))
             {
                 var c = new RG.ArcCurve(new RG.Circle(new RG.Plane(Q(h.Center), RG.Vector3d.ZAxis), h.Diameter / 2 * _s));
                 c.Reverse();
@@ -743,7 +757,8 @@ public static class Rhino3dmExporter
             {
                 var bpd = b.Definition ?? ps.Definition;
                 Solid(b.Mesh, L("3D-PS-GIRDERS"), Base(b.Mark, "PrestressedBeam").Add("Mark", b.Mark).Add("Description", b.TypeName).Add("Length", Len(b.Length))
-                    .Add("Mass_kg", b.Mass, "0.#").Add("GlobalId", Gid(IfcKeys.PsBeam(bk, b.Mark))).Flag(b.Assumption));
+                    .Add("Mass_kg", b.Mass, "0.#").Add("GlobalId", Gid(IfcKeys.PsBeam(bk, b.Mark))).Flag(b.Assumption),
+                    b.Body != null && b.Shape.Profile != null ? () => RhinoBrepBuilder.Faces(b.Body, b.Shape.Profile) : null);
                 if (!_o.Detail) continue;
                 int n = 0;
                 foreach (var st in b.Strands)
