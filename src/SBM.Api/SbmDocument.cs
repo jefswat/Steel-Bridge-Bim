@@ -62,6 +62,11 @@ public sealed class SbmDocument
         return null;
     }
 
+    /// <summary>Terrain references that could not be loaded at the last regeneration (missing / unreadable files; empty = all loaded). Was silent before 2026-10-26.</summary>
+    public IReadOnlyList<string> TerrainProblems { get; private set; } = Array.Empty<string>();
+    /// <summary>Number of terrain surfaces loaded at the last regeneration.</summary>
+    public int TerrainCount => _terrains?.Count ?? 0;
+
     /// <summary>Loads the project's visible terrain references (used for automatic foundation tops and ground lines).</summary>
     private void EnsureTerrain()
     {
@@ -69,17 +74,23 @@ public sealed class SbmDocument
         string key = string.Join("|", defs.Select(d => d.Path + d.UnitScale + d.OffsetX + d.OffsetY + d.OffsetZ));
         if (_terrains != null && key == _terrainKey) return;
         var list = new List<TerrainModel>();
+        var problems = new List<string>();
         foreach (var def in defs)
         {
             string full = BridgeProject.ResolvePath(def.Path, FilePath);
-            if (!File.Exists(full)) continue;
+            if (!File.Exists(full)) { problems.Add($"terrain reference '{def.Name}': file not found ({def.Path}) - no ground for this model; `sbm pipeline` rebuilds it when the project is georeferenced"); continue; }
             try
             {
                 var geo = ReferenceReaders.Load(def, full, Units.LongUnit);
                 if (!geo.Mesh.IsEmpty) list.Add(geo.Grid is { } grd ? new TerrainModel(grd, geo.Mesh) : new TerrainModel(geo.Mesh));
+                else problems.Add($"terrain reference '{def.Name}': {full} has no surface");
             }
-            catch (Exception ex) when (ex is IOException or InvalidDataException or FormatException or System.Xml.XmlException) { }
+            catch (Exception ex) when (ex is IOException or InvalidDataException or FormatException or System.Xml.XmlException)
+            {
+                problems.Add($"terrain reference '{def.Name}': {full} could not be read ({ex.Message})");
+            }
         }
+        TerrainProblems = problems;
         _terrains = list;
         _terrainKey = key;
         _cache.GroundVersion++;

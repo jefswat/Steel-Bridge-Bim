@@ -23,6 +23,9 @@ public sealed class BridgeProject
     /// <summary>Georeference of the project X / Y (OPTIONAL, null = local grid, IFC map conversion scale 1): map CRS, grid scale (map = local x scale,
     /// e.g. 1 / surface adjustment factor for TxDOT surface coordinates).</summary>
     public GeoreferenceDefinition? Georeference { get; set; }
+    /// <summary>The plan-set PDFs this model is built from (OPTIONAL; absolute, or relative to the model file; saved only when not empty).
+    /// `sbm pipeline` builds the sheet index / skeleton link rules from them when no sheet-links*.json names the model.</summary>
+    public List<string> PlanPdfs { get; set; } = new();
 
     /// <summary>Resolves a reference path (relative paths are relative to the project file's folder). An absolute path that does not exist
     /// (a model saved on another machine or in the sandbox, e.g. C:\SBM\dist\terrain\...) is looked up again under the project file's folders:
@@ -86,6 +89,8 @@ public sealed class BridgeProject
         public GeometrySettings? Geometry { get; set; }
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
         public GeoreferenceDefinition? Georeference { get; set; }
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+        public List<string>? PlanPdfs { get; set; }
 
         public static ProjectDto From(BridgeProject p) => new()
         {
@@ -97,6 +102,7 @@ public sealed class BridgeProject
             References = p.References,
             Geometry = p.Geometry.IsDefault ? null : p.Geometry,
             Georeference = p.Georeference,
+            PlanPdfs = p.PlanPdfs.Count == 0 ? null : p.PlanPdfs,
         };
 
         public BridgeProject ToProject() => new()
@@ -108,6 +114,7 @@ public sealed class BridgeProject
             References = References ?? new(),
             Geometry = Geometry ?? new(),
             Georeference = Georeference,
+            PlanPdfs = PlanPdfs ?? new(),
         };
     }
 

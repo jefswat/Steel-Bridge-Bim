@@ -51,6 +51,9 @@ public static class ModelDatabase
     public const int SchemaVersion = 3; // 3 = asset management tables (AssetSchema, G9)
 
     private static readonly Regex UnitName = new(@"^(?<g>.*?)\s+Unit\s+(?<n>\d+)\s*$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
+    /// <summary>The <c>bridge_group</c> value the database gives a bridge of this name ("X Unit 3" -> "X", else the name).</summary>
+    public static string BridgeGroupOf(string bridgeName) => UnitName.Match(bridgeName) is { Success: true } m ? m.Groups["g"].Value : bridgeName;
     private static readonly Regex CfName = new(@"^(?<type>.*?)\s+G(?<a>\d+)[–-]G(?<b>\d+)(?:, span (?<span>\d+))?", RegexOptions.Compiled);
     private static readonly Regex XgName = new(@"^Cross girder G(?<a>\d+)[–-]G(?<b>\d+) carrying discontinuous G(?<g>\d+)", RegexOptions.Compiled);
 

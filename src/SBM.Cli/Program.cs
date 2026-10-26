@@ -42,7 +42,19 @@ public static partial class Program
                                                             inspections (element-level CS1-CS4, NBI/SNBI ratings, CSV import /
                                                             export), findings, calcs (summary pages, values, diff, apply).
                                                             "sbm asset <file.sbm> help" lists the commands
-          sbm run <script.csx> [file.sbm] [-- args...]      Run a C# script (globals: Doc, Print, Ft, In, Sta, Len)
+          sbm run <script.csx> [file.sbm] [--no-pipeline] [-- args...]
+                                                            Run a C# script (globals: Doc, Print, Ft, In, Sta, Len); when the script
+                                                            SAVES a model, `sbm pipeline` runs on it afterwards (--no-pipeline skips;
+                                                            --no-db / --no-terrain / --no-index / --offline are passed on)
+          sbm pipeline <file.sbm> [--status] [--no-regen] [--no-db] [--no-index] [--no-terrain] [--offline] [--reindex] [--force-db]
+                       [--pdf <plan set.pdf>]... [--plans <folder>[,<folder>]] [--terrain-dir <folder>] [--margin LEN]
+                                                            REQUIRED final step of every model (alias build-all; also runs by itself
+                                                            after `sbm run` saves a model): regenerate -> georeference check ->
+                                                            terrain (USGS 3DEP for a georeferenced project, cached) -> plan sheet index
+                                                            (automatic from the PDF text layer / OCR; skeleton sheet-links file for a new
+                                                            plan set; curated rules stay authoritative) -> companion database + sheet
+                                                            links. Reports DONE / UP TO DATE / SKIPPED / UNRESOLVED / FAILED per step.
+                                                            --status = report only, changes nothing
           sbm bench <file.sbm> [n]                          Time cold/warm regeneration
           sbm nurbs <file.sbm> [--bridge NAME] [--chord LEN] [--tol LEN] [--csv out.csv]
                                                             Exact curved geometry (NURBS) report: regenerates with the project
@@ -161,6 +173,9 @@ public static partial class Program
                     var doc = args.Contains("--sample") ? SbmDocument.Sample() : SbmDocument.New(Path.GetFileNameWithoutExtension(args[1]), args.Contains("--metric"));
                     doc.Save(args[1]);
                     Console.WriteLine($"Created {args[1]}");
+                    if (!args.Contains("--sample"))
+                        Console.WriteLine("  New plan-set model: follow the checklist in CLAUDE.md / docs/MODEL-PIPELINE.md (georeference, plan PDFs in "
+                            + "Doc.Project.PlanPdfs); `sbm run <build.csx> <file.sbm>` runs `sbm pipeline` after the script saves.");
                     return 0;
                 }
                 case "info":
@@ -263,8 +278,14 @@ public static partial class Program
                     var doc = SbmDocument.Open(args[1]);
                     var r = doc.Regenerate();
                     Print(r, doc);
+                    foreach (var tp in doc.TerrainProblems) Console.WriteLine("  warning: " + tp);
+                    var st = ModelPipeline.Status(doc);
+                    if (st.Open > 0) Console.WriteLine($"Model pipeline: {st.Open} item(s) open - run `sbm pipeline \"{args[1]}\"` (`--status` lists them)");
                     return r.Errors.Count > 0 ? 2 : 0;
                 }
+                case "pipeline":
+                case "build-all":
+                    return PipelineCommand(args);
                 case "export":
                 {
                     Need(args, 2);
@@ -340,11 +361,14 @@ public static partial class Program
                     int dd = Array.IndexOf(args, "--");
                     var scriptArgs = dd > 0 ? args[(dd + 1)..] : Array.Empty<string>();
                     string? file = args.Length > 2 && args[2] != "--" ? args[2] : null;
+                    if (file is "--no-pipeline" or "--no-db" or "--no-terrain" or "--no-index" or "--offline") file = null;
                     var doc = file != null && File.Exists(file) ? SbmDocument.Open(file) : SbmDocument.New();
+                    DateTime? before = file != null && File.Exists(file) ? File.GetLastWriteTimeUtc(file) : null;
                     var res = await ScriptHost.RunFileAsync(args[1], doc, scriptArgs);
                     Console.Write(res.Output);
                     if (res.ReturnValue != null) Console.WriteLine(res.ReturnValue);
                     if (!res.Success) { Console.Error.WriteLine(res.Error); return 1; }
+                    PipelineAfterRun(doc, args, file, before);
                     return 0;
                 }
                 case "elevations":
