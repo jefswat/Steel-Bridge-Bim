@@ -1,4 +1,4 @@
-# Steel Bridge Modeler — automation API
+﻿# Steel Bridge Modeler — automation API
 
 There are three ways to drive the modeler from code. All three use the same engine as the desktop app and read and
 write the same `.sbm` project files.
