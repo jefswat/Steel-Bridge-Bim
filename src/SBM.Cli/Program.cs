@@ -327,17 +327,18 @@ public static partial class Program
                     }
                     if (Opt("--3dm") is { } r3)
                     {
-                        doc.Regenerate();
                         var sw = System.Diagnostics.Stopwatch.StartNew();
                         var bl = Opt("--bridges")?.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
                         var rr = doc.Export3dm(r3, bl, detail: !args.Contains("--no-detail"), meshOnly: args.Contains("--mesh-only"),
-                            terrain: args.Contains("--terrain"), barSolids: args.Contains("--bar-solids"), fileVersion: int.Parse(Opt("--3dm-version") ?? "8"), centerlines: args.Contains("--centerlines"));
+                            terrain: args.Contains("--terrain"), barSolids: args.Contains("--bar-solids"), fileVersion: int.Parse(Opt("--3dm-version") ?? "8"), centerlines: args.Contains("--centerlines"), exactCurved: !args.Contains("--no-exact"));
                         Console.WriteLine($"  Rhino 3DM ({rr.Units}) â†’ {r3}  ({rr.Elapsed.TotalSeconds:0.0} s export, {sw.Elapsed.TotalSeconds:0.0} s with the regeneration check, {new FileInfo(r3).Length / 1048576.0:0.0} MB, {rr.Objects:N0} objects: " +
-                                          $"{rr.Extrusions:N0} extrusions, {rr.MiteredExtrusions:N0} mitered extrusions, {rr.ObliqueBreps:N0} oblique B-reps, {rr.NurbsBreps:N0} NURBS B-reps ({rr.NurbsBrepsClosed:N0} closed), {rr.ExactBodies:N0} beam bodies, {rr.Meshes:N0} meshes, " +
+                                          $"{rr.Extrusions:N0} extrusions, {rr.MiteredExtrusions:N0} mitered extrusions, {rr.ObliqueBreps:N0} oblique B-reps, {rr.NurbsBreps:N0} NURBS B-reps ({rr.NurbsBrepsClosed:N0} closed), {rr.PlanarBreps:N0} planar B-reps, {rr.ExactBodies:N0} beam bodies, {rr.Meshes:N0} meshes, " +
                                           $"{rr.Curves:N0} curves ({rr.CurveSegments:N0} pieces), {rr.BlockInstances:N0} block instances of {rr.BlockDefinitions:N0} blocks; {rr.Layers} layers, {rr.Fallbacks} fallbacks to mesh, {rr.DroppedSlivers:N0} sliver triangles left out)");
                         Console.WriteLine($"  base point (Rhino origin) = grid {rr.BasePoint.X:0.###}, {rr.BasePoint.Y:0.###}, {rr.BasePoint.Z:0.###} m (as the IFC export)");
                         foreach (var n in rr.Notes.Take(10)) Console.WriteLine("  " + n);
                         foreach (var n in rr.FallbackItems.Take(5)) Console.WriteLine("    e.g. " + n);
+                        if (rr.MeshReasons.Count > 0)
+                            Console.WriteLine("  still meshes: " + string.Join("; ", rr.MeshReasons.OrderByDescending(kv => kv.Value).Take(6).Select(kv => $"{kv.Value:N0} {kv.Key}")));
                         Console.WriteLine("  timings: " + string.Join(", ", rr.Timings.Select(kv => $"{kv.Key} {kv.Value:0.0} s")));
                     }
                     if (Opt("--dxf") is { } dxf) { doc.ExportDxf(dxf); Console.WriteLine($"  DXF â†’ {dxf}"); }

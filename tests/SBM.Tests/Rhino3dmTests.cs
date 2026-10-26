@@ -147,7 +147,7 @@ public class Rhino3dmTests
         string path = TempFile("sample.3dm");
         try
         {
-            var r = doc.Export3dm(path);
+            var r = doc.Export3dm(path, exactCurved: false);   // plates as extrusions (the exact-curved export is tested below)
             Assert.True(File.Exists(path));
             var s = Rhino3dmInfo.Read(path);
             Assert.Equal("Feet", s.Units);
@@ -284,6 +284,132 @@ public class Rhino3dmTests
             Assert.Equal(0, r.Fallbacks);
             var s = Rhino3dmInfo.Read(path);
             Assert.True(s.ClosedBreps >= r.NurbsBrepsClosed);
+        }
+        finally { File.Delete(path); }
+    }
+
+    // ------------------------------------------------------------ polyhedra -> planar B-reps, round sections -> circles (2026-10-26)
+
+    /// <summary>Volume of a set of planar faces (divergence theorem; outward normal = X x Y, holes subtracted).</summary>
+    private static double FacesVolume(List<FaceSpec> faces)
+    {
+        double v = 0;
+        foreach (var f in faces)
+        {
+            var n = Vec3.Cross(f.X, f.Y).Normalized();
+            double LoopArea(List<SBM.Core.Geometry.Nurbs.NurbsCurve> l)
+            {
+                var s = Vec3.Zero;
+                foreach (var c in l) s += Vec3.Cross(c.Control[0] - f.Origin, c.Control[^1] - f.Origin);
+                return Math.Abs(Vec3.Dot(s, n)) / 2;
+            }
+            double a = LoopArea(f.Outer) - f.Holes.Sum(LoopArea);
+            v += Vec3.Dot(n, f.Origin) * a / 3;
+        }
+        return v;
+    }
+
+    private static Mesh Quads(params Vec3[][] quads)
+    {
+        var m = new Mesh();
+        foreach (var q in quads)
+        {
+            int b = m.Positions.Count;
+            m.Positions.AddRange(q);
+            for (int i = 1; i + 1 < q.Length; i++) { m.Indices.Add(b); m.Indices.Add(b + i); m.Indices.Add(b + i + 1); }
+        }
+        return m;
+    }
+
+    [Fact]
+    public void PolyhedralMesh_WithTJunctions_BecomesAClosedPlanarBrep_SameVolume()
+    {
+        // 2 x 1 x 1 box at state-plane magnitudes; the top is two quads (a vertex at x = 1 in the middle of the front / back top edges = T-junctions)
+        var o = new Vec3(700000, 4700000, 300);
+        Vec3 P(double x, double y, double z) => o + new Vec3(x, y, z);
+        var m = Quads(
+            new[] { P(0, 0, 0), P(0, 1, 0), P(2, 1, 0), P(2, 0, 0) },                       // bottom (outward -z)
+            new[] { P(0, 0, 1), P(1, 0, 1), P(1, 1, 1), P(0, 1, 1) },                       // top, left half
+            new[] { P(1, 0, 1), P(2, 0, 1), P(2, 1, 1), P(1, 1, 1) },                       // top, right half
+            new[] { P(0, 0, 0), P(2, 0, 0), P(2, 0, 1), P(0, 0, 1) },                       // front (-y)
+            new[] { P(0, 1, 0), P(0, 1, 1), P(2, 1, 1), P(2, 1, 0) },                       // back (+y)
+            new[] { P(0, 0, 0), P(0, 0, 1), P(0, 1, 1), P(0, 1, 0) },                       // left (-x)
+            new[] { P(2, 0, 0), P(2, 1, 0), P(2, 1, 1), P(2, 0, 1) });                      // right (+x)
+        Assert.Equal(2.0, m.Volume(), 9);
+        var faces = RhinoBrepBuilder.PlanarFaces(m, 400, out var why);
+        Assert.True(faces != null, why);
+        Assert.Equal(6, faces!.Count);                                                       // the two top quads are one face
+        Assert.Equal(2.0, FacesVolume(faces), 6);
+        var b = new RhinoBrepBuilder(v => new RG.Point3d(v.X - o.X, v.Y - o.Y, v.Z - o.Z), 1, 1e-6);
+        foreach (var f in faces) b.AddFace(f);
+        var brep = b.Finish();
+        Assert.True(brep != null, b.Error);
+        Assert.True(brep!.IsSolid);
+        Assert.Equal(6, brep.Faces.Count);
+        Assert.Equal(12, brep.Edges.Count);                                                  // collinear T-junction vertices merged on both sides
+    }
+
+    [Fact]
+    public void Shells_SplitTouchingPieces_FlatShadedTrianglesStayTogether()
+    {
+        var box = Quads(
+            new[] { new Vec3(0, 0, 0), new Vec3(0, 1, 0), new Vec3(1, 1, 0), new Vec3(1, 0, 0) },
+            new[] { new Vec3(0, 0, 1), new Vec3(1, 0, 1), new Vec3(1, 1, 1), new Vec3(0, 1, 1) },
+            new[] { new Vec3(0, 0, 0), new Vec3(1, 0, 0), new Vec3(1, 0, 1), new Vec3(0, 0, 1) },
+            new[] { new Vec3(0, 1, 0), new Vec3(0, 1, 1), new Vec3(1, 1, 1), new Vec3(1, 1, 0) },
+            new[] { new Vec3(0, 0, 0), new Vec3(0, 0, 1), new Vec3(0, 1, 1), new Vec3(0, 1, 0) },
+            new[] { new Vec3(1, 0, 0), new Vec3(1, 1, 0), new Vec3(1, 1, 1), new Vec3(1, 0, 1) });
+        Assert.Single(RhinoBrepBuilder.Shells(box));                                        // a vertex per quad corner: joined through the edges
+        var two = new Mesh();
+        foreach (var dx in new[] { 0.0, 1.0 })                                              // two boxes touching along one edge (x = y = 1)
+        {
+            int b0 = two.Positions.Count;
+            two.Positions.AddRange(box.Positions.Select(p => p + new Vec3(dx, dx, 0)));
+            two.Indices.AddRange(box.Indices.Select(i => i + b0));
+        }
+        var sh = RhinoBrepBuilder.Shells(two);
+        Assert.Equal(2, sh.Count);
+        Assert.All(sh, s => Assert.Equal(1.0, s.Volume(), 9));
+    }
+
+    [Fact]
+    public void RoundSections_AreWrittenAsCircles()
+    {
+        var c32 = Enumerable.Range(0, 32).Select(i => Vec2.FromAngle(2 * Math.PI * i / 32) * 0.6 + new Vec2(3, 4)).ToArray();
+        Assert.True(Rhino3dmExporter.RegularPolygon(c32, out var c, out double r));
+        Assert.Equal(0.6, r, 12);
+        Assert.Equal(3, c.X, 12);
+        var c12 = Enumerable.Range(0, 12).Select(i => Vec2.FromAngle(2 * Math.PI * i / 12) * 0.6).ToArray();
+        Assert.False(Rhino3dmExporter.RegularPolygon(c12, out _, out _));                   // a 12-gon may be a real polygon: kept
+        var squashed = c32.Select(p => new Vec2(p.X, p.Y * 1.01)).ToArray();
+        Assert.False(Rhino3dmExporter.RegularPolygon(squashed, out _, out _));
+    }
+
+    [Fact]
+    public void Sample_PlanarBrepsAndExactCurvedByDefault()
+    {
+        var doc = SbmDocument.Sample();
+        doc.Regenerate();
+        string path = TempFile("planar.3dm");
+        try
+        {
+            var r = doc.Export3dm(path, detail: false);
+            Assert.False(doc.Project.Geometry.ExactCurvedGeometry);                           // the project setting is restored
+            Assert.True(r.PlanarBreps > 0, string.Join("; ", r.MeshReasons.Select(kv => $"{kv.Value} {kv.Key}")));
+            Assert.True(r.NurbsBreps > 0);
+            Assert.Equal(0, r.Fallbacks);
+            using var f = RF.File3dm.Read(path);
+            Assert.All(f.Objects.Select(o => o.Geometry).OfType<RG.Brep>(), b => { Assert.True(b.IsValid); Assert.True(b.IsSolid); });
+            // every planar B-rep has the volume of the mesh it replaces (divergence check on the face sets of the substructure solids)
+            foreach (var so in doc.Substructure().Units.SelectMany(u => u.Solids).Where(x => !x.Mesh.IsEmpty && !x.Mesh.HasExactSolids))
+            {
+                var shells = RhinoBrepBuilder.Shells(so.Mesh);
+                var fs = shells.Select(sh => RhinoBrepBuilder.PlanarFaces(sh, 400, out _)).ToList();
+                if (fs.Any(x => x == null)) continue;
+                Assert.Equal(so.Mesh.Volume(), fs.Sum(x => FacesVolume(x!)), 6);
+            }
+            var rm = doc.Export3dm(TempFile("meshes.3dm"), detail: false, exactCurved: false);
+            Assert.Equal(0, rm.NurbsBreps);
         }
         finally { File.Delete(path); }
     }

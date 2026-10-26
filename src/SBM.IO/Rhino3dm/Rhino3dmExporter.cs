@@ -39,6 +39,10 @@ public sealed class Rhino3dmOptions
     public int FileVersion { get; init; } = 8;
     /// <summary>Element centerlines to write as curves on <c>&lt;bridge&gt;::CL-GEOMETRIC</c> / <c>CL-CENTROID</c> (null = none); world points, meters.</summary>
     public IReadOnlyList<Rhino3dmCenterline>? Centerlines { get; init; }
+    /// <summary>Closed polyhedral meshes (no recorded description) as closed B-reps of their planar faces; false = meshes, as before.</summary>
+    public bool PlanarBreps { get; init; } = true;
+    /// <summary>A polyhedron with more planar faces than this is a faceted curved surface and stays a mesh.</summary>
+    public int MaxPlanarFaces { get; init; } = 400;
 }
 
 /// <summary>One element's geometric centerline and section centroid line (see SBM.Core.Solids.Centerlines).</summary>
@@ -55,6 +59,12 @@ public sealed class Rhino3dmResult
     /// <summary>Recorded extrusions swept almost parallel to their profile plane (no valid miter) written as closed B-reps.</summary>
     public int ObliqueBreps { get; set; }
     /// <summary>Exact NURBS solids written as B-reps (and how many of them are closed).</summary>
+    /// <summary>Closed polyhedral meshes written as closed B-reps of planar faces.</summary>
+    public int PlanarBreps { get; set; }
+    /// <summary>Why solids without an exact description stayed meshes (reason -> count).</summary>
+    public Dictionary<string, int> MeshReasons { get; } = new();
+    /// <summary>First 50 elements that stayed meshes, with the reason.</summary>
+    public List<string> MeshItems { get; } = new();
     public int NurbsBreps { get; set; }
     public int NurbsBrepsClosed { get; set; }
     /// <summary>Exact bodies kept outside the mesh (prestressed beams with a true-arc profile, cut by the skewed end planes) written as closed B-reps.</summary>
@@ -179,6 +189,12 @@ public static class Rhino3dmExporter
             }
             outer = pc;
         }
+        else if (RegularPolygon(es.Outline, out var cc, out double cr))
+        {
+            // a round section (columns, shafts, piles: the generators draw an n-gon with its vertices ON the circle) -> the true circle
+            if (!oblique) outer = new RG.ArcCurve(new RG.Circle(new RG.Plane(Q(cc), RG.Vector3d.ZAxis), cr * s));
+            else outer = Mapped(SBM.Core.Geometry.Nurbs.NurbsArc.Circle(f.ToWorld(cc.X, cc.Y, 0), f.X, f.Y, cr), Qw);
+        }
         else
         {
             var pts = es.Outline.Select(Q).ToList();
@@ -212,6 +228,29 @@ public static class Rhino3dmExporter
     }
 
     /// <summary>A world NURBS curve mapped point by point through an affine map (exact: control points mapped, weights kept).</summary>
+    /// <summary>Outline = a regular polygon of at least 16 vertices (equal radius, equal angle steps): centre and the vertex radius.</summary>
+    internal static bool RegularPolygon(IReadOnlyList<Vec2> o, out Vec2 c, out double r)
+    {
+        c = default; r = 0;
+        int n = o.Count;
+        if (n < 16) return false;
+        double sx = 0, sy = 0;
+        foreach (var p in o) { sx += p.X; sy += p.Y; }
+        c = new Vec2(sx / n, sy / n);
+        var cen = c;
+        r = o.Average(p => Vec2.Distance(p, cen));
+        if (r <= 0) return false;
+        double step = 2 * Math.PI / n;
+        for (int i = 0; i < n; i++)
+        {
+            if (Math.Abs(Vec2.Distance(o[i], c) - r) > 1e-9 + 1e-7 * r) return false;
+            var a = o[i] - c; var b = o[(i + 1) % n] - c;
+            double ang = Math.Atan2(a.X * b.Y - a.Y * b.X, a.X * b.X + a.Y * b.Y);
+            if (Math.Abs(Math.Abs(ang) - step) > 1e-6) return false;
+        }
+        return true;
+    }
+
     private static RG.NurbsCurve Mapped(SBM.Core.Geometry.Nurbs.NurbsCurve c, Func<Vec3, RG.Point3d> map)
     {
         var r = new RG.NurbsCurve(3, c.IsRational, c.Degree + 1, c.Control.Length);
@@ -392,6 +431,12 @@ public static class Rhino3dmExporter
         }
 
         private string _cur = "";
+        private void MeshWhy(string why)
+        {
+            string k = why.Length > 80 ? why[..80] : why;
+            _r.MeshReasons[k] = _r.MeshReasons.GetValueOrDefault(k) + 1;
+            if (_r.MeshItems.Count < 50) _r.MeshItems.Add($"{_cur}: {k}");
+        }
         private void Fallback(string why)
         {
             _r.Fallbacks++;
@@ -430,7 +475,33 @@ public static class Rhino3dmExporter
                 if (rest.Count > 0) { geoms.Add(ToMesh(mesh, rest)); _r.Meshes++; }
                 return;
             }
-            if (!mesh.HasExactSolids) return;
+            if (!mesh.HasExactSolids)
+            {
+                // a closed polyhedron (concrete caps, footings, walls, pedestals ...): planar faces with shared edges -> closed B-rep, one per shell
+                if (!_o.PlanarBreps) { MeshWhy("planar B-reps off"); return; }
+                var shells = RhinoBrepBuilder.Shells(mesh);
+                var made = new List<RG.Brep>();
+                string? why = null;
+                foreach (var sh in shells)
+                {
+                    var pf = RhinoBrepBuilder.PlanarFaces(sh, _o.MaxPlanarFaces, out why);
+                    if (pf == null) break;
+                    var bb = new RhinoBrepBuilder(P, _s, _tol);
+                    try
+                    {
+                        foreach (var f in pf) bb.AddFace(f);
+                        var brep = bb.Finish();
+                        if (brep == null) { why = bb.Error; break; }
+                        if (!brep.IsSolid) { brep.Dispose(); why = "planar faces do not close"; break; }
+                        made.Add(brep);
+                    }
+                    catch (Exception ex) when (ex is InvalidOperationException or ArgumentException) { why = ex.Message; break; }
+                }
+                if (made.Count == shells.Count) { geoms.AddRange(made); _r.PlanarBreps += made.Count; return; }
+                foreach (var b in made) b.Dispose();
+                MeshWhy(why ?? "planar B-rep failed");
+                return;
+            }
             var list = new List<RG.GeometryBase>();
             int ext = 0, mit = 0, obl = 0;
             foreach (var es in mesh.Solids!)
@@ -944,7 +1015,7 @@ public static class Rhino3dmExporter
             notes.AppendLine($"Units: {_r.Units}. The Rhino origin is the project grid point {bpText} - add it to Rhino coordinates for grid / map coordinates (same base point as the IFC export).");
             notes.AppendLine("Layers: <bridge>::<3D layer> (viewport layer names and colours); Alignments::<name>; Terrain::<name>. Object name = mark; attribute user text: Bridge, Kind, Mark, Assembly, Description, Material, Mass_kg, GlobalId (= IFC GlobalId), Status / Reason / Basis for UNRESOLVED items.");
             notes.AppendLine("Exact solids: plates / rolled shapes / boxes = extrusions (holes as inner profiles, arcs exact); oblique sweeps = extrusions mitered to the profile plane; NURBS solids and true-arc beam bodies = closed polysurfaces; other solids = meshes. Bolts, rivets, studs and anchor bolts are blocks (one definition per size); bars, strands and tendons are curves (lines + true arcs).");
-            notes.AppendLine($"Counts: {_r.Objects:N0} objects, {_r.Extrusions:N0} extrusions, {_r.MiteredExtrusions:N0} mitered extrusions, {_r.ObliqueBreps:N0} oblique B-reps, {_r.ExactBodies:N0} beam bodies, {_r.NurbsBreps:N0} NURBS B-reps, {_r.Meshes:N0} meshes, {_r.Curves:N0} curves, {_r.BlockInstances:N0} block instances of {_r.BlockDefinitions:N0} definitions.");
+            notes.AppendLine($"Counts: {_r.Objects:N0} objects, {_r.Extrusions:N0} extrusions, {_r.MiteredExtrusions:N0} mitered extrusions, {_r.ObliqueBreps:N0} oblique B-reps, {_r.ExactBodies:N0} beam bodies, {_r.NurbsBreps:N0} NURBS B-reps, {_r.PlanarBreps:N0} planar B-reps, {_r.Meshes:N0} meshes, {_r.Curves:N0} curves, {_r.BlockInstances:N0} block instances of {_r.BlockDefinitions:N0} definitions.");
             if (_fallbackReasons.Count > 0)
             {
                 notes.AppendLine($"Exact geometry that fell back to meshes: {_r.Fallbacks}.");

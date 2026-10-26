@@ -431,8 +431,19 @@ public sealed class SbmDocument
     /// <param name="barSolids">Also write bars / strands / tendons as tube meshes.</param>
     /// <param name="fileVersion">3DM archive version 8 (default) or 7 (for Rhino 7).</param>
     /// <param name="centerlines">Also write every element's geometric centerline and section centroid line (layers CL-GEOMETRIC / CL-CENTROID).</param>
+    /// <param name="exactCurved">Regenerate with exact NURBS for the curved parts (deck, haunches, barriers, curved girder plates) for this export when
+    /// the project setting is off (the setting is restored afterwards and the model is not saved). False = the model as it is set.</param>
     public SBM.IO.Rhino3dm.Rhino3dmResult Export3dm(string path, IReadOnlyList<string>? bridges = null, bool detail = true, bool meshOnly = false,
-        bool terrain = false, bool barSolids = false, int fileVersion = 8, bool centerlines = false)
+        bool terrain = false, bool barSolids = false, int fileVersion = 8, bool centerlines = false, bool exactCurved = true)
+    {
+        bool flip = exactCurved && !meshOnly && !Project.Geometry.ExactCurvedGeometry;
+        if (flip) Project.Geometry.ExactCurvedGeometry = true;
+        try { return Export3dmCore(path, bridges, detail, meshOnly, terrain, barSolids, fileVersion, centerlines); }
+        finally { if (flip) Project.Geometry.ExactCurvedGeometry = false; }
+    }
+
+    private SBM.IO.Rhino3dm.Rhino3dmResult Export3dmCore(string path, IReadOnlyList<string>? bridges, bool detail, bool meshOnly,
+        bool terrain, bool barSolids, int fileVersion, bool centerlines)
     {
         Regenerate();
         var all = _models.OfType<BridgeModel>().ToList();

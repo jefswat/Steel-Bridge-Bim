@@ -565,6 +565,9 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   document text `SBM\BasePoint_*`, notes, earth anchor description). Written to %TEMP% then copied (openNURBS small writes: 20x slower on the mapped
   C:\SBM folder). Group names may be locked once added (try/catch). Tests `Rhino3dmTests`
   (oblique / arc / beam-body B-reps closed, mitered holes = circles in the caps, sample round trip: units, layers, blocks, GlobalIds, volumes, bounds).
+  NURBS throughout (2026-10-26): regular 16+-gon outlines -> true circles (`Rhino3dmExporter.RegularPolygon`), closed polyhedral meshes -> planar B-reps
+  (`RhinoBrepBuilder.Shells` + `PlanarFaces`: weld 0.01 mm, coplanar groups through overlapping opposite edges, net edge coverage per line, corners shared + inserted
+  into neighbour edges, corners < 0.2 mm clustered), export regenerates with ExactCurvedGeometry ON unless `--no-exact`; why meshes remain: `MeshReasons`.
   Results: docs/API.md "Rhino export".
   Exports must be reproducible (test `Ifc_RegeneratedModel_ExportsIdentically`): anything numbered from a parallel
   generator's ConcurrentBag (stiffener marks, bar order, hole order) must be put in a fixed order first. Bar role:

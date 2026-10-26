@@ -563,4 +563,262 @@ internal sealed class RhinoBrepBuilder
         double a0 = Math.Atan2(p0.Y - c2.Y, p0.X - c2.X);
         return sweep > 0 ? NurbsArc.Arc(center, x, y, r, a0, a0 + sweep) : NurbsArc.Arc(center, x, y * -1, r, -a0, -a0 - sweep);
     }
+
+    // ---------------------------------------------------------------- polyhedral meshes
+
+    /// <summary>
+    /// Planar faces of a CLOSED polyhedral mesh (concrete caps, footings, walls, pedestals ... built as triangles): vertices welded at 0.01 mm,
+    /// triangles grouped across edges into coplanar faces (normals within ~0.003 deg, 1 µm off the plane), each face bounded by its boundary edge loops
+    /// (outer + holes). A loop vertex is kept when it is a corner of that face or touches three or more faces, so both faces of an edge are cut at
+    /// the same vertices and the builder shares the edge. Null (with <paramref name="why"/>) when the mesh is open, non-manifold or has more than
+    /// <paramref name="maxFaces"/> faces (a faceted curved surface: no exact description to give - it stays a mesh).
+    /// </summary>
+    /// <summary>The mesh split into its shells: triangles connected through shared vertex INDICES (generators build each closed piece with its own
+    /// vertices; pieces that only touch stay apart). One mesh = one shell is returned as is.</summary>
+    public static List<Mesh> Shells(Mesh mesh)
+    {
+        var I = mesh.Indices; int nt = I.Count / 3;
+        var parent = Enumerable.Range(0, mesh.Positions.Count).ToArray();
+        int Find(int x) { while (parent[x] != x) { parent[x] = parent[parent[x]]; x = parent[x]; } return x; }
+        for (int t = 0; t < nt; t++) { int a = Find(I[3 * t]); parent[Find(I[3 * t + 1])] = a; parent[Find(I[3 * t + 2])] = a; }
+        // flat-shaded meshes (a vertex per triangle corner): also join across welded edges that exactly two triangles use (pieces that only touch
+        // along an edge give that edge four triangles and stay apart)
+        var o = mesh.Positions.Count > 0 ? mesh.Positions[0] : default;
+        var weld = new Dictionary<(long, long, long), int>();
+        int W(int v) { var q = mesh.Positions[v] - o; var k = ((long)Math.Round(q.X * 1e5), (long)Math.Round(q.Y * 1e5), (long)Math.Round(q.Z * 1e5)); if (!weld.TryGetValue(k, out int id)) weld[k] = id = weld.Count; return id; }
+        var wv = Enumerable.Range(0, mesh.Positions.Count).Select(W).ToArray();
+        var edges = new Dictionary<(int, int), List<int>>();
+        for (int t = 0; t < nt; t++)
+            for (int k = 0; k < 3; k++)
+            {
+                int a = wv[I[3 * t + k]], b = wv[I[3 * t + (k + 1) % 3]];
+                if (a == b) continue;
+                var e = a < b ? (a, b) : (b, a);
+                if (!edges.TryGetValue(e, out var l)) edges[e] = l = new();
+                l.Add(t);
+            }
+        foreach (var l in edges.Values)
+            if (l.Count == 2) parent[Find(I[3 * l[0]])] = Find(I[3 * l[1]]);
+        var byRoot = new Dictionary<int, List<int>>();
+        for (int t = 0; t < nt; t++) { int r = Find(I[3 * t]); if (!byRoot.TryGetValue(r, out var l)) byRoot[r] = l = new(); l.Add(t); }
+        if (byRoot.Count == 1) return new() { mesh };
+        var res = new List<Mesh>();
+        foreach (var tl in byRoot.Values)
+        {
+            var m = new Mesh(); var map = new Dictionary<int, int>();
+            foreach (int t in tl)
+                for (int k = 0; k < 3; k++)
+                {
+                    int v = I[3 * t + k];
+                    if (!map.TryGetValue(v, out int nv)) { nv = m.Positions.Count; map[v] = nv; m.Positions.Add(mesh.Positions[v]); }
+                    m.Indices.Add(nv);
+                }
+            res.Add(m);
+        }
+        return res;
+    }
+
+    /// <summary>Supporting line of a segment: canonical direction (first non-zero component positive), sense of the segment against it, key.</summary>
+    private static ((long, long, long, long, long, long) key, Vec3 d, int sg) LineKey(Vec3 a, Vec3 b)
+    {
+        var d = (b - a).Normalized();
+        int sg = 1;
+        if (d.X < -1e-12 || (Math.Abs(d.X) <= 1e-12 && (d.Y < -1e-12 || (Math.Abs(d.Y) <= 1e-12 && d.Z < 0)))) { d = -d; sg = -1; }
+        var foot = a - d * Vec3.Dot(a, d);
+        return (((long)Math.Round(d.X * 1e6), (long)Math.Round(d.Y * 1e6), (long)Math.Round(d.Z * 1e6),
+                 (long)Math.Round(foot.X * 1e5), (long)Math.Round(foot.Y * 1e5), (long)Math.Round(foot.Z * 1e5)), d, sg);
+    }
+
+    public static List<FaceSpec>? PlanarFaces(Mesh mesh, int maxFaces, out string? why, double minEdge = 2e-4)
+    {
+        why = null;
+        var P = mesh.Positions; var I = mesh.Indices;
+        if (I.Count < 12) { why = "too few triangles"; return null; }
+        var o = P[I[0]];
+        const double tol = 1e-6;
+        // weld (0.01 mm)
+        var key = new Dictionary<(long, long, long), int>();
+        var pts = new List<Vec3>();
+        var map = new int[P.Count];
+        for (int i = 0; i < P.Count; i++)
+        {
+            var q = P[i] - o;
+            var k = ((long)Math.Round(q.X * 1e5), (long)Math.Round(q.Y * 1e5), (long)Math.Round(q.Z * 1e5));
+            if (!key.TryGetValue(k, out int id)) { id = pts.Count; key[k] = id; pts.Add(q); }
+            map[i] = id;
+        }
+        var tris = new List<(int a, int b, int c, Vec3 n)>();
+        for (int t = 0; t + 2 < I.Count; t += 3)
+        {
+            int a = map[I[t]], b = map[I[t + 1]], c = map[I[t + 2]];
+            if (a == b || b == c || a == c) continue;
+            var cr = Vec3.Cross(pts[b] - pts[a], pts[c] - pts[a]);
+            if (cr.Length < 1e-12) continue;
+            tris.Add((a, b, c, cr.Normalized()));
+        }
+        if (tris.Count < 4) { why = "too few triangles"; return null; }
+        // coplanar groups: triangles sharing a vertex and lying in one plane (vertex adjacency survives T-junctions)
+        var parent = Enumerable.Range(0, tris.Count).ToArray();
+        int Find(int x) { while (parent[x] != x) { parent[x] = parent[parent[x]]; x = parent[x]; } return x; }
+        bool Coplanar(int s, int t)
+        {
+            var ts = tris[s]; var tt = tris[t];
+            if (Vec3.Dot(ts.n, tt.n) < 1 - 1e-9) return false;
+            var p0 = pts[ts.a];
+            return Math.Abs(Vec3.Dot(pts[tt.a] - p0, ts.n)) <= tol && Math.Abs(Vec3.Dot(pts[tt.b] - p0, ts.n)) <= tol && Math.Abs(Vec3.Dot(pts[tt.c] - p0, ts.n)) <= tol;
+        }
+        // adjacency = opposite collinear triangle edges that overlap over a length (a T-junction splits one side; touching at a point is not adjacency)
+        var edgeLines = new Dictionary<(long, long, long, long, long, long), List<(double t0, double t1, int sg, int tri)>>();
+        for (int t = 0; t < tris.Count; t++)
+        {
+            var (a, b, c, _) = tris[t];
+            foreach (var (u, v) in new[] { (a, b), (b, c), (c, a) })
+            {
+                var (lk, d, sg) = LineKey(pts[u], pts[v]);
+                double t0 = Vec3.Dot(pts[u], d), t1 = Vec3.Dot(pts[v], d);
+                if (!edgeLines.TryGetValue(lk, out var l)) edgeLines[lk] = l = new();
+                l.Add((Math.Min(t0, t1), Math.Max(t0, t1), sg, t));
+            }
+        }
+        foreach (var l in edgeLines.Values)
+            for (int i2 = 0; i2 < l.Count; i2++)
+                for (int j2 = 0; j2 < i2; j2++)
+                {
+                    var e1 = l[i2]; var e2 = l[j2];
+                    if (e1.sg == e2.sg || Math.Min(e1.t1, e2.t1) - Math.Max(e1.t0, e2.t0) <= tol) continue;
+                    if (Find(e1.tri) != Find(e2.tri) && Coplanar(e1.tri, e2.tri)) parent[Find(e1.tri)] = Find(e2.tri);
+                }
+        var groups = Enumerable.Range(0, tris.Count).GroupBy(Find).Select(g => g.ToList()).ToList();
+        if (groups.Count > maxFaces) { why = $"more than {maxFaces} planar faces (faceted curved surface)"; return null; }
+
+        (long, long, long) K(Vec3 p) => ((long)Math.Round(p.X * 1e5), (long)Math.Round(p.Y * 1e5), (long)Math.Round(p.Z * 1e5));
+        // boundary of each group: net directed edge coverage along each supporting line (T-junction splits cancel)
+        var faces = new List<(Vec3 n, List<List<Vec3>> loops)>();
+        foreach (var g in groups)
+        {
+            var lines = new Dictionary<(long, long, long, long, long, long), List<(double t0, double t1, int w)>>();
+            var lineDir = new Dictionary<(long, long, long, long, long, long), (Vec3 d, Vec3 foot)>();
+            foreach (int t in g)
+            {
+                var (a, b, c, _) = tris[t];
+                foreach (var (u, v) in new[] { (a, b), (b, c), (c, a) })
+                {
+                    var (lk, d, sg) = LineKey(pts[u], pts[v]);
+                    var foot = pts[u] - d * Vec3.Dot(pts[u], d);
+                    if (!lines.TryGetValue(lk, out var segs)) { lines[lk] = segs = new(); lineDir[lk] = (d, foot); }
+                    double t0 = Vec3.Dot(pts[u], d), t1 = Vec3.Dot(pts[v], d);
+                    segs.Add((Math.Min(t0, t1), Math.Max(t0, t1), sg));
+                }
+            }
+            var pieces = new List<(Vec3 a, Vec3 b)>();
+            foreach (var (lk, segs) in lines)
+            {
+                var (d, foot) = lineDir[lk];
+                var cuts = segs.SelectMany(s => new[] { s.t0, s.t1 }).OrderBy(x => x).ToList();
+                var bp = new List<double>();
+                foreach (var x in cuts) if (bp.Count == 0 || x - bp[^1] > tol) bp.Add(x);
+                for (int i = 0; i + 1 < bp.Count; i++)
+                {
+                    double m = (bp[i] + bp[i + 1]) / 2;
+                    int w = 0;
+                    foreach (var s in segs) if (s.t0 < m && s.t1 > m) w += s.w;
+                    if (w == 0) continue;
+                    if (Math.Abs(w) > 1) { why = "overlapping triangles"; return null; }
+                    var pa = foot + d * bp[i]; var pb = foot + d * bp[i + 1];
+                    pieces.Add(w > 0 ? (pa, pb) : (pb, pa));
+                }
+            }
+            // chain into loops
+            var from = new Dictionary<(long, long, long), int>();
+            for (int i = 0; i < pieces.Count; i++) if (!from.TryAdd(K(pieces[i].a), i)) { why = "pinched face boundary"; return null; }
+            var used = new bool[pieces.Count];
+            var loops = new List<List<Vec3>>();
+            for (int i = 0; i < pieces.Count; i++)
+            {
+                if (used[i]) continue;
+                var loop = new List<Vec3>();
+                int cur = i;
+                while (!used[cur])
+                {
+                    used[cur] = true; loop.Add(pieces[cur].a);
+                    if (!from.TryGetValue(K(pieces[cur].b), out cur)) { why = "open mesh (face boundary does not close)"; return null; }
+                }
+                if (cur != i) { why = "broken face boundary"; return null; }
+                loops.Add(loop);
+            }
+            if (loops.Count == 0) { why = "face without boundary"; return null; }
+            faces.Add((tris[g[0]].n, loops));
+        }
+        // corners of every face; each loop keeps its corners plus any other face corner lying on its edges, so shared edges match
+        static bool Collinear(Vec3 pa, Vec3 pb, Vec3 pc)
+        {
+            var d1 = pb - pa; var d2 = pc - pb;
+            return Vec3.Cross(d1, d2).Length <= 1e-9 * d1.Length * d2.Length + 1e-15 && Vec3.Dot(d1, d2) > 0;
+        }
+        var corners = new List<Vec3>();
+        var cornerKeys = new HashSet<(long, long, long)>();
+        foreach (var (_, loops) in faces)
+            foreach (var l in loops)
+                for (int i = 0; i < l.Count; i++)
+                    if (!Collinear(l[(i + l.Count - 1) % l.Count], l[i], l[(i + 1) % l.Count]) && cornerKeys.Add(K(l[i]))) corners.Add(l[i]);
+        // corners closer than minEdge (below the B-rep vertex tolerance) become one vertex, the same on every face
+        var rep = new Dictionary<(long, long, long), Vec3>();
+        if (minEdge > 0)
+        {
+            var grid = new Dictionary<(long, long, long), List<Vec3>>();
+            (long, long, long) G(Vec3 p) => ((long)Math.Floor(p.X / minEdge), (long)Math.Floor(p.Y / minEdge), (long)Math.Floor(p.Z / minEdge));
+            foreach (var c in corners)
+            {
+                var g = G(c); Vec3? hit = null;
+                for (long i = g.Item1 - 1; i <= g.Item1 + 1 && hit == null; i++)
+                    for (long j = g.Item2 - 1; j <= g.Item2 + 1 && hit == null; j++)
+                        for (long k = g.Item3 - 1; k <= g.Item3 + 1 && hit == null; k++)
+                            if (grid.TryGetValue((i, j, k), out var l)) foreach (var q in l) if ((q - c).Length < minEdge) { hit = q; break; }
+                if (hit is Vec3 h) rep[K(c)] = h;
+                else { if (!grid.TryGetValue(g, out var l)) grid[g] = l = new(); l.Add(c); }
+            }
+        }
+        Vec3 R(Vec3 p) => rep.TryGetValue(K(p), out var q) ? q : p;
+        var res = new List<FaceSpec>();
+        foreach (var (n, loops) in faces)
+        {
+            var kept = new List<List<Vec3>>();
+            foreach (var l in loops)
+            {
+                var k = l.Where(p => cornerKeys.Contains(K(p))).ToList();
+                if (k.Count < 3) { why = "degenerate face loop"; return null; }
+                var full = new List<Vec3>();
+                for (int i = 0; i < k.Count; i++)
+                {
+                    var a = k[i]; var b = k[(i + 1) % k.Count];
+                    full.Add(a);
+                    var ab = b - a; double L = ab.Length; var dd = ab * (1 / L);
+                    var on = new List<(double t, Vec3 p)>();
+                    foreach (var c in corners)
+                    {
+                        double t = Vec3.Dot(c - a, dd);
+                        if (t <= tol || t >= L - tol) continue;
+                        if ((c - (a + dd * t)).Length <= tol) on.Add((t, c));
+                    }
+                    foreach (var (_, p) in on.OrderBy(x => x.t)) full.Add(p);
+                }
+                var merged = new List<Vec3>();
+                foreach (var p in full.Select(R)) if (merged.Count == 0 || K(merged[^1]) != K(p)) merged.Add(p);
+                while (merged.Count > 1 && K(merged[0]) == K(merged[^1])) merged.RemoveAt(merged.Count - 1);
+                if (merged.Count < 3) continue;   // a sliver loop collapsed below the tolerance
+                kept.Add(merged);
+            }
+            if (kept.Count == 0) continue;   // the whole face collapsed (narrower than the tolerance)
+            double Area(List<Vec3> l) { var s = Vec3.Zero; for (int i = 0; i < l.Count; i++) s += Vec3.Cross(l[i], l[(i + 1) % l.Count]); return Vec3.Dot(s, n) / 2; }
+            var outer = kept.OrderByDescending(l => Math.Abs(Area(l))).First();
+            var x = (outer[1] - outer[0]).Normalized();
+            var y = Vec3.Cross(n, x).Normalized();
+            List<SCurve> Curves(List<Vec3> l) => Enumerable.Range(0, l.Count).Select(i => Line(l[i] + o, l[(i + 1) % l.Count] + o)).ToList();
+            var f = new FaceSpec { Origin = outer[0] + o, X = x, Y = y };
+            f.Outer.AddRange(Curves(outer));
+            foreach (var l in kept) if (!ReferenceEquals(l, outer)) f.Holes.Add(Curves(l));
+            res.Add(f);
+        }
+        return res;
+    }
 }

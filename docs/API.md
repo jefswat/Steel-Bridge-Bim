@@ -64,7 +64,7 @@ sbm export "C:\Jobs\Br12\Br12.sbm" --ifc Br12.ifc --geometry abv [--chord-tol 0.
                                                  # holes and clipped beam profiles as IfcPolygonalFaceSet (holes = void loops), hole
                                                  # circles and profile arcs polygonized to --chord-tol mm (default 1/32" = 0.79 mm).
                                                  # --geometry parametric (default) = exact extrusions. Prints time, size, entity count.
-sbm export "C:\Jobs\Br12\Br12.sbm" --3dm Br12.3dm [--bridges "Unit 2,Unit 3"] [--no-detail] [--mesh-only] [--terrain] [--bar-solids] [--3dm-version 7] [--centerlines]
+sbm export "C:\Jobs\Br12\Br12.sbm" --3dm Br12.3dm [--bridges "Unit 2,Unit 3"] [--no-detail] [--mesh-only] [--terrain] [--bar-solids] [--3dm-version 7] [--centerlines] [--no-exact]
                                                  # Rhino 3DM (see "Rhino export" below): exact extrusions / B-reps, fastener blocks,
                                                  # bar + alignment curves, layers per bridge, IFC GlobalIds as user text
 sbm 3dm-info   Br12.3dm [--blocks]              # read a 3DM back: units, objects by layer and type, blocks, document text
@@ -123,7 +123,10 @@ MIT; openNURBS; the native `librhino3dm_native.dll` ships beside `sbm.exe` / the
 | Same, swept almost parallel to its profile plane (no valid miter) | closed B-rep (planar caps, ruled sides, half-cylinder hole walls) |
 | Exact NURBS solid (`Mesh.Nurbs`, project setting Geometry.ExactCurvedGeometry) | closed B-rep: NURBS faces, planar faces, holes trimmed by the hole walls' edges (shared edges) |
 | Prestressed beam with a true-arc profile (`PrestressedBeam.Body`) | closed B-rep: profile caps projected onto the skewed end planes, ruled sides |
-| Everything else (deck, barriers, concrete, substructure, meshes the generators build directly) | Mesh (double-precision vertices, creases split at 30 deg) |
+| Round sections (columns, drilled shafts, piles: regular n-gon of 16+ vertices on the circle) | Extrusion of the TRUE circle (vertex radius = the plan diameter / 2; the volume is the circle's, 0.6 % above the 32-gon mesh) |
+| Closed polyhedral meshes (caps, footings, walls, pedestals, bent plates ...: no recorded description) | closed B-rep of their planar faces, one per shell (coplanar triangles merged, T-junctions resolved, shared edges), grouped per element |
+| Curved parts (deck, haunches, barriers, curved girder plates) | NURBS B-reps: the export regenerates with `Geometry.ExactCurvedGeometry` ON when the project has it off (`--no-exact` / `exactCurved: false` = the model as set; the setting is restored, nothing saved) |
+| Anything left (faceted curved surfaces over 400 faces, open / pinched meshes, concrete diaphragm stacks) | Mesh (double-precision vertices, creases split at 30 deg); the reasons are printed ("still meshes: ...", `Rhino3dmResult.MeshReasons` / `MeshItems`) |
 | Bolts, rivets, studs, anchor bolts | one block (instance definition) per type and size + an instance reference per fastener |
 | Bars, strands, PT tendons | curves: lines + true arcs (ArcFit, 0.5 mm) or polylines; `--bar-solids` adds tube meshes on `<layer>-SOLID` |
 | File version | Rhino 8 archive by default; `--3dm-version 7` writes a Rhino 7 archive (Rhino 7 cannot open version 8 files; Rhino 8 reads both). `SbmDocument.Export3dm(..., fileVersion: 7)` |
