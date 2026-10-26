@@ -364,7 +364,8 @@ public static class Rhino3dmExporter
                 if (gi >= 0)
                 {
                     var grp = _f.AllGroups.FindIndex(gi);
-                    if (grp != null) grp.Name = p.Name.Length > 0 ? $"{p.Name} #{gi}" : $"group {gi}";
+                    // naming is best effort: some table entries are locked once added (rhino3dm), the objects carry the name anyway
+                    try { if (grp != null) grp.Name = p.Name.Length > 0 ? $"{p.Name} #{gi}" : $"group {gi}"; } catch (InvalidOperationException) { }
                     a.AddToGroup(gi);
                     _r.Groups++;
                 }
@@ -375,6 +376,7 @@ public static class Rhino3dmExporter
                 g.Dispose();
                 Count(layer);
             }
+            a.Dispose();
         }
 
         private string _cur = "";
@@ -518,6 +520,7 @@ public static class Rhino3dmExporter
             var a = Attr(layer, p);
             _f.Objects.Add(c, a);
             c.Dispose();
+            a.Dispose();
             _r.Curves++;
             Count(layer);
             if (_o.BarSolids && diameter > 0 && pts.Count >= 2)
@@ -646,17 +649,18 @@ public static class Rhino3dmExporter
 
             if (m.Steel is { } steel)
             {
-                var asmOf = steel.Assemblies.GroupBy(a => a.Mark).ToDictionary(g => g.Key, g => g.First());
                 foreach (var part in steel.Parts)
                 {
                     if (part.Mesh.IsEmpty) continue;
                     if (part.Category == PartCategory.Weld && !_o.Detail) continue;
                     var p = Base(part.Mark, part.Category.ToString()).Add("Mark", part.Mark).Add("Assembly", part.Assembly)
-                        .Add("AssemblyDescription", asmOf.TryGetValue(part.Assembly, out var asm) ? asm.Description : null)
                         .Add("Description", part.Description).Add("Material", part.Material)
                         .Add("Mass_kg", part.Mass, "0.##").Add("Length", part.Length > 0 ? Len(part.Length) : null)
                         .Add("GlobalId", Gid(IfcKeys.Part(bk, part.Mark))).Flag(part.Assumption);
-                    if (part.Fabrication is { IsEmpty: false } fab) p.Add("Fabrication", fab.ToString());
+                    if (part.Fabrication is { IsEmpty: false } fab)
+                        p.Add("Fab_Toughness", fab.Toughness).Add("Fab_ContactFinish", fab.ContactFinish).Add("Fab_NDT", fab.Ndt).Add("Fab_CoatingExterior", fab.CoatingExterior)
+                         .Add("Fab_CoatingInterior", fab.CoatingInterior).Add("Fab_ShopAssembly", fab.ShopAssembly).Add("Fab_Tolerance", fab.Tolerance).Add("Fab_Camber", fab.Camber)
+                         .Add("Fab_Weld", fab.Weld).Add("Fab_Notes", fab.Notes.Count > 0 ? string.Join("; ", fab.Notes) : null);
                     Solid(part.Mesh, L(ModelLayers.SteelLayer(part)), p);
                 }
                 Lap("steel parts");
@@ -715,13 +719,26 @@ public static class Rhino3dmExporter
             }
         }
 
+        private readonly Dictionary<Assumption, string> _reasonKeys = new();
+
         private void Instance(int def, Frame3 f, int layer, string name, string assembly, string gid, Assumption? flag)
         {
             var a = new RD.ObjectAttributes { LayerIndex = layer, Name = name };
             a.SetUserString("Assembly", assembly);
             a.SetUserString("GlobalId", gid);
-            if (flag != null) { a.SetUserString("Status", flag.Status); a.SetUserString("Reason", flag.Reason); }
+            if (flag != null)
+            {
+                // the reason text is shared by thousands of fasteners (e.g. rivet positions derived): stored once in the document user
+                // text (section SBM_Reasons) and referenced by key, which keeps the instances small
+                if (!_reasonKeys.TryGetValue(flag, out var rk))
+                {
+                    _reasonKeys[flag] = rk = "R" + (_reasonKeys.Count + 1);
+                    _f.Strings.SetString("SBM_Reasons", rk, $"{flag.Status}{(flag.DimensionOnly ? " (dimension only)" : "")}: {flag.Reason} | assumed: {flag.Basis}");
+                }
+                a.SetUserString("StatusKey", rk);       // "UNRESOLVED: reason | assumed: basis" in SBM_Reasons\R<n>
+            }
             _f.Objects.AddInstanceObject(def, Placement(f), a);
+            a.Dispose();
             _r.BlockInstances++;
             Count(layer);
         }
@@ -763,14 +780,16 @@ public static class Rhino3dmExporter
                     var b = c.Bars[i];
                     marks.TryGetValue(b.Mark, out var mk);
                     string layer = b.Group switch { "Rail" => "3D-REBAR-RAIL", "CapHaunch" => "3D-REBAR-CAP-HAUNCH", _ => "3D-REBAR-DECK" };
-                    Bar(b.Points, mk?.Size.Diameter ?? 0, L(layer), L(layer + "-SOLID"), BarProps(Base("Bar " + b.Mark, "Rebar"), b, mk).Add("GlobalId", Gid(IfcKeys.DeckBar(bk, i))));
+                    Bar(b.Points, mk?.Size.Diameter ?? 0, L(layer), L(layer + "-SOLID"), BarProps("Bar " + b.Mark, b, mk).Add("GlobalId", Gid(IfcKeys.DeckBar(bk, i))));
                 }
             }
         }
 
-        private Props BarProps(Props p, BarPlacement b, BarMark? mk) =>
-            p.Add("Mark", b.Mark).Add("Unit", b.Unit).Add("Group", b.Group).Add("Size", mk?.Size.Name).Add("Diameter", mk == null ? null : Len(mk.Size.Diameter))
-             .Add("Location", mk?.Location).Add("Coating", mk == null ? null : mk.Epoxy ? "epoxy" : mk.Coating).Add("Shape", mk?.Shape.Code);
+        /// <summary>Lean user text for bars (there can be hundreds of thousands; the mark's size / shape / location / bend data are in the bar
+        /// schedule and the companion database): Kind, Mark, Size, Unit, Coating (+ GlobalId added by the caller).</summary>
+        private static Props BarProps(string name, BarPlacement b, BarMark? mk) =>
+            new Props { Name = name }.Add("Kind", "Rebar").Add("Mark", b.Mark).Add("Size", mk?.Size.Name).Add("Unit", b.Unit)
+                .Add("Coating", mk == null ? null : mk.Epoxy ? "epoxy" : mk.Coating);
 
         private void Substructure(string bn, string bk, Core.Substructure.SubstructureModel sub, Func<string, string, Props> Base, Func<string, int> L)
         {
@@ -817,7 +836,7 @@ public static class Rhino3dmExporter
                     foreach (var b in sub.Bars.Where(b => b.Unit == unit.Name))
                     {
                         marks.TryGetValue(b.Mark, out var mk);
-                        Bar(b.Points, mk?.Size.Diameter ?? 0, L("3D-REBAR-SUB"), L("3D-REBAR-SUB-SOLID"), BarProps(Base("Bar " + b.Mark, "Rebar"), b, mk).Add("GlobalId", Gid(IfcKeys.SubBar(uk, i++))));
+                        Bar(b.Points, mk?.Size.Diameter ?? 0, L("3D-REBAR-SUB"), L("3D-REBAR-SUB-SOLID"), BarProps("Bar " + b.Mark, b, mk).Add("GlobalId", Gid(IfcKeys.SubBar(uk, i++))));
                     }
                 }
         }
@@ -843,7 +862,7 @@ public static class Rhino3dmExporter
                 {
                     var bar = b.Bars[i];
                     var mk = ps.MarkOf(bar);
-                    Bar(bar.Points, mk?.Size.Diameter ?? 0, L("3D-REBAR-BEAM"), L("3D-REBAR-BEAM-SOLID"), BarProps(Base("Bar " + bar.Mark, "Rebar"), bar, mk).Add("Beam", b.Mark).Add("GlobalId", Gid(IfcKeys.PsBar(bk, b.Mark, i))));
+                    Bar(bar.Points, mk?.Size.Diameter ?? 0, L("3D-REBAR-BEAM"), L("3D-REBAR-BEAM-SOLID"), BarProps("Bar " + bar.Mark, bar, mk).Add("Beam", b.Mark).Add("GlobalId", Gid(IfcKeys.PsBar(bk, b.Mark, i))));
                 }
             }
             foreach (var p in ps.Pads)
