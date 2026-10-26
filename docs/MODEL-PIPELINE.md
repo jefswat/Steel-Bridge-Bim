@@ -88,6 +88,8 @@ do not save do not trigger it); opt out with `--no-pipeline` or `SBM_PIPELINE=0`
 - Nebraska St Ramp B: `sbm pipeline` -> regenerate 4.8 s, curated index 71 pages (kept), database 15,688 elements, 71 sheets, 1,781 links (1.7 s);
   georeference UNRESOLVED (model is in UTM 14N, CRS not declared); second run: database UP TO DATE. Total 7.7 s.
 - Woodbury I-29 NB: regenerate 16.6 s, database 6,630 elements, 48 sheets, 684 links; `sbm db ... --sheets-for "Pier 1"` -> p.9-11 PIER DETAILS.
+- ODOT Bridge O tub unit (georeferenced EPSG:2267, terrain present, curated index 49 pages): database 15,766 elements, 317 links -> "Pipeline complete:
+  nothing open" (10 s).
 - Terrain: a copy of Br02069 with its terrain removed, `sbm run strip.csx copy.sbm --no-db --no-index` -> the pipeline ran after the save, found 3DEP
   1 m tile x48y501 (298 MB, downloaded in ~15 s), wrote a 601 x 631 m grid (ESRI:103708 county ftUS system, 100 % valid), attached and regenerated;
   vs the hand-made terrain at the 6 support points (offsets -20 / 0 / +20 m): max 18 mm, mean 2.9 mm.
@@ -95,6 +97,10 @@ do not save do not trigger it); opt out with `--no-pipeline` or `SBM_PIPELINE=0`
   (Nebraska 71 pages, 68 text, 3 scanned; PTC 108 scanned = no titles, "install Tesseract"), database with 179 sheets, link rules UNRESOLVED.
 - Automatic index quality vs the curated indexes: Nebraska sheet no. 69 / 71, titles 62 / 71 (the rest are hand-added parentheticals); Woodbury
   43 / 48 and 43 / 48; NHT (TxDOT, 134 scanned pages with a stamped sheet number) sheet no. 153 / 155, titles need OCR.
+
+Tests: `ModelPipelineTests` (terrain decisions incl. offline / unsupported CRS / hidden or missing references, CRS table mirrors crs.py, index merge,
+skeleton = valid rules file, database up-to-date logic, writable terrain folder, PlanPdfs round trip, an offline end-to-end run: skeleton + automatic
+index -> database with the sheets, second run keeps the hand-edited skeleton and finds the database up to date). Full suite 602 / 602.
 
 ## 4. Open
 
