@@ -42,7 +42,10 @@ public sealed class Rhino3dmResult
     public int Objects { get; set; }
     /// <summary>Recorded exact extrusions written as Rhino extrusions (sweep normal to the profile).</summary>
     public int Extrusions { get; set; }
-    /// <summary>Recorded exact extrusions with an oblique sweep written as closed B-reps.</summary>
+    /// <summary>Recorded exact extrusions with an oblique sweep (plates along a grade with plumb ends) written as Rhino extrusions whose ends are
+    /// mitered back to the profile plane (the right section = the profile projected along the sweep: circles become ellipses).</summary>
+    public int MiteredExtrusions { get; set; }
+    /// <summary>Recorded extrusions swept almost parallel to their profile plane (no valid miter) written as closed B-reps.</summary>
     public int ObliqueBreps { get; set; }
     /// <summary>Exact NURBS solids written as B-reps (and how many of them are closed).</summary>
     public int NurbsBreps { get; set; }
@@ -62,6 +65,8 @@ public sealed class Rhino3dmResult
     public string Units { get; set; } = "";
     public Dictionary<string, int> ObjectsByLayer { get; } = new();
     public List<string> Notes { get; } = new();
+    /// <summary>First elements whose exact geometry fell back to the mesh ("bridge / name: reason").</summary>
+    public List<string> FallbackItems { get; } = new();
     public TimeSpan Elapsed { get; set; }
     /// <summary>Seconds per phase (alignments, steel parts, fasteners, concrete, substructure, prestressed, terrain, write).</summary>
     public Dictionary<string, double> Timings { get; } = new();
@@ -106,6 +111,121 @@ public static class Rhino3dmExporter
         using var f = new RF.File3dm();
         f.Settings.ModelUnitSystem = Rhino.UnitSystem.Meters;
         return "rhino3dm " + typeof(RF.File3dm).Assembly.GetName().Version;
+    }
+
+    /// <summary>A recorded exact extrusion as a Rhino extrusion (straight; or mitered to the profile plane at both ends when the sweep is oblique),
+    /// or a closed B-rep when the sweep is almost parallel to the profile plane. Null (with the reason) when Rhino rejects it.</summary>
+    internal static RG.GeometryBase? ExtrusionOf(ExtrudedSolid es, Func<Vec3, RG.Point3d> P, double s, double tol, out string? error)
+    {
+    error = null;
+        var f = es.Frame;
+        var d = es.Extrusion;
+        bool oblique = Vec3.Cross(d.Normalized(), f.Z).Length > 1e-7;          // sweep off the profile normal (plates along a grade with plumb ends)
+        var dn = d.Normalized();
+        if (Math.Abs(Vec3.Dot(dn, f.Z)) < 1.0 / 32)
+        {
+            // nearly parallel to the profile plane: no valid miter (openNURBS needs N.z > 1/64) - closed B-rep instead
+            var bb = new RhinoBrepBuilder(P, s, tol);
+            try { foreach (var face in RhinoBrepBuilder.Faces(es)) bb.AddFace(face); }
+            catch (Exception ex) when (ex is InvalidOperationException or ArgumentException) { error = "oblique extrusion: " + ex.Message; return null; }
+            var brep = bb.Finish();
+            if (brep == null) { error = "oblique extrusion: " + bb.Error; return null; }
+            return brep;
+        }
+        var ext = new RG.Extrusion();
+        var a = P(f.Origin);
+        var b = P(f.Origin + d);
+        // path = the sweep; up = the profile y axis made exactly perpendicular to it (openNURBS checks it to 1e-12)
+        var up = f.Y - dn * Vec3.Dot(f.Y, dn);
+        if (up.Length < 1e-6) up = f.X - dn * Vec3.Dot(f.X, dn);
+        up = up.Normalized();
+        if (!ext.SetPathAndUp(a, b, new RG.Vector3d(up.X, up.Y, up.Z))) { error = "extrusion path"; ext.Dispose(); return null; }
+        var pl = ext.GetPathPlane(0);
+        var px = new Vec3(pl.XAxis.X, pl.XAxis.Y, pl.XAxis.Z);
+        var py = new Vec3(pl.YAxis.X, pl.YAxis.Y, pl.YAxis.Z);
+        // profile coordinates (model units) of a world point of the profile plane: its parallel projection along the sweep onto the plane
+        // normal to the path (= the right section). For an oblique sweep both ends are then mitered back to the profile plane.
+        RG.Point3d Qw(Vec3 w) { var v = (w - f.Origin) * s; return new RG.Point3d(Vec3.Dot(v, px), Vec3.Dot(v, py), 0); }
+        RG.Point3d Q(Vec2 q) => Qw(f.ToWorld(q.X, q.Y, 0));
+        RG.Curve outer;
+        if (es.ExactOutline is { } ao)
+        {
+            var pc = new RG.PolyCurve();
+            for (int i = 0; i < ao.Count; i++)
+            {
+                if (!ao.IsArc(i)) pc.Append(new RG.Line(Q(ao.Points[i]), Q(ao.End(i))));
+                else if (!oblique) pc.Append(new RG.Arc(Q(ao.Points[i]), Q(ao.Mid(i)), Q(ao.End(i))));
+                else
+                {
+                    // a true arc seen along an oblique sweep is an ellipse arc: the exact rational arc mapped affinely
+                    var c = ao.Center(i);
+                    double a0 = Math.Atan2(ao.Points[i].Y - c.Y, ao.Points[i].X - c.X), sw = ao.Sweep(i), r = Math.Abs(ao.Radii[i]);
+                    var arc = sw > 0 ? SBM.Core.Geometry.Nurbs.NurbsArc.Arc(f.ToWorld(c.X, c.Y, 0), f.X, f.Y, r, a0, a0 + sw)
+                                     : SBM.Core.Geometry.Nurbs.NurbsArc.Arc(f.ToWorld(c.X, c.Y, 0), f.X, f.Y * -1, r, -a0, -a0 - sw);
+                    pc.Append(Mapped(arc, Qw));
+                }
+            }
+            outer = pc;
+        }
+        else
+        {
+            var pts = es.Outline.Select(Q).ToList();
+            pts.Add(pts[0]);
+            outer = new RG.PolylineCurve(pts);
+        }
+        // outer loop counter-clockwise in profile coordinates, holes clockwise
+        if (SignedArea(outer) < 0) outer.Reverse();
+        if (!ext.SetOuterProfile(outer, true)) { error = "extrusion profile"; ext.Dispose(); return null; }
+        foreach (var h in RhinoBrepBuilder.DistinctHoles(es.Holes))
+        {
+            RG.Curve c;
+            double r = h.Diameter / 2;
+            if (!oblique) c = new RG.ArcCurve(new RG.Circle(new RG.Plane(Q(h.Center), RG.Vector3d.ZAxis), r * s));
+            else c = Mapped(SBM.Core.Geometry.Nurbs.NurbsArc.Circle(f.ToWorld(h.Center.X, h.Center.Y, 0), f.X, f.Y, r), Qw);   // ellipse
+            if (SignedArea(c) > 0) c.Reverse();
+            if (!ext.AddInnerProfile(c)) { error = "extrusion hole"; ext.Dispose(); return null; }
+        }
+        if (oblique)
+        {
+            // miter planes = the profile plane at both ends, normal in profile coordinates (z along the path, must be > 0)
+            var n = new RG.Vector3d(Vec3.Dot(f.Z, px), Vec3.Dot(f.Z, py), Vec3.Dot(f.Z, dn));
+            if (n.Z < 0) n = -n;
+            n.Unitize();
+            ext.MiterPlaneNormalAtStart = n;
+            ext.MiterPlaneNormalAtEnd = n;
+            if (!ext.IsMiteredAtStart || !ext.IsMiteredAtEnd) { error = "extrusion miter"; ext.Dispose(); return null; }
+        }
+        if (!ext.IsValid) { ext.IsValidWithLog(out string why); error = "invalid extrusion: " + string.Join(" ", why.Split('\n').Select(x => x.Trim()).Where(x => x.Length > 0).Take(2)); ext.Dispose(); return null; }
+        return ext;
+    }
+
+    /// <summary>A world NURBS curve mapped point by point through an affine map (exact: control points mapped, weights kept).</summary>
+    private static RG.NurbsCurve Mapped(SBM.Core.Geometry.Nurbs.NurbsCurve c, Func<Vec3, RG.Point3d> map)
+    {
+        var r = new RG.NurbsCurve(3, c.IsRational, c.Degree + 1, c.Control.Length);
+        for (int i = 1; i < c.Knots.Length - 1; i++) r.Knots[i - 1] = c.Knots[i];
+        for (int i = 0; i < c.Control.Length; i++)
+        {
+            if (c.Weights != null) r.Points.SetPoint(i, map(c.Control[i]), c.Weights[i]);
+            else r.Points.SetPoint(i, map(c.Control[i]));
+        }
+        return r;
+    }
+
+    private static double SignedArea(RG.Curve c)
+    {
+        var dom = c.Domain;
+        double s = 0;
+        const int n = 96;
+        var p0 = c.PointAt(dom.T0);
+        var prev = p0;
+        for (int i = 1; i <= n; i++)
+        {
+            var q = i == n ? p0 : c.PointAt(dom.T0 + dom.Length * i / n);
+            s += prev.X * q.Y - q.X * prev.Y;
+            prev = q;
+        }
+        return s / 2;
     }
 
     private sealed class Writer
@@ -212,6 +332,7 @@ public static class Rhino3dmExporter
         private void Solid(SMesh mesh, int layer, Props p, Func<List<FaceSpec>>? faces = null)
         {
             if (mesh.IsEmpty) return;
+            _cur = (p.Strings.FirstOrDefault(s => s.k == "Bridge").v ?? "") + " / " + p.Name;
             var geoms = new List<RG.GeometryBase>();
             if (!_o.MeshOnly && faces != null)
             {
@@ -256,11 +377,13 @@ public static class Rhino3dmExporter
             }
         }
 
+        private string _cur = "";
         private void Fallback(string why)
         {
             _r.Fallbacks++;
             string k = why.Length > 120 ? why[..120] : why;
             _fallbackReasons[k] = _fallbackReasons.GetValueOrDefault(k) + 1;
+            if (_r.FallbackItems.Count < 50) _r.FallbackItems.Add($"{_cur}: {k}");
         }
 
         /// <summary>Exact geometry of a mesh (NURBS solids first, then recorded extrusions); adds nothing when the mesh is the only definition.</summary>
@@ -295,83 +418,31 @@ public static class Rhino3dmExporter
             }
             if (!mesh.HasExactSolids) return;
             var list = new List<RG.GeometryBase>();
-            int ext = 0, obl = 0;
+            int ext = 0, mit = 0, obl = 0;
             foreach (var es in mesh.Solids!)
             {
-                var g = FromExtruded(es, out bool oblique);
+                var g = FromExtruded(es);
                 if (g == null)
                 {
                     foreach (var x in list) x.Dispose();
                     return;                                              // the whole element falls back to its mesh
                 }
                 list.Add(g);
-                if (oblique) obl++; else ext++;
+                if (g is RG.Extrusion e) { if (e.IsMiteredAtStart) mit++; else ext++; } else obl++;
             }
             geoms.AddRange(list);
             _r.Extrusions += ext;
             _r.ObliqueBreps += obl;
+            _r.MiteredExtrusions += mit;
         }
 
-        private RG.GeometryBase? FromExtruded(ExtrudedSolid es, out bool oblique)
+        private RG.GeometryBase? FromExtruded(ExtrudedSolid es)
         {
-            var f = es.Frame;
-            var d = es.Extrusion;
-            oblique = Vec3.Cross(d, f.Z).Length > 1e-5;              // sweep off the profile normal by more than 0.01 mm
-            if (oblique)
-            {
-                var bb = new RhinoBrepBuilder(P, _s, _tol);
-                try
-                {
-                    foreach (var face in RhinoBrepBuilder.Faces(es)) bb.AddFace(face);
-                }
-                catch (Exception ex) when (ex is InvalidOperationException or ArgumentException) { Fallback("oblique extrusion: " + ex.Message); return null; }
-                var brep = bb.Finish();
-                if (brep == null) { Fallback("oblique extrusion: " + bb.Error); return null; }
-                return brep;
-            }
-            var ext = new RG.Extrusion();
-            var a = P(f.Origin);
-            var b = P(f.Origin + d);
-            if (!ext.SetPathAndUp(a, b, new RG.Vector3d(f.Y.X, f.Y.Y, f.Y.Z))) { Fallback("extrusion path"); ext.Dispose(); return null; }
-            var pl = ext.GetProfilePlane(0);
-            // profile coordinates: frame (x, y) -> world vector -> the extrusion's profile plane axes (model units)
-            RG.Point3d Q(Vec2 q)
-            {
-                var v = (f.X * q.X + f.Y * q.Y) * _s;
-                return new RG.Point3d(v.X * pl.XAxis.X + v.Y * pl.XAxis.Y + v.Z * pl.XAxis.Z, v.X * pl.YAxis.X + v.Y * pl.YAxis.Y + v.Z * pl.YAxis.Z, 0);
-            }
-            RG.Curve outer;
-            if (es.ExactOutline is { } ao)
-            {
-                var pc = new RG.PolyCurve();
-                for (int i = 0; i < ao.Count; i++)
-                {
-                    if (!ao.IsArc(i)) pc.Append(new RG.Line(Q(ao.Points[i]), Q(ao.End(i))));
-                    else pc.Append(new RG.Arc(Q(ao.Points[i]), Q(ao.Mid(i)), Q(ao.End(i))));
-                }
-                outer = pc;
-            }
-            else
-            {
-                var pts = es.Outline.Select(Q).ToList();
-                pts.Add(pts[0]);
-                outer = new RG.PolylineCurve(pts);
-            }
-            // outer loop counter-clockwise in profile coordinates, holes clockwise
-            var probe = new List<Vec2>();
-            var dom = outer.Domain;
-            for (int i = 0; i < 64; i++) { var q = outer.PointAt(dom.T0 + dom.Length * i / 64); probe.Add(new Vec2(q.X, q.Y)); }
-            if (MeshBuilder.SignedArea(probe) < 0) outer.Reverse();
-            if (!ext.SetOuterProfile(outer, true)) { Fallback("extrusion profile"); ext.Dispose(); return null; }
-            foreach (var h in RhinoBrepBuilder.DistinctHoles(es.Holes))
-            {
-                var c = new RG.ArcCurve(new RG.Circle(new RG.Plane(Q(h.Center), RG.Vector3d.ZAxis), h.Diameter / 2 * _s));
-                c.Reverse();
-                if (!ext.AddInnerProfile(c)) { Fallback("extrusion hole"); ext.Dispose(); return null; }
-            }
-            if (!ext.IsValid) { Fallback("invalid extrusion"); ext.Dispose(); return null; }
-            return ext;
+            var g = ExtrusionOf(es, P, _s, _tol, out string? error);
+            if (g == null) Fallback(error ?? "extrusion");
+            return g;
         }
+
 
         /// <summary>Rhino mesh (double-precision vertices; vertices split where faces meet at more than 30 deg so creases render sharp).</summary>
         private RG.Mesh ToMesh(SMesh m, IReadOnlyList<int>? tris)
@@ -816,8 +887,8 @@ public static class Rhino3dmExporter
             notes.AppendLine($"Steel Bridge Modeler export of '{_project.Name}'{(_o.Source != null ? " (" + _o.Source + ")" : "")}, {DateTime.Now:yyyy-MM-dd HH:mm}.");
             notes.AppendLine($"Units: {_r.Units}. The Rhino origin is the project grid point {bpText} - add it to Rhino coordinates for grid / map coordinates (same base point as the IFC export).");
             notes.AppendLine("Layers: <bridge>::<3D layer> (viewport layer names and colours); Alignments::<name>; Terrain::<name>. Object name = mark; attribute user text: Bridge, Kind, Mark, Assembly, Description, Material, Mass_kg, GlobalId (= IFC GlobalId), Status / Reason / Basis for UNRESOLVED items.");
-            notes.AppendLine("Exact solids: plates / rolled shapes / boxes = extrusions (holes as inner profiles, arcs exact); oblique sweeps and NURBS solids = closed polysurfaces; other solids = meshes. Bolts, rivets, studs and anchor bolts are blocks (one definition per size); bars, strands and tendons are curves (lines + true arcs).");
-            notes.AppendLine($"Counts: {_r.Objects:N0} objects, {_r.Extrusions:N0} extrusions, {_r.ObliqueBreps:N0} oblique B-reps, {_r.NurbsBreps:N0} NURBS B-reps, {_r.Meshes:N0} meshes, {_r.Curves:N0} curves, {_r.BlockInstances:N0} block instances of {_r.BlockDefinitions:N0} definitions.");
+            notes.AppendLine("Exact solids: plates / rolled shapes / boxes = extrusions (holes as inner profiles, arcs exact); oblique sweeps = extrusions mitered to the profile plane; NURBS solids and true-arc beam bodies = closed polysurfaces; other solids = meshes. Bolts, rivets, studs and anchor bolts are blocks (one definition per size); bars, strands and tendons are curves (lines + true arcs).");
+            notes.AppendLine($"Counts: {_r.Objects:N0} objects, {_r.Extrusions:N0} extrusions, {_r.MiteredExtrusions:N0} mitered extrusions, {_r.ObliqueBreps:N0} oblique B-reps, {_r.ExactBodies:N0} beam bodies, {_r.NurbsBreps:N0} NURBS B-reps, {_r.Meshes:N0} meshes, {_r.Curves:N0} curves, {_r.BlockInstances:N0} block instances of {_r.BlockDefinitions:N0} definitions.");
             if (_fallbackReasons.Count > 0)
             {
                 notes.AppendLine($"Exact geometry that fell back to meshes: {_r.Fallbacks}.");

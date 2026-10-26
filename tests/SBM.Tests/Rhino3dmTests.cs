@@ -62,6 +62,43 @@ public class Rhino3dmTests
     }
 
     [Fact]
+    public void ObliquePrismWithHoles_MiteredExtrusion_HolesAreCirclesInTheCaps()
+    {
+        // same plate as above: written as a Rhino extrusion along the oblique sweep, mitered back to the (horizontal) profile plane
+        var bottom = new[] { new Vec3(0, 0, 0), new Vec3(0.3, 0, 0), new Vec3(0.3, 0.2, 0), new Vec3(0, 0.2, 0) };
+        var d = new Vec3(0.04, 0.015, 0.025);
+        var holes = new[] { (new Vec3(0.08, 0.1, 0), 0.024), (new Vec3(0.22, 0.1, 0), 0.024) };
+        var es = ExtrudedSolid.TryCreate(bottom, bottom.Select(p => p + d).ToArray(), holes)!;
+        var g = Rhino3dmExporter.ExtrusionOf(es, v => new RG.Point3d(v.X, v.Y, v.Z), 1, 1e-6, out string? err);
+        var e = Assert.IsType<RG.Extrusion>(g);
+        Assert.Null(err);
+        Assert.True(e.IsMiteredAtStart && e.IsMiteredAtEnd);
+        using var b = e.ToBrep(true);
+        Assert.True(b.IsSolid);
+        Assert.Equal(0.34, b.Vertices.Max(v => v.Location.X), 9);
+        Assert.Equal(0.0, b.Vertices.Min(v => v.Location.Z), 9);
+        Assert.Equal(0.025, b.Vertices.Max(v => v.Location.Z), 9);
+        // every edge point on a cap lies on the plate outline or on a hole circle of that cap
+        int onHoles = 0;
+        foreach (var edge in b.Edges)
+        {
+            var dom = edge.Domain;
+            for (int i = 0; i <= 8; i++)
+            {
+                var p = edge.PointAt(dom.T0 + dom.Length * i / 8);
+                bool top = Math.Abs(p.Z - 0.025) < 1e-9, bot = Math.Abs(p.Z) < 1e-9;
+                if (!top && !bot) continue;
+                var q = new Vec2(p.X - (top ? d.X : 0), p.Y - (top ? d.Y : 0));
+                bool outline = Math.Abs(q.X) < 1e-9 || Math.Abs(q.X - 0.3) < 1e-9 || Math.Abs(q.Y) < 1e-9 || Math.Abs(q.Y - 0.2) < 1e-9;
+                bool hole = holes.Any(h => Math.Abs(Vec2.Distance(q, h.Item1.XY) - 0.012) < 1e-9);
+                Assert.True(outline || hole, $"cap edge point {p} is neither on the outline nor on a hole");
+                if (hole) onHoles++;
+            }
+        }
+        Assert.True(onHoles >= 4 * 8);
+    }
+
+    [Fact]
     public void ObliquePrismWithArcOutline_IsAClosedBrep()
     {
         // outline with a true arc edge (ArcPolygon) swept obliquely
@@ -116,7 +153,7 @@ public class Rhino3dmTests
             Assert.Equal("Feet", s.Units);
             Assert.Equal(r.Objects, s.Objects);
             Assert.Equal(r.BlockInstances, s.ByType.GetValueOrDefault("Block"));
-            Assert.Equal(r.Extrusions, s.ByType.GetValueOrDefault("Extrusion"));
+            Assert.Equal(r.Extrusions + r.MiteredExtrusions, s.ByType.GetValueOrDefault("Extrusion"));
             var m = doc.Model();
             string bn = m.Definition.Name;
             Assert.Contains(s.LayerPaths, l => l == $"{bn}::3D-GIRDER-PLATES");
@@ -125,7 +162,7 @@ public class Rhino3dmTests
             var steel = m.Steel!;
             Assert.Equal(steel.Bolts.Count + steel.Studs.Count, r.BlockInstances);
             Assert.True(r.BlockDefinitions >= 2 && r.BlockDefinitions < 50);
-            Assert.True(r.Extrusions + r.ObliqueBreps > steel.Parts.Count / 2, $"{r.Extrusions} extrusions + {r.ObliqueBreps} oblique for {steel.Parts.Count} parts");
+            Assert.True(r.Extrusions + r.MiteredExtrusions > steel.Parts.Count / 2, $"{r.Extrusions} extrusions + {r.MiteredExtrusions} mitered for {steel.Parts.Count} parts");
             Assert.Equal(0, r.Fallbacks);
 
             // a girder plate: name, layer, GlobalId (= IFC), volume and bounding box vs the model (feet, relative to the IFC base point)
@@ -140,22 +177,22 @@ public class Rhino3dmTests
                 Assert.Equal(IfcKeys.GlobalId(IfcKeys.Part(IfcKeys.Bridge(doc.Project.Name, bn), part.Mark)), o.Attributes.GetUserString("GlobalId"));
                 Assert.Equal(part.Material, o.Attributes.GetUserString("Material"));
                 var mb = part.Mesh.Bounds();
-                if (o.Geometry is RG.Extrusion e)
+                var e = Assert.IsType<RG.Extrusion>(o.Geometry);
+                if (!e.IsMiteredAtStart)
                 {
                     double vModel = part.Volume * s1 * s1 * s1;
                     Assert.Equal(1, ExtrusionVolume(e) / vModel, 3);
-                    var bb = e.GetBoundingBox(true);
-                    Assert.Equal((mb.Min.X - bp.X) * s1, bb.Min.X, 3);
-                    Assert.Equal((mb.Max.Z - bp.Z) * s1, bb.Max.Z, 3);
                 }
-                else
-                {
-                    // oblique sweep (plate along the grade with plumb ends): closed B-rep whose vertices span the mesh bounds
-                    var b = Assert.IsType<RG.Brep>(o.Geometry);
-                    Assert.True(b.IsSolid);
-                    Assert.Equal((mb.Min.X - bp.X) * s1, b.Vertices.Min(v => v.Location.X), 3);
-                    Assert.Equal((mb.Max.Z - bp.Z) * s1, b.Vertices.Max(v => v.Location.Z), 3);
-                }
+                else Assert.True(e.IsMiteredAtEnd);    // plate along the grade with plumb ends: right section swept along the grade, both ends mitered
+                // the B-rep form's corners span the model plate (feet, relative to the base point; recorded solids fit the mesh to 0.5 mm)
+                using var b = e.ToBrep(true);
+                Assert.True(b.IsSolid);
+                Assert.Equal((mb.Min.X - bp.X) * s1, b.Vertices.Min(v => v.Location.X), 3);
+                Assert.Equal((mb.Min.Y - bp.Y) * s1, b.Vertices.Min(v => v.Location.Y), 3);
+                Assert.Equal((mb.Min.Z - bp.Z) * s1, b.Vertices.Min(v => v.Location.Z), 3);
+                Assert.Equal((mb.Max.X - bp.X) * s1, b.Vertices.Max(v => v.Location.X), 3);
+                Assert.Equal((mb.Max.Y - bp.Y) * s1, b.Vertices.Max(v => v.Location.Y), 3);
+                Assert.Equal((mb.Max.Z - bp.Z) * s1, b.Vertices.Max(v => v.Location.Z), 3);
             }
             Assert.Contains("BasePoint_E", string.Join(",", s.DocumentStrings.Keys));
         }
