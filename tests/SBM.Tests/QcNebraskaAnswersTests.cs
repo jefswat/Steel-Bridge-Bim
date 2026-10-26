@@ -35,6 +35,31 @@ public class QcNebraskaAnswersTests
     }
 
     [Fact]
+    public void StudZones_AtASupport_StayOnTheGirder()
+    {
+        // regression: a Support location took the span LENGTH as the span fraction, so the zone ran kilometres past the girder end
+        var doc = SbmDocument.Sample();
+        var b = doc.Bridge();
+        b.Studs.RowsAcross = 1;
+        b.Studs.Zones = new()
+        {
+            new StudZone { From = new StudLocation(StudLocationKind.Support, 1, -Ft(10)), To = new StudLocation(StudLocationKind.Support, 1, -Ft(2)), Spaces = 4 },
+        };
+        doc.Regenerate();
+        var m = doc.Model();
+        var g = m.Framing.Girders[0];
+        double atSupport = g.DistanceAt(0, 1.0);
+        var rows = m.Steel!.Studs.Where(s => s.Assembly.StartsWith("G1-")).Select(s => s.Frame.Origin).ToList();
+        Assert.Equal(5, rows.Count);
+        var (p, _, _) = g.Path.At(atSupport);
+        foreach (var o in rows)
+        {
+            double d = Math.Sqrt((o.X - p.X) * (o.X - p.X) + (o.Y - p.Y) * (o.Y - p.Y));
+            Assert.InRange(d, Ft(2) - 0.01, Ft(10) + 0.01);
+        }
+    }
+
+    [Fact]
     public void StudEdgeDistance_MakesTheTransverseSpacingWidthDependent()
     {
         var doc = SbmDocument.Sample();

@@ -765,7 +765,7 @@ public sealed partial class SteelModelGenerator
                     return sp == null ? double.NaN : sp.GirderDistance + l.Offset;
                 default:
                     if (l.Number < 0 || l.Number > g.Spans.Count) return double.NaN;
-                    return (l.Number == 0 ? g.StartExtension : g.DistanceAt(l.Number - 1, g.Spans[l.Number - 1].Length)) + l.Offset;
+                    return (l.Number == 0 ? g.StartExtension : g.DistanceAt(l.Number - 1, 1.0)) + l.Offset;   // DistanceAt takes the span fraction u
             }
         }
         var rows = new List<double>();
@@ -781,7 +781,9 @@ public sealed partial class SteelModelGenerator
                 rows.Add(s);
             }
         }
-        foreach (double s in rows.OrderBy(x => x)) yield return s;
+        int outside = rows.Count(s => s < 0 || s > g.Length);
+        if (outside > 0) Warn($"{g.Name}: {outside} stud row(s) of the plan zones fall outside the girder (0 .. {_u.FormatLength(g.Length, LengthKind.Long)}) - not placed; check the zone locations.");
+        foreach (double s in rows.Where(s => s >= 0 && s <= g.Length).OrderBy(x => x)) yield return s;
     }
 
     /// <summary>Orders marks naturally (G1-2 before G1-10).</summary>
