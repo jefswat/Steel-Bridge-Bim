@@ -1,3 +1,5 @@
+// FINISH (required, see CLAUDE.md "New plan-set model checklist" / docs/MODEL-PIPELINE.md): `sbm run <this script> <model.sbm>` runs `sbm pipeline` after the
+// script saves = regenerate, terrain (georeferenced projects), plan sheet index, companion database + sheet links; UNRESOLVED items are printed.
 // PTC / NJTA DELAWARE RIVER BRIDGE (Bucks Co. PA - Burlington Co. NJ; ORIGINAL 1954-57 bridge, I-95 / former I-276), phase 1a = LOCATION ONLY:
 // alignment + vertical profile + the support lines of all 31 spans, in SEVEN bridges (one per structure unit as the plans group them), each
 // `SupportLinesOnly` (no steel, concrete or substructure is generated: the program cannot build riveted trusses / floor-beam girders yet).

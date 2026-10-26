@@ -1,3 +1,5 @@
+// FINISH (required, see CLAUDE.md "New plan-set model checklist" / docs/MODEL-PIPELINE.md): `sbm run <this script> <model.sbm>` runs `sbm pipeline` after the
+// script saves = regenerate, terrain (georeferenced projects), plan sheet index, companion database + sheet links; UNRESOLVED items are printed.
 // Iowa DOT Design 1617 (File 30377, Woodbury County / Sioux City): NEBRASKA ST. RAMP B over Virginia St. and Virginia St. Ramp D ("911").
 // 570'-0 x 26'-0 continuous welded plate girder bridge, weathering steel, spans 180'-0 / 203'-0 / 187'-0, 4 girders A-D at 7'-8, straight
 // (tangent) from the S abutment to the P.C., curved (R 1500) after; Pier 1 = concrete 2-column pier with cap; Pier 2 = 2 turned columns with an

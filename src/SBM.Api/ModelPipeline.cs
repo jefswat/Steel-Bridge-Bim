@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Text.Json;
 using SBM.Core.Geometry;
 using SBM.Core.Project;
@@ -430,6 +430,7 @@ public static class ModelPipeline
     {
         var psi = new ProcessStartInfo(python) { RedirectStandardOutput = true, RedirectStandardError = true, UseShellExecute = false, CreateNoWindow = true };
         psi.ArgumentList.Add("-I");
+        psi.ArgumentList.Add("-B");   // no __pycache__ beside the tools
         foreach (var a in args) psi.ArgumentList.Add(a);
         var sb = new System.Text.StringBuilder();
         Process? p;

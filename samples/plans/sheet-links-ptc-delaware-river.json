@@ -6,7 +6,8 @@
 {
  "models": [
   "PTC Delaware River Bridge.sbm",
-  "PTC approach trusses.sbm"
+  "PTC approach trusses.sbm",
+  "PTC main truss 18-20.sbm"
  ],
  "planFolders": [
   "plans",

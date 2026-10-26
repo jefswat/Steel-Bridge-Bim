@@ -1,3 +1,5 @@
+// FINISH (required, see CLAUDE.md "New plan-set model checklist" / docs/MODEL-PIPELINE.md): `sbm run <this script> <model.sbm>` runs `sbm pipeline` after the
+// script saves = regenerate, terrain (georeferenced projects), plan sheet index, companion database + sheet links; UNRESOLVED items are printed.
 // NCDOT B-2500 (Bonner Bridge replacement, NC 12 over Oregon Inlet), NAVIGATION UNIT 5 = spans 19-29, 3,550'-0" along -L-:
 // precast post-tensioned SEGMENTAL concrete box girder, balanced cantilever from bents 19-28, closure joints, end segments at bents 18 / 29.
 // From scratch (re-runnable; replaces the -L- alignment and the bridge "Bonner Unit 5"), run from the repo root:

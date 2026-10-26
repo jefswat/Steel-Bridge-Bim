@@ -1,3 +1,5 @@
+// FINISH (required, see CLAUDE.md "New plan-set model checklist" / docs/MODEL-PIPELINE.md): `sbm run <this script> <model.sbm>` runs `sbm pipeline` after the
+// script saves = regenerate, terrain (georeferenced projects), plan sheet index, companion database + sheet links; UNRESOLVED items are printed.
 // TxDOT CSJ 0047-07-228 (bridge items also CSJ 0918-47-242): US 75 PEDESTRIAN UNDERPASS AT NORTHAVEN TRAIL (HNTB, 100% plans 09/2020).
 // 861.57 ft shared-use path bridge: 14 Tx28 prestressed approach spans in 5 units + one steel TIED ARCH (span 10, Pier 10 - Pier 11).
 // THIS SCRIPT builds everything EXCEPT the arch superstructure: alignment, profile, cross slope, the 5 approach units (one bridge each),

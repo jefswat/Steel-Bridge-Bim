@@ -38,3 +38,7 @@ samples/plans/*.log
 qc/bin/
 qc/*/inputs/
 qc/bin-ptc/
+
+# Python bytecode (tools run with python -I; the pipeline also passes -B)
+__pycache__/
+*.pyc

@@ -1,3 +1,5 @@
+// FINISH (required, see CLAUDE.md "New plan-set model checklist" / docs/MODEL-PIPELINE.md): `sbm run <this script> <model.sbm>` runs `sbm pipeline` after the
+// script saves = regenerate, terrain (georeferenced projects), plan sheet index, companion database + sheet links; UNRESOLVED items are printed.
 // Iowa DOT Design 817 (File 30377): I-29 NB over Floyd Blvd, Sioux City (Woodbury County) - STAGE 1.
 // 223'-10 7/8 x 36'-0 pretensioned prestressed concrete beam bridge, 3 spans, BTD bulb tees, integral abutments.
 // Alignment (local coordinates, no datum - U1), profile on the PGL 5.00' RT of CL I-29,

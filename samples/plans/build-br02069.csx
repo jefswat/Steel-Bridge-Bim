@@ -1,3 +1,5 @@
+// FINISH (required, see CLAUDE.md "New plan-set model checklist" / docs/MODEL-PIPELINE.md): `sbm run <this script> <model.sbm>` runs `sbm pipeline` after the
+// script saves = regenerate, terrain (georeferenced projects), plan sheet index, companion database + sheet links; UNRESOLVED items are printed.
 // MnDOT Br. 02069 - T.H. 65 S.B. over 117th Ave (S.P. 0208-02069, certified plans 9/26/2025, 39 sheets; PDF page = sheet).
 // Single span 99'-3" CL-CL bearing, seven MnDOT 30MH pretensioned beams @ 6'-0", 9" CIP slab 41'-0" o-o, 0 deg skew,
 // pile-supported abutments behind MSE walls. Builds the model FROM SCRATCH (re-runnable; replaces the alignment and bridge):
