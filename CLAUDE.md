@@ -123,6 +123,11 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
     `NurbsQuantities.Rows` / `SbmDocument.ExactQuantities`, `sbm nurbs` (timings off/on, fallbacks, exact vs mesh volumes, csv). Measure snaps refine onto the NURBS (see App). Not wired yet:
     drawings section cuts, view-dependent viewport tessellation, welds / stiffeners / deck end blocks / joint shelves (stay meshes).
     Cost (2026-10-11): I-80 + Ramp G full regen 27 s OFF -> 41 s ON; Woodbury 0.2 -> 1.1 s cold. Tests `NurbsTests`.
+  - `Solids/Centerline.cs` - element CENTERLINES: `Centerlines.Of(mesh)` -> `ElementCenterline` (Geometric = centre of the section extents, Centroid = section area centroid, holes
+    subtracted; exact from a single `ExtrudedSolid` recipe when it runs along the long direction, else mesh sections normal to the long principal axis (volume inertia, snapped
+    plumb / level 2 deg; no single long axis = symmetry axis), second pass square to the path for curved members, partial end / hole stations dropped, ends = ray exit from the solid).
+    `SbmDocument.Centerlines`, CLI `sbm centerlines` (`SBM.Cli/CenterlinesCommand.cs`: csv / json / dxf), Rhino `--centerlines` (layers `<bridge>::CL-GEOMETRIC` / `CL-CENTROID`, GlobalId
+    of the element), docs/API.md "Element centerlines". Not in the IFC / viewport yet.
   - `Solids/PlateBuilder.cs` â€” plates WITH HOLES: polygon+holes triangulation (horizontal bridge to the +x ray hit â€”
     don't change to a vertex bridge; that crossed unmerged holes and caused the bearing-stiffener artifact), long girder
     plates built in strips/cells (â‰¤1 hole per cell keeps it linear), Sutherlandâ€“Hodgman half-plane clip.
@@ -444,7 +449,13 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
     on a shared block, seats beyond the cap, step top vs seat) go to `ElevationChain.Reported` — never adjusted. Shared
     piers built by another bridge are found via `others` (`SbmDocument.BearingElevations` passes the other bridges' units).
     Plan reconciliation: `samples\plans\check-substructure-chains.csx`.
-  - `Project/RegenerationCache.cs` â€” per-bridge hash cache used by app and API.
+  - `Project/RegenerationCache.cs` â€” per-bridge hash cache used by app and API. Phase 2 concrete diaphragms + surface treatments are reused when the bridge's superstructure AND substructure came from the cache (`_phase2`; they were rebuilt every call: Woodbury 15.5 s per cached regeneration -> 0).
+  - Lateral bracing ZONES (OPTIONAL `LateralBracingDefinition.Zones` = `LateralBracingZone` list, JSON omitted when null; null = the single Bays / Spans / Flange / Pattern layout, output unchanged):
+    per zone Spans / Bays (empty = all), Flange, panel range `FromPanel` / `ToPanel` (1-based cross-frame panel points of the span, negative = from the last) or `FromDistance` / `ToDistance`
+    (along the bay's left girder from the span's first CL bearing), Pattern (Warren / SingleDiagonal / X), `DiagonalStart`, Angle / GussetThickness / BoltsPerConnection (null = definition),
+    Material / GussetMaterial, Source, Unresolved (flag + warning). Last zone wins per panel (overlap warning); consecutive panels of one zone = one assembly `LB-S{s}-B{b}[-T][-R{n}]`;
+    gussets shared where runs meet (owned by the first run). X = second diagonal cut clear of the first at the crossing, flagged dimension-only (crossing connection not an input).
+    Zones on no panel / bays or spans that do not exist = warnings. `LateralBracingDetailer.cs`, tests `CenterlineAndLateralZoneTests`.
   - Steel generator phases: layouts â†’ connections (cross frames, field splices, lateral bracing register bolt holes
     in `_holes` / `_stiffHoles` / `_studExclusions`) â†’ members (girder plates, stiffeners, bearings, studs). Files:
     `SteelModelGenerator.cs`, `CrossFrameDetailer.cs`, `FieldSpliceDetailer.cs`, `LateralBracingDetailer.cs`,

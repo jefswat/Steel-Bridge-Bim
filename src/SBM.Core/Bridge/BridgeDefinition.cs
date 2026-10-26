@@ -1197,11 +1197,58 @@ public sealed class LateralBracingDefinition
     public double GussetThickness { get; set; } = In(0.5);
     /// <summary>Bolts per gusset-to-flange connection (two lines along the girder).</summary>
     public int BoltsPerConnection { get; set; } = 4;
+    /// <summary>
+    /// OPTIONAL zones (plan bracing layouts): each zone says where bracing is (spans, bays, flange, panel range) and what it is (pattern, member,
+    /// gusset, bolts, material). When set they REPLACE <see cref="Bays"/> / <see cref="Spans"/> / <see cref="Flange"/> / <see cref="Pattern"/>; the
+    /// fields above stay the defaults for the zone values left null. Where zones overlap on one flange of one bay, the LAST zone wins for that panel.
+    /// Null / empty = the single layout above (unchanged).
+    /// </summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public List<LateralBracingZone>? Zones { get; set; }
     public LateralBracingDefinition Clone() => new()
     {
         Enabled = Enabled, Flange = Flange, Bays = Bays.ToList(), Spans = Spans.ToList(), Pattern = Pattern, Angle = Angle,
-        GussetThickness = GussetThickness, BoltsPerConnection = BoltsPerConnection,
+        GussetThickness = GussetThickness, BoltsPerConnection = BoltsPerConnection, Zones = Zones?.Select(z => z.Clone()).ToList(),
     };
+}
+
+/// <summary>Which girder of the bay the first diagonal of a Warren / single-diagonal run starts from (at the run's first panel point).</summary>
+public enum LateralDiagonalStart { LeftGirder, RightGirder }
+
+/// <summary>
+/// One lateral bracing zone: spans x bays x flange x a range of panels (panel points = the cross frame lines of the span, in order along the bay's left
+/// girder). The range is given by panel point numbers (<see cref="FromPanel"/> / <see cref="ToPanel"/>, 1-based, negative = from the last point) or by
+/// distances along the bay's LEFT girder from the span's first CL bearing (<see cref="FromDistance"/> / <see cref="ToDistance"/>); a panel belongs to the
+/// zone when both of its points do. Null member values take the <see cref="LateralBracingDefinition"/> values.
+/// </summary>
+public sealed class LateralBracingZone
+{
+    /// <summary>Label for reports (plan name of the zone, e.g. "Type A").</summary>
+    public string Name { get; set; } = "";
+    public LateralFlange Flange { get; set; } = LateralFlange.Bottom;
+    /// <summary>1-based spans; empty = all spans.</summary>
+    public List<int> Spans { get; set; } = new();
+    /// <summary>1-based bays (bay 1 = G1-G2); empty = all bays.</summary>
+    public List<int> Bays { get; set; } = new();
+    public int? FromPanel { get; set; }
+    public int? ToPanel { get; set; }
+    public double? FromDistance { get; set; }
+    public double? ToDistance { get; set; }
+    public LateralPattern Pattern { get; set; } = LateralPattern.Warren;
+    /// <summary>Girder the first diagonal leaves from at the run's first panel point (default = the left girder, as the single layout).</summary>
+    public LateralDiagonalStart DiagonalStart { get; set; } = LateralDiagonalStart.LeftGirder;
+    public string? Angle { get; set; }
+    public double? GussetThickness { get; set; }
+    public int? BoltsPerConnection { get; set; }
+    /// <summary>Member material (null = ASTM A709 Gr. 36).</summary>
+    public string? Material { get; set; }
+    /// <summary>Gusset material (null = the steel default).</summary>
+    public string? GussetMaterial { get; set; }
+    /// <summary>Plan page / note the zone comes from (part descriptions, reports).</summary>
+    public string Source { get; set; } = "";
+    /// <summary>Plan item not settled (page + reason): the members of the zone carry an UNRESOLVED dimension flag and one warning is raised.</summary>
+    public string? Unresolved { get; set; }
+    public LateralBracingZone Clone() { var c = (LateralBracingZone)MemberwiseClone(); c.Spans = Spans.ToList(); c.Bays = Bays.ToList(); return c; }
 }
 
 public sealed class FieldSpliceDefinition

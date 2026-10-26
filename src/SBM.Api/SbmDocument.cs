@@ -370,7 +370,9 @@ public sealed class SbmDocument
             {
                 "part" => IfcKeys.Part(bk, r.Mark),
                 "assembly" => IfcKeys.Assembly(bk, r.Mark),
-                "deck" when r.Mark == "Deck slab" => IfcKeys.DeckSlab(bk),
+                "deck" => IfcKeys.DeckSlab(bk),   // deck widenings are items of the deck slab in the IFC
+                "pad" => IfcKeys.PsPad(bk, r.Mark),
+                "diaphragm" when r.Assembly != null => IfcKeys.Diaphragm(bk, r.Assembly),
                 "haunch" => IfcKeys.DeckSlab(bk),           // the haunches are an item of the deck slab in the IFC
                 "barrier" => IfcKeys.Barrier(bk, r.Mark),
                 "caphaunch" when r.Assembly != null => IfcKeys.CapHaunch(bk, r.Assembly),
@@ -385,6 +387,27 @@ public sealed class SbmDocument
         }
         _measureFor = _models;
         return _measure = new SBM.Core.Checks.Measure.MeasureModel(_models.OfType<BridgeModel>(), Units) { GlobalIds = Gid };
+    }
+
+    /// <summary>One element's centerlines (<see cref="SBM.Core.Solids.Centerlines"/>) with the element's reference (bridge, kind, mark, IFC GlobalId).</summary>
+    public sealed record CenterlineRow(SBM.Core.Checks.Measure.ElementRef Ref, string Category, string Description, bool IsConcrete, SBM.Core.Solids.ElementCenterline Line);
+
+    /// <summary>Geometric centerline (centre of the section extents) and centroid line (section area centroid) of every solid of the model: steel parts,
+    /// concrete, substructure (columns, caps, footings, piles ...), misc items. Welds are left out unless <paramref name="welds"/>. Read-only.</summary>
+    /// <param name="filter">Optional element filter (kind / category / mark ...).</param>
+    public List<CenterlineRow> Centerlines(string? bridge = null, Func<SBM.Core.Checks.Measure.MeasureElement, bool>? filter = null,
+        SBM.Core.Solids.CenterlineOptions? options = null, bool welds = false)
+    {
+        var mm = MeasureModel();
+        var els = mm.Elements(bridge).Where(e => (welds || e.Category != nameof(SBM.Core.Steel.PartCategory.Weld)) && (filter == null || filter(e))).ToList();
+        var rows = new CenterlineRow[els.Count];
+        Parallel.For(0, els.Count, i =>
+        {
+            var e = els[i];
+            e.Ref.GlobalId ??= mm.GlobalIds?.Invoke(e.Ref);
+            rows[i] = new CenterlineRow(e.Ref, e.Category, e.Description, e.IsConcrete, SBM.Core.Solids.Centerlines.Of(e.Mesh, options));
+        });
+        return rows.ToList();
     }
 
     // ------------------------------------------------------------------ export
@@ -407,8 +430,9 @@ public sealed class SbmDocument
     /// <param name="terrain">Include the visible terrain references (display meshes).</param>
     /// <param name="barSolids">Also write bars / strands / tendons as tube meshes.</param>
     /// <param name="fileVersion">3DM archive version 8 (default) or 7 (for Rhino 7).</param>
+    /// <param name="centerlines">Also write every element's geometric centerline and section centroid line (layers CL-GEOMETRIC / CL-CENTROID).</param>
     public SBM.IO.Rhino3dm.Rhino3dmResult Export3dm(string path, IReadOnlyList<string>? bridges = null, bool detail = true, bool meshOnly = false,
-        bool terrain = false, bool barSolids = false, int fileVersion = 8)
+        bool terrain = false, bool barSolids = false, int fileVersion = 8, bool centerlines = false)
     {
         Regenerate();
         var all = _models.OfType<BridgeModel>().ToList();
@@ -426,6 +450,11 @@ public sealed class SbmDocument
         {
             Bridges = bridges, Detail = detail, MeshOnly = meshOnly, BarSolids = barSolids, Terrain = terr, BasePoint = bp,
             Source = FilePath != null ? Path.GetFileName(FilePath) : null, FileVersion = fileVersion,
+            Centerlines = centerlines
+                ? Centerlines(null, e => bridges is not { Count: > 0 } || bridges.Any(b => b.Equals(e.Ref.Bridge, StringComparison.OrdinalIgnoreCase)))
+                    .Where(r => r.Line.Note == null)
+                    .Select(r => new SBM.IO.Rhino3dm.Rhino3dmCenterline(r.Ref.Bridge, r.Ref.Mark, r.Ref.Assembly, r.Category, r.Ref.GlobalId, r.Line.Geometric, r.Line.Centroid)).ToList()
+                : null,
         };
         return SBM.IO.Rhino3dm.Rhino3dmExporter.Export(path, Project, all, o);
     }

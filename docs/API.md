@@ -64,7 +64,7 @@ sbm export "C:\Jobs\Br12\Br12.sbm" --ifc Br12.ifc --geometry abv [--chord-tol 0.
                                                  # holes and clipped beam profiles as IfcPolygonalFaceSet (holes = void loops), hole
                                                  # circles and profile arcs polygonized to --chord-tol mm (default 1/32" = 0.79 mm).
                                                  # --geometry parametric (default) = exact extrusions. Prints time, size, entity count.
-sbm export "C:\Jobs\Br12\Br12.sbm" --3dm Br12.3dm [--bridges "Unit 2,Unit 3"] [--no-detail] [--mesh-only] [--terrain] [--bar-solids] [--3dm-version 7]
+sbm export "C:\Jobs\Br12\Br12.sbm" --3dm Br12.3dm [--bridges "Unit 2,Unit 3"] [--no-detail] [--mesh-only] [--terrain] [--bar-solids] [--3dm-version 7] [--centerlines]
                                                  # Rhino 3DM (see "Rhino export" below): exact extrusions / B-reps, fastener blocks,
                                                  # bar + alignment curves, layers per bridge, IFC GlobalIds as user text
 sbm 3dm-info   Br12.3dm [--blocks]              # read a 3DM back: units, objects by layer and type, blocks, document text
@@ -418,6 +418,28 @@ ft / m. API: `SbmDocument.MeasureModel()` (GlobalIds attached) and the classes i
 (`PlateMeasure`, `AssemblyMeasure`, `ModelSection`, `SectionPlanes`, `MeasureQueries`, `MeasureSvg`).
 Limits: meshes are faceted (curved faces to the chord tolerance); curved / bent plates are measured at the cut of their
 largest flat faces (`flatSharePct` and a note say so); hole polygons from meshes are assumed circumscribed.
+
+## Element centerlines (`sbm centerlines`)
+
+```
+sbm centerlines model.sbm [--bridge NAME] [--kind sub,part,psbeam,deck,...] [--category Column,Cap,Footing,...] [--match REGEX] [--welds]
+                [--stations 24] [--csv cl.csv] [--json cl.json] [--dxf cl.dxf]
+sbm export model.sbm --3dm m.3dm --centerlines        # the same lines as Rhino curves (layers <bridge>::CL-GEOMETRIC / CL-CENTROID)
+```
+
+Two 3D lines per element (columns, caps, footings, piles, girders' plates, beams, diaphragms, deck, barriers, misc items ...), end to end along
+its axis: **GEOMETRIC** = centre of the section's extents, **CENTROID** = area centroid of the section (holes / voids subtracted). They coincide for
+symmetric sections and differ for angles, tees, beams with a wide bottom flange, sloped / stepped caps ("max_offset" in the CSV).
+
+| Element | Method |
+|---|---|
+| One straight extrusion along its long direction (piles, rolled shapes, plates, prismatic beams) | exact: profile centroid / extents centre swept along the extrusion (`extrusion`) |
+| Anything else (caps drawn as elevation profiles, tapered / stepped members, lofts, curved members) | `sections`: N cuts normal to the long principal axis of the solid (snapped plumb / level within 2 deg), a second pass square to the path when the path is curved (leaves its chord > 25 mm / 0.5 %); partial end sections (skewed / tapered ends, < 90 % of the median area) are not used and the lines run straight on to where they leave the solid (or to its extreme plane when the line is outside the material) |
+
+Output: CSV (bridge, kind, mark, assembly, unit, GlobalId, category, method, length, points `E,N,Z ...` in ft / m, max offset), JSON, DXF
+(3D polylines, CL-GEOMETRIC / CL-CENTROID). API: `SbmDocument.Centerlines(bridge, filter, options)` -> `CenterlineRow` (element ref with the IFC GlobalId +
+`SBM.Core.Solids.ElementCenterline`), or `SBM.Core.Solids.Centerlines.Of(mesh)` for any closed mesh. Limits: near-square plan elements (square
+footings) have no single long axis - one horizontal axis is taken; combined meshes (all haunches of a bridge in one solid) give one line for the set.
 
 ## Performance notes
 

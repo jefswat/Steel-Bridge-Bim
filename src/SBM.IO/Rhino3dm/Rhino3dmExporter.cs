@@ -37,7 +37,12 @@ public sealed class Rhino3dmOptions
     public string? Source { get; init; }
     /// <summary>3DM archive version: 8 (Rhino 8, default) or 7 (readable by Rhino 7 and 8; Rhino 7 cannot open version 8 files).</summary>
     public int FileVersion { get; init; } = 8;
+    /// <summary>Element centerlines to write as curves on <c>&lt;bridge&gt;::CL-GEOMETRIC</c> / <c>CL-CENTROID</c> (null = none); world points, meters.</summary>
+    public IReadOnlyList<Rhino3dmCenterline>? Centerlines { get; init; }
 }
+
+/// <summary>One element's geometric centerline and section centroid line (see SBM.Core.Solids.Centerlines).</summary>
+public sealed record Rhino3dmCenterline(string Bridge, string Mark, string? Assembly, string Category, string? GlobalId, IReadOnlyList<Vec3> Geometric, IReadOnlyList<Vec3> Centroid);
 
 public sealed class Rhino3dmResult
 {
@@ -104,6 +109,9 @@ public static class Rhino3dmExporter
         foreach (var m in selected) w.Bridge(m);
         if (o.Terrain != null) foreach (var (name, mesh) in o.Terrain) w.Terrain(name, mesh);
         w.Lap("terrain");
+        if (o.Centerlines != null)
+            foreach (var c in o.Centerlines.Where(c => selected.Any(m => m.Definition.Name == c.Bridge))) w.Centerline(c);
+        w.Lap("centerlines");
         var res = w.Finish(path);
         res.Elapsed = sw.Elapsed;
         return res;
@@ -640,6 +648,21 @@ public static class Rhino3dmExporter
                 p3.Add("Note", "3D profile grade line, sampled at 1 m or less");
                 _f.Objects.Add(c3, Attr(lay, p3));
                 c3.Dispose();
+                _r.Curves++; Count(lay);
+            }
+        }
+
+        public void Centerline(Rhino3dmCenterline c)
+        {
+            foreach (var (layer, pts, color) in new[] { ("CL-GEOMETRIC", c.Geometric, ((byte)0, (byte)200, (byte)255)), ("CL-CENTROID", c.Centroid, ((byte)255, (byte)120, (byte)0)) })
+            {
+                if (pts.Count < 2) continue;
+                int lay = Layer(Clean(c.Bridge), layer, color);
+                var crv = new RG.PolylineCurve(pts.Select(P));
+                var pp = new Props { Name = c.Mark }.Add("Kind", "Centerline").Add("Line", layer == "CL-CENTROID" ? "section centroid" : "geometric centre")
+                    .Add("Mark", c.Mark).Add("Assembly", c.Assembly).Add("Category", c.Category).Add("GlobalId", c.GlobalId);
+                _f.Objects.Add(crv, Attr(lay, pp));
+                crv.Dispose();
                 _r.Curves++; Count(lay);
             }
         }

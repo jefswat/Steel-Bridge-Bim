@@ -22,6 +22,8 @@ public sealed class RegenerationCache
 {
     private readonly Dictionary<string, (BridgeFraming framing, SteelModel? steel, Concrete.ConcreteModel? concrete, Prestressed.PrestressedModel? ps)> _super = new();
     private readonly Dictionary<string, Substructure.SubstructureModel?> _sub = new();
+    /// <summary>Substructure keys whose phase-2 products (concrete diaphragms, surface treatments) are on the cached objects.</summary>
+    private readonly HashSet<string> _phase2 = new();
     private readonly object _lock = new();
 
     private static readonly JsonSerializerOptions Json = new()
@@ -219,16 +221,21 @@ public sealed class RegenerationCache
                     sub.Misc = Misc.MiscItemsGenerator.Generate(pt.f, pt.s, sub, project.Units, Ground);
                 lock (_lock) _sub[subKey] = sub;
             }
-            // Concrete end / pier diaphragms: superstructure elements built after the beams and the substructure (cheap; always rebuilt).
-            if (includeSteel && pt.ps != null && !pt.f.HasErrors)
+            // Concrete end / pier diaphragms and surface treatments depend only on cached inputs (framing / beams / deck / substructure): when all of
+            // those came from the cache they are already on the cached objects (Woodbury pier diaphragms = 274 k triangles: 15 s a regeneration).
+            bool phase2Cached;
+            lock (_lock) phase2Cached = pt.hit && found && _phase2.Contains(subKey);
+            if (phase2Cached) { }
+            // Concrete end / pier diaphragms: superstructure elements built after the beams and the substructure.
+            else if (includeSteel && pt.ps != null && !pt.f.HasErrors)
                 pt.ps.ConcreteDiaphragms = Diaphragms.ConcreteDiaphragmGenerator.Generate(pt.f, pt.ps, project.Units);
             // Architectural surface treatments (form liner / thin brick) on the barrier, substructure and diaphragm faces: after everything they sit on
             // (cheap; always rebuilt). Kept on the substructure model, which every consumer (viewport, IFC, database) already receives.
-            if (sub != null)
+            if (sub != null && !phase2Cached)
                 sub.SurfaceTreatments = includeSteel && !pt.f.HasErrors
                     ? Surface.SurfaceTreatmentGenerator.Generate(pt.f, pt.cm, sub, pt.ps?.ConcreteDiaphragms, project.Units,
                         pt.ps?.Beams.Select(x => x.Mesh).ToList()) : null;
-            lock (_lock) { if (pt.hit && found) Hits++; else Misses++; }
+            lock (_lock) { _phase2.Add(subKey); if (pt.hit && found) Hits++; else Misses++; }
             results[i] = new BridgeModel(b, pt.f, pt.s, pt.hit && found, pt.cm, sub, pt.ps);
         });
         // Drop entries no longer used by the project (keeps memory bounded).
@@ -236,6 +243,7 @@ public sealed class RegenerationCache
         {
             foreach (var stale in _super.Keys.Where(k => !used.Contains(k)).ToList()) _super.Remove(stale);
             foreach (var stale in _sub.Keys.Where(k => !used.Contains(k)).ToList()) _sub.Remove(stale);
+            _phase2.RemoveWhere(k => !_sub.ContainsKey(k));
         }
         return results.ToList();
     }
@@ -313,6 +321,6 @@ public sealed class RegenerationCache
 
     public void Clear()
     {
-        lock (_lock) { _super.Clear(); _sub.Clear(); }
+        lock (_lock) { _super.Clear(); _sub.Clear(); _phase2.Clear(); }
     }
 }

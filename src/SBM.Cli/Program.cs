@@ -97,6 +97,8 @@ public static partial class Program
           sbm section <file.sbm> --plane x,y,z,nx,ny,nz | --station STA [--normal-to ...] [--svg/--dxf/--csv f] [--dims]
                                                             Read-only QC measurements (flattened plates, assembly planes, true sections,
                                                             distances, rebar); "sbm measure" alone lists the options. Never saves the model.
+          sbm centerlines <file.sbm> [--bridge NAME] [--kind sub,part] [--category Column] [--csv f] [--json f] [--dxf f]
+                                                            Geometric centerline + section centroid line of every element; "sbm centerlines" alone = help.
 
         Paths:   Bridges[0].Supports[1].SkewDegrees   Bridges["Sample Bridge"].Girders.Section.WebDepth
                  Alignments[0].StartStation           Bridges[0].FieldSplices   Units.Kind
@@ -329,7 +331,7 @@ public static partial class Program
                         var sw = System.Diagnostics.Stopwatch.StartNew();
                         var bl = Opt("--bridges")?.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
                         var rr = doc.Export3dm(r3, bl, detail: !args.Contains("--no-detail"), meshOnly: args.Contains("--mesh-only"),
-                            terrain: args.Contains("--terrain"), barSolids: args.Contains("--bar-solids"), fileVersion: int.Parse(Opt("--3dm-version") ?? "8"));
+                            terrain: args.Contains("--terrain"), barSolids: args.Contains("--bar-solids"), fileVersion: int.Parse(Opt("--3dm-version") ?? "8"), centerlines: args.Contains("--centerlines"));
                         Console.WriteLine($"  Rhino 3DM ({rr.Units}) â†’ {r3}  ({rr.Elapsed.TotalSeconds:0.0} s export, {sw.Elapsed.TotalSeconds:0.0} s with the regeneration check, {new FileInfo(r3).Length / 1048576.0:0.0} MB, {rr.Objects:N0} objects: " +
                                           $"{rr.Extrusions:N0} extrusions, {rr.MiteredExtrusions:N0} mitered extrusions, {rr.ObliqueBreps:N0} oblique B-reps, {rr.NurbsBreps:N0} NURBS B-reps ({rr.NurbsBrepsClosed:N0} closed), {rr.ExactBodies:N0} beam bodies, {rr.Meshes:N0} meshes, " +
                                           $"{rr.Curves:N0} curves ({rr.CurveSegments:N0} pieces), {rr.BlockInstances:N0} block instances of {rr.BlockDefinitions:N0} blocks; {rr.Layers} layers, {rr.Fallbacks} fallbacks to mesh, {rr.DroppedSlivers:N0} sliver triangles left out)");
@@ -504,6 +506,8 @@ public static partial class Program
                 case "measure":
                     if (args.Length < 3) { Console.WriteLine(MeasureCommand.Help); return args.Length < 2 ? 1 : 0; }
                     return MeasureCommand.Measure(args);
+                case "centerlines":
+                    return CenterlinesCommand.Run(args);
                 case "section":
                     if (args.Length < 3) { Console.WriteLine(MeasureCommand.Help); return args.Length < 2 ? 1 : 0; }
                     return MeasureCommand.Section(args);
