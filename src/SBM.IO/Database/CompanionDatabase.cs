@@ -221,6 +221,19 @@ public static class CompanionDatabase
             string? script = options.Pages ? FindScript() ?? throw new FileNotFoundException("tools/plan_split.py not found.") : null;
             foreach (var set in rules.PlanSets)
             {
+                // Machine-made index (sbm pipeline): fills a plan set without a curated index, or pages the curated index lacks; curated entries win.
+                if (AutoSheetIndex.Load(AutoSheetIndex.PathFor(Path.GetDirectoryName(Path.GetFullPath(linksFile!))!, set.Id)) is { } auto)
+                {
+                    bool curated = set.Sheets != null;
+                    var (merged, added) = AutoSheetIndex.Merge(set.Sheets, auto.Sheets);
+                    if (added > 0)
+                    {
+                        set.Sheets = merged;
+                        options.Log?.Invoke(curated ? $"plan set {set.Id}: curated sheet index + {added} page(s) from the automatic index"
+                            : $"plan set {set.Id}: no curated sheet index, using the AUTOMATIC index ({added} pages, {auto.LowConfidence} low confidence"
+                              + (auto.RasterPages > auto.OcrPages ? $", {auto.RasterPages - auto.OcrPages} scanned pages without OCR = no title" : "") + ")");
+                    }
+                }
                 string? pdf = PlanSheets.FindPdf(set, folders);
                 if (pdf == null) options.Log?.Invoke($"plan set {set.Id}: PDF '{set.Pdf}' not found in {string.Join("; ", folders.Where(Directory.Exists))}"
                     + (set.Sheets != null ? " (sheets and links come from the sheet index; Open PDF needs the PDF)" : ""));

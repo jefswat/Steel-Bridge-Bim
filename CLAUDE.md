@@ -21,6 +21,20 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   and the same for `src/SBM.Cli` (same output folder â†’ `sbm.exe` beside the app).
 - Automation docs for the user: `docs/API.md`; example scripts in `samples/scripts`.
 
+## New plan-set model checklist (REQUIRED - a model is not finished without it)
+1. Build script `samples/plans/build-<name>.csx` (run on `sbm new <model.sbm>`), ending with `Doc.Save()`. In it: `Doc.Project.PlanPdfs.Add(@"C:\SBMData\<plan set>.pdf")`
+   and, when the plans give coordinates (control monument / PI N-E / lat-long), `Doc.Project.Georeference` (CRS + grid scale + Basis with the page). A local grid:
+   move it into the map CRS first (`geolocate-cbis.csx` pattern) or leave the georeference null - the pipeline then reports terrain as UNRESOLVED (never silent).
+2. `sbm run samples/plans/build-<name>.csx <model.sbm>` -> after the save the DEFAULT pipeline runs (`sbm pipeline <model.sbm>`, alias `build-all`;
+   `SBM.Api/ModelPipeline.cs`, docs/MODEL-PIPELINE.md): regenerate -> georeference check -> terrain (3DEP DEM for the model extents when georeferenced, CRS table
+   `tools/terrain/crs.py`, cached in `C:\SBMData\terrain` if writable else `<repo>\dist\terrain`) -> plan sheet index (`tools/plan_index_auto.py`: text layer / OCR ->
+   `sheet-index-<set>.auto.json`; skeleton `sheet-links-<model>.json` when no rules file names the model; a curated `"sheets"` index always wins, merge only adds missing
+   pages) -> companion database + sheet links. Opt-outs: `--no-pipeline` (on `sbm run`), `--no-regen --no-db --no-index --no-terrain --offline`, env `SBM_PIPELINE=0`,
+   `SBM_OFFLINE=1`. `sbm pipeline <model.sbm> --status` = report only (`sbm regen` also says when items are open).
+3. Resolve what it prints as UNRESOLVED: write the link rules in the sheet-links file (title regex -> element selectors), correct low-confidence / scanned pages
+   (paste a curated `"sheets"` index), set the georeference. Re-run `sbm pipeline <model.sbm>` until it says "nothing open" (or every open item is a reported user decision).
+4. Do not commit .sqlite / DEM / image files (ignored); the .sbm + scripts + sheet-links JSON (+ the small `.auto.json` index) are the source.
+
 ## Projects
 - `src/SBM.Api` â€” `SbmDocument` (open/new/save, typed + text property-path edits, incremental `Regenerate`, export),
   `PropertyPath` (paths like `Bridges[0].Supports[1].SkewDegrees`; unit-aware parsing; plain numbers use the field's
@@ -44,7 +58,7 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   `sheets.pdf_path`). A model outside that folder (copied / saved elsewhere) gets the SHIPPED rules: `CompanionDatabase.LibraryFolders` = `%SBM_LINKS%`, the program's `plans` folder
   (the rules are copied there by the App / Cli csproj) and the repo's `samples/plans`, matched by `models` (file name) then by plan set `bridgeGroup` = a bridge name
   (`DatabaseOptions.BridgeNames`); a generic rules file is never taken from the library. Every build applies them; `CompanionDatabase.Relink` / `sbm db --relink` re-applies to an existing db; the app relinks on
-  load when links are missing or the rules file is newer. A new bridge needs its own `sheet-links-<name>.json` with an index (tests check every rule matches a sheet).
+  load when links are missing or the rules file is newer. A new bridge needs its own `sheet-links-<name>.json` with an index (tests check every rule matches a sheet) - `sbm pipeline` writes the skeleton + automatic index (checklist above).
   Asset management (G9, `AssetSchema` / `AssetStore` / `ModelDb.Assets.cs` / `InspectionCsv`, `SBM.Api/CalcSync`, CLI `sbm asset` in `SBM.Cli/AssetCommand.cs`,
   docs/API.md "Asset management"): tables asset_files / asset_links / inspections / element_condition (AASHTO CS1-CS4 + defects) / component_ratings
   (NBI 0-9, N) / findings / calcs / calc_values / calc_applied, version `meta.asset_schema_version` (created on Open = migration). NEVER touched by

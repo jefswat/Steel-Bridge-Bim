@@ -1,3 +1,5 @@
+// FINISH (required, see CLAUDE.md "New plan-set model checklist" / docs/MODEL-PIPELINE.md): `sbm run <this script> <model.sbm>` runs `sbm pipeline` after the
+// script saves = regenerate, terrain (georeferenced projects), plan sheet index, companion database + sheet links; UNRESOLVED items are printed.
 // NCDOT B-2500 (Bonner Bridge replacement, NC 12 over Oregon Inlet), UNIT 6 = spans 30-35, bents 29-35, 965'-0" along -L- (6 x 160'-10"):
 // four lines of 96" precast prestressed Florida I-Beams (FIB-96), simple spans made continuous for live load, 9" deck, precast caps on precast
 // segmental columns, CIP footings on battered 36" square prestressed piles.

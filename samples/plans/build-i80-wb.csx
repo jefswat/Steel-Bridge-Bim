@@ -1,3 +1,5 @@
+// FINISH (required, see CLAUDE.md "New plan-set model checklist" / docs/MODEL-PIPELINE.md): `sbm run <this script> <model.sbm>` runs `sbm pipeline` after the
+// script saves = regenerate, terrain (georeferenced projects), plan sheet index, companion database + sheet links; UNRESOLVED items are printed.
 // Iowa DOT Design 116 (B00168): WB I-80 viaduct over NB I-29, Council Bluffs — 3349'-10 x varies continuous welded
 // girder bridge in three units. Built from the plan sheets (see notes at the end for what is approximate).
 //   sbm new "samples\plans\I-80 WB and Ramp G.sbm"

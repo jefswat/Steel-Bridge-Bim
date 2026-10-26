@@ -382,6 +382,33 @@ largest flat faces (`flatSharePct` and a note say so); hole polygons from meshes
 - **Terrain queries:** terrain uses a uniform-grid spatial index. A 335,000-triangle TIN indexes in about 30 ms and
   answers an elevation query in about 0.3 µs.
 
+## Model pipeline (`sbm pipeline`, default after `sbm run`) - REQUIRED final step of every model
+
+```
+sbm pipeline <model.sbm> [--status] [--no-regen] [--no-db] [--no-index] [--no-terrain] [--offline] [--reindex] [--force-db]
+             [--pdf <plan set.pdf>]... [--plans <folder>[,<folder>]] [--terrain-dir <folder>] [--margin LEN]
+sbm build-all <model.sbm> ...        (same)
+sbm run <build.csx> <model.sbm> [--no-pipeline] [--no-db|--no-terrain|--no-index|--offline] [-- args]
+```
+
+Runs, in order, and prints one line per step (`DONE`, `UP TO DATE`, `SKIPPED` + why, `UNRESOLVED` + `next:` = what is needed, `FAILED`):
+
+1. regenerate;
+2. georeference check (`Doc.Project.Georeference`);
+3. terrain: kept when a visible terrain reference file exists; else, for a georeferenced project in a CRS of `tools/terrain/crs.py`, USGS 3DEP (1 m DEM,
+   else 1/3 arc-second) for the bridges' plan extents + 300 m (`--margin`), resampled into project metres (`tools/terrain/auto_terrain.py`), attached as
+   "3DEP DEM (auto, sbm pipeline)", model saved and regenerated. Tiles cached in the terrain folder (`--terrain-dir`, `%SBM_TERRAIN%`,
+   `C:\SBMData\terrain` when writable, `<repo>\dist\terrain`, else `<model folder>\terrain`). No georeference = UNRESOLVED with the next step;
+4. plan sheet index: plan sets without a curated `"sheets"` index get `sheet-index-<set>.auto.json` from `tools/plan_index_auto.py` (text layer, or OCR
+   when Tesseract is installed; scanned pages without OCR are reported). No rules file for the model + plan PDFs (`--pdf`, or `Doc.Project.PlanPdfs`) =
+   a skeleton `sheet-links-<model>.json` is written once (never rewritten). A curated index is authoritative (`--reindex`: only pages it lacks are added);
+5. companion database (`CompanionDatabase.Build`) unless it is newer than the model and its link inputs (`--force-db`).
+
+`--status` reports without changing anything; `sbm regen` prints "Model pipeline: N item(s) open" when something is missing. `sbm run` runs the pipeline
+only when the script SAVED the model; `--no-pipeline` / `SBM_PIPELINE=0` skip it, `SBM_OFFLINE=1` = no downloads, `SBM_PYTHON` = the Python to use.
+Library: `ModelPipeline.Run(doc, new PipelineOptions { ... })`, `ModelPipeline.Status(doc)`, pure decisions `DecideTerrain`, `AutoSheetIndex.Merge`.
+Diagnosis and proof runs: docs/MODEL-PIPELINE.md.
+
 ## Companion database (`sbm db`)
 
 `sbm db <model.sbm> [out.sqlite] [--pages] [--plans <folder>] [--links rules.json] [--unused report.md] [--no-previews] [--no-vacuum] [--relink]`

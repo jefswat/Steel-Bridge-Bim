@@ -1,3 +1,5 @@
+// FINISH (required, see CLAUDE.md "New plan-set model checklist" / docs/MODEL-PIPELINE.md): `sbm run <this script> <model.sbm>` runs `sbm pipeline` after the
+// script saves = regenerate, terrain (georeferenced projects), plan sheet index, companion database + sheet links; UNRESOLVED items are printed.
 // ODOT Vol 2 (Phase 2B, job piece 09033(11)) - Bridge 'O' spans 14-16: ONE steel tub girder unit (proof of concept), SUPERSTRUCTURE ONLY.
 // Ramp 44F over I-44 & Ramps 44N / 44M2, 3 continuous spans 139'-3 3/8 + 161'-0 + 161'-0 along CL Ramp 44F (curve no. 9, R 881.47 LT),
 // 2 steel tub girders (50" webs at 4:1, 77" bottom flange, 2 x 21" top flanges), 8" deck 32'-0 out to out.

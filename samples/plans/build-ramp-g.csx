@@ -1,3 +1,5 @@
+// FINISH (required, see CLAUDE.md "New plan-set model checklist" / docs/MODEL-PIPELINE.md): `sbm run <this script> <model.sbm>` runs `sbm pipeline` after the
+// script saves = regenerate, terrain (georeferenced projects), plan sheet index, companion database + sheet links; UNRESOLVED items are printed.
 // Iowa DOT Design 316 (B00169): Ramp G — 3675'-0 x 32'-0 continuous welded girder bridge, four units, joining the
 // I-80 WB viaduct at the shared Pier 11WB & 19G. Run after build-i80-wb.csx (same project).
 //   sbm run "samples\plans\build-ramp-g.csx" "samples\plans\I-80 WB and Ramp G.sbm"
