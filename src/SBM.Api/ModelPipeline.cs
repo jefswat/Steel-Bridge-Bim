@@ -42,18 +42,20 @@ public sealed class PipelineReport
     public int Open => Steps.Count(s => s.Status is PipelineStepStatus.Unresolved or PipelineStepStatus.Failed);
     public PipelineStep Add(string name, PipelineStepStatus st, string msg, string? next = null) { var s = new PipelineStep(name, st, msg, next); Steps.Add(s); return s; }
 
+    private static string Tag(PipelineStepStatus s) => s switch
+    {
+        PipelineStepStatus.Done => "DONE      ", PipelineStepStatus.UpToDate => "UP TO DATE", PipelineStepStatus.Skipped => "SKIPPED   ",
+        PipelineStepStatus.Unresolved => "UNRESOLVED", _ => "FAILED    ",
+    };
+
     public string ToText()
     {
         var sb = new System.Text.StringBuilder();
+        var shown = new HashSet<string>();
         foreach (var s in Steps)
         {
-            string tag = s.Status switch
-            {
-                PipelineStepStatus.Done => "DONE      ", PipelineStepStatus.UpToDate => "UP TO DATE", PipelineStepStatus.Skipped => "SKIPPED   ",
-                PipelineStepStatus.Unresolved => "UNRESOLVED", _ => "FAILED    ",
-            };
-            sb.AppendLine($"  [{tag}] {s.Name}: {s.Message}");
-            if (s.Next != null) sb.AppendLine($"               next: {s.Next}");
+            sb.AppendLine($"  [{Tag(s.Status)}] {s.Name}: {s.Message}");
+            if (s.Next != null) sb.AppendLine("               next: " + (shown.Add(s.Next) ? s.Next : "(as above)"));
         }
         sb.Append(Open == 0 ? "  Pipeline complete: nothing open." : $"  {Open} item(s) open (UNRESOLVED / FAILED above): they are required for a finished model.");
         return sb.ToString();
@@ -123,13 +125,36 @@ public static class ModelPipeline
     }
 
     /// <summary>The terrain output / tile cache folder (see <see cref="PipelineOptions.TerrainFolder"/>).</summary>
-    public static string TerrainFolder(PipelineOptions o, string modelFile, Func<string, bool>? dirExists = null)
+    public static string TerrainFolder(PipelineOptions o, string modelFile, Func<string, bool>? writable = null)
     {
-        dirExists ??= Directory.Exists;
+        writable ??= Writable;
         if (o.TerrainFolder is { Length: > 0 } f) return f;
         if (Environment.GetEnvironmentVariable("SBM_TERRAIN") is { Length: > 0 } env) return env;
-        if (dirExists(@"C:\SBMData")) return @"C:\SBMData\terrain";
+        if (writable(@"C:\SBMData\terrain")) return @"C:\SBMData\terrain";
+        // A model in the repository: <repo>\dist\terrain (git-ignored, where the hand-made terrains live).
+        for (var d = new DirectoryInfo(Path.GetDirectoryName(Path.GetFullPath(modelFile))!); d != null; d = d.Parent)
+            if (File.Exists(Path.Combine(d.FullName, "SteelBridgeModeler.sln")))
+            {
+                string rd = Path.Combine(d.FullName, "dist", "terrain");
+                if (writable(rd)) return rd;
+                break;
+            }
         return Path.Combine(Path.GetDirectoryName(Path.GetFullPath(modelFile))!, "terrain");
+    }
+
+    /// <summary>True when the folder exists (or can be created) and a file can be written in it.</summary>
+    public static bool Writable(string dir)
+    {
+        try
+        {
+            if (!Directory.Exists(Path.GetDirectoryName(Path.GetFullPath(dir)) ?? dir) && !Directory.Exists(dir)) return false;
+            Directory.CreateDirectory(dir);
+            string probe = Path.Combine(dir, ".sbm-write-test");
+            File.WriteAllText(probe, "");
+            File.Delete(probe);
+            return true;
+        }
+        catch (Exception) { return false; }
     }
 
     /// <summary>True when the database is newer than the model file and every input of its sheet links (rules file, automatic index files).</summary>
