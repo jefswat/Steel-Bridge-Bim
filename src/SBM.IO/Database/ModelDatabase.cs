@@ -562,6 +562,8 @@ public static class ModelDatabase
             // Steel truss (Truss/TrussGenerator): group "truss" > truss line / bracing / floor / suspender / shoe assemblies > panel / joint groups > members
             string trussGroup = "";
             string TrussGroup() => trussGroup.Length > 0 ? trussGroup : (trussGroup = Group($"{bk}/group/truss", superId, steel.Truss?.Name ?? "Truss", "truss"));
+            string csGroup = "";
+            string CsGroup() => csGroup.Length > 0 ? csGroup : (csGroup = Group($"{bk}/group/cablestayed", superId, "Cable-stayed", "cable-stayed"));
             string GirderGroup(int g)
             {
                 if (girderGroup.TryGetValue(g, out var id)) return id;
@@ -598,6 +600,9 @@ public static class ModelDatabase
                     case AssemblyKind.ArchHanger: parent = ArchGroup(); cat = "hanger"; break;
                     case AssemblyKind.ArchFloorbeam: parent = ArchGroup(); cat = "floorbeam"; break;
                     case AssemblyKind.ArchBracing: parent = ArchGroup(); cat = "upper lateral bracing"; break;
+                    case AssemblyKind.Pylon: parent = CsGroup(); cat = "pylon"; break;
+                    case AssemblyKind.StayGroup: parent = CsGroup(); cat = "stay group"; break;
+                    case AssemblyKind.CsDeck: parent = CsGroup(); cat = "deck"; break;
                     case AssemblyKind.ArchKnuckle: parent = ArchGroup(); cat = "knuckle"; break;
                     case AssemblyKind.ArchDeckForm: parent = ArchGroup(); cat = "deck form"; break;
                     case AssemblyKind.ArchSplice: parent = ArchGroup(); cat = "arch field splice"; sub = asm.Description.Contains("tie") ? "tie splice" : "rib splice"; break;
@@ -804,7 +809,9 @@ public static class ModelDatabase
             PartCategory.TrussStringer => "stringer", PartCategory.TrussGusset => "gusset plate", PartCategory.Suspender => "suspender rope",
             PartCategory.SuspenderSocket => "suspender socket", PartCategory.TrussPin => "pin", PartCategory.TrussShoeFixed => "fixed shoe",
             PartCategory.TrussShoeExpansion => "expansion shoe", PartCategory.TrussConnectionAngle => "connection angle",
-            PartCategory.TrussConnectionPlate => "connection plate", _ => c.ToString(),
+            PartCategory.TrussConnectionPlate => "connection plate",
+            PartCategory.Pylon => "pylon", PartCategory.PylonCrossBeam => "pylon cross beam", PartCategory.PylonStrut => "strut",
+            PartCategory.StayCable => "stay cable", PartCategory.CsDeck => "deck segment", _ => c.ToString(),
         };
 
         private static bool IsCapPart(SteelPart p) => p.Category is PartCategory.EndPlate or PartCategory.ConnectorPlate or PartCategory.DiaphragmPlate
@@ -816,8 +823,10 @@ public static class ModelDatabase
                 or PartCategory.WalkwayStringer or PartCategory.WalkwayPost or PartCategory.RolledTee
                 or PartCategory.ArchRib or PartCategory.Hanger or PartCategory.ArchBracing or PartCategory.RailPost or PartCategory.RailMember
                 or PartCategory.TrussChord or PartCategory.TrussDiagonal or PartCategory.TrussVertical or PartCategory.TrussHanger or PartCategory.TrussBracing
-                or PartCategory.TrussStringer or PartCategory.Suspender or PartCategory.TrussConnectionAngle => "IFCMEMBER",
-            PartCategory.TrussFloorBeam or PartCategory.TrussGirder => "IFCBEAM",
+                or PartCategory.TrussStringer or PartCategory.Suspender or PartCategory.TrussConnectionAngle
+                or PartCategory.PylonStrut or PartCategory.StayCable => "IFCMEMBER",
+            PartCategory.TrussFloorBeam or PartCategory.TrussGirder or PartCategory.PylonCrossBeam or PartCategory.CsDeck => "IFCBEAM",
+            PartCategory.Pylon => "IFCCOLUMN",
             PartCategory.TrussShoeFixed or PartCategory.TrussShoeExpansion => "IFCBEARING",
             PartCategory.SuspenderSocket or PartCategory.TrussPin => "IFCMECHANICALFASTENER",
             PartCategory.RailHandrail or PartCategory.RailEnvelope => "IFCRAILING",

@@ -690,6 +690,8 @@ internal sealed class RhinoBrepBuilder
                 }
         var groups = Enumerable.Range(0, tris.Count).GroupBy(Find).Select(g => g.ToList()).ToList();
         if (groups.Count > maxFaces) { why = $"more than {maxFaces} planar faces (faceted curved surface)"; return null; }
+        // a faceted curved surface (a swept curved member: nearly every triangle its own plane) has no exact planar description either
+        if (groups.Count > 24 && groups.Count * 3 > tris.Count) { why = "faceted curved surface (most triangles in their own plane)"; return null; }
 
         (long, long, long) K(Vec3 p) => ((long)Math.Round(p.X * 1e5), (long)Math.Round(p.Y * 1e5), (long)Math.Round(p.Z * 1e5));
         // boundary of each group: net directed edge coverage along each supporting line (T-junction splits cancel)

@@ -52,6 +52,9 @@ public static class ModelLayers
         ("3D-TRUSS-SUSPENDERS", 215, 215, 225, new[] { PartCategory.Suspender, PartCategory.SuspenderSocket }),
         ("3D-TRUSS-SHOES", 150, 150, 155, new[] { PartCategory.TrussShoeFixed, PartCategory.TrussShoeExpansion, PartCategory.TrussPin }),
         ("3D-TRUSS-CONNECTIONS", 200, 150, 215, new[] { PartCategory.TrussConnectionAngle, PartCategory.TrussConnectionPlate }),
+        ("3D-CS-PYLON", 240, 240, 240, new[] { PartCategory.Pylon, PartCategory.PylonCrossBeam, PartCategory.PylonStrut }),
+        ("3D-CS-STAYS", 215, 215, 225, new[] { PartCategory.StayCable }),
+        ("3D-CS-DECK", 220, 160, 50, new[] { PartCategory.CsDeck }),
     };
 
     private static readonly Dictionary<string, (byte r, byte g, byte b)> Colors = new()

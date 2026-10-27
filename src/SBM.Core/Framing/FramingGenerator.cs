@@ -61,7 +61,7 @@ public sealed class FramingGenerator
         foreach (var e in _def.Validate()) Error(e);
         if (_align.Elements.Count == 0) Error("The alignment has no horizontal geometry.");
         if (!_diag.IsEmpty && _diag.Any(d => d.Severity == DiagnosticSeverity.Error)) return;
-        if ((_def.Arch != null || _def.Segmental != null || _def.SupportLinesOnly || _def.Truss != null) && NG == 0) { RunArchSupportsOnly(); return; }
+        if ((_def.Arch != null || _def.Segmental != null || _def.SupportLinesOnly || _def.Truss != null || _def.CableStayed != null) && NG == 0) { RunArchSupportsOnly(); return; }
 
         SetupSupports();
         SetupSpanLayouts();

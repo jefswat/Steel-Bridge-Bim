@@ -80,7 +80,7 @@ public sealed class RegenerationCache
             SteelModel? st = null;
             Concrete.ConcreteModel? cm = null;
             Prestressed.PrestressedModel? ps = null;
-            if (b.SupportLinesOnly && b.Arch == null && b.Segmental == null && b.Truss == null)
+            if (b.SupportLinesOnly && b.Arch == null && b.Segmental == null && b.Truss == null && b.CableStayed == null)
             {
                 // Support lines only: no steel, concrete or substructure (st / cm / ps stay null).
             }
@@ -98,6 +98,13 @@ public sealed class RegenerationCache
                 var tm = SBM.Core.Truss.TrussGenerator.Generate(f, project.Units);
                 st = tm.Steel;
                 cm = tm.Concrete;
+            }
+            else if (includeSteel && !f.HasErrors && b.CableStayed != null)
+            {
+                // Cable-stayed footbridge: deck / pylon / stays in a SteelModel (+ a concrete deck), piers in its own substructure (taken in phase 2).
+                var csm = SBM.Core.CableStayed.CableStayedGenerator.Generate(f, project.Units);
+                st = csm.Steel;
+                cm = csm.Concrete;
             }
             else if (includeSteel && !f.HasErrors && b.Segmental != null)
             {
@@ -187,11 +194,17 @@ public sealed class RegenerationCache
                 sub = sgm.Substructure;
                 lock (_lock) _sub[subKey] = sub;
             }
+            // A cable-stayed bridge's piers / pylon footing come from its generator.
+            else if (!found && includeSteel && !pt.f.HasErrors && pt.cm?.CableStayed is { } csd)
+            {
+                sub = csd.Substructure;
+                lock (_lock) _sub[subKey] = sub;
+            }
             // A tied-arch bridge builds no substructure: its bearings reach the approach units' piers as foreign seats.
             // A truss bridge builds no automatic substructure either (its shoes publish bearing seats with locations); plan-defined substructures
             // (SubstructureDefinition.Plan, seats from plan elevations, no bearings needed) are built for any non-arch bridge, incl. truss and
             // support-lines-only bridges (PTC piers).
-            else if (!found && includeSteel && !pt.f.HasErrors && b.Arch == null
+            else if (!found && includeSteel && !pt.f.HasErrors && b.Arch == null && b.CableStayed == null
                 && (((pt.s != null || pt.ps != null) && b.Truss == null)
                     || b.Supports.Any(x => x.ResolvedSubstructure.Enabled && x.ResolvedSubstructure.Plan != null)))
             {

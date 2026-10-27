@@ -1198,6 +1198,14 @@ UNRESOLVED FLAG (general, reusable): `SBM.Core/Assumption.cs` `Assumption{Status
   CL walkways (walkways-ptc `WalkCl`) centred 2'-0 north of the CL (p.101 / p.106 / p.43), web to web on the floor beam bottom flange (main 2'-2 1/2 above it) - the earlier 1'-0
   north walk through the webs caused the walkway x bracing clashes; girder-span CL walk built; piers 18 / 19 fender line + 19 pile dolphins (p.25, substructure-ptc.csx, flagged).
   Steel 89.2 -> 90.2 % of p.42 (girder spans 91.1 / 89.0 %), non-bolt clash rows 6,682 -> 4,402, IFC 260.8 MB.
+- CABLE-STAYED footbridge (OPTIONAL `BridgeDefinition.CableStayed` = `Bridge/CableStayedDefinition.cs`, omitted when null; `Girders.Count = 0` like the arch; WIP 2026-10-26): generator
+  `CableStayed/CableStayedGenerator.cs` (RegenerationCache branch; steel model = pylon trunk / curved legs (cubic from start / tip points + lean / splay tangent angles, NURBS sweeps) /
+  cross beams / struts, stays (deck anchors or ground anchors -> points along a leg), steel deck pieces per span (NURBS sweep along alignment + profile) or concrete deck, glass barrier
+  panels; substructure units (piers, abutment seats, footings) taken in phase 2 like segmental). Inputs are points `CsXyz` / `CsXy` (JSON; Vec types recurse in System.Text.Json).
+  Starting shapes `Bridge/CableStayedConcepts.cs` (`Osprey`: values read from renderings, all flagged). New PartCategory Pylon / PylonCrossBeam / PylonStrut / StayCable / CsDeck,
+  AssemblyKind Pylon / StayGroup / CsDeck (IFC IfcColumn 'PYLON', IfcMember STAY_CABLE, IfcElementAssembly PYLON / SUSPENSIONASSEMBLY / DECK; layers 3D-CS-*). First-cut analysis
+  (`CableStayedAnalysis`: wireframe + tributary stay forces + pylon base statics; user: analysis comes LATER, do not extend now) and CLI `sbm cable-stayed`. Richmond Greenway concept:
+  `samples/plans/build-richmond-greenway.csx` (site from OSM + 3DEP, UTM 10N). SHAPE NOT YET FITTED to the renderings (camera-matched overlay work in progress). Tests `CableStayedTests`.
 - Bonner Unit 6 (spans 30-35, 4 x FIB-96, `samples/plans/build-bonner-unit6.csx` -> `Bonner Unit 6 FIB.sbm`, reads docs/plan-data/bonner-b2500/fib-unit6
   CSVs; same -L- placement as Unit 5; terrain + georeference `samples/plans/terrain-bonner.csx`, `docs/plan-data/bonner-b2500/TERRAIN.md`): 24 SpanBeams, per-span layouts (G1 LEFT, CL bearing 1'-2" / 3'-2" bent 29 / 1'-4" bent 35), p439 strand pattern
   read from the VECTOR drawing (72 + 4 slack, 8 draped, 20 debonded), E1/E2/E3 + P sole plates, camber tables, bents 30-35 (level precast cap profile,

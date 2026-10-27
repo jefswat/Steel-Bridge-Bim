@@ -99,6 +99,8 @@ public static partial class Program
                                                             distances, rebar); "sbm measure" alone lists the options. Never saves the model.
           sbm centerlines <file.sbm> [--bridge NAME] [--kind sub,part] [--category Column] [--csv f] [--json f] [--dxf f]
                                                             Geometric centerline + section centroid line of every element; "sbm centerlines" alone = help.
+          sbm cable-stayed <file.sbm> [--json f] [--nodes f --members f] [--stays f]
+                                                            Cable-stayed report (stays, first-cut forces, pylon balance, clearances) + analysis wireframe.
 
         Paths:   Bridges[0].Supports[1].SkewDegrees   Bridges["Sample Bridge"].Girders.Section.WebDepth
                  Alignments[0].StartStation           Bridges[0].FieldSplices   Units.Kind
@@ -509,6 +511,8 @@ public static partial class Program
                     return MeasureCommand.Measure(args);
                 case "centerlines":
                     return CenterlinesCommand.Run(args);
+                case "cable-stayed":
+                    return CableStayedCommand.Run(args);
                 case "section":
                     if (args.Length < 3) { Console.WriteLine(MeasureCommand.Help); return args.Length < 2 ? 1 : 0; }
                     return MeasureCommand.Section(args);

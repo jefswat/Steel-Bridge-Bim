@@ -205,6 +205,9 @@ public static class IfcExporter
                 PartCategory.Suspender => (0.82, 0.82, 0.86),
                 PartCategory.SuspenderSocket or PartCategory.TrussPin => (0.55, 0.55, 0.6),
                 PartCategory.TrussShoeFixed or PartCategory.TrussShoeExpansion => (0.6, 0.6, 0.6),
+                PartCategory.Pylon or PartCategory.PylonCrossBeam or PartCategory.PylonStrut => (0.94, 0.94, 0.94),
+                PartCategory.StayCable => (0.82, 0.82, 0.86),
+                PartCategory.CsDeck => (0.86, 0.62, 0.20),
                 _ => (0.95, 0.3, 0.2),
             };
             int rgb = w.Add("IFCCOLOURRGB", $"$,{R(r)},{R(g)},{R(b)}");
@@ -1194,6 +1197,9 @@ public static class IfcExporter
                     AssemblyKind.TrussBracing => (".SITE.", ".CROSS_BRACING.", "$"),
                     AssemblyKind.TrussFloor => (".SITE.", ".BEAM_GRID.", "$"),
                     AssemblyKind.TrussSuspender => (".SITE.", ".SUSPENSIONASSEMBLY.", "$"),
+                    AssemblyKind.Pylon => (".SITE.", ".PYLON.", "$"),
+                    AssemblyKind.StayGroup => (".SITE.", ".SUSPENSIONASSEMBLY.", "$"),
+                    AssemblyKind.CsDeck => (".FACTORY.", ".DECK.", "$"),
                     _ => (".SITE.", ".USERDEFINED.", "'BEARING'"),
                 };
                 if (asm.Kind == AssemblyKind.Railing)
@@ -1299,6 +1305,13 @@ public static class IfcExporter
                     PartCategory.TrussShoeExpansion => w.Add("IFCBEARING", $"{common},$,{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.ROCKER."),
                     PartCategory.TrussConnectionAngle => w.Add("IFCMEMBER", $"{common},'CONNECTION_ANGLE',{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.USERDEFINED."),
                     PartCategory.TrussConnectionPlate => w.Add("IFCPLATE", $"{common},'CONNECTION_PLATE',{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.USERDEFINED."),
+                    // Cable-stayed footbridge: pylon legs / trunk IfcColumn 'PYLON', cross beams IfcBeam 'PYLON_CROSS_BEAM', struts STRUT, stays STAY_CABLE (IFC 4.3),
+                    // steel deck pieces IfcBeam GIRDER_SEGMENT.
+                    PartCategory.Pylon => w.Add("IFCCOLUMN", $"{common},'PYLON',{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.USERDEFINED."),
+                    PartCategory.PylonCrossBeam => w.Add("IFCBEAM", $"{common},'PYLON_CROSS_BEAM',{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.USERDEFINED."),
+                    PartCategory.PylonStrut => w.Add("IFCMEMBER", $"{common},$,{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.STRUT."),
+                    PartCategory.StayCable => w.Add("IFCMEMBER", $"{common},$,{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.STAY_CABLE."),
+                    PartCategory.CsDeck => w.Add("IFCBEAM", $"{common},$,{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.GIRDER_SEGMENT."),
                     _ => w.Add("IFCFASTENER", $"{common},$,{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.WELD."),
                 };
                 if (part.Assumption != null) miscStatus.Add((id, part.Assumption));

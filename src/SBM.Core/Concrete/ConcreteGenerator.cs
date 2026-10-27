@@ -122,6 +122,8 @@ public sealed class ConcreteModel
     /// <summary>Precast segmental box (bridges with <c>BridgeDefinition.Segmental</c>): segments, tendons, bearings and bents. Hung on the
     /// concrete model so every consumer that receives the concrete model (viewport, IFC, database) finds it; null otherwise.</summary>
     public SBM.Core.Segmental.SegmentalModel? Segmental { get; set; }
+    /// <summary>Cable-stayed results (OPTIONAL BridgeDefinition.CableStayed): carries the piers / pylon footing to phase 2 of the regeneration.</summary>
+    public SBM.Core.CableStayed.CableStayedModel? CableStayed { get; set; }
     public double DeckVolume => Math.Abs(Deck?.Volume() ?? 0);
     public double HaunchVolume => Math.Abs(Haunches?.Volume() ?? 0);
     public double BarrierVolume => Barriers.Sum(b => Math.Abs(b.Mesh.Volume()));
