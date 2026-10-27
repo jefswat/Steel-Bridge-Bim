@@ -82,7 +82,7 @@ foreach (var s in br.Supports) s.Substructure!.Enabled = false;   // the cable-s
 
 double groundAtPylon = Ft(26.0);                    // 3DEP at the 23rd St median
 double deckTopAtPylon = al.Profile.ElevationAt(pylonSta);
-var cs = CableStayedConcepts.Osprey("Pylon", pylonSta, groundAtPylon, deckTopAtPylon - groundAtPylon, tipAboveDeck: Ft(420));   // the renderings (three-view fit); the press reported "180 feet at its tallest point"
+var cs = CableStayedConcepts.Osprey("Pylon", pylonSta, groundAtPylon, deckTopAtPylon - groundAtPylon, tipAboveDeck: Ft(180));   // the reported "180 feet at its tallest point", read as above the walkway
 cs.Concept = "Richmond Greenway Bridge - osprey concept, starting shape for the shape study";
 cs.Unresolved.Add("UNRESOLVED (site): alignment, profile, pier stations and ramp lengths are a concept reading (straight line through the OSM trail ends, 5 % grades, 3DEP point ground) - the renderings show curved approach ramps.");
 cs.Unresolved.Add("UNRESOLVED (site): clearance envelopes (UP 23'-4\" / roads 17'-0) and the ground at the piers are from public data, not a survey.");

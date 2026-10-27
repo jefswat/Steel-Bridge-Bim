@@ -55,22 +55,22 @@ public static class CableStayedConcepts
         py.Support = pylonSupport;
         py.BaseElevation = baseElevation;
         py.TrunkHeight = 0;
-        // Wings fitted to THREE renderings at once (near-plan aerial with its camera fitted to the OSM lines of 23rd St / UP / Carlson / BART = the scale,
-        // the earlier aerial and the view back along the path, both cameras solved with the shape; 14 px RMS): knee 54 ft above the walkway, upper cross
-        // beam 33 ft above it, tips 151 ft forward / 114 ft out from the CL at 420 ft above the walkway (the renderings are ~2.3 x the reported "180 ft");
-        // side view: lean 2 deg from vertical at the knee to 45 deg at the tip; transverse: splay 46 deg at the knee closing to 14 deg. The tip reach
-        // scales with the rise when tipAboveDeck changes.
-        double edge = Ft(8.5), colY = Ft(9.75), knee = deckTop + Ft(54);
+        // Wings fitted to two renderings (aerial + view back along the path, cameras solved with the shape; 12 px RMS) with the tips held 180 ft above the
+        // walkway (the reported "180 feet at its tallest point"; a three-view fit at rendering scale gave ~420 ft, judged far too tall by the user):
+        // knee 37 ft above the walkway, upper cross beam 22 ft above it, tips 81 ft forward / 64 ft out from the CL; side view: lean 25 deg from vertical at
+        // the knee increasing to 41 deg at the tip; transverse: nearly straight, splay 16 deg at the knee, 14 deg at the tip. The tip reach scales with
+        // the rise when tipAboveDeck changes.
+        double edge = Ft(8.5), colY = Ft(9.75), knee = deckTop + Ft(37);
         double colFoot = sgn * Ft(41), footY = Ft(30), propFoot = -sgn * Ft(9), propTop = sgn * Ft(18);
         double legLean = Math.Atan(Ft(41) / knee) * 180 / Math.PI;
-        double tipZ = deckTop + tipAboveDeck, sc = (tipZ - knee) / Ft(420.4 - 54);
+        double tipZ = deckTop + tipAboveDeck, sc = (tipZ - knee) / Ft(182 - 37);
         foreach (double sy in new[] { -1.0, 1.0 })
             py.Legs.Add(new CsPylonLeg
             {
                 Name = sy < 0 ? "Left wing" : "Right wing", Start = new CsXyz(0, sy * colY, knee),
-                Tip = new CsXyz(sgn * Ft(151.1) * sc, sy * (colY + (Ft(113.8) - colY) * sc), tipZ),
-                StartLeanDeg = sgn * 2.3, StartSplayDeg = sy * 45.8, TipLeanDeg = sgn * 44.5, TipSplayDeg = sy * 14.1, StartHandle = 0.11, TipHandle = 0.68,
-                Section = new CsSection(Ft(6), Ft(6), Ft(2.5), Ft(3), In(1.5)), Segments = 48,
+                Tip = new CsXyz(sgn * Ft(80.8) * sc, sy * (colY + (Ft(63.9) - colY) * sc), tipZ),
+                StartLeanDeg = sgn * 24.6, StartSplayDeg = sy * 16.4, TipLeanDeg = sgn * 40.6, TipSplayDeg = sy * 14.3, StartHandle = 0.16, TipHandle = 0.65,
+                Section = new CsSection(Ft(4), Ft(4), Ft(1.75), Ft(2), In(1.25)), Segments = 40,
             });
         // lower legs (legs 2 / 3): from the feet, flared out transversely, curving in to the waist (plumb there) just outside the deck edge;
         // in side view they lean back from the feet to the waist
@@ -86,7 +86,7 @@ public static class CableStayedConcepts
         foreach (double y in new[] { -colY, colY })
             d.Struts.Add(new CsStrut { Name = (y < 0 ? "left" : "right") + " prop", From = new CsXyz(propTop, y, deckTop - Ft(3)), To = new CsXyz(propFoot, y, 0),
                 Section = new CsSection(Ft(2.5), Ft(3)) { Wall = In(1) }, FootingLength = Ft(10), FootingWidth = Ft(10), FootingThickness = Ft(4) });
-        py.CrossBeams.Add(new CsCrossBeam { Name = "strut", LegA = 2, LegB = 3, Height = deckTop + Ft(33), Section = new CsSection(Ft(3), Ft(3)) { Wall = In(1) } });
+        py.CrossBeams.Add(new CsCrossBeam { Name = "strut", LegA = 2, LegB = 3, Height = deckTop + Ft(22), Section = new CsSection(Ft(3), Ft(3)) { Wall = In(1) } });
         // deck beam under the walkway between the lower legs (the deck bears on it; user markup of the top view rendering)
         py.CrossBeams.Add(new CsCrossBeam { Name = "deck beam", LegA = 2, LegB = 3, Height = deckTop - Ft(3) - Ft(1.5), Section = new CsSection(Ft(4), Ft(3)) { Wall = In(1) } });
 

@@ -1723,58 +1723,58 @@
               "Start": {
                 "X": 0,
                 "Y": -2.9718,
-                "Z": 28.75830094401541
+                "Z": 23.576700944015414
               },
               "Tip": {
-                "X": 46.005001310043674,
-                "Y": -34.651617248908295,
-                "Z": 140.31510094401543
+                "X": 24.28814565517241,
+                "Y": -19.24906593103448,
+                "Z": 67.16310094401541
               },
-              "StartLeanDeg": 2.3,
-              "StartSplayDeg": -45.8,
-              "TipLeanDeg": 44.5,
-              "TipSplayDeg": -14.1,
-              "StartHandle": 0.11,
-              "TipHandle": 0.68,
+              "StartLeanDeg": 24.6,
+              "StartSplayDeg": -16.4,
+              "TipLeanDeg": 40.6,
+              "TipSplayDeg": -14.3,
+              "StartHandle": 0.16,
+              "TipHandle": 0.65,
               "Straight": false,
               "Section": {
-                "Width": 1.8288000000000002,
-                "Depth": 1.8288000000000002,
-                "EndWidth": 0.762,
-                "EndDepth": 0.9144000000000001,
-                "Wall": 0.038099999999999995,
+                "Width": 1.2192,
+                "Depth": 1.2192,
+                "EndWidth": 0.5334,
+                "EndDepth": 0.6096,
+                "Wall": 0.03175,
                 "Material": "Steel"
               },
-              "Segments": 48
+              "Segments": 40
             },
             {
               "Name": "Right wing",
               "Start": {
                 "X": 0,
                 "Y": 2.9718,
-                "Z": 28.75830094401541
+                "Z": 23.576700944015414
               },
               "Tip": {
-                "X": 46.005001310043674,
-                "Y": 34.651617248908295,
-                "Z": 140.31510094401543
+                "X": 24.28814565517241,
+                "Y": 19.24906593103448,
+                "Z": 67.16310094401541
               },
-              "StartLeanDeg": 2.3,
-              "StartSplayDeg": 45.8,
-              "TipLeanDeg": 44.5,
-              "TipSplayDeg": 14.1,
-              "StartHandle": 0.11,
-              "TipHandle": 0.68,
+              "StartLeanDeg": 24.6,
+              "StartSplayDeg": 16.4,
+              "TipLeanDeg": 40.6,
+              "TipSplayDeg": 14.3,
+              "StartHandle": 0.16,
+              "TipHandle": 0.65,
               "Straight": false,
               "Section": {
-                "Width": 1.8288000000000002,
-                "Depth": 1.8288000000000002,
-                "EndWidth": 0.762,
-                "EndDepth": 0.9144000000000001,
-                "Wall": 0.038099999999999995,
+                "Width": 1.2192,
+                "Depth": 1.2192,
+                "EndWidth": 0.5334,
+                "EndDepth": 0.6096,
+                "Wall": 0.03175,
                 "Material": "Steel"
               },
-              "Segments": 48
+              "Segments": 40
             },
             {
               "Name": "Left lower leg",
@@ -1786,11 +1786,11 @@
               "Tip": {
                 "X": 0,
                 "Y": -2.9718,
-                "Z": 28.75830094401541
+                "Z": 23.576700944015414
               },
-              "StartLeanDeg": -23.487155505509758,
+              "StartLeanDeg": -27.925768661269633,
               "StartSplayDeg": 40,
-              "TipLeanDeg": -23.487155505509758,
+              "TipLeanDeg": -27.925768661269633,
               "TipSplayDeg": 0,
               "StartHandle": 0.35,
               "TipHandle": 0.45,
@@ -1815,11 +1815,11 @@
               "Tip": {
                 "X": 0,
                 "Y": 2.9718,
-                "Z": 28.75830094401541
+                "Z": 23.576700944015414
               },
-              "StartLeanDeg": -23.487155505509758,
+              "StartLeanDeg": -27.925768661269633,
               "StartSplayDeg": -40,
-              "TipLeanDeg": -23.487155505509758,
+              "TipLeanDeg": -27.925768661269633,
               "TipSplayDeg": 0,
               "StartHandle": 0.35,
               "TipHandle": 0.45,
@@ -1840,7 +1840,7 @@
               "Name": "strut",
               "LegA": 2,
               "LegB": 3,
-              "Height": 22.357500944015413,
+              "Height": 19.00470094401541,
               "Section": {
                 "Width": 0.9144000000000001,
                 "Depth": 0.9144000000000001,
