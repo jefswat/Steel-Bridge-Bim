@@ -12,19 +12,21 @@ public static class CableStayedConcepts
     private static double In(double x) => x * 0.0254;
 
     /// <summary>
-    /// "Osprey" footbridge (Donald MacDonald Architects concept for the Richmond Greenway, renderings Dec 2022 / Grandview Independent 2026): one pier,
-    /// a trunk splitting below the deck into two curved legs that straddle the deck, splay apart and sweep back away from the main span (wings), a portal
-    /// cross beam above the walkway, a fan / semi-harp of stays from each leg to its deck edge, a few back stays, a prop strut, thin steel deck with glass
-    /// barriers. Heights are above the pylon base (the ground at the pier); stations of the stay anchors are distances from the pylon station along
+    /// "Osprey" footbridge (Donald MacDonald Architects concept for the Richmond Greenway, renderings Dec 2022 / Grandview Independent 2026 / Pogo Park
+    /// Bridge Week flyer; form per the user's elevation sketch): transversely symmetric; plumb columns straddling the deck (side view: leaning back from
+    /// their footings to a knee above the walkway), a cross beam at the knees, wings leaning forward over the main span and splaying outward, props from
+    /// the ground behind crossing the columns to the deck edges, stay fans from both wings to the main span deck edges, two back stays per wing. Heights are above the pylon base (the ground at the pier); stations of the stay anchors are distances from the pylon station along
     /// the main span direction (<paramref name="mainSpanAhead"/> = main span up-station).
     /// </summary>
     /// <param name="pylonSupport">Support line name of the pylon.</param>
     /// <param name="pylonStation">Its station (stay anchors are placed from it).</param>
     /// <param name="baseElevation">Pylon base (top of footing, ground at the pier).</param>
     /// <param name="deckTopAboveBase">Finished grade at the pylon minus the base elevation (sets the junction below the deck and the cross beam above it).</param>
-    /// <param name="height">Pylon tip above the base (the renderings' "180 feet at its tallest point").</param>
+    /// <param name="tipAboveDeck">Wing tips above the walkway at the pylon. The article's "rise 180 feet at its tallest point" read as above the walkway:
+    /// the two-view fit (aerial + path view) gives the same fit quality for this reading and for a 180 ft wing length (the fitted wing is ~177 ft long),
+    /// and a worse one for 180 ft above the road in the cut.</param>
     public static CableStayedDefinition Osprey(string pylonSupport, double pylonStation, double baseElevation, double deckTopAboveBase,
-        double height = 54.864, bool mainSpanAhead = true)
+        double tipAboveDeck = 54.864, bool mainSpanAhead = true)
     {
         double sgn = mainSpanAhead ? 1 : -1;
         double deckTop = deckTopAboveBase;
@@ -43,44 +45,64 @@ public static class CableStayedConcepts
                 RingSpacing = Ft(5), BarrierHeight = Ft(4.5), BarrierThickness = In(1), BarrierInset = Ft(0.5), BarrierMaterial = "glass", BarrierDensity = 2500,
             },
         };
+        // Form per the user's elevation sketch (2026-10-26; the renderings are perspective views): TRANSVERSELY SYMMETRIC.
+        //  transverse elevation: two plumb columns just outside the deck edges, a cross beam ~26 ft above the walkway (the knee), wings splaying outward from
+        //  the knees;
+        //  side elevation: each column leans back from its footing on the main-span side up to the knee; from the knee the wing leans strongly forward over
+        //  the main span; a prop from the ground behind the knee crosses the column and supports the deck edge (the "X" below the walkway).
+        // Stays: a fan from each wing to its own deck edge over the main span, two back stays per wing.
         var py = d.Pylon;
         py.Support = pylonSupport;
         py.BaseElevation = baseElevation;
-        py.TrunkHeight = deckTop - Ft(20);
-        py.TrunkSection = new CsSection(Ft(14), Ft(8)) { Wall = In(1.25) };
-        py.FootingLength = Ft(30); py.FootingWidth = Ft(36); py.FootingThickness = Ft(6);
-        double lean = -sgn;   // the legs sweep back, away from the main span
-        var leg = new CsPylonLeg
-        {
-            Name = "Left wing",
-            Start = new CsXyz(0, -Ft(5), py.TrunkHeight),
-            Tip = new CsXyz(lean * Ft(50), -Ft(40), height),
-            StartLeanDeg = lean * 3, StartSplayDeg = -25, TipLeanDeg = lean * 20, TipSplayDeg = -12,
-            StartHandle = 0.35, TipHandle = 0.3,
-            Section = new CsSection(Ft(4), Ft(6), Ft(2), Ft(2.5), In(1.25)),
-            Segments = 40,
-        };
-        py.Legs.Add(leg);
-        py.Legs.Add(leg.Mirrored("Right wing"));
-        py.CrossBeams.Add(new CsCrossBeam { Name = "portal", LegA = 0, LegB = 1, Height = deckTop + Ft(13), Section = new CsSection(Ft(3), Ft(3)) { Wall = In(1) } });
-        d.Struts.Add(new CsStrut { Name = "prop", From = new CsXyz(0, Ft(2), py.TrunkHeight - Ft(4)), To = new CsXyz(sgn * Ft(2), Ft(32), 0),
-            Section = new CsSection(Ft(3), Ft(2.5), Ft(2), Ft(2)) { Wall = In(1) }, FootingLength = Ft(10), FootingWidth = Ft(10), FootingThickness = Ft(4) });
+        py.TrunkHeight = 0;
+        // Wings fitted to THREE renderings at once (near-plan aerial with its camera fitted to the OSM lines of 23rd St / UP / Carlson / BART = the scale,
+        // the earlier aerial and the view back along the path, both cameras solved with the shape; 14 px RMS): knee 54 ft above the walkway, upper cross
+        // beam 33 ft above it, tips 151 ft forward / 114 ft out from the CL at 420 ft above the walkway (the renderings are ~2.3 x the reported "180 ft");
+        // side view: lean 2 deg from vertical at the knee to 45 deg at the tip; transverse: splay 46 deg at the knee closing to 14 deg. The tip reach
+        // scales with the rise when tipAboveDeck changes.
+        double edge = Ft(8.5), colY = Ft(9.75), knee = deckTop + Ft(54);
+        double colFoot = sgn * Ft(41), footY = Ft(30), propFoot = -sgn * Ft(9), propTop = sgn * Ft(18);
+        double legLean = Math.Atan(Ft(41) / knee) * 180 / Math.PI;
+        double tipZ = deckTop + tipAboveDeck, sc = (tipZ - knee) / Ft(420.4 - 54);
+        foreach (double sy in new[] { -1.0, 1.0 })
+            py.Legs.Add(new CsPylonLeg
+            {
+                Name = sy < 0 ? "Left wing" : "Right wing", Start = new CsXyz(0, sy * colY, knee),
+                Tip = new CsXyz(sgn * Ft(151.1) * sc, sy * (colY + (Ft(113.8) - colY) * sc), tipZ),
+                StartLeanDeg = sgn * 2.3, StartSplayDeg = sy * 45.8, TipLeanDeg = sgn * 44.5, TipSplayDeg = sy * 14.1, StartHandle = 0.11, TipHandle = 0.68,
+                Section = new CsSection(Ft(6), Ft(6), Ft(2.5), Ft(3), In(1.5)), Segments = 48,
+            });
+        // lower legs (legs 2 / 3): from the feet, flared out transversely, curving in to the waist (plumb there) just outside the deck edge;
+        // in side view they lean back from the feet to the waist
+        foreach (double sy in new[] { -1.0, 1.0 })
+            py.Legs.Add(new CsPylonLeg
+            {
+                Name = sy < 0 ? "Left lower leg" : "Right lower leg", Start = new CsXyz(colFoot, sy * footY, 0), Tip = new CsXyz(0, sy * colY, knee),
+                StartLeanDeg = -sgn * legLean, StartSplayDeg = -sy * 40, TipLeanDeg = -sgn * legLean, TipSplayDeg = 0, StartHandle = 0.35, TipHandle = 0.45,
+                // blade: deep in side view at the foot (~9 ft), tapering to ~3.5 ft at the waist (user markup of the aerial rendering)
+                Section = new CsSection(Ft(4), Ft(9), Ft(3), Ft(3.5), In(1.25)), Segments = 24,
+            });
+        py.FootingLength = Ft(16); py.FootingWidth = Ft(2 * 30 + 16); py.FootingThickness = Ft(6); py.FootingX = colFoot;
+        foreach (double y in new[] { -colY, colY })
+            d.Struts.Add(new CsStrut { Name = (y < 0 ? "left" : "right") + " prop", From = new CsXyz(propTop, y, deckTop - Ft(3)), To = new CsXyz(propFoot, y, 0),
+                Section = new CsSection(Ft(2.5), Ft(3)) { Wall = In(1) }, FootingLength = Ft(10), FootingWidth = Ft(10), FootingThickness = Ft(4) });
+        py.CrossBeams.Add(new CsCrossBeam { Name = "strut", LegA = 2, LegB = 3, Height = deckTop + Ft(33), Section = new CsSection(Ft(3), Ft(3)) { Wall = In(1) } });
+        // deck beam under the walkway between the lower legs (the deck bears on it; user markup of the top view rendering)
+        py.CrossBeams.Add(new CsCrossBeam { Name = "deck beam", LegA = 2, LegB = 3, Height = deckTop - Ft(3) - Ft(1.5), Section = new CsSection(Ft(4), Ft(3)) { Wall = In(1) } });
 
-        double edge = Ft(8.5);
         for (int side = 0; side < 2; side++)
         {
             double off = side == 0 ? -edge : edge;
+            string n = side == 0 ? "left" : "right";
             d.Stays.Add(new CsStayGroup
             {
-                Name = side == 0 ? "front left" : "front right", Leg = side, Count = 10,
-                FirstStation = pylonStation + sgn * Ft(50), LastStation = pylonStation + sgn * Ft(350), DeckOffset = off, DeckAnchorHeight = -Ft(1),
-                PylonFrom = 0.45, PylonTo = 0.97, Diameter = In(3),
+                Name = n + " fan", Leg = side, Count = 12, FirstStation = pylonStation + sgn * Ft(40), LastStation = pylonStation + sgn * Ft(420),
+                DeckOffset = off, DeckAnchorHeight = -Ft(1), PylonFrom = 0.3, PylonTo = 1.0, Diameter = In(3),
             });
             d.Stays.Add(new CsStayGroup
             {
-                Name = side == 0 ? "back left" : "back right", Leg = side, Count = 4,
-                FirstStation = pylonStation - sgn * Ft(40), LastStation = pylonStation - sgn * Ft(130), DeckOffset = off, DeckAnchorHeight = -Ft(1),
-                PylonFrom = 0.55, PylonTo = 0.92, Diameter = In(3),
+                Name = n + " back stays", Leg = side, Count = 2, FirstStation = pylonStation - sgn * Ft(100), LastStation = pylonStation - sgn * Ft(200),
+                DeckOffset = off, DeckAnchorHeight = -Ft(1), PylonFrom = 0.9, PylonTo = 1.0, Diameter = In(3),
             });
         }
         d.Piers = new CsPierDefinition

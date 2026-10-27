@@ -42,20 +42,23 @@ public class CableStayedTests
         var m = doc.Model("CS");
         var cs = m.Steel!.CableStayed!;
         Assert.DoesNotContain(cs.Diagnostics, d => d.Severity == SBM.Core.Framing.DiagnosticSeverity.Error);
-        Assert.Equal(2, cs.Legs.Count);
+        Assert.Equal(4, cs.Legs.Count);                                         // two wings + two lower legs
         Assert.Equal(28, cs.Stays.Count);
         Assert.Equal(28, m.Steel.Parts.Count(p => p.Category == PartCategory.StayCable));
-        Assert.Equal(2, m.Steel.Parts.Count(p => p.Category == PartCategory.Pylon && p.Mark.StartsWith("PY-L")));
+        Assert.Equal(4, m.Steel.Parts.Count(p => p.Category == PartCategory.Pylon && p.Mark.StartsWith("PY-L")));
         Assert.All(m.Steel.Parts, p => Assert.True(p.Mesh.Volume() > 0, p.Mark));
-        // leg tips where the definition puts them: 180 ft above the base, swept back 50 ft (main span ahead = +X), +-40 ft across
+        // leg ends where the definition puts them (pylon frame -> world), wings mirrored
         var f = cs.PylonFrame;
-        foreach (var (leg, sy) in cs.Legs.Zip(new[] { -1.0, 1.0 }))
+        var def = doc.Project.Bridges.Single(b => b.Name == "CS").CableStayed!.Pylon.Legs;
+        for (int i = 0; i < cs.Legs.Count; i++)
         {
-            var tip = leg.Points[^1] - f.Origin;
-            Assert.Equal(Ft(180), tip.Z, 6);
-            Assert.Equal(-Ft(50), Vec3.Dot(tip, f.X), 6);
-            Assert.Equal(sy * Ft(40), Vec3.Dot(tip, f.Y), 6);
+            var tip = cs.Legs[i].Points[^1] - f.Origin;
+            Assert.Equal(def[i].Tip.Z, tip.Z, 6);
+            Assert.Equal(def[i].Tip.X, Vec3.Dot(tip, f.X), 6);
+            Assert.Equal(def[i].Tip.Y, Vec3.Dot(tip, f.Y), 6);
         }
+        Assert.Equal(-def[0].Tip.Y, def[1].Tip.Y, 9);
+        Assert.Equal(Ft(180), def[0].Tip.Z - (doc.Alignment("CL").Profile.ElevationAt(Ft(1000)) - Ft(26)), 6);   // 180 ft above the walkway
         // every stay's upper end lies on its leg's centerline, the lower end at the deck anchor
         foreach (var s in cs.Stays)
             Assert.True(cs.Legs[s.Leg].Points.Min(p => (p - s.Upper).Length) < 0.2, s.Name);
@@ -65,7 +68,7 @@ public class CableStayedTests
         var units = m.Substructure!.Units;
         Assert.Contains(units, u => u.Name == "P1" && u.Solids.Any(s => s.Kind == SBM.Core.Substructure.SubElementKind.Column));
         Assert.Contains(units, u => u.Name == "A1" && u.Solids.Any(s => s.Kind == SBM.Core.Substructure.SubElementKind.Cap));
-        Assert.Equal(2, units.Single(u => u.Name == "PY").Solids.Count(s => s.Kind == SBM.Core.Substructure.SubElementKind.Footing));
+        Assert.Equal(3, units.Single(u => u.Name == "PY").Solids.Count(s => s.Kind == SBM.Core.Substructure.SubElementKind.Footing));   // legs + two props
     }
 
     [Fact]
@@ -83,10 +86,6 @@ public class CableStayedTests
             Assert.True(sf.Total > sf.Dead);
         }
         Assert.Equal(0, r.BaseMomentTransDead, 0);                       // two mirrored legs
-        Assert.True(r.BaseMomentLongDead > 0);                            // the 10 front stays out-pull 4 back stays + the lean
-        // more back stays (same front stays) reduce the tipping toward the main span
-        var more = Doc(c => { foreach (var g in c.Stays.Where(g => g.Name.StartsWith("back"))) { g.Count = 8; g.LastStation = Ft(1000 - 190); } });
-        Assert.True(more.Model("CS").Steel!.CableStayed!.Forces.BaseMomentLongDead < r.BaseMomentLongDead);
         // the deck weight is the hollow section: thin wall x perimeter
         var o = cs.DeckSection;
         double per = Enumerable.Range(0, o.Count).Sum(i => (o[(i + 1) % o.Count] - o[i]).Length);

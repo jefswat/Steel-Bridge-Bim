@@ -154,6 +154,8 @@ public sealed class CsPylonDefinition
     public double FootingLength { get; set; }
     public double FootingWidth { get; set; }
     public double FootingThickness { get; set; }
+    /// <summary>Footing centre along the pylon frame x (feet of legs that lean in side view).</summary>
+    public double FootingX { get; set; }
     /// <summary>The deck bears on the pylon (vertical support at the pylon station in the analysis model and the force estimate).</summary>
     public bool DeckBearsOnPylon { get; set; } = true;
     public CsPylonDefinition Clone()

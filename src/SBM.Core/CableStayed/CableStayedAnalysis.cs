@@ -160,7 +160,19 @@ public static class CableStayedAnalysis
                 var w = Vec3.Cross(new Vec3(0, 0, 1), t); w = w.Length < 1e-6 ? pf.Y : w.Normalized();
                 Member($"{leg.Name} {k + 1}", "pylon", nodes[keysL[k]], nodes[keysL[k + 1]], RectProps(sec, um), e, rho, wAxis: w);
             }
-            if (trunkTop > 0) Member($"{leg.Name} root", "link", trunkTop, nodes[0], rigid, Es * 100, 0);
+        }
+        // leg roots: on another leg's end (a wing on its lower leg) -> link; on the ground -> fixed support; else to the trunk top / base
+        for (int li = 0; li < legNodes.Count; li++)
+        {
+            var start = an.Nodes[legNodes[li][0] - 1];
+            int other = -1; double bd = 1.5;
+            for (int lj = 0; lj < legNodes.Count; lj++)
+                if (lj != li)
+                    foreach (var id in new[] { legNodes[lj][0], legNodes[lj][1] })
+                    { double dd = (an.Nodes[id - 1].P - start.P).Length; if (dd < bd) { bd = dd; other = id; } }
+            if (other > 0) Member($"{m.Legs[li].Name} root", "link", other, start.Id, rigid, Es * 100, 0);
+            else if (start.P.Z - pf.Origin.Z < 0.5) an.Supports.Add(new CsSupport { Node = start.Id, Name = $"{m.Legs[li].Name} foot", Fixed = new[] { true, true, true, true, true, true } });
+            else if (trunkTop > 0) Member($"{m.Legs[li].Name} root", "link", trunkTop, start.Id, rigid, Es * 100, 0);
         }
         int cbi = 0;
         foreach (var cb in d.Pylon.CrossBeams)
@@ -189,6 +201,7 @@ public static class CableStayedAnalysis
             Member($"strut {si}", "strut", na, nb, RectProps(s.Section, 0.5), Es, ad.SteelDensity, wAxis: pf.Y);
             var low = a.Z <= b.Z ? na : nb;
             if (s.FootingThickness > 0) an.Supports.Add(new CsSupport { Node = low, Name = $"strut {si} footing", Fixed = new[] { true, true, true, false, false, false } });
+            else if (Math.Min(s.From.Z, s.To.Z) < 0.3) an.Supports.Add(new CsSupport { Node = low, Name = $"strut {si} base (pylon footing)", Fixed = new[] { true, true, true, true, true, true } });
         }
         // deck on the pylon
         var pylonSup = m.Supports.FirstOrDefault(x => x.Pylon);

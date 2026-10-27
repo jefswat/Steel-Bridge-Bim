@@ -6,15 +6,47 @@
   "Alignments": [
     {
       "Name": "CL Richmond Greenway Bridge (concept)",
-      "Description": "Richmond Greenway gap 23rd St / UP tracks / Carlson Blvd: straight line through the two OSM trail ends (concept; the renderings show curved ramps - set PIs here)",
+      "Description": "Richmond Greenway Bridge concept: Greenway trail line (OSM trail ends) to the pylon, then the S-curve read from the renderings (R 300 ft left, R 700 ft right; fitted to the near-plan aerial rendering)",
       "StartStation": 60.96000000000001,
       "StationEquations": [],
       "Elements": [
         {
           "X": 557042.0919106832,
           "Y": 4198429.526061405,
-          "Angle": -0.053425433705297114,
-          "Length": 640.1705734069609,
+          "Angle": -0.053425433704259874,
+          "Length": 259.7255482313286,
+          "K0": 0,
+          "K1": 0
+        },
+        {
+          "X": 557301.4468827461,
+          "Y": 4198415.656711373,
+          "Angle": -0.0534254337042952,
+          "Length": 16.948216546756463,
+          "K0": 0.010936132983377079,
+          "K1": 0.010936132983377079
+        },
+        {
+          "X": 557318.3578162736,
+          "Y": 4198416.320781869,
+          "Angle": 0.1319225162741711,
+          "Length": 28.70789484857066,
+          "K0": 0,
+          "K1": 0
+        },
+        {
+          "X": 557346.8162635639,
+          "Y": 4198420.097023977,
+          "Angle": 0.1319225162821053,
+          "Length": 120.73067922903468,
+          "K0": -0.004686914135733033,
+          "K1": -0.004686914135733033
+        },
+        {
+          "X": 557464.5870680067,
+          "Y": 4198402.176668626,
+          "Angle": -0.4339318108133631,
+          "Length": 233.42233824174104,
           "K0": 0,
           "K1": 0
         }
@@ -29,8 +61,22 @@
             "SpiralOut": 0
           },
           {
-            "Northing": 4198395.340938594,
-            "Easting": 557681.3490893168,
+            "Northing": 4198415.20289386,
+            "Easting": 557309.9332089317,
+            "Radius": 91.44,
+            "SpiralIn": 0,
+            "SpiralOut": 0
+          },
+          {
+            "Northing": 4198428.256375995,
+            "Easting": 557408.3066242639,
+            "Radius": 213.36,
+            "SpiralIn": 0,
+            "SpiralOut": 0
+          },
+          {
+            "Northing": 4198304.036241723,
+            "Easting": 557676.3757471129,
             "Radius": 0,
             "SpiralIn": 0,
             "SpiralOut": 0
@@ -52,8 +98,8 @@
             "LengthOut": 30.48
           },
           {
-            "Station": 701.1305734069609,
-            "Elevation": 5.100871329651959,
+            "Station": 720.4946770974315,
+            "Elevation": 4.132666145128432,
             "LengthIn": 0,
             "LengthOut": 0
           }
@@ -712,7 +758,7 @@
         {
           "Name": "Pylon",
           "Type": "Pier",
-          "Station": 323.78904,
+          "Station": 323.7060188803083,
           "SkewDegrees": 0,
           "DeckEndOffset": 0.45720000000000005,
           "GirderEndExtension": 0.2286,
@@ -869,7 +915,7 @@
         {
           "Name": "Pier E1",
           "Type": "Pier",
-          "Station": 445.61760000000004,
+          "Station": 461.77200000000005,
           "SkewDegrees": 0,
           "DeckEndOffset": 0.45720000000000005,
           "GirderEndExtension": 0.2286,
@@ -1026,7 +1072,7 @@
         {
           "Name": "Pier E2",
           "Type": "Pier",
-          "Station": 478.536,
+          "Station": 495.3,
           "SkewDegrees": 0,
           "DeckEndOffset": 0.45720000000000005,
           "GirderEndExtension": 0.2286,
@@ -1183,7 +1229,7 @@
         {
           "Name": "East abutment",
           "Type": "Abutment",
-          "Station": 510.54,
+          "Station": 527.304,
           "SkewDegrees": 0,
           "DeckEndOffset": 0.45720000000000005,
           "GirderEndExtension": 0.2286,
@@ -1660,13 +1706,13 @@
           "RotationDeg": 0,
           "OriginX": 0,
           "OriginY": 0,
-          "TrunkHeight": 6.207251999999997,
+          "TrunkHeight": 0,
           "TrunkSection": {
-            "Width": 4.2672,
-            "Depth": 2.4384,
+            "Width": 0,
+            "Depth": 0,
             "EndWidth": "NaN",
             "EndDepth": "NaN",
-            "Wall": 0.03175,
+            "Wall": 0,
             "Material": "Steel"
           },
           "TrunkTopX": 0,
@@ -1676,67 +1722,125 @@
               "Name": "Left wing",
               "Start": {
                 "X": 0,
-                "Y": -1.524,
-                "Z": 6.207251999999997
+                "Y": -2.9718,
+                "Z": 28.75830094401541
               },
               "Tip": {
-                "X": -15.24,
-                "Y": -12.192,
-                "Z": 54.864000000000004
+                "X": 46.005001310043674,
+                "Y": -34.651617248908295,
+                "Z": 140.31510094401543
               },
-              "StartLeanDeg": -3,
-              "StartSplayDeg": -25,
-              "TipLeanDeg": -20,
-              "TipSplayDeg": -12,
-              "StartHandle": 0.35,
-              "TipHandle": 0.3,
+              "StartLeanDeg": 2.3,
+              "StartSplayDeg": -45.8,
+              "TipLeanDeg": 44.5,
+              "TipSplayDeg": -14.1,
+              "StartHandle": 0.11,
+              "TipHandle": 0.68,
               "Straight": false,
               "Section": {
-                "Width": 1.2192,
+                "Width": 1.8288000000000002,
                 "Depth": 1.8288000000000002,
-                "EndWidth": 0.6096,
-                "EndDepth": 0.762,
-                "Wall": 0.03175,
+                "EndWidth": 0.762,
+                "EndDepth": 0.9144000000000001,
+                "Wall": 0.038099999999999995,
                 "Material": "Steel"
               },
-              "Segments": 40
+              "Segments": 48
             },
             {
               "Name": "Right wing",
               "Start": {
                 "X": 0,
-                "Y": 1.524,
-                "Z": 6.207251999999997
+                "Y": 2.9718,
+                "Z": 28.75830094401541
               },
               "Tip": {
-                "X": -15.24,
-                "Y": 12.192,
-                "Z": 54.864000000000004
+                "X": 46.005001310043674,
+                "Y": 34.651617248908295,
+                "Z": 140.31510094401543
               },
-              "StartLeanDeg": -3,
-              "StartSplayDeg": 25,
-              "TipLeanDeg": -20,
-              "TipSplayDeg": 12,
+              "StartLeanDeg": 2.3,
+              "StartSplayDeg": 45.8,
+              "TipLeanDeg": 44.5,
+              "TipSplayDeg": 14.1,
+              "StartHandle": 0.11,
+              "TipHandle": 0.68,
+              "Straight": false,
+              "Section": {
+                "Width": 1.8288000000000002,
+                "Depth": 1.8288000000000002,
+                "EndWidth": 0.762,
+                "EndDepth": 0.9144000000000001,
+                "Wall": 0.038099999999999995,
+                "Material": "Steel"
+              },
+              "Segments": 48
+            },
+            {
+              "Name": "Left lower leg",
+              "Start": {
+                "X": 12.4968,
+                "Y": -9.144,
+                "Z": 0
+              },
+              "Tip": {
+                "X": 0,
+                "Y": -2.9718,
+                "Z": 28.75830094401541
+              },
+              "StartLeanDeg": -23.487155505509758,
+              "StartSplayDeg": 40,
+              "TipLeanDeg": -23.487155505509758,
+              "TipSplayDeg": 0,
               "StartHandle": 0.35,
-              "TipHandle": 0.3,
+              "TipHandle": 0.45,
               "Straight": false,
               "Section": {
                 "Width": 1.2192,
-                "Depth": 1.8288000000000002,
-                "EndWidth": 0.6096,
-                "EndDepth": 0.762,
+                "Depth": 2.7432000000000003,
+                "EndWidth": 0.9144000000000001,
+                "EndDepth": 1.0668,
                 "Wall": 0.03175,
                 "Material": "Steel"
               },
-              "Segments": 40
+              "Segments": 24
+            },
+            {
+              "Name": "Right lower leg",
+              "Start": {
+                "X": 12.4968,
+                "Y": 9.144,
+                "Z": 0
+              },
+              "Tip": {
+                "X": 0,
+                "Y": 2.9718,
+                "Z": 28.75830094401541
+              },
+              "StartLeanDeg": -23.487155505509758,
+              "StartSplayDeg": -40,
+              "TipLeanDeg": -23.487155505509758,
+              "TipSplayDeg": 0,
+              "StartHandle": 0.35,
+              "TipHandle": 0.45,
+              "Straight": false,
+              "Section": {
+                "Width": 1.2192,
+                "Depth": 2.7432000000000003,
+                "EndWidth": 0.9144000000000001,
+                "EndDepth": 1.0668,
+                "Wall": 0.03175,
+                "Material": "Steel"
+              },
+              "Segments": 24
             }
           ],
           "CrossBeams": [
             {
-              "Name": "portal",
-              "LegA": 0,
-              "LegB": 1,
-              "Height": 16.265651999999996,
+              "Name": "strut",
+              "LegA": 2,
+              "LegB": 3,
+              "Height": 22.357500944015413,
               "Section": {
                 "Width": 0.9144000000000001,
                 "Depth": 0.9144000000000001,
@@ -1745,70 +1849,85 @@
                 "Wall": 0.0254,
                 "Material": "Steel"
               }
+            },
+            {
+              "Name": "deck beam",
+              "LegA": 2,
+              "LegB": 3,
+              "Height": 10.92750094401541,
+              "Section": {
+                "Width": 1.2192,
+                "Depth": 0.9144000000000001,
+                "EndWidth": "NaN",
+                "EndDepth": "NaN",
+                "Wall": 0.0254,
+                "Material": "Steel"
+              }
             }
           ],
-          "FootingLength": 9.144,
-          "FootingWidth": 10.972800000000001,
+          "FootingLength": 4.8768,
+          "FootingWidth": 23.1648,
           "FootingThickness": 1.8288000000000002,
+          "FootingX": 12.4968,
           "DeckBearsOnPylon": true
         },
         "Stays": [
           {
-            "Name": "front left",
+            "Name": "left fan",
             "Leg": 0,
-            "Count": 10,
-            "FirstStation": 339.02904,
-            "LastStation": 430.46904,
+            "Count": 12,
+            "FirstStation": 335.8980188803083,
+            "LastStation": 451.7220188803083,
             "DeckOffset": -2.5908,
             "DeckAnchorHeight": -0.3048,
             "GroundAnchors": [],
-            "PylonFrom": 0.45,
-            "PylonTo": 0.97,
+            "PylonFrom": 0.3,
+            "PylonTo": 1,
             "Diameter": 0.07619999999999999,
             "Area": 0,
             "Type": "parallel strand stay"
           },
           {
-            "Name": "back left",
+            "Name": "left back stays",
             "Leg": 0,
-            "Count": 4,
-            "FirstStation": 311.59704,
-            "LastStation": 284.16504,
+            "Count": 2,
+            "FirstStation": 293.2260188803083,
+            "LastStation": 262.7460188803083,
             "DeckOffset": -2.5908,
             "DeckAnchorHeight": -0.3048,
             "GroundAnchors": [],
-            "PylonFrom": 0.55,
-            "PylonTo": 0.92,
+            "PylonFrom": 0.9,
+            "PylonTo": 1,
             "Diameter": 0.07619999999999999,
             "Area": 0,
             "Type": "parallel strand stay"
           },
           {
-            "Name": "front right",
+            "Name": "right fan",
             "Leg": 1,
-            "Count": 10,
-            "FirstStation": 339.02904,
-            "LastStation": 430.46904,
+            "Count": 12,
+            "FirstStation": 335.8980188803083,
+            "LastStation": 451.7220188803083,
             "DeckOffset": 2.5908,
             "DeckAnchorHeight": -0.3048,
             "GroundAnchors": [],
-            "PylonFrom": 0.45,
-            "PylonTo": 0.97,
+            "PylonFrom": 0.3,
+            "PylonTo": 1,
             "Diameter": 0.07619999999999999,
             "Area": 0,
             "Type": "parallel strand stay"
           },
           {
-            "Name": "back right",
+            "Name": "right back stays",
             "Leg": 1,
-            "Count": 4,
-            "FirstStation": 311.59704,
-            "LastStation": 284.16504,
+            "Count": 2,
+            "FirstStation": 293.2260188803083,
+            "LastStation": 262.7460188803083,
             "DeckOffset": 2.5908,
             "DeckAnchorHeight": -0.3048,
             "GroundAnchors": [],
-            "PylonFrom": 0.55,
-            "PylonTo": 0.92,
+            "PylonFrom": 0.9,
+            "PylonTo": 1,
             "Diameter": 0.07619999999999999,
             "Area": 0,
             "Type": "parallel strand stay"
@@ -1816,22 +1935,46 @@
         ],
         "Struts": [
           {
-            "Name": "prop",
+            "Name": "left prop",
             "From": {
-              "X": 0,
-              "Y": 0.6096,
-              "Z": 4.988051999999997
+              "X": 5.486400000000001,
+              "Y": -2.9718,
+              "Z": 11.38470094401541
             },
             "To": {
-              "X": 0.6096,
-              "Y": 9.7536,
+              "X": -2.7432000000000003,
+              "Y": -2.9718,
               "Z": 0
             },
             "Section": {
-              "Width": 0.9144000000000001,
-              "Depth": 0.762,
-              "EndWidth": 0.6096,
-              "EndDepth": 0.6096,
+              "Width": 0.762,
+              "Depth": 0.9144000000000001,
+              "EndWidth": "NaN",
+              "EndDepth": "NaN",
+              "Wall": 0.0254,
+              "Material": "Steel"
+            },
+            "FootingLength": 3.048,
+            "FootingWidth": 3.048,
+            "FootingThickness": 1.2192
+          },
+          {
+            "Name": "right prop",
+            "From": {
+              "X": 5.486400000000001,
+              "Y": 2.9718,
+              "Z": 11.38470094401541
+            },
+            "To": {
+              "X": -2.7432000000000003,
+              "Y": 2.9718,
+              "Z": 0
+            },
+            "Section": {
+              "Width": 0.762,
+              "Depth": 0.9144000000000001,
+              "EndWidth": "NaN",
+              "EndDepth": "NaN",
               "Wall": 0.0254,
               "Material": "Steel"
             },
@@ -1849,7 +1992,7 @@
             "Pier W2": 11.20920288,
             "Pier W1": 11.64662136,
             "Pier E1": 12.4968,
-            "Pier E2": 13.225448784000001
+            "Pier E2": 13.471209024
           },
           "FootingLength": 3.6576000000000004,
           "FootingWidth": 3.6576000000000004,
@@ -1899,26 +2042,7 @@
       }
     }
   ],
-  "References": [
-    {
-      "Name": "3DEP DEM (auto, sbm pipeline)",
-      "Path": "C:\\SBM\\dist\\terrain\\richmond-greenway-bridge\\richmond-greenway-bridge-3dep.flt",
-      "Kind": "Terrain",
-      "Format": "Grid",
-      "Visible": true,
-      "R": 150,
-      "G": 140,
-      "B": 120,
-      "Opacity": 1,
-      "UnitScale": 1,
-      "OffsetX": 0,
-      "OffsetY": 0,
-      "OffsetZ": 0,
-      "ContourInterval": 0.6096,
-      "ImagePath": "",
-      "DisplayMaxVertices": 0
-    }
-  ],
+  "References": [],
   "Georeference": {
     "CrsName": "EPSG:26910",
     "Description": "NAD83 / UTM zone 10N (m); project X/Y = UTM metres",

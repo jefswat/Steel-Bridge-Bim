@@ -228,7 +228,7 @@ public sealed class CableStayedGenerator
         if (py.FootingLength > 0 && py.FootingWidth > 0 && py.FootingThickness > 0)
         {
             var fm = new Mesh();
-            MeshBuilder.AddBox(fm, _pf, -py.FootingLength / 2, py.FootingLength / 2, -py.FootingWidth / 2, py.FootingWidth / 2, -py.FootingThickness, 0);
+            MeshBuilder.AddBox(fm, _pf, py.FootingX - py.FootingLength / 2, py.FootingX + py.FootingLength / 2, -py.FootingWidth / 2, py.FootingWidth / 2, -py.FootingThickness, 0);
             _pylonConcrete.Add(new SubSolid(SubElementKind.Footing, $"{sl.Name} pylon footing", $"Pylon footing {L(py.FootingLength)} x {L(py.FootingWidth)} x {L(py.FootingThickness)}", fm) { Assumption = _flag });
         }
     }
